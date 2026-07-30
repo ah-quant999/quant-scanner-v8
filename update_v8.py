@@ -49,6 +49,7 @@ DATA_SOURCES = {
     "etf_subscription.json":       "ETF_SUBSCRIPTION",
     "w52_high.json":               "W52_HIGH",
     "limit_up_heatmap.json":       "LIMIT_UP_HEATMAP",
+    "limit_up_ladder.json":        "LIMIT_UP_LADDER",
     "herding_data.json":           "HERDING_DATA",
     "analyst_ratings.json":        "ANALYST_RATINGS",
     "suspension_alert.json":       "SUSPENSION_ALERT",

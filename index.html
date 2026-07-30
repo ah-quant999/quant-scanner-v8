@@ -122,6 +122,43 @@
   .lu-h4{background:rgba(198,40,40,.68);color:#fff;font-weight:700}
   .lu-h5{background:rgba(198,40,40,.88);color:#fff;font-weight:700}
 
+  /* ===== 涨停联动·连板强度（暗色主题） ===== */
+  .ladder-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;font-size:12px}
+  .ladder-sum-item{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:6px}
+  .ladder-sum-num{font-size:18px;font-weight:800;color:var(--up);line-height:1}
+  .ladder-sum-label{color:var(--dim);font-size:11px}
+  .ladder-mood{padding:5px 10px;border-radius:16px;font-size:11px;font-weight:700;background:rgba(244,73,93,.14);color:var(--up)}
+  .ladder-mood.hot{background:rgba(244,73,93,.2);color:#ff5252}
+  .ladder-mood.warm{background:rgba(251,191,36,.16);color:var(--gold)}
+  .ladder-mood.cool{background:rgba(56,189,248,.14);color:var(--cyan)}
+  .ladder-body{display:flex;flex-direction:column;gap:8px}
+  .ladder-row{display:flex;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px;align-items:stretch}
+  .ladder-rank{width:46px;flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(244,73,93,.22),rgba(244,73,93,.06));border-radius:8px;border:1px solid rgba(244,73,93,.35)}
+  .ladder-board-num{font-size:26px;font-weight:900;color:var(--up);line-height:1}
+  .ladder-board-label{font-size:11px;color:#ff8a80;font-weight:700}
+  .ladder-fire{font-size:10px;margin-top:3px;letter-spacing:-1px}
+  .ladder-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+  .ladder-row-header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .ladder-row-title{font-size:13px;font-weight:700;color:var(--txt)}
+  .ladder-row-meta{font-size:11px;color:var(--dim)}
+  .ladder-stocks{display:flex;flex-direction:column;gap:5px}
+  .ladder-stock{display:grid;grid-template-columns:minmax(72px,1fr) 54px 76px 70px 80px 36px;align-items:center;gap:6px;font-size:12px;padding:5px 0;border-bottom:1px dashed rgba(255,255,255,.06)}
+  .ladder-stock:last-child{border-bottom:0}
+  .ladder-name{font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ladder-code{font-size:10px;color:var(--dim);font-family:monospace}
+  .ladder-ind{font-size:10px;color:var(--sub);background:var(--card2);padding:1px 5px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ladder-seal{font-size:11px;color:var(--up);font-weight:600;text-align:right;white-space:nowrap}
+  .ladder-bar-wrap{height:6px;background:var(--card2);border-radius:3px;overflow:hidden}
+  .ladder-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#ff5252,var(--up))}
+  .ladder-score{font-size:12px;font-weight:800;color:var(--up);text-align:right}
+  .ladder-sector-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+  .ladder-sector-chip{font-size:10px;padding:2px 6px;border-radius:10px;background:rgba(56,189,248,.12);color:#7dd3fc}
+  @media(max-width:720px){
+    .ladder-stock{grid-template-columns:minmax(72px,1fr) 50px 60px 60px 50px 32px;font-size:11px}
+    .ladder-rank{width:40px}
+    .ladder-board-num{font-size:22px}
+  }
+
   /* ===== 板块资金三合一（v6 风格暗色移植） ===== */
   .sf-block{border-radius:12px;padding:14px 16px;margin-bottom:12px;border:1px solid var(--border)}
   .sf-block:last-child{margin-bottom:0}
@@ -398,6 +435,7 @@
 <script>window.EXPERIMENT = {};</script>
 <script>window.ETF_PULSE = {"update_time": "2026-07-30 16:52:27", "times": ["13:00", "13:05", "13:10", "13:15"], "etfs": [{"name": "创业板ETF", "code": "159915", "slices": [10945800145.88, 11279345692.53, 11701370793.88, 12070563118.4], "times": ["13:00", "13:05", "13:10", "13:15"], "read": "买力持续加码到13:15，缩量但价格守住(3.242)"}, {"name": "科创50ETF", "code": "588000", "slices": [9977692096.56, 10291925662.53, 10667085324.3, 10949451633.8], "times": ["13:00", "13:05", "13:10", "13:15"], "read": "同上，1.649拉升到1.657后横住"}, {"name": "沪深300ETF", "code": "510300", "slices": [3819577494.0, 3989312750.22, 4149918322.0, 4276921743.99], "times": ["13:00", "13:05", "13:10", "13:15"], "read": "同步"}, {"name": "中证500ETF", "code": "510500", "slices": [3935925531.71, 4167504951.1, 4436427343.28, 4611644203.98], "times": ["13:00", "13:05", "13:10", "13:15"], "read": "同步"}], "summary": "这是教科书式的护盘节奏——13:00~13:15连续加码拉升，13:20缩量但价格不回落，说明抛压被吸收干净了，不需要继续加码也能守住。这一波「一流」健康得多。"};</script>
 <script>window.ETF_DAILY_MONITOR = {"no_data": false, "update_time": "2026-07-30 18:06:16", "total_net_inflow": -2744093.34, "broad_net": -2118089.07, "sector_net": -545186.14, "cross_net": -80818.12, "top_inflow": [{"name": "红利ETF华泰柏瑞", "code": "510880", "net_inflow": 33430.79, "pct_chg": 1.19}, {"name": "港股通互联网ETF富国", "code": "159792", "net_inflow": 29249.11, "pct_chg": -0.64}, {"name": "红利低波ETF华泰柏瑞", "code": "512890", "net_inflow": 29004.51, "pct_chg": 1.68}, {"name": "港股低波红利ETF摩根", "code": "513630", "net_inflow": 18607.9, "pct_chg": 0.25}, {"name": "酒ETF鹏华", "code": "512690", "net_inflow": 14137.15, "pct_chg": 3.67}, {"name": "港股通非银ETF广发", "code": "513750", "net_inflow": 10521.23, "pct_chg": 0.84}, {"name": "华宝添益ETF", "code": "511990", "net_inflow": 9919.41, "pct_chg": 0.0}, {"name": "金融科技ETF广发", "code": "159086", "net_inflow": 6848.4, "pct_chg": 0.78}, {"name": "中证红利ETF招商", "code": "515080", "net_inflow": 6569.68, "pct_chg": 1.02}, {"name": "红利低波ETF易方达", "code": "563020", "net_inflow": 5648.81, "pct_chg": 1.53}], "top_outflow": [{"name": "创业板ETF易方达", "code": "159915", "net_outflow": 343375.28, "pct_chg": -3.88}, {"name": "科创50ETF华夏", "code": "588000", "net_outflow": 332268.8, "pct_chg": -6.02}, {"name": "沪深300ETF华泰柏瑞", "code": "510300", "net_outflow": 199395.6, "pct_chg": -1.12}, {"name": "科创半导体ETF华夏", "code": "588170", "net_outflow": 173743.84, "pct_chg": -8.37}, {"name": "A500ETF华泰柏瑞", "code": "563360", "net_outflow": 103303.96, "pct_chg": -1.65}, {"name": "创业板50ETF华安", "code": "159949", "net_outflow": 87036.83, "pct_chg": -4.24}, {"name": "科创50ETF易方达", "code": "588080", "net_outflow": 72507.84, "pct_chg": -6.04}, {"name": "科创芯片ETF嘉实", "code": "588200", "net_outflow": 71989.0, "pct_chg": -7.71}, {"name": "通信ETF国泰", "code": "515880", "net_outflow": 66366.17, "pct_chg": -7.81}, {"name": "中证1000ETF南方", "code": "512100", "net_outflow": 63698.39, "pct_chg": -2.78}], "source": "akshare fund_etf_spot_em · 主力净流入", "total_etfs": 1557};</script>
+<script>window.LIMIT_UP_LADDER = {"update_time":"2026-07-31 07:26:47","trade_date":"20260731","total":52,"max_board":8,"ladder":[{"board":8,"label":"8板","count":1,"stocks":[{"code":"603221","name":"爱丽家居","board":8,"industry":"家居用品","seal_amount":3.07,"seal_ratio":0.06,"amount":0.68,"turnover":1.37,"bomb_count":0,"first_seal_time":"092503","last_seal_time":"092503","pct_chg":9.98,"limit_stat":"8/8","strength":83.7}]},{"board":4,"label":"4板 × 2","count":2,"stocks":[{"code":"003032","name":"传智教育","board":4,"industry":"教育","seal_amount":1.08,"seal_ratio":0.05,"amount":1.97,"turnover":8.8,"bomb_count":0,"first_seal_time":"093009","last_seal_time":"093009","pct_chg":10.03,"limit_stat":"4/4","strength":67.3},{"code":"605068","name":"明新旭腾","board":4,"industry":"汽车零部","seal_amount":0.44,"seal_ratio":0.01,"amount":1.23,"turnover":3.67,"bomb_count":1,"first_seal_time":"093006","last_seal_time":"093015","pct_chg":9.99,"limit_stat":"4/4","strength":62.7}]},{"board":3,"label":"3板","count":1,"stocks":[{"code":"605179","name":"一鸣食品","board":3,"industry":"饮料乳品","seal_amount":1.59,"seal_ratio":0.02,"amount":0.49,"turnover":0.69,"bomb_count":0,"first_seal_time":"092501","last_seal_time":"092501","pct_chg":9.99,"limit_stat":"3/3","strength":55.3}]},{"board":2,"label":"2板 × 6","count":6,"stocks":[{"code":"600228","name":"返利科技","board":2,"industry":"数字媒体","seal_amount":0.63,"seal_ratio":0.02,"amount":1.72,"turnover":5.81,"bomb_count":0,"first_seal_time":"093702","last_seal_time":"093702","pct_chg":10.06,"limit_stat":"2/2","strength":56.2},{"code":"002882","name":"金龙羽","board":2,"industry":"电网设备","seal_amount":0.56,"seal_ratio":0.01,"amount":3.31,"turnover":6.29,"bomb_count":1,"first_seal_time":"093018","last_seal_time":"094100","pct_chg":10.03,"limit_stat":"2/2","strength":53.1},{"code":"605388","name":"均瑶健康","board":2,"industry":"饮料乳品","seal_amount":0.26,"seal_ratio":0.01,"amount":0.9,"turnover":2.47,"bomb_count":0,"first_seal_time":"093048","last_seal_time":"093048","pct_chg":10.07,"limit_stat":"2/2","strength":53.0},{"code":"603556","name":"海兴电力","board":2,"industry":"电网设备","seal_amount":1.0,"seal_ratio":0.01,"amount":6.54,"turnover":5.19,"bomb_count":0,"first_seal_time":"134907","last_seal_time":"134907","pct_chg":9.98,"limit_stat":"2/2","strength":52.8},{"code":"002827","name":"高争民爆","board":2,"industry":"化学制品","seal_amount":2.47,"seal_ratio":0.03,"amount":0.52,"turnover":0.6,"bomb_count":0,"first_seal_time":"092500","last_seal_time":"092500","pct_chg":10.0,"limit_stat":"2/2","strength":50.8},{"code":"601003","name":"柳钢股份","board":2,"industry":"普钢","seal_amount":0.42,"seal_ratio":0.0,"amount":1.55,"turnover":1.48,"bomb_count":0,"first_seal_time":"093329","last_seal_time":"093329","pct_chg":9.97,"limit_stat":"2/2","strength":50.5}]},{"board":1,"label":"首板 × 42","count":42,"stocks":[{"code":"000526","name":"学大教育","board":1,"industry":"教育","seal_amount":0.84,"seal_ratio":0.02,"amount":2.21,"turnover":5.13,"bomb_count":0,"first_seal_time":"094200","last_seal_time":"094200","pct_chg":9.99,"limit_stat":"1/1","strength":51.6},{"code":"301667","name":"纳百川","board":1,"industry":"汽车零部","seal_amount":0.74,"seal_ratio":0.05,"amount":2.54,"turnover":17.3,"bomb_count":0,"first_seal_time":"100557","last_seal_time":"100557","pct_chg":20.0,"limit_stat":"1/1","strength":51.0},{"code":"603352","name":"至信股份","board":1,"industry":"汽车零部","seal_amount":0.88,"seal_ratio":0.07,"amount":1.16,"turnover":9.7,"bomb_count":0,"first_seal_time":"102509","last_seal_time":"102509","pct_chg":10.0,"limit_stat":"1/1","strength":51.0},{"code":"600629","name":"华建集团","board":1,"industry":"工程咨询","seal_amount":0.67,"seal_ratio":0.0,"amount":5.25,"turnover":3.39,"bomb_count":0,"first_seal_time":"101932","last_seal_time":"101932","pct_chg":10.02,"limit_stat":"3/2","strength":50.6},{"code":"000721","name":"西安饮食","board":1,"industry":"酒店餐饮","seal_amount":0.45,"seal_ratio":0.01,"amount":1.93,"turnover":5.69,"bomb_count":0,"first_seal_time":"095309","last_seal_time":"095309","pct_chg":10.02,"limit_stat":"1/1","strength":50.4},{"code":"600162","name":"香江控股","board":1,"industry":"房地产开","seal_amount":0.33,"seal_ratio":0.0,"amount":3.32,"turnover":3.58,"bomb_count":0,"first_seal_time":"093423","last_seal_time":"093423","pct_chg":9.89,"limit_stat":"1/1","strength":50.1},{"code":"605033","name":"美邦股份","board":1,"industry":"农化制品","seal_amount":0.34,"seal_ratio":0.01,"amount":0.76,"turnover":3.11,"bomb_count":0,"first_seal_time":"094351","last_seal_time":"094351","pct_chg":10.0,"limit_stat":"1/1","strength":50.0},{"code":"001309","name":"德明利","board":1,"industry":"半导体","seal_amount":7.16,"seal_ratio":0.01,"amount":113.66,"turnover":18.57,"bomb_count":1,"first_seal_time":"132233","last_seal_time":"134430","pct_chg":10.0,"limit_stat":"1/1","strength":50.0},{"code":"001225","name":"和泰机电","board":1,"industry":"专用设备","seal_amount":0.47,"seal_ratio":0.05,"amount":0.78,"turnover":8.71,"bomb_count":0,"first_seal_time":"102833","last_seal_time":"102833","pct_chg":10.0,"limit_stat":"1/1","strength":49.9},{"code":"600418","name":"江淮汽车","board":1,"industry":"商用车","seal_amount":1.95,"seal_ratio":0.0,"amount":18.08,"turnover":3.52,"bomb_count":1,"first_seal_time":"095922","last_seal_time":"095958","pct_chg":10.01,"limit_stat":"1/1","strength":49.8},{"code":"000025","name":"特  力Ａ","board":1,"industry":"综合Ⅱ","seal_amount":0.51,"seal_ratio":0.01,"amount":2.23,"turnover":3.73,"bomb_count":0,"first_seal_time":"103718","last_seal_time":"103718","pct_chg":9.99,"limit_stat":"1/1","strength":49.8},{"code":"300996","name":"普联软件","board":1,"industry":"软件开发","seal_amount":0.25,"seal_ratio":0.0,"amount":7.05,"turnover":14.03,"bomb_count":0,"first_seal_time":"093333","last_seal_time":"093333","pct_chg":20.03,"limit_stat":"1/1","strength":49.7},{"code":"002702","name":"海欣食品","board":1,"industry":"食品加工","seal_amount":0.27,"seal_ratio":0.01,"amount":1.73,"turnover":7.85,"bomb_count":0,"first_seal_time":"093945","last_seal_time":"093945","pct_chg":10.02,"limit_stat":"1/1","strength":49.7},{"code":"603376","name":"大明电子","board":1,"industry":"汽车零部","seal_amount":0.32,"seal_ratio":0.04,"amount":0.77,"turnover":9.33,"bomb_count":0,"first_seal_time":"100434","last_seal_time":"100434","pct_chg":10.02,"limit_stat":"1/1","strength":49.6},{"code":"600702","name":"舍得酒业","board":1,"industry":"白酒Ⅱ","seal_amount":1.17,"seal_ratio":0.01,"amount":5.22,"turnover":4.28,"bomb_count":1,"first_seal_time":"094211","last_seal_time":"094541","pct_chg":10.01,"limit_stat":"1/1","strength":49.2},{"code":"000009","name":"中国宝安","board":1,"industry":"综合Ⅱ","seal_amount":1.11,"seal_ratio":0.01,"amount":3.9,"turnover":2.18,"bomb_count":0,"first_seal_time":"100415","last_seal_time":"100415","pct_chg":10.0,"limit_stat":"1/1","strength":49.0},{"code":"002703","name":"浙江世宝","board":1,"industry":"汽车零部","seal_amount":0.93,"seal_ratio":0.01,"amount":7.03,"turnover":8.37,"bomb_count":1,"first_seal_time":"093536","last_seal_time":"100127","pct_chg":10.02,"limit_stat":"1/1","strength":48.9},{"code":"603382","name":"海阳科技","board":1,"industry":"化学纤维","seal_amount":0.44,"seal_ratio":0.02,"amount":0.71,"turnover":3.42,"bomb_count":0,"first_seal_time":"112457","last_seal_time":"112457","pct_chg":9.99,"limit_stat":"1/1","strength":48.8},{"code":"603185","name":"弘元绿能","board":1,"industry":"光伏设备","seal_amount":1.06,"seal_ratio":0.01,"amount":2.72,"turnover":2.69,"bomb_count":1,"first_seal_time":"095906","last_seal_time":"095918","pct_chg":10.02,"limit_stat":"1/1","strength":47.7},{"code":"002846","name":"英联股份","board":1,"industry":"包装印刷","seal_amount":0.49,"seal_ratio":0.02,"amount":1.25,"turnover":4.57,"bomb_count":1,"first_seal_time":"095715","last_seal_time":"095733","pct_chg":10.04,"limit_stat":"1/1","strength":47.4},{"code":"002534","name":"西子洁能","board":1,"industry":"其他电源","seal_amount":0.7,"seal_ratio":0.01,"amount":3.13,"turnover":2.84,"bomb_count":0,"first_seal_time":"130906","last_seal_time":"130906","pct_chg":10.04,"limit_stat":"1/1","strength":47.3},{"code":"601616","name":"广电电气","board":1,"industry":"电网设备","seal_amount":0.3,"seal_ratio":0.01,"amount":2.04,"turnover":6.35,"bomb_count":1,"first_seal_time":"093154","last_seal_time":"134433","pct_chg":10.14,"limit_stat":"1/1","strength":47.0},{"code":"600712","name":"南宁百货","board":1,"industry":"一般零售","seal_amount":0.31,"seal_ratio":0.01,"amount":1.03,"turnover":3.72,"bomb_count":1,"first_seal_time":"093908","last_seal_time":"093947","pct_chg":10.06,"limit_stat":"1/1","strength":47.0},{"code":"603919","name":"金徽酒","board":1,"industry":"白酒Ⅱ","seal_amount":0.64,"seal_ratio":0.01,"amount":3.78,"turnover":4.56,"bomb_count":1,"first_seal_time":"111636","last_seal_time":"133337","pct_chg":10.03,"limit_stat":"1/1","strength":46.6},{"code":"002258","name":"利尔化学","board":1,"industry":"农化制品","seal_amount":0.94,"seal_ratio":0.01,"amount":5.93,"turnover":4.61,"bomb_count":2,"first_seal_time":"092500","last_seal_time":"095545","pct_chg":9.99,"limit_stat":"1/1","strength":46.5},{"code":"603348","name":"文灿股份","board":1,"industry":"汽车零部","seal_amount":0.39,"seal_ratio":0.01,"amount":0.84,"turnover":1.85,"bomb_count":0,"first_seal_time":"101559","last_seal_time":"101559","pct_chg":9.99,"limit_stat":"1/1","strength":46.0},{"code":"600513","name":"联环药业","board":1,"industry":"化学制药","seal_amount":0.58,"seal_ratio":0.01,"amount":5.26,"turnover":11.22,"bomb_count":2,"first_seal_time":"095503","last_seal_time":"100233","pct_chg":9.97,"limit_stat":"1/1","strength":45.7},{"code":"603660","name":"苏州科达","board":1,"industry":"计算机设","seal_amount":0.55,"seal_ratio":0.01,"amount":2.95,"turnover":5.97,"bomb_count":2,"first_seal_time":"093615","last_seal_time":"132536","pct_chg":9.96,"limit_stat":"4/2","strength":45.6},{"code":"603171","name":"税友股份","board":1,"industry":"IT服务Ⅱ","seal_amount":0.68,"seal_ratio":0.0,"amount":3.62,"turnover":2.2,"bomb_count":1,"first_seal_time":"094422","last_seal_time":"095325","pct_chg":10.0,"limit_stat":"1/1","strength":45.6},{"code":"301449","name":"天溯计量","board":1,"industry":"专业服务","seal_amount":0.32,"seal_ratio":0.04,"amount":1.81,"turnover":23.89,"bomb_count":0,"first_seal_time":"132051","last_seal_time":"132051","pct_chg":19.99,"limit_stat":"1/1","strength":45.6},{"code":"600475","name":"华光环能","board":1,"industry":"电力","seal_amount":0.57,"seal_ratio":0.0,"amount":3.39,"turnover":2.49,"bomb_count":0,"first_seal_time":"134617","last_seal_time":"134617","pct_chg":9.98,"limit_stat":"1/1","strength":45.2},{"code":"002686","name":"亿利达","board":1,"industry":"通用设备","seal_amount":0.41,"seal_ratio":0.01,"amount":1.19,"turnover":3.95,"bomb_count":2,"first_seal_time":"093030","last_seal_time":"093524","pct_chg":10.04,"limit_stat":"1/1","strength":45.1},{"code":"603137","name":"恒尚节能","board":1,"industry":"装修装饰","seal_amount":0.42,"seal_ratio":0.01,"amount":8.15,"turnover":17.3,"bomb_count":5,"first_seal_time":"093727","last_seal_time":"102533","pct_chg":9.99,"limit_stat":"23/12","strength":45.1},{"code":"300894","name":"火星人","board":1,"industry":"厨卫电器","seal_amount":0.19,"seal_ratio":0.01,"amount":2.19,"turnover":6.7,"bomb_count":1,"first_seal_time":"104712","last_seal_time":"131757","pct_chg":20.04,"limit_stat":"1/1","strength":44.9},{"code":"002585","name":"双星新材","board":1,"industry":"塑料","seal_amount":0.23,"seal_ratio":0.0,"amount":10.88,"turnover":14.46,"bomb_count":3,"first_seal_time":"093103","last_seal_time":"134336","pct_chg":10.04,"limit_stat":"1/1","strength":44.1},{"code":"301668","name":"昊创瑞通","board":1,"industry":"电网设备","seal_amount":0.32,"seal_ratio":0.04,"amount":2.01,"turnover":23.32,"bomb_count":2,"first_seal_time":"100024","last_seal_time":"100709","pct_chg":20.0,"limit_stat":"1/1","strength":44.0},{"code":"603039","name":"泛微网络","board":1,"industry":"软件开发","seal_amount":0.19,"seal_ratio":0.0,"amount":7.59,"turnover":7.52,"bomb_count":2,"first_seal_time":"130949","last_seal_time":"143113","pct_chg":9.99,"limit_stat":"1/1","strength":43.7},{"code":"603813","name":"原尚股份","board":1,"industry":"物流","seal_amount":0.58,"seal_ratio":0.02,"amount":0.33,"turnover":1.04,"bomb_count":0,"first_seal_time":"104359","last_seal_time":"104359","pct_chg":9.99,"limit_stat":"1/1","strength":43.4},{"code":"000566","name":"海南海药","board":1,"industry":"化学制药","seal_amount":0.23,"seal_ratio":0.0,"amount":21.27,"turnover":28.19,"bomb_count":8,"first_seal_time":"094609","last_seal_time":"145318","pct_chg":9.98,"limit_stat":"12/6","strength":42.4},{"code":"000820","name":"神雾节能","board":1,"industry":"环保设备","seal_amount":0.47,"seal_ratio":0.05,"amount":0.02,"turnover":0.23,"bomb_count":0,"first_seal_time":"092500","last_seal_time":"092500","pct_chg":9.97,"limit_stat":"1/1","strength":41.7},{"code":"600663","name":"陆家嘴","board":1,"industry":"房地产开","seal_amount":0.46,"seal_ratio":0.0,"amount":4.28,"turnover":1.69,"bomb_count":0,"first_seal_time":"143039","last_seal_time":"143039","pct_chg":9.96,"limit_stat":"1/1","strength":41.4},{"code":"920685","name":"新芝生物","board":1,"industry":"通用设备","seal_amount":0.03,"seal_ratio":0.0,"amount":1.46,"turnover":18.92,"bomb_count":5,"first_seal_time":"094810","last_seal_time":"141119","pct_chg":30.0,"limit_stat":"1/1","strength":40.4}]}],"sectors":[{"name":"汽车零部","count":6,"max_board":4,"total_seal":3.7,"strength":66.7,"lead_stocks":["明新旭腾","浙江世宝","大明电子"]},{"name":"家居用品","count":1,"max_board":8,"total_seal":3.07,"strength":42.1,"lead_stocks":["爱丽家居"]},{"name":"电网设备","count":4,"max_board":2,"total_seal":2.17,"strength":41.0,"lead_stocks":["金龙羽","广电电气","昊创瑞通"]},{"name":"教育","count":2,"max_board":4,"total_seal":1.92,"strength":40.6,"lead_stocks":["传智教育","学大教育"]},{"name":"饮料乳品","count":2,"max_board":3,"total_seal":1.85,"strength":34.5,"lead_stocks":["一鸣食品","均瑶健康"]},{"name":"化学制品","count":1,"max_board":2,"total_seal":2.47,"strength":23.4,"lead_stocks":["高争民爆"]},{"name":"白酒Ⅱ","count":2,"max_board":1,"total_seal":1.81,"strength":22.5,"lead_stocks":["舍得酒业","金徽酒"]},{"name":"综合Ⅱ","count":2,"max_board":1,"total_seal":1.62,"strength":22.2,"lead_stocks":["中国宝安","特  力Ａ"]},{"name":"农化制品","count":2,"max_board":1,"total_seal":1.27,"strength":21.6,"lead_stocks":["利尔化学","美邦股份"]},{"name":"半导体","count":1,"max_board":1,"total_seal":7.16,"strength":21.1,"lead_stocks":["德明利"]},{"name":"化学制药","count":2,"max_board":1,"total_seal":0.81,"strength":20.6,"lead_stocks":["海南海药","联环药业"]},{"name":"房地产开","count":2,"max_board":1,"total_seal":0.79,"strength":20.5,"lead_stocks":["香江控股","陆家嘴"]},{"name":"数字媒体","count":1,"max_board":2,"total_seal":0.63,"strength":20.1,"lead_stocks":["返利科技"]},{"name":"通用设备","count":2,"max_board":1,"total_seal":0.44,"strength":19.6,"lead_stocks":["亿利达","新芝生物"]},{"name":"软件开发","count":2,"max_board":1,"total_seal":0.43,"strength":19.6,"lead_stocks":["普联软件","泛微网络"]},{"name":"普钢","count":1,"max_board":2,"total_seal":0.42,"strength":19.5,"lead_stocks":["柳钢股份"]},{"name":"商用车","count":1,"max_board":1,"total_seal":1.95,"strength":16.7,"lead_stocks":["江淮汽车"]},{"name":"光伏设备","count":1,"max_board":1,"total_seal":1.06,"strength":15.1,"lead_stocks":["弘元绿能"]},{"name":"其他电源","count":1,"max_board":1,"total_seal":0.7,"strength":14.3,"lead_stocks":["西子洁能"]},{"name":"IT服务Ⅱ","count":1,"max_board":1,"total_seal":0.68,"strength":14.2,"lead_stocks":["税友股份"]},{"name":"工程咨询","count":1,"max_board":1,"total_seal":0.67,"strength":14.2,"lead_stocks":["华建集团"]},{"name":"物流","count":1,"max_board":1,"total_seal":0.58,"strength":14.0,"lead_stocks":["原尚股份"]},{"name":"电力","count":1,"max_board":1,"total_seal":0.57,"strength":14.0,"lead_stocks":["华光环能"]},{"name":"计算机设","count":1,"max_board":1,"total_seal":0.55,"strength":13.9,"lead_stocks":["苏州科达"]},{"name":"环保设备","count":1,"max_board":1,"total_seal":0.47,"strength":13.7,"lead_stocks":["神雾节能"]},{"name":"包装印刷","count":1,"max_board":1,"total_seal":0.49,"strength":13.7,"lead_stocks":["英联股份"]},{"name":"专用设备","count":1,"max_board":1,"total_seal":0.47,"strength":13.7,"lead_stocks":["和泰机电"]},{"name":"酒店餐饮","count":1,"max_board":1,"total_seal":0.45,"strength":13.6,"lead_stocks":["西安饮食"]},{"name":"化学纤维","count":1,"max_board":1,"total_seal":0.44,"strength":13.6,"lead_stocks":["海阳科技"]},{"name":"装修装饰","count":1,"max_board":1,"total_seal":0.42,"strength":13.5,"lead_stocks":["恒尚节能"]},{"name":"一般零售","count":1,"max_board":1,"total_seal":0.31,"strength":13.2,"lead_stocks":["南宁百货"]},{"name":"专业服务","count":1,"max_board":1,"total_seal":0.32,"strength":13.2,"lead_stocks":["天溯计量"]},{"name":"食品加工","count":1,"max_board":1,"total_seal":0.27,"strength":13.0,"lead_stocks":["海欣食品"]},{"name":"塑料","count":1,"max_board":1,"total_seal":0.23,"strength":12.9,"lead_stocks":["双星新材"]},{"name":"厨卫电器","count":1,"max_board":1,"total_seal":0.19,"strength":12.7,"lead_stocks":["火星人"]}],"summary":{"highest_board_label":"8板","top_sector":"汽车零部","top_sector_strength":66.7}};</script>
 </head>
 <body>
 
@@ -579,19 +617,11 @@
     </div>
 
     <div class="grid g-2" style="margin-bottom:16px">
-      <!-- 连板梯队 -->
+      <!-- 涨停联动·连板强度 -->
       <div class="card">
-        <h3><span class="ic">🔥</span>涨停联动 - 盘中实时 · <span class="fresh">更新于 今日 15:21</span></h3>
-        <table>
-          <thead><tr><th>连板梯队</th><th>核心股</th><th>题材</th><th>封单额</th></tr></thead>
-          <tbody>
-            <tr><td>5板</td><td>航天晨光</td><td>商业航天</td><td class="up">2.1亿</td></tr>
-            <tr><td>4板</td><td>腾达科技</td><td>机器人</td><td class="up">1.4亿</td></tr>
-            <tr><td>3板 × 2</td><td>寒武纪 / 中际旭创</td><td>AI芯片 / CPO</td><td class="up">3.8亿</td></tr>
-            <tr><td>2板 × 6</td><td>长电科技 等</td><td>半导体</td><td class="up">5.2亿</td></tr>
-            <tr><td>首板</td><td>62 家</td><td>多题材</td><td class="up">—</td></tr>
-          </tbody>
-        </table>
+        <h3><span class="ic">🔥</span>涨停联动·连板强度 - 盘中实时 · <span class="fresh" id="limitUpLadderTime">更新于 --</span></h3>
+        <div id="limitUpLadderSummary"></div>
+        <div id="limitUpLadderBody"><div class="ipo-empty">加载中…</div></div>
       </div>
 
       <!-- 涨停热力矩阵 -->
@@ -1916,6 +1946,92 @@ function renderLimitUpHeatmap(){
 
 (function(){
   function run(){ try{ renderLimitUpHeatmap(); }catch(e){ console.warn('涨停热力矩阵渲染失败',e); } }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', run);
+  else run();
+})();
+
+/* ===== 涨停联动·连板强度渲染 ===== */
+function renderLimitUpLadder(){
+  const data = window.LIMIT_UP_LADDER || null;
+  const body = document.getElementById('limitUpLadderBody');
+  const summary = document.getElementById('limitUpLadderSummary');
+  const timeEl = document.getElementById('limitUpLadderTime');
+  if(!body) return;
+  if(!data || !data.ladder || !data.ladder.length){
+    body.innerHTML = '<div class="ipo-empty">涨停池数据暂未接入</div>';
+    if(summary) summary.innerHTML = '';
+    return;
+  }
+
+  // 摘要条
+  const total = data.total || 0;
+  const maxBoard = data.max_board || 0;
+  const topSector = (data.sectors && data.sectors[0]) || {name:'-', strength:0};
+  let moodCls = 'cool', moodText = '情绪一般';
+  if(total >= 70 && maxBoard >= 5){ moodCls='hot'; moodText='情绪炽热'; }
+  else if(total >= 50 || maxBoard >= 5){ moodCls='warm'; moodText='情绪偏暖'; }
+  else if(total >= 30){ moodCls='warm'; moodText='情绪温和'; }
+
+  if(summary){
+    summary.innerHTML =
+      '<div class="ladder-sum-item"><span class="ladder-sum-num">'+total+'</span><span class="ladder-sum-label">今日涨停</span></div>'+
+      '<div class="ladder-sum-item"><span class="ladder-sum-num">'+maxBoard+'板</span><span class="ladder-sum-label">最高连板</span></div>'+
+      '<div class="ladder-sum-item"><span class="ladder-sum-num">'+topSector.name+'</span><span class="ladder-sum-label">最强板块·强度 '+topSector.strength+'</span></div>'+
+      '<div class="ladder-mood '+moodCls+'">'+moodText+'</div>';
+  }
+  if(timeEl && data.update_time) timeEl.textContent = '更新于 '+fmtDataTime(data.update_time);
+
+  // 梯队强度卡片
+  let h = '<div class="ladder-body">';
+  data.ladder.forEach(function(row){
+    const fireCount = Math.min(5, Math.max(1, row.board));
+    const fire = '🔥'.repeat(fireCount);
+    h += '<div class="ladder-row">';
+    h += '<div class="ladder-rank">'+
+         '<div class="ladder-board-num">'+row.board+'</div>'+
+         '<div class="ladder-board-label">板</div>'+
+         '<div class="ladder-fire">'+fire+'</div>'+
+         '</div>';
+    h += '<div class="ladder-main">';
+    h += '<div class="ladder-row-header">'+
+         '<span class="ladder-row-title">'+row.label+'</span>'+
+         '<span class="ladder-row-meta">平均强度 '+ (row.stocks.length ? (row.stocks.reduce(function(s,x){return s+x.strength;},0)/row.stocks.length).toFixed(1) : 0) +'</span>'+
+         '</div>';
+    h += '<div class="ladder-stocks">';
+    row.stocks.slice(0,5).forEach(function(s){
+      const barW = Math.min(100, Math.max(4, s.strength)) + '%';
+      h += '<div class="ladder-stock">'+
+           '<span class="ladder-name" title="'+s.name+'">'+s.name+'</span>'+
+           '<span class="ladder-code">'+s.code+'</span>'+
+           '<span class="ladder-ind" title="'+(s.industry||'')+'">'+(s.industry||'-')+'</span>'+
+           '<span class="ladder-seal">'+(s.seal_amount?s.seal_amount+'亿':'-')+'</span>'+
+           '<div class="ladder-bar-wrap"><div class="ladder-bar-fill" style="width:'+barW+'"></div></div>'+
+           '<span class="ladder-score">'+s.strength+'</span>'+
+           '</div>';
+    });
+    if(row.stocks.length > 5){
+      h += '<div class="ladder-row-meta" style="margin-top:4px">还有 '+(row.stocks.length-5)+' 只…</div>';
+    }
+    h += '</div></div></div>';
+  });
+  h += '</div>';
+
+  // 板块强度 TOP
+  if(data.sectors && data.sectors.length){
+    h += '<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">';
+    h += '<div style="font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:8px">🎯 涨停板块强度 TOP5</div>';
+    h += '<div class="ladder-sector-list">';
+    data.sectors.slice(0,5).forEach(function(sec){
+      h += '<span class="ladder-sector-chip">'+sec.name+' '+sec.count+'家·'+sec.strength+'</span>';
+    });
+    h += '</div></div>';
+  }
+
+  body.innerHTML = h;
+}
+
+(function(){
+  function run(){ try{ renderLimitUpLadder(); }catch(e){ console.warn('涨停联动渲染失败',e); } }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', run);
   else run();
 })();
