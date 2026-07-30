@@ -142,13 +142,13 @@ def build():
     if not RAW_DIR.exists():
         print(f"⚠️  raw_data/ 目录不存在（{RAW_DIR}）。")
         print("   请将数据源端生成的 *.json 放到 raw_data/，再运行本脚本。")
-        print("   当前 data/*.js 不会被修改。")
-        return 1
+        print("   当前 data/*.js 不会被修改（保持既有线上数据）。")
+        return 0
 
     files = [p for p in RAW_DIR.iterdir() if p.suffix == '.json']
     if not files:
-        print(f"⚠️  raw_data/ 为空，无数据可更新。")
-        return 1
+        print(f"⚠️  raw_data/ 为空，无数据可更新。保持既有 data/*.js 不变。")
+        return 0
 
     updated = 0
     skipped = 0
