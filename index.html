@@ -556,6 +556,18 @@
       </div>
       <div class="note">按成交额与主力净流入综合排序，四分类独立展示。涨跌幅·红涨绿跌。</div>
     </div>
+
+    <!-- ====== ETF 5分钟量能脉冲监测 ====== -->
+    <div class="card" style="margin-bottom:16px" id="etfPulseCard">
+      <h3><span class="ic">⚡</span>ETF 5分钟量能脉冲监测 · <span class="fresh" id="etfPulseTime">--</span> <span class="tag" style="font-size:11px">盘中 T+0 · 最近4个5min切片</span></h3>
+      <div id="etfPulseBody"><div class="note">正在加载量能数据...</div></div>
+    </div>
+
+    <!-- ====== 股票型ETF日监控（华宝风格） ====== -->
+    <div class="card" style="margin-bottom:16px" id="etfDailyCard">
+      <h3><span class="ic">📊</span>股票型ETF日监控 · <span class="fresh" id="etfDailyTime">--</span> <span class="tag" style="font-size:11px">T+1 盘后更新</span></h3>
+      <div id="etfDailyBody"><div class="note">正在加载日监控数据...</div></div>
+    </div>
   </section>
 
   <!-- ============ 盘后数据 ============ -->
@@ -1821,6 +1833,9 @@ function doQuery(){
       if(d['market_fund_flow.json'])safe(renderMff,d['market_fund_flow.json']);
       if(d['sector_fund_flow.json'])safe(renderSector,d['sector_fund_flow.json']);
       if(d['macro_data.json'])safe(renderMacro,d['macro_data.json']);
+      // ETF量能脉冲 + 日监控（实时数据板块）
+      safe(renderEtfPulse);
+      safe(renderEtfDaily);
     });
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initPostMarket);
@@ -2731,6 +2746,83 @@ function doQuery(){
       +'</div>';
   }
 
+  /* ===================== ETF 5分钟量能脉冲监测 ===================== */
+  function renderEtfPulse(){
+    var el=$('etfPulseBody');
+    if(!el) return;
+    var d=DATA.etf_pulse;
+    if(!d||!d.etfs){ el.innerHTML='<div class="note">量能脉冲数据暂不可用（非交易时段或数据源未更新）</div>'; return; }
+    var h='';
+    h+='<table style="width:100%;border-collapse:collapse;font-size:13px;">';
+    h+='<thead><tr style="color:var(--sub);border-bottom:2px solid var(--border);"><th style="padding:6px 8px;text-align:left;">ETF</th><th style="padding:6px 4px;text-align:center;" colspan="4">5min切片成交额（M）</th><th style="padding:6px 8px;text-align:left;min-width:180px;">判读</th></tr></thead>';
+    if(d.times&&d.times.length){
+      h+='<tr style="color:var(--dim);font-size:11px;"><td style="padding:2px 8px;"></td>';
+      d.times.forEach(function(t){ h+='<td style="padding:2px 4px;text-align:center;">'+t+'</td>'; });
+      h+='<td style="padding:2px 8px;"></td></tr>';
+    }
+    d.etfs.forEach(function(e){
+      var name=e.name, code=e.code, slices=e.slices||[], read=e.read||'—';
+      var maxV=0; slices.forEach(function(s){ if(s>maxV) maxV=s; });
+      h+='<tr style="border-top:1px solid rgba(255,255,255,.06);">';
+      h+='<td style="padding:6px 8px;font-weight:700;color:var(--fg);">'+name+'<span style="font-size:10px;color:var(--dim);margin-left:4px;">'+code+'</span></td>';
+      slices.forEach(function(s){
+        var v=s>0?(s/1e6).toFixed(0):'—';
+        var pct=maxV>0?(s/maxV*100):0;
+        var bg=s>0?'background:rgba('+(/买力|强|放量|加速|护盘|加码/.test(read)?'239,83,80':'38,166,154')+','+(0.08+pct*0.004)+')':'';
+        h+='<td style="padding:5px 4px;text-align:right;font-variant-numeric:tabular-nums;'+bg+'">'+v+'</td>';
+      });
+      for(var i=slices.length;i<4;i++) h+='<td style="padding:5px 4px;text-align:center;color:var(--dim);">—</td>';
+      var rc=/买力|强|放量|加速|护盘|加码/.test(read)?'color:var(--up)':(/缩量|弱|回落|衰减/.test(read)?'color:var(--down)':'color:var(--sub)');
+      h+='<td style="padding:6px 8px;font-size:12px;'+rc+'">'+read+'</td></tr>';
+    });
+    h+='</table>';
+    if(d.summary){
+      h+='<div style="margin-top:12px;padding:10px 12px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.15);border-radius:8px;font-size:12px;line-height:1.8;color:var(--cyan);">';
+      h+='<b>📝 判读：</b>'+d.summary+'</div>';
+    }
+    var tt=$('etfPulseTime');
+    if(tt&&d.update_time) tt.textContent=d.update_time;
+    el.innerHTML=h;
+  }
+
+  /* ===================== 股票型ETF日监控（华宝风格） ===================== */
+  function renderEtfDaily(){
+    var el=$('etfDailyBody');
+    if(!el) return;
+    var d=DATA.etf_daily;
+    if(!d){ el.innerHTML='<div class="note">日监控数据暂不可用（收盘后更新）</div>'; return; }
+    var h='';
+    // 概览卡片
+    h+='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;">';
+    var ov=[['📈 全市场净流入',d.total_net_inflow||0],['📊 宽基',d.broad_net||0],['🏭 行业/主题',d.sector_net||0],['🌐 跨境',d.cross_net||0]];
+    ov.forEach(function(o){
+      var v=o[1], cls=v>=0?'up':'down';
+      h+='<div style="flex:1;min-width:120px;padding:10px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;text-align:center;">';
+      h+='<div style="font-size:11px;color:var(--sub);">'+o[0]+'</div>';
+      h+='<div style="font-size:18px;font-weight:800;color:var(--'+cls+');margin:4px 0;">'+(v>0?'+':'')+v.toFixed(1)+'<small style="font-size:11px;"> 亿</small></div></div>';
+    });
+    h+='</div>';
+    // TOP10 流入
+    if(d.top_inflow&&d.top_inflow.length){
+      h+='<div style="margin-bottom:14px;"><b style="font-size:13px;color:var(--up);">▲ 单日净流入 TOP10</b>';
+      h+='<table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;"><thead><tr style="color:var(--sub);border-bottom:1px solid var(--border);"><th style="padding:4px 6px;">#</th><th style="padding:4px 6px;">名称</th><th style="padding:4px 6px;">代码</th><th style="padding:4px 6px;text-align:right;">净流入(亿)</th><th style="padding:4px 6px;text-align:right;">涨跌%</th></tr></thead><tbody>';
+      d.top_inflow.forEach(function(item,i){
+        h+='<tr style="border-top:1px solid rgba(255,255,255,.04);"><td style="padding:4px 6px;color:var(--dim);">'+(i+1)+'</td><td style="padding:4px 6px;font-weight:600;">'+item.name+'</td><td style="padding:4px 6px;color:var(--dim);">'+item.code+'</td><td style="padding:4px 6px;text-align:right;color:var(--up);font-weight:700;">+'+item.net_inflow.toFixed(1)+'</td><td style="padding:4px 6px;text-align:right;" class="'+(item.pct_chg>=0?'up':'down')+'">'+(item.pct_chg>=0?'+':'')+item.pct_chg.toFixed(2)+'%</td></tr>';
+      });h+='</tbody></table></div>';
+    }
+    // TOP10 流出
+    if(d.top_outflow&&d.top_outflow.length){
+      h+='<div><b style="font-size:13px;color:var(--down);">▼ 单日净流出 TOP10</b>';
+      h+='<table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;"><thead><tr style="color:var(--sub);border-bottom:1px solid var(--border);"><th style="padding:4px 6px;">#</th><th style="padding:4px 6px;">名称</th><th style="padding:4px 6px;">代码</th><th style="padding:4px 6px;text-align:right;">净流出(亿)</th><th style="padding:4px 6px;text-align:right;">涨跌%</th></tr></thead><tbody>';
+      d.top_outflow.forEach(function(item,i){
+        h+='<tr style="border-top:1px solid rgba(255,255,255,.04);"><td style="padding:4px 6px;color:var(--dim);">'+(i+1)+'</td><td style="padding:4px 6px;font-weight:600;">'+item.name+'</td><td style="padding:4px 6px;color:var(--dim);">'+item.code+'</td><td style="padding:4px 6px;text-align:right;color:var(--down);font-weight:700;">'+item.net_outflow.toFixed(1)+'</td><td style="padding:4px 6px;text-align:right;" class="'+(item.pct_chg>=0?'up':'down')+'">'+(item.pct_chg>=0?'+':'')+item.pct_chg.toFixed(2)+'%</td></tr>';
+      });h+='</tbody></table></div>';
+    }
+    var tt=$('etfDailyTime');
+    if(tt&&d.update_time) tt.textContent=d.update_time;
+    el.innerHTML=h;
+  }
+
   function renderUnlisted(){
     var el=$('unlistedPanel');
     if(!el) return;
@@ -3121,6 +3213,8 @@ function doQuery(){
     DATA.backtest_tdx = window.BACKTEST_TDX||null;
     DATA.cockpit_advice = window.COCKPIT_ADVICE||null;
     DATA.experiment = window.EXPERIMENT||{};
+    DATA.etf_pulse = window.ETF_PULSE||null;
+    DATA.etf_daily = window.ETF_DAILY_MONITOR||null;
     var safe=function(fn){try{fn();}catch(e){console.warn('运维子页渲染失败',e);}};
     safe(renderAllsite);
     safe(renderCockpit);
