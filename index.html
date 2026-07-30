@@ -2061,6 +2061,8 @@ function doQuery(){
 
   let stRendered={};
   function renderStTab(tab){
+    // 确保 op 标签的 DATA.*（驾驶舱/全站精选/逆势龙头读取的共享数据源）已从 window.X 填充
+    if(tab!=='tc'){ try{ if(window.__renderOps) window.__renderOps(); }catch(e){} }
     if(tab==='tc'){ initTriple(); }
     else if(tab==='cockpit'){ if(!stRendered.cockpit){ stRendered.cockpit=1; try{ window.renderCockpit('stCockpit'); }catch(e){console.warn('驾驶舱渲染失败',e);} } }
     else if(tab==='allsite'){ if(!stRendered.allsite){ stRendered.allsite=1; try{ window.renderAllsite('stAllsite'); }catch(e){console.warn('全站精选渲染失败',e);} } }
