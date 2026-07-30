@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""v8 部署脚本 — 推 v8/index.html 到 gh-pages 的 v8/ 子目录（不影响 v6 主站）"""
+"""v8 部署脚本 — 推 index.html 到 quant-scanner-v8 的 gh-pages 分支（独立仓库，不依赖 v6）"""
 
 import subprocess, sys, os, shutil, tempfile
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 V8_SRC = os.path.join(REPO, "v8", "dist", "index.html")
-GH_PAGES_URL = "https://github.com/ah-quant999/quant-scanner-v6.git"
+GH_PAGES_URL = "git@github.com:ah-quant999/quant-scanner-v8.git"
 
 def log(msg):
     print(f"  {msg}")
@@ -19,26 +19,25 @@ def run(cmd, cwd=None):
 def deploy():
     tmp = tempfile.mkdtemp(prefix="v8deploy_")
     try:
-        log("📥 克隆 gh-pages 分支...")
-        run(f"git clone -b gh-pages --depth=1 {GH_PAGES_URL} .", cwd=tmp)
+        log("📥 克隆 main 分支...")
+        run(f"git clone --depth=1 {GH_PAGES_URL} .", cwd=tmp)
 
-        target = os.path.join(tmp, "v8")
-        os.makedirs(target, exist_ok=True)
-
-        log(f"📄 复制 v8/index.html...")
-        shutil.copy2(V8_SRC, os.path.join(target, "index.html"))
+        log(f"📄 复制 index.html...")
+        shutil.copy2(V8_SRC, os.path.join(tmp, "index.html"))
 
         run("git add -A", cwd=tmp)
         st = run("git status --porcelain", cwd=tmp)
         if not st:
-            log("✅ v8 无变化，跳过部署")
+            log("✅ 无变化，跳过部署")
             return
 
-        run('git commit -m "deploy v8 $(date +\\%Y-\\%m-\\%d_\\%H:\\%M)"', cwd=tmp)
-        log("🚀 推送到 gh-pages...")
-        run(f"git push origin gh-pages", cwd=tmp)
+        run('git config user.email "2814546@qq.com"', cwd=tmp)
+        run('git config user.name "ah-quant999"', cwd=tmp)
+        run('git commit -m "deploy $(date +\\%Y-\\%m-\\%d_\\%H:\\%M)"', cwd=tmp)
+        log("🚀 推送到 main...")
+        run(f"git push origin main", cwd=tmp)
         log("✅ v8 部署成功！")
-        log(f"   🌐 https://ah-quant999.github.io/quant-scanner-v6/v8/")
+        log(f"   🌐 https://ah-quant999.github.io/quant-scanner-v8/")
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
