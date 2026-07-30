@@ -109,29 +109,44 @@
   .ad-bars{flex:1;display:flex;gap:2px;height:100%;align-items:center;position:relative}
   .ad-bars>div{height:100%;border-radius:2px}
 
-  /* 日历 */
+  /* ===== 完整周历（calendar.html 同源 · V8_CAL 数据） ===== */
+  .v8cal-week-label{font-size:13px;color:var(--sub);margin:16px 0 6px;padding-left:4px;font-weight:600}
+  .v8cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px}
+  .v8cal-head{font-size:12px;color:var(--sub);text-align:center;padding:8px 0;font-weight:700;background:var(--card);border-radius:4px}
+  .v8cal-day{background:var(--card);border:1px solid var(--border);border-radius:6px;min-height:80px;padding:8px;display:flex;flex-direction:column;gap:3px;position:relative}
+  .v8cal-day.today{border-color:var(--cyan);box-shadow:0 0 0 1px var(--cyan)}
+  .v8cal-day-num{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:4px}
+  .v8cal-day.dim{opacity:.4}
+  .v8cal-event{font-size:11px;line-height:1.4;padding:3px 6px;border-radius:3px;display:flex;align-items:center;gap:3px}
+  .v8cal-event .ck{font-size:10px;color:#0d6e2a;background:#a5d6a7;padding:0 3px;border-radius:2px;font-weight:700}
+  .v8cal-event.imp{background:rgba(198,40,40,.15);color:#ff8a80;border-left:3px solid #c62828}
+  .v8cal-event.cb{background:rgba(21,101,192,.15);color:#64b5f6;border-left:3px solid #1565c0}
+  .v8cal-event.data{background:rgba(245,127,23,.15);color:#ffb74d;border-left:3px solid #f57f17}
+  .v8cal-event.data2{background:rgba(67,160,71,.15);color:#81c784;border-left:3px solid #43a047}
+  .v8cal-event.fomc{background:rgba(156,39,176,.15);color:#ce93d8;border-left:3px solid #9c27b0}
+  .v8cal-event.us{background:rgba(66,165,245,.15);color:#90caf9;border-left:3px solid #42a5f5}
+  .v8cal-event.hk{background:rgba(239,83,80,.15);color:#ef9a9a;border-left:3px solid #ef5350}
+  .v8cal-event.tw{background:rgba(255,152,0,.15);color:#ffcc80;border-left:3px solid #ff9800}
+  .v8cal-event.a50{background:rgba(233,30,99,.15);color:#f48fb1;border-left:3px solid #e91e63}
+  .v8cal-event.ipo{background:rgba(103,52,183,.15);color:#b39ddb;border-left:3px solid #673ab7}
+  .v8cal-event.option{background:rgba(0,131,143,.15);color:#4dd0e1;border-left:3px solid #00838f}
+  .v8cal-event.future{background:rgba(29,111,66,.15);color:#81c784;border-left:3px solid #1d6f42}
+  .v8cal-event.appl{background:rgba(55,71,79,.15);color:#90a4ae;border-left:3px solid #37474f}
+  .v8cal-event.sg{background:rgba(142,36,170,.15);color:#ce93d8;border-left:3px solid #8e24aa}
+  .v8cal-event.kr{background:rgba(0,172,193,.15);color:#80deea;border-left:3px solid #00acc1}
+  .v8cal-legend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+  .v8cal-legend-item{border-radius:6px;padding:10px 12px 12px;font-size:12px;border-left:5px solid;backdrop-filter:blur(4px)}
+  .v8cal-legend-item .lt{font-weight:800;color:var(--txt);margin-bottom:4px;display:flex;align-items:center;gap:6px;font-size:13px}
+  .v8cal-legend-item .ld{color:var(--sub);line-height:1.55;font-size:11px;margin-bottom:6px}
+  .v8cal-legend-item .swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+  .v8cal-li{list-style:none;padding:0;margin:0;font-size:11px;color:var(--txt);line-height:1.7}
+  .v8cal-li li{padding-left:10px;position:relative}
+  .v8cal-li li::before{content:'·';position:absolute;left:2px;color:var(--dim);font-weight:700}
+  .v8cal-li.col2{column-count:2;column-gap:14px;margin-top:8px}
+  .v8cal-li.col2 li{break-inside:avoid}
+
+  /* 旧日历兼容（保留 modal 用） */
   .cal-month{font-size:16px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:10px}
-  .cal-week{font-size:12px;color:var(--dim);text-align:center;padding:6px 0;border-bottom:1px solid var(--border)}
-  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-  .cal-cell{background:var(--card);border:1px solid var(--border);border-radius:10px;min-height:96px;padding:8px 8px 6px;cursor:pointer;transition:.15s;display:flex;flex-direction:column;gap:4px}
-  .cal-cell:hover{border-color:var(--cyan);transform:translateY(-2px)}
-  .cal-cell.empty{background:transparent;border:0;cursor:default}
-  .cal-cell.empty:hover{transform:none}
-  .cal-d{font-size:13px;font-weight:700;color:var(--sub)}
-  .cal-cell.today{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
-  .ev{font-size:11px;line-height:1.35;display:flex;gap:4px;align-items:flex-start}
-  .ev .e{font-size:12px}
-  .ev .t{color:var(--txt);opacity:.9;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .cal-foot{margin-top:22px;border-top:1px solid var(--border);padding-top:16px}
-  .legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
-  .lg{border-radius:12px;padding:12px 14px;backdrop-filter:blur(4px)}
-  .lg .lh{display:flex;align-items:center;gap:8px;font-weight:800;font-size:13px;margin-bottom:6px}
-  .lg .sw{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
-  .lg .ld{font-size:11px;line-height:1.45;margin-bottom:8px;opacity:.85;color:var(--txt)}
-  .lg .li{list-style:none;padding:0;margin:0}
-  .lg .li.two-col{column-count:2;column-gap:14px}
-  .lg .li li{font-size:11px;line-height:1.55;padding:2px 0 2px 12px;position:relative;color:var(--txt)}
-  .lg .li li::before{content:'';position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;background:var(--bullet)}
 
   .mask{position:fixed;inset:0;background:rgba(4,8,16,.78);z-index:100;display:none;align-items:center;justify-content:center;padding:24px}
   .mask.show{display:flex}
@@ -284,6 +299,7 @@
 <script>window.CFFEX_HOLDINGS = {};</script>
 <script>window.IPO_DATA = {"update_time": "2026-07-29 10:54:06", "eligible_count": 3, "pre_listing_count": 6, "listed_count": 1, "tracking_count": 3, "summary": "3只待评估，6只待上市，今日1只上市，3只上市后表现强势。 📋 可转债4待申购", "stocks": [{"code": "920165", "name": "珈凯生物", "issue_price": 19.26, "issue_pe": 14.98, "industry_pe": 29.3, "pe_discount": 48.9, "board": "北交所", "apply_date": "20260729", "listing_date": "", "score": 63, "recommend": "谨慎参与", "tag_color": "#f57f17", "bg_color": "#fffde7", "arbitrage_score": 73, "fundamental_score": 48, "fundamentals": {"track_label": "传统/其他赛道", "main_business": "化妆品功效原料的研发、生产及销售", "industry": "", "over_subscription": null, "over_label": "募资待定", "pb": null, "pb_label": "PB待定", "profitable": false, "profit_label": "盈利待披露", "data_source": "发行披露(营收/毛利/研发需上市后F10补充)"}, "highlights": ["募资1亿"], "status": "applying"}, {"code": "301717", "name": "超纯应材", "issue_price": 0, "issue_pe": 60.01, "industry_pe": 70.6, "pe_discount": 15.0, "board": "科创板", "apply_date": "20260731", "listing_date": "", "score": 55, "recommend": "待定价", "tag_color": "#888", "bg_color": "#f5f5f5", "arbitrage_score": 47, "fundamental_score": 68, "fundamentals": {"track_label": "高景气赛道", "main_business": "专注于特殊涂层工艺及其关联技术和材料的国家级专精特新重点“小巨人”企业,主要面向芯片制造、精密光学等领域,提供经材料改性、精密表面加工、精密清洗和特殊涂层工艺后的精密零部件产品及服务", "industry": "", "over_subscription": 1.0, "over_label": "足额募资", "pb": null, "pb_label": "PB待定", "profitable": false, "profit_label": "盈利待披露", "data_source": "发行披露(营收/毛利/研发需上市后F10补充)"}, "highlights": ["高景气赛道", "募资11亿"], "status": "applying"}, {"code": "688828", "name": "国仪公司", "issue_price": 0, "issue_pe": 57.29, "industry_pe": 67.4, "pe_discount": 15.0, "board": "科创板", "apply_date": "20260731", "listing_date": "", "score": 55, "recommend": "待定价", "tag_color": "#888", "bg_color": "#f5f5f5", "arbitrage_score": 47, "fundamental_score": 68, "fundamentals": {"track_label": "高景气赛道", "main_business": "专注于高端科学仪器的研发,面向量子科技、材料科学、化学化工、生物医药、先进制造等多个领域,向全球范围内的高校及科研院所、企业提供科技前沿探索所需的高端科学仪器装备、以增强型量子传感器为代表的核心关键器件以及解决方案", "industry": "", "over_subscription": 1.0, "over_label": "足额募资", "pb": null, "pb_label": "PB待定", "profitable": false, "profit_label": "盈利待披露", "data_source": "发行披露(营收/毛利/研发需上市后F10补充)"}, "highlights": ["高景气赛道", "募资12亿"], "status": "applying"}, {"code": "301677", "name": "欣兴工具", "issue_price": 33.58, "issue_pe": 17.17, "industry_pe": 53.5, "pe_discount": 67.9, "board": "科创板", "apply_date": "20260720", "listing_date": "20260730", "score": 72, "recommend": "建议申购", "tag_color": "#e65100", "bg_color": "#fff3e0", "arbitrage_score": 81, "fundamental_score": 59, "fundamentals": {"track_label": "传统/其他赛道", "main_business": "孔加工刀具中钻削刀具产品的研发、生产和销售业务", "industry": "金属制品业", "over_subscription": 1.5, "over_label": "超募1.5倍", "pb": 1.8, "pb_label": "低PB1.8", "profitable": false, "profit_label": "盈利待披露", "data_source": "发行披露(营收/毛利/研发需上市后F10补充)"}, "highlights": ["预计07.30上市", "超募1.5倍", "募资8亿"], "status": "pre_listing"}, {"code": "603468", "name": "津富士达", "issue_price": 17.46, "issue_pe": 19.25, "industry_pe": 33.5, "pe_discount": 42.5, "board": "科创板", "apply_date": "20260724", "listing_date": "", "score": 69, "recommend": "建议申购", "tag_color": "#e65100", "bg_color": "#fff3e0", "arbitrage_score": 71, "fundamental_score": 65, "fundamentals": {"track_label": "高景气赛道", "main_business": "从事自行车、电助力自行车、共享单车等产品及其关键零部件的研发、设计、生产与销售业务", "industry": "铁路、船舶、航空航天和其他运输设备制造业", "over_subscription": 0.93, "over_label": "募资0.9倍计划", "pb": 2.26, "pb_label": "PB2.3", "profitable": false, "profit_label": "盈利待披露", "data_source": "发行披露(营收/毛利/研发需上市后F10补充)"}, "highlights": ["高景气赛道", "募资7亿"], "status": "pre_listing"}, {"code": "301707", "name": "展芯股份", "issue_price": 23.45, "issue_pe": 44.23, "industry_pe": 73.6, "pe_discount": 39.9, "board": "科创板", "apply_date": "20260727", "listing_date": "", "score": 67, "recommend": "建议申购", "tag_color": "#e65100", "bg_color": "#fff3e0", "arbitrage_score": 70, "fundamental_score": 62, "fundamentals": {"track_label": "高景气赛道", "main_business": "高可靠模拟芯片及微模块产品的研发设计、测试及销售", "industry": "计算机、通信和其他电子设备制造业", "over_subscription": 1.08, "over_label": "足额募资", "pb": 5.94, "pb_label": "高PB5.9", "profitable": false, "profit_label": "盈利待披露", "data_source": "发行披露(营收/毛利/研发需上市后F10补充)"}, "highlights": ["高景气赛道", "募资10亿"], "status": "pre_listing"}, {"code": "920038", "name": "森合高科", "issue_price": 29.06, "issue_pe": 11.49, "industry_pe": 29.6, "pe_discount": 61.2, "board": "北交所", "apply_date": "20260727", "listing_date": "", "score": 67, "recommend": "建议申购", "tag_color": "#e65100", "bg_color": "#fff3e0", "arbitrage_score": 80, "fundamental_score": 48, "fundamentals": {"track_label": "传统/其他赛道", "main_business": "环保型贵金属选矿剂的研发、生产及销售", "industry": "", "over_subscription": null, "over_label": "募资待定", "pb": null, "pb_label": "PB待定", "profitable": false, "profit_label": "盈利待披露", "data_source": "发行披露(营收/毛利/研发需上市后F10补充)"}, "highlights": ["募资6亿"], "status": "pre_listing"}, {"code": "001232", "name": "嘉立创", "issue_price": 84.46, "issue_pe": 38.19, "industry_pe": 73.6, "pe_discount": 48.1, "board": "科创板", "apply_date": "20260724", "listing_date": "", "score": 60, "recommend": "谨慎参与", "tag_color": "#f57f17", "bg_color": "#fffde7", "arbitrage_score": 59, "fundamental_score": 62, "fundamentals": {"track_label": "高景气赛道", "main_business": "(1)印制电路板业务,可满足客户“样板→小批量→中大批量”的PCB制造需求;(2)电子元器件业务,主要通过全品类现货模式满足客户样品、小批量电子元器件的采购需求;(3)电子装联业务,通过对工程管理及生产环节等流程的高效组织,公司能够快速响应样品、小批量客户的PCBA订单需求;(4)其他主营业务,包含EDA/CAM工业软件、激光钢网等电子产业配套服务和与电子产业链服务具有“客户同源”特点的3D打印、CNC制造、FA机械零部件商城等机械产业服务", "industry": "计算机、通信和其他电子设备制造业", "over_subscription": 1.12, "over_label": "足额募资", "pb": 5.58, "pb_label": "高PB5.6", "profitable": false, "profit_label": "盈利待披露", "data_source": "发行披露(营收/毛利/研发需上市后F10补充)"}, "highlights": ["高景气赛道", "募资47亿"], "status": "pre_listing"}, {"code": "920258", "name": "聚仁新材", "issue_price": 4.48, "issue_pe": 14.97, "industry_pe": 30.2, "pe_discount": 50.4, "board": "北交所", "apply_date": "20260722", "listing_date": "", "score": 59, "recommend": "谨慎参与", "tag_color": "#f57f17", "bg_color": "#fffde7", "arbitrage_score": 67, "fundamental_score": 48, "fundamentals": {"track_label": "传统/其他赛道", "main_business": "己内酯系列产品的研发、生产和销售", "industry": "", "over_subscription": null, "over_label": "募资待定", "pb": null, "pb_label": "PB待定", "profitable": false, "profit_label": "盈利待披露", "data_source": "发行披露(营收/毛利/研发需上市后F10补充)"}, "highlights": ["募资2亿"], "status": "pre_listing"}, {"code": "920065", "name": "N千岸", "issue_price": 24.3, "latest_price": 72.9, "open_price": 50.0, "change_pct": 200.0, "turnover": 74.64, "total_return": 200.0, "open_return": 105.76, "board": "北交所", "listing_date": "20260729", "score": 0, "recommend": "上市首日", "tag_color": "#1565c0", "bg_color": "#e3f2fd", "highlights": ["开盘涨105.76%"], "status": "listed_today"}, {"code": "688825", "name": "长鑫科技", "issue_price": 8.66, "latest_price": 48.61, "open_price": 46.5, "change_pct": 3.43, "turnover": 9.58, "total_return": 461.32, "open_return": 436.95, "board": "科创板", "listing_date": "20260727", "score": 0, "recommend": "🟡 表现良好，观望等回调", "tag_color": "#e65100", "bg_color": "#fff3e0", "highlights": [], "status": "tracking"}, {"code": "920238", "name": "长鹰硬科", "issue_price": 18.89, "latest_price": 69.35, "open_price": 69.0, "change_pct": -1.95, "turnover": 30.15, "total_return": 267.13, "open_return": 265.27, "board": "北交所", "listing_date": "20260724", "score": 0, "recommend": "🟠 温和上涨，可小仓位", "tag_color": "#f57f17", "bg_color": "#fffde7", "highlights": [], "status": "tracking"}, {"code": "920176", "name": "维琪科技", "issue_price": 22.16, "latest_price": 88.9, "open_price": 75.96, "change_pct": -18.07, "turnover": 69.7, "total_return": 301.17, "open_return": 242.78, "board": "北交所", "listing_date": "20260727", "score": 0, "recommend": "🟢 已破发或走弱，不建议追", "tag_color": "#2e7d32", "bg_color": "#e8f5e9", "highlights": [], "status": "tracking"}, {"type": "bond", "code": "113709", "name": "振26转债", "issue_price": 100.0, "transfer_price": 40.33, "bond_scale": 8.78, "stock_code": "", "apply_date": "20260730", "listing_date": "", "status": "applying", "market_code": "SH", "dec_sumfina": 8.78, "score": 61, "arbitrage_score": 65, "fundamental_score": 55, "recommend": "谨慎参与", "tag_color": "#f57f17", "bg_color": "#fffde7", "board": "可转债", "fundamentals": {"track": "可转债", "scale": 8.78, "transfer_price": 40.33, "bond_safety": "高"}, "highlights": ["转股价 ¥40.33", "规模 8.8亿", "债底安全 高"]}, {"type": "bond", "code": "123278", "name": "合金转债", "issue_price": 100.0, "transfer_price": 13.98, "bond_scale": 5.45, "stock_code": "", "apply_date": "20260730", "listing_date": "", "status": "applying", "market_code": "SZ", "dec_sumfina": 5.45, "score": 61, "arbitrage_score": 65, "fundamental_score": 55, "recommend": "谨慎参与", "tag_color": "#f57f17", "bg_color": "#fffde7", "board": "可转债", "fundamentals": {"track": "可转债", "scale": 5.45, "transfer_price": 13.98, "bond_safety": "高"}, "highlights": ["转股价 ¥13.98", "规模 5.5亿", "债底安全 高"]}, {"type": "bond", "code": "118075", "name": "奥普转债", "issue_price": 100.0, "transfer_price": 150.03, "bond_scale": 12.7, "stock_code": "", "apply_date": "20260729", "listing_date": "", "status": "applying", "market_code": "SH", "dec_sumfina": 12.7, "score": 56, "arbitrage_score": 60, "fundamental_score": 50, "recommend": "谨慎参与", "tag_color": "#f57f17", "bg_color": "#fffde7", "board": "可转债", "fundamentals": {"track": "可转债", "scale": 12.7, "transfer_price": 150.03, "bond_safety": "中"}, "highlights": ["转股价 ¥150.03", "规模 12.7亿", "债底安全 中"]}, {"type": "bond", "code": "123277", "name": "玉禾转债", "issue_price": 100.0, "transfer_price": 16.35, "bond_scale": 15.0, "stock_code": "", "apply_date": "20260729", "listing_date": "", "status": "applying", "market_code": "SZ", "dec_sumfina": 15.0, "score": 66, "arbitrage_score": 70, "fundamental_score": 60, "recommend": "谨慎参与", "tag_color": "#f57f17", "bg_color": "#fffde7", "board": "可转债", "fundamentals": {"track": "可转债", "scale": 15.0, "transfer_price": 16.35, "bond_safety": "高"}, "highlights": ["转股价 ¥16.35", "规模 15.0亿", "债底安全 高"]}, {"type": "bond", "code": "118074", "name": "特宝转债", "issue_price": 100.0, "transfer_price": 58.56, "bond_scale": 15.33, "stock_code": "", "apply_date": "20260728", "listing_date": "", "status": "pre_listing", "market_code": "SH", "dec_sumfina": 15.33266, "score": 63, "arbitrage_score": 65, "fundamental_score": 60, "recommend": "谨慎参与", "tag_color": "#f57f17", "bg_color": "#fffde7", "board": "可转债", "fundamentals": {"track": "可转债", "scale": 15.33, "transfer_price": 58.56, "bond_safety": "高"}, "highlights": ["转股价 ¥58.56", "规模 15.3亿", "债底安全 高"]}, {"type": "bond", "code": "127115", "name": "炬申转债", "issue_price": 100.0, "transfer_price": 13.76, "bond_scale": 3.8, "stock_code": "", "apply_date": "20260724", "listing_date": "", "status": "pre_listing", "market_code": "SZ", "dec_sumfina": 3.8, "score": 54, "arbitrage_score": 60, "fundamental_score": 45, "recommend": "不建议申购", "tag_color": "#c62828", "bg_color": "#ffebee", "board": "可转债", "fundamentals": {"track": "可转债", "scale": 3.8, "transfer_price": 13.76, "bond_safety": "中"}, "highlights": ["转股价 ¥13.76", "规模 3.8亿", "债底安全 中"]}, {"type": "bond", "code": "110103", "name": "申能转债", "issue_price": 100.0, "transfer_price": 8.74, "bond_scale": 20.0, "stock_code": "", "apply_date": "20260724", "listing_date": "", "status": "pre_listing", "market_code": "SH", "dec_sumfina": 20.0, "score": 71, "arbitrage_score": 75, "fundamental_score": 65, "recommend": "建议申购", "tag_color": "#0d7d4a", "bg_color": "#e8f5e9", "board": "可转债", "fundamentals": {"track": "可转债", "scale": 20.0, "transfer_price": 8.74, "bond_safety": "高"}, "highlights": ["转股价 ¥8.74", "规模 20.0亿", "债底安全 高"]}, {"type": "bond", "code": "113707", "name": "科博转债", "issue_price": 100.0, "transfer_price": 45.56, "bond_scale": 14.91, "stock_code": "", "apply_date": "20260703", "listing_date": "20260731", "status": "pre_listing", "market_code": "SH", "dec_sumfina": 14.9074, "score": 66, "arbitrage_score": 70, "fundamental_score": 60, "recommend": "谨慎参与", "tag_color": "#f57f17", "bg_color": "#fffde7", "board": "可转债", "fundamentals": {"track": "可转债", "scale": 14.91, "transfer_price": 45.56, "bond_safety": "高"}, "highlights": ["转股价 ¥45.56", "规模 14.9亿", "债底安全 高"]}, {"type": "bond", "code": "123275", "name": "肇民转债", "issue_price": 100.0, "transfer_price": 33.8, "bond_scale": 5.9, "stock_code": "", "apply_date": "20260709", "listing_date": "20260724", "status": "tracking", "market_code": "SZ", "dec_sumfina": 5.9, "latest": 1613.99, "open_price": 1631.0, "change_pct": -0.06, "turnover": 37.61, "total_return": 1514.0, "open_return": 1531.0, "score": 66, "arbitrage_score": 80, "fundamental_score": 45, "recommend": "🟠 温和上涨，可小仓位", "tag_color": "#f57f17", "bg_color": "#fffde7", "fundamentals": {"track": "可转债", "total_return": 1514.0, "turnover": 37.61}, "highlights": ["较发行 +1514.0%", "现价 ¥1613.99", "🟠 温和上涨，可小仓位"]}]};</script>
 <script>window.CRISIS_DATA = {"update_time": "2026-07-30 08:33:27", "indicators": {"shibor_on": {"name": "SHIBOR隔夜", "cat": "货币", "dim": "流动性", "freq": "日频", "unit": "%", "dir": "high_bad", "value": 1.415, "date": "2026-07-28", "percentile": 86.5, "trend": "up", "score": 86.5, "level": 2, "hist_n": 260}, "margin_balance": {"name": "两融余额", "cat": "货币", "dim": "流动性", "freq": "日频", "unit": "万亿", "dir": "high_bad", "value": 1.3783, "date": "2026-07-27", "percentile": 76.5, "trend": "flat", "score": 76.5, "level": 2, "hist_n": 260}, "m2_yoy": {"name": "M2同比", "cat": "货币", "dim": "流动性", "freq": "月频", "unit": "%", "dir": "low_bad", "value": 8.0, "date": "2026-06-01", "percentile": 54.2, "trend": "down", "score": 45.8, "level": 1, "hist_n": 24}, "term_spread": {"name": "期限利差10Y-2Y", "cat": "货币", "dim": "利率", "freq": "日频", "unit": "%", "dir": "low_bad", "value": 0.466, "date": "2026-07-28", "percentile": 63.5, "trend": "down", "score": 36.5, "level": 0, "hist_n": 260}, "cn_us_spread": {"name": "中美利差10Y", "cat": "货币", "dim": "利率", "freq": "日频", "unit": "%", "dir": "low_bad", "value": -2.916, "date": "2026-07-27", "percentile": 1.9, "trend": "down", "score": 98.1, "level": 2, "hist_n": 260}, "lpr_5y": {"name": "LPR 5年", "cat": "货币", "dim": "利率", "freq": "月频", "unit": "%", "dir": "low_bad", "value": 3.5, "date": "2026-07-20", "percentile": 62.5, "trend": "flat", "score": 37.5, "level": 0, "hist_n": 24}, "pmi": {"name": "制造业PMI", "cat": "经济", "dim": "经济", "freq": "月频", "unit": "", "dir": "low_bad", "value": 50.3, "date": "2026-06-01", "percentile": 91.7, "trend": "up", "score": 8.3, "level": 0, "hist_n": 24}, "social_fin_yoy": {"name": "社融增量·滚动同比", "cat": "经济", "dim": "经济", "freq": "月频", "unit": "%", "dir": "low_bad", "value": -3.2, "date": "2026-04-01", "percentile": 25.0, "trend": "down", "score": 75.0, "level": 2, "hist_n": 24}, "export_yoy": {"name": "出口同比", "cat": "经济", "dim": "经济", "freq": "月频", "unit": "%", "dir": "low_bad", "value": 27.0, "date": "2026-06-01", "percentile": 95.8, "trend": "up", "score": 4.2, "level": 0, "hist_n": 24}, "cpi_yoy": {"name": "CPI同比", "cat": "经济", "dim": "经济", "freq": "月频", "unit": "%", "dir": "low_bad", "value": 1.0, "date": "2026-06-01", "percentile": 87.5, "trend": "down", "score": 12.5, "level": 0, "hist_n": 24}, "house_price_2h": {"name": "70城二手房价环比", "cat": "经济", "dim": "房地产", "freq": "月频", "unit": "%", "dir": "low_bad", "value": 0.25, "date": "2026-06-01", "percentile": 70.8, "trend": "down", "score": 29.2, "level": 0, "hist_n": 24}, "vix": {"name": "VIX恐慌指数", "cat": "全球", "dim": "全球", "freq": "日频", "unit": "", "dir": "high_bad", "value": 18.95, "date": "2026-07-28", "percentile": 55.4, "trend": "up", "score": 55.4, "level": 1, "hist_n": 260}, "dxy": {"name": "美元指数DXY", "cat": "全球", "dim": "全球", "freq": "日频", "unit": "", "dir": "high_bad", "value": 101.54, "date": "2026-07-28", "percentile": null, "trend": "up", "score": 34.55000000000005, "level": 0, "hist_n": 12}, "copper_gold": {"name": "铜金比", "cat": "全球", "dim": "全球", "freq": "日频", "unit": "", "dir": "low_bad", "value": 3.408, "date": "2026-07-28", "percentile": 93.8, "trend": "down", "score": 6.2, "level": 0, "hist_n": 260}, "bdi": {"name": "BDI波罗的海", "cat": "全球", "dim": "全球", "freq": "日频", "unit": "", "dir": "low_bad", "value": 2664.0, "date": "2026-07-28", "percentile": 76.2, "trend": "flat", "score": 23.8, "level": 0, "hist_n": 260}, "oil_wti": {"name": "WTI原油", "cat": "全球", "dim": "全球", "freq": "日频", "unit": "$", "dir": "low_bad", "value": 80.89, "date": "2026-07-28", "percentile": 70.0, "trend": "down", "score": 30.0, "level": 0, "hist_n": 260}, "usdcnh": {"name": "离岸人民币", "cat": "全球", "dim": "汇率", "freq": "日频", "unit": "", "dir": "high_bad", "value": 6.7654, "date": "2026-07-28", "percentile": null, "trend": "flat", "score": 5, "level": 0, "hist_n": 12}, "us_2s10s": {"name": "美债10Y-2Y倒挂", "cat": "全球", "dim": "全球", "freq": "日频", "unit": "%", "dir": "low_bad", "value": 0.34, "date": "2026-07-27", "percentile": 4.6, "trend": "down", "score": 95.4, "level": 2, "hist_n": 260}, "us_2y": {"name": "美债2Y收益率", "cat": "全球", "dim": "全球", "freq": "日频", "unit": "%", "dir": "high_bad", "value": 4.31, "date": "2026-07-27", "percentile": 99.2, "trend": "up", "score": 99.2, "level": 2, "hist_n": 260}}, "updated_at": "2026-07-30 08:33:27"};</script>
+<script>window.V8_CAL = {"month": "2026年7月", "update_time": "2026-07-30 08:59", "legend": [{"title": "重要政策", "color": "#c62828", "desc": "中国政府/监管机构发布的重大政策、法规、规划等"}, {"title": "央行/LPR", "color": "#1565c0", "desc": "央行货币政策、利率决议、LPR报价等"}, {"title": "中国数据", "color": "#f57f17", "desc": "国家统计局/央行发布的宏观经济数据"}, {"title": "财报截止", "color": "#673ab7", "desc": "A股财报披露法定截止日"}, {"title": "期权交割", "color": "#00838f", "desc": "各交易所期权合约到期日"}, {"title": "期货交割", "color": "#1d6f42", "desc": "期货合约最后交易日"}, {"title": "A50交割", "color": "#e91e63", "desc": "新加坡富时A50期货交割日，外资对冲A股关键窗口"}, {"title": "港股休市", "color": "#ef5350", "desc": "香港交易所休市日"}, {"title": "台股财报", "color": "#ff9800", "desc": "台股关注股票"}, {"title": "苹果/华为", "color": "#37474f", "desc": "两大科技巨头新品发布/重要财报"}, {"title": "FOMC", "color": "#9c27b0", "desc": "美联储货币政策会议"}, {"title": "美股休市", "color": "#42a5f5", "desc": "NYSE/Nasdaq休市日"}, {"title": "美股财报", "color": "#66bb6a", "desc": "美股关注股票"}, {"title": "欧股财报", "color": "#26a69a", "desc": "欧股关注股票"}, {"title": "日股财报", "color": "#ab47bc", "desc": "日股关注股票"}, {"title": "韩股财报", "color": "#00acc1", "desc": "韩股关注股票"}, {"title": "SG公假", "color": "#8e24aa", "desc": "新加坡公共假期"}, {"title": "财新PMI", "color": "#5c6bc0", "desc": "财新PMI月度数据"}], "weeks": [{"no": "1", "dates": "6/29-7/5", "days": [{"num": 29, "dim": true, "events": []}, {"num": 30, "dim": true, "events": [{"text": "🇭🇰 港股休市", "cls": "hk", "released": false}]}, {"num": 1, "events": [{"text": "🇭🇰 港股休市", "cls": "hk", "released": false}, {"text": "🇨🇳 6月财新制造业PMI", "cls": "future", "released": true}, {"text": "🇨🇳 《社会救助法》等新规实施", "cls": "imp", "released": false}]}, {"num": 2, "events": []}, {"num": 3, "events": [{"text": "🇺🇸 美股休市（独立日补假）", "cls": "us", "released": false}]}, {"num": 4, "events": []}, {"num": 5, "events": []}]}, {"no": "2", "dates": "7/6-7/12", "days": [{"num": 6, "events": []}, {"num": 7, "events": [{"text": "🇰🇷 三星电子Q2业绩指引", "cls": "kr", "released": false}, {"text": "广期所2608期权到期", "cls": "option", "released": false}]}, {"num": 8, "events": [{"text": "🇨🇳 国务院科技奖励决定", "cls": "imp", "released": false}]}, {"num": 9, "events": [{"text": "🇺🇸 美联储6月会议纪要", "cls": "fomc", "released": true}, {"text": "🇨🇳 CPI/PPI数据", "cls": "data2", "released": true}, {"text": "PEP 百事 盘前", "cls": "us", "released": false}]}, {"num": 10, "events": [{"text": "🇹🇭 台股休市（台风巴威）", "cls": "tw", "released": false}, {"text": "DAL 达美航空 盘前", "cls": "us", "released": false}]}, {"num": 11, "events": []}, {"num": 12, "events": []}]}, {"no": "3", "dates": "7/13-7/19", "days": [{"num": 13, "events": [{"text": "郑商所2608期权到期", "cls": "option", "released": false}]}, {"num": 14, "events": [{"text": "大商所/郑商所/广期所2607最后交易日", "cls": "future", "released": false}, {"text": "🇺🇸 6月CPI 20:30", "cls": "data", "released": false}, {"text": "华为Pura 90S系列发布", "cls": "appl", "released": false}, {"text": "JPM 摩根大通 盘前", "cls": "us", "released": false}, {"text": "🇺🇸 摩根士丹利 Q2财报", "cls": "us", "released": false}, {"text": "🇺🇸 贝莱德 Q2财报", "cls": "us", "released": false}]}, {"num": 15, "events": [{"text": "🇨🇳 A股半年报预告强制截止日", "cls": "ipo", "released": false}, {"text": "上期所/能源中心2607最后交易日", "cls": "future", "released": false}, {"text": "🇨🇳 工业增加值/社零/固投数据", "cls": "data", "released": false}, {"text": "能源中心SC2608期权到期", "cls": "option", "released": false}, {"text": "MS 摩根士丹利 盘前", "cls": "us", "released": false}, {"text": "BLK 贝莱德 盘前", "cls": "us", "released": false}]}, {"num": 16, "events": [{"text": "大商所2608期权到期", "cls": "option", "released": false}, {"text": "NFLX 奈飞 盘后", "cls": "us", "released": false}]}, {"num": 17, "events": [{"text": "中金所IF/IH/IC/IM股指期货交割", "cls": "future", "released": false}, {"text": "中金所股指期权到期", "cls": "option", "released": false}]}, {"num": 18, "events": [{"text": "🇹🇭 台积电TSMC Q2财报/法说会", "cls": "tw", "released": false}]}, {"num": 19, "events": []}]}, {"no": "4", "dates": "7/20-7/26", "days": [{"num": 20, "events": [{"text": "🇨🇳 LPR利率报价（1年/5年以上）", "cls": "cb", "released": false}, {"text": "上期所FU2608期权到期", "cls": "option", "released": false}]}, {"num": 21, "events": []}, {"num": 22, "events": [{"text": "上交所/深交所ETF期权最后交易日", "cls": "option", "released": false}, {"text": "TSLA 特斯拉 盘后", "cls": "us", "released": false}]}, {"num": 23, "events": [{"text": "🇬🇧 EasyJet Q3交易更新", "cls": "data", "released": false}, {"text": "GOOGL 谷歌 盘后", "cls": "us", "released": false}]}, {"num": 24, "events": []}, {"num": 25, "events": []}, {"num": 26, "events": []}]}, {"no": "5", "dates": "7/27-7/31", "days": [{"num": 27, "events": [{"text": "能源中心EC2607最后交易日", "cls": "future", "released": false}, {"text": "上期所2608期权到期（除FU）", "cls": "option", "released": false}, {"text": "能源中心NR/BC2608期权到期", "cls": "option", "released": false}]}, {"num": 28, "events": [{"text": "大商所BZ/EB/EG/JD等2607最后交易日", "cls": "future", "released": false}, {"text": "SPGI 标普全球 盘前", "cls": "us", "released": false}, {"text": "🇺🇸 英伟达NVDA Q2财报", "cls": "us", "released": false}]}, {"num": 29, "events": [{"text": "🇬🇧 Rio Tinto（力拓）半年报", "cls": "data", "released": false}, {"text": "🇺🇸 FOMC议息会议第1天", "cls": "fomc", "released": false}, {"text": "郑商所CJ/PX2609期权到期", "cls": "option", "released": false}, {"text": "MSFT 微软 盘后", "cls": "us", "released": false}, {"text": "META 盘后", "cls": "us", "released": false}, {"text": "ADP 盘前", "cls": "us", "released": false}]}, {"num": 30, "events": [{"text": "🇸🇬 富时A50交割日", "cls": "a50", "released": false}, {"text": "Shell/Rolls-Royce等半年报", "cls": "data", "released": false}, {"text": "🇺🇸 FOMC利率决议 北京7/30凌晨", "cls": "fomc", "released": false}, {"text": "🇰🇷 三星电子Q2完整财报", "cls": "kr", "released": false}, {"text": "苹果Q3财报", "cls": "appl", "released": false}, {"text": "AAPL 苹果 盘后", "cls": "us", "released": false}, {"text": "AMZN 亚马逊 盘后", "cls": "us", "released": false}]}, {"num": 31, "events": [{"text": "上期所FU2608/能源中心SC/LU2608最后交易日", "cls": "future", "released": false}, {"text": "🇰🇷 三星电子2026Q2完整财报", "cls": "kr", "released": false}, {"text": "🇨🇳 中国PMI制造业/非制造业数据", "cls": "data", "released": false}]}]}]};</script>
 </head>
 <body>
 
@@ -310,16 +326,10 @@
     <div class="sec-head"><h2>📅 今日事件</h2><span class="tag">交易日历 + 打新速览 · 2026-07-28</span></div>
 
     <div class="grid g-2" style="margin-bottom:16px">
-      <!-- 当天事件详情（顶部·点击日历也可弹出） -->
+      <!-- 今日事件详情（合并卡：日历事件 + 宏观速览） -->
       <div class="card" style="grid-column:1/-1">
-        <h3><span class="ic">📅</span><span id="v8DayTitle">今日</span> 事件详情 - <span class="fresh" id="v8DayDate">--</span></h3>
-        <div id="v8DayDetail" style="font-size:13px;color:var(--txt);"></div>
-      </div>
-
-      <!-- 今日关键事件速览 -->
-      <div class="card" style="grid-column:1/-1">
-        <h3><span class="ic">⚡</span>今日关键事件 - 盘中 · <span class="fresh">更新于 今日 15:20</span></h3>
-        <div id="mevToday" style="margin-top:4px"></div>
+        <h3><span class="ic">📅</span>今日事件详情 - <span class="fresh" id="v8DayDate">--</span></h3>
+        <div id="v8TodayAll" style="font-size:13px;color:var(--txt);"></div>
       </div>
 
       <!-- 打新速览 -->
@@ -330,7 +340,7 @@
             <div class="ipo-sec-title" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
               <span>今日上市</span>
               <div class="ipo-tabs" id="ipoTabs" style="margin-left:90px;margin-top:0;margin-bottom:0">
-                <button class="ipo-tab" data-cat="futureApply">待申购</button>
+                <button class="ipo-tab active" data-cat="futureApply">待申购</button>
                 <button class="ipo-tab" data-cat="pricing">待定价</button>
                 <button class="ipo-tab" data-cat="preListing">待上市</button>
               </div>
@@ -339,22 +349,20 @@
           </div>
           <div class="ipo-sec" data-cat="todayApply"><div class="ipo-sec-title">今日申购</div><div class="ipo-grid" id="ipoGrid-todayApply"><div class="note" style="grid-column:1/-1">加载中…</div></div></div>
           <div class="ipo-sec" data-cat="tracking"><div class="ipo-sec-title">上市日追踪5日</div><div class="ipo-grid" id="ipoGrid-tracking"><div class="note" style="grid-column:1/-1">加载中…</div></div></div>
-          <div class="ipo-tab-body"><div class="ipo-grid" id="ipoTabsGrid"><div class="note" style="grid-column:1/-1">加载中…</div></div></div>
+          <div class="ipo-tab-body"><div class="ipo-grid" id="ipoTabsGrid"><div class="note" style="grid-column:1/-1;color:var(--dim)">点击上方 tab 查看 待申购 / 待定价 / 待上市</div></div></div>
         </div>
         <div class="note">双维度 = 套利评分（收益弹性）+ 基本面评分（安全边际）。综合分 = 套利×60% + 基本面×40%。</div>
       </div>
 
     </div>
 
-    <!-- 重要事件日历 -->
-    <div class="card">
-      <h3><span class="ic">📅</span>重要事件日历（点击当日放大） - 中长线 · <span class="fresh">每周日更新</span></h3>
-      <div class="cal-month">📅 2026年7月 · 重要日历</div>
-      <div class="cal-grid" id="calHead" style="margin-bottom:6px"></div>
-      <div class="cal-grid" id="calBody"></div>
-      <div class="cal-foot">
-        <div style="font-weight:800;margin-bottom:10px">🎨 色块标注说明</div>
-        <div class="legend" id="legend"></div>
+    <!-- 重要事件日历（完整周历 · 与 calendar.html 同源） -->
+    <div class="card" style="grid-column:1/-1">
+      <h3><span class="ic">📅</span>重要事件日历 - 中长线 · <span class="fresh" id="v8caltime">每周日更新</span></h3>
+      <div id="v8calcontent"></div>
+      <div style="margin-top:20px">
+        <div style="font-weight:800;margin-bottom:10px;font-size:14px">🎨 色块标注说明</div>
+        <div class="v8cal-legend-grid" id="v8callegend"></div>
       </div>
     </div>
   </section>
@@ -1178,93 +1186,140 @@ function doQuery(){
   }).join('');
 })();
 
-/* ===== 日历（北向样式暗色移植 · 分色块格） ===== */
-const CAT={
-  policy:{name:'重要政策',color:'#f472b6',bg:'rgba(244,114,182,.18)',border:'rgba(244,114,182,.40)',desc:'中国政府/监管机构发布的重大政策、法规、规划等',items:['暂无数据，待政策发布后补充']},
-  lpr:{name:'央行/LPR',color:'#fbbf24',bg:'rgba(251,191,36,.18)',border:'rgba(251,191,36,.40)',desc:'央行货币政策、利率决议、LPR报价等',items:['7月 LPR利率报价（1年期/5年期以上）— 每月20日']},
-  cn:{name:'中国数据',color:'#38bdf8',bg:'rgba(56,189,248,.18)',border:'rgba(56,189,248,.40)',desc:'国家统计局/央行发布的宏观经济数据',items:['CPI/PPI — 每月9日前后','工业增加值/社零/固投 — 每月15日前后','PMI — 每月最后一日']},
-  report:{name:'财报截止',color:'#a78bfa',bg:'rgba(167,139,250,.18)',border:'rgba(167,139,250,.40)',desc:'A股财报披露法定截止日',items:['7/15 🇨🇳 A股半年报预告强制截止日']},
-  opt:{name:'期权交割',color:'#34d399',bg:'rgba(52,211,153,.18)',border:'rgba(52,211,153,.40)',desc:'各交易所期权合约到期日，涉及多空博弈',items:['中金所股指期权 — 每月第三个周五','各商品交易所期权到期日 — 每月约13-20日间','暂无具体数据，待各交易所公告后补充']},
-  fut:{name:'期货交割',color:'#22d3ee',bg:'rgba(34,211,238,.18)',border:'rgba(34,211,238,.40)',desc:'期货合约最后交易日，交割前后波动加大',items:['中金所IF/IH/IC/IM股指期货 — 每月第三个周五','各交易所2607合约最后交易日 — 约每月中旬']},
-  a50:{name:'A50交割',color:'#fb923c',bg:'rgba(251,146,60,.18)',border:'rgba(251,146,60,.40)',desc:'新加坡富时A50期货交割日，外资对冲A股关键窗口',items:['2026年7月 — 倒数第二个工作日','⚠️ 交割前1-2周可能出现提前移仓波动']},
-  hk:{name:'港股休市',color:'#ef4444',bg:'rgba(239,68,68,.18)',border:'rgba(239,68,68,.40)',desc:'香港交易所休市日，港股通/沪深股通同步暂停',items:['7/1 🇭🇰 港股休市']},
-  tw:{name:'台股财报',color:'#c084fc',bg:'rgba(192,132,252,.18)',border:'rgba(192,132,252,.40)',desc:'台股关注股票',items:['台积电TSMC','联发科MediaTek']},
-  phone:{name:'苹果/华为发布',color:'#e879f9',bg:'rgba(232,121,249,.18)',border:'rgba(232,121,249,.40)',desc:'两大科技巨头新品发布/重要财报',items:['苹果Q3财报 — 7月最后一周']},
-  ushol:{name:'美股休市',color:'#f87171',bg:'rgba(248,113,113,.18)',border:'rgba(248,113,113,.40)',desc:'NYSE/Nasdaq休市日',items:['7/3 🇺🇸 美股休市']},
-  fomc:{name:'FOMC',color:'#facc15',bg:'rgba(250,204,21,.18)',border:'rgba(250,204,21,.40)',desc:'美联储货币政策会议，全球资本市场核心事件',items:['7/29-30 FOMC利率决议 北京时间7/30凌晨']},
-  us:{name:'美股财报',color:'#60a5fa',bg:'rgba(96,165,250,.18)',border:'rgba(96,165,250,.40)',desc:'美股关注股票',items:['特斯拉TSLA','谷歌GOOGL','微软MSFT','苹果AAPL','亚马逊AMZN','Meta','英伟达NVDA','美光MU']},
-  eu:{name:'欧股财报',color:'#2dd4bf',bg:'rgba(45,212,191,.18)',border:'rgba(45,212,191,.40)',desc:'欧股关注股票',items:['ASML阿斯麦']},
-  jp:{name:'日股财报',color:'#fbbf24',bg:'rgba(251,191,36,.18)',border:'rgba(251,191,36,.40)',desc:'日股关注股票',items:['铠侠Kioxia','东京电子','爱德万测试']},
-  kr:{name:'韩股财报',color:'#c084fc',bg:'rgba(192,132,252,.18)',border:'rgba(192,132,252,.40)',desc:'韩股关注股票',items:['三星电子','SK海力士']},
-  sg:{name:'SG公假',color:'#e879f9',bg:'rgba(232,121,249,.18)',border:'rgba(232,121,249,.40)',desc:'新加坡公共假期',items:['本月新加坡无公共假期']},
-};
-const FLAG={policy:'🇨🇳',lpr:'🏦',cn:'📊',report:'📑',opt:'📊',fut:'📈',a50:'🇸🇬',hk:'🇭🇰',ushol:'🇺🇸',us:'🇺🇸',tw:'🇹🇼',phone:'📱',fomc:'🇺🇸',eu:'🇪🇺',jp:'🇯🇵',kr:'🇰🇷',sg:'🇸🇬'};
-const EV={
- 1:[{cat:'hk',t:'港股休市'}],
- 3:[{cat:'ushol',t:'美股休市（独立日补假）'}],
- 9:[{cat:'fomc',t:'美联储6月会议纪要 ✅已发布'},{cat:'cn',t:'CPI/PPI数据 ✅已发布（同比+1.0%）'}],
- 15:[{cat:'cn',t:'工业增加值/社零/固投数据'},{cat:'report',t:'A股半年报预告强制截止日'}],
- 17:[{cat:'fut',t:'中金所IF/IH/IC/IM股指期货交割'},{cat:'opt',t:'中金所股指期权到期'}],
- 20:[{cat:'lpr',t:'LPR利率报价（1年/5年）'}],
- 22:[{cat:'opt',t:'上交所/深交所ETF期权最后交易日'}],
- 29:[{cat:'fomc',t:'FOMC议息会议第1天'},{cat:'us',t:'英伟达NVDA Q2财报（预估）'}],
- 30:[{cat:'fomc',t:'FOMC利率决议 北京时间7/30凌晨'},{cat:'us',t:'苹果AAPL / 亚马逊AMZN 盘后'},{cat:'a50',t:'富时A50交割日'}],
- 31:[{cat:'cn',t:'中国PMI制造业/非制造业数据'}],
-};
+/* ===== 完整周历渲染（V8_CAL 数据 · 与 calendar.html 同源） ===== */
 (function(){
-  const head=['一','二','三','四','五','六','日'];
-  document.getElementById('calHead').innerHTML=head.map(h=>`<div class="cal-week">周${h}</div>`).join('');
-  const firstDow=2; const days=31;
-  let cells='';
-  for(let i=0;i<firstDow;i++) cells+=`<div class="cal-cell empty"></div>`;
-  for(let d=1;d<=days;d++){
-    const evs=EV[d]||[];
-    const today=d===28?'today':'';
-    let inner=`<div class="cal-d">${d}</div>`;
-    evs.slice(0,3).forEach(e=>{inner+=`<div class="ev"><span class="e">${FLAG[e.cat]}</span><span class="t" style="color:${CAT[e.cat].color}">${e.t}</span></div>`;});
-    if(evs.length>3) inner+=`<div class="ev"><span class="t" style="color:var(--dim)">+${evs.length-3} 更多…</span></div>`;
-    cells+=`<div class="cal-cell ${today}" onclick="openCal(${d})">${inner}</div>`;
+  var D = window.V8_CAL || {weeks:[],legend:[]};
+  var days = ['周一','周二','周三','周四','周五','周六','周日'];
+  function fmtEvents(events){
+    if(!events || !events.length) return '';
+    return events.map(function(e){
+      var cls = e.cls || 'data';
+      var mark = e.released ? '<span class="ck">✅已发</span>' : '';
+      return '<div class="v8cal-event '+cls+'">'+mark+e.text+'</div>';
+    }).join('');
   }
-  const total=firstDow+days; const rem=(7-total%7)%7;
-  for(let i=0;i<rem;i++) cells+=`<div class="cal-cell empty"></div>`;
-  document.getElementById('calBody').innerHTML=cells;
-  document.getElementById('legend').innerHTML=Object.keys(CAT).map(k=>{
-    const c=CAT[k];
-    const items=(c.items||[]).map(x=>`<li>${x}</li>`).join('');
-    return `<div class="lg" style="--bullet:${c.color};background:${c.bg};border:1px solid ${c.border}">
-      <div class="lh"><span class="sw" style="background:${c.color}"></span><span style="color:${c.color}">${c.name}</span></div>
-      <div class="ld">${c.desc}</div>
-      <ul class="li${k==='us'?' two-col':''}">${items}</ul>
-    </div>`;
-  }).join('');
+  var c = document.getElementById('v8calcontent');
+  if(c){
+    var html = '';
+    D.weeks.forEach(function(w){
+      html += '<div class="v8cal-week-label">第'+w.no+'周 ' + w.dates + '</div>';
+      html += '<div class="v8cal-grid">';
+      html += days.map(function(d){return '<div class="v8cal-head">'+d+'</div>';}).join('');
+      w.days.forEach(function(d){
+        var cl = d.dim ? 'v8cal-day dim' : 'v8cal-day';
+        if(d.today) cl += ' today';
+        html += '<div class="'+cl+'">';
+        html += '<div class="v8cal-day-num">'+d.num+'</div>';
+        html += fmtEvents(d.events);
+        html += '</div>';
+      });
+      html += '</div>';
+    });
+    c.innerHTML = html || '<div style="padding:16px;color:var(--dim);font-size:13px">暂无日历数据</div>';
+  }
+  var lg = document.getElementById('v8callegend');
+  if(lg){
+    function hx(h){h=h.replace('#','');return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}
+    var LG=[
+      {n:'重要政策',c:'#c62828',d:'中国政府/监管机构发布的重大政策、法规、规划等',i:['暂无数据，待政策发布补充']},
+      {n:'央行/LPR',c:'#1565c0',d:'央行货币政策、利率决议、LPR报价等',i:['7月 LPR利率报价（1年期/5年期以上）— 每月20日']},
+      {n:'中国数据',c:'#f57f17',d:'国家统计局/央行发布的宏观经济数据',i:['CPI/PPI — 每月9日前后','工业增加值/社零/固投 — 每月15日前后','PMI — 每月最后一日']},
+      {n:'财报截止',c:'#673ab7',d:'A股财报披露法定截止日',i:['7/15 🇨🇳 A股半年报预告强制截止日']},
+      {n:'期权交割',c:'#00838f',d:'各交易所期权合约到期日，涉及多空博弈',i:['中金所股指期权 — 每月第三个周五','各商品交易所期权到期日 — 每月约13-20日间']},
+      {n:'期货交割',c:'#1d6f42',d:'期货合约最后交易日，交割前后波动加大',i:['中金所IF/IH/IC/IM股指期货 — 每月第三个周五','各交易所2607合约最后交易日 — 约每月中旬']},
+      {n:'A50交割',c:'#e91e63',d:'新加坡富时A50期货交割日，外资对冲A股关键窗口',i:['2026年7月 — 倒数第二个工作日','⚠️ 交割前1-2周可能出现提前移仓波动']},
+      {n:'港股休市',c:'#ef5350',d:'香港交易所休市日，港股通/沪深股通同步暂停',i:['7/1 🇭🇰 港股休市']},
+      {n:'台股财报',c:'#ff9800',d:'台股关注股票',i:['台积电TSMC','联发科MediaTek']},
+      {n:'苹果/华为发布',c:'#37474f',d:'两大科技巨头新品发布/重要财报',i:['苹果Q3财报 — 7月最后一周']},
+      {n:'FOMC',c:'#9c27b0',d:'美联储货币政策会议，全球资本市场核心事件',i:['7/29-30 FOMC利率决议 北京时间7/30凌晨']},
+      {n:'美股休市',c:'#42a5f5',d:'NYSE/Nasdaq休市日',i:['7/3 🇺🇸 美股休市']},
+      {n:'美股财报',c:'#66bb6a',d:'美股关注股票',i:['特斯拉TSLA','谷歌GOOGL','微软MSFT','苹果AAPL','亚马逊AMZN','Meta','英伟达NVDA','美光MU']},
+      {n:'欧股财报',c:'#26a69a',d:'欧股关注股票',i:['ASML阿斯麦']},
+      {n:'日股财报',c:'#ab47bc',d:'日股关注股票',i:['铠侠Kioxia','东京电子','爱德万测试']},
+      {n:'韩股财报',c:'#00acc1',d:'韩股关注股票',i:['三星电子','SK海力士']},
+      {n:'SG公假',c:'#8e24aa',d:'新加坡公共假期',i:['本月新加坡无公共假期']},
+      {n:'财新PMI',c:'#5c6bc0',d:'财新PMI 行业数据',i:['财新PMI 行业数据']}
+    ];
+    lg.innerHTML = LG.map(function(l){
+      var rgb=hx(l.c);
+      var bg='rgba('+rgb.join(',')+',.14)';
+      var items=l.i.map(function(x){return '<li>'+x+'</li>';}).join('');
+      var ulCls = l.i.length >= 6 ? 'v8cal-li col2' : 'v8cal-li';
+      return '<div class="v8cal-legend-item" style="border-left-color:'+l.c+';background:'+bg+'">'
+        + '<div class="lt"><span class="swatch" style="background:'+l.c+'"></span>'+l.n+'</div>'
+        + '<div class="ld">'+l.d+'</div>'
+        + '<ul class="'+ulCls+'">'+items+'</ul></div>';
+    }).join('');
+  }
+  var tm = document.getElementById('v8caltime');
+  if(tm && D.update_time) tm.textContent = '更新于 ' + D.update_time;
 })();
-function openCal(d){
-  const evs=EV[d]||[];
-  document.getElementById('calDate').textContent=`2026年7月${d}日`;
-  if(!evs.length){document.getElementById('calEvents').innerHTML='<div class="note">当日无标注的重要事件</div>';}
-  else{
-    document.getElementById('calEvents').innerHTML=evs.map(e=>`
-      <div class="mev"><span class="e">${FLAG[e.cat]}</span><div><div class="mt" style="color:${CAT[e.cat].color}">${CAT[e.cat].name}</div><div>${e.t}</div><div class="md">${CAT[e.cat].desc}</div></div></div>`).join('');
-  }
-  document.getElementById('calMask').classList.add('show');
-}
-function closeCal(){document.getElementById('calMask').classList.remove('show');}
 
-/* 今日关键事件卡片：动态渲染 EV[今日]，与日历弹窗同源 */
+/* ===== 今日事件合并卡：V8_CAL 日历事件 + 宏观速览 ===== */
 (function(){
-  const TODAY_DAY=28; // 与日历 today 保持一致（页面日期 2026-07-28）
-  const evs=EV[TODAY_DAY]||[];
-  const box=document.getElementById('mevToday');
+  var D = window.V8_CAL || {weeks:[]};
+  var now = new Date();
+  var todayNum = now.getDate();
+  // DEBUG: show V8_CAL status
+  var dbg = document.getElementById('v8TodayAll');
+  if(dbg) dbg.innerHTML = '<div style="color:#fbbf24;padding:8px">[DEBUG] V8_CAL weeks='+(D.weeks?D.weeks.length:'NULL')+' todayNum='+todayNum+'</div>';
+  var todayEvents = [];
+  var found = false;
+  D.weeks.forEach(function(w){
+    w.days.forEach(function(d){
+      if(d.today && !found){ todayEvents = d.events || []; found = true; }
+      else if(!found && d.num === todayNum){ todayEvents = d.events || []; }
+    });
+  });
+  var dateEl = document.getElementById('v8DayDate');
+  if(dateEl){
+    var m = now.getMonth() + 1;
+    dateEl.textContent = now.getFullYear() + '年' + m + '月' + todayNum + '日';
+  }
+  var box = document.getElementById('v8TodayAll');
   if(!box) return;
-  if(!evs.length){box.innerHTML='<div class="ipo-empty">当日无标注的重要事件</div>';return;}
-  box.innerHTML=evs.map(e=>`
-    <div class="mev" style="border-bottom:1px dashed var(--border);padding:8px 0"><span class="e">${FLAG[e.cat]}</span><div><div class="mt" style="color:${CAT[e.cat].color}">${CAT[e.cat].name}</div><div>${e.t}</div><div class="md">${CAT[e.cat].desc}</div></div></div>`).join('');
+
+  var catClr = {imp:'#c62828',cb:'#1565c0',data:'#f57f17',data2:'#43a047',fomc:'#9c27b0',us:'#42a5f5',hk:'#ef5350',tw:'#ff9800',a50:'#e91e63',ipo:'#673ab7',option:'#00838f',future:'#1d6f42',appl:'#37474f',sg:'#8e24aa',kr:'#00acc1'};
+  var catName = {imp:'重要政策',cb:'央行/LPR',data:'中国数据',data2:'中国数据',fomc:'FOMC',us:'美股财报',hk:'港股休市',tw:'台股财报',a50:'A50交割',ipo:'IPO/财报',option:'期权交割',future:'期货交割',appl:'科技发布',sg:'SG公假',kr:'韩股财报'};
+
+  var html = '';
+  if(todayEvents && todayEvents.length){
+    html += '<div style="margin-bottom:12px">';
+    todayEvents.forEach(function(e){
+      var cls = e.cls || 'data', clr = catClr[cls] || '#666', name = catName[cls] || '其他';
+      var cr=parseInt(clr.slice(1,3),16),cg=parseInt(clr.slice(3,5),16),cb=parseInt(clr.slice(5,7),16);
+      html += '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)">'
+        + '<span style="font-size:11px;color:'+clr+';background:rgba('+cr+','+cg+','+cb+',.32);border:1px solid rgba('+cr+','+cg+','+cb+',.55);padding:3px 9px;border-radius:4px;flex-shrink:0;white-space:nowrap;font-weight:600">'+name+'</span>'
+        + '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+clr+';flex-shrink:0"></span>'
+        + '<span style="flex:1">'+(e.text||'')+(e.released?' <span style="color:#4caf50;font-size:11px">✅已发</span>':'')+'</span></div>';
+    });
+    html += '</div>';
+  } else {
+    html += '<div style="color:#888;padding:8px 0">📅 今日日历无标注事件</div>';
+  }
+  try{
+    var M = window.MACRO_DATA||{}, N = window.NT_DATA||{};
+    var items=[];
+    if(N&&N.latest) items.push('📊 涨<span style="color:#ef5350;font-weight:700">'+(N.latest.up_count||0)+'</span> / 跌<span style="color:#26a69a;font-weight:700">'+(N.latest.down_count||0)+'</span>');
+    if(M.monetary&&M.monetary.shibor_on) items.push('SHIBOR '+(M.monetary.shibor_on.value||'--')+'%');
+    if(M.monetary&&M.monetary.cn_us_spread) items.push('中美利差 <span style="color:#26a69a">'+(M.monetary.cn_us_spread.value||'--')+'%</span>');
+    if(M.global_macro&&M.global_macro.vix) items.push('VIX '+(M.global_macro.vix.value||'--'));
+    if(items.length){
+      html += '<div style="border-top:1px dashed var(--border);padding-top:10px;margin-top:4px">'
+        + '<div style="font-size:11px;color:var(--sub);margin-bottom:6px">⚡ 盘中宏观速览</div>'
+        + '<div style="display:flex;flex-wrap:wrap;gap:10px;font-size:13px">'+items.join('<span style="color:var(--dim)">｜</span>')+'</div></div>';
+    }
+  }catch(err){}
+  box.innerHTML = html || '<div style="color:#888;padding:12px">加载中…</div>';
 })();
+
+
 
 /* ===== 打新速览：动态加载 + 内嵌兜底 ===== */
 (function(){
-  let ipoData=[], ipoGrouped={};
-  const today='20260728'; // 与页面日期 2026-07-28 保持一致；真实部署时由构建脚本注入
+  let ipoData=[], ipoGrouped={}, today='';
+  function todayStr(d){ return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`; }
+  function dateFromUpdate(ts){ if(!ts) return ''; const m=String(ts).match(/(\d{4})-(\d{2})-(\d{2})/); return m?`${m[1]}${m[2]}${m[3]}`:''; }
 
   function fmtDate(d){
     if(!d || d.length!==8) return '';
@@ -1363,7 +1418,7 @@ function closeCal(){document.getElementById('calMask').classList.remove('show');
   const DIRECT=['listedToday','todayApply','tracking'];
   // 其余分类用按钮 tab 点击查看
   const TAB_CATS=['futureApply','pricing','preListing'];
-  let activeTab='';
+  let activeTab='futureApply';
 
   function fmtUpdateTime(ts){
     if(!ts) return '今日';
@@ -1399,7 +1454,7 @@ function closeCal(){document.getElementById('calMask').classList.remove('show');
     const grid=document.getElementById('ipoTabsGrid');
     if(!grid) return;
     if(!activeTab){
-      grid.innerHTML=`<div class="ipo-empty" style="grid-column:1/-1">点击上方 tab 查看待申购 / 待定价 / 待上市</div>`;
+      grid.innerHTML=`<div class="ipo-empty" style="grid-column:1/-1;color:var(--dim)">该分类暂无新股</div>`;
       return;
     }
     const cat=activeTab;
@@ -1429,23 +1484,31 @@ function closeCal(){document.getElementById('calMask').classList.remove('show');
     bindTabs();
     const IPO_FALLBACK={"update_time":"2026-07-28 12:18:54","eligible_count":3,"pre_listing_count":6,"listed_count":0,"tracking_count":0,"summary":"3只待评估，6只待上市。 📋 可转债5待申购","stocks":[{"code":"920165","name":"珈凯生物","issue_price":19.26,"issue_pe":14.98,"industry_pe":29.3,"pe_discount":48.9,"board":"北交所","apply_date":"20260729","listing_date":"","score":63,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","arbitrage_score":73,"fundamental_score":48,"fundamentals":{"track_label":"传统/其他赛道","main_business":"化妆品功效原料的研发、生产及销售","industry":"","over_subscription":null,"over_label":"募资待定","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["募资1亿"],"status":"applying"},{"code":"301717","name":"超纯应材","issue_price":0,"issue_pe":60.01,"industry_pe":70.6,"pe_discount":15.0,"board":"科创板","apply_date":"20260731","listing_date":"","score":55,"recommend":"待定价","tag_color":"#888","bg_color":"#f5f5f5","arbitrage_score":47,"fundamental_score":68,"fundamentals":{"track_label":"高景气赛道","main_business":"专注于特殊涂层工艺及其关联技术和材料的国家级专精特新重点“小巨人”企业,主要面向芯片制造、精密光学等领域,提供经材料改性、精密表面加工、精密清洗和特殊涂层工艺后的精密零部件产品及服务","industry":"","over_subscription":1.0,"over_label":"足额募资","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["高景气赛道","募资11亿"],"status":"applying"},{"code":"688828","name":"国仪公司","issue_price":0,"issue_pe":57.63,"industry_pe":67.8,"pe_discount":15.0,"board":"科创板","apply_date":"20260731","listing_date":"","score":55,"recommend":"待定价","tag_color":"#888","bg_color":"#f5f5f5","arbitrage_score":47,"fundamental_score":68,"fundamentals":{"track_label":"高景气赛道","main_business":"专注于高端科学仪器的研发,面向量子科技、材料科学、化学化工、生物医药、先进制造等多个领域,向全球范围内的高校及科研院所、企业提供科技前沿探索所需的高端科学仪器装备、以增强型量子传感器为代表的核心关键器件以及解决方案","industry":"","over_subscription":1.0,"over_label":"足额募资","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["高景气赛道","募资12亿"],"status":"applying"},{"code":"603468","name":"津富士达","issue_price":17.46,"issue_pe":19.25,"industry_pe":33.5,"pe_discount":42.5,"board":"科创板","apply_date":"20260724","listing_date":"","score":69,"recommend":"建议申购","tag_color":"#e65100","bg_color":"#fff3e0","arbitrage_score":71,"fundamental_score":65,"fundamentals":{"track_label":"高景气赛道","main_business":"从事自行车、电助力自行车、共享单车等产品及其关键零部件的研发、设计、生产与销售业务","industry":"铁路、船舶、航空航天和其他运输设备制造业","over_subscription":0.93,"over_label":"募资0.9倍计划","pb":2.26,"pb_label":"PB2.3","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["高景气赛道","募资7亿"],"status":"pre_listing"},{"code":"301707","name":"展芯股份","issue_price":23.45,"issue_pe":44.23,"industry_pe":73.6,"pe_discount":39.9,"board":"科创板","apply_date":"20260727","listing_date":"","score":67,"recommend":"建议申购","tag_color":"#e65100","bg_color":"#fff3e0","arbitrage_score":70,"fundamental_score":62,"fundamentals":{"track_label":"高景气赛道","main_business":"高可靠模拟芯片及微模块产品的研发设计、测试及销售","industry":"计算机、通信和其他电子设备制造业","over_subscription":1.08,"over_label":"足额募资","pb":5.94,"pb_label":"高PB5.9","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["高景气赛道","募资10亿"],"status":"pre_listing"},{"code":"920038","name":"森合高科","issue_price":29.06,"issue_pe":11.49,"industry_pe":29.6,"pe_discount":61.2,"board":"北交所","apply_date":"20260727","listing_date":"","score":67,"recommend":"建议申购","tag_color":"#e65100","bg_color":"#fff3e0","arbitrage_score":80,"fundamental_score":48,"fundamentals":{"track_label":"传统/其他赛道","main_business":"环保型贵金属选矿剂的研发、生产及销售","industry":"","over_subscription":null,"over_label":"募资待定","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["募资6亿"],"status":"pre_listing"},{"code":"920065","name":"千岸科技","issue_price":24.3,"issue_pe":10.28,"industry_pe":21.6,"pe_discount":52.4,"board":"北交所","apply_date":"20260720","listing_date":"20260729","score":64,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","arbitrage_score":75,"fundamental_score":48,"fundamentals":{"track_label":"传统/其他赛道","main_business":"从事自有品牌产品研发、设计并主要通过电商平台和自营网站进行销售","industry":"","over_subscription":null,"over_label":"募资待定","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["预计07.29上市","募资4亿"],"status":"pre_listing"},{"code":"001232","name":"嘉立创","issue_price":84.46,"issue_pe":38.19,"industry_pe":73.6,"pe_discount":48.1,"board":"科创板","apply_date":"20260724","listing_date":"","score":60,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","arbitrage_score":59,"fundamental_score":62,"fundamentals":{"track_label":"高景气赛道","main_business":"(1)印制电路板业务,可满足客户“样板→小批量→中大批量”的PCB制造需求;(2)电子元器件业务,主要通过全品类现货模式满足客户样品、小批量电子元器件的采购需求;(3)电子装联业务,通过对工程管理及生产环节等流程的高效组织,公司能够快速响应样品、小批量客户的PCBA订单需求;(4)其他主营业务,包含EDA/CAM工业软件、激光钢网等电子产业配套服务和与电子产业链服务具有“客户同源”特点的3D打印、CNC制造、FA机械零部件商城等机械产业服务","industry":"计算机、通信和其他电子设备制造业","over_subscription":1.12,"over_label":"足额募资","pb":5.58,"pb_label":"高PB5.6","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["高景气赛道","募资47亿"],"status":"pre_listing"},{"code":"920258","name":"聚仁新材","issue_price":4.48,"issue_pe":14.97,"industry_pe":30.2,"pe_discount":50.4,"board":"北交所","apply_date":"20260722","listing_date":"","score":59,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","arbitrage_score":67,"fundamental_score":48,"fundamentals":{"track_label":"传统/其他赛道","main_business":"己内酯系列产品的研发、生产和销售","industry":"","over_subscription":null,"over_label":"募资待定","pb":null,"pb_label":"PB待定","profitable":false,"profit_label":"盈利待披露","data_source":"发行披露(营收/毛利/研发需上市后F10补充)"},"highlights":["募资2亿"],"status":"pre_listing"},{"type":"bond","code":"113709","name":"振26转债","issue_price":100.0,"transfer_price":40.33,"bond_scale":8.78,"stock_code":"","apply_date":"20260730","listing_date":"","status":"applying","market_code":"SH","dec_sumfina":8.78,"score":61,"arbitrage_score":65,"fundamental_score":55,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","board":"可转债","fundamentals":{"track":"可转债","scale":8.78,"transfer_price":40.33,"bond_safety":"高"},"highlights":["转股价 ¥40.33","规模 8.8亿","债底安全 高"]},{"type":"bond","code":"123278","name":"合金转债","issue_price":100.0,"transfer_price":13.98,"bond_scale":5.45,"stock_code":"","apply_date":"20260730","listing_date":"","status":"applying","market_code":"SZ","dec_sumfina":5.45,"score":61,"arbitrage_score":65,"fundamental_score":55,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","board":"可转债","fundamentals":{"track":"可转债","scale":5.45,"transfer_price":13.98,"bond_safety":"高"},"highlights":["转股价 ¥13.98","规模 5.5亿","债底安全 高"]},{"type":"bond","code":"118075","name":"奥普转债","issue_price":100.0,"transfer_price":150.03,"bond_scale":12.7,"stock_code":"","apply_date":"20260729","listing_date":"","status":"applying","market_code":"SH","dec_sumfina":12.7,"score":56,"arbitrage_score":60,"fundamental_score":50,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","board":"可转债","fundamentals":{"track":"可转债","scale":12.7,"transfer_price":150.03,"bond_safety":"中"},"highlights":["转股价 ¥150.03","规模 12.7亿","债底安全 中"]},{"type":"bond","code":"123277","name":"玉禾转债","issue_price":100.0,"transfer_price":16.35,"bond_scale":15.0,"stock_code":"","apply_date":"20260729","listing_date":"","status":"applying","market_code":"SZ","dec_sumfina":15.0,"score":66,"arbitrage_score":70,"fundamental_score":60,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","board":"可转债","fundamentals":{"track":"可转债","scale":15.0,"transfer_price":16.35,"bond_safety":"高"},"highlights":["转股价 ¥16.35","规模 15.0亿","债底安全 高"]},{"type":"bond","code":"118074","name":"特宝转债","issue_price":100.0,"transfer_price":58.56,"bond_scale":15.33,"stock_code":"","apply_date":"20260728","listing_date":"","status":"applying","market_code":"SH","dec_sumfina":15.33266,"score":63,"arbitrage_score":65,"fundamental_score":60,"recommend":"谨慎参与","tag_color":"#f57f17","bg_color":"#fffde7","board":"可转债","fundamentals":{"track":"可转债","scale":15.33,"transfer_price":58.56,"bond_safety":"高"},"highlights":["转股价 ¥58.56","规模 15.3亿","债底安全 高"]},{"type":"bond","code":"127115","name":"炬申转债","issue_price":100.0,"transfer_price":13.76,"bond_scale":3.8,"stock_code":"","apply_date":"20260724","listing_date":"","status":"pre_listing","market_code":"SZ","dec_sumfina":3.8,"score":54,"arbitrage_score":60,"fundamental_score":45,"recommend":"不建议申购","tag_color":"#c62828","bg_color":"#ffebee","board":"可转债","fundamentals":{"track":"可转债","scale":3.8,"transfer_price":13.76,"bond_safety":"中"},"highlights":["转股价 ¥13.76","规模 3.8亿","债底安全 中"]},{"type":"bond","code":"110103","name":"申能转债","issue_price":100.0,"transfer_price":8.74,"bond_scale":20.0,"stock_code":"","apply_date":"20260724","listing_date":"","status":"pre_listing","market_code":"SH","dec_sumfina":20.0,"score":71,"arbitrage_score":75,"fundamental_score":65,"recommend":"建议申购","tag_color":"#0d7d4a","bg_color":"#e8f5e9","board":"可转债","fundamentals":{"track":"可转债","scale":20.0,"transfer_price":8.74,"bond_safety":"高"},"highlights":["转股价 ¥8.74","规模 20.0亿","债底安全 高"]},{"type":"bond","code":"123275","name":"肇民转债","issue_price":100.0,"transfer_price":33.8,"bond_scale":5.9,"stock_code":"","apply_date":"20260709","listing_date":"20260724","status":"tracking","market_code":"SZ","dec_sumfina":5.9,"latest":100.0,"open_price":100.0,"change_pct":0,"turnover":0,"total_return":0,"open_return":0,"score":46,"arbitrage_score":50,"fundamental_score":40,"recommend":"⚪ 震荡，建议观望","tag_color":"#888","bg_color":"#f5f5f5","fundamentals":{"track":"可转债","total_return":0,"turnover":0},"highlights":["较发行 +0.0%","现价 ¥100.00","⚪ 震荡，建议观望"]}]}
 ;
-    fetch('../data/ipo_score.json')
-      .then(r=>r.json())
+    // 1) 优先使用构建注入的 window.IPO_DATA（线上/本地 dist 均含完整当日数据）
+    if(window.IPO_DATA && Array.isArray(window.IPO_DATA.stocks) && window.IPO_DATA.stocks.length){
+      today = dateFromUpdate(window.IPO_DATA.update_time) || todayStr(new Date());
+      ipoData = window.IPO_DATA.stocks;
+      ipoGrouped = classify(ipoData);
+      if(fresh && window.IPO_DATA.update_time){ fresh.textContent=`更新于 ${fmtUpdateTime(window.IPO_DATA.update_time)}`; }
+      renderAll();
+      return;
+    }
+    // 2) 本地预览兜底：若已放置 data/ 目录则 fetch
+    fetch('data/ipo_score.json')
+      .then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
       .then(data=>{
+        today = dateFromUpdate(data.update_time) || todayStr(new Date());
         ipoData=data.stocks||[];
         ipoGrouped=classify(ipoData);
-        if(fresh && data.update_time){
-          fresh.textContent=`更新于 ${fmtUpdateTime(data.update_time)}`;
-        }
+        if(fresh && data.update_time){ fresh.textContent=`更新于 ${fmtUpdateTime(data.update_time)}`; }
         renderAll();
       })
       .catch(err=>{
-        console.warn('IPO fetch failed, using embedded fallback',err);
+        console.warn('IPO load failed, using embedded fallback',err);
+        today = dateFromUpdate(IPO_FALLBACK.update_time) || '20260728';
         ipoData=IPO_FALLBACK.stocks||[];
         ipoGrouped=classify(ipoData);
-        if(fresh){
-          fresh.textContent=`更新于 ${fmtUpdateTime(IPO_FALLBACK.update_time)}`;
-        }
+        if(fresh){ fresh.textContent=`更新于 ${fmtUpdateTime(IPO_FALLBACK.update_time)}`; }
         renderAll();
       });
   }
@@ -2736,37 +2799,134 @@ function switchLg(id,el){
   el.classList.add('active');
 }
 // v8 数据注入（不动 HTML，只填已有元素）
-try{var D=window.IPO_DATA;if(D&&D.stocks){var s=D.stocks,td=new Date().toISOString().slice(0,10).replace(/-/g,''),lt=s.filter(function(x){return x.status==='listed_today';}),ta=s.filter(function(x){return x.apply_date===td&&x.status==='applying';}),tr=s.filter(function(x){return x.status==='tracking';}),fn=function(x){var sc=x.score||0,g=sc>=75?'A':sc>=65?'B':sc>=55?'C':'D',gc=sc>=75?'#4ade80':sc>=65?'#fbbf24':sc>=55?'#f87171':'#ef4444',bc=x.board==='科创板'?'#ef5350':x.board==='北交所'?'#42a5f5':x.board==='创业板'?'#66bb6a':'#888';return '<div class="ipo-card"><div style="display:flex;justify-content:space-between"><span style="font-weight:700;color:#eee">'+(x.name||'').substring(0,8)+'</span><span style="font-size:11px;color:'+bc+'">'+(x.board||'')+'</span></div><div style="font-size:12px;color:#888">评分 <b style="color:'+gc+'">'+(sc||'--')+'('+g+')</b> 套利'+(x.arbitrage_score||'--')+' 基本'+(x.fundamental_score||'--')+'</div>'+(x.issue_price>0?'<div style="font-size:11px;color:#888">发行价 ¥'+x.issue_price+' · PE'+(x.issue_pe||'?')+' · 折价'+(x.pe_discount||'?')+'%</div>':'')+'</div>';};var g1=document.getElementById('ipoGrid-listedToday');if(g1)g1.innerHTML=lt.length?lt.map(fn).join(''):'<div class="note" style="grid-column:1/-1">无今日上市</div>';var g2=document.getElementById('ipoGrid-todayApply');if(g2)g2.innerHTML=ta.length?ta.map(fn).join(''):'<div class="note" style="grid-column:1/-1">无今日申购</div>';var g3=document.getElementById('ipoGrid-tracking');if(g3)g3.innerHTML=tr.length?tr.map(fn).join(''):'<div class="note" style="grid-column:1/-1">无上市追踪</div>';var f=document.getElementById('ipoFresh');if(f&&D.update_time)f.textContent='更新于 '+D.update_time;}}catch(e){console.warn('IPO',e);}
-try{var M=window.MACRO_DATA||{},N=window.NT_DATA||{},ev=document.getElementById('mevToday');if(ev){var it=[];if(N&&N.latest)it.push('📊 涨<span style="color:#ef5350;font-weight:700">'+N.latest.up_count+'</span> / 跌<span style="color:#26a69a;font-weight:700">'+N.latest.down_count+'</span>');if(M.monetary&&M.monetary.shibor_on)it.push('SHIBOR '+M.monetary.shibor_on.value+'%');if(M.monetary&&M.monetary.cn_us_spread)it.push('中美利差 <span style="color:#26a69a">'+M.monetary.cn_us_spread.value+'%</span>');if(M.global_macro&&M.global_macro.vix)it.push('VIX '+M.global_macro.vix.value);ev.innerHTML=it.length?it.join(' ｜ '):'加载中…';var mt=document.getElementById('mevTime');if(mt&&M.update_time)mt.textContent='更新于 '+M.update_time.substring(0,16);}}catch(e){console.warn('mev',e);}
-try{var n=new Date(),y=n.getFullYear(),m=n.getMonth(),fd=new Date(y,m,1).getDay(),ds=new Date(y,m+1,0).getDate(),td2=n.getDate(),ch=document.getElementById('calHead');if(ch)ch.innerHTML=['日','一','二','三','四','五','六'].map(function(d){return '<div class="cal-d" style="font-weight:600">'+d+'</div>';}).join('');var cb=document.getElementById('calBody');if(cb){var c='';for(var i=0;i<fd;i++)c+='<div></div>';for(var d=1;d<=ds;d++){var cl=d===td2?'background:#43a047;color:#fff;border-radius:4px':d<td2?'color:#666':'color:#aaa';c+='<div class="cal-d" style="text-align:center;padding:3px;font-size:13px;'+cl+'">'+d+'</div>';}cb.innerHTML=c;}var cm=document.querySelector('.cal-month');if(cm)cm.innerHTML='📅 '+y+'年'+(m+1)+'月 · 重要日历';var leg=document.getElementById('legend');if(leg)leg.innerHTML='<span style="background:#42a5f5;width:12px;height:12px;display:inline-block;border-radius:2px;margin-right:3px"></span>宏观数据 · <span style="background:#ef5350;width:12px;height:12px;display:inline-block;border-radius:2px;margin-right:3px"></span>涨跌日 · <span style="background:#43a047;width:12px;height:12px;display:inline-block;border-radius:2px;margin-right:3px"></span>今日';}catch(e){console.warn('cal',e);}
-// 顶部"今日事件详情"卡片：从 calendar.json 拿今天的 EV
-try{
-var CAL=window.V8_CAL||{weeks:[]};
-var dt=new Date(),tdy=dt.getDate();
-var todayEvents=[];
-CAL.weeks.forEach(function(w){w.days.forEach(function(d){if(d.num===tdy){todayEvents=d.events||[];}});});
-var detailBox=document.getElementById('v8DayDetail');
-var titleEl=document.getElementById('v8DayTitle');
-var dateEl=document.getElementById('v8DayDate');
-if(titleEl)titleEl.textContent=tdy+'日';
-if(dateEl)dateEl.textContent=y+'年'+(m+1)+'月'+tdy+'日';
-if(detailBox){
-  if(!todayEvents.length){
-    detailBox.innerHTML='<div style="color:#888;padding:8px 0;">今日无重要事件</div>';
-  } else {
-    // 类别配色（与 calendar.html 一致）
-    var catClr={'imp':'#c62828','cb':'#1565c0','data':'#f57f17','data2':'#43a047','fomc':'#9c27b0','us':'#42a5f5','hk':'#ef5350','tw':'#ff9800','a50':'#e91e63','ipo':'#673ab7','option':'#00838f','future':'#1d6f42','appl':'#37474f','sg':'#8e24aa','kr':'#00acc1'};
-    var catName={'imp':'重要政策','cb':'央行/LPR','data':'中国数据','data2':'中国数据','fomc':'FOMC','us':'美股财报','hk':'港股休市','tw':'台股财报','a50':'A50交割','ipo':'财报截止','option':'期权交割','future':'期货交割','appl':'苹果/华为','sg':'SG公假','kr':'韩股财报'};
-    var dotClr={'imp':'#ef5350','cb':'#ef5350','data':'#ef5350','data2':'#ef5350','fomc':'#9c27b0','us':'#42a5f5','hk':'#ef5350','tw':'#ff9800','a50':'#ef5350','ipo':'#9c27b0','option':'#00838f','future':'#1d6f42','appl':'#37474f','sg':'#8e24aa','kr':'#00acc1','cb':'#1565c0'};
-    detailBox.innerHTML=todayEvents.map(function(e){
-      var cat=e.cls||'data',clr=catClr[cat]||'#666',name=catName[cat]||'其他',dot=dotClr[cat]||'#666';
-      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);">'
-        + '<div style="display:flex;align-items:center;gap:8px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+dot+';flex-shrink:0;"></span><span>'+(e.text||'')+(e.released?' <span style="color:#4ade80;font-size:11px;">✅已发</span>':'')+'</span></div>'
-        + '<span style="font-size:11px;color:'+clr+';background:rgba(255,255,255,.06);padding:2px 8px;border-radius:4px;flex-shrink:0;">'+name+'</span></div>';
+try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
+try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
+</script>
+
+<!-- ===== 独立脚本：V8_CAL 日历 + 今日事件（确保执行） ===== -->
+<script>
+/* 完整周历渲染 */
+(function(){
+  var D = window.V8_CAL || {weeks:[],legend:[]};
+  var days = ['周一','周二','周三','周四','周五','周六','周日'];
+  function fmtEvents(events){
+    if(!events || !events.length) return '';
+    return events.map(function(e){
+      var cls = e.cls || 'data';
+      var mark = e.released ? '<span class="ck">✅已发</span>' : '';
+      return '<div class="v8cal-event '+cls+'">'+mark+e.text+'</div>';
     }).join('');
   }
-}
-}catch(e){console.warn('daydetail',e);}
+  var c = document.getElementById('v8calcontent');
+  if(c){
+    var html = '';
+    D.weeks.forEach(function(w){
+      html += '<div class="v8cal-week-label">第'+w.no+'周 ' + w.dates + '</div>';
+      html += '<div class="v8cal-grid">';
+      html += days.map(function(d){return '<div class="v8cal-head">'+d+'</div>';}).join('');
+      w.days.forEach(function(d){
+        var cl = d.dim ? 'v8cal-day dim' : 'v8cal-day';
+        if(d.today) cl += ' today';
+        html += '<div class="'+cl+'">';
+        html += '<div class="v8cal-day-num">'+d.num+'</div>';
+        html += fmtEvents(d.events);
+        html += '</div>';
+      });
+      html += '</div>';
+    });
+    c.innerHTML = html || '<div style="padding:16px;color:#888;font-size:13px">暂无日历数据</div>';
+  }
+  var lg = document.getElementById('v8callegend');
+  if(lg){
+    function hx(h){h=h.replace('#','');return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}
+    var LG=[
+      {n:'重要政策',c:'#c62828',d:'中国政府/监管机构发布的重大政策、法规、规划等',i:['暂无数据，待政策发布补充']},
+      {n:'央行/LPR',c:'#1565c0',d:'央行货币政策、利率决议、LPR报价等',i:['7月 LPR利率报价（1年期/5年期以上）— 每月20日']},
+      {n:'中国数据',c:'#f57f17',d:'国家统计局/央行发布的宏观经济数据',i:['CPI/PPI — 每月9日前后','工业增加值/社零/固投 — 每月15日前后','PMI — 每月最后一日']},
+      {n:'财报截止',c:'#673ab7',d:'A股财报披露法定截止日',i:['7/15 🇨🇳 A股半年报预告强制截止日']},
+      {n:'期权交割',c:'#00838f',d:'各交易所期权合约到期日，涉及多空博弈',i:['中金所股指期权 — 每月第三个周五','各商品交易所期权到期日 — 每月约13-20日间']},
+      {n:'期货交割',c:'#1d6f42',d:'期货合约最后交易日，交割前后波动加大',i:['中金所IF/IH/IC/IM股指期货 — 每月第三个周五','各交易所2607合约最后交易日 — 约每月中旬']},
+      {n:'A50交割',c:'#e91e63',d:'新加坡富时A50期货交割日，外资对冲A股关键窗口',i:['2026年7月 — 倒数第二个工作日','⚠️ 交割前1-2周可能出现提前移仓波动']},
+      {n:'港股休市',c:'#ef5350',d:'香港交易所休市日，港股通/沪深股通同步暂停',i:['7/1 🇭🇰 港股休市']},
+      {n:'台股财报',c:'#ff9800',d:'台股关注股票',i:['台积电TSMC','联发科MediaTek']},
+      {n:'苹果/华为发布',c:'#37474f',d:'两大科技巨头新品发布/重要财报',i:['苹果Q3财报 — 7月最后一周']},
+      {n:'FOMC',c:'#9c27b0',d:'美联储货币政策会议，全球资本市场核心事件',i:['7/29-30 FOMC利率决议 北京时间7/30凌晨']},
+      {n:'美股休市',c:'#42a5f5',d:'NYSE/Nasdaq休市日',i:['7/3 🇺🇸 美股休市']},
+      {n:'美股财报',c:'#66bb6a',d:'美股关注股票',i:['特斯拉TSLA','谷歌GOOGL','微软MSFT','苹果AAPL','亚马逊AMZN','Meta','英伟达NVDA','美光MU']},
+      {n:'欧股财报',c:'#26a69a',d:'欧股关注股票',i:['ASML阿斯麦']},
+      {n:'日股财报',c:'#ab47bc',d:'日股关注股票',i:['铠侠Kioxia','东京电子','爱德万测试']},
+      {n:'韩股财报',c:'#00acc1',d:'韩股关注股票',i:['三星电子','SK海力士']},
+      {n:'SG公假',c:'#8e24aa',d:'新加坡公共假期',i:['本月新加坡无公共假期']},
+      {n:'财新PMI',c:'#5c6bc0',d:'财新PMI 行业数据',i:['财新PMI 行业数据']}
+    ];
+    lg.innerHTML = LG.map(function(l){
+      var rgb=hx(l.c);
+      var bg='rgba('+rgb.join(',')+',.14)';
+      var items=l.i.map(function(x){return '<li>'+x+'</li>';}).join('');
+      var ulCls = l.i.length >= 6 ? 'v8cal-li col2' : 'v8cal-li';
+      return '<div class="v8cal-legend-item" style="border-left-color:'+l.c+';background:'+bg+'">'
+        + '<div class="lt"><span class="swatch" style="background:'+l.c+'"></span>'+l.n+'</div>'
+        + '<div class="ld">'+l.d+'</div>'
+        + '<ul class="'+ulCls+'">'+items+'</ul></div>';
+    }).join('');
+  }
+  var tm = document.getElementById('v8caltime');
+  if(tm && D.update_time) tm.textContent = '更新于 ' + D.update_time;
+})();
+
+/* 今日事件合并卡：日历事件 + 宏观速览 */
+(function(){
+  var D = window.V8_CAL || {weeks:[]};
+  var now = new Date();
+  var todayNum = now.getDate();
+  var todayEvents = [];
+  var found = false;
+  D.weeks.forEach(function(w){
+    w.days.forEach(function(d){
+      if(d.today && !found){ todayEvents = d.events || []; found = true; }
+      else if(!found && d.num === todayNum){ todayEvents = d.events || []; }
+    });
+  });
+  var dateEl = document.getElementById('v8DayDate');
+  if(dateEl){
+    dateEl.textContent = now.getFullYear() + '年' + (now.getMonth()+1) + '月' + todayNum + '日';
+  }
+  var box = document.getElementById('v8TodayAll');
+  if(!box) return;
+
+  var catClr = {imp:'#c62828',cb:'#1565c0',data:'#f57f17',data2:'#43a047',fomc:'#9c27b0',us:'#42a5f5',hk:'#ef5350',tw:'#ff9800',a50:'#e91e63',ipo:'#673ab7',option:'#00838f',future:'#1d6f42',appl:'#37474f',sg:'#8e24aa',kr:'#00acc1'};
+  var catName = {imp:'重要政策',cb:'央行/LPR',data:'中国数据',data2:'中国数据',fomc:'FOMC',us:'美股财报',hk:'港股休市',tw:'台股财报',a50:'A50交割',ipo:'IPO/财报',option:'期权交割',future:'期货交割',appl:'科技发布',sg:'SG公假',kr:'韩股财报'};
+
+  var html = '';
+  if(todayEvents && todayEvents.length){
+    html += '<div style="margin-bottom:12px">';
+    todayEvents.forEach(function(e){
+      var cls = e.cls || 'data', clr = catClr[cls] || '#666', name = catName[cls] || '其他';
+      var cr=parseInt(clr.slice(1,3),16),cg=parseInt(clr.slice(3,5),16),cb=parseInt(clr.slice(5,7),16);
+      html += '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)">'
+        + '<span style="font-size:11px;color:'+clr+';background:rgba('+cr+','+cg+','+cb+',.32);border:1px solid rgba('+cr+','+cg+','+cb+',.55);padding:3px 9px;border-radius:4px;flex-shrink:0;white-space:nowrap;font-weight:600">'+name+'</span>'
+        + '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+clr+';flex-shrink:0"></span>'
+        + '<span style="flex:1">'+(e.text||'')+(e.released?' <span style="color:#4caf50;font-size:11px">✅已发</span>':'')+'</span></div>';
+    });
+    html += '</div>';
+  } else {
+    html += '<div style="color:#888;padding:8px 0">📅 今日日历无标注事件</div>';
+  }
+  try{
+    var M = window.MACRO_DATA||{}, N = window.NT_DATA||{};
+    var items=[];
+    if(N&&N.latest) items.push('📊 涨<span style="color:#ef5350;font-weight:700">'+(N.latest.up_count||0)+'</span> / 跌<span style="color:#26a69a;font-weight:700">'+(N.latest.down_count||0)+'</span>');
+    if(M.monetary&&M.monetary.shibor_on) items.push('SHIBOR '+(M.monetary.shibor_on.value||'--')+'%');
+    if(M.monetary&&M.monetary.cn_us_spread) items.push('中美利差 <span style="color:#26a69a">'+(M.monetary.cn_us_spread.value||'--')+'%</span>');
+    if(M.global_macro&&M.global_macro.vix) items.push('VIX '+(M.global_macro.vix.value||'--'));
+    if(items.length){
+      html += '<div style="border-top:1px dashed var(--border);padding-top:10px;margin-top:4px">'
+        + '<div style="font-size:11px;color:var(--sub);margin-bottom:6px">⚡ 盘中宏观速览</div>'
+        + '<div style="display:flex;flex-wrap:wrap;gap:10px;font-size:13px">'+items.join('<span style="color:var(--dim)">｜</span>')+'</div></div>';
+    }
+  }catch(err){}
+  box.innerHTML = html || '<div style="color:#888;padding:12px">加载中…</div>';
+})();
 </script>
 </body>
 </html>
