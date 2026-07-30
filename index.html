@@ -408,25 +408,25 @@
     <div class="sec-head"><h2>📡 实时数据</h2><span class="fresh">更新于 今日 15:20</span><span class="tag">盘中 T+0 · 数据延迟约 3~5 秒</span></div>
 
     <!-- 🧠 AI市场速览（A 阶段 2026-07-31：数字写死，参考 v6 周一真实快照；B 阶段接 JSON） -->
-    <div id="aiSummaryCard" style="background:#fff;border:1px solid #e8eaed;border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
-      <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:2px solid #f0f0f0;">
-        <span style="font-size:16px;font-weight:700;color:#8d6e63;">🧠 AI市场速览 <span style="font-size:10px;font-weight:400;color:#999;">短线·综合 · A 阶段演示数据</span></span>
-        <span style="font-size:12px;color:#999;font-weight:400;" id="aiSummaryTime">周一 15:46 快照</span>
+    <div id="aiSummaryCard" style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--border);">
+        <span style="font-size:16px;font-weight:700;color:var(--txt);">🧠 AI市场速览 <span style="font-size:10px;font-weight:400;color:var(--dim);">短线·综合 · A 阶段演示数据</span></span>
+        <span style="font-size:12px;color:var(--sub);font-weight:400;" id="aiSummaryTime">周一 15:46 快照</span>
       </div>
       <div style="padding:0;" id="aiSummaryContent">
-        <div style="padding:10px 18px;background:#f3e5f5;font-size:13px;line-height:1.7;">
-          <span style="padding:2px 8px;border-radius:4px;background:#ce93d8;color:#4a148c;margin-right:6px;">🟣 日内风向</span>
-          <strong>情绪冰点</strong>，普跌格局，多维共振 8 只，<span style="color:#c62828;font-weight:700;">⚠️ 连跌 52 天</span>
+        <div style="padding:10px 18px;background:rgba(167,139,250,0.10);font-size:13px;line-height:1.7;color:var(--txt);">
+          <span style="padding:2px 8px;border-radius:4px;background:rgba(167,139,250,0.20);color:#a78bfa;margin-right:6px;">🟣 日内风向</span>
+          <strong>情绪冰点</strong>，普跌格局，多维共振 8 只，<span style="color:var(--up);font-weight:700;">⚠️ 连跌 52 天</span>
         </div>
-        <div style="padding:10px 18px;background:#e8f5e9;font-size:13px;line-height:1.7;">
-          <span style="padding:2px 8px;border-radius:4px;background:#a5d6a7;color:#1b5e20;margin-right:6px;">🟢 市场健康度</span>
-          <span style="color:#2e7d32;font-weight:700;">结构承压</span> ·
-          <span style="color:#2e7d32;font-weight:700;">资金偏多</span> ·
-          <span style="color:#2e7d32;font-weight:700;">情绪偏冷</span>
+        <div style="padding:10px 18px;background:rgba(31,209,123,0.10);font-size:13px;line-height:1.7;color:var(--txt);">
+          <span style="padding:2px 8px;border-radius:4px;background:rgba(31,209,123,0.20);color:#1fd17b;margin-right:6px;">🟢 市场健康度</span>
+          <span style="color:#1fd17b;font-weight:700;">结构承压</span> ·
+          <span style="color:#1fd17b;font-weight:700;">资金偏多</span> ·
+          <span style="color:#1fd17b;font-weight:700;">情绪偏冷</span>
           — <strong>1/3 灯道值</strong>
         </div>
-        <div style="padding:10px 18px;background:#e3f2fd;font-size:13px;line-height:1.7;">
-          <span style="padding:2px 8px;border-radius:4px;background:#90caf9;color:#0d47a1;margin-right:6px;">📊 指数</span>
+        <div style="padding:10px 18px;background:rgba(56,189,248,0.10);font-size:13px;line-height:1.7;color:var(--txt);">
+          <span style="padding:2px 8px;border-radius:4px;background:rgba(56,189,248,0.20);color:#38bdf8;margin-right:6px;">📊 指数</span>
           <span class="up" style="font-weight:700;">-1.2%</span> 上证指数 ·
           <span class="down" style="font-weight:700;">-4.5%</span> 深证成指 ·
           <span class="down" style="font-weight:700;">-7.3%</span> 创业板指 ·
@@ -436,13 +436,13 @@
           <span class="down" style="font-weight:700;">-0.9%</span> 日经225 ·
           <span class="down" style="font-weight:700;">-7.2%</span> 韩国 KOSPI
         </div>
-        <div style="padding:10px 18px;background:#fff3e0;font-size:13px;line-height:1.7;">
-          <span style="padding:2px 8px;border-radius:4px;background:#ffcc80;color:#e65100;margin-right:6px;">⚠️ 市场异动</span>
+        <div style="padding:10px 18px;background:rgba(251,191,36,0.10);font-size:13px;line-height:1.7;color:var(--txt);">
+          <span style="padding:2px 8px;border-radius:4px;background:rgba(251,191,36,0.20);color:#fbbf24;margin-right:6px;">⚠️ 市场异动</span>
           融资大增 <strong>1.0%</strong>，地量创 20 日新低
         </div>
-        <div style="padding:10px 18px;background:#fce4ec;font-size:13px;line-height:1.7;">
-          <span style="padding:2px 8px;border-radius:4px;background:#f48fb1;color:#880e4f;margin-right:6px;">📉 期货持仓</span>
-          <span style="color:#c62828;font-weight:700;">⚠️ 中信整体偏空</span>，机构态度谨慎，各合约连续方向不一
+        <div style="padding:10px 18px;background:rgba(244,114,182,0.10);font-size:13px;line-height:1.7;color:var(--txt);">
+          <span style="padding:2px 8px;border-radius:4px;background:rgba(244,114,182,0.20);color:#f472b6;margin-right:6px;">📉 期货持仓</span>
+          <span style="color:var(--up);font-weight:700;">⚠️ 中信整体偏空</span>，机构态度谨慎，各合约连续方向不一
         </div>
       </div>
     </div>
