@@ -1,66 +1,175 @@
 #!/usr/bin/env python3
-"""v8 数据构建脚本 — 从共享 data/ 注入真实JSON到 v8/index.html 模板"""
+"""v8 数据构建脚本 — 从 raw_data/*.json 生成 data/*.js
 
-import json, os, re, sys
+说明：
+- v8 已改为轻量模板：index.html 不再内联大数据，而是引用 data/*.js。
+- 本脚本负责把原始数据 raw_data/<file>.json 转换为 data/<VAR>.js。
+- 原始数据由数据源端（小九/单位机）提供，本脚本只负责格式转换与轻量裁剪。
+- 输出文件可直接被 index.html 通过 <script src="./data/VAR.js"> 同步加载。
+"""
+
+import json, os, sys
 from pathlib import Path
 
-REPO = Path(__file__).resolve().parent.parent
-DATA = REPO / "data"
-V8_DIR = REPO / "v8"
-TEMPLATE = V8_DIR / "index.html"
-OUTPUT = V8_DIR / "dist" / "index.html"
+ROOT = Path(__file__).resolve().parent
+RAW_DIR = ROOT / "raw_data"
+DATA_DIR = ROOT / "data"
 
-# 需要注入到页面的数据源（key=window变量名, value=data目录文件名）
+# 原始文件名 → window 变量名映射
+# 若数据源端直接以变量名命名文件，可省略映射，按文件名自动推断。
 DATA_SOURCES = {
-    "ETF_INTRADAY_HEAT": "etf_intraday_heat.json",
-    "SECTOR_FUND_FLOW":  "sector_fund_flow.json",
-    "SCAN_DATA":         "scan_data.json",
-    "GOLD_POOL":         "gold_pool.json",
-    "STOCK_LIST":        "stock_names.json",  # 实际是 stock_names
-    "RECOMMEND":         "recommend.json",
-    "MACRO_DATA":        "macro_data.json",
-    "NT_DATA":           "nt_data.json",
-    "LHB_DATA":          "lhb_data.json",
-    "CONCEPT_RANKING":   "concept_ranking.json",
-    "MARGIN_DATA":       "margin_data.json",
-    "CFFEX_HOLDINGS":    "cffex_data.json",
-    "IPO_DATA":          "ipo_score.json",
-    "CRISIS_DATA":       "crisis_data.json",
+    "etf_intraday_heat.json":      "ETF_INTRADAY_HEAT",
+    "sector_fund_flow.json":       "SECTOR_FUND_FLOW",
+    "scan_data.json":              "SCAN_DATA",
+    "gold_pool.json":              "GOLD_POOL",
+    "stock_names.json":            "STOCK_LIST",
+    "recommend.json":              "RECOMMEND",
+    "macro_data.json":             "MACRO_DATA",
+    "nt_data.json":                "NT_DATA",
+    "lhb_data.json":               "LHB_DATA",
+    "concept_ranking.json":        "CONCEPT_RANKING",
+    "margin_data.json":            "MARGIN_DATA",
+    "cffex_data.json":             "CFFEX_HOLDINGS",
+    "ipo_score.json":              "IPO_DATA",
+    "crisis_data.json":            "CRISIS_DATA",
+    "crds_card_data.json":         "CRDS_CARD_DATA",
+    "triple_consensus.json":       "TRIPLE_CONSENSUS",
+    "triple_track.json":           "TRIPLE_TRACK",
+    "triple_history.json":         "TRIPLE_HISTORY",
+    "cockpit_tier_recommend.json": "COCKPIT_TIER_RECOMMEND",
+    "top10_daily.json":            "TOP10_DAILY",
+    "cockpit_advice.json":         "COCKPIT_ADVICE",
+    "sh_fib.json":                 "SH_FIB",
+    "sz_fib.json":                 "SZ_FIB",
+    "sector_rs.json":              "SECTOR_RS",
+    "inst_trade.json":             "INST_TRADE",
+    "north_fund.json":             "NORTH_FUND",
+    "market_alerts.json":          "MARKET_ALERTS",
+    "market_fund_flow_data.json":  "MARKET_FUND_FLOW_DATA",
+    "etf_subscription.json":       "ETF_SUBSCRIPTION",
+    "w52_high.json":               "W52_HIGH",
+    "limit_up_heatmap.json":       "LIMIT_UP_HEATMAP",
+    "herding_data.json":           "HERDING_DATA",
+    "volatility.json":             "VOLATILITY",
+    "capital_flow_data.json":      "CAPITAL_FLOW_DATA",
+    "mahoro.json":                 "MAHORO",
+    "candidate.json":              "CANDIDATE",
+    "backtest_comprehensive.json": "BACKTEST_COMPREHENSIVE",
+    "cockpit_backtest.json":       "COCKPIT_BACKTEST",
+    "backtest_tdx.json":           "BACKTEST_TDX",
+    "experiment.json":             "EXPERIMENT",
+    "etf_pulse.json":              "ETF_PULSE",
+    "etf_daily_monitor.json":      "ETF_DAILY_MONITOR",
+    "v8_cal.json":                 "V8_CAL",
 }
 
-def load_json(path):
+
+def _load_json(path):
     try:
         with open(path, encoding='utf-8') as f:
             return json.load(f)
-    except:
-        return {}
+    except Exception as e:
+        print(f"  ⚠️  读取失败 {path}: {e}")
+        return None
+
+
+def _make_lite(name, obj):
+    """轻量裁剪：只保留累计/计算数值，去掉历史明细。"""
+    if not isinstance(obj, dict):
+        return obj
+    if name == 'BACKTEST_TDX':
+        return {
+            'calc_time': obj.get('calc_time'),
+            'method': obj.get('method'),
+            'gold_pool_size': obj.get('gold_pool_size'),
+            'stocks_analyzed': obj.get('stocks_analyzed'),
+            'summary': obj.get('summary', {}),
+            '_lite_note': '个股历史信号明细已裁剪，仅保留汇总统计',
+        }
+    if name == 'BACKTEST_COMPREHENSIVE':
+        lite = {k: v for k, v in obj.items() if k != 'details'}
+        lite['_lite_note'] = 'details 回测明细已裁剪，仅保留 overview/comparison'
+        return lite
+    if name == 'COCKPIT_BACKTEST':
+        lite = {k: v for k, v in obj.items() if k != 'results'}
+        results = obj.get('results', [])
+        lite['results'] = results[:20]
+        lite['_lite_note'] = 'results 已裁剪至最近 20 条明细'
+        return lite
+    if name == 'GOLD_POOL':
+        lite = {k: v for k, v in obj.items() if k != 'stocks'}
+        stocks_lite = {}
+        for sid, s in obj.get('stocks', {}).items():
+            stocks_lite[sid] = {
+                'code': s.get('code'),
+                'name': s.get('name'),
+                'market': s.get('market'),
+                'board_label': s.get('board_label'),
+                'fund_type': s.get('fund_type'),
+                'first_date': s.get('first_date'),
+                'first_signal': s.get('first_signal'),
+                'max_signal': s.get('max_signal'),
+                'signal_count': s.get('signal_count'),
+                'sources': s.get('sources'),
+                'latest': s.get('latest'),
+                'industry': s.get('industry'),
+                'sectors': s.get('sectors'),
+                'concepts': s.get('concepts'),
+                'board': s.get('board'),
+            }
+        lite['stocks'] = stocks_lite
+        lite['_lite_note'] = 'stocks 已去掉 history 日明细，仅保留 latest 聚合'
+        return lite
+    if name == 'W52_HIGH':
+        lite = {k: v for k, v in obj.items() if k != 'stocks'}
+        lite['_lite_note'] = 'stocks 完整列表已裁剪，仅保留 top_gainers 与 total'
+        return lite
+    return obj
+
+
+def _write_js(var_name, obj):
+    DATA_DIR.mkdir(exist_ok=True)
+    out_path = DATA_DIR / f"{var_name}.js"
+    lite_obj = _make_lite(var_name, obj)
+    with open(out_path, 'w', encoding='utf-8') as f:
+        f.write(f"window.{var_name} = ")
+        json.dump(lite_obj, f, ensure_ascii=False, separators=(',', ':'))
+        f.write(";\n")
+    return out_path
+
 
 def build():
-    os.makedirs(V8_DIR / "dist", exist_ok=True)
-    
-    with open(TEMPLATE, encoding='utf-8') as f:
-        html = f.read()
-    
-    # 在 </head> 前注入数据块
-    data_blocks = []
-    for var, file in DATA_SOURCES.items():
-        jd = load_json(DATA / file)
-        json_str = json.dumps(jd, ensure_ascii=False, default=str)
-        data_blocks.append(f'<script>window.{var} = {json_str};</script>')
-    
-    inject_script = '\n'.join(data_blocks) + '\n'
-    
-    # 插入到 </head> 前
-    html = html.replace('</head>', inject_script + '</head>')
-    
-    # 写入输出
-    with open(OUTPUT, 'w', encoding='utf-8') as f:
-        f.write(html)
-    
-    print(f"✅ v8 数据注入完成")
-    print(f"   数据源: {len(DATA_SOURCES)} 个")
-    print(f"   输出: {OUTPUT}")
-    print(f"   大小: {len(html):,} 字符")
+    if not RAW_DIR.exists():
+        print(f"⚠️  raw_data/ 目录不存在（{RAW_DIR}）。")
+        print("   请将数据源端生成的 *.json 放到 raw_data/，再运行本脚本。")
+        print("   当前 data/*.js 不会被修改。")
+        return 1
+
+    files = [p for p in RAW_DIR.iterdir() if p.suffix == '.json']
+    if not files:
+        print(f"⚠️  raw_data/ 为空，无数据可更新。")
+        return 1
+
+    updated = 0
+    skipped = 0
+    for src_path in sorted(files):
+        var_name = DATA_SOURCES.get(src_path.name)
+        if not var_name:
+            # 尝试按文件名推断变量名（如 v8_cal.json → V8_CAL）
+            stem = src_path.stem
+            var_name = stem.upper().replace('-', '_')
+        obj = _load_json(src_path)
+        if obj is None:
+            skipped += 1
+            continue
+        out_path = _write_js(var_name, obj)
+        updated += 1
+        print(f"  ✅ {src_path.name} → {out_path.name}")
+
+    print(f"\n完成：更新 {updated} 个，跳过 {skipped} 个。")
+    print(f"输出目录：{DATA_DIR}")
+    return 0
+
 
 if __name__ == '__main__':
-    build()
+    sys.exit(build())

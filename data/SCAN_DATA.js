@@ -1,0 +1,1 @@
+window.SCAN_DATA = {};
