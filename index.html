@@ -876,6 +876,36 @@
   <section id="sec-lg">
     <div class="sec-head"><h2>📖 逻辑详解</h2><span class="tag">仅管理员可见 · 指标/策略/安全口径</span></div>
 
+    <!-- ============ 版本演进总览 ============ -->
+    <div class="lg-box cyan" style="margin-bottom:18px">
+      <h3 style="margin:0 0 6px">🧭 版本演进与设计准则（v6 → v8）</h3>
+      <div class="logic-h">为什么重写</div>
+      <div class="logic-p">上一版（v6）在长期迭代中累积了结构性包袱。本版（v8）以「轻量、及时、真实、可靠」为唯一目标推倒重来。以下教训已固化为设计红线，写入铁律，避免重蹈覆辙。</div>
+
+      <div class="logic-h">v6 八大失败（已固化为红线）</div>
+      <div class="logic-p">
+        ① <b>单体巨页</b>：全部数据与逻辑塞进单一超大型页面，改一个数就要重建并全量重部署，迭代慢、历史膨胀、缓存粒度粗。<br>
+        ② <b>脚本与结构脱节</b>：刷新/部署脚本指向错误的目录布局，执行即失败，沦为死代码。<br>
+        ③ <b>监控误推</b>：守护脚本把内容推送到错误的站点分支，污染他站。<br>
+        ④ <b>新鲜度断裂</b>：多源缺统一新鲜度闸门，部分板块停更数日用户无从感知，误以为站点死亡。<br>
+        ⑤ <b>脚本孤岛</b>：抓取脚本写了却没接入数据流水线，等于没写。<br>
+        ⑥ <b>网络位置错配</b>：云端抓取任务因执行机网络位置限制完全抓不到本土数据源，又无就近执行机兜底，「自动化」落空。<br>
+        ⑦ <b>监控信号错位</b>：用已停管线的信号误判主机失联，发出假警报。<br>
+        ⑧ <b>产物与源不同步</b>：构建产物未随源同步，部署出现假成功。
+      </div>
+
+      <div class="logic-h">v8 对应改进（红线落地）</div>
+      <div class="logic-p">
+        ① <b>数据层彻底分离</b>：每个数据源独立成文件，页面本体轻量，改数不动页。<br>
+        ② <b>大块头聚合裁剪</b>：历史明细类数据只留最新聚合值，体积极大压缩（页面由数 MB 降到数百 KB）。<br>
+        ③ <b>脚本重写对齐结构</b>：刷新/部署/守护脚本全部按当前实际结构重写，目标单一显式校验。<br>
+        ④ <b>单源容错</b>：任一来源失败只跳过并保留既有正常数据，绝不用占位/估算覆盖真实值。<br>
+        ⑤ <b>就近执行 + 定时自动</b>：本土数据源在就近网络位置按固定节奏自动抓取推送，不再依赖人工触发。<br>
+        ⑥ <b>新鲜度看门狗</b>：独立监控每个数据源更新时间，过期即告警，杜绝静默停更。<br>
+        ⑦ <b>演进教训文档化</b>：版本教训沉淀为设计准则，接手即可读。
+      </div>
+    </div>
+
     <div class="lg-subtabs" id="lgSubtabs">
       <div class="lg-tab active" data-lg="td" onclick="switchLg('td',this)">📅 今日事件</div>
       <div class="lg-tab" data-lg="rt" onclick="switchLg('rt',this)">📡 实时数据</div>
@@ -887,102 +917,162 @@
     <!-- === 今日事件 === -->
     <div class="lg-pane active" id="lg-td">
       <div class="card">
+        <h3><span class="ic">📅</span>今日事件详情 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">交易日历事件 + 宏观速览，由日历数据源与宏观数据聚合生成。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">一张卡汇总当日所有高优先级市场事件，开盘前快速掌握全天节奏。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">事件必须带「相对时间」标签（今日/明日/X天后），不写裸日期；全天性事件置顶，盘中动态事件按触发时间倒序。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">将日历事件与宏观速览按优先级合并去重，渲染为时间轴列表。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🚀</span>打新速览 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">新股发行数据（待申购/待上市/上市日追踪），由发行信息披露聚合。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">盘中一眼看今日可申购/可上市新股及上市5日追踪，辅助打新决策。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">「今日上市 / 今日申购 / 上市日追踪5日」直接展示，其余通过按钮 tab 进入；无可申购时显示「近期无新股上市」。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">评分模型：满分100 = PE折价(0-40) + 行业热度(0-25) + 发行价合理性(0-20) + 板块溢价(0-15)。双维度 = 套利评分(收益弹性) + 基本面评分(安全边际)；综合分 = 套利×60% + 基本面×40%。推荐等级：≥80强烈 / 65-79建议 / 50-64谨慎 / ＜50不建议。</div>
+      </div>
+
+      <div class="card">
         <h3><span class="ic">📅</span>重要事件日历 - 说明</h3>
-        <div class="logic-h">定位</div>
-        <div class="logic-p">月度日历视图，标注当日各类市场事件，用于预判宏观/政策/资金面窗口。中长线视角，每周日更新、月底补全下月。</div>
-        <div class="logic-h">标签体系</div>
-        <div class="logic-p">今天 / 重要政策 / 央行·LPR / 中国数据 / FOMC / 期权交割 / 期货交割 / A50交割 / 休市（港股/美股）/ SG公假 / 财报（美股绿/韩股灰/台股靛）/ 苹果·华为发布。</div>
-        <div class="logic-h">去重规则</div>
-        <div class="logic-p">同一天多个事件时自动去重，保留最详细版本，避免「港股休市」与「港股休市（xxx）」重复显示。</div>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">月度市场事件清单（政策/央行/LPR/中国数据/FOMC/交割/休市/财报/发布），由日历数据源维护。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">中长线视角预判宏观/政策/资金面窗口；每周日更新、月底补全下月。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">标签体系：今天/重要政策/央行·LPR/中国数据/FOMC/期权交割/期货交割/A50交割/休市/财报（美股绿/韩股灰/台股靛）/苹果·华为发布。同一天多事件自动去重，保留最详细版本。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">按日期渲染月历网格，事件按标签着色；色块图例与日历同源。</div>
       </div>
-
-      <div class="card">
-        <h3><span class="ic">🚀</span>打新研判 - 说明</h3>
-        <div class="logic-h">评分模型</div>
-        <div class="logic-p">满分100 = PE折价(0-40分) + 行业热度(0-25分) + 发行价合理性(0-20分) + 板块溢价(0-15分)。</div>
-        <div class="logic-h">推荐等级</div>
-        <div class="logic-p">≥80 强烈推荐 / 65-79 建议申购 / 50-64 谨慎参与 / ＜50 不建议。无可申购新股时显示「近期无新股上市」。</div>
-        <div class="logic-h">当前展示</div>
-        <div class="logic-p">v8 保留「今日上市」「今日申购」「上市日追踪5日」直接显示，其余通过按钮 tab 进入查看。</div>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">⚡</span>今日关键事件 - 说明</h3>
-        <div class="logic-h">数据来源</div>
-        <div class="logic-p">整合宏观数据、政策、FOMC、重要财报、休市等当日高优先级事件，按盘中实时口径聚合。</div>
-        <div class="logic-h">展示原则</div>
-        <div class="logic-p">事件必须带「相对时间」标签（今日/明日/X天后），不写裸日期。全天性事件置顶，盘中动态事件按触发时间倒序。</div>
-      </div>
-
     </div>
 
     <!-- === 实时数据 === -->
     <div class="lg-pane" id="lg-rt">
       <div class="card">
-        <h3><span class="ic">🌟</span>AI市场速览 - 说明</h3>
-        <div class="logic-h">定位</div>
-        <div class="logic-p">替代旧版「市场异动速览」，自动聚合14维度中国源数据，盘中实时驱动。</div>
-        <div class="logic-h">14 维度</div>
-        <div class="logic-p">日内风向标、ETF国家队资金、板块资金主线、主力抱团方向、指数纵览、异动催化剂、美联储FOMC、投行观点、异常速览（上证连跌/涨跌家数/涨停跌停/成交额/两融/VIX/国债/ETF申赎等）。</div>
-        <div class="logic-h">ETF国家队资金估算口径</div>
-        <table class="lg-table">
-          <tr><th>金额级别</th><th>净流入分析</th><th>净流出分析</th></tr>
-          <tr><td>≥200亿</td><td class="up">机构资金大举进场，情绪极度乐观</td><td class="down">机构资金大幅撤退，情绪极度谨慎</td></tr>
-          <tr><td>100-200亿</td><td class="up">机构资金明显流入，态度偏积极</td><td class="down">机构资金明显流出，态度偏谨慎</td></tr>
-          <tr><td>50-100亿</td><td class="up">资金温和流入，市场信心尚可</td><td class="down">资金温和流出，市场略有分歧</td></tr>
-          <tr><td>＜50亿</td><td class="up">资金小幅流入，属正常波动</td><td class="down">资金小幅流出，属正常波动</td></tr>
-        </table>
+        <h3><span class="ic">🔥</span>沪指 / 深成指 / 创业板 / 北向资金 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">交易所实时行情推送（盘中）。北向为沪股通+深股通实时净买入合计。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">一眼看盘，掌握主要指数强弱与北向实时动向。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">红涨绿跌；卡片含迷你当日 intraday 走势图。北向资金自 2024-05 港交所停止披露 top_buy 后仅展示净额口径。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">直接展示行情接口返回的现价/涨跌额/涨跌幅；北向 = 沪股通净买入 + 深股通净买入。</div>
       </div>
 
       <div class="card">
-        <h3><span class="ic">🚦</span>市场健康度三灯 - 说明</h3>
-        <div class="logic-h">三维判断</div>
-        <table class="lg-table">
-          <tr><th>灯</th><th>亮灯条件</th><th>灭灯条件</th></tr>
-          <tr><td>🟢 结构灯</td><td>上证连跌＜10天 且 累计跌幅＞-8%</td><td>创新低且无窗口覆盖</td></tr>
-          <tr><td>🟢 资金灯</td><td>主力净流入+流出＞-5亿 或 流入＞|流出|</td><td>主力净出且流入不抵流出</td></tr>
-          <tr><td>🟢 情绪灯</td><td>涨家＞跌家 且 涨停≥30只</td><td>跌多涨少或涨停冻结</td></tr>
-        </table>
-        <div class="logic-h">综合判定</div>
-        <div class="logic-p">3灯=积极 / 2灯=中性偏暖 / 1灯=谨慎 / 0灯=观望。与五维行互补：五维看中长期，三灯看短期。</div>
+        <h3><span class="ic">🚀</span>主力板块 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">公开行情接口的行业板块主力资金净流入。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">看清当日资金主攻方向。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">|净流入|≥5亿标「大幅流入/流出」；红=流入，绿=流出；主数据源失败时自动切换备用源（流入TOP10+流出TOP10合并去重）。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">成分股主力净流入合计，按净额排序取 TOP。</div>
       </div>
 
       <div class="card">
-        <h3><span class="ic">⚠️</span>异动提醒监控算法 - 说明</h3>
-        <div class="logic-h">触发阈值与依据</div>
-        <table class="lg-table">
-          <tr><th>维度</th><th>触发阈值</th><th>市场依据</th></tr>
-          <tr><td>融券余额异动</td><td>日环比 ≥ ±5% 且 绝对值变动 ≥ 3亿</td><td>融券市值约150亿，5%约7.5亿属显著异动</td></tr>
-          <tr><td>融资余额异动</td><td>日环比 ≥ ±1%</td><td>融资约1.5万亿，1%≈150亿</td></tr>
-          <tr><td>连续下跌</td><td>连续下跌 ≥ 20天</td><td>约1个自然月连续走低</td></tr>
-          <tr><td>累计跌幅</td><td>累计跌幅 ≤ -8%</td><td>8%为技术性回调与中级调整分界线</td></tr>
-          <tr><td>成交额异动</td><td>两市成交额日环比 ≥ ±20%</td><td>20%以上属异常放量或缩量</td></tr>
-          <tr><td>普涨/普跌</td><td>上涨/下跌家数＞4000</td><td>A股约5000只，4000以上为极端行情</td></tr>
-          <tr><td>情绪偏强/偏弱</td><td>一方＞另一方×2 且 基数＞2000</td><td>多空力量超过2倍且有统计意义</td></tr>
-          <tr><td>ETF大幅申赎</td><td>净申赎绝对值 ≥ 100亿份</td><td>百亿级为机构大额调仓信号</td></tr>
-          <tr><td>跌停潮</td><td>跌停 ≥ 30家</td><td>恐慌性抛售</td></tr>
-          <tr><td>涨停冰点</td><td>涨停 ≤ 15家</td><td>投机情绪进入冰点</td></tr>
-          <tr><td>北向资金异动</td><td>单日净流入/流出 ≥ 50亿</td><td>⚠️ 港交所2024年5月起停止披露top_buy，监控暂停</td></tr>
-          <tr><td>VIX恐慌</td><td>VIX ≥ 30</td><td>阈值已从单日涨幅改为绝对水平</td></tr>
-        </table>
+        <h3><span class="ic">📊</span>概念涨跌排名 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">公开行情接口的概念板块涨幅与领涨股。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">实时看热点（涨幅榜）与弱势（跌幅榜）。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">涨幅榜/跌幅榜各前10；红涨绿跌。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">按板块涨幅排序，取领涨股。</div>
       </div>
 
       <div class="card">
-        <h3><span class="ic">🚀</span>主力板块 / 概念涨跌排名 - 说明</h3>
-        <div class="logic-h">主力板块</div>
-        <div class="logic-p">行业板块主力净流入/流出排名，|净流入|≥5亿为「大幅流入/流出」。红色=流入，绿色=流出。主数据源失败时自动切换备用数据源（流入TOP10+流出TOP10合并去重）。</div>
-        <div class="logic-h">概念涨跌排名</div>
-        <div class="logic-p">实时展示概念板块涨幅榜与跌幅榜各前10名。涨幅榜看热点，跌幅榜看弱势。</div>
+        <h3><span class="ic">📈</span>上证+深证 每日成交金额 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">交易所行情聚合（两市成交额）。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">量能温度计，判断放量/缩量与情绪。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">展示当日合计与环比；标注 1.2 万亿警戒线。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">沪市成交额 + 深市成交额合计，与前日比计算环比。</div>
       </div>
 
       <div class="card">
-        <h3><span class="ic">🔥</span>涨停联动 / 个股实时查询 / ETF资金热度 - 说明</h3>
-        <div class="logic-h">涨停联动</div>
-        <div class="logic-p">10日滚动热力矩阵，按概念板块统计涨停家数。持续热点(≥7日有涨停且近3日连续) / 新启动(今日≥2家但前2日=0) / 消退(前5日活跃但近3日&lt;2)。</div>
-        <div class="logic-h">个股实时查询</div>
-        <div class="logic-p">输入代码或名称，聚合多维共振评分、金股池状态、主力资金、近10日走势等。</div>
-        <div class="logic-h">ETF资金热度</div>
-        <div class="logic-p">宽基指数ETF每日净申购赎回份额折线图，T+0实时估算国家队动向。</div>
+        <h3><span class="ic">🏘️</span>近一月 涨跌家数统计 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">交易所实时行情聚合。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">市场广度，识别普涨/普跌。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">红=上涨家数，绿=下跌家数，灰=平盘。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">全市场涨跌平家数统计，近一月滚动展示。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🔥</span>涨停联动 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">公开行情接口的连板梯队与封单数据。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">短线情绪与题材主线一览。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">10日滚动热力矩阵，按概念板块统计涨停家数；持续热点(≥7日有涨停且近3日连续) / 新启动(今日≥2家但前2日=0) / 消退(前5日活跃但近3日&lt;2)。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">按概念板块统计涨停家数，连板数分级（首板/2板/3板…）展示。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🔍</span>个股实时查询 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">实时行情 + 多源共振评分。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">单只股票多维体检：共振评分、金股池状态、主力资金、近10日走势。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">输入代码或名称查询；聚合多维数据展示。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">综合评分见「个股查询评分」卡；其余字段直接取行情与评分结果。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🔥</span>ETF 资金热度 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">ETF 申赎与成交数据（T+0 估算）。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">看宽基/行业/主题/跨境四类 ETF 资金方向，T+0 估国家队动向。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">四分类独立展示；涨跌幅红涨绿跌；按成交额与主力净流入综合排序。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">每类取成交额 TOP4，展示涨跌幅与主力净流入，分类小计。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">⚡</span>ETF 5分钟量能脉冲监测 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">ETF 分时成交（T+0）。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">捕捉盘中突发量能，辅助判断资金突袭。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">最近 4 个 5min 切片；盘中 T+0。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">5 分钟成交量环比突增检测，标记脉冲强度。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">📊</span>股票型ETF日监控 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">股票型 ETF 日频申赎/规模数据（T+1 盘后）。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">机构资金中线调仓信号。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">T+1 盘后更新；当前若数据源未接入则标注「⚠️ 无数据」。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">日频净申赎份额统计，按净申赎排序。</div>
       </div>
     </div>
 
@@ -990,51 +1080,74 @@
     <div class="lg-pane" id="lg-ph">
       <div class="card">
         <h3><span class="ic">🌡️</span>市场温度计 - 说明</h3>
-        <div class="logic-h">综合打分</div>
-        <div class="logic-p">0~100 = 0.3×涨跌家数比 + 0.2×量能分 + 0.2×北向分 + 0.15×涨停跌停比 + 0.15×情绪分。</div>
-        <div class="code">temp = 0.3*ad_ratio + 0.2*vol_z + 0.2*north_z + 0.15*zt_ratio + 0.15*sentiment</div>
-        <div class="logic-h">分档</div>
-        <div class="logic-p">≥70 偏热 / ≤30 偏冷 / 30-70 中性。北向停更后北向分权重仍保留，但数据源标注停更。</div>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">盘后聚合：涨跌家数比、量能、北向、涨停跌停比、情绪。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">市场冷热一眼判。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">≥70 偏热 / ≤30 偏冷 / 30-70 中性。北向停更后北向分权重仍保留但标注停更。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">temp = 0.3×涨跌家数比 + 0.2×量能分 + 0.2×北向分 + 0.15×涨停跌停比 + 0.15×情绪分。</div>
       </div>
 
       <div class="card">
         <h3><span class="ic">🕸️</span>六维共振雷达 - 说明</h3>
-        <div class="logic-h">六个维度</div>
-        <div class="logic-p">量能 / 情绪 / 资金 / 估值 / 技术 / 外围。各维归一化到 0~100 后绘制多边形。</div>
-        <div class="code">dims = [vol, sentiment, fund, valuation, tech, external]
-norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
-        <div class="logic-h">危机雷达算法</div>
-        <div class="logic-p">综合危机指数 = 货币×40% + 经济×35% + 全球×25%。状态分档：0-30平稳 / 30-50关注 / 50-70警惕 / 70-100危机。</div>
-        <div class="logic-h">指标危险分</div>
-        <div class="logic-p">基于近1年历史分位。越高越危险指标（SHIBOR/VIX/DXY/两融/离岸汇率）危险分=分位；越低越危险指标（期限利差/中美利差/PMI/出口/CPI/房价/铜金比/BDI/美债倒挂）危险分=100−分位。</div>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">盘后多维归一化（量能/情绪/资金/估值/技术/外围）。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">六维健康全景，识别短板维度。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">六维各归一化到 0~100 后绘制多边形。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">norm = clip((x-lo)/(hi-lo)×100, 0, 100)。危机雷达：综合危机指数 = 货币×40% + 经济×35% + 全球×25%；分档 0-30平稳/30-50关注/50-70警惕/70-100危机。指标危险分基于近1年分位：越高越危险指标（SHIBOR/VIX/DXY/两融/离岸汇率）危险分=分位；越低越危险指标（期限利差/中美利差/PMI/出口/CPI/房价/铜金比/BDI/美债倒挂）危险分=100−分位。</div>
       </div>
 
       <div class="card">
-        <h3><span class="ic">🌀</span>斐波窗口 - 说明</h3>
-        <div class="logic-h">时间窗口</div>
-        <div class="logic-p">以显著高低点为基准日，叠加 5/8/13/21/34/55 交易日序列，标注变盘窗口。F21窗口（21个交易日）最重要，±1天容差。</div>
-        <div class="logic-h">价格窗口</div>
-        <div class="logic-p">上证从peak回撤，用38.2%/50%/61.8%/78.6%标记支撑窗口。分类：⚡已触发→🔄追踪→🔴活跃→📅待观。</div>
-        <div class="logic-h">与宏观事件重合</div>
-        <div class="logic-p">与FOMC、LPR、重要经济数据发布日重合时权重提升。窗口失效后依次观察34日/55日更高级别窗口。</div>
+        <h3><span class="ic">📉</span>斐波那契窗口 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">指数显著高低点 + 斐波数列。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">变盘窗口预警与回调支撑位。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">以显著高低点为基准叠加 5/8/13/21/34/55 交易日；F21 最重要，±1天容差。价格窗口用 38.2%/50%/61.8%/78.6% 标记支撑。分类：⚡已触发→🔄追踪→🔴活跃→📅待观。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">基准日 + 斐波序列标注窗口；peak 回撤百分比定位支撑；与 FOMC/LPR/重要数据日重合时权重提升；失效后依次观察 34/55 日窗口。</div>
       </div>
 
       <div class="card">
-        <h3><span class="ic">💰</span>资金流口径 - 说明</h3>
-        <div class="logic-h">板块/概念资金流</div>
-        <div class="logic-p">成分股主力净流入合计，单位统一为亿元。红色=净流入/绿色=净流出。</div>
-        <div class="logic-h">主力资金定义</div>
-        <div class="logic-p">超大单(≥50万股或≥100万元) + 大单(≥10万股或≥20万元) = 主力净流入。</div>
-        <div class="logic-h">资金流向追踪</div>
-        <div class="logic-p">5日/20日/60日累计净流入排名：⚡短线5日反映近期热点，📊中线20日反映中期建仓趋势，🏛️长线60日反映机构级别大资金动向。</div>
+        <h3><span class="ic">📊</span>资金流时间轴 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">沪市全市场成分股主力资金净流入（滚动累加）。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">中线资金趋势，识别主力建仓/撤退节奏。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">可切 60日/120日/250日/全部；累计净流入 = 单日主力净流入滚动累加。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">逐日主力净流入累加绘制时间轴，范围切换重算。</div>
       </div>
 
       <div class="card">
-        <h3><span class="ic">🌍</span>宏观观测 / 危机监测 - 说明</h3>
-        <div class="logic-h">宏观观测</div>
-        <div class="logic-p">追踪四大类：货币（国债/LPR/OMO/M2）/ 全球（VIX/DXY/CNH/利差）/ 情绪（新增投资者）/ 经济（PMI/CPI/PPI/社融/出口）。月度⭐已更新 / ☆待更新；每日高频实时显示。</div>
-        <div class="logic-h">危机监测·趋势对比</div>
-        <div class="logic-p">监测SHIBOR隔夜、中美利差、PMI、社融增速、出口增速、VIX、铜金比共7项。与前值对比，趋势箭头↑恶化↓改善。评分：🔴2分危险 / 🟡1分关注 / 🟢0分安全；≥6高度警惕 / 3-5需要关注 / ＜3暂无异常。</div>
+        <h3><span class="ic">📈</span>板块资金三合一 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">板块资金流（短/中/长线）。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">板块资金三维透视。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">⚡短线5日 / 📊中线20日 / 🏛️长线60日 累计净流入排名。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">按 5/20/60 日窗口累计净流入排序，合并展示。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🌍</span>宏观观测 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">宏观数据接口（货币/全球/情绪/经济）。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">宏观环境变量，辅助中长线判断。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">四大类：货币（国债/LPR/OMO/M2）/ 全球（VIX/DXY/CNH/利差）/ 情绪（新增投资者）/ 经济（PMI/CPI/PPI/社融/出口）。月度⭐已更新 / ☆待更新；每日高频实时显示。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">危机监测：SHIBOR隔夜/中美利差/PMI/社融增速/出口增速/VIX/铜金比 共7项，与前值对比趋势箭头↑恶化↓改善；评分 🔴2分危险/🟡1分关注/🟢0分安全；≥6高度警惕/3-5需关注/＜3暂无异常。</div>
       </div>
     </div>
 
@@ -1045,119 +1158,252 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="lg-box red">
           <b>该看「三重共识」买卖，其他都是辅助/背景。</b><br>
           · 🥇 三重共识：可直接作为买卖候选池<br>
-          · 🌐 全站精选（原驾驶舱A/B档）：扩大观察范围，不是最终买点<br>
-          · 🚀 驾驶舱：看市场环境和技术面背景<br>
+          · 🌐 全站精选：扩大观察范围，不是最终买点<br>
+          · 🎯 驾驶舱：看市场环境和技术面背景<br>
           · 📦 股池构成：只是背景信息，不用于买卖
         </div>
       </div>
 
       <div class="card">
-        <h3><span class="ic">🧬</span>三重共识 - 说明</h3>
-        <div class="logic-h">判定公式</div>
-        <div class="logic-p">主站 TOP10（total_score ≥70） ∩ 驾驶舱 A档 ∩ 基本面质量 A档，三者同时满足即严格共识。</div>
-        <div class="logic-h">分组展示</div>
-        <div class="logic-p">· <b class="up">严格共识（3/3）</b>：无条件优先看<br>· <b style="color:var(--gold)">优先观察（2/3，total_score≥75）</b>：差1步<br>· <b style="color:var(--dim)">扩展观察（2/3，total_score&lt;75）</b>：差2步</div>
-        <div class="logic-h">历史追踪</div>
-        <div class="logic-p">持仓表、催化剂兑现、回测N日胜率、严格vs宽松、阈值敏感性、板块聚类、重叠度、每日入选历史。</div>
+        <h3><span class="ic">🧬</span>严格三重共识 / 优先观察 / 扩展观察 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">主站 TOP10 评分 + 驾驶舱 A档 + 基本面质量 A档 三路融合。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">给出可直接作为买卖候选的严格共识池，及差1步/差2步备选。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">严格共识(3/3)：主站TOP10(total_score≥70) ∩ 驾驶舱A档 ∩ 基本面A档。优先观察(2/3, total_score≥75)差1步；扩展观察(2/3, total_score&lt;75)差2步。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">三者取交集为严格共识；满足两项且评分≥75为优先，&lt;75为扩展。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">📈</span>持仓盈亏跟踪 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">入选记录 + 本地逐日累积快照。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">跟踪已入选个股的持有表现。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">入选以来涨跌 = 入选首日收盘价→最新收盘价；持有/连续天数来自本地快照。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">(最新收盘价 − 入选首日收盘价)/入选首日收盘价。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🔔</span>状态迁移 &amp; 告警 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">入选池状态变更日志。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">提示个股从观察→共识/退出等状态变化。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">状态迁移触发告警；展示最近变更。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">对比前后快照，差异项生成告警条目。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🧪</span>催化剂兑现追踪 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">基本面季报/重组消息面。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">跟踪入选逻辑是否被市场兑现。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">已兑现=价涨≥3%；走弱=回撤≥3%；否则观察中。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">催化剂触发后 N 日涨跌幅判定状态。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">📊</span>回测 N 日胜率（信号层） - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">历史真实收盘价滚动回测。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">验证信号层策略的历史胜率与期望收益。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">持有期 N 日；样本少时结论仅供参考。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">按信号入选后持有 N 日的胜率/平均收益/夏普/最佳/最差统计。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">⚖️</span>严格 vs 宽松 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">同口径历史回测。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">对比严格(总评分≥70共振)与宽松(信号≥2)的表现差异。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">同口径真实收盘价滚动回测。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">分别统计严格/宽松在各持有期的胜率与均收。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🎚</span>阈值敏感性 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">不同总评分门槛的回测（不改动实盘规则，仅测试）。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">观察评分门槛对胜率的影响。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">样本少时结论仅供参考。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">扫不同门槛的 5 日回测表现。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🏭</span>板块聚类（相关性风险） - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">当前跟踪池行业分布。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">提示单一行业占比过高导致同涨同跌相关性风险。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">行业集中度超阈值告警。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">统计跟踪池各行业占比，绘制聚类。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🔗</span>全站精选重叠度 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">跟踪池（严格+差一步）与全站其他精选层。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">辅助判断市场共识集中度。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">重叠越高共识越强。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">集合交集/并集比计算重叠度。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">📅</span>三重入选历史（每日记录） - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">每日入选三重共识候选的数量与状态记录。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">长期观察共识池质量变化。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">每日一条记录。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">每日盘后写入入选快照。</div>
       </div>
 
       <div class="card">
         <h3><span class="ic">🎯</span>选股驾驶舱 / 全站精选 - 说明</h3>
-        <div class="logic-h">驾驶舱定位</div>
-        <div class="logic-p">出手信号灯→宏观环境→最强赛道TOP5→共振候选→机构/龙虎榜验证→三重选股。用于确认市场环境和技术面背景。</div>
-        <div class="logic-h">全站精选</div>
-        <div class="logic-p">技术面形态+基本面质量分筛选后的观察池（A/B档）。A档进入三重共识候选，B档扩大观察范围。</div>
-        <div class="logic-h">基本面质量分</div>
-        <div class="logic-p">A=+15~25 / B=+5 / C=0 / D=-10。A档阈值已对齐真实上限70分。</div>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">驾驶舱 = 市场环境+技术面背景；全站精选 = 技术面形态+基本面质量分筛选。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">驾驶舱确认出手环境；全站精选扩大观察范围（A档进三重共识候选，B档扩大观察）。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">驾驶舱流程：出手信号灯→宏观环境→最强赛道TOP5→共振候选→机构/龙虎榜验证→三重选股。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">基本面质量分：A=+15~25 / B=+5 / C=0 / D=-10；A档阈值已对齐真实上限70分。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">📊</span>CRDS · 逆势龙头 - 说明</h3>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">短线连板/大跌日逆势/量能确认等盘面特征。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">在大盘弱势时识别逆势强势标的。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">三项全满足 / 两项满足 / 10日≥2板 / 大跌日逆势板 / 量能确认 五类分组；含大盘判断有效性标签。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">连板天数、大跌日抗跌、量能放大等特征组合判定逆势强度。</div>
       </div>
 
       <div class="card">
         <h3><span class="ic">🔤</span>四个基础信号 - 说明</h3>
-        <table class="lg-table">
-          <tr><th>信号</th><th>含义</th><th>技术定义</th></tr>
-          <tr><td><b class="up">C</b> 缠论买</td><td>技术拐点信号</td><td>日K底分型+MACD金叉/底背离</td></tr>
-          <tr><td><b style="color:var(--gold)">J</b> 金钻起涨/黄柱</td><td>金钻量化买点</td><td>DDX资金流入+阳线+涨幅&gt;2%触发起涨；金钻趋势&gt;最高价触发黄柱</td></tr>
-          <tr><td><b style="color:var(--cyan)">I</b> 机构变红</td><td>机构资金介入</td><td>收盘价高于牛线1；牛线1=WMA20(加权中间价MID9)</td></tr>
-          <tr><td><b class="down">T</b> 上涨趋势</td><td>趋势确认</td><td>EMA多头+量能+价格确认</td></tr>
-        </table>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">技术面信号（缠论/金钻/机构/趋势）。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">构成多维共振评分的基础单元。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">C缠论买 / J金钻起涨·黄柱 / I机构变红 / T上涨趋势 四信号。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">C=日K底分型+MACD金叉/底背离；J=DDX流入+阳线+涨幅&gt;2%触发起涨，金钻趋势&gt;最高价触发黄柱；I=收盘价高于牛线1（牛线1=WMA20加权中间价）；T=EMA多头+量能+价格确认。</div>
       </div>
 
       <div class="card">
         <h3><span class="ic">🔍</span>个股查询评分 - 说明</h3>
-        <div class="logic-h">满分100分</div>
-        <table class="lg-table">
-          <tr><th>因子</th><th>加分逻辑</th><th>上限</th></tr>
-          <tr><td>当日涨幅</td><td>涨1%→+3分（涨停10%→+30分）</td><td>30</td></tr>
-          <tr><td>量比</td><td>(量比-1)×10，量比1.5→5分，3→20分</td><td>20</td></tr>
-          <tr><td>K线形态</td><td>bullish +8分/个，neutral +3分/个，bearish -5分/个</td><td>不限</td></tr>
-          <tr><td>开盘强度</td><td>高开→+15，平开→+5</td><td>15</td></tr>
-          <tr><td>收盘位置</td><td>收在最高价附近(&gt;98%)→+10，收&gt;开盘价→+5</td><td>10</td></tr>
-        </table>
-        <div class="logic-h">标签判定</div>
-        <div class="logic-p"><b class="up">BUY</b>：当日上涨且评分≥50 / <b style="color:var(--gold)">关注</b>：评分≥30但未达BUY / <b style="color:var(--dim)">观望</b>：评分&lt;30。</div>
-        <div class="logic-h">止损/目标价</div>
-        <div class="logic-p">止损 = max(当前价×0.93, 近10日最低价×0.98)，上限不超过当前价×0.95。目标价 = max(当前价×1.12, 近20日最高价)。K线不足时退化固定比例（-7%止损/+12%目标）。</div>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">实时行情 + K线形态 + 开盘/收盘位置。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">单只股票日内强度快速评分。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">满分100：当日涨幅(30,涨1%→+3,涨停+30) + 量比(20,(量比-1)×10) + K线形态(bullish+8/个) + 开盘强度(15,高开+15/平开+5) + 收盘位置(10,收最高附近+10)。标签：BUY=上涨且≥50 / 关注≥30 / 观望&lt;30。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">止损 = max(当前价×0.93, 近10日最低×0.98) 上限当前价×0.95；目标价 = max(当前价×1.12, 近20日最高)；K线不足退化固定比例(-7%止损/+12%目标)。</div>
       </div>
 
       <div class="card">
         <h3><span class="ic">🧬</span>多维共振评分·完整公式 - 说明</h3>
-        <div class="logic-p">总分 = 基础(~100) + 增强(±13) + 资金(~15) + 板块(~5) + 机构(~10) + 基本面(-10~+25)，上限~158。</div>
-        <table class="lg-table">
-          <tr><th>维度</th><th>满分</th><th>细则</th></tr>
-          <tr><td>缠论买</td><td>25</td><td>日K底分型+MACD金叉/底背离</td></tr>
-          <tr><td>金钻起涨/黄柱</td><td>25</td><td>金钻起涨或金钻黄柱信号</td></tr>
-          <tr><td>机构变红</td><td>25</td><td>四量图机构资金介入</td></tr>
-          <tr><td>上涨趋势</td><td>25</td><td>EMA多头+量能+价格确认</td></tr>
-          <tr><td>信号组合优待</td><td>+10/+5</td><td>缠论买+金钻起涨=+10；+黄柱=+5</td></tr>
-          <tr><td>增强因子</td><td>±13</td><td>20日动量(±5)+RSI风控(±5)+连续共振(+2/天上限8)</td></tr>
-          <tr><td>资金动力</td><td>~15</td><td>主力净买(+5/+2)+龙虎榜纯共振(+5/+3)+北向覆盖(+2)</td></tr>
-          <tr><td>板块共振</td><td>~5</td><td>所属板块净流入&gt;5亿+5/&gt;1亿+2/&lt;-5亿-3</td></tr>
-          <tr><td>机构投行</td><td>~10</td><td>投行bullish+3/52周新高+4/分析师转向+3</td></tr>
-          <tr><td>基本面质量分</td><td>-10~+25</td><td>A级15-25/B级5/C级0/D级-10</td></tr>
-        </table>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">四基础信号 + 增强 + 资金 + 板块 + 机构 + 基本面 多因子。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">个股综合强度总评分，是三重共识的核心输入。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">总分上限~158；A档阈值已对齐真实上限70分。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">基础(~100)：缠论买/金钻/机构/趋势各25。增强(±13)：20日动量(±5)+RSI风控(±5)+连续共振(+2/天上限8)。资金(~15)：主力净买(+5/+2)+龙虎榜纯共振(+5/+3)+北向覆盖(+2)。板块(~5)：板块净流入&gt;5亿+5/&gt;1亿+2/&lt;-5亿-3。机构(~10)：投行bullish+3/52周新高+4/分析师转向+3。基本面(-10~+25)：A级15-25/B级5/C级0/D级-10。</div>
       </div>
     </div>
 
     <!-- === 运维 === -->
     <div class="lg-pane" id="lg-op">
       <div class="card">
-        <h3><span class="ic">🔒</span>数据安全口径 - 说明</h3>
+        <h3><span class="ic">🔒</span>数据安全口径（铁律） - 说明</h3>
         <div class="lg-box red">
           <b>铁律</b>：前端面板一律不得暴露具体数据源、脚本路径、本地文件名、机器节点或跑批时间等核心信息。所有口径仅写 HANDOVER/代码注释，不进入用户可见文本。
         </div>
         <div class="logic-h">更新时间</div>
         <div class="logic-p">盘中数据按固定周期刷新，盘后数据在日终批处理后统一更新。面板统一使用相对时间（今日/昨日/X天前+时分）。</div>
         <div class="logic-h">免责声明</div>
-        <div class="note">所有数据仅供参考，不构成投资建议。</div>
+        <div class="logic-p">所有数据仅供参考，不构成投资建议。</div>
       </div>
 
       <div class="card">
         <h3><span class="ic">☁️</span>部署与双机状态 - 说明</h3>
-        <div class="logic-h">部署状态</div>
-        <div class="logic-p">展示最近一次部署时间、来源、关键数据文件状态、异常告警。每次部署前执行四层安全检查：数据语法→前端语法→运行时冒烟→注入率闸门。</div>
-        <div class="logic-h">双机状态</div>
-        <div class="logic-p">小九（单位机·全天在线）全面接管阿狸咪家中机职责。云端 bot 与双机 bot 分别标记。</div>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">部署流水线状态 + 双机心跳。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">一眼看站点部署新鲜度与双机存活。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">展示最近一次部署时间、来源、关键数据状态、异常告警；部署前执行四层安全检查（数据语法→前端语法→运行时冒烟→注入率闸门）。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">双机架构：一机常驻主机全面接管，另一机待命夜间/周末接管；failover 守卫活跃时自动交接。</div>
       </div>
 
       <div class="card">
         <h3><span class="ic">⚙️</span>自动化任务 - 说明</h3>
-        <div class="logic-h">调度韧性</div>
-        <div class="logic-p">云端4 workflow原生cron + 本机发令枪每15分兜底dispatch。发令枪4档：每小时:00/:15/:30/:45。同一档位串行互锁，不同档位不互杀。</div>
-        <div class="logic-h">故障转移</div>
-        <div class="logic-p">云端掉线>30min激活本机盘中5+盘后1默认PAUSED任务；小九掉线>90min阿狸咪自动接管救火任务，恢复后自动交还。</div>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">调度系统状态。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">展示定时任务清单与运行韧性。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">云端定时原生 cron + 本机发令枪每15分兜底 dispatch；发令枪4档(:00/:15/:30/:45)串行互锁。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">故障转移：主机掉线超阈值激活备用机救火任务，恢复后自动交还。</div>
       </div>
 
       <div class="card">
         <h3><span class="ic">💾</span>数据新鲜度 / 看门狗 - 说明</h3>
-        <div class="logic-h">看门狗监控</div>
-        <div class="logic-p">监控27核心数据，market类盘后15:30查。每日20:30自动化自修复：safe_pull→重跑陈旧fetch→update_data_v2 --fast→push→deploy --force。</div>
-        <div class="logic-h">新鲜度闸门</div>
-        <div class="logic-p">部署前扫描data/*.json内部update_time vs 最近交易日收盘，核心源过期即阻断；网络易抖/需交互登录的源仅告警不阻断。</div>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">各数据源更新时间。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">杜绝静默停更，过期即告警。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">监控核心数据源；部署前扫描数据内部更新时间 vs 最近交易日收盘，核心源过期即阻断；网络易抖/需交互登录的源仅告警不阻断。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">独立监控每个数据源更新时间，计算距当前交易时点的滞后，超阈值告警。</div>
       </div>
 
       <div class="card">
         <h3><span class="ic">🛠️</span>运维面板内部模块 - 说明</h3>
-        <div class="logic-p">· <b>v6精选</b>：选股驾驶舱+全站精选（15个JSON映射到DATA.*）<br>· <b>暂未上架</b>：候选观察池 + V6卡片真实渲染（F窗口/金股池停牌/波动率/精选预判/四路资金/大盘资金流/期指/两融/ETF申赎）<br>· <b>已下架</b>：原9张卡已归入暂未上架并接入数据，此区保留旧版清单参考</div>
+        <div class="logic-h">来源</div>
+        <div class="logic-p">v6 精选移植 + 暂未上架 + 已下架 三区。</div>
+        <div class="logic-h">作用</div>
+        <div class="logic-p">保留历史卡片清单与未上线模块参考。</div>
+        <div class="logic-h">规则</div>
+        <div class="logic-p">· v6精选：选股驾驶舱+全站精选映射。<br>· 暂未上架：候选观察池 + 多张待渲染卡片（F窗口/金股池/波动率/精选预判/四路资金/大盘资金流/期指/两融/ETF申赎）。<br>· 已下架：旧版清单参考。</div>
+        <div class="logic-h">算法</div>
+        <div class="logic-p">静态清单，不实时计算。</div>
       </div>
     </div>
   </section>
