@@ -108,6 +108,28 @@
 .etf-spark{display:inline-block;width:16px;height:4px;border-radius:2px;margin-left:4px;vertical-align:middle}
   .etf-row b{font-variant-numeric:tabular-nums}
 
+  /* ===== 涨停热力矩阵（暗色主题） ===== */
+  .limit-up-content{overflow-x:auto;font-size:11px;line-height:1.5}
+  .limit-up-content table{width:100%;min-width:460px;border-collapse:separate;border-spacing:0}
+  .limit-up-content th{padding:5px 3px;text-align:center;font-weight:500;color:var(--dim);font-size:10px;border-bottom:1px solid var(--border2);white-space:nowrap}
+  .limit-up-content th:first-child{text-align:left;padding-left:6px}
+  .limit-up-content td{padding:4px 3px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap}
+  .limit-up-content td:first-child{text-align:left;padding-left:6px;color:var(--txt);font-weight:600}
+  .limit-up-content .lu-total{color:var(--gold);font-weight:700}
+  .limit-up-content .lu-trend{font-size:12px;font-weight:700}
+  .limit-up-content .lu-ignite{box-shadow:inset 0 0 0 2px var(--gold);border-radius:4px}
+  .limit-up-legend{display:flex;gap:8px;font-size:10px;color:var(--dim);margin-top:8px;flex-wrap:wrap;align-items:center}
+  .limit-up-legend span{padding:2px 6px;border-radius:3px}
+  .limit-up-legend .lu-legend-ignite{border:2px solid var(--gold);padding:1px 6px}
+  .limit-up-analysis{font-size:12px;line-height:1.7;margin-bottom:10px;padding:8px 10px;background:var(--bg2);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;color:var(--sub)}
+  .limit-up-analysis b{color:var(--txt)}
+  .lu-h0{background:transparent;color:var(--dim)}
+  .lu-h1{background:rgba(198,40,40,.12);color:#ff8a80}
+  .lu-h2{background:rgba(198,40,40,.28);color:#ff5252;font-weight:600}
+  .lu-h3{background:rgba(198,40,40,.48);color:#fff;font-weight:700}
+  .lu-h4{background:rgba(198,40,40,.68);color:#fff;font-weight:700}
+  .lu-h5{background:rgba(198,40,40,.88);color:#fff;font-weight:700}
+
   .fib{position:relative;height:54px;background:var(--bg2);border-radius:10px;margin-top:8px}
   .fib .node{position:absolute;top:0;bottom:0;width:2px;background:var(--gold);opacity:.7}
   .fib .node span{position:absolute;top:-2px;left:6px;font-size:11px;color:var(--gold);white-space:nowrap}
@@ -519,7 +541,7 @@
     </div>
 
     <div class="grid g-2" style="margin-bottom:16px">
-      <!-- 涨停联动 -->
+      <!-- 连板梯队 -->
       <div class="card">
         <h3><span class="ic">🔥</span>涨停联动 - 盘中实时 · <span class="fresh">更新于 今日 15:21</span></h3>
         <table>
@@ -534,6 +556,12 @@
         </table>
       </div>
 
+      <!-- 涨停热力矩阵 -->
+      <div class="card" id="limitUpHeatCard">
+        <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近10日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">更新于 --</span></h3>
+        <div id="limitUpHeatAnalysis" class="limit-up-analysis" style="display:none"></div>
+        <div id="limitUpHeatContent" class="limit-up-content">加载中…</div>
+      </div>
     </div>
 
     <!-- ETF 资金热度（按 4 大类分组的 TOP5流入+TOP5流出，横向 bar 风格） -->
@@ -1740,6 +1768,117 @@ function drawUpDownChart(){
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', tryDraw);
   else tryDraw();
   window.addEventListener('resize', function(){ drawAmountChart(); drawUpDownChart(); });
+})();
+
+/* ===== 涨停热力矩阵（v6风格暗色适配） ===== */
+function renderLimitUpHeatmap(){
+  const card=document.getElementById('limitUpHeatCard');
+  const contentEl=document.getElementById('limitUpHeatContent');
+  const analysisEl=document.getElementById('limitUpHeatAnalysis');
+  const timeEl=document.getElementById('limitUpHeatTime');
+  if(!card || !contentEl) return;
+
+  const data=window.LIMIT_UP_HEATMAP || null;
+  if(!data || !data.dates || !data.sectors){ card.style.display='none'; return; }
+
+  if(timeEl && data.update_time){
+    const d=new Date(String(data.update_time).replace('T',' ').replace(/-/g,'/'));
+    if(!isNaN(d.getTime())){
+      const now=new Date();
+      const dayDiff=Math.round((new Date(now.getFullYear(),now.getMonth(),now.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);
+      const hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+      timeEl.textContent='更新于 '+(dayDiff<=0?'今日':dayDiff===1?'昨日':dayDiff+'天前')+' '+hm;
+    }else{ timeEl.textContent='更新于 '+data.update_time; }
+  }
+
+  function isIgnite(sectorData,idx){
+    if(idx===0) return sectorData[0]>=2;
+    return sectorData[idx]>=2 && sectorData[idx-1]===0;
+  }
+
+  const sorted=data.sectors.slice().sort(function(a,b){
+    return b.data.reduce(function(s,n){return s+n;},0) - a.data.reduce(function(s,n){return s+n;},0);
+  });
+
+  let h='<table><thead><tr><th>板块</th>';
+  for(let di=0;di<data.dates.length;di++){
+    h+='<th>'+data.dates[di].split('/').pop()+'</th>';
+  }
+  h+='<th>合</th><th>势</th></tr></thead><tbody>';
+
+  for(let s=0;s<sorted.length;s++){
+    const sector=sorted[s];
+    const total=sector.data.reduce(function(sum,n){return sum+n;},0);
+    if(total===0) continue; // 全0行隐藏，减少视觉噪音
+    h+='<tr><td>'+sector.name+'</td>';
+    for(let j=0;j<sector.data.length;j++){
+      const val=sector.data[j];
+      const ignite=isIgnite(sector.data,j)?' lu-ignite':'';
+      const cls=val>=8?'lu-h5':val>=5?'lu-h4':val>=3?'lu-h3':val>=2?'lu-h2':val>=1?'lu-h1':'lu-h0';
+      h+='<td class="'+cls+ignite+'">'+(val===0?'·':val)+'</td>';
+    }
+    h+='<td class="lu-total">'+total+'</td>';
+    const r3=sector.data.slice(-3).reduce(function(s,n){return s+n;},0);
+    const p3=sector.data.slice(-6,-3).reduce(function(s,n){return s+n;},0);
+    const tr=r3>p3*1.5?'↑':r3<p3*0.5?'↓':r3>=p3?'→':'↘';
+    const tColor=tr==='↑'?'var(--up)':tr==='↓'?'var(--down)':'var(--dim)';
+    h+='<td class="lu-trend" style="color:'+tColor+'">'+tr+'</td></tr>';
+  }
+  h+='</tbody></table>';
+  h+='<div class="limit-up-legend">';
+  h+='<span>热度→</span>';
+  h+='<span class="lu-h1">1</span>';
+  h+='<span class="lu-h2">2</span>';
+  h+='<span class="lu-h3">3-4</span>';
+  h+='<span class="lu-h4">5-7</span>';
+  h+='<span class="lu-h5">≥8</span>';
+  h+='<span style="color:var(--dim)">|</span><span class="lu-legend-ignite">启动日</span></div>';
+  contentEl.innerHTML=h;
+  card.style.display='block';
+
+  if(!analysisEl) return;
+  const analysis=[];
+  const sustained=[];
+  for(let si=0;si<sorted.length;si++){
+    const sd=sorted[si].data;
+    let streak=0,ms=0;
+    for(let di2=0;di2<sd.length;di2++){ if(sd[di2]>=3){ streak++; if(streak>ms) ms=streak; } else streak=0; }
+    if(ms>=2) sustained.push({name:sorted[si].name,days:ms});
+  }
+  if(sustained.length) analysis.push('🔥 <b>持续热点：</b>'+sustained.map(function(x){return x.name+'(连'+x.days+'天)';}).join('、'));
+
+  const ni=[];
+  for(let si2=0;si2<sorted.length;si2++){
+    const sd2=sorted[si2].data;
+    if(sd2.slice(0,sd2.length-3).reduce(function(s,n){return s+n;},0)<=1 && sd2.slice(-3).reduce(function(s,n){return s+n;},0)>=4)
+      ni.push(sorted[si2].name);
+  }
+  if(ni.length) analysis.push('⚡ <b>新启动：</b>'+ni.join('、')+' — 前期沉寂近期爆发');
+
+  const cl=[];
+  for(let si3=0;si3<sorted.length;si3++){
+    const sd3=sorted[si3].data;
+    const hlen=Math.ceil(sd3.length/2);
+    if(sd3.slice(0,hlen).reduce(function(s,n){return s+n;},0)>=8 && sd3.slice(hlen).reduce(function(s,n){return s+n;},0)<=2)
+      cl.push(sorted[si3].name);
+  }
+  if(cl.length) analysis.push('❄️ <b>热度消退：</b>'+cl.join('、')+' — 前期热闹近期熄火');
+
+  const ti=data.dates.length-1;
+  const tt=sorted.slice().sort(function(a,b){return b.data[ti]-a.data[ti];}).slice(0,3);
+  if(tt[0].data[ti]>0) analysis.push('📊 <b>今日最强：</b>'+tt.map(function(x){return x.name+' '+x.data[ti]+'只涨停';}).join('、'));
+
+  const td=sorted.reduce(function(s,sec){return s+sec.data[ti];},0);
+  const pd=sorted.reduce(function(s,sec){return s+sec.data[Math.max(0,ti-3)];},0);
+  analysis.push('💡 <b>全局：</b>'+(td>pd*1.2?'涨停效应扩大，短线情绪升温':td<pd*0.8?'涨停效应收缩，情绪降温':'涨停效应平稳')+'（当日'+td+'只 vs 3日前'+pd+'只）');
+  analysisEl.innerHTML=analysis.map(function(a){return '<div>'+a+'</div>';}).join('');
+  analysisEl.style.display='block';
+}
+
+(function(){
+  function run(){ try{ renderLimitUpHeatmap(); }catch(e){ console.warn('涨停热力矩阵渲染失败',e); } }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', run);
+  else run();
 })();
 
 /* ===== 完整周历渲染（V8_CAL 数据 · 与 calendar.html 同源） ===== */
