@@ -624,22 +624,82 @@
   <!-- ============ 选股策略 · 三重共识 + 历史追踪 ============ -->
   <section id="sec-st">
     <div class="sec-head"><h2>🎯 选股策略 · 三重共识</h2><span class="tag">主站TOP10≥70 · 驾驶舱A档 · 基本面A档 · 入选即跟踪</span></div>
-    <div class="grid g-3">    <div class="st-tabs">
+    <!-- TAB 按钮行（横排，独立于内容区） -->
+    <div class="st-tabs">
       <button class="st-tab active" data-st="tc" onclick="switchSt('tc')">🥇 三重共识</button>
       <button class="st-tab" data-st="cockpit" onclick="switchSt('cockpit')">🎯 驾驶舱</button>
       <button class="st-tab" data-st="allsite" onclick="switchSt('allsite')">🌐 全站精选</button>
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头</button>
     </div>
-<div id="st-tc" class="st-pane active">
 
-      <div class="card" style="grid-column:1/-1">
+    <!-- ===== TAB 页面：三重共识（默认展示） ===== -->
+    <div id="st-tc" class="st-pane active">
+      <div class="card">
         <h3><span class="ic">🥇</span>严格三重共识 - 盘后 · <span class="fresh" id="tcTime">更新于 --</span></h3>
         <div id="tcConsensus" class="tp-stocklist"></div>
         <div class="note">筛选：主站TOP10≥70 且 驾驶舱A档 且 基本面A档。下方「优先/扩展观察」为差1步/差2步备选（主站评分≥75）。</div>
       </div>
+      <div class="card">
+        <h3><span class="ic">🎯</span>优先观察（差1步）· <span class="fresh" id="tcNearCount">0</span></h3>
+        <div id="tcPriority" class="tp-stocklist"></div>
+      </div>
+      <div class="card">
+        <h3><span class="ic">🔮</span>扩展观察（差2步）· <span class="fresh" id="tcExtCount">0</span></h3>
+        <div id="tcExtended" class="tp-stocklist"></div>
+      </div>
+      <div class="card">
+        <h3><span class="ic">📈</span>持仓盈亏跟踪 - <span class="fresh" id="ttTime">更新于 --</span></h3>
+        <div class="note">入选以来涨跌 = 入选首日收盘价 → 最新收盘价；持有/连续天数来自本地逐日累积快照。</div>
+        <table id="ttTrack"><thead><tr><th style="width:22%">名称</th><th>状态</th><th>入选日</th><th>持有</th><th>连续</th><th>入选以来</th><th>基本面</th></tr></thead><tbody id="ttTrackBody"></tbody></table>
+      </div>
+      <div class="card">
+        <h3><span class="ic">🔔</span>状态迁移 &amp; 告警 · <span class="fresh" id="ttAlertCount">0</span></h3>
+        <div id="ttAlerts"></div>
+      </div>
+      <div class="card">
+        <h3><span class="ic">🧪</span>催化剂兑现追踪 - 盘后</h3>
+        <div class="note">源自基本面季报/重组消息面。已兑现=价涨≥3%；走弱=回撤≥3%；否则观察中。</div>
+        <div id="ttCatalyst"></div>
+      </div>
+      <div class="card">
+        <h3><span class="ic">📊</span>回测 N 日胜率（信号层） - 历史</h3>
+        <div class="note" id="ttBackNote">加载中…</div>
+        <table id="ttBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>夏普</th><th>最佳</th><th>最差</th></tr></thead><tbody id="ttBackBody"></tbody></table>
+      </div>
+      <div class="card">
+        <h3><span class="ic">⚖️</span>严格 vs 宽松 - 历史</h3>
+        <div class="note">严格=总评分≥70共振；宽松=信号≥2。同口径 baostock 真实收盘价滚动回测。</div>
+        <table id="ttSvl"><thead><tr><th>持有期</th><th>严格胜率</th><th>严格均收</th><th>宽松胜率</th><th>宽松均收</th></tr></thead><tbody id="ttSvlBody"></tbody></table>
+      </div>
+      <div class="card">
+        <h3><span class="ic">🎚</span>阈值敏感性 - 历史</h3>
+        <div class="note">不同总评分门槛的 5 日回测表现（不改动实盘规则，仅测试）。样本少时结论仅供参考。</div>
+        <table id="ttThr"><thead><tr><th>门槛</th><th>样本</th><th>5日胜率</th><th>5日均收</th><th>最佳胜率</th><th>最佳持有</th></tr></thead><tbody id="ttThrBody"></tbody></table>
+      </div>
+      <div class="card">
+        <h3><span class="ic">🏭</span>板块聚类（相关性风险） - 盘后</h3>
+        <div class="note">当前跟踪池行业分布；单一行业占比过高提示同涨同跌相关性风险。</div>
+        <div id="ttCluster"></div>
+      </div>
+      <div class="card">
+        <h3><span class="ic">🔗</span>全站精选重叠度 - 盘后</h3>
+        <div class="note">当前跟踪池（严格+差一步）与全站其他精选层的重叠，辅助判断市场共识集中度。</div>
+        <div id="ttOverlap"></div>
+      </div>
+      <div class="card">
+        <h3><span class="ic">📅</span>三重入选历史（每日记录） - 历史</h3>
+        <div class="note">每日入选三重共识候选的数量与最新跟踪状态（来自 triple_resonance_history.json）。</div>
+        <div id="ttHistory"></div>
+      </div>
     </div><!--/st-tc-->
+
+    <!-- ===== TAB 页面：驾驶舱 ===== -->
     <div id="st-cockpit" class="st-pane"><div id="stCockpit"></div></div>
+
+    <!-- ===== TAB 页面：全站精选 ===== -->
     <div id="st-allsite" class="st-pane"><div id="stAllsite"></div></div>
+
+    <!-- ===== TAB 页面：逆势龙头(CRDS) ===== -->
     <div id="st-crds" class="st-pane"><div class="card" id="stv8CrdsCard">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
           📊 <span style="font-weight:700;font-size:14px;color:var(--txt);">CRDS · 逆势龙头</span>
@@ -711,67 +771,7 @@
           </div>
         </div>
         <div id="stcrdsHistory" style="font-size:11px;color:var(--dim);"></div>
-      </div></div>
-
-      <div class="card">
-        <h3><span class="ic">🎯</span>优先观察（差1步）· <span class="fresh" id="tcNearCount">0</span></h3>
-        <div id="tcPriority" class="tp-stocklist"></div>
-      </div>
-      <div class="card">
-        <h3><span class="ic">🔮</span>扩展观察（差2步）· <span class="fresh" id="tcExtCount">0</span></h3>
-        <div id="tcExtended" class="tp-stocklist"></div>
-      </div>
-
-      <div class="card" style="grid-column:1/-1">
-        <h3><span class="ic">📈</span>持仓盈亏跟踪 - <span class="fresh" id="ttTime">更新于 --</span></h3>
-        <div class="note">入选以来涨跌 = 入选首日收盘价 → 最新收盘价；持有/连续天数来自本地逐日累积快照。</div>
-        <table id="ttTrack"><thead><tr><th style="width:22%">名称</th><th>状态</th><th>入选日</th><th>持有</th><th>连续</th><th>入选以来</th><th>基本面</th></tr></thead><tbody id="ttTrackBody"></tbody></table>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">🔔</span>状态迁移 &amp; 告警 · <span class="fresh" id="ttAlertCount">0</span></h3>
-        <div id="ttAlerts"></div>
-      </div>
-      <div class="card">
-        <h3><span class="ic">🧪</span>催化剂兑现追踪 - 盘后</h3>
-        <div class="note">源自基本面季报/重组消息面。已兑现=价涨≥3%；走弱=回撤≥3%；否则观察中。</div>
-        <div id="ttCatalyst"></div>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">📊</span>回测 N 日胜率（信号层） - 历史</h3>
-        <div class="note" id="ttBackNote">加载中…</div>
-        <table id="ttBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>夏普</th><th>最佳</th><th>最差</th></tr></thead><tbody id="ttBackBody"></tbody></table>
-      </div>
-      <div class="card">
-        <h3><span class="ic">⚖️</span>严格 vs 宽松 - 历史</h3>
-        <div class="note">严格=总评分≥70共振；宽松=信号≥2。同口径 baostock 真实收盘价滚动回测。</div>
-        <table id="ttSvl"><thead><tr><th>持有期</th><th>严格胜率</th><th>严格均收</th><th>宽松胜率</th><th>宽松均收</th></tr></thead><tbody id="ttSvlBody"></tbody></table>
-      </div>
-      <div class="card">
-        <h3><span class="ic">🎚</span>阈值敏感性 - 历史</h3>
-        <div class="note">不同总评分门槛的 5 日回测表现（不改动实盘规则，仅测试）。样本少时结论仅供参考。</div>
-        <table id="ttThr"><thead><tr><th>门槛</th><th>样本</th><th>5日胜率</th><th>5日均收</th><th>最佳胜率</th><th>最佳持有</th></tr></thead><tbody id="ttThrBody"></tbody></table>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">🏭</span>板块聚类（相关性风险） - 盘后</h3>
-        <div class="note">当前跟踪池行业分布；单一行业占比过高提示同涨同跌相关性风险。</div>
-        <div id="ttCluster"></div>
-      </div>
-      <div class="card">
-        <h3><span class="ic">🔗</span>全站精选重叠度 - 盘后</h3>
-        <div class="note">当前跟踪池（严格+差一步）与全站其他精选层的重叠，辅助判断市场共识集中度。</div>
-        <div id="ttOverlap"></div>
-      </div>
-
-      <div class="card" style="grid-column:1/-1">
-        <h3><span class="ic">📅</span>三重入选历史（每日记录） - 历史</h3>
-        <div class="note">每日入选三重共识候选的数量与最新跟踪状态（来自 triple_resonance_history.json）。</div>
-        <div id="ttHistory"></div>
-      </div>
-    </div>
-  </section>
+      </div></div><!--/st-crds-->
 
   <!-- ============ 运维（管理员） ============ -->
   <section id="sec-op">
@@ -803,10 +803,8 @@
 </style>
     <div class="op-tabs">
       <button class="op-tab-btn active" data-op="1" onclick="opSwitchTab(1)">运维</button>
-      <button class="op-tab-btn" data-op="2" onclick="opSwitchTab(2)">v6精选</button>
       <button class="op-tab-btn" data-op="3" onclick="opSwitchTab(3)">暂未上架</button>
       <button class="op-tab-btn" data-op="4" onclick="opSwitchTab(4)">已下架</button>
-      <button class="op-tab-btn" data-op="5" onclick="opSwitchTab(5)">逆势龙头</button>
     </div>
     <div id="opTab1" class="op-tab-pane active">
     <div class="grid g-2" style="margin-bottom:16px">
@@ -847,90 +845,12 @@
       </tbody></table>
     </div>
     </div>
-    <div id="opTab2" class="op-tab-pane">
-      <div id="stockCockpit"></div>
-      <div class="card" style="margin-top:16px"><h3><span class="ic">🌐</span>全站精选 - v6精选</h3><div id="allsitePanel"></div></div>
-    </div>
     <div id="opTab3" class="op-tab-pane"><div id="unlistedPanel"></div></div>
     <div id="opTab4" class="op-tab-pane"><div id="delistedPanel"></div></div>
-    <div id="opTab5" class="op-tab-pane">
-      <div class="card" id="v8CrdsCard">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-          📊 <span style="font-weight:700;font-size:14px;color:var(--txt);">CRDS · 逆势龙头</span>
-          <span id="crdsTime" style="font-size:12px;color:var(--dim);font-weight:500;background:var(--bg2);padding:1px 8px;border-radius:8px;">更新 ...</span>
-          <span style="font-size:10px;color:#fff;background:#c62828;padding:1px 7px;border-radius:8px;">短线</span>
-          <span style="font-size:10px;color:#fff;background:#1565c0;padding:1px 7px;border-radius:8px;">盘后</span>
-          <span style="font-size:10px;color:#fff;background:#607d8b;padding:1px 7px;border-radius:8px;">日频</span>
-        </div>
-        <div id="crdsCoverage" style="font-size:11px;color:var(--dim);margin-bottom:8px;line-height:1.6;"></div>
-        <div id="crdsStandby" style="display:none;margin-bottom:10px;padding:8px 10px;border-radius:6px;background:rgba(240,160,32,0.08);border-left:4px solid #f0a020;font-size:12px;color:#d4a020;line-height:1.6;"></div>
-        <div id="crdsMarketContext" style="display:none;margin-bottom:10px;padding:8px 10px;border-radius:6px;background:var(--bg2);border-left:4px solid var(--border);">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <span style="font-size:12px;font-weight:600;color:var(--sub);">大盘判断</span>
-            <span id="crdsMarketValidity" style="font-size:12px;font-weight:700;padding:1px 8px;border-radius:8px;color:#fff;"></span>
-            <span id="crdsMarketPct" style="font-size:12px;color:var(--sub);"></span>
-          </div>
-          <div id="crdsMarketSummary" style="font-size:12px;color:var(--dim);margin-top:4px;"></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-          <div>
-            <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
-              <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('crdsEliteBody','crdsEliteArr')">
-                <span style="width:10px;height:10px;border-radius:50%;background:#1D9E75;"></span>
-                <span style="font-size:12px;font-weight:600;color:var(--txt);">三项全满足</span>
-                <span style="margin-left:auto;font-size:13px;font-weight:700;color:#1D9E75;"><span id="crdsEliteCnt">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
-                <span id="crdsEliteArr" style="font-size:10px;color:var(--dim);">▾</span>
-              </div>
-              <div id="crdsEliteBody" style="display:none;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:160px;overflow-y:auto;"></div>
-            </div>
-            <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
-              <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('crdsAdvBody','crdsAdvArr')">
-                <span style="width:10px;height:10px;border-radius:50%;background:#BA7517;"></span>
-                <span style="font-size:12px;font-weight:600;color:var(--txt);">两项满足</span>
-                <span style="margin-left:auto;font-size:13px;font-weight:700;color:#BA7517;"><span id="crdsAdvCnt">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
-                <span id="crdsAdvHint"></span>
-                <span id="crdsAdvArr" style="font-size:10px;color:var(--dim);">▾</span>
-              </div>
-              <div id="crdsAdvBody" style="display:none;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:200px;overflow-y:auto;"></div>
-            </div>
-          </div>
-          <div>
-            <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
-              <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('crdsList1','crdsArr1')">
-                <span style="width:10px;height:10px;border-radius:50%;background:#185FA5;"></span>
-                <span style="font-size:12px;font-weight:600;color:var(--txt);">10日≥2板</span>
-                <span style="margin-left:auto;font-size:13px;font-weight:700;color:#185FA5;"><span id="crdsCnt1">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
-                <span id="crdsArr1" style="font-size:10px;color:var(--dim);">▾</span>
-              </div>
-              <div id="crdsList1" style="display:none;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:280px;overflow-y:auto;"></div>
-            </div>
-            <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
-              <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('crdsList2','crdsArr2')">
-                <span style="width:10px;height:10px;border-radius:50%;background:#C62828;"></span>
-                <span style="font-size:12px;font-weight:600;color:var(--txt);">大跌日逆势板</span>
-                <span style="margin-left:auto;font-size:13px;font-weight:700;color:#C62828;"><span id="crdsCnt2">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
-                <span id="crdsArr2" style="font-size:10px;color:var(--dim);">▾</span>
-              </div>
-              <div id="crdsList2" style="display:none;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:160px;overflow-y:auto;"></div>
-            </div>
-            <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
-              <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('crdsList3','crdsArr3')">
-                <span style="width:10px;height:10px;border-radius:50%;background:#3B6D11;"></span>
-                <span style="font-size:12px;font-weight:600;color:var(--txt);">量能确认</span>
-                <span style="margin-left:auto;font-size:13px;font-weight:700;color:#3B6D11;"><span id="crdsCnt3">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
-                <span id="crdsArr3" style="font-size:10px;color:var(--dim);">▾</span>
-              </div>
-              <div id="crdsList3" style="display:none;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:200px;overflow-y:auto;"></div>
-            </div>
-          </div>
-        </div>
-        <div id="crdsHistory" style="font-size:11px;color:var(--dim);"></div>
-      </div>
-    </div>
   </section>
 
   <!-- ============ 逻辑详解（管理员） ============ -->
-  
+
   <!-- ============ 逻辑详解（管理员） ============ -->
   <section id="sec-lg">
     <div class="sec-head"><h2>📖 逻辑详解</h2><span class="tag">仅管理员可见 · 指标/策略/安全口径</span></div>
@@ -3020,8 +2940,8 @@ function doQuery(){
 
   window.opSwitchTab=function(n){
     document.querySelectorAll('.op-tab-btn').forEach(function(b){b.classList.toggle('active', +b.dataset.op===n);});
-    [1,2,3,4,5].forEach(function(i){var p=document.getElementById('opTab'+i);if(p)p.classList.toggle('active', i===n);});
-    if(n===2||n===3||n===4||n===5) setTimeout(window.__renderOps,60);
+    [1,3,4].forEach(function(i){var p=document.getElementById('opTab'+i);if(p)p.classList.toggle('active', i===n);});
+    if(n===3||n===4) setTimeout(window.__renderOps,60);
   };
 })();
 
