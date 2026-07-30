@@ -46,7 +46,7 @@ VAR_TO_RAW = {
 
 _ak = None
 
-def ak():
+def get_ak():
     global _ak
     if _ak is None:
         import akshare as _ak_mod
@@ -61,71 +61,84 @@ def save(var, obj):
     obj["update_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     path = RAW_DIR / fname
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(obj, f, ensure_ascii=False, separators=(",", ":"))
+        json.dump(obj, f, ensure_ascii=False, separators=(",", ":"), default=str)
     print(f"  ✅ {var} → raw_data/{fname}")
 
-def run(label, fn):
-    try:
-        print(f">>> {label} {datetime.now().isoformat(timespec='seconds')}")
-        obj = fn()
-        if obj is not None:
-            save(label, obj)
-        else:
-            print(f"  ⚠️ {label}: 返回空，跳过")
-    except Exception as e:
-        print(f"  ❌ {label} 失败: {type(e).__name__}: {e}")
+def run(label, fn, retries=2):
+    last_err = None
+    for attempt in range(retries + 1):
+        try:
+            print(f">>> {label} {datetime.now().isoformat(timespec='seconds')}{' (retry '+str(attempt)+')' if attempt else ''}")
+            obj = fn()
+            if obj is not None:
+                save(label, obj)
+            else:
+                print(f"  ⚠️ {label}: 返回空，跳过")
+            return
+        except Exception as e:
+            last_err = e
+            print(f"  ❌ {label} 失败(attempt {attempt+1}/{retries+1}): {type(e).__name__}: {e}")
+            time.sleep(2)
+    print(f"  🚫 {label} 跳过，最终错误: {type(last_err).__name__}: {last_err}")
     time.sleep(0.5)
 
 # ───────────────────────── 各模块抓取（akshare） ─────────────────────────
 
 def f_etf_intraday_heat():
-    # ETF 资金流向热度（东方财富）
-    df = ak.fund_flow_rank(indicator="ETF")
+    # ETF 资金流向热度：用 ETF 实时行情成交额排序作为热度占位
+    # TODO 小九接入真实 ETF 净流入排名后替换
+    df = get_ak().fund_etf_spot_em()
     if df is None or df.empty:
         return None
-    return {"items": df.head(30).to_dict(orient="records")}
+    cols = [c for c in ["代码", "名称", "最新价", "涨跌幅", "成交额", "所属行业"] if c in df.columns]
+    try:
+        df = df[cols].sort_values("成交额", ascending=False) if "成交额" in df.columns else df[cols]
+    except Exception:
+        df = df[cols]
+    return {"items": df.head(30).to_dict(orient="records"), "note": "ETF净流入真实排名待接入，当前用成交额热度占位"}
 
 def f_sector_fund_flow():
-    df = ak.stock_sector_fund_flow_rank(indicator="今日")
+    df = get_ak().stock_sector_fund_flow_rank(indicator="今日")
     if df is None or df.empty:
         return None
     return {"items": df.head(50).to_dict(orient="records")}
 
 def f_concept_ranking():
-    df = ak.stock_board_concept_name_em()
+    df = get_ak().stock_board_concept_name_em()
     if df is None or df.empty:
         return None
     return {"items": df.head(80).to_dict(orient="records")}
 
 def f_ipo_data():
-    df = ak.stock_ipo_summary()
+    df = get_ak().stock_ipo_summary_cninfo()
     if df is None or df.empty:
         return None
     return {"items": df.tail(30).to_dict(orient="records")}
 
 def f_margin_data():
-    # 融资融券（沪市汇总）
-    df = ak.stock_margin_detail_sh()
+    # 融资融券（沪市明细）
+    df = get_ak().stock_margin_detail_sse()
     if df is None or df.empty:
         return None
     return {"items": df.tail(20).to_dict(orient="records")}
 
 def f_cffex_holdings():
-    df = ak.futures_cffex_detail_sr()
+    # 中金所股指期货日行情（最近20个交易日）
+    df = get_ak().get_cffex_daily(date="20260730")
     if df is None or df.empty:
         return None
-    return {"items": df.head(20).to_dict(orient="records")}
+    return {"items": df.tail(20).to_dict(orient="records"), "note": "占位：中金所日行情，真实持仓/情绪指标待接入"}
 
 def f_macro_data():
     # 宏观：以 CPI/PMI 为例（轻量）
     out = {}
     try:
-        cpi = ak.macro_china_cpi_yearly()
+        cpi = get_ak().macro_china_cpi_yearly()
         out["cpi"] = cpi.tail(6).to_dict(orient="records") if cpi is not None else []
     except Exception:
         out["cpi"] = []
     try:
-        pmi = ak.macro_china_pmi_yearly()
+        pmi = get_ak().macro_china_pmi_yearly()
         out["pmi"] = pmi.tail(6).to_dict(orient="records") if pmi is not None else []
     except Exception:
         out["pmi"] = []
@@ -140,7 +153,7 @@ def f_crisis_data():
 
 def f_volatility():
     # 20 日年化波动率（样例：沪深300）
-    df = ak.stock_zh_index_daily(symbol="sh000300")
+    df = get_ak().stock_zh_index_daily(symbol="sh000300")
     if df is None or df.empty:
         return None
     close = df["close"].astype(float).tail(20)
@@ -159,13 +172,13 @@ def f_limit_up_heatmap():
     return {"note": "占位结构，涨停池由小九本地 fetch_limit_up 提供"}
 
 def f_capital_flow_data():
-    df = ak.stock_individual_fund_flow_rank()
+    df = get_ak().stock_individual_fund_flow_rank()
     if df is None or df.empty:
         return None
     return {"items": df.head(50).to_dict(orient="records")}
 
 def f_etf_subscription():
-    df = ak.fund_etf_category_sina(symbol="ETF基金")
+    df = get_ak().fund_etf_category_sina(symbol="ETF基金")
     if df is None or df.empty:
         return None
     return {"items": df.head(30).to_dict(orient="records")}
@@ -175,7 +188,7 @@ def f_north_fund():
     return {"stopped": True, "note": "港交所 2024-05 后停止披露北向 top_buy，无实时数据"}
 
 def f_market_fund_flow_data():
-    df = ak.stock_market_fund_flow()
+    df = get_ak().stock_market_fund_flow()
     if df is None or df.empty:
         return None
     return {"items": df.tail(10).to_dict(orient="records")}
