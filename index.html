@@ -1535,11 +1535,12 @@ function doQuery(){
     const score=it.score||0, arb=it.arbitrage_score||0, fund=it.fundamental_score||0;
     const rec=it.recommend||'—';
     // 统一映射：不再依赖数据自带的 tag_color/bg_color（数据源颜色不一致）
+    // ⚠️ 不建议必须在建议申购之前，否则"不建议申购"包含子串"建议申购"会被误匹配为红色
     let tagColor, bgColor;
-    if(/强烈推荐|建议申购/.test(rec))      { tagColor='#ef5350'; bgColor='rgba(239,83,80,.14)'; }
-    else if(/谨慎|观望/.test(rec))            { tagColor='#ffb74d'; bgColor='rgba(255,183,77,.12)'; }
-    else if(/不建议/.test(rec))              { tagColor='#26a69a'; bgColor='rgba(38,166,154,.12)'; }
-    else                                       { tagColor='#93a4c4'; bgColor='rgba(147,164,196,.12)'; }
+    if(/不建议/.test(rec))                  { tagColor='#26a69a'; bgColor='rgba(38,166,154,.12)'; }
+    else if(/强烈推荐|建议申购/.test(rec))   { tagColor='#ef5350'; bgColor='rgba(239,83,80,.14)'; }
+    else if(/谨慎|观望/.test(rec))           { tagColor='#ffb74d'; bgColor='rgba(255,183,77,.12)'; }
+    else                                      { tagColor='#93a4c4'; bgColor='rgba(147,164,196,.12)'; }
     const highlights=(it.highlights||[]).filter(Boolean).slice(0,4);
     let extra;
     if(isLive){
