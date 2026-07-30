@@ -2170,6 +2170,48 @@ function drawUpDownChart(){
     renderTrendCard('phTrend60d', sf.trend_60d, 'net_60d', '60');
   }
 
+  /* ---- ETF 资金热度（4 大类 TOP5流入+TOP5流出，横向 bar） ---- */
+  function renderEtfHeatByCategory(etfHeat){
+    if(!etfHeat||!etfHeat.categories) return;
+    const catNames=['宽基','行业','主题','跨境'];
+    const colorMap={宽基:'var(--cyan)',行业:'var(--purple)',主题:'var(--gold)',跨境:'var(--pink)'};
+    const fmtYi=v=>{const a=Math.abs(v);if(a>=1e8)return(v/1e8).toFixed(1)+'万亿';if(a>=1e4)return(v/1e4).toFixed(1)+'亿';return(v/1e4).toFixed(2)+'亿';};
+    const fmtPct=p=>(p>=0?'+':'')+p.toFixed(2)+'%';
+    // summary
+    let shtml='<span style="color:var(--dim)">4 大类净流入汇总：</span>';
+    catNames.forEach(cn=>{
+      const c=etfHeat.categories[cn]; if(!c) return;
+      const yi=c.net_inflow_yi||0, c2=yi>=0?'var(--up)':'var(--down)';
+      shtml+='<span><span style="color:'+colorMap[cn]+';font-weight:700">'+cn+'</span> <span style="color:'+c2+';font-weight:700">'+(yi>=0?'+':'')+yi.toFixed(2)+'亿</span> · '+c.count+'只</span>';
+    });
+    const el0=$('etfHeatSummary'); if(el0) el0.innerHTML=shtml;
+    // 4 大类
+    let h='';
+    catNames.forEach(cn=>{
+      const c=etfHeat.categories[cn];
+      if(!c){h+='<div></div>';return;}
+      const list=[].concat(c.top_inflow||[],c.top_outflow||[]).slice(0,10);
+      const maxAbs=Math.max.apply(null,list.map(x=>Math.abs(x.main_net_inflow||0)))||1;
+      let rows='';
+      list.forEach(x=>{
+        const v=x.main_net_inflow||0, isIn=v>=0;
+        const color=isIn?'var(--up)':'var(--down)';
+        const bg=isIn?'linear-gradient(90deg,#f4495d,#f87171)':'linear-gradient(90deg,#1fd17b,#4ade80)';
+        const w=Math.min(100,Math.abs(v)/maxAbs*100);
+        const valY=fmtYi(v);
+        const dirMark=isIn?'▲':'▼';
+        rows+='<div class="flow-row"><span class="flow-name" style="width:120px;font-size:12px" title="'+x.name+' '+x.code+'">'+x.name+'</span><div class="flow-bar"><div class="flow-fill" style="width:'+w.toFixed(1)+'%;background:'+bg+'"></div></div><span class="flow-val" style="width:140px;font-size:11px"><span style="color:'+color+';font-weight:700">'+dirMark+' '+valY+'</span> <span style="color:var(--sub);font-size:10px;margin-left:4px">'+fmtPct(x.pct||0)+'</span></span></div>';
+      });
+      const yi=c.net_inflow_yi||0, c2=yi>=0?'var(--up)':'var(--down)';
+      h+='<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;max-height:380px;overflow-y:auto">';
+      h+='<div style="font-weight:700;margin-bottom:6px;color:'+colorMap[cn]+';display:flex;justify-content:space-between;align-items:center"><span>'+cn+' · '+c.count+'只</span><span style="font-size:11px;color:'+c2+';font-weight:700">'+(yi>=0?'+':'')+yi.toFixed(2)+'亿</span></div>';
+      h+=rows;
+      h+='</div>';
+    });
+    const el1=$('etfHeatByCat'); if(el1) el1.innerHTML=h;
+    setTime('etfHeatTime',etfHeat.update_time);
+  }
+
   /* ---- 4.5 板块资金短/中/长 TOP 卡片 ---- */
   function renderTrendCard(elId, list, key, windowLabel){
     const el=$(elId);
@@ -3558,6 +3600,9 @@ function drawUpDownChart(){
       h+='</div>';
     } else { h+='<div class="note" style="padding:12px;text-align:center;color:var(--dim);">ETF热度数据暂不可用</div>'; }
     h+='</div>';
+
+    /* ═══ 11. ETF 资金热度（4 大类 TOP5流入+TOP5流出·横向 bar） ═══ */
+    if(etfHeat) renderEtfHeatByCategory(etfHeat);
 
     el.innerHTML=h;
   }
