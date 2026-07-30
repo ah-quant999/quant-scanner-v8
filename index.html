@@ -534,73 +534,16 @@
         </table>
       </div>
 
-      <!-- 个股查询 -->
-      <div class="card">
-        <h3><span class="ic">🔍</span>个股实时查询 - 盘中实时 · <span class="fresh">更新于 今日 15:20</span></h3>
-        <div class="qbox">
-          <input id="qInput" placeholder="输入代码或名称，如 600519 或 贵州茅台" onkeydown="if(event.key==='Enter')doQuery()" />
-          <button class="btn" onclick="doQuery()">查询</button>
-        </div>
-        <div id="qResult"></div>
-      </div>
     </div>
 
-    <!-- ETF 资金热度 -->
+    <!-- ETF 资金热度（按 4 大类分组的 TOP5流入+TOP5流出，横向 bar 风格） -->
     <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🔥</span>ETF 资金热度 - 实时·T+0 · <span class="fresh">更新于 今日 09:43</span></h3>
-      <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:10px;font-size:13px;color:var(--sub)">
-        <span><span style="color:var(--up)">▲ 290</span> 涨</span>
-        <span><span style="color:var(--down)">▼ 1168</span> 跌</span>
-        <span>主力净流出 <span style="color:var(--down);font-weight:700">20.4 亿</span></span>
-        <span style="font-size:11px;color:var(--dim)">宽基-3.2 亿 · 行业+5.1 亿 · 主题+18.2 亿 · 跨境+0.3 亿</span>
+      <h3><span class="ic">🔥</span>ETF 资金热度 - 实时·T+0 · <span class="fresh" id="etfHeatTime">更新于 --</span></h3>
+      <div id="etfHeatSummary" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;font-size:12px;color:var(--sub)">加载中…</div>
+      <div class="grid g-2" id="etfHeatByCat">
+        <div class="ipo-empty" style="grid-column:1/3">加载中…</div>
       </div>
-      <div class="grid g-4">
-        <div>
-          <div style="font-weight:700;margin-bottom:8px;color:var(--cyan);display:flex;justify-content:space-between">
-            <span>宽基</span>
-            <span style="font-size:11px;color:var(--dim)">TOP4占87%</span>
-          </div>
-          <div class="etf-row"><span>科创50ETF</span><span class="pct up">+2.1%</span><b>21.5亿</b></div>
-          <div class="etf-row"><span>创业板ETF</span><span class="pct up">+1.5%</span><b>17.2亿</b></div>
-          <div class="etf-row"><span>中证500ETF</span><span class="pct up">+0.8%</span><b>15.4亿</b></div>
-          <div class="etf-row"><span>沪深300ETF</span><span class="pct up">+0.6%</span><b>11.5亿</b></div>
-          <div class="subtotal"><span>4只</span><span style="color:var(--up)">+65.6亿</span></div>
-        </div>
-        <div>
-          <div style="font-weight:700;margin-bottom:8px;color:var(--purple);display:flex;justify-content:space-between">
-            <span>行业</span>
-            <span style="font-size:11px;color:var(--dim)">TOP4占52%</span>
-          </div>
-          <div class="etf-row"><span>科创半导体ETF</span><span class="pct down">-0.4%</span><b class="up">+1.1亿</b></div>
-          <div class="etf-row"><span>半导体设备ETF</span><span class="pct down">-1.2%</span><b>13.7亿</b></div>
-          <div class="etf-row"><span>券商ETF</span><span class="pct up">+2.3%</span><b>8.9亿</b></div>
-          <div class="etf-row"><span>医药ETF</span><span class="pct down">-0.8%</span><b>7.3亿</b></div>
-          <div class="subtotal"><span>4只</span><span style="color:var(--up)">+31.0亿</span></div>
-        </div>
-        <div>
-          <div style="font-weight:700;margin-bottom:8px;color:var(--gold);display:flex;justify-content:space-between">
-            <span>主题</span>
-            <span style="font-size:11px;color:var(--dim)">TOP4占61%</span>
-          </div>
-          <div class="etf-row"><span>芯片ETF</span><span class="pct down">-1.1%</span><b>8.0亿</b></div>
-          <div class="etf-row"><span>AI ETF</span><span class="pct up">+3.2%</span><b>6.5亿</b></div>
-          <div class="etf-row"><span>新能源ETF</span><span class="pct down">-0.5%</span><b>5.8亿</b></div>
-          <div class="etf-row"><span>军工ETF</span><span class="pct up">+0.3%</span><b>4.2亿</b></div>
-          <div class="subtotal"><span>4只</span><span style="color:var(--up)">+24.5亿</span></div>
-        </div>
-        <div>
-          <div style="font-weight:700;margin-bottom:8px;color:var(--pink);display:flex;justify-content:space-between">
-            <span>跨境</span>
-            <span style="font-size:11px;color:var(--dim)">TOP4占39%</span>
-          </div>
-          <div class="etf-row"><span>恒生科技ETF</span><span class="pct up">+1.8%</span><b class="up">+4675万</b></div>
-          <div class="etf-row"><span>恒生互联网ETF</span><span class="pct down">-1.3%</span><b class="up">+2512万</b></div>
-          <div class="etf-row"><span>纳斯达克ETF</span><span class="pct down">-0.6%</span><b>3.1亿</b></div>
-          <div class="etf-row"><span>标普500ETF</span><span class="pct down">-0.2%</span><b>2.4亿</b></div>
-          <div class="subtotal"><span>4只</span><span style="color:var(--up)">+6.2亿</span></div>
-        </div>
-      </div>
-      <div class="note">按成交额与主力净流入综合排序，四分类独立展示。涨跌幅·红涨绿跌。</div>
+      <div class="note">按 4 大类独立展示，每类 TOP5 流入 + TOP5 流出（按主力净流入/流出排序，bar 长度=强度）。涨跌幅·红涨绿跌。</div>
     </div>
 
   </section>
@@ -676,14 +619,77 @@
     <div class="sec-head"><h2>🎯 选股策略 · 三重共识</h2><span class="tag">主站TOP10≥70 · 驾驶舱A档 · 基本面A档 · 入选即跟踪</span></div>
     <!-- TAB 按钮行（横排，独立于内容区） -->
     <div class="st-tabs">
-      <button class="st-tab active" data-st="tc" onclick="switchSt('tc')">🥇 三重共识</button>
+      <button class="st-tab active" data-st="query" onclick="switchSt('query')">🔍 个股查询</button>
+      <button class="st-tab" data-st="tc" onclick="switchSt('tc')">🥇 三重共识</button>
       <button class="st-tab" data-st="cockpit" onclick="switchSt('cockpit')">🎯 驾驶舱</button>
       <button class="st-tab" data-st="allsite" onclick="switchSt('allsite')">🌐 全站精选</button>
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头</button>
     </div>
 
+    <!-- ===== TAB 页面：个股查询 ===== -->
+    <div id="st-query" class="st-pane active">
+      <div class="card">
+        <h3><span class="ic">🔍</span>个股查询 · 全站扩展信息</h3>
+        <div class="query-search-box" style="display:flex;gap:10px;margin-bottom:16px;background:linear-gradient(135deg,rgba(0,188,212,.12),rgba(56,189,248,.08));padding:14px 18px;border-radius:10px;box-shadow:0 1px 6px rgba(56,189,248,.1);position:relative;border:1px solid var(--border);">
+          <div style="position:relative;flex:1;">
+            <input type="text" id="v8QueryInput" placeholder="输入股票代码、拼音首字母或名称，如 600000、hlzj、茅台" onkeydown="if(event.key==='Enter')doV8Query()" oninput="showV8QueryDropdown(this.value)" onfocus="if(this.value.trim())showV8QueryDropdown(this.value)" style="width:100%;padding:11px 15px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;outline:none;transition:border-color .2s;background:var(--card);color:var(--txt);box-sizing:border-box;" />
+            <div id="v8QueryDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);border:1.5px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:320px;overflow-y:auto;z-index:1000;box-shadow:0 4px 16px rgba(0,0,0,.24);"></div>
+          </div>
+          <button class="btn" onclick="doV8Query()">查询分析</button>
+        </div>
+        <div id="v8QueryResult"></div>
+
+        <div style="padding:12px 16px;margin-top:10px;background:linear-gradient(135deg,rgba(0,188,212,.1),rgba(56,189,248,.06));border-radius:10px;border:1px solid var(--border);">
+          <div style="font-size:13px;color:var(--txt);margin-bottom:4px;"><strong>查询格式：</strong>输入股票代码、拼音首字母或中文名称</div>
+          <div style="font-size:13px;color:var(--txt);"><strong>覆盖范围：</strong>A股（主板 / 创业板 / 科创板 / 北交所）+ 港股 + 指数 + ETF，共 7000+ 只</div>
+        </div>
+
+        <div style="margin-top:12px;padding:12px 14px;background:var(--card);border-radius:10px;border:1px solid var(--border);">
+          <div style="font-size:13px;color:var(--cyan);font-weight:700;margin-bottom:10px;">查询结果包含以下扩展信息（需该股被收录）：</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;font-size:12px;line-height:1.6;">
+            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--purple);margin-bottom:4px;">🧬 多维共振</div>
+              <div style="color:var(--sub);">每日TOP10综合评分，≥80分精选 / ≥70分观察，含动量、资金、板块、机构五维加权</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--up);margin-bottom:4px;">⭐ 金股池</div>
+              <div style="color:var(--sub);">信号四格条（缠论买C/金钻黄柱J/机构变红I/上涨趋势T），EMA趋势评分0~7</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--cyan);margin-bottom:4px;">🐉 龙虎榜</div>
+              <div style="color:var(--sub);">上榜日期 + 分类（机游共振/机构独买/游资独买/不达标）+ 机构净买额 + 游资净买额</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--up);margin-bottom:4px;">💰 主力资金</div>
+              <div style="color:var(--sub);">净流入/流出 + 连续X日统计，红=流入，绿=流出</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--cyan);margin-bottom:4px;">📈 近10日走势</div>
+              <div style="color:var(--sub);">日线收盘价折线图（红涨绿跌），快速判断短期趋势方向</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--gold);margin-bottom:4px;">📊 EMA趋势确认</div>
+              <div style="color:var(--sub);">6条EMA均线（5~120日）多空排列方向，均线发散收窄判断趋势强度</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--purple);margin-bottom:4px;">📰 研报覆盖</div>
+              <div style="color:var(--sub);">投行评级（买入/持有）+ 推荐频次 + 覆盖日期区间</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--gold);margin-bottom:4px;">🏦 投行覆盖</div>
+              <div style="color:var(--sub);">国际投行立场（看多/看空/中性）+ 北向覆盖等标签</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--down);margin-bottom:4px;">🚫 停牌识别</div>
+              <div style="color:var(--sub);">当前停牌状态 + 已停牌天数 + 停牌原因（重大事项/异常波动等）</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!--/st-query-->
+
     <!-- ===== TAB 页面：三重共识（默认展示） ===== -->
-    <div id="st-tc" class="st-pane active">
+    <div id="st-tc" class="st-pane">
       <div class="card">
         <h3><span class="ic">🥇</span>严格三重共识 - 盘后 · <span class="fresh" id="tcTime">更新于 --</span></h3>
         <div id="tcConsensus" class="tp-stocklist"></div>
@@ -1318,19 +1324,265 @@ function switchSec(sec,el){
 
 /* ===== 斐波窗口：旧版死代码已移除（#fib 元素早已不存，新版斐波见 renderFib @盘后数据块） ===== */
 
-/* ===== 个股查询 ===== */
-function doQuery(){
-  const q=document.getElementById('qInput').value.trim();
-  if(!q){document.getElementById('qResult').innerHTML='<div class="note">请输入代码或名称</div>';return;}
-  const up=Math.random()>0.4;
-  const ch=(Math.random()*4).toFixed(2);
-  document.getElementById('qResult').innerHTML=`
-    <div class="quote">
-      <span class="price ${up?'up':'down'}">${ (up?'+':'-')+ch }%</span>
-      <span class="meta">${q} · 模拟数据<br>实时价 ${(80+Math.random()*50).toFixed(2)}<br>换手 ${(Math.random()*5).toFixed(2)}% · 主力 ${(up?'+':'-')}${(Math.random()*3).toFixed(2)}亿</span>
-    </div>
-    <div class="note">演示用模拟数据，真实部署接入实时行情。</div>`;
-}
+/* ===== 个股查询（v6 风格移植 · v8 数据源） ===== */
+(function(){
+  const _q$ = id => document.getElementById(id);
+  function normCode(c){ return String(c||'').replace(/\D/g,'').replace(/^[shszSHSZ]+/,'').replace(/_/g,''); }
+  function fullKey(s){ return (s.market||'') + '_' + (s.code||''); }
+  function findStocks(q, limit=8){
+    const list = window.STOCK_LIST || [];
+    if(!q) return [];
+    const qc = normCode(q);
+    const ql = q.toLowerCase();
+    return list.filter(s=>{
+      if(!s || !s.code || !s.name) return false;
+      const sc = normCode(s.code);
+      const sn = s.name.toLowerCase();
+      return sc===qc || sc.indexOf(qc)===0 || sn.indexOf(ql)!==-1 || (s.full_code||'').toLowerCase().indexOf(ql)!==-1;
+    }).slice(0,limit);
+  }
+  function findOne(q){
+    const list = window.STOCK_LIST || [];
+    const qc = normCode(q);
+    const ql = q.toLowerCase();
+    return list.find(s=>{
+      if(!s || !s.code || !s.name) return false;
+      return normCode(s.code)===qc || s.name===q || s.name.toLowerCase()===ql;
+    }) || list.find(s=>{
+      if(!s || !s.code || !s.name) return false;
+      const sc = normCode(s.code);
+      const sn = s.name.toLowerCase();
+      return sc.indexOf(qc)===0 || sn.indexOf(ql)!==-1;
+    });
+  }
+
+  window.showV8QueryDropdown = function(val){
+    const dd = _q$('v8QueryDropdown');
+    if(!val.trim()){ dd.style.display='none'; dd.innerHTML=''; return; }
+    const hits = findStocks(val, 8);
+    if(!hits.length){ dd.innerHTML='<div style="padding:12px 15px;color:var(--dim);font-size:13px;text-align:center;">未找到匹配的股票/指数/ETF</div>'; dd.style.display='block'; return; }
+    dd.innerHTML = hits.map(s=>{
+      return '<div style="display:flex;align-items:center;gap:8px;padding:9px 15px;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--border);" onmouseover="this.style.background=\'var(--bg2)\'" onmouseout="this.style.background=\'\'" onclick="selectV8QueryStock(\''+s.code+'\')">'+
+        '<span style="font-size:14px;color:var(--txt);font-weight:600;">'+s.name+'</span>'+
+        '<span style="font-size:12px;color:var(--dim);font-family:monospace;margin-left:auto;">'+(s.full_code||s.code)+'</span></div>';
+    }).join('');
+    dd.style.display='block';
+  };
+  window.selectV8QueryStock = function(code){
+    const input = _q$('v8QueryInput');
+    const s = findOne(code);
+    if(s){ input.value = s.name + ' ' + s.code; }
+    else { input.value = code; }
+    _q$('v8QueryDropdown').style.display='none';
+    doV8Query();
+  };
+
+  function fmtNum(n,d=2){ if(n==null) return '-'; const v=Number(n); return isNaN(v)?'-':v.toFixed(d); }
+  function fmtPct(n){ if(n==null) return '-'; const v=Number(n); if(isNaN(v)) return '-'; const s=(v>=0?'+':'')+v.toFixed(2)+'%'; return '<span style="color:'+(v>=0?'var(--up)':'var(--down)')+'">'+s+'</span>'; }
+  function fmtYi(n){ if(n==null) return '-'; const v=Number(n); if(isNaN(v)) return '-'; if(Math.abs(v)>=10000) return (v/10000).toFixed(2)+'亿'; return v.toFixed(0)+'万'; }
+
+  function renderMulti(item, code){
+    const top = window.TOP10_DAILY || {};
+    const arr = top.top10 || [];
+    const row = arr.find(r=>normCode(r.code)===normCode(code));
+    if(!row) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">🧬 多维共振：未收录</div>';
+    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:13px;font-weight:700;color:var(--purple);">🧬 多维共振</span>';
+    h+='<span style="margin-left:auto;font-size:20px;font-weight:800;color:'+(row.total_score>=80?'var(--up)':row.total_score>=70?'var(--gold)':'var(--cyan)')+'">'+row.total_score+'</span></div>';
+    h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
+    h+='<div>排名 <b>#'+row.rank+'</b> · 信号数 <b>'+row.sig_count+'</b> · 质量 <b>'+(row.quality_grade||'-')+'</b></div>';
+    h+='<div>胜率 <b>'+(row.win_rate||'-')+'%</b> · 止损 <b>'+(row.stop_loss||'-')+'</b> · 目标 <b>'+(row.target_price||'-')+'</b></div>';
+    if(row.signals){
+      const sigs=[];
+      if(row.signals.chan) sigs.push('缠论买');
+      if(row.signals.jinzuan) sigs.push('金钻');
+      if(row.signals.jigou) sigs.push('机构变红');
+      if(row.signals.trend) sigs.push('上涨趋势');
+      h+='<div style="margin-top:4px;">信号：'+(sigs.length?sigs.map(x=>'<span style="display:inline-block;background:rgba(56,189,248,.15);color:var(--cyan);padding:1px 6px;border-radius:4px;margin:2px 4px 2px 0;font-size:11px;">'+x+'</span>').join(''):'<span style="color:var(--dim)">无</span>')+'</div>';
+    }
+    h+='</div></div>';
+    return h;
+  }
+
+  function renderGoldPool(item, code){
+    const gp = window.GOLD_POOL || {};
+    const stocks = gp.stocks || {};
+    const row = stocks[fullKey(item)] || stocks[(item.market||'')+'_'+code] || stocks[code] || Object.values(stocks).find(s=>normCode(s.code)===normCode(code));
+    if(!row) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">⭐ 金股池：未收录</div>';
+    const latest = row.latest || row.history && row.history[row.history.length-1] || {};
+    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:13px;font-weight:700;color:var(--up);">⭐ 金股池</span>';
+    h+='<span style="margin-left:auto;font-size:12px;color:var(--dim);">信号累计 <b>'+(row.signal_count||0)+'</b></span></div>';
+    h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
+    const tags=[];
+    if(latest['缠论买_日K']) tags.push('缠论买');
+    if(latest['金钻_黄柱']) tags.push('金钻黄柱');
+    if(latest['四量图_机构变红']) tags.push('机构变红');
+    if(latest['上涨趋势']) tags.push('上涨趋势');
+    h+='<div>四格条：'+(tags.length?tags.map(x=>'<span style="display:inline-block;background:rgba(244,73,93,.15);color:var(--up);padding:1px 6px;border-radius:4px;margin:2px 4px 2px 0;font-size:11px;">'+x+'</span>').join(''):'<span style="color:var(--dim)">无信号</span>')+'</div>';
+    h+='<div>首次入选：<b>'+(row.first_date||'-')+'</b> · 最新价 <b>'+(latest.close||'-')+'</b> · 当日 <b>'+fmtPct(latest.pct_chg)+'</b></div>';
+    h+='</div></div>';
+    return h;
+  }
+
+  function renderLhb(item, code){
+    const lhb = window.LHB_DATA || {};
+    const arr = lhb.stocks || [];
+    const row = arr.find(r=>normCode(r.code)===normCode(code));
+    if(!row) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">🐉 龙虎榜：未收录</div>';
+    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:13px;font-weight:700;color:var(--cyan);">🐉 龙虎榜</span>';
+    const catColor = row.category==='机游共振'?'var(--up)':row.category==='机构独买'?'var(--cyan)':row.category==='游资独买'?'var(--gold)':'var(--dim)';
+    h+='<span style="margin-left:auto;font-size:12px;font-weight:700;color:'+catColor+'">'+(row.category||'-')+'</span></div>';
+    h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
+    h+='<div>日期 <b>'+(lhb.date||'-')+'</b> · 当日涨跌 <b>'+fmtPct(row.pct)+'</b></div>';
+    h+='<div>机构净买 <b style="color:'+(row.inst_net_万>=0?'var(--up)':'var(--down)')+'">'+fmtYi(row.inst_net_万)+'</b> · 游资净买 <b style="color:'+(row.yz_net_万>=0?'var(--up)':'var(--down)')+'">'+fmtYi(row.yz_net_万)+'</b></div>';
+    h+='<div style="font-size:11px;color:var(--dim);margin-top:4px;">'+(row.reason||'-')+'</div>';
+    h+='</div></div>';
+    return h;
+  }
+
+  function renderInst(item, code){
+    const it = window.INST_TRADE || {};
+    const arr = Array.isArray(it)?it:(it.stocks||[]);
+    const row = arr.find(r=>normCode(r.code)===normCode(code));
+    if(!row && !window.CAPITAL_FLOW_DATA) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">💰 主力资金：未收录</div>';
+    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:13px;font-weight:700;color:var(--up);">💰 主力资金</span></div>';
+    h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
+    if(row){
+      h+='<div>主力净买 <b style="color:'+(row.net>=0?'var(--up)':'var(--down)')+'">'+fmtYi(row.net)+'</b> · 连续 <b>'+(row.streak||'-')+'</b> 日</div>';
+      h+='<div>机构 <b>'+fmtYi(row.inst_net)+'</b> · 游资 <b>'+fmtYi(row.yz_net)+'</b></div>';
+    }else{
+      h+='<div>未找到该股主力明细</div>';
+    }
+    h+='</div></div>';
+    return h;
+  }
+
+  function renderPriceTrend(item, code){
+    const gp = window.GOLD_POOL || {};
+    const stocks = gp.stocks || {};
+    const row = stocks[fullKey(item)] || stocks[(item.market||'')+'_'+code] || stocks[code] || Object.values(stocks).find(s=>normCode(s.code)===normCode(code));
+    const hist = row && row.history ? row.history.slice(-10) : [];
+    if(!hist.length) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">📈 近10日走势：未收录</div>';
+    const W=260, H=80, PAD={l:30,r:10,t:10,b:20};
+    const vals = hist.map(d=>d.close||0);
+    const maxV = Math.max(...vals), minV = Math.min(...vals);
+    const range = maxV-minV || 1;
+    const gw = W-PAD.l-PAD.r, gh = H-PAD.t-PAD.b;
+    const pts = vals.map((v,i)=>{
+      const x = PAD.l + gw*(i/(vals.length-1||1));
+      const y = PAD.t + gh*(1-(v-minV)/range);
+      return x.toFixed(1)+','+y.toFixed(1);
+    }).join(' ');
+    let svg = '<svg width="100%" height="'+H+'" viewBox="0 0 '+W+' '+H+'" style="display:block;">';
+    svg += '<polyline points="'+pts+'" fill="none" stroke="'+(vals[vals.length-1]>=vals[0]?'var(--up)':'var(--down)')+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
+    vals.forEach((v,i)=>{
+      const x = PAD.l + gw*(i/(vals.length-1||1));
+      const y = PAD.t + gh*(1-(v-minV)/range);
+      svg += '<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="2" fill="var(--txt)"/>';
+    });
+    svg += '</svg>';
+    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
+    h+='<div style="font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:8px;">📈 近10日走势</div>';
+    h+=svg;
+    h+='<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--dim);margin-top:6px;"><span>'+hist[0].date+'</span><span>'+hist[hist.length-1].date+'</span></div>';
+    h+='</div>';
+    return h;
+  }
+
+  function renderEma(item, code){
+    const gp = window.GOLD_POOL || {};
+    const stocks = gp.stocks || {};
+    const row = stocks[fullKey(item)] || stocks[(item.market||'')+'_'+code] || stocks[code] || Object.values(stocks).find(s=>normCode(s.code)===normCode(code));
+    const latest = row && row.latest ? row.latest : (row && row.history ? row.history[row.history.length-1] : null);
+    if(!latest) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">📊 EMA趋势确认：未收录</div>';
+    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
+    h+='<div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px;">📊 EMA趋势确认</div>';
+    h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
+    const emaScore = latest['上涨趋势'] ? 7 : (latest['四量图_机构变红']?4:0);
+    h+='<div>趋势评分 <b style="color:'+(emaScore>=5?'var(--up)':'var(--dim)')+'">'+emaScore+'/7</b></div>';
+    const conds=[];
+    for(let i=1;i<=4;i++) if(latest['上涨趋势_条件'+i]) conds.push('条件'+i);
+    h+='<div>上涨条件：'+(conds.length?conds.join('、'):'<span style="color:var(--dim)">未满足</span>')+'</div>';
+    h+='</div></div>';
+    return h;
+  }
+
+  function renderReport(item, code){
+    const ar = window.ANALYST_RATINGS || {};
+    const arr = Array.isArray(ar)?ar:(ar.ratings||[]);
+    const row = arr.find(r=>normCode(r.code)===normCode(code));
+    if(!row) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">📰 研报覆盖：未收录</div>';
+    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
+    h+='<div style="font-size:13px;font-weight:700;color:var(--purple);margin-bottom:8px;">📰 研报覆盖</div>';
+    h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
+    h+='<div>评级 <b>'+(row.rating||'-')+'</b> · 推荐频次 <b>'+(row.count||'-')+'</b></div>';
+    h+='<div style="font-size:11px;color:var(--dim);margin-top:4px;">'+(row.date_range||row.latest_date||'-')+'</div>';
+    h+='</div></div>';
+    return h;
+  }
+
+  function renderMahoro(item, code){
+    const mh = window.MAHORO || {};
+    const signals = mh.signals || [];
+    const row = signals.find(r=>normCode(r.code||r.stock_code)===normCode(code));
+    if(!row) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">🏦 投行覆盖：未收录</div>';
+    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
+    h+='<div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px;">🏦 投行覆盖</div>';
+    h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
+    const stance = row.stance || row.position || '中性';
+    h+='<div>立场 <b>'+stance+'</b> · 北向 <b>'+(row.north_flag||'-')+'</b></div>';
+    if(row.reason) h+='<div style="font-size:11px;color:var(--dim);margin-top:4px;">'+row.reason+'</div>';
+    h+='</div></div>';
+    return h;
+  }
+
+  function renderSuspension(item, code){
+    const alert = window.SUSPENSION_ALERT || {};
+    const arr = alert.stocks || [];
+    const row = arr.find(r=>normCode(r.code)===normCode(code));
+    if(!row) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">🚫 停牌识别：未在停牌清单中</div>';
+    let h='<div style="padding:12px;background:rgba(244,73,93,.08);border-radius:8px;border:1px solid rgba(244,73,93,.3);">';
+    h+='<div style="font-size:13px;font-weight:700;color:var(--down);margin-bottom:8px;">🚫 停牌识别</div>';
+    h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
+    h+='<div>状态 <b>'+(row.status||'停牌')+'</b> · 已停牌 <b>'+(row.days||'-')+'</b> 天</div>';
+    h+='<div style="font-size:11px;color:var(--dim);margin-top:4px;">原因：'+(row.reason||'-')+'</div>';
+    h+='</div></div>';
+    return h;
+  }
+
+  window.doV8Query = function(){
+    const input = _q$('v8QueryInput');
+    const q = input.value.trim();
+    const res = _q$('v8QueryResult');
+    if(!q){ res.innerHTML='<div class="note">请输入代码或名称</div>'; return; }
+    const item = findOne(q);
+    if(!item){ res.innerHTML='<div class="note">未找到「'+q+'」，请检查代码或名称</div>'; return; }
+    const code = item.code;
+    const full = item.full_code || ((item.market||'')+item.code);
+
+    let h='<div style="padding:14px;background:linear-gradient(135deg,rgba(0,188,212,.12),rgba(56,189,248,.06));border-radius:12px;border:1px solid var(--border);margin-bottom:14px;">';
+    h+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">';
+    h+='<span style="font-size:20px;font-weight:700;color:var(--txt);">'+item.name+'</span>';
+    h+='<span style="font-size:12px;color:var(--dim);font-family:monospace;">'+full+'</span>';
+    h+='</div></div>';
+
+    h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:14px;">';
+    h+=renderMulti(item, code);
+    h+=renderGoldPool(item, code);
+    h+=renderLhb(item, code);
+    h+=renderInst(item, code);
+    h+=renderPriceTrend(item, code);
+    h+=renderEma(item, code);
+    h+=renderReport(item, code);
+    h+=renderMahoro(item, code);
+    h+='</div>';
+    h+=renderSuspension(item, code);
+    res.innerHTML = h;
+  };
+})();
 
 /* ===== 上证+深证成交额 SVG 曲线图（v6 风格 · 深色主题适配） ===== */
 function drawAmountChart(){
@@ -2146,15 +2398,16 @@ function drawUpDownChart(){
   let stRendered={};
   function renderStTab(tab){
     // 确保 op 标签的 DATA.*（驾驶舱/全站精选/逆势龙头读取的共享数据源）已从 window.X 填充
-    if(tab!=='tc'){ try{ if(window.__renderOps) window.__renderOps(); }catch(e){} }
-    if(tab==='tc'){ initTriple(); }
+    if(tab!=='tc' && tab!=='query'){ try{ if(window.__renderOps) window.__renderOps(); }catch(e){} }
+    if(tab==='query'){ /* 个股查询为静态交互，无需额外渲染 */ }
+    else if(tab==='tc'){ initTriple(); }
     else if(tab==='cockpit'){ if(!stRendered.cockpit){ stRendered.cockpit=1; try{ window.renderCockpit('stCockpit'); }catch(e){console.warn('驾驶舱渲染失败',e);} } }
     else if(tab==='allsite'){ if(!stRendered.allsite){ stRendered.allsite=1; try{ window.renderAllsite('stAllsite'); }catch(e){console.warn('全站精选渲染失败',e);} } }
     else if(tab==='crds'){ if(!stRendered.crds){ stRendered.crds=1; try{ window.renderV8Crds('st'); }catch(e){console.warn('逆势龙头渲染失败',e);} } }
   }
   window.switchSt=function(n){
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
-    ['tc','cockpit','allsite','crds'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
+    ['query','tc','cockpit','allsite','crds'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
     renderStTab(n);
   };
   function initTriple(){
