@@ -55,6 +55,14 @@
   @media(max-width:1080px){.g-2,.g-3,.g-4,.g-5{grid-template-columns:1fr}}
   .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
   .card h3{font-size:14px;color:var(--sub);font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;line-height:1.4}
+  .ph-trend-card{display:flex;flex-direction:column;min-height:360px}
+  .ph-trend-body{flex:1;display:flex;flex-direction:column;justify-content:flex-start}
+  .ph-trend-list{display:flex;flex-direction:column;gap:6px}
+  .ph-trend-row{display:flex;align-items:center;gap:8px;font-size:13px;line-height:1.5;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+  .ph-trend-rank{width:18px;text-align:center;color:var(--dim);font-size:11px;font-weight:700}
+  .ph-trend-name{flex:1;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ph-trend-name small{color:var(--dim);font-size:10px;margin-left:4px}
+  .ph-trend-val{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
   .card h3 .ic{font-size:16px;line-height:1}
   .card h3 .fresh{font-size:11px;color:var(--dim);font-weight:400;white-space:nowrap}
   .card .fresh{font-size:11px;color:var(--dim);font-weight:400}
@@ -227,12 +235,6 @@
   .ph-fib-val.up{color:var(--up)}
   .ph-fib-lbl{font-size:12px;color:var(--dim)}
   .ph-fib-badge{display:inline-block;font-size:12px;font-weight:700;padding:3px 12px;border-radius:8px;color:#fff;background:var(--dim)}
-  .ph-mff-toolbar{display:flex;align-items:center;gap:8px;margin:12px 0 8px;flex-wrap:wrap}
-  .ph-mff-btn{font-size:11px;padding:4px 12px;border-radius:14px;border:1px solid var(--border);background:var(--card2);color:var(--sub);cursor:pointer;transition:.15s;font-family:inherit}
-  .ph-mff-btn:hover{border-color:var(--border2);color:var(--txt)}
-  .ph-mff-btn.active{background:var(--up);color:#fff;border-color:var(--up)}
-  .ph-mff-summary{margin-left:auto;font-size:11px;color:var(--dim)}
-  .ph-mff-summary b{font-weight:700}
   .ph-dim{display:flex;gap:8px;margin-top:10px}
   .ph-dim-item{flex:1;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center}
   .ph-dim-score{font-size:22px;font-weight:800;line-height:1;margin-bottom:4px}
@@ -404,6 +406,46 @@
   <!-- ============ 实时数据 ============ -->
   <section id="sec-rt">
     <div class="sec-head"><h2>📡 实时数据</h2><span class="fresh">更新于 今日 15:20</span><span class="tag">盘中 T+0 · 数据延迟约 3~5 秒</span></div>
+
+    <!-- 🧠 AI市场速览（A 阶段 2026-07-31：数字写死，参考 v6 周一真实快照；B 阶段接 JSON） -->
+    <div id="aiSummaryCard" style="background:#fff;border:1px solid #e8eaed;border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:2px solid #f0f0f0;">
+        <span style="font-size:16px;font-weight:700;color:#8d6e63;">🧠 AI市场速览 <span style="font-size:10px;font-weight:400;color:#999;">短线·综合 · A 阶段演示数据</span></span>
+        <span style="font-size:12px;color:#999;font-weight:400;" id="aiSummaryTime">周一 15:46 快照</span>
+      </div>
+      <div style="padding:0;" id="aiSummaryContent">
+        <div style="padding:10px 18px;background:#f3e5f5;font-size:13px;line-height:1.7;">
+          <span style="padding:2px 8px;border-radius:4px;background:#ce93d8;color:#4a148c;margin-right:6px;">🟣 日内风向</span>
+          <strong>情绪冰点</strong>，普跌格局，多维共振 8 只，<span style="color:#c62828;font-weight:700;">⚠️ 连跌 52 天</span>
+        </div>
+        <div style="padding:10px 18px;background:#e8f5e9;font-size:13px;line-height:1.7;">
+          <span style="padding:2px 8px;border-radius:4px;background:#a5d6a7;color:#1b5e20;margin-right:6px;">🟢 市场健康度</span>
+          <span style="color:#2e7d32;font-weight:700;">结构承压</span> ·
+          <span style="color:#2e7d32;font-weight:700;">资金偏多</span> ·
+          <span style="color:#2e7d32;font-weight:700;">情绪偏冷</span>
+          — <strong>1/3 灯道值</strong>
+        </div>
+        <div style="padding:10px 18px;background:#e3f2fd;font-size:13px;line-height:1.7;">
+          <span style="padding:2px 8px;border-radius:4px;background:#90caf9;color:#0d47a1;margin-right:6px;">📊 指数</span>
+          <span class="up" style="font-weight:700;">-1.2%</span> 上证指数 ·
+          <span class="down" style="font-weight:700;">-4.5%</span> 深证成指 ·
+          <span class="down" style="font-weight:700;">-7.3%</span> 创业板指 ·
+          <span class="down" style="font-weight:700;">-6.3%</span> 科创50 ·
+          <span class="up" style="font-weight:700;">+0.3%</span> 恒生指数 ·
+          <span class="up" style="font-weight:700;">+0.1%</span> 恒生科技 ·
+          <span class="down" style="font-weight:700;">-0.9%</span> 日经225 ·
+          <span class="down" style="font-weight:700;">-7.2%</span> 韩国 KOSPI
+        </div>
+        <div style="padding:10px 18px;background:#fff3e0;font-size:13px;line-height:1.7;">
+          <span style="padding:2px 8px;border-radius:4px;background:#ffcc80;color:#e65100;margin-right:6px;">⚠️ 市场异动</span>
+          融资大增 <strong>1.0%</strong>，地量创 20 日新低
+        </div>
+        <div style="padding:10px 18px;background:#fce4ec;font-size:13px;line-height:1.7;">
+          <span style="padding:2px 8px;border-radius:4px;background:#f48fb1;color:#880e4f;margin-right:6px;">📉 期货持仓</span>
+          <span style="color:#c62828;font-weight:700;">⚠️ 中信整体偏空</span>，机构态度谨慎，各合约连续方向不一
+        </div>
+      </div>
+    </div>
 
     <div class="grid g-3" style="margin-bottom:16px">
       <div class="card rt-card">
@@ -600,19 +642,20 @@
       <div class="ph-fib-badge" id="phFibBadge">--</div>
     </div>
 
-    <!-- 资金流时间轴 -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📊</span>资金流时间轴 - 中长线 · <span class="fresh" id="phMffTime">更新于 --</span></h3>
-      <div class="ph-mff-toolbar">
-        <span class="ph-mff-label">时间范围:</span>
-        <button class="ph-mff-btn active" data-range="60">60日</button>
-        <button class="ph-mff-btn" data-range="120">120日</button>
-        <button class="ph-mff-btn" data-range="250">1年</button>
-        <button class="ph-mff-btn" data-range="all">全部</button>
-        <span class="ph-mff-summary" id="phMffSummary"></span>
+    <!-- 板块资金短/中/长三窗口 -->
+    <div class="grid g-3" style="margin-bottom:16px;align-items:stretch;">
+      <div class="card ph-trend-card">
+        <h3><span class="ic">⚡</span>短线 5日累计净流入 TOP</h3>
+        <div id="phTrend5d" class="ph-trend-body"><div class="ipo-empty">加载中…</div></div>
       </div>
-      <div id="phMffChart" style="width:100%;height:320px"></div>
-      <div class="note">口径说明：累计净流入 = 上证指数单日主力资金净流入的滚动累加；数据覆盖沪市全市场成分股。</div>
+      <div class="card ph-trend-card">
+        <h3><span class="ic">📊</span>中线 20日累计净流入 TOP</h3>
+        <div id="phTrend20d" class="ph-trend-body"><div class="ipo-empty">加载中…</div></div>
+      </div>
+      <div class="card ph-trend-card">
+        <h3><span class="ic">🏛️</span>长线 60日累计净流入 TOP</h3>
+        <div id="phTrend60d" class="ph-trend-body"><div class="ipo-empty">加载中…</div></div>
+      </div>
     </div>
 
     <!-- 板块资金三合一 -->
@@ -849,7 +892,6 @@
         <tr><td>盘后扫描</td><td>15:20 今日</td><td><span class="status-dot s-ok"></span>新鲜</td></tr>
         <tr><td>黄金池</td><td>15:20 今日</td><td><span class="status-dot s-ok"></span>新鲜</td></tr>
         <tr><td>概念映射</td><td>09:45 今日</td><td><span class="status-dot s-ok"></span>新鲜</td></tr>
-        <tr><td>北向资金</td><td>15:05 今日</td><td><span class="status-dot s-warn"></span>盘中陈旧</td></tr>
       </tbody></table>
     </div>
     </div>
@@ -949,7 +991,6 @@
           <tr><td>ETF大幅申赎</td><td>净申赎绝对值 ≥ 100亿份</td><td>百亿级为机构大额调仓信号</td></tr>
           <tr><td>跌停潮</td><td>跌停 ≥ 30家</td><td>恐慌性抛售</td></tr>
           <tr><td>涨停冰点</td><td>涨停 ≤ 15家</td><td>投机情绪进入冰点</td></tr>
-          <tr><td>北向资金异动</td><td>单日净流入/流出 ≥ 50亿</td><td>⚠️ 港交所2024年5月起停止披露top_buy，监控暂停</td></tr>
           <tr><td>VIX恐慌</td><td>VIX ≥ 30</td><td>阈值已从单日涨幅改为绝对水平</td></tr>
         </table>
       </div>
@@ -1852,60 +1893,6 @@ function drawUpDownChart(){
     setTime('phCrisisTime',cr.update_time);
   }
 
-  /* ---- 4. 资金流时间轴（ECharts） ---- */
-  let mffChart=null,mffData=null,mffRange='60';
-  function renderMffChart(range){
-    if(!mffData||typeof echarts==='undefined')return;
-    mffRange=range;
-    const box=$('phMffChart');
-    if(!box||!box.offsetWidth)return; // 容器隐藏时跳过，切tab后再画
-    let daily=mffData.daily||[];
-    if(range!=='all'){const n=parseInt(range,10);daily=daily.slice(-n);}
-    const dates=daily.map(d=>d.date), nets=daily.map(d=>d.net_yi);
-    let cum=0;const cums=daily.map(d=>{cum+=d.net_yi;return +cum.toFixed(1);});
-    const el=$('phMffChart');
-    if(!mffChart)mffChart=echarts.init(el,null,{renderer:'canvas'});
-    mffChart.setOption({
-      backgroundColor:'transparent',
-      tooltip:{trigger:'axis',backgroundColor:'#1b2430',borderColor:'#2c3a4d',textStyle:{color:'#dfe7f1',fontSize:11}},
-      legend:{data:['单日净流入','区间累计'],textStyle:{color:'#8a93a6',fontSize:11},top:0},
-      grid:{left:50,right:50,top:30,bottom:24},
-      xAxis:{type:'category',data:dates,axisLabel:{color:'#8a93a6',fontSize:10},axisLine:{lineStyle:{color:'#2c3a4d'}}},
-      yAxis:[
-        {type:'value',name:'亿',axisLabel:{color:'#8a93a6',fontSize:10},splitLine:{lineStyle:{color:'rgba(255,255,255,.06)'}}},
-        {type:'value',name:'累计',axisLabel:{color:'#8a93a6',fontSize:10},splitLine:{show:false}}
-      ],
-      series:[
-        {name:'单日净流入',type:'bar',data:nets,itemStyle:{color:p=>p.value>=0?'#ef5350':'#26a269'},barMaxWidth:8},
-        {name:'区间累计',type:'line',yAxisIndex:1,data:cums,smooth:true,showSymbol:false,lineStyle:{color:'#29b6f6',width:2}}
-      ]
-    },true);
-    const last=daily[daily.length-1];
-    if(last)$('phMffSummary').innerHTML='最新 '+last.date+'：<b style="color:'+(last.net_yi>=0?'var(--up)':'var(--down)')+'">'+
-      (last.net_yi>=0?'+':'')+num(last.net_yi,1)+'亿</b> · 区间累计 <b style="color:'+(cum>=0?'var(--up)':'var(--down)')+'">'+
-      (cum>=0?'+':'')+num(cum,1)+'亿</b>';
-  }
-  function renderMff(mff){
-    mffData=mff;
-    setTime('phMffTime',mff.last_update);
-    document.querySelectorAll('.ph-mff-btn').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        document.querySelectorAll('.ph-mff-btn').forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        renderMffChart(btn.dataset.range);
-      });
-    });
-    renderMffChart('60');
-    window.addEventListener('resize',()=>{if(mffChart)mffChart.resize();});
-    // 切到盘后tab时若尚未绘图则补画
-    document.querySelectorAll('.tab[data-sec="ph"]').forEach(t=>{
-      t.addEventListener('click',()=>{setTimeout(()=>{
-        if(!mffChart)renderMffChart(mffRange);
-        else mffChart.resize();
-      },60);});
-    });
-  }
-
   /* ---- 5. 板块资金三合一 ---- */
   function renderSector(sf){
     const sm=sf.summary||{};
@@ -1921,21 +1908,43 @@ function drawUpDownChart(){
     h+='</div>';
     if(sm.alert)h+='<div style="font-size:11px;color:#ffb74d;margin-top:8px;line-height:1.7">'+sm.alert+'</div>';
     h+='</div>';
-    const trendBlock=(title,list,key)=>{
-      if(!list||!list.length)return '';
-      let b='<div class="ph-sector-block"><div class="ph-sector-title">'+title+'</div>';
-      list.slice(0,6).forEach(s=>{
-        const v=s[key];
-        b+='<div class="ph-sector-mini"><span>'+s.name+' <span style="color:var(--dim);font-size:10px">'+(s.type||'')+'</span></span>'+
-          '<b style="color:'+(v>=0?'var(--up)':'var(--down)')+'">'+fmt(v)+'亿</b></div>';
-      });
-      return b+'</div>';
-    };
-    h+=trendBlock('中线 5日累计净流入 TOP',sf.trend_5d,'net_5d');
-    h+=trendBlock('长线 20日累计净流入 TOP',sf.trend_20d,'net_20d');
     h+='</div>';
     $('phSectorBody').innerHTML=h;
     setTime('phSectorTime',sf.update_time);
+
+    // 短/中/长线板块资金 TOP 三卡片（独立于板块资金三合一）
+    renderTrendCard('phTrend5d', sf.trend_5d, 'net_5d', '5');
+    renderTrendCard('phTrend20d', sf.trend_20d, 'net_20d', '20');
+    renderTrendCard('phTrend60d', sf.trend_60d, 'net_60d', '60');
+  }
+
+  /* ---- 4.5 板块资金短/中/长 TOP 卡片 ---- */
+  function renderTrendCard(elId, list, key, windowLabel){
+    const el=$(elId);
+    if(!el)return;
+    if(!list||!list.length){
+      el.innerHTML='<div class="ipo-empty">暂未累积到数据区间</div>';
+      return;
+    }
+    // 按金额降序，金额相同按连续流入天数降序
+    const sorted=list.slice().sort((a,b)=>{
+      const av=parseFloat(a[key])||0, bv=parseFloat(b[key])||0;
+      if(Math.abs(bv-av)>0.01)return bv-av;
+      return (b.consecutive_days||0)-(a.consecutive_days||0);
+    });
+    let h='<div class="ph-trend-list">';
+    sorted.slice(0,8).forEach((s,idx)=>{
+      const v=s[key];
+      const days=s.consecutive_days||0;
+      const fire=days>=3?' <span style="color:#ff9800;font-size:11px">🔥'+days+'天</span>':'';
+      h+='<div class="ph-trend-row">'+
+        '<span class="ph-trend-rank">'+(idx+1)+'</span>'+
+        '<span class="ph-trend-name">'+s.name+' <small>'+(s.type||'')+'</small></span>'+
+        '<span class="ph-trend-val" style="color:'+(v>=0?'var(--up)':'var(--down)')+'">'+(v>=0?'+':'')+num(v,1)+'亿</span>'+
+        '</div>'+fire;
+    });
+    h+='</div>';
+    el.innerHTML=h;
   }
 
   /* ---- 6. 宏观观测 ---- */
@@ -1983,7 +1992,6 @@ function drawUpDownChart(){
       if(d['sh_index_fib.json'])safe(renderFib,d['sh_index_fib.json']);
       if(d['sh_index_fib.json'])safe(renderThermo,d['sh_index_fib.json'],d['margin_data.json']||{},d['cffex_holdings.json']||{},d['fomc_summary.json']||{},d['sector_fund_flow.json']||{});
       if(d['crisis_data.json'])safe(renderCrisis,d['crisis_data.json']);
-      if(d['market_fund_flow.json'])safe(renderMff,d['market_fund_flow.json']);
       if(d['sector_fund_flow.json'])safe(renderSector,d['sector_fund_flow.json']);
       if(d['macro_data.json'])safe(renderMacro,d['macro_data.json']);
       // ETF量能脉冲 + 日监控（实时数据板块）已删除，避免信息过载
