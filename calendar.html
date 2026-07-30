@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>重要日历 - 九宝量化 V8.0</title>
+<style>
+:root{
+  --bg:#0d0e15;--bg2:#15151e;--card:#1a1a26;--txt:#eee;--sub:#aaa;--dim:#666;
+  --bd:#262633;--bd2:#3a3a4a;
+  --important:#c62828;--cb:#1565c0;--data:#f57f17;--data2:#43a047;
+  --fomc:#9c27b0;--us:#42a5f5;--hk:#ef5350;--tw:#ff9800;--a50:#e91e63;
+  --ipo:#673ab7;--option:#00838f;--future:#1d6f42;--appl:#37474f;
+  --sg:#8e24aa;--kr:#00acc1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;padding:16px;line-height:1.5}
+.back{font-size:13px;color:var(--sub);margin-bottom:12px}
+.back a{color:var(--cb);text-decoration:none}
+.back a:hover{text-decoration:underline}
+h1{font-size:22px;font-weight:800;color:var(--txt);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.meta{font-size:11px;color:var(--dim);margin-bottom:16px}
+.week-label{font-size:13px;color:var(--sub);margin:16px 0 6px;padding-left:4px;font-weight:600}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px}
+.cal .head{font-size:12px;color:var(--sub);text-align:center;padding:8px 0;font-weight:700;background:var(--bg2);border-radius:4px}
+.day{background:var(--card);border:1px solid var(--bd);border-radius:6px;min-height:80px;padding:8px;display:flex;flex-direction:column;gap:3px;position:relative}
+.day.today{border-color:var(--cb);box-shadow:0 0 0 1px var(--cb)}
+.day-num{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:4px}
+.day.dim{opacity:.4}
+.event{font-size:11px;line-height:1.4;padding:3px 6px;border-radius:3px;display:flex;align-items:center;gap:3px}
+.event .ck{font-size:10px;color:#0d6e2a;background:#a5d6a7;padding:0 3px;border-radius:2px;font-weight:700}
+.event.imp{background:rgba(198,40,40,.15);color:#ff8a80;border-left:3px solid var(--important)}
+.event.cb{background:rgba(21,101,192,.15);color:#64b5f6;border-left:3px solid var(--cb)}
+.event.data{background:rgba(245,127,23,.15);color:#ffb74d;border-left:3px solid var(--data)}
+.event.data2{background:rgba(67,160,71,.15);color:#81c784;border-left:3px solid var(--data2)}
+.event.fomc{background:rgba(156,39,176,.15);color:#ce93d8;border-left:3px solid var(--fomc)}
+.event.us{background:rgba(66,165,245,.15);color:#90caf9;border-left:3px solid var(--us)}
+.event.hk{background:rgba(239,83,80,.15);color:#ef9a9a;border-left:3px solid var(--hk)}
+.event.tw{background:rgba(255,152,0,.15);color:#ffcc80;border-left:3px solid var(--tw)}
+.event.a50{background:rgba(233,30,99,.15);color:#f48fb1;border-left:3px solid var(--a50)}
+.event.ipo{background:rgba(103,52,183,.15);color:#b39ddb;border-left:3px solid var(--ipo)}
+.event.option{background:rgba(0,131,143,.15);color:#4dd0e1;border-left:3px solid var(--option)}
+.event.future{background:rgba(29,111,66,.15);color:#81c784;border-left:3px solid var(--future)}
+.event.appl{background:rgba(55,71,79,.15);color:#90a4ae;border-left:3px solid var(--appl)}
+.event.sg{background:rgba(142,36,170,.15);color:#ce93d8;border-left:3px solid var(--sg)}
+.event.kr{background:rgba(0,172,193,.15);color:#80deea;border-left:3px solid var(--kr)}
+.legend{margin-top:32px;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:20px}
+.legend-title{font-size:16px;font-weight:800;color:var(--txt);margin-bottom:14px}
+.legend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.legend-item{background:var(--card);border-left:4px solid;border-radius:4px;padding:10px 12px;font-size:12px}
+.legend-item .lt{font-weight:700;color:var(--txt);margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.legend-item .ld{color:var(--sub);line-height:1.6;font-size:11px}
+.legend-item .swatch{width:14px;height:14px;border-radius:3px;flex-shrink:0}
+.empty{padding:8px 0;color:var(--dim);font-size:11px}
+</style>
+</head>
+<body>
+<div class="back">📅 <a href="index.html">返回九宝量化 V8.0</a></div>
+<h1>📅 重要日历</h1>
+<div class="meta">重要日历 · 2026年7月版 · 全18类事件覆盖<br>数据来源：国家统计局/央行/美联储/各交易所/公司IR | 仅供参考，不构成投资建议 | 更新日期：<span id="v8caltime"></span></div>
+
+<!-- 重要日历由 V8_CAL 数据注入 -->
+<div id="v8calcontent"></div>
+
+<div class="legend">
+<div class="legend-title">🎨 色块标注说明</div>
+<div class="legend-grid" id="v8callegend"></div>
+</div>
+
+<script>window.V8_CAL = {"month": "2026年7月", "update_time": "2026-07-30 08:59", "legend": [{"title": "重要政策", "color": "#c62828", "desc": "中国政府/监管机构发布的重大政策、法规、规划等"}, {"title": "央行/LPR", "color": "#1565c0", "desc": "央行货币政策、利率决议、LPR报价等"}, {"title": "中国数据", "color": "#f57f17", "desc": "国家统计局/央行发布的宏观经济数据"}, {"title": "财报截止", "color": "#673ab7", "desc": "A股财报披露法定截止日"}, {"title": "期权交割", "color": "#00838f", "desc": "各交易所期权合约到期日"}, {"title": "期货交割", "color": "#1d6f42", "desc": "期货合约最后交易日"}, {"title": "A50交割", "color": "#e91e63", "desc": "新加坡富时A50期货交割日，外资对冲A股关键窗口"}, {"title": "港股休市", "color": "#ef5350", "desc": "香港交易所休市日"}, {"title": "台股财报", "color": "#ff9800", "desc": "台股关注股票"}, {"title": "苹果/华为", "color": "#37474f", "desc": "两大科技巨头新品发布/重要财报"}, {"title": "FOMC", "color": "#9c27b0", "desc": "美联储货币政策会议"}, {"title": "美股休市", "color": "#42a5f5", "desc": "NYSE/Nasdaq休市日"}, {"title": "美股财报", "color": "#66bb6a", "desc": "美股关注股票"}, {"title": "欧股财报", "color": "#26a69a", "desc": "欧股关注股票"}, {"title": "日股财报", "color": "#ab47bc", "desc": "日股关注股票"}, {"title": "韩股财报", "color": "#00acc1", "desc": "韩股关注股票"}, {"title": "SG公假", "color": "#8e24aa", "desc": "新加坡公共假期"}, {"title": "财新PMI", "color": "#5c6bc0", "desc": "财新PMI月度数据"}], "weeks": [{"no": "1", "dates": "6/29-7/5", "days": [{"num": 29, "dim": true, "events": []}, {"num": 30, "dim": true, "events": [{"text": "🇭🇰 港股休市", "cls": "hk", "released": false}]}, {"num": 1, "events": [{"text": "🇭🇰 港股休市", "cls": "hk", "released": false}, {"text": "🇨🇳 6月财新制造业PMI", "cls": "future", "released": true}, {"text": "🇨🇳 《社会救助法》等新规实施", "cls": "imp", "released": false}]}, {"num": 2, "events": []}, {"num": 3, "events": [{"text": "🇺🇸 美股休市（独立日补假）", "cls": "us", "released": false}]}, {"num": 4, "events": []}, {"num": 5, "events": []}]}, {"no": "2", "dates": "7/6-7/12", "days": [{"num": 6, "events": []}, {"num": 7, "events": [{"text": "🇰🇷 三星电子Q2业绩指引", "cls": "kr", "released": false}, {"text": "广期所2608期权到期", "cls": "option", "released": false}]}, {"num": 8, "events": [{"text": "🇨🇳 国务院科技奖励决定", "cls": "imp", "released": false}]}, {"num": 9, "events": [{"text": "🇺🇸 美联储6月会议纪要", "cls": "fomc", "released": true}, {"text": "🇨🇳 CPI/PPI数据", "cls": "data2", "released": true}, {"text": "PEP 百事 盘前", "cls": "us", "released": false}]}, {"num": 10, "events": [{"text": "🇹🇭 台股休市（台风巴威）", "cls": "tw", "released": false}, {"text": "DAL 达美航空 盘前", "cls": "us", "released": false}]}, {"num": 11, "events": []}, {"num": 12, "events": []}]}, {"no": "3", "dates": "7/13-7/19", "days": [{"num": 13, "events": [{"text": "郑商所2608期权到期", "cls": "option", "released": false}]}, {"num": 14, "events": [{"text": "大商所/郑商所/广期所2607最后交易日", "cls": "future", "released": false}, {"text": "🇺🇸 6月CPI 20:30", "cls": "data", "released": false}, {"text": "华为Pura 90S系列发布", "cls": "appl", "released": false}, {"text": "JPM 摩根大通 盘前", "cls": "us", "released": false}, {"text": "🇺🇸 摩根士丹利 Q2财报", "cls": "us", "released": false}, {"text": "🇺🇸 贝莱德 Q2财报", "cls": "us", "released": false}]}, {"num": 15, "events": [{"text": "🇨🇳 A股半年报预告强制截止日", "cls": "ipo", "released": false}, {"text": "上期所/能源中心2607最后交易日", "cls": "future", "released": false}, {"text": "🇨🇳 工业增加值/社零/固投数据", "cls": "data", "released": false}, {"text": "能源中心SC2608期权到期", "cls": "option", "released": false}, {"text": "MS 摩根士丹利 盘前", "cls": "us", "released": false}, {"text": "BLK 贝莱德 盘前", "cls": "us", "released": false}]}, {"num": 16, "events": [{"text": "大商所2608期权到期", "cls": "option", "released": false}, {"text": "NFLX 奈飞 盘后", "cls": "us", "released": false}]}, {"num": 17, "events": [{"text": "中金所IF/IH/IC/IM股指期货交割", "cls": "future", "released": false}, {"text": "中金所股指期权到期", "cls": "option", "released": false}]}, {"num": 18, "events": [{"text": "🇹🇭 台积电TSMC Q2财报/法说会", "cls": "tw", "released": false}]}, {"num": 19, "events": []}]}, {"no": "4", "dates": "7/20-7/26", "days": [{"num": 20, "events": [{"text": "🇨🇳 LPR利率报价（1年/5年以上）", "cls": "cb", "released": false}, {"text": "上期所FU2608期权到期", "cls": "option", "released": false}]}, {"num": 21, "events": []}, {"num": 22, "events": [{"text": "上交所/深交所ETF期权最后交易日", "cls": "option", "released": false}, {"text": "TSLA 特斯拉 盘后", "cls": "us", "released": false}]}, {"num": 23, "events": [{"text": "🇬🇧 EasyJet Q3交易更新", "cls": "data", "released": false}, {"text": "GOOGL 谷歌 盘后", "cls": "us", "released": false}]}, {"num": 24, "events": []}, {"num": 25, "events": []}, {"num": 26, "events": []}]}, {"no": "5", "dates": "7/27-7/31", "days": [{"num": 27, "events": [{"text": "能源中心EC2607最后交易日", "cls": "future", "released": false}, {"text": "上期所2608期权到期（除FU）", "cls": "option", "released": false}, {"text": "能源中心NR/BC2608期权到期", "cls": "option", "released": false}]}, {"num": 28, "events": [{"text": "大商所BZ/EB/EG/JD等2607最后交易日", "cls": "future", "released": false}, {"text": "SPGI 标普全球 盘前", "cls": "us", "released": false}, {"text": "🇺🇸 英伟达NVDA Q2财报", "cls": "us", "released": false}]}, {"num": 29, "events": [{"text": "🇬🇧 Rio Tinto（力拓）半年报", "cls": "data", "released": false}, {"text": "🇺🇸 FOMC议息会议第1天", "cls": "fomc", "released": false}, {"text": "郑商所CJ/PX2609期权到期", "cls": "option", "released": false}, {"text": "MSFT 微软 盘后", "cls": "us", "released": false}, {"text": "META 盘后", "cls": "us", "released": false}, {"text": "ADP 盘前", "cls": "us", "released": false}]}, {"num": 30, "events": [{"text": "🇸🇬 富时A50交割日", "cls": "a50", "released": false}, {"text": "Shell/Rolls-Royce等半年报", "cls": "data", "released": false}, {"text": "🇺🇸 FOMC利率决议 北京7/30凌晨", "cls": "fomc", "released": false}, {"text": "🇰🇷 三星电子Q2完整财报", "cls": "kr", "released": false}, {"text": "苹果Q3财报", "cls": "appl", "released": false}, {"text": "AAPL 苹果 盘后", "cls": "us", "released": false}, {"text": "AMZN 亚马逊 盘后", "cls": "us", "released": false}]}, {"num": 31, "events": [{"text": "上期所FU2608/能源中心SC/LU2608最后交易日", "cls": "future", "released": false}, {"text": "🇰🇷 三星电子2026Q2完整财报", "cls": "kr", "released": false}, {"text": "🇨🇳 中国PMI制造业/非制造业数据", "cls": "data", "released": false}]}]}]};</script>
+<script>
+// 数据占位（由 update_calendar.py 注入）
+window.V8_CAL = {weeks:[],legend:[],update_time:''};
+</script>
+<script>
+// 渲染日历
+(function(){
+  var D = window.V8_CAL || {weeks:[],legend:[]};
+  var days = ['周一','周二','周三','周四','周五','周六','周日'];
+  function fmtEvents(events){
+    if(!events || !events.length) return '';
+    return events.map(function(e){
+      var cls = e.cls || 'data';
+      var mark = e.released ? '<span class="ck">✅已发</span>' : '';
+      return '<div class="event '+cls+'">'+mark+e.text+'</div>';
+    }).join('');
+  }
+  var c = document.getElementById('v8calcontent');
+  if(c){
+    var html = '';
+    D.weeks.forEach(function(w){
+      html += '<div class="week-label">第'+w.no+'周 ' + w.dates + '</div>';
+      html += '<div class="cal">';
+      html += days.map(function(d){return '<div class="head">'+d+'</div>';}).join('');
+      w.days.forEach(function(d,i){
+        var cl = d.dim ? 'day dim' : 'day';
+        if(d.today) cl += ' today';
+        html += '<div class="'+cl+'">';
+        html += '<div class="day-num">'+d.num+'</div>';
+        html += fmtEvents(d.events);
+        html += '</div>';
+      });
+      html += '</div>';
+    });
+    c.innerHTML = html || '<div class="empty">暂无日历数据</div>';
+  }
+  var lg = document.getElementById('v8callegend');
+  if(lg && D.legend && D.legend.length){
+    lg.innerHTML = D.legend.map(function(l){
+      return '<div class="legend-item" style="border-left-color:'+l.color+'">'
+        + '<div class="lt"><span class="swatch" style="background:'+l.color+'"></span>'+l.title+'</div>'
+        + '<div class="ld">'+l.desc+'</div></div>';
+    }).join('');
+  }
+  var tm = document.getElementById('v8caltime');
+  if(tm && D.update_time) tm.textContent = D.update_time;
+})();
+</script>
+</body>
+</html>
