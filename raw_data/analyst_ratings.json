@@ -1,0 +1,38 @@
+{
+  "update_time": "2026-07-27 22:01",
+  "upgrades": [],
+  "downgrades": [],
+  "new_coverage": [],
+  "hot_stocks": [
+    {
+      "code": "300750",
+      "name": "宁德时代",
+      "rating": "增持",
+      "institution": "群益证券",
+      "report_count_1m": 3,
+      "date": "2026-07-27"
+    },
+    {
+      "code": "300502",
+      "name": "新易盛",
+      "rating": "买入",
+      "institution": "华鑫证券",
+      "report_count_1m": 2,
+      "date": "2026-07-26"
+    }
+  ],
+  "latest_reports": [
+    {
+      "code": "300750",
+      "name": "宁德时代",
+      "title": "公司半年报业绩快速增长，拟回购A股股份，建议“买进”",
+      "rating": "增持",
+      "institution": "群益证券",
+      "date": "2026-07-27"
+    }
+  ],
+  "note": "数据源: akshare(TOP40个股), 近3日新增推荐2只（买入/增持）",
+  "rating_summary": {
+    "增持": 1
+  }
+}

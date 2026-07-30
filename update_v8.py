@@ -50,6 +50,8 @@ DATA_SOURCES = {
     "w52_high.json":               "W52_HIGH",
     "limit_up_heatmap.json":       "LIMIT_UP_HEATMAP",
     "herding_data.json":           "HERDING_DATA",
+    "analyst_ratings.json":        "ANALYST_RATINGS",
+    "suspension_alert.json":       "SUSPENSION_ALERT",
     "volatility.json":             "VOLATILITY",
     "capital_flow_data.json":      "CAPITAL_FLOW_DATA",
     "mahoro.json":                 "MAHORO",
@@ -120,6 +122,39 @@ def _make_lite(name, obj):
         lite['stocks'] = stocks_lite
         lite['_lite_note'] = 'stocks 已去掉 history 日明细，仅保留 latest 聚合'
         return lite
+    if name == 'ANALYST_RATINGS':
+        # v6 源结构(upgrades/downgrades/hot_stocks/latest_reports) → v8 期望 {ratings:[...]}
+        merged = {}
+        for k in ('hot_stocks', 'latest_reports', 'upgrades', 'downgrades', 'new_coverage'):
+            for r in (obj.get(k) or []):
+                code = str(r.get('code', ''))
+                if not code or code in merged:
+                    continue
+                merged[code] = {
+                    'code': code,
+                    'name': r.get('name', ''),
+                    'rating': r.get('rating', '-'),
+                    'count': r.get('report_count_1m') or 1,
+                    'date_range': r.get('date', ''),
+                }
+        return {'update_time': obj.get('update_time'), 'ratings': list(merged.values())}
+    if name == 'SUSPENSION_ALERT':
+        # v6 源结构(suspended/near_trigger) → v8 期望 {stocks:[...]}
+        stocks = []
+        for r in (obj.get('suspended') or []):
+            code = str(r.get('code', ''))
+            if not code:
+                continue
+            stocks.append({'code': code, 'name': r.get('name', ''), 'status': '停牌',
+                           'days': r.get('days'), 'reason': r.get('reason', '')})
+        for r in (obj.get('near_trigger') or []):
+            code = str(r.get('code', ''))
+            if not code:
+                continue
+            stocks.append({'code': code, 'name': r.get('name', ''), 'status': '临停预警',
+                           'days': None,
+                           'reason': '临近触发阈值(pct=%s, gap=%s)' % (r.get('pct'), r.get('gap'))})
+        return {'update_time': obj.get('update_time'), 'stocks': stocks}
     if name == 'W52_HIGH':
         lite = {k: v for k, v in obj.items() if k != 'stocks'}
         lite['_lite_note'] = 'stocks 完整列表已裁剪，仅保留 top_gainers 与 total'

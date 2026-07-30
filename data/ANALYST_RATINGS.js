@@ -1,0 +1,1 @@
+window.ANALYST_RATINGS = {"update_time":"2026-07-27 22:01","ratings":[{"code":"300750","name":"宁德时代","rating":"增持","count":3,"date_range":"2026-07-27"},{"code":"300502","name":"新易盛","rating":"买入","count":2,"date_range":"2026-07-26"}]};
