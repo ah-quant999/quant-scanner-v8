@@ -257,6 +257,28 @@
   .ph-macro-section{font-size:12px;font-weight:700;color:var(--cyan);padding:8px;background:var(--bg2);margin-top:8px;border-radius:6px}
   @media(max-width:720px){.ph-fib-grid{grid-template-columns:repeat(2,1fr)}.ph-dim{flex-direction:column}}
 
+  /* ETF 实时监控（成交额热度 / 量能脉冲 / 日监控） */
+  .etf-heat-summary{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--sub);margin:8px 0 12px}
+  .etf-heat-summary b{color:var(--txt);font-weight:700}
+  .etf-heat-cat{margin-bottom:12px}
+  .etf-heat-cat-title{font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+  .etf-heat-list{display:flex;flex-direction:column;gap:6px}
+  .etf-heat-item{display:flex;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:8px 11px}
+  .etf-heat-name{font-size:13px;font-weight:700;color:var(--txt);flex:1;min-width:0}
+  .etf-heat-code{font-size:10px;color:var(--dim);font-family:ui-monospace,Menlo,monospace;font-weight:400;margin-left:4px}
+  .etf-heat-pct{font-size:13px;font-weight:700;min-width:62px;text-align:right}
+  .etf-heat-amt{font-size:12px;color:var(--sub);min-width:72px;text-align:right}
+  .etf-pulse-item{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+  .etf-pulse-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .etf-pulse-name{font-size:13px;font-weight:700;color:var(--txt)}
+  .etf-pulse-code{font-size:10px;color:var(--dim);font-family:ui-monospace,Menlo,monospace;font-weight:400;margin-left:4px}
+  .etf-pulse-delta{font-size:13px;font-weight:700}
+  .etf-pulse-bars{display:flex;align-items:flex-end;gap:4px;height:42px;margin:9px 0 6px}
+  .etf-pulse-bar{flex:1;border-radius:3px 3px 0 0;min-height:3px}
+  .etf-pulse-read{font-size:11px;color:var(--sub);line-height:1.6}
+  .etf-pulse-summary{font-size:12px;color:var(--gold);line-height:1.7;margin-top:4px;padding:8px 10px;background:var(--bg2);border-radius:8px}
+  @media(max-width:720px){.etf-heat-amt{min-width:60px}}
+
   /* 三重共识 / 历史追踪（选股策略 tab） */
   .tp-stocklist{display:flex;flex-direction:column;gap:10px}
   .tp-stock{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 12px}
@@ -353,6 +375,7 @@
   <div class="tab" data-sec="st" onclick="switchSec('st',this)">🎯 选股策略</div>
   <div class="tab locked" data-sec="op" data-lock="1" onclick="guardLock('op',this)">🔒 运维 <span class="lk">[锁]</span></div>
   <div class="tab locked" data-sec="lg" data-lock="1" onclick="guardLock('lg',this)">📖 逻辑详解 <span class="lk">[锁]</span></div>
+  <div class="tab" data-sec="v6" onclick="switchSec('v6',this)">📦 v6备忘录</div>
 </nav>
 
 <main>
@@ -505,62 +528,10 @@
       </div>
     </div>
 
-    <!-- ETF 资金热度 -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🔥</span>ETF 资金热度 - 实时·T+0 · <span class="fresh">更新于 今日 09:43</span></h3>
-      <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:10px;font-size:13px;color:var(--sub)">
-        <span><span style="color:var(--up)">▲ 290</span> 涨</span>
-        <span><span style="color:var(--down)">▼ 1168</span> 跌</span>
-        <span>主力净流出 <span style="color:var(--down);font-weight:700">20.4 亿</span></span>
-        <span style="font-size:11px;color:var(--dim)">宽基-3.2 亿 · 行业+5.1 亿 · 主题+18.2 亿 · 跨境+0.3 亿</span>
-      </div>
-      <div class="grid g-4">
-        <div>
-          <div style="font-weight:700;margin-bottom:8px;color:var(--cyan);display:flex;justify-content:space-between">
-            <span>宽基</span>
-            <span style="font-size:11px;color:var(--dim)">TOP4占87%</span>
-          </div>
-          <div class="etf-row"><span>科创50ETF</span><span class="pct up">+2.1%</span><b>21.5亿</b></div>
-          <div class="etf-row"><span>创业板ETF</span><span class="pct up">+1.5%</span><b>17.2亿</b></div>
-          <div class="etf-row"><span>中证500ETF</span><span class="pct up">+0.8%</span><b>15.4亿</b></div>
-          <div class="etf-row"><span>沪深300ETF</span><span class="pct up">+0.6%</span><b>11.5亿</b></div>
-          <div class="subtotal"><span>4只</span><span style="color:var(--up)">+65.6亿</span></div>
-        </div>
-        <div>
-          <div style="font-weight:700;margin-bottom:8px;color:var(--purple);display:flex;justify-content:space-between">
-            <span>行业</span>
-            <span style="font-size:11px;color:var(--dim)">TOP4占52%</span>
-          </div>
-          <div class="etf-row"><span>科创半导体ETF</span><span class="pct down">-0.4%</span><b class="up">+1.1亿</b></div>
-          <div class="etf-row"><span>半导体设备ETF</span><span class="pct down">-1.2%</span><b>13.7亿</b></div>
-          <div class="etf-row"><span>券商ETF</span><span class="pct up">+2.3%</span><b>8.9亿</b></div>
-          <div class="etf-row"><span>医药ETF</span><span class="pct down">-0.8%</span><b>7.3亿</b></div>
-          <div class="subtotal"><span>4只</span><span style="color:var(--up)">+31.0亿</span></div>
-        </div>
-        <div>
-          <div style="font-weight:700;margin-bottom:8px;color:var(--gold);display:flex;justify-content:space-between">
-            <span>主题</span>
-            <span style="font-size:11px;color:var(--dim)">TOP4占61%</span>
-          </div>
-          <div class="etf-row"><span>芯片ETF</span><span class="pct down">-1.1%</span><b>8.0亿</b></div>
-          <div class="etf-row"><span>AI ETF</span><span class="pct up">+3.2%</span><b>6.5亿</b></div>
-          <div class="etf-row"><span>新能源ETF</span><span class="pct down">-0.5%</span><b>5.8亿</b></div>
-          <div class="etf-row"><span>军工ETF</span><span class="pct up">+0.3%</span><b>4.2亿</b></div>
-          <div class="subtotal"><span>4只</span><span style="color:var(--up)">+24.5亿</span></div>
-        </div>
-        <div>
-          <div style="font-weight:700;margin-bottom:8px;color:var(--pink);display:flex;justify-content:space-between">
-            <span>跨境</span>
-            <span style="font-size:11px;color:var(--dim)">TOP4占39%</span>
-          </div>
-          <div class="etf-row"><span>恒生科技ETF</span><span class="pct up">+1.8%</span><b class="up">+4675万</b></div>
-          <div class="etf-row"><span>恒生互联网ETF</span><span class="pct down">-1.3%</span><b class="up">+2512万</b></div>
-          <div class="etf-row"><span>纳斯达克ETF</span><span class="pct down">-0.6%</span><b>3.1亿</b></div>
-          <div class="etf-row"><span>标普500ETF</span><span class="pct down">-0.2%</span><b>2.4亿</b></div>
-          <div class="subtotal"><span>4只</span><span style="color:var(--up)">+6.2亿</span></div>
-        </div>
-      </div>
-      <div class="note">按成交额与主力净流入综合排序，四分类独立展示。涨跌幅·红涨绿跌。</div>
+    <!-- ETF 成交额热度榜（实时） -->
+    <div class="card" style="margin-bottom:16px" id="etfHeatCard">
+      <h3><span class="ic">🔥</span>ETF 成交额热度榜（实时） · <span class="fresh" id="etfHeatTime">--</span> <span class="tag" style="font-size:11px">盘中 T+0 · 按成交额分类 TOP4</span></h3>
+      <div id="etfHeatBody"><div class="note">正在加载 ETF 成交额数据...</div></div>
     </div>
 
     <!-- ====== ETF 5分钟量能脉冲监测 ====== -->
@@ -1408,6 +1379,11 @@
     </div>
   </section>
 
+  <!-- ============ v6备忘录 ============ -->
+  <section id="sec-v6">
+    <iframe src="v6_memo.html" style="width:100%;height:calc(100vh - 140px);border:none;border-radius:14px;background:#f5f7fa;" id="v6MemoFrame"></iframe>
+  </section>
+
 </main>
 
 <!-- 日历放大 modal -->
@@ -1819,9 +1795,20 @@ function doQuery(){
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 <script>
 /* ===== 盘后数据六大模块 ===== */
+window.__pmScriptStarted = true;
 (function(){
-  const P='../data/';
-  const J=f=>fetch(P+f).then(r=>{if(!r.ok)throw new Error(f);return r.json();});
+  // v8 数据已通过构建脚本注入为 window.X 全局变量，禁止 fetch 公开仓库的 data/*.json
+  const DATA_SRC={
+    'sh_index_fib.json': window.SH_FIB,
+    'market_fund_flow.json': window.MARKET_FUND_FLOW_DATA,
+    'crisis_data.json': window.CRISIS_DATA,
+    'sector_fund_flow.json': window.SECTOR_FUND_FLOW,
+    'macro_data.json': window.MACRO_DATA,
+    'margin_data.json': window.MARGIN_DATA,
+    'cffex_holdings.json': window.CFFEX_HOLDINGS,
+    'fomc_summary.json': window.FOMC_SUMMARY || null
+  };
+  const J=f=>Promise.resolve(DATA_SRC[f]||null);
   const $=id=>document.getElementById(id);
   const num=(v,d)=>v==null||isNaN(v)?'--':Number(v).toFixed(d==null?2:d);
 
@@ -1864,6 +1851,7 @@ function doQuery(){
 
   /* ---- 2. 短线/中线市场温度计（技术/资金/机构） ---- */
   function renderThermo(fib,margin,cffex,fomc,sf){
+    if(!$('phThermoBody'))return; // 该卡片未纳入当前 v8 布局，跳过渲染
     const c=fib.current||{};
     const declineDays=c.days_down||0, declinePct=c.total_pct||0;
     let nextWindow='',nextWindowDays=99;
@@ -1925,6 +1913,7 @@ function doQuery(){
 
   /* ---- 3. 六维预警雷达 ---- */
   function renderCrisis(cr){
+    if(!$('phCrisisBody'))return; // 该卡片未纳入当前 v8 布局，跳过渲染
     const inds=cr.indicators||{};
     const cats={'货币':[],'经济':[],'全球':[]};
     Object.keys(inds).forEach(k=>{const it=inds[k];if(cats[it.cat]&&it.score!=null)cats[it.cat].push(it.score);});
@@ -2074,33 +2063,108 @@ function doQuery(){
     setTime('phMacroTime',m.update_time);
   }
 
+  /* ---- 7. ETF 实时监控（成交额热度 / 量能脉冲 / 日监控）---- */
+  function classifyEtf(name){
+    const n=name||'';
+    if(/港股|恒生|中韩|纳指|标普|道琼|日经|日本|德国|法国|美国|美股|东南亚|沙特|越南|英国|印度|中概|恒指|国企指数/.test(n))return '跨境';
+    if(/沪深300|中证500|中证1000|中证2000|中证A50|创业板|科创50|科创创业|双创|上证50|深证|国证2000|A500|MSCI|基本面50|180ETF|380ETF|中证A100/.test(n))return '宽基';
+    if(/半导体|芯片|医药|医疗|创新药|消费|白酒|银行|券商|证券|军工|新能源|光伏|电池|科技|人工|AI|5G|通信|有色|煤炭|钢铁|化工|汽车|地产|食品|农业|养殖|传媒|游戏|电力|机器人|算力|软件|互联网|电子|计算机|机械|环保|建材|家电|保险|稀土/.test(n))return '行业';
+    return '主题';
+  }
+  function fmtAmount(v){
+    if(v==null||isNaN(v))return '--';
+    if(v>=1e8)return (v/1e8).toFixed(2)+'亿';
+    if(v>=1e4)return (v/1e4).toFixed(2)+'万';
+    return Math.round(v).toLocaleString();
+  }
+  function renderEtfHeat(){
+    const box=$('etfHeatBody'); if(!box)return;
+    const d=window.ETF_INTRADAY_HEAT;
+    if(!d||!d.items||!d.items.length){box.innerHTML='<div class="note">暂无 ETF 成交额数据</div>';return;}
+    const items=d.items.slice().sort((a,b)=>(b['成交额']||0)-(a['成交额']||0));
+    const cats={'宽基':[],'行业':[],'主题':[],'跨境':[]};
+    items.forEach(it=>{const c=classifyEtf(it['名称']);(cats[c]||cats['主题']).push(it);});
+    let up=0,down=0,total=0;
+    items.forEach(it=>{total+=(it['成交额']||0);const p=it['涨跌幅']||0;if(p>0)up++;else if(p<0)down++;});
+    let h='<div class="etf-heat-summary"><span>成交额TOP'+items.length+' · 合计 <b>'+fmtAmount(total)+'</b></span><span style="color:var(--up)">涨 '+up+'</span><span style="color:var(--down)">跌 '+down+'</span></div>';
+    const cn={'宽基':'宽基ETF','行业':'行业ETF','主题':'主题ETF','跨境':'跨境ETF'};
+    ['宽基','行业','主题','跨境'].forEach(cat=>{
+      const list=cats[cat].slice(0,4); if(!list.length)return;
+      h+='<div class="etf-heat-cat"><div class="etf-heat-cat-title">'+cn[cat]+'</div><div class="etf-heat-list">';
+      list.forEach(it=>{
+        const pct=it['涨跌幅']||0; const col=pct>0?'var(--up)':pct<0?'var(--down)':'var(--dim)';
+        h+='<div class="etf-heat-item"><span class="etf-heat-name">'+it['名称']+'<span class="etf-heat-code">'+it['代码']+'</span></span>'+
+           '<span class="etf-heat-pct" style="color:'+col+'">'+(pct>=0?'+':'')+pct.toFixed(2)+'%</span>'+
+           '<span class="etf-heat-amt">'+fmtAmount(it['成交额'])+'</span></div>';
+      });
+      h+='</div></div>';
+    });
+    box.innerHTML=h;
+    const t=$('etfHeatTime'); if(t)t.textContent='盘中实时';
+  }
+  function renderEtfPulse(){
+    const box=$('etfPulseBody'); if(!box)return;
+    const d=window.ETF_PULSE;
+    if(!d||!d.etfs||!d.etfs.length){box.innerHTML='<div class="note">暂无 ETF 量能脉冲数据</div>';return;}
+    let h='';
+    d.etfs.forEach(e=>{
+      const slices=e.slices||[]; const last=slices[slices.length-1]||0; const first=slices[0]||0; const delta=last-first;
+      const col=delta>0?'var(--up)':'var(--down)';
+      h+='<div class="etf-pulse-item"><div class="etf-pulse-head"><span class="etf-pulse-name">'+e.name+'<span class="etf-pulse-code">'+e.code+'</span></span><span class="etf-pulse-delta" style="color:'+col+'">'+(delta>=0?'+':'')+fmtAmount(delta)+'</span></div><div class="etf-pulse-bars">';
+      const maxv=Math.max.apply(null,slices.concat([1]));
+      slices.forEach(v=>{const w=(v/maxv*100).toFixed(1);h+='<span class="etf-pulse-bar" style="height:'+w+'%;background:'+col+'"></span>';});
+      h+='</div>';
+      if(e.read)h+='<div class="etf-pulse-read">'+e.read+'</div>';
+      h+='</div>';
+    });
+    if(d.summary)h+='<div class="etf-pulse-summary">'+d.summary+'</div>';
+    box.innerHTML=h;
+    setTime('etfPulseTime',d.update_time);
+  }
+  function renderEtfDaily(){
+    const box=$('etfDailyBody'); if(!box)return;
+    const d=window.ETF_DAILY_MONITOR;
+    if(!d||d.no_data){
+      const note=d&&d.note?d.note:'ETF 日监控数据源尚未接入';
+      box.innerHTML='<div class="note" style="color:#ffb74d">'+note+'</div>';
+      const t=$('etfDailyTime'); if(t)t.textContent='待接入';
+      return;
+    }
+    if(d.summary)box.innerHTML='<div class="note">'+d.summary+'</div>';
+    else box.innerHTML='<div class="note">ETF 日监控数据已接入，渲染待完善</div>';
+    setTime('etfDailyTime',d.update_time);
+  }
+
   /* ---- 初始化 ---- */
   function initPostMarket(){
+    window.__pmInitCalled = true;
     const files=['sh_index_fib.json','market_fund_flow.json','crisis_data.json','sector_fund_flow.json','macro_data.json','margin_data.json','cffex_holdings.json','fomc_summary.json'];
     Promise.allSettled(files.map(J)).then(rs=>{
+      window.__pmThenCalled = true;
       const d={};files.forEach((f,i)=>{d[f]=rs[i].status==='fulfilled'?rs[i].value:null;});
-      const safe=(fn,...args)=>{try{fn(...args);}catch(e){console.warn('盘后模块渲染失败',e);}};
+      const safe=(fn,...args)=>{try{fn(...args); window.__pmLastFn=fn.name||'anon'; }catch(e){ console.warn('盘后模块渲染失败', fn.name||'anon', e); window.__pmLastErr=(e.message||''); }};
       if(d['sh_index_fib.json'])safe(renderFib,d['sh_index_fib.json']);
       if(d['sh_index_fib.json'])safe(renderThermo,d['sh_index_fib.json'],d['margin_data.json']||{},d['cffex_holdings.json']||{},d['fomc_summary.json']||{},d['sector_fund_flow.json']||{});
       if(d['crisis_data.json'])safe(renderCrisis,d['crisis_data.json']);
       if(d['market_fund_flow.json'])safe(renderMff,d['market_fund_flow.json']);
       if(d['sector_fund_flow.json'])safe(renderSector,d['sector_fund_flow.json']);
       if(d['macro_data.json'])safe(renderMacro,d['macro_data.json']);
-      // ETF量能脉冲 + 日监控（实时数据板块）
+      // ETF成交额热度 + 量能脉冲 + 日监控（实时数据板块）
+      safe(renderEtfHeat);
       safe(renderEtfPulse);
       safe(renderEtfDaily);
-    });
+      window.__pmThenDone = true;
+    }).catch(e=>{ window.__pmThenErr = e.message; });
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initPostMarket);
   else initPostMarket();
+  window.__pmScriptEnded = true;
 })();
 </script>
 
 <script>
 /* ===== 选股策略 · 三重共识 + 历史追踪 ===== */
 (function(){
-  const P='../data/';
-  const J=f=>fetch(P+f).then(r=>{if(!r.ok)throw new Error(f);return r.json();});
   const $=id=>document.getElementById(id);
   const num=(v,d)=>v==null||isNaN(v)?'--':Number(v).toFixed(d==null?2:d);
   function rel(ts){
@@ -2265,8 +2329,14 @@ function doQuery(){
 <script>
 /* ===== 运维子页：v6 精选 / 暂未上架 / 已下架 移植（精简、暗色主题） ===== */
 (function(){
-  const P='../data/';
-  const J=f=>fetch(P+f).then(r=>{if(!r.ok)throw new Error(f);return r.json();});
+  // v8 数据已通过构建脚本注入为 window.X 全局变量，禁止 fetch 公开仓库的 data/*.json
+  const DATA_SRC={
+    'backtest_comprehensive.json': window.BACKTEST_COMPREHENSIVE || null,
+    'cockpit_backtest.json': window.COCKPIT_BACKTEST || null,
+    'cockpit_advice.json': window.COCKPIT_ADVICE || null,
+    'backtest_tdx.json': window.BACKTEST_TDX || null
+  };
+  const J=f=>{ var k=(f||'').split('?')[0]; return Promise.resolve(DATA_SRC[k]||null); };
   const $=id=>document.getElementById(id);
   const DATA={};
 
@@ -3000,82 +3070,6 @@ function doQuery(){
       +'</div>';
   }
 
-  /* ===================== ETF 5分钟量能脉冲监测 ===================== */
-  function renderEtfPulse(){
-    var el=$('etfPulseBody');
-    if(!el) return;
-    var d=DATA.etf_pulse;
-    if(!d||!d.etfs){ el.innerHTML='<div class="note">量能脉冲数据暂不可用（非交易时段或数据源未更新）</div>'; return; }
-    var h='';
-    h+='<table style="width:100%;border-collapse:collapse;font-size:13px;">';
-    h+='<thead><tr style="color:var(--sub);border-bottom:2px solid var(--border);"><th style="padding:6px 8px;text-align:left;">ETF</th><th style="padding:6px 4px;text-align:center;" colspan="4">5min切片成交额（M）</th><th style="padding:6px 8px;text-align:left;min-width:180px;">判读</th></tr></thead>';
-    if(d.times&&d.times.length){
-      h+='<tr style="color:var(--dim);font-size:11px;"><td style="padding:2px 8px;"></td>';
-      d.times.forEach(function(t){ h+='<td style="padding:2px 4px;text-align:center;">'+t+'</td>'; });
-      h+='<td style="padding:2px 8px;"></td></tr>';
-    }
-    d.etfs.forEach(function(e){
-      var name=e.name, code=e.code, slices=e.slices||[], read=e.read||'—';
-      var maxV=0; slices.forEach(function(s){ if(s>maxV) maxV=s; });
-      h+='<tr style="border-top:1px solid rgba(255,255,255,.06);">';
-      h+='<td style="padding:6px 8px;font-weight:700;color:var(--fg);">'+name+'<span style="font-size:10px;color:var(--dim);margin-left:4px;">'+code+'</span></td>';
-      slices.forEach(function(s){
-        var v=s>0?(s/1e6).toFixed(0):'—';
-        var pct=maxV>0?(s/maxV*100):0;
-        var bg=s>0?'background:rgba('+(/买力|强|放量|加速|护盘|加码/.test(read)?'239,83,80':'38,166,154')+','+(0.08+pct*0.004)+')':'';
-        h+='<td style="padding:5px 4px;text-align:right;font-variant-numeric:tabular-nums;'+bg+'">'+v+'</td>';
-      });
-      for(var i=slices.length;i<4;i++) h+='<td style="padding:5px 4px;text-align:center;color:var(--dim);">—</td>';
-      var rc=/买力|强|放量|加速|护盘|加码/.test(read)?'color:var(--up)':(/缩量|弱|回落|衰减/.test(read)?'color:var(--down)':'color:var(--sub)');
-      h+='<td style="padding:6px 8px;font-size:12px;'+rc+'">'+read+'</td></tr>';
-    });
-    h+='</table>';
-    if(d.summary){
-      h+='<div style="margin-top:12px;padding:10px 12px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.15);border-radius:8px;font-size:12px;line-height:1.8;color:var(--cyan);">';
-      h+='<b>📝 判读：</b>'+d.summary+'</div>';
-    }
-    var tt=$('etfPulseTime');
-    if(tt&&d.update_time) tt.textContent=d.update_time;
-    el.innerHTML=h;
-  }
-
-  /* ===================== 股票型ETF日监控（华宝风格） ===================== */
-  function renderEtfDaily(){
-    var el=$('etfDailyBody');
-    if(!el) return;
-    var d=DATA.etf_daily;
-    if(!d||d.no_data){ el.innerHTML='<div class="note" style="color:var(--down);font-weight:600;">⚠️ 无数据：ETF 资金流 TOP10 数据源尚未接入（非模拟数据）。</div>'; return; }
-    var h='';
-    // 概览卡片
-    h+='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;">';
-    var ov=[['📈 全市场净流入',d.total_net_inflow||0],['📊 宽基',d.broad_net||0],['🏭 行业/主题',d.sector_net||0],['🌐 跨境',d.cross_net||0]];
-    ov.forEach(function(o){
-      var v=o[1], cls=v>=0?'up':'down';
-      h+='<div style="flex:1;min-width:120px;padding:10px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:8px;text-align:center;">';
-      h+='<div style="font-size:11px;color:var(--sub);">'+o[0]+'</div>';
-      h+='<div style="font-size:18px;font-weight:800;color:var(--'+cls+');margin:4px 0;">'+(v>0?'+':'')+v.toFixed(1)+'<small style="font-size:11px;"> 亿</small></div></div>';
-    });
-    h+='</div>';
-    // TOP10 流入
-    if(d.top_inflow&&d.top_inflow.length){
-      h+='<div style="margin-bottom:14px;"><b style="font-size:13px;color:var(--up);">▲ 单日净流入 TOP10</b>';
-      h+='<table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;"><thead><tr style="color:var(--sub);border-bottom:1px solid var(--border);"><th style="padding:4px 6px;">#</th><th style="padding:4px 6px;">名称</th><th style="padding:4px 6px;">代码</th><th style="padding:4px 6px;text-align:right;">净流入(亿)</th><th style="padding:4px 6px;text-align:right;">涨跌%</th></tr></thead><tbody>';
-      d.top_inflow.forEach(function(item,i){
-        h+='<tr style="border-top:1px solid rgba(255,255,255,.04);"><td style="padding:4px 6px;color:var(--dim);">'+(i+1)+'</td><td style="padding:4px 6px;font-weight:600;">'+item.name+'</td><td style="padding:4px 6px;color:var(--dim);">'+item.code+'</td><td style="padding:4px 6px;text-align:right;color:var(--up);font-weight:700;">+'+item.net_inflow.toFixed(1)+'</td><td style="padding:4px 6px;text-align:right;" class="'+(item.pct_chg>=0?'up':'down')+'">'+(item.pct_chg>=0?'+':'')+item.pct_chg.toFixed(2)+'%</td></tr>';
-      });h+='</tbody></table></div>';
-    }
-    // TOP10 流出
-    if(d.top_outflow&&d.top_outflow.length){
-      h+='<div><b style="font-size:13px;color:var(--down);">▼ 单日净流出 TOP10</b>';
-      h+='<table style="width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;"><thead><tr style="color:var(--sub);border-bottom:1px solid var(--border);"><th style="padding:4px 6px;">#</th><th style="padding:4px 6px;">名称</th><th style="padding:4px 6px;">代码</th><th style="padding:4px 6px;text-align:right;">净流出(亿)</th><th style="padding:4px 6px;text-align:right;">涨跌%</th></tr></thead><tbody>';
-      d.top_outflow.forEach(function(item,i){
-        h+='<tr style="border-top:1px solid rgba(255,255,255,.04);"><td style="padding:4px 6px;color:var(--dim);">'+(i+1)+'</td><td style="padding:4px 6px;font-weight:600;">'+item.name+'</td><td style="padding:4px 6px;color:var(--dim);">'+item.code+'</td><td style="padding:4px 6px;text-align:right;color:var(--down);font-weight:700;">'+item.net_outflow.toFixed(1)+'</td><td style="padding:4px 6px;text-align:right;" class="'+(item.pct_chg>=0?'up':'down')+'">'+(item.pct_chg>=0?'+':'')+item.pct_chg.toFixed(2)+'%</td></tr>';
-      });h+='</tbody></table></div>';
-    }
-    var tt=$('etfDailyTime');
-    if(tt&&d.update_time) tt.textContent=d.update_time;
-    el.innerHTML=h;
-  }
 
   function renderUnlisted(){
     var el=$('unlistedPanel');
@@ -3430,8 +3424,7 @@ function doQuery(){
     }
   }
 
-  function renderOps(){
-    if(rendered) return; rendered=true;
+  function fillData(){
     // 直接从构建注入的 window.X 读取（v8 不发布 data/ 目录，禁止 fetch）
     DATA.crisis = window.CRISIS_DATA||null;
     DATA.sh_fib = window.SH_FIB||null;
@@ -3455,6 +3448,14 @@ function doQuery(){
     DATA.experiment = window.EXPERIMENT||{};
     DATA.etf_pulse = window.ETF_PULSE||null;
     DATA.etf_daily = window.ETF_DAILY_MONITOR||null;
+    DATA.etf_intraday_heat = window.ETF_INTRADAY_HEAT||null;
+  }
+  fillData();
+
+  function renderOps(){
+    if(rendered) return; rendered=true;
+    fillData();
+    DATA.etf_intraday_heat = window.ETF_INTRADAY_HEAT||null;
     var safe=function(fn){try{fn();}catch(e){console.warn('运维子页渲染失败',e);}};
     safe(renderAllsite);
     safe(renderCockpit);
