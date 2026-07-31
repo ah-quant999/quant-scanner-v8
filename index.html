@@ -2394,7 +2394,13 @@ function renderLimitUpHeatmap(){
   function renderSector(sf){
     const d=sf||{};
     const si=(d.sectors_in||[]).slice(), so=(d.sectors_out||[]).slice();
-    const t5d=d.trend_5d||[], t20d=d.trend_20d||[], t60d=d.trend_60d||[];
+    // 若数据源只给 sectors_in/out 的 net_5d/net_20d，从中派生中期趋势数组
+    const deriveTrend=(k)=>{
+      if(d['trend_'+k]&&d['trend_'+k].length) return d['trend_'+k];
+      const arr=[].concat(si||[], so||[]).filter(x=>x&&x['net_'+k]!=null&&!isNaN(x['net_'+k]));
+      return arr.map(x=>({name:x.name, type:x.type, ['net_'+k]:x['net_'+k]}));
+    };
+    const t5d=deriveTrend('5d'), t20d=deriveTrend('20d'), t60d=deriveTrend('60d');
 
     // 降级：sects_in/out为空但top_list有数据时派生
     if(!si.length && !so.length){
@@ -2617,6 +2623,16 @@ function renderLimitUpHeatmap(){
 
   /* ---- 6. 宏观观测 ---- */
   function renderMacro(m){
+    // 兼容新版 flat schema：cloud_fetch_v8.py 目前只产出 cpi/pmi 数组
+    if(!m.monetary && (Array.isArray(m.cpi)||Array.isArray(m.pmi))){
+      const last=(arr,key)=>{const r=(arr||[]).filter(x=>x&&x[key]!=null&&!isNaN(x[key])); return r.length?r[r.length-1]:null;};
+      const cpi=last(m.cpi,'今值'), pmi=last(m.pmi,'今值');
+      m={
+        monetary:{}, global_macro:{}, market_sentiment:{},
+        economy:{pmi:{value:pmi?pmi['今值']:null}, cpi:{value:cpi?cpi['今值']:null}, ppi:{}},
+        update_time:m.update_time
+      };
+    }
     const mo=m.monetary||{},gl=m.global_macro||{},ec=m.economy||{},se=m.market_sentiment||{};
     const cm=gl.commodities||{};
     const row=(name,val,desc)=>'<tr><td>'+name+'</td><td style="text-align:center;font-weight:700;color:var(--txt)">'+val+'</td><td style="color:var(--dim)">'+desc+'</td></tr>';
@@ -2653,19 +2669,21 @@ function renderLimitUpHeatmap(){
 
   /* ---- 初始化 ---- */
   function initPostMarket(){
-    // 先用已注入的 SECTOR_FUND_FLOW.js 数据立即渲染，避免一直显示“加载中”
-    try{ renderSector(window.SECTOR_FUND_FLOW || {}); }catch(e){ console.warn('板块资金三合一初始渲染失败',e); }
-    const files=['sh_index_fib.json','market_fund_flow.json','crisis_data.json','sector_fund_flow.json','macro_data.json','margin_data.json','cffex_holdings.json','fomc_summary.json'];
-    Promise.allSettled(files.map(J)).then(rs=>{
-      const d={};files.forEach((f,i)=>{d[f]=rs[i].status==='fulfilled'?rs[i].value:null;});
-      const safe=(fn,...args)=>{try{fn(...args);}catch(e){console.warn('盘后模块渲染失败',e);}};
-      if(d['sh_index_fib.json'])safe(renderFib,d['sh_index_fib.json']);
-      if(d['sh_index_fib.json'])safe(renderThermo,d['sh_index_fib.json'],d['margin_data.json']||{},d['cffex_holdings.json']||{},d['fomc_summary.json']||{},d['sector_fund_flow.json']||{});
-      if(d['crisis_data.json'])safe(renderCrisis,d['crisis_data.json']);
-      if(d['sector_fund_flow.json'])safe(renderSector,d['sector_fund_flow.json']);
-      if(d['macro_data.json'])safe(renderMacro,d['macro_data.json']);
-      // ETF量能脉冲 + 日监控（实时数据板块）已删除，避免信息过载
-    });
+    const safe=(fn,...args)=>{try{fn(...args);}catch(e){console.warn('模块渲染失败',fn&&fn.name,e);}};
+    // 1) ETF 三合一（盘中异动/资金热度/日监控）—— 直接用已注入的 window 变量
+    safe(renderEtfPulse, window.ETF_PULSE || {});
+    safe(renderEtfHeatByCategory, window.ETF_INTRADAY_HEAT || {});
+    safe(renderEtfDaily, window.ETF_DAILY_MONITOR || {});
+
+    // 2) 板块资金三合一
+    safe(renderSector, window.SECTOR_FUND_FLOW || {});
+
+    // 3) 盘后数据：全部使用已注入的 window.* 变量（data/*.js 已在 <head> 同步加载）
+    safe(renderFib, window.SH_FIB || {});
+    safe(renderThermo, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, {}, window.SECTOR_FUND_FLOW || {});
+    safe(renderCrisis, window.CRISIS_DATA || {});
+    safe(renderSector, window.SECTOR_FUND_FLOW || {});
+    safe(renderMacro, window.MACRO_DATA || {});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initPostMarket);
   else initPostMarket();

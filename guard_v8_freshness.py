@@ -64,10 +64,13 @@ def extract_update_time(path: Path) -> datetime | None:
     m = re.search(r'"update_time"\s*:\s*"([^"]+)"', text)
     if not m:
         return None
-    try:
-        return datetime.strptime(m.group(1), "%Y-%m-%d %H:%M:%S")
-    except ValueError:
-        return None
+    ts = m.group(1)
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(ts, fmt)
+        except ValueError:
+            continue
+    return None
 
 
 def js_var_name(path: Path) -> str:
