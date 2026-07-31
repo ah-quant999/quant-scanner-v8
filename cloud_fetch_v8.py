@@ -210,10 +210,13 @@ def f_concept_ranking():
     return {"items": items, "note": "概念板块列表(涨跌幅/主力净流入亿)，来源东方财富push2delay"}
 
 def f_ipo_data():
-    df = get_ak().stock_ipo_summary_cninfo()
-    if df is None or df.empty:
+    """打新日历：复用 v6 验证有效的东财 datacenter + 可转债 + 同花顺已上市补充逻辑。"""
+    try:
+        import fetch_ipo_data_v8 as ipo
+        return ipo.generate_ipo_score()
+    except Exception as e:
+        print(f"  ⚠️ IPO 抓取失败: {e}")
         return None
-    return {"items": df.tail(30).to_dict(orient="records")}
 
 def f_margin_data():
     # 融资融券（沪市明细）

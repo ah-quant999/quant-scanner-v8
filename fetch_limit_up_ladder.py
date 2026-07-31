@@ -270,11 +270,8 @@ def main():
     # 同时写入 raw_data，供 update_v8.py 生成 data/LIMIT_UP_LADDER.js
     raw_path = os.path.join(RAW_DIR, "limit_up_ladder.json")
     save_json(raw_path, result)
-    # 注入 index.html inline（本地预览与部署同源）
-    index_path = os.path.join(WORKSPACE, "index.html")
-    inject_inline(index_path, "LIMIT_UP_LADDER", result)
     print(f"✓ 已保存 {OUTPUT}（涨停 {total} 家，最高 {max_board} 板）")
-    print(f"✓ 已注册 raw_data/limit_up_ladder.json 并内联注入 index.html")
+    print(f"✓ 已注册 raw_data/limit_up_ladder.json")
     return 0
 
 

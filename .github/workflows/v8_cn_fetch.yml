@@ -48,7 +48,7 @@ jobs:
           python -c @'
           import os, base64, json, urllib.request
           token = os.environ['GITHUB_TOKEN']
-          files = ['cloud_fetch_v8.py', 'api_push_raw.py']
+          files = ['cloud_fetch_v8.py', 'api_push_raw.py', 'fetch_ipo_data_v8.py', 'fetch_limit_up_ladder.py']
           for fn in files:
               url = f'https://api.github.com/repos/ah-quant999/quant-scanner-v8/contents/{fn}'
               req = urllib.request.Request(url, headers={
@@ -78,6 +78,12 @@ jobs:
         shell: powershell
         run: |
           python cloud_fetch_v8.py
+
+      - name: "🔥 涨停连板梯队 → raw_data/（逐模块容错）"
+        continue-on-error: true
+        shell: powershell
+        run: |
+          python fetch_limit_up_ladder.py
 
       - name: "📤 经 API 推送 raw_data/ 到 main"
         shell: powershell
