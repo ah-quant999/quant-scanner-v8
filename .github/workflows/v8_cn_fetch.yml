@@ -40,11 +40,12 @@ jobs:
         shell: powershell
         run: |
           Write-Host "hello-from-powershell"
-          Write-Host ("PWD=" + (Get-Location).Path)
           $py = Get-Command python -ErrorAction SilentlyContinue
           Write-Host ("python: " + $(if($py){$py.Source}else{"NOT FOUND"}))
           $git = Get-Command git -ErrorAction SilentlyContinue
-          Write-Host ("git: " + $(if($git){$git.Source}else{"NOT FOUND"}))
+          Write-Host ("git Get-Command: " + $(if($git){$git.Source}else{"NOT FOUND"}))
+          $gitFull = 'E:\workbuddy-data\vendor\PortableGit\mingw64\bin\git.exe'
+          & $gitFull --version
           if ($py) { & python --version; & python -c "import akshare; print('akshare', akshare.__version__)" }
 
       - name: "安装 akshare（已装则跳过，走清华镜像避免境外 pypi 超时）"
