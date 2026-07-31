@@ -1,1 +1,1 @@
-window.VOLATILITY = {"hs300_20d_annualized":0.29,"update_time":"2026-07-31 09:09:52"};
+window.VOLATILITY = {"hs300_20d_annualized":0.29,"update_time":"2026-07-31 16:42:15"};
