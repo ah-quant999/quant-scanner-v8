@@ -1,7 +1,64 @@
 {
-  "check_time": "2026-07-31 22:33:46",
+  "check_time": "2026-07-31 23:25:54",
   "last_trade_close": "2026-07-31 15:30:00",
-  "stale_core": [],
-  "stale_warn": [],
-  "missing": []
+  "core_stale": [],
+  "warn_stale": [],
+  "frozen_stale": [
+    {
+      "var": "COCKPIT_BACKTEST",
+      "reason": "更新于 07-27 22:07，落后 3.7 天"
+    },
+    {
+      "var": "BACKTEST_COMPREHENSIVE",
+      "reason": "更新于 07-27 22:07，落后 3.7 天"
+    },
+    {
+      "var": "BACKTEST_TDX",
+      "reason": "更新于 07-27 00:00，落后 4.6 天"
+    },
+    {
+      "var": "LHB_DATA",
+      "reason": "更新于 07-28 20:55，落后 2.8 天"
+    },
+    {
+      "var": "SH_FIB",
+      "reason": "更新于 07-27 11:23，落后 4.2 天"
+    },
+    {
+      "var": "SZ_FIB",
+      "reason": "更新于 07-27 11:23，落后 4.2 天"
+    },
+    {
+      "var": "SECTOR_RS",
+      "reason": "更新于 07-25 13:52，落后 6.1 天"
+    },
+    {
+      "var": "NT_DATA",
+      "reason": "更新于 07-29 10:21，落后 2.2 天"
+    },
+    {
+      "var": "SUSPENSION_ALERT",
+      "reason": "更新于 07-28 15:21，落后 3.0 天"
+    },
+    {
+      "var": "MARKET_ALERTS",
+      "reason": "更新于 07-28 15:19，落后 3.0 天"
+    }
+  ],
+  "no_update_time": [
+    "COCKPIT_ADVICE",
+    "COCKPIT_TIER_RECOMMEND",
+    "MAHORO",
+    "RECOMMEND",
+    "SCAN_DATA",
+    "STOCK_LIST",
+    "TRIPLE_HISTORY"
+  ],
+  "summary": {
+    "total_checked": 46,
+    "core_stale": 0,
+    "warn_stale": 0,
+    "frozen_stale": 10,
+    "no_timestamp": 7
+  }
 }

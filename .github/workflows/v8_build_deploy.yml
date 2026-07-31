@@ -16,13 +16,17 @@ on:
     branches: [main]
     paths: ['raw_data/**']
   schedule:
-    - cron: '35 0 * * *'    # 08:35 CST
-    - cron: '40 2 * * *'    # 10:40 CST
-    - cron: '40 3 * * *'    # 11:40 CST
-    - cron: '10 6 * * *'    # 14:10 CST
-    - cron: '15 7 * * *'    # 15:15 CST
-    - cron: '40 8 * * *'    # 16:40 CST
-    - cron: '0 11 * * 0,6'  # 19:00 CST 周末兜底（周六/周日）
+    # 与 v8_cn_fetch 一一对应，各错后 10 分钟，确保 raw_data 已落地。
+    # 2026-07-31 审计调整：补 13:15（对应 cn_fetch 13:05 下午开盘）；
+    #                     去掉周末 19:00 空转，改为周六 09:10 跟随日历刷新。
+    - cron: '35 0 * * 1-5'   # 08:35 CST
+    - cron: '40 2 * * 1-5'   # 10:40 CST
+    - cron: '40 3 * * 1-5'   # 11:40 CST
+    - cron: '15 5 * * 1-5'   # 13:15 CST（补缺口）
+    - cron: '10 6 * * 1-5'   # 14:10 CST
+    - cron: '15 7 * * 1-5'   # 15:15 CST
+    - cron: '40 8 * * 1-5'   # 16:40 CST
+    - cron: '10 1 * * 6'     # 周六 09:10 CST 日历类跟随构建
   workflow_dispatch:
 
 permissions:
