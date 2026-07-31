@@ -696,8 +696,8 @@
     <!-- 盘后概览：市场温度计 / 六维共振雷达 -->
     <div class="grid g-2" style="margin-bottom:16px">
       <div class="card">
-        <h3><span class="ic">🌡️</span>市场温度计 - 盘后 · <span class="fresh">更新于 今日 15:20</span></h3>
-        <div class="gauge-wrap" style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <h3><span class="ic">🌡️</span>市场温度计 - 盘后 · <span class="fresh" id="phThermoTime">更新于 --</span></h3>
+        <div id="phThermoBody" class="gauge-wrap" style="display:flex;flex-direction:column;align-items:center;gap:8px">
           <svg width="200" height="120" viewBox="0 0 200 120">
             <path d="M20 110 A80 80 0 0 1 180 110" fill="none" stroke="#1b2740" stroke-width="14" stroke-linecap="round"/>
             <path d="M20 110 A80 80 0 0 1 158 54" fill="none" stroke="url(#gg)" stroke-width="14" stroke-linecap="round"/>
@@ -709,7 +709,7 @@
         </div>
       </div>
       <div class="card">
-        <h3><span class="ic">🕸️</span>六维共振雷达 - 盘后 · <span class="fresh">更新于 今日 15:20</span></h3>
+        <h3><span class="ic">🕸️</span>六维共振雷达 - 盘后 · <span class="fresh" id="phRadarTime">更新于 --</span></h3>
         <svg class="radar" style="display:block;margin:0 auto" width="220" height="200" viewBox="-110 -110 220 220" id="radar"></svg>
       </div>
     </div>
@@ -1463,24 +1463,7 @@ function switchSec(sec,el){
   if(sec==='op' && typeof window.__renderOps==='function') setTimeout(window.__renderOps,60);
 }
 
-/* ===== 六维雷达 SVG ===== */
-(function(){
-  const dims=['量能','情绪','资金','估值','技术','外围'];
-  const vals=[72,65,80,55,68,60];
-  const cx=0,cy=0,R=85,n=dims.length;
-  let svg=document.getElementById('radar');
-  let grid='';
-  for(let g=1;g<=4;g++){
-    let pts=[];
-    for(let i=0;i<n;i++){let a=-Math.PI/2+i*2*Math.PI/n;pts.push((cx+Math.cos(a)*R*g/4).toFixed(1)+','+(cy+Math.sin(a)*R*g/4).toFixed(1));}
-    grid+=`<polygon points="${pts.join(' ')}" fill="none" stroke="#243150" stroke-width="1"/>`;
-  }
-  let axes='';
-  for(let i=0;i<n;i++){let a=-Math.PI/2+i*2*Math.PI/n;axes+=`<line x1="0" y1="0" x2="${(cx+Math.cos(a)*R).toFixed(1)}" y2="${(cy+Math.sin(a)*R).toFixed(1)}" stroke="#243150" stroke-width="1"/><text x="${(cx+Math.cos(a)*(R+14)).toFixed(1)}" y="${(cy+Math.sin(a)*(R+14)+4).toFixed(1)}" fill="#93a4c4" font-size="11" text-anchor="middle">${dims[i]}</text>`;}
-  let dpts=[];
-  for(let i=0;i<n;i++){let a=-Math.PI/2+i*2*Math.PI/n;dpts.push((cx+Math.cos(a)*R*vals[i]/100).toFixed(1)+','+(cy+Math.sin(a)*R*vals[i]/100).toFixed(1));}
-  svg.innerHTML=grid+axes+`<polygon points="${dpts.join(' ')}" fill="rgba(56,189,248,.25)" stroke="#38bdf8" stroke-width="2"/>`+dpts.map((p,i)=>`<circle cx="${p.split(',')[0]}" cy="${p.split(',')[1]}" r="3" fill="#38bdf8"/>`).join('');
-})();
+/* ===== 六维雷达 SVG：由 renderSixDim 动态绘制 ===== */
 
 /* ===== 斐波窗口：旧版死代码已移除（#fib 元素早已不存，新版斐波见 renderFib @盘后数据块） ===== */
 
@@ -2362,32 +2345,114 @@ function renderLimitUpHeatmap(){
     if(fomcLabel.indexOf('转鹰')>-1||fomcLabel.indexOf('加息')>-1){instScore-=1;instDetail.push('FOMC转鹰');}
     instScore=Math.max(1,Math.min(10,instScore));
 
-    const sc=n=>n>=7?'#4caf50':n>=5?'#ff9800':n>=3?'#ff9800':'#ef5350';
     const avg=Math.round((techScore+fundScore+instScore)/3);
-    const word=avg>=7?'偏多':avg>=5?'中性':'偏空';
-    const wColor=avg>=7?'#4caf50':avg>=5?'#ff9800':'#ef5350';
-    const advice=avg>=7?'多头信号为主，可积极把握机会。':avg>=5?'多空交织，观望为主。':'偏空信号为主，建议减仓观望。';
-    const dims=[
-      {name:'技术面',icon:'📉',score:techScore,detail:techDetail.join(' · ')},
-      {name:'资金面',icon:'💰',score:fundScore,detail:fundDetail.join(' · ')},
-      {name:'机构面',icon:'🏛',score:instScore,detail:instDetail.join(' · ')}
-    ];
-    let h='<div style="padding:8px 12px;border-radius:8px;background:rgba(255,255,255,.04);font-size:12px;margin-bottom:4px;">'+
-      '<b style="color:'+wColor+'">综合研判：'+avg+'/10 → '+word+'</b> <span style="color:var(--dim)">'+advice+'</span></div>'+
-      '<div class="ph-dim">';
-    dims.forEach(d=>{
-      const col=sc(d.score);
-      h+='<div class="ph-dim-item"><div class="ph-dim-name">'+d.icon+' '+d.name+'</div>'+
-        '<div class="ph-dim-score" style="color:'+col+'">'+d.score+'<span style="font-size:11px;color:var(--dim)">/10</span></div>'+
-        '<div class="ph-dim-bar"><div class="ph-dim-fill" style="width:'+(d.score*10)+'%;background:'+col+'"></div></div>'+
-        '<div style="font-size:10px;color:var(--dim);margin-top:6px;line-height:1.5">'+(d.detail||'—')+'</div></div>';
-    });
-    h+='</div>';
+    const deg=avg*10;                 // 0-10 映射为 0°-100°
+    const pct=deg/100;
+    // 颜色：>=70 偏热(红)，>=50 中性(黄)，<50 偏冷(绿)
+    let mainColor, word, subText;
+    if(deg>=70){mainColor='#f4495d'; word='偏热'; subText='情绪活跃，注意高位回撤';}
+    else if(deg>=50){mainColor='#fbbf24'; word='中性'; subText='多空交织，观望为主';}
+    else{mainColor='#1fd17b'; word='偏冷'; subText='偏空信号为主，建议减仓观望';}
+
+    // SVG gauge：半圆 0-180度，起点左端(-PI)，终点顶端/右端
+    const cx=100, cy=110, R=80, startA=Math.PI, maxSweep=Math.PI;
+    const sweep=maxSweep*pct;
+    const endA=startA+sweep;
+    const ex=cx+R*Math.cos(endA), ey=cy+R*Math.sin(endA);
+    const largeArc=sweep>Math.PI?1:0;
+    const arcPath=`M${cx-R} ${cy} A${R} ${R} 0 ${largeArc} 1 ${ex.toFixed(1)} ${ey.toFixed(1)}`;
+
+    const detailLine=[
+      '📉 技术面 '+techScore+'/10 · '+techDetail.join(' · '),
+      '💰 资金面 '+fundScore+'/10 · '+fundDetail.join(' · '),
+      '🏛 机构面 '+instScore+'/10 · '+instDetail.join(' · ')
+    ].filter(Boolean).join('<br>');
+
+    const h='<svg width="200" height="120" viewBox="0 0 200 120">'+
+      '<path d="M20 110 A80 80 0 0 1 180 110" fill="none" stroke="#1b2740" stroke-width="14" stroke-linecap="round"/>'+
+      '<path d="'+arcPath+'" fill="none" stroke="'+mainColor+'" stroke-width="14" stroke-linecap="round"/>'+
+      '<circle cx="'+ex.toFixed(1)+'" cy="'+ey.toFixed(1)+'" r="8" fill="'+mainColor+'"/>'+
+      '</svg>'+
+      '<div style="font-size:42px;font-weight:800;color:'+mainColor+'">'+deg+'°</div>'+
+      '<div style="font-size:14px;font-weight:700;color:'+mainColor+'">'+word+'</div>'+
+      '<div style="font-size:12px;color:var(--sub);margin-bottom:6px">'+subText+'</div>'+
+      '<div style="font-size:10px;color:var(--dim);line-height:1.6;text-align:center;padding:0 8px">'+detailLine+'</div>';
     $('phThermoBody').innerHTML=h;
-    setTime('phThermoTime',fib.update_time||sf.update_time);
+    setTime('phThermoTime',fib.update_time||sf.update_time||margin.update_time);
   }
 
-  /* ---- 3. 六维预警雷达 ---- */
+  /* ---- 3. 六维共振雷达（量能/情绪/资金/估值/技术/外围） ---- */
+  function renderSixDim(fib,margin,cffex,crisis,sf,mff){
+    const c=fib.current||{};
+    const mktNet=(mff||{}).market_net||0;
+    const declinePct=c.total_pct||0;
+    const rzLatest=(margin.sh&&margin.sh.length)?(margin.sh[margin.sh.length-1].rz_balance||0):0;
+    const sfIn=(sf.summary||{}).in_count||0, sfOut=(sf.summary||{}).out_count||0;
+    const cffexNet=(cffex||{}).net_total||0;
+    const inds=(crisis||{}).indicators||{};
+    const crisisAvg=(keys)=>{
+      const vals=keys.map(k=>{const it=inds[k];return it&&it.score!=null?it.score:null;}).filter(v=>v!=null);
+      return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:50;
+    };
+
+    // 量能：基于市场主力净流入 + 成交额情绪；越大越热
+    let volScore=50;
+    if(mktNet>200)volScore=80; else if(mktNet>0)volScore=65; else if(mktNet>-200)volScore=45; else volScore=30;
+
+    // 情绪：基于两融余额 + 板块流入数量
+    let emoScore=50;
+    if(rzLatest>=15000)emoScore+=15; else if(rzLatest>=14500)emoScore+=5;
+    if(sfIn>=30)emoScore+=15; else if(sfIn>=15)emoScore+=5;
+    if(sfOut>=10)emoScore-=10;
+    emoScore=Math.max(20,Math.min(95,emoScore));
+
+    // 资金：板块净流入强度
+    let fundScore=50;
+    const netDiff=sfIn-sfOut;
+    if(netDiff>30)fundScore=85; else if(netDiff>15)fundScore=70; else if(netDiff>0)fundScore=60;
+    else if(netDiff>-15)fundScore=40; else fundScore=25;
+
+    // 估值：基于回调深度反向映射（跌得多=估值低=分数高）
+    let valScore=50;
+    if(declinePct<=-15)valScore=85; else if(declinePct<=-8)valScore=75; else if(declinePct<=-3)valScore=65;
+    else if(declinePct>=10)valScore=35; else valScore=55;
+
+    // 技术：基于斐波那契回调状态
+    let techScore=50;
+    const days=c.days_down||0;
+    if(days>=20&&declinePct<=-10)techScore=30;          // 深度回调，技术偏弱
+    else if(days>=10&&declinePct<=-5)techScore=40;
+    else if(days<=5&&declinePct>=-3)techScore=65;
+    else if(days<=3&&declinePct>=0)techScore=75;
+    else techScore=55;
+
+    // 外围：基于危机雷达全球指标 + 期指净持仓
+    let outScore=50;
+    const gScore=crisisAvg(Object.keys(inds).filter(k=>inds[k]&&inds[k].cat==='全球'));
+    if(!isNaN(gScore))outScore=gScore;
+    if(cffexNet<-5000)outScore-=15; else if(cffexNet>5000)outScore+=5;
+    outScore=Math.max(20,Math.min(95,outScore));
+
+    const dims=['量能','情绪','资金','估值','技术','外围'];
+    const vals=[volScore,emoScore,fundScore,valScore,techScore,outScore];
+    const cx=0,cy=0,R=85,n=dims.length;
+    let grid='',axes='';
+    for(let g=1;g<=4;g++){
+      let pts=[];
+      for(let i=0;i<n;i++){let a=-Math.PI/2+i*2*Math.PI/n;pts.push((cx+Math.cos(a)*R*g/4).toFixed(1)+','+(cy+Math.sin(a)*R*g/4).toFixed(1));}
+      grid+=`<polygon points="${pts.join(' ')}" fill="none" stroke="#243150" stroke-width="1"/>`;
+    }
+    for(let i=0;i<n;i++){let a=-Math.PI/2+i*2*Math.PI/n;axes+=`<line x1="0" y1="0" x2="${(cx+Math.cos(a)*R).toFixed(1)}" y2="${(cy+Math.sin(a)*R).toFixed(1)}" stroke="#243150" stroke-width="1"/><text x="${(cx+Math.cos(a)*(R+14)).toFixed(1)}" y="${(cy+Math.sin(a)*(R+14)+4).toFixed(1)}" fill="#93a4c4" font-size="11" text-anchor="middle">${dims[i]}</text>`;}
+    let dpts=[];
+    for(let i=0;i<n;i++){let a=-Math.PI/2+i*2*Math.PI/n;dpts.push((cx+Math.cos(a)*R*vals[i]/100).toFixed(1)+','+(cy+Math.sin(a)*R*vals[i]/100).toFixed(1));}
+    const svg=document.getElementById('radar');
+    if(svg){
+      svg.innerHTML=grid+axes+`<polygon points="${dpts.join(' ')}" fill="rgba(56,189,248,.25)" stroke="#38bdf8" stroke-width="2"/>`+dpts.map((p,i)=>`<circle cx="${p.split(',')[0]}" cy="${p.split(',')[1]}" r="3" fill="#38bdf8"/>`).join('');
+    }
+    setTime('phRadarTime',fib.update_time||sf.update_time||margin.update_time);
+  }
+
+  /* ---- 4. 六维预警雷达 ---- */
   function renderCrisis(cr){
     const inds=cr.indicators||{};
     const cats={'货币':[],'经济':[],'全球':[]};
@@ -2954,6 +3019,7 @@ function renderLimitUpHeatmap(){
     // 3) 盘后数据：全部使用已注入的 window.* 变量（data/*.js 已在 <head> 同步加载）
     safe(renderFib, window.SH_FIB || {});
     safe(renderThermo, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, {}, window.SECTOR_FUND_FLOW || {});
+    safe(renderSixDim, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, window.CRISIS_DATA || {}, window.SECTOR_FUND_FLOW || {}, window.MARKET_FUND_FLOW_DATA || {});
     safe(renderCrisis, window.CRISIS_DATA || {});
     safe(renderMarketFundFlow, window.MARKET_FUND_FLOW_DATA || {});
     safe(renderSector, window.SECTOR_FUND_FLOW || {});

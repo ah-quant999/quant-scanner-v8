@@ -16,7 +16,7 @@
 #   13:05  盘中：同上（补午后开盘缺口）
 #   14:00  盘中：同上
 #   15:05  盘中：同上（收盘前最后一次快照）
-#   15:30  盘后（收盘数据）：EXPERIMENT（akshare 可提供的收盘 T+1 数据）
+#   15:30  盘后：EXPERIMENT + MARKET_FUND_FLOW_DATA（收盘后累积历史序列）
 #          ETF_DAILY_MONITOR 因配合 ETF 三连板实时卡，已归 intraday 盘中更新
 #   周六 09:00 盘前：日历/IPO 类刷新
 
@@ -56,9 +56,12 @@ jobs:
             "25 0 * * 1-5"|"0 1 * * 6")
               echo "category=premarket" >> "$GITHUB_OUTPUT"
               echo "label=盘前" ;;
-            "30 2 * * 1-5"|"30 3 * * 1-5"|"5 5 * * 1-5"|"0 6 * * 1-5"|"5 7 * * 1-5"|"30 7 * * 1-5")
+            "30 2 * * 1-5"|"30 3 * * 1-5"|"5 5 * * 1-5"|"0 6 * * 1-5"|"5 7 * * 1-5")
               echo "category=intraday" >> "$GITHUB_OUTPUT"
-              echo "label=盘中/收盘数据" ;;
+              echo "label=盘中" ;;
+            "30 7 * * 1-5")
+              echo "category=post_close" >> "$GITHUB_OUTPUT"
+              echo "label=盘后" ;;
             *)
               echo "category=all" >> "$GITHUB_OUTPUT"
               echo "label=全量兜底" ;;

@@ -75,7 +75,8 @@ CATEGORY_MAP = {
     "CAPITAL_FLOW_DATA": "intraday",
     "CONCEPT_RANKING": "intraday",
     "LIMIT_UP_HEATMAP": "intraday",
-    "MARKET_FUND_FLOW_DATA": "intraday",
+    # 盘后（15:30 后）：大盘资金流时间轴，累积历史序列，避免盘中覆盖
+    "MARKET_FUND_FLOW_DATA": "post_close",
     # 15:30 收盘数据：EXPERIMENT 等 akshare 可抓的 T+1 数据
     "EXPERIMENT": "post_close",
 }
@@ -680,17 +681,39 @@ def f_north_fund():
 
 def f_market_fund_flow_data():
     # 大盘资金流：日K线接口(push2his)在当前网络被重置，故以全市场个股主力净流入求和
-    # 得到「今日市场主力净流入(亿)」作为单点今日值。后续若镜像开放 daykline 可补历史序列。
+    # 得到「今日市场主力净流入(亿)」。以已有 raw_data 为基线追加新一天，累积历史序列。
     recs = _all_individual_recs("f12,f62")
     if not recs:
         return None
     net_yi = round(sum(x["net"] for x in recs), 2)
     today = datetime.now().strftime("%Y%m%d")
+
+    # 读取历史并追加（保留最近 252 个交易日，约一年）
+    history = []
+    hist_file = RAW_DIR / "market_fund_flow_data.json"
+    if hist_file.exists():
+        try:
+            old = json.loads(hist_file.read_text(encoding="utf-8"))
+            history = (old.get("daily") or [])[:252]
+        except Exception:
+            history = []
+    # 去重：若今天已存在则替换，否则追加
+    history = [x for x in history if str(x.get("date", "")) != today]
+    history.append({"date": today, "net_yi": net_yi})
+    history = history[-252:]
+
+    # 累计净值
+    cum = 0.0
+    cumulative = []
+    for x in history:
+        cum += float(x.get("net_yi") or 0)
+        cumulative.append({"date": x["date"], "cum_yi": round(cum, 2)})
+
     return {
-        "daily": [{"date": today, "net_yi": net_yi}],
-        "cumulative": [{"date": today, "cum_yi": net_yi}],
+        "daily": history,
+        "cumulative": cumulative,
         "market_net": net_yi,
-        "note": "今日市场主力净流入(个股汇总，亿)；日K线源被限流，历史序列待累积",
+        "note": "今日市场主力净流入(个股汇总，亿)；历史序列由每日盘后追加累积",
     }
 
 def f_w52_high():

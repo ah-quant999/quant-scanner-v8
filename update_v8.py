@@ -92,7 +92,8 @@ CATEGORY_MAP = {
     "CAPITAL_FLOW_DATA": "intraday",
     "CONCEPT_RANKING": "intraday",
     "LIMIT_UP_HEATMAP": "intraday",
-    "MARKET_FUND_FLOW_DATA": "intraday",
+    # 盘后：大盘资金流时间轴，累积历史序列
+    "MARKET_FUND_FLOW_DATA": "post_close",
 
     # 盘后（17:00，主要由 v6 算法推送；cloud_fetch 暂无生产者）
     "GOLD_POOL": "post_close",
