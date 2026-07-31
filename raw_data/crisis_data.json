@@ -1,1 +1,1 @@
-{"currency":0.3,"economy":0.35,"global":0.25,"note":"占位结构，待小九接入真实宏观/货币/全球风险信号","update_time":"2026-07-31 09:09:51"}
+{"currency":0.15,"economy":0.494,"global":0.4,"pmi_value":49.4,"usd_cny":6.7894,"note":"经济维度=中国PMI真实值(49.4)；货币维度=中国银行USD/CNY中间价(6.7894)；全球维度因VIX/美债等源CN不可达暂用中性估值","update_time":"2026-07-31 22:22:10"}

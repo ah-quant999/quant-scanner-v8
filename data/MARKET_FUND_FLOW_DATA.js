@@ -1,1 +1,1 @@
-window.MARKET_FUND_FLOW_DATA = {"daily":[{"date":"20260731","net_yi":371.21}],"cumulative":[{"date":"20260731","cum_yi":371.21}],"market_net":371.21,"note":"今日市场主力净流入(个股汇总，亿)；日K线源被限流，历史序列待累积","update_time":"2026-07-31 17:00:12"};
+window.MARKET_FUND_FLOW_DATA = {"daily":[{"date":"20260731","net_yi":371.21}],"cumulative":[{"date":"20260731","cum_yi":371.21}],"market_net":371.21,"note":"今日市场主力净流入(个股汇总，亿)；日K线源被限流，历史序列待累积","update_time":"2026-07-31 22:22:24"};
