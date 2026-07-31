@@ -35,18 +35,13 @@ jobs:
         with:
           fetch-depth: 1
 
-      # 诊断：确认 runner bash 环境与可用 python 路径
+      # 诊断：最小 bash 探针，确认 runner 的 bash 是否可用
       - name: "挂载本机 tool cache Python（预装 akshare/pandas，免境外下载）"
         shell: bash
         run: |
-          echo "DIAG start"
-          echo "RUNNER_TOOL_CACHE=[$RUNNER_TOOL_CACHE]"
-          echo "PATH=[$PATH]"
-          command -v bash && bash --version | head -1
-          command -v cygpath && echo "cygpath present" || echo "no cygpath"
-          ls -la /d/actions-runner-v8/_work/_tool/Python/3.13.14/x64/python.exe 2>&1 || echo "no toolcache python"
-          /d/actions-runner-v8/_work/_tool/Python/3.13.14/x64/python.exe --version 2>&1 || echo "toolcache python exec failed"
-          echo "DIAG end"
+          echo hello-from-bash
+          pwd
+          which python || echo "no python on PATH"
 
       - name: "安装 akshare（已装则跳过，走清华镜像避免境外 pypi 超时）"
         shell: bash
