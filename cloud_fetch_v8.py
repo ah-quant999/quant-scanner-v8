@@ -46,6 +46,8 @@ VAR_TO_RAW = {
     "ETF_PULSE": "etf_pulse.json",
     "ETF_DAILY_MONITOR": "etf_daily_monitor.json",
     "ANALYST_RATINGS": "analyst_ratings.json",
+    "INDEX_QUOTES": "index_quotes.json",
+    "EXPERIMENT": "experiment.json",
 }
 
 _ak = None
@@ -162,17 +164,73 @@ def _get_zt_pool():
 # ───────────────────────── 各模块抓取（akshare） ─────────────────────────
 
 def f_etf_intraday_heat():
-    # ETF 资金流向热度：用 ETF 实时行情成交额排序作为热度占位
-    # TODO 小九接入真实 ETF 净流入排名后替换
-    df = get_ak().fund_etf_spot_em()
-    if df is None or df.empty:
+    # ETF 主力净流入真实排名（东财 push2delay，ETF 市场 m:1+t:9，fid=f62）。
+    # 返回：items(净流入TOP，含成交额供内联卡) + categories(宽基/行业/主题/跨境 分类净流入)
+    snap = em_clist("m:1+t:9", "f12,f14,f2,f3,f6,f62,f184", fid="f62", pz=3000, po="1")
+    recs = []
+    for r in snap:
+        try:
+            code = str(r.get("f12"))
+            name = r.get("f14")
+            recs.append({
+                "代码": code, "名称": name,
+                "最新价": round(float(r.get("f2") or 0), 3),
+                "涨跌幅": round(float(r.get("f3") or 0), 2),
+                "成交额": round(float(r.get("f6") or 0), 2),
+                "code": code, "name": name,
+                "chg": round(float(r.get("f3") or 0), 2),
+                "main_net_inflow": round(float(r.get("f62") or 0), 2),  # 元
+                "pct": round(float(r.get("f184") or 0), 2),
+            })
+        except Exception:
+            continue
+    if not recs:
         return None
-    cols = [c for c in ["代码", "名称", "最新价", "涨跌幅", "成交额", "所属行业"] if c in df.columns]
-    try:
-        df = df[cols].sort_values("成交额", ascending=False) if "成交额" in df.columns else df[cols]
-    except Exception:
-        df = df[cols]
-    return {"items": df.head(30).to_dict(orient="records"), "note": "ETF净流入真实排名待接入，当前用成交额热度占位"}
+    ranked = sorted(recs, key=lambda x: x["main_net_inflow"], reverse=True)
+    inflow_top = ranked[:30]
+    outflow_top = sorted(recs, key=lambda x: x["main_net_inflow"])[:30]
+
+    def cat_of(name):
+        n = str(name or "")
+        if any(k in n for k in ["沪深300", "中证500", "中证1000", "创业板", "科创", "上证50",
+                                 "上证180", "深证", "MSCI", "A50", "双创", "300ETF", "500ETF"]):
+            return "宽基"
+        if any(k in n for k in ["恒生", "纳斯达克", "标普", "纳指", "日经", "德国", "法国", "美国",
+                                 "道琼斯", "港股", "中概", "标普", "H股", "日本", "东南亚"]):
+            return "跨境"
+        if any(k in n for k in ["5G", "人工智能", "AI", "半导体", "芯片", "新能源", "碳中和", "国企",
+                                 "医药", "消费", "券商", "银行", "证券", "军工", "有色", "煤炭", "地产",
+                                 "化工", "食品", "汽车", "光伏", "锂电", "机器人", "算力", "数据", "稀土",
+                                 "钢铁", "保险", "传媒", "游戏", "养殖", "农业", "电力", "通信", "环保",
+                                 "酒", "中药", "疫苗", "创新药", "VR", "物联网", "区块链", "元宇宙",
+                                 "芯片", "科技", "电子", "高端装备", "智能"]):
+            return "主题"
+        return "行业"
+
+    cats = {"宽基": [], "行业": [], "主题": [], "跨境": []}
+    for r in recs:
+        cats[cat_of(r["name"])].append(r)
+    categories = {}
+    for cn, lst in cats.items():
+        net_yi = sum(x["main_net_inflow"] for x in lst) / 1e8
+        top_in = sorted(lst, key=lambda x: x["main_net_inflow"], reverse=True)[:8]
+        top_out = sorted(lst, key=lambda x: x["main_net_inflow"])[:8]
+        categories[cn] = {
+            "net_inflow_yi": round(net_yi, 2),
+            "count": len(lst),
+            "top_inflow": [{"code": x["code"], "name": x["name"],
+                            "main_net_inflow": x["main_net_inflow"], "pct": x["pct"]} for x in top_in],
+            "top_outflow": [{"code": x["code"], "name": x["name"],
+                             "main_net_inflow": x["main_net_inflow"], "pct": x["pct"]} for x in top_out],
+        }
+    return {
+        "items": inflow_top,
+        "inflow_top": inflow_top,
+        "outflow_top": outflow_top,
+        "categories": categories,
+        "note": "ETF主力净流入真实排名(东财push2delay, ETF市场m:1+t:9, fid=f62)；净流入单位元，分类按名称关键词",
+        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
 
 def f_sector_fund_flow():
     # 板块/概念资金流：行业(m:90 t:2) + 概念(m:90 t:3)，主力净流入(f62, 元→亿)
@@ -195,9 +253,50 @@ def f_sector_fund_flow():
     items.sort(key=lambda x: x["net"], reverse=True)
     return {"top_list": items, "note": "行业+概念主力净流入(亿)，来源东方财富push2delay"}
 
+def f_index_quotes():
+    # 四大核心宽基指数实时行情：上证/深证/创业板/科创50
+    # 东财 ulist.np 接口，secid 规则：1=上海，0=深圳
+    secids = "1.000001,0.399001,0.399006,1.000688"
+    names = {"000001": "上证指数", "399001": "深证成指", "399006": "创业板指", "000688": "科创50"}
+    short = {"000001": "沪指", "399001": "深成指", "399006": "创业板", "000688": "科创板"}
+    try:
+        r = _requests.get(
+            "https://push2.eastmoney.com/api/qt/ulist.np/get",
+            params={"fltt": "2", "invt": "2", "ut": "b2884a393a59ad64002292a3e90d46a5",
+                    "fields": "f2,f3,f4,f5,f6,f12,f13,f14,f18,f20,f21", "secids": secids},
+            headers=_EM_HEADERS, timeout=12)
+        j = r.json()
+        rows = j.get("data", {}).get("diff", []) or []
+    except Exception as e:
+        print(f"  ⚠️ 东财指数行情失败: {e}")
+        rows = []
+    items = []
+    for r in rows:
+        code = str(r.get("f12") or "")
+        # 东财 f13 标记 1=上海 0=深圳
+        prefix = "SH" if str(r.get("f13")) == "1" else "SZ"
+        full_code = prefix + code
+        items.append({
+            "code": code,
+            "full_code": full_code,
+            "name": names.get(code, r.get("f14", code)),
+            "short": short.get(code, r.get("f14", code)),
+            "price": round(float(r.get("f2") or 0), 2),
+            "chg": round(float(r.get("f3") or 0), 2),
+            "change": round(float(r.get("f4") or 0), 2),
+            "volume": int(r.get("f5") or 0),
+            "amount": round(float(r.get("f6") or 0) / 1e8, 2),  # 元->亿
+            "prev_close": round(float(r.get("f18") or 0), 2),
+            "total_mv": round(float(r.get("f20") or 0) / 1e8, 2),  # 总市值亿
+            "float_mv": round(float(r.get("f21") or 0) / 1e8, 2),  # 流通市值亿
+        })
+    if not items:
+        return None
+    return {"items": items, "note": "东财实时指数行情"}
+
 def f_concept_ranking():
     # 概念板块列表（涨跌幅 + 主力净流入），push2delay 镜像。
-    rows = em_clist("m:90 t:3 f:!50", "f12,f14,f3,f62,f184", fid="f62", stat="1", pz=300)
+    rows = em_clist("m:90 t:3 f:!50", "f12,f14,f3,f62,f184,f20", fid="f62", stat="1", pz=300)
     items = []
     for r in rows:
         items.append({
@@ -205,6 +304,7 @@ def f_concept_ranking():
             "name": r.get("f14"),
             "chg": round(float(r.get("f3") or 0), 2),
             "net": _to_yi(r.get("f62")),
+            "amount": round(float(r.get("f20") or 0) / 1e8, 2),
         })
     if not items:
         return None
@@ -630,10 +730,64 @@ def f_analyst_ratings():
     return result
 
 
+def f_experiment():
+    # 实验选股调试专区（三重选股）：用全市场个股实时快照(em_clist, 东财push2delay)做透明技术面初筛。
+    # 产生 金钻起涨/波段多头/主力进场/主力出货/三重选股 五个名单，供前端「⑤ 三重选股补充候选」渲染。
+    # 说明：纯实时快照初筛（非历史回测），验证中请勿依赖。
+    desc = em_clist(_IND_FS, "f12,f14,f2,f3,f6,f62,f184", fid="f62", pz=5000, po="1")
+    asc = em_clist(_IND_FS, "f12,f14,f2,f3,f6,f62,f184", fid="f62", pz=5000, po="0")
+    by_code = {}
+    for r in desc + asc:
+        c = str(r.get("f12"))
+        if c in by_code:
+            continue
+        try:
+            by_code[c] = {
+                "code": c, "name": r.get("f14"),
+                "chg": round(float(r.get("f3") or 0), 2),
+                "net": round(float(r.get("f62") or 0) / 1e8, 2),
+                "netpct": round(float(r.get("f184") or 0), 2),
+            }
+        except Exception:
+            continue
+    stocks = list(by_code.values())
+    if not stocks:
+        return None
+
+    def pick(pred, key, n=15):
+        return [{"code": s["code"], "name": s["name"]}
+                for s in sorted([s for s in stocks if pred(s)], key=key, reverse=True)[:n]]
+
+    main_in = pick(lambda s: s["net"] > 0 and s["chg"] > 0, lambda s: s["net"])            # 主力进场
+    main_out = pick(lambda s: s["net"] < 0 and s["chg"] < 0, lambda s: s["net"])           # 主力出货
+    jin_zuan = pick(lambda s: 3 <= s["chg"] <= 9.8 and s["net"] > 0, lambda s: s["net"])  # 金钻起涨
+    bo_duan = pick(lambda s: 1 <= s["chg"] <= 5 and s["net"] > 0, lambda s: s["chg"])      # 波段多头
+    triple = [s for s in jin_zuan if s["code"] in {x["code"] for x in main_in}]             # 三重=金钻∩主力进场
+    return {
+        "triple_select": {
+            "lists": {
+                "金钻起涨": jin_zuan,
+                "波段多头": bo_duan,
+                "主力进场": main_in,
+                "主力出货": main_out,
+                "三重选股": triple,
+            },
+            "signals": {
+                "金钻起涨": len(jin_zuan), "波段多头": len(bo_duan),
+                "主力进场": len(main_in), "主力出货": len(main_out), "三重选股": len(triple),
+            },
+        },
+        "note": "实验区：全市场个股实时快照初筛(东财push2delay)。金钻起涨=涨幅3~9.8%且主力净流入; 波段多头=涨幅1~5%且净流入; "
+                "主力进场=净流入且上涨; 主力出货=净流出且下跌; 三重=金钻∩主力进场。验证中请勿依赖。",
+        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
 def main():
     print(f"=== v8 云端抓取开始 {datetime.now().isoformat(timespec='seconds')} ===")
     run("ETF_INTRADAY_HEAT", f_etf_intraday_heat)
     run("SECTOR_FUND_FLOW", f_sector_fund_flow)
+    run("INDEX_QUOTES", f_index_quotes)
     run("CONCEPT_RANKING", f_concept_ranking)
     run("IPO_DATA", f_ipo_data)
     run("MARGIN_DATA", f_margin_data)
@@ -651,6 +805,7 @@ def main():
     run("ETF_PULSE", f_etf_pulse)
     run("ETF_DAILY_MONITOR", f_etf_daily_monitor)
     run("ANALYST_RATINGS", f_analyst_ratings)
+    run("EXPERIMENT", f_experiment)
     print(f"=== v8 云端抓取结束 {datetime.now().isoformat(timespec='seconds')} ===")
     print(f"raw_data/ 文件数: {len(list(RAW_DIR.glob('*.json')))}")
     return 0
