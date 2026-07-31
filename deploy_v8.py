@@ -33,6 +33,19 @@ def run(args, cwd=None):
 def deploy():
     tmp = tempfile.mkdtemp(prefix="v8deploy_")
     try:
+        # 【防回退】先同步本地仓库到 origin/main，避免用陈旧本地副本覆盖线上
+        log("🔄 同步本地到 origin/main（防回退）...")
+        run(["git", "fetch", "origin"], cwd=REPO)
+        rc, _, _ = run(["git", "rebase", "origin/main"], cwd=REPO)
+        if rc != 0:
+            run(["git", "rebase", "--abort"], cwd=REPO)
+            run(["git", "stash"], cwd=REPO)
+            rc, _, _ = run(["git", "rebase", "origin/main"], cwd=REPO)
+            run(["git", "stash", "pop"], cwd=REPO)
+            if rc != 0:
+                log("⚠️ 本地与 origin/main 冲突，请先解决后再部署")
+                return 1
+
         log("📥 克隆 main 分支...")
         code, _, err = run(["git", "clone", "--depth=1", GH_PAGES_URL, "."], cwd=tmp)
         if code != 0:
@@ -49,6 +62,15 @@ def deploy():
             shutil.copytree(src_data, dst_data)
         else:
             log("⚠️  本地 data/ 目录不存在")
+
+        # 校验：index.html 引用的 data/*.js 必须都存在，防止部署残缺页面
+        import re as _re
+        _html = open(os.path.join(tmp, "index.html"), encoding="utf-8").read()
+        _refs = _re.findall(r'src="data/([A-Z_]+)\.js"', _html)
+        _missing = [r for r in _refs if not os.path.exists(os.path.join(tmp, "data", r + ".js"))]
+        if _missing:
+            log(f"⚠️ 数据文件缺失，部署中止: {_missing}")
+            return 1
 
         run(["git", "config", "user.email", "2814546@qq.com"], cwd=tmp)
         run(["git", "config", "user.name", "ah-quant999"], cwd=tmp)
