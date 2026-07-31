@@ -1,1 +1,0 @@
-window.SCAN_DATA = {};

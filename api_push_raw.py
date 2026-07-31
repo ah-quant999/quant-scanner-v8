@@ -71,11 +71,16 @@ def main():
             print("❌ 创建 blob 失败:", path, b.get("__msg__")); sys.exit(1)
         new_entries[path] = b["sha"]
 
-    if existing == new_entries:
+    # 合并策略：保留远程已有的其他 raw_data 文件，只覆盖本地存在的文件。
+    # 这样 cloud_fetch --category 只更新当次类别，不会删掉盘前/盘后类别的文件。
+    merged_entries = dict(existing)  # path -> sha
+    merged_entries.update(new_entries)
+
+    if new_entries == existing:
         print("ℹ️ raw_data 内容无变化，跳过提交"); sys.exit(0)
 
     tree_items = [{"path": p, "mode": "100644", "type": "blob", "sha": s}
-                  for p, s in new_entries.items()]
+                  for p, s in merged_entries.items()]
 
     msg = "v8 cn fetch: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     for attempt in range(1, 4):

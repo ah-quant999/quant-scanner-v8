@@ -81,9 +81,10 @@ FROZEN_SOURCES = {
     "SUSPENSION_ALERT": 48,
     "MARKET_ALERTS": 48,
     "STOCK_LIST": 24 * 30,   # 股票名录，月度更新即可
-    "RECOMMEND": 48,
-    "SCAN_DATA": 48,
 }
+
+# 引入 update_v8.py 的时段映射，用于输出"每个模块由哪个定时任务更新"
+from update_v8 import CATEGORY_MAP, CATEGORY_LABEL
 
 
 def last_trade_day_close(now: datetime) -> datetime:
@@ -145,12 +146,15 @@ def main():
     warn_stale, warn_notime = check_group(WARN_SOURCES, close, "WARN")
     frozen_stale, frozen_notime = check_group(FROZEN_SOURCES, close, "FROZEN")
 
+    def _with_cat(items):
+        return [{"var": v, "reason": r, "category": CATEGORY_MAP.get(v, "post_close")} for v, r in items]
+
     status = {
         "check_time": now.strftime("%Y-%m-%d %H:%M:%S"),
         "last_trade_close": close.strftime("%Y-%m-%d %H:%M:%S"),
-        "core_stale": [{"var": v, "reason": r} for v, r in core_stale],
-        "warn_stale": [{"var": v, "reason": r} for v, r in warn_stale],
-        "frozen_stale": [{"var": v, "reason": r} for v, r in frozen_stale],
+        "core_stale": _with_cat(core_stale),
+        "warn_stale": _with_cat(warn_stale),
+        "frozen_stale": _with_cat(frozen_stale),
         "no_update_time": sorted(core_notime + warn_notime + frozen_notime),
         "summary": {
             "total_checked": len(CORE_SOURCES) + len(WARN_SOURCES) + len(FROZEN_SOURCES),
@@ -159,6 +163,8 @@ def main():
             "frozen_stale": len(frozen_stale),
             "no_timestamp": len(core_notime) + len(warn_notime) + len(frozen_notime),
         },
+        "category_map": CATEGORY_MAP,
+        "category_label": CATEGORY_LABEL,
     }
     out_path = DATA_DIR / "freshness_status.json"
     with open(out_path, "w", encoding="utf-8") as f:

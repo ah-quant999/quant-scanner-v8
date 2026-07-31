@@ -1,32 +1,25 @@
 # 九宝量化 v8.0 — 构建 + 部署（GitHub 云端 ubuntu-latest）
 #
-# 纯云端执行：拉取 cn runner 已推送的 raw_data/ → update_v8.py 转 data/*.js → push main
-# （main 即 GitHub Pages 源，push 即部署）。不依赖中国 IP，放 ubuntu-latest 省本机 token。
-# 定时比 v8_cn_fetch 错后 10 分钟，确保 raw_data 已落地。
+# 2026-07-31 周末改造：
+#   1) push 事件（cn runner 推 raw_data 或 v6 算法端推 post_close raw_data）
+#      改用 --detect-changes：只构建发生变化的那几个 data/*.js，不全站重部署。
+#   2) 保留 16:40 CST 盘后兜底调度：对 post_close 类别做一次 selective build，
+#      确保 v6 算法端在非 push 场景下也能被构建到。
+#   3) concurrency 保持 serial，防止并发 push 冲突。
+#
+# 触发策略：
+#   - push raw_data/**  → 检测变化 → 只构建受影响类别
+#   - schedule 16:40    → 构建 post_close 类别
+#   - workflow_dispatch → 全量构建
 
 name: "☁️ v8 构建部署(云端ubuntu)"
 
-# 触发策略（双保险）：
-#  1) push 到 main 且改动 raw_data/** —— cn runner 经 API 推送 raw_data 后自动接力（事件驱动，去时间耦合）
-#  2) schedule —— 兜底定时（与 cn fetch 错后 10 分钟）
-#  3) workflow_dispatch —— 手动触发
-# 注意：paths 过滤器仅作用于 push 事件；schedule/dispatch 不受 paths 限制，始终运行。
 on:
   push:
     branches: [main]
     paths: ['raw_data/**']
   schedule:
-    # 与 v8_cn_fetch 一一对应，各错后 10 分钟，确保 raw_data 已落地。
-    # 2026-07-31 审计调整：补 13:15（对应 cn_fetch 13:05 下午开盘）；
-    #                     去掉周末 19:00 空转，改为周六 09:10 跟随日历刷新。
-    - cron: '35 0 * * 1-5'   # 08:35 CST
-    - cron: '40 2 * * 1-5'   # 10:40 CST
-    - cron: '40 3 * * 1-5'   # 11:40 CST
-    - cron: '15 5 * * 1-5'   # 13:15 CST（补缺口）
-    - cron: '10 6 * * 1-5'   # 14:10 CST
-    - cron: '15 7 * * 1-5'   # 15:15 CST
-    - cron: '40 8 * * 1-5'   # 16:40 CST
-    - cron: '10 1 * * 6'     # 周六 09:10 CST 日历类跟随构建
+    - cron: '40 8 * * 1-5'   # 16:40 CST 盘后兜底
   workflow_dispatch:
 
 permissions:
@@ -43,14 +36,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 2   # 需要 HEAD~1 做 detect_changes
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
 
-      - name: "🏗️ 构建 data/*.js（raw_data → data/*.js，纯 JSON 转换，无需 akshare）"
-        run: python update_v8.py
+      - name: "🏗️ 构建 data/*.js（selective）"
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "调度触发：构建 post_close 类别"
+            python update_v8.py --category post_close
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "手动触发：全量构建"
+            python update_v8.py
+          else
+            echo "raw_data push 触发：检测变化并 selective build"
+            python update_v8.py --detect-changes
+          fi
 
       - name: "📤 部署到 main（GitHub Pages 源）"
         env:
@@ -65,7 +68,6 @@ jobs:
           fi
           git commit -m "v8 build: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
           REPO="https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
-          # 与 cn_fetch 并发 push 时可能非快进被拒，rebase 重试 3 次
           for i in 1 2 3; do
             if git push "$REPO" HEAD:main; then
               echo "✅ 已部署 main（第 $i 次尝试，GitHub Pages 自动重建）"; exit 0

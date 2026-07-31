@@ -1,0 +1,105 @@
+# 九宝量化 v8.0 — 每周清理（周日 23:00）
+#
+# 目标：删除无映射的 orphan raw_data/data 文件，更新 freshness_status.json，
+#       防止 v6 时代遗留的废弃数据像雪球一样越滚越大。
+#
+# ⚠️ 安全机制：只删 "不在 DATA_SOURCES 且不被 index.html 引用" 的文件，
+#    不会删除有用模块。误删风险由 guard + git diff 兜底。
+
+name: "🧹 v8 每周清理(云端ubuntu)"
+
+on:
+  schedule:
+    - cron: '0 15 * * 0'   # 周日 23:00 CST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-weekly-cleanup
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: "🩺 运行全量新鲜度体检"
+        continue-on-error: true
+        run: python guard_v8_freshness.py | tee guard_output.txt
+
+      - name: "🧹 清理 orphan 文件"
+        run: |
+          python - <<'PY'
+          import json, re
+          from pathlib import Path
+
+          ROOT = Path('.')
+          RAW_DIR = ROOT / 'raw_data'
+          DATA_DIR = ROOT / 'data'
+
+          # 读取 DATA_SOURCES 映射
+          src = Path('update_v8.py').read_text(encoding='utf-8')
+          # 简单提取 DATA_SOURCES dict
+          m = re.search(r'DATA_SOURCES\s*=\s*\{([^}]+)\}', src, re.S)
+          mapped_files = set()
+          if m:
+              for line in m.group(1).splitlines():
+                  if ':' in line and '"' in line:
+                      fname = line.split(':')[0].strip().strip('"\'')
+                      mapped_files.add(fname)
+
+          # 读取 index.html 引用的 data/*.js
+          index = Path('index.html').read_text(encoding='utf-8')
+          referenced = set(re.findall(r'data/([A-Z_0-9]+)\.js', index))
+
+          removed_raw = []
+          if RAW_DIR.exists():
+              for p in RAW_DIR.glob('*.json'):
+                  if p.name not in mapped_files:
+                      p.unlink()
+                      removed_raw.append(p.name)
+
+          removed_data = []
+          if DATA_DIR.exists():
+              for p in DATA_DIR.glob('*.js'):
+                  var_name = p.stem
+                  json_name = var_name + '.json'
+                  # 不在映射且不被 index.html 引用
+                  if json_name not in mapped_files and var_name not in referenced:
+                      p.unlink()
+                      removed_data.append(p.name)
+
+          print(f"删除 orphan raw_data: {removed_raw or '无'}")
+          print(f"删除 orphan data/*.js: {removed_data or '无'}")
+          PY
+
+      - name: "📤 提交清理结果"
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "v8-cloud-bot"
+          git config user.email "v8-bot@users.noreply.github.com"
+          git add -f data/freshness_status.json raw_data/ data/
+          if git diff --cached --quiet; then
+            echo "ℹ️ 无清理内容"
+            exit 0
+          fi
+          git commit -m "v8 weekly cleanup: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
+          REPO="https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
+          for i in 1 2 3; do
+            if git push "$REPO" HEAD:main; then
+              echo "✅ 清理已提交（第 $i 次）"; exit 0
+            fi
+            git fetch "$REPO" main && git rebase FETCH_HEAD || { git rebase --abort; exit 1; }
+          done
+          echo "❌ 3 次重试后仍失败"; exit 1

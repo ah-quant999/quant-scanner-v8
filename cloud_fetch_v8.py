@@ -51,6 +51,35 @@ VAR_TO_RAW = {
     "V8_CAL": "v8_cal.json",
 }
 
+# 变量名 → 更新时段（与 update_v8.py 的 CATEGORY_MAP 对齐）
+CATEGORY_MAP = {
+    # 盘前
+    "V8_CAL": "premarket",
+    "IPO_DATA": "premarket",
+    "MARGIN_DATA": "premarket",
+    "CFFEX_HOLDINGS": "premarket",
+    "MACRO_DATA": "premarket",
+    "CRISIS_DATA": "premarket",
+    "NORTH_FUND": "premarket",
+    "ANALYST_RATINGS": "premarket",
+    "W52_HIGH": "premarket",
+    "VOLATILITY": "premarket",
+    "HERDING_DATA": "premarket",
+    # 盘中
+    "INDEX_QUOTES": "intraday",
+    "ETF_PULSE": "intraday",
+    "ETF_INTRADAY_HEAT": "intraday",
+    "ETF_SUBSCRIPTION": "intraday",
+    "SECTOR_FUND_FLOW": "intraday",
+    "CAPITAL_FLOW_DATA": "intraday",
+    "CONCEPT_RANKING": "intraday",
+    "LIMIT_UP_HEATMAP": "intraday",
+    "MARKET_FUND_FLOW_DATA": "intraday",
+    # 盘中/盘后交界：ETF_DAILY_MONITOR 云端虽能抓，但 T+1 语义，归入 post_close 减少盘中噪音
+    "ETF_DAILY_MONITOR": "post_close",
+    "EXPERIMENT": "post_close",
+}
+
 _ak = None
 
 def get_ak():
@@ -1222,11 +1251,32 @@ def f_v8_cal(today=None):
     }
 
 
-def main():
-    print(f"=== v8 云端抓取开始 {datetime.now().isoformat(timespec='seconds')} ===")
-    # 清理旧 raw_data，防止已下架/废弃的 json 被 api_push_raw.py 重新推回仓库
+def main(category=None):
+    print(f"=== v8 云端抓取开始 {datetime.now().isoformat(timespec='seconds')} "
+          f"category={category or 'all'} ===")
+
+    # 分时段清理：只删除本次任务类别的 raw_data，避免盘中任务把盘前/盘后数据清掉
+    target_vars = None
+    if category:
+        target_vars = {var for var, cat in CATEGORY_MAP.items() if cat == category}
+        if not target_vars:
+            print(f"⚠️ 未知 category={category}，无任务可执行")
+            return 0
+        print(f"🎯 目标类别 {category}，涉及 {len(target_vars)} 个变量")
+    else:
+        print("🎯 全量模式，执行全部 cloud_fetch 模块")
+
     cleaned = 0
     for old in RAW_DIR.glob("*.json"):
+        if category:
+            # 只清理属于当前 category 的文件
+            var_for_file = None
+            for var, fname in VAR_TO_RAW.items():
+                if fname == old.name:
+                    var_for_file = var
+                    break
+            if var_for_file not in target_vars:
+                continue
         try:
             old.unlink()
             cleaned += 1
@@ -1234,32 +1284,47 @@ def main():
             print(f"  ⚠️  清理旧文件失败 {old.name}: {e}")
     if cleaned:
         print(f"  🧹 已清理 {cleaned} 个旧 raw_data/*.json")
-    run("ETF_INTRADAY_HEAT", f_etf_intraday_heat)
-    run("SECTOR_FUND_FLOW", f_sector_fund_flow)
-    run("INDEX_QUOTES", f_index_quotes)
-    run("CONCEPT_RANKING", f_concept_ranking)
-    run("IPO_DATA", f_ipo_data)
-    run("MARGIN_DATA", f_margin_data)
-    run("CFFEX_HOLDINGS", f_cffex_holdings)
-    run("MACRO_DATA", f_macro_data)
-    run("CRISIS_DATA", f_crisis_data)
-    run("VOLATILITY", f_volatility)
-    run("HERDING_DATA", f_herding_data)
-    run("LIMIT_UP_HEATMAP", f_limit_up_heatmap)
-    run("CAPITAL_FLOW_DATA", f_capital_flow_data)
-    run("ETF_SUBSCRIPTION", f_etf_subscription)
-    run("NORTH_FUND", f_north_fund)
-    run("MARKET_FUND_FLOW_DATA", f_market_fund_flow_data)
-    run("W52_HIGH", f_w52_high)
-    run("ETF_PULSE", f_etf_pulse)
-    run("ETF_DAILY_MONITOR", f_etf_daily_monitor)
-    run("ANALYST_RATINGS", f_analyst_ratings)
-    run("EXPERIMENT", f_experiment)
-    run("V8_CAL", f_v8_cal)
+
+    # 任务列表：顺序影响下游构建，保持原有顺序
+    tasks = [
+        ("ETF_INTRADAY_HEAT", f_etf_intraday_heat),
+        ("SECTOR_FUND_FLOW", f_sector_fund_flow),
+        ("INDEX_QUOTES", f_index_quotes),
+        ("CONCEPT_RANKING", f_concept_ranking),
+        ("IPO_DATA", f_ipo_data),
+        ("MARGIN_DATA", f_margin_data),
+        ("CFFEX_HOLDINGS", f_cffex_holdings),
+        ("MACRO_DATA", f_macro_data),
+        ("CRISIS_DATA", f_crisis_data),
+        ("VOLATILITY", f_volatility),
+        ("HERDING_DATA", f_herding_data),
+        ("LIMIT_UP_HEATMAP", f_limit_up_heatmap),
+        ("CAPITAL_FLOW_DATA", f_capital_flow_data),
+        ("ETF_SUBSCRIPTION", f_etf_subscription),
+        ("NORTH_FUND", f_north_fund),
+        ("MARKET_FUND_FLOW_DATA", f_market_fund_flow_data),
+        ("W52_HIGH", f_w52_high),
+        ("ETF_PULSE", f_etf_pulse),
+        ("ETF_DAILY_MONITOR", f_etf_daily_monitor),
+        ("ANALYST_RATINGS", f_analyst_ratings),
+        ("EXPERIMENT", f_experiment),
+        ("V8_CAL", f_v8_cal),
+    ]
+
+    for var, fn in tasks:
+        if target_vars is not None and var not in target_vars:
+            continue
+        run(var, fn)
+
     print(f"=== v8 云端抓取结束 {datetime.now().isoformat(timespec='seconds')} ===")
     print(f"raw_data/ 文件数: {len(list(RAW_DIR.glob('*.json')))}")
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    import argparse
+    parser = argparse.ArgumentParser(description="v8 cloud fetch")
+    parser.add_argument("--category", choices=["premarket", "intraday", "post_close"],
+                        help="只抓取某一时段类别")
+    args = parser.parse_args()
+    sys.exit(main(category=args.category))

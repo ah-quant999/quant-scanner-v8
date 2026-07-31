@@ -1,29 +1,26 @@
 #!/usr/bin/env python3
 """v8 数据构建脚本 — 从 raw_data/*.json 生成 data/*.js
 
-说明：
-- v8 已改为轻量模板：index.html 不再内联大数据，而是引用 data/*.js。
-- 本脚本负责把原始数据 raw_data/<file>.json 转换为 data/<VAR>.js。
-- 原始数据由数据源端（小九/单位机）提供，本脚本只负责格式转换与轻量裁剪。
-- 输出文件可直接被 index.html 通过 <script src="./data/VAR.js"> 同步加载。
+改造要点（2026-07-31 周末·阿狸咪）：
+- 支持按 category 选择性构建：premarket / intraday / post_close / weekly。
+- 支持 --detect-changes：只构建本次 push 发生变化的 raw_data 所属类别。
+- 缺失 raw_data 的模块：保持既有 data/*.js 不变（carry-forward），由 guard 标陈旧。
+- 删除死数据文件 RECOMMEND / SCAN_DATA 的映射。
 """
 
-import json, os, sys
+import json, os, sys, subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 RAW_DIR = ROOT / "raw_data"
 DATA_DIR = ROOT / "data"
 
-# 原始文件名 → window 变量名映射
-# 若数据源端直接以变量名命名文件，可省略映射，按文件名自动推断。
+# 原始文件名 → window 变量名
 DATA_SOURCES = {
     "etf_intraday_heat.json":      "ETF_INTRADAY_HEAT",
     "sector_fund_flow.json":       "SECTOR_FUND_FLOW",
-    "scan_data.json":              "SCAN_DATA",
     "gold_pool.json":              "GOLD_POOL",
     "stock_names.json":            "STOCK_LIST",
-    "recommend.json":              "RECOMMEND",
     "macro_data.json":             "MACRO_DATA",
     "nt_data.json":                "NT_DATA",
     "lhb_data.json":               "LHB_DATA",
@@ -64,6 +61,66 @@ DATA_SOURCES = {
     "etf_pulse.json":              "ETF_PULSE",
     "etf_daily_monitor.json":      "ETF_DAILY_MONITOR",
     "v8_cal.json":                 "V8_CAL",
+}
+
+# 变量名 → 更新时段
+CATEGORY_MAP = {
+    # 盘前（08:25 cn / 08:35 deploy）
+    "V8_CAL": "premarket",
+    "IPO_DATA": "premarket",
+    "NT_DATA": "premarket",
+    "MARGIN_DATA": "premarket",
+    "CFFEX_HOLDINGS": "premarket",
+    "MACRO_DATA": "premarket",
+    "CRISIS_DATA": "premarket",
+    "NORTH_FUND": "premarket",
+    "ANALYST_RATINGS": "premarket",
+    "SUSPENSION_ALERT": "premarket",
+    "MARKET_ALERTS": "premarket",
+    "W52_HIGH": "premarket",
+    "VOLATILITY": "premarket",
+    "HERDING_DATA": "premarket",
+
+    # 盘中（10:30/11:30/13:05/14:00/15:05）
+    "INDEX_QUOTES": "intraday",
+    "ETF_PULSE": "intraday",
+    "ETF_INTRADAY_HEAT": "intraday",
+    "ETF_SUBSCRIPTION": "intraday",
+    "SECTOR_FUND_FLOW": "intraday",
+    "CAPITAL_FLOW_DATA": "intraday",
+    "CONCEPT_RANKING": "intraday",
+    "LIMIT_UP_HEATMAP": "intraday",
+    "MARKET_FUND_FLOW_DATA": "intraday",
+
+    # 盘后（16:30，主要由 v6 算法推送；cloud_fetch 暂无生产者）
+    "GOLD_POOL": "post_close",
+    "CANDIDATE": "post_close",
+    "TRIPLE_CONSENSUS": "post_close",
+    "TRIPLE_TRACK": "post_close",
+    "TRIPLE_HISTORY": "post_close",
+    "TOP10_DAILY": "post_close",
+    "LHB_DATA": "post_close",
+    "SECTOR_RS": "post_close",
+    "SH_FIB": "post_close",
+    "SZ_FIB": "post_close",
+    "INST_TRADE": "post_close",
+    "CRDS_CARD_DATA": "post_close",
+    "COCKPIT_TIER_RECOMMEND": "post_close",
+    "COCKPIT_ADVICE": "post_close",
+    "COCKPIT_BACKTEST": "post_close",
+    "BACKTEST_TDX": "post_close",
+    "BACKTEST_COMPREHENSIVE": "post_close",
+    "MAHORO": "post_close",
+    "EXPERIMENT": "post_close",
+    "STOCK_LIST": "post_close",
+    "ETF_DAILY_MONITOR": "post_close",
+}
+
+CATEGORY_LABEL = {
+    "premarket": "盘前",
+    "intraday": "盘中",
+    "post_close": "盘后",
+    "weekly": "每周清理",
 }
 
 
@@ -174,11 +231,41 @@ def _write_js(var_name, obj):
     return out_path
 
 
-def build():
+def _var_category(var_name):
+    return CATEGORY_MAP.get(var_name, "post_close")
+
+
+def _file_category(filename):
+    var_name = DATA_SOURCES.get(filename)
+    return _var_category(var_name) if var_name else None
+
+
+def _list_changed_raw_files():
+    """通过 git diff HEAD~1..HEAD 找出变化的 raw_data 文件（用于 v6 push 触发构建）。"""
+    try:
+        result = subprocess.run(
+            ["git", "diff", "--name-only", "HEAD~1", "HEAD"],
+            cwd=ROOT, capture_output=True, text=True, check=False, timeout=30
+        )
+        if result.returncode != 0:
+            # 可能是第一次提交或浅克隆，尝试 HEAD
+            result = subprocess.run(
+                ["git", "diff", "--name-only", "HEAD"],
+                cwd=ROOT, capture_output=True, text=True, check=False, timeout=30
+            )
+        if result.returncode != 0:
+            return []
+        changed = [line.strip() for line in result.stdout.splitlines()
+                   if line.strip().startswith("raw_data/")]
+        return [Path(ROOT) / p for p in changed]
+    except Exception as e:
+        print(f"  ⚠️  git diff 检测失败: {e}")
+        return []
+
+
+def build(category=None, detect_changes=False):
     if not RAW_DIR.exists():
-        print(f"⚠️  raw_data/ 目录不存在（{RAW_DIR}）。")
-        print("   请将数据源端生成的 *.json 放到 raw_data/，再运行本脚本。")
-        print("   当前 data/*.js 不会被修改（保持既有线上数据）。")
+        print(f"⚠️  raw_data/ 目录不存在（{RAW_DIR}）。保持既有 data/*.js 不变。")
         return 0
 
     files = [p for p in RAW_DIR.iterdir() if p.suffix == '.json']
@@ -186,12 +273,32 @@ def build():
         print(f"⚠️  raw_data/ 为空，无数据可更新。保持既有 data/*.js 不变。")
         return 0
 
+    if detect_changes:
+        changed = _list_changed_raw_files()
+        changed_names = {p.name for p in changed}
+        affected_cats = {_file_category(p.name) for p in changed}
+        affected_cats.discard(None)
+        print(f"🔍 detect_changes 模式：变化 raw_data {len(changed)} 个，涉及类别 {sorted(affected_cats) or '无'}")
+        if not affected_cats:
+            print("   无受影响的类别，跳过构建。")
+            return 0
+        target_files = [p for p in files if _file_category(p.name) in affected_cats]
+    elif category:
+        print(f"🔍 category={category}（{CATEGORY_LABEL.get(category, category)}） selective build")
+        target_files = [p for p in files if _file_category(p.name) == category]
+    else:
+        print("🔍 全量构建模式")
+        target_files = files
+
+    if not target_files:
+        print(f"⚠️ 没有属于目标类别的 raw_data 文件，保持 data/*.js 不变。")
+        return 0
+
     updated = 0
     skipped = 0
-    for src_path in sorted(files):
+    for src_path in sorted(target_files):
         var_name = DATA_SOURCES.get(src_path.name)
         if not var_name:
-            # 未知文件：不自动推断，避免已下架/废弃数据（如 limit_up_ladder.json）被重新生成
             print(f"  ⏭️  {src_path.name} 不在 DATA_SOURCES 映射中，跳过（避免废弃数据复活）")
             skipped += 1
             continue
@@ -203,10 +310,20 @@ def build():
         updated += 1
         print(f"  ✅ {src_path.name} → {out_path.name}")
 
-    print(f"\n完成：更新 {updated} 个，跳过 {skipped} 个。")
-    print(f"输出目录：{DATA_DIR}")
+    print(f"\n完成：更新 {updated} 个，跳过 {skipped} 个。输出目录：{DATA_DIR}")
     return 0
 
 
+def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="v8 data builder")
+    parser.add_argument("--category", choices=["premarket", "intraday", "post_close", "weekly"],
+                        help="只构建某一时段类别")
+    parser.add_argument("--detect-changes", action="store_true",
+                        help="只构建最近 git diff 发生变化的 raw_data 所属类别")
+    args = parser.parse_args()
+    return build(category=args.category, detect_changes=args.detect_changes)
+
+
 if __name__ == '__main__':
-    sys.exit(build())
+    sys.exit(main())

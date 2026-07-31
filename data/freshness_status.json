@@ -1,64 +1,124 @@
 {
-  "check_time": "2026-07-31 23:25:54",
+  "check_time": "2026-08-01 00:11:44",
   "last_trade_close": "2026-07-31 15:30:00",
   "core_stale": [],
   "warn_stale": [],
   "frozen_stale": [
     {
       "var": "COCKPIT_BACKTEST",
-      "reason": "更新于 07-27 22:07，落后 3.7 天"
+      "reason": "更新于 07-27 22:07，落后 3.7 天",
+      "category": "post_close"
     },
     {
       "var": "BACKTEST_COMPREHENSIVE",
-      "reason": "更新于 07-27 22:07，落后 3.7 天"
+      "reason": "更新于 07-27 22:07，落后 3.7 天",
+      "category": "post_close"
     },
     {
       "var": "BACKTEST_TDX",
-      "reason": "更新于 07-27 00:00，落后 4.6 天"
+      "reason": "更新于 07-27 00:00，落后 4.6 天",
+      "category": "post_close"
     },
     {
       "var": "LHB_DATA",
-      "reason": "更新于 07-28 20:55，落后 2.8 天"
+      "reason": "更新于 07-28 20:55，落后 2.8 天",
+      "category": "post_close"
     },
     {
       "var": "SH_FIB",
-      "reason": "更新于 07-27 11:23，落后 4.2 天"
+      "reason": "更新于 07-27 11:23，落后 4.2 天",
+      "category": "post_close"
     },
     {
       "var": "SZ_FIB",
-      "reason": "更新于 07-27 11:23，落后 4.2 天"
+      "reason": "更新于 07-27 11:23，落后 4.2 天",
+      "category": "post_close"
     },
     {
       "var": "SECTOR_RS",
-      "reason": "更新于 07-25 13:52，落后 6.1 天"
+      "reason": "更新于 07-25 13:52，落后 6.1 天",
+      "category": "post_close"
     },
     {
       "var": "NT_DATA",
-      "reason": "更新于 07-29 10:21，落后 2.2 天"
+      "reason": "更新于 07-29 10:21，落后 2.2 天",
+      "category": "premarket"
     },
     {
       "var": "SUSPENSION_ALERT",
-      "reason": "更新于 07-28 15:21，落后 3.0 天"
+      "reason": "更新于 07-28 15:21，落后 3.0 天",
+      "category": "premarket"
     },
     {
       "var": "MARKET_ALERTS",
-      "reason": "更新于 07-28 15:19，落后 3.0 天"
+      "reason": "更新于 07-28 15:19，落后 3.0 天",
+      "category": "premarket"
     }
   ],
   "no_update_time": [
     "COCKPIT_ADVICE",
     "COCKPIT_TIER_RECOMMEND",
     "MAHORO",
-    "RECOMMEND",
-    "SCAN_DATA",
     "STOCK_LIST",
     "TRIPLE_HISTORY"
   ],
   "summary": {
-    "total_checked": 46,
+    "total_checked": 44,
     "core_stale": 0,
     "warn_stale": 0,
     "frozen_stale": 10,
-    "no_timestamp": 7
+    "no_timestamp": 5
+  },
+  "category_map": {
+    "V8_CAL": "premarket",
+    "IPO_DATA": "premarket",
+    "NT_DATA": "premarket",
+    "MARGIN_DATA": "premarket",
+    "CFFEX_HOLDINGS": "premarket",
+    "MACRO_DATA": "premarket",
+    "CRISIS_DATA": "premarket",
+    "NORTH_FUND": "premarket",
+    "ANALYST_RATINGS": "premarket",
+    "SUSPENSION_ALERT": "premarket",
+    "MARKET_ALERTS": "premarket",
+    "W52_HIGH": "premarket",
+    "VOLATILITY": "premarket",
+    "HERDING_DATA": "premarket",
+    "INDEX_QUOTES": "intraday",
+    "ETF_PULSE": "intraday",
+    "ETF_INTRADAY_HEAT": "intraday",
+    "ETF_SUBSCRIPTION": "intraday",
+    "SECTOR_FUND_FLOW": "intraday",
+    "CAPITAL_FLOW_DATA": "intraday",
+    "CONCEPT_RANKING": "intraday",
+    "LIMIT_UP_HEATMAP": "intraday",
+    "MARKET_FUND_FLOW_DATA": "intraday",
+    "GOLD_POOL": "post_close",
+    "CANDIDATE": "post_close",
+    "TRIPLE_CONSENSUS": "post_close",
+    "TRIPLE_TRACK": "post_close",
+    "TRIPLE_HISTORY": "post_close",
+    "TOP10_DAILY": "post_close",
+    "LHB_DATA": "post_close",
+    "SECTOR_RS": "post_close",
+    "SH_FIB": "post_close",
+    "SZ_FIB": "post_close",
+    "INST_TRADE": "post_close",
+    "CRDS_CARD_DATA": "post_close",
+    "COCKPIT_TIER_RECOMMEND": "post_close",
+    "COCKPIT_ADVICE": "post_close",
+    "COCKPIT_BACKTEST": "post_close",
+    "BACKTEST_TDX": "post_close",
+    "BACKTEST_COMPREHENSIVE": "post_close",
+    "MAHORO": "post_close",
+    "EXPERIMENT": "post_close",
+    "STOCK_LIST": "post_close",
+    "ETF_DAILY_MONITOR": "post_close"
+  },
+  "category_label": {
+    "premarket": "盘前",
+    "intraday": "盘中",
+    "post_close": "盘后",
+    "weekly": "每周清理"
   }
 }
