@@ -896,7 +896,7 @@
           </div>
           <div id="stcrdsMarketSummary" style="font-size:12px;color:var(--dim);margin-top:4px;"></div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;align-items:start;">
           <div>
             <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
               <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('stcrdsEliteBody','crdsEliteArr')">
@@ -917,8 +917,6 @@
               </div>
               <div id="stcrdsAdvBody" style="display:block;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:300px;overflow-y:auto;"></div>
             </div>
-          </div>
-          <div>
             <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
               <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('stcrdsList1','crdsArr1')">
                 <span style="width:10px;height:10px;border-radius:50%;background:#185FA5;"></span>
@@ -937,6 +935,8 @@
               </div>
               <div id="stcrdsList2" style="display:block;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:300px;overflow-y:auto;"></div>
             </div>
+          </div>
+          <div>
             <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
               <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('stcrdsList3','crdsArr3')">
                 <span style="width:10px;height:10px;border-radius:50%;background:#3B6D11;"></span>
@@ -944,7 +944,7 @@
                 <span style="margin-left:auto;font-size:13px;font-weight:700;color:#3B6D11;"><span id="stcrdsCnt3">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
                 <span id="stcrdsArr3" style="font-size:10px;color:var(--dim);">▴</span>
               </div>
-              <div id="stcrdsList3" style="display:block;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:300px;overflow-y:auto;"></div>
+              <div id="stcrdsList3" style="display:grid;grid-template-columns:1fr 1fr;gap:3px 14px;padding:4px 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.6;"></div>
             </div>
           </div>
         </div>
@@ -3858,7 +3858,7 @@ function renderLimitUpHeatmap(){
       }
     }
     function fillList(listEl,arr,html){if(!arr||!arr.length){listEl.innerHTML=html;return;}
-      listEl.innerHTML=arr.map(function(s){return '<span style="cursor:default;color:var(--txt);">'+s.name+'('+s.code+')</span><br>';}).join('');
+      listEl.innerHTML=arr.map(function(s){return '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+s.name+'('+s.code+')</div>';}).join('');
     }
     var l1=d.cond1_list||[],l2=d.cond2_list||[],l3=d.cond3_list||[];
     document.getElementById(p+'crdsCnt1').textContent=l1.length;
