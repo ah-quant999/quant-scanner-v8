@@ -2573,18 +2573,29 @@ function renderLimitUpHeatmap(){
       if(pulse&&pulse.update_time) setTime('phEtfTime',pulse.update_time);
       return;
     }
+    var list=pulse.etfs.slice(0,12);
+    var maxVol=Math.max.apply(null,list.map(function(e){return e.vol||0;}))||1;
     var h='<div style="padding:8px 4px;">';
-    if(pulse.note) h+='<div style="font-size:10px;color:var(--dim);margin-bottom:6px;">'+pulse.note+'</div>';
-    pulse.etfs.slice(0,12).forEach(function(e){
-      var c=e.chg>=0?'var(--up)':'var(--down)';
-      var arrow=e.chg>=0?'▲':'▼';
-      var volColor=e.vol>=2?'#f4495d':(e.vol>=1.5?'#f59e0b':'var(--sub)');
+    if(pulse.note) h+='<div style="font-size:10px;color:var(--dim);margin-bottom:8px;">'+pulse.note+'</div>';
+    list.forEach(function(e){
+      var isUp=e.chg>=0;
+      var c=isUp?'var(--up)':'var(--down)';
+      var barColor=isUp?'var(--up)':'var(--down)';
+      var arrow=isUp?'▲':'▼';
+      var barW=(Math.min((e.vol/maxVol)*100,100)).toFixed(1);
       var amtY=(e.amount/1e8).toFixed(1)+'亿';
-      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;margin-bottom:4px;background:var(--card2);border:1px solid var(--border);border-radius:7px;font-size:12px;">';
-      h+='<span style="font-weight:600;">'+e.name+' <span style="color:var(--sub);font-size:10px;">'+e.code+'</span></span>';
-      h+='<span style="color:'+c+';font-weight:700;">'+arrow+' '+Math.abs(e.chg).toFixed(2)+'%</span>';
-      h+='<span style="color:'+volColor+';font-weight:700;">量比 '+e.vol.toFixed(2)+'</span>';
-      h+='<span style="color:var(--sub);font-size:10px;">'+amtY+'</span>';
+      h+='<div style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:12px;border-bottom:1px solid var(--border);">';
+      h+='<div style="width:110px;flex-shrink:0;line-height:1.4;">';
+      h+='<div style="font-weight:600;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+e.name+'</div>';
+      h+='<div style="font-size:10px;color:var(--sub);">'+e.code+'</div>';
+      h+='</div>';
+      h+='<div style="flex:1;position:relative;height:18px;background:var(--card2);border-radius:9px;overflow:hidden;">';
+      h+='<div style="position:absolute;left:0;top:0;height:100%;width:'+barW+'%;background:'+barColor+';border-radius:9px;opacity:0.85;"></div>';
+      h+='</div>';
+      h+='<div style="width:95px;flex-shrink:0;text-align:right;line-height:1.4;">';
+      h+='<div style="color:'+c+';font-weight:700;">'+arrow+' '+Math.abs(e.chg).toFixed(2)+'%</div>';
+      h+='<div style="font-size:10px;color:var(--sub);">量比 '+e.vol.toFixed(2)+' · '+amtY+'</div>';
+      h+='</div>';
       h+='</div>';
     });
     h+='</div>';
