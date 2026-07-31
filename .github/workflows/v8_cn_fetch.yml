@@ -35,12 +35,39 @@ jobs:
         with:
           fetch-depth: 1
 
+      # cn runner 在中国网络下连 github.com 下载 python 包会 ETIMEDOUT，
+      # 故本机已预填 tool cache（_work/_tool/Python/3.13.14/x64）供其秒命中；
+      # 万一 cache 失效则 continue-on-error 放行，由下一步直接挂载 tool cache 兜底。
       - uses: actions/setup-python@v5
+        id: setuppy
+        continue-on-error: true
         with:
           python-version: '3.13'
 
-      - name: "安装 akshare"
-        run: pip install akshare --quiet 2>/dev/null || pip install akshare
+      - name: "Python 兜底（setup-python 失败时直接挂载 tool cache）"
+        if: steps.setuppy.outcome != 'success'
+        shell: bash
+        run: |
+          PY="$RUNNER_TOOL_CACHE/Python/3.13.14/x64"
+          if [ -x "$PY/python.exe" ]; then
+            echo "$PY" >> "$GITHUB_PATH"
+            echo "$PY/Scripts" >> "$GITHUB_PATH"
+            echo "✅ 已挂载本机 tool cache Python：$PY"
+          else
+            echo "❌ tool cache 未命中且 setup-python 失败，无可用 Python"
+            exit 1
+          fi
+
+      - name: "安装 akshare（已装则跳过，走清华镜像避免境外 pypi 超时）"
+        shell: bash
+        run: |
+          if python -c "import akshare, pandas" 2>/dev/null; then
+            echo "✅ akshare/pandas 已就绪，跳过安装"
+            python -c "import akshare; print('akshare', akshare.__version__)"
+          else
+            pip install akshare pandas --quiet -i https://pypi.tuna.tsinghua.edu.cn/simple \
+              || pip install akshare pandas --quiet
+          fi
 
       - name: "📡 抓中国数据 → raw_data/（逐模块容错）"
         continue-on-error: true
