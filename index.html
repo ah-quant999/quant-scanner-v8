@@ -486,7 +486,7 @@
 
   <!-- ============ 实时数据 ============ -->
   <section id="sec-rt">
-    <div class="sec-head"><h2>📡 实时数据</h2><span class="fresh">更新于 今日 15:20</span><span class="tag">盘中 T+0 · 数据延迟约 3~5 秒</span></div>
+    <div class="sec-head"><h2>📡 实时数据</h2><span class="fresh" id="rtUpdateTime">更新于 --</span><span class="tag">盘中 T+0 · 数据延迟约 3~5 秒</span></div>
 
     <!-- 🧠 AI市场速览（A 阶段 2026-07-31：数字写死，参考 v6 周一真实快照；B 阶段接 JSON） -->
     <div id="aiSummaryCard" style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">
@@ -2923,6 +2923,25 @@ function renderLimitUpHeatmap(){
   /* ---- 初始化 ---- */
   function initPostMarket(){
     const safe=(fn,...args)=>{try{fn(...args);}catch(e){console.warn('模块渲染失败',fn&&fn.name,e);}};
+
+    // 实时数据区统一时间：取所有盘中数据的最晚 update_time
+    const intradayTimes=[
+      window.ETF_PULSE && window.ETF_PULSE.update_time,
+      window.ETF_INTRADAY_HEAT && window.ETF_INTRADAY_HEAT.update_time,
+      window.ETF_SUBSCRIPTION && window.ETF_SUBSCRIPTION.update_time,
+      window.ETF_DAILY_MONITOR && window.ETF_DAILY_MONITOR.update_time,
+      window.SECTOR_FUND_FLOW && window.SECTOR_FUND_FLOW.update_time,
+      window.INDEX_QUOTES && window.INDEX_QUOTES.update_time,
+      window.CONCEPT_RANKING && window.CONCEPT_RANKING.update_time,
+      window.LIMIT_UP_HEATMAP && window.LIMIT_UP_HEATMAP.update_time,
+      window.CAPITAL_FLOW_DATA && window.CAPITAL_FLOW_DATA.update_time,
+      window.MARKET_FUND_FLOW_DATA && window.MARKET_FUND_FLOW_DATA.update_time,
+    ].filter(Boolean);
+    if(intradayTimes.length){
+      intradayTimes.sort();
+      setTime('rtUpdateTime', intradayTimes[intradayTimes.length-1]);
+    }
+
     // 1) ETF 三合一（盘中异动/资金热度/日监控）—— 直接用已注入的 window 变量
     safe(renderEtfPulse, window.ETF_PULSE || {});
     safe(renderEtfHeatByCategory, window.ETF_INTRADAY_HEAT || {});
