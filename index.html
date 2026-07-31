@@ -583,21 +583,68 @@
         <div class="flow-row"><span class="flow-name">白酒</span><div class="flow-bar"><div class="flow-fill" style="width:30%;background:linear-gradient(90deg,#1fd17b,#4ade80)"></div></div><span class="flow-val down">-9.8亿</span></div>
       </div>
 
-      <!-- 概念涨跌排名 -->
-      <div class="card">
-        <h3><span class="ic">📊</span>概念涨跌排名 - 短线盘中 · <span class="fresh">更新于 今日 15:18</span></h3>
-        <table>
-          <thead><tr><th>概念</th><th>涨幅</th><th>领涨股</th></tr></thead>
-          <tbody>
-            <tr><td>Chiplet</td><td class="up">+5.82%</td><td>长电科技</td></tr>
-            <tr><td>存储芯片</td><td class="up">+4.67%</td><td>兆易创新</td></tr>
-            <tr><td>光伏设备</td><td class="up">+3.51%</td><td>隆基绿能</td></tr>
-            <tr><td>CRO</td><td class="down">-2.34%</td><td>药明康德</td></tr>
-            <tr><td>白酒</td><td class="down">-1.89%</td><td>贵州茅台</td></tr>
-          </tbody>
-        </table>
+      <!-- 概念排名（真实数据：CONCEPT_RANKING.js） -->
+      <div class="card" id="conceptRankCard">
+        <h3><span class="ic">📊</span>概念资金排名 - 主力净流入 TOP · <span class="fresh" id="conceptRankTime">更新于 --</span></h3>
+        <div id="conceptRankBody"><div class="ipo-empty">加载中…</div></div>
       </div>
     </div>
+
+    <script>
+    /* 概念排名渲染（CONCEPT_RANKING.js → 实时数据区） */
+    (function(){
+      const $=id=>document.getElementById(id);
+      function fmt(v){ return v==null||isNaN(v)?'--':Number(v).toFixed(2); }
+      function rel(ts){
+        if(!ts) return '--';
+        const d=new Date(String(ts).replace('T',' ').replace(/-/g,'/'));
+        if(isNaN(d)) return String(ts);
+        const now=new Date();
+        const diff=Math.round((new Date(now.getFullYear(),now.getMonth(),now.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);
+        const hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+        return (diff<=0?'今日':diff===1?'昨日':diff+'天前')+' '+hm;
+      }
+      function renderConceptRank(){
+        const d=window.CONCEPT_RANKING;
+        if(!d || !d.items || !d.items.length){
+          $('conceptRankBody').innerHTML='<div class="ipo-empty">暂无概念排名数据</div>';
+          return;
+        }
+        const top=d.items.slice(0,15);
+        let h='<table style="width:100%;border-collapse:collapse;font-size:12px">';
+        h+='<thead><tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px 4px;color:var(--sub)">概念</th><th style="text-align:right;padding:6px 4px;color:var(--sub)">涨幅</th><th style="text-align:right;padding:6px 4px;color:var(--sub)">净流入(亿)</th></tr></thead><tbody>';
+        top.forEach((it,i)=>{
+          const chgCls=it.chg>0?'up':it.chg<0?'down':'';
+          const netCls=it.net>0?'up':it.net<0?'down':'';
+          const maxNet=top[0].net||1;
+          const barW=Math.round((Math.abs(it.net)/maxNet)*100);
+          const barColor=it.net>0?'rgba(244,73,93,.18)':'rgba(31,209,123,.18)';
+          const barFill=it.net>0?'linear-gradient(90deg,#f4495d,#f87171)':'linear-gradient(90deg,#1fd17b,#4ade80)';
+          h+='<tr style="border-bottom:1px solid rgba(255,255,255,.04)">';
+          h+='<td style="padding:5px 4px;text-align:left;white-space:nowrap">';
+          h+='<span style="font-weight:600;color:var(--txt)">'+esc(it.name)+'</span>';
+          if(i<3) h+=' <span style="font-size:9px;color:var(--gold);font-weight:700">TOP'+(i+1)+'</span>';
+          h+='</td>';
+          h+='<td style="padding:5px 4px;text-align:right;white-space:nowrap" class="'+chgCls+'">'+(it.chg>0?'+':'')+fmt(it.chg)+'%</td>';
+          h+='<td style="padding:5px 4px;text-align:right;white-space:nowrap;width:45%">';
+          h+='<div style="display:inline-flex;align-items:center;gap:4px;width:100%;justify-content:flex-end">';
+          h+='<div style="flex:1;max-width:70px;height:14px;background:'+barColor+';border-radius:3px;position:relative;overflow:hidden">';
+          h+='<div style="width:'+barW+'%;height:100%;background:'+barFill+';border-radius:3px"></div>';
+          h+='</div>';
+          h+='<span class="'+netCls+'" style="font-weight:600;min-width:52px;text-align:right">'+(it.net>0?'+':'')+fmt(it.net)+'</span>';
+          h+='</div></td></tr>';
+        });
+        h+='</tbody></table>';
+        if(d.note) h+='<div class="note" style="margin-top:8px;font-size:11px;color:var(--dim)">'+esc(d.note)+'</div>';
+        $('conceptRankBody').innerHTML=h;
+        $('conceptRankTime').textContent='更新于 '+rel(d.update_time);
+      }
+      function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+      if(document.readyState==='loading')
+        document.addEventListener('DOMContentLoaded',renderConceptRank);
+      else renderConceptRank();
+    })();
+    </script>
 
     <div class="grid g-2" style="margin-bottom:16px">
       <!-- 上证+深证成交额 -->
