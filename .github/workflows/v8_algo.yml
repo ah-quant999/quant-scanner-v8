@@ -1,13 +1,14 @@
 # 九宝量化 v8.0 — 算法上云（GitHub 云端 ubuntu-latest）
 #
-# 17:00 CST（09:00 UTC）周一至周五。将最新 raw_data 全量重建为 data/*.js（算法产出上云），
+# 17:00 CST（09:00 UTC）每日运行（含周末）。将最新 raw_data 全量重建为 data/*.js（算法产出上云），
 # 与盘中抓取解耦。纯云端执行，不占用本机资源。
+# 2026-07-31: 由周一至周五扩展为每日，阿狸咪周末代班监督。
 
 name: "🧮 v8 算法上云(云端ubuntu)"
 
 on:
   schedule:
-    - cron: '0 9 * * 1-5'   # 17:00 CST 周一至周五
+    - cron: '0 9 * * *'   # 17:00 CST 每日
   workflow_dispatch:
 
 permissions:
