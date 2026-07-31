@@ -9,7 +9,13 @@
 # 数据交接链路：本任务抓完 push raw_data/ → v8_build_deploy 拉取 → update_v8.py 生成
 # data/*.js → push main（GitHub Pages 源即部署）。两任务定时错开 10 分钟保证 raw_data 已落地。
 #
-# 首次使用需在本机注册 label=cn 的自托管 runner（见仓库 HANDOVER 文档）。
+# 运行环境说明（本机 cn runner 已配好）：
+#   - runner 以 NT AUTHORITY\NETWORK SERVICE 运行，无法访问 E:（坚果云 junction）。
+#   - 故 git/Python 工具链全部放在 D: 真实本地盘：
+#       Python: D:\actions-runner-v8\_work\_tool\Python\3.13.14\x64（预装 akshare 1.18.64 + pandas）
+#       Git:    D:\PortableGit\mingw64\bin（由 E: 复制而来，并给 NETWORK SERVICE 授权）
+#   - 上述路径已写入 D:\actions-runner-v8\.env 的 PATH，runner 服务已重启生效。
+#   - shell 统一用 powershell（本机 git-bash 在 service 账户下异常，powershell 稳定）。
 
 name: "🇨🇳 v8 中国数据抓取(cn)"
 
@@ -35,54 +41,45 @@ jobs:
         with:
           fetch-depth: 1
 
-      # 诊断：powershell 探针 + 检查 python/git 是否可达
-      - name: "挂载本机 tool cache Python（预装 akshare/pandas，免境外下载）"
+      - name: "校验 Python / akshare（缺失则走清华镜像安装）"
         shell: powershell
         run: |
-          Write-Host "hello-from-powershell"
-          $py = Get-Command python -ErrorAction SilentlyContinue
-          Write-Host ("python: " + $(if($py){$py.Source}else{"NOT FOUND"}))
-          $git = Get-Command git -ErrorAction SilentlyContinue
-          Write-Host ("git Get-Command: " + $(if($git){$git.Source}else{"NOT FOUND"}))
-          if ($git) { & git --version }
-          if ($py) { & python --version; & python -c "import akshare; print('akshare', akshare.__version__)" }
-
-      - name: "安装 akshare（已装则跳过，走清华镜像避免境外 pypi 超时）"
-        shell: bash
-        run: |
-          if python -c "import akshare, pandas" 2>/dev/null; then
-            echo "✅ akshare/pandas 已就绪，跳过安装"
-            python -c "import akshare; print('akshare', akshare.__version__)"
-          else
-            pip install akshare pandas --quiet -i https://pypi.tuna.tsinghua.edu.cn/simple \
-              || pip install akshare pandas --quiet
-          fi
+          python --version
+          python -c "import akshare, pandas" 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "akshare/pandas 缺失，安装中（清华镜像）..."
+            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple akshare pandas
+          } else {
+            Write-Host "akshare/pandas 已就绪，跳过安装"
+          }
+          python -c "import akshare; print('akshare', akshare.__version__)"
 
       - name: "📡 抓中国数据 → raw_data/（逐模块容错）"
         continue-on-error: true
-        shell: bash
-        run: python cloud_fetch_v8.py
+        shell: powershell
+        run: |
+          python cloud_fetch_v8.py
 
       - name: "📤 push raw_data/ 到 main"
         env:
-          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: powershell
         run: |
+          if (-not (Test-Path raw_data)) { Write-Host "raw_data 未生成，跳过"; exit 0 }
           git config user.name "v8-cn-bot"
           git config user.email "v8-bot@users.noreply.github.com"
           git add -f raw_data/
-          if git diff --cached --quiet; then
-            echo "ℹ️ 无数据变化，跳过提交"
-            exit 0
-          fi
-          git commit -m "v8 cn fetch: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
-          REPO="https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
+          git diff --cached --quiet
+          if ($LASTEXITCODE -eq 0) { Write-Host "ℹ️ 无数据变化，跳过提交"; exit 0 }
+          $msg = "v8 cn fetch: " + (Get-Date -Format 'yyyy-MM-dd HH:mm')
+          git commit -m $msg
+          $repo = "https://x-access-token:$env:GITHUB_TOKEN@github.com/ah-quant999/quant-scanner-v8.git"
           # 与 build_deploy 并发 push 时可能非快进被拒，rebase 重试 3 次
-          for i in 1 2 3; do
-            if git push "$REPO" HEAD:main; then
-              echo "✅ raw_data 已推送（第 $i 次尝试）"; exit 0
-            fi
-            echo "⚠️ push 被拒，rebase 后重试 ($i/3)"
-            git fetch "$REPO" main && git rebase FETCH_HEAD || { git rebase --abort; exit 1; }
-          done
-          echo "❌ 3 次重试后仍失败"; exit 1
+          for ($i=1; $i -le 3; $i++) {
+            if (git push $repo HEAD:main) { Write-Host "✅ raw_data 已推送（第 $i 次尝试）"; exit 0 }
+            Write-Host "⚠️ push 被拒，rebase 后重试 ($i/3)"
+            git fetch $repo main
+            git rebase FETCH_HEAD
+            if ($LASTEXITCODE -ne 0) { git rebase --abort; exit 1 }
+          }
+          Write-Host "❌ 3 次重试后仍失败"; exit 1
