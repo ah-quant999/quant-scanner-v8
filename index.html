@@ -635,14 +635,31 @@
       </div>
     </div>
 
-    <!-- ETF 资金热度（按 4 大类分组的 TOP5流入+TOP5流出，横向 bar 风格） -->
+    <!-- ETF 三合一（盘中异动 + 资金热度 + 日监控，纵向三联） -->
     <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🔥</span>ETF 资金热度 - 实时·T+0 · <span class="fresh" id="etfHeatTime">更新于 --</span></h3>
-      <div id="etfHeatSummary" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;font-size:12px;color:var(--sub)">加载中…</div>
-      <div class="grid g-2" id="etfHeatByCat">
-        <div class="ipo-empty" style="grid-column:1/3">加载中…</div>
+      <h3><span class="ic">💰</span>ETF 三合一 - 盘中异动 + 资金热度 + 日监控 · <span class="fresh" id="phEtfTime">更新于 --</span></h3>
+
+      <!-- Block 1: 盘中异动·量能脉冲 (顶, T+0) -->
+      <div class="sf-block sf-block-hot">
+        <div class="sf-block-title"><span class="sf-block-icon">⚡</span>盘中异动·量能脉冲 <span style="font-size:10px;color:var(--dim)">T+0·5分钟级</span></div>
+        <div id="etfPulseBlock"><div class="ipo-empty">加载中…</div></div>
       </div>
-      <div class="note">按 4 大类独立展示，每类 TOP5 流入 + TOP5 流出（按主力净流入/流出排序，bar 长度=强度）。涨跌幅·红涨绿跌。</div>
+
+      <!-- Block 2: 资金热度·净申赎 (中, T+0) -->
+      <div class="sf-block sf-block-close">
+        <div class="sf-block-title"><span class="sf-block-icon">🔥</span>资金热度·净申赎 <span style="font-size:10px;color:var(--dim)">T+0·宽基申赎</span></div>
+        <div id="etfHeatBlock">
+          <div id="etfHeatSummary" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;font-size:12px;color:var(--sub)">加载中…</div>
+          <div class="grid g-2" id="etfHeatByCat"><div class="ipo-empty" style="grid-column:1/3">加载中…</div></div>
+        </div>
+      </div>
+
+      <!-- Block 3: 日监控·主力净流入 (底, T+1) -->
+      <div class="sf-block sf-block-trend">
+        <div class="sf-block-title"><span class="sf-block-icon">📊</span>日监控·主力净流入 <span style="font-size:10px;color:var(--dim)">T+1·盘后</span></div>
+        <div id="etfDailyBlock"><div class="ipo-empty">加载中…</div></div>
+      </div>
+      <div class="note">盘中异动=ETF 5 分钟量能脉冲异动；资金热度=宽基 ETF 净申赎份额趋势；日监控=全市场 ETF 当日主力净流入排名（需盘后 T+1 更新）。三者维度互补，不构成重复。</div>
     </div>
 
   </section>
@@ -2609,6 +2626,57 @@ function renderLimitUpLadder(){
     setTime('etfHeatTime',etfHeat.update_time);
   }
 
+  /* ---- 5.5 ETF 量能脉冲(盘中异动) / 日监控 渲染 ---- */
+  function renderEtfPulse(pulse){
+    var el=document.getElementById('etfPulseBlock');
+    if(!el) return;
+    if(!pulse||!pulse.etfs||!pulse.etfs.length){
+      el.innerHTML='<div class="ipo-empty">⏳ 盘中量能脉冲数据尚未生成（开盘后才会产生 5 分钟级数据）</div>';
+      return;
+    }
+    var h='<div style="padding:8px 4px;">';
+    pulse.etfs.slice(0,6).forEach(function(e){
+      var s=e.slices||[], first=s[0]||0, last=s[s.length-1]||0;
+      var grow=last-first, pct=first?(grow/first*100).toFixed(1):'0.0';
+      var color=grow>=0?'var(--up)':'var(--down)';
+      var maxv=Math.max.apply(null,s)||1, minv=Math.min.apply(null,s), range=(maxv-minv)||1;
+      var bars=s.map(function(v){
+        var w=((v-minv)/range*100).toFixed(0);
+        return '<span style="display:inline-block;width:5px;height:'+(10+parseFloat(w)*0.4).toFixed(0)+'px;background:'+(v>=last?'#f4495d':'rgba(244,73,93,.45)')+';margin:0 1px;vertical-align:bottom;border-radius:1px;"></span>';
+      }).join('');
+      h+='<div style="margin-bottom:8px;padding:6px 8px;background:var(--card2);border:1px solid var(--border);border-radius:8px;">';
+      h+='<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span style="font-weight:600;">'+e.name+' <span style="color:var(--sub);font-size:10px;">'+e.code+'</span></span><span style="color:'+color+';font-weight:700;">'+(grow>=0?'+':'')+pct+'%</span></div>';
+      h+='<div style="display:flex;align-items:flex-end;height:32px;margin-bottom:3px;">'+bars+'</div>';
+      if(e.read) h+='<div style="font-size:10px;color:var(--dim);line-height:1.4;">'+e.read+'</div>';
+      h+='</div>';
+    });
+    h+='</div>';
+    el.innerHTML=h;
+    if(pulse.update_time) setTime('phEtfTime',pulse.update_time);
+  }
+
+  function renderEtfDaily(daily){
+    var el=document.getElementById('etfDailyBlock');
+    if(!el) return;
+    if(!daily||daily.no_data||!daily.top_inflow){
+      el.innerHTML='<div class="ipo-empty">⏳ 日监控数据尚未接入（盘后 T+1 由 fund_etf_spot_em 抓取主力净流入排名后填充）</div>';
+      return;
+    }
+    var h='<div style="padding:8px 4px;">';
+    h+='<div style="font-size:11px;color:var(--sub);margin-bottom:6px;">全市场净流入：<span style="color:'+(daily.total_net>=0?'var(--up)':'var(--down)')+';font-weight:700;">'+(daily.total_net>=0?'+':'')+(daily.total_net/1e4).toFixed(0)+'万</span> · 覆盖 '+(daily.total_etf||0)+' 只</div>';
+    h+='<div style="font-weight:700;font-size:11px;color:var(--up);margin:6px 0 3px;">TOP5 主力净流入</div>';
+    (daily.top_inflow||[]).slice(0,5).forEach(function(x){
+      h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px dashed var(--border);"><span>'+x.name+'</span><span style="color:var(--up);font-weight:700;">+'+(x.net/1e4).toFixed(0)+'万</span></div>';
+    });
+    h+='<div style="font-weight:700;font-size:11px;color:var(--down);margin:6px 0 3px;">TOP5 主力净流出</div>';
+    (daily.top_outflow||[]).slice(0,5).forEach(function(x){
+      h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px dashed var(--border);"><span>'+x.name+'</span><span style="color:var(--down);font-weight:700;">'+(x.net/1e4).toFixed(0)+'万</span></div>';
+    });
+    h+='</div>';
+    el.innerHTML=h;
+    if(daily.update_time) setTime('phEtfTime',daily.update_time);
+  }
+
   /* ---- 6. 宏观观测 ---- */
   function renderMacro(m){
     const mo=m.monetary||{},gl=m.global_macro||{},ec=m.economy||{},se=m.market_sentiment||{};
@@ -3971,6 +4039,11 @@ function renderLimitUpLadder(){
 
     /* ═══ 11. ETF 资金热度（4 大类 TOP5流入+TOP5流出·横向 bar） ═══ */
     if(etfHeat) renderEtfHeatByCategory(etfHeat);
+    /* ═══ 11.5 ETF 三合一（盘中异动·资金热度·日监控 三联，直接读 window.X 注入变量） ═══ */
+    var etfPulse=window.ETF_PULSE||null;
+    if(etfPulse) renderEtfPulse(etfPulse);
+    var etfDaily=window.ETF_DAILY_MONITOR||null;
+    if(etfDaily) renderEtfDaily(etfDaily);
 
     el.innerHTML=h;
   }
