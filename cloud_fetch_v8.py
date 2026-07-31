@@ -48,6 +48,7 @@ VAR_TO_RAW = {
     "ANALYST_RATINGS": "analyst_ratings.json",
     "INDEX_QUOTES": "index_quotes.json",
     "EXPERIMENT": "experiment.json",
+    "V8_CAL": "v8_cal.json",
 }
 
 _ak = None
@@ -771,6 +772,180 @@ def f_experiment():
     }
 
 
+def f_v8_cal(today=None):
+    """重要事件日历：自动生成【当前月】日历。
+    - 自动切月：永远渲染「今天所在月」，8/1 起自然显示 8 月。
+    - 自动标今天：today 高亮每天动态算。
+    - 规则事件自动算：股指期货/ETF期权交割(第3周五/第4周三)、LPR(20日)、A50交割(倒数第2工作日)、
+      FOMC(2026年度表)、中国宏观数据日(PMI/CPI/工业增加值，约)、港股/美股休市(2026假期表)。
+    - 手工事件：合并 calendar_seed.json（公司财报等一次性事件，owner 维护）。
+    随 cloud_fetch 每日定时抓取运行 → 自动切月 + 每周刷新。
+    today 参数仅用于测试（默认取系统当天）。
+    """
+    import calendar as _cal
+    from datetime import date
+    today = today or date.today()
+    y, m = today.year, today.month
+    last_day = _cal.monthrange(y, m)[1]
+
+    # 2026 港股/美股休市（手工维护，需每年更新；仅供参考）
+    HK_HOLIDAYS_2026 = {
+        (2026,1,1):"元旦", (2026,2,17):"农历新年", (2026,2,18):"农历新年", (2026,2,19):"农历新年",
+        (2026,4,3):"耶稣受难节", (2026,4,6):"复活节星期一", (2026,5,1):"劳动节",
+        (2026,5,25):"佛诞", (2026,6,19):"端午节", (2026,7,1):"香港回归纪念日",
+        (2026,9,25):"中秋节", (2026,10,1):"国庆日", (2026,10,19):"重阳节",
+        (2026,12,25):"圣诞节", (2026,12,26):"圣诞节翌日",
+    }
+    US_HOLIDAYS_2026 = {
+        (2026,1,1):"元旦", (2026,1,19):"马丁路德金日", (2026,2,16):"总统日",
+        (2026,4,3):"耶稣受难节", (2026,5,25):"阵亡将士纪念日", (2026,6,19):"六月节",
+        (2026,9,7):"劳动节", (2026,11,26):"感恩节", (2026,12,25):"圣诞节",
+    }
+    # FOMC 2026 议息会议（月, 第1天, 决议日）
+    FOMC_2026 = [(1,27,28),(3,17,18),(4,28,29),(6,9,10),(7,28,29),(9,15,16),(10,27,28),(12,15,16)]
+
+    def nth_weekday(yy, mm, n, wd):
+        d = date(yy, mm, 1)
+        off = (wd - d.weekday()) % 7
+        return d + timedelta(days=off + 7 * (n - 1))
+
+    def last_weekday(yy, mm, n_from_end):
+        d = date(yy, mm, _cal.monthrange(yy, mm)[1])
+        cnt = 0
+        while True:
+            if d.weekday() < 5:
+                cnt += 1
+                if cnt == n_from_end:
+                    return d
+            d -= timedelta(days=1)
+
+    def shift_weekend(d):
+        while d.weekday() >= 5:
+            d += timedelta(days=1)
+        return d
+
+    ev = {}
+    def add(day, text, cls, released=None):
+        if 1 <= day <= last_day:
+            rel = (day < today.day) if released is None else bool(released)
+            ev.setdefault(day, []).append({"text": text, "cls": cls, "released": rel})
+
+    # 期货/期权交割（每月第3周五）
+    d3 = nth_weekday(y, m, 3, 4)
+    if (d3.year, d3.month) == (y, m):
+        add(d3.day, "中金所IF/IH/IC/IM股指期货交割", "future")
+        add(d3.day, "中金所股指期权到期", "option")
+    # ETF期权（每月第4周三）
+    d4 = nth_weekday(y, m, 4, 2)
+    if (d4.year, d4.month) == (y, m):
+        add(d4.day, "上交所/深交所ETF期权最后交易日", "option")
+    # LPR（每月20日，周末顺延）
+    dl = shift_weekend(date(y, m, 20))
+    if dl.month == m:
+        add(dl.day, "LPR利率报价（1年/5年以上）", "cb")
+    # 富时A50交割（每月倒数第2工作日）
+    da = last_weekday(y, m, 2)
+    if da.month == m:
+        add(da.day, "富时A50交割日", "a50")
+    # FOMC
+    for (fm, d1, d2) in FOMC_2026:
+        if fm == m:
+            add(d1, "🇺🇸 FOMC议息会议第1天", "fomc")
+            add(d2, "🇺🇸 FOMC利率决议", "fomc")
+    # 宏观数据日（约）
+    dc = shift_weekend(date(y, m, 1))
+    if dc.month == m:
+        add(dc.day, "🇨🇳 财新制造业PMI", "data")
+    dp = shift_weekend(date(y, m, 10))
+    if dp.month == m:
+        add(dp.day, "🇨🇳 CPI/PPI数据", "data2")
+    dg = shift_weekend(date(y, m, 15))
+    if dg.month == m:
+        add(dg.day, "🇨🇳 工业增加值/社零/固投", "data")
+    dpm = last_weekday(y, m, 1)
+    if dpm.month == m:
+        add(dpm.day, "🇨🇳 官方制造业PMI", "data")
+    # 港股/美股休市
+    for (yy, mm2, dd), name in HK_HOLIDAYS_2026.items():
+        if (yy, mm2) == (y, m):
+            add(dd, f"🇭🇰 港股休市（{name}）", "hk")
+    for (yy, mm2, dd), name in US_HOLIDAYS_2026.items():
+        if (yy, mm2) == (y, m):
+            add(dd, f"🇺🇸 美股休市（{name}）", "us")
+
+    # 合并 seed（手工一次性事件）
+    seed_path = ROOT / "calendar_seed.json"
+    if seed_path.exists():
+        try:
+            seed = json.loads(seed_path.read_text(encoding="utf-8"))
+            items = seed.get("events", seed) if isinstance(seed, dict) else seed
+            for item in items:
+                ds = str(item.get("date", ""))
+                try:
+                    yy, mm2, dd = map(int, ds.split("-"))
+                except Exception:
+                    continue
+                if (yy, mm2) == (y, m):
+                    add(dd, item.get("text", ""), item.get("cls", "data"), item.get("released", False))
+        except Exception as e:
+            print(f"    ⚠️ calendar_seed.json 解析失败: {e}")
+
+    # 构建周网格（周一对齐，覆盖整月）
+    first = date(y, m, 1)
+    grid_start = first - timedelta(days=first.weekday())
+    weeks = []
+    cur = grid_start
+    wno = 1
+    while cur <= date(y, m, last_day):
+        days = []
+        for i in range(7):
+            d = cur + timedelta(days=i)
+            dim = (d.month != m)
+            days.append({
+                "num": d.day,
+                "dim": dim,
+                "today": (d == today),
+                "events": ev.get(d.day, []) if not dim else [],
+            })
+        wk_end = cur + timedelta(days=6)
+        weeks.append({
+            "no": str(wno),
+            "dates": f"{cur.month}/{cur.day}-{wk_end.month}/{wk_end.day}",
+            "days": days,
+        })
+        cur += timedelta(days=7)
+        wno += 1
+
+    legend = [
+        {"title":"重要政策","color":"#c62828","desc":"中国政府/监管机构发布的重大政策、法规、规划等"},
+        {"title":"央行/LPR","color":"#1565c0","desc":"央行货币政策、利率决议、LPR报价等"},
+        {"title":"中国数据","color":"#f57f17","desc":"国家统计局/央行发布的宏观经济数据"},
+        {"title":"财报截止","color":"#673ab7","desc":"A股财报披露法定截止日"},
+        {"title":"期权交割","color":"#00838f","desc":"各交易所期权合约到期日"},
+        {"title":"期货交割","color":"#1d6f42","desc":"期货合约最后交易日"},
+        {"title":"A50交割","color":"#e91e63","desc":"新加坡富时A50期货交割日，外资对冲A股关键窗口"},
+        {"title":"港股休市","color":"#ef5350","desc":"香港交易所休市日"},
+        {"title":"台股财报","color":"#ff9800","desc":"台股关注股票"},
+        {"title":"苹果/华为","color":"#37474f","desc":"两大科技巨头新品发布/重要财报"},
+        {"title":"FOMC","color":"#9c27b0","desc":"美联储货币政策会议"},
+        {"title":"美股休市","color":"#42a5f5","desc":"NYSE/Nasdaq休市日"},
+        {"title":"美股财报","color":"#66bb6a","desc":"美股关注股票"},
+        {"title":"欧股财报","color":"#26a69a","desc":"欧股关注股票"},
+        {"title":"日股财报","color":"#ab47bc","desc":"日股关注股票"},
+        {"title":"韩股财报","color":"#00acc1","desc":"韩股关注股票"},
+        {"title":"SG公假","color":"#8e24aa","desc":"新加坡公共假期"},
+        {"title":"财新PMI","color":"#5c6bc0","desc":"财新PMI月度数据"},
+    ]
+
+    print(f"    日历: {y}年{m}月, {len(weeks)}周, 事件日 {len(ev)} 天")
+    return {
+        "month": f"{y}年{m}月",
+        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "legend": legend,
+        "weeks": weeks,
+    }
+
+
 def main():
     print(f"=== v8 云端抓取开始 {datetime.now().isoformat(timespec='seconds')} ===")
     run("ETF_INTRADAY_HEAT", f_etf_intraday_heat)
@@ -794,6 +969,7 @@ def main():
     run("ETF_DAILY_MONITOR", f_etf_daily_monitor)
     run("ANALYST_RATINGS", f_analyst_ratings)
     run("EXPERIMENT", f_experiment)
+    run("V8_CAL", f_v8_cal)
     print(f"=== v8 云端抓取结束 {datetime.now().isoformat(timespec='seconds')} ===")
     print(f"raw_data/ 文件数: {len(list(RAW_DIR.glob('*.json')))}")
     return 0

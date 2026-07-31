@@ -1,0 +1,8 @@
+{
+  "_说明": "手工维护的一次性日历事件（公司财报/重大政策/活动日等）。程序每月自动渲染「当前月」时，会合并本文件里落在当月的事件。日期格式 YYYY-MM-DD。cls 用现有色块：imp(重要政策)/cb(央行LPR)/data(中国数据)/data2/us(美股)/hk(港股)/fomc/appl(苹果华为)/ipo/option(期权交割)/future(期货交割)/a50/kr(韩股)/tw(台股)/sg。released=true 显示「✅已发」标记。",
+  "_template": {"date": "2026-08-15", "text": "示例：某公司Q2财报", "cls": "us", "released": false},
+  "events": [
+    {"date": "2026-09-15", "text": "🇺🇸 FOMC议息会议第1天（seed补充，防规则表遗漏）", "cls": "fomc", "released": false},
+    {"date": "2026-09-16", "text": "🇺🇸 FOMC利率决议", "cls": "fomc", "released": false}
+  ]
+}
