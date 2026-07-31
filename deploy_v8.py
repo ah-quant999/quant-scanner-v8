@@ -57,6 +57,7 @@ def deploy():
         import re as _re
         _origin_html = open(os.path.join(tmp, "index.html"), encoding="utf-8").read()
         _origin_secs = set(_re.findall(r'data-sec="([^"]+)"', _origin_html))
+        _origin_secs |= set(_re.findall(r'data-lg="([^"]+)"', _origin_html))
 
         shutil.copy2(os.path.join(REPO, "index.html"), os.path.join(tmp, "index.html"))
         src_data = os.path.join(REPO, "data")
@@ -71,6 +72,7 @@ def deploy():
         # 护栏：若本地 index.html 缺少 origin 已有的板块（如 v6备忘录），中止部署，避免冲掉他人/历史内容
         _local_html = open(os.path.join(tmp, "index.html"), encoding="utf-8").read()
         _local_secs = set(_re.findall(r'data-sec="([^"]+)"', _local_html))
+        _local_secs |= set(_re.findall(r'data-lg="([^"]+)"', _local_html))
         _dropped = _origin_secs - _local_secs
         if _dropped:
             log(f"⚠️ 部署中止：本地 index.html 缺少 origin 已有板块 {sorted(_dropped)}，会覆盖掉既有内容。请先 'git pull' 同步后再部署。")
