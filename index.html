@@ -2630,24 +2630,24 @@ function renderLimitUpLadder(){
   function renderEtfPulse(pulse){
     var el=document.getElementById('etfPulseBlock');
     if(!el) return;
-    if(!pulse||!pulse.etfs||!pulse.etfs.length){
-      el.innerHTML='<div class="ipo-empty">⏳ 盘中量能脉冲数据尚未生成（开盘后才会产生 5 分钟级数据）</div>';
+    if(!pulse||pulse.no_data||!pulse.etfs||!pulse.etfs.length){
+      var msg=(pulse&&pulse.note)?pulse.note:'盘中异动数据尚未生成';
+      el.innerHTML='<div class="ipo-empty">⏳ '+msg+'</div>';
+      if(pulse&&pulse.update_time) setTime('phEtfTime',pulse.update_time);
       return;
     }
     var h='<div style="padding:8px 4px;">';
-    pulse.etfs.slice(0,6).forEach(function(e){
-      var s=e.slices||[], first=s[0]||0, last=s[s.length-1]||0;
-      var grow=last-first, pct=first?(grow/first*100).toFixed(1):'0.0';
-      var color=grow>=0?'var(--up)':'var(--down)';
-      var maxv=Math.max.apply(null,s)||1, minv=Math.min.apply(null,s), range=(maxv-minv)||1;
-      var bars=s.map(function(v){
-        var w=((v-minv)/range*100).toFixed(0);
-        return '<span style="display:inline-block;width:5px;height:'+(10+parseFloat(w)*0.4).toFixed(0)+'px;background:'+(v>=last?'#f4495d':'rgba(244,73,93,.45)')+';margin:0 1px;vertical-align:bottom;border-radius:1px;"></span>';
-      }).join('');
-      h+='<div style="margin-bottom:8px;padding:6px 8px;background:var(--card2);border:1px solid var(--border);border-radius:8px;">';
-      h+='<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span style="font-weight:600;">'+e.name+' <span style="color:var(--sub);font-size:10px;">'+e.code+'</span></span><span style="color:'+color+';font-weight:700;">'+(grow>=0?'+':'')+pct+'%</span></div>';
-      h+='<div style="display:flex;align-items:flex-end;height:32px;margin-bottom:3px;">'+bars+'</div>';
-      if(e.read) h+='<div style="font-size:10px;color:var(--dim);line-height:1.4;">'+e.read+'</div>';
+    if(pulse.note) h+='<div style="font-size:10px;color:var(--dim);margin-bottom:6px;">'+pulse.note+'</div>';
+    pulse.etfs.slice(0,12).forEach(function(e){
+      var c=e.chg>=0?'var(--up)':'var(--down)';
+      var arrow=e.chg>=0?'▲':'▼';
+      var volColor=e.vol>=2?'#f4495d':(e.vol>=1.5?'#f59e0b':'var(--sub)');
+      var amtY=(e.amount/1e8).toFixed(1)+'亿';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 8px;margin-bottom:4px;background:var(--card2);border:1px solid var(--border);border-radius:7px;font-size:12px;">';
+      h+='<span style="font-weight:600;">'+e.name+' <span style="color:var(--sub);font-size:10px;">'+e.code+'</span></span>';
+      h+='<span style="color:'+c+';font-weight:700;">'+arrow+' '+Math.abs(e.chg).toFixed(2)+'%</span>';
+      h+='<span style="color:'+volColor+';font-weight:700;">量比 '+e.vol.toFixed(2)+'</span>';
+      h+='<span style="color:var(--sub);font-size:10px;">'+amtY+'</span>';
       h+='</div>';
     });
     h+='</div>';
@@ -2659,7 +2659,9 @@ function renderLimitUpLadder(){
     var el=document.getElementById('etfDailyBlock');
     if(!el) return;
     if(!daily||daily.no_data||!daily.top_inflow){
-      el.innerHTML='<div class="ipo-empty">⏳ 日监控数据尚未接入（盘后 T+1 由 fund_etf_spot_em 抓取主力净流入排名后填充）</div>';
+      var dmsg=(daily&&daily.note)?daily.note:'日监控数据尚未生成，盘后 T+1 自动更新';
+      el.innerHTML='<div class="ipo-empty">⏳ '+dmsg+'</div>';
+      if(daily&&daily.update_time) setTime('phEtfTime',daily.update_time);
       return;
     }
     var h='<div style="padding:8px 4px;">';

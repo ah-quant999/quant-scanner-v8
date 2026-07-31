@@ -1,0 +1,70 @@
+# 九宝量化 v8.0 — 中国数据抓取（自托管 cn runner，仅此一步在中国机器跑）
+#
+# ⚠️ 为什么只在 cn runner 跑：cloud_fetch_v8.py 调 akshare 抓 A 股数据源（东方财富/新浪/
+# 中国接口），GitHub 官方 runner 在美国会被 60s 超时。所以「抓取」必须在本机(cn)执行。
+#
+# 其余全部上云：update_v8 转换 + deploy 部署 + 算法 + 清理 都交给 ubuntu-latest（见
+# v8_build_deploy.yml / v8_algo.yml / v8_cleanup.yml），不占用本机资源，省 token。
+#
+# 数据交接链路：本任务抓完 push raw_data/ → v8_build_deploy 拉取 → update_v8.py 生成
+# data/*.js → push main（GitHub Pages 源即部署）。两任务定时错开 10 分钟保证 raw_data 已落地。
+#
+# 首次使用需在本机注册 label=cn 的自托管 runner（见仓库 HANDOVER 文档）。
+
+name: "🇨🇳 v8 中国数据抓取(cn)"
+
+on:
+  schedule:
+    - cron: '25 0 * * *'    # 08:25 CST 盘前
+    - cron: '30 2 * * *'    # 10:30 CST
+    - cron: '30 3 * * *'    # 11:30 CST
+    - cron: '0 6 * * *'     # 14:00 CST
+    - cron: '5 7 * * *'     # 15:05 CST
+    - cron: '30 8 * * *'    # 16:30 CST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: [self-hosted, cn]
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: "安装 akshare"
+        run: pip install akshare --quiet 2>/dev/null || pip install akshare
+
+      - name: "📡 抓中国数据 → raw_data/（逐模块容错）"
+        continue-on-error: true
+        run: python cloud_fetch_v8.py
+
+      - name: "📤 push raw_data/ 到 main"
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "v8-cn-bot"
+          git config user.email "v8-bot@users.noreply.github.com"
+          git add -f raw_data/
+          if git diff --cached --quiet; then
+            echo "ℹ️ 无数据变化，跳过提交"
+            exit 0
+          fi
+          git commit -m "v8 cn fetch: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
+          REPO="https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
+          # 与 build_deploy 并发 push 时可能非快进被拒，rebase 重试 3 次
+          for i in 1 2 3; do
+            if git push "$REPO" HEAD:main; then
+              echo "✅ raw_data 已推送（第 $i 次尝试）"; exit 0
+            fi
+            echo "⚠️ push 被拒，rebase 后重试 ($i/3)"
+            git fetch "$REPO" main && git rebase FETCH_HEAD || { git rebase --abort; exit 1; }
+          done
+          echo "❌ 3 次重试后仍失败"; exit 1

@@ -1,0 +1,59 @@
+# 九宝量化 v8.0 — 构建 + 部署（GitHub 云端 ubuntu-latest）
+#
+# 纯云端执行：拉取 cn runner 已推送的 raw_data/ → update_v8.py 转 data/*.js → push main
+# （main 即 GitHub Pages 源，push 即部署）。不依赖中国 IP，放 ubuntu-latest 省本机 token。
+# 定时比 v8_cn_fetch 错后 10 分钟，确保 raw_data 已落地。
+
+name: "☁️ v8 构建部署(云端ubuntu)"
+
+on:
+  schedule:
+    - cron: '35 0 * * *'    # 08:35 CST
+    - cron: '40 2 * * *'    # 10:40 CST
+    - cron: '40 3 * * *'    # 11:40 CST
+    - cron: '10 6 * * *'    # 14:10 CST
+    - cron: '15 7 * * *'    # 15:15 CST
+    - cron: '40 8 * * *'    # 16:40 CST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: "🏗️ 构建 data/*.js（raw_data → data/*.js，纯 JSON 转换，无需 akshare）"
+        run: python update_v8.py
+
+      - name: "📤 部署到 main（GitHub Pages 源）"
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "v8-cloud-bot"
+          git config user.email "v8-bot@users.noreply.github.com"
+          git add -f data/
+          if git diff --cached --quiet; then
+            echo "ℹ️ 无数据变化，跳过部署"
+            exit 0
+          fi
+          git commit -m "v8 build: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
+          REPO="https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
+          # 与 cn_fetch 并发 push 时可能非快进被拒，rebase 重试 3 次
+          for i in 1 2 3; do
+            if git push "$REPO" HEAD:main; then
+              echo "✅ 已部署 main（第 $i 次尝试，GitHub Pages 自动重建）"; exit 0
+            fi
+            echo "⚠️ push 被拒，rebase 后重试 ($i/3)"
+            git fetch "$REPO" main && git rebase FETCH_HEAD || { git rebase --abort; exit 1; }
+          done
+          echo "❌ 3 次重试后仍失败"; exit 1

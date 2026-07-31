@@ -1,0 +1,6 @@
+# workflow 里的多行 bash 脚本在 ubuntu-latest runner 上执行，
+# 若被 Windows 端 checkout 成 CRLF 会导致 `\r` 混入命令而报错，故强制 LF。
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sh  text eol=lf
+*.py  text eol=lf
