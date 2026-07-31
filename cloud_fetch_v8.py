@@ -45,6 +45,7 @@ VAR_TO_RAW = {
     "W52_HIGH": "w52_high.json",
     "ETF_PULSE": "etf_pulse.json",
     "ETF_DAILY_MONITOR": "etf_daily_monitor.json",
+    "ANALYST_RATINGS": "analyst_ratings.json",
 }
 
 _ak = None
@@ -516,6 +517,80 @@ def f_etf_pulse():
     return {"etfs": etfs, "note": note}
 
 
+def f_analyst_ratings():
+    """分析师评级：akshare stock_analyst_rank_em（东财分析师排名 + 最新推荐个股）。
+    输出结构兼容 update_v8.py 的 ANALYST_RATINGS 转换：
+    {hot_stocks, latest_reports, upgrades, downgrades, new_coverage}"""
+    ak = get_ak()
+    result = {"hot_stocks": [], "latest_reports": [], "upgrades": [], "downgrades": [], "new_coverage": []}
+    year = datetime.now().year
+
+    # ① 分析师年度排名 → 提取 TOP 分析师最新推荐个股作为"热门"
+    try:
+        df = ak.stock_analyst_rank_em(year=str(year))
+        if df is not None and len(df) > 0:
+            cols = list(df.columns)
+            # 动态匹配年份前缀的列名
+            code_col = next((c for c in cols if "股票代码" in c), "")
+            name_col = next((c for c in cols if "股票名称" in c), "")
+            if not code_col:
+                print("    ⚠️ 分析师排名: 未找到股票代码列")
+            else:
+                seen = set()
+                for _, row in df.head(30).iterrows():
+                    code = str(row.get(code_col, "")).strip()
+                    name = str(row.get(name_col, "")).strip()
+                    analyst = str(row.get("分析师名称", "") or "")
+                    firm = str(row.get("分析师单位", "") or "")
+                    idx_val = row.get("年度指数")
+                    ret_12m = row.get("12个月收益率")
+                    if not code or code in seen or code == "nan":
+                        continue
+                    seen.add(code)
+                    entry = {
+                        "code": code, "name": name,
+                        "rating": f"TOP分析师推荐({analyst}/{firm})",
+                        "report_count_1m": 1,
+                        "date": datetime.now().strftime("%Y-%m-%d"),
+                        "org": firm,
+                        "analyst": analyst,
+                        "annual_index": idx_val,
+                        "ret_12m": ret_12m,
+                    }
+                    result["hot_stocks"].append(entry)
+                    result["latest_reports"].append(entry)
+                print(f"    分析师排名: 获取 {len(result['hot_stocks'])} 只推荐股")
+    except Exception as e:
+        print(f"    ⚠️ 分析师排名获取失败: {e}")
+
+    # ② 尝试获取个股研报明细（补充，失败不阻塞）
+    try:
+        # 取 hot_stocks 前 5 只的研报
+        top_codes = [s["code"] for s in result["hot_stocks"][:5]]
+        for code in top_codes[:3]:  # 限 3 只防超时
+            try:
+                rdf = ak.stock_research_report_em(symbol=code)
+                if rdf is not None and len(rdf) > 0:
+                    stock_name = next((s["name"] for s in result["hot_stocks"] if s["code"] == code), "")
+                    for _, rrow in rdf.head(2).iterrows():
+                        title = str(rrow.get("标题", ""))[:40]
+                        result["new_coverage"].append({
+                            "code": code,
+                            "name": stock_name,
+                            "rating": "研报覆盖",
+                            "report_count_1m": 1,
+                            "date": str(rrow.get("发布日期", ""))[:10] if pd.notna(rrow.get("发布日期")) else "",
+                            "title": title,
+                        })
+            except Exception:
+                pass
+        print(f"    研报明细: 补充 {len(result['new_coverage'])} 条")
+    except Exception as e:
+        print(f"    ⚠️ 研报明细跳过: {e}")
+
+    return result
+
+
 def main():
     print(f"=== v8 云端抓取开始 {datetime.now().isoformat(timespec='seconds')} ===")
     run("ETF_INTRADAY_HEAT", f_etf_intraday_heat)
@@ -536,6 +611,7 @@ def main():
     run("W52_HIGH", f_w52_high)
     run("ETF_PULSE", f_etf_pulse)
     run("ETF_DAILY_MONITOR", f_etf_daily_monitor)
+    run("ANALYST_RATINGS", f_analyst_ratings)
     print(f"=== v8 云端抓取结束 {datetime.now().isoformat(timespec='seconds')} ===")
     print(f"raw_data/ 文件数: {len(list(RAW_DIR.glob('*.json')))}")
     return 0
