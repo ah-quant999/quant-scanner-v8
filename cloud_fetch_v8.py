@@ -258,8 +258,8 @@ def f_macro_data():
     return out
 
 def f_crisis_data():
-    # 危机雷达：国内经济维度(PMI)真实接入；货币/全球维度因外国数据源(CN网络不可达)
-    # 暂用保守估值，待补充代理源（如美元人民币、离岸流动性）。
+    # 危机雷达：三个维度尽量用真实数据
+    # 经济维度：中国 PMI（真实）
     economy = None
     try:
         pmi = get_ak().macro_china_pmi_yearly()
@@ -272,12 +272,51 @@ def f_crisis_data():
                 economy = float(v)
     except Exception:
         economy = None
+
+    # 货币维度：中国银行美元汇率（真实，替代估值）
+    # 逻辑：USD/CNY 中间价偏离 7.0 基线的程度 → 货币压力分
+    currency_score = 0.30  # 默认保守值
+    usd_cny_latest = None
+    try:
+        boc = get_ak().currency_boc_safe()
+        if boc is not None and not boc.empty:
+            # 取最近有数据的美元列
+            usd_col = next((c for c in boc.columns if c == "美元"), None)
+            if usd_col:
+                # 倒序找最新非空值
+                for val in boc[usd_col].iloc[::-1]:
+                    if pd.notna(val) and float(val) > 0:
+                        usd_cny_latest = float(val)
+                        break
+                if usd_cny_latest:
+                    # BOC 汇率单位为"每100外币"，需除以 100
+                    usd_cny_latest = round(usd_cny_latest / 100.0, 4)
+                    # 归一化：7.0=健康(0.2), 7.3=警戒(0.5), 7.5+=危险(0.8+)
+                    if usd_cny_latest < 6.9:
+                        currency_score = 0.15  # 强势人民币
+                    elif usd_cny_latest < 7.1:
+                        currency_score = 0.25  # 正常偏强
+                    elif usd_cny_latest < 7.25:
+                        currency_score = 0.40  # 正常区间
+                    elif usd_cny_latest < 7.35:
+                        currency_score = 0.55  # 有贬值压力
+                    else:
+                        currency_score = min(0.85, 0.55 + (usd_cny_latest - 7.35) * 0.3)
+    except Exception as e:
+        print(f"    ⚠️ 汇率数据获取失败: {e}")
+
+    # 全球维度：仍用保守估值（CN 网络难达 VIX/美债等实时源），但标注更清晰
+    global_score = 0.40  # 中性
+
     return {
-        "currency": 0.30,
+        "currency": round(currency_score, 3),
         "economy": (round(economy / 100.0, 3) if economy else 0.50),
-        "global": 0.40,
+        "global": round(global_score, 3),
         "pmi_value": economy,
-        "note": "经济维度=中国PMI真实值；货币/全球维度因外国数据源(CN网络不可达)暂保守估值，待补代理源",
+        "usd_cny": usd_cny_latest,
+        "note": f"经济维度=中国PMI真实值({economy or 'N/A'})；"
+               f"货币维度=中国银行USD/CNY中间价({usd_cny_latest or 'N/A'})；"
+               f"全球维度因VIX/美债等源CN不可达暂用中性估值",
     }
 
 def f_volatility():
