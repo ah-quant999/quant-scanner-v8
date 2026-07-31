@@ -553,6 +553,26 @@
     })();
     </script>
 
+    <div class="grid g-2" style="margin-bottom:16px">
+      <!-- 上证+深证成交额 -->
+      <div class="card">
+        <h3><span class="ic">📈</span>上证+深证 每日成交金额（亿元） - 短线盘中 · <span class="fresh" id="amountUpdateTime">更新于 今日 15:21</span></h3>
+        <div id="amountChartContainer" style="width:100%;height:260px;position:relative;overflow:visible;">
+          <svg id="amountChart" width="100%" height="260" style="overflow:visible;" overflow="visible"></svg>
+        </div>
+        <div class="note" id="amountNote" style="margin-top:10px;line-height:1.7">今日两市合计 -- 亿元，较前日 --%，--。</div>
+      </div>
+
+      <!-- 近一月涨跌家数统计 -->
+      <div class="card">
+        <h3><span class="ic">🏘️</span>近一月 涨跌家数统计 - 盘中实时 · <span class="fresh" id="upDownUpdateTime">更新于 今日 15:21</span></h3>
+        <div id="upDownChartContainer" style="width:100%;height:260px;position:relative;overflow:visible;">
+          <svg id="upDownChart" width="100%" height="260" style="overflow:visible;" overflow="visible"></svg>
+        </div>
+        <div class="note" id="upDownNote">红=上涨家数，绿=下跌家数，灰=平盘。今日涨 -- / 跌 -- / 平 --。</div>
+      </div>
+    </div>
+
     <!-- 概念资金热力图（treemap · 真实数据：CONCEPT_RANKING.js） -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">🗺️</span>概念资金热力图 · 大小=净流入 · 颜色=涨跌 · <span class="fresh" id="conceptMapTime">更新于 --</span></h3>
@@ -613,26 +633,6 @@
     })();
     </script>
 
-    <div class="grid g-2" style="margin-bottom:16px">
-      <!-- 上证+深证成交额 -->
-      <div class="card">
-        <h3><span class="ic">📈</span>上证+深证 每日成交金额（亿元） - 短线盘中 · <span class="fresh" id="amountUpdateTime">更新于 今日 15:21</span></h3>
-        <div id="amountChartContainer" style="width:100%;height:260px;position:relative;overflow:visible;">
-          <svg id="amountChart" width="100%" height="260" style="overflow:visible;" overflow="visible"></svg>
-        </div>
-        <div class="note" id="amountNote" style="margin-top:10px;line-height:1.7">今日两市合计 -- 亿元，较前日 --%，--。</div>
-      </div>
-
-      <!-- 近一月涨跌家数统计 -->
-      <div class="card">
-        <h3><span class="ic">🏘️</span>近一月 涨跌家数统计 - 盘中实时 · <span class="fresh" id="upDownUpdateTime">更新于 今日 15:21</span></h3>
-        <div id="upDownChartContainer" style="width:100%;height:260px;position:relative;overflow:visible;">
-          <svg id="upDownChart" width="100%" height="260" style="overflow:visible;" overflow="visible"></svg>
-        </div>
-        <div class="note" id="upDownNote">红=上涨家数，绿=下跌家数，灰=平盘。今日涨 -- / 跌 -- / 平 --。</div>
-      </div>
-    </div>
-
     <!-- 涨停热力矩阵（整行宽度） -->
     <div class="card" id="limitUpHeatCard" style="margin-bottom:16px">
       <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近10日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">更新于 --</span></h3>
@@ -664,6 +664,7 @@
         <div class="sf-block-title"><span class="sf-block-icon">📊</span>日监控·主力净流入 <span style="font-size:10px;color:var(--dim)">T+1·盘后</span></div>
         <div id="etfDailyBlock"><div class="ipo-empty">加载中…</div></div>
       </div>
+      <div id="etfAnalysis" class="limit-up-analysis" style="display:none;margin-top:12px;"></div>
       <div class="note">盘中异动=ETF 5 分钟量能脉冲异动；资金热度=宽基 ETF 净申赎份额趋势；日监控=全市场 ETF 当日主力净流入排名（需盘后 T+1 更新）。三者维度互补，不构成重复。</div>
     </div>
 
@@ -692,6 +693,12 @@
         <h3><span class="ic">🕸️</span>六维共振雷达 - 盘后 · <span class="fresh">更新于 今日 15:20</span></h3>
         <svg class="radar" style="display:block;margin:0 auto" width="220" height="200" viewBox="-110 -110 220 220" id="radar"></svg>
       </div>
+    </div>
+
+    <!-- 资金流时间轴 -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📊</span>资金流时间轴 · 中长线 · <span class="fresh" id="marketFundFlowTime">更新于 --</span></h3>
+      <div id="marketFundFlowBody"><div class="ipo-empty">加载中…</div></div>
     </div>
 
     <!-- 斐波那契窗口 -->
@@ -2390,6 +2397,36 @@ function renderLimitUpHeatmap(){
     setTime('phCrisisTime',cr.update_time);
   }
 
+  /* ---- 4. 资金流时间轴（MARKET_FUND_FLOW_DATA） ---- */
+  function renderMarketFundFlow(mff){
+    const d=mff||{};
+    const el=$('marketFundFlowBody');
+    if(!el) return;
+    if(!d.daily || !d.daily.length){
+      el.innerHTML='<div class="ipo-empty" style="text-align:center">大盘资金流数据暂不可用</div>';
+      setTime('marketFundFlowTime',d.update_time); return;
+    }
+    const cnt=d.daily.length;
+    const last=d.daily[cnt-1];
+    const cumLast=d.cumulative&&d.cumulative.length?d.cumulative[d.cumulative.length-1].cum_yi:0;
+    let h='<div style="padding:12px 14px;">';
+    h+='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;">';
+    h+='<div style="background:var(--bg2);border-radius:10px;padding:10px 14px;"><div style="font-size:11px;color:var(--dim);">数据天数</div><div style="font-size:20px;font-weight:800;color:var(--txt);">'+cnt+'</div></div>';
+    h+='<div style="background:var(--bg2);border-radius:10px;padding:10px 14px;"><div style="font-size:11px;color:var(--dim);">最新净流入</div><div style="font-size:20px;font-weight:800;color:'+(last.net_yi>=0?'var(--up)':'var(--down)')+';">'+last.net_yi.toFixed(0)+'亿</div></div>';
+    h+='<div style="background:var(--bg2);border-radius:10px;padding:10px 14px;"><div style="font-size:11px;color:var(--dim);">累计净流入</div><div style="font-size:20px;font-weight:800;color:'+(cumLast>=0?'var(--up)':'var(--down)')+';">'+(cumLast/10000).toFixed(2)+'万亿</div></div></div>';
+    h+='<div style="font-size:12px;color:var(--sub);margin-bottom:4px;">近5日趋势（亿元）</div><div style="display:flex;gap:4px;align-items:flex-end;height:60px;">';
+    const recent=d.daily.slice(-5),maxA=Math.max.apply(null,recent.map(function(x){return Math.abs(x.net_yi);}))||1;
+    recent.forEach(function(x){
+      const bh=Math.max(4,Math.abs(x.net_yi)/maxA*50),bc=x.net_yi>=0?'var(--up)':'var(--down)';
+      h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="width:28px;height:'+bh+'px;background:'+bc+';border-radius:4px 4px 0 0;opacity:.8;"></div><div style="font-size:9px;color:var(--dim);">'+(x.date||'').slice(4)+'</div></div>';
+    });
+    h+='</div>';
+    if(d.note) h+='<div style="font-size:10px;color:var(--dim);margin-top:8px;line-height:1.5;">'+d.note+'</div>';
+    h+='</div>';
+    el.innerHTML=h;
+    setTime('marketFundFlowTime',d.update_time);
+  }
+
   /* ---- 5. 板块资金三合一（盘中追热 + 收盘复盘 + 中期趋势） ---- */
   function renderSector(sf){
     const d=sf||{};
@@ -2632,6 +2669,71 @@ function renderLimitUpHeatmap(){
     if(daily.update_time) setTime('phEtfTime',daily.update_time);
   }
 
+  /* ---- ETF 三合一·三段式分析说明（对标涨停热力矩阵） ---- */
+  function renderEtfAnalysis(pulse, heat, daily){
+    var el=document.getElementById('etfAnalysis');
+    if(!el) return;
+    var pulseEtfs=(pulse&&pulse.etfs)||[];
+    var heatItems=(heat&&heat.items)||[];
+    var topIn=(daily&&daily.top_inflow)||[];
+    var analysis=[];
+
+    // 1) 共振主线：日内资金热度 TOP ∩ 盘后主力净流入 TOP（跨周期同向加仓）
+    if(topIn.length && heatItems.length){
+      var inNames={};
+      topIn.slice(0,5).forEach(function(x){ inNames[x.name]=true; });
+      var overlap=heatItems.slice(0,8).filter(function(x){ return inNames[x.name]; })
+        .map(function(x){ return x.name; });
+      if(overlap.length){
+        analysis.push('🔥 <b>共振主线：</b>'+overlap.slice(0,3).join('、')+' 同时跻身「日内资金热度 TOP」与「盘后主力净流入 TOP」，跨周期资金同向加仓，主线延续性强。');
+      }
+    }
+
+    // 2) 今日最强：单只 ETF 主力净流入最高（取自日内热度榜）
+    var strongest=null;
+    heatItems.forEach(function(x){
+      var v=x.main_net_inflow||0;
+      if(!strongest || v>strongest.net){ strongest={name:x.name, code:x.code, net:v, chg:x.chg||0, pct:x.pct||0}; }
+    });
+    if(strongest && strongest.net>0){
+      analysis.push('📊 <b>今日最强：</b>'+strongest.name+'（'+strongest.code+'）主力净流入 '+(strongest.net/1e8).toFixed(1)+'亿，涨'+strongest.chg.toFixed(2)+'%，占成交比 '+strongest.pct.toFixed(1)+'%，获资金主动追捧。');
+    }
+
+    // 3) 盘中异动：量比最显著的 ETF + 异动榜收红广度
+    if(pulseEtfs.length){
+      var top=pulseEtfs[0];
+      var upN=pulseEtfs.filter(function(e){ return e.chg>=0; }).length;
+      analysis.push('⚡ <b>盘中异动：</b>'+top.name+' 量比高达 '+top.vol.toFixed(1)+'（涨'+top.chg.toFixed(2)+'%），放量最突出；异动榜 '+upN+'/'+pulseEtfs.length+' 只收红，短线情绪偏'+(upN>pulseEtfs.length/2?'热':'分化')+'。');
+    }
+
+    // 4) 综合：全市场净流入总额 + 居首类别 + 上涨广度
+    var totalNet=(daily&&daily.total_net)||0;
+    var totalEtf=(daily&&daily.total_etf)||0;
+    var netYi=(totalNet/1e8).toFixed(1);
+    var syn='💡 <b>综合：</b>全市场 '+totalEtf+' 只 ETF 当日主力净'+(totalNet>=0?'流入':'流出')+' '+Math.abs(netYi)+'亿';
+    if(heat&&heat.categories){
+      var domCat=null, domVal=-Infinity;
+      ['宽基','行业','主题','跨境'].forEach(function(cn){
+        var c=heat.categories[cn];
+        var v=c&&(c.net_inflow_yi||0);
+        if(v>domVal){ domVal=v; domCat=cn; }
+      });
+      if(domCat && domVal>0) syn+='，'+domCat+'类净流入居首（'+domVal.toFixed(2)+'亿）';
+    }
+    if(heatItems.length){
+      var up=heatItems.filter(function(x){ return (x.chg||0)>=0; }).length;
+      syn+='；资金热度样本 '+heatItems.length+' 只中 '+up+' 只上涨，广度'+(up>heatItems.length/2?'偏暖':'分化');
+    }
+    syn+='。';
+    analysis.push(syn);
+
+    if(analysis.length){
+      el.innerHTML=analysis.map(function(a){ return '<div>'+a+'</div>'; }).join('');
+      el.style.display='block';
+    }
+  }
+  window.renderEtfAnalysis=renderEtfAnalysis;
+
   // 暴露给跨 IIFE 调用（renderDelisted 在另一个 IIFE 中调用）
   window.renderEtfHeatByCategory=renderEtfHeatByCategory;
   window.renderEtfPulse=renderEtfPulse;
@@ -2690,6 +2792,7 @@ function renderLimitUpHeatmap(){
     safe(renderEtfPulse, window.ETF_PULSE || {});
     safe(renderEtfHeatByCategory, window.ETF_INTRADAY_HEAT || {});
     safe(renderEtfDaily, window.ETF_DAILY_MONITOR || {});
+    safe(renderEtfAnalysis, window.ETF_PULSE || {}, window.ETF_INTRADAY_HEAT || {}, window.ETF_DAILY_MONITOR || {});
 
     // 2) 板块资金三合一
     safe(renderSector, window.SECTOR_FUND_FLOW || {});
@@ -2698,6 +2801,7 @@ function renderLimitUpHeatmap(){
     safe(renderFib, window.SH_FIB || {});
     safe(renderThermo, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, {}, window.SECTOR_FUND_FLOW || {});
     safe(renderCrisis, window.CRISIS_DATA || {});
+    safe(renderMarketFundFlow, window.MARKET_FUND_FLOW_DATA || {});
     safe(renderSector, window.SECTOR_FUND_FLOW || {});
     safe(renderMacro, window.MACRO_DATA || {});
   }
