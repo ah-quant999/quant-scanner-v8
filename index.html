@@ -122,43 +122,6 @@
   .lu-h4{background:rgba(198,40,40,.68);color:#fff;font-weight:700}
   .lu-h5{background:rgba(198,40,40,.88);color:#fff;font-weight:700}
 
-  /* ===== 涨停联动·连板强度（暗色主题） ===== */
-  .ladder-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;font-size:12px}
-  .ladder-sum-item{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:6px}
-  .ladder-sum-num{font-size:18px;font-weight:800;color:var(--up);line-height:1}
-  .ladder-sum-label{color:var(--dim);font-size:11px}
-  .ladder-mood{padding:5px 10px;border-radius:16px;font-size:11px;font-weight:700;background:rgba(244,73,93,.14);color:var(--up)}
-  .ladder-mood.hot{background:rgba(244,73,93,.2);color:#ff5252}
-  .ladder-mood.warm{background:rgba(251,191,36,.16);color:var(--gold)}
-  .ladder-mood.cool{background:rgba(56,189,248,.14);color:var(--cyan)}
-  .ladder-body{display:flex;flex-direction:column;gap:8px}
-  .ladder-row{display:flex;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px;align-items:stretch}
-  .ladder-rank{width:46px;flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(244,73,93,.22),rgba(244,73,93,.06));border-radius:8px;border:1px solid rgba(244,73,93,.35)}
-  .ladder-board-num{font-size:26px;font-weight:900;color:var(--up);line-height:1}
-  .ladder-board-label{font-size:11px;color:#ff8a80;font-weight:700}
-  .ladder-fire{font-size:10px;margin-top:3px;letter-spacing:-1px}
-  .ladder-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
-  .ladder-row-header{display:flex;justify-content:space-between;align-items:center;gap:8px}
-  .ladder-row-title{font-size:13px;font-weight:700;color:var(--txt)}
-  .ladder-row-meta{font-size:11px;color:var(--dim)}
-  .ladder-stocks{display:flex;flex-direction:column;gap:5px}
-  .ladder-stock{display:grid;grid-template-columns:minmax(72px,1fr) 54px 76px 70px 80px 36px;align-items:center;gap:6px;font-size:12px;padding:5px 0;border-bottom:1px dashed rgba(255,255,255,.06)}
-  .ladder-stock:last-child{border-bottom:0}
-  .ladder-name{font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .ladder-code{font-size:10px;color:var(--dim);font-family:monospace}
-  .ladder-ind{font-size:10px;color:var(--sub);background:var(--card2);padding:1px 5px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .ladder-seal{font-size:11px;color:var(--up);font-weight:600;text-align:right;white-space:nowrap}
-  .ladder-bar-wrap{height:6px;background:var(--card2);border-radius:3px;overflow:hidden}
-  .ladder-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#ff5252,var(--up))}
-  .ladder-score{font-size:12px;font-weight:800;color:var(--up);text-align:right}
-  .ladder-sector-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
-  .ladder-sector-chip{font-size:10px;padding:2px 6px;border-radius:10px;background:rgba(56,189,248,.12);color:#7dd3fc}
-  @media(max-width:720px){
-    .ladder-stock{grid-template-columns:minmax(72px,1fr) 50px 60px 60px 50px 32px;font-size:11px}
-    .ladder-rank{width:40px}
-    .ladder-board-num{font-size:22px}
-  }
-
   /* ===== 板块资金三合一（v6 风格暗色移植） ===== */
   .sf-block{border-radius:12px;padding:14px 16px;margin-bottom:12px;border:1px solid var(--border)}
   .sf-block:last-child{margin-bottom:0}
@@ -434,7 +397,6 @@
 <script src="data/EXPERIMENT.js"></script>
 <script src="data/ETF_PULSE.js"></script>
 <script src="data/ETF_DAILY_MONITOR.js"></script>
-<script src="data/LIMIT_UP_LADDER.js"></script>
 <script src="data/TOP10_DAILY.js"></script>
 <script src="data/V8_CAL.js"></script>
 <script src="data/W52_HIGH.js"></script>
@@ -591,25 +553,7 @@
     })();
     </script>
 
-    <div class="grid g-2" style="margin-bottom:16px">
-      <!-- 主力板块 -->
-      <div class="card">
-        <h3><span class="ic">🚀</span>主力板块 - 短线盘中 · <span class="fresh">更新于 今日 15:17</span></h3>
-        <div class="flow-row"><span class="flow-name">半导体</span><div class="flow-bar"><div class="flow-fill" style="width:92%;background:linear-gradient(90deg,#f4495d,#f87171)"></div></div><span class="flow-val up">+38.2亿</span></div>
-        <div class="flow-row"><span class="flow-name">新能源</span><div class="flow-bar"><div class="flow-fill" style="width:72%;background:linear-gradient(90deg,#f4495d,#f87171)"></div></div><span class="flow-val up">+22.7亿</span></div>
-        <div class="flow-row"><span class="flow-name">消费电子</span><div class="flow-bar"><div class="flow-fill" style="width:58%;background:linear-gradient(90deg,#f4495d,#f87171)"></div></div><span class="flow-val up">+16.4亿</span></div>
-        <div class="flow-row"><span class="flow-name">银行</span><div class="flow-bar"><div class="flow-fill" style="width:40%;background:linear-gradient(90deg,#1fd17b,#4ade80)"></div></div><span class="flow-val down">-12.4亿</span></div>
-        <div class="flow-row"><span class="flow-name">白酒</span><div class="flow-bar"><div class="flow-fill" style="width:30%;background:linear-gradient(90deg,#1fd17b,#4ade80)"></div></div><span class="flow-val down">-9.8亿</span></div>
-      </div>
-
-      <!-- 概念排名（真实数据：CONCEPT_RANKING.js） -->
-      <div class="card" id="conceptRankCard">
-        <h3><span class="ic">📊</span>概念资金排名 - 主力净流入 TOP15 · <span class="fresh" id="conceptRankTime">更新于 --</span></h3>
-        <div id="conceptRankBody"><div class="ipo-empty">加载中…</div></div>
-      </div>
-    </div>
-
-    <!-- 概念资金热力图（treemap） -->
+    <!-- 概念资金热力图（treemap · 真实数据：CONCEPT_RANKING.js） -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">🗺️</span>概念资金热力图 · 大小=净流入 · 颜色=涨跌 · <span class="fresh" id="conceptMapTime">更新于 --</span></h3>
       <div id="conceptTreemap" style="min-height:180px;"><div class="ipo-empty">加载中…</div></div>
@@ -621,7 +565,7 @@
     </div>
 
     <script>
-    /* 概念排名渲染（CONCEPT_RANKING.js → 实时数据区） */
+    /* 概念资金热力图渲染（CONCEPT_RANKING.js → 实时数据区） */
     (function(){
       const $=id=>document.getElementById(id);
       function fmt(v){ return v==null||isNaN(v)?'--':Number(v).toFixed(2); }
@@ -633,41 +577,6 @@
         const diff=Math.round((new Date(now.getFullYear(),now.getMonth(),now.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);
         const hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
         return (diff<=0?'今日':diff===1?'昨日':diff+'天前')+' '+hm;
-      }
-      function renderConceptRank(){
-        const d=window.CONCEPT_RANKING;
-        if(!d || !d.items || !d.items.length){
-          $('conceptRankBody').innerHTML='<div class="ipo-empty">暂无概念排名数据</div>';
-          return;
-        }
-        const top=d.items.slice(0,15);
-        let h='<table style="width:100%;border-collapse:collapse;font-size:12px">';
-        h+='<thead><tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px 4px;color:var(--sub)">概念</th><th style="text-align:right;padding:6px 4px;color:var(--sub)">涨幅</th><th style="text-align:right;padding:6px 4px;color:var(--sub)">净流入(亿)</th></tr></thead><tbody>';
-        top.forEach((it,i)=>{
-          const chgCls=it.chg>0?'up':it.chg<0?'down':'';
-          const netCls=it.net>0?'up':it.net<0?'down':'';
-          const maxNet=top[0].net||1;
-          const barW=Math.round((Math.abs(it.net)/maxNet)*100);
-          const barColor=it.net>0?'rgba(244,73,93,.18)':'rgba(31,209,123,.18)';
-          const barFill=it.net>0?'linear-gradient(90deg,#f4495d,#f87171)':'linear-gradient(90deg,#1fd17b,#4ade80)';
-          h+='<tr style="border-bottom:1px solid rgba(255,255,255,.04)">';
-          h+='<td style="padding:5px 4px;text-align:left;white-space:nowrap">';
-          h+='<span style="font-weight:600;color:var(--txt)">'+esc(it.name)+'</span>';
-          if(i<3) h+=' <span style="font-size:9px;color:var(--gold);font-weight:700">TOP'+(i+1)+'</span>';
-          h+='</td>';
-          h+='<td style="padding:5px 4px;text-align:right;white-space:nowrap" class="'+chgCls+'">'+(it.chg>0?'+':'')+fmt(it.chg)+'%</td>';
-          h+='<td style="padding:5px 4px;text-align:right;white-space:nowrap;width:45%">';
-          h+='<div style="display:inline-flex;align-items:center;gap:4px;width:100%;justify-content:flex-end">';
-          h+='<div style="flex:1;max-width:70px;height:14px;background:'+barColor+';border-radius:3px;position:relative;overflow:hidden">';
-          h+='<div style="width:'+barW+'%;height:100%;background:'+barFill+';border-radius:3px"></div>';
-          h+='</div>';
-          h+='<span class="'+netCls+'" style="font-weight:600;min-width:52px;text-align:right">'+(it.net>0?'+':'')+fmt(it.net)+'</span>';
-          h+='</div></td></tr>';
-        });
-        h+='</tbody></table>';
-        if(d.note) h+='<div class="note" style="margin-top:8px;font-size:11px;color:var(--dim)">'+esc(d.note)+'</div>';
-        $('conceptRankBody').innerHTML=h;
-        $('conceptRankTime').textContent='更新于 '+rel(d.update_time);
       }
       function renderConceptTreemap(){
         const d=window.CONCEPT_RANKING;
@@ -698,10 +607,9 @@
         if(mt) mt.textContent='更新于 '+rel(d.update_time);
       }
       function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-      function runBoth(){ renderConceptRank(); renderConceptTreemap(); }
       if(document.readyState==='loading')
-        document.addEventListener('DOMContentLoaded', runBoth);
-      else runBoth();
+        document.addEventListener('DOMContentLoaded', renderConceptTreemap);
+      else renderConceptTreemap();
     })();
     </script>
 
@@ -718,27 +626,18 @@
       <!-- 近一月涨跌家数统计 -->
       <div class="card">
         <h3><span class="ic">🏘️</span>近一月 涨跌家数统计 - 盘中实时 · <span class="fresh" id="upDownUpdateTime">更新于 今日 15:21</span></h3>
-        <div id="upDownChartContainer" style="width:100%;height:180px;position:relative;overflow:visible;">
-          <svg id="upDownChart" width="100%" height="180" style="overflow:visible;" overflow="visible"></svg>
+        <div id="upDownChartContainer" style="width:100%;height:260px;position:relative;overflow:visible;">
+          <svg id="upDownChart" width="100%" height="260" style="overflow:visible;" overflow="visible"></svg>
         </div>
         <div class="note" id="upDownNote">红=上涨家数，绿=下跌家数，灰=平盘。今日涨 -- / 跌 -- / 平 --。</div>
       </div>
     </div>
 
-    <div class="grid g-2" style="margin-bottom:16px">
-      <!-- 涨停联动·连板强度 -->
-      <div class="card">
-        <h3><span class="ic">🔥</span>涨停联动·连板强度 - 盘中实时 · <span class="fresh" id="limitUpLadderTime">更新于 --</span></h3>
-        <div id="limitUpLadderSummary"></div>
-        <div id="limitUpLadderBody"><div class="ipo-empty">加载中…</div></div>
-      </div>
-
-      <!-- 涨停热力矩阵 -->
-      <div class="card" id="limitUpHeatCard">
-        <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近10日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">更新于 --</span></h3>
-        <div id="limitUpHeatAnalysis" class="limit-up-analysis" style="display:none"></div>
-        <div id="limitUpHeatContent" class="limit-up-content">加载中…</div>
-      </div>
+    <!-- 涨停热力矩阵（整行宽度） -->
+    <div class="card" id="limitUpHeatCard" style="margin-bottom:16px">
+      <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近10日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">更新于 --</span></h3>
+      <div id="limitUpHeatAnalysis" class="limit-up-analysis" style="display:none"></div>
+      <div id="limitUpHeatContent" class="limit-up-content">加载中…</div>
     </div>
 
     <!-- ETF 三合一（盘中异动 + 资金热度 + 日监控，纵向三联） -->
@@ -1226,16 +1125,16 @@
       </div>
 
       <div class="card">
-        <h3><span class="ic">🚀</span>主力板块 / 概念涨跌排名 - 说明</h3>
-        <div class="logic-h">主力板块</div>
+        <h3><span class="ic">📈</span>板块资金三合一 / 概念资金热力图 - 说明</h3>
+        <div class="logic-h">板块资金三合一</div>
         <div class="logic-p">行业板块主力净流入/流出排名，|净流入|≥5亿为「大幅流入/流出」。红色=流入，绿色=流出。主数据源失败时自动切换备用数据源（流入TOP10+流出TOP10合并去重）。</div>
-        <div class="logic-h">概念涨跌排名</div>
-        <div class="logic-p">实时展示概念板块涨幅榜与跌幅榜各前10名。涨幅榜看热点，跌幅榜看弱势。</div>
+        <div class="logic-h">概念资金热力图</div>
+        <div class="logic-p">以 treemap 方块可视化概念板块主力净流入 TOP30。方块大小∝|净流入|，红色=上涨、绿色=下跌。一眼识别资金集中流向与概念热度。</div>
       </div>
 
       <div class="card">
-        <h3><span class="ic">🔥</span>涨停联动 / 个股实时查询 / ETF资金热度 - 说明</h3>
-        <div class="logic-h">涨停联动</div>
+        <h3><span class="ic">🔥</span>涨停热力矩阵 / 个股实时查询 / ETF资金热度 - 说明</h3>
+        <div class="logic-h">涨停热力矩阵</div>
         <div class="logic-p">10日滚动热力矩阵，按概念板块统计涨停家数。持续热点(≥7日有涨停且近3日连续) / 新启动(今日≥2家但前2日=0) / 消退(前5日活跃但近3日&lt;2)。</div>
         <div class="logic-h">个股实时查询</div>
         <div class="logic-p">输入代码或名称，聚合多维共振评分、金股池状态、主力资金、近10日走势等。</div>
@@ -1409,8 +1308,8 @@ CRDS_score = round(CRDS_raw × 10)   # 归一化 0~100</div>
         </table>
         <div class="logic-h">名字清洗（防研报/新闻稿污染名）</div>
         <div class="logic-p">卡片绝不出「看好/完成/给予」等研报词垃圾名。优先级：东财 f58 权威名 &gt; 通达信名字(仅股票段且非指数/债) &gt; raw 干净名 &gt; 退化代码兜底。</div>
-        <div class="logic-h">与「涨停联动」的区别</div>
-        <div class="logic-p"><b>涨停联动</b>：10日<b>概念板块</b>涨停家数热力矩阵，看板块热点持续性。<br><b>CRDS 逆势龙头</b>：<b>单只个股</b>的逆势涨停强度评分，看个股逆大盘的龙头成色。维度不同、不重复。</div>
+      <div class="logic-h">与「涨停热力矩阵」的区别</div>
+      <div class="logic-p"><b>涨停热力矩阵</b>：10日<b>概念板块</b>涨停家数热力矩阵，看板块热点持续性。<br><b>CRDS 逆势龙头</b>：<b>单只个股</b>的逆势涨停强度评分，看个股逆大盘的龙头成色。维度不同、不重复。</div>
         <div class="logic-h">输出链路</div>
         <div class="logic-p">calc_crds.py → <b>data/crds_result.json</b> → update_v8.py 注入 <b>window.CRDS_CARD_DATA</b> → 前端「逆势龙头」tab 渲染（含历史扫描累积追踪）。</div>
       </div>
@@ -1921,8 +1820,8 @@ function drawUpDownChart(){
   let W = svg.clientWidth || svg.getBoundingClientRect().width || 0;
   if(!W){ setTimeout(drawUpDownChart, 200); return; }
   W = Math.round(W);
-  const H = 180;
-  const PAD = {top:40, right:30, bottom:30, left:40};
+  const H = 260;
+  const PAD = {top:72, right:50, bottom:46, left:50};
   const gw = W - PAD.left - PAD.right;
   const gh = H - PAD.top - PAD.bottom;
 
@@ -1947,7 +1846,7 @@ function drawUpDownChart(){
     html += '<rect x="'+x+'" y="'+(PAD.top+gh-hUp)+'" width="'+(barW*0.3)+'" height="'+hUp+'" fill="#ff5252" opacity="0.75" rx="2"/>';
     html += '<rect x="'+(x+barW*0.35)+'" y="'+(PAD.top+gh-hDown)+'" width="'+(barW*0.3)+'" height="'+hDown+'" fill="#69f0ae" opacity="0.65" rx="2"/>';
     if(i%3===0 || i===filtered.length-1){
-      html += '<text x="'+(x+barW/2)+'" y="'+(H-8)+'" text-anchor="middle" font-size="9" fill="'+(i===filtered.length-1?'var(--txt)':'var(--dim)')+'"'+(i===filtered.length-1?' font-weight="bold"':'')+'>'+d.date+'</text>';
+      html += '<text x="'+(x+barW/2)+'" y="'+(H-10)+'" text-anchor="middle" font-size="9" fill="'+(i===filtered.length-1?'var(--txt)':'var(--dim)')+'"'+(i===filtered.length-1?' font-weight="bold"':'')+'>'+d.date+'</text>';
     }
   });
 
@@ -2084,92 +1983,6 @@ function renderLimitUpHeatmap(){
 
 (function(){
   function run(){ try{ renderLimitUpHeatmap(); }catch(e){ console.warn('涨停热力矩阵渲染失败',e); } }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', run);
-  else run();
-})();
-
-/* ===== 涨停联动·连板强度渲染 ===== */
-function renderLimitUpLadder(){
-  const data = window.LIMIT_UP_LADDER || null;
-  const body = document.getElementById('limitUpLadderBody');
-  const summary = document.getElementById('limitUpLadderSummary');
-  const timeEl = document.getElementById('limitUpLadderTime');
-  if(!body) return;
-  if(!data || !data.ladder || !data.ladder.length){
-    body.innerHTML = '<div class="ipo-empty">涨停池数据为空</div>';
-    if(summary) summary.innerHTML = '';
-    return;
-  }
-
-  // 摘要条
-  const total = data.total || 0;
-  const maxBoard = data.max_board || 0;
-  const topSector = (data.sectors && data.sectors[0]) || {name:'-', strength:0};
-  let moodCls = 'cool', moodText = '情绪一般';
-  if(total >= 70 && maxBoard >= 5){ moodCls='hot'; moodText='情绪炽热'; }
-  else if(total >= 50 || maxBoard >= 5){ moodCls='warm'; moodText='情绪偏暖'; }
-  else if(total >= 30){ moodCls='warm'; moodText='情绪温和'; }
-
-  if(summary){
-    summary.innerHTML =
-      '<div class="ladder-sum-item"><span class="ladder-sum-num">'+total+'</span><span class="ladder-sum-label">今日涨停</span></div>'+
-      '<div class="ladder-sum-item"><span class="ladder-sum-num">'+maxBoard+'板</span><span class="ladder-sum-label">最高连板</span></div>'+
-      '<div class="ladder-sum-item"><span class="ladder-sum-num">'+topSector.name+'</span><span class="ladder-sum-label">最强板块·强度 '+topSector.strength+'</span></div>'+
-      '<div class="ladder-mood '+moodCls+'">'+moodText+'</div>';
-  }
-  if(timeEl && data.update_time) timeEl.textContent = '更新于 '+fmtDataTime(data.update_time);
-
-  // 梯队强度卡片
-  let h = '<div class="ladder-body">';
-  data.ladder.forEach(function(row){
-    const fireCount = Math.min(5, Math.max(1, row.board));
-    const fire = '🔥'.repeat(fireCount);
-    h += '<div class="ladder-row">';
-    h += '<div class="ladder-rank">'+
-         '<div class="ladder-board-num">'+row.board+'</div>'+
-         '<div class="ladder-board-label">板</div>'+
-         '<div class="ladder-fire">'+fire+'</div>'+
-         '</div>';
-    h += '<div class="ladder-main">';
-    h += '<div class="ladder-row-header">'+
-         '<span class="ladder-row-title">'+row.label+'</span>'+
-         '<span class="ladder-row-meta">平均强度 '+ (row.stocks.length ? (row.stocks.reduce(function(s,x){return s+x.strength;},0)/row.stocks.length).toFixed(1) : 0) +'</span>'+
-         '</div>';
-    h += '<div class="ladder-stocks">';
-    row.stocks.slice(0,5).forEach(function(s){
-      const barW = Math.min(100, Math.max(4, s.strength)) + '%';
-      h += '<div class="ladder-stock">'+
-           '<span class="ladder-name" title="'+s.name+'">'+s.name+'</span>'+
-           '<span class="ladder-code">'+s.code+'</span>'+
-           '<span class="ladder-ind" title="'+(s.industry||'')+'">'+(s.industry||'-')+'</span>'+
-           '<span class="ladder-seal">'+(s.seal_amount?s.seal_amount+'亿':'-')+'</span>'+
-           '<div class="ladder-bar-wrap"><div class="ladder-bar-fill" style="width:'+barW+'"></div></div>'+
-           '<span class="ladder-score">'+s.strength+'</span>'+
-           '</div>';
-    });
-    if(row.stocks.length > 5){
-      h += '<div class="ladder-row-meta" style="margin-top:4px">还有 '+(row.stocks.length-5)+' 只…</div>';
-    }
-    h += '</div></div></div>';
-  });
-  h += '</div>';
-
-  // 板块强度 TOP
-  if(data.sectors && data.sectors.length){
-    h += '<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">';
-    h += '<div style="font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:8px">🎯 涨停板块强度 TOP5</div>';
-    h += '<div class="ladder-sector-list">';
-    data.sectors.slice(0,5).forEach(function(sec){
-      h += '<span class="ladder-sector-chip">'+sec.name+' '+sec.count+'家·'+sec.strength+'</span>';
-    });
-    h += '</div></div>';
-  }
-
-  body.innerHTML = h;
-}
-
-(function(){
-  function run(){ try{ renderLimitUpLadder(); }catch(e){ console.warn('涨停联动渲染失败',e); } }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', run);
   else run();
 })();
@@ -2840,6 +2653,8 @@ function renderLimitUpLadder(){
 
   /* ---- 初始化 ---- */
   function initPostMarket(){
+    // 先用已注入的 SECTOR_FUND_FLOW.js 数据立即渲染，避免一直显示“加载中”
+    try{ renderSector(window.SECTOR_FUND_FLOW || {}); }catch(e){ console.warn('板块资金三合一初始渲染失败',e); }
     const files=['sh_index_fib.json','market_fund_flow.json','crisis_data.json','sector_fund_flow.json','macro_data.json','margin_data.json','cffex_holdings.json','fomc_summary.json'];
     Promise.allSettled(files.map(J)).then(rs=>{
       const d={};files.forEach((f,i)=>{d[f]=rs[i].status==='fulfilled'?rs[i].value:null;});
