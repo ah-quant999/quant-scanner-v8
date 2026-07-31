@@ -315,6 +315,27 @@
   .ph-macro-table th,.ph-macro-table td{padding:7px 8px;text-align:left;border-bottom:1px solid var(--border)}
   .ph-macro-table th{color:var(--dim);font-weight:600;background:var(--bg2)}
   .ph-macro-section{font-size:12px;font-weight:700;color:var(--cyan);padding:8px;background:var(--bg2);margin-top:8px;border-radius:6px}
+  .ph-macro-wrap{overflow-x:auto}
+  .ph-macro-table-v2{width:100%;min-width:760px;border-collapse:collapse;font-size:12px;margin-top:8px}
+  .ph-macro-table-v2 th,.ph-macro-table-v2 td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+  .ph-macro-table-v2 th{color:var(--dim);font-weight:600;background:var(--bg2);white-space:nowrap}
+  .ph-macro-section-v2{font-size:12px;font-weight:700;color:var(--cyan);padding:8px;background:var(--bg2);margin-top:8px;border-radius:6px}
+  .ph-macro-table-v2 .v2-name{font-weight:600;color:var(--txt);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .ph-macro-table-v2 .v2-freq{font-size:10px;padding:1px 5px;border-radius:4px;background:var(--bg2);color:var(--dim);border:1px solid var(--border)}
+  .ph-macro-table-v2 .v2-freq.realtime{background:rgba(56,189,248,.12);color:#38bdf8;border-color:rgba(56,189,248,.3)}
+  .ph-macro-table-v2 .v2-freq.daily{background:rgba(167,139,250,.12);color:#a78bfa;border-color:rgba(167,139,250,.3)}
+  .ph-macro-table-v2 .v2-freq.weekly{background:rgba(251,191,36,.12);color:#fbbf24;border-color:rgba(251,191,36,.3)}
+  .ph-macro-table-v2 .v2-freq.monthly{background:rgba(244,114,182,.12);color:#f472b6;border-color:rgba(244,114,182,.3)}
+  .ph-macro-table-v2 .v2-val{font-size:15px;font-weight:700;color:var(--txt);white-space:nowrap}
+  .ph-macro-table-v2 .v2-arrow{font-size:12px;margin-left:6px;white-space:nowrap}
+  .ph-macro-table-v2 .v2-range{font-size:11px;color:var(--sub);line-height:1.6}
+  .ph-macro-table-v2 .v2-mean{font-size:11px;color:var(--dim);line-height:1.6;margin-top:3px}
+  .ph-macro-table-v2 .v2-status{font-size:10px;padding:2px 6px;border-radius:4px;margin-top:5px;display:inline-block}
+  .ph-macro-table-v2 .v2-status.fresh{background:rgba(31,209,123,.15);color:#1fd17b}
+  .ph-macro-table-v2 .v2-status.stale{background:rgba(251,191,36,.15);color:#fbbf24}
+  .ph-macro-table-v2 .v2-pos-above{color:var(--up);font-weight:700}
+  .ph-macro-table-v2 .v2-pos-below{color:var(--down);font-weight:700}
+  .ph-macro-table-v2 .v2-pos-normal{color:#38bdf8;font-weight:700}
   @media(max-width:720px){.ph-fib-grid{grid-template-columns:repeat(2,1fr)}.ph-dim{flex-direction:column}}
 
   /* 三重共识 / 历史追踪（选股策略 tab） */
@@ -643,6 +664,7 @@
     <!-- ETF 三合一（盘中异动 + 资金热度 + 日监控，纵向三联） -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">💰</span>ETF 三合一 - 盘中异动 + 资金热度 + 日监控 · <span class="fresh" id="phEtfTime">更新于 --</span></h3>
+      <div id="etfAnalysis" class="limit-up-analysis" style="display:none;margin-bottom:12px;"></div>
 
       <!-- Block 1: 盘中异动·量能脉冲 (顶, T+0) -->
       <div class="sf-block sf-block-hot">
@@ -664,7 +686,6 @@
         <div class="sf-block-title"><span class="sf-block-icon">📊</span>日监控·主力净流入 <span style="font-size:10px;color:var(--dim)">T+1·盘后</span></div>
         <div id="etfDailyBlock"><div class="ipo-empty">加载中…</div></div>
       </div>
-      <div id="etfAnalysis" class="limit-up-analysis" style="display:none;margin-top:12px;"></div>
       <div class="note">盘中异动=ETF 5 分钟量能脉冲异动；资金热度=宽基 ETF 净申赎份额趋势；日监控=全市场 ETF 当日主力净流入排名（需盘后 T+1 更新）。三者维度互补，不构成重复。</div>
     </div>
 
@@ -2683,7 +2704,7 @@ function renderLimitUpHeatmap(){
       var inNames={};
       topIn.slice(0,5).forEach(function(x){ inNames[x.name]=true; });
       var overlap=heatItems.slice(0,8).filter(function(x){ return inNames[x.name]; })
-        .map(function(x){ return x.name; });
+        .map(function(x){ return x.name+'（'+x.code+'）'; });
       if(overlap.length){
         analysis.push('🔥 <b>共振主线：</b>'+overlap.slice(0,3).join('、')+' 同时跻身「日内资金热度 TOP」与「盘后主力净流入 TOP」，跨周期资金同向加仓，主线延续性强。');
       }
@@ -2703,7 +2724,7 @@ function renderLimitUpHeatmap(){
     if(pulseEtfs.length){
       var top=pulseEtfs[0];
       var upN=pulseEtfs.filter(function(e){ return e.chg>=0; }).length;
-      analysis.push('⚡ <b>盘中异动：</b>'+top.name+' 量比高达 '+top.vol.toFixed(1)+'（涨'+top.chg.toFixed(2)+'%），放量最突出；异动榜 '+upN+'/'+pulseEtfs.length+' 只收红，短线情绪偏'+(upN>pulseEtfs.length/2?'热':'分化')+'。');
+      analysis.push('⚡ <b>盘中异动：</b>'+top.name+'（'+top.code+'） 量比高达 '+top.vol.toFixed(1)+'（涨'+top.chg.toFixed(2)+'%），放量最突出；异动榜 '+upN+'/'+pulseEtfs.length+' 只收红，短线情绪偏'+(upN>pulseEtfs.length/2?'热':'分化')+'。');
     }
 
     // 4) 综合：全市场净流入总额 + 居首类别 + 上涨广度
@@ -2748,42 +2769,156 @@ function renderLimitUpHeatmap(){
       m={
         monetary:{}, global_macro:{}, market_sentiment:{},
         economy:{pmi:{value:pmi?pmi['今值']:null}, cpi:{value:cpi?cpi['今值']:null}, ppi:{}},
-        update_time:m.update_time
+        update_time:m.update_time,
+        indicator_status:{}
       };
     }
-    const mo=m.monetary||{},gl=m.global_macro||{},ec=m.economy||{},se=m.market_sentiment||{};
+    const mo=m.monetary||{}, gl=m.global_macro||{}, ec=m.economy||{}, se=m.market_sentiment||{};
     const cm=gl.commodities||{};
-    const row=(name,val,desc)=>'<tr><td>'+name+'</td><td style="text-align:center;font-weight:700;color:var(--txt)">'+val+'</td><td style="color:var(--dim)">'+desc+'</td></tr>';
-    const sec=t=>'<tr><td colspan="3" class="ph-macro-section" style="display:table-cell">'+t+'</td></tr>';
+    const status=m.indicator_status||{};
     const g=(o,k)=>o&&o[k]!=null?o[k]:null;
-    let h='<table class="ph-macro-table"><tr><th style="width:32%">指标</th><th style="width:24%;text-align:center">数值</th><th>说明</th></tr>';
-    h+=sec('💰 货币政策');
-    h+=row('10Y中国国债',num(g(mo.cn_bond_10y,'value'))+'%','无风险利率，估值锚');
-    h+=row('10Y美国国债',num(g(mo.us_bond_10y,'value'))+'%','全球资产定价锚');
-    h+=row('中美利差(10Y)',num(g(mo.cn_us_spread,'value'))+'%','资本流动核心驱动');
-    h+=row('Shibor 隔夜/1W',mo.shibor?num(mo.shibor.on,3)+'% / '+num(mo.shibor.w1,2)+'%':'--','银行间短期利率');
-    h+=row('LPR 1Y/5Y',mo.lpr?num(mo.lpr.lpr_1y,1)+'% / '+num(mo.lpr.lpr_5y,1)+'%':'--','政策利率信号');
-    h+=row('M2同比',num(g(mo.m2_yoy,'value'),1)+'%','货币供应增速');
-    h+=sec('🌐 全球宏观');
-    h+=row('离岸人民币',num(g(gl.usdcnh,'price'),4),'汇率走势→外资流向');
-    h+=row('美元指数 DXY',num(g(gl.dxy,'value')),'强美元→资本流出');
-    h+=row('VIX恐慌指数',num(g(gl.vix,'value'),1),'全球风险偏好');
-    h+=row('黄金(COMEX)',num(g(cm.gold,'value'),1),'避险资产风向标');
-    h+=row('白银(COMEX)',num(g(cm.silver,'value')),'工业+避险双属性');
-    h+=row('铜(COMEX)',num(g(cm.copper,'value'),3),'全球经济晴雨表');
-    h+=row('原油(WTI)',num(g(cm.oil,'value')),'通胀预期核心指标');
-    h+=sec('📊 经济基本面');
-    h+=row('制造业PMI',num(g(ec.pmi,'value'),1),'荣枯线50');
-    h+=row('CPI同比',num(g(ec.cpi,'value'),1)+'%','消费端通胀');
-    h+=row('PPI同比',num(g(ec.ppi,'value'),1)+'%','工业端价格');
-    h+=row('社融增量',ec.social_financing?num(ec.social_financing.value,0)+'亿':'--','实体融资需求');
-    h+=row('出口同比',num(g(ec.export_yoy,'value'),1)+'%','外需景气度');
-    if(ec.ipo)h+=row('IPO 本周/本月',ec.ipo.count+'家 '+num(ec.ipo.amount,1)+'亿 / '+ec.ipo.count_month+'家 '+num(ec.ipo.amount_month,1)+'亿','一级市场抽血');
-    if(se.new_investors)h+=row('新增投资者',num(se.new_investors.value)+'万人','散户入场热度');
-    h+='</table>';
+
+    // 数据新鲜度（当月/当周/当日已更新标识）
+    function isFresh(key, dateStr){
+      const st=status[key];
+      if(st && st.is_fresh!=null) return !!st.is_fresh;
+      if(!dateStr) return false;
+      try{
+        const d=new Date(String(dateStr).replace(/-/g,'/'));
+        const now=new Date();
+        if(Number.isNaN(d.getTime())) return false;
+        return (now-d)/(864e5)<=30;
+      }catch(e){return false;}
+    }
+
+    // 环比箭头：高=红↑  低=绿↓
+    function arrow(cur, prev, unit, dec){
+      if(cur==null || isNaN(cur) || prev==null || isNaN(prev)){
+        return '<span style="color:var(--dim);font-size:11px">—</span>';
+      }
+      const diff=cur-prev;
+      const up=diff>0;
+      const eq=Math.abs(diff)<1e-9;
+      const color=eq?'var(--dim)':(up?'var(--up)':'var(--down)');
+      const arr=eq?'→':(up?'↑':'↓');
+      const diffTxt=(diff>0?'+':'')+num(diff,dec==null?2:dec)+(unit||'');
+      const pct=prev!==0?((diff/Math.abs(prev))*100):0;
+      const pctTxt=Math.abs(pct)>=0.01?' ('+(diff>0?'+':'')+num(pct,1)+'%)':'';
+      return '<span class="v2-arrow" style="color:'+color+'">'+arr+' '+diffTxt+pctTxt+'</span>';
+    }
+
+    // 正常区间与当前位置
+    function rangeText(cur, range){
+      if(!range || range.length<2) return '';
+      const lo=range[0], hi=range[1];
+      let pos='';
+      if(cur==null || isNaN(cur)) pos='';
+      else if(cur>hi) pos='<span class="v2-pos-above">高于正常区间</span>';
+      else if(cur<lo) pos='<span class="v2-pos-below">低于正常区间</span>';
+      else pos='<span class="v2-pos-normal">处于正常区间</span>';
+      return '<div class="v2-range">正常区间 '+num(lo,2)+'-'+num(hi,2)+' · '+pos+'</div>';
+    }
+
+    // 更新状态徽章
+    function statusBadge(key, dateStr, freq){
+      const fresh=isFresh(key, dateStr);
+      const cls=fresh?'fresh':'stale';
+      let text;
+      if(freq==='monthly') text=fresh?'本月已更新':'本月待更新';
+      else if(freq==='weekly') text=fresh?'本周已更新':'本周待更新';
+      else text=fresh?'今日已更新':'待更新';
+      return '<span class="v2-status '+cls+'">'+text+'</span>';
+    }
+
+    // 通用行
+    function row(name, freq, valHtml, cur, prev, range, aboveText, belowText, meaning, statusKey, dateStr){
+      const freqClass=freq==='实时'?'realtime':freq==='日'?'daily':freq==='周'?'weekly':freq==='月'?'monthly':'';
+      const freqBadge='<span class="v2-freq '+freqClass+'">'+freq+'</span>';
+      const rangeHtml=rangeText(cur, range);
+      let abHtml='';
+      if(cur!=null && !isNaN(cur) && range && range.length>=2){
+        if(cur>range[1]) abHtml='<div class="v2-mean">'+aboveText+'</div>';
+        else if(cur<range[0]) abHtml='<div class="v2-mean">'+belowText+'</div>';
+      }
+      const meanHtml=meaning?'<div class="v2-mean">'+meaning+'</div>':'';
+      const statusHtml=statusBadge(statusKey||'', dateStr, freq==='实时'?'realtime':freq==='日'?'daily':freq==='周'?'weekly':freq==='月'?'monthly':'');
+      return '<tr>'+
+        '<td><div class="v2-name">'+name+freqBadge+'</div>'+statusHtml+'</td>'+
+        '<td><div class="v2-val">'+valHtml+'</div>'+arrow(cur, prev, '', 2)+'</td>'+
+        '<td>'+rangeHtml+meanHtml+abHtml+'</td>'+
+      '</tr>';
+    }
+
+    let h='<div class="ph-macro-wrap"><table class="ph-macro-table-v2"><tr><th style="width:22%">指标</th><th style="width:26%">数值 / 环比</th><th>区间 / 含义 / 异动说明</th></tr>';
+
+    h+='<tr><td colspan="3" class="ph-macro-section-v2" style="display:table-cell">💰 货币政策</td></tr>';
+    h+=row('10Y中国国债','日', num(g(mo.cn_bond_10y,'value'),2)+'%', g(mo.cn_bond_10y,'value'), g(mo.cn_bond_10y,'previous'), [1.5,3.0], '利率偏高→估值承压、融资成本高企', '利率偏低→流动性充裕、估值受支撑', '无风险利率，估值锚', 'cn_bond_10y', g(mo.cn_bond_10y,'date'));
+    h+=row('10Y美国国债','日', num(g(mo.us_bond_10y,'value'),2)+'%', g(mo.us_bond_10y,'value'), g(mo.us_bond_10y,'previous'), [3.0,5.5], '利率偏高→全球资产估值承压', '利率偏低→全球流动性宽松', '全球资产定价锚', 'us_bond_10y', g(mo.us_bond_10y,'date'));
+    h+=row('中美利差(10Y)','日', num(g(mo.cn_us_spread,'value'),2)+'%', g(mo.cn_us_spread,'value'), g(mo.cn_us_spread,'previous'), [-1.0,2.0], '利差扩大→人民币资产吸引力增强', '利差收窄/倒挂→资本外流压力', '资本流动核心驱动', 'cn_us_spread', g(mo.cn_bond_10y,'date'));
+    if(mo.shibor){
+      const on=mo.shibor.on, w1=mo.shibor.w1, pon=g(mo.shibor,'previous_on'), pw1=g(mo.shibor,'previous_w1');
+      const valHtml=num(on,3)+'% / '+num(w1,2)+'%';
+      const arrowHtml=arrow(on, pon, '%', 3)+'<br>'+arrow(w1, pw1, '%', 2);
+      let shiborPos='', shiborAb='';
+      if(on>2.5){shiborPos='<span class="v2-pos-above">偏高</span>'; shiborAb='<div class="v2-mean">资金利率偏高→银行间资金面偏紧</div>';}
+      else if(on<1.0){shiborPos='<span class="v2-pos-below">偏低</span>'; shiborAb='<div class="v2-mean">资金利率偏低→流动性充裕</div>';}
+      else shiborPos='<span class="v2-pos-normal">正常</span>';
+      const freqBadge='<span class="v2-freq daily">日</span>';
+      const statusHtml=statusBadge('shibor', g(mo.shibor,'date'), 'daily');
+      h+='<tr><td><div class="v2-name">Shibor 隔夜/1W'+freqBadge+'</div>'+statusHtml+'</td><td><div class="v2-val">'+valHtml+'</div>'+arrowHtml+'</td><td><div class="v2-range">正常区间 1.0%-2.5% · '+shiborPos+'</div><div class="v2-mean">银行间短期利率，反映资金面松紧</div>'+shiborAb+'</td></tr>';
+    }
+    if(mo.lpr){
+      const l1=mo.lpr.lpr_1y, l5=mo.lpr.lpr_5y, pl1=g(mo.lpr,'previous_1y'), pl5=g(mo.lpr,'previous_5y');
+      const valHtml=num(l1,1)+'% / '+num(l5,1)+'%';
+      const arrowHtml=arrow(l1, pl1, '%', 1)+'<br>'+arrow(l5, pl5, '%', 1);
+      let lprPos='', lprAb='';
+      if(l1!=null && !isNaN(l1)){
+        if(l1>4.5){lprPos='<span class="v2-pos-above">高于正常区间</span>'; lprAb='<div class="v2-mean">政策利率偏高→抑制融资需求</div>';}
+        else if(l1<3.0){lprPos='<span class="v2-pos-below">低于正常区间</span>'; lprAb='<div class="v2-mean">政策利率偏低→强力刺激实体融资</div>';}
+        else lprPos='<span class="v2-pos-normal">处于正常区间</span>';
+      }
+      const freqBadge='<span class="v2-freq monthly">月</span>';
+      const statusHtml=statusBadge('lpr', g(mo.lpr,'date'), 'monthly');
+      h+='<tr><td><div class="v2-name">LPR 1Y/5Y'+freqBadge+'</div>'+statusHtml+'</td><td><div class="v2-val">'+valHtml+'</div>'+arrowHtml+'</td><td><div class="v2-range">正常区间 3.0%-4.5% · '+lprPos+'</div><div class="v2-mean">政策利率信号；LPR下调→降低实体融资成本，利好股市估值</div>'+lprAb+'</td></tr>';
+    }
+    h+=row('M2同比','月', num(g(mo.m2_yoy,'value'),1)+'%', g(mo.m2_yoy,'value'), g(mo.m2_yoy,'previous'), [6.0,12.0], '货币供应偏快→潜在通胀/资产泡沫风险', '货币供应偏慢→经济活力不足', '货币供应增速', 'm2_yoy', g(mo.m2_yoy,'date'));
+
+    h+='<tr><td colspan="3" class="ph-macro-section-v2" style="display:table-cell">🌐 全球宏观</td></tr>';
+    const usd=g(gl.usdcnh,'price'), usdPrev=g(gl.usdcnh,'prev_close');
+    h+=row('离岸人民币','实时', num(usd,4), usd, usdPrev, [6.80,7.30], '人民币贬值→资本外流、进口承压', '人民币升值→资本流入、出口承压', '汇率走势→外资流向', 'usdcnh', g(gl.usdcnh,'date'));
+    const dxy=g(gl.dxy,'value'), dxyPct=g(gl.dxy,'pct');
+    const dxyPrev=dxy!=null && dxyPct!=null?dxy/(1+dxyPct/100):null;
+    h+=row('美元指数 DXY','日', num(dxy,2), dxy, dxyPrev, [95.0,110.0], '美元过强→新兴市场资本外流', '美元偏弱→全球风险资产受益', '强美元→资本流出', 'dxy', g(gl.dxy,'date'));
+    h+=row('VIX恐慌指数','日', num(g(gl.vix,'value'),1), g(gl.vix,'value'), g(gl.vix,'previous'), [10.0,25.0], '恐慌升温→避险情绪上升', '情绪过于低迷→警惕波动放大', '全球风险偏好', 'vix', g(gl.vix,'date'));
+    h+=row('黄金(COMEX)','日', num(g(cm.gold,'value'),1), g(cm.gold,'value'), g(cm.gold,'previous'), [1800.0,4500.0], '金价偏高→避险/去美元化情绪浓', '金价偏低→实际利率或美元偏强', '避险资产风向标', 'gold', g(cm.gold,'date'));
+    h+=row('白银(COMEX)','日', num(g(cm.silver,'value'),2), g(cm.silver,'value'), g(cm.silver,'previous'), [20.0,80.0], '银价偏高→工业+投机需求旺', '银价偏低→工业需求疲软', '工业+避险双属性', 'silver', g(cm.silver,'date'));
+    h+=row('铜(COMEX)','日', num(g(cm.copper,'value'),3), g(cm.copper,'value'), g(cm.copper,'previous'), [3.0,8.0], '铜价偏高→全球经济景气', '铜价偏低→经济放缓担忧', '全球经济晴雨表', 'copper', g(cm.copper,'date'));
+    h+=row('原油(WTI)','日', num(g(cm.oil,'value'),2), g(cm.oil,'value'), g(cm.oil,'previous'), [50.0,120.0], '油价偏高→通胀压力上行', '油价偏低→通缩/需求疲弱', '通胀预期核心指标', 'oil', g(cm.oil,'date'));
+
+    h+='<tr><td colspan="3" class="ph-macro-section-v2" style="display:table-cell">📊 经济基本面</td></tr>';
+    h+=row('制造业PMI','月', num(g(ec.pmi,'value'),1), g(ec.pmi,'value'), g(ec.pmi,'previous'), [48.0,52.0], 'PMI高于荣枯线→制造业扩张', 'PMI低于荣枯线→制造业收缩', '荣枯线50', 'pmi', g(ec.pmi,'date'));
+    h+=row('CPI同比','月', num(g(ec.cpi,'value'),1)+'%', g(ec.cpi,'value'), g(ec.cpi,'previous'), [0.0,3.0], '通胀偏高→货币收紧压力', '通胀偏低→通缩/需求不足', '消费端通胀', 'cpi', g(ec.cpi,'date'));
+    h+=row('PPI同比','月', num(g(ec.ppi,'value'),1)+'%', g(ec.ppi,'value'), g(ec.ppi,'previous'), [-2.0,5.0], '工业品涨价→上游通胀压力', '工业品降价→企业盈利承压', '工业端价格', 'ppi', g(ec.ppi,'date'));
+    const sf=g(ec.social_financing,'value'), sfPct=g(ec.social_financing,'change_pct');
+    const sfPrev=sf!=null && sfPct!=null?sf/(1+sfPct/100):null;
+    h+=row('社融增量','月', num(sf,0)+'亿', sf, sfPrev, [1000.0,50000.0], '社融高增→信用扩张、经济动能强', '社融萎缩→融资需求弱', '实体融资需求', 'social_financing', g(ec.social_financing,'date'));
+    h+=row('出口同比','月', num(g(ec.export_yoy,'value'),1)+'%', g(ec.export_yoy,'value'), g(ec.export_yoy,'previous'), [-10.0,20.0], '出口高增→外需强劲', '出口下滑→外需疲软', '外需景气度', 'export_yoy', g(ec.export_yoy,'date'));
+    if(ec.ipo){
+      const freqBadge='<span class="v2-freq weekly">周</span>';
+      const statusHtml=statusBadge('ipo', g(ec.ipo,'date'), 'weekly');
+      const valHtml=ec.ipo.count+'家 '+num(ec.ipo.amount,1)+'亿 / '+ec.ipo.count_month+'家 '+num(ec.ipo.amount_month,1)+'亿';
+      h+='<tr><td><div class="v2-name">IPO 本周/本月'+freqBadge+'</div>'+statusHtml+'</td><td><div class="v2-val">'+valHtml+'</div></td><td><div class="v2-mean">一级市场抽血；本周/本月发行规模越大，对二级市场资金分流压力越明显</div></td></tr>';
+    }
+    if(se.new_investors){
+      const ni=g(se.new_investors,'value'), niChg=g(se.new_investors,'change');
+      const niPrev=ni!=null && niChg!=null?ni-niChg:null;
+      h+=row('新增投资者','周', num(ni,2)+'万人', ni, niPrev, [50.0,200.0], '新增投资者多→散户入场热度高', '新增投资者少→情绪冷清', '散户入场热度', 'new_investors', g(se.new_investors,'date'));
+    }
+    h+='</table></div>';
     $('phMacroBody').innerHTML=h;
     setTime('phMacroTime',m.update_time);
   }
+
 
   /* ---- 初始化 ---- */
   function initPostMarket(){
