@@ -39,7 +39,10 @@ CORE_SOURCES = {
     "V8_CAL": 48,
 }
 
-# ── 分类二：网络易抖 / 低频源，仅告警 ─────────────────────────────────
+# ── 分类二：网络易抖 / 低频源 / v6 算法盘后产出，仅告警 ───────────────
+# 2026-08-01：post_close 模块已建立 v6→v8 同步桥（sync_v6_to_v8.py），
+# 这些模块不再属于「无生产者冻结快照」，但更新频率依赖 v6 收盘链路，
+# 故归入 WARN，阈值 48h；股票名录月度更新即可。
 WARN_SOURCES = {
     "SECTOR_FUND_FLOW": 26,
     "CONCEPT_RANKING": 26,
@@ -51,14 +54,6 @@ WARN_SOURCES = {
     "MARKET_FUND_FLOW_DATA": 26,
     "ANALYST_RATINGS": 72,
     "EXPERIMENT": 72,
-}
-
-# ── 分类三：无云端生产者的冻结快照 ────────────────────────────────────
-# 这些模块的 raw_data/*.json 从未进入过仓库（git 0 次提交），
-# data/*.js 是 2026-07-30 split_inline_data.py 一次性拆分的产物。
-# 在建立 v6→v8 推送链路之前，它们只会越来越旧。
-# 阈值设为 48h：超过即提示「已停更」，避免线上静默展示陈旧数据。
-FROZEN_SOURCES = {
     "GOLD_POOL": 48,
     "CANDIDATE": 48,
     "TRIPLE_CONSENSUS": 48,
@@ -80,7 +75,12 @@ FROZEN_SOURCES = {
     "TOP10_DAILY": 48,
     "SUSPENSION_ALERT": 48,
     "MARKET_ALERTS": 48,
-    "STOCK_LIST": 24 * 30,   # 股票名录，月度更新即可
+    "STOCK_LIST": 24 * 30,
+}
+
+# ── 分类三：无云端生产者的冻结快照 ────────────────────────────────────
+# 当前暂无。保留空 dict，便于未来新增模块时快速标记。
+FROZEN_SOURCES = {
 }
 
 # 引入 update_v8.py 的时段映射，用于输出"每个模块由哪个定时任务更新"

@@ -65,18 +65,18 @@ CATEGORY_MAP = {
     "W52_HIGH": "premarket",
     "VOLATILITY": "premarket",
     "HERDING_DATA": "premarket",
-    # 盘中
+    # 盘中（含 ETF 三连板、板块资金三连板盘中追热等实时场景）
     "INDEX_QUOTES": "intraday",
     "ETF_PULSE": "intraday",
     "ETF_INTRADAY_HEAT": "intraday",
     "ETF_SUBSCRIPTION": "intraday",
+    "ETF_DAILY_MONITOR": "intraday",
     "SECTOR_FUND_FLOW": "intraday",
     "CAPITAL_FLOW_DATA": "intraday",
     "CONCEPT_RANKING": "intraday",
     "LIMIT_UP_HEATMAP": "intraday",
     "MARKET_FUND_FLOW_DATA": "intraday",
-    # 盘中/盘后交界：ETF_DAILY_MONITOR 云端虽能抓，但 T+1 语义，归入 post_close 减少盘中噪音
-    "ETF_DAILY_MONITOR": "post_close",
+    # 15:30 收盘数据：EXPERIMENT 等 akshare 可抓的 T+1 数据
     "EXPERIMENT": "post_close",
 }
 

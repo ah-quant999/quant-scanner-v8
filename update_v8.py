@@ -82,17 +82,19 @@ CATEGORY_MAP = {
     "HERDING_DATA": "premarket",
 
     # 盘中（10:30/11:30/13:05/14:00/15:05）
+    # 注意：ETF_DAILY_MONITOR 虽字段含 T+1，但为配合 ETF 三连板实时卡，归 intraday 盘中更新
     "INDEX_QUOTES": "intraday",
     "ETF_PULSE": "intraday",
     "ETF_INTRADAY_HEAT": "intraday",
     "ETF_SUBSCRIPTION": "intraday",
+    "ETF_DAILY_MONITOR": "intraday",
     "SECTOR_FUND_FLOW": "intraday",
     "CAPITAL_FLOW_DATA": "intraday",
     "CONCEPT_RANKING": "intraday",
     "LIMIT_UP_HEATMAP": "intraday",
     "MARKET_FUND_FLOW_DATA": "intraday",
 
-    # 盘后（16:30，主要由 v6 算法推送；cloud_fetch 暂无生产者）
+    # 盘后（17:00，主要由 v6 算法推送；cloud_fetch 暂无生产者）
     "GOLD_POOL": "post_close",
     "CANDIDATE": "post_close",
     "TRIPLE_CONSENSUS": "post_close",
@@ -113,7 +115,6 @@ CATEGORY_MAP = {
     "MAHORO": "post_close",
     "EXPERIMENT": "post_close",
     "STOCK_LIST": "post_close",
-    "ETF_DAILY_MONITOR": "post_close",
 }
 
 CATEGORY_LABEL = {
