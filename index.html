@@ -838,7 +838,7 @@
     <!-- ===== TAB 页面：三重共识（默认展示） ===== -->
     <div id="st-tc" class="st-pane">
       <div class="card">
-        <h3><span class="ic">🥇</span>严格三重共识 - 盘后 · <span class="fresh" id="tcTime">更新于 --</span></h3>
+        <h3><span class="ic">🥇</span>严格三重共识 - 盘后 · <span class="fresh" id="tcTime">更新于 --</span><span class="fresh" id="tcDataTime" style="margin-left:8px;font-weight:400;"></span></h3>
         <div id="tcConsensus" class="tp-stocklist"></div>
         <div class="note">筛选：主站TOP10≥70 且 驾驶舱A档 且 基本面A档。下方「优先/扩展观察」为差1步/差2步备选（主站评分≥75）。</div>
       </div>
@@ -3133,6 +3133,8 @@ function renderLimitUpHeatmap(){
     $('tcExtCount').textContent=ext.length;
     $('tcExtended').innerHTML=ext.length?ext.map(s=>renderStock(s,true,tm)).join(''):'<div class="tp-empty">暂无</div>';
     setTime('tcTime',data.update_time);
+    var dtEl=$('tcDataTime');
+    if(dtEl && data.data_time){ dtEl.textContent='(数据时间 '+rel(data.data_time)+')'; }
   }
 
   function renderTrack(track){
@@ -4208,16 +4210,19 @@ function renderLimitUpHeatmap(){
     var el=document.getElementById(p+'v8CrdsCard');
     if(!el) return;
     var d=window.CRDS_CARD_DATA||{};
-    // 时间
+    // 时间（与全站统一：今日/昨日/N天前 HH:MM）
+    function _crdsRel(ts){
+      if(!ts) return '--';
+      var t=new Date(String(ts).replace(/-/g,'/').replace('T',' '));
+      if(isNaN(t)) return String(ts);
+      var now=new Date();
+      var diff=Math.round((new Date(now.getFullYear(),now.getMonth(),now.getDate())-new Date(t.getFullYear(),t.getMonth(),t.getDate()))/864e5);
+      var hm=('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2);
+      return (diff<=0?'今日':diff===1?'昨日':diff+'天前')+' '+hm;
+    }
     var timeEl=document.getElementById(p+'crdsTime');
     if(timeEl&&d.update_time){
-      var t=new Date(String(d.update_time).replace(/-/g,'/').replace('T',' '));
-      if(isNaN(t)) timeEl.textContent='更新于 '+d.update_time;
-      else{
-        var now=new Date(), diff=Math.round((now-t)/8.6e7);
-        var day=diff<60?'刚刚':diff<1440?'今日'+Math.floor(diff/60)+'时前':diff<2880?'昨日':Math.floor(diff/1440)+'天前';
-        timeEl.textContent='🕐 更新于 '+day;
-      }
+      timeEl.textContent='🕐 更新于 '+_crdsRel(d.update_time);
     }
     // 覆盖说明
     var covEl=document.getElementById(p+'crdsCoverage');

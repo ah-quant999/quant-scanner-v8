@@ -5,8 +5,9 @@
 #
 # 时段（北京时间）：
 #   08:40  盘前：同步 NT_DATA / SUSPENSION_ALERT / MARKET_ALERTS 等盘前预警
-#   16:45  盘后：同步 GOLD_POOL / CANDIDATE / TRIPLE_* / COCKPIT_* / BACKTEST_* /
+#   19:00  盘后：同步 GOLD_POOL / CANDIDATE / TRIPLE_* / COCKPIT_* / BACKTEST_* /
 #                LHB / SECTOR_RS / FIB / MAHORO / CRDS / INST_TRADE / STOCK_LIST 等
+#                （v6 close_p2 18:30 才生成算法产出，故同步时间从原 16:45 推迟到 19:00）
 #
 # 注意：
 # - 本工作流依赖 v6 仓库位于 runner 的 E:\workspace\stock-scanner\data。
@@ -18,7 +19,7 @@ name: "🔄 v8 v6数据同步(cn)"
 on:
   schedule:
     - cron: '40 0 * * 1-5'   # 08:40 CST 盘前
-    - cron: '45 8 * * 1-5'   # 16:45 CST 盘后（v6 收盘数据已就绪）
+    - cron: '0 11 * * 1-5'   # 19:00 CST 盘后（v6 close_p2 18:30 算法产出已就绪）
   workflow_dispatch:
 
 permissions:
