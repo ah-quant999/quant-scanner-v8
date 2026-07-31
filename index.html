@@ -2791,19 +2791,21 @@ function renderLimitUpHeatmap(){
       }catch(e){return false;}
     }
 
-    // 环比箭头：高=红↑  低=绿↓
+    // 环比箭头：高=红↑  低=绿↓；变化极小显示“基本持平”
     function arrow(cur, prev, unit, dec){
       if(cur==null || isNaN(cur) || prev==null || isNaN(prev)){
         return '<span style="color:var(--dim);font-size:11px">—</span>';
       }
       const diff=cur-prev;
-      const up=diff>0;
-      const eq=Math.abs(diff)<1e-9;
-      const color=eq?'var(--dim)':(up?'var(--up)':'var(--down)');
-      const arr=eq?'→':(up?'↑':'↓');
-      const diffTxt=(diff>0?'+':'')+num(diff,dec==null?2:dec)+(unit||'');
       const pct=prev!==0?((diff/Math.abs(prev))*100):0;
-      const pctTxt=Math.abs(pct)>=0.01?' ('+(diff>0?'+':'')+num(pct,1)+'%)':'';
+      if(Math.abs(pct)<0.01){
+        return '<span class="v2-arrow" style="color:var(--dim)">→ 基本持平</span>';
+      }
+      const up=diff>0;
+      const color=up?'var(--up)':'var(--down)';
+      const arr=up?'↑':'↓';
+      const diffTxt=(diff>0?'+':'')+num(diff,dec==null?2:dec)+(unit||'');
+      const pctTxt=' ('+(diff>0?'+':'')+num(pct,1)+'%)';
       return '<span class="v2-arrow" style="color:'+color+'">'+arr+' '+diffTxt+pctTxt+'</span>';
     }
 

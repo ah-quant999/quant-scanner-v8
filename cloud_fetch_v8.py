@@ -344,18 +344,150 @@ def f_cffex_holdings():
     return None
 
 def f_macro_data():
-    # 宏观：以 CPI/PMI 为例（轻量）
+    """宏观数据：保留已有丰富字段，增量更新 CPI/PMI 及债券/Shibor/LPR/M2 前值"""
+    import json
+    # 以现有 raw_data/macro_data.json 为基线，避免云端 runner 把 rich 结构冲成只有 cpi/pmi
+    base_path = RAW_DIR / "macro_data.json"
     out = {}
+    if base_path.exists():
+        try:
+            with open(base_path, encoding="utf-8") as f:
+                out = json.load(f)
+        except Exception:
+            out = {}
+    if not isinstance(out, dict):
+        out = {}
+    # 保证结构
+    out.setdefault("monetary", {})
+    out.setdefault("economy", {})
+    out.setdefault("market_sentiment", {})
+    out.setdefault("global_macro", {})
+    out.setdefault("indicator_status", {})
+
+    def mark_updated(indicator_key, data_dict):
+        sched = {
+            'lpr': {'name': 'LPR利率', 'expected_day': 20, 'tolerance_days': 5},
+            'm2_yoy': {'name': 'M2同比', 'expected_day': 12, 'tolerance_days': 5},
+            'pmi': {'name': '制造业PMI', 'expected_day': 1, 'tolerance_days': 10},
+            'cpi': {'name': 'CPI同比', 'expected_day': 10, 'tolerance_days': 5},
+            'ppi': {'name': 'PPI同比', 'expected_day': 10, 'tolerance_days': 5},
+            'social_financing': {'name': '社融规模', 'expected_day': 10, 'tolerance_days': 8},
+            'export_yoy': {'name': '出口增速', 'expected_day': 7, 'tolerance_days': 5},
+            'new_investors': {'name': '新增投资者', 'expected_day': 15, 'tolerance_days': 10},
+        }
+        st = sched.get(indicator_key)
+        if not st:
+            return
+        data_date = str(data_dict.get('date', ''))[:10]
+        is_fresh = False
+        try:
+            from datetime import datetime
+            dt = datetime.strptime(data_date, '%Y-%m-%d')
+            is_fresh = (datetime.now() - dt).days <= 60
+        except Exception:
+            pass
+        out['indicator_status'][indicator_key] = {
+            'last_updated': datetime.now().strftime('%Y-%m-%d'),
+            'is_fresh': is_fresh,
+            'name': st['name'],
+            'frequency': 'monthly' if indicator_key in ('lpr','m2_yoy','pmi','cpi','ppi','social_financing','export_yoy','new_investors') else 'daily',
+        }
+
+    # 1) CPI / PMI 数组（保留原 flat schema 兼容）
     try:
         cpi = get_ak().macro_china_cpi_yearly()
         out["cpi"] = cpi.tail(6).to_dict(orient="records") if cpi is not None else []
     except Exception:
-        out["cpi"] = []
+        out.setdefault("cpi", [])
     try:
         pmi = get_ak().macro_china_pmi_yearly()
         out["pmi"] = pmi.tail(6).to_dict(orient="records") if pmi is not None else []
     except Exception:
-        out["pmi"] = []
+        out.setdefault("pmi", [])
+
+    # 2) 债券收益率 + 前值
+    try:
+        df = get_ak().bond_zh_us_rate()
+        if df is not None and len(df) > 1:
+            cn = df[['日期', '中国国债收益率10年']].dropna()
+            us = df[['日期', '美国国债收益率10年']].dropna()
+            if len(cn) > 0:
+                cl = cn.iloc[-1]
+                out['monetary']['cn_bond_10y'] = {
+                    'value': round(float(cl['中国国债收益率10年']), 4),
+                    'date': str(cl['日期'])[:10],
+                    'previous': round(float(cn.iloc[-2]['中国国债收益率10年']), 4) if len(cn) > 1 else None,
+                }
+            if len(us) > 0:
+                ul = us.iloc[-1]
+                out['monetary']['us_bond_10y'] = {
+                    'value': round(float(ul['美国国债收益率10年']), 4),
+                    'date': str(ul['日期'])[:10],
+                    'previous': round(float(us.iloc[-2]['美国国债收益率10年']), 4) if len(us) > 1 else None,
+                }
+            if 'cn_bond_10y' in out['monetary'] and 'us_bond_10y' in out['monetary']:
+                cn_v = out['monetary']['cn_bond_10y']['value']
+                us_v = out['monetary']['us_bond_10y']['value']
+                cn_p = out['monetary']['cn_bond_10y'].get('previous')
+                us_p = out['monetary']['us_bond_10y'].get('previous')
+                out['monetary']['cn_us_spread'] = {'value': round(cn_v - us_v, 2)}
+                if cn_p is not None and us_p is not None:
+                    out['monetary']['cn_us_spread']['previous'] = round(cn_p - us_p, 2)
+    except Exception as e:
+        print(f"  ⚠️ 国债收益率获取失败: {e}")
+
+    # 3) LPR + 前值
+    try:
+        df_lpr = get_ak().macro_china_lpr()
+        if df_lpr is not None and len(df_lpr) > 0:
+            lpr_last = df_lpr.iloc[-1]
+            out['monetary']['lpr'] = {
+                'lpr_1y': float(lpr_last['LPR1Y']),
+                'lpr_5y': float(lpr_last['LPR5Y']),
+                'date': str(lpr_last['TRADE_DATE'])[:10],
+                'previous_1y': float(df_lpr.iloc[-2]['LPR1Y']) if len(df_lpr) > 1 else None,
+                'previous_5y': float(df_lpr.iloc[-2]['LPR5Y']) if len(df_lpr) > 1 else None,
+            }
+            mark_updated('lpr', out['monetary']['lpr'])
+    except Exception as e:
+        print(f"  ⚠️ LPR获取失败: {e}")
+
+    # 4) Shibor + 前值
+    try:
+        df_shibor = get_ak().macro_china_shibor_all()
+        if df_shibor is not None and len(df_shibor) > 0:
+            sh = df_shibor.iloc[-1]
+            prev = df_shibor.iloc[-2] if len(df_shibor) > 1 else None
+            out['monetary']['shibor'] = {
+                'on': float(sh.get('O/N-定价', 0)),
+                'w1': float(sh.get('1W-定价', 0)),
+                'm1': float(sh.get('1M-定价', 0)),
+                'm3': float(sh.get('3M-定价', 0)),
+                'date': str(sh.get('日期', ''))[:10],
+                'previous_on': float(prev.get('O/N-定价', 0)) if prev is not None else None,
+                'previous_w1': float(prev.get('1W-定价', 0)) if prev is not None else None,
+            }
+    except Exception as e:
+        print(f"  ⚠️ Shibor获取失败: {e}")
+
+    # 5) M2/M1 货币供应 + 前值
+    try:
+        df_m2 = get_ak().macro_china_money_supply()
+        if df_m2 is not None and len(df_m2) > 0:
+            m2_row = df_m2.iloc[0]
+            m2_val = m2_row.get('货币和准货币(M2)-同比增长')
+            m2_date = str(m2_row['月份']).replace('年', '-').replace('月份', '-01')
+            prev_val = df_m2.iloc[1].get('货币和准货币(M2)-同比增长') if len(df_m2) > 1 else None
+            out['monetary']['m2_yoy'] = {
+                'value': float(m2_val) if pd.notna(m2_val) else None,
+                'date': m2_date,
+                'previous': float(prev_val) if prev_val is not None and pd.notna(prev_val) else None,
+            }
+            if out['monetary']['m2_yoy']['value'] is not None:
+                mark_updated('m2_yoy', out['monetary']['m2_yoy'])
+    except Exception as e:
+        print(f"  ⚠️ M2获取失败: {e}")
+
     return out
 
 def f_crisis_data():
