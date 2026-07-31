@@ -2628,13 +2628,40 @@ function renderLimitUpHeatmap(){
       return c;
     }
     let h3='';
+    // 市场资金流向趋势图（来自 MARKET_FUND_FLOW_DATA，盘后累积）
+    const mff=window.MARKET_FUND_FLOW_DATA||{};
+    if(mff.daily && mff.daily.length>=2){
+      const mDaily=mff.daily.slice(-30);
+      const maxM=Math.max.apply(null,mDaily.map(x=>Math.abs(x.net_yi||0)))||1;
+      const pts=mDaily.map((x,i)=>{
+        const y=50 - (x.net_yi||0)/maxM*45;
+        return ((i/(mDaily.length-1))*100).toFixed(1)+','+y.toFixed(1);
+      }).join(' ');
+      const bars=mDaily.map((x,i)=>{
+        const xh=(i/(mDaily.length-1))*100;
+        const up=(x.net_yi||0)>=0;
+        const bh=Math.max(2,Math.abs(x.net_yi||0)/maxM*40);
+        const by=up?50-bh:50;
+        return `<rect x="${(xh-1.5).toFixed(1)}%" y="${by.toFixed(1)}%" width="3%" height="${bh.toFixed(1)}%" fill="${up?'var(--up)':'var(--down)'}" opacity="0.35" rx="1"/>`;
+      }).join('');
+      h3+='<div style="margin-bottom:12px;background:var(--bg2);border-radius:8px;padding:10px;">';
+      h3+='<div style="font-size:12px;font-weight:700;color:var(--txt);margin-bottom:6px;">📈 市场资金流向趋势（近'+mDaily.length+'日，亿元）</div>';
+      h3+='<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="width:100%;height:90px;display:block;">';
+      h3+=bars;
+      h3+='<polyline points="'+pts+'" fill="none" stroke="#38bdf8" stroke-width="1.5"/>';
+      h3+='<line x1="0" y1="50" x2="100" y2="50" stroke="var(--border)" stroke-width="0.5" stroke-dasharray="2,2"/>';
+      h3+='</svg>';
+      h3+='<div style="display:flex;justify-content:space-between;font-size:9px;color:var(--dim);margin-top:4px;">';
+      h3+='<span>'+(mDaily[0].date||'').slice(4)+'</span><span>'+(mDaily[mDaily.length-1].date||'').slice(4)+'</span>';
+      h3+='</div></div>';
+    }
     if(t5d.length>0 || t20d.length>0 || t60d.length>0){
       h3+='<div class="sf-trend-grid">';
       h3+=sfTrendCard('5日趋势',t5d,'net_5d','sf-trend-head-5');
       h3+=sfTrendCard('20日趋势',t20d,'net_20d','sf-trend-head-20');
       h3+=sfTrendCard('60日趋势',t60d,'net_60d','sf-trend-head-60');
       h3+='</div>';
-    }else{
+    }else if(!h3){
       h3='<div class="ipo-empty">暂无趋势数据（盘中时段或数据未更新）</div>';
     }
     $('sfBlock3').innerHTML=h3;
