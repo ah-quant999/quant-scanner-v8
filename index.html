@@ -796,20 +796,20 @@
           <div style="font-size:13px;color:var(--cyan);font-weight:700;margin-bottom:10px;">查询结果包含以下扩展信息（需该股被收录）：</div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;font-size:12px;line-height:1.6;">
             <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--purple);margin-bottom:4px;">🧬 多维共振</div>
-              <div style="color:var(--sub);">每日TOP10综合评分，≥80分精选 / ≥70分观察，含动量、资金、板块、机构五维加权</div>
+              <div style="font-weight:700;color:var(--purple);margin-bottom:4px;">🧬 多维共振 <span style="font-size:10px;color:var(--gold);font-weight:500;">● 数据滞后</span></div>
+              <div style="color:var(--sub);">每日综合评分，≥80分精选 / ≥70分观察；当前数据源停在 2026-07-30，新数据待 v6 跑批后同步</div>
             </div>
             <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--up);margin-bottom:4px;">⭐ 金股池</div>
-              <div style="color:var(--sub);">信号四格条（缠论买C/金钻黄柱J/机构变红I/上涨趋势T），EMA趋势评分0~7</div>
+              <div style="font-weight:700;color:var(--up);margin-bottom:4px;">⭐ 金股池 <span style="font-size:10px;color:var(--down);font-weight:500;">● 213只</span></div>
+              <div style="color:var(--sub);">信号四格条（缠论买C/金钻黄柱J/机构变红I/上涨趋势T），EMA趋势评分0~7；覆盖部分活跃股</div>
             </div>
             <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--cyan);margin-bottom:4px;">🐉 龙虎榜</div>
+              <div style="font-weight:700;color:var(--cyan);margin-bottom:4px;">🐉 龙虎榜 <span style="font-size:10px;color:var(--down);font-weight:500;">● 72条</span></div>
               <div style="color:var(--sub);">上榜日期 + 分类（机游共振/机构独买/游资独买/不达标）+ 机构净买额 + 游资净买额</div>
             </div>
             <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--up);margin-bottom:4px;">💰 主力资金</div>
-              <div style="color:var(--sub);">净流入/流出 + 连续X日统计，红=流入，绿=流出</div>
+              <div style="font-weight:700;color:var(--up);margin-bottom:4px;">💰 主力资金 <span style="font-size:10px;color:var(--gold);font-weight:500;">● 部分覆盖</span></div>
+              <div style="color:var(--sub);">机构席位净买卖 + 连续净流入统计（覆盖部分活跃股，非全市场）</div>
             </div>
             <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
               <div style="font-weight:700;color:var(--cyan);margin-bottom:4px;">📈 近10日走势</div>
@@ -820,17 +820,16 @@
               <div style="color:var(--sub);">6条EMA均线（5~120日）多空排列方向，均线发散收窄判断趋势强度</div>
             </div>
             <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--purple);margin-bottom:4px;">📰 研报覆盖</div>
-              <div style="color:var(--sub);">投行评级（买入/持有）+ 推荐频次 + 覆盖日期区间</div>
+              <div style="font-weight:700;color:var(--gold);margin-bottom:4px;">🏦 投行覆盖 <span style="font-size:10px;color:var(--down);font-weight:500;">● 28条</span></div>
+              <div style="color:var(--sub);">国际投行立场（看多/看空/中性）+ 北向覆盖等标签；覆盖外资研报触及的个股</div>
             </div>
             <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--gold);margin-bottom:4px;">🏦 投行覆盖</div>
-              <div style="color:var(--sub);">国际投行立场（看多/看空/中性）+ 北向覆盖等标签</div>
-            </div>
-            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--down);margin-bottom:4px;">🚫 停牌识别</div>
+              <div style="font-weight:700;color:var(--down);margin-bottom:4px;">🚫 停牌识别 <span style="font-size:10px;color:var(--down);font-weight:500;">● 12条</span></div>
               <div style="color:var(--sub);">当前停牌状态 + 已停牌天数 + 停牌原因（重大事项/异常波动等）</div>
             </div>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:var(--dim);line-height:1.6;">
+            注：📰 研报覆盖 已下线（数据源仅 26 条且停在 2026-07-27，覆盖率过低，不再展示）。个股查询数据源每日 16:45 从 v6 同步，盘前 08:40 同步预警类数据。
           </div>
         </div>
       </div>
@@ -1719,7 +1718,6 @@ function switchSec(sec,el){
     h+=renderInst(item, code);
     h+=renderPriceTrend(item, code);
     h+=renderEma(item, code);
-    h+=renderReport(item, code);
     h+=renderMahoro(item, code);
     h+='</div>';
     h+=renderSuspension(item, code);
