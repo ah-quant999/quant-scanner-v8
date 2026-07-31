@@ -54,6 +54,7 @@ DATA_SOURCES = {
     "analyst_ratings.json":        "ANALYST_RATINGS",
     "suspension_alert.json":       "SUSPENSION_ALERT",
     "volatility.json":             "VOLATILITY",
+    "index_quotes.json":           "INDEX_QUOTES",
     "capital_flow_data.json":      "CAPITAL_FLOW_DATA",
     "mahoro.json":                 "MAHORO",
     "candidate.json":              "CANDIDATE",

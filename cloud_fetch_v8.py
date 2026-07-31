@@ -459,47 +459,35 @@ def f_herding_data():
     }
 
 def f_limit_up_heatmap():
-    # 涨停热力图：东方财富涨停池（真实），按行业聚合为时间序列，附连板梯队
+    # 涨停热力图：近10个交易日板块涨停家数日历时序（v6风格）。
+    # 复用 fetch_limit_up_heatmap_v8.generate() 做重建/增量。
     try:
-        df = _get_zt_pool()
+        import fetch_limit_up_heatmap_v8 as hm
+        result = hm.generate()
+        if not result:
+            return None
+        # 补充今日涨停池的连板梯队与TOP（保持前端兼容）
+        try:
+            df = _get_zt_pool()
+            ladder = {}
+            for _, r in df.iterrows():
+                lb = int(r.get("连板数") or 0)
+                ladder[lb] = ladder.get(lb, 0) + 1
+            top = []
+            for _, r in df.sort_values("连板数", ascending=False).head(8).iterrows():
+                top.append({"name": r["名称"], "code": r["代码"],
+                            "lbc": int(r.get("连板数") or 0),
+                            "chg": round(float(r.get("涨跌幅") or 0), 2)})
+            result["ladder"] = ladder
+            result["top"] = top
+            result["total"] = int(len(df))
+        except Exception:
+            pass
+        result["note"] = "东方财富涨停池（真实），近10日板块涨停家数"
+        return result
     except Exception as e:
-        print("  zt_pool err:", e)
+        print(f"  ⚠️ 涨停热力图失败: {e}")
         return None
-    if df is None or df.empty:
-        return None
-    today = datetime.now().strftime("%Y-%m-%d")
-    ind = {}
-    for _, r in df.iterrows():
-        name = r.get("所属行业") or "其它"
-        if name in (None, "", "None"):
-            name = "其它"
-        ind[name] = ind.get(name, 0) + 1
-    sectors = [{"name": k, "data": [v]} for k, v in sorted(ind.items(), key=lambda x: -x[1])]
-    # 连板梯队
-    ladder = {}
-    try:
-        for _, r in df.iterrows():
-            lb = int(r.get("连板数") or 0)
-            ladder[lb] = ladder.get(lb, 0) + 1
-    except Exception:
-        ladder = {}
-    # TOP（按连板数）
-    top = []
-    try:
-        for _, r in df.sort_values("连板数", ascending=False).head(8).iterrows():
-            top.append({"name": r["名称"], "code": r["代码"],
-                        "lbc": int(r.get("连板数") or 0),
-                        "chg": round(float(r.get("涨跌幅") or 0), 2)})
-    except Exception:
-        top = []
-    return {
-        "total": int(len(df)),
-        "dates": [today],
-        "sectors": sectors,
-        "ladder": ladder,
-        "top": top,
-        "note": "东方财富涨停池（真实），按行业聚合 + 连板梯队",
-    }
 
 def f_capital_flow_data():
     # 个股主力净流入排行：全市场降序+升序并集（push2delay 镜像），

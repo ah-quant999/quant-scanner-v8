@@ -401,6 +401,7 @@
 <script src="data/NT_DATA.js"></script>
 <script src="data/LHB_DATA.js"></script>
 <script src="data/CONCEPT_RANKING.js"></script>
+<script src="data/INDEX_QUOTES.js"></script>
 <script src="data/MARGIN_DATA.js"></script>
 <script src="data/CFFEX_HOLDINGS.js"></script>
 <script src="data/IPO_DATA.js"></script>
@@ -546,29 +547,49 @@
       </div>
     </div>
 
-    <div class="grid g-3" style="margin-bottom:16px">
-      <div class="card rt-card">
-        <h3><span><span class="ic">🔥</span>沪指 - 盘中</span><span class="rt-summary up">3,418.6 <b>+0.82%</b> <small>+27.8</small></span></h3>
-        <svg class="rt-spark" viewBox="0 0 300 78" preserveAspectRatio="none">
-          <path d="M0,52 L20,50 L40,48 L60,45 L80,42 L100,40 L120,38 L140,35 L160,32 L180,30 L200,28 L220,25 L240,22 L260,18 L280,15 L300,10 L300,78 L0,78 Z" fill="rgba(244,73,93,0.18)"/>
-          <path d="M0,52 L20,50 L40,48 L60,45 L80,42 L100,40 L120,38 L140,35 L160,32 L180,30 L200,28 L220,25 L240,22 L260,18 L280,15 L300,10" fill="none" stroke="#f4495d" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div class="card rt-card">
-        <h3><span><span class="ic">🔥</span>深成指 - 盘中</span><span class="rt-summary up">10,892.3 <b>+1.05%</b> <small>+113.2</small></span></h3>
-        <svg class="rt-spark" viewBox="0 0 300 78" preserveAspectRatio="none">
-          <path d="M0,58 L30,54 L60,50 L90,46 L120,42 L150,38 L180,34 L210,28 L240,24 L270,18 L300,12 L300,78 L0,78 Z" fill="rgba(244,73,93,0.18)"/>
-          <path d="M0,58 L30,54 L60,50 L90,46 L120,42 L150,38 L180,34 L210,28 L240,24 L270,18 L300,12" fill="none" stroke="#f4495d" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <div class="card rt-card">
-        <h3><span><span class="ic">🔥</span>创业板 - 盘中</span><span class="rt-summary down">2,176.4 <b>-0.31%</b> <small>-6.7</small></span></h3>
-        <svg class="rt-spark" viewBox="0 0 300 78" preserveAspectRatio="none">
-          <path d="M0,12 L30,16 L60,20 L90,24 L120,28 L150,32 L180,36 L210,40 L240,44 L270,48 L300,52 L300,78 L0,78 Z" fill="rgba(31,209,123,0.18)"/>
-          <path d="M0,12 L30,16 L60,20 L90,24 L120,28 L150,32 L180,36 L210,40 L240,44 L270,48 L300,52" fill="none" stroke="#1fd17b" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-        </svg>
-      </div>
+    <div class="grid g-4" id="indexCardsGrid" style="margin-bottom:16px">
+      <div class="card rt-card"><div class="ipo-empty">指数行情加载中…</div></div>
+      <div class="card rt-card"><div class="ipo-empty">指数行情加载中…</div></div>
+      <div class="card rt-card"><div class="ipo-empty">指数行情加载中…</div></div>
+      <div class="card rt-card"><div class="ipo-empty">指数行情加载中…</div></div>
     </div>
+    <script>
+    (function(){
+      function fmt(n){ return n==null||isNaN(n)?'--':Number(n).toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:2}); }
+      function renderIndexCards(){
+        var data=window.INDEX_QUOTES;
+        var grid=document.getElementById('indexCardsGrid');
+        if(!grid) return;
+        if(!data || !data.items || !data.items.length){
+          grid.innerHTML='<div class="card rt-card" style="grid-column:1/-1"><div class="ipo-empty">指数行情暂不可用</div></div>';
+          return;
+        }
+        var order=[{c:'000001',l:'沪指'},{c:'399001',l:'深成指'},{c:'399006',l:'创业板'},{c:'000688',l:'科创板'}];
+        var byCode={};
+        data.items.forEach(function(it){ byCode[it.code]=it; });
+        var h='';
+        order.forEach(function(o){
+          var it=byCode[o.c];
+          if(!it) return;
+          var up=it.chg>0, cls=up?'up':'down', color=up?'#f4495d':'#1fd17b', fill=up?'rgba(244,73,93,.18)':'rgba(31,209,123,.18)';
+          var price=fmt(it.price);
+          var chgTxt=(up?'+':'')+it.chg+'%';
+          var changeTxt=(up?'+':'')+fmt(it.change);
+          var sparkUp=up?' L300,10 L300,78 L0,78 Z':' L300,68 L300,78 L0,78 Z';
+          var pathLine=up?'M0,52 L300,10':'M0,10 L300,68';
+          h+='<div class="card rt-card">';
+          h+='<h3><span><span class="ic">🔥</span>'+o.l+' - 盘中</span><span class="rt-summary '+cls+'">'+price+' <b>'+chgTxt+'</b> <small>'+changeTxt+'</small></span></h3>';
+          h+='<svg class="rt-spark" viewBox="0 0 300 78" preserveAspectRatio="none">';
+          h+='<path d="'+pathLine+sparkUp+'" fill="'+fill+'"/>';
+          h+='<path d="'+pathLine+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+          h+='</svg></div>';
+        });
+        grid.innerHTML=h;
+      }
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderIndexCards);
+      else renderIndexCards();
+    })();
+    </script>
 
     <div class="grid g-2" style="margin-bottom:16px">
       <!-- 主力板块 -->
@@ -583,8 +604,19 @@
 
       <!-- 概念排名（真实数据：CONCEPT_RANKING.js） -->
       <div class="card" id="conceptRankCard">
-        <h3><span class="ic">📊</span>概念资金排名 - 主力净流入 TOP · <span class="fresh" id="conceptRankTime">更新于 --</span></h3>
+        <h3><span class="ic">📊</span>概念资金排名 - 主力净流入 TOP15 · <span class="fresh" id="conceptRankTime">更新于 --</span></h3>
         <div id="conceptRankBody"><div class="ipo-empty">加载中…</div></div>
+      </div>
+    </div>
+
+    <!-- 概念资金热力图（treemap） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🗺️</span>概念资金热力图 · 大小=净流入 · 颜色=涨跌 · <span class="fresh" id="conceptMapTime">更新于 --</span></h3>
+      <div id="conceptTreemap" style="min-height:180px;"><div class="ipo-empty">加载中…</div></div>
+      <div style="display:flex;gap:12px;font-size:11px;color:var(--dim);margin-top:10px;align-items:center;flex-wrap:wrap;">
+        <span>方块面积 ≈ |主力净流入|</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:var(--up);border-radius:2px;"></span> 涨</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:var(--down);border-radius:2px;"></span> 跌</span>
       </div>
     </div>
 
@@ -637,10 +669,39 @@
         $('conceptRankBody').innerHTML=h;
         $('conceptRankTime').textContent='更新于 '+rel(d.update_time);
       }
+      function renderConceptTreemap(){
+        const d=window.CONCEPT_RANKING;
+        const el=$('conceptTreemap');
+        if(!el) return;
+        if(!d || !d.items || !d.items.length){
+          el.innerHTML='<div class="ipo-empty">暂无概念数据</div>'; return;
+        }
+        // 取净流入前 30，按 |net| 排序
+        const items=d.items.slice().sort((a,b)=>Math.abs(b.net)-Math.abs(a.net)).slice(0,30);
+        const maxArea=Math.sqrt(Math.abs(items[0].net)||1);
+        let h='<div style="display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start;">';
+        items.forEach(it=>{
+          const up=it.chg>0, down=it.chg<0;
+          const bg=up?'var(--up)':down?'var(--down)':'var(--dim)';
+          const txt=up||down?'#fff':'var(--txt)';
+          const area=Math.sqrt(Math.abs(it.net))/maxArea;
+          const px=Math.max(44, Math.round(area*110));
+          const netTxt=(it.net>0?'+':'')+fmt(it.net);
+          h+='<div style="width:'+px+'px;height:'+px+'px;background:'+bg+';color:'+txt+';border-radius:6px;padding:5px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;font-size:11px;line-height:1.25;box-shadow:0 1px 3px rgba(0,0,0,.25);overflow:hidden;">';
+          h+='<div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;">'+esc(it.name)+'</div>';
+          h+='<div style="font-size:10px;opacity:.9;">'+(it.chg>0?'+':'')+fmt(it.chg)+'% · '+netTxt+'</div>';
+          h+='</div>';
+        });
+        h+='</div>';
+        el.innerHTML=h;
+        const mt=$('conceptMapTime');
+        if(mt) mt.textContent='更新于 '+rel(d.update_time);
+      }
       function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+      function runBoth(){ renderConceptRank(); renderConceptTreemap(); }
       if(document.readyState==='loading')
-        document.addEventListener('DOMContentLoaded',renderConceptRank);
-      else renderConceptRank();
+        document.addEventListener('DOMContentLoaded', runBoth);
+      else runBoth();
     })();
     </script>
 
