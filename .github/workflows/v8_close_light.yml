@@ -1,0 +1,44 @@
+# 九宝量化 v8.0 — 收盘超轻量刷新（自托管 cn runner）
+# 15:05 CST(07:05 UTC) 周一至周五。超轻量：仅做抓取+构建+推送，不设重分析，timeout 收紧。
+name: "🌇 v8 收盘超轻量(cn)"
+
+on:
+  schedule:
+    - cron: '5 7 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  close-light:
+    runs-on: [self-hosted, cn]
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: 安装依赖
+        run: pip install akshare --quiet 2>/dev/null || pip install akshare
+      - name: "📡 收盘抓取（逐模块容错）"
+        continue-on-error: true
+        run: python cloud_fetch_v8.py
+      - name: "🏗️ 构建 data/*.js"
+        run: python update_v8.py
+      - name: "📤 提交并推送"
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "v8-cloud-bot"
+          git config user.email "v8-cloud-bot@users.noreply.github.com"
+          git fetch origin main && git rebase origin/main || true
+          git add -f data/ raw_data/
+          if git diff --cached --quiet; then
+            echo "ℹ️ 无数据变化，跳过提交"
+          else
+            git commit -m "v8 close-light: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
+            git push "https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git" HEAD:main
+          fi

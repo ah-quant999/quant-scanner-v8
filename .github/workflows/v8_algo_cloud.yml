@@ -1,0 +1,39 @@
+# 九宝量化 v8.0 — 算法上云（自托管 cn runner）
+# 17:00 CST(09:00 UTC) 周一至周五。将最新原始数据全量重建为 data/*.js（算法产出上云），与盘中抓取解耦。
+name: "🧮 v8 算法上云(cn)"
+
+on:
+  schedule:
+    - cron: '0 9 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  algo:
+    runs-on: [self-hosted, cn]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: "🧮 全量重建 data/*.js（算法产出上云）"
+        run: python update_v8.py
+      - name: "📤 提交并推送"
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "v8-cloud-bot"
+          git config user.email "v8-cloud-bot@users.noreply.github.com"
+          git fetch origin main && git rebase origin/main || true
+          git add -f data/
+          if git diff --cached --quiet; then
+            echo "ℹ️ 无变化，跳过提交"
+          else
+            git commit -m "v8 algo-cloud: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
+            git push "https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git" HEAD:main
+          fi

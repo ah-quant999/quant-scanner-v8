@@ -1,0 +1,38 @@
+# 九宝量化 v8.0 — 周日清理（自托管 cn runner）
+# 周日 23:00 CST(15:00 UTC)。轻量维护：清缓存/修剪心跳日志，保持仓库整洁，无数据抓取。
+name: "🧹 v8 周日清理(cn)"
+
+on:
+  schedule:
+    - cron: '0 15 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: [self-hosted, cn]
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: "🧹 清理缓存与修剪心跳日志"
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "v8-cloud-bot"
+          git config user.email "v8-cloud-bot@users.noreply.github.com"
+          rm -rf __pycache__
+          if [ -f data/_heartbeat.log ]; then
+            tail -n 200 data/_heartbeat.log > data/_heartbeat.log.tmp && mv data/_heartbeat.log.tmp data/_heartbeat.log
+          fi
+          git fetch origin main && git rebase origin/main || true
+          git add -A
+          if git diff --cached --quiet; then
+            echo "ℹ️ 无变化，跳过提交"
+          else
+            git commit -m "v8 cleanup: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
+            git push "https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git" HEAD:main
+          fi
