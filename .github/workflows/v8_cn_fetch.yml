@@ -38,18 +38,35 @@ jobs:
       # 本机已预填 tool cache（_work/_tool/Python/3.13.14/x64，且已预装 akshare 1.18.64
       # + pandas 3.0.3）。直接挂载到 PATH，不需要任何联网（绕开 setup-python 在 cn runner
       # 上拉取境外 Python 包 ETIMEDOUT，也绕开它「命中缓存却不更新 bash PATH」的坑）。
+      # ⚠️ 关键坑：RUNNER_TOOL_CACHE 是 Windows 反斜杠路径，bash(msys) 无法直接 exec，
+      # 必须用 cygpath 转成 POSIX 路径（/d/...）才能跑 python.exe。
       - name: "挂载本机 tool cache Python（预装 akshare/pandas，免境外下载）"
         shell: bash
         run: |
-          PY="$RUNNER_TOOL_CACHE/Python/3.13.14/x64"
-          if [ -x "$PY/python.exe" ]; then
+          echo "RUNNER_TOOL_CACHE=$RUNNER_TOOL_CACHE"
+          CANDIDATES=()
+          if command -v cygpath >/dev/null 2>&1; then
+            CANDIDATES+=("$(cygpath -u "$RUNNER_TOOL_CACHE/Python/3.13.14/x64" 2>/dev/null)")
+          fi
+          # 兜底：硬编码已知绝对路径（git-bash 下 D:\ → /d/，C:\ 管理版 Python 也含 akshare）
+          CANDIDATES+=("/d/actions-runner-v8/_work/_tool/Python/3.13.14/x64")
+          CANDIDATES+=("/c/Users/Administrator/.workbuddy/binaries/python/versions/3.13.12")
+          PY=""
+          for cand in "${CANDIDATES[@]}"; do
+            if [ -n "$cand" ] && [ -x "$cand/python.exe" ]; then
+              PY="$cand"; break
+            fi
+          done
+          echo "PY=$PY"
+          if [ -n "$PY" ]; then
             echo "$PY" >> "$GITHUB_PATH"
             echo "$PY/Scripts" >> "$GITHUB_PATH"
-            echo "✅ 已挂载 tool cache Python：$PY"
+            echo "✅ 已挂载本机 Python：$PY"
             "$PY/python.exe" --version
             "$PY/python.exe" -c "import akshare; print('akshare', akshare.__version__)"
           else
-            echo "❌ tool cache Python 缺失：$PY"
+            echo "❌ 候选路径均未命中可用的 python.exe"
+            ls -la "$RUNNER_TOOL_CACHE/Python" 2>&1 || true
             exit 1
           fi
 
