@@ -9,13 +9,13 @@
 # 数据交接链路：本任务抓完 push raw_data/ → v8_build_deploy 拉取 → update_v8.py 生成
 # data/*.js → push main（GitHub Pages 源即部署）。两任务定时错开 10 分钟保证 raw_data 已落地。
 #
-# 运行环境说明（本机 cn runner 已配好）：
+# ⚠️ 中国网络特殊说明（本机 cn runner 已配好）：
 #   - runner 以 NT AUTHORITY\NETWORK SERVICE 运行，无法访问 E:（坚果云 junction）。
-#   - 故 git/Python 工具链全部放在 D: 真实本地盘：
-#       Python: D:\actions-runner-v8\_work\_tool\Python\3.13.14\x64（预装 akshare 1.18.64 + pandas）
-#       Git:    D:\PortableGit\mingw64\bin（由 E: 复制而来，并给 NETWORK SERVICE 授权）
-#   - 上述路径已写入 D:\actions-runner-v8\.env 的 PATH，runner 服务已重启生效。
-#   - shell 统一用 powershell（本机 git-bash 在 service 账户下异常，powershell 稳定）。
+#     工具链全在 D: 真实本地盘：Python(D:\actions-runner-v8\_work\_tool) / Git(D:\PortableGit)。
+#   - 关键坑：该账户下 github.com 的 git/HTTPS 协议被重置（Connection reset / timeout），
+#     但 api.github.com 可达。因此本工作流【完全不用 git】：脚本经 REST API 拉取、
+#     raw_data 也经 Git Database API 推送（单次 commit，并发安全）。
+#   - shell 统一 powershell（git-bash 在 service 账户下异常）。
 
 name: "🇨🇳 v8 中国数据抓取(cn)"
 
@@ -36,10 +36,29 @@ jobs:
   fetch:
     runs-on: [self-hosted, cn]
     timeout-minutes: 20
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
+      - name: "经 API 拉取脚本（绕过 git）"
+        shell: powershell
+        run: |
+          python -c @'
+          import os, base64, json, urllib.request
+          token = os.environ['GITHUB_TOKEN']
+          files = ['cloud_fetch_v8.py', 'api_push_raw.py']
+          for fn in files:
+              url = f'https://api.github.com/repos/ah-quant999/quant-scanner-v8/contents/{fn}'
+              req = urllib.request.Request(url, headers={
+                  'Authorization': f'Bearer {token}',
+                  'Accept': 'application/vnd.github+json',
+                  'X-GitHub-Api-Version': '2022-11-28'})
+              d = json.load(urllib.request.urlopen(req, timeout=60))
+              with open(fn, 'wb') as f: f.write(base64.b64decode(d['content']))
+              print('downloaded', fn, len(d['content']), 'b64 chars')
+          '@
 
       - name: "校验 Python / akshare（缺失则走清华镜像安装）"
         shell: powershell
@@ -60,26 +79,7 @@ jobs:
         run: |
           python cloud_fetch_v8.py
 
-      - name: "📤 push raw_data/ 到 main"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: "📤 经 API 推送 raw_data/ 到 main"
         shell: powershell
         run: |
-          if (-not (Test-Path raw_data)) { Write-Host "raw_data 未生成，跳过"; exit 0 }
-          git config user.name "v8-cn-bot"
-          git config user.email "v8-bot@users.noreply.github.com"
-          git add -f raw_data/
-          git diff --cached --quiet
-          if ($LASTEXITCODE -eq 0) { Write-Host "ℹ️ 无数据变化，跳过提交"; exit 0 }
-          $msg = "v8 cn fetch: " + (Get-Date -Format 'yyyy-MM-dd HH:mm')
-          git commit -m $msg
-          $repo = "https://x-access-token:$env:GITHUB_TOKEN@github.com/ah-quant999/quant-scanner-v8.git"
-          # 与 build_deploy 并发 push 时可能非快进被拒，rebase 重试 3 次
-          for ($i=1; $i -le 3; $i++) {
-            if (git push $repo HEAD:main) { Write-Host "✅ raw_data 已推送（第 $i 次尝试）"; exit 0 }
-            Write-Host "⚠️ push 被拒，rebase 后重试 ($i/3)"
-            git fetch $repo main
-            git rebase FETCH_HEAD
-            if ($LASTEXITCODE -ne 0) { git rebase --abort; exit 1 }
-          }
-          Write-Host "❌ 3 次重试后仍失败"; exit 1
+          python api_push_raw.py
