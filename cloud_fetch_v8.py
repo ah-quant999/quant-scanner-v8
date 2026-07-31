@@ -1092,6 +1092,16 @@ def f_v8_cal(today=None):
 
 def main():
     print(f"=== v8 云端抓取开始 {datetime.now().isoformat(timespec='seconds')} ===")
+    # 清理旧 raw_data，防止已下架/废弃的 json 被 api_push_raw.py 重新推回仓库
+    cleaned = 0
+    for old in RAW_DIR.glob("*.json"):
+        try:
+            old.unlink()
+            cleaned += 1
+        except Exception as e:
+            print(f"  ⚠️  清理旧文件失败 {old.name}: {e}")
+    if cleaned:
+        print(f"  🧹 已清理 {cleaned} 个旧 raw_data/*.json")
     run("ETF_INTRADAY_HEAT", f_etf_intraday_heat)
     run("SECTOR_FUND_FLOW", f_sector_fund_flow)
     run("INDEX_QUOTES", f_index_quotes)

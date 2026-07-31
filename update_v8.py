@@ -191,9 +191,10 @@ def build():
     for src_path in sorted(files):
         var_name = DATA_SOURCES.get(src_path.name)
         if not var_name:
-            # 尝试按文件名推断变量名（如 v8_cal.json → V8_CAL）
-            stem = src_path.stem
-            var_name = stem.upper().replace('-', '_')
+            # 未知文件：不自动推断，避免已下架/废弃数据（如 limit_up_ladder.json）被重新生成
+            print(f"  ⏭️  {src_path.name} 不在 DATA_SOURCES 映射中，跳过（避免废弃数据复活）")
+            skipped += 1
+            continue
         obj = _load_json(src_path)
         if obj is None:
             skipped += 1
