@@ -3,3 +3,7 @@ __pycache__/
 *.pyo
 .DS_Store
 .workbuddy/
+# 算法 staging / 生成数据（脚本和工作流会重建）
+algorithms/data/
+algorithms/out/
+out/

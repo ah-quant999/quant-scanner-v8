@@ -985,6 +985,7 @@
       .op-tab-btn{padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid #243150;background:#0f1a2e;color:#93a4c4;transition:.15s}
       .op-tab-btn:hover{border-color:#38bdf8;color:#cfe3ff}
       .op-tab-btn.active{background:linear-gradient(135deg,#13243f,#0e2747);border-color:#38bdf8;color:#fff;box-shadow:0 0 0 1px rgba(56,189,248,.4)}
+      .op-tab-time{font-size:10px;font-weight:500;color:var(--sub);margin-left:6px;white-space:nowrap}
       .op-tab-pane{display:none}
       .op-tab-pane.active{display:block}
     
@@ -1007,8 +1008,8 @@
 </style>
     <div class="op-tabs">
       <button class="op-tab-btn active" data-op="1" onclick="opSwitchTab(1)">运维</button>
-      <button class="op-tab-btn" data-op="3" onclick="opSwitchTab(3)">暂未上架</button>
-      <button class="op-tab-btn" data-op="4" onclick="opSwitchTab(4)">已下架</button>
+      <button class="op-tab-btn" data-op="3" onclick="opSwitchTab(3)">暂未上架 <span class="op-tab-time" id="opTab3Time"></span></button>
+      <button class="op-tab-btn" data-op="4" onclick="opSwitchTab(4)">已下架 <span class="op-tab-time" id="opTab4Time"></span></button>
     </div>
     <div id="opTab1" class="op-tab-pane active">
     <div class="grid g-2" style="margin-bottom:16px">
@@ -3972,28 +3973,28 @@ function renderLimitUpHeatmap(){
       var future=fib.windows.filter(function(w){return w.status==='future';}).slice(0,3);
       var missed=fib.windows.filter(function(w){return w.status==='missed';}).slice(0,3);
       h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">';
-      h+='<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25);border-radius:8px;padding:10px;">';
-      h+='<div style="font-weight:700;color:#a78bfa;margin-bottom:6px;font-size:12px;">⏱️ F窗口</div>';
+      h+='<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25);border-radius:8px;padding:12px;">';
+      h+='<div style="font-weight:700;color:#a78bfa;margin-bottom:8px;font-size:13px;">⏱️ F窗口</div>';
       if(triggered.length){
-        h+='<div style="font-size:11px;color:#1D9E75;margin-bottom:4px;">⚡ '+triggered.map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')+'</div>';
-      } else { h+='<div style="font-size:11px;color:var(--dim);">暂无触发窗口</div>'; }
+        h+='<div style="font-size:13px;color:#1D9E75;margin-bottom:6px;line-height:1.6;">⚡ '+triggered.map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')+'</div>';
+      } else { h+='<div style="font-size:13px;color:var(--dim);">暂无触发窗口</div>'; }
       if(future.length){
-        h+='<div style="font-size:10px;color:var(--sub);margin-top:4px;">📅 待观：'+future.map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')+'</div>';
+        h+='<div style="font-size:12px;color:var(--sub);margin-top:6px;line-height:1.5;">📅 待观：'+future.map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')+'</div>';
       }
       h+='</div>';
-      h+='<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:8px;padding:10px;">';
-      h+='<div style="font-weight:700;color:var(--cyan);margin-bottom:6px;font-size:12px;">📐 缠论视角</div>';
+      h+='<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:8px;padding:12px;">';
+      h+='<div style="font-weight:700;color:var(--cyan);margin-bottom:8px;font-size:13px;">📐 缠论视角</div>';
       if(fib.current){
-        h+='<div style="font-size:11px;color:var(--txt);">从 <b>'+(fib.current.peak_date||'--').slice(5)+'</b> 高点回调 <b>'+(fib.current.days_down||0)+'天</b></div>';
-        h+='<div style="font-size:11px;color:'+(fib.current.total_pct>=0?'var(--up)':'var(--down)')+';margin-top:4px;">累计 '+fib.current.total_pct+'%，模式：'+(fib.current.mode||'—')+'</div>';
-      } else { h+='<div style="font-size:11px;color:var(--dim);">暂无中枢数据</div>'; }
+        h+='<div style="font-size:13px;color:var(--txt);line-height:1.6;">从 <b>'+(fib.current.peak_date||'--').slice(5)+'</b> 高点回调 <b>'+(fib.current.days_down||0)+'天</b></div>';
+        h+='<div style="font-size:13px;color:'+(fib.current.total_pct>=0?'var(--up)':'var(--down)')+';margin-top:6px;line-height:1.6;">累计 '+fib.current.total_pct+'%，模式：'+(fib.current.mode||'—')+'</div>';
+      } else { h+='<div style="font-size:13px;color:var(--dim);">暂无中枢数据</div>'; }
       h+='</div>';
-      h+='<div style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:8px;padding:10px;">';
-      h+='<div style="font-weight:700;color:var(--down);margin-bottom:6px;font-size:12px;">🛡️ 窗口失效应对</div>';
+      h+='<div style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:8px;padding:12px;">';
+      h+='<div style="font-weight:700;color:var(--down);margin-bottom:8px;font-size:13px;">🛡️ 窗口失效应对</div>';
       if(missed.length){
-        h+='<div style="font-size:10px;color:var(--dim);">近3个失效：'+missed.map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')+'</div>';
+        h+='<div style="font-size:12px;color:var(--dim);line-height:1.6;">近3个失效：'+missed.map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')+'</div>';
       }
-      h+='<div style="font-size:10px;color:var(--sub);margin-top:4px;">F窗口跌破或放量未反 → 按原计划止损，不追加。</div>';
+      h+='<div style="font-size:12px;color:var(--sub);margin-top:6px;line-height:1.5;">F窗口跌破或放量未反 → 按原计划止损，不追加。</div>';
       h+='</div>';
       h+='</div>';
     } else {
@@ -4047,21 +4048,55 @@ function renderLimitUpHeatmap(){
     try{
     var h='';
 
+    /* ── 分组标题：盘后更新 ── */
+    h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167,139,250,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#a78bfa;border-radius:8px;margin:16px 0 10px 0;">🌙 盘后更新</div>';
+
+    /* 1. 精选预判信号 */
     var w52=window.W52_HIGH||{}, lu=window.LIMIT_UP_HEATMAP||{}, hd=window.HERDING_DATA||{};
     var sigT=w52.update_time||lu.update_time||hd.update_time||'';
     var hasSig=(w52.total||0)>0 || (lu.sectors&&lu.dates) || (hd.current_clusters&&hd.current_clusters.length);
-    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid var(--purple);">';
+    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #7b1fa2;">';
     h+=v8CardHeader('🎯','精选预判信号','事件型盘后','update_time',{update_time:sigT},!hasSig);
-    h+='<div style="padding:12px 14px;">';
+    h+='<div style="padding:0;">';
     if(hasSig){
       var n52=w52.total||0;
-      var luTotal=0; try{ if(lu.sectors&&lu.dates){var li=lu.dates.length-1;lu.sectors.forEach(function(s){luTotal+=(s.data&&s.data[li])||0;});} }catch(e){}
-      var herdingTop='',herdingDir='流入'; try{ if(hd.current_clusters&&hd.current_clusters[0]){herdingTop=hd.current_clusters[0].sector;herdingDir=hd.current_clusters[0].direction||'流入';} }catch(e){}
-      h+='<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;">';
-      h+='<div style="text-align:center;"><div style="font-size:24px;font-weight:800;color:var(--up);">'+n52+'</div><div style="font-size:11px;color:var(--dim);">历史新高</div></div>';
-      h+='<div style="text-align:center;"><div style="font-size:24px;font-weight:800;color:var(--gold);">'+luTotal+'</div><div style="font-size:11px;color:var(--dim);">今日涨停</div></div>';
-      if(herdingTop){ h+='<div style="text-align:center;"><div style="font-size:13px;font-weight:700;color:var(--purple);max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+herdingTop+'</div><div style="font-size:11px;color:var(--dim);">最强抱团 · '+herdingDir+'</div></div>'; }
+      var luTotal=0, topSector={name:'--',n:0}, prevTotal=0;
+      try{ if(lu.sectors&&lu.dates){var li=lu.dates.length-1; lu.sectors.forEach(function(s){var v=(s.data&&s.data[li])||0; luTotal+=v; if(v>topSector.n){topSector={name:s.name,n:v};}}); var pi=li-1; if(pi>=0){lu.sectors.forEach(function(s){prevTotal+=(s.data&&s.data[pi])||0;});} } }catch(e){}
+      var diff=luTotal-prevTotal;
+      var diffStr=diff>0?'↑+'+diff:(diff<0?'↓'+diff:'±0');
+      var herdingTop='',herdingAmt=0,herdingPct=0,herdingLeader='--';
+      try{ if(hd.current_clusters&&hd.current_clusters[0]){var t1=hd.current_clusters[0]; herdingTop=(t1.medal||'🥇')+' '+t1.sector; herdingAmt=t1.amount||0; herdingPct=t1.pct||0; herdingLeader=t1.leader||'--';} }catch(e){}
+      var totalA=5500;
+      try{ var sl=window.STOCK_LIST; if(Array.isArray(sl)) totalA=sl.filter(function(s){return /^\d{6}$/.test((s&&s.code)||'');}).length||5500; }catch(e){}
+      var pct52=(n52/totalA)*100;
+      var zone52=pct52<1?'极度弱势区':pct52<3?'温和活跃区':pct52<5?'健康偏强区':pct52<10?'强势主升区':pct52<15?'亢奋警戒区':'极度贪婪';
+      var zoneColor52=pct52<1?'#ef5350':pct52<3?'#aaa':pct52<5?'#7ee0a0':pct52<10?'#f59e0b':pct52<15?'#ef5350':'#ef5350';
+      var n52Label=n52>=150?'市场热度极高':n52>=100?'强势股活跃':n52>=50?'结构性行情':n52>0?'局部热点':'';
+      var n52LabelColor=n52>=150?'#ef5350':n52>=100?'#f59e0b':n52>=50?'var(--txt)':'#aaa';
+
+      h+='<div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:0;">';
+      h+='<div style="padding:14px 12px;text-align:center;border-right:1px solid var(--border);background:linear-gradient(135deg,rgba(255,160,0,.12),rgba(255,160,0,.04));">';
+      h+='<div style="font-size:10px;color:#f59e0b;font-weight:700;margin-bottom:2px;">🎯 主信号</div>';
+      h+='<div style="font-size:10px;color:var(--dim);margin-bottom:4px;">📈 52周新高</div>';
+      h+='<div style="font-size:32px;font-weight:800;color:#f59e0b;line-height:1.1;">'+n52+'<span style="font-size:14px;color:var(--dim);">只</span></div>';
+      h+='<div style="font-size:10px;color:'+n52LabelColor+';margin-top:2px;font-weight:600;">'+n52Label+'</div>';
+      h+='<div style="font-size:9px;color:var(--sub);margin-top:4px;line-height:1.4;">占比 '+pct52.toFixed(1)+'% / <span style="color:'+zoneColor52+';font-weight:600;">'+zone52+'</span></div>';
+      h+='<div style="font-size:9px;color:var(--dim);margin-top:4px;line-height:1.3;">突破过去一年最高价的股票数量，反映市场中长期强势股活跃度</div>';
       h+='</div>';
+      h+='<div style="padding:14px 8px;text-align:center;border-right:1px solid var(--border);background:linear-gradient(135deg,rgba(239,83,80,.12),rgba(239,83,80,.04));">';
+      h+='<div style="font-size:10px;color:#ef5350;font-weight:600;margin-bottom:4px;">🔥 今日涨停</div>';
+      h+='<div style="font-size:26px;font-weight:800;color:#ef5350;line-height:1.1;">'+luTotal+'<span style="font-size:14px;color:var(--dim);">只</span></div>';
+      h+='<div style="font-size:10px;color:var(--sub);margin-top:2px;">vs昨日 <b style="color:'+(diff>0?'var(--up)':diff<0?'var(--down)':'#aaa')+';">'+diffStr+'</b></div>';
+      h+='<div style="font-size:9px;color:#ef5350;margin-top:4px;line-height:1.3;">情绪热度·连板梯队<br>最强板块：'+topSector.name+'('+topSector.n+'只)</div>';
+      h+='</div>';
+      h+='<div style="padding:14px 8px;text-align:center;background:linear-gradient(135deg,rgba(167,139,250,.12),rgba(167,139,250,.04));">';
+      h+='<div style="font-size:10px;color:#a78bfa;font-weight:600;margin-bottom:4px;">🥇 最强抱团</div>';
+      h+='<div style="font-size:18px;font-weight:800;color:#a78bfa;line-height:1.2;max-width:120px;margin:0 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(herdingTop||'--')+'</div>';
+      h+='<div style="font-size:10px;color:#a78bfa;margin-top:2px;">'+(herdingAmt?herdingAmt.toFixed(1)+'亿 · ':'')+herdingPct.toFixed(1)+'%</div>';
+      h+='<div style="font-size:9px;color:#a78bfa;margin-top:4px;line-height:1.3;">资金抱团方向·龙头：'+herdingLeader+'</div>';
+      h+='</div>';
+      h+='</div>';
+
       var judge=''; var luT=luTotal||0;
       if(n52>=100&&luT>=50) judge='⚡ 强势股独立行情：历史新高活跃+'+luT+'只涨停，短线可追但快进快出。';
       else if(n52>=100&&luT<50) judge='📊 新高多涨停少，跟风盘不热，结构性行情。';
@@ -4069,88 +4104,134 @@ function renderLimitUpHeatmap(){
       else if(n52<30&&luT>=50) judge='🔥 短线热炒，游资主导，严格止损。';
       else if(n52<30&&luT<30) judge='🌫️ 信号清淡，多看少动。';
       else judge='🌫️ 信号混合，建议综合判断。';
-      h+='<div style="font-size:12px;color:var(--sub);background:var(--bg2);border-radius:6px;padding:8px 10px;">'+judge+'</div>';
+      h+='<div style="font-size:12px;color:var(--sub);background:var(--bg2);border-radius:0 0 8px 8px;padding:10px 14px;border-top:1px solid var(--border);">'+judge+'</div>';
     } else {
-      h+='<div class="note" style="text-align:center;">信号数据为空</div>';
+      h+='<div class="note" style="padding:14px;text-align:center;">信号数据为空</div>';
     }
     h+='</div></div>';
 
-    var cfd=window.CAPITAL_FLOW_DATA||{};
-    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid var(--cyan);">';
-    h+=v8CardHeader('💰','四路资金流向对比','个股主力净流入/流出','update_time',cfd,!cfd||(!cfd.top_inflow&&!cfd.top_outflow));
+    /* 2. 四路资金流向对比（龙虎榜席位口径） */
+    var lhb=window.LHB_DATA||{}, lhbT=lhb.update_time||'';
+    var hasLhb=lhb.stocks&&lhb.stocks.length;
+    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #4527a0;">';
+    h+=v8CardHeader('💰','四路资金流向对比','龙虎榜席位口径','update_time',{update_time:lhbT},!hasLhb);
     h+='<div style="padding:12px 14px;">';
-    if(cfd&&(cfd.top_inflow||cfd.top_outflow)){
-      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">';
-      h+='<div><div style="font-size:11px;font-weight:700;color:var(--up);margin-bottom:4px;">▲ 净流入 TOP5</div>';
-      (cfd.top_inflow||[]).slice(0,5).forEach(function(r){
-        h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px dashed var(--border);"><span>'+r.name+'</span><span style="color:var(--up);font-weight:700;">+'+r.net+'亿</span></div>';
-      });
+    if(hasLhb){
+      function lhbNet(s,key){ var seat=s.seats&&s.seats[key]; return seat?(seat.buy||0)-(seat.sell||0):0; }
+      var instNet=0, yzNet=0, bxNet=0, unNet=0;
+      lhb.stocks.forEach(function(s){ instNet+=s.inst_net_万||0; yzNet+=s.yz_net_万||0; bxNet+=lhbNet(s,'北向'); unNet+=lhbNet(s,'未识别'); });
+      function fmtNet(n){ return (n>=0?'+':'')+(n/1e4).toFixed(1)+'亿'; }
+      function dirClass(n){ return n>=0?'up':'down'; }
+      function dirStr(n){ return n>=0?'净流入':'净流出'; }
+      function stocksTop(arr, netFn, buyOrSell){
+        var sorted=arr.slice().sort(function(a,b){return netFn(b)-netFn(a);});
+        if(buyOrSell==='buy') return sorted.slice(0,3).map(function(s){return s.name+'('+(netFn(s)/1e4).toFixed(1)+')';}).join('、');
+        return sorted.slice(-3).reverse().map(function(s){return s.name+'('+(-netFn(s)/1e4).toFixed(1)+')';}).join('、');
+      }
+      function netRow(label, net, netFn, color){
+        var dc=dirClass(net);
+        return '<tr style="background:'+color+';">'
+          +'<td style="padding:6px 8px;border:1px solid var(--border);font-weight:600;white-space:nowrap;">'+label+'</td>'
+          +'<td style="padding:6px 8px;border:1px solid var(--border);text-align:center;color:'+(dc==='up'?'var(--up)':'var(--down)')+';font-weight:600;">'+dirStr(net)+'</td>'
+          +'<td style="padding:6px 8px;border:1px solid var(--border);text-align:center;color:'+(dc==='up'?'var(--up)':'var(--down)')+';font-weight:700;">'+fmtNet(net)+'</td>'
+          +'<td style="padding:6px 8px;border:1px solid var(--border);color:var(--up);">'+stocksTop(lhb.stocks,netFn,'buy')+'</td>'
+          +'<td style="padding:6px 8px;border:1px solid var(--border);color:var(--down);">'+stocksTop(lhb.stocks,netFn,'sell')+'</td>'
+          +'</tr>';
+      }
+      function instFn(s){ return s.inst_net_万||0; }
+      function yzFn(s){ return s.yz_net_万||0; }
+      function bxFn(s){ return lhbNet(s,'北向'); }
+      function unFn(s){ return lhbNet(s,'未识别'); }
+
+      h+='<div style="margin-bottom:10px;padding:8px 10px;background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(86,71,135,.08));border:1px dashed rgba(167,139,250,.3);border-radius:8px;font-size:11px;color:var(--sub);line-height:1.6;">';
+      if(lhb.common_buy_stocks&&lhb.common_buy_stocks.length) h+='<span style="color:var(--up);">🔴 三方共振净买入：'+lhb.common_buy_stocks.slice(0,5).join('、')+'</span> ｜ ';
+      if(lhb.common_sell_stocks&&lhb.common_sell_stocks.length) h+='<span style="color:var(--down);">🟢 三方共振净卖出：'+lhb.common_sell_stocks.slice(0,5).join('、')+'</span>';
+      if(!((lhb.common_buy_stocks&&lhb.common_buy_stocks.length)||(lhb.common_sell_stocks&&lhb.common_sell_stocks.length))) h+='龙虎榜席位口径，仅覆盖当日异动上榜股。';
       h+='</div>';
-      h+='<div><div style="font-size:11px;font-weight:700;color:var(--down);margin-bottom:4px;">▼ 净流出 TOP5</div>';
-      (cfd.top_outflow||[]).slice(0,5).forEach(function(r){
-        h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px dashed var(--border);"><span>'+r.name+'</span><span style="color:var(--down);font-weight:700;">'+r.net+'亿</span></div>';
-      });
-      h+='</div></div>';
+
+      h+='<table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+      h+='<thead><tr style="background:#3C3489;color:#fff;">';
+      h+='<th style="text-align:left;padding:6px 8px;border:1px solid #2A2470;font-weight:500;">维度</th>';
+      h+='<th style="text-align:center;padding:6px 8px;border:1px solid #2A2470;font-weight:500;">方向</th>';
+      h+='<th style="text-align:center;padding:6px 8px;border:1px solid #2A2470;font-weight:500;">净额</th>';
+      h+='<th style="text-align:center;padding:6px 8px;border:1px solid #2A2470;font-weight:500;">净买入TOP3</th>';
+      h+='<th style="text-align:center;padding:6px 8px;border:1px solid #2A2470;font-weight:500;">净卖出TOP3</th>';
+      h+='</tr></thead><tbody>';
+      h+=netRow('🏦 机构席位', instNet, instFn, 'rgba(255,245,245,.05)');
+      h+=netRow('🚀 游资席位', yzNet, yzFn, 'rgba(245,245,255,.05)');
+      h+=netRow('🌎 龙虎榜北向席位', bxNet, bxFn, 'rgba(240,248,255,.05)');
+      h+=netRow('🌏 未识别席位', unNet, unFn, 'rgba(245,255,245,.05)');
+      h+='</tbody></table>';
+      h+='<div style="margin-top:8px;font-size:10px;color:var(--dim);padding:0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">数据源：龙虎榜席位 '+lhb.date+'｜仅覆盖异动上榜股</div>';
     } else {
-      h+='<div class="note" style="text-align:center;">资金流向数据为空</div>';
+      h+='<div class="note" style="text-align:center;">龙虎榜席位数据为空</div>';
     }
     h+='</div></div>';
 
-    var cffex=window.CFFEX_HOLDINGS||{};
-    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #fbbf24;">';
-    h+=v8CardHeader('📊','股指期货升贴水','T+1·期指持仓结构','update_time',cffex,!cffex||!cffex.items);
+    /* ── 分组标题：T+1 盘后更新 ── */
+    h+='<div style="background:linear-gradient(135deg,rgba(56,189,248,.18),rgba(56,189,248,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#38bdf8;border-radius:8px;margin:16px 0 10px 0;">📅 T+1 盘后更新</div>';
+
+    /* 3. 中信期货 */
+    var cffex=window.CFFEX_HOLDINGS||{}, cffexT=cffex.update_time||'';
+    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #7cb342;">';
+    h+=v8CardHeader('📊','中信期货','中长线·T+1','update_time',{update_time:cffexT},!cffex||!cffex.items);
     h+='<div style="padding:12px 14px;">';
     if(cffex&&cffex.items&&cffex.items.length){
       var groups={}; cffex.items.forEach(function(it){ var v=it.variety||''; if(!groups[v]) groups[v]=[]; groups[v].push(it); });
       var main={}; Object.keys(groups).forEach(function(v){ main[v]=groups[v].sort(function(a,b){return (b.open_interest||0)-(a.open_interest||0);})[0]; });
+      h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;">';
       ['IF','IC','IM','IH'].forEach(function(v){
         var it=main[v]; if(!it) return;
         var chg=((it.close||0)-(it.pre_settle||0))/(it.pre_settle||1)*100;
         var c=chg>=0?'var(--up)':'var(--down)';
-        h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed var(--border);font-size:12px;">';
-        h+='<span style="font-weight:600;">'+(v==='IF'?'沪深300':v==='IC'?'中证500':v==='IM'?'中证1000':'上证50')+'</span>';
-        h+='<span style="color:var(--sub);">'+it.close.toFixed(1)+'</span>';
-        h+='<span style="color:'+c+';font-weight:700;">'+(chg>=0?'+':'')+chg.toFixed(2)+'%</span>';
-        h+='<span style="color:var(--dim);font-size:11px;">持仓 '+((it.open_interest||0)/1e4).toFixed(1)+'万</span>';
+        var name=v==='IF'?'沪深300':v==='IC'?'中证500':v==='IM'?'中证1000':'上证50';
+        h+='<div style="text-align:center;background:var(--bg2);border-radius:8px;padding:10px;">';
+        h+='<div style="font-size:11px;color:var(--dim);margin-bottom:4px;">'+name+'</div>';
+        h+='<div style="font-size:18px;font-weight:800;color:var(--txt);">'+it.close.toFixed(1)+'</div>';
+        h+='<div style="font-size:12px;font-weight:700;color:'+c+';">'+(chg>=0?'+':'')+chg.toFixed(2)+'%</div>';
+        h+='<div style="font-size:10px;color:var(--dim);margin-top:4px;">持仓 '+((it.open_interest||0)/1e4).toFixed(1)+'万</div>';
         h+='</div>';
       });
+      h+='</div>';
     } else {
       h+='<div class="note" style="text-align:center;">期指数据暂不可用</div>';
     }
     h+='</div></div>';
 
-    var margin=window.MARGIN_DATA||{};
-    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #38bdf8;">';
-    h+=v8CardHeader('📈','两融余额走势','T+1','update_time',margin,!margin||!margin.items);
+    /* 4. 两融余额走势 */
+    var margin=window.MARGIN_DATA||{}, marginT=margin.update_time||'';
+    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #1976d2;">';
+    h+=v8CardHeader('📊','两融余额走势（亿元）','T+1','update_time',{update_time:marginT},!margin||!margin.items);
     h+='<div style="padding:12px 14px;">';
     if(margin&&margin.items&&margin.items.length){
       var rz=0,rq=0; margin.items.forEach(function(it){ rz+=it['融资余额']||0; rq+=it['融券余量']||0; });
-      var total=(rz+rq)/1e12;
-      h+='<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;">';
-      h+='<div style="text-align:center;"><div style="font-size:20px;font-weight:800;color:var(--gold);">'+total.toFixed(2)+'<span style="font-size:11px;color:var(--dim);">万亿</span></div><div style="font-size:10px;color:var(--dim);">两融合计</div></div>';
-      h+='<div style="text-align:center;"><div style="font-size:14px;font-weight:700;color:#42a5f5;">'+(rz/1e12).toFixed(3)+'</div><div style="font-size:10px;color:var(--dim);">融资余额</div></div>';
-      h+='<div style="text-align:center;"><div style="font-size:14px;font-weight:700;color:#f472b6;">'+(rq/1e12).toFixed(3)+'</div><div style="font-size:10px;color:var(--dim);">融券余量</div></div>';
+      var total=(rz+rq)/1e8;
+      h+='<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">';
+      h+='<div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:#f59e0b;">'+total.toFixed(0)+'<span style="font-size:11px;color:var(--dim);">亿</span></div><div style="font-size:10px;color:var(--dim);">两融合计</div></div>';
+      h+='<div style="text-align:center;"><div style="font-size:16px;font-weight:700;color:#42a5f5;">'+(rz/1e8).toFixed(0)+'<span style="font-size:10px;color:var(--dim);">亿</span></div><div style="font-size:10px;color:var(--dim);">融资余额</div></div>';
+      h+='<div style="text-align:center;"><div style="font-size:16px;font-weight:700;color:#ef5350;">'+(rq/1e8).toFixed(0)+'<span style="font-size:10px;color:var(--dim);">亿</span></div><div style="font-size:10px;color:var(--dim);">融券余量</div></div>';
+      h+='<div style="font-size:11px;color:var(--sub);line-height:1.6;max-width:260px;">样本 '+margin.items.length+' 只。v8 当前为单日截面数据，尚未累积时序，故暂以最新合计值展示。</div>';
       h+='</div>';
-      h+='<div style="font-size:11px;color:var(--dim);">样本 '+margin.items.length+' 只，全市场两融余额估算。</div>';
     } else {
       h+='<div class="note" style="text-align:center;">两融数据暂不可用</div>';
     }
     h+='</div></div>';
 
-    var esub=window.ETF_SUBSCRIPTION||{};
-    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #1fd17b;">';
-    h+=v8CardHeader('🔄','宽基ETF净申赎','T+1','update_time',esub,!esub||!esub.items);
+    /* 5. 宽基ETF净申赎 */
+    var esub=window.ETF_SUBSCRIPTION||{}, esubT=esub.update_time||'';
+    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #00acc1;">';
+    h+=v8CardHeader('📈','宽基ETF净申赎（亿份）','T+1','update_time',{update_time:esubT},!esub||!esub.items);
     h+='<div style="padding:12px 14px;">';
     if(esub&&esub.items&&esub.items.length){
       var broadKeys=['沪深300','中证500','中证1000','创业板','科创50','上证50','A500'];
       var broad=esub.items.filter(function(it){ var n=it['名称']||''; return broadKeys.some(function(k){return n.indexOf(k)>=0;}); });
       var net=0; broad.forEach(function(it){ net+=(it['买入']||0)-(it['卖出']||0); });
-      h+='<div style="font-size:24px;font-weight:800;color:'+(net>=0?'var(--up)':'var(--down)')+';margin-bottom:8px;">'+(net>=0?'+':'')+(net/1e8).toFixed(1)+'<span style="font-size:12px;color:var(--dim);">亿份</span></div>';
-      h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">沪深300/中证500/中证1000/创业板/科创50/上证50/A500 宽基合计</div>';
+      h+='<div style="font-size:11px;color:#38bdf8;margin-bottom:8px;">沪深300/中证500/中证1000/创业板/科创50/上证50/A500 宽基指数ETF每日净申购赎回份额</div>';
+      h+='<div style="font-size:26px;font-weight:800;color:'+(net>=0?'var(--up)':'var(--down)')+';margin-bottom:10px;">'+(net>=0?'+':'')+(net/1e8).toFixed(1)+'<span style="font-size:12px;color:var(--dim);">亿份</span></div>';
       h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px;">';
-      broad.slice(0,8).forEach(function(it){
+      broad.slice(0,10).forEach(function(it){
         var nv=(it['买入']||0)-(it['卖出']||0);
-        h+='<div style="display:flex;justify-content:space-between;background:var(--bg2);border-radius:6px;padding:5px 8px;font-size:11px;"><span>'+(it['名称']||'').slice(0,8)+'</span><span style="color:'+(nv>=0?'var(--up)':'var(--down)')+';font-weight:700;">'+(nv>=0?'+':'')+(nv/1e8).toFixed(1)+'亿</span></div>';
+        h+='<div style="display:flex;justify-content:space-between;background:var(--bg2);border-radius:6px;padding:6px 8px;font-size:12px;"><span>'+(it['名称']||'').slice(0,10)+'</span><span style="color:'+(nv>=0?'var(--up)':'var(--down)')+';font-weight:700;">'+(nv>=0?'+':'')+(nv/1e8).toFixed(1)+'亿</span></div>';
       });
       h+='</div>';
     } else {
@@ -4158,9 +4239,13 @@ function renderLimitUpHeatmap(){
     }
     h+='</div></div>';
 
-    var etfHeat=window.ETF_INTRADAY_HEAT||{};
+    /* ── 分组标题：盘中 / T+0 ── */
+    h+='<div style="background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(245,158,11,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#f59e0b;border-radius:8px;margin:16px 0 10px 0;">⚡ 盘中 / T+0</div>';
+
+    /* 6. 国家队ETF */
+    var etfHeat=window.ETF_INTRADAY_HEAT||{}, etfHeatT=etfHeat.update_time||'';
     h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #f59e0b;">';
-    h+=v8CardHeader('🔥','国家队ETF','T+0·主要宽基ETF','update_time',etfHeat,!etfHeat||!etfHeat.items);
+    h+=v8CardHeader('🔥','国家队ETF','T+0·主要宽基ETF','update_time',{update_time:etfHeatT},!etfHeat||!etfHeat.items);
     h+='<div style="padding:12px 14px;">';
     if(etfHeat&&etfHeat.items&&etfHeat.items.length){
       var stateCodes=['510300','510310','510330','510500','510050','159915','159949','588000','588080','512100','159845','563360'];
@@ -4324,6 +4409,31 @@ function renderLimitUpHeatmap(){
     DATA.experiment = window.EXPERIMENT||{};
     DATA.etf_pulse = window.ETF_PULSE||null;
     DATA.etf_daily = window.ETF_DAILY_MONITOR||null;
+    DATA.w52 = window.W52_HIGH||null;
+    DATA.limit_up = window.LIMIT_UP_HEATMAP||null;
+    DATA.herding = window.HERDING_DATA||null;
+    DATA.capital_flow = window.CAPITAL_FLOW_DATA||null;
+    DATA.cffex = window.CFFEX_HOLDINGS||null;
+    DATA.margin = window.MARGIN_DATA||null;
+    DATA.etf_sub = window.ETF_SUBSCRIPTION||null;
+    DATA.etf_heat = window.ETF_INTRADAY_HEAT||null;
+
+    // 运维子页 tab 更新时间（取各自面板数据源最晚时间）
+    function latestTime(arr){
+      var valid=arr.filter(function(x){return x && /^\d{4}-\d{2}-\d{2}/.test(String(x));});
+      if(!valid.length) return '';
+      return valid.sort().pop();
+    }
+    var t3=latestTime([(DATA.sh_fib||{}).update_time, (DATA.candidate||{}).update_time, (window.CRDS_CARD_DATA||{}).update_time]);
+    var t4=latestTime([
+      (DATA.w52||{}).update_time, (DATA.limit_up||{}).update_time, (DATA.herding||{}).update_time,
+      (DATA.capital_flow||{}).update_time, (DATA.cffex||{}).update_time,
+      (DATA.margin||{}).update_time, (DATA.etf_sub||{}).update_time, (DATA.etf_heat||{}).update_time
+    ]);
+    var t3el=document.getElementById('opTab3Time'), t4el=document.getElementById('opTab4Time');
+    if(t3el && t3){ try{ t3el.textContent='更新于 '+fmtDataTime(t3).text; }catch(e){} }
+    if(t4el && t4){ try{ t4el.textContent='更新于 '+fmtDataTime(t4).text; }catch(e){} }
+
     var safe=function(fn){try{fn();}catch(e){console.warn('运维子页渲染失败',e);}};
     safe(renderAllsite);
     safe(renderCockpit);

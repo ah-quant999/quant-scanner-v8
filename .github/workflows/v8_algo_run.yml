@@ -1,0 +1,67 @@
+# 九宝量化 v8.0 — 盘后算法链（自托管 cn runner）
+#
+# 2026-08-01 周末改造：把 v6 的算法产出脚本选择性复制到 v8/algorithms/，
+# 由本工作流在本地 cn 自托管 runner 上按依赖顺序运行，直接产出 v8 raw_data/，
+# 不再依赖 v6 每日批处理。GitHub 美区云端 runner 无法访问 EastMoney/akshare/
+# Tongdaxin，故算法必须在 cn runner（本地机器）执行。
+#
+# 过渡期（约 1 周）：gold_pool / scan_result / guanlan_* / mahoro_signals 仍由
+# v6 供给，run_algorithms.py 每轮从 V6_DATA_DIR 重灌到 out/；随后这些上游输入
+# 由 v8 原生抓取器取代，即可完全脱离 v6。
+
+name: "🇨🇳 v8 盘后算法链(cn)"
+
+on:
+  schedule:
+    - cron: '0 9 * * 1-5'    # 17:00 CST 盘后（收盘数据 + 算法部署）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  algo:
+    runs-on: [self-hosted, cn]
+    timeout-minutes: 60
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      V8_PUSH: "1"
+      V6_DATA_DIR: "E:\\workspace\\stock-scanner\\data"
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    steps:
+      - name: "📥 Checkout v8"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: "🐍 校验 Python / 安装 A股依赖"
+        shell: powershell
+        run: |
+          python --version
+          python -c "import akshare, pandas, numpy, requests" 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "基础依赖缺失，安装中（清华镜像）..."
+            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple akshare pandas numpy requests
+          } else { Write-Host "基础依赖已就绪" }
+          # 回测/候选池依赖（mootdx / baostock），缺失则尽力安装
+          python -c "import mootdx" 2>$null; if ($LASTEXITCODE -ne 0) {
+            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple mootdx 2>$null; Write-Host "mootdx 安装结果: $LASTEXITCODE"
+          }
+          python -c "import baostock" 2>$null; if ($LASTEXITCODE -ne 0) {
+            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple baostock 2>$null; Write-Host "baostock 安装结果: $LASTEXITCODE"
+          }
+
+      - name: "🧮 运行盘后算法链 → raw_data/ → 推送"
+        shell: powershell
+        continue-on-error: true
+        run: |
+          python algorithms/run_algorithms.py
+
+      - name: "📤 兜底推送（若上一步未推）"
+        if: always()
+        shell: powershell
+        continue-on-error: true
+        run: |
+          python api_push_raw.py

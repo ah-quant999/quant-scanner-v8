@@ -1,0 +1,207 @@
+#!/usr/bin/env python3
+"""
+gen_triple_consensus.py — 三重共识选股
+共识定义（严格）：同时满足
+  1) 主站 TOP10 精选（generate_top10.py 输出，total_score >= 70）
+  2) 驾驶舱 A 档（gen_cockpit_tier_recommend.py 的 tier_a）
+  3) 基本面 A 档（fundamental_quality.json 中 grade 为 A）
+
+同时输出 near_miss：满足 2/3 条件的观察清单。
+输出：data/triple_consensus.json
+"""
+import json
+import os
+
+try:
+    _ = BASE
+except NameError:
+    BASE = os.path.dirname(os.path.abspath(__file__))
+from datetime import datetime
+
+WORKSPACE = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(WORKSPACE, "..", "out")
+OUTPUT = os.path.join(DATA_DIR, "triple_consensus.json")
+
+
+def load_json(path, default=None):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return default if default is not None else {}
+
+
+def normalize_code(c):
+    return str(c or "").replace("sh_", "").replace("sz_", "").replace("hk_", "").replace("bj_", "").replace("sh.", "").replace("sz.", "").replace("hk.", "").replace("bj.", "")
+
+
+def enrich_extra(record, code, gp_map):
+    """从 gold_pool 补充行业/板块/概念信息"""
+    gp = gp_map.get(code)
+    if not gp:
+        return record
+    # 行业
+    if not record.get("industry"):
+        record["industry"] = gp.get("industry", "")
+    # 板块：合并 gold_pool.sectors 与已有 sectors，去重
+    existing_sectors = set(record.get("sectors") or [])
+    gp_sectors = gp.get("sectors") or []
+    if gp.get("industry") and not existing_sectors:
+        gp_sectors = [gp.get("industry")] + list(gp_sectors)
+    merged_sectors = list(existing_sectors | set(gp_sectors))
+    if merged_sectors:
+        record["sectors"] = merged_sectors
+    # 概念
+    concepts = gp.get("concepts") or []
+    if concepts:
+        record["concepts"] = concepts
+    return record
+
+
+def main():
+    print(f"  三重共识选股  —  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("=" * 60)
+
+    top10 = load_json(os.path.join(DATA_DIR, "top10_daily.json"), {})
+    tier = load_json(os.path.join(DATA_DIR, "cockpit_tier_recommend_alimi.json"), {})
+    fundamental = load_json(os.path.join(DATA_DIR, "fundamental_quality.json"), {})
+    gold_pool = load_json(os.path.join(DATA_DIR, "gold_pool.json"), {})
+
+    # 从 gold_pool 补充行业/板块/概念信息
+    gp_map = {}
+    for key, s in (gold_pool.get("stocks", {}) if isinstance(gold_pool, dict) else {}).items():
+        gp_map[normalize_code(key)] = s
+
+
+    # 1) TOP10 >=70
+    top_map = {}
+    for s in top10.get("top10", []):
+        score = s.get("total_score", 0) or 0
+        if score >= 70:
+            top_map[normalize_code(s.get("code", ""))] = s
+
+    # 2) A 档 / B 档
+    a_map = {}
+    for s in tier.get("tier_a", []):
+        a_map[normalize_code(s.get("code", ""))] = s
+    b_map = {}
+    for s in tier.get("tier_b", []):
+        b_map[normalize_code(s.get("code", ""))] = s
+
+    # 3) 基本面 A 档
+    fund_stocks = fundamental.get("stocks", {}) if isinstance(fundamental, dict) else {}
+    good_fund = set()
+    fund_map = {}
+    for key, f in fund_stocks.items():
+        grade = (f.get("grade") or "").upper()
+        nc = normalize_code(key)
+        fund_map[nc] = f
+        if grade == "A":
+            good_fund.add(nc)
+
+    # 收集所有候选 code
+    all_codes = set(top_map.keys()) | set(a_map.keys()) | set(b_map.keys())
+
+    consensus = []
+    near_miss = []
+    for code in all_codes:
+        top = top_map.get(code)
+        a = a_map.get(code)
+        b = b_map.get(code)
+        in_top = bool(top)
+        in_a = bool(a)
+        in_ab = bool(a or b)
+        in_fund = code in good_fund
+
+        # 严格三重：TOP10>=70 + A档 + 基本面A档
+        if in_top and in_a and in_fund:
+            src = top or a
+            rec = {
+                "code": src.get("code", code),
+                "name": src.get("name", ""),
+                "market": src.get("market", ""),
+                "board": src.get("board", src.get("market", "")),
+                "total_score": top.get("total_score", 0),
+                "top10_rank": top.get("rank", 0),
+                "a_score": a.get("total_score", 0),
+                "quality_grade": top.get("quality_grade", a.get("quality_grade", "")),
+                "quality_score": top.get("score_quality", a.get("quality_score", 0)),
+                "close": top.get("close", 0),
+                "pct_chg": top.get("pct_chg", 0),
+                "pct_chg_20d": top.get("pct_chg_20d", 0),
+                "stop_loss": top.get("stop_loss", 0),
+                "target_price": top.get("target_price", 0),
+                "signals": top.get("signals", {}),
+                "sectors": top.get("sectors", []),
+                "fund_detail": top.get("fund_detail", ""),
+                "sector_detail": top.get("sector_detail", ""),
+                "inst_detail": top.get("inst_detail", ""),
+                "win_rate": top.get("win_rate", None),
+            }
+            consensus.append(enrich_extra(rec, code, gp_map))
+            continue
+
+        # near_miss：满足 2/3（TOP10>=70 / 驾驶舱A或B档 / 基本面A档）
+        # 2026-07-27 修正：驾驶舱 B 档同样代表机构/技术质量信号，应计入候补条件，
+        # 否则会出现 TOP10≥75 且 tier_b 的个股（如特锐德）被排除在优先观察之外。
+        score = sum([in_top, in_ab, in_fund])
+        if score == 2:
+            src = top or a or b
+            rec = {
+                "code": src.get("code", code),
+                "name": src.get("name", ""),
+                "market": src.get("market", ""),
+                "board": src.get("board", src.get("market", "")),
+                "total_score": top.get("total_score", 0) if top else (a.get("total_score", 0) if a else b.get("total_score", 0)),
+                "top10_rank": top.get("rank", 0) if top else 0,
+                "a_score": a.get("total_score", 0) if a else 0,
+                "quality_grade": (top.get("quality_grade") if top else None) or (a.get("quality_grade") if a else None) or (fund_map.get(code) or {}).get("grade", ""),
+                "in_top10": in_top,
+                "in_tier_a": in_a,
+                "in_tier_b": bool(b),
+                "in_good_fund": in_fund,
+                # 距离严格共识还差几步（按质量档位感知）：
+                # A档候选只差1步（缺另一个条件即可严格）；B档候选相当于差2步（B→A一档，再到严格又一档）。
+                "miss_steps": 1 if in_a else (2 if b else 1),
+                "close": src.get("close", 0),
+                "pct_chg": src.get("pct_chg", 0),
+                "pct_chg_20d": src.get("pct_chg_20d", 0),
+                "signals": top.get("signals", {}) if top else {},
+                "sectors": src.get("sectors", []),
+            }
+            near_miss.append(enrich_extra(rec, code, gp_map))
+
+    consensus.sort(key=lambda x: -x["total_score"])
+    near_miss.sort(key=lambda x: -x["total_score"])
+
+    result = {
+        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "data_time": top10.get("update_time", ""),
+        "count": len(consensus),
+        "near_miss_count": len(near_miss),
+        "criteria": "主站TOP10≥70 · 驾驶舱A档 · 基本面A档",
+        "near_miss_criteria": "以上三条满足任意两条（驾驶舱A/B档均计入）",
+        "stocks": consensus,
+        "near_miss": near_miss,
+    }
+
+    os.makedirs(DATA_DIR, exist_ok=True)
+    with open(OUTPUT, "w", encoding="utf-8") as f:
+        json.dump(result, f, ensure_ascii=False, indent=2)
+
+    print(f"  ✅ 三重共识: {len(consensus)} 只")
+    for s in consensus:
+        print(f"     {s['name']}({s['code']}) TOP10#{s['top10_rank']} 评分{s['total_score']} A档{s['a_score']} 基本面{s['quality_grade']}")
+    print(f"  ⚠️ 差一步(2/3): {len(near_miss)} 只")
+    for s in near_miss[:5]:
+        tags = []
+        if s["in_top10"]: tags.append("TOP10")
+        if s["in_tier_a"]: tags.append("A档")
+        if s.get("in_tier_b"): tags.append("B档")
+        if s["in_good_fund"]: tags.append("基本面A档")
+        print(f"     {s['name']}({s['code']}) 评分{s['total_score']} {'+'.join(tags)}")
+    print(f"\n  输出: {OUTPUT}")
+
+
+if __name__ == "__main__":
+    main()
