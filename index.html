@@ -3752,12 +3752,12 @@ function renderLimitUpLadder(){
       var luTotal=0; try{ if(lu.sectors&&lu.dates){var li=lu.dates.length-1;lu.sectors.forEach(function(s){luTotal+=(s.data&&s.data[li])||0;});} }catch(e){}
       var herdingTop='',herdingDir='流入'; try{ if(hd.current_clusters&&hd.current_clusters[0]){herdingTop=hd.current_clusters[0].sector;herdingDir=hd.current_clusters[0].direction||'流入';} }catch(e){}
       h+='<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;">';
-      h+='<div style="text-align:center;"><div style="font-size:24px;font-weight:800;color:var(--up);">'+n52+'</div><div style="font-size:11px;color:var(--dim);">52周新高</div></div>';
+      h+='<div style="text-align:center;"><div style="font-size:24px;font-weight:800;color:var(--up);">'+n52+'</div><div style="font-size:11px;color:var(--dim);">历史新高</div></div>';
       h+='<div style="text-align:center;"><div style="font-size:24px;font-weight:800;color:var(--gold);">'+luTotal+'</div><div style="font-size:11px;color:var(--dim);">今日涨停</div></div>';
       if(herdingTop){ h+='<div style="text-align:center;"><div style="font-size:13px;font-weight:700;color:var(--purple);max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+herdingTop+'</div><div style="font-size:11px;color:var(--dim);">最强抱团 · '+herdingDir+'</div></div>'; }
       h+='</div>';
       var judge=''; var luT=luTotal||0;
-      if(n52>=100&&luT>=50) judge='⚡ 强势股独立行情：52周新高活跃+'+luT+'只涨停，短线可追但快进快出。';
+      if(n52>=100&&luT>=50) judge='⚡ 强势股独立行情：历史新高活跃+'+luT+'只涨停，短线可追但快进快出。';
       else if(n52>=100&&luT<50) judge='📊 新高多涨停少，跟风盘不热，结构性行情。';
       else if(n52>=30&&n52<100&&luT>=30) judge='📈 温和偏多：结构性行情。';
       else if(n52<30&&luT>=50) judge='🔥 短线热炒，游资主导，严格止损。';

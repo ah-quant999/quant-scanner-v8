@@ -1,1 +1,1 @@
-window.CRISIS_DATA = {"currency":0.3,"economy":0.35,"global":0.25,"note":"占位结构，待小九接入真实宏观/货币/全球风险信号","update_time":"2026-07-31 09:09:51"};
+window.CRISIS_DATA = {"currency":0.3,"economy":0.494,"global":0.4,"pmi_value":49.4,"note":"经济维度=中国PMI真实值；货币/全球维度因外国数据源(CN网络不可达)暂保守估值，待补代理源","update_time":"2026-07-31 15:16:56"};

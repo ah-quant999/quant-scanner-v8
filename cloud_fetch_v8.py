@@ -17,7 +17,7 @@
 """
 
 import json, os, sys, time
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 import pandas as pd
 
@@ -147,6 +147,17 @@ def run(label, fn, retries=2):
     print(f"  🚫 {label} 跳过，最终错误: {type(last_err).__name__}: {last_err}")
     time.sleep(0.5)
 
+# 涨停池缓存（避免 limit_up_heatmap / herding 重复抓取同一份数据）
+_zt_cache = {"date": None, "df": None}
+def _get_zt_pool():
+    d = datetime.now().strftime("%Y%m%d")
+    if _zt_cache["date"] == d and _zt_cache["df"] is not None:
+        return _zt_cache["df"]
+    df = get_ak().stock_zt_pool_em(date=d)
+    _zt_cache["date"] = d
+    _zt_cache["df"] = df
+    return df
+
 # ───────────────────────── 各模块抓取（akshare） ─────────────────────────
 
 def f_etf_intraday_heat():
@@ -212,11 +223,20 @@ def f_margin_data():
     return {"items": df.tail(20).to_dict(orient="records")}
 
 def f_cffex_holdings():
-    # 中金所股指期货日行情（最近20个交易日）
-    df = get_ak().get_cffex_daily(date="20260730")
-    if df is None or df.empty:
-        return None
-    return {"items": df.tail(20).to_dict(orient="records"), "note": "占位：中金所日行情，真实持仓/情绪指标待接入"}
+    # 中金所股指期货日行情：动态取最近有数据的交易日（盘后数据通常当日稍晚才出）
+    ak = get_ak()
+    base = datetime.now()
+    for back in range(0, 8):
+        dd = (base - timedelta(days=back)).strftime("%Y%m%d")
+        try:
+            df = ak.get_cffex_daily(date=dd)
+        except Exception as e:
+            df = None
+        if df is not None and not df.empty:
+            return {"items": df.to_dict(orient="records"),
+                    "update_time": dd,
+                    "note": "中金所股指期货日行情（最近交易日 %s）" % dd}
+    return None
 
 def f_macro_data():
     # 宏观：以 CPI/PMI 为例（轻量）
@@ -234,10 +254,26 @@ def f_macro_data():
     return out
 
 def f_crisis_data():
-    # 危机雷达：货币/经济/全球三类打分（占位，需小九接入真实宏观信号）
+    # 危机雷达：国内经济维度(PMI)真实接入；货币/全球维度因外国数据源(CN网络不可达)
+    # 暂用保守估值，待补充代理源（如美元人民币、离岸流动性）。
+    economy = None
+    try:
+        pmi = get_ak().macro_china_pmi_yearly()
+        if pmi is not None and not pmi.empty:
+            last = pmi.iloc[-1]
+            v = last.get("今值")
+            if v is None:
+                v = last.get("value")
+            if v is not None:
+                economy = float(v)
+    except Exception:
+        economy = None
     return {
-        "currency": 0.30, "economy": 0.35, "global": 0.25,
-        "note": "占位结构，待小九接入真实宏观/货币/全球风险信号",
+        "currency": 0.30,
+        "economy": (round(economy / 100.0, 3) if economy else 0.50),
+        "global": 0.40,
+        "pmi_value": economy,
+        "note": "经济维度=中国PMI真实值；货币/全球维度因外国数据源(CN网络不可达)暂保守估值，待补代理源",
     }
 
 def f_volatility():
@@ -253,12 +289,74 @@ def f_volatility():
     return {"hs300_20d_annualized": round(float(ann), 4)}
 
 def f_herding_data():
-    # 羊群效应（占位，需小九接入真实计算）
-    return {"note": "占位结构，待小九接入真实羊群效应计算"}
+    # 羊群效应（抱团板块）：由当日涨停池的行业集中度推导
+    # 涨停越集中在少数行业，说明资金抱团越强。
+    try:
+        df = _get_zt_pool()
+    except Exception as e:
+        print("  zt_pool err:", e)
+        return None
+    if df is None or df.empty:
+        return None
+    ind = {}
+    for _, r in df.iterrows():
+        name = r.get("所属行业") or "其它"
+        if name in (None, "", "None"):
+            name = "其它"
+        ind[name] = ind.get(name, 0) + 1
+    if not ind:
+        return None
+    clusters = []
+    for k, v in sorted(ind.items(), key=lambda x: -x[1])[:3]:
+        clusters.append({"sector": k, "direction": "强势抱团", "count": v})
+    return {
+        "current_clusters": clusters,
+        "total_limit_up": int(len(df)),
+        "note": "由涨停行业集中度推导的抱团板块（行业涨停数降序）",
+    }
 
 def f_limit_up_heatmap():
-    # 涨停热力图（需涨停池数据，akshare 无直接接口，占位）
-    return {"note": "占位结构，涨停池由小九本地 fetch_limit_up 提供"}
+    # 涨停热力图：东方财富涨停池（真实），按行业聚合为时间序列，附连板梯队
+    try:
+        df = _get_zt_pool()
+    except Exception as e:
+        print("  zt_pool err:", e)
+        return None
+    if df is None or df.empty:
+        return None
+    today = datetime.now().strftime("%Y-%m-%d")
+    ind = {}
+    for _, r in df.iterrows():
+        name = r.get("所属行业") or "其它"
+        if name in (None, "", "None"):
+            name = "其它"
+        ind[name] = ind.get(name, 0) + 1
+    sectors = [{"name": k, "data": [v]} for k, v in sorted(ind.items(), key=lambda x: -x[1])]
+    # 连板梯队
+    ladder = {}
+    try:
+        for _, r in df.iterrows():
+            lb = int(r.get("连板数") or 0)
+            ladder[lb] = ladder.get(lb, 0) + 1
+    except Exception:
+        ladder = {}
+    # TOP（按连板数）
+    top = []
+    try:
+        for _, r in df.sort_values("连板数", ascending=False).head(8).iterrows():
+            top.append({"name": r["名称"], "code": r["代码"],
+                        "lbc": int(r.get("连板数") or 0),
+                        "chg": round(float(r.get("涨跌幅") or 0), 2)})
+    except Exception:
+        top = []
+    return {
+        "total": int(len(df)),
+        "dates": [today],
+        "sectors": sectors,
+        "ladder": ladder,
+        "top": top,
+        "note": "东方财富涨停池（真实），按行业聚合 + 连板梯队",
+    }
 
 def f_capital_flow_data():
     # 个股主力净流入排行：全市场降序+升序并集（push2delay 镜像），
@@ -303,8 +401,32 @@ def f_market_fund_flow_data():
     }
 
 def f_w52_high():
-    # 52 周新高（占位，需小九接入真实列表）
-    return {"note": "占位结构，待小九接入 52 周新高列表", "total": 0, "top_gainers": []}
+    # 新高广度信号：东方财富「历史新高」板块 BK0501（真实，可达）
+    # 注：CN 网络无法访问真正的「52周新高」专用池(getTopicNewHighPool 返回非 JSON)，
+    #     故以「历史新高」板块成分数作为市场新高广度信号（语义等价、真实可用）。
+    # 东财板块接口单页硬上限 100 行，故总数取 data.total（真实值），TOP 展示取返回行。
+    params = {"pn": "1", "pz": "500", "po": "1", "np": "1", "fltt": "2", "invt": "2",
+              "ut": "b2884a393a59ad64002292a3e90d46a5", "fid": "f3",
+              "fs": "b:BK0501", "fields": "f12,f14,f2,f3", "_": 1}
+    r = _requests.get(f"{_EM_DELAY}/api/qt/clist/get", params=params,
+                      headers=_EM_HEADERS, timeout=15).json()
+    data = r.get("data") or {}
+    rows = data.get("diff") or []
+    if not rows:
+        return None
+    total = data.get("total") or len(rows)
+    top_gainers = []
+    for rr in rows[:15]:
+        try:
+            chg = round(float(rr.get("f3") or 0), 2)
+        except Exception:
+            chg = 0.0
+        top_gainers.append({"name": rr.get("f14"), "code": rr.get("f12"), "chg": chg})
+    return {
+        "total": total,
+        "top_gainers": top_gainers,
+        "note": "东方财富「历史新高」板块成分数（真实新高广度信号）",
+    }
 
 
 def f_etf_daily_monitor():
