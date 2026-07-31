@@ -6,7 +6,15 @@
 
 name: "☁️ v8 构建部署(云端ubuntu)"
 
+# 触发策略（双保险）：
+#  1) push 到 main 且改动 raw_data/** —— cn runner 经 API 推送 raw_data 后自动接力（事件驱动，去时间耦合）
+#  2) schedule —— 兜底定时（与 cn fetch 错后 10 分钟）
+#  3) workflow_dispatch —— 手动触发
+# 注意：paths 过滤器仅作用于 push 事件；schedule/dispatch 不受 paths 限制，始终运行。
 on:
+  push:
+    branches: [main]
+    paths: ['raw_data/**']
   schedule:
     - cron: '35 0 * * *'    # 08:35 CST
     - cron: '40 2 * * *'    # 10:40 CST
@@ -18,6 +26,10 @@ on:
 
 permissions:
   contents: write
+
+concurrency:
+  group: v8-build-deploy
+  cancel-in-progress: false
 
 jobs:
   build:
