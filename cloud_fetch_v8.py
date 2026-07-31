@@ -67,6 +67,68 @@ def save(var, obj):
         json.dump(obj, f, ensure_ascii=False, separators=(",", ":"), default=str)
     print(f"  ✅ {var} → raw_data/{fname}")
 
+
+# ───────────────────────── 东方财富「延迟镜像」直连 ─────────────────────────
+# 说明：东方财富 push2.eastmoney.com / push2his.eastmoney.com 的实时资金流接口
+# 在本机/runner 网络下被 WAF 以 TCP 重置（ConnectionError: RemoteDisconnected）拒绝；
+# 但其「延迟镜像」push2delay.eastmoney.com 可达且返回相同字段（延迟仅数秒，对日频排名无影响）。
+# 故资金流类接口统一走 push2delay，规避实时 host 的封锁。
+import requests as _requests
+
+_EM_DELAY = "https://push2delay.eastmoney.com"
+_EM_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                  "(KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+    "Referer": "https://data.eastmoney.com/zjlx/detail.html",
+    "Accept": "*/*",
+}
+
+def em_clist(fs, fields, fid="f62", stat="1", pz=5000, po="1", timeout=15):
+    """东方财富 clist 接口（push2delay 镜像）。返回 data.diff 列表（每项为字段字典）。
+    po="1" 降序(取净流入最高)，po="0" 升序(取净流出最高)。"""
+    params = {
+        "pn": "1", "pz": str(pz), "po": po, "np": "1", "fltt": "2", "invt": "2",
+        "ut": "b2884a393a59ad64002292a3e90d46a5",
+        "fid": fid, "fs": fs, "stat": stat,
+        "fields": fields, "_": int(time.time() * 1000),
+    }
+    r = _requests.get(f"{_EM_DELAY}/api/qt/clist/get", params=params,
+                      headers=_EM_HEADERS, timeout=timeout)
+    d = r.json()
+    if d.get("rc") != 0 or not d.get("data"):
+        return []
+    return d["data"].get("diff", []) or []
+
+def _to_yi(v):
+    """东财字段单位为元，转亿（保留2位）。"""
+    try:
+        return round(float(v or 0) / 1e8, 2)
+    except Exception:
+        return 0.0
+
+
+# 全市场个股过滤串（沪市/深市/北交所主力，排除指数与债券等）
+_IND_FS = "m:0+t:6+f:!2,m:0+t:13+f:!2,m:0+t:80+f:!2,m:1+t:2+f:!2,m:1+t:23+f:!2,m:0+t:7+f:!2,m:1+t:3+f:!2"
+
+def _all_individual_recs(fields="f12,f14,f2,f3,f62,f184"):
+    """取全市场个股主力净流入并集（降序 TOP + 升序 TOP 合并去重），用于准确求和与净流入/流出 TOP。"""
+    desc = em_clist(_IND_FS, fields, fid="f62", stat="1", pz=5000, po="1")
+    asc = em_clist(_IND_FS, fields, fid="f62", stat="1", pz=5000, po="0")
+    by_code = {}
+    for r in desc + asc:
+        c = str(r.get("f12"))
+        if c in by_code:
+            continue
+        by_code[c] = {
+            "code": c,
+            "name": r.get("f14"),
+            "price": round(float(r.get("f2") or 0), 2),
+            "chg": round(float(r.get("f3") or 0), 2),
+            "net": _to_yi(r.get("f62")),
+            "net_pct": round(float(r.get("f184") or 0), 2),
+        }
+    return list(by_code.values())
+
 def run(label, fn, retries=2):
     last_err = None
     for attempt in range(retries + 1):
@@ -101,16 +163,40 @@ def f_etf_intraday_heat():
     return {"items": df.head(30).to_dict(orient="records"), "note": "ETF净流入真实排名待接入，当前用成交额热度占位"}
 
 def f_sector_fund_flow():
-    df = get_ak().stock_sector_fund_flow_rank(indicator="今日")
-    if df is None or df.empty:
+    # 板块/概念资金流：行业(m:90 t:2) + 概念(m:90 t:3)，主力净流入(f62, 元→亿)
+    # 走 push2delay 镜像，规避实时 push2 host 的 WAF 重置。renderSector 从 top_list 派生流入/流出。
+    items = []
+    for stype, fs in [("行业", "m:90 t:2"), ("概念", "m:90 t:3")]:
+        rows = em_clist(fs, "f12,f14,f3,f62,f184", fid="f62", stat="1", pz=200)
+        for r in rows:
+            net = _to_yi(r.get("f62"))
+            if net == 0:
+                continue
+            items.append({
+                "name": r.get("f14"),
+                "type": stype,
+                "net": net,
+                "chg": round(float(r.get("f3") or 0), 2),
+            })
+    if not items:
         return None
-    return {"items": df.head(50).to_dict(orient="records")}
+    items.sort(key=lambda x: x["net"], reverse=True)
+    return {"top_list": items, "note": "行业+概念主力净流入(亿)，来源东方财富push2delay"}
 
 def f_concept_ranking():
-    df = get_ak().stock_board_concept_name_em()
-    if df is None or df.empty:
+    # 概念板块列表（涨跌幅 + 主力净流入），push2delay 镜像。
+    rows = em_clist("m:90 t:3 f:!50", "f12,f14,f3,f62,f184", fid="f62", stat="1", pz=300)
+    items = []
+    for r in rows:
+        items.append({
+            "code": r.get("f12"),
+            "name": r.get("f14"),
+            "chg": round(float(r.get("f3") or 0), 2),
+            "net": _to_yi(r.get("f62")),
+        })
+    if not items:
         return None
-    return {"items": df.head(80).to_dict(orient="records")}
+    return {"items": items, "note": "概念板块列表(涨跌幅/主力净流入亿)，来源东方财富push2delay"}
 
 def f_ipo_data():
     df = get_ak().stock_ipo_summary_cninfo()
@@ -175,10 +261,21 @@ def f_limit_up_heatmap():
     return {"note": "占位结构，涨停池由小九本地 fetch_limit_up 提供"}
 
 def f_capital_flow_data():
-    df = get_ak().stock_individual_fund_flow_rank()
-    if df is None or df.empty:
+    # 个股主力净流入排行：全市场降序+升序并集（push2delay 镜像），
+    # 规避实时 push2 host 的 WAF 重置，且避免 pz 截断只取头部导致净流出缺失。
+    recs = _all_individual_recs()
+    if not recs:
         return None
-    return {"items": df.head(50).to_dict(orient="records")}
+    recs.sort(key=lambda x: x["net"], reverse=True)
+    inflow = [x for x in recs if x["net"] > 0][:20]
+    outflow = sorted([x for x in recs if x["net"] < 0], key=lambda x: x["net"])[:20]
+    market_net = round(sum(x["net"] for x in recs), 2)
+    return {
+        "top_inflow": inflow,
+        "top_outflow": outflow,
+        "market_net": market_net,
+        "note": "全市场个股主力净流入(亿)，来源东方财富push2delay；非席位四路口径",
+    }
 
 def f_etf_subscription():
     df = get_ak().fund_etf_category_sina(symbol="ETF基金")
@@ -191,10 +288,19 @@ def f_north_fund():
     return {"stopped": True, "note": "港交所 2024-05 后停止披露北向 top_buy，无实时数据"}
 
 def f_market_fund_flow_data():
-    df = get_ak().stock_market_fund_flow()
-    if df is None or df.empty:
+    # 大盘资金流：日K线接口(push2his)在当前网络被重置，故以全市场个股主力净流入求和
+    # 得到「今日市场主力净流入(亿)」作为单点今日值。后续若镜像开放 daykline 可补历史序列。
+    recs = _all_individual_recs("f12,f62")
+    if not recs:
         return None
-    return {"items": df.tail(10).to_dict(orient="records")}
+    net_yi = round(sum(x["net"] for x in recs), 2)
+    today = datetime.now().strftime("%Y%m%d")
+    return {
+        "daily": [{"date": today, "net_yi": net_yi}],
+        "cumulative": [{"date": today, "cum_yi": net_yi}],
+        "market_net": net_yi,
+        "note": "今日市场主力净流入(个股汇总，亿)；日K线源被限流，历史序列待累积",
+    }
 
 def f_w52_high():
     # 52 周新高（占位，需小九接入真实列表）

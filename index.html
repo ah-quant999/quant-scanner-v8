@@ -3755,27 +3755,30 @@ function renderLimitUpLadder(){
     if(herdingTop&&herdingTop!=='--') items.push('🥇 <b>抱团方向：</b>'+herdingTop+'，资金'+herdingDir);
     h+='<div style="background:rgba(56,189,248,.06);border-left:3px solid var(--cyan);padding:8px 12px;border-radius:0 8px 8px 0;font-size:12px;line-height:1.75;"><b style="color:var(--cyan);">📊 判断：</b>'+items.join('<br>')+'</div></div></div>'; }
 
-    /* ═══ 6. 四路资金流向对比（CAPITAL_FLOW_DATA）═══ */
-    var cfdNd=!window.CAPITAL_FLOW_DATA;
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid var(--purple);">';
-    h+=v8CardHeader('💰','四路资金流向对比','席位口径','update_time',window.CAPITAL_FLOW_DATA, cfdNd);
+    /* ═══ 6. 个股主力资金流向（CAPITAL_FLOW_DATA）═══ */
     var cfd=window.CAPITAL_FLOW_DATA||{};
+    var cfdNd=!cfd || (!cfd.top_inflow && !cfd.top_outflow);
+    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid var(--purple);">';
+    h+=v8CardHeader('💰','个股主力资金流向 TOP','个股口径','update_time',cfd, cfdNd);
     if(cfdNd){
-      h+='<div class="note" style="color:var(--down);font-weight:600;padding:14px;text-align:center;">⚠️ 数据未接入：四路资金（机构 / 游资 / 北向龙虎榜 / 南向）席位口径源尚未采集。</div>';
-    } else if(cfd.north_south||cfd.inst||cfd.hot_money){
-      h+='<div style="padding:12px 14px;">';
-      function dirCls(ds){if(!ds)return '';if(ds.indexOf('流入')!==-1||ds.indexOf('买入')!==-1)return 'var(--up)';if(ds.indexOf('流出')!==-1||ds.indexOf('卖出')!==-1)return 'var(--down)';return 'var(--sub)';}
-      function cfRow(label,data,bgColor){if(!data)return '';var dir=data.direction||'-',st=data.style||'-',cb=data.common_buy&&data.common_buy.length?data.common_buy.slice(0,3).join('、'):'-',cs=data.common_sell&&data.common_sell.length?data.common_sell.slice(0,3).join('、'):'-',dc=dirCls(dir);
-        return '<tr style="background:'+bgColor+';"><td style="padding:7px 10px;font-weight:700;white-space:nowrap;">'+label+'</td><td style="padding:7px 10px;text-align:center;color:'+dc+';font-weight:700;">'+dir+'</td><td style="padding:7px 10px;">'+st+'</td><td style="padding:7px 10px;color:var(--up);">'+cb+'</td><td style="padding:7px 10px;color:var(--down);">'+cs+'</td></tr>';}
-      h+='<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="color:var(--dim);"><th style="padding:6px 8px;">资金类型</th><th>方向</th><th>风格</th><th>共振买入</th><th>共振卖出</th></tr></thead><tbody>';
-      h+=cfRow('🏦 机构席位',cfd.inst,'rgba(239,83,80,.06)');h+=cfRow('🚀 游资席位',cfd.hot_money,'rgba(167,139,250,.06)');h+=cfRow('🌎 北向龙虎榜',cfd.bx,'rgba(38,166,154,.06)');h+=cfRow('🌏 南向资金',cfd.north_south,'rgba(251,191,36,.06)');
-      h+='</tbody></table>';
-      if(cfd.analysis&&cfd.analysis.length){h+='<div style="margin-top:10px;padding:8px 12px;background:rgba(167,139,250,.08);border-radius:8px;font-size:11.5px;line-height:1.7;"><div style="font-weight:700;color:var(--purple);margin-bottom:4px;">📊 资金研判</div>';cfd.analysis.forEach(function(p){h+='<div>'+p+'</div>';});h+='</div>';}
-      var rp=[];if(cfd.common_buy_stocks&&cfd.common_buy_stocks.length) rp.push('<span style="color:var(--up);">🔴 三方净买入：'+cfd.common_buy_stocks.slice(0,5).join('、')+'</span>');
-      if(cfd.common_sell_stocks&&cfd.common_sell_stocks.length) rp.push('<span style="color:var(--down);">🟢 三方净卖出：'+cfd.common_sell_stocks.slice(0,5).join('、')+'</span>');
-      if(rp.length) h+='<div style="margin-top:8px;font-size:11.5px;">'+rp.join(' ｜ ')+'</div>';
-      h+='</div>';
-    } else { h+='<div style="padding:14px;color:var(--dim);text-align:center;">四路资金数据暂不可用</div>'; }
+      h+='<div class="note" style="color:var(--down);font-weight:600;padding:14px;text-align:center;">⚠️ 数据未接入：个股主力净流入排名源尚未采集。</div>';
+    } else {
+      var mnet=cfd.market_net!=null?cfd.market_net:0;
+      h+='<div style="padding:10px 14px 2px;"><span style="font-size:12px;color:var(--dim);">全市场主力净流入：</span><b style="font-size:18px;color:'+(mnet>=0?'var(--up)':'var(--down)')+';">'+(mnet>=0?'+':'')+mnet.toFixed(1)+'亿</b></div>';
+      function cfTable(title, arr, color){
+        if(!arr||!arr.length) return '';
+        var t='<div style="font-weight:700;color:'+color+';margin:10px 0 4px;font-size:12px;">'+title+'</div>';
+        t+='<table style="width:100%;border-collapse:collapse;font-size:11.5px;"><thead><tr style="color:var(--dim);"><th style="padding:5px 8px;text-align:left;">名称</th><th style="padding:5px 8px;">代码</th><th style="padding:5px 8px;text-align:right;">涨跌幅</th><th style="padding:5px 8px;text-align:right;">主力净流入</th></tr></thead><tbody>';
+        arr.forEach(function(r){
+          t+='<tr style="border-top:1px solid var(--border);"><td style="padding:5px 8px;">'+r.name+'</td><td style="padding:5px 8px;color:var(--dim);">'+r.code+'</td><td style="padding:5px 8px;text-align:right;color:'+(r.chg>=0?'var(--up)':'var(--down)')+';">'+(r.chg>=0?'+':'')+r.chg+'%</td><td style="padding:5px 8px;text-align:right;color:'+(r.net>=0?'var(--up)':'var(--down)')+';">'+(r.net>=0?'+':'')+r.net+'亿</td></tr>';
+        });
+        t+='</tbody></table>';
+        return t;
+      }
+      h+=cfTable('🔴 主力净流入 TOP', cfd.top_inflow, 'var(--up)');
+      h+=cfTable('🟢 主力净流出 TOP', cfd.top_outflow, 'var(--down)');
+      if(cfd.note) h+='<div style="margin-top:8px;font-size:10.5px;color:var(--dim);">'+cfd.note+'</div>';
+    }
     h+='</div>';
 
     /* ═══ 7. 上交所大盘资金流时间轴（MARKET_FUND_FLOW_DATA）═══ */
