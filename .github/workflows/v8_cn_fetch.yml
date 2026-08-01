@@ -74,7 +74,7 @@ jobs:
           python -c @'
           import os, base64, json, urllib.request
           token = os.environ['GITHUB_TOKEN']
-          files = ['cloud_fetch_v8.py', 'api_push_raw.py', 'fetch_ipo_data_v8.py', 'fetch_limit_up_heatmap_v8.py']
+          files = ['cloud_fetch_v8.py', 'api_push_raw.py', 'fetch_ipo_data_v8.py', 'fetch_limit_up_heatmap_v8.py', 'backfill_lhb_history.py']
           for fn in files:
               url = f'https://api.github.com/repos/ah-quant999/quant-scanner-v8/contents/{fn}'
               req = urllib.request.Request(url, headers={
@@ -106,6 +106,13 @@ jobs:
           $cat = "${{ steps.cat.outputs.category }}"
           Write-Host "本次类别: $cat"
           python cloud_fetch_v8.py --category $cat
+
+      - name: "🐉 回填 LHB 历史（仅 post_close）"
+        if: steps.cat.outputs.category == 'post_close'
+        continue-on-error: true
+        shell: powershell
+        run: |
+          python backfill_lhb_history.py
 
       - name: "📤 经 API 推送 raw_data/ 到 main"
         shell: powershell
