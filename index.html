@@ -3063,6 +3063,14 @@ function renderLimitUpHeatmap(){
       let text;
       if(freq==='monthly') text=fresh?'本月已更新':'本月待更新';
       else if(freq==='weekly') text=fresh?'本周已更新':'本周待更新';
+      else if(freq==='daily'){
+        // 日更不写“今日已更新”，显示最新数据日期
+        if(dateStr){
+          const ds=String(dateStr);
+          const m=ds.match(/(\d{4})[-]?(\d{2})[-]?(\d{2})/);
+          text=m?m[2]+'-'+m[3]:(ds.length>=8?ds.slice(4,6)+'-'+ds.slice(6,8):ds);
+        }else{ text='—'; }
+      }
       else text=fresh?'今日已更新':'待更新';
       return '<span class="v2-status '+cls+'">'+text+'</span>';
     }
@@ -3122,7 +3130,7 @@ function renderLimitUpHeatmap(){
 
     h+='<tr><td colspan="3" class="ph-macro-section-v2" style="display:table-cell">🌐 全球宏观</td></tr>';
     const usd=g(gl.usdcnh,'price'), usdPrev=g(gl.usdcnh,'prev_close');
-    h+=row('离岸人民币','实时', num(usd,4), usd, usdPrev, [6.80,7.30], '人民币贬值→资本外流、进口承压', '人民币升值→资本流入、出口承压', '汇率走势→外资流向', 'usdcnh', g(gl.usdcnh,'date'));
+    h+=row('离岸人民币','日', num(usd,4), usd, usdPrev, [6.80,7.30], '人民币贬值→资本外流、进口承压', '人民币升值→资本流入、出口承压', '汇率走势→外资流向', 'usdcnh', g(gl.usdcnh,'date'));
     const dxy=g(gl.dxy,'value'), dxyPct=g(gl.dxy,'pct');
     const dxyPrev=dxy!=null && dxyPct!=null?dxy/(1+dxyPct/100):null;
     h+=row('美元指数 DXY','日', num(dxy,2), dxy, dxyPrev, [95.0,110.0], '美元过强→新兴市场资本外流', '美元偏弱→全球风险资产受益', '强美元→资本流出', 'dxy', g(gl.dxy,'date'));
