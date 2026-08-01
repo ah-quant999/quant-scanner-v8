@@ -652,6 +652,13 @@
     })();
     </script>
 
+    <!-- 涨停热力矩阵（整行宽度） -->
+    <div class="card" id="limitUpHeatCard" style="margin-bottom:16px">
+      <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近10日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">更新于 --</span></h3>
+      <div id="limitUpHeatAnalysis" class="limit-up-analysis" style="display:none"></div>
+      <div id="limitUpHeatContent" class="limit-up-content">加载中…</div>
+    </div>
+
     <!-- ETF 三合一（盘中异动 + 资金热度 + 日监控，纵向三联） -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">💰</span>ETF 三合一 - 盘中异动 + 资金热度 + 日监控 · <span class="fresh" id="phEtfTime">更新于 --</span></h3>
@@ -678,13 +685,6 @@
         <div id="etfDailyBlock"><div class="ipo-empty">加载中…</div></div>
       </div>
       <div class="note">盘中异动=ETF 5 分钟量能脉冲异动；资金热度=宽基 ETF 净申赎份额趋势；日监控=全市场 ETF 当日主力净流入排名（需盘后 T+1 更新）。三者维度互补，不构成重复。</div>
-    </div>
-
-    <!-- 涨停热力矩阵（整行宽度） -->
-    <div class="card" id="limitUpHeatCard" style="margin-bottom:16px">
-      <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近10日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">更新于 --</span></h3>
-      <div id="limitUpHeatAnalysis" class="limit-up-analysis" style="display:none"></div>
-      <div id="limitUpHeatContent" class="limit-up-content">加载中…</div>
     </div>
 
   </section>
