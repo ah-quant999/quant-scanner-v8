@@ -728,132 +728,171 @@ window.V8_CAL = {weeks:[],legend:[]};
     <!-- 热力矩阵 + 行业树图（并排，窄屏自动换行） -->
     <div class="grid g-2" style="margin-bottom:16px">
 
-      <!-- 🗺️ 热力矩阵（Wind 风：概念/行业/核心指数 三栏） -->
+      <!-- 🗺️ 热力矩阵（Wind 风 treemap：概念/行业/核心指数 三栏） -->
       <div class="card" style="margin-bottom:0">
         <h3><span class="ic">🗺️</span>热力矩阵 · 概念 / 行业 / 指数 · <span class="fresh" id="hmUpdateTime">更新于 --</span></h3>
-        <div id="heatmapMatrix" style="min-height:200px;"><div class="ipo-empty">加载中…</div></div>
-        <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:8px;flex-wrap:wrap;align-items:center;">
+        <div id="heatmapMatrix" style="min-height:280px;"></div>
+        <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:6px;flex-wrap:wrap;align-items:center;">
           <span><b style="color:var(--up)">■</b> 涨 &nbsp;<b style="color:var(--down)">■</b> 跌</span>
-          <span>色深=幅度大</span>
+          <span>面积≈净流入/市值 &nbsp; 色深=幅度</span>
         </div>
       </div>
 
-      <!-- 🏭 行业树图（双层 treemap：行业→候选股） -->
+      <!-- 🏭 行业树图（双层 treemap：行业→候选股嵌套矩形） -->
       <div class="card" style="margin-bottom:0">
         <h3><span class="ic">🏭</span>行业树图 · 行业→候选股双层 · <span class="fresh" id="htUpdateTime">更新于 --</span></h3>
-        <div id="industryTreemap" style="min-height:200px;"><div class="ipo-empty">加载中…</div></div>
-        <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:8px;flex-wrap:wrap;align-items:center;">
-          <span>面积≈市值 &nbsp; 颜色=涨跌</span>
-          <span>点击行业展开/收起成分股</span>
+        <div id="industryTreemap" style="min-height:280px;"></div>
+        <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:6px;flex-wrap:wrap;align-items:center;">
+          <span>大块=行业 &nbsp; 小块=个股</span>
+          <span>颜色=涨跌 &nbsp; 面积≈市值</span>
         </div>
       </div>
     </div>
 
     <script>
-    /* ===== 热力矩阵渲染（concept_ranking + sector_rs + index_quotes） ===== */
+    /* ===== 热力矩阵：Wind 风 treemap（概念/行业/指数 三栏并列） ===== */
     (function(){
       const $=id=>document.getElementById(id);
       function fmt(v){ return v==null||isNaN(v)?'--':Number(v).toFixed(2); }
       function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
-      function heatColor(chg){
-        var v=parseFloat(chg)||0;
-        if(v>0){ var t=Math.min(1,v/5); return 'rgba(244,73,93,'+(.25+.75*t).toFixed(2)+')'; }
-        if(v<0){ var t=Math.min(1,Math.abs(v)/5); return 'rgba(31,209,123,'+(.25+.75*t).toFixed(2)+')'; }
-        return 'var(--bg2)';
+
+      /* 涨跌色映射（匹配 v8 红涨绿跌暗色主题） */
+      function heatColor(v){
+        var x=parseFloat(v)||0;
+        if(x>0){ var t=Math.min(1,x/6); return {c:'rgb('+Math.round(244-80*t)+','+Math.round(73-20*t)+','+Math.round(93-30*t)+')', t:'#fff'}; }
+        if(x<0){ var t=Math.min(1,Math.abs(x)/6); return {c:'rgb('+Math.round(31+15*t)+','+Math.round(209-60*t)+','+Math.round(123-40*t)+')', t:'#111'}; }
+        return {c:'#2a3548',t:'#8899aa'};
       }
-      function heatTxtColor(chg){
-        var v=parseFloat(chg)||0;
-        return Math.abs(v)>2?(v>0?'#fff':'#111'):'var(--txt)';
+
+      function makeTreemapOption(titleText, dataList, valueField, nameField, chgField, extraLabel){
+        var children=dataList.map(function(it){
+          var v=parseFloat(it[valueField])||0;
+          var c=parseFloat(it[chgField])||0;
+          var hc=heatColor(c);
+          var labelStr=esc(it[nameField]||'')+'\n'+(c>=0?'+':'')+fmt(c)+'%';
+          if(extraLabel) labelStr+='\n'+extraLabel(it);
+          return {
+            name: it[nameField]||'', value: Math.abs(v)||Math.abs(c)||1,
+            itemStyle:{color:hc.c},
+            label:{color:hc.t, fontSize:11, formatter:function(p){return labelStr;}},
+            tooltip:{formatter:function(p){
+              return '<b>'+p.name+'</b><br/>涨跌幅: '+(c>=0?'+':'')+fmt(c)+'%<br/>'+(extraLabel?extraLabel(it):'');
+            }}
+          };
+        });
+        return {
+          tooltip:{trigger:'item', backgroundColor:'rgba(18,24,38,.95)', borderColor:'#334155',
+            textStyle:{color:'#e2e8f0',fontSize:12}, confine:true},
+          series:[{
+            type:'treemap', width:'100%', height:'100%',
+            roam:false, nodeClick:false,
+            breadcrumb:{show:false},
+            label:{show:true, fontSize:10, color:'#ccc'},
+            upperLabel:{show:true, height:22, fontSize:12, color:'#fff', fontWeight:'bold',
+              formatter:function(p){return p.name;}},
+            itemStyle:{gapWidth:2, borderColor:'#141c2b', borderWidth:2,
+              shadowColor:'rgba(0,0,0,.3)', shadowBlur:4},
+            levels:[{
+              itemStyle:{gapWidth:2, borderColor:'#141c2b', borderWidth:2},
+              upperLabel:{show:true}
+            },{
+              itemStyle:{gapWidth:1, borderColor:#1a2332', borderWidth:1}
+            }],
+            data:children.length?children:[{name:'暂无数据',value:1,itemStyle:{color:'#2a3548'}}]
+          }]
+        };
       }
 
       function renderHeatmap(){
         var el=$('heatmapMatrix');
-        if(!el) return;
+        if(!el || typeof echarts==='undefined') return;
+
         var concept=(window.CONCEPT_RANKING||{}).items||[];
         var sectorData=window.SECTOR_RS;
         var idxItems=(window.INDEX_QUOTES||{}).items||[];
 
-        // --- 概念栏（取净流入 top 16） ---
+        // 三栏容器：用 HTML 分三列，每列一个 echarts instance
+        el.innerHTML='<div style="display:flex;gap:4px;height:280px;">'+
+          '<div id="hmConcept" style="flex:1.2;min-height:0;"></div>'+
+          '<div id="hmSector" style="flex:1;min-height:0;"></div>'+
+          '<div id="hmIndex" style="flex:.8;min-height:0;"></div>'+
+          '</div>';
+
+        // --- 概念 treemap（按净流入排序 top16） ---
         var cList=concept.slice().sort(function(a,b){return Math.abs(b.net||0)-Math.abs(a.net||0)}).slice(0,16);
-        // --- 行业栏（sector_rs 当日涨跌） ---
+        var cOpt=makeTreemapOption('热门概念', cList, 'net', 'name', 'chg', function(it){
+          var n=parseFloat(it.net)||0;
+          return '净入'+(n>=0?'+':'')+fmt(n)+'亿';
+        });
+        var cChart=echarts.init(document.getElementById('hmConcept'));
+        cChart.setOption(cOpt);
+
+        // --- 行业 treemap（按|涨跌|排序） ---
         var sList=[];
         if(sectorData && sectorData.sectors){
           Object.keys(sectorData.sectors).forEach(function(k){
             var s=sectorData.sectors[k];
-            if(s && typeof s==='object') sList.push({name:k, chg:s.pct_day||0, pct:s.rs_5||s.rs_20||0});
+            if(s && typeof s==='object') sList.push({name:k, pct_day:s.pct_day||0, rs_5:s.rs_5||0, rs_20:s.rs_20||0});
           });
-          sList.sort(function(a,b){return Math.abs(b.chg)-Math.abs(a.chg)}).slice(0,16);
+          sList.sort(function(a,b){return Math.abs(b.pct_day)-Math.abs(a.pct_day)});
         }
-        // --- 核心指数 ---
+        var sOpt=makeTreemapOption('申万行业', sList, 'rs_5', 'name', 'pct_day', function(it){
+          return '5日:'+fmt(it.rs_5||0)+'%  20日:'+fmt(it.rs_20||0)+'%';
+        });
+        var sChart=echarts.init(document.getElementById('hmSector'));
+        sChart.setOption(sOpt);
+
+        // --- 核心指数 treemap ---
         var iMap={};
         idxItems.forEach(function(it){ iMap[it.code]=it; });
-        var iNames=[{c:'000001',l:'沪指'},{c:'399001',l:'深成指'},{c:'399006',l:'创业板'},{c:'000688',l:'科创板'},{c:'000300',l:'沪深300'},{c:'000016',l:'上证50'},{c:'000905',l:'中证500'},{c:'000852',l:'中证1000'}];
+        var iNames=[{c:'000001',l:'沪指'},{c:'399001',l:'深成指'},{c:'399006',l:'创业板'},{c:'000688',l:'科创板'},
+                    {c:'000300',l:'沪深300'},{c:'000016',l:'上证50'},{c:'000905',l:'中证500'},{c:'000852',l:'中证1000'}];
         var iList=[];
-        iNames.forEach(function(o){ var it=iMap[o.c]; if(it) iList.push({name:o.l, chg:it.chg||0}); });
-
-        var h='<div style="display:flex;flex-direction:column;gap:10px;">';
-
-        // 概念
-        h+='<div><div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:4px;">📌 热门概念 Top16</div>';
-        h+='<div style="display:flex;flex-wrap:wrap;gap:3px;">';
-        cList.forEach(function(it){
-          var c=it.chg||0;
-          h+='<div style="padding:4px 8px;border-radius:4px;background:'+heatColor(c)+';color:'+heatTxtColor(c)+';font-size:11px;font-weight:600;white-space:nowrap;" title="'+esc(it.name)+' '+(c>0?'+':'')+fmt(c)+'%">';
-          h+=esc(it.name).replace(/.{8}/g,'$&\n')+' '+(c>0?'+':'')+fmt(c)+'%';
-          h+='</div>';
+        iNames.forEach(function(o){ var it=iMap[o.c]; if(it) iList.push({name:o.l, chg:it.chg||0, mv:(it.total_mv||it.mv||0)}); });
+        var iOpt=makeTreemapOption('核心指数', iList, 'mv', 'name', 'chg', function(it){
+          var m=parseFloat(it.mv)||0;
+          return m>10000?'市值'+(m/10000).toFixed(1)+'万亿':'市值'+fmt(m)+'亿';
         });
-        h+='</div></div>';
-
-        // 行业
-        h+='<div><div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:4px;">🏭 申万行业</div>';
-        h+='<div style="display:flex;flex-wrap:wrap;gap:3px;">';
-        sList.forEach(function(it){
-          var c=it.chg||0;
-          h+='<div style="padding:4px 8px;border-radius:4px;background:'+heatColor(c)+';color:'+heatTxtColor(c)+';font-size:11px;font-weight:600;white-space:nowrap;" title="'+esc(it.name)+' '+(c>0?'+':'')+fmt(c)+'%">';
-          h+=esc(it.name)+' '+(c>0?'+':'')+fmt(c)+'%';
-          h+='</div>';
-        });
-        h+='</div></div>';
-
-        // 核心
-        h+='<div><div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:4px;">📊 核心指数</div>';
-        h+='<div style="display:flex;flex-wrap:wrap;gap:3px;">';
-        iList.forEach(function(it){
-          var c=it.chg||0;
-          h+='<div style="padding:5px 12px;border-radius:4px;background:'+heatColor(c)+';color:'+heatTxtColor(c)+';font-size:12px;font-weight:700;white-space:nowrap;">';
-          h+=esc(it.name)+' '+(c>0?'+':'')+fmt(c)+'%';
-          h+='</div>';
-        });
-        h+='</div></div>';
-
-        h+='</div>';
-        el.innerHTML=h;
+        var iChart=echarts.init(document.getElementById('hmIndex'));
+        iChart.setOption(iOpt);
 
         // 更新时间
         var cr=window.CONCEPT_RANKING;
         if(cr && cr.update_time) $('hmUpdateTime').textContent='更新于 '+rel(cr.update_time);
+
+        // resize 响应
+        window._hmCharts=[cChart,sChart,iChart];
+        setTimeout(function(){ cChart.resize();sChart.resize();iChart.resize(); },100);
       }
 
       function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
       if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderHeatmap);
       else renderHeatmap();
+      window.addEventListener('resize', function(){ if(window._hmCharts) window._hmCharts.forEach(function(c){ try{c.resize();}catch(e){} }); });
     })();
     </script>
 
     <script>
-    /* ===== 行业树图渲染（sector_rs → candidate_quotes 双层） ===== */
+    /* ===== 行业树图：双层 treemap（行业→候选股嵌套） ===== */
     (function(){
       const $=id=>document.getElementById(id);
       function fmt(v){ return v==null||isNaN(v)?'--':Number(v).toFixed(2); }
       function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
 
+      function heatColor(v){
+        var x=parseFloat(v)||0;
+        if(x>0){ var t=Math.min(1,x/7); return 'rgb('+Math.round(244-60*t)+','+Math.round(73-15*t)+','+Math.round(93-20*t)+')'; }
+        if(x<0){ var t=Math.min(1,Math.abs(x)/7); return 'rgb('+Math.round(31+10*t)+','+Math.round(209-50*t)+','+Math.round(123-30*t)+')'; }
+        return '#2a3548';
+      }
+
       function renderIndustryTree(){
         var el=$('industryTreemap');
-        if(!el) return;
+        if(!el || typeof echarts==='undefined') return;
+
         var sectorData=window.SECTOR_RS;
         var candQuotes=(window.CANDIDATE_QUOTES||{}).items||[];
-        var candMap={};
-        candQuotes.forEach(function(s){ candMap[s.code]=s; });
         var candidateStocks=(window.CANDIDATE||{}).stocks||{};
 
         if(!sectorData || !sectorData.sectors){
@@ -866,51 +905,83 @@ window.V8_CAL = {weeks:[],legend:[]};
           var s=candidateStocks[k];
           var ind=s.industry||s.sector||'其他';
           if(!byIndustry[ind]) byIndustry[ind]=[];
-          byIndustry[ind].push({code:s.code||k, name:s.name||k, quote:candMap[s.code||k]||null});
+          byIndustry[ind].push({code:s.code||k, name:s.name||k});
         });
 
+        // 构建候选股 code→quote 映射
+        var qMap={};
+        candQuotes.forEach(function(q){ qMap[q.code]=q; });
+
         var sectors=sectorData.sectors;
-        var h='<div style="display:flex;flex-direction:column;gap:6px;">';
+
+        // 构建 treemap 层级数据
+        var treeData=[];
         var sortedKeys=Object.keys(sectors).sort(function(a,b){
           return Math.abs((sectors[b]||{}).pct_day||0)-Math.abs((sectors[a]||{}).pct_day||0);
         });
 
         sortedKeys.forEach(function(indName){
           var sec=sectors[indName]||{};
-          var chg=sec.pct_day||0;
-          var up=chg>0;
-          var bg=up?'rgba(244,73,93,.15)':'rgba(31,209,123,.15)';
-          var border=up?'rgba(244,73,93,.35)':'rgba(31,209,123,.35)';
+          var secChg=sec.pct_day||0;
           var stocks=byIndustry[indName]||[];
 
-          h+='<div style="background:'+bg+';border-left:3px solid '+(up?'var(--up)':'var(--down)')+';border-radius:6px;padding:8px 10px;cursor:pointer;" onclick="this.querySelector(\'.ind-stocks\').style.display=this.querySelector(\'.ind-stocks\').style.display===\'block\'?\'none\':\'block\'">';
-          h+='<div style="display:flex;justify-content:space-between;align-items:center;">';
-          h+='<span style="font-size:12px;font-weight:700;color:var(--txt);">'+esc(indName)+'</span>';
-          h+='<span style="font-size:12px;font-weight:700;color:'+(up?'var(--up)':'var(--down)')+';">'+(up?'+':'')+fmt(chg)+'%</span>';
-          h+='</div>';
-          h+='<div style="font-size:10px;color:var(--dim);margin-top:2px;">候选 '+stocks.length+'只</div>';
-
-          // 成分股列表（默认折叠）
-          h+='<div class="ind-stocks" style="display:none;margin-top:6px;border-top:1px solid var(--border);padding-top:6px;">';
+          var children=[];
           if(stocks.length){
-            stocks.sort(function(a,b){ return parseFloat(b.quote?b.quote.chg:0)-parseFloat(a.quote?a.quote.chg:0); });
             stocks.forEach(function(st){
-              var q=st.quote;
+              var q=qMap[st.code];
               var sc=q?q.chg:0;
-              var sup=sc>0;
-              h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;color:'+(sup?'var(--up)':sc<0?'var(--down)':'var(--txt)')+';">';
-              h+='<span>'+esc(st.name)+'</span>';
-              h+='<span>'+(q?fmt(q.price):'--')+' '+(sup?'+':'')+fmt(sc)+'%</span>';
-              h+='</div>';
+              var mv=q?q.total_mv:1;
+              children.push({
+                name:st.name,
+                value:Math.max(mv||1, 0.5),
+                itemStyle:{color:heatColor(sc)},
+                label:{fontSize:9, color:Math.abs(sc)>2?(sc>0?'#fff':'#111'):'#ccc',
+                  formatter:function(p){return p.name+'\n'+(sc>=0?'+':'')+fmt(sc)+'%';}},
+                tooltip:{formatter:function(p){
+                  return '<b>'+p.name+'</b> ('+(st.code||'')+')<br/>涨跌幅: '+(sc>=0?'+':'')+fmt(sc)+'%<br/>现价: '+fmt(q?q.price:0);
+                }}
+              });
             });
-          } else {
-            h+='<div style="font-size:11px;color:var(--dim);">该行业暂无候选股</div>';
           }
-          h+='</div>';
-          h+='</div>';
+
+          // 行业节点本身
+          treeData.push({
+            name:indName+'  '+(secChg>=0?'+':'')+fmt(secChg)+'%',
+            value:Math.max(children.reduce(function(s,c){return s+(c.value||0);},0), 2),
+            itemStyle:{color:heatColor(secChg)},
+            children:children.length?children:undefined,
+            label:{fontSize:12, color:'#fff', fontWeight:'bold',
+              formatter:function(p){var n=p.name.split('  ');return n[0];}},
+            tooltip:{formatter:function(){
+              return '<b>'+indName+'</b><br/>行业涨跌: '+(secChg>=0?'+':'')+fmt(secChg)+'%<br/>候选股: '+stocks.length+'只';
+            }}
+          });
         });
-        h+='</div>';
-        el.innerHTML=h;
+
+        var chart=echarts.init(el);
+        chart.setOption({
+          tooltip:{trigger:'item', backgroundColor:'rgba(18,24,38,.95)', borderColor:'#334155',
+            textStyle:{color:'#e2e8f0',fontSize:11}, confine:true},
+          series:[{
+            type:'treemap', width:'98%', height:'260px',
+            roam:true, nodeClick:false,
+            breadcrumb:{show:false},
+            visibleMin:3,
+            label:{show:true, fontSize:10, color:'#ccc'},
+            upperLabel:{show:true, height:20, fontSize:11, color:'#fff', fontWeight:'bold',
+              formatter:function(p){var s=p.name.split('  ');return s[s.length-1]||p.name;}},
+            itemStyle:{gapWidth:2, borderColor:'#141c2b', borderWidth:2,
+              shadowColor:'rgba(0,0,0,.25)', shadowBlur:3},
+            levels:[
+              { itemStyle:{gapWidth:3, borderColor:'#0f1624', borderWidth:2}, upperLabel:{show:true, fontSize:12} },
+              { itemStyle:{gapWidth:1, borderColor:'#1a2332', borderWidth:1}, label:{fontSize:9} }
+            ],
+            data:treeData.length?treeData:[{name:'暂无数据',value:1,itemStyle:{color:'#2a3548'}}]
+          }]
+        });
+
+        window._treeChart=chart;
+        setTimeout(function(){ chart.resize(); },150);
 
         var cq=window.CANDIDATE_QUOTES;
         if(cq && cq.update_time) $('htUpdateTime').textContent='更新于 '+rel(cq.update_time);
@@ -920,6 +991,7 @@ window.V8_CAL = {weeks:[],legend:[]};
       function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
       if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderIndustryTree);
       else renderIndustryTree();
+      window.addEventListener('resize', function(){ if(window._treeChart) try{window._treeChart.resize();}catch(e){} });
     })();
     </script>
 
