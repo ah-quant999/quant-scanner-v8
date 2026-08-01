@@ -25,6 +25,7 @@ DATA_SOURCES = {
     "macro_data.json":             "MACRO_DATA",
     "nt_data.json":                "NT_DATA",
     "lhb_data.json":               "LHB_DATA",
+    "lhb_history.json":           "LHB_HISTORY",
     "concept_ranking.json":        "CONCEPT_RANKING",
     "margin_data.json":            "MARGIN_DATA",
     "cffex_data.json":             "CFFEX_HOLDINGS",
@@ -62,6 +63,7 @@ DATA_SOURCES = {
     "etf_pulse.json":              "ETF_PULSE",
     "etf_daily_monitor.json":      "ETF_DAILY_MONITOR",
     "v8_cal.json":                 "V8_CAL",
+    "candidate_quotes.json":       "CANDIDATE_QUOTES",
 }
 
 # 变量名 → 更新时段
@@ -95,6 +97,7 @@ CATEGORY_MAP = {
     "CAPITAL_FLOW_DATA": "intraday",
     "CONCEPT_RANKING": "intraday",
     "LIMIT_UP_HEATMAP": "intraday",
+    "CANDIDATE_QUOTES": "intraday",
     # 盘后：大盘资金流时间轴，累积历史序列
     "MARKET_FUND_FLOW_DATA": "post_close",
 
@@ -107,6 +110,7 @@ CATEGORY_MAP = {
     "TRIPLE_HISTORY": "post_close",
     "TOP10_DAILY": "post_close",
     "LHB_DATA": "post_close",
+    "LHB_HISTORY": "post_close",
     "SECTOR_RS": "post_close",
     "SH_FIB": "post_close",
     "SZ_FIB": "post_close",

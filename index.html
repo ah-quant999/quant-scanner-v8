@@ -390,7 +390,49 @@
 <script src="data/CFFEX_HOLDINGS.js"></script>
 <script src="data/IPO_DATA.js"></script>
 <script src="data/CRISIS_DATA.js"></script>
-<script>window.V8_CAL = {weeks:[],legend:[]};</script>
+<script>
+window.V8_CAL = {weeks:[],legend:[]};
+/* ===== 2026 A股交易日历（每年需更新） ===== */
+(function(){
+  window._AS_HOLIDAY_RANGES_2026 = [
+    ["01-01","01-03"], ["02-15","02-23"], ["04-04","04-06"],
+    ["05-01","05-05"], ["06-19","06-21"], ["09-25","09-27"], ["10-01","10-07"]
+  ];
+  window._AS_MAKEUP_DAYS_2026 = new Set([
+    "2026-01-04","2026-02-14","2026-02-28","2026-05-09","2026-09-20","2026-10-10"
+  ]);
+  window._isAshareTradingDay = function(d){
+    var iso = d.toISOString ? d.toISOString().slice(0,10) : String(d).slice(0,10);
+    if (window._AS_MAKEUP_DAYS_2026.has(iso)) return true;
+    var MM = (d.getMonth()+1).toString().padStart(2,'0');
+    var DD = d.getDate().toString().padStart(2,'0');
+    var md = MM + '-' + DD;
+    for (var i=0;i<window._AS_HOLIDAY_RANGES_2026.length;i++){
+      var r = window._AS_HOLIDAY_RANGES_2026[i];
+      if (md >= r[0] && md <= r[1]) return false;
+    }
+    var wd = d.getDay();
+    return wd !== 0 && wd !== 6;
+  };
+  /* 统一相对时间：非交易日且数据日期为上一交易日，显示「上一交易日收盘」 */
+  window._fmtAshareRel = function(ts){
+    if(!ts) return '--';
+    var d = new Date(String(ts).replace('T',' ').replace(/-/g,'/'));
+    if(isNaN(d.getTime())) return String(ts);
+    var now = new Date();
+    var today0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var data0  = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    var diff = Math.round((today0 - data0) / 864e5);
+    var hm = ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+    if(diff >= 1 && !window._isAshareTradingDay(today0)){
+      return '上一交易日收盘 ' + hm;
+    }
+    if(diff <= 0) return '今日 ' + hm;
+    if(diff === 1) return '昨日 ' + hm;
+    return diff + '天前 ' + hm;
+  };
+})();
+</script>
 <script src="data/CRDS_CARD_DATA.js"></script>
 <script src="data/TRIPLE_CONSENSUS.js"></script>
 <script src="data/TRIPLE_TRACK.js"></script>
@@ -421,6 +463,7 @@
 <script src="data/TOP10_DAILY.js"></script>
 <script src="data/V8_CAL.js"></script>
 <script src="data/W52_HIGH.js"></script>
+<script src="data/CANDIDATE_QUOTES.js"></script>
 </head>
 <body>
 
@@ -437,6 +480,8 @@
   <div class="tab" data-sec="rt" onclick="switchSec('rt',this)">📡 实时数据</div>
   <div class="tab" data-sec="ph" onclick="switchSec('ph',this)">🌙 盘后数据</div>
   <div class="tab" data-sec="st" onclick="switchSec('st',this)">🎯 选股策略</div>
+  <div class="tab" data-sec="rc" onclick="switchSec('rc',this)">📊 共振日历</div>
+  <a class="tab" href="lhb_resonance.html" style="text-decoration:none">🐉 龙虎榜</a>
   <div class="tab locked" data-sec="op" data-lock="1" onclick="guardLock('op',this)">🔒 运维 <span class="lk">[锁]</span></div>
   <div class="tab locked" data-sec="lg" data-lock="1" onclick="guardLock('lg',this)">📖 逻辑详解 <span class="lk">[锁]</span></div>
 </nav>
@@ -610,15 +655,7 @@
     (function(){
       const $=id=>document.getElementById(id);
       function fmt(v){ return v==null||isNaN(v)?'--':Number(v).toFixed(2); }
-      function rel(ts){
-        if(!ts) return '--';
-        const d=new Date(String(ts).replace('T',' ').replace(/-/g,'/'));
-        if(isNaN(d)) return String(ts);
-        const now=new Date();
-        const diff=Math.round((new Date(now.getFullYear(),now.getMonth(),now.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);
-        const hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
-        return (diff<=0?'今日':diff===1?'昨日':diff+'天前')+' '+hm;
-      }
+      function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
       function renderConceptTreemap(){
         const d=window.CONCEPT_RANKING;
         const el=$('conceptTreemap');
@@ -688,6 +725,204 @@
       </div>
       <div class="note">盘中异动=ETF 5 分钟量能脉冲异动；资金热度=宽基 ETF 净申赎份额趋势；日监控=全市场 ETF 当日主力净流入排名（需盘后 T+1 更新）。三者维度互补，不构成重复。</div>
     </div>
+
+    <!-- 热力矩阵 + 行业树图（并排，窄屏自动换行） -->
+    <div class="grid g-2" style="margin-bottom:16px">
+
+      <!-- 🗺️ 热力矩阵（Wind 风：概念/行业/核心指数 三栏） -->
+      <div class="card" style="margin-bottom:0">
+        <h3><span class="ic">🗺️</span>热力矩阵 · 概念 / 行业 / 指数 · <span class="fresh" id="hmUpdateTime">更新于 --</span></h3>
+        <div id="heatmapMatrix" style="min-height:200px;"><div class="ipo-empty">加载中…</div></div>
+        <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:8px;flex-wrap:wrap;align-items:center;">
+          <span><b style="color:var(--up)">■</b> 涨 &nbsp;<b style="color:var(--down)">■</b> 跌</span>
+          <span>色深=幅度大</span>
+        </div>
+      </div>
+
+      <!-- 🏭 行业树图（双层 treemap：行业→候选股） -->
+      <div class="card" style="margin-bottom:0">
+        <h3><span class="ic">🏭</span>行业树图 · 行业→候选股双层 · <span class="fresh" id="htUpdateTime">更新于 --</span></h3>
+        <div id="industryTreemap" style="min-height:200px;"><div class="ipo-empty">加载中…</div></div>
+        <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:8px;flex-wrap:wrap;align-items:center;">
+          <span>面积≈市值 &nbsp; 颜色=涨跌</span>
+          <span>点击行业展开/收起成分股</span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+    /* ===== 热力矩阵渲染（concept_ranking + sector_rs + index_quotes） ===== */
+    (function(){
+      const $=id=>document.getElementById(id);
+      function fmt(v){ return v==null||isNaN(v)?'--':Number(v).toFixed(2); }
+      function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
+      function heatColor(chg){
+        var v=parseFloat(chg)||0;
+        if(v>0){ var t=Math.min(1,v/5); return 'rgba(244,73,93,'+(.25+.75*t).toFixed(2)+')'; }
+        if(v<0){ var t=Math.min(1,Math.abs(v)/5); return 'rgba(31,209,123,'+(.25+.75*t).toFixed(2)+')'; }
+        return 'var(--bg2)';
+      }
+      function heatTxtColor(chg){
+        var v=parseFloat(chg)||0;
+        return Math.abs(v)>2?(v>0?'#fff':'#111'):'var(--txt)';
+      }
+
+      function renderHeatmap(){
+        var el=$('heatmapMatrix');
+        if(!el) return;
+        var concept=(window.CONCEPT_RANKING||{}).items||[];
+        var sectorData=window.SECTOR_RS;
+        var idxItems=(window.INDEX_QUOTES||{}).items||[];
+
+        // --- 概念栏（取净流入 top 16） ---
+        var cList=concept.slice().sort(function(a,b){return Math.abs(b.net||0)-Math.abs(a.net||0)}).slice(0,16);
+        // --- 行业栏（sector_rs 当日涨跌） ---
+        var sList=[];
+        if(sectorData && sectorData.sectors){
+          Object.keys(sectorData.sectors).forEach(function(k){
+            var s=sectorData.sectors[k];
+            if(s && typeof s==='object') sList.push({name:k, chg:s.pct_day||0, pct:s.rs_5||s.rs_20||0});
+          });
+          sList.sort(function(a,b){return Math.abs(b.chg)-Math.abs(a.chg)}).slice(0,16);
+        }
+        // --- 核心指数 ---
+        var iMap={};
+        idxItems.forEach(function(it){ iMap[it.code]=it; });
+        var iNames=[{c:'000001',l:'沪指'},{c:'399001',l:'深成指'},{c:'399006',l:'创业板'},{c:'000688',l:'科创板'},{c:'000300',l:'沪深300'},{c:'000016',l:'上证50'},{c:'000905',l:'中证500'},{c:'000852',l:'中证1000'}];
+        var iList=[];
+        iNames.forEach(function(o){ var it=iMap[o.c]; if(it) iList.push({name:o.l, chg:it.chg||0}); });
+
+        var h='<div style="display:flex;flex-direction:column;gap:10px;">';
+
+        // 概念
+        h+='<div><div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:4px;">📌 热门概念 Top16</div>';
+        h+='<div style="display:flex;flex-wrap:wrap;gap:3px;">';
+        cList.forEach(function(it){
+          var c=it.chg||0;
+          h+='<div style="padding:4px 8px;border-radius:4px;background:'+heatColor(c)+';color:'+heatTxtColor(c)+';font-size:11px;font-weight:600;white-space:nowrap;" title="'+esc(it.name)+' '+(c>0?'+':'')+fmt(c)+'%">';
+          h+=esc(it.name).replace(/.{8}/g,'$&\n')+' '+(c>0?'+':'')+fmt(c)+'%';
+          h+='</div>';
+        });
+        h+='</div></div>';
+
+        // 行业
+        h+='<div><div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:4px;">🏭 申万行业</div>';
+        h+='<div style="display:flex;flex-wrap:wrap;gap:3px;">';
+        sList.forEach(function(it){
+          var c=it.chg||0;
+          h+='<div style="padding:4px 8px;border-radius:4px;background:'+heatColor(c)+';color:'+heatTxtColor(c)+';font-size:11px;font-weight:600;white-space:nowrap;" title="'+esc(it.name)+' '+(c>0?'+':'')+fmt(c)+'%">';
+          h+=esc(it.name)+' '+(c>0?'+':'')+fmt(c)+'%';
+          h+='</div>';
+        });
+        h+='</div></div>';
+
+        // 核心
+        h+='<div><div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:4px;">📊 核心指数</div>';
+        h+='<div style="display:flex;flex-wrap:wrap;gap:3px;">';
+        iList.forEach(function(it){
+          var c=it.chg||0;
+          h+='<div style="padding:5px 12px;border-radius:4px;background:'+heatColor(c)+';color:'+heatTxtColor(c)+';font-size:12px;font-weight:700;white-space:nowrap;">';
+          h+=esc(it.name)+' '+(c>0?'+':'')+fmt(c)+'%';
+          h+='</div>';
+        });
+        h+='</div></div>';
+
+        h+='</div>';
+        el.innerHTML=h;
+
+        // 更新时间
+        var cr=window.CONCEPT_RANKING;
+        if(cr && cr.update_time) $('hmUpdateTime').textContent='更新于 '+rel(cr.update_time);
+      }
+
+      function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderHeatmap);
+      else renderHeatmap();
+    })();
+    </script>
+
+    <script>
+    /* ===== 行业树图渲染（sector_rs → candidate_quotes 双层） ===== */
+    (function(){
+      const $=id=>document.getElementById(id);
+      function fmt(v){ return v==null||isNaN(v)?'--':Number(v).toFixed(2); }
+      function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
+
+      function renderIndustryTree(){
+        var el=$('industryTreemap');
+        if(!el) return;
+        var sectorData=window.SECTOR_RS;
+        var candQuotes=(window.CANDIDATE_QUOTES||{}).items||[];
+        var candMap={};
+        candQuotes.forEach(function(s){ candMap[s.code]=s; });
+        var candidateStocks=(window.CANDIDATE||{}).stocks||{};
+
+        if(!sectorData || !sectorData.sectors){
+          el.innerHTML='<div class="ipo-empty">暂无行业数据</div>'; return;
+        }
+
+        // 按 industry 分组候选股
+        var byIndustry={};
+        Object.keys(candidateStocks).forEach(function(k){
+          var s=candidateStocks[k];
+          var ind=s.industry||s.sector||'其他';
+          if(!byIndustry[ind]) byIndustry[ind]=[];
+          byIndustry[ind].push({code:s.code||k, name:s.name||k, quote:candMap[s.code||k]||null});
+        });
+
+        var sectors=sectorData.sectors;
+        var h='<div style="display:flex;flex-direction:column;gap:6px;">';
+        var sortedKeys=Object.keys(sectors).sort(function(a,b){
+          return Math.abs((sectors[b]||{}).pct_day||0)-Math.abs((sectors[a]||{}).pct_day||0);
+        });
+
+        sortedKeys.forEach(function(indName){
+          var sec=sectors[indName]||{};
+          var chg=sec.pct_day||0;
+          var up=chg>0;
+          var bg=up?'rgba(244,73,93,.15)':'rgba(31,209,123,.15)';
+          var border=up?'rgba(244,73,93,.35)':'rgba(31,209,123,.35)';
+          var stocks=byIndustry[indName]||[];
+
+          h+='<div style="background:'+bg+';border-left:3px solid '+(up?'var(--up)':'var(--down)')+';border-radius:6px;padding:8px 10px;cursor:pointer;" onclick="this.querySelector(\'.ind-stocks\').style.display=this.querySelector(\'.ind-stocks\').style.display===\'block\'?\'none\':\'block\'">';
+          h+='<div style="display:flex;justify-content:space-between;align-items:center;">';
+          h+='<span style="font-size:12px;font-weight:700;color:var(--txt);">'+esc(indName)+'</span>';
+          h+='<span style="font-size:12px;font-weight:700;color:'+(up?'var(--up)':'var(--down)')+';">'+(up?'+':'')+fmt(chg)+'%</span>';
+          h+='</div>';
+          h+='<div style="font-size:10px;color:var(--dim);margin-top:2px;">候选 '+stocks.length+'只</div>';
+
+          // 成分股列表（默认折叠）
+          h+='<div class="ind-stocks" style="display:none;margin-top:6px;border-top:1px solid var(--border);padding-top:6px;">';
+          if(stocks.length){
+            stocks.sort(function(a,b){ return parseFloat(b.quote?b.quote.chg:0)-parseFloat(a.quote?a.quote.chg:0); });
+            stocks.forEach(function(st){
+              var q=st.quote;
+              var sc=q?q.chg:0;
+              var sup=sc>0;
+              h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;color:'+(sup?'var(--up)':sc<0?'var(--down)':'var(--txt)')+';">';
+              h+='<span>'+esc(st.name)+'</span>';
+              h+='<span>'+(q?fmt(q.price):'--')+' '+(sup?'+':'')+fmt(sc)+'%</span>';
+              h+='</div>';
+            });
+          } else {
+            h+='<div style="font-size:11px;color:var(--dim);">该行业暂无候选股</div>';
+          }
+          h+='</div>';
+          h+='</div>';
+        });
+        h+='</div>';
+        el.innerHTML=h;
+
+        var cq=window.CANDIDATE_QUOTES;
+        if(cq && cq.update_time) $('htUpdateTime').textContent='更新于 '+rel(cq.update_time);
+        else if(sectorData && sectorData.update_time) $('htUpdateTime').textContent='更新于 '+rel(sectorData.update_time);
+      }
+
+      function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderIndustryTree);
+      else renderIndustryTree();
+    })();
+    </script>
 
   </section>
 
@@ -990,6 +1225,160 @@
         </div>
         <div id="stcrdsHistory" style="font-size:11px;color:var(--dim);"></div>
       </div></div><!--/st-crds-->
+  </section>
+
+  <!-- ============ 共振日历（机游共振 + 北向） ============ -->
+  <section id="sec-rc">
+    <div class="sec-head"><h2>📊 共振日历</h2><span class="fresh" id="rcUpdateTime">更新于 --</span><span class="tag">机游共振 / 北向资金 · 历史追踪</span></div>
+
+    <div class="grid g-2" style="margin-bottom:16px">
+
+      <!-- 机游共振日历 -->
+      <div class="card" style="margin-bottom:0">
+        <h3><span class="ic">🐉</span>机游共振日历 · 龙虎榜分类统计 · <span class="fresh" id="jyCalTime">更新于 --</span></h3>
+        <div id="jyResonanceCal" style="min-height:160px;"><div class="ipo-empty">加载中…</div></div>
+        <div class="note" style="margin-top:8px;">每日龙虎榜上榜股票按「机构+游资同时净买入」= 机游共振分类。数据来源：龙虎榜盘后披露（T+1）。</div>
+      </div>
+
+      <!-- 北向共振日历 -->
+      <div class="card" style="margin-bottom:0">
+        <h3><span class="ic">🌊</span>北向资金日历 · <span class="fresh" id="northCalTime">更新于 --</span></h3>
+        <div id="northFundCal" style="min-height:160px;"><div class="ipo-empty">加载中…</div></div>
+        <div class="note" style="margin-top:8px;" id="northCalNote">加载中…</div>
+      </div>
+
+    </div>
+
+    <script>
+    /* ===== 机游共振日历渲染 ===== */
+    (function(){
+      const $=id=>document.getElementById(id);
+      function fmt(v){ return v==null||isNaN(v)?'--':Number(v).toFixed(2); }
+      function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
+
+      function renderJyCalendar(){
+        var el=$('jyResonanceCal');
+        if(!el) return;
+        var lhb=window.LHB_DATA;
+        var thist=window.TRIPLE_HISTORY;
+
+        // 当日摘要
+        var summary={};
+        var stocks=[];
+        var lhbDate='';
+        if(lhb){
+          summary=lhb.summary||{};
+          stocks=lhb.stocks||[];
+          lhbDate=String(lhb.date||'');
+        }
+
+        var h='';
+
+        // 当日统计
+        h+='<div style="background:var(--bg2);border-radius:8px;padding:12px;margin-bottom:12px;">';
+        h+='<div style="font-size:11px;color:var(--dim);margin-bottom:6px;">'+(lhbDate?lhbDate.slice(0,4)+'-'+lhbDate.slice(4,6)+'-'+lhbDate.slice(6,8):'今日')+' 龙虎榜</div>';
+        h+='<div style="display:flex;gap:16px;flex-wrap:wrap;">';
+        var cats=[
+          {k:'机游共振',c:'var(--up)',icon:'🔥'},
+          {k:'机构独买',c:'var(--cyan)',icon:'🏛️'},
+          {k:'游资独买',c:'var(--gold)',icon:'⚡'},
+          {k:'不达标',c:'var(--dim)',icon:'—'}
+        ];
+        cats.forEach(function(cat){
+          var n=summary[cat.k]||0;
+          h+='<div style="text-align:center;"><div style="font-size:20px;font-weight:800;color:'+cat.c+';">'+n+'</div>';
+          h+='<div style="font-size:10px;color:var(--sub);">'+cat.icon+' '+cat.k+'</div></div>';
+        });
+        h+='</div></div>';
+
+        // 机游共振个股列表
+        var jyStocks=stocks.filter(function(s){ return s.category==='机游共振'; });
+        if(jyStocks.length){
+          h+='<div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:4px;">🔥 机游共振个股 ('+jyStocks.length+'只)</div>';
+          h+='<div style="display:flex;flex-direction:column;gap:3px;">';
+          jyStocks.forEach(function(s){
+            h+='<div style="display:flex;justify-content:space-between;background:rgba(244,73,93,.08);border-left:3px solid var(--up);border-radius:4px;padding:5px 8px;font-size:11px;">';
+            h+='<span style="color:var(--txt);font-weight:600;">'+esc(s.name)+' <span style="color:var(--dim);font-weight:400;">'+s.code+'</span></span>';
+            h+='<span style="color:var(--up);">'+fmt(s.pct)+'% · 机构 '+(s.inst_net_万>0?'+':'')+fmt(s.inst_net_万)+'万 · 游资 '+(s.yz_net_万>0?'+':'')+fmt(s.yz_net_万)+'万</span>';
+            h+='</div>';
+          });
+          h+='</div>';
+        } else {
+          h+='<div style="font-size:11px;color:var(--dim);padding:8px 0;">今日无机游共振标的</div>';
+        }
+
+        // 历史三重共识日期线
+        if(thist && typeof thist==='object'){
+          var dates=Object.keys(thist).filter(function(k){ return /^\d{4}-\d{2}-\d{2}$/.test(k); }).sort().reverse().slice(0,15);
+          if(dates.length){
+            h+='<div style="font-size:11px;font-weight:700;color:var(--sub);margin-top:14px;margin-bottom:4px;">📅 近期三重共识历史</div>';
+            h+='<div style="display:flex;flex-wrap:wrap;gap:4px;">';
+            dates.forEach(function(d){
+              var items=thist[d]||[];
+              var cnt=items.length;
+              var nearCnt=items.filter(function(x){ return x.status==='near'; }).length;
+              h+='<div style="padding:3px 8px;border-radius:4px;background:'+(cnt>0?'rgba(167,139,250,.15)':'var(--bg2)')+';color:'+(cnt>0?'#a78bfa':'var(--dim)')+';font-size:10px;white-space:nowrap;" title="'+d+' : 共识'+cnt+'只 + near_miss '+nearCnt+'只">';
+            h+=d.slice(5)+' · '+cnt+'只';
+            h+='</div>';
+            });
+            h+='</div>';
+          }
+        }
+
+        el.innerHTML=h;
+        var mt=$('jyCalTime');
+        if(mt && lhb && lhb.update_time) mt.textContent='更新于 '+rel(lhb.update_time);
+      }
+
+      function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderJyCalendar);
+      else renderJyCalendar();
+    })();
+    </script>
+
+    <script>
+    /* ===== 北向资金日历渲染 ===== */
+    (function(){
+      const $=id=>document.getElementById(id);
+      function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
+
+      function renderNorthCalendar(){
+        var el=$('northFundCal');
+        var noteEl=$('northCalNote');
+        if(!el) return;
+        var nf=window.NORTH_FUND;
+
+        if(!nf){
+          el.innerHTML='<div class="ipo-empty">暂无北向数据</div>';
+          if(noteEl) noteEl.textContent='北向资金数据不可用';
+          return;
+        }
+
+        var stopped=nf.stopped;
+        var note=nf.note||'';
+
+        if(stopped){
+          el.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:140px;gap:10px;">';
+          el.innerHTML+='<span style="font-size:32px;">🚫</span>';
+          el.innerHTML+='<span style="font-size:13px;font-weight:700;color:var(--sub);">数据源已停止更新</span>';
+          el.innerHTML+='<span style="font-size:11px;color:var(--dim);max-width:320px;text-align:center;line-height:1.6;">'+esc(note)+'</span>';
+          el.innerHTML+='</div>';
+          if(noteEl) noteEl.textContent=note;
+          var mt=$('northCalTime');
+          if(mt && nf.update_time) mt.textContent='更新于 '+rel(nf.update_time);
+          return;
+        }
+
+        // 如果未来恢复，这里渲染正常日历
+        el.innerHTML='<div class="ipo-empty">北向数据结构待对接</div>';
+        if(noteEl) noteEl.textContent=note||'--';
+      }
+
+      function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderNorthCalendar);
+      else renderNorthCalendar();
+    })();
+    </script>
   </section>
 
   <!-- ============ 运维（管理员） ============ -->
@@ -1866,7 +2255,7 @@ function drawAmountChart(){
     note.textContent = '今日两市合计 '+last.total.toFixed(0)+' 亿元，较前日 '+chgStr+'，'+desc+'。';
   }
   const tm = document.getElementById('amountUpdateTime');
-  if(tm && data.update_time) tm.textContent = '更新于 '+data.update_time;
+  if(tm && data.update_time) tm.textContent = '更新于 '+(window._fmtAshareRel?window._fmtAshareRel(data.update_time):data.update_time);
 }
 
 /* ===== 近一月涨跌家数 SVG 柱状图（v6 风格 · 深色主题适配） ===== */
@@ -1940,7 +2329,7 @@ function drawUpDownChart(){
     note.textContent = '红=上涨家数，绿=下跌家数。今日涨 '+udLast.up+' / 跌 '+udLast.down+' / 平 '+(udLast.flat||0)+'。涨跌比 '+(udLast.down?(udLast.up/udLast.down).toFixed(2):'—')+'。';
   }
   const tm = document.getElementById('upDownUpdateTime');
-  if(tm && data.update_time) tm.textContent = '更新于 '+data.update_time;
+  if(tm && data.update_time) tm.textContent = '更新于 '+(window._fmtAshareRel?window._fmtAshareRel(data.update_time):data.update_time);
 }
 
 (function(){
@@ -1965,9 +2354,16 @@ function renderLimitUpHeatmap(){
     const d=new Date(String(data.update_time).replace('T',' ').replace(/-/g,'/'));
     if(!isNaN(d.getTime())){
       const now=new Date();
-      const dayDiff=Math.round((new Date(now.getFullYear(),now.getMonth(),now.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);
+      const today0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+      const data0=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+      const dayDiff=Math.round((today0-data0)/864e5);
       const hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
-      timeEl.textContent='更新于 '+(dayDiff<=0?'今日':dayDiff===1?'昨日':dayDiff+'天前')+' '+hm;
+      let txt;
+      if(dayDiff>=1 && window._isAshareTradingDay && !window._isAshareTradingDay(today0)) txt='上一交易日收盘 '+hm;
+      else if(dayDiff<=0) txt='今日 '+hm;
+      else if(dayDiff===1) txt='昨日 '+hm;
+      else txt=dayDiff+'天前 '+hm;
+      timeEl.textContent='更新于 '+txt;
     }else{ timeEl.textContent='更新于 '+data.update_time; }
   }
 
@@ -2151,8 +2547,8 @@ function renderLimitUpHeatmap(){
   var box = document.getElementById('v8TodayAll');
   if(!box) return;
 
-  var catClr = {imp:'#ff1744',cb:'#2979ff',data:'#ff9100',data2:'#00c853',fomc:'#e040fb',us:'#18ffff',hk:'#ff5252',tw:'#ffc400',a50:'#f50057',ipo:'#7c4dff',option:'#00bfa5',future:'#00e676',appl:'#00e5ff',sg:'#ea80fc',kr:'#1de9b6'};
-  var catName = {imp:'重要政策',cb:'央行/LPR',data:'中国数据',data2:'中国数据',fomc:'FOMC',us:'美股财报',hk:'港股休市',tw:'台股财报',a50:'A50交割',ipo:'IPO/财报',option:'期权交割',future:'期货交割',appl:'科技发布',sg:'SG公假',kr:'韩股财报'};
+  var catClr = {imp:'#ff1744',cb:'#2979ff',data:'#ff9100',data2:'#00c853',fomc:'#e040fb',us:'#42a5f5',hk:'#ff5252',tw:'#ffc400',a50:'#f50057',ipo:'#7c4dff',option:'#00bfa5',future:'#00e676',appl:'#00e5ff',sg:'#ea80fc',kr:'#1de9b6',us_earnings:'#66bb6a',eu:'#26a69a',jp:'#ab47bc',caixin:'#5c6bc0'};
+  var catName = {imp:'重要政策',cb:'央行/LPR',data:'中国数据',data2:'中国数据',fomc:'FOMC',us:'美股休市',hk:'港股休市',tw:'台股财报',a50:'A50交割',ipo:'IPO/财报',option:'期权交割',future:'期货交割',appl:'科技发布',sg:'SG公假',kr:'韩股财报',us_earnings:'美股财报',eu:'欧股财报',jp:'日股财报',caixin:'财新PMI'};
 
   var html = '';
   if(todayEvents && todayEvents.length){
@@ -2337,15 +2733,7 @@ function renderLimitUpHeatmap(){
   const $=id=>document.getElementById(id);
   const num=(v,d)=>v==null||isNaN(v)?'--':Number(v).toFixed(d==null?2:d);
 
-  function rel(ts){
-    if(!ts)return '--';
-    const d=new Date(String(ts).replace('T',' ').replace(/-/g,'/'));
-    if(isNaN(d))return String(ts);
-    const now=new Date();
-    const diff=Math.round((new Date(now.getFullYear(),now.getMonth(),now.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);
-    const hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
-    return (diff<=0?'今日':diff===1?'昨日':diff+'天前')+' '+hm;
-  }
+  function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
   function setTime(id,ts){const el=$(id);if(el&&ts)el.textContent='更新于 '+rel(ts);}
 
   /* ---- 1. 斐波那契窗口 ---- */
@@ -3219,15 +3607,7 @@ function renderLimitUpHeatmap(){
   const J=f=>fetch(P+f).then(r=>{if(!r.ok)throw new Error(f);return r.json();});
   const $=id=>document.getElementById(id);
   const num=(v,d)=>v==null||isNaN(v)?'--':Number(v).toFixed(d==null?2:d);
-  function rel(ts){
-    if(!ts)return '--';
-    const d=new Date(String(ts).replace('T',' ').replace(/-/g,'/'));
-    if(isNaN(d))return String(ts);
-    const now=new Date();
-    const diff=Math.round((new Date(now.getFullYear(),now.getMonth(),now.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);
-    const hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
-    return (diff<=0?'今日':diff===1?'昨日':diff+'天前')+' '+hm;
-  }
+  function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
   function setTime(id,ts){const el=$(id);if(el&&ts)el.textContent='更新于 '+rel(ts);}
   function fmtPct(v){ if(v==null||isNaN(v))return '<span style="color:var(--sub)">—</span>'; const n=Number(v); return '<span class="'+(n>0?'up':n<0?'down':'')+'">'+(n>0?'+':'')+n.toFixed(2)+'%</span>'; }
   function pnlClass(v){ if(v==null||isNaN(v))return 'style="color:var(--sub)"'; return v>0?'class="up"':v<0?'class="down"':'style="color:var(--sub)"'; }
@@ -3395,10 +3775,13 @@ function renderLimitUpHeatmap(){
     const d=new Date(String(timeStr).replace('T',' ').replace(/-/g,'/'));
     if(isNaN(d.getTime())) return {text:String(timeStr)};
     const now=new Date();
-    const dayDiff=Math.round((new Date(now.getFullYear(),now.getMonth(),now.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/864e5);
+    const today0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    const data0=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+    const dayDiff=Math.round((today0-data0)/864e5);
     const hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
     let txt;
-    if(dayDiff<=0) txt='今日 '+hm;
+    if(dayDiff>=1 && window._isAshareTradingDay && !window._isAshareTradingDay(today0)) txt='上一交易日收盘 '+hm;
+    else if(dayDiff<=0) txt='今日 '+hm;
     else if(dayDiff===1) txt='昨日 '+hm;
     else txt=dayDiff+'天前 '+hm;
     return {text:txt};
@@ -3478,9 +3861,11 @@ function renderLimitUpHeatmap(){
     if(m){Y=+m[1];Mo=+m[2];D=+m[3];H=+m[4];Mi=+m[5];}
     else { m=ts.match(/(\d{1,2})[-/](\d{1,2})\s+(\d{1,2}):(\d{2})/); if(m){Y=new Date().getFullYear();Mo=+m[1];D=+m[2];H=+m[3];Mi=+m[4];} else return ts.substring(0,16); }
     var now=new Date();
+    var today0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
     var that0=new Date(Y,Mo-1,D);
-    var dayDiff=Math.round((new Date(now.getFullYear(),now.getMonth(),now.getDate())-that0)/86400000);
+    var dayDiff=Math.round((today0-that0)/86400000);
     var hm=(H<10?'0':'')+H+':'+(Mi<10?'0':'')+Mi;
+    if(dayDiff>=1 && window._isAshareTradingDay && !window._isAshareTradingDay(today0)) return '上一交易日收盘 '+hm;
     if(dayDiff===0) return '今日 '+hm;
     if(dayDiff===1) return '昨日 '+hm;
     if(dayDiff>1) return dayDiff+'天前 '+hm;
@@ -4854,8 +5239,8 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   var box = document.getElementById('v8TodayAll');
   if(!box) return;
 
-  var catClr = {imp:'#ff1744',cb:'#2979ff',data:'#ff9100',data2:'#00c853',fomc:'#e040fb',us:'#18ffff',hk:'#ff5252',tw:'#ffc400',a50:'#f50057',ipo:'#7c4dff',option:'#00bfa5',future:'#00e676',appl:'#00e5ff',sg:'#ea80fc',kr:'#1de9b6'};
-  var catName = {imp:'重要政策',cb:'央行/LPR',data:'中国数据',data2:'中国数据',fomc:'FOMC',us:'美股财报',hk:'港股休市',tw:'台股财报',a50:'A50交割',ipo:'IPO/财报',option:'期权交割',future:'期货交割',appl:'科技发布',sg:'SG公假',kr:'韩股财报'};
+  var catClr = {imp:'#ff1744',cb:'#2979ff',data:'#ff9100',data2:'#00c853',fomc:'#e040fb',us:'#42a5f5',hk:'#ff5252',tw:'#ffc400',a50:'#f50057',ipo:'#7c4dff',option:'#00bfa5',future:'#00e676',appl:'#00e5ff',sg:'#ea80fc',kr:'#1de9b6',us_earnings:'#66bb6a',eu:'#26a69a',jp:'#ab47bc',caixin:'#5c6bc0'};
+  var catName = {imp:'重要政策',cb:'央行/LPR',data:'中国数据',data2:'中国数据',fomc:'FOMC',us:'美股休市',hk:'港股休市',tw:'台股财报',a50:'A50交割',ipo:'IPO/财报',option:'期权交割',future:'期货交割',appl:'科技发布',sg:'SG公假',kr:'韩股财报',us_earnings:'美股财报',eu:'欧股财报',jp:'日股财报',caixin:'财新PMI'};
 
   var html = '';
   if(todayEvents && todayEvents.length){

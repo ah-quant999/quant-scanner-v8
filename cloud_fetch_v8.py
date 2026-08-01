@@ -48,6 +48,7 @@ VAR_TO_RAW = {
     "INDEX_QUOTES": "index_quotes.json",
     "EXPERIMENT": "experiment.json",
     "V8_CAL": "v8_cal.json",
+    "CANDIDATE_QUOTES": "candidate_quotes.json",
 }
 
 # 变量名 → 更新时段（与 update_v8.py 的 CATEGORY_MAP 对齐）
@@ -73,6 +74,7 @@ CATEGORY_MAP = {
     "CAPITAL_FLOW_DATA": "intraday",
     "CONCEPT_RANKING": "intraday",
     "LIMIT_UP_HEATMAP": "intraday",
+    "CANDIDATE_QUOTES": "intraday",  # 候选池实时行情：行业树图第二层（个股）数据源
     # 盘后（15:30 后）：大盘资金流时间轴，累积历史序列，避免盘中覆盖
     "MARKET_FUND_FLOW_DATA": "post_close",
     # 15:30 收盘数据：EXPERIMENT 等 akshare 可抓的 T+1 数据
@@ -87,6 +89,37 @@ def get_ak():
         import akshare as _ak_mod
         _ak = _ak_mod
     return _ak
+
+# 2026 年中国A股休市区间（与 index.html 硬编码日历保持一致；每年初更新）
+_AS_HOLIDAY_RANGES_2026 = [
+    ("2026-01-01", "2026-01-03"), ("2026-02-15", "2026-02-23"),
+    ("2026-04-04", "2026-04-06"), ("2026-05-01", "2026-05-05"),
+    ("2026-06-19", "2026-06-21"), ("2026-09-25", "2026-09-27"),
+    ("2026-10-01", "2026-10-07"),
+]
+_AS_MAKEUP_DAYS_2026 = {"2026-01-04", "2026-02-14", "2026-02-28",
+                        "2026-05-09", "2026-09-20", "2026-10-10"}
+
+def _is_trading_day(d=None):
+    """判断某天是否为A股交易日。优先用 akshare 交易日历，失败则回退硬编码。"""
+    d = d or datetime.now().date()
+    iso = d.isoformat()
+    if iso in _AS_MAKEUP_DAYS_2026:
+        return True
+    # 硬编码休市区间兜底
+    for start, end in _AS_HOLIDAY_RANGES_2026:
+        if start <= iso <= end:
+            return False
+    if d.weekday() >= 5:  # 周六日
+        return False
+    # 尝试 akshare 交易日历
+    try:
+        df = get_ak().tool_trade_date_hist_sina()
+        if df is not None and not df.empty and 'trade_date' in df.columns:
+            return iso in set(str(x)[:10] for x in df['trade_date'])
+    except Exception:
+        pass
+    return True
 
 def save(var, obj):
     fname = VAR_TO_RAW.get(var)
@@ -338,6 +371,74 @@ def f_concept_ranking():
     if not items:
         return None
     return {"items": items, "note": "概念板块列表(涨跌幅/主力净流入亿)，来源东方财富push2delay"}
+
+def f_candidate_quotes():
+    """候选池实时行情（行业树图第二层·个股数据源）。
+
+    方案：ulist 批量拉取（走 push2delay 延迟镜像，规避实时 push2 host 的 WAF TCP 重置；
+    分小批 100 个 secid/批，长 secid 串会偶发被断连）。字段：当日涨跌幅/现价/市值。
+    """
+    try:
+        with open(RAW_DIR / "candidate.json", encoding="utf-8") as f:
+            cand = json.load(f)
+    except Exception as e:
+        print(f"  ⚠️ candidate.json 读取失败: {e}")
+        return None
+    stocks = cand.get("stocks") or {}
+    if not stocks:
+        print("  ⚠️ 候选池为空，跳过 CANDIDATE_QUOTES")
+        return None
+    # 构造 secid 分批：market sh→1, sz→0
+    secids = []
+    for sid, s in stocks.items():
+        code = str(s.get("code") or "")
+        if not code:
+            continue
+        mkt = "1" if str(s.get("market", "")).lower() == "sh" else "0"
+        secids.append(f"{mkt}.{code}")
+    if not secids:
+        return None
+    items = []
+    BATCH = 100
+    for i in range(0, len(secids), BATCH):
+        batch = secids[i:i + BATCH]
+        rows = []
+        for attempt in range(3):
+            try:
+                r = _requests.get(
+                    f"{_EM_DELAY}/api/qt/ulist.np/get",
+                    params={"fltt": "2", "invt": "2",
+                            "ut": "b2884a393a59ad64002292a3e90d46a5",
+                            "fields": "f2,f3,f12,f13,f14,f20,f21",
+                            "secids": ",".join(batch)},
+                    headers=_EM_HEADERS, timeout=15)
+                j = r.json()
+                rows = j.get("data", {}).get("diff", []) or []
+                if rows:
+                    break
+            except Exception as e:
+                print(f"  ⚠️ 候选池行情批次 {i//BATCH+1} 尝试{attempt+1}失败: {str(e)[:60]}")
+                time.sleep(2 * (attempt + 1))
+        for r in rows:
+            code = str(r.get("f12") or "")
+            if not code:
+                continue
+            # f2 可能为 "-"（停牌/未开），此时视为无行情
+            price = r.get("f2")
+            if price in (None, "-", ""):
+                continue
+            items.append({
+                "code": code,
+                "name": r.get("f14") or code,
+                "price": round(float(price), 2),
+                "chg": round(float(r.get("f3") or 0), 2),
+                "total_mv": round(float(r.get("f20") or 0) / 1e8, 2),   # 元→亿
+                "float_mv": round(float(r.get("f21") or 0) / 1e8, 2),
+            })
+    if not items:
+        print("  ⚠️ 候选池行情无有效数据")
+        return None
+    return {"items": items, "note": "候选池实时行情(涨跌幅/现价/市值)，来源东方财富push2delay"}
 
 def f_ipo_data():
     """打新日历：复用 v6 验证有效的东财 datacenter + 可转债 + 同花顺已上市补充逻辑。"""
@@ -1104,12 +1205,14 @@ def f_v8_cal(today=None):
     from datetime import date
     today = today or date.today()
 
-    # ── 频率控制：非月初(1~3号)则读缓存 ──
+    # ── 频率控制：非月初(1~3号)且非周六则读缓存 ──
+    # 周六作为 T+1 周度/月度统一刷新窗口，强制重建日历（覆盖月度事件调整/财报日期修正）
     cache_file = RAW_DIR / "v8_cal.json"
-    if today.day > 3 and cache_file.exists():
+    is_saturday = today.weekday() == 5
+    if today.day > 3 and not is_saturday and cache_file.exists():
         try:
             cached = json.loads(cache_file.read_text(encoding="utf-8"))
-            print(f"    日历: 非月初({today.day}号)，读取缓存 {cached.get('month','?')}")
+            print(f"    日历: 非月初({today.day}号)且非周六，读取缓存 {cached.get('month','?')}")
             return cached
         except Exception:
             pass  # 缓存损坏则重新生成
@@ -1189,7 +1292,7 @@ def f_v8_cal(today=None):
     # 宏观数据日（约）
     dc = shift_weekend(date(y, m, 1))
     if dc.month == m:
-        add(dc.day, "🇨🇳 财新制造业PMI", "data")
+        add(dc.day, "🇨🇳 财新制造业PMI", "caixin")
     dp = shift_weekend(date(y, m, 10))
     if dp.month == m:
         add(dp.day, "🇨🇳 CPI/PPI数据", "data2")
@@ -1437,6 +1540,16 @@ def main(category=None):
     print(f"=== v8 云端抓取开始 {datetime.now().isoformat(timespec='seconds')} "
           f"category={category or 'all'} ===")
 
+    # 假期/周末冻结：盘中/盘后/盘前（非周六T+1）遇到非交易日时跳过，保留上一交易日收盘数据
+    today = datetime.now().date()
+    is_saturday = today.weekday() == 5
+    if category in ("intraday", "post_close") and not _is_trading_day(today):
+        print(f"⏸️ 今日 {today} 非A股交易日，{category} 跳过，保留上一交易日收盘数据")
+        return 0
+    if category == "premarket" and not is_saturday and not _is_trading_day(today):
+        print(f"⏸️ 今日 {today} 非A股交易日且非周六T+1，premarket 跳过")
+        return 0
+
     # 分时段清理：只删除本次任务类别的 raw_data，避免盘中任务把盘前/盘后数据清掉
     target_vars = None
     if category:
@@ -1490,6 +1603,7 @@ def main(category=None):
         ("ANALYST_RATINGS", f_analyst_ratings),
         ("EXPERIMENT", f_experiment),
         ("V8_CAL", f_v8_cal),
+        ("CANDIDATE_QUOTES", f_candidate_quotes),
     ]
 
     for var, fn in tasks:
