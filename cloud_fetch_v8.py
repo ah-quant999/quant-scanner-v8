@@ -35,7 +35,6 @@ VAR_TO_RAW = {
     "CFFEX_HOLDINGS": "cffex_data.json",
     "MACRO_DATA": "macro_data.json",
     "CRISIS_DATA": "crisis_data.json",
-    "VOLATILITY": "volatility.json",
     "HERDING_DATA": "herding_data.json",
     "LIMIT_UP_HEATMAP": "limit_up_heatmap.json",
     "CAPITAL_FLOW_DATA": "capital_flow_data.json",
@@ -63,7 +62,6 @@ CATEGORY_MAP = {
     "NORTH_FUND": "premarket",
     "ANALYST_RATINGS": "premarket",
     "W52_HIGH": "premarket",
-    "VOLATILITY": "premarket",
     "HERDING_DATA": "premarket",
     # 盘中（含 ETF 三连板、板块资金三连板盘中追热等实时场景）
     "INDEX_QUOTES": "intraday",
@@ -611,18 +609,6 @@ def f_crisis_data():
                f"货币维度=中国银行USD/CNY中间价({usd_cny_latest or 'N/A'})；"
                f"全球维度因VIX/美债等源CN不可达暂用中性估值",
     }
-
-def f_volatility():
-    # 20 日年化波动率（样例：沪深300）
-    df = get_ak().stock_zh_index_daily(symbol="sh000300")
-    if df is None or df.empty:
-        return None
-    close = df["close"].astype(float).tail(20)
-    if len(close) < 2:
-        return None
-    ret = close.pct_change().dropna()
-    ann = ret.std() * (252 ** 0.5)
-    return {"hs300_20d_annualized": round(float(ann), 4)}
 
 def f_herding_data():
     # 羊群效应（抱团板块）：由当日涨停池的行业集中度推导
@@ -1465,7 +1451,6 @@ def main(category=None):
         ("CFFEX_HOLDINGS", f_cffex_holdings),
         ("MACRO_DATA", f_macro_data),
         ("CRISIS_DATA", f_crisis_data),
-        ("VOLATILITY", f_volatility),
         ("HERDING_DATA", f_herding_data),
         ("LIMIT_UP_HEATMAP", f_limit_up_heatmap),
         ("CAPITAL_FLOW_DATA", f_capital_flow_data),

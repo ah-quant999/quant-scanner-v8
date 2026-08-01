@@ -56,12 +56,13 @@ V6_TO_V8 = {
     "suspension_alert.json":        "suspension_alert.json",
     "market_alerts.json":           "market_alerts.json",
     "sector_fund_flow.json":        "sector_fund_flow_trend.json",
+    "volatility_watch.json":        "volatility.json",
 }
 
 # cloud_fetch_v8.py 已负责的模块：默认跳过，避免双写
 CLOUD_FETCH_VARS = {
     "ETF_INTRADAY_HEAT", "SECTOR_FUND_FLOW", "CONCEPT_RANKING", "IPO_DATA",
-    "MARGIN_DATA", "CFFEX_HOLDINGS", "MACRO_DATA", "CRISIS_DATA", "VOLATILITY",
+    "MARGIN_DATA", "CFFEX_HOLDINGS", "MACRO_DATA", "CRISIS_DATA",
     "HERDING_DATA", "LIMIT_UP_HEATMAP", "CAPITAL_FLOW_DATA", "ETF_SUBSCRIPTION",
     "NORTH_FUND", "MARKET_FUND_FLOW_DATA", "W52_HIGH", "ETF_PULSE",
     "ETF_DAILY_MONITOR", "ANALYST_RATINGS", "INDEX_QUOTES", "EXPERIMENT", "V8_CAL",

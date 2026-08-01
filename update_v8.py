@@ -79,8 +79,10 @@ CATEGORY_MAP = {
     "SUSPENSION_ALERT": "premarket",
     "MARKET_ALERTS": "premarket",
     "W52_HIGH": "premarket",
-    "VOLATILITY": "premarket",
     "HERDING_DATA": "premarket",
+
+    # 盘后（由 v6 算法 calc_volatility_watch.py 同步桥推送）
+    "VOLATILITY": "post_close",
 
     # 盘中（10:30/11:30/13:05/14:00/15:05）
     # 注意：ETF_DAILY_MONITOR 虽字段含 T+1，但为配合 ETF 三连板实时卡，归 intraday 盘中更新
