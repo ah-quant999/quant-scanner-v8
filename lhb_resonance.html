@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>机游共振日历 - 九宝量化 V8.0</title>
+<style>
+:root{
+  --bg:#0d0e15;--bg2:#15151e;--card:#1a1a26;--txt:#eee;--sub:#aaa;--dim:#666;
+  --bd:#262633;--bd2:#3a3a4a;
+  --inst:#64b5f6;--yz:#ffb74d;--gold:#ffd54f;--north:#f48fb1;--red:#ff8a80;--grn:#81c784;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;padding:16px;line-height:1.5}
+.back{font-size:13px;color:var(--sub);margin-bottom:12px}
+.back a{color:var(--inst);text-decoration:none}
+.back a:hover{text-decoration:underline}
+h1{font-size:22px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.meta{font-size:11px;color:var(--dim);margin-bottom:12px}
+.bar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.toggle{font-size:12px;background:var(--card);border:1px solid var(--bd);color:var(--sub);padding:5px 12px;border-radius:6px;cursor:pointer}
+.toggle:hover{border-color:var(--bd2);color:var(--txt)}
+.week-label{font-size:13px;color:var(--sub);margin:18px 0 6px;padding-left:4px;font-weight:700;display:flex;align-items:center;gap:8px}
+.week-label .cnt{font-size:11px;color:var(--gold);background:rgba(255,213,79,.12);padding:1px 8px;border-radius:10px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dow{font-size:12px;color:var(--sub);text-align:center;padding:6px 0;font-weight:700;background:var(--bg2);border-radius:4px}
+.day{background:var(--card);border:1px solid var(--bd);border-radius:6px;min-height:64px;padding:7px;display:flex;flex-direction:column;gap:3px;cursor:pointer;transition:border-color .15s}
+.day:hover{border-color:var(--bd2)}
+.day.today{border-color:var(--inst);box-shadow:0 0 0 1px var(--inst)}
+.day.dim{opacity:.35;cursor:default}
+.day .dn{font-size:13px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.day .badge{font-size:10px;background:rgba(255,213,79,.18);color:var(--gold);padding:0 5px;border-radius:8px;font-weight:700}
+.day .mini{font-size:10px;color:var(--dim);line-height:1.35}
+.day .mini b{color:var(--yz)}
+.detail{margin-top:6px;border-top:1px solid var(--bd);padding-top:6px;display:none;flex-direction:column;gap:7px}
+.day.open .detail{display:flex}
+.sec-t{font-size:11px;font-weight:700;margin-bottom:2px;display:flex;align-items:center;gap:4px}
+.sec-t.inst{color:var(--inst)} .sec-t.yz{color:var(--yz)} .sec-t.gold{color:var(--gold)}
+.row{font-size:11.5px;display:flex;justify-content:space-between;gap:6px;padding:1px 0}
+.row .nm{color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .amt{font-weight:700;white-space:nowrap}
+.amt.buy{color:var(--red)} .amt.sell{color:var(--grn)} .amt.inst{color:var(--inst)} .amt.yz{color:var(--yz)} .amt.gold{color:var(--gold)}
+.note{font-size:10px;color:var(--dim);margin-left:2px}
+.empty{padding:6px 0;color:var(--dim);font-size:11px}
+.warn{padding:24px;color:var(--sub);font-size:13px;text-align:center}
+.legend{margin-top:28px;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:16px}
+.legend-title{font-size:14px;font-weight:800;margin-bottom:10px}
+.legend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.li{background:var(--card);border-left:4px solid;border-radius:4px;padding:8px 10px;font-size:11px}
+.li .t{font-weight:700;margin-bottom:3px}
+.li .d{color:var(--sub);line-height:1.5}
+</style>
+</head>
+<body>
+<div class="back">🐉 <a href="index.html">返回九宝量化 V8.0</a> · <a href="calendar.html">重要日历</a> · <a href="lhb_north_seat.html">北向席位日历</a></div>
+<h1>🐉 机游共振日历</h1>
+<div class="meta">龙虎榜「机构专用席位」×「游资(非北向)席位」同时净买入 = 机游共振 ★｜数据来源：沪深交易所龙虎榜（东财席位明细）<br>口径：机构净买&gt;8000万 且 游资净买&gt;8000万 判定为共振｜仅供参考，不构成投资建议｜更新日期：<span id="uptime"></span></div>
+<div class="bar">
+  <span class="toggle" id="expandAll">展开全部</span>
+  <span class="toggle" id="collapseAll">收起全部</span>
+</div>
+<div id="content"><div class="warn">读取数据中…</div></div>
+<div class="legend">
+<div class="legend-title">🎨 口径说明</div>
+<div class="legend-grid">
+  <div class="li" style="border-color:var(--inst)"><div class="t" style="color:var(--inst)">▲ 机构净买入/卖出</div><div class="d">龙虎榜「机构专用」席位净买卖（东财原始披露，最贴近交易所）</div></div>
+  <div class="li" style="border-color:var(--yz)"><div class="t" style="color:var(--yz)">▲ 游资净买入/卖出</div><div class="d">游资/量化/未识别营业部净额（含拉萨等知名游资，剔除北向席位）</div></div>
+  <div class="li" style="border-color:var(--gold)"><div class="t" style="color:var(--gold)">★ 机游共振</div><div class="d">机构净买&gt;8000万 且 游资净买&gt;8000万，双方合力信号</div></div>
+  <div class="li" style="border-color:var(--yz)"><div class="t" style="color:var(--yz)">⚡ 纯游资异动</div><div class="d">仅游资强买、机构未达阈值（游资独买）</div></div>
+</div></div>
+<script src="data/LHB_HISTORY.js"></script>
+<script>
+function fmtWan(wan){
+  if(wan==null) return '-';
+  var a=Math.abs(wan);
+  if(a>=10000) return (wan/10000).toFixed(2)+'亿';
+  return Math.round(wan).toLocaleString('zh-CN')+'万';
+}
+function sign(wan){ return wan>=0 ? '+' : '-'; }
+function topN(arr, key, n, asc){
+  var f=arr.filter(function(x){return (x[key]!=null)&&(asc?x[key]<0:x[key]>0);});
+  f.sort(function(a,b){return asc? a[key]-b[key] : b[key]-a[key];});
+  return f.slice(0,n);
+}
+function rowHtml(name, amt, cls, note){
+  return '<div class="row"><span class="nm">'+name+'</span><span class="amt '+cls+'">'+sign(amt)+fmtWan(Math.abs(amt))+'</span></div>';
+}
+function renderDay(stocks){
+  var res=stocks.filter(function(s){return s.category==='机游共振';});
+  var instB=topN(stocks,'inst_net_万',5,false);
+  var instS=topN(stocks,'inst_net_万',5,true);
+  var yzB=topN(stocks,'yz_net_万',5,false);
+  var yzS=topN(stocks,'yz_net_万',5,true);
+  var pure=stocks.filter(function(s){return s.category==='游资独买';}).slice(0,5);
+  var h='';
+  h+='<div class="sec-t inst">▲ 机构净买入TOP5</div>';
+  if(instB.length) instB.forEach(function(s){h+=rowHtml(s.name+' <span class="note">'+s.code+'</span>', s.inst_net_万,'inst');});
+  else h+='<div class="empty">—</div>';
+  h+='<div class="sec-t inst">▼ 机构净卖出TOP5</div>';
+  if(instS.length) instS.forEach(function(s){h+=rowHtml(s.name,s.inst_net_万,'inst');});
+  else h+='<div class="empty">—</div>';
+  h+='<div class="sec-t yz">▲ 游资净买入TOP5</div>';
+  if(yzB.length) yzB.forEach(function(s){h+=rowHtml(s.name,s.yz_net_万,'yz');});
+  else h+='<div class="empty">—</div>';
+  h+='<div class="sec-t yz">▼ 游资净卖出TOP5</div>';
+  if(yzS.length) yzS.forEach(function(s){h+=rowHtml(s.name,s.yz_net_万,'yz');});
+  else h+='<div class="empty">—</div>';
+  h+='<div class="sec-t gold">★ 机游共振 ('+res.length+')</div>';
+  if(res.length) res.forEach(function(s){h+=rowHtml(s.name+' <span class="note">机'+sign(s.inst_net_万)+fmtWan(Math.abs(s.inst_net_万))+'/游'+sign(s.yz_net_万)+fmtWan(Math.abs(s.yz_net_万))+'</span>', s.inst_net_万,'gold');});
+  else h+='<div class="empty">无共振</div>';
+  h+='<div class="sec-t yz">⚡ 纯游资异动 ('+pure.length+')</div>';
+  if(pure.length) pure.forEach(function(s){h+=rowHtml(s.name,s.yz_net_万,'yz');});
+  else h+='<div class="empty">—</div>';
+  return h;
+}
+function build(){
+  var H=window.LHB_HISTORY;
+  if(!H){document.getElementById('content').innerHTML='<div class="warn">未加载到数据文件 data/LHB_HISTORY.js</div>';return;}
+  document.getElementById('uptime').textContent=H.update_time||'-';
+  var dates=Object.keys(H).filter(function(k){return /^\d{4}-\d{2}-\d{2}$/.test(k);}).sort();
+  if(!dates.length){document.getElementById('content').innerHTML='<div class="warn">暂无历史龙虎榜数据</div>';return;}
+  var first=dates[0], last=dates[dates.length-1];
+  var d0=new Date(first+'T00:00:00');
+  // 找到 first 所在周的周一
+  var mon=new Date(d0); mon.setDate(d0.getDate()-((d0.getDay()+6)%7));
+  var end=new Date(last+'T00:00:00');
+  var html='';
+  var wk=0;
+  var today=new Date(); today.setHours(0,0,0,0);
+  while(mon<=end){
+    wk++;
+    var wstart=new Date(mon);
+    var wend=new Date(mon); wend.setDate(mon.getDate()+6);
+    // 统计本周交易日 & 共振数
+    var tradingCnt=0, resCnt=0;
+    var cells=[];
+    for(var i=0;i<7;i++){
+      var dd=new Date(mon); dd.setDate(mon.getDate()+i);
+      var iso=dd.toISOString().slice(0,10);
+      var rec=H[iso];
+      var isToday=(dd.getTime()===today.getTime());
+      var dow=['一','二','三','四','五','六','日'][i];
+      if(rec && rec.trading){
+        tradingCnt++;
+        var stocks=rec.stocks||[];
+        var res=stocks.filter(function(s){return s.category==='机游共振';}).length;
+        resCnt+=res;
+        var mini='共振 '+res;
+        var topRes=stocks.filter(function(s){return s.category==='机游共振';})[0];
+        if(topRes) mini+=' · '+topRes.name;
+        var openCls = isToday ? ' day open today' : ' day';
+        cells.push('<div class="'+openCls+'" data-iso="'+iso+'">'
+          +'<div class="dn"><span>'+dd.getDate()+'<span class="note" style="font-size:10px;color:var(--dim);font-weight:400"> '+dow+'</span></span>'
+          +'<span class="badge">'+res+'★</span></div>'
+          +'<div class="mini">'+mini+'</div>'
+          +'<div class="detail">'+renderDay(stocks)+'</div></div>');
+      } else {
+        cells.push('<div class="day dim"><div class="dn"><span>'+dd.getDate()+'<span class="note" style="font-size:10px;color:var(--dim);font-weight:400"> '+dow+'</span></span></div><div class="mini">休市</div></div>');
+      }
+    }
+    html+='<div class="week-label">第'+wk+'周 '+wstart.toISOString().slice(5,10)+'~'+wend.toISOString().slice(5,10)
+      +' <span class="cnt">交易日'+tradingCnt+' · 共振'+resCnt+'</span></div>';
+    html+='<div class="cal">'+['一','二','三','四','五','六','日'].map(function(d){return '<div class="dow">周'+d+'</div>';}).join('')
+      +cells.join('')+'</div>';
+    mon.setDate(mon.getDate()+7);
+  }
+  document.getElementById('content').innerHTML=html;
+  // 绑定折叠
+  document.querySelectorAll('.day:not(.dim)').forEach(function(el){
+    el.addEventListener('click',function(){el.classList.toggle('open');});
+  });
+}
+document.getElementById('expandAll').onclick=function(){document.querySelectorAll('.day').forEach(function(el){el.classList.add('open');});};
+document.getElementById('collapseAll').onclick=function(){document.querySelectorAll('.day').forEach(function(el){if(!el.classList.contains('today'))el.classList.remove('open');});};
+build();
+</script>
+</body>
+</html>

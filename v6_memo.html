@@ -109,6 +109,30 @@ table td, table th, table tr { color: #333 !important; }
       </div>
     </div>
 
+    <!-- ⏰ v8 定时任务（2026-08-01 新增） -->
+    <div style="background:#fff;border-radius:10px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-bottom:18px;">
+      <h3 style="margin-bottom:12px;font-size:16px;">⏰ 九宝量化 v8 定时任务</h3>
+      <div style="margin-bottom:16px;padding:14px;background:#e8f5e9;border-left:4px solid #43a047;border-radius:8px;font-size:12px;line-height:1.8;">
+        <b>责任归属原则</b>：A股数据源（东方财富/akshare/通达信等）必须在中国 IP 抓取，因此所有中国数据抓取与盘后算法链都运行在<b>小九单位机</b>的 <code>self-hosted cn</code> runner 上；GitHub 云端 runner 只负责构建部署（ubuntu-latest）与体检/清理。
+      </div>
+
+      <table style="width:100%;border-collapse:collapse;font-size:11.5px;margin-bottom:14px;">
+        <tr style="background:#cfd8dc;"><th style="padding:7px 10px;text-align:left;width:18%;">北京时间</th><th style="padding:7px 10px;text-align:left;width:22%;">工作流</th><th style="padding:7px 10px;text-align:left;width:18%;">runner</th><th style="padding:7px 10px;text-align:left;width:42%;">更新内容</th></tr>
+        <tr style="background:#fff;"><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">08:25 工作日</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">v8_cn_fetch.yml</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">cn（小九）</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">盘前：日历/IPO/两融/中金所/宏观/危机/北向/分析师评级/52周高/羊群效应</td></tr>
+        <tr style="background:#f5f7fa;"><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">10:30 / 11:30 / 13:05 / 14:00 / 15:05 工作日</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">v8_cn_fetch.yml</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">cn（小九）</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">盘中：指数/ETF/板块资金流/概念排行/涨停热力图/个股资金流</td></tr>
+        <tr style="background:#fff;"><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">15:30 工作日</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">v8_cn_fetch.yml</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">cn（小九）</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">盘后收盘数据：大盘资金流时间轴/EXPERIMENT</td></tr>
+        <tr style="background:#f5f7fa;"><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">18:30 工作日</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">v8_algo_run.yml</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">cn（小九）</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">盘后算法链：候选池/金股池/三重共识/龙虎榜/回测/驾驶舱等（等交易所龙虎榜17点后发布）</td></tr>
+        <tr style="background:#fff;"><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">raw_data push 后</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">v8_build_deploy.yml</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">云端 ubuntu</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">检测变化 → selective build → 部署 GitHub Pages</td></tr>
+        <tr style="background:#f5f7fa;"><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">周六 09:00</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">v8_cn_fetch.yml</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">cn（小九）</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;"><b>T+1 周度/月度统一刷新</b>：强制重建日历（月度事件）+ 刷新 IPO/两融/中金所/宏观/危机/北向/分析师/52周高/羊群效应</td></tr>
+        <tr style="background:#fff;"><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">周六 21:00</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">cloud_weekly_cleanup.yml</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">云端 ubuntu</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">每周清理：删除 orphan raw_data/data，更新新鲜度体检报告</td></tr>
+        <tr style="background:#f5f7fa;"><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">工作日 09:00 / 17:00</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">v8_algo.yml</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">云端 ubuntu</td><td style="padding:6px 10px;border-bottom:1px solid #e0e0e0;">数据新鲜度体检</td></tr>
+      </table>
+
+      <div style="font-size:11.5px;line-height:1.8;background:#fff8e1;padding:10px 14px;border-radius:8px;">
+        <b>关于收盘后两个时间点的说明</b>：15:05 是收盘前最后一次盘中快照；15:30 是收盘后 T+1 数据（大盘资金流/EXPERIMENT）。A股 15:00 收盘后数据在 15:30 已稳定，<b>无需 15:15 单独部署</b>。v8 目前没有港股收盘专属数据模块，<b>也无需 16:15 为港股单独部署</b>；港股休市信息已纳入日历。
+      </div>
+    </div>
+
     <h3 style="margin-bottom:12px;font-size:16px;">📊 选股逻辑详解</h3>
 
     <!-- 铁律 -->

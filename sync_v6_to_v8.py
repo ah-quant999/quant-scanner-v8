@@ -93,6 +93,40 @@ def _add_timestamp(obj):
     return obj
 
 
+def _append_lhb_to_history():
+    """把最新一天的分类龙虎榜（raw_data/lhb_data.json）追加进 raw_data/lhb_history.json，
+    实现每日自动累积历史（供机游共振/北向席位日历使用）。已存在的日期跳过。"""
+    lhb = V8_RAW / "lhb_data.json"
+    if not lhb.exists():
+        return
+    obj = _load_json(lhb)
+    if not obj or not obj.get("stocks"):
+        return
+    ds = str(obj.get("date", ""))  # 形如 20260731
+    if len(ds) != 8:
+        return
+    iso = f"{ds[:4]}-{ds[4:6]}-{ds[6:]}"
+    hist_path = V8_RAW / "lhb_history.json"
+    hist = {}
+    if hist_path.exists():
+        try:
+            hist = _load_json(hist_path) or {}
+        except Exception:
+            hist = {}
+    if iso in hist:
+        return  # 当日已追加，跳过
+    hist[iso] = {
+        "trading": True,
+        "stocks": obj["stocks"],
+        "summary": obj.get("summary", {}),
+    }
+    hist["update_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    if "range" not in hist:
+        hist["range"] = [iso, iso]
+    _save_json(hist_path, hist)
+    print(f"  🐉 龙虎榜历史追加 {iso}（{len(obj['stocks'])} 只，共振{obj.get('summary',{}).get('机游共振',0)}）")
+
+
 def _enrich_sector_fund_flow_trend(obj):
     """为 sector_fund_flow_trend 补 net_10d / 回填 net_60d（从 v6 history 计算）。"""
     if not isinstance(obj, dict):
@@ -214,6 +248,8 @@ def sync(category="post_close", dry_run=False, force_cloud=False, push=False):
         _save_json(v8_path, obj)
         synced.append((v6_path.name, v8_name, var))
         print(f"  ✅ {v6_path.name} -> raw_data/{v8_name} (window.{var})")
+        if var == "LHB_DATA":
+            _append_lhb_to_history()
 
     print(f"\n实际同步: {len(synced)}")
     if missing:

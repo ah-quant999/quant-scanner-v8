@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>北向席位日历 - 九宝量化 V8.0</title>
+<style>
+:root{
+  --bg:#0d0e15;--bg2:#15151e;--card:#1a1a26;--txt:#eee;--sub:#aaa;--dim:#666;
+  --bd:#262633;--bd2:#3a3a4a;
+  --north:#f48fb1;--red:#ff8a80;--grn:#81c784;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;padding:16px;line-height:1.5}
+.back{font-size:13px;color:var(--sub);margin-bottom:12px}
+.back a{color:var(--north);text-decoration:none}
+.back a:hover{text-decoration:underline}
+h1{font-size:22px;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.meta{font-size:11px;color:var(--dim);margin-bottom:12px}
+.bar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.toggle{font-size:12px;background:var(--card);border:1px solid var(--bd);color:var(--sub);padding:5px 12px;border-radius:6px;cursor:pointer}
+.toggle:hover{border-color:var(--bd2);color:var(--txt)}
+.week-label{font-size:13px;color:var(--sub);margin:18px 0 6px;padding-left:4px;font-weight:700;display:flex;align-items:center;gap:8px}
+.week-label .cnt{font-size:11px;color:var(--north);background:rgba(244,143,177,.12);padding:1px 8px;border-radius:10px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dow{font-size:12px;color:var(--sub);text-align:center;padding:6px 0;font-weight:700;background:var(--bg2);border-radius:4px}
+.day{background:var(--card);border:1px solid var(--bd);border-radius:6px;min-height:64px;padding:7px;display:flex;flex-direction:column;gap:3px;cursor:pointer;transition:border-color .15s}
+.day:hover{border-color:var(--bd2)}
+.day.today{border-color:var(--north);box-shadow:0 0 0 1px var(--north)}
+.day.dim{opacity:.35;cursor:default}
+.day .dn{font-size:13px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.day .flow{font-size:11px;font-weight:700;margin-top:2px}
+.day .flow.pos{color:var(--red)} .day .flow.neg{color:var(--grn)}
+.day .mini{font-size:10px;color:var(--dim);line-height:1.35}
+.detail{margin-top:6px;border-top:1px solid var(--bd);padding-top:6px;display:none;flex-direction:column;gap:7px}
+.day.open .detail{display:flex}
+.sec-t{font-size:11px;font-weight:700;margin-bottom:2px;color:var(--north)}
+.row{font-size:11.5px;display:flex;justify-content:space-between;gap:6px;padding:1px 0}
+.row .nm{color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .amt{font-weight:700;white-space:nowrap}
+.amt.buy{color:var(--red)} .amt.sell{color:var(--grn)}
+.empty{padding:6px 0;color:var(--dim);font-size:11px}
+.warn{padding:24px;color:var(--sub);font-size:13px;text-align:center}
+.summary{margin-top:28px;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:16px}
+.summary-title{font-size:15px;font-weight:800;margin:6px 0 12px;color:var(--txt)}
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sum-col h4{font-size:13px;margin-bottom:8px}
+.sum-col.buy h4{color:var(--red)} .sum-col.sell h4{color:var(--grn)}
+.sum-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid var(--bd)}
+.sum-row .rk{color:var(--dim);width:18px}
+.sum-row .nm{flex:1;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sum-row .amt{font-weight:700}
+@media(max-width:680px){.sum-grid{grid-template-columns:1fr}.cal{grid-template-columns:repeat(7,1fr);font-size:10px}.day{min-height:54px}}
+.legend{margin-top:24px;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:16px}
+.legend-title{font-size:14px;font-weight:800;margin-bottom:10px}
+.li{background:var(--card);border-left:4px solid var(--north);border-radius:4px;padding:8px 10px;font-size:11px;color:var(--sub);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="back">🐉 <a href="index.html">返回九宝量化 V8.0</a> · <a href="calendar.html">重要日历</a> · <a href="lhb_resonance.html">机游共振日历</a></div>
+<h1>🏦 北向席位日历</h1>
+<div class="meta">龙虎榜「北向席位」（深股通/沪股通专用 + 外资券商）净买卖日历｜数据来源：沪深交易所龙虎榜（东财席位明细）<br>⚠️ 2024年5月起港交所已停更北向资金实时/盘后净流入，本页仅统计龙虎榜上榜个股的北向<b>席位</b>动向，非全市场北向资金流｜更新日期：<span id="uptime"></span></div>
+<div class="bar">
+  <span class="toggle" id="expandAll">展开全部</span>
+  <span class="toggle" id="collapseAll">收起全部</span>
+</div>
+<div id="content"><div class="warn">读取数据中…</div></div>
+<div class="summary">
+  <div class="summary-title">📊 周度汇总</div>
+  <div class="sum-grid" id="weekly"></div>
+</div>
+<div class="summary">
+  <div class="summary-title">📊 月度汇总</div>
+  <div class="sum-grid" id="monthly"></div>
+</div>
+<div class="legend">
+<div class="legend-title">📋 数据口径说明</div>
+<div class="li">北向席位：龙虎榜中出现的「深股通专用 / 沪股通专用」及瑞银、高盛、摩根等外资券商营业部。口径：北向席位净买卖（买入−卖出）。仅覆盖当日上龙虎榜个股，精确但非全市场。真实北向资金全市场净流入自 2024-05 起已停更，请勿与全市场北向资金流混淆。</div>
+</div>
+<script src="data/LHB_HISTORY.js"></script>
+<script>
+function fmtWan(wan){
+  if(wan==null) return '-';
+  var a=Math.abs(wan);
+  if(a>=10000) return (wan/10000).toFixed(2)+'亿';
+  return Math.round(wan).toLocaleString('zh-CN')+'万';
+}
+function sign(w){ return w>=0?'+':'-'; }
+function northNet(s){ var n=s.seats&&s.seats['北向']; if(!n) return 0; return (n.buy||0)-(n.sell||0); }
+function topN(arr,key,n,asc){
+  var f=arr.filter(function(x){return (x[key]!=null)&&(asc?x[key]<0:x[key]>0);});
+  f.sort(function(a,b){return asc?a[key]-b[key]:b[key]-a[key];});
+  return f.slice(0,n);
+}
+function rowHtml(s,cls){ return '<div class="row"><span class="nm">'+s.name+' <span style="color:var(--dim);font-size:10px">'+s.code+'</span></span><span class="amt '+cls+'">'+sign(s._n)+fmtWan(Math.abs(s._n))+'</span></div>'; }
+function dayDetail(stocks){
+  var buy=topN(stocks.map(function(s){return Object.assign({},s,{_n:northNet(s)});}),'_n',5,false);
+  var sell=topN(stocks.map(function(s){return Object.assign({},s,{_n:northNet(s)});}),'_n',5,true);
+  var h='<div class="sec-t">▲ 北向净买入TOP5</div>';
+  if(buy.length) buy.forEach(function(s){h+=rowHtml(s,'buy');}); else h+='<div class="empty">—</div>';
+  h+='<div class="sec-t">▼ 北向净卖出TOP5</div>';
+  if(sell.length) sell.forEach(function(s){h+=rowHtml(s,'sell');}); else h+='<div class="empty">—</div>';
+  return h;
+}
+function aggregate(stockList){
+  var m={};
+  stockList.forEach(function(s){
+    var n=northNet(s); if(!n) return;
+    if(!m[s.code]) m[s.code]={code:s.code,name:s.name,net:n};
+    else m[s.code].net+=n;
+  });
+  return Object.values(m);
+}
+function sumRows(list, cls){
+  var html='';
+  list.forEach(function(s,i){
+    html+='<div class="sum-row"><span class="rk">'+(i+1)+'</span><span class="nm">'+s.name+'</span><span class="amt '+cls+'">'+sign(s.net)+fmtWan(Math.abs(s.net))+'</span></div>';
+  });
+  return html||'<div class="empty">—</div>';
+}
+function build(){
+  var H=window.LHB_HISTORY;
+  if(!H){document.getElementById('content').innerHTML='<div class="warn">未加载到数据文件 data/LHB_HISTORY.js</div>';return;}
+  document.getElementById('uptime').textContent=H.update_time||'-';
+  var dates=Object.keys(H).filter(function(k){return /^\d{4}-\d{2}-\d{2}$/.test(k);}).sort();
+  if(!dates.length){document.getElementById('content').innerHTML='<div class="warn">暂无历史龙虎榜数据</div>';return;}
+  var first=dates[0], last=dates[dates.length-1];
+  var d0=new Date(first+'T00:00:00');
+  var mon=new Date(d0); mon.setDate(d0.getDate()-((d0.getDay()+6)%7));
+  var end=new Date(last+'T00:00:00');
+  var html=''; var wk=0;
+  var today=new Date(); today.setHours(0,0,0,0);
+  var allStocks=[];
+  while(mon<=end){
+    wk++;
+    var wstart=new Date(mon), wend=new Date(mon); wend.setDate(mon.getDate()+6);
+    var tradingCnt=0, weekStocks=[];
+    var cells=[];
+    for(var i=0;i<7;i++){
+      var dd=new Date(mon); dd.setDate(mon.getDate()+i);
+      var iso=dd.toISOString().slice(0,10);
+      var rec=H[iso];
+      var isToday=(dd.getTime()===today.getTime());
+      var dow=['一','二','三','四','五','六','日'][i];
+      if(rec && rec.trading){
+        tradingCnt++;
+        var stocks=rec.stocks||[]; weekStocks=weekStocks.concat(stocks); allStocks=allStocks.concat(stocks);
+        var total=stocks.reduce(function(a,s){return a+northNet(s);},0);
+        var pos=total>=0;
+        var openCls=isToday?' day open today':' day';
+        cells.push('<div class="'+openCls+'" data-iso="'+iso+'">'
+          +'<div class="dn"><span>'+dd.getDate()+'<span style="font-size:10px;color:var(--dim);font-weight:400"> '+dow+'</span></span></div>'
+          +'<div class="flow '+(pos?'pos':'neg')+'">净流入 '+sign(total)+fmtWan(Math.abs(total))+'</div>'
+          +'<div class="mini">'+(stocks.length)+'只上榜</div>'
+          +'<div class="detail">'+dayDetail(stocks)+'</div></div>');
+      } else {
+        cells.push('<div class="day dim"><div class="dn"><span>'+dd.getDate()+'<span style="font-size:10px;color:var(--dim);font-weight:400"> '+dow+'</span></span></div><div class="mini">休市</div></div>');
+      }
+    }
+    html+='<div class="week-label">第'+wk+'周 '+wstart.toISOString().slice(5,10)+'~'+wend.toISOString().slice(5,10)
+      +' <span class="cnt">交易日'+tradingCnt+'</span></div>';
+    html+='<div class="cal">'+['一','二','三','四','五','六','日'].map(function(d){return '<div class="dow">周'+d+'</div>';}).join('')+cells.join('')+'</div>';
+    // 周度汇总
+    var wa=aggregate(weekStocks);
+    var wbuy=topN(wa,'net',5,false), wsell=topN(wa,'net',5,true);
+    document.getElementById('weekly').insertAdjacentHTML('beforeend',
+      '<div><div class="summary-title" style="font-size:13px">第'+wk+'周</div><div class="sum-grid">'
+      +'<div class="sum-col buy"><h4>✅ 买入TOP5</h4>'+sumRows(wbuy,'buy')+'</div>'
+      +'<div class="sum-col sell"><h4>❌ 卖出TOP5</h4>'+sumRows(wsell,'sell')+'</div></div></div>');
+    mon.setDate(mon.getDate()+7);
+  }
+  document.getElementById('content').innerHTML=html;
+  document.querySelectorAll('.day:not(.dim)').forEach(function(el){el.addEventListener('click',function(){el.classList.toggle('open');});});
+  // 月度汇总
+  var ma=aggregate(allStocks);
+  var mbuy=topN(ma,'net',10,false), msell=topN(ma,'net',10,true);
+  document.getElementById('monthly').innerHTML=
+    '<div class="sum-col buy"><h4>▲ 净买入TOP10</h4>'+sumRows(mbuy,'buy')+'</div>'
+    +'<div class="sum-col sell"><h4>▼ 净卖出TOP10</h4>'+sumRows(msell,'sell')+'</div>';
+}
+document.getElementById('expandAll').onclick=function(){document.querySelectorAll('.day').forEach(function(el){el.classList.add('open');});};
+document.getElementById('collapseAll').onclick=function(){document.querySelectorAll('.day').forEach(function(el){if(!el.classList.contains('today'))el.classList.remove('open');});};
+build();
+</script>
+</body>
+</html>

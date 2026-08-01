@@ -1032,6 +1032,11 @@ window.V8_CAL = {weeks:[],legend:[]};
           <button class="mff-range-btn" data-range="120" style="padding:3px 12px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub);">120日</button>
           <button class="mff-range-btn" data-range="250" style="padding:3px 12px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub);">1年</button>
           <button class="mff-range-btn" data-range="all" style="padding:3px 12px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub);">全部</button>
+          <span style="width:1px;height:14px;background:var(--border);margin:0 2px;"></span>
+          <span style="font-size:11px;color:var(--dim);">显示:</span>
+          <button class="mff-series-btn" data-series="daily" style="padding:3px 10px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub);">单日净流入</button>
+          <span style="font-size:11px;color:var(--dim);">+</span>
+          <button class="mff-series-btn" data-series="cum" style="padding:3px 10px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub);">累计</button>
           <span id="mffSummary" style="font-size:11px;color:var(--dim);margin-left:auto;"></span>
         </div>
         <div id="mffChart" style="width:100%;height:320px;"></div>
@@ -3007,7 +3012,16 @@ function renderLimitUpHeatmap(){
 
   /* ---- 4. 资金流时间轴（MARKET_FUND_FLOW_DATA）· v6 一年样式 ---- */
   var __MFF_CURRENT_RANGE = 120;
+  var __MFF_SHOW_DAILY = true;
+  var __MFF_SHOW_CUM = true;
   var __MFF_CHART_INST = null;
+  function mffFormatUpdateTime(ts, dailyArr){
+    if(ts) return ts;
+    if(!dailyArr || !dailyArr.length) return '';
+    var last = dailyArr[dailyArr.length-1].date || '';
+    if(last.length !== 8) return '';
+    return last.slice(0,4)+'-'+last.slice(4,6)+'-'+last.slice(6,8)+' 15:00:00';
+  }
   function renderMarketFundFlow(mff){
     var d = mff || {};
     var card = $('marketFundFlowCard');
@@ -3017,9 +3031,9 @@ function renderLimitUpHeatmap(){
       return;
     }
     card.style.display='';
-    // 更新时间
+    // 更新时间：数据文件可能没有 update_time，取最后一条日线日期兜底
     var tEl = $('mffTime');
-    if(tEl && d.update_time) setTime('mffTime', d.update_time);
+    if(tEl) setTime('mffTime', mffFormatUpdateTime(d.update_time, d.daily));
     // 摘要
     var sumEl = $('mffSummary');
     if(sumEl){
@@ -3040,9 +3054,31 @@ function renderLimitUpHeatmap(){
         renderMffChart();
       };
     });
-    // 默认激活 120日
+    // 绑定序列显示按钮
+    document.querySelectorAll('.mff-series-btn').forEach(function(btn){
+      btn.onclick = function(){
+        var key = btn.getAttribute('data-series');
+        if(key === 'daily') __MFF_SHOW_DAILY = !__MFF_SHOW_DAILY;
+        else __MFF_SHOW_CUM = !__MFF_SHOW_CUM;
+        renderMffSeriesBtnState();
+        renderMffChart();
+      };
+    });
+    function renderMffSeriesBtnState(){
+      document.querySelectorAll('.mff-series-btn').forEach(function(btn){
+        var key = btn.getAttribute('data-series');
+        var active = (key==='daily' ? __MFF_SHOW_DAILY : __MFF_SHOW_CUM);
+        if(active){
+          btn.style.background='var(--up)'; btn.style.color='#fff'; btn.style.borderColor='var(--up)'; btn.style.fontWeight='600';
+        }else{
+          btn.style.background='var(--bg2)'; btn.style.color='var(--sub)'; btn.style.borderColor='var(--border)'; btn.style.fontWeight='400';
+        }
+      });
+    }
+    // 默认激活 120日 + 两个序列
     var defBtn = document.querySelector('.mff-range-btn[data-range="120"]');
     if(defBtn && !defBtn.dataset.activated){ defBtn.dataset.activated='1'; defBtn.click(); }
+    renderMffSeriesBtnState();
   }
   function renderMffChart(){
     var d = window.MARKET_FUND_FLOW_DATA || {};
@@ -3064,6 +3100,28 @@ function renderLimitUpHeatmap(){
     var txtColor = getComputedStyle(document.documentElement).getPropertyValue('--txt').trim() || '#e2e8f0';
     var dimColor = getComputedStyle(document.documentElement).getPropertyValue('--dim').trim() || '#94a3b8';
     var gridColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim() || '#334155';
+    var legendData = [];
+    var series = [];
+    if(__MFF_SHOW_DAILY){
+      legendData.push('单日净流入(亿)');
+      series.push({
+        name: '单日净流入(亿)', type: 'bar', yAxisIndex: 0, data: nets,
+        itemStyle: { color: function(p){ return p.value >= 0 ? upColor : downColor; } },
+        barWidth: '60%'
+      });
+    }
+    if(__MFF_SHOW_CUM){
+      legendData.push('累计净流入(亿)');
+      series.push({
+        name: '累计净流入(亿)', type: 'line', yAxisIndex: 1, data: cums,
+        smooth: true, symbol: 'none',
+        lineStyle: { color: '#ec4899', width: 2 },
+        areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [
+          { offset: 0, color: 'rgba(236,72,153,0.25)' },
+          { offset: 1, color: 'rgba(236,72,153,0.02)' }
+        ]}}
+      });
+    }
     var option = {
       backgroundColor: 'transparent',
       grid: { left: 60, right: 70, top: 30, bottom: 60 },
@@ -3082,7 +3140,7 @@ function renderLimitUpHeatmap(){
           return html;
         }
       },
-      legend: { data: ['单日净流入(亿)', '累计净流入(亿)'], top: 5, textStyle: { color: dimColor, fontSize: 11 } },
+      legend: legendData.length ? { data: legendData, top: 5, textStyle: { color: dimColor, fontSize: 11 } } : { show: false },
       xAxis: {
         type: 'category',
         data: dates,
@@ -3099,15 +3157,15 @@ function renderLimitUpHeatmap(){
       },
       yAxis: [
         {
-          type: 'value', name: '单日(亿)', position: 'left',
+          type: 'value', name: __MFF_SHOW_DAILY ? '单日(亿)' : '', position: 'left',
           nameTextStyle: { color: dimColor },
-          axisLabel: { fontSize: 10, color: dimColor },
+          axisLabel: { fontSize: 10, color: dimColor, show: __MFF_SHOW_DAILY },
           splitLine: { lineStyle: { color: gridColor, opacity: 0.3 } }
         },
         {
-          type: 'value', name: '累计(亿)', position: 'right',
+          type: 'value', name: __MFF_SHOW_CUM ? '累计(亿)' : '', position: 'right',
           nameTextStyle: { color: dimColor },
-          axisLabel: { fontSize: 10, color: dimColor, formatter: function(v){ return (v/10000).toFixed(1) + '万亿'; } },
+          axisLabel: { fontSize: 10, color: dimColor, show: __MFF_SHOW_CUM, formatter: function(v){ return (v/10000).toFixed(1) + '万亿'; } },
           splitLine: { show: false }
         }
       ],
@@ -3115,22 +3173,7 @@ function renderLimitUpHeatmap(){
         { type: 'inside', xAxisIndex: 0, start: 0, end: 100 },
         { type: 'slider', xAxisIndex: 0, height: 20, bottom: 10, start: 0, end: 100, fillerColor: 'rgba(239,68,68,0.25)', borderColor: gridColor, textStyle: { color: dimColor } }
       ],
-      series: [
-        {
-          name: '单日净流入(亿)', type: 'bar', yAxisIndex: 0, data: nets,
-          itemStyle: { color: function(p){ return p.value >= 0 ? upColor : downColor; } },
-          barWidth: '60%'
-        },
-        {
-          name: '累计净流入(亿)', type: 'line', yAxisIndex: 1, data: cums,
-          smooth: true, symbol: 'none',
-          lineStyle: { color: '#ec4899', width: 2 },
-          areaStyle: { color: { type: 'linear', x: 0, y: 0, x2: 0, y2: 1, colorStops: [
-            { offset: 0, color: 'rgba(236,72,153,0.25)' },
-            { offset: 1, color: 'rgba(236,72,153,0.02)' }
-          ]}}
-        }
-      ]
+      series: series
     };
     if(!__MFF_CHART_INST){
       __MFF_CHART_INST = echarts.init(chartDom, null, { renderer: 'canvas' });

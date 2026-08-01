@@ -1,4 +1,4 @@
-# 九宝量化 v8.0 — 每周清理（周日 23:00）
+# 九宝量化 v8.0 — 每周清理（周六 21:00，并入周六 T+1 统一维护窗口）
 #
 # 目标：删除无映射的 orphan raw_data/data 文件，更新 freshness_status.json，
 #       防止 v6 时代遗留的废弃数据像雪球一样越滚越大。
@@ -10,7 +10,7 @@ name: "🧹 v8 每周清理(云端ubuntu)"
 
 on:
   schedule:
-    - cron: '0 15 * * 0'   # 周日 23:00 CST
+    - cron: '0 13 * * 6'   # 周六 21:00 CST
   workflow_dispatch:
 
 permissions:

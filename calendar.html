@@ -11,6 +11,7 @@
   --fomc:#9c27b0;--us:#42a5f5;--hk:#ef5350;--tw:#ff9800;--a50:#e91e63;
   --ipo:#673ab7;--option:#00838f;--future:#1d6f42;--appl:#37474f;
   --sg:#8e24aa;--kr:#00acc1;
+  --us-earnings:#66bb6a;--eu:#26a69a;--jp:#ab47bc;--caixin:#5c6bc0;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;padding:16px;line-height:1.5}
@@ -43,6 +44,10 @@ h1{font-size:22px;font-weight:800;color:var(--txt);margin-bottom:8px;display:fle
 .event.appl{background:rgba(55,71,79,.15);color:#90a4ae;border-left:3px solid var(--appl)}
 .event.sg{background:rgba(142,36,170,.15);color:#ce93d8;border-left:3px solid var(--sg)}
 .event.kr{background:rgba(0,172,193,.15);color:#80deea;border-left:3px solid var(--kr)}
+.event.us_earnings{background:rgba(102,187,106,.15);color:#81c784;border-left:3px solid var(--us-earnings)}
+.event.eu{background:rgba(38,166,154,.15);color:#80cbc4;border-left:3px solid var(--eu)}
+.event.jp{background:rgba(171,71,188,.15);color:#ce93d8;border-left:3px solid var(--jp)}
+.event.caixin{background:rgba(92,107,192,.15);color:#9fa8da;border-left:3px solid var(--caixin)}
 .legend{margin-top:32px;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:20px}
 .legend-title{font-size:16px;font-weight:800;color:var(--txt);margin-bottom:14px}
 .legend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
@@ -113,5 +118,10 @@ h1{font-size:22px;font-weight:800;color:var(--txt);margin-bottom:8px;display:fle
   if(tm && D.update_time) tm.textContent = D.update_time;
 })();
 </script>
+<div style="margin-top:28px;padding:14px 16px;background:var(--bg2);border:1px solid var(--bd);border-radius:10px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+  <span style="font-size:13px;color:var(--sub);font-weight:700">🐉 龙虎榜专题</span>
+  <a href="lhb_resonance.html" style="color:var(--inst);text-decoration:none;font-size:13px;background:var(--card);border:1px solid var(--bd);padding:6px 14px;border-radius:8px">机游共振日历 →</a>
+  <a href="lhb_north_seat.html" style="color:var(--north);text-decoration:none;font-size:13px;background:var(--card);border:1px solid var(--bd);padding:6px 14px;border-radius:8px">北向席位日历 →</a>
+</div>
 </body>
 </html>
