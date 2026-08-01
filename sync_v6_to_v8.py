@@ -26,7 +26,7 @@ import json, os, sys, subprocess, shutil
 from pathlib import Path
 from datetime import datetime
 
-V6_ROOT = Path(r"E:\workspace\stock-scanner")
+V6_ROOT = Path(os.environ.get("V6_ROOT", r"E:\workspace\stock-scanner"))
 V8_ROOT = Path(__file__).resolve().parent
 V6_DATA = V6_ROOT / "data"
 V8_RAW = V8_ROOT / "raw_data"
