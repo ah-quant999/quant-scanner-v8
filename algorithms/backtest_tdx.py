@@ -213,16 +213,53 @@ def calc_forward_return(rows, idx, hold_days):
     return round((exit_ - entry) / entry * 100, 2)
 
 
+def _load_historical_pool_union(current_gp):
+    """读取最近 90 天金股池快照的并集，减少「当前池=幸存者」偏差。
+    快照不足时回退到当前池，并返回警告标志。"""
+    hist_dir = os.path.join(DATA_DIR, "history")
+    if not os.path.isdir(hist_dir):
+        return current_gp, False, 0
+
+    union_stocks = {}
+    today = datetime.now().date()
+    snapshots_used = 0
+    for fn in sorted(os.listdir(hist_dir), reverse=True):
+        if not fn.startswith("gold_pool_") or not fn.endswith(".json"):
+            continue
+        # 解析日期 gold_pool_YYYYMMDD.json
+        try:
+            date_str = fn.replace("gold_pool_", "").replace(".json", "")
+            snap_date = datetime.strptime(date_str, "%Y%m%d").date()
+        except Exception:
+            continue
+        if (today - snap_date).days > 90:
+            continue
+        try:
+            snap = json.load(open(os.path.join(hist_dir, fn), "r", encoding="utf-8"))
+            union_stocks.update(snap.get("stocks", {}))
+            snapshots_used += 1
+        except Exception:
+            pass
+
+    if snapshots_used <= 1:
+        # 只有今天或没有快照，尚无法纠偏，回退当前池
+        return current_gp, True, snapshots_used
+    return union_stocks, False, snapshots_used
+
+
 def main():
     print(f"\n{'='*60}")
     print(f"  通达信60天全量回测引擎 V3")
     print(f"  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"{'='*60}\n")
-    
-    # 读金股池
+
+    # 读金股池，并尝试用历史快照并集作为回测宇宙（纠偏幸存者偏差）
     gp = json.load(open(os.path.join(DATA_DIR, "gold_pool.json"), "r", encoding="utf-8"))
-    gp_stocks = gp.get("stocks", {})
-    log(f"金股池: {len(gp_stocks)} 只")
+    current_gp_stocks = gp.get("stocks", {})
+    gp_stocks, survivor_bias_warning, snapshots_used = _load_historical_pool_union(current_gp_stocks)
+    log(f"金股池: 当前 {len(current_gp_stocks)} 只 / 回测宇宙 {len(gp_stocks)} 只（历史快照 {snapshots_used} 个）")
+    if survivor_bias_warning:
+        log("⚠️ 历史金股池快照不足，回测仍含幸存者偏差（会随着每日快照累积逐步消除）")
     
     # 读取现有回测结果（用于增量追加）
     existing = {}
@@ -322,6 +359,8 @@ def main():
         d = {"total": 0}
         for d_ in HOLD_DAYS:
             d[f"win_{d_}d"] = 0
+            d[f"loss_{d_}d"] = 0
+            d[f"draw_{d_}d"] = 0
             d[f"total_ret_{d_}d"] = 0.0
             d[f"win_ret_{d_}d"] = 0.0
             d[f"loss_ret_{d_}d"] = 0.0
@@ -329,18 +368,22 @@ def main():
     summary = defaultdict(_new_summary)
 
     def _accumulate(s, sd):
-        """把单个信号日 sd 的各周期收益累加到汇总对象 s"""
+        """把单个信号日 sd 的各周期收益累加到汇总对象 s。
+        胜率口径与 backtest_comprehensive 统一：排除平盘，只统计 win/(win+loss)。"""
         s["total"] += 1
         for d_ in HOLD_DAYS:
             r = sd.get(f"ret_{d_}d")
-            w = sd.get(f"win_{d_}d")
-            if r is not None:
-                s[f"total_ret_{d_}d"] += r
-                if w:
-                    s[f"win_{d_}d"] += 1
-                    s[f"win_ret_{d_}d"] += r
-                else:
-                    s[f"loss_ret_{d_}d"] += r
+            if r is None:
+                continue
+            s[f"total_ret_{d_}d"] += r
+            if r > 0:
+                s[f"win_{d_}d"] += 1
+                s[f"win_ret_{d_}d"] += r
+            elif r < 0:
+                s[f"loss_{d_}d"] += 1
+                s[f"loss_ret_{d_}d"] += r
+            else:
+                s[f"draw_{d_}d"] += 1
 
     for key, sr in stock_results.items():
         if "signals" not in sr:
@@ -373,6 +416,8 @@ def main():
         "method": f"baostock 60日K线全量回测 (T+{', T+'.join(map(str, HOLD_DAYS))})",
         "gold_pool_size": len(gp_stocks),
         "stocks_analyzed": len([k for k in stock_results if "signals" in stock_results[k]]),
+        "survivor_bias_warning": survivor_bias_warning,
+        "pool_snapshots_used": snapshots_used,
         "summary": {},
         "stocks": stock_results,
     }
@@ -394,10 +439,13 @@ def main():
         row = f"  {label:<14} {s['total']:>5}"
         sd = {"label": label, "total": s["total"]}
         for d_ in HOLD_DAYS:
-            wr = round(s[f"win_{d_}d"] / s["total"] * 100, 1) if s["total"] else 0
+            decided = s[f"win_{d_}d"] + s[f"loss_{d_}d"]  # 排除平盘，与 comprehensive 统一
+            wr = round(s[f"win_{d_}d"] / decided * 100, 1) if decided else 0
             ar = round(s[f"total_ret_{d_}d"] / s["total"], 2) if s["total"] else 0
             row += f" {wr:>6}%  {ar:>+8}%"
             sd[f"win_{d_}d"] = s[f"win_{d_}d"]
+            sd[f"loss_{d_}d"] = s[f"loss_{d_}d"]
+            sd[f"draw_{d_}d"] = s[f"draw_{d_}d"]
             sd[f"win_rate_{d_}d"] = wr
             sd[f"avg_return_{d_}d"] = ar
         print(row)

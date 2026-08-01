@@ -208,8 +208,14 @@ def main():
 
     stocks = fetch_lhb_list(date_str)
     if not stocks:
-        print("无龙虎榜数据")
+        print("无龙虎榜数据（节假日或数据尚未发布）")
+        # 非周末空数据 → 写节假日占位，避免历史日历显示陈旧数据
+        _update_lhb_history({}, date_str, trading=False)
         return
+
+    # 按龙虎榜净买额绝对值排序，只分析前 DETAIL_LIMIT 只（防超时/限流）
+    stocks = sorted(stocks, key=lambda s: abs(s.get('amount', 0)), reverse=True)[:DETAIL_LIMIT]
+    print(f"  取净买额前 {len(stocks)} 只进行席位明细分析")
 
     # 新浪机构席位接口：兜底（新浪把北向卖出误并入机构卖出，必须以东财「机构专用」为主源）
     inst_map = _fetch_inst_sina(date_str)
@@ -239,15 +245,15 @@ def main():
             inst_net = inst_data['net']
 
         # ★ 2026-07-17 修复：按站点"数据口径说明"表 — 「机游共振」= 机构+游资同时净买入，
-        #   明确「本页不涉及北向」。所以 yz 必须剔除北向：游资+量化+未识别。
-        #   之前把'北向'算进 other_buy/other_sell → yz 含深股通专用席位的卖出，污染数据。
+        #   明确「本页不涉及北向」。所以 yz 必须剔除北向：游资+量化。
+        #   2026-08-01 再修：「未识别」席位也不得并入游资，避免把无名席位误判为游资共振。
         other_buy = 0
         other_sell = 0
-        for stype in ('游资', '量化', '未识别'):
+        for stype in ('游资', '量化'):
             d = seats.get(stype, {'buy': 0, 'sell': 0})
             other_buy += d['buy']
             other_sell += d['sell']
-        # 北向单独算（不归入 yz，供其他用途）
+        # 北向/未识别单独算（不归入 yz，供其他用途）
         # var bx = seats.get('北向', {'buy': 0, 'sell': 0})
 
         cat, _, other_net = classify(
@@ -319,8 +325,9 @@ def main():
     print(f"  游资独买：{len(results['游资独买'])} 只")
     print(f"  不达标：{len(results['不达标'])} 只")
 
-def _update_lhb_history(results, date_str):
-    """只写入机游共振数据到机游共振日历（2026-07-17 改：纯共振→机游共振）"""
+def _update_lhb_history(results, date_str, trading=True):
+    """写入机游共振日历（2026-07-17 改：纯共振→机游共振）。
+    trading=False 用于节假日占位，避免历史日历显示陈旧数据。"""
     path = os.path.join(BASE, "..", "out", "lhb_history.json")
     hist = {}
     if os.path.exists(path):
@@ -330,17 +337,18 @@ def _update_lhb_history(results, date_str):
         except Exception:
             pass
     pure_simple = []
-    for item in results.get('机游共振', results.get('纯共振', [])):
-        pure_simple.append({
-            'code': item['code'],
-            'name': item['name'],
-            'amount': f"{item['inst_net_万']/10000:.2f}亿" if abs(item['inst_net_万']) >= 10000 else f"{item['inst_net_万']:.0f}万",
-        })
+    if trading:
+        for item in results.get('机游共振', results.get('纯共振', [])):
+            pure_simple.append({
+                'code': item['code'],
+                'name': item['name'],
+                'amount': f"{item['inst_net_万']/10000:.2f}亿" if abs(item['inst_net_万']) >= 10000 else f"{item['inst_net_万']:.0f}万",
+            })
     if len(date_str) == 8:
         fmt_date = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:]}"
     else:
         fmt_date = datetime.date.today().strftime('%Y-%m-%d')
-    hist[fmt_date] = {'trading': True, 'pure': pure_simple}
+    hist[fmt_date] = {'trading': trading, 'pure': pure_simple}
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(hist, f, ensure_ascii=False, indent=2)
 

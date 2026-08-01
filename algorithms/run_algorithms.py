@@ -83,6 +83,21 @@ def step_seed_inputs():
         else:
             print(f"  ⚠️ v6 缺失输入: {f}（本轮将跳过依赖它的脚本）")
 
+    # 保存金股池快照，供 backtest_tdx 消除幸存者偏差（用历史池的并集作为回测宇宙）
+    try:
+        gp_src = os.path.join(OUT, "gold_pool.json")
+        if os.path.exists(gp_src):
+            hist_dir = os.path.join(OUT, "history")
+            os.makedirs(hist_dir, exist_ok=True)
+            today_str = datetime.now().strftime("%Y%m%d")
+            gp_snap = os.path.join(hist_dir, f"gold_pool_{today_str}.json")
+            with open(gp_src, "rb") as a:
+                data = a.read()
+            with open(gp_snap, "wb") as b:
+                b.write(data)
+    except Exception as e:
+        print(f"  ⚠️ 保存金股池快照失败: {e}")
+
 
 def step_run():
     print(f"\n[1] 运行算法链（{len(ORDER)} 个）")

@@ -31,6 +31,40 @@ def load_json(path, default=None):
         return default if default is not None else {}
 
 
+def _migrate_old_top10_scores(hist_dir):
+    """将历史 top10_daily_YYYYMMDD.json 中旧 raw 评分（>100）统一归一化到 0~100，
+    保证回测与阈值口径一致。按 250 理论满分折算，最高 100。"""
+    if not os.path.isdir(hist_dir):
+        return
+    for fn in os.listdir(hist_dir):
+        if not fn.startswith("top10_daily_") or not fn.endswith(".json"):
+            continue
+        path = os.path.join(hist_dir, fn)
+        try:
+            data = load_json(path, {})
+            if not isinstance(data, dict):
+                continue
+            # max_score > 100 说明是旧 raw 分
+            if data.get("max_score", 0) <= 100:
+                continue
+            top10 = data.get("top10", [])
+            count_80 = 0
+            max_s = 0
+            for item in top10:
+                raw = item.get("total_score", 0)
+                norm = round(min(100, raw / 250 * 100), 1)
+                item["total_score"] = norm
+                max_s = max(max_s, norm)
+                if norm >= 80:
+                    count_80 += 1
+            data["max_score"] = max_s
+            data["count_80plus"] = count_80
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
+
+
 def main():
     print("=" * 60)
     print(f"  多维共振评分 · 每日TOP20精选  —  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
@@ -348,7 +382,7 @@ def main():
         fq = fundamental_stocks.get(fq_key, {})
         quality_score, quality_grade, quality_detail = quality_points(fq)
 
-        # ── 总分 ──
+        # ── 原始总分（各维度绝对加分之和）──
         raw_total = base + enhance + form_score + fund + sector_score + inst + quality_score
 
         # ── 回测胜率反哺（2026-07-25）──
@@ -357,7 +391,12 @@ def main():
         win_rate = bt_win_rate_for(sig_tuple)
         # 以 50% 为中性基准；每偏离 10% ±5 分，限制 ±10 分
         score_backtest = max(-10, min(10, round((win_rate - 50) / 10 * 5)))
-        total = raw_total + score_backtest
+        raw_total = raw_total + score_backtest
+
+        # ── 归一化到 0~100（2026-08-01 升级）──
+        # 理论满分 ≈ 250（base 110 + enhance 16 + form 16 + fund 10 + sector 5 + inst 10 + quality 40 + backtest 10）
+        # 避免 base 单项满分 110 却被下游当百分制阈值用的口径混乱
+        total = round(min(100, raw_total / 250 * 100), 1)
 
         scored.append({
             "code": raw_code,
@@ -480,6 +519,9 @@ def main():
         }
         with open(hist_file, "w", encoding="utf-8") as f:
             json.dump(hist, f, ensure_ascii=False, indent=2)
+
+        # 归一化历史快照（一次性过渡，保证旧 raw 分不影响回测口径）
+        _migrate_old_top10_scores(hist_dir)
     except Exception as e:
         print(f"  [warn] 保存历史记录失败: {e}")
 
