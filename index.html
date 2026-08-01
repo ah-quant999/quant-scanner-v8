@@ -796,7 +796,7 @@ window.V8_CAL = {weeks:[],legend:[]};
               itemStyle:{gapWidth:2, borderColor:'#141c2b', borderWidth:2},
               upperLabel:{show:true}
             },{
-              itemStyle:{gapWidth:1, borderColor:#1a2332', borderWidth:1}
+              itemStyle:{gapWidth:1, borderColor:'#1a2332', borderWidth:1}
             }],
             data:children.length?children:[{name:'暂无数据',value:1,itemStyle:{color:'#2a3548'}}]
           }]
@@ -3192,7 +3192,6 @@ function renderLimitUpHeatmap(){
       const arr=[].concat(si||[], so||[]).filter(x=>x&&x['net_'+k]!=null&&!isNaN(x['net_'+k]));
       return arr.map(x=>({name:x.name, type:x.type, ['net_'+k]:x['net_'+k]}));
     };
-    const t5d=deriveTrend('5d'), t20d=deriveTrend('20d'), t60d=deriveTrend('60d');
 
     // 降级：sects_in/out为空但top_list有数据时派生
     if(!si.length && !so.length){
