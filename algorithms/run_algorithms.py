@@ -65,6 +65,7 @@ ORDER = [
     "update_triple_resonance_history.py",  # 累积 triple_resonance_history
     "gen_triple_consensus.py",         # 读 top10 / cockpit_tier / fundamental / gold_pool
     "gen_triple_track.py",             # 读 triple_history / gold_pool / backtest / cockpit
+    "calc_volatility_watch.py",         # → raw_data/volatility.json（v8 原生，独立无依赖）
 ]
 
 
