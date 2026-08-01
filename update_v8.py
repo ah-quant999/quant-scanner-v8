@@ -86,7 +86,7 @@ CATEGORY_MAP = {
     "INDEX_QUOTES": "intraday",
     "ETF_PULSE": "intraday",
     "ETF_INTRADAY_HEAT": "intraday",
-    "ETF_SUBSCRIPTION": "intraday",
+    "ETF_SUBSCRIPTION": "premarket",
     "ETF_DAILY_MONITOR": "intraday",
     "SECTOR_FUND_FLOW": "intraday",
     "CAPITAL_FLOW_DATA": "intraday",

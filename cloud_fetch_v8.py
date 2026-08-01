@@ -69,8 +69,8 @@ CATEGORY_MAP = {
     "INDEX_QUOTES": "intraday",
     "ETF_PULSE": "intraday",
     "ETF_INTRADAY_HEAT": "intraday",
-    "ETF_SUBSCRIPTION": "intraday",
     "ETF_DAILY_MONITOR": "intraday",
+    "ETF_SUBSCRIPTION": "premarket",  # T+1 盘后/盘前更新一次即可
     "SECTOR_FUND_FLOW": "intraday",
     "CAPITAL_FLOW_DATA": "intraday",
     "CONCEPT_RANKING": "intraday",
@@ -351,11 +351,41 @@ def f_ipo_data():
         return None
 
 def f_margin_data():
-    # 融资融券（沪市明细）
-    df = get_ak().stock_margin_detail_sse()
-    if df is None or df.empty:
+    """两融余额走势：上交所融资融券汇总（日线）。
+    输出结构与 v6 MARGIN_DATA 一致：{sh:[{date,date_raw,rz_balance,rq_balance_amt,total}], update_time}
+    """
+    end = datetime.now().strftime("%Y%m%d")
+    start = (datetime.now() - timedelta(days=120)).strftime("%Y%m%d")
+    result = {"sh": [], "update_time": ""}
+    try:
+        df = get_ak().stock_margin_sse(start_date=start, end_date=end)
+        if df is None or df.empty:
+            return None
+        rows = []
+        for _, row in df.iterrows():
+            dt = str(row["信用交易日期"])
+            try:
+                d_obj = datetime.strptime(dt, "%Y%m%d")
+                dt_fmt = f"{d_obj.month}/{d_obj.day}"
+            except Exception:
+                dt_fmt = dt
+            rows.append({
+                "date": dt_fmt,
+                "date_raw": f"{dt[:4]}-{dt[4:6]}-{dt[6:]}",
+                "rz_balance": round(float(row["融资余额"]) / 1e8),
+                "rz_buy": round(float(row["融资买入额"]) / 1e8),
+                "rq_balance_amt": round(float(row["融券余量金额"]) / 1e8),
+                "total": round(float(row["融资融券余额"]) / 1e8),
+            })
+        # 按日期升序（旧→新），保证图表方向正确
+        rows.sort(key=lambda x: x["date_raw"])
+        result["sh"] = rows
+        print(f"  ✅ 两融余额：{len(rows)} 条")
+    except Exception as e:
+        print(f"  ❌ 两融余额失败: {e}")
         return None
-    return {"items": df.tail(20).to_dict(orient="records")}
+    result["update_time"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+    return result
 
 def f_cffex_holdings():
     # 中金所股指期货日行情：动态取最近有数据的交易日（盘后数据通常当日稍晚才出）
@@ -669,51 +699,167 @@ def f_capital_flow_data():
         "note": "全市场个股主力净流入(亿)，来源东方财富push2delay；非席位四路口径",
     }
 
+# 宽基ETF申赎：行业/主题排除关键词（与 v6 fetch_etf_subscription.py 保持一致）
+_ETF_SECTOR_KEYWORDS = [
+    '半导体','芯片','医药','医疗','券商','银行','煤炭','通信','消费','军工','电池','新能源','光伏','有色','化工',
+    '物联网','云计算','互联','科技','传媒','地产','基建','食品','汽车','钢铁','建材','农业','环保','旅游','教育',
+    '港股','恒生','H股','德国','日本','法国','印度','越南','黄金','原油','豆粕','能源','商品','货币','债券','国债',
+    '国开','政金','城投','信用','短融','存单','理财','标普','纳斯达克','MSCI','富时','央企','国企','产业','畜牧',
+    '养殖','种植','渔业','种业','化肥','农药','服装','家电','造纸','包装','石油','天然气','电力','水务','燃气',
+    '供热','固废','污水','风电','核电','水电','储能','氢能','生物质','充电桩','换电','锂电','钠电','固态','燃料电池',
+    '电机','电控','轨道交通','航空航天','船舶','港口','机场','公路','铁路','物流','快递','仓储','供应链','贸易',
+    '零售','电商','免税','餐饮','酒店','演艺','会展','体育','游戏','动漫','影视','音乐','广告','营销','家政','共享',
+    '租赁','卫星','火箭','基因','干细胞','机器人','无人机','虚拟','增强','量子','纳米','石墨烯','超导','核聚变',
+    '信创','电子','电信','5G','6G','AI','智能制造','工业','芯','数字','大数据','金融科技','区块链','元宇宙','碳中和',
+]
+_ETF_BROAD_PATTERNS = [
+    r'(?:沪深)?300(?:ETF|指数|基金|[A-Z]|增|价值|成长|质量|ESG|红利|指增|增强)?$',
+    r'^(?:中证)?500(?:ETF|指数|基金|质量|低波|价值|成长|增强)?$',
+    r'^(?:中证)?1000(?:ETF|指数|基金|价值|成长|增强)?$',
+    r'^(?:上证)?50(?:ETF|指数|基金|[A-Z])?$',
+    r'^(?:上证)?180(?:ETF|指数|基金|[A-Z])?$',
+    r'^创业板(?:ETF|指数|50)?$',
+    r'^创50(?:ETF)?$',
+    r'^(?:科创板|科创)(?:50|100|200)(?:ETF|指数|基金|[A-Za-z])?$',
+    r'^(?:中证)?A500(?:ETF|基金|指数|龙头|添富|富国|华宝|中金|申万|银河|红利|增强|[A-Z])?$',
+    r'^A500[EF]?$',
+    r'^综指ETF$',
+    r'^(?:上证|沪深|中证)综合(?:ETF|指数)?$',
+    r'^AH300ETF$',
+    r'^AH500ETF$',
+    r'^A50ETF$',
+    r'^双创50(?:ETF)?$',
+]
+
+def _is_broad_etf(name):
+    n = str(name or "").strip()
+    for kw in _ETF_SECTOR_KEYWORDS:
+        if kw in n:
+            return False
+    for p in _ETF_BROAD_PATTERNS:
+        if __import__("re").search(p, n):
+            return True
+    return False
+
+def _trade_dates(n=60):
+    dates = []
+    d = datetime.now()
+    while len(dates) < n:
+        if d.weekday() < 5:
+            dates.append(d.strftime("%Y%m%d"))
+        d -= timedelta(days=1)
+    return list(reversed(dates))
+
 def f_etf_subscription():
-    df = get_ak().fund_etf_category_sina(symbol="ETF基金")
-    if df is None or df.empty:
+    """宽基ETF净申赎：上交所ETF份额日环比，筛选宽基指数ETF。
+    输出结构与 v6 ETF_SUBSCRIPTION 一致：{sh:[{date,date_raw,total_shares_bil,net_subscribe_bil}], update_time}
+    """
+    dates = _trade_dates(60)
+    result = {"sh": [], "sh_all": [], "update_time": ""}
+    prev_total = None
+    prev_total_all = None
+    for d in dates:
+        try:
+            df = get_ak().fund_etf_scale_sse(date=d)
+            if df is None or len(df) == 0:
+                continue
+            # 基金份额字段名兼容
+            share_col = "基金份额" if "基金份额" in df.columns else None
+            if share_col is None:
+                continue
+            df_broad = df[df["基金简称"].apply(_is_broad_etf)]
+            broad_shares = float(df_broad[share_col].sum()) if len(df_broad) else 0.0
+            all_shares = float(df[share_col].sum())
+            dt_fmt = f"{int(d[4:6])}/{int(d[6:8])}"
+            dt_raw = f"{d[:4]}-{d[4:6]}-{d[6:]}"
+            entry = {"date": dt_fmt, "date_raw": dt_raw, "total_shares_bil": round(broad_shares / 1e8, 2)}
+            if prev_total is not None:
+                entry["net_subscribe_bil"] = round((broad_shares - prev_total) / 1e8, 2)
+            else:
+                entry["net_subscribe_bil"] = 0.0
+            result["sh"].append(entry)
+            prev_total = broad_shares
+
+            entry_all = {"date": dt_fmt, "date_raw": dt_raw, "total_shares_bil": round(all_shares / 1e8, 2)}
+            if prev_total_all is not None:
+                entry_all["net_subscribe_bil"] = round((all_shares - prev_total_all) / 1e8, 2)
+            else:
+                entry_all["net_subscribe_bil"] = 0.0
+            result["sh_all"].append(entry_all)
+            prev_total_all = all_shares
+        except Exception:
+            pass
+        time.sleep(0.15)
+    if not result["sh"]:
         return None
-    return {"items": df.head(30).to_dict(orient="records")}
+    result["update_time"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+    print(f"  ✅ 宽基ETF净申赎：{len(result['sh'])} 条")
+    return result
 
 def f_north_fund():
     # 北向资金：港交所 2024-05 后停止披露 top_buy，系统标「停止」
     return {"stopped": True, "note": "港交所 2024-05 后停止披露北向 top_buy，无实时数据"}
 
 def f_market_fund_flow_data():
-    # 大盘资金流：日K线接口(push2his)在当前网络被重置，故以全市场个股主力净流入求和
-    # 得到「今日市场主力净流入(亿)」。以已有 raw_data 为基线追加新一天，累积历史序列。
-    recs = _all_individual_recs("f12,f62")
-    if not recs:
-        return None
-    net_yi = round(sum(x["net"] for x in recs), 2)
-    today = datetime.now().strftime("%Y%m%d")
+    """大盘资金流向时间轴：东方财富 push2his 日线接口。
+    取上证指数(000001)主力资金净流入历史序列，覆盖今年以来到最近交易日。
+    f52=主力净流入(元)，f62/f63=上证收盘/涨跌幅，f64/f65=深证收盘/涨跌幅。
+    """
+    url = "http://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get"
+    params = {
+        "lmt": "0",
+        "klt": "101",
+        "secid": "1.000001",
+        "secid2": "0.399001",
+        "fields1": "f1,f2,f3,f7",
+        "fields2": "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65",
+        "ut": "b2884a393a59ad64002292a3e90d46a5",
+        "_": int(time.time() * 1000),
+    }
+    try:
+        r = _requests.get(url, params=params, headers=_EM_HEADERS, timeout=20)
+        text = r.text
+        start = text.find("{")
+        end = text.rfind(")")
+        j = json.loads(text[start:end if end > 0 else None])
+        klines = j.get("data", {}).get("klines", []) or []
+    except Exception as e:
+        print(f"  ⚠️ 大盘资金流向接口失败: {e}")
+        klines = []
 
-    # 读取历史并追加（保留最近 252 个交易日，约一年）
-    history = []
-    hist_file = RAW_DIR / "market_fund_flow_data.json"
-    if hist_file.exists():
+    if not klines:
+        return None
+
+    daily = []
+    sh_quote = {}
+    for line in klines:
+        parts = line.split(",")
+        if len(parts) < 15:
+            continue
+        ds = parts[0].replace("-", "")
         try:
-            old = json.loads(hist_file.read_text(encoding="utf-8"))
-            history = (old.get("daily") or [])[:252]
+            net_yi = round(float(parts[1]) / 1e8, 2)  # f52 主力净流入(元)
         except Exception:
-            history = []
-    # 去重：若今天已存在则替换，否则追加
-    history = [x for x in history if str(x.get("date", "")) != today]
-    history.append({"date": today, "net_yi": net_yi})
-    history = history[-252:]
+            net_yi = 0.0
+        daily.append({"date": ds, "net_yi": net_yi})
+        try:
+            sh_quote[ds] = {"close": round(float(parts[11]), 2), "chg": round(float(parts[12]), 2)}
+        except Exception:
+            pass
 
     # 累计净值
     cum = 0.0
     cumulative = []
-    for x in history:
+    for x in daily:
         cum += float(x.get("net_yi") or 0)
         cumulative.append({"date": x["date"], "cum_yi": round(cum, 2)})
 
     return {
-        "daily": history,
+        "daily": daily,
         "cumulative": cumulative,
-        "market_net": net_yi,
-        "note": "今日市场主力净流入(个股汇总，亿)；历史序列由每日盘后追加累积",
+        "market_net": daily[-1]["net_yi"] if daily else 0,
+        "sh_quote": sh_quote,
+        "note": "上证指数(000001)单日主力资金净流入滚动累加，来源东方财富push2his",
     }
 
 def f_w52_high():
