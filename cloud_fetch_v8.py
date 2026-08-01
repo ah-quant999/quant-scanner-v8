@@ -1130,6 +1130,11 @@ def f_v8_cal(today=None):
         (2026,4,3):"耶稣受难节", (2026,5,25):"阵亡将士纪念日", (2026,6,19):"六月节",
         (2026,9,7):"劳动节", (2026,11,26):"感恩节", (2026,12,25):"圣诞节",
     }
+    SG_HOLIDAYS_2026 = {
+        (2026,1,1):"元旦", (2026,2,17):"农历新年", (2026,3,31):"开斋节",
+        (2026,5,1):"劳动节", (2026,5,25):"卫塞节", (2026,8,9):"国庆日",
+        (2026,10,22):"屠妖节", (2026,12,25):"圣诞节",
+    }
     # FOMC 2026 议息会议（月, 第1天, 决议日）
     FOMC_2026 = [(1,27,28),(3,17,18),(4,28,29),(6,9,10),(7,28,29),(9,15,16),(10,27,28),(12,15,16)]
 
@@ -1194,6 +1199,25 @@ def f_v8_cal(today=None):
     dpm = last_weekday(y, m, 1)
     if dpm.month == m:
         add(dpm.day, "🇨🇳 官方制造业PMI", "data")
+    # 中国进出口数据（每月约7-10号，遇周末顺延；海关公布）
+    de = shift_weekend(date(y, m, 7))
+    if de.month == m:
+        add(de.day, "🇨🇳 中国出口", "data")
+    # 美国非农（每月第一个周五）
+    dnf = nth_weekday(y, m, 1, 4)
+    if dnf.month == m:
+        add(dnf.day, "🇺🇸 美国非农", "us")
+    # 美国CPI（每月第二个周三，约10-15号）
+    dcpi = nth_weekday(y, m, 2, 2)
+    if dcpi.month == m:
+        add(dcpi.day, "🇺🇸 美国CPI", "us")
+    # MLF操作（每月15日左右，遇周末顺延）
+    dmlf = shift_weekend(date(y, m, 15))
+    if dmlf.month == m:
+        add(dmlf.day, "🇨🇳 MLF操作", "cb")
+    # A股中报披露截止（8月31日）
+    if m == 8:
+        add(31, "🇨🇳 中报披露截止", "ipo")
     # 港股/美股休市
     for (yy, mm2, dd), name in HK_HOLIDAYS_2026.items():
         if (yy, mm2) == (y, m):
@@ -1201,6 +1225,9 @@ def f_v8_cal(today=None):
     for (yy, mm2, dd), name in US_HOLIDAYS_2026.items():
         if (yy, mm2) == (y, m):
             add(dd, f"🇺🇸 美股休市（{name}）", "us")
+    for (yy, mm2, dd), name in SG_HOLIDAYS_2026.items():
+        if (yy, mm2) == (y, m):
+            add(dd, f"🇸🇬 SG公假（{name}）", "sg")
 
     # ════════════════════════════════════════
     #  公司财报（从 v6 fetch_nt_data.py 移植）
