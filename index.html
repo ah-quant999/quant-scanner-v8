@@ -59,6 +59,28 @@
   .card h3 .fresh{font-size:11px;color:var(--dim);font-weight:400;white-space:nowrap}
   .card .fresh{font-size:11px;color:var(--dim);font-weight:400}
 
+  /* 决策中枢 */
+  .hub-card{border-color:var(--border2)}
+  .hub-verdict{display:flex;align-items:center;gap:16px;padding:14px 16px;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid var(--border2);border-radius:12px;margin-bottom:14px;flex-wrap:wrap}
+  .hub-verdict-score{font-size:46px;font-weight:800;line-height:1}
+  .hub-verdict-main{flex:1;min-width:220px}
+  .hub-verdict-title{font-size:16px;font-weight:700;margin-bottom:4px}
+  .hub-verdict-sub{font-size:12px;color:var(--sub);line-height:1.5}
+  .hub-verdict-action{font-size:12px;color:var(--dim);margin-top:6px}
+  .hub-layers{gap:12px}
+  .hub-layer{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px}
+  .hub-layer-title{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .hub-cycle{font-size:20px;font-weight:800;color:var(--gold);margin-bottom:8px}
+  .hub-layer-body{font-size:12px;color:var(--sub);line-height:1.6}
+  .hub-score-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:14px;font-weight:700}
+  .hub-score-num{font-size:26px;font-weight:800}
+  .hub-factor-count{font-size:26px;font-weight:800;color:var(--cyan);margin-bottom:8px}
+  .hub-loading{color:var(--dim);font-size:13px}
+  .hub-tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;border:1px solid var(--border2);margin:0 6px 6px 0}
+  .hub-tag.up{color:var(--up);border-color:var(--up)}
+  .hub-tag.down{color:var(--down);border-color:var(--down)}
+  .hub-tag.neutral{color:var(--gold);border-color:var(--gold)}
+
   /* 实时数据卡片：走势图 + 标题行数字 */
   .rt-card h3{justify-content:space-between;flex-wrap:wrap;gap:6px 10px}
   .rt-summary{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;white-space:nowrap}
@@ -150,7 +172,7 @@
   .sf-rotate-table{width:100%;font-size:11px;border-collapse:collapse;line-height:1.6}
   .sf-rotate-table td{padding:4px 6px;border:1px solid var(--border)}
   .sf-rotate-table tr:first-child td{background:var(--bg2);color:var(--dim);font-weight:600}
-  .sf-trend-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .sf-trend-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
   .sf-trend-card{background:var(--card2);border-radius:10px;overflow:hidden;border:1px solid var(--border)}
   .sf-trend-head{padding:8px 10px;font-size:12px;font-weight:700;text-align:center;color:#fff}
   .sf-trend-head-5{background:#534ab7}
@@ -165,7 +187,8 @@
   .sf-trend-col .col-out{color:var(--down)}
   .sf-trend-row2{display:flex;justify-content:space-between;white-space:nowrap;overflow:hidden}
   .sf-trend-row2 span:first-child{overflow:hidden;text-overflow:ellipsis;padding-right:4px}
-  @media(max-width:900px){.sf-trend-grid{grid-template-columns:1fr}}
+  @media(max-width:1200px){.sf-trend-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:700px){.sf-trend-grid{grid-template-columns:1fr}}
 
   .fib{position:relative;height:54px;background:var(--bg2);border-radius:10px;margin-top:8px}
   .fib .node{position:absolute;top:0;bottom:0;width:2px;background:var(--gold);opacity:.7}
@@ -451,7 +474,7 @@ window.V8_CAL = {weeks:[],legend:[]};
 <script src="data/HERDING_DATA.js"></script>
 <script src="data/VOLATILITY.js"></script>
 <script src="data/CAPITAL_FLOW_DATA.js"></script>
-<script>window.SH_SZ_HISTORY = {"update_time": "2026-07-28 15:21:01", "amount_history": [{"date": "4/29", "sh_amount": 11788.2, "sz_amount": 13815.3, "total": 25603.5}, {"date": "4/30", "sh_amount": 12607.6, "sz_amount": 13840.1, "total": 26447.7}, {"date": "5/6", "sh_amount": 13457.1, "sz_amount": 15501.3, "total": 28958.4}, {"date": "5/7", "sh_amount": 13157.6, "sz_amount": 15843.5, "total": 29001.2}, {"date": "5/8", "sh_amount": 13377.3, "sz_amount": 15500.7, "total": 28878.0}, {"date": "5/11", "sh_amount": 14638.5, "sz_amount": 17103.2, "total": 31741.8}, {"date": "5/12", "sh_amount": 13798.8, "sz_amount": 15906.0, "total": 29704.8}, {"date": "5/13", "sh_amount": 13530.8, "sz_amount": 15521.8, "total": 29052.6}, {"date": "5/14", "sh_amount": 14667.3, "sz_amount": 16388.3, "total": 31055.6}, {"date": "5/15", "sh_amount": 14071.0, "sz_amount": 15941.2, "total": 30012.2}, {"date": "5/18", "sh_amount": 12037.9, "sz_amount": 13851.4, "total": 25889.4}, {"date": "5/19", "sh_amount": 11853.3, "sz_amount": 13718.4, "total": 25571.7}, {"date": "5/20", "sh_amount": 11978.8, "sz_amount": 13624.6, "total": 25603.4}, {"date": "5/21", "sh_amount": 13956.9, "sz_amount": 16490.7, "total": 30447.6}, {"date": "5/22", "sh_amount": 11313.0, "sz_amount": 14316.0, "total": 25629.0}, {"date": "5/25", "sh_amount": 11821.0, "sz_amount": 14656.6, "total": 26477.7}, {"date": "5/26", "sh_amount": 12566.6, "sz_amount": 15445.5, "total": 28012.1}, {"date": "5/27", "sh_amount": 12675.8, "sz_amount": 15306.6, "total": 27982.4}, {"date": "5/28", "sh_amount": 11921.8, "sz_amount": 14030.5, "total": 25952.2}, {"date": "5/29", "sh_amount": 14040.9, "sz_amount": 15925.9, "total": 29966.8}, {"date": "6/1", "sh_amount": 12974.4, "sz_amount": 14265.8, "total": 27240.2}, {"date": "6/2", "sh_amount": 12326.1, "sz_amount": 13833.5, "total": 26159.5}, {"date": "6/3", "sh_amount": 12829.0, "sz_amount": 14872.6, "total": 27701.7}, {"date": "6/4", "sh_amount": 11922.1, "sz_amount": 13488.1, "total": 25410.1}, {"date": "6/5", "sh_amount": 12722.8, "sz_amount": 15351.3, "total": 28074.1}, {"date": "6/8", "sh_amount": 12653.3, "sz_amount": 14795.7, "total": 27449.0}, {"date": "6/9", "sh_amount": 11065.6, "sz_amount": 13471.4, "total": 24537.0}, {"date": "6/10", "sh_amount": 11490.2, "sz_amount": 13329.0, "total": 24819.3}, {"date": "6/11", "sh_amount": 10911.6, "sz_amount": 12566.5, "total": 23478.1}, {"date": "6/12", "sh_amount": 14262.3, "sz_amount": 14865.1, "total": 29127.4}, {"date": "6/15", "sh_amount": 13029.7, "sz_amount": 14203.2, "total": 27232.9}, {"date": "6/16", "sh_amount": 11816.0, "sz_amount": 14161.4, "total": 25977.4}, {"date": "6/17", "sh_amount": 11670.3, "sz_amount": 13994.2, "total": 25664.5}, {"date": "6/18", "sh_amount": 12630.7, "sz_amount": 14335.5, "total": 26966.1}, {"date": "6/22", "sh_amount": 14273.2, "sz_amount": 16441.8, "total": 30715.0}, {"date": "6/23", "sh_amount": 13607.3, "sz_amount": 15148.7, "total": 28756.0}, {"date": "6/24", "sh_amount": 12369.9, "sz_amount": 14823.7, "total": 27193.5}, {"date": "6/25", "sh_amount": 12867.6, "sz_amount": 15581.5, "total": 28449.1}, {"date": "6/26", "sh_amount": 12668.9, "sz_amount": 15693.8, "total": 28362.7}, {"date": "6/29", "sh_amount": 12651.5, "sz_amount": 15159.6, "total": 27811.1}, {"date": "6/30", "sh_amount": 11484.8, "sz_amount": 13969.1, "total": 25453.9}, {"date": "7/1", "sh_amount": 12903.5, "sz_amount": 16381.1, "total": 29284.5}, {"date": "7/2", "sh_amount": 12594.5, "sz_amount": 16071.2, "total": 28665.8}, {"date": "7/3", "sh_amount": 11553.9, "sz_amount": 14736.6, "total": 26290.4}, {"date": "7/6", "sh_amount": 11330.4, "sz_amount": 14401.6, "total": 25732.0}, {"date": "7/7", "sh_amount": 9873.5, "sz_amount": 12722.1, "total": 22595.6}, {"date": "7/8", "sh_amount": 9523.7, "sz_amount": 12277.9, "total": 21801.6}, {"date": "7/9", "sh_amount": 10614.5, "sz_amount": 13436.6, "total": 24051.0}, {"date": "7/10", "sh_amount": 12042.1, "sz_amount": 15545.5, "total": 27587.6}, {"date": "7/13", "sh_amount": 11340.8, "sz_amount": 13762.3, "total": 25103.1}, {"date": "7/14", "sh_amount": 11131.1, "sz_amount": 12659.1, "total": 23790.2}, {"date": "7/15", "sh_amount": 11058.7, "sz_amount": 12924.9, "total": 23983.6}, {"date": "7/16", "sh_amount": 10273.2, "sz_amount": 12492.4, "total": 22765.6}, {"date": "7/17", "sh_amount": 12483.5, "sz_amount": 14329.2, "total": 26812.7}, {"date": "7/20", "sh_amount": 13611.7, "sz_amount": 14500.0, "total": 28111.7}, {"date": "7/21", "sh_amount": 14106.6, "sz_amount": 15682.6, "total": 29789.2}, {"date": "7/22", "sh_amount": 11788.9, "sz_amount": 12783.2, "total": 24572.0}, {"date": "7/23", "sh_amount": 10788.3, "sz_amount": 11736.5, "total": 22524.9}, {"date": "7/24", "sh_amount": 9753.5, "sz_amount": 10669.6, "total": 20423.1}, {"date": "7/27", "sh_amount": 9689.7, "sz_amount": 10719.3, "total": 20409.1}, {"date": "7/28", "sh_amount": 9496.8, "sz_amount": 10761.0, "total": 20257.8}], "up_down": {}, "daily_stats": [{"date": "4/30", "up": 2503, "down": 2396, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/6", "up": 2937, "down": 1962, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/7", "up": 2707, "down": 2192, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/8", "up": 2437, "down": 2462, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/11", "up": 2904, "down": 1995, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/12", "up": 2410, "down": 2489, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/13", "up": 2792, "down": 2107, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/14", "up": 2042, "down": 2857, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/15", "up": 2226, "down": 2673, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/18", "up": 2463, "down": 2436, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/19", "up": 2646, "down": 2253, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/20", "up": 2478, "down": 2421, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/21", "up": 1985, "down": 2914, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/22", "up": 2896, "down": 2003, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/25", "up": 2828, "down": 2071, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/26", "up": 2493, "down": 2406, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/27", "up": 2234, "down": 2665, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/28", "up": 2614, "down": 2285, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/29", "up": 2182, "down": 2717, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/1", "up": 2278, "down": 2621, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/2", "up": 2757, "down": 2142, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/3", "up": 2618, "down": 2281, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/4", "up": 2385, "down": 2514, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/5", "up": 2130, "down": 2769, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/8", "up": 1884, "down": 3015, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/9", "up": 3037, "down": 1862, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/10", "up": 2190, "down": 2709, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/11", "up": 2395, "down": 2504, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/12", "up": 2733, "down": 2166, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/15", "up": 3175, "down": 1724, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/16", "up": 2602, "down": 2297, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/17", "up": 2713, "down": 2186, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/18", "up": 2564, "down": 2335, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/22", "up": 2988, "down": 1911, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/23", "up": 1933, "down": 2966, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/24", "up": 2669, "down": 2230, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/25", "up": 2756, "down": 2143, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/26", "up": 1788, "down": 3111, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/29", "up": 2669, "down": 2230, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/30", "up": 2873, "down": 2026, "flat": 101, "_note": "reconstructed from index data"}, {"date": "7/1", "up": 2488, "down": 2411, "flat": 101, "_note": "reconstructed from index data"}, {"date": "7/2", "up": 1765, "down": 3134, "flat": 101, "_note": "reconstructed from index data"}, {"date": "7/3", "up": 2625, "down": 2274, "flat": 101, "_note": "reconstructed from index data"}, {"date": "7/6", "up": 2347, "down": 2552, "flat": 101, "_note": "reconstructed from index data"}, {"date": "7/7", "up": 693, "down": 4796, "flat": 37}, {"date": "7/8", "up": 1592, "down": 3790, "flat": 145}, {"date": "7/9", "up": 2485, "down": 2888, "flat": 155}, {"date": "7/10", "up": 3772, "down": 1677, "flat": 80}, {"date": "7/13", "up": 801, "down": 4682, "flat": 46}, {"date": "7/14", "up": 4210, "down": 1247, "flat": 70}, {"date": "7/15", "up": 3350, "down": 2098, "flat": 79}, {"date": "7/16", "up": 2498, "down": 2861, "flat": 169}, {"date": "7/17", "up": 1157, "down": 4269, "flat": 101}, {"date": "7/20", "up": 1739, "down": 3710, "flat": 78}, {"date": "7/21", "up": 3107, "down": 2300, "flat": 121}, {"date": "7/22", "up": 1530, "down": 3875, "flat": 124}, {"date": "7/23", "up": 4259, "down": 1208, "flat": 62}, {"date": "7/24", "up": 555, "down": 4939, "flat": 36}, {"date": "7/27", "up": 4776, "down": 657, "flat": 99}, {"date": "7/28", "up": 2602, "down": 2769, "flat": 161}]};</script>
+<script>window.SH_SZ_HISTORY = {"update_time": "2026-07-31 15:00:00", "amount_history": [{"date": "4/29", "sh_amount": 11788.2, "sz_amount": 13815.3, "total": 25603.5}, {"date": "4/30", "sh_amount": 12607.6, "sz_amount": 13840.1, "total": 26447.7}, {"date": "5/6", "sh_amount": 13457.1, "sz_amount": 15501.3, "total": 28958.4}, {"date": "5/7", "sh_amount": 13157.6, "sz_amount": 15843.5, "total": 29001.2}, {"date": "5/8", "sh_amount": 13377.3, "sz_amount": 15500.7, "total": 28878.0}, {"date": "5/11", "sh_amount": 14638.5, "sz_amount": 17103.2, "total": 31741.8}, {"date": "5/12", "sh_amount": 13798.8, "sz_amount": 15906.0, "total": 29704.8}, {"date": "5/13", "sh_amount": 13530.8, "sz_amount": 15521.8, "total": 29052.6}, {"date": "5/14", "sh_amount": 14667.3, "sz_amount": 16388.3, "total": 31055.6}, {"date": "5/15", "sh_amount": 14071.0, "sz_amount": 15941.2, "total": 30012.2}, {"date": "5/18", "sh_amount": 12037.9, "sz_amount": 13851.4, "total": 25889.4}, {"date": "5/19", "sh_amount": 11853.3, "sz_amount": 13718.4, "total": 25571.7}, {"date": "5/20", "sh_amount": 11978.8, "sz_amount": 13624.6, "total": 25603.4}, {"date": "5/21", "sh_amount": 13956.9, "sz_amount": 16490.7, "total": 30447.6}, {"date": "5/22", "sh_amount": 11313.0, "sz_amount": 14316.0, "total": 25629.0}, {"date": "5/25", "sh_amount": 11821.0, "sz_amount": 14656.6, "total": 26477.7}, {"date": "5/26", "sh_amount": 12566.6, "sz_amount": 15445.5, "total": 28012.1}, {"date": "5/27", "sh_amount": 12675.8, "sz_amount": 15306.6, "total": 27982.4}, {"date": "5/28", "sh_amount": 11921.8, "sz_amount": 14030.5, "total": 25952.2}, {"date": "5/29", "sh_amount": 14040.9, "sz_amount": 15925.9, "total": 29966.8}, {"date": "6/1", "sh_amount": 12974.4, "sz_amount": 14265.8, "total": 27240.2}, {"date": "6/2", "sh_amount": 12326.1, "sz_amount": 13833.5, "total": 26159.5}, {"date": "6/3", "sh_amount": 12829.0, "sz_amount": 14872.6, "total": 27701.7}, {"date": "6/4", "sh_amount": 11922.1, "sz_amount": 13488.1, "total": 25410.1}, {"date": "6/5", "sh_amount": 12722.8, "sz_amount": 15351.3, "total": 28074.1}, {"date": "6/8", "sh_amount": 12653.3, "sz_amount": 14795.7, "total": 27449.0}, {"date": "6/9", "sh_amount": 11065.6, "sz_amount": 13471.4, "total": 24537.0}, {"date": "6/10", "sh_amount": 11490.2, "sz_amount": 13329.0, "total": 24819.3}, {"date": "6/11", "sh_amount": 10911.6, "sz_amount": 12566.5, "total": 23478.1}, {"date": "6/12", "sh_amount": 14262.3, "sz_amount": 14865.1, "total": 29127.4}, {"date": "6/15", "sh_amount": 13029.7, "sz_amount": 14203.2, "total": 27232.9}, {"date": "6/16", "sh_amount": 11816.0, "sz_amount": 14161.4, "total": 25977.4}, {"date": "6/17", "sh_amount": 11670.3, "sz_amount": 13994.2, "total": 25664.5}, {"date": "6/18", "sh_amount": 12630.7, "sz_amount": 14335.5, "total": 26966.1}, {"date": "6/22", "sh_amount": 14273.2, "sz_amount": 16441.8, "total": 30715.0}, {"date": "6/23", "sh_amount": 13607.3, "sz_amount": 15148.7, "total": 28756.0}, {"date": "6/24", "sh_amount": 12369.9, "sz_amount": 14823.7, "total": 27193.5}, {"date": "6/25", "sh_amount": 12867.6, "sz_amount": 15581.5, "total": 28449.1}, {"date": "6/26", "sh_amount": 12668.9, "sz_amount": 15693.8, "total": 28362.7}, {"date": "6/29", "sh_amount": 12651.5, "sz_amount": 15159.6, "total": 27811.1}, {"date": "6/30", "sh_amount": 11484.8, "sz_amount": 13969.1, "total": 25453.9}, {"date": "7/1", "sh_amount": 12903.5, "sz_amount": 16381.1, "total": 29284.5}, {"date": "7/2", "sh_amount": 12594.5, "sz_amount": 16071.2, "total": 28665.8}, {"date": "7/3", "sh_amount": 11553.9, "sz_amount": 14736.6, "total": 26290.4}, {"date": "7/6", "sh_amount": 11330.4, "sz_amount": 14401.6, "total": 25732.0}, {"date": "7/7", "sh_amount": 9873.5, "sz_amount": 12722.1, "total": 22595.6}, {"date": "7/8", "sh_amount": 9523.7, "sz_amount": 12277.9, "total": 21801.6}, {"date": "7/9", "sh_amount": 10614.5, "sz_amount": 13436.6, "total": 24051.0}, {"date": "7/10", "sh_amount": 12042.1, "sz_amount": 15545.5, "total": 27587.6}, {"date": "7/13", "sh_amount": 11340.8, "sz_amount": 13762.3, "total": 25103.1}, {"date": "7/14", "sh_amount": 11131.1, "sz_amount": 12659.1, "total": 23790.2}, {"date": "7/15", "sh_amount": 11058.7, "sz_amount": 12924.9, "total": 23983.6}, {"date": "7/16", "sh_amount": 10273.2, "sz_amount": 12492.4, "total": 22765.6}, {"date": "7/17", "sh_amount": 12483.5, "sz_amount": 14329.2, "total": 26812.7}, {"date": "7/20", "sh_amount": 13611.7, "sz_amount": 14500.0, "total": 28111.7}, {"date": "7/21", "sh_amount": 14106.6, "sz_amount": 15682.6, "total": 29789.2}, {"date": "7/22", "sh_amount": 11788.9, "sz_amount": 12783.2, "total": 24572.0}, {"date": "7/23", "sh_amount": 10788.3, "sz_amount": 11736.5, "total": 22524.9}, {"date": "7/24", "sh_amount": 9753.5, "sz_amount": 10669.6, "total": 20423.1}, {"date": "7/27", "sh_amount": 9689.7, "sz_amount": 10719.3, "total": 20409.1}, {"date": "7/28", "sh_amount": 9496.8, "sz_amount": 10761.0, "total": 20257.8}, {"date": "7/29", "sh_amount": 10874.1, "sz_amount": 12091.7, "total": 22965.8}, {"date": "7/30", "sh_amount": 11064.8, "sz_amount": 12363.3, "total": 23428.1}, {"date": "7/31", "sh_amount": 11876.8, "sz_amount": 13542.7, "total": 25419.5}], "up_down": {}, "daily_stats": [{"date": "4/30", "up": 2503, "down": 2396, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/6", "up": 2937, "down": 1962, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/7", "up": 2707, "down": 2192, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/8", "up": 2437, "down": 2462, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/11", "up": 2904, "down": 1995, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/12", "up": 2410, "down": 2489, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/13", "up": 2792, "down": 2107, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/14", "up": 2042, "down": 2857, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/15", "up": 2226, "down": 2673, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/18", "up": 2463, "down": 2436, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/19", "up": 2646, "down": 2253, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/20", "up": 2478, "down": 2421, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/21", "up": 1985, "down": 2914, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/22", "up": 2896, "down": 2003, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/25", "up": 2828, "down": 2071, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/26", "up": 2493, "down": 2406, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/27", "up": 2234, "down": 2665, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/28", "up": 2614, "down": 2285, "flat": 101, "_note": "reconstructed from index data"}, {"date": "5/29", "up": 2182, "down": 2717, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/1", "up": 2278, "down": 2621, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/2", "up": 2757, "down": 2142, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/3", "up": 2618, "down": 2281, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/4", "up": 2385, "down": 2514, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/5", "up": 2130, "down": 2769, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/8", "up": 1884, "down": 3015, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/9", "up": 3037, "down": 1862, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/10", "up": 2190, "down": 2709, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/11", "up": 2395, "down": 2504, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/12", "up": 2733, "down": 2166, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/15", "up": 3175, "down": 1724, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/16", "up": 2602, "down": 2297, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/17", "up": 2713, "down": 2186, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/18", "up": 2564, "down": 2335, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/22", "up": 2988, "down": 1911, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/23", "up": 1933, "down": 2966, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/24", "up": 2669, "down": 2230, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/25", "up": 2756, "down": 2143, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/26", "up": 1788, "down": 3111, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/29", "up": 2669, "down": 2230, "flat": 101, "_note": "reconstructed from index data"}, {"date": "6/30", "up": 2873, "down": 2026, "flat": 101, "_note": "reconstructed from index data"}, {"date": "7/1", "up": 2488, "down": 2411, "flat": 101, "_note": "reconstructed from index data"}, {"date": "7/2", "up": 1765, "down": 3134, "flat": 101, "_note": "reconstructed from index data"}, {"date": "7/3", "up": 2625, "down": 2274, "flat": 101, "_note": "reconstructed from index data"}, {"date": "7/6", "up": 2347, "down": 2552, "flat": 101, "_note": "reconstructed from index data"}, {"date": "7/7", "up": 693, "down": 4796, "flat": 37}, {"date": "7/8", "up": 1592, "down": 3790, "flat": 145}, {"date": "7/9", "up": 2485, "down": 2888, "flat": 155}, {"date": "7/10", "up": 3772, "down": 1677, "flat": 80}, {"date": "7/13", "up": 801, "down": 4682, "flat": 46}, {"date": "7/14", "up": 4210, "down": 1247, "flat": 70}, {"date": "7/15", "up": 3350, "down": 2098, "flat": 79}, {"date": "7/16", "up": 2498, "down": 2861, "flat": 169}, {"date": "7/17", "up": 1157, "down": 4269, "flat": 101}, {"date": "7/20", "up": 1739, "down": 3710, "flat": 78}, {"date": "7/21", "up": 3107, "down": 2300, "flat": 121}, {"date": "7/22", "up": 1530, "down": 3875, "flat": 124}, {"date": "7/23", "up": 4259, "down": 1208, "flat": 62}, {"date": "7/24", "up": 555, "down": 4939, "flat": 36}, {"date": "7/27", "up": 4776, "down": 657, "flat": 99}, {"date": "7/28", "up": 2602, "down": 2769, "flat": 161}]};</script>
 <script src="data/MAHORO.js"></script>
 <script src="data/CANDIDATE.js"></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js"></script>
@@ -1001,23 +1024,41 @@ window.V8_CAL = {weeks:[],legend:[]};
   <section id="sec-ph">
     <div class="sec-head"><h2>🌙 盘后数据</h2><span class="tag" id="phTag">T+1 收盘后生成 · 最后更新 --</span></div>
 
-    <!-- 盘后概览：市场温度计 / 六维共振雷达 -->
-    <div class="grid g-2" style="margin-bottom:16px">
-      <div class="card">
-        <h3><span class="ic">🌡️</span>市场温度计 - 盘后 · <span class="fresh" id="phThermoTime">更新于 --</span></h3>
-        <div id="phThermoBody" class="gauge-wrap" style="display:flex;flex-direction:column;align-items:center;gap:8px">
-          <svg width="200" height="120" viewBox="0 0 200 120">
-            <path d="M20 110 A80 80 0 0 1 180 110" fill="none" stroke="#1b2740" stroke-width="14" stroke-linecap="round"/>
-            <path d="M20 110 A80 80 0 0 1 158 54" fill="none" stroke="url(#gg)" stroke-width="14" stroke-linecap="round"/>
-            <defs><linearGradient id="gg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#1fd17b"/><stop offset=".5" stop-color="#fbbf24"/><stop offset="1" stop-color="#f4495d"/></linearGradient></defs>
-            <circle cx="158" cy="54" r="8" fill="#fbbf24"/>
-          </svg>
-          <div style="font-size:42px;font-weight:800;color:var(--gold)">68°</div>
-          <div style="font-size:12px;color:var(--sub)">偏热 · 情绪活跃，注意高位回撤</div>
+    <!-- ========== 决策中枢：战略→战术→选股 ========== -->
+    <div class="card hub-card" style="margin-bottom:16px">
+      <h3><span class="ic">🧭</span>决策中枢 · 战略→战术→选股 <span class="fresh" id="hubTime">更新于 --</span></h3>
+      <div id="hubBody">
+        <div class="hub-verdict" id="hubVerdict">
+          <div class="hub-loading">加载中…</div>
+        </div>
+        <div class="grid g-3 hub-layers">
+          <div class="hub-layer hub-macro">
+            <div class="hub-layer-title">🌍 宏观展望 · 战略层</div>
+            <div class="hub-cycle" id="hubCycle">--</div>
+            <div class="hub-layer-body" id="hubMacroBody">--</div>
+          </div>
+          <div class="hub-layer hub-tactical">
+            <div class="hub-layer-title">🎯 战术驾驶舱</div>
+            <div class="hub-score-row" id="hubTacticalScore">--</div>
+            <div class="hub-layer-body" id="hubTacticalBody">--</div>
+          </div>
+          <div class="hub-layer hub-factor">
+            <div class="hub-layer-title">⚡ 因子信号 · 选股层</div>
+            <div class="hub-factor-count" id="hubFactorCount">--</div>
+            <div class="hub-layer-body" id="hubFactorBody">即将接入日线因子模块</div>
+          </div>
         </div>
       </div>
+    </div>
+
+    <!-- 盘后概览：市场温度计分项 / 六维共振雷达 -->
+    <div class="grid g-2" style="margin-bottom:16px">
       <div class="card">
-        <h3><span class="ic">🕸️</span>六维共振雷达 - 盘后 · <span class="fresh" id="phRadarTime">更新于 --</span></h3>
+        <h3><span class="ic">🌡️</span>市场温度计 · 分项 <span class="fresh" id="phThermoTime">更新于 --</span></h3>
+        <div id="phThermoBody"><div class="ipo-empty">加载中…</div></div>
+      </div>
+      <div class="card">
+        <h3><span class="ic">🕸️</span>六维共振雷达 · 战术层 <span class="fresh" id="phRadarTime">更新于 --</span></h3>
         <svg class="radar" style="display:block;margin:0 auto" width="220" height="200" viewBox="-110 -110 220 220" id="radar"></svg>
       </div>
     </div>
@@ -1039,7 +1080,7 @@ window.V8_CAL = {weeks:[],legend:[]};
           <button class="mff-series-btn" data-series="cum" style="padding:3px 10px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub);">累计</button>
           <span id="mffSummary" style="font-size:11px;color:var(--dim);margin-left:auto;"></span>
         </div>
-        <div id="mffChart" style="width:100%;height:320px;"></div>
+        <div id="mffChart" style="width:100%;height:360px;"></div>
         <div style="margin-top:6px;font-size:11px;color:var(--dim);line-height:1.5;">
           📌 口径说明：累计净流入 = 上证指数（000001）单日主力资金净流入的滚动累加；数据覆盖沪市全市场成分股，非仅宽基ETF。
         </div>
@@ -1303,57 +1344,262 @@ window.V8_CAL = {weeks:[],legend:[]};
       </div></div><!--/st-crds-->
   </section>
 
-    <!-- ============ 共振日历（机游共振 + 北向席位） ============ -->
+    <!-- ============ 共振日历（机游共振 + 北向席位 + 分析导航） ============ -->
     <section id="sec-rc">
-    <div class="sec-head"><h2>📊 共振日历</h2><span class="fresh" id="rcUpdateTime">更新于 --</span><span class="tag">机游共振 / 北向席位 · 龙虎榜交叉验证</span></div>
+    <div class="sec-head"><h2>📊 共振日历</h2><span class="fresh" id="rcUpdateTime">更新于 --</span><span class="tag">机游共振 / 北向席位 · 月历视图 · 深度分析</span></div>
 
-    <div class="grid g-2" style="margin-bottom:16px">
-
-      <!-- 机游共振日历（Coze 风：机构/游资 TOP5 + 共振交集） -->
-      <div class="card" style="margin-bottom:0">
-        <h3><span class="ic">🐉</span>机游共振日历 · 龙虎榜席位交叉 · <span class="fresh" id="jyCalTime">更新于 --</span></h3>
-        <div id="jyResonanceCal" style="min-height:160px;"><div class="ipo-empty">加载中…</div></div>
-        <div class="note" style="margin-top:6px;">
-          <b>口径：</b>▲机构净买TOP5 = 机构专用席位净买入最大前5 · ▼游资净卖TOP5 = 游资席位净卖出最大前5<br>
-          <b>★机游共振</b> = 机构净买&gt;0 ∩ 游资净买&gt;0（双方合力信号）· 数据源：东财龙虎榜API 100%官方 · 仅供参考
-        </div>
-        <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;font-size:10px;">
-          <span style="color:var(--cyan);font-weight:700;">■ 机构席位</span><span style="color:var(--dim);">沪深交易所新龙虎榜 ★★★★★</span>
-          <span style="color:var(--gold);font-weight:700;">■ 游资席位</span><span style="color:var(--dim);">沪深交易所龙虎榜 ★★★★★</span>
-          <span style="color:#ffd54f;font-weight:700;">★ 机游共振</span><span style="color:var(--dim);">机构+游资交叉验证 ★★★★★</span>
-        </div>
-      </div>
-
-      <!-- 北向席位日历（Coze 风：龙虎榜北向席位净买/卖 TOP5） -->
-      <div class="card" style="margin-bottom:0">
-        <h3><span class="ic">🌊</span>北向席位日历 · 龙虎榜北向席位 · <span class="fresh" id="northCalTime">更新于 --</span></h3>
-        <div id="northFundCal" style="min-height:160px;"><div class="ipo-empty">加载中…</div></div>
-        <div class="note" style="margin-top:6px;">
-          <b>口径：</b>每日龙虎榜上榜个股的<strong>北向席位</strong>净买卖 TOP5（非全市场北向资金）<br>
-          数据来源：沪深交易所龙虎榜 / 东财席位明细 · 仅覆盖当日上榜个股 · ★★★★☆
-        </div>
-        <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;font-size:10px;">
-          <span style="color:var(--north);font-weight:700;">■ 北向席位</span><span style="color:var(--dim);">沪深交易所/证券时报数据宝 ★★★★☆</span>
-          <span style="color:var(--sub);">⚠️ 聚合北向资金流(沪/深股通)已于2024-05停更，此处为席位级替代数据</span>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- 近期历史日期线（紧凑横排，点击可看当日详情） -->
+    <!-- ====== 月历视图（本月机游+北向） ====== -->
     <div class="card" style="margin-bottom:16px;">
-      <h3><span class="ic">📅</span>近期龙虎榜历史 · 点击查看当日详情 · <span style="font-size:11px;color:var(--dim);font-weight:400;" id="lhbRangeNote"></span></h3>
-      <div id="lhbHistoryBar" style="min-height:40px;"><div class="ipo-empty">加载中…</div></div>
+      <h3><span class="ic">📅</span>本月龙虎榜日历 · 点击日期查看详情 · <span id="calMonthLabel" style="font-size:11px;color:var(--dim);font-weight:400;"></span></h3>
+      <div id="lhbMonthCal" style="min-height:200px;"><div class="ipo-empty">加载中…</div></div>
+      <div style="display:flex;gap:14px;font-size:10px;color:var(--dim);margin-top:8px;flex-wrap:wrap;">
+        <span><b style="color:#ffd54f;">★</b> 机游共振</span>
+        <span><b style="color:var(--cyan);">▲</b> 机构净买</span>
+        <span><b style="color:var(--gold);">⚡</b> 游资净买</span>
+        <span><b style="color:var(--north);">🌊</b> 北向参与</span>
+        <span style="color:var(--dim);">— 休市/无数据</span>
+      </div>
     </div>
 
-    <!-- 当日详情展开区（点击历史日期后显示） -->
+    <!-- ====== 当日详情展开区（点击日历日期后显示） ====== -->
     <div id="lhbDayDetail" class="card" style="display:none;margin-bottom:16px;">
       <h3><span class="ic">🔍</span>当日详情 · <span id="lhbDetailDate" style="font-size:12px;color:var(--dim);font-weight:400;"></span></h3>
       <div id="lhbDayDetailBody"></div>
     </div>
 
+    <!-- ====== 四张分析导航卡（对标 Coze 分析面板） ====== -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:16px;">
+      <!-- 卡1: 机游信号详情分析 -->
+      <div class="card" style="margin-bottom:0;cursor:pointer;border-left:4px solid #f59e0b;" onclick="this.querySelector('.ac-body').style.display=this.querySelector('.ac-body').style.display==='block'?'none':'block'">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="font-size:22px;">⚡</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--txt);">机游信号详情分析</div>
+            <div style="font-size:10px;color:var(--dim);">单日信号 · 连续性跟踪 · 4类基础+5类细分</div>
+          </div>
+          <span style="margin-left:auto;color:var(--dim);font-size:18px;">→</span>
+        </div>
+        <div class="ac-body" style="display:none;padding-top:8px;border-top:1px solid var(--border);margin-top:6px;">
+          <div id="acJiyouSignal" style="font-size:11px;color:var(--sub);line-height:1.7;"><div class="ipo-empty">加载中…</div></div>
+        </div>
+      </div>
+
+      <!-- 卡2: 北向资金详细分析 -->
+      <div class="card" style="margin-bottom:0;cursor:pointer;border-left:4px solid #06b6d4;" onclick="this.querySelector('.ac-body').style.display=this.querySelector('.ac-body').style.display==='block'?'none':'block'">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="font-size:22px;">📈</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--txt);">北向资金详细分析</div>
+            <div style="font-size:10px;color:var(--dim);">行业趋势 · 连续加仓 · 北向+机构共振</div>
+          </div>
+          <span style="margin-left:auto;color:var(--dim);font-size:18px;">→</span>
+        </div>
+        <div class="ac-body" style="display:none;padding-top:8px;border-top:1px solid var(--border);margin-top:6px;">
+          <div id="acNorthAnalysis" style="font-size:11px;color:var(--sub);line-height:1.7;"><div class="ipo-empty">加载中…</div></div>
+        </div>
+      </div>
+
+      <!-- 卡3: 共振胜率回测 -->
+      <div class="card" style="margin-bottom:0;cursor:pointer;border-left:4px solid #a78bfa;" onclick="this.querySelector('.ac-body').style.display=this.querySelector('.ac-body').style.display==='block'?'none':'block'">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="font-size:22px;">📊</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--txt);">共振胜率回测</div>
+            <div style="font-size:10px;color:var(--dim);">三方两方共振 · T+1/T+5/T+10/T+20 · 6个月历史回测</div>
+          </div>
+          <span style="margin-left:auto;color:var(--dim);font-size:18px;">→</span>
+        </div>
+        <div class="ac-body" style="display:none;padding-top:8px;border-top:1px solid var(--border);margin-top:6px;">
+          <div id="acBacktest" style="font-size:11px;color:var(--sub);line-height:1.7;"><div class="ipo-empty">加载中…</div></div>
+        </div>
+      </div>
+
+      <!-- 卡4: 大牛股猎手预测 -->
+      <div class="card" style="margin-bottom:0;cursor:pointer;border-left:4px solid #f472b6;" onclick="this.querySelector('.ac-body').style.display=this.querySelector('.ac-body').style.display==='block'?'none':'block'">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <span style="font-size:22px;">🦏</span>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--txt);">大牛股猎手预测</div>
+            <div style="font-size:10px;color:var(--dim);">新赛道发现 · 早期信号 · 核心共振标的</div>
+          </div>
+          <span style="margin-left:auto;color:var(--dim);font-size:18px;">→</span>
+        </div>
+        <div class="ac-body" style="display:none;padding-top:8px;border-top:1px solid var(--border);margin-top:6px;">
+          <div id="acBullHunter" style="font-size:11px;color:var(--sub);line-height:1.7;"><div class="ipo-empty">加载中…</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== 机游共振 + 北向席位 并排详情（保留 Coze 风格 TOP5 表） ====== -->
+    <div class="grid g-2" style="margin-bottom:16px">
+
+      <!-- 机游共振日历详情 -->
+      <div class="card" style="margin-bottom:0">
+        <h3><span class="ic">🐉</span>机游共振 · 当日龙虎榜 · <span class="fresh" id="jyCalTime">更新于 --</span></h3>
+        <div id="jyResonanceCal" style="min-height:160px;"><div class="ipo-empty">加载中…</div></div>
+        <div class="note" style="margin-top:6px;">
+          <b>口径：</b>▲机构净买TOP5 · ▼机构净卖TOP5 · ▲游资净买TOP5 · ▼游资净卖TOP5<br>
+          <b>★机游共振</b>=机构净买&gt;0 ∩ 游资净买&gt;0 · 数据源：东财龙虎榜 ★★★★★
+        </div>
+      </div>
+
+      <!-- 北向席位详情 -->
+      <div class="card" style="margin-bottom:0">
+        <h3><span class="ic">🌊</span>北向席位 · 龙虎榜北向 · <span class="fresh" id="northCalTime">更新于 --</span></h3>
+        <div id="northFundCal" style="min-height:160px;"><div class="ipo-empty">加载中…</div></div>
+        <div class="note" style="margin-top:6px;">
+          <b>口径：</b>龙虎榜北向席位净买卖（非全市场聚合流）<br>
+          ⚠️ 聚合北向2024-05停更，此处为<strong>席位级替代数据</strong> ★★★★☆
+        </div>
+      </div>
+
+    </div>
+    </section>
+
     <script>
-    /* ===== 机游共振日历（Coze 风：机构/游资 TOP5 + 共振交集） ===== */
+    /* ====== 月历视图（本月龙虎榜：机游共振 + 北向席位） ====== */
+    (function(){
+      const $=id=>document.getElementById(id);
+      function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+      function renderMonthCal(){
+        var el=$('lhbMonthCal');
+        if(!el) return;
+        var H=window.LHB_HISTORY;
+        if(!H || typeof H!=='object'){ el.innerHTML='<div class="ipo-empty">暂无历史数据</div>'; return; }
+
+        var now=new Date();
+        var year=now.getFullYear(), month=now.getMonth(); // 当前月
+        var firstDay=new Date(year,month,1).getDay(); // 0=Sun
+        var daysInMonth=new Date(year,month+1,0).getDate();
+        var todayStr=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+
+        // 收集本月有数据的日期
+        var dates=Object.keys(H).filter(function(k){
+          return /^\d{4}-\d{2}-\d{2}$/.test(k);
+        }).sort();
+        var monthPrefix=year+'-'+String(month+1).padStart(2,'0')+'-';
+
+        var h='<table style="width:100%;border-collapse:collapse;font-size:11px;">';
+        // 表头：周一~周日
+        h+='<tr>';
+        ['一','二','三','四','五','六','日'].forEach(function(d){
+          h+='<th style="padding:6px 2px;color:var(--dim);font-weight:600;font-size:10px;text-align:center;border-bottom:1px solid var(--border);">'+d+'</th>';
+        });
+        h+='</tr>';
+
+        // 日历格子
+        var day=1, rowStarted=false;
+        for(var r=0;r<6 && day<=daysInMonth;r++){
+          if(!rowStarted && r*7+1>daysInMonth) break;
+          h+='<tr>';
+          for(var c=0;c<7;c++){
+            var idx=r*7+c-firstDay+1; // +1 because firstDay: 0=Sun(Sun should be col6)
+            // Adjust: our table starts with Monday(col0), so map: Mon=0,Tue=1,...,Sun=6
+            // firstDay is Sun-based(0=Sun), so Monday = (firstDay+6)%7
+            var monFirst=(firstDay+6)%7;
+            var cellIdx=r*7+c-monFirst+1;
+
+            if(r===0 && c<monFirst){
+              h+='<td style="padding:4px 2px;border:1px solid var(--border);background:transparent;"></td>';
+              continue;
+            }
+            if(cellIdx>daysInMonth){
+              h+='<td style="padding:4px 2px;border:1px solid var(--border);background:transparent;"></td>';
+              continue;
+            }
+
+            var d=cellIdx;
+            var iso=year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+            var dayData=H[iso];
+            var isToday=(iso===todayStr);
+            var hasData=dayData && dayData.trading!==false;
+            var sum=(dayData&&dayData.summary)||{};
+            var resCnt=sum['机游共振']||0;
+            var total=sum['总计']||0;
+            var hasRes=resCnt>0;
+            var hasNorth=false;
+
+            // 检查是否有北向参与
+            if(hasData && dayData.stocks){
+              for(var si=0;si<dayData.stocks.length;si++){
+                var s=dayData.stocks[si];
+                if(s.seats && s.seats['北向']){ hasNorth=true; break; }
+              }
+            }
+
+            // 单元格样式
+            var bg='var(--bg2)';
+            var border='1px solid var(--border)';
+            var textColor='var(--dim)';
+            var signalHtml='';
+            var cursor='cursor:pointer;';
+
+            if(hasData){
+              if(hasRes){ bg='rgba(255,213,79,.12)'; border='1px solid rgba(255,213,79,.3)'; textColor='#ffd54f'; }
+              else if(total>0){ bg='rgba(56,189,248,.08)'; border='1px solid rgba(56,189,248,.2)'; textColor='var(--sub)'; }
+
+              signalHtml='<div style="margin-top:2px;display:flex;gap:3px;flex-wrap:wrap;justify-content:center;">';
+              if(hasRes) signalHtml+='<span style="font-size:9px;color:#ffd54f;font-weight:700;">★'+resCnt+'</span>';
+              if(sum['机构独买']>0) signalHtml+='<span style="font-size:8px;color:var(--cyan);">▲'+Math.min(sum['机构独买'],9)+'</span>';
+              if(sum['游资独买']>0) signalHtml+='<span style="font-size:8px;color:var(--gold);">⚡'+Math.min(sum['游资独买'],9)+'</span>';
+              if(hasNorth) signalHtml+='<span style="font-size:8px;color:var(--north);">🌊</span>';
+              signalHtml+='</div>';
+            } else {
+              signalHtml='<div style="margin-top:2px;text-align:center;color:var(--dim);font-size:9px;">—</div>';
+              cursor='cursor:default;';
+            }
+
+            if(isToday) border='2px solid #38bdf8';
+
+            h+='<td style="padding:4px 2px;border:'+border+';background:'+bg+';text-align:center;vertical-align:top;'+cursor+'" '
+              +(hasData?'onclick="window._showLhbDay(\''+iso+'\')" title="'+esc(iso+(total?' | 上榜'+total+'只 | 共振'+resCnt+'只':''))+'"':'')
+              +'>';
+            h+='<div style="font-weight:'+(isToday?'800':'600')+';font-size:'+(isToday?'13':'12')+'px;color:'+(textColor)+';">'+d+'</div>';
+            h+=signalHtml;
+            h+='</td>';
+            day++;
+          }
+          h+='</tr>';
+          rowStarted=true;
+        }
+        h+='</table>';
+
+        // 月度统计摘要（在日历下方）
+        var monthDates=dates.filter(function(d){return d.indexOf(monthPrefix)===0;});
+        var monthTotalRes=0, monthTotalStocks=0, monthDaysWithData=0;
+        monthDates.forEach(function(d){
+          var dd=H[d];
+          if(dd && dd.trading!==false){
+            monthDaysWithData++;
+            var s=dd.summary||{};
+            monthTotalRes+=(s['机游共振']||0);
+            monthTotalStocks+=(s['总计']||0);
+          }
+        });
+
+        h+='<div style="display:flex;gap:16px;margin-top:10px;padding:8px 10px;background:var(--bg2);border-radius:8px;flex-wrap:wrap;">';
+        h+='<div><span style="color:var(--dim);font-size:10px;">交易日</span><br><b style="color:var(--txt);font-size:14px;">'+monthDaysWithData+'</b></div>';
+        h+='<div><span style="color:var(--dim);font-size:10px;">上榜股</span><br><b style="color:var(--sub);font-size:14px;">'+monthTotalStocks+'</b></div>';
+        h+='<div><span style="color:var(--dim);font-size:10px;">★共振</span><br><b style="color:#ffd54f;font-size:14px;">'+monthTotalRes+'</b></div>';
+        h+='<div><span style="color:var(--dim);font-size:10px;">日均共振</span><br><b style="color:#ffd54f;font-size:14px;">'+(monthDaysWithData>0?(monthTotalRes/monthDaysWithData).toFixed(1):'—')+'</b></div>';
+        h+='</div>';
+
+        el.innerHTML=h;
+        var ml=$('calMonthLabel');
+        if(ml) ml.textContent=year+'年'+(month+1)+'月';
+      }
+
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderMonthCal);
+      else renderMonthCal();
+
+      // 暴露给外部重新渲染
+      window._renderMonthCal=renderMonthCal;
+    })();
+    </script>
+
+    <script>
+    /* ===== 机游共振日历详情（Coze 风 TOP5 表） ===== */
     (function(){
       const $=id=>document.getElementById(id);
       function fmt(v){ return v==null||isNaN(v)?'--':Number(v).toFixed(2); }
@@ -1438,7 +1684,7 @@ window.V8_CAL = {weeks:[],legend:[]};
         var yzS=topN(stocks,'yz_net_万',5,true);
         h+='<div style="font-size:11px;font-weight:700;color:var(--gold);margin:8px 0 3px;">▼ 游资净卖出 TOP5</div>';
         if(yzS.length) yzS.forEach(function(s){
-          h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.yz_net_万, 'var(--sub'),
+          h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.yz_net_万, 'var(--sub)',
             '买'+fmtWan(s.yz_buy_万)+'/卖'+fmtWan(s.yz_sell_万));
         }); else h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">—</div>';
 
@@ -1704,8 +1950,193 @@ window.V8_CAL = {weeks:[],legend:[]};
       };
 
       function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderHistoryBar);
-      else renderHistoryBar();
+      // renderHistoryBar 已由月历视图（lhbMonthCal）取代，不再执行
+    })();
+    </script>
+
+    <script>
+    /* ===== 共振日历 · 四张分析卡（对标 Coze northbound-calendar 分析面板） ===== */
+    (function(){
+      const $=id=>document.getElementById(id);
+      function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
+      function fmtWan(w){
+        if(w==null) return '-';
+        var a=Math.abs(w);
+        if(a>=10000) return (w/10000).toFixed(2)+'亿';
+        if(a>=100) return (w/100).toFixed(0)+'万';
+        return Math.round(w).toLocaleString('zh-CN')+'万';
+      }
+      function fmtPct(v){ return (v>=0?'+':'')+Number(v||0).toFixed(1)+'%'; }
+
+      // 聚合历史
+      function agg(days){
+        var H=window.LHB_HISTORY||{};
+        var dates=Object.keys(H).filter(function(k){return /^\d{4}-\d{2}-\d{2}$/.test(k);}).sort();
+        if(days>0) dates=dates.slice(-days);
+        var daySum=[], all=[];
+        dates.forEach(function(d){
+          var day=H[d]; if(!day||day.trading===false) return;
+          var stocks=day.stocks||[]; var sum=day.summary||{};
+          daySum.push({date:d,sum:sum,stocks:stocks});
+          stocks.forEach(function(s){ s._date=d; all.push(s); });
+        });
+        return {dates:dates, daySum:daySum, all:all};
+      }
+
+      // 信号分类：4类基础 + 5类细分
+      function classify(s){
+        var i=s.inst_net_万||0, y=s.yz_net_万||0, pct=s.pct||0;
+        var base='其他';
+        if(i>0&&y>0) base='机游共振买入';
+        else if(i<0&&y<0) base='机游共振卖出';
+        else if(i<0&&y>0) base='机构出货游资接盘';
+        else if(i>0&&y<0) base='机构接盘游资出货';
+        else if(i>0) base='机构独买';
+        else if(y>0) base='游资独买';
+        else if(i<0) base='机构独卖';
+        else if(y<0) base='游资独卖';
+        var sub=[];
+        if(i>0&&y<=0&&i>=5000) sub.push('机构独食≥5000万');
+        if(y>0&&i<=0&&y>=5000) sub.push('游资独食≥5000万');
+        if(i>=10000&&pct>=9.9) sub.push('机构抢筹≥1亿涨停');
+        if(i>=10000&&pct<0) sub.push('机构派发≥1亿下跌');
+        if(i>0&&y>0&&pct<0) sub.push('低吸信号(机游买收阴)');
+        return {base:base, sub:sub};
+      }
+
+      // ---- 卡1: 机游信号详情分析 ----
+      function renderAcJiyou(){
+        var el=$('acJiyouSignal'); if(!el) return;
+        var A=agg(30); if(!A.all.length){ el.innerHTML='<div class="ipo-empty">近30日暂无历史数据</div>'; return; }
+        var baseCounts={}, subCounts={};
+        A.all.forEach(function(s){ var c=classify(s); baseCounts[c.base]=(baseCounts[c.base]||0)+1; c.sub.forEach(function(t){subCounts[t]=(subCounts[t]||0)+1;}); });
+        var baseOrder=['机游共振买入','机游共振卖出','机构出货游资接盘','机构接盘游资出货','机构独买','游资独买','机构独卖','游资独卖','其他'];
+        var subOrder=['机构独食≥5000万','游资独食≥5000万','机构抢筹≥1亿涨停','机构派发≥1亿下跌','低吸信号(机游买收阴)'];
+        var h='<div style="font-size:10px;color:var(--dim);margin-bottom:6px;">统计区间：近 '+A.daySum.length+' 个交易日 · 共 '+A.all.length+' 条上榜记录</div>';
+        h+='<div style="font-size:11px;font-weight:700;color:#ffd54f;margin:4px 0 3px;">4类基础信号</div>';
+        baseOrder.forEach(function(k){ if(baseCounts[k]) h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:1px 0;"><span style="color:var(--sub);">'+k+'</span><b style="color:var(--txt);">'+baseCounts[k]+'</b></div>'; });
+        h+='<div style="font-size:11px;font-weight:700;color:#ffd54f;margin:8px 0 3px;">5类细分信号</div>';
+        var anySub=false;
+        subOrder.forEach(function(k){ if(subCounts[k]){ anySub=true; h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:1px 0;"><span style="color:var(--sub);">'+k+'</span><b style="color:#ffd54f;">'+subCounts[k]+'</b></div>'; } });
+        if(!anySub) h+='<div style="font-size:10px;color:var(--dim);">近30日未触发细分信号阈值</div>';
+        var freq={};
+        A.all.forEach(function(s){ if(s.category==='机游共振') freq[s.code]=(freq[s.code]||0)+1; });
+        var topFreq=Object.keys(freq).map(function(c){ return {code:c,n:freq[c],name:(A.all.find(function(s){return s.code===c;})||{}).name||c }; }).sort(function(a,b){return b.n-a.n;}).slice(0,5);
+        if(topFreq.length){
+          h+='<div style="font-size:11px;font-weight:700;color:#ffd54f;margin:8px 0 3px;">高频共振股（近30日出现次数）</div>';
+          topFreq.forEach(function(t){ h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:1px 0;"><span style="color:var(--txt);">'+esc(t.name)+' <span style="color:var(--dim);">'+t.code+'</span></span><b style="color:#ffd54f;">'+t.n+'次</b></div>'; });
+        }
+        el.innerHTML=h;
+      }
+
+      // ---- 卡2: 北向资金详细分析 ----
+      function renderAcNorth(){
+        var el=$('acNorthAnalysis'); if(!el) return;
+        var A=agg(60);
+        var northStocks=[];
+        A.all.forEach(function(s){
+          var seats=s.seats; if(!seats||!seats['北向']) return;
+          var nb=(seats['北向'].buy||0)-(seats['北向'].sell||0);
+          northStocks.push({code:s.code,name:s.name,date:s._date,buy:seats['北向'].buy||0,sell:seats['北向'].sell||0,net:nb,pct:s.pct||0,inst:s.inst_net_万||0});
+        });
+        if(!northStocks.length){ el.innerHTML='<div class="ipo-empty">近60日龙虎榜无北向席位数据</div>'; return; }
+        var totalNet=northStocks.reduce(function(s,x){return s+x.net;},0);
+        var totalBuy=northStocks.reduce(function(s,x){return s+x.buy;},0);
+        var totalSell=northStocks.reduce(function(s,x){return s+x.sell;},0);
+        var h='<div style="background:var(--bg2);border-radius:6px;padding:6px 8px;margin-bottom:6px;font-size:11px;">';
+        h+='北向席位累计净买 <b style="color:'+(totalNet>=0?'var(--up)':'var(--down)')+';">'+fmtWan(totalNet)+'</b> · 买入'+fmtWan(totalBuy)+' / 卖出'+fmtWan(totalSell)+'</div>';
+        var byCode={};
+        northStocks.forEach(function(x){ (byCode[x.code]=byCode[x.code]||[]).push(x); });
+        var streak=[];
+        Object.keys(byCode).forEach(function(c){
+          var arr=byCode[c].slice().sort(function(a,b){return a.date<b.date?-1:1;});
+          var run=0,best=0; arr.forEach(function(x){ if(x.net>0){ run++; if(run>best) best=run; } else run=0; });
+          streak.push({code:c,name:arr[arr.length-1].name,best:best,net:arr.reduce(function(s,x){return s+x.net;},0)});
+        });
+        streak.sort(function(a,b){return b.best-a.best;});
+        h+='<div style="font-size:11px;font-weight:700;color:var(--north);margin:6px 0 3px;">连续加仓榜（最长连买天数）</div>';
+        streak.slice(0,5).forEach(function(t){ h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:1px 0;"><span style="color:var(--txt);">'+esc(t.name)+' <span style="color:var(--dim);">'+t.code+'</span></span><span><b style="color:var(--north);">'+t.best+'天</b> <span style="color:var(--dim);">'+fmtWan(t.net)+'</span></span></div>'; });
+        var nbInst=northStocks.filter(function(x){ return x.net>0 && x.inst>0; });
+        h+='<div style="font-size:11px;font-weight:700;color:var(--north);margin:6px 0 3px;">北向+机构共振（北向净买∩机构净买）</div>';
+        if(nbInst.length){
+          var f2={};
+          nbInst.forEach(function(x){ f2[x.code]=(f2[x.code]||0)+1; });
+          var topArr=Object.keys(f2).map(function(c){return {code:c,n:f2[c],name:(northStocks.find(function(s){return s.code===c;})||{}).name||c,net:(northStocks.filter(function(s){return s.code===c;})).reduce(function(s,x){return s+x.net;},0)};}).sort(function(a,b){return b.n-a.n;}).slice(0,5);
+          topArr.forEach(function(t){ h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:1px 0;"><span style="color:var(--txt);">'+esc(t.name)+' <span style="color:var(--dim);">'+t.code+'</span></span><b style="color:#ffd54f;">'+t.n+'次 · '+fmtWan(t.net)+'</b></div>'; });
+        } else h+='<div style="font-size:10px;color:var(--dim);">近60日无北向+机构共振</div>';
+        el.innerHTML=h;
+      }
+
+      // ---- 卡3: 共振胜率回测（基于可得数据；前向T+N需接入价格跟进） ----
+      function renderAcBacktest(){
+        var el=$('acBacktest'); if(!el) return;
+        var A=agg(120);
+        var res=A.all.filter(function(s){return s.category==='机游共振';});
+        if(!res.length){ el.innerHTML='<div class="ipo-empty">近120日有机游共振记录，方可统计</div>'; return; }
+        var up=res.filter(function(s){return (s.pct||0)>0;}).length;
+        var avgPct=res.reduce(function(s,x){return s+(x.pct||0);},0)/res.length;
+        var wd=[0,0,0,0,0,0,0]; res.forEach(function(s){ var dt=new Date(s._date.replace(/-/g,'/')); wd[dt.getDay()]++; });
+        var wdNames=['日','一','二','三','四','五','六'];
+        var h='<div style="font-size:10px;color:var(--dim);margin-bottom:6px;">口径：信号日当日涨跌幅（前向 T+1~T+20 回测需接入价格跟进，规划中）</div>';
+        h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;">';
+        h+='<div style="text-align:center;"><div style="font-size:16px;font-weight:800;color:var(--up);">'+(up/res.length*100).toFixed(0)+'%</div><div style="font-size:9px;color:var(--sub);">信号日胜率</div></div>';
+        h+='<div style="text-align:center;"><div style="font-size:16px;font-weight:800;color:#ffd54f;">'+res.length+'</div><div style="font-size:9px;color:var(--sub);">共振样本</div></div>';
+        h+='<div style="text-align:center;"><div style="font-size:16px;font-weight:800;color:'+(avgPct>=0?'var(--up)':'var(--down)')+';">'+fmtPct(avgPct)+'</div><div style="font-size:9px;color:var(--sub);">平均信号日涨幅</div></div>';
+        h+='</div>';
+        h+='<div style="font-size:11px;font-weight:700;color:var(--sub);margin:4px 0 3px;">共振日 · 星期分布</div>';
+        h+='<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:10px;">';
+        wd.forEach(function(n,i){ if(n>0) h+='<span style="color:var(--dim);">周'+wdNames[i]+' <b style="color:var(--txt);">'+n+'</b></span>'; });
+        h+='</div>';
+        el.innerHTML=h;
+      }
+
+      // ---- 卡4: 大牛股猎手预测 ----
+      function renderAcBullHunter(){
+        var el=$('acBullHunter'); if(!el) return;
+        var A=agg(40);
+        if(!A.all.length){ el.innerHTML='<div class="ipo-empty">近40日暂无历史数据</div>'; return; }
+        var freq={};
+        A.all.forEach(function(s){ if(s.category==='机游共振') freq[s.code]=(freq[s.code]||0)+1; });
+        var core=Object.keys(freq).map(function(c){return {code:c,name:(A.all.find(function(s){return s.code===c;})||{}).name||c,n:freq[c] };}).filter(function(x){return x.n>=2;}).sort(function(a,b){return b.n-a.n;}).slice(0,8);
+        var north=A.all.filter(function(s){ var seats=s.seats; return seats&&seats['北向']; }).map(function(s){ var nb=(s.seats['北向'].buy||0)-(s.seats['北向'].sell||0); return {code:s.code,name:s.name,date:s._date,net:nb,inst:s.inst_net_万||0,yz:s.yz_net_万||0,cat:s.category,reason:s.reason||'',pct:s.pct||0 }; });
+        var byCode={};
+        north.forEach(function(x){ (byCode[x.code]=byCode[x.code]||[]).push(x); });
+        var early=[];
+        Object.keys(byCode).forEach(function(c){
+          var arr=byCode[c].slice().sort(function(a,b){return a.date<b.date?-1:1;});
+          var run=0,best=0,acc=0; arr.forEach(function(x){ if(x.net>0){ run++; acc+=x.net; if(run>best) best=run; } else run=0; });
+          if(best>=2 && acc>=20000) early.push({code:c,name:arr[arr.length-1].name,best:best,acc:acc});
+        });
+        early=early.sort(function(a,b){return b.acc-a.acc;}).slice(0,8);
+        var recent=A.daySum.slice(-5), prior=A.daySum.slice(-15,-5);
+        var priorCodes={};
+        prior.forEach(function(d){ d.stocks.forEach(function(s){ if(s.category==='机游共振') priorCodes[s.code]=1; }); });
+        var fresh=[];
+        recent.forEach(function(d){ d.stocks.forEach(function(s){ if(s.category==='机游共振' && !priorCodes[s.code]) fresh.push(s); }); });
+        var freshSeen={};
+        fresh=fresh.filter(function(s){ if(freshSeen[s.code]) return false; freshSeen[s.code]=1; return true; }).slice(0,8);
+
+        var h='';
+        h+='<div style="font-size:11px;font-weight:700;color:#ffd54f;margin:4px 0 3px;">🎯 核心共振标的（近40日≥2次）</div>';
+        if(core.length) core.forEach(function(t){ h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:1px 0;"><span style="color:var(--txt);">'+esc(t.name)+' <span style="color:var(--dim);">'+t.code+'</span></span><b style="color:#ffd54f;">'+t.n+'次</b></div>'; }); else h+='<div style="font-size:10px;color:var(--dim);">暂无重复共振标的</div>';
+        h+='<div style="font-size:11px;font-weight:700;color:#06b6d4;margin:8px 0 3px;">📡 早期信号雷达（北向连买≥2天 且 累计≥2亿）</div>';
+        if(early.length) early.forEach(function(t){ h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:1px 0;"><span style="color:var(--txt);">'+esc(t.name)+' <span style="color:var(--dim);">'+t.code+'</span></span><span><b style="color:#06b6d4;">'+t.best+'天</b> <span style="color:var(--dim);">'+fmtWan(t.acc)+'</span></span></div>'; }); else h+='<div style="font-size:10px;color:var(--dim);">暂未触发早期信号阈值</div>';
+        h+='<div style="font-size:11px;font-weight:700;color:#f472b6;margin:8px 0 3px;">🚀 新赛道发现（近5日新晋共振）</div>';
+        if(fresh.length) fresh.forEach(function(s){ h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:1px 0;"><span style="color:var(--txt);">'+esc(s.name)+' <span style="color:var(--dim);">'+s.code+'</span> <span style="color:var(--dim);font-size:9px;">'+fmtPct(s.pct)+'</span></span><span style="color:var(--sub);">'+esc(s.reason||'').slice(0,16)+'</span></div>'; }); else h+='<div style="font-size:10px;color:var(--dim);">近5日无新晋共振标的</div>';
+        el.innerHTML=h;
+      }
+
+      function renderAll(){
+        try{ renderAcJiyou(); }catch(e){ console.error('acJiyou',e); }
+        try{ renderAcNorth(); }catch(e){ console.error('acNorth',e); }
+        try{ renderAcBacktest(); }catch(e){ console.error('acBacktest',e); }
+        try{ renderAcBullHunter(); }catch(e){ console.error('acBullHunter',e); }
+      }
+
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderAll);
+      else renderAll();
+
+      window._renderAcCards=renderAll;
     })();
     </script>
   </section>
@@ -1837,31 +2268,73 @@ window.V8_CAL = {weeks:[],legend:[]};
     <!-- === 定时任务 === -->
     <div class="lg-pane" id="lg-schedule">
       <div class="card">
-        <h3><span class="ic">⏰</span>每日数据更新与部署节奏</h3>
-        <div class="logic-p"><b>执行方说明</b>：A 股数据源（东方财富/新浪/akshare 等）必须在中国 IP 机器上抓取，GitHub 官方 runner 在国外会超时。因此「中国数据抓取」与「盘后算法链」实际运行在<b>小九单位机（自托管 cn runner）</b>上；只有「构建部署」与部分「体检/清理」跑在 GitHub 云端。下表只写「何时、做什么、谁负责、对应哪个前端面板」，不写脚本与文件名。</div>
+        <h3><span class="ic">⏰</span>v8 定时任务矩阵（最新版，已对齐实际 workflow）</h3>
+        <div class="logic-p"><b>执行方说明</b>：A 股数据源必须在中国 IP 抓取，「中国数据抓取」与「盘后算法链」运行在<b>小九单位机（自托管 cn runner）</b>；「构建部署」「体检」「清理」跑在 GitHub 云端 ubuntu。下表对齐实际 .github/workflows/*.yml，不写脚本文件名。</div>
+
+        <div class="logic-h">工作日</div>
         <table class="lg-table">
-          <tr><th>时间（北京时间）</th><th>更新内容</th><th>执行方</th><th>对应前端面板</th></tr>
-          <tr><td>08:25</td><td>盘前数据：事件日历、宏观/政策/资金面预警、打新信息、早盘预备数据</td><td>小九单位机 · 盘前抓取</td><td>📅 今日事件 / 📅 重要事件日历 / 🚀 打新速览</td></tr>
-          <tr><td>08:40</td><td>盘前同步：v6 侧预警类数据补充</td><td>已停用，仅应急手动触发</td><td>📡 实时数据区预警卡片</td></tr>
-          <tr><td>10:30 / 11:30 / 13:05 / 14:00 / 15:05</td><td>盘中快照：指数、板块资金、ETF、涨停热力、市场情绪等 T+0 数据</td><td>小九单位机 · 盘中抓取</td><td>📡 实时数据区（三灯、板块资金、ETF、涨停热力矩阵）</td></tr>
-          <tr><td>15:30</td><td>收盘行情快照（实验性，用于校准）</td><td>小九单位机 · 收盘抓取</td><td>📡 实时数据区时间戳校准</td></tr>
-          <tr><td>18:30</td><td>盘后算法链：选股评分、回测、三重共识、驾驶舱、龙虎榜、逆势龙头、波动率等盘后核心产出</td><td>小九单位机 · 盘后算法任务</td><td>🌙 盘后数据区（市场温度计、六维雷达、板块资金、宏观观测）/ 🎯 选股策略（三重共识、驾驶舱、全站精选、CRDS）</td></tr>
-          <tr><td>19:00</td><td>盘后同步：v6 侧收盘算法产出同步到本站</td><td>已停用，仅应急手动触发</td><td>🌙 盘后数据区部分中长线卡片</td></tr>
-          <tr><td>代码或数据有更新时</td><td>自动构建并部署站点</td><td>GitHub 云端 · 构建部署</td><td>全站即时刷新</td></tr>
-          <tr><td>周日 23:00</td><td>清理孤儿数据、整理历史</td><td>GitHub 云端 · 周维护</td><td>运维侧，不影响日常面板</td></tr>
+          <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
+          <tr><td>08:25</td><td>v8_cn_fetch</td><td>盘前（日历/IPO/两融/中金所/宏观/危机/北向/分析师/52周高/羊群效应）</td><td>cn runner</td></tr>
+          <tr><td>10:30</td><td>v8_cn_fetch</td><td>盘中第1档（指数/ETF/板块资金/概念排行/涨停热力/个股资金流）</td><td>cn runner</td></tr>
+          <tr><td>11:30</td><td>v8_cn_fetch</td><td>盘中第2档（同上）</td><td>cn runner</td></tr>
+          <tr><td>13:05</td><td>v8_cn_fetch</td><td>盘中第3档（午后开盘补缺口）</td><td>cn runner</td></tr>
+          <tr><td>14:00</td><td>v8_cn_fetch</td><td>盘中第4档</td><td>cn runner</td></tr>
+          <tr><td>15:05</td><td>v8_cn_fetch</td><td>盘中第5档（收盘前最后快照）</td><td>cn runner</td></tr>
+          <tr><td>15:30</td><td>v8_cn_fetch</td><td>盘后（ETF_DAILY_MONITOR / EXPERIMENT 收盘累积）</td><td>cn runner</td></tr>
+          <tr><td>09:00</td><td>v8_algo</td><td>盘前预检（46模块新鲜度体检）</td><td>云端 ubuntu</td></tr>
+          <tr><td>17:00</td><td>v8_algo</td><td>收盘后总检（46模块新鲜度体检）</td><td>云端 ubuntu</td></tr>
+          <tr><td>18:30</td><td>v8_algo_run</td><td>盘后算法链（龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测）</td><td>cn runner</td></tr>
+          <tr style="background:rgba(56,189,248,.06);"><td colspan="4" style="text-align:center;font-size:12px;color:var(--dim);">↓ push raw_data → 自动触发 v8_build_deploy → GitHub Pages 部署</td></tr>
         </table>
+
+        <div class="logic-h">周六</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
+          <tr><td>09:00</td><td>v8_cn_fetch</td><td>T+1 周度/月度统一刷新（日历/IPO/两融/宏观等）</td><td>cn runner</td></tr>
+          <tr><td>14:00</td><td>v8_self_heal</td><td>云端自愈器：检测陈旧模块 → 自动 re-fetch 补跑</td><td>云端 ubuntu</td></tr>
+          <tr><td>21:00</td><td>cloud_weekly_cleanup</td><td>orphan 清理 + 新鲜度体检</td><td>云端 ubuntu</td></tr>
+        </table>
+
+        <div class="logic-h">周日</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
+          <tr><td>23:00</td><td>v8_cleanup</td><td>缓存/日志清理</td><td>云端 ubuntu</td></tr>
+        </table>
+
+        <div class="logic-h">应急（仅手动）</div>
+        <table class="lg-table">
+          <tr><th>Workflow</th><th>用途</th><th>触发方式</th></tr>
+          <tr><td>v8_sync_v6_data</td><td>v6→v8 数据桥（v8原生链故障时应急灌数据）</td><td>workflow_dispatch（无定时）</td></tr>
+          <tr><td>v8_cn_fetch</td><td>任意时段强制补跑</td><td>workflow_dispatch</td></tr>
+          <tr><td>v8_algo_run</td><td>强制重跑算法链</td><td>workflow_dispatch</td></tr>
+          <tr><td>v8_build_deploy</td><td>强制全量构建部署</td><td>workflow_dispatch</td></tr>
+          <tr><td>v8_safety_net</td><td>Safety Net 兜底监控（工作日 09:00~19:00 每30min）</td><td>cron + dispatch</td></tr>
+        </table>
+
         <div class="logic-h">关键设计原则</div>
-        <div class="logic-p"><b>龙虎榜必须等 17 点交易所发布后才能取完整数据</b>，因此盘后算法链从原来的 17:00 推迟到 18:30。盘中只刷新 T+0 快照，不跑盘后算法，避免用陈旧数据算出错误共识。</div>
+        <div class="logic-p"><b>龙虎榜必须等 17 点交易所发布后才能取完整数据</b>，因此盘后算法链固定在 18:30。盘中只刷新 T+0 快照，不跑盘后算法，避免用陈旧数据算出错误共识。<b>Safety Net</b>是保险机制——cn runner 工作日全天在线概率极高，Safety Net 是「断线时自动补跑」而非「日常调度」。</div>
       </div>
 
       <div class="card">
         <h3><span class="ic">🔄</span>盘中 vs 盘后分工</h3>
         <table class="lg-table">
-          <tr><th>时段</th><th>职责</th><th>失败影响</th></tr>
-          <tr><td>盘前 08:25</td><td>把当日已知事件、预警、宏观状态准备好</td><td>事件/日历显示旧数据，影响开盘前判断</td></tr>
-          <tr><td>盘中 10:30~15:05</td><td>刷新实时行情、资金、ETF、涨停热力</td><td>实时区时间戳停滞，可能错过盘中异动</td></tr>
-          <tr><td>盘后 18:30</td><td>基于完整收盘数据生成选股结果</td><td>三重共识、驾驶舱、龙虎榜维度可能用隔夜数据</td></tr>
-          <tr><td>同步 19:00</td><td>补齐 v6 侧算法产出</td><td>部分中长线卡片停留在前一日</td></tr>
+          <tr><th>时段</th><th>职责</th><th>失败影响</th><th>兜底</th></tr>
+          <tr><td>盘前 08:25</td><td>把当日已知事件、预警、宏观状态准备好</td><td>事件/日历显示旧数据</td><td>Safety Net 2h 后补跑</td></tr>
+          <tr><td>盘中 10:30~15:05</td><td>刷新实时行情、资金、ETF、涨停热力</td><td>实时区时间戳停滞</td><td>下一档自动覆盖</td></tr>
+          <tr><td>盘后 18:30</td><td>基于完整收盘数据生成选股结果</td><td>三重共识/驾驶舱用隔夜数据</td><td>周六 self_heal 补跑</td></tr>
+          <tr><td>构建部署</td><td>raw_data push 触发 selective build → Pages</td><td>线上数据不更新</td><td>manual dispatch</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🛡️</span>v8 vs v6 遗产对比</h3>
+        <table class="lg-table">
+          <tr><th>能力</th><th>v6 实现</th><th>v8 现状</th><th>优先级</th></tr>
+          <tr><td>Safety Net 兜底</td><td>safety-net.yml 每15min轮询</td><td><span style="color:#38bdf8;">✅ 已建 v8_safety_net.yml</span></td><td>P0 必须</td></tr>
+          <tr><td>云端自愈器</td><td>cloud_self_heal 周末T+1补全</td><td><span style="color:#38bdf8;">✅ 已建 v8_self_heal.yml</span></td><td>P1 应补</td></tr>
+          <tr><td>每日备份</td><td>cloud_backup.yml 21:00</td><td>❌ 无（raw_data 由 git 历史+Pages 回溯）</td><td>P2 可选</td></tr>
+          <tr><td>心跳监控上云</td><td>peer_health_monitor 本机</td><td>⚠️ 仅本地 PAUSED</td><td>P2 可选</td></tr>
+          <tr><td>防误删清单</td><td>DO_NOT_DELETE.md + pre-commit hook</td><td><span style="color:#38bdf8;">✅ 已建 DO_NOT_DELETE.md</span></td><td>P0 必须</td></tr>
         </table>
       </div>
     </div>
@@ -2265,7 +2738,7 @@ function switchSec(sec,el){
       if(!s || !s.code || !s.name) return false;
       const sc = normCode(s.code);
       const sn = s.name.toLowerCase();
-      return sc===qc || sc.indexOf(qc)===0 || sn.indexOf(ql)!==-1 || (s.full_code||'').toLowerCase().indexOf(ql)!==-1;
+      return sc===qc || sc.indexOf(qc)===0 || sn.indexOf(ql)!==-1 || (s.full_code||'').toLowerCase().indexOf(ql)!==-1 || (s.py||'').toLowerCase().indexOf(ql)!==-1;
     }).slice(0,limit);
   }
   function findOne(q){
@@ -2279,7 +2752,7 @@ function switchSec(sec,el){
       if(!s || !s.code || !s.name) return false;
       const sc = normCode(s.code);
       const sn = s.name.toLowerCase();
-      return sc.indexOf(qc)===0 || sn.indexOf(ql)!==-1;
+      return sc.indexOf(qc)===0 || sn.indexOf(ql)!==-1 || (s.py||'').toLowerCase().indexOf(ql)!==-1;
     });
   }
 
@@ -3091,6 +3564,128 @@ function renderLimitUpHeatmap(){
     setTime('phFibTime',fib.update_time);
   }
 
+  /* ---- 1.5 决策中枢：战略→战术→选股 ---- */
+  function renderDecisionHub(fib,margin,cffex,fomc,sf,crisis,macro){
+    const c=fib.current||{};
+    const declineDays=c.days_down||0, declinePct=c.total_pct||0;
+    const pmiLatest=crisis.pmi_value!=null?crisis.pmi_value:(macro.pmi&&macro.pmi.length?macro.pmi[macro.pmi.length-1].今值:null);
+    const m2=(macro.monetary&&macro.monetary.m2_yoy)?macro.monetary.m2_yoy.value:null;
+    const m2Prev=(macro.monetary&&macro.monetary.m2_yoy)?macro.monetary.m2_yoy.previous:null;
+    const cn10y=(macro.monetary&&macro.monetary.cn_bond_10y)?macro.monetary.cn_bond_10y.value:null;
+    const us10y=(macro.monetary&&macro.monetary.us_bond_10y)?macro.monetary.us_bond_10y.value:null;
+    const globalScore=(crisis.global!=null?crisis.global:0.5);
+    const crisisScore=((crisis.currency||0)+(crisis.economy||0)+(crisis.global||0))/3;
+
+    // 1. 宏观周期判断
+    let cycle='中性震荡', cycleColor='var(--gold)', styleBias='结构性行情，均衡配置';
+    if(globalScore>=0.6 || crisisScore>=0.55){
+      cycle='外部承压'; cycleColor='var(--down)'; styleBias='避险为主，高股息/现金流';
+    }else if(pmiLatest!=null && pmiLatest<49 && (m2!=null && (m2Prev==null || m2>=m2Prev))){
+      cycle='筑底修复'; cycleColor='var(--cyan)'; styleBias='超跌修复+成长试探，左侧布局';
+    }else if(pmiLatest!=null && pmiLatest>=50 && (cn10y!=null && cn10y<=2.0)){
+      cycle='扩张初期'; cycleColor='var(--up)'; styleBias='顺周期+低估值蓝筹';
+    }else if(pmiLatest!=null && pmiLatest>=49 && pmiLatest<50){
+      cycle='弱复苏'; cycleColor='var(--gold)'; styleBias='业绩确定性>主题，精选行业';
+    }
+
+    // 2. 战术评分（复用温度计逻辑）
+    let techScore=5;
+    if(declineDays>=30) techScore-=2;
+    else if(declineDays>=15) techScore-=1;
+    if(declinePct<=-5) techScore-=2;
+    else if(declinePct<=-3) techScore-=1;
+    techScore=Math.max(1,Math.min(10,techScore));
+
+    let rzLatest=0;
+    if(margin.sh&&margin.sh.length) rzLatest=margin.sh[margin.sh.length-1].rz_balance||0;
+    const sfIn=(sf.summary||{}).in_count||0, sfOut=(sf.summary||{}).out_count||0;
+    let fundScore=5;
+    if(rzLatest>=15000) fundScore+=2;
+    else if(rzLatest>=14500) fundScore+=1;
+    if(sfIn>sfOut) fundScore+=1;
+    else if(sfOut>sfIn) fundScore-=1;
+    if(sfIn>=8) fundScore+=1;
+    fundScore=Math.max(1,Math.min(10,fundScore));
+
+    const cffexNet=cffex.net_total||0;
+    let instScore=5;
+    if(cffexNet<-8000) instScore-=2;
+    else if(cffexNet<-3000) instScore-=1;
+    else if(cffexNet>3000) instScore+=1;
+    instScore=Math.max(1,Math.min(10,instScore));
+
+    const avgScore=Math.round((techScore+fundScore+instScore)/3);
+    const deg=avgScore*10;
+
+    // 3. 综合行动建议
+    let action='观望', actionColor='var(--gold)', position='5成';
+    if(cycle==='筑底修复' && avgScore>=5){ action='积极布局'; actionColor='var(--up)'; position='6-7成'; }
+    else if(cycle==='扩张初期' && avgScore>=6){ action='持仓待涨'; actionColor='var(--up)'; position='7-8成'; }
+    else if(cycle==='外部承压' || avgScore<4){ action='控制仓位'; actionColor='var(--down)'; position='3-4成'; }
+    else if(avgScore>=7){ action='偏积极'; actionColor='var(--up)'; position='6-7成'; }
+    else if(avgScore<=3){ action='防守'; actionColor='var(--down)'; position='3成以下'; }
+
+    // 4. 渲染
+    const hubVerdict=$('hubVerdict');
+    if(hubVerdict){
+      hubVerdict.innerHTML=
+        '<div class="hub-verdict-score" style="color:'+actionColor+'">'+deg+'°</div>'+
+        '<div class="hub-verdict-main">'+
+          '<div class="hub-verdict-title">'+action+' · '+cycle+'</div>'+
+          '<div class="hub-verdict-sub">'+styleBias+'</div>'+
+          '<div class="hub-verdict-action">建议仓位 '+position+' ｜ 技术'+techScore+' 资金'+fundScore+' 机构'+instScore+'</div>'+
+        '</div>'+
+        '<div style="margin-left:auto;text-align:right;min-width:140px">'+
+          '<div style="font-size:12px;color:var(--dim);margin-bottom:4px">危机雷达</div>'+
+          '<div style="font-size:18px;font-weight:800;color:'+(crisisScore>=0.5?'var(--down)':'var(--cyan)')+'">'+(crisisScore*100).toFixed(0)+'</div>'+
+        '</div>';
+    }
+
+    const hubCycle=$('hubCycle');
+    if(hubCycle) hubCycle.innerHTML='<span style="color:'+cycleColor+'">'+cycle+'</span>';
+
+    const macroBody=$('hubMacroBody');
+    if(macroBody){
+      const rows=[];
+      if(pmiLatest!=null) rows.push('PMI '+pmiLatest+(pmiLatest>=50?' 扩张':' 收缩'));
+      if(m2!=null) rows.push('M2 '+m2+'%'+(m2Prev!=null?(m2>=m2Prev?'↑':'↓'):''));
+      if(cn10y!=null) rows.push('中债10Y '+cn10y+'%');
+      if(us10y!=null && cn10y!=null) rows.push('中美利差 '+(cn10y-us10y).toFixed(2)+'%');
+      rows.push('危机雷达 '+(crisisScore*100).toFixed(0)+'/100');
+      macroBody.innerHTML=rows.length?rows.map(r=>'<div style="margin-bottom:4px">'+r+'</div>').join(''):'宏观数据加载中';
+    }
+
+    const hubTacticalScore=$('hubTacticalScore');
+    if(hubTacticalScore){
+      const color=deg>=70?'var(--up)':(deg>=50?'var(--gold)':'var(--down)');
+      hubTacticalScore.innerHTML='<span class="hub-score-num" style="color:'+color+'">'+deg+'°</span><span>'+(deg>=70?'偏热':(deg>=50?'中性':'偏冷'))+'</span>';
+    }
+    const hubTacticalBody=$('hubTacticalBody');
+    if(hubTacticalBody){
+      hubTacticalBody.innerHTML=
+        '<div>技术面 '+techScore+'/10 · '+(declineDays>0?'回调'+declineDays+'天':'震荡')+'</div>'+
+        '<div>资金面 '+fundScore+'/10 · 两融'+ (rzLatest>=10000?(rzLatest/10000).toFixed(2)+'万亿':'--') +'</div>'+
+        '<div>机构面 '+instScore+'/10 · 期指 '+ (cffexNet>0?'净多':'净空') +' '+Math.abs(cffexNet)+'</div>'+
+        '<div style="margin-top:6px">'+action+' · '+position+'</div>';
+    }
+
+    const hubFactorCount=$('hubFactorCount');
+    const hubFactorBody=$('hubFactorBody');
+    if(hubFactorCount && hubFactorBody){
+      hubFactorCount.textContent='—';
+      hubFactorCount.style.color='var(--dim)';
+      hubFactorBody.innerHTML=
+        '<span class="hub-tag neutral">龙头合力</span>'+
+        '<span class="hub-tag neutral">主力通道</span>'+
+        '<span class="hub-tag neutral">RSI背离</span>'+
+        '<span class="hub-tag neutral">资金排列</span>'+
+        '<div style="margin-top:8px;color:var(--dim)">因子模块建设中，接入后显示今日触发数量</div>';
+    }
+
+    const latestTime=crisis.update_time||macro.update_time||fib.update_time;
+    setTime('hubTime',latestTime);
+  }
+
   /* ---- 2. 短线/中线市场温度计（技术/资金/机构） ---- */
   function renderThermo(fib,margin,cffex,fomc,sf){
     const c=fib.current||{};
@@ -3150,15 +3745,22 @@ function renderLimitUpHeatmap(){
       '🏛 机构面 '+instScore+'/10 · '+instDetail.join(' · ')
     ].filter(Boolean).join('<br>');
 
-    const h='<svg width="200" height="120" viewBox="0 0 200 120">'+
-      '<path d="M20 110 A80 80 0 0 1 180 110" fill="none" stroke="#1b2740" stroke-width="14" stroke-linecap="round"/>'+
-      '<path d="'+arcPath+'" fill="none" stroke="'+mainColor+'" stroke-width="14" stroke-linecap="round"/>'+
-      '<circle cx="'+ex.toFixed(1)+'" cy="'+ey.toFixed(1)+'" r="8" fill="'+mainColor+'"/>'+
-      '</svg>'+
-      '<div style="font-size:42px;font-weight:800;color:'+mainColor+'">'+deg+'°</div>'+
-      '<div style="font-size:14px;font-weight:700;color:'+mainColor+'">'+word+'</div>'+
-      '<div style="font-size:12px;color:var(--sub);margin-bottom:6px">'+subText+'</div>'+
-      '<div style="font-size:10px;color:var(--dim);line-height:1.6;text-align:center;padding:0 8px">'+detailLine+'</div>';
+    const bar=(label,score,detail,color)=>{
+      const pct=score*10;
+      return '<div style="margin-bottom:12px">'+
+        '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">'+
+          '<span>'+label+' <span style="color:var(--dim)">'+detail+'</span></span>'+
+          '<span style="font-weight:700;color:'+color+'">'+score+'/10</span>'+
+        '</div>'+
+        '<div style="height:8px;background:var(--bg2);border-radius:4px;overflow:hidden">'+
+          '<div style="width:'+pct+'%;height:100%;background:'+color+'"></div>'+
+        '</div>'+
+      '</div>';
+    };
+    const h='<div style="font-size:12px;color:var(--dim);margin-bottom:14px">综合评分 <b style="color:'+mainColor+'">'+deg+'°</b> · '+word+' · '+subText+'</div>'+
+      bar('📉 技术面',techScore,techDetail.join(' · '),mainColor)+
+      bar('💰 资金面',fundScore,fundDetail.join(' · '),mainColor)+
+      bar('🏛 机构面',instScore,instDetail.join(' · '),mainColor);
     $('phThermoBody').innerHTML=h;
     setTime('phThermoTime',fib.update_time||sf.update_time||margin.update_time);
   }
@@ -3360,7 +3962,7 @@ function renderLimitUpHeatmap(){
       series.push({
         name: '单日净流入(亿)', type: 'bar', yAxisIndex: 0, data: nets,
         itemStyle: { color: function(p){ return p.value >= 0 ? upColor : downColor; } },
-        barWidth: '60%'
+        barMaxWidth: 18, barGap: '-100%'
       });
     }
     if(__MFF_SHOW_CUM){
@@ -3377,7 +3979,7 @@ function renderLimitUpHeatmap(){
     }
     var option = {
       backgroundColor: 'transparent',
-      grid: { left: 60, right: 70, top: 30, bottom: 60 },
+      grid: { left: 55, right: 55, top: 35, bottom: 70 },
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'cross', link: [{xAxisIndex: 'all'}] },
@@ -3954,6 +4556,7 @@ function renderLimitUpHeatmap(){
 
     // 3) 盘后数据：全部使用已注入的 window.* 变量（data/*.js 已在 <head> 同步加载）
     safe(renderFib, window.SH_FIB || {});
+    safe(renderDecisionHub, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, {}, window.SECTOR_FUND_FLOW || {}, window.CRISIS_DATA || {}, window.MACRO_DATA || {});
     safe(renderThermo, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, {}, window.SECTOR_FUND_FLOW || {});
     safe(renderSixDim, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, window.CRISIS_DATA || {}, window.SECTOR_FUND_FLOW || {}, window.MARKET_FUND_FLOW_DATA || {});
     safe(renderCrisis, window.CRISIS_DATA || {});
