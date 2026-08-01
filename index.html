@@ -853,9 +853,9 @@ window.V8_CAL = {weeks:[],legend:[]};
         // --- 行业 treemap（按|涨跌|排序） ---
         var sList=[];
         if(sectorData && sectorData.sectors){
-          Object.keys(sectorData.sectors).forEach(function(k){
-            var s=sectorData.sectors[k];
-            if(s && typeof s==='object') sList.push({name:k, pct_day:s.pct_day||0, rs_5:s.rs_5||0, rs_20:s.rs_20||0});
+          var sectorsArr=Array.isArray(sectorData.sectors)?sectorData.sectors:Object.values(sectorData.sectors);
+          sectorsArr.forEach(function(s){
+            if(s && typeof s==='object') sList.push({name:s.name||'', pct_day:s.pct_day||0, rs_5:s.rs_5||0, rs_20:s.rs_20||0});
           });
           sList.sort(function(a,b){return Math.abs(b.pct_day)-Math.abs(a.pct_day)});
         }
@@ -936,15 +936,17 @@ window.V8_CAL = {weeks:[],legend:[]};
         candQuotes.forEach(function(q){ qMap[q.code]=q; });
 
         var sectors=sectorData.sectors;
+        var sectorsArr=Array.isArray(sectors)?sectors:Object.values(sectors);
 
         // 构建 treemap 层级数据
         var treeData=[];
-        var sortedKeys=Object.keys(sectors).sort(function(a,b){
-          return Math.abs((sectors[b]||{}).pct_day||0)-Math.abs((sectors[a]||{}).pct_day||0);
+        var sortedSectors=sectorsArr.slice().sort(function(a,b){
+          return Math.abs((b||{}).pct_day||0)-Math.abs((a||{}).pct_day||0);
         });
 
-        sortedKeys.forEach(function(indName){
-          var sec=sectors[indName]||{};
+        sortedSectors.forEach(function(sec){
+          if(!sec || typeof sec!=='object') return;
+          var indName=sec.name||'其他';
           var secChg=sec.pct_day||0;
           var stocks=byIndustry[indName]||[];
 
@@ -2718,6 +2720,12 @@ function switchSec(sec,el){
     try{ window.opSwitchTab(1); }catch(e){}
   }
   if(sec==='op' && typeof window.__renderOps==='function') setTimeout(window.__renderOps,60);
+  // tab 切换后 echarts 实例需要 resize（容器从 display:none 恢复时尺寸为 0）
+  setTimeout(function(){
+    if(window._hmCharts) window._hmCharts.forEach(function(c){ try{ c.resize(); }catch(e){} });
+    if(window._treeChart) try{ window._treeChart.resize(); }catch(e){}
+    if(window.__MFF_CHART_INST) try{ window.__MFF_CHART_INST.resize(); }catch(e){}
+  }, 120);
 }
 
 /* ===== 六维雷达 SVG：由 renderSixDim 动态绘制 ===== */
