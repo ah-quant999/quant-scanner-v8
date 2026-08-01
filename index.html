@@ -561,7 +561,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     <div id="aiSummaryCard" style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">
       <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--border);">
         <span style="font-size:16px;font-weight:700;color:var(--txt);">🧠 AI市场速览 <span style="font-size:10px;font-weight:400;color:var(--dim);">短线·综合 · A 阶段演示数据</span></span>
-        <span style="font-size:12px;color:var(--sub);font-weight:400;" id="aiSummaryTime">周一 15:46 快照</span>
+        <span style="font-size:12px;color:var(--sub);font-weight:400;" id="aiSummaryTime">--</span>
       </div>
       <div style="padding:0;" id="aiSummaryContent">
         <div style="padding:10px 18px;background:rgba(167,139,250,0.10);font-size:13px;line-height:1.7;color:var(--txt);">
@@ -596,6 +596,17 @@ window.V8_CAL = {weeks:[],legend:[]};
         </div>
       </div>
     </div>
+    <script>
+    (function(){
+      var el=document.getElementById('aiSummaryTime');
+      if(!el) return;
+      var adv=window.COCKPIT_ADVICE;
+      var gt=adv&&adv.gen_time;
+      if(!gt){ el.textContent='演示数据'; return; }
+      var f=window._fmtCockpitRel||window._fmtAshareRel;
+      el.textContent='AI建议 '+(f?f(gt):gt);
+    })();
+    </script>
 
     <div class="grid g-4" id="indexCardsGrid" style="margin-bottom:16px">
       <div class="card rt-card"><div class="ipo-empty">指数行情加载中…</div></div>
@@ -748,27 +759,25 @@ window.V8_CAL = {weeks:[],legend:[]};
       <div class="note">盘中异动=ETF 5 分钟量能脉冲异动；资金热度=宽基 ETF 净申赎份额趋势；日监控=全市场 ETF 当日主力净流入排名（需盘后 T+1 更新）。三者维度互补，不构成重复。</div>
     </div>
 
-    <!-- 热力矩阵 + 行业树图（并排，窄屏自动换行） -->
-    <div class="grid g-2" style="margin-bottom:16px">
+    <!-- 热力矩阵（满宽一行） -->
+    <div class="card" style="margin-bottom:16px">
 
       <!-- 🗺️ 热力矩阵（Wind 风 treemap：概念/行业/核心指数 三栏） -->
-      <div class="card" style="margin-bottom:0">
-        <h3><span class="ic">🗺️</span>热力矩阵 · 概念 / 行业 / 指数 · <span class="fresh" id="hmUpdateTime">更新于 --</span></h3>
-        <div id="heatmapMatrix" style="min-height:280px;"></div>
-        <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:6px;flex-wrap:wrap;align-items:center;">
-          <span><b style="color:var(--up)">■</b> 涨 &nbsp;<b style="color:var(--down)">■</b> 跌</span>
-          <span>面积≈净流入/市值 &nbsp; 色深=幅度</span>
-        </div>
+      <h3><span class="ic">🗺️</span>热力矩阵 · 概念 / 行业 / 指数 · <span class="fresh" id="hmUpdateTime">更新于 --</span></h3>
+      <div id="heatmapMatrix" style="min-height:280px;"></div>
+      <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:6px;flex-wrap:wrap;align-items:center;">
+        <span><b style="color:var(--up)">■</b> 涨 &nbsp;<b style="color:var(--down)">■</b> 跌</span>
+        <span>面积≈净流入/市值 &nbsp; 色深=幅度</span>
       </div>
+    </div>
 
-      <!-- 🏭 行业树图（双层 treemap：行业→候选股嵌套矩形） -->
-      <div class="card" style="margin-bottom:0">
-        <h3><span class="ic">🏭</span>行业树图 · 行业→候选股双层 · <span class="fresh" id="htUpdateTime">更新于 --</span></h3>
-        <div id="industryTreemap" style="min-height:280px;"></div>
-        <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:6px;flex-wrap:wrap;align-items:center;">
-          <span>大块=行业 &nbsp; 小块=个股</span>
-          <span>颜色=涨跌 &nbsp; 面积≈市值</span>
-        </div>
+    <!-- 行业树图（满宽一行） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🏭</span>行业树图 · 行业→候选股双层 · <span class="fresh" id="htUpdateTime">更新于 --</span></h3>
+      <div id="industryTreemap" style="min-height:280px;"></div>
+      <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:6px;flex-wrap:wrap;align-items:center;">
+        <span>大块=行业 &nbsp; 小块=个股</span>
+        <span>颜色=涨跌 &nbsp; 面积≈市值</span>
       </div>
     </div>
 
@@ -1082,7 +1091,7 @@ window.V8_CAL = {weeks:[],legend:[]};
           <button class="mff-series-btn" data-series="cum" style="padding:3px 10px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub);">累计</button>
           <span id="mffSummary" style="font-size:11px;color:var(--dim);margin-left:auto;"></span>
         </div>
-        <div id="mffChart" style="width:100%;height:360px;"></div>
+        <div id="mffChart" style="width:100%;height:420px;"></div>
         <div style="margin-top:6px;font-size:11px;color:var(--dim);line-height:1.5;">
           📌 口径说明：累计净流入 = 上证指数（000001）单日主力资金净流入的滚动累加；数据覆盖沪市全市场成分股，非仅宽基ETF。
         </div>
@@ -1348,116 +1357,262 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     <!-- ============ 共振日历（机游共振 + 北向席位 + 分析导航） ============ -->
     <section id="sec-rc">
-    <div class="sec-head"><h2>📊 共振日历</h2><span class="fresh" id="rcUpdateTime">更新于 --</span><span class="tag">机游共振 / 北向席位 · 月历视图 · 深度分析</span></div>
+    <div class="sec-head"><h2>📊 共振日历</h2><span class="fresh" id="rcUpdateTime">更新于 --</span><span class="tag">机游共振 · 北向席位 · 每日洞察 · 大牛股猎手</span></div>
 
-    <!-- ====== 月历视图（本月机游+北向） ====== -->
-    <div class="card" style="margin-bottom:16px;">
-      <h3><span class="ic">📅</span>本月龙虎榜日历 · 点击日期查看详情 · <span id="calMonthLabel" style="font-size:11px;color:var(--dim);font-weight:400;"></span></h3>
-      <div id="lhbMonthCal" style="min-height:200px;"><div class="ipo-empty">加载中…</div></div>
-      <div style="display:flex;gap:14px;font-size:10px;color:var(--dim);margin-top:8px;flex-wrap:wrap;">
-        <span><b style="color:#ffd54f;">★</b> 机游共振</span>
-        <span><b style="color:var(--cyan);">▲</b> 机构净买</span>
-        <span><b style="color:var(--gold);">⚡</b> 游资净买</span>
-        <span><b style="color:var(--north);">🌊</b> 北向参与</span>
-        <span style="color:var(--dim);">— 休市/无数据</span>
+    <style>
+      #sec-rc{--north:#22d3ee}
+      .rc-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+      .rc-tab-btn{padding:8px 18px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub);transition:.15s}
+      .rc-tab-btn:hover{border-color:var(--cyan);color:var(--txt)}
+      .rc-tab-btn.active{background:linear-gradient(135deg,#13243f,#0e2747);border-color:var(--cyan);color:#fff;box-shadow:0 0 0 1px rgba(56,189,248,.35)}
+      .rc-tab-pane{display:none}
+      .rc-tab-pane.active{display:block;animation:fade .25s ease}
+      .rc-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:10px;color:var(--dim);margin-bottom:8px}
+      .rc-ac-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+      .rc-ac-card{margin-bottom:0;cursor:pointer}
+      .rc-ac-title{font-size:13px;font-weight:700;color:var(--txt)}
+      .rc-ac-desc{font-size:10px;color:var(--dim)}
+      .rc-cal{width:100%;border-collapse:collapse;font-size:11px}
+      .rc-cal th{padding:6px 2px;color:var(--dim);font-weight:600;font-size:10px;text-align:center;border-bottom:1px solid var(--border)}
+      .rc-cal td{padding:4px 2px;border:1px solid var(--border);text-align:center;vertical-align:top}
+      .rc-row{display:flex;justify-content:space-between;gap:8px;padding:2px 0;font-size:11px}
+      .rc-row .nm{color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .rc-h{font-size:11px;font-weight:700;margin:8px 0 3px}
+    </style>
+
+    <div class="rc-tabs">
+      <button class="rc-tab-btn active" data-rc="rcTab1" onclick="switchRcTab('rcTab1',this)">📅 机游共振日历</button>
+      <button class="rc-tab-btn" data-rc="rcTab2" onclick="switchRcTab('rcTab2',this)">🌊 北向日历</button>
+      <button class="rc-tab-btn" data-rc="rcTab3" onclick="switchRcTab('rcTab3',this)">📋 每日洞察</button>
+      <button class="rc-tab-btn" data-rc="rcTab4" onclick="switchRcTab('rcTab4',this)">🦏 大牛股猎手</button>
+    </div>
+
+    <!-- ================= TAB1: 机游共振日历 ================= -->
+    <div id="rcTab1" class="rc-tab-pane active">
+
+      <div class="card" style="margin-bottom:16px;">
+        <h3><span class="ic">📅</span>本月龙虎榜日历 · 点击日期查看详情 · <span id="calMonthLabel" style="font-size:11px;color:var(--dim);font-weight:400;"></span></h3>
+        <div class="rc-legend">
+          <span><b style="color:#ffd54f;">★</b> 机游共振</span>
+          <span><b style="color:var(--cyan);">▲</b> 机构净买</span>
+          <span><b style="color:var(--gold);">⚡</b> 游资净买</span>
+          <span><b style="color:var(--north);">🌊</b> 北向</span>
+          <span>— 休市/无数据</span>
+        </div>
+        <div id="lhbMonthCal" style="min-height:200px;"><div class="ipo-empty">加载中…</div></div>
       </div>
-    </div>
 
-    <!-- ====== 当日详情展开区（点击日历日期后显示） ====== -->
-    <div id="lhbDayDetail" class="card" style="display:none;margin-bottom:16px;">
-      <h3><span class="ic">🔍</span>当日详情 · <span id="lhbDetailDate" style="font-size:12px;color:var(--dim);font-weight:400;"></span></h3>
-      <div id="lhbDayDetailBody"></div>
-    </div>
+      <!-- 当日详情展开区（点击日历日期后显示） -->
+      <div id="lhbDayDetail" class="card" style="display:none;margin-bottom:16px;">
+        <h3><span class="ic">🔍</span>当日详情 · <span id="lhbDetailDate" style="font-size:12px;color:var(--dim);font-weight:400;"></span></h3>
+        <div id="lhbDayDetailBody"></div>
+      </div>
 
-    <!-- ====== 四张分析导航卡（对标 Coze 分析面板） ====== -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:16px;">
-      <!-- 卡1: 机游信号详情分析 -->
-      <div class="card" style="margin-bottom:0;cursor:pointer;border-left:4px solid #f59e0b;" onclick="this.querySelector('.ac-body').style.display=this.querySelector('.ac-body').style.display==='block'?'none':'block'">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <!-- 机游共振 + 北向席位 并排详情 -->
+      <div class="grid g-2" style="margin-bottom:16px">
+        <div class="card" style="margin-bottom:0">
+          <h3><span class="ic">🐉</span>机游共振 · 当日龙虎榜 · <span class="fresh" id="jyCalTime">更新于 --</span></h3>
+          <div id="jyResonanceCal" style="min-height:160px;"><div class="ipo-empty">加载中…</div></div>
+          <div class="note" style="margin-top:6px;">
+            <b>口径：</b>▲机构净买TOP5 · ▼机构净卖TOP5 · ▲游资净买TOP5 · ▼游资净卖TOP5<br>
+            <b>★机游共振</b>=机构净买&gt;0 ∩ 游资净买&gt;0 · 数据源：东财龙虎榜 ★★★★★
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <h3><span class="ic">🌊</span>北向席位 · 龙虎榜北向 · <span class="fresh" id="northCalTime">更新于 --</span></h3>
+          <div id="northFundCal" style="min-height:160px;"><div class="ipo-empty">加载中…</div></div>
+          <div class="note" style="margin-top:6px;">
+            <b>口径：</b>龙虎榜北向席位净买卖（非全市场聚合流）<br>
+            ⚠️ 聚合北向2024-05停更，此处为<strong>席位级替代数据</strong> ★★★★☆
+          </div>
+        </div>
+      </div>
+
+    </div><!--/rcTab1-->
+
+    <!-- ================= TAB2: 北向日历 ================= -->
+    <div id="rcTab2" class="rc-tab-pane">
+
+      <div class="card" style="margin-bottom:16px;">
+        <h3><span class="ic">🌊</span>本月北向席位日历 · <span id="rcNorthMonthLabel" style="font-size:11px;color:var(--dim);font-weight:400;"></span></h3>
+        <div class="rc-legend">
+          <span><b style="color:var(--up);">▲</b> 当日北向净买</span>
+          <span><b style="color:var(--down);">▼</b> 当日北向净卖</span>
+          <span><b style="color:var(--north);">n</b> 北向参与股数</span>
+          <span>— 休市/无北向席位</span>
+        </div>
+        <div id="rcNorthMonthCal" style="min-height:200px;"><div class="ipo-empty">加载中…</div></div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <h3><span class="ic">▲</span>北向买入 TOP5 汇总 · <span class="fresh" id="rcNorthRange">--</span></h3>
+        <div id="rcNorthTopBuy" style="min-height:80px;"><div class="ipo-empty">加载中…</div></div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <h3><span class="ic">▼</span>北向卖出 TOP5 汇总</h3>
+        <div id="rcNorthTopSell" style="min-height:80px;"><div class="ipo-empty">加载中…</div></div>
+        <div class="note" style="margin-top:6px;">
+          <b>口径：</b>按区间内各交易日龙虎榜「北向」席位买卖额按个股累加排序 ★★★★☆
+        </div>
+      </div>
+
+    </div><!--/rcTab2-->
+
+    <!-- ================= TAB3: 每日洞察 ================= -->
+    <div id="rcTab3" class="rc-tab-pane">
+
+      <div class="card" style="margin-bottom:16px;">
+        <h3><span class="ic">📋</span>今日市场总结 · <span class="fresh" id="rcInsightTime">更新于 --</span></h3>
+        <div id="rcInsightSummary" style="font-size:12px;color:var(--sub);line-height:1.8;"><div class="ipo-empty">加载中…</div></div>
+      </div>
+
+      <div class="grid g-2" style="margin-bottom:16px">
+        <div class="card" style="margin-bottom:0">
+          <h3><span class="ic">📈</span>涨跌概况</h3>
+          <div id="rcInsightIndex" style="min-height:100px;"><div class="ipo-empty">加载中…</div></div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <h3><span class="ic">💰</span>资金流向</h3>
+          <div id="rcInsightFlow" style="min-height:100px;"><div class="ipo-empty">加载中…</div></div>
+        </div>
+      </div>
+
+      <div class="grid g-2" style="margin-bottom:16px">
+        <div class="card" style="margin-bottom:0">
+          <h3><span class="ic">🔥</span>热点板块</h3>
+          <div id="rcInsightSector" style="min-height:100px;"><div class="ipo-empty">加载中…</div></div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <h3><span class="ic">⚠️</span>异动信号</h3>
+          <div id="rcInsightAlert" style="min-height:100px;"><div class="ipo-empty">加载中…</div></div>
+        </div>
+      </div>
+
+    </div><!--/rcTab3-->
+
+    <!-- ================= TAB4: 大牛股猎手 ================= -->
+    <div id="rcTab4" class="rc-tab-pane">
+
+      <div class="card" style="margin-bottom:16px;">
+        <h3><span class="ic">🦏</span>大牛股猎手 · 三段式筛选 · <span class="fresh" id="rcBullRange">--</span></h3>
+        <div style="font-size:11px;color:var(--dim);line-height:1.7;">
+          新赛道发现（近5日新晋共振） → 早期信号雷达（北向连买） → 核心共振标的（高频共振）
+        </div>
+      </div>
+
+      <div class="grid g-3" style="margin-bottom:16px">
+        <div class="card" style="margin-bottom:0;border-left:4px solid #f472b6;">
+          <h3><span class="ic">🚀</span>新赛道发现</h3>
+          <div style="font-size:10px;color:var(--dim);margin-bottom:6px;">近5日新晋共振标的（前10日未出现）</div>
+          <div id="rcBullFresh" style="min-height:100px;font-size:11px;"><div class="ipo-empty">加载中…</div></div>
+        </div>
+        <div class="card" style="margin-bottom:0;border-left:4px solid #06b6d4;">
+          <h3><span class="ic">📡</span>早期信号雷达</h3>
+          <div style="font-size:10px;color:var(--dim);margin-bottom:6px;">北向席位连续净买 ≥2 天</div>
+          <div id="rcBullEarly" style="min-height:100px;font-size:11px;"><div class="ipo-empty">加载中…</div></div>
+        </div>
+        <div class="card" style="margin-bottom:0;border-left:4px solid #ffd54f;">
+          <h3><span class="ic">🎯</span>核心共振标的</h3>
+          <div style="font-size:10px;color:var(--dim);margin-bottom:6px;">区间内机游共振出现 ≥2 次</div>
+          <div id="rcBullCore" style="min-height:100px;font-size:11px;"><div class="ipo-empty">加载中…</div></div>
+        </div>
+      </div>
+
+    </div><!--/rcTab4-->
+
+    <!-- ================= 底部固定：四张深度分析卡（独立于 TAB） ================= -->
+    <div style="font-size:12px;font-weight:700;color:var(--sub);margin:4px 0 8px;">🔬 深度分析 · 点击卡片展开</div>
+    <div class="rc-ac-grid" style="margin-bottom:16px;">
+
+      <div class="card rc-ac-card" style="border-left:4px solid #f59e0b;" onclick="rcToggleAc(this)">
+        <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:22px;">⚡</span>
           <div>
-            <div style="font-size:13px;font-weight:700;color:var(--txt);">机游信号详情分析</div>
-            <div style="font-size:10px;color:var(--dim);">单日信号 · 连续性跟踪 · 4类基础+5类细分</div>
+            <div class="rc-ac-title">机游信号详细分析</div>
+            <div class="rc-ac-desc">单日信号 · 连续性跟踪 · 4类基础+5类细分</div>
           </div>
           <span style="margin-left:auto;color:var(--dim);font-size:18px;">→</span>
         </div>
-        <div class="ac-body" style="display:none;padding-top:8px;border-top:1px solid var(--border);margin-top:6px;">
+        <div class="ac-body" style="display:none;padding-top:8px;border-top:1px solid var(--border);margin-top:8px;">
           <div id="acJiyouSignal" style="font-size:11px;color:var(--sub);line-height:1.7;"><div class="ipo-empty">加载中…</div></div>
         </div>
       </div>
 
-      <!-- 卡2: 北向资金详细分析 -->
-      <div class="card" style="margin-bottom:0;cursor:pointer;border-left:4px solid #06b6d4;" onclick="this.querySelector('.ac-body').style.display=this.querySelector('.ac-body').style.display==='block'?'none':'block'">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <div class="card rc-ac-card" style="border-left:4px solid #06b6d4;" onclick="rcToggleAc(this)">
+        <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:22px;">📈</span>
           <div>
-            <div style="font-size:13px;font-weight:700;color:var(--txt);">北向资金详细分析</div>
-            <div style="font-size:10px;color:var(--dim);">行业趋势 · 连续加仓 · 北向+机构共振</div>
+            <div class="rc-ac-title">北向资金详细分析</div>
+            <div class="rc-ac-desc">行业趋势 · 连续加仓 · 北向+机构共振</div>
           </div>
           <span style="margin-left:auto;color:var(--dim);font-size:18px;">→</span>
         </div>
-        <div class="ac-body" style="display:none;padding-top:8px;border-top:1px solid var(--border);margin-top:6px;">
+        <div class="ac-body" style="display:none;padding-top:8px;border-top:1px solid var(--border);margin-top:8px;">
           <div id="acNorthAnalysis" style="font-size:11px;color:var(--sub);line-height:1.7;"><div class="ipo-empty">加载中…</div></div>
         </div>
       </div>
 
-      <!-- 卡3: 共振胜率回测 -->
-      <div class="card" style="margin-bottom:0;cursor:pointer;border-left:4px solid #a78bfa;" onclick="this.querySelector('.ac-body').style.display=this.querySelector('.ac-body').style.display==='block'?'none':'block'">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <div class="card rc-ac-card" style="border-left:4px solid #a78bfa;" onclick="rcToggleAc(this)">
+        <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:22px;">📊</span>
           <div>
-            <div style="font-size:13px;font-weight:700;color:var(--txt);">共振胜率回测</div>
-            <div style="font-size:10px;color:var(--dim);">三方两方共振 · T+1/T+5/T+10/T+20 · 6个月历史回测</div>
+            <div class="rc-ac-title">共振胜率回测</div>
+            <div class="rc-ac-desc">三方两方共振 · T+1/T+5/T+10/T+20 · 历史回测</div>
           </div>
           <span style="margin-left:auto;color:var(--dim);font-size:18px;">→</span>
         </div>
-        <div class="ac-body" style="display:none;padding-top:8px;border-top:1px solid var(--border);margin-top:6px;">
+        <div class="ac-body" style="display:none;padding-top:8px;border-top:1px solid var(--border);margin-top:8px;">
           <div id="acBacktest" style="font-size:11px;color:var(--sub);line-height:1.7;"><div class="ipo-empty">加载中…</div></div>
         </div>
       </div>
 
-      <!-- 卡4: 大牛股猎手预测 -->
-      <div class="card" style="margin-bottom:0;cursor:pointer;border-left:4px solid #f472b6;" onclick="this.querySelector('.ac-body').style.display=this.querySelector('.ac-body').style.display==='block'?'none':'block'">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <div class="card rc-ac-card" style="border-left:4px solid #f472b6;" onclick="rcToggleAc(this)">
+        <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:22px;">🦏</span>
           <div>
-            <div style="font-size:13px;font-weight:700;color:var(--txt);">大牛股猎手预测</div>
-            <div style="font-size:10px;color:var(--dim);">新赛道发现 · 早期信号 · 核心共振标的</div>
+            <div class="rc-ac-title">大牛股猎手回测</div>
+            <div class="rc-ac-desc">新赛道发现 · 早期信号 · 核心共振标的</div>
           </div>
           <span style="margin-left:auto;color:var(--dim);font-size:18px;">→</span>
         </div>
-        <div class="ac-body" style="display:none;padding-top:8px;border-top:1px solid var(--border);margin-top:6px;">
+        <div class="ac-body" style="display:none;padding-top:8px;border-top:1px solid var(--border);margin-top:8px;">
           <div id="acBullHunter" style="font-size:11px;color:var(--sub);line-height:1.7;"><div class="ipo-empty">加载中…</div></div>
         </div>
       </div>
-    </div>
-
-    <!-- ====== 机游共振 + 北向席位 并排详情（保留 Coze 风格 TOP5 表） ====== -->
-    <div class="grid g-2" style="margin-bottom:16px">
-
-      <!-- 机游共振日历详情 -->
-      <div class="card" style="margin-bottom:0">
-        <h3><span class="ic">🐉</span>机游共振 · 当日龙虎榜 · <span class="fresh" id="jyCalTime">更新于 --</span></h3>
-        <div id="jyResonanceCal" style="min-height:160px;"><div class="ipo-empty">加载中…</div></div>
-        <div class="note" style="margin-top:6px;">
-          <b>口径：</b>▲机构净买TOP5 · ▼机构净卖TOP5 · ▲游资净买TOP5 · ▼游资净卖TOP5<br>
-          <b>★机游共振</b>=机构净买&gt;0 ∩ 游资净买&gt;0 · 数据源：东财龙虎榜 ★★★★★
-        </div>
-      </div>
-
-      <!-- 北向席位详情 -->
-      <div class="card" style="margin-bottom:0">
-        <h3><span class="ic">🌊</span>北向席位 · 龙虎榜北向 · <span class="fresh" id="northCalTime">更新于 --</span></h3>
-        <div id="northFundCal" style="min-height:160px;"><div class="ipo-empty">加载中…</div></div>
-        <div class="note" style="margin-top:6px;">
-          <b>口径：</b>龙虎榜北向席位净买卖（非全市场聚合流）<br>
-          ⚠️ 聚合北向2024-05停更，此处为<strong>席位级替代数据</strong> ★★★★☆
-        </div>
-      </div>
 
     </div>
-    </section>
 
+    <script>
+    /* ===== 共振日历 · TAB 切换 + 分析卡折叠 ===== */
+    function switchRcTab(tabId, btn){
+      var root=document.getElementById('sec-rc');
+      if(!root) return;
+      var panes=root.querySelectorAll('.rc-tab-pane');
+      for(var i=0;i<panes.length;i++){
+        if(panes[i].id===tabId) panes[i].classList.add('active');
+        else panes[i].classList.remove('active');
+      }
+      var btns=root.querySelectorAll('.rc-tab-btn');
+      for(var j=0;j<btns.length;j++){
+        if(btn ? btns[j]===btn : btns[j].getAttribute('data-rc')===tabId) btns[j].classList.add('active');
+        else btns[j].classList.remove('active');
+      }
+      try{
+        if(tabId==='rcTab2' && window._renderRcNorthTab) window._renderRcNorthTab();
+        if(tabId==='rcTab3' && window._renderRcInsight) window._renderRcInsight();
+        if(tabId==='rcTab4' && window._renderRcBull) window._renderRcBull();
+      }catch(e){ console.error('switchRcTab',e); }
+    }
+    window.switchRcTab=switchRcTab;
+
+    function rcToggleAc(card){
+      var body=card.querySelector('.ac-body');
+      if(!body) return;
+      body.style.display = (body.style.display==='block') ? 'none' : 'block';
+    }
+    window.rcToggleAc=rcToggleAc;
+    </script>
     <script>
     /* ====== 月历视图（本月龙虎榜：机游共振 + 北向席位） ====== */
     (function(){
@@ -2141,6 +2296,468 @@ window.V8_CAL = {weeks:[],legend:[]};
       window._renderAcCards=renderAll;
     })();
     </script>
+
+    <script>
+    /* ===== 共振日历 · 公共数据源（LHB_HISTORY 优先，降级 LHB_DATA 当日） ===== */
+    (function(){
+      function toIso(d){
+        d=String(d||'');
+        return d.length===8 ? (d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6,8)) : d;
+      }
+      // 返回 [{iso, stocks, summary}]，按日期升序
+      window._rcDays=function(){
+        var out=[];
+        var H=window.LHB_HISTORY;
+        if(H && typeof H==='object'){
+          Object.keys(H).filter(function(k){ return /^\d{4}-\d{2}-\d{2}$/.test(k); }).sort().forEach(function(k){
+            var d=H[k];
+            if(!d || d.trading===false) return;
+            out.push({iso:k, stocks:d.stocks||[], summary:d.summary||{}});
+          });
+        }
+        if(!out.length){
+          var L=window.LHB_DATA;
+          if(L && L.stocks && L.stocks.length){
+            out.push({iso:toIso(L.date), stocks:L.stocks, summary:L.summary||{}});
+          }
+        }
+        return out;
+      };
+      // 抽取某日北向席位明细
+      window._rcNorthOf=function(stocks){
+        var arr=[];
+        (stocks||[]).forEach(function(s){
+          var seat=s.seats && s.seats['北向'];
+          if(!seat) return;
+          var b=seat.buy||0, sl=seat.sell||0;
+          if(!b && !sl) return;
+          arr.push({code:s.code, name:s.name, buy:b, sell:sl, net:b-sl, pct:s.pct||0, inst:s.inst_net_万||0});
+        });
+        return arr;
+      };
+    })();
+    </script>
+
+    <script>
+    /* ===== TAB2: 北向日历（月历 + 北向买/卖 TOP5 汇总） ===== */
+    (function(){
+      const $=id=>document.getElementById(id);
+      function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
+      function fmtWan(w){
+        if(w==null) return '-';
+        var a=Math.abs(w);
+        if(a>=10000) return (w/10000).toFixed(2)+'亿';
+        return Math.round(w).toLocaleString('zh-CN')+'万';
+      }
+      function sgn(w){ return w>=0?'+':''; }
+
+      function renderNorthMonth(days){
+        var el=$('rcNorthMonthCal'); if(!el) return;
+        var map={};
+        days.forEach(function(d){
+          var arr=window._rcNorthOf(d.stocks);
+          if(!arr.length) return;
+          map[d.iso]={n:arr.length, net:arr.reduce(function(s,x){return s+x.net;},0)};
+        });
+
+        var now=new Date();
+        var year=now.getFullYear(), month=now.getMonth();
+        // 若本月无数据，回落到最近有数据的月份
+        var keys=Object.keys(map).sort();
+        var curPrefix=year+'-'+String(month+1).padStart(2,'0')+'-';
+        var hasCur=keys.some(function(k){ return k.indexOf(curPrefix)===0; });
+        if(!hasCur && keys.length){
+          var last=keys[keys.length-1];
+          year=parseInt(last.slice(0,4),10); month=parseInt(last.slice(5,7),10)-1;
+        }
+
+        var firstDay=new Date(year,month,1).getDay();
+        var monFirst=(firstDay+6)%7;
+        var daysInMonth=new Date(year,month+1,0).getDate();
+        var todayStr=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+
+        var h='<table class="rc-cal"><tr>';
+        ['一','二','三','四','五','六','日'].forEach(function(d){ h+='<th>'+d+'</th>'; });
+        h+='</tr>';
+
+        for(var r=0;r<6;r++){
+          if(r*7-monFirst+1>daysInMonth) break;
+          h+='<tr>';
+          for(var c=0;c<7;c++){
+            var cellIdx=r*7+c-monFirst+1;
+            if(cellIdx<1 || cellIdx>daysInMonth){ h+='<td style="background:transparent;"></td>'; continue; }
+            var iso=year+'-'+String(month+1).padStart(2,'0')+'-'+String(cellIdx).padStart(2,'0');
+            var info=map[iso];
+            var isToday=(iso===todayStr);
+            var bg='var(--bg2)', bd='1px solid var(--border)', tc='var(--dim)', body='';
+            if(info){
+              var pos=info.net>=0;
+              bg = pos ? 'rgba(244,73,93,.10)' : 'rgba(31,209,123,.10)';
+              bd = '1px solid '+(pos?'rgba(244,73,93,.28)':'rgba(31,209,123,.28)');
+              tc = 'var(--txt)';
+              body='<div style="margin-top:2px;font-size:9px;font-weight:700;color:'+(pos?'var(--up)':'var(--down)')+';">'
+                +(pos?'▲':'▼')+fmtWan(Math.abs(info.net))+'</div>'
+                +'<div style="font-size:8px;color:var(--north);">'+info.n+'只</div>';
+            } else {
+              body='<div style="margin-top:2px;font-size:9px;color:var(--dim);">—</div>';
+            }
+            if(isToday) bd='2px solid #38bdf8';
+            h+='<td style="border:'+bd+';background:'+bg+';">';
+            h+='<div style="font-weight:'+(isToday?'800':'600')+';font-size:12px;color:'+tc+';">'+cellIdx+'</div>'+body;
+            h+='</td>';
+          }
+          h+='</tr>';
+        }
+        h+='</table>';
+
+        var lbl=$('rcNorthMonthLabel');
+        if(lbl) lbl.textContent=year+'年'+(month+1)+'月';
+        el.innerHTML=h;
+      }
+
+      function aggByCode(days){
+        var m={};
+        days.forEach(function(d){
+          window._rcNorthOf(d.stocks).forEach(function(x){
+            var o=m[x.code]||(m[x.code]={code:x.code,name:x.name,buy:0,sell:0,net:0,n:0});
+            o.name=x.name; o.buy+=x.buy; o.sell+=x.sell; o.net+=x.net; o.n++;
+          });
+        });
+        return Object.keys(m).map(function(k){ return m[k]; });
+      }
+
+      function rowsHtml(list, color, key){
+        if(!list.length) return '<div class="ipo-empty">暂无数据</div>';
+        var h='';
+        list.forEach(function(x,i){
+          h+='<div class="rc-row">'
+            +'<span class="nm"><b style="color:'+color+';">'+(i+1)+'.</b> '+esc(x.name)
+            +' <span style="color:var(--dim);font-size:9px;">'+esc(x.code)+'</span>'
+            +' <span style="color:var(--dim);font-size:9px;">上榜'+x.n+'次</span></span>'
+            +'<span style="font-weight:700;white-space:nowrap;color:'+color+';">'+sgn(x[key])+fmtWan(x[key])
+            +' <span style="color:var(--dim);font-weight:400;font-size:10px;">买'+fmtWan(x.buy)+'/卖'+fmtWan(x.sell)+'</span></span>'
+            +'</div>';
+        });
+        return h;
+      }
+
+      function renderAll(){
+        var days=window._rcDays();
+        var buyEl=$('rcNorthTopBuy'), sellEl=$('rcNorthTopSell'), rangeEl=$('rcNorthRange');
+        if(!days.length){
+          if(buyEl) buyEl.innerHTML='<div class="ipo-empty">暂无龙虎榜数据</div>';
+          if(sellEl) sellEl.innerHTML='<div class="ipo-empty">暂无龙虎榜数据</div>';
+          var mc=$('rcNorthMonthCal');
+          if(mc) mc.innerHTML='<div class="ipo-empty">暂无历史数据（需 data/LHB_HISTORY.js）</div>';
+          return;
+        }
+        renderNorthMonth(days);
+
+        var agg=aggByCode(days);
+        var top=agg.filter(function(x){return x.net>0;}).sort(function(a,b){return b.net-a.net;}).slice(0,5);
+        var bot=agg.filter(function(x){return x.net<0;}).sort(function(a,b){return a.net-b.net;}).slice(0,5);
+        if(buyEl) buyEl.innerHTML=rowsHtml(top,'var(--up)','net');
+        if(sellEl) sellEl.innerHTML=rowsHtml(bot,'var(--down)','net');
+        if(rangeEl) rangeEl.textContent=days[0].iso+' ~ '+days[days.length-1].iso+' · '+days.length+'个交易日';
+      }
+
+      window._renderRcNorthTab=function(){ try{ renderAll(); }catch(e){ console.error('rcNorthTab',e); } };
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',window._renderRcNorthTab);
+      else window._renderRcNorthTab();
+    })();
+    </script>
+
+    <script>
+    /* ===== TAB3: 每日洞察（涨跌概况 / 资金流向 / 热点板块 / 异动信号） ===== */
+    (function(){
+      const $=id=>document.getElementById(id);
+      function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
+      function pct(v){ return (v>=0?'+':'')+Number(v||0).toFixed(2)+'%'; }
+      function pcolor(v){ return v>0?'var(--up)':v<0?'var(--down)':'var(--dim)'; }
+      function fmtWan(w){
+        if(w==null) return '-';
+        var a=Math.abs(w);
+        if(a>=10000) return (w/10000).toFixed(2)+'亿';
+        return Math.round(w).toLocaleString('zh-CN')+'万';
+      }
+
+      function renderIndex(){
+        var el=$('rcInsightIndex'); if(!el) return;
+        var items=(window.INDEX_QUOTES&&window.INDEX_QUOTES.items)||[];
+        if(!items.length){
+          var al=(window.MARKET_ALERTS&&window.MARKET_ALERTS.indices)||[];
+          if(!al.length){ el.innerHTML='<div class="ipo-empty">暂无指数数据</div>'; return; }
+          var h0='';
+          al.forEach(function(x){
+            h0+='<div class="rc-row"><span class="nm">'+esc(x.name)+'</span><b style="color:'+pcolor(x.pct)+';">'+pct(x.pct)+'</b></div>';
+          });
+          el.innerHTML=h0; return;
+        }
+        var h='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px;margin-bottom:8px;">';
+        items.slice(0,6).forEach(function(x){
+          h+='<div style="background:var(--bg2);border-radius:8px;padding:8px;text-align:center;">'
+            +'<div style="font-size:10px;color:var(--sub);">'+esc(x.short||x.name)+'</div>'
+            +'<div style="font-size:15px;font-weight:800;color:'+pcolor(x.chg)+';">'+Number(x.price||0).toFixed(2)+'</div>'
+            +'<div style="font-size:11px;font-weight:700;color:'+pcolor(x.chg)+';">'+pct(x.chg)+'</div>'
+            +'</div>';
+        });
+        h+='</div>';
+        var amt=items.slice(0,3).reduce(function(s,x){return s+(x.amount||0);},0);
+        if(amt>0) h+='<div style="font-size:11px;color:var(--dim);">沪深创成交合计约 <b style="color:var(--txt);">'+amt.toFixed(0)+'亿</b></div>';
+        el.innerHTML=h;
+      }
+
+      function renderFlow(){
+        var el=$('rcInsightFlow'); if(!el) return;
+        var d=(window.MARKET_FUND_FLOW_DATA&&window.MARKET_FUND_FLOW_DATA.daily)||[];
+        var h='';
+        if(d.length){
+          var last=d[d.length-1];
+          var l5=d.slice(-5).reduce(function(s,x){return s+(x.net_yi||0);},0);
+          var l20=d.slice(-20).reduce(function(s,x){return s+(x.net_yi||0);},0);
+          h+='<div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px;">';
+          [['当日',last.net_yi],['近5日',l5],['近20日',l20]].forEach(function(p){
+            h+='<div style="text-align:center;min-width:70px;">'
+              +'<div style="font-size:15px;font-weight:800;color:'+pcolor(p[1])+';">'+(p[1]>=0?'+':'')+Number(p[1]).toFixed(0)+'</div>'
+              +'<div style="font-size:9px;color:var(--sub);">'+p[0]+'主力净额(亿)</div></div>';
+          });
+          h+='</div>';
+        }
+        var lhb=window.LHB_DATA||{};
+        var stocks=lhb.stocks||[];
+        if(stocks.length){
+          var inst=stocks.reduce(function(s,x){return s+(x.inst_net_万||0);},0);
+          var yz=stocks.reduce(function(s,x){return s+(x.yz_net_万||0);},0);
+          var north=window._rcNorthOf(stocks).reduce(function(s,x){return s+x.net;},0);
+          h+='<div class="rc-h" style="color:var(--sub);">龙虎榜席位净额</div>';
+          [['🏛 机构',inst,'var(--cyan)'],['⚡ 游资',yz,'var(--gold)'],['🌊 北向席位',north,'var(--north)']].forEach(function(p){
+            h+='<div class="rc-row"><span class="nm" style="color:'+p[2]+';">'+p[0]+'</span>'
+              +'<b style="color:'+pcolor(p[1])+';">'+(p[1]>=0?'+':'')+fmtWan(p[1])+'</b></div>';
+          });
+        }
+        el.innerHTML=h||'<div class="ipo-empty">暂无资金流数据</div>';
+      }
+
+      function renderSector(){
+        var el=$('rcInsightSector'); if(!el) return;
+        var tl=(window.SECTOR_FUND_FLOW&&window.SECTOR_FUND_FLOW.top_list)||[];
+        var h='';
+        if(tl.length){
+          var inn=tl.filter(function(x){return (x.net||0)>0;}).sort(function(a,b){return b.net-a.net;}).slice(0,6);
+          var out=tl.filter(function(x){return (x.net||0)<0;}).sort(function(a,b){return a.net-b.net;}).slice(0,4);
+          h+='<div class="rc-h" style="color:var(--up);">资金流入 TOP6</div>';
+          inn.forEach(function(x){
+            h+='<div class="rc-row"><span class="nm">'+esc(x.name)+' <span style="color:var(--dim);font-size:9px;">'+esc(x.type||'')+'</span></span>'
+              +'<span style="white-space:nowrap;"><b style="color:var(--up);">+'+Number(x.net).toFixed(1)+'亿</b> '
+              +'<span style="color:'+pcolor(x.chg)+';font-size:10px;">'+pct(x.chg)+'</span></span></div>';
+          });
+          if(out.length){
+            h+='<div class="rc-h" style="color:var(--down);">资金流出 TOP4</div>';
+            out.forEach(function(x){
+              h+='<div class="rc-row"><span class="nm">'+esc(x.name)+'</span>'
+                +'<b style="color:var(--down);">'+Number(x.net).toFixed(1)+'亿</b></div>';
+            });
+          }
+        }
+        var lu=window.LIMIT_UP_HEATMAP;
+        if(lu && lu.sectors && lu.dates && lu.dates.length){
+          var li=lu.dates.length-1;
+          var hot=lu.sectors.map(function(s){ return {name:s.name, n:(s.data&&s.data[li])||0}; })
+            .filter(function(s){ return s.n>0 && s.name!=='其他'; })
+            .sort(function(a,b){ return b.n-a.n; }).slice(0,6);
+          if(hot.length){
+            h+='<div class="rc-h" style="color:var(--gold);">涨停板块（'+esc(lu.dates[li])+'）</div>';
+            h+='<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:11px;">';
+            hot.forEach(function(s){
+              h+='<span style="background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:2px 10px;color:var(--txt);">'
+                +esc(s.name)+' <b style="color:var(--gold);">'+s.n+'</b></span>';
+            });
+            h+='</div>';
+          }
+        }
+        el.innerHTML=h||'<div class="ipo-empty">暂无板块数据</div>';
+      }
+
+      function renderAlert(){
+        var el=$('rcInsightAlert'); if(!el) return;
+        var h='';
+        var lhb=window.LHB_DATA||{};
+        var stocks=lhb.stocks||[];
+        var sum=lhb.summary||{};
+        if(stocks.length){
+          h+='<div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px;">';
+          [['机游共振','#ffd54f','★'],['机构独买','var(--cyan)','🏛'],['游资独买','var(--gold)','⚡'],['总计','var(--sub)','Σ']].forEach(function(c){
+            h+='<div style="text-align:center;min-width:52px;">'
+              +'<div style="font-size:16px;font-weight:800;color:'+c[1]+';">'+(sum[c[0]]||0)+'</div>'
+              +'<div style="font-size:9px;color:var(--sub);">'+c[2]+' '+c[0]+'</div></div>';
+          });
+          h+='</div>';
+          var res=stocks.filter(function(s){return s.category==='机游共振';})
+            .sort(function(a,b){ return ((b.inst_net_万||0)+(b.yz_net_万||0))-((a.inst_net_万||0)+(a.yz_net_万||0)); }).slice(0,5);
+          h+='<div class="rc-h" style="color:#ffd54f;">★ 当日共振异动</div>';
+          if(res.length){
+            res.forEach(function(s){
+              h+='<div class="rc-row"><span class="nm">'+esc(s.name)+' <span style="color:var(--dim);font-size:9px;">'+esc(s.code)+'</span>'
+                +' <span style="color:var(--dim);font-size:9px;">'+esc(String(s.reason||'').slice(0,14))+'</span></span>'
+                +'<span style="white-space:nowrap;"><b style="color:'+pcolor(s.pct)+';">'+pct(s.pct)+'</b> '
+                +'<span style="color:var(--cyan);font-size:10px;">机'+fmtWan(s.inst_net_万)+'</span> '
+                +'<span style="color:var(--gold);font-size:10px;">游'+fmtWan(s.yz_net_万)+'</span></span></div>';
+            });
+          } else h+='<div style="font-size:11px;color:var(--dim);">今日无机游共振标的</div>';
+        }
+        var SA=window.SUSPENSION_ALERT||{};
+        var sus=SA.stocks||SA.items||[];
+        if(sus.length){
+          h+='<div class="rc-h" style="color:var(--purple);">⏸ 停牌提示（'+sus.length+'只）</div>';
+          h+='<div style="font-size:11px;color:var(--sub);">'+sus.slice(0,6).map(function(x){return esc(x.name||x.code||'');}).join(' · ')+'</div>';
+        }
+        el.innerHTML=h||'<div class="ipo-empty">暂无异动信号</div>';
+      }
+
+      function renderSummary(){
+        var el=$('rcInsightSummary'); if(!el) return;
+        var A=window.MARKET_ALERTS||{};
+        var items=(window.INDEX_QUOTES&&window.INDEX_QUOTES.items)||[];
+        var lhb=window.LHB_DATA||{};
+        var sum=lhb.summary||{};
+        var parts=[];
+        if(items.length){
+          parts.push('主要指数：'+items.slice(0,4).map(function(x){
+            return esc(x.short||x.name)+' <b style="color:'+pcolor(x.chg)+';">'+pct(x.chg)+'</b>';
+          }).join(' · '));
+        } else if(A.summary){
+          parts.push(esc(A.summary));
+        }
+        var d=(window.MARKET_FUND_FLOW_DATA&&window.MARKET_FUND_FLOW_DATA.daily)||[];
+        if(d.length){
+          var lastN=d[d.length-1].net_yi||0;
+          parts.push('主力资金当日净'+(lastN>=0?'流入':'流出')+' <b style="color:'+pcolor(lastN)+';">'+Math.abs(lastN).toFixed(0)+'亿</b>');
+        }
+        if(lhb.stocks && lhb.stocks.length){
+          parts.push('龙虎榜上榜 <b style="color:var(--txt);">'+(sum['总计']||lhb.stocks.length)+'</b> 只，其中机游共振 <b style="color:#ffd54f;">'+(sum['机游共振']||0)+'</b> 只');
+        }
+        var tl=(window.SECTOR_FUND_FLOW&&window.SECTOR_FUND_FLOW.top_list)||[];
+        if(tl.length){
+          var t3=tl.filter(function(x){return (x.net||0)>0;}).sort(function(a,b){return b.net-a.net;}).slice(0,3);
+          if(t3.length) parts.push('资金主攻：'+t3.map(function(x){return esc(x.name)+'(+'+Number(x.net).toFixed(0)+'亿)';}).join('、'));
+        }
+        el.innerHTML = parts.length ? parts.map(function(p){ return '<div>• '+p+'</div>'; }).join('') : '<div class="ipo-empty">暂无当日数据</div>';
+        var t=$('rcInsightTime');
+        if(t){
+          var ts=A.update_time||lhb.update_time||'';
+          if(ts) t.textContent='更新于 '+ts;
+        }
+      }
+
+      function renderAll(){
+        try{ renderSummary(); }catch(e){ console.error('rcSummary',e); }
+        try{ renderIndex(); }catch(e){ console.error('rcIndex',e); }
+        try{ renderFlow(); }catch(e){ console.error('rcFlow',e); }
+        try{ renderSector(); }catch(e){ console.error('rcSector',e); }
+        try{ renderAlert(); }catch(e){ console.error('rcAlert',e); }
+      }
+
+      window._renderRcInsight=renderAll;
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderAll);
+      else renderAll();
+    })();
+    </script>
+
+    <script>
+    /* ===== TAB4: 大牛股猎手（新赛道 / 早期信号 / 核心共振） ===== */
+    (function(){
+      const $=id=>document.getElementById(id);
+      function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
+      function fmtWan(w){
+        if(w==null) return '-';
+        var a=Math.abs(w);
+        if(a>=10000) return (w/10000).toFixed(2)+'亿';
+        return Math.round(w).toLocaleString('zh-CN')+'万';
+      }
+      function pct(v){ return (v>=0?'+':'')+Number(v||0).toFixed(1)+'%'; }
+      function empty(msg){ return '<div style="font-size:11px;color:var(--dim);padding:6px 0;">'+msg+'</div>'; }
+
+      function row(name, code, right, color){
+        return '<div class="rc-row"><span class="nm">'+esc(name)
+          +' <span style="color:var(--dim);font-size:9px;">'+esc(code)+'</span></span>'
+          +'<span style="white-space:nowrap;color:'+(color||'var(--txt)')+';font-weight:700;">'+right+'</span></div>';
+      }
+
+      function renderAll(){
+        var freshEl=$('rcBullFresh'), earlyEl=$('rcBullEarly'), coreEl=$('rcBullCore'), rangeEl=$('rcBullRange');
+        var days=window._rcDays();
+        if(!days.length){
+          if(freshEl) freshEl.innerHTML='<div class="ipo-empty">暂无数据</div>';
+          if(earlyEl) earlyEl.innerHTML='<div class="ipo-empty">暂无数据</div>';
+          if(coreEl) coreEl.innerHTML='<div class="ipo-empty">暂无数据</div>';
+          return;
+        }
+        if(rangeEl) rangeEl.textContent=days[0].iso+' ~ '+days[days.length-1].iso+' · '+days.length+'个交易日';
+
+        // 1) 核心共振标的：区间内共振次数 >= 2
+        var freq={}, nameOf={};
+        days.forEach(function(d){
+          d.stocks.forEach(function(s){
+            nameOf[s.code]=s.name;
+            if(s.category==='机游共振') freq[s.code]=(freq[s.code]||0)+1;
+          });
+        });
+        var core=Object.keys(freq).map(function(c){ return {code:c,name:nameOf[c]||c,n:freq[c]}; })
+          .filter(function(x){ return x.n>=2; }).sort(function(a,b){ return b.n-a.n; }).slice(0,10);
+        if(coreEl){
+          coreEl.innerHTML = core.length
+            ? core.map(function(t){ return row(t.name,t.code,t.n+'次','#ffd54f'); }).join('')
+            : empty(days.length<2 ? '历史样本不足（需多日数据）' : '区间内暂无重复共振标的');
+        }
+
+        // 2) 早期信号雷达：北向席位连续净买
+        var byCode={};
+        days.forEach(function(d){
+          window._rcNorthOf(d.stocks).forEach(function(x){
+            (byCode[x.code]=byCode[x.code]||[]).push({date:d.iso,net:x.net,name:x.name});
+          });
+        });
+        var early=[];
+        Object.keys(byCode).forEach(function(c){
+          var arr=byCode[c].sort(function(a,b){ return a.date<b.date?-1:1; });
+          var run=0,best=0,acc=0;
+          arr.forEach(function(x){ if(x.net>0){ run++; acc+=x.net; if(run>best) best=run; } else run=0; });
+          if(best>=1 && acc>0) early.push({code:c,name:arr[arr.length-1].name,best:best,acc:acc});
+        });
+        early=early.sort(function(a,b){ return (b.best-a.best)||(b.acc-a.acc); }).slice(0,10);
+        if(earlyEl){
+          earlyEl.innerHTML = early.length
+            ? early.map(function(t){ return row(t.name,t.code,'<span style="color:#06b6d4;">连'+t.best+'天</span> <span style="color:var(--dim);font-weight:400;">'+fmtWan(t.acc)+'</span>','#06b6d4'); }).join('')
+            : empty('区间内无北向席位净买记录');
+        }
+
+        // 3) 新赛道发现：近5日共振 且 之前10日未出现
+        var recent=days.slice(-5), prior=days.slice(-15,-5);
+        var priorSet={};
+        prior.forEach(function(d){ d.stocks.forEach(function(s){ if(s.category==='机游共振') priorSet[s.code]=1; }); });
+        var seen={}, fresh=[];
+        recent.forEach(function(d){
+          d.stocks.forEach(function(s){
+            if(s.category!=='机游共振') return;
+            if(priorSet[s.code] || seen[s.code]) return;
+            seen[s.code]=1;
+            fresh.push({code:s.code,name:s.name,pct:s.pct||0,reason:s.reason||'',date:d.iso});
+          });
+        });
+        fresh=fresh.slice(0,10);
+        if(freshEl){
+          freshEl.innerHTML = fresh.length
+            ? fresh.map(function(s){ return row(s.name,s.code,'<span style="color:'+(s.pct>=0?'var(--up)':'var(--down)')+';">'+pct(s.pct)+'</span> <span style="color:var(--dim);font-weight:400;font-size:10px;">'+esc(s.date.slice(5))+'</span>','#f472b6'); }).join('')
+            : empty('近5日无新晋共振标的');
+        }
+      }
+
+      window._renderRcBull=function(){ try{ renderAll(); }catch(e){ console.error('rcBull',e); } };
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',window._renderRcBull);
+      else window._renderRcBull();
+    })();
+    </script>
+
   </section>
 
   <!-- ============ 运维（管理员） ============ -->
@@ -2742,26 +3359,60 @@ function switchSec(sec,el){
     if(!q) return [];
     const qc = normCode(q);
     const ql = q.toLowerCase();
-    return list.filter(s=>{
-      if(!s || !s.code || !s.name) return false;
-      const sc = normCode(s.code);
-      const sn = s.name.toLowerCase();
-      return sc===qc || sc.indexOf(qc)===0 || sn.indexOf(ql)!==-1 || (s.full_code||'').toLowerCase().indexOf(ql)!==-1 || (s.py||'').toLowerCase().indexOf(ql)!==-1;
-    }).slice(0,limit);
+    const isAlphaOnly = qc === '' && ql.length > 0;
+    // 打分排序：py前缀=4, py子串=3, name子串=2, code前缀=1, full_code子串=1
+    const scored = [];
+    for(let i=0;i<list.length;i++){
+      const s=list[i]; if(!s||!s.code||!s.name) continue;
+      const sc=normCode(s.code), sn=s.name.toLowerCase(), py=(s.py||'').toLowerCase(), fc=(s.full_code||'').toLowerCase();
+      let score=0;
+      if(isAlphaOnly){
+        // 纯字母搜索：拼音优先，不靠code空串匹配
+        if(py===ql) score=5;
+        else if(py.indexOf(ql)===0) score=4;
+        else if(py.indexOf(ql)!==-1) score=3;
+        else if(sn.indexOf(ql)!==-1) score=2;
+        else if(fc.indexOf(ql)!==-1) score=1;
+      } else {
+        if(sc===qc) score=4;
+        else if(sc.indexOf(qc)===0) score=3;
+        if(sn.indexOf(ql)!==-1) score=Math.max(score,2);
+        if(fc.indexOf(ql)!==-1) score=Math.max(score,1);
+        if(py.indexOf(ql)!==-1) score=Math.max(score, py===ql?5:py.indexOf(ql)===0?4:3);
+      }
+      if(score>0) scored.push({s,score,idx:i});
+    }
+    scored.sort((a,b)=>b.score-a.score||a.idx-b.idx);
+    return scored.slice(0,limit).map(x=>x.s);
   }
   function findOne(q){
     const list = window.STOCK_LIST || [];
     const qc = normCode(q);
     const ql = q.toLowerCase();
-    return list.find(s=>{
-      if(!s || !s.code || !s.name) return false;
-      return normCode(s.code)===qc || s.name===q || s.name.toLowerCase()===ql;
-    }) || list.find(s=>{
-      if(!s || !s.code || !s.name) return false;
-      const sc = normCode(s.code);
-      const sn = s.name.toLowerCase();
-      return sc.indexOf(qc)===0 || sn.indexOf(ql)!==-1 || (s.py||'').toLowerCase().indexOf(ql)!==-1;
+    const isAlphaOnly = qc === '' && ql.length > 0;
+    // 精确匹配
+    let exact = list.find(s=>{
+      if(!s||!s.code||!s.name) return false;
+      return normCode(s.code)===qc || s.name===q || s.name.toLowerCase()===ql || (isAlphaOnly && (s.py||'').toLowerCase()===ql);
     });
+    if(exact) return exact;
+    // 模糊匹配（打分取最高）
+    let best=null, bestScore=-1;
+    for(let i=0;i<list.length;i++){
+      const s=list[i]; if(!s||!s.code||!s.name) continue;
+      const sc=normCode(s.code), sn=s.name.toLowerCase(), py=(s.py||'').toLowerCase(), fc=(s.full_code||'').toLowerCase();
+      let score=0;
+      if(isAlphaOnly){
+        if(py.indexOf(ql)===0) score=4; else if(py.indexOf(ql)!==-1) score=3;
+        else if(sn.indexOf(ql)!==-1) score=2; else if(fc.indexOf(ql)!==-1) score=1;
+      } else {
+        if(sc.indexOf(qc)===0) score=3;
+        if(sn.indexOf(ql)!==-1) score=Math.max(score,2);
+        if(py.indexOf(ql)!==-1) score=Math.max(score,3);
+      }
+      if(score>bestScore){ bestScore=score; best=s; }
+    }
+    return best;
   }
 
   window.showV8QueryDropdown = function(val){
@@ -3636,17 +4287,34 @@ function renderLimitUpHeatmap(){
     // 4. 渲染
     const hubVerdict=$('hubVerdict');
     if(hubVerdict){
-      hubVerdict.innerHTML=
-        '<div class="hub-verdict-score" style="color:'+actionColor+'">'+deg+'°</div>'+
-        '<div class="hub-verdict-main">'+
-          '<div class="hub-verdict-title">'+action+' · '+cycle+'</div>'+
-          '<div class="hub-verdict-sub">'+styleBias+'</div>'+
-          '<div class="hub-verdict-action">建议仓位 '+position+' ｜ 技术'+techScore+' 资金'+fundScore+' 机构'+instScore+'</div>'+
-        '</div>'+
-        '<div style="margin-left:auto;text-align:right;min-width:140px">'+
-          '<div style="font-size:12px;color:var(--dim);margin-bottom:4px">危机雷达</div>'+
-          '<div style="font-size:18px;font-weight:800;color:'+(crisisScore>=0.5?'var(--down)':'var(--cyan)')+'">'+(crisisScore*100).toFixed(0)+'</div>'+
-        '</div>';
+            hubVerdict.innerHTML=
+        (function(){
+          var bannerBg = actionColor==='var(--up)'?'rgba(239,68,68,.10)':actionColor==='var(--down)'?'rgba(34,197,94,.10)':'rgba(234,179,8,.10)';
+          var tColor = techScore>=7?'var(--up)':techScore<=3?'var(--down)':'var(--gold)';
+          var fColor = fundScore>=7?'var(--up)':fundScore<=3?'var(--down)':'var(--gold)';
+          var iColor = instScore>=7?'var(--up)':instScore<=3?'var(--down)':'var(--gold)';
+          var crColor = crisisScore>=0.5?'var(--down)':'var(--cyan)';
+          var chip = function(c,col){return '<span style="display:inline-block;padding:3px 10px;border-radius:999px;border:1px solid '+col+';color:var(--txt);font-size:12px;font-weight:600">'+c+'</span>';};
+          return '<div style="border-left:6px solid '+actionColor+';background:'+bannerBg+';border-radius:14px;padding:16px 20px;">'+
+            '<div style="display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;">'+
+              '<div style="min-width:200px">'+
+                '<div style="font-size:24px;font-weight:900;color:'+actionColor+'">'+action+'</div>'+
+                '<div style="font-size:13px;color:var(--txt);margin-top:4px;">周期 <b style="color:'+cycleColor+'">'+cycle+'</b> \u00b7 '+styleBias+'</div>'+
+                '<div style="font-size:13px;color:var(--sub);margin-top:6px;">建议仓位 <b style="color:var(--txt)">'+position+'</b></div>'+
+              '</div>'+
+              '<div style="text-align:center">'+
+                '<div style="font-size:46px;font-weight:900;line-height:1;color:'+actionColor+'">'+deg+'\u00b0</div>'+
+                '<div style="font-size:11px;color:var(--sub);margin-top:2px">战术温度</div>'+
+              '</div>'+
+            '</div>'+
+            '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">'+
+              chip('技术面 '+techScore+'/10', tColor)+
+              chip('资金面 '+fundScore+'/10', fColor)+
+              chip('机构面 '+instScore+'/10', iColor)+
+              chip('危机雷达 '+(crisisScore*100).toFixed(0), crColor)+
+            '</div>'+
+          '</div>';
+        })();
     }
 
     const hubCycle=$('hubCycle');
@@ -3755,20 +4423,24 @@ function renderLimitUpHeatmap(){
 
     const bar=(label,score,detail,color)=>{
       const pct=score*10;
-      return '<div style="margin-bottom:12px">'+
-        '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">'+
-          '<span>'+label+' <span style="color:var(--dim)">'+detail+'</span></span>'+
-          '<span style="font-weight:700;color:'+color+'">'+score+'/10</span>'+
+      const bgColor = score>=7 ? (color||'#1fd17b') : (score>=4 ? (color||'#fbbf24') : (color||'#f4495d'));
+      return '<div style="background:'+bgColor+'22;border:1px solid '+bgColor+'44;border-radius:10px;padding:14px 16px;">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'+
+          '<span style="font-size:13px;font-weight:700;color:var(--txt)">'+label+'</span>'+
+          '<span style="font-size:22px;font-weight:800;color:'+color+'">'+score+'/10</span>'+
         '</div>'+
-        '<div style="height:8px;background:var(--bg2);border-radius:4px;overflow:hidden">'+
-          '<div style="width:'+pct+'%;height:100%;background:'+color+'"></div>'+
+        '<div style="height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden">'+
+          '<div style="width:'+pct+'%;height:100%;background:'+color+';border-radius:3px"></div>'+
         '</div>'+
+        '<div style="margin-top:6px;font-size:11px;color:var(--sub);line-height:1.5">'+detail+'</div>'+
       '</div>';
     };
-    const h='<div style="font-size:12px;color:var(--dim);margin-bottom:14px">综合评分 <b style="color:'+mainColor+'">'+deg+'°</b> · '+word+' · '+subText+'</div>'+
-      bar('📉 技术面',techScore,techDetail.join(' · '),mainColor)+
-      bar('💰 资金面',fundScore,fundDetail.join(' · '),mainColor)+
-      bar('🏛 机构面',instScore,instDetail.join(' · '),mainColor);
+    const h='<div style="font-size:13px;color:var(--dim);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;"><span>综合评分 <b style="color:'+mainColor+';font-size:18px">'+deg+'°</b> · '+word+'</span><span style="font-size:12px">'+subText+'</span></div>'+
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">'+
+      bar('📉 技术面',techScore,techDetail.join(' · ')||'震荡整理',techScore>=7?'#1fd17b':techScore>=4?'#fbbf24':'#f4495d')+
+      bar('💰 资金面',fundScore,fundDetail.join(' · ')||'多空平衡',fundScore>=7?'#1fd17b':fundScore>=4?'#fbbf24':'#f4495d')+
+      bar('🏛 机构面',instScore,instDetail.join(' · ')||'观望为主',instScore>=7?'#1fd17b':instScore>=4?'#fbbf24':'#f4495d')+
+      '</div>';
     $('phThermoBody').innerHTML=h;
     setTime('phThermoTime',fib.update_time||sf.update_time||margin.update_time);
   }
@@ -3970,7 +4642,7 @@ function renderLimitUpHeatmap(){
       series.push({
         name: '单日净流入(亿)', type: 'bar', yAxisIndex: 0, data: nets,
         itemStyle: { color: function(p){ return p.value >= 0 ? upColor : downColor; } },
-        barMaxWidth: 18, barGap: '-100%'
+        barMaxWidth: 10, barGap: '-80%'
       });
     }
     if(__MFF_SHOW_CUM){
@@ -3987,7 +4659,7 @@ function renderLimitUpHeatmap(){
     }
     var option = {
       backgroundColor: 'transparent',
-      grid: { left: 55, right: 55, top: 35, bottom: 70 },
+      grid: { left: 45, right: 45, top: 28, bottom: 78 },
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'cross', link: [{xAxisIndex: 'all'}] },
@@ -4033,8 +4705,8 @@ function renderLimitUpHeatmap(){
         }
       ],
       dataZoom: [
-        { type: 'inside', xAxisIndex: 0, start: 0, end: 100 },
-        { type: 'slider', xAxisIndex: 0, height: 20, bottom: 10, start: 0, end: 100, fillerColor: 'rgba(239,68,68,0.25)', borderColor: gridColor, textStyle: { color: dimColor } }
+        { type: 'inside', xAxisIndex: 0, start: 20, end: 100 },
+        { type: 'slider', xAxisIndex: 0, height: 22, bottom: 8, start: 20, end: 100, fillerColor: 'rgba(239,68,68,0.2)', borderColor: gridColor, textStyle: { color: dimColor, fontSize: 10 } }
       ],
       series: series
     };
@@ -4183,12 +4855,12 @@ function renderLimitUpHeatmap(){
   /* ---- ETF 资金热度（4 大类 TOP5流入+TOP5流出，横向 bar） ---- */
   function renderEtfHeatByCategory(etfHeat){
     if(!etfHeat||!etfHeat.categories) return;
-    const catNames=['宽基','行业','主题','跨境'];
-    const colorMap={宽基:'var(--cyan)',行业:'var(--purple)',主题:'var(--gold)',跨境:'var(--pink)'};
-    const fmtYi=v=>{const a=Math.abs(v);if(a>=1e8)return(v/1e8).toFixed(1)+'万亿';if(a>=1e4)return(v/1e4).toFixed(1)+'亿';return(v/1e4).toFixed(2)+'亿';};
+    const catNames=['宽基','行业','主题','跨境','商品','货币'];
+    const colorMap={宽基:'var(--cyan)',行业:'var(--purple)',主题:'var(--gold)',跨境:'var(--pink)',商品:'var(--up)',货币:'var(--down)'};
+    const fmtYi=v=>{const a=Math.abs(v);if(a>=1e4)return(v/1e4).toFixed(1)+'亿';if(a>=1)return(v/1).toFixed(1)+'万';return(v/1).toFixed(1);};
     const fmtPct=p=>(p>=0?'+':'')+p.toFixed(2)+'%';
     // summary
-    let shtml='<span style="color:var(--dim)">4 大类净流入汇总：</span>';
+    let shtml='<span style="color:var(--dim)">6 大类净流入汇总：</span>';
     catNames.forEach(cn=>{
       const c=etfHeat.categories[cn]; if(!c) return;
       const yi=c.net_inflow_yi||0, c2=yi>=0?'var(--up)':'var(--down)';
@@ -4272,18 +4944,18 @@ function renderLimitUpHeatmap(){
       return;
     }
     var h='<div style="padding:8px 4px;">';
-    h+='<div style="font-size:11px;color:var(--sub);margin-bottom:8px;">全市场净流入：<span style="color:'+(daily.total_net>=0?'var(--up)':'var(--down)')+';font-weight:700;">'+(daily.total_net>=0?'+':'')+(daily.total_net/1e4).toFixed(0)+'万</span> · 覆盖 '+(daily.total_etf||0)+' 只</div>';
-    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">';
+    h+='<div style="font-size:11px;color:var(--sub);margin-bottom:8px;">全市场净流入：<span style="color:'+(daily.total_net>=0?'var(--up)':'var(--down)')+';font-weight:700;">'+(daily.total_net>=0?'+':'')+(daily.total_net/1e8).toFixed(2)+'亿</span> · 覆盖 '+(daily.total_etf||0)+' 只</div>';
+    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">';
     h+='<div>';
     h+='<div style="font-weight:700;font-size:11px;color:var(--up);margin-bottom:6px;">TOP5 主力净流入</div>';
     (daily.top_inflow||[]).slice(0,5).forEach(function(x){
-      h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px dashed var(--border);"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:6px;">'+x.name+'</span><span style="color:var(--up);font-weight:700;flex-shrink:0;">+'+(x.net/1e4).toFixed(0)+'万</span></div>';
+      h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px dashed var(--border);"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:6px;">'+x.name+'</span><span style="color:var(--up);font-weight:700;flex-shrink:0;">+'+(x.net/1e8).toFixed(2)+'亿</span></div>';
     });
     h+='</div>';
     h+='<div>';
     h+='<div style="font-weight:700;font-size:11px;color:var(--down);margin-bottom:6px;">TOP5 主力净流出</div>';
     (daily.top_outflow||[]).slice(0,5).forEach(function(x){
-      h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px dashed var(--border);"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:6px;">'+x.name+'</span><span style="color:var(--down);font-weight:700;flex-shrink:0;">'+(x.net/1e4).toFixed(0)+'万</span></div>';
+      h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px dashed var(--border);"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:6px;">'+x.name+'</span><span style="color:var(--down);font-weight:700;flex-shrink:0;">'+(x.net/1e8).toFixed(2)+'亿</span></div>';
     });
     h+='</div>';
     h+='</div>';
@@ -5508,11 +6180,12 @@ function renderLimitUpHeatmap(){
         h+='<div style="font-size:15px;font-weight:700;color:#d0bcff;line-height:1.4;">'+next.name+' '+next.date+' '+_fmtWeekday(next.date)+'</div>';
         h+='<div style="font-size:11px;color:var(--sub);margin-top:3px;">距今 '+(next.days_left>=0?next.days_left:0)+' 天 · '+(next.desc||'')+'</div>';
         h+='</div>';
-        h+='<div style="font-size:11px;color:var(--sub);line-height:1.6;margin-bottom:2px;">📅 全部待观窗口：</div>';
+        h+='<div style="font-size:11px;color:var(--sub);line-height:1.6;margin-bottom:2px;">📅 全部待观测窗口：</div>';
         h+='<div style="font-size:11px;color:var(--txt);line-height:1.7;">';
+        var fibDescMap={'F(3)':'小反弹窗口','F(5)':'短期变盘','F(8)':'8日变盘','F(13)':'13日重要窗口','F(21)':'21日大窗口·中期转折','F(34)':'34日中期窗口·趋势确认','F(55)':'55日长期窗口·大周期拐点'};
         future.forEach(function(w){
           h+='<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.06);padding:3px 0;">';
-          h+='<span>'+w.name+' <span style="color:var(--sub);">'+w.date+' '+_fmtWeekday(w.date)+'</span></span>';
+          h+='<span>'+w.name+' <span style="color:var(--sub);">'+w.date+' '+_fmtWeekday(w.date)+'</span> <span style="color:'+(w.desc?'#a78bfa':'var(--dim)')+';font-size:10px;">'+(fibDescMap[w.name]||w.desc||'')+'</span></span>';
           h+='<span style="color:var(--sub);">距今'+(w.days_left>=0?w.days_left:0)+'天</span>';
           h+='</div>';
         });

@@ -3,7 +3,23 @@ __pycache__/
 *.pyo
 .DS_Store
 .workbuddy/
+# 临时文件（_ 开头 / 脚本检查切片 / 日志 / 缓存）
+_*/
+_tmp_*/
+*.log
+*.err
+*.tmp
+*.bak
+nul
+# Token / 密钥（防泄露）
+.neodata_token
+.gh_pat
+*token*.json
+*.jwt_cache
 # 算法 staging / 生成数据（脚本和工作流会重建）
 algorithms/data/
 algorithms/out/
 out/
+# 冲突文件（双机同步残留）
+*-冲突-*
+*-conflict-*

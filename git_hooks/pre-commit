@@ -1,0 +1,77 @@
+#!/bin/bash
+# ============================================================
+# pre-commit 钩子 — 阻止删除 DO_NOT_DELETE.md 中登记的"不得删除"文件
+# 安装: cp git_hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+#       本副本提交在 git_hooks/pre-commit，双机 pull 后各自安装即可。
+#
+# 继承自 v6（stock-scanner/git_hooks/pre-commit），2026-07-12 修复版
+# 适配 v8 仓库结构（quant-scanner-v8）
+# ============================================================
+set -u
+
+ROOT="$(git rev-parse --show-toplevel)"
+
+# 优先 .md，回退 .txt
+if [ -f "$ROOT/DO_NOT_DELETE.md" ]; then
+  REGISTRY="$ROOT/DO_NOT_DELETE.md"
+elif [ -f "$ROOT/DO_NOT_DELETE.txt" ]; then
+  REGISTRY="$ROOT/DO_NOT_DELETE.txt"
+else
+  # 清单不存在则放行
+  exit 0
+fi
+
+# 本次提交中被删除(状态 D)的文件
+DELETED="$(git diff --cached --name-only --diff-filter=D)"
+if [ -z "$DELETED" ]; then
+  exit 0
+fi
+
+# 解析受保护清单: 从 markdown 表格提取第一列的路径/通配符
+PROTECTED="$(grep -vE '^[[:space:]]*#' "$REGISTRY" \
+  | grep -vE '^[[:space:]]*$' \
+  | grep -E '\|' \
+  | grep -vE '^\|[[:space:]]*-+\|' \
+  | while IFS= read -r line; do
+      cell=$(echo "$line" | sed -E 's/^[[:space:]]*\|[[:space:]]*//; s/[[:space:]]*\|.*$//')
+      cell=$(echo "$cell" | tr -d '`')
+      tok=$(echo "$cell" | awk '{print $1}')
+      [ -z "$tok" ] && continue
+      [[ "$tok" == -* ]] && continue
+      [[ "$tok" == "*"* || "$tok" == "#"* ]] && continue
+      echo "$tok"
+    done)"
+
+VIOLATIONS=""
+while IFS= read -r tok; do
+  [ -z "$tok" ] && continue
+  while IFS= read -r del; do
+    [ -z "$del" ] && continue
+    if [[ "$tok" == *"*"* ]]; then
+      if [[ "$del" == $tok ]]; then
+        VIOLATIONS="${VIOLATIONS}  - ${del}  (匹配保护规则: ${tok})\n"
+      fi
+    elif [[ "$tok" == */ ]]; then
+      if [[ "$del" == "${tok}"* ]]; then
+        VIOLATIONS="${VIOLATIONS}  - ${del}  (匹配保护目录: ${tok})\n"
+      fi
+    else
+      if [ "$del" = "$tok" ]; then
+        VIOLATIONS="${VIOLATIONS}  - ${del}\n"
+      fi
+    fi
+  done <<< "$DELETED"
+done <<< "$PROTECTED"
+
+if [ -n "$VIOLATIONS" ]; then
+  echo ""
+  echo "🛑 提交被阻止: 检测到试图删除受保护(不得删除)的文件!"
+  echo "   这些文件在 $REGISTRY 中被标记为严禁删除。"
+  printf "%b" "$VIOLATIONS"
+  echo ""
+  echo "   如需删除,请先编辑 $REGISTRY 移除对应条目,并经确认后再提交。"
+  echo ""
+  exit 1
+fi
+
+exit 0
