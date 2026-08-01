@@ -255,7 +255,12 @@ def calc_multi_hold(entry_date: str, entry_price: float, bsc: str) -> dict | Non
     # 计算 1/3/5/10/20 日后收益
     holds = {}
     for hp in HOLD_PERIODS:
-        idx = min(hp, len(after) - 1)
+        # 2026-08-01 修正(P0)：原 idx=min(hp,len(after)-1) 会在入场距今不足 N 交易日时，
+        # 取最后一根可得价却仍标记为 hold_{N}d → 近期信号的长周期收益/胜率被短期价冒名顶替，
+        # 污染 10d/20d 胜率与 best_hold_days。对齐 backtest_tdx：周期不足则跳过该周期。
+        if len(after) - 1 < hp:
+            continue
+        idx = hp
         hold_row = after[idx]
         hp_ret = round((float(hold_row[1]) - real_entry_price) / real_entry_price * 100, 2)
         holds[f"hold_{hp}d"] = {

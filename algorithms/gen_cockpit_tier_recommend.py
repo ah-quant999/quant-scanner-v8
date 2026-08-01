@@ -134,8 +134,10 @@ def build_alimi(all_results, fq_map=FQ):
 
         if up:  # 趋势已确认的归 A 档
             continue
-        # 需要至少机构变红 或 缠论买/三线共振
-        if not (inst or triple or (inst and chan)):
+        # 需要至少机构变红 或 三线共振（原 `(inst and chan)` 是死项，恒被 inst 覆盖，已删）
+        # 注：缠论买(chan) 单独目前不构成入档条件，与文档「缠论买/三线共振」表述不完全一致，
+        #     是否让 chan 单独入 B 档属选股口径变更，保持现状待确认，不擅自扩大选股范围。
+        if not (inst or triple):
             continue
         if rsi >= 65:
             continue

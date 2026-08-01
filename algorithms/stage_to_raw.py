@@ -10,10 +10,12 @@ guanlan_* / mahoro_signals / fundamental_quality / lhb_history 等）保持不�
 """
 import os
 import sys
+from pathlib import Path
 
 V8_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ALGO = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(ALGO, "out")
+# out 目录与 run_algorithms / 被迁移脚本口径一致 = 仓库根/out
+OUT = os.path.join(V8_ROOT, "out")
 RAW = os.path.join(V8_ROOT, "raw_data")
 
 sys.path.insert(0, V8_ROOT)
@@ -32,7 +34,8 @@ def main():
             print(f"  ⚠️ 跳过（解析失败）: {v6_name}")
             continue
         obj = s._add_timestamp(obj)
-        s._save_json(os.path.join(RAW, v8_name), obj)
+        # sync_v6_to_v8._save_json 期望 pathlib.Path（内部调用 path.parent.mkdir）
+        s._save_json(Path(RAW) / v8_name, obj)
         promoted += 1
         print(f"  ✅ {v6_name} -> raw_data/{v8_name}")
     print(f"\nstaged: {promoted} 个文件")

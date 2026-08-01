@@ -72,7 +72,9 @@ def _tdx_reset():
 
 def _query_kline_mootdx(code, days):
     """mootdx 通达信直连日K线。code: 6位。返回归一化 DataFrame 或 None。"""
-    global _TDX_CALL_COUNT
+    # 2026-08-01 修正：函数体在 except 分支写 _KLINE_FAILS，但原来只声明了 _TDX_CALL_COUNT，
+    # 触发 UnboundLocalError；因主循环对该函数无 try 兜底 → mootdx 一异常整轮 CRDS 崩溃。
+    global _TDX_CALL_COUNT, _KLINE_FAILS
     client = _get_tdx()
     if client is None:
         return None
@@ -475,7 +477,8 @@ def calc_crds_for_stock(stock_df, mkt_df, code, name, board_label):
     # crds = af_peak × min(vr_peak, 3) × (1 + 逆势板占比) / 3
     inverse_ratio = zt_on_down / max(zt_count, 1)
     crds_raw = af_peak * min(vr_peak, 3) * (1 + inverse_ratio) / 3
-    crds_score = round(crds_raw * 10)  # 归一化到0~100
+    # 2026-08-01 修正：原无上限，大跌日 af_peak 可达6+ → 分值轻松破百，与「0~100」承诺不符。
+    crds_score = min(100, round(crds_raw * 10))  # 归一化并截断到 0~100
 
     return {
         "code": code,

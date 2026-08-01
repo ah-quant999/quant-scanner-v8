@@ -15,6 +15,7 @@ import json, os, sys, datetime, requests as req
 from fetch_logger import record_success, record_failure
 import pandas as pd
 
+BASE = os.path.dirname(os.path.abspath(__file__))   # 迁移守卫漏注入（合并 import 行未匹配），此处补上
 OUT = os.path.join(BASE, "..", "out", "sector_rs.json")
 NEODATA_URL = "https://copilot.tencent.com/agenttool/v1/neodata"
 

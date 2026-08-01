@@ -7,10 +7,13 @@
 #      确保 v6 算法端在非 push 场景下也能被构建到。
 #   3) concurrency 保持 serial，防止并发 push 冲突。
 #
-# 触发策略（按主人要求）：
-#   - push raw_data/**  → 检测变化 → 只构建受影响类别
-#   - schedule 17:00    → 构建 post_close 类别（算法换算后部署）
+# 触发策略（2026-08-01 审计修正）：
+#   - push raw_data/**  → 检测变化 → 只构建受影响类别（盘中抓取 & 盘后算法链推送均由此触发）
 #   - workflow_dispatch → 全量构建
+#
+# ⚠️ 已移除原 17:00 schedule：它会与 18:30 前尚未完成的算法链竞态，用旧 raw_data
+#   先构建部署一版陈旧数据；而算法链 18:30 推送 raw_data 时会经 push 触发本工作流
+#   自动重新构建，schedule 纯属冗余且有害，故删除。
 
 name: "☁️ v8 构建部署(云端ubuntu)"
 
@@ -18,8 +21,6 @@ on:
   push:
     branches: [main]
     paths: ['raw_data/**']
-  schedule:
-    - cron: '0 9 * * 1-5'    # 17:00 CST 盘后算法换算部署
   workflow_dispatch:
 
 permissions:

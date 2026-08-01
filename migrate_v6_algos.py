@@ -12,6 +12,12 @@ migrate_v6_algos.py — 将 v6 的算法产出脚本选择性复制到 v8/algori
 - 本地依赖 fundamental_helper.py / fetch_logger.py 一并复制。
 
 运行：python migrate_v6_algos.py   （在 v8 仓库根目录执行）
+
+⚠️ 2026-08-01 起：algorithms/ 下的副本已在 v8 侧手工修复多处 bug（见各文件内
+   "2026-08-01 修正" 注释：triple_consensus 漏股 / calc_crds 崩溃与分值上限 /
+   backtest_comprehensive 收益错标(P0) / cockpit_tier 死项 / fetch_sector_rs BASE 等）。
+   **切勿直接重跑本脚本覆盖！** 如确需重新迁移，请先把这些修复同步回 v6 原件，
+   否则会用未修复的 v6 版本覆盖掉 v8 侧的修复。
 """
 import os
 import re

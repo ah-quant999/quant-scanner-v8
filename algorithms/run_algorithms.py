@@ -21,7 +21,10 @@ from datetime import datetime
 
 ALGO = os.path.dirname(os.path.abspath(__file__))
 V8_ROOT = os.path.dirname(ALGO)
-OUT = os.path.join(ALGO, "out")
+# ⚠️ out 目录必须与被迁移脚本的 os.path.join(BASE, "..", "out") 口径一致：
+#   脚本 BASE = algorithms/，故 BASE/../out = 仓库根/out（不是 algorithms/out）。
+#   原来这里写 ALGO/out 与脚本对不上 → reseed 灌到 algorithms/out 而脚本读仓库根/out → 全链找不到输入。
+OUT = os.path.join(V8_ROOT, "out")
 
 V6_DATA_DIR = os.environ.get("V6_DATA_DIR", r"E:\workspace\stock-scanner\data")
 PY = os.environ.get("V8_PYTHON", "python")
@@ -37,6 +40,7 @@ PUSH = os.environ.get("V8_PUSH", "0") == "1"
 INPUTS_FROM_V6 = [
     "gold_pool.json",
     "scan_result.json",
+    "watch_result.json",       # calc_crds 的输入（逆势龙头候选），过渡期由 v6 scanner 供给
     "guanlan_watchlist.json",
     "guanlan_reports.json",
     "maharo_signals.json",
@@ -66,6 +70,7 @@ ORDER = [
 
 def step_seed_inputs():
     print(f"\n[0] 重灌 v6 上游输入 → out/  (V6={V6_DATA_DIR})")
+    os.makedirs(OUT, exist_ok=True)   # 确保仓库根/out 存在（脚本 open(...,'w') 依赖它）
     for f in INPUTS_FROM_V6:
         src = os.path.join(V6_DATA_DIR, f)
         if os.path.exists(src):

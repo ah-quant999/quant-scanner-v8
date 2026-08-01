@@ -145,7 +145,10 @@ def main():
         # 2026-07-27 修正：驾驶舱 B 档同样代表机构/技术质量信号，应计入候补条件，
         # 否则会出现 TOP10≥75 且 tier_b 的个股（如特锐德）被排除在优先观察之外。
         score = sum([in_top, in_ab, in_fund])
-        if score == 2:
+        # 2026-08-01 修正：原 `== 2` 会把「TOP10≥70 + 驾驶舱B档 + 基本面A档」这类
+        # 三条件相对满足（in_ab 经 B 档为真 → score=3）却非严格共识（缺 in_a）的强票
+        # 静默丢弃。严格共识已在上方 continue，故此处 `>= 2` 只会纳入候补、不会重复。
+        if score >= 2:
             src = top or a or b
             rec = {
                 "code": src.get("code", code),
