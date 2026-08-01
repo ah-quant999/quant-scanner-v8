@@ -20,7 +20,7 @@ name: "☁️ v8 构建部署(云端ubuntu)"
 on:
   push:
     branches: [main]
-    paths: ['raw_data/**', '.github/workflows/v8_build_deploy.yml']
+    paths: ['raw_data/**']
   workflow_dispatch:
 
 permissions:
@@ -43,10 +43,18 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: "🏗️ 构建 data/*.js（临时强制全量）"
+      - name: "🏗️ 构建 data/*.js（selective）"
         run: |
-          echo "强制全量构建（主人 2026-08-01 19:55 指令）"
-          python update_v8.py
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "调度触发：构建 post_close 类别"
+            python update_v8.py --category post_close
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "手动触发：全量构建"
+            python update_v8.py
+          else
+            echo "raw_data push 触发：检测变化并 selective build"
+            python update_v8.py --detect-changes
+          fi
 
       - name: "📤 部署到 main（GitHub Pages 源）"
         env:
