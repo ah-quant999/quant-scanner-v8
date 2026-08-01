@@ -55,6 +55,7 @@ V6_TO_V8 = {
     "nt_data.json":                 "nt_data.json",
     "suspension_alert.json":        "suspension_alert.json",
     "market_alerts.json":           "market_alerts.json",
+    "sector_fund_flow.json":        "sector_fund_flow_trend.json",
 }
 
 # cloud_fetch_v8.py 已负责的模块：默认跳过，避免双写
@@ -88,6 +89,67 @@ def _add_timestamp(obj):
         return obj
     if "update_time" not in obj and "calc_time" not in obj and "date" not in obj:
         obj["update_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return obj
+
+
+def _enrich_sector_fund_flow_trend(obj):
+    """为 sector_fund_flow_trend 补 net_10d / 回填 net_60d（从 v6 history 计算）。"""
+    if not isinstance(obj, dict):
+        return obj
+    # 只有当对象带 sectors_in/top_list 等字段时才认为是板块资金流
+    if not any(k in obj for k in ("sectors_in", "sectors_out", "top_list")):
+        return obj
+    hist_path = V6_DATA / "sector_fund_flow_history.json"
+    hist = {}
+    if hist_path.exists():
+        try:
+            with open(hist_path, encoding="utf-8") as f:
+                hist = json.load(f)
+        except Exception:
+            pass
+    # 预计算各板块历史滚动和
+    hist_sums = {}
+    for name, days in hist.items():
+        try:
+            nets = sorted(days, key=lambda x: x.get("date", ""))
+            vals = [d.get("net", 0) or 0 for d in nets]
+            hist_sums[name] = {
+                "n5": sum(vals[-5:]) if len(vals) >= 5 else None,
+                "n10": sum(vals[-10:]) if len(vals) >= 10 else None,
+                "n20": sum(vals[-20:]) if len(vals) >= 20 else None,
+                "n60": sum(vals[-60:]) if len(vals) >= 60 else None,
+            }
+        except Exception:
+            pass
+
+    def enrich(s):
+        if not isinstance(s, dict):
+            return s
+        name = s.get("name")
+        h = hist_sums.get(name, {}) if name else {}
+        out = dict(s)
+        # 仅当原值缺失/为None/为0 时用历史回填；保留 v6 API 原始值优先
+        for key, hist_key in [("net_5d", "n5"), ("net_10d", "n10"), ("net_20d", "n20"), ("net_60d", "n60")]:
+            val = out.get(key)
+            if (val is None or val == 0) and h.get(hist_key) is not None:
+                out[key] = round(h[hist_key], 2)
+        return out
+
+    for key in ("sectors_in", "sectors_out", "top_list", "trend_5d", "trend_20d", "trend_60d"):
+        if key not in obj or not isinstance(obj[key], list):
+            continue
+        obj[key] = [enrich(s) for s in obj[key]]
+
+    # 构建 trend_10d（从 sectors_in/out 去重）
+    seen = set()
+    trend_10d = []
+    for key in ("sectors_in", "sectors_out"):
+        for s in obj.get(key, []):
+            name = s.get("name")
+            if name and name not in seen and s.get("net_10d") is not None:
+                seen.add(name)
+                trend_10d.append(s)
+    obj["trend_10d"] = trend_10d
     return obj
 
 
@@ -144,6 +206,8 @@ def sync(category="post_close", dry_run=False, force_cloud=False, push=False):
         if obj is None:
             missing.append((v6_path.name, v8_name, var))
             continue
+        if v8_name == "sector_fund_flow_trend.json":
+            obj = _enrich_sector_fund_flow_trend(obj)
         obj = _add_timestamp(obj)
         v8_path = V8_RAW / v8_name
         _save_json(v8_path, obj)

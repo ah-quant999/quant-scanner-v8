@@ -19,6 +19,7 @@ DATA_DIR = ROOT / "data"
 DATA_SOURCES = {
     "etf_intraday_heat.json":      "ETF_INTRADAY_HEAT",
     "sector_fund_flow.json":       "SECTOR_FUND_FLOW",
+    "sector_fund_flow_trend.json": "SECTOR_FUND_FLOW_TREND",
     "gold_pool.json":              "GOLD_POOL",
     "stock_names.json":            "STOCK_LIST",
     "macro_data.json":             "MACRO_DATA",
@@ -96,6 +97,7 @@ CATEGORY_MAP = {
     "MARKET_FUND_FLOW_DATA": "post_close",
 
     # 盘后（17:00，主要由 v6 算法推送；cloud_fetch 暂无生产者）
+    "SECTOR_FUND_FLOW_TREND": "post_close",
     "GOLD_POOL": "post_close",
     "CANDIDATE": "post_close",
     "TRIPLE_CONSENSUS": "post_close",
