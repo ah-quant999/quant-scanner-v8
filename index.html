@@ -3485,6 +3485,11 @@ function renderLimitUpHeatmap(){
     if(dayDiff===-1) return '明日 '+hm;
     return (Mo<10?'0':'')+Mo+'-'+(D<10?'0':'')+D+' '+hm;
   }
+  function _fmtWeekday(dateStr){
+    if(!dateStr) return '';
+    var d=new Date(dateStr+'T00:00:00+08:00');
+    return ['周日','周一','周二','周三','周四','周五','周六'][d.getDay()]||'';
+  }
   function cockpitBlock(title, body, color, textColor){
     textColor=textColor||color;
     var numMap={'④':'4','⑤':'5','⑥':'6','⑦':'7'};
@@ -4130,10 +4135,24 @@ function renderLimitUpHeatmap(){
       h+='<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25);border-radius:8px;padding:12px;">';
       h+='<div style="font-weight:700;color:#a78bfa;margin-bottom:8px;font-size:13px;">⏱️ F窗口</div>';
       if(triggered.length){
-        h+='<div style="font-size:13px;color:#1D9E75;margin-bottom:6px;line-height:1.6;">⚡ '+triggered.map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')+'</div>';
-      } else { h+='<div style="font-size:13px;color:var(--dim);">暂无触发窗口</div>'; }
+        h+='<div style="font-size:12px;color:#1D9E75;margin-bottom:8px;line-height:1.6;">⚡ 已触发/追踪：'+triggered.map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')+'</div>';
+      } else { h+='<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">暂无触发窗口</div>'; }
       if(future.length){
-        h+='<div style="font-size:12px;color:var(--sub);margin-top:6px;line-height:1.5;">📅 待观：'+future.map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')+'</div>';
+        var next=future[0];
+        h+='<div style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);border-radius:6px;padding:8px 10px;margin-bottom:8px;">';
+        h+='<div style="font-size:11px;color:var(--sub);margin-bottom:3px;">📍 下个转折点</div>';
+        h+='<div style="font-size:15px;font-weight:700;color:#d0bcff;line-height:1.4;">'+next.name+' '+next.date+' '+_fmtWeekday(next.date)+'</div>';
+        h+='<div style="font-size:11px;color:var(--sub);margin-top:3px;">距今 '+(next.days_left>=0?next.days_left:0)+' 天 · '+(next.desc||'')+'</div>';
+        h+='</div>';
+        h+='<div style="font-size:11px;color:var(--sub);line-height:1.6;margin-bottom:2px;">📅 全部待观窗口：</div>';
+        h+='<div style="font-size:11px;color:var(--txt);line-height:1.7;">';
+        future.forEach(function(w){
+          h+='<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.06);padding:3px 0;">';
+          h+='<span>'+w.name+' <span style="color:var(--sub);">'+w.date+' '+_fmtWeekday(w.date)+'</span></span>';
+          h+='<span style="color:var(--sub);">距今'+(w.days_left>=0?w.days_left:0)+'天</span>';
+          h+='</div>';
+        });
+        h+='</div>';
       }
       h+='</div>';
       h+='<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:8px;padding:12px;">';
