@@ -4531,7 +4531,7 @@ function renderLimitUpHeatmap(){
         var c=chg>=0?'var(--up)':'var(--down)';
         var name=v==='IF'?'沪深300':v==='IC'?'中证500':v==='IM'?'中证1000':'上证50';
         h+='<div style="text-align:center;background:var(--bg2);border-radius:8px;padding:10px;">';
-        h+='<div style="font-size:11px;color:var(--dim);margin-bottom:4px;">'+name+'</div>';
+        h+='<div style="font-size:11px;color:var(--dim);margin-bottom:4px;"><span style="color:var(--txt);font-weight:600;">'+v+'</span> · '+name+'</div>';
         h+='<div style="font-size:18px;font-weight:800;color:var(--txt);">'+it.close.toFixed(1)+'</div>';
         h+='<div style="font-size:12px;font-weight:700;color:'+c+';">'+(chg>=0?'+':'')+chg.toFixed(2)+'%</div>';
         h+='<div style="font-size:10px;color:var(--dim);margin-top:4px;">持仓 '+((it.open_interest||0)/1e4).toFixed(1)+'万</div>';
