@@ -925,7 +925,7 @@ window.V8_CAL = {weeks:[],legend:[]};
             if(isToday) border='2px solid #38bdf8';
 
             h+='<td style="padding:4px 2px;border:'+border+';background:'+bg+';text-align:center;vertical-align:top;'+cursor+'" '
-              +(hasData?'onclick="window._showLhbDay(\''+iso+'\')" title="'+esc(iso+(total?' | 上榜'+total+'只 | 共振'+resCnt+'只':''))+'"':'')
+              +(hasData?'onclick="window._showLhbDay(\''+iso+'\')" title="'+esc(iso)+'"':'')
               +'>';
             h+='<div style="font-weight:'+(isToday?'800':'600')+';font-size:'+(isToday?'13':'12')+'px;color:'+(textColor)+';">'+d+'</div>';
             h+=signalHtml;
@@ -2497,10 +2497,8 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     var now = new Date();
     var year = now.getFullYear(), month = now.getMonth();
-    if(lhbDate && lhbDate.length >= 8){
-      year = parseInt(lhbDate.slice(0,4));
-      month = parseInt(lhbDate.slice(4,6)) - 1;
-    }
+    // 注：日历标题与日历网格统一用「当前月」（8月）；下方「最近交易日」卡片展示
+    // LHB_DATA 里最近一个有数据的那一天（7/31），与日历网格解耦。
     var firstDay = new Date(year, month, 1).getDay();
     var monOffset = firstDay === 0 ? 6 : firstDay - 1;
     var daysInMonth = new Date(year, month+1, 0).getDate();
@@ -2522,7 +2520,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     var h = '';
     h += '<div class="cal-header-row">';
     h += '<span class="cal-title">📅 机游共振日历</span>';
-    h += '<span class="cal-meta">' + year + '年' + (month+1) + '月 &nbsp;|&nbsp; 本月龙虎榜：机游共振 ' + (summary['机游共振']||0) + '只 &nbsp;|&nbsp; 更新于 ' + _rcRel(D.update_time||'') + '</span>';
+    h += '<span class="cal-meta">' + year + '年' + (month+1) + '月 &nbsp;|&nbsp; 更新于 ' + _rcRel(D.update_time||'') + '</span>';
     h += '</div>';
 
     // Legend
@@ -2599,14 +2597,18 @@ window.V8_CAL = {weeks:[],legend:[]};
     // Detail panel
     h += '<div id="jyDayDetail" class="cal-detail"></div>';
 
-    /* ===== 当日龙虎榜详情（参照参考页：每个交易日完整 TOP5 列表） ===== */
-    h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📋 当日龙虎榜详情</h3>';
+    /* ===== 最近交易日龙虎榜详情（参照参考页：每个交易日完整 TOP5 列表） ===== */
+    h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📋 最近交易日龙虎榜</h3>';
     var jyDays = (D.days && D.days.length) ? D.days : (stocks.length ? [{date:lhbDate, stocks:stocks, summary:summary}] : []);
     var weekBuckets = {};
     jyDays.forEach(function(dy){
+      // dy 自身年月：lhbDate 可能在日历当前月之外（7/31 数据 + 8月日历），
+      // 用 dy 自己的年/月算 weekRangeOf / wkIdx，避免错位。
+      var dyYr = parseInt(dy.date.slice(0,4));
+      var dyMo = parseInt(dy.date.slice(4,6)) - 1;
       var dyi = parseInt(dy.date.slice(6));
-      var wr = _rcWeekRangeOf(year, month, dyi);
-      var off0 = new Date(year, month, 1).getDay();
+      var wr = _rcWeekRangeOf(dyYr, dyMo, dyi);
+      var off0 = new Date(dyYr, dyMo, 1).getDay();
       var offset = (off0 === 0) ? 6 : (off0 - 1);
       var wkIdx = Math.floor((dyi - 1 + offset) / 7);
       (weekBuckets[wkIdx] = weekBuckets[wkIdx] || []).push({dy:dy, wr:wr});
@@ -2636,6 +2638,61 @@ window.V8_CAL = {weeks:[],legend:[]};
       });
       h += '</div>';
     });
+    /* ===== 周度汇总（按周聚合：每组 TOP5 净买/卖） ===== */
+    h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📊 周度汇总</h3>';
+    if(weekKeys.length === 0){
+      h += '<div style="padding:10px;color:var(--dim);font-size:11px">本月暂无数据</div>';
+    } else {
+      weekKeys.forEach(function(wk){
+        var items = weekBuckets[wk];
+        var wr = items[0].wr;
+        var rangeLabel = (wr.mon.getMonth()+1)+'/'+wr.mon.getDate()+'-'+(wr.sun.getMonth()+1)+'/'+wr.sun.getDate();
+        // 聚合本周所有 dStocks
+        var wStocks = [];
+        items.forEach(function(it){ wStocks = wStocks.concat(it.dy.stocks || []); });
+        // 净买卖
+        var wBuy = wStocks.filter(function(s){ return ((s.inst_net_万||0)+(s.yz_net_万||0)) > 0; })
+          .sort(function(a,b){ return ((b.inst_net_万||0)+(b.yz_net_万||0))-((a.inst_net_万||0)+(a.yz_net_万||0)); })
+          .slice(0,5);
+        var wSell = wStocks.filter(function(s){ return ((s.inst_net_万||0)+(s.yz_net_万||0)) < 0; })
+          .sort(function(a,b){ return ((a.inst_net_万||0)+(a.yz_net_万||0))-((b.inst_net_万||0)+(b.yz_net_万||0)); })
+          .slice(0,5);
+        // 共振只数
+        var wJy = wStocks.filter(function(s){return (s.category||'')==='机游共振';}).length;
+        // 本周净买卖合计
+        var wNet = 0; wStocks.forEach(function(s){ wNet += (s.inst_net_万||0)+(s.yz_net_万||0); });
+        var wNetColor = wNet>=0?'c-up':'c-down';
+
+        h += '<div class="jy-week" style="margin-bottom:14px">';
+        h += '<div class="jy-week-hd">第'+(wk+1)+'周 '+rangeLabel
+          + ' &nbsp;<span style="color:#a78bfa;font-weight:600">★共振 '+wJy+'</span>'
+          + ' &nbsp;<span class="'+wNetColor+'" style="font-weight:700">净买卖 '+_rcFmtYi(wNet)+'</span>'
+          + '</div>';
+        h += '<div class="month-summary">';
+        h += '<div class="ms-col"><div class="ms-title"><span style="color:var(--up)">▲</span> 净买入TOP5</div>';
+        if(wBuy.length === 0){
+          h += '<div class="ms-item" style="color:var(--dim)">无</div>';
+        } else {
+          wBuy.forEach(function(s, idx){
+            var net = ((s.inst_net_万||0)+(s.yz_net_万||0));
+            h += '<div class="ms-item"><span>' + (idx+1) + _rcEsc(s.name) + '<span class="ms-code">'+(s.code||'')+'</span></span><span class="ms-val c-up">' + _rcFmtYi(net) + '</span></div>';
+          });
+        }
+        h += '</div>';
+        h += '<div class="ms-col"><div class="ms-title"><span style="color:var(--down)">▼</span> 净卖出TOP5</div>';
+        if(wSell.length === 0){
+          h += '<div class="ms-item" style="color:var(--dim)">无</div>';
+        } else {
+          wSell.forEach(function(s, idx){
+            var net = ((s.inst_net_万||0)+(s.yz_net_万||0));
+            h += '<div class="ms-item"><span>' + (idx+1) + _rcEsc(s.name) + '<span class="ms-code">'+(s.code||'')+'</span></span><span class="ms-val c-down">' + _rcFmtYi(net) + '</span></div>';
+          });
+        }
+        h += '</div>';
+        h += '</div>'; // month-summary
+        h += '</div>'; // jy-week
+      });
+    }
     /* ===== 月度汇总 ===== */
     h += '<h3 style="margin-top:20px;font-size:15px;color:var(--txt)">📊 月度汇总</h3>';
     h += '<div class="month-summary">';
