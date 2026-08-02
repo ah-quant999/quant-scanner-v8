@@ -49,6 +49,7 @@ VAR_TO_RAW = {
     "EXPERIMENT": "experiment.json",
     "V8_CAL": "v8_cal.json",
     "CANDIDATE_QUOTES": "candidate_quotes.json",
+    "SH_SZ_HISTORY": "sh_sz_history.json",
 }
 
 # 变量名 → 更新时段（与 update_v8.py 的 CATEGORY_MAP 对齐）
@@ -75,6 +76,7 @@ CATEGORY_MAP = {
     "CONCEPT_RANKING": "intraday",
     "LIMIT_UP_HEATMAP": "intraday",
     "CANDIDATE_QUOTES": "intraday",  # 候选池实时行情：行业树图第二层（个股）数据源
+    "SH_SZ_HISTORY": "intraday",  # 沪深成交额历史（滚动窗口，盘中最少5刷）
     # 盘后（15:30 后）：大盘资金流时间轴，累积历史序列，避免盘中覆盖
     "MARKET_FUND_FLOW_DATA": "post_close",
     # 15:30 收盘数据：EXPERIMENT 等 akshare 可抓的 T+1 数据
@@ -958,6 +960,7 @@ def f_market_fund_flow_data():
         "cumulative": cumulative,
         "market_net": daily[-1]["net_yi"] if daily else 0,
         "sh_quote": sh_quote,
+        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "note": "上证指数(000001)单日主力资金净流入滚动累加，来源东方财富push2his",
     }
 
@@ -1624,6 +1627,67 @@ def main(category=None):
         print(f"  🧹 已清理 {cleaned} 个旧 raw_data/*.json")
 
     # 任务列表：顺序影响下游构建，保持原有顺序
+    def f_sh_sz_history():
+        """沪深两市每日成交额历史（滚动窗口，供量能对比图）。
+
+        东财 push2his 指数日线接口分别取上证(1.000001)与深证(0.399001)的
+        成交额(f57, 单位元)，按日期对齐后输出 amount_history：
+            [{date:'M/D', sh_amount, sz_amount, total}]  （单位：亿元）
+        滚动保留最近 ~130 个交易日；index.html 按数组顺序渲染折线。
+        """
+        def _fetch_amount(secid):
+            url = "http://push2his.eastmoney.com/api/qt/stock/kline/get"
+            params = {
+                "lmt": "0", "klt": "101", "secid": secid,
+                "fields1": "f1,f2,f3,f4,f5,f6",
+                "fields2": "f51,f57",   # f51=日期, f57=成交额(元)
+                "ut": "b2884a393a59ad64002292a3e90d46a5",
+                "_": int(time.time() * 1000),
+            }
+            try:
+                r = _requests.get(url, params=params, headers=_EM_HEADERS, timeout=20)
+                text = r.text
+                s = text.find("{"); e = text.rfind(")")
+                j = json.loads(text[s:e if e > 0 else None])
+                klines = (j.get("data") or {}).get("klines") or []
+                out = {}
+                for line in klines:
+                    parts = line.split(",")
+                    if len(parts) < 7:
+                        continue
+                    ds = parts[0].replace("-", "")
+                    try:
+                        out[ds] = round(float(parts[6]) / 1e8, 1)  # 元 → 亿
+                    except Exception:
+                        continue
+                return out
+            except Exception as ex:
+                print(f"  ⚠️ 沪深成交额接口失败({secid}): {ex}")
+                return {}
+
+        sh = _fetch_amount("1.000001")
+        sz = _fetch_amount("0.399001")
+        dates = sorted(set(sh) & set(sz))
+        if not dates:
+            return None
+        window = dates[-130:]
+        amount_history = []
+        for d in window:
+            sh_a = sh.get(d, 0.0)
+            sz_a = sz.get(d, 0.0)
+            mm = str(int(d[4:6]))
+            dd = str(int(d[6:8]))
+            amount_history.append({
+                "date": f"{mm}/{dd}",
+                "sh_amount": sh_a,
+                "sz_amount": sz_a,
+                "total": round(sh_a + sz_a, 1),
+            })
+        return {
+            "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "amount_history": amount_history,
+        }
+
     tasks = [
         ("ETF_INTRADAY_HEAT", f_etf_intraday_heat),
         ("SECTOR_FUND_FLOW", f_sector_fund_flow),
@@ -1647,6 +1711,7 @@ def main(category=None):
         ("EXPERIMENT", f_experiment),
         ("V8_CAL", f_v8_cal),
         ("CANDIDATE_QUOTES", f_candidate_quotes),
+        ("SH_SZ_HISTORY", f_sh_sz_history),
     ]
 
     for var, fn in tasks:

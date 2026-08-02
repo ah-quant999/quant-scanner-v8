@@ -37,6 +37,7 @@ CORE_SOURCES = {
     "ETF_PULSE": 26,
     "ETF_DAILY_MONITOR": 26,
     "V8_CAL": 6,    # 2026-08-02 收紧：日历为高频显示，48h 太宽；周内强制日刷新，节假日另豁免,
+    "SH_SZ_HISTORY": 3,  # 沪深成交额历史：高频量能图，日内多次刷新，3天阈值（含周末缓冲）
 }
 
 # ── 分类二：网络易抖 / 低频源 / v6 算法盘后产出，仅告警 ───────────────
@@ -71,6 +72,7 @@ WARN_SOURCES = {
     "SECTOR_RS": 48,
     "MAHORO": 48,
     "INST_TRADE": 48,
+    "LHB_HISTORY": 48,  # 龙虎榜历史（机游共振/北向席位日历）：18:30 算法链累积，每日刷新
     "NT_DATA": 48,
     "TOP10_DAILY": 48,
     "SUSPENSION_ALERT": 48,

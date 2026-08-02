@@ -189,7 +189,7 @@ def _enrich_sector_fund_flow_trend(obj):
     return obj
 
 
-def sync(category="post_close", dry_run=False, force_cloud=False, push=False):
+def sync(category="post_close", dry_run=False, force_cloud=False, push=False, only=None):
     # 加载 v8 DATA_SOURCES / CATEGORY_MAP（避免硬编码耦合）
     sys.path.insert(0, str(V8_ROOT))
     try:
@@ -202,6 +202,14 @@ def sync(category="post_close", dry_run=False, force_cloud=False, push=False):
     var_to_fname = {v: k for k, v in fname_to_var.items()}
 
     target_vars = {v for v, c in var_to_cat.items() if c == category}
+    if only:
+        # 仅同步指定孤儿变量（绕过 category 过滤），用于只补 v8 原生链不产出的模块
+        only_set = set(only) if isinstance(only, (list, tuple, set)) else {x.strip().upper() for x in str(only).split(",") if x.strip()}
+        target_vars = only_set & set(var_to_cat.keys())
+        if not target_vars:
+            print(f"⚠️ --only 指定的变量均不存在于 CATEGORY_MAP: {only}")
+            return 1
+        print(f"⚠️ --only 模式：仅同步 {sorted(target_vars)}（绕过 category={category}）")
     if not target_vars:
         print(f"⚠️ category={category} 无目标变量")
         return 1
@@ -284,6 +292,8 @@ if __name__ == "__main__":
     parser.add_argument("--force-cloud", action="store_true",
                         help="强制覆盖 cloud_fetch 已负责的模块")
     parser.add_argument("--push", action="store_true", help="同步后 git push")
+    parser.add_argument("--only", default=None,
+                        help="只同步指定 v8 变量（逗号分隔），绕过 category 过滤；用于只补 v8 原生链不产出的孤儿模块")
     args = parser.parse_args()
     sys.exit(sync(category=args.category, dry_run=args.dry_run,
-                  force_cloud=args.force_cloud, push=args.push))
+                  force_cloud=args.force_cloud, push=args.push, only=args.only))

@@ -64,6 +64,7 @@ DATA_SOURCES = {
     "etf_daily_monitor.json":      "ETF_DAILY_MONITOR",
     "v8_cal.json":                 "V8_CAL",
     "candidate_quotes.json":       "CANDIDATE_QUOTES",
+    "sh_sz_history.json":         "SH_SZ_HISTORY",
 }
 
 # 变量名 → 更新时段
@@ -98,6 +99,7 @@ CATEGORY_MAP = {
     "CONCEPT_RANKING": "intraday",
     "LIMIT_UP_HEATMAP": "intraday",
     "CANDIDATE_QUOTES": "intraday",
+    "SH_SZ_HISTORY": "intraday",
     # 盘后：大盘资金流时间轴，累积历史序列
     "MARKET_FUND_FLOW_DATA": "post_close",
 

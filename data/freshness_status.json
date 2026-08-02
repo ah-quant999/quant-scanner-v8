@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-08-02 10:43:25",
+  "check_time": "2026-08-02 19:06:14",
   "last_trade_close": "2026-07-31 15:30:00",
   "core_stale": [],
   "warn_stale": [],
@@ -9,7 +9,7 @@
     "STOCK_LIST"
   ],
   "summary": {
-    "total_checked": 44,
+    "total_checked": 46,
     "core_stale": 0,
     "warn_stale": 0,
     "frozen_stale": 0,
@@ -40,6 +40,7 @@
     "CONCEPT_RANKING": "intraday",
     "LIMIT_UP_HEATMAP": "intraday",
     "CANDIDATE_QUOTES": "intraday",
+    "SH_SZ_HISTORY": "intraday",
     "MARKET_FUND_FLOW_DATA": "post_close",
     "SECTOR_FUND_FLOW_TREND": "post_close",
     "GOLD_POOL": "post_close",

@@ -150,11 +150,26 @@ def step_push():
         print("  ❌ 推送失败，请检查 GITHUB_TOKEN / 网络")
 
 
+def step_append_lhb_history():
+    """累积龙虎榜历史（raw_data/lhb_data.json → raw_data/lhb_history.json），
+    供 index.html 共振日历历史 + lhb_resonance/lhb_north_seat 独立页使用。
+    复用 sync_v6_to_v8 的成熟逻辑；lhb_data 由本链 fetch_lhb 产出并 stage 后已就位。"""
+    print("\n[2.5] 累积 LHB 历史 → raw_data/lhb_history.json")
+    try:
+        sys.path.insert(0, ALGO)
+        import sync_v6_to_v8
+        sync_v6_to_v8._append_lhb_to_history()
+        print("  ✅ LHB 历史累积完成")
+    except Exception as e:
+        print(f"  ⚠️ LHB 历史累积失败: {e}")
+
+
 def main():
     print(f"=== v8 算法编排  {datetime.now():%Y-%m-%d %H:%M:%S} ===")
     step_seed_inputs()
     step_run()
     n = step_stage()
+    step_append_lhb_history()
     step_push()
     print(f"\n=== 完成。staged {n} 个文件 ===")
 

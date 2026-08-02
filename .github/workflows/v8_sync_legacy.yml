@@ -1,0 +1,45 @@
+# 九宝量化 v8.0 — 孤儿模块同步（仅 v8 原生算法链不产出的 4 个 v6 源）
+#
+# 背景（2026-08-02 审计发现）：
+#   2026-08-01 起 v8 算法链(v8_algo_run.yml)原生产出绝大多数盘后模块，
+#   原 v6→v8 同步桥(v8_sync_v6_data.yml)因会覆盖新鲜 v8 数据而停用定时。
+#   但 NT_DATA / SUSPENSION_ALERT / MARKET_ALERTS / SECTOR_FUND_FLOW_TREND
+#   这 4 个模块 v8 原生链不产出，只靠 v6 源 → 停用同步后变成"无定时刷新"。
+#   本工作流用 --only 精确只同步这 4 个孤儿，绝不触碰 v8 原生模块。
+#
+# ⚠️ 长期演进：待为这 4 个模块补齐 v8 原生 akshare/东财 抓取器后可移除本工作流。
+
+name: "🔄 v8 孤儿模块同步(cn)【仅4个v6源】"
+
+on:
+  schedule:
+    - cron: '30 11 * * 1-5'   # 19:30 CST 工作日（收盘 + 算法链之后）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-sync-legacy
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: [self-hosted, cn]
+    timeout-minutes: 10
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: "📥 检出 v8 仓库"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: "🐍 校验 Python"
+        shell: powershell
+        run: python --version
+
+      - name: "🔄 仅同步 4 个孤儿模块（绕过 category，不碰 v8 原生数据）"
+        shell: powershell
+        run: |
+          python sync_v6_to_v8.py --only NT_DATA,SUSPENSION_ALERT,MARKET_ALERTS,SECTOR_FUND_FLOW_TREND --push
