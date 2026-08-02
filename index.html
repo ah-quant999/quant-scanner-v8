@@ -4784,7 +4784,7 @@ function renderLimitUpHeatmap(){
   }
 
   /* ---- 1.5 决策中枢：战略→战术→选股 ---- */
-  function renderDecisionHub(fib,margin,cffex,fomc,sf,crisis,macro){
+  function renderDecisionHub(fib,margin,cffex,fomc,sf,crisis,macro,cand,quotes,inst,gold,top10){
     const c=fib.current||{};
     const declineDays=c.days_down||0, declinePct=c.total_pct||0;
     const pmiLatest=crisis.pmi_value!=null?crisis.pmi_value:(macro.pmi&&macro.pmi.length?macro.pmi[macro.pmi.length-1].今值:null);
@@ -4905,17 +4905,88 @@ function renderLimitUpHeatmap(){
         '<div style="margin-top:6px">'+action+' · '+position+'</div>';
     }
 
+    /* ---- 因子层：4 因子触发计算 ---- */
     const hubFactorCount=$('hubFactorCount');
     const hubFactorBody=$('hubFactorBody');
     if(hubFactorCount && hubFactorBody){
-      hubFactorCount.textContent='—';
-      hubFactorCount.style.color='var(--dim)';
-      hubFactorBody.innerHTML=
-        '<span class="hub-tag neutral">龙头合力</span>'+
-        '<span class="hub-tag neutral">主力通道</span>'+
-        '<span class="hub-tag neutral">RSI背离</span>'+
-        '<span class="hub-tag neutral">资金排列</span>'+
-        '<div style="margin-top:8px;color:var(--dim)">因子模块建设中，接入后显示今日触发数量</div>';
+      // 准备数据索引
+      const candStocks = (cand && cand.stocks) || {};
+      const quoteMap = {};
+      (quotes && quotes.items || []).forEach(q=>{ if(q && q.code) quoteMap[String(q.code)] = q; });
+      const instArr = (inst && inst.all) || [];
+      const instMap = {};
+      instArr.forEach(r=>{ if(r && r.code) instMap[String(r.code)] = r; });
+      const goldKeys = new Set(Object.keys((gold && gold.stocks) || {}));
+
+      // ① 龙头合力 = 多源共识(≥2) ∩ 当日强势(chg≥+5%)
+      const lead = [];
+      Object.entries(candStocks).forEach(([k, st])=>{
+        if(!st || !st.code) return;
+        const q = quoteMap[String(st.code)];
+        if(!q || q.chg==null) return;
+        if((st.sources||[]).length >= 2 && q.chg >= 5){
+          lead.push({code:st.code, name:st.name, chg:q.chg, sources:(st.sources||[]).length});
+        }
+      });
+      lead.sort((a,b)=>b.chg - a.chg);
+
+      // ② 主力追踪 = INST_TRADE 净流入(buy_inst>0 且 net_amt>0)
+      const instIn = instArr.filter(r=>r && r.buy_inst>0 && r.net_amt>0)
+        .sort((a,b)=>(b.net_amt||0)-(a.net_amt||0));
+
+      // ③ RSI 背离(单日极值代理) = chg≥+15% 超买预警 + chg≤-5% 超卖机会
+      const rsiOver = [], rsiUnder = [];
+      Object.entries(candStocks).forEach(([k, st])=>{
+        if(!st || !st.code) return;
+        const q = quoteMap[String(st.code)];
+        if(!q || q.chg==null) return;
+        if(q.chg >= 15) rsiOver.push({code:st.code, name:st.name, chg:q.chg});
+        else if(q.chg <= -5) rsiUnder.push({code:st.code, name:st.name, chg:q.chg});
+      });
+      rsiOver.sort((a,b)=>b.chg-a.chg);
+      rsiUnder.sort((a,b)=>a.chg-b.chg);
+      const rsiCount = rsiOver.length + rsiUnder.length;
+
+      // ④ 资金排列 = 候选 ∩ 机构 ∩ 涨幅>0 ∩ 主力净买，四维对齐
+      const arr = [];
+      Object.entries(candStocks).forEach(([k, st])=>{
+        if(!st || !st.code) return;
+        const code = String(st.code);
+        const q = quoteMap[code], ir = instMap[code];
+        if(!q || !ir) return;
+        if(q.chg>0 && (ir.net_amt||0)>0 && (ir.buy_inst||0)>0){
+          arr.push({code:st.code, name:st.name, chg:q.chg, net_amt:ir.net_amt||0, buy_inst:ir.buy_inst||0});
+        }
+      });
+      arr.sort((a,b)=>b.net_amt - a.net_amt);
+
+      // 计数 + 配色
+      const total = lead.length + instIn.length + rsiCount + arr.length;
+      hubFactorCount.textContent = total ? (total+' 触发') : '无触发';
+      hubFactorCount.style.color = total ? 'var(--up)' : 'var(--dim)';
+
+      // 样本预览
+      const leadHtml = lead.length ? lead.slice(0,3).map(x=>x.name+' +'+x.chg.toFixed(1)+'%').join(' · ')+'…' : '无';
+      const instHtml = instIn.length ? instIn.slice(0,3).map(x=>x.name).join(' · ')+'…' : '无';
+      const rsiHtml = (rsiOver.length||rsiUnder.length)
+        ? (rsiOver.slice(0,2).map(x=>x.name+'+'+x.chg.toFixed(1)+'%').join(' / ')+
+           (rsiUnder.length?('  /  '+rsiUnder.slice(0,2).map(x=>x.name+x.chg.toFixed(1)+'%').join(' / ')):''))
+        : '无';
+      const arrHtml = arr.length ? arr.slice(0,3).map(x=>x.name).join(' · ')+'…' : '无';
+
+      hubFactorBody.innerHTML =
+        '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;">'+
+          '<span class="hub-tag '+(lead.length?'up':'neutral')+'">龙头合力 '+lead.length+'</span>'+
+          '<span class="hub-tag '+(instIn.length?'up':'neutral')+'">主力通道 '+instIn.length+'</span>'+
+          '<span class="hub-tag '+(rsiCount?'warn':'neutral')+'">RSI背离 '+rsiCount+'</span>'+
+          '<span class="hub-tag '+(arr.length?'gold':'neutral')+'">资金排列 '+arr.length+'</span>'+
+        '</div>'+
+        '<div style="font-size:10.5px;color:var(--sub);line-height:1.55;">'+
+          '<div><b style="color:var(--up)">龙</b> '+leadHtml+'</div>'+
+          '<div><b style="color:var(--up)">主</b> '+instHtml+'</div>'+
+          '<div><b style="color:var(--gold)">背</b> '+rsiHtml+'</div>'+
+          '<div><b style="color:var(--gold)">列</b> '+arrHtml+'</div>'+
+        '</div>';
     }
 
     const latestTime=crisis.update_time||macro.update_time||fib.update_time;
@@ -5815,7 +5886,7 @@ function renderLimitUpHeatmap(){
 
     // 3) 盘后数据：全部使用已注入的 window.* 变量（data/*.js 已在 <head> 同步加载）
     safe(renderFib, window.SH_FIB || {});
-    safe(renderDecisionHub, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, {}, window.SECTOR_FUND_FLOW || {}, window.CRISIS_DATA || {}, window.MACRO_DATA || {});
+    safe(renderDecisionHub, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, {}, window.SECTOR_FUND_FLOW || {}, window.CRISIS_DATA || {}, window.MACRO_DATA || {}, window.CANDIDATE || {}, window.CANDIDATE_QUOTES || {}, window.INST_TRADE || {}, window.GOLD_POOL || {}, window.TRIPLE_CONSENSUS || {});
     safe(renderThermo, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, {}, window.SECTOR_FUND_FLOW || {});
     safe(renderSixDim, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, window.CRISIS_DATA || {}, window.SECTOR_FUND_FLOW || {}, window.MARKET_FUND_FLOW_DATA || {});
     safe(renderCrisis, window.CRISIS_DATA || {});
