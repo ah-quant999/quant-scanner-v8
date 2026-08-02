@@ -3411,7 +3411,7 @@ window.V8_CAL = {weeks:[],legend:[]};
       </div>
       <div class="card">
         <h3><span class="ic">🤖</span>双机状态 - 运维</h3>
-        <div class="kv"><span class="k">主力节点（中国节点）</span><span><span class="status-dot s-ok"></span>在线 · 08:15-17:00 主机</span></div>
+        <div class="kv"><span class="k">主力节点（中国节点）</span><span><span class="status-dot s-ok"></span>在线 · 全天在线（单位机）</span></div>
         <div class="kv"><span class="k">阿狸咪（云端）</span><span><span class="status-dot s-warn"></span>待命 · 夜间/周末接管</span></div>
         <div class="kv"><span class="k">failover 守卫</span><span><span class="status-dot s-ok"></span>活跃</span></div>
       </div>
@@ -3564,7 +3564,7 @@ window.V8_CAL = {weeks:[],legend:[]};
         </table>
 
         <div class="logic-h">关键设计原则</div>
-        <div class="logic-p"><b>龙虎榜必须等 17 点交易所发布后才能取完整数据</b>，因此盘后算法链固定在 18:30。盘中只刷新 T+0 快照，不跑盘后算法，避免用陈旧数据算出错误共识。<b>Safety Net</b>是保险机制——中国节点仅工作日 08:15-17:00 在线（17:00-次日 8:25 + 周末 cron 不跑），Safety Net 是「断线时自动补跑」而非「日常调度」。</div>
+        <div class="logic-p"><b>龙虎榜必须等 17 点交易所发布后才能取完整数据</b>，因此盘后算法链固定在 18:30。盘中只刷新 T+0 快照，不跑盘后算法，避免用陈旧数据算出错误共识。<b>Safety Net</b>是保险机制——中国节点（单位机）全天在线，Safety Net 是「断线时自动补跑」而非「日常调度」。</div>
       </div>
 
       <div class="card">
@@ -3868,7 +3868,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">部署状态</div>
         <div class="logic-p">展示最近一次部署时间、来源、关键数据文件状态、异常告警。每次部署前执行四层安全检查：数据语法→前端语法→运行时冒烟→注入率闸门。</div>
         <div class="logic-h">双机状态</div>
-        <div class="logic-p">小九（单位机，工作日 08:15-17:00 在岗）全面接管阿狸咪家中机职责。云端 bot 与双机 bot 分别标记。</div>
+        <div class="logic-p">小九（单位机，全天在线）全面接管阿狸咪家中机职责。云端 bot 与双机 bot 分别标记。</div>
       </div>
 
       <div class="card">
