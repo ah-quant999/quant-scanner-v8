@@ -4584,6 +4584,16 @@ function renderLimitUpHeatmap(){
     const day = diff===1?'昨日':diff>1?`${diff}天前`:diff<0?'未来':'今日';
     return `${day} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
+  // 数据陈旧度（>1 天时金色提示，和资金流时间轴同款）
+  function fmtStaleness(ts){
+    if(!ts) return '';
+    const d=new Date(String(ts).replace(/-/g,'/'));
+    if(isNaN(d.getTime())) return '';
+    const diffMs=Date.now()-d.getTime();
+    const days=Math.floor(diffMs/86400000);
+    if(days>=2) return `<span style="color:#fbbf24;margin-left:6px;">⚠ 数据 ${days} 天前</span>`;
+    return '';
+  }
 
   function classify(items, today){
     const g={listedToday:[],todayApply:[],futureApply:[],pricing:[],preListing:[],tracking:[]};
@@ -4679,7 +4689,7 @@ function renderLimitUpHeatmap(){
     today = dateFromUpdate(data&&data.update_time) || todayStr(new Date());
     grouped = classify((data&&data.stocks)||[], today);
     const fresh=document.getElementById('ipoFresh');
-    if(fresh && data && data.update_time) fresh.textContent=`更新于 ${fmtUpdateTime(data.update_time)}`;
+    if(fresh && data && data.update_time) fresh.innerHTML=`更新于 ${fmtUpdateTime(data.update_time)}${fmtStaleness(data.update_time)}`;
     renderAll();
   }
 
@@ -4688,10 +4698,17 @@ function renderLimitUpHeatmap(){
     if(window.IPO_DATA && Array.isArray(window.IPO_DATA.stocks) && window.IPO_DATA.stocks.length){
       applyData(window.IPO_DATA);
     }else{
-      fetch('data/ipo_score.json')
-        .then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
+      // 优先 fetch data/IPO_DATA.js（真实数据文件），其次 data/ipo_score.json（兼容旧路径）
+      fetch('data/IPO_DATA.js')
+        .then(r=>{ if(!r.ok) throw new Error('data/IPO_DATA.js http '+r.status); return r.text(); })
+        .then(txt=>{ const m=txt.match(/window\.IPO_DATA\s*=\s*({[\s\S]+?});?\s*$/); if(!m) throw new Error('no IPO_DATA found'); return JSON.parse(m[1]); })
         .then(applyData)
-        .catch(err=>{ console.warn('IPO: 回退内嵌兜底', err); applyData(IPO_FALLBACK); });
+        .catch(err=>{ console.warn('IPO: 尝试 data/IPO_DATA.js 失败', err);
+          fetch('data/ipo_score.json')
+            .then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
+            .then(applyData)
+            .catch(err2=>{ console.warn('IPO: 回退内嵌兜底', err2); applyData(IPO_FALLBACK); });
+        });
     }
     // ② tab 绑定独立执行，失败绝不影响数据渲染
     try{ bindTabs(); }catch(e){ console.warn('IPO tab 绑定失败（不影响数据）', e); }
