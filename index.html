@@ -6213,8 +6213,10 @@ function renderLimitUpHeatmap(){
     }
   }
 
-  /* ===== 运维系统告警 ===== */
+    /* ===== 运维系统告警（多维） ===== */
   var _opsAlertRendered=false;
+  var _alertCategories={freshness:null,bloat:null,anomaly:null,missing:null};
+  var _alertCurCat='freshness';
   function renderOpsAlerts(){
     if(_opsAlertRendered) return;
     var body=document.getElementById('opsAlertBody');
@@ -6222,7 +6224,8 @@ function renderLimitUpHeatmap(){
     if(!body){ return; }
     _opsAlertRendered=true;
     var now=Date.now();
-    // 定义监控项：[window属性名, 显示名, 阈值小时(警告/严重)]
+
+    /* ---------- 维度1：数据新鲜度（原有逻辑） ---------- */
     var watchList=[
       ['CRISIS_DATA','危机雷达',6,24],['CANDIDATE','候选池',6,24],
       ['COCKPIT_ADVICE','AI建议',12,36],['CAPITAL_FLOW_DATA','板块资金流',4,18],
@@ -6239,7 +6242,6 @@ function renderLimitUpHeatmap(){
       ['CRDS_CARD_DATA','CRDS卡片',6,24],['COCKPIT_TIER_RECOMM','分层推荐',12,36],
       ['CANDIDATE_QUOTES','候选池行情',2,6]
     ];
-    // 时间戳字段优先级
     var tsFields=['update_time','gen_time','last_update','last_updated'];
     function extractTs(obj){
       if(!obj || typeof obj!=='object') return null;
@@ -6247,85 +6249,283 @@ function renderLimitUpHeatmap(){
         var v=obj[tsFields[i]];
         if(v && typeof v==='string' && /^\d{4}-\d{2}/.test(v)) return v;
       }
-      if(Array.isArray(obj) && obj.length>0){
-        return extractTs(obj[0]);
-      }
+      if(Array.isArray(obj) && obj.length>0){ return extractTs(obj[0]); }
       return null;
     }
-    var alerts=[]; // {name, tsStr, ageHours, level: 'ok'|'warn'|'crit'}
-    var okCount=0, warnCount=0, critCount=0;
+    function estimateSize(obj){
+      try{ return JSON.stringify(obj).length; }catch(e){ return 0; }
+    }
+    function estimateCount(obj){
+      if(!obj) return 0;
+      if(Array.isArray(obj)) return obj.length;
+      if(typeof obj==='object'){
+        var keys=Object.keys(obj); if(keys.length===0) return 0;
+        var first=obj[keys[0]];
+        if(Array.isArray(first)) return first.length;
+        return keys.length;
+      }
+      return 0;
+    }
+
+    /* --- 新鲜度扫描 --- */
+    var freshAlerts=[], okF=0, warnF=0, critF=0;
     for(var i=0;i<watchList.length;i++){
       var w=watchList[i];
-      var obj=window[w[0]];
-      var ts=extractTs(obj);
-      if(!ts){ alerts.push({name:w[1],tsStr:'--',ageHours:9999,level:'crit',reason:'无数据'}); critCount++; continue; }
+      var obj=window[w[0]], ts=extractTs(obj);
+      if(!ts){ freshAlerts.push({name:w[1],tsStr:'--',ageH:9999,lvl:'crit',reason:'无数据'}); critF++; continue; }
       var d=new Date(ts.replace(/\s/,'T'));
-      if(isNaN(d.getTime())){ alerts.push({name:w[1],tsStr:ts,ageHours:9999,level:'crit',reason:'时间格式异常'}); critCount++; continue; }
-      var ageMs=now-d.getTime();
-      var ageH=ageMs/3600000;
-      var level='ok', reason='';
-      if(ageH>w[3]){ level='crit'; reason='超过'+w[3]+'h未更新'; critCount++; }
-      else if(ageH>w[2]){ level='warn'; reason='超过'+w[2]+'h未更新'; warnCount++; }
-      else{ okCount++; }
-      alerts.push({name:w[1],tsStr:ts,ageHours:Math.round(ageH*10)/10,level:level,reason:reason});
+      if(isNaN(d.getTime())){ freshAlerts.push({name:w[1],tsStr:ts,ageH:9999,lvl:'crit',reason:'时间格式异常'}); critF++; continue; }
+      var ageH=(now-d.getTime())/3600000, lvl='ok', reason='';
+      if(ageH>w[3]){ lvl='crit'; reason='超过'+w[3]+'h未更新'; critF++; }
+      else if(ageH>w[2]){ lvl='warn'; reason='超过'+w[2]+'h未更新'; warnF++; }
+      else{ okF++; }
+      freshAlerts.push({name:w[1],tsStr:ts,ageH:Math.round(ageH*10)/10,lvl:lvl,reason:reason});
     }
-    // 健康分
-    var total=watchList.length;
-    var healthScore=Math.round((okCount*100 + warnCount*50 + critCount*0)/total);
-    var healthColor=healthScore>=80?'var(--up)':healthScore>=50?'var(--gold)':'var(--down)';
-    var healthLabel=healthScore>=80?'健康':healthScore>=50?'亚健康':'异常';
-    // 构建HTML
-    var lvlIcon={ok:'✅',warn:'⚠️',crit:'🚨'};
-    var lvlDot={ok:'s-ok',warn:'s-warn',crit:'s-err'};
-    var lvlBorder={ok:'var(--up)',warn:'var(--gold)',crit:'var(--down)'};
-    var h='<div style="display:flex;gap:16px;align-items:center;margin-bottom:14px;flex-wrap:wrap">';
-    // 健康分大色块
-    h+='<div style="flex:0 0 auto;padding:14px 22px;border-radius:12px;text-align:center;background:'+healthColor+'22;border:1px solid '+healthColor+'44">';
-    h+='<div style="font-size:28px;font-weight:800;color:'+healthColor+'">'+healthScore+'</div>';
-    h+='<div style="font-size:11px;color:'+healthColor+'">'+healthLabel+'</div></div>';
-    // 统计条
-    h+='<div style="flex:1;min-width:160px"><div style="display:flex;gap:12px;margin-bottom:6px;font-size:12px">';
-    h+='<span>'+lvlIcon.ok+' 正常 <b style="color:var(--up)">'+okCount+'</b></span>';
-    h+='<span>'+lvlIcon.warn+' 警告 <b style="color:var(--gold)">'+warnCount+'</b></span>';
-    h+='<span>'+lvlIcon.crit+' 异常 <b style="color:var(--down)">'+critCount+'</b></span></div>';
-    // 进度条
-    h+='<div style="height:6px;border-radius:3px;background:var(--card2);overflow:hidden;display:flex">';
-    if(okCount>0) h+='<div style="width:'+(okCount/total*100)+'%;background:var(--up);border-radius:3px 0 0 3px"></div>';
-    if(warnCount>0) h+='<div style="width:'+(warnCount/total*100)+'%;background:var(--gold)"></div>';
-    if(critCount>0) h+='<div style="width:'+(critCount/total*100)+'%;background:var(--down);border-radius:0 3px 3px 0"></div>';
-    h+='</div></div>';
+    _alertCategories.freshness={items:freshAlerts,ok:okF,warn:warnF,crit:critF,total:watchList.length};
+
+    /* --- 臃肿度扫描 --- */
+    var bloatRules=[
+      ['CANDIDATE','候选池','count',200,'候选数超标'],
+      ['LHB_DATA','龙虎榜','size',300000,'JSON体积过大'],
+      ['LIMIT_UP_HEATMAP','涨停热力','count',200,'涨停标的过多'],
+      ['HERDING_DATA','羊群效应','size',200000,'JSON体积过大'],
+      ['ETF_DAILY_MONITOR','ETF日监控','size',500000,'JSON体积过大'],
+      ['ETF_INTRADAY_HEAT','ETF盘中热力','count',500,'热力项过多'],
+      ['MARKET_ALERTS','异动监控','count',100,'异动条目过多'],
+      ['CONCEPT_RANKING','概念排名','count',300,'概念数超标'],
+      ['INST_TRADE','机构交易','size',200000,'JSON体积过大'],
+      ['SH_SZ_HISTORY','涨跌家数','size',100000,'历史数据膨胀'],
+      ['SECTOR_FUND_FLOW','资金流矩阵','size',200000,'矩阵体积过大'],
+      ['CAPITAL_FLOW_DATA','板块资金流','count',150,'板块数超标'],
+      ['STOCK_LIST','股票列表','count',6000,'标的池过大']
+    ];
+    var bloatAlerts=[], okB=0, warnB=0, critB=0;
+    for(var b=0;b<bloatRules.length;b++){
+      var rule=bloatRules[b], obj=window[rule[0]];
+      if(!obj){ continue; }
+      var val=rule[2]==='size'?estimateSize(obj):estimateCount(obj);
+      var threshold=rule[3], lvl='ok', reason='';
+      var displayVal=rule[2]==='size'?(val/1024).toFixed(1)+'KB':val+'条';
+      var threshDisplay=rule[2]==='size'?(threshold/1024).toFixed(1)+'KB':threshold+'条';
+      if(val>threshold*1.5){ lvl='crit'; reason=displayVal+'>'+threshDisplay+' ('+rule[4]+')'; critB++; }
+      else if(val>threshold){ lvl='warn'; reason=displayVal+'接近'+threshDisplay; warnB++; }
+      else{ okB++; }
+      if(lvl!=='ok'){ bloatAlerts.push({name:rule[1],val:displayVal,lvl:lvl,reason:reason}); }
+    }
+    _alertCategories.bloat={items:bloatAlerts,ok:okB,warn:warnB,crit:critB,total:bloatRules.length};
+
+    /* --- 数值异常扫描 --- */
+    var anomalyAlerts=[], okA=0, warnA=0, critA=0;
+    (function(){
+      var o=window.CRISIS_DATA;
+      if(!o) return;
+      if(o.score!=null && (o.score<0||o.score>100)){ anomalyAlerts.push({name:'危机雷达·综合分',val:o.score.toFixed(1),lvl:'crit',reason:'分值越界(0-100)'}); critA++; } else { okA++; }
+      if(o.dimensions){
+        if(o.dimensions.currency!=null && (o.dimensions.currency<0||o.dimensions.currency>100)){ anomalyAlerts.push({name:'危机雷达·货币',val:o.dimensions.currency.toFixed(1),lvl:'crit',reason:'货币分越界'}); critA++; } else if(o.dimensions.currency!=null){ okA++; }
+        if(o.dimensions.economy!=null && (o.dimensions.economy<0||o.dimensions.economy>100)){ anomalyAlerts.push({name:'危机雷达·经济',val:o.dimensions.economy.toFixed(1),lvl:'crit',reason:'经济分越界'}); critA++; } else if(o.dimensions.economy!=null){ okA++; }
+        if(o.dimensions.global!=null && (o.dimensions.global<0||o.dimensions.global>100)){ anomalyAlerts.push({name:'危机雷达·全球',val:o.dimensions.global.toFixed(1),lvl:'crit',reason:'全球分越界'}); critA++; } else if(o.dimensions.global!=null){ okA++; }
+      }
+    })();
+    (function(){
+      var o=window.NORTH_FUND;
+      if(!o || o.net_buy==null) return;
+      if(Math.abs(o.net_buy)>500){ anomalyAlerts.push({name:'北向资金·净买入',val:o.net_buy.toFixed(1),lvl:'crit',reason:'单日净买入极端(>500亿)'}); critA++; }
+      else if(Math.abs(o.net_buy)>200){ anomalyAlerts.push({name:'北向资金·净买入',val:o.net_buy.toFixed(1),lvl:'warn',reason:'净买入偏高'}); warnA++; }
+      else{ okA++; }
+    })();
+    (function(){
+      var o=window.VOLATILITY;
+      if(!o || !o.items || o.items.length===0) return;
+      var v=o.items[0].vol_ann;
+      if(v==null || isNaN(v)) return;
+      if(v>150 || v<0){ anomalyAlerts.push({name:'波动率·年化',val:v.toFixed(1),lvl:'crit',reason:'年化波动率异常'}); critA++; }
+      else if(v>80){ anomalyAlerts.push({name:'波动率·年化',val:v.toFixed(1),lvl:'warn',reason:'波动率偏高'}); warnA++; }
+      else{ okA++; }
+    })();
+    _alertCategories.anomaly={items:anomalyAlerts,ok:okA,warn:warnA,crit:critA,total:okA+warnA+critA};
+
+    /* --- 缺失检测 --- */
+    var requiredData=[
+      ['CRISIS_DATA','危机雷达'],['CANDIDATE','候选池'],['CAPITAL_FLOW_DATA','板块资金流'],
+      ['LHB_DATA','龙虎榜'],['ETF_DAILY_MONITOR','ETF日监控'],['MARKET_ALERTS','异动监控'],
+      ['SH_SZ_HISTORY','涨跌家数'],['INDEX_QUOTES','指数行情'],['COCKPIT_ADVICE','AI建议'],
+      ['VOLATILITY','波动率观测'],['SECTOR_RS','板块RS'],['CONCEPT_RANKING','概念排名']
+    ];
+    var missingAlerts=[], okM=0, critM=0;
+    for(var m=0;m<requiredData.length;m++){
+      var rq=requiredData[m], obj=window[rq[0]];
+      var isMissing=!obj || (Array.isArray(obj)&&obj.length===0) || (typeof obj==='object'&&Object.keys(obj).length===0);
+      if(!isMissing && obj && typeof obj==='object'){
+        var keys=Object.keys(obj);
+        var dataKeys=keys.filter(function(k){ return k!=='update_time'&&k!=='gen_time'&&k!=='last_update'&&k!=='stopped'; });
+        if(dataKeys.length===0){ isMissing=true; }
+        else{
+          var hasContent=false;
+          for(var dk=0;dk<dataKeys.length;dk++){
+            var dv=obj[dataKeys[dk]];
+            if(dv && !(Array.isArray(dv)&&dv.length===0)){ hasContent=true; break; }
+          }
+          if(!hasContent){ isMissing=true; }
+        }
+      }
+      if(isMissing){ missingAlerts.push({name:rq[1],lvl:'crit',reason:'数据为空或不存在'}); critM++; }
+      else{ okM++; }
+    }
+    _alertCategories.missing={items:missingAlerts,ok:okM,warn:0,crit:critM,total:requiredData.length};
+
+    /* ========== 构建UI ========== */
+    var cats=[
+      {key:'freshness',icon:'\u23f0',label:'新鲜度',cat:_alertCategories.freshness},
+      {key:'bloat',icon:'\ud83d\udce6',label:'臃肿度',cat:_alertCategories.bloat},
+      {key:'anomaly',icon:'\ud83d\udcc8',label:'异常值',cat:_alertCategories.anomaly},
+      {key:'missing',icon:'\u2753',label:'缺失检测',cat:_alertCategories.missing}
+    ];
+
+    var h='';
+    h+='<div style="display:flex;gap:12px;align-items:center;margin-bottom:14px;flex-wrap:wrap">';
+    var freshScore=Math.round((_alertCategories.freshness.ok*100+_alertCategories.freshness.warn*50)/_alertCategories.freshness.total);
+    var otherPenalty=_alertCategories.bloat.crit*15+_alertCategories.bloat.warn*5+
+                      _alertCategories.anomaly.crit*20+_alertCategories.anomaly.warn*8+
+                      _alertCategories.missing.crit*25;
+    var overallScore=Math.max(0,freshScore-otherPenalty);
+    var hc=overallScore>=80?'var(--up)':overallScore>=50?'var(--gold)':'var(--down)';
+    var hl=overallScore>=80?'\u5065\u5eb7':overallScore>=50?'\u4e9a\u5065\u5eb7':'\u5f02\u5e38';
+    h+='<div style="flex:0 0 auto;padding:12px 18px;border-radius:12px;text-align:center;background:'+hc+'22;border:1px solid '+hc+'44">';
+    h+='<div style="font-size:26px;font-weight:800;color:'+hc+'">'+overallScore+'</div>';
+    h+='<div style="font-size:11px;color:'+hc+'">'+hl+'</div></div>';
+    for(var ci=0;ci<cats.length;ci++){
+      var c=cats[ci], ct=c.cat;
+      var bad=ct.crit+ct.warn;
+      var cc=ct.crit>0?'var(--down)':ct.warn>0?'var(--gold)':'var(--up)';
+      h+='<div style="flex:0 0 auto;padding:8px 14px;border-radius:10px;background:var(--card2);border:1px solid '+cc+'33;cursor:pointer;text-align:center" onclick="_alertSwitchCat(\''+c.key+'\')">';
+      h+='<div style="font-size:16px">'+c.icon+'</div>';
+      h+='<div style="font-size:11px;font-weight:700;color:'+cc+'">'+c.label+'</div>';
+      h+='<div style="font-size:10px;color:var(--dim)">'+(bad>0?'\u26a0\ufe0f'+bad:'\u2705')+'</div></div>';
+    }
     h+='</div>';
-    // 只展示有问题的项（正常的不展开）
-    var problems=alerts.filter(function(a){return a.level!=='ok';});
+
+    h+='<div id="alertCatContent">';
+    h+=_renderFreshTable();
+    h+='</div>';
+
+    body.innerHTML=h;
+    if(scanTime) scanTime.textContent='\u626b\u63cf\u4e8e '+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+  }
+
+  function _renderFreshTable(){
+    var items=_alertCategories.freshness.items, ct=_alertCategories.freshness;
+    var problems=items.filter(function(a){return a.lvl!=='ok';});
+    var html='<div>';
     if(problems.length===0){
-      h+='<div style="padding:10px 14px;border-radius:8px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);font-size:12px;color:var(--up)">✅ 全部 '+total+' 个数据源均在新鲜度阈值内</div>';
+      html+='<div style="padding:10px 14px;border-radius:8px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);font-size:12px;color:var(--up)">\u2705 \u5168\u90e8 '+ct.total+' \u4e2a\u6570\u636e\u6e90\u5748\u5728\u65b0\u9c9c\u5ea6\u9608\u503c\u5185</div>';
     }else{
-      h+='<table style="width:100%;border-collapse:collapse;font-size:11.5px"><thead><tr><th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600">数据源</th><th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600">最后更新</th><th style="text-align:right;padding:5px 8px;color:var(--dim);font-weight:600">陈旧</th><th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600">状态</th></tr></thead><tbody>';
-      // 按严重度排序：crit在前
-      problems.sort(function(a,b){return (a.level==='crit'?0:1)-(b.level==='crit'?0:1); });
+      html+='<table style="width:100%;border-collapse:collapse;font-size:11.5px"><thead><tr>';
+      html+='<th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600">\u6570\u636e\u6e90</th>';
+      html+='<th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600">\u6700\u540e\u66f4\u65b0</th>';
+      html+='<th style="text-align:right;padding:5px 8px;color:var(--dim);font-weight:600">\u9648\u65e7</th>';
+      html+='<th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600">\u72b6\u6001</th></tr></thead><tbody>';
+      problems.sort(function(a,b){return (a.lvl==='crit'?0:1)-(b.lvl==='crit'?0:1);});
       for(var p=0;p<problems.length;p++){
         var a=problems[p];
-        var bg=a.level==='crit'?'rgba(244,63,94,0.06)':a.level==='warn'?'rgba(251,191,36,0.06)':'transparent';
-        var bd=lvlBorder[a.level];
-        h+='<tr style="background:'+bg+';border-left:2px solid '+bd+'"><td style="padding:5px 8px;font-weight:600">'+a.name+'</td>';
-        h+='<td style="padding:5px 8px;color:var(--sub);white-space:nowrap;font-size:10.5px">'+a.tsStr+'</td>';
-        h+='<td style="padding:5px 8px;text-align:right;color:'+(a.level==='crit'?'var(--down)':a.level==='warn'?'var(--gold)':'var(--up)')+';font-weight:600">'+a.ageHours+'h</td>';
-        h+='<td style="padding:5px 8px"><span class="status-dot '+lvlDot[a.level]+'"></span>'+(a.reason||a.level==='crit'?'严重陈旧':a.level==='warn'?'接近过期':'')+'</td></tr>';
+        var bg=a.lvl==='crit'?'rgba(244,63,94,0.06)':a.lvl==='warn'?'rgba(251,191,36,0.06)':'transparent';
+        var bd=a.lvl==='crit'?'var(--down)':a.lvl==='warn'?'var(--gold)':'var(--up)';
+        html+='<tr style="background:'+bg+';border-left:2px solid '+bd+'"><td style="padding:5px 8px;font-weight:600">'+a.name+'</td>';
+        html+='<td style="padding:5px 8px;color:var(--sub);white-space:nowrap;font-size:10.5px">'+a.tsStr+'</td>';
+        html+='<td style="padding:5px 8px;text-align:right;color:'+(a.lvl==='crit'?'var(--down)':a.lvl==='warn'?'var(--gold)':'var(--up)')+';font-weight:600">'+a.ageH+'h</td>';
+        html+='<td style="padding:5px 8px"><span class="status-dot '+(a.lvl==='crit'?'s-err':a.lvl==='warn'?'s-warn':'s-ok')+'"></span>'+(a.reason||(a.lvl==='crit'?'\u4e25\u91cd\u9648\u65e7':'\u63a5\u8fd1\u8fc7\u671f'))+'</td></tr>';
       }
-      h+='</tbody></table>';
-      // 折叠正常项
-      var okItems=alerts.filter(function(a){return a.level==='ok';});
+      html+='</tbody></table>';
+      var okItems=items.filter(function(a){return a.lvl==='ok';});
       if(okItems.length>0){
-        h+='<details style="margin-top:8px"><summary style="cursor:pointer;font-size:11px;color:var(--dim);padding:4px 0">✅ '+okItems.length+' 个正常数据源（展开）</summary>';
-        h+='<div style="display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;padding:8px;background:var(--card2);border-radius:6px">';
-        for(var o=0;o<okItems.length;o++){
-          h+='<span style="font-size:10.5px;color:var(--sub);white-space:nowrap">'+lvlIcon.ok+' '+okItems[o].name+' <span style="color:var(--dim)">'+okItems[o].ageHours+'h</span></span>';
-        }
-        h+='</div></details>';
+        html+='<details style="margin-top:8px"><summary style="cursor:pointer;font-size:11px;color:var(--dim);padding:4px 0">\u2705 '+okItems.length+' \u4e2a\u6b63\u5e38\u6570\u636e\u6e90\uff08\u5c55\u5f00\uff09</summary>';
+        html+='<div style="display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;padding:8px;background:var(--card2);border-radius:6px">';
+        for(var o=0;o<okItems.length;o++){ html+='<span style="font-size:10.5px;color:var(--sub);white-space:nowrap">\u2705 '+okItems[o].name+' <span style="color:var(--dim)">'+okItems[o].ageH+'h</span></span>'; }
+        html+='</div></details>';
       }
     }
-    body.innerHTML=h;
-    if(scanTime) scanTime.textContent='扫描于 '+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+    html+='</div>'; return html;
+  }
+
+  function _renderBloatTable(){
+    var items=_alertCategories.bloat.items, ct=_alertCategories.bloat;
+    var html='<div>';
+    if(items.length===0){
+      html+='<div style="padding:10px 14px;border-radius:8px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);font-size:12px;color:var(--up)">\u2705 \u6240\u6709\u53d7\u68c0\u6570\u636e\u91cf\u5748\u5728\u6b63\u5e38\u8303\u56f4\u5185</div>';
+    }else{
+      html+='<table style="width:100%;border-collapse:collapse;font-size:11.5px"><thead><tr>';
+      html+='<th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600">\u6570\u636e\u6e90</th>';
+      html+='<th style="text-align:right;padding:5px 8px;color:var(--dim);font-weight:600">\u5f53\u524d\u91cf</th>';
+      html+='<th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600">\u72b6\u6001</th></tr></thead><tbody>';
+      for(var bi=0;bi<items.length;bi++){
+        var a=items[bi];
+        var bg=a.lvl==='crit'?'rgba(244,63,94,0.08)':a.lvl==='warn'?'rgba(251,191,36,0.08)':'transparent';
+        var bd=a.lvl==='crit'?'var(--down)':a.lvl==='warn'?'var(--gold)':'var(--up)';
+        html+='<tr style="background:'+bg+';border-left:2px solid '+bd+'"><td style="padding:5px 8px;font-weight:600">'+a.name+'</td>';
+        html+='<td style="padding:5px 8px;text-align:right;font-weight:700;color:'+(a.lvl==='crit'?'var(--down)':'var(--gold)')+'">'+a.val+'</td>';
+        html+='<td style="padding:5px 8px"><span class="status-dot '+(a.lvl==='crit'?'s-err':'s-warn')+'"></span>'+a.reason+'</td></tr>';
+      }
+      html+='</tbody></table>';
+    }
+    html+='<div style="margin-top:8px;font-size:10px;color:var(--dim)">\ud83d\udccb \u68c0\u6d4b\u6807\u51c6\uff1a\u6570\u7ec4\u957f\u5ea6\u6216 JSON \u4f53\u79ef\u8d85\u9608\u503c\u5373\u62a5\u8b66\uff0c\u907f\u514d\u524d\u7aef\u52a0\u8f7d\u5361\u987f</div>';
+    html+='</div>'; return html;
+  }
+
+  function _renderAnomalyTable(){
+    var items=_alertCategories.anomaly.items, ct=_alertCategories.anomaly;
+    var html='<div>';
+    if(items.length===0){
+      html+='<div style="padding:10px 14px;border-radius:8px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);font-size:12px;color:var(--up)">\u2705 \u672a\u53d1\u73b0\u6570\u503c\u5f02\u5e38</div>';
+    }else{
+      html+='<table style="width:100%;border-collapse:collapse;font-size:11.5px"><thead><tr>';
+      html+='<th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600">\u6307\u6807</th>';
+      html+='<th style="text-align:right;padding:5px 8px;color:var(--dim);font-weight:600">\u5f53\u524d\u503c</th>';
+      html+='<th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600>\u8bf4\u660e</th></tr></thead><tbody>';
+      for(var ai=0;ai<items.length;ai++){
+        var a=items[ai];
+        var bg=a.lvl==='crit'?'rgba(244,63,94,0.08)':a.lvl==='warn'?'rgba(251,191,36,0.08)':'transparent';
+        var bd=a.lvl==='crit'?'var(--down)':a.lvl==='warn'?'var(--gold)':'var(--up)';
+        html+='<tr style="background:'+bg+';border-left:2px solid '+bd+'"><td style="padding:5px 8px;font-weight:600">'+a.name+'</td>';
+        html+='<td style="padding:5px 8px;text-align:right;font-weight:700;font-family:monospace;color:'+(a.lvl==='crit'?'var(--down)':'var(--gold)')+'">'+a.val+'</td>';
+        html+='<td style="padding:5px 8px;color:var(--sub)">'+a.reason+'</td></tr>';
+      }
+      html+='</tbody></table>';
+    }
+    html+='<div style="margin-top:8px;font-size:10px;color:var(--dim)">\ud83d\udccb \u68c0\u6d4b\u8303\u56f4\uff1a\u5371\u673a\u96f7\u8fbe\u5206\u503c(0-100)\u3001\u5317\u5411\u51c0\u4e70\u5165\u3001\u6ce2\u52a8\u7387\u7b49\u5173\u952e\u6307\u6807\u8d8a\u754c\u68c0\u6d4b</div>';
+    html+='</div>'; return html;
+  }
+
+  function _renderMissingTable(){
+    var items=_alertCategories.missing.items, ct=_alertCategories.missing;
+    var html='<div>';
+    if(items.length===0){
+      html+='<div style="padding:10px 14px;border-radius:8px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);font-size:12px;color:var(--up)">\u2705 \u6240\u6709\u6838\u5fc3\u6570\u636e\u6e90\u5747\u6b63\u5e38\u52a0\u8f7d</div>';
+    }else{
+      html+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
+      for(var mi=0;mi<items.length;mi++){
+        var a=items[mi];
+        html+='<div style="padding:6px 12px;border-radius:6px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2);font-size:11.5px;font-weight:600;color:var(--down)">';
+        html+='<span style="margin-right:4px">\ud83d\udea8</span>'+a.name+' <span style="font-weight:400;font-size:10px;color:var(--sub)">'+a.reason+'</span></div>';
+      }
+      html+='</div>';
+    }
+    html+='<div style="margin-top:8px;font-size:10px;color:var(--dim)">\ud83d\udccb \u53d7\u68c0\u9879\uff1a'+ct.total+' \u4e2a\u6838\u5fc3\u6570\u636e\u6e90\uff0c\u7a7a/null/\u65e0\u6709\u6548\u5185\u5bb9\u5373\u6807\u7ea2</div>';
+    html+='</div>'; return html;
+  }
+
+  function _alertSwitchCat(catKey){
+    _alertCurCat=catKey;
+    var container=document.getElementById('alertCatContent');
+    if(!container) return;
+    if(catKey==='freshness'){ container.innerHTML=_renderFreshTable(); }
+    else if(catKey==='bloat'){ container.innerHTML=_renderBloatTable(); }
+    else if(catKey==='anomaly'){ container.innerHTML=_renderAnomalyTable(); }
+    else if(catKey==='missing'){ container.innerHTML=_renderMissingTable(); }
+    var cards=document.querySelectorAll('#opsAlertBody > div:first-child > div[onclick^="_alertSwitchCat"]');
+    for(var i=0;i<cards.length;i++){
+      var c=cards[i];
+      if(c.getAttribute('onclick').indexOf(catKey)!==-1){ c.style.boxShadow='0 0 0 2px var(--purple)'; }
+      else{ c.style.boxShadow='none'; }
+    }
   }
 
   function renderOps(){
