@@ -1214,20 +1214,51 @@ def f_v8_cal(today=None):
     today 参数仅用于测试（默认取系统当天）。
     """
     import calendar as _cal
-    from datetime import date
+    from datetime import date, datetime as _dt
     today = today or date.today()
 
     # ── 频率控制：非月初(1~3号)且非周六则读缓存 ──
     # 周六作为 T+1 周度/月度统一刷新窗口，强制重建日历（覆盖月度事件调整/财报日期修正）
+        # ── 频率控制（2026-08-02 修）：缓存里"今天的 today 标记"是否还在 ──
+    # 重建条件（满足任一即重建）：
+    #   1) 缓存不存在
+    #   2) 缓存月份 ≠ 今天所在月（自然切月）
+    #   3) 缓存 update_time 是昨天或更早
+    #   4) 缓存 weeks 里没有任何 day 标 today=true 且 num==今天的日子数
+    # 否则（缓存新鲜 + 今天是缓存里的 today）→ 直接返回缓存
+    # 修前 bug：「day>3 且非周六读缓存」漏掉周日-周六之间隔一整天的边角，
+    #  导致 8/2（周日）显示 8/1（周六）数据，today 永远停在 1 号。
     cache_file = RAW_DIR / "v8_cal.json"
-    is_saturday = today.weekday() == 5
-    if today.day > 3 and not is_saturday and cache_file.exists():
+    if cache_file.exists():
         try:
             cached = json.loads(cache_file.read_text(encoding="utf-8"))
-            print(f"    日历: 非月初({today.day}号)且非周六，读取缓存 {cached.get('month','?')}")
-            return cached
-        except Exception:
-            pass  # 缓存损坏则重新生成
+            cache_month = cached.get("month", "")
+            today_yyyymm = f"{today.year}-{today.month:02d}"
+            cache_ut = cached.get("update_time", "")
+            cache_has_today = any(
+                d.get("today") and d.get("num") == today.day
+                for w in cached.get("weeks", []) for d in w.get("days", [])
+            )
+            cache_stale_day = False
+            try:
+                if cache_ut:
+                    cache_dt = _dt.strptime(cache_ut, "%Y-%m-%d %H:%M:%S")
+                    cache_stale_day = cache_dt.date() < today
+            except Exception:
+                cache_stale_day = True
+            if (cache_month == today_yyyymm
+                    and not cache_stale_day
+                    and cache_has_today):
+                print(f"    日历: 缓存新鲜（{cache_ut} · today={today.day} 已标记），直接返回")
+                return cached
+            else:
+                reasons = []
+                if cache_month != today_yyyymm: reasons.append(f"月份切换 {cache_month}->{today_yyyymm}")
+                if cache_stale_day: reasons.append(f"update_time {cache_ut} 早于今天")
+                if not cache_has_today: reasons.append(f"缓存内无 today={today.day} 标记")
+                print(f"    日历: 需重建（{'; '.join(reasons)}）")
+        except Exception as e:
+            print(f"    日历: 缓存解析失败 {e}，重建")
 
     y, m = today.year, today.month
     last_day = _cal.monthrange(y, m)[1]

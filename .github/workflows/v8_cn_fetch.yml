@@ -33,6 +33,7 @@ on:
     - cron: '5 7 * * 1-5'    # 15:05 CST 盘中（收盘前最后一次快照）
     - cron: '30 7 * * 1-5'   # 15:30 CST 盘后（收盘数据：ETF_DAILY_MONITOR / EXPERIMENT）
     - cron: '0 1 * * 6'      # 周六 09:00 CST 盘前
+    - cron: '0 1 * * 0'      # 周日 09:00 CST 盘前（2026-08-02 补：周日-周六隔一天不刷新导致 today 标错）
   workflow_dispatch:
 
 permissions:
