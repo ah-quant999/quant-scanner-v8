@@ -7861,12 +7861,12 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       return '<span style="color:var(--down);font-weight:700">✕</span>';
     }
     function lvlText(l){ return l==='crit'?'严重':l==='warn'?'警告':l==='ok'?'正常':'无数据'; }
-    /* 维度组：5 列平分宽度，格间 1px 浅色分隔 */
+    /* 维度组：5 列平分整行剩余宽度（用 CSS Grid 1fr + width:100%） */
     function dimGroup(items, baseStyle){
-      var h='<div style="display:flex;justify-content:stretch;align-items:stretch">';
+      var h='<div style="display:grid;grid-template-columns:repeat(5,1fr);width:100%">';
       for(var i=0;i<items.length;i++){
         var it=items[i];
-        h+='<div '+(i>0?'style="flex:1;text-align:center;padding:5px 0;'+baseStyle+';border-left:1px solid rgba(255,255,255,0.07)"':'style="flex:1;text-align:center;padding:5px 0;'+baseStyle+'"')+' title="'+it.title+'">'+it.content+'</div>';
+        h+='<div style="text-align:center;padding:5px 0;'+baseStyle+(i>0?';border-left:1px solid rgba(255,255,255,0.07)':'')+'" title="'+it.title+'">'+it.content+'</div>';
       }
       h+='</div>';
       return h;
@@ -7888,9 +7888,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     }
     function _renderRow(a){
       var bg=a.lvl==='crit'?'rgba(244,63,94,0.04)':a.lvl==='warn'?'rgba(251,191,36,0.04)':'transparent';
-      var h='<tr style="background:'+bg+'"><td style="padding:1.5px 5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;color:var(--sub)" title="'+a.name+'">'+a.name+'</td>';
-      h+='<td style="padding:1.5px 10px 1.5px 4px;text-align:right;color:var(--dim);font-size:9px;width:56px">'+a.ageH+'h</td>';
-      h+='<td style="padding:0;border-left:1px solid rgba(255,255,255,0.1)">';
+      var h='<tr style="background:'+bg+'"><td style="padding:1.5px 6px 1.5px 5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:88px;color:var(--sub)" title="'+a.name+'">'+a.name+'</td>';
+      h+='<td style="padding:1.5px 4px;text-align:right;color:var(--dim);font-size:9px;width:44px">'+a.ageH+'h</td>';
+      h+='<td style="padding:0 4px 0 0;width:100%;border-left:1px solid rgba(255,255,255,0.1)">';
       h+=dimGroup([
         {title:'新鲜度 '+lvlText(a.lvl), content: cell(a.lvl)},
         {title:'臃肿度 '+lvlText(idxB[a.dataKey]), content: cell(idxB[a.dataKey]||(idxB[a.dataKey]===undefined?'ok':null))},
@@ -7903,15 +7903,15 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     }
     function _renderTable(list){
       if(!list || !list.length) return '';
-      var h='<table style="width:100%;border-collapse:collapse;font-size:9.5px;line-height:1.2"><thead><tr>';
-      h+='<th style="text-align:left;padding:2px 5px;color:var(--dim);font-weight:600">\u6570\u636e\u6e90</th>';
-      h+='<th style="text-align:right;padding:2px 10px 2px 4px;color:var(--dim);font-weight:600;width:56px">\u9648\u65e7</th>';
-      h+='<th style="padding:0 0 0 6px;color:var(--dim);font-weight:600;border-left:1px solid rgba(255,255,255,0.1)"><div style="display:flex;justify-content:stretch">';
-      h+='<div style="flex:1;text-align:center;padding:3px 0;font-size:9.5px" title="新鲜度">\u65b0</div>';
-      h+='<div style="flex:1;text-align:center;padding:3px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="臃肿度">\u80c0</div>';
-      h+='<div style="flex:1;text-align:center;padding:3px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="异常值">\u5f02</div>';
-      h+='<div style="flex:1;text-align:center;padding:3px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="缺失检测">\u7f3a</div>';
-      h+='<div style="flex:1;text-align:center;padding:3px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="依赖就绪">\u8d56</div>';
+      var h='<table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:9.5px;line-height:1.2"><colgroup><col style="width:88px"><col style="width:44px"><col style="width:auto"></colgroup><thead><tr>';
+      h+='<th style="text-align:left;padding:2px 6px 2px 5px;color:var(--dim);font-weight:600">\u6570\u636e\u6e90</th>';
+      h+='<th style="text-align:right;padding:2px 4px;color:var(--dim);font-weight:600">\u9648\u65e7</th>';
+      h+='<th style="padding:0 4px 0 0;color:var(--dim);font-weight:600;border-left:1px solid rgba(255,255,255,0.1)"><div style="display:grid;grid-template-columns:repeat(5,1fr);width:100%">';
+      h+='<div style="text-align:center;padding:3px 0;font-size:9.5px" title="新鲜度">\u65b0</div>';
+      h+='<div style="text-align:center;padding:3px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="臃肿度">\u80c0</div>';
+      h+='<div style="text-align:center;padding:3px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="异常值">\u5f02</div>';
+      h+='<div style="text-align:center;padding:3px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="缺失检测">\u7f3a</div>';
+      h+='<div style="text-align:center;padding:3px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="依赖就绪">\u8d56</div>';
       h+='</div></th></tr></thead><tbody>';
       for (var ri=0;ri<list.length;ri++) h+=_renderRow(list[ri]);
       h+='</tbody></table>';
