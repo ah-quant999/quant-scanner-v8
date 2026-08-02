@@ -2778,8 +2778,11 @@ window.V8_CAL = {weeks:[],legend:[]};
   .lg-subtabs .lg-tab:hover{border-color:var(--cyan);color:var(--txt)}
   .lg-subtabs .lg-tab.active{background:var(--cyan);color:#081018;border-color:var(--cyan)}
   .lg-pane{display:none;animation:fade .25s ease}
-  .lg-pane.active{display:block}
-  .lg-pane .card{margin-bottom:16px}
+      .lg-pane.active{display:block}
+      .lg-pane .card{margin-bottom:16px}
+      /* 系统告警 */
+      #opsAlertCard details summary{list-style:none}
+      #opsAlertCard details summary::-webkit-details-marker{display:none}
   .lg-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
   .lg-table th,.lg-table td{padding:7px 10px;border:1px solid var(--border);text-align:left}
   .lg-table th{background:var(--card2);color:var(--dim);font-weight:600}
@@ -2795,6 +2798,11 @@ window.V8_CAL = {weeks:[],legend:[]};
       <button class="op-tab-btn" data-op="4" onclick="opSwitchTab(4)">已下架 <span class="op-tab-time" id="opTab4Time"></span></button>
     </div>
     <div id="opTab1" class="op-tab-pane active">
+    <!-- ⚠️ 系统告警（动态扫描） -->
+    <div class="card" style="margin-bottom:16px;border-left:3px solid var(--purple)" id="opsAlertCard">
+      <h3><span class="ic">⚠️</span>系统告警 <small style="font-weight:400;color:var(--sub);font-size:11px" id="alertScanTime">扫描中...</small></h3>
+      <div id="opsAlertBody"><span style="color:var(--dim);font-size:12px">正在加载数据时间戳...</span></div>
+    </div>
     <div class="grid g-2" style="margin-bottom:16px">
       <div class="card">
         <h3><span class="ic">🚀</span>部署状态 - 运维</h3>
@@ -6715,8 +6723,125 @@ function renderLimitUpHeatmap(){
     }
   }
 
+  /* ===== 运维系统告警 ===== */
+  var _opsAlertRendered=false;
+  function renderOpsAlerts(){
+    if(_opsAlertRendered) return;
+    var body=document.getElementById('opsAlertBody');
+    var scanTime=document.getElementById('alertScanTime');
+    if(!body){ return; }
+    _opsAlertRendered=true;
+    var now=Date.now();
+    // 定义监控项：[window属性名, 显示名, 阈值小时(警告/严重)]
+    var watchList=[
+      ['CRISIS_DATA','危机雷达',6,24],['CANDIDATE','候选池',6,24],
+      ['COCKPIT_ADVICE','AI建议',12,36],['CAPITAL_FLOW_DATA','板块资金流',4,18],
+      ['LHB_DATA','龙虎榜',6,24],['LIMIT_UP_HEATMAP','涨停热力',4,12],
+      ['HERDING_DATA','羊群效应',6,24],['ETF_DAILY_MONITOR','ETF日监控',4,12],
+      ['ETF_INTRADAY_HEAT','ETF盘中热力',2,8],['MARGIN_DATA','融资融券',6,24],
+      ['CFFEX_HOLDINGS','期指持仓',6,24],['IPO_DATA','新股日历',12,48],
+      ['MARKET_ALERTS','异动监控',4,12],['CONCEPT_RANKING','概念排名',12,36],
+      ['ANALYST_RATINGS','分析师评级',24,72],['GOLD_POOL','黄金池',24,72],
+      ['INST_TRADE','机构交易',12,36],['MAHORO','观澜台信号',12,36],
+      ['EXPERIMENT','实验数据',24,72],['MACRO_DATA','宏观数据',24,72],
+      ['SECTOR_FUND_FLOW','资金流矩阵',6,24],['INDEX_QUOTES','指数行情',2,6],
+      ['ETF_PULSE','ETF脉搏',4,12],['ETF_SUBSCRIPTION','ETF申赎',6,24],
+      ['CRDS_CARD_DATA','CRDS卡片',6,24],['COCKPIT_TIER_RECOMM','分层推荐',12,36],
+      ['CANDIDATE_QUOTES','候选池行情',2,6]
+    ];
+    // 时间戳字段优先级
+    var tsFields=['update_time','gen_time','last_update','last_updated'];
+    function extractTs(obj){
+      if(!obj || typeof obj!=='object') return null;
+      for(var i=0;i<tsFields.length;i++){
+        var v=obj[tsFields[i]];
+        if(v && typeof v==='string' && /^\d{4}-\d{2}/.test(v)) return v;
+      }
+      if(Array.isArray(obj) && obj.length>0){
+        return extractTs(obj[0]);
+      }
+      return null;
+    }
+    var alerts=[]; // {name, tsStr, ageHours, level: 'ok'|'warn'|'crit'}
+    var okCount=0, warnCount=0, critCount=0;
+    for(var i=0;i<watchList.length;i++){
+      var w=watchList[i];
+      var obj=window[w[0]];
+      var ts=extractTs(obj);
+      if(!ts){ alerts.push({name:w[1],tsStr:'--',ageHours:9999,level:'crit',reason:'无数据'}); critCount++; continue; }
+      var d=new Date(ts.replace(/\s/,'T'));
+      if(isNaN(d.getTime())){ alerts.push({name:w[1],tsStr:ts,ageHours:9999,level:'crit',reason:'时间格式异常'}); critCount++; continue; }
+      var ageMs=now-d.getTime();
+      var ageH=ageMs/3600000;
+      var level='ok', reason='';
+      if(ageH>w[3]){ level='crit'; reason='超过'+w[3]+'h未更新'; critCount++; }
+      else if(ageH>w[2]){ level='warn'; reason='超过'+w[2]+'h未更新'; warnCount++; }
+      else{ okCount++; }
+      alerts.push({name:w[1],tsStr:ts,ageHours:Math.round(ageH*10)/10,level:level,reason:reason});
+    }
+    // 健康分
+    var total=watchList.length;
+    var healthScore=Math.round((okCount*100 + warnCount*50 + critCount*0)/total);
+    var healthColor=healthScore>=80?'var(--up)':healthScore>=50?'var(--gold)':'var(--down)';
+    var healthLabel=healthScore>=80?'健康':healthScore>=50?'亚健康':'异常';
+    // 构建HTML
+    var lvlIcon={ok:'✅',warn:'⚠️',crit:'🚨'};
+    var lvlDot={ok:'s-ok',warn:'s-warn',crit:'s-err'};
+    var lvlBorder={ok:'var(--up)',warn:'var(--gold)',crit:'var(--down)'};
+    var h='<div style="display:flex;gap:16px;align-items:center;margin-bottom:14px;flex-wrap:wrap">';
+    // 健康分大色块
+    h+='<div style="flex:0 0 auto;padding:14px 22px;border-radius:12px;text-align:center;background:'+healthColor+'22;border:1px solid '+healthColor+'44">';
+    h+='<div style="font-size:28px;font-weight:800;color:'+healthColor+'">'+healthScore+'</div>';
+    h+='<div style="font-size:11px;color:'+healthColor+'">'+healthLabel+'</div></div>';
+    // 统计条
+    h+='<div style="flex:1;min-width:160px"><div style="display:flex;gap:12px;margin-bottom:6px;font-size:12px">';
+    h+='<span>'+lvlIcon.ok+' 正常 <b style="color:var(--up)">'+okCount+'</b></span>';
+    h+='<span>'+lvlIcon.warn+' 警告 <b style="color:var(--gold)">'+warnCount+'</b></span>';
+    h+='<span>'+lvlIcon.crit+' 异常 <b style="color:var(--down)">'+critCount+'</b></span></div>';
+    // 进度条
+    h+='<div style="height:6px;border-radius:3px;background:var(--card2);overflow:hidden;display:flex">';
+    if(okCount>0) h+='<div style="width:'+(okCount/total*100)+'%;background:var(--up);border-radius:3px 0 0 3px"></div>';
+    if(warnCount>0) h+='<div style="width:'+(warnCount/total*100)+'%;background:var(--gold)"></div>';
+    if(critCount>0) h+='<div style="width:'+(critCount/total*100)+'%;background:var(--down);border-radius:0 3px 3px 0"></div>';
+    h+='</div></div>';
+    h+='</div>';
+    // 只展示有问题的项（正常的不展开）
+    var problems=alerts.filter(function(a){return a.level!=='ok';});
+    if(problems.length===0){
+      h+='<div style="padding:10px 14px;border-radius:8px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);font-size:12px;color:var(--up)">✅ 全部 '+total+' 个数据源均在新鲜度阈值内</div>';
+    }else{
+      h+='<table style="width:100%;border-collapse:collapse;font-size:11.5px"><thead><tr><th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600">数据源</th><th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600">最后更新</th><th style="text-align:right;padding:5px 8px;color:var(--dim);font-weight:600">陈旧</th><th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600">状态</th></tr></thead><tbody>';
+      // 按严重度排序：crit在前
+      problems.sort(function(a,b){return (a.level==='crit'?0:1)-(b.level==='crit'?0:1); });
+      for(var p=0;p<problems.length;p++){
+        var a=problems[p];
+        var bg=a.level==='crit'?'rgba(244,63,94,0.06)':a.level==='warn'?'rgba(251,191,36,0.06)':'transparent';
+        var bd=lvlBorder[a.level];
+        h+='<tr style="background:'+bg+';border-left:2px solid '+bd+'"><td style="padding:5px 8px;font-weight:600">'+a.name+'</td>';
+        h+='<td style="padding:5px 8px;color:var(--sub);white-space:nowrap;font-size:10.5px">'+a.tsStr+'</td>';
+        h+='<td style="padding:5px 8px;text-align:right;color:'+(a.level==='crit'?'var(--down)':a.level==='warn'?'var(--gold)':'var(--up)')+';font-weight:600">'+a.ageHours+'h</td>';
+        h+='<td style="padding:5px 8px"><span class="status-dot '+lvlDot[a.level]+'"></span>'+(a.reason||a.level==='crit'?'严重陈旧':a.level==='warn'?'接近过期':'')+'</td></tr>';
+      }
+      h+='</tbody></table>';
+      // 折叠正常项
+      var okItems=alerts.filter(function(a){return a.level==='ok';});
+      if(okItems.length>0){
+        h+='<details style="margin-top:8px"><summary style="cursor:pointer;font-size:11px;color:var(--dim);padding:4px 0">✅ '+okItems.length+' 个正常数据源（展开）</summary>';
+        h+='<div style="display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;padding:8px;background:var(--card2);border-radius:6px">';
+        for(var o=0;o<okItems.length;o++){
+          h+='<span style="font-size:10.5px;color:var(--sub);white-space:nowrap">'+lvlIcon.ok+' '+okItems[o].name+' <span style="color:var(--dim)">'+okItems[o].ageHours+'h</span></span>';
+        }
+        h+='</div></details>';
+      }
+    }
+    body.innerHTML=h;
+    if(scanTime) scanTime.textContent='扫描于 '+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+  }
+
   function renderOps(){
     if(rendered) return; rendered=true;
+    // 系统告警（最先执行，不依赖其他数据）
+    try{ renderOpsAlerts(); }catch(e){ console.warn('ops alert failed',e); }
     // 直接从构建注入的 window.X 读取（v8 不发布 data/ 目录，禁止 fetch）
     DATA.crisis = window.CRISIS_DATA||null;
     DATA.sh_fib = window.SH_FIB||null;
