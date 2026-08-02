@@ -708,8 +708,6 @@ window.V8_CAL = {weeks:[],legend:[]};
       <div class="note">盘中异动=ETF 5 分钟量能脉冲异动；资金热度=宽基 ETF 净申赎份额趋势；日监控=全市场 ETF 当日主力净流入排名（需盘后 T+1 更新）。三者维度互补，不构成重复。</div>
     </div>
 
-    <script
-
     <!-- 概念资金热力图 · 大小=净流入 · 颜色=涨跌 -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">🗺️</span>概念资金热力图 · <span class="fresh" id="conceptMapTime">更新于 --</span></h3>
@@ -2094,138 +2092,217 @@ window.V8_CAL = {weeks:[],legend:[]};
 
   <!-- ============ 选股策略 ============ -->
   <section id="sec-st">
-    <div class="sec-head"><h2>🎯 选股策略</h2><span class="fresh" id="stUpdateTime">更新于 --</span><span class="tag">三重共识 · 候选池 · 筛选信号</span></div>
-
-    <!-- 三重共识概览 -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🎯</span>三重共识 <small style="font-weight:400;color:var(--sub);font-size:11px">机游+北向+机构共振标的</small></h3>
-      <div id="consensusList" style="min-height:120px"></div>
+    <div class="sec-head"><h2>🎯 选股策略 · 三重共识</h2><span class="tag">主站TOP10≥70 · 驾驶舱A档 · 基本面A档 · 入选即跟踪</span></div>
+    <!-- TAB 按钮行（横排，独立于内容区） -->
+    <div class="st-tabs">
+      <button class="st-tab active" data-st="query" onclick="switchSt('query')">🔍 个股查询</button>
+      <button class="st-tab" data-st="tc" onclick="switchSt('tc')">🥇 三重共识</button>
+      <button class="st-tab" data-st="cockpit" onclick="switchSt('cockpit')">🎯 驾驶舱</button>
+      <button class="st-tab" data-st="allsite" onclick="switchSt('allsite')">🌐 全站精选</button>
+      <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头</button>
     </div>
 
-    <!-- 候选池 TOP15 -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📋</span>候选池 <small style="font-weight:400;color:var(--sub);font-size:11px">综合评分 TOP15</small></h3>
-      <div id="candidateList" style="min-height:200px"></div>
-    </div>
+    <!-- ===== TAB 页面：个股查询 ===== -->
+    <div id="st-query" class="st-pane active">
+      <div class="card">
+        <h3><span class="ic">🔍</span>个股查询 · 全站扩展信息</h3>
+        <div class="query-search-box" style="display:flex;gap:10px;margin-bottom:16px;background:linear-gradient(135deg,rgba(0,188,212,.12),rgba(56,189,248,.08));padding:14px 18px;border-radius:10px;box-shadow:0 1px 6px rgba(56,189,248,.1);position:relative;border:1px solid var(--border);">
+          <div style="position:relative;flex:1;">
+            <input type="text" id="v8QueryInput" placeholder="输入股票代码、拼音首字母或名称，如 600000、hlzj、茅台" onkeydown="if(event.key==='Enter')doV8Query()" oninput="showV8QueryDropdown(this.value)" onfocus="if(this.value.trim())showV8QueryDropdown(this.value)" style="width:100%;padding:11px 15px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;outline:none;transition:border-color .2s;background:var(--card);color:var(--txt);box-sizing:border-box;" />
+            <div id="v8QueryDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);border:1.5px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:320px;overflow-y:auto;z-index:1000;box-shadow:0 4px 16px rgba(0,0,0,.24);"></div>
+          </div>
+          <button class="btn" onclick="doV8Query()">查询分析</button>
+        </div>
+        <div id="v8QueryResult"></div>
 
-    <!-- 危机雷达 -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🚨</span>危机雷达 <small style="font-weight:400;color:var(--sub);font-size:11px">市场风险监测</small></h3>
-      <div id="crisisCard" style="min-height:120px"></div>
-    </div>
+        <div style="padding:12px 16px;margin-top:10px;background:linear-gradient(135deg,rgba(0,188,212,.1),rgba(56,189,248,.06));border-radius:10px;border:1px solid var(--border);">
+          <div style="font-size:13px;color:var(--txt);margin-bottom:4px;"><strong>查询格式：</strong>输入股票代码、拼音首字母或中文名称</div>
+          <div style="font-size:13px;color:var(--txt);"><strong>覆盖范围：</strong>A股（主板 / 创业板 / 科创板 / 北交所）+ 港股 + 指数 + ETF，共 7000+ 只</div>
+        </div>
 
-    <script>
-    (function(){
-      var $=function(id){return document.getElementById(id)};
-      function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
-      function fmt(v){return v==null?'--':Number(v).toFixed(2)}
-      function rel(ts){return window._fmtAshareRel?window._fmtAshareRel(ts):String(ts)}
+        <div style="margin-top:12px;padding:12px 14px;background:var(--card);border-radius:10px;border:1px solid var(--border);">
+          <div style="font-size:13px;color:var(--cyan);font-weight:700;margin-bottom:10px;">查询结果包含以下扩展信息（需该股被收录）：</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;font-size:12px;line-height:1.6;">
+            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--purple);margin-bottom:4px;">🧬 多维共振 <span style="font-size:10px;color:var(--gold);font-weight:500;">● 数据滞后</span></div>
+              <div style="color:var(--sub);">每日综合评分，≥80分精选 / ≥70分观察；当前数据源停在 2026-07-30，新数据待 v6 跑批后同步</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--up);margin-bottom:4px;">⭐ 金股池 <span style="font-size:10px;color:var(--down);font-weight:500;">● 213只</span></div>
+              <div style="color:var(--sub);">信号四格条（缠论买C/金钻黄柱J/机构变红I/上涨趋势T），EMA趋势评分0~7；覆盖部分活跃股</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--cyan);margin-bottom:4px;">🐉 龙虎榜 <span style="font-size:10px;color:var(--down);font-weight:500;">● 72条</span></div>
+              <div style="color:var(--sub);">上榜日期 + 分类（机游共振/机构独买/游资独买/不达标）+ 机构净买额 + 游资净买额</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--up);margin-bottom:4px;">💰 主力资金 <span style="font-size:10px;color:var(--gold);font-weight:500;">● 部分覆盖</span></div>
+              <div style="color:var(--sub);">机构席位净买卖 + 连续净流入统计（覆盖部分活跃股，非全市场）</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--cyan);margin-bottom:4px;">📈 近10日走势</div>
+              <div style="color:var(--sub);">日线收盘价折线图（红涨绿跌），快速判断短期趋势方向</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--gold);margin-bottom:4px;">📊 EMA趋势确认</div>
+              <div style="color:var(--sub);">6条EMA均线（5~120日）多空排列方向，均线发散收窄判断趋势强度</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--gold);margin-bottom:4px;">🏦 投行覆盖 <span style="font-size:10px;color:var(--down);font-weight:500;">● 28条</span></div>
+              <div style="color:var(--sub);">国际投行立场（看多/看空/中性）+ 北向覆盖等标签；覆盖外资研报触及的个股</div>
+            </div>
+            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
+              <div style="font-weight:700;color:var(--down);margin-bottom:4px;">🚫 停牌识别 <span style="font-size:10px;color:var(--down);font-weight:500;">● 12条</span></div>
+              <div style="color:var(--sub);">当前停牌状态 + 已停牌天数 + 停牌原因（重大事项/异常波动等）</div>
+            </div>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:var(--dim);line-height:1.6;">
+            注：📰 研报覆盖 已下线（数据源仅 26 条且停在 2026-07-27，覆盖率过低，不再展示）。个股查询数据源每日 16:45 从 v6 同步，盘前 08:40 同步预警类数据。
+          </div>
+        </div>
+      </div>
+    </div><!--/st-query-->
 
-      /* ---- 三重共识列表 ---- */
-      function renderConsensus(){
-        var el=$('consensusList');
-        if(!el) return;
-        var CAND=window.CANDIDATE;
-        if(!CAND || !CAND.stocks || !CAND.stocks.length){
-          el.innerHTML='<div class="tp-empty">暂无三重共识数据（需机游共振+北向+机构同时信号）</div>';
-          return;
-        }
-        var stocks=CAND.stocks.slice(0,15);
-        var h='<div class="tp-stocklist">';
-        stocks.forEach(function(s){
-          var score=s.score||s.consensus_score||0;
-          var reasons=s.reasons||s.signals||[];
-          h+='<div class="tp-stock"><div class="tp-head">';
-          h+='<span class="tp-code">'+esc(s.code||'')+'</span>';
-          h+='<span class="tp-name">'+esc(s.name||'')+'</span>';
-          if(s.board) h+='<span class="tp-board" style="background:var(--purple);color:#fff">'+esc(s.board)+'</span>';
-          h+='</div>';
-          h+='<div class="tp-meta"><span>共识分:</span> <b style="color:var(--purple);font-size:18px">'+score.toFixed(0)+'</b></div>';
-          if(reasons.length){
-            h+='<div class="tp-tags">';
-            reasons.forEach(function(r){ h+='<span class="tp-tag">'+esc(String(r))+'</span>'; });
-            h+='</div>';
-          }
-          h+='</div>';
-        });
-        h+='</div>';
-        el.innerHTML=h;
-        var te=$('stUpdateTime');
-        if(te && CAND.update_time) te.textContent='更新于 '+rel(CAND.update_time);
-      }
+    <!-- ===== TAB 页面：三重共识（默认展示） ===== -->
+    <div id="st-tc" class="st-pane">
+      <div class="card">
+        <h3><span class="ic">🥇</span>严格三重共识 - 盘后 · <span class="fresh" id="tcTime">更新于 --</span><span class="fresh" id="tcDataTime" style="margin-left:8px;font-weight:400;"></span></h3>
+        <div id="tcConsensus" class="tp-stocklist"></div>
+        <div class="note">筛选：主站TOP10≥70 且 驾驶舱A档 且 基本面A档。下方「优先/扩展观察」为差1步/差2步备选（主站评分≥75）。</div>
+      </div>
+      <div class="card">
+        <h3><span class="ic">🎯</span>优先观察（差1步）· <span class="fresh" id="tcNearCount">0</span></h3>
+        <div id="tcPriority" class="tp-stocklist"></div>
+      </div>
+      <div class="card">
+        <h3><span class="ic">🔮</span>扩展观察（差2步）· <span class="fresh" id="tcExtCount">0</span></h3>
+        <div id="tcExtended" class="tp-stocklist"></div>
+      </div>
+      <div class="card">
+        <h3><span class="ic">📈</span>持仓盈亏跟踪 - <span class="fresh" id="ttTime">更新于 --</span></h3>
+        <div class="note">入选以来涨跌 = 入选首日收盘价 → 最新收盘价；持有/连续天数来自本地逐日累积快照。</div>
+        <table id="ttTrack"><thead><tr><th style="width:22%">名称</th><th>状态</th><th>入选日</th><th>持有</th><th>连续</th><th>入选以来</th><th>基本面</th></tr></thead><tbody id="ttTrackBody"></tbody></table>
+      </div>
+      <div class="card">
+        <h3><span class="ic">🔔</span>状态迁移 &amp; 告警 · <span class="fresh" id="ttAlertCount">0</span></h3>
+        <div id="ttAlerts"></div>
+      </div>
+      <div class="card">
+        <h3><span class="ic">🧪</span>催化剂兑现追踪 - 盘后</h3>
+        <div class="note">源自基本面季报/重组消息面。已兑现=价涨≥3%；走弱=回撤≥3%；否则观察中。</div>
+        <div id="ttCatalyst"></div>
+      </div>
+      <div class="card">
+        <h3><span class="ic">📊</span>回测 N 日胜率（信号层） - 历史</h3>
+        <div class="note" id="ttBackNote">加载中…</div>
+        <table id="ttBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>夏普</th><th>最佳</th><th>最差</th></tr></thead><tbody id="ttBackBody"></tbody></table>
+      </div>
+      <div class="card">
+        <h3><span class="ic">⚖️</span>严格 vs 宽松 - 历史</h3>
+        <div class="note">严格=总评分≥70共振；宽松=信号≥2。同口径 baostock 真实收盘价滚动回测。</div>
+        <table id="ttSvl"><thead><tr><th>持有期</th><th>严格胜率</th><th>严格均收</th><th>宽松胜率</th><th>宽松均收</th></tr></thead><tbody id="ttSvlBody"></tbody></table>
+      </div>
+      <div class="card">
+        <h3><span class="ic">🎚</span>阈值敏感性 - 历史</h3>
+        <div class="note">不同总评分门槛的 5 日回测表现（不改动实盘规则，仅测试）。样本少时结论仅供参考。</div>
+        <table id="ttThr"><thead><tr><th>门槛</th><th>样本</th><th>5日胜率</th><th>5日均收</th><th>最佳胜率</th><th>最佳持有</th></tr></thead><tbody id="ttThrBody"></tbody></table>
+      </div>
+      <div class="card">
+        <h3><span class="ic">🏭</span>板块聚类（相关性风险） - 盘后</h3>
+        <div class="note">当前跟踪池行业分布；单一行业占比过高提示同涨同跌相关性风险。</div>
+        <div id="ttCluster"></div>
+      </div>
+      <div class="card">
+        <h3><span class="ic">🔗</span>全站精选重叠度 - 盘后</h3>
+        <div class="note">当前跟踪池（严格+差一步）与全站其他精选层的重叠，辅助判断市场共识集中度。</div>
+        <div id="ttOverlap"></div>
+      </div>
+      <div class="card">
+        <h3><span class="ic">📅</span>三重入选历史（每日记录） - 历史</h3>
+        <div class="note">每日入选三重共识候选的数量与最新跟踪状态（来自 triple_resonance_history.json）。</div>
+        <div id="ttHistory"></div>
+      </div>
+    </div><!--/st-tc-->
 
-      /* ---- 候选池 TOP15 ---- */
-      function renderCandidates(){
-        var el=$('candidateList');
-        if(!el) return;
-        var CAND=window.CANDIDATE;
-        if(!CAND || !CAND.stocks || !CAND.stocks.length){
-          el.innerHTML='<div class="tp-empty">暂无候选池数据</div>';
-          return;
-        }
-        var stocks=CAND.stocks.slice(0,15).sort(function(a,b){return(b.score||0)-(a.score||0)});
-        var h='<div class="tp-stocklist">';
-        stocks.forEach(function(s){
-          h+='<div class="tp-stock"><div class="tp-head">';
-          h+='<span class="tp-code">'+esc(s.code||'')+'</span>';
-          h+='<span class="tp-name">'+esc(s.name||'')+'</span>';
-          var score=s.score||0;
-          var scoreColor=score>=70?'var(--up)':score>=50?'var(--gold)':'var(--down)';
-          h+='<span class="tp-badge cons" style="background:'+scoreColor+'22;color:'+scoreColor+'">'+score.toFixed(0)+'分</span>';
-          h+='</div>';
-          h+='<div class="tp-meta">';
-          if(s.price!=null) h+='<span>现价: <b>'+fmt(s.price)+'</b></span>';
-          if(s.change_pct!=null){ var cp=s.change_pct; h+='<span>涨跌: <b style="color:'+(cp>=0?'var(--up)':'var(--down))+'">'+(cp>0?'+':'')+cp.toFixed(2)+'%</b></span>'; }
-          h+='</div>';
-          if(s.tags && s.tags.length){
-            h+='<div class="tp-tags">';
-            s.tags.forEach(function(t){ h+='<span class="tp-tag">'+esc(t)+'</span>'; });
-            h+='</div>';
-          }
-          h+='</div>';
-        });
-        h+='</div>';
-        el.innerHTML=h;
-      }
+    <!-- ===== TAB 页面：驾驶舱 ===== -->
+    <div id="st-cockpit" class="st-pane"><div id="stCockpit"></div></div>
 
-      /* ---- 危机雷达 ---- */
-      function renderCrisis(){
-        var el=$('crisisCard');
-        if(!el) return;
-        var CR=window.CRISIS_DATA;
-        if(!CR){ el.innerHTML='<div class="tp-empty">暂无危机雷达数据</div>'; return; }
-        var score=CR.score||0;
-        var lvl=score>=70?'高风险':score>=50?'警戒':'安全';
-        var lvlColor=score>=70?'var(--down)':score>=50?'var(--gold)':'var(--up)';
-        var dims=CR.dimensions||{};
-        var h='<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding:12px;background:var(--card2);border-radius:10px">';
-        h+='<div style="text-align:center;padding:16px 24px;border-radius:12px;background:'+lvlColor+'22;border:1px solid '+lvlColor+'44">';
-        h+='<div style="font-size:36px;font-weight:800;color:'+lvlColor+'">'+score.toFixed(0)+'</div>';
-        h+='<div style="font-size:12px;color:'+lvlColor+'">'+lvl+'</div></div>';
-        h+='<div style="flex:1;min-width:180px">';
-        var dimItems=[
-          ['货币风险',dims.currency,'currency'],
-          ['经济压力',dims.economy,'economy'],
-          ['全球波动',dims.global,'global']
-        ];
-        dimItems.forEach(function(di){
-          var val=di[1];
-          if(val==null) return;
-          var barW=val+'%';
-          var c=val>=60?'var(--down)':val>=35?'var(--gold)':'var(--up)';
-          h+='<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px">';
-          h+='<span style="color:var(--sub)">'+di[0]+'</span>';
-          h+='<span style="color:'+c+';font-weight:700">'+val.toFixed(0)+'</span></div>';
-          h+='<div style="height:6px;border-radius:3px;background:var(--card);overflow:hidden"><div style="width:'+barW+';height:100%;background:'+c+';border-radius:3px;transition:.3s"></div></div></div>';
-        });
-        h+='</div></div>';
-        el.innerHTML=h;
-      }
+    <!-- ===== TAB 页面：全站精选 ===== -->
+    <div id="st-allsite" class="st-pane"><div id="stAllsite"></div></div>
 
-      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){setTimeout(renderConsensus,100);setTimeout(renderCandidates,200);setTimeout(renderCrisis,300)});
-      else{renderConsensus();renderCandidates();renderCrisis();}
-    })();
-    </script>
+    <!-- ===== TAB 页面：逆势龙头(CRDS) ===== -->
+    <div id="st-crds" class="st-pane"><div class="card" id="stv8CrdsCard">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+          📊 <span style="font-weight:700;font-size:14px;color:var(--txt);">CRDS · 逆势龙头</span>
+          <span id="stcrdsTime" style="font-size:12px;color:var(--dim);font-weight:500;background:var(--bg2);padding:1px 8px;border-radius:8px;">更新 ...</span>
+          <span style="font-size:10px;color:#fff;background:#c62828;padding:1px 7px;border-radius:8px;">短线</span>
+          <span style="font-size:10px;color:#fff;background:#1565c0;padding:1px 7px;border-radius:8px;">盘后</span>
+          <span style="font-size:10px;color:#fff;background:#607d8b;padding:1px 7px;border-radius:8px;">日频</span>
+        </div>
+        <div id="stcrdsCoverage" style="font-size:11px;color:var(--dim);margin-bottom:8px;line-height:1.6;"></div>
+        <div id="stcrdsStandby" style="display:none;margin-bottom:10px;padding:8px 10px;border-radius:6px;background:rgba(240,160,32,0.08);border-left:4px solid #f0a020;font-size:12px;color:#d4a020;line-height:1.6;"></div>
+        <div id="stcrdsMarketContext" style="display:none;margin-bottom:10px;padding:8px 10px;border-radius:6px;background:var(--bg2);border-left:4px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:12px;font-weight:600;color:var(--sub);">大盘判断</span>
+            <span id="stcrdsMarketValidity" style="font-size:12px;font-weight:700;padding:1px 8px;border-radius:8px;color:#fff;"></span>
+            <span id="stcrdsMarketPct" style="font-size:12px;color:var(--sub);"></span>
+          </div>
+          <div id="stcrdsMarketSummary" style="font-size:12px;color:var(--dim);margin-top:4px;"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;align-items:start;">
+          <div>
+            <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
+              <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('stcrdsEliteBody','crdsEliteArr')">
+                <span style="width:10px;height:10px;border-radius:50%;background:#1D9E75;"></span>
+                <span style="font-size:12px;font-weight:600;color:var(--txt);">三项全满足</span>
+                <span style="margin-left:auto;font-size:13px;font-weight:700;color:#1D9E75;"><span id="stcrdsEliteCnt">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
+                <span id="stcrdsEliteArr" style="font-size:10px;color:var(--dim);">▴</span>
+              </div>
+              <div id="stcrdsEliteBody" style="display:block;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:300px;overflow-y:auto;"></div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
+              <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('stcrdsAdvBody','crdsAdvArr')">
+                <span style="width:10px;height:10px;border-radius:50%;background:#BA7517;"></span>
+                <span style="font-size:12px;font-weight:600;color:var(--txt);">两项满足</span>
+                <span style="margin-left:auto;font-size:13px;font-weight:700;color:#BA7517;"><span id="stcrdsAdvCnt">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
+                <span id="stcrdsAdvHint"></span>
+                <span id="stcrdsAdvArr" style="font-size:10px;color:var(--dim);">▴</span>
+              </div>
+              <div id="stcrdsAdvBody" style="display:block;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:300px;overflow-y:auto;"></div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
+              <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('stcrdsList1','crdsArr1')">
+                <span style="width:10px;height:10px;border-radius:50%;background:#185FA5;"></span>
+                <span style="font-size:12px;font-weight:600;color:var(--txt);">10日≥2板</span>
+                <span style="margin-left:auto;font-size:13px;font-weight:700;color:#185FA5;"><span id="stcrdsCnt1">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
+                <span id="stcrdsArr1" style="font-size:10px;color:var(--dim);">▴</span>
+              </div>
+              <div id="stcrdsList1" style="display:block;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:360px;overflow-y:auto;"></div>
+            </div>
+            <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
+              <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('stcrdsList2','crdsArr2')">
+                <span style="width:10px;height:10px;border-radius:50%;background:#C62828;"></span>
+                <span style="font-size:12px;font-weight:600;color:var(--txt);">大跌日逆势板</span>
+                <span style="margin-left:auto;font-size:13px;font-weight:700;color:#C62828;"><span id="stcrdsCnt2">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
+                <span id="stcrdsArr2" style="font-size:10px;color:var(--dim);">▴</span>
+              </div>
+              <div id="stcrdsList2" style="display:block;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:300px;overflow-y:auto;"></div>
+            </div>
+          </div>
+          <div>
+            <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
+              <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('stcrdsList3','crdsArr3')">
+                <span style="width:10px;height:10px;border-radius:50%;background:#3B6D11;"></span>
+                <span style="font-size:12px;font-weight:600;color:var(--txt);">量能确认</span>
+                <span style="margin-left:auto;font-size:13px;font-weight:700;color:#3B6D11;"><span id="stcrdsCnt3">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
+                <span id="stcrdsArr3" style="font-size:10px;color:var(--dim);">▴</span>
+              </div>
+              <div id="stcrdsList3" style="display:grid;grid-template-columns:1fr 1fr;gap:3px 14px;padding:4px 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.6;"></div>
+            </div>
+          </div>
+        </div>
+        <div id="stcrdsHistory" style="font-size:11px;color:var(--dim);"></div>
+      </div></div><!--/st-crds-->
   </section>
 
 
@@ -2696,9 +2773,9 @@ window.V8_CAL = {weeks:[],legend:[]};
       arr.forEach(function(s){
         var pct = s.pct || 0;
         h += '<tr style="border-bottom:1px solid var(--border)"><td>'+_rcEsc(s.name)+'</td>';
-        h += '<td style="text-align:right;color:'+(pct>=0?'var(--up)':'var(--down))+';font-weight:600">'+(pct>=0?'+':'')+pct.toFixed(1)+'%</td>';
-        h += '<td style="text-align:right;color:'+(s.inst_net_万>=0?'var(--up)':'var(--down))+'">'+_rcFmtYi(s.inst_net_万)+'</td>';
-        h += '<td style="text-align:right;color:'+(s.yz_net_万>=0?'var(--up)':'var(--down))+'">'+_rcFmtYi(s.yz_net_万)+'</td></tr>';
+        h += '<td style="text-align:right;color:'+(pct>=0?'var(--up)':'var(--down)')+';font-weight:600">'+(pct>=0?'+':'')+pct.toFixed(1)+'%</td>';
+        h += '<td style="text-align:right;color:'+(s.inst_net_万>=0?'var(--up)':'var(--down)')+'">'+_rcFmtYi(s.inst_net_万)+'</td>';
+        h += '<td style="text-align:right;color:'+(s.yz_net_万>=0?'var(--up)':'var(--down)')+'">'+_rcFmtYi(s.yz_net_万)+'</td></tr>';
       });
       h += '</tbody></table></div>';
     });
@@ -2897,8 +2974,8 @@ window.V8_CAL = {weeks:[],legend:[]};
     h += '<table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr style="color:var(--dim)"><th>名称</th><th style="text-align:right">涨跌%</th><th style="text-align:right">净买入</th></tr></thead><tbody>';
     northStocks.forEach(function(s){
       h += '<tr style="border-bottom:1px solid var(--border)"><td>'+_rcEsc(s.name)+'</td>';
-      h += '<td style="text-align:right;color:'+(s.pct>=0?'var(--up)':'var(--down))+'">'+(s.pct>=0?'+':'')+(s.pct||0).toFixed(1)+'%</td>';
-      h += '<td style="text-align:right;color:'+(s.inst_net_万>=0?'var(--up)':'var(--down))+';font-weight:700">'+_rcFmtYi(s.inst_net_万||0)+'</td></tr>';
+      h += '<td style="text-align:right;color:'+(s.pct>=0?'var(--up)':'var(--down)')+'">'+(s.pct>=0?'+':'')+(s.pct||0).toFixed(1)+'%</td>';
+      h += '<td style="text-align:right;color:'+(s.inst_net_万>=0?'var(--up)':'var(--down)')+';font-weight:700">'+_rcFmtYi(s.inst_net_万||0)+'</td></tr>';
     });
     h += '</tbody></table></div>';
     detail.innerHTML = h;
@@ -2982,7 +3059,7 @@ window.V8_CAL = {weeks:[],legend:[]};
       h += '<div class="insight-list">';
       recStocks.forEach(function(s){
         var sc = s.score || 0;
-        h += '<div class="insight-li"><span>' + _rcEsc(s.name) + '</span><span style="color:'+(sc>=70?'var(--up)':sc>=50?'var(--gold)':'var(--down))+';font-weight:600">' + sc.toFixed(0) + '分</span></div>';
+        h += '<div class="insight-li"><span>' + _rcEsc(s.name) + '</span><span style="color:'+(sc>=70?'var(--up)':sc>=50?'var(--gold)':'var(--down)')+';font-weight:600">' + sc.toFixed(0) + '分</span></div>';
       });
       h += '</div>';
     } else {
@@ -3046,7 +3123,7 @@ window.V8_CAL = {weeks:[],legend:[]};
       h += '<div class="insight-list">';
       sectors.forEach(function(s){
         var pct = s.pct_day || 0;
-        h += '<div class="insight-li"><span>' + _rcEsc(s.name||s.sector_name||'') + '</span><span style="color:'+(pct>=0?'var(--up)':'var(--down))+';font-weight:600">'+(pct>=0?'+':'')+pct.toFixed(2)+'%</span></div>';
+        h += '<div class="insight-li"><span>' + _rcEsc(s.name||s.sector_name||'') + '</span><span style="color:'+(pct>=0?'var(--up)':'var(--down)')+';font-weight:600">'+(pct>=0?'+':'')+pct.toFixed(2)+'%</span></div>';
       });
       h += '</div>';
     } else { h += '<div style="color:var(--dim);font-size:11px">暂无板块数据</div>'; }
@@ -3217,7 +3294,7 @@ window.V8_CAL = {weeks:[],legend:[]};
       ['🐂','大牛股猎手回测','容量基 · 排期号 · 核心共振<br>+ T+7/T+10/T+20 起收收益追踪']
     ];
     actions.forEach(function(ac){
-      h += '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:.15s" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--border)'">';
+      h += '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:.15s" onmouseover="this.style.borderColor=\'var(--purple)\'" onmouseout="this.style.borderColor=\'var(--border)\'">';
       h += '<div style="font-size:20px;margin-bottom:4px">' + ac[0] + '</div>';
       h += '<div style="font-size:12px;font-weight:700;color:var(--txt)">' + ac[1] + '</div>';
       h += '<div style="font-size:10px;color:var(--dim);margin-top:4px;line-height:1.4">' + ac[2] + '</div>';
@@ -4042,11 +4119,15 @@ function switchSec(sec,el){
     try{ window.opSwitchTab(1); }catch(e){}
   }
   if(sec==='op' && typeof window.__renderOps==='function') setTimeout(window.__renderOps,60);
+  // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
+  if(sec==='ph' && typeof window._renderSecPh==='function') setTimeout(window._renderSecPh,80);
+  if(sec==='st' && typeof window._renderSecSt==='function') setTimeout(window._renderSecSt,80);
   // tab 切换后 echarts 实例需要 resize（容器从 display:none 恢复时尺寸为 0）
   setTimeout(function(){
     if(window._hmCharts) window._hmCharts.forEach(function(c){ try{ c.resize(); }catch(e){} });
     if(window._treeChart) try{ window._treeChart.resize(); }catch(e){}
     if(window.__MFF_CHART_INST) try{ window.__MFF_CHART_INST.resize(); }catch(e){}
+    if(window._secPhCharts) window._secPhCharts.forEach(function(c){ try{ c.resize(); }catch(e){} });
   }, 120);
 }
 
@@ -5659,7 +5740,7 @@ function renderLimitUpHeatmap(){
     h+='<div style="background:linear-gradient(135deg,rgba(244,79,93,0.08),rgba(244,79,93,0.02));border:1px solid rgba(244,79,93,0.2);border-radius:12px;padding:14px;">';
     h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;"><span style="font-size:16px">📥</span><span style="font-weight:700;font-size:13px;color:var(--up)">TOP10 主力净流入</span></div>';
     (daily.top_inflow||[]).slice(0,10).forEach(function(x,xi){
-      var rankBadge='<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;margin-right:8px;flex-shrink:0;'+(xi<3?'background:var(--up);color:#fff':'background:var(--card2);color:var(--dim))+'">'+(xi+1)+'</span>';
+      var rankBadge='<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;margin-right:8px;flex-shrink:0;'+(xi<3?'background:var(--up);color:#fff':'background:var(--card2);color:var(--dim)')+'">'+(xi+1)+'</span>';
       var barW=Math.min(100,(x.net/(daily.top_inflow[0]?daily.top_inflow[0].net:1))*100);
       h+='<div style="display:flex;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">'+rankBadge;
       h+='<div style="flex:1;margin-right:8px;"><div style="font-size:11px;color:var(--txt);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+x.name+'</div>';
@@ -5672,7 +5753,7 @@ function renderLimitUpHeatmap(){
     h+='<div style="background:linear-gradient(135deg,rgba(31,209,123,0.08),rgba(31,209,123,0.02));border:1px solid rgba(31,209,123,0.2);border-radius:12px;padding:14px;">';
     h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;"><span style="font-size:16px">📤</span><span style="font-weight:700;font-size:13px;color:var(--down)">TOP10 主力净流出</span></div>';
     (daily.top_outflow||[]).slice(0,10).forEach(function(x,xi){
-      var rankBadge='<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;margin-right:8px;flex-shrink:0;'+(xi<3?'background:var(--down);color:#fff':'background:var(--card2);color:var(--dim))+'">'+(xi+1)+'</span>';
+      var rankBadge='<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;margin-right:8px;flex-shrink:0;'+(xi<3?'background:var(--down);color:#fff':'background:var(--card2);color:var(--dim)')+'">'+(xi+1)+'</span>';
       var absNet=Math.abs(x.net);
       var barW=Math.min(100,(absNet/(daily.top_outflow[0]?Math.abs(daily.top_outflow[0].net):1))*100);
       h+='<div style="display:flex;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">'+rankBadge;
