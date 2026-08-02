@@ -5082,10 +5082,10 @@ function renderLimitUpHeatmap(){
       const fColor = fundScore>=7?'var(--up)':fundScore<=3?'var(--down)':'var(--gold)';
       const iColor = instScore>=7?'var(--up)':instScore<=3?'var(--down)':'var(--gold)';
       hubTacticalBody.innerHTML =
-        '<div style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11.5px;line-height:1.5;color:var(--sub);">'+
-          '<span><b style="color:'+tColor+'">📉 技术面 '+techScore+'/10</b> · '+(declineDays>0?'回调'+declineDays+'天':'震荡')+'</span>'+
-          '<span><b style="color:'+fColor+'">💰 资金面 '+fundScore+'/10</b> · 两融'+(rzLatest>=10000?(rzLatest/10000).toFixed(2)+'万亿':'--')+'</span>'+
-          '<span><b style="color:'+iColor+'">🏛 机构面 '+instScore+'/10</b> · 期指'+(cffexNet>0?'净多':'净空')+Math.abs(cffexNet)+'</span>'+
+        '<div style="display:flex;flex-direction:column;gap:4px;font-size:11.5px;line-height:1.5;color:var(--sub);">'+
+          '<div><b style="color:'+tColor+'">📉 技术面 '+techScore+'/10</b> · '+(declineDays>0?'回调'+declineDays+'天':'震荡')+'</div>'+
+          '<div><b style="color:'+fColor+'">💰 资金面 '+fundScore+'/10</b> · 两融'+(rzLatest>=10000?(rzLatest/10000).toFixed(2)+'万亿':'--')+'</div>'+
+          '<div><b style="color:'+iColor+'">🏛 机构面 '+instScore+'/10</b> · 期指'+(cffexNet>0?'净多':'净空')+Math.abs(cffexNet)+'</div>'+
         '</div>';
     }
 
@@ -7864,72 +7864,87 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var problems=items.filter(function(a){return a.lvl!=='ok';});
     var html='<div>';
     if(problems.length===0){
-      html+='<div style="padding:10px 14px;border-radius:8px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);font-size:12px;color:var(--up)">\u2705 \u5168\u90e8 '+ct.total+' \u4e2a\u6570\u636e\u6e90\u5748\u5728\u65b0\u9c9c\u5ea6\u9608\u503c\u5185</div>';
-    }else{
-      html+='<table style="width:100%;border-collapse:collapse;font-size:10px;line-height:1.2"><thead><tr>';
-      html+='<th style="text-align:left;padding:2px 5px;color:var(--dim);font-weight:600">\u6570\u636e\u6e90</th>';
-      html+='<th style="text-align:left;padding:2px 5px;color:var(--dim);font-weight:600">\u6700\u540e\u66f4\u65b0</th>';
-      html+='<th style="text-align:right;padding:2px 10px 2px 4px;color:var(--dim);font-weight:600;width:64px">\u9648\u65e7</th>';
-      html+='<th style="padding:0 0 0 10px;color:var(--dim);font-weight:600;border-left:1px solid rgba(255,255,255,0.1)"><div style="display:flex;justify-content:stretch">';
-      html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:10px" title="新鲜度">\u65b0</div>';
-      html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:10px;border-left:1px solid rgba(255,255,255,0.07)" title="臃肿度">\u80c0</div>';
-      html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:10px;border-left:1px solid rgba(255,255,255,0.07)" title="异常值">\u5f02</div>';
-      html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:10px;border-left:1px solid rgba(255,255,255,0.07)" title="缺失检测">\u7f3a</div>';
-      html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:10px;border-left:1px solid rgba(255,255,255,0.07)" title="依赖就绪">\u8d56</div>';
-      html+='</div></th>';
-      html+='</div></th>';
-      html+='</tr></thead><tbody>';
-      problems.sort(function(a,b){return (a.lvl==='crit'?0:1)-(b.lvl==='crit'?0:1);});
-      for(var p=0;p<problems.length;p++){
-        var a=problems[p];
-        var bg=a.lvl==='crit'?'rgba(244,63,94,0.06)':a.lvl==='warn'?'rgba(251,191,36,0.06)':'transparent';
-        html+='<tr style="background:'+bg+'"><td style="padding:2px 5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px" title="'+a.name+'">'+a.name+'</td>';
-        html+='<td style="padding:2px 5px;color:var(--sub);white-space:nowrap;font-size:9.5px">'+a.tsStr+'</td>';
-        html+='<td style="padding:2px 10px 2px 4px;text-align:right;color:'+(a.lvl==='crit'?'var(--down)':a.lvl==='warn'?'var(--gold)':'var(--up)')+';font-weight:600;width:64px">'+a.ageH+'h</td>';
-        html+='<td style="padding:0;border-left:1px solid rgba(255,255,255,0.1)">';
-        html+=dimGroup([
-          {title:'新鲜度 '+lvlText(a.lvl), content: cell(a.lvl)},
-          {title:'臃肿度 '+lvlText(idxB[a.dataKey]), content: cell(idxB[a.dataKey]||(idxB[a.dataKey]===undefined?'ok':null))},
-          {title:'异常值 '+lvlText(idxA[a.dataKey]), content: cell(idxA[a.dataKey]||(idxA[a.dataKey]===undefined?'ok':null))},
-          {title:'缺失 '+lvlText(idxM[a.dataKey]), content: cell(idxM[a.dataKey]||(idxM[a.dataKey]===undefined?'ok':null))},
-          {title:'依赖 '+lvlText(idxD[a.dataKey]), content: cell(idxD[a.dataKey]||(idxD[a.dataKey]===undefined?'ok':null))}
-        ], 'font-size:12px');
-        html+='</td></tr>';
-      }
-      html+='</tbody></table>';
+      html+='<div style="padding:8px 14px;border-radius:8px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);font-size:11.5px;color:var(--up)">\u2705 \u5168\u90e8 '+ct.total+' \u4e2a\u6570\u636e\u6e90\u5748\u5728\u65b0\u9c9c\u5ea6\u9608\u503c\u5185</div>';
     }
-    /* v8.2 全维度概览：27 数据源全部列出，5 维度 ✅/❌/— 一目了然 */
-    html+='<details style="margin-top:6px"><summary style="cursor:pointer;font-size:10.5px;color:var(--dim);padding:2px 0;user-select:none">\ud83d\udcca \u5168 '+ct.total+' \u4e2a\u6570\u636e\u6e90 \u00b7 5 \u7ef4\u5ea6\u6982\u89c8\uff08\u5c55\u5f00\uff09</summary>';
-    html+='<table style="width:100%;border-collapse:collapse;font-size:9.5px;line-height:1.2;margin-top:4px"><thead><tr>';
-    html+='<th style="text-align:left;padding:2px 5px;color:var(--dim);font-weight:600">\u6570\u636e\u6e90</th>';
-    html+='<th style="text-align:left;padding:2px 5px;color:var(--dim);font-weight:600;width:32px" title="主更新时段">\u65f6\u6bb5</th>';
-    html+='<th style="text-align:right;padding:2px 10px 2px 4px;color:var(--dim);font-weight:600;width:64px">\u9648\u65e7</th>';
-    html+='<th style="padding:0 0 0 10px;color:var(--dim);font-weight:600;border-left:1px solid rgba(255,255,255,0.1)"><div style="display:flex;justify-content:stretch">';
-    html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:9.5px" title="新鲜度">\u65b0</div>';
-    html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="臃肿度">\u80c0</div>';
-    html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="异常值">\u5f02</div>';
-    html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="缺失检测">\u7f3a</div>';
-    html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="依赖就绪">\u8d56</div>';
-    html+='</div></th>';
-    html+='</tr></thead><tbody>';
-    for(var q=0;q<items.length;q++){
-      var a=items[q];
+    /* (问题列表已删, 2行表格冗余; 异常数据源在下方 3 卡片概览里高亮即可) */
+    /* v8.2 全维度概览：按盘前/盘中/盘后 拆 3 卡片，全部展开 */
+    var _slotGroups={'盘前':[],'盘中':[],'盘后':[],'全天':[]};
+    for (var qi=0;qi<items.length;qi++){
+      var ai=items[qi];
+      var s=_slotMap[ai.dataKey]||'盘中';
+      if (s==='收盘') s='盘后';
+      if (!_slotGroups[s]) _slotGroups[s]=[];
+      _slotGroups[s].push(ai);
+    }
+    function _renderRow(a){
       var bg=a.lvl==='crit'?'rgba(244,63,94,0.04)':a.lvl==='warn'?'rgba(251,191,36,0.04)':'transparent';
-      html+='<tr style="background:'+bg+'"><td style="padding:1.5px 5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;color:var(--sub)" title="'+a.name+'">'+a.name+'</td>';
-      html+='<td style="padding:1.5px 5px">'+slotTag(a.dataKey)+'</td>';
-      html+='<td style="padding:1.5px 10px 1.5px 4px;text-align:right;color:var(--dim);font-size:9px;width:64px">'+a.ageH+'h</td>';
-      html+='<td style="padding:0;border-left:1px solid rgba(255,255,255,0.1)">';
-      html+=dimGroup([
+      var h='<tr style="background:'+bg+'"><td style="padding:1.5px 5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;color:var(--sub)" title="'+a.name+'">'+a.name+'</td>';
+      h+='<td style="padding:1.5px 10px 1.5px 4px;text-align:right;color:var(--dim);font-size:9px;width:56px">'+a.ageH+'h</td>';
+      h+='<td style="padding:0;border-left:1px solid rgba(255,255,255,0.1)">';
+      h+=dimGroup([
         {title:'新鲜度 '+lvlText(a.lvl), content: cell(a.lvl)},
         {title:'臃肿度 '+lvlText(idxB[a.dataKey]), content: cell(idxB[a.dataKey]||(idxB[a.dataKey]===undefined?'ok':null))},
         {title:'异常值 '+lvlText(idxA[a.dataKey]), content: cell(idxA[a.dataKey]||(idxA[a.dataKey]===undefined?'ok':null))},
         {title:'缺失 '+lvlText(idxM[a.dataKey]), content: cell(idxM[a.dataKey]||(idxM[a.dataKey]===undefined?'ok':null))},
         {title:'依赖 '+lvlText(idxD[a.dataKey]), content: cell(idxD[a.dataKey]||(idxD[a.dataKey]===undefined?'ok':null))}
       ], 'font-size:11px');
-      html+='</td>';
-      html+='</tr>';
+      h+='</td></tr>';
+      return h;
     }
-    html+='</tbody></table></details>';
+    function _renderTable(list){
+      if(!list || !list.length) return '';
+      var h='<table style="width:100%;border-collapse:collapse;font-size:9.5px;line-height:1.2"><thead><tr>';
+      h+='<th style="text-align:left;padding:2px 5px;color:var(--dim);font-weight:600">\u6570\u636e\u6e90</th>';
+      h+='<th style="text-align:right;padding:2px 10px 2px 4px;color:var(--dim);font-weight:600;width:56px">\u9648\u65e7</th>';
+      h+='<th style="padding:0 0 0 6px;color:var(--dim);font-weight:600;border-left:1px solid rgba(255,255,255,0.1)"><div style="display:flex;justify-content:stretch">';
+      h+='<div style="flex:1;text-align:center;padding:3px 0;font-size:9.5px" title="新鲜度">\u65b0</div>';
+      h+='<div style="flex:1;text-align:center;padding:3px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="臃肿度">\u80c0</div>';
+      h+='<div style="flex:1;text-align:center;padding:3px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="异常值">\u5f02</div>';
+      h+='<div style="flex:1;text-align:center;padding:3px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="缺失检测">\u7f3a</div>';
+      h+='<div style="flex:1;text-align:center;padding:3px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="依赖就绪">\u8d56</div>';
+      h+='</div></th></tr></thead><tbody>';
+      for (var ri=0;ri<list.length;ri++) h+=_renderRow(list[ri]);
+      h+='</tbody></table>';
+      return h;
+    }
+    function _renderCard(slotName, color, slotEmoji, list, subLabel){
+      if(!list || !list.length) return '';
+      var h='<div style="margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">';
+      h+='<div style="display:flex;align-items:baseline;gap:6px;margin-bottom:6px">';
+      h+='<span style="color:'+color+';font-size:11.5px;font-weight:700">'+slotEmoji+' '+slotName+'</span>';
+      h+='<span style="color:var(--dim);font-size:9.5px">'+list.length+' \u4e2a\u6570\u636e\u6e90</span>';
+      if(subLabel) h+='<span style="color:var(--dim);font-size:9px">\u00b7 '+subLabel+'</span>';
+      h+='</div>';
+      h+=_renderTable(list);
+      h+='</div>';
+      return h;
+    }
+    /* 3 \u4e3b\u5361\u7247\uff1a\u76d8\u524d / \u76d8\u4e2d / \u76d8\u540e */
+    html+='<div style="margin-top:8px;display:flex;align-items:center;gap:6px;color:var(--dim);font-size:10px">\ud83d\udcca '+ct.total+' \u4e2a\u6570\u636e\u6e90 \u00b7 \u6309\u76d8\u524d/\u76d8\u4e2d/\u76d8\u540e \u62c6 3 \u5361\u7247</div>';
+    var _preItems=(_slotGroups['盘前']||[]).concat(_slotGroups['全天']||[]);
+    html+=_renderCard('盘前','var(--purple)','\ud83d\udfe3',_preItems,'08:25 \u76d8\u524d + \u5168\u5929\u5b8f\u89c2');
+    html+=_renderCard('盘中','var(--up)','\ud83d\udd34',_slotGroups['盘中']||[],'10:30-15:05 5 \u6293');
+    var _postItems=_slotGroups['盘后']||[];
+    if(_postItems.length){
+      var _postClose=_postItems.filter(function(x){return _slotMap[x.dataKey]==='收盘';});
+      var _postAlgo =_postItems.filter(function(x){return _slotMap[x.dataKey]!=='收盘';});
+      var _postH='<div style="margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">';
+      _postH+='<div style="display:flex;align-items:baseline;gap:6px;margin-bottom:6px">';
+      _postH+='<span style="color:var(--down);font-size:11.5px;font-weight:700">\ud83d\udfe2 \u76d8\u540e</span>';
+      _postH+='<span style="color:var(--dim);font-size:9.5px">'+_postItems.length+' \u4e2a\u6570\u636e\u6e90</span>';
+      _postH+='<span style="color:var(--dim);font-size:9px">\u00b7 15:30 \u6536\u76d8 7 + 18:30 \u7b97\u6cd5 12</span>';
+      _postH+='</div>';
+      if(_postClose.length){
+        _postH+='<div style="color:var(--gold);font-size:9.5px;font-weight:600;margin:4px 0 3px">\u6536\u76d8 \u00b7 15:30</div>';
+        _postH+=_renderTable(_postClose);
+      }
+      if(_postAlgo.length){
+        _postH+='<div style="color:var(--down);font-size:9.5px;font-weight:600;margin:8px 0 3px;padding-top:6px;border-top:1px dashed rgba(255,255,255,0.05)">\u76d8\u540e \u00b7 18:30 \u7b97\u6cd5</div>';
+        _postH+=_renderTable(_postAlgo);
+      }
+      _postH+='</div>';
+      html+=_postH;
+    }
     html+='</div>'; return html;
   }
 
