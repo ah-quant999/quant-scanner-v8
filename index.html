@@ -5218,13 +5218,19 @@ function renderLimitUpHeatmap(){
     // 更新时间：数据文件可能没有 update_time，取最后一条日线日期兜底
     var tEl = $('mffTime');
     if(tEl) setTime('mffTime', mffFormatUpdateTime(d.update_time, d.daily));
-    // 摘要
+    // 摘要：显示当前 range 实际显示的天数 + 总条数 + 数据陈旧度
     var sumEl = $('mffSummary');
     if(sumEl){
       var cnt = d.daily.length;
       var last = d.daily[cnt-1];
       var cumLast = d.cumulative && d.cumulative.length ? d.cumulative[d.cumulative.length-1].cum_yi : 0;
-      sumEl.innerHTML = '共 <b style="color:var(--txt);">'+cnt+'</b> 天 · 最新 <b style="color:'+(last.net_yi>=0?'var(--up)':'var(--down)')+';">'+last.net_yi.toFixed(0)+'</b>亿 · 累计 <b style="color:'+(cumLast>=0?'var(--up)':'var(--down)')+';">'+(cumLast/10000).toFixed(2)+'</b>万亿';
+      // 数据陈旧度：最后日期距今天几天
+      var lastDateStr = (last.date||'').slice(0,4)+'-'+(last.date||'').slice(4,6)+'-'+(last.date||'').slice(6,8);
+      var lastDate = lastDateStr ? new Date(lastDateStr+'T15:00:00+08:00') : null;
+      var today = new Date();
+      var daysOld = lastDate ? Math.floor((today - lastDate) / 86400000) : 0;
+      var staleHint = daysOld > 1 ? ' · <span style="color:var(--gold)">数据 '+daysOld+' 天前</span>' : '';
+      sumEl.innerHTML = '当前 <b style="color:var(--txt);">'+cnt+'</b> 天总览 · 最新 <b style="color:'+(last.net_yi>=0?'var(--up)':'var(--down)')+';">'+last.net_yi.toFixed(0)+'</b>亿 · 累计 <b style="color:'+(cumLast>=0?'var(--up)':'var(--down)')+';">'+(cumLast/10000).toFixed(2)+'</b>万亿' + staleHint;
     }
     renderMffChart();
     // 绑定时间范围按钮
@@ -5357,8 +5363,8 @@ function renderLimitUpHeatmap(){
         }
       ],
       dataZoom: [
-        { type: 'inside', xAxisIndex: 0, start: 70, end: 100 },
-        { type: 'slider', xAxisIndex: 0, height: 22, bottom: 8, start: 70, end: 100, fillerColor: 'rgba(239,68,68,0.15)', borderColor: gridColor, textStyle: { color: dimColor, fontSize: 10 } }
+        { type: 'inside', xAxisIndex: 0, start: 0, end: 100 },
+        { type: 'slider', xAxisIndex: 0, height: 22, bottom: 8, start: 0, end: 100, fillerColor: 'rgba(239,68,68,0.15)', borderColor: gridColor, textStyle: { color: dimColor, fontSize: 10 } }
       ],
       series: series
     };
@@ -5471,34 +5477,33 @@ function renderLimitUpHeatmap(){
 
     // ── Block 3: 中期趋势（5日/10日/20日/60日板块资金流，来自 SECTOR_FUND_FLOW_TREND）──
     function sfTrendCard(title,dataArr,netKey,headClass){
-      if(!dataArr || !dataArr.length) return '';
-      const inList=dataArr.filter(s=>(s[netKey]||0)>0).sort((a,b)=>b[netKey]-a[netKey]).slice(0,5);
-      const outList=dataArr.filter(s=>(s[netKey]||0)<0).sort((a,b)=>a[netKey]-b[netKey]).slice(0,5);
+      const inList=(dataArr||[]).filter(s=>s&&(s[netKey]||0)>0).sort((a,b)=>b[netKey]-a[netKey]).slice(0,5);
+      const outList=(dataArr||[]).filter(s=>s&&(s[netKey]||0)<0).sort((a,b)=>a[netKey]-b[netKey]).slice(0,5);
+      const hasData = (dataArr||[]).length > 0;
       let c='<div class="sf-trend-card"><div class="sf-trend-head '+headClass+'">'+title+'</div><div class="sf-trend-cols">';
       c+='<div class="sf-trend-col"><div class="col-title col-in">流入TOP</div>';
       if(inList.length){inList.forEach(s=>{c+='<div class="sf-trend-row2"><span>'+s.name+'</span><span style="color:var(--up);flex-shrink:0">+'+(s[netKey]||0).toFixed(1)+'亿</span></div>';});}
-      else{c+='<div style="color:var(--dim)">暂无</div>';}
+      else if(hasData){c+='<div style="color:var(--dim);font-size:11px;padding:4px 0">暂无</div>';}
+      else{c+='<div style="color:var(--dim);font-size:11px;padding:4px 0">暂无数据</div>';}
       c+='</div>';
       c+='<div class="sf-trend-col"><div class="col-title col-out">流出TOP</div>';
       if(outList.length){outList.forEach(s=>{c+='<div class="sf-trend-row2"><span>'+s.name+'</span><span style="color:var(--down);flex-shrink:0">'+(s[netKey]||0).toFixed(1)+'亿</span></div>';});}
-      else{c+='<div style="color:var(--dim)">暂无</div>';}
+      else if(hasData){c+='<div style="color:var(--dim);font-size:11px;padding:4px 0">暂无</div>';}
+      else{c+='<div style="color:var(--dim);font-size:11px;padding:4px 0">暂无数据</div>';}
       c+='</div></div></div>';
       return c;
     }
     const sft = window.SECTOR_FUND_FLOW_TREND || {};
     const t5d=sft.trend_5d||[], t10d=sft.trend_10d||[], t20d=sft.trend_20d||[], t60d=sft.trend_60d||[];
+    // 始终渲染 4 列（5/10/20/60 日），无数据的列显示「暂无数据」占位，避免空列造成视觉跳跃
     let h3='';
-    if(t5d.length>0 || t10d.length>0 || t20d.length>0 || t60d.length>0){
-      h3+='<div class="sf-trend-grid">';
-      h3+=sfTrendCard('5日趋势',t5d,'net_5d','sf-trend-head-5');
-      h3+=sfTrendCard('10日趋势',t10d,'net_10d','sf-trend-head-10');
-      h3+=sfTrendCard('20日趋势',t20d,'net_20d','sf-trend-head-20');
-      h3+=sfTrendCard('60日趋势',t60d,'net_60d','sf-trend-head-60');
-      h3+='</div>';
-      h3+='<div style="font-size:10px;color:var(--dim);margin-top:8px;line-height:1.5;">📌 中期趋势按板块主力资金净流入滚动累计排序；10日数据由本地历史滚动累加得出，部分板块历史不足10日则暂缺。</div>';
-    }else{
-      h3='<div class="ipo-empty">暂无趋势数据（盘后 v6 同步后更新）</div>';
-    }
+    h3+='<div class="sf-trend-grid">';
+    h3+=sfTrendCard('5日趋势',t5d,'net_5d','sf-trend-head-5');
+    h3+=sfTrendCard('10日趋势',t10d,'net_10d','sf-trend-head-10');
+    h3+=sfTrendCard('20日趋势',t20d,'net_20d','sf-trend-head-20');
+    h3+=sfTrendCard('60日趋势',t60d,'net_60d','sf-trend-head-60');
+    h3+='</div>';
+    h3+='<div style="font-size:10px;color:var(--dim);margin-top:8px;line-height:1.5;">📌 中期趋势按板块主力资金净流入滚动累计排序；10日数据由本地历史滚动累加得出，60日数据由云端 v6 同步（待部署后接入）。</div>';
     $('sfBlock3').innerHTML=h3;
 
     setTime('phSectorTime',d.update_time);
