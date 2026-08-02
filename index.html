@@ -1376,139 +1376,6 @@ window.V8_CAL = {weeks:[],legend:[]};
         return {base:base, sub:sub};
       }
 
-      // ---- 卡1: 机游信号详情分析 ----
-      function renderAcJiyou(){
-        var el=$('acJiyouSignal'); if(!el) return;
-        var A=agg(30); if(!A.all.length){ el.innerHTML='<div class="ipo-empty">数据收集中 — 需连续交易日积累</div>'; return; }
-        var baseCounts={}, subCounts={};
-        A.all.forEach(function(s){ var c=classify(s); baseCounts[c.base]=(baseCounts[c.base]||0)+1; c.sub.forEach(function(t){subCounts[t]=(subCounts[t]||0)+1;}); });
-        var baseOrder=['机游共振买入','机游共振卖出','机构出货游资接盘','机构接盘游资出货','机构独买','游资独买','机构独卖','游资独卖','其他'];
-        var subOrder=['机构独食≥5000万','游资独食≥5000万','机构抢筹≥1亿涨停','机构派发≥1亿下跌','低吸信号(机游买收阴)'];
-        var h='<div style="font-size:10px;color:var(--dim);margin-bottom:6px;">统计区间：近 '+A.daySum.length+' 个交易日 · 共 '+A.all.length+' 条上榜记录</div>';
-        h+='<div style="font-size:11px;font-weight:700;color:#ffd54f;margin:4px 0 3px;">4类基础信号</div>';
-        baseOrder.forEach(function(k){ if(baseCounts[k]) h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:1px 0;"><span style="color:var(--sub);">'+k+'</span><b style="color:var(--txt);">'+baseCounts[k]+'</b></div>'; });
-        h+='<div style="font-size:11px;font-weight:700;color:#ffd54f;margin:8px 0 3px;">5类细分信号</div>';
-        var anySub=false;
-        subOrder.forEach(function(k){ if(subCounts[k]){ anySub=true; h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:1px 0;"><span style="color:var(--sub);">'+k+'</span><b style="color:#ffd54f;">'+subCounts[k]+'</b></div>'; } });
-        if(!anySub) h+='<div style="font-size:10px;color:var(--dim);">近30日未触发细分信号阈值</div>';
-        var freq={};
-        A.all.forEach(function(s){ if(s.category==='机游共振') freq[s.code]=(freq[s.code]||0)+1; });
-        var topFreq=Object.keys(freq).map(function(c){ return {code:c,n:freq[c],name:(A.all.find(function(s){return s.code===c;})||{}).name||c }; }).sort(function(a,b){return b.n-a.n;}).slice(0,5);
-        if(topFreq.length){
-          h+='<div style="font-size:11px;font-weight:700;color:#ffd54f;margin:8px 0 3px;">高频共振股（近30日出现次数）</div>';
-          topFreq.forEach(function(t){ h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:1px 0;"><span style="color:var(--txt);">'+esc(t.name)+' <span style="color:var(--dim);">'+t.code+'</span></span><b style="color:#ffd54f;">'+t.n+'次</b></div>'; });
-        }
-        el.innerHTML=h;
-      }
-
-      // ---- 卡2: 北向资金详细分析 ----
-      function renderAcNorth(){
-        var el=$('acNorthAnalysis'); if(!el) return;
-        var A=agg(60);
-        var northStocks=[];
-        A.all.forEach(function(s){
-          var seats=s.seats; if(!seats||!seats['北向']) return;
-          var nb=(seats['北向'].buy||0)-(seats['北向'].sell||0);
-          northStocks.push({code:s.code,name:s.name,date:s._date,buy:seats['北向'].buy||0,sell:seats['北向'].sell||0,net:nb,pct:s.pct||0,inst:s.inst_net_万||0});
-        });
-        if(!northStocks.length){ el.innerHTML='<div class="ipo-empty">近60日龙虎榜无北向席位数据</div>'; return; }
-        var totalNet=northStocks.reduce(function(s,x){return s+x.net;},0);
-        var totalBuy=northStocks.reduce(function(s,x){return s+x.buy;},0);
-        var totalSell=northStocks.reduce(function(s,x){return s+x.sell;},0);
-        var h='<div style="background:var(--bg2);border-radius:6px;padding:6px 8px;margin-bottom:6px;font-size:11px;">';
-        h+='北向席位累计净买 <b style="color:'+(totalNet>=0?'var(--up)':'var(--down)')+';">'+fmtWan(totalNet)+'</b> · 买入'+fmtWan(totalBuy)+' / 卖出'+fmtWan(totalSell)+'</div>';
-        var byCode={};
-        northStocks.forEach(function(x){ (byCode[x.code]=byCode[x.code]||[]).push(x); });
-        var streak=[];
-        Object.keys(byCode).forEach(function(c){
-          var arr=byCode[c].slice().sort(function(a,b){return a.date<b.date?-1:1;});
-          var run=0,best=0; arr.forEach(function(x){ if(x.net>0){ run++; if(run>best) best=run; } else run=0; });
-          streak.push({code:c,name:arr[arr.length-1].name,best:best,net:arr.reduce(function(s,x){return s+x.net;},0)});
-        });
-        streak.sort(function(a,b){return b.best-a.best;});
-        h+='<div style="font-size:11px;font-weight:700;color:var(--north);margin:6px 0 3px;">连续加仓榜（最长连买天数）</div>';
-        streak.slice(0,5).forEach(function(t){ h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:1px 0;"><span style="color:var(--txt);">'+esc(t.name)+' <span style="color:var(--dim);">'+t.code+'</span></span><span><b style="color:var(--north);">'+t.best+'天</b> <span style="color:var(--dim);">'+fmtWan(t.net)+'</span></span></div>'; });
-        var nbInst=northStocks.filter(function(x){ return x.net>0 && x.inst>0; });
-        h+='<div style="font-size:11px;font-weight:700;color:var(--north);margin:6px 0 3px;">北向+机构共振（北向净买∩机构净买）</div>';
-        if(nbInst.length){
-          var f2={};
-          nbInst.forEach(function(x){ f2[x.code]=(f2[x.code]||0)+1; });
-          var topArr=Object.keys(f2).map(function(c){return {code:c,n:f2[c],name:(northStocks.find(function(s){return s.code===c;})||{}).name||c,net:(northStocks.filter(function(s){return s.code===c;})).reduce(function(s,x){return s+x.net;},0)};}).sort(function(a,b){return b.n-a.n;}).slice(0,5);
-          topArr.forEach(function(t){ h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:1px 0;"><span style="color:var(--txt);">'+esc(t.name)+' <span style="color:var(--dim);">'+t.code+'</span></span><b style="color:#ffd54f;">'+t.n+'次 · '+fmtWan(t.net)+'</b></div>'; });
-        } else h+='<div style="font-size:10px;color:var(--dim);">近60日无北向+机构共振</div>';
-        el.innerHTML=h;
-      }
-
-      // ---- 卡3: 共振胜率回测（基于可得数据；前向T+N需接入价格跟进） ----
-      function renderAcBacktest(){
-        var el=$('acBacktest'); if(!el) return;
-        var A=agg(120);
-        var res=A.all.filter(function(s){return s.category==='机游共振';});
-        if(!res.length){ el.innerHTML='<div class="ipo-empty">近120日有机游共振记录，方可统计</div>'; return; }
-        var up=res.filter(function(s){return (s.pct||0)>0;}).length;
-        var avgPct=res.reduce(function(s,x){return s+(x.pct||0);},0)/res.length;
-        var wd=[0,0,0,0,0,0,0]; res.forEach(function(s){ var dt=new Date(s._date.replace(/-/g,'/')); wd[dt.getDay()]++; });
-        var wdNames=['日','一','二','三','四','五','六'];
-        var h='<div style="font-size:10px;color:var(--dim);margin-bottom:6px;">口径：信号日当日涨跌幅（前向 T+1~T+20 回测需接入价格跟进，规划中）</div>';
-        h+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;">';
-        h+='<div style="text-align:center;"><div style="font-size:16px;font-weight:800;color:var(--up);">'+(up/res.length*100).toFixed(0)+'%</div><div style="font-size:9px;color:var(--sub);">信号日胜率</div></div>';
-        h+='<div style="text-align:center;"><div style="font-size:16px;font-weight:800;color:#ffd54f;">'+res.length+'</div><div style="font-size:9px;color:var(--sub);">共振样本</div></div>';
-        h+='<div style="text-align:center;"><div style="font-size:16px;font-weight:800;color:'+(avgPct>=0?'var(--up)':'var(--down)')+';">'+fmtPct(avgPct)+'</div><div style="font-size:9px;color:var(--sub);">平均信号日涨幅</div></div>';
-        h+='</div>';
-        h+='<div style="font-size:11px;font-weight:700;color:var(--sub);margin:4px 0 3px;">共振日 · 星期分布</div>';
-        h+='<div style="display:flex;gap:6px;flex-wrap:wrap;font-size:10px;">';
-        wd.forEach(function(n,i){ if(n>0) h+='<span style="color:var(--dim);">周'+wdNames[i]+' <b style="color:var(--txt);">'+n+'</b></span>'; });
-        h+='</div>';
-        el.innerHTML=h;
-      }
-
-      // ---- 卡4: 大牛股猎手预测 ----
-      function renderAcBullHunter(){
-        var el=$('acBullHunter'); if(!el) return;
-        var A=agg(40);
-        if(!A.all.length){ el.innerHTML='<div class="ipo-empty">数据收集中 — 需异动信号历史累积</div>'; return; }
-        var freq={};
-        A.all.forEach(function(s){ if(s.category==='机游共振') freq[s.code]=(freq[s.code]||0)+1; });
-        var core=Object.keys(freq).map(function(c){return {code:c,name:(A.all.find(function(s){return s.code===c;})||{}).name||c,n:freq[c] };}).filter(function(x){return x.n>=2;}).sort(function(a,b){return b.n-a.n;}).slice(0,8);
-        var north=A.all.filter(function(s){ var seats=s.seats; return seats&&seats['北向']; }).map(function(s){ var nb=(s.seats['北向'].buy||0)-(s.seats['北向'].sell||0); return {code:s.code,name:s.name,date:s._date,net:nb,inst:s.inst_net_万||0,yz:s.yz_net_万||0,cat:s.category,reason:s.reason||'',pct:s.pct||0 }; });
-        var byCode={};
-        north.forEach(function(x){ (byCode[x.code]=byCode[x.code]||[]).push(x); });
-        var early=[];
-        Object.keys(byCode).forEach(function(c){
-          var arr=byCode[c].slice().sort(function(a,b){return a.date<b.date?-1:1;});
-          var run=0,best=0,acc=0; arr.forEach(function(x){ if(x.net>0){ run++; acc+=x.net; if(run>best) best=run; } else run=0; });
-          if(best>=2 && acc>=20000) early.push({code:c,name:arr[arr.length-1].name,best:best,acc:acc});
-        });
-        early=early.sort(function(a,b){return b.acc-a.acc;}).slice(0,8);
-        var recent=A.daySum.slice(-5), prior=A.daySum.slice(-15,-5);
-        var priorCodes={};
-        prior.forEach(function(d){ d.stocks.forEach(function(s){ if(s.category==='机游共振') priorCodes[s.code]=1; }); });
-        var fresh=[];
-        recent.forEach(function(d){ d.stocks.forEach(function(s){ if(s.category==='机游共振' && !priorCodes[s.code]) fresh.push(s); }); });
-        var freshSeen={};
-        fresh=fresh.filter(function(s){ if(freshSeen[s.code]) return false; freshSeen[s.code]=1; return true; }).slice(0,8);
-
-        var h='';
-        h+='<div style="font-size:11px;font-weight:700;color:#ffd54f;margin:4px 0 3px;">🎯 核心共振标的（近40日≥2次）</div>';
-        if(core.length) core.forEach(function(t){ h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:1px 0;"><span style="color:var(--txt);">'+esc(t.name)+' <span style="color:var(--dim);">'+t.code+'</span></span><b style="color:#ffd54f;">'+t.n+'次</b></div>'; }); else h+='<div style="font-size:10px;color:var(--dim);">暂无重复共振标的</div>';
-        h+='<div style="font-size:11px;font-weight:700;color:#06b6d4;margin:8px 0 3px;">📡 早期信号雷达（北向连买≥2天 且 累计≥2亿）</div>';
-        if(early.length) early.forEach(function(t){ h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:1px 0;"><span style="color:var(--txt);">'+esc(t.name)+' <span style="color:var(--dim);">'+t.code+'</span></span><span><b style="color:#06b6d4;">'+t.best+'天</b> <span style="color:var(--dim);">'+fmtWan(t.acc)+'</span></span></div>'; }); else h+='<div style="font-size:10px;color:var(--dim);">暂未触发早期信号阈值</div>';
-        h+='<div style="font-size:11px;font-weight:700;color:#f472b6;margin:8px 0 3px;">🚀 新赛道发现（近5日新晋共振）</div>';
-        if(fresh.length) fresh.forEach(function(s){ h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:1px 0;"><span style="color:var(--txt);">'+esc(s.name)+' <span style="color:var(--dim);">'+s.code+'</span> <span style="color:var(--dim);font-size:9px;">'+fmtPct(s.pct)+'</span></span><span style="color:var(--sub);">'+esc(s.reason||'').slice(0,16)+'</span></div>'; }); else h+='<div style="font-size:10px;color:var(--dim);">近5日无新晋共振标的</div>';
-        el.innerHTML=h;
-      }
-
-      function renderAll(){
-        try{ renderAcJiyou(); }catch(e){ console.error('acJiyou',e); }
-        try{ renderAcNorth(); }catch(e){ console.error('acNorth',e); }
-        try{ renderAcBacktest(); }catch(e){ console.error('acBacktest',e); }
-        try{ renderAcBullHunter(); }catch(e){ console.error('acBullHunter',e); }
-      }
-
-      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderAll);
-      else renderAll();
-
-      window._renderAcCards=renderAll;
     })();
     </script>
 
@@ -3366,26 +3233,9 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     h += '</div>'; // hunter-grid
 
-    // Bottom action row
-    h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px">';
-    var actions = [
-      ['⚡','机游信号详析分析','单日信号连续性检测 + 4类基础信号<br>+ 3类进阶信号'],
-      ['📊','北向资金详细分析','行业趋势 + 渠道持仓 + 陆股通共振<br>+ 中线价值视角'],
-      ['📈','共振胜率回测测','三维度胜率共振 T+1~T+90 8周期 · 5<br>+ 个历史完整区间'],
-      ['🐂','大牛股猎手回测','容量基 · 排期号 · 核心共振<br>+ T+7/T+10/T+20 起收收益追踪']
-    ];
-    actions.forEach(function(ac){
-      h += '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:.15s" onmouseover="this.style.borderColor=\'var(--purple)\'" onmouseout="this.style.borderColor=\'var(--border)\'">';
-      h += '<div style="font-size:20px;margin-bottom:4px">' + ac[0] + '</div>';
-      h += '<div style="font-size:12px;font-weight:700;color:var(--txt)">' + ac[1] + '</div>';
-      h += '<div style="font-size:10px;color:var(--dim);margin-top:4px;line-height:1.4">' + ac[2] + '</div>';
-      h += '<div style="margin-top:6px;text-align:right;color:var(--dim);font-size:10px">→</div>';
-      h += '</div>';
-    });
-    h += '</div>';
-
     // Footer
     h += '<div style="margin-top:12px;font-size:10px;color:var(--dim);text-align:center">更新于 ' + _rcRel(updateTime) + '</div>';
+    h += '<div style="margin-top:4px;font-size:10px;color:var(--sub);text-align:center">→ 详细分析见顶部 🔒 共振日历（管理员区）</div>';
 
     c.innerHTML = h;
   }
@@ -3628,6 +3478,17 @@ window.V8_CAL = {weeks:[],legend:[]};
           <tr><td>每日备份</td><td>cloud_backup.yml 21:00</td><td><span style="color:#38bdf8;">✅ 已建 v8_backup.yml 21:00</span></td><td>P2 可选</td></tr>
           <tr><td>心跳监控上云</td><td>peer_health_monitor 本机</td><td>✅ Actions 日志即心跳</td><td>P2 可选</td></tr>
           <tr><td>防误删清单</td><td>DO_NOT_DELETE.md + pre-commit hook</td><td><span style="color:#38bdf8;">✅ 已建 DO_NOT_DELETE.md</span></td><td>P0 必须</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">📝</span>本周待办/建议表</h3>
+        <div class="logic-p">主人在历史 HANDOVER 中规划的「建议项」，照搬待落地。本周（7/27~8/02）已完成：4 类上游原生化（89da5fc）· 每日洞察/大牛股猎手对标参考页重构（7466799）· 2 次周度锚点 bug 修复（300ec6d/589f601）· 北向席位 hasMultiDay 修复 + 月度汇总加日期注释（589f601）。</div>
+        <table class="lg-table">
+          <tr><th>时段</th><th>任务</th><th>建议</th><th>频次</th></tr>
+          <tr><td>14:06</td><td>v8_self_heal · 冻结模块诊断+补跑</td><td>⚠️ 建议并入 21:00 窗口，删掉这个独立 workflow</td><td>周度兜底</td></tr>
+          <tr><td>首周六</td><td>(建议)月度报告 + STOCK_LIST pinyin 重生 + 依赖体检</td><td><span class="op-tab-time" style="background:#3b82f6;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600">NEW</span> 加 if 首周六 guard 进 21:00 脚本</td><td>月度</td></tr>
+          <tr><td>首周日</td><td>(建议)旧数据归档 + git gc/pack + 备份轮转</td><td><span class="op-tab-time" style="background:#3b82f6;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600">NEW</span> 加 if 首周日 guard 进 23:00 脚本</td><td>月度</td></tr>
         </table>
       </div>
     </div>
