@@ -2395,29 +2395,24 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     <!-- TAB buttons -->
     <div class="rc-tabs">
-      <button class="rc-tab-btn active" onclick="switchRcTab('tab1',this)">📅 机游共振日历</button>
-      <button class="rc-tab-btn" onclick="switchRcTab('tab2',this)">🌊 北向日历</button>
-      <button class="rc-tab-btn" onclick="switchRcTab('tab3',this)">🔍 每日洞察</button>
-      <button class="rc-tab-btn" onclick="switchRcTab('tab4',this)">🐂 大牛股猎手</button>
+      <button class="rc-tab-btn active" onclick="switchRcTab('tab1',this)">📅 共振日历（机游+北向）</button>
+      <button class="rc-tab-btn" onclick="switchRcTab('tab2',this)">🔍 每日洞察</button>
+      <button class="rc-tab-btn" onclick="switchRcTab('tab3',this)">🐂 大牛股猎手</button>
     </div>
 
-    <!-- ===== TAB1: 机游共振日历 ===== -->
+    <!-- ===== TAB1: 共振日历（机游共振 + 北向资金） ===== -->
     <div id="rcTab1" class="rc-pane active">
       <div id="jyCalContainer"></div>
+      <div id="northCalContainer" style="margin-top:36px;border-top:1px solid var(--border);padding-top:24px"></div>
     </div>
 
-    <!-- ===== TAB2: 北向日历 ===== -->
+    <!-- ===== TAB2: 每日洞察 ===== -->
     <div id="rcTab2" class="rc-pane">
-      <div id="northCalContainer"></div>
-    </div>
-
-    <!-- ===== TAB3: 每日洞察 ===== -->
-    <div id="rcTab3" class="rc-pane">
       <div id="insightContainer"></div>
     </div>
 
-    <!-- ===== TAB4: 大牛股猎手 ===== -->
-    <div id="rcTab4" class="rc-pane">
+    <!-- ===== TAB3: 大牛股猎手 ===== -->
+    <div id="rcTab3" class="rc-pane">
       <div id="hunterContainer"></div>
     </div>
 
@@ -2434,10 +2429,12 @@ window.V8_CAL = {weeks:[],legend:[]};
     if(btn) btn.classList.add('active');
     window.__rcActiveTab = tabId;
     // Lazy render on first visit
-    if(tabId === 'tab1' && !window.__jyCalRendered){ setTimeout(renderJyCalendar, 30); }
-    if(tabId === 'tab2' && !window.__northCalRendered){ setTimeout(renderNorthCalendar, 30); }
-    if(tabId === 'tab3' && !window.__insightRendered){ setTimeout(renderInsight, 30); }
-    if(tabId === 'tab4' && !window.__hunterRendered){ setTimeout(renderHunter, 30); }
+    if(tabId === 'tab1'){
+      if(!window.__jyCalRendered) setTimeout(renderJyCalendar, 30);
+      if(!window.__northCalRendered) setTimeout(renderNorthCalendar, 50);
+    }
+    if(tabId === 'tab2' && !window.__insightRendered){ setTimeout(renderInsight, 30); }
+    if(tabId === 'tab3' && !window.__hunterRendered){ setTimeout(renderHunter, 30); }
   }
 
   /* ===== 工具函数 ===== */
@@ -2741,20 +2738,14 @@ window.V8_CAL = {weeks:[],legend:[]};
     var h = '';
     h += '<div class="cal-header-row">';
     h += '<span class="cal-title">🌊 北向资金日历</span>';
-    if(NF.stopped){
-      h += '<span class="cal-meta" style="color:var(--gold)">⚠️ 已停更（2024-05起港交所停止披露个股级数据）</span>';
-    } else {
-      h += '<span class="cal-meta">更新于 ' + _rcRel(NF.update_time||'') + '</span>';
-    }
+    h += '<span class="cal-meta">更新于 ' + _rcRel(NF.update_time||'') + ' · 龙虎榜北向席位动向（非全市场北向资金）</span>';
     h += '</div>';
 
-    // Notice box
+    // Notice box（精简·去掉过期"已停更"信息）
     h += '<div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:11px;line-height:1.7;color:var(--sub)">';
     h += '<strong style="color:var(--gold)">说明：</strong><br>';
-    h += '1. ⚠️ 本页面已删除全市场净流入汇总数据，原因：港交所自2024年5月13日起已停止向北交所实时交易数据。2024年9月16日起停更每日净流入数据。<br>';
-    h += '2. 本页仅保留龙虎榜北向席位净买卖实测数据——该数据来自沪深交易所官方披露的龙虎榜北向席位明细。<br>';
-    h += '3. 龙虎榜数据 ≠ 北向全盘，仅覆盖当日价格异动导致上榜的个股。<br>';
-    h += '4. 7月9日起数据取自当日收盘后更新库。';
+    h += '1. 本页统计龙虎榜中「深股通/沪股通专用 + 瑞银/高盛/摩根等外资券商」席位净买卖动向（数据来自沪深交易所龙虎榜北向席位明细）。<br>';
+    h += '2. 口径：仅覆盖当日上龙虎榜的个股，精确但非全市场北向资金流。每日盘后更新。';
     h += '</div>';
 
     // Calendar using LHB_DATA north seat info
@@ -2835,17 +2826,44 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     h += '<div id="northDayDetail" class="cal-detail"></div>';
 
-    // Weekly summary (same as 机游 but filtered to north stocks)
+    // Weekly summary (动态生成当前月份的每周，按周一开始)
     h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📊 周度汇总</h3>';
     h += '<div class="week-cards">';
-    [
-      ['第1周 7/1-7/5',0],['第2周 7/6-7/12',1],['第3周 7/13-7/19',2],
-      ['第4周 7/20-7/26',3],['第5周 7/27-8/2',4]
-    ].forEach(function(wk){
-      h += '<div class="wk-card"><div class="wk-card-hd"><span class="wk-card-title">' + wk[0] + '</span></div>';
-      if(wk[1] === 4 && northStocks.length > 0){
-        var wBuy = northStocks.filter(function(s){ return (s.inst_net_万||0) > 0; }).sort(function(a,b){return (b.inst_net_万||0)-(a.inst_net_万||0);}).slice(0,5);
-        var wSell = northStocks.filter(function(s){ return (s.inst_net_万||0) < 0; }).sort(function(a,b){return (a.inst_net_万||0)-(b.inst_net_万||0);}).slice(0,5);
+    var firstDayOfMonth = new Date(year, month, 1);
+    var firstDowOfMonth = firstDayOfMonth.getDay();
+    var monOffset = (firstDowOfMonth === 0) ? 6 : (firstDowOfMonth - 1);
+    var weekRanges = [];
+    var wd = 1 - monOffset; // 第一个周一在月内或前月
+    var wkIdx = 1;
+    while(wd <= daysInMonth){
+      var wMon = Math.max(1, wd);
+      var wSun = Math.min(wd + 6, daysInMonth);
+      var monLabel = (month+1) + '/' + wMon;
+      var sunLabel = (month+1) + '/' + wSun;
+      // 跨月标记
+      if(wd < 1) monLabel = (month+1) + '/1';
+      if(wd + 6 > daysInMonth) sunLabel = (month+1) + '/' + daysInMonth;
+      weekRanges.push({label: '第' + (wkIdx++) + '周 ' + monLabel + '-' + sunLabel, mon: wMon, end: wSun});
+      wd += 7;
+    }
+    // 智能归类：单日数据时按 lhbDate 所在周放入，其他周暂无；多日数据时按 stock.date 过滤
+    var lhbDay = lhbDate && lhbDate.length >= 8 ? parseInt(lhbDate.slice(6)) : null;
+    var hasMultiDay = northStocks.some(function(s){ return s && s.date; });
+    weekRanges.forEach(function(wk){
+      h += '<div class="wk-card"><div class="wk-card-hd"><span class="wk-card-title">' + wk.label + '</span></div>';
+      var wkNorth;
+      if(hasMultiDay){
+        wkNorth = northStocks.filter(function(s){
+          var sd = parseInt((s.date||'').slice(6));
+          return sd && sd >= wk.mon && sd <= wk.end;
+        });
+      } else {
+        // 单日：归入 lhbDate 所在周
+        wkNorth = (lhbDay != null && lhbDay >= wk.mon && lhbDay <= wk.end) ? northStocks : [];
+      }
+      if(wkNorth.length > 0){
+        var wBuy = wkNorth.filter(function(s){ return (s.inst_net_万||0) > 0; }).sort(function(a,b){return (b.inst_net_万||0)-(a.inst_net_万||0);}).slice(0,5);
+        var wSell = wkNorth.filter(function(s){ return (s.inst_net_万||0) < 0; }).sort(function(a,b){return (a.inst_net_万||0)-(b.inst_net_万||0);}).slice(0,5);
         h += '<div class="wk-badge buy">✅ 买入TOP5</div><div class="wk-list">';
         wBuy.forEach(function(s){ h += '<div class="wk-item"><span>'+_rcEsc(s.name)+'</span><span class="c-up">'+_rcFmtYi(s.inst_net_万||0)+'</span></div>'; });
         h += '</div><div class="wk-badge sell">❌ 卖出TOP5</div><div class="wk-list">';
@@ -2878,7 +2896,6 @@ window.V8_CAL = {weeks:[],legend:[]};
     h += '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:8px"><thead><tr style="color:var(--dim)"><th>口径</th><th>来源</th><th>精确度</th><th>覆盖范围</th><th>说明</th></tr></thead><tbody>';
     h += '<tr><td>龙虎榜北向席位</td><td>沪深交易所/证券时报·数据宝</td><td>★★★★★</td><td>仅当日上龙虎榜个股</td><td>交易所官方数据，精确但只覆盖异动股</td></tr>';
     h += '<tr><td>十大成交股</td><td>东方财富Choice</td><td>★★★★☆</td><td>沪/深各10只</td><td>仅显示成交金额，不显示净买卖</td></tr>';
-    h += '<tr><td>全市场净流向</td><td>港交所/券商统计</td><td>☆☆☆☆☆</td><td>已停更</td><td>⚠️ 2024年5月起港交所已停止...</td></tr>';
     h += '</tbody></table></div>';
 
     // Footer
