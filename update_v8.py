@@ -9,6 +9,7 @@
 """
 
 import json, os, sys, subprocess
+from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -233,10 +234,50 @@ def _make_lite(name, obj):
 
 
 def _write_js(var_name, obj):
+    """把 obj 写入 data/<var>.js，同时强制注入顶层 update_time。
+
+    强制规则（2026-08-02 收紧）：
+    - 顶层是 dict 且已有 update_time/calc_time：保留较新者
+    - 顶层是 dict 但缺 update_time：用源文件 mtime 兜底，无源文件则用当前时间
+    - 顶层是 list（如 STOCK_LIST）：包装成 {"data": [...], "update_time": ...}，
+      index.html 需读 .data；此规则对应 sync_v6_to_v8._add_timestamp()
+    """
     DATA_DIR.mkdir(exist_ok=True)
     out_path = DATA_DIR / f"{var_name}.js"
     lite_obj = _make_lite(var_name, obj)
-    with open(out_path, 'w', encoding='utf-8') as f:
+
+    # 找源文件以取 mtime
+    src_path = None
+    for fname, var in DATA_SOURCES.items():
+        if var == var_name:
+            sp = RAW_DIR / fname
+            if sp.exists():
+                src_path = sp
+            break
+
+    now_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    mtime_ts = ""
+    if src_path is not None:
+        try:
+            mtime_ts = datetime.fromtimestamp(src_path.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+        except Exception:
+            pass
+
+    def _pick_ts(existing):
+        """从已有时间戳列表中挑最新的。"""
+        candidates = [t for t in (existing, mtime_ts, now_ts) if t]
+        if not candidates:
+            return now_ts
+        return max(candidates)
+
+    if isinstance(lite_obj, list):
+        # 顶层数组：包装成 dict（同步 sync_v6_to_v8 规则）
+        lite_obj = {"data": lite_obj, "update_time": _pick_ts(None)}
+    elif isinstance(lite_obj, dict):
+        existing = lite_obj.get("update_time") or lite_obj.get("calc_time") or ""
+        lite_obj["update_time"] = _pick_ts(existing)
+
+    with open(out_path, "w", encoding='utf-8') as f:
         f.write(f"window.{var_name} = ")
         json.dump(lite_obj, f, ensure_ascii=False, separators=(',', ':'))
         f.write(";\n")

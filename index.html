@@ -3985,8 +3985,15 @@ function switchSec(sec,el){
   const _q$ = id => document.getElementById(id);
   function normCode(c){ return String(c||'').replace(/\D/g,'').replace(/^[shszSHSZ]+/,'').replace(/_/g,''); }
   function fullKey(s){ return (s.market||'') + '_' + (s.code||''); }
+  // STOCK_LIST 兼容两种 schema：直接数组（旧）或 {data:[...]} 包装（2026-08-02 收紧 update_time 后）
+  function stockListArray(){
+    const sl = window.STOCK_LIST;
+    if (Array.isArray(sl)) return sl;
+    if (sl && Array.isArray(sl.data)) return sl.data;
+    return [];
+  }
   function findStocks(q, limit=8){
-    const list = window.STOCK_LIST || [];
+    const list = stockListArray();
     if(!q) return [];
     const qc = normCode(q);
     const ql = q.toLowerCase();
@@ -4017,7 +4024,7 @@ function switchSec(sec,el){
     return scored.slice(0,limit).map(x=>x.s);
   }
   function findOne(q){
-    const list = window.STOCK_LIST || [];
+    const list = stockListArray();
     const qc = normCode(q);
     const ql = q.toLowerCase();
     const isAlphaOnly = qc === '' && ql.length > 0;
@@ -5628,7 +5635,7 @@ function renderLimitUpHeatmap(){
     h3+=sfTrendCard('20日趋势',t20d,'net_20d','sf-trend-head-20');
     h3+=sfTrendCard('60日趋势',t60d,'net_60d','sf-trend-head-60');
     h3+='</div>';
-    h3+='<div style="font-size:10px;color:var(--dim);margin-top:8px;line-height:1.5;">📌 中期趋势按板块主力资金净流入滚动累计排序；10日数据由本地历史滚动累加得出，60日数据由云端 v6 同步（待部署后接入）。</div>';
+    h3+='<div style="font-size:10px;color:var(--dim);margin-top:8px;line-height:1.5;">📌 中期趋势按板块主力资金净流入滚动累计排序；10日/60日数据均由 v8 原生数据管道（板块资金流趋势抓取器）历史滚动累加产出，已脱离 v6 同步。</div>';
     $('sfBlock3').innerHTML=h3;
 
     setTime('phSectorTime',d.update_time);
@@ -7259,7 +7266,7 @@ function renderLimitUpHeatmap(){
       var herdingTop='',herdingAmt=0,herdingPct=0,herdingLeader='--';
       try{ if(hd.current_clusters&&hd.current_clusters[0]){var t1=hd.current_clusters[0]; herdingTop=(t1.medal||'🥇')+' '+t1.sector; herdingAmt=t1.amount||0; herdingPct=t1.pct||0; herdingLeader=t1.leader||'--';} }catch(e){}
       var totalA=5500;
-      try{ var sl=window.STOCK_LIST; if(Array.isArray(sl)) totalA=sl.filter(function(s){return /^\d{6}$/.test((s&&s.code)||'');}).length||5500; }catch(e){}
+      try{ var sl=window.STOCK_LIST; var sla=Array.isArray(sl)?sl:(sl&&Array.isArray(sl.data)?sl.data:[]); totalA=sla.filter(function(s){return /^\d{6}$/.test((s&&s.code)||'');}).length||5500; }catch(e){}
       var pct52=(n52/totalA)*100;
       var zone52=pct52<1?'极度弱势区':pct52<3?'温和活跃区':pct52<5?'健康偏强区':pct52<10?'强势主升区':pct52<15?'亢奋警戒区':'极度贪婪';
       var zoneColor52=pct52<1?'#ef5350':pct52<3?'#aaa':pct52<5?'#7ee0a0':pct52<10?'#f59e0b':pct52<15?'#ef5350':'#ef5350';

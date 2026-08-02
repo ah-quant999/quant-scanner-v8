@@ -12,8 +12,6 @@
 | 文件路径 | 内容描述 | 禁止删除原因 |
 |---------|---------|------------|
 | `index.html` | 主站单页面（全站 UI + 数据注入 + 逻辑详解） | 唯一入口，432KB，全站核心 |
-| `lhb_resonance.html` | 机游共振日历专题页 | index.html 内链跳转目标 |
-| `lhb_north_seat.html` | 北向席位日历专题页 | index.html 内链跳转目标 |
 | `calendar.html` | 共振日历月历视图 | index.html 内链跳转目标 |
 | `v6_memo.html` | v6 遗留参考页（运维面板引用） | 迁移过渡期保留 |
 

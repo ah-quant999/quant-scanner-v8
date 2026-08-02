@@ -23,7 +23,55 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 DATA_DIR = ROOT / "data"
 
+# 2026 年中国A股休市区间（与 cloud_fetch_v8.py 保持一致；每年初同步更新）
+_HOLIDAY_RANGES_2026 = [
+    ("2026-01-01", "2026-01-03"), ("2026-02-15", "2026-02-23"),
+    ("2026-04-04", "2026-04-06"), ("2026-05-01", "2026-05-05"),
+    ("2026-06-19", "2026-06-21"), ("2026-09-25", "2026-09-27"),
+    ("2026-10-01", "2026-10-07"),
+]
+# 补班日（周末但实际交易日）
+_MAKEUP_DAYS_2026 = {
+    "2026-01-04", "2026-02-14", "2026-02-28",
+    "2026-05-09", "2026-09-20", "2026-10-10",
+}
+
+
+def _is_trading_day(d) -> bool:
+    """判断某天是否为 A 股交易日（含补班日、剔除周末和节假日）。"""
+    if d.weekday() >= 5 and d.isoformat() not in _MAKEUP_DAYS_2026:
+        return False
+    iso = d.isoformat()
+    for start, end in _HOLIDAY_RANGES_2026:
+        if start <= iso <= end:
+            return False
+    return True
+
+
+def trading_days_between(start_date, end_date) -> int:
+    """两个日期之间经过的交易日数（含两端；周末/节假日扣除；补班日计入）。
+
+    返回的是「start_date 当天是否交易 + start→end 之间每个交易日」的累计。
+    用于「CORE=3天」类阈值改按交易日判定，避免「周五→周一」按日历 3 天误报。
+
+    示例（假设无节假日）：
+        trading_days_between(Fri, Fri) = 1   # 当天
+        trading_days_between(Fri, Mon) = 2   # Fri + Mon（Sat/Sun 跳过）
+        trading_days_between(Fri, Tue) = 3   # Fri + Mon + Tue
+    """
+    if end_date < start_date:
+        return 0
+    from datetime import timedelta
+    n = 0
+    d = start_date
+    while d <= end_date:
+        if _is_trading_day(d):
+            n += 1
+        d += timedelta(days=1)
+    return n
+
 # ── 分类一：云端 cloud_fetch_v8.py 每日抓取，必须新鲜 ──────────────────
+# 阈值单位：小时。>= 24h 的阈值在 check_group 内自动按「交易日」判定（避开周末/节假日误报）。
 CORE_SOURCES = {
     "CRISIS_DATA": 4,
     "ETF_INTRADAY_HEAT": 26,
@@ -37,7 +85,7 @@ CORE_SOURCES = {
     "ETF_PULSE": 26,
     "ETF_DAILY_MONITOR": 26,
     "V8_CAL": 6,    # 2026-08-02 收紧：日历为高频显示，48h 太宽；周内强制日刷新，节假日另豁免,
-    "SH_SZ_HISTORY": 3,  # 沪深成交额历史：高频量能图，日内多次刷新，3天阈值（含周末缓冲）
+    "SH_SZ_HISTORY": 72,  # 2026-08-02 修订：原 3h 偏严（盘中刚过就误报），改 72h=3 个交易日；check_group 按交易日判定
 }
 
 # ── 分类二：网络易抖 / 低频源 / v6 算法盘后产出，仅告警 ───────────────
@@ -122,7 +170,14 @@ def extract_update_time(path: Path):
 
 
 def check_group(group, close, label):
-    """返回 (stale_list, notime_list)"""
+    """返回 (stale_list, notime_list)
+
+    陈旧判定（2026-08-02 修订）：
+    - 阈值 < 24h：按日历小时判定（盘中/日内高频刷新够用）
+    - 阈值 ≥ 24h：按 **交易日** 判定（避免「周五 15:05 → 周一 09:00」按日历 68h 误报）
+      - 实际交易日数 = trading_days_between(ts.date(), close.date())
+      - 阈值天数 = max_hours / 24
+    """
     stale, notime = [], []
     for var, max_hours in group.items():
         path = DATA_DIR / f"{var}.js"
@@ -134,9 +189,23 @@ def check_group(group, close, label):
             notime.append(var)
             continue
         age_hours = (close - ts).total_seconds() / 3600
-        if age_hours > max_hours:
-            days = age_hours / 24
-            stale.append((var, f"更新于 {ts.strftime('%m-%d %H:%M')}，落后 {days:.1f} 天"))
+        is_stale = False
+        reason = ""
+        if max_hours >= 24:
+            # 日级阈值改按交易日判定（修「CORE=3天 遇周末名延退易误报」）
+            tdays = trading_days_between(ts.date(), close.date())
+            threshold_days = max_hours / 24
+            if tdays > threshold_days:
+                is_stale = True
+                reason = f"更新于 {ts.strftime('%m-%d %H:%M')}，落后 {tdays} 个交易日（阈值 {threshold_days:g}）"
+        else:
+            # < 24h 维持原小时判定
+            if age_hours > max_hours:
+                is_stale = True
+                hours = age_hours
+                reason = f"更新于 {ts.strftime('%m-%d %H:%M')}，落后 {hours:.1f} 小时"
+        if is_stale:
+            stale.append((var, reason))
     return stale, notime
 
 
