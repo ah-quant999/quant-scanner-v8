@@ -3512,30 +3512,30 @@ window.V8_CAL = {weeks:[],legend:[]};
     <div class="lg-pane" id="lg-schedule">
       <div class="card">
         <h3><span class="ic">⏰</span>v8 定时任务矩阵（最新版，已对齐实际 workflow）</h3>
-        <div class="logic-p"><b>执行方说明</b>：A 股数据源必须在中国 IP 抓取，「中国数据抓取」与「盘后算法链」运行在<b>小九单位机（自托管 cn runner）</b>；「构建部署」「体检」「清理」跑在 GitHub 云端 ubuntu。下表对齐实际 .github/workflows/*.yml，不写脚本文件名。</div>
+        <div class="logic-p"><b>执行方说明</b>：A 股数据源需中国 IP 抓取，必需中国节点的 workflow 跑在「中国节点」；其余（构建/部署/体检/清理/备份/自愈）跑在 GitHub 云端。下表对齐实际 .github/workflows/*.yml。</div>
 
         <div class="logic-h">工作日</div>
         <table class="lg-table">
           <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
-          <tr><td>08:25</td><td>v8_cn_fetch</td><td>盘前（日历/IPO/两融/中金所/宏观/危机/北向/分析师/52周高/羊群效应）</td><td>cn runner</td></tr>
-          <tr><td>10:30</td><td>v8_cn_fetch</td><td>盘中第1档（指数/ETF/板块资金/概念排行/涨停热力/个股资金流）</td><td>cn runner</td></tr>
-          <tr><td>11:30</td><td>v8_cn_fetch</td><td>盘中第2档（同上）</td><td>cn runner</td></tr>
-          <tr><td>13:05</td><td>v8_cn_fetch</td><td>盘中第3档（午后开盘补缺口）</td><td>cn runner</td></tr>
-          <tr><td>14:00</td><td>v8_cn_fetch</td><td>盘中第4档</td><td>cn runner</td></tr>
-          <tr><td>15:05</td><td>v8_cn_fetch</td><td>盘中第5档（收盘前最后快照）</td><td>cn runner</td></tr>
-          <tr><td>15:30</td><td>v8_cn_fetch</td><td>盘后（ETF_DAILY_MONITOR / EXPERIMENT 收盘累积）</td><td>cn runner</td></tr>
-          <tr><td>09:00</td><td>v8_algo</td><td>盘前预检（46模块新鲜度体检）</td><td>云端 ubuntu</td></tr>
-          <tr><td>17:00</td><td>v8_algo</td><td>收盘后总检（46模块新鲜度体检）</td><td>云端 ubuntu</td></tr>
-          <tr><td>18:30</td><td>v8_algo_run</td><td>盘后算法链（龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测）</td><td>cn runner</td></tr>
+          <tr><td>08:25</td><td>v8_cn_fetch</td><td>盘前（日历/IPO/两融/中金所/宏观/危机/北向/分析师/52周高/羊群效应）</td><td>中国节点</td></tr>
+          <tr><td>10:30</td><td>v8_cn_fetch</td><td>盘中第1档（指数/ETF/板块资金/概念排行/涨停热力/个股资金流）</td><td>中国节点</td></tr>
+          <tr><td>11:30</td><td>v8_cn_fetch</td><td>盘中第2档（同上）</td><td>中国节点</td></tr>
+          <tr><td>13:05</td><td>v8_cn_fetch</td><td>盘中第3档（午后开盘补缺口）</td><td>中国节点</td></tr>
+          <tr><td>14:00</td><td>v8_cn_fetch</td><td>盘中第4档</td><td>中国节点</td></tr>
+          <tr><td>15:05</td><td>v8_cn_fetch</td><td>盘中第5档（收盘前最后快照）</td><td>中国节点</td></tr>
+          <tr><td>15:30</td><td>v8_cn_fetch</td><td>盘后（ETF_DAILY_MONITOR / EXPERIMENT 收盘累积）</td><td>中国节点</td></tr>
+          <tr><td>09:00</td><td>v8_algo</td><td>盘前预检（46模块新鲜度体检）</td><td>云端</td></tr>
+          <tr><td>17:00</td><td>v8_algo</td><td>收盘后总检（46模块新鲜度体检）</td><td>云端</td></tr>
+          <tr><td>18:30</td><td>v8_algo_run</td><td>盘后算法链（龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测）</td><td>中国节点</td></tr>
           <tr style="background:rgba(56,189,248,.06);"><td colspan="4" style="text-align:center;font-size:12px;color:var(--dim);">↓ push raw_data → 自动触发 v8_build_deploy → GitHub Pages 部署</td></tr>
         </table>
 
         <div class="logic-h">周六</div>
         <table class="lg-table">
           <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
-          <tr><td>09:00</td><td>v8_cn_fetch</td><td>T+1 周度/月度统一刷新（日历/IPO/两融/宏观等）</td><td>cn runner</td></tr>
-          <tr><td>14:00</td><td>v8_self_heal</td><td>云端自愈器：检测陈旧模块 → 自动 re-fetch 补跑</td><td>云端 ubuntu</td></tr>
-          <tr><td>21:00</td><td>cloud_weekly_cleanup</td><td>orphan 清理 + 新鲜度体检</td><td>云端 ubuntu</td></tr>
+          <tr><td>09:00</td><td>v8_cn_fetch</td><td>T+1 周度/月度统一刷新（日历/IPO/两融/宏观等）</td><td>中国节点</td></tr>
+          <tr><td>14:00</td><td>v8_self_heal</td><td>云端自愈器：检测陈旧模块 → 自动 re-fetch 补跑</td><td>云端</td></tr>
+          <tr><td>21:00</td><td>cloud_weekly_cleanup</td><td>orphan 清理 + 新鲜度体检</td><td>云端</td></tr>
         </table>
 
         <div class="logic-h">周日</div>
@@ -3555,7 +3555,7 @@ window.V8_CAL = {weeks:[],legend:[]};
         </table>
 
         <div class="logic-h">关键设计原则</div>
-        <div class="logic-p"><b>龙虎榜必须等 17 点交易所发布后才能取完整数据</b>，因此盘后算法链固定在 18:30。盘中只刷新 T+0 快照，不跑盘后算法，避免用陈旧数据算出错误共识。<b>Safety Net</b>是保险机制——cn runner 工作日全天在线概率极高，Safety Net 是「断线时自动补跑」而非「日常调度」。</div>
+        <div class="logic-p"><b>龙虎榜必须等 17 点交易所发布后才能取完整数据</b>，因此盘后算法链固定在 18:30。盘中只刷新 T+0 快照，不跑盘后算法，避免用陈旧数据算出错误共识。<b>Safety Net</b>是保险机制——中国节点工作日全天在线概率极高，Safety Net 是「断线时自动补跑」而非「日常调度」。</div>
       </div>
 
       <div class="card">
