@@ -4,9 +4,10 @@
 run_algorithms.py — v8 本地/自托管 cn runner 的盘后算法编排器
 
 流程：
-  0) 重灌 v6 仍负责产出的「上游输入」到 algorithms/out/（gold_pool / scan_result /
-     guanlan_* / mahoro_signals）。这部分在 1 周过渡期内仍由 v6 供给，之后由
-     v8 原生抓取器取代。
+  0) v8 原生化自产「上游输入」到 仓库根/out/（gold_pool / scan_result / watch_result /
+     guanlan_* / mahoro_signals），由 scanner.py / guanlan_extractor.py /
+     fetch_maharo_signals.py 经 V8_OUT_DIR 钩子产出，彻底脱离 v6。
+     （设 V6_SEED=1 可强制回退到 v6 重灌，仅用于应急。）
   1) 按依赖顺序运行 v8/algorithms/ 下的算法脚本（各自写 out/，沿用 v6 文件名）。
   2) stage_to_raw：按 V6_TO_V8 重命名为 raw_data/（v8 命名）+ 注入 update_time。
   3) 若 V8_PUSH=1：调用 api_push_raw.py 经 API 推送 raw_data 到 main。
@@ -36,7 +37,8 @@ if PY.startswith("/") and len(PY) > 2 and PY[2] == "/":
 
 PUSH = os.environ.get("V8_PUSH", "0") == "1"
 
-# 过渡期仍由 v6 供给的上游输入（v6 文件名）
+# 上游输入（v6 文件名）。2026-08-02 已原生化，正常不再从这里拉取；
+# 仅当 V6_SEED=1 才回退使用（应急）。
 INPUTS_FROM_V6 = [
     "gold_pool.json",
     "scan_result.json",
@@ -75,7 +77,47 @@ ORDER = [
 ]
 
 
+def step_v8_self_sufficiency():
+    """2026-08-02 原生化：v8 自产 4 类上游输入（gold_pool / scan_result / watch_result /
+    guanlan_* / mahoro_signals），替代 v6 供给。通过 V8_OUT_DIR 环境变量让被迁移脚本
+    把数据写到仓库根 out/（而非 algorithms/data）。"""
+    print(f"\n[0-pre] v8 原生化自产上游输入 → out/  (V8_OUT_DIR={OUT})")
+    os.makedirs(OUT, exist_ok=True)
+    env = dict(os.environ)
+    env["V8_OUT_DIR"] = OUT
+    jobs = [
+        ("scanner.py", 3600),             # 产出 gold_pool / scan_result / watch_result
+        ("guanlan_extractor.py", 600),    # 产出 guanlan_reports / guanlan_watchlist
+        ("fetch_maharo_signals.py", 300), # 产出 mahoro_signals（cookie 在 v8 data/）
+    ]
+    for script, timeout in jobs:
+        path = os.path.join(ALGO, script)
+        if not os.path.exists(path):
+            print(f"  ❌ 缺失脚本: {script}")
+            continue
+        print(f"  ▶ {script}  ({datetime.now():%H:%M:%S})")
+        try:
+            r = subprocess.run([PY, path], cwd=ALGO, env=env,
+                                capture_output=True, text=True, timeout=timeout)
+            if r.returncode == 0:
+                last = [l for l in r.stdout.strip().splitlines() if l.strip()][-1:] or [""]
+                print(f"     ✅ ok | {last[0][:80]}")
+            else:
+                print(f"     ⚠️ 退出码 {r.returncode}")
+                tail = "\n".join(r.stdout.strip().splitlines()[-3:] + r.stderr.strip().splitlines()[-3:])
+                print("     " + tail.replace("\n", "\n     ")[:400])
+        except subprocess.TimeoutExpired:
+            print(f"     ⏱️ 超时(>{timeout}s)，跳过")
+        except Exception as e:
+            print(f"     ❌ 异常: {e}")
+
+
 def step_seed_inputs():
+    # 2026-08-02 原生化后，默认 no-op；仅 V6_SEED=1 才回退重灌 v6 输入。
+    if os.environ.get("V6_SEED", "0") != "1":
+        print(f"\n[0] 跳过 v6 重灌（已原生化，设 V6_SEED=1 可强制回退）")
+        os.makedirs(OUT, exist_ok=True)
+        return
     print(f"\n[0] 重灌 v6 上游输入 → out/  (V6={V6_DATA_DIR})")
     os.makedirs(OUT, exist_ok=True)   # 确保仓库根/out 存在（脚本 open(...,'w') 依赖它）
     for f in INPUTS_FROM_V6:
@@ -172,7 +214,8 @@ def step_append_lhb_history():
 
 def main():
     print(f"=== v8 算法编排  {datetime.now():%Y-%m-%d %H:%M:%S} ===")
-    step_seed_inputs()
+    step_v8_self_sufficiency()  # 2026-08-02 原生化: 先自产 4 类上游输入
+    step_seed_inputs()          # 默认 no-op, V6_SEED=1 才重灌
     step_run()
     n = step_stage()
     step_append_lhb_history()

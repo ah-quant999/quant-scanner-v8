@@ -16,6 +16,12 @@ nul
 .gh_pat
 *token*.json
 *.jwt_cache
+data/.mahoro_cookies.txt
+data/.maharo_cookies.txt
+data/zsxq_token.json
+data/.wc_jwt_cache.json
+data/.neodata_token
+data/zszxq_token.json
 # 算法 staging / 生成数据（脚本和工作流会重建）
 algorithms/data/
 algorithms/out/

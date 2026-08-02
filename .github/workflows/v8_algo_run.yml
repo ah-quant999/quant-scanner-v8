@@ -5,9 +5,19 @@
 # 不再依赖 v6 每日批处理。GitHub 美区云端 runner 无法访问 EastMoney/akshare/
 # Tongdaxin，故算法必须在 cn runner（本地机器）执行。
 #
-# 过渡期（约 1 周）：gold_pool / scan_result / guanlan_* / mahoro_signals 仍由
-# v6 供给，run_algorithms.py 每轮从 V6_DATA_DIR 重灌到 out/；随后这些上游输入
-# 由 v8 原生抓取器取代，即可完全脱离 v6。
+# 2026-08-02 原生化：4 类上游输入（gold_pool / scan_result / guanlan_* / mahoro_signals）
+# 也已由 v8 自产（scanner.py / guanlan_extractor.py / fetch_maharo_signals.py + V8_OUT_DIR 钩子
+# → 写 v8 仓根 out/）。run_algorithms.py 的 step_v8_self_sufficiency() 负责调度这 3 脚本；
+# 原 step_seed_inputs() 默认 no-op（V6_SEED=1 可强制回退 v6 重灌）。彻底脱离 v6。
+#
+# 4 类原 v6 → v8 映射:
+#   v6 data/scan_result.json          → v8 out/scan_result.json          (scanner.py)
+#   v6 data/guanlan_watchlist.json     → v8 out/guanlan_watchlist.json     (guanlan_extractor.py)
+#   v6 data/guanlan_reports.json       → v8 out/guanlan_reports.json       (guanlan_extractor.py)
+#   v6 data/mahoro_signals.json (拼写 mahoro) ← fetch_maharo_signals.py 写 (拼写 maharo, v8 钩子自动改写)
+#
+# 注意: v6 build_candidate_pool.py 读「mahoro_signals.json」, v6 fetch_maharo_signals.py 写「maharo_signals.json」,
+# 两个文件在 v6 data/ 一直并存. v8 fetch_maharo_signals.py 在 v8 环境下 OUTPUT_JSON 改写为 mahoro_signals.json, 兼容下游.
 
 name: "🇨🇳 v8 盘后算法链(cn)"
 
@@ -34,7 +44,7 @@ permissions:
 jobs:
   algo:
     runs-on: [self-hosted, cn]
-    timeout-minutes: 60
+    timeout-minutes: 120
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       V8_PUSH: "1"
