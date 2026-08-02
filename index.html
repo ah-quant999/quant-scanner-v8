@@ -7911,10 +7911,10 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     function _renderCard(slotName, color, slotEmoji, list, subLabel){
       if(!list || !list.length) return '';
       var h='<div style="margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">';
-      h+='<div style="display:flex;align-items:baseline;gap:6px;margin-bottom:6px">';
-      h+='<span style="color:'+color+';font-size:11.5px;font-weight:700">'+slotEmoji+' '+slotName+'</span>';
-      h+='<span style="color:var(--dim);font-size:9.5px">'+list.length+' \u4e2a\u6570\u636e\u6e90</span>';
-      if(subLabel) h+='<span style="color:var(--dim);font-size:9px">\u00b7 '+subLabel+'</span>';
+      h+='<div style="display:flex;align-items:baseline;margin-bottom:6px;white-space:nowrap;overflow:hidden">';
+      h+='<span style="color:'+color+';font-size:15px;font-weight:800;letter-spacing:0.5px">'+slotEmoji+' '+slotName+'</span>';
+      h+='<span style="color:var(--sub);font-size:12.5px;font-weight:600;margin-left:8px">'+list.length+' \u4e2a\u6570\u636e\u6e90</span>';
+      if(subLabel) h+='<span style="color:var(--dim);font-size:11.5px;margin-left:6px">\u00b7 '+subLabel+'</span>';
       h+='</div>';
       h+=_renderTable(list);
       h+='</div>';
