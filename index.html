@@ -81,6 +81,10 @@ html>
   .hub-tag.up{color:var(--up);border-color:var(--up)}
   .hub-tag.down{color:var(--down);border-color:var(--down)}
   .hub-tag.neutral{color:var(--gold);border-color:var(--gold)}
+  /* 因子卡 4 行样本预览：省略号截断，hover 看全 */
+  .hub-sample-rows{display:flex;flex-direction:column;gap:2px;font-size:10.5px;color:var(--sub);line-height:1.55;overflow:hidden}
+  .hub-sample-row{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:help;border-radius:3px;padding:0 2px}
+  .hub-sample-row:hover{background:rgba(56,189,248,0.08);color:var(--txt)}
 
   /* 实时数据卡片：走势图 + 标题行数字 */
   .rt-card h3{justify-content:space-between;flex-wrap:wrap;gap:6px 10px}
@@ -571,7 +575,7 @@ window.V8_CAL = {weeks:[],legend:[]};
       <div style="padding:0;" id="aiSummaryContent">
         <div style="padding:10px 18px;background:rgba(167,139,250,0.10);font-size:13px;line-height:1.7;color:var(--txt);">
           <span style="padding:2px 8px;border-radius:4px;background:rgba(167,139,250,0.20);color:#a78bfa;margin-right:6px;">🟣 日内风向</span>
-          <strong>情绪冰点</strong>，普跌格局，三重共识 8 只，<span style="color:var(--up);font-weight:700;">⚠️ 连跌 52 天</span>
+          <strong>情绪冰点</strong>，普跌格局，今日无严格共识，差一步 2 只，<span style="color:var(--up);font-weight:700;">⚠️ 连跌 52 天</span>
         </div>
         <div style="padding:10px 18px;background:rgba(31,209,123,0.10);font-size:13px;line-height:1.7;color:var(--txt);">
           <span style="padding:2px 8px;border-radius:4px;background:rgba(31,209,123,0.20);color:#1fd17b;margin-right:6px;">🟢 市场健康度</span>
@@ -4988,13 +4992,22 @@ function renderLimitUpHeatmap(){
       hubFactorCount.textContent = total ? (total+' 触发') : '无触发';
       hubFactorCount.style.color = total ? 'var(--up)' : 'var(--dim)';
 
-      const leadHtml = lead.length ? lead.slice(0,3).map(x=>x.name+' +'+x.chg.toFixed(1)+'%').join(' · ')+'…' : '无';
-      const instHtml = instIn.length ? instIn.slice(0,3).map(x=>x.name).join(' · ')+'…' : '无';
-      const rsiHtml = (rsiOver.length||rsiUnder.length)
+      // 4 行样本预览：CSS 截断 + hover title 看全（不撑大版面）
+      const escAttr = function(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; };
+      const leadFull = lead.length ? lead.slice(0,3).map(x=>x.name+' +'+x.chg.toFixed(1)+'%').join(' · ')+(lead.length>3?'（+'+ (lead.length-3) +'）':'') : '无';
+      const instFull = instIn.length ? instIn.slice(0,3).map(x=>x.name).join(' · ')+(instIn.length>3?'（+'+ (instIn.length-3) +'）':'') : '无';
+      const rsiFull = (rsiOver.length||rsiUnder.length)
         ? (rsiOver.slice(0,2).map(x=>x.name+'+'+x.chg.toFixed(1)+'%').join(' / ')+
            (rsiUnder.length?('  /  '+rsiUnder.slice(0,2).map(x=>x.name+x.chg.toFixed(1)+'%').join(' / ')):''))
         : '无';
-      const arrHtml = arr.length ? arr.slice(0,3).map(x=>x.name).join(' · ')+'…' : '无';
+      const arrFull = arr.length ? arr.slice(0,3).map(x=>x.name).join(' · ')+(arr.length>3?'（+'+ (arr.length-3) +'）':'') : '无';
+      const leadDisp = lead.length ? lead.slice(0,3).map(x=>x.name+' +'+x.chg.toFixed(1)+'%').join(' · ') : '无';
+      const instDisp = instIn.length ? instIn.slice(0,3).map(x=>x.name).join(' · ') : '无';
+      const rsiDisp = (rsiOver.length||rsiUnder.length)
+        ? (rsiOver.slice(0,2).map(x=>x.name+'+'+x.chg.toFixed(1)+'%').join(' / ')+
+           (rsiUnder.length?('  /  '+rsiUnder.slice(0,2).map(x=>x.name+x.chg.toFixed(1)+'%').join(' / ')):''))
+        : '无';
+      const arrDisp = arr.length ? arr.slice(0,3).map(x=>x.name).join(' · ') : '无';
 
       hubFactorBody.innerHTML =
         '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;">'+
@@ -5003,11 +5016,11 @@ function renderLimitUpHeatmap(){
           '<span class="hub-tag '+(rsiCount?'warn':'neutral')+'">RSI背离 '+rsiCount+'</span>'+
           '<span class="hub-tag '+(arr.length?'gold':'neutral')+'">资金排列 '+arr.length+'</span>'+
         '</div>'+
-        '<div style="font-size:10.5px;color:var(--sub);line-height:1.55;">'+
-          '<div><b style="color:var(--up)">龙</b> '+leadHtml+'</div>'+
-          '<div><b style="color:var(--up)">主</b> '+instHtml+'</div>'+
-          '<div><b style="color:var(--gold)">背</b> '+rsiHtml+'</div>'+
-          '<div><b style="color:var(--gold)">列</b> '+arrHtml+'</div>'+
+        '<div class="hub-sample-rows">'+
+          '<div class="hub-sample-row" title="龙 '+escAttr(leadFull)+'"><b style="color:var(--up)">龙</b> '+leadDisp+'</div>'+
+          '<div class="hub-sample-row" title="主 '+escAttr(instFull)+'"><b style="color:var(--up)">主</b> '+instDisp+'</div>'+
+          '<div class="hub-sample-row" title="背 '+escAttr(rsiFull)+'"><b style="color:var(--gold)">背</b> '+rsiDisp+'</div>'+
+          '<div class="hub-sample-row" title="列 '+escAttr(arrFull)+'"><b style="color:var(--gold)">列</b> '+arrDisp+'</div>'+
         '</div>';
     }
   }
@@ -7659,7 +7672,7 @@ function renderLimitUpHeatmap(){
     ];
 
     var h='';
-    h+='<div style="display:flex;gap:6px;align-items:stretch;margin-bottom:6px;flex-wrap:wrap">';
+    h+='<div style="display:flex;gap:6px;align-items:stretch;margin-bottom:8px;flex-wrap:wrap">';
     /* v8.2 五维加权健康分：fresh 35% + bloat 20% + anomaly 20% + missing 15% + dependency 10% */
     function calcDimScore(c){ if(!c||c.total===0) return 100; return Math.max(0,Math.min(100,Math.round((c.ok*100+c.warn*50-c.crit*100)/c.total))); }
     var dimF=calcDimScore(_alertCategories.freshness);
@@ -7670,27 +7683,28 @@ function renderLimitUpHeatmap(){
     var overallScore=Math.round(dimF*0.35+dimB*0.20+dimA*0.20+dimM*0.15+dimD*0.10);
     var hc=overallScore>=80?'var(--up)':overallScore>=50?'var(--gold)':'var(--down)';
     var hl=overallScore>=80?'\u5065\u5eb7':overallScore>=50?'\u4e9a\u5065\u5eb7':'\u5f02\u5e38';
-    h+='<div title="五维加权：新鲜度35% + 臃肿20% + 异常20% + 缺失15% + 依赖10%" style="flex:0 0 auto;padding:6px 12px;border-radius:8px;text-align:center;background:'+hc+'22;border:1px solid '+hc+'44;display:flex;flex-direction:column;justify-content:center;line-height:1.2">';
-    h+='<div style="font-size:22px;font-weight:800;color:'+hc+'">'+overallScore+'</div>';
-    h+='<div style="font-size:10px;color:'+hc+'">'+hl+'</div></div>';
-    /* 显示各维度分 */
+    h+='<div title="五维加权：新鲜度35% + 臃肿20% + 异常20% + 缺失15% + 依赖10%" style="flex:0 0 auto;padding:4px 10px;border-radius:8px;text-align:center;background:'+hc+'22;border:1px solid '+hc+'44;display:flex;flex-direction:column;justify-content:center;line-height:1.15">';
+    h+='<div style="font-size:18px;font-weight:800;color:'+hc+'">'+overallScore+'</div>';
+    h+='<div style="font-size:9.5px;color:'+hc+'">'+hl+'</div></div>';
+    /* v8.2 5 维概览条（可点击切换维度详情表） */
     h+='<div style="flex:1 1 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;min-width:240px;font-size:10px;color:var(--dim);align-items:center">';
-    var dimLabels=[['新',dimF],['胀',dimB],['异',dimA],['缺',dimM],['赖',dimD]];
-    for(var dl=0;dl<dimLabels.length;dl++){
-      var dd=dimLabels[dl][1], dc=dd>=80?'var(--up)':dd>=50?'var(--gold)':'var(--down)';
-      h+='<div style="text-align:center;line-height:1.2"><div style="color:'+dc+';font-weight:700;font-size:12px">'+dd+'</div><div style="font-size:9.5px">'+dimLabels[dl][0]+'</div></div>';
-    }
-    h+='</div>';
-    for(var ci=0;ci<cats.length;ci++){
-      var c=cats[ci], ct=c.cat;
+    var dimMeta=[
+      {key:'freshness',label:'新',val:dimF},
+      {key:'bloat',label:'胀',val:dimB},
+      {key:'anomaly',label:'异',val:dimA},
+      {key:'missing',label:'缺',val:dimM},
+      {key:'dependency',label:'赖',val:dimD}
+    ];
+    for(var dl=0;dl<dimMeta.length;dl++){
+      var dm=dimMeta[dl], dd=dm.val, dc=dd>=80?'var(--up)':dd>=50?'var(--gold)':'var(--down)';
+      var ct=(_alertCategories[dm.key])||{crit:0,warn:0,ok:0,total:0};
       var bad=ct.crit+ct.warn;
-      var cc=ct.crit>0?'var(--down)':ct.warn>0?'var(--gold)':'var(--up)';
-      h+='<div style="flex:0 0 auto;padding:4px 8px;border-radius:6px;background:var(--card2);border:1px solid '+cc+'33;cursor:pointer;text-align:center;line-height:1.25" onclick="_alertSwitchCat(\''+c.key+'\')">';
-      h+='<div style="font-size:13px">'+c.icon+'</div>';
-      h+='<div style="font-size:10.5px;font-weight:700;color:'+cc+'">'+c.label+'</div>';
-      h+='<div style="font-size:9.5px;color:var(--dim)">'+(bad>0?'\u26a0\ufe0f'+bad:'\u2705')+'</div></div>';
+      h+='<div onclick="_alertSwitchCat(\''+dm.key+'\')" title="点击查看：'+dm.label+' 维度详情（'+(bad>0?('异常 '+bad):'全部正常')+'）" style="text-align:center;line-height:1.15;cursor:pointer;padding:3px 4px;border-radius:5px;background:'+dc+'11;border:1px solid '+dc+'33;transition:.15s" onmouseover="this.style.background=\''+dc+'22\'" onmouseout="this.style.background=\''+dc+'11\'">';
+      h+='<div style="color:'+dc+';font-weight:700;font-size:13px">'+dd+'</div>';
+      h+='<div style="font-size:9.5px">'+dm.label+(bad>0?' <span style="color:'+dc+'">⚠'+bad+'</span>':'')+'</div>';
+      h+='</div>';
     }
-    h+='</div>';
+    h+='</div></div>';
 
     h+='<div id="alertCatContent">';
     h+=_renderFreshTable();
@@ -7702,39 +7716,75 @@ function renderLimitUpHeatmap(){
 
   function _renderFreshTable(){
     var items=_alertCategories.freshness.items, ct=_alertCategories.freshness;
+    /* v8.2 全维度索引：按 dataKey 聚合 5 维度状态 */
+    function buildIdx(arr){ var m={}; for(var i=0;i<arr.length;i++){ var a=arr[i]; if(a.dataKey) m[a.dataKey]=a.lvl; } return m; }
+    var idxB=buildIdx(_alertCategories.bloat.items);
+    var idxA=buildIdx(_alertCategories.anomaly.items);
+    var idxM=buildIdx(_alertCategories.missing.items);
+    var idxD=buildIdx(_alertCategories.dependency.items);
+    function cell(lvl){
+      if(!lvl) return '<span style="color:var(--dim);opacity:.5">—</span>';
+      if(lvl==='ok') return '<span style="color:var(--up);font-weight:700">✓</span>';
+      if(lvl==='warn') return '<span style="color:var(--gold);font-weight:700">△</span>';
+      return '<span style="color:var(--down);font-weight:700">✕</span>';
+    }
     var problems=items.filter(function(a){return a.lvl!=='ok';});
     var html='<div>';
     if(problems.length===0){
       html+='<div style="padding:10px 14px;border-radius:8px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);font-size:12px;color:var(--up)">\u2705 \u5168\u90e8 '+ct.total+' \u4e2a\u6570\u636e\u6e90\u5748\u5728\u65b0\u9c9c\u5ea6\u9608\u503c\u5185</div>';
     }else{
-      html+='<table style="width:100%;border-collapse:collapse;font-size:10.5px;line-height:1.35"><thead><tr>';
-      html+='<th style="text-align:left;padding:2.5px 6px;color:var(--dim);font-weight:600">\u6570\u636e\u6e90</th>';
-      html+='<th style="text-align:left;padding:2.5px 6px;color:var(--dim);font-weight:600">\u6700\u540e\u66f4\u65b0</th>';
-      html+='<th style="text-align:right;padding:2.5px 6px;color:var(--dim);font-weight:600">\u9648\u65e7</th>';
-      html+='<th style="text-align:left;padding:2.5px 6px;color:var(--dim);font-weight:600">\u72b6\u6001</th>';
-      html+='<th style="padding:2.5px 3px;color:var(--dim);font-weight:600;width:32px"></th></tr></thead><tbody>';
+      html+='<table style="width:100%;border-collapse:collapse;font-size:10px;line-height:1.2"><thead><tr>';
+      html+='<th style="text-align:left;padding:2px 5px;color:var(--dim);font-weight:600">\u6570\u636e\u6e90</th>';
+      html+='<th style="text-align:left;padding:2px 5px;color:var(--dim);font-weight:600">\u6700\u540e\u66f4\u65b0</th>';
+      html+='<th style="text-align:right;padding:2px 4px;color:var(--dim);font-weight:600">\u9648\u65e7</th>';
+      html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="新鲜度">\u65b0</th>';
+      html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="臃肿度">\u80c0</th>';
+      html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="异常值">\u5f02</th>';
+      html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="缺失检测">\u7f3a</th>';
+      html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="依赖就绪">\u8d56</th>';
+      html+='<th style="padding:2px 3px;color:var(--dim);font-weight:600;width:28px"></th></tr></thead><tbody>';
       problems.sort(function(a,b){return (a.lvl==='crit'?0:1)-(b.lvl==='crit'?0:1);});
       for(var p=0;p<problems.length;p++){
         var a=problems[p];
         var bg=a.lvl==='crit'?'rgba(244,63,94,0.06)':a.lvl==='warn'?'rgba(251,191,36,0.06)':'transparent';
-        var bd=a.lvl==='crit'?'var(--down)':a.lvl==='warn'?'var(--gold)':'var(--up)';
         var drill=_alertDrillMap[a.dataKey]||null;
         var drillBtn=drill?_alertDrillBtn(drill.t,drill.a,drill.l):'';
-        html+='<tr style="background:'+bg+';border-left:2px solid '+bd+'"><td style="padding:2.5px 6px;font-weight:600">'+a.name+'</td>';
-        html+='<td style="padding:2.5px 6px;color:var(--sub);white-space:nowrap;font-size:10px">'+a.tsStr+'</td>';
-        html+='<td style="padding:2.5px 6px;text-align:right;color:'+(a.lvl==='crit'?'var(--down)':a.lvl==='warn'?'var(--gold)':'var(--up)')+';font-weight:600">'+a.ageH+'h</td>';
-        html+='<td style="padding:2.5px 6px"><span class="status-dot '+(a.lvl==='crit'?'s-err':a.lvl==='warn'?'s-warn':'s-ok')+'"></span>'+(a.reason||(a.lvl==='crit'?'\u4e25\u91cd\u9648\u65e7':'\u63a5\u8fd1\u8fc7\u671f'))+'</td>';
-        html+='<td style="padding:2.5px 3px">'+drillBtn+'</td></tr>';
+        html+='<tr style="background:'+bg+'"><td style="padding:2px 5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px" title="'+a.name+'">'+a.name+'</td>';
+        html+='<td style="padding:2px 5px;color:var(--sub);white-space:nowrap;font-size:9.5px">'+a.tsStr+'</td>';
+        html+='<td style="padding:2px 4px;text-align:right;color:'+(a.lvl==='crit'?'var(--down)':a.lvl==='warn'?'var(--gold)':'var(--up)')+';font-weight:600">'+a.ageH+'h</td>';
+        html+='<td style="padding:2px 1px;text-align:center;font-size:11px">'+cell(a.lvl)+'</td>';
+        html+='<td style="padding:2px 1px;text-align:center;font-size:11px">'+cell(idxB[a.dataKey]||(idxB[a.dataKey]===undefined?'ok':null))+'</td>';
+        html+='<td style="padding:2px 1px;text-align:center;font-size:11px">'+cell(idxA[a.dataKey]||(idxA[a.dataKey]===undefined?'ok':null))+'</td>';
+        html+='<td style="padding:2px 1px;text-align:center;font-size:11px">'+cell(idxM[a.dataKey]||(idxM[a.dataKey]===undefined?'ok':null))+'</td>';
+        html+='<td style="padding:2px 1px;text-align:center;font-size:11px">'+cell(idxD[a.dataKey]||(idxD[a.dataKey]===undefined?'ok':null))+'</td>';
+        html+='<td style="padding:2px 3px">'+drillBtn+'</td></tr>';
       }
       html+='</tbody></table>';
-      var okItems=items.filter(function(a){return a.lvl==='ok';});
-      if(okItems.length>0){
-        html+='<details style="margin-top:8px"><summary style="cursor:pointer;font-size:11px;color:var(--dim);padding:4px 0">\u2705 '+okItems.length+' \u4e2a\u6b63\u5e38\u6570\u636e\u6e90\uff08\u5c55\u5f00\uff09</summary>';
-        html+='<div style="display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;padding:8px;background:var(--card2);border-radius:6px">';
-        for(var o=0;o<okItems.length;o++){ html+='<span style="font-size:10.5px;color:var(--sub);white-space:nowrap">\u2705 '+okItems[o].name+' <span style="color:var(--dim)">'+okItems[o].ageH+'h</span></span>'; }
-        html+='</div></details>';
-      }
     }
+    /* v8.2 全维度概览：27 数据源全部列出，5 维度 ✅/❌/— 一目了然 */
+    html+='<details style="margin-top:6px"><summary style="cursor:pointer;font-size:10.5px;color:var(--dim);padding:2px 0;user-select:none">\ud83d\udcca \u5168 '+ct.total+' \u4e2a\u6570\u636e\u6e90 \u00b7 5 \u7ef4\u5ea6\u6982\u89c8\uff08\u5c55\u5f00\uff09</summary>';
+    html+='<table style="width:100%;border-collapse:collapse;font-size:9.5px;line-height:1.2;margin-top:4px"><thead><tr>';
+    html+='<th style="text-align:left;padding:2px 5px;color:var(--dim);font-weight:600">\u6570\u636e\u6e90</th>';
+    html+='<th style="text-align:right;padding:2px 4px;color:var(--dim);font-weight:600">\u9648\u65e7</th>';
+    html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="新鲜度">\u65b0</th>';
+    html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="臃肿度">\u80c0</th>';
+    html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="异常值">\u5f02</th>';
+    html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="缺失检测">\u7f3a</th>';
+    html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="依赖就绪">\u8d56</th>';
+    html+='</tr></thead><tbody>';
+    for(var q=0;q<items.length;q++){
+      var a=items[q];
+      var bg=a.lvl==='crit'?'rgba(244,63,94,0.04)':a.lvl==='warn'?'rgba(251,191,36,0.04)':'transparent';
+      html+='<tr style="background:'+bg+'"><td style="padding:1.5px 5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;color:var(--sub)" title="'+a.name+'">'+a.name+'</td>';
+      html+='<td style="padding:1.5px 4px;text-align:right;color:var(--dim);font-size:9px">'+a.ageH+'h</td>';
+      html+='<td style="padding:1.5px 1px;text-align:center;font-size:10px">'+cell(a.lvl)+'</td>';
+      html+='<td style="padding:1.5px 1px;text-align:center;font-size:10px">'+cell(idxB[a.dataKey]||(idxB[a.dataKey]===undefined?'ok':null))+'</td>';
+      html+='<td style="padding:1.5px 1px;text-align:center;font-size:10px">'+cell(idxA[a.dataKey]||(idxA[a.dataKey]===undefined?'ok':null))+'</td>';
+      html+='<td style="padding:1.5px 1px;text-align:center;font-size:10px">'+cell(idxM[a.dataKey]||(idxM[a.dataKey]===undefined?'ok':null))+'</td>';
+      html+='<td style="padding:1.5px 1px;text-align:center;font-size:10px">'+cell(idxD[a.dataKey]||(idxD[a.dataKey]===undefined?'ok':null))+'</td>';
+      html+='</tr>';
+    }
+    html+='</tbody></table></details>';
     html+='</div>'; return html;
   }
 
