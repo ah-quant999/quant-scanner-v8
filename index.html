@@ -3514,6 +3514,15 @@ window.V8_CAL = {weeks:[],legend:[]};
         <h3><span class="ic">⏰</span>v8 定时任务矩阵（最新版，已对齐实际 workflow）</h3>
         <div class="logic-p"><b>执行方说明</b>：A 股数据源需中国 IP 抓取，必需中国节点的 workflow 跑在「中国节点」；其余（构建/部署/体检/清理/备份/自愈）跑在 GitHub 云端。下表对齐实际 .github/workflows/*.yml。</div>
 
+        <div class="logic-p"><b>哪些前端由小九托管的中国节点产出</b>：A股实时源（东财/akshare/同花顺）对境外云端 runner 限流、抓不到，所以下列模块必须小九家里机（self-hosted 中国节点）抓取或跑算法。其余模块（构建/部署/体检/清理/备份/自愈）跑在 GitHub 云端。</div>
+        <table class="lg-table">
+          <tr><th>前端模块</th><th>产出类别</th><th>时段</th></tr>
+          <tr><td>交易日历 · 打新速览 · 两融 · 中金所持仓 · 宏观 · 危机雷达 · 北向(已停更) · 分析师评级 · 52周高 · 波动率观测 · 羊群效应</td><td>中国数据抓取</td><td>盘前 08:25</td></tr>
+          <tr><td>成交金额 · 指数行情 · ETF资金 · ETF日内热力 · ETF申购 · ETF三连板 · 板块资金流 · 个股资金流 · 概念排行 · 涨停热力 · 市场资金流</td><td>中国数据抓取</td><td>盘中 10:30-15:05</td></tr>
+          <tr><td>收盘累积序列（EXPERIMENT 相关）</td><td>中国数据抓取</td><td>盘后 15:30</td></tr>
+          <tr><td>龙虎榜 · 严格三重共识 · 机构游资共振 · top10 · 逆势龙头 · 候选池 · 回测 · 板块资金流趋势 · 停牌预警 · 市场预警 · NT数据</td><td>盘后算法链</td><td>盘后 18:30</td></tr>
+        </table>
+
         <div class="logic-h">工作日</div>
         <table class="lg-table">
           <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
