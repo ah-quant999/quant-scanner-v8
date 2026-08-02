@@ -566,7 +566,7 @@ window.V8_CAL = {weeks:[],legend:[]};
       <div style="padding:0;" id="aiSummaryContent">
         <div style="padding:10px 18px;background:rgba(167,139,250,0.10);font-size:13px;line-height:1.7;color:var(--txt);">
           <span style="padding:2px 8px;border-radius:4px;background:rgba(167,139,250,0.20);color:#a78bfa;margin-right:6px;">🟣 日内风向</span>
-          <strong>情绪冰点</strong>，普跌格局，多维共振 8 只，<span style="color:var(--up);font-weight:700;">⚠️ 连跌 52 天</span>
+          <strong>情绪冰点</strong>，普跌格局，三重共识 8 只，<span style="color:var(--up);font-weight:700;">⚠️ 连跌 52 天</span>
         </div>
         <div style="padding:10px 18px;background:rgba(31,209,123,0.10);font-size:13px;line-height:1.7;color:var(--txt);">
           <span style="padding:2px 8px;border-radius:4px;background:rgba(31,209,123,0.20);color:#1fd17b;margin-right:6px;">🟢 市场健康度</span>
@@ -672,59 +672,7 @@ window.V8_CAL = {weeks:[],legend:[]};
       </div>
     </div>
 
-    <!-- 概念资金热力图（treemap · 真实数据：CONCEPT_RANKING.js） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🗺️</span>概念资金热力图 · 大小=净流入 · 颜色=涨跌 · <span class="fresh" id="conceptMapTime">更新于 --</span></h3>
-      <div id="conceptTreemap" style="min-height:180px;"><div class="ipo-empty">加载中…</div></div>
-      <div style="display:flex;gap:12px;font-size:11px;color:var(--dim);margin-top:10px;align-items:center;flex-wrap:wrap;">
-        <span>方块面积 ≈ |主力净流入|</span>
-        <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:var(--up);border-radius:2px;"></span> 涨</span>
-        <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:var(--down);border-radius:2px;"></span> 跌</span>
-      </div>
-    </div>
-
-    <script>
-    /* 概念资金热力图渲染（CONCEPT_RANKING.js → 实时数据区） */
-    (function(){
-      const $=id=>document.getElementById(id);
-      function fmt(v){ return v==null||isNaN(v)?'--':Number(v).toFixed(2); }
-      function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
-      function renderConceptTreemap(){
-        const d=window.CONCEPT_RANKING;
-        const el=$('conceptTreemap');
-        if(!el) return;
-        if(!d || !d.items || !d.items.length){
-          el.innerHTML='<div class="ipo-empty">暂无概念数据</div>'; return;
-        }
-        // 取净流入前 30，按 |net| 排序
-        const items=d.items.slice().sort((a,b)=>Math.abs(b.net)-Math.abs(a.net)).slice(0,30);
-        const maxArea=Math.sqrt(Math.abs(items[0].net)||1);
-        let h='<div style="display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start;">';
-        items.forEach(it=>{
-          const up=it.chg>0, down=it.chg<0;
-          const bg=up?'var(--up)':down?'var(--down)':'var(--dim)';
-          const txt=up||down?'#fff':'var(--txt)';
-          const area=Math.sqrt(Math.abs(it.net))/maxArea;
-          const px=Math.max(44, Math.round(area*110));
-          const netTxt=(it.net>0?'+':'')+fmt(it.net);
-          h+='<div style="width:'+px+'px;height:'+px+'px;background:'+bg+';color:'+txt+';border-radius:6px;padding:5px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;font-size:11px;line-height:1.25;box-shadow:0 1px 3px rgba(0,0,0,.25);overflow:hidden;">';
-          h+='<div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;">'+esc(it.name)+'</div>';
-          h+='<div style="font-size:10px;opacity:.9;">'+(it.chg>0?'+':'')+fmt(it.chg)+'% · '+netTxt+'</div>';
-          h+='</div>';
-        });
-        h+='</div>';
-        el.innerHTML=h;
-        const mt=$('conceptMapTime');
-        if(mt) mt.textContent='更新于 '+rel(d.update_time);
-      }
-      function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-      if(document.readyState==='loading')
-        document.addEventListener('DOMContentLoaded', renderConceptTreemap);
-      else renderConceptTreemap();
-    })();
-    </script>
-
-    <!-- 涨停热力矩阵（整行宽度） -->
+        <!-- 涨停热力矩阵（整行宽度） -->
     <div class="card" id="limitUpHeatCard" style="margin-bottom:16px">
       <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近10日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">更新于 --</span></h3>
       <div id="limitUpHeatAnalysis" class="limit-up-analysis" style="display:none"></div>
@@ -747,7 +695,7 @@ window.V8_CAL = {weeks:[],legend:[]};
         <div class="sf-block-title"><span class="sf-block-icon">🔥</span>资金热度·净申赎 <span style="font-size:10px;color:var(--dim)">T+0·宽基申赎</span></div>
         <div id="etfHeatBlock">
           <div id="etfHeatSummary" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;font-size:12px;color:var(--sub)">加载中…</div>
-          <div class="grid g-2" id="etfHeatByCat"><div class="ipo-empty" style="grid-column:1/3">加载中…</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="etfHeatByCat"><div class="ipo-empty" style="grid-column:1/3">加载中…</div></div>
         </div>
       </div>
 
@@ -978,10 +926,12 @@ window.V8_CAL = {weeks:[],legend:[]};
             });
           }
 
-          // 行业节点本身
+          // 行业节点本身：以 |涨跌幅| 为基础权重，有候选股加成
+          var baseVal = Math.max(Math.abs(secChg), 0.5);
+          var childVal = children.length ? children.reduce(function(s,c){return s+(c.value||0);},0) : 0;
           treeData.push({
             name:indName+'  '+(secChg>=0?'+':'')+fmt(secChg)+'%',
-            value:Math.max(children.reduce(function(s,c){return s+(c.value||0);},0), 2),
+            value: Math.max(baseVal * 10 + childVal, 1),
             itemStyle:{color:heatColor(secChg)},
             children:children.length?children:undefined,
             label:{fontSize:12, color:'#fff', fontWeight:'bold',
@@ -1091,7 +1041,7 @@ window.V8_CAL = {weeks:[],legend:[]};
           <button class="mff-series-btn" data-series="cum" style="padding:3px 10px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub);">累计</button>
           <span id="mffSummary" style="font-size:11px;color:var(--dim);margin-left:auto;"></span>
         </div>
-        <div id="mffChart" style="width:100%;height:420px;"></div>
+        <div id="mffChart" style="width:100%;height:480px;"></div>
         <div style="margin-top:6px;font-size:11px;color:var(--dim);line-height:1.5;">
           📌 口径说明：累计净流入 = 上证指数（000001）单日主力资金净流入的滚动累加；数据覆盖沪市全市场成分股，非仅宽基ETF。
         </div>
@@ -1174,7 +1124,7 @@ window.V8_CAL = {weeks:[],legend:[]};
           <div style="font-size:13px;color:var(--cyan);font-weight:700;margin-bottom:10px;">查询结果包含以下扩展信息（需该股被收录）：</div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;font-size:12px;line-height:1.6;">
             <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--purple);margin-bottom:4px;">🧬 多维共振 <span style="font-size:10px;color:var(--gold);font-weight:500;">● 数据滞后</span></div>
+              <div style="font-weight:700;color:var(--purple);margin-bottom:4px;">🧬 三重共识 <span style="font-size:10px;color:var(--gold);font-weight:500;">● 数据滞后</span></div>
               <div style="color:var(--sub);">每日综合评分，≥80分精选 / ≥70分观察；当前数据源停在 2026-07-30，新数据待 v6 跑批后同步</div>
             </div>
             <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
@@ -3031,7 +2981,7 @@ window.V8_CAL = {weeks:[],legend:[]};
         <div class="logic-h">涨停热力矩阵</div>
         <div class="logic-p">10日滚动热力矩阵，按概念板块统计涨停家数。持续热点(≥7日有涨停且近3日连续) / 新启动(今日≥2家但前2日=0) / 消退(前5日活跃但近3日&lt;2)。</div>
         <div class="logic-h">个股实时查询</div>
-        <div class="logic-p">输入代码或名称，聚合多维共振评分、金股池状态、主力资金、近10日走势等。</div>
+        <div class="logic-p">输入代码或名称，聚合三重共识评分、金股池状态、主力资金、近10日走势等。</div>
         <div class="logic-h">ETF资金热度</div>
         <div class="logic-p">宽基指数ETF每日净申购赎回份额折线图，T+0实时估算国家队动向。数据源：etf_intraday_heat.json（akshare fund_etf_hist_em）。展示沪深300/中证500/创业板/科创50/上证50等主要宽基ETF。</div>
       </div>
@@ -3154,7 +3104,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
       </div>
 
       <div class="card">
-        <h3><span class="ic">🧬</span>多维共振评分·完整公式 - 说明</h3>
+        <h3><span class="ic">🧬</span>三重共识评分·完整公式 - 说明</h3>
         <div class="logic-p">原始加分 = 基础(~110) + 增强(±16) + 形态(~16) + 资金(~10) + 板块(~5) + 机构投行(~10) + 基本面(-10~+40) + 回测反哺(±10)，理论满分约 250。<br><b>最终 total_score 已归一化到 0~100</b>，因此 ≥80 分才是「精选」、≥70 分是「观察」，阈值语义与百分制一致。</div>
         <table class="lg-table">
           <tr><th>维度</th><th>原始满分</th><th>细则</th></tr>
@@ -3452,9 +3402,9 @@ function switchSec(sec,el){
     const top = window.TOP10_DAILY || {};
     const arr = top.top10 || [];
     const row = arr.find(r=>normCode(r.code)===normCode(code));
-    if(!row) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">🧬 多维共振：未收录</div>';
+    if(!row) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">🧬 三重共识：未收录</div>';
     let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
-    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:13px;font-weight:700;color:var(--purple);">🧬 多维共振</span>';
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:13px;font-weight:700;color:var(--purple);">🧬 三重共识</span>';
     h+='<span style="margin-left:auto;font-size:20px;font-weight:800;color:'+(row.total_score>=80?'var(--up)':row.total_score>=70?'var(--gold)':'var(--cyan)')+'">'+row.total_score+'</span></div>';
     h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
     h+='<div>排名 <b>#'+row.rank+'</b> · 信号数 <b>'+row.sig_count+'</b> · 质量 <b>'+(row.quality_grade||'-')+'</b></div>';
@@ -4650,7 +4600,7 @@ function renderLimitUpHeatmap(){
       series.push({
         name: '单日净流入(亿)', type: 'bar', yAxisIndex: 0, data: nets,
         itemStyle: { color: function(p){ return p.value >= 0 ? upColor : downColor; } },
-        barMaxWidth: 10, barGap: '-80%'
+        barMaxWidth: 16, barGap: '30%'
       });
     }
     if(__MFF_SHOW_CUM){
@@ -4667,7 +4617,7 @@ function renderLimitUpHeatmap(){
     }
     var option = {
       backgroundColor: 'transparent',
-      grid: { left: 45, right: 45, top: 28, bottom: 78 },
+      grid: { left: 48, right: 52, top: 32, bottom: 88 },
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'cross', link: [{xAxisIndex: 'all'}] },
@@ -4689,6 +4639,7 @@ function renderLimitUpHeatmap(){
         data: dates,
         axisLabel: {
           fontSize: 10, color: dimColor, showMaxLabel: true,
+          interval: Math.floor(dates.length / 12),
           formatter: function(v, i){
             var label = v.slice(4,6) + '/' + v.slice(6,8);
             if(i === dates.length - 1) return '{mffLast|📅 ' + label + '}';
@@ -4713,8 +4664,8 @@ function renderLimitUpHeatmap(){
         }
       ],
       dataZoom: [
-        { type: 'inside', xAxisIndex: 0, start: 20, end: 100 },
-        { type: 'slider', xAxisIndex: 0, height: 22, bottom: 8, start: 20, end: 100, fillerColor: 'rgba(239,68,68,0.2)', borderColor: gridColor, textStyle: { color: dimColor, fontSize: 10 } }
+        { type: 'inside', xAxisIndex: 0, start: 65, end: 100 },
+        { type: 'slider', xAxisIndex: 0, height: 24, bottom: 10, start: 65, end: 100, fillerColor: 'rgba(239,68,68,0.2)', borderColor: gridColor, textStyle: { color: dimColor, fontSize: 10 } }
       ],
       series: series
     };
@@ -4867,8 +4818,9 @@ function renderLimitUpHeatmap(){
     const colorMap={宽基:'var(--cyan)',行业:'var(--purple)',主题:'var(--gold)',跨境:'var(--pink)',商品:'var(--up)',货币:'var(--down)'};
     const fmtYi=v=>{const a=Math.abs(v);if(a>=1e4)return(v/1e4).toFixed(1)+'亿';if(a>=1)return(v/1).toFixed(1)+'万';return(v/1).toFixed(1);};
     const fmtPct=p=>(p>=0?'+':'')+p.toFixed(2)+'%';
-    // summary
-    let shtml='<span style="color:var(--dim)">6 大类净流入汇总：</span>';
+    // summary（动态计数）
+    const validCats=catNames.filter(cn=>etfHeat.categories&&etfHeat.categories[cn]);
+    let shtml='<span style="color:var(--dim)">'+validCats.length+' 大类净流入汇总：</span>';
     catNames.forEach(cn=>{
       const c=etfHeat.categories[cn]; if(!c) return;
       const yi=c.net_inflow_yi||0, c2=yi>=0?'var(--up)':'var(--down)';
@@ -4879,8 +4831,8 @@ function renderLimitUpHeatmap(){
     let h='';
     catNames.forEach(cn=>{
       const c=etfHeat.categories[cn];
-      if(!c){h+='<div></div>';return;}
-      const list=[].concat(c.top_inflow||[],c.top_outflow||[]).slice(0,10);
+      if(!c){h+='<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px"><div style="font-weight:700;margin-bottom:6px;color:'+colorMap[cn]+'">'+cn+' · 暂无数据</div><div style="color:var(--dim);font-size:11.5px">该分类 ETF 资金热度数据待数据管道补充</div></div>';return;}
+      const list=[].concat(c.top_inflow||[],c.top_outflow||[]).slice(0,5);
       const maxAbs=Math.max.apply(null,list.map(x=>Math.abs(x.main_net_inflow||0)))||1;
       let rows='';
       list.forEach(x=>{
@@ -4890,11 +4842,11 @@ function renderLimitUpHeatmap(){
         const w=Math.min(100,Math.abs(v)/maxAbs*100);
         const valY=fmtYi(v);
         const dirMark=isIn?'▲':'▼';
-        rows+='<div class="flow-row"><span class="flow-name" style="width:120px;font-size:12px" title="'+x.name+' '+x.code+'">'+x.name+'</span><div class="flow-bar"><div class="flow-fill" style="width:'+w.toFixed(1)+'%;background:'+bg+'"></div></div><span class="flow-val" style="width:140px;font-size:11px"><span style="color:'+color+';font-weight:700">'+dirMark+' '+valY+'</span> <span style="color:var(--sub);font-size:10px;margin-left:4px">'+fmtPct(x.pct||0)+'</span></span></div>';
+        rows+='<div class="flow-row" style="padding:2px 0"><span class="flow-name" style="width:100px;font-size:11px" title="'+x.name+' '+x.code+'">'+x.name+'</span><div class="flow-bar"><div class="flow-fill" style="width:'+w.toFixed(1)+'%;background:'+bg+'"></div></div><span class="flow-val" style="width:120px;font-size:10.5px"><span style="color:'+color+';font-weight:700">'+dirMark+' '+valY+'</span> <span style="color:var(--sub);font-size:9px;margin-left:4px">'+fmtPct(x.pct||0)+'</span></span></div>';
       });
       const yi=c.net_inflow_yi||0, c2=yi>=0?'var(--up)':'var(--down)';
-      h+='<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;max-height:380px;overflow-y:auto">';
-      h+='<div style="font-weight:700;margin-bottom:6px;color:'+colorMap[cn]+';display:flex;justify-content:space-between;align-items:center"><span>'+cn+' · '+c.count+'只</span><span style="font-size:11px;color:'+c2+';font-weight:700">'+(yi>=0?'+':'')+yi.toFixed(2)+'亿</span></div>';
+      h+='<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:8px 10px">';
+      h+='<div style="font-weight:700;margin-bottom:4px;color:'+colorMap[cn]+';display:flex;justify-content:space-between;align-items:center;font-size:11.5px"><span>'+cn+' · '+c.count+'只</span><span style="font-size:10px;color:'+c2+';font-weight:700">'+(yi>=0?'+':'')+yi.toFixed(2)+'亿</span></div>';
       h+=rows;
       h+='</div>';
     });
