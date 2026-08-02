@@ -7731,6 +7731,17 @@ function renderLimitUpHeatmap(){
       if(lvl==='warn') return '<span style="color:var(--gold);font-weight:700">△</span>';
       return '<span style="color:var(--down);font-weight:700">✕</span>';
     }
+    function lvlText(l){ return l==='crit'?'严重':l==='warn'?'警告':l==='ok'?'正常':'无数据'; }
+    /* 维度组：5 列平分宽度，格间 1px 浅色分隔 */
+    function dimGroup(items, baseStyle){
+      var h='<div style="display:flex;justify-content:stretch;align-items:stretch">';
+      for(var i=0;i<items.length;i++){
+        var it=items[i];
+        h+='<div '+(i>0?'style="flex:1;text-align:center;padding:5px 0;'+baseStyle+';border-left:1px solid rgba(255,255,255,0.07)"':'style="flex:1;text-align:center;padding:5px 0;'+baseStyle+'"')+' title="'+it.title+'">'+it.content+'</div>';
+      }
+      h+='</div>';
+      return h;
+    }
     var problems=items.filter(function(a){return a.lvl!=='ok';});
     var html='<div>';
     if(problems.length===0){
@@ -7739,12 +7750,14 @@ function renderLimitUpHeatmap(){
       html+='<table style="width:100%;border-collapse:collapse;font-size:10px;line-height:1.2"><thead><tr>';
       html+='<th style="text-align:left;padding:2px 5px;color:var(--dim);font-weight:600">\u6570\u636e\u6e90</th>';
       html+='<th style="text-align:left;padding:2px 5px;color:var(--dim);font-weight:600">\u6700\u540e\u66f4\u65b0</th>';
-      html+='<th style="text-align:right;padding:2px 4px;color:var(--dim);font-weight:600">\u9648\u65e7</th>';
-      html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="新鲜度">\u65b0</th>';
-      html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="臃肿度">\u80c0</th>';
-      html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="异常值">\u5f02</th>';
-      html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="缺失检测">\u7f3a</th>';
-      html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="依赖就绪">\u8d56</th>';
+      html+='<th style="text-align:right;padding:2px 10px 2px 4px;color:var(--dim);font-weight:600;width:64px">\u9648\u65e7</th>';
+      html+='<th style="padding:0 0 0 10px;color:var(--dim);font-weight:600;border-left:1px solid rgba(255,255,255,0.1)"><div style="display:flex;justify-content:stretch">';
+      html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:10px" title="新鲜度">\u65b0</div>';
+      html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:10px;border-left:1px solid rgba(255,255,255,0.07)" title="臃肿度">\u80c0</div>';
+      html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:10px;border-left:1px solid rgba(255,255,255,0.07)" title="异常值">\u5f02</div>';
+      html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:10px;border-left:1px solid rgba(255,255,255,0.07)" title="缺失检测">\u7f3a</div>';
+      html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:10px;border-left:1px solid rgba(255,255,255,0.07)" title="依赖就绪">\u8d56</div>';
+      html+='</div></th>';
       html+='<th style="padding:2px 3px;color:var(--dim);font-weight:600;width:28px"></th></tr></thead><tbody>';
       problems.sort(function(a,b){return (a.lvl==='crit'?0:1)-(b.lvl==='crit'?0:1);});
       for(var p=0;p<problems.length;p++){
@@ -7754,12 +7767,16 @@ function renderLimitUpHeatmap(){
         var drillBtn=drill?_alertDrillBtn(drill.t,drill.a,drill.l):'';
         html+='<tr style="background:'+bg+'"><td style="padding:2px 5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px" title="'+a.name+'">'+a.name+'</td>';
         html+='<td style="padding:2px 5px;color:var(--sub);white-space:nowrap;font-size:9.5px">'+a.tsStr+'</td>';
-        html+='<td style="padding:2px 4px;text-align:right;color:'+(a.lvl==='crit'?'var(--down)':a.lvl==='warn'?'var(--gold)':'var(--up)')+';font-weight:600">'+a.ageH+'h</td>';
-        html+='<td style="padding:2px 1px;text-align:center;font-size:11px">'+cell(a.lvl)+'</td>';
-        html+='<td style="padding:2px 1px;text-align:center;font-size:11px">'+cell(idxB[a.dataKey]||(idxB[a.dataKey]===undefined?'ok':null))+'</td>';
-        html+='<td style="padding:2px 1px;text-align:center;font-size:11px">'+cell(idxA[a.dataKey]||(idxA[a.dataKey]===undefined?'ok':null))+'</td>';
-        html+='<td style="padding:2px 1px;text-align:center;font-size:11px">'+cell(idxM[a.dataKey]||(idxM[a.dataKey]===undefined?'ok':null))+'</td>';
-        html+='<td style="padding:2px 1px;text-align:center;font-size:11px">'+cell(idxD[a.dataKey]||(idxD[a.dataKey]===undefined?'ok':null))+'</td>';
+        html+='<td style="padding:2px 10px 2px 4px;text-align:right;color:'+(a.lvl==='crit'?'var(--down)':a.lvl==='warn'?'var(--gold)':'var(--up)')+';font-weight:600;width:64px">'+a.ageH+'h</td>';
+        html+='<td style="padding:0;border-left:1px solid rgba(255,255,255,0.1)">';
+        html+=dimGroup([
+          {title:'新鲜度 '+lvlText(a.lvl), content: cell(a.lvl)},
+          {title:'臃肿度 '+lvlText(idxB[a.dataKey]), content: cell(idxB[a.dataKey]||(idxB[a.dataKey]===undefined?'ok':null))},
+          {title:'异常值 '+lvlText(idxA[a.dataKey]), content: cell(idxA[a.dataKey]||(idxA[a.dataKey]===undefined?'ok':null))},
+          {title:'缺失 '+lvlText(idxM[a.dataKey]), content: cell(idxM[a.dataKey]||(idxM[a.dataKey]===undefined?'ok':null))},
+          {title:'依赖 '+lvlText(idxD[a.dataKey]), content: cell(idxD[a.dataKey]||(idxD[a.dataKey]===undefined?'ok':null))}
+        ], 'font-size:12px');
+        html+='</td>';
         html+='<td style="padding:2px 3px">'+drillBtn+'</td></tr>';
       }
       html+='</tbody></table>';
@@ -7768,23 +7785,29 @@ function renderLimitUpHeatmap(){
     html+='<details style="margin-top:6px"><summary style="cursor:pointer;font-size:10.5px;color:var(--dim);padding:2px 0;user-select:none">\ud83d\udcca \u5168 '+ct.total+' \u4e2a\u6570\u636e\u6e90 \u00b7 5 \u7ef4\u5ea6\u6982\u89c8\uff08\u5c55\u5f00\uff09</summary>';
     html+='<table style="width:100%;border-collapse:collapse;font-size:9.5px;line-height:1.2;margin-top:4px"><thead><tr>';
     html+='<th style="text-align:left;padding:2px 5px;color:var(--dim);font-weight:600">\u6570\u636e\u6e90</th>';
-    html+='<th style="text-align:right;padding:2px 4px;color:var(--dim);font-weight:600">\u9648\u65e7</th>';
-    html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="新鲜度">\u65b0</th>';
-    html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="臃肿度">\u80c0</th>';
-    html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="异常值">\u5f02</th>';
-    html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="缺失检测">\u7f3a</th>';
-    html+='<th style="text-align:center;padding:2px 1px;color:var(--dim);font-weight:600;width:18px" title="依赖就绪">\u8d56</th>';
+    html+='<th style="text-align:right;padding:2px 10px 2px 4px;color:var(--dim);font-weight:600;width:64px">\u9648\u65e7</th>';
+    html+='<th style="padding:0 0 0 10px;color:var(--dim);font-weight:600;border-left:1px solid rgba(255,255,255,0.1)"><div style="display:flex;justify-content:stretch">';
+    html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:9.5px" title="新鲜度">\u65b0</div>';
+    html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="臃肿度">\u80c0</div>';
+    html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="异常值">\u5f02</div>';
+    html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="缺失检测">\u7f3a</div>';
+    html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="依赖就绪">\u8d56</div>';
+    html+='</div></th>';
     html+='</tr></thead><tbody>';
     for(var q=0;q<items.length;q++){
       var a=items[q];
       var bg=a.lvl==='crit'?'rgba(244,63,94,0.04)':a.lvl==='warn'?'rgba(251,191,36,0.04)':'transparent';
       html+='<tr style="background:'+bg+'"><td style="padding:1.5px 5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;color:var(--sub)" title="'+a.name+'">'+a.name+'</td>';
-      html+='<td style="padding:1.5px 4px;text-align:right;color:var(--dim);font-size:9px">'+a.ageH+'h</td>';
-      html+='<td style="padding:1.5px 1px;text-align:center;font-size:10px">'+cell(a.lvl)+'</td>';
-      html+='<td style="padding:1.5px 1px;text-align:center;font-size:10px">'+cell(idxB[a.dataKey]||(idxB[a.dataKey]===undefined?'ok':null))+'</td>';
-      html+='<td style="padding:1.5px 1px;text-align:center;font-size:10px">'+cell(idxA[a.dataKey]||(idxA[a.dataKey]===undefined?'ok':null))+'</td>';
-      html+='<td style="padding:1.5px 1px;text-align:center;font-size:10px">'+cell(idxM[a.dataKey]||(idxM[a.dataKey]===undefined?'ok':null))+'</td>';
-      html+='<td style="padding:1.5px 1px;text-align:center;font-size:10px">'+cell(idxD[a.dataKey]||(idxD[a.dataKey]===undefined?'ok':null))+'</td>';
+      html+='<td style="padding:1.5px 10px 1.5px 4px;text-align:right;color:var(--dim);font-size:9px;width:64px">'+a.ageH+'h</td>';
+      html+='<td style="padding:0;border-left:1px solid rgba(255,255,255,0.1)">';
+      html+=dimGroup([
+        {title:'新鲜度 '+lvlText(a.lvl), content: cell(a.lvl)},
+        {title:'臃肿度 '+lvlText(idxB[a.dataKey]), content: cell(idxB[a.dataKey]||(idxB[a.dataKey]===undefined?'ok':null))},
+        {title:'异常值 '+lvlText(idxA[a.dataKey]), content: cell(idxA[a.dataKey]||(idxA[a.dataKey]===undefined?'ok':null))},
+        {title:'缺失 '+lvlText(idxM[a.dataKey]), content: cell(idxM[a.dataKey]||(idxM[a.dataKey]===undefined?'ok':null))},
+        {title:'依赖 '+lvlText(idxD[a.dataKey]), content: cell(idxD[a.dataKey]||(idxD[a.dataKey]===undefined?'ok':null))}
+      ], 'font-size:11px');
+      html+='</td>';
       html+='</tr>';
     }
     html+='</tbody></table></details>';
