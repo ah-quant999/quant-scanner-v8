@@ -3126,6 +3126,44 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     h += '</div></div>'; // main grid
 
+    // 机游共振（短线）— 数据源 lhb_data（仅龙虎榜上榜个股，非全市场）
+    var _LHB = window.LHB_DATA || {};
+    var _lhb = _LHB.stocks || [];
+    function _lyi(w){ return ((w||0)/10000).toFixed(2) + '亿'; }
+    h += '<div style="margin-top:16px;font-size:12px;font-weight:700;color:var(--purple);margin-bottom:8px">⚡ 机游共振（短线）· 仅龙虎榜上榜个股</div>';
+    h += '<div class="insight-grid" style="grid-template-columns:1fr 1fr 1fr">';
+    // 最强共振
+    var _strong = _lhb.filter(function(s){ return (s.inst_net_万||0)>0 && (s.yz_net_万||0)>0; })
+                     .sort(function(a,b){ return ((b.inst_net_万||0)+(b.yz_net_万||0))-((a.inst_net_万||0)+(a.yz_net_万||0)); }).slice(0,4);
+    h += '<div class="insight-card" style="border-left-color:var(--purple)"><h4>🔥 最强共振 <span style="font-size:10px;color:var(--purple);font-weight:400">机构+游资</span></h4>';
+    if(_strong.length){
+      h += '<div class="insight-list">';
+      _strong.forEach(function(s){ h += '<div class="insight-li"><span>'+_rcEsc(s.name)+'</span><span class="c-up">'+_lyi(s.inst_net_万+s.yz_net_万)+'</span></div>'; });
+      h += '</div>';
+    } else { h += '<div style="color:var(--dim);font-size:11px">暂无共振标的</div>'; }
+    h += '</div>';
+    // 纯游资异动
+    var _yz = _lhb.filter(function(s){ return (s.yz_net_万||0)>0 && (s.inst_net_万||0)<=0; })
+                 .sort(function(a,b){ return (b.yz_net_万||0)-(a.yz_net_万||0); }).slice(0,4);
+    h += '<div class="insight-card" style="border-left-color:var(--up)"><h4>⚡ 纯游资异动 <span style="font-size:10px;color:var(--up);font-weight:400">游资独买</span></h4>';
+    if(_yz.length){
+      h += '<div class="insight-list">';
+      _yz.forEach(function(s){ h += '<div class="insight-li"><span>'+_rcEsc(s.name)+'</span><span class="c-up">'+_lyi(s.yz_net_万)+'</span></div>'; });
+      h += '</div>';
+    } else { h += '<div style="color:var(--dim);font-size:11px">暂无纯游资异动</div>'; }
+    h += '</div>';
+    // 风险警示（机游共振卖出）
+    var _risk = _lhb.filter(function(s){ return (s.inst_net_万||0)<0 && (s.yz_net_万||0)<0; })
+                  .sort(function(a,b){ return ((a.inst_net_万||0)+(a.yz_net_万||0))-((b.inst_net_万||0)+(b.yz_net_万||0)); }).slice(0,4);
+    h += '<div class="insight-card" style="border-left-color:var(--down)"><h4>⚠️ 风险警示 <span style="font-size:10px;color:var(--down);font-weight:400">机游共振卖出</span></h4>';
+    if(_risk.length){
+      h += '<div class="insight-list">';
+      _risk.forEach(function(s){ h += '<div class="insight-li"><span>'+_rcEsc(s.name)+'</span><span class="c-down">'+_lyi(s.inst_net_万+s.yz_net_万)+'</span></div>'; });
+      h += '</div>';
+    } else { h += '<div style="color:var(--up);font-size:11px">✅ 无显著卖出共振</div>'; }
+    h += '</div>';
+    h += '</div>'; // insight-grid 机游
+
     // Bottom row: Sector analysis cards
     h += '<div class="insight-grid">';
 
@@ -3207,119 +3245,93 @@ window.V8_CAL = {weeks:[],legend:[]};
     var CAND = window.CANDIDATE || {};
     var GOLD = window.GOLD_POOL || {};
     var MAHORO = window.MAHORO || {};
-    var stocks = CAND.stocks || [];
-    var updateTime = CAND.update_time || GOLD.update_time || MAHORO.update_time || '--';
+    var LHB = window.LHB_DATA || {};
+    var lhbStocks = LHB.stocks || [];
+    var SF = window.SECTOR_FUND_FLOW || {};
+    var updateTime = LHB.update_time || CAND.update_time || GOLD.update_time || '--';
+
+    function _yi(w){ return ((w||0)/10000).toFixed(2) + '亿'; }
+    function _pc(p){ return (p>=0?'+':'') + (p||0).toFixed(2) + '%'; }
 
     var h = '';
     // Header
     h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">';
     h += '<div><span style="font-size:18px;font-weight:800;color:var(--txt)">🐂 大牛股猎手</span></div>';
-    h += '<div style="font-size:11px;color:var(--dim)">新赛道发掘 · 早期信号 · 核心共振</div>';
+    h += '<div style="font-size:11px;color:var(--dim)">机游共振 · 板块资金流 · 核心共振（仅龙虎榜覆盖个股）</div>';
     h += '</div>';
 
     // Description bar
     h += '<div style="background:rgba(234,179,8,.06);border:1px solid rgba(234,179,8,.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:11px;color:var(--sub);line-height:1.6">';
-    h += '本周<strong style="color:var(--gold)">5个赛道</strong>获资金重点布局。4只需制造标的已形成<strong style="color:var(--up)">共振合力</strong>，左侧机会集中在新赛道，右侧持有核心龙头。';
+    h += '机游共振基于龙虎榜上榜个股（机构 + 游资净买卖），精确但仅覆盖当日异动股，非全市场资金流；板块资金流为当日行业净流入。';
     h += '</div>';
 
     // Main grid: 3 columns
     h += '<div class="hunter-grid" style="grid-template-columns:repeat(3,1fr)">';
 
-    // Col 1: 新赛道发掘
-    h += '<div class="hunter-card"><h4>🆕 新赛道发掘 <span style="font-size:10px;color:var(--dim);font-weight:400">五星级</span></h4>';
-    // Find high-score candidates as "new tracks"
-    var newTracks = stocks.filter(function(s){ return (s.score||0) >= 60; }).slice(0, 5);
-    if(newTracks.length > 0){
-      newTracks.forEach(function(s){
-        var sc = s.score || 0;
-        var scColor = sc >= 80 ? 'var(--up)' : sc >= 60 ? 'var(--gold)' : 'var(--purple)';
-        h += '<div style="margin-bottom:12px;padding:10px;background:var(--bg2);border-radius:8px">';
+    // Col 1: 新赛道发现（行业资金流）
+    h += '<div class="hunter-card"><h4>🆕 新赛道发现 <span style="font-size:10px;color:var(--dim);font-weight:400">当日行业净流入</span></h4>';
+    var sfInd = (SF.top_list || []).filter(function(x){ return x.type === '行业'; })
+                .sort(function(a,b){ return (b.net||0)-(a.net||0); }).slice(0, 5);
+    if(sfInd.length > 0){
+      sfInd.forEach(function(s){
+        var net = s.net || 0;
+        var c = net >= 0 ? 'var(--up)' : 'var(--down)';
+        h += '<div style="margin-bottom:10px;padding:10px;background:var(--bg2);border-radius:8px">';
         h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">';
         h += '<span class="hunter-stock-name">' + _rcEsc(s.name) + '</span>';
-        h += '<span style="font-size:10px;color:var(--dim)">本月</span></div>';
+        h += '<span style="font-size:10px;color:var(--dim)">行业</span></div>';
         h += '<div style="display:flex;justify-content:space-between;font-size:12px">';
-        h += '<span class="c-up;font-weight:700">+' + ((s.inst_net_万||0)/10000).toFixed(2) + '亿</span>';
-        h += '<span class="c-up;font-weight:700">+' + ((s.yz_net_万||0)/10000).toFixed(2) + '亿</span>';
-        h += '<span style="color:'+scColor+';font-weight:700">' + sc + '%</span></div>';
-        // Tags
-        if(s.tags && s.tags.length){
-          h += '<div class="hunter-tags">';
-          s.tags.slice(0,3).forEach(function(t){ h += '<span class="hunter-tag">' + _rcEsc(t) + '</span>'; });
-          h += '</div>';
-        }
-        h += '<div style="font-size:10px;color:var(--dim);margin-top:4px">推荐：<span style="color:var(--gold)">' + (s.reasons&&s.reasons.length?s.reasons[0]:s.board||'--') + '</span></div>';
+        h += '<span style="color:'+c+';font-weight:700">' + (net>=0?'+':'') + net.toFixed(1) + '亿</span>';
+        h += '<span style="color:'+c+';font-weight:700">' + _pc(s.chg) + '</span></div>';
         h += '</div>';
       });
     } else {
-      h += '<div style="text-align:center;color:var(--dim);padding:20px;font-size:11px">暂无高分候选赛道</div>';
+      h += '<div style="text-align:center;color:var(--dim);padding:20px;font-size:11px">暂无行业资金流数据</div>';
     }
     h += '</div>';
 
-    // Col 2: 早期信号筛选
-    h += '<div class="hunter-card"><h4>🔮 早期信号筛选 <span style="font-size:10px;color:var(--dim);font-weight:400">五星级别</span></h4>';
-    // Near-miss candidates (almost qualified)
-    var nearMiss = CAND.near_miss || [];
-    var earlySignals = nearMiss.length > 0 ? nearMiss : stocks.filter(function(s){ return (s.score||0) >= 40 && (s.score||0) < 60; }).slice(0, 6);
-    if(earlySignals.length > 0){
-      earlySignals.forEach(function(s){
-        var sc = s.score || 0;
-        h += '<div style="margin-bottom:10px;padding:8px;background:var(--bg2);border-radius:8px;border-left:2px solid ' + (sc>=50?'var(--gold)':'var(--purple)') + '">';
+    // Col 2: 早期信号（纯游资异动）
+    h += '<div class="hunter-card"><h4>🔮 早期信号 <span style="font-size:10px;color:var(--dim);font-weight:400">纯游资异动</span></h4>';
+    var early = lhbStocks.filter(function(s){ return (s.yz_net_万||0) > 0 && (s.inst_net_万||0) <= 0; })
+                 .sort(function(a,b){ return (b.yz_net_万||0)-(a.yz_net_万||0); }).slice(0, 6);
+    if(early.length > 0){
+      early.forEach(function(s){
+        h += '<div style="margin-bottom:10px;padding:8px;background:var(--bg2);border-radius:8px;border-left:2px solid var(--purple)">';
         h += '<div style="display:flex;justify-content:space-between">';
         h += '<span class="hunter-stock-name">' + _rcEsc(s.name) + '</span>';
         h += '<span style="font-size:10px;color:var(--dim)">' + (s.code||'') + '</span></div>';
-        h += '<div style="font-size:10px;color:var(--dim);margin-top:2px">' + (s.reasons&&s.reasons.length?s.reasons.slice(0,2).join(' / '):'观察候选') + '</div>';
-        // Tags
-        var tags = s.tags || (s.reasons || []);
-        if(tags.length){
-          h += '<div class="hunter-tags">';
-          tags.slice(0,2).forEach(function(t){ h += '<span class="hunter-tag">' + _rcEsc(String(t)) + '</span>'; });
-          h += '</div>';
-        }
-        // Score badge
-        h += '<div style="margin-top:4px"><span style="font-size:11px;color:'+(sc>=50?'var(--gold)':'var(--purple)')+';font-weight:700">评分 ' + sc.toFixed(0) + '</span></div>';
+        h += '<div style="display:flex;justify-content:space-between;font-size:11px;margin-top:4px">';
+        h += '<span style="color:var(--dim)">游资净买</span>';
+        h += '<span class="c-up;font-weight:700">' + _yi(s.yz_net_万) + '</span></div>';
+        h += '<div style="font-size:10px;color:var(--dim);margin-top:2px">涨幅 ' + _pc(s.pct) + '</div>';
         h += '</div>';
       });
     } else {
-      h += '<div style="text-align:center;color:var(--dim);padding:20px;font-size:11px">暂无早期信号</div>';
+      h += '<div style="text-align:center;color:var(--dim);padding:20px;font-size:11px">暂无纯游资异动信号</div>';
     }
     h += '</div>';
 
-    // Col 3: 核心重仓标的
-    h += '<div class="hunter-card"><h4>🔥 核心重仓标的 <span style="font-size:10px;color:var(--dim);font-weight:400">科创版</span></h4>';
-    // Gold pool or top-score stocks
-    var coreStocks = [];
-    if(GOLD.stocks && GOLD.stocks.length){
-      coreStocks = GOLD.stocks.slice(0, 6);
-    } else {
-      coreStocks = stocks.slice().sort(function(a,b){ return (b.score||0)-(a.score||0); }).slice(0, 6);
-    }
-    if(coreStocks.length > 0){
-      coreStocks.forEach(function(s){
-        var sc = s.score || s.total_score || 0;
-        var chg = s.change_pct || s.pct || 0;
+    // Col 3: 核心共振（机构 + 游资）
+    h += '<div class="hunter-card"><h4>🔥 核心共振 <span style="font-size:10px;color:var(--dim);font-weight:400">机构+游资</span></h4>';
+    var core = lhbStocks.filter(function(s){ return (s.inst_net_万||0) > 0 && (s.yz_net_万||0) > 0; })
+                 .sort(function(a,b){ return ((b.inst_net_万||0)+(b.yz_net_万||0))-((a.inst_net_万||0)+(a.yz_net_万||0)); }).slice(0, 6);
+    if(core.length > 0){
+      core.forEach(function(s){
+        var inst = s.inst_net_万||0, yz = s.yz_net_万||0, total = inst+yz;
         h += '<div style="margin-bottom:10px;padding:8px;background:var(--bg2);border-radius:8px">';
         h += '<div style="display:flex;justify-content:space-between;align-items:center">';
         h += '<span class="hunter-stock-name">' + _rcEsc(s.name) + '</span>';
         h += '<span style="font-size:10px;color:var(--dim)">' + (s.code||'') + '</span></div>';
         h += '<div style="display:flex;justify-content:space-between;font-size:11px;margin-top:4px">';
-        h += '<span style="color:var(--dim)">小融</span>';
-        h += '<span class="c-' + (chg>=0?'up':'down') + '">' + (chg>=0?'+':'') + chg.toFixed(2) + '%</span>';
-        h += '<span style="color:var(--dim)">北内</span>';
-        h += '<span class="c-' + (chg>=0?'up':'down') + '">' + (chg>=0?'+':'') + (chg*1.5).toFixed(2) + '%</span>';
-        h += '<span style="color:var(--dim)">井融</span>';
-        h += '<span class="c-' + (sc>=70?'up':sc>=50?'gold':'down') + '">' + sc.toFixed(0) + '%</span></div>';
-        // Tags
-        var hTags = s.tags || s.concept || [];
-        if(hTags && hTags.length){
-          h += '<div class="hunter-tags">';
-          (Array.isArray(hTags)?hTags:[hTags]).slice(0,2).forEach(function(t){ h += '<span class="hunter-tag">' + _rcEsc(String(t)) + '</span>'; });
-          h += '</div>';
-        }
-        h += '<div style="font-size:10px;color:var(--dim);margin-top:4px">' + (s.sector||s.industry||'') + '</div>';
+        h += '<span style="color:var(--dim)">机构 ' + _yi(inst) + '</span>';
+        h += '<span style="color:var(--dim)">游资 ' + _yi(yz) + '</span></div>';
+        h += '<div style="display:flex;justify-content:space-between;font-size:11px;margin-top:2px">';
+        h += '<span style="color:var(--up);font-weight:700">共振 ' + _yi(total) + '</span>';
+        h += '<span class="c-' + ((s.pct||0)>=0?'up':'down') + '">' + _pc(s.pct) + '</span></div>';
         h += '</div>';
       });
     } else {
-      h += '<div style="text-align:center;color:var(--dim);padding:20px;font-size:11px">暂无核心持仓数据</div>';
+      h += '<div style="text-align:center;color:var(--dim);padding:20px;font-size:11px">暂无机构+游资共振标的</div>';
     }
     h += '</div>';
 
@@ -7388,20 +7400,21 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(cffex&&cffex.items&&cffex.items.length){
       var groups={}; cffex.items.forEach(function(it){ var v=it.variety||''; if(!groups[v]) groups[v]=[]; groups[v].push(it); });
       var main={}; Object.keys(groups).forEach(function(v){ main[v]=groups[v].sort(function(a,b){return (b.open_interest||0)-(a.open_interest||0);})[0]; });
-      h+='<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+      var cffexNames={IF:'沪深300',IC:'中证500',IM:'中证1000',IH:'上证50'};
+      h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">';
       ['IF','IC','IM','IH'].forEach(function(v){
         var it=main[v]; if(!it) return;
         var chg=((it.close||0)-(it.pre_settle||0))/(it.pre_settle||1)*100;
         var c=chg>=0?'var(--up)':'var(--down)';
-        var name=v==='IF'?'沪深300':v==='IC'?'中证500':v==='IM'?'中证1000':'上证50';
-        h+='<tr style="border-bottom:1px solid var(--border);">';
-        h+='<td style="padding:8px 6px;font-weight:600;color:var(--txt);">'+v+' <span style="color:var(--dim);font-weight:400;">'+name+'</span></td>';
-        h+='<td style="padding:8px 6px;text-align:right;font-weight:800;color:var(--txt);">'+it.close.toFixed(1)+'</td>';
-        h+='<td style="padding:8px 6px;text-align:right;font-weight:700;color:'+c+';">'+(chg>=0?'+':'')+chg.toFixed(2)+'%</td>';
-        h+='<td style="padding:8px 6px;text-align:right;color:var(--dim);">持仓 '+((it.open_interest||0)/1e4).toFixed(1)+'万</td>';
-        h+='</tr>';
+        var name=cffexNames[v]||'';
+        h+='<div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:6px;padding:8px 6px;text-align:center;">';
+        h+='<div style="font-size:12px;font-weight:600;color:var(--txt);margin-bottom:6px;">'+v+' <span style="color:var(--dim);font-weight:400;">'+name+'</span></div>';
+        h+='<div style="font-size:18px;font-weight:800;color:var(--txt);margin-bottom:4px;">'+it.close.toFixed(1)+'</div>';
+        h+='<div style="font-size:13px;font-weight:700;color:'+c+';margin-bottom:4px;">'+(chg>=0?'+':'')+chg.toFixed(2)+'%</div>';
+        h+='<div style="font-size:11px;color:var(--dim);">持仓 '+((it.open_interest||0)/1e4).toFixed(1)+'万</div>';
+        h+='</div>';
       });
-      h+='</table>';
+      h+='</div>';
     } else {
       h+='<div class="note" style="text-align:center;">期指数据暂不可用</div>';
     }
@@ -7856,9 +7869,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var idxD=buildIdx(_alertCategories.dependency.items);
     function cell(lvl){
       if(!lvl) return '<span style="color:var(--dim);opacity:.5">—</span>';
-      if(lvl==='ok') return '<span style="color:var(--up);font-weight:700">✓</span>';
-      if(lvl==='warn') return '<span style="color:var(--gold);font-weight:700">△</span>';
-      return '<span style="color:var(--down);font-weight:700">✕</span>';
+      if(lvl==='ok') return '<span style="color:var(--up);font-weight:900;font-size:13px;text-shadow:0 0 8px var(--up)">✓</span>';
+      if(lvl==='warn') return '<span style="color:var(--gold);font-weight:900;font-size:13px;text-shadow:0 0 8px var(--gold)">△</span>';
+      return '<span style="color:var(--down);font-weight:900;font-size:13px;text-shadow:0 0 8px var(--down)">✕</span>';
     }
     function lvlText(l){ return l==='crit'?'严重':l==='warn'?'警告':l==='ok'?'正常':'无数据'; }
     /* 维度组：5 列平分整行剩余宽度（用 CSS Grid 1fr + width:100%） */
@@ -7888,8 +7901,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     }
     function _renderRow(a){
       var bg=a.lvl==='crit'?'rgba(244,63,94,0.04)':a.lvl==='warn'?'rgba(251,191,36,0.04)':'transparent';
-      var h='<tr style="background:'+bg+'"><td style="padding:1.5px 6px 1.5px 5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:88px;color:var(--sub)" title="'+a.name+'">'+a.name+'</td>';
-      h+='<td style="padding:1.5px 4px;text-align:right;color:var(--dim);font-size:9px;width:44px">'+a.ageH+'h</td>';
+      var h='<tr style="background:'+bg+'"><td style="padding:1.5px 6px 1.5px 5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:88px;color:var(--txt)" title="'+a.name+'">'+a.name+'</td>';
+      h+='<td style="padding:1.5px 4px;text-align:right;color:var(--sub);font-size:10.5px;width:44px">'+a.ageH+'h</td>';
       h+='<td style="padding:0 4px 0 0;width:100%;border-left:1px solid rgba(255,255,255,0.1)">';
       h+=dimGroup([
         {title:'新鲜度 '+lvlText(a.lvl), content: cell(a.lvl)},
@@ -7904,14 +7917,14 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     function _renderTable(list){
       if(!list || !list.length) return '';
       var h='<table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:9.5px;line-height:1.2"><colgroup><col style="width:88px"><col style="width:44px"><col style="width:auto"></colgroup><thead><tr>';
-      h+='<th style="text-align:left;padding:2px 6px 2px 5px;color:var(--dim);font-weight:600">\u6570\u636e\u6e90</th>';
-      h+='<th style="text-align:right;padding:2px 4px;color:var(--dim);font-weight:600">\u9648\u65e7</th>';
-      h+='<th style="padding:0 4px 0 0;color:var(--dim);font-weight:600;border-left:1px solid rgba(255,255,255,0.1)"><div style="display:grid;grid-template-columns:repeat(5,1fr);width:100%">';
-      h+='<div style="text-align:center;padding:3px 0;font-size:9.5px" title="新鲜度">\u65b0</div>';
-      h+='<div style="text-align:center;padding:3px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="臃肿度">\u80c0</div>';
-      h+='<div style="text-align:center;padding:3px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="异常值">\u5f02</div>';
-      h+='<div style="text-align:center;padding:3px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="缺失检测">\u7f3a</div>';
-      h+='<div style="text-align:center;padding:3px 0;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.07)" title="依赖就绪">\u8d56</div>';
+      h+='<th style="text-align:left;padding:2px 6px 2px 5px;color:var(--sub);font-weight:700;font-size:11.5px">\u6570\u636e\u6e90</th>';
+      h+='<th style="text-align:right;padding:2px 4px;color:var(--sub);font-weight:700;font-size:11.5px">\u9648\u65e7</th>';
+      h+='<th style="padding:0 4px 0 0;color:var(--sub);font-weight:600;border-left:1px solid rgba(255,255,255,0.1)"><div style="display:grid;grid-template-columns:repeat(5,1fr);width:100%">';
+      h+='<div style="text-align:center;padding:3px 0;font-size:11.5px" title="新鲜度">\u65b0</div>';
+      h+='<div style="text-align:center;padding:3px 0;font-size:11.5px;border-left:1px solid rgba(255,255,255,0.07)" title="臃肿度">\u80c0</div>';
+      h+='<div style="text-align:center;padding:3px 0;font-size:11.5px;border-left:1px solid rgba(255,255,255,0.07)" title="异常值">\u5f02</div>';
+      h+='<div style="text-align:center;padding:3px 0;font-size:11.5px;border-left:1px solid rgba(255,255,255,0.07)" title="缺失检测">\u7f3a</div>';
+      h+='<div style="text-align:center;padding:3px 0;font-size:11.5px;border-left:1px solid rgba(255,255,255,0.07)" title="依赖就绪">\u8d56</div>';
       h+='</div></th></tr></thead><tbody>';
       for (var ri=0;ri<list.length;ri++) h+=_renderRow(list[ri]);
       h+='</tbody></table>';
@@ -7940,16 +7953,16 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       var _postAlgo =_postItems.filter(function(x){return _slotMap[x.dataKey]!=='收盘';});
       var _postH='<div style="margin-top:8px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">';
       _postH+='<div style="display:flex;align-items:baseline;gap:6px;margin-bottom:6px">';
-      _postH+='<span style="color:var(--down);font-size:11.5px;font-weight:700">\ud83d\udfe2 \u76d8\u540e</span>';
-      _postH+='<span style="color:var(--dim);font-size:9.5px">'+_postItems.length+' \u4e2a\u6570\u636e\u6e90</span>';
-      _postH+='<span style="color:var(--dim);font-size:9px">\u00b7 15:30 \u6536\u76d8 7 + 18:30 \u7b97\u6cd5 12</span>';
+      _postH+='<span style="color:var(--down);font-size:15px;font-weight:800;letter-spacing:0.5px">\ud83d\udfe2 \u76d8\u540e</span>';
+      _postH+='<span style="color:var(--sub);font-size:12.5px;font-weight:600">'+_postItems.length+' \u4e2a\u6570\u636e\u6e90</span>';
+      _postH+='<span style="color:var(--sub);font-size:11.5px;margin-left:6px">\u00b7 15:30 \u6536\u76d8 7 + 18:30 \u7b97\u6cd5 12</span>';
       _postH+='</div>';
       if(_postClose.length){
-        _postH+='<div style="color:var(--gold);font-size:9.5px;font-weight:600;margin:4px 0 3px">\u6536\u76d8 \u00b7 15:30</div>';
+        _postH+='<div style="color:var(--gold);font-size:11.5px;font-weight:700;margin:4px 0 3px">\u6536\u76d8 \u00b7 15:30</div>';
         _postH+=_renderTable(_postClose);
       }
       if(_postAlgo.length){
-        _postH+='<div style="color:var(--down);font-size:9.5px;font-weight:600;margin:8px 0 3px;padding-top:6px;border-top:1px dashed rgba(255,255,255,0.05)">\u76d8\u540e \u00b7 18:30 \u7b97\u6cd5</div>';
+        _postH+='<div style="color:var(--down);font-size:11.5px;font-weight:700;margin:8px 0 3px;padding-top:6px;border-top:1px dashed rgba(255,255,255,0.05)">\u76d8\u540e \u00b7 18:30 \u7b97\u6cd5</div>';
         _postH+=_renderTable(_postAlgo);
       }
       _postH+='</div>';
