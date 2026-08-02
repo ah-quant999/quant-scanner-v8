@@ -4890,8 +4890,9 @@ function renderLimitUpHeatmap(){
         html+='<span style="color:#1D9E75;font-size:11.5px;">⚡ '+triggered.slice(0,5).map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')+'</span>';
       }
       if(future.length){
-        const nx=future[0];
-        html+='<span style="color:#d0bcff;font-size:11.5px;">📍 下转 '+nx.name+' '+(nx.date||'').slice(5)+' '+fibWeekday(nx.date)+' · 距今'+(nx.days_left>=0?nx.days_left:0)+'天</span>';
+        // 每个未来 F 窗口都展开"下转 X 日期 周X·距今N天"，最多 3 个（避免行过长）
+        const nxList=future.slice(0,3);
+        html+='<span style="color:#d0bcff;font-size:11.5px;">📍 下转 '+nxList.map(function(w){return w.name+' '+(w.date||'').slice(5)+' '+fibWeekday(w.date)+' · 距今'+(w.days_left>=0?w.days_left:0)+'天';}).join(' / ')+'</span>';
       }
       if(!triggered.length && !future.length){
         html+='<span style="color:var(--dim);font-size:11.5px;">当前无在观测窗口</span>';
@@ -5123,7 +5124,7 @@ function renderLimitUpHeatmap(){
         '<div class="hub-sample-rows">'+
           '<div class="hub-sample-row" title="龙 '+escAttr(leadFull)+'"><b style="color:var(--up)">龙</b> '+leadDisp+'</div>'+
           '<div class="hub-sample-row" title="主 '+escAttr(instFull)+'"><b style="color:var(--up)">主</b> '+instDisp+'</div>'+
-          '<div class="hub-sample-row" title="极 '+escAttr(rsiFull)+'"><b style="color:var(--gold)">极</b> '+rsiDisp+'</div>'+
+          '<div class="hub-sample-row" title="超 '+escAttr(rsiFull)+'"><b style="color:var(--gold)">超</b> '+rsiDisp+'</div>'+
           '<div class="hub-sample-row" title="列 '+escAttr(arrFull)+'"><b style="color:var(--gold)">列</b> '+arrDisp+'</div>'+
         '</div>';
     }
