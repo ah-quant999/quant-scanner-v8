@@ -93,11 +93,11 @@ html>
   .quote .price{font-size:32px;font-weight:800}
   .quote .meta{color:var(--sub);font-size:13px}
 
-  .flow-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--border)}
+  .flow-row{display:flex;align-items:center;gap:10px;padding:3px 0;border-bottom:1px dashed var(--border)}
   .flow-row:last-child{border:0}
   .flow-name{width:96px;color:var(--sub);font-size:13px;flex:0 0 auto}
-  .flow-bar{flex:1;height:18px;background:var(--bg2);border-radius:6px;overflow:hidden;position:relative}
-  .flow-fill{height:100%;border-radius:6px}
+  .flow-bar{flex:1;height:4px;background:var(--bg2);border-radius:0;overflow:hidden;position:relative}
+  .flow-fill{height:100%;border-radius:0}
   .flow-val{width:88px;text-align:right;font-variant-numeric:tabular-nums;font-weight:700;flex:0 0 auto}
 
   table{width:100%;border-collapse:collapse;font-size:13px}
@@ -5574,13 +5574,13 @@ function renderLimitUpHeatmap(){
       var arrow=isUp?'▲':'▼';
       var barW=(Math.min((e.vol/maxVol)*100,100)).toFixed(1);
       var amtY=(e.amount/1e8).toFixed(1)+'亿';
-      h+='<div style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:11px;border-bottom:1px solid var(--border);">';
+      h+='<div style="display:flex;align-items:center;gap:6px;padding:3px 0;font-size:11px;border-bottom:1px solid var(--border);">';
       h+='<div style="width:110px;flex-shrink:0;line-height:1.4;">';
       h+='<div style="font-weight:600;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+e.name+'</div>';
       h+='<div style="font-size:10px;color:var(--sub);">'+e.code+'</div>';
       h+='</div>';
-      h+='<div style="flex:1;position:relative;height:18px;background:var(--card2);border-radius:9px;overflow:hidden;">';
-      h+='<div style="position:absolute;left:0;top:0;height:100%;width:'+barW+'%;background:'+barColor+';border-radius:9px;opacity:0.85;"></div>';
+      h+='<div style="flex:1;position:relative;height:4px;background:var(--card2);border-radius:0;overflow:hidden;">';
+      h+='<div style="position:absolute;left:0;top:0;height:100%;width:'+barW+'%;background:'+barColor+';border-radius:0;opacity:0.85;"></div>';
       h+='</div>';
       h+='<div style="width:95px;flex-shrink:0;text-align:right;line-height:1.4;">';
       h+='<div style="color:'+c+';font-weight:700;">'+arrow+' '+Math.abs(e.chg).toFixed(2)+'%</div>';
