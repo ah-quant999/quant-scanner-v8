@@ -3874,12 +3874,13 @@ function switchSec(sec,el){
   if(sec==='ph' && typeof window._renderSecPh==='function') setTimeout(window._renderSecPh,80);
   if(sec==='st' && typeof window._renderSecSt==='function') setTimeout(window._renderSecSt,80);
   // tab 切换后 echarts 实例需要 resize（容器从 display:none 恢复时尺寸为 0）
+  // 250ms 二次 resize：等父级 layout 完成 + ResizeObserver 兜底仍未到时手动补救
   setTimeout(function(){
     if(window._hmCharts) window._hmCharts.forEach(function(c){ try{ c.resize(); }catch(e){} });
     if(window._treeChart) try{ window._treeChart.resize(); }catch(e){}
     if(window.__MFF_CHART_INST) try{ window.__MFF_CHART_INST.resize(); }catch(e){}
     if(window._secPhCharts) window._secPhCharts.forEach(function(c){ try{ c.resize(); }catch(e){} });
-  }, 120);
+  }, 250);
 }
 
 /* ===== 六维雷达 SVG：由 renderSixDim 动态绘制 ===== */
@@ -5388,8 +5389,22 @@ function renderLimitUpHeatmap(){
     if(!__MFF_CHART_INST){
       __MFF_CHART_INST = echarts.init(chartDom, null, { renderer: 'canvas' });
       window.addEventListener('resize', function(){ if(__MFF_CHART_INST) __MFF_CHART_INST.resize(); });
+      // 兜底：display:none 状态下 init 时容器 width=0，需在切到可见 tab 时强制重画。
+      // 监听容器尺寸变化、tab 切到 ph 后 250ms 二次 resize，避免画在 0 宽导致"挤在左半"。
+      if(window.ResizeObserver){
+        try{
+          new ResizeObserver(function(entries){
+            for(var i=0;i<entries.length;i++){
+              var w=entries[i].contentRect.width;
+              if(w>50 && __MFF_CHART_INST){ __MFF_CHART_INST.resize(); break; }
+            }
+          }).observe(chartDom);
+        }catch(e){}
+      }
     }
     __MFF_CHART_INST.setOption(option, true);
+    // 立即 resize 一次：解决"父容器已可见但 chart 仍画在 0 宽"导致的左半挤压
+    try{ __MFF_CHART_INST.resize(); }catch(e){}
   }
 
   /* ---- 5. 板块资金三合一（盘中追热 + 收盘复盘 + 中期趋势） ---- */
