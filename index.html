@@ -4739,45 +4739,27 @@ function renderLimitUpHeatmap(){
         const dd=new Date(dateStr+'T00:00:00+08:00');
         return ['周日','周一','周二','周三','周四','周五','周六'][dd.getDay()]||'';
       };
-      const fibDescMap={'F(3)':'小反弹窗口','F(5)':'短期变盘','F(8)':'8日变盘','F(13)':'13日重要窗口','F(21)':'21日大窗口·中期转折','F(34)':'34日中期窗口·趋势确认','F(55)':'55日长期窗口·大周期拐点'};
       const allWins=(fib.windows||[]).filter(w=>['future','triggered','tracking','active'].includes(w.status));
       const triggered=allWins.filter(w=>w.status==='triggered'||w.status==='tracking'||w.status==='active');
       const future=allWins.filter(w=>w.status==='future');
 
+      // 一行式：「⏱️ F窗口 · 触发 F(21)(06-12) F(55)(07-16) · 下转 F(21) 08-14 (13天)」
       let html='';
-      html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">';
-      html+='<span style="font-weight:700;color:#a78bfa;font-size:13px;">⏱️ F窗口</span>';
-      html+='<span style="margin-left:auto;font-size:10px;color:var(--dim);background:rgba(255,255,255,.04);padding:1px 6px;border-radius:4px;">'+modeLabel+'</span>';
-      html+='</div>';
-      // 1) 已触发 / 追踪
+      html+='<span style="font-weight:700;color:#a78bfa;font-size:12px;">⏱️ F窗口 · '+modeLabel+'</span>';
+
       if(triggered.length){
-        html+='<div style="font-size:12px;color:#1D9E75;margin-bottom:8px;line-height:1.6;">⚡ 已触发/追踪：'+triggered.map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')+'</div>';
-      } else {
-        html+='<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">暂无触发窗口</div>';
+        html+='<span style="color:#1D9E75;font-size:11.5px;">⚡ '+triggered.slice(0,5).map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')+'</span>';
       }
-      // 2) 下个转折点
       if(future.length){
         const nx=future[0];
-        html+='<div style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);border-radius:6px;padding:8px 10px;margin-bottom:8px;">';
-        html+='<div style="font-size:11px;color:var(--sub);margin-bottom:3px;">📍 下个转折点</div>';
-        html+='<div style="font-size:15px;font-weight:700;color:#d0bcff;line-height:1.4;">'+nx.name+' '+(nx.date||'')+' '+fibWeekday(nx.date)+'</div>';
-        html+='<div style="font-size:11px;color:var(--sub);margin-top:3px;">距今 '+(nx.days_left>=0?nx.days_left:0)+' 天 · '+(nx.desc||'')+'</div>';
-        html+='</div>';
-        // 3) 全部待观测窗口
-        html+='<div style="font-size:11px;color:var(--sub);line-height:1.6;margin-bottom:2px;">📅 全部待观测窗口：</div>';
-        html+='<div style="font-size:11px;color:var(--txt);line-height:1.7;">';
-        future.forEach(function(w){
-          html+='<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.06);padding:3px 0;">';
-          html+='<span>'+w.name+' <span style="color:var(--sub);">'+(w.date||'')+' '+fibWeekday(w.date)+'</span> <span style="color:'+(w.desc?'#a78bfa':'var(--dim)')+';font-size:10px;">'+(fibDescMap[w.name]||w.desc||'')+'</span></span>';
-          html+='<span style="color:var(--sub);white-space:nowrap;">距今'+(w.days_left>=0?w.days_left:0)+'天</span>';
-          html+='</div>';
-        });
-        html+='</div>';
-      } else if(!triggered.length){
-        html+='<div style="font-size:12px;color:var(--dim);padding:6px 0;">当前无在观测窗口</div>';
+        html+='<span style="color:#d0bcff;font-size:11.5px;">📍 下转 '+nx.name+' '+(nx.date||'').slice(5)+' '+fibWeekday(nx.date)+' · 距今'+(nx.days_left>=0?nx.days_left:0)+'天</span>';
       }
-      // 容器撑成竖排卡（覆盖 .ph-fib-badge 默认 inline-block 行胶囊样式）
-      badge.style.cssText='display:block;padding:12px 14px;margin-top:10px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.25);border-radius:8px;text-align:left;color:var(--txt);line-height:1.5;';
+      if(!triggered.length && !future.length){
+        html+='<span style="color:var(--dim);font-size:11.5px;">当前无在观测窗口</span>';
+      }
+
+      // 容器撑成单行卡（覆盖 .ph-fib-badge 默认 inline-block 行胶囊样式）
+      badge.style.cssText='display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:8px 12px;margin-top:10px;background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.25);border-radius:8px;text-align:left;color:var(--txt);line-height:1.5;';
       badge.innerHTML=html;
     }
     setTime('phFibTime',fib.update_time);
@@ -4977,12 +4959,8 @@ function renderLimitUpHeatmap(){
         (grindBadge
           ? '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">'+grindBadge+'</div>'
           : '')+
-        '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:'+(isGrind?'8':'10')+'px;">'+
-          '<span class="hub-tag '+(lead.length?'up':'neutral')+'" style="margin:0">龙头合力 '+lead.length+'</span>'+
-          '<span class="hub-tag '+(instIn.length?'up':'neutral')+'" style="margin:0">主力通道 '+instIn.length+'</span>'+
-          '<span class="hub-tag '+(rsiCount?'warn':'neutral')+'" style="margin:0">RSI背离 '+rsiCount+'</span>'+
-          '<span class="hub-tag '+(arr.length?'gold':'neutral')+'" style="margin:0">资金排列 '+arr.length+'</span>'+
-          '<span style="margin-left:auto;font-size:11.5px;color:var(--sub)"><b style="color:'+actionColor+'">'+action+'</b> · '+position+'</span>'+
+        '<div style="margin-top:'+(isGrind?'8':'10')+'px;font-size:11.5px;color:var(--sub);text-align:right;">'+
+          '<b style="color:'+actionColor+'">'+action+'</b> · '+position+
         '</div>';
     }
 
@@ -5002,6 +4980,12 @@ function renderLimitUpHeatmap(){
       const arrHtml = arr.length ? arr.slice(0,3).map(x=>x.name).join(' · ')+'…' : '无';
 
       hubFactorBody.innerHTML =
+        '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;">'+
+          '<span class="hub-tag '+(lead.length?'up':'neutral')+'">龙头合力 '+lead.length+'</span>'+
+          '<span class="hub-tag '+(instIn.length?'up':'neutral')+'">主力通道 '+instIn.length+'</span>'+
+          '<span class="hub-tag '+(rsiCount?'warn':'neutral')+'">RSI背离 '+rsiCount+'</span>'+
+          '<span class="hub-tag '+(arr.length?'gold':'neutral')+'">资金排列 '+arr.length+'</span>'+
+        '</div>'+
         '<div style="font-size:10.5px;color:var(--sub);line-height:1.55;">'+
           '<div><b style="color:var(--up)">龙</b> '+leadHtml+'</div>'+
           '<div><b style="color:var(--up)">主</b> '+instHtml+'</div>'+
