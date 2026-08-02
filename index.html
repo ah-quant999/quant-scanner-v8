@@ -3043,6 +3043,10 @@ window.V8_CAL = {weeks:[],legend:[]};
     var SR = window.SECTOR_RS || {};
     var VOL = window.VOLATILITY || {};
     var IQ = window.INDEX_QUOTES || {};
+    var NF = window.NORTH_FUND || {};
+    var LHB = window.LHB_DATA || {};
+    // 兼容 stocks 字段为 dict/array 两种形态
+    function _rcArr(x){ if(!x) return []; if(Array.isArray(x)) return x; if(typeof x==='object') return Object.values(x); return []; }
 
     var score = CR.score || 50;
     var scoreLvl = score >= 70 ? '高风险' : score >= 50 ? '警戒' : '安全';
@@ -3102,11 +3106,12 @@ window.V8_CAL = {weeks:[],legend:[]};
     // 明日关注
     h += '<div class="insight-card" style="border-left-color:var(--gold)"><h4>⚡ 明日关注</h4>';
     h += '<p>高胜率信号组合，明日开盘重点跟踪标的。</p>';
-    var recStocks = (CAND.stocks || []).slice(0, 5);
+    var candList = _rcArr(CAND.stocks);
+    var recStocks = candList.slice(0, 5);
     if(recStocks.length > 0){
       h += '<div class="insight-list">';
       recStocks.forEach(function(s){
-        var sc = s.score || 0;
+        var sc = s.ema_score || s.score || 0;
         h += '<div class="insight-li"><span>' + _rcEsc(s.name) + '</span><span style="color:'+(sc>=70?'var(--up)':sc>=50?'var(--gold)':'var(--down)')+';font-weight:600">' + sc.toFixed(0) + '分</span></div>';
       });
       h += '</div>';
@@ -3121,8 +3126,8 @@ window.V8_CAL = {weeks:[],legend:[]};
     var riskItems = [];
     if(score >= 70) riskItems.push('危机雷达综合分≥70，系统性风险偏高');
     if(VOL.items && VOL.items[0] && (VOL.items[0].vol_ann||0) > 80) riskItems.push('年化波动率偏高，注意仓位控制');
-    var negStocks = (CAND.stocks || []).filter(function(s){ return (s.change_pct||0) < -5; });
-    if(negStocks.length > 0) riskItems.push(negStocks.length + '只候选股跌幅超5%');
+    var lhbRisk = _rcArr(LHB.stocks).filter(function(s){ return (s.inst_net_万||0)<0 && (s.yz_net_万||0)<0; });
+    if(lhbRisk.length > 0) riskItems.push(lhbRisk.length + '只龙虎榜个股机游共振卖出');
     if(riskItems.length > 0){
       h += '<div class="insight-list">';
       riskItems.forEach(function(r){ h += '<div class="insight-li"><span style="color:var(--down)">●</span><span>' + r + '</span></div>'; });
@@ -3136,7 +3141,7 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     // 机游共振（短线）— 数据源 lhb_data（仅龙虎榜上榜个股，非全市场）
     var _LHB = window.LHB_DATA || {};
-    var _lhb = _LHB.stocks || [];
+    var _lhb = _rcArr(_LHB.stocks);
     function _lyi(w){ return ((w||0)/10000).toFixed(2) + '亿'; }
     h += '<div style="margin-top:16px;font-size:12px;font-weight:700;color:var(--purple);margin-bottom:8px">⚡ 机游共振（短线）· 仅龙虎榜上榜个股</div>';
     h += '<div class="insight-grid" style="grid-template-columns:1fr 1fr 1fr">';
@@ -3178,11 +3183,12 @@ window.V8_CAL = {weeks:[],legend:[]};
     // 机游方向
     h += '<div class="insight-card"><h4>⚡ 机游方向 <span style="font-size:10px;color:var(--purple);font-weight:400">机游共振</span></h4>';
     h += '<p>机构+游资同时净买入方向，短期共识度高。</p>';
-    var jyStocks = (CAND.stocks || []).filter(function(s){ return (s.reasons||[]).some(function(r){ return r.indexOf('机游')!==-1 || r.indexOf('共振')!==-1; }); });
+    var jyStocks = _rcArr(LHB.stocks).filter(function(s){ return (s.inst_net_万||0)>0 && (s.yz_net_万||0)>0; })
+      .sort(function(a,b){ return ((b.inst_net_万||0)+(b.yz_net_万||0))-((a.inst_net_万||0)+(a.yz_net_万||0)); }).slice(0,5);
     if(jyStocks.length > 0){
       h += '<div class="insight-list">';
-      jyStocks.slice(0,5).forEach(function(s){
-        h += '<div class="insight-li"><span>' + _rcEsc(s.name) + '</span><span class="c-purple">' + _rcFmtYi((s.inst_net_万||0)*100) + '</span></div>';
+      jyStocks.forEach(function(s){
+        h += '<div class="insight-li"><span>' + _rcEsc(s.name) + '</span><span class="c-purple">+' + _rcFmtYi(s.inst_net_万+s.yz_net_万) + '</span></div>';
       });
       h += '</div>';
     } else { h += '<div style="color:var(--dim);font-size:11px">暂无机游共振信号</div>'; }
