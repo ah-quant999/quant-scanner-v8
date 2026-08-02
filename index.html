@@ -512,7 +512,7 @@ window.V8_CAL = {weeks:[],legend:[]};
   <div class="tab" data-sec="rt" onclick="switchSec('rt',this)">📡 实时数据</div>
   <div class="tab" data-sec="ph" onclick="switchSec('ph',this)">🌙 盘后数据</div>
   <div class="tab" data-sec="st" onclick="switchSec('st',this)">🎯 选股策略</div>
-  <div class="tab" data-sec="rc" onclick="switchSec('rc',this)">📊 共振日历</div>
+  <div class="tab locked" data-sec="rc" data-lock="1" onclick="guardLock('rc',this)">📊 共振日历 <span class="lk">[锁]</span></div>
   <div class="tab locked" data-sec="op" data-lock="1" onclick="guardLock('op',this)">🔒 运维 <span class="lk">[锁]</span></div>
   <div class="tab locked" data-sec="lg" data-lock="1" onclick="guardLock('lg',this)">📖 逻辑详解 <span class="lk">[锁]</span></div>
 </nav>
@@ -2294,7 +2294,7 @@ window.V8_CAL = {weeks:[],legend:[]};
   <!-- ============ 共振日历（月历格式 · 机游/北向/洞察/猎手） ============ -->
   <!-- ============ 共振日历（全面重构） ============ -->
   <section id="sec-rc">
-    <div class="sec-head"><h2>📊 共振日历</h2><span class="tag">机游共振 · 北向席位 · 每日洞察 · 大牛股猎手</span></div>
+    <div class="sec-head"><h2>📊 共振日历</h2><span class="tag">机游共振 · 北向席位 · 每日洞察 · 大牛股猎手（限管理员）</span></div>
 
     <style>
       .rc-tabs{display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap}
@@ -2395,24 +2395,29 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     <!-- TAB buttons -->
     <div class="rc-tabs">
-      <button class="rc-tab-btn active" onclick="switchRcTab('tab1',this)">📅 共振日历（机游+北向）</button>
-      <button class="rc-tab-btn" onclick="switchRcTab('tab2',this)">🔍 每日洞察</button>
-      <button class="rc-tab-btn" onclick="switchRcTab('tab3',this)">🐂 大牛股猎手</button>
+      <button class="rc-tab-btn active" onclick="switchRcTab('tab1',this)">📅 机游共振日历</button>
+      <button class="rc-tab-btn" onclick="switchRcTab('tab2',this)">🌊 北向席位日历</button>
+      <button class="rc-tab-btn" onclick="switchRcTab('tab3',this)">🔍 每日洞察</button>
+      <button class="rc-tab-btn" onclick="switchRcTab('tab4',this)">🐂 大牛股猎手</button>
     </div>
 
-    <!-- ===== TAB1: 共振日历（机游共振 + 北向资金） ===== -->
+    <!-- ===== TAB1: 机游共振日历 ===== -->
     <div id="rcTab1" class="rc-pane active">
       <div id="jyCalContainer"></div>
-      <div id="northCalContainer" style="margin-top:36px;border-top:1px solid var(--border);padding-top:24px"></div>
     </div>
 
-    <!-- ===== TAB2: 每日洞察 ===== -->
+    <!-- ===== TAB2: 北向席位日历 ===== -->
     <div id="rcTab2" class="rc-pane">
+      <div id="northCalContainer"></div>
+    </div>
+
+    <!-- ===== TAB3: 每日洞察 ===== -->
+    <div id="rcTab3" class="rc-pane">
       <div id="insightContainer"></div>
     </div>
 
-    <!-- ===== TAB3: 大牛股猎手 ===== -->
-    <div id="rcTab3" class="rc-pane">
+    <!-- ===== TAB4: 大牛股猎手 ===== -->
+    <div id="rcTab4" class="rc-pane">
       <div id="hunterContainer"></div>
     </div>
 
@@ -2428,13 +2433,11 @@ window.V8_CAL = {weeks:[],legend:[]};
     if(pane) pane.classList.add('active');
     if(btn) btn.classList.add('active');
     window.__rcActiveTab = tabId;
-    // Lazy render on first visit
-    if(tabId === 'tab1'){
-      if(!window.__jyCalRendered) setTimeout(renderJyCalendar, 30);
-      if(!window.__northCalRendered) setTimeout(renderNorthCalendar, 50);
-    }
-    if(tabId === 'tab2' && !window.__insightRendered){ setTimeout(renderInsight, 30); }
-    if(tabId === 'tab3' && !window.__hunterRendered){ setTimeout(renderHunter, 30); }
+    // Lazy render on first visit（机游/北向已拆成独立 tab）
+    if(tabId === 'tab1' && !window.__jyCalRendered){ setTimeout(renderJyCalendar, 30); }
+    if(tabId === 'tab2' && !window.__northCalRendered){ setTimeout(renderNorthCalendar, 30); }
+    if(tabId === 'tab3' && !window.__insightRendered){ setTimeout(renderInsight, 30); }
+    if(tabId === 'tab4' && !window.__hunterRendered){ setTimeout(renderHunter, 30); }
   }
 
   /* ===== 工具函数 ===== */
@@ -3873,6 +3876,8 @@ function switchSec(sec,el){
   // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
   if(sec==='ph' && typeof window._renderSecPh==='function') setTimeout(window._renderSecPh,80);
   if(sec==='st' && typeof window._renderSecSt==='function') setTimeout(window._renderSecSt,80);
+  // 共振日历：进入时确保默认 tab1（机游共振）渲染（rcTab1 默认 active，但 switchRcTab 仅在点 tab 时触发）
+  if(sec==='rc' && typeof window.switchRcTab==='function') setTimeout(function(){ try{ window.switchRcTab('tab1', document.querySelector('.rc-tab-btn.active')); }catch(e){} }, 30);
   // tab 切换后 echarts 实例需要 resize（容器从 display:none 恢复时尺寸为 0）
   // 250ms 二次 resize：等父级 layout 完成 + ResizeObserver 兜底仍未到时手动补救
   setTimeout(function(){
