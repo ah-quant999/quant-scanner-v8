@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+<!DOCTYPE 
+html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8" />
@@ -686,7 +687,7 @@ window.V8_CAL = {weeks:[],legend:[]};
 
       <!-- Block 1: 盘中异动·量能脉冲 (顶, T+0) -->
       <div class="sf-block sf-block-hot">
-        <div class="sf-block-title"><span class="sf-block-icon">⚡</span>盘中异动·量能脉冲 <span style="font-size:10px;color:var(--dim)">T+0·5分钟级</span></div>
+        <div class="sf-block-title"><span class="sf-block-icon">⚡</span>盘中异动·量能脉冲 <span style="font-size:10px;color:var(--dim)">T+0·量比突增</span></div>
         <div id="etfPulseBlock"><div class="ipo-empty">加载中…</div></div>
       </div>
 
@@ -707,863 +708,70 @@ window.V8_CAL = {weeks:[],legend:[]};
       <div class="note">盘中异动=ETF 5 分钟量能脉冲异动；资金热度=宽基 ETF 净申赎份额趋势；日监控=全市场 ETF 当日主力净流入排名（需盘后 T+1 更新）。三者维度互补，不构成重复。</div>
     </div>
 
-    <!-- 热力矩阵（满宽一行） -->
-    <div class="card" style="margin-bottom:16px">
+    <script
 
-      <!-- 🗺️ 热力矩阵（Wind 风 treemap：概念/行业/核心指数 三栏） -->
-      <h3><span class="ic">🗺️</span>热力矩阵 · 概念 / 行业 / 指数 · <span class="fresh" id="hmUpdateTime">更新于 --</span></h3>
-      <div id="heatmapMatrix" style="min-height:280px;"></div>
-      <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:6px;flex-wrap:wrap;align-items:center;">
-        <span><b style="color:var(--up)">■</b> 涨 &nbsp;<b style="color:var(--down)">■</b> 跌</span>
-        <span>面积≈净流入/市值 &nbsp; 色深=幅度</span>
+    <!-- 概念资金热力图 · 大小=净流入 · 颜色=涨跌 -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🗺️</span>概念资金热力图 · <span class="fresh" id="conceptMapTime">更新于 --</span></h3>
+      <div id="conceptTreemap" style="min-height:160px;"><div class="ipo-empty">加载中…</div></div>
+      <div style="display:flex;gap:12px;font-size:11px;color:var(--dim);margin-top:8px;align-items:center;flex-wrap:wrap;">
+        <span>方块面积 ≈ |主力净流入|</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:var(--up);border-radius:2px;"></span> 涨</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:var(--down);border-radius:2px;"></span> 跌</span>
       </div>
     </div>
 
-    <!-- 行业树图（满宽一行） -->
+    <script>
+    /* 概念资金热力图渲染（CONCEPT_RANKING.js → CSS flex 方块） */
+    (function(){
+      const $=id=>document.getElementById(id);
+      function fmt(v){ return v==null||isNaN(v)?'--':Number(v).toFixed(2); }
+      function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
+      function renderConceptTreemap(){
+        const d=window.CONCEPT_RANKING;
+        const el=$('conceptTreemap');
+        if(!el) return;
+        if(!d || !d.items || !d.items.length){
+          el.innerHTML='<div class="ipo-empty">暂无概念数据</div>'; return;
+        }
+        const items=d.items.slice().sort((a,b)=>Math.abs(b.net)-Math.abs(a.net)).slice(0,30);
+        const maxArea=Math.sqrt(Math.abs(items[0].net)||1);
+        let h='<div style="display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start;">';
+        items.forEach(it=>{
+          const up=it.chg>0, down=it.chg<0;
+          const bg=up?'var(--up)':down?'var(--down)':'var(--dim)';
+          const txt=up||down?'#fff':'var(--txt)';
+          const area=Math.sqrt(Math.abs(it.net))/maxArea;
+          const px=Math.max(44, Math.round(area*110));
+          const netTxt=(it.net>0?'+':'')+fmt(it.net);
+          h+='<div style="width:'+px+'px;height:'+px+'px;background:'+bg+';color:'+txt+';border-radius:6px;padding:5px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;font-size:11px;line-height:1.25;box-shadow:0 1px 3px rgba(0,0,0,.25);overflow:hidden;">';
+          h+='<div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;">'+esc(it.name)+'</div>';
+          h+='<div style="font-size:10px;opacity:.9;">'+(it.chg>0?'+':'')+fmt(it.chg)+'% · '+netTxt+'</div>';
+          h+='</div>';
+        });
+        h+='</div>';
+        el.innerHTML=h;
+        const mt=$('conceptMapTime');
+        if(mt) mt.textContent='更新于 '+rel(d.update_time);
+      }
+      function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+      if(document.readyState==='loading')
+        document.addEventListener('DOMContentLoaded', renderConceptTreemap);
+      else renderConceptTreemap();
+    })();
+    </script>
+
+    <!-- 行业树图 · 细分赛道 -->
     <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🏭</span>行业树图 · 行业→候选股双层 · <span class="fresh" id="htUpdateTime">更新于 --</span></h3>
-      <div id="industryTreemap" style="min-height:280px;"></div>
+      <h3><span class="ic">🏭</span>行业树图 · 细分赛道 · <span class="fresh" id="htUpdateTime">更新于 --</span></h3>
+      <div id="industryTreemap" style="min-height:260px;"></div>
       <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:6px;flex-wrap:wrap;align-items:center;">
         <span>大块=行业 &nbsp; 小块=个股</span>
         <span>颜色=涨跌 &nbsp; 面积≈市值</span>
       </div>
     </div>
-
-    <script>
-    /* ===== 热力矩阵：Wind 风 treemap（概念/行业/指数 三栏并列） ===== */
-    (function(){
-      const $=id=>document.getElementById(id);
-      function fmt(v){ return v==null||isNaN(v)?'--':Number(v).toFixed(2); }
-      function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
-
-      /* 涨跌色映射（匹配 v8 红涨绿跌暗色主题） */
-      function heatColor(v){
-        var x=parseFloat(v)||0;
-        if(x>0){ var t=Math.min(1,x/6); return {c:'rgb('+Math.round(244-80*t)+','+Math.round(73-20*t)+','+Math.round(93-30*t)+')', t:'#fff'}; }
-        if(x<0){ var t=Math.min(1,Math.abs(x)/6); return {c:'rgb('+Math.round(31+15*t)+','+Math.round(209-60*t)+','+Math.round(123-40*t)+')', t:'#111'}; }
-        return {c:'#2a3548',t:'#8899aa'};
-      }
-
-      function makeTreemapOption(titleText, dataList, valueField, nameField, chgField, extraLabel){
-        var children=dataList.map(function(it){
-          var v=parseFloat(it[valueField])||0;
-          var c=parseFloat(it[chgField])||0;
-          var hc=heatColor(c);
-          var labelStr=esc(it[nameField]||'')+'\n'+(c>=0?'+':'')+fmt(c)+'%';
-          if(extraLabel) labelStr+='\n'+extraLabel(it);
-          return {
-            name: it[nameField]||'', value: Math.abs(v)||Math.abs(c)||1,
-            itemStyle:{color:hc.c},
-            label:{color:hc.t, fontSize:11, formatter:function(p){return labelStr;}},
-            tooltip:{formatter:function(p){
-              return '<b>'+p.name+'</b><br/>涨跌幅: '+(c>=0?'+':'')+fmt(c)+'%<br/>'+(extraLabel?extraLabel(it):'');
-            }}
-          };
-        });
-        return {
-          tooltip:{trigger:'item', backgroundColor:'rgba(18,24,38,.95)', borderColor:'#334155',
-            textStyle:{color:'#e2e8f0',fontSize:12}, confine:true},
-          series:[{
-            type:'treemap', width:'100%', height:'100%',
-            roam:false, nodeClick:false,
-            breadcrumb:{show:false},
-            label:{show:true, fontSize:10, color:'#ccc'},
-            upperLabel:{show:true, height:22, fontSize:12, color:'#fff', fontWeight:'bold',
-              formatter:function(p){return p.name;}},
-            itemStyle:{gapWidth:2, borderColor:'#141c2b', borderWidth:2,
-              shadowColor:'rgba(0,0,0,.3)', shadowBlur:4},
-            levels:[{
-              itemStyle:{gapWidth:2, borderColor:'#141c2b', borderWidth:2},
-              upperLabel:{show:true}
-            },{
-              itemStyle:{gapWidth:1, borderColor:'#1a2332', borderWidth:1}
-            }],
-            data:children.length?children:[{name:'暂无数据',value:1,itemStyle:{color:'#2a3548'}}]
-          }]
-        };
-      }
-
-      function renderHeatmap(){
-        var el=$('heatmapMatrix');
-        if(!el || typeof echarts==='undefined') return;
-
-        var concept=(window.CONCEPT_RANKING||{}).items||[];
-        var sectorData=window.SECTOR_RS;
-        var idxItems=(window.INDEX_QUOTES||{}).items||[];
-
-        // 三栏容器：用 HTML 分三列，每列一个 echarts instance
-        el.innerHTML='<div style="display:flex;gap:4px;height:280px;">'+
-          '<div id="hmConcept" style="flex:1.2;min-height:0;"></div>'+
-          '<div id="hmSector" style="flex:1;min-height:0;"></div>'+
-          '<div id="hmIndex" style="flex:.8;min-height:0;"></div>'+
-          '</div>';
-
-        // --- 概念 treemap（按净流入排序 top16） ---
-        var cList=concept.slice().sort(function(a,b){return Math.abs(b.net||0)-Math.abs(a.net||0)}).slice(0,16);
-        var cOpt=makeTreemapOption('热门概念', cList, 'net', 'name', 'chg', function(it){
-          var n=parseFloat(it.net)||0;
-          return '净入'+(n>=0?'+':'')+fmt(n)+'亿';
-        });
-        var cChart=echarts.init(document.getElementById('hmConcept'));
-        cChart.setOption(cOpt);
-
-        // --- 行业 treemap（按|涨跌|排序） ---
-        var sList=[];
-        if(sectorData && sectorData.sectors){
-          var sectorsArr=Array.isArray(sectorData.sectors)?sectorData.sectors:Object.values(sectorData.sectors);
-          sectorsArr.forEach(function(s){
-            if(s && typeof s==='object') sList.push({name:s.name||'', pct_day:s.pct_day||0, rs_5:s.rs_5||0, rs_20:s.rs_20||0});
-          });
-          sList.sort(function(a,b){return Math.abs(b.pct_day)-Math.abs(a.pct_day)});
-        }
-        var sOpt=makeTreemapOption('申万行业', sList, 'rs_5', 'name', 'pct_day', function(it){
-          return '5日:'+fmt(it.rs_5||0)+'%  20日:'+fmt(it.rs_20||0)+'%';
-        });
-        var sChart=echarts.init(document.getElementById('hmSector'));
-        sChart.setOption(sOpt);
-
-        // --- 核心指数 treemap ---
-        var iMap={};
-        idxItems.forEach(function(it){ iMap[it.code]=it; });
-        var iNames=[{c:'000001',l:'沪指'},{c:'399001',l:'深成指'},{c:'399006',l:'创业板'},{c:'000688',l:'科创板'},
-                    {c:'000300',l:'沪深300'},{c:'000016',l:'上证50'},{c:'000905',l:'中证500'},{c:'000852',l:'中证1000'}];
-        var iList=[];
-        iNames.forEach(function(o){ var it=iMap[o.c]; if(it) iList.push({name:o.l, chg:it.chg||0, mv:(it.total_mv||it.mv||0)}); });
-        var iOpt=makeTreemapOption('核心指数', iList, 'mv', 'name', 'chg', function(it){
-          var m=parseFloat(it.mv)||0;
-          return m>10000?'市值'+(m/10000).toFixed(1)+'万亿':'市值'+fmt(m)+'亿';
-        });
-        var iChart=echarts.init(document.getElementById('hmIndex'));
-        iChart.setOption(iOpt);
-
-        // 更新时间
-        var cr=window.CONCEPT_RANKING;
-        if(cr && cr.update_time) $('hmUpdateTime').textContent='更新于 '+rel(cr.update_time);
-
-        // resize 响应
-        window._hmCharts=[cChart,sChart,iChart];
-        setTimeout(function(){ cChart.resize();sChart.resize();iChart.resize(); },100);
-      }
-
-      function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-
-      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderHeatmap);
-      else renderHeatmap();
-      window.addEventListener('resize', function(){ if(window._hmCharts) window._hmCharts.forEach(function(c){ try{c.resize();}catch(e){} }); });
-    })();
-    </script>
-
-    <script>
-    /* ===== 行业树图：双层 treemap（行业→候选股嵌套） ===== */
-    (function(){
-      const $=id=>document.getElementById(id);
-      function fmt(v){ return v==null||isNaN(v)?'--':Number(v).toFixed(2); }
-      function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
-
-      function heatColor(v){
-        var x=parseFloat(v)||0;
-        if(x>0){ var t=Math.min(1,x/7); return 'rgb('+Math.round(244-60*t)+','+Math.round(73-15*t)+','+Math.round(93-20*t)+')'; }
-        if(x<0){ var t=Math.min(1,Math.abs(x)/7); return 'rgb('+Math.round(31+10*t)+','+Math.round(209-50*t)+','+Math.round(123-30*t)+')'; }
-        return '#2a3548';
-      }
-
-      function renderIndustryTree(){
-        var el=$('industryTreemap');
-        if(!el || typeof echarts==='undefined') return;
-
-        var sectorData=window.SECTOR_RS;
-        var candQuotes=(window.CANDIDATE_QUOTES||{}).items||[];
-        var candidateStocks=(window.CANDIDATE||{}).stocks||{};
-
-        if(!sectorData || !sectorData.sectors){
-          el.innerHTML='<div class="ipo-empty">暂无行业数据</div>'; return;
-        }
-
-        // 按 industry 分组候选股
-        var byIndustry={};
-        Object.keys(candidateStocks).forEach(function(k){
-          var s=candidateStocks[k];
-          var ind=s.industry||s.sector||'其他';
-          if(!byIndustry[ind]) byIndustry[ind]=[];
-          byIndustry[ind].push({code:s.code||k, name:s.name||k});
-        });
-
-        // 构建候选股 code→quote 映射
-        var qMap={};
-        candQuotes.forEach(function(q){ qMap[q.code]=q; });
-
-        var sectors=sectorData.sectors;
-        var sectorsArr=Array.isArray(sectors)?sectors:Object.values(sectors);
-
-        // 构建 treemap 层级数据
-        var treeData=[];
-        var sortedSectors=sectorsArr.slice().sort(function(a,b){
-          return Math.abs((b||{}).pct_day||0)-Math.abs((a||{}).pct_day||0);
-        });
-
-        sortedSectors.forEach(function(sec){
-          if(!sec || typeof sec!=='object') return;
-          var indName=sec.name||'其他';
-          var secChg=sec.pct_day||0;
-          var stocks=byIndustry[indName]||[];
-
-          var children=[];
-          if(stocks.length){
-            stocks.forEach(function(st){
-              var q=qMap[st.code];
-              var sc=q?q.chg:0;
-              var mv=q?q.total_mv:1;
-              children.push({
-                name:st.name,
-                value:Math.max(mv||1, 0.5),
-                itemStyle:{color:heatColor(sc)},
-                label:{fontSize:9, color:Math.abs(sc)>2?(sc>0?'#fff':'#111'):'#ccc',
-                  formatter:function(p){return p.name+'\n'+(sc>=0?'+':'')+fmt(sc)+'%';}},
-                tooltip:{formatter:function(p){
-                  return '<b>'+p.name+'</b> ('+(st.code||'')+')<br/>涨跌幅: '+(sc>=0?'+':'')+fmt(sc)+'%<br/>现价: '+fmt(q?q.price:0);
-                }}
-              });
-            });
-          }
-
-          // 行业节点本身：以 |涨跌幅| 为基础权重，有候选股加成
-          var baseVal = Math.max(Math.abs(secChg), 0.5);
-          var childVal = children.length ? children.reduce(function(s,c){return s+(c.value||0);},0) : 0;
-          treeData.push({
-            name:indName+'  '+(secChg>=0?'+':'')+fmt(secChg)+'%',
-            value: Math.max(baseVal * 10 + childVal, 1),
-            itemStyle:{color:heatColor(secChg)},
-            children:children.length?children:undefined,
-            label:{fontSize:12, color:'#fff', fontWeight:'bold',
-              formatter:function(p){var n=p.name.split('  ');return n[0];}},
-            tooltip:{formatter:function(){
-              return '<b>'+indName+'</b><br/>行业涨跌: '+(secChg>=0?'+':'')+fmt(secChg)+'%<br/>候选股: '+stocks.length+'只';
-            }}
-          });
-        });
-
-        var chart=echarts.init(el);
-        chart.setOption({
-          tooltip:{trigger:'item', backgroundColor:'rgba(18,24,38,.95)', borderColor:'#334155',
-            textStyle:{color:'#e2e8f0',fontSize:11}, confine:true},
-          series:[{
-            type:'treemap', width:'98%', height:'260px',
-            roam:true, nodeClick:false,
-            breadcrumb:{show:false},
-            visibleMin:3,
-            label:{show:true, fontSize:10, color:'#ccc'},
-            upperLabel:{show:true, height:20, fontSize:11, color:'#fff', fontWeight:'bold',
-              formatter:function(p){var s=p.name.split('  ');return s[s.length-1]||p.name;}},
-            itemStyle:{gapWidth:2, borderColor:'#141c2b', borderWidth:2,
-              shadowColor:'rgba(0,0,0,.25)', shadowBlur:3},
-            levels:[
-              { itemStyle:{gapWidth:3, borderColor:'#0f1624', borderWidth:2}, upperLabel:{show:true, fontSize:12} },
-              { itemStyle:{gapWidth:1, borderColor:'#1a2332', borderWidth:1}, label:{fontSize:9} }
-            ],
-            data:treeData.length?treeData:[{name:'暂无数据',value:1,itemStyle:{color:'#2a3548'}}]
-          }]
-        });
-
-        window._treeChart=chart;
-        setTimeout(function(){ chart.resize(); },150);
-
-        var cq=window.CANDIDATE_QUOTES;
-        if(cq && cq.update_time) $('htUpdateTime').textContent='更新于 '+rel(cq.update_time);
-        else if(sectorData && sectorData.update_time) $('htUpdateTime').textContent='更新于 '+rel(sectorData.update_time);
-      }
-
-      function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderIndustryTree);
-      else renderIndustryTree();
-      window.addEventListener('resize', function(){ if(window._treeChart) try{window._treeChart.resize();}catch(e){} });
-    })();
-    </script>
-
-  </section>
-
-  <!-- ============ 盘后数据 ============ -->
-  <section id="sec-ph">
-    <div class="sec-head"><h2>🌙 盘后数据</h2><span class="tag" id="phTag">T+1 收盘后生成 · 最后更新 --</span></div>
-
-    <!-- ========== 决策中枢：战略→战术→选股 ========== -->
-    <div class="card hub-card" style="margin-bottom:16px">
-      <h3><span class="ic">🧭</span>决策中枢 · 战略→战术→选股 <span class="fresh" id="hubTime">更新于 --</span></h3>
-      <div id="hubBody">
-        <div class="hub-verdict" id="hubVerdict">
-          <div class="hub-loading">加载中…</div>
-        </div>
-        <div class="grid g-3 hub-layers">
-          <div class="hub-layer hub-macro">
-            <div class="hub-layer-title">🌍 宏观展望 · 战略层</div>
-            <div class="hub-cycle" id="hubCycle">--</div>
-            <div class="hub-layer-body" id="hubMacroBody">--</div>
-          </div>
-          <div class="hub-layer hub-tactical">
-            <div class="hub-layer-title">🎯 战术驾驶舱</div>
-            <div class="hub-score-row" id="hubTacticalScore">--</div>
-            <div class="hub-layer-body" id="hubTacticalBody">--</div>
-          </div>
-          <div class="hub-layer hub-factor">
-            <div class="hub-layer-title">⚡ 因子信号 · 选股层</div>
-            <div class="hub-factor-count" id="hubFactorCount">--</div>
-            <div class="hub-layer-body" id="hubFactorBody">即将接入日线因子模块</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 盘后概览：市场温度计分项 / 六维共振雷达 -->
-    <div class="grid g-2" style="margin-bottom:16px">
-      <div class="card">
-        <h3><span class="ic">🌡️</span>市场温度计 · 分项 <span class="fresh" id="phThermoTime">更新于 --</span></h3>
-        <div id="phThermoBody"><div class="ipo-empty">加载中…</div></div>
-      </div>
-      <div class="card">
-        <h3><span class="ic">🕸️</span>六维共振雷达 · 战术层 <span class="fresh" id="phRadarTime">更新于 --</span></h3>
-        <svg class="radar" style="display:block;margin:0 auto" width="220" height="200" viewBox="-110 -110 220 220" id="radar"></svg>
-      </div>
-    </div>
-
-    <!-- 资金流时间轴 · v6 一年样式（ECharts 双轴：单日柱状 + 累计折线） -->
-    <div class="card" id="marketFundFlowCard" style="margin-bottom:16px">
-      <h3><span class="ic">📊</span>资金流时间轴 · 中长线 · <span class="fresh" id="mffTime">更新于 --</span></h3>
-      <div style="padding:10px 14px;">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
-          <span style="font-size:11px;color:var(--dim);">时间范围:</span>
-          <button class="mff-range-btn" data-range="60"  style="padding:3px 12px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub);">60日</button>
-          <button class="mff-range-btn" data-range="120" style="padding:3px 12px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub);">120日</button>
-          <button class="mff-range-btn" data-range="250" style="padding:3px 12px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub);">1年</button>
-          <button class="mff-range-btn" data-range="all" style="padding:3px 12px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub);">全部</button>
-          <span style="width:1px;height:14px;background:var(--border);margin:0 2px;"></span>
-          <span style="font-size:11px;color:var(--dim);">显示:</span>
-          <button class="mff-series-btn" data-series="daily" style="padding:3px 10px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub);">单日净流入</button>
-          <span style="font-size:11px;color:var(--dim);">+</span>
-          <button class="mff-series-btn" data-series="cum" style="padding:3px 10px;border-radius:14px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub);">累计</button>
-          <span id="mffSummary" style="font-size:11px;color:var(--dim);margin-left:auto;"></span>
-        </div>
-        <div id="mffChart" style="width:100%;height:480px;"></div>
-        <div style="margin-top:6px;font-size:11px;color:var(--dim);line-height:1.5;">
-          📌 口径说明：累计净流入 = 上证指数（000001）单日主力资金净流入的滚动累加；数据覆盖沪市全市场成分股，非仅宽基ETF。
-        </div>
-      </div>
-    </div>
-
-    <!-- 斐波那契窗口 -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📉</span>斐波那契窗口 · 当前回调状态 - 中长线 · <span class="fresh" id="phFibTime">更新于 --</span></h3>
-      <div class="ph-fib-grid" id="phFibGrid">
-        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibDays">--</div><div class="ph-fib-lbl">已回调交易日</div></div>
-        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibPct">--</div><div class="ph-fib-lbl">累计跌幅</div></div>
-        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibPoints">--</div><div class="ph-fib-lbl">下跌点数</div></div>
-        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibNext">--</div><div class="ph-fib-lbl" id="phFibNextLbl">下一窗口跟踪</div></div>
-      </div>
-      <div class="ph-fib-badge" id="phFibBadge">--</div>
-    </div>
-
-    <!-- 板块资金三合一（v6 风格移植：盘中追热 + 收盘复盘 + 中期趋势） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📈</span>板块资金三合一 - 盘中+盘后+趋势 · <span class="fresh" id="phSectorTime">更新于 --</span></h3>
-
-      <!-- Block 1: 盘中追热 -->
-      <div class="sf-block sf-block-hot">
-        <div class="sf-block-title"><span class="sf-block-icon">🚀</span>盘中追热</div>
-        <div id="sfBlock1"><div class="ipo-empty">加载中…</div></div>
-      </div>
-
-      <!-- Block 2: 收盘复盘 -->
-      <div class="sf-block sf-block-close">
-        <div class="sf-block-title"><span class="sf-block-icon">🔥</span>收盘复盘</div>
-        <div id="sfBlock2"><div class="ipo-empty">加载中…</div></div>
-      </div>
-
-      <!-- Block 3: 中期趋势 -->
-      <div class="sf-block sf-block-trend">
-        <div class="sf-block-title"><span class="sf-block-icon">📊</span>中期趋势</div>
-        <div id="sfBlock3"><div class="ipo-empty">加载中…</div></div>
-      </div>
-    </div>
-
-    <!-- 宏观观测 -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🌍</span>宏观观测 - 中长线 · <span class="fresh" id="phMacroTime">更新于 --</span></h3>
-      <div id="phMacroBody"><div class="ipo-empty">加载中…</div></div>
-    </div>
-  </section>
-
-  <!-- ============ 选股策略 · 三重共识 + 历史追踪 ============ -->
-  <section id="sec-st">
-    <div class="sec-head"><h2>🎯 选股策略 · 三重共识</h2><span class="tag">主站TOP10≥70 · 驾驶舱A档 · 基本面A档 · 入选即跟踪</span></div>
-    <!-- TAB 按钮行（横排，独立于内容区） -->
-    <div class="st-tabs">
-      <button class="st-tab active" data-st="query" onclick="switchSt('query')">🔍 个股查询</button>
-      <button class="st-tab" data-st="tc" onclick="switchSt('tc')">🥇 三重共识</button>
-      <button class="st-tab" data-st="cockpit" onclick="switchSt('cockpit')">🎯 驾驶舱</button>
-      <button class="st-tab" data-st="allsite" onclick="switchSt('allsite')">🌐 全站精选</button>
-      <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头</button>
-    </div>
-
-    <!-- ===== TAB 页面：个股查询 ===== -->
-    <div id="st-query" class="st-pane active">
-      <div class="card">
-        <h3><span class="ic">🔍</span>个股查询 · 全站扩展信息</h3>
-        <div class="query-search-box" style="display:flex;gap:10px;margin-bottom:16px;background:linear-gradient(135deg,rgba(0,188,212,.12),rgba(56,189,248,.08));padding:14px 18px;border-radius:10px;box-shadow:0 1px 6px rgba(56,189,248,.1);position:relative;border:1px solid var(--border);">
-          <div style="position:relative;flex:1;">
-            <input type="text" id="v8QueryInput" placeholder="输入股票代码、拼音首字母或名称，如 600000、hlzj、茅台" onkeydown="if(event.key==='Enter')doV8Query()" oninput="showV8QueryDropdown(this.value)" onfocus="if(this.value.trim())showV8QueryDropdown(this.value)" style="width:100%;padding:11px 15px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;outline:none;transition:border-color .2s;background:var(--card);color:var(--txt);box-sizing:border-box;" />
-            <div id="v8QueryDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);border:1.5px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:320px;overflow-y:auto;z-index:1000;box-shadow:0 4px 16px rgba(0,0,0,.24);"></div>
-          </div>
-          <button class="btn" onclick="doV8Query()">查询分析</button>
-        </div>
-        <div id="v8QueryResult"></div>
-
-        <div style="padding:12px 16px;margin-top:10px;background:linear-gradient(135deg,rgba(0,188,212,.1),rgba(56,189,248,.06));border-radius:10px;border:1px solid var(--border);">
-          <div style="font-size:13px;color:var(--txt);margin-bottom:4px;"><strong>查询格式：</strong>输入股票代码、拼音首字母或中文名称</div>
-          <div style="font-size:13px;color:var(--txt);"><strong>覆盖范围：</strong>A股（主板 / 创业板 / 科创板 / 北交所）+ 港股 + 指数 + ETF，共 7000+ 只</div>
-        </div>
-
-        <div style="margin-top:12px;padding:12px 14px;background:var(--card);border-radius:10px;border:1px solid var(--border);">
-          <div style="font-size:13px;color:var(--cyan);font-weight:700;margin-bottom:10px;">查询结果包含以下扩展信息（需该股被收录）：</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;font-size:12px;line-height:1.6;">
-            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--purple);margin-bottom:4px;">🧬 三重共识 <span style="font-size:10px;color:var(--gold);font-weight:500;">● 数据滞后</span></div>
-              <div style="color:var(--sub);">每日综合评分，≥80分精选 / ≥70分观察；当前数据源停在 2026-07-30，新数据待 v6 跑批后同步</div>
-            </div>
-            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--up);margin-bottom:4px;">⭐ 金股池 <span style="font-size:10px;color:var(--down);font-weight:500;">● 213只</span></div>
-              <div style="color:var(--sub);">信号四格条（缠论买C/金钻黄柱J/机构变红I/上涨趋势T），EMA趋势评分0~7；覆盖部分活跃股</div>
-            </div>
-            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--cyan);margin-bottom:4px;">🐉 龙虎榜 <span style="font-size:10px;color:var(--down);font-weight:500;">● 72条</span></div>
-              <div style="color:var(--sub);">上榜日期 + 分类（机游共振/机构独买/游资独买/不达标）+ 机构净买额 + 游资净买额</div>
-            </div>
-            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--up);margin-bottom:4px;">💰 主力资金 <span style="font-size:10px;color:var(--gold);font-weight:500;">● 部分覆盖</span></div>
-              <div style="color:var(--sub);">机构席位净买卖 + 连续净流入统计（覆盖部分活跃股，非全市场）</div>
-            </div>
-            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--cyan);margin-bottom:4px;">📈 近10日走势</div>
-              <div style="color:var(--sub);">日线收盘价折线图（红涨绿跌），快速判断短期趋势方向</div>
-            </div>
-            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--gold);margin-bottom:4px;">📊 EMA趋势确认</div>
-              <div style="color:var(--sub);">6条EMA均线（5~120日）多空排列方向，均线发散收窄判断趋势强度</div>
-            </div>
-            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--gold);margin-bottom:4px;">🏦 投行覆盖 <span style="font-size:10px;color:var(--down);font-weight:500;">● 28条</span></div>
-              <div style="color:var(--sub);">国际投行立场（看多/看空/中性）+ 北向覆盖等标签；覆盖外资研报触及的个股</div>
-            </div>
-            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--down);margin-bottom:4px;">🚫 停牌识别 <span style="font-size:10px;color:var(--down);font-weight:500;">● 12条</span></div>
-              <div style="color:var(--sub);">当前停牌状态 + 已停牌天数 + 停牌原因（重大事项/异常波动等）</div>
-            </div>
-          </div>
-          <div style="margin-top:10px;font-size:11px;color:var(--dim);line-height:1.6;">
-            注：📰 研报覆盖 已下线（数据源仅 26 条且停在 2026-07-27，覆盖率过低，不再展示）。个股查询数据源每日 16:45 从 v6 同步，盘前 08:40 同步预警类数据。
-          </div>
-        </div>
-      </div>
-    </div><!--/st-query-->
-
-    <!-- ===== TAB 页面：三重共识（默认展示） ===== -->
-    <div id="st-tc" class="st-pane">
-      <div class="card">
-        <h3><span class="ic">🥇</span>严格三重共识 - 盘后 · <span class="fresh" id="tcTime">更新于 --</span><span class="fresh" id="tcDataTime" style="margin-left:8px;font-weight:400;"></span></h3>
-        <div id="tcConsensus" class="tp-stocklist"></div>
-        <div class="note">筛选：主站TOP10≥70 且 驾驶舱A档 且 基本面A档。下方「优先/扩展观察」为差1步/差2步备选（主站评分≥75）。</div>
-      </div>
-      <div class="card">
-        <h3><span class="ic">🎯</span>优先观察（差1步）· <span class="fresh" id="tcNearCount">0</span></h3>
-        <div id="tcPriority" class="tp-stocklist"></div>
-      </div>
-      <div class="card">
-        <h3><span class="ic">🔮</span>扩展观察（差2步）· <span class="fresh" id="tcExtCount">0</span></h3>
-        <div id="tcExtended" class="tp-stocklist"></div>
-      </div>
-      <div class="card">
-        <h3><span class="ic">📈</span>持仓盈亏跟踪 - <span class="fresh" id="ttTime">更新于 --</span></h3>
-        <div class="note">入选以来涨跌 = 入选首日收盘价 → 最新收盘价；持有/连续天数来自本地逐日累积快照。</div>
-        <table id="ttTrack"><thead><tr><th style="width:22%">名称</th><th>状态</th><th>入选日</th><th>持有</th><th>连续</th><th>入选以来</th><th>基本面</th></tr></thead><tbody id="ttTrackBody"></tbody></table>
-      </div>
-      <div class="card">
-        <h3><span class="ic">🔔</span>状态迁移 &amp; 告警 · <span class="fresh" id="ttAlertCount">0</span></h3>
-        <div id="ttAlerts"></div>
-      </div>
-      <div class="card">
-        <h3><span class="ic">🧪</span>催化剂兑现追踪 - 盘后</h3>
-        <div class="note">源自基本面季报/重组消息面。已兑现=价涨≥3%；走弱=回撤≥3%；否则观察中。</div>
-        <div id="ttCatalyst"></div>
-      </div>
-      <div class="card">
-        <h3><span class="ic">📊</span>回测 N 日胜率（信号层） - 历史</h3>
-        <div class="note" id="ttBackNote">加载中…</div>
-        <table id="ttBack"><thead><tr><th>持有期</th><th>样本</th><th>胜率</th><th>平均收益</th><th>夏普</th><th>最佳</th><th>最差</th></tr></thead><tbody id="ttBackBody"></tbody></table>
-      </div>
-      <div class="card">
-        <h3><span class="ic">⚖️</span>严格 vs 宽松 - 历史</h3>
-        <div class="note">严格=总评分≥70共振；宽松=信号≥2。同口径 baostock 真实收盘价滚动回测。</div>
-        <table id="ttSvl"><thead><tr><th>持有期</th><th>严格胜率</th><th>严格均收</th><th>宽松胜率</th><th>宽松均收</th></tr></thead><tbody id="ttSvlBody"></tbody></table>
-      </div>
-      <div class="card">
-        <h3><span class="ic">🎚</span>阈值敏感性 - 历史</h3>
-        <div class="note">不同总评分门槛的 5 日回测表现（不改动实盘规则，仅测试）。样本少时结论仅供参考。</div>
-        <table id="ttThr"><thead><tr><th>门槛</th><th>样本</th><th>5日胜率</th><th>5日均收</th><th>最佳胜率</th><th>最佳持有</th></tr></thead><tbody id="ttThrBody"></tbody></table>
-      </div>
-      <div class="card">
-        <h3><span class="ic">🏭</span>板块聚类（相关性风险） - 盘后</h3>
-        <div class="note">当前跟踪池行业分布；单一行业占比过高提示同涨同跌相关性风险。</div>
-        <div id="ttCluster"></div>
-      </div>
-      <div class="card">
-        <h3><span class="ic">🔗</span>全站精选重叠度 - 盘后</h3>
-        <div class="note">当前跟踪池（严格+差一步）与全站其他精选层的重叠，辅助判断市场共识集中度。</div>
-        <div id="ttOverlap"></div>
-      </div>
-      <div class="card">
-        <h3><span class="ic">📅</span>三重入选历史（每日记录） - 历史</h3>
-        <div class="note">每日入选三重共识候选的数量与最新跟踪状态（来自 triple_resonance_history.json）。</div>
-        <div id="ttHistory"></div>
-      </div>
-    </div><!--/st-tc-->
-
-    <!-- ===== TAB 页面：驾驶舱 ===== -->
-    <div id="st-cockpit" class="st-pane"><div id="stCockpit"></div></div>
-
-    <!-- ===== TAB 页面：全站精选 ===== -->
-    <div id="st-allsite" class="st-pane"><div id="stAllsite"></div></div>
-
-    <!-- ===== TAB 页面：逆势龙头(CRDS) ===== -->
-    <div id="st-crds" class="st-pane"><div class="card" id="stv8CrdsCard">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-          📊 <span style="font-weight:700;font-size:14px;color:var(--txt);">CRDS · 逆势龙头</span>
-          <span id="stcrdsTime" style="font-size:12px;color:var(--dim);font-weight:500;background:var(--bg2);padding:1px 8px;border-radius:8px;">更新 ...</span>
-          <span style="font-size:10px;color:#fff;background:#c62828;padding:1px 7px;border-radius:8px;">短线</span>
-          <span style="font-size:10px;color:#fff;background:#1565c0;padding:1px 7px;border-radius:8px;">盘后</span>
-          <span style="font-size:10px;color:#fff;background:#607d8b;padding:1px 7px;border-radius:8px;">日频</span>
-        </div>
-        <div id="stcrdsCoverage" style="font-size:11px;color:var(--dim);margin-bottom:8px;line-height:1.6;"></div>
-        <div id="stcrdsStandby" style="display:none;margin-bottom:10px;padding:8px 10px;border-radius:6px;background:rgba(240,160,32,0.08);border-left:4px solid #f0a020;font-size:12px;color:#d4a020;line-height:1.6;"></div>
-        <div id="stcrdsMarketContext" style="display:none;margin-bottom:10px;padding:8px 10px;border-radius:6px;background:var(--bg2);border-left:4px solid var(--border);">
-          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <span style="font-size:12px;font-weight:600;color:var(--sub);">大盘判断</span>
-            <span id="stcrdsMarketValidity" style="font-size:12px;font-weight:700;padding:1px 8px;border-radius:8px;color:#fff;"></span>
-            <span id="stcrdsMarketPct" style="font-size:12px;color:var(--sub);"></span>
-          </div>
-          <div id="stcrdsMarketSummary" style="font-size:12px;color:var(--dim);margin-top:4px;"></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;align-items:start;">
-          <div>
-            <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
-              <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('stcrdsEliteBody','crdsEliteArr')">
-                <span style="width:10px;height:10px;border-radius:50%;background:#1D9E75;"></span>
-                <span style="font-size:12px;font-weight:600;color:var(--txt);">三项全满足</span>
-                <span style="margin-left:auto;font-size:13px;font-weight:700;color:#1D9E75;"><span id="stcrdsEliteCnt">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
-                <span id="stcrdsEliteArr" style="font-size:10px;color:var(--dim);">▴</span>
-              </div>
-              <div id="stcrdsEliteBody" style="display:block;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:300px;overflow-y:auto;"></div>
-            </div>
-            <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
-              <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('stcrdsAdvBody','crdsAdvArr')">
-                <span style="width:10px;height:10px;border-radius:50%;background:#BA7517;"></span>
-                <span style="font-size:12px;font-weight:600;color:var(--txt);">两项满足</span>
-                <span style="margin-left:auto;font-size:13px;font-weight:700;color:#BA7517;"><span id="stcrdsAdvCnt">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
-                <span id="stcrdsAdvHint"></span>
-                <span id="stcrdsAdvArr" style="font-size:10px;color:var(--dim);">▴</span>
-              </div>
-              <div id="stcrdsAdvBody" style="display:block;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:300px;overflow-y:auto;"></div>
-            </div>
-            <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
-              <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('stcrdsList1','crdsArr1')">
-                <span style="width:10px;height:10px;border-radius:50%;background:#185FA5;"></span>
-                <span style="font-size:12px;font-weight:600;color:var(--txt);">10日≥2板</span>
-                <span style="margin-left:auto;font-size:13px;font-weight:700;color:#185FA5;"><span id="stcrdsCnt1">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
-                <span id="stcrdsArr1" style="font-size:10px;color:var(--dim);">▴</span>
-              </div>
-              <div id="stcrdsList1" style="display:block;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:360px;overflow-y:auto;"></div>
-            </div>
-            <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
-              <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('stcrdsList2','crdsArr2')">
-                <span style="width:10px;height:10px;border-radius:50%;background:#C62828;"></span>
-                <span style="font-size:12px;font-weight:600;color:var(--txt);">大跌日逆势板</span>
-                <span style="margin-left:auto;font-size:13px;font-weight:700;color:#C62828;"><span id="stcrdsCnt2">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
-                <span id="stcrdsArr2" style="font-size:10px;color:var(--dim);">▴</span>
-              </div>
-              <div id="stcrdsList2" style="display:block;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:300px;overflow-y:auto;"></div>
-            </div>
-          </div>
-          <div>
-            <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
-              <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('stcrdsList3','crdsArr3')">
-                <span style="width:10px;height:10px;border-radius:50%;background:#3B6D11;"></span>
-                <span style="font-size:12px;font-weight:600;color:var(--txt);">量能确认</span>
-                <span style="margin-left:auto;font-size:13px;font-weight:700;color:#3B6D11;"><span id="stcrdsCnt3">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
-                <span id="stcrdsArr3" style="font-size:10px;color:var(--dim);">▴</span>
-              </div>
-              <div id="stcrdsList3" style="display:grid;grid-template-columns:1fr 1fr;gap:3px 14px;padding:4px 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.6;"></div>
-            </div>
-          </div>
-        </div>
-        <div id="stcrdsHistory" style="font-size:11px;color:var(--dim);"></div>
-      </div></div><!--/st-crds-->
-  </section>
-
-    <!-- ============ 共振日历（机游共振 + 北向席位 + 分析导航） ============ -->
-    <section id="sec-rc">
-    <div class="sec-head"><h2>📊 共振日历</h2><span class="fresh" id="rcUpdateTime">更新于 --</span><span class="tag">机游共振 · 北向席位 · 每日洞察 · 大牛股猎手</span></div>
-
-    <style>
-      #sec-rc{--north:#22d3ee}
-      .rc-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
-      .rc-tab-btn{padding:8px 18px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--sub);transition:.15s}
-      .rc-tab-btn:hover{border-color:var(--cyan);color:var(--txt)}
-      .rc-tab-btn.active{background:linear-gradient(135deg,#13243f,#0e2747);border-color:var(--cyan);color:#fff;box-shadow:0 0 0 1px rgba(56,189,248,.35)}
-      .rc-tab-pane{display:none}
-      .rc-tab-pane.active{display:block;animation:fade .25s ease}
-      .rc-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:10px;color:var(--dim);margin-bottom:8px}
-      .rc-ac-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
-      .rc-ac-card{margin-bottom:0;cursor:pointer}
-      .rc-ac-title{font-size:13px;font-weight:700;color:var(--txt)}
-      .rc-ac-desc{font-size:10px;color:var(--dim)}
-      .rc-cal{width:100%;border-collapse:collapse;font-size:11px}
-      .rc-cal th{padding:6px 2px;color:var(--dim);font-weight:600;font-size:10px;text-align:center;border-bottom:1px solid var(--border)}
-      .rc-cal td{padding:4px 2px;border:1px solid var(--border);text-align:center;vertical-align:top}
-      .rc-row{display:flex;justify-content:space-between;gap:8px;padding:2px 0;font-size:11px}
-      .rc-row .nm{color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-      .rc-h{font-size:11px;font-weight:700;margin:8px 0 3px}
-    </style>
-
-    <div class="rc-tabs">
-      <button class="rc-tab-btn active" data-rc="rcTab1" onclick="switchRcTab('rcTab1',this)">📅 机游共振日历</button>
-      <button class="rc-tab-btn" data-rc="rcTab2" onclick="switchRcTab('rcTab2',this)">🌊 北向日历</button>
-      <button class="rc-tab-btn" data-rc="rcTab3" onclick="switchRcTab('rcTab3',this)">📋 每日洞察</button>
-      <button class="rc-tab-btn" data-rc="rcTab4" onclick="switchRcTab('rcTab4',this)">🦏 大牛股猎手</button>
-    </div>
-
-    <!-- ================= TAB1: 机游共振日历 ================= -->
-    <div id="rcTab1" class="rc-tab-pane active">
-
-      <div class="card" style="margin-bottom:16px;">
-        <h3><span class="ic">📅</span>本月龙虎榜日历 · 点击日期查看详情 · <span id="calMonthLabel" style="font-size:11px;color:var(--dim);font-weight:400;"></span></h3>
-        <div class="rc-legend">
-          <span><b style="color:#ffd54f;">★</b> 机游共振</span>
-          <span><b style="color:var(--cyan);">▲</b> 机构净买</span>
-          <span><b style="color:var(--gold);">⚡</b> 游资净买</span>
-          <span><b style="color:var(--north);">🌊</b> 北向</span>
-          <span>— 休市/无数据</span>
-        </div>
-        <div id="lhbMonthCal" style="min-height:200px;"><div class="ipo-empty">加载中…</div></div>
-      </div>
-
-      <!-- 当日详情展开区（点击日历日期后显示） -->
-      <div id="lhbDayDetail" class="card" style="display:none;margin-bottom:16px;">
-        <h3><span class="ic">🔍</span>当日详情 · <span id="lhbDetailDate" style="font-size:12px;color:var(--dim);font-weight:400;"></span></h3>
-        <div id="lhbDayDetailBody"></div>
-      </div>
-
-      <!-- 机游共振 + 北向席位 并排详情 -->
-      <div class="grid g-2" style="margin-bottom:16px">
-        <div class="card" style="margin-bottom:0">
-          <h3><span class="ic">🐉</span>机游共振 · 当日龙虎榜 · <span class="fresh" id="jyCalTime">更新于 --</span></h3>
-          <div id="jyResonanceCal" style="min-height:160px;"><div class="ipo-empty">加载中…</div></div>
-          <div class="note" style="margin-top:6px;">
-            <b>口径：</b>▲机构净买TOP5 · ▼机构净卖TOP5 · ▲游资净买TOP5 · ▼游资净卖TOP5<br>
-            <b>★机游共振</b>=机构净买&gt;0 ∩ 游资净买&gt;0 · 数据源：东财龙虎榜 ★★★★★
-          </div>
-        </div>
-        <div class="card" style="margin-bottom:0">
-          <h3><span class="ic">🌊</span>北向席位 · 龙虎榜北向 · <span class="fresh" id="northCalTime">更新于 --</span></h3>
-          <div id="northFundCal" style="min-height:160px;"><div class="ipo-empty">加载中…</div></div>
-          <div class="note" style="margin-top:6px;">
-            <b>口径：</b>龙虎榜北向席位净买卖（非全市场聚合流）<br>
-            ⚠️ 聚合北向2024-05停更，此处为<strong>席位级替代数据</strong> ★★★★☆
-          </div>
-        </div>
-      </div>
-
-    </div><!--/rcTab1-->
-
-    <!-- ================= TAB2: 北向日历 ================= -->
-    <div id="rcTab2" class="rc-tab-pane">
-
-      <div class="card" style="margin-bottom:16px;">
-        <h3><span class="ic">🌊</span>本月北向席位日历 · <span id="rcNorthMonthLabel" style="font-size:11px;color:var(--dim);font-weight:400;"></span></h3>
-        <div class="rc-legend">
-          <span><b style="color:var(--up);">▲</b> 当日北向净买</span>
-          <span><b style="color:var(--down);">▼</b> 当日北向净卖</span>
-          <span><b style="color:var(--north);">n</b> 北向参与股数</span>
-          <span>— 休市/无北向席位</span>
-        </div>
-        <div id="rcNorthMonthCal" style="min-height:200px;"><div class="ipo-empty">加载中…</div></div>
-      </div>
-
-      <div class="card" style="margin-bottom:16px;">
-        <h3><span class="ic">▲</span>北向买入 TOP5 汇总 · <span class="fresh" id="rcNorthRange">--</span></h3>
-        <div id="rcNorthTopBuy" style="min-height:80px;"><div class="ipo-empty">加载中…</div></div>
-      </div>
-
-      <div class="card" style="margin-bottom:16px;">
-        <h3><span class="ic">▼</span>北向卖出 TOP5 汇总</h3>
-        <div id="rcNorthTopSell" style="min-height:80px;"><div class="ipo-empty">加载中…</div></div>
-        <div class="note" style="margin-top:6px;">
-          <b>口径：</b>按区间内各交易日龙虎榜「北向」席位买卖额按个股累加排序 ★★★★☆
-        </div>
-      </div>
-
-    </div><!--/rcTab2-->
-
-    <!-- ================= TAB3: 每日洞察 ================= -->
-    <div id="rcTab3" class="rc-tab-pane">
-
-      <div class="card" style="margin-bottom:16px;">
-        <h3><span class="ic">📋</span>今日市场总结 · <span class="fresh" id="rcInsightTime">更新于 --</span></h3>
-        <div id="rcInsightSummary" style="font-size:12px;color:var(--sub);line-height:1.8;"><div class="ipo-empty">加载中…</div></div>
-      </div>
-
-      <div class="grid g-2" style="margin-bottom:16px">
-        <div class="card" style="margin-bottom:0">
-          <h3><span class="ic">📈</span>涨跌概况</h3>
-          <div id="rcInsightIndex" style="min-height:100px;"><div class="ipo-empty">加载中…</div></div>
-        </div>
-        <div class="card" style="margin-bottom:0">
-          <h3><span class="ic">💰</span>资金流向</h3>
-          <div id="rcInsightFlow" style="min-height:100px;"><div class="ipo-empty">加载中…</div></div>
-        </div>
-      </div>
-
-      <div class="grid g-2" style="margin-bottom:16px">
-        <div class="card" style="margin-bottom:0">
-          <h3><span class="ic">🔥</span>热点板块</h3>
-          <div id="rcInsightSector" style="min-height:100px;"><div class="ipo-empty">加载中…</div></div>
-        </div>
-        <div class="card" style="margin-bottom:0">
-          <h3><span class="ic">⚠️</span>异动信号</h3>
-          <div id="rcInsightAlert" style="min-height:100px;"><div class="ipo-empty">加载中…</div></div>
-        </div>
-      </div>
-
-    </div><!--/rcTab3-->
-
-    <!-- ================= TAB4: 大牛股猎手 ================= -->
-    <div id="rcTab4" class="rc-tab-pane">
-
-      <div class="card" style="margin-bottom:16px;">
-        <h3><span class="ic">🦏</span>大牛股猎手 · 三段式筛选 · <span class="fresh" id="rcBullRange">--</span></h3>
-        <div style="font-size:11px;color:var(--dim);line-height:1.7;">
-          新赛道发现（近5日新晋共振） → 早期信号雷达（北向连买） → 核心共振标的（高频共振）
-        </div>
-      </div>
-
-      <div class="grid g-3" style="margin-bottom:16px">
-        <div class="card" style="margin-bottom:0;border-left:4px solid #f472b6;">
-          <h3><span class="ic">🚀</span>新赛道发现</h3>
-          <div style="font-size:10px;color:var(--dim);margin-bottom:6px;">近5日新晋共振标的（前10日未出现）</div>
-          <div id="rcBullFresh" style="min-height:100px;font-size:11px;"><div class="ipo-empty">加载中…</div></div>
-        </div>
-        <div class="card" style="margin-bottom:0;border-left:4px solid #06b6d4;">
-          <h3><span class="ic">📡</span>早期信号雷达</h3>
-          <div style="font-size:10px;color:var(--dim);margin-bottom:6px;">北向席位连续净买 ≥2 天</div>
-          <div id="rcBullEarly" style="min-height:100px;font-size:11px;"><div class="ipo-empty">加载中…</div></div>
-        </div>
-        <div class="card" style="margin-bottom:0;border-left:4px solid #ffd54f;">
-          <h3><span class="ic">🎯</span>核心共振标的</h3>
-          <div style="font-size:10px;color:var(--dim);margin-bottom:6px;">区间内机游共振出现 ≥2 次</div>
-          <div id="rcBullCore" style="min-height:100px;font-size:11px;"><div class="ipo-empty">加载中…</div></div>
-        </div>
-      </div>
-
-    </div><!--/rcTab4-->
-
-    <!-- ================= 底部固定：四张深度分析卡（独立于 TAB） ================= -->
-    <div style="font-size:12px;font-weight:700;color:var(--sub);margin:4px 0 8px;">🔬 深度分析 · 点击卡片展开</div>
-    <div class="rc-ac-grid" style="margin-bottom:16px;">
-
-      <div class="card rc-ac-card" style="border-left:4px solid #f59e0b;" onclick="rcToggleAc(this)">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:22px;">⚡</span>
-          <div>
-            <div class="rc-ac-title">机游信号详细分析</div>
-            <div class="rc-ac-desc">单日信号 · 连续性跟踪 · 4类基础+5类细分</div>
-          </div>
-          <span style="margin-left:auto;color:var(--dim);font-size:18px;">→</span>
-        </div>
-        <div class="ac-body" style="display:none;padding-top:8px;border-top:1px solid var(--border);margin-top:8px;">
-          <div id="acJiyouSignal" style="font-size:11px;color:var(--sub);line-height:1.7;"><div class="ipo-empty">加载中…</div></div>
-        </div>
-      </div>
-
-      <div class="card rc-ac-card" style="border-left:4px solid #06b6d4;" onclick="rcToggleAc(this)">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:22px;">📈</span>
-          <div>
-            <div class="rc-ac-title">北向资金详细分析</div>
-            <div class="rc-ac-desc">行业趋势 · 连续加仓 · 北向+机构共振</div>
-          </div>
-          <span style="margin-left:auto;color:var(--dim);font-size:18px;">→</span>
-        </div>
-        <div class="ac-body" style="display:none;padding-top:8px;border-top:1px solid var(--border);margin-top:8px;">
-          <div id="acNorthAnalysis" style="font-size:11px;color:var(--sub);line-height:1.7;"><div class="ipo-empty">加载中…</div></div>
-        </div>
-      </div>
-
-      <div class="card rc-ac-card" style="border-left:4px solid #a78bfa;" onclick="rcToggleAc(this)">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:22px;">📊</span>
-          <div>
-            <div class="rc-ac-title">共振胜率回测</div>
-            <div class="rc-ac-desc">三方两方共振 · T+1/T+5/T+10/T+20 · 历史回测</div>
-          </div>
-          <span style="margin-left:auto;color:var(--dim);font-size:18px;">→</span>
-        </div>
-        <div class="ac-body" style="display:none;padding-top:8px;border-top:1px solid var(--border);margin-top:8px;">
-          <div id="acBacktest" style="font-size:11px;color:var(--sub);line-height:1.7;"><div class="ipo-empty">加载中…</div></div>
-        </div>
-      </div>
-
-      <div class="card rc-ac-card" style="border-left:4px solid #f472b6;" onclick="rcToggleAc(this)">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:22px;">🦏</span>
-          <div>
-            <div class="rc-ac-title">大牛股猎手回测</div>
-            <div class="rc-ac-desc">新赛道发现 · 早期信号 · 核心共振标的</div>
-          </div>
-          <span style="margin-left:auto;color:var(--dim);font-size:18px;">→</span>
-        </div>
-        <div class="ac-body" style="display:none;padding-top:8px;border-top:1px solid var(--border);margin-top:8px;">
-          <div id="acBullHunter" style="font-size:11px;color:var(--sub);line-height:1.7;"><div class="ipo-empty">加载中…</div></div>
-        </div>
-      </div>
-
-    </div>
-
-    <script>
-    /* ===== 共振日历 · TAB 切换 + 分析卡折叠 ===== */
-    function switchRcTab(tabId, btn){
-      var root=document.getElementById('sec-rc');
-      if(!root) return;
-      var panes=root.querySelectorAll('.rc-tab-pane');
-      for(var i=0;i<panes.length;i++){
-        if(panes[i].id===tabId) panes[i].classList.add('active');
-        else panes[i].classList.remove('active');
-      }
-      var btns=root.querySelectorAll('.rc-tab-btn');
-      for(var j=0;j<btns.length;j++){
-        if(btn ? btns[j]===btn : btns[j].getAttribute('data-rc')===tabId) btns[j].classList.add('active');
-        else btns[j].classList.remove('active');
-      }
-      try{
-        if(tabId==='rcTab2' && window._renderRcNorthTab) window._renderRcNorthTab();
-        if(tabId==='rcTab3' && window._renderRcInsight) window._renderRcInsight();
-        if(tabId==='rcTab4' && window._renderRcBull) window._renderRcBull();
-      }catch(e){ console.error('switchRcTab',e); }
-    }
-    window.switchRcTab=switchRcTab;
-
-    function rcToggleAc(card){
-      var body=card.querySelector('.ac-body');
-      if(!body) return;
-      body.style.display = (body.style.display==='block') ? 'none' : 'block';
-    }
-    window.rcToggleAc=rcToggleAc;
-    </script>
-    <script>
+>
+    /* =====     <script>
     /* ====== 月历视图（本月龙虎榜：机游共振 + 北向席位） ====== */
     (function(){
       const $=id=>document.getElementById(id);
@@ -2791,7 +1999,11 @@ window.V8_CAL = {weeks:[],legend:[]};
     </div>
     </div>
     <div id="opTab3" class="op-tab-pane"><div id="unlistedPanel"></div></div>
-    <div id="opTab4" class="op-tab-pane"><div id="delistedPanel"></div></div>
+    <div id="opTab4" class="op-tab-pane"><div id="delistedPanel">
+
+    <!-- 温度计 + 雷达（从盘后数据区迁入） -->
+
+    </div></div>
   </section>
 
   <!-- ============ 逻辑详解（管理员） ============ -->
@@ -4864,7 +4076,7 @@ function renderLimitUpHeatmap(){
       if(pulse&&pulse.update_time) setTime('phEtfTime',pulse.update_time);
       return;
     }
-    var list=pulse.etfs.slice(0,12);
+    var list=pulse.etfs.slice(0,6);
     var maxVol=Math.max.apply(null,list.map(function(e){return e.vol||0;}))||1;
     var h='<div style="padding:8px 4px;">';
     if(pulse.note) h+='<div style="font-size:10px;color:var(--dim);margin-bottom:8px;">'+pulse.note+'</div>';
@@ -4875,7 +4087,7 @@ function renderLimitUpHeatmap(){
       var arrow=isUp?'▲':'▼';
       var barW=(Math.min((e.vol/maxVol)*100,100)).toFixed(1);
       var amtY=(e.amount/1e8).toFixed(1)+'亿';
-      h+='<div style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:12px;border-bottom:1px solid var(--border);">';
+      h+='<div style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:11px;border-bottom:1px solid var(--border);">';
       h+='<div style="width:110px;flex-shrink:0;line-height:1.4;">';
       h+='<div style="font-weight:600;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+e.name+'</div>';
       h+='<div style="font-size:10px;color:var(--sub);">'+e.code+'</div>';
@@ -4905,7 +4117,7 @@ function renderLimitUpHeatmap(){
     }
     var h='<div style="padding:8px 4px;">';
     h+='<div style="font-size:11px;color:var(--sub);margin-bottom:8px;">全市场净流入：<span style="color:'+(daily.total_net>=0?'var(--up)':'var(--down)')+';font-weight:700;">'+(daily.total_net>=0?'+':'')+(daily.total_net/1e8).toFixed(2)+'亿</span> · 覆盖 '+(daily.total_etf||0)+' 只</div>';
-    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">';
     h+='<div>';
     h+='<div style="font-weight:700;font-size:11px;color:var(--up);margin-bottom:6px;">TOP5 主力净流入</div>';
     (daily.top_inflow||[]).slice(0,5).forEach(function(x){
