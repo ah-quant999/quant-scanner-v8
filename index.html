@@ -2823,7 +2823,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     // Extract north-bound stocks from LHB (北向席位 buy-sell 净买卖)
     var northStocks = [];
     stocks.forEach(function(s){
-      var sx = (s.seats || {}).['北向'] || null;
+      var sx = (s.seats || {})['北向'] || null;
       if(sx){
         s._nb_net_万 = ((sx.buy||0) - (sx.sell||0));
         northStocks.push(s);
@@ -5048,7 +5048,7 @@ function renderLimitUpHeatmap(){
     const instIn = instArr.filter(r=>r && r.buy_inst>0 && r.net_amt>0)
       .sort((a,b)=>(b.net_amt||0)-(a.net_amt||0));
 
-    // ③ RSI 背离（单日极值代理）
+    // ③ 超买超卖（单日涨幅极值代理：涨≥15% 或 跌≤-5%，与 RSI 公式无直接关系）
     const rsiOver = [], rsiUnder = [];
     Object.entries(candStocks).forEach(([k, st])=>{
       if(!st || !st.code) return;
@@ -5117,13 +5117,13 @@ function renderLimitUpHeatmap(){
         '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;">'+
           '<span class="hub-tag '+(lead.length?'up':'neutral')+'">龙头合力 '+lead.length+'</span>'+
           '<span class="hub-tag '+(instIn.length?'up':'neutral')+'">主力通道 '+instIn.length+'</span>'+
-          '<span class="hub-tag '+(rsiCount?'warn':'neutral')+'">RSI背离 '+rsiCount+'</span>'+
+          '<span class="hub-tag '+(rsiCount?'warn':'neutral')+'">超买超卖 '+rsiCount+'</span>'+
           '<span class="hub-tag '+(arr.length?'gold':'neutral')+'">资金排列 '+arr.length+'</span>'+
         '</div>'+
         '<div class="hub-sample-rows">'+
           '<div class="hub-sample-row" title="龙 '+escAttr(leadFull)+'"><b style="color:var(--up)">龙</b> '+leadDisp+'</div>'+
           '<div class="hub-sample-row" title="主 '+escAttr(instFull)+'"><b style="color:var(--up)">主</b> '+instDisp+'</div>'+
-          '<div class="hub-sample-row" title="背 '+escAttr(rsiFull)+'"><b style="color:var(--gold)">背</b> '+rsiDisp+'</div>'+
+          '<div class="hub-sample-row" title="极 '+escAttr(rsiFull)+'"><b style="color:var(--gold)">极</b> '+rsiDisp+'</div>'+
           '<div class="hub-sample-row" title="列 '+escAttr(arrFull)+'"><b style="color:var(--gold)">列</b> '+arrDisp+'</div>'+
         '</div>';
     }
@@ -5644,9 +5644,9 @@ function renderLimitUpHeatmap(){
   /* ---- ETF 资金热度（4 大类 TOP5流入+TOP5流出，横向 bar） ---- */
   function renderEtfHeatByCategory(etfHeat){
     if(!etfHeat||!etfHeat.categories) return;
-    const catNames=['宽基','行业','主题','跨境','商品','货币'];
-    const colorMap={宽基:'var(--cyan)',行业:'var(--purple)',主题:'var(--gold)',跨境:'var(--pink)',商品:'var(--up)',货币:'var(--down)'};
-    const fmtYi=v=>{const a=Math.abs(v);if(a>=1e4)return(v/1e4).toFixed(1)+'亿';if(a>=1)return(v/1).toFixed(1)+'万';return(v/1).toFixed(1);};
+const catNames=['宽基','行业','主题','跨境','商品'];
+    const colorMap={宽基:'var(--cyan)',行业:'var(--purple)',主题:'var(--gold)',跨境:'var(--pink)',商品:'var(--up)'};
+    const fmtYi=v=>{const a=Math.abs(v);if(a>=1e8)return(v/1e8).toFixed(2)+'亿';if(a>=1e4)return(v/1e4).toFixed(1)+'万';return(v/1).toFixed(0);};
     const fmtPct=p=>(p>=0?'+':'')+p.toFixed(2)+'%';
     // summary（动态计数）
     const validCats=catNames.filter(cn=>etfHeat.categories&&etfHeat.categories[cn]);
