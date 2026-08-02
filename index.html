@@ -4896,76 +4896,103 @@ function renderLimitUpHeatmap(){
       const color=deg>=70?'var(--up)':(deg>=50?'var(--gold)':'var(--down)');
       hubTacticalScore.innerHTML='<span class="hub-score-num" style="color:'+color+'">'+deg+'°</span><span>'+(deg>=70?'偏热':(deg>=50?'中性':'偏冷'))+'</span>';
     }
+
+    const latestTime=crisis.update_time||macro.update_time||fib.update_time;
+    setTime('hubTime',latestTime);
+
+    /* ---- 4 因子计算（共享给战术卡 hub-tag 行 + 因子卡样本预览） ---- */
+    const candStocks = (cand && cand.stocks) || {};
+    const quoteMap = {};
+    (quotes && quotes.items || []).forEach(q=>{ if(q && q.code) quoteMap[String(q.code)] = q; });
+    const instArr = (inst && inst.all) || [];
+    const instMap = {};
+    instArr.forEach(r=>{ if(r && r.code) instMap[String(r.code)] = r; });
+    const goldKeys = new Set(Object.keys((gold && gold.stocks) || {}));
+
+    // ① 龙头合力
+    const lead = [];
+    Object.entries(candStocks).forEach(([k, st])=>{
+      if(!st || !st.code) return;
+      const q = quoteMap[String(st.code)];
+      if(!q || q.chg==null) return;
+      if((st.sources||[]).length >= 2 && q.chg >= 5){
+        lead.push({code:st.code, name:st.name, chg:q.chg, sources:(st.sources||[]).length});
+      }
+    });
+    lead.sort((a,b)=>b.chg - a.chg);
+
+    // ② 主力通道
+    const instIn = instArr.filter(r=>r && r.buy_inst>0 && r.net_amt>0)
+      .sort((a,b)=>(b.net_amt||0)-(a.net_amt||0));
+
+    // ③ RSI 背离（单日极值代理）
+    const rsiOver = [], rsiUnder = [];
+    Object.entries(candStocks).forEach(([k, st])=>{
+      if(!st || !st.code) return;
+      const q = quoteMap[String(st.code)];
+      if(!q || q.chg==null) return;
+      if(q.chg >= 15) rsiOver.push({code:st.code, name:st.name, chg:q.chg});
+      else if(q.chg <= -5) rsiUnder.push({code:st.code, name:st.name, chg:q.chg});
+    });
+    rsiOver.sort((a,b)=>b.chg-a.chg);
+    rsiUnder.sort((a,b)=>a.chg-b.chg);
+    const rsiCount = rsiOver.length + rsiUnder.length;
+
+    // ④ 资金排列
+    const arr = [];
+    Object.entries(candStocks).forEach(([k, st])=>{
+      if(!st || !st.code) return;
+      const code = String(st.code);
+      const q = quoteMap[code], ir = instMap[code];
+      if(!q || !ir) return;
+      if(q.chg>0 && (ir.net_amt||0)>0 && (ir.buy_inst||0)>0){
+        arr.push({code:st.code, name:st.name, chg:q.chg, net_amt:ir.net_amt||0, buy_inst:ir.buy_inst||0});
+      }
+    });
+    arr.sort((a,b)=>b.net_amt - a.net_amt);
+    const total = lead.length + instIn.length + rsiCount + arr.length;
+
+    /* ---- 战术卡：3 行紧凑布局 + 阴跌磨底大徽章 + 4 因子 hub-tag ---- */
     const hubTacticalBody=$('hubTacticalBody');
     if(hubTacticalBody){
-      hubTacticalBody.innerHTML=
-        '<div>技术面 '+techScore+'/10 · '+(declineDays>0?'回调'+declineDays+'天':'震荡')+'</div>'+
-        '<div>资金面 '+fundScore+'/10 · 两融'+ (rzLatest>=10000?(rzLatest/10000).toFixed(2)+'万亿':'--') +'</div>'+
-        '<div>机构面 '+instScore+'/10 · 期指 '+ (cffexNet>0?'净多':'净空') +' '+Math.abs(cffexNet)+'</div>'+
-        '<div style="margin-top:6px">'+action+' · '+position+'</div>';
+      const fibMode = (c.mode||'').trim();              // '阴跌磨底'
+      const isGrind = /阴跌|磨底|回调/.test(fibMode);
+      const grindSummary = (fib.judgement && fib.judgement.summary) || '';
+      const tColor = techScore>=7?'var(--up)':techScore<=3?'var(--down)':'var(--gold)';
+      const fColor = fundScore>=7?'var(--up)':fundScore<=3?'var(--down)':'var(--gold)';
+      const iColor = instScore>=7?'var(--up)':instScore<=3?'var(--down)':'var(--gold)';
+      const grindBadge = isGrind
+        ? '<div style="display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:linear-gradient(90deg,rgba(244,73,93,.18),rgba(244,73,93,.06));border:1.5px solid rgba(244,73,93,.55);color:var(--down);font-size:14px;font-weight:900;letter-spacing:.5px;box-shadow:0 0 0 3px rgba(244,73,93,.08);">'+
+            '<span style="font-size:16px">🔻</span>'+
+            '<span>阴跌磨底 · 回调'+declineDays+'天 '+declinePct.toFixed(1)+'%</span>'+
+            (grindSummary?'<span style="font-size:11px;font-weight:500;color:var(--sub);opacity:.85;max-width:60%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+grindSummary+'</span>':'')+
+          '</div>'
+        : '';
+      hubTacticalBody.innerHTML =
+        '<div style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11.5px;line-height:1.5;color:var(--sub);">'+
+          '<span><b style="color:'+tColor+'">📉 技术面 '+techScore+'/10</b> · '+(declineDays>0?'回调'+declineDays+'天':'震荡')+'</span>'+
+          '<span><b style="color:'+fColor+'">💰 资金面 '+fundScore+'/10</b> · 两融'+(rzLatest>=10000?(rzLatest/10000).toFixed(2)+'万亿':'--')+'</span>'+
+          '<span><b style="color:'+iColor+'">🏛 机构面 '+instScore+'/10</b> · 期指'+(cffexNet>0?'净多':'净空')+Math.abs(cffexNet)+'</span>'+
+        '</div>'+
+        (grindBadge
+          ? '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">'+grindBadge+'</div>'
+          : '')+
+        '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:'+(isGrind?'8':'10')+'px;">'+
+          '<span class="hub-tag '+(lead.length?'up':'neutral')+'" style="margin:0">龙头合力 '+lead.length+'</span>'+
+          '<span class="hub-tag '+(instIn.length?'up':'neutral')+'" style="margin:0">主力通道 '+instIn.length+'</span>'+
+          '<span class="hub-tag '+(rsiCount?'warn':'neutral')+'" style="margin:0">RSI背离 '+rsiCount+'</span>'+
+          '<span class="hub-tag '+(arr.length?'gold':'neutral')+'" style="margin:0">资金排列 '+arr.length+'</span>'+
+          '<span style="margin-left:auto;font-size:11.5px;color:var(--sub)"><b style="color:'+actionColor+'">'+action+'</b> · '+position+'</span>'+
+        '</div>';
     }
 
-    /* ---- 因子层：4 因子触发计算 ---- */
+    /* ---- 因子卡：顶部计数 + 4 行样本预览（4 hub-tag 已搬战术卡） ---- */
     const hubFactorCount=$('hubFactorCount');
     const hubFactorBody=$('hubFactorBody');
     if(hubFactorCount && hubFactorBody){
-      // 准备数据索引
-      const candStocks = (cand && cand.stocks) || {};
-      const quoteMap = {};
-      (quotes && quotes.items || []).forEach(q=>{ if(q && q.code) quoteMap[String(q.code)] = q; });
-      const instArr = (inst && inst.all) || [];
-      const instMap = {};
-      instArr.forEach(r=>{ if(r && r.code) instMap[String(r.code)] = r; });
-      const goldKeys = new Set(Object.keys((gold && gold.stocks) || {}));
-
-      // ① 龙头合力 = 多源共识(≥2) ∩ 当日强势(chg≥+5%)
-      const lead = [];
-      Object.entries(candStocks).forEach(([k, st])=>{
-        if(!st || !st.code) return;
-        const q = quoteMap[String(st.code)];
-        if(!q || q.chg==null) return;
-        if((st.sources||[]).length >= 2 && q.chg >= 5){
-          lead.push({code:st.code, name:st.name, chg:q.chg, sources:(st.sources||[]).length});
-        }
-      });
-      lead.sort((a,b)=>b.chg - a.chg);
-
-      // ② 主力追踪 = INST_TRADE 净流入(buy_inst>0 且 net_amt>0)
-      const instIn = instArr.filter(r=>r && r.buy_inst>0 && r.net_amt>0)
-        .sort((a,b)=>(b.net_amt||0)-(a.net_amt||0));
-
-      // ③ RSI 背离(单日极值代理) = chg≥+15% 超买预警 + chg≤-5% 超卖机会
-      const rsiOver = [], rsiUnder = [];
-      Object.entries(candStocks).forEach(([k, st])=>{
-        if(!st || !st.code) return;
-        const q = quoteMap[String(st.code)];
-        if(!q || q.chg==null) return;
-        if(q.chg >= 15) rsiOver.push({code:st.code, name:st.name, chg:q.chg});
-        else if(q.chg <= -5) rsiUnder.push({code:st.code, name:st.name, chg:q.chg});
-      });
-      rsiOver.sort((a,b)=>b.chg-a.chg);
-      rsiUnder.sort((a,b)=>a.chg-b.chg);
-      const rsiCount = rsiOver.length + rsiUnder.length;
-
-      // ④ 资金排列 = 候选 ∩ 机构 ∩ 涨幅>0 ∩ 主力净买，四维对齐
-      const arr = [];
-      Object.entries(candStocks).forEach(([k, st])=>{
-        if(!st || !st.code) return;
-        const code = String(st.code);
-        const q = quoteMap[code], ir = instMap[code];
-        if(!q || !ir) return;
-        if(q.chg>0 && (ir.net_amt||0)>0 && (ir.buy_inst||0)>0){
-          arr.push({code:st.code, name:st.name, chg:q.chg, net_amt:ir.net_amt||0, buy_inst:ir.buy_inst||0});
-        }
-      });
-      arr.sort((a,b)=>b.net_amt - a.net_amt);
-
-      // 计数 + 配色
-      const total = lead.length + instIn.length + rsiCount + arr.length;
       hubFactorCount.textContent = total ? (total+' 触发') : '无触发';
       hubFactorCount.style.color = total ? 'var(--up)' : 'var(--dim)';
 
-      // 样本预览
       const leadHtml = lead.length ? lead.slice(0,3).map(x=>x.name+' +'+x.chg.toFixed(1)+'%').join(' · ')+'…' : '无';
       const instHtml = instIn.length ? instIn.slice(0,3).map(x=>x.name).join(' · ')+'…' : '无';
       const rsiHtml = (rsiOver.length||rsiUnder.length)
@@ -4975,12 +5002,6 @@ function renderLimitUpHeatmap(){
       const arrHtml = arr.length ? arr.slice(0,3).map(x=>x.name).join(' · ')+'…' : '无';
 
       hubFactorBody.innerHTML =
-        '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;">'+
-          '<span class="hub-tag '+(lead.length?'up':'neutral')+'">龙头合力 '+lead.length+'</span>'+
-          '<span class="hub-tag '+(instIn.length?'up':'neutral')+'">主力通道 '+instIn.length+'</span>'+
-          '<span class="hub-tag '+(rsiCount?'warn':'neutral')+'">RSI背离 '+rsiCount+'</span>'+
-          '<span class="hub-tag '+(arr.length?'gold':'neutral')+'">资金排列 '+arr.length+'</span>'+
-        '</div>'+
         '<div style="font-size:10.5px;color:var(--sub);line-height:1.55;">'+
           '<div><b style="color:var(--up)">龙</b> '+leadHtml+'</div>'+
           '<div><b style="color:var(--up)">主</b> '+instHtml+'</div>'+
@@ -4988,9 +5009,6 @@ function renderLimitUpHeatmap(){
           '<div><b style="color:var(--gold)">列</b> '+arrHtml+'</div>'+
         '</div>';
     }
-
-    const latestTime=crisis.update_time||macro.update_time||fib.update_time;
-    setTime('hubTime',latestTime);
   }
 
   /* ---- 2. 短线/中线市场温度计（技术/资金/机构） ---- */
