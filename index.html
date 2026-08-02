@@ -3575,7 +3575,7 @@ window.V8_CAL = {weeks:[],legend:[]};
           <tr><th>能力</th><th>v6 实现</th><th>v8 现状</th><th>优先级</th></tr>
           <tr><td>Safety Net 兜底</td><td>safety-net.yml 每15min轮询</td><td><span style="color:#38bdf8;">✅ 已建 v8_safety_net.yml</span></td><td>P0 必须</td></tr>
           <tr><td>云端自愈器</td><td>cloud_self_heal 周末T+1补全</td><td><span style="color:#38bdf8;">✅ 已建 v8_self_heal.yml</span></td><td>P1 应补</td></tr>
-          <tr><td>每日备份</td><td>cloud_backup.yml 21:00</td><td>❌ 无（raw_data 由 git 历史+Pages 回溯）</td><td>P2 可选</td></tr>
+          <tr><td>每日备份</td><td>cloud_backup.yml 21:00</td><td><span style="color:#38bdf8;">✅ 已建 v8_backup.yml 21:00</span></td><td>P2 可选</td></tr>
           <tr><td>心跳监控上云</td><td>peer_health_monitor 本机</td><td>⚠️ 仅本地 PAUSED</td><td>P2 可选</td></tr>
           <tr><td>防误删清单</td><td>DO_NOT_DELETE.md + pre-commit hook</td><td><span style="color:#38bdf8;">✅ 已建 DO_NOT_DELETE.md</span></td><td>P0 必须</td></tr>
         </table>
