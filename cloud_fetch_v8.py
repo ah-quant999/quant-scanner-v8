@@ -921,18 +921,30 @@ def f_market_fund_flow_data():
     sh_quote = {}
     for line in klines:
         parts = line.split(",")
-        if len(parts) < 15:
+        if len(parts) < 6:
             continue
         ds = parts[0].replace("-", "")
-        try:
-            net_yi = round(float(parts[1]) / 1e8, 2)  # f52 主力净流入(元)
-        except Exception:
-            net_yi = 0.0
-        daily.append({"date": ds, "net_yi": net_yi})
-        try:
-            sh_quote[ds] = {"close": round(float(parts[11]), 2), "chg": round(float(parts[12]), 2)}
-        except Exception:
-            pass
+        # 参照 v6 fetch_market_fund_flow.py：存全 8 字段（date + net_yi + 特大/大/中/小单 + 主力%/小单%）
+        def _f(idx):
+            try: return round(float(parts[idx]) / 1e8, 2)
+            except Exception: return 0.0
+        def _pct(idx):
+            try: return float(parts[idx])
+            except Exception: return None
+        entry = {"date": ds, "net_yi": _f(1)}
+        if len(parts) >= 8:
+            entry["super_large_yi"] = _f(2)
+            entry["large_yi"]       = _f(3)
+            entry["medium_yi"]      = _f(4)
+            entry["small_yi"]       = _f(5)
+            entry["main_pct"]       = _pct(6)
+            entry["small_pct"]      = _pct(7)
+        daily.append(entry)
+        if len(parts) >= 15:
+            try:
+                sh_quote[ds] = {"close": round(float(parts[11]), 2), "chg": round(float(parts[12]), 2)}
+            except Exception:
+                pass
 
     # 累计净值
     cum = 0.0

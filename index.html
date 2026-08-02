@@ -1974,7 +1974,7 @@ window.V8_CAL = {weeks:[],legend:[]};
   <section id="sec-ph">
     <div class="sec-head"><h2>🌙 盘后数据</h2><span class="tag" id="phTag">T+1 收盘后生成 · 最后更新 --</span></div>
 
-    <!-- ========== 决策中枢：战略→战术→选股 ========== -->
+        <!-- ========== 决策中枢：战略→战术→选股 ========== -->
     <div class="card hub-card" style="margin-bottom:16px">
       <h3><span class="ic">🧭</span>决策中枢 · 战略→战术→选股 <span class="fresh" id="hubTime">更新于 --</span></h3>
       <div id="hubBody">
@@ -2001,16 +2001,16 @@ window.V8_CAL = {weeks:[],legend:[]};
       </div>
     </div>
 
-    <!-- 盘后概览：市场温度计分项 / 六维共振雷达 -->
-    <div class="grid g-2" style="margin-bottom:16px">
-      <div class="card">
-        <h3><span class="ic">🌡️</span>市场温度计 · 分项 <span class="fresh" id="phThermoTime">更新于 --</span></h3>
-        <div id="phThermoBody"><div class="ipo-empty">加载中…</div></div>
+    <!-- 斐波那契窗口 -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📉</span>斐波那契窗口 · 当前回调状态 - 中长线 · <span class="fresh" id="phFibTime">更新于 --</span></h3>
+      <div class="ph-fib-grid" id="phFibGrid">
+        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibDays">--</div><div class="ph-fib-lbl">已回调交易日</div></div>
+        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibPct">--</div><div class="ph-fib-lbl">累计跌幅</div></div>
+        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibPoints">--</div><div class="ph-fib-lbl">下跌点数</div></div>
+        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibNext">--</div><div class="ph-fib-lbl" id="phFibNextLbl">下一窗口跟踪</div></div>
       </div>
-      <div class="card">
-        <h3><span class="ic">🕸️</span>六维共振雷达 · 战术层 <span class="fresh" id="phRadarTime">更新于 --</span></h3>
-        <svg class="radar" style="display:block;margin:0 auto" width="220" height="200" viewBox="-110 -110 220 220" id="radar"></svg>
-      </div>
+      <div class="ph-fib-badge" id="phFibBadge">--</div>
     </div>
 
     <!-- 资金流时间轴 · v6 一年样式（ECharts 双轴：单日柱状 + 累计折线） -->
@@ -2035,18 +2035,6 @@ window.V8_CAL = {weeks:[],legend:[]};
           📌 口径说明：累计净流入 = 上证指数（000001）单日主力资金净流入的滚动累加；数据覆盖沪市全市场成分股，非仅宽基ETF。
         </div>
       </div>
-    </div>
-
-    <!-- 斐波那契窗口 -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📉</span>斐波那契窗口 · 当前回调状态 - 中长线 · <span class="fresh" id="phFibTime">更新于 --</span></h3>
-      <div class="ph-fib-grid" id="phFibGrid">
-        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibDays">--</div><div class="ph-fib-lbl">已回调交易日</div></div>
-        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibPct">--</div><div class="ph-fib-lbl">累计跌幅</div></div>
-        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibPoints">--</div><div class="ph-fib-lbl">下跌点数</div></div>
-        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibNext">--</div><div class="ph-fib-lbl" id="phFibNextLbl">下一窗口跟踪</div></div>
-      </div>
-      <div class="ph-fib-badge" id="phFibBadge">--</div>
     </div>
 
     <!-- 板块资金三合一（v6 风格移植：盘中追热 + 收盘复盘 + 中期趋势） -->
@@ -2077,7 +2065,7 @@ window.V8_CAL = {weeks:[],legend:[]};
       <h3><span class="ic">🌍</span>宏观观测 - 中长线 · <span class="fresh" id="phMacroTime">更新于 --</span></h3>
       <div id="phMacroBody"><div class="ipo-empty">加载中…</div></div>
     </div>
-  </section>
+
 
 
 
@@ -3606,6 +3594,20 @@ window.V8_CAL = {weeks:[],legend:[]};
     <div id="opTab3" class="op-tab-pane"><div id="unlistedPanel"></div></div>
     <div id="opTab4" class="op-tab-pane"><div id="delistedPanel">
 
+        <!-- 盘后概览：市场温度计分项 / 六维共振雷达 -->
+    <div class="grid g-2" style="margin-bottom:16px">
+      <div class="card">
+        <h3><span class="ic">🌡️</span>市场温度计 · 分项 <span class="fresh" id="phThermoTime">更新于 --</span></h3>
+        <div id="phThermoBody"><div class="ipo-empty">加载中…</div></div>
+      </div>
+      <div class="card">
+        <h3><span class="ic">🕸️</span>六维共振雷达 · 战术层 <span class="fresh" id="phRadarTime">更新于 --</span></h3>
+        <svg class="radar" style="display:block;margin:0 auto" width="220" height="200" viewBox="-110 -110 220 220" id="radar"></svg>
+      </div>
+    </div>
+
+
+
     <!-- 温度计 + 雷达（从盘后数据区迁入） -->
 
     </div></div>
@@ -4996,8 +4998,26 @@ function renderLimitUpHeatmap(){
     const badge=$('phFibBadge');
     if(badge){
       const jt=(fib.judgement||{});
-      badge.textContent=(c.mode||'--')+(jt.key_window?' · '+jt.key_window:'');
-      badge.style.background='rgba(255,152,0,.18)';badge.style.color='#ffb74d';
+      const modeLabel=c.mode||'--';
+      // 多 pill 列表：列出 future/triggered/active 全部 F 窗口（最多 3 个）——补 F(34)/F(55)
+      const allWins=(fib.windows||[]).filter(w=>['future','triggered','active'].includes(w.status)).slice(0,3);
+      if(allWins.length){
+        let pills='<span style="margin-right:10px;font-weight:700;color:#ffb74d;">'+modeLabel+'</span>';
+        allWins.forEach((w,i)=>{
+          const icon=w.status==='triggered'?'⚡':w.status==='active'?'🟢':'🔮';
+          pills+='<span class="ph-fib-pill" style="display:inline-block;margin:0 6px 4px 0;padding:5px 12px;border-radius:16px;background:rgba(255,152,0,.18);color:#ffb74d;font-size:12px;font-weight:600;letter-spacing:.3px;border:1px solid rgba(255,152,0,.35);">';
+          pills+=icon+' 已续命第'+(i+1)+'轮 → '+w.name+'('+w.date+')';
+          if(w.status==='future'&&w.days_left!=null) pills+=' · 距今'+w.days_left+'天';
+          pills+='</span>';
+        });
+        badge.innerHTML=pills;
+        badge.style.background='transparent';
+        badge.style.color='inherit';
+      } else {
+        badge.textContent=modeLabel+(jt.key_window?' · '+jt.key_window:'');
+        badge.style.background='rgba(255,152,0,.18)';
+        badge.style.color='#ffb74d';
+      }
     }
     setTime('phFibTime',fib.update_time);
   }
@@ -5325,7 +5345,7 @@ function renderLimitUpHeatmap(){
   }
 
   /* ---- 4. 资金流时间轴（MARKET_FUND_FLOW_DATA）· v6 一年样式 ---- */
-  var __MFF_CURRENT_RANGE = 120;
+  var __MFF_CURRENT_RANGE = 'all';
   var __MFF_SHOW_DAILY = true;
   var __MFF_SHOW_CUM = true;
   var __MFF_CHART_INST = null;
@@ -5390,7 +5410,7 @@ function renderLimitUpHeatmap(){
       });
     }
     // 默认激活 120日 + 两个序列
-    var defBtn = document.querySelector('.mff-range-btn[data-range="120"]');
+    var defBtn = document.querySelector('.mff-range-btn[data-range="all"]');
     if(defBtn && !defBtn.dataset.activated){ defBtn.dataset.activated='1'; defBtn.click(); }
     renderMffSeriesBtnState();
   }

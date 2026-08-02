@@ -55,6 +55,7 @@ V6_TO_V8 = {
     "nt_data.json":                 "nt_data.json",
     "suspension_alert.json":        "suspension_alert.json",
     "market_alerts.json":           "market_alerts.json",
+    "market_fund_flow.json":        "market_fund_flow.json",
     "sector_fund_flow.json":        "sector_fund_flow_trend.json",
     "volatility_watch.json":        "volatility.json",
 }
