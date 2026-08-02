@@ -788,20 +788,20 @@ window.V8_CAL = {weeks:[],legend:[]};
         }
         var sectors=SR.sectors.slice().sort(function(a,b){
           return Math.abs(b.pct_day||0)-Math.abs(a.pct_day||0);
-        }).slice(0,40);
+        }).slice(0,50);
         if(!sectors.length){
           el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">暂无行业板块数据</div>';
           return;
         }
         var maxVal=Math.abs(sectors[0].pct_day||0)||1;
-        var h='<div style="display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start;padding:4px">';
+        var h='<div style="display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start;padding:4px">';
         sectors.forEach(function(s){
           var pct=s.pct_day||0;
           var up=pct>0, down=pct<0;
           var bg=up?'var(--up)':down?'var(--down)':'var(--dim)';
           var txt=(up||down)?'#fff':'var(--txt)';
           var area=Math.sqrt(Math.abs(pct))/Math.sqrt(maxVal);
-          var px=Math.max(50, Math.round(area*140));
+          var px=Math.max(40, Math.round(area*100));
           var name=s.name||s.sector_name||'未知';
           h+='<div style="width:'+px+'px;height:'+px+'px;background:'+bg+';color:'+txt;
           h+=';border-radius:8px;padding:6px;display:flex;flex-direction:column';
@@ -6125,19 +6125,7 @@ function renderLimitUpHeatmap(){
     const stocks=data.stocks||[];
     const near=data.near_miss||[];
     const tm=track?buildTrackMap(track.tracked):{};
-    const cand=window.CANDIDATE||{};
-    const candStocks=cand.stocks;
-    let consensusHtml;
-    if(stocks.length){
-      consensusHtml=stocks.map(s=>renderStock(s,false,tm)).join('');
-    } else if(candStocks && typeof candStocks==='object' && Object.keys(candStocks).length){
-      const arr=Object.keys(candStocks).map(k=>candStocks[k]);
-      consensusHtml='<div class="tp-detail" style="margin-bottom:8px">严格三重共识当前为空（算法 0 只入选）；以下为实时候选池 <b>'+arr.length+'</b> 只（展示前 30）：</div>'+
-        arr.slice(0,30).map(p=>renderCandidateCard(p)).join('');
-    } else {
-      consensusHtml='<div class="tp-empty">当前无严格三重共识股<br><span style="font-size:12px">下方「优先观察」展示满足 2/3 且主站评分≥75 的股票</span></div>';
-    }
-    $('tcConsensus').innerHTML=consensusHtml;
+    $('tcConsensus').innerHTML = stocks.length ? stocks.map(s=>renderStock(s,false,tm)).join('') : '<div class="tp-empty">当前无严格三重共识股<br><span style="font-size:12px">下方「优先观察」展示满足 2/3 且主站评分≥75 的股票</span></div>';
     const pri=near.filter(s=>(s.total_score||0)>=75&&(s.miss_steps||1)===1);
     const ext=near.filter(s=>(s.total_score||0)>=75&&(s.miss_steps||1)===2);
     $('tcNearCount').textContent=pri.length;
