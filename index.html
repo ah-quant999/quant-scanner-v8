@@ -6965,7 +6965,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       +'<span style="font-size:14px;font-weight:800;color:var(--cyan);">'+title+'</span>';
     if(subtitle){ html+='<span style="font-size:11px;color:var(--dim);margin-left:4px;">'+subtitle+'</span>'; }
     if(nodata){ html+='<span style="font-size:10px;color:var(--down);border:1px solid var(--down);border-radius:4px;padding:1px 5px;margin-left:4px;">无数据</span>'; }
-    if(t){ html+='<span style="font-size:10px;color:var(--sub);margin-left:auto;white-space:nowrap;">'+t+'</span>'; }
+    if(t){ html+='<span style="font-size:10px;color:var(--sub);margin-left:8px;white-space:nowrap;">'+t+'</span>'; }
     else { html+='<span style="margin-left:auto;"></span>'; }
     html+='</div>';
     return html;
@@ -7379,20 +7379,20 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(cffex&&cffex.items&&cffex.items.length){
       var groups={}; cffex.items.forEach(function(it){ var v=it.variety||''; if(!groups[v]) groups[v]=[]; groups[v].push(it); });
       var main={}; Object.keys(groups).forEach(function(v){ main[v]=groups[v].sort(function(a,b){return (b.open_interest||0)-(a.open_interest||0);})[0]; });
-      h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;">';
+      h+='<table style="width:100%;border-collapse:collapse;font-size:12px;">';
       ['IF','IC','IM','IH'].forEach(function(v){
         var it=main[v]; if(!it) return;
         var chg=((it.close||0)-(it.pre_settle||0))/(it.pre_settle||1)*100;
         var c=chg>=0?'var(--up)':'var(--down)';
         var name=v==='IF'?'沪深300':v==='IC'?'中证500':v==='IM'?'中证1000':'上证50';
-        h+='<div style="text-align:center;background:var(--bg2);border-radius:8px;padding:10px;">';
-        h+='<div style="font-size:11px;color:var(--dim);margin-bottom:4px;"><span style="color:var(--txt);font-weight:600;">'+v+'</span> · '+name+'</div>';
-        h+='<div style="font-size:18px;font-weight:800;color:var(--txt);">'+it.close.toFixed(1)+'</div>';
-        h+='<div style="font-size:12px;font-weight:700;color:'+c+';">'+(chg>=0?'+':'')+chg.toFixed(2)+'%</div>';
-        h+='<div style="font-size:10px;color:var(--dim);margin-top:4px;">持仓 '+((it.open_interest||0)/1e4).toFixed(1)+'万</div>';
-        h+='</div>';
+        h+='<tr style="border-bottom:1px solid var(--border);">';
+        h+='<td style="padding:8px 6px;font-weight:600;color:var(--txt);">'+v+' <span style="color:var(--dim);font-weight:400;">'+name+'</span></td>';
+        h+='<td style="padding:8px 6px;text-align:right;font-weight:800;color:var(--txt);">'+it.close.toFixed(1)+'</td>';
+        h+='<td style="padding:8px 6px;text-align:right;font-weight:700;color:'+c+';">'+(chg>=0?'+':'')+chg.toFixed(2)+'%</td>';
+        h+='<td style="padding:8px 6px;text-align:right;color:var(--dim);">持仓 '+((it.open_interest||0)/1e4).toFixed(1)+'万</td>';
+        h+='</tr>';
       });
-      h+='</div>';
+      h+='</table>';
     } else {
       h+='<div class="note" style="text-align:center;">期指数据暂不可用</div>';
     }
