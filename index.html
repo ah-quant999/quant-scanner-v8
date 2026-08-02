@@ -1918,7 +1918,331 @@ window.V8_CAL = {weeks:[],legend:[]};
 
   </section>
 
-  <!-- ============ 运维（管理员） ============ -->
+
+  <!-- ============ 共振日历（月历格式 · 机游/北向/洞察/猎手） ============ -->
+  <section id="sec-rc">
+    <div class="sec-head"><h2>📊 共振日历</h2><span class="tag">机游共振 · 北向席位 · 每日洞察 · 大牛股猎手</span></div>
+
+    <style>
+      .rc-tabs{display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap}
+      .rc-tab-btn{padding:8px 18px;border-radius:10px;font-size:13px;cursor:pointer;border:1px solid #243150;background:#0f1a2e;color:#93a4c4;transition:.2s;font-weight:500}
+      .rc-tab-btn:hover{border-color:#38bdf8;color:#cfe3ff}
+      .rc-tab-btn.active{background:linear-gradient(135deg,#13243f,#0e2747);border-color:#38bdf8;color:#fff;box-shadow:0 0 0 1px rgba(56,189,248,.4)}
+      .rc-pane{display:none}
+      .rc-pane.active{display:block}
+
+      /* 月历格子 */
+      .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;overflow:hidden}
+      .cal-head{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px}
+      .cal-head span{text-align:center;font-size:11px;font-weight:700;color:var(--dim);padding:6px 0}
+      .cal-head span.weekend{color:var(--gold)}
+      .cal-cell{min-height:72px;border:1px solid var(--border);border-radius:6px;padding:4px 5px;cursor:pointer;transition:.15s;display:flex;flex-direction:column;position:relative;overflow:hidden;background:var(--bg2)}
+      .cal-cell:hover{border-color:#38bdf8;box-shadow:0 0 0 1px rgba(56,189,248,.3);z-index:2}
+      .cal-cell.today{border-color:#38bdf8;border-width:2px;background:rgba(56,189,248,.08)}
+      .cal-cell.empty{background:transparent;border-color:transparent;cursor:default}
+      .cal-cell.empty:hover{border-color:transparent;box-shadow:none}
+      .cal-date{font-size:11px;font-weight:700;color:var(--sub);margin-bottom:2px}
+      .cal-cell.today .cal-date{color:#38bdf8}
+      .cal-cell:not(.empty):not(.no-data) .cal-date{color:var(--txt)}
+      .cal-stat{font-size:9px;line-height:1.4;color:var(--dim);flex:1;overflow:hidden}
+      .cal-stat b{font-weight:600}
+      .cal-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:3px;vertical-align:middle}
+      .dot-jy{background:#a78bfa}/* 机游 */
+      .dot-jg{background:#38bdf8}/* 机构 */
+      .dot-yz{background:#f59e0b}/* 游资 */
+
+      /* 详情展开区 */
+      .cal-detail{margin-top:14px;border:1px solid var(--border);border-radius:12px;background:var(--card);overflow:hidden;display:none}
+      .cal-detail.show{display:block}
+      .cal-detail-head{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg2)}
+      .cal-detail-head h4{margin:0;font-size:14px;color:var(--txt)}
+      .cal-detail-close{cursor:pointer;font-size:18px;color:var(--dim);line-height:1}
+      .cal-detail-close:hover{color:var(--up)}
+      .cal-detail-body{padding:12px 16px}
+
+      /* 北向TOP5同行 */
+      .north-top5-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    </style>
+
+    <!-- TAB buttons -->
+    <div class="rc-tabs">
+      <button class="rc-tab-btn active" onclick="switchRcTab('tab1',this)">📅 机游共振日历</button>
+      <button class="rc-tab-btn" onclick="switchRcTab('tab2',this)">🌊 北向日历</button>
+      <button class="rc-tab-btn" onclick="switchRcTab('tab3',this)">🔍 每日洞察</button>
+      <button class="rc-tab-btn" onclick="switchRcTab('tab4',this)">🐂 大牛股猎手</button>
+    </div>
+
+    <!-- ====== TAB1: 机游共振月历 ====== -->
+    <div id="rcTab1" class="rc-pane active">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:13px;font-weight:600;color:var(--txt)">📅 本月龙虎榜日历 · 点击日期查看详情</span>
+        <span style="font-size:11px;color:var(--dim)" id="rcCalTime">--</span>
+      </div>
+      <div id="jyMonthCal" class="cal-grid">加载中…</div>
+      <div id="jyDayDetail" class="cal-detail"></div>
+    </div>
+
+    <!-- ====== TAB2: 北向日历 ====== -->
+    <div id="rcTab2" class="rc-pane">
+      <div style="text-align:center;padding:40px 20px;color:var(--dim)">
+        <div style="font-size:36px;margin-bottom:12px">🚫</div>
+        <div style="font-size:15px;font-weight:600;color:var(--txt);margin-bottom:8px">北向数据已停更</div>
+        <div style="font-size:12px;line-height:1.7">港交所自 2024-05 起停止披露北向资金个股买入/卖出 TOP 数据。<br>本页面依赖的 NORTH_FUND 数据源已标记 stopped=true。<br>如港交所恢复披露，北向日历将自动恢复。</div>
+      </div>
+    </div>
+
+    <!-- ====== TAB3: 每日洞察（含深度分析4卡片） ====== -->
+    <div id="rcTab3" class="rc-pane">
+      <div class="grid g-4" style="margin-bottom:16px">
+        <!-- 深度分析4卡片：只在每日洞察下显示 -->
+        <div class="card" id="acJiyouSignalCard" style="cursor:pointer;position:relative;overflow:hidden;border-left:4px solid #a78bfa">
+          <h3 style="font-size:13px"><span class="ic">⚡</span> 机游信号研判分析</h3>
+          <p style="font-size:11px;color:var(--dim);margin:4px 0 0">每日信号 · 连续性跟踪 · 机游共振5维度</p>
+          <div id="acJiyouSignal" style="margin-top:8px"><div class="ipo-empty">加载中…</div></div>
+        </div>
+        <div class="card" id="acNorthAnalysisCard" style="cursor:pointer;position:relative;overflow:hidden;border-left:4px solid #22d3ee">
+          <h3 style="font-size:13px"><span class="ic">📊</span> 北向资金详细分析</h3>
+          <p style="font-size:11px;color:var(--dim);margin:4px 0 0">行业趋势 · 渠道持仓 · 陆股通共振</p>
+          <div id="acNorthAnalysis" style="margin-top:8px"><div class="ipo-empty">加载中…</div></div>
+        </div>
+        <div class="card" id="acBacktestCard" style="cursor:pointer;position:relative;overflow:hidden;border-left:4px solid #ec4899">
+          <h3 style="font-size:13px"><span class="ic">📈</span> 共振胜率回测</h3>
+          <p style="font-size:11px;color:var(--dim);margin:4px 0 0">三维度胜率 · T+1/5/10/20 · 年化收益</p>
+          <div id="acBacktest" style="margin-top:8px"><div class="ipo-empty">加载中…</div></div>
+        </div>
+        <div class="card" id="acBullHunterCard" style="cursor:pointer;position:relative;overflow:hidden;border-left:4px solid #f59e0b">
+          <h3 style="font-size:13px"><span class="ic">🎯</span> 大牛股信号扫描</h3>
+          <p style="font-size:11px;color:var(--dim);margin:4px 0 0">新赛道发现 · 异动信号 · 核心共振标的</p>
+          <div id="acBullHunter" style="margin-top:8px"><div class="ipo-empty">加载中…</div></div>
+      </div>
+    </div>
+
+    <!-- ====== TAB4: 大牛股猎手 ====== -->
+    <div id="rcTab4" class="rc-pane">
+      <div style="text-align:center;padding:40px 20px;color:var(--dim)">
+        <div style="font-size:36px;margin-bottom:12px">🔭</div>
+        <div style="font-size:15px;font-weight:600;color:var(--txt);margin-bottom:8px">大牛股猎手</div>
+        <div style="font-size:12px;line-height:1.7">新赛道发现 · 早期信号雷达 · 核心共振标的追踪<br>基于三重共识、板块轮动、资金异动的多维度扫描。</div>
+      </div>
+    </div>
+
+  </section>
+ 
+  <script>
+  /* ===== 共振日历：TAB切换 ===== */
+  window.__rcActiveTab = 'tab1';
+  function switchRcTab(tabId, btn){
+    document.querySelectorAll('.rc-pane').forEach(function(p){ p.classList.remove('active'); });
+    document.querySelectorAll('.rc-tab-btn').forEach(function(b){ b.classList.remove('active'); });
+    var pane = document.getElementById('rc' + tabId.charAt(0).toUpperCase() + tabId.slice(1));
+    if(pane) pane.classList.add('active');
+    if(btn) btn.classList.add('active');
+    window.__rcActiveTab = tabId;
+    // 首次切换到tab1时渲染月历
+    if(tabId === 'tab1' && !window.__rcCalRendered){
+      setTimeout(renderJyMonthCal, 50);
+    }
+  }
+
+  /* ===== TAB1: 机游共振月历渲染 ===== */
+  var __rcSelectedDate = null;
+  function renderJyMonthCal(){
+    window.__rcCalRendered = true;
+    var $ = function(id){ return document.getElementById(id); };
+    var cal = $('jyMonthCal');
+    if(!cal) return;
+
+    var d = window.LHB_DATA || {};
+    var stocks = d.stocks || [];
+    var summary = d.summary || {};
+    var lhbDate = d.date || '';
+
+    // Update time
+    var timeEl = $('rcCalTime');
+    if(timeEl && d.update_time){
+      timeEl.textContent = '更新于 ' + (window._fmtAshareRel ? window._fmtAshareRel(d.update_time) : d.update_time);
+    }
+
+    // Build month calendar for LHB date's month
+    var now = new Date();
+    var year = now.getFullYear();
+    var month = now.getMonth(); // 0-indexed
+
+    // If we have LHB data, use its month
+    if(lhbDate && lhbDate.length >= 6){
+      year = parseInt(lhbDate.slice(0,4));
+      month = parseInt(lhbDate.slice(4,6)) - 1;
+    }
+
+    var firstDay = new Date(year, month, 1);
+    var lastDay = new Date(year, month + 1, 0);
+    var startDow = firstDay.getDay(); // 0=Sun, 6=Sat → convert to Mon=0
+    var startOffset = startDow === 0 ? 6 : startDow - 1; // Monday=0
+    var daysInMonth = lastDay.getDate();
+
+    // Today string for highlighting
+    var today = new Date();
+    var todayStr = String(today.getFullYear()) + String(today.getMonth()+1).padStart(2,'0') + String(today.getDate()).padStart(2,'0');
+
+    // Group stocks by category
+    var byCat = {};
+    stocks.forEach(function(st){
+      var cat = st.category || '其他';
+      if(!byCat[cat]) byCat[cat] = [];
+      byCat[cat].push(st);
+    });
+
+    // Build calendar HTML
+    var h = '';
+    // Header row: 一 二 三 四 五 六 日
+    var weekNames = ['一','二','三','四','五','六','日'];
+    h += '<div class="cal-head">';
+    weekNames.forEach(function(n, i){
+      var cls = i >= 5 ? ' weekend' : '';
+      h += '<span class="'+cls+'">'+n+'</span>';
+    });
+    h += '</div>';
+
+    // Empty cells before day 1
+    for(var i = 0; i < startOffset; i++){
+      h += '<div class="cal-cell empty"></div>';
+    }
+
+    // Day cells
+    for(var day = 1; day <= daysInMonth; day++){
+      var dateStr = String(year) + String(month+1).padStart(2,'0') + String(day).padStart(2,'0');
+      var isToday = dateStr === todayStr;
+      var hasData = dateStr === lhbDate;
+      var cls = 'cal-cell';
+      if(isToday) cls += ' today';
+      if(!hasData) cls += ' no-data';
+
+      h += "<div class='"+cls+"' onclick=\"__rcClickDay('"+dateStr+"')\" data-date='"+dateStr+"'>";
+      h += '<span class="cal-date">'+day+'</span>';
+
+      if(hasData){
+        h += '<div class="cal-stat">';
+        // Show category counts with colors
+        var cats = ['机游共振','机构独买','游资独买'];
+        cats.forEach(function(cat){
+          var arr = byCat[cat] || [];
+          if(arr.length > 0){
+            var dotCls = cat==='机游共振'?'dot-jy':cat==='机构独买'?'dot-jg':'dot-yz';
+            var netSum = 0;
+            arr.forEach(function(s){ netSum += (s.inst_net_万||0); });
+            var netColor = netSum >= 0 ? 'var(--up)' : 'var(--down)';
+            h += '<div><span class="cal-dot '+dotCls+'"></span><b>'+arr.length+'</b>只 <span style="color:'+netColor+'">'+(netSum>=0?'+':'')+(netSum/10000).toFixed(1)+'亿</span></div>';
+          }
+        });
+        // Total
+        var totalNet = 0;
+        stocks.forEach(function(s){ totalNet += (s.inst_net_万||0); });
+        var tColor = totalNet >= 0 ? 'var(--up)' : 'var(--down)';
+        h += '<div style="margin-top:2px;border-top:1px solid var(--border);padding-top:2px"><span style="color:'+tColor+';font-weight:700">合计'+(totalNet>=0?'+':'')+(totalNet/10000).toFixed(1)+'亿</span></div>';
+        h += '</div>';
+      } else {
+        h += '<div class="cal-stat" style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);opacity:0.3">—</div>';
+      }
+      h += '</div>';
+    }
+
+    // Fill remaining cells
+    var totalCells = startOffset + daysInMonth;
+    var remainder = totalCells % 7;
+    if(remainder > 0){
+      for(var i = 0; i < 7 - remainder; i++){
+        h += '<div class="cal-cell empty"></div>';
+      }
+    }
+
+    cal.innerHTML = h;
+  }
+
+  /* Click day cell → show detail */
+  window.__rcClickDay = function(dateStr){
+    var $ = function(id){ return document.getElementById(id); };
+    var detail = $('jyDayDetail');
+    if(!detail) return;
+
+    var d = window.LHB_DATA || {};
+    var lhbDate = d.date || '';
+
+    if(dateStr !== lhbDate){
+      detail.innerHTML = '<div class="cal-detail-body" style="text-align:center;color:var(--dim);padding:20px">该日暂无龙虎榜数据</div>';
+      detail.className = 'cal-detail show';
+      return;
+    }
+
+    var stocks = d.stocks || [];
+    var byCat = {};
+    stocks.forEach(function(st){
+      var cat = st.category || '其他';
+      if(cat === '不达标') return;
+      if(!byCat[cat]) byCat[cat] = [];
+      byCat[cat].push(st);
+    });
+
+    var h = "<div class='cal-detail-head'><h4>" + dateStr.slice(0,4)+'-'+dateStr.slice(4,6)+'-'+dateStr.slice(6,8) + " 龙虎榜详情</h4><span class='cal-detail-close' onclick=\"document.getElementById('jyDayDetail').classList.remove('show')\">✕</span></div>";
+    h += '<div class="cal-detail-body">';
+
+    // Summary numbers
+    var sum = d.summary || {};
+    h += '<div style="display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap">';
+    var sumItems = [
+      ['机游共振', sum['机游共振']||0, '#a78bfa'],
+      ['机构独买', sum['机构独买']||0, '#38bdf8'],
+      ['游资独买', sum['游资独买']||0, '#f59e0b']
+    ];
+    sumItems.forEach(function(item){
+      h += '<div style="background:var(--bg2);border-radius:8px;padding:10px 16px;text-align:center;flex:1;min-width:80px">';
+      h += '<div style="font-size:20px;font-weight:800;color:' + item[2] + '">' + item[1] + '</div>';
+      h += '<div style="font-size:10px;color:var(--dim)">' + item[0] + '</div></div>';
+    });
+    h += '</div>';
+
+    // Category tables
+    var catOrder = ['机游共振','机构独买','游资独买'];
+    catOrder.forEach(function(cat){
+      var arr = byCat[cat] || [];
+      if(!arr.length) return;
+      var dotCls = cat==='机游共振'?'dot-jy':cat==='机构独买'?'dot-jg':'dot-yz';
+      var dotColor = cat==='机游共振'?'#a78bfa':cat==='机构独买'?'#38bdf8':'#f59e0b';
+      h += '<div style="margin-bottom:12px"><div style="font-size:12px;font-weight:700;color:var(--txt);margin-bottom:6px"><span class="cal-dot '+dotCls+'" style="margin-right:5px"></span>'+cat+' ('+arr.length+'只)</div>';
+      h += '<table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr style="color:var(--dim)"><th style="text-align:left;padding:3px 6px">名称</th><th style="text-align:right;padding:3px 6px">涨跌%</th><th style="text-align:right;padding:3px 6px">机构净入</th><th style="text-align:right;padding:3px 6px">游资净入</th></tr></thead><tbody>';
+      arr.forEach(function(st){
+        var instNet = (st.inst_net_万||0);
+        var yzNet = (st.yz_net_万||0);
+        var pct = st.pct || 0;
+        var pctColor = pct >= 0 ? 'var(--up)' : 'var(--down)';
+        h += '<tr style="border-bottom:1px solid var(--border)">';
+        h += '<td style="padding:3px 6px">' + escHtml(st.name) + '</td>';
+        h += '<td style="text-align:right;padding:3px 6px;color:'+pctColor+';font-weight:600">' + (pct>=0?'+':'') + pct.toFixed(1) + '%</td>';
+        h += '<td style="text-align:right;padding:3px 6px;color:'+(instNet>=0?'var(--up)':'var(--down)')+'">' + (instNet>=0?'+':'') + (instNet/10000).toFixed(2) + '亿</td>';
+        h += '<td style="text-align:right;padding:3px 6px;color:'+(yzNet>=0?'var(--up)':'var(--down)')+'">' + (yzNet>=0?'+':'') + (yzNet/10000).toFixed(2) + '亿</td>';
+        h += '</tr>';
+      });
+      h += '</tbody></table></div>';
+    });
+
+    h += '</div>'; // detail-body
+    detail.innerHTML = h;
+    detail.className = 'cal-detail show';
+  };
+
+  function escHtml(s){
+    var d = document.createElement('div');
+    d.textContent = s || '';
+    return d.innerHTML;
+  }
+
+  /* Auto-render on DOM ready */
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){ renderJyMonthCal(); });
+  } else {
+    renderJyMonthCal();
+  }
+  </script>
+ <!-- ============ 运维（管理员） ============ -->
   <section id="sec-op">
     <div class="sec-head"><h2>🔒 运维面板</h2><span class="tag">仅管理员可见 · 部署/心跳/数据新鲜度</span></div>
     <style>
@@ -3812,7 +4136,7 @@ function renderLimitUpHeatmap(){
       series.push({
         name: '单日净流入(亿)', type: 'bar', yAxisIndex: 0, data: nets,
         itemStyle: { color: function(p){ return p.value >= 0 ? upColor : downColor; } },
-        barMaxWidth: 16, barGap: '30%'
+        barMaxWidth: 20, barGap: '40%'
       });
     }
     if(__MFF_SHOW_CUM){
@@ -3866,7 +4190,9 @@ function renderLimitUpHeatmap(){
           type: 'value', name: __MFF_SHOW_DAILY ? '单日(亿)' : '', position: 'left',
           nameTextStyle: { color: dimColor },
           axisLabel: { fontSize: 10, color: dimColor, show: __MFF_SHOW_DAILY },
-          splitLine: { lineStyle: { color: gridColor, opacity: 0.3 } }
+          splitLine: { lineStyle: { color: gridColor, opacity: 0.3 } },
+          min: function(v) { var abs = Math.max(Math.abs(v.min), Math.abs(v.max)); return -Math.ceil(abs / 100) * 100; },
+          max: function(v) { var abs = Math.max(Math.abs(v.min), Math.abs(v.max)); return Math.ceil(abs / 100) * 100; }
         },
         {
           type: 'value', name: __MFF_SHOW_CUM ? '累计(亿)' : '', position: 'right',
@@ -3876,8 +4202,8 @@ function renderLimitUpHeatmap(){
         }
       ],
       dataZoom: [
-        { type: 'inside', xAxisIndex: 0, start: 65, end: 100 },
-        { type: 'slider', xAxisIndex: 0, height: 24, bottom: 10, start: 65, end: 100, fillerColor: 'rgba(239,68,68,0.2)', borderColor: gridColor, textStyle: { color: dimColor, fontSize: 10 } }
+        { type: 'inside', xAxisIndex: 0, start: 70, end: 100 },
+        { type: 'slider', xAxisIndex: 0, height: 22, bottom: 8, start: 70, end: 100, fillerColor: 'rgba(239,68,68,0.15)', borderColor: gridColor, textStyle: { color: dimColor, fontSize: 10 } }
       ],
       series: series
     };
