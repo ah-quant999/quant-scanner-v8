@@ -7834,6 +7834,10 @@ function renderLimitUpHeatmap(){
 
   function _renderFreshTable(){
     var items=_alertCategories.freshness.items, ct=_alertCategories.freshness;
+    /* v8.2 数据源 → 主更新时段：盘前 08:25 / 盘中 10:30-15:05 / 收盘 15:30 / 盘后 18:30 / 全天 */
+    var _slotMap={'CRISIS_DATA':'盘后','CANDIDATE':'收盘','COCKPIT_ADVICE':'盘后','CAPITAL_FLOW_DATA':'收盘','LHB_DATA':'盘后','LIMIT_UP_HEATMAP':'收盘','HERDING_DATA':'盘后','ETF_DAILY_MONITOR':'盘后','ETF_INTRADAY_HEAT':'盘中','MARGIN_DATA':'收盘','CFFEX_HOLDINGS':'收盘','IPO_DATA':'盘前','MARKET_ALERTS':'盘中','CONCEPT_RANKING':'盘中','ANALYST_RATINGS':'盘后','GOLD_POOL':'盘后','INST_TRADE':'盘后','MAHORO':'盘后','EXPERIMENT':'盘后','MACRO_DATA':'全天','SECTOR_FUND_FLOW':'收盘','INDEX_QUOTES':'盘中','ETF_PULSE':'盘中','ETF_SUBSCRIPTION':'盘后','CRDS_CARD_DATA':'盘后','COCKPIT_TIER_RECOMM':'盘后','CANDIDATE_QUOTES':'盘中'};
+    var _slotColor={'盘前':'var(--purple)','盘中':'var(--up)','收盘':'var(--gold)','盘后':'var(--down)','全天':'var(--dim)'};
+    function slotTag(k){ var s=_slotMap[k]||'--'; var c=_slotColor[s]||'var(--dim)'; return '<span style="color:'+c+';font-weight:600;font-size:9px" title="主更新时段">'+s+'</span>'; }
     /* v8.2 全维度索引：按 dataKey 聚合 5 维度状态 */
     function buildIdx(arr){ var m={}; for(var i=0;i<arr.length;i++){ var a=arr[i]; if(a.dataKey) m[a.dataKey]=a.lvl; } return m; }
     var idxB=buildIdx(_alertCategories.bloat.items);
@@ -7873,13 +7877,12 @@ function renderLimitUpHeatmap(){
       html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:10px;border-left:1px solid rgba(255,255,255,0.07)" title="缺失检测">\u7f3a</div>';
       html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:10px;border-left:1px solid rgba(255,255,255,0.07)" title="依赖就绪">\u8d56</div>';
       html+='</div></th>';
-      html+='<th style="padding:2px 3px;color:var(--dim);font-weight:600;width:28px"></th></tr></thead><tbody>';
+      html+='</div></th>';
+      html+='</tr></thead><tbody>';
       problems.sort(function(a,b){return (a.lvl==='crit'?0:1)-(b.lvl==='crit'?0:1);});
       for(var p=0;p<problems.length;p++){
         var a=problems[p];
         var bg=a.lvl==='crit'?'rgba(244,63,94,0.06)':a.lvl==='warn'?'rgba(251,191,36,0.06)':'transparent';
-        var drill=_alertDrillMap[a.dataKey]||null;
-        var drillBtn=drill?_alertDrillBtn(drill.t,drill.a,drill.l):'';
         html+='<tr style="background:'+bg+'"><td style="padding:2px 5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px" title="'+a.name+'">'+a.name+'</td>';
         html+='<td style="padding:2px 5px;color:var(--sub);white-space:nowrap;font-size:9.5px">'+a.tsStr+'</td>';
         html+='<td style="padding:2px 10px 2px 4px;text-align:right;color:'+(a.lvl==='crit'?'var(--down)':a.lvl==='warn'?'var(--gold)':'var(--up)')+';font-weight:600;width:64px">'+a.ageH+'h</td>';
@@ -7891,8 +7894,7 @@ function renderLimitUpHeatmap(){
           {title:'缺失 '+lvlText(idxM[a.dataKey]), content: cell(idxM[a.dataKey]||(idxM[a.dataKey]===undefined?'ok':null))},
           {title:'依赖 '+lvlText(idxD[a.dataKey]), content: cell(idxD[a.dataKey]||(idxD[a.dataKey]===undefined?'ok':null))}
         ], 'font-size:12px');
-        html+='</td>';
-        html+='<td style="padding:2px 3px">'+drillBtn+'</td></tr>';
+        html+='</td></tr>';
       }
       html+='</tbody></table>';
     }
@@ -7900,6 +7902,7 @@ function renderLimitUpHeatmap(){
     html+='<details style="margin-top:6px"><summary style="cursor:pointer;font-size:10.5px;color:var(--dim);padding:2px 0;user-select:none">\ud83d\udcca \u5168 '+ct.total+' \u4e2a\u6570\u636e\u6e90 \u00b7 5 \u7ef4\u5ea6\u6982\u89c8\uff08\u5c55\u5f00\uff09</summary>';
     html+='<table style="width:100%;border-collapse:collapse;font-size:9.5px;line-height:1.2;margin-top:4px"><thead><tr>';
     html+='<th style="text-align:left;padding:2px 5px;color:var(--dim);font-weight:600">\u6570\u636e\u6e90</th>';
+    html+='<th style="text-align:left;padding:2px 5px;color:var(--dim);font-weight:600;width:32px" title="主更新时段">\u65f6\u6bb5</th>';
     html+='<th style="text-align:right;padding:2px 10px 2px 4px;color:var(--dim);font-weight:600;width:64px">\u9648\u65e7</th>';
     html+='<th style="padding:0 0 0 10px;color:var(--dim);font-weight:600;border-left:1px solid rgba(255,255,255,0.1)"><div style="display:flex;justify-content:stretch">';
     html+='<div style="flex:1;text-align:center;padding:4px 0;font-size:9.5px" title="新鲜度">\u65b0</div>';
@@ -7913,6 +7916,7 @@ function renderLimitUpHeatmap(){
       var a=items[q];
       var bg=a.lvl==='crit'?'rgba(244,63,94,0.04)':a.lvl==='warn'?'rgba(251,191,36,0.04)':'transparent';
       html+='<tr style="background:'+bg+'"><td style="padding:1.5px 5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100px;color:var(--sub)" title="'+a.name+'">'+a.name+'</td>';
+      html+='<td style="padding:1.5px 5px">'+slotTag(a.dataKey)+'</td>';
       html+='<td style="padding:1.5px 10px 1.5px 4px;text-align:right;color:var(--dim);font-size:9px;width:64px">'+a.ageH+'h</td>';
       html+='<td style="padding:0;border-left:1px solid rgba(255,255,255,0.1)">';
       html+=dimGroup([
@@ -7939,17 +7943,14 @@ function renderLimitUpHeatmap(){
       html+='<th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600">\u6570\u636e\u6e90</th>';
       html+='<th style="text-align:right;padding:5px 8px;color:var(--dim);font-weight:600">\u5f53\u524d\u91cf</th>';
       html+='<th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600">\u72b6\u6001</th>';
-      html+='<th style="padding:5px 4px;color:var(--dim);font-weight:600;width:38px"></th></tr></thead><tbody>';
+      html+='</tr></thead><tbody>';
       for(var bi=0;bi<items.length;bi++){
         var a=items[bi];
         var bg=a.lvl==='crit'?'rgba(244,63,94,0.08)':a.lvl==='warn'?'rgba(251,191,36,0.08)':'transparent';
         var bd=a.lvl==='crit'?'var(--down)':a.lvl==='warn'?'var(--gold)':'var(--up)';
-        var drill=_alertDrillMap[a.dataKey]||null;
-        var drillBtn=drill?_alertDrillBtn(drill.t,drill.a,drill.l):'';
         html+='<tr style="background:'+bg+';border-left:2px solid '+bd+'"><td style="padding:5px 8px;font-weight:600">'+a.name+'</td>';
         html+='<td style="padding:5px 8px;text-align:right;font-weight:700;color:'+(a.lvl==='crit'?'var(--down)':'var(--gold)')+'">'+a.val+'</td>';
-        html+='<td style="padding:5px 8px"><span class="status-dot '+(a.lvl==='crit'?'s-err':'s-warn')+'"></span>'+a.reason+'</td>';
-        html+='<td style="padding:5px 4px">'+drillBtn+'</td></tr>';
+        html+='<td style="padding:5px 8px"><span class="status-dot '+(a.lvl==='crit'?'s-err':'s-warn')+'"></span>'+a.reason+'</td></tr>';
       }
       html+='</tbody></table>';
     }
@@ -7990,10 +7991,8 @@ function renderLimitUpHeatmap(){
       html+='<div style="display:flex;flex-wrap:wrap;gap:6px">';
       for(var mi=0;mi<items.length;mi++){
         var a=items[mi];
-        var drill=_alertDrillMap[a.dataKey]||null;
-        var drillBtn=drill?_alertDrillBtn(drill.t,drill.a,drill.l):'';
         html+='<div style="padding:6px 12px;border-radius:6px;background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2);font-size:11.5px;font-weight:600;color:var(--down);display:flex;align-items:center;gap:6px">';
-        html+='<span style="margin-right:4px">\ud83d\udea8</span>'+a.name+' <span style="font-weight:400;font-size:10px;color:var(--sub)">'+a.reason+'</span>'+drillBtn+'</div>';
+        html+='<span style="margin-right:4px">\ud83d\udea8</span>'+a.name+' <span style="font-weight:400;font-size:10px;color:var(--sub)">'+a.reason+'</span></div>';
       }
       html+='</div>';
     }
@@ -8093,15 +8092,14 @@ function renderLimitUpHeatmap(){
       html+='<th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600">功能模块</th>';
       html+='<th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600">缺失依赖</th>';
       html+='<th style="text-align:left;padding:5px 8px;color:var(--dim);font-weight:600">状态</th>';
-      html+='<th style="text-align:right;padding:5px 8px;color:var(--dim);font-weight:600">操作</th></tr></thead><tbody>';
+      html+='</tr></thead><tbody>';
       for(var di=0;di<items.length;di++){
         var a=items[di];
         var bg=a.lvl==='crit'?'rgba(244,63,94,0.06)':'rgba(251,191,36,0.06)';
         var bd=a.lvl==='crit'?'var(--down)':'var(--gold)';
         html+='<tr style="background:'+bg+';border-left:2px solid '+bd+'"><td style="padding:5px 8px;font-weight:600">'+a.name+'</td>';
         html+='<td style="padding:5px 8px;color:var(--sub);font-size:10.5px">'+a.missing.join('、')+'</td>';
-        html+='<td style="padding:5px 8px"><span class="status-dot '+(a.lvl==='crit'?'s-err':'s-warn')+'"></span>'+a.reason+'</td>';
-        html+='<td style="padding:5px 8px;text-align:right">'+_alertDrillBtn(a.target,a.anchor,'查看')+'</td></tr>';
+        html+='<td style="padding:5px 8px"><span class="status-dot '+(a.lvl==='crit'?'s-err':'s-warn')+'"></span>'+a.reason+'</td></tr>';
       }
       html+='</tbody></table>';
       var okItems=ct.total-items.length;
