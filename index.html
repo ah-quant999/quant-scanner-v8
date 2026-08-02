@@ -5653,18 +5653,33 @@ function renderLimitUpHeatmap(){
     }
     var h='<div style="padding:8px 4px;">';
     h+='<div style="font-size:11px;color:var(--sub);margin-bottom:8px;">全市场净流入：<span style="color:'+(daily.total_net>=0?'var(--up)':'var(--down)')+';font-weight:700;">'+(daily.total_net>=0?'+':'')+(daily.total_net/1e8).toFixed(2)+'亿</span> · 覆盖 '+(daily.total_etf||0)+' 只</div>';
-    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">';
-    h+='<div>';
-    h+='<div style="font-weight:700;font-size:11px;color:var(--up);margin-bottom:6px;">TOP5 主力净流入</div>';
-    (daily.top_inflow||[]).slice(0,5).forEach(function(x){
-      h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px dashed var(--border);"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:6px;">'+x.name+'</span><span style="color:var(--up);font-weight:700;flex-shrink:0;">+'+(x.net/1e8).toFixed(2)+'亿</span></div>';
+    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">';
+    /* Card 1: TOP10 主力净流入 */
+    h+='<div style="background:linear-gradient(135deg,rgba(244,79,93,0.08),rgba(244,79,93,0.02));border:1px solid rgba(244,79,93,0.2);border-radius:12px;padding:14px;">';
+    h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;"><span style="font-size:16px">📥</span><span style="font-weight:700;font-size:13px;color:var(--up)">TOP10 主力净流入</span></div>';
+    (daily.top_inflow||[]).slice(0,10).forEach(function(x,xi){
+      var rankBadge='<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;margin-right:8px;flex-shrink:0;'+(xi<3?'background:var(--up);color:#fff':'background:var(--card2);color:var(--dim))+'">'+(xi+1)+'</span>';
+      var barW=Math.min(100,(x.net/(daily.top_inflow[0]?daily.top_inflow[0].net:1))*100);
+      h+='<div style="display:flex;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">'+rankBadge;
+      h+='<div style="flex:1;margin-right:8px;"><div style="font-size:11px;color:var(--txt);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+x.name+'</div>';
+      h+='<div style="height:4px;background:var(--card2);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+barW.toFixed(1)+'%;background:linear-gradient(90deg,#f4495d,#f87171);border-radius:2px"></div></div></div>';
+      h+='<span style="font-size:11.5px;font-weight:700;color:var(--up);flex-shrink:0;min-width:68px;text-align:right">+'+(x.net/1e8).toFixed(2)+'亿</span></div>';
     });
+    if((daily.top_inflow||[]).length===0){ h+='<div style="color:var(--dim);font-size:11.5px;padding:10px;text-align:center">暂无数据</div>'; }
     h+='</div>';
-    h+='<div>';
-    h+='<div style="font-weight:700;font-size:11px;color:var(--down);margin-bottom:6px;">TOP5 主力净流出</div>';
-    (daily.top_outflow||[]).slice(0,5).forEach(function(x){
-      h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px dashed var(--border);"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:6px;">'+x.name+'</span><span style="color:var(--down);font-weight:700;flex-shrink:0;">'+(x.net/1e8).toFixed(2)+'亿</span></div>';
+    /* Card 2: TOP10 主力净流出 */
+    h+='<div style="background:linear-gradient(135deg,rgba(31,209,123,0.08),rgba(31,209,123,0.02));border:1px solid rgba(31,209,123,0.2);border-radius:12px;padding:14px;">';
+    h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;"><span style="font-size:16px">📤</span><span style="font-weight:700;font-size:13px;color:var(--down)">TOP10 主力净流出</span></div>';
+    (daily.top_outflow||[]).slice(0,10).forEach(function(x,xi){
+      var rankBadge='<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;margin-right:8px;flex-shrink:0;'+(xi<3?'background:var(--down);color:#fff':'background:var(--card2);color:var(--dim))+'">'+(xi+1)+'</span>';
+      var absNet=Math.abs(x.net);
+      var barW=Math.min(100,(absNet/(daily.top_outflow[0]?Math.abs(daily.top_outflow[0].net):1))*100);
+      h+='<div style="display:flex;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">'+rankBadge;
+      h+='<div style="flex:1;margin-right:8px;"><div style="font-size:11px;color:var(--txt);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+x.name+'</div>';
+      h+='<div style="height:4px;background:var(--card2);border-radius:2px;overflow:hidden"><div style="height:100%;width:'+barW.toFixed(1)+'%;background:linear-gradient(90deg,#1fd17b,#4ade80);border-radius:2px"></div></div></div>';
+      h+='<span style="font-size:11.5px;font-weight:700;color:var(--down);flex-shrink:0;min-width:68px;text-align:right">'+(x.net/1e8).toFixed(2)+'亿</span></div>';
     });
+    if((daily.top_outflow||[]).length===0){ h+='<div style="color:var(--dim);font-size:11.5px;padding:10px;text-align:center">暂无数据</div>'; }
     h+='</div>';
     h+='</div>';
     el.innerHTML=h;
