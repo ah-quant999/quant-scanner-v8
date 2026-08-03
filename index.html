@@ -418,6 +418,7 @@ html>
 <script src="data/LHB_DATA.js"></script>
 <script src="data/CONCEPT_RANKING.js"></script>
 <script src="data/INDEX_QUOTES.js"></script>
+<script src="data/AI_MARKET_BRIEF.js"></script>
 <script src="data/MARGIN_DATA.js"></script>
 <script src="data/CFFEX_HOLDINGS.js"></script>
 <script src="data/IPO_DATA.js"></script>
@@ -596,56 +597,106 @@ window.V8_CAL = {weeks:[],legend:[]};
   <section id="sec-rt">
     <div class="sec-head"><h2>📡 实时数据</h2><span class="fresh" id="rtUpdateTime">更新于 --</span><span class="tag">盘中 T+0 · 数据延迟约 3~5 秒</span></div>
 
-    <!-- 🧠 AI市场速览（A 阶段 2026-07-31：数字写死，参考 v6 周一真实快照；B 阶段接 JSON） -->
+    <!-- 🧠 AI市场速览（B 阶段：由 gen_market_brief.py 根据盘中实时数据规则生成） -->
     <div id="aiSummaryCard" style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">
       <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--border);">
-        <span style="font-size:16px;font-weight:700;color:var(--txt);">🧠 AI市场速览 <span style="font-size:10px;font-weight:400;color:var(--dim);">短线·综合 · A 阶段演示数据</span></span>
+        <span style="font-size:16px;font-weight:700;color:var(--txt);">🧠 AI市场速览 <span style="font-size:10px;font-weight:400;color:var(--dim);">短线·综合 · 盘中实时解读</span></span>
         <span style="font-size:12px;color:var(--sub);font-weight:400;" id="aiSummaryTime">--</span>
       </div>
       <div style="padding:0;" id="aiSummaryContent">
-        <div style="padding:10px 18px;background:rgba(167,139,250,0.10);font-size:13px;line-height:1.7;color:var(--txt);">
-          <span style="padding:2px 8px;border-radius:4px;background:rgba(167,139,250,0.20);color:#a78bfa;margin-right:6px;">🟣 日内风向</span>
-          <strong>情绪冰点</strong>，普跌格局，<strong style="color:var(--purple);">三重共识</strong>今日无严格共识（差一步 2 只），<span style="color:var(--up);font-weight:700;">⚠️ 连跌 52 天</span>
-        </div>
-        <div style="padding:10px 18px;background:rgba(31,209,123,0.10);font-size:13px;line-height:1.7;color:var(--txt);">
-          <span style="padding:2px 8px;border-radius:4px;background:rgba(31,209,123,0.20);color:#1fd17b;margin-right:6px;">🟢 市场健康度</span>
-          <span style="color:#1fd17b;font-weight:700;">结构承压</span> ·
-          <span style="color:#1fd17b;font-weight:700;">资金偏多</span> ·
-          <span style="color:#1fd17b;font-weight:700;">情绪偏冷</span>
-          — <strong>1/3 灯道值</strong>
-        </div>
-        <div style="padding:10px 18px;background:rgba(56,189,248,0.10);font-size:13px;line-height:1.7;color:var(--txt);">
-          <span style="padding:2px 8px;border-radius:4px;background:rgba(56,189,248,0.20);color:#38bdf8;margin-right:6px;">📊 指数</span>
-          <span class="up" style="font-weight:700;">-1.2%</span> 上证指数 ·
-          <span class="down" style="font-weight:700;">-4.5%</span> 深证成指 ·
-          <span class="down" style="font-weight:700;">-7.3%</span> 创业板指 ·
-          <span class="down" style="font-weight:700;">-6.3%</span> 科创50 ·
-          <span class="up" style="font-weight:700;">+0.3%</span> 恒生指数 ·
-          <span class="up" style="font-weight:700;">+0.1%</span> 恒生科技 ·
-          <span class="down" style="font-weight:700;">-0.9%</span> 日经225 ·
-          <span class="down" style="font-weight:700;">-7.2%</span> 韩国 KOSPI
-        </div>
-        <div style="padding:10px 18px;background:rgba(251,191,36,0.10);font-size:13px;line-height:1.7;color:var(--txt);">
-          <span style="padding:2px 8px;border-radius:4px;background:rgba(251,191,36,0.20);color:#fbbf24;margin-right:6px;">⚠️ 市场异动</span>
-          融资大增 <strong>1.0%</strong>，地量创 20 日新低
-        </div>
-        <div style="padding:10px 18px;background:rgba(244,114,182,0.10);font-size:13px;line-height:1.7;color:var(--txt);">
-          <span style="padding:2px 8px;border-radius:4px;background:rgba(244,114,182,0.20);color:#f472b6;margin-right:6px;">📉 期货持仓</span>
-          <span style="color:var(--up);font-weight:700;">⚠️ 中信整体偏空</span>，机构态度谨慎，各合约连续方向不一
-        </div>
+        <div class="ipo-empty">加载中…</div>
       </div>
     </div>
     <script>
     (function(){
-      var el=document.getElementById('aiSummaryTime');
-      if(!el) return;
-      var adv=window.COCKPIT_ADVICE;
-      var gt=adv&&adv.gen_time;
-      if(!gt){ el.textContent='演示数据'; return; }
-      var f=window._fmtCockpitRel||window._fmtAshareRel;
-      el.textContent='AI建议 '+(f?f(gt):gt);
+      var $=function(id){ return document.getElementById(id); };
+      var rel=window._fmtAshareRel||function(s){ return String(s); };
+      var colorMap={
+        purple:{bg:'rgba(167,139,250,.10)', tag:'rgba(167,139,250,.20)', c:'#a78bfa'},
+        green:{bg:'rgba(31,209,123,.10)', tag:'rgba(31,209,123,.20)', c:'#1fd17b'},
+        blue:{bg:'rgba(56,189,248,.10)', tag:'rgba(56,189,248,.20)', c:'#38bdf8'},
+        gold:{bg:'rgba(251,191,36,.10)', tag:'rgba(251,191,36,.20)', c:'#fbbf24'},
+        red:{bg:'rgba(244,73,93,.10)', tag:'rgba(244,73,93,.20)', c:'#f4495d'},
+        cyan:{bg:'rgba(34,211,238,.10)', tag:'rgba(34,211,238,.20)', c:'#22d3ee'},
+        gray:{bg:'rgba(148,163,184,.10)', tag:'rgba(148,163,184,.20)', c:'#94a3b8'}
+      };
+      function fmtPct(v){ return v==null||isNaN(v)?'--':(v>0?'+':'')+Number(v).toFixed(2)+'%'; }
+      function lightText(c){ return c==='green'?'#1fd17b':c==='red'?'#f4495d':c==='yellow'?'#fbbf24':c==='gray'?'#94a3b8':'#38bdf8'; }
+      function renderAiSummary(){
+        var d=window.AI_MARKET_BRIEF;
+        var timeEl=$('aiSummaryTime');
+        var contentEl=$('aiSummaryContent');
+        if(!contentEl) return;
+        if(!d || !d.gen_time){
+          contentEl.innerHTML='<div class="ipo-empty">AI市场速览数据暂不可用</div>';
+          if(timeEl) timeEl.textContent='--';
+          return;
+        }
+        if(timeEl) timeEl.textContent='AI建议 '+rel(d.gen_time);
+        var h='';
+
+        // 1. 日内风向
+        var sent=d.sentiment||{};
+        var sclr=colorMap.purple;
+        h+='<div style="padding:10px 18px;background:'+sclr.bg+';font-size:13px;line-height:1.7;color:var(--txt);">';
+        h+='<span style="padding:2px 8px;border-radius:4px;background:'+sclr.tag+';color:'+sclr.c+';margin-right:6px;">🟣 日内风向</span>';
+        h+='<strong>'+sent.label+'</strong>，'+sent.description;
+        if(sent.up_down_ratio!=null){
+          h+=' &nbsp;|&nbsp; 涨跌比 <strong>'+sent.up_down_ratio+'</strong>（涨'+sent.up+' / 跌'+sent.down+' / 平'+sent.flat+'）';
+        }
+        h+='</div>';
+
+        // 2. 市场健康度
+        var health=d.health||{};
+        var hclr=colorMap.green;
+        h+='<div style="padding:10px 18px;background:'+hclr.bg+';font-size:13px;line-height:1.7;color:var(--txt);">';
+        h+='<span style="padding:2px 8px;border-radius:4px;background:'+hclr.tag+';color:'+hclr.c+';margin-right:6px;">🟢 市场健康度</span>';
+        var hl=[health.structure, health.fund, health.emotion];
+        var hparts=[];
+        hl.forEach(function(x){ if(x && x[0]) hparts.push('<span style="color:'+lightText(x[1])+' ;font-weight:700;">'+x[0]+'</span>'); });
+        h+=hparts.join(' · ');
+        h+='</div>';
+
+        // 3. 指数纵览
+        var iclr=colorMap.blue;
+        h+='<div style="padding:10px 18px;background:'+iclr.bg+';font-size:13px;line-height:1.7;color:var(--txt);">';
+        h+='<span style="padding:2px 8px;border-radius:4px;background:'+iclr.tag+';color:'+iclr.c+';margin-right:6px;">📊 指数</span>';
+        var idxs=d.indices||[];
+        var iparts=[];
+        idxs.forEach(function(it){
+          var cls=it.chg>0?'up':it.chg<0?'down':'';
+          iparts.push('<span class="'+cls+'" style="font-weight:700;">'+fmtPct(it.chg)+'</span> '+it.name);
+        });
+        h+=iparts.join(' · ');
+        h+='</div>';
+
+        // 4. 市场异动（最多5条）
+        var anoms=d.anomalies||[];
+        anoms.forEach(function(a){
+          var c=colorMap[a.color]||colorMap.gold;
+          h+='<div style="padding:10px 18px;background:'+c.bg+';font-size:13px;line-height:1.7;color:var(--txt);">';
+          h+='<span style="padding:2px 8px;border-radius:4px;background:'+c.tag+';color:'+c.c+';margin-right:6px;">'+a.emoji+' '+a.tag+'</span>';
+          h+=a.text;
+          h+='</div>';
+        });
+
+        // 5. 操作建议
+        var strats=d.strategies||[];
+        if(strats.length){
+          var sclr=colorMap.gold;
+          h+='<div style="padding:10px 18px;background:'+sclr.bg+';font-size:13px;line-height:1.7;color:var(--txt);">';
+          h+='<span style="padding:2px 8px;border-radius:4px;background:'+sclr.tag+';color:'+sclr.c+';margin-right:6px;">🎯 操作建议</span>';
+          h+=strats.join(' &nbsp;|&nbsp; ');
+          h+='</div>';
+        }
+
+        contentEl.innerHTML=h;
+      }
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', renderAiSummary);
+      else renderAiSummary();
     })();
     </script>
+
 
     <div class="grid g-4" id="indexCardsGrid" style="margin-bottom:16px">
       <div class="card rt-card"><div class="ipo-empty">指数行情加载中…</div></div>
@@ -1887,7 +1938,61 @@ window.V8_CAL = {weeks:[],legend:[]};
       </div>
     </div>
 
-        <!-- ========== 决策中枢：战略→战术→选股 ========== -->
+    <!-- 极端风险联动策略 · 盘后决策框架（与实时风险温度计上下挨着） -->
+    <div class="card" id="riskLinkageCard" style="margin-bottom:16px;border-left:4px solid #ef4444;">
+      <div class="risk-linkage-section" style="margin-top:0;padding-top:0;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <span style="font-size:16px;">🚨</span>
+          <span style="font-size:14px;font-weight:700;color:var(--txt);">极端风险联动策略 · 盘后决策框架</span>
+          <span class="fresh" id="riskLinkageTime">更新于 2026-08-03 09:54</span>
+        </div>
+
+        <div class="risk-status-bar" style="display:flex;align-items:center;gap:12px;margin:10px 0 14px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.12);">
+          <span style="font-size:13px;color:var(--sub);">当前系统状态：</span>
+          <span class="status-dot" style="width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;"></span>
+          <span style="font-weight:700;color:#22c55e;">观察</span>
+          <span style="font-size:12px;color:var(--dim);margin-left:auto;">基于 8/3 美日联合干预日元事件 · 干预有效区 156–158</span>
+        </div>
+
+        <div class="logic-p" style="margin-bottom:12px;">
+          <b>用途</b>：当外围风险（日元急升 / 套利 unwind / 美债波动）升级时，联动现有选股策略给出仓位与方向调整框架，不是每日交易指令，是<strong>极端情形预案</strong>。
+        </div>
+
+        <div class="grid g-2" style="margin-bottom:12px;">
+          <div class="card" style="margin-bottom:0;background:rgba(255,255,255,.03);">
+            <h4 style="font-size:13px;margin:0 0 8px;color:var(--txt);">🎯 高风险触发矩阵（任一亮红灯即进入警惕）</h4>
+            <table class="risk-table" style="width:100%;border-collapse:collapse;font-size:12px;">
+              <thead><tr style="background:rgba(245,158,11,.15);"><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">指标</th><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">阈值</th><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">当前</th><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">状态</th></tr></thead>
+              <tbody>
+                <tr><td style="padding:6px 8px;border:1px solid var(--border);">USDJPY</td><td style="padding:6px 8px;border:1px solid var(--border);">&lt; 155 或 &gt; 163</td><td style="padding:6px 8px;border:1px solid var(--border);">~157.6</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 有效</td></tr>
+                <tr><td style="padding:6px 8px;border:1px solid var(--border);">VIX</td><td style="padding:6px 8px;border:1px solid var(--border);">&gt; 25 + 美股科技破位</td><td style="padding:6px 8px;border:1px solid var(--border);">--</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 正常</td></tr>
+                <tr><td style="padding:6px 8px;border:1px solid var(--border);">北向资金</td><td style="padding:6px 8px;border:1px solid var(--border);">连续大额净流出 + 人民币急贬</td><td style="padding:6px 8px;border:1px solid var(--border);">--</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 待观察</td></tr>
+                <tr><td style="padding:6px 8px;border:1px solid var(--border);">10Y 美债收益率</td><td style="padding:6px 8px;border:1px solid var(--border);">&gt; 4.5%</td><td style="padding:6px 8px;border:1px solid var(--border);">--</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 正常</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card" style="margin-bottom:0;background:rgba(255,255,255,.03);">
+            <h4 style="font-size:13px;margin:0 0 8px;color:var(--txt);">⚡ 联动动作（与选股策略对齐）</h4>
+            <ul style="margin:0;padding-left:18px;font-size:12px;line-height:1.8;color:var(--sub);">
+              <li><b>观察级（现在）</b>：三重共识正常执行，主站TOP10≥70、驾驶舱A档、基本面A档标准不变。</li>
+              <li><b>警惕级（1红灯）</b>：选股池加<strong>北向持股&lt;3%</strong>、<strong>海外收入&lt;20%</strong>过滤；降低成长板块权重。</li>
+              <li><b>减仓级（2红灯）</b>：整体仓位降 20–40%；优先减<strong>高估值科技 / 出口链 / 外资重仓</strong>；增配黄金、公用事业、高股息。</li>
+              <li><b>清仓级（3+红灯或系统性踩踏）</b>：权益仓位压至 20% 以下或空仓；只保留现金/国债/黄金ETF。</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="logic-p" style="margin-bottom:10px;background:rgba(34,197,94,.08);padding:10px 12px;border-radius:8px;">
+          <b>今日判定（8/3）</b>：USDJPY 从 164 回落至 157.6，干预有效，未触发任何红灯。A 股主驱动仍在国内政策/基本面，<strong>不构成清仓理由</strong>。继续观察北向、人民币汇率、晚间美股开盘情绪。
+        </div>
+
+        <div style="font-size:11px;color:var(--dim);line-height:1.6;border-top:1px solid var(--border);padding-top:10px;">
+          <b>数据来源</b>：公开新闻 + 市场数据；本卡为分析框架，非投资建议。详细逻辑见 <a href="宏观解读_美日干预日元_2026-08-03.md" target="_blank" style="color:#60a5fa;">宏观解读_美日干预日元_2026-08-03.md</a>。
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 决策中枢：战略→战术→选股 ========== -->
     <div class="card hub-card" style="margin-bottom:16px">
       <h3><span class="ic">🧭</span>决策中枢 · 战略→战术→选股 <span class="fresh" id="hubTime">更新于 --</span></h3>
       <div id="hubBody">
@@ -1909,58 +2014,6 @@ window.V8_CAL = {weeks:[],legend:[]};
             <div class="hub-layer-title">⚡ 因子信号 · 选股层</div>
             <div class="hub-factor-count" id="hubFactorCount">--</div>
             <div class="hub-layer-body" id="hubFactorBody">即将接入日线因子模块</div>
-          </div>
-        </div>
-
-        <!-- 极端风险联动策略（合并进决策中枢） -->
-        <div class="risk-linkage-section" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-            <span style="font-size:16px;">🚨</span>
-            <span style="font-size:14px;font-weight:700;color:var(--txt);">极端风险联动策略 · 盘后决策框架</span>
-            <span class="fresh" id="riskLinkageTime">更新于 2026-08-03 09:54</span>
-          </div>
-
-          <div class="risk-status-bar" style="display:flex;align-items:center;gap:12px;margin:10px 0 14px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.12);">
-            <span style="font-size:13px;color:var(--sub);">当前系统状态：</span>
-            <span class="status-dot" style="width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;"></span>
-            <span style="font-weight:700;color:#22c55e;">观察</span>
-            <span style="font-size:12px;color:var(--dim);margin-left:auto;">基于 8/3 美日联合干预日元事件 · 干预有效区 156–158</span>
-          </div>
-
-          <div class="logic-p" style="margin-bottom:12px;">
-            <b>用途</b>：当外围风险（日元急升 / 套利 unwind / 美债波动）升级时，联动现有选股策略给出仓位与方向调整框架，不是每日交易指令，是<strong>极端情形预案</strong>。
-          </div>
-
-          <div class="grid g-2" style="margin-bottom:12px;">
-            <div class="card" style="margin-bottom:0;background:rgba(255,255,255,.03);">
-              <h4 style="font-size:13px;margin:0 0 8px;color:var(--txt);">🎯 高风险触发矩阵（任一亮红灯即进入警惕）</h4>
-              <table class="risk-table" style="width:100%;border-collapse:collapse;font-size:12px;">
-                <thead><tr style="background:rgba(245,158,11,.15);"><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">指标</th><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">阈值</th><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">当前</th><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">状态</th></tr></thead>
-                <tbody>
-                  <tr><td style="padding:6px 8px;border:1px solid var(--border);">USDJPY</td><td style="padding:6px 8px;border:1px solid var(--border);">&lt; 155 或 &gt; 163</td><td style="padding:6px 8px;border:1px solid var(--border);">~157.6</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 有效</td></tr>
-                  <tr><td style="padding:6px 8px;border:1px solid var(--border);">VIX</td><td style="padding:6px 8px;border:1px solid var(--border);">&gt; 25 + 美股科技破位</td><td style="padding:6px 8px;border:1px solid var(--border);">--</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 正常</td></tr>
-                  <tr><td style="padding:6px 8px;border:1px solid var(--border);">北向资金</td><td style="padding:6px 8px;border:1px solid var(--border);">连续大额净流出 + 人民币急贬</td><td style="padding:6px 8px;border:1px solid var(--border);">--</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 待观察</td></tr>
-                  <tr><td style="padding:6px 8px;border:1px solid var(--border);">10Y 美债收益率</td><td style="padding:6px 8px;border:1px solid var(--border);">&gt; 4.5%</td><td style="padding:6px 8px;border:1px solid var(--border);">--</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 正常</td></tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="card" style="margin-bottom:0;background:rgba(255,255,255,.03);">
-              <h4 style="font-size:13px;margin:0 0 8px;color:var(--txt);">⚡ 联动动作（与选股策略对齐）</h4>
-              <ul style="margin:0;padding-left:18px;font-size:12px;line-height:1.8;color:var(--sub);">
-                <li><b>观察级（现在）</b>：三重共识正常执行，主站TOP10≥70、驾驶舱A档、基本面A档标准不变。</li>
-                <li><b>警惕级（1红灯）</b>：选股池加<strong>北向持股&lt;3%</strong>、<strong>海外收入&lt;20%</strong>过滤；降低成长板块权重。</li>
-                <li><b>减仓级（2红灯）</b>：整体仓位降 20–40%；优先减<strong>高估值科技 / 出口链 / 外资重仓</strong>；增配黄金、公用事业、高股息。</li>
-                <li><b>清仓级（3+红灯或系统性踩踏）</b>：权益仓位压至 20% 以下或空仓；只保留现金/国债/黄金ETF。</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="logic-p" style="margin-bottom:10px;background:rgba(34,197,94,.08);padding:10px 12px;border-radius:8px;">
-            <b>今日判定（8/3）</b>：USDJPY 从 164 回落至 157.6，干预有效，未触发任何红灯。A 股主驱动仍在国内政策/基本面，<strong>不构成清仓理由</strong>。继续观察北向、人民币汇率、晚间美股开盘情绪。
-          </div>
-
-          <div style="font-size:11px;color:var(--dim);line-height:1.6;border-top:1px solid var(--border);padding-top:10px;">
-            <b>数据来源</b>：公开新闻 + 市场数据；本卡为分析框架，非投资建议。详细逻辑见 <a href="宏观解读_美日干预日元_2026-08-03.md" target="_blank" style="color:#60a5fa;">宏观解读_美日干预日元_2026-08-03.md</a>。
           </div>
         </div>
       </div>
@@ -3591,8 +3644,8 @@ window.V8_CAL = {weeks:[],legend:[]};
         <h3><span class="ic">🌟</span>AI市场速览 - 说明</h3>
         <div class="logic-h">定位</div>
         <div class="logic-p">替代旧版「市场异动速览」，计划自动聚合 14 维度中国源数据，盘中实时驱动。</div>
-        <div class="logic-h">当前状态（A 阶段）</div>
-        <div class="logic-p"><b>演示数据，尚未接入真实 JSON</b>。当前卡片内数字为写死的参考快照（参考 v6 周一真实数据），仅用于 UI 验证与布局演示。<b>B 阶段</b>将接入后端聚合 JSON，替换为实时/盘后自动生成的市场综述。</div>
+        <div class="logic-h">当前状态（B 阶段·已上线）</div>
+        <div class="logic-p"><b>已接入实时数据</b>。卡片由 <code>algorithms/gen_market_brief.py</code> 规则引擎根据盘中 <code>raw_data</code> 真实数据自动生成（日内风向 / 市场健康度三灯 / 指数纵览 / 市场异动 / 操作建议），随盘中刷新（每 15 分钟）更新，标题显示「AI建议 &lt;相对时间&gt;」。<b>C 阶段</b>将升级为 LLM 自然语言解读。</div>
         <div class="logic-h">14 维度</div>
         <div class="logic-p">日内风向标、ETF国家队资金、板块资金主线、主力抱团方向、指数纵览、异动催化剂、美联储FOMC、投行观点、异常速览（上证连跌/涨跌家数/涨停跌停/成交额/两融/VIX/国债/ETF申赎等）。</div>
         <div class="logic-h">ETF国家队资金估算口径</div>
@@ -6055,7 +6108,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     h += '</div>';
 
     h += '<div class="logic-p" style="font-size:12px;color:var(--dim);">';
-    h += '<b>联动提示</b>：红灯≥1时，决策中枢下方的「极端风险联动策略」自动生效，按级别调整仓位与选股过滤。本温度计仅反映外围宏观压力，不替代 A 股自身信号。';
+    h += '<b>联动提示</b>：红灯≥1时，实时风险温度计下方的「极端风险联动策略」自动生效，按级别调整仓位与选股过滤。本温度计仅反映外围宏观压力，不替代 A 股自身信号。';
     h += '</div>';
 
     body.innerHTML = h;

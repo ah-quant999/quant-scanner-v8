@@ -9,13 +9,9 @@
 #   08:25  盘前：V8_CAL / IPO_DATA / MARGIN_DATA / CFFEX_HOLDINGS / MACRO_DATA /
 #                 CRISIS_DATA / NORTH_FUND / ANALYST_RATINGS / W52_HIGH /
 #                 VOLATILITY / HERDING_DATA
-#   10:30  盘中：INDEX_QUOTES / ETF_PULSE / ETF_INTRADAY_HEAT / ETF_SUBSCRIPTION /
-#                 ETF_DAILY_MONITOR / SECTOR_FUND_FLOW / CAPITAL_FLOW_DATA /
-#                 CONCEPT_RANKING / LIMIT_UP_HEATMAP / MARKET_FUND_FLOW_DATA
-#   11:30  盘中：同上
-#   13:05  盘中：同上（补午后开盘缺口）
-#   14:00  盘中：同上
-#   15:05  盘中：同上（收盘前最后一次快照）
+#   盘中每15分钟刷新：INDEX_QUOTES / ETF_PULSE / ETF_INTRADAY_HEAT / ETF_SUBSCRIPTION /
+#                     ETF_DAILY_MONITOR / SECTOR_FUND_FLOW / CAPITAL_FLOW_DATA /
+#                     CONCEPT_RANKING / LIMIT_UP_HEATMAP / MARKET_FUND_FLOW_DATA / AI_MARKET_BRIEF
 #   15:30  盘后：EXPERIMENT + MARKET_FUND_FLOW_DATA（收盘后累积历史序列）
 #          ETF_DAILY_MONITOR 因配合 ETF 三连板实时卡，已归 intraday 盘中更新
 #   周六 09:00 T+1 周度/月度统一刷新：日历/IPO/两融/中金所/宏观/危机/北向/分析师/52周高/羊群效应
@@ -26,10 +22,22 @@ name: "🇨🇳 v8 中国数据抓取(cn)"
 on:
   schedule:
     - cron: '25 0 * * 1-5'   # 08:25 CST 盘前
+    - cron: '45 1 * * 1-5'   # 09:45 CST 盘中（开盘首刷）
+    - cron: '0 2 * * 1-5'    # 10:00 CST 盘中
+    - cron: '15 2 * * 1-5'   # 10:15 CST 盘中
     - cron: '30 2 * * 1-5'   # 10:30 CST 盘中
+    - cron: '45 2 * * 1-5'   # 10:45 CST 盘中
+    - cron: '0 3 * * 1-5'    # 11:00 CST 盘中
+    - cron: '15 3 * * 1-5'   # 11:15 CST 盘中
     - cron: '30 3 * * 1-5'   # 11:30 CST 盘中
-    - cron: '5 5 * * 1-5'    # 13:05 CST 盘中（补缺口）
+    - cron: '5 5 * * 1-5'    # 13:05 CST 盘中（午后开盘）
+    - cron: '20 5 * * 1-5'   # 13:20 CST 盘中
+    - cron: '35 5 * * 1-5'   # 13:35 CST 盘中
+    - cron: '50 5 * * 1-5'   # 13:50 CST 盘中
     - cron: '0 6 * * 1-5'    # 14:00 CST 盘中
+    - cron: '20 6 * * 1-5'   # 14:20 CST 盘中
+    - cron: '35 6 * * 1-5'   # 14:35 CST 盘中
+    - cron: '50 6 * * 1-5'   # 14:50 CST 盘中
     - cron: '5 7 * * 1-5'    # 15:05 CST 盘中（收盘前最后一次快照）
     - cron: '30 7 * * 1-5'   # 15:30 CST 盘后（收盘数据：ETF_DAILY_MONITOR / EXPERIMENT）
     - cron: '0 1 * * 6'      # 周六 09:00 CST 盘前
@@ -38,6 +46,10 @@ on:
 
 permissions:
   contents: write
+
+concurrency:
+  group: v8-cn-fetch
+  cancel-in-progress: false
 
 jobs:
   fetch:
@@ -55,10 +67,13 @@ jobs:
         run: |
           CRON="${{ github.event.schedule }}"
           case "$CRON" in
-            "25 0 * * 1-5"|"0 1 * * 6")
+            "25 0 * * 1-5"|"0 1 * * 6"|"0 1 * * 0")
               echo "category=premarket" >> "$GITHUB_OUTPUT"
               echo "label=盘前" ;;
-            "30 2 * * 1-5"|"30 3 * * 1-5"|"5 5 * * 1-5"|"0 6 * * 1-5"|"5 7 * * 1-5")
+            "45 1 * * 1-5"|"0 2 * * 1-5"|"15 2 * * 1-5"|"30 2 * * 1-5"|"45 2 * * 1-5"|\
+            "0 3 * * 1-5"|"15 3 * * 1-5"|"30 3 * * 1-5"|\
+            "5 5 * * 1-5"|"20 5 * * 1-5"|"35 5 * * 1-5"|"50 5 * * 1-5"|\
+            "0 6 * * 1-5"|"20 6 * * 1-5"|"35 6 * * 1-5"|"50 6 * * 1-5"|"5 7 * * 1-5")
               echo "category=intraday" >> "$GITHUB_OUTPUT"
               echo "label=盘中" ;;
             "30 7 * * 1-5")
@@ -75,7 +90,11 @@ jobs:
           python -c @'
           import os, base64, json, urllib.request
           token = os.environ['GITHUB_TOKEN']
-          files = ['cloud_fetch_v8.py', 'api_push_raw.py', 'fetch_ipo_data_v8.py', 'fetch_limit_up_heatmap_v8.py', 'backfill_lhb_history.py']
+          files = [
+              'cloud_fetch_v8.py', 'api_push_raw.py',
+              'fetch_ipo_data_v8.py', 'fetch_limit_up_heatmap_v8.py',
+              'backfill_lhb_history.py', 'algorithms/gen_market_brief.py'
+          ]
           for fn in files:
               url = f'https://api.github.com/repos/ah-quant999/quant-scanner-v8/contents/{fn}'
               req = urllib.request.Request(url, headers={
@@ -83,6 +102,7 @@ jobs:
                   'Accept': 'application/vnd.github+json',
                   'X-GitHub-Api-Version': '2022-11-28'})
               d = json.load(urllib.request.urlopen(req, timeout=60))
+              os.makedirs(os.path.dirname(fn) or '.', exist_ok=True)
               with open(fn, 'wb') as f: f.write(base64.b64decode(d['content']))
               print('downloaded', fn, len(d['content']), 'b64 chars')
           '@
