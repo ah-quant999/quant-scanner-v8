@@ -1902,6 +1902,58 @@ window.V8_CAL = {weeks:[],legend:[]};
             <div class="hub-layer-body" id="hubFactorBody">即将接入日线因子模块</div>
           </div>
         </div>
+
+        <!-- 极端风险联动策略（合并进决策中枢） -->
+        <div class="risk-linkage-section" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <span style="font-size:16px;">🚨</span>
+            <span style="font-size:14px;font-weight:700;color:var(--txt);">极端风险联动策略 · 盘后决策框架</span>
+            <span class="fresh" id="riskLinkageTime">更新于 2026-08-03 09:54</span>
+          </div>
+
+          <div class="risk-status-bar" style="display:flex;align-items:center;gap:12px;margin:10px 0 14px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.12);">
+            <span style="font-size:13px;color:var(--sub);">当前系统状态：</span>
+            <span class="status-dot" style="width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;"></span>
+            <span style="font-weight:700;color:#22c55e;">观察</span>
+            <span style="font-size:12px;color:var(--dim);margin-left:auto;">基于 8/3 美日联合干预日元事件 · 干预有效区 156–158</span>
+          </div>
+
+          <div class="logic-p" style="margin-bottom:12px;">
+            <b>用途</b>：当外围风险（日元急升 / 套利 unwind / 美债波动）升级时，联动现有选股策略给出仓位与方向调整框架，不是每日交易指令，是<strong>极端情形预案</strong>。
+          </div>
+
+          <div class="grid g-2" style="margin-bottom:12px;">
+            <div class="card" style="margin-bottom:0;background:rgba(255,255,255,.03);">
+              <h4 style="font-size:13px;margin:0 0 8px;color:var(--txt);">🎯 高风险触发矩阵（任一亮红灯即进入警惕）</h4>
+              <table class="risk-table" style="width:100%;border-collapse:collapse;font-size:12px;">
+                <thead><tr style="background:rgba(245,158,11,.15);"><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">指标</th><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">阈值</th><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">当前</th><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">状态</th></tr></thead>
+                <tbody>
+                  <tr><td style="padding:6px 8px;border:1px solid var(--border);">USDJPY</td><td style="padding:6px 8px;border:1px solid var(--border);">&lt; 155 或 &gt; 163</td><td style="padding:6px 8px;border:1px solid var(--border);">~157.6</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 有效</td></tr>
+                  <tr><td style="padding:6px 8px;border:1px solid var(--border);">VIX</td><td style="padding:6px 8px;border:1px solid var(--border);">&gt; 25 + 美股科技破位</td><td style="padding:6px 8px;border:1px solid var(--border);">--</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 正常</td></tr>
+                  <tr><td style="padding:6px 8px;border:1px solid var(--border);">北向资金</td><td style="padding:6px 8px;border:1px solid var(--border);">连续大额净流出 + 人民币急贬</td><td style="padding:6px 8px;border:1px solid var(--border);">--</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 待观察</td></tr>
+                  <tr><td style="padding:6px 8px;border:1px solid var(--border);">10Y 日债收益率</td><td style="padding:6px 8px;border:1px solid var(--border);">&gt; 3.5%</td><td style="padding:6px 8px;border:1px solid var(--border);">--</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 正常</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card" style="margin-bottom:0;background:rgba(255,255,255,.03);">
+              <h4 style="font-size:13px;margin:0 0 8px;color:var(--txt);">⚡ 联动动作（与选股策略对齐）</h4>
+              <ul style="margin:0;padding-left:18px;font-size:12px;line-height:1.8;color:var(--sub);">
+                <li><b>观察级（现在）</b>：三重共识正常执行，主站TOP10≥70、驾驶舱A档、基本面A档标准不变。</li>
+                <li><b>警惕级（1红灯）</b>：选股池加<strong>北向持股&lt;3%</strong>、<strong>海外收入&lt;20%</strong>过滤；降低成长板块权重。</li>
+                <li><b>减仓级（2红灯）</b>：整体仓位降 20–40%；优先减<strong>高估值科技 / 出口链 / 外资重仓</strong>；增配黄金、公用事业、高股息。</li>
+                <li><b>清仓级（3+红灯或系统性踩踏）</b>：权益仓位压至 20% 以下或空仓；只保留现金/国债/黄金ETF。</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="logic-p" style="margin-bottom:10px;background:rgba(34,197,94,.08);padding:10px 12px;border-radius:8px;">
+            <b>今日判定（8/3）</b>：USDJPY 从 164 回落至 157.6，干预有效，未触发任何红灯。A 股主驱动仍在国内政策/基本面，<strong>不构成清仓理由</strong>。继续观察北向、人民币汇率、晚间美股开盘情绪。
+          </div>
+
+          <div style="font-size:11px;color:var(--dim);line-height:1.6;border-top:1px solid var(--border);padding-top:10px;">
+            <b>数据来源</b>：公开新闻 + 市场数据；本卡为分析框架，非投资建议。详细逻辑见 <a href="宏观解读_美日干预日元_2026-08-03.md" target="_blank" style="color:#60a5fa;">宏观解读_美日干预日元_2026-08-03.md</a>。
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1970,53 +2022,6 @@ window.V8_CAL = {weeks:[],legend:[]};
       <div id="phMacroBody"><div class="ipo-empty">加载中…</div></div>
     </div>
 
-    <!-- 极端风险联动策略（方案3静态卡片） -->
-    <div class="card risk-linkage-card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
-      <h3><span class="ic">🚨</span>极端风险联动策略 · 盘后决策框架 <span class="fresh" id="riskLinkageTime">更新于 2026-08-03 09:54</span></h3>
-
-      <div class="risk-status-bar" style="display:flex;align-items:center;gap:12px;margin:10px 0 14px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.12);">
-        <span style="font-size:13px;color:var(--sub);">当前系统状态：</span>
-        <span class="status-dot" style="width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;"></span>
-        <span style="font-weight:700;color:#22c55e;">观察</span>
-        <span style="font-size:12px;color:var(--dim);margin-left:auto;">基于 8/3 美日联合干预日元事件 · 干预有效区 156–158</span>
-      </div>
-
-      <div class="logic-p" style="margin-bottom:12px;">
-        <b>用途</b>：当外围风险（日元急升 / 套利 unwind / 美债波动）升级时，联动现有选股策略给出仓位与方向调整框架，不是每日交易指令，是<strong>极端情形预案</strong>。
-      </div>
-
-      <div class="grid g-2" style="margin-bottom:12px;">
-        <div class="card" style="margin-bottom:0;background:rgba(255,255,255,.03);">
-          <h4 style="font-size:13px;margin:0 0 8px;color:var(--txt);">🎯 高风险触发矩阵（任一亮红灯即进入警惕）</h4>
-          <table class="risk-table" style="width:100%;border-collapse:collapse;font-size:12px;">
-            <thead><tr style="background:rgba(245,158,11,.15);"><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">指标</th><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">阈值</th><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">当前</th><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">状态</th></tr></thead>
-            <tbody>
-              <tr><td style="padding:6px 8px;border:1px solid var(--border);">USDJPY</td><td style="padding:6px 8px;border:1px solid var(--border);">&lt; 155 或 &gt; 163</td><td style="padding:6px 8px;border:1px solid var(--border);">~157.6</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 有效</td></tr>
-              <tr><td style="padding:6px 8px;border:1px solid var(--border);">VIX</td><td style="padding:6px 8px;border:1px solid var(--border);">&gt; 25 + 美股科技破位</td><td style="padding:6px 8px;border:1px solid var(--border);">--</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 正常</td></tr>
-              <tr><td style="padding:6px 8px;border:1px solid var(--border);">北向资金</td><td style="padding:6px 8px;border:1px solid var(--border);">连续大额净流出 + 人民币急贬</td><td style="padding:6px 8px;border:1px solid var(--border);">--</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 待观察</td></tr>
-              <tr><td style="padding:6px 8px;border:1px solid var(--border);">10Y 日债收益率</td><td style="padding:6px 8px;border:1px solid var(--border);">&gt; 3.5%</td><td style="padding:6px 8px;border:1px solid var(--border);">--</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 正常</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="card" style="margin-bottom:0;background:rgba(255,255,255,.03);">
-          <h4 style="font-size:13px;margin:0 0 8px;color:var(--txt);">⚡ 联动动作（与选股策略对齐）</h4>
-          <ul style="margin:0;padding-left:18px;font-size:12px;line-height:1.8;color:var(--sub);">
-            <li><b>观察级（现在）</b>：三重共识正常执行，主站TOP10≥70、驾驶舱A档、基本面A档标准不变。</li>
-            <li><b>警惕级（1红灯）</b>：选股池加<strong>北向持股&lt;3%</strong>、<strong>海外收入&lt;20%</strong>过滤；降低成长板块权重。</li>
-            <li><b>减仓级（2红灯）</b>：整体仓位降 20–40%；优先减<strong>高估值科技 / 出口链 / 外资重仓</strong>；增配黄金、公用事业、高股息。</li>
-            <li><b>清仓级（3+红灯或系统性踩踏）</b>：权益仓位压至 20% 以下或空仓；只保留现金/国债/黄金ETF。</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="logic-p" style="margin-bottom:10px;background:rgba(34,197,94,.08);padding:10px 12px;border-radius:8px;">
-        <b>今日判定（8/3）</b>：USDJPY 从 164 回落至 157.6，干预有效，未触发任何红灯。A 股主驱动仍在国内政策/基本面，<strong>不构成清仓理由</strong>。继续观察北向、人民币汇率、晚间美股开盘情绪。
-      </div>
-
-      <div style="font-size:11px;color:var(--dim);line-height:1.6;border-top:1px solid var(--border);padding-top:10px;">
-        <b>数据来源</b>：公开新闻 + 市场数据；本卡为分析框架，非投资建议。详细逻辑见 <a href="宏观解读_美日干预日元_2026-08-03.md" target="_blank" style="color:#60a5fa;">宏观解读_美日干预日元_2026-08-03.md</a>。
-      </div>
-    </div>
   </section>
 
   <!-- ============ 选股策略 ============ -->
