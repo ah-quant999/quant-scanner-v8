@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-08-03 04:22:27",
+  "check_time": "2026-08-03 12:29:11",
   "last_trade_close": "2026-07-31 15:30:00",
   "core_stale": [],
   "warn_stale": [],
@@ -39,6 +39,7 @@
     "CANDIDATE_QUOTES": "intraday",
     "SH_SZ_HISTORY": "intraday",
     "RISK_GAUGE": "intraday",
+    "AI_MARKET_BRIEF": "intraday",
     "MARKET_FUND_FLOW_DATA": "post_close",
     "SECTOR_FUND_FLOW_TREND": "post_close",
     "GOLD_POOL": "post_close",
