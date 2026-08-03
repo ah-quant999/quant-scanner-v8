@@ -1,6 +1,6 @@
 # 九宝量化 v8.0 - 禁止删除清单
 
-**最后更新**: 2026-08-01 22:42
+**最后更新**: 2026-08-03 21:48
 **维护人**: HH + AI助手
 **用途**: 防止误删核心资产，每次项目瘦身/清理前必须核对此清单
 **继承自**: v6 DO_NOT_DELETE.md（已验证 v6 2026-07-25 版本）
@@ -47,7 +47,7 @@
 | `deploy_v8.py` | 本地 SSH 强制部署脚本 | 本机部署入口（git push main → Pages） |
 | `guard_v8_freshness.py` | 46 模块新鲜度守卫 | v8_algo / cloud_weekly_cleanup 调用 |
 | `guard_v8.py` | 站点健康检查 | 手动诊断工具 |
-| `sync_v6_to_v8.py` | v6→v8 数据同步桥（应急） | v8_sync_v6_data.yml 调用 |
+| `sync_v6_to_v8.py` | v6→v8 映射辅助（仅 `V6_TO_V8` 映射表） | 被 stage_to_raw.py 导入；2026-08-03 v8 已脱离 v6，不再读 v6 数据 |
 | `backfill_lhb_history.py` | LHB 历史回填生成器 | post_close 时段自动跑 |
 | `fetch_ipo_data_v8.py` | IPO/打新数据抓取 | premarket 时段调用 |
 | `fetch_limit_up_heatmap_v8.py` | 涨停热力矩阵抓取 | intraday 时段调用 |
@@ -70,19 +70,33 @@
 
 ---
 
+## 🔴 v8 算法铁律（严禁从 v6 回退覆盖）
+
+> **2026-08-03 审计结论**：v8 算法链本就自包含（`run_algorithms.py` 默认 `V6_SEED` 关闭、step 0 自产上游输入），正常运营**不依赖 v6**。v8 的 `algorithms/*.py` 是带原生钩子（`V8_OUT_DIR`、`DATA=../out`）的**增强版**，比 v6 还新、含多处修复。
+
+| 铁律 | 原因 | 违反后果 |
+|------|------|---------|
+| **严禁用 v6 的 `algorithms/*.py` 覆盖 v8 同名文件** | v8 算法是增强版，含 v8 专用钩子与修复 | 覆盖会回退 v8 修复 → 全算法链失效 |
+| **严禁重跑 `migrate_v6_algos.py`** | 该脚本自带警告"切勿重跑覆盖"；v8 已是迁移后最终版 | 同上 |
+| **严禁启用 `v8_sync_v6_data.yml` / `v8_sync_legacy.yml`** | 已于 2026-08-03 `if:false` 变 inert（分支 `feat/v8-detach-v6`） | 手动 trigger 会拉陈旧 v6 数据覆盖新鲜 v8 |
+
+**v8 已完全脱离 v6（2026-08-03）**：缺失资产仅补齐 2 个（`algorithms/fetch_sector_fund_flow_westock.py`、`raw_data/sector_fund_flow_history.json`），v6 仓可退役。任何"把 v6 算法复制回 v8"的诉求，**先核对本铁律**。
+
+---
+
 ## 🟢 GitHub Actions 工作流 (.github/workflows/)
 
 | 文件路径 | 内容描述 | 禁止删除原因 |
 |---------|---------|------------|
 | `v8_cn_fetch.yml` | 中国数据抓取（cn runner，7个 cron + dispatch） | **唯一数据源工作流**，丢失则全站不更新 |
-| `v8_algo_run.yml` | 盘后算法链（cn runner，18:30） | **唯一算法工作流** |
+| `v8_algo_run.yml` | 盘后算法链（cn runner，18:30 + 20:00 冗余 cron） | **唯一算法工作流** |
 | `v8_build_deploy.yml` | 构建+部署（ubuntu，push 触发） | **唯一部署工作流** |
 | `v8_algo.yml` | 每日数据体检（ubuntu，09:00/17:00） | 新鲜度监控 |
 | `v8_safety_net.yml` | Safety Net 兜底监控（ubuntu，工作日每30min） | **P0 保险**：cn 断线自动补跑 |
 | `v8_self_heal.yml` | 云端自愈器（ubuntu，周六14:00） | **P1 自愈**：周末检测陈旧模块并补跑 |
 | `cloud_weekly_cleanup.yml` | 每周清理（ubuntu，周六21:00） | orphan 清理 + 新鲜度体检 |
 | `v8_cleanup.yml` | 周日清理（ubuntu，23:00） | 缓存/日志修剪 |
-| `v8_sync_v6_data.yml` | v6→v8 应急同步（仅 dispatch） | 应急工具，无定时 |
+| `v8_sync_v6_data.yml` | v6→v8 应急同步 | **2026-08-03 已 `if:false` 禁用**（v8 已脱离 v6，勿 enable/trigger） |
 
 **注意**: **9 个 yml 缺一不可**。丢失任何一个都会导致对应能力永久失效。特别是 `v8_cn_fetch.yml` 和 `v8_build_deploy.yml` 是整站的「呼吸」和「心跳」。
 
@@ -138,5 +152,5 @@
 
 ---
 
-**最后核对**: 2026-08-01 22:42 ✅
+**最后核对**: 2026-08-03 21:48 ✅
 **下次审查**: 2026-08-08 (每周审查)
