@@ -706,45 +706,116 @@ def f_macro_data():
             line = line.strip()
             if not line.startswith('var hq_str_'):
                 continue
-            key = line[len('var hq_str_'):line.find('=')]
-            rest = line[line.find('"') + 1:line.rfind('"')]
+            eq = line.find('=')
+            if eq < 0:
+                continue
+            key = line[len('var hq_str_'):eq]
+            q1 = line.find('"')
+            q2 = line.rfind('"')
+            rest = line[q1 + 1:q2] if q1 >= 0 and q2 > q1 else ''
             result[key] = rest.split(',') if rest else []
         return result
 
-    try:
+    gm = out.setdefault('global_macro', {})
+
+    def _fetch_sina_global_macro(retries=2):
+        """新浪全球宏观行情，带重试与详细日志。"""
         sina_codes = "fx_susdcnh,DINIW,b_VIX,hf_GC,hf_SI,hf_HG,hf_CL"
-        r = _requests.get(
-            f"https://hq.sinajs.cn/list={sina_codes}",
-            headers={"Referer": "https://finance.sina.com.cn"},
-            timeout=15,
-        )
-        r.encoding = 'gb2312'
-        data = _parse_sina_csv(r.text)
-
-        gm = out.setdefault('global_macro', {})
-        # 离岸人民币：取第 8 位（收盘价/即期）
-        if data.get('fx_susdcnh') and len(data['fx_susdcnh']) > 8:
-            gm['usdcnh'] = {'price': float(data['fx_susdcnh'][8])}
-        # 美元指数 DINIW：取第 8 位
-        if data.get('DINIW') and len(data['DINIW']) > 8:
-            gm['dxy'] = {'value': float(data['DINIW'][8])}
-        # VIX：取第 1 位；日期为美股交易日
-        if data.get('b_VIX') and len(data['b_VIX']) > 1:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                          "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Referer": "https://finance.sina.com.cn/",
+            "Accept": "*/*",
+        }
+        last_err = None
+        for attempt in range(retries + 1):
             try:
-                gm['vix'] = {'value': float(data['b_VIX'][1])}
-            except Exception:
-                pass
-        # 商品：取第 0 位最新价
-        for code, name in [('hf_GC', 'gold'), ('hf_SI', 'silver'), ('hf_HG', 'copper'), ('hf_CL', 'oil')]:
-            parts = data.get(code, [])
-            if parts and len(parts) > 0:
-                try:
-                    gm[name] = {'value': float(parts[0])}
-                except Exception:
-                    pass
-    except Exception as e:
-        print(f"  ⚠️ 全球宏观获取失败: {e}")
+                r = _requests.get(
+                    f"https://hq.sinajs.cn/list={sina_codes}",
+                    headers=headers,
+                    timeout=20,
+                )
+                r.encoding = 'gb2312'
+                if r.status_code != 200:
+                    raise RuntimeError(f"HTTP {r.status_code}")
+                data = _parse_sina_csv(r.text)
+                if not data:
+                    raise RuntimeError("解析结果为空")
+                return data
+            except Exception as e:
+                last_err = e
+                print(f"    ⚠️ 新浪全球宏观尝试 {attempt+1}/{retries+1} 失败: {e}")
+                time.sleep(1.5 * (attempt + 1))
+        print(f"    🚫 新浪全球宏观最终失败: {last_err}")
+        return {}
 
+    data = _fetch_sina_global_macro()
+
+    # 解析函数：安全取值并打印字段数
+    def _set_gm(key, value, date_str=None):
+        if value is None:
+            return
+        try:
+            gm[key] = {'value': float(value)} if key != 'usdcnh' else {'price': float(value)}
+            if date_str:
+                gm[key]['date'] = date_str
+        except Exception as e:
+            print(f"    ⚠️ global_macro {key} 转换失败: value={value}, {e}")
+
+    # 离岸人民币 fx_susdcnh：索引 8=收盘价/即期，17=日期
+    parts = data.get('fx_susdcnh', [])
+    if len(parts) > 8:
+        _set_gm('usdcnh', parts[8], parts[17] if len(parts) > 17 else None)
+    else:
+        print(f"    ⚠️ fx_susdcnh 字段不足: {len(parts)}")
+
+    # 美元指数 DINIW：索引 8=收盘价，10=日期
+    parts = data.get('DINIW', [])
+    if len(parts) > 8:
+        _set_gm('dxy', parts[8], parts[10] if len(parts) > 10 else None)
+    else:
+        print(f"    ⚠️ DINIW 字段不足: {len(parts)}")
+
+    # VIX：索引 1=当前值，6=日期
+    parts = data.get('b_VIX', [])
+    if len(parts) > 1:
+        _set_gm('vix', parts[1], parts[6] if len(parts) > 6 else None)
+    else:
+        print(f"    ⚠️ b_VIX 字段不足: {len(parts)}")
+
+    # 商品：索引 0=最新价，12=日期；统一放到 commodities 对象下保持前端兼容
+    commodity_map = [('hf_GC', 'gold'), ('hf_SI', 'silver'), ('hf_HG', 'copper'), ('hf_CL', 'oil')]
+    commodities = gm.setdefault('commodities', {})
+    for code, name in commodity_map:
+        parts = data.get(code, [])
+        if parts and parts[0] not in (None, '', '-'):
+            try:
+                commodities[name] = {'value': float(parts[0])}
+                if len(parts) > 12:
+                    commodities[name]['date'] = parts[12]
+            except Exception as e:
+                print(f"    ⚠️ {code}({name}) 转换失败: {parts[0]}, {e}")
+        else:
+            print(f"    ⚠️ {code}({name}) 无有效价格: {parts[:3] if parts else 'empty'}")
+
+    # fallback：新浪失败时，用 akshare 外汇/商品接口补部分数据
+    if not gm.get('usdcnh') or not gm.get('dxy'):
+        try:
+            ak = get_ak()
+            if not gm.get('usdcnh'):
+                try:
+                    fx = ak.fx_spot_quote()
+                    if fx is not None and not fx.empty:
+                        usd_cnh = fx[fx['code'] == 'USDCNH']
+                        if not usd_cnh.empty:
+                            gm['usdcnh'] = {'price': float(usd_cnh.iloc[0]['bid']), 'date': datetime.now().strftime('%Y-%m-%d')}
+                            print("    ✅ akshare fallback USDCNH")
+                except Exception as e:
+                    print(f"    ⚠️ akshare USDCNH fallback 失败: {e}")
+        except Exception as e:
+            print(f"    ⚠️ akshare fallback 整体失败: {e}")
+
+    print(f"    ✅ 全球宏观结果: { {k: v.get('value') or v.get('price') for k, v in gm.items()} }")
     return out
 
 def f_crisis_data():

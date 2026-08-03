@@ -5371,11 +5371,19 @@ function renderLimitUpHeatmap(){
   var __MFF_SHOW_CUM = true;
   var __MFF_CHART_INST = null;
   function mffFormatUpdateTime(ts, dailyArr){
-    if(ts) return ts;
-    if(!dailyArr || !dailyArr.length) return '';
+    // 日频数据：标题必须显示「数据最后日期」，避免用文件 update_time 误导成「今日」。
+    if(!dailyArr || !dailyArr.length) return ts || '';
     var last = dailyArr[dailyArr.length-1].date || '';
-    if(last.length !== 8) return '';
-    return last.slice(0,4)+'-'+last.slice(4,6)+'-'+last.slice(6,8)+' 15:00:00';
+    if(last.length !== 8) return ts || '';
+    var lastFmt = last.slice(0,4)+'-'+last.slice(4,6)+'-'+last.slice(6,8);
+    var now = new Date();
+    var today = now.getFullYear() + ('0'+(now.getMonth()+1)).slice(-2) + ('0'+now.getDate()).slice(-2);
+    if(last === today){
+      // 数据确实是今天，再补充文件更新时间（如果有）
+      var hm = ts && ts.length >= 16 ? ' · 文件 '+ts.slice(11,16) : '';
+      return '今日 '+lastFmt+hm;
+    }
+    return '数据截至 '+lastFmt;
   }
   function renderMarketFundFlow(mff){
     var d = mff || {};
@@ -5386,9 +5394,9 @@ function renderLimitUpHeatmap(){
       return;
     }
     card.style.display='';
-    // 更新时间：数据文件可能没有 update_time，取最后一条日线日期兜底
+    // 更新时间：日频数据标题显示「数据最后日期」，避免用文件 update_time 误导成「今日」
     var tEl = $('mffTime');
-    if(tEl) setTime('mffTime', mffFormatUpdateTime(d.update_time, d.daily));
+    if(tEl) tEl.textContent = mffFormatUpdateTime(d.update_time, d.daily);
     // 摘要：显示当前 range 实际显示的天数 + 总条数 + 数据陈旧度
     var sumEl = $('mffSummary');
     if(sumEl){
