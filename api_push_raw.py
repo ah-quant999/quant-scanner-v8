@@ -27,7 +27,15 @@ def api(method, path, data=None):
             txt = r.read().decode("utf-8")
             return json.loads(txt) if txt else {}
     except urllib.error.HTTPError as e:
-        return {"__error__": e.code, "__msg__": e.read().decode("utf-8", "replace")}
+        body = e.read().decode("utf-8", "replace")
+        print(f"  ⚠️ API {method} {path} -> HTTP {e.code}")
+        try:
+            err = json.loads(body)
+            print(f"     message: {err.get('message')}")
+            print(f"     doc: {err.get('documentation_url')}")
+        except Exception:
+            print(f"     body: {body[:500]}")
+        return {"__error__": e.code, "__msg__": body}
 
 
 def walk_raw():
@@ -97,11 +105,16 @@ def main():
                      {"message": msg, "tree": new_tree["sha"], "parents": [base_sha2]})
         if "__error__" in commit:
             print("❌ 创建 commit 失败:", commit.get("__msg__")); sys.exit(1)
-        # force=True 但 parent 始终为最新 main，不会丢失他人提交
+        # 2026-08-03 修复：改用 force=False，避免触发分支保护"Block force pushes"。
+        # parent 始终为最新 main，重试逻辑已保证不会丢失他人提交。
         upd = api("PATCH", f"/repos/{REPO}/git/refs/heads/main",
-                  {"sha": commit["sha"], "force": True})
+                  {"sha": commit["sha"], "force": False})
         if "__error__" in upd:
-            print(f"⚠️ ref 更新冲突 ({upd.get('__error__')})，重试 ({attempt}/3)")
+            code = upd.get('__error__')
+            print(f"⚠️ ref 更新失败 ({code})，重试 ({attempt}/3)")
+            if code == 422:
+                print("   可能原因：分支保护禁止 force push 或要求 status check / PR review。")
+                print("   若 3 次重试仍 422，请检查 Settings > Branches > main 保护规则。")
             continue
         print(f"✅ raw_data 已推送（第 {attempt} 次）commit {commit['sha'][:8]}")
         sys.exit(0)
