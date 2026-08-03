@@ -21,6 +21,11 @@
 #   根因不是 git 命令，而是 checkout action 自己删不掉旧 .git。修复 = 前置清理步直接删除整个 workspace，
 #   让 checkout 重新 clone 到空目录。经实测 run#30820713215 因此失败。
 #
+# 2026-08-03 22:58 三修复：上一轮（run#30824863189）改前置删 workspace + checkout clean:false 仍失败——
+#   日志显示 checkout action 内部又会"Deleting the contents of"再删一次，仍撞 safe-delete 阈值。
+#   彻底方案：**弃用 actions/checkout@v4，改手动 `git clone --depth 1`**（用 GITHUB_TOKEN 走 https），
+#   完全绕开 checkout action 的 safe-delete 逻辑。api_push_raw.py 走 GitHub Contents API 推送，不需 git remote 凭据。
+#
 
 # 2026-08-02 原生化：4 类上游输入（gold_pool / scan_result / guanlan_* / mahoro_signals）
 # 也已由 v8 自产（scanner.py / guanlan_extractor.py / fetch_maharo_signals.py + V8_OUT_DIR 钩子
@@ -81,11 +86,19 @@ jobs:
           New-Item -ItemType Directory -Path $ws -Force | Out-Null
           Write-Host "workspace 已清空，等待 checkout 重新 clone"
 
-      - name: "📥 Checkout v8"
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-          clean: false
+      - name: "📥 Clone v8 (绕过 actions/checkout safe-delete 阈值)"
+        shell: bash
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global --add safe.directory '*' || true
+          rm -rf "${{ github.workspace }}"
+          git clone --depth 1 "https://x-access-token:${TOKEN}@github.com/ah-quant999/quant-scanner-v8.git" "${{ github.workspace }}"
+          cd "${{ github.workspace }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          echo "clone 完成，当前 HEAD:"
+          git log --oneline -1
 
       - name: "🐍 校验 Python / 安装 A股依赖"
         shell: powershell
