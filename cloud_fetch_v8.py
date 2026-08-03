@@ -658,6 +658,82 @@ def f_macro_data():
     except Exception as e:
         print(f"  ⚠️ M2获取失败: {e}")
 
+    # 6) 把 flat cpi/pmi 数组同步到 economy 对象（index.html 渲染需要 ec.cpi.value / ec.pmi.value）
+    def _last_numeric(arr, val_key='今值', prev_key='前值', date_key='日期'):
+        if not arr:
+            return None
+        for row in reversed(arr):
+            v = row.get(val_key)
+            if v is not None and not pd.isna(v):
+                try:
+                    return {
+                        'value': float(v),
+                        'date': str(row.get(date_key, ''))[:10],
+                        'previous': float(row[prev_key]) if row.get(prev_key) is not None and not pd.isna(row[prev_key]) else None,
+                    }
+                except Exception:
+                    pass
+        return None
+
+    try:
+        cpi_last = _last_numeric(out.get('cpi', []))
+        if cpi_last:
+            out['economy']['cpi'] = cpi_last
+            mark_updated('cpi', cpi_last)
+        pmi_last = _last_numeric(out.get('pmi', []))
+        if pmi_last:
+            out['economy']['pmi'] = pmi_last
+            mark_updated('pmi', pmi_last)
+    except Exception as e:
+        print(f"  ⚠️ economy 同步失败: {e}")
+
+    # 7) 全球宏观：离岸人民币、美元指数、VIX、黄金、白银、铜、原油（盘中也可更新）
+    def _parse_sina_csv(body):
+        """解析 sinajs.cn 返回的多条 var hq_str_xxx=\"...\"; 语句"""
+        result = {}
+        for line in body.split(';'):
+            line = line.strip()
+            if not line.startswith('var hq_str_'):
+                continue
+            key = line[len('var hq_str_'):line.find('=')]
+            rest = line[line.find('"') + 1:line.rfind('"')]
+            result[key] = rest.split(',') if rest else []
+        return result
+
+    try:
+        sina_codes = "fx_susdcnh,DINIW,b_VIX,hf_GC,hf_SI,hf_HG,hf_CL"
+        r = _requests.get(
+            f"https://hq.sinajs.cn/list={sina_codes}",
+            headers={"Referer": "https://finance.sina.com.cn"},
+            timeout=15,
+        )
+        r.encoding = 'gb2312'
+        data = _parse_sina_csv(r.text)
+
+        gm = out.setdefault('global_macro', {})
+        # 离岸人民币：取第 8 位（收盘价/即期）
+        if data.get('fx_susdcnh') and len(data['fx_susdcnh']) > 8:
+            gm['usdcnh'] = {'price': float(data['fx_susdcnh'][8])}
+        # 美元指数 DINIW：取第 8 位
+        if data.get('DINIW') and len(data['DINIW']) > 8:
+            gm['dxy'] = {'value': float(data['DINIW'][8])}
+        # VIX：取第 1 位；日期为美股交易日
+        if data.get('b_VIX') and len(data['b_VIX']) > 1:
+            try:
+                gm['vix'] = {'value': float(data['b_VIX'][1])}
+            except Exception:
+                pass
+        # 商品：取第 0 位最新价
+        for code, name in [('hf_GC', 'gold'), ('hf_SI', 'silver'), ('hf_HG', 'copper'), ('hf_CL', 'oil')]:
+            parts = data.get(code, [])
+            if parts and len(parts) > 0:
+                try:
+                    gm[name] = {'value': float(parts[0])}
+                except Exception:
+                    pass
+    except Exception as e:
+        print(f"  ⚠️ 全球宏观获取失败: {e}")
+
     return out
 
 def f_crisis_data():
