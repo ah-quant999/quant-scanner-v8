@@ -8,8 +8,10 @@ v8 云端管线看门狗（只监督，不部署）
 - 检查站点 HTTP 200
 - 把异常写入 _v8_watchdog.log，供人工/自动化追踪
 """
+import argparse
 import json
 import os
+import subprocess
 import sys
 import urllib.request
 import urllib.error
@@ -20,6 +22,8 @@ REPO = "ah-quant999/quant-scanner-v8"
 SITE_URL = "https://ah-quant999.github.io/quant-scanner-v8/"
 CN_WORKFLOW_NAME = "🇨🇳 v8 中国数据抓取(cn)"
 BD_WORKFLOW_NAME = "☁️ v8 构建部署(云端ubuntu)"
+RUNNER_DIR = Path("D:/actions-runner-v8")
+RUNNER_EXE = RUNNER_DIR / "bin" / "Runner.Listener.exe"
 
 # 尝试从多个位置读取 token（本地文件优先，不落入仓库）
 def _load_token():
@@ -70,7 +74,36 @@ def api_get(url):
         return {"__error__": e.code, "__msg__": e.read().decode("utf-8", "replace")}
 
 
-def check_runner():
+def is_runner_process_alive():
+    try:
+        output = subprocess.check_output(
+            ["tasklist.exe", "/FI", "IMAGENAME eq Runner.Listener.exe", "/NH"],
+            stderr=subprocess.DEVNULL,
+            timeout=10,
+        ).decode("gbk", errors="ignore")
+        return "Runner.Listener.exe" in output
+    except Exception:
+        return False
+
+
+def start_runner():
+    """当 runner 离线且本地无进程时，尝试重新拉起监听进程。"""
+    if not RUNNER_EXE.exists():
+        return False, f"找不到 {RUNNER_EXE}"
+    try:
+        subprocess.Popen(
+            [str(RUNNER_EXE), "run"],
+            cwd=str(RUNNER_DIR),
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
+        )
+        return True, f"已尝试启动 {RUNNER_EXE} run"
+    except Exception as e:
+        return False, f"启动 runner 失败: {e}"
+
+
+def check_runner(heal=False):
     d = api_get(f"https://api.github.com/repos/{REPO}/actions/runners")
     if "__error__" in d:
         return False, f"runner API error {d['__error__']}"
@@ -85,6 +118,12 @@ def check_runner():
         parts.append(f"{r['name']}: online={online}, busy={busy}")
         if not online:
             ok = False
+            if heal:
+                if not is_runner_process_alive():
+                    started, msg = start_runner()
+                    parts.append(f"heal={started}({msg})")
+                else:
+                    parts.append("heal=skipped(local process alive, waiting GitHub connect)")
     return ok, "; ".join(parts)
 
 
@@ -152,10 +191,14 @@ def check_site():
 
 
 def main():
+    parser = argparse.ArgumentParser(description="v8 云端管线看门狗")
+    parser.add_argument("--heal", action="store_true", help="runner 离线时尝试自动拉起本地进程")
+    args = parser.parse_args()
+
     now = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
     results = []
 
-    ok, msg = check_runner()
+    ok, msg = check_runner(heal=args.heal)
     results.append(("runner", ok, msg))
 
     ok, msg = check_workflow(CN_WORKFLOW_NAME, "cn_fetch", max_age_min=120)
