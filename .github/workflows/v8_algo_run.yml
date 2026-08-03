@@ -115,7 +115,7 @@ jobs:
                       last = e
                       print("  retry %d: %s" % (i + 1, e), flush=True)
                       time.sleep(2 ** i)
-              raise SystemExit("API 拉取失败: %s (%s)" % (url, last))
+              raise SystemExit("API fetch failed: %s (%s)" % (url, last))
 
           tree = get("https://api.github.com/repos/%s/git/trees/main?recursive=1" % REPO)
           want = []
@@ -123,10 +123,10 @@ jobs:
               if e.get("type") != "blob":
                   continue
               p = e["path"]
-              # 算法目录全量 + 根目录所有 .py（含 api_push_raw.py）
+              # all of algorithms/ + every root-level .py (incl. api_push_raw.py)
               if p.startswith("algorithms/") or ("/" not in p and p.endswith(".py")):
                   want.append((p, e["sha"]))
-          print("待同步源码文件: %d" % len(want), flush=True)
+          print("files to sync: %d" % len(want), flush=True)
 
           ok = 0
           for p, sha in want:
@@ -145,12 +145,15 @@ jobs:
               with open(p, "wb") as f:
                   f.write(raw)
               ok += 1
-          print("OK 源码同步完成: %d/%d" % (ok, len(want)), flush=True)
+          print("OK source sync done: %d/%d" % (ok, len(want)), flush=True)
           if ok != len(want):
               raise SystemExit(1)
           '@
-          # ⚠️ 必须写临时文件再执行：`python -c @'...'@` 传参时 PowerShell 会剥离双引号
-          #    （08-04 run#30859885910 实测报 SyntaxError: '{' was never closed）
+          # NOTE: must write a temp file then run it; passing code via `python -c` gets
+          #       its double quotes stripped by the shell (run#30859885910).
+          # NOTE: keep every powershell step ASCII-only - Windows PowerShell 5.1 reads
+          #       the generated .ps1 as ANSI/GBK, and CJK bytes swallow quote terminators
+          #       (run#30860170070 died on a Chinese Write-Host string).
           $tmp = Join-Path $env:RUNNER_TEMP "sync_src_v8.py"
           Set-Content -Path $tmp -Value $code -Encoding UTF8
           python $tmp
@@ -158,20 +161,22 @@ jobs:
 
       - name: "🐍 校验 Python / 安装 A股依赖"
         shell: powershell
+        # ASCII-ONLY step: Windows PowerShell 5.1 reads the generated .ps1 as ANSI/GBK,
+        # CJK characters corrupt string terminators (run#30860170070 died exactly here).
         run: |
           python --version
           python -c "import akshare, pandas, numpy, requests" 2>$null
           if ($LASTEXITCODE -ne 0) {
-            Write-Host "基础依赖缺失，安装中（清华镜像）..."
+            Write-Host "base deps missing, installing from tsinghua mirror..."
             python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple akshare pandas numpy requests
-          } else { Write-Host "基础依赖已就绪" }
-          # 回测/候选池依赖（mootdx / baostock），缺失则尽力安装
+          } else { Write-Host "base deps ready" }
           python -c "import mootdx" 2>$null; if ($LASTEXITCODE -ne 0) {
-            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple mootdx 2>$null; Write-Host "mootdx 安装结果: $LASTEXITCODE"
+            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple mootdx 2>$null; Write-Host "mootdx install exit: $LASTEXITCODE"
           }
           python -c "import baostock" 2>$null; if ($LASTEXITCODE -ne 0) {
-            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple baostock 2>$null; Write-Host "baostock 安装结果: $LASTEXITCODE"
+            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple baostock 2>$null; Write-Host "baostock install exit: $LASTEXITCODE"
           }
+          exit 0
 
       - name: "🧮 运行盘后算法链 → raw_data/ → 推送"
         shell: powershell
@@ -180,8 +185,8 @@ jobs:
           python algorithms/run_algorithms.py
 
       - name: "📤 兜底推送（若上一步未推）"
-        # ⚠️ 原为 if: always()，导致源码同步失败时把工作区里的「旧 raw_data」当新数据推上去（污染线上）。
-        #    改为仅在源码同步成功后才允许兜底推送。
+        # was `if: always()` -> pushed stale workspace raw_data when source sync failed.
+        # now only runs after a successful source sync.
         if: steps.sync_api.outcome == 'success'
         shell: powershell
         continue-on-error: true
