@@ -68,6 +68,7 @@ DATA_SOURCES = {
     "sh_sz_history.json":         "SH_SZ_HISTORY",
     "risk_gauge.json":             "RISK_GAUGE",
     "ai_market_brief.json":        "AI_MARKET_BRIEF",
+    "runner_status.json":          "RUNNER_STATUS",
 }
 
 # 变量名 → 更新时段
@@ -346,6 +347,11 @@ def build(category=None, detect_changes=False):
     else:
         print("🔍 全量构建模式")
         target_files = files
+
+    # runner_status.json 跨所有时段，每次构建都带上，保证前端任务跟踪看板最新
+    runner_path = RAW_DIR / "runner_status.json"
+    if runner_path.exists() and runner_path not in target_files:
+        target_files.append(runner_path)
 
     if not target_files:
         print(f"⚠️ 没有属于目标类别的 raw_data 文件，保持 data/*.js 不变。")

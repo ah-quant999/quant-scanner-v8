@@ -205,6 +205,9 @@ def _all_individual_recs(fields="f12,f14,f2,f3,f62,f184"):
         }
     return list(by_code.values())
 
+# 单次运行状态跟踪（用于前端定时任务跟踪看板）
+_run_status = {}
+
 def run(label, fn, retries=2):
     last_err = None
     for attempt in range(retries + 1):
@@ -213,12 +216,15 @@ def run(label, fn, retries=2):
             obj = fn()
             if obj is not None:
                 save(label, obj)
+                _run_status[label] = {"status": "ok", "msg": "成功"}
             else:
                 print(f"  ⚠️ {label}: 返回空，跳过")
+                _run_status[label] = {"status": "empty", "msg": "返回空"}
             return
         except Exception as e:
             last_err = e
             print(f"  ❌ {label} 失败(attempt {attempt+1}/{retries+1}): {type(e).__name__}: {e}")
+            _run_status[label] = {"status": "fail", "msg": f"{type(e).__name__}: {str(e)[:80]}"}
             time.sleep(2)
     print(f"  🚫 {label} 跳过，最终错误: {type(last_err).__name__}: {last_err}")
     time.sleep(0.5)
@@ -1897,6 +1903,26 @@ def main(category=None):
             subprocess.run([sys.executable, str(script)], cwd=str(ROOT), check=False)
         except Exception as e:
             print(f"  ⚠️ gen_market_brief 调用失败: {e}")
+
+    # 生成 runner 状态文件，供前端「定时任务跟踪」看板展示
+    try:
+        runner_status = {
+            "run_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "category": category or "all",
+            "hostname": os.environ.get("COMPUTERNAME", "") or os.environ.get("HOSTNAME", ""),
+            "modules": _run_status,
+            "summary": {
+                "total": len(_run_status),
+                "ok": sum(1 for v in _run_status.values() if v.get("status") == "ok"),
+                "empty": sum(1 for v in _run_status.values() if v.get("status") == "empty"),
+                "fail": sum(1 for v in _run_status.values() if v.get("status") == "fail"),
+            },
+        }
+        with open(RAW_DIR / "runner_status.json", "w", encoding="utf-8") as f:
+            json.dump(runner_status, f, ensure_ascii=False, separators=(",", ":"), default=str)
+        print(f"📋 runner_status: {runner_status['summary']}")
+    except Exception as e:
+        print(f"  ⚠️ 写入 runner_status 失败: {e}")
 
     print(f"=== v8 云端抓取结束 {datetime.now().isoformat(timespec='seconds')} ===")
     print(f"raw_data/ 文件数: {len(list(RAW_DIR.glob('*.json')))}")

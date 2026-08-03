@@ -498,6 +498,7 @@ window.V8_CAL = {weeks:[],legend:[]};
 <script src="data/W52_HIGH.js"></script>
 <script src="data/CANDIDATE_QUOTES.js"></script>
 <script src="data/RISK_GAUGE.js"></script>
+<script src="data/RUNNER_STATUS.js"></script>
 </head>
 <body>
 
@@ -3435,11 +3436,14 @@ window.V8_CAL = {weeks:[],legend:[]};
         <div class="kv"><span class="k">心跳</span><span><span class="status-dot s-ok"></span>正常（本机每小时巡查）</span></div>
       </div>
       <div class="card">
-        <h3><span class="ic">🤖</span>双机状态 - 运维</h3>
+        <h3><span class="ic">🤖</span>双机状态 / 定时任务跟踪 - 运维</h3>
         <div class="kv"><span class="k">中国抓取节点（self-hosted）</span><span><span class="status-dot s-ok"></span>在线 · GitHub Actions 自动调度（单位机·非手动）</span></div>
         <div class="kv"><span class="k">阿狸咪（家中机）</span><span><span class="status-dot s-off"></span>已关机 · 不接手</span></div>
         <div class="kv"><span class="k">中国节点 runner</span><span><span class="status-dot s-ok"></span>lemoncat-cn（self-hosted）在线 · 自动调度</span></div>
         <div class="kv"><span class="k">failover 守卫</span><span><span class="status-dot s-ok"></span>活跃</span></div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--border)" id="runnerTrackBody">
+          <div style="font-size:12px;color:var(--dim)">等待 runner 状态数据…</div>
+        </div>
       </div>
     </div>
     <div class="card" style="margin-bottom:16px">
@@ -6117,6 +6121,45 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     setTime('riskGaugeTime', D.update_time);
   }
 
+  /* ---- 定时任务跟踪（RUNNER_STATUS） ---- */
+  function renderRunnerTrack(rs){
+    const el = $('runnerTrackBody');
+    if(!el) return;
+    if(!rs || !rs.run_time){
+      el.innerHTML = '<div style="font-size:12px;color:var(--dim)">暂无 runner 状态（等待中国节点首次抓取后生成）</div>';
+      return;
+    }
+    const modules = rs.modules || {};
+    const summary = rs.summary || {};
+    const total = summary.total || Object.keys(modules).length;
+    const ok = summary.ok || 0;
+    const fail = summary.fail || 0;
+    const empty = summary.empty || 0;
+    const statusColor = fail > 0 ? 'var(--up)' : (empty > 0 ? 'var(--gold)' : 'var(--down)');
+    const statusText = fail > 0 ? '有失败' : (empty > 0 ? '部分空' : '正常');
+    // 关注与全球宏观、资金流时间轴直接相关的模块
+    const watch = ['MACRO_DATA','MARKET_FUND_FLOW_DATA','INDEX_QUOTES','ETF_INTRADAY_HEAT','SECTOR_FUND_FLOW'];
+    let watchHtml = '';
+    watch.forEach(function(key){
+      const m = modules[key];
+      if(!m) return;
+      const color = m.status === 'ok' ? 'var(--down)' : (m.status === 'empty' ? 'var(--gold)' : 'var(--up)');
+      const dot = '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+color+';margin-right:4px;"></span>';
+      watchHtml += '<span style="font-size:11px;color:var(--sub);margin-right:10px;">'+dot+key+'</span>';
+    });
+    el.innerHTML =
+      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'+
+        '<span style="font-size:12px;color:var(--sub)">中国节点最后抓取</span>'+
+        '<b style="font-size:13px;">'+rel(rs.run_time)+'</b>'+
+        '<span style="font-size:11px;color:'+statusColor+';">● '+statusText+'</span>'+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--dim);margin-bottom:6px;">'+
+        '共 '+total+' 模块 · 成功 '+ok+' · 空 '+empty+' · 失败 '+fail+
+        (rs.hostname ? ' · 节点 '+esc(rs.hostname) : '')+
+      '</div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:4px 0;">'+watchHtml+'</div>';
+  }
+
 
   /* ---- 初始化 ---- */
   function initPostMarket(){
@@ -6159,6 +6202,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     safe(renderSector, window.SECTOR_FUND_FLOW || {});
     safe(renderMacro, window.MACRO_DATA || {});
     safe(renderRiskGauge);
+    safe(renderRunnerTrack, window.RUNNER_STATUS || {});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initPostMarket);
   else initPostMarket();
