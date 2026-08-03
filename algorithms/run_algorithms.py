@@ -97,7 +97,9 @@ def step_v8_self_sufficiency():
             continue
         print(f"  ▶ {script}  ({datetime.now():%H:%M:%S})")
         try:
-            r = subprocess.run([PY, path], cwd=ALGO, env=env,
+            # ★ 2026-08-04 修复：scanner.py 必须带 full 子命令，否则只打印用法即退出，
+            #   永远不写 gold_pool.json → 连锁导致 backtest_tdx/gen_cockpit_advice 失败。
+            r = subprocess.run([PY, path, "full"], cwd=ALGO, env=env,
                                 capture_output=True, text=True, timeout=timeout)
             if r.returncode == 0:
                 last = [l for l in r.stdout.strip().splitlines() if l.strip()][-1:] or [""]

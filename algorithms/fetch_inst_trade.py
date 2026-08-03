@@ -15,7 +15,7 @@ def log(msg):
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
 
 def _fetch_lhb_with_retry(today, max_retry=4):
-    """带指数退避重试的龙虎榜机构买卖抓取，全部失败返回 None"""
+    """带指数退避重试的龙虎榜机构买卖抓取（东财 jgmmtj 接口），全部失败返回 None"""
     import akshare as ak
     import time
     last_err = None
@@ -24,12 +24,52 @@ def _fetch_lhb_with_retry(today, max_retry=4):
             return ak.stock_lhb_jgmmtj_em(start_date=today, end_date=today)
         except Exception as e:
             last_err = e
-            log(f"akshare失败(第{attempt+1}/{max_retry}次): {e}")
+            log(f"akshare(jgmmtj)失败(第{attempt+1}/{max_retry}次): {e}")
             if attempt < max_retry - 1:
                 wait = 5 * (2 ** attempt)
                 log(f"  等待 {wait}s 后重试...")
                 time.sleep(wait)
     return None
+
+def _fetch_lhb_detail_with_retry(today, max_retry=4):
+    """兜底：东财 stock_lhb_detail_em（盘后席位分析同款接口，常年可用）抓机构买卖统计。
+    2026-08-04 新增：主接口 jgmmtj 连日返回 NoneType 报错，detail_em 列名略有差异，
+    下方用容错 _num/_txt 读取。"""
+    import akshare as ak
+    import time
+    last_err = None
+    for attempt in range(max_retry):
+        try:
+            df = ak.stock_lhb_detail_em(start_date=today, end_date=today)
+            if df is None or len(df) == 0:
+                return None
+            return df
+        except Exception as e:
+            last_err = e
+            log(f"akshare(detail)失败(第{attempt+1}/{max_retry}次): {e}")
+            if attempt < max_retry - 1:
+                wait = 5 * (2 ** attempt)
+                log(f"  等待 {wait}s 后重试...")
+                time.sleep(wait)
+    return None
+
+def _num(row, *names, default=0.0):
+    """容错读数值：多候选列名，None/NaN/缺失返回 default"""
+    for n in names:
+        if n in row and row[n] is not None:
+            try:
+                v = float(row[n])
+                if v == v:  # 非 NaN
+                    return v
+            except Exception:
+                pass
+    return default
+
+def _txt(row, *names, default=''):
+    for n in names:
+        if n in row and row[n] is not None:
+            return str(row[n])
+    return default
 
 def _get_recent_trade_date(ref=None):
     """回退到最近一个交易日（跳过周末），用于周末抓取周五龙虎榜数据。"""
@@ -48,36 +88,41 @@ def main():
     log("=" * 40)
     
     today = _get_recent_trade_date()
-    
+    log(f"目标交易日: {today}")
+
     df = _fetch_lhb_with_retry(today)
-    if df is None:
-        log("akshare多次重试仍失败，保留旧数据（如有）")
+    src = "jgmmtj"
+    if df is None or len(df) == 0:
+        log("主接口(jgmmtj)无数据，切换兜底接口(detail_em)...")
+        df = _fetch_lhb_detail_with_retry(today)
+        src = "detail_em"
+    if df is None or len(df) == 0:
+        log("全部接口重试仍失败，保留旧数据（如有）")
         sys.exit(1)
-    
-    if len(df) == 0:
-        log(f"{today} 无龙虎榜机构数据（非交易日或尚未公布）")
-        sys.exit(0)
-    
-    # Deduplicate by code (keep max net buy)
+    log(f"数据源: {src}，命中 {len(df)} 行")
+
+    # Deduplicate by code (keep max net buy)；容错读列（两套接口列名不同）
     deduped = {}
     for _, r in df.iterrows():
-        code = str(r['代码'])
-        amt = float(r['机构买入净额'])
+        code = str(_txt(r, '代码')).zfill(6)
+        if not code:
+            continue
+        amt = _num(r, '机构买入净额', '机构净买额')
         if code not in deduped or abs(amt) > abs(deduped[code]['net_amt']):
             deduped[code] = {
                 'code': code,
-                'name': r['名称'],
-                'close': float(r['收盘价']),
-                'pct': float(r['涨跌幅']),
-                'buy_inst': int(r['买方机构数']),
-                'sell_inst': int(r['卖方机构数']),
-                'buy_amt': float(r['机构买入总额']),
-                'sell_amt': float(r['机构卖出总额']),
+                'name': _txt(r, '名称'),
+                'close': _num(r, '收盘价', '最新价'),
+                'pct': _num(r, '涨跌幅'),
+                'buy_inst': int(_num(r, '买方机构数')),
+                'sell_inst': int(_num(r, '卖方机构数')),
+                'buy_amt': _num(r, '机构买入总额'),
+                'sell_amt': _num(r, '机构卖出总额'),
                 'net_amt': amt,
-                'total_amt': float(r['市场总成交额']),
-                'net_ratio': float(r['机构净买额占总成交额比']),
-                'turnover': float(r['换手率']),
-                'reason': r['上榜原因'][:80],
+                'total_amt': _num(r, '市场总成交额', '总成交额'),
+                'net_ratio': _num(r, '机构净买额占总成交额比'),
+                'turnover': _num(r, '换手率'),
+                'reason': _txt(r, '上榜原因')[:80],
             }
     
     stocks = sorted(deduped.values(), key=lambda x: x['net_amt'], reverse=True)
