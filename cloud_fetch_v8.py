@@ -16,7 +16,7 @@
 依赖：akshare（pip install akshare），中国网络可达。
 """
 
-import json, os, sys, time
+import json, os, sys, time, subprocess
 from datetime import datetime, timedelta
 from pathlib import Path
 import pandas as pd
@@ -1817,6 +1817,15 @@ def main(category=None):
         if target_vars is not None and var not in target_vars:
             continue
         run(var, fn)
+
+    # 盘中/全量抓取后，用实时 raw_data 生成 AI 盘面解读（规则引擎，零成本，稳定可调试）
+    if category in ("intraday", "all"):
+        try:
+            script = ROOT / "algorithms" / "gen_market_brief.py"
+            print(f"🧠 生成 AI 盘面解读: {script.name}")
+            subprocess.run([sys.executable, str(script)], cwd=str(ROOT), check=False)
+        except Exception as e:
+            print(f"  ⚠️ gen_market_brief 调用失败: {e}")
 
     print(f"=== v8 云端抓取结束 {datetime.now().isoformat(timespec='seconds')} ===")
     print(f"raw_data/ 文件数: {len(list(RAW_DIR.glob('*.json')))}")

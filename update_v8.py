@@ -67,6 +67,7 @@ DATA_SOURCES = {
     "candidate_quotes.json":       "CANDIDATE_QUOTES",
     "sh_sz_history.json":         "SH_SZ_HISTORY",
     "risk_gauge.json":             "RISK_GAUGE",
+    "ai_market_brief.json":        "AI_MARKET_BRIEF",
 }
 
 # 变量名 → 更新时段
@@ -89,7 +90,7 @@ CATEGORY_MAP = {
     # 盘后（由 v6 算法 calc_volatility_watch.py 同步桥推送）
     "VOLATILITY": "post_close",
 
-    # 盘中（10:30/11:30/13:05/14:00/15:05）
+    # 盘中（每30分钟 10:00~15:00，由 cn runner 刷新）
     # 注意：ETF_DAILY_MONITOR 虽字段含 T+1，但为配合 ETF 三连板实时卡，归 intraday 盘中更新
     "INDEX_QUOTES": "intraday",
     "ETF_PULSE": "intraday",
@@ -103,6 +104,7 @@ CATEGORY_MAP = {
     "CANDIDATE_QUOTES": "intraday",
     "SH_SZ_HISTORY": "intraday",
     "RISK_GAUGE": "intraday",
+    "AI_MARKET_BRIEF": "intraday",
     # 盘后：大盘资金流时间轴，累积历史序列
     "MARKET_FUND_FLOW_DATA": "post_close",
 
