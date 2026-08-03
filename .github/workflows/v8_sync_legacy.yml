@@ -30,6 +30,7 @@ concurrency:
 
 jobs:
   sync:
+    if: false   # 2026-08-03 切断 v6 依赖：孤儿已原生化，本桥彻底停用
     runs-on: [self-hosted, cn]
     timeout-minutes: 5
     env:

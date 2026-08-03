@@ -25,6 +25,7 @@ concurrency:
 
 jobs:
   sync:
+    if: false   # 2026-08-03 切断 v6 依赖：v8 已自包含，禁用本同步桥（含手动 dispatch）
     runs-on: [self-hosted, cn]
     timeout-minutes: 10
     env:

@@ -27,7 +27,7 @@ V8_ROOT = os.path.dirname(ALGO)
 #   原来这里写 ALGO/out 与脚本对不上 → reseed 灌到 algorithms/out 而脚本读仓库根/out → 全链找不到输入。
 OUT = os.path.join(V8_ROOT, "out")
 
-V6_DATA_DIR = os.environ.get("V6_DATA_DIR", r"E:\workspace\stock-scanner\data")
+V6_DATA_DIR = os.environ.get("V6_DATA_DIR", os.path.join(V8_ROOT, "out"))
 PY = os.environ.get("V8_PYTHON", "python")
 
 # 本地测试可能传入 Git-Bash 风格路径（/c/Users/...），Windows CreateProcess 无法解析，

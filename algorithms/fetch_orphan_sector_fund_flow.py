@@ -38,7 +38,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HISTORY_FILE = os.path.join(ROOT, "raw_data", "sector_fund_flow_history.json")
 OUTPUT_FILE = os.path.join(ROOT, "raw_data", "sector_fund_flow_trend.json")
 BASE_DIR = ROOT  # 兼容 v6 代码里 BASE_DIR 派生路径（.neodata_token / westock 缓存）
-V6_DATA_DIR = os.environ.get("V6_DATA_DIR", r"E:\workspace\stock-scanner\data")
+V6_DATA_DIR = os.environ.get("V6_DATA_DIR", os.path.join(ROOT, "raw_data"))
 
 # 板块代码模式（东方财富内部编码 pt02xxxx / pt01xxxx），不应作为板块名称存入历史
 _INVALID_SECTOR_CODE_RE = re.compile(r"^pt\d+[A-Za-z0-9]+$")
