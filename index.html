@@ -3296,27 +3296,28 @@ window.V8_CAL = {weeks:[],legend:[]};
       <div class="card">
         <h3><span class="ic">🚀</span>部署状态 - 运维</h3>
         <div class="kv"><span class="k">站点</span><b>ah-quant999.github.io/quant-scanner-v8</b></div>
-        <div class="kv"><span class="k">部署 SHA</span><b>5db8d32</b></div>
-        <div class="kv"><span class="k">最后部署</span><b>2026-07-30 17:10</b></div>
-        <div class="kv"><span class="k">心跳</span><span><span class="status-dot s-ok"></span>正常（5 分钟前）</span></div>
+        <div class="kv"><span class="k">部署 SHA</span><b>018c870</b></div>
+        <div class="kv"><span class="k">最后部署</span><b>2026-08-03 08:51</b></div>
+        <div class="kv"><span class="k">触发方式</span><b>cn_fetch 成功后 workflow_run 自动触发</b></div>
+        <div class="kv"><span class="k">心跳</span><span><span class="status-dot s-ok"></span>正常（本机每小时巡查）</span></div>
       </div>
       <div class="card">
         <h3><span class="ic">🤖</span>双机状态 - 运维</h3>
         <div class="kv"><span class="k">主力节点（中国节点）</span><span><span class="status-dot s-ok"></span>在线 · 全天在线（单位机）</span></div>
-        <div class="kv"><span class="k">阿狸咪（云端）</span><span><span class="status-dot s-warn"></span>待命 · 夜间/周末接管</span></div>
+        <div class="kv"><span class="k">阿狸咪（家中机）</span><span><span class="status-dot s-off"></span>已关机 · 不接手</span></div>
+        <div class="kv"><span class="k">云端 runner</span><span><span class="status-dot s-ok"></span>lemoncat-cn 在线</span></div>
         <div class="kv"><span class="k">failover 守卫</span><span><span class="status-dot s-ok"></span>活跃</span></div>
       </div>
     </div>
     <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">⚙️</span>自动化任务（11） - 运维</h3>
-      <table><thead><tr><th>任务</th><th>周期</th><th>状态</th><th>上次</th></tr></thead>
+      <h3><span class="ic">⚙️</span>自动化任务 - 运维</h3>
+      <table><thead><tr><th>任务</th><th>周期</th><th>状态</th><th>说明</th></tr></thead>
       <tbody>
-        <tr><td>网络健康检查</td><td>每30分</td><td><span class="status-dot s-ok"></span>ACTIVE</td><td>16:30</td></tr>
-        <tr><td>全任务心跳守卫</td><td>每30分</td><td><span class="status-dot s-ok"></span>ACTIVE</td><td>16:45</td></tr>
-        <tr><td>发令枪:00/15/30/45</td><td>每15分</td><td><span class="status-dot s-ok"></span>ACTIVE</td><td>16:45</td></tr>
-        <tr><td>健康监控:00/30</td><td>每30分</td><td><span class="status-dot s-ok"></span>ACTIVE</td><td>16:30</td></tr>
-        <tr><td>看门狗-整点/半点</td><td>每30分</td><td><span class="status-dot s-ok"></span>ACTIVE</td><td>16:00</td></tr>
-        <tr><td>夜间周末值守</td><td>每6时</td><td><span class="status-dot s-ok"></span>ACTIVE</td><td>13:36</td></tr>
+        <tr><td>v8 云端中国数据抓取</td><td>cron</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>push raw_data → 自动触发 build_deploy</td></tr>
+        <tr><td>v8 云端安全网</td><td>每30分</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>raw_data stale 时兜底 dispatch</td></tr>
+        <tr><td>v8 云端盘后算法链</td><td>post_close</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>收盘后算法数据生产</td></tr>
+        <tr><td>v8 云端每日备份</td><td>每日21:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>备份 raw_data / data</td></tr>
+        <tr><td>小九-v8云端管线看门狗</td><td>08-22每小时</td><td><span class="status-dot s-ok"></span>ACTIVE</td><td>只监督、不部署、不抢跑</td></tr>
       </tbody></table>
     </div>
     <div class="card">
@@ -3767,26 +3768,28 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
 
       <div class="card">
         <h3><span class="ic">☁️</span>部署与双机状态 - 说明</h3>
-        <div class="logic-h">部署状态</div>
-        <div class="logic-p">展示最近一次部署时间、来源、关键数据文件状态、异常告警。每次部署前执行四层安全检查：数据语法→前端语法→运行时冒烟→注入率闸门。</div>
+        <div class="logic-h">部署链路</div>
+        <div class="logic-p"><b>v8 独立仓库</b>：中国数据抓取（cn_fetch）→ 推送 raw_data → GitHub Actions 自动触发 build_deploy（workflow_run）→ 构建 data/*.js → 推 main → GitHub Pages 自动发布。小九本机<b>只监督、不手动部署</b>。</div>
         <div class="logic-h">双机状态</div>
-        <div class="logic-p">小九（单位机，全天在线）全面接管阿狸咪家中机职责。云端 bot 与双机 bot 分别标记。</div>
+        <div class="logic-p"><b>小九（单位机）</b>：全天在线，负责 v8 云端管线看门狗与主人指令执行。<b>阿狸咪（家中机）</b>：已关机，长期决策不再接手任何部署/救火任务。<b>云端 runner（lemoncat-cn）</b>：执行实际抓取与构建。</div>
       </div>
 
       <div class="card">
         <h3><span class="ic">⚙️</span>自动化任务 - 说明</h3>
-        <div class="logic-h">调度韧性</div>
-        <div class="logic-p">云端4 workflow原生cron + 本机发令枪每15分兜底dispatch。发令枪4档：每小时:00/:15/:30/:45。同一档位串行互锁，不同档位不互杀。</div>
-        <div class="logic-h">故障转移</div>
-        <div class="logic-p">云端掉线>30min激活本机盘中5+盘后1默认PAUSED任务；小九掉线>90min阿狸咪自动接管救火任务，恢复后自动交还。</div>
+        <div class="logic-h">云端调度</div>
+        <div class="logic-p">v8_cn_fetch（盘前/盘中/盘后/周末）、v8_safety_net（每30分 stale 兜底）、v8_algo_run（post_close 算法链）、v8_backup（每日21:00备份）。</div>
+        <div class="logic-h">本机监督</div>
+        <div class="logic-p">小九-v8云端管线看门狗：每天 08:00–22:00 每小时运行 v8_cloud_watchdog.py，检查 runner 在线、cn_fetch/build_deploy 状态、raw_data 陈旧度、站点存活。发现异常写 _v8_watchdog.log 并告警。</div>
+        <div class="logic-h">v6 状态</div>
+        <div class="logic-p">2026-08-03 起，所有 v6 相关定时任务已全部停止；v6 仅在主人明确指令下由小九手动操作。</div>
       </div>
 
       <div class="card">
         <h3><span class="ic">💾</span>数据新鲜度 / 看门狗 - 说明</h3>
-        <div class="logic-h">看门狗监控</div>
-        <div class="logic-p">监控27核心数据，market类盘后15:30查。每日20:30自动化自修复：safe_pull→重跑陈旧fetch→update_data_v2 --fast→push→deploy --force。</div>
-        <div class="logic-h">新鲜度闸门</div>
-        <div class="logic-p">部署前扫描data/*.json内部update_time vs 最近交易日收盘，核心源过期即阻断；网络易抖/需交互登录的源仅告警不阻断。</div>
+        <div class="logic-h">云端兜底</div>
+        <div class="logic-p">v8_safety_net 每30分钟检查 raw_data 最新 commit，超过阈值自动 dispatch cn_fetch 全量兜底；阈值当前为1小时（方案B严格版待生效）。</div>
+        <div class="logic-h">本机闸门</div>
+        <div class="logic-p">v8_cloud_watchdog.py 核对核心 data/*.js 的 update_time，raw_data 超过90分钟无新 commit 即 ALERT；本机只告警/汇报，不自动覆盖数据。</div>
       </div>
 
       <div class="card">
