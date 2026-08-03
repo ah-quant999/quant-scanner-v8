@@ -329,26 +329,34 @@ def f_sector_fund_flow():
 def f_index_quotes():
     # 四大核心宽基指数实时行情：上证/深证/创业板/科创50
     # 东财 ulist.np 接口，secid 规则：1=上海，0=深圳
+    # 2026-08-03 修复：本机/cn runner 直连 push2 host 会被 WAF 重置，改走 push2delay 镜像。
     secids = "1.000001,0.399001,0.399006,1.000688"
     names = {"000001": "上证指数", "399001": "深证成指", "399006": "创业板指", "000688": "科创50"}
     short = {"000001": "沪指", "399001": "深成指", "399006": "创业板", "000688": "科创板"}
-    try:
-        r = _requests.get(
-            "https://push2.eastmoney.com/api/qt/ulist.np/get",
-            params={"fltt": "2", "invt": "2", "ut": "b2884a393a59ad64002292a3e90d46a5",
-                    "fields": "f2,f3,f4,f5,f6,f12,f13,f14,f18,f20,f21", "secids": secids},
-            headers=_EM_HEADERS, timeout=12)
-        j = r.json()
-        rows = j.get("data", {}).get("diff", []) or []
-    except Exception as e:
-        print(f"  ⚠️ 东财指数行情失败: {e}")
-        rows = []
+    rows = []
+    for attempt in range(3):
+        try:
+            r = _requests.get(
+                f"{_EM_DELAY}/api/qt/ulist.np/get",
+                params={"fltt": "2", "invt": "2", "ut": "b2884a393a59ad64002292a3e90d46a5",
+                        "fields": "f2,f3,f4,f5,f6,f12,f13,f14,f18,f20,f21,f104,f105,f106", "secids": secids},
+                headers=_EM_HEADERS, timeout=15)
+            j = r.json()
+            rows = j.get("data", {}).get("diff", []) or []
+            if rows:
+                break
+        except Exception as e:
+            print(f"  ⚠️ 东财指数行情失败(尝试{attempt+1}/3): {e}")
+            time.sleep(1.5)
     items = []
     for r in rows:
         code = str(r.get("f12") or "")
         # 东财 f13 标记 1=上海 0=深圳
         prefix = "SH" if str(r.get("f13")) == "1" else "SZ"
         full_code = prefix + code
+        up = int(r.get("f104") or 0)
+        down = int(r.get("f105") or 0)
+        flat = int(r.get("f106") or 0)
         items.append({
             "code": code,
             "full_code": full_code,
@@ -362,10 +370,13 @@ def f_index_quotes():
             "prev_close": round(float(r.get("f18") or 0), 2),
             "total_mv": round(float(r.get("f20") or 0) / 1e8, 2),  # 总市值亿
             "float_mv": round(float(r.get("f21") or 0) / 1e8, 2),  # 流通市值亿
+            "up": up,
+            "down": down,
+            "flat": flat,
         })
     if not items:
         return None
-    return {"items": items, "note": "东财实时指数行情"}
+    return {"items": items, "note": "东财实时指数行情(push2delay)"}
 
 def f_concept_ranking():
     # 概念板块列表（涨跌幅 + 主力净流入），push2delay 镜像。
