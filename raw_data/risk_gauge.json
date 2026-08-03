@@ -1,11 +1,11 @@
 {
-  "update_time": "2026-08-03 13:33:54",
+  "update_time": "2026-08-03 10:11:11",
   "overall": "red",
   "indicators": [
     {
       "name": "USDJPY",
       "label": "美元兑日元",
-      "value": 156.432,
+      "value": 156.965,
       "unit": "",
       "source": "Yahoo Finance",
       "status": "yellow",
@@ -15,7 +15,7 @@
     {
       "name": "VIX",
       "label": "VIX 恐慌指数",
-      "value": 15.99,
+      "value": 16.05,
       "unit": "",
       "source": "Yahoo Finance",
       "status": "green",
@@ -25,7 +25,7 @@
     {
       "name": "US10Y",
       "label": "10Y 美债收益率",
-      "value": 4.69,
+      "value": 4.75,
       "unit": "%",
       "source": "Yahoo Finance",
       "status": "red",
@@ -35,7 +35,7 @@
     {
       "name": "USDCNH",
       "label": "美元兑离岸人民币",
-      "value": 6.7532,
+      "value": 6.7529,
       "unit": "",
       "source": "Yahoo Finance",
       "status": "green",
