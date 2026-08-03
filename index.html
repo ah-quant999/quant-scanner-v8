@@ -3303,9 +3303,9 @@ window.V8_CAL = {weeks:[],legend:[]};
       </div>
       <div class="card">
         <h3><span class="ic">🤖</span>双机状态 - 运维</h3>
-        <div class="kv"><span class="k">主力节点（中国节点）</span><span><span class="status-dot s-ok"></span>在线 · 全天在线（单位机）</span></div>
+        <div class="kv"><span class="k">中国抓取节点（self-hosted）</span><span><span class="status-dot s-ok"></span>在线 · GitHub Actions 自动调度（单位机·非手动）</span></div>
         <div class="kv"><span class="k">阿狸咪（家中机）</span><span><span class="status-dot s-off"></span>已关机 · 不接手</span></div>
-        <div class="kv"><span class="k">云端 runner</span><span><span class="status-dot s-ok"></span>lemoncat-cn 在线</span></div>
+        <div class="kv"><span class="k">中国节点 runner</span><span><span class="status-dot s-ok"></span>lemoncat-cn（self-hosted）在线 · 自动调度</span></div>
         <div class="kv"><span class="k">failover 守卫</span><span><span class="status-dot s-ok"></span>活跃</span></div>
       </div>
     </div>
@@ -3404,9 +3404,9 @@ window.V8_CAL = {weeks:[],legend:[]};
     <div class="lg-pane" id="lg-schedule">
       <div class="card">
         <h3><span class="ic">⏰</span>v8 定时任务矩阵（最新版，已对齐实际 workflow）</h3>
-        <div class="logic-p"><b>执行方说明</b>：A 股数据源需中国 IP 抓取，必需中国节点的 workflow 跑在「中国节点」；其余（构建/部署/体检/清理/备份/自愈）跑在 GitHub 云端。下表对齐实际 .github/workflows/*.yml。</div>
+        <div class="logic-p"><b>执行方说明</b>：A 股数据源需中国 IP 抓取，必需中国节点的 workflow <b>自动调度</b>跑在「中国节点」（小九单位机，作为 GitHub self-hosted runner，到点由 GitHub 自动派任务，<b>非小九手动</b>）；其余（构建/部署/体检/清理/备份/自愈）跑在 GitHub 云端 ubuntu runner，全部自动。小九本机只运行看门狗监督，不手动跑数据、不手动部署。</div>
 
-        <div class="logic-p"><b>哪些前端由小九托管的中国节点产出</b>：A股实时源（东财/akshare/同花顺）对境外云端 runner 限流、抓不到，所以下列模块必须小九家里机（self-hosted 中国节点）抓取或跑算法。其余模块（构建/部署/体检/清理/备份/自愈）跑在 GitHub 云端。</div>
+        <div class="logic-p"><b>哪些前端由「中国节点（self-hosted runner）」产出</b>：A股实时源（东财/akshare/同花顺）对境外云端 runner 限流、抓不到，所以下列模块必须走中国节点抓取或跑算法——该节点是小九单位机作为 GitHub self-hosted runner，由 GitHub Actions 到点<b>自动调度</b>，<b>并非小九手动运行</b>。其余模块（构建/部署/体检/清理/备份/自愈）跑在 GitHub 云端。</div>
         <table class="lg-table">
           <tr><th>前端模块</th><th>产出类别</th><th>时段</th></tr>
           <tr><td>交易日历 · 打新速览 · 两融 · 中金所持仓 · 宏观 · 危机雷达 · 北向(已停更) · 分析师评级 · 52周高 · 波动率观测 · 羊群效应</td><td>中国数据抓取</td><td>盘前 08:25</td></tr>
@@ -3771,7 +3771,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">部署链路</div>
         <div class="logic-p"><b>v8 独立仓库</b>：中国数据抓取（cn_fetch）→ 推送 raw_data → GitHub Actions 自动触发 build_deploy（workflow_run）→ 构建 data/*.js → 推 main → GitHub Pages 自动发布。小九本机<b>只监督、不手动部署</b>。</div>
         <div class="logic-h">双机状态</div>
-        <div class="logic-p"><b>小九（单位机）</b>：全天在线，负责 v8 云端管线看门狗与主人指令执行。<b>阿狸咪（家中机）</b>：已关机，长期决策不再接手任何部署/救火任务。<b>云端 runner（lemoncat-cn）</b>：执行实际抓取与构建。</div>
+        <div class="logic-p"><b>小九（单位机）</b>：作为 GitHub self-hosted runner「中国节点」自动承接需中国 IP 的抓取/算法任务，并运行看门狗监督；<b>本人不手动跑数据、不手动部署</b>。<b>阿狸咪（家中机）</b>：已关机，长期决策不再接手任何部署/救火任务。<b>GitHub 云端（ubuntu runner）</b>：执行构建/部署/体检/备份/自愈。<b>中国节点（lemoncat-cn）</b>：即小九单位机，由 GitHub 自动调度，承担需中国 IP 的抓取。</div>
       </div>
 
       <div class="card">
