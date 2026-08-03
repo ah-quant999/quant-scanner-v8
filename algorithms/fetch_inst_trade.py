@@ -72,10 +72,14 @@ def _txt(row, *names, default=''):
     return default
 
 def _get_recent_trade_date(ref=None):
-    """回退到最近一个交易日（跳过周末），用于周末抓取周五龙虎榜数据。"""
-    from datetime import date, timedelta
+    """龙虎榜机构数据 T+1 发布且盘中未收盘时无当日数据：
+    17 点前取上一交易日，并跳过周末，与 fetch_lhb.py 对齐。"""
+    from datetime import date, timedelta, datetime
     if ref is None:
         ref = date.today()
+    # 17点前（含盘前/早盘）当日龙虎榜尚未公布，取上一交易日
+    if datetime.now().hour < 17:
+        ref = ref - timedelta(days=1)
     while ref.weekday() >= 5:
         ref = ref - timedelta(days=1)
     return ref.strftime('%Y%m%d')

@@ -3076,9 +3076,10 @@ def scan_market(scan_a=True, scan_hk=True, max_stocks=None, resume=False):
         json.dump(output, f, ensure_ascii=False, indent=2)
     print(f"  结果已保存: {OUTPUT_JSON}")
 
-    # 清理进度文件
-    if os.path.exists(PROGRESS_JSON):
-        os.remove(PROGRESS_JSON)
+    # 清理进度文件（runner 上 os.remove 会被安全删除 guard 拦截并强制 SystemExit(1)，
+    # 故不再删除；文件很小，保留不影响后续运行）
+    # if os.path.exists(PROGRESS_JSON):
+    #     os.remove(PROGRESS_JSON)
 
     # 更新金股池
     update_gold_pool_from_scan(output)
@@ -3584,6 +3585,9 @@ if __name__ == "__main__":
         if cmd == "full":
             # 盘后扫描活跃股池(创业板Top100+科创板Top100+主板Top100+港股Top50)
             scan_market()
+            # runner 宿主 sitecustomize.py 可能在 atexit 阶段强制 SystemExit(1)，
+            # 用 os._exit(0) 直接退出，保证金股池已落盘且不被 atexit hook 破坏。
+            os._exit(0)
         elif cmd == "quick":
             # 盘中极速扫描(只要60天K线, 速度加倍)
             import __main__

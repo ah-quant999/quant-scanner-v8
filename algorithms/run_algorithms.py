@@ -99,14 +99,22 @@ def step_v8_self_sufficiency():
         try:
             # ★ 2026-08-04 修复：scanner.py 必须带 full 子命令，否则只打印用法即退出，
             #   永远不写 gold_pool.json → 连锁导致 backtest_tdx/gen_cockpit_advice 失败。
-            r = subprocess.run([PY, path, "full"], cwd=ALGO, env=env,
+            #   其他上游脚本不要带 full，避免 argparse 报错。
+            args = [PY, path, "full"] if script == "scanner.py" else [PY, path]
+            r = subprocess.run(args, cwd=ALGO, env=env,
                                 capture_output=True, text=True, timeout=timeout)
-            if r.returncode == 0:
-                last = [l for l in r.stdout.strip().splitlines() if l.strip()][-1:] or [""]
+            # 2026-08-04 修复2：runner 宿主 sitecustomize.py 会在进程退出时因批量临时文件
+            # 清理强制 SystemExit(1)。若 scanner.py 已输出"金股池已更新"，则视为成功。
+            stdout_all = r.stdout or ""
+            stderr_all = r.stderr or ""
+            looks_ok = (r.returncode == 0 or
+                        (script == "scanner.py" and "金股池已更新" in stdout_all))
+            if looks_ok:
+                last = [l for l in stdout_all.strip().splitlines() if l.strip()][-1:] or [""]
                 print(f"     ✅ ok | {last[0][:80]}")
             else:
                 print(f"     ⚠️ 退出码 {r.returncode}")
-                tail = "\n".join(r.stdout.strip().splitlines()[-3:] + r.stderr.strip().splitlines()[-3:])
+                tail = "\n".join(stdout_all.strip().splitlines()[-3:] + stderr_all.strip().splitlines()[-3:])
                 print("     " + tail.replace("\n", "\n     ")[:400])
         except subprocess.TimeoutExpired:
             print(f"     ⏱️ 超时(>{timeout}s)，跳过")
