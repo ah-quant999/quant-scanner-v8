@@ -5,6 +5,11 @@
 # 不再依赖 v6 每日批处理。GitHub 美区云端 runner 无法访问 EastMoney/akshare/
 # Tongdaxin，故算法必须在 cn runner（本地机器）执行。
 #
+# 2026-08-03 修复：该 workflow 自 07-31 创建、08-01/08-02 多次提交后，GitHub 调度器从未派发其
+#   schedule（API 实测 total runs = 0，而同仓库同 cn runner 的 v8_cn_fetch 正常 30 次）。
+#   根因 = schedule 未被调度器注册/触发（非 runner 问题）。修复 = re-touch 文件 + 加 20:00 冗余 cron。
+#   若日后再次发现盘后页陈旧，先查本 workflow 的 schedule 是否又失效，手动 workflow_dispatch 即可补算。
+#
 # 2026-08-02 原生化：4 类上游输入（gold_pool / scan_result / guanlan_* / mahoro_signals）
 # 也已由 v8 自产（scanner.py / guanlan_extractor.py / fetch_maharo_signals.py + V8_OUT_DIR 钩子
 # → 写 v8 仓根 out/）。run_algorithms.py 的 step_v8_self_sufficiency() 负责调度这 3 脚本；
@@ -35,7 +40,8 @@ name: "🇨🇳 v8 盘后算法链(cn)"
 #   详见 TIME_ORDER.md。
 on:
   schedule:
-    - cron: '30 10 * * 1-5'  # 18:30 CST 盘后（龙虎榜18点后已发布 + 收盘数据 + 算法部署）
+    - cron: '30 10 * * 1-5'  # 18:30 CST 盘后（龙虎榜18点后已发布 + 收盘数据 + 算法部署）主
+    - cron: '0 12 * * 1-5'   # 20:00 CST 盘后冗余备份（2026-08-03 阿狸咪修复：原单一 cron 自 07-31 创建以来 0 次被调度，加冗余防再失效；与 18:30 主跑错峰不并发）
   workflow_dispatch:
 
 permissions:
