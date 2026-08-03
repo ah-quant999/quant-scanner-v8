@@ -1,1 +1,1024 @@
-{"update_time":"2026-07-31 23:02","data_type":"real","summary":{"in_count":40,"out_count":0,"in_text":"人工智能(268.2亿)、DeepSeek概念(257.0亿)、AI应用(251.5亿)、AI智能体(237.4亿)、深股通(220.0亿)","out_text":"无","alert":"🔥 40个板块大幅流入；🚀 人工智能+268.2亿(连10天)、DeepSeek概念+257.0亿(连8天)、AI应用+251.5亿(连8天)"},"sectors_in":[{"name":"人工智能","net":268.2,"net_5d":660.18,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":10,"trend":"in","net_10d":1099.8},{"name":"DeepSeek概念","net":256.98,"net_5d":396.84,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":8,"trend":"in"},{"name":"AI应用","net":251.52,"net_5d":417.37,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":8,"trend":"in"},{"name":"AI智能体","net":237.44,"net_5d":321.87,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":7,"trend":"in"},{"name":"深股通","net":220.01,"net_5d":714.61,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":13,"trend":"in","net_10d":1613.57},{"name":"AIGC概念","net":181.48,"net_5d":257.61,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":5,"trend":"in"},{"name":"阿里巴巴概念","net":155.88,"net_5d":848.8,"net_20d":-2247.43,"type":"概念","source":"本地累加","consecutive_days":9,"trend":"in"},{"name":"融资融券","net":146.67,"net_5d":1498.11,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":13,"trend":"in","net_10d":4133.24},{"name":"虚拟数字人","net":133.72,"net_5d":206.72,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":6,"trend":"in"},{"name":"腾讯概念","net":132.44,"net_5d":713.5,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":8,"trend":"in"},{"name":"ChatGPT概念","net":130.3,"net_5d":198.76,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":7,"trend":"in"},{"name":"数据要素","net":128.39,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":3,"trend":"in"},{"name":"云计算","net":127.53,"net_5d":238.62,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":5,"trend":"in"},{"name":"百度概念","net":126.28,"net_5d":262.24,"net_20d":-1250.12,"type":"概念","source":"本地累加","consecutive_days":6,"trend":"in"},{"name":"华为概念","net":126.27,"net_5d":636.56,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":12,"trend":"in","net_10d":1310.84},{"name":"机器人概念","net":120.85,"net_5d":310.41,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":11,"trend":"in","net_10d":1030.13},{"name":"多模态AI","net":117.25,"net_5d":200.62,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":6,"trend":"in"},{"name":"抖音概念(字节概念)","net":111.23,"net_5d":811.71,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":6,"trend":"in"},{"name":"东数西算(算力)","net":109.92,"net_5d":384.38,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":9,"trend":"in"},{"name":"信创","net":107.4,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":4,"trend":"in"},{"name":"元宇宙","net":105.36,"net_5d":154.85,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":7,"trend":"in"},{"name":"算力租赁","net":104.7,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":4,"trend":"in"},{"name":"鸿蒙概念","net":101.72,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":4,"trend":"in"},{"name":"数字经济","net":101.65,"net_5d":221.18,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":6,"trend":"in"},{"name":"区块链","net":91.78,"net_5d":258.83,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":5,"trend":"in"},{"name":"虚拟现实","net":91.31,"net_5d":470.77,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":7,"trend":"in"},{"name":"数据安全","net":91.07,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":3,"trend":"in"},{"name":"智慧政务","net":90.32,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":3,"trend":"in"},{"name":"智慧城市","net":90.26,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":3,"trend":"in"},{"name":"在线教育","net":88.18,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":4,"trend":"in"},{"name":"软件开发","net":82.51,"net_5d":102.76,"net_20d":0,"type":"行业","source":"本地累加","consecutive_days":6,"trend":"in"},{"name":"智能医疗","net":81.03,"net_5d":187.17,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":5,"trend":"in"},{"name":"车联网(车路协同)","net":80.66,"net_5d":134.06,"net_20d":-3030.72,"type":"概念","source":"本地累加","consecutive_days":6,"trend":"in"},{"name":"跨境电商","net":79.86,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":2,"trend":"in"},{"name":"工业互联网","net":78.49,"net_5d":320.86,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":9,"trend":"in"},{"name":"文化传媒概念","net":77.79,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":4,"trend":"in"},{"name":"智谱AI","net":73.36,"net_5d":125.16,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":5,"trend":"in"},{"name":"短剧游戏","net":73.3,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":4,"trend":"in"},{"name":"数据中心(AIDC)","net":66.64,"net_5d":302.07,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":13,"trend":"in","net_10d":1219.69},{"name":"华为鲲鹏","net":65.78,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":4,"trend":"in"}],"sectors_out":[],"top_list":[{"name":"人工智能","net":268.2,"net_5d":660.18,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":10,"trend":"in","net_10d":1099.8},{"name":"DeepSeek概念","net":256.98,"net_5d":396.84,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":8,"trend":"in"},{"name":"AI应用","net":251.52,"net_5d":417.37,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":8,"trend":"in"},{"name":"AI智能体","net":237.44,"net_5d":321.87,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":7,"trend":"in"},{"name":"深股通","net":220.01,"net_5d":714.61,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":13,"trend":"in","net_10d":1613.57},{"name":"AIGC概念","net":181.48,"net_5d":257.61,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":5,"trend":"in"},{"name":"阿里巴巴概念","net":155.88,"net_5d":848.8,"net_20d":-2247.43,"type":"概念","source":"本地累加","consecutive_days":9,"trend":"in"},{"name":"融资融券","net":146.67,"net_5d":1498.11,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":13,"trend":"in","net_10d":4133.24},{"name":"虚拟数字人","net":133.72,"net_5d":206.72,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":6,"trend":"in"},{"name":"腾讯概念","net":132.44,"net_5d":713.5,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":8,"trend":"in"},{"name":"ChatGPT概念","net":130.3,"net_5d":198.76,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":7,"trend":"in"},{"name":"数据要素","net":128.39,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":3,"trend":"in"},{"name":"云计算","net":127.53,"net_5d":238.62,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":5,"trend":"in"},{"name":"百度概念","net":126.28,"net_5d":262.24,"net_20d":-1250.12,"type":"概念","source":"本地累加","consecutive_days":6,"trend":"in"},{"name":"华为概念","net":126.27,"net_5d":636.56,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":12,"trend":"in","net_10d":1310.84},{"name":"机器人概念","net":120.85,"net_5d":310.41,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":11,"trend":"in","net_10d":1030.13},{"name":"多模态AI","net":117.25,"net_5d":200.62,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":6,"trend":"in"},{"name":"抖音概念(字节概念)","net":111.23,"net_5d":811.71,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":6,"trend":"in"},{"name":"东数西算(算力)","net":109.92,"net_5d":384.38,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":9,"trend":"in"},{"name":"信创","net":107.4,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":4,"trend":"in"},{"name":"元宇宙","net":105.36,"net_5d":154.85,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":7,"trend":"in"},{"name":"算力租赁","net":104.7,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":4,"trend":"in"},{"name":"鸿蒙概念","net":101.72,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":4,"trend":"in"},{"name":"数字经济","net":101.65,"net_5d":221.18,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":6,"trend":"in"},{"name":"区块链","net":91.78,"net_5d":258.83,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":5,"trend":"in"},{"name":"虚拟现实","net":91.31,"net_5d":470.77,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":7,"trend":"in"},{"name":"数据安全","net":91.07,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":3,"trend":"in"},{"name":"智慧政务","net":90.32,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":3,"trend":"in"},{"name":"智慧城市","net":90.26,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":3,"trend":"in"},{"name":"在线教育","net":88.18,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":4,"trend":"in"},{"name":"软件开发","net":82.51,"net_5d":102.76,"net_20d":0,"type":"行业","source":"本地累加","consecutive_days":6,"trend":"in"},{"name":"智能医疗","net":81.03,"net_5d":187.17,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":5,"trend":"in"},{"name":"车联网(车路协同)","net":80.66,"net_5d":134.06,"net_20d":-3030.72,"type":"概念","source":"本地累加","consecutive_days":6,"trend":"in"},{"name":"跨境电商","net":79.86,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":2,"trend":"in"},{"name":"工业互联网","net":78.49,"net_5d":320.86,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":9,"trend":"in"},{"name":"文化传媒概念","net":77.79,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":4,"trend":"in"},{"name":"智谱AI","net":73.36,"net_5d":125.16,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":5,"trend":"in"},{"name":"短剧游戏","net":73.3,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":4,"trend":"in"},{"name":"数据中心(AIDC)","net":66.64,"net_5d":302.07,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":13,"trend":"in","net_10d":1219.69},{"name":"华为鲲鹏","net":65.78,"net_5d":0,"net_20d":0,"type":"概念","consecutive_days":4,"trend":"in"}],"consecutive":{"人工智能":{"days":10,"trend":"in"},"DeepSeek概念":{"days":8,"trend":"in"},"AI应用":{"days":8,"trend":"in"},"AI智能体":{"days":7,"trend":"in"},"深股通":{"days":13,"trend":"in"},"AIGC概念":{"days":5,"trend":"in"},"阿里巴巴概念":{"days":9,"trend":"in"},"融资融券":{"days":13,"trend":"in"},"虚拟数字人":{"days":6,"trend":"in"},"腾讯概念":{"days":8,"trend":"in"},"ChatGPT概念":{"days":7,"trend":"in"},"数据要素":{"days":3,"trend":"in"},"云计算":{"days":5,"trend":"in"},"百度概念":{"days":6,"trend":"in"},"华为概念":{"days":12,"trend":"in"},"机器人概念":{"days":11,"trend":"in"},"多模态AI":{"days":6,"trend":"in"},"抖音概念(字节概念)":{"days":6,"trend":"in"},"东数西算(算力)":{"days":9,"trend":"in"},"信创":{"days":4,"trend":"in"},"元宇宙":{"days":7,"trend":"in"},"算力租赁":{"days":4,"trend":"in"},"鸿蒙概念":{"days":4,"trend":"in"},"数字经济":{"days":6,"trend":"in"},"区块链":{"days":5,"trend":"in"},"虚拟现实":{"days":7,"trend":"in"},"数据安全":{"days":3,"trend":"in"},"智慧政务":{"days":3,"trend":"in"},"智慧城市":{"days":3,"trend":"in"},"在线教育":{"days":4,"trend":"in"},"软件开发":{"days":6,"trend":"in"},"智能医疗":{"days":5,"trend":"in"},"车联网(车路协同)":{"days":6,"trend":"in"},"跨境电商":{"days":2,"trend":"in"},"工业互联网":{"days":9,"trend":"in"},"文化传媒概念":{"days":4,"trend":"in"},"智谱AI":{"days":5,"trend":"in"},"短剧游戏":{"days":4,"trend":"in"},"数据中心(AIDC)":{"days":13,"trend":"in"},"华为鲲鹏":{"days":4,"trend":"in"}},"trend_5d":[{"name":"融资融券","net":146.67,"net_5d":1498.11,"net_20d":3822.57,"type":"概念","source":"本地累加","consecutive_days":13,"trend":"in","net_20d_days":11,"net_60d":null,"net_10d":4133.24},{"name":"阿里巴巴概念","net":155.88,"net_5d":848.8,"net_20d":-2247.43,"type":"概念","source":"本地累加","consecutive_days":9,"trend":"in","net_60d":null},{"name":"抖音概念(字节概念)","net":111.23,"net_5d":811.71,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":6,"trend":"in","net_60d":null},{"name":"深股通","net":220.01,"net_5d":714.61,"net_20d":1952.5,"type":"概念","source":"本地累加","consecutive_days":13,"trend":"in","net_20d_days":11,"net_60d":null,"net_10d":1613.57},{"name":"腾讯概念","net":132.44,"net_5d":713.5,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":8,"trend":"in","net_60d":null},{"name":"人工智能","net":268.2,"net_5d":660.18,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":10,"trend":"in","net_60d":null,"net_10d":1099.8},{"name":"华为概念","net":126.27,"net_5d":636.56,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":12,"trend":"in","net_60d":null,"net_10d":1310.84},{"name":"先进封装","net":64.25,"net_5d":576.03,"net_20d":0,"net_60d":null,"type":"行业","consecutive_days":7,"trend":"in","net_5d_days":5},{"name":"虚拟现实","net":91.31,"net_5d":470.77,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":7,"trend":"in","net_60d":null},{"name":"AI应用","net":251.52,"net_5d":417.37,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":8,"trend":"in","net_5d_days":5,"net_60d":null},{"name":"DeepSeek概念","net":256.98,"net_5d":396.84,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":8,"trend":"in","net_5d_days":5,"net_60d":null},{"name":"东数西算(算力)","net":109.92,"net_5d":384.38,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":9,"trend":"in","net_5d_days":5,"net_60d":null}],"trend_20d":[{"name":"融资融券","net":146.67,"net_5d":1498.11,"net_20d":3822.57,"type":"概念","source":"本地累加","consecutive_days":13,"trend":"in","net_20d_days":11,"net_60d":null,"net_10d":4133.24},{"name":"深股通","net":220.01,"net_5d":714.61,"net_20d":1952.5,"type":"概念","source":"本地累加","consecutive_days":13,"trend":"in","net_20d_days":11,"net_60d":null,"net_10d":1613.57},{"name":"半导体","net":35.79,"net_5d":1125.2,"net_20d":1626.85,"net_60d":null,"type":"行业","consecutive_days":14,"trend":"in","net_20d_days":13,"net_10d":1484.91},{"name":"人民币贬值受益","net":82.62,"net_5d":1202.74,"net_20d":1611.09,"net_60d":null,"type":"行业","consecutive_days":13,"trend":"in","net_20d_days":11,"net_10d":1976.39},{"name":"沪股通","net":142.65,"net_5d":572.83,"net_20d":1585.31,"net_60d":null,"type":"行业","consecutive_days":13,"trend":"in","net_20d_days":11,"net_10d":1614.57},{"name":"数据中心(AIDC)","net":66.64,"net_5d":302.07,"net_20d":1418.49,"type":"概念","source":"本地累加","consecutive_days":13,"trend":"in","net_20d_days":11,"net_60d":null,"net_10d":1219.69},{"name":"存储芯片","net":534.39,"net_5d":1339.48,"net_20d":1378.45,"net_60d":null,"type":"行业","consecutive_days":11,"trend":"in","net_20d_days":10,"net_10d":1879.37},{"name":"机器人概念","net":120.85,"net_5d":310.41,"net_20d":1075.52,"type":"概念","source":"本地累加","consecutive_days":11,"trend":"in","net_20d_days":10,"net_60d":null,"net_10d":1030.13},{"name":"同花顺漂亮100","net":108.87,"net_5d":372.51,"net_20d":878.14,"net_60d":null,"type":"行业","consecutive_days":12,"trend":"in","net_20d_days":11,"net_10d":770.44},{"name":"高股息精选","net":194.04,"net_5d":364.59,"net_20d":856.91,"net_60d":null,"type":"行业","consecutive_days":14,"trend":"in","net_5d_days":5,"net_20d_days":12,"net_10d":744.74},{"name":"消费电子概念","net":28.54,"net_5d":312.32,"net_20d":753.49,"net_60d":null,"type":"概念","consecutive_days":10,"trend":"in","net_5d_days":5,"net_20d_days":10,"net_10d":753.49},{"name":"同花顺中特估100","net":107.68,"net_5d":231.83,"net_20d":577.05,"net_60d":null,"type":"行业","consecutive_days":14,"trend":"in","net_20d_days":11,"net_10d":564.73}],"trend_60d":[],"trend_10d":[{"name":"人工智能","net":268.2,"net_5d":660.18,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":10,"trend":"in","net_10d":1099.8},{"name":"深股通","net":220.01,"net_5d":714.61,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":13,"trend":"in","net_10d":1613.57},{"name":"融资融券","net":146.67,"net_5d":1498.11,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":13,"trend":"in","net_10d":4133.24},{"name":"华为概念","net":126.27,"net_5d":636.56,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":12,"trend":"in","net_10d":1310.84},{"name":"机器人概念","net":120.85,"net_5d":310.41,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":11,"trend":"in","net_10d":1030.13},{"name":"数据中心(AIDC)","net":66.64,"net_5d":302.07,"net_20d":0,"type":"概念","source":"本地累加","consecutive_days":13,"trend":"in","net_10d":1219.69}]}
+{
+  "update_time": "2026-08-04 07:02",
+  "data_type": "real",
+  "summary": {
+    "in_count": 40,
+    "out_count": 0,
+    "in_text": "核电(33.4亿)、水利(23.6亿)、银行(23.4亿)、高股息精选(22.3亿)、电力(21.6亿)",
+    "out_text": "无",
+    "alert": "🔥 40个板块大幅流入；🚀 核电+33.4亿、水利+23.6亿、银行+23.4亿"
+  },
+  "sectors_in": [
+    {
+      "name": "核电",
+      "net": 33.43,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "水利",
+      "net": 23.65,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "银行",
+      "net": 23.38,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "高股息精选",
+      "net": 22.3,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "电力",
+      "net": 21.61,
+      "net_5d": 81.93,
+      "net_20d": 495.75,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "通信设备",
+      "net": 20.26,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "抽水蓄能",
+      "net": 17.6,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "同花顺新质50",
+      "net": 17.5,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "电网设备",
+      "net": 16.73,
+      "net_5d": 107.11,
+      "net_20d": -154.3,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "超超临界发电",
+      "net": 14.45,
+      "net_5d": 60.65,
+      "net_20d": 45.83,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "军民融合",
+      "net": 13.92,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "海工装备",
+      "net": 12.7,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "污水处理",
+      "net": 12.69,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "雅下水电概念",
+      "net": 12.35,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "大飞机",
+      "net": 11.98,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "卫星导航",
+      "net": 11.79,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "柔性直流输电",
+      "net": 11.71,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "绿色电力",
+      "net": 11.48,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "PPP概念",
+      "net": 11.4,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "高端装备",
+      "net": 11.08,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "新型城镇化",
+      "net": 10.97,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "航空发动机",
+      "net": 9.96,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "跨境支付(CIPS)",
+      "net": 9.7,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "F5G概念",
+      "net": 9.42,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "地下管网",
+      "net": 9.12,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "HJT电池",
+      "net": 9.0,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "碳交易",
+      "net": 8.78,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "光伏设备",
+      "net": 8.74,
+      "net_5d": 73.13,
+      "net_20d": -676.39,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "光热发电",
+      "net": 7.99,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "BC电池",
+      "net": 7.77,
+      "net_5d": 15.43,
+      "net_20d": -1149.27,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "化肥",
+      "net": 7.69,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "风电设备",
+      "net": 7.32,
+      "net_5d": 23.58,
+      "net_20d": -117.92,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "土壤修复",
+      "net": 6.65,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "生物质能发电",
+      "net": 6.14,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "家庭医生",
+      "net": 6.12,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "低空经济",
+      "net": 6.06,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "军工信息化",
+      "net": 5.79,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "碳中和",
+      "net": 5.61,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "钒电池",
+      "net": 5.57,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "可降解塑料",
+      "net": 5.25,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    }
+  ],
+  "sectors_out": [],
+  "top_list": [
+    {
+      "name": "核电",
+      "net": 33.43,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "水利",
+      "net": 23.65,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "银行",
+      "net": 23.38,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "高股息精选",
+      "net": 22.3,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "电力",
+      "net": 21.61,
+      "net_5d": 81.93,
+      "net_20d": 495.75,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "通信设备",
+      "net": 20.26,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "抽水蓄能",
+      "net": 17.6,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "同花顺新质50",
+      "net": 17.5,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "电网设备",
+      "net": 16.73,
+      "net_5d": 107.11,
+      "net_20d": -154.3,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "超超临界发电",
+      "net": 14.45,
+      "net_5d": 60.65,
+      "net_20d": 45.83,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "军民融合",
+      "net": 13.92,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "海工装备",
+      "net": 12.7,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "污水处理",
+      "net": 12.69,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "雅下水电概念",
+      "net": 12.35,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "大飞机",
+      "net": 11.98,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "卫星导航",
+      "net": 11.79,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "柔性直流输电",
+      "net": 11.71,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "绿色电力",
+      "net": 11.48,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "PPP概念",
+      "net": 11.4,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "高端装备",
+      "net": 11.08,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "新型城镇化",
+      "net": 10.97,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "航空发动机",
+      "net": 9.96,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "跨境支付(CIPS)",
+      "net": 9.7,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "F5G概念",
+      "net": 9.42,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "地下管网",
+      "net": 9.12,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "HJT电池",
+      "net": 9.0,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "碳交易",
+      "net": 8.78,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "光伏设备",
+      "net": 8.74,
+      "net_5d": 73.13,
+      "net_20d": -676.39,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "光热发电",
+      "net": 7.99,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "BC电池",
+      "net": 7.77,
+      "net_5d": 15.43,
+      "net_20d": -1149.27,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "化肥",
+      "net": 7.69,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "风电设备",
+      "net": 7.32,
+      "net_5d": 23.58,
+      "net_20d": -117.92,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "土壤修复",
+      "net": 6.65,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "生物质能发电",
+      "net": 6.14,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "家庭医生",
+      "net": 6.12,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "低空经济",
+      "net": 6.06,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "军工信息化",
+      "net": 5.79,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "碳中和",
+      "net": 5.61,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "钒电池",
+      "net": 5.57,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "可降解塑料",
+      "net": 5.25,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in"
+    }
+  ],
+  "consecutive": {
+    "核电": {
+      "days": 1,
+      "trend": "in"
+    },
+    "水利": {
+      "days": 1,
+      "trend": "in"
+    },
+    "银行": {
+      "days": 1,
+      "trend": "in"
+    },
+    "高股息精选": {
+      "days": 1,
+      "trend": "in"
+    },
+    "电力": {
+      "days": 1,
+      "trend": "in"
+    },
+    "通信设备": {
+      "days": 1,
+      "trend": "in"
+    },
+    "抽水蓄能": {
+      "days": 1,
+      "trend": "in"
+    },
+    "同花顺新质50": {
+      "days": 1,
+      "trend": "in"
+    },
+    "电网设备": {
+      "days": 1,
+      "trend": "in"
+    },
+    "超超临界发电": {
+      "days": 1,
+      "trend": "in"
+    },
+    "军民融合": {
+      "days": 1,
+      "trend": "in"
+    },
+    "海工装备": {
+      "days": 1,
+      "trend": "in"
+    },
+    "污水处理": {
+      "days": 1,
+      "trend": "in"
+    },
+    "雅下水电概念": {
+      "days": 1,
+      "trend": "in"
+    },
+    "大飞机": {
+      "days": 1,
+      "trend": "in"
+    },
+    "卫星导航": {
+      "days": 1,
+      "trend": "in"
+    },
+    "柔性直流输电": {
+      "days": 1,
+      "trend": "in"
+    },
+    "绿色电力": {
+      "days": 1,
+      "trend": "in"
+    },
+    "PPP概念": {
+      "days": 1,
+      "trend": "in"
+    },
+    "高端装备": {
+      "days": 1,
+      "trend": "in"
+    },
+    "新型城镇化": {
+      "days": 1,
+      "trend": "in"
+    },
+    "航空发动机": {
+      "days": 1,
+      "trend": "in"
+    },
+    "跨境支付(CIPS)": {
+      "days": 1,
+      "trend": "in"
+    },
+    "F5G概念": {
+      "days": 1,
+      "trend": "in"
+    },
+    "地下管网": {
+      "days": 1,
+      "trend": "in"
+    },
+    "HJT电池": {
+      "days": 1,
+      "trend": "in"
+    },
+    "碳交易": {
+      "days": 1,
+      "trend": "in"
+    },
+    "光伏设备": {
+      "days": 1,
+      "trend": "in"
+    },
+    "光热发电": {
+      "days": 1,
+      "trend": "in"
+    },
+    "BC电池": {
+      "days": 1,
+      "trend": "in"
+    },
+    "化肥": {
+      "days": 1,
+      "trend": "in"
+    },
+    "风电设备": {
+      "days": 1,
+      "trend": "in"
+    },
+    "土壤修复": {
+      "days": 1,
+      "trend": "in"
+    },
+    "生物质能发电": {
+      "days": 1,
+      "trend": "in"
+    },
+    "家庭医生": {
+      "days": 1,
+      "trend": "in"
+    },
+    "低空经济": {
+      "days": 1,
+      "trend": "in"
+    },
+    "军工信息化": {
+      "days": 1,
+      "trend": "in"
+    },
+    "碳中和": {
+      "days": 1,
+      "trend": "in"
+    },
+    "钒电池": {
+      "days": 1,
+      "trend": "in"
+    },
+    "可降解塑料": {
+      "days": 1,
+      "trend": "in"
+    }
+  },
+  "trend_5d": [
+    {
+      "name": "电网设备",
+      "net": 16.73,
+      "net_5d": 107.11,
+      "net_20d": -154.3,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_60d": null
+    },
+    {
+      "name": "电力",
+      "net": 21.61,
+      "net_5d": 81.93,
+      "net_20d": 495.75,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_60d": null
+    },
+    {
+      "name": "光伏设备",
+      "net": 8.74,
+      "net_5d": 73.13,
+      "net_20d": -676.39,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_60d": null
+    },
+    {
+      "name": "超超临界发电",
+      "net": 14.45,
+      "net_5d": 60.65,
+      "net_20d": 45.83,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_60d": null
+    },
+    {
+      "name": "风电设备",
+      "net": 7.32,
+      "net_5d": 23.58,
+      "net_20d": -117.92,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_60d": null
+    },
+    {
+      "name": "BC电池",
+      "net": 7.77,
+      "net_5d": 15.43,
+      "net_20d": -1149.27,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_60d": null
+    }
+  ],
+  "trend_10d": [],
+  "trend_20d": [
+    {
+      "name": "电力",
+      "net": 21.61,
+      "net_5d": 81.93,
+      "net_20d": 495.75,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_60d": null
+    },
+    {
+      "name": "超超临界发电",
+      "net": 14.45,
+      "net_5d": 60.65,
+      "net_20d": 45.83,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_60d": null
+    },
+    {
+      "name": "风电设备",
+      "net": 7.32,
+      "net_5d": 23.58,
+      "net_20d": -117.92,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_60d": null
+    },
+    {
+      "name": "电网设备",
+      "net": 16.73,
+      "net_5d": 107.11,
+      "net_20d": -154.3,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_60d": null
+    },
+    {
+      "name": "光伏设备",
+      "net": 8.74,
+      "net_5d": 73.13,
+      "net_20d": -676.39,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_60d": null
+    },
+    {
+      "name": "BC电池",
+      "net": 7.77,
+      "net_5d": 15.43,
+      "net_20d": -1149.27,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_60d": null
+    }
+  ],
+  "trend_60d": []
+}
