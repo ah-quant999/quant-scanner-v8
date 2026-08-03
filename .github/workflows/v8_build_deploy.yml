@@ -7,10 +7,10 @@
 #      确保 v6 算法端在非 push 场景下也能被构建到。
 #   3) concurrency 保持 serial，防止并发 push 冲突。
 #
-# 触发策略（2026-08-01 审计修正，2026-08-03 修正 auto-deploy）：
+# 触发策略（2026-08-01 审计修正，2026-08-03 修正 auto-deploy，2026-08-03 扩展风险温度计）：
 #   - push raw_data/**  → 检测变化 → 只构建受影响类别（v6 算法端推 raw_data 由此触发）
-#   - workflow_run: 🇨🇳 v8 中国数据抓取(cn) 成功完成后 → 自动构建部署
-#     原因：cn runner 用 GITHUB_TOKEN push raw_data 不会触发 push 类 workflow，
+#   - workflow_run: 🇨🇳 v8 中国数据抓取(cn) / 🌍 v8 实时风险温度计 成功完成后 → 自动构建部署
+#     原因：cn runner / 云端 workflow 用 GITHUB_TOKEN push raw_data 不会触发 push 类 workflow，
 #     用 workflow_run 原生机制绕过该限制，实现"抓取完成即自动部署"，无需小九手动 dispatch。
 #   - workflow_dispatch → 全量构建（人工兜底）
 #
@@ -25,7 +25,9 @@ on:
     branches: [main]
     paths: ['raw_data/**', 'index.html']
   workflow_run:
-    workflows: ["🇨🇳 v8 中国数据抓取(cn)"]
+    workflows:
+      - "🇨🇳 v8 中国数据抓取(cn)"
+      - "🌍 v8 实时风险温度计"
     types: [completed]
     branches: [main]
   workflow_dispatch:

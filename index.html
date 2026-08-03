@@ -496,6 +496,7 @@ window.V8_CAL = {weeks:[],legend:[]};
 <script src="data/V8_CAL.js"></script>
 <script src="data/W52_HIGH.js"></script>
 <script src="data/CANDIDATE_QUOTES.js"></script>
+<script src="data/RISK_GAUGE.js"></script>
 </head>
 <body>
 
@@ -1877,6 +1878,14 @@ window.V8_CAL = {weeks:[],legend:[]};
   <!-- ============ 盘后数据 ============ -->
   <section id="sec-ph">
     <div class="sec-head"><h2>🌙 盘后数据</h2><span class="tag" id="phTag">T+1 收盘后生成 · 最后更新 --</span></div>
+
+    <!-- 实时风险温度计 -->
+    <div class="card" id="riskGaugeCard" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
+      <h3><span class="ic">🌡️</span>实时风险温度计 <span class="fresh" id="riskGaugeTime">更新于 --</span></h3>
+      <div id="riskGaugeBody">
+        <div class="ipo-empty">加载中…</div>
+      </div>
+    </div>
 
         <!-- ========== 决策中枢：战略→战术→选股 ========== -->
     <div class="card hub-card" style="margin-bottom:16px">
@@ -6004,6 +6013,55 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     setTime('phMacroTime',m.update_time);
   }
 
+  /* ---- 实时风险温度计 ---- */
+  function renderRiskGauge(){
+    const D = window.RISK_GAUGE || {};
+    const indicators = D.indicators || [];
+    const body = $('riskGaugeBody');
+    if(!body) return;
+    if(!indicators.length){
+      body.innerHTML = '<div class="ipo-empty">暂无风险温度计数据（等待云端首次抓取）</div>';
+      return;
+    }
+
+    const colorMap = {
+      green:  '#22c55e',
+      yellow: '#f59e0b',
+      red:    '#ef4444',
+      gray:   '#6b7280'
+    };
+    const overall = D.overall || 'gray';
+    const overallLabels = {green:'观察', yellow:'警惕', red:'高危', gray:'待更新'};
+    const overallColor = colorMap[overall] || colorMap.gray;
+
+    let h = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:12px 14px;border-radius:10px;background:'+overallColor+'1a;">';
+    h += '<span style="font-size:13px;color:var(--sub);">综合状态：</span>';
+    h += '<span style="width:12px;height:12px;border-radius:50%;background:'+overallColor+';box-shadow:0 0 8px '+overallColor+';"></span>';
+    h += '<span style="font-weight:700;color:'+overallColor+';">'+overallLabels[overall]+'</span>';
+    h += '<span style="font-size:12px;color:var(--dim);margin-left:auto;">任一亮红灯即进入警惕 · 数据来源 Yahoo Finance</span>';
+    h += '</div>';
+
+    h += '<div class="grid g-5" style="gap:10px;margin-bottom:10px;">';
+    indicators.forEach(function(it){
+      const c = colorMap[it.status] || colorMap.gray;
+      const valText = it.value != null ? it.value + (it.unit || '') : '--';
+      h += '<div class="card" style="margin-bottom:0;background:rgba(255,255,255,.03);padding:12px;text-align:center;">';
+      h += '<div style="font-size:12px;color:var(--dim);margin-bottom:6px;">'+it.label+'</div>';
+      h += '<div style="font-size:20px;font-weight:700;color:var(--txt);margin-bottom:4px;">'+valText+'</div>';
+      h += '<div style="font-size:12px;color:'+c+';font-weight:600;">'+it.status_text+'</div>';
+      h += '<div style="font-size:11px;color:var(--dim);margin-top:4px;line-height:1.4;">'+it.note+'</div>';
+      h += '</div>';
+    });
+    h += '</div>';
+
+    h += '<div class="logic-p" style="font-size:12px;color:var(--dim);">';
+    h += '<b>联动提示</b>：红灯≥1时，决策中枢下方的「极端风险联动策略」自动生效，按级别调整仓位与选股过滤。本温度计仅反映外围宏观压力，不替代 A 股自身信号。';
+    h += '</div>';
+
+    body.innerHTML = h;
+    setTime('riskGaugeTime', D.update_time);
+  }
+
 
   /* ---- 初始化 ---- */
   function initPostMarket(){
@@ -6045,6 +6103,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     safe(renderMarketFundFlow, window.MARKET_FUND_FLOW_DATA || {});
     safe(renderSector, window.SECTOR_FUND_FLOW || {});
     safe(renderMacro, window.MACRO_DATA || {});
+    safe(renderRiskGauge);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initPostMarket);
   else initPostMarket();
