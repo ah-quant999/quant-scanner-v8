@@ -3543,7 +3543,7 @@ window.V8_CAL = {weeks:[],legend:[]};
         <table class="lg-table">
           <tr><th>前端模块</th><th>产出类别</th><th>时段</th></tr>
           <tr><td>交易日历 · 打新速览 · 两融 · 中金所持仓 · 宏观 · 危机雷达 · 北向(已停更) · 分析师评级 · 52周高 · 波动率观测 · 羊群效应</td><td>中国数据抓取</td><td>盘前 08:25</td></tr>
-          <tr><td>成交金额 · 指数行情 · ETF资金 · ETF日内热力 · ETF申购 · ETF三连板 · 板块资金流 · 个股资金流 · 概念排行 · 涨停热力 · 市场资金流</td><td>中国数据抓取</td><td>盘中 10:30-15:05</td></tr>
+          <tr><td>成交金额 · 指数行情 · ETF资金 · ETF日内热力 · ETF申购 · ETF三连板 · 板块资金流 · 个股资金流 · 概念排行 · 涨停热力 · 市场资金流</td><td>中国数据抓取</td><td>盘中 09:40-15:10</td></tr>
           <tr><td>收盘累积序列（EXPERIMENT 相关）</td><td>中国数据抓取</td><td>盘后 15:30</td></tr>
           <tr><td>龙虎榜 · 严格三重共识 · 机构游资共振 · top10 · 逆势龙头 · 候选池 · 回测 · 板块资金流趋势 · 停牌预警 · 市场预警 · NT数据</td><td>盘后算法链</td><td>盘后 18:30</td></tr>
         </table>
@@ -3552,11 +3552,16 @@ window.V8_CAL = {weeks:[],legend:[]};
         <table class="lg-table">
           <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
           <tr><td>08:25</td><td>v8_cn_fetch</td><td>盘前（日历/IPO/两融/中金所/宏观/危机/北向/分析师/52周高/羊群效应）</td><td>中国节点</td></tr>
-          <tr><td>10:30</td><td>v8_cn_fetch</td><td>盘中第1档（指数/ETF/板块资金/概念排行/涨停热力/个股资金流）</td><td>中国节点</td></tr>
-          <tr><td>11:30</td><td>v8_cn_fetch</td><td>盘中第2档（同上）</td><td>中国节点</td></tr>
-          <tr><td>13:05</td><td>v8_cn_fetch</td><td>盘中第3档（午后开盘补缺口）</td><td>中国节点</td></tr>
-          <tr><td>14:00</td><td>v8_cn_fetch</td><td>盘中第4档</td><td>中国节点</td></tr>
-          <tr><td>15:05</td><td>v8_cn_fetch</td><td>盘中第5档（收盘前最后快照）</td><td>中国节点</td></tr>
+          <tr><td>09:40</td><td>v8_cn_fetch</td><td>盘中首档（开盘前首刷：指数/ETF/板块资金/概念排行/涨停热力/个股资金流）</td><td>中国节点</td></tr>
+          <tr><td>10:00</td><td>v8_cn_fetch</td><td>盘中（同上）</td><td>中国节点</td></tr>
+          <tr><td>10:30</td><td>v8_cn_fetch</td><td>盘中（同上）</td><td>中国节点</td></tr>
+          <tr><td>11:00</td><td>v8_cn_fetch</td><td>盘中（同上）</td><td>中国节点</td></tr>
+          <tr><td>11:30</td><td>v8_cn_fetch</td><td>盘中（同上）</td><td>中国节点</td></tr>
+          <tr><td>13:00</td><td>v8_cn_fetch</td><td>盘中（午后开盘）</td><td>中国节点</td></tr>
+          <tr><td>13:30</td><td>v8_cn_fetch</td><td>盘中（同上）</td><td>中国节点</td></tr>
+          <tr><td>14:00</td><td>v8_cn_fetch</td><td>盘中（同上）</td><td>中国节点</td></tr>
+          <tr><td>14:30</td><td>v8_cn_fetch</td><td>盘中（同上）</td><td>中国节点</td></tr>
+          <tr><td>15:10</td><td>v8_cn_fetch</td><td>盘中末档（收盘前最后快照）</td><td>中国节点</td></tr>
           <tr><td>15:30</td><td>v8_cn_fetch</td><td>盘后（ETF_DAILY_MONITOR / EXPERIMENT 收盘累积）</td><td>中国节点</td></tr>
           <tr><td>09:00</td><td>v8_algo</td><td>盘前预检（46模块新鲜度体检）</td><td>云端</td></tr>
           <tr><td>17:00</td><td>v8_algo</td><td>收盘后总检（46模块新鲜度体检）</td><td>云端</td></tr>
@@ -3597,7 +3602,7 @@ window.V8_CAL = {weeks:[],legend:[]};
         <table class="lg-table">
           <tr><th>时段</th><th>职责</th><th>失败影响</th><th>兜底</th></tr>
           <tr><td>盘前 08:25</td><td>把当日已知事件、预警、宏观状态准备好</td><td>事件/日历显示旧数据</td><td>Safety Net 2h 后补跑</td></tr>
-          <tr><td>盘中 10:30~15:05</td><td>刷新实时行情、资金、ETF、涨停热力</td><td>实时区时间戳停滞</td><td>下一档自动覆盖</td></tr>
+          <tr><td>盘中 09:40~15:10</td><td>刷新实时行情、资金、ETF、涨停热力</td><td>实时区时间戳停滞</td><td>下一档自动覆盖</td></tr>
           <tr><td>盘后 18:30</td><td>基于完整收盘数据生成选股结果</td><td>三重共识/驾驶舱用隔夜数据</td><td>周六 self_heal 补跑</td></tr>
           <tr><td>构建部署</td><td>raw_data push 触发 selective build → Pages</td><td>线上数据不更新</td><td>manual dispatch</td></tr>
         </table>
@@ -3634,7 +3639,7 @@ window.V8_CAL = {weeks:[],legend:[]};
         <div class="logic-h">定位</div>
         <div class="logic-p">替代旧版「市场异动速览」，计划自动聚合 14 维度中国源数据，盘中实时驱动。</div>
         <div class="logic-h">当前状态（B 阶段·已上线）</div>
-        <div class="logic-p"><b>已接入实时数据</b>。卡片由 <code>algorithms/gen_market_brief.py</code> 规则引擎根据盘中 <code>raw_data</code> 真实数据自动生成（日内风向 / 市场健康度三灯 / 指数纵览 / 市场异动 / 操作建议），随盘中刷新（每 15 分钟）更新，标题显示「AI建议 &lt;相对时间&gt;」。<b>C 阶段</b>将升级为 LLM 自然语言解读。</div>
+        <div class="logic-p"><b>已接入实时数据</b>。卡片由 <code>algorithms/gen_market_brief.py</code> 规则引擎根据盘中 <code>raw_data</code> 真实数据自动生成（日内风向 / 市场健康度三灯 / 指数纵览 / 市场异动 / 操作建议），随盘中刷新（每 30 分钟，09:40–15:10）更新，标题显示「AI建议 &lt;相对时间&gt;」。<b>C 阶段</b>将升级为 LLM 自然语言解读。</div>
         <div class="logic-h">14 维度</div>
         <div class="logic-p">日内风向标、ETF国家队资金、板块资金主线、主力抱团方向、指数纵览、异动催化剂、美联储FOMC、投行观点、异常速览（上证连跌/涨跌家数/涨停跌停/成交额/两融/VIX/国债/ETF申赎等）。</div>
         <div class="logic-h">ETF国家队资金估算口径</div>
@@ -7933,7 +7938,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
   function _renderFreshTable(){
     var items=_alertCategories.freshness.items, ct=_alertCategories.freshness;
-    /* v8.2 数据源 → 主更新时段：盘前 08:25 / 盘中 10:30-15:05 / 收盘 15:30 / 盘后 18:30 / 全天 */
+    /* v8.2 数据源 → 主更新时段：盘前 08:25 / 盘中 09:40-15:10 / 收盘 15:30 / 盘后 18:30 / 全天 */
     var _slotMap={'CRISIS_DATA':'盘后','CANDIDATE':'收盘','COCKPIT_ADVICE':'盘后','CAPITAL_FLOW_DATA':'收盘','LHB_DATA':'盘后','LIMIT_UP_HEATMAP':'收盘','HERDING_DATA':'盘后','ETF_DAILY_MONITOR':'盘后','ETF_INTRADAY_HEAT':'盘中','MARGIN_DATA':'收盘','CFFEX_HOLDINGS':'收盘','IPO_DATA':'盘前','MARKET_ALERTS':'盘中','CONCEPT_RANKING':'盘中','ANALYST_RATINGS':'盘后','GOLD_POOL':'盘后','INST_TRADE':'盘后','MAHORO':'盘后','EXPERIMENT':'盘后','MACRO_DATA':'全天','SECTOR_FUND_FLOW':'收盘','INDEX_QUOTES':'盘中','ETF_PULSE':'盘中','ETF_SUBSCRIPTION':'盘后','CRDS_CARD_DATA':'盘后','COCKPIT_TIER_RECOMM':'盘后','CANDIDATE_QUOTES':'盘中'};
     var _slotColor={'盘前':'var(--purple)','盘中':'var(--up)','收盘':'var(--gold)','盘后':'var(--down)','全天':'var(--dim)'};
     function slotTag(k){ var s=_slotMap[k]||'--'; var c=_slotColor[s]||'var(--dim)'; return '<span style="color:'+c+';font-weight:600;font-size:9px" title="主更新时段">'+s+'</span>'; }
@@ -8022,7 +8027,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     html+='<div style="margin-top:8px;display:flex;align-items:center;gap:6px;color:var(--dim);font-size:10px">\ud83d\udcca '+ct.total+' \u4e2a\u6570\u636e\u6e90 \u00b7 \u6309\u76d8\u524d/\u76d8\u4e2d/\u76d8\u540e \u62c6 3 \u5361\u7247</div>';
     var _preItems=(_slotGroups['盘前']||[]).concat(_slotGroups['全天']||[]);
     html+=_renderCard('盘前','var(--purple)','\ud83d\udfe3',_preItems,'08:25 \u76d8\u524d + \u5168\u5929\u5b8f\u89c2');
-    html+=_renderCard('盘中','var(--up)','\ud83d\udd34',_slotGroups['盘中']||[],'10:30-15:05 5 \u6293');
+    html+=_renderCard('盘中','var(--up)','\ud83d\udd34',_slotGroups['盘中']||[],'09:40-15:10 10 \u6293');
     var _postItems=_slotGroups['盘后']||[];
     if(_postItems.length){
       var _postClose=_postItems.filter(function(x){return _slotMap[x.dataKey]==='收盘';});

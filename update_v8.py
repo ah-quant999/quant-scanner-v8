@@ -90,7 +90,7 @@ CATEGORY_MAP = {
     # 盘后（由 v6 算法 calc_volatility_watch.py 同步桥推送）
     "VOLATILITY": "post_close",
 
-    # 盘中（每30分钟 10:00~15:00，由 cn runner 刷新）
+    # 盘中（每30分钟 09:40~15:10，由 cn runner 刷新）
     # 注意：ETF_DAILY_MONITOR 虽字段含 T+1，但为配合 ETF 三连板实时卡，归 intraday 盘中更新
     "INDEX_QUOTES": "intraday",
     "ETF_PULSE": "intraday",
