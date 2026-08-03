@@ -17,7 +17,7 @@ OUT = os.path.join(ROOT, "raw_data", "risk_gauge.json")
 YAHOO_SYMBOLS = {
     "USDJPY": "USDJPY=X",   # 美元兑日元
     "VIX": "^VIX",          # 恐慌指数
-    "JP10Y": "JP10Y=X",     # 日本 10 年期国债收益率
+    "US10Y": "^TNX",        # 美国 10 年期国债收益率（日债暂缺稳定免费源，用美债替代）
     "USDCNH": "CNH=X",      # 美元兑离岸人民币
 }
 
@@ -78,12 +78,12 @@ def status_for(name, value):
             return {"status": "yellow", "status_text": "⚠️ 警惕", "note": "风险偏好下降"}
         return {"status": "green", "status_text": "🟢 正常", "note": "波动率处于低位"}
 
-    if name == "JP10Y":
-        if value > 3.5:
-            return {"status": "red", "status_text": "🚨 高危", "note": "日债收益率突破 3.5%"}
-        if value > 3.0:
-            return {"status": "yellow", "status_text": "⚠️ 警惕", "note": "日债融资成本上升"}
-        return {"status": "green", "status_text": "🟢 正常", "note": "日债收益率低于 3.0%"}
+    if name == "US10Y":
+        if value > 4.5:
+            return {"status": "red", "status_text": "🚨 高危", "note": "美债收益率突破 4.5%"}
+        if value > 4.0:
+            return {"status": "yellow", "status_text": "⚠️ 警惕", "note": "美债融资成本上升"}
+        return {"status": "green", "status_text": "🟢 正常", "note": "美债收益率低于 4.0%"}
 
     if name == "USDCNH":
         if value > 7.30:
@@ -161,7 +161,7 @@ def main():
         meta = {
             "USDJPY": {"label": "美元兑日元", "unit": "", "source": "Yahoo Finance"},
             "VIX": {"label": "VIX 恐慌指数", "unit": "", "source": "Yahoo Finance"},
-            "JP10Y": {"label": "10Y 日债收益率", "unit": "%", "source": "Yahoo Finance"},
+            "US10Y": {"label": "10Y 美债收益率", "unit": "%", "source": "Yahoo Finance"},
             "USDCNH": {"label": "美元兑离岸人民币", "unit": "", "source": "Yahoo Finance"},
         }[name]
 
