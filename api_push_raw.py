@@ -81,13 +81,32 @@ def main():
             existing[e["path"]] = e["sha"]
 
     # 上传 blobs（幂等：内容相同则 sha 相同）
+    # 2026-08-04：GitHub blob API 对较大文件偶发 HTTP 400 "malformed request"（08-03 stock_names.json
+    # 325KB 命中，导致整次推送 sys.exit(1)、全部数据不落地）。加 3 次指数退避重试；仍失败则跳过该文件
+    # 而不是整体退出——保证其余数十个数据文件能正常上线。
+    import time as _t
     new_entries = {}
+    failed_paths = []
     for path, content in files.items():
-        b = api("POST", f"/repos/{REPO}/git/blobs",
-                {"content": base64.b64encode(content).decode(), "encoding": "base64"})
-        if "__error__" in b:
-            print("❌ 创建 blob 失败:", path, b.get("__msg__")); sys.exit(1)
+        payload = {"content": base64.b64encode(content).decode(), "encoding": "base64"}
+        b = None
+        for attempt in range(3):
+            b = api("POST", f"/repos/{REPO}/git/blobs", payload)
+            if "__error__" not in b:
+                break
+            wait = 2 ** attempt
+            print(f"  ↻ blob 重试 {attempt + 1}/3（{path}，{wait}s 后）")
+            _t.sleep(wait)
+        if b is None or "__error__" in b:
+            print(f"  ⚠️ 跳过（3 次均失败）: {path}")
+            failed_paths.append(path)
+            continue
         new_entries[path] = b["sha"]
+
+    if failed_paths:
+        print(f"⚠️ 共 {len(failed_paths)} 个文件上传失败，将保留远程旧版本: {failed_paths}")
+    if not new_entries:
+        print("❌ 全部 blob 上传失败，终止推送"); sys.exit(1)
 
     # 合并策略：保留远程已有的其他 raw_data 文件，只覆盖本地存在的文件。
     # 这样 cloud_fetch --category 只更新当次类别，不会删掉盘前/盘后类别的文件。
