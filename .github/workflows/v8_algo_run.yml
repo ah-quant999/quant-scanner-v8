@@ -31,10 +31,17 @@
 #   （Node 的 fs.rm、bash 的 rm -rf 全部命中）都会被拦截并要求人工 BULK_CONFIRM，CI 无法确认 → abort。
 #   证据：run#30825718613 日志里报错行紧跟在**我们自己写的 bash `rm -rf`** 之后，count 从 217 涨到 397。
 #
-#   ✅ 正确解法 = **一个文件都不删**：
-#      git init（如无 .git）→ git remote set-url → git fetch --depth 1 → git checkout -f -B main FETCH_HEAD
-#      只强制覆盖被跟踪文件，不碰未跟踪文件，永不触发批量删除。
 #   ❌ 严禁在本 workflow 里出现：actions/checkout、rm -rf、git clean -fdx、Remove-Item -Recurse。
+#
+# 🔴 2026-08-04 07:05 第二真根因（run#30859885910 实测）：
+#   本 cn runner 上 **git 协议访问 github.com 会被连接重置**：
+#     fatal: unable to access 'https://github.com/...': Recv failure: Connection was reset
+#   而 api.github.com 畅通 —— 这才是常年健康的 v8_cn_fetch 完全不用 git、只走 Contents API 的原因。
+#   ✅ 唯一可行源码同步路线 = **GitHub Trees/Blobs API 下载**（algorithms/** + 根目录 *.py），
+#      既不走 git 网络，也不删任何文件，同时规避 safe-delete 钩子。严禁改回 git clone/fetch。
+#
+# ⚠️ PowerShell 坑（同 run 实测）：`python -c @'...'@` 传参时 PowerShell 会剥离双引号，
+#   导致 SyntaxError: '{' was never closed。必须 Set-Content 写临时 .py 文件再 `python $tmp` 执行。
 #
 
 # 2026-08-02 原生化：4 类上游输入（gold_pool / scan_result / guanlan_* / mahoro_signals）
@@ -86,75 +93,68 @@ jobs:
       run:
         working-directory: ${{ github.workspace }}
     steps:
-      - name: "📥 同步 v8 源码（零删除，规避 runner safe-delete 钩子）"
-        id: sync_src
-        shell: bash
-        continue-on-error: true
-        env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -e
-          ws="${GITHUB_WORKSPACE}"
-          git config --global --add safe.directory '*' || true
-          mkdir -p "$ws"
-          cd "$ws"
-          if [ ! -d .git ]; then
-            echo "工作区无 .git，就地 init（绝不删除已有文件）"
-            git init -q
-          fi
-          remote_url="https://x-access-token:${TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
-          if git remote get-url origin >/dev/null 2>&1; then
-            git remote set-url origin "$remote_url"
-          else
-            git remote add origin "$remote_url"
-          fi
-          git fetch --depth 1 origin main
-          # ⚠️ 只强制覆盖被跟踪文件；绝不 rm -rf / git clean（runner 有 safe-delete 钩子，
-          #    单次删除 >50 文件即被拦截并 abort，这正是 08-03 连挂 4 次的根因）
-          git checkout -f -B main FETCH_HEAD
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          echo "源码同步完成，当前 HEAD:"
-          git log --oneline -1
-
-      - name: "🛟 兜底：经 Contents API 下载源码（git 路线失败时启用，照抄 v8_cn_fetch 唯一稳定做法）"
+      - name: "📥 经 GitHub API 同步源码（唯一可行路线：本 runner 上 git 走 github.com 会被连接重置）"
         id: sync_api
-        if: steps.sync_src.outcome != 'success'
         shell: powershell
         run: |
-          python -c @'
+          $code = @'
           import os, base64, json, urllib.request, time
           token = os.environ["GITHUB_TOKEN"]
           REPO = "ah-quant999/quant-scanner-v8"
-          H = {"Authorization": f"Bearer {token}",
+          H = {"Authorization": "Bearer " + token,
                "Accept": "application/vnd.github+json",
                "X-GitHub-Api-Version": "2022-11-28"}
+
           def get(url):
-              for i in range(3):
+              last = None
+              for i in range(4):
                   try:
                       return json.load(urllib.request.urlopen(
                           urllib.request.Request(url, headers=H), timeout=90))
                   except Exception as e:
-                      print("  retry", i + 1, e); time.sleep(2 ** i)
-              raise SystemExit("API 拉取失败: " + url)
-          tree = get(f"https://api.github.com/repos/{REPO}/git/trees/main?recursive=1")
+                      last = e
+                      print("  retry %d: %s" % (i + 1, e), flush=True)
+                      time.sleep(2 ** i)
+              raise SystemExit("API 拉取失败: %s (%s)" % (url, last))
+
+          tree = get("https://api.github.com/repos/%s/git/trees/main?recursive=1" % REPO)
           want = []
           for e in tree.get("tree", []):
-              if e["type"] != "blob":
+              if e.get("type") != "blob":
                   continue
               p = e["path"]
-              if p.startswith("algorithms/") or (("/" not in p) and p.endswith(".py")):
+              # 算法目录全量 + 根目录所有 .py（含 api_push_raw.py）
+              if p.startswith("algorithms/") or ("/" not in p and p.endswith(".py")):
                   want.append((p, e["sha"]))
-          print("待下载源码文件:", len(want))
+          print("待同步源码文件: %d" % len(want), flush=True)
+
           ok = 0
           for p, sha in want:
-              d = get(f"https://api.github.com/repos/{REPO}/git/blobs/{sha}")
-              os.makedirs(os.path.dirname(p) or ".", exist_ok=True)
+              d = get("https://api.github.com/repos/%s/git/blobs/%s" % (REPO, sha))
+              raw = base64.b64decode(d["content"])
+              if os.path.exists(p):
+                  try:
+                      if open(p, "rb").read() == raw:
+                          ok += 1
+                          continue
+                  except Exception:
+                      pass
+              parent = os.path.dirname(p)
+              if parent:
+                  os.makedirs(parent, exist_ok=True)
               with open(p, "wb") as f:
-                  f.write(base64.b64decode(d["content"]))
+                  f.write(raw)
               ok += 1
-          print(f"✅ API 兜底同步完成: {ok}/{len(want)} 个文件")
+          print("OK 源码同步完成: %d/%d" % (ok, len(want)), flush=True)
+          if ok != len(want):
+              raise SystemExit(1)
           '@
+          # ⚠️ 必须写临时文件再执行：`python -c @'...'@` 传参时 PowerShell 会剥离双引号
+          #    （08-04 run#30859885910 实测报 SyntaxError: '{' was never closed）
+          $tmp = Join-Path $env:RUNNER_TEMP "sync_src_v8.py"
+          Set-Content -Path $tmp -Value $code -Encoding UTF8
+          python $tmp
+          if ($LASTEXITCODE -ne 0) { exit 1 }
 
       - name: "🐍 校验 Python / 安装 A股依赖"
         shell: powershell
@@ -181,8 +181,8 @@ jobs:
 
       - name: "📤 兜底推送（若上一步未推）"
         # ⚠️ 原为 if: always()，导致源码同步失败时把工作区里的「旧 raw_data」当新数据推上去（污染线上）。
-        #    改为仅在源码同步（git 主路线 或 API 兜底路线）成功后才允许兜底推送。
-        if: steps.sync_src.outcome == 'success' || steps.sync_api.outcome == 'success'
+        #    改为仅在源码同步成功后才允许兜底推送。
+        if: steps.sync_api.outcome == 'success'
         shell: powershell
         continue-on-error: true
         run: |
