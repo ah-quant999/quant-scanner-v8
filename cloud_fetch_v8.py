@@ -21,6 +21,15 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import pandas as pd
 
+# 2026-08-03 修复：Windows cn runner 默认 GBK 终端，emoji 输出会 UnicodeEncodeError 崩溃。
+try:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8")
+except Exception:
+    pass
+
 ROOT = Path(__file__).resolve().parent
 RAW_DIR = ROOT / "raw_data"
 RAW_DIR.mkdir(exist_ok=True)
@@ -1598,7 +1607,10 @@ def main(category=None):
 
     # 分时段清理：只删除本次任务类别的 raw_data，避免盘中任务把盘前/盘后数据清掉
     target_vars = None
-    if category:
+    if category == "all":
+        target_vars = set(CATEGORY_MAP.keys())
+        print(f"🎯 全量兜底模式，涉及 {len(target_vars)} 个变量")
+    elif category:
         target_vars = {var for var, cat in CATEGORY_MAP.items() if cat == category}
         if not target_vars:
             print(f"⚠️ 未知 category={category}，无任务可执行")
@@ -1727,7 +1739,7 @@ def main(category=None):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="v8 cloud fetch")
-    parser.add_argument("--category", choices=["premarket", "intraday", "post_close"],
-                        help="只抓取某一时段类别")
+    parser.add_argument("--category", choices=["premarket", "intraday", "post_close", "all"],
+                        help="只抓取某一时段类别；all=全量兜底")
     args = parser.parse_args()
     sys.exit(main(category=args.category))
