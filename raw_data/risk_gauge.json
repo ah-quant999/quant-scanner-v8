@@ -1,11 +1,11 @@
 {
-  "update_time": "2026-08-03 02:44:02",
-  "overall": "yellow",
+  "update_time": "2026-08-03 02:51:31",
+  "overall": "red",
   "indicators": [
     {
       "name": "USDJPY",
       "label": "美元兑日元",
-      "value": 156.375,
+      "value": 156.465,
       "unit": "",
       "source": "Yahoo Finance",
       "status": "yellow",
@@ -23,19 +23,19 @@
       "note": "波动率处于低位"
     },
     {
-      "name": "JP10Y",
-      "label": "10Y 日债收益率",
-      "value": null,
+      "name": "US10Y",
+      "label": "10Y 美债收益率",
+      "value": 4.75,
       "unit": "%",
       "source": "Yahoo Finance",
-      "status": "gray",
-      "status_text": "待更新",
-      "note": "数据暂不可得"
+      "status": "red",
+      "status_text": "🚨 高危",
+      "note": "美债收益率突破 4.5%"
     },
     {
       "name": "USDCNH",
       "label": "美元兑离岸人民币",
-      "value": 6.7503,
+      "value": 6.7507,
       "unit": "",
       "source": "Yahoo Finance",
       "status": "green",
