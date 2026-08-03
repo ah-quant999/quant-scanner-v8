@@ -1,101 +1,135 @@
-# 九宝量化 v8.0 — Safety Net 兜底监控（GitHub 云端 ubuntu-latest）
+# 九宝量化 v8.0 — v8_cn_fetch 兜底调度（safety_net）
 #
-# P0 保险机制：cn runner（小九单位机）工作日全天在线概率极高，
-# 但万一断线/卡死/网络抖动导致 raw_data 超过 2 小时未更新，
-# 本工作流自动 dispatch 触发 v8_cn_fetch 补跑，无需人工介入。
+# 目标：当 GitHub schedule 偶发跳过、或 v8_cn_fetch 抓取失败导致数据中断时，
+#       自动触发一次 workflow_dispatch 重试，无需人工干预。
 #
-# 设计原则：
-#   - 纯云端执行（ubuntu），不依赖 cn runner 在线
-#   - 只检查 + dispatch，不自己抓数据（数据必须 CN IP）
-#   - 每 30 分钟检查一次，超 2h 未更新才触发（避免误触发）
-#   - 工作日 09:00~19:00 活跃（覆盖盘前到收盘后算法链完成）
-#
-# ⚠️ 这是"保险"不是"刚需"——正常情况下永远不会触发。
+# 防崩溃设计（回答“加来加去会不会崩”）：
+#   1. 只查不抓：本工作流只做状态检查 + dispatch，不跑任何数据脚本。
+#   2. 盘中限时：仅工作日 09:00–17:00 CST 运行，夜间/周末静默。
+#   3. 成功即退：最近 1 小时已有 v8_cn_fetch 成功 run，直接跳过。
+#   4. 防并发：当前已有 v8_cn_fetch 在运行（queued/in_progress/waiting），不重复触发。
+#   5. 去重窗口：最近 20 分钟内已经启动过 v8_cn_fetch，不再 dispatch，避免连环重试雪崩。
+#   6. 单并发：safety_net 自身 concurrency.group 串行，防止重叠检查导致重复 dispatch。
 
-name: "🛡️ v8 Safety Net 兜底监控(云端ubuntu)"
+name: "🛡️ v8 cn_fetch safety_net"
 
 on:
   schedule:
-    # 工作日北京时间 09:00~19:00，每30分钟一次（UTC = CST-8）
-    - cron: '1 1 * * 1-5'    # 09:01 CST
-    - cron: '31 1 * * 1-5'   # 09:31 CST
-    - cron: '1 2 * * 1-5'    # 10:01 CST
-    - cron: '31 2 * * 1-5'   # 10:31 CST
-    - cron: '1 3 * * 1-5'    # 11:01 CST
-    - cron: '31 3 * * 1-5'   # 11:31 CST
-    - cron: '1 4 * * 1-5'    # 12:01 CST
-    - cron: '31 4 * * 1-5'   # 12:31 CST
-    - cron: '1 5 * * 1-5'    # 13:01 CST
-    - cron: '31 5 * * 1-5'   # 13:31 CST
-    - cron: '1 6 * * 1-5'    # 14:01 CST
-    - cron: '31 6 * * 1-5'   # 14:31 CST
-    - cron: '1 7 * * 1-5'    # 15:01 CST
-    - cron: '31 7 * * 1-5'   # 15:31 CST
-    - cron: '1 8 * * 1-5'    # 16:01 CST
-    - cron: '31 8 * * 1-5'   # 16:31 CST
-    - cron: '1 9 * * 1-5'    # 17:01 CST
-    - cron: '31 9 * * 1-5'   # 17:31 CST
-    - cron: '1 10 * * 1-5'   # 18:01 CST
-    - cron: '31 10 * * 1-5'  # 18:31 CST
-    - cron: '1 11 * * 1-5'   # 19:01 CST（最后一检，19:00后不再查）
+    # 北京时间工作日 09:00–17:00，每 20 分钟检查一次（UTC 01:00–09:00）
+    - cron: '0 1 * * 1-5'    # 09:00 CST
+    - cron: '20 1 * * 1-5'   # 09:20 CST
+    - cron: '40 1 * * 1-5'   # 09:40 CST
+    - cron: '0 2 * * 1-5'    # 10:00 CST
+    - cron: '20 2 * * 1-5'   # 10:20 CST
+    - cron: '40 2 * * 1-5'   # 10:40 CST
+    - cron: '0 3 * * 1-5'    # 11:00 CST
+    - cron: '20 3 * * 1-5'   # 11:20 CST
+    - cron: '40 3 * * 1-5'   # 11:40 CST
+    - cron: '0 5 * * 1-5'    # 13:00 CST
+    - cron: '20 5 * * 1-5'   # 13:20 CST
+    - cron: '40 5 * * 1-5'   # 13:40 CST
+    - cron: '0 6 * * 1-5'    # 14:00 CST
+    - cron: '20 6 * * 1-5'   # 14:20 CST
+    - cron: '40 6 * * 1-5'   # 14:40 CST
+    - cron: '0 7 * * 1-5'    # 15:00 CST
+    - cron: '20 7 * * 1-5'   # 15:20 CST
+    - cron: '40 7 * * 1-5'   # 15:40 CST
+    - cron: '0 8 * * 1-5'    # 16:00 CST
+    - cron: '20 8 * * 1-5'   # 16:20 CST
+    - cron: '40 8 * * 1-5'   # 16:40 CST
+    - cron: '0 9 * * 1-5'    # 17:00 CST
   workflow_dispatch:
 
 permissions:
-  contents: read
   actions: write
+  contents: read
+
+concurrency:
+  group: v8-safety-net
+  cancel-in-progress: false
 
 jobs:
-  safety-net:
+  check_and_dispatch:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: "🕐 检查 raw_data/ 最后更新时间"
-        id: check
-        run: |
-          echo "=== Safety Net 检查 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S') ==="
-
-          # 找 raw_data/ 下最新文件的最后修改时间（git log）
-          LATEST=$(git log -1 --format="%ai" -- raw_data/ 2>/dev/null || echo "never")
-          echo "raw_data 最后 commit: $LATEST"
-
-          if [ "$LATEST" = "never" ]; then
-            echo "⚠️ raw_data/ 无任何 commit 历史"
-            echo "stale=true" >> "$GITHUB_OUTPUT"
-            echo "last_update=never" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          # 计算距今秒数
-          NOW=$(date +%s)
-          LAST=$(date -d "$LATEST" +%s 2>/dev/null || echo "$NOW")
-          AGE=$(( NOW - LAST ))
-          echo "距今 ${AGE} 秒（约 $(( AGE / 60 )) 分钟）"
-
-          THRESHOLD=$(( 2 * 60 * 60 ))  # 2 小时 = 7200 秒
-          if [ "$AGE" -gt "$THRESHOLD" ]; then
-            echo "🔴 超过 2 小时未更新！触发补跑"
-            echo "stale=true" >> "$GITHUB_OUTPUT"
-            echo "age_minutes=$(( AGE / 60 ))" >> "$GITHUB_OUTPUT"
-          else
-            echo "✅ 数据新鲜（< 2h）"
-            echo "stale=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: "🚨 dispatch v8_cn_fetch 补跑"
-        if: steps.check.outputs.stale == 'true'
+      - name: "🛡️ 检查是否需要兜底"
+        id: decide
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          AGE="${{ steps.check.outputs.age_minutes }}"
-          echo "🔴 Safety Net 触发：raw_data 已 ${AGE} 分钟未更新，dispatch v8_cn_fetch"
+          set -e
+          REPO="${{ github.repository }}"
+          NOW=$(date -u +%s)
+          ONE_HOUR_AGO=$((NOW - 3600))
+          TWENTY_MIN_AGO=$((NOW - 1200))
 
-          gh workflow run "🇨🇳 v8 中国数据抓取(cn)" \
-            -R ah-quant999/quant-scanner-v8 \
-            -f category=all \
-            -f label="Safety Net 自动补跑（${AGE}min stale）"
+          echo "当前 UTC 时间: $(date -u '+%Y-%m-%d %H:%M:%S')"
 
-          echo "✅ 已 dispatch v8_cn_fetch（全量兜底模式）"
+          # 1) 获取最近 20 条 v8_cn_fetch 运行记录
+          RUNS_JSON=$(curl -sL \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${REPO}/actions/workflows/v8_cn_fetch.yml/runs?per_page=20")
+
+          # 2) 最近 1 小时有 success？
+          HAS_SUCCESS=$(echo "$RUNS_JSON" | jq -r --arg t "$ONE_HOUR_AGO" '
+            [.workflow_runs[] | select(.conclusion == "success") |
+              (.updated_at | fromdateiso8601 // 0)] | map(select(. > ($t | tonumber))) | length
+          ')
+          if [ "$HAS_SUCCESS" -gt 0 ]; then
+            echo "result=skip" >> "$GITHUB_OUTPUT"
+            echo "reason=最近1小时已有 v8_cn_fetch 成功运行" >> "$GITHUB_OUTPUT"
+            echo "✅ 最近1小时已有 v8_cn_fetch 成功运行，无需兜底"
+            exit 0
+          fi
+
+          # 3) 当前是否有运行中/排队中/等待中？
+          HAS_ACTIVE=$(echo "$RUNS_JSON" | jq -r '
+            [.workflow_runs[] | select(.status == "in_progress" or .status == "queued" or .status == "waiting")] | length
+          ')
+          if [ "$HAS_ACTIVE" -gt 0 ]; then
+            echo "result=skip" >> "$GITHUB_OUTPUT"
+            echo "reason=当前已有 v8_cn_fetch 运行中" >> "$GITHUB_OUTPUT"
+            echo "⏳ 当前已有 v8_cn_fetch 运行中，不重复触发"
+            exit 0
+          fi
+
+          # 4) 最近 20 分钟内已经启动过 v8_cn_fetch？（避免连环 dispatch 雪崩）
+          HAS_RECENT=$(echo "$RUNS_JSON" | jq -r --arg t "$TWENTY_MIN_AGO" '
+            [.workflow_runs[] |
+              (.run_started_at | fromdateiso8601 // 0)] | map(select(. > ($t | tonumber))) | length
+          ')
+          if [ "$HAS_RECENT" -gt 0 ]; then
+            echo "result=skip" >> "$GITHUB_OUTPUT"
+            echo "reason=最近20分钟已有 v8_cn_fetch 启动过" >> "$GITHUB_OUTPUT"
+            echo "🚦 最近20分钟已有 v8_cn_fetch 启动过，避免雪崩式重试"
+            exit 0
+          fi
+
+          echo "result=dispatch" >> "$GITHUB_OUTPUT"
+          echo "⚠️ 最近1小时无成功运行、无运行中、且20分钟内未启动过，准备兜底 dispatch"
+
+      - name: "🚀 dispatch v8_cn_fetch"
+        if: steps.decide.outputs.result == 'dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO="${{ github.repository }}"
+          RESP=$(curl -sL -w "\nHTTP_CODE:%{http_code}" \
+            -X POST \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${REPO}/actions/workflows/v8_cn_fetch.yml/dispatches" \
+            -d '{"ref":"main"}')
+          CODE=$(echo "$RESP" | grep -oP 'HTTP_CODE:\K\d+')
+          BODY=$(echo "$RESP" | sed '/HTTP_CODE:/d')
+          if [ "$CODE" = "204" ]; then
+            echo "✅ 已成功 dispatch v8_cn_fetch"
+          else
+            echo "❌ dispatch 失败，HTTP $CODE"
+            echo "$BODY"
+            exit 1
+          fi
