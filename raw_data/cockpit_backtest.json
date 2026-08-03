@@ -1,1 +1,1 @@
-{"calc_time":"2026-08-04 07:01:16","method":"baostock 真实收盘价滚动回测","signal_criteria":"total_score>=70（与驾驶舱共振候选口径一致）","entry_window":[],"latest_date":"2026-08-04","results":[],"summary":{"overall":null,"gte80":null,"gte70_lt80":null,"stock_summary":[]}}
+{"calc_time":"2026-08-04 07:31:03","method":"baostock 真实收盘价滚动回测","signal_criteria":"total_score>=70（与驾驶舱共振候选口径一致）","entry_window":[],"latest_date":"2026-08-04","results":[],"summary":{"overall":null,"gte80":null,"gte70_lt80":null,"stock_summary":[]}}
