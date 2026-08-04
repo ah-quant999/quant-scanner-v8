@@ -1,46 +1,51 @@
 {
-  "update_time": "2026-08-04 01:30:04",
-  "overall": "red",
+  "update_time": "2026-08-05 07:03:29",
+  "overall": "yellow",
+  "verdict": "外围 2 项指标无红灯，其中 美元兑日元 157.75 处于警惕区，需持续跟踪。A 股主驱动仍在国内政策与基本面，外部环境暂不构成额外约束，仓位与选股标准维持不变。",
   "indicators": [
     {
       "name": "USDJPY",
       "label": "美元兑日元",
-      "value": 157.531,
+      "value": 157.75,
       "unit": "",
       "source": "Yahoo Finance",
       "status": "yellow",
       "status_text": "⚠️ 警惕",
-      "note": "接近干预区边缘"
+      "note": "接近干预区边缘",
+      "analysis": "当前 157.75（较上次 +0.219），处于干预有效区 156-158 内。汇率端平稳，套息交易未见异动，外资流向由基本面而非汇率主导。"
     },
     {
       "name": "VIX",
       "label": "VIX 恐慌指数",
-      "value": 15.86,
+      "value": null,
       "unit": "",
       "source": "Yahoo Finance",
-      "status": "green",
-      "status_text": "🟢 正常",
-      "note": "波动率处于低位"
+      "status": "gray",
+      "status_text": "待更新",
+      "note": "数据暂不可得",
+      "analysis": "数据暂不可得，本轮不参与判定。"
     },
     {
       "name": "US10Y",
       "label": "10Y 美债收益率",
-      "value": 4.69,
+      "value": null,
       "unit": "%",
       "source": "Yahoo Finance",
-      "status": "red",
-      "status_text": "🚨 高危",
-      "note": "美债收益率突破 4.5%"
+      "status": "gray",
+      "status_text": "待更新",
+      "note": "数据暂不可得",
+      "analysis": "数据暂不可得，本轮不参与判定。"
     },
     {
       "name": "USDCNH",
       "label": "美元兑离岸人民币",
-      "value": 6.7577,
+      "value": 6.7468,
       "unit": "",
       "source": "Yahoo Finance",
       "status": "green",
       "status_text": "🟢 正常",
-      "note": "人民币汇率相对稳定"
+      "note": "人民币汇率相对稳定",
+      "analysis": "当前 6.7468（较上次 -0.0109），低于 7.0，人民币偏强。外资回流环境友好、人民币资产吸引力上升，利好核心资产与进口型行业；但出口企业汇兑损益与价格竞争力受一定挤压。"
     },
     {
       "name": "NORTH_FUND",
@@ -50,7 +55,8 @@
       "source": "中国数据源",
       "status": "gray",
       "status_text": "待更新",
-      "note": "由中国节点抓取后更新"
+      "note": "由中国节点抓取后更新",
+      "analysis": "港交所自 2024-05 起停止披露实时额度，该项暂无数据，不参与红灯计数。"
     }
   ]
 }

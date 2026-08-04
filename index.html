@@ -12612,7 +12612,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
 
 
-    const thresholds = {USDJPY:'<155 或 >163', VIX:'>25', US10Y:'>4.5%', USDCNH:'离岸急跌', NORTH_FUND:'连续大额净流出'};
+    const thresholds = {USDJPY:'<155 或 >163', VIX:'>25', US10Y:'>4.5%', USDCNH:'>7.30', NORTH_FUND:'连续大额净流出'};
 
     const shortNames = {'美元兑日元':'USDJPY','VIX 恐慌指数':'VIX','10Y 美债收益率':'10Y美债','美元兑离岸人民币':'USDCNH','北向资金':'北向'};
 
@@ -12686,7 +12686,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     h += '<th style="text-align:left;padding:6px 8px;border:1px solid var(--border);color:var(--txt);white-space:nowrap;">当前</th>';
 
-    h += '<th style="text-align:left;padding:6px 8px;border:1px solid var(--border);color:var(--txt);">分析解说（高了/低了会怎样）</th>';
+    h += '<th style="text-align:left;padding:6px 8px;border:1px solid var(--border);color:var(--txt);">分析解说（按当前值实时生成）</th>';
 
     h += '</tr></thead><tbody>';
 
@@ -12702,7 +12702,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
       h += '<td style="padding:6px 8px;border:1px solid var(--border);color:'+c+';font-weight:700;white-space:nowrap;">'+valText+' '+it.status_text+'</td>';
 
-      h += '<td style="padding:6px 8px;border:1px solid var(--border);color:var(--sub);line-height:1.55;">'+analysis[it.name]+'</td></tr>';
+      h += '<td style="padding:6px 8px;border:1px solid var(--border);color:var(--sub);line-height:1.55;">'+(it.analysis || analysis[it.name] || '--')+'</td></tr>';
 
     });
 
