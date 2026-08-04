@@ -2335,33 +2335,29 @@ def main(category=None, only=None):
             except Exception as ex:
                 print(f"  ⚠️ 盘中补充成交额失败({ex})，沿用日线序列")
 
-        # ---- 涨跌家数（push2delay 镜像：上证指数 000001 的 f104/f105/f106 = 全市场涨跌平家数）----
-        # 注：akshare stock_zh_a_spot_em 在本机/云端均被 WAF 拦截（ConnectionError），
-        #     改用东财 ulist 接口（与 f_index_quotes 同源，稳定可连）。
+        # ---- 涨跌家数：沪市 + 深市（与 AI市场速览 口径一致）----
+        # index_quotes.json 已含 000001/399001 的 f104/f105/f106，直接读取求和，避免再调 ulist。
         ds_hist = baseline.get("daily_stats") or []
         if is_today_trade:
             try:
-                r = _requests.get(
-                    f"{_EM_DELAY}/api/qt/ulist.np/get",
-                    params={"fltt": "2", "invt": "2", "ut": "b2884a393a59ad64002292a3e90d46a5",
-                            "fields": "f12,f14,f104,f105,f106", "secids": "1.000001"},
-                    headers=_EM_HEADERS, timeout=15)
-                j = r.json()
-                row = (j.get("data", {}).get("diff") or [])
-                if row:
-                    row = row[0]
-                    up = int(row.get("f104") or 0)
-                    down = int(row.get("f105") or 0)
-                    flat = int(row.get("f106") or 0)
+                idx_path = RAW_DIR / "index_quotes.json"
+                idx_data = json.loads(idx_path.read_text(encoding="utf-8")) if idx_path.exists() else {}
+                by_code = {it["code"]: it for it in idx_data.get("items", [])}
+                sh = by_code.get("000001", {})
+                sz = by_code.get("399001", {})
+                up = int(sh.get("up") or 0) + int(sz.get("up") or 0)
+                down = int(sh.get("down") or 0) + int(sz.get("down") or 0)
+                flat = int(sh.get("flat") or 0) + int(sz.get("flat") or 0)
+                if up + down + flat > 0:
                     rec = {"date": today_md, "up": up, "down": down, "flat": flat}
                     if ds_hist and ds_hist[-1].get("date") == today_md:
                         ds_hist[-1] = rec
                     else:
                         ds_hist.append(rec)
                     ds_hist = ds_hist[-120:]
-                    print(f"  ✅ 盘中补充今日涨跌家数 {today_md}: 涨{up}/跌{down}/平{flat}")
+                    print(f"  ✅ 盘中补充今日涨跌家数 {today_md}: 涨{up}/跌{down}/平{flat}（沪市+深市）")
                 else:
-                    print(f"  ⚠️ 涨跌家数接口返回空，沿用历史序列")
+                    print(f"  ⚠️ index_quotes 缺少涨跌家数，沿用历史序列")
             except Exception as ex:
                 print(f"  ⚠️ 涨跌家数获取失败({ex})，沿用历史序列")
         else:
@@ -2412,8 +2408,9 @@ def main(category=None, only=None):
             continue
         run(var, fn)
 
-    # 盘中/全量抓取后，用实时 raw_data 生成 AI 盘面解读（规则引擎，零成本，稳定可调试）
-    if category in ("intraday", "all"):
+    # 盘中/收盘/全量抓取后，用实时 raw_data 生成 AI 盘面解读（规则引擎，零成本，稳定可调试）
+    # post_close 15:30 运行会生成「收盘」版解读，避免盘中 13:xx 的评论挂到次日。
+    if category in ("intraday", "post_close", "all"):
         try:
             script = ROOT / "algorithms" / "gen_market_brief.py"
             print(f"🧠 生成 AI 盘面解读: {script.name}")

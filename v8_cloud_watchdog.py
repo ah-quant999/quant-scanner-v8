@@ -156,6 +156,36 @@ def latest_workflow_run(name):
     return items[0], None
 
 
+def in_schedule_window(kind, now_cst=None):
+    """判断当前是否处于该项的"应有调度"时段。
+
+    非调度时段（夜间/周末/收盘后）没有 cron，数据不刷新属于设计预期，
+    此时不应判 FAIL —— 否则夜间每轮巡检必然满屏红灯，把真问题淹没。
+
+    调度事实（北京时间）：
+      cn_fetch     周一~周五 08:25-15:30（周末仅 09:00 一轮）
+      algo_run     周一~周五 18:30 / 20:00
+      build_deploy 由上游 push / workflow_run 触发，白天到夜间早段
+    """
+    now = now_cst or datetime.now(timezone(timedelta(hours=8)))
+    h, wd = now.hour, now.weekday()
+    weekend = wd >= 5
+
+    if kind == "cn_fetch":
+        if weekend:
+            return 9 <= h <= 11          # 周末只有 09:00 一轮
+        return 8 <= h <= 16              # 收盘 15:30 + 1h 容错
+    if kind == "build_deploy":
+        if weekend:
+            return 9 <= h <= 22
+        return 8 <= h <= 22              # 盘后算法链 20:00 后仍会触发构建
+    if kind == "raw_data":
+        if weekend:
+            return 9 <= h <= 22
+        return 8 <= h <= 22
+    return True
+
+
 def check_workflow(name, label, max_age_min=None):
     run, err = latest_workflow_run(name)
     if err:
@@ -314,12 +344,18 @@ def main():
     results.append(("runner", ok, msg))
 
     ok, msg = check_workflow(CN_WORKFLOW_NAME, "cn_fetch", max_age_min=120)
+    if not ok and not in_schedule_window("cn_fetch", now_cst):
+        ok, msg = True, msg + " —— 非调度时段，豁免（cn_fetch 仅工作日 08:25-15:30 有 cron）"
     results.append(("cn_fetch", ok, msg))
 
     ok, msg = check_workflow(BD_WORKFLOW_NAME, "build_deploy", max_age_min=120)
+    if not ok and not in_schedule_window("build_deploy", now_cst):
+        ok, msg = True, msg + " —— 非调度时段，豁免（夜间无上游推送属预期）"
     results.append(("build_deploy", ok, msg))
 
     raw_ok, raw_msg = check_raw_data_stale(threshold_min=90)
+    if not raw_ok and not in_schedule_window("raw_data", now_cst):
+        raw_ok, raw_msg = True, raw_msg + " —— 非调度时段，豁免（夜间数据不刷新属预期）"
     results.append(("raw_data_fresh", raw_ok, raw_msg))
 
     ok, msg = check_site()

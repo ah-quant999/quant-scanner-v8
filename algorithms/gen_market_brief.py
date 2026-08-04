@@ -417,9 +417,11 @@ def main():
         if broad_in:
             etf_insight.append(f"资金同时流入 {'、'.join([x['name'] for x in broad_in[:2]])}，向蓝筹和中盘轮动。")
 
+    closing_summary = build_closing_summary(indices, up, down, flat, amount_total) if market_status == "收盘" else ""
+
     brief = {
         "gen_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "market_status": "盘中",
+        "market_status": market_status,
         "sentiment": {
             "label": sentiment_label,
             "description": sentiment_desc,
@@ -430,16 +432,18 @@ def main():
         },
         "health": health,
         "indices": index_overview,
+        "amount_total": amount_total,
         "anomalies": anomalies,
         "strategies": strategies,
         "etf_insight": etf_insight,
-        "note": "由盘中实时数据规则生成，非投资建议",
+        "closing_summary": closing_summary,
+        "note": f"由{market_status}数据规则生成，非投资建议",
     }
 
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(brief, f, ensure_ascii=False, separators=(",", ":"))
     print(f"✅ 已生成 {OUT}")
-    print(f"   风向: {sentiment_label} | 涨跌比 {up_down_ratio} | 异动 {len(anomalies)} 条 | 策略 {len(strategies)} 条")
+    print(f"   状态: {market_status} | 风向: {sentiment_label} | 涨跌比 {up_down_ratio} | 异动 {len(anomalies)} 条 | 策略 {len(strategies)} 条")
 
 
 if __name__ == "__main__":

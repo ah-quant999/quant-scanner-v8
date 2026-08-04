@@ -42,7 +42,8 @@ CARD_DEFS = [
     {"id": "MACRO_DATA", "name": "今日宏观解读", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["global_macro", "monetary"]},
     {"id": "JUDGMENT_DATA", "name": "今日判定", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["verdict", "indices"]},
     {"id": "IPO_DATA", "name": "打新日历", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["stocks"]},
-    {"id": "NT_DATA", "name": "财经日历", "page": "今日事件", "freq": "每日盘前", "max_age": 720, "key_fields": ["calendar"]},
+    {"id": "NT_DATA", "name": "市场提示", "page": "今日事件", "freq": "每日盘前", "max_age": 720, "key_fields": ["alerts"]},
+    {"id": "V8_CAL", "name": "财经日历(月历)", "page": "今日事件", "freq": "每日盘前", "max_age": 1500, "key_fields": ["weeks", "month"]},
     # 实时数据
     {"id": "CRISIS_DATA", "name": "实时风险联动温度计", "page": "实时数据", "freq": "盘中30分钟", "max_age": 60, "key_fields": ["currency", "global"]},
     {"id": "MARKET_FUND_FLOW_DATA", "name": "四路资金流向", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["daily"]},
@@ -59,7 +60,7 @@ CARD_DEFS = [
     {"id": "MARGIN_DATA", "name": "融资融券", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["sh"]},
     {"id": "CFFEX_HOLDINGS", "name": "期指持仓", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["items"]},
     {"id": "CANDIDATE", "name": "候选池", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["stocks"]},
-    {"id": "GOLD_POOL", "name": "金股池", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["candidates", "stocks"]},
+    {"id": "GOLD_POOL", "name": "金股池", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["stocks"]},
     {"id": "LHB_DATA", "name": "龙虎榜", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["stocks"]},
     {"id": "INST_TRADE", "name": "机构交易", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["top_buy", "top_sell"]},
     {"id": "TRIPLE_CONSENSUS", "name": "三重共识", "page": "选股策略", "freq": "收盘后", "max_age": 360, "key_fields": ["stocks"]},
@@ -177,16 +178,15 @@ def adjust_max_age(def_max, page=None):
         return 2880
 
     if page in ("盘后数据", "选股策略"):
-        # 盘后数据由 v8_algo 18:30 算法链产出
-        if is_trade_day and 17.0 <= h < 23.0:
-            # 收盘后晚间：应已更新，用默认 360 或收紧到 240
+        # 盘后数据由 v8_algo_run 18:30 算法链产出，每个交易日仅一次。
+        # 关键：18:30 之外的所有时段，数据合理地来自「上一交易日 18:30」，
+        # 年龄可达 24h+，绝不能再用 360min 判 stale（否则夜间/白天必然满屏红灯）。
+        if is_trade_day and 19.0 <= h < 23.0:
+            # 当晚产出窗口（18:30 跑完 + 构建部署延迟）：必须是今晚的新数据，严格检查
             return min(def_max, 360)
-        if is_trade_day and h >= 23.0:
-            # 深夜：次日 18:30 前不预期更新
-            return 1200  # 20h，撑到次日傍晚
-        if is_trade_day and h < 17.0:
-            # 白天还没到产出时间：放宽
-            return min(def_max, 480)
+        if is_trade_day:
+            # 23:00~次日 19:00：数据来自上一交易日傍晚，允许 25h
+            return 1500
         # 周末：覆盖到周一傍晚
         return 2880
 
