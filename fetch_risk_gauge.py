@@ -7,6 +7,8 @@
 import json
 import os
 import sys
+import http.cookiejar
+import urllib.parse
 import urllib.request
 from datetime import datetime
 
@@ -22,40 +24,94 @@ YAHOO_SYMBOLS = {
 }
 
 
+_UA = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/120.0.0.0 Safari/537.36"
+)
+
+# Yahoo 近年对无 cookie 的裸请求返回 403，需先预热拿一次 cookie
+_opener = urllib.request.build_opener(
+    urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar())
+)
+_opener.addheaders = [
+    ("User-Agent", _UA),
+    ("Accept", "application/json,text/plain,*/*"),
+    ("Accept-Language", "en-US,en;q=0.9"),
+]
+_cookie_ready = False
+
+
+def _warm_cookie():
+    """访问 Yahoo 首页取 cookie，规避 chart API 的 403。"""
+    global _cookie_ready
+    if _cookie_ready:
+        return
+    for u in ("https://fc.yahoo.com", "https://finance.yahoo.com"):
+        try:
+            _opener.open(u, timeout=12).read(1024)
+            _cookie_ready = True
+            return
+        except Exception:
+            continue
+    _cookie_ready = True  # 预热失败也只试一次，避免每个指标都重试拖慢
+
+
 def fetch_yahoo(symbol):
-    """从 Yahoo Finance 抓取最新价，失败返回 None。"""
-    url = (
-        "https://query1.finance.yahoo.com/v8/finance/chart/"
-        f"{symbol}?interval=1d&range=5d"
-    )
-    req = urllib.request.Request(
-        url,
-        headers={
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/120.0.0.0 Safari/537.36"
-            ),
-            "Accept": "application/json",
-        },
-    )
+    """从 Yahoo Finance 抓取最新价（query1/query2 双域名 + cookie），失败返回 None。"""
+    _warm_cookie()
+    last_err = None
+    for host in ("query1", "query2"):
+        url = (
+            f"https://{host}.finance.yahoo.com/v8/finance/chart/"
+            f"{symbol}?interval=1d&range=5d"
+        )
+        try:
+            with _opener.open(url, timeout=20) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            result = data.get("chart", {}).get("result", [None])[0]
+            if not result:
+                continue
+            meta = result.get("meta", {})
+            price = meta.get("regularMarketPrice") or meta.get("previousClose")
+            if price is None:
+                quotes = result.get("indicators", {}).get("quote", [{}])
+                closes = quotes[0].get("close", [])
+                price = next((v for v in reversed(closes) if v is not None), None)
+            if price is not None:
+                return price
+        except Exception as e:
+            last_err = e
+            continue
+    print(f"[WARN] Yahoo {symbol} 抓取失败: {last_err}", file=sys.stderr)
+    return None
+
+
+# stooq 免费 CSV，作为 VIX / 美债的第三源（Yahoo 全挂时兜底）
+STOOQ_SYMBOLS = {"VIX": "^vix", "US10Y": "10usy.b"}
+
+
+def fetch_stooq(name):
+    """stooq CSV 兜底，返回最新收盘价，失败返回 None。"""
+    sym = STOOQ_SYMBOLS.get(name)
+    if not sym:
+        return None
+    url = f"https://stooq.com/q/l/?s={urllib.parse.quote(sym)}&f=sd2t2ohlcv&h&e=csv"
     try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-        result = data.get("chart", {}).get("result", [None])[0]
-        if not result:
+        req = urllib.request.Request(url, headers={"User-Agent": _UA})
+        text = urllib.request.urlopen(req, timeout=15).read().decode("utf-8", "ignore")
+        lines = [l for l in text.strip().splitlines() if l.strip()]
+        if len(lines) < 2:
             return None
-        meta = result.get("meta", {})
-        # 优先用实时价/收盘价
-        price = meta.get("regularMarketPrice") or meta.get("previousClose")
-        if price is None:
-            # 从 quote 数组兜底
-            quotes = result.get("indicators", {}).get("quote", [{}])
-            closes = quotes[0].get("close", [])
-            price = next((v for v in reversed(closes) if v is not None), None)
-        return price
+        cols = lines[0].split(",")
+        vals = lines[1].split(",")
+        row = dict(zip([c.strip().lower() for c in cols], vals))
+        close = row.get("close")
+        if close in (None, "", "N/D"):
+            return None
+        return float(close)
     except Exception as e:
-        print(f"[WARN] Yahoo {symbol} 抓取失败: {e}", file=sys.stderr)
+        print(f"[WARN] stooq {name} 抓取失败: {e}", file=sys.stderr)
         return None
 
 
@@ -67,8 +123,8 @@ def status_for(name, value):
     if name == "USDJPY":
         if value < 155 or value > 163:
             return {"status": "red", "status_text": "🚨 高危", "note": "突破干预警戒区"}
-        if value < 158 or value > 160:
-            return {"status": "yellow", "status_text": "⚠️ 警惕", "note": "接近干预区边缘"}
+        if value < 156 or value > 158:
+            return {"status": "yellow", "status_text": "⚠️ 警惕", "note": "偏离干预有效区"}
         return {"status": "green", "status_text": "🟢 有效", "note": "干预有效区 156-158"}
 
     if name == "VIX":
@@ -127,15 +183,22 @@ def fetch_sina_fx(pair):
 
 
 def fetch_with_fallback(name, symbol):
-    """先 Yahoo，再 Sina（仅外汇对）。"""
+    """三源冗余：Yahoo → 新浪（外汇对）/ stooq（VIX、美债）。"""
     value = fetch_yahoo(symbol)
     if value is not None:
         return value
+
     sina_pairs = {"USDJPY": "fx_susdjpy", "USDCNH": "fx_susdcnh"}
     if name in sina_pairs:
         value = fetch_sina_fx(sina_pairs[name])
         if value is not None:
             print(f"[INFO] {name} 使用新浪兜底数据: {value}", file=sys.stderr)
+            return value
+
+    if name in STOOQ_SYMBOLS:
+        value = fetch_stooq(name)
+        if value is not None:
+            print(f"[INFO] {name} 使用 stooq 兜底数据: {value}", file=sys.stderr)
     return value
 
 
@@ -150,13 +213,14 @@ def format_value(name, value):
 
 
 def _load_prev():
-    """读取上一次快照，用于生成"较上次"的变化描述。"""
+    """读取上一次快照：用于"较上次"变化描述 + 本轮抓取失败时兜底沿用。"""
     try:
         with open(OUT, "r", encoding="utf-8") as f:
             old = json.load(f)
-        return {i.get("name"): i.get("value") for i in old.get("indicators", [])}
+        vals = {i.get("name"): i.get("value") for i in old.get("indicators", [])}
+        return vals, old.get("update_time", "")
     except Exception:
-        return {}
+        return {}, ""
 
 
 def _delta_text(name, value, prev):
@@ -250,7 +314,7 @@ def analysis_for(name, value, status, prev):
     return "暂无解说。"
 
 
-def build_verdict(indicators, overall):
+def build_verdict(indicators, overall, stale_names=None):
     """基于本轮真实数值组合，动态生成综合判定文案。"""
     real = [i for i in indicators if i.get("value") is not None]
     reds = [i for i in real if i["status"] == "red"]
@@ -259,6 +323,11 @@ def build_verdict(indicators, overall):
 
     def brief(items):
         return "、".join(f"{i['label']} {i['value']}{i['unit']}" for i in items)
+
+    tip = ""
+    if stale_names:
+        labels = "、".join(i["label"] for i in indicators if i["name"] in stale_names)
+        tip = f"（注：{labels} 本轮数据源不可用，沿用上一次数值）"
 
     if not real:
         return "本轮外围指标全部抓取失败，风险温度计暂不可用，请以国内数据为准。"
@@ -270,7 +339,7 @@ def build_verdict(indicators, overall):
             base += f"，其中 {brief(yellows)} 处于警惕区，需持续跟踪"
         else:
             base += f"（{brief(greens)} 均在安全区）"
-        return base + "。A 股主驱动仍在国内政策与基本面，外部环境暂不构成额外约束，仓位与选股标准维持不变。"
+        return base + "。A 股主驱动仍在国内政策与基本面，外部环境暂不构成额外约束，仓位与选股标准维持不变。" + tip
 
     red_names = brief(reds)
     if n == 1:
@@ -283,25 +352,37 @@ def build_verdict(indicators, overall):
             "NORTH_FUND": "外资流出为主要压力源，核心资产流动性需重点观察",
         }.get(r["name"], "该项为当前主要外部风险")
         tail = f"其余指标（{brief(yellows + greens)}）暂未共振" if (yellows or greens) else "其余指标暂未共振"
-        return f"当前 1 项亮红灯：{red_names}。{focus}；{tail}，尚不构成系统性风险，建议在标准流程上增加一层过滤。"
+        return f"当前 1 项亮红灯：{red_names}。{focus}；{tail}，尚不构成系统性风险，建议在标准流程上增加一层过滤。" + tip
 
     if n == 2:
         return (f"当前 2 项亮红灯：{red_names}。两项外部风险已开始共振，"
-                "对成长股与外资重仓股形成叠加压制，建议将权益仓位下调 20%-40%，优先保留低估值防御品种。")
+                "对成长股与外资重仓股形成叠加压制，建议将权益仓位下调 20%-40%，优先保留低估值防御品种。" + tip)
 
     return (f"当前 {n} 项亮红灯：{red_names}。外围风险全面共振，属系统性风险区间，"
-            "建议权益仓位降至 20% 以下，以现金与防御资产为主，暂停新开仓。")
+            "建议权益仓位降至 20% 以下，以现金与防御资产为主，暂停新开仓。" + tip)
 
 
 def main():
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    prev = _load_prev()
+    prev, prev_time = _load_prev()
     indicators = []
+    stale_names = []
 
     for name, symbol in YAHOO_SYMBOLS.items():
         raw = fetch_with_fallback(name, symbol)
         value = format_value(name, raw)
+
+        # 关键保护：本轮源不可用时沿用上次值，绝不用 None 覆盖已有数据
+        stale = False
+        if value is None and prev.get(name) is not None:
+            value = prev[name]
+            stale = True
+            stale_names.append(name)
+            print(f"[STALE] {name} 本轮抓取失败，沿用上次值 {value}（{prev_time}）", file=sys.stderr)
+
         st = status_for(name, value)
+        if stale:
+            st["note"] = f"沿用 {prev_time[5:16] if prev_time else '上次'} 数据（本轮源不可用）"
 
         meta = {
             "USDJPY": {"label": "美元兑日元", "unit": "", "source": "Yahoo Finance"},
@@ -320,6 +401,7 @@ def main():
                 "status": st["status"],
                 "status_text": st["status_text"],
                 "note": st["note"],
+                "stale": stale,
                 "analysis": analysis_for(name, value, st["status"], prev),
             }
         )
@@ -353,7 +435,8 @@ def main():
     payload = {
         "update_time": now,
         "overall": overall,
-        "verdict": build_verdict(indicators, overall),
+        "verdict": build_verdict(indicators, overall, stale_names),
+        "stale_names": stale_names,
         "indicators": indicators,
     }
 
