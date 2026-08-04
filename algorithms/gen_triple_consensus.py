@@ -11,6 +11,7 @@ gen_triple_consensus.py — 三重共识选股
 """
 import json
 import os
+import re
 
 try:
     _ = BASE
@@ -21,6 +22,7 @@ from datetime import datetime
 WORKSPACE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(WORKSPACE, "..", "out")
 OUTPUT = os.path.join(DATA_DIR, "triple_consensus.json")
+META_FILE = os.path.join(WORKSPACE, "stock_industry_concepts.json")
 
 
 def load_json(path, default=None):
@@ -35,24 +37,59 @@ def normalize_code(c):
     return str(c or "").replace("sh_", "").replace("sz_", "").replace("hk_", "").replace("bj_", "").replace("sh.", "").replace("sz.", "").replace("hk.", "").replace("bj.", "")
 
 
-def enrich_extra(record, code, gp_map):
-    """从 gold_pool 补充行业/板块/概念信息"""
-    gp = gp_map.get(code)
-    if not gp:
-        return record
+def load_meta_map(path=META_FILE):
+    """加载本地静态行业/概念/板块映射（云端安全，不依赖 akshare/东财）。"""
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def board_from_code(code):
+    c = re.sub(r"[^0-9]", "", str(code))
+    if not c:
+        return ""
+    if c.startswith(("600", "601", "603", "605", "000", "001", "002", "003")):
+        return "主板"
+    if c.startswith(("300", "301")):
+        return "创业板"
+    if c.startswith(("688", "689")):
+        return "科创板"
+    if c.startswith(("8", "4", "92")):
+        return "北交所"
+    return ""
+
+
+def enrich_extra(record, code, gp_map, meta_map=None):
+    """从 stock_industry_concepts.json 补充行业/板块/概念；gold_pool 仅作兜底。"""
+    meta_map = meta_map or {}
+    code = normalize_code(code)
+    meta = meta_map.get(code) or {}
+    gp = gp_map.get(code) or {}
+
+    # 板块：优先静态映射，次选代码前缀，再次 gold_pool/board
+    board = meta.get("board") or record.get("board") or gp.get("board_label") or gp.get("board") or board_from_code(code)
+    if board:
+        record["board"] = board
+
     # 行业
     if not record.get("industry"):
-        record["industry"] = gp.get("industry", "")
-    # 板块：合并 gold_pool.sectors 与已有 sectors，去重
+        record["industry"] = meta.get("industry") or gp.get("industry", "")
+
+    # 板块/行业主题标签（sectors）：合并 meta 的 concepts 前端、gold_pool.sectors、industry
     existing_sectors = set(record.get("sectors") or [])
-    gp_sectors = gp.get("sectors") or []
-    if gp.get("industry") and not existing_sectors:
-        gp_sectors = [gp.get("industry")] + list(gp_sectors)
-    merged_sectors = list(existing_sectors | set(gp_sectors))
+    if record.get("industry"):
+        existing_sectors.add(record["industry"])
+    for s in gp.get("sectors") or []:
+        if s:
+            existing_sectors.add(s)
+    merged_sectors = [s for s in existing_sectors if s]
     if merged_sectors:
         record["sectors"] = merged_sectors
+
     # 概念
-    concepts = gp.get("concepts") or []
+    concepts = meta.get("concepts") or gp.get("concepts") or record.get("concepts") or []
     if concepts:
         record["concepts"] = concepts
     return record
@@ -67,10 +104,11 @@ def main():
     fundamental = load_json(os.path.join(DATA_DIR, "fundamental_quality.json"), {})
     gold_pool = load_json(os.path.join(DATA_DIR, "gold_pool.json"), {})
 
-    # 从 gold_pool 补充行业/板块/概念信息
+    # 从 gold_pool / 静态映射补充行业/板块/概念信息
     gp_map = {}
     for key, s in (gold_pool.get("stocks", {}) if isinstance(gold_pool, dict) else {}).items():
         gp_map[normalize_code(key)] = s
+    meta_map = load_meta_map()
 
 
     # 1) TOP10 >=70
@@ -138,7 +176,7 @@ def main():
                 "inst_detail": top.get("inst_detail", ""),
                 "win_rate": top.get("win_rate", None),
             }
-            consensus.append(enrich_extra(rec, code, gp_map))
+            consensus.append(enrich_extra(rec, code, gp_map, meta_map))
             continue
 
         # near_miss：满足 2/3（TOP10>=70 / 驾驶舱A或B档 / 基本面A档）
@@ -172,7 +210,7 @@ def main():
                 "signals": top.get("signals", {}) if top else {},
                 "sectors": src.get("sectors", []),
             }
-            near_miss.append(enrich_extra(rec, code, gp_map))
+            near_miss.append(enrich_extra(rec, code, gp_map, meta_map))
 
     consensus.sort(key=lambda x: -x["total_score"])
     near_miss.sort(key=lambda x: -x["total_score"])
