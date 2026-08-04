@@ -501,6 +501,7 @@ window.V8_CAL = {weeks:[],legend:[]};
 <script src="data/CANDIDATE_QUOTES.js"></script>
 <script src="data/RISK_GAUGE.js"></script>
 <script src="data/RUNNER_STATUS.js"></script>
+<script src="data/HEALTH_CHECK.js"></script>
 </head>
 <body>
 
@@ -3569,8 +3570,9 @@ window.V8_CAL = {weeks:[],legend:[]};
     <div class="op-tabs">
       <button class="op-tab-btn active" data-op="1" onclick="opSwitchTab(1)">运维</button>
       <button class="op-tab-btn" data-op="2" onclick="opSwitchTab(2)">⏰ 任务运行看板 <span class="op-tab-time" id="opTab2Time"></span></button>
-      <button class="op-tab-btn" data-op="3" onclick="opSwitchTab(3)">暂未上架 <span class="op-tab-time" id="opTab3Time"></span></button>
-      <button class="op-tab-btn" data-op="4" onclick="opSwitchTab(4)">已下架 <span class="op-tab-time" id="opTab4Time"></span></button>
+      <button class="op-tab-btn" data-op="3" onclick="opSwitchTab(3)">🩺 前端健康 <span class="op-tab-time" id="opTab3Time"></span></button>
+      <button class="op-tab-btn" data-op="4" onclick="opSwitchTab(4)">暂未上架 <span class="op-tab-time" id="opTab4Time"></span></button>
+      <button class="op-tab-btn" data-op="5" onclick="opSwitchTab(5)">已下架 <span class="op-tab-time" id="opTab5Time"></span></button>
     </div>
     <div id="opTab1" class="op-tab-pane active">
     <!-- ⚠️ 系统告警（动态扫描） -->
@@ -3629,8 +3631,22 @@ window.V8_CAL = {weeks:[],legend:[]};
         <div id="taskScheduleSummary" style="font-size:12px;color:var(--sub)">加载中…</div>
       </div>
     </div>
-    <div id="opTab3" class="op-tab-pane"><div id="unlistedPanel"></div></div>
-    <div id="opTab4" class="op-tab-pane"><div id="delistedPanel">
+    <div id="opTab3" class="op-tab-pane">
+      <div class="card" style="margin-bottom:16px;border-left:3px solid var(--purple)">
+        <h3><span class="ic">🩺</span>前端健康巡检 <span class="fresh" id="healthCheckTime">更新于 --</span></h3>
+        <div id="healthCheckSummary" style="margin-bottom:12px;font-size:13px;font-weight:700">加载中…</div>
+        <div id="healthCheckBody" style="font-size:12px;color:var(--sub)">加载中…</div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <h3><span class="ic">📋</span>巡检说明</h3>
+        <div style="font-size:12px;color:var(--sub);line-height:1.7">
+          <p>本页自动检查每个前端卡片的<strong>数据新鲜度</strong>与<strong>关键字段是否空值</strong>，同时校验 GitHub Pages 部署同步、runner 在线状态、本地与 origin/main 同步。</p>
+          <p>✓ 正常 · ⚠ 警告 · ✗ 异常；异常时系统会自动派发刷新并发送邮件告警。</p>
+        </div>
+      </div>
+    </div>
+    <div id="opTab4" class="op-tab-pane"><div id="unlistedPanel"></div></div>
+    <div id="opTab5" class="op-tab-pane"><div id="delistedPanel">
 
         <!-- 盘后概览：市场温度计分项 / 六维共振雷达 -->
     <div class="grid g-2" style="margin-bottom:16px">
@@ -6540,6 +6556,52 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   }
 
 
+  /* ---- 前端健康巡检渲染 ---- */
+  function renderHealthCheck(){
+    const body = document.getElementById('healthCheckBody');
+    const sum = document.getElementById('healthCheckSummary');
+    const timeEl = document.getElementById('healthCheckTime');
+    if(!body) return;
+    const H = window.HEALTH_CHECK || {};
+    if(timeEl) timeEl.textContent = H.updated ? '更新于 ' + H.updated : '更新于 --';
+    if(!H.items || !H.items.length){
+      if(sum) sum.innerHTML = '<span style="color:var(--dim)">暂无巡检数据</span>';
+      body.innerHTML = '';
+      return;
+    }
+    const overall = H.overall || 'unknown';
+    const s = H.summary || {};
+    const overallColor = overall === 'ok' ? 'var(--down)' : (overall === 'warn' ? 'var(--gold)' : 'var(--up)');
+    const overallText = overall === 'ok' ? '✓ 正常' : (overall === 'warn' ? '⚠ 警告' : '✗ 异常');
+    if(sum) sum.innerHTML = '<span style="color:'+overallColor+'">'+overallText+'</span> · ✓ '+(s.ok||0)+' · ⚠ '+(s.warn||0)+' · ✗ '+(s.fail||0)+' / 共 '+(s.total||0)+' 项';
+
+    const byPage = {};
+    H.items.forEach(function(it){
+      byPage[it.page] = byPage[it.page] || [];
+      byPage[it.page].push(it);
+    });
+    let html = '';
+    Object.keys(byPage).forEach(function(page){
+      html += '<div style="margin-bottom:12px;"><div style="font-weight:700;margin-bottom:6px;font-size:13px;">'+page+'</div>';
+      html += '<table style="width:100%;border-collapse:collapse;font-size:11px;"><thead><tr style="background:var(--card2);">';
+      html += '<th style="padding:4px 6px;border:1px solid var(--border);text-align:left;">检查项</th>';
+      html += '<th style="padding:4px 6px;border:1px solid var(--border);text-align:center;width:40px;">状态</th>';
+      html += '<th style="padding:4px 6px;border:1px solid var(--border);text-align:left;">说明</th>';
+      html += '</tr></thead><tbody>';
+      byPage[page].forEach(function(it){
+        const color = it.status === 'ok' ? 'var(--down)' : (it.status === 'warn' ? 'var(--gold)' : 'var(--up)');
+        const sym = it.status === 'ok' ? '✓' : (it.status === 'warn' ? '⚠' : '✗');
+        html += '<tr><td style="padding:4px 6px;border:1px solid var(--border);">'+it.name+'</td>';
+        html += '<td style="padding:4px 6px;border:1px solid var(--border);text-align:center;color:'+color+';font-weight:700;">'+sym+'</td>';
+        html += '<td style="padding:4px 6px;border:1px solid var(--border);color:var(--sub);">'+it.message+'</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    });
+    body.innerHTML = html;
+  }
+  window.renderHealthCheck = renderHealthCheck;
+
+
   /* ---- 初始化 ---- */
   function initPostMarket(){
     const safe=(fn,...args)=>{try{fn(...args);}catch(e){console.warn('模块渲染失败',fn&&fn.name,e);}};
@@ -8735,10 +8797,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
   window.opSwitchTab=function(n){
     document.querySelectorAll('.op-tab-btn').forEach(function(b){b.classList.toggle('active', +b.dataset.op===n);});
-    [1,2,3,4].forEach(function(i){var p=document.getElementById('opTab'+i);if(p)p.classList.toggle('active', i===n);});
+    [1,2,3,4,5].forEach(function(i){var p=document.getElementById('opTab'+i);if(p)p.classList.toggle('active', i===n);});
     if(n===2) setTimeout(renderTaskSchedule,60);
-    if(n===3) setTimeout(renderUnlisted,60);
-    if(n===4) setTimeout(renderDelisted,60);
+    if(n===3) setTimeout(renderHealthCheck,60);
+    if(n===4) setTimeout(renderUnlisted,60);
+    if(n===5) setTimeout(renderDelisted,60);
   };
 })();
 
