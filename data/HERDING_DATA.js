@@ -1,1 +1,1 @@
-window.HERDING_DATA = {"current_clusters":[{"sector":"IT服务Ⅱ","direction":"强势抱团","count":8},{"sector":"电网设备","direction":"强势抱团","count":6},{"sector":"通信设备","direction":"强势抱团","count":5}],"total_limit_up":84,"note":"由涨停行业集中度推导的抱团板块（行业涨停数降序）","update_time":"2026-08-04 14:19:06"};
+window.HERDING_DATA = {"current_clusters":[{"sector":"IT服务Ⅱ","direction":"强势抱团","count":8},{"sector":"电网设备","direction":"强势抱团","count":6},{"sector":"通信设备","direction":"强势抱团","count":5}],"total_limit_up":84,"note":"由涨停行业集中度推导的抱团板块（行业涨停数降序）","update_time":"2026-08-04 14:58:11"};
