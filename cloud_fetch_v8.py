@@ -299,6 +299,223 @@ def f_judgment():
     }
 
 
+def f_macro_brief():
+    """每日宏观解读 + 时事要点（盘前 08:25 自动生成，注册于 MACRO_BRIEF→premarket）。
+    
+    基于当日 MACRO_DATA（利率/汇率/VIX/商品）+ CRISIS_DATA（危机雷达）+ 美股隔夜，
+    用规则引擎生成：
+      - headline: 一句话宏观结论
+      - key_numbers: 3~5 个关键数据变动（含昨日对比）
+      - news_brief: 3~5 条数据驱动的"时事要点"（对 A 股有影响的）
+      - a_impact: 对 A 股的简短影响评估
+    """
+    now = datetime.now()
+    today = now.date()
+
+    # ---- 读取已生成的 MACRO_DATA ----
+    macro = {}
+    macro_path = Path(ROOT) / "data" / "MACRO_DATA.js"
+    raw_macro_path = Path(ROOT) / "raw_data" / "macro_data.json"
+    try:
+        for p in [macro_path, raw_macro_path]:
+            if p.exists():
+                txt = p.read_text(encoding="utf-8")
+                if txt.startswith("window.MACRO_DATA"):
+                    txt = txt[len("window.MACRO_DATA "):].lstrip("=").lstrip().strip().rstrip(";")
+                macro = json.loads(txt)
+                if macro:
+                    break
+    except Exception:
+        macro = {}
+
+    gm = macro.get("global_macro", {})
+    monetary = macro.get("monetary", {})
+    commodities = gm.get("commodities", {})
+
+    # ---- 读取危机雷达 ----
+    crisis = {}
+    crisis_path = Path(ROOT) / "data" / "CRISIS_DATA.js"
+    raw_crisis_path = Path(ROOT) / "raw_data" / "crisis_data.json"
+    try:
+        for p in [crisis_path, raw_crisis_path]:
+            if p.exists():
+                txt = p.read_text(encoding="utf-8")
+                if txt.startswith("window.CRISIS_DATA"):
+                    txt = txt[len("window.CRISIS_DATA "):].lstrip("=").lstrip().strip().rstrip(";")
+                crisis = json.loads(txt)
+                if crisis:
+                    break
+    except Exception:
+        crisis = {}
+
+    # ---- 提取关键数值 ----
+    vix = float(gm.get("vix", {}).get("value", 0) or 0)
+    us10y = float(monetary.get("us_bond_10y", {}).get("value", 0) or 0)
+    us10y_prev = float(monetary.get("us_bond_10y", {}).get("previous", 0) or 0)
+    cn10y = float(monetary.get("cn_bond_10y", {}).get("value", 0) or 0)
+    cn10y_prev = float(monetary.get("cn_bond_10y", {}).get("previous", 0) or 0)
+    dxy = float(gm.get("dxy", {}).get("value", 0) or 0)
+    usdcnh = float(gm.get("usdcnh", {}).get("price", 0) or 0)
+    gold = float(commodities.get("gold", {}).get("value", 0) or 0)
+    oil = float(commodities.get("oil", {}).get("value", 0) or 0)
+    silver = float(commodities.get("silver", {}).get("value", 0) or 0)
+    copper = float(commodities.get("copper", {}).get("value", 0) or 0)
+
+    crisis_score = crisis.get("score", crisis.get("total_score", 0))
+    crisis_level = crisis.get("level", "")
+
+    # ---- 规则引擎：生成 headline ----
+    signals = []
+    if vix > 25:
+        signals.append(f"VIX 飙升至 {vix:.1f}（恐慌区域）")
+    elif vix > 20:
+        signals.append(f"VIX 升至 {vix:.1f}（偏高）")
+    elif vix < 13:
+        signals.append(f"VIX 降至 {vix:.1f}（极度乐观）")
+
+    if us10y > 4.5:
+        signals.append(f"美债 10Y 突破 {us10y:.2f}%（紧缩压力）")
+    elif us10y < 4.0:
+        signals.append(f"美债 10Y 回落至 {us10y:.2f}%（压力缓和）")
+
+    spread = cn10y - us10y if cn10y and us10y else None
+    if spread is not None and spread < -2.8:
+        signals.append(f"中美利差 {spread:.2f}%（历史深度倒挂收窄中）")
+
+    if gold > 4200:
+        signals.append(f"黄金突破 ${gold:.0f}/oz（避险情绪升温）")
+
+    if crisis_score >= 70:
+        signals.append(f"危机雷达 {crisis_score} 分（{crisis_level}·高风险）")
+    elif crisis_score >= 50:
+        signals.append(f"危机雷达 {crisis_score} 分（{crisis_level}·需关注）")
+
+    if not signals:
+        signals.append("全球宏观环境平稳，无极端信号")
+
+    headline = "；".join(signals[:3])
+
+    # ---- 关键数据变动表 ----
+    key_numbers = []
+    def _kn(label, value, prev, unit="", fmt=".2f"):
+        if not value and value != 0:
+            return
+        delta = value - (prev or 0)
+        arrow = "↑" if delta > 0 else ("↓" if delta < 0 else "→")
+        key_numbers.append({
+            "label": label,
+            "value": f"{value:{fmt}}{unit}",
+            "delta": f"{arrow}{abs(delta):{fmt}}{unit}" if delta != 0 else "持平",
+        })
+
+    _kn("美债 10Y", us10y, us10y_prev, "%")
+    _kn("中国 10Y", cn10y, cn10y_prev, "%")
+    _kn("VIX 恐慌指数", vix, None, fmt=".1f")
+    _kn("美元指数 DXY", dxy, None, fmt=".2f")
+    _kn("USD/CNH 汇率", usdcnh, None, fmt=".4f")
+    _kn("黄金 COMEX", gold, None, "$/oz", fmt=".0f")
+    _kn("原油 WTI", oil, None, "$/bbl", fmt=".1f")
+
+    # ---- 数据驱动的时事要点（news_brief）----
+    news = []
+
+    # 美债
+    if us10y and us10y_prev:
+        yld_chg = us10y - us10y_prev
+        if abs(yld_chg) >= 0.05:
+            direction = "飙升" if yld_chg > 0 else "骤降"
+            impact = "压制全球风险资产估值" if yld_chg > 0 else "利好风险资产反弹"
+            news.append({
+                "tag": "🇺🇸 美债",
+                "text": f"10Y 美债收益率{direction}至 {us10y:.2f}%（单日{'+' if yld_chg>0 else ''}{yld_chg:+.2f}%bp），{impact}。A 股高估值成长板块承压{'减轻' if yld_chg<0 else '加剧'}。",
+            })
+
+    # VIX
+    if vix:
+        if vix > 25:
+            news.append({"tag": "😰 全球风险", "text": f"VIX 跳升至 {vix:.1f}，进入恐慌区域。外围市场波动放大，北向资金可能趋于谨慎，A股开盘或有低开压力。"})
+        elif vix < 13:
+            news.append({"tag": "😌 全球风险", "text": f"VIX 降至 {vix:.1f} 的极低位，市场过度乐观。警惕均值回归风险，不宜追高。"})
+        elif abs(vix - 17) > 3:
+            direction = "攀升" if vix > 20 else "回落"
+            news.append({"tag": "📊 波动率", "text": f"VIX {direction}至 {vix:.1f}，{'避险情绪升温' if vix>18 else '风险偏好回升'}。关注今日 A 股开盘联动反应。"})
+
+    # 汇率
+    if usdcnh:
+        if usdcnh > 7.30:
+            news.append({"tag": "💱 汇率", "text": f"USD/CNH 报 {usdcnh:.4f}，人民币贬值压力较大。外资流入意愿或受抑制，出口链相对受益。"})
+        elif usdcnh < 7.00:
+            news.append({"tag": "💱 汇率", "text": f"USD/CNH 回落至 {usdcnh:.4f}，人民币走强。外资配置 A 股环境改善，但出口企业汇兑收益承压。"})
+        elif abs(usdcnh - 7.15) > 0.05:
+            direction = "升值" if usdcnh < 7.15 else "贬值"
+            news.append({"tag": "💱 汇率", "text": f"人民币对美元{direction}，USDCNH={usdcnh:.4f}。{'资金面偏紧' if usdcnh>7.2 else '资金面中性偏松'}。"})
+
+    # 黄金
+    if gold:
+        if gold > 4300:
+            news.append({"tag": "🥇 大宗", "text": f"COMEX 黄金突破 ${gold:.0f}/oz，避险资产持续走强。反映全球不确定性升温，黄金/防御板块相对受益。"})
+        elif gold < 3800:
+            news.append({"tag": "🥇 大宗", "text": f"COMEX 黄金回落至 ${gold:.0f}/oz，避险需求降温。风险偏好修复时资金可能从黄金回流股市。"})
+
+    # 原油
+    if oil:
+        if oil > 85:
+            news.append({"tag": "🛢️ 大宗", "text": f"WTI 原油突破 $85/bbl，通胀预期升温。可能推迟美联储降息节奏，对 A 股新能源/化工有成本传导影响。"})
+        elif oil < 72:
+            news.append({"tag": "🛢️ 大宗", "text": f"WTI 原油跌破 $72/bbl，能源成本下降。利好交运/化工等中下游行业，但反映全球需求疲软。"})
+
+    # 中美利差
+    if spread is not None:
+        if spread > -2.0:
+            news.append({"tag": "📈 利差", "text": f"中美 10Y 利差收窄至 {spread:.2f}%，人民币资产吸引力提升空间打开，中长期利好 A 股估值修复。"})
+        elif spread < -3.2:
+            news.append({"tag": "📉 利差", "text": f"中美 10Y 利差深度倒挂 {spread:.2f}%，资本外流压力仍在。央行货币政策空间受限，A 股估值承压。"})
+
+    # 危机雷达
+    if crisis_score >= 70:
+        c_items = crisis.get("items", []) if isinstance(crisis.get("items"), list) else []
+        top_risks = [it.get("name", it.get("label", "")) for it in c_items[:3] if it]
+        risk_str = "、".join(top_risks) if top_risks else "多项指标异常"
+        news.append({"tag": "🚨 风控", "text": f"危机雷达亮红灯（{crisis_score}分/{crisis_level}）：{risk_str}。建议降低仓位、提高现金比例，回避高 Beta 个股。"})
+    elif crisis_score >= 50:
+        news.append({"tag": "⚠️ 风控", "text": f"危机雷达黄色预警（{crisis_score}分），部分指标偏离正常区间。保持中等仓位，设置好止损位。"})
+
+    # 如果没有任何新闻生成，给一条默认的
+    if not news:
+        news.append({
+            "tag": "📋 宏观",
+            "text": f"今日关键宏观数据：美债10Y={us10y or '--'}%、VIX={vix or '--'}、USD/CNH={usdcnh or '--'}、黄金=${gold or '--'}/oz。整体环境平稳，以 A 股内部结构性行情为主。",
+        })
+
+    # 限制条数
+    news = news[:5]
+
+    # ---- A 股影响综合评估 ----
+    risk_factors = sum(1 for n in news if any(k in n["tag"] for k in ["😰", "🚨", "⚠️"]))
+    benign_factors = sum(1 for n in news if any(k in n["tag"] for k in ["😌", "📈"]))
+
+    if risk_factors >= 3:
+        a_impact = "偏空：多重风险信号叠加，建议防守为主，控制仓位在 5 成以下，聚焦确定性高的红利/防御板块。"
+    elif risk_factors >= 2:
+        a_impact = "谨慎：存在 2-3 个风险因素，建议中性偏低仓位（5-6成），回避高波动题材，关注抗跌板块。"
+    elif benign_factors >= 2 and risk_factors == 0:
+        a_impact = "偏多：宏观环境友好，可积极布局（6-7成仓），关注受益于当前宏观主题的板块。"
+    else:
+        a_impact = "中性：多空因素交织，无明显方向性驱动。建议均衡配置（5-6成仓），轻指数重个股，跟随资金流向操作。"
+
+    return {
+        "date": today.strftime("%Y-%m-%d"),
+        "headline": headline,
+        "key_numbers": key_numbers,
+        "news_brief": news,
+        "a_impact": a_impact,
+        "crisis_score": crisis_score,
+        "crisis_level": crisis_level,
+        "update_time": now.strftime("%Y-%m-%d %H:%M:%S"),
+        "auto": True,
+    }
+
+
 def _fetch_us_overnight():
     """美股隔夜三大指数表现（最佳努力，失败返回空串）。"""
     try:
@@ -2126,6 +2343,7 @@ def main(category=None, only=None):
         ("CANDIDATE_QUOTES", f_candidate_quotes),
         ("SH_SZ_HISTORY", f_sh_sz_history),
         ("JUDGMENT_DATA", f_judgment),
+        ("MACRO_BRIEF", f_macro_brief),
     ]
 
     for var, fn in tasks:

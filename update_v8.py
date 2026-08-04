@@ -89,6 +89,7 @@ CATEGORY_MAP = {
     "W52_HIGH": "premarket",
     "HERDING_DATA": "premarket",
     "JUDGMENT_DATA": "premarket",
+    "MACRO_BRIEF": "premarket",
 
     # 盘后（由 v6 算法 calc_volatility_watch.py 同步桥推送）
     "VOLATILITY": "post_close",

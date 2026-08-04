@@ -571,239 +571,113 @@ window.V8_CAL = {weeks:[],legend:[]};
       })();
       </script>
 
-      <!-- 今日宏观解读（每日盘前 · premarket 08:30 刷新） -->
+      <!-- 今日宏观解读（每日盘前 · premarket 08:25 刷新 · 数据驱动） -->
       <div class="card" style="grid-column:1/-1;border-left:4px solid var(--cyan);">
-        <h3><span class="ic">📊</span>今日宏观解读 <span id="macroInterpretTag" style="font-size:11px;font-weight:400;color:var(--dim)">美日联合干预日元 · 对 A 股影响与持仓框架 · 2026-08-03 · 底层数据更新于 --</span></h3>
-        <div style="font-size:13px;line-height:1.8;color:var(--txt)">
-          <p style="margin:8px 0"><b style="color:var(--up)">一句话结论：</b>1986 年以来美日首次官方联手买入日元，叠加日本央行最明确加息信号，标志"弱日元+零成本融资"套利时代进入拐点。当前 USDJPY 回落至 157.6（干预有效区），尚未触发套利 unwind，对 A 股属<strong>温和、间接</strong>影响，<strong>不构成清仓理由</strong>。</p>
-          <div style="font-weight:700;margin:10px 0 4px;color:var(--sub)">对 A 股的三条传导</div>
-          <ul style="margin:4px 0 4px 20px;padding:0">
-            <li><b>情绪面：</b>若套利 unwind 触发，全球风险偏好骤降，北向资金可能流出、亚太联动下跌；但 A 股有"政策底"缓冲，跌幅通常小于外围。</li>
-            <li><b>资金面：</b>日元急升→美元走弱→人民币贬值压力缓和（偏利好）；但避险情绪主导时外资仍可能减仓新兴市场。</li>
-            <li><b>板块面：</b>出口链（对日/对美）受日元升值压制；高估值成长（科技/新能源）受全球无风险利率上行压制；黄金/防御相对受益。</li>
-          </ul>
-          <div style="font-weight:700;margin:10px 0 4px;color:var(--sub)">减仓前兆（任一亮红灯即警惕，非清仓指令）</div>
-          <p style="margin:6px 0;font-size:12px;color:var(--sub)">USDJPY、VIX、10Y 美债、北向资金等实时数值、阈值与联动动作，请见「<a href="#sec-rt" style="color:var(--link,#38bdf8)">实时数据 → 实时风险联动温度计</a>」。此处不再重复列表。</p>
-          <button id="macroFullBtn" onclick="var e=document.getElementById('macroFull');var b=document.getElementById('macroFullBtn');if(e.style.display==='none'){e.style.display='block';b.textContent='📄 收起完整 10 节分析';}else{e.style.display='none';b.textContent='📄 展开完整 10 节分析（含三情景推演/历史平行剧本/可证伪观察点）';}" style="cursor:pointer;border:1px solid var(--cyan);background:rgba(56,189,248,.1);color:var(--cyan);padding:6px 12px;border-radius:8px;font-size:12px;margin:8px 0 0">📄 展开完整 10 节分析（含三情景推演 / 历史平行剧本 / 可证伪观察点）</button>
-          <div id="macroFull" style="display:none;margin-top:10px;border-top:1px dashed var(--border);padding-top:10px">
-<div style="font-size:15px;font-weight:800;margin:6px 0 4px;color:var(--txt)">美日联合干预日元 · 宏观分析解说与后续预测框架</div>
-<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--sub);margin:8px 0;line-height:1.6">整理时间：2026-08-03（事件当日）｜资料来源：公开新闻（环球、腾讯、新浪、雪球、网易、FX168 等）综合<br>说明：本文为「宏观解说 + 情景推演」，非确定性预言。所有预测均带前提与可证伪观察点。</div>
-<div style="font-size:13px;font-weight:800;margin:14px 0 6px;color:var(--cyan);border-left:3px solid var(--cyan);padding-left:8px">一、一句话结论</div>
-<p style="margin:6px 0;font-size:12px;color:var(--sub);line-height:1.7"><b>这是 1986 年以来美日首次"官方联手买入日元"的汇率协同，叠加日本央行释放的最明确加息信号，标志着"弱日元 + 零成本融资"的全球套利时代进入拐点。</b> 短期日元反弹已兑现，但能否扭转长期贬值趋势、是否引爆套利交易大规模平仓（unwind），取决于「加息是否落地 + 风险情绪是否恶化」的组合，而非单一变量。</p>
-<div style="font-size:13px;font-weight:800;margin:14px 0 6px;color:var(--cyan);border-left:3px solid var(--cyan);padding-left:8px">二、事件速览（8/3 当日事实）</div>
-<table style="width:100%;border-collapse:collapse;margin:8px 0;font-size:11px">
-<tr>
-<th style="border:1px solid var(--border);padding:5px 7px;text-align:left;background:rgba(56,189,248,.12);color:var(--txt);font-weight:700">事实</th>
-<th style="border:1px solid var(--border);padding:5px 7px;text-align:left;background:rgba(56,189,248,.12);color:var(--txt);font-weight:700">细节</th>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>联合干预</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">美日 15 年来首次联手买入日元。美国财长贝森特手写待办清单写明"买入日元 50–100 亿美元"；美国财政部 7/31 通知多家银行可能入市</td>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>日本已动用资金</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">日本央行数据：上周四纽约市场或卖出最多 <b>589.7 亿美元</b>买入日元；日本财务大臣片山皋月 8/3 确认联合干预，并称"今后也将毫不犹豫进一步联手干预"</td>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>汇率反应</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">USDJPY 从 <b>164（1986 年来最高）</b>回落至 157.60（上周五收盘），一度升至 156 区间（5 月上旬以来最强）</td>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>美国高层背书</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">特朗普 8/2 确认"美国正在帮助日本提振日元"；贝森特称"毫不犹豫参与进一步联合干预"</td>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>区域协同</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">韩国上周四也出手买入韩元，区域政策协调信号增强</td>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>日本央行信号</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">7/31 会议维持利率 <b>1%</b> 不变，但植田和男释放最明确加息信号："若认为金融环境过于宽松，完全有可能加快加息步伐"</td>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>FIMA 工具</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">日本持有 <b>1.14 万亿美元</b>美债（最大外国持有者）。贝森特呼吁<b>扩大美联储 FIMA 回购便利规模</b>——日本可在不抛售美债的情况下借入美元买日元，从而缓冲美债收益率上行压力</td>
-</tr>
-</table>
-<div style="font-size:13px;font-weight:800;margin:14px 0 6px;color:var(--cyan);border-left:3px solid var(--cyan);padding-left:8px">三、核心矛盾链（因果链）</div>
-<pre style="background:#0a0e17;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--sub);overflow-x:auto;line-height:1.5;white-space:pre">美日利差悬殊（日 1% vs 美高位）
-        │
-        ▼
-日元长期贬值 → 进口成本↑ → 日本通胀↑ → 高市内阁支持率承压
-        │                                      │
-        │                                      ▼
-        │                          日本央行公信力受损（"行动滞后"）
-        ▼                                      │
-全球套利交易狂欢（借日元买高收益资产）◄────────┘
-        │
-        ▼
-贝森特施压 + 联合干预 + 央行加息信号
-        │
-        ▼
-日元急升 → 套利盘浮亏 → 被迫平仓回补日元 → 正反馈踩踏</pre>
-<p style="margin:6px 0;font-size:12px;color:var(--sub);line-height:1.7"><b>关键拐点</b>：套利交易的盈利基础 = "利差持续存在 + 日元维持弱势"。两者同时动摇时，交易瓦解。</p>
-<div style="font-size:13px;font-weight:800;margin:14px 0 6px;color:var(--cyan);border-left:3px solid var(--cyan);padding-left:8px">四、利益方矩阵</div>
-<table style="width:100%;border-collapse:collapse;margin:8px 0;font-size:11px">
-<tr>
-<th style="border:1px solid var(--border);padding:5px 7px;text-align:left;background:rgba(56,189,248,.12);color:var(--txt);font-weight:700">利益方</th>
-<th style="border:1px solid var(--border);padding:5px 7px;text-align:left;background:rgba(56,189,248,.12);color:var(--txt);font-weight:700">立场</th>
-<th style="border:1px solid var(--border);padding:5px 7px;text-align:left;background:rgba(56,189,248,.12);color:var(--txt);font-weight:700">诉求</th>
-<th style="border:1px solid var(--border);padding:5px 7px;text-align:left;background:rgba(56,189,248,.12);color:var(--txt);font-weight:700">风险</th>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>美国财政部（贝森特）</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">主动下场买日元</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">纠正"日元严重低估"、避免无序波动；特朗普预期"财务获益"（类比阿根廷互换赚 250 亿）</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">美元走弱、美债长端承压</td>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>日本财务省（片山）</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">联合干预护汇</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">托举日元、压通胀、保内阁支持率</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">外储消耗、干预效果短暂（4/5 月已验证）</td>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>日本央行（植田）</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">释放加息信号但按兵不动</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">保公信力、控通胀超调</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">行动滞后→公信力崩；或加息过快→经济承压</td>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>日本寿险/养老金</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">持有大量外债</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">汇率对冲成本下降</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">未对冲头寸在日元急升中亏损</td>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>套利交易员（对冲基金/杠杆账户）</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">重仓套息</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">维持利差</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">日元升值→margin call→踩踏平仓</td>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>出口商（丰田等）</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">偏好弱日元</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">汇率红利</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">日元急升侵蚀海外利润</td>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>中小企业/消费者</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">承受输入性通胀</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">物价稳定</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">弱日元持续→生活成本↑</td>
-</tr>
-</table>
-<div style="font-size:13px;font-weight:800;margin:14px 0 6px;color:var(--cyan);border-left:3px solid var(--cyan);padding-left:8px">五、关键变量与观察指标</div>
-<table style="width:100%;border-collapse:collapse;margin:8px 0;font-size:11px">
-<tr>
-<th style="border:1px solid var(--border);padding:5px 7px;text-align:left;background:rgba(56,189,248,.12);color:var(--txt);font-weight:700">变量</th>
-<th style="border:1px solid var(--border);padding:5px 7px;text-align:left;background:rgba(56,189,248,.12);color:var(--txt);font-weight:700">当前状态</th>
-<th style="border:1px solid var(--border);padding:5px 7px;text-align:left;background:rgba(56,189,248,.12);color:var(--txt);font-weight:700">观察阈值</th>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>USDJPY</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">157.6（从 164 回落）</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">站稳 156–158 = 干预有效；重回 <b>163+</b> = 失败、需更大干预</td>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>10 年期日债收益率</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">逼近 <b>3%</b>（本世纪最高）</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">突破 3% 并向 3.5% 迈进 = 融资压力升级</td>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>日本央行下次加息时点</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">市场定价 9 月/10 月（概率 70%）</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">提前至 9 月 = 强鹰派；推迟 = 公信力再受损</td>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>FIMA 工具规模</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">贝森特呼吁扩容</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">实际扩容 = 美债抛压缓冲；无动作 = 日本或被逼抛美债</td>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>套利头寸规模</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">"相当可观"，无精确测算</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">日元每升 1% 触发多少平仓 = 核心风险放大器</td>
-</tr>
-<tr>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)"><b>全球风险情绪</b></td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">美股仍在高位</td>
-<td style="border:1px solid var(--border);padding:5px 7px;text-align:left;color:var(--sub)">美股破位 + 日元升 = unwind 组合拳触发</td>
-</tr>
-</table>
-<div style="font-size:13px;font-weight:800;margin:14px 0 6px;color:var(--cyan);border-left:3px solid var(--cyan);padding-left:8px">六、历史平行剧本</div>
-<ol style="margin:6px 0 6px 20px;padding:0;font-size:12px;color:var(--sub);line-height:1.7">
-<li style="margin:2px 0"><b>1985 广场协议</b>：美日德法英联合干预压低美元。本次被市场称为"新广场协议 / 布雷顿森林体系 2.0"雏形——但当年是多边协调，本次是美日双边为主。</li>
-<li style="margin:2px 0"><b>2011 G7 联合干预</b>：日本地震后 G7 协调干预，美方参与。本次是美国<b>主动</b>出手买日元，主动性更强。</li>
-<li style="margin:2px 0"><b>2024 年 8 月日元套息崩盘</b>：日元急升引发全球股灾（日元套息 unwind）。本次若组合拳触发，规模可能更大（套利头寸近年"迅速蔓延"）。</li>
-<li style="margin:2px 0"><b>4 月 / 5 月日本单边干预</b>：仅带来<b>短暂反弹</b>，未能持久。本次加上"美国下场 + 加息信号"，力度不同但效果待验证。</li>
-</ol>
-<div style="font-size:13px;font-weight:800;margin:14px 0 6px;color:var(--cyan);border-left:3px solid var(--cyan);padding-left:8px">七、后续情景推演（未来 1–4 周）</div>
-<div style="font-size:12px;font-weight:800;margin:10px 0 4px;color:var(--down)">🟢 情景 A：有序收敛（基准 / 概率偏高）</div>
-<ul style="margin:6px 0 6px 20px;padding:0;font-size:12px;color:var(--sub);line-height:1.7">
-<li style="margin:2px 0"><b>触发条件</b>：联合干预持续 + 植田勾勒 9 月加息路径 + FIMA 扩容 + 全球风险情绪平稳</li>
-<li style="margin:2px 0"><b>演绎</b>：USDJPY 在 156–158 企稳；套利交易<b>有序、缓慢</b>平仓；日债收益率高位震荡不破 3.5%；全球股市温和回调后企稳</li>
-<li style="margin:2px 0"><b>资产</b>：日元偏强、黄金避险受捧、美股科技高位消化、美债长端受 FIMA 缓冲</li>
-</ul>
-<div style="font-size:12px;font-weight:800;margin:10px 0 4px;color:var(--gold)">🟡 情景 B：拉锯与反复（中性 / 概率中）</div>
-<ul style="margin:6px 0 6px 20px;padding:0;font-size:12px;color:var(--sub);line-height:1.7">
-<li style="margin:2px 0"><b>触发条件</b>：干预效果如 4/5 月般短暂 + 加息推迟至 10 月 + 风险情绪中性</li>
-<li style="margin:2px 0"><b>演绎</b>：USDJPY 在 158–163 区间宽幅震荡；间歇性套利 unwind 造成局部波动；日本被迫二次、三次干预，外储消耗加速</li>
-<li style="margin:2px 0"><b>资产</b>：外汇波动率↑、日元波段机会、高收益债利差走阔</li>
-</ul>
-<div style="font-size:12px;font-weight:800;margin:10px 0 4px;color:var(--up)">🔴 情景 C：套利踩踏（悲观 / 概率偏低但破坏力大）</div>
-<ul style="margin:6px 0 6px 20px;padding:0;font-size:12px;color:var(--sub);line-height:1.7">
-<li style="margin:2px 0"><b>触发条件</b>：<b>加息预期上修 + 风险情绪恶化 + 日元急升</b>三因素组合（单一不够）</li>
-<li style="margin:2px 0"><b>演绎</b>：大规模套利 unwind 踩踏——抛售美股/加密/高收益债回补日元，日元几天内急升数元，全球风险资产重挫，类似 2024-08 但规模更大</li>
-<li style="margin:2px 0"><b>资产</b>：日元暴涨、全球股/加密/高收益债同跌、VIX 飙升、黄金与美债避险分化（美债受 FIMA 缓冲但长端仍重估）</li>
-</ul>
-<div style="font-size:13px;font-weight:800;margin:14px 0 6px;color:var(--cyan);border-left:3px solid var(--cyan);padding-left:8px">八、市场传导链与受影响资产排序</div>
-<pre style="background:#0a0e17;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--sub);overflow-x:auto;line-height:1.5;white-space:pre">日元升值
-   ├─→ 日债收益率↑（财政刺激+供给压力）→ 通过 FIMA 缓冲美债抛压 → 美债长端重估
-   └─→ 套利交易 unwind
-            ├─→ 抛售美股（尤其科技/高估值）── 全球股市承压
-            ├─→ 抛售加密货币 ──────────────── 比特币/ETH 下跌
-            ├─→ 抛售高收益公司债 ──────────── 信用利差走阔
-            └─→ 回补日元 ─────────────────── 日元自我强化升值（正反馈）</pre>
-<p style="margin:6px 0;font-size:12px;color:var(--sub);line-height:1.7"><b>受影响强度排序</b>（由强到弱）：</p>
-<ol style="margin:6px 0 6px 20px;padding:0;font-size:12px;color:var(--sub);line-height:1.7">
-<li style="margin:2px 0"><b>日元本身</b>（最强正反馈） + 日债收益率</li>
-<li style="margin:2px 0"><b>全球高估值/杠杆资产</b>：美股科技、加密货币、高收益债</li>
-<li style="margin:2px 0"><b>新兴市场资产</b>（套利资金回流来源）</li>
-<li style="margin:2px 0"><b>黄金 / 美债</b>（避险但美债受长端重估牵制）</li>
-<li style="margin:2px 0"><b>出口导向型日股</b>（丰田等，日元升侵蚀利润）</li>
-</ol>
-<div style="font-size:13px;font-weight:800;margin:14px 0 6px;color:var(--cyan);border-left:3px solid var(--cyan);padding-left:8px">九、可证伪的观察点（未来 1–4 周验证）</div>
-<ol style="margin:6px 0 6px 20px;padding:0;font-size:12px;color:var(--sub);line-height:1.7">
-<li style="margin:2px 0"><b>USDJPY 是否守住 156</b> —— 守住=干预有效；跌破 155 甚至 150=套利 unwind 加速</li>
-<li style="margin:2px 0"><b>植田是否明确 9 月加息路径</b> —— 明确=强信号；模糊=公信力再受损</li>
-<li style="margin:2px 0"><b>10 年日债收益率是否破 3% 并向 3.5%</b> —— 破位=融资压力升级</li>
-<li style="margin:2px 0"><b>FIMA 是否实际扩容</b> —— 扩容=美债缓冲确立；无动作=关注日本外储消耗</li>
-<li style="margin:2px 0"><b>美股是否出现套利 unwind 迹象</b>（成交量异常 + 高 Beta 领跌）—— 出现=情景 C 前兆</li>
-<li style="margin:2px 0"><b>日本外储月度变动</b> —— 消耗过快=干预不可持续</li>
-</ol>
-<div style="font-size:13px;font-weight:800;margin:14px 0 6px;color:var(--cyan);border-left:3px solid var(--cyan);padding-left:8px">十、给"九宝量化"的监测建议</div>
-<ul style="margin:6px 0 6px 20px;padding:0;font-size:12px;color:var(--sub);line-height:1.7">
-<li style="margin:2px 0"><b>实时盯盘</b>：USDJPY、10Y 日债收益率、VIX、纳斯达克/比特币——任一破阈值即触发预警</li>
-<li style="margin:2px 0"><b>套利温度计</b>：用"日元 5 日涨幅 × 美股波动率"构造 unwind 风险指数</li>
-<li style="margin:2px 0"><b>美债缓冲观察</b>：FIMA 扩容新闻 + 日本持美债月度变化</li>
-<li style="margin:2px 0"><b>历史对照</b>：以 2024-08 套息崩盘为压力测试模板，预设情景 C 的应对</li>
-</ul>
-<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--sub);margin:8px 0;line-height:1.6">⚠️ 免责：本文基于公开资料整理，为宏观框架性分析，不构成任何投资建议。金融市场预测必须带概率与前提，请结合自身风险承受能力独立判断。</div>
-          </div>
-          <p style="margin:8px 0 0;font-size:11px;color:var(--dim)">⚠️ 本文为宏观框架分析，不构成投资建议。</p>
-        </div>
+        <h3><span class="ic">📊</span>今日宏观解读 <span id="macroInterpretTag" style="font-size:11px;font-weight:400;color:var(--dim)">每日盘前 · 更新于 --</span></h3>
+        <div id="macroBody" style="font-size:13px;line-height:1.8;color:var(--txt)"></div>
       </div>
       <script>
       (function(){
-        var tag=document.getElementById('macroInterpretTag');
-        if(!tag) return;
-        var t=(window.CRISIS_DATA&&window.CRISIS_DATA.update_time)||(window.MACRO_DATA&&window.MACRO_DATA.update_time)||'--';
-        tag.textContent='美日联合干预日元 · 对 A 股影响与持仓框架 · 每日盘前 · 底层数据更新于 '+(window._fmtAshareRel?window._fmtAshareRel(t):t);
+        var b = document.getElementById('macroBody');
+        var tag = document.getElementById('macroInterpretTag');
+        if(!b){ if(tag) tag.textContent='渲染失败'; return; }
+
+        var d = window.MACRO_BRIEF;
+        var md = window.MACRO_DATA;
+
+        // 标签时间
+        var ts = (d && d.update_time) || (md && (md.update_time || (md.global_macro && md.global_macro.usdcnh && md.global_macro.usdcnh.date))) || '--';
+        if(tag) tag.textContent = '每日盘前 · 更新于 ' + (window._fmtAshareRel ? window._fmtAshareRel(ts) : ts);
+
+        // 无数据兜底
+        if(!d && !md){ b.innerHTML='<p style="color:var(--dim)">宏观数据加载中（盘前 08:25 自动生成）...</p>'; return; }
+
+        var h = '';
+
+        // ===== 一句话结论 =====
+        if(d && d.headline){
+          h += '<p style="margin:8px 0"><b style="color:var(--up)">一句话结论：</b>'+d.headline+'</p>';
+        } else if(md){
+          h += '<p style="margin:8px 0;color:var(--dim)">宏观数据已更新，解读生成中…</p>';
+        }
+
+        // ===== 关键数据变动表 =====
+        if(d && d.key_numbers && d.key_numbers.length){
+          h += '<div style="font-weight:700;margin:10px 0 4px;color:var(--sub)">关键数据</div>';
+          h += '<table style="width:100%;border-collapse:collapse;margin:6px 0;font-size:12px">'
+            + '<thead><tr style="background:rgba(56,189,248,0.12)">'
+            + '<th style="border:1px solid var(--border);padding:5px 8px;text-align:left;color:var(--txt)">指标</th>'
+            + '<th style="border:1px solid var(--border);padding:5px 8px;text-align:right;color:var(--txt)">当前值</th>'
+            + '<th style="border:1px solid var(--border);padding:5px 8px;text-align:right;color:var(--txt)">变动</th></tr></thead><tbody>';
+          d.key_numbers.forEach(function(k){
+            var dColor = (k.delta.indexOf('\u2191')>=0) ? 'var(--up)' : ((k.delta.indexOf('\u2193')>=0) ? 'var(--down)' : 'var(--txt)');
+            h += '<tr><td style="border:1px solid var(--border);padding:5px 8px">'+k.label+'</td>'
+              + '<td style="border:1px solid var(--border);padding:5px 8px;text-align:right">'+k.value+'</td>'
+              + '<td style="border:1px solid var(--border);padding:5px 8px;text-align:right;color:'+dColor+'">'+k.delta+'</td></tr>';
+          });
+          h += '</tbody></table>';
+        }
+
+        // ===== 时事要点（新闻摘要）=====
+        if(d && d.news_brief && d.news_brief.length){
+          h += '<div style="font-weight:700;margin:12px 0 4px;color:var(--sub)">\ud83d\udcf0 \u65f6\u4e8b\u8981\u70b9\uff08\u5bf9 A \u80a1\u6709\u5f71\u54cd\u7684\uff09</div>';
+          h += '<ul style="margin:4px 0 4px 18px;padding:0">';
+          d.news_brief.forEach(function(n){
+            h += '<li style="margin:3px 0"><b style="color:var(--cyan)">'+n.tag+'</b> '+n.text+'</li>';
+          });
+          h += '</ul>';
+        }
+
+        // ===== A 股影响评估 =====
+        if(d && d.a_impact){
+          var impactColor = (d.a_impact.indexOf('\u504f\u7a7a')>=0) ? 'var(--down)' : ((d.a_impact.indexOf('\u504f\u591a')>=0) ? 'var(--up)' : 'var(--txt)');
+          h += '<p style="margin:10px 0;padding:8px 12px;background:rgba(56,189,248,0.06);border-radius:8px;border-left:3px solid var(--cyan)">';
+          h += '<b>\u2192 \u5bf9 A \u80a1\u5f71\u54cd\uff1a</b><span style="color:'+impactColor+'">'+d.a_impact+'</span>';
+          h += '</p>';
+        }
+
+        // ===== 展开详细数据按钮 =====
+        if(md){
+          h += '<button id="macroDataBtn" onclick="var e=document.getElementById(\'macroDetail\');var btn=document.getElementById(\'macroDataBtn\');if(e.style.display===\'none\'){e.style.display=\'block\';btn.textContent=\'\ud83d\udcc4 \u6536\u8d77\u8be6\u7ec6\u6570\u636e\';}else{e.style.display=\'none\';btn.textContent=\'\ud83d\udcc4 \u5c55\u5f00\u8be6\u7ec6\u5b8f\u89c2\u6570\u636e\uff08\u5229\u7387 / \u6c47\u7387 / VIX / \u5546\u54c1\uff09\';}" ';
+          h += 'style="cursor:pointer;border:1px solid var(--cyan);background:rgba(56,189,248,.1);color:var(--cyan);padding:6px 12px;border-radius:8px;font-size:12px;margin:8px 0 0">';
+          h += '\ud83d\udcc4 \u5c55\u5f00\u8be6\u7ec6\u5b8f\u89c2\u6570\u636e\uff08\u5229\u7387 / \u6c47\u7387 / VIX / \u5546\u54c1\uff09</button>';
+
+          h += '<div id="macroDetail" style="display:none;margin-top:10px;border-top:1px dashed var(--border);padding-top:10px">';
+          if(md.monetary){
+            h += '<div style="font-weight:700;margin:8px 0 4px;color:var(--sub)">\u8d27\u5e01\u4e0E\u5229\u7387</div>';
+            h += '<table style="width:100%;border-collapse:collapse;font-size:11px"><tbody>';
+            var mFields=[['\u4e2d\u56fd10Y\u56fd\u503a','cn_bond_10y'],['\u7f8e\u503a10Y','us_bond_10y'],['\u4e2d\u7f8E\u5229\u5dee','cn_us_spread'],['LPR 1Y/5Y','lpr'],['SHIBOR\u9694\u591c','shibor.on'],['M2\u540c\u6bd4','m2_yoy']];
+            mFields.forEach(function(f){
+              var val=md.monetary[f[1]];if(!val)return;
+              var v=(typeof val==='object'?val.value:val);
+              var p=(typeof val==='object'&&val.date)?('('+val.date+')'):'';
+              if(v===undefined||v===null)v='--';
+              h+='<tr><td style="border:1px solid var(--border);padding:3px 6px;color:var(--sub)">'+f[0]+'</td><td style="border:1px solid var(--border);padding:3px 6px;text-align:right">'+v+' '+p+'</td></tr>';
+            });
+            h+='</tbody></table>';
+          }
+          if(md.global_macro){
+            var gm=md.global_macro;
+            h+='<div style="font-weight:700;margin:8px 0 4px;color:var(--sub)">\u5168\u7403\u5e02\u573a</div>';
+            h+='<table style="width:100%;border-collapse:collapse;font-size:11px"><tbody>';
+            var gItems=[['USD/CNH',gm.usdcnh&&gm.usdcnh.price,gm.usdcnh&&gm.usdcnh.date],['\u7f14\u5143\u6307\u6570 DXY',gm.dxy&&gm.dxy.value,gm.dxy&&gm.dxy.date],['VIX \u6050\u6f62\u6307\u6570',gm.vix&&gm.vix.value,gm.vix&&gm.vix.date]];
+            gItems.forEach(function(g){if(g[1]==null)return;
+              h+='<tr><td style="border:1px solid var(--border);padding:3px 6px;color:var(--sub)">'+g[0]+'</td><td style="border:1px solid var(--border);padding:3px 6px;text-align:right">'+g[1]+' '+(g[2]||'')+'</td></tr>';});
+            if(gm.commodities){var c=gm.commodities;
+              [['\u9ec4\u91d1',c.gold],['\u94f6',c.silver],['\u539f\u6cb9',c.oil],['\u94dc',c.copper]].forEach(function(x){if(!x[1]||!x[1].value)return;
+                h+='<tr><td style="border:1px solid var(--border);padding:3px 6px;color:var(--sub)">'+x[0]+'</td><td style="border:1px solid var(--border);padding:3px 6px;text-align:right">'+x[1].value+' '+(x[1].date||'')+'</td></tr>';});
+            }
+            h+='</tbody></table>';
+          }
+          h+='<p style="margin:6px 0;font-size:11px;color:var(--dim)">\u6570\u636e\u6765\u6e90\uff1aMACRO_DATA \u00b7 \u6bcf\u65e5\u81ea\u52a8\u66f4\u65b0</p>';
+          h+='</div>';
+        }
+
+        b.innerHTML = h;
       })();
       </script>
 
-      <!-- 打新速览 -->
+      <!-- 打新速览 --><!-- 打新速览 -->
       <div class="card" style="grid-column:1/-1">
         <h3><span class="ic">🚀</span>打新速览 - 盘中 · <span class="fresh" id="ipoFresh">更新于 今日 12:18</span></h3>
         <div id="ipoAll">
