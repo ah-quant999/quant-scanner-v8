@@ -24,6 +24,7 @@ CN_WORKFLOW_NAME = "🇨🇳 v8 中国数据抓取(cn)"
 BD_WORKFLOW_NAME = "☁️ v8 构建部署(云端ubuntu)"
 RUNNER_DIR = Path("D:/actions-runner-v8")
 RUNNER_EXE = RUNNER_DIR / "bin" / "Runner.Listener.exe"
+CN_WORKFLOW_ID = 324135267  # v8_cn_fetch workflow id（用于 API 派发）
 
 # 尝试从多个位置读取 token（本地文件优先，不落入仓库）
 def _load_token():
@@ -190,12 +191,43 @@ def check_site():
         return False, f"site unreachable: {e}"
 
 
+def choose_category(now_cst):
+    """按当前北京时刻选择派发类别（绕过 GitHub schedule 下午失效）。"""
+    h = now_cst.hour + now_cst.minute / 60.0
+    if h < 9:
+        return "premarket"
+    if h < 15:
+        return "intraday"
+    if h < 16.5:
+        return "post_close"
+    return "all"
+
+
+def auto_dispatch(cat):
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_WORKFLOW_ID}/dispatches"
+    data = json.dumps({"ref": "main", "inputs": {"category": cat}}).encode("utf-8")
+    req = urllib.request.Request(
+        url,
+        data=data,
+        headers=HEADERS,
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return True, f"已派发 cn_fetch category={cat} (HTTP {r.status})"
+    except urllib.error.HTTPError as e:
+        return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
+
+
 def main():
     parser = argparse.ArgumentParser(description="v8 云端管线看门狗")
     parser.add_argument("--heal", action="store_true", help="runner 离线时尝试自动拉起本地进程")
+    parser.add_argument("--auto-dispatch", action="store_true",
+                        help="数据陈旧且处于交易时段时，经 API 主动派发 cn_fetch 刷新（绕过 GitHub schedule）")
     args = parser.parse_args()
 
-    now = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
+    now_cst = datetime.now(timezone(timedelta(hours=8)))
+    now = now_cst.strftime("%Y-%m-%d %H:%M:%S")
     results = []
 
     ok, msg = check_runner(heal=args.heal)
@@ -207,11 +239,33 @@ def main():
     ok, msg = check_workflow(BD_WORKFLOW_NAME, "build_deploy", max_age_min=120)
     results.append(("build_deploy", ok, msg))
 
-    ok, msg = check_raw_data_stale(threshold_min=90)
-    results.append(("raw_data_fresh", ok, msg))
+    raw_ok, raw_msg = check_raw_data_stale(threshold_min=90)
+    results.append(("raw_data_fresh", raw_ok, raw_msg))
 
     ok, msg = check_site()
     results.append(("site", ok, msg))
+
+    # === 自动派发修复（紧急交接核心） ===
+    if args.auto_dispatch:
+        # 取 raw_data 实际陈旧分钟数（独立于 90min 监控阈值，用更高阈值避免频繁派发）
+        commits = api_get(f"https://api.github.com/repos/{REPO}/commits?path=raw_data&per_page=1")
+        stale_min = None
+        if "__error__" not in commits and commits:
+            dt = utc_to_cst(commits[0]["commit"]["author"]["date"])
+            stale_min = (now_cst - dt).total_seconds() / 60
+        # 活跃窗口：工作日 09:00–21:00；周末 09:00–18:00 也允许（T+1 刷新）
+        weekday = now_cst.weekday()  # 0=Mon
+        is_weekend = weekday >= 5
+        active = (9 <= now_cst.hour <= 21) and (not is_weekend or now_cst.hour <= 18)
+        if stale_min is not None and stale_min > 150 and active:
+            cat = choose_category(now_cst)
+            d_ok, d_msg = auto_dispatch(cat)
+            results.append(("auto_dispatch", d_ok, d_msg))
+        elif stale_min is not None and stale_min > 150 and not active:
+            results.append(("auto_dispatch", True, "数据陈旧但处于非活跃时段，跳过派发（防打扰）"))
+        else:
+            age = f"{stale_min/60:.1f}h" if stale_min is not None else "N/A"
+            results.append(("auto_dispatch", True, f"数据新鲜({age})，无需派发"))
 
     overall = all(ok for _, ok, _ in results)
     flag = "OK" if overall else "ALERT"
@@ -227,6 +281,7 @@ def main():
         f.write(log_text)
 
     print(log_text, end="")
+    # auto_dispatch 自身成功不算 ALERT；仅当监控项 FAIL 才返回 2
     sys.exit(0 if overall else 2)
 
 

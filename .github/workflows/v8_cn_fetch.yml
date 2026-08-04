@@ -37,6 +37,12 @@ on:
     - cron: '0 1 * * 6'      # 周六 09:00 CST 盘前
     - cron: '0 1 * * 0'      # 周日 09:00 CST 盘前（2026-08-02 补：周日-周六隔一天不刷新导致 today 标错）
   workflow_dispatch:
+    inputs:
+      category:
+        description: '抓取类别：premarket / intraday / post_close / all（不填则由 cron 自动推断）'
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: write
@@ -55,10 +61,17 @@ jobs:
       run:
         working-directory: ${{ github.workspace }}
     steps:
-      - name: "🕐 根据 cron 确定本次抓取类别"
+      - name: "🕐 确定本次抓取类别（优先用 workflow_dispatch 传入的 category）"
         id: cat
         shell: bash
         run: |
+          # 手动派发时优先用 inputs.category，绕过 GitHub schedule 下午失效率
+          DISPATCH_CAT="${{ github.event.inputs.category }}"
+          if [ -n "$DISPATCH_CAT" ]; then
+            echo "category=$DISPATCH_CAT" >> "$GITHUB_OUTPUT"
+            echo "label=手动派发($DISPATCH_CAT)"
+            exit 0
+          fi
           CRON="${{ github.event.schedule }}"
           case "$CRON" in
             "25 0 * * 1-5"|"0 1 * * 6"|"0 1 * * 0")
