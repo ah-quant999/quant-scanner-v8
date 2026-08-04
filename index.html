@@ -6156,140 +6156,180 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       '<div style="display:flex;flex-wrap:wrap;gap:4px 0;">'+watchHtml+'</div>';
   }
 
-  /* ---- 任务运行看板（静态快照，需定期按 GitHub API 更新） ---- */
-  const V8_TASK_SCHEDULE = {
-    updated: '2026-08-04 14:26',
-    source: 'GitHub Actions API 实测',
-    tasks: [
+  /* ---- 任务运行看板（按前端页面→卡片顺序，每个时段成功✓失败✗） ---- */
+  const V8_PAGE_SCHEDULE = {
+    updated: '2026-08-04 16:35',
+    source: 'GitHub Actions API + data/*.js 时间戳',
+    pages: [
       {
-        id:'cn_fetch', name:'🇨🇳 中国数据抓取', owner:'中国节点 cn runner', runner:'self-hosted',
-        freq:'工作日 12 次', slots:['08:25','09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:10','15:30'],
-        today:['❌','❌','❌','❌','❌','✅','✅','✅','✅','⬜','⬜','⬜'],
-        actual:['—','—','—','—','—','11:44','12:47','13:28','13:48/14:09','—','—','—'],
-        issue:'上午 08:25–11:00 多档未触发；实际运行比 cron 延迟 10–15 分钟'
+        id:'td', icon:'📅', name:'今日事件',
+        cards:[
+          {name:'重要事件日历', source:'CALENDAR_DATA', freq:'每周日+月末', slots:['周日'], note:'非每日更新'},
+          {name:'打新研判', source:'IPO_DATA', freq:'每日盘前', slots:['08:30'], note:'新股评分'},
+          {name:'盘前预判 / 决策中枢', source:'DECISION_HUB', freq:'每日盘前', slots:['08:30'], note:'综合打分'},
+          {name:'今日宏观解读', source:'MACRO_DATA', freq:'盘中实时', slots:['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'联动风险温度计'}
+        ]
       },
       {
-        id:'risk_gauge', name:'🌍 实时风险温度计', owner:'GitHub 云端', runner:'ubuntu-latest',
-        freq:'工作日 17 次', slots:['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','19:00','19:30','20:00','20:30','21:00','21:30','22:00'],
-        today:['❌','❌','❌','✅','❌','❌','❌','❌','❌','✅','❌','❌','❌','⬜','⬜','⬜','⬜','⬜','⬜','⬜','⬜','⬜','⬜','⬜'],
-        actual:['—','—','—','09:29','—','—','—','—','—','12:44','—','—','—','—','—','—','—','—','—','—','—','—','—','—'],
-        issue:'大量 slots 未触发；截图中 10Y美债/北向资金为 -- 与此直接相关'
+        id:'rt', icon:'📡', name:'实时数据',
+        cards:[
+          {name:'全球指数 / 股指期货', source:'INDEX_QUOTES', freq:'盘中每30分', slots:['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'], note:'A股期指/恒指/美股期指'},
+          {name:'ETF 盘中异动', source:'ETF_PULSE', freq:'盘中实时', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'T+0 资金流向'},
+          {name:'ETF 资金热度', source:'ETF_INTRADAY_HEAT', freq:'盘中实时 T+0', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'按类别实时热度'},
+          {name:'ETF 日监控', source:'ETF_DAILY_MONITOR', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'日常监控清单'},
+          {name:'板块资金流向', source:'SECTOR_FUND_FLOW', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'行业/概念资金流'},
+          {name:'概念排名', source:'CONCEPT_RANKING', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'涨停概念追踪'},
+          {name:'涨停热度', source:'LIMIT_UP_HEATMAP', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'连板/炸板热度'},
+          {name:'市场资金流向', source:'MARKET_FUND_FLOW_DATA', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'两市净流入'},
+          {name:'实时风险温度计', source:'CRISIS_DATA', freq:'盘中每30分', slots:['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'VIX/美债/汇率/北向'},
+          {name:'市场预警', source:'MARKET_ALERT_DATA', freq:'盘中实时', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'量价异常预警'}
+        ]
       },
       {
-        id:'algo_run', name:'🇨🇳 盘后算法链', owner:'中国节点 cn runner', runner:'self-hosted',
-        freq:'工作日 2 次', slots:['18:30','20:00'],
-        today:['⬜','⬜'], actual:['—','—'],
-        issue:'昨天 schedule 18:30 失败，靠多次手动 dispatch 才在 07:42 跑完；今天尚未到点'
+        id:'ph', icon:'🌙', name:'盘后数据',
+        cards:[
+          {name:'市场温度计', source:'SH_FIB', freq:'收盘后1次', slots:['15:30'], note:'多因子综合温度'},
+          {name:'六维共振雷达', source:'SH_FIB', freq:'收盘后1次', slots:['15:30'], note:'战术/战略层评分'},
+          {name:'融资融券', source:'MARGIN_DATA', freq:'收盘后1次', slots:['15:30'], note:'两市融资余额'},
+          {name:'股指期货持仓', source:'CFFEX_HOLDINGS', freq:'收盘后1次', slots:['15:30'], note:'IF/IC/IM 持仓'},
+          {name:'危机雷达', source:'CRISIS_DATA', freq:'收盘后1次', slots:['15:30'], note:'尾部风险监控'},
+          {name:'盘后资金流向', source:'MARKET_FUND_FLOW_DATA', freq:'收盘后1次', slots:['15:30'], note:'全天资金总结'},
+          {name:'候选池', source:'CANDIDATE', freq:'收盘后1次', slots:['18:30'], note:'算法初筛名单'},
+          {name:'黄金池', source:'GOLD_POOL', freq:'收盘后1次', slots:['20:00'], note:'精选标的'},
+          {name:'龙虎榜', source:'LHB_DATA', freq:'收盘后1次', slots:['15:30'], note:'机构/游资动向'},
+          {name:'机构买卖', source:'INST_TRADE', freq:'收盘后1次', slots:['15:30'], note:'机构专用通道'},
+          {name:'三重共识', source:'TRIPLE_CONSENSUS', freq:'收盘后1次', slots:['20:00'], note:'多策略共振'}
+        ]
       },
       {
-        id:'health_check', name:'🩺 每日数据体检', owner:'GitHub 云端', runner:'ubuntu-latest',
-        freq:'每日 2 次', slots:['09:00','17:00'],
-        today:['❌','⬜'], actual:['11:56(时间异常)','—'],
-        issue:'09:00 档未在整点触发，实际 11:56 才跑（时间对不上）'
+        id:'st', icon:'🎯', name:'选股策略',
+        cards:[
+          {name:'技术策略', source:'STRATEGY_TECH', freq:'收盘后1次', slots:['20:00'], note:'技术形态选股'},
+          {name:'资金策略', source:'STRATEGY_FUND', freq:'收盘后1次', slots:['20:00'], note:'资金流选股'},
+          {name:'事件策略', source:'STRATEGY_EVENT', freq:'收盘后1次', slots:['20:00'], note:'事件驱动选股'},
+          {name:'综合策略', source:'STRATEGY_COMPOSITE', freq:'收盘后1次', slots:['20:00'], note:'多因子综合'}
+        ]
       },
       {
-        id:'backup', name:'☁️ 每日自动备份', owner:'GitHub 云端', runner:'ubuntu-latest',
-        freq:'每日 1 次', slots:['21:00'],
-        today:['⬜'], actual:['—'],
-        issue:'昨天延迟 2.5h（23:36 才成）'
-      },
-      {
-        id:'safety_net', name:'🛡️ cn_fetch safety_net', owner:'GitHub 云端', runner:'ubuntu-latest',
-        freq:'工作日每20分检查', slots:['09:00–17:00'],
-        today:['✅'], actual:['持续运行'],
-        issue:'检查本身正常，但只能兜底“1小时无成功”，补不回所有漏档'
-      },
-      {
-        id:'build_deploy', name:'☁️ 构建部署', owner:'GitHub 云端', runner:'ubuntu-latest',
-        freq:'触发式', slots:['push/workflow_run'],
-        today:['✅'], actual:['多次成功'],
-        issue:'自动部署链健康'
-      },
-      {
-        id:'self_heal', name:'💊 云端自愈器', owner:'GitHub 云端', runner:'ubuntu-latest',
-        freq:'周六 14:06', slots:['周六14:06'],
-        today:['—'], actual:['最近运行：无'],
-        issue:'非今日任务；需确认上周六是否实际触发'
-      },
-      {
-        id:'weekly_cleanup', name:'🧹 每周清理', owner:'GitHub 云端', runner:'ubuntu-latest',
-        freq:'周六 21:00', slots:['周六21:00'],
-        today:['—'], actual:['上周六22:24(延迟1.5h)'],
-        issue:'非今日任务'
-      },
-      {
-        id:'cleanup', name:'🧹 周日清理', owner:'GitHub 云端', runner:'ubuntu-latest',
-        freq:'周日 23:00', slots:['周日23:00'],
-        today:['—'], actual:['周日00:01(延迟1h)'],
-        issue:'非今日任务'
+        id:'op', icon:'🔒', name:'运维',
+        cards:[
+          {name:'中国数据抓取 (cn_fetch)', source:'RUNNER_STATUS', freq:'工作日12次', slots:['08:25','09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:10','15:30'], note:'核心数据管线'},
+          {name:'实时风险温度计', source:'CRISIS_DATA', freq:'工作日盘中每30分', slots:['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'宏观指标实时刷新'},
+          {name:'盘后算法链', source:'ALGO_RUN_LOG', freq:'工作日2次', slots:['18:30','20:00'], note:'候选池/黄金池/三重共识'},
+          {name:'构建部署', source:'BUILD_DEPLOY', freq:'触发式', slots:['push后'], note:'Pages 自动部署'},
+          {name:'每日数据体检', source:'HEALTH_CHECK', freq:'每日2次', slots:['09:00','17:00'], note:'数据完整性检查'},
+          {name:'每日自动备份', source:'BACKUP_LOG', freq:'每日1次', slots:['21:00'], note:'raw_data/data 备份'}
+        ]
       }
     ]
   };
 
   function renderTaskSchedule(){
-    const body = $('taskScheduleBody');
-    const sum = $('taskScheduleSummary');
-    const timeEl = $('taskScheduleTime');
+    const body = document.getElementById('taskScheduleBody');
+    const sum = document.getElementById('taskScheduleSummary');
+    const timeEl = document.getElementById('taskScheduleTime');
     if(!body) return;
-    const S = V8_TASK_SCHEDULE;
+    const S = V8_PAGE_SCHEDULE;
     if(timeEl) timeEl.textContent = 'API 快照 ' + S.updated;
 
-    // 1) cn_fetch 全时段矩阵
-    const cn = S.tasks.find(function(t){return t.id==='cn_fetch';});
-    let h = '<div style="margin-bottom:14px;"><div style="font-weight:700;margin-bottom:6px;font-size:13px;">'+cn.name+' · '+cn.owner+'</div>';
-    h += '<div style="display:grid;grid-template-columns:repeat(12,1fr);gap:4px;font-size:10px;text-align:center;">';
-    cn.slots.forEach(function(s,i){
-      const st = cn.today[i] || '⬜';
-      const ac = cn.actual[i] || '';
-      const bg = st==='✅' ? 'rgba(31,209,123,.15)' : st==='❌' ? 'rgba(244,73,93,.15)' : 'rgba(255,255,255,.05)';
-      const c  = st==='✅' ? 'var(--down)' : st==='❌' ? 'var(--up)' : 'var(--dim)';
-      h += '<div style="padding:4px 2px;border-radius:4px;background:'+bg+';color:'+c+';border:1px solid var(--border);" title="实际 '+ac+'">';
-      h += '<div style="font-size:9px;color:var(--dim);margin-bottom:1px;">'+s+'</div>';
-      h += '<div style="font-size:12px;">'+st+'</div>';
-      h += '</div>';
-    });
-    h += '</div><div style="font-size:10px;color:var(--gold);margin-top:4px;">'+cn.issue+'</div></div>';
+    const now = new Date();
+    const todayStr = [now.getFullYear(), String(now.getMonth()+1).padStart(2,'0'), String(now.getDate()).padStart(2,'0')].join('-');
 
-    // 2) 风险温度计矩阵（只显示盘中关键档 08:00-16:00）
-    const rg = S.tasks.find(function(t){return t.id==='risk_gauge';});
-    h += '<div style="margin-bottom:14px;"><div style="font-weight:700;margin-bottom:6px;font-size:13px;">'+rg.name+' · '+rg.owner+'</div>';
-    h += '<div style="display:grid;grid-template-columns:repeat(12,1fr);gap:4px;font-size:10px;text-align:center;">';
-    rg.slots.slice(0,17).forEach(function(s,i){
-      const st = rg.today[i] || '⬜';
-      const ac = rg.actual[i] || '';
-      const bg = st==='✅' ? 'rgba(31,209,123,.15)' : st==='❌' ? 'rgba(244,73,93,.15)' : 'rgba(255,255,255,.05)';
-      const c  = st==='✅' ? 'var(--down)' : st==='❌' ? 'var(--up)' : 'var(--dim)';
-      h += '<div style="padding:4px 2px;border-radius:4px;background:'+bg+';color:'+c+';border:1px solid var(--border);" title="实际 '+ac+'">';
-      h += '<div style="font-size:9px;color:var(--dim);margin-bottom:1px;">'+s+'</div>';
-      h += '<div style="font-size:12px;">'+st+'</div>';
-      h += '</div>';
-    });
-    h += '</div><div style="font-size:10px;color:var(--gold);margin-top:4px;">'+rg.issue+'</div></div>';
+    function parseTs(t){
+      if(!t) return null;
+      let d = new Date(t);
+      if(!isNaN(d.getTime())) return d;
+      const m = String(t).match(/(\d{4}-\d{2}-\d{2})[\sT](\d{2}:\d{2}:\d{2})/);
+      if(m){ d = new Date(m[1]+'T'+m[2]); if(!isNaN(d.getTime())) return d; }
+      const m2 = String(t).match(/(\d{2}):(\d{2})/);
+      if(m2){ d = new Date(todayStr+'T'+m2[1]+':'+m2[2]+':00'); if(!isNaN(d.getTime())) return d; }
+      return null;
+    }
+    function slotDate(s){
+      const m = String(s).match(/(\d{2}):(\d{2})/);
+      if(!m) return null;
+      return new Date(todayStr+'T'+m[1]+':'+m[2]+':00');
+    }
+    function isToday(d){ return d && [d.getFullYear(), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join('-') === todayStr; }
+    function fmtHm(d){ return [String(d.getHours()).padStart(2,'0'), String(d.getMinutes()).padStart(2,'0')].join(':'); }
 
-    // 3) 其它任务汇总表
-    h += '<table style="width:100%;border-collapse:collapse;font-size:11px;"><thead><tr style="background:var(--card2);">';
-    h += '<th style="padding:5px 8px;border:1px solid var(--border);text-align:left;">任务</th>';
-    h += '<th style="padding:5px 8px;border:1px solid var(--border);text-align:left;">负责</th>';
-    h += '<th style="padding:5px 8px;border:1px solid var(--border);text-align:center;">今日</th>';
-    h += '<th style="padding:5px 8px;border:1px solid var(--border);text-align:left;">最近实际</th>';
-    h += '</tr></thead><tbody>';
-    S.tasks.filter(function(t){return t.id!=='cn_fetch' && t.id!=='risk_gauge';}).forEach(function(t){
-      const todayOk = t.today.filter(function(x){return x==='✅';}).length;
-      const todayMiss = t.today.filter(function(x){return x==='❌';}).length;
-      const todayPending = t.today.filter(function(x){return x==='⬜';}).length;
-      const badge = todayMiss>0 ? '<span style="color:var(--up);">❌ '+todayMiss+'</span>' : (todayOk>0 ? '<span style="color:var(--down);">✅ '+todayOk+'</span>' : '<span style="color:var(--dim);">—</span>');
-      const last = t.actual[t.actual.length-1] || '—';
-      h += '<tr><td style="padding:5px 8px;border:1px solid var(--border);">'+t.name+'</td>';
-      h += '<td style="padding:5px 8px;border:1px solid var(--border);color:var(--sub);">'+t.owner+'</td>';
-      h += '<td style="padding:5px 8px;border:1px solid var(--border);text-align:center;">'+badge+'</td>';
-      h += '<td style="padding:5px 8px;border:1px solid var(--border);color:var(--dim);font-size:10px;">'+last+'</td></tr>';
-    });
-    h += '</tbody></table>';
-    body.innerHTML = h;
+    let totalCards=0, okCards=0, missCards=0, pendingCards=0;
+    let issueList = [];
+    let html = '';
 
-    // 摘要
-    let issues = S.tasks.filter(function(t){return t.issue;}).map(function(t){return '<li style="margin-bottom:4px;"><b>'+t.name+'</b>：'+t.issue+'</li>';}).join('');
-    sum.innerHTML = '<ul style="padding-left:18px;margin:0;">'+issues+'</ul>';
+    S.pages.forEach(function(pg){
+      let pageHtml = '';
+      let pageOk=0, pageMiss=0, pagePending=0, pageCards=0;
+      pg.cards.forEach(function(c){
+        const data = window[c.source] || {};
+        const lastTs = parseTs(data.update_time || data.last_update || data.run_time);
+        const lastStr = lastTs && isToday(lastTs) ? fmtHm(lastTs) : (lastTs ? '昨日' : '无');
+        const hasDataToday = lastTs && isToday(lastTs);
+
+        let slotsHtml = '';
+        let cOk=0, cMiss=0, cPending=0;
+        c.slots.forEach(function(s){
+          const sd = slotDate(s);
+          if(!sd){ slotsHtml += '<span title="'+s+'" style="display:inline-block;min-width:32px;text-align:center;padding:2px 4px;border-radius:3px;background:rgba(255,255,255,.05);color:var(--dim);border:1px solid var(--border);font-size:10px;margin:0 2px 2px 0;">'+s+'</span>'; return; }
+          const isPast = sd <= now;
+          const isFuture = !isPast;
+          let ok = false;
+          if(isPast && hasDataToday){
+            // 该时段已到期：数据更新时间不早于时段起点-15分钟视为新鲜
+            const grace = new Date(sd.getTime() - 15*60000);
+            ok = lastTs >= grace;
+          }
+          if(isFuture) cPending++;
+          else if(ok){ cOk++; }
+          else { cMiss++; }
+          const bg = isFuture ? 'rgba(255,255,255,.05)' : (ok ? 'rgba(31,209,123,.12)' : 'rgba(244,73,93,.12)');
+          const co = isFuture ? 'var(--dim)' : (ok ? 'var(--down)' : 'var(--up)');
+          const sym = isFuture ? '⬜' : (ok ? '✓' : '✗');
+          const title = isFuture ? s+' 未到期' : (ok ? s+' 已更新 '+lastStr : s+' 未更新');
+          slotsHtml += '<span title="'+title+'" style="display:inline-block;min-width:32px;text-align:center;padding:2px 4px;border-radius:3px;background:'+bg+';color:'+co+';border:1px solid var(--border);font-size:11px;margin:0 2px 2px 0;">'+sym+'</span>';
+        });
+
+        pageCards++;
+        if(cMiss>0) pageMiss++;
+        else if(cOk>0) pageOk++;
+        else pagePending++;
+
+        totalCards++;
+        if(cMiss>0){ missCards++; issueList.push('<b>'+pg.name+' / '+c.name+'</b>：'+c.note+'（最近 '+lastStr+'）'); }
+        else if(cOk>0) okCards++;
+        else pendingCards++;
+
+        const rowColor = cMiss>0 ? 'color:var(--up);' : (cOk>0 ? 'color:var(--down);' : 'color:var(--dim);');
+        pageHtml += '<tr>'+
+          '<td style="padding:5px 8px;border:1px solid var(--border);font-weight:600;">'+c.name+'</td>'+
+          '<td style="padding:5px 8px;border:1px solid var(--border);color:var(--sub);font-size:11px;white-space:nowrap;">'+c.freq+'</td>'+
+          '<td style="padding:5px 8px;border:1px solid var(--border);">'+slotsHtml+'</td>'+
+          '<td style="padding:5px 8px;border:1px solid var(--border);white-space:nowrap;'+rowColor+'">'+lastStr+'</td>'+
+          '<td style="padding:5px 8px;border:1px solid var(--border);color:var(--sub);font-size:10px;">'+c.note+'</td>'+
+        '</tr>';
+      });
+
+      const pageBadge = pageMiss>0 ? '<span style="color:var(--up);">✗ '+pageMiss+'</span>' : (pageOk>0 ? '<span style="color:var(--down);">✓ '+pageOk+'</span>' : '<span style="color:var(--dim);">⬜ '+pagePending+'</span>');
+      html += '<div class="card" style="margin-bottom:14px;border-left:3px solid var(--cyan)">';
+      html += '<h3><span class="ic">'+pg.icon+'</span>'+pg.name+' <span style="font-size:11px;color:var(--dim);font-weight:400;">'+pg.cards.length+' 张卡片 · 今日 '+pageBadge+'</span></h3>';
+      html += '<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead>';
+      html += '<tr style="background:var(--card2);"><th style="padding:5px 8px;border:1px solid var(--border);text-align:left;">卡片</th><th style="padding:5px 8px;border:1px solid var(--border);text-align:left;">频率</th><th style="padding:5px 8px;border:1px solid var(--border);text-align:left;">今日运行时间轴（✓成功 ✗失败 ⬜未到期）</th><th style="padding:5px 8px;border:1px solid var(--border);text-align:left;">最近实际</th><th style="padding:5px 8px;border:1px solid var(--border);text-align:left;">说明</th></tr>';
+      html += '</thead><tbody>'+pageHtml+'</tbody></table>';
+      html += '</div>';
+    });
+
+    // 总览条
+    const summaryBadge = '<span style="color:var(--down);">✓ '+okCards+'</span> · <span style="color:var(--up);">✗ '+missCards+'</span> · <span style="color:var(--dim);">⬜ '+pendingCards+'</span> / 共 '+totalCards+' 张卡片';
+    html = '<div style="margin-bottom:14px;padding:10px 12px;background:var(--card2);border:1px solid var(--border);border-radius:10px;font-size:12px;">'+summaryBadge+' · 当前时间 '+fmtHm(now)+' · 状态按 data/*.js 最新时间戳判定</div>' + html;
+    body.innerHTML = html;
+
+    if(sum){
+      if(issueList.length){
+        sum.innerHTML = '<ul style="padding-left:18px;margin:0;">'+issueList.map(function(s){return '<li style="margin-bottom:4px;">'+s+'</li>';}).join('')+'</ul>';
+      }else{
+        sum.innerHTML = '<span style="color:var(--down);">✓ 当前所有到期卡片均已更新，无明显异常。</span>';
+      }
+    }
   }
 
 
