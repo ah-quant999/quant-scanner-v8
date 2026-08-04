@@ -3373,6 +3373,7 @@ window.V8_CAL = {weeks:[],legend:[]};
 </style>
     <div class="op-tabs">
       <button class="op-tab-btn active" data-op="1" onclick="opSwitchTab(1)">运维</button>
+      <button class="op-tab-btn" data-op="2" onclick="opSwitchTab(2)">⏰ 任务运行看板 <span class="op-tab-time" id="opTab2Time"></span></button>
       <button class="op-tab-btn" data-op="3" onclick="opSwitchTab(3)">暂未上架 <span class="op-tab-time" id="opTab3Time"></span></button>
       <button class="op-tab-btn" data-op="4" onclick="opSwitchTab(4)">已下架 <span class="op-tab-time" id="opTab4Time"></span></button>
     </div>
@@ -3422,6 +3423,16 @@ window.V8_CAL = {weeks:[],legend:[]};
         <tr><td>概念映射</td><td>09:45 今日</td><td><span class="status-dot s-ok"></span>新鲜</td></tr>
       </tbody></table>
     </div>
+    </div>
+    <div id="opTab2" class="op-tab-pane">
+      <div class="card" style="margin-bottom:16px;border-left:3px solid var(--cyan)">
+        <h3><span class="ic">⏰</span>任务运行看板 <span class="fresh" id="taskScheduleTime">更新于 --</span></h3>
+        <div id="taskScheduleBody" style="font-size:12px;color:var(--sub)">加载中…</div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <h3><span class="ic">📋</span>审计摘要</h3>
+        <div id="taskScheduleSummary" style="font-size:12px;color:var(--sub)">加载中…</div>
+      </div>
     </div>
     <div id="opTab3" class="op-tab-pane"><div id="unlistedPanel"></div></div>
     <div id="opTab4" class="op-tab-pane"><div id="delistedPanel">
@@ -6041,7 +6052,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     setTime('phMacroTime',m.update_time);
   }
 
-  /* ---- 实时风险联动温度计（紧凑版） ---- */
+  /* ---- 实时风险联动温度计（超紧凑版） ---- */
   function renderRiskGauge(){
     const D = window.RISK_GAUGE || {};
     const indicators = D.indicators || [];
@@ -6058,69 +6069,48 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     const overallColor = colorMap[overall] || colorMap.gray;
     const redCount = indicators.filter(function(it){ return it.status === 'red'; }).length;
 
-    // 阈值表（策略参数， rarely 变化）
-    const thresholds = {
-      USDJPY:     '< 155 或 > 163',
-      VIX:        '> 25 + 科技破位',
-      US10Y:      '> 4.5%',
-      USDCNH:     '离岸急跌',
-      NORTH_FUND: '连续大额净流出 + 人民币急贬'
-    };
+    const thresholds = {USDJPY:'<155或>163', VIX:'>25', US10Y:'>4.5%', USDCNH:'离岸急跌', NORTH_FUND:'连续大额净流出'};
+    const shortNames = {'美元兑日元':'USDJPY','VIX 恐慌指数':'VIX','10Y 美债收益率':'10Y美债','美元兑离岸人民币':'USDCNH','北向资金':'北向'};
 
-    let h = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:8px 12px;border-radius:8px;background:'+overallColor+'15;">';
-    h += '<span style="width:10px;height:10px;border-radius:50%;background:'+overallColor+';"></span>';
-    h += '<span style="font-weight:700;color:'+overallColor+';">'+overallLabels[overall]+'</span>';
-    h += '<span style="font-size:12px;color:var(--dim);">红灯 '+redCount+'/4 · 任一亮红灯即警惕</span>';
+    // 顶部一行：状态 + 红灯计数 + 联动动作
+    let action = redCount===0 ? '观察级：标准不变' : redCount===1 ? '警惕级：加过滤' : redCount===2 ? '减仓级：降仓20-40%' : '清仓级：权益<20%';
+    let h = '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;padding:4px 8px;border-radius:6px;background:'+overallColor+'12;font-size:11px;">';
+    h += '<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+overallColor+';margin-right:5px;vertical-align:middle;"></span><b style="color:'+overallColor+';">'+overallLabels[overall]+'</b> · 红灯 '+redCount+'/5</span>';
+    h += '<span style="color:var(--sub);">'+action+'</span>';
     h += '</div>';
 
-    // 指标小卡：5 列变紧凑
-    h += '<div class="grid g-5" style="gap:8px;margin-bottom:10px;">';
+    // 指标小卡：5 列，更紧凑
+    h += '<div class="grid g-5" style="gap:6px;margin-bottom:6px;">';
     indicators.forEach(function(it){
       const c = colorMap[it.status] || colorMap.gray;
       const valText = it.value != null ? it.value + (it.unit || '') : '--';
-      const short = it.label.replace('美元兑日元','USDJPY').replace('VIX 恐慌指数','VIX').replace('10Y 美债收益率','10Y美债').replace('美元兑离岸人民币','USDCNH').replace('北向资金','北向');
-      h += '<div class="card" style="margin-bottom:0;background:rgba(255,255,255,.03);padding:8px 4px;text-align:center;">';
-      h += '<div style="font-size:11px;color:var(--dim);margin-bottom:3px;">'+short+'</div>';
-      h += '<div style="font-size:16px;font-weight:700;color:var(--txt);margin-bottom:2px;">'+valText+'</div>';
-      h += '<div style="font-size:11px;color:'+c+';">'+it.status_text+'</div>';
+      const short = shortNames[it.label] || it.label;
+      h += '<div class="card" style="margin-bottom:0;background:rgba(255,255,255,.03);padding:5px 2px 4px;text-align:center;">';
+      h += '<div style="font-size:10px;color:var(--dim);margin-bottom:1px;">'+short+'</div>';
+      h += '<div style="font-size:14px;font-weight:700;color:var(--txt);line-height:1.2;">'+valText+'</div>';
+      h += '<div style="font-size:10px;color:'+c+';">'+it.status_text+'</div>';
       h += '</div>';
     });
     h += '</div>';
 
-    // 阈值矩阵：3 列，无表头更紧凑
-    h += '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:10px;">';
-    h += '<thead><tr style="background:rgba(245,158,11,.12);"><th style="text-align:left;padding:5px 8px;border:1px solid var(--border);color:var(--txt);">指标</th><th style="text-align:left;padding:5px 8px;border:1px solid var(--border);color:var(--txt);">红灯阈值</th><th style="text-align:left;padding:5px 8px;border:1px solid var(--border);color:var(--txt);">当前</th></tr></thead><tbody>';
+    // 阈值矩阵：紧凑表格
+    h += '<table style="width:100%;border-collapse:collapse;font-size:10px;margin-bottom:5px;">';
+    h += '<thead><tr style="background:rgba(245,158,11,.10);"><th style="text-align:left;padding:3px 6px;border:1px solid var(--border);color:var(--txt);">指标</th><th style="text-align:left;padding:3px 6px;border:1px solid var(--border);color:var(--txt);">阈值</th><th style="text-align:left;padding:3px 6px;border:1px solid var(--border);color:var(--txt);">当前</th></tr></thead><tbody>';
     indicators.forEach(function(it){
       const c = colorMap[it.status] || colorMap.gray;
       const valText = it.value != null ? it.value + (it.unit || '') : '--';
-      h += '<tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--txt);">'+it.label+'</td>';
-      h += '<td style="padding:5px 8px;border:1px solid var(--border);color:var(--dim);">'+thresholds[it.name]+'</td>';
-      h += '<td style="padding:5px 8px;border:1px solid var(--border);color:'+c+';font-weight:600;">'+valText+' '+it.status_text+'</td></tr>';
+      h += '<tr><td style="padding:3px 6px;border:1px solid var(--border);color:var(--txt);">'+shortNames[it.label]+'</td>';
+      h += '<td style="padding:3px 6px;border:1px solid var(--border);color:var(--dim);">'+thresholds[it.name]+'</td>';
+      h += '<td style="padding:3px 6px;border:1px solid var(--border);color:'+c+';font-weight:600;">'+valText+' '+it.status_text+'</td></tr>';
     });
     h += '</tbody></table>';
 
-    // 联动动作（压缩为 3 行）
-    h += '<div style="font-size:11px;color:var(--sub);line-height:1.7;margin-bottom:8px;">';
-    h += '<b>联动动作</b>：';
-    if(redCount === 0){
-      h += '<span style="color:'+overallColor+'">观察级</span>：三重共识标准不变。';
-    } else if(redCount === 1){
-      h += '<span style="color:#f59e0b">警惕级</span>：加北向&lt;3%、海外收入&lt;20%过滤，降低成长权重。';
-    } else if(redCount === 2){
-      h += '<span style="color:#f97316">减仓级</span>：仓位降20–40%，减高估值科技/出口链/外资重仓，增配黄金公用事业高股息。';
-    } else {
-      h += '<span style="color:#ef4444">清仓级</span>：权益仓位压至20%以下，仅保留现金/国债/黄金ETF。';
-    }
+    // 判定 + 免责声明合并一行
+    const verdict = D.verdict || (redCount===0 ? '未触发红灯，A股主驱动仍在国内政策/基本面。' : '外围风险指标已亮红灯，按级别执行联动动作。');
+    h += '<div style="font-size:10px;color:var(--dim);line-height:1.5;background:rgba(255,255,255,.03);padding:5px 8px;border-radius:5px;margin-bottom:4px;">';
+    h += '<b>判定</b>：' + verdict;
     h += '</div>';
-
-    // 判定 + 免责声明
-    const verdict = D.verdict || (redCount===0 ? '未触发任何红灯，A股主驱动仍在国内政策/基本面，不构成清仓理由。' : '外围风险指标已亮红灯，按级别执行联动动作。');
-    h += '<div style="font-size:11px;color:var(--dim);line-height:1.6;background:rgba(255,255,255,.03);padding:8px 10px;border-radius:6px;margin-bottom:8px;">';
-    h += '<b>今日判定</b>：' + verdict;
-    h += '</div>';
-    h += '<div style="font-size:10px;color:var(--dim);line-height:1.5;">';
-    h += '本卡为分析框架，非投资建议。详细逻辑见 <a href="宏观解读_美日干预日元_2026-08-03.md" target="_blank" style="color:#60a5fa;">宏观解读_美日干预日元_2026-08-03.md</a>。';
-    h += '</div>';
+    h += '<div style="font-size:9px;color:var(--dim);line-height:1.4;">分析框架，非投资建议。逻辑见 <a href="宏观解读_美日干预日元_2026-08-03.md" target="_blank" style="color:#60a5fa;">宏观解读</a>。</div>';
 
     body.innerHTML = h;
     setTime('riskGaugeTime', D.update_time);
@@ -6163,6 +6153,142 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         (rs.hostname ? ' · 节点 '+esc(rs.hostname) : '')+
       '</div>'+
       '<div style="display:flex;flex-wrap:wrap;gap:4px 0;">'+watchHtml+'</div>';
+  }
+
+  /* ---- 任务运行看板（静态快照，需定期按 GitHub API 更新） ---- */
+  const V8_TASK_SCHEDULE = {
+    updated: '2026-08-04 14:26',
+    source: 'GitHub Actions API 实测',
+    tasks: [
+      {
+        id:'cn_fetch', name:'🇨🇳 中国数据抓取', owner:'中国节点 cn runner', runner:'self-hosted',
+        freq:'工作日 12 次', slots:['08:25','09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:10','15:30'],
+        today:['❌','❌','❌','❌','❌','✅','✅','✅','✅','⬜','⬜','⬜'],
+        actual:['—','—','—','—','—','11:44','12:47','13:28','13:48/14:09','—','—','—'],
+        issue:'上午 08:25–11:00 多档未触发；实际运行比 cron 延迟 10–15 分钟'
+      },
+      {
+        id:'risk_gauge', name:'🌍 实时风险温度计', owner:'GitHub 云端', runner:'ubuntu-latest',
+        freq:'工作日 17 次', slots:['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','19:00','19:30','20:00','20:30','21:00','21:30','22:00'],
+        today:['❌','❌','❌','✅','❌','❌','❌','❌','❌','✅','❌','❌','❌','⬜','⬜','⬜','⬜','⬜','⬜','⬜','⬜','⬜','⬜','⬜'],
+        actual:['—','—','—','09:29','—','—','—','—','—','12:44','—','—','—','—','—','—','—','—','—','—','—','—','—','—'],
+        issue:'大量 slots 未触发；截图中 10Y美债/北向资金为 -- 与此直接相关'
+      },
+      {
+        id:'algo_run', name:'🇨🇳 盘后算法链', owner:'中国节点 cn runner', runner:'self-hosted',
+        freq:'工作日 2 次', slots:['18:30','20:00'],
+        today:['⬜','⬜'], actual:['—','—'],
+        issue:'昨天 schedule 18:30 失败，靠多次手动 dispatch 才在 07:42 跑完；今天尚未到点'
+      },
+      {
+        id:'health_check', name:'🩺 每日数据体检', owner:'GitHub 云端', runner:'ubuntu-latest',
+        freq:'每日 2 次', slots:['09:00','17:00'],
+        today:['❌','⬜'], actual:['11:56(时间异常)','—'],
+        issue:'09:00 档未在整点触发，实际 11:56 才跑（时间对不上）'
+      },
+      {
+        id:'backup', name:'☁️ 每日自动备份', owner:'GitHub 云端', runner:'ubuntu-latest',
+        freq:'每日 1 次', slots:['21:00'],
+        today:['⬜'], actual:['—'],
+        issue:'昨天延迟 2.5h（23:36 才成）'
+      },
+      {
+        id:'safety_net', name:'🛡️ cn_fetch safety_net', owner:'GitHub 云端', runner:'ubuntu-latest',
+        freq:'工作日每20分检查', slots:['09:00–17:00'],
+        today:['✅'], actual:['持续运行'],
+        issue:'检查本身正常，但只能兜底“1小时无成功”，补不回所有漏档'
+      },
+      {
+        id:'build_deploy', name:'☁️ 构建部署', owner:'GitHub 云端', runner:'ubuntu-latest',
+        freq:'触发式', slots:['push/workflow_run'],
+        today:['✅'], actual:['多次成功'],
+        issue:'自动部署链健康'
+      },
+      {
+        id:'self_heal', name:'💊 云端自愈器', owner:'GitHub 云端', runner:'ubuntu-latest',
+        freq:'周六 14:06', slots:['周六14:06'],
+        today:['—'], actual:['最近运行：无'],
+        issue:'非今日任务；需确认上周六是否实际触发'
+      },
+      {
+        id:'weekly_cleanup', name:'🧹 每周清理', owner:'GitHub 云端', runner:'ubuntu-latest',
+        freq:'周六 21:00', slots:['周六21:00'],
+        today:['—'], actual:['上周六22:24(延迟1.5h)'],
+        issue:'非今日任务'
+      },
+      {
+        id:'cleanup', name:'🧹 周日清理', owner:'GitHub 云端', runner:'ubuntu-latest',
+        freq:'周日 23:00', slots:['周日23:00'],
+        today:['—'], actual:['周日00:01(延迟1h)'],
+        issue:'非今日任务'
+      }
+    ]
+  };
+
+  function renderTaskSchedule(){
+    const body = $('taskScheduleBody');
+    const sum = $('taskScheduleSummary');
+    const timeEl = $('taskScheduleTime');
+    if(!body) return;
+    const S = V8_TASK_SCHEDULE;
+    if(timeEl) timeEl.textContent = 'API 快照 ' + S.updated;
+
+    // 1) cn_fetch 全时段矩阵
+    const cn = S.tasks.find(function(t){return t.id==='cn_fetch';});
+    let h = '<div style="margin-bottom:14px;"><div style="font-weight:700;margin-bottom:6px;font-size:13px;">'+cn.name+' · '+cn.owner+'</div>';
+    h += '<div style="display:grid;grid-template-columns:repeat(12,1fr);gap:4px;font-size:10px;text-align:center;">';
+    cn.slots.forEach(function(s,i){
+      const st = cn.today[i] || '⬜';
+      const ac = cn.actual[i] || '';
+      const bg = st==='✅' ? 'rgba(31,209,123,.15)' : st==='❌' ? 'rgba(244,73,93,.15)' : 'rgba(255,255,255,.05)';
+      const c  = st==='✅' ? 'var(--down)' : st==='❌' ? 'var(--up)' : 'var(--dim)';
+      h += '<div style="padding:4px 2px;border-radius:4px;background:'+bg+';color:'+c+';border:1px solid var(--border);" title="实际 '+ac+'">';
+      h += '<div style="font-size:9px;color:var(--dim);margin-bottom:1px;">'+s+'</div>';
+      h += '<div style="font-size:12px;">'+st+'</div>';
+      h += '</div>';
+    });
+    h += '</div><div style="font-size:10px;color:var(--gold);margin-top:4px;">'+cn.issue+'</div></div>';
+
+    // 2) 风险温度计矩阵（只显示盘中关键档 08:00-16:00）
+    const rg = S.tasks.find(function(t){return t.id==='risk_gauge';});
+    h += '<div style="margin-bottom:14px;"><div style="font-weight:700;margin-bottom:6px;font-size:13px;">'+rg.name+' · '+rg.owner+'</div>';
+    h += '<div style="display:grid;grid-template-columns:repeat(12,1fr);gap:4px;font-size:10px;text-align:center;">';
+    rg.slots.slice(0,17).forEach(function(s,i){
+      const st = rg.today[i] || '⬜';
+      const ac = rg.actual[i] || '';
+      const bg = st==='✅' ? 'rgba(31,209,123,.15)' : st==='❌' ? 'rgba(244,73,93,.15)' : 'rgba(255,255,255,.05)';
+      const c  = st==='✅' ? 'var(--down)' : st==='❌' ? 'var(--up)' : 'var(--dim)';
+      h += '<div style="padding:4px 2px;border-radius:4px;background:'+bg+';color:'+c+';border:1px solid var(--border);" title="实际 '+ac+'">';
+      h += '<div style="font-size:9px;color:var(--dim);margin-bottom:1px;">'+s+'</div>';
+      h += '<div style="font-size:12px;">'+st+'</div>';
+      h += '</div>';
+    });
+    h += '</div><div style="font-size:10px;color:var(--gold);margin-top:4px;">'+rg.issue+'</div></div>';
+
+    // 3) 其它任务汇总表
+    h += '<table style="width:100%;border-collapse:collapse;font-size:11px;"><thead><tr style="background:var(--card2);">';
+    h += '<th style="padding:5px 8px;border:1px solid var(--border);text-align:left;">任务</th>';
+    h += '<th style="padding:5px 8px;border:1px solid var(--border);text-align:left;">负责</th>';
+    h += '<th style="padding:5px 8px;border:1px solid var(--border);text-align:center;">今日</th>';
+    h += '<th style="padding:5px 8px;border:1px solid var(--border);text-align:left;">最近实际</th>';
+    h += '</tr></thead><tbody>';
+    S.tasks.filter(function(t){return t.id!=='cn_fetch' && t.id!=='risk_gauge';}).forEach(function(t){
+      const todayOk = t.today.filter(function(x){return x==='✅';}).length;
+      const todayMiss = t.today.filter(function(x){return x==='❌';}).length;
+      const todayPending = t.today.filter(function(x){return x==='⬜';}).length;
+      const badge = todayMiss>0 ? '<span style="color:var(--up);">❌ '+todayMiss+'</span>' : (todayOk>0 ? '<span style="color:var(--down);">✅ '+todayOk+'</span>' : '<span style="color:var(--dim);">—</span>');
+      const last = t.actual[t.actual.length-1] || '—';
+      h += '<tr><td style="padding:5px 8px;border:1px solid var(--border);">'+t.name+'</td>';
+      h += '<td style="padding:5px 8px;border:1px solid var(--border);color:var(--sub);">'+t.owner+'</td>';
+      h += '<td style="padding:5px 8px;border:1px solid var(--border);text-align:center;">'+badge+'</td>';
+      h += '<td style="padding:5px 8px;border:1px solid var(--border);color:var(--dim);font-size:10px;">'+last+'</td></tr>';
+    });
+    h += '</tbody></table>';
+    body.innerHTML = h;
+
+    // 摘要
+    let issues = S.tasks.filter(function(t){return t.issue;}).map(function(t){return '<li style="margin-bottom:4px;"><b>'+t.name+'</b>：'+t.issue+'</li>';}).join('');
+    sum.innerHTML = '<ul style="padding-left:18px;margin:0;">'+issues+'</ul>';
   }
 
 
@@ -8361,7 +8487,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
   window.opSwitchTab=function(n){
     document.querySelectorAll('.op-tab-btn').forEach(function(b){b.classList.toggle('active', +b.dataset.op===n);});
-    [1,3,4].forEach(function(i){var p=document.getElementById('opTab'+i);if(p)p.classList.toggle('active', i===n);});
+    [1,2,3,4].forEach(function(i){var p=document.getElementById('opTab'+i);if(p)p.classList.toggle('active', i===n);});
+    if(n===2) setTimeout(renderTaskSchedule,60);
     if(n===3) setTimeout(renderUnlisted,60);
     if(n===4) setTimeout(renderDelisted,60);
   };
