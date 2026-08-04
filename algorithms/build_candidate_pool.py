@@ -348,10 +348,6 @@ def _enrich_industry_concepts(pool):
     """
     if not pool:
         return
-    # 云端 runner 数据链路不稳定，跳过行业概念补全以控制耗时
-    if _is_cloud():
-        print("  [行业/概念] 云端 runner 跳过")
-        return
     try:
         import akshare as ak
     except Exception as e:
