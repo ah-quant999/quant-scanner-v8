@@ -1755,7 +1755,7 @@ def f_v8_cal(today=None):
     }
 
 
-def main(category=None):
+def main(category=None, only=None):
     print(f"=== v8 云端抓取开始 {datetime.now().isoformat(timespec='seconds')} "
           f"category={category or 'all'} ===")
 
@@ -1783,6 +1783,10 @@ def main(category=None):
     else:
         print("🎯 全量模式，执行全部 cloud_fetch 模块")
 
+    if only:
+        target_vars = {only}
+        print(f"🎯 --only 模式，仅执行 {only}")
+
     cleaned = 0
 
     # 🔧 盘后（15:30）额外补抓 ETF_DAILY_MONITOR（T+1 日监控收盘后定稿，配合盘中实时卡）
@@ -1791,23 +1795,27 @@ def main(category=None):
     # 🔧 盘前（08:25）额外补抓 MARKET_FUND_FLOW_DATA（日频资金流时间轴，防止 15:30 post_close 漏跑导致滞后一天）
     if category == "premarket" and target_vars is not None:
         target_vars.add("MARKET_FUND_FLOW_DATA")
-    for old in RAW_DIR.glob("*.json"):
-        if category:
-            # 只清理属于当前 category 的文件
-            var_for_file = None
-            for var, fname in VAR_TO_RAW.items():
-                if fname == old.name:
-                    var_for_file = var
-                    break
-            if var_for_file not in target_vars:
-                continue
-        try:
-            old.unlink()
-            cleaned += 1
-        except Exception as e:
-            print(f"  ⚠️  清理旧文件失败 {old.name}: {e}")
-    if cleaned:
-        print(f"  🧹 已清理 {cleaned} 个旧 raw_data/*.json")
+
+    if only:
+        print("  ⏭️ --only 模式，跳过 raw_data 清理（保留其他时段数据）")
+    else:
+        for old in RAW_DIR.glob("*.json"):
+            if category:
+                # 只清理属于当前 category 的文件
+                var_for_file = None
+                for var, fname in VAR_TO_RAW.items():
+                    if fname == old.name:
+                        var_for_file = var
+                        break
+                if var_for_file not in target_vars:
+                    continue
+            try:
+                old.unlink()
+                cleaned += 1
+            except Exception as e:
+                print(f"  ⚠️  清理旧文件失败 {old.name}: {e}")
+        if cleaned:
+            print(f"  🧹 已清理 {cleaned} 个旧 raw_data/*.json")
 
     # 任务列表：顺序影响下游构建，保持原有顺序
     def f_sh_sz_history():
@@ -1917,21 +1925,33 @@ def main(category=None):
             except Exception as ex:
                 print(f"  ⚠️ 盘中补充成交额失败({ex})，沿用日线序列")
 
-        # ---- 涨跌家数（akshare 全市场快照）----
+        # ---- 涨跌家数（push2delay 镜像：上证指数 000001 的 f104/f105/f106 = 全市场涨跌平家数）----
+        # 注：akshare stock_zh_a_spot_em 在本机/云端均被 WAF 拦截（ConnectionError），
+        #     改用东财 ulist 接口（与 f_index_quotes 同源，稳定可连）。
         ds_hist = baseline.get("daily_stats") or []
         if is_today_trade:
             try:
-                spot = ak.stock_zh_a_spot_em()
-                chg = spot["涨跌幅"]
-                up = int((chg > 0).sum())
-                down = int((chg < 0).sum())
-                flat = int((chg == 0).sum())
-                rec = {"date": today_md, "up": up, "down": down, "flat": flat}
-                if ds_hist and ds_hist[-1].get("date") == today_md:
-                    ds_hist[-1] = rec
+                r = _requests.get(
+                    f"{_EM_DELAY}/api/qt/ulist.np/get",
+                    params={"fltt": "2", "invt": "2", "ut": "b2884a393a59ad64002292a3e90d46a5",
+                            "fields": "f12,f14,f104,f105,f106", "secids": "1.000001"},
+                    headers=_EM_HEADERS, timeout=15)
+                j = r.json()
+                row = (j.get("data", {}).get("diff") or [])
+                if row:
+                    row = row[0]
+                    up = int(row.get("f104") or 0)
+                    down = int(row.get("f105") or 0)
+                    flat = int(row.get("f106") or 0)
+                    rec = {"date": today_md, "up": up, "down": down, "flat": flat}
+                    if ds_hist and ds_hist[-1].get("date") == today_md:
+                        ds_hist[-1] = rec
+                    else:
+                        ds_hist.append(rec)
+                    ds_hist = ds_hist[-120:]
+                    print(f"  ✅ 盘中补充今日涨跌家数 {today_md}: 涨{up}/跌{down}/平{flat}")
                 else:
-                    ds_hist.append(rec)
-                ds_hist = ds_hist[-120:]
+                    print(f"  ⚠️ 涨跌家数接口返回空，沿用历史序列")
             except Exception as ex:
                 print(f"  ⚠️ 涨跌家数获取失败({ex})，沿用历史序列")
         else:
@@ -1943,7 +1963,7 @@ def main(category=None):
         return {
             "update_time": now.strftime("%Y-%m-%d %H:%M:%S"),
             "amount_history": amount_history,
-            "up_down": baseline.get("up_down", {}),
+            "up_down": ds_hist,  # 同步为最新涨跌家数序列（与 daily_stats 一致）
             "daily_stats": ds_hist,
             "amount_last_date": amount_last_date,
             "up_down_last_date": up_down_last_date,
@@ -2019,5 +2039,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="v8 cloud fetch")
     parser.add_argument("--category", choices=["premarket", "intraday", "post_close", "all"],
                         help="只抓取某一时段类别；all=全量兜底")
+    parser.add_argument("--only", default=None,
+                        help="只抓取指定变量（如 SH_SZ_HISTORY），跳过 raw_data 清理，不误删其他时段数据")
     args = parser.parse_args()
-    sys.exit(main(category=args.category))
+    sys.exit(main(category=args.category, only=args.only))
