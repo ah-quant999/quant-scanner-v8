@@ -7,6 +7,39 @@ from datetime import datetime
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "out")
 OUTPUT = os.path.join(DATA_DIR, "stock_names.json")
 
+# 本地拼音首字母映射（由月度维护脚本生成，避免 runner 安装 pypinyin）
+PINYIN_FILE = os.path.join(os.path.dirname(__file__), "stock_pinyin.json")
+
+def _load_pinyin_map():
+    """加载 code -> py 映射；缺失则返回空 dict，让后续 fallback。"""
+    try:
+        with open(PINYIN_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def _fallback_py(name):
+    """无映射时的轻量 fallback：仅保留 A-Z/a-z 字母作为首字母，
+    对纯中文名返回空字符串（避免乱猜）。"""
+    if not name:
+        return ""
+    letters = []
+    for ch in name:
+        if "a" <= ch.lower() <= "z":
+            letters.append(ch.lower())
+    return "".join(letters)
+
+
+def _attach_py(stocks):
+    """给股票列表附加 py 字段。"""
+    py_map = _load_pinyin_map()
+    for s in stocks:
+        code = str(s.get("code", "")).strip()
+        name = s.get("name", "")
+        s["py"] = py_map.get(code) or _fallback_py(name)
+    return stocks
+
 def _fetch_a_share_via_eastmoney():
     """东方财富全量 A 股代码→名称（akshare stock_zh_a_spot_em 经常超时丢数据时的兜底）"""
     import requests
@@ -130,6 +163,8 @@ def main():
     if len(all_stocks) < 4000:
         print(f"  ⚠️ 总数 {len(all_stocks)} 不足（预期>4000），保留旧文件")
         return
+
+    _attach_py(all_stocks)
 
     with open(OUTPUT, "w", encoding="utf-8") as f:
         json.dump(all_stocks, f, ensure_ascii=False, indent=0)

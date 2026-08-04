@@ -4291,15 +4291,46 @@ function switchSec(sec,el){
     return best;
   }
 
+  function getStockMeta(item){
+    const code = normCode(item.code);
+    let board='', industry='', concepts=[];
+    // 优先从 CANDIDATE 取（最全）
+    const cand = window.CANDIDATE || {};
+    const cstocks = cand.stocks || {};
+    for(const k of [fullKey(item), (item.market||'')+'_'+item.code, item.code]){
+      if(k && cstocks[k]){ const v=cstocks[k]; board=v.board_label||v.board||board; industry=v.industry||industry; concepts=v.concepts||concepts; break; }
+    }
+    // 次选 GOLD_POOL
+    if(!industry && !concepts.length){
+      const gp = window.GOLD_POOL || {};
+      const gstocks = gp.stocks || {};
+      for(const k of [fullKey(item), (item.market||'')+'_'+item.code, item.code]){
+        if(k && gstocks[k]){ const v=gstocks[k]; board=v.board_label||v.board||board; industry=v.industry||industry; concepts=v.concepts||concepts; break; }
+      }
+    }
+    return {board, industry, concepts};
+  }
+
   window.showV8QueryDropdown = function(val){
     const dd = _q$('v8QueryDropdown');
     if(!val.trim()){ dd.style.display='none'; dd.innerHTML=''; return; }
     const hits = findStocks(val, 8);
     if(!hits.length){ dd.innerHTML='<div style="padding:12px 15px;color:var(--dim);font-size:13px;text-align:center;">未找到匹配的股票/指数/ETF</div>'; dd.style.display='block'; return; }
     dd.innerHTML = hits.map(s=>{
+      const meta = getStockMeta(s);
+      const tags = [];
+      if(meta.board) tags.push('<span style="font-size:10px;background:rgba(56,189,248,.15);color:var(--cyan);padding:1px 5px;border-radius:3px;">'+meta.board+'</span>');
+      if(meta.industry) tags.push('<span style="font-size:10px;background:rgba(129,140,248,.15);color:var(--purple);padding:1px 5px;border-radius:3px;">'+meta.industry+'</span>');
+      const pyBadge = s.py ? '<span style="font-size:10px;color:var(--dim);font-family:monospace;">'+s.py+'</span>' : '';
       return '<div style="display:flex;align-items:center;gap:8px;padding:9px 15px;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--border);" onmouseover="this.style.background=\'var(--bg2)\'" onmouseout="this.style.background=\'\'" onclick="selectV8QueryStock(\''+s.code+'\')">'+
-        '<span style="font-size:14px;color:var(--txt);font-weight:600;">'+s.name+'</span>'+
-        '<span style="font-size:12px;color:var(--dim);font-family:monospace;margin-left:auto;">'+(s.full_code||s.code)+'</span></div>';
+        '<div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">'+
+          '<span style="font-size:14px;color:var(--txt);font-weight:600;white-space:nowrap;">'+s.name+'</span>'+
+          (tags.length?'<div style="display:flex;gap:4px;flex-wrap:nowrap;overflow:hidden;">'+tags.join('')+'</div>':'')+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:8px;margin-left:auto;flex-shrink:0;">'+
+          pyBadge+
+          '<span style="font-size:12px;color:var(--dim);font-family:monospace;">'+(s.full_code||s.code)+'</span>'+
+        '</div></div>';
     }).join('');
     dd.style.display='block';
   };
@@ -4498,11 +4529,26 @@ function switchSec(sec,el){
     const code = item.code;
     const full = item.full_code || ((item.market||'')+item.code);
 
+    const meta = getStockMeta(item);
     let h='<div style="padding:14px;background:linear-gradient(135deg,rgba(0,188,212,.12),rgba(56,189,248,.06));border-radius:12px;border:1px solid var(--border);margin-bottom:14px;">';
-    h+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">';
+    h+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px;">';
     h+='<span style="font-size:20px;font-weight:700;color:var(--txt);">'+item.name+'</span>';
     h+='<span style="font-size:12px;color:var(--dim);font-family:monospace;">'+full+'</span>';
-    h+='</div></div>';
+    if(item.py) h+='<span style="font-size:11px;color:var(--cyan);font-family:monospace;background:rgba(56,189,248,.12);padding:2px 6px;border-radius:4px;">'+item.py+'</span>';
+    h+='</div>';
+    // 板块 / 行业 / 概念标签
+    const metaTags=[];
+    if(meta.board) metaTags.push('<span style="font-size:11px;background:rgba(56,189,248,.15);color:var(--cyan);padding:2px 8px;border-radius:4px;">'+meta.board+'</span>');
+    if(meta.industry) metaTags.push('<span style="font-size:11px;background:rgba(129,140,248,.15);color:var(--purple);padding:2px 8px;border-radius:4px;">'+meta.industry+'</span>');
+    if(meta.concepts && meta.concepts.length){
+      meta.concepts.slice(0,8).forEach(c=>{
+        metaTags.push('<span style="font-size:11px;background:rgba(255,213,79,.12);color:var(--gold);padding:2px 8px;border-radius:4px;">'+c+'</span>');
+      });
+    }
+    if(metaTags.length){
+      h+='<div style="display:flex;gap:6px;flex-wrap:wrap;">'+metaTags.join('')+'</div>';
+    }
+    h+='</div>';
 
     h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:14px;">';
     h+=renderMulti(item, code);

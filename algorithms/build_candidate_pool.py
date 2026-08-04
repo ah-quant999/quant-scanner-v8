@@ -340,6 +340,62 @@ def _hk_spot():
 
 
 # ---------- 工具 ----------
+def _enrich_industry_concepts(pool):
+    """为候选股池补充 industry / concepts / board 字段。
+
+    使用 akshare.stock_individual_info_em 单股查询，港股/北交所未覆盖。
+    失败不阻断主流程，仅打印日志。
+    """
+    if not pool:
+        return
+    # 云端 runner 数据链路不稳定，跳过行业概念补全以控制耗时
+    if _is_cloud():
+        print("  [行业/概念] 云端 runner 跳过")
+        return
+    try:
+        import akshare as ak
+    except Exception as e:
+        print(f"  [行业/概念] akshare 不可用，跳过: {e}")
+        return
+
+    ok = 0
+    fail = 0
+    skip = 0
+    for key, st in pool.items():
+        code = str(st.get("code", "")).strip()
+        market = st.get("market", "")
+        # 仅 A 股主板/创业板/科创板；港股/北交所/指数跳过
+        if market not in ("sh", "sz") or not code.isdigit() or len(code) != 6:
+            skip += 1
+            continue
+        try:
+            df = ak.stock_individual_info_em(symbol=code)
+            if df is None or df.empty:
+                fail += 1
+                continue
+            kv = {}
+            for _, row in df.iterrows():
+                item = str(row.get("item", "")).strip()
+                value = str(row.get("value", "")).strip()
+                if item:
+                    kv[item] = value
+            industry = kv.get("所属行业") or kv.get("行业") or ""
+            concepts = kv.get("所属概念") or kv.get("概念") or ""
+            if industry:
+                st["industry"] = industry
+            if concepts:
+                st["concepts"] = [c.strip() for c in concepts.split(",") if c.strip()]
+            # board 字段：细化上市板（主/创/科）
+            if "board" not in st or not st["board"]:
+                st["board"] = st.get("board_label") or _board_of_a(code) or ""
+            ok += 1
+        except Exception as e:
+            fail += 1
+            if fail <= 5:
+                print(f"  [行业/概念] {code} 失败: {e}")
+    print(f"  [行业/概念] 补充完成：成功 {ok}，失败 {fail}，跳过 {skip}")
+
+
 def _board_of_a(code):
     """A股代码 → 上市板（兼容 sh600000 / 600000.SH / 600000 等格式）"""
     c = str(code).strip().upper()
@@ -526,6 +582,9 @@ def build():
         print(f"  [maharo] 研报个股 {n} 只已并入")
     except Exception as e:
         print(f"  [maharo] 读取失败: {e}")
+
+    # 补充行业 / 概念 / 板块元数据（用于个股查询展示）
+    _enrich_industry_concepts(pool)
 
     # 汇总来源分布
     from collections import Counter
