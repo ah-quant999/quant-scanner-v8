@@ -1431,8 +1431,6 @@ window.V8_CAL = {weeks:[],legend:[]};
 
           }
 
-          h+='<p style="margin:6px 0;font-size:11px;color:var(--dim)">\u6570\u636e\u6765\u6e90\uff1aMACRO_DATA \u00b7 \u6bcf\u65e5\u81ea\u52a8\u66f4\u65b0</p>';
-
           h+='</div>';
 
         }
@@ -5871,7 +5869,7 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     h += '<strong style="color:var(--gold)">说明：</strong><br>';
 
-    h += '1. 本页统计龙虎榜中「深股通/沪股通专用 + 瑞银/高盛/摩根等外资券商」席位净买卖动向（数据来自沪深交易所龙虎榜北向席位明细）。<br>';
+    h += '1. 本页统计龙虎榜中「深股通/沪股通专用 + 瑞银/高盛/摩根等外资券商」席位净买卖动向。<br>';
 
     h += '2. 口径：仅覆盖当日上龙虎榜的个股，精确但非全市场北向资金流。每日盘后更新。';
 
@@ -6987,6 +6985,42 @@ window.V8_CAL = {weeks:[],legend:[]};
 
       .lg-pane .card{margin-bottom:16px}
 
+      /* 数据来源汇总 */
+
+      .src-page{margin-bottom:18px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+
+      .src-page-head{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--card2);font-weight:700;font-size:13px;color:var(--txt)}
+
+      .src-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;padding:12px}
+
+      .src-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+
+      .src-card h4{font-size:12px;font-weight:700;color:var(--txt);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+
+      .src-card .src-meta{font-size:11px;color:var(--sub);line-height:1.5}
+
+      .src-card .src-note{font-size:11px;color:var(--dim);margin-top:4px}
+
+      .src-pill{display:inline-block;padding:1px 6px;border-radius:4px;background:var(--card);border:1px solid var(--border);font-size:10px;color:var(--dim);margin-left:4px}
+
+      /* 全站精选重叠度紧凑胶囊 */
+
+      .ov-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}
+
+      .ov-col{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px}
+
+      .ov-col h5{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+
+      .ov-col .ov-count{font-size:11px;color:var(--dim);margin-bottom:8px}
+
+      .ov-pills{display:flex;flex-wrap:wrap;gap:5px}
+
+      .ov-pill{display:inline-block;padding:3px 8px;border-radius:999px;background:rgba(56,189,248,.10);border:1px solid rgba(56,189,248,.35);color:var(--txt);font-size:11px;font-weight:600;white-space:nowrap}
+
+      .ov-empty{font-size:11px;color:var(--dim)}
+
+      @media(max-width:900px){.ov-grid{grid-template-columns:1fr}.src-grid{grid-template-columns:1fr}}
+
       /* 系统告警 */
 
       #opsAlertCard details summary{list-style:none}
@@ -7025,111 +7059,71 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     <div id="opTab1" class="op-tab-pane active">
 
-    <!-- ⚠️ 系统告警（动态扫描） -->
+    <!-- ═══════════════ 📡 动态监控区（实时扫描/自动渲染） ═══════════════ -->
 
+    <div style="text-align:center;margin:14px 0 10px;padding:6px 0;border-bottom:2px solid var(--purple);font-size:12px;font-weight:700;color:var(--purple);letter-spacing:2px">📡 动态监控区 · 切到本页时自动扫描</div>
+
+    <!-- ⚠️ 系统告警（动态） -->
     <div class="card" style="margin-bottom:16px;border-left:3px solid var(--purple)" id="opsAlertCard">
-
-      <h3><span class="ic">⚠️</span>系统告警 <small style="font-weight:400;color:var(--sub);font-size:11px" id="alertScanTime">扫描中...</small></h3>
-
+      <h3><span class="ic">⚠️</span>系统告警 <small style="font-weight:400;color:var(--sub);font-size:11px" id="alertScanTime">扫描中...</small> <span class="fresh" style="font-size:10px">[动态]</span></h3>
       <div id="opsAlertBody"><span style="color:var(--dim);font-size:12px">正在加载数据时间戳...</span></div>
-
     </div>
 
+    <!-- 🤖 Runner 追踪（动态） -->
+    <div class="card" style="margin-bottom:16px;border-left:3px solid var(--teal)">
+      <h3><span class="ic">🤖</span>Runner 追踪 <span class="fresh" style="font-size:10px">[动态]</span></h3>
+      <div id="runnerTrackBody"><div style="font-size:12px;color:var(--dim)">等待 runner 状态数据…</div></div>
+    </div>
+
+    <!-- 🩺 前端健康巡检（动态） -->
+    <div class="card" style="margin-bottom:16px;border-left:3px solid var(--purple)">
+      <h3><span class="ic">🩺</span>前端健康巡检 <span class="fresh" id="healthCheckTime">更新于 --</span> <span class="fresh" style="font-size:10px">[动态]</span></h3>
+      <div id="healthCheckSummary" style="margin-bottom:12px;font-size:13px;font-weight:700">加载中…</div>
+      <div id="healthCheckBody" style="font-size:12px;color:var(--sub)">加载中…</div>
+    </div>
+
+    <!-- ═══════════════ 📋 静态配置区（部署时写入/手动维护） ═══════════════ -->
+
+    <div style="text-align:center;margin:18px 0 10px;padding:6px 0;border-bottom:2px solid var(--border);font-size:12px;font-weight:700;color:var(--dim);letter-spacing:2px">📋 静态配置区 · 部署时写入</div>
+
     <div class="grid g-2" style="margin-bottom:16px">
-
       <div class="card">
-
-        <h3><span class="ic">🚀</span>部署状态 - 运维</h3>
-
+        <h3><span class="ic">🚀</span>部署状态 <span class="fresh" style="font-size:10px;color:var(--dim)">[静态]</span></h3>
         <div class="kv"><span class="k">站点</span><b>ah-quant999.github.io/quant-scanner-v8</b></div>
-
-        <div class="kv"><span class="k">部署 SHA</span><b>018c870</b></div>
-
-        <div class="kv"><span class="k">最后部署</span><b>2026-08-03 08:51</b></div>
-
+        <div class="kv"><span class="k">部署 SHA</span><b id="opsDeploySha">--</b></div>
+        <div class="kv"><span class="k">最后部署</span><b id="opsDeployTime">--</b></div>
         <div class="kv"><span class="k">触发方式</span><b>cn_fetch 成功后 workflow_run 自动触发</b></div>
-
-        <div class="kv"><span class="k">心跳</span><span><span class="status-dot s-ok"></span>正常（本机每小时巡查）</span></div>
-
+        <div class="kv"><span class="k">心跳</span><span><span class="status-dot s-ok"></span>正常（每小时巡查）</span></div>
       </div>
-
       <div class="card">
-
-        <h3><span class="ic">🤖</span>双机状态 / 定时任务跟踪 - 运维</h3>
-
-        <div class="kv"><span class="k">中国抓取节点（self-hosted）</span><span><span class="status-dot s-ok"></span>在线 · GitHub Actions 自动调度（单位机·非手动）</span></div>
-
-        <div class="kv"><span class="k">阿狸咪（家中机）</span><span><span class="status-dot s-off"></span>已关机 · 不接手</span></div>
-
-        <div class="kv"><span class="k">中国节点 runner</span><span><span class="status-dot s-ok"></span>lemoncat-cn（self-hosted）在线 · 自动调度</span></div>
-
+        <h3><span class="ic">🖥️</span>双机状态 <span class="fresh" style="font-size:10px;color:var(--dim)">[静态]</span></h3>
+        <div class="kv"><span class="k">执行节点（self-hosted）</span><span><span class="status-dot s-ok"></span>lemoncat-cn 在线 · GitHub Actions 调度</span></div>
+        <div class="kv"><span class="k">阿狸咪（家中机）</span><span><span class="status-dot s-off"></span>已关机 · 仅 detect+dispatch</span></div>
         <div class="kv"><span class="k">failover 守卫</span><span><span class="status-dot s-ok"></span>活跃</span></div>
-
-        <div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--border)" id="runnerTrackBody">
-
-          <div style="font-size:12px;color:var(--dim)">等待 runner 状态数据…</div>
-
-        </div>
-
       </div>
-
     </div>
 
     <div class="card" style="margin-bottom:16px">
-
-      <h3><span class="ic">⚙️</span>自动化任务 - 运维</h3>
-
-      <table><thead><tr><th>任务</th><th>周期</th><th>状态</th><th>说明</th></tr></thead>
-
-      <tbody>
-
+      <h3><span class="ic">⚙️</span>自动化任务 <span class="fresh" style="font-size:10px;color:var(--dim)">[静态]</span></h3>
+      <table><thead><tr><th>任务</th><th>周期</th><th>状态</th><th>说明</th></tr></thead><tbody>
         <tr><td>v8 云端中国数据抓取</td><td>cron</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>push raw_data → 自动触发 build_deploy</td></tr>
-
         <tr><td>v8 云端安全网</td><td>每30分</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>raw_data stale 时兜底 dispatch</td></tr>
-
         <tr><td>v8 云端盘后算法链</td><td>post_close</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>收盘后算法数据生产</td></tr>
-
         <tr><td>v8 云端每日备份</td><td>每日21:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>备份 raw_data / data</td></tr>
-
         <tr><td>小九-v8云端管线看门狗</td><td>08-22每小时</td><td><span class="status-dot s-ok"></span>ACTIVE</td><td>只监督、不部署、不抢跑</td></tr>
-
       </tbody></table>
-
     </div>
 
     <div class="card">
-
-      <h3><span class="ic">💾</span>数据新鲜度 - 运维</h3>
-
-      <table><thead><tr><th>文件</th><th>最后更新</th><th>状态</th></tr></thead>
-
-      <tbody>
-
-        <tr><td>盘后扫描</td><td>15:20 今日</td><td><span class="status-dot s-ok"></span>新鲜</td></tr>
-
-        <tr><td>黄金池</td><td>15:20 今日</td><td><span class="status-dot s-ok"></span>新鲜</td></tr>
-
-        <tr><td>概念映射</td><td>09:45 今日</td><td><span class="status-dot s-ok"></span>新鲜</td></tr>
-
+      <h3><span class="ic">💾</span>数据新鲜度 <span class="fresh" style="font-size:10px;color:var(--dim)">[静态]</span></h3>
+      <table><thead><tr><th>文件</th><th>最后更新</th><th>状态</th></tr></thead><tbody>
+        <tr><td>盘后扫描</td><td>--</td><td><span class="status-dot s-warn"></span>待扫描</td></tr>
+        <tr><td>黄金池</td><td>--</td><td><span class="status-dot s-warn"></span>待扫描</td></tr>
+        <tr><td>概念映射</td><td>--</td><td><span class="status-dot s-warn"></span>待扫描</td></tr>
       </tbody></table>
-
     </div>
 
-    <!-- 前端健康巡检（原Tab3，方案A合并入运维） -->
-
-    <div class="card" style="margin-bottom:16px;border-left:3px solid var(--purple)">
-
-      <h3><span class="ic">🩺</span>前端健康巡检 <span class="fresh" id="healthCheckTime">更新于 --</span></h3>
-
-      <div id="healthCheckSummary" style="margin-bottom:12px;font-size:13px;font-weight:700">加载中…</div>
-
-      <div id="healthCheckBody" style="font-size:12px;color:var(--sub)">加载中…</div>
-
-    </div>
-
-    </div>
-
-    <div id="opTab2" class="op-tab-pane">
+    </div>id="opTab2" class="op-tab-pane">
 
       <div class="card" style="margin-bottom:16px;border-left:3px solid var(--cyan)">
 
@@ -7218,6 +7212,8 @@ window.V8_CAL = {weeks:[],legend:[]};
       <div class="lg-tab" data-lg="st" onclick="switchLg('st',this)">🎯 选股策略</div>
 
       <div class="lg-tab" data-lg="op" onclick="switchLg('op',this)">🔒 运维</div>
+
+      <div class="lg-tab" data-lg="src" onclick="switchLg('src',this)">📡 数据来源</div>
 
       <div class="lg-tab" data-lg="v6" onclick="switchLg('v6',this)">📦 v6备忘录</div>
 
@@ -8096,6 +8092,24 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <h3><span class="ic">🛠️</span>运维面板内部模块 - 说明</h3>
 
         <div class="logic-p">· <b>v6精选</b>：选股驾驶舱+全站精选（15个JSON映射到DATA.*）<br>· <b>暂未上架</b>：候选观察池 + V6卡片真实渲染（F窗口/金股池停牌/波动率/精选预判/四路资金/大盘资金流/期指/两融/ETF申赎）<br>· <b>已下架</b>：2026-07-30 起已<b>全面接入真实数据（10张卡）</b>，分别来自 F窗口实时监测(SH_FIB) / 金股池停牌监测(GOLD_POOL) / 波动率结构观测(VOLATILITY) / 精选预判信号(W52_HIGH·LIMIT_UP_HEATMAP·HERDING_DATA) / 四路资金流向对比(CAPITAL_FLOW_DATA) / 上交所大盘资金流时间轴(MARKET_FUND_FLOW_DATA) / 股指期货升贴水(CFFEX_HOLDINGS) / 两融余额走势(MARGIN_DATA) / 宽基ETF净申赎(ETF_SUBSCRIPTION) / 国家队ETF资金流向(ETF_INTRADAY_HEAT)；数据缺失时显示友好提示而非空白。</div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- === 数据来源汇总（逻辑详解页子tab，仅管理员可见） === -->
+
+    <div class="lg-pane" id="lg-src">
+
+      <div class="card">
+
+        <h3><span class="ic">📡</span>前端数据来源汇总</h3>
+
+        <div class="note">按页面 → 卡片顺序排列，仅管理员可见。自动从 V8_PAGE_SCHEDULE 生成，随站点部署同步更新。</div>
+
+        <div id="lgSrcBody"></div>
 
       </div>
 
@@ -13578,7 +13592,19 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
       let h='跟踪池共 <b>'+o.total_tracked+'</b> 只。';
 
-      [['TOP10≥70',o.top10_ge70],['驾驶舱A档',o.cockpit_a],['驾驶舱B档',o.cockpit_b]].forEach(pair=>{const key=pair[0],obj=pair[1];h+='<div style="margin-top:8px"><b>'+key+'</b>（全站 '+obj.count+' 只，重叠 <span style="color:var(--down)">'+obj.overlap+'</span> 只）：'+(obj.names&&obj.names.length?obj.names.map(n=>'<span class="tp-pill">'+n+'</span>').join(''):'<span class="tp-empty" style="display:inline">无重叠</span>')+'</div>';});
+      h+='<div class="ov-grid">';
+
+      [['TOP10≥70',o.top10_ge70],['驾驶舱A档',o.cockpit_a],['驾驶舱B档',o.cockpit_b]].forEach(function(pair){
+
+        var key=pair[0], obj=pair[1];
+
+        var pills=(obj.names&&obj.names.length)?obj.names.map(function(n){return '<span class="ov-pill">'+n+'</span>';}).join(''):'<span class="ov-empty">无重叠</span>';
+
+        h+='<div class="ov-col"><h5>'+key+'</h5><div class="ov-count">全站 '+obj.count+' 只 · 重叠 <span style="color:var(--down)">'+obj.overlap+'</span> 只</div><div class="ov-pills">'+pills+'</div></div>';
+
+      });
+
+      h+='</div>';
 
       $('ttOverlap').innerHTML=h;
 
@@ -17665,6 +17691,56 @@ function switchLg(id,el){
   if(pane) pane.classList.add('active');
 
   if(el) el.classList.add('active');
+
+  if(id==='src') setTimeout(renderDataSources,30);
+
+}
+
+/* ===== 数据来源汇总渲染（仅管理员逻辑详解页） ===== */
+
+function renderDataSources(){
+
+  var el=document.getElementById('lgSrcBody'); if(!el) return;
+
+  var schedule=window.V8_PAGE_SCHEDULE;
+
+  if(!schedule || !schedule.pages){
+
+    el.innerHTML='<div class="note">暂无数据源配置（V8_PAGE_SCHEDULE 未加载）。</div>';
+
+    return;
+
+  }
+
+  var html='';
+
+  schedule.pages.forEach(function(pg){
+
+    html+='<div class="src-page">';
+
+    html+='<div class="src-page-head"><span>'+pg.icon+'</span><span>'+pg.name+'</span><span class="src-pill">'+pg.cards.length+' 个卡片</span></div>';
+
+    html+='<div class="src-grid">';
+
+    pg.cards.forEach(function(c){
+
+      html+='<div class="src-card">';
+
+      html+='<h4>'+c.name+'<span class="src-pill">'+c.source+'</span></h4>';
+
+      html+='<div class="src-meta">频率：'+c.freq+' · 时段：'+(c.slots&&c.slots.length?c.slots.slice(0,4).join(' / ')+(c.slots.length>4?' …':'):'—')+'</div>';
+
+      if(c.note) html+='<div class="src-note">'+c.note+'</div>';
+
+      html+='</div>';
+
+    });
+
+    html+='</div></div>';
+
+  });
+
+  el.innerHTML=html;
 
 }
 
