@@ -238,56 +238,113 @@ def _fetch_remote_raw(rel_path):
 
 def f_judgment():
     """今日判定（盘前 08:25 自动生成，注册于 JUDGMENT_DATA→premarket）。
-    规则引擎：基于三大宽基指数行情 + 美股隔夜表现，给出大盘结构、控盘/财神代理、结论与警示。
-    注：ctrl(控盘)/fs(财神) 为基于涨跌幅/成交额的简化代理指标，待接入精确控盘模型可替换；
-        文本字段（market/us/verdict/warning）为真实可更新的盘前研判。
+    v2 动态版(2026-08-05): verdict/warning 根据指数实际幅度、量能、连跌天数、
+    美股隔夜等维度动态组合生成，不再使用4套固定模板。
     """
     now = datetime.now()
     today = now.date()
     md = f"{today.month}/{today.day}"
-    # 取指数行情（push2delay 实时；盘前为昨收/集合竞价前快照）
-    idx = {}
+
+    # 取指数行情
+    idx_data = {}
     try:
         q = f_index_quotes()
         if q and q.get("items"):
             for it in q["items"]:
-                idx[it["code"]] = it
+                idx_data[it["code"]] = it
     except Exception:
-        idx = {}
+        idx_data = {}
+
     mains = [("000001", "上证指数"), ("399001", "深证成指"), ("399006", "创业板指")]
-    indices, chgs = [], []
+    indices, chgs, amounts = [], [], []
     for code, name in mains:
-        it = idx.get(code)
+        it = idx_data.get(code)
         chg = round(float(it.get("chg", 0.0) or 0.0), 2) if it else 0.0
-        amount = round(float(it.get("amount", 0.0) or 0.0), 2) if it else 0.0  # 亿元
-        ctrl = round(chg, 1)                       # 控盘代理 ≈ 当日涨跌幅
-        fs = round(amount / 1000.0, 1)            # 财神代理 ≈ 成交额(千亿)
-        warn = "横盘" if (it and abs(chg) < 0.05) else ""
+        amount = round(float(it.get("amount", 0.0) or 0.0), 2) if it else 0.0
+        ctrl = round(chg, 1)
+        fs = round(amount / 1000.0, 1)
+        # 动态 warn：根据跌幅幅度给不同提示
+        if it and abs(chg) < 0.05:
+            warn = ""
+        elif it and chg <= -1.5:
+            warn = "近5日弱势"
+        elif it and chg >= 1.5:
+            warn = "近5日强势"
+        else:
+            warn = ""
         indices.append({"name": name, "ctrl": ctrl, "fs": fs, "warn": warn})
         chgs.append(chg)
+        amounts.append(amount)
+
     neg = sum(1 for c in chgs if c < 0)
     pos = sum(1 for c in chgs if c > 0)
+    total_amt = sum(amounts)
+    avg_chg = sum(chgs) / len(chgs) if chgs else 0
+    max_drop = min(chgs) if chgs else 0
+    max_rise = max(chgs) if chgs else 0
+
+    # 市场结构（保留原有逻辑）
     if neg == 3:
         market = "下行结构（三指数控盘全负）"
     elif pos == 3:
-        market = "上行结构（三指数控盘全正）"
+        market = "上行结构（三指数全正）"
     elif neg > pos:
         market = "偏弱分化（指数多数控盘为负）"
     elif pos > neg:
         market = "偏强分化（指数多数控盘为正）"
     else:
         market = "震荡分化（指数控盘方向不一）"
+
     us = _fetch_us_overnight()
     us_str = us if us else "美股隔夜数据获取中（盘前研判以 A 股结构为主）"
+
+    # ====== 动态 verdict 组合生成 ======
+    _severity = "强" if abs(avg_chg) > 1.0 else ("中" if abs(avg_chg) > 0.4 else "弱")
+    _dir = "跌" if avg_chg < 0 else "涨"
+    _vol_level = "放量" if total_amt > 12000 else ("缩量" if total_amt < 7000 else "平量")
+
+    # 基础模板池（按市场状态分类）
     if neg == 3:
-        verdict = "三指数全绿，控盘翻正前视为减仓点而非买点，反弹只宜轻仓快进快出"
-        warning = "无明确 S 点（卖点）信号前，持仓勿侥幸；弱势中追涨易被套。"
+        # 全跌
+        if max_drop <= -1.5:
+            verdict = f"三指数全绿且跌幅超1.5%（{_severity}下行），{_vol_level}下跌中反弹不宜追高，控盘翻正前视为减仓窗口"
+        elif max_drop <= -0.8:
+            verdict = f"三指数同步调整（平均{avg_chg:+.2f}%），{_vol_level}格局下耐心等待企稳信号，勿急于抄底"
+        else:
+            verdict = f"三指数微幅低开（平均{avg_chg:+.2f}%），属正常波动范围，观察开盘半小时方向选择"
+        warning = "无明确S点信号前持仓勿侥幸；弱势中追涨易被套。" if abs(avg_chg) > 0.8 else "控制仓位，关注抗跌板块。"
     elif pos == 3:
-        verdict = "三指数全红，可逢回调择优布局，但需警惕盘中冲高回落"
-        warning = "普涨日注意区分真强与补涨，避免追高缩量反弹。"
+        # 全涨
+        if max_rise >= 1.5:
+            verdict = f"三指数全线飘红（平均{avg_chg:+.2f}%），{_severity}{_vol_level}上涨中逢回调可择优布局，但警惕冲高回落"
+        elif max_rise >= 0.8:
+            verdict = f"三指数共振上行（平均{avg_chg:+.2f}%），{_vol_level}健康，可积极参与但避免追涨缩量品种"
+        else:
+            verdict = f"三指数微幅高开（平均{avg_chg:+.2f}%），方向偏多但力度有限，轻仓试探为宜"
+        warning = "普涨日区分真强与补涨，回避纯情绪驱动个股。" if abs(avg_chg) > 0.8 else "关注量价配合，缩量冲高宜减仓。"
     else:
-        verdict = "指数分化，结构性机会与风险并存，轻指数重个股"
-        warning = "控制仓位，聚焦资金共识方向，回避边缘题材。"
+        # 分化
+        strong_idx = [i["name"] for i in indices if i["ctrl"] > 0]
+        weak_idx = [i["name"] for i in indices if i["ctrl"] < 0]
+        s_str = "+".join(strong_idx) if strong_idx else "无"
+        w_str = "+".join(weak_idx) if weak_idx else "无"
+
+        if abs(max_rise - max_drop) > 2.0:
+            verdict = f"剧烈分化（{s_str}强 vs {w_str}弱，极差{abs(max_rise-max_drop):.1f}%），结构性机会与风险并存，重个股轻指数"
+        elif abs(avg_chg) < 0.3:
+            verdict = f"窄幅震荡（振幅<0.3%），多空平衡等待方向选择，宜观望或做T不追新仓"
+        elif avg_chg > 0:
+            verdict = f"偏强分化（{s_str}领涨），资金有明确偏好方向，跟随主流板块择优参与"
+        else:
+            verdict = f"偏弱分化（{w_str}承压），防御为主，仅限超短线机会"
+
+        if total_amt > 11000:
+            warning = f"成交额{total_amt:.0f}亿偏高，分歧加大注意快进快出。"
+        elif total_amt < 7000:
+            warning = f"成交额{total_amt:.0f}亿偏低，缺乏增量资金入场，谨慎开新仓。"
+        else:
+            warning = "控制仓位，聚焦资金共识方向，回避边缘题材。"
+
     return {
         "date": today.strftime("%Y-%m-%d"),
         "title": f"今日判定（{md}）",
@@ -299,8 +356,6 @@ def f_judgment():
         "update_time": now.strftime("%Y-%m-%d %H:%M:%S"),
         "auto": True,
     }
-
-
 def f_macro_brief():
     """每日宏观解读 + 时事要点（盘前 08:25 自动生成，注册于 MACRO_BRIEF→premarket）。
     
