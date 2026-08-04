@@ -655,64 +655,11 @@ window.V8_CAL = {weeks:[],legend:[]};
       </div>
     </div>
 
-<!-- 实时风险温度计 -->
-    <div class="card" id="riskGaugeCard" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
-      <h3><span class="ic">🌡️</span>实时风险温度计 <span class="fresh" id="riskGaugeTime">更新于 --</span></h3>
+    <!-- 实时风险联动温度计 -->
+    <div class="card" id="riskGaugeCard" style="margin-bottom:12px;border-left:4px solid #f59e0b;">
+      <h3><span class="ic">🌡️</span>实时风险联动温度计 <span class="fresh" id="riskGaugeTime">更新于 --</span></h3>
       <div id="riskGaugeBody">
         <div class="ipo-empty">加载中…</div>
-      </div>
-    </div>
-    <!-- 极端风险联动策略 · 盘后决策框架（与实时风险温度计上下挨着） -->
-    <div class="card" id="riskLinkageCard" style="margin-bottom:16px;border-left:4px solid #ef4444;">
-      <div class="risk-linkage-section" style="margin-top:0;padding-top:0;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <span style="font-size:16px;">🚨</span>
-          <span style="font-size:14px;font-weight:700;color:var(--txt);">极端风险联动策略 · 盘后决策框架</span>
-          <span class="fresh" id="riskLinkageTime">更新于 2026-08-03 09:54</span>
-        </div>
-
-        <div class="risk-status-bar" style="display:flex;align-items:center;gap:12px;margin:10px 0 14px;padding:12px 14px;border-radius:10px;background:rgba(245,158,11,.12);">
-          <span style="font-size:13px;color:var(--sub);">当前系统状态：</span>
-          <span class="status-dot" style="width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;"></span>
-          <span style="font-weight:700;color:#22c55e;">观察</span>
-          <span style="font-size:12px;color:var(--dim);margin-left:auto;">基于 8/3 美日联合干预日元事件 · 干预有效区 156–158</span>
-        </div>
-
-        <div class="logic-p" style="margin-bottom:12px;">
-          <b>用途</b>：当外围风险（日元急升 / 套利 unwind / 美债波动）升级时，联动现有选股策略给出仓位与方向调整框架，不是每日交易指令，是<strong>极端情形预案</strong>。
-        </div>
-
-        <div class="grid g-2" style="margin-bottom:12px;">
-          <div class="card" style="margin-bottom:0;background:rgba(255,255,255,.03);">
-            <h4 style="font-size:13px;margin:0 0 8px;color:var(--txt);">🎯 高风险触发矩阵（任一亮红灯即进入警惕）</h4>
-            <table class="risk-table" style="width:100%;border-collapse:collapse;font-size:12px;">
-              <thead><tr style="background:rgba(245,158,11,.15);"><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">指标</th><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">阈值</th><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">当前</th><th style="text-align:left;padding:6px 8px;border:1px solid var(--border);">状态</th></tr></thead>
-              <tbody>
-                <tr><td style="padding:6px 8px;border:1px solid var(--border);">USDJPY</td><td style="padding:6px 8px;border:1px solid var(--border);">&lt; 155 或 &gt; 163</td><td style="padding:6px 8px;border:1px solid var(--border);">~157.6</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 有效</td></tr>
-                <tr><td style="padding:6px 8px;border:1px solid var(--border);">VIX</td><td style="padding:6px 8px;border:1px solid var(--border);">&gt; 25 + 美股科技破位</td><td style="padding:6px 8px;border:1px solid var(--border);">--</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 正常</td></tr>
-                <tr><td style="padding:6px 8px;border:1px solid var(--border);">北向资金</td><td style="padding:6px 8px;border:1px solid var(--border);">连续大额净流出 + 人民币急贬</td><td style="padding:6px 8px;border:1px solid var(--border);">--</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 待观察</td></tr>
-                <tr><td style="padding:6px 8px;border:1px solid var(--border);">10Y 美债收益率</td><td style="padding:6px 8px;border:1px solid var(--border);">&gt; 4.5%</td><td style="padding:6px 8px;border:1px solid var(--border);">--</td><td style="padding:6px 8px;border:1px solid var(--border);color:#22c55e;">🟢 正常</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="card" style="margin-bottom:0;background:rgba(255,255,255,.03);">
-            <h4 style="font-size:13px;margin:0 0 8px;color:var(--txt);">⚡ 联动动作（与选股策略对齐）</h4>
-            <ul style="margin:0;padding-left:18px;font-size:12px;line-height:1.8;color:var(--sub);">
-              <li><b>观察级（现在）</b>：三重共识正常执行，主站TOP10≥70、驾驶舱A档、基本面A档标准不变。</li>
-              <li><b>警惕级（1红灯）</b>：选股池加<strong>北向持股&lt;3%</strong>、<strong>海外收入&lt;20%</strong>过滤；降低成长板块权重。</li>
-              <li><b>减仓级（2红灯）</b>：整体仓位降 20–40%；优先减<strong>高估值科技 / 出口链 / 外资重仓</strong>；增配黄金、公用事业、高股息。</li>
-              <li><b>清仓级（3+红灯或系统性踩踏）</b>：权益仓位压至 20% 以下或空仓；只保留现金/国债/黄金ETF。</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="logic-p" style="margin-bottom:10px;background:rgba(34,197,94,.08);padding:10px 12px;border-radius:8px;">
-          <b>今日判定（8/3）</b>：USDJPY 从 164 回落至 157.6，干预有效，未触发任何红灯。A 股主驱动仍在国内政策/基本面，<strong>不构成清仓理由</strong>。继续观察北向、人民币汇率、晚间美股开盘情绪。
-        </div>
-
-        <div style="font-size:11px;color:var(--dim);line-height:1.6;border-top:1px solid var(--border);padding-top:10px;">
-          本卡为分析框架，非投资建议。详细逻辑见 <a href="宏观解读_美日干预日元_2026-08-03.md" target="_blank" style="color:#60a5fa;">宏观解读_美日干预日元_2026-08-03.md</a>。
-        </div>
       </div>
     </div>
 
@@ -6094,7 +6041,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     setTime('phMacroTime',m.update_time);
   }
 
-  /* ---- 实时风险温度计 ---- */
+  /* ---- 实时风险联动温度计（紧凑版） ---- */
   function renderRiskGauge(){
     const D = window.RISK_GAUGE || {};
     const indicators = D.indicators || [];
@@ -6105,38 +6052,74 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       return;
     }
 
-    const colorMap = {
-      green:  '#22c55e',
-      yellow: '#f59e0b',
-      red:    '#ef4444',
-      gray:   '#6b7280'
-    };
+    const colorMap = {green:'#22c55e', yellow:'#f59e0b', red:'#ef4444', gray:'#6b7280'};
     const overall = D.overall || 'gray';
     const overallLabels = {green:'观察', yellow:'警惕', red:'高危', gray:'待更新'};
     const overallColor = colorMap[overall] || colorMap.gray;
+    const redCount = indicators.filter(function(it){ return it.status === 'red'; }).length;
 
-    let h = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:12px 14px;border-radius:10px;background:'+overallColor+'1a;">';
-    h += '<span style="font-size:13px;color:var(--sub);">综合状态：</span>';
-    h += '<span style="width:12px;height:12px;border-radius:50%;background:'+overallColor+';box-shadow:0 0 8px '+overallColor+';"></span>';
+    // 阈值表（策略参数， rarely 变化）
+    const thresholds = {
+      USDJPY:     '< 155 或 > 163',
+      VIX:        '> 25 + 科技破位',
+      US10Y:      '> 4.5%',
+      USDCNH:     '离岸急跌',
+      NORTH_FUND: '连续大额净流出 + 人民币急贬'
+    };
+
+    let h = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:8px 12px;border-radius:8px;background:'+overallColor+'15;">';
+    h += '<span style="width:10px;height:10px;border-radius:50%;background:'+overallColor+';"></span>';
     h += '<span style="font-weight:700;color:'+overallColor+';">'+overallLabels[overall]+'</span>';
-    h += '<span style="font-size:12px;color:var(--dim);margin-left:auto;">任一亮红灯即进入警惕</span>';
+    h += '<span style="font-size:12px;color:var(--dim);">红灯 '+redCount+'/4 · 任一亮红灯即警惕</span>';
     h += '</div>';
 
-    h += '<div class="grid g-5" style="gap:10px;margin-bottom:10px;">';
+    // 指标小卡：5 列变紧凑
+    h += '<div class="grid g-5" style="gap:8px;margin-bottom:10px;">';
     indicators.forEach(function(it){
       const c = colorMap[it.status] || colorMap.gray;
       const valText = it.value != null ? it.value + (it.unit || '') : '--';
-      h += '<div class="card" style="margin-bottom:0;background:rgba(255,255,255,.03);padding:12px;text-align:center;">';
-      h += '<div style="font-size:12px;color:var(--dim);margin-bottom:6px;">'+it.label+'</div>';
-      h += '<div style="font-size:20px;font-weight:700;color:var(--txt);margin-bottom:4px;">'+valText+'</div>';
-      h += '<div style="font-size:12px;color:'+c+';font-weight:600;">'+it.status_text+'</div>';
-      h += '<div style="font-size:11px;color:var(--dim);margin-top:4px;line-height:1.4;">'+it.note+'</div>';
+      const short = it.label.replace('美元兑日元','USDJPY').replace('VIX 恐慌指数','VIX').replace('10Y 美债收益率','10Y美债').replace('美元兑离岸人民币','USDCNH').replace('北向资金','北向');
+      h += '<div class="card" style="margin-bottom:0;background:rgba(255,255,255,.03);padding:8px 4px;text-align:center;">';
+      h += '<div style="font-size:11px;color:var(--dim);margin-bottom:3px;">'+short+'</div>';
+      h += '<div style="font-size:16px;font-weight:700;color:var(--txt);margin-bottom:2px;">'+valText+'</div>';
+      h += '<div style="font-size:11px;color:'+c+';">'+it.status_text+'</div>';
       h += '</div>';
     });
     h += '</div>';
 
-    h += '<div class="logic-p" style="font-size:12px;color:var(--dim);">';
-    h += '<b>联动提示</b>：红灯≥1时，实时风险温度计下方的「极端风险联动策略」自动生效，按级别调整仓位与选股过滤。本温度计仅反映外围宏观压力，不替代 A 股自身信号。';
+    // 阈值矩阵：3 列，无表头更紧凑
+    h += '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:10px;">';
+    h += '<thead><tr style="background:rgba(245,158,11,.12);"><th style="text-align:left;padding:5px 8px;border:1px solid var(--border);color:var(--txt);">指标</th><th style="text-align:left;padding:5px 8px;border:1px solid var(--border);color:var(--txt);">红灯阈值</th><th style="text-align:left;padding:5px 8px;border:1px solid var(--border);color:var(--txt);">当前</th></tr></thead><tbody>';
+    indicators.forEach(function(it){
+      const c = colorMap[it.status] || colorMap.gray;
+      const valText = it.value != null ? it.value + (it.unit || '') : '--';
+      h += '<tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--txt);">'+it.label+'</td>';
+      h += '<td style="padding:5px 8px;border:1px solid var(--border);color:var(--dim);">'+thresholds[it.name]+'</td>';
+      h += '<td style="padding:5px 8px;border:1px solid var(--border);color:'+c+';font-weight:600;">'+valText+' '+it.status_text+'</td></tr>';
+    });
+    h += '</tbody></table>';
+
+    // 联动动作（压缩为 3 行）
+    h += '<div style="font-size:11px;color:var(--sub);line-height:1.7;margin-bottom:8px;">';
+    h += '<b>联动动作</b>：';
+    if(redCount === 0){
+      h += '<span style="color:'+overallColor+'">观察级</span>：三重共识标准不变。';
+    } else if(redCount === 1){
+      h += '<span style="color:#f59e0b">警惕级</span>：加北向&lt;3%、海外收入&lt;20%过滤，降低成长权重。';
+    } else if(redCount === 2){
+      h += '<span style="color:#f97316">减仓级</span>：仓位降20–40%，减高估值科技/出口链/外资重仓，增配黄金公用事业高股息。';
+    } else {
+      h += '<span style="color:#ef4444">清仓级</span>：权益仓位压至20%以下，仅保留现金/国债/黄金ETF。';
+    }
+    h += '</div>';
+
+    // 判定 + 免责声明
+    const verdict = D.verdict || (redCount===0 ? '未触发任何红灯，A股主驱动仍在国内政策/基本面，不构成清仓理由。' : '外围风险指标已亮红灯，按级别执行联动动作。');
+    h += '<div style="font-size:11px;color:var(--dim);line-height:1.6;background:rgba(255,255,255,.03);padding:8px 10px;border-radius:6px;margin-bottom:8px;">';
+    h += '<b>今日判定</b>：' + verdict;
+    h += '</div>';
+    h += '<div style="font-size:10px;color:var(--dim);line-height:1.5;">';
+    h += '本卡为分析框架，非投资建议。详细逻辑见 <a href="宏观解读_美日干预日元_2026-08-03.md" target="_blank" style="color:#60a5fa;">宏观解读_美日干预日元_2026-08-03.md</a>。';
     h += '</div>';
 
     body.innerHTML = h;
