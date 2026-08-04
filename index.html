@@ -533,6 +533,42 @@ window.V8_CAL = {weeks:[],legend:[]};
         <div id="v8TodayAll" style="font-size:13px;color:var(--txt);"></div>
       </div>
 
+      <!-- 今日判定（数据驱动 · premarket 08:25 刷新） -->
+      <div class="card" style="grid-column:1/-1;border-left:4px solid #f59e0b;">
+        <h3><span class="ic">⚖️</span>今日判定 <span id="judgmentTag" style="font-size:11px;font-weight:400;color:var(--dim)">--</span></h3>
+        <div id="judgmentBody" style="font-size:13px;line-height:1.8;color:var(--txt)"></div>
+      </div>
+      <script>
+      (function(){
+        var d = window.JUDGMENT_DATA;
+        var tag = document.getElementById('judgmentTag');
+        var body = document.getElementById('judgmentBody');
+        if(!d || !body){ if(tag) tag.textContent='数据缺失'; return; }
+        if(tag) tag.textContent = (d.date||'') + ' · 盘前研判 · 更新于 ' + (d.update_time||'--');
+        var h = '';
+        h += '<p style="margin:8px 0"><b style="color:var(--sub)">大盘：</b>'+(d.market||'')+'</p>';
+        if(d.indices && d.indices.length){
+          h += '<table style="width:100%;border-collapse:collapse;margin:6px 0;font-size:12px">'
+            + '<thead><tr style="background:rgba(167,139,250,0.12)">'
+            + '<th style="border:1px solid var(--border);padding:6px 8px;text-align:left;color:var(--txt)">指数</th>'
+            + '<th style="border:1px solid var(--border);padding:6px 8px;text-align:left;color:var(--txt)">控盘</th>'
+            + '<th style="border:1px solid var(--border);padding:6px 8px;text-align:left;color:var(--txt)">财神</th>'
+            + '<th style="border:1px solid var(--border);padding:6px 8px;text-align:left;color:var(--txt)">备注</th></tr></thead><tbody>';
+          d.indices.forEach(function(r){
+            h += '<tr><td style="border:1px solid var(--border);padding:6px 8px">'+r.name+'</td>'
+              + '<td style="border:1px solid var(--border);padding:6px 8px;color:var(--down)">'+r.ctrl+'</td>'
+              + '<td style="border:1px solid var(--border);padding:6px 8px;color:var(--down)">'+r.fs+'</td>'
+              + '<td style="border:1px solid var(--border);padding:6px 8px">'+(r.warn?'<span style="color:#f59e0b">⚠️ '+r.warn+'</span>':'')+'</td></tr>';
+          });
+          h += '</tbody></table>';
+        }
+        if(d.us) h += '<p style="margin:8px 0"><b style="color:var(--sub)">美股：</b><span style="color:var(--up)">'+d.us+'</span></p>';
+        if(d.verdict) h += '<p style="margin:8px 0"><b style="color:var(--sub)">→ 结论：</b>'+d.verdict+'</p>';
+        if(d.warning) h += '<p style="margin:8px 0;color:#f59e0b">⚠️ '+d.warning+'</p>';
+        body.innerHTML = h;
+      })();
+      </script>
+
       <!-- 今日宏观解读（静态卡片 · 2026-08-03） -->
       <div class="card" style="grid-column:1/-1">
         <h3><span class="ic">📊</span>今日宏观解读 <span id="macroInterpretTag" style="font-size:11px;font-weight:400;color:var(--dim)">美日联合干预日元 · 对 A 股影响与持仓框架 · 2026-08-03 · 底层数据更新于 --</span></h3>

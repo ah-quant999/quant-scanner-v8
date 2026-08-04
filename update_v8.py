@@ -32,6 +32,7 @@ DATA_SOURCES = {
     "cffex_data.json":             "CFFEX_HOLDINGS",
     "ipo_score.json":              "IPO_DATA",
     "crisis_data.json":            "CRISIS_DATA",
+    "judgment_data.json":          "JUDGMENT_DATA",
     "crds_card_data.json":         "CRDS_CARD_DATA",
     "triple_consensus.json":       "TRIPLE_CONSENSUS",
     "triple_track.json":           "TRIPLE_TRACK",
@@ -87,6 +88,7 @@ CATEGORY_MAP = {
     "MARKET_ALERTS": "premarket",
     "W52_HIGH": "premarket",
     "HERDING_DATA": "premarket",
+    "JUDGMENT_DATA": "premarket",
 
     # 盘后（由 v6 算法 calc_volatility_watch.py 同步桥推送）
     "VOLATILITY": "post_close",
