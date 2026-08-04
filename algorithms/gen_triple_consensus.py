@@ -2,7 +2,8 @@
 """
 gen_triple_consensus.py — 三重共识选股
 共识定义（严格）：同时满足
-  1) 主站 TOP10 精选（generate_top10.py 输出，total_score >= 70）
+  1) 主站 TOP10 精选（generate_top10.py 输出前 10 名，且
+     total_score >= max(max_score * 0.5, 25)，避免评分尺度变化后硬门槛失效）
   2) 驾驶舱 A 档（gen_cockpit_tier_recommend.py 的 tier_a）
   3) 基本面 A 档（fundamental_quality.json 中 grade 为 A）
 
@@ -111,11 +112,17 @@ def main():
     meta_map = load_meta_map()
 
 
-    # 1) TOP10 >=70
+    # 1) 主站 TOP10 精选：排名前 10 + 相对分兜底
+    # 2026-08-05 修正：原 score>=70 在 generate_top10.py 归一化到 0~100 后失效
+    #（昨晚最高分仅 39.2）。改为 rank<=10 且 score>=max(max_score*0.5, 25)，
+    # 既保留“当日相对最强”语义，又避免极端弱市硬塞入票。
+    max_score = top10.get("max_score", 0) or 0
+    top_threshold = max(max_score * 0.5, 25)
     top_map = {}
     for s in top10.get("top10", []):
         score = s.get("total_score", 0) or 0
-        if score >= 70:
+        rank = s.get("rank", 999)
+        if rank <= 10 and score >= top_threshold:
             top_map[normalize_code(s.get("code", ""))] = s
 
     # 2) A 档 / B 档
@@ -151,7 +158,7 @@ def main():
         in_ab = bool(a or b)
         in_fund = code in good_fund
 
-        # 严格三重：TOP10>=70 + A档 + 基本面A档
+        # 严格三重：主站TOP10精选 + A档 + 基本面A档
         if in_top and in_a and in_fund:
             src = top or a
             rec = {
@@ -179,7 +186,7 @@ def main():
             consensus.append(enrich_extra(rec, code, gp_map, meta_map))
             continue
 
-        # near_miss：满足 2/3（TOP10>=70 / 驾驶舱A或B档 / 基本面A档）
+        # near_miss：满足 2/3（主站TOP10精选 / 驾驶舱A或B档 / 基本面A档）
         # 2026-07-27 修正：驾驶舱 B 档同样代表机构/技术质量信号，应计入候补条件，
         # 否则会出现 TOP10≥75 且 tier_b 的个股（如特锐德）被排除在优先观察之外。
         score = sum([in_top, in_ab, in_fund])
@@ -220,7 +227,7 @@ def main():
         "data_time": top10.get("update_time", ""),
         "count": len(consensus),
         "near_miss_count": len(near_miss),
-        "criteria": "主站TOP10≥70 · 驾驶舱A档 · 基本面A档",
+        "criteria": "主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)）· 驾驶舱A档 · 基本面A档",
         "near_miss_criteria": "以上三条满足任意两条（驾驶舱A/B档均计入）",
         "stocks": consensus,
         "near_miss": near_miss,
