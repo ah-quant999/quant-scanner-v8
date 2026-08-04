@@ -1104,31 +1104,25 @@ window.V8_CAL = {weeks:[],legend:[]};
 
         if(d.indices && d.indices.length){
 
-          h += '<table style="width:100%;border-collapse:collapse;margin:6px 0;font-size:12px">'
-
-            + '<thead><tr style="background:rgba(167,139,250,0.12)">'
-
-            + '<th style="border:1px solid var(--border);padding:6px 8px;text-align:left;color:var(--txt)">指数</th>'
-
-            + '<th style="border:1px solid var(--border);padding:6px 8px;text-align:left;color:var(--txt)">控盘</th>'
-
-            + '<th style="border:1px solid var(--border);padding:6px 8px;text-align:left;color:var(--txt)">财神</th>'
-
-            + '<th style="border:1px solid var(--border);padding:6px 8px;text-align:left;color:var(--txt)">备注</th></tr></thead><tbody>';
+          h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0">';
 
           d.indices.forEach(function(r){
 
-            h += '<tr><td style="border:1px solid var(--border);padding:6px 8px">'+r.name+'</td>'
+            h += '<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.22);border-radius:999px;padding:3px 10px;font-size:12px;line-height:1.6">'
 
-              + '<td style="border:1px solid var(--border);padding:6px 8px;color:var(--down)">'+r.ctrl+'</td>'
+              + '<b style="color:var(--txt)">'+r.name+'</b>'
 
-              + '<td style="border:1px solid var(--border);padding:6px 8px;color:var(--down)">'+r.fs+'</td>'
+              + '<span style="color:var(--down)">控'+r.ctrl+'</span>'
 
-              + '<td style="border:1px solid var(--border);padding:6px 8px">'+(r.warn?'<span style="color:#f59e0b">⚠️ '+r.warn+'</span>':'')+'</td></tr>';
+              + '<span style="color:var(--down)">财'+r.fs+'</span>'
+
+              + (r.warn?'<span style="color:#f59e0b;margin-left:2px">⚠️ '+r.warn+'</span>':'')
+
+              + '</span>';
 
           });
 
-          h += '</tbody></table>';
+          h += '</div>';
 
         }
 
@@ -13538,9 +13532,12 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     const bs=track.backtest_signal||{};
 
-    var _ttLD = bs.latest_date || '-';
-    var _ttLDrel = (bs.latest_date && window._fmtAshareRel) ? window._fmtAshareRel(bs.latest_date+' 15:00:00') : _ttLD;
-    $('ttBackNote').textContent='口径：'+(bs.method||'')+'；样本 '+(bs.total||0)+' 笔；数据截至 '+_ttLDrel+'；最优持有 '+(bs.best_hold_days||'-')+' 日。';
+    var _ttLD = bs.latest_date || '';
+    var _ttTotal = bs.total || 0;
+    var _ttValid = _ttLD && _ttTotal > 0;
+    var _ttLDrel = (_ttValid && window._fmtAshareRel) ? window._fmtAshareRel(_ttLD+' 15:00:00') : (_ttLD || '暂无');
+    if(!_ttValid) _ttLDrel = '暂无回测数据（'+(bs.calc_time||_ttLD||'—')+'起）';
+    $('ttBackNote').textContent='口径：'+(bs.method||'')+'；样本 '+_ttTotal+' 笔；数据截至 '+_ttLDrel+'；最优持有 '+(bs.best_hold_days||'-')+' 日。';
 
     const per=bs.periods||{};
 
@@ -13894,6 +13891,20 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     return (Mo<10?'0':'')+Mo+'-'+(D<10?'0':'')+D+' '+hm;
 
+  }
+
+  function _fmtAshareRel(ts){
+    if(!ts) return '';
+    var Y,Mo,D,H=0,Mi=0,m;
+    m=ts.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})[ T](\d{1,2}):(\d{2})/);
+    if(m){Y=+m[1];Mo=+m[2];D=+m[3];H=+m[4];Mi=+m[5];}
+    else{m=ts.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);if(m){Y=+m[1];Mo=+m[2];D=+m[3];}else return String(ts).substring(0,16);}
+    var now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    var td=new Date(Y,Mo-1,D),diff=Math.round((today-td)/86400000);
+    if(diff===0)return '今日 '+String(H).padStart(2,'0')+':'+String(Mi).padStart(2,'0');
+    if(diff===1)return '昨日 '+String(H).padStart(2,'0')+':'+String(Mi).padStart(2,'0');
+    if(diff<7)return diff+'天前';
+    return ts.substring(0,10);
   }
 
   function _fmtWeekday(dateStr){

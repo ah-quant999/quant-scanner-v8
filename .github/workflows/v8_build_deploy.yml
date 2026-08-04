@@ -76,18 +76,25 @@ jobs:
         run: |
           git config user.name "v8-cloud-bot"
           git config user.email "v8-bot@users.noreply.github.com"
-          git add -f data/
-          if git diff --cached --quiet; then
-            echo "ℹ️ 无数据变化，跳过部署"
-            exit 0
-          fi
-          git commit -m "v8 build: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
           REPO="https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
+          # ⚠️ 不要改回 git rebase：data/*.js 是构建产物，两趟构建并发时 rebase 必然
+          #   在生成文件上产生 content conflict -> rebase --abort -> 整个部署失败
+          #   （2026-08-04 23:50 实例：data/HEALTH_CHECK.js CONFLICT，部署挂掉）。
+          #   正确做法：push 被拒 = 远端已前进，同步远端后用最新 raw_data 重新全量构建，
+          #   产物由构建决定而非由合并决定，天然无冲突且不会用旧产物覆盖新数据。
           for i in 1 2 3; do
+            git add -f data/
+            if git diff --cached --quiet; then
+              echo "ℹ️ 无数据变化，跳过部署（远端已是最新构建）"
+              exit 0
+            fi
+            git commit -m "v8 build: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
             if git push "$REPO" HEAD:main; then
               echo "✅ 已部署 main（第 $i 次尝试，GitHub Pages 自动重建）"; exit 0
             fi
-            echo "⚠️ push 被拒，rebase 后重试 ($i/3)"
-            git fetch "$REPO" main && git rebase FETCH_HEAD || { git rebase --abort; exit 1; }
+            echo "⚠️ push 被拒（远端已前进），同步远端并按最新 raw_data 全量重建后重试 ($i/3)"
+            git fetch "$REPO" main
+            git reset --hard FETCH_HEAD
+            python update_v8.py
           done
           echo "❌ 3 次重试后仍失败"; exit 1
