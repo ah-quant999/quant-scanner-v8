@@ -208,6 +208,121 @@ def _all_individual_recs(fields="f12,f14,f2,f3,f62,f184"):
 # 单次运行状态跟踪（用于前端定时任务跟踪看板）
 _run_status = {}
 
+def _fetch_remote_raw(rel_path):
+    """从 GitHub main 拉取 raw_data 已有内容，作为追加型序列（如 sh_sz_history）的权威基线。
+    绕过 git/HTTPS 封锁，走 Git Database / Contents API。失败返回 None。
+    用途：本地 raw_data 在每次 intraday 运行开头会被清理删除，且 data/SH_SZ_HISTORY.js 滞后于
+    推送→构建周期；直接用「上一次成功推送的远端版本」作基线，可根治追加型序列跨天塌缩（每日丢一天）。
+    """
+    import base64 as _b64
+    tok = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    if not tok:
+        return None
+    url = f"https://api.github.com/repos/ah-quant999/quant-scanner-v8/contents/raw_data/{rel_path}"
+    try:
+        r = _requests.get(url, headers={
+            "Authorization": f"Bearer {tok}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28"}, timeout=30)
+        d = r.json()
+        if not isinstance(d, dict) or "content" not in d:
+            return None
+        content = _b64.b64decode(d.get("content", "")).decode("utf-8")
+        return json.loads(content)
+    except Exception as e:
+        print(f"  ⚠️ 远端基线拉取失败 {rel_path}: {e}")
+        return None
+
+
+def f_judgment():
+    """今日判定（盘前 08:25 自动生成，注册于 JUDGMENT_DATA→premarket）。
+    规则引擎：基于三大宽基指数行情 + 美股隔夜表现，给出大盘结构、控盘/财神代理、结论与警示。
+    注：ctrl(控盘)/fs(财神) 为基于涨跌幅/成交额的简化代理指标，待接入精确控盘模型可替换；
+        文本字段（market/us/verdict/warning）为真实可更新的盘前研判。
+    """
+    now = datetime.now()
+    today = now.date()
+    md = f"{today.month}/{today.day}"
+    # 取指数行情（push2delay 实时；盘前为昨收/集合竞价前快照）
+    idx = {}
+    try:
+        q = f_index_quotes()
+        if q and q.get("items"):
+            for it in q["items"]:
+                idx[it["code"]] = it
+    except Exception:
+        idx = {}
+    mains = [("000001", "上证指数"), ("399001", "深证成指"), ("399006", "创业板指")]
+    indices, chgs = [], []
+    for code, name in mains:
+        it = idx.get(code)
+        chg = round(float(it.get("chg", 0.0) or 0.0), 2) if it else 0.0
+        amount = round(float(it.get("amount", 0.0) or 0.0), 2) if it else 0.0  # 亿元
+        ctrl = round(chg, 1)                       # 控盘代理 ≈ 当日涨跌幅
+        fs = round(amount / 1000.0, 1)            # 财神代理 ≈ 成交额(千亿)
+        warn = "横盘" if (it and abs(chg) < 0.05) else ""
+        indices.append({"name": name, "ctrl": ctrl, "fs": fs, "warn": warn})
+        chgs.append(chg)
+    neg = sum(1 for c in chgs if c < 0)
+    pos = sum(1 for c in chgs if c > 0)
+    if neg == 3:
+        market = "下行结构（三指数控盘全负）"
+    elif pos == 3:
+        market = "上行结构（三指数控盘全正）"
+    elif neg > pos:
+        market = "偏弱分化（指数多数控盘为负）"
+    elif pos > neg:
+        market = "偏强分化（指数多数控盘为正）"
+    else:
+        market = "震荡分化（指数控盘方向不一）"
+    us = _fetch_us_overnight()
+    us_str = us if us else "美股隔夜数据获取中（盘前研判以 A 股结构为主）"
+    if neg == 3:
+        verdict = "三指数全绿，控盘翻正前视为减仓点而非买点，反弹只宜轻仓快进快出"
+        warning = "无明确 S 点（卖点）信号前，持仓勿侥幸；弱势中追涨易被套。"
+    elif pos == 3:
+        verdict = "三指数全红，可逢回调择优布局，但需警惕盘中冲高回落"
+        warning = "普涨日注意区分真强与补涨，避免追高缩量反弹。"
+    else:
+        verdict = "指数分化，结构性机会与风险并存，轻指数重个股"
+        warning = "控制仓位，聚焦资金共识方向，回避边缘题材。"
+    return {
+        "date": today.strftime("%Y-%m-%d"),
+        "title": f"今日判定（{md}）",
+        "market": market,
+        "indices": indices,
+        "us": us_str,
+        "verdict": verdict,
+        "warning": warning,
+        "update_time": now.strftime("%Y-%m-%d %H:%M:%S"),
+        "auto": True,
+    }
+
+
+def _fetch_us_overnight():
+    """美股隔夜三大指数表现（最佳努力，失败返回空串）。"""
+    try:
+        r = _requests.get(
+            f"{_EM_DELAY}/api/qt/ulist.np/get",
+            params={"fltt": "2", "invt": "2", "ut": "b2884a393a59ad64002292a3e90d46a5",
+                    "fields": "f12,f14,f3", "secids": "100.GSPC,100.IXIC,100.DJI"},
+            headers=_EM_HEADERS, timeout=15)
+        j = r.json()
+        rows = (j.get("data", {}).get("diff") or [])
+        if not rows:
+            return ""
+        parts = []
+        all_up = True
+        for x in rows:
+            chg = float(x.get("f3") or 0)
+            if chg < 0:
+                all_up = False
+            parts.append(f"{x.get('f14', '')}{chg:+.1f}%")
+        return ("涨" if all_up else "跌") + "（" + "/".join(parts) + "）"
+    except Exception:
+        return ""
+
+
 def run(label, fn, retries=2):
     last_err = None
     for attempt in range(retries + 1):
@@ -1843,14 +1958,22 @@ def main(category=None, only=None):
         today_md = f"{now.month}/{now.day}"
         is_today_trade = _is_trading_day()
 
-        # ---- 读取历史基线 ----
+        # ---- 读取历史基线（权威源 = 远端 main raw_data，避免跨天塌缩）----
         baseline = {}
-        raw_path = RAW_DIR / "sh_sz_history.json"
-        if raw_path.exists():
-            try:
-                baseline = json.loads(raw_path.read_text(encoding="utf-8"))
-            except Exception:
-                baseline = {}
+        # 1) 优先远端 main 的 raw_data/sh_sz_history.json（追加型序列的权威基线，根治每日丢一天）
+        remote = _fetch_remote_raw("sh_sz_history.json")
+        if remote and isinstance(remote, dict) and (remote.get("daily_stats") or remote.get("amount_history")):
+            baseline = remote
+            print(f"  📥 远端基线命中：daily_stats={len(remote.get('daily_stats') or [])} 条 / amount_history={len(remote.get('amount_history') or [])} 条")
+        # 2) 回退：本地 raw_data（intraday 清理后通常不存在，但全量兜底时可能有）
+        if not baseline:
+            raw_path = RAW_DIR / "sh_sz_history.json"
+            if raw_path.exists():
+                try:
+                    baseline = json.loads(raw_path.read_text(encoding="utf-8"))
+                except Exception:
+                    baseline = {}
+        # 3) 回退：已构建的 data/SH_SZ_HISTORY.js
         if not baseline:
             js_path = ROOT / "data" / "SH_SZ_HISTORY.js"
             if js_path.exists():
@@ -2002,6 +2125,7 @@ def main(category=None, only=None):
         ("V8_CAL", f_v8_cal),
         ("CANDIDATE_QUOTES", f_candidate_quotes),
         ("SH_SZ_HISTORY", f_sh_sz_history),
+        ("JUDGMENT_DATA", f_judgment),
     ]
 
     for var, fn in tasks:

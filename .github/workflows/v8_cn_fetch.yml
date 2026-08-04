@@ -87,7 +87,8 @@ jobs:
           files = [
               'cloud_fetch_v8.py', 'api_push_raw.py',
               'fetch_ipo_data_v8.py', 'fetch_limit_up_heatmap_v8.py',
-              'backfill_lhb_history.py', 'algorithms/gen_market_brief.py'
+              'backfill_lhb_history.py', 'algorithms/gen_market_brief.py',
+              'out/lhb_seats.json'
           ]
           for fn in files:
               url = f'https://api.github.com/repos/ah-quant999/quant-scanner-v8/contents/{fn}'

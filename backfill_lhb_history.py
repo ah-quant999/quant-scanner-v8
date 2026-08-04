@@ -31,14 +31,39 @@ THRESHOLD = 8000  # 万，强买阈值
 N_CALENDAR_DAYS = 55  # 回溯的日历天数（约 40 个交易日，覆盖 ~6 周）
 
 
-def _classify_seat(seat_name):
-    """极简分类，与 v6（lhb_seats.json 缺失时）一致。"""
+def _load_lhb_seats():
+    """加载席位库 out/lhb_seats.json（与算法端 fetch_lhb.py 同源）。缺失则回退空库。"""
+    p = os.path.join(HERE, "out", "lhb_seats.json")
+    if not os.path.exists(p):
+        print("  ⚠️ out/lhb_seats.json 不存在，回退纯规则分类")
+        return {"seats": [], "patterns": {}}
+    try:
+        with open(p, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"  ⚠️ 席位库读取失败: {e}")
+        return {"seats": [], "patterns": {}}
+
+
+def _classify_seat(seat_name, seats_db=None):
+    """席位分类：机构专用→机构、深股通/沪股通→北向，其余按席位库模式匹配游资/量化，未命中→未识别。
+    与算法端 fetch_lhb.py 口径一致，确保机游共振的「游资」= 游资+量化（剔除北向/未识别）。"""
     if not seat_name:
         return '未识别'
     if '机构专用' in seat_name:
         return '机构'
     if '深股通' in seat_name or '沪股通' in seat_name:
         return '北向'
+    seats_db = seats_db or {}
+    for s in seats_db.get("seats", []):
+        if s.get("name") == seat_name:
+            return s.get("type", "游资")
+    for p in seats_db.get("patterns", {}).get("游资", []):
+        if p in seat_name:
+            return '游资'
+    for p in seats_db.get("patterns", {}).get("量化", []):
+        if p in seat_name:
+            return '量化'
     return '未识别'
 
 
@@ -72,8 +97,8 @@ def fetch_lhb_list(date_str):
     return stocks
 
 
-def fetch_seat_detail(stocks, date_str):
-    """逐笔席位明细：合并买入/卖出页并按席位去重。"""
+def fetch_seat_detail(stocks, date_str, seats_db=None):
+    """逐笔席位明细：合并买入/卖出页并按席位去重。seats_db=席位库（out/lhb_seats.json）。"""
     detail_map = {}
     for s in stocks:
         code = s['code']
@@ -94,7 +119,7 @@ def fetch_seat_detail(stocks, date_str):
                     if key in seen:
                         continue
                     seen.add(key)
-                    stype = _classify_seat(seat)
+                    stype = _classify_seat(seat, seats_db)
                     if stype not in detail_map[code]:
                         detail_map[code][stype] = {'buy': 0.0, 'sell': 0.0}
                     detail_map[code][stype]['buy'] += buy_amt
@@ -120,11 +145,12 @@ def classify(inst_buy, inst_sell, other_buy, other_sell):
 
 
 def process_day(date_str):
-    """返回当日记录 dict，或 {'trading': False}。"""
+    """返回当日记录 dict，或 {'trading': False}。读取 out/lhb_seats.json 做席位分类。"""
+    seats_db = _load_lhb_seats()
     stocks = fetch_lhb_list(date_str)
     if not stocks:
         return {'trading': False}
-    detail_map = fetch_seat_detail(stocks, date_str)
+    detail_map = fetch_seat_detail(stocks, date_str, seats_db)
     out_stocks = []
     summary = {'机游共振': 0, '机构独买': 0, '游资独买': 0, '不达标': 0, '总计': len(stocks)}
     for s in stocks:
@@ -133,8 +159,12 @@ def process_day(date_str):
         inst_buy = seats.get('机构', {}).get('buy', 0.0)
         inst_sell = seats.get('机构', {}).get('sell', 0.0)
         inst_net = inst_buy - inst_sell
-        other_buy = seats.get('未识别', {}).get('buy', 0.0)
-        other_sell = seats.get('未识别', {}).get('sell', 0.0)
+        # 机游共振口径：游资 + 量化（剔除北向/未识别），与算法端 fetch_lhb.py 一致
+        other_buy = 0.0
+        other_sell = 0.0
+        for st in ('游资', '量化'):
+            other_buy += seats.get(st, {}).get('buy', 0.0)
+            other_sell += seats.get(st, {}).get('sell', 0.0)
         other_net = other_buy - other_sell
         cat = classify(inst_buy, inst_sell, other_buy, other_sell)
         summary[cat] += 1
@@ -144,8 +174,10 @@ def process_day(date_str):
             seat_detail['机构'] = {'buy': round(inst_buy, 1), 'sell': round(inst_sell, 1)}
         if north.get('buy', 0) > 0 or north.get('sell', 0) > 0:
             seat_detail['北向'] = {'buy': round(north.get('buy', 0), 1), 'sell': round(north.get('sell', 0), 1)}
-        if other_buy > 0 or other_sell > 0:
-            seat_detail['未识别'] = {'buy': round(other_buy, 1), 'sell': round(other_sell, 1)}
+        for st in ('游资', '量化', '未识别'):
+            d = seats.get(st, {})
+            if d.get('buy', 0) > 0 or d.get('sell', 0) > 0:
+                seat_detail[st] = {'buy': round(d['buy'], 1), 'sell': round(d['sell'], 1)}
         out_stocks.append({
             'code': code,
             'name': s['name'],
