@@ -1,11 +1,11 @@
 {
-  "update_time": "2026-08-04 01:30:04",
+  "update_time": "2026-08-04 04:44:27",
   "overall": "red",
   "indicators": [
     {
       "name": "USDJPY",
       "label": "美元兑日元",
-      "value": 157.531,
+      "value": 157.505,
       "unit": "",
       "source": "Yahoo Finance",
       "status": "yellow",
@@ -35,7 +35,7 @@
     {
       "name": "USDCNH",
       "label": "美元兑离岸人民币",
-      "value": 6.7577,
+      "value": 6.7548,
       "unit": "",
       "source": "Yahoo Finance",
       "status": "green",
