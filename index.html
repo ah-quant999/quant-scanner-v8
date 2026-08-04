@@ -570,8 +570,8 @@ window.V8_CAL = {weeks:[],legend:[]};
       })();
       </script>
 
-      <!-- 今日宏观解读（静态卡片 · 2026-08-03） -->
-      <div class="card" style="grid-column:1/-1">
+      <!-- 今日宏观解读（每日盘前 · premarket 08:30 刷新） -->
+      <div class="card" style="grid-column:1/-1;border-left:4px solid var(--cyan);">
         <h3><span class="ic">📊</span>今日宏观解读 <span id="macroInterpretTag" style="font-size:11px;font-weight:400;color:var(--dim)">美日联合干预日元 · 对 A 股影响与持仓框架 · 2026-08-03 · 底层数据更新于 --</span></h3>
         <div style="font-size:13px;line-height:1.8;color:var(--txt)">
           <p style="margin:8px 0"><b style="color:var(--up)">一句话结论：</b>1986 年以来美日首次官方联手买入日元，叠加日本央行最明确加息信号，标志"弱日元+零成本融资"套利时代进入拐点。当前 USDJPY 回落至 157.6（干预有效区），尚未触发套利 unwind，对 A 股属<strong>温和、间接</strong>影响，<strong>不构成清仓理由</strong>。</p>
@@ -591,7 +591,7 @@ window.V8_CAL = {weeks:[],legend:[]};
         var tag=document.getElementById('macroInterpretTag');
         if(!tag) return;
         var t=(window.CRISIS_DATA&&window.CRISIS_DATA.update_time)||(window.MACRO_DATA&&window.MACRO_DATA.update_time)||'--';
-        tag.textContent='美日联合干预日元 · 对 A 股影响与持仓框架 · 2026-08-03 · 底层数据更新于 '+t;
+        tag.textContent='美日联合干预日元 · 对 A 股影响与持仓框架 · 每日盘前 · 底层数据更新于 '+t;
       })();
       </script>
 
@@ -6167,7 +6167,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
           {name:'重要事件日历', source:'CALENDAR_DATA', freq:'每周日+月末', slots:['周日'], note:'非每日更新'},
           {name:'打新研判', source:'IPO_DATA', freq:'每日盘前', slots:['08:30'], note:'新股评分'},
           {name:'盘前预判 / 决策中枢', source:'DECISION_HUB', freq:'每日盘前', slots:['08:30'], note:'综合打分'},
-          {name:'今日宏观解读', source:'MACRO_DATA', freq:'盘中实时', slots:['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'联动风险温度计'}
+          {name:'今日宏观解读', source:'MACRO_DATA', freq:'每日盘前', slots:['08:30'], note:'当前宏观总结分析'}
         ]
       },
       {
