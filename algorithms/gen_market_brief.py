@@ -312,6 +312,41 @@ def build_strategy(sentiment_label, health, anomalies, indices, etf_daily):
     return strategies[:2]
 
 
+def get_market_status():
+    """根据当前时间判断盘前/盘中/收盘。"""
+    now = datetime.now()
+    hm = now.hour * 100 + now.minute
+    if hm >= 1500:
+        return "收盘"
+    if hm >= 930:
+        return "盘中"
+    return "盘前"
+
+
+def build_closing_summary(indices, up, down, flat, amount_total):
+    """收盘后生成一句话总结。"""
+    by_code = {it["code"]: it for it in indices}
+    sh = by_code.get("000001", {})
+    cy = by_code.get("399006", {})
+    sh_chg = sh.get("chg", 0) or 0
+    cy_chg = cy.get("chg", 0) or 0
+    total_ud = up + down + flat
+    up_pct = round(up / total_ud * 100, 1) if total_ud else 0
+    parts = []
+    if sh_chg >= 1.0:
+        parts.append(f"沪指收涨 {sh_chg:+.2f}%")
+    elif sh_chg <= -1.0:
+        parts.append(f"沪指收跌 {sh_chg:+.2f}%")
+    else:
+        parts.append(f"沪指{'收涨' if sh_chg>=0 else '收跌'} {sh_chg:+.2f}%")
+    parts.append(f"{up} 只上涨（{up_pct}%）")
+    if amount_total:
+        parts.append(f"两市合计成交 {amount_total:.0f} 亿元")
+    if abs(cy_chg - sh_chg) >= 1.5:
+        parts.append(f"创业板{'大涨' if cy_chg>=0 else '大跌'} {cy_chg:+.2f}%，风格分化明显")
+    return "。".join(parts) + "。"
+
+
 def main():
     print(f"=== gen_market_brief 开始 {datetime.now().isoformat(timespec='seconds')} ===")
 
@@ -326,13 +361,18 @@ def main():
     indices = idx.get("items", [])
     by_code = {it["code"]: it for it in indices}
     sh = by_code.get("000001", {})
+    sz = by_code.get("399001", {})
 
-    # 涨跌家数以上证指数为准（东财 f104/f105/f106）
-    up = sh.get("up", 0)
-    down = sh.get("down", 0)
-    flat = sh.get("flat", 0)
+    # 涨跌家数：沪市 + 深市（东财 f104/f105/f106）
+    up = (sh.get("up", 0) or 0) + (sz.get("up", 0) or 0)
+    down = (sh.get("down", 0) or 0) + (sz.get("down", 0) or 0)
+    flat = (sh.get("flat", 0) or 0) + (sz.get("flat", 0) or 0)
     total_ud = up + down
     up_down_ratio = round(up / down, 2) if down else None
+
+    amount_total = round((sh.get("amount", 0) or 0) + (sz.get("amount", 0) or 0), 1)
+
+    market_status = get_market_status()
 
     # 日内风向
     sh_chg = sh.get("chg", 0)
