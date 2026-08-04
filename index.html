@@ -2544,6 +2544,26 @@ window.V8_CAL = {weeks:[],legend:[]};
     }
     return out;
   }
+  // 以当月第一个周一为起点，向后顺延 6 周（月对齐，不往前翻到上月）
+  function _rcMonthWeekCards(year, month){
+    var firstMon = new Date(year, month, 1);
+    var dow = firstMon.getDay();
+    var diffToMon = (8 - dow) % 7; // 第一个周一（含当天若恰为周一）
+    firstMon.setDate(firstMon.getDate() + diffToMon);
+    var DAY = 86400000;
+    var out = [];
+    for(var i = 0; i < 6; i++){
+      var wm = new Date(firstMon.getTime() + i * 7 * DAY);
+      var ws = new Date(wm.getTime() + 6 * DAY);
+      out.push({
+        no: i + 1,
+        mon: wm, sun: ws,
+        monLabel: (wm.getMonth()+1) + '/' + wm.getDate(),
+        sunLabel: (ws.getMonth()+1) + '/' + ws.getDate()
+      });
+    }
+    return out;
+  }
 
   /* ===== TAB1: 机游共振日历（参照参考页布局） ===== */
   window.__jyCalRendered = false;
@@ -2702,7 +2722,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     /* ===== 周度汇总(6 周卡·以 today 为 anchor) ===== */
     h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📊 周度汇总 · 机游共振</h3>';
     h += '<div class="week-cards">';
-    var cardsJy = _rc6WeekCards(todayStr);
+    var cardsJy = _rcMonthWeekCards(year, month);
     cardsJy.forEach(function(wk){
       // 归类：把 jyDays 里的天按 Mon-Sun 落入对应周卡
       var wkItems = jyDays.filter(function(dy){
@@ -2984,7 +3004,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     // Weekly summary (北向席位·6 周卡片·以 today 为 anchor)
     h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📊 周度汇总 · 北向席位</h3>';
     h += '<div class="week-cards">';
-    var cardsNb = _rc6WeekCards(todayStr);
+    var cardsNb = _rcMonthWeekCards(year, month);
     cardsNb.forEach(function(wk){
       h += '<div class="wk-card"><div class="wk-card-hd"><span class="wk-card-title">第'+wk.no+'周 '+wk.monLabel+'-'+wk.sunLabel+'</span></div>';
       var wkNorth;
