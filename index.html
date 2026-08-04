@@ -13451,9 +13451,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     $('tcConsensus').innerHTML = stocks.length ? stocks.map(s=>renderStock(s,false,tm)).join('') : '<div class="tp-empty">当前无严格三重共识股<br><span style="font-size:12px">下方「优先观察」展示满足 2/3 且主站评分≥75 的股票</span></div>';
 
-    const pri=near.filter(s=>(s.total_score||0)>=75&&(s.miss_steps||1)===1);
-
-    const ext=near.filter(s=>(s.total_score||0)>=75&&(s.miss_steps||1)===2);
+        const pri=near.filter(s=>(s.miss_steps||1)===1);
+    const ext=near.filter(s=>(s.miss_steps||1)===2);
 
     $('tcNearCount').textContent=pri.length;
 
