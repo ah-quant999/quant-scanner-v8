@@ -353,6 +353,7 @@ def main():
     payload = {
         "update_time": now,
         "overall": overall,
+        "verdict": build_verdict(indicators, overall),
         "indicators": indicators,
     }
 
