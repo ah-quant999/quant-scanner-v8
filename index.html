@@ -3445,9 +3445,8 @@ window.V8_CAL = {weeks:[],legend:[]};
     <div class="op-tabs">
       <button class="op-tab-btn active" data-op="1" onclick="opSwitchTab(1)">运维</button>
       <button class="op-tab-btn" data-op="2" onclick="opSwitchTab(2)">⏰ 任务运行看板 <span class="op-tab-time" id="opTab2Time"></span></button>
-      <button class="op-tab-btn" data-op="3" onclick="opSwitchTab(3)">🩺 前端健康 <span class="op-tab-time" id="opTab3Time"></span></button>
-      <button class="op-tab-btn" data-op="4" onclick="opSwitchTab(4)">暂未上架 <span class="op-tab-time" id="opTab4Time"></span></button>
-      <button class="op-tab-btn" data-op="5" onclick="opSwitchTab(5)">已下架 <span class="op-tab-time" id="opTab5Time"></span></button>
+      <button class="op-tab-btn" data-op="3" onclick="opSwitchTab(3)">暂未上架 <span class="op-tab-time" id="opTab3Time"></span></button>
+      <button class="op-tab-btn" data-op="4" onclick="opSwitchTab(4)">已下架 <span class="op-tab-time" id="opTab4Time"></span></button>
     </div>
     <div id="opTab1" class="op-tab-pane active">
     <!-- ⚠️ 系统告警（动态扫描） -->
@@ -3495,6 +3494,12 @@ window.V8_CAL = {weeks:[],legend:[]};
         <tr><td>概念映射</td><td>09:45 今日</td><td><span class="status-dot s-ok"></span>新鲜</td></tr>
       </tbody></table>
     </div>
+    <!-- 前端健康巡检（原Tab3，方案A合并入运维） -->
+    <div class="card" style="margin-bottom:16px;border-left:3px solid var(--purple)">
+      <h3><span class="ic">🩺</span>前端健康巡检 <span class="fresh" id="healthCheckTime">更新于 --</span></h3>
+      <div id="healthCheckSummary" style="margin-bottom:12px;font-size:13px;font-weight:700">加载中…</div>
+      <div id="healthCheckBody" style="font-size:12px;color:var(--sub)">加载中…</div>
+    </div>
     </div>
     <div id="opTab2" class="op-tab-pane">
       <div class="card" style="margin-bottom:16px;border-left:3px solid var(--cyan)">
@@ -3506,22 +3511,8 @@ window.V8_CAL = {weeks:[],legend:[]};
         <div id="taskScheduleSummary" style="font-size:12px;color:var(--sub)">加载中…</div>
       </div>
     </div>
-    <div id="opTab3" class="op-tab-pane">
-      <div class="card" style="margin-bottom:16px;border-left:3px solid var(--purple)">
-        <h3><span class="ic">🩺</span>前端健康巡检 <span class="fresh" id="healthCheckTime">更新于 --</span></h3>
-        <div id="healthCheckSummary" style="margin-bottom:12px;font-size:13px;font-weight:700">加载中…</div>
-        <div id="healthCheckBody" style="font-size:12px;color:var(--sub)">加载中…</div>
-      </div>
-      <div class="card" style="margin-bottom:16px">
-        <h3><span class="ic">📋</span>巡检说明</h3>
-        <div style="font-size:12px;color:var(--sub);line-height:1.7">
-          <p>本页自动检查每个前端卡片的<strong>数据新鲜度</strong>与<strong>关键字段是否空值</strong>，同时校验 GitHub Pages 部署同步、runner 在线状态、本地与 origin/main 同步。</p>
-          <p>✓ 正常 · ⚠ 警告 · ✗ 异常；异常时系统会自动派发刷新并发送邮件告警。</p>
-        </div>
-      </div>
-    </div>
-    <div id="opTab4" class="op-tab-pane"><div id="unlistedPanel"></div></div>
-    <div id="opTab5" class="op-tab-pane"><div id="delistedPanel">
+    <div id="opTab3" class="op-tab-pane"><div id="unlistedPanel"></div></div>
+    <div id="opTab4" class="op-tab-pane"><div id="delistedPanel">
 
         <!-- 盘后概览：市场温度计分项 / 六维共振雷达 -->
     <div class="grid g-2" style="margin-bottom:16px">
@@ -8718,11 +8709,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
   window.opSwitchTab=function(n){
     document.querySelectorAll('.op-tab-btn').forEach(function(b){b.classList.toggle('active', +b.dataset.op===n);});
-    [1,2,3,4,5].forEach(function(i){var p=document.getElementById('opTab'+i);if(p)p.classList.toggle('active', i===n);});
+    [1,2,3,4].forEach(function(i){var p=document.getElementById('opTab'+i);if(p)p.classList.toggle('active', i===n);});
+    if(n===1) setTimeout(renderHealthCheck,60);
     if(n===2) setTimeout(renderTaskSchedule,60);
-    if(n===3) setTimeout(renderHealthCheck,60);
-    if(n===4) setTimeout(renderUnlisted,60);
-    if(n===5) setTimeout(renderDelisted,60);
+    if(n===3) setTimeout(renderUnlisted,60);
+    if(n===4) setTimeout(renderDelisted,60);
   };
 })();
 
