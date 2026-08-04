@@ -4382,6 +4382,13 @@ function drawAmountChart(){
   const data = window.SH_SZ_HISTORY || {};
   const hist = data.amount_history || [];
   if(!hist.length) return;
+
+  // 时间标签先更新（不依赖 SVG 尺寸，避免无宽度时提前 return 导致标签空白）
+  const tm = document.getElementById('amountUpdateTime');
+  if(tm && data.update_time) tm.textContent = '更新于 '+(window._fmtAshareRel?window._fmtAshareRel(data.update_time):data.update_time);
+  const ld = document.getElementById('amountLastDate');
+  if(ld) ld.textContent = data.amount_last_date ? '· 序列至 '+data.amount_last_date : '';
+
   const svg = document.getElementById('amountChart');
   if(!svg) return;
   let W = svg.clientWidth || svg.getBoundingClientRect().width || 0;
@@ -4450,10 +4457,6 @@ function drawAmountChart(){
     else if(chg<=-8) desc = '成交萎缩';
     note.textContent = '今日两市合计 '+last.total.toFixed(0)+' 亿元，较前日 '+chgStr+'，'+desc+'。';
   }
-  const tm = document.getElementById('amountUpdateTime');
-  if(tm && data.update_time) tm.textContent = '更新于 '+(window._fmtAshareRel?window._fmtAshareRel(data.update_time):data.update_time);
-  const ld = document.getElementById('amountLastDate');
-  if(ld) ld.textContent = data.amount_last_date ? '· 序列至 '+data.amount_last_date : '';
 }
 
 /* ===== 近一月涨跌家数 SVG 柱状图（v6 风格 · 深色主题适配） ===== */
@@ -4461,6 +4464,12 @@ function drawUpDownChart(){
   const data = window.SH_SZ_HISTORY || {};
   const stats = data.daily_stats || [];
   if(!stats.length) return;
+
+  // 时间标签先更新（不依赖 SVG 尺寸）
+  const tm = document.getElementById('upDownUpdateTime');
+  if(tm && data.update_time) tm.textContent = '更新于 '+(window._fmtAshareRel?window._fmtAshareRel(data.update_time):data.update_time);
+  const ld = document.getElementById('upDownLastDate');
+  if(ld) ld.textContent = data.up_down_last_date ? '· 序列至 '+data.up_down_last_date : '';
 
   // 过滤假期
   var holidayDates={};
@@ -4526,10 +4535,6 @@ function drawUpDownChart(){
   if(note && udLast){
     note.textContent = '红=上涨家数，绿=下跌家数。今日涨 '+udLast.up+' / 跌 '+udLast.down+' / 平 '+(udLast.flat||0)+'。涨跌比 '+(udLast.down?(udLast.up/udLast.down).toFixed(2):'—')+'。';
   }
-  const tm = document.getElementById('upDownUpdateTime');
-  if(tm && data.update_time) tm.textContent = '更新于 '+(window._fmtAshareRel?window._fmtAshareRel(data.update_time):data.update_time);
-  const ld = document.getElementById('upDownLastDate');
-  if(ld) ld.textContent = data.up_down_last_date ? '· 序列至 '+data.up_down_last_date : '';
 }
 
 (function(){
