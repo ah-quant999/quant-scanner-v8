@@ -1100,6 +1100,15 @@ window.V8_CAL = {weeks:[],legend:[]};
 
         var h = '';
 
+        // 美股 + 结论 + 预警（置顶、大字）
+        if(d.us || d.verdict || d.warning){
+          h += '<div style="margin-bottom:14px;padding:12px 14px;background:linear-gradient(135deg,rgba(56,189,248,0.08),rgba(167,139,250,0.06));border:1px solid var(--border2);border-radius:10px;font-size:15px;line-height:1.9">';
+          if(d.us) h += '<p style="margin:6px 0"><b style="color:var(--sub)">美股：</b><span style="color:var(--up)">'+d.us+'</span></p>';
+          if(d.verdict) h += '<p style="margin:6px 0"><b style="color:var(--sub)">→ 结论：</b>'+d.verdict+'</p>';
+          if(d.warning) h += '<p style="margin:6px 0;color:#f59e0b">⚠️ '+d.warning+'</p>';
+          h += '</div>';
+        }
+
         h += '<p style="margin:8px 0"><b style="color:var(--sub)">大盘：</b>'+(d.market||'')+'</p>';
 
         if(d.indices && d.indices.length){
@@ -1126,11 +1135,6 @@ window.V8_CAL = {weeks:[],legend:[]};
 
         }
 
-        if(d.us) h += '<p style="margin:8px 0"><b style="color:var(--sub)">美股：</b><span style="color:var(--up)">'+d.us+'</span></p>';
-
-        if(d.verdict) h += '<p style="margin:8px 0"><b style="color:var(--sub)">→ 结论：</b>'+d.verdict+'</p>';
-
-        if(d.warning) h += '<p style="margin:8px 0;color:#f59e0b">⚠️ '+d.warning+'</p>';
 
 
 
@@ -1290,6 +1294,20 @@ window.V8_CAL = {weeks:[],legend:[]};
 
         }
 
+        // ===== A 股影响评估（紧跟结论）=====
+
+        if(d && d.a_impact){
+
+          var impactColor = (d.a_impact.indexOf('偏空')>=0) ? 'var(--down)' : ((d.a_impact.indexOf('偏多')>=0) ? 'var(--up)' : 'var(--txt)');
+
+          h += '<p style="margin:10px 0;padding:8px 12px;background:rgba(56,189,248,0.06);border-radius:8px;border-left:3px solid var(--cyan)">';
+
+          h += '<b>→ 对 A 股影响：</b><span style="color:'+impactColor+'">'+d.a_impact+'</span>';
+
+          h += '</p>';
+
+        }
+
 
 
         // ===== 关键数据（紧凑内联标签） =====
@@ -1344,19 +1362,6 @@ window.V8_CAL = {weeks:[],legend:[]};
 
 
 
-        // ===== A 股影响评估 =====
-
-        if(d && d.a_impact){
-
-          var impactColor = (d.a_impact.indexOf('\u504f\u7a7a')>=0) ? 'var(--down)' : ((d.a_impact.indexOf('\u504f\u591a')>=0) ? 'var(--up)' : 'var(--txt)');
-
-          h += '<p style="margin:10px 0;padding:8px 12px;background:rgba(56,189,248,0.06);border-radius:8px;border-left:3px solid var(--cyan)">';
-
-          h += '<b>\u2192 \u5bf9 A \u80a1\u5f71\u54cd\uff1a</b><span style="color:'+impactColor+'">'+d.a_impact+'</span>';
-
-          h += '</p>';
-
-        }
 
 
 
