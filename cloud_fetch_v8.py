@@ -1788,6 +1788,9 @@ def main(category=None):
     # 🔧 盘后（15:30）额外补抓 ETF_DAILY_MONITOR（T+1 日监控收盘后定稿，配合盘中实时卡）
     if category == "post_close" and target_vars is not None:
         target_vars.add("ETF_DAILY_MONITOR")
+    # 🔧 盘前（08:25）额外补抓 MARKET_FUND_FLOW_DATA（日频资金流时间轴，防止 15:30 post_close 漏跑导致滞后一天）
+    if category == "premarket" and target_vars is not None:
+        target_vars.add("MARKET_FUND_FLOW_DATA")
     for old in RAW_DIR.glob("*.json"):
         if category:
             # 只清理属于当前 category 的文件

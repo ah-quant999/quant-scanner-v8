@@ -11,8 +11,9 @@
 #                 VOLATILITY / HERDING_DATA
 #   盘中每30分钟刷新（09:40 首刷 / 15:10 末档）：INDEX_QUOTES / ETF_PULSE / ETF_INTRADAY_HEAT / ETF_SUBSCRIPTION /
 #                     ETF_DAILY_MONITOR / SECTOR_FUND_FLOW / CAPITAL_FLOW_DATA /
-#                     CONCEPT_RANKING / LIMIT_UP_HEATMAP / MARKET_FUND_FLOW_DATA / AI_MARKET_BRIEF
+#                     CONCEPT_RANKING / LIMIT_UP_HEATMAP / AI_MARKET_BRIEF
 #   15:30  盘后：EXPERIMENT + MARKET_FUND_FLOW_DATA（收盘后累积历史序列）
+#   08:25  盘前：额外补抓 MARKET_FUND_FLOW_DATA，作为 15:30 漏跑的 safety_net（日频数据早上已可获取）
 #          ETF_DAILY_MONITOR 盘中每30分钟刷新 + 盘后15:30再补抓一次（T+1 日监控收盘后定稿）
 #   周六 09:00 T+1 周度/月度统一刷新：日历/IPO/两融/中金所/宏观/危机/北向/分析师/52周高/羊群效应
 #                 周六强制重建日历（月度事件），避免非月初只读缓存导致停滞
