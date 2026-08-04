@@ -44,6 +44,7 @@ VAR_TO_RAW = {
     "CFFEX_HOLDINGS": "cffex_data.json",
     "MACRO_DATA": "macro_data.json",
     "CRISIS_DATA": "crisis_data.json",
+    "MACRO_BRIEF": "macro_brief.json",
     "HERDING_DATA": "herding_data.json",
     "LIMIT_UP_HEATMAP": "limit_up_heatmap.json",
     "CAPITAL_FLOW_DATA": "capital_flow_data.json",
@@ -70,6 +71,7 @@ CATEGORY_MAP = {
     "CFFEX_HOLDINGS": "premarket",
     "MACRO_DATA": "premarket",
     "CRISIS_DATA": "premarket",
+    "MACRO_BRIEF": "premarket",
     "NORTH_FUND": "premarket",
     "ANALYST_RATINGS": "premarket",
     "W52_HIGH": "premarket",
@@ -400,12 +402,16 @@ def f_macro_brief():
     def _kn(label, value, prev, unit="", fmt=".2f"):
         if not value and value != 0:
             return
-        delta = value - (prev or 0)
-        arrow = "↑" if delta > 0 else ("↓" if delta < 0 else "→")
+        if prev is None:
+            delta = "—"   # 无昨日对比基准，不臆造变动
+        else:
+            d = value - prev
+            arrow = "↑" if d > 0 else ("↓" if d < 0 else "→")
+            delta = f"{arrow}{abs(d):{fmt}}{unit}" if d != 0 else "持平"
         key_numbers.append({
             "label": label,
             "value": f"{value:{fmt}}{unit}",
-            "delta": f"{arrow}{abs(delta):{fmt}}{unit}" if delta != 0 else "持平",
+            "delta": delta,
         })
 
     _kn("美债 10Y", us10y, us10y_prev, "%")
@@ -421,7 +427,7 @@ def f_macro_brief():
 
     # 美债
     if us10y and us10y_prev:
-        yld_chg = us10y - us10y_prev
+        yld_chg = round(us10y - us10y_prev, 4)
         if abs(yld_chg) >= 0.05:
             direction = "飙升" if yld_chg > 0 else "骤降"
             impact = "压制全球风险资产估值" if yld_chg > 0 else "利好风险资产反弹"

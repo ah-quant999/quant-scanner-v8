@@ -24,6 +24,7 @@ DATA_SOURCES = {
     "gold_pool.json":              "GOLD_POOL",
     "stock_names.json":            "STOCK_LIST",
     "macro_data.json":             "MACRO_DATA",
+    "macro_brief.json":            "MACRO_BRIEF",
     "nt_data.json":                "NT_DATA",
     "lhb_data.json":               "LHB_DATA",
     "lhb_history.json":           "LHB_HISTORY",
