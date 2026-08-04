@@ -1,0 +1,397 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+v8 前端健康巡检（三期一期 + 二期核心）
+- 检查 data/*.js 数据新鲜度与关键字段空值
+- 检查 GitHub Pages 部署 commit 与本地/remote HEAD 同步
+- 检查 self-hosted runner 在线状态
+- 输出 data/HEALTH_CHECK.js 供前端渲染
+- 异常时发邮件告警（三期）
+
+运行方式：
+  python v8_health_check.py                # 本地检查，生成 HEALTH_CHECK.js
+  python v8_health_check.py --alert        # 有异常时发送邮件
+  python v8_health_check.py --site         # 额外拉取线上页面做简单 DOM 空值检测
+"""
+import argparse
+import json
+import os
+import re
+import subprocess
+import sys
+import urllib.request
+import urllib.error
+from datetime import datetime, timezone, timedelta
+from pathlib import Path
+
+# 如需要邮件告警，导入发送器（该模块从 .workbuddy/v8_smtp_config.json 读配置）
+try:
+    from v8_send_alert import send_alert
+except Exception:
+    send_alert = None
+
+REPO = "ah-quant999/quant-scanner-v8"
+SITE_URL = "https://ah-quant999.github.io/quant-scanner-v8/"
+DATA_DIR = Path("data")
+RAW_DIR = Path("raw_data")
+
+# 关键卡片定义：页面 -> 卡片列表
+# expected：频率说明；max_age：按时段动态计算，这里先给默认阈值（分钟）
+CARD_DEFS = [
+    # 今日事件（盘前）
+    {"id": "MACRO_DATA", "name": "今日宏观解读", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["global_macro", "monetary"]},
+    {"id": "JUDGMENT_DATA", "name": "今日判定", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["verdict", "indices"]},
+    {"id": "IPO_DATA", "name": "打新日历", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["items"]},
+    {"id": "NT_DATA", "name": "财经日历", "page": "今日事件", "freq": "每日盘前", "max_age": 720, "key_fields": ["items"]},
+    # 实时数据
+    {"id": "CRISIS_DATA", "name": "实时风险联动温度计", "page": "实时数据", "freq": "盘中30分钟", "max_age": 60, "key_fields": ["summary", "indicators"]},
+    {"id": "MARKET_FUND_FLOW_DATA", "name": "四路资金流向", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["daily"]},
+    {"id": "MARKET_ALERTS", "name": "市场预警", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["alerts", "indices"]},
+    {"id": "INDEX_QUOTES", "name": "股指行情", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["items"]},
+    {"id": "ETF_PULSE", "name": "ETF 资金热度", "page": "实时数据", "freq": "盘中 T+0", "max_age": 60, "key_fields": ["items"]},
+    {"id": "ETF_INTRADAY_HEAT", "name": "ETF 盘中热度", "page": "实时数据", "freq": "盘中 T+0", "max_age": 60, "key_fields": ["items"]},
+    {"id": "ETF_DAILY_MONITOR", "name": "ETF 日线监控", "page": "实时数据", "freq": "盘中 T+0", "max_age": 60, "key_fields": ["items"]},
+    {"id": "SECTOR_FUND_FLOW", "name": "板块资金流", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["top_list"]},
+    {"id": "CONCEPT_RANKING", "name": "概念排名", "page": "实时数据", "freq": "盘中实时", "max_age": 90, "key_fields": ["items"]},
+    {"id": "LIMIT_UP_HEATMAP", "name": "涨停热力图", "page": "实时数据", "freq": "盘中实时", "max_age": 90, "key_fields": ["items"]},
+    # 盘后数据
+    {"id": "SH_FIB", "name": "上证斐波那契", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["windows", "current"]},
+    {"id": "MARGIN_DATA", "name": "融资融券", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["items"]},
+    {"id": "CFFEX_HOLDINGS", "name": "期指持仓", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["items"]},
+    {"id": "CANDIDATE", "name": "候选池", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["items"]},
+    {"id": "GOLD_POOL", "name": "金股池", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["items"]},
+    {"id": "LHB_DATA", "name": "龙虎榜", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["items"]},
+    {"id": "INST_TRADE", "name": "机构交易", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["items"]},
+    {"id": "TRIPLE_CONSENSUS", "name": "三重共识", "page": "选股策略", "freq": "收盘后", "max_age": 360, "key_fields": ["items"]},
+]
+
+
+def now_cst():
+    return datetime.now(timezone(timedelta(hours=8)))
+
+
+def parse_time(s):
+    if not s or s in ("--", "N/A"):
+        return None
+    try:
+        return datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone(timedelta(hours=8)))
+    except Exception:
+        try:
+            return datetime.strptime(s, "%Y-%m-%d %H:%M").replace(tzinfo=timezone(timedelta(hours=8)))
+        except Exception:
+            return None
+
+
+def load_window_var(path, var_name):
+    """从 data/*.js 读取 window.X = {...}; 并解析为 dict。"""
+    if not path.exists():
+        return None
+    text = path.read_text(encoding="utf-8")
+    # 去掉 BOM
+    text = text.lstrip("\ufeff")
+    m = re.search(rf"window\.{re.escape(var_name)}\s*=\s*([\s\S]*?);\s*\n", text)
+    if not m:
+        # 尝试更宽松的匹配
+        m = re.search(rf"window\.{re.escape(var_name)}\s*=\s*(\{{[\s\S]*?\}})\s*;", text)
+        if not m:
+            return None
+    try:
+        return json.loads(m.group(1))
+    except Exception:
+        return None
+
+
+def _load_token():
+    if os.environ.get("V8_GITHUB_TOKEN"):
+        return os.environ["V8_GITHUB_TOKEN"]
+    candidates = [
+        Path("E:/workspace/stock-scanner/.workbuddy/v8_gh_token.txt"),
+        Path.home() / ".workbuddy" / "v8_gh_token.txt",
+    ]
+    for p in candidates:
+        if p.exists():
+            return p.read_text(encoding="utf-8").strip()
+    return None
+
+
+def api_get(url):
+    token = _load_token()
+    if not token:
+        return {"__error__": 401, "__msg__": "no token"}
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    req = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return json.loads(r.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        return {"__error__": e.code, "__msg__": e.read().decode("utf-8", "replace")}
+    except Exception as e:
+        return {"__error__": 0, "__msg__": str(e)}
+
+
+def adjust_max_age(def_max):
+    """根据交易时段动态收紧/放宽阈值。"""
+    n = now_cst()
+    h = n.hour + n.minute / 60.0
+    weekday = n.weekday()
+    is_weekend = weekday >= 5
+    is_trade_day = weekday < 5
+
+    # 盘中实时数据：周一~周五 09:30-11:30, 13:00-15:00 必须很新
+    if is_trade_day and ((9.5 <= h <= 11.5) or (13.0 <= h <= 15.0)):
+        return min(def_max, 45)
+    # 盘前 08:00-09:30：允许稍旧（可能是昨日收盘数据/预更新）
+    if is_trade_day and 8.0 <= h < 9.5:
+        return min(def_max, 180)
+    # 收盘后 15:00-20:00：盘后数据应已刷新
+    if is_trade_day and 15.0 <= h < 20.0:
+        return min(def_max, 120)
+    # 夜间/周末：放宽
+    return def_max
+
+
+def check_data_cards():
+    results = []
+    today_str = now_cst().strftime("%Y-%m-%d")
+    for d in CARD_DEFS:
+        path = DATA_DIR / f"{d['id']}.js"
+        data = load_window_var(path, d["id"])
+        if data is None:
+            results.append({
+                "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
+                "status": "fail", "last_update": "--", "age_min": None,
+                "message": f"找不到数据文件 {path.name} 或解析失败"
+            })
+            continue
+        ts = data.get("update_time") or data.get("date") or data.get("lastUpdated") or "--"
+        dt = parse_time(ts)
+        max_age = adjust_max_age(d["max_age"])
+        if dt is None:
+            results.append({
+                "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
+                "status": "warn", "last_update": str(ts), "age_min": None,
+                "message": "无法解析更新时间"
+            })
+            continue
+        age_min = (now_cst() - dt).total_seconds() / 60
+        status = "ok" if age_min <= max_age else "fail"
+        # 空值检测
+        empty_fields = []
+        for f in d["key_fields"]:
+            v = data.get(f)
+            if v is None or v == "" or v == [] or v == {} or v == "--" or v == "加载中":
+                empty_fields.append(f)
+        if empty_fields and status == "ok":
+            status = "warn"
+        msg = f"更新于 {ts}（{age_min:.0f}分钟前）"
+        if empty_fields:
+            msg += f"；关键字段空值：{', '.join(empty_fields)}"
+        if status == "fail":
+            msg += f"；超过阈值 {max_age} 分钟"
+        results.append({
+            "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
+            "status": status, "last_update": ts, "age_min": round(age_min, 1),
+            "message": msg
+        })
+    return results
+
+
+def check_raw_data():
+    """检查 raw_data/ 目录是否存在关键文件且不为空。"""
+    results = []
+    if not RAW_DIR.exists():
+        return [{"id": "raw_data_dir", "name": "raw_data 目录", "page": "管线", "status": "fail", "message": "raw_data 目录不存在"}]
+    key_files = ["etf_pulse.json", "capital_flow_data.json", "index_quotes.json", "crisis_data.json", "concept_ranking.json"]
+    for fn in key_files:
+        p = RAW_DIR / fn
+        status = "ok"
+        msg = "存在"
+        if not p.exists():
+            status = "fail"
+            msg = "文件缺失"
+        elif p.stat().st_size == 0:
+            status = "fail"
+            msg = "文件为空"
+        elif p.stat().st_size < 100:
+            status = "warn"
+            msg = f"文件过小 ({p.stat().st_size} bytes)"
+        results.append({"id": f"raw_{fn}", "name": f"raw_data/{fn}", "page": "管线", "status": status, "message": msg})
+    return results
+
+
+def check_site_deploy_sync():
+    """检查线上 Pages commit 是否与 origin/main 一致。"""
+    # 先拿本地 HEAD
+    local_sha = None
+    try:
+        local_sha = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, timeout=10).strip()
+    except Exception as e:
+        return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "warn", "message": f"无法获取本地 HEAD: {e}"}]
+
+    # 线上站点 meta
+    try:
+        req = urllib.request.Request(SITE_URL, headers={"User-Agent": "v8-health-check"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            html = r.read().decode("utf-8", "replace")
+    except Exception as e:
+        return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "fail", "message": f"站点不可达: {e}"}]
+
+    # 尝试从 HTML 注释或脚本中找 commit sha
+    m = re.search(r"v8-build-sha[:=]\s*([a-f0-9]{7,40})", html, re.I)
+    site_sha = m.group(1) if m else None
+    if not site_sha:
+        # fallback：拿 GitHub Pages 的 latest deployment SHA（通过 GitHub API）
+        deployments = api_get(f"https://api.github.com/repos/{REPO}/deployments?environment=github-pages&per_page=1")
+        if isinstance(deployments, list) and deployments:
+            site_sha = deployments[0].get("sha", "")[:7]
+
+    if not site_sha:
+        return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "warn", "message": "无法从线上或 API 获取 Pages SHA"}]
+
+    synced = local_sha.startswith(site_sha) or site_sha.startswith(local_sha)
+    status = "ok" if synced else "fail"
+    msg = f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]} {'已同步' if synced else '不同步，可能部署延迟或缓存'}"
+    return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": status, "message": msg}]
+
+
+def check_runner():
+    d = api_get(f"https://api.github.com/repos/{REPO}/actions/runners")
+    if "__error__" in d:
+        return [{"id": "runner", "name": "self-hosted runner", "page": "管线", "status": "fail", "message": f"API error {d['__error__']}: {d.get('__msg__', '')[:80]}"}]
+    runners = d.get("runners", [])
+    if not runners:
+        return [{"id": "runner", "name": "self-hosted runner", "page": "管线", "status": "fail", "message": "无 runner 记录"}]
+    msgs = []
+    status = "ok"
+    for r in runners:
+        online = r.get("status") == "online"
+        busy = r.get("busy", False)
+        msgs.append(f"{r['name']}: online={online}, busy={busy}")
+        if not online:
+            status = "fail"
+        elif busy:
+            status = "warn"
+    return [{"id": "runner", "name": "self-hosted runner", "page": "管线", "status": status, "message": "; ".join(msgs)}]
+
+
+def check_local_head_sync():
+    """检查本地 HEAD 是否与 origin/main 一致。"""
+    try:
+        subprocess.run(["git", "fetch", "origin"], check=True, timeout=30)
+        local = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, timeout=10).strip()
+        remote = subprocess.check_output(["git", "rev-parse", "origin/main"], text=True, timeout=10).strip()
+        synced = local == remote
+        status = "ok" if synced else "fail"
+        msg = f"本地 {local[:7]} / origin/main {remote[:7]} {'同步' if synced else '本地落后，需 pull/push'}"
+        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线", "status": status, "message": msg}]
+    except Exception as e:
+        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线", "status": "warn", "message": f"检查失败: {e}"}]
+
+
+def check_site_dom(site_html=None):
+    """二期：简单 DOM 空值检测（从线上 HTML 检查关键 id 是否存在且非空）。"""
+    if site_html is None:
+        try:
+            req = urllib.request.Request(SITE_URL, headers={"User-Agent": "v8-health-check"})
+            with urllib.request.urlopen(req, timeout=15) as r:
+                site_html = r.read().decode("utf-8", "replace")
+        except Exception as e:
+            return [{"id": "dom_check", "name": "线上 DOM 空值检测", "page": "管线", "status": "warn", "message": f"拉取页面失败: {e}"}]
+
+    critical_ids = ["riskGaugeBody", "todayEventsBody", "afterHoursBody", "strategyBody", "taskScheduleBody"]
+    results = []
+    for cid in critical_ids:
+        m = re.search(rf'id=["\']{re.escape(cid)}["\'][^>]*>(.*?)</[^>]+>', site_html, re.S)
+        if not m:
+            results.append({"id": f"dom_{cid}", "name": f"DOM #{cid}", "page": "管线", "status": "fail", "message": "未找到元素"})
+            continue
+        content = m.group(1).strip()
+        bad = content == "" or "加载中" in content or content == "--" or len(content) < 20
+        status = "fail" if bad else "ok"
+        msg = "内容为空或仍在加载" if bad else f"内容长度 {len(content)}"
+        results.append({"id": f"dom_{cid}", "name": f"DOM #{cid}", "page": "管线", "status": status, "message": msg})
+    return results
+
+
+def build_report(cards, raw, site_sync, runner, local_sync, dom):
+    all_items = cards + raw + site_sync + runner + local_sync + dom
+    ok = sum(1 for x in all_items if x["status"] == "ok")
+    warn = sum(1 for x in all_items if x["status"] == "warn")
+    fail = sum(1 for x in all_items if x["status"] == "fail")
+    overall = "ok" if fail == 0 else ("warn" if fail <= 2 else "fail")
+    return {
+        "updated": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
+        "overall": overall,
+        "summary": {"ok": ok, "warn": warn, "fail": fail, "total": len(all_items)},
+        "items": all_items,
+    }
+
+
+def write_health_js(report):
+    out_path = DATA_DIR / "HEALTH_CHECK.js"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    js = "window.HEALTH_CHECK = " + json.dumps(report, ensure_ascii=False, indent=2) + ";\n"
+    out_path.write_text(js, encoding="utf-8")
+    print(f"[INFO] 已生成 {out_path}")
+
+
+def send_report_email(report):
+    if not send_alert:
+        print("[WARN] 邮件发送器未导入，跳过邮件")
+        return False
+    if report["overall"] == "ok":
+        return False
+    subject = f"【v8健康告警】{report['summary']['fail']}项异常 / {report['updated']}"
+    lines = [f"v8 前端健康检查时间：{report['updated']}", f"总体状态：{report['overall']}",
+             f"统计：✓ {report['summary']['ok']} / ⚠ {report['summary']['warn']} / ✗ {report['summary']['fail']}",
+             "", "异常项："]
+    for item in report["items"]:
+        if item["status"] != "ok":
+            flag = "✗" if item["status"] == "fail" else "⚠"
+            lines.append(f"{flag} [{item['page']}] {item['name']}: {item['message']}")
+    lines.append("")
+    lines.append(f"站点：{SITE_URL}")
+    return send_alert(subject, "\n".join(lines))
+
+
+def main():
+    parser = argparse.ArgumentParser(description="v8 前端健康巡检")
+    parser.add_argument("--alert", action="store_true", help="异常时发送邮件告警")
+    parser.add_argument("--site", action="store_true", help="额外检查线上 DOM 空值")
+    args = parser.parse_args()
+
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+
+    print(f"[INFO] v8 health check start @ {now_cst().strftime('%Y-%m-%d %H:%M:%S')}")
+
+    cards = check_data_cards()
+    raw = check_raw_data()
+    site_sync = check_site_deploy_sync()
+    runner = check_runner()
+    local_sync = check_local_head_sync()
+    dom = []
+    if args.site:
+        dom = check_site_dom()
+
+    report = build_report(cards, raw, site_sync, runner, local_sync, dom)
+    write_health_js(report)
+
+    # 打印摘要
+    print(f"[INFO] 总体: {report['overall']} | 统计: {report['summary']}")
+    for item in report["items"]:
+        if item["status"] != "ok":
+            print(f"  [{item['status'].upper()}] {item['page']}/{item['name']}: {item['message']}")
+
+    if args.alert:
+        send_report_email(report)
+
+    sys.exit(0 if report["overall"] == "ok" else 2)
+
+
+if __name__ == "__main__":
+    main()

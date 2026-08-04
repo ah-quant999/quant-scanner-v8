@@ -7,6 +7,7 @@ v8 云端管线看门狗（只监督，不部署）
 - 检查 raw_data 最新提交是否陈旧
 - 检查站点 HTTP 200
 - 把异常写入 _v8_watchdog.log，供人工/自动化追踪
+- 集成健康检查与邮件告警
 """
 import argparse
 import json
@@ -17,6 +18,12 @@ import urllib.request
 import urllib.error
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
+
+# 邮件告警（配置在 .workbuddy/v8_smtp_config.json，gitignored）
+try:
+    from v8_send_alert import send_alert
+except Exception:
+    send_alert = None
 
 REPO = "ah-quant999/quant-scanner-v8"
 SITE_URL = "https://ah-quant999.github.io/quant-scanner-v8/"
@@ -219,11 +226,55 @@ def auto_dispatch(cat):
         return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
 
 
+def write_urgent(reason_lines):
+    """邮件失败或需要留痕时，写 URGENT 文件到仓库根目录。"""
+    ts = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d_%H%M")
+    p = Path(f"URGENT_小九_{ts}_v8看门狗告警.md")
+    body = [f"# v8 看门狗告警 {ts}", ""] + reason_lines + ["", "请检查 v8_cloud_watchdog.py / v8_health_check.py 日志。"]
+    p.write_text("\n".join(body), encoding="utf-8")
+    print(f"[INFO] 已写紧急文件 {p}")
+
+
+def run_health_check(alert=False):
+    """调用 v8_health_check.py 做完整前端健康检查。"""
+    cmd = [sys.executable, "v8_health_check.py"]
+    if alert:
+        cmd.append("--alert")
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=300)
+        return result.returncode, result.stdout + result.stderr
+    except Exception as e:
+        return 1, f"调用 v8_health_check.py 失败: {e}"
+
+
+def send_watchdog_alert(now, results, health_rc=None, health_out=None):
+    """发送看门狗汇总告警邮件；邮件失败时写 URGENT 文件。"""
+    if not send_alert:
+        write_urgent(["邮件发送器未加载"])
+        return False
+    fail_items = [f"✗ {name}: {msg}" for name, ok, msg in results if not ok]
+    subject = f"【v8看门狗告警】{len(fail_items)}项异常 @ {now}"
+    lines = [f"v8 看门狗巡检时间：{now}", f"站点：{SITE_URL}", "", "异常项："]
+    lines.extend(fail_items)
+    if health_rc is not None:
+        lines.extend(["", f"健康检查返回码：{health_rc}"])
+        if health_out:
+            lines.extend(["健康检查输出（前30行）：", *health_out.splitlines()[:30]])
+    ok = send_alert(subject, "\n".join(lines))
+    if not ok:
+        write_urgent(fail_items)
+    return ok
+
+
 def main():
     parser = argparse.ArgumentParser(description="v8 云端管线看门狗")
     parser.add_argument("--heal", action="store_true", help="runner 离线时尝试自动拉起本地进程")
     parser.add_argument("--auto-dispatch", action="store_true",
                         help="数据陈旧且处于交易时段时，经 API 主动派发 cn_fetch 刷新（绕过 GitHub schedule）")
+    parser.add_argument("--health-check", action="store_true",
+                        help="同时运行 v8_health_check.py 做前端数据/空值/部署同步检查")
+    parser.add_argument("--alert", action="store_true",
+                        help="异常时发送邮件告警（依赖 .workbuddy/v8_smtp_config.json）")
     args = parser.parse_args()
 
     now_cst = datetime.now(timezone(timedelta(hours=8)))
@@ -247,14 +298,12 @@ def main():
 
     # === 自动派发修复（紧急交接核心） ===
     if args.auto_dispatch:
-        # 取 raw_data 实际陈旧分钟数（独立于 90min 监控阈值，用更高阈值避免频繁派发）
         commits = api_get(f"https://api.github.com/repos/{REPO}/commits?path=raw_data&per_page=1")
         stale_min = None
         if "__error__" not in commits and commits:
             dt = utc_to_cst(commits[0]["commit"]["author"]["date"])
             stale_min = (now_cst - dt).total_seconds() / 60
-        # 活跃窗口：工作日 09:00–21:00；周末 09:00–18:00 也允许（T+1 刷新）
-        weekday = now_cst.weekday()  # 0=Mon
+        weekday = now_cst.weekday()
         is_weekend = weekday >= 5
         active = (9 <= now_cst.hour <= 21) and (not is_weekend or now_cst.hour <= 18)
         if stale_min is not None and stale_min > 150 and active:
@@ -281,7 +330,20 @@ def main():
         f.write(log_text)
 
     print(log_text, end="")
-    # auto_dispatch 自身成功不算 ALERT；仅当监控项 FAIL 才返回 2
+
+    # === 健康检查（二期） ===
+    health_rc, health_out = None, None
+    if args.health_check:
+        health_rc, health_out = run_health_check(alert=args.alert)
+        # health check 失败也算 overall 失败
+        if health_rc != 0:
+            overall = False
+            print(f"[ALERT] v8_health_check.py 返回非零: {health_rc}")
+
+    # === 邮件告警（三期） ===
+    if args.alert and not overall:
+        send_watchdog_alert(now, results, health_rc=health_rc, health_out=health_out)
+
     sys.exit(0 if overall else 2)
 
 

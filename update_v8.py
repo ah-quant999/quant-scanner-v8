@@ -379,6 +379,17 @@ def build(category=None, detect_changes=False):
     return 0
 
 
+def run_health_check():
+    """构建完成后生成 data/HEALTH_CHECK.js，供前端健康面板渲染。"""
+    hc_path = Path(__file__).resolve().parent / "v8_health_check.py"
+    if not hc_path.exists():
+        return
+    try:
+        subprocess.run([sys.executable, str(hc_path)], check=False, timeout=300)
+    except Exception as e:
+        print(f"[WARN] 健康检查调用失败: {e}")
+
+
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="v8 data builder")
@@ -387,7 +398,10 @@ def main():
     parser.add_argument("--detect-changes", action="store_true",
                         help="只构建最近 git diff 发生变化的 raw_data 所属类别")
     args = parser.parse_args()
-    return build(category=args.category, detect_changes=args.detect_changes)
+    rc = build(category=args.category, detect_changes=args.detect_changes)
+    if rc == 0:
+        run_health_check()
+    return rc
 
 
 if __name__ == '__main__':
