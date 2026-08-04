@@ -248,21 +248,50 @@ def run_health_check(alert=False):
 
 
 def send_watchdog_alert(now, results, health_rc=None, health_out=None):
-    """发送看门狗汇总告警邮件；邮件失败时写 URGENT 文件。"""
+    """发送看门狗汇总告警邮件；邮件失败时写 URGENT 文件。
+
+    告警门槛（2026-08-04 修订）：
+    - 管线类（runner/cn_fetch/build_deploy/raw_data/site）：任一 fail 即告警（基础设施问题）
+    - 健康检查类：仅「超阈值 ≥ 120 分钟」的 fail 才触发邮件，纯空值/盘前数据不骚扰
+    """
     if not send_alert:
         write_urgent(["邮件发送器未加载"])
         return False
-    fail_items = [f"✗ {name}: {msg}" for name, ok, msg in results if not ok]
-    subject = f"【v8看门狗告警】{len(fail_items)}项异常 @ {now}"
-    lines = [f"v8 看门狗巡检时间：{now}", f"站点：{SITE_URL}", "", "异常项："]
-    lines.extend(fail_items)
-    if health_rc is not None:
-        lines.extend(["", f"健康检查返回码：{health_rc}"])
-        if health_out:
-            lines.extend(["健康检查输出（前30行）：", *health_out.splitlines()[:30]])
+    # 管线类异常（基础设施，始终告警）
+    infra_fails = [f"✗ {name}: {msg}" for name, ok, msg in results if not ok]
+    # 健康检查类：过滤出真正陈旧的项
+    health_alert_items = []
+    ALERT_OVERDUE_MIN = 120
+    if health_out:
+        for line in health_out.splitlines():
+            stripped = line.strip()
+            # 匹配 [FAIL] 开头的健康检查行，提取年龄信息
+            if not stripped.startswith("[FAIL]"):
+                continue
+            # 尝试从消息中解析年龄（格式如 "493分钟前" 或 "age_min=xxx"）
+            import re as _re
+            m = _re.search(r'(\d+(?:\.\d+)?)\s*分钟前', stripped)
+            if m and float(m.group(1)) >= ALERT_OVERDUE_MIN:
+                health_alert_items.append(f"✗ {stripped[6:].strip()}")
+            elif not m:
+                # 无法解析年龄的 FAIL 也保留（可能是文件缺失等严重问题）
+                if "找不到" in stripped or "不存在" in stripped or "无法获取" in stripped:
+                    health_alert_items.append(f"✗ {stripped[6:].strip()}")
+
+    total_alerts = len(infra_fails) + len(health_alert_items)
+    if total_alerts == 0:
+        print(f"[INFO] watchdog 跳过邮件：无管线异常且健康检查无超阈 ≥ {ALERT_OVERDUE_MIN}min 的项")
+        return False
+
+    subject = f"【v8看门狗告警】{total_alerts}项异常 @ {now}"
+    lines = [f"v8 看门狗巡检时间：{now}", f"站点：{SITE_URL}", ""]
+    if infra_fails:
+        lines.extend(["管线异常：", *infra_fails, ""])
+    if health_alert_items:
+        lines.extend(["数据陈旧（≥2h）：", *health_alert_items])
     ok = send_alert(subject, "\n".join(lines))
     if not ok:
-        write_urgent(fail_items)
+        write_urgent(infra_fails + health_alert_items)
     return ok
 
 

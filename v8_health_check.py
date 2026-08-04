@@ -133,24 +133,70 @@ def api_get(url):
         return {"__error__": 0, "__msg__": str(e)}
 
 
-def adjust_max_age(def_max):
-    """根据交易时段动态收紧/放宽阈值。"""
+def adjust_max_age(def_max, page=None):
+    """根据交易时段 + 数据更新窗口动态调整阈值。
+
+    核心思路：每类数据有自己的「更新窗口」，窗口关闭后数据自然不会再刷新，
+    此时不应再用盘中阈值去判 stale，而应放宽到「下次预计更新前都算正常」。
+
+    参数:
+        def_max: CARD_DEFS 里定义的默认阈值（分钟）
+        page:   卡片所属分组（今日事件/实时数据/盘后数据/选股策略），用于区分更新窗口
+    """
     n = now_cst()
     h = n.hour + n.minute / 60.0
     weekday = n.weekday()
     is_weekend = weekday >= 5
     is_trade_day = weekday < 5
 
-    # 盘中实时数据：周一~周五 09:30-11:30, 13:00-15:00 必须很新
+    # ── 通用收紧：交易时段内实时数据必须很新 ──
+    if page == "实时数据":
+        if is_trade_day and ((9.5 <= h <= 11.5) or (13.0 <= h <= 15.0)):
+            # 盘中：必须 45 分钟内更新过
+            return min(def_max, 45)
+        if is_trade_day and 15.0 <= h < 16.5:
+            # 收盘后 1 小时宽限（收盘整理 + 构建部署延迟）
+            return min(def_max, 120)
+        # 盘前 / 夜间 / 周末：实时数据本就不预期更新，放过夜阈值
+        # 次日 09:30 才会有新数据，给到次日开盘都算正常
+        if is_trade_day and h < 9.5:
+            return 960  # 16h：从前一天收盘到当天开盘
+        # 周末 /节假日：给 2880（48h，覆盖周末+周一开盘）
+        return 2880
+
+    if page == "今日事件":
+        # 今日事件由 v8_cn_fetch 08:25 premarket 产出，每日仅一次
+        if is_trade_day and 8.0 <= h < 10.0:
+            # 盘前窗口：期望已更新，但允许 180 分钟（可能稍晚）
+            return min(def_max, 180)
+        # 10:00 后当日不会再更新（下次是次日 08:25）
+        # 给到次日早盘都算正常
+        if is_trade_day:
+            return 960 if h < 23 else 1200  # 到次日 08:00~09:00
+        # 周末：覆盖到周一早盘
+        return 2880
+
+    if page in ("盘后数据", "选股策略"):
+        # 盘后数据由 v8_algo 18:30 算法链产出
+        if is_trade_day and 17.0 <= h < 23.0:
+            # 收盘后晚间：应已更新，用默认 360 或收紧到 240
+            return min(def_max, 360)
+        if is_trade_day and h >= 23.0:
+            # 深夜：次日 18:30 前不预期更新
+            return 1200  # 20h，撑到次日傍晚
+        if is_trade_day and h < 17.0:
+            # 白天还没到产出时间：放宽
+            return min(def_max, 480)
+        # 周末：覆盖到周一傍晚
+        return 2880
+
+    # 未分类 / 管线类：沿用旧逻辑兜底
     if is_trade_day and ((9.5 <= h <= 11.5) or (13.0 <= h <= 15.0)):
         return min(def_max, 45)
-    # 盘前 08:00-09:30：允许稍旧（可能是昨日收盘数据/预更新）
     if is_trade_day and 8.0 <= h < 9.5:
         return min(def_max, 180)
-    # 收盘后 15:00-20:00：盘后数据应已刷新
     if is_trade_day and 15.0 <= h < 20.0:
         return min(def_max, 120)
-    # 夜间/周末：放宽
     return def_max
 
 
@@ -169,7 +215,7 @@ def check_data_cards():
             continue
         ts = data.get("update_time") or data.get("date") or data.get("lastUpdated") or "--"
         dt = parse_time(ts)
-        max_age = adjust_max_age(d["max_age"])
+        max_age = adjust_max_age(d["max_age"], page=d.get("page"))
         if dt is None:
             results.append({
                 "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
@@ -345,14 +391,22 @@ def send_report_email(report):
         return False
     if report["overall"] == "ok":
         return False
-    subject = f"【v8健康告警】{report['summary']['fail']}项异常 / {report['updated']}"
+    # ── 过滤：仅「真正陈旧」的项才触发邮件 ──
+    # 规则：fail 项必须超阈值 ≥ 120 分钟（2 小时）才算值得告警；
+    #       纯空值 warn（数据新鲜但关键字段为空）不触发邮件，避免噪音。
+    ALERT_OVERDUE_MIN = 120
+    alert_items = [it for it in report["items"] if it["status"] == "fail"
+                   and it.get("age_min") is not None and it["age_min"] >= ALERT_OVERDUE_MIN]
+    if not alert_items:
+        print(f"[INFO] 跳过邮件：{report['summary']['fail']} 项 fail 中无超阈 ≥ {ALERT_OVERDUE_MIN}min 的项")
+        return False
+    subject = f"【v8健康告警】{len(alert_items)}项数据陈旧 / {report['updated']}"
     lines = [f"v8 前端健康检查时间：{report['updated']}", f"总体状态：{report['overall']}",
              f"统计：✓ {report['summary']['ok']} / ⚠ {report['summary']['warn']} / ✗ {report['summary']['fail']}",
-             "", "异常项："]
-    for item in report["items"]:
-        if item["status"] != "ok":
-            flag = "✗" if item["status"] == "fail" else "⚠"
-            lines.append(f"{flag} [{item['page']}] {item['name']}: {item['message']}")
+             "", "以下项超过阈值 ≥ 2 小时："]
+    for item in alert_items:
+        flag = "✗" if item["status"] == "fail" else "⚠"
+        lines.append(f"{flag} [{item['page']}] {item['name']}: {item['message']}")
     lines.append("")
     lines.append(f"站点：{SITE_URL}")
     return send_alert(subject, "\n".join(lines))
