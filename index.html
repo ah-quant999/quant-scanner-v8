@@ -11166,7 +11166,18 @@ function renderLimitUpHeatmap(){
 
     }
 
-    return '数据截至 '+lastFmt;
+        // 用相对时间替代裸日期
+    var lastDateObj = new Date(lastFmt+'T15:00:00+08:00');
+    var relText = window._fmtAshareRel ? window._fmtAshareRel(lastFmt+' 15:00:00') : lastFmt;
+    if(last !== today){
+      var daysOld = Math.floor((new Date() - lastDateObj) / 86400000);
+      var staleTag = daysOld > 1 ? ' <span style="color:var(--gold);font-size:10px">('+daysOld+'天前)</span>' : '';
+      return '数据截至 '+relText+staleTag;
+    }
+    var hm = ts && ts.length >= 16 ? ' · '+ts.slice(11,16) : '';
+    return relText+hm;
+  }
+  function renderMarketFundFlow(mff){
 
   }
 
@@ -13136,7 +13147,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     const H = window.HEALTH_CHECK || {};
 
-    if(timeEl) timeEl.textContent = H.updated ? '更新于 ' + H.updated : '更新于 --';
+    if(timeEl) timeEl.textContent = H.updated ? '更新于 ' + (window._fmtAshareRel ? window._fmtAshareRel(H.updated) : H.updated) : '更新于 --';
 
     if(!H.items || !H.items.length){
 
@@ -13526,7 +13537,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     const bs=track.backtest_signal||{};
 
-    $('ttBackNote').textContent='口径：'+(bs.method||'')+'；样本 '+(bs.total||0)+' 笔；数据截至 '+(bs.latest_date||'-')+'；最优持有 '+(bs.best_hold_days||'-')+' 日。';
+    var _ttLD = bs.latest_date || '-';
+    var _ttLDrel = (bs.latest_date && window._fmtAshareRel) ? window._fmtAshareRel(bs.latest_date+' 15:00:00') : _ttLD;
+    $('ttBackNote').textContent='口径：'+(bs.method||'')+'；样本 '+(bs.total||0)+' 笔；数据截至 '+_ttLDrel+'；最优持有 '+(bs.best_hold_days||'-')+' 日。';
 
     const per=bs.periods||{};
 
