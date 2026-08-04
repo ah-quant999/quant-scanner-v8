@@ -54,6 +54,29 @@ def r2(x):
         return 0.0
 
 
+def load_meta_map(path=META_FILE):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def board_from_code(code):
+    c = re.sub(r"[^0-9]", "", str(code))
+    if not c:
+        return ""
+    if c.startswith(("600", "601", "603", "605", "000", "001", "002", "003")):
+        return "主板"
+    if c.startswith(("300", "301")):
+        return "创业板"
+    if c.startswith(("688", "689")):
+        return "科创板"
+    if c.startswith(("8", "4", "92")):
+        return "北交所"
+    return ""
+
+
 def main():
     print(f"  三重共识 跟踪/回测分析  —  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 60)
@@ -68,6 +91,7 @@ def main():
 
     fq_stocks = fq.get("stocks", {}) if isinstance(fq, dict) else {}
     gp_stocks = gold_pool.get("stocks", {}) if isinstance(gold_pool, dict) else {}
+    meta_map = load_meta_map()
     price_hist = history.get("_stock_price_history", {})
     tracking = history.get("_tracking_latest", {})
     meta = history.get("_meta", {})
@@ -80,6 +104,15 @@ def main():
     tracked = []
     for r in today_records:
         code = ncode(r.get("code", ""))
+        meta = meta_map.get(code) or {}
+        if not r.get("industry"):
+            r["industry"] = meta.get("industry") or ""
+        if not r.get("board"):
+            r["board"] = meta.get("board") or board_from_code(code) or r.get("board", "")
+        if (not r.get("sectors") or len(r.get("sectors", [])) == 0) and meta.get("concepts"):
+            r["sectors"] = list(meta.get("concepts"))[:6]
+        if meta.get("concepts") and not r.get("concepts"):
+            r["concepts"] = meta.get("concepts")
         tr = tracking.get(code, {})
         enter_date = tr.get("enter_date", today)
         first_close = price_hist.get(code, {}).get(enter_date)
