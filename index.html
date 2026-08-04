@@ -4775,6 +4775,28 @@ window.V8_CAL = {weeks:[],legend:[]};
 
       .cal-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
 
+      .rc-monthnav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px;padding:8px 10px;background:var(--card);border:1px solid var(--border);border-radius:10px}
+
+      .rc-mn-btn{background:var(--bg2);border:1px solid var(--border);color:var(--sub);font-size:11px;padding:4px 10px;border-radius:7px;cursor:pointer;transition:.15s}
+
+      .rc-mn-btn:hover:not(:disabled){color:var(--txt);border-color:var(--gold)}
+
+      .rc-mn-btn:disabled{opacity:.3;cursor:not-allowed}
+
+      .rc-mn-cur{font-size:13px;font-weight:700;color:var(--txt);min-width:78px;text-align:center}
+
+      .rc-mn-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-left:6px;padding-left:10px;border-left:1px solid var(--border)}
+
+      .rc-mn-tab{background:transparent;border:1px solid var(--border);color:var(--dim);font-size:10px;padding:3px 8px;border-radius:6px;cursor:pointer;transition:.15s}
+
+      .rc-mn-tab i{font-style:normal;margin-left:4px;opacity:.65;font-size:9px}
+
+      .rc-mn-tab:hover{color:var(--txt)}
+
+      .rc-mn-tab.on{background:rgba(251,191,36,.12);border-color:var(--gold);color:var(--gold);font-weight:700}
+
+      .rc-mn-tab.none{opacity:.35}
+
       .cal-title{font-size:14px;font-weight:700;color:var(--txt)}
 
       .cal-meta{font-size:11px;color:var(--dim)}
@@ -5177,39 +5199,233 @@ window.V8_CAL = {weeks:[],legend:[]};
 
   }
 
-  // 以当月第一个周一为起点，向后顺延 6 周（月对齐，不往前翻到上月）
+  /* ===== 日历月份导航：可回看历史月（数据源 LHB_HISTORY，并入当日 LHB_DATA） ===== */
+
+  function _rcHistMonthMap(){
+
+    if(window.__rcHistMonthMap) return window.__rcHistMonthMap;
+
+    var map = {};
+
+    var H = window.LHB_HISTORY;
+
+    if(H && typeof H === 'object'){
+
+      Object.keys(H).forEach(function(k){
+
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(k)) return;
+
+        var d = H[k];
+
+        if(!d || d.trading === false) return;
+
+        var st = d.stocks || [];
+
+        if(!st.length) return;
+
+        var ym = k.slice(0,7);
+
+        (map[ym] = map[ym] || []).push({date: k.replace(/-/g,''), stocks: st, summary: d.summary || {}});
+
+      });
+
+    }
+
+    var LD = window.LHB_DATA || {};
+
+    if(LD.date && (LD.stocks||[]).length){
+
+      var ym2 = LD.date.slice(0,4) + '-' + LD.date.slice(4,6);
+
+      var arr = (map[ym2] = map[ym2] || []);
+
+      if(!arr.some(function(x){ return x.date === LD.date; })){
+
+        arr.push({date: LD.date, stocks: LD.stocks, summary: LD.summary || {}});
+
+      }
+
+    }
+
+    Object.keys(map).forEach(function(k){ map[k].sort(function(a,b){ return a.date < b.date ? -1 : 1; }); });
+
+    window.__rcHistMonthMap = map;
+
+    return map;
+
+  }
+
+  window._rcDayData = function(dateStr){
+
+    if(!dateStr || dateStr.length < 8) return null;
+
+    var arr = _rcHistMonthMap()[dateStr.slice(0,4) + '-' + dateStr.slice(4,6)] || [];
+
+    for(var i = 0; i < arr.length; i++){ if(arr[i].date === dateStr) return arr[i]; }
+
+    return null;
+
+  };
+
+  function _rcAvailMonths(){
+
+    var map = _rcHistMonthMap();
+
+    var arr = Object.keys(map);
+
+    var now = new Date();
+
+    var cur = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+
+    if(arr.indexOf(cur) < 0) arr.push(cur);
+
+    arr.sort();
+
+    return arr;
+
+  }
+
+  window._rcCalSel = window._rcCalSel || {};
+
+  function _rcCalYm(kind){
+
+    if(!window._rcCalSel[kind]){
+
+      var ms = _rcAvailMonths(), map = _rcHistMonthMap(), pick = '';
+
+      for(var i = ms.length - 1; i >= 0; i--){ if((map[ms[i]]||[]).length){ pick = ms[i]; break; } }
+
+      window._rcCalSel[kind] = pick || ms[ms.length-1];
+
+    }
+
+    return window._rcCalSel[kind];
+
+  }
+
+  function _rcMonthDays(kind){
+
+    return (_rcHistMonthMap()[_rcCalYm(kind)] || []).slice();
+
+  }
+
+  window._rcCalGo = function(kind, ym){
+
+    if(!ym) return;
+
+    window._rcCalSel[kind] = ym;
+
+    try{
+
+      if(kind === 'nb'){ if(typeof renderNorthCalendar === 'function') renderNorthCalendar(); }
+
+      else { if(typeof renderJyCalendar === 'function') renderJyCalendar(); }
+
+    }catch(err){ console.warn('calendar re-render failed', err); }
+
+  };
+
+  function _rcMonthNavHtml(kind, ym){
+
+    var ms = _rcAvailMonths(), map = _rcHistMonthMap();
+
+    var idx = ms.indexOf(ym);
+
+    var prev = idx > 0 ? ms[idx-1] : '';
+
+    var next = (idx >= 0 && idx < ms.length - 1) ? ms[idx+1] : '';
+
+    var h = '<div class="rc-monthnav">';
+
+    h += prev ? '<button class="rc-mn-btn" onclick="_rcCalGo(\'' + kind + '\',\'' + prev + '\')">\u2039 上月</button>' : '<button class="rc-mn-btn" disabled>\u2039 上月</button>';
+
+    h += '<span class="rc-mn-cur">' + ym.slice(0,4) + '年' + (+ym.slice(5,7)) + '月</span>';
+
+    h += next ? '<button class="rc-mn-btn" onclick="_rcCalGo(\'' + kind + '\',\'' + next + '\')">下月 \u203a</button>' : '<button class="rc-mn-btn" disabled>下月 \u203a</button>';
+
+    h += '<span class="rc-mn-tabs">';
+
+    ms.forEach(function(m){
+
+      var n = (map[m]||[]).length;
+
+      h += '<button class="rc-mn-tab' + (m === ym ? ' on' : '') + (n ? '' : ' none') + '" onclick="_rcCalGo(\'' + kind + '\',\'' + m + '\')" title="' + m + ' 有数据交易日 ' + n + ' 天">' + (+m.slice(5,7)) + '月<i>' + n + '</i></button>';
+
+    });
+
+    h += '</span></div>';
+
+    return h;
+
+  }
+
+  // 按自然月切周：首尾周截断到月内，跳过无工作日的残周（不多一天、不少一天）
 
   function _rcMonthWeekCards(year, month){
 
-    var firstMon = new Date(year, month, 1);
-
-    var dow = firstMon.getDay();
-
-    var diffToMon = (8 - dow) % 7; // 第一个周一（含当天若恰为周一）
-
-    firstMon.setDate(firstMon.getDate() + diffToMon);
-
     var DAY = 86400000;
 
-    var out = [];
+    var first = new Date(year, month, 1);
 
-    for(var i = 0; i < 6; i++){
+    var lastD = new Date(year, month + 1, 0).getDate();
 
-      var wm = new Date(firstMon.getTime() + i * 7 * DAY);
+    var last = new Date(year, month, lastD);
 
-      var ws = new Date(wm.getTime() + 6 * DAY);
+    var dow0 = first.getDay();
 
-      out.push({
+    var back = (dow0 === 0) ? 6 : (dow0 - 1);
 
-        no: i + 1,
+    var cur = new Date(year, month, 1 - back);
 
-        mon: wm, sun: ws,
+    var pad = function(n){ return String(n).padStart(2,'0'); };
 
-        monLabel: (wm.getMonth()+1) + '/' + wm.getDate(),
+    var out = [], no = 0;
 
-        sunLabel: (ws.getMonth()+1) + '/' + ws.getDate()
+    while(cur.getTime() <= last.getTime()){
 
-      });
+      var wkSun = new Date(cur.getTime() + 6 * DAY);
+
+      var st = cur.getTime() < first.getTime() ? new Date(first.getTime()) : new Date(cur.getTime());
+
+      var en = wkSun.getTime() > last.getTime() ? new Date(last.getTime()) : new Date(wkSun.getTime());
+
+      var hasWd = false;
+
+      for(var t = st.getTime(); t <= en.getTime(); t += DAY){
+
+        var w = new Date(t).getDay();
+
+        if(w >= 1 && w <= 5){ hasWd = true; break; }
+
+      }
+
+      if(hasWd){
+
+        no++;
+
+        out.push({
+
+          no: no,
+
+          mon: new Date(cur.getTime()),
+
+          sun: wkSun,
+
+          start: st, end: en,
+
+          startStr: '' + st.getFullYear() + pad(st.getMonth()+1) + pad(st.getDate()),
+
+          endStr: '' + en.getFullYear() + pad(en.getMonth()+1) + pad(en.getDate()),
+
+          monLabel: (st.getMonth()+1) + '/' + st.getDate(),
+
+          sunLabel: (en.getMonth()+1) + '/' + en.getDate()
+
+        });
+
+      }
+
+      cur = new Date(cur.getTime() + 7 * DAY);
 
     }
 
@@ -5233,17 +5449,27 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     var D = window.LHB_DATA || {};
 
-    var stocks = D.stocks || [];
+    // 数据源：按月切片（可回看历史月），缺当日时并入最新单日数据
 
-    var summary = D.summary || {};
+    var _ym = _rcCalYm('jy');
 
-    var lhbDate = D.date || '';
+    var year = +_ym.slice(0,4), month = +_ym.slice(5,7) - 1;
+
+    var _mDays = _rcMonthDays('jy');
+
+    var _dayMap = {}; _mDays.forEach(function(x){ _dayMap[x.date] = x; });
+
+    var _lastDay = _mDays.length ? _mDays[_mDays.length-1] : null;
+
+    var stocks = _lastDay ? (_lastDay.stocks || []) : [];
+
+    var summary = _lastDay ? (_lastDay.summary || {}) : {};
+
+    var lhbDate = _lastDay ? _lastDay.date : '';
 
 
 
     var now = new Date();
-
-    var year = now.getFullYear(), month = now.getMonth();
 
     // 注：日历标题与日历网格统一用「当前月」（8月）；下方「最近交易日」卡片展示
 
@@ -5291,9 +5517,11 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     h += '<span class="cal-title">📅 机游共振日历</span>';
 
-    h += '<span class="cal-meta">' + year + '年' + (month+1) + '月 &nbsp;|&nbsp; 更新于 ' + _rcRel(D.update_time||'') + '</span>';
+    h += '<span class="cal-meta">更新于 ' + _rcRel(D.update_time||'') + '</span>';
 
     h += '</div>';
+
+    h += _rcMonthNavHtml('jy', _ym);
 
 
 
@@ -5367,7 +5595,9 @@ window.V8_CAL = {weeks:[],legend:[]};
 
       var isToday = iso === todayStr;
 
-      var hasData = iso === lhbDate;
+      var _dd = _dayMap[iso] || null;
+
+      var hasData = !!_dd;
 
 
 
@@ -5387,11 +5617,13 @@ window.V8_CAL = {weeks:[],legend:[]};
 
       if(hasData){
 
-        var jyArr = byCat['机游共振'] || [];
+        var _ds = _dd.stocks || [];
+
+        var jyArr = _ds.filter(function(s){ return (s.category||'') === '机游共振'; });
 
         var dayNet = 0;
 
-        stocks.forEach(function(s){ dayNet += (s.inst_net_万||0) + (s.yz_net_万||0); });
+        _ds.forEach(function(s){ dayNet += (s.inst_net_万||0) + (s.yz_net_万||0); });
 
         var netColor = dayNet >= 0 ? 'c-up' : 'c-down';
 
@@ -5447,9 +5679,9 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     /* ===== 最近交易日龙虎榜详情（参照参考页：每个交易日完整 TOP5 列表） ===== */
 
-    h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📋 最近交易日龙虎榜</h3>';
+    h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📋 本月交易日龙虎榜</h3>';
 
-    var jyDays = (D.days && D.days.length) ? D.days : (stocks.length ? [{date:lhbDate, stocks:stocks, summary:summary}] : []);
+    var jyDays = _mDays.slice();
 
     var weekBuckets = {};
 
@@ -5543,15 +5775,7 @@ window.V8_CAL = {weeks:[],legend:[]};
 
         if(!dy || !dy.date || dy.date.length < 8) return false;
 
-        var dyYr = parseInt(dy.date.slice(0,4));
-
-        var dyMo = parseInt(dy.date.slice(4,6))-1;
-
-        var dyi = parseInt(dy.date.slice(6,8));
-
-        var w = _rcWeekRangeOf(dyYr, dyMo, dyi);
-
-        return w.mon.getTime() === wk.mon.getTime();
+        return dy.date >= wk.startStr && dy.date <= wk.endStr;
 
       });
 
@@ -5727,15 +5951,13 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     if(!detail) return;
 
-    var D = window.LHB_DATA || {};
+    var _dd = window._rcDayData(dateStr);
 
-    var lhbDate = D.date || '';
-
-    var stocks = D.stocks || [];
+    var stocks = (_dd && _dd.stocks) ? _dd.stocks : [];
 
 
 
-    if(dateStr !== lhbDate){
+    if(!stocks.length){
 
       detail.innerHTML = '<div class="cal-detail-body" style="text-align:center;color:var(--dim);padding:20px">该日暂无龙虎榜详细数据</div>';
 
@@ -5773,7 +5995,7 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     // Summary
 
-    var sum = D.summary || {};
+    var sum = (_dd && _dd.summary) ? _dd.summary : {};
 
     h += '<div style="display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap">';
 
@@ -5877,21 +6099,29 @@ window.V8_CAL = {weeks:[],legend:[]};
 
 
 
-    // Calendar using LHB_DATA north seat info
+    // 数据源：按月切片（可回看历史月），缺当日时并入最新单日数据
 
     var D = window.LHB_DATA || {};
 
-    var stocks = D.stocks || [];
+    var _ym = _rcCalYm('nb');
 
-    var lhbDate = D.date || '';
+    var year = +_ym.slice(0,4), month = +_ym.slice(5,7) - 1;
 
-    var hasMultiDay = stocks.some(function(s){ return s.date; });
+    var _mDays = _rcMonthDays('nb');
+
+    var _dayMap = {}; _mDays.forEach(function(x){ _dayMap[x.date] = x; });
+
+    var _lastDay = _mDays.length ? _mDays[_mDays.length-1] : null;
+
+    var stocks = _lastDay ? (_lastDay.stocks || []) : [];
+
+    var lhbDate = _lastDay ? _lastDay.date : '';
+
+    var hasMultiDay = _mDays.length > 1;
 
 
 
     var now = new Date();
-
-    var year = now.getFullYear(), month = now.getMonth();
 
     var firstDay = new Date(year, month, 1).getDay();
 
@@ -5905,21 +6135,45 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     // Extract north-bound stocks from LHB (北向席位 buy-sell 净买卖)
 
-    var northStocks = [];
+    function _nbPick(list, dstr){
 
-    stocks.forEach(function(s){
+      var out = [];
 
-      var sx = (s.seats || {})['北向'] || null;
+      (list||[]).forEach(function(s){
 
-      if(sx){
+        var sx = (s.seats || {})['北向'] || null;
 
-        s._nb_net_万 = ((sx.buy||0) - (sx.sell||0));
+        if(!sx) return;
 
-        northStocks.push(s);
+        var o = {};
 
-      }
+        for(var k in s){ if(Object.prototype.hasOwnProperty.call(s, k)) o[k] = s[k]; }
+
+        o._nb_net_万 = ((sx.buy||0) - (sx.sell||0));
+
+        o.date = o.date || dstr;
+
+        out.push(o);
+
+      });
+
+      return out;
+
+    }
+
+    var northAll = [], _nbByDay = {};
+
+    _mDays.forEach(function(dy){
+
+      var arr = _nbPick(dy.stocks, dy.date);
+
+      _nbByDay[dy.date] = arr;
+
+      northAll = northAll.concat(arr);
 
     });
+
+    var northStocks = lhbDate ? (_nbByDay[lhbDate] || []) : [];
 
 
 
@@ -5938,6 +6192,8 @@ window.V8_CAL = {weeks:[],legend:[]};
     h += '</div>';
 
 
+
+    h += _rcMonthNavHtml('nb', _ym);
 
     // Grid
 
@@ -5963,7 +6219,9 @@ window.V8_CAL = {weeks:[],legend:[]};
 
       var isToday = iso === todayStr;
 
-      var hasData = iso === lhbDate;
+      var _dnb = _nbByDay[iso] || null;
+
+      var hasData = !!_dayMap[iso];
 
       var cls = 'cal-cell';
 
@@ -5979,17 +6237,17 @@ window.V8_CAL = {weeks:[],legend:[]};
 
 
 
-      if(hasData && northStocks.length > 0){
+      if(_dnb && _dnb.length > 0){
 
         var nNet = 0;
 
-        northStocks.forEach(function(s){ nNet += (s._nb_net_万||0); });
+        _dnb.forEach(function(s){ nNet += (s._nb_net_万||0); });
 
         var nColor = nNet >= 0 ? 'c-up' : 'c-down';
 
         h += '<div class="cal-stat" style="text-align:center;padding:3px 2px">';
 
-        h += '<div style="color:#f59e0b;font-weight:700;font-size:10px">🌊北向 ' + northStocks.length + '</div>';
+        h += '<div style="color:#f59e0b;font-weight:700;font-size:10px">🌊北向 ' + _dnb.length + '</div>';
 
         h += '<div class="' + nColor + '" style="font-size:9px;font-weight:600">' + _rcFmtYi(nNet) + '</div>';
 
@@ -6053,7 +6311,7 @@ window.V8_CAL = {weeks:[],legend:[]};
 
       var wkLabel = wkdayMap[new Date(parseInt(lhbDate.slice(0,4)), dyMo-1, dyDy).getDay()];
 
-      h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📋 最近交易日龙虎榜北向席位</h3>';
+      h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📋 本月最近交易日 · 龙虎榜北向席位</h3>';
 
       h += '<div style="display:flex;align-items:baseline;gap:14px;padding:0 4px;margin-bottom:10px;font-size:12px">';
 
@@ -6103,39 +6361,13 @@ window.V8_CAL = {weeks:[],legend:[]};
 
       h += '<div class="wk-card"><div class="wk-card-hd"><span class="wk-card-title">第'+wk.no+'周 '+wk.monLabel+'-'+wk.sunLabel+'</span></div>';
 
-      var wkNorth;
+      var wkNorth = northAll.filter(function(s){
 
-      if(hasMultiDay){
+        var sd = (s.date||'').replace(/-/g,'');
 
-        wkNorth = northStocks.filter(function(s){
+        return sd.length === 8 && sd >= wk.startStr && sd <= wk.endStr;
 
-          var sd = (s.date||'').replace(/-/g,'');
-
-          if(sd.length < 8) return false;
-
-          var sy = +sd.slice(0,4), sm = +sd.slice(4,6)-1, sdd = +sd.slice(6,8);
-
-          return _rcWeekRangeOf(sy, sm, sdd).mon.getTime() === wk.mon.getTime();
-
-        });
-
-      } else {
-
-        // 单日数据：仅当 lhbDate 落入本卡所在周时展示
-
-        var lhbMon = null;
-
-        if(lhbDate && lhbDate.length >= 8){
-
-          var _ly = +lhbDate.slice(0,4), _lm = +lhbDate.slice(4,6)-1, _ld = +lhbDate.slice(6,8);
-
-          lhbMon = _rcWeekRangeOf(_ly, _lm, _ld).mon;
-
-        }
-
-        wkNorth = (lhbMon && lhbMon.getTime() === wk.mon.getTime()) ? northStocks : [];
-
-      }
+      });
 
       if(wkNorth.length > 0){
 
@@ -6229,9 +6461,9 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     if(!detail) return;
 
-    var D = window.LHB_DATA || {};
+    var _dd = window._rcDayData(dateStr);
 
-    if(dateStr !== D.date){
+    if(!_dd || !(_dd.stocks||[]).length){
 
       detail.innerHTML = '<div class="cal-detail-body" style="text-align:center;color:var(--dim);padding:20px">该日暂无北向席位数据</div>';
 
@@ -6239,7 +6471,7 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     }
 
-    var northStocks = (D.stocks||[]).filter(function(s){ return (s.seats||{})['北向']; }).map(function(s){
+    var northStocks = ((_dd && _dd.stocks) || []).filter(function(s){ return (s.seats||{})['北向']; }).map(function(s){
 
       var sx = s.seats['北向'] || {};
 
@@ -7123,7 +7355,7 @@ window.V8_CAL = {weeks:[],legend:[]};
       </tbody></table>
     </div>
 
-    </div>id="opTab2" class="op-tab-pane">
+    </div><div id="opTab2" class="op-tab-pane">
 
       <div class="card" style="margin-bottom:16px;border-left:3px solid var(--cyan)">
 
@@ -11908,7 +12140,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
         const dirMark=isIn?'▲':'▼';
 
-        rows+='<div class="flow-row" style="padding:2px 0"><span class="flow-name" style="width:100px;font-size:11px" title="'+x.name+' '+x.code+'">'+x.name+'</span><div class="flow-bar"><div class="flow-fill" style="width:'+w.toFixed(1)+'%;background:'+bg+'"></div></div><span class="flow-val" style="width:120px;font-size:10.5px"><span style="color:'+color+';font-weight:700">'+dirMark+' '+valY+'</span> <span style="color:var(--sub);font-size:9px;margin-left:4px">'+fmtPct(x.pct||0)+'</span></span></div>';
+        rows+='<div class="flow-row" style="padding:2px 0"><span class="flow-name" style="width:140px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="'+x.name+' '+x.code+'">'+x.name+'</span><div class="flow-bar"><div class="flow-fill" style="width:'+w.toFixed(1)+'%;background:'+bg+'"></div></div><span class="flow-val" style="width:110px;font-size:10.5px;white-space:nowrap;"><span style="color:'+color+';font-weight:700">'+dirMark+' '+valY+'</span> <span style="color:var(--sub);font-size:9px;margin-left:4px">'+fmtPct(x.pct||0)+'</span></span></div>';
 
       });
 
@@ -12958,7 +13190,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     const S = V8_PAGE_SCHEDULE;
 
-    if(timeEl) timeEl.textContent = 'API 快照 ' + S.updated;
+    if(timeEl) timeEl.textContent = '更新于 ' + (window._fmtAshareRel ? window._fmtAshareRel(S.updated) : S.updated);
 
 
 
@@ -13157,10 +13389,13 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       }
 
 
-  window.renderTaskSchedule = renderTaskSchedule;
     }
 
   }
+
+  window.renderTaskSchedule = renderTaskSchedule;
+
+  window.V8_PAGE_SCHEDULE = V8_PAGE_SCHEDULE;
 
 
 
@@ -13218,17 +13453,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     Object.keys(byPage).forEach(function(page){
 
-      html += '<div style="margin-bottom:12px;"><div style="font-weight:700;margin-bottom:6px;font-size:13px;">'+page+'</div>';
+      html += '<div style="margin-bottom:16px;"><div style="font-weight:800;margin-bottom:10px;font-size:15px;color:var(--txt);letter-spacing:.5px;">'+page+'</div>';
 
-      html += '<table style="width:100%;border-collapse:collapse;font-size:11px;"><thead><tr style="background:var(--card2);">';
-
-      html += '<th style="padding:4px 6px;border:1px solid var(--border);text-align:left;">检查项</th>';
-
-      html += '<th style="padding:4px 6px;border:1px solid var(--border);text-align:center;width:40px;">状态</th>';
-
-      html += '<th style="padding:4px 6px;border:1px solid var(--border);text-align:left;">说明</th>';
-
-      html += '</tr></thead><tbody>';
+      html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">';
 
       byPage[page].forEach(function(it){
 
@@ -13236,15 +13463,25 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
         const sym = it.status === 'ok' ? '✓' : (it.status === 'warn' ? '⚠' : '✗');
 
-        html += '<tr><td style="padding:4px 6px;border:1px solid var(--border);">'+it.name+'</td>';
+        const bg = it.status === 'ok' ? 'rgba(31,209,123,.08)' : (it.status === 'warn' ? 'rgba(251,191,36,.08)' : 'rgba(244,73,93,.08)');
 
-        html += '<td style="padding:4px 6px;border:1px solid var(--border);text-align:center;color:'+color+';font-weight:700;">'+sym+'</td>';
+        const border = it.status === 'ok' ? 'rgba(31,209,123,.25)' : (it.status === 'warn' ? 'rgba(251,191,36,.25)' : 'rgba(244,73,93,.25)');
 
-        html += '<td style="padding:4px 6px;border:1px solid var(--border);color:var(--sub);">'+it.message+'</td></tr>';
+        html += '<div style="background:'+bg+';border:1px solid '+border+';border-radius:10px;padding:10px 12px;">';
+
+        html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
+
+        html += '<span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--card);color:'+color+';font-weight:800;font-size:13px;">'+sym+'</span>';
+
+        html += '<span style="font-size:14px;font-weight:700;color:var(--txt);">'+it.name+'</span></div>';
+
+        html += '<div style="font-size:13px;color:var(--sub);line-height:1.5;">'+it.message+'</div>';
+
+        html += '</div>';
 
       });
 
-      html += '</tbody></table></div>';
+      html += '</div></div>';
 
     });
 

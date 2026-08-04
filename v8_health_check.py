@@ -71,6 +71,27 @@ def now_cst():
     return datetime.now(timezone(timedelta(hours=8)))
 
 
+def fmt_rel_time(ts):
+    """把 'YYYY-MM-DD HH:MM:SS' 格式化为相对时间：今日/昨日/X天前 HH:MM。"""
+    if not ts:
+        return "--"
+    dt = parse_time(ts)
+    if not dt:
+        return str(ts)[:16]
+    now = now_cst()
+    today = datetime(now.year, now.month, now.day, tzinfo=timezone(timedelta(hours=8)))
+    date_only = datetime(dt.year, dt.month, dt.day, tzinfo=timezone(timedelta(hours=8)))
+    diff = (today - date_only).days
+    hm = dt.strftime("%H:%M")
+    if diff == 0:
+        return f"今日 {hm}"
+    if diff == 1:
+        return f"昨日 {hm}"
+    if diff < 7:
+        return f"{diff}天前 {hm}"
+    return dt.strftime("%m-%d %H:%M")
+
+
 def parse_time(s):
     if not s or s in ("--", "N/A"):
         return None
@@ -233,7 +254,8 @@ def check_data_cards():
                 empty_fields.append(f)
         if empty_fields and status == "ok":
             status = "warn"
-        msg = f"更新于 {ts}（{age_min:.0f}分钟前）"
+        rel = fmt_rel_time(ts)
+        msg = f"更新于 {rel}"
         if empty_fields:
             msg += f"；关键字段空值：{', '.join(empty_fields)}"
         if status == "fail":
