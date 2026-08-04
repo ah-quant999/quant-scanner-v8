@@ -2302,36 +2302,27 @@ def main(category=None, only=None):
             print(f"  ⚠️ 沪深成交额获取失败({ex})，沿用历史序列")
             amount_history = baseline.get("amount_history") or []
 
-        # ---- 盘中补充今日成交额（akshare 指数实时行情）----
-        # 日线序列通常滞后半日到一日；盘中用上证指数 spot 成交额 + 昨日深市占比估算，
-        # 保证 amount_history 与 daily_stats 在交易日同步到最新日期。
+        # ---- 盘中/收盘补充今日成交额（优先用已抓取的 index_quotes.json，避免 akshare spot 单位异常）----
+        # index_quotes.json 由同一次 run 中先执行的 INDEX_QUOTES 任务写入，来源为东财 push2delay，
+        # 与前端指数卡片同源，时间和数值更可靠。
         if is_today_trade:
             try:
-                spot_df = ak.stock_zh_index_spot_em()
-                sh_row = spot_df[spot_df["代码"] == "000001"]
-                if not sh_row.empty:
-                    sh_amt = float(sh_row.iloc[0]["成交额"])
-                    if sh_amt > 1e10:          # 元 → 亿元
-                        sh_amt = sh_amt / 1e8
-                    sh_amt = round(sh_amt, 1)
-
-                    # 深市成交额：spot 接口无深证成指，用昨日深市/沪市占比估算
-                    last = amount_history[-1] if amount_history else {}
-                    sz_ratio = 0.5
-                    if last.get("sh_amount") and last.get("sz_amount"):
-                        total_last = last["sh_amount"] + last["sz_amount"]
-                        if total_last > 0:
-                            sz_ratio = last["sz_amount"] / total_last
-                    sz_amt = round(sh_amt * sz_ratio / (1 - sz_ratio), 1) if sz_ratio < 1 else sh_amt
+                idx_path = RAW_DIR / "index_quotes.json"
+                idx_data = json.loads(idx_path.read_text(encoding="utf-8")) if idx_path.exists() else {}
+                by_code = {it["code"]: it for it in idx_data.get("items", [])}
+                sh_amt = float(by_code.get("000001", {}).get("amount") or 0)
+                sz_amt = float(by_code.get("399001", {}).get("amount") or 0)
+                if sh_amt > 0 and sz_amt > 0:
                     total_amt = round(sh_amt + sz_amt, 1)
-
-                    rec = {"date": today_md, "sh_amount": sh_amt, "sz_amount": sz_amt, "total": total_amt}
+                    rec = {"date": today_md, "sh_amount": round(sh_amt, 1), "sz_amount": round(sz_amt, 1), "total": total_amt}
                     if amount_history and amount_history[-1].get("date") == today_md:
                         amount_history[-1] = rec
                     else:
                         amount_history.append(rec)
                     amount_history = amount_history[-130:]
-                    print(f"  ✅ 盘中补充今日成交额 {today_md}: 上证{sh_amt}亿 / 深证{sz_amt}亿 / 合计{total_amt}亿")
+                    print(f"  ✅ 盘中补充今日成交额 {today_md}: 上证{sh_amt:.1f}亿 / 深证{sz_amt:.1f}亿 / 合计{total_amt:.1f}亿（来源：index_quotes）")
+                else:
+                    print(f"  ⚠️ index_quotes 缺少今日成交额，沿用日线序列")
             except Exception as ex:
                 print(f"  ⚠️ 盘中补充成交额失败({ex})，沿用日线序列")
 
