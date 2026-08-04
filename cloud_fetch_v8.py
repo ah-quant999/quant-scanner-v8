@@ -313,7 +313,8 @@ def f_etf_intraday_heat():
 
 def f_sector_fund_flow():
     # 板块/概念资金流：行业(m:90 t:2) + 概念(m:90 t:3)，主力净流入(f62, 元→亿)
-    # 走 push2delay 镜像，规避实时 push2 host 的 WAF 重置。renderSector 从 top_list 派生流入/流出。
+    # 走 push2delay 镜像，规避实时 push2 host 的 WAF 重置。
+    # 同时生成 sectors_in/out（供 renderSector 直接渲染）与 top_list（兼容降级）。
     items = []
     for stype, fs in [("行业", "m:90 t:2"), ("概念", "m:90 t:3")]:
         rows = em_clist(fs, "f12,f14,f3,f62,f184", fid="f62", stat="1", pz=200)
@@ -330,7 +331,15 @@ def f_sector_fund_flow():
     if not items:
         return None
     items.sort(key=lambda x: x["net"], reverse=True)
-    return {"top_list": items, "note": "行业+概念主力净流入(亿)，来源东方财富push2delay"}
+    sectors_in = [x for x in items if x["net"] > 0]
+    sectors_out = [x for x in items if x["net"] < 0]
+    return {
+        "sectors_in": sectors_in,
+        "sectors_out": sectors_out,
+        "top_list": items,
+        "note": "行业+概念主力净流入(亿)，来源东方财富push2delay",
+        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
 
 def f_index_quotes():
     # 四大核心宽基指数实时行情：上证/深证/创业板/科创50
