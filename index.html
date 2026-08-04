@@ -6103,9 +6103,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     // 阈值矩阵：4列（指标/阈值/当前/分析解说），字号整体加大
     h += '<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px;">';
     h += '<thead><tr style="background:rgba(245,158,11,.12);">';
-    h += '<th style="text-align:left;padding:6px 8px;border:1px solid var(--border);color:var(--txt);width:70px;">指标</th>';
-    h += '<th style="text-align:left;padding:6px 8px;border:1px solid var(--border);color:var(--txt);width:95px;">阈值</th>';
-    h += '<th style="text-align:left;padding:6px 8px;border:1px solid var(--border);color:var(--txt);width:95px;">当前</th>';
+    h += '<th style="text-align:left;padding:6px 8px;border:1px solid var(--border);color:var(--txt);width:62px;">指标</th>';
+    h += '<th style="text-align:left;padding:6px 8px;border:1px solid var(--border);color:var(--txt);width:82px;">阈值</th>';
+    h += '<th style="text-align:left;padding:6px 8px;border:1px solid var(--border);color:var(--txt);white-space:nowrap;">当前</th>';
     h += '<th style="text-align:left;padding:6px 8px;border:1px solid var(--border);color:var(--txt);">分析解说（高了/低了会怎样）</th>';
     h += '</tr></thead><tbody>';
     indicators.forEach(function(it){
@@ -6113,7 +6113,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       const valText = it.value != null ? it.value + (it.unit || '') : '--';
       h += '<tr><td style="padding:6px 8px;border:1px solid var(--border);color:var(--txt);font-weight:600;">'+shortNames[it.label]+'</td>';
       h += '<td style="padding:6px 8px;border:1px solid var(--border);color:var(--dim);">'+thresholds[it.name]+'</td>';
-      h += '<td style="padding:6px 8px;border:1px solid var(--border);color:'+c+';font-weight:700;">'+valText+' '+it.status_text+'</td>';
+      h += '<td style="padding:6px 8px;border:1px solid var(--border);color:'+c+';font-weight:700;white-space:nowrap;">'+valText+' '+it.status_text+'</td>';
       h += '<td style="padding:6px 8px;border:1px solid var(--border);color:var(--sub);line-height:1.55;">'+analysis[it.name]+'</td></tr>';
     });
     h += '</tbody></table>';
