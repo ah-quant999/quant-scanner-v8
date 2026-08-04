@@ -498,32 +498,122 @@ def calc_crds_for_stock(stock_df, mkt_df, code, name, board_label):
     }
 
 
+def _load_scan_targets():
+    """从v8自有数据源加载CRDS扫描标的（不再依赖v6 watch_result.json）。
+
+    优先级: gold_pool_stocks.json(算法链原始) > gold_pool.json(raw) > GOLD_POOL.js(前端)
+    每个源返回 [{code, name, board_label, market_label, pct_chg}, ...]
+    """
+    import re as _re
+
+    # 候选数据源路径（按优先级）
+    _base = os.path.dirname(os.path.abspath(__file__))
+    _out_dir = os.path.join(_base, "..", "out")
+    _raw_dir = os.path.join(_base, "..", "raw_data")
+    _data_dir = os.path.join(_base, "..", "data")
+
+    _sources = [
+        ("金股池(算法链)", os.path.join(_out_dir, "gold_pool_stocks.json"), "stocks"),
+        ("金股池(raw)", os.path.join(_raw_dir, "gold_pool.json"), "stocks"),
+        ("金股池(前端JS)", os.path.join(_data_dir, "GOLD_POOL.js"), None),  # JS需特殊解析
+        ("候选池(前端JS)", os.path.join(_data_dir, "CANDIDATE.js"), None),
+    ]
+
+    for label, path, key in _sources:
+        try:
+            if path.endswith(".js") and key is None:
+                # 解析 window.XXX = {...}; 格式
+                stocks = _parse_js_stock_file(path)
+            else:
+                with open(path, "r", encoding="utf-8") as _f:
+                    _d = json.load(_f)
+                stocks = _d.get(key, []) if key else (_d if isinstance(_d, list) else [])
+
+            if not stocks:
+                continue
+
+            # 标准化: 确保每项有 code 字段
+            _normalized = []
+            _seen_codes = set()
+            for s in stocks:
+                if isinstance(s, dict):
+                    raw_code = str(s.get("code", "") or s.get("stock_code", "") or "")
+                    nc = _re.sub(r'[^0-9]', '', raw_code)
+                    if not nc or nc in _seen_codes:
+                        continue
+                    _seen_codes.add(nc)
+                    _normalized.append({
+                        "code": nc,
+                        "name": s.get("name", "") or s.get("stock_name", ""),
+                        "board_label": s.get("board_label", "") or s.get("board", ""),
+                        "market_label": s.get("market_label", "") or s.get("market", ""),
+                        "pct_chg": s.get("pct_chg", 0) or s.get("pctChg", 0) or s.get("change_pct", 0),
+                    })
+
+            if _normalized:
+                print(f"  [数据源] {label}: {_normalized} 只股票")
+                return _normalized
+        except Exception as e:
+            print(f"  [跳过] {label}: {e}")
+            continue
+
+    print("  [WARN] 所有数据源均不可用")
+    return []
+
+
+def _parse_js_stock_file(js_path):
+    """解析 window.VAR = [{...}, ...]; 格式的JS数据文件，返回股票列表"""
+    try:
+        with open(js_path, "r", encoding="utf-8") as f:
+            text = f.read()
+        m = __import__("re").search(r"window\.\w+\s*=\s*(\{[\s\S]*?\})\s*;", text)
+        if not m:
+            # 尝试数组格式
+            m2 = __import__("re").search(r"window\.\w+\s*=\s*(\[[\s\S]*?\])\s*;", text)
+            if m2:
+                data = json.loads(m2.group(1))
+            else:
+                return []
+        else:
+            data = json.loads(m.group(1))
+
+        # 从对象中提取stocks列表
+        if isinstance(data, dict):
+            stocks = data.get("stocks", data.get("list", data.get("items", data.get("data", []))))
+        elif isinstance(data, list):
+            stocks = data
+        else:
+            return []
+
+        # 如果是dict格式 {code: {name,...}} 转为列表
+        if isinstance(stocks, dict) and len(stocks) > 0:
+            first_val = next(iter(stocks.values()))
+            if isinstance(first_val, dict):
+                return [{"code": k, **v} for k, v in stocks.items()]
+            return []
+
+        return stocks if isinstance(stocks, list) else []
+    except Exception:
+        return []
+
+
 def calc_crds():
-    """主流程：读取watch_result → 逐只计算CRDS → 输出"""
+    """主流程：读取v8金股池/候选池 → 逐只计算CRDS → 输出
+
+    数据源优先级(2026-08-05 修复，不再依赖已退役v6的watch_result.json):
+      1. out/gold_pool_stocks.json (算法链build_candidate_pool.py产出)
+      2. raw_data/gold_pool.json (update_v8.py注入前)
+      3. data/GOLD_POOL.js (前端数据文件，window.GOLD_POOL)
+    """
     print(f"\n{'='*60}")
     print(f"CRDS逆势龙头评分计算 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"{'='*60}")
 
-    # 1. 读取watch结果
-    if not os.path.exists(WATCH_RESULT):
-        print(f"[ERROR] 未找到 {WATCH_RESULT}，请先运行 scanner.py watch")
+    # 1. 读取股票列表（v8自有数据源，不再依赖v6 watch_result.json）
+    all_stocks = _load_scan_targets()
+    if not all_stocks:
+        print("[ERROR] 无可扫描股票，退出")
         return None
-
-    with open(WATCH_RESULT, "r", encoding="utf-8") as f:
-        watch = json.load(f)
-
-    all_stocks = watch.get("all_results", [])
-    # 按代码去重：同一数字代码可能因市场前缀不同被重复计入(如 sh_002472 / sz_002472)
-    _seen, _uniq = set(), []
-    for s in all_stocks:
-        nc = re.sub(r'[^0-9]', '', str(s.get('code', '')))
-        if nc in _seen:
-            print(f"  [去重] 跳过重复代码 {s.get('code')}")
-            continue
-        _seen.add(nc)
-        _uniq.append(s)
-    all_stocks = _uniq
-    print(f"  输入: {len(all_stocks)} 只股票")
 
     # 2. 获取大盘指数
     print("\n[1/3] 获取大盘指数数据...")
