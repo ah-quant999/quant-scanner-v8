@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """获取 A 股 + 港股全量股票名称列表（每周更新一次即可）"""
 
-import json, os, time
+import json, os, re, time
 from datetime import datetime
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "out")
@@ -9,6 +9,9 @@ OUTPUT = os.path.join(DATA_DIR, "stock_names.json")
 
 # 本地拼音首字母映射（由月度维护脚本生成，避免 runner 安装 pypinyin）
 PINYIN_FILE = os.path.join(os.path.dirname(__file__), "stock_pinyin.json")
+
+# 本地行业/概念/板块映射（由 v6 industry_map.json 归一化生成，避免云端依赖 akshare/东财）
+META_FILE = os.path.join(os.path.dirname(__file__), "stock_industry_concepts.json")
 
 def _load_pinyin_map():
     """加载 code -> py 映射；缺失则返回空 dict，让后续 fallback。"""
@@ -38,6 +41,50 @@ def _attach_py(stocks):
         code = str(s.get("code", "")).strip()
         name = s.get("name", "")
         s["py"] = py_map.get(code) or _fallback_py(name)
+    return stocks
+
+
+def _load_meta_map():
+    """加载 code -> {industry, concepts, board} 映射；缺失返回空 dict。"""
+    try:
+        with open(META_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def _board_of_a(code):
+    """A股/北交所代码 → 上市板（兼容 sh600000 / 600000 等格式）。"""
+    c = re.sub(r"[^0-9]", "", str(code))
+    if not c:
+        return ""
+    if c.startswith(("600", "601", "603", "605")):
+        return "主板"
+    if c.startswith(("000", "001", "002", "003")):
+        return "主板"
+    if c.startswith(("300", "301")):
+        return "创业板"
+    if c.startswith(("688", "689")):
+        return "科创板"
+    if c.startswith(("8", "4", "92")):
+        return "北交所"
+    return ""
+
+
+def _attach_meta(stocks):
+    """给股票列表附加 industry / concepts / board 字段（来自本地静态映射，云端安全）。"""
+    meta_map = _load_meta_map()
+    for s in stocks:
+        code = str(s.get("code", "")).strip()
+        m = meta_map.get(code) or {}
+        if m.get("industry"):
+            s["industry"] = m["industry"]
+        if m.get("concepts"):
+            s["concepts"] = m["concepts"]
+        # board：优先映射，缺失则按代码前缀推导
+        board = m.get("board") or _board_of_a(code)
+        if board:
+            s["board"] = board
     return stocks
 
 def _fetch_a_share_via_eastmoney():
@@ -161,10 +208,25 @@ def main():
         print(f"  ⚠️ 港股获取失败: {e}")
 
     if len(all_stocks) < 4000:
-        print(f"  ⚠️ 总数 {len(all_stocks)} 不足（预期>4000），保留旧文件")
-        return
+        # 抓取不足：保留旧文件，但仍把 py / 行业 / 概念 / 板块 重新合并进去，避免数据回退
+        print(f"  ⚠️ 新抓取总数 {len(all_stocks)} 不足（预期>4000），尝试沿用并补全旧文件")
+        try:
+            with open(OUTPUT, "r", encoding="utf-8") as f:
+                old = json.load(f)
+            if isinstance(old, dict):
+                old = old.get("data", old)
+            if isinstance(old, list) and len(old) >= 4000:
+                all_stocks = old
+                print(f"  ✅ 沿用旧文件 {len(all_stocks)} 只，继续补全元数据")
+            else:
+                print("  ⚠️ 旧文件也不足，放弃写入")
+                return
+        except Exception as e:
+            print(f"  ⚠️ 读取旧文件失败: {e}，放弃写入")
+            return
 
     _attach_py(all_stocks)
+    _attach_meta(all_stocks)
 
     with open(OUTPUT, "w", encoding="utf-8") as f:
         json.dump(all_stocks, f, ensure_ascii=False, indent=0)

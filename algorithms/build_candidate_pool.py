@@ -343,20 +343,22 @@ def _hk_spot():
 def _enrich_industry_concepts(pool):
     """为候选股池补充 industry / concepts / board 字段。
 
-    使用 akshare.stock_individual_info_em 单股查询，港股/北交所未覆盖。
+    优先用本地静态映射 algorithms/stock_industry_concepts.json（由 v6 industry_map.json
+    归一化生成，云端可达、不依赖 akshare/东财）；缺失项在本地（非云端）用 akshare
+    单股查询补充，云端跳过 akshare 以免卡死。
     失败不阻断主流程，仅打印日志。
     """
     if not pool:
         return
+    # 1) 静态映射（主来源，云端安全）
+    meta_path = os.path.join(os.path.dirname(__file__), "stock_industry_concepts.json")
+    meta_map = {}
     try:
-        import akshare as ak
-    except Exception as e:
-        print(f"  [行业/概念] akshare 不可用，跳过: {e}")
-        return
-
-    ok = 0
-    fail = 0
-    skip = 0
+        with open(meta_path, "r", encoding="utf-8") as f:
+            meta_map = json.load(f)
+    except Exception:
+        meta_map = {}
+    ok = skip = 0
     for key, st in pool.items():
         code = str(st.get("code", "")).strip()
         market = st.get("market", "")
@@ -364,10 +366,37 @@ def _enrich_industry_concepts(pool):
         if market not in ("sh", "sz") or not code.isdigit() or len(code) != 6:
             skip += 1
             continue
+        m = meta_map.get(code) or {}
+        if m.get("industry"):
+            st["industry"] = m["industry"]
+        if m.get("concepts"):
+            st["concepts"] = m["concepts"]
+        if "board" not in st or not st.get("board"):
+            st["board"] = m.get("board") or st.get("board_label") or _board_of_a(code) or ""
+        if m:
+            ok += 1
+    print(f"  [行业/概念] 静态映射补充：命中 {ok}，跳过 {skip}")
+
+    # 2) 本地 akshare 兜底（仅非云端，填补静态映射缺口，限制数量防超时）
+    if _is_cloud():
+        return
+    missing = [k for k, st in pool.items()
+               if st.get("market") in ("sh", "sz") and not st.get("industry")]
+    if not missing:
+        return
+    try:
+        import akshare as ak
+    except Exception as e:
+        print(f"  [行业/概念] akshare 不可用，跳过兜底: {e}")
+        return
+    ak_ok = ak_fail = 0
+    for key in missing[:200]:
+        st = pool[key]
+        code = str(st.get("code", "")).strip()
         try:
             df = ak.stock_individual_info_em(symbol=code)
             if df is None or df.empty:
-                fail += 1
+                ak_fail += 1
                 continue
             kv = {}
             for _, row in df.iterrows():
@@ -381,15 +410,12 @@ def _enrich_industry_concepts(pool):
                 st["industry"] = industry
             if concepts:
                 st["concepts"] = [c.strip() for c in concepts.split(",") if c.strip()]
-            # board 字段：细化上市板（主/创/科）
-            if "board" not in st or not st["board"]:
+            if "board" not in st or not st.get("board"):
                 st["board"] = st.get("board_label") or _board_of_a(code) or ""
-            ok += 1
-        except Exception as e:
-            fail += 1
-            if fail <= 5:
-                print(f"  [行业/概念] {code} 失败: {e}")
-    print(f"  [行业/概念] 补充完成：成功 {ok}，失败 {fail}，跳过 {skip}")
+            ak_ok += 1
+        except Exception:
+            ak_fail += 1
+    print(f"  [行业/概念] akshare 兜底：成功 {ak_ok}，失败 {ak_fail}")
 
 
 def _board_of_a(code):

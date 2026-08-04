@@ -4175,16 +4175,42 @@ function switchSec(sec,el){
     return best;
   }
 
+  function getStockListMap(){
+    if(window.__SL_MAP__) return window.__SL_MAP__;
+    const m = {};
+    const list = stockListArray();
+    for(const s of list){ if(s && s.code){ m[String(s.code)] = s; } }
+    window.__SL_MAP__ = m;
+    return m;
+  }
   function getStockMeta(item){
     const code = normCode(item.code);
     let board='', industry='', concepts=[];
-    // 优先从 CANDIDATE 取（最全）
-    const cand = window.CANDIDATE || {};
-    const cstocks = cand.stocks || {};
-    for(const k of [fullKey(item), (item.market||'')+'_'+item.code, item.code]){
-      if(k && cstocks[k]){ const v=cstocks[k]; board=v.board_label||v.board||board; industry=v.industry||industry; concepts=v.concepts||concepts; break; }
+    // 0) 条目本身直接带（STOCK_LIST 已是全量，含 industry/concepts/board）
+    if(item.industry || (item.concepts && item.concepts.length) || item.board){
+      board = item.board || board;
+      industry = item.industry || industry;
+      concepts = item.concepts || concepts;
     }
-    // 次选 GOLD_POOL
+    // 1) 从全量 STOCK_LIST 按 code 取（覆盖所有可搜索股票，最全、最稳）
+    if(!industry && !concepts.length){
+      const slm = getStockListMap();
+      const sl = slm[code];
+      if(sl){
+        board = sl.board || board;
+        industry = sl.industry || industry;
+        concepts = sl.concepts || concepts;
+      }
+    }
+    // 2) 兜底 CANDIDATE
+    if(!industry && !concepts.length){
+      const cand = window.CANDIDATE || {};
+      const cstocks = cand.stocks || {};
+      for(const k of [fullKey(item), (item.market||'')+'_'+item.code, item.code]){
+        if(k && cstocks[k]){ const v=cstocks[k]; board=v.board_label||v.board||board; industry=v.industry||industry; concepts=v.concepts||concepts; break; }
+      }
+    }
+    // 3) 兜底 GOLD_POOL
     if(!industry && !concepts.length){
       const gp = window.GOLD_POOL || {};
       const gstocks = gp.stocks || {};
@@ -4205,6 +4231,9 @@ function switchSec(sec,el){
       const tags = [];
       if(meta.board) tags.push('<span style="font-size:10px;background:rgba(56,189,248,.15);color:var(--cyan);padding:1px 5px;border-radius:3px;">'+meta.board+'</span>');
       if(meta.industry) tags.push('<span style="font-size:10px;background:rgba(129,140,248,.15);color:var(--purple);padding:1px 5px;border-radius:3px;">'+meta.industry+'</span>');
+      (meta.concepts||[]).slice(0,3).forEach(c=>{
+        tags.push('<span style="font-size:10px;background:rgba(255,213,79,.12);color:var(--gold);padding:1px 5px;border-radius:3px;">'+c+'</span>');
+      });
       const pyBadge = s.py ? '<span style="font-size:10px;color:var(--dim);font-family:monospace;">'+s.py+'</span>' : '';
       return '<div style="display:flex;align-items:center;gap:8px;padding:9px 15px;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--border);" onmouseover="this.style.background=\'var(--bg2)\'" onmouseout="this.style.background=\'\'" onclick="selectV8QueryStock(\''+s.code+'\')">'+
         '<div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">'+
@@ -4425,7 +4454,7 @@ function switchSec(sec,el){
     if(meta.board) metaTags.push('<span style="font-size:11px;background:rgba(56,189,248,.15);color:var(--cyan);padding:2px 8px;border-radius:4px;">'+meta.board+'</span>');
     if(meta.industry) metaTags.push('<span style="font-size:11px;background:rgba(129,140,248,.15);color:var(--purple);padding:2px 8px;border-radius:4px;">'+meta.industry+'</span>');
     if(meta.concepts && meta.concepts.length){
-      meta.concepts.slice(0,8).forEach(c=>{
+      meta.concepts.forEach(c=>{
         metaTags.push('<span style="font-size:11px;background:rgba(255,213,79,.12);color:var(--gold);padding:2px 8px;border-radius:4px;">'+c+'</span>');
       });
     }
