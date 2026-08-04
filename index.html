@@ -546,7 +546,7 @@ window.V8_CAL = {weeks:[],legend:[]};
         var tag = document.getElementById('judgmentTag');
         var body = document.getElementById('judgmentBody');
         if(!d || !body){ if(tag) tag.textContent='数据缺失'; return; }
-        if(tag) tag.textContent = (d.date||'') + ' · 盘前研判 · 更新于 ' + (d.update_time||'--');
+        if(tag) tag.textContent = (d.date||'') + ' · 盘前研判 · 更新于 ' + (window._fmtAshareRel ? window._fmtAshareRel(d.update_time) : (d.update_time||'--'));
         var h = '';
         h += '<p style="margin:8px 0"><b style="color:var(--sub)">大盘：</b>'+(d.market||'')+'</p>';
         if(d.indices && d.indices.length){
@@ -799,7 +799,7 @@ window.V8_CAL = {weeks:[],legend:[]};
         var tag=document.getElementById('macroInterpretTag');
         if(!tag) return;
         var t=(window.CRISIS_DATA&&window.CRISIS_DATA.update_time)||(window.MACRO_DATA&&window.MACRO_DATA.update_time)||'--';
-        tag.textContent='美日联合干预日元 · 对 A 股影响与持仓框架 · 每日盘前 · 底层数据更新于 '+t;
+        tag.textContent='美日联合干预日元 · 对 A 股影响与持仓框架 · 每日盘前 · 底层数据更新于 '+(window._fmtAshareRel?window._fmtAshareRel(t):t);
       })();
       </script>
 
@@ -2019,7 +2019,7 @@ window.V8_CAL = {weeks:[],legend:[]};
         var t=$('rcInsightTime');
         if(t){
           var ts=A.update_time||lhb.update_time||'';
-          if(ts) t.textContent='更新于 '+ts;
+          if(ts) t.textContent='更新于 '+(window._fmtAshareRel?window._fmtAshareRel(ts):ts);
         }
       }
 
@@ -2914,7 +2914,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     h += '<div style="margin-top:12px;font-size:10px;color:var(--dim);text-align:center;line-height:1.6">';
     h += '机游共振日历 · 机构/游资席位净买卖TOP5 + 机游共振信号 + 纯游资异动<br>';
     h += '口径：龙虎榜机构+游资席位净买卖 | 仅供参考，不构成投资建议<br>';
-    h += '生成日期：' + (D.update_time || '--');
+    h += '生成日期：' + (window._fmtAshareRel ? window._fmtAshareRel(D.update_time) : (D.update_time || '--'));
     h += '</div>';
 
     c.innerHTML = h;
@@ -3166,7 +3166,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     // Footer
     h += '<div style="margin-top:12px;font-size:10px;color:var(--dim);text-align:center;line-height:1.6">';
     h += '龙虎榜北向席位日历 · 每日净买入TOP5 + 净卖出TOP5<br>';
-    h += '生成日期：' + (D.update_time || '--');
+    h += '生成日期：' + (window._fmtAshareRel ? window._fmtAshareRel(D.update_time) : (D.update_time || '--'));
     h += '</div>';
 
     c.innerHTML = h;
@@ -4710,7 +4710,7 @@ function renderLimitUpHeatmap(){
       else if(dayDiff===1) txt='昨日 '+hm;
       else txt=dayDiff+'天前 '+hm;
       timeEl.textContent='更新于 '+txt;
-    }else{ timeEl.textContent='更新于 '+data.update_time; }
+    }else{ timeEl.textContent='更新于 '+(window._fmtAshareRel?window._fmtAshareRel(data.update_time):data.update_time); }
   }
 
   function isIgnite(sectorData,idx){
@@ -4869,7 +4869,7 @@ function renderLimitUpHeatmap(){
     }).join('');
   }
   var tm = document.getElementById('v8caltime');
-  if(tm && D.update_time) tm.textContent = '更新于 ' + D.update_time;
+  if(tm && D.update_time) tm.textContent = '更新于 ' + (window._fmtAshareRel ? window._fmtAshareRel(D.update_time) : D.update_time);
 })();
 
 /* ===== 今日事件合并卡：V8_CAL 日历事件 + 宏观速览 ===== */
@@ -8887,9 +8887,9 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     }).join('');
   }
   var tm = document.getElementById('v8caltime');
-  if(tm && D.update_time) tm.textContent = '更新于 ' + D.update_time;
+  if(tm && D.update_time) tm.textContent = '更新于 ' + (window._fmtAshareRel ? window._fmtAshareRel(D.update_time) : D.update_time);
   var tht = document.getElementById('tdHeaderTag');
-  if(tht && D.update_time) tht.textContent = '交易日历 + 打新速览 · ' + D.update_time;
+  if(tht && D.update_time) tht.textContent = '交易日历 + 打新速览 · ' + (window._fmtAshareRel ? window._fmtAshareRel(D.update_time) : D.update_time);
 })();
 
 /* 今日事件合并卡：日历事件 + 宏观速览 */
