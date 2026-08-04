@@ -595,7 +595,7 @@ window.V8_CAL = {weeks:[],legend:[]};
               <tr><td style="border:1px solid var(--border);padding:6px 8px">10Y 美债收益率</td><td style="border:1px solid var(--border);padding:6px 8px">破 4.5%</td><td style="border:1px solid var(--border);padding:6px 8px">全球融资压力升级</td></tr>
             </tbody>
           </table>
-          <p style="margin:8px 0 0;font-size:11px;color:var(--dim)">📄 <a href="宏观解读_美日干预日元_2026-08-03.md" style="color:var(--link,#38bdf8)">完整 10 节分析（含三情景推演 / 历史平行剧本 / 可证伪观察点）</a>。资料来源：公开新闻综合。⚠️ 本文为宏观框架分析，不构成投资建议。</p>
+          <p style="margin:8px 0 0;font-size:11px;color:var(--dim)">📄 <a href="宏观解读_美日干预日元_2026-08-03.md" style="color:var(--link,#38bdf8)">完整 10 节分析（含三情景推演 / 历史平行剧本 / 可证伪观察点）</a>。⚠️ 本文为宏观框架分析，不构成投资建议。</p>
         </div>
       </div>
       <script>
@@ -711,7 +711,7 @@ window.V8_CAL = {weeks:[],legend:[]};
         </div>
 
         <div style="font-size:11px;color:var(--dim);line-height:1.6;border-top:1px solid var(--border);padding-top:10px;">
-          <b>数据来源</b>：公开新闻 + 市场数据；本卡为分析框架，非投资建议。详细逻辑见 <a href="宏观解读_美日干预日元_2026-08-03.md" target="_blank" style="color:#60a5fa;">宏观解读_美日干预日元_2026-08-03.md</a>。
+          本卡为分析框架，非投资建议。详细逻辑见 <a href="宏观解读_美日干预日元_2026-08-03.md" target="_blank" style="color:#60a5fa;">宏观解读_美日干预日元_2026-08-03.md</a>。
         </div>
       </div>
     </div>
@@ -2798,7 +2798,6 @@ window.V8_CAL = {weeks:[],legend:[]};
     // Footer note
     h += '<div style="margin-top:12px;font-size:10px;color:var(--dim);text-align:center;line-height:1.6">';
     h += '机游共振日历 · 机构/游资席位净买卖TOP5 + 机游共振信号 + 纯游资异动<br>';
-    h += '数据来源：沪深交易所龙虎榜 / 证券时报·数据宝 / 东方财富Choice<br>';
     h += '口径：龙虎榜机构+游资席位净买卖 | 仅供参考，不构成投资建议<br>';
     h += '生成日期：' + (D.update_time || '--');
     h += '</div>';
@@ -3049,17 +3048,9 @@ window.V8_CAL = {weeks:[],legend:[]};
     });
     h += '</div></div>';
 
-    // Data source table
-    h += '<div style="margin-top:20px"><h3 style="font-size:13px;color:var(--txt)">📋 数据口径说明</h3>';
-    h += '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:8px"><thead><tr style="color:var(--dim)"><th>口径</th><th>来源</th><th>精确度</th><th>覆盖范围</th><th>说明</th></tr></thead><tbody>';
-    h += '<tr><td>龙虎榜北向席位</td><td>沪深交易所/证券时报·数据宝</td><td>★★★★★</td><td>仅当日上龙虎榜个股</td><td>交易所官方数据，精确但只覆盖异动股</td></tr>';
-    h += '<tr><td>十大成交股</td><td>东方财富Choice</td><td>★★★★☆</td><td>沪/深各10只</td><td>仅显示成交金额，不显示净买卖</td></tr>';
-    h += '</tbody></table></div>';
-
     // Footer
     h += '<div style="margin-top:12px;font-size:10px;color:var(--dim);text-align:center;line-height:1.6">';
     h += '龙虎榜北向席位日历 · 每日净买入TOP5 + 净卖出TOP5<br>';
-    h += '数据来源：沪深交易所龙虎榜 / 证券时报·数据宝 / 东方财富Choice<br>';
     h += '生成日期：' + (D.update_time || '--');
     h += '</div>';
 
@@ -4699,7 +4690,7 @@ function renderLimitUpHeatmap(){
     var LG=[
       {n:'重要政策',c:'#c62828',d:'中国政府/监管机构发布的重大政策、法规、规划等',i:['关注国务院/证监会/交易所重大发布']},
       {n:'央行/LPR',c:'#1565c0',d:'央行货币政策、利率决议、LPR报价等',i:['7月 LPR利率报价（1年期/5年期以上）— 每月20日']},
-      {n:'中国数据',c:'#f57f17',d:'国家统计局/央行发布的宏观经济数据',i:['CPI/PPI — 每月9日前后','工业增加值/社零/固投 — 每月15日前后','PMI — 每月最后一日']},
+      {n:'中国数据',c:'#f57f17',d:'中国宏观经济数据发布',i:['CPI/PPI — 每月9日前后','工业增加值/社零/固投 — 每月15日前后','PMI — 每月最后一日']},
       {n:'财报截止',c:'#673ab7',d:'A股财报披露法定截止日',i:['7/15 🇨🇳 A股半年报预告强制截止日']},
       {n:'期权交割',c:'#00838f',d:'各交易所期权合约到期日，涉及多空博弈',i:['中金所股指期权 — 每月第三个周五','各商品交易所期权到期日 — 每月约13-20日间']},
       {n:'期货交割',c:'#1d6f42',d:'期货合约最后交易日，交割前后波动加大',i:['中金所IF/IH/IC/IM股指期货 — 每月第三个周五','各交易所2607合约最后交易日 — 约每月中旬']},
@@ -6147,7 +6138,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     h += '<span style="font-size:13px;color:var(--sub);">综合状态：</span>';
     h += '<span style="width:12px;height:12px;border-radius:50%;background:'+overallColor+';box-shadow:0 0 8px '+overallColor+';"></span>';
     h += '<span style="font-weight:700;color:'+overallColor+';">'+overallLabels[overall]+'</span>';
-    h += '<span style="font-size:12px;color:var(--dim);margin-left:auto;">任一亮红灯即进入警惕 · 数据来源 Yahoo Finance</span>';
+    h += '<span style="font-size:12px;color:var(--dim);margin-left:auto;">任一亮红灯即进入警惕</span>';
     h += '</div>';
 
     h += '<div class="grid g-5" style="gap:10px;margin-bottom:10px;">';
@@ -6344,7 +6335,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(p.industry)tags+=makeTag('🏭 '+p.industry,'ind');
     (p.concepts||[]).slice(0,8).forEach(c=>tags+=makeTag(c,'con'));
     if(tags)h+='<div class="tp-tags">'+tags+'</div>';
-    if(p.sources&&p.sources.length)h+='<div class="tp-detail" style="font-size:11px;color:var(--sub)">来源：'+p.sources.join(' · ')+'</div>';
+    // 来源信息不在公开页展示
     h+='</div>';
     return h;
   }
@@ -8465,7 +8456,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     var LG=[
       {n:'重要政策',c:'#c62828',d:'中国政府/监管机构发布的重大政策、法规、规划等',i:['关注国务院/证监会/交易所重大发布']},
       {n:'央行/LPR',c:'#1565c0',d:'央行货币政策、利率决议、LPR报价等',i:['7月 LPR利率报价（1年期/5年期以上）— 每月20日']},
-      {n:'中国数据',c:'#f57f17',d:'国家统计局/央行发布的宏观经济数据',i:['CPI/PPI — 每月9日前后','工业增加值/社零/固投 — 每月15日前后','PMI — 每月最后一日']},
+      {n:'中国数据',c:'#f57f17',d:'中国宏观经济数据发布',i:['CPI/PPI — 每月9日前后','工业增加值/社零/固投 — 每月15日前后','PMI — 每月最后一日']},
       {n:'财报截止',c:'#673ab7',d:'A股财报披露法定截止日',i:['7/15 🇨🇳 A股半年报预告强制截止日']},
       {n:'期权交割',c:'#00838f',d:'各交易所期权合约到期日，涉及多空博弈',i:['中金所股指期权 — 每月第三个周五','各商品交易所期权到期日 — 每月约13-20日间']},
       {n:'期货交割',c:'#1d6f42',d:'期货合约最后交易日，交割前后波动加大',i:['中金所IF/IH/IC/IM股指期货 — 每月第三个周五','各交易所2607合约最后交易日 — 约每月中旬']},
