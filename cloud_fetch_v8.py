@@ -1824,6 +1824,7 @@ def main(category=None):
 
         now = datetime.now()
         today_md = f"{now.month}/{now.day}"
+        is_today_trade = _is_trading_day()
 
         # ---- 读取历史基线 ----
         baseline = {}
@@ -1851,11 +1852,17 @@ def main(category=None):
             amap = {"sh": {}, "sz": {}}
             for key, sym in (("sh", "sh000001"), ("sz", "sz399001")):
                 df = ak.stock_zh_index_daily_em(symbol=sym)
+                # akshare 不同指数返回列名可能为中文或英文，做兼容
+                date_col = next((c for c in df.columns if c in ("日期", "date")), None)
+                amount_col = next((c for c in df.columns if c in ("成交额", "amount")), None)
+                if not date_col or not amount_col:
+                    print(f"  ⚠️ {sym} 日线列名异常，跳过")
+                    continue
                 for _, row in df.iterrows():
-                    ds = str(row["日期"])
+                    ds = str(row[date_col])
                     mm = str(int(ds[5:7])); dd = str(int(ds[8:10]))
                     try:
-                        amt = float(row["成交额"])
+                        amt = float(row[amount_col])
                         if amt > 1e10:        # 元 → 亿元
                             amt = amt / 1e8
                         amt = round(amt, 1)
@@ -1877,28 +1884,69 @@ def main(category=None):
             print(f"  ⚠️ 沪深成交额获取失败({ex})，沿用历史序列")
             amount_history = baseline.get("amount_history") or []
 
+        # ---- 盘中补充今日成交额（akshare 指数实时行情）----
+        # 日线序列通常滞后半日到一日；盘中用上证指数 spot 成交额 + 昨日深市占比估算，
+        # 保证 amount_history 与 daily_stats 在交易日同步到最新日期。
+        if is_today_trade:
+            try:
+                spot_df = ak.stock_zh_index_spot_em()
+                sh_row = spot_df[spot_df["代码"] == "000001"]
+                if not sh_row.empty:
+                    sh_amt = float(sh_row.iloc[0]["成交额"])
+                    if sh_amt > 1e10:          # 元 → 亿元
+                        sh_amt = sh_amt / 1e8
+                    sh_amt = round(sh_amt, 1)
+
+                    # 深市成交额：spot 接口无深证成指，用昨日深市/沪市占比估算
+                    last = amount_history[-1] if amount_history else {}
+                    sz_ratio = 0.5
+                    if last.get("sh_amount") and last.get("sz_amount"):
+                        total_last = last["sh_amount"] + last["sz_amount"]
+                        if total_last > 0:
+                            sz_ratio = last["sz_amount"] / total_last
+                    sz_amt = round(sh_amt * sz_ratio / (1 - sz_ratio), 1) if sz_ratio < 1 else sh_amt
+                    total_amt = round(sh_amt + sz_amt, 1)
+
+                    rec = {"date": today_md, "sh_amount": sh_amt, "sz_amount": sz_amt, "total": total_amt}
+                    if amount_history and amount_history[-1].get("date") == today_md:
+                        amount_history[-1] = rec
+                    else:
+                        amount_history.append(rec)
+                    amount_history = amount_history[-130:]
+                    print(f"  ✅ 盘中补充今日成交额 {today_md}: 上证{sh_amt}亿 / 深证{sz_amt}亿 / 合计{total_amt}亿")
+            except Exception as ex:
+                print(f"  ⚠️ 盘中补充成交额失败({ex})，沿用日线序列")
+
         # ---- 涨跌家数（akshare 全市场快照）----
         ds_hist = baseline.get("daily_stats") or []
-        try:
-            spot = ak.stock_zh_a_spot_em()
-            chg = spot["涨跌幅"]
-            up = int((chg > 0).sum())
-            down = int((chg < 0).sum())
-            flat = int((chg == 0).sum())
-            rec = {"date": today_md, "up": up, "down": down, "flat": flat}
-            if ds_hist and ds_hist[-1].get("date") == today_md:
-                ds_hist[-1] = rec
-            else:
-                ds_hist.append(rec)
-            ds_hist = ds_hist[-120:]
-        except Exception as ex:
-            print(f"  ⚠️ 涨跌家数获取失败({ex})，沿用历史序列")
+        if is_today_trade:
+            try:
+                spot = ak.stock_zh_a_spot_em()
+                chg = spot["涨跌幅"]
+                up = int((chg > 0).sum())
+                down = int((chg < 0).sum())
+                flat = int((chg == 0).sum())
+                rec = {"date": today_md, "up": up, "down": down, "flat": flat}
+                if ds_hist and ds_hist[-1].get("date") == today_md:
+                    ds_hist[-1] = rec
+                else:
+                    ds_hist.append(rec)
+                ds_hist = ds_hist[-120:]
+            except Exception as ex:
+                print(f"  ⚠️ 涨跌家数获取失败({ex})，沿用历史序列")
+        else:
+            print(f"  ⏸️ 今日非交易日，涨跌家数/成交额不追加新记录")
+
+        amount_last_date = amount_history[-1].get("date") if amount_history else ""
+        up_down_last_date = ds_hist[-1].get("date") if ds_hist else ""
 
         return {
             "update_time": now.strftime("%Y-%m-%d %H:%M:%S"),
             "amount_history": amount_history,
             "up_down": baseline.get("up_down", {}),
             "daily_stats": ds_hist,
+            "amount_last_date": amount_last_date,
+            "up_down_last_date": up_down_last_date,
         }
 
     tasks = [

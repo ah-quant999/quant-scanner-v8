@@ -842,7 +842,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     <div class="grid g-2" style="margin-bottom:16px">
       <!-- 上证+深证成交额 -->
       <div class="card">
-        <h3><span class="ic">📈</span>上证+深证 每日成交金额（亿元） - 短线盘中 · <span class="fresh" id="amountUpdateTime">更新于 今日 15:21</span></h3>
+        <h3><span class="ic">📈</span>上证+深证 每日成交金额（亿元） - 短线盘中 · <span class="fresh" id="amountUpdateTime">更新于 今日 15:21</span><span class="fresh" id="amountLastDate" style="margin-left:8px;font-weight:400;"></span></h3>
         <div id="amountChartContainer" style="width:100%;height:260px;position:relative;overflow:visible;">
           <svg id="amountChart" width="100%" height="260" style="overflow:visible;" overflow="visible"></svg>
         </div>
@@ -851,7 +851,7 @@ window.V8_CAL = {weeks:[],legend:[]};
 
       <!-- 近一月涨跌家数统计 -->
       <div class="card">
-        <h3><span class="ic">🏘️</span>近一月 涨跌家数统计 - 盘中实时 · <span class="fresh" id="upDownUpdateTime">更新于 今日 15:21</span></h3>
+        <h3><span class="ic">🏘️</span>近一月 涨跌家数统计 - 盘中实时 · <span class="fresh" id="upDownUpdateTime">更新于 今日 15:21</span><span class="fresh" id="upDownLastDate" style="margin-left:8px;font-weight:400;"></span></h3>
         <div id="upDownChartContainer" style="width:100%;height:260px;position:relative;overflow:visible;">
           <svg id="upDownChart" width="100%" height="260" style="overflow:visible;" overflow="visible"></svg>
         </div>
@@ -4452,6 +4452,8 @@ function drawAmountChart(){
   }
   const tm = document.getElementById('amountUpdateTime');
   if(tm && data.update_time) tm.textContent = '更新于 '+(window._fmtAshareRel?window._fmtAshareRel(data.update_time):data.update_time);
+  const ld = document.getElementById('amountLastDate');
+  if(ld) ld.textContent = data.amount_last_date ? '· 序列至 '+data.amount_last_date : '';
 }
 
 /* ===== 近一月涨跌家数 SVG 柱状图（v6 风格 · 深色主题适配） ===== */
@@ -4526,6 +4528,8 @@ function drawUpDownChart(){
   }
   const tm = document.getElementById('upDownUpdateTime');
   if(tm && data.update_time) tm.textContent = '更新于 '+(window._fmtAshareRel?window._fmtAshareRel(data.update_time):data.update_time);
+  const ld = document.getElementById('upDownLastDate');
+  if(ld) ld.textContent = data.up_down_last_date ? '· 序列至 '+data.up_down_last_date : '';
 }
 
 (function(){
