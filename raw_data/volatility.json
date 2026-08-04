@@ -1,11 +1,9 @@
 {
-  "update_time": "2026-08-04 07:51:04",
+  "update_time": "2026-08-04 15:37:30",
   "update_date": "2026-08-04",
   "available": true,
   "indices": [
     {
-      "code": "000001",
-      "name": "上证指数",
       "close": 3809.66,
       "today_pct": -0.59,
       "vol_20d": 21.18,
@@ -15,11 +13,11 @@
       "ret_5d": -1.26,
       "ret_20d": -5.73,
       "ret_60d": -8.86,
-      "source": "baostock"
+      "source": "baostock",
+      "code": "000001",
+      "name": "上证指数"
     },
     {
-      "code": "000300",
-      "name": "沪深300",
       "close": 4543.18,
       "today_pct": -0.99,
       "vol_20d": 28.67,
@@ -29,11 +27,11 @@
       "ret_5d": -3.39,
       "ret_20d": -6.17,
       "ret_60d": -6.75,
-      "source": "baostock"
+      "source": "baostock",
+      "code": "000300",
+      "name": "沪深300"
     },
     {
-      "code": "399006",
-      "name": "创业板指",
       "close": 3302.55,
       "today_pct": -1.25,
       "vol_20d": 60.48,
@@ -43,11 +41,11 @@
       "ret_5d": -8.03,
       "ret_20d": -16.37,
       "ret_60d": -13.0,
-      "source": "baostock"
+      "source": "baostock",
+      "code": "399006",
+      "name": "创业板指"
     },
     {
-      "code": "000905",
-      "name": "中证500",
       "close": 7414.52,
       "today_pct": -1.07,
       "vol_20d": 43.12,
@@ -57,11 +55,11 @@
       "ret_5d": -3.96,
       "ret_20d": -14.29,
       "ret_60d": -14.72,
-      "source": "baostock"
+      "source": "baostock",
+      "code": "000905",
+      "name": "中证500"
     },
     {
-      "code": "000852",
-      "name": "中证1000",
       "close": 7079.78,
       "today_pct": 0.06,
       "vol_20d": 43.88,
@@ -71,7 +69,9 @@
       "ret_5d": -2.06,
       "ret_20d": -16.44,
       "ret_60d": -19.01,
-      "source": "baostock"
+      "source": "baostock",
+      "code": "000852",
+      "name": "中证1000"
     }
   ],
   "composite": {
