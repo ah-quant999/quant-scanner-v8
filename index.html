@@ -1104,31 +1104,25 @@ window.V8_CAL = {weeks:[],legend:[]};
 
         if(d.indices && d.indices.length){
 
-          h += '<table style="width:100%;border-collapse:collapse;margin:6px 0;font-size:12px">'
-
-            + '<thead><tr style="background:rgba(167,139,250,0.12)">'
-
-            + '<th style="border:1px solid var(--border);padding:6px 8px;text-align:left;color:var(--txt)">指数</th>'
-
-            + '<th style="border:1px solid var(--border);padding:6px 8px;text-align:left;color:var(--txt)">控盘</th>'
-
-            + '<th style="border:1px solid var(--border);padding:6px 8px;text-align:left;color:var(--txt)">财神</th>'
-
-            + '<th style="border:1px solid var(--border);padding:6px 8px;text-align:left;color:var(--txt)">备注</th></tr></thead><tbody>';
+          h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0">';
 
           d.indices.forEach(function(r){
 
-            h += '<tr><td style="border:1px solid var(--border);padding:6px 8px">'+r.name+'</td>'
+            h += '<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.22);border-radius:999px;padding:3px 10px;font-size:12px;line-height:1.6">'
 
-              + '<td style="border:1px solid var(--border);padding:6px 8px;color:var(--down)">'+r.ctrl+'</td>'
+              + '<b style="color:var(--txt)">'+r.name+'</b>'
 
-              + '<td style="border:1px solid var(--border);padding:6px 8px;color:var(--down)">'+r.fs+'</td>'
+              + '<span style="color:var(--down)">控'+r.ctrl+'</span>'
 
-              + '<td style="border:1px solid var(--border);padding:6px 8px">'+(r.warn?'<span style="color:#f59e0b">⚠️ '+r.warn+'</span>':'')+'</td></tr>';
+              + '<span style="color:var(--down)">财'+r.fs+'</span>'
+
+              + (r.warn?'<span style="color:#f59e0b;margin-left:2px">⚠️ '+r.warn+'</span>':'')
+
+              + '</span>';
 
           });
 
-          h += '</tbody></table>';
+          h += '</div>';
 
         }
 
