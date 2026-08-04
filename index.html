@@ -795,50 +795,6 @@ window.V8_CAL = {weeks:[],legend:[]};
     </script>
 
 
-    <div class="grid g-4" id="indexCardsGrid" style="margin-bottom:16px">
-      <div class="card rt-card"><div class="ipo-empty">指数行情加载中…</div></div>
-      <div class="card rt-card"><div class="ipo-empty">指数行情加载中…</div></div>
-      <div class="card rt-card"><div class="ipo-empty">指数行情加载中…</div></div>
-      <div class="card rt-card"><div class="ipo-empty">指数行情加载中…</div></div>
-    </div>
-    <script>
-    (function(){
-      function fmt(n){ return n==null||isNaN(n)?'--':Number(n).toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:2}); }
-      function renderIndexCards(){
-        var data=window.INDEX_QUOTES;
-        var grid=document.getElementById('indexCardsGrid');
-        if(!grid) return;
-        if(!data || !data.items || !data.items.length){
-          grid.innerHTML='<div class="card rt-card" style="grid-column:1/-1"><div class="ipo-empty">指数行情暂不可用</div></div>';
-          return;
-        }
-        var order=[{c:'000001',l:'沪指'},{c:'399001',l:'深成指'},{c:'399006',l:'创业板'},{c:'000688',l:'科创板'}];
-        var byCode={};
-        data.items.forEach(function(it){ byCode[it.code]=it; });
-        var h='';
-        order.forEach(function(o){
-          var it=byCode[o.c];
-          if(!it) return;
-          var up=it.chg>0, cls=up?'up':'down', color=up?'#f4495d':'#1fd17b', fill=up?'rgba(244,73,93,.18)':'rgba(31,209,123,.18)';
-          var price=fmt(it.price);
-          var chgTxt=(up?'+':'')+it.chg+'%';
-          var changeTxt=(up?'+':'')+fmt(it.change);
-          var sparkUp=up?' L300,10 L300,78 L0,78 Z':' L300,68 L300,78 L0,78 Z';
-          var pathLine=up?'M0,52 L300,10':'M0,10 L300,68';
-          h+='<div class="card rt-card">';
-          h+='<h3><span><span class="ic">🔥</span>'+o.l+' - 盘中</span><span class="rt-summary '+cls+'">'+price+' <b>'+chgTxt+'</b> <small>'+changeTxt+'</small></span></h3>';
-          h+='<svg class="rt-spark" viewBox="0 0 300 78" preserveAspectRatio="none">';
-          h+='<path d="'+pathLine+sparkUp+'" fill="'+fill+'"/>';
-          h+='<path d="'+pathLine+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
-          h+='</svg></div>';
-        });
-        grid.innerHTML=h;
-      }
-      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderIndexCards);
-      else renderIndexCards();
-    })();
-    </script>
-
     <div class="grid g-2" style="margin-bottom:16px">
       <!-- 上证+深证成交额 -->
       <div class="card">
