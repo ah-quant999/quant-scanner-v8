@@ -906,11 +906,12 @@ window.V8_CAL = {weeks:[],legend:[]};
     </div>
 
     <script>
-    /* 概念资金热力图渲染（CONCEPT_RANKING.js → CSS flex 方块） */
+    /* 概念资金热力图渲染（CONCEPT_RANKING.js → 行业树图同款 Treemap 方块） */
     (function(){
       const $=id=>document.getElementById(id);
       function fmt(v){ return v==null||isNaN(v)?'--':Number(v).toFixed(2); }
       function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
+      function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
       function renderConceptTreemap(){
         const d=window.CONCEPT_RANKING;
         const el=$('conceptTreemap');
@@ -918,19 +919,34 @@ window.V8_CAL = {weeks:[],legend:[]};
         if(!d || !d.items || !d.items.length){
           el.innerHTML='<div class="ipo-empty">暂无概念数据</div>'; return;
         }
-        const items=d.items.slice().sort((a,b)=>Math.abs(b.net)-Math.abs(a.net)).slice(0,30);
+        // 过滤掉资金为0的无效项，避免全部等高
+        const items=d.items.filter(it=>Math.abs(it.net)>0.001||Math.abs(it.chg)>0.001)
+                           .sort((a,b)=>Math.abs(b.net)-Math.abs(a.net)).slice(0,30);
+        if(!items.length){
+          el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">概念板块资金数据待更新</div>';
+          return;
+        }
         const maxArea=Math.sqrt(Math.abs(items[0].net)||1);
-        let h='<div style="display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start;">';
+        let h='<div style="display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start;padding:4px;">';
         items.forEach(it=>{
-          const up=it.chg>0, down=it.chg<0;
+          const pct=it.chg||0;
+          const up=pct>0, down=pct<0;
           const bg=up?'var(--up)':down?'var(--down)':'var(--dim)';
-          const txt=up||down?'#fff':'var(--txt)';
+          const txt=(up||down)?'#fff':'var(--txt)';
           const area=Math.sqrt(Math.abs(it.net))/maxArea;
-          const px=Math.max(44, Math.round(area*110));
+          const px=Math.max(44, Math.round(area*130)); // 最大130，和行业树图同模式但可更大
+          let fz=10, titleFz=11;
+          if(px>110){ fz=11; titleFz=13; }
+          else if(px>80){ fz=10; titleFz=12; }
+          else if(px>55){ fz=9; titleFz=11; }
+          else { fz=8; titleFz=10; }
           const netTxt=(it.net>0?'+':'')+fmt(it.net);
-          h+='<div style="width:'+px+'px;height:'+px+'px;background:'+bg+';color:'+txt+';border-radius:6px;padding:5px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;font-size:11px;line-height:1.25;box-shadow:0 1px 3px rgba(0,0,0,.25);overflow:hidden;">';
-          h+='<div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;">'+esc(it.name)+'</div>';
-          h+='<div style="font-size:10px;opacity:.9;">'+(it.chg>0?'+':'')+fmt(it.chg)+'% · '+netTxt+'</div>';
+          h+='<div style="width:'+px+'px;height:'+px+'px;background:'+bg+';color:'+txt+';border-radius:8px;padding:6px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;line-height:1.2;box-shadow:0 1px 4px rgba(0,0,0,.3);overflow:hidden;cursor:default">';
+          h+='<div style="font-weight:700;font-size:'+titleFz+'px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;">'+esc(it.name)+'</div>';
+          h+='<div style="font-size:'+fz+'px;opacity:.85">'+(pct>0?'+':'')+fmt(pct)+'%</div>';
+          if(px>=55){
+            h+='<div style="font-size:'+(fz-1)+'px;opacity:.75">'+netTxt+'亿</div>';
+          }
           h+='</div>';
         });
         h+='</div>';
@@ -938,10 +954,10 @@ window.V8_CAL = {weeks:[],legend:[]};
         const mt=$('conceptMapTime');
         if(mt) mt.textContent='更新于 '+rel(d.update_time);
       }
-      function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
       if(document.readyState==='loading')
         document.addEventListener('DOMContentLoaded', renderConceptTreemap);
       else renderConceptTreemap();
+      window._renderConceptTreemap=renderConceptTreemap;
     })();
     </script>
 
