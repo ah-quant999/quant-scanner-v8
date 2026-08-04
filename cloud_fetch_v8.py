@@ -1784,6 +1784,10 @@ def main(category=None):
         print("🎯 全量模式，执行全部 cloud_fetch 模块")
 
     cleaned = 0
+
+    # 🔧 盘后（15:30）额外补抓 ETF_DAILY_MONITOR（T+1 日监控收盘后定稿，配合盘中实时卡）
+    if category == "post_close" and target_vars is not None:
+        target_vars.add("ETF_DAILY_MONITOR")
     for old in RAW_DIR.glob("*.json"):
         if category:
             # 只清理属于当前 category 的文件
@@ -1804,64 +1808,94 @@ def main(category=None):
 
     # 任务列表：顺序影响下游构建，保持原有顺序
     def f_sh_sz_history():
-        """沪深两市每日成交额历史（滚动窗口，供量能对比图）。
+        """沪深两市每日成交额历史 + 全市场涨跌家数（量能对比图 / 涨跌家数图）。
 
-        东财 push2his 指数日线接口分别取上证(1.000001)与深证(0.399001)的
-        成交额(f57, 单位元)，按日期对齐后输出 amount_history：
-            [{date:'M/D', sh_amount, sz_amount, total}]  （单位：亿元）
-        滚动保留最近 ~130 个交易日；index.html 按数组顺序渲染折线。
+        成交额：用 akshare stock_zh_index_daily_em（东财指数日线，含成交额）替代被 WAF 拦截的
+               push2his 接口；自动识别单位（元→亿元），避免 10000 倍误差。
+        涨跌家数：用 akshare stock_zh_a_spot_em 全市场快照统计 涨/跌/平。
+        历史序列从 raw_data（优先）/ data/SH_SZ_HISTORY.js（回退）继承，仅更新/追加最近交易日，
+        避免每次全删 raw_data 后序列断裂。
         """
-        def _fetch_amount(secid):
-            url = "http://push2his.eastmoney.com/api/qt/stock/kline/get"
-            params = {
-                "lmt": "0", "klt": "101", "secid": secid,
-                "fields1": "f1,f2,f3,f4,f5,f6",
-                "fields2": "f51,f57",   # f51=日期, f57=成交额(元)
-                "ut": "b2884a393a59ad64002292a3e90d46a5",
-                "_": int(time.time() * 1000),
-            }
+        import re
+        import akshare as ak
+
+        now = datetime.now()
+        today_md = f"{now.month}/{now.day}"
+
+        # ---- 读取历史基线 ----
+        baseline = {}
+        raw_path = RAW_DIR / "sh_sz_history.json"
+        if raw_path.exists():
             try:
-                r = _requests.get(url, params=params, headers=_EM_HEADERS, timeout=20)
-                text = r.text
-                s = text.find("{"); e = text.rfind(")")
-                j = json.loads(text[s:e if e > 0 else None])
-                klines = (j.get("data") or {}).get("klines") or []
-                out = {}
-                for line in klines:
-                    parts = line.split(",")
-                    if len(parts) < 7:
-                        continue
-                    ds = parts[0].replace("-", "")
+                baseline = json.loads(raw_path.read_text(encoding="utf-8"))
+            except Exception:
+                baseline = {}
+        if not baseline:
+            js_path = ROOT / "data" / "SH_SZ_HISTORY.js"
+            if js_path.exists():
+                try:
+                    txt = js_path.read_text(encoding="utf-8")
+                    i = txt.find("=")
+                    j = txt.rfind(";")
+                    if i != -1 and j != -1 and j > i:
+                        baseline = json.loads(txt[i + 1:j].strip())
+                except Exception:
+                    baseline = {}
+
+        # ---- 成交额历史（akshare 指数日线）----
+        amount_history = []
+        try:
+            amap = {"sh": {}, "sz": {}}
+            for key, sym in (("sh", "sh000001"), ("sz", "sz399001")):
+                df = ak.stock_zh_index_daily_em(symbol=sym)
+                for _, row in df.iterrows():
+                    ds = str(row["日期"])
+                    mm = str(int(ds[5:7])); dd = str(int(ds[8:10]))
                     try:
-                        out[ds] = round(float(parts[6]) / 1e8, 1)  # 元 → 亿
+                        amt = float(row["成交额"])
+                        if amt > 1e10:        # 元 → 亿元
+                            amt = amt / 1e8
+                        amt = round(amt, 1)
                     except Exception:
                         continue
-                return out
-            except Exception as ex:
-                print(f"  ⚠️ 沪深成交额接口失败({secid}): {ex}")
-                return {}
+                    amap[key][f"{mm}/{dd}"] = amt
+            dates = sorted(set(amap["sh"]) & set(amap["sz"]))
+            if dates:
+                window = dates[-130:]
+                amount_history = [{
+                    "date": d,
+                    "sh_amount": amap["sh"].get(d, 0.0),
+                    "sz_amount": amap["sz"].get(d, 0.0),
+                    "total": round(amap["sh"].get(d, 0.0) + amap["sz"].get(d, 0.0), 1),
+                } for d in window]
+            else:
+                amount_history = baseline.get("amount_history") or []
+        except Exception as ex:
+            print(f"  ⚠️ 沪深成交额获取失败({ex})，沿用历史序列")
+            amount_history = baseline.get("amount_history") or []
 
-        sh = _fetch_amount("1.000001")
-        sz = _fetch_amount("0.399001")
-        dates = sorted(set(sh) & set(sz))
-        if not dates:
-            return None
-        window = dates[-130:]
-        amount_history = []
-        for d in window:
-            sh_a = sh.get(d, 0.0)
-            sz_a = sz.get(d, 0.0)
-            mm = str(int(d[4:6]))
-            dd = str(int(d[6:8]))
-            amount_history.append({
-                "date": f"{mm}/{dd}",
-                "sh_amount": sh_a,
-                "sz_amount": sz_a,
-                "total": round(sh_a + sz_a, 1),
-            })
+        # ---- 涨跌家数（akshare 全市场快照）----
+        ds_hist = baseline.get("daily_stats") or []
+        try:
+            spot = ak.stock_zh_a_spot_em()
+            chg = spot["涨跌幅"]
+            up = int((chg > 0).sum())
+            down = int((chg < 0).sum())
+            flat = int((chg == 0).sum())
+            rec = {"date": today_md, "up": up, "down": down, "flat": flat}
+            if ds_hist and ds_hist[-1].get("date") == today_md:
+                ds_hist[-1] = rec
+            else:
+                ds_hist.append(rec)
+            ds_hist = ds_hist[-120:]
+        except Exception as ex:
+            print(f"  ⚠️ 涨跌家数获取失败({ex})，沿用历史序列")
+
         return {
-            "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "update_time": now.strftime("%Y-%m-%d %H:%M:%S"),
             "amount_history": amount_history,
+            "up_down": baseline.get("up_down", {}),
+            "daily_stats": ds_hist,
         }
 
     tasks = [

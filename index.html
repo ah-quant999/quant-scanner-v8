@@ -523,7 +523,7 @@ window.V8_CAL = {weeks:[],legend:[]};
 <main>
   <!-- ============ 今日事件 ============ -->
   <section id="sec-td" class="active">
-    <div class="sec-head"><h2>📅 今日事件</h2><span class="tag">交易日历 + 打新速览 · 2026-07-31</span></div>
+    <div class="sec-head"><h2>📅 今日事件</h2><span class="tag" id="tdHeaderTag">交易日历 + 打新速览 · --</span></div>
 
     <div class="grid g-2" style="margin-bottom:16px">
       <!-- 今日事件详情（合并卡：日历事件 + 宏观速览） -->
@@ -851,7 +851,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     <!-- 概念资金热力图 · 大小=净流入 · 颜色=涨跌 -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">🗺️</span>概念资金热力图 · <span class="fresh" id="conceptMapTime">更新于 --</span></h3>
-      <div id="conceptTreemap" style="min-height:160px;"><div class="ipo-empty">加载中…</div></div>
+      <div id="conceptTreemap" style="min-height:260px;max-height:360px;overflow:auto;"><div class="ipo-empty">加载中…</div></div>
       <div style="display:flex;gap:12px;font-size:11px;color:var(--dim);margin-top:8px;align-items:center;flex-wrap:wrap;">
         <span>方块面积 ≈ |主力净流入|</span>
         <span style="display:inline-flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:var(--up);border-radius:2px;"></span> 涨</span>
@@ -902,7 +902,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     <!-- 行业树图 · 细分赛道 -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">🏭</span>行业树图 · 细分赛道 · <span class="fresh" id="htUpdateTime">更新于 --</span></h3>
-      <div id="industryTreemap" style="min-height:260px;"></div>
+      <div id="industryTreemap" style="min-height:260px;max-height:360px;overflow:auto;"></div>
       <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:6px;flex-wrap:wrap;align-items:center;">
         <span>大块=行业 &nbsp; 小块=个股</span>
         <span>颜色=涨跌 &nbsp; 面积≈市值</span>
@@ -3551,6 +3551,7 @@ window.V8_CAL = {weeks:[],legend:[]};
           <tr><td>收盘累积序列（EXPERIMENT 相关）</td><td>中国数据抓取</td><td>盘后 15:30</td></tr>
           <tr><td>龙虎榜 · 严格三重共识 · 机构游资共振 · top10 · 逆势龙头 · 候选池 · 回测 · 板块资金流趋势 · 停牌预警 · 市场预警 · NT数据</td><td>盘后算法链</td><td>盘后 18:30</td></tr>
         </table>
+        <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>成交金额 / 涨跌家数</b> = 模块 <code>SH_SZ_HISTORY</code>，归属 <b>盘中 09:40–15:10 每 30 分钟</b> 自动抓取（v8_cn_fetch · 中国节点）。此前因上游 push2his 接口被 WAF 拦截导致序列冻结，已于今日改用 akshare 指数日线 + 全市场快照修复，恢复实时刷新。</div>
 
         <div class="logic-h">工作日</div>
         <table class="lg-table">
@@ -6177,6 +6178,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       window.LIMIT_UP_HEATMAP && window.LIMIT_UP_HEATMAP.update_time,
       window.CAPITAL_FLOW_DATA && window.CAPITAL_FLOW_DATA.update_time,
       window.MARKET_FUND_FLOW_DATA && window.MARKET_FUND_FLOW_DATA.update_time,
+      window.SH_SZ_HISTORY && window.SH_SZ_HISTORY.update_time,
     ].filter(Boolean);
     if(intradayTimes.length){
       intradayTimes.sort();
@@ -8444,6 +8446,8 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }
   var tm = document.getElementById('v8caltime');
   if(tm && D.update_time) tm.textContent = '更新于 ' + D.update_time;
+  var tht = document.getElementById('tdHeaderTag');
+  if(tht && D.update_time) tht.textContent = '交易日历 + 打新速览 · ' + D.update_time;
 })();
 
 /* 今日事件合并卡：日历事件 + 宏观速览 */
