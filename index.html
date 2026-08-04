@@ -3119,9 +3119,8 @@ window.V8_CAL = {weeks:[],legend:[]};
     var h = '';
     // Header
     h += '<div style="text-align:center;margin-bottom:18px">';
-    h += '<div style="font-size:18px;font-weight:800;color:var(--txt)">📊 每日市场洞察</div>';
+    h += '<div style="font-size:18px;font-weight:800;color:var(--txt)">📊 每日市场洞察 <span style="font-size:11px;color:var(--dim);font-weight:400">更新于 ' + _rcRel(updateTime) + '</span></div>';
     h += '<div style="font-size:11px;color:var(--dim);margin-top:4px">框架：结构面/情绪面/波动率/资金面/北向/龙头</div>';
-    h += '<div style="font-size:10px;color:var(--dim);margin-top:2px">更新时间：' + _rcRel(updateTime) + '</div>';
     h += '</div>';
 
     // Tag row
@@ -3333,7 +3332,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     var h = '';
     // Header
     h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">';
-    h += '<div><span style="font-size:18px;font-weight:800;color:var(--txt)">🐂 大牛股猎手</span></div>';
+    h += '<div><span style="font-size:18px;font-weight:800;color:var(--txt)">🐂 大牛股猎手</span> <span style="font-size:11px;color:var(--dim);font-weight:400">更新于 ' + _rcRel(updateTime) + '</span></div>';
     h += '<div style="font-size:11px;color:var(--dim)">机游共振 · 板块资金流 · 核心共振（仅龙虎榜覆盖个股）</div>';
     h += '</div>';
 
@@ -3415,7 +3414,6 @@ window.V8_CAL = {weeks:[],legend:[]};
     h += '</div>'; // hunter-grid
 
     // Footer
-    h += '<div style="margin-top:12px;font-size:10px;color:var(--dim);text-align:center">更新于 ' + _rcRel(updateTime) + '</div>';
     h += '<div style="margin-top:4px;font-size:10px;color:var(--sub);text-align:center">→ 详细分析见顶部 🔒 共振日历（管理员区）</div>';
 
     c.innerHTML = h;
