@@ -1,1 +1,1 @@
-window.RUNNER_STATUS = {"run_time":"2026-08-04 13:11:31","category":"intraday","hostname":"LEMONCAT","modules":{"SECTOR_FUND_FLOW":{"status":"ok","msg":"成功"}},"summary":{"total":1,"ok":1,"empty":0,"fail":0},"update_time":"2026-08-04 14:19:06"};
+window.RUNNER_STATUS = {"run_time":"2026-08-04 13:11:31","category":"intraday","hostname":"LEMONCAT","modules":{"SECTOR_FUND_FLOW":{"status":"ok","msg":"成功"}},"summary":{"total":1,"ok":1,"empty":0,"fail":0},"update_time":"2026-08-04 14:57:32"};
