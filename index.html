@@ -3824,9 +3824,66 @@ window.V8_CAL = {weeks:[],legend:[]};
         <div class="code">dims = [vol, sentiment, fund, valuation, tech, external]
 norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-h">危机雷达算法</div>
-        <div class="logic-p">综合危机指数 = 货币×40% + 经济×35% + 全球×25%。状态分档：0-30平稳 / 30-50关注 / 50-70警惕 / 70-100危机。</div>
+        <div class="logic-p">综合危机指数 = 货币×40% + 经济×35% + 全球×25%。各指标危险分基于近1年历史分位（越高越危险的指标=分位；越低越危险的指标=100−分位）。状态分档：</div>
+        <table class="lg-table">
+          <tr><th>危机指数</th><th>档位</th><th>含义 / 应对</th></tr>
+          <tr><td>0 ~ 30</td><td style="color:#5ee0a0;font-weight:700;">平稳</td><td>系统性风险低，正常仓位</td></tr>
+          <tr><td>30 ~ 50</td><td style="color:#7fb4ff;font-weight:700;">关注</td><td>局部风险升温，留意信号</td></tr>
+          <tr><td>50 ~ 70</td><td style="color:#ffb74d;font-weight:700;">警惕</td><td>多维度恶化，减仓避险</td></tr>
+          <tr><td>70 ~ 100</td><td style="color:#ff6b81;font-weight:700;">危机</td><td>系统性风险高，防御为主</td></tr>
+        </table>
         <div class="logic-h">指标危险分</div>
         <div class="logic-p">基于近1年历史分位。越高越危险指标（SHIBOR/VIX/DXY/两融/离岸汇率）危险分=分位；越低越危险指标（期限利差/中美利差/PMI/出口/CPI/房价/铜金比/BDI/美债倒挂）危险分=100−分位。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">📏</span>全站判定区间 / 分档一览（备忘）</h3>
+        <div class="logic-p">各算法/模块核心区间值与档位阈值汇总，方便对比记忆。完整算法见各对应章节。</div>
+
+        <div class="logic-h">① CRDS 大盘环境有效性判断（基于上证今日涨跌幅）</div>
+        <table class="lg-table">
+          <tr><th>上证涨跌幅</th><th>有效性</th><th>含义</th></tr>
+          <tr><td>≥ +2.0%</td><td>失效</td><td>大涨市无需逆势龙头，信号参考意义极低</td></tr>
+          <tr><td>+1.0% ~ +2.0%</td><td>低效</td><td>市场偏强，CRDS 有效性降低</td></tr>
+          <tr><td>-0.5% ~ +1.0%</td><td>有效</td><td>震荡市，CRDS 可正常参考</td></tr>
+          <tr><td>-2.0% ~ -0.5%</td><td>较有效</td><td>市场偏弱，CRDS 较有效</td></tr>
+          <tr><td>&lt; -2.0%</td><td>高有效</td><td>暴跌恐慌市信号最强，但需防系统性风险</td></tr>
+        </table>
+
+        <div class="logic-h">② 危机雷达综合指数分档（货币40% + 经济35% + 全球25%）</div>
+        <table class="lg-table">
+          <tr><th>危机指数</th><th>档位</th><th>应对</th></tr>
+          <tr><td>0 ~ 30</td><td style="color:#5ee0a0;font-weight:700;">平稳</td><td>系统性风险低，正常仓位</td></tr>
+          <tr><td>30 ~ 50</td><td style="color:#7fb4ff;font-weight:700;">关注</td><td>局部风险升温，留意信号</td></tr>
+          <tr><td>50 ~ 70</td><td style="color:#ffb74d;font-weight:700;">警惕</td><td>多维度恶化，减仓避险</td></tr>
+          <tr><td>70 ~ 100</td><td style="color:#ff6b81;font-weight:700;">危机</td><td>系统性风险高，防御为主</td></tr>
+        </table>
+
+        <div class="logic-h">③ volatility regime 四档（基于 5日/20日 波动 + 5日/20日 涨跌幅）</div>
+        <table class="lg-table">
+          <tr><th>regime_code</th><th>档位</th><th>含义</th></tr>
+          <tr><td>stabilize</td><td style="color:#5ee0a0;font-weight:700;">🟢 企稳</td><td>价稳 + 波动收敛 → 企稳回升</td></tr>
+          <tr><td>grind</td><td style="color:#ffb74d;font-weight:700;">🟡 阴跌</td><td>价未止跌 + 波动收敛 → 阴跌磨底</td></tr>
+          <tr><td>rebound_diverge</td><td style="color:#7fb4ff;font-weight:700;">🔵 反弹分歧</td><td>价反弹 + 波动仍升 → 反弹分歧</td></tr>
+          <tr><td>panic</td><td style="color:#ff6b81;font-weight:700;">🔴 恐慌</td><td>价跌 + 波动升 → 恐慌下行</td></tr>
+        </table>
+
+        <div class="logic-h">④ top10 分数档位</div>
+        <table class="lg-table">
+          <tr><th>分数</th><th>档位</th><th>前端展示</th></tr>
+          <tr><td>≥ 80</td><td style="color:#5ee0a0;font-weight:700;">精选</td><td>卡片详细显示全部条件命中</td></tr>
+          <tr><td>70 ~ 79</td><td style="color:#f0b083;font-weight:700;">观察</td><td>仅计数，不详细展开（防视觉噪音）</td></tr>
+          <tr><td>&lt; 70</td><td>不入选</td><td>top10_daily 排除</td></tr>
+        </table>
+
+        <div class="logic-h">⑤ 基础面质量档位（fundamental_quality.json）</div>
+        <table class="lg-table">
+          <tr><th>档位</th><th>评分加成</th><th>阈值</th></tr>
+          <tr><td style="color:#1D9E75;font-weight:700;">A</td><td>+40</td><td>真实上限 70 分（quality_score ≥ 70）</td></tr>
+          <tr><td>B</td><td>+5</td><td>中上</td></tr>
+          <tr><td>C</td><td>0</td><td>中性</td></tr>
+          <tr><td style="color:var(--down);font-weight:700;">D</td><td>-10</td><td>扣分项</td></tr>
+        </table>
       </div>
 
       <div class="card">
