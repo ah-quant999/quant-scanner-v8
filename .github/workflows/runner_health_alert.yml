@@ -1,0 +1,160 @@
+# 九宝量化 v8.0 — Runner 健康监控（24/7 离线即时告警）
+#
+# 2026-08-05 新增：主人「怕小九停电」要求发现 runner 离线立刻告警。
+# 方案：每 10 分钟由 GitHub 云端 ubuntu-latest 自检 lemoncat-cn runner 状态，
+# 离线即开 GitHub Issue（带 runner-offline 标签+@主人），恢复时自动关闭。
+# 同步把状态写入 data/RUNNER_STATUS_HEALTH.js 让运维面板可见。
+# 24/7 跑、不依赖小九在线；GHA cron 永不漏跑、无 safe-delete 拦截。
+
+name: "🚨 Runner 健康监控"
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: "🩺 探测 lemoncat-cn runner 状态"
+        id: probe
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          API="https://api.github.com/repos/ah-quant999/quant-scanner-v8/actions/runners"
+          RUNNERS=$(curl -s -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github.v3+json" "$API")
+          LEMONCAT=$(echo "$RUNNERS" | python3 -c "
+          import json,sys
+          d=json.load(sys.stdin)
+          for r in d.get('runners',[]):
+              if r.get('name')=='lemoncat-cn':
+                  s=r.get('status','')
+                  o=r.get('online',False)
+                  b=r.get('busy',False)
+                  state='online' if (o and s=='online') else 'offline'
+                  print(f'{state}|{s}|{o}|{b}')
+                  break
+          else:
+              print('missing|||')
+          ")
+          STATE=$(echo "$LEMONCAT" | cut -d'|' -f1)
+          ONLINE=$(echo "$LEMONCAT" | cut -d'|' -f3)
+          echo "lemoncat-cn: state=$STATE online=$ONLINE"
+          echo "state=$STATE" >> "$GITHUB_OUTPUT"
+          echo "online=$ONLINE" >> "$GITHUB_OUTPUT"
+
+      - name: "🚨 离线告警：开 GitHub Issue"
+        if: steps.probe.outputs.state == 'offline'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          REPO="ah-quant999/quant-scanner-v8"
+          BJ_NOW=$(TZ='Asia/Shanghai' date '+%m-%d %H:%M')
+          EXISTING=$(curl -s -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO/issues?state=open&labels=runner-offline&per_page=1" \
+            | python3 -c "import json,sys;d=json.load(sys.stdin);print(d[0]['number'] if d else '')")
+          if [ -z "$EXISTING" ]; then
+            echo "::warning::lemoncat-cn runner 离线，开 GitHub Issue 告警"
+            BODY=$(python3 -c "
+import json
+body_text = '''@ah-quant999 ⚠️ **lemoncat-cn runner 离线**
+
+- 检测时间: ''' + '$BJ_NOW' + ''' 北京
+
+**后果**: v8_cn_fetch / v8_algo 全部 cron 漏跑 → 实时数据停更
+**可能原因**: 小九机器停电 / 网络断 / runner 服务未启动 / 安全软件拦截
+
+**自愈路径**:
+- 数据陈旧 → 邮件报警 + v8_postclose_guard.py 自愈
+- 恢复后本 workflow 会自动关闭此 issue
+
+---
+*本 issue 由 runner_health_alert.yml 自动创建*'''
+print(json.dumps({
+  'title': '🚨 lemoncat-cn runner 离线 (' + '$BJ_NOW' + ')',
+  'body': body_text,
+  'labels': ['runner-offline'],
+  'assignees': ['ah-quant999']
+}, ensure_ascii=False))
+            ")
+            curl -s -X POST -H "Authorization: token $GH_TOKEN" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/$REPO/issues" \
+              -d "$BODY" > /dev/null
+            echo "  created issue"
+          else
+            echo "  issue #$EXISTING 已开，跳过"
+          fi
+
+      - name: "✅ 恢复在线：关闭告警 Issue"
+        if: steps.probe.outputs.state == 'online'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          REPO="ah-quant999/quant-scanner-v8"
+          BJ_NOW=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
+          ISSUES=$(curl -s -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO/issues?state=open&labels=runner-offline&per_page=10" \
+            | python3 -c "import json,sys;[print(i['number']) for i in json.load(sys.stdin)]")
+          if [ -z "$ISSUES" ]; then
+            echo "  无 open 告警 issue，runner 健康"
+          else
+            for n in $ISSUES; do
+              echo "  closing issue #$n"
+              curl -s -X POST -H "Authorization: token $GH_TOKEN" \
+                "https://api.github.com/repos/$REPO/issues/$n/comments" \
+                -d "{\"body\":\"✅ lemoncat-cn runner 已恢复在线（$BJ_NOW 北京）\"}" > /dev/null
+              curl -s -X PATCH -H "Authorization: token $GH_TOKEN" \
+                "https://api.github.com/repos/$REPO/issues/$n" \
+                -d '{"state":"closed"}' > /dev/null
+            done
+          fi
+
+      - name: "📝 写状态文件 data/RUNNER_STATUS_HEALTH.js"
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          REPO="ah-quant999/quant-scanner-v8"
+          STATE="${{ steps.probe.outputs.state }}"
+          if [ -z "$STATE" ]; then STATE="unknown"; fi
+          BJ_NOW=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
+          UTC_NOW=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+          SHA=$(curl -s -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO/contents/data/RUNNER_STATUS_HEALTH.js" \
+            | python3 -c "import json,sys
+try:
+  d=json.load(sys.stdin)
+  print(d.get('sha',''))
+except: print('')")
+          mkdir -p data
+          printf 'window.RUNNER_STATUS_HEALTH = {"runner":"lemoncat-cn","state":"%s","checked_at_utc":"%s","checked_at_bj":"%s","source":"runner_health_alert.yml"};\n' \
+            "$STATE" "$UTC_NOW" "$BJ_NOW" > data/RUNNER_STATUS_HEALTH.js
+          B64=$(base64 -w0 data/RUNNER_STATUS_HEALTH.js)
+          python3 -c "
+import json
+sha='$SHA'
+payload={'message':'runner health: $STATE @ $BJ_NOW','content':'$B64'}
+if sha: payload['sha']=sha
+print(json.dumps(payload, ensure_ascii=False))
+" > /tmp/payload.json
+          HTTP_CODE=$(curl -s -o /tmp/resp.json -w "%{http_code}" -X PUT \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/$REPO/contents/data/RUNNER_STATUS_HEALTH.js" \
+            --data @/tmp/payload.json)
+          if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
+            echo "  ✅ 状态文件已更新 state=$STATE"
+          else
+            echo "  ::warning::状态文件推送失败 HTTP=$HTTP_CODE"
+          fi
