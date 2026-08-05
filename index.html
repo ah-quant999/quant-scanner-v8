@@ -5455,19 +5455,18 @@ function renderLimitUpHeatmap(){
   var __MFF_SHOW_CUM = true;
   var __MFF_CHART_INST = null;
   function mffFormatUpdateTime(ts, dailyArr){
-    // 日频数据：标题必须显示「数据最后日期」，避免用文件 update_time 误导成「今日」。
-    if(!dailyArr || !dailyArr.length) return ts || '';
+    // 日频数据：标题显示「数据最后日期」+「文件更新于」，避免只用 update_time 误导成「今日」。
+    var hm = ts && ts.length >= 16 ? ' · 更新于 '+ts.slice(11,16) : (ts ? ' · 更新于 '+ts : '');
+    if(!dailyArr || !dailyArr.length) return ts ? '更新于 '+ts : '';
     var last = dailyArr[dailyArr.length-1].date || '';
-    if(last.length !== 8) return ts || '';
+    if(last.length !== 8) return '更新于 '+ts;
     var lastFmt = last.slice(0,4)+'-'+last.slice(4,6)+'-'+last.slice(6,8);
     var now = new Date();
     var today = now.getFullYear() + ('0'+(now.getMonth()+1)).slice(-2) + ('0'+now.getDate()).slice(-2);
     if(last === today){
-      // 数据确实是今天，再补充文件更新时间（如果有）
-      var hm = ts && ts.length >= 16 ? ' · 文件 '+ts.slice(11,16) : '';
       return '今日 '+lastFmt+hm;
     }
-    return '数据截至 '+lastFmt;
+    return '数据截至 '+lastFmt+hm;
   }
   function renderMarketFundFlow(mff){
     var d = mff || {};

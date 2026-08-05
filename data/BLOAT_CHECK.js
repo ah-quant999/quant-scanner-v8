@@ -1,9 +1,9 @@
 window.BLOAT_CHECK = {
-  "updated": "2026-08-05 12:04:06",
+  "updated": "2026-08-05 12:57:57",
   "overall": "ok",
   "summary": {
-    "ok": 8,
-    "warn": 1,
+    "ok": 9,
+    "warn": 0,
     "fail": 0,
     "total": 9
   },
@@ -11,30 +11,30 @@ window.BLOAT_CHECK = {
     {
       "name": "index.html 体积",
       "status": "ok",
-      "message": "584.0 KB",
-      "metric": 584.0
+      "message": "582.9 KB",
+      "metric": 582.9
     },
     {
       "name": "index.html 行数",
       "status": "ok",
-      "message": "9051 行",
-      "metric": 9051
+      "message": "9075 行",
+      "metric": 9075
     },
     {
       "name": "script 标签平衡",
       "status": "ok",
-      "message": "75 个 <script> 块，75 个 </script>",
+      "message": "77 个 <script> 块，77 个 </script>",
       "metric": {
-        "opens": 75,
-        "closes": 75
+        "opens": 77,
+        "closes": 77
       }
     },
     {
       "name": "重复 id 检查",
       "status": "ok",
-      "message": "共 205 个 id，无重复",
+      "message": "共 208 个 id，无重复",
       "metric": {
-        "total": 205,
+        "total": 208,
         "duplicates": 0
       }
     },
@@ -50,16 +50,16 @@ window.BLOAT_CHECK = {
     {
       "name": "node --check 语法闸门",
       "status": "ok",
-      "message": "语法检查通过（75 个 script 块）",
-      "metric": 75
+      "message": "语法检查通过（77 个 script 块）",
+      "metric": 77
     },
     {
       "name": "data/*.js 总体积",
       "status": "ok",
-      "message": "55 个文件，共 3196.4 KB",
+      "message": "55 个文件，共 3196.5 KB",
       "metric": {
         "files": 55,
-        "kb": 3196.4
+        "kb": 3196.5
       }
     },
     {
@@ -73,10 +73,10 @@ window.BLOAT_CHECK = {
     },
     {
       "name": "data/*.js 引用检查",
-      "status": "warn",
-      "message": "1 个未引用：MACRO_BRIEF.js",
+      "status": "ok",
+      "message": "全部已引用",
       "metric": {
-        "unreferenced": 1
+        "unreferenced": 0
       }
     }
   ]
