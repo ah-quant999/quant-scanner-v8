@@ -32,9 +32,9 @@ REQUIRED_SECTIONS = {
 
 # 必须存在的独立容器 id（非整段 section，仅校验 id 存在）。
 # 注意：hmUpdateTime（完整热力矩阵）是用户刻意未恢复的，不纳入守护。
+# 注意：alertScanTime（系统告警）随动态监控区一起被用户删除，不纳入守护。
 REQUIRED_IDS = [
     "conceptMapTime",   # 概念资金热力图（treemap）
-    "alertScanTime",    # 系统告警扫描时间容器
 ]
 
 
@@ -101,7 +101,7 @@ def main():
         if ("id=\"%s\"" % cid) in h or ("id='%s'" % cid) in h:
             print("✅ 容器 id=%s 存在" % cid)
         else:
-            print("⚠️ 关键容器 id=%s 缺失（概念热力图/系统告警）" % cid)
+            print("⚠️ 关键容器 id=%s 缺失（概念热力图）" % cid)
             ok = False
 
     if not ok:
