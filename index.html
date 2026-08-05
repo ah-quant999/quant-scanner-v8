@@ -1956,7 +1956,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         var t=$('rcInsightTime');
         if(t){
           var ts=A.update_time||lhb.update_time||'';
-          if(ts) t.innerHTML = _uBadge('盘中','短线',ts);
+          if(ts) t.innerHTML = _uBadge('盘后','短线',ts);
         }
       }
 
@@ -2651,7 +2651,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     var h = '';
     h += '<div class="cal-header-row">';
     h += '<span class="cal-title">📅 机游共振日历</span>';
-    h += '<span class="cal-meta">' + year + '年' + (month+1) + '月 &nbsp;|&nbsp; ' + _uBadge('盘中', '短线', D.update_time) + '</span>';
+    h += '<span class="cal-meta">' + year + '年' + (month+1) + '月 &nbsp;|&nbsp; ' + _uBadge('盘后', '短线', D.update_time) + '</span>';
     h += '</div>';
 
     // Legend
@@ -2934,7 +2934,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     var h = '';
     h += '<div class="cal-header-row">';
     h += '<span class="cal-title">🌊 北向资金日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span></span>';
-    h += '<span class="cal-meta">' + _uBadge('盘中', '短线', NF.update_time) + '</span>';
+    h += '<span class="cal-meta">' + _uBadge('盘后', '短线', NF.update_time) + '</span>';
     h += '</div>';
 
     // Notice box（精简·去掉过期"已停更"信息）
@@ -3171,7 +3171,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     h += '<div style="text-align:center;margin-bottom:18px">';
     h += '<div style="font-size:18px;font-weight:800;color:var(--txt)">📊 每日市场洞察</div>';
     h += '<div style="font-size:11px;color:var(--dim);margin-top:4px">框架：结构面/情绪面/波动率/资金面/北向/龙头</div>';
-    h += '<div style="margin-top:6px;display:flex;justify-content:center">' + _uBadge('盘中', '短线', updateTime) + '</div>';
+    h += '<div style="margin-top:6px;display:flex;justify-content:center">' + _uBadge('盘后', '短线', updateTime) + '</div>';
     h += '</div>';
 
     // Tag row
@@ -3383,7 +3383,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     var h = '';
     // Header
     h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">';
-    h += '<div><span style="font-size:18px;font-weight:800;color:var(--txt)">🐂 大牛股猎手</span><span style="margin-left:8px">' + _uBadge('盘中', '短线', updateTime) + '</span></div>';
+    h += '<div><span style="font-size:18px;font-weight:800;color:var(--txt)">🐂 大牛股猎手</span><span style="margin-left:8px">' + _uBadge('盘后', '短线', updateTime) + '</span></div>';
     h += '<div style="font-size:11px;color:var(--dim)">机游共振 · 板块资金流 · 核心共振（仅龙虎榜覆盖个股）</div>';
     h += '</div>';
 
@@ -3465,7 +3465,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     h += '</div>'; // hunter-grid
 
     // Footer
-    h += '<div style="margin-top:12px;font-size:10px;color:var(--dim);text-align:center">' + _uBadge('盘中', '短线', updateTime) + '</div>';
+    h += '<div style="margin-top:12px;font-size:10px;color:var(--dim);text-align:center">' + _uBadge('盘后', '短线', updateTime) + '</div>';
     h += '<div style="margin-top:4px;font-size:10px;color:var(--sub);text-align:center">→ 详细分析见顶部 🔒 共振日历（管理员区）</div>';
 
     c.innerHTML = h;
@@ -7398,7 +7398,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     h+='<div style="background:linear-gradient(135deg,#13243f,#0e2747);color:#cfe3ff;border:1px solid #244066;border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">';
     h+='<span style="font-size:22px;">🎯</span><div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:700;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">选股驾驶舱';
-    if(cockpitTs) h+=_uBadge('盘中','短线',cockpitTs);
+    if(cockpitTs) h+=_uBadge('盘后','短线',cockpitTs);
     h+='</div><div style="font-size:11px;opacity:.85;">出手信号灯 → 大盘可操作区 → 最强赛道 → 共振候选 → 机构/龙虎榜验证 → 交易计划</div></div>';
     h+='</div>';
 
@@ -8501,7 +8501,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     }
     var timeEl=document.getElementById(p+'crdsTime');
     if(timeEl&&d.update_time){
-      timeEl.innerHTML = _uBadge('盘中','短线',d.update_time);
+      timeEl.innerHTML = _uBadge('盘后','短线',d.update_time);
     }
     // 覆盖说明
     var covEl=document.getElementById(p+'crdsCoverage');
