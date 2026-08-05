@@ -1,1 +1,1 @@
-window.HERDING_DATA = {"current_clusters":[{"sector":"汽车零部","direction":"强势抱团","count":7},{"sector":"小金属","direction":"强势抱团","count":6},{"sector":"光学光电","direction":"强势抱团","count":6}],"total_limit_up":103,"note":"由涨停行业集中度推导的抱团板块（行业涨停数降序）","update_time":"2026-08-05 17:44:36"};
+window.HERDING_DATA = {"current_clusters":[{"sector":"汽车零部","direction":"强势抱团","count":7},{"sector":"小金属","direction":"强势抱团","count":6},{"sector":"光学光电","direction":"强势抱团","count":6}],"total_limit_up":103,"note":"由涨停行业集中度推导的抱团板块（行业涨停数降序）","update_time":"2026-08-05 17:47:28"};
