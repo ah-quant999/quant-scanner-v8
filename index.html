@@ -3512,9 +3512,9 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
       <button class="op-tab-btn" data-op="2" onclick="opSwitchTab(2)">⏰ 任务运行看板 <span class="op-tab-time" id="opTab2Time"></span></button>
 
-      <button class="op-tab-btn" data-op="3" onclick="opSwitchTab(3)">暂未上架 <span class="op-tab-time" id="opTab3Time"></span></button>
+      <button class="op-tab-btn" data-op="3" onclick="opSwitchTab(3)">暂未上架</button>
 
-      <button class="op-tab-btn" data-op="4" onclick="opSwitchTab(4)">已下架 <span class="op-tab-time" id="opTab4Time"></span></button>
+      <button class="op-tab-btn" data-op="4" onclick="opSwitchTab(4)">已下架</button>
 
     </div>
 
@@ -7933,11 +7933,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   function genericSourceList(arr){ return (arr||[]).map(genericSource).join('、')||'—'; }
 
   /* ── 辅助：暗色主题卡片头（全站统一样式） ── */
-  function v8CardHeader(icon, title, subtitle, timeKey, dataObj, nodata){
+  function v8CardHeader(icon, title, subtitle, timeKey, dataObj, nodata, hideTime){
     var t = '';
     var slot='', horizon='';
     // 解析时间 + 卡片元信息（slot/horizon 通过 window.V8_CARD_META 注册，每个调用方传参覆盖）
-    if(timeKey && dataObj && dataObj.update_time){
+    if(!hideTime && timeKey && dataObj && dataObj.update_time){
       try { var ft=fmtDataTime(dataObj.update_time); t=ft.text; }catch(e){}
     }
     // 元信息默认从 dataObj.meta 读取（可选）；也可被同名全局 V8_CARD_META 覆盖
@@ -7956,7 +7956,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       +'<span style="font-size:14px;font-weight:800;color:var(--cyan);">'+title+'</span>';
     if(subtitle){ html+='<span style="font-size:11px;color:var(--dim);margin-left:4px;">'+subtitle+'</span>'; }
     if(nodata){ html+='<span style="font-size:10px;color:var(--down);border:1px solid var(--down);border-radius:4px;padding:1px 5px;margin-left:4px;">无数据</span>'; }
-    if(badge){ html+='<span style="margin-left:6px">'+badge+'</span>'; }
+    if(hideTime){
+      // 不渲染胶囊；不加占位 span（卡片名 + subtitle 紧贴左侧，符合大卡规范）
+    }else if(badge){ html+='<span style="margin-left:6px">'+badge+'</span>'; }
     else { html+='<span style="margin-left:auto;"></span>'; }
     html+='</div>';
     return html;
@@ -8336,7 +8338,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var lhb=window.LHB_DATA||{}, lhbT=lhb.update_time||'';
     var hasLhb=lhb.stocks&&lhb.stocks.length;
     h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #4527a0;">';
-    h+=v8CardHeader('💰','四路资金流向对比','龙虎榜席位口径','update_time',{update_time:lhbT},!hasLhb);
+    h+=v8CardHeader('💰','四路资金流向对比','龙虎榜席位口径','update_time',{update_time:lhbT},!hasLhb,true);
     h+='<div style="padding:12px 14px;">';
     if(hasLhb){
       function lhbNet(s,key){ var seat=s.seats&&s.seats[key]; return seat?(seat.buy||0)-(seat.sell||0):0; }
@@ -8596,21 +8598,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     DATA.etf_sub = window.ETF_SUBSCRIPTION||null;
     DATA.etf_heat = window.ETF_INTRADAY_HEAT||null;
 
-    // 运维子页 tab 更新时间（取各自面板数据源最晚时间）
-    function latestTime(arr){
-      var valid=arr.filter(function(x){return x && /^\d{4}-\d{2}-\d{2}/.test(String(x));});
-      if(!valid.length) return '';
-      return valid.sort().pop();
-    }
-    var t3=latestTime([(DATA.sh_fib||{}).update_time, (DATA.candidate||{}).update_time, (window.CRDS_CARD_DATA||{}).update_time]);
-    var t4=latestTime([
-      (DATA.w52||{}).update_time, (DATA.limit_up||{}).update_time, (DATA.herding||{}).update_time,
-      (DATA.capital_flow||{}).update_time, (DATA.cffex||{}).update_time,
-      (DATA.margin||{}).update_time, (DATA.etf_sub||{}).update_time, (DATA.etf_heat||{}).update_time
-    ]);
-    var t3el=document.getElementById('opTab3Time'), t4el=document.getElementById('opTab4Time');
-    if(t3el && t3){ try{ t3el.innerHTML = _uBadge('盘后', '中线', t3); }catch(e){} }
-    if(t4el && t4){ try{ t4el.innerHTML = _uBadge('盘后', '短线', t4); }catch(e){} }
+    // 「暂未上架/已下架」Tab 不再挂时间胶囊（2026-08-06 主人确立：Tab 类别名属大卡，不显示具体时间）
 
     var safe=function(fn){try{fn();}catch(e){console.warn('运维子页渲染失败',e);}};
     safe(renderAllsite);
