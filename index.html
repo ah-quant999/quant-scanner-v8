@@ -504,6 +504,40 @@ window.V8_CAL = {weeks:[],legend:[]};
   };
 })();
 </script>
+<script>
+/* ===== 全站统一「更新于」胶囊（HOIST 版本）=====
+   原定义在 line 2491+ 太靠后，judgmentTag / macroInterpretTag / aiSummaryTime 等 IIFE
+   会在初次解析时执行并调用 _uBadge，原位置会 ReferenceError 静默吞掉整段 IIFE。
+   所以这里在数据文件加载完（line 506 后）立即注册 _uBadge / setBadge，
+   并暴露到 window，**下游 IIFE 与下游脚本块均可同步使用**。
+   原始定义（line 2515+）会一并删除以避免重复。
+   ================================================================ */
+function _uBadge(slot, horizon, ts, sub){
+  var t = '—';
+  if(ts){
+    try{
+      var ft = (window.fmtDataTime && typeof fmtDataTime === 'function') ? fmtDataTime(ts) : null;
+      var rel = window._fmtAshareRel ? window._fmtAshareRel(ts) : null;
+      t = (ft && ft.text) || rel || String(ts);
+    } catch(e){ t = String(ts); }
+  }
+  var sHTML = slot    ? '<span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">'+slot+'</span>' : '';
+  var hHTML = horizon ? '<span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">'+horizon+'</span>' : '';
+  return '<span class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;">'
+    + '<span aria-hidden="true">🐻</span>'
+    + '<span style="margin-left:4px">更新于</span>'
+    + '<span style="color:#9fd0ff;font-weight:600;margin-left:4px">' + t + '</span>'
+    + sHTML + hHTML + '</span>'
+    + (sub ? ' <span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">' + sub + '</span>' : '');
+}
+function setBadge(id, slot, horizon, ts, sub){
+  var el = document.getElementById(id) || (typeof $ === 'function' ? $(id) : null);
+  if(!el) return;
+  if(!ts && !sub){ el.innerHTML = ''; return; }
+  el.innerHTML = _uBadge(slot, horizon, ts, sub);
+}
+window._uBadge = _uBadge; window.setBadge = setBadge;
+</script>
 <script src="data/CRDS_CARD_DATA.js"></script>
 <script src="data/TRIPLE_CONSENSUS.js"></script>
 <script src="data/TRIPLE_TRACK.js"></script>
@@ -779,10 +813,10 @@ window.V8_CAL = {weeks:[],legend:[]};
         if(!contentEl) return;
         if(!d || !d.gen_time){
           contentEl.innerHTML='<div class="ipo-empty">AI市场速览数据暂不可用</div>';
-          if(timeEl) timeEl.textContent='--';
-          return;
+        if(timeEl) timeEl.innerHTML = _uBadge('盘中','短线',null);
+        return;
         }
-        if(timeEl) timeEl.textContent='AI建议 '+rel(d.gen_time);
+        if(timeEl) timeEl.innerHTML = _uBadge('盘中','短线',d.gen_time);
         var h='';
 
         // 1. 日内风向
@@ -2513,38 +2547,12 @@ window.V8_CAL = {weeks:[],legend:[]};
   function _rcFmtYi(wan){ var yi=wan/10000; return (yi>=0?'+':'')+yi.toFixed(2)+'亿'; }
 
   /* ──────────────────────────────────────────────────────────
-     全站统一「更新于」胶囊（截图样式：深蓝渐变背景 + 🐻 emoji）
+     全站统一「更新于」胶囊（HOISTED 版，定义在 line ~507，原位置已删除）
      slot     — 盘前 / 盘中 / 盘后 / T+1 / 实时 / 周度 …
      horizon  — 短线 / 中线 / 长线 / 中长线 / —
      ts       — ISO 时间字符串或日期对象（空=显 —）
      sub      — 副标签（可选，胶囊外独立小标，如「数据时间」「持仓连续 N 只」）
      ────────────────────────────────────────────────────────── */
-  function _uBadge(slot, horizon, ts, sub){
-    var t = '—';
-    if(ts){
-      try{
-        var ft = (window.fmtDataTime && typeof fmtDataTime === 'function') ? fmtDataTime(ts) : null;
-        t = (ft && ft.text) || _rcRel(ts) || String(ts);
-      } catch(e){ t = _rcRel(ts) || String(ts); }
-    }
-    var sHTML = slot    ? '<span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">'+slot+'</span>' : '';
-    var hHTML = horizon ? '<span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">'+horizon+'</span>' : '';
-    return '<span class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;">'
-      + '<span aria-hidden="true">🐻</span>'
-      + '<span style="margin-left:4px">更新于</span>'
-      + '<span style="color:#9fd0ff;font-weight:600;margin-left:4px">' + t + '</span>'
-      + sHTML + hHTML
-      + '</span>'
-      + (sub ? ' <span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">' + sub + '</span>' : '');
-  }
-  /* 便捷：直接给某个 id 的 DOM 设上胶囊 */
-  function setBadge(id, slot, horizon, ts, sub){
-    var el = document.getElementById(id) || (typeof $ === 'function' ? $(id) : null);
-    if(!el) return;
-    if(!ts && !sub){ el.innerHTML = ''; return; }
-    el.innerHTML = _uBadge(slot, horizon, ts, sub);
-  }
-  window._uBadge = _uBadge; window.setBadge = setBadge;
 
 
   /* ===== 工具：机游共振每日 TOP5 列表（参照参考页） ===== */

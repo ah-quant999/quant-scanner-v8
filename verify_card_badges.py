@@ -8,7 +8,8 @@
 1. 抽出所有 .fresh ID（HTML 静态 / JS 端 ID）
 2. 抽出所有 setBadge('id', ...) 和 _uBadge(_inline_) 调用涉及到的 ID
 3. 抽 .fresh ID 但没有 setBadge 调用或 innerHTML=_uBadge 的，记入漂移
-4. 主站结构变更多由人手同步，校验结果进 HANDOVER_LOG，不阻断备份
+4. 额外：显式列出的非 .fresh 卡片时间 ID（如 aiSummaryTime）也要校验
+5. 主站结构变更多由人手同步，校验结果进 HANDOVER_LOG，不阻断备份
 
 输出：HANDOVER_LOG.jsonl 一条漂移记录
 """
@@ -53,10 +54,21 @@ NON_TIME_FRESH = {
     'ttAlertCount',       # 数量
 }
 
-ok_handled = sorted([i for i in fresh_ids if i not in NON_TIME_FRESH and is_id_handled(i)])
-drift = sorted([i for i in fresh_ids if i not in NON_TIME_FRESH and not is_id_handled(i)])
+# 显式列出的非 .fresh 卡片时间 ID —— 这些 ID 不带 .fresh class，但卡片名右侧必须有胶囊
+# （主人铁律：所有卡片名后必须跟 🐻 胶囊，TAB/section 名例外）
+EXPLICIT_CARD_TIME_IDS = {
+    'aiSummaryTime',      # AI市场速览（盘前数据区卡片）
+    'judgmentTag',        # 今日判定
+    'macroInterpretTag',  # 今日宏观解读
+}
 
-print(f'全站 .fresh ID 共 {len(fresh_ids)} 个')
+# 合并：所有需要校验的卡片时间 ID = .fresh \ 非时间 + 显式列表
+check_ids = (fresh_ids - NON_TIME_FRESH) | EXPLICIT_CARD_TIME_IDS
+
+ok_handled = sorted([i for i in check_ids if is_id_handled(i)])
+drift = sorted([i for i in check_ids if not is_id_handled(i)])
+
+print(f'全站卡片时间 ID 共 {len(check_ids)} 个（.fresh={len(fresh_ids - NON_TIME_FRESH)} + 显式={len(EXPLICIT_CARD_TIME_IDS)}）')
 print(f'  已统一胶囊化: {len(ok_handled)}')
 print(f'  漂移（未注入 _uBadge/setBadge）: {len(drift)}')
 for d in drift:
@@ -71,6 +83,7 @@ log_entry = {
     'drift_count': len(drift),
     'handled_count': len(ok_handled),
     'fresh_total': len(fresh_ids),
+    'explicit_total': len(EXPLICIT_CARD_TIME_IDS),
     'drift_ids': drift,
 }
 with log.open('a', encoding='utf-8') as f:

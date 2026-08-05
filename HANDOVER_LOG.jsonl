@@ -1,1 +1,4 @@
 {"time": "2026-08-06 00:33:38", "mode": "verify_card_badges", "success": true, "drift_count": 0, "handled_count": 22, "fresh_total": 28, "drift_ids": []}
+{"time": "2026-08-06 00:36:52", "mode": "verify_card_badges", "success": true, "drift_count": 0, "handled_count": 22, "fresh_total": 28, "drift_ids": []}
+{"time": "2026-08-06 06:27:31", "mode": "verify_card_badges", "success": true, "drift_count": 0, "handled_count": 22, "fresh_total": 28, "drift_ids": []}
+{"time": "2026-08-06 06:33:57", "mode": "verify_card_badges", "success": true, "drift_count": 0, "handled_count": 25, "fresh_total": 28, "explicit_total": 3, "drift_ids": []}
