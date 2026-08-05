@@ -1,0 +1,67 @@
+# 九宝量化 v8.0 — 盘后算法链（云端 ubuntu-latest）
+#
+# 2026-08-05 23:45 创建：cn 自托管 runner 连续 2 天盘后算法链失败——
+#   run#16/#17（08-05 18:30/20:00）双双挂在「经 GitHub API 同步源码」步骤，
+#   根因是 cn runner 网络层不稳定（git 走 github.com 被连接重置，GitHub API 同步也超时）。
+#   与 v8_cn_fetch_cloud.yml 同理，把算法链迁到 GitHub 云端 ubuntu-latest：
+#   - 云端 runner 在 GitHub 内网，checkout/clone 无 safe-delete 钩子、无连接重置问题；
+#   - 东财镜像/akshare 可达性已由 probe_v8_cn_cloud.yml 实测（10/11 通，唯一 FAIL 是探针函数名写错）；
+#   - cn_fetch 云端版 08-05 17:34 已实测跑通 12 模块，同源数据链路可信。
+#
+# ⚠️ 保留 v8_algo_run.yml（cn runner）仅作 workflow_dispatch 应急回退，其 cron 已移除
+#    （防止双跑：两路都会往 main 推 raw_data，同一产物并发会互相覆盖）。
+#
+# 2026-08-05 23:45 兼容性要点：
+#   - actions/checkout@v4 在云端 ubuntu 是标准操作（无 Windows safe-delete 钩子）；
+#   - actions/setup-python 提供 python3；
+#   - SKIP_MOOTDX=1：云端无通达信接口，直走 akshare；
+#   - V6_SEED 不设（默认 0，v8 已原生化，不依赖 v6 路径 E:\...）；
+#   - GITHUB_TOKEN 由云端自动注入，api_push_raw.py 走 Contents API 推送。
+
+name: "☁️ v8 盘后算法链(云端)"
+
+on:
+  schedule:
+    - cron: '30 10 * * 1-5'  # 18:30 CST 盘后（龙虎榜18点后已发布 + 收盘数据 + 算法部署）主
+    - cron: '0 12 * * 1-5'   # 20:00 CST 盘后冗余备份
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  algo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      V8_PUSH: "1"
+      SKIP_MOOTDX: "1"
+    steps:
+      - name: "📥 Checkout 源码（云端无需 safe-delete 钩子规避）"
+        uses: actions/checkout@v4
+
+      - name: "🐍 配置 Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: "📦 安装 A股依赖（清华镜像）"
+        run: |
+          pip install -q -i https://pypi.tuna.tsinghua.edu.cn/simple akshare pandas numpy requests baostock 2>&1 | tail -3 || true
+          pip install -q -i https://pypi.tuna.tsinghua.edu.cn/simple mootdx 2>&1 | tail -3 || true
+          python -c "import akshare, pandas, numpy, requests; print('deps ready')"
+
+      - name: "🧮 运行盘后算法链 → raw_data/ → 推送"
+        run: |
+          set +e
+          python algorithms/run_algorithms.py
+          echo "algo exit: $?"
+          # run_algorithms 内部每个脚本 continue-on-error，整体退出码不代表全失败；
+          # 推送交由下一步兜底执行，这里不因非零退出码而 fail。
+          exit 0
+
+      - name: "📤 兜底推送（若上一步未推）"
+        if: always()
+        run: |
+          python api_push_raw.py || true

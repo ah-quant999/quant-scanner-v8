@@ -72,10 +72,11 @@ name: "🇨🇳 v8 盘后算法链(cn)"
 #   也已由本链原生产出（fetch_orphan_*.py → raw_data/ → api_push），彻底脱离 v6。
 #   原 v8_sync_legacy.yml（19:30 从 v6 补 4 孤儿）已退役为 no-op，不再参与时序。
 #   详见 TIME_ORDER.md。
+# 2026-08-05 23:45 四修复：cron 已移除，本 workflow 仅作 workflow_dispatch 应急回退。
+#   算法链主力已迁「☁️ v8 盘后算法链(云端)」v8_algo_cloud.yml（ubuntu-latest）。
+#   双路同时跑会向 main 推同一批 raw_data 互相覆盖，故 cn 版必须禁 cron。
+#   应急用法：云端版挂时手动 dispatch 本 workflow（cn runner 在线时仍能补算）。
 on:
-  schedule:
-    - cron: '30 10 * * 1-5'  # 18:30 CST 盘后（龙虎榜18点后已发布 + 收盘数据 + 算法部署）主
-    - cron: '0 12 * * 1-5'   # 20:00 CST 盘后冗余备份（2026-08-03 阿狸咪修复：原单一 cron 自 07-31 创建以来 0 次被调度，加冗余防再失效；与 18:30 主跑错峰不并发）
   workflow_dispatch:
 
 permissions:
