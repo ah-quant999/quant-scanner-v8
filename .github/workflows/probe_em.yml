@@ -1,0 +1,52 @@
+name: Probe Data Source Reachability (GHA)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install akshare
+        run: pip install akshare
+      - name: Probe EastMoney + THS
+        run: |
+          python - <<'PY'
+          import time, traceback
+          def test(name, fn):
+              t=time.time()
+              try:
+                  r=fn()
+                  dt=time.time()-t
+                  if r is None:
+                      print(f"[{name}] OK but None  sec={dt:.1f}")
+                  elif hasattr(r,'shape'):
+                      print(f"[{name}] OK rows={r.shape} sec={dt:.1f}")
+                  elif isinstance(r,dict):
+                      print(f"[{name}] OK dict_keys={list(r.keys())[:6]} sec={dt:.1f}")
+                  else:
+                      print(f"[{name}] OK type={type(r).__name__} sec={dt:.1f}")
+                  return True
+              except Exception as e:
+                  dt=time.time()-t
+                  print(f"[{name}] FAIL sec={dt:.1f} {type(e).__name__}: {str(e)[:160]}")
+                  return False
+          import akshare as ak
+          print("akshare", ak.__version__)
+          # 东财主源：个股所属概念板块
+          test("EM stock_board_concept_cons_em(688001)", lambda: ak.stock_board_concept_cons_em(symbol="688001"))
+          # 东财备选：个股资料
+          test("EM stock_individual_info_em(688001)", lambda: ak.stock_individual_info_em(symbol="688001"))
+          # 东财北交所列表
+          test("EM stock_bj_a_spot_em", lambda: ak.stock_bj_a_spot_em())
+          # 同花顺概念名（已知单位机可达）
+          test("THS stock_board_concept_name_ths", lambda: ak.stock_board_concept_name_ths())
+          PY
