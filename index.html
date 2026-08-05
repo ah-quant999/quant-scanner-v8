@@ -883,20 +883,28 @@ window.V8_CAL = {weeks:[],legend:[]};
       function renderIndustryTree(){
         var el=$('industryTreemap');
         if(!el) return;
-        var SR=window.SECTOR_RS;
         var timeEl=$('htUpdateTime');
-        if(!SR || !SR.sectors || !SR.sectors.length){
+        // 优先用盘中实时资金流 SECTOR_FUND_FLOW（每30分刷新），无数据时回落到盘后 SECTOR_RS
+        var SF=window.SECTOR_FUND_FLOW;
+        var SR=window.SECTOR_RS;
+        var sectors=[], updateTime=null, source='SECTOR_FUND_FLOW';
+        if(SF && (SF.sectors_in||SF.sectors_out)){
+          var all=(SF.sectors_in||[]).concat(SF.sectors_out||[]);
+          sectors=all.map(function(s){ return {name:s.name, pct_day:s.chg}; }).filter(function(s){ return s.pct_day!=null; });
+          updateTime=SF.update_time;
+        }else if(SR && SR.sectors && SR.sectors.length){
+          sectors=SR.sectors.map(function(s){ return {name:s.name||s.sector_name, pct_day:s.pct_day}; });
+          updateTime=SR.update_time;
+          source='SECTOR_RS';
+        }
+        if(!sectors.length){
           el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">暂无行业板块数据</div>';
           if(timeEl) timeEl.textContent='更新于 --';
           return;
         }
-        var sectors=SR.sectors.slice().sort(function(a,b){
+        sectors=sectors.slice().sort(function(a,b){
           return Math.abs(b.pct_day||0)-Math.abs(a.pct_day||0);
         }).slice(0,50);
-        if(!sectors.length){
-          el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">暂无行业板块数据</div>';
-          return;
-        }
         var maxVal=Math.abs(sectors[0].pct_day||0)||1;
         var h='<div style="display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start;padding:4px">';
         sectors.forEach(function(s){
@@ -906,7 +914,7 @@ window.V8_CAL = {weeks:[],legend:[]};
           var txt=(up||down)?'#fff':'var(--txt)';
           var area=Math.sqrt(Math.abs(pct))/Math.sqrt(maxVal);
           var px=Math.max(40, Math.round(area*100));
-          var name=s.name||s.sector_name||'未知';
+          var name=s.name||'未知';
           h+='<div style="width:'+px+'px;height:'+px+'px;background:'+bg+';color:'+txt;
           h+=';border-radius:8px;padding:6px;display:flex;flex-direction:column';
           h+=';justify-content:center;align-items:center;text-align:center';
@@ -917,7 +925,7 @@ window.V8_CAL = {weeks:[],legend:[]};
         });
         h+='</div>';
         el.innerHTML=h;
-        if(timeEl && SR.update_time) timeEl.textContent='更新于 '+rel(SR.update_time);
+        if(timeEl && updateTime) timeEl.textContent='更新于 '+rel(updateTime);
       }
       if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderIndustryTree);
       else renderIndustryTree();
