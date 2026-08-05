@@ -35,3 +35,4 @@ _*.py
 
 # 自愈派发防抖锁（运行时本地文件，不入库）
 data/.heal_dispatch.json
+data/FOUR_VOLUME_BACKTEST.json
