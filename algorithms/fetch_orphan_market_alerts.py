@@ -392,7 +392,8 @@ def main():
     top_sectors, bottom_sectors = fetch_sector_board()
     mood = fetch_a_spot()
 
-    now_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    # 北京时间(UTC+8)，与 CRISIS_DATA 等卡片的 update_time 时区保持一致（cn runner 本地时钟为 UTC）
+    now_str = (datetime.datetime.utcnow() + datetime.timedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')
 
     # 获取美股三大指数（隔夜收盘）
     log("📊 美股指数（隔夜收盘）...")
