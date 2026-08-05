@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-08-05 03:51:42",
+  "check_time": "2026-08-05 11:23:58",
   "last_trade_close": "2026-08-04 15:30:00",
   "core_stale": [],
   "warn_stale": [],
@@ -64,7 +64,8 @@
     "BACKTEST_COMPREHENSIVE": "post_close",
     "MAHORO": "post_close",
     "EXPERIMENT": "post_close",
-    "STOCK_LIST": "post_close"
+    "STOCK_LIST": "post_close",
+    "STOCK_PROFILE": "post_close"
   },
   "category_label": {
     "premarket": "盘前",
