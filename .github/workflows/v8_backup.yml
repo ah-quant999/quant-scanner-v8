@@ -45,6 +45,8 @@ jobs:
         continue-on-error: true
         run: |
           python3 align_logic_ops.py || echo "⚠️ 对齐校验发现漂移（见上方输出），已记录至 HANDOVER_LOG，不影响备份完成"
+          echo "---"
+          python3 verify_card_badges.py || echo "⚠️ 卡片徽章校验发现漂移（见上方输出），已记录至 HANDOVER_LOG，不影响备份完成"
 
       - name: "📝 写日志"
         run: |
