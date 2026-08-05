@@ -592,22 +592,23 @@ window.V8_CAL = {weeks:[],legend:[]};
         if(d.warning) h += '<p style="margin:3px 0;color:#f59e0b">⚠️ '+d.warning+'</p>';
         h += '</div>';
       }
-      // 2) 三大分析师 对比表（技术面/情绪面/宏观面）
+      // 2) 三大分析师 单行紧凑列表（理由/风险/进场合并为一行）
       var ans = d.analysts || [];
       if(ans.length){
-        h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">';
+        h += '<div style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px">';
         ans.forEach(function(a){
           var rec = a.recommendation || 0;
           var stars = '';
           for(var i=1;i<=5;i++) stars += (i<=rec ? '★' : '☆');
           var recColor = rec>=4 ? 'var(--up)' : (rec>=3 ? '#f59e0b' : 'var(--down)');
-          h += '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px">';
-          h += '<div style="font-size:13px;font-weight:800;color:var(--txt)">'+a.name+'</div>';
-          h += '<div style="font-size:13px;font-weight:700;color:var(--purple)">'+a.judgment+'</div>';
-          h += '<div style="font-size:13px;color:'+recColor+';font-weight:700;letter-spacing:1px">'+stars+'</div>';
-          h += '<div style="font-size:11px;color:var(--sub);line-height:1.5"><b>理由：</b>'+a.reason+'</div>';
-          h += '<div style="font-size:11px;color:var(--down);line-height:1.5"><b>风险：</b>'+a.risk+'</div>';
-          h += '<div style="font-size:11px;color:var(--up);line-height:1.5"><b>若必须进场：</b>'+a.if_must_enter+'</div>';
+          var dangerChip = (a.danger && a.danger.length)
+            ? ' <span style="color:var(--down);font-size:10.5px">⚠'+a.danger.join(' · ')+'</span>'
+            : '';
+          h += '<div style="display:grid;grid-template-columns:auto auto auto 1fr;gap:10px;padding:6px 10px;background:rgba(167,139,250,.05);border-radius:6px;border-left:3px solid var(--purple);font-size:11.5px;line-height:1.55;align-items:baseline">';
+          h += '<span style="font-weight:800;color:var(--txt);min-width:48px">'+a.name+'</span>';
+          h += '<span style="font-weight:700;color:var(--purple);min-width:60px">'+a.judgment+'</span>';
+          h += '<span style="font-weight:700;color:'+recColor+';letter-spacing:1px;min-width:48px">'+stars+'</span>';
+          h += '<span style="color:var(--sub)"><b style="color:var(--txt)">理由</b> '+a.reason+' · <b style="color:var(--down)">风险</b> '+a.risk+' · <b style="color:var(--up)">若必进场</b> '+a.if_must_enter+dangerChip+'</span>';
           h += '</div>';
         });
         h += '</div>';
@@ -643,45 +644,7 @@ window.V8_CAL = {weeks:[],legend:[]};
         });
         h += '</div>';
       }
-      // 6) 多信号扫描（保留）
-      var _cr = window.CRISIS_DATA;
-      var _md2 = window.MACRO_DATA;
-      var sigs = [];
-      if(_md2 && _md2.global_macro && _md2.global_macro.vix){
-        var vx = _md2.global_macro.vix;
-        var vVal = typeof vx === 'object' ? (vx.value || vx.close || 0) : parseFloat(vx);
-        if(!isNaN(vVal)){
-          var vLv = vVal < 15 ? '低位(低波)' : (vVal < 20 ? '中性' : (vVal < 28 ? '偏高' : '恐慌'));
-          var vClr = vVal < 20 ? 'var(--up)' : (vVal < 28 ? '#f59e0b' : 'var(--down)');
-          sigs.push({tag:'😰 VIX', text:vVal.toFixed(1)+' '+vLv, color:vClr});
-        }
-      }
-      if(_cr && (_cr.score !== undefined || _cr.crisis_score !== undefined)){
-        var cs = _cr.score !== undefined ? _cr.score : (_cr.crisis_score || 0);
-        var cl = _cr.level || _cr.crisis_level || '--';
-        var cClr = cs < 30 ? 'var(--up)' : (cs < 50 ? '#f59e0b' : (cs < 70 ? '#ef4444' : '#dc2626'));
-        sigs.push({tag:'🚨 雷达', text:cl+'('+cs+'分)', color:cClr});
-      }
-      if(window.SECTOR_FUND_FLOW){
-        var sff = window.SECTOR_FUND_FLOW;
-        if(sff.top_list && sff.top_list.length){
-          var topN = sff.top_list.slice(0, 3);
-          var snames = topN.map(function(s){ return s.name || s.sector_name; }).filter(Boolean).join(' / ');
-          if(snames) sigs.push({tag:'📊 板块', text:snames, color:'var(--cyan)'});
-        }
-      }
-      sigs.push({tag:'💰 北向', text:'港交所停止披露(top_buy)', color:'var(--dim)'});
-      if(sigs.length){
-        h += '<div style="margin-top:10px;padding:8px 10px;background:rgba(167,139,250,0.06);border-radius:8px;border-left:3px solid var(--purple)">';
-        h += '<div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:4px">📡 多信号扫描</div>';
-        h += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
-        sigs.forEach(function(s){
-          h += '<span style="display:inline-block;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:5px;padding:3px 7px;font-size:11px">'
-            + '<b style="color:var(--sub)">'+s.tag+'</b> '
-            + '<span style="color:'+s.color+'">'+s.text+'</span></span>';
-        });
-        h += '</div></div>';
-      }
+      // 6) 多信号扫描 — 已删除（2026-08-05 用户反馈无用：北向永久停用、VIX/雷达/板块与今日宏观重复）
       body.innerHTML = h;
     })();
     </script>
