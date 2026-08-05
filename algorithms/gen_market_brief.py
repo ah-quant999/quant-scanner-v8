@@ -152,18 +152,22 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
     max_chg = max(abs(sh.get("chg", 0)), abs(sz.get("chg", 0)), abs(cy.get("chg", 0)), abs(kc.get("chg", 0)))
     if max_chg >= 2.0:
         leader = max([sh, sz, cy, kc], key=lambda x: abs(x.get("chg", 0)))
+        chg = leader.get("chg", 0)
+        word = "大涨" if chg >= 0 else "大跌"
         anomalies.append({
             "tag": "大盘异动",
             "emoji": "📊",
-            "text": f"{leader.get('name', '领涨指数')} 大涨 {leader.get('chg', 0):+.2f}%，市场波动剧烈",
+            "text": f"{leader.get('name', '领涨指数')} {word} {chg:+.2f}%，市场波动剧烈",
             "color": "blue"
         })
     elif max_chg >= 1.0:
-        leader = max([sh, sz, cy, kc], key=lambda x: x.get("chg", 0))
+        leader = max([sh, sz, cy, kc], key=lambda x: abs(x.get("chg", 0)))
+        chg = leader.get("chg", 0)
+        word = "领涨" if chg >= 0 else "领跌"
         anomalies.append({
             "tag": "大盘异动",
             "emoji": "📊",
-            "text": f"{leader.get('name', '领涨指数')} 领涨 {leader.get('chg', 0):+.2f}%，市场偏强",
+            "text": f"{leader.get('name', '领涨指数')} {word} {chg:+.2f}%，市场{'偏强' if chg >= 0 else '偏弱'}",
             "color": "blue"
         })
 
