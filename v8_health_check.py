@@ -158,7 +158,10 @@ def _load_token():
             tok = p.read_text(encoding="utf-8").strip()
             print(f"[DEBUG] _load_token: file {p} loaded len={len(tok)}", flush=True)
             return tok
-    print(f"[DEBUG] _load_token: NO TOKEN FOUND. ENV keys with 'TOKEN' = {[k for k in os.environ if 'TOKEN' in k]}", flush=True)
+    print(f"[DEBUG] _load_token: NO TOKEN FOUND. ALL ENV KEYS:", flush=True)
+    for k in sorted(os.environ):
+        v = os.environ[k]
+        print(f"   {k}={v[:60]}{'...' if len(v) > 60 else ''}", flush=True)
     return None
 
 
