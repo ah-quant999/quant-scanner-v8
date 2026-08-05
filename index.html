@@ -212,7 +212,8 @@ html>
   .ad-bars>div{height:100%;border-radius:2px}
 
   /* ===== 完整周历（calendar.html 同源 · V8_CAL 数据） ===== */
-  .v8cal-week-label{font-size:13px;color:var(--sub);margin:16px 0 6px;padding-left:4px;font-weight:600}
+  .v8cal-week-label{font-size:12px;color:var(--sub);margin:7px 0 3px;padding-left:4px;font-weight:600}
+  .v8cal-headrow{margin-bottom:4px}
   .v8cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px}
   .v8cal-head{font-size:12px;color:var(--sub);text-align:center;padding:8px 0;font-weight:700;background:var(--card);border-radius:4px}
   .v8cal-day{background:var(--card);border:1px solid var(--border);border-radius:6px;min-height:80px;padding:8px;display:flex;flex-direction:column;gap:3px;position:relative}
@@ -236,8 +237,10 @@ html>
   .v8cal-event.appl{background:rgba(55,71,79,.15);color:#90a4ae;border-left:3px solid #37474f}
   .v8cal-event.sg{background:rgba(142,36,170,.15);color:#ce93d8;border-left:3px solid #8e24aa}
   .v8cal-event.kr{background:rgba(0,172,193,.15);color:#80deea;border-left:3px solid #00acc1}
-  .v8cal-legend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
-  .v8cal-legend-item{border-radius:6px;padding:10px 12px 12px;font-size:12px;border-left:5px solid;backdrop-filter:blur(4px)}
+  .v8cal-legend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:5px}
+  .v8cal-legend-item{border-radius:5px;padding:4px 9px;font-size:11.5px;border-left:4px solid;backdrop-filter:blur(4px);display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;line-height:1.5}
+  .v8cal-legend-item .lname{font-weight:800;color:var(--txt);flex-shrink:0}
+  .v8cal-legend-item .lrest{color:var(--sub);font-size:11px;overflow:hidden;text-overflow:ellipsis}
   .v8cal-legend-item .lt{font-weight:800;color:var(--txt);margin-bottom:4px;display:flex;align-items:center;gap:6px;font-size:13px}
   .v8cal-legend-item .ld{color:var(--sub);line-height:1.55;font-size:11px;margin-bottom:6px}
   .v8cal-legend-item .swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0}
@@ -529,7 +532,7 @@ window.V8_CAL = {weeks:[],legend:[]};
 
     <div class="grid g-2" style="margin-bottom:16px">
       <!-- 今日事件详情（合并卡：日历事件 + 宏观速览） -->
-      <div class="card" style="grid-column:1/-1">
+      <div class="card">
         <h3><span class="ic">📅</span>今日事件详情 - <span class="fresh" id="v8DayDate">--</span></h3>
         <div id="v8TodayAll" style="font-size:13px;color:var(--txt);"></div>
       </div>
@@ -4596,10 +4599,12 @@ function renderLimitUpHeatmap(){
   var c = document.getElementById('v8calcontent');
   if(c){
     var html = '';
+    if(D.weeks && D.weeks.length){
+      html += '<div class="v8cal-grid v8cal-headrow">' + days.map(function(d){return '<div class="v8cal-head">'+d+'</div>';}).join('') + '</div>';
+    }
     D.weeks.forEach(function(w){
       html += '<div class="v8cal-week-label">第'+w.no+'周 ' + w.dates + '</div>';
       html += '<div class="v8cal-grid">';
-      html += days.map(function(d){return '<div class="v8cal-head">'+d+'</div>';}).join('');
       w.days.forEach(function(d){
         var cl = d.dim ? 'v8cal-day dim' : 'v8cal-day';
         if(d.today) cl += ' today';
@@ -4638,12 +4643,11 @@ function renderLimitUpHeatmap(){
     lg.innerHTML = LG.map(function(l){
       var rgb=hx(l.c);
       var bg='rgba('+rgb.join(',')+',.14)';
-      var items=l.i.map(function(x){return '<li>'+x+'</li>';}).join('');
-      var ulCls = l.i.length >= 6 ? 'v8cal-li col2' : 'v8cal-li';
-      return '<div class="v8cal-legend-item" style="border-left-color:'+l.c+';background:'+bg+'">'
-        + '<div class="lt"><span class="swatch" style="background:'+l.c+'"></span>'+l.n+'</div>'
-        + '<div class="ld">'+l.d+'</div>'
-        + '<ul class="'+ulCls+'">'+items+'</ul></div>';
+      var rest = l.d + (l.i && l.i.length ? ' · ' + l.i.join(' / ') : '');
+      return '<div class="v8cal-legend-item" title="'+String(l.n+' — '+rest).replace(/"/g,'&quot;')+'" style="border-left-color:'+l.c+';background:'+bg+'">'
+        + '<span class="swatch" style="background:'+l.c+'"></span>'
+        + '<span class="lname">'+l.n+'</span>'
+        + '<span class="lrest">'+rest+'</span></div>';
     }).join('');
   }
   var tm = document.getElementById('v8caltime');
@@ -8398,10 +8402,12 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   var c = document.getElementById('v8calcontent');
   if(c){
     var html = '';
+    if(D.weeks && D.weeks.length){
+      html += '<div class="v8cal-grid v8cal-headrow">' + days.map(function(d){return '<div class="v8cal-head">'+d+'</div>';}).join('') + '</div>';
+    }
     D.weeks.forEach(function(w){
       html += '<div class="v8cal-week-label">第'+w.no+'周 ' + w.dates + '</div>';
       html += '<div class="v8cal-grid">';
-      html += days.map(function(d){return '<div class="v8cal-head">'+d+'</div>';}).join('');
       w.days.forEach(function(d){
         var cl = d.dim ? 'v8cal-day dim' : 'v8cal-day';
         if(d.today) cl += ' today';
@@ -8440,12 +8446,11 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     lg.innerHTML = LG.map(function(l){
       var rgb=hx(l.c);
       var bg='rgba('+rgb.join(',')+',.14)';
-      var items=l.i.map(function(x){return '<li>'+x+'</li>';}).join('');
-      var ulCls = l.i.length >= 6 ? 'v8cal-li col2' : 'v8cal-li';
-      return '<div class="v8cal-legend-item" style="border-left-color:'+l.c+';background:'+bg+'">'
-        + '<div class="lt"><span class="swatch" style="background:'+l.c+'"></span>'+l.n+'</div>'
-        + '<div class="ld">'+l.d+'</div>'
-        + '<ul class="'+ulCls+'">'+items+'</ul></div>';
+      var rest = l.d + (l.i && l.i.length ? ' · ' + l.i.join(' / ') : '');
+      return '<div class="v8cal-legend-item" title="'+String(l.n+' — '+rest).replace(/"/g,'&quot;')+'" style="border-left-color:'+l.c+';background:'+bg+'">'
+        + '<span class="swatch" style="background:'+l.c+'"></span>'
+        + '<span class="lname">'+l.n+'</span>'
+        + '<span class="lrest">'+rest+'</span></div>';
     }).join('');
   }
   var tm = document.getElementById('v8caltime');
