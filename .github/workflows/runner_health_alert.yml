@@ -15,11 +15,10 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: '仅探测不写 Issue（调试用）'
+        description: '仅探测不写 Issue（true=仅探测调试用；false=正常模式）'
         required: false
-        default: 'false'
-        type: choice
-        options: ['true', 'false']
+        type: boolean
+        default: false
 
 permissions:
   contents: write
