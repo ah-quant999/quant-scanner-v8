@@ -13,12 +13,6 @@ on:
   schedule:
     - cron: '*/10 * * * *'    # 每 10 分钟一次
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: '仅探测不写 Issue（true=仅探测调试用；false=正常模式）'
-        required: false
-        type: boolean
-        default: false
 
 permissions:
   contents: write
