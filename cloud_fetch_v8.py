@@ -247,10 +247,134 @@ def _fetch_remote_raw(rel_path):
         return None
 
 
+def _load_judgment_raw(var_name, fname):
+    """读取同一次 premarket 运行内已生成的 raw_data/X.json 或 data/X.js。"""
+    try:
+        for p in [Path(ROOT) / "raw_data" / fname, Path(ROOT) / "data" / (var_name + ".js")]:
+            if p.exists():
+                txt = p.read_text(encoding="utf-8")
+                if txt.startswith("window." + var_name):
+                    pre = len("window." + var_name)
+                    txt = txt[pre:].lstrip("=").lstrip().strip().rstrip(";")
+                return json.loads(txt)
+    except Exception:
+        pass
+    return {}
+
+
+def _analyst_tech(neg, pos, avg_chg, max_drop, max_rise, total_amt, market):
+    """技术面分析师：基于指数结构/趋势/量能。"""
+    if neg == 3:
+        if max_drop <= -1.5:
+            return {"name": "技术面", "judgment": "减仓观望", "recommendation": 1,
+                    "reason": f"三指数全绿且跌幅超1.5%（{avg_chg:+.2f}%），下行结构确认",
+                    "risk": "下行趋势中反弹易套", "danger": ["三指数同步破位，趋势性下跌风险"],
+                    "if_must_enter": "仅超短，≤10%仓，快进快出"}
+        if max_drop <= -0.8:
+            return {"name": "技术面", "judgment": "耐心等待企稳", "recommendation": 2,
+                    "reason": f"三指数同步调整（平均{avg_chg:+.2f}%）",
+                    "risk": "未现企稳信号", "danger": ["连续调整，抄底需等放量止跌"],
+                    "if_must_enter": "轻仓试错≤15%"}
+        return {"name": "技术面", "judgment": "正常波动", "recommendation": 3,
+                "reason": f"三指数微幅低开（平均{avg_chg:+.2f}%）",
+                "risk": "方向待选", "danger": [],
+                "if_must_enter": "≤20%仓观望"}
+    if pos == 3:
+        if max_rise >= 1.5:
+            return {"name": "技术面", "judgment": "积极参与", "recommendation": 5,
+                    "reason": f"三指数全线飘红（平均{avg_chg:+.2f}%），放量健康",
+                    "risk": "警惕冲高回落", "danger": ["普涨后分化，追涨缩量品种易套"],
+                    "if_must_enter": "择优布局≤30%"}
+        if max_rise >= 0.8:
+            return {"name": "技术面", "judgment": "可积极参与", "recommendation": 4,
+                    "reason": f"三指数共振上行（平均{avg_chg:+.2f}%）",
+                    "risk": "冲高回落", "danger": [],
+                    "if_must_enter": "≤25%仓跟随主流"}
+        return {"name": "技术面", "judgment": "轻仓试探", "recommendation": 4,
+                "reason": f"三指数微幅高开（平均{avg_chg:+.2f}%），力度有限",
+                "risk": "力度不足", "danger": [],
+                "if_must_enter": "≤20%仓"}
+    # 分化
+    if abs(max_rise - max_drop) > 2.0:
+        return {"name": "技术面", "judgment": "重个股轻指数", "recommendation": 3,
+                "reason": f"剧烈分化（极差{abs(max_rise-max_drop):.1f}%），结构性机会与风险并存",
+                "risk": "踩错方向易亏损", "danger": ["分化极端，板块轮动快"],
+                "if_must_enter": "跟随强势板块≤20%"}
+    if abs(avg_chg) < 0.3:
+        return {"name": "技术面", "judgment": "观望或做T", "recommendation": 3,
+                "reason": f"窄幅震荡（振幅<0.3%），多空平衡",
+                "risk": "方向不明", "danger": ["量能不足，突破需等待"],
+                "if_must_enter": "≤15%仓做T"}
+    if avg_chg > 0:
+        return {"name": "技术面", "judgment": "跟随主流", "recommendation": 4,
+                "reason": f"偏强分化（平均{avg_chg:+.2f}%），资金有明确偏好",
+                "risk": "边缘题材补跌", "danger": [],
+                "if_must_enter": "≤20%仓跟主流"}
+    return {"name": "技术面", "judgment": "防御为主", "recommendation": 2,
+            "reason": f"偏弱分化（平均{avg_chg:+.2f}%）",
+            "risk": "弱势承压", "danger": ["弱势指数拖累，谨防破位"],
+            "if_must_enter": "仅超短≤10%"}
+
+
+def _analyst_sentiment(cs, vix, sff_names):
+    """情绪面分析师：基于危机雷达 + VIX + 板块资金。"""
+    if cs >= 70:
+        return {"name": "情绪面", "judgment": "继续空仓", "recommendation": 1,
+                "reason": f"危机雷达{cs}分（高风险），系统性风险偏高",
+                "risk": "系统性风险偏高", "danger": [f"危机雷达综合分≥70（{cs}分）"],
+                "if_must_enter": "仅≤10%仓，优先防御"}
+    if cs >= 50:
+        return {"name": "情绪面", "judgment": "防御为主", "recommendation": 2,
+                "reason": f"危机雷达{cs}分（警戒），情绪偏谨慎" + (f"；资金偏好 {sff_names}" if sff_names else ""),
+                "risk": "警戒区", "danger": [f"危机雷达{cs}分处于警戒区"],
+                "if_must_enter": "≤15%仓结构性"}
+    if cs >= 30:
+        return {"name": "情绪面", "judgment": "中性偏谨慎", "recommendation": 3,
+                "reason": f"危机雷达{cs}分（中性），情绪平稳" + (f"；资金偏好 {sff_names}" if sff_names else ""),
+                "risk": "中性", "danger": [],
+                "if_must_enter": "≤20%仓"}
+    return {"name": "情绪面", "judgment": "风险可控", "recommendation": 4,
+            "reason": f"危机雷达{cs}分（安全），系统性风险低" + (f"；资金偏好 {sff_names}" if sff_names else ""),
+            "risk": "低位", "danger": [],
+            "if_must_enter": "≤25%仓"}
+
+
+def _analyst_macro(us_str, usdcnh, us10y, vix):
+    """宏观面分析师：基于美股隔夜 + 汇率 + 美债。"""
+    bear = ("跌" in us_str) or ("收跌" in us_str) or ("下挫" in us_str)
+    bull = ("涨" in us_str) or ("收涨" in us_str) or ("创新高" in us_str)
+    cny_weak = usdcnh >= 7.25
+    if bull and not cny_weak:
+        return {"name": "宏观面", "judgment": "外部环境友好", "recommendation": 4,
+                "reason": f"美股偏强，人民币稳（USDCNH {usdcnh:.3f}）",
+                "risk": "外围扰动低", "danger": [],
+                "if_must_enter": "≤25%仓"}
+    if bear and cny_weak:
+        return {"name": "宏观面", "judgment": "外围偏空", "recommendation": 2,
+                "reason": f"美股承压+人民币贬值（USDCNH {usdcnh:.3f}），外资流出压力",
+                "risk": "外资流出", "danger": [f"人民币贬值至 {usdcnh:.3f}，外资撤离压力"],
+                "if_must_enter": "≤15%仓，规避外资重仓"}
+    if bear:
+        return {"name": "宏观面", "judgment": "外围承压", "recommendation": 3,
+                "reason": f"美股走弱但汇率平稳，影响有限",
+                "risk": "情绪传导", "danger": [],
+                "if_must_enter": "≤20%仓"}
+    if cny_weak:
+        return {"name": "宏观面", "judgment": "汇率偏空", "recommendation": 3,
+                "reason": f"人民币贬值（USDCNH {usdcnh:.3f}）压制核心资产",
+                "risk": "汇率波动", "danger": [f"人民币贬值至 {usdcnh:.3f}"],
+                "if_must_enter": "≤20%仓，规避出口链"}
+    return {"name": "宏观面", "judgment": "中性", "recommendation": 3,
+            "reason": f"外围平稳（USDCNH {usdcnh:.3f}，VIX {vix:.1f}）",
+            "risk": "中性", "danger": [],
+            "if_must_enter": "≤20%仓"}
+
+
 def f_judgment():
     """今日判定（盘前 08:25 自动生成，注册于 JUDGMENT_DATA→premarket）。
-    v2 动态版(2026-08-05): verdict/warning 根据指数实际幅度、量能、连跌天数、
-    美股隔夜等维度动态组合生成，不再使用4套固定模板。
+    v3 多模型共识版(2026-08-05)：拆成 技术面/情绪面/宏观面 三个独立分析师视角，
+    各自输出 核心判断/推荐度(1-5星)/关键理由/风险评估/若必须进场，再聚合
+    共同结论 + 三大危险信号（双方一致认可），前端渲染为对比表 + 共识区。
     """
     now = now_cst()
     today = now.date()
@@ -309,52 +433,61 @@ def f_judgment():
     us = _fetch_us_overnight()
     us_str = us if us else "美股隔夜数据获取中（盘前研判以 A 股结构为主）"
 
-    # ====== 动态 verdict 组合生成 ======
-    _severity = "强" if abs(avg_chg) > 1.0 else ("中" if abs(avg_chg) > 0.4 else "弱")
-    _dir = "跌" if avg_chg < 0 else "涨"
-    _vol_level = "放量" if total_amt > 12000 else ("缩量" if total_amt < 7000 else "平量")
+    # ---- 读取同一次 premarket 已生成的 情绪面/宏观面 数据源 ----
+    crisis = _load_judgment_raw("CRISIS_DATA", "crisis_data.json")
+    macro = _load_judgment_raw("MACRO_DATA", "macro_data.json")
+    sff = _load_judgment_raw("SECTOR_FUND_FLOW", "sector_fund_flow.json")
 
-    # 基础模板池（按市场状态分类）
-    if neg == 3:
-        # 全跌
-        if max_drop <= -1.5:
-            verdict = f"三指数全绿且跌幅超1.5%（{_severity}下行），{_vol_level}下跌中反弹不宜追高，控盘翻正前视为减仓窗口"
-        elif max_drop <= -0.8:
-            verdict = f"三指数同步调整（平均{avg_chg:+.2f}%），{_vol_level}格局下耐心等待企稳信号，勿急于抄底"
-        else:
-            verdict = f"三指数微幅低开（平均{avg_chg:+.2f}%），属正常波动范围，观察开盘半小时方向选择"
-        warning = "无明确S点信号前持仓勿侥幸；弱势中追涨易被套。" if abs(avg_chg) > 0.8 else "控制仓位，关注抗跌板块。"
-    elif pos == 3:
-        # 全涨
-        if max_rise >= 1.5:
-            verdict = f"三指数全线飘红（平均{avg_chg:+.2f}%），{_severity}{_vol_level}上涨中逢回调可择优布局，但警惕冲高回落"
-        elif max_rise >= 0.8:
-            verdict = f"三指数共振上行（平均{avg_chg:+.2f}%），{_vol_level}健康，可积极参与但避免追涨缩量品种"
-        else:
-            verdict = f"三指数微幅高开（平均{avg_chg:+.2f}%），方向偏多但力度有限，轻仓试探为宜"
-        warning = "普涨日区分真强与补涨，回避纯情绪驱动个股。" if abs(avg_chg) > 0.8 else "关注量价配合，缩量冲高宜减仓。"
+    cs = crisis.get("score", crisis.get("crisis_score", 0)) or 0
+    gm = macro.get("global_macro", {})
+    vix = float(gm.get("vix", {}).get("value", 0) or 0)
+    usdcnh = float(gm.get("usdcnh", {}).get("price", 0) or 0)
+    us10y = float(macro.get("monetary", {}).get("us_bond_10y", {}).get("value", 0) or 0)
+    sff_top = (sff.get("top_list") or [])[:3]
+    sff_names = " / ".join([s.get("name") or s.get("sector_name") for s in sff_top if (s.get("name") or s.get("sector_name"))])
+
+    # ====== 三大分析师 ======
+    tech = _analyst_tech(neg, pos, avg_chg, max_drop, max_rise, total_amt, market)
+    sent = _analyst_sentiment(cs, vix, sff_names)
+    macro_a = _analyst_macro(us_str, usdcnh, us10y, vix)
+    analysts = [tech, sent, macro_a]
+
+    # 共同结论
+    recs = [a["recommendation"] for a in analysts]
+    avg_rec = sum(recs) / len(recs)
+    if avg_rec >= 3.5:
+        direction = "偏多共识"
+    elif avg_rec <= 2.5:
+        direction = "偏空共识"
     else:
-        # 分化
-        strong_idx = [i["name"] for i in indices if i["ctrl"] > 0]
-        weak_idx = [i["name"] for i in indices if i["ctrl"] < 0]
-        s_str = "+".join(strong_idx) if strong_idx else "无"
-        w_str = "+".join(weak_idx) if weak_idx else "无"
+        direction = "分歧观望"
+    consensus = f"{direction}（技术{tech['recommendation']}★/情绪{sent['recommendation']}★/宏观{macro_a['recommendation']}★）"
 
-        if abs(max_rise - max_drop) > 2.0:
-            verdict = f"剧烈分化（{s_str}强 vs {w_str}弱，极差{abs(max_rise-max_drop):.1f}%），结构性机会与风险并存，重个股轻指数"
-        elif abs(avg_chg) < 0.3:
-            verdict = f"窄幅震荡（振幅<0.3%），多空平衡等待方向选择，宜观望或做T不追新仓"
-        elif avg_chg > 0:
-            verdict = f"偏强分化（{s_str}领涨），资金有明确偏好方向，跟随主流板块择优参与"
-        else:
-            verdict = f"偏弱分化（{w_str}承压），防御为主，仅限超短线机会"
+    # 三大危险信号（收集各分析师 danger，去重取前3）
+    danger_signals = []
+    for a in analysts:
+        for d in (a.get("danger") or []):
+            if d and d not in danger_signals:
+                danger_signals.append(d)
+            if len(danger_signals) >= 3:
+                break
+        if len(danger_signals) >= 3:
+            break
 
-        if total_amt > 11000:
-            warning = f"成交额{total_amt:.0f}亿偏高，分歧加大注意快进快出。"
-        elif total_amt < 7000:
-            warning = f"成交额{total_amt:.0f}亿偏低，缺乏增量资金入场，谨慎开新仓。"
-        else:
-            warning = "控制仓位，聚焦资金共识方向，回避边缘题材。"
+    # 兼容旧版字段（health check 仍校验 verdict/indices）
+    _vol_level = "放量" if total_amt > 12000 else ("缩量" if total_amt < 7000 else "平量")
+    if neg == 3:
+        verdict = f"三指数全绿（平均{avg_chg:+.2f}%），{_vol_level}下行，{direction}"
+        warning = "减仓窗口，反弹不宜追高。" if abs(avg_chg) > 0.8 else "控制仓位。"
+    elif pos == 3:
+        verdict = f"三指数全红（平均{avg_chg:+.2f}%），{_vol_level}上行，{direction}"
+        warning = "逢调择优，警惕冲高回落。" if abs(avg_chg) > 0.8 else "轻仓试探。"
+    elif abs(avg_chg) < 0.3:
+        verdict = f"窄幅震荡（振幅<0.3%），{direction}，宜观望或做T"
+        warning = f"成交额{total_amt:.0f}亿偏低，谨慎开新仓。" if total_amt < 7000 else "聚焦共识方向。"
+    else:
+        verdict = f"{market}（平均{avg_chg:+.2f}%），{direction}"
+        warning = "控制仓位，重个股轻指数。"
 
     return {
         "date": today.strftime("%Y-%m-%d"),
@@ -364,6 +497,9 @@ def f_judgment():
         "us": us_str,
         "verdict": verdict,
         "warning": warning,
+        "analysts": analysts,
+        "consensus": consensus,
+        "danger_signals": danger_signals,
         "update_time": now.strftime("%Y-%m-%d %H:%M:%S"),
         "auto": True,
     }

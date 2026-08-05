@@ -582,16 +582,54 @@ window.V8_CAL = {weeks:[],legend:[]};
       var tag = document.getElementById('judgmentTag');
       var body = document.getElementById('judgmentBody');
       if(!d || !body){ if(tag) tag.textContent='数据缺失'; return; }
-      if(tag) tag.textContent = (d.date||'') + ' · 盘前研判 · 更新于 ' + (window._fmtAshareRel ? window._fmtAshareRel(d.update_time) : (d.update_time||'--'));
+      if(tag) tag.textContent = (d.date||'') + ' · 盘前多模型研判 · 更新于 ' + (window._fmtAshareRel ? window._fmtAshareRel(d.update_time) : (d.update_time||'--'));
       var h = '';
-      // 美股 + 结论 + 预警（置顶、大字）
+      // 1) 美股 + 结论 + 预警（置顶）
       if(d.us || d.verdict || d.warning){
-        h += '<div style="margin-bottom:12px;padding:10px 12px;background:linear-gradient(135deg,rgba(56,189,248,0.08),rgba(167,139,250,0.06));border:1px solid var(--border2);border-radius:10px;font-size:14px;line-height:1.8">';
-        if(d.us) h += '<p style="margin:4px 0"><b style="color:var(--sub)">美股：</b><span style="color:var(--up)">'+d.us+'</span></p>';
-        if(d.verdict) h += '<p style="margin:4px 0"><b style="color:var(--sub)">→ 结论：</b>'+d.verdict+'</p>';
-        if(d.warning) h += '<p style="margin:4px 0;color:#f59e0b">⚠️ '+d.warning+'</p>';
+        h += '<div style="margin-bottom:12px;padding:10px 12px;background:linear-gradient(135deg,rgba(56,189,248,0.08),rgba(167,139,250,0.06));border:1px solid var(--border2);border-radius:10px;font-size:14px;line-height:1.7">';
+        if(d.us) h += '<p style="margin:3px 0"><b style="color:var(--sub)">美股：</b><span style="color:var(--up)">'+d.us+'</span></p>';
+        if(d.verdict) h += '<p style="margin:3px 0"><b style="color:var(--sub)">→ 结论：</b>'+d.verdict+'</p>';
+        if(d.warning) h += '<p style="margin:3px 0;color:#f59e0b">⚠️ '+d.warning+'</p>';
         h += '</div>';
       }
+      // 2) 三大分析师 对比表（技术面/情绪面/宏观面）
+      var ans = d.analysts || [];
+      if(ans.length){
+        h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">';
+        ans.forEach(function(a){
+          var rec = a.recommendation || 0;
+          var stars = '';
+          for(var i=1;i<=5;i++) stars += (i<=rec ? '★' : '☆');
+          var recColor = rec>=4 ? 'var(--up)' : (rec>=3 ? '#f59e0b' : 'var(--down)');
+          h += '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px">';
+          h += '<div style="font-size:13px;font-weight:800;color:var(--txt)">'+a.name+'</div>';
+          h += '<div style="font-size:13px;font-weight:700;color:var(--purple)">'+a.judgment+'</div>';
+          h += '<div style="font-size:13px;color:'+recColor+';font-weight:700;letter-spacing:1px">'+stars+'</div>';
+          h += '<div style="font-size:11px;color:var(--sub);line-height:1.5"><b>理由：</b>'+a.reason+'</div>';
+          h += '<div style="font-size:11px;color:var(--down);line-height:1.5"><b>风险：</b>'+a.risk+'</div>';
+          h += '<div style="font-size:11px;color:var(--up);line-height:1.5"><b>若必须进场：</b>'+a.if_must_enter+'</div>';
+          h += '</div>';
+        });
+        h += '</div>';
+      }
+      // 3) 共同结论（高亮多空共识/分歧）
+      if(d.consensus){
+        var dir = d.consensus.indexOf('偏多')>=0 ? 'var(--up)' : (d.consensus.indexOf('偏空')>=0 ? 'var(--down)' : '#f59e0b');
+        h += '<div style="margin-bottom:10px;padding:9px 12px;background:'+dir+'15;border:1px solid '+dir+'40;border-radius:9px;font-size:13px;font-weight:700;color:'+dir+'">🤝 共同结论：'+d.consensus+'</div>';
+      }
+      // 4) 三大危险信号（双方一致认可）
+      var dg = d.danger_signals || [];
+      if(dg.length){
+        h += '<div style="margin-bottom:12px;padding:9px 12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:9px">';
+        h += '<div style="font-size:12px;font-weight:700;color:var(--down);margin-bottom:5px">⚠️ 三大危险信号（双方一致认可）</div>';
+        h += '<div style="display:flex;flex-direction:column;gap:4px">';
+        dg.slice(0,3).forEach(function(s,i){
+          var num = ['①','②','③'][i] || ('④'+i);
+          h += '<div style="font-size:11.5px;color:var(--txt);line-height:1.5"><span style="color:var(--down);font-weight:700">'+num+'</span> '+s+'</div>';
+        });
+        h += '</div></div>';
+      }
+      // 5) 大盘结构 + 指数标签（保留）
       h += '<p style="margin:6px 0"><b style="color:var(--sub)">大盘：</b>'+(d.market||'')+'</p>';
       if(d.indices && d.indices.length){
         h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0">';
@@ -605,7 +643,7 @@ window.V8_CAL = {weeks:[],legend:[]};
         });
         h += '</div>';
       }
-      // 多信号摘要（VIX / 危机雷达 / 板块 / 北向）
+      // 6) 多信号扫描（保留）
       var _cr = window.CRISIS_DATA;
       var _md2 = window.MACRO_DATA;
       var sigs = [];
