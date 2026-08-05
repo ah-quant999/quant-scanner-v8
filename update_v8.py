@@ -398,7 +398,12 @@ def run_health_check():
     if not hc_path.exists():
         return
     try:
-        subprocess.run([sys.executable, str(hc_path)], check=False, timeout=300)
+        # 显式继承当前进程环境（GHA 上的 secrets.GITHUB_TOKEN 等），防 subprocess 默认过滤
+        subprocess.run(
+            [sys.executable, str(hc_path)],
+            check=False, timeout=300,
+            env=os.environ.copy(),
+        )
     except Exception as e:
         print(f"[WARN] 健康检查调用失败: {e}")
 

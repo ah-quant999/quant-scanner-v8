@@ -140,8 +140,12 @@ def load_window_var(path, var_name):
 
 
 def _load_token():
-    if os.environ.get("V8_GITHUB_TOKEN"):
-        return os.environ["V8_GITHUB_TOKEN"]
+    # GHA/云端：secrets.GITHUB_TOKEN (默认 workflow token, 有 actions:read 权限可查 runners)
+    for env_name in ("V8_GITHUB_TOKEN", "GITHUB_TOKEN", "GH_TOKEN"):
+        v = os.environ.get(env_name)
+        if v:
+            return v
+    # 本机/开发环境：读 .workbuddy/v8_gh_token.txt
     candidates = [
         Path("E:/workspace/stock-scanner/.workbuddy/v8_gh_token.txt"),
         Path.home() / ".workbuddy" / "v8_gh_token.txt",
