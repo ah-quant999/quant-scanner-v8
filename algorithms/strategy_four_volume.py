@@ -260,7 +260,11 @@ def scan_four_volume(top_cy=100, top_kc=100, top_zb=100, top_hk=50):
 
 def write_four_volume_js(records, out_dir=DATA_DIR):
     """写出 data/FOUR_VOLUME.js（北京时间时间戳，供 v8 暂未上架区渲染）。"""
-    now = datetime.now() + timedelta(hours=8)  # 云端 ubuntu 为 UTC，+8 得北京
+    try:
+        from zoneinfo import ZoneInfo
+        now = datetime.now(ZoneInfo("Asia/Shanghai"))
+    except Exception:
+        now = datetime.now() + timedelta(hours=8)  # 兜底：UTC+8
     update_time = now.strftime("%Y-%m-%d %H:%M:%S")
     records = sorted(records, key=lambda x: -abs(x.get("pct_chg", 0)))
     data = {
