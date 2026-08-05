@@ -23,7 +23,18 @@ name: "☁️ v8 构建部署(云端ubuntu)"
 on:
   push:
     branches: [main]
-    paths: ['raw_data/**', 'index.html']
+    paths:
+      - 'raw_data/**'
+      - 'index.html'
+      - 'update_v8.py'
+      - 'v8_health_check.py'
+      - 'v8_cloud_watchdog.py'
+      - 'guard_index_sections.py'
+      - 'guard_v8_freshness.py'
+      - 'extract_panels_v8.py'
+      - 'algorithms/**'
+      - 'v8_postclose_guard.py'
+      - 'data/.workbuddy/**'   # 自愈调度锁文件改动也会触发重新构建 HEALTH_CHECK.js
   workflow_run:
     workflows:
       - "🇨🇳 v8 中国数据抓取(cn)"
