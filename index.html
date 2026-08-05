@@ -6134,6 +6134,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   function renderRunnerTrack(rs){
     const el = document.getElementById('runnerTrackBody');
     if(!el) return;
+    const _esc = function(v){ return String(v==null?'':v).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
     if(!rs || !rs.run_time){
       el.innerHTML = '<div style="font-size:12px;color:var(--dim)">暂无 runner 状态（等待中国节点首次抓取后生成）</div>';
       return;
@@ -6164,7 +6165,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       '</div>'+
       '<div style="font-size:11px;color:var(--dim);margin-bottom:6px;">'+
         '共 '+total+' 模块 · 成功 '+ok+' · 空 '+empty+' · 失败 '+fail+
-        (rs.hostname ? ' · 节点 '+esc(rs.hostname) : '')+
+        (rs.hostname ? ' · 节点 '+_esc(rs.hostname) : '')+
       '</div>'+
       '<div style="display:flex;flex-wrap:wrap;gap:4px 0;">'+watchHtml+'</div>';
   }
