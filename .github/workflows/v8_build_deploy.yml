@@ -45,6 +45,7 @@ on:
 
 permissions:
   contents: write
+  actions: read   # v8_health_check.py 查 /actions/runners 需要此权限；不加则 401
 
 concurrency:
   group: v8-build-deploy
