@@ -11848,7 +11848,7 @@ function renderLimitUpHeatmap(){
 
     const indOut=so.filter(s=>s.type==='行业');
 
-    const // 真实市场净流入（四路资金）优先，fallback 到行业加总(未去重)
+    // 真实市场净流入（四路资金）优先，fallback 到行业加总(未去重)
     var _realNet = false, _realNetYi = 0;
     try {
       var _mfd = window.MARKET_FUND_FLOW_DATA;
@@ -17983,7 +17983,7 @@ function renderDataSources(){
 
       html+='<h4>'+c.name+'<span class="src-pill">'+c.source+'</span></h4>';
 
-      html+='<div class="src-meta">频率：'+c.freq+' · 时段：'+(c.slots&&c.slots.length?c.slots.slice(0,4).join(' / ')+(c.slots.length>4?' …':'):'—')+'</div>';
+      html+='<div class="src-meta">频率：'+c.freq+' · 时段：'+(c.slots&&c.slots.length?c.slots.slice(0,4).join(' / ')+(c.slots.length>4?' …':'') : '—')+'</div>';
 
       if(c.note) html+='<div class="src-note">'+c.note+'</div>';
 

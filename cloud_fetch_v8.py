@@ -1474,6 +1474,7 @@ def f_market_fund_flow_data():
     """大盘资金流向时间轴：东方财富 push2his 日线接口。
     取上证指数(000001)主力资金净流入历史序列，覆盖今年以来到最近交易日。
     f52=主力净流入(元)，f62/f63=上证收盘/涨跌幅，f64/f65=深证收盘/涨跌幅。
+    2026-08-05 改进：与远端/本地 baseline 合并，避免接口滞后时跨天塌缩丢失已有最新日期。
     """
     url = "http://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get"
     params = {
@@ -1497,33 +1498,65 @@ def f_market_fund_flow_data():
         print(f"  ⚠️ 大盘资金流向接口失败: {e}")
         klines = []
 
-    if not klines:
-        return None
+    # 先取已有 baseline：远端 main 优先（避免本地 raw_data 刚被清空），其次本地 raw_data
+    baseline = _fetch_remote_raw("market_fund_flow_data.json") or {}
+    if not baseline:
+        try:
+            local_path = RAW_DIR / "market_fund_flow_data.json"
+            if local_path.exists():
+                baseline = json.loads(local_path.read_text(encoding="utf-8"))
+        except Exception as e:
+            print(f"  ⚠️ 读取本地 market_fund_flow_data baseline 失败: {e}")
+            baseline = {}
 
-    daily = []
-    sh_quote = {}
-    for line in klines:
-        parts = line.split(",")
-        if len(parts) < 6:
-            continue
-        ds = parts[0].replace("-", "")
-        # 参照 v6 fetch_market_fund_flow.py：存全 8 字段（date + net_yi + 特大/大/中/小单 + 主力%/小单%）
-        def _f(idx):
-            try: return round(float(parts[idx]) / 1e8, 2)
-            except Exception: return 0.0
-        def _pct(idx):
-            try: return float(parts[idx])
-            except Exception: return None
-        entry = {"date": ds, "net_yi": _f(1)}
-        if len(parts) >= 8:
-            entry["super_large_yi"] = _f(2)
-            entry["large_yi"]       = _f(3)
-            entry["medium_yi"]      = _f(4)
-            entry["small_yi"]       = _f(5)
-            entry["main_pct"]       = _pct(6)
-            entry["small_pct"]      = _pct(7)
-        daily.append(entry)
-        if len(parts) >= 15:
+    baseline_daily = {x["date"]: x for x in (baseline.get("daily") or [])}
+    baseline_quote = baseline.get("sh_quote") or {}
+
+    if not klines:
+        if baseline_daily:
+            print("  ⏭️ 大盘资金流向接口无返回，沿用 baseline")
+            daily = [baseline_daily[d] for d in sorted(baseline_daily.keys())]
+        else:
+            return None
+    else:
+        daily = []
+        for line in klines:
+            parts = line.split(",")
+            if len(parts) < 6:
+                continue
+            ds = parts[0].replace("-", "")
+            # 参照 v6 fetch_market_fund_flow.py：存全 8 字段（date + net_yi + 特大/大/中/小单 + 主力%/小单%）
+            def _f(idx):
+                try: return round(float(parts[idx]) / 1e8, 2)
+                except Exception: return 0.0
+            def _pct(idx):
+                try: return float(parts[idx])
+                except Exception: return None
+            entry = {"date": ds, "net_yi": _f(1)}
+            if len(parts) >= 8:
+                entry["super_large_yi"] = _f(2)
+                entry["large_yi"]       = _f(3)
+                entry["medium_yi"]      = _f(4)
+                entry["small_yi"]       = _f(5)
+                entry["main_pct"]       = _pct(6)
+                entry["small_pct"]      = _pct(7)
+            daily.append(entry)
+
+        # 合并 baseline：保留接口未覆盖但 baseline 中已有的日期（通常无，但可防接口 truncated）
+        seen = {x["date"] for x in daily}
+        for ds, x in baseline_daily.items():
+            if ds not in seen:
+                daily.append(x)
+        daily.sort(key=lambda x: x["date"])
+
+    # 上证行情 quote：接口有则覆盖，无则沿用 baseline
+    sh_quote = dict(baseline_quote)
+    if klines:
+        for line in klines:
+            parts = line.split(",")
+            if len(parts) < 15:
+                continue
+            ds = parts[0].replace("-", "")
             try:
                 sh_quote[ds] = {"close": round(float(parts[11]), 2), "chg": round(float(parts[12]), 2)}
             except Exception:
