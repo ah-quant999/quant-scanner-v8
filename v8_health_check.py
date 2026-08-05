@@ -24,6 +24,22 @@ import urllib.error
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
+# 夜间静音时段（北京时间）：22:00-07:00 不发邮件，避免打扰休息。
+# 严重基础设施问题仍会通过 write_urgent 留痕，但不在夜间发邮件。
+QUIET_HOURS_START = 22
+QUIET_HOURS_END = 7
+
+
+def in_quiet_hours(now_cst=None):
+    """判断当前是否处于夜间静音时段。"""
+    n = now_cst or datetime.now(timezone(timedelta(hours=8)))
+    h = n.hour
+    if QUIET_HOURS_START <= QUIET_HOURS_END:
+        return QUIET_HOURS_START <= h < QUIET_HOURS_END
+    # 跨午夜：22:00-23:59 或 00:00-06:59
+    return h >= QUIET_HOURS_START or h < QUIET_HOURS_END
+
+
 # 如需要邮件告警，导入发送器（该模块从 .workbuddy/v8_smtp_config.json 读配置）
 try:
     from v8_send_alert import send_alert
@@ -412,6 +428,9 @@ def send_report_email(report):
         print("[WARN] 邮件发送器未导入，跳过邮件")
         return False
     if report["overall"] == "ok":
+        return False
+    if in_quiet_hours():
+        print("[INFO] 当前处于夜间静音时段（22:00-07:00），跳过邮件告警，仅记录日志")
         return False
     # ── 过滤：仅「真正陈旧」的项才触发邮件 ──
     # 规则：fail 项必须超阈值 ≥ 120 分钟（2 小时）才算值得告警；

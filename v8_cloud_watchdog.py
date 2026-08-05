@@ -19,6 +19,22 @@ import urllib.error
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
+# 夜间静音时段（北京时间）：22:00-07:00 不发邮件，避免打扰休息。
+# 严重基础设施问题仍会通过 write_urgent 留痕，但不在夜间发邮件。
+QUIET_HOURS_START = 22
+QUIET_HOURS_END = 7
+
+
+def in_quiet_hours(now_cst=None):
+    """判断当前是否处于夜间静音时段。"""
+    n = now_cst or datetime.now(timezone(timedelta(hours=8)))
+    h = n.hour
+    if QUIET_HOURS_START <= QUIET_HOURS_END:
+        return QUIET_HOURS_START <= h < QUIET_HOURS_END
+    # 跨午夜：22:00-23:59 或 00:00-06:59
+    return h >= QUIET_HOURS_START or h < QUIET_HOURS_END
+
+
 # 邮件告警（配置在 .workbuddy/v8_smtp_config.json，gitignored）
 try:
     from v8_send_alert import send_alert
@@ -283,10 +299,17 @@ def send_watchdog_alert(now, results, health_rc=None, health_out=None):
     告警门槛（2026-08-04 修订）：
     - 管线类（runner/cn_fetch/build_deploy/raw_data/site）：任一 fail 即告警（基础设施问题）
     - 健康检查类：仅「超阈值 ≥ 120 分钟」的 fail 才触发邮件，纯空值/盘前数据不骚扰
+
+    2026-08-05 新增：22:00-07:00 夜间静音时段不发邮件，避免打扰休息；
+    严重问题仍写 URGENT 文件留痕，次日处理。
     """
     if not send_alert:
         write_urgent(["邮件发送器未加载"])
         return False
+
+    now_cst = datetime.now(timezone(timedelta(hours=8)))
+    quiet = in_quiet_hours(now_cst)
+
     # 管线类异常（基础设施，始终告警）
     infra_fails = [f"✗ {name}: {msg}" for name, ok, msg in results if not ok]
     # 健康检查类：过滤出真正陈旧的项
@@ -311,6 +334,12 @@ def send_watchdog_alert(now, results, health_rc=None, health_out=None):
     total_alerts = len(infra_fails) + len(health_alert_items)
     if total_alerts == 0:
         print(f"[INFO] watchdog 跳过邮件：无管线异常且健康检查无超阈 ≥ {ALERT_OVERDUE_MIN}min 的项")
+        return False
+
+    if quiet:
+        print(f"[INFO] 当前处于夜间静音时段（{QUIET_HOURS_START}:00-{QUIET_HOURS_END}:00），"
+              f"跳过邮件告警，改写入 URGENT 文件留痕（共 {total_alerts} 项异常）")
+        write_urgent(infra_fails + health_alert_items)
         return False
 
     subject = f"【v8看门狗告警】{total_alerts}项异常 @ {now}"
