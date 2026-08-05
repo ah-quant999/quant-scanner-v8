@@ -774,7 +774,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     <!-- 🧠 AI市场速览（B 阶段：由 gen_market_brief.py 根据盘中实时数据规则生成） -->
     <div id="aiSummaryCard" style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">
       <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--border);">
-        <span style="font-size:16px;font-weight:700;color:var(--txt);">🧠 AI市场速览 <span style="font-size:10px;font-weight:400;color:var(--dim);">短线·综合 · 盘中实时解读</span></span>
+        <span style="font-size:16px;font-weight:700;color:var(--txt);">🧠 AI市场速览</span>
         <span style="font-size:12px;color:var(--sub);font-weight:400;" id="aiSummaryTime">--</span>
       </div>
       <div style="padding:0;" id="aiSummaryContent">
@@ -871,7 +871,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
     <!-- 上证+深证成交额 -->
     <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📈</span>上证+深证 每日成交金额（亿元） - 短线盘中 · <span class="fresh" id="amountUpdateTime">—</span><span class="fresh" id="amountLastDate" style="margin-left:8px;font-weight:400;"></span></h3>
+      <h3><span class="ic">📈</span>上证+深证 每日成交金额（亿元）<span class="fresh" id="amountUpdateTime">—</span><span class="fresh" id="amountLastDate" style="margin-left:8px;font-weight:400;"></span></h3>
       <div id="amountChartContainer" style="width:100%;height:260px;position:relative;overflow:visible;">
         <svg id="amountChart" width="100%" height="260" style="overflow:visible;" overflow="visible"></svg>
       </div>
@@ -880,7 +880,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
     <!-- 近一月涨跌家数统计 -->
     <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🏘️</span>近一月 涨跌家数统计 - 盘中实时 · <span class="fresh" id="upDownUpdateTime">—</span><span class="fresh" id="upDownLastDate" style="margin-left:8px;font-weight:400;"></span></h3>
+      <h3><span class="ic">🏘️</span>近一月 涨跌家数统计<span class="fresh" id="upDownUpdateTime">—</span><span class="fresh" id="upDownLastDate" style="margin-left:8px;font-weight:400;"></span></h3>
       <div id="upDownChartContainer" style="width:100%;height:260px;position:relative;overflow:visible;">
         <svg id="upDownChart" width="100%" height="260" style="overflow:visible;" overflow="visible"></svg>
       </div>
@@ -2109,7 +2109,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
     <!-- 斐波那契窗口 -->
     <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📉</span>斐波那契窗口 · 当前回调状态 - 中长线 · <span class="fresh" id="phFibTime">—</span></h3>
+      <h3><span class="ic">📉</span>斐波那契窗口 · 当前回调状态<span class="fresh" id="phFibTime">—</span></h3>
       <div class="ph-fib-grid" id="phFibGrid">
         <div class="ph-fib-card"><div class="ph-fib-val" id="phFibDays">--</div><div class="ph-fib-lbl">已回调交易日</div></div>
         <div class="ph-fib-card"><div class="ph-fib-val" id="phFibPct">--</div><div class="ph-fib-lbl">累计跌幅</div></div>
@@ -2121,7 +2121,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
     <!-- 资金流时间轴 · v6 一年样式（ECharts 双轴：单日柱状 + 累计折线） -->
     <div class="card" id="marketFundFlowCard" style="margin-bottom:16px">
-      <h3><span class="ic">📊</span>资金流时间轴 · 中长线 · <span class="fresh" id="mffTime">—</span></h3>
+      <h3><span class="ic">📊</span>资金流时间轴<span class="fresh" id="mffTime">—</span></h3>
       <div style="padding:10px 14px;">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
           <span style="font-size:11px;color:var(--dim);">时间范围:</span>
@@ -8401,7 +8401,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     /* 4. 中信期货 */
     var cffex=window.CFFEX_HOLDINGS||{}, cffexT=cffex.update_time||'';
     h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #7cb342;">';
-    h+=v8CardHeader('📊','中信期货','中长线·T+1','update_time',{update_time:cffexT},!cffex||!cffex.items);
+    h+=v8CardHeader('📊','中信期货','','update_time',{update_time:cffexT},!cffex||!cffex.items);
     h+='<div style="padding:12px 14px;">';
     if(cffex&&cffex.items&&cffex.items.length){
       var groups={}; cffex.items.forEach(function(it){ var v=it.variety||''; if(!groups[v]) groups[v]=[]; groups[v].push(it); });
@@ -8429,7 +8429,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     /* 5. 两融余额走势 */
     var margin=window.MARGIN_DATA||{}, marginT=margin.update_time||'';
     h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #1976d2;">';
-    h+=v8CardHeader('📊','两融余额走势（亿元）','T+1','update_time',{update_time:marginT},!margin||!margin.sh||!margin.sh.length);
+    h+=v8CardHeader('📊','两融余额走势（亿元）','','update_time',{update_time:marginT},!margin||!margin.sh||!margin.sh.length);
     h+='<div style="padding:12px 14px;">';
     if(margin&&margin.sh&&margin.sh.length){
       h+='<div id="v8MarginChart" style="width:100%;height:240px;"></div>';
@@ -8441,7 +8441,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     /* 6. 宽基ETF净申赎 */
     var esub=window.ETF_SUBSCRIPTION||{}, esubT=esub.update_time||'';
     h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #00acc1;">';
-    h+=v8CardHeader('📈','宽基ETF净申赎（亿份）','T+1','update_time',{update_time:esubT},!esub||!esub.sh||!esub.sh.length);
+    h+=v8CardHeader('📈','宽基ETF净申赎（亿份）','','update_time',{update_time:esubT},!esub||!esub.sh||!esub.sh.length);
     h+='<div style="padding:12px 14px;">';
     if(esub&&esub.sh&&esub.sh.length){
       h+='<div style="font-size:11px;color:#38bdf8;margin-bottom:8px;">沪深300/中证500/中证1000/创业板/科创50/上证50/A500 宽基指数ETF每日净申购赎回份额</div>';
