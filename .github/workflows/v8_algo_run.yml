@@ -43,6 +43,19 @@
 # ⚠️ PowerShell 坑（同 run 实测）：`python -c @'...'@` 传参时 PowerShell 会剥离双引号，
 #   导致 SyntaxError: '{' was never closed。必须 Set-Content 写临时 .py 文件再 `python $tmp` 执行。
 #
+# 🔴 2026-08-05 23:58 第三真根因（run#31005326516 20:29 + run#31011155328 21:46 连挂两次）：
+#   源码同步步骤稳定卡死在**单个大 blob** algorithms/stock_industry_concepts.json（1.35MB，
+#   base64 后约 1.86MB）：本 runner 到 api.github.com 的长连接在 ~1.82MB 处被截断，
+#   4 次重试全部 IncompleteRead（1820829/1824422/1693416/1846048 bytes read）→ 整步 exit 1，
+#   算法链 0 执行 → 全部盘后数据停在前一天。**不是 token/权限/磁盘问题，是大响应体传输截断。**
+#   ✅ 修法（三层，已落地）：
+#     1) 下载前先算**本地 git blob sha1**（sha1("blob <len>\0"+content)）与 tree 里的 sha 比对，
+#        相同直接跳过——大 json 极少变动，正常情况下**根本不再下载它**，从源头绕开截断；
+#     2) 真要下载时优先用 Accept: application/vnd.github.raw（省掉 base64 的 33% 膨胀），
+#        与 base64 JSON 两种模式交替重试 6 次；
+#     3) 每次下载都做 sha 校验，截断内容绝不落盘（旧代码 json.load 截断会直接抛异常，
+#        但 raw 模式下截断是"静默半个文件"，必须校验）。
+#
 
 # 2026-08-02 原生化：4 类上游输入（gold_pool / scan_result / guanlan_* / mahoro_signals）
 # 也已由 v8 自产（scanner.py / guanlan_extractor.py / fetch_maharo_signals.py + V8_OUT_DIR 钩子
@@ -99,26 +112,71 @@ jobs:
         shell: powershell
         run: |
           $code = @'
-          import os, base64, json, urllib.request, time
+          import os, base64, json, hashlib, urllib.request, time
           token = os.environ["GITHUB_TOKEN"]
           REPO = "ah-quant999/quant-scanner-v8"
           H = {"Authorization": "Bearer " + token,
                "Accept": "application/vnd.github+json",
                "X-GitHub-Api-Version": "2022-11-28"}
 
-          def get(url):
+          def local_blob_sha(path):
+              # git blob sha1 = sha1("blob <len>\0" + content); lets us decide
+              # "already identical" WITHOUT downloading the file at all.
+              try:
+                  data = open(path, "rb").read()
+              except Exception:
+                  return None
+              h = hashlib.sha1()
+              h.update(("blob %d\0" % len(data)).encode())
+              h.update(data)
+              return h.hexdigest()
+
+          def sha_of(data):
+              h = hashlib.sha1()
+              h.update(("blob %d\0" % len(data)).encode())
+              h.update(data)
+              return h.hexdigest()
+
+          def get_json(url, tries=6):
               last = None
-              for i in range(4):
+              for i in range(tries):
                   try:
                       return json.load(urllib.request.urlopen(
-                          urllib.request.Request(url, headers=H), timeout=90))
+                          urllib.request.Request(url, headers=H), timeout=120))
                   except Exception as e:
                       last = e
                       print("  retry %d: %s" % (i + 1, e), flush=True)
-                      time.sleep(2 ** i)
+                      time.sleep(min(2 ** i, 20))
               raise SystemExit("API fetch failed: %s (%s)" % (url, last))
 
-          tree = get("https://api.github.com/repos/%s/git/trees/main?recursive=1" % REPO)
+          def fetch_blob(sha, tries=6):
+              # Prefer the raw media type: no base64 inflation (~26pct smaller payload),
+              # which is what kept truncating on this runner for the 1.3MB json
+              # (run#31005326516 / #31011155328: IncompleteRead at ~1.82MB of 1.86MB).
+              # Every attempt is sha-verified so a silent truncation can never be written.
+              url = "https://api.github.com/repos/%s/git/blobs/%s" % (REPO, sha)
+              raw_h = dict(H)
+              raw_h["Accept"] = "application/vnd.github.raw"
+              last = None
+              for i in range(tries):
+                  mode = "raw" if i % 2 == 0 else "b64"
+                  try:
+                      hdr = raw_h if mode == "raw" else H
+                      resp = urllib.request.urlopen(
+                          urllib.request.Request(url, headers=hdr), timeout=180)
+                      body = resp.read()
+                      data = body if mode == "raw" else base64.b64decode(
+                          json.loads(body.decode())["content"])
+                      if sha_of(data) != sha:
+                          raise ValueError("sha mismatch (truncated?) got %d bytes" % len(data))
+                      return data
+                  except Exception as e:
+                      last = e
+                      print("  blob retry %d [%s]: %s" % (i + 1, mode, e), flush=True)
+                      time.sleep(min(2 ** i, 20))
+              raise SystemExit("blob fetch failed: %s (%s)" % (sha, last))
+
+          tree = get_json("https://api.github.com/repos/%s/git/trees/main?recursive=1" % REPO)
           want = []
           for e in tree.get("tree", []):
               if e.get("type") != "blob":
@@ -130,23 +188,21 @@ jobs:
           print("files to sync: %d" % len(want), flush=True)
 
           ok = 0
+          skipped = 0
           for p, sha in want:
-              d = get("https://api.github.com/repos/%s/git/blobs/%s" % (REPO, sha))
-              raw = base64.b64decode(d["content"])
-              if os.path.exists(p):
-                  try:
-                      if open(p, "rb").read() == raw:
-                          ok += 1
-                          continue
-                  except Exception:
-                      pass
+              if local_blob_sha(p) == sha:
+                  ok += 1
+                  skipped += 1
+                  continue
+              data = fetch_blob(sha)
               parent = os.path.dirname(p)
               if parent:
                   os.makedirs(parent, exist_ok=True)
               with open(p, "wb") as f:
-                  f.write(raw)
+                  f.write(data)
+              print("  updated %s (%d bytes)" % (p, len(data)), flush=True)
               ok += 1
-          print("OK source sync done: %d/%d" % (ok, len(want)), flush=True)
+          print("OK source sync done: %d/%d (unchanged: %d)" % (ok, len(want), skipped), flush=True)
           if ok != len(want):
               raise SystemExit(1)
           '@
