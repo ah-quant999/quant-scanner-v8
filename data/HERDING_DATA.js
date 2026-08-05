@@ -1,1 +1,1 @@
-window.HERDING_DATA = {"current_clusters":[{"sector":"汽车零部","direction":"强势抱团","count":3},{"sector":"游戏Ⅱ","direction":"强势抱团","count":2},{"sector":"铁路公路","direction":"强势抱团","count":2}],"total_limit_up":14,"note":"由涨停行业集中度推导的抱团板块（行业涨停数降序）","update_time":"2026-08-05 16:05:55"};
+window.HERDING_DATA = {"current_clusters":[{"sector":"汽车零部","direction":"强势抱团","count":3},{"sector":"游戏Ⅱ","direction":"强势抱团","count":2},{"sector":"铁路公路","direction":"强势抱团","count":2}],"total_limit_up":14,"note":"由涨停行业集中度推导的抱团板块（行业涨停数降序）","update_time":"2026-08-05 16:31:23"};
