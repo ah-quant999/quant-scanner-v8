@@ -6718,7 +6718,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
       html += '<div style="margin-bottom:10px;"><div style="font-weight:700;margin-bottom:6px;font-size:12px;color:var(--txt);letter-spacing:.3px;">'+page+'</div>';
 
-      html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;">';
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px;">';
 
       byPage[page].forEach(function(it){
 
