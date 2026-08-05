@@ -3637,7 +3637,10 @@ window.V8_CAL = {weeks:[],legend:[]};
           <tr><td>08:25（工作日）/ 09:00（周六日）</td><td>v8_cn_fetch_cloud</td><td>盘前</td><td>今日事件(V8_CAL日历+今日判定JUDGMENT_DATA+打新)、IPO、两融、中金所持仓、宏观、危机雷达、北向、分析师评级、52周高、羊群效应、ETF申赎</td></tr>
           <tr><td>09:40 / 10:00 / 10:30 / 11:00 / 11:30 / 13:00 / 13:30 / 14:00 / 14:30 / 15:10</td><td>v8_cn_fetch_cloud</td><td>盘中</td><td>指数行情、ETF脉搏、ETF盘中热度、ETF日监控(实时)、板块资金流、个股资金流、概念排行、涨停热力、候选池实时行情、成交金额/涨跌家数(SH_SZ_HISTORY)</td></tr>
           <tr><td>15:30</td><td>v8_cn_fetch_cloud</td><td>盘后</td><td>EXPERIMENT、大盘资金流累积序列、ETF日监控再补抓(T+1收盘定稿)、龙虎榜历史回填</td></tr>
-          <tr><td>18:30</td><td>v8_algo_run</td><td>盘后算法</td><td>龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测/板块资金流趋势/停牌预警/市场预警/NT数据（暂小九，待迁云端）</td></tr>
+          <tr><td>16:30</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓</td><td>港股16:00收盘后补抓恒指/港股候选/盘中模块收盘值（A股已收盘，不重复抓A股）</td></tr>
+          <tr><td>盘中每30分</td><td>v8_risk_gauge</td><td>危机雷达</td><td>危机雷达/风险温度计实时刷新（美股开盘情绪覆盖 19:00-22:00 北京时间）</td></tr>
+          <tr><td>18:30 / 20:00（主+冗余）</td><td>v8_algo_cloud</td><td>盘后算法（云端主链）</td><td>龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测/板块资金流趋势/停牌预警/市场预警/NT数据（已迁 GitHub 云端 ubuntu，20:30/20:50 兜底）</td></tr>
+          <tr><td>21:00</td><td>v8_backup</td><td>每日备份</td><td>备份 raw_data/*.json 防意外丢失（push 至 main）</td></tr>
           <tr><td>09:00 / 17:00</td><td>v8_algo</td><td>体检</td><td>46 模块新鲜度体检（云端）</td></tr>
           <tr><td>非交易时段每2h</td><td>runner_health_alert</td><td>健康监控</td><td>lemoncat-cn runner 离线 → 开 Issue 告警（云端，工作日13-21点/周末0-20点）</td></tr>
           <tr><td>周六/周日 09:00</td><td>v8_cn_fetch_cloud</td><td>T+1 周度</td><td>日历/今日判定/IPO/两融/中金所/宏观/危机/北向/分析师/52周高/羊群效应统一刷新</td></tr>
@@ -3660,10 +3663,13 @@ window.V8_CAL = {weeks:[],legend:[]};
           <tr><td>14:30</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
           <tr><td>15:10</td><td>v8_cn_fetch_cloud</td><td>盘中末档（收盘前最后快照）</td><td>云端</td></tr>
           <tr><td>15:30</td><td>v8_cn_fetch_cloud</td><td>盘后（MARKET_FUND_FLOW_DATA 收盘累积 · ETF_DAILY_MONITOR / EXPERIMENT）</td><td>云端</td></tr>
-          <tr><td>13-21点每2h</td><td>runner_health_alert</td><td>Runner 健康监控（离线开 Issue）</td><td>云端</td></tr>
+          <tr><td>16:30</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓（恒指/港股候选/盘中模块收盘值）</td><td>云端</td></tr>
+          <tr><td>盘中每30分</td><td>v8_risk_gauge</td><td>危机雷达/风险温度计实时刷新</td><td>云端</td></tr>
+          <tr><td>13-21点每小时5次(约12分)</td><td>runner_health_alert</td><td>Runner 健康监控（离线开 Issue）</td><td>云端</td></tr>
           <tr><td>09:00</td><td>v8_algo</td><td>盘前预检（46模块新鲜度体检）</td><td>云端</td></tr>
           <tr><td>17:00</td><td>v8_algo</td><td>收盘后总检（46模块新鲜度体检）</td><td>云端</td></tr>
-          <tr><td>18:30</td><td>v8_algo_run</td><td>盘后算法链（龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测）</td><td>中国节点（小九，待迁云端）</td></tr>
+          <tr><td>18:30 / 20:00</td><td>v8_algo_cloud</td><td>盘后算法链（龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测）</td><td>GitHub 云端 ubuntu（主链；20:30/20:50 兜底）</td></tr>
+          <tr><td>21:00</td><td>v8_backup</td><td>每日自动备份 raw_data</td><td>云端</td></tr>
           <tr style="background:rgba(56,189,248,.06);"><td colspan="4" style="text-align:center;font-size:12px;color:var(--dim);">↓ push raw_data → 自动触发 v8_build_deploy → GitHub Pages 部署</td></tr>
         </table>
 
@@ -3691,7 +3697,7 @@ window.V8_CAL = {weeks:[],legend:[]};
           <tr><td>v8_cn_fetch（应急回退）</td><td>任意时段强制补跑（原中国节点自托管版，cron 已移除；云端版 v8_cn_fetch_cloud 为主力）</td><td>workflow_dispatch</td></tr>
           <tr><td>v8_algo_run</td><td>强制重跑算法链（中国节点小九）</td><td>workflow_dispatch</td></tr>
           <tr><td>v8_build_deploy</td><td>强制全量构建部署</td><td>workflow_dispatch</td></tr>
-          <tr><td>v8_safety_net</td><td>Safety Net 兜底监控（工作日 09:00~19:00 每30min）</td><td>cron + dispatch</td></tr>
+          <tr><td>v8_safety_net</td><td>Safety Net 兜底监控（工作日 09:00~17:00 每20min）</td><td>cron + dispatch</td></tr>
           <tr><td>runner_health_alert</td><td>Runner 离线即时告警（可手动触发立即检查）</td><td>workflow_dispatch</td></tr>
         </table>
 
