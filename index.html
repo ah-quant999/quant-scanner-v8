@@ -2318,7 +2318,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     <div id="st-crds" class="st-pane"><div class="card" id="stv8CrdsCard">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
           📊 <span style="font-weight:700;font-size:14px;color:var(--txt);">CRDS · 逆势龙头</span>
-          <span id="stcrdsTime" style="font-size:12px;color:var(--dim);font-weight:500;background:var(--bg2);padding:1px 8px;border-radius:8px;">更新 ...</span>
+          <span id="stcrdsTime" class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;"><span aria-hidden="true">🐻</span><span style="margin-left:4px">更新</span><span style="color:#9fd0ff;font-weight:600;margin-left:4px">…</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">盘后</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">短线</span></span>
         </div>
         <div id="stcrdsCoverage" style="font-size:11px;color:var(--dim);margin-bottom:8px;line-height:1.6;"></div>
         <div id="stcrdsStandby" style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:8px;background:rgba(240,160,32,0.10);border-left:4px solid #f0a020;font-size:15px;font-weight:600;color:#e8b54a;line-height:1.65;letter-spacing:0.2px;"></div>
@@ -2404,6 +2404,9 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       .cal-header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
       .cal-title{font-size:14px;font-weight:700;color:var(--txt)}
       .cal-meta{font-size:11px;color:var(--dim)}
+      .cal-nav-btn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;border:1px solid var(--border);background:var(--bg2);color:var(--sub);font-size:11px;cursor:pointer;transition:.15s;user-select:none}
+      .cal-nav-btn:hover{border-color:#38bdf8;color:#38bdf8;box-shadow:0 0 0 1px rgba(56,189,248,.3)}
+      .cal-nav-btn:active{transform:scale(.94)}
       .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;overflow:hidden}
       .cal-head{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px}
       .cal-head span{text-align:center;font-size:11px;font-weight:700;color:var(--dim);padding:6px 0}
@@ -2614,6 +2617,9 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
   /* ===== TAB1: 机游共振日历（参照参考页布局） ===== */
   window.__jyCalRendered = false;
+  window.__jyCalState = window.__jyCalState || (function(){
+    var n=new Date(); return { y:n.getFullYear(), m:n.getMonth() };
+  })();
   function renderJyCalendar(){
     window.__jyCalRendered = true;
     var c = _rc$('jyCalContainer');
@@ -2623,10 +2629,9 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     var summary = D.summary || {};
     var lhbDate = D.date || '';
 
-    var now = new Date();
-    var year = now.getFullYear(), month = now.getMonth();
     // 注：日历标题与日历网格统一用「当前月」（8月）；下方「最近交易日」卡片展示
     // LHB_DATA 里最近一个有数据的那一天（7/31），与日历网格解耦。
+    var year = window.__jyCalState.y, month = window.__jyCalState.m;
     var firstDay = new Date(year, month, 1).getDay();
     var monOffset = firstDay === 0 ? 6 : firstDay - 1;
     var daysInMonth = new Date(year, month+1, 0).getDate();
@@ -2648,7 +2653,11 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     var h = '';
     h += '<div class="cal-header-row">';
     h += '<span class="cal-title">📅 机游共振日历 ' + _uBadge('盘后', '短线', D.update_time) + '</span>';
-    h += '<span class="cal-meta">' + year + '年' + (month+1) + '月</span>';
+    h += '<span class="cal-meta">'
+       + '<button class="cal-nav-btn" onclick="_jyCalPrev()" title="上个月">◀</button>'
+       + ' <span id="jyCalYearMonth">' + year + '年' + (month+1) + '月</span> '
+       + '<button class="cal-nav-btn" onclick="_jyCalNext()" title="下个月">▶</button>'
+       + '</span>';
     h += '</div>';
 
     // Legend
@@ -2919,19 +2928,50 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     detail.innerHTML = h;
     detail.className = 'cal-detail show';
   };
+  // 机游共振日历翻月按钮（2026-08-06 主人确立：前后月翻页）
+  window._jyCalNav = function(delta){
+    window.__jyCalState.m += delta;
+    if(window.__jyCalState.m < 0){ window.__jyCalState.m = 11; window.__jyCalState.y--; }
+    else if(window.__jyCalState.m > 11){ window.__jyCalState.m = 0; window.__jyCalState.y++; }
+    var c = _rc$('jyCalContainer'); if(c) c.innerHTML = '';
+    window.__jyCalRendered = false;
+    try{ renderJyCalendar(); }catch(e){ console.warn('机游翻月渲染失败', e); }
+  };
+  window._jyCalPrev = function(){ window._jyCalNav(-1); };
+  window._jyCalNext = function(){ window._jyCalNav(1); };
 
   /* ===== TAB2: 北向日历（参照参考页） ===== */
   window.__northCalRendered = false;
+  window.__northCalState = window.__northCalState || (function(){
+    var n=new Date(); return { y:n.getFullYear(), m:n.getMonth() };
+  })();
+  // 北向资金日历翻月按钮（2026-08-06 主人确立：前后月翻页）
+  window._northCalNav = function(delta){
+    window.__northCalState.m += delta;
+    if(window.__northCalState.m < 0){ window.__northCalState.m = 11; window.__northCalState.y--; }
+    else if(window.__northCalState.m > 11){ window.__northCalState.m = 0; window.__northCalState.y++; }
+    var c = _rc$('northCalContainer'); if(c) c.innerHTML = '';
+    window.__northCalRendered = false;
+    try{ renderNorthCalendar(); }catch(e){ console.warn('北向翻月渲染失败', e); }
+  };
+  window._northCalPrev = function(){ window._northCalNav(-1); };
+  window._northCalNext = function(){ window._northCalNav(1); };
   function renderNorthCalendar(){
     window.__northCalRendered = true;
     var c = _rc$('northCalContainer');
     if(!c) return;
     var NF = window.NORTH_FUND || {};
 
+    var year = window.__northCalState.y, month = window.__northCalState.m;
+
     var h = '';
     h += '<div class="cal-header-row">';
     h += '<span class="cal-title">🌊 北向资金日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span> ' + _uBadge('盘后', '短线', NF.update_time) + '</span>';
-    h += '<span class="cal-meta"></span>';
+    h += '<span class="cal-meta">'
+       + '<button class="cal-nav-btn" onclick="_northCalPrev()" title="上个月">◀</button>'
+       + ' <span id="northCalYearMonth">' + year + '年' + (month+1) + '月</span> '
+       + '<button class="cal-nav-btn" onclick="_northCalNext()" title="下个月">▶</button>'
+       + '</span>';
     h += '</div>';
 
     // Notice box（精简·去掉过期"已停更"信息）
@@ -2948,7 +2988,6 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     var hasMultiDay = stocks.some(function(s){ return s.date; });
 
     var now = new Date();
-    var year = now.getFullYear(), month = now.getMonth();
     var firstDay = new Date(year, month, 1).getDay();
     var monOffset = firstDay === 0 ? 6 : firstDay - 1;
     var daysInMonth = new Date(year, month+1, 0).getDate();
@@ -8603,7 +8642,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var safe=function(fn){try{fn();}catch(e){console.warn('运维子页渲染失败',e);}};
     safe(renderAllsite);
     safe(renderCockpit);
-    safe(renderV8Crds);
+    // 传 'st' 前缀：stcrdsTime / stcrdsCoverage 等 DOM id 在运维 section 下都带 st 前缀（2026-08-06 主人纠正：原调用未传前缀导致胶囊找不到）
+    safe(function(){ renderV8Crds('st'); });
   }
   window.__renderOps=renderOps;
   window.renderCockpit=renderCockpit;
