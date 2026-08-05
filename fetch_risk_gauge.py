@@ -10,7 +10,7 @@ import sys
 import http.cookiejar
 import urllib.parse
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(ROOT, "raw_data", "risk_gauge.json")
@@ -363,7 +363,7 @@ def build_verdict(indicators, overall, stale_names=None):
 
 
 def main():
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
     prev, prev_time = _load_prev()
     indicators = []
     stale_names = []

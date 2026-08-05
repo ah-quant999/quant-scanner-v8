@@ -417,6 +417,7 @@ html>
     <script src="data/GOLD_POOL.js"></script>
     <script src="data/STOCK_LIST.js"></script>
     <script src="data/MACRO_DATA.js"></script>
+    <script src="data/MACRO_BRIEF.js"></script>
 <script src="data/NT_DATA.js"></script>
 <script src="data/LHB_DATA.js"></script>
 <script src="data/LHB_HISTORY.js"></script>
@@ -531,46 +532,139 @@ window.V8_CAL = {weeks:[],legend:[]};
   <section id="sec-td" class="active">
     <div class="sec-head"><h2>📅 今日事件</h2><span class="tag" id="tdHeaderTag">交易日历 + 打新速览 · --</span></div>
 
-    <!-- 今日事件详情（合并卡：日历事件 + 宏观速览） -->
+    <!-- 今日事件详情（日历事件） -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">📅</span>今日事件详情 - <span class="fresh" id="v8DayDate">--</span></h3>
       <div id="v8TodayAll" style="font-size:13px;color:var(--txt);"></div>
     </div>
 
-    <!-- 今日宏观解读（静态卡片 · 2026-08-03） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📊</span>今日宏观解读 <span id="macroInterpretTag" style="font-size:11px;font-weight:400;color:var(--dim)">美日联合干预日元 · 对 A 股影响与持仓框架 · 2026-08-03 · 底层数据更新于 --</span></h3>
-      <div style="font-size:13px;line-height:1.8;color:var(--txt)">
-        <p style="margin:8px 0"><b style="color:var(--up)">一句话结论：</b>1986 年以来美日首次官方联手买入日元，叠加日本央行最明确加息信号，标志"弱日元+零成本融资"套利时代进入拐点。当前 USDJPY 回落至 157.6（干预有效区），尚未触发套利 unwind，对 A 股属<strong>温和、间接</strong>影响，<strong>不构成清仓理由</strong>。</p>
-        <div style="font-weight:700;margin:10px 0 4px;color:var(--sub)">对 A 股的三条传导</div>
-        <ul style="margin:4px 0 4px 20px;padding:0">
-          <li><b>情绪面：</b>若套利 unwind 触发，全球风险偏好骤降，北向资金可能流出、亚太联动下跌；但 A 股有"政策底"缓冲，跌幅通常小于外围。</li>
-          <li><b>资金面：</b>日元急升→美元走弱→人民币贬值压力缓和（偏利好）；但避险情绪主导时外资仍可能减仓新兴市场。</li>
-          <li><b>板块面：</b>出口链（对日/对美）受日元升值压制；高估值成长（科技/新能源）受全球无风险利率上行压制；黄金/防御相对受益。</li>
-        </ul>
-        <div style="font-weight:700;margin:10px 0 4px;color:var(--sub)">减仓前兆（任一亮红灯即警惕，非清仓指令）</div>
-        <table style="width:100%;border-collapse:collapse;margin:6px 0;font-size:12px">
-          <thead><tr style="background:rgba(167,139,250,0.12)">
-            <th style="border:1px solid var(--border);padding:6px 8px;text-align:left;color:var(--txt)">指标</th>
-            <th style="border:1px solid var(--border);padding:6px 8px;text-align:left;color:var(--txt)">触发阈值</th>
-            <th style="border:1px solid var(--border);padding:6px 8px;text-align:left;color:var(--txt)">含义</th>
-          </tr></thead>
-          <tbody>
-            <tr><td style="border:1px solid var(--border);padding:6px 8px">USDJPY</td><td style="border:1px solid var(--border);padding:6px 8px">跌破 155 / 冲向 150</td><td style="border:1px solid var(--border);padding:6px 8px">套利 unwind 加速</td></tr>
-            <tr><td style="border:1px solid var(--border);padding:6px 8px">VIX</td><td style="border:1px solid var(--border);padding:6px 8px">&gt; 25 且美股科技破位</td><td style="border:1px solid var(--border);padding:6px 8px">情景 C 前兆</td></tr>
-            <tr><td style="border:1px solid var(--border);padding:6px 8px">北向资金</td><td style="border:1px solid var(--border);padding:6px 8px">连续大额净流出 + 人民币急贬</td><td style="border:1px solid var(--border);padding:6px 8px">外资撤离新兴</td></tr>
-            <tr><td style="border:1px solid var(--border);padding:6px 8px">10Y 美债收益率</td><td style="border:1px solid var(--border);padding:6px 8px">破 4.5%</td><td style="border:1px solid var(--border);padding:6px 8px">全球融资压力升级</td></tr>
-          </tbody>
-        </table>
-        <p style="margin:8px 0 0;font-size:11px;color:var(--dim)">📄 <a href="宏观解读_美日干预日元_2026-08-03.md" style="color:var(--link,#38bdf8)">完整 10 节分析（含三情景推演 / 历史平行剧本 / 可证伪观察点）</a>。⚠️ 本文为宏观框架分析，不构成投资建议。</p>
-      </div>
+    <!-- 今日判定（数据驱动 · premarket 08:25 刷新） -->
+    <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
+      <h3><span class="ic">⚖️</span>今日判定 <span id="judgmentTag" style="font-size:11px;font-weight:400;color:var(--dim)">--</span></h3>
+      <div id="judgmentBody" style="font-size:13px;line-height:1.8;color:var(--txt)"></div>
     </div>
     <script>
     (function(){
-      var tag=document.getElementById('macroInterpretTag');
-      if(!tag) return;
-      var t=(window.CRISIS_DATA&&window.CRISIS_DATA.update_time)||(window.MACRO_DATA&&window.MACRO_DATA.update_time)||'--';
-      tag.textContent='美日联合干预日元 · 对 A 股影响与持仓框架 · 2026-08-03 · 底层数据更新于 '+t;
+      var d = window.JUDGMENT_DATA;
+      var tag = document.getElementById('judgmentTag');
+      var body = document.getElementById('judgmentBody');
+      if(!d || !body){ if(tag) tag.textContent='数据缺失'; return; }
+      if(tag) tag.textContent = (d.date||'') + ' · 盘前研判 · 更新于 ' + (window._fmtAshareRel ? window._fmtAshareRel(d.update_time) : (d.update_time||'--'));
+      var h = '';
+      // 美股 + 结论 + 预警（置顶、大字）
+      if(d.us || d.verdict || d.warning){
+        h += '<div style="margin-bottom:12px;padding:10px 12px;background:linear-gradient(135deg,rgba(56,189,248,0.08),rgba(167,139,250,0.06));border:1px solid var(--border2);border-radius:10px;font-size:14px;line-height:1.8">';
+        if(d.us) h += '<p style="margin:4px 0"><b style="color:var(--sub)">美股：</b><span style="color:var(--up)">'+d.us+'</span></p>';
+        if(d.verdict) h += '<p style="margin:4px 0"><b style="color:var(--sub)">→ 结论：</b>'+d.verdict+'</p>';
+        if(d.warning) h += '<p style="margin:4px 0;color:#f59e0b">⚠️ '+d.warning+'</p>';
+        h += '</div>';
+      }
+      h += '<p style="margin:6px 0"><b style="color:var(--sub)">大盘：</b>'+(d.market||'')+'</p>';
+      if(d.indices && d.indices.length){
+        h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0">';
+        d.indices.forEach(function(r){
+          h += '<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.22);border-radius:999px;padding:3px 10px;font-size:12px;line-height:1.6">'
+            + '<b style="color:var(--txt)">'+r.name+'</b>'
+            + '<span style="color:var(--down)">控'+r.ctrl+'</span>'
+            + '<span style="color:var(--down)">财'+r.fs+'</span>'
+            + (r.warn?'<span style="color:#f59e0b;margin-left:2px">⚠️ '+r.warn+'</span>':'')
+            + '</span>';
+        });
+        h += '</div>';
+      }
+      // 多信号摘要（VIX / 危机雷达 / 板块 / 北向）
+      var _cr = window.CRISIS_DATA;
+      var _md2 = window.MACRO_DATA;
+      var sigs = [];
+      if(_md2 && _md2.global_macro && _md2.global_macro.vix){
+        var vx = _md2.global_macro.vix;
+        var vVal = typeof vx === 'object' ? (vx.value || vx.close || 0) : parseFloat(vx);
+        if(!isNaN(vVal)){
+          var vLv = vVal < 15 ? '低位(低波)' : (vVal < 20 ? '中性' : (vVal < 28 ? '偏高' : '恐慌'));
+          var vClr = vVal < 20 ? 'var(--up)' : (vVal < 28 ? '#f59e0b' : 'var(--down)');
+          sigs.push({tag:'😰 VIX', text:vVal.toFixed(1)+' '+vLv, color:vClr});
+        }
+      }
+      if(_cr && (_cr.score !== undefined || _cr.crisis_score !== undefined)){
+        var cs = _cr.score !== undefined ? _cr.score : (_cr.crisis_score || 0);
+        var cl = _cr.level || _cr.crisis_level || '--';
+        var cClr = cs < 30 ? 'var(--up)' : (cs < 50 ? '#f59e0b' : (cs < 70 ? '#ef4444' : '#dc2626'));
+        sigs.push({tag:'🚨 雷达', text:cl+'('+cs+'分)', color:cClr});
+      }
+      if(window.SECTOR_FUND_FLOW){
+        var sff = window.SECTOR_FUND_FLOW;
+        if(sff.top_list && sff.top_list.length){
+          var topN = sff.top_list.slice(0, 3);
+          var snames = topN.map(function(s){ return s.name || s.sector_name; }).filter(Boolean).join(' / ');
+          if(snames) sigs.push({tag:'📊 板块', text:snames, color:'var(--cyan)'});
+        }
+      }
+      sigs.push({tag:'💰 北向', text:'港交所停止披露(top_buy)', color:'var(--dim)'});
+      if(sigs.length){
+        h += '<div style="margin-top:10px;padding:8px 10px;background:rgba(167,139,250,0.06);border-radius:8px;border-left:3px solid var(--purple)">';
+        h += '<div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:4px">📡 多信号扫描</div>';
+        h += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+        sigs.forEach(function(s){
+          h += '<span style="display:inline-block;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:5px;padding:3px 7px;font-size:11px">'
+            + '<b style="color:var(--sub)">'+s.tag+'</b> '
+            + '<span style="color:'+s.color+'">'+s.text+'</span></span>';
+        });
+        h += '</div></div>';
+      }
+      body.innerHTML = h;
+    })();
+    </script>
+
+    <!-- 今日宏观解读（每日盘前 · premarket 08:25 刷新 · 数据驱动） -->
+    <div class="card" style="margin-bottom:16px;border-left:4px solid var(--cyan);">
+      <h3><span class="ic">📊</span>今日宏观解读 <span id="macroInterpretTag" style="font-size:11px;font-weight:400;color:var(--dim)">每日盘前 · 更新于 --</span></h3>
+      <div id="macroBody" style="font-size:13px;line-height:1.8;color:var(--txt)"></div>
+    </div>
+    <script>
+    (function(){
+      var b = document.getElementById('macroBody');
+      var tag = document.getElementById('macroInterpretTag');
+      if(!b){ if(tag) tag.textContent='渲染失败'; return; }
+      var d = window.MACRO_BRIEF;
+      var md = window.MACRO_DATA;
+      var ts = (d && d.update_time) || (md && (md.update_time || (md.global_macro && md.global_macro.usdcnh && md.global_macro.usdcnh.date))) || '--';
+      if(tag) tag.textContent = '每日盘前 · 更新于 ' + (window._fmtAshareRel ? window._fmtAshareRel(ts) : ts);
+      if(!d && !md){ b.innerHTML='<p style="color:var(--dim)">宏观数据加载中（盘前 08:25 自动生成）...</p>'; return; }
+      var h = '';
+      if(d && d.headline){
+        h += '<p style="margin:8px 0"><b style="color:var(--up)">一句话结论：</b>'+d.headline+'</p>';
+      } else if(md){
+        h += '<p style="margin:8px 0;color:var(--dim)">宏观数据已更新，解读生成中…</p>';
+      }
+      if(d && d.a_impact){
+        var impactColor = (d.a_impact.indexOf('偏空')>=0) ? 'var(--down)' : ((d.a_impact.indexOf('偏多')>=0) ? 'var(--up)' : 'var(--txt)');
+        h += '<p style="margin:10px 0;padding:8px 12px;background:rgba(56,189,248,0.06);border-radius:8px;border-left:3px solid var(--cyan)">';
+        h += '<b>→ 对 A 股影响：</b><span style="color:'+impactColor+'">'+d.a_impact+'</span>';
+        h += '</p>';
+      }
+      if(d && d.key_numbers && d.key_numbers.length){
+        h += '<div style="font-weight:700;margin:8px 0 4px;color:var(--sub)">关键数据</div>';
+        h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0">';
+        d.key_numbers.forEach(function(k){
+          var dColor = (k.delta.indexOf('\u2191')>=0 || k.delta.indexOf('\u2193')>=0)
+            ? ((k.delta.indexOf('\u2191')>=0) ? 'var(--up)' : 'var(--down)')
+            : 'var(--txt)';
+          h += '<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.18);border-radius:6px;padding:3px 8px;font-size:11.5px;line-height:1.6">'
+            + '<b style="color:var(--sub)">'+k.label+'</b>'
+            + '<span style="color:var(--txt)">'+k.value+'</span>'
+            + '<span style="color:'+dColor+';font-weight:600">'+k.delta+'</span></span>';
+        });
+        h += '</div>';
+      }
+      if(d && d.news_brief && d.news_brief.length){
+        h += '<div style="font-weight:700;margin:12px 0 4px;color:var(--sub)">📰 时事要点（对 A 股有影响的）</div>';
+        h += '<ul style="margin:4px 0 4px 18px;padding:0">';
+        d.news_brief.forEach(function(n){
+          h += '<li style="margin:3px 0"><b style="color:var(--cyan)">'+n.tag+'</b> '+n.text+'</li>';
+        });
+        h += '</ul>';
+      }
+      b.innerHTML = h || '<p style="color:var(--dim)">宏观数据加载中…</p>';
     })();
     </script>
 
@@ -4670,7 +4764,7 @@ function renderLimitUpHeatmap(){
   if(tm && D.update_time) tm.textContent = '更新于 ' + D.update_time;
 })();
 
-/* ===== 今日事件合并卡：V8_CAL 日历事件 + 盘前判定 + 宏观速览 ===== */
+/* ===== 今日事件卡：V8_CAL 日历事件 ===== */
 (function(){
   var D = window.V8_CAL || {weeks:[]};
   var now = new Date();
@@ -4695,38 +4789,6 @@ function renderLimitUpHeatmap(){
   var catName = {imp:'重要政策',cb:'央行/LPR',data:'中国数据',data2:'中国数据',fomc:'FOMC',us:'美股休市',hk:'港股休市',tw:'台股财报',a50:'A50交割',ipo:'IPO/财报',option:'期权交割',future:'期货交割',appl:'科技发布',sg:'SG公假',kr:'韩股财报',us_earnings:'美股财报',eu:'欧股财报',jp:'日股财报',caixin:'财新PMI'};
 
   var html = '';
-
-  // ===== 盘前判定（JUDGMENT_DATA）并入今日事件 =====
-  (function(){
-    var d = window.JUDGMENT_DATA;
-    if(d && d.date){
-      html += '<div style="margin-bottom:14px;padding:12px 14px;background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(245,158,11,0.04));border:1px solid rgba(245,158,11,0.25);border-radius:10px;border-left:4px solid #f59e0b;">';
-      html += '<div style="font-size:12px;color:var(--dim);margin-bottom:8px;font-weight:600">⚖️ 今日判定 · '+(d.date||'')+' · 盘前研判 · 更新于 '+(d.update_time||'--')+'</div>';
-      html += '<p style="margin:6px 0"><b style="color:var(--sub)">大盘：</b>'+(d.market||'')+'</p>';
-      if(d.indices && d.indices.length){
-        html += '<table style="width:100%;border-collapse:collapse;margin:6px 0;font-size:12px">'
-          + '<thead><tr style="background:rgba(245,158,11,0.12)">'
-          + '<th style="border:1px solid var(--border);padding:5px 8px;text-align:left;color:var(--txt)">指数</th>'
-          + '<th style="border:1px solid var(--border);padding:5px 8px;text-align:left;color:var(--txt)">控盘</th>'
-          + '<th style="border:1px solid var(--border);padding:5px 8px;text-align:left;color:var(--txt)">财神</th>'
-          + '<th style="border:1px solid var(--border);padding:5px 8px;text-align:left;color:var(--txt)">备注</th></tr></thead><tbody>';
-        d.indices.forEach(function(r){
-          html += '<tr><td style="border:1px solid var(--border);padding:5px 8px">'+r.name+'</td>'
-            + '<td style="border:1px solid var(--border);padding:5px 8px;color:var(--down)">'+r.ctrl+'</td>'
-            + '<td style="border:1px solid var(--border);padding:5px 8px;color:var(--down)">'+r.fs+'</td>'
-            + '<td style="border:1px solid var(--border);padding:5px 8px">'+(r.warn?'<span style="color:#f59e0b">⚠️ '+r.warn+'</span>':'')+'</td></tr>';
-        });
-        html += '</tbody></table>';
-      }
-      if(d.us) html += '<p style="margin:6px 0"><b style="color:var(--sub)">美股：</b><span style="color:var(--up)">'+d.us+'</span></p>';
-      if(d.verdict) html += '<p style="margin:6px 0"><b style="color:var(--sub)">→ 结论：</b>'+d.verdict+'</p>';
-      if(d.warning) html += '<p style="margin:6px 0;color:#f59e0b">⚠️ '+d.warning+'</p>';
-      html += '</div>';
-      html += '<div style="height:1px;background:rgba(255,255,255,.08);margin:12px 0"></div>';
-    }
-  })();
-
-  // ===== 日历事件 =====
   if(todayEvents && todayEvents.length){
     html += '<div style="margin-bottom:12px">';
     todayEvents.forEach(function(e){
@@ -4741,9 +4803,6 @@ function renderLimitUpHeatmap(){
   } else {
     html += '<div style="color:#888;padding:8px 0">📅 今日日历无标注事件</div>';
   }
-  try{
-    var M = window.MACRO_DATA||{}, N = window.NT_DATA||{};
-  }catch(err){}
   box.innerHTML = html || '<div style="color:#888;padding:12px">加载中…</div>';
 })();
 
@@ -8971,7 +9030,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(tht && D.update_time) tht.textContent = '交易日历 + 打新速览 · ' + D.update_time;
 })();
 
-/* 今日事件合并卡：日历事件 + 盘前判定 + 宏观速览 */
+/* 今日事件卡兜底：V8_CAL 日历事件（确保执行） */
 (function(){
   var D = window.V8_CAL || {weeks:[]};
   var now = new Date();
@@ -8995,38 +9054,6 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   var catName = {imp:'重要政策',cb:'央行/LPR',data:'中国数据',data2:'中国数据',fomc:'FOMC',us:'美股休市',hk:'港股休市',tw:'台股财报',a50:'A50交割',ipo:'IPO/财报',option:'期权交割',future:'期货交割',appl:'科技发布',sg:'SG公假',kr:'韩股财报',us_earnings:'美股财报',eu:'欧股财报',jp:'日股财报',caixin:'财新PMI'};
 
   var html = '';
-
-  // ===== 盘前判定（JUDGMENT_DATA）并入今日事件 =====
-  (function(){
-    var d = window.JUDGMENT_DATA;
-    if(d && d.date){
-      html += '<div style="margin-bottom:14px;padding:12px 14px;background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(245,158,11,0.04));border:1px solid rgba(245,158,11,0.25);border-radius:10px;border-left:4px solid #f59e0b;">';
-      html += '<div style="font-size:12px;color:var(--dim);margin-bottom:8px;font-weight:600">⚖️ 今日判定 · '+(d.date||'')+' · 盘前研判 · 更新于 '+(d.update_time||'--')+'</div>';
-      html += '<p style="margin:6px 0"><b style="color:var(--sub)">大盘：</b>'+(d.market||'')+'</p>';
-      if(d.indices && d.indices.length){
-        html += '<table style="width:100%;border-collapse:collapse;margin:6px 0;font-size:12px">'
-          + '<thead><tr style="background:rgba(245,158,11,0.12)">'
-          + '<th style="border:1px solid var(--border);padding:5px 8px;text-align:left;color:var(--txt)">指数</th>'
-          + '<th style="border:1px solid var(--border);padding:5px 8px;text-align:left;color:var(--txt)">控盘</th>'
-          + '<th style="border:1px solid var(--border);padding:5px 8px;text-align:left;color:var(--txt)">财神</th>'
-          + '<th style="border:1px solid var(--border);padding:5px 8px;text-align:left;color:var(--txt)">备注</th></tr></thead><tbody>';
-        d.indices.forEach(function(r){
-          html += '<tr><td style="border:1px solid var(--border);padding:5px 8px">'+r.name+'</td>'
-            + '<td style="border:1px solid var(--border);padding:5px 8px;color:var(--down)">'+r.ctrl+'</td>'
-            + '<td style="border:1px solid var(--border);padding:5px 8px;color:var(--down)">'+r.fs+'</td>'
-            + '<td style="border:1px solid var(--border);padding:5px 8px">'+(r.warn?'<span style="color:#f59e0b">⚠️ '+r.warn+'</span>':'')+'</td></tr>';
-        });
-        html += '</tbody></table>';
-      }
-      if(d.us) html += '<p style="margin:6px 0"><b style="color:var(--sub)">美股：</b><span style="color:var(--up)">'+d.us+'</span></p>';
-      if(d.verdict) html += '<p style="margin:6px 0"><b style="color:var(--sub)">→ 结论：</b>'+d.verdict+'</p>';
-      if(d.warning) html += '<p style="margin:6px 0;color:#f59e0b">⚠️ '+d.warning+'</p>';
-      html += '</div>';
-      html += '<div style="height:1px;background:rgba(255,255,255,.08);margin:12px 0"></div>';
-    }
-  })();
-
-  // ===== 日历事件 =====
   if(todayEvents && todayEvents.length){
     html += '<div style="margin-bottom:12px">';
     todayEvents.forEach(function(e){
@@ -9041,9 +9068,6 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   } else {
     html += '<div style="color:#888;padding:8px 0">📅 今日日历无标注事件</div>';
   }
-  try{
-    var M = window.MACRO_DATA||{}, N = window.NT_DATA||{};
-  }catch(err){}
   box.innerHTML = html || '<div style="color:#888;padding:12px">加载中…</div>';
 })();
 </script>
