@@ -861,19 +861,28 @@ def f_sector_fund_flow():
     # 板块/概念资金流：行业(m:90 t:2) + 概念(m:90 t:3)，主力净流入(f62, 元→亿)
     # 走 push2delay 镜像，规避实时 push2 host 的 WAF 重置。
     # 同时生成 sectors_in/out（供 renderSector 直接渲染）与 top_list（兼容降级）。
+    # 2026-08-05 修复：必须同时查降序(流入TOP)与升序(流出TOP)，否则 po='1' 只返回
+    # 净流入条目，sectors_out 恒为空，导致“净额(行业)”只加不减、数字虚高。
     items = []
     for stype, fs in [("行业", "m:90 t:2"), ("概念", "m:90 t:3")]:
-        rows = em_clist(fs, "f12,f14,f3,f62,f184", fid="f62", stat="1", pz=200)
-        for r in rows:
-            net = _to_yi(r.get("f62"))
-            if net == 0:
-                continue
-            items.append({
-                "name": r.get("f14"),
-                "type": stype,
-                "net": net,
-                "chg": round(float(r.get("f3") or 0), 2),
-            })
+        # 降序取流入、升序取流出，合并去重（同名同类型以绝对值大者为准）
+        by_key = {}
+        for po in ("1", "0"):
+            rows = em_clist(fs, "f12,f14,f3,f62,f184", fid="f62", stat="1", pz=200, po=po)
+            for r in rows:
+                name = r.get("f14")
+                net = _to_yi(r.get("f62"))
+                if not name or net == 0:
+                    continue
+                key = (name, stype)
+                if key not in by_key or abs(net) > abs(by_key[key]["net"]):
+                    by_key[key] = {
+                        "name": name,
+                        "type": stype,
+                        "net": net,
+                        "chg": round(float(r.get("f3") or 0), 2),
+                    }
+        items.extend(by_key.values())
     if not items:
         return None
     items.sort(key=lambda x: x["net"], reverse=True)
@@ -883,7 +892,7 @@ def f_sector_fund_flow():
         "sectors_in": sectors_in,
         "sectors_out": sectors_out,
         "top_list": items,
-        "note": "行业+概念主力净流入(亿)，来源东方财富push2delay",
+        "note": "行业+概念主力净流入(亿)，来源东方财富push2delay（升序+降序合并）",
         "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
     }
 
