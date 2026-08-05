@@ -769,7 +769,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
   <!-- ============ 实时数据 ============ -->
   <section id="sec-rt">
-    <div class="sec-head"><h2>📡 实时数据</h2><span class="fresh" id="rtUpdateTime">—</span><span class="tag">盘中 T+0 · 数据延迟约 3~5 秒</span></div>
+    <div class="sec-head"><h2>📡 实时数据</h2><span class="tag">盘中 T+0 · 数据延迟约 3~5 秒</span></div>
 
     <!-- 🧠 AI市场速览（B 阶段：由 gen_market_brief.py 根据盘中实时数据规则生成） -->
     <div id="aiSummaryCard" style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">
@@ -6995,24 +6995,10 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   function initPostMarket(){
     const safe=(fn,...args)=>{try{fn(...args);}catch(e){console.warn('模块渲染失败',fn&&fn.name,e);}};
 
-    // 实时数据区统一时间：取所有盘中数据的最晚 update_time
-    const intradayTimes=[
-      window.ETF_PULSE && window.ETF_PULSE.update_time,
-      window.ETF_INTRADAY_HEAT && window.ETF_INTRADAY_HEAT.update_time,
-      window.ETF_SUBSCRIPTION && window.ETF_SUBSCRIPTION.update_time,
-      window.ETF_DAILY_MONITOR && window.ETF_DAILY_MONITOR.update_time,
-      window.SECTOR_FUND_FLOW && window.SECTOR_FUND_FLOW.update_time,
-      window.INDEX_QUOTES && window.INDEX_QUOTES.update_time,
-      window.CONCEPT_RANKING && window.CONCEPT_RANKING.update_time,
-      window.LIMIT_UP_HEATMAP && window.LIMIT_UP_HEATMAP.update_time,
-      window.CAPITAL_FLOW_DATA && window.CAPITAL_FLOW_DATA.update_time,
-      window.MARKET_FUND_FLOW_DATA && window.MARKET_FUND_FLOW_DATA.update_time,
-      window.SH_SZ_HISTORY && window.SH_SZ_HISTORY.update_time,
-    ].filter(Boolean);
-    if(intradayTimes.length){
-      intradayTimes.sort();
-      setBadge('rtUpdateTime','实时','短线', intradayTimes[intradayTimes.length-1]);
-    }
+    // 实时数据区 section header 不显示具体时间（主人 2026-08-06 06:54 明确指示：
+    //   「实时数据 / 今日事件 / 盘后数据」三个 section header 是分类标题级大卡，
+    //   不挂带具体时间的 🐻 胶囊；时间统一在下属各子卡片上展示）
+    // 原代码曾在 rtUpdateTime 拼一个 max(intradayTimes) 的胶囊徽章,已删除。
 
     // 1) ETF 三合一（盘中异动/资金热度/日监控）—— 直接用已注入的 window 变量
     safe(renderEtfPulse, window.ETF_PULSE || {});
@@ -8735,7 +8721,8 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   var tm = document.getElementById('v8caltime');
   if(tm && D.update_time) tm.innerHTML = _uBadge('周度','中长线',D.update_time);
   var tht = document.getElementById('tdHeaderTag');
-  if(tht && D.update_time) tht.textContent = '交易日历 + 打新速览 · ' + D.update_time;
+  // section header 大卡不写具体时间（主人 2026-08-06 06:54 明确指示）
+  if(tht) tht.textContent = '交易日历 + 打新速览';
 })();
 
 /* 今日事件卡兜底：V8_CAL 日历事件（确保执行） */
