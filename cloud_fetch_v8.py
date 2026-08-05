@@ -1834,9 +1834,9 @@ def f_market_alerts():
     print(f"  🔄 调用市场预警孤儿模块: {script.name}")
     try:
         r = _sp.run([sys.executable, str(script)], cwd=str(ROOT),
-                    capture_output=True, text=True, timeout=300)
+                    capture_output=True, text=True, timeout=90)
     except Exception as e:
-        raise RuntimeError(f"fetch_orphan_market_alerts 调用异常: {e}")
+        raise RuntimeError(f"fetch_orphan_market_alerts 调用异常(90s超时): {e}")
     if r.returncode != 0:
         raise RuntimeError(f"fetch_orphan_market_alerts exit {r.returncode}: {r.stderr[:160]}")
     p = RAW_DIR / "market_alerts.json"
