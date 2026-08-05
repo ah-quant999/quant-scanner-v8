@@ -55,6 +55,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
+      # 🔴 2026-08-06 00:10 必须保留：云端 runner 默认 UTC，朴素 datetime.now() 写出的
+      #   update_time 会比北京时间慢 8 小时，前端「更新于」与新鲜度判定全线错位。
+      #   显式声明时区后与中国节点产出一致；显式带 tzinfo 的写法不受影响，不会双重偏移。
+      TZ: Asia/Shanghai
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     defaults:
       run:

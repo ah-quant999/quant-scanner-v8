@@ -41,6 +41,11 @@ jobs:
           git commit -m "backup: v8 每日自动备份 $(TZ=Asia/Shanghai date '+%Y-%m-%d')" 2>/dev/null || echo "无新备份"
           git push origin main 2>/dev/null || echo "推送跳过（无新内容）"
 
+      - name: "🔍 逻辑详解页/运维页 对齐校验"
+        continue-on-error: true
+        run: |
+          python3 align_logic_ops.py || echo "⚠️ 对齐校验发现漂移（见上方输出），已记录至 HANDOVER_LOG，不影响备份完成"
+
       - name: "📝 写日志"
         run: |
           echo "{\"time\":\"$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S')\",\"mode\":\"v8_cloud_backup\",\"host\":\"GitHubActions\",\"success\":true}" >> HANDOVER_LOG.jsonl

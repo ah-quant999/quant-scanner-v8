@@ -36,6 +36,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
+      # 🔴 2026-08-06 00:10 必须保留：云端 runner 默认 UTC，脚本里凡是用朴素 datetime.now()
+      #   写的 update_time 会比北京时间慢 8 小时（run#31021842600 实测：lhb_data/candidate/
+      #   inst_trade 写成 15:5x，实际是 23:5x），前端「更新于」相对时间会整体错一个时区，
+      #   新鲜度守卫在北京 00:00-08:00 还会把当天数据误判成昨天。
+      #   显式声明时区后，朴素 now() 即北京时间，与中国节点产出完全一致。
+      #   （显式带 tzinfo 的写法不受本变量影响，不会双重偏移。）
+      TZ: Asia/Shanghai
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       V8_PUSH: "1"
       SKIP_MOOTDX: "1"
