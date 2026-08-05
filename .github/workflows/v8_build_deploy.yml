@@ -38,6 +38,7 @@ on:
   workflow_run:
     workflows:
       - "🇨🇳 v8 中国数据抓取(cn)"
+      - "🇨🇳 v8 中国数据抓取(云端)"
       - "🌍 v8 实时风险温度计"
     types: [completed]
     branches: [main]
