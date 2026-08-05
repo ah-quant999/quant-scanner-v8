@@ -82,11 +82,11 @@ CATEGORY_MAP = {
     "MARGIN_DATA": "premarket",
     "CFFEX_HOLDINGS": "premarket",
     "MACRO_DATA": "premarket",
-    "CRISIS_DATA": "premarket",
+    "CRISIS_DATA": "premarket,intraday",
     "NORTH_FUND": "premarket",
     "ANALYST_RATINGS": "premarket",
     "SUSPENSION_ALERT": "premarket",
-    "MARKET_ALERTS": "premarket",
+    "MARKET_ALERTS": "intraday",
     "W52_HIGH": "premarket",
     "HERDING_DATA": "premarket",
     "JUDGMENT_DATA": "premarket",
@@ -294,12 +294,14 @@ def _write_js(var_name, obj):
 
 
 def _var_category(var_name):
-    return CATEGORY_MAP.get(var_name, "post_close")
+    c = CATEGORY_MAP.get(var_name, "post_close")
+    # 支持多类别（逗号分隔），如 "premarket,intraday"
+    return [x.strip() for x in c.split(",")]
 
 
 def _file_category(filename):
     var_name = DATA_SOURCES.get(filename)
-    return _var_category(var_name) if var_name else None
+    return _var_category(var_name) if var_name else []
 
 
 def _list_changed_raw_files():
@@ -338,16 +340,17 @@ def build(category=None, detect_changes=False):
     if detect_changes:
         changed = _list_changed_raw_files()
         changed_names = {p.name for p in changed}
-        affected_cats = {_file_category(p.name) for p in changed}
-        affected_cats.discard(None)
+        affected_cats = set()
+        for p in changed:
+            affected_cats.update(_file_category(p.name))
         print(f"🔍 detect_changes 模式：变化 raw_data {len(changed)} 个，涉及类别 {sorted(affected_cats) or '无'}")
         if not affected_cats:
             print("   无受影响的类别，跳过构建。")
             return 0
-        target_files = [p for p in files if _file_category(p.name) in affected_cats]
+        target_files = [p for p in files if set(_file_category(p.name)) & affected_cats]
     elif category:
         print(f"🔍 category={category}（{CATEGORY_LABEL.get(category, category)}） selective build")
-        target_files = [p for p in files if _file_category(p.name) == category]
+        target_files = [p for p in files if category in _file_category(p.name)]
     else:
         print("🔍 全量构建模式")
         target_files = files

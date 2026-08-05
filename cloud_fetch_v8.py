@@ -61,6 +61,7 @@ VAR_TO_RAW = {
     "V8_CAL": "v8_cal.json",
     "CANDIDATE_QUOTES": "candidate_quotes.json",
     "SH_SZ_HISTORY": "sh_sz_history.json",
+    "MARKET_ALERTS": "market_alerts.json",
 }
 
 # 变量名 → 更新时段（与 update_v8.py 的 CATEGORY_MAP 对齐）
@@ -90,6 +91,7 @@ CATEGORY_MAP = {
     "LIMIT_UP_HEATMAP": "intraday",
     "CANDIDATE_QUOTES": "intraday",  # 候选池实时行情：行业树图第二层（个股）数据源
     "SH_SZ_HISTORY": "intraday",  # 沪深成交额历史（滚动窗口，盘中最少5刷）
+    "MARKET_ALERTS": "intraday",  # 市场预警（孤儿模块 fetch_orphan_market_alerts.py 接入盘中刷新）
     # 盘后（15:30 后）：大盘资金流时间轴，累积历史序列，避免盘中覆盖
     "MARKET_FUND_FLOW_DATA": "post_close",
     # 15:30 收盘数据：EXPERIMENT 等 akshare 可抓的 T+1 数据
@@ -1820,6 +1822,29 @@ def f_experiment():
     }
 
 
+def f_market_alerts():
+    """市场预警（全市场异动速览）：接入盘中刷新。
+    复用孤儿模块 algorithms/fetch_orphan_market_alerts.py（原 v6 fetch_market_alerts.py 移植）。
+    盘中每30分钟刷新一次，避免长期停更到凌晨的历史残留值。"""
+    import subprocess as _sp
+    script = ROOT / "algorithms" / "fetch_orphan_market_alerts.py"
+    if not script.exists():
+        print(f"  ⚠️ 未找到 {script}")
+        return None
+    print(f"  🔄 调用市场预警孤儿模块: {script.name}")
+    try:
+        r = _sp.run([sys.executable, str(script)], cwd=str(ROOT),
+                    capture_output=True, text=True, timeout=300)
+    except Exception as e:
+        raise RuntimeError(f"fetch_orphan_market_alerts 调用异常: {e}")
+    if r.returncode != 0:
+        raise RuntimeError(f"fetch_orphan_market_alerts exit {r.returncode}: {r.stderr[:160]}")
+    p = RAW_DIR / "market_alerts.json"
+    if p.exists():
+        return json.loads(p.read_text(encoding="utf-8"))
+    return None
+
+
 def f_v8_cal(today=None):
     """重要事件日历：自动生成【当前月】日历。
     - 频率控制：仅在每月 1~3 号执行完整生成；其余日期直接返回已有缓存（v8_cal.json），
@@ -2238,6 +2263,9 @@ def main(category=None, only=None):
     # 🔧 盘前（08:25）额外补抓 MARKET_FUND_FLOW_DATA（日频资金流时间轴，防止 15:30 post_close 漏跑导致滞后一天）
     if category == "premarket" and target_vars is not None:
         target_vars.add("MARKET_FUND_FLOW_DATA")
+    # 🔧 盘中额外补抓 CRISIS_DATA（危机温度计实时刷新，盘前仅一次不够）
+    if category == "intraday" and target_vars is not None:
+        target_vars.add("CRISIS_DATA")
 
     if only:
         print("  ⏭️ --only 模式，跳过 raw_data 清理（保留其他时段数据）")
@@ -2433,6 +2461,7 @@ def main(category=None, only=None):
         ("SH_SZ_HISTORY", f_sh_sz_history),
         ("JUDGMENT_DATA", f_judgment),
         ("MACRO_BRIEF", f_macro_brief),
+        ("MARKET_ALERTS", f_market_alerts),
     ]
 
     for var, fn in tasks:
