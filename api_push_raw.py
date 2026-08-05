@@ -75,13 +75,25 @@ def walk_raw():
     return out
 
 
+def walk_extra():
+    """额外推送文件（不在 raw_data/，但由抓取脚本直接写 data/，如四量终极选股结果）。"""
+    out = {}
+    extra = ["data/FOUR_VOLUME.js"]
+    for rel in extra:
+        if os.path.isfile(rel):
+            with open(rel, "rb") as fh:
+                out[rel] = fh.read()
+    return out
+
+
 def main():
     files = walk_raw()
+    files.update(walk_extra())
     if not files:
         print("ℹ️ raw_data 为空，跳过"); sys.exit(0)
     print(f"待推送文件: {len(files)} 个 -> {sorted(files)[:5]} ...")
 
-    # 现有 main 树里的 raw_data 子树的 blob sha，用于变更检测
+    # 现有 main 树里的 raw_data 子树（及额外文件）的 blob sha，用于变更检测
     ref = api("GET", f"/repos/{REPO}/git/refs/heads/main")
     if "__error__" in ref:
         print("❌ 获取 main ref 失败:", ref.get("__msg__")); sys.exit(1)
@@ -91,7 +103,7 @@ def main():
     existing = {}
     tfull = api("GET", f"/repos/{REPO}/git/trees/{base_tree}?recursive=1")
     for e in tfull.get("tree", []):
-        if e["path"].startswith("raw_data/") and e["type"] == "blob":
+        if (e["path"].startswith("raw_data/") or e["path"] == "data/FOUR_VOLUME.js") and e["type"] == "blob":
             existing[e["path"]] = e["sha"]
 
     # 上传 blobs（幂等：内容相同则 sha 相同）

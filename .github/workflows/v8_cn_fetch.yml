@@ -101,6 +101,7 @@ jobs:
               'cloud_fetch_v8.py', 'api_push_raw.py',
               'fetch_ipo_data_v8.py', 'fetch_limit_up_heatmap_v8.py',
               'backfill_lhb_history.py', 'algorithms/gen_market_brief.py',
+              'algorithms/strategy_four_volume.py', 'algorithms/scanner.py',
               'out/lhb_seats.json'
           ]
           for fn in files:

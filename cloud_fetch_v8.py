@@ -2611,8 +2611,12 @@ def main(category=None, only=None):
         try:
             script = ROOT / "algorithms" / "strategy_four_volume.py"
             print(f"🔥 四量终极选股: {script.name}")
+            # 云端强制 CLOUD_RUNNER=true：scanner 统一走腾讯 GTimg 数据源（东财/mootdx 云端不可靠）
+            _env = dict(os.environ)
+            _env["CLOUD_RUNNER"] = "true"
             r = _sp.run([sys.executable, str(script), "--top", "80"],
-                        cwd=str(ROOT), capture_output=True, text=True, timeout=1200)
+                        cwd=str(ROOT), capture_output=True, text=True, timeout=1200,
+                        env=_env)
             out = (r.stdout or "") + (r.stderr or "")
             for line in out.strip().splitlines()[-6:]:
                 print("   ", line)
