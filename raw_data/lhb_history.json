@@ -28537,10 +28537,10 @@
   "trading": false,
   "stocks": []
  },
- "update_time": "2026-08-04 18:13:46",
+ "update_time": "2026-08-05 15:26:52",
  "range": [
-  "2026-06-10",
-  "2026-08-04"
+  "2026-06-11",
+  "2026-08-05"
  ],
  "2026-06-10": {
   "trading": true,
@@ -61378,5 +61378,9 @@
    "总计": 98
   }
  },
- "backfill_days": 40
+ "backfill_days": 40,
+ "2026-08-05": {
+  "trading": false,
+  "error": "'NoneType' object is not subscriptable"
+ }
 }
