@@ -39,8 +39,12 @@ def api(method, path, data=None):
     }
     body = json.dumps(data).encode("utf-8") if data is not None else None
     req = urllib.request.Request(url, data=body, headers=headers, method=method)
+    # 2026-08-05 修复：timeout 90s 对候选池等大文件 blob 上传太紧，cn runner 网络抖动时
+    # 触发 TimeoutError 且未被捕获 → 整个推送进程崩溃（exit 1），54 个文件全部不落地。
+    # 1) 超时放宽到 300s；2) 捕获网络类异常（TimeoutError/URLError/OSError）返回错误 dict，
+    #    让调用方（blob 上传循环的 3 次重试 + 跳过）逻辑真正生效，而不是整体崩溃。
     try:
-        with urllib.request.urlopen(req, timeout=90) as r:
+        with urllib.request.urlopen(req, timeout=300) as r:
             txt = r.read().decode("utf-8")
             return json.loads(txt) if txt else {}
     except urllib.error.HTTPError as e:
@@ -53,6 +57,9 @@ def api(method, path, data=None):
         except Exception:
             print(f"     body: {body[:500]}")
         return {"__error__": e.code, "__msg__": body}
+    except (TimeoutError, urllib.error.URLError, OSError) as e:
+        print(f"  ⚠️ API {method} {path} -> 网络异常 {type(e).__name__}: {e}")
+        return {"__error__": "network", "__msg__": str(e)}
 
 
 def walk_raw():
