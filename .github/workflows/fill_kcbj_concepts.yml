@@ -11,9 +11,9 @@ on:
         description: "是否写回主文件 (true/false)"
         required: false
         default: "true"
-  # 盘后每天 18:05 自动跑（在 algo_run 之前，让新映射进入下游）
-  schedule:
-    - cron: "5 10 * * 1-5"
+  # 注意：东财源在 unit 机与 GHA 均不可达(502/RemoteDisconnected)，同花顺无成分股函数，
+  # 故 P1 概念补全当前被数据源封死。保留手动 dispatch 以便东财恢复后手动触发，
+  # 不挂自动 schedule（避免每日产生必失败的 cancelled run）。
 
 permissions:
   contents: write
