@@ -46,11 +46,16 @@ except Exception:
 
 REPO = "ah-quant999/quant-scanner-v8"
 SITE_URL = "https://ah-quant999.github.io/quant-scanner-v8/"
-CN_WORKFLOW_NAME = "🇨🇳 v8 中国数据抓取(cn)"
+# 2026-08-06 修正：阿狸咪 08-05 把中国数据抓取迁到云端 ubuntu，workflow 改名 + 新 id。
+# 旧常量 "(cn)" / 324135267 已两个都不匹配 → 夜间靠 in_schedule_window 豁免掩盖成"假绿"，
+# 白天调度窗口内会每小时误报一封告警邮件。此处切到云端主力，自建 runner 版降级为应急备份。
+CN_WORKFLOW_NAME = "🇨🇳 v8 中国数据抓取(云端)"          # v8_cn_fetch_cloud.yml（主力）
+CN_WORKFLOW_NAME_FALLBACK = "🇨🇳 v8 中国数据抓取(cn·应急)"  # v8_cn_fetch.yml（自建 runner 应急）
 BD_WORKFLOW_NAME = "☁️ v8 构建部署(云端ubuntu)"
 RUNNER_DIR = Path("D:/actions-runner-v8")
 RUNNER_EXE = RUNNER_DIR / "bin" / "Runner.Listener.exe"
-CN_WORKFLOW_ID = 324135267  # v8_cn_fetch workflow id（用于 API 派发）
+CN_WORKFLOW_ID = 327687211           # v8_cn_fetch_cloud.yml（云端 ubuntu 主力，用于 API 派发）
+CN_WORKFLOW_ID_FALLBACK = 324135267  # v8_cn_fetch.yml（自建 cn runner 应急）
 
 # 尝试从多个位置读取 token（本地文件优先，不落入仓库）
 def _load_token():
@@ -193,7 +198,9 @@ def in_schedule_window(kind, now_cst=None):
     if kind == "cn_fetch":
         if weekend:
             return 9 <= h <= 11          # 周末只有 09:00 一轮
-        return 8 <= h <= 16              # 收盘 15:30 + 1h 容错
+        # 2026-08-06 修正：云端 v8_cn_fetch_cloud 除盘中槽外新增 16:30 港股补抓、
+        # 17:00 与 21:00 两个全量兜底 cron，旧窗口 8-16 会把 17:00/21:00 故障静默掉。
+        return 8 <= h <= 22              # 云端 08:25~21:00（含 16:30/17:00/21:00 兜底）+1h 容错
     if kind == "build_deploy":
         if weekend:
             return 9 <= h <= 22
@@ -365,7 +372,7 @@ def main():
 
     ok, msg = check_workflow(CN_WORKFLOW_NAME, "cn_fetch", max_age_min=120)
     if not ok and not in_schedule_window("cn_fetch", now_cst):
-        ok, msg = True, msg + " —— 非调度时段，豁免（cn_fetch 仅工作日 08:25-15:30 有 cron）"
+        ok, msg = True, msg + " —— 非调度时段，豁免（cn_fetch 工作日 08:25-21:00 有 cron，周末仅 09:00）"
     results.append(("cn_fetch", ok, msg))
 
     ok, msg = check_workflow(BD_WORKFLOW_NAME, "build_deploy", max_age_min=120)

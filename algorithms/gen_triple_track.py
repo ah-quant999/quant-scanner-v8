@@ -33,6 +33,10 @@ from datetime import datetime
 WORKSPACE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(WORKSPACE, "..", "out")
 OUT = os.path.join(DATA_DIR, "triple_track.json")
+# 2026-08-06 补：line 57 `def load_meta_map(path=META_FILE)` 引用了本文件从未定义的 META_FILE
+# （复制自 gen_triple_consensus.py 时漏带常量），默认参数在定义时即求值 → 每轮 NameError 必崩，
+# out/triple_track.json 从未生成，前端「历史追踪」长期吃 08-04 僵尸数据。定义与 consensus 一致。
+META_FILE = os.path.join(WORKSPACE, "stock_industry_concepts.json")
 
 
 def load_json(path, default=None):
