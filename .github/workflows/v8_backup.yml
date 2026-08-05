@@ -1,6 +1,14 @@
 # 九宝量化 v8 — 每日自动备份 (21:00 CST)
-# 对齐 v6 cloud_backup.yml 21:00 CST；备份 raw_data/*.json 防意外丢失。
+# cron 时间口径溯源：v6 cloud_backup.yml (现仅归档) 当时用 0 13 * * * (= 21:00 CST)，
+# v8 沿用同口径以便主人 23 点睡前能核对当天的 raw_data 健康度。
 # raw_data 由 git 历史 + Pages 回溯只是兜底，主动备份更稳。
+#
+# 本 workflow 不只备份，还承担【每日审计】职责（主人 2026-08-06 确立）：
+#   ① 与单位机小九交接：检查当天 HANDOVER_小九_YYYY-MM-DD.md 是否存在
+#   ② 当天修改审核通过防覆盖：拉今天 origin/main 全部人工 commit，关键词必须在交接文档中命中
+#   ③ 运维页/逻辑详解页对齐：align_logic_ops.py
+#   ④ 卡片徽章统一：verify_card_badges.py
+# 漂移均不阻断备份（continue-on-error），仅告警 + 落 HANDOVER_LOG.jsonl。
 
 name: "☁️ v8 每日自动备份 (21:00)"
 
@@ -41,11 +49,16 @@ jobs:
           git commit -m "backup: v8 每日自动备份 $(TZ=Asia/Shanghai date '+%Y-%m-%d')" 2>/dev/null || echo "无新备份"
           git push origin main 2>/dev/null || echo "推送跳过（无新内容）"
 
-      - name: "🔍 逻辑详解页/运维页 对齐校验"
+      - name: "🎯 v8 每日审计（与小九交接 + 防覆盖 + 运维页对齐 + 卡片徽章）"
         continue-on-error: true
         run: |
-          python3 align_logic_ops.py || echo "⚠️ 对齐校验发现漂移（见上方输出），已记录至 HANDOVER_LOG，不影响备份完成"
-          echo "---"
+          echo "── ① 与单位机小九交接 + 当天修改审核通过防覆盖 ──"
+          python3 verify_daily_audit.py || echo "⚠️ 每日审计发现漂移（见上方输出），已记录至 HANDOVER_LOG，不影响备份完成"
+          echo ""
+          echo "── ② 运维页/逻辑详解页 与 workflow 调度对齐校验 ──"
+          python3 align_logic_ops.py || echo "⚠️ 运维页/逻辑详解页对齐发现漂移（见上方输出），已记录至 HANDOVER_LOG，不影响备份完成"
+          echo ""
+          echo "── ③ 全站「更新于」卡片徽章统一校验 ──"
           python3 verify_card_badges.py || echo "⚠️ 卡片徽章校验发现漂移（见上方输出），已记录至 HANDOVER_LOG，不影响备份完成"
 
       - name: "📝 写日志"
