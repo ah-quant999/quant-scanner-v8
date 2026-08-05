@@ -2250,7 +2250,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     <!-- ===== TAB 页面：三重共识（默认展示） ===== -->
     <div id="st-tc" class="st-pane active">
       <div class="card">
-        <h3><span class="ic">🥇</span>严格三重共识 - 盘后 · <span class="fresh" id="tcTime">—</span><span class="fresh" id="tcDataTime" style="margin-left:8px;font-weight:400;"></span></h3>
+        <h3><span class="ic">🥇</span>严格三重共识 - 盘后 · <span class="fresh" id="tcTime">—</span></h3>
         <div id="tcConsensus" class="tp-stocklist"></div>
         <div class="note">筛选：主站TOP10≥70 且 驾驶舱A档 且 基本面A档。下方「优先/扩展观察」为差1步/差2步备选（主站评分≥75）。</div>
       </div>
@@ -2319,9 +2319,6 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
           📊 <span style="font-weight:700;font-size:14px;color:var(--txt);">CRDS · 逆势龙头</span>
           <span id="stcrdsTime" style="font-size:12px;color:var(--dim);font-weight:500;background:var(--bg2);padding:1px 8px;border-radius:8px;">更新 ...</span>
-          <span style="font-size:10px;color:#fff;background:#c62828;padding:1px 7px;border-radius:8px;">短线</span>
-          <span style="font-size:10px;color:#fff;background:#1565c0;padding:1px 7px;border-radius:8px;">盘后</span>
-          <span style="font-size:10px;color:#fff;background:#607d8b;padding:1px 7px;border-radius:8px;">日频</span>
         </div>
         <div id="stcrdsCoverage" style="font-size:11px;color:var(--dim);margin-bottom:8px;line-height:1.6;"></div>
         <div id="stcrdsStandby" style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:8px;background:rgba(240,160,32,0.10);border-left:4px solid #f0a020;font-size:15px;font-weight:600;color:#e8b54a;line-height:1.65;letter-spacing:0.2px;"></div>
@@ -2650,8 +2647,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
     var h = '';
     h += '<div class="cal-header-row">';
-    h += '<span class="cal-title">📅 机游共振日历</span>';
-    h += '<span class="cal-meta">' + year + '年' + (month+1) + '月 &nbsp;|&nbsp; ' + _uBadge('盘后', '短线', D.update_time) + '</span>';
+    h += '<span class="cal-title">📅 机游共振日历 ' + _uBadge('盘后', '短线', D.update_time) + '</span>';
+    h += '<span class="cal-meta">' + year + '年' + (month+1) + '月</span>';
     h += '</div>';
 
     // Legend
@@ -2933,8 +2930,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
     var h = '';
     h += '<div class="cal-header-row">';
-    h += '<span class="cal-title">🌊 北向资金日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span></span>';
-    h += '<span class="cal-meta">' + _uBadge('盘后', '短线', NF.update_time) + '</span>';
+    h += '<span class="cal-title">🌊 北向资金日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span> ' + _uBadge('盘后', '短线', NF.update_time) + '</span>';
+    h += '<span class="cal-meta"></span>';
     h += '</div>';
 
     // Notice box（精简·去掉过期"已停更"信息）
@@ -7098,8 +7095,6 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     $('tcExtCount').textContent=ext.length;
     $('tcExtended').innerHTML=ext.length?ext.map(s=>renderStock(s,true,tm)).join(''):'<div class="tp-empty">暂无</div>';
     setBadge('tcTime','盘后','短线',data.update_time);
-    var dtEl=$('tcDataTime');
-    if(dtEl && data.data_time){ dtEl.innerHTML = _uBadge('','','数据时间 '+rel(data.data_time)); }
   }
 
   function renderCandidateCard(p){
