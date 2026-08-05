@@ -1,0 +1,202 @@
+# 九宝量化 v8.0 — Runner 健康监控（24/7 离线即时告警）
+#
+# 2026-08-05 新增：主人「怕小九停电」要求发现 runner 离线立刻告警。
+# 方案：每 10 分钟由 GitHub 云端 ubuntu-latest 自检 lemoncat-cn runner 状态，
+# 离线即开 GitHub Issue（带 runner-offline 标签+@主人），恢复时自动关闭。
+# 同步把状态写入 data/RUNNER_STATUS_HEALTH.js 让运维面板可见。
+#
+# 24/7 跑、不依赖小九在线；GHA cron 永不漏跑、无 safe-delete 拦截。
+
+name: "🚨 Runner 健康监控"
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'    # 每 10 分钟一次
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: '仅探测不写 Issue（调试用）'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['true', 'false']
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  check-runner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: "🩺 检测 lemoncat-cn runner 状态"
+        id: probe
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          python3 << 'PYEOF'
+          import os, json, subprocess, sys
+          from datetime import datetime, timezone, timedelta
+
+          token = os.environ['GH_TOKEN']
+          repo = 'ah-quant999/quant-scanner-v8'
+          dry = os.environ.get('DRY_RUN', 'false') == 'true'
+          now_utc = datetime.now(timezone.utc)
+          now_bj = now_utc.astimezone(timezone(timedelta(hours=8)))
+
+          env = {**os.environ, 'GH_TOKEN': token}
+
+          # ── 1. 查 lemoncat-cn runner ──
+          r = subprocess.run(
+              ['gh', 'api', f'repos/{repo}/actions/runners'],
+              env=env, capture_output=True, text=True
+          )
+          if r.returncode != 0:
+              print(f"::error::查 runners 失败: {r.stderr[:200]}")
+              sys.exit(1)
+          runners = json.loads(r.stdout).get('runners', [])
+          lemoncat = next((x for x in runners if x.get('name') == 'lemoncat-cn'), None)
+          if lemoncat is None:
+              state = 'missing'
+              busy = False
+              status = 'unknown'
+              online = False
+              print("::warning::lemoncat-cn runner 未找到（可能已移除）")
+          else:
+              status = lemoncat.get('status', 'unknown')
+              online = lemoncat.get('online', False) and status == 'online'
+              busy = lemoncat.get('busy', False)
+              state = 'online' if online else 'offline'
+          print(f"  lemoncat-cn: status={status} online={online} busy={busy} → state={state}")
+
+          # ── 2. 查现有 runner-offline Issue ──
+          r = subprocess.run(
+              ['gh', 'issue', 'list', '--repo', repo, '--state', 'open',
+               '--label', 'runner-offline', '--json', 'number,createdAt',
+               '--limit', '5'],
+              env=env, capture_output=True, text=True
+          )
+          open_issues = json.loads(r.stdout) if r.returncode == 0 else []
+          print(f"  当前 open runner-offline issue: {[i['number'] for i in open_issues]}")
+
+          # ── 3. 根据 state 决定动作 ──
+          action = 'none'
+          if state == 'offline':
+              if not open_issues:
+                  if dry:
+                      print("  [DRY-RUN] 离线但不开 issue")
+                  else:
+                      # 写状态文件
+                      health = {
+                          "runner": "lemoncat-cn",
+                          "state": state,
+                          "busy": busy,
+                          "status": status,
+                          "online": online,
+                          "checked_at_utc": now_utc.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                          "checked_at_bj": now_bj.strftime("%Y-%m-%d %H:%M:%S"),
+                          "source": "runner_health_alert.yml",
+                      }
+                      with open('data/RUNNER_STATUS_HEALTH.js', 'w', encoding='utf-8') as f:
+                          f.write('window.RUNNER_STATUS_HEALTH = ' + json.dumps(health, ensure_ascii=False) + ';\n')
+                      subprocess.run(['git', 'config', 'user.name', 'github-actions[bot]'], check=True)
+                      subprocess.run(['git', 'config', 'user.email', 'github-actions[bot]@users.noreply.github.com'], check=True)
+                      subprocess.run(['git', 'add', 'data/RUNNER_STATUS_HEALTH.js'], check=True)
+                      subprocess.run(['git', 'commit', '-m', f'runner health: lemoncat-cn offline @ {now_bj.strftime("%Y-%m-%d %H:%M:%S")}'], check=True)
+                      subprocess.run(['git', 'push'], check=True)
+                      # 开 issue
+                      body = f'''@ah-quant999 ⚠️ **lemoncat-cn runner 离线**
+
+- 检测时间: {now_bj.strftime("%Y-%m-%d %H:%M:%S")} 北京
+- GitHub status: `{status}`
+- online: `{online}`
+- busy: `{busy}`
+
+**后果**: v8_cn_fetch / v8_algo 全部 cron 漏跑 → 实时数据停更
+**可能原因**: 小九机器停电 / 网络断 / runner 服务未启动 / 安全软件拦截
+
+**自愈路径**: 
+- 数据陈旧 → 邮件报警 + v8_postclose_guard.py 自愈
+- 恢复后本 workflow 会自动关闭此 issue
+
+---
+*本 issue 由 `runner_health_alert.yml` 自动创建*
+'''
+                      subprocess.run([
+                          'gh', 'issue', 'create', '--repo', repo,
+                          '--title', f'🚨 lemoncat-cn runner 离线 ({now_bj.strftime("%m-%d %H:%M")})',
+                          '--body', body,
+                          '--label', 'runner-offline',
+                          '--assignee', 'ah-quant999',
+                      ], env=env, check=True)
+                      action = 'opened_issue'
+                  print(f"  action: {action}")
+              else:
+                  # 已有 issue：检查是否超时（超过 6h 加 note）
+                  age_h = (now_utc - datetime.fromisoformat(open_issues[0]['createdAt'].replace('Z', '+00:00'))).total_seconds() / 3600
+                  print(f"  issue #{open_issues[0]['number']} 已开 {age_h:.1f}h")
+                  action = 'keep_existing'
+          else:
+              # 在线 → 关闭所有 open issue
+              if open_issues and not dry:
+                  for iss in open_issues:
+                      subprocess.run([
+                          'gh', 'issue', 'close', str(iss['number']),
+                          '--repo', repo,
+                          '--comment', f'✅ lemoncat-cn runner 已恢复在线（{now_bj.strftime("%Y-%m-%d %H:%M:%S")} 北京），本 issue 自动关闭。',
+                      ], env=env, check=True)
+                      print(f"  closed issue #{iss['number']}")
+                      action = 'closed_issue'
+              else:
+                  print("  在线无操作")
+          # 4. 写状态文件（无论是否离线都更新一次最新探测时间）
+          if not dry:
+              health = {
+                  "runner": "lemoncat-cn",
+                  "state": state,
+                  "busy": busy,
+                  "status": status,
+                  "online": online,
+                  "checked_at_utc": now_utc.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                  "checked_at_bj": now_bj.strftime("%Y-%m-%d %H:%M:%S"),
+                  "source": "runner_health_alert.yml",
+              }
+              with open('data/RUNNER_STATUS_HEALTH.js', 'w', encoding='utf-8') as f:
+                  f.write('window.RUNNER_STATUS_HEALTH = ' + json.dumps(health, ensure_ascii=False) + ';\n')
+              # 用 API 直推（避免 git push 失败时丢状态）
+              try:
+                  # 读现有 sha
+                  r2 = subprocess.run(['gh', 'api', f'repos/{repo}/contents/data/RUNNER_STATUS_HEALTH.js'],
+                                       env=env, capture_output=True, text=True)
+                  sha = json.loads(r2.stdout).get('sha') if r2.returncode == 0 else None
+                  import base64
+                  content_b64 = base64.b64encode(open('data/RUNNER_STATUS_HEALTH.js', 'rb').read()).decode()
+                  payload = {"message": f"runner health: {state} @ {now_bj.strftime('%Y-%m-%d %H:%M:%S')}",
+                             "content": content_b64}
+                  if sha:
+                      payload["sha"] = sha
+                  r3 = subprocess.run(['gh', 'api', '-X', 'PUT',
+                                       f'repos/{repo}/contents/data/RUNNER_STATUS_HEALTH.js',
+                                       '--input', '-'],
+                                      env=env, input=json.dumps(payload), capture_output=True, text=True)
+                  if r3.returncode != 0:
+                      print(f"  ::warning::API 推送状态文件失败: {r3.stderr[:200]}")
+                  else:
+                      print(f"  状态文件已推送：state={state}")
+              except Exception as e:
+                  print(f"  ::warning::推送状态文件异常: {e}")
+
+          # 输出供 step 引用
+          with open(os.environ.get('GITHUB_OUTPUT', '/dev/null'), 'a') as f:
+              f.write(f"state={state}\n")
+              f.write(f"online={'true' if online else 'false'}\n")
+              f.write(f"action={action}\n")
+          PYEOF
+
+      - name: "📢 离线状态播报"
+        if: steps.probe.outputs.state == 'offline'
+        run: |
+          echo "::warning::lemoncat-cn runner 离线！请检查小九机器状态。"
+          echo "查看 issue: https://github.com/ah-quant999/quant-scanner-v8/issues?q=is%3Aissue+is%3Aopen+label%3Arunner-offline"
