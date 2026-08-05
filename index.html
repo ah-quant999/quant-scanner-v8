@@ -2290,7 +2290,7 @@ window.V8_CAL = {weeks:[],legend:[]};
           <span style="font-size:10px;color:#fff;background:#607d8b;padding:1px 7px;border-radius:8px;">日频</span>
         </div>
         <div id="stcrdsCoverage" style="font-size:11px;color:var(--dim);margin-bottom:8px;line-height:1.6;"></div>
-        <div id="stcrdsStandby" style="display:none;margin-bottom:10px;padding:8px 10px;border-radius:6px;background:rgba(240,160,32,0.08);border-left:4px solid #f0a020;font-size:12px;color:#d4a020;line-height:1.6;"></div>
+        <div id="stcrdsStandby" style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:8px;background:rgba(240,160,32,0.10);border-left:4px solid #f0a020;font-size:15px;font-weight:600;color:#e8b54a;line-height:1.65;letter-spacing:0.2px;"></div>
         <div id="stcrdsMarketContext" style="display:none;margin-bottom:10px;padding:8px 10px;border-radius:6px;background:var(--bg2);border-left:4px solid var(--border);">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
             <span style="font-size:12px;font-weight:600;color:var(--sub);">大盘判断</span>
@@ -3983,6 +3983,15 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>-0.5% ~ +1.0%</td><td>有效</td><td>震荡市，CRDS 可正常参考</td></tr>
           <tr><td>-2.0% ~ -0.5%</td><td>较有效</td><td>市场偏弱，CRDS 较有效</td></tr>
           <tr><td>&lt; -2.0%</td><td>高有效</td><td>暴跌恐慌市信号最强，但需防系统性风险</td></tr>
+        </table>
+        <div class="logic-h">待机提示文案（无逆势板时显示）</div>
+        <table class="lg-table">
+          <tr><th>大盘档</th><th>卡片待机文案</th></tr>
+          <tr><td>高有效 / 较有效</td><td>🟡 <b>当前无逆势板信号</b> — 今日大盘偏弱但暂无个股逆势涨停，CRDS 逆势模型持续监控中</td></tr>
+          <tr><td>有效（震荡市）</td><td>🟢 <b>当前大盘震荡，暂无逆势板信号</b> — 震荡市 CRDS 可正常参考，模型持续监控中</td></tr>
+          <tr><td>低效</td><td>⚠️ <b>市场偏强，CRDS 有效性降低</b> — 暂无需逆势龙头，信号参考意义有限</td></tr>
+          <tr><td>失效</td><td>🔴 <b>今日大涨，逆势龙头不适用</b> — CRDS 参考意义极低</td></tr>
+          <tr><td>其他</td><td>⏳ <b>当前无暴跌日</b> — CRDS 逆势模型持续监控中</td></tr>
         </table>
         <div class="logic-h">名字清洗（防研报/新闻稿污染名）</div>
         <div class="logic-p">卡片绝不出「看好/完成/给予」等研报词垃圾名。优先级：东财 f58 权威名 &gt; 通达信名字(仅股票段且非指数/债) &gt; raw 干净名 &gt; 退化代码兜底。</div>
@@ -6530,13 +6539,13 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
         cards:[
 
-          {name:'技术策略', source:'STRATEGY_TECH', freq:'收盘后1次', slots:['20:00'], note:'技术形态选股'},
+          {name:'候选池（盘中/盘后）', source:'CANDIDATE', freq:'盘中+收盘后1次', slots:['15:30','18:30'], note:'算法初筛名单'},
 
-          {name:'资金策略', source:'STRATEGY_FUND', freq:'收盘后1次', slots:['20:00'], note:'资金流选股'},
+          {name:'黄金池', source:'GOLD_POOL', freq:'收盘后1次', slots:['20:00'], note:'精选标的'},
 
-          {name:'事件策略', source:'STRATEGY_EVENT', freq:'收盘后1次', slots:['20:00'], note:'事件驱动选股'},
+          {name:'三重共识', source:'TRIPLE_CONSENSUS', freq:'收盘后1次', slots:['20:00'], note:'多策略共振'},
 
-          {name:'综合策略', source:'STRATEGY_COMPOSITE', freq:'收盘后1次', slots:['20:00'], note:'多因子综合'}
+          {name:'四量终极', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['20:00'], note:'四路翻多共振'}
 
         ]
 
@@ -6552,15 +6561,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
           {name:'实时风险温度计', source:'CRISIS_DATA', freq:'工作日盘中每30分', slots:['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'宏观指标实时刷新'},
 
-          {name:'盘后算法链', source:'ALGO_RUN_LOG', freq:'工作日2次', slots:['18:30','20:00'], note:'候选池/黄金池/三重共识 · 仍 cn runner(小九)，待迁云端'},
+          {name:'盘后算法链', source:'TRIPLE_CONSENSUS', freq:'工作日2次', slots:['18:30','20:00'], note:'候选池/黄金池/三重共识 · 仍 cn runner(小九)，待迁云端'},
 
-          {name:'构建部署', source:'BUILD_DEPLOY', freq:'触发式', slots:['push后'], note:'Pages 自动部署'},
-
-          {name:'Runner 健康监控', source:'RUNNER_STATUS_HEALTH', freq:'非交易时段每2h', slots:['工作日13-21点','周末0-20点'], note:'lemoncat-cn 离线即开 Issue 告警'},
-
-          {name:'每日数据体检', source:'HEALTH_CHECK', freq:'每日2次', slots:['09:00','17:00'], note:'数据完整性检查'},
-
-          {name:'每日自动备份', source:'BACKUP_LOG', freq:'每日1次', slots:['21:00'], note:'raw_data/data 备份'}
+          {name:'每日数据体检', source:'HEALTH_CHECK', freq:'每日2次', slots:['09:00','17:00'], note:'数据完整性检查 · 覆盖构建/Runner/备份健康'}
 
         ]
 
@@ -8422,8 +8425,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if(l2.length===0){
         sb.style.display='block';
         var vv=mc.validity||'';
-        if(vv==='高有效'||vv==='较有效') sb.innerHTML='⏳ <b>当前无逆势板信号</b> — 今日大盘偏弱但暂无个股逆势涨停，CRDS 逆势模型待命中';
-        else sb.innerHTML='⏳ <b>当前无暴跌日</b> — 近期上证无单日跌超 1.5% 的恐慌日，CRDS 逆势模型待命中';
+        if(vv==='高有效'||vv==='较有效') sb.innerHTML='🟡 <b>当前无逆势板信号</b> — 今日大盘偏弱但暂无个股逆势涨停，CRDS 逆势模型持续监控中';
+        else if(vv==='有效') sb.innerHTML='🟢 <b>当前大盘震荡，暂无逆势板信号</b> — 震荡市 CRDS 可正常参考，模型持续监控中';
+        else if(vv==='低效') sb.innerHTML='⚠️ <b>市场偏强，CRDS 有效性降低</b> — 暂无需逆势龙头，信号参考意义有限';
+        else if(vv==='失效') sb.innerHTML='🔴 <b>今日大涨，逆势龙头不适用</b> — CRDS 参考意义极低';
+        else sb.innerHTML='⏳ <b>当前无暴跌日</b> — 近期上证无单日跌超 1.5% 的恐慌日，CRDS 逆势模型持续监控中';
       }else{sb.style.display='none';}
     }
     fillList(document.getElementById(p+'crdsList3'),l3,'<span style="color:var(--dim);">今日无</span>');
