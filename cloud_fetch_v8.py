@@ -19,7 +19,14 @@
 import json, os, sys, time, subprocess
 from datetime import datetime, timedelta
 from pathlib import Path
+from zoneinfo import ZoneInfo
 import pandas as pd
+
+CST = ZoneInfo("Asia/Shanghai")
+
+def now_cst():
+    """返回中国标准时间（Asia/Shanghai）的当前 datetime。"""
+    return datetime.now(CST)
 
 # 2026-08-03 修复：Windows cn runner 默认 GBK 终端，emoji 输出会 UnicodeEncodeError 崩溃。
 try:
@@ -119,7 +126,7 @@ _AS_MAKEUP_DAYS_2026 = {"2026-01-04", "2026-02-14", "2026-02-28",
 
 def _is_trading_day(d=None):
     """判断某天是否为A股交易日。优先用 akshare 交易日历，失败则回退硬编码。"""
-    d = d or datetime.now().date()
+    d = d or now_cst().date()
     iso = d.isoformat()
     if iso in _AS_MAKEUP_DAYS_2026:
         return True
@@ -143,7 +150,7 @@ def save(var, obj):
     if not fname:
         return
     obj = obj if isinstance(obj, dict) else {"data": obj}
-    obj["update_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    obj["update_time"] = now_cst().strftime("%Y-%m-%d %H:%M:%S")
     path = RAW_DIR / fname
     with open(path, "w", encoding="utf-8") as f:
         json.dump(obj, f, ensure_ascii=False, separators=(",", ":"), default=str)
@@ -245,7 +252,7 @@ def f_judgment():
     v2 动态版(2026-08-05): verdict/warning 根据指数实际幅度、量能、连跌天数、
     美股隔夜等维度动态组合生成，不再使用4套固定模板。
     """
-    now = datetime.now()
+    now = now_cst()
     today = now.date()
     md = f"{today.month}/{today.day}"
 
@@ -370,7 +377,7 @@ def f_macro_brief():
       - news_brief: 3~5 条数据驱动的"时事要点"（对 A 股有影响的）
       - a_impact: 对 A 股的简短影响评估
     """
-    now = datetime.now()
+    now = now_cst()
     today = now.date()
 
     # ---- 读取已生成的 MACRO_DATA ----
@@ -609,7 +616,7 @@ def run(label, fn, retries=2):
     last_err = None
     for attempt in range(retries + 1):
         try:
-            print(f">>> {label} {datetime.now().isoformat(timespec='seconds')}{' (retry '+str(attempt)+')' if attempt else ''}")
+            print(f">>> {label} {now_cst().isoformat(timespec='seconds')}{' (retry '+str(attempt)+')' if attempt else ''}")
             obj = fn()
             if obj is not None:
                 save(label, obj)
@@ -629,7 +636,7 @@ def run(label, fn, retries=2):
 # 涨停池缓存（避免 limit_up_heatmap / herding 重复抓取同一份数据）
 _zt_cache = {"date": None, "df": None}
 def _get_zt_pool():
-    d = datetime.now().strftime("%Y%m%d")
+    d = now_cst().strftime("%Y%m%d")
     if _zt_cache["date"] == d and _zt_cache["df"] is not None:
         return _zt_cache["df"]
     df = get_ak().stock_zt_pool_em(date=d)
@@ -711,7 +718,7 @@ def f_etf_intraday_heat():
         "outflow_top": outflow_top,
         "categories": categories,
         "note": "ETF主力净流入真实排名(东财push2delay, ETF市场m:1+t:9, fid=f62)；净流入单位元，分类按名称关键词",
-        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
     }
 
 def f_sector_fund_flow():
@@ -741,7 +748,7 @@ def f_sector_fund_flow():
         "sectors_out": sectors_out,
         "top_list": items,
         "note": "行业+概念主力净流入(亿)，来源东方财富push2delay",
-        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
     }
 
 def f_index_quotes():
@@ -893,8 +900,8 @@ def f_margin_data():
     """两融余额走势：上交所融资融券汇总（日线）。
     输出结构与 v6 MARGIN_DATA 一致：{sh:[{date,date_raw,rz_balance,rq_balance_amt,total}], update_time}
     """
-    end = datetime.now().strftime("%Y%m%d")
-    start = (datetime.now() - timedelta(days=120)).strftime("%Y%m%d")
+    end = now_cst().strftime("%Y%m%d")
+    start = (now_cst() - timedelta(days=120)).strftime("%Y%m%d")
     result = {"sh": [], "update_time": ""}
     try:
         df = get_ak().stock_margin_sse(start_date=start, end_date=end)
@@ -923,13 +930,13 @@ def f_margin_data():
     except Exception as e:
         print(f"  ❌ 两融余额失败: {e}")
         return None
-    result["update_time"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+    result["update_time"] = now_cst().strftime("%Y-%m-%d %H:%M")
     return result
 
 def f_cffex_holdings():
     # 中金所股指期货日行情：动态取最近有数据的交易日（盘后数据通常当日稍晚才出）
     ak = get_ak()
-    base = datetime.now()
+    base = now_cst()
     for back in range(0, 8):
         dd = (base - timedelta(days=back)).strftime("%Y%m%d")
         try:
@@ -982,11 +989,11 @@ def f_macro_data():
         try:
             from datetime import datetime
             dt = datetime.strptime(data_date, '%Y-%m-%d')
-            is_fresh = (datetime.now() - dt).days <= 60
+            is_fresh = (now_cst() - dt).days <= 60
         except Exception:
             pass
         out['indicator_status'][indicator_key] = {
-            'last_updated': datetime.now().strftime('%Y-%m-%d'),
+            'last_updated': now_cst().strftime('%Y-%m-%d'),
             'is_fresh': is_fresh,
             'name': st['name'],
             'frequency': 'monthly' if indicator_key in ('lpr','m2_yoy','pmi','cpi','ppi','social_financing','export_yoy','new_investors') else 'daily',
@@ -1226,7 +1233,7 @@ def f_macro_data():
                     if fx is not None and not fx.empty:
                         usd_cnh = fx[fx['code'] == 'USDCNH']
                         if not usd_cnh.empty:
-                            gm['usdcnh'] = {'price': float(usd_cnh.iloc[0]['bid']), 'date': datetime.now().strftime('%Y-%m-%d')}
+                            gm['usdcnh'] = {'price': float(usd_cnh.iloc[0]['bid']), 'date': now_cst().strftime('%Y-%m-%d')}
                             print("    ✅ akshare fallback USDCNH")
                 except Exception as e:
                     print(f"    ⚠️ akshare USDCNH fallback 失败: {e}")
@@ -1417,7 +1424,7 @@ def _is_broad_etf(name):
 
 def _trade_dates(n=60):
     dates = []
-    d = datetime.now()
+    d = now_cst()
     while len(dates) < n:
         if d.weekday() < 5:
             dates.append(d.strftime("%Y%m%d"))
@@ -1466,7 +1473,7 @@ def f_etf_subscription():
         time.sleep(0.15)
     if not result["sh"]:
         return None
-    result["update_time"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+    result["update_time"] = now_cst().strftime("%Y-%m-%d %H:%M")
     print(f"  ✅ 宽基ETF净申赎：{len(result['sh'])} 条")
     return result
 
@@ -1578,7 +1585,7 @@ def f_market_fund_flow_data():
         "cumulative": cumulative,
         "market_net": daily[-1]["net_yi"] if daily else 0,
         "sh_quote": sh_quote,
-        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
         "note": "上证指数(000001)单日主力资金净流入滚动累加，来源东方财富push2his",
     }
 
@@ -1701,7 +1708,7 @@ def f_analyst_ratings():
     {hot_stocks, latest_reports, upgrades, downgrades, new_coverage}"""
     ak = get_ak()
     result = {"hot_stocks": [], "latest_reports": [], "upgrades": [], "downgrades": [], "new_coverage": []}
-    year = datetime.now().year
+    year = now_cst().year
 
     # ① 分析师年度排名 → 提取 TOP 分析师最新推荐个股作为"热门"
     try:
@@ -1729,7 +1736,7 @@ def f_analyst_ratings():
                         "code": code, "name": name,
                         "rating": f"TOP分析师推荐({analyst}/{firm})",
                         "report_count_1m": 1,
-                        "date": datetime.now().strftime("%Y-%m-%d"),
+                        "date": now_cst().strftime("%Y-%m-%d"),
                         "org": firm,
                         "analyst": analyst,
                         "annual_index": idx_val,
@@ -1818,7 +1825,7 @@ def f_experiment():
         },
         "note": "实验区：全市场个股实时快照初筛(东财push2delay)。金钻起涨=涨幅3~9.8%且主力净流入; 波段多头=涨幅1~5%且净流入; "
                 "主力进场=净流入且上涨; 主力出货=净流出且下跌; 三重=金钻∩主力进场。验证中请勿依赖。",
-        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
     }
 
 
@@ -2217,18 +2224,18 @@ def f_v8_cal(today=None):
     print(f"    日历: {y}年{m}月, {len(weeks)}周, 事件日 {len(ev)} 天")
     return {
         "month": f"{y}年{m}月",
-        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "update_time": now_cst().strftime("%Y-%m-%d %H:%M"),
         "legend": legend,
         "weeks": weeks,
     }
 
 
 def main(category=None, only=None):
-    print(f"=== v8 云端抓取开始 {datetime.now().isoformat(timespec='seconds')} "
+    print(f"=== v8 云端抓取开始 {now_cst().isoformat(timespec='seconds')} "
           f"category={category or 'all'} ===")
 
     # 假期/周末冻结：盘中/盘后/盘前（非周六T+1）遇到非交易日时跳过，保留上一交易日收盘数据
-    today = datetime.now().date()
+    today = now_cst().date()
     is_saturday = today.weekday() == 5
     if category in ("intraday", "post_close") and not _is_trading_day(today):
         print(f"⏸️ 今日 {today} 非A股交易日，{category} 跳过，保留上一交易日收盘数据")
@@ -2290,7 +2297,7 @@ def main(category=None, only=None):
         import re
         import akshare as ak
 
-        now = datetime.now()
+        now = now_cst()
         today_md = f"{now.month}/{now.day}"
         is_today_trade = _is_trading_day()
 
@@ -2495,7 +2502,7 @@ def main(category=None, only=None):
     # 生成 runner 状态文件，供前端「定时任务跟踪」看板展示
     try:
         runner_status = {
-            "run_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "run_time": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
             "category": category or "all",
             "hostname": os.environ.get("COMPUTERNAME", "") or os.environ.get("HOSTNAME", ""),
             "modules": _run_status,
@@ -2512,7 +2519,7 @@ def main(category=None, only=None):
     except Exception as e:
         print(f"  ⚠️ 写入 runner_status 失败: {e}")
 
-    print(f"=== v8 云端抓取结束 {datetime.now().isoformat(timespec='seconds')} ===")
+    print(f"=== v8 云端抓取结束 {now_cst().isoformat(timespec='seconds')} ===")
     print(f"raw_data/ 文件数: {len(list(RAW_DIR.glob('*.json')))}")
     return 0
 

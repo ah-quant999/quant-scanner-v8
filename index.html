@@ -441,11 +441,12 @@ window.V8_CAL = {weeks:[],legend:[]};
     "2026-01-04","2026-02-14","2026-02-28","2026-05-09","2026-09-20","2026-10-10"
   ]);
   window._isAshareTradingDay = function(d){
-    var iso = d.toISOString ? d.toISOString().slice(0,10) : String(d).slice(0,10);
+    // 统一按中国时间取日期，避免 toISOString 取 UTC 日期导致跨天误判
+    var cstDateStr = d.toLocaleDateString ? d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}) : String(d).slice(0,10);
+    var iso = cstDateStr.replace(/\//g,'-');
     if (window._AS_MAKEUP_DAYS_2026.has(iso)) return true;
-    var MM = (d.getMonth()+1).toString().padStart(2,'0');
-    var DD = d.getDate().toString().padStart(2,'0');
-    var md = MM + '-' + DD;
+    var parts = iso.split('-');
+    var md = parts[1] + '-' + parts[2];
     for (var i=0;i<window._AS_HOLIDAY_RANGES_2026.length;i++){
       var r = window._AS_HOLIDAY_RANGES_2026[i];
       if (md >= r[0] && md <= r[1]) return false;
@@ -4841,18 +4842,25 @@ function renderLimitUpHeatmap(){
   function scoreColor(s){ if(s>=70)return '#fbbf24'; if(s>=55)return '#f472b6'; if(s>=40)return '#93a4c4'; return '#5f7099'; }
   function fmtUpdateTime(ts){
     if(!ts) return '今日';
-    const d=new Date(String(ts).replace(/-/g,'/'));
-    if(isNaN(d.getTime())) return ts;
-    const t0=new Date(), a=new Date(t0.getFullYear(),t0.getMonth(),t0.getDate()), b=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+    const d = window._parseAsCST ? window._parseAsCST(ts) : null;
+    if(!d || isNaN(d.getTime())) return ts;
+    const t0=new Date();
+    const aStr = t0.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
+    const bStr = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
+    const ap = aStr.split('/');
+    const bp = bStr.split('/');
+    const a=new Date(+ap[0],+ap[1]-1,+ap[2]);
+    const b=new Date(+bp[0],+bp[1]-1,+bp[2]);
     const diff=Math.round((a-b)/86400000);
     const day = diff===1?'昨日':diff>1?`${diff}天前`:diff<0?'未来':'今日';
-    return `${day} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    const hm = window._fmtHmCST ? window._fmtHmCST(d) : pad(d.getHours())+':'+pad(d.getMinutes());
+    return `${day} ${hm}`;
   }
   // 数据陈旧度（>1 天时金色提示，和资金流时间轴同款）
   function fmtStaleness(ts){
     if(!ts) return '';
-    const d=new Date(String(ts).replace(/-/g,'/'));
-    if(isNaN(d.getTime())) return '';
+    const d = window._parseAsCST ? window._parseAsCST(ts) : null;
+    if(!d || isNaN(d.getTime())) return '';
     const diffMs=Date.now()-d.getTime();
     const days=Math.floor(diffMs/86400000);
     if(days>=2) return `<span style="color:#fbbf24;margin-left:6px;">⚠ 数据 ${days} 天前</span>`;
@@ -6017,9 +6025,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if(st && st.is_fresh!=null) return !!st.is_fresh;
       if(!dateStr) return false;
       try{
-        const d=new Date(String(dateStr).replace(/-/g,'/'));
+        const d = window._parseAsCST ? window._parseAsCST(dateStr) : null;
         const now=new Date();
-        if(Number.isNaN(d.getTime())) return false;
+        if(!d || Number.isNaN(d.getTime())) return false;
         return (now-d)/(864e5)<=30;
       }catch(e){return false;}
     }
@@ -6487,7 +6495,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     function isToday(d){ return d && [d.getFullYear(), String(d.getMonth()+1).padStart(2,'0'), String(d.getDate()).padStart(2,'0')].join('-') === todayStr; }
 
-    function fmtHm(d){ return [String(d.getHours()).padStart(2,'0'), String(d.getMinutes()).padStart(2,'0')].join(':'); }
+    function fmtHm(d){ return window._fmtHmCST ? window._fmtHmCST(d) : [String(d.getHours()).padStart(2,'0'), String(d.getMinutes()).padStart(2,'0')].join(':'); }
 
 
 
@@ -6982,16 +6990,20 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   const $=id=>document.getElementById(id);
   const DATA={};
 
-  /* ---- 相对时间（v8 风格：今日/昨日/N天前 HH:MM） ---- */
+  /* ---- 相对时间（v8 风格：今日/昨日/N天前 HH:MM，统一中国时间） ---- */
   function fmtDataTime(timeStr){
     if(!timeStr) return {text:''};
-    const d=new Date(String(timeStr).replace('T',' ').replace(/-/g,'/'));
-    if(isNaN(d.getTime())) return {text:String(timeStr)};
+    const d = window._parseAsCST ? window._parseAsCST(timeStr) : null;
+    if(!d || isNaN(d.getTime())) return {text:String(timeStr)};
     const now=new Date();
-    const today0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-    const data0=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+    const todayStr = now.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
+    const dataStr  = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
+    const tp = todayStr.split('/');
+    const dp = dataStr.split('/');
+    const today0=new Date(+tp[0], +tp[1]-1, +tp[2]);
+    const data0=new Date(+dp[0], +dp[1]-1, +dp[2]);
     const dayDiff=Math.round((today0-data0)/864e5);
-    const hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+    const hm = window._fmtHmCST ? window._fmtHmCST(d) : ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
     let txt;
     if(dayDiff>=1 && window._isAshareTradingDay && !window._isAshareTradingDay(today0)) txt='上一交易日收盘 '+hm;
     else if(dayDiff<=0) txt='今日 '+hm;
@@ -7067,21 +7079,28 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
   function _fmtCockpitRel(ts){
     if(!ts) return '';
-    var Y,Mo,D,H=0,Mi=0,m;
-    m=ts.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})[ T](\d{1,2}):(\d{2})/);
-    if(m){Y=+m[1];Mo=+m[2];D=+m[3];H=+m[4];Mi=+m[5];}
-    else { m=ts.match(/(\d{1,2})[-/](\d{1,2})\s+(\d{1,2}):(\d{2})/); if(m){Y=new Date().getFullYear();Mo=+m[1];D=+m[2];H=+m[3];Mi=+m[4];} else return ts.substring(0,16); }
+    var d = window._parseAsCST ? window._parseAsCST(ts) : null;
+    if(!d || isNaN(d.getTime())){
+      // 兜底：兼容 MM-DD HH:MM
+      var m=ts.match(/(\d{1,2})[-/](\d{1,2})\s+(\d{1,2}):(\d{2})/);
+      if(m){ return ts; }
+      return ts.substring(0,16);
+    }
     var now=new Date();
-    var today0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-    var that0=new Date(Y,Mo-1,D);
+    var todayStr = now.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
+    var dataStr  = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
+    var tp = todayStr.split('/');
+    var dp = dataStr.split('/');
+    var today0=new Date(+tp[0], +tp[1]-1, +tp[2]);
+    var that0=new Date(+dp[0], +dp[1]-1, +dp[2]);
     var dayDiff=Math.round((today0-that0)/86400000);
-    var hm=(H<10?'0':'')+H+':'+(Mi<10?'0':'')+Mi;
+    var hm = window._fmtHmCST ? window._fmtHmCST(d) : ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
     if(dayDiff>=1 && window._isAshareTradingDay && !window._isAshareTradingDay(today0)) return '上一交易日收盘 '+hm;
     if(dayDiff===0) return '今日 '+hm;
     if(dayDiff===1) return '昨日 '+hm;
     if(dayDiff>1) return dayDiff+'天前 '+hm;
     if(dayDiff===-1) return '明日 '+hm;
-    return (Mo<10?'0':'')+Mo+'-'+(D<10?'0':'')+D+' '+hm;
+    return dp[1]+'-'+dp[2]+' '+hm;
   }
   function _fmtWeekday(dateStr){
     if(!dateStr) return '';
@@ -8221,11 +8240,15 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     // 时间（与全站统一：今日/昨日/N天前 HH:MM）
     function _crdsRel(ts){
       if(!ts) return '--';
-      var t=new Date(String(ts).replace(/-/g,'/').replace('T',' '));
-      if(isNaN(t)) return String(ts);
+      var t = window._parseAsCST ? window._parseAsCST(ts) : null;
+      if(!t || isNaN(t.getTime())) return String(ts);
       var now=new Date();
-      var diff=Math.round((new Date(now.getFullYear(),now.getMonth(),now.getDate())-new Date(t.getFullYear(),t.getMonth(),t.getDate()))/864e5);
-      var hm=('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2);
+      var todayStr = now.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
+      var dataStr  = t.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
+      var tp = todayStr.split('/');
+      var dp = dataStr.split('/');
+      var diff=Math.round((new Date(+tp[0],+tp[1]-1,+tp[2])-new Date(+dp[0],+dp[1]-1,+dp[2]))/864e5);
+      var hm = window._fmtHmCST ? window._fmtHmCST(t) : ('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2);
       return (diff<=0?'今日':diff===1?'昨日':diff+'天前')+' '+hm;
     }
     var timeEl=document.getElementById(p+'crdsTime');
