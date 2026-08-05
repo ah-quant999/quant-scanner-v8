@@ -144,10 +144,7 @@ def _load_token():
     for env_name in ("V8_GITHUB_TOKEN", "GITHUB_TOKEN", "GH_TOKEN"):
         v = os.environ.get(env_name)
         if v:
-            print(f"[DEBUG] _load_token: env {env_name} loaded len={len(v)} tail=...{v[-6:]}", flush=True)
             return v
-        else:
-            print(f"[DEBUG] _load_token: env {env_name} missing", flush=True)
     # 本机/开发环境：读 .workbuddy/v8_gh_token.txt
     candidates = [
         Path("E:/workspace/stock-scanner/.workbuddy/v8_gh_token.txt"),
@@ -155,13 +152,7 @@ def _load_token():
     ]
     for p in candidates:
         if p.exists():
-            tok = p.read_text(encoding="utf-8").strip()
-            print(f"[DEBUG] _load_token: file {p} loaded len={len(tok)}", flush=True)
-            return tok
-    print(f"[DEBUG] _load_token: NO TOKEN FOUND. ALL ENV KEYS:", flush=True)
-    for k in sorted(os.environ):
-        v = os.environ[k]
-        print(f"   {k}={v[:60]}{'...' if len(v) > 60 else ''}", flush=True)
+            return p.read_text(encoding="utf-8").strip()
     return None
 
 

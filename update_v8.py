@@ -416,10 +416,6 @@ def main():
     parser.add_argument("--detect-changes", action="store_true",
                         help="只构建最近 git diff 发生变化的 raw_data 所属类别")
     args = parser.parse_args()
-    # DEBUG: 报告环境变量（排查 GHA 上 GITHUB_TOKEN 是否可用）
-    token_keys = [k for k in os.environ if 'TOKEN' in k]
-    print(f"[DEBUG-update_v8] TOKEN env keys: {token_keys}", flush=True)
-    print(f"[DEBUG-update_v8] GITHUB_ACTIONS={os.environ.get('GITHUB_ACTIONS','?')}, CI={os.environ.get('CI','?')}, RUNNER_OS={os.environ.get('RUNNER_OS','?')}", flush=True)
     rc = build(category=args.category, detect_changes=args.detect_changes)
     if rc == 0:
         run_health_check()

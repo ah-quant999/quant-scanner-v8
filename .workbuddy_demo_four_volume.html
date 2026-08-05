@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>四量终极 选股 · 卡片样式预览</title>
+<style>
+  :root{
+    --bg:#0a0e17; --bg2:#0e1422; --card:#131b2e; --card2:#172238;
+    --border:#243150; --border2:#2e3d63;
+    --txt:#e6edf7; --sub:#93a4c4; --dim:#5f7099;
+    --cyan:#38bdf8; --purple:#a78bfa; --gold:#fbbf24; --pink:#f472b6;
+    --up:#f4495d; --down:#1fd17b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:14px;line-height:1.5;padding:24px}
+  .wrap{max-width:1100px;margin:0 auto}
+  .title{font-size:14px;color:var(--dim);margin-bottom:14px;letter-spacing:.5px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:16px}
+  .card h3{font-size:14px;color:var(--sub);font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .demo-tag{display:inline-block;font-size:11px;background:rgba(167,139,250,.18);color:var(--purple);border:1px solid rgba(167,139,250,.35);padding:2px 8px;border-radius:999px;margin-left:auto}
+  .desc{font-size:12px;color:var(--dim);margin-bottom:8px;line-height:1.6}
+  .demo-where{font-size:11.5px;color:var(--cyan);margin-top:10px;padding:8px 12px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.25);border-radius:8px;line-height:1.7}
+  .demo-where b{color:var(--gold)}
+  /* 股票列表 */
+  .stock-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .stock{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+  .stock-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .stock-name{font-size:13px;font-weight:700;color:var(--txt)}
+  .stock-code{font-size:11px;color:var(--dim);font-family:Consolas,monospace}
+  .stock-board{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:999px;border:1px solid}
+  .b-cy{color:#fbbf24;border-color:rgba(251,191,36,.4);background:rgba(251,191,36,.08)}
+  .b-kc{color:#a78bfa;border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.08)}
+  .b-zb{color:var(--cyan);border-color:rgba(56,189,248,.4);background:rgba(56,189,248,.08)}
+  .stock-px{font-size:14px;font-weight:800;margin-left:auto;font-family:Consolas,monospace}
+  .stock-px .ch{font-size:11.5px;font-weight:700;margin-left:6px;padding:1px 6px;border-radius:5px}
+  .up .ch{color:var(--up);background:rgba(244,73,93,.12)}
+  .dn .ch{color:var(--down);background:rgba(31,209,123,.12)}
+  .stock-meta{font-size:11px;color:var(--sub);display:flex;gap:14px}
+  .stock-meta b{color:var(--txt)}
+  .reason{font-size:11.5px;color:var(--txt);line-height:1.55;background:rgba(255,255,255,.03);padding:6px 10px;border-radius:6px;border-left:3px solid var(--gold)}
+  .reason b{color:var(--gold);margin-right:4px}
+  /* 7 个组件灯 */
+  .lights{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+  .light{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;padding:3px 8px;border-radius:6px;border:1px solid;font-weight:600}
+  .light.on{background:rgba(244,73,93,.12);color:var(--up);border-color:rgba(244,73,93,.35)}
+  .light.off{background:rgba(31,209,123,.10);color:var(--down);border-color:rgba(31,209,123,.30);opacity:.65}
+  .light-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+  /* 空态 */
+  .empty{padding:18px;text-align:center;color:var(--dim);font-size:12.5px;background:rgba(255,255,255,.02);border:1px dashed var(--border);border-radius:8px}
+  /* 回测摘要 */
+  .bt{margin-top:12px;padding:10px 14px;background:linear-gradient(135deg,rgba(56,189,248,0.08),rgba(167,139,250,0.06));border:1px solid var(--border2);border-radius:9px;font-size:11.5px;line-height:1.7}
+  .bt b{color:var(--cyan)}
+  .bt .ok{color:var(--down);font-weight:700}
+  .bt .no{color:var(--down)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="title">▶ 四量终极 选股 · 卡片样式预览（commit ba93e62 · 暂未上架 opTab3 区 · 盘后日线）</div>
+
+  <!-- 场景 A：命中 3 只（mock 真实命中场景） -->
+  <div class="card">
+    <h3>
+      <span class="ic">🔥</span>四量终极 选股
+      <span class="demo-tag">2026-08-05 · 盘后 · 共 3 只命中 · 100 只扫描</span>
+    </h3>
+    <div class="desc">QD = 游资点火(YZC) + 机构托底(JG) + 当天金叉(XC=四金叉或) + 四路翻多(FOUR)，忠实原文 2026-08-05</div>
+
+    <div class="stock-list">
+      <div class="stock">
+        <div class="stock-head">
+          <span class="stock-name">工业富联</span>
+          <span class="stock-code">601138</span>
+          <span class="stock-board b-zb">主板</span>
+          <span class="stock-px">28.45 <span class="ch">+5.82%</span></span>
+        </div>
+        <div class="stock-meta"><span>成交额 <b>96.3亿</b></span><span>换手 <b>3.42%</b></span></div>
+        <div class="reason"><b>触发原因：</b>四指数全红+放量健康，W2 首次上穿零轴</div>
+        <div class="lights">
+          <span class="light on"><span class="light-dot"></span>游资点火</span>
+          <span class="light on"><span class="light-dot"></span>机构托底</span>
+          <span class="light on"><span class="light-dot"></span>广度翻多</span>
+          <span class="light on"><span class="light-dot"></span>主力动量翻多</span>
+          <span class="light off"><span class="light-dot"></span>机构金叉</span>
+          <span class="light off"><span class="light-dot"></span>散户金叉</span>
+          <span class="light on"><span class="light-dot"></span>主力金叉</span>
+        </div>
+      </div>
+
+      <div class="stock">
+        <div class="stock-head">
+          <span class="stock-name">寒武纪</span>
+          <span class="stock-code">688256</span>
+          <span class="stock-board b-kc">科创板</span>
+          <span class="stock-px">612.80 <span class="ch">+7.13%</span></span>
+        </div>
+        <div class="stock-meta"><span>成交额 <b>42.1亿</b></span><span>换手 <b>2.18%</b></span></div>
+        <div class="reason"><b>触发原因：</b>机构托底确认，OBV 金叉加速，GB1 转正</div>
+        <div class="lights">
+          <span class="light on"><span class="light-dot"></span>游资点火</span>
+          <span class="light on"><span class="light-dot"></span>机构托底</span>
+          <span class="light on"><span class="light-dot"></span>广度翻多</span>
+          <span class="light on"><span class="light-dot"></span>主力动量翻多</span>
+          <span class="light on"><span class="light-dot"></span>机构金叉</span>
+          <span class="light off"><span class="light-dot"></span>散户金叉</span>
+          <span class="light off"><span class="light-dot"></span>主力金叉</span>
+        </div>
+      </div>
+
+      <div class="stock">
+        <div class="stock-head">
+          <span class="stock-name">中际旭创</span>
+          <span class="stock-code">300308</span>
+          <span class="stock-board b-cy">创业板</span>
+          <span class="stock-px">947.74 <span class="ch">-7.27%</span></span>
+        </div>
+        <div class="stock-meta"><span>成交额 <b>675亿</b></span><span>换手 <b>5.31%</b></span></div>
+        <div class="reason"><b>触发原因：</b>游资点火确认（OBV 金叉），DKX 上穿 MADKX，V6 翻正</div>
+        <div class="lights">
+          <span class="light on"><span class="light-dot"></span>游资点火</span>
+          <span class="light on"><span class="light-dot"></span>机构托底</span>
+          <span class="light off"><span class="light-dot"></span>广度翻多</span>
+          <span class="light on"><span class="light-dot"></span>主力动量翻多</span>
+          <span class="light off"><span class="light-dot"></span>机构金叉</span>
+          <span class="light on"><span class="light-dot"></span>散户金叉</span>
+          <span class="light off"><span class="light-dot"></span>主力金叉</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="bt">
+      <b>📊 近 3 年回测</b>（独立 CLI：<code>python algorithms/strategy_four_volume.py --backtest 3</code>）<br>
+      命中 86 个信号 · T+5 胜率 <span class="ok">61.6%</span> · 均值 <span class="ok">+5.93%</span> · 最佳 +28% · 最差 -11%
+    </div>
+
+    <div class="demo-where">
+      📍 <b>位置</b>：v8 站点 → 选股策略 tab → 「暂未上架」opTab3 调试区（与 SH_FIB / CANDIDATE 同区）<br>
+      🕐 <b>刷新</b>：每日盘后 GHA <code>v8_cn_fetch.yml</code> post_close 档 → 真实数据由 <code>strategy_four_volume.py</code> 生成，<code>api_push_raw.py</code> 一并推 main
+    </div>
+  </div>
+
+  <!-- 场景 B：空态（实际 8-05 实测 run#78：0 命中） -->
+  <div class="card">
+    <h3>
+      <span class="ic">🔥</span>四量终极 选股
+      <span class="demo-tag">2026-08-05 · 盘后 · 0 只命中 · 100 只扫描</span>
+    </h3>
+    <div class="desc">QD = 游资点火(YZC) + 机构托底(JG) + 当天金叉(XC=四金叉或) + 四路翻多(FOUR)</div>
+    <div class="empty">
+      四量终极信号暂未生成（盘后扫描填充）。0 命中 = QD 信号极严（本就稀少），非故障。
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

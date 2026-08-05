@@ -71,6 +71,9 @@ jobs:
         run: python guard_index_sections.py
 
       - name: "🏗️ 构建 data/*.js（selective）"
+        env:
+          # GHA 在 build step 默认不注入 GITHUB_TOKEN 到 env（虽 setup 阶段显示 Secret source: Actions），必须显式声明，子进程 update_v8.py → v8_health_check.py 才能拿到
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
             echo "调度触发：构建 post_close 类别"
