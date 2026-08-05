@@ -1,1 +1,6 @@
-window.FOUR_VOLUME={"update_time":"","total":0,"note":"四量终极 XG：游资点火+机构托底+当天金叉+四路翻多（盘后日线信号）。占位文件，待盘后 GHA 抓取填充。","stocks":[]};
+window.FOUR_VOLUME={
+ "update_time": "2026-08-06 00:53:40",
+ "total": 0,
+ "note": "四量终极 QD：游资点火(YZC)+机构托底(JG)+当天金叉(XC=四金叉或)+四路翻多(FOUR)，忠实原文 2026-08-05",
+ "stocks": []
+};
