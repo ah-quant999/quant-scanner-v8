@@ -24,6 +24,9 @@ from pathlib import Path
 QUIET_HOURS_START = 22
 QUIET_HOURS_END = 7
 
+# 健康检查类 fail 的告警门槛（分钟）：仅超阈项才在汇总邮件中提示（见 send_watchdog_alert docstring）
+ALERT_OVERDUE_MIN = 120
+
 
 def in_quiet_hours(now_cst=None):
     """判断当前是否处于夜间静音时段。"""
