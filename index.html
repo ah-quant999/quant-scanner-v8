@@ -237,13 +237,13 @@ html>
   .v8cal-event.appl{background:rgba(55,71,79,.15);color:#90a4ae;border-left:3px solid #37474f}
   .v8cal-event.sg{background:rgba(142,36,170,.15);color:#ce93d8;border-left:3px solid #8e24aa}
   .v8cal-event.kr{background:rgba(0,172,193,.15);color:#80deea;border-left:3px solid #00acc1}
-  .v8cal-legend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:5px}
-  .v8cal-legend-item{border-radius:5px;padding:4px 9px;font-size:11.5px;border-left:4px solid;backdrop-filter:blur(4px);display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;line-height:1.5}
-  .v8cal-legend-item .lname{font-weight:800;color:var(--txt);flex-shrink:0}
-  .v8cal-legend-item .lrest{color:var(--sub);font-size:11px;overflow:hidden;text-overflow:ellipsis}
-  .v8cal-legend-item .lt{font-weight:800;color:var(--txt);margin-bottom:4px;display:flex;align-items:center;gap:6px;font-size:13px}
-  .v8cal-legend-item .ld{color:var(--sub);line-height:1.55;font-size:11px;margin-bottom:6px}
-  .v8cal-legend-item .swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+  .v8cal-legend-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+  .v8cal-legend-item{border-radius:8px;padding:12px 14px;font-size:13px;border-left:5px solid;backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:flex-start;gap:6px;line-height:1.6;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .v8cal-legend-item .lname{font-weight:800;color:var(--txt);font-size:14px;display:flex;align-items:center;gap:8px}
+  .v8cal-legend-item .lrest{color:var(--sub);font-size:12px;line-height:1.65}
+  .v8cal-legend-item .lt{font-weight:800;color:var(--txt);margin-bottom:4px;display:flex;align-items:center;gap:8px;font-size:14px}
+  .v8cal-legend-item .ld{color:var(--sub);line-height:1.65;font-size:12px}
+  .v8cal-legend-item .swatch{width:16px;height:16px;border-radius:4px;flex-shrink:0}
   .v8cal-li{list-style:none;padding:0;margin:0;font-size:11px;color:var(--txt);line-height:1.7}
   .v8cal-li li{padding-left:10px;position:relative}
   .v8cal-li li::before{content:'·';position:absolute;left:2px;color:var(--dim);font-weight:700}
@@ -725,7 +725,7 @@ window.V8_CAL = {weeks:[],legend:[]};
       <h3><span class="ic">📅</span>重要事件日历 - 中长线 · <span class="fresh" id="v8caltime">每周日更新</span></h3>
       <div id="v8calcontent"></div>
       <div style="margin-top:20px">
-        <div style="font-weight:800;margin-bottom:10px;font-size:14px">🎨 色块标注说明</div>
+        <div style="font-weight:800;margin-bottom:14px;font-size:15px">🎨 色块标注说明</div>
         <div class="v8cal-legend-grid" id="v8callegend"></div>
       </div>
     </div>
@@ -4762,9 +4762,8 @@ function renderLimitUpHeatmap(){
       var bg='rgba('+rgb.join(',')+',.14)';
       var rest = l.d + (l.i && l.i.length ? ' · ' + l.i.join(' / ') : '');
       return '<div class="v8cal-legend-item" title="'+String(l.n+' — '+rest).replace(/"/g,'&quot;')+'" style="border-left-color:'+l.c+';background:'+bg+'">'
-        + '<span class="swatch" style="background:'+l.c+'"></span>'
-        + '<span class="lname">'+l.n+'</span>'
-        + '<span class="lrest">'+rest+'</span></div>';
+        + '<div class="lname"><span class="swatch" style="background:'+l.c+'"></span>'+l.n+'</div>'
+        + '<div class="lrest">'+rest+'</div></div>';
     }).join('');
   }
   var tm = document.getElementById('v8caltime');
@@ -8477,9 +8476,8 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       var bg='rgba('+rgb.join(',')+',.14)';
       var rest = l.d + (l.i && l.i.length ? ' · ' + l.i.join(' / ') : '');
       return '<div class="v8cal-legend-item" title="'+String(l.n+' — '+rest).replace(/"/g,'&quot;')+'" style="border-left-color:'+l.c+';background:'+bg+'">'
-        + '<span class="swatch" style="background:'+l.c+'"></span>'
-        + '<span class="lname">'+l.n+'</span>'
-        + '<span class="lrest">'+rest+'</span></div>';
+        + '<div class="lname"><span class="swatch" style="background:'+l.c+'"></span>'+l.n+'</div>'
+        + '<div class="lrest">'+rest+'</div></div>';
     }).join('');
   }
   var tm = document.getElementById('v8caltime');
