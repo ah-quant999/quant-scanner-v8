@@ -3586,12 +3586,14 @@ window.V8_CAL = {weeks:[],legend:[]};
           <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
           <tr><td>09:00</td><td>v8_cn_fetch</td><td>T+1 周度/月度统一刷新（日历/IPO/两融/宏观等）</td><td>中国节点</td></tr>
           <tr><td>14:00</td><td>v8_self_heal</td><td>云端自愈器：检测陈旧模块 → 自动 re-fetch 补跑</td><td>云端</td></tr>
+          <tr><td>15:30</td><td>周末选股四模块T+1更新部署</td><td>选股数据更新+部署+臃肿度/崩溃风险体检（v8_bloat_check.py --alert）</td><td>中国节点/本机</td></tr>
           <tr><td>21:00</td><td>cloud_weekly_cleanup</td><td>orphan 清理 + 新鲜度体检</td><td>云端</td></tr>
         </table>
 
         <div class="logic-h">周日</div>
         <table class="lg-table">
           <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
+          <tr><td>15:30</td><td>周末选股四模块T+1更新部署</td><td>选股数据更新+部署+臃肿度/崩溃风险体检（v8_bloat_check.py --alert）</td><td>中国节点/本机</td></tr>
           <tr><td>23:00</td><td>v8_cleanup</td><td>缓存/日志清理</td><td>云端 ubuntu</td></tr>
         </table>
 
