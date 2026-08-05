@@ -72,8 +72,10 @@ jobs:
 
       - name: "🏗️ 构建 data/*.js（selective）"
         env:
-          # GHA 在 build step 默认不注入 GITHUB_TOKEN 到 env（虽 setup 阶段显示 Secret source: Actions），必须显式声明，子进程 update_v8.py → v8_health_check.py 才能拿到
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # V8_GH_TOKEN 是含 actions:read+list runners 权限的 PAT（已存为 repo secret）。
+          # GHA 默认 GITHUB_TOKEN 即便声明 actions:read 也无权列 self-hosted runners。
+          # v8_health_check.py 通过 _load_token() 优先选 V8_GITHUB_TOKEN > GITHUB_TOKEN > 本地文件。
+          V8_GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
             echo "调度触发：构建 post_close 类别"
