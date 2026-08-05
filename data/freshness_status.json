@@ -1,13 +1,19 @@
 {
-  "check_time": "2026-08-04 11:27:35",
-  "last_trade_close": "2026-08-03 15:30:00",
-  "core_stale": [],
+  "check_time": "2026-08-05 09:42:26",
+  "last_trade_close": "2026-08-04 15:30:00",
+  "core_stale": [
+    {
+      "var": "CRISIS_DATA",
+      "reason": "更新于 08-04 09:46，落后 5.7 小时",
+      "category": "premarket"
+    }
+  ],
   "warn_stale": [],
   "frozen_stale": [],
   "no_update_time": [],
   "summary": {
     "total_checked": 46,
-    "core_stale": 0,
+    "core_stale": 1,
     "warn_stale": 0,
     "frozen_stale": 0,
     "no_timestamp": 0
@@ -27,6 +33,7 @@
     "W52_HIGH": "premarket",
     "HERDING_DATA": "premarket",
     "JUDGMENT_DATA": "premarket",
+    "MACRO_BRIEF": "premarket",
     "VOLATILITY": "post_close",
     "INDEX_QUOTES": "intraday",
     "ETF_PULSE": "intraday",
