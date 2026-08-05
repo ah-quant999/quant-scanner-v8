@@ -1,12 +1,23 @@
-name: Test Simple Workflow
+name: Runner Health Alert v2
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "*/10 * * * *"
   workflow_dispatch:
 
+permissions:
+  contents: write
+  issues: write
+
 jobs:
-  test:
+  check:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     steps:
-      - run: echo "hello"
+      - name: probe runner
+        id: probe
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          echo "test step"
