@@ -1,0 +1,118 @@
+# 九宝量化 v8.0 — 中国数据抓取（GitHub 云端 ubuntu-latest）
+#
+# 2026-08-05 新增：探针实测 push2delay 东财镜像 + akshare 从 GHA 全部可达（OK 10/11），
+# 故新增本 workflow 作为云端主力，让小九(lemoncat-cn)停电/离线不再影响中国数据。
+# 分时段 selective fetch，逻辑与 v8_cn_fetch.yml 一致，仅 runner 改为 ubuntu-latest。
+#
+# 时段映射（北京时间）：
+#   08:25  盘前：V8_CAL / IPO_DATA / MARGIN_DATA / CFFEX_HOLDINGS / MACRO_DATA /
+#                 CRISIS_DATA / NORTH_FUND / ANALYST_RATINGS / W52_HIGH /
+#                 VOLATILITY / HERDING_DATA
+#   盘中每30分钟刷新（09:40 首刷 / 15:10 末档）：INDEX_QUOTES / ETF_PULSE / ETF_INTRADAY_HEAT / ETF_SUBSCRIPTION /
+#                     ETF_DAILY_MONITOR / SECTOR_FUND_FLOW / CAPITAL_FLOW_DATA /
+#                     CONCEPT_RANKING / LIMIT_UP_HEATMAP / AI_MARKET_BRIEF
+#   15:30  盘后：EXPERIMENT + MARKET_FUND_FLOW_DATA
+#   周六 09:00 / 周日 09:00  T+1 周度/月度统一刷新
+
+name: "🇨🇳 v8 中国数据抓取(云端)"
+
+on:
+  schedule:
+    - cron: '25 0 * * 1-5'   # 08:25 CST 盘前
+    - cron: '40 1 * * 1-5'    # 09:40 CST 盘中
+    - cron: '0 2 * * 1-5'    # 10:00 CST 盘中
+    - cron: '30 2 * * 1-5'   # 10:30 CST 盘中
+    - cron: '0 3 * * 1-5'    # 11:00 CST 盘中
+    - cron: '30 3 * * 1-5'   # 11:30 CST 盘中
+    - cron: '0 5 * * 1-5'    # 13:00 CST 盘中
+    - cron: '30 5 * * 1-5'   # 13:30 CST 盘中
+    - cron: '0 6 * * 1-5'    # 14:00 CST 盘中
+    - cron: '30 6 * * 1-5'   # 14:30 CST 盘中
+    - cron: '10 7 * * 1-5'    # 15:10 CST 盘中
+    - cron: '30 7 * * 1-5'   # 15:30 CST 盘后
+    - cron: '0 1 * * 6'      # 周六 09:00 CST
+    - cron: '0 1 * * 0'      # 周日 09:00 CST
+  workflow_dispatch:
+    inputs:
+      category:
+        description: '抓取类别：premarket / intraday / post_close / all'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-cn-fetch-cloud
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    steps:
+      - name: "🕐 确定抓取类别"
+        id: cat
+        shell: bash
+        run: |
+          DISPATCH_CAT="${{ github.event.inputs.category }}"
+          if [ -n "$DISPATCH_CAT" ]; then
+            echo "category=$DISPATCH_CAT" >> "$GITHUB_OUTPUT"
+            echo "label=手动派发($DISPATCH_CAT)"
+            exit 0
+          fi
+          CRON="${{ github.event.schedule }}"
+          case "$CRON" in
+            "25 0 * * 1-5"|"0 1 * * 6"|"0 1 * * 0")
+              echo "category=premarket" >> "$GITHUB_OUTPUT"
+              echo "label=盘前" ;;
+            "40 1 * * 1-5"|"0 2 * * 1-5"|"30 2 * * 1-5"|\
+            "0 3 * * 1-5"|"30 3 * * 1-5"|\
+            "0 5 * * 1-5"|"30 5 * * 1-5"|\
+            "0 6 * * 1-5"|"30 6 * * 1-5"|"10 7 * * 1-5")
+              echo "category=intraday" >> "$GITHUB_OUTPUT"
+              echo "label=盘中" ;;
+            "30 7 * * 1-5")
+              echo "category=post_close" >> "$GITHUB_OUTPUT"
+              echo "label=盘后" ;;
+            *)
+              echo "category=all" >> "$GITHUB_OUTPUT"
+              echo "label=全量兜底" ;;
+          esac
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: "📦 安装依赖"
+        run: |
+          pip install akshare pandas requests --quiet
+          python -c "import akshare, pandas; print('akshare', akshare.__version__, '/ pandas', pandas.__version__)"
+
+      - name: "📡 抓中国数据 → raw_data/（selective）"
+        continue-on-error: true
+        shell: bash
+        run: |
+          cat="${{ steps.cat.outputs.category }}"
+          echo "本次类别: $cat"
+          python cloud_fetch_v8.py --category "$cat"
+
+      - name: "🐉 回填 LHB 历史（仅 post_close）"
+        if: steps.cat.outputs.category == 'post_close'
+        continue-on-error: true
+        shell: bash
+        run: |
+          python backfill_lhb_history.py
+
+      - name: "📤 推送 raw_data/ 到 main（Contents API）"
+        shell: bash
+        run: |
+          python api_push_raw.py
