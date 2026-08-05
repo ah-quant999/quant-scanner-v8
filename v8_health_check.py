@@ -171,6 +171,133 @@ def api_get(url):
         return {"__error__": 0, "__msg__": str(e)}
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 自愈（detect-and-heal）：发现可修复的数据陈腐，主动派发对应类别刷新，而非只发邮件
+# ─────────────────────────────────────────────────────────────────────────────
+CN_WORKFLOW_ID = 324135267  # v8_cn_fetch workflow id（用于 API 派发刷新）
+HEAL_DEBOUNCE_MIN = 25       # 同一类别最小派发间隔，避免每小时巡检重复触发
+ALERT_OVERDUE_MIN = 120      # 与 send_report_email 一致的「值得处理」阈值（分钟）
+
+# 卡片分组 -> 刷新类别映射（与 cloud_fetch_v8.py / update_v8.py 的 CATEGORY_MAP 对应）
+PAGE_TO_CAT = {
+    "实时数据": "intraday",
+    "今日事件": "premarket",
+    "盘后数据": "post_close",
+    "选股策略": "post_close",
+}
+
+
+def _dispatch_cn_fetch(cat):
+    """经 GitHub API 派发 cn_fetch 刷新（自愈核心动作）。"""
+    token = _load_token()
+    if not token:
+        return False, "无 GitHub token，无法派发"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_WORKFLOW_ID}/dispatches"
+    data = json.dumps({"ref": "main", "inputs": {"category": cat}}).encode("utf-8")
+    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return True, f"已派发 cn_fetch category={cat} (HTTP {r.status})"
+    except urllib.error.HTTPError as e:
+        return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
+    except Exception as e:
+        return False, f"派发异常: {e}"
+
+
+def _heal_lock_path():
+    return DATA_DIR / ".heal_dispatch.json"
+
+
+def _load_heal_lock():
+    p = _heal_lock_path()
+    if p.exists():
+        try:
+            return json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
+
+
+def _save_heal_lock(lock):
+    p = _heal_lock_path()
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(json.dumps(lock, ensure_ascii=False), encoding="utf-8")
+
+
+def self_heal(report):
+    """发现可自愈的数据陈腐问题时，主动派发对应类别刷新。
+
+    返回 (healed, failed) 两个文案列表：
+      - healed: 已自动派发刷新 / 近期已派发跳过重复
+      - failed: 派发失败（需人工）
+    同时给 report["items"] 中对应卡片打上 heal 标记（供前端展示「已自动修复」）。
+
+    仅处理「数据卡片」（实时数据/今日事件/盘后数据/选股策略）的陈腐；
+    管线类检查（本地/部署同步）不属于此处自愈范围，交给看门狗统一处理。
+    """
+    healed, failed = [], []
+    if report.get("overall") == "ok":
+        return healed, failed
+
+    stale = [it for it in report["items"]
+             if it.get("status") == "fail"
+             and it.get("age_min") is not None
+             and it["age_min"] >= ALERT_OVERDUE_MIN]
+    if not stale:
+        return healed, failed
+
+    # 按刷新类别归集（仅数据卡片）
+    cat_items = {}
+    for it in stale:
+        cat = PAGE_TO_CAT.get(it.get("page"))
+        if not cat:
+            continue  # 非数据卡片（管线类），交给看门狗
+        cat_items.setdefault(cat, []).append(it)
+
+    if not cat_items:
+        return healed, failed
+
+    lock = _load_heal_lock()
+    now = now_cst()
+    for cat, items in cat_items.items():
+        names = [it.get("name", "") for it in items]
+        last = lock.get(cat)
+        if last:
+            last_dt = parse_time(last)
+            if last_dt and (now - last_dt).total_seconds() < HEAL_DEBOUNCE_MIN * 60:
+                msg = f"近 {HEAL_DEBOUNCE_MIN} 分钟内已派发，跳过重复"
+                healed.append(f"[{cat}] {', '.join(names)}: {msg}")
+                for it in items:
+                    it["heal"] = f"已自愈(跳过重复): {msg}"
+                continue
+        ok, dmsg = _dispatch_cn_fetch(cat)
+        if ok:
+            healed.append(f"[{cat}] {', '.join(names)}: 已自动派发刷新 ({dmsg})")
+            for it in items:
+                it["heal"] = f"已自动派发刷新({cat})"
+            lock[cat] = now.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            failed.append(f"[{cat}] {', '.join(names)}: 自动派发失败 ({dmsg})")
+            for it in items:
+                it["heal"] = f"自愈失败: {dmsg}"
+    _save_heal_lock(lock)
+    return healed, failed
+
+
+def write_urgent(reason_lines):
+    """邮件失败/夜间静音时需留痕时，写 URGENT 文件到仓库根目录。"""
+    ts = now_cst().strftime("%Y-%m-%d_%H%M")
+    p = Path(f"URGENT_小九_{ts}_v8健康自检告警.md")
+    body = [f"# v8 健康自检告警 {ts}", ""] + reason_lines + ["", "请检查 v8_health_check.py 日志与自愈结果。"]
+    p.write_text("\n".join(body), encoding="utf-8")
+    print(f"[INFO] 已写紧急文件 {p}")
+
+
 def adjust_max_age(def_max, page=None):
     """根据交易时段 + 数据更新窗口动态调整阈值。
 
@@ -423,33 +550,66 @@ def write_health_js(report):
     print(f"[INFO] 已生成 {out_path}")
 
 
-def send_report_email(report):
+def send_report_email(report, healed=None, failed=None):
+    """发送健康检查邮件。
+
+    自愈优先：先已由 self_heal() 尝试修复。邮件定位从「纯告警」改为：
+      - 全部自愈成功 -> 发一条『已自愈』确认邮件（告知已自动派发刷新，无需人工）
+      - 有自愈失败 / 不可自愈项 -> 升级邮件，列明需人工介入的项
+    夜间静音时段：自愈动作照常（已在 main 中执行），仅降级为写 URGENT 留痕，不发邮件。
+    """
+    healed = healed or []
+    failed = failed or []
     if not send_alert:
         print("[WARN] 邮件发送器未导入，跳过邮件")
         return False
-    if report["overall"] == "ok":
+    if report["overall"] == "ok" and not healed and not failed:
         return False
-    if in_quiet_hours():
-        print("[INFO] 当前处于夜间静音时段（22:00-07:00），跳过邮件告警，仅记录日志")
+
+    # 仍需人工关注的 fail 项：
+    #  - 已自愈（heal 标记为「已自动…」）的卡片不再告警
+    #  - 自愈失败的卡片列入（与 failed 对应）
+    #  - 不可自愈的 fail（文件缺失等）列入
+    #  - 管线类检查（本地/部署同步）由看门狗统一处理，此处不重复告警，避免噪声
+    remaining = []
+    for it in report["items"]:
+        if it.get("status") != "fail":
+            continue
+        if it.get("page") == "管线":
+            continue
+        if it.get("heal", "").startswith("已自动"):
+            continue  # 已自愈，无需人工
+        remaining.append(it)
+
+    quiet = in_quiet_hours()
+    if quiet:
+        if failed or remaining:
+            lines = [f"[{it.get('page', '')}] {it.get('name', '')}: {it.get('message', '')}" for it in remaining]
+            lines += failed
+            write_urgent(lines)
+        # 夜间静音：自愈已执行，仅不邮件
         return False
-    # ── 过滤：仅「真正陈旧」的项才触发邮件 ──
-    # 规则：fail 项必须超阈值 ≥ 120 分钟（2 小时）才算值得告警；
-    #       纯空值 warn（数据新鲜但关键字段为空）不触发邮件，避免噪音。
-    ALERT_OVERDUE_MIN = 120
-    alert_items = [it for it in report["items"] if it["status"] == "fail"
-                   and it.get("age_min") is not None and it["age_min"] >= ALERT_OVERDUE_MIN]
-    if not alert_items:
-        print(f"[INFO] 跳过邮件：{report['summary']['fail']} 项 fail 中无超阈 ≥ {ALERT_OVERDUE_MIN}min 的项")
+
+    if failed or remaining:
+        subject = f"【v8需人工】自愈失败/无法自动修复 {len(failed) + len(remaining)} 项 @ {report['updated']}"
+        lines = [f"v8 自愈巡检时间：{report['updated']}", "",
+                 "以下项自动修复失败或无法自动修复，需人工介入："]
+        for it in remaining:
+            lines.append(f"✗ [{it.get('page', '')}] {it.get('name', '')}: {it.get('message', '')}")
+        for f in failed:
+            lines.append(f"✗ {f}")
+        if healed:
+            lines += ["", "以下项已自动派发刷新（无需人工）："]
+            lines += [f"✓ {h}" for h in healed]
+    elif healed:
+        subject = f"【v8已自愈】{len(healed)} 项数据陈腐已自动派发刷新 @ {report['updated']}"
+        lines = [f"v8 自愈巡检时间：{report['updated']}", "",
+                 "检测到以下数据陈腐，已自动派发对应类别刷新（runner 执行中，稍后线上刷新）："]
+        lines += [f"✓ {h}" for h in healed]
+    else:
         return False
-    subject = f"【v8健康告警】{len(alert_items)}项数据陈旧 / {report['updated']}"
-    lines = [f"v8 前端健康检查时间：{report['updated']}", f"总体状态：{report['overall']}",
-             f"统计：✓ {report['summary']['ok']} / ⚠ {report['summary']['warn']} / ✗ {report['summary']['fail']}",
-             "", "以下项超过阈值 ≥ 2 小时："]
-    for item in alert_items:
-        flag = "✗" if item["status"] == "fail" else "⚠"
-        lines.append(f"{flag} [{item['page']}] {item['name']}: {item['message']}")
-    lines.append("")
-    lines.append(f"站点：{SITE_URL}")
+
+    lines += ["", f"站点：{SITE_URL}"]
     return send_alert(subject, "\n".join(lines))
 
 
@@ -457,6 +617,9 @@ def main():
     parser = argparse.ArgumentParser(description="v8 前端健康巡检")
     parser.add_argument("--alert", action="store_true", help="异常时发送邮件告警")
     parser.add_argument("--site", action="store_true", help="额外检查线上 DOM 空值")
+    parser.add_argument("--heal", dest="heal", action="store_true", default=True,
+                        help="发现可自愈陈腐时自动派发刷新（默认开）")
+    parser.add_argument("--no-heal", dest="heal", action="store_false", help="关闭自愈派发（仅诊断）")
     args = parser.parse_args()
 
     sys.stdout.reconfigure(encoding="utf-8")
@@ -482,8 +645,17 @@ def main():
         if item["status"] != "ok":
             print(f"  [{item['status'].upper()}] {item['page']}/{item['name']}: {item['message']}")
 
+    # ── 自愈（默认开）：发现可修复陈腐即尝试派发刷新，而非只发邮件 ──
+    healed, failed = [], []
+    if args.heal and report["overall"] != "ok":
+        healed, failed = self_heal(report)
+        for h in healed:
+            print(f"  [HEAL✓] {h}")
+        for f in failed:
+            print(f"  [HEAL✗] {f}")
+
     if args.alert:
-        send_report_email(report)
+        send_report_email(report, healed=healed, failed=failed)
 
     sys.exit(0 if report["overall"] == "ok" else 2)
 

@@ -1,5 +1,5 @@
 window.BLOAT_CHECK = {
-  "updated": "2026-08-05 10:32:28",
+  "updated": "2026-08-05 12:04:06",
   "overall": "ok",
   "summary": {
     "ok": 8,
@@ -11,30 +11,30 @@ window.BLOAT_CHECK = {
     {
       "name": "index.html 体积",
       "status": "ok",
-      "message": "580.9 KB",
-      "metric": 580.9
+      "message": "584.0 KB",
+      "metric": 584.0
     },
     {
       "name": "index.html 行数",
       "status": "ok",
-      "message": "9018 行",
-      "metric": 9018
+      "message": "9051 行",
+      "metric": 9051
     },
     {
       "name": "script 标签平衡",
       "status": "ok",
-      "message": "76 个 <script> 块，76 个 </script>",
+      "message": "75 个 <script> 块，75 个 </script>",
       "metric": {
-        "opens": 76,
-        "closes": 76
+        "opens": 75,
+        "closes": 75
       }
     },
     {
       "name": "重复 id 检查",
       "status": "ok",
-      "message": "共 207 个 id，无重复",
+      "message": "共 205 个 id，无重复",
       "metric": {
-        "total": 207,
+        "total": 205,
         "duplicates": 0
       }
     },
@@ -50,16 +50,16 @@ window.BLOAT_CHECK = {
     {
       "name": "node --check 语法闸门",
       "status": "ok",
-      "message": "语法检查通过（76 个 script 块）",
-      "metric": 76
+      "message": "语法检查通过（75 个 script 块）",
+      "metric": 75
     },
     {
       "name": "data/*.js 总体积",
       "status": "ok",
-      "message": "55 个文件，共 3197.4 KB",
+      "message": "55 个文件，共 3196.4 KB",
       "metric": {
         "files": 55,
-        "kb": 3197.4
+        "kb": 3196.4
       }
     },
     {

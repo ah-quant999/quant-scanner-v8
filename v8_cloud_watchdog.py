@@ -312,37 +312,10 @@ def send_watchdog_alert(now, results, health_rc=None, health_out=None):
 
     # 管线类异常（基础设施，始终告警）
     infra_fails = [f"✗ {name}: {msg}" for name, ok, msg in results if not ok]
-    # 健康检查类：过滤出真正陈旧的项
-    # 2026-08-05 10:35 修复：原实现用正则解析 health stdout 的「X分钟前」，
-    # 但 v8_health_check.py 实际输出「超过阈值 X 分钟」（X 是阈值非真实年龄），
-    # 导致实时卡片真实陈旧（如市场预警 523min）永远无法命中 → 汇总邮件漏报健康类 fail。
-    # 改为读取本次 health check 生成的 data/HEALTH_CHECK.js（含 age_min 字段），
-    # 与 v8_health_check.py 内部 send_report_email 的判定口径保持一致。
+    # 健康检查类（数据卡片陈腐）改由 v8_health_check.py 自身负责：
+    # 它已内置自愈（自动派发对应类别刷新）并发送「已自愈 / 需人工」邮件。
+    # 此处不再重复告警，避免对同一次自愈既发「已自愈」又发「数据陈旧」造成噪声。
     health_alert_items = []
-    ALERT_OVERDUE_MIN = 120
-    try:
-        hc_path = Path("data/HEALTH_CHECK.js")
-        if hc_path.exists():
-            import re as _re
-            txt = hc_path.read_text(encoding="utf-8")
-            m = _re.search(r"window\.HEALTH_CHECK\s*=\s*(\{.*\});", txt, _re.S)
-            if m:
-                hc = json.loads(m.group(1))
-                for it in hc.get("items", []):
-                    if it.get("status") != "fail":
-                        continue
-                    age = it.get("age_min")
-                    if age is not None and age >= ALERT_OVERDUE_MIN:
-                        health_alert_items.append(
-                            f"✗ [{it.get('page','')}] {it.get('name','')}: {it.get('message','')}")
-                    elif age is None:
-                        # 无年龄字段的 FAIL（文件缺失等严重问题）也保留
-                        msg = it.get("message", "")
-                        if any(k in msg for k in ("找不到", "不存在", "无法获取")):
-                            health_alert_items.append(
-                                f"✗ [{it.get('page','')}] {it.get('name','')}: {msg}")
-    except Exception as e:
-        print(f"[WARN] 解析 HEALTH_CHECK.js 失败: {e}")
 
     total_alerts = len(infra_fails) + len(health_alert_items)
     if total_alerts == 0:
@@ -370,8 +343,10 @@ def send_watchdog_alert(now, results, health_rc=None, health_out=None):
 def main():
     parser = argparse.ArgumentParser(description="v8 云端管线看门狗")
     parser.add_argument("--heal", action="store_true", help="runner 离线时尝试自动拉起本地进程")
-    parser.add_argument("--auto-dispatch", action="store_true",
-                        help="数据陈旧且处于交易时段时，经 API 主动派发 cn_fetch 刷新（绕过 GitHub schedule）")
+    parser.add_argument("--auto-dispatch", action="store_true", default=True,
+                        help="数据陈旧且处于交易时段时，经 API 主动派发 cn_fetch 刷新（绕过 GitHub schedule，默认开）")
+    parser.add_argument("--no-auto-dispatch", dest="auto_dispatch", action="store_false",
+                        help="关闭自动派发（仅诊断）")
     parser.add_argument("--health-check", action="store_true",
                         help="同时运行 v8_health_check.py 做前端数据/空值/部署同步检查")
     parser.add_argument("--alert", action="store_true",
