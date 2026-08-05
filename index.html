@@ -746,24 +746,22 @@ window.V8_CAL = {weeks:[],legend:[]};
     </script>
 
 
-    <div class="grid g-2" style="margin-bottom:16px">
-      <!-- 上证+深证成交额 -->
-      <div class="card">
-        <h3><span class="ic">📈</span>上证+深证 每日成交金额（亿元） - 短线盘中 · <span class="fresh" id="amountUpdateTime">更新于 今日 15:21</span><span class="fresh" id="amountLastDate" style="margin-left:8px;font-weight:400;"></span></h3>
-        <div id="amountChartContainer" style="width:100%;height:260px;position:relative;overflow:visible;">
-          <svg id="amountChart" width="100%" height="260" style="overflow:visible;" overflow="visible"></svg>
-        </div>
-        <div class="note" id="amountNote" style="margin-top:10px;line-height:1.7">今日两市合计 -- 亿元，较前日 --%，--。</div>
+    <!-- 上证+深证成交额 -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📈</span>上证+深证 每日成交金额（亿元） - 短线盘中 · <span class="fresh" id="amountUpdateTime">更新于 今日 15:21</span><span class="fresh" id="amountLastDate" style="margin-left:8px;font-weight:400;"></span></h3>
+      <div id="amountChartContainer" style="width:100%;height:260px;position:relative;overflow:visible;">
+        <svg id="amountChart" width="100%" height="260" style="overflow:visible;" overflow="visible"></svg>
       </div>
+      <div class="note" id="amountNote" style="margin-top:10px;line-height:1.7">今日两市合计 -- 亿元，较前日 --%，--。</div>
+    </div>
 
-      <!-- 近一月涨跌家数统计 -->
-      <div class="card">
-        <h3><span class="ic">🏘️</span>近一月 涨跌家数统计 - 盘中实时 · <span class="fresh" id="upDownUpdateTime">更新于 今日 15:21</span><span class="fresh" id="upDownLastDate" style="margin-left:8px;font-weight:400;"></span></h3>
-        <div id="upDownChartContainer" style="width:100%;height:260px;position:relative;overflow:visible;">
-          <svg id="upDownChart" width="100%" height="260" style="overflow:visible;" overflow="visible"></svg>
-        </div>
-        <div class="note" id="upDownNote">红=上涨家数，绿=下跌家数，灰=平盘。今日涨 -- / 跌 -- / 平 --。</div>
+    <!-- 近一月涨跌家数统计 -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🏘️</span>近一月 涨跌家数统计 - 盘中实时 · <span class="fresh" id="upDownUpdateTime">更新于 今日 15:21</span><span class="fresh" id="upDownLastDate" style="margin-left:8px;font-weight:400;"></span></h3>
+      <div id="upDownChartContainer" style="width:100%;height:260px;position:relative;overflow:visible;">
+        <svg id="upDownChart" width="100%" height="260" style="overflow:visible;" overflow="visible"></svg>
       </div>
+      <div class="note" id="upDownNote">红=上涨家数，绿=下跌家数，灰=平盘。今日涨 -- / 跌 -- / 平 --。</div>
     </div>
 
         <!-- 涨停热力矩阵（整行宽度） -->
