@@ -32,3 +32,6 @@ out/
 
 # 临时脚本残留
 _*.py
+
+# 自愈派发防抖锁（运行时本地文件，不入库）
+data/.heal_dispatch.json
