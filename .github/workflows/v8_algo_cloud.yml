@@ -24,6 +24,8 @@ on:
   schedule:
     - cron: '30 10 * * 1-5'  # 18:30 CST 盘后（龙虎榜18点后已发布 + 收盘数据 + 算法部署）主
     - cron: '0 12 * * 1-5'   # 20:00 CST 盘后冗余备份
+    - cron: '30 12 * * 1-5'  # 20:30 CST 兜底（防 18:30/20:00 schedule 失效；与 8-03 v8_algo_run 失效同源问题冗余修复）
+    - cron: '50 12 * * 1-5'  # 20:50 CST 兜底（确保今晚明早盘后算法链至少一次成功落地）
   workflow_dispatch:
 
 permissions:
