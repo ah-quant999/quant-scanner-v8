@@ -29,6 +29,7 @@ DATA_SOURCES = {
     "sector_fund_flow_trend.json": "SECTOR_FUND_FLOW_TREND",
     "gold_pool.json":              "GOLD_POOL",
     "stock_names.json":            "STOCK_LIST",
+    "stock_profile.json":          "STOCK_PROFILE",
     "macro_data.json":             "MACRO_DATA",
     "macro_brief.json":            "MACRO_BRIEF",
     "nt_data.json":                "NT_DATA",
@@ -142,6 +143,7 @@ CATEGORY_MAP = {
     "MAHORO": "post_close",
     "EXPERIMENT": "post_close",
     "STOCK_LIST": "post_close",
+    "STOCK_PROFILE": "post_close",
 }
 
 CATEGORY_LABEL = {

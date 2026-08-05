@@ -416,6 +416,7 @@ html>
     <script src="data/SUSPENSION_ALERT.js"></script>
     <script src="data/GOLD_POOL.js"></script>
     <script src="data/STOCK_LIST.js"></script>
+    <script src="data/STOCK_PROFILE.js"></script>
     <script src="data/MACRO_DATA.js"></script>
     <script src="data/MACRO_BRIEF.js"></script>
 <script src="data/NT_DATA.js"></script>
@@ -4398,6 +4399,127 @@ function switchSec(sec,el){
     return h;
   }
 
+  function getProfile(code){
+    const sp = window.STOCK_PROFILE || {};
+    const p = sp.profiles && sp.profiles[code];
+    if(p) return p;
+    // fallback：候选池自带行业/概念
+    const cd = window.CANDIDATE || {};
+    const stocks = cd.stocks || {};
+    const key = Object.keys(stocks).find(k=>normCode(stocks[k].code)===normCode(code));
+    if(key){
+      const s=stocks[key];
+      return {industry:s.industry, concepts:(s.concepts||[]).slice(0,10)};
+    }
+    return null;
+  }
+
+  function renderProfile(item, code){
+    const p = getProfile(code);
+    const board = item.board_label || (p && p.board) || '-';
+    if(!p) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">🏷️ 概念行业：未收录</div>';
+    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
+    h+='<div style="font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:8px;">🏷️ 概念行业概览</div>';
+    h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
+    h+='<div>板块 <span style="display:inline-block;background:rgba(56,189,248,.15);color:var(--cyan);padding:1px 8px;border-radius:4px;font-size:11px;font-weight:600;">'+board+'</span> · 行业 <b>'+(p.industry||'-')+'</b></div>';
+    const tags = (p.concepts||[]).slice(0,12);
+    h+='<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:5px;">'+
+        tags.map(function(t){return '<span style="display:inline-block;background:var(--bg);border:1px solid var(--border);color:var(--txt);padding:2px 8px;border-radius:12px;font-size:11px;">'+t+'</span>';}).join('')+
+        (tags.length?'':'<span style="color:var(--dim)">无题材概念</span>')+'</div>';
+    h+='</div></div>';
+    return h;
+  }
+
+  function renderStrategyHits(item, code){
+    const hits=[];
+    const nc = normCode(code);
+    // 三重共识
+    const top = window.TOP10_DAILY || {};
+    const trow = (top.top10||[]).find(r=>normCode(r.code)===nc);
+    if(trow) hits.push({name:'🧬 三重共识', color:'var(--purple)', detail:'排名 #'+trow.rank+' · 评分 '+trow.total_score});
+    // 金股池
+    const gp = window.GOLD_POOL || {};
+    const gstocks = gp.stocks || {};
+    const gkey = Object.keys(gstocks).find(k=>normCode(gstocks[k].code)===nc);
+    if(gkey) hits.push({name:'⭐ 金股池', color:'var(--up)', detail:'累计信号 '+(gstocks[gkey].signal_count||0)});
+    // 候选池（全站精选底层池）
+    const cd = window.CANDIDATE || {};
+    const cstocks = cd.stocks || {};
+    const ckey = Object.keys(cstocks).find(k=>normCode(cstocks[k].code)===nc);
+    if(ckey) hits.push({name:'🎯 候选池', color:'var(--cyan)', detail:(cstocks[ckey].sources||[]).join(' / ')});
+    // 驾驶舱
+    const cp = window.COCKPIT_TIER_RECOMMEND || {};
+    const cpa = (cp.tier_a||[]).find(r=>normCode(r.code)===nc);
+    const cpb = (cp.tier_b||[]).find(r=>normCode(r.code)===nc);
+    if(cpa) hits.push({name:'🚀 驾驶舱 A档', color:'#ffd54f', detail:'评分 '+cpa.total_score+' · '+ (cpa.comment||'-')});
+    else if(cpb) hits.push({name:'🚁 驾驶舱 B档', color:'var(--gold)', detail:'评分 '+cpb.total_score+' · '+(cpb.comment||'-')});
+    // 逆势龙头
+    const crds = window.CRDS_CARD_DATA || {};
+    let crdsCond='';
+    if((crds.cond1_list||[]).find(r=>normCode(r.code)===nc)) crdsCond='条件① 逆势涨停';
+    else if((crds.cond2_list||[]).find(r=>normCode(r.code)===nc)) crdsCond='条件② 大跌日涨停';
+    else if((crds.cond3_list||[]).find(r=>normCode(r.code)===nc)) crdsCond='条件③ 强α';
+    if(crdsCond) hits.push({name:'🐉 逆势龙头', color:'var(--down)', detail:crdsCond});
+    // 四量终极
+    const fv = window.FOUR_VOLUME || {};
+    const frow = (fv.stocks||[]).find(r=>normCode(r.code)===nc);
+    if(frow) hits.push({name:'🔥 四量终极', color:'#ff7043', detail:'游资+机构+金叉+四路翻多'});
+
+    if(!hits.length) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">🎖️ 选股策略命中：未收录</div>';
+    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
+    h+='<div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px;">🎖️ 选股策略命中</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:6px;">';
+    hits.forEach(function(hit){
+      h+='<div style="display:flex;align-items:center;gap:8px;font-size:12px;">';
+      h+='<span style="font-weight:700;color:'+hit.color+';">'+hit.name+'</span>';
+      h+='<span style="color:var(--sub);">'+hit.detail+'</span></div>';
+    });
+    h+='</div></div>';
+    return h;
+  }
+
+  function renderRelatedFlow(item, code){
+    const p = getProfile(code);
+    if(!p) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">💧 关联板块资金流向：无档案</div>';
+    const concepts = (p.concepts||[]).slice(0,8);
+    const industry = p.industry || '';
+    const rows=[];
+    // 概念资金流匹配
+    const cr = window.CONCEPT_RANKING || {};
+    const clist = cr.list || cr.ranking || cr.data || [];
+    concepts.forEach(function(c){
+      const row = clist.find(function(r){ return (r.name||r.concept||'')===c; });
+      if(row && row.net_inflow!=null){
+        const v=Number(row.net_inflow);
+        rows.push({name:c, type:'概念', value:v, pct:row.pct_day});
+      }
+    });
+    // 行业/板块资金流匹配
+    const sf = window.SECTOR_FUND_FLOW || {};
+    const sall = (sf.sectors_in||[]).concat(sf.sectors_out||[]);
+    if(industry && sall.length){
+      const srow = sall.find(function(r){
+        const n=(r.name||r.sector_name||'');
+        return industry.indexOf(n)!==-1 || n.indexOf(industry.replace(/.*业/,''))!==-1;
+      });
+      if(srow && srow.net!=null) rows.push({name:srow.name||srow.sector_name, type:'板块', value:Number(srow.net), pct:srow.chg});
+    }
+    if(!rows.length) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">💧 关联板块资金流向：暂无匹配</div>';
+    rows.sort(function(a,b){ return Math.abs(b.value)-Math.abs(a.value); });
+    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
+    h+='<div style="font-size:13px;font-weight:700;color:var(--up);margin-bottom:8px;">💧 关联板块资金流向</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:6px;">';
+    rows.slice(0,6).forEach(function(r){
+      const color = r.value>=0?'var(--up)':'var(--down)';
+      const pctStr = r.pct!=null?(' · '+fmtPct(r.pct)) :'';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;">';
+      h+='<span><span style="color:var(--dim);">['+r.type+']</span> '+r.name+'</span>';
+      h+='<span style="color:'+color+';font-weight:600;">'+(r.value>=0?'+':'')+fmtYi(r.value)+pctStr+'</span></div>';
+    });
+    h+='</div></div>';
+    return h;
+  }
+
   window.doV8Query = function(){
     const input = _q$('v8QueryInput');
     const q = input.value.trim();
@@ -4415,6 +4537,9 @@ function switchSec(sec,el){
     h+='</div></div>';
 
     h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:14px;">';
+    h+=renderProfile(item, code);
+    h+=renderStrategyHits(item, code);
+    h+=renderRelatedFlow(item, code);
     h+=renderMulti(item, code);
     h+=renderGoldPool(item, code);
     h+=renderLhb(item, code);

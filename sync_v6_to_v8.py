@@ -40,6 +40,7 @@ V8_RAW = V8_ROOT / "raw_data"
 
 # v6 文件名 → v8 raw_data 文件名
 V6_TO_V8 = {
+    "stock_names.json":             "stock_names.json",
     "gold_pool.json":               "gold_pool.json",
     "candidate_pool.json":          "candidate.json",
     "triple_consensus.json":        "triple_consensus.json",
@@ -142,6 +143,60 @@ def _append_lhb_to_history():
     print(f"  🐉 龙虎榜历史追加 {iso}（{len(obj['stocks'])} 只，共振{obj.get('summary',{}).get('机游共振',0)}）")
 
 
+def build_stock_profile():
+    """从 v6 industry_map.json + stock_names.json 构建压缩版 STOCK_PROFILE。
+
+    仅保留 A 股基础档案（行业、前10概念、板块标签），用于个股查询反查概念/行业。
+    大小约 350KB，远小于完整 industry_map（1.9MB）。
+    """
+    v6_industry = V6_DATA / "industry_map.json"
+    v6_names = V6_DATA / "stock_names.json"
+    if not v6_industry.exists() or not v6_names.exists():
+        print("  ⚠️ 缺少 industry_map.json 或 stock_names.json，跳过 STOCK_PROFILE")
+        return False
+
+    ind = _load_json(v6_industry)
+    names = _load_json(v6_names)
+    if not ind or not names:
+        return False
+
+    industry_stocks = ind.get("stocks", {})
+    profiles = {}
+    for s in names:
+        code = s.get("code")
+        if not code:
+            continue
+        market = s.get("market", "")
+        if not market:
+            fc = (s.get("full_code") or "").lower()
+            if fc.startswith(("sh", "sz", "bj")):
+                market = fc[:2]
+        key = f"{market}_{code}".lower()
+        info = industry_stocks.get(key) or industry_stocks.get(code)
+        if not info:
+            continue
+        concepts = info.get("concepts", [])
+        # 过滤掉纯指数/风格标签，保留题材概念：去掉以年份、HS/MSCI/上证/深证/中证等开头或含"风格"的
+        filtered = [c for c in concepts if not (
+            c.startswith(("20", "HS", "MSCI", "上证", "深证", "中证", "富时", "标准", "QFII", "基金", "昨日", "最近", "行业", "周期", "大盘", "中盘", "小盘", "成长", "价值")) or
+            "风格" in c or "重仓" in c or "持股" in c or "AH股" in c or "沪股通" in c or "深股通" in c
+        )]
+        profiles[code] = {
+            "industry": info.get("industry"),
+            "concepts": filtered[:10],
+        }
+
+    out = {
+        "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
+        "total": len(profiles),
+        "profiles": profiles,
+    }
+    out_path = V8_RAW / "stock_profile.json"
+    _save_json(out_path, out)
+    print(f"  ✅ STOCK_PROFILE: {len(profiles)} 只（约 {out_path.stat().st_size/1024:.0f}KB）")
+    return True
+
+
 def sync(category="post_close", dry_run=False, force_cloud=False, push=False, only=None):
     # 加载 v8 DATA_SOURCES / CATEGORY_MAP（避免硬编码耦合）
     sys.path.insert(0, str(V8_ROOT))
@@ -215,7 +270,10 @@ def sync(category="post_close", dry_run=False, force_cloud=False, push=False, on
     if missing:
         print(f"仍缺失: {len(missing)}  {', '.join(v for _,_,v in missing)}")
 
-    if push and synced:
+    # 构建压缩版个股档案（行业/概念/板块），供个股查询使用
+    profile_ok = build_stock_profile()
+
+    if push and (synced or profile_ok):
         print("\n--- git push ---")
         subprocess.run(["git", "add", "-f", "raw_data/"], cwd=V8_ROOT, check=True)
         result = subprocess.run(
@@ -224,8 +282,10 @@ def sync(category="post_close", dry_run=False, force_cloud=False, push=False, on
         if result.returncode == 0:
             print("ℹ️ raw_data 无变化，无需 push")
             return 0
-        msg = f"data(v8): v6→v8 同步 {category} 模块 ({len(synced)}个)\n\n" + \
-              "\n".join(f"- {v}: {s} -> raw_data/{t}" for s, t, v in synced)
+        parts = [f"- {v}: {s} -> raw_data/{t}" for s, t, v in synced]
+        if profile_ok:
+            parts.append("- STOCK_PROFILE: 压缩个股档案（行业/概念/板块）")
+        msg = f"data(v8): v6→v8 同步 {category} 模块 ({len(synced)}个)\n\n" + "\n".join(parts)
         subprocess.run(["git", "commit", "-m", msg], cwd=V8_ROOT, check=True)
         subprocess.run(["git", "push", "origin", "main"], cwd=V8_ROOT, check=True)
         print("✅ 已 push origin/main，v8_build_deploy.yml 将自动构建")
