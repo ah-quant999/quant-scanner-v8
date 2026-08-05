@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 """四量终极 选股策略模块（v8 候选策略 · 暂未上架区）
 
-· calc_siliang_ultimate_signal 本模块自包含（忠实翻译用户 2026-08-05 通达信「四量终极」XG 公式）。
-  ⚠️ 原始公式未被持久化（运行期 reset 抹除初稿），下方为按解码结构重建的版本，
-     常量（1e-5/1e-6/0.06 缩放、REF(MID9,19) 省略）以注释标注，若与您原始源码不符请回贴修正。
+· calc_siliang_ultimate_signal 本模块自包含，忠实翻译用户 2026-08-05 通达信「四量终极 指标版 副图」公式（原贴完整源码，已核对）。
+· 信号 QD = YZC AND JG AND XC AND FOUR：游资点火 YZC=CROSS(W2,0) / 机构托底 JG=C>NLJ / 当天金叉 XC=JGC|SHC|YZC|ZLC（四金叉取或）/ 四路翻多 FOUR=JG&GB1>=0&W2>=0&V6>=0。
 · scan_four_volume()  : 复用 scanner 的成交量前N活跃股池 + 日K 抓取，逐只算 XG，
                         收集末根触发 XG 的票，产出命中清单（含组件灯 + 触发理由）。
 · write_four_volume_js(): 写出 data/FOUR_VOLUME.js 供 v8 站点渲染。
@@ -38,13 +37,15 @@ from scanner import (  # noqa: E402
 
 
 # ──────────────────────────────────────────────────────────────────────────
-# 四量终极 信号计算（自包含，忠实翻译用户 2026-08-05 通达信 XG 公式）
-#   XG: YZC AND JG AND XC AND FOUR
-#   游资点火 YZC / 机构托底 JG / 当天金叉 XC(=JGC&ZLC&SHC) / 四路翻多 FOUR(=YZC&JG&GB1>=0&V6>=0)
-# 解码结构（来自用户源码）：
-#   MID9=MID1=MID（量加权价 MA），NLJ=NLS=DKX（量加权价 MA，与 MID 同源不同周期）
-#   原公式 _wline 故意省略 REF(MID9,19)（保留该“bug”以求与通达信一致）
-#   缩放常量 1e-5 / 1e-6 / 0.06（量纲归一，详见各变量注释）
+# 四量终极 信号计算（自包含，忠实翻译用户 2026-08-05 通达信「指标版 副图」公式）
+#   QD: YZC AND JG AND XC AND FOUR
+#   游资点火 YZC = CROSS(W2, 0)
+#   机构托底 JG  = C > NLJ
+#   当天金叉 XC  = JGC OR SHC OR YZC OR ZLC（四金叉取或）
+#   四路翻多 FOUR= JG AND GB1>=0 AND W2>=0 AND V6>=0
+#   其中 JGC=CROSS(NLJ,MA(NLJ,6)) / SHC=CROSS(GB1,0) / ZLC=CROSS(V6,0)
+#   加权价 MID=(3C+O+L+H)/6；NLJ=NLS=DKX=MID 同一条 20 周期加权线（含 REF(MID,19)→REF(MID,20) 替换）
+#   非未来函数。
 # ──────────────────────────────────────────────────────────────────────────
 def _obv(close, vol):
     """累计能量潮 OBV（非未来函数）。"""
@@ -57,29 +58,56 @@ def _obv(close, vol):
     return np.cumsum(sign * v)
 
 
-def _vwma(vol, price, period):
-    """量加权价移动平均（非未来函数）。"""
-    v = np.asarray(vol, dtype=float)
-    p = np.asarray(price, dtype=float)
-    vp = v * p
-    num = pd.Series(vp).rolling(period, min_periods=1).sum().values
-    den = pd.Series(v).rolling(period, min_periods=1).sum().values
-    return np.where(den > 0, num / den, p)
-
-
 def _cross(a, b):
-    """CROSS(a,b)：a 上穿 b（非未来函数）。"""
+    """CROSS(a,b)：a 上穿 b（非未来函数）。b 可为数组或标量。"""
     a = np.asarray(a, dtype=float)
-    b = np.asarray(b, dtype=float)
+    if np.isscalar(b):
+        b = np.full(a.shape, float(b), dtype=float)
+    else:
+        b = np.asarray(b, dtype=float)
     prev = np.r_[a[0], a[:-1]] <= np.r_[b[0], b[:-1]]
     cur = a > b
     return prev & cur
 
 
-def calc_siliang_ultimate_signal(df):
-    """四量终极 选股信号。写入 df 列：四量终极_JG/JGC/SHC/YZC/ZLC/GB1/W2/V6/XG 等。
+def _wma20(mid):
+    """通达信式 20 周期加权移动平均（含 REF(MID,19)→REF(MID,20) 替换）。
+    权重 REF(k):(20-k)/210, k=0..18，再以 REF(20) 系数1 顶替 REF(19)（即 -REF19+REF20）。"""
+    mid = np.asarray(mid, dtype=float)
+    n = len(mid)
+    if n < 20:
+        return np.full(n, np.nan)
+    b = np.arange(20, 0, -1, dtype=float) / 210.0  # [20,19,...,1]/210
+    full = np.convolve(mid, b, mode='full')         # length n+19
+    out = full[:n].copy()
+    out[:19] = np.nan
+    ref19 = np.r_[np.full(19, np.nan), mid[:-19]]
+    ref20 = np.r_[np.full(20, np.nan), mid[:-20]]
+    out = out + (ref20 - ref19)
+    return out
 
-    所有指标仅用截至当根的已发生量价（非未来函数）。
+
+def _ema(x, n):
+    """通达信 EMA(X,N)（adjust=False 的 Wilder 平滑）。"""
+    return pd.Series(np.asarray(x, dtype=float)).ewm(span=n, adjust=False).mean().values
+
+
+def _turnover(df, V):
+    """换手率：优先 turnover_rate 列；其次 circ_mv 估算；否则用成交量 5 日均归一近似。"""
+    if "turnover_rate" in df.columns:
+        return df["turnover_rate"].astype(float).values
+    if "circ_mv" in df.columns:
+        circ = df["circ_mv"].astype(float).values
+        with np.errstate(divide='ignore', invalid='ignore'):
+            t = np.where(circ > 0, V * 100.0 / (circ * 1e8), np.nan)
+        return np.nan_to_num(t, nan=np.nan)
+    return V / pd.Series(V).rolling(5, min_periods=1).mean().values
+
+
+def calc_siliang_ultimate_signal(df):
+    """四量终极 选股信号（忠实翻译用户 2026-08-05 通达信「指标版 副图」公式）。
+
+    非未来函数。输出 df 列：四量终极_*（JG/JGC/SHC/YZC/ZLC/GB1/W2/V6/XC/FOUR/XG）。
     """
     req = ["close", "open", "high", "low", "vol"]
     if not all(k in df.columns for k in req):
@@ -90,54 +118,53 @@ def calc_siliang_ultimate_signal(df):
     H = df["high"].astype(float).values
     L = df["low"].astype(float).values
     V = df["vol"].astype(float).values
-    typ = (C + O) / 2.0 + L + H  # 典型价近似 (C+O)/2 + L + H
 
-    def vma(p):
-        return _vwma(V, typ, p)
+    # 加权典型价 MID = (3C + O + L + H)/6；20 周期加权线（同一条，MID9=MID1=MID=DKX=NLJ=NLS）
+    mid = (3.0 * C + O + L + H) / 6.0
+    MID = _wma20(mid)
+    NLJ = MID
+    NLS = MID
+    DKX = MID
 
-    MID = vma(9)        # MID9 = MID1 = MID
-    MID1 = MID
-    DKX = vma(13)       # NLJ = NLS = DKX
-    NLJ = DKX
-    NLS = DKX
-    ZH = vma(17)
-    SHH = vma(21)
+    # 机构托底 JG：收盘价在量能线之上
+    JG = C > NLJ
+    # 机构金叉 JGC：NLJ 上穿其 6 日均线
+    JGC = _cross(NLJ, pd.Series(NLJ).rolling(6, min_periods=1).mean().values)
 
-    # 机构托底 JG：量能线走高且位于慢线之上
-    JG = (NLJ > np.r_[NLJ[0], NLJ[:-1]]) & (NLJ >= MID)
-    # 机构金叉 JGC = CROSS(NLJ, MID9)
-    JGC = _cross(NLJ, MID)
-    # 散户金叉 SHC = CROSS(NLS, MID1)（与 JGC 同源，忠实保留冗余）
-    SHC = _cross(NLS, MID1)
+    # 广度 GB1 = (C - NLS) + (ZH - SHH)；散户金叉 SHC = GB1 上穿 0
+    turnover = _turnover(df, V)
+    ZH = pd.Series(turnover).rolling(5, min_periods=1).mean().values
+    SHH = pd.Series(turnover).rolling(55, min_periods=1).mean().values
+    GB = C - NLS
+    GBB = ZH - SHH
+    GB1 = GB + GBB
+    SHC = _cross(GB1, 0.0)
 
-    # 广度 GB（四线均值）与其 55 日均值，GB1 为偏离百分比
-    GB = (MID + NLJ + ZH + SHH) / 4.0
-    GBB = pd.Series(GB).rolling(55, min_periods=1).mean().values
-    GB1 = np.where(GBB > 0, (GB - GBB) / GBB * 100.0, 0.0)  # 广度翻多度量
-
-    # OBV 三窗：W(3)/W1(5)/W2(7)
+    # 游资点火 YZC：W2 上穿 0
+    Q = _ema(V, 5)
+    Q1 = _ema(V, 50)
+    W = (Q - Q1) * 0.00001
     obv = _obv(C, V)
-    obv_prev = np.r_[obv[0], obv[:-1]]
-    obv2 = obv - obv_prev                       # OBV 增量
-    W = pd.Series(obv2).rolling(3, min_periods=1).mean().values
-    W1 = pd.Series(obv2).rolling(5, min_periods=1).mean().values
-    W2 = pd.Series(obv2).rolling(7, min_periods=1).mean().values * 1e-6  # 缩放 1e-6（量纲归一）
-    # 游资点火 YZC：OBV 加速（W2 走高）且显著放量
-    ma_v5 = pd.Series(V).rolling(5, min_periods=1).mean().values
-    obv2_pct = np.where(np.abs(obv) > 0, obv2 / np.abs(obv) * 100.0, 0.0)
-    YZC = (W2 > np.r_[W2[0], W2[:-1]]) & (V > ma_v5 * 1.2) & (obv2_pct > 0.06)  # 0.06 阈值（量纲归一）
+    OBV1 = _ema(obv, 5)
+    OBV2 = _ema(obv, 50)
+    W1 = (OBV1 - OBV2) * 0.000001
+    W2 = W + W1
+    YZC = _cross(W2, 0.0)
 
-    # 主力金叉 ZLC = CROSS(DKX, MADKX)
-    MADKX = pd.Series(DKX).rolling(9, min_periods=1).mean().values
-    ZLC = _cross(DKX, MADKX)
-    # 主力动量 V6（缩放 1e-5，量纲归一）
-    V6 = (DKX - np.r_[DKX[0], DKX[:-1]]) * 1e-5
+    # 主力金叉 ZLC：V6 上穿 0
+    MADKX = pd.Series(DKX).rolling(6, min_periods=1).mean().values
+    MDD = (DKX - MADKX) * 1.2
+    V1 = (C * 2.0 + H + L) / 4.0 * 10.0
+    V2v = _ema(V1, 6) - _ema(V1, 55)
+    V5 = (V2v - _ema(V2v, 6)) * 0.06
+    V6 = MDD + V5
+    ZLC = _cross(V6, 0.0)
 
-    # 当天金叉 XC = JGC & ZLC & SHC
-    XC = JGC & ZLC & SHC
-    # 四路翻多 FOUR = YZC & JG & GB1>=0 & V6>=0
-    FOUR = YZC & JG & (GB1 >= 0) & (V6 >= 0)
-    # 终极信号
+    # 当天金叉 XC：四金叉任一
+    XC = JGC | SHC | YZC | ZLC
+    # 四路翻多 FOUR：机构托底 + 广度翻多 + 游资量能翻多 + 主力动量翻多
+    FOUR = JG & (GB1 >= 0) & (W2 >= 0) & (V6 >= 0)
+    # 终极信号 QD
     XG = YZC & JG & XC & FOUR
 
     df["四量终极_JG"] = JG
@@ -239,7 +266,7 @@ def write_four_volume_js(records, out_dir=DATA_DIR):
     data = {
         "update_time": update_time,
         "total": len(records),
-        "note": "四量终极 XG：游资点火+机构托底+当天金叉+四路翻多（盘后日线信号）",
+        "note": "四量终极 QD：游资点火(YZC)+机构托底(JG)+当天金叉(XC=四金叉或)+四路翻多(FOUR)，忠实原文 2026-08-05",
         "stocks": records,
     }
     path = os.path.join(out_dir, "FOUR_VOLUME.js")
