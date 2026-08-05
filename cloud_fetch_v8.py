@@ -2270,23 +2270,12 @@ def main(category=None, only=None):
     if only:
         print("  ⏭️ --only 模式，跳过 raw_data 清理（保留其他时段数据）")
     else:
-        for old in RAW_DIR.glob("*.json"):
-            if category:
-                # 只清理属于当前 category 的文件
-                var_for_file = None
-                for var, fname in VAR_TO_RAW.items():
-                    if fname == old.name:
-                        var_for_file = var
-                        break
-                if var_for_file not in target_vars:
-                    continue
-            try:
-                old.unlink()
-                cleaned += 1
-            except Exception as e:
-                print(f"  ⚠️  清理旧文件失败 {old.name}: {e}")
-        if cleaned:
-            print(f"  🧹 已清理 {cleaned} 个旧 raw_data/*.json")
+        # 2026-08-05 修复：runner 上的 safe-delete 安全拦截会在批量 unlink raw_data 时直接
+        # 杀掉 python 进程（exit 1、无报错栈），导致抓取链路中断、实时数据卡在午前数日。
+        # 改为不再删除：各模块成功抓取时以 json.dump 原地覆盖同名文件；api_push_raw.py 已与
+        # 远端 main 的 raw_data 做内容级合并，失败模块保留远端旧值，站点表现与「删除后重抓」一致，
+        # 但不再触发 safe-delete。若要恢复清理语义，请在 runner 侧将 raw_data/ 加入 safe-delete 白名单。
+        print("  ⏭️ 跳过 raw_data 批量清理（避免触发 runner safe-delete 拦截；依赖原地覆盖 + 远端合并）")
 
     # 任务列表：顺序影响下游构建，保持原有顺序
     def f_sh_sz_history():
