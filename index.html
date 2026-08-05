@@ -6290,7 +6290,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
   const V8_PAGE_SCHEDULE = {
 
-    updated: '2026-08-04 16:35',
+    updated: '2026-08-05 13:15',
 
     source: 'GitHub Actions API + data/*.js 时间戳',
 
@@ -6302,11 +6302,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
         cards:[
 
-          {name:'重要事件日历', source:'CALENDAR_DATA', freq:'每周日+月末', slots:['周日'], note:'非每日更新'},
+          {name:'重要事件日历', source:'V8_CAL', freq:'每周日+月末', slots:['周日'], note:'非每日更新'},
 
           {name:'打新研判', source:'IPO_DATA', freq:'每日盘前', slots:['08:30'], note:'新股评分'},
 
-          {name:'盘前预判 / 决策中枢', source:'DECISION_HUB', freq:'每日盘前', slots:['08:30'], note:'综合打分'},
+          {name:'盘前预判 / 决策中枢', source:'JUDGMENT_DATA', freq:'每日盘前', slots:['08:30'], note:'综合打分'},
 
           {name:'今日宏观解读', source:'MACRO_DATA', freq:'每日盘前', slots:['08:30'], note:'当前宏观总结分析'}
 
@@ -6338,7 +6338,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
           {name:'实时风险温度计', source:'CRISIS_DATA', freq:'盘中每30分', slots:['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'VIX/美债/汇率/北向'},
 
-          {name:'市场预警', source:'MARKET_ALERT_DATA', freq:'盘中实时', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'量价异常预警'}
+          {name:'市场预警', source:'MARKET_ALERTS', freq:'盘中实时', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'量价异常预警'}
 
         ]
 
