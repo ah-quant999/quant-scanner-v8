@@ -453,16 +453,46 @@ window.V8_CAL = {weeks:[],legend:[]};
     var wd = d.getDay();
     return wd !== 0 && wd !== 6;
   };
+  /* ---- 中国时间（Asia/Shanghai）统一解析与格式化 ---- */
+  window._parseAsCST = function(ts){
+    if(!ts) return null;
+    var s = String(ts).trim();
+    // ISO 8601 带 Z / +00:00 / -00:00 视为 UTC，转北京时间（+8h）
+    var m = s.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-]\d{2}:?\d{2})?$/);
+    if(m){
+      var tz = (m[7] || '').replace(':', '');
+      if(tz === 'Z' || tz === '+0000' || tz === '-0000'){
+        var d = new Date(Date.UTC(+m[1], +m[2]-1, +m[3], +m[4], +m[5], +m[6]));
+        d.setTime(d.getTime() + 8*3600*1000);
+        return d;
+      }
+    }
+    // 无时区信息：假设源数据就是北京时间，按本地时间解析
+    var d2 = new Date(s.replace('T',' ').replace(/-/g,'/'));
+    return isNaN(d2.getTime()) ? null : d2;
+  };
+  window._fmtHmCST = function(d){
+    if(!d || isNaN(d.getTime())) return '--';
+    return d.toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour:'2-digit',minute:'2-digit',hour12:false});
+  };
+  window._fmtDateCST = function(d){
+    if(!d || isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
+  };
   /* 统一相对时间：非交易日且数据日期为上一交易日，显示「上一交易日收盘」 */
   window._fmtAshareRel = function(ts){
     if(!ts) return '--';
-    var d = new Date(String(ts).replace('T',' ').replace(/-/g,'/'));
-    if(isNaN(d.getTime())) return String(ts);
+    var d = window._parseAsCST(ts);
+    if(!d || isNaN(d.getTime())) return String(ts);
     var now = new Date();
-    var today0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    var data0  = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    var todayStr = now.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
+    var dataStr  = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
+    var tp = todayStr.split('/');
+    var dp = dataStr.split('/');
+    var today0 = new Date(+tp[0], +tp[1]-1, +tp[2]);
+    var data0  = new Date(+dp[0], +dp[1]-1, +dp[2]);
     var diff = Math.round((today0 - data0) / 864e5);
-    var hm = ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+    var hm = window._fmtHmCST(d);
     if(diff >= 1 && !window._isAshareTradingDay(today0)){
       return '上一交易日收盘 ' + hm;
     }
@@ -493,6 +523,7 @@ window.V8_CAL = {weeks:[],legend:[]};
 <script src="data/SH_SZ_HISTORY.js"></script>
 <script src="data/MAHORO.js"></script>
 <script src="data/CANDIDATE.js"></script>
+<script src="data/FOUR_VOLUME.js"></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js"></script>
 <script src="data/COCKPIT_BACKTEST.js"></script>
 <script src="data/BACKTEST_TDX.js"></script>
@@ -4575,20 +4606,8 @@ function renderLimitUpHeatmap(){
   if(!data || !data.dates || !data.sectors){ card.style.display='none'; return; }
 
   if(timeEl && data.update_time){
-    const d=new Date(String(data.update_time).replace('T',' ').replace(/-/g,'/'));
-    if(!isNaN(d.getTime())){
-      const now=new Date();
-      const today0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-      const data0=new Date(d.getFullYear(),d.getMonth(),d.getDate());
-      const dayDiff=Math.round((today0-data0)/864e5);
-      const hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
-      let txt;
-      if(dayDiff>=1 && window._isAshareTradingDay && !window._isAshareTradingDay(today0)) txt='上一交易日收盘 '+hm;
-      else if(dayDiff<=0) txt='今日 '+hm;
-      else if(dayDiff===1) txt='昨日 '+hm;
-      else txt=dayDiff+'天前 '+hm;
-      timeEl.textContent='更新于 '+txt;
-    }else{ timeEl.textContent='更新于 '+data.update_time; }
+    const txt = window._fmtAshareRel ? window._fmtAshareRel(data.update_time) : data.update_time;
+    timeEl.textContent='更新于 '+txt;
   }
 
   function isIgnite(sectorData,idx){
@@ -5443,13 +5462,18 @@ function renderLimitUpHeatmap(){
   var __MFF_CHART_INST = null;
   function mffFormatUpdateTime(ts, dailyArr){
     // 日频数据：标题显示「数据最后日期」+「文件更新于」，避免只用 update_time 误导成「今日」。
-    var hm = ts && ts.length >= 16 ? ' · 更新于 '+ts.slice(11,16) : (ts ? ' · 更新于 '+ts : '');
+    var hm = '';
+    if(ts){
+      var d = window._parseAsCST ? window._parseAsCST(ts) : null;
+      hm = d && !isNaN(d.getTime()) ? ' · 更新于 '+window._fmtHmCST(d) : ' · 更新于 '+ts.slice(11,16);
+    }
     if(!dailyArr || !dailyArr.length) return ts ? '更新于 '+ts : '';
     var last = dailyArr[dailyArr.length-1].date || '';
     if(last.length !== 8) return '更新于 '+ts;
     var lastFmt = last.slice(0,4)+'-'+last.slice(4,6)+'-'+last.slice(6,8);
     var now = new Date();
-    var today = now.getFullYear() + ('0'+(now.getMonth()+1)).slice(-2) + ('0'+now.getDate()).slice(-2);
+    var todayStr = now.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+    var today = todayStr.slice(0,4)+todayStr.slice(5,7)+todayStr.slice(8,10);
     if(last === today){
       return '今日 '+lastFmt+hm;
     }
@@ -7781,6 +7805,37 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       h+='</div>';
     } else {
       h+='<div class="note" style="padding:14px;text-align:center;">候选池数据暂不可用</div>';
+    }
+    h+='</div>';
+
+    // 四量终极 选股卡片
+    var fv=window.FOUR_VOLUME||{};
+    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">';
+    var fvT=fv.update_time?fv.update_time:'';
+    h+=v8CardHeader('🔥','四量终极 选股','游资点火+机构托底+当天金叉+四路翻多（盘后日线）','update_time',{update_time:fvT},!fv||!fv.stocks||!fv.stocks.length);
+    if(fv&&fv.stocks&&fv.stocks.length){
+      h+='<div style="padding:12px 14px;">';
+      h+='<div style="font-size:12px;color:var(--sub);margin-bottom:10px;">共 <b>'+fv.total+'</b> 只触发 XG（按涨跌幅排序，最多显示20）</div>';
+      fv.stocks.slice(0,20).forEach(function(s){
+        h+='<div style="border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:8px;background:var(--bg2);">';
+        h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
+        h+='<b>'+s.name+'</b> <span style="color:var(--dim);font-size:11px;">'+s.code+'</span>';
+        h+='<span style="font-size:11px;color:var(--cyan);margin-left:auto;">'+s.board_label+'</span>';
+        h+='</div>';
+        h+='<div style="font-size:11px;color:var(--sub);margin-bottom:4px;">'+s.close+' · <span style="'+(s.pct_chg>=0?'color:var(--up)':'color:var(--down)')+'">'+(s.pct_chg>0?'+':'')+s.pct_chg+'%</span> · 换手'+(s.turnover_rate||0)+'% · '+(s.reason||'')+'</div>';
+        if(s.components){
+          h+='<div style="display:flex;flex-wrap:wrap;gap:4px;">';
+          [['游资点火','YZC'],['机构托底','JG'],['广度翻多','GB1'],['主力动量翻多','V6'],['机构金叉','JGC'],['散户金叉','SHC'],['主力金叉','ZLC']].forEach(function(p){
+            var on=s.components[p[0]];
+            h+='<span style="font-size:10px;padding:1px 6px;border-radius:10px;'+(on?'background:rgba(34,197,94,.18);color:var(--up);border:1px solid rgba(34,197,94,.4);':'background:rgba(120,120,120,.12);color:var(--dim);border:1px solid var(--border);')+'">'+p[0]+(on?'✓':'')+'</span>';
+          });
+          h+='</div>';
+        }
+        h+='</div>';
+      });
+      h+='</div>';
+    } else {
+      h+='<div class="note" style="padding:14px;text-align:center;">四量终极信号暂未生成（盘后扫描填充）</div>';
     }
     h+='</div>';
 

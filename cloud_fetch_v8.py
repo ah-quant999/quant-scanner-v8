@@ -2453,6 +2453,22 @@ def main(category=None, only=None):
         ("MARKET_ALERTS", f_market_alerts),
     ]
 
+    def f_four_volume():
+        """四量终极 选股：子进程跑 strategy_four_volume.py（盘后日线，直接写 data/FOUR_VOLUME.js）。"""
+        import subprocess as _sp
+        try:
+            script = ROOT / "algorithms" / "strategy_four_volume.py"
+            print(f"🔥 四量终极选股: {script.name}")
+            r = _sp.run([sys.executable, str(script), "--top", "80"],
+                        cwd=str(ROOT), capture_output=True, text=True, timeout=1200)
+            out = (r.stdout or "") + (r.stderr or "")
+            for line in out.strip().splitlines()[-6:]:
+                print("   ", line)
+            if r.returncode != 0:
+                print(f"  ⚠️ 四量终极返回码 {r.returncode}")
+        except Exception as e:
+            print(f"  ⚠️ 四量终极子进程失败: {e}")
+
     for var, fn in tasks:
         if target_vars is not None and var not in target_vars:
             continue
@@ -2467,6 +2483,14 @@ def main(category=None, only=None):
             subprocess.run([sys.executable, str(script)], cwd=str(ROOT), check=False)
         except Exception as e:
             print(f"  ⚠️ gen_market_brief 调用失败: {e}")
+
+    # 四量终极 选股策略（盘后日线，直接写 data/FOUR_VOLUME.js，不进 raw_data）
+    if category in ("post_close", "all"):
+        try:
+            f_four_volume()
+        except Exception as e:
+            print(f"  ⚠️ 四量终极策略失败: {e}")
+
 
     # 生成 runner 状态文件，供前端「定时任务跟踪」看板展示
     try:

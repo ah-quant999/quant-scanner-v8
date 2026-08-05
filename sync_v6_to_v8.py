@@ -25,6 +25,13 @@ quant-scanner-v8 (v8) raw_data/，使 v8_build_deploy.yml 自动构建 data/*.js
 import json, os, sys, subprocess, shutil
 from pathlib import Path
 from datetime import datetime
+from zoneinfo import ZoneInfo
+
+CST = ZoneInfo("Asia/Shanghai")
+
+def now_cst():
+    """返回中国标准时间（Asia/Shanghai）的当前 datetime。"""
+    return datetime.now(CST)
 
 V6_ROOT = Path(os.environ.get("V6_ROOT", r"E:\workspace\stock-scanner"))
 V8_ROOT = Path(__file__).resolve().parent
@@ -93,11 +100,11 @@ def _add_timestamp(obj):
     与 update_v8._write_js 规则一致；index.html 通过 .data 读取实际数组。
     """
     if isinstance(obj, list):
-        return {"data": obj, "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+        return {"data": obj, "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S")}
     if not isinstance(obj, dict):
         return obj
     if "update_time" not in obj and "calc_time" not in obj and "date" not in obj:
-        obj["update_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        obj["update_time"] = now_cst().strftime("%Y-%m-%d %H:%M:%S")
     return obj
 
 
@@ -128,7 +135,7 @@ def _append_lhb_to_history():
         "stocks": obj["stocks"],
         "summary": obj.get("summary", {}),
     }
-    hist["update_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    hist["update_time"] = now_cst().strftime("%Y-%m-%d %H:%M:%S")
     if "range" not in hist:
         hist["range"] = [iso, iso]
     _save_json(hist_path, hist)

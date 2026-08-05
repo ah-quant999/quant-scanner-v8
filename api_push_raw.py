@@ -4,6 +4,13 @@
 # 但 api.github.com 可达。故用 Git Database API 以「单次 commit」方式提交 raw_data。
 import os, sys, json, base64, hashlib, datetime
 import urllib.request, urllib.error
+from zoneinfo import ZoneInfo
+
+CST = ZoneInfo("Asia/Shanghai")
+
+def now_cst():
+    """返回中国标准时间（Asia/Shanghai）的当前 datetime。"""
+    return datetime.datetime.now(CST)
 
 # 2026-08-03 修复：Windows cn runner 默认 stdout/stderr 为 GBK，打印 ℹ️/❌ 等 emoji
 # 会触发 UnicodeEncodeError 崩溃（exit 1 但无可见错误）。强制 UTF-8 输出。
@@ -119,7 +126,7 @@ def main():
     tree_items = [{"path": p, "mode": "100644", "type": "blob", "sha": s}
                   for p, s in merged_entries.items()]
 
-    msg = "v8 cn fetch: " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    msg = "v8 cn fetch: " + now_cst().strftime("%Y-%m-%d %H:%M")
     for attempt in range(1, 4):
         # 重新读取最新 main（与 build_deploy 并发安全）
         r2 = api("GET", f"/repos/{REPO}/git/refs/heads/main")

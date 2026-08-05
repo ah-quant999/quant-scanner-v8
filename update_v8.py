@@ -11,10 +11,16 @@
 import json, os, sys, subprocess
 from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parent
 RAW_DIR = ROOT / "raw_data"
 DATA_DIR = ROOT / "data"
+CST = ZoneInfo("Asia/Shanghai")
+
+def now_cst():
+    """返回中国标准时间（Asia/Shanghai）的当前 datetime。"""
+    return datetime.now(CST)
 
 # 原始文件名 → window 变量名
 DATA_SOURCES = {
@@ -264,11 +270,11 @@ def _write_js(var_name, obj):
                 src_path = sp
             break
 
-    now_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    now_ts = now_cst().strftime("%Y-%m-%d %H:%M:%S")
     mtime_ts = ""
     if src_path is not None:
         try:
-            mtime_ts = datetime.fromtimestamp(src_path.stat().st_mtime).strftime("%Y-%m-%d %H:%M:%S")
+            mtime_ts = datetime.fromtimestamp(src_path.stat().st_mtime, tz=CST).strftime("%Y-%m-%d %H:%M:%S")
         except Exception:
             pass
 
