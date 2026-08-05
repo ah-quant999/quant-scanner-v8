@@ -6708,7 +6708,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
         const data = window[c.source] || {};
 
-        const lastTs = parseTs(data.update_time || data.last_update || data.run_time);
+        const lastTs = parseTs(data.update_time || data.last_update || data.run_time || data.updated);
 
         const lastStr = lastTs && isToday(lastTs) ? fmtHm(lastTs) : (lastTs ? '昨日' : '无');
 
