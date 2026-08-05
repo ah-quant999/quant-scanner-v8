@@ -10,6 +10,17 @@
 #   4. 防并发：当前已有 v8_cn_fetch 在运行（queued/in_progress/waiting），不重复触发。
 #   5. 去重窗口：最近 20 分钟内已经启动过 v8_cn_fetch，不再 dispatch，避免连环重试雪崩。
 #   6. 单并发：safety_net 自身 concurrency.group 串行，防止重叠检查导致重复 dispatch。
+#
+# 🔴 2026-08-06 04:50 修正（小九看门狗第三十五轮）——兜底目标切到云端主力：
+#   背景：08-05 23:45 阿狸咪把中国数据抓取迁到 v8_cn_fetch_cloud.yml（ubuntu 云端），
+#         并移除旧自建版 v8_cn_fetch.yml 的全部 cron（其注释明写「防止双跑：两路都会往
+#         main 推 raw_data，同一产物并发会互相覆盖」），旧版降级为 dispatch 应急回退。
+#   缺陷：本 safety_net 仍只检查/派发【旧版 v8_cn_fetch.yml】。旧版 cron 已删 ⇒ 永远不会
+#         自动产生成功 run ⇒ 条件2「最近1小时有 success」恒为假 ⇒ 每轮都会 dispatch，
+#         把已退役的自建 runner 每小时拉起来推 raw_data，与云端主力对撞（实测坐实：
+#         08-05 19:03 safety_net run 与 v8_cn_fetch workflow_dispatch run 同分钟出现）。
+#   修法：检查与派发目标统一改为 v8_cn_fetch_cloud.yml（用 TARGET_WF 单点常量，防再漂移）。
+#         旧自建版保持 0 cron + 纯手动 dispatch 应急，不再被自动唤醒。
 
 name: "🛡️ v8 cn_fetch safety_net"
 
@@ -52,6 +63,9 @@ jobs:
   check_and_dispatch:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    env:
+      # 兜底目标：云端主力（2026-08-06 起）。旧自建版 v8_cn_fetch.yml 仅手动应急，勿在此引用。
+      TARGET_WF: v8_cn_fetch_cloud.yml
     steps:
       - name: "🛡️ 检查是否需要兜底"
         id: decide
@@ -66,12 +80,13 @@ jobs:
 
           echo "当前 UTC 时间: $(date -u '+%Y-%m-%d %H:%M:%S')"
 
-          # 1) 获取最近 20 条 v8_cn_fetch 运行记录
+          # 1) 获取最近 20 条抓取运行记录（目标 = ${TARGET_WF}，云端主力）
+          echo "兜底监控目标: ${TARGET_WF}"
           RUNS_JSON=$(curl -sL \
             -H "Authorization: Bearer ${GH_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/${REPO}/actions/workflows/v8_cn_fetch.yml/runs?per_page=20")
+            "https://api.github.com/repos/${REPO}/actions/workflows/${TARGET_WF}/runs?per_page=20")
 
           # 2) 最近 1 小时有 success？
           HAS_SUCCESS=$(echo "$RUNS_JSON" | jq -r --arg t "$ONE_HOUR_AGO" '
@@ -111,7 +126,7 @@ jobs:
           echo "result=dispatch" >> "$GITHUB_OUTPUT"
           echo "⚠️ 最近1小时无成功运行、无运行中、且20分钟内未启动过，准备兜底 dispatch"
 
-      - name: "🚀 dispatch v8_cn_fetch"
+      - name: "🚀 dispatch v8_cn_fetch_cloud"
         if: steps.decide.outputs.result == 'dispatch'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -122,12 +137,12 @@ jobs:
             -H "Authorization: Bearer ${GH_TOKEN}" \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/${REPO}/actions/workflows/v8_cn_fetch.yml/dispatches" \
+            "https://api.github.com/repos/${REPO}/actions/workflows/${TARGET_WF}/dispatches" \
             -d '{"ref":"main"}')
           CODE=$(echo "$RESP" | grep -oP 'HTTP_CODE:\K\d+')
           BODY=$(echo "$RESP" | sed '/HTTP_CODE:/d')
           if [ "$CODE" = "204" ]; then
-            echo "✅ 已成功 dispatch v8_cn_fetch"
+            echo "✅ 已成功 dispatch ${TARGET_WF}"
           else
             echo "❌ dispatch 失败，HTTP $CODE"
             echo "$BODY"
