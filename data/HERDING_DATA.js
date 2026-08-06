@@ -1,1 +1,1 @@
-window.HERDING_DATA = {"current_clusters":[{"sector":"通信设备","direction":"强势抱团","count":6},{"sector":"化学制品","direction":"强势抱团","count":5},{"sector":"计算机设","direction":"强势抱团","count":3}],"total_limit_up":58,"note":"由涨停行业集中度推导的抱团板块（行业涨停数降序）","update_time":"2026-08-06 11:51:15"};
+window.HERDING_DATA = {"current_clusters":[{"sector":"通信设备","direction":"强势抱团","count":6},{"sector":"化学制品","direction":"强势抱团","count":5},{"sector":"计算机设","direction":"强势抱团","count":3}],"total_limit_up":58,"note":"由涨停行业集中度推导的抱团板块（行业涨停数降序）","update_time":"2026-08-06 11:57:07"};

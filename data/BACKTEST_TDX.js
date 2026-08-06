@@ -1,1 +1,1 @@
-window.BACKTEST_TDX = {"calc_time":"2026-08-05","method":"baostock 60日K线全量回测 (T+1, T+3, T+5, T+10, T+20)","gold_pool_size":9,"stocks_analyzed":9,"summary":{},"_lite_note":"个股历史信号明细已裁剪，仅保留汇总统计","update_time":"2026-08-06 11:51:15"};
+window.BACKTEST_TDX = {"calc_time":"2026-08-05","method":"baostock 60日K线全量回测 (T+1, T+3, T+5, T+10, T+20)","gold_pool_size":9,"stocks_analyzed":9,"summary":{},"_lite_note":"个股历史信号明细已裁剪，仅保留汇总统计","update_time":"2026-08-06 11:57:07"};
