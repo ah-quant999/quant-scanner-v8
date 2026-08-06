@@ -102,7 +102,7 @@ jobs:
           #   正确做法：push 被拒 = 远端已前进，同步远端后用最新 raw_data 重新全量构建，
           #   产物由构建决定而非由合并决定，天然无冲突且不会用旧产物覆盖新数据。
           for i in 1 2 3; do
-            git add -f data/
+            git add -f data/ index.html
             if git diff --cached --quiet; then
               echo "ℹ️ 无数据变化，跳过部署（远端已是最新构建）"
               exit 0

@@ -8,7 +8,7 @@
 - 删除死数据文件 RECOMMEND / SCAN_DATA 的映射。
 """
 
-import json, os, sys, subprocess
+import json, os, re, subprocess, sys
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -301,6 +301,55 @@ def _write_js(var_name, obj):
     return out_path
 
 
+def _data_file_update_time(var_name):
+    """获取 data/*.js 的 cache-busting 时间戳。
+
+    优先读取文件内容中的 update_time/updated/run_time/calc_time（语义稳定），
+    失败则回退到文件 mtime。空文件返回空字符串。
+    """
+    path = DATA_DIR / f"{var_name}.js"
+    if not path.exists():
+        return ""
+    try:
+        text = path.read_text(encoding='utf-8')
+        for key in ('"update_time":"', '"updated":"', '"run_time":"', '"calc_time":"'):
+            m = re.search(re.escape(key) + r'([^"]+)"', text)
+            if m:
+                return m.group(1)
+        mtime = path.stat().st_mtime
+        return datetime.fromtimestamp(mtime, tz=CST).strftime("%Y-%m-%d %H:%M:%S")
+    except Exception:
+        return ""
+
+
+def _rewrite_index_html_cache_busters():
+    """为 index.html 中 data/*.js 引用追加基于文件更新时间的 cache-busting 参数。
+
+    核心用途：防止浏览器/CDN 在数据更新后继续返回旧 data/*.js（典型问题：
+    AI市场速览已生成新数据，但页面仍显示旧时间戳）。
+    只有文件本身的时间戳发生变化时，对应的 URL 才会变化，未变更文件保持原 URL。
+    """
+    idx_path = ROOT / "index.html"
+    if not idx_path.exists():
+        return
+    html = idx_path.read_text(encoding='utf-8')
+    pat = re.compile(r'<script src="(data/[A-Z_]+\.js)(?:\?[^"]*)?"></script>')
+
+    def repl(m):
+        src = m.group(1)
+        var_name = src.split('/')[-1].replace('.js', '')
+        ts = _data_file_update_time(var_name)
+        if ts:
+            ts_compact = re.sub(r'[^\d]', '', ts)
+            return f'<script src="{src}?v={ts_compact}"></script>'
+        return m.group(0)
+
+    new_html = pat.sub(repl, html)
+    if new_html != html:
+        idx_path.write_text(new_html, encoding='utf-8')
+        print("✅ index.html cache-busting 参数已更新")
+
+
 def _var_category(var_name):
     c = CATEGORY_MAP.get(var_name, "post_close")
     # 支持多类别（逗号分隔），如 "premarket,intraday"
@@ -419,6 +468,7 @@ def main():
     rc = build(category=args.category, detect_changes=args.detect_changes)
     if rc == 0:
         run_health_check()
+        _rewrite_index_html_cache_busters()
     return rc
 
 
