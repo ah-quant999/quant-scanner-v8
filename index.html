@@ -608,6 +608,75 @@ function __judgmentCandidatesHTML(){
     + lines.join('');
 }
 window.__judgmentCandidatesHTML = __judgmentCandidatesHTML;
+
+/* ===== ⚖️ 今日判定·环境态势 HTML 构建（2026-08-07 抽全局：供今日事件页 + 暂未上架 Tab 双向复用） =====
+   数据源：JUDGMENT_DATA（每日盘前 08:25 刷新）。动态时事驱动，不写固定文字。 */
+function _buildJudgmentEnvHTML(d){
+  if(!d) return '<div style="color:var(--dim);padding:12px;text-align:center">环境态势数据加载中（盘前 08:25 自动生成）…</div>';
+  var h = '';
+  // 1) 美股 + 结论 + 预警（置顶）
+  if(d.us || d.verdict || d.warning){
+    h += '<div style="margin-bottom:12px;padding:10px 12px;background:linear-gradient(135deg,rgba(56,189,248,0.08),rgba(167,139,250,0.06));border:1px solid var(--border2);border-radius:10px;font-size:14px;line-height:1.7">';
+    if(d.us) h += '<p style="margin:3px 0"><b style="color:var(--sub)">美股：</b><span style="color:var(--up)">'+d.us+'</span></p>';
+    if(d.verdict) h += '<p style="margin:3px 0"><b style="color:var(--sub)">→ 结论：</b>'+d.verdict+'</p>';
+    if(d.warning) h += '<p style="margin:3px 0;color:#f59e0b">⚠️ '+d.warning+'</p>';
+    h += '</div>';
+  }
+  // 2) 三大分析师 单行紧凑列表
+  var ans = d.analysts || [];
+  if(ans.length){
+    h += '<div style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px">';
+    ans.forEach(function(a){
+      var rec = a.recommendation || 0;
+      var stars = '';
+      for(var i=1;i<=5;i++) stars += (i<=rec ? '★' : '☆');
+      var recColor = rec>=4 ? 'var(--up)' : (rec>=3 ? '#f59e0b' : 'var(--down)');
+      var dangerChip = (a.danger && a.danger.length)
+        ? ' <span style="color:var(--down);font-size:10.5px">⚠'+a.danger.join(' · ')+'</span>'
+        : '';
+      h += '<div style="display:grid;grid-template-columns:auto auto auto 1fr;gap:10px;padding:6px 10px;background:rgba(167,139,250,.05);border-radius:6px;border-left:3px solid var(--purple);font-size:11.5px;line-height:1.55;align-items:baseline">';
+      h += '<span style="font-weight:800;color:var(--txt);min-width:48px">'+a.name+'</span>';
+      h += '<span style="font-weight:700;color:var(--purple);min-width:60px">'+a.judgment+'</span>';
+      h += '<span style="font-weight:700;color:'+recColor+';letter-spacing:1px;min-width:48px">'+stars+'</span>';
+      h += '<span style="color:var(--sub)"><b style="color:var(--txt)">理由</b> '+a.reason+' · <b style="color:var(--down)">风险</b> '+a.risk+' · <b style="color:var(--up)">若必进场</b> '+a.if_must_enter+dangerChip+'</span>';
+      h += '</div>';
+    });
+    h += '</div>';
+  }
+  // 3) 共同结论
+  if(d.consensus){
+    var dir = d.consensus.indexOf('偏多')>=0 ? 'var(--up)' : (d.consensus.indexOf('偏空')>=0 ? 'var(--down)' : '#f59e0b');
+    h += '<div style="margin-bottom:10px;padding:9px 12px;background:'+dir+'15;border:1px solid '+dir+'40;border-radius:9px;font-size:13px;font-weight:700;color:'+dir+'">🤝 共同结论：'+d.consensus+'</div>';
+  }
+  // 4) 三大危险信号
+  var dg = d.danger_signals || [];
+  if(dg.length){
+    h += '<div style="margin-bottom:12px;padding:9px 12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:9px">';
+    h += '<div style="font-size:12px;font-weight:700;color:var(--down);margin-bottom:5px">⚠️ 三大危险信号（双方一致认可）</div>';
+    h += '<div style="display:flex;flex-direction:column;gap:4px">';
+    dg.slice(0,3).forEach(function(s,i){
+      var num = ['①','②','③'][i] || ('④'+i);
+      h += '<div style="font-size:11.5px;color:var(--txt);line-height:1.5"><span style="color:var(--down);font-weight:700">'+num+'</span> '+s+'</div>';
+    });
+    h += '</div></div>';
+  }
+  // 5) 大盘结构 + 指数标签
+  h += '<p style="margin:6px 0"><b style="color:var(--sub)">大盘：</b>'+(d.market||'')+'</p>';
+  if(d.indices && d.indices.length){
+    h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0">';
+    d.indices.forEach(function(r){
+      h += '<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.22);border-radius:999px;padding:3px 10px;font-size:12px;line-height:1.6">'
+        + '<b style="color:var(--txt)">'+r.name+'</b>'
+        + '<span style="color:var(--down)">控'+r.ctrl+'</span>'
+        + '<span style="color:var(--down)">财'+r.fs+'</span>'
+        + (r.warn?'<span style="color:#f59e0b;margin-left:2px">⚠️ '+r.warn+'</span>':'')
+        + '</span>';
+    });
+    h += '</div>';
+  }
+  return h || '<div style="color:var(--dim);padding:10px">今日暂无环境态势数据</div>';
+}
+window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 </script>
 <script src="data/CRDS_CARD_DATA.js?v=20260807002043"></script>
 <script src="data/TRIPLE_CONSENSUS.js?v=20260807002044"></script>
@@ -692,74 +761,15 @@ window.__judgmentCandidatesHTML = __judgmentCandidatesHTML;
       var d = window.JUDGMENT_DATA;
       var tag = document.getElementById('judgmentTag');
       var body = document.getElementById('judgmentBody');
-      if(!d || !body){ if(tag) tag.textContent='数据缺失'; return; }
+      if(!d){ if(tag) tag.textContent='数据缺失'; return; }
       if(tag) tag.innerHTML = _uBadge('盘前','短线',d.update_time);
-      var h = '';
-      // 1) 美股 + 结论 + 预警（置顶）
-      if(d.us || d.verdict || d.warning){
-        h += '<div style="margin-bottom:12px;padding:10px 12px;background:linear-gradient(135deg,rgba(56,189,248,0.08),rgba(167,139,250,0.06));border:1px solid var(--border2);border-radius:10px;font-size:14px;line-height:1.7">';
-        if(d.us) h += '<p style="margin:3px 0"><b style="color:var(--sub)">美股：</b><span style="color:var(--up)">'+d.us+'</span></p>';
-        if(d.verdict) h += '<p style="margin:3px 0"><b style="color:var(--sub)">→ 结论：</b>'+d.verdict+'</p>';
-        if(d.warning) h += '<p style="margin:3px 0;color:#f59e0b">⚠️ '+d.warning+'</p>';
-        h += '</div>';
-      }
-      // 2) 三大分析师 单行紧凑列表（理由/风险/进场合并为一行）
-      var ans = d.analysts || [];
-      if(ans.length){
-        h += '<div style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px">';
-        ans.forEach(function(a){
-          var rec = a.recommendation || 0;
-          var stars = '';
-          for(var i=1;i<=5;i++) stars += (i<=rec ? '★' : '☆');
-          var recColor = rec>=4 ? 'var(--up)' : (rec>=3 ? '#f59e0b' : 'var(--down)');
-          var dangerChip = (a.danger && a.danger.length)
-            ? ' <span style="color:var(--down);font-size:10.5px">⚠'+a.danger.join(' · ')+'</span>'
-            : '';
-          h += '<div style="display:grid;grid-template-columns:auto auto auto 1fr;gap:10px;padding:6px 10px;background:rgba(167,139,250,.05);border-radius:6px;border-left:3px solid var(--purple);font-size:11.5px;line-height:1.55;align-items:baseline">';
-          h += '<span style="font-weight:800;color:var(--txt);min-width:48px">'+a.name+'</span>';
-          h += '<span style="font-weight:700;color:var(--purple);min-width:60px">'+a.judgment+'</span>';
-          h += '<span style="font-weight:700;color:'+recColor+';letter-spacing:1px;min-width:48px">'+stars+'</span>';
-          h += '<span style="color:var(--sub)"><b style="color:var(--txt)">理由</b> '+a.reason+' · <b style="color:var(--down)">风险</b> '+a.risk+' · <b style="color:var(--up)">若必进场</b> '+a.if_must_enter+dangerChip+'</span>';
-          h += '</div>';
-        });
-        h += '</div>';
-      }
-      // 3) 共同结论（高亮多空共识/分歧）
-      if(d.consensus){
-        var dir = d.consensus.indexOf('偏多')>=0 ? 'var(--up)' : (d.consensus.indexOf('偏空')>=0 ? 'var(--down)' : '#f59e0b');
-        h += '<div style="margin-bottom:10px;padding:9px 12px;background:'+dir+'15;border:1px solid '+dir+'40;border-radius:9px;font-size:13px;font-weight:700;color:'+dir+'">🤝 共同结论：'+d.consensus+'</div>';
-      }
-      // 4) 三大危险信号（双方一致认可）
-      var dg = d.danger_signals || [];
-      if(dg.length){
-        h += '<div style="margin-bottom:12px;padding:9px 12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:9px">';
-        h += '<div style="font-size:12px;font-weight:700;color:var(--down);margin-bottom:5px">⚠️ 三大危险信号（双方一致认可）</div>';
-        h += '<div style="display:flex;flex-direction:column;gap:4px">';
-        dg.slice(0,3).forEach(function(s,i){
-          var num = ['①','②','③'][i] || ('④'+i);
-          h += '<div style="font-size:11.5px;color:var(--txt);line-height:1.5"><span style="color:var(--down);font-weight:700">'+num+'</span> '+s+'</div>';
-        });
-        h += '</div></div>';
-      }
-      // 5) 大盘结构 + 指数标签（保留）
-      h += '<p style="margin:6px 0"><b style="color:var(--sub)">大盘：</b>'+(d.market||'')+'</p>';
-      if(d.indices && d.indices.length){
-        h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0">';
-        d.indices.forEach(function(r){
-          h += '<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.22);border-radius:999px;padding:3px 10px;font-size:12px;line-height:1.6">'
-            + '<b style="color:var(--txt)">'+r.name+'</b>'
-            + '<span style="color:var(--down)">控'+r.ctrl+'</span>'
-            + '<span style="color:var(--down)">财'+r.fs+'</span>'
-            + (r.warn?'<span style="color:#f59e0b;margin-left:2px">⚠️ '+r.warn+'</span>':'')
-            + '</span>';
-        });
-        h += '</div>';
-      }
-      // 6) 多信号扫描 — 已删除（2026-08-05 用户反馈无用：北向永久停用、VIX/雷达/板块与今日宏观重复）
-      body.innerHTML = h;
-      // 缓存环境态势 HTML，供暂未上架 Tab 的 judgmentBodyOp 在进入时填充（解析顺序早于该 DOM，不能直接同步写）
+      // 用全局构建函数（2026-08-07 抽函数：供今日事件页 + 暂未上架 Tab 双向复用）
+      var h = (typeof window._buildJudgmentEnvHTML === 'function')
+        ? window._buildJudgmentEnvHTML(d)
+        : '<div style="color:var(--down);padding:10px">构建函数未加载</div>';
+      if(body) body.innerHTML = h;
+      // 缓存 + 尝试同步写暂未上架 Tab（DOM 可能尚未解析，fallback 在 renderUnlisted 里处理）
       window.__judgmentEnvHTML_cache = h;
-      // 🔒 同步写入暂未上架 Tab 的「今日判定·环境态势」卡（2026-08-06 主人令：理论段挪到管理员可见区）
       try{ var opBody=document.getElementById('judgmentBodyOp'); if(opBody) opBody.innerHTML=h; }catch(e){}
     })();
     </script>
@@ -2304,46 +2314,6 @@ window.__judgmentCandidatesHTML = __judgmentCandidatesHTML;
           <div style="font-size:13px;color:var(--txt);"><strong>覆盖范围：</strong>A股（主板 / 创业板 / 科创板 / 北交所）+ 港股 + 指数 + ETF，共 7000+ 只</div>
         </div>
 
-        <div style="margin-top:12px;padding:12px 14px;background:var(--card);border-radius:10px;border:1px solid var(--border);">
-          <div style="font-size:13px;color:var(--cyan);font-weight:700;margin-bottom:10px;">查询结果包含以下扩展信息（需该股被收录）：</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;font-size:12px;line-height:1.6;">
-            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--purple);margin-bottom:4px;">🧬 多维共振 <span style="font-size:10px;color:var(--gold);font-weight:500;">● 数据滞后</span></div>
-              <div style="color:var(--sub);">每日综合评分，≥80分精选 / ≥70分观察；当前数据源停在 2026-07-30，新数据待 v6 跑批后同步</div>
-            </div>
-            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--up);margin-bottom:4px;">⭐ 金股池 <span style="font-size:10px;color:var(--down);font-weight:500;">● 213只</span></div>
-              <div style="color:var(--sub);">信号四格条（缠论买C/金钻黄柱J/机构变红I/上涨趋势T），EMA趋势评分0~7；覆盖部分活跃股</div>
-            </div>
-            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--cyan);margin-bottom:4px;">🐉 龙虎榜 <span style="font-size:10px;color:var(--down);font-weight:500;">● 72条</span></div>
-              <div style="color:var(--sub);">上榜日期 + 分类（机游共振/机构独买/游资独买/不达标）+ 机构净买额 + 游资净买额</div>
-            </div>
-            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--up);margin-bottom:4px;">💰 主力资金 <span style="font-size:10px;color:var(--gold);font-weight:500;">● 部分覆盖</span></div>
-              <div style="color:var(--sub);">机构席位净买卖 + 连续净流入统计（覆盖部分活跃股，非全市场）</div>
-            </div>
-            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--cyan);margin-bottom:4px;">📈 近10日走势</div>
-              <div style="color:var(--sub);">日线收盘价折线图（红涨绿跌），快速判断短期趋势方向</div>
-            </div>
-            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--gold);margin-bottom:4px;">📊 EMA趋势确认</div>
-              <div style="color:var(--sub);">6条EMA均线（5~120日）多空排列方向，均线发散收窄判断趋势强度</div>
-            </div>
-            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--gold);margin-bottom:4px;">🏦 投行覆盖 <span style="font-size:10px;color:var(--down);font-weight:500;">● 28条</span></div>
-              <div style="color:var(--sub);">国际投行立场（看多/看空/中性）+ 北向覆盖等标签；覆盖外资研报触及的个股</div>
-            </div>
-            <div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">
-              <div style="font-weight:700;color:var(--down);margin-bottom:4px;">🚫 停牌识别 <span style="font-size:10px;color:var(--down);font-weight:500;">● 12条</span></div>
-              <div style="color:var(--sub);">当前停牌状态 + 已停牌天数 + 停牌原因（重大事项/异常波动等）</div>
-            </div>
-          </div>
-          <div style="margin-top:10px;font-size:11px;color:var(--dim);line-height:1.6;">
-            注：📰 研报覆盖 已下线（数据源仅 26 条且停在 2026-07-27，覆盖率过低，不再展示）。个股查询数据源每日 16:45 从 v6 同步，盘前 08:40 同步预警类数据。
-          </div>
-        </div>
       </div>
     </div><!--/st-query-->
 
@@ -7978,7 +7948,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var el=containerId?document.getElementById(containerId):$('stockCockpit');
     if(!el) return;
     var h='';
-    function _pickTs(d){ return (d&&(d.update_time||d.scan_time))?String(d.update_time||d.scan_time):''; }
+    function _pickTs(d){ return (d&&(d.update_time||d.gen_time||d.data_time||d.scan_time))?String(d.update_time||d.gen_time||d.data_time||d.scan_time):''; }
     function _maxTs(a,b){ if(!a) return b; if(!b) return a; return (a>b)?a:b; }
     var cockpitTs='';
     cockpitTs=_maxTs(cockpitTs,_pickTs(DATA.crisis));
@@ -7989,6 +7959,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     cockpitTs=_maxTs(cockpitTs,_pickTs(DATA.top10_daily));
     cockpitTs=_maxTs(cockpitTs,_pickTs(DATA.lhb));
     cockpitTs=_maxTs(cockpitTs,_pickTs(DATA.inst_trade));
+    cockpitTs=_maxTs(cockpitTs,_pickTs(window.COCKPIT_TIER_RECOMMEND));
     var cockpitTsShort=_fmtCockpitRel(cockpitTs);
 
     h+='<div style="background:linear-gradient(135deg,#13243f,#0e2747);color:#cfe3ff;border:1px solid #244066;border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">';
@@ -7996,7 +7967,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(cockpitTs) h+=_uBadge('盘后','短线',cockpitTs);
     // 「今日已跑完」灰色胶囊（无条件显示，只看数据是否当天落地；CST 日期规避 UTC 跨天误判）
     var _cockpitData = window.COCKPIT_TIER_RECOMMEND || {};
-    var _cockpitFresh = (cockpitTs && String(_cockpitData.update_time || cockpitTs).slice(0,10) === new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-'));
+    var _cockpitFresh = (cockpitTs && String(_cockpitData.gen_time || _cockpitData.data_time || _cockpitData.update_time || cockpitTs).slice(0,10) === new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-'));
     if(_cockpitFresh) h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">✅ 今日已跑完</span>';
     // 今日已入仓胶囊：tier_a + tier_b 任意 > 0 才显示
     var _cta=(DATA.cockpit_tier&&DATA.cockpit_tier.tier_a)||[];
@@ -8598,8 +8569,16 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(!el || el.dataset.rendered==='1') return;
     el.dataset.rendered='1';
     try{
-    // 填充「今日判定 · 环境态势」卡（理论段 HTML 在页面解析时已缓存到 window.__judgmentEnvHTML_cache）
-    try{ var opBody=document.getElementById('judgmentBodyOp'); if(opBody && window.__judgmentEnvHTML_cache) opBody.innerHTML=window.__judgmentEnvHTML_cache; }catch(e){}
+    // 填充「今日判定 · 环境态势」卡（优先用缓存；若缓存为空则即时从 JUDGMENT_DATA 重建——2026-08-07 修内容为空 bug）
+    try{
+      var opBody=document.getElementById('judgmentBodyOp');
+      if(opBody){
+        opBody.innerHTML = window.__judgmentEnvHTML_cache
+          || ((typeof window._buildJudgmentEnvHTML === 'function')
+            ? window._buildJudgmentEnvHTML(window.JUDGMENT_DATA)
+            : '<div style="color:var(--dim);padding:10px">环境态势数据暂不可用</div>');
+      }
+    }catch(e){}
     var h='';
     // 2026-08-07 升级为一级 Tab：保留 render 时刻提示，用于判断浏览器是否加载最新构建
     h+='<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:6px;padding:6px 10px;margin-bottom:12px;font-size:11px;color:var(--sub);">';
@@ -8736,46 +8715,257 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     }
     h+='</div>';
 
-    // === 暂未上架 v8.5 实验（主人 2026-08-06 22:39 令·选 A+B 先行） ===
-    var planned = [
-      {icon:'🧭', title:'决策四步 + 三不原则（参考）', color:'#94a3b8',
-        sub:'操作纪律参考卡（与 🎯 今日判定配对 · 2026-08-07 迁入暂未上架实验区）',
-        cur:'今日判定卡原展示：理论规则文字，实际无可买股票',
-        plan:'主人令「今日判定里不要理论，要实际可买股票」。本卡保留为<b>决策参考</b>（不实施买入），未来升级为单卡工具：4 步决策 + 5 条铁律 + 交互式检查清单（输入环境状态自动给"该不该买"答案）。当前内容：<br>· <b>决策四步</b>：①环境择时（今日事件日历+危机 ≤50）/②选股（按可信度 5 算法排序）/③出手确认（信号+绿灯+大盘）/④持仓风控（止损/止盈/分批）<br>· <b>三不原则</b>：危机≥70 空仓 / 大盘-1.5% 只逆势龙头 / 盈亏比<1.5 不介入 / 单票≤20% / 事件标红不开新仓',
-        data:null, dataName:'无（参考卡，无数据源）'},
-      {icon:'🎭', title:'情绪周期', color:'#38bdf8',
-        sub:'情绪因子+情绪日报（v8.5 方案 A）',
-        cur:'已有预警/危机雷达 + 涨停热力 + ETF 申赎 + 龙虎榜（机构/游资活跃度）',
-        plan:'四源数据 → 4 阶段判定：<b>冰点（情绪低）→ 修复（情绪转好）→ 温和（情绪中性）→ 狂热（情绪高）→ 降温</b>。每阶段配套仓位建议（冰点空仓/修复 30%/温和 50%/狂热 70%→80%/降温 30%）。',
-        data:window.CRISIS_DATA, dataName:'CRISIS_DATA + LIMIT_UP_HEATMAP + ETF_INTRADAY_HEAT + LHB_DATA',
-        dataReady: true},
-      {icon:'📝', title:'AI 报告解读', color:'#22c55e',
-        sub:'让数据自动翻译成可读结论（v8.5 方案 B）',
-        cur:'每个卡是数据/列表，用户需自己解读',
-        plan:'每个重要卡片（今日事件/今日判定/算法命中/候选池）加 🤖 按钮，点击调 LLM 生成 200 字解读：为什么今日某项关键？后续关注什么？raw_data 喂 LLM，无需新数据源，2-3 天可落地。',
-        data:null, dataName:'无（基于现有 raw_data + LLM 调用）'},
-      {icon:'🏔️', title:'连板天梯', color:'#ff7043',
-        sub:'首板/连板/炸板分层梯队（v8.6+ 后续）',
-        cur:'只有涨停热力 heatmap',
-        plan:'v8.6+ 立项。可加「连板梯队」视图（LIMIT_UP_HEATMAP 数据已有，缺展示）',
-        data:window.LIMIT_UP_HEATMAP, dataName:'LIMIT_UP_HEATMAP'},
-      {icon:'🔄', title:'板块周期', color:'#a78bfa',
-        sub:'板块处于 启动/主升/退潮 哪一阶段（v8.6+ 后续）',
-        cur:'只有资金流+RS 强度',
-        plan:'v8.6+ 立项。给 SECTOR_RS 加"周期定位"标签（可做）',
-        data:window.SECTOR_RS, dataName:'SECTOR_RS'},
-    ];
-    planned.forEach(function(p){
-      var has = p.dataReady || !!(p.data && (p.data.items||p.data.data||p.data.update_time));
-      h+='<div class="card" style="margin-bottom:16px;border-left:4px solid '+p.color+';opacity:0.85;">';
-      h+=v8CardHeader(p.icon, p.title+' <span style="font-size:11px;color:#94a3b8;font-weight:400;">(计划中 · 待实验)</span>', p.plan, 'update_time', {update_time:''}, !has);
-      h+='<div style="padding:10px 14px;font-size:11px;color:var(--sub);line-height:1.6;">';
-      h+='<div style="margin-bottom:4px;"><b style="color:var(--txt)">目标:</b> '+p.sub+'</div>';
-      h+='<div style="margin-bottom:4px;"><b style="color:#94a3b8">现状:</b> '+p.cur+'</div>';
-      h+='<div style="margin-bottom:4px;"><b style="color:'+p.color+'">计划:</b> '+p.plan+'</div>';
-      h+='<div style="color:var(--dim);font-size:10px;margin-top:6px;">📦 数据源 '+p.dataName+(has?' 已就绪':' 未填充')+'</div>';
-      h+='</div></div>';
-    });
+    // === 暂未上架实验区 · 5 张数据驱动卡（2026-08-07 主人令：今晚开始开发） ===
+
+    // ── 卡 1：🧭 决策四步 + 三不原则（参考卡，动态检查清单） ──
+    (function(){
+      var jd = window.JUDGMENT_DATA || {};
+      var cr = window.CRISIS_DATA || {};
+      var crisisScore = (cr.currency||0)*0.4 + (cr.economy||0)*0.35 + (cr.global||0)*0.25;
+      var crisisPct = Math.round(crisisScore * 100);
+      // 动态判断四步状态
+      var steps = [
+        {name:'① 环境择时', desc:'危机雷达 ≤50 且无重大利空', ok: crisisPct <= 50, detail: '危机雷达 '+crisisPct+'分'+(crisisPct<=50?' ✅':' ⚠️ 偏高')+(jd.warning?' · '+jd.warning:'')},
+        {name:'② 选股排序', desc:'按可信度从算法候选中选', ok: !!(window.TRIPLE_CONSENSUS || window.COCKPIT_TIER_RECOMMEND), detail: (window.TRIPLE_CONSENSUS?'三重共识 ':'')+(window.COCKPIT_TIER_RECOMMEND?'驾驶舱A档 ':'')||'暂无算法命中'},
+        {name:'③ 出手确认', desc:'信号+绿灯+大盘配合', ok: !!(jd && jd.verdict && jd.verdict.indexOf('偏多')>=0), detail: (jd.verdict||'--')+' · 大盘 '+(jd.market||'--')},
+        {name:'④ 持仓风控', desc:'止损-7% / 分批止盈', ok: true, detail: '硬止损 -7% · 短线+7% · 中线+12% · 强势+15%（始终生效）'},
+      ];
+      var rules = [
+        {t:'危机≥70 空仓', ok: crisisPct < 70},
+        {t:'大盘-1.5%只逆势龙头', ok: true}, // 需实时大盘数据，默认通过
+        {t:'盈亏比<1.5不介入', ok: true},
+        {t:'单票≤20%', ok: true},
+        {t:'事件标红不开新仓', ok: true},
+      ];
+      var allOk = steps.every(function(s){return s.ok;}) && rules.every(function(r){return r.ok;});
+      // 辅助：CSS变量→rgba（避免 .replace 引号嵌套问题）
+      function _vra(c,a){ return c.indexOf('var(')===0 ? "rgba(0,0,0,"+a+")" : c.replace(/[^0-9a-f#]/gi,"").length>4 ? c+"1f" : "rgba(0,0,0,"+a+")"; }
+      var verdictColor = allOk ? 'var(--up)' : (crisisPct >= 70 ? 'var(--down)' : '#f59e0b');
+      var verdictText = allOk ? '✅ 环境允许操作' : (crisisPct >= 70 ? '❌ 建议空仓观望' : '⚠️ 谨慎操作，严守纪律');
+      h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #94a3b8;">';
+      h += v8CardHeader('🧭','决策四步 + 三不原则','操作纪律参考卡（与 🎯 今日判定配对 · 动态检查清单）','update_time',
+        {update_time:(jd.update_time || cr.update_time), slot:'盘前', horizon:'短线'}, !(jd.update_time || cr.update_time));
+      h += '<div style="padding:12px 14px;">';
+      // 总判
+      h += '<div style="text-align:center;margin-bottom:10px;padding:8px;background:'+_vra(verdictColor,0.12)+';border-radius:8px;border:1px solid '+_vra(verdictColor,0.3)+'">';
+      h += '<span style="font-size:15px;font-weight:800;color:'+verdictColor+'">'+verdictText+'</span></div>';
+      // 四步
+      h += '<div style="font-weight:700;color:var(--sub);margin:8px 0 4px">决策四步</div>';
+      steps.forEach(function(s){
+        h += '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)">';
+        h += '<span style="font-weight:700;color:'+(s.ok?'var(--up)':'#f59e0b')+';min-width:90px">'+s.name+'</span>';
+        h += '<span style="color:var(--dim);font-size:11px">'+s.desc+'</span>';
+        h += '<span style="margin-left:auto;color:'+(s.ok?'var(--up)':'var(--down)')+';font-size:12px">'+(s.ok?'✅':'⚠️')+'</span>';
+        h += '</div><div style="color:var(--dim);font-size:10px;padding:0 0 6px 96px">'+s.detail+'</div>';
+      });
+      // 三不
+      h += '<div style="font-weight:700;color:#ef4444;margin:10px 0 4px">三不原则</div>';
+      h += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
+      rules.forEach(function(r){
+        h += '<span style="padding:2px 8px;background:'+(r.ok?'rgba(34,197,94,.08)':'rgba(239,68,68,.08)')+';border:1px solid '+(r.ok?'rgba(34,197,94,.25)':'rgba(239,68,68,.25)')+';border-radius:999px;font-size:11px;color:'+(r.ok?'var(--up)':'var(--down)')+'">' + (r.ok?'✅':'❌') + ' ' + r.t + '</span>';
+      });
+      h += '</div></div></div>';
+    })();
+
+    // ── 卡 2：🎭 情绪周期（CRISIS_DATA + LIMIT_UP_HEATMAP + LHB_DATA 四源综合） ──
+    (function(){
+      var cr = window.CRISIS_DATA || {};
+      var lh = window.LIMIT_UP_HEATMAP || {};
+      var lhb = window.LHB_DATA || {};
+      var crisisScore = (cr.currency||0)*0.4 + (cr.economy||0)*0.35 + (cr.global||0)*0.25;
+      var crisisPct = Math.round(crisisScore * 100);
+      var totalUp = lh.total || 0;
+      var ladder = lh.ladder || {};
+      var lhbCount = (lhb.stocks && lhb.stocks.length) || 0;
+      // 计算机构净买入总额
+      var instNetSum = 0;
+      if(lhb.stocks) lhb.stocks.forEach(function(s){ instNetSum += (s.inst_net_万||0); });
+      // 四阶段判定
+      var phase, phaseColor, phaseDesc, posAdvice;
+      if(crisisPct >= 70){ phase='冰点'; phaseColor='var(--down)'; phaseDesc='危机雷达高位，系统性风险显著'; posAdvice='空仓/≤10%试错'; }
+      else if(crisisPct >= 50){ phase='降温'; phaseColor='#f59e0b'; phaseDesc='风险累积，情绪从高位回落'; posAdvice='≤30%'; }
+      else if(totalUp >= 80 && (ladder['3']||0)+(ladder['4']||0)+(ladder['5']||0)+(ladder['10']||0) >= 15){ phase='狂热'; phaseColor='#ef4444'; phaseDesc='涨停泛滥+连板密集，追高风险大'; posAdvice='70%→80%注意兑现'; }
+      else if(totalUp >= 40 && crisisPct <= 30){ phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪中性偏暖，结构性行情'; posAdvice='50%'; }
+      else if(totalUp < 30 || crisisPct > 35){ phase='修复'; phaseColor='#38bdf8'; phaseDesc='情绪低位筑底，耐心等待信号'; posAdvice='30%'; }
+      else { phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪平稳过渡'; posAdvice='50%'; }
+      function _vra(c,a){ return c.indexOf("var(")===0 ? "rgba(0,0,0,"+a+")" : (c+"22").slice(0,9); }
+      h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';
+      h += v8CardHeader('🎭','情绪周期','四源数据综合判定（危机雷达+涨停热力+连板梯队+龙虎榜）','update_time',
+        {update_time:(cr.update_time || lh.update_time), slot:'盘中', horizon:'短线'}, !(cr.update_time || lh.update_time));
+      h += '<div style="padding:12px 14px;">';
+      // 阶段大标签
+      h += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px;background:'+_vra(phaseColor,0.08)+';border-radius:8px;border:1px solid '+_vra(phaseColor,0.2)+'">';
+      h += '<span style="font-size:22px;font-weight:900;color:'+phaseColor+'">'+phase+'</span>';
+      h += '<div><div style="font-size:13px;font-weight:700;color:var(--txt)">'+phaseDesc+'</div>';
+      h += '<div style="font-size:11px;color:var(--sub)">建议仓位：<b style="color:'+phaseColor+'">'+posAdvice+'</b></div></div></div>';
+      // 四指标仪表盘
+      h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">';
+      var meters = [
+        {label:'危机雷达', val:crisisPct, unit:'分', color: crisisPct>=70?'var(--down)':(crisisPct>=50?'#f59e0b':'var(--up)'), width: Math.min(100, crisisPct)},
+        {label:'涨停总数', val:totalUp, unit:'只', color: totalUp>=80?'#ef4444':(totalUp>=40?'var(--up)':'var(--down)'), width: Math.min(100, totalUp*1.2)},
+        {label:'高连板', val:(ladder['3']||0)+(ladder['4']||0)+(ladder['5']||0)+(ladder['10']||0), unit:'只', color: 'var(--up)', width: 0},
+        {label:'龙虎榜', val:lhbCount, unit:'只', color: 'var(--up)', width: 0},
+      ];
+      meters.forEach(function(m){
+        h += '<div style="background:rgba(255,255,255,.04);border-radius:6px;padding:8px;text-align:center">';
+        h += '<div style="font-size:10px;color:var(--dim)">'+m.label+'</div>';
+        h += '<div style="font-size:18px;font-weight:800;color:'+m.color+'">'+m.val+'</div>';
+        if(m.width>0){
+          h += '<div style="height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:4px"><div style="height:100%;width:'+m.width+'%;background:'+m.color+';border-radius:2px"></div></div>';
+        }
+        h += '</div>';
+      });
+      h += '</div>';
+      // 连板分布
+      if(lh.top && lh.top.length){
+        h += '<div style="font-size:11px;font-weight:700;color:var(--sub);margin:6px 0 4px">🔥 连板龙头 TOP8</div>';
+        h += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
+        lh.top.slice(0,8).forEach(function(t){
+          var lbcColor = t.lbc>=5 ? '#ef4444' : (t.lbc>=3 ? '#f59e0b' : 'var(--up)');
+          h += '<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:rgba(255,255,255,.05);border-radius:999px;font-size:11px">';
+          h += '<b style="color:var(--txt)">'+t.name+'</b>';
+          h += '<span style="color:'+lbcColor+';font-weight:700">'+t.lbc+'板</span>';
+          h += '<span style="color:var(--up)">+'+t.chg.toFixed(1)+'%</span>';
+          h += '</span>';
+        });
+        h += '</div>';
+      }
+      h += '</div></div>';
+    })();
+
+    // ── 卡 3：📝 AI 报告解读（框架卡，标记需 LLM） ──
+    (function(){
+      h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #22c55e;opacity:0.9">';
+      h += v8CardHeader('📝','AI 报告解读','让数据自动翻译成可读结论（需 LLM 调用 · 当前仅框架）','update_time',
+        {update_time:'', slot:'T+1', horizon:'中线'}, true);
+      h += '<div style="padding:12px 14px;font-size:12px;line-height:1.7">';
+      h += '<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:6px;color:#f59e0b;font-weight:700;font-size:11px;margin-bottom:10px">🤖 未就绪 — 需接入 LLM 服务</div>';
+      h += '<div style="color:var(--sub);margin-bottom:8px"><b>设计目标：</b>每个重要卡片旁加 🤖 按钮，点击后调 LLM 生成 ~200 字自然语言解读：</div>';
+      h += '<ul style="color:var(--dim);padding-left:18px;margin:4px 0">';
+      h += '<li>为什么今日这项数据关键？</li>';
+      h += '<li>后续应该关注什么？</li>';
+      h += '<li>对操作的具体建议是什么？</li>';
+      h += '</ul>';
+      h += '<div style="color:var(--dim);font-size:10px;margin-top:8px">📦 数据源：基于现有 raw_data + LLM API 调用（无需新数据采集）</div>';
+      h += '</div></div>';
+    })();
+
+    // ── 卡 4：⛰️ 连板天梯（LIMIT_UP_HEATMAP 数据驱动） ──
+    (function(){
+      var lh = window.LIMIT_UP_HEATMAP || {};
+      var ladder = lh.ladder || {};
+      var top = lh.top || [];
+      var hasData = lh.update_time;
+      h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #ff7043;">';
+      h += v8CardHeader('⛰️','连板天梯','首板/连板/炸板分层梯队（当日涨停结构）','update_time',
+        {update_time:lh.update_time, slot:'盘后', horizon:'短线'}, !hasData);
+      h += '<div style="padding:12px 14px;">';
+      if(!hasData){
+        h += '<div style="color:var(--dim);text-align:center;padding:16px">涨停数据加载中…</div>';
+      } else {
+        // 连板分布条形图
+        var lbcKeys = Object.keys(ladder).sort(function(a,b){return parseInt(a)-parseInt(b);});
+        var maxLbc = 0; lbcKeys.forEach(function(k){ maxLbc=Math.max(maxLbc,ladder[k]); });
+        h += '<div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:6px">连板分布（共 '+(lh.total||0)+' 只涨停）</div>';
+        h += '<div style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px">';
+        lbcKeys.forEach(function(k){
+          var v = ladder[k];
+          var pct = maxLbc>0 ? Math.round(v/maxLbc*100) : 0;
+          var lbl = k==='1'?'首板':k+'连板';
+          var barColor = parseInt(k)>=4 ? '#ef4444' : (parseInt(k)>=3 ? '#f59e0b' : (parseInt(k)>=2 ? '#38bdf8' : 'var(--up)'));
+          h += '<div style="display:flex;align-items:center;gap:6px">';
+          h += '<span style="font-size:11px;color:var(--sub);min-width:42px;text-align:right">'+lbl+'</span>';
+          h += '<div style="flex:1;height:18px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden">';
+          h += '<div style="width:'+pct+'%;height:100%;background:'+barColor+';border-radius:4px;display:flex;align-items:center;padding-left:6px">';
+          h += '<span style="font-size:10px;font-weight:700;color:#fff">'+v+'只</span>';
+          h += '</div></div></div>';
+        });
+        h += '</div>';
+        // 高连板个股列表
+        var highLb = top.filter(function(t){return t.lbc>=3;}).sort(function(a,b){return b.lbc-a.lbc;});
+        if(highLb.length){
+          h += '<div style="font-size:11px;font-weight:700;color:#f59e0b;margin:8px 0 4px">⚡ 高连板梯队（≥3板）</div>';
+          h += '<div style="display:flex;flex-direction:column;gap:2px">';
+          highLb.forEach(function(t){
+            h += '<div style="display:flex;align-items:center;gap:8px;padding:3px 6px;background:rgba(255,112,67,.05);border-radius:4px">';
+            h += '<span style="font-weight:800;color:#ef4444;min-width:28px;text-align:right">'+t.lbc+'板</span>';
+            h += '<b style="color:var(--txt);min-width:56px">'+t.name+'</b>';
+            h += '<span style="color:var(--dim);font-size:10px">'+t.code+'</span>';
+            h += '<span style="margin-left:auto;color:var(--up);font-weight:700;font-size:11px">+'+t.chg.toFixed(2)+'%</span>';
+            h += '</div>';
+          });
+          h += '</div>';
+        }
+        // 首板代表
+        var firstBoard = top.filter(function(t){return t.lbc===1;}).slice(0,5);
+        if(firstBoard.length){
+          h += '<div style="font-size:11px;font-weight:700;color:var(--up);margin:8px 0 4px">🔥 首板代表 TOP5</div>';
+          h += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
+          firstBoard.forEach(function(t){
+            h += '<span style="padding:2px 8px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:999px;font-size:11px">';
+            h += '<b>'+t.name+'</b> <span style="color:var(--up)">+'+t.chg.toFixed(1)+'%</span></span>';
+          });
+          h += '</div>';
+        }
+      }
+      h += '</div></div>';
+    })();
+
+    // ── 卡 5：🔄 板块周期（SECTOR_RS 多维度周期定位） ──
+    (function(){
+      var sr = window.SECTOR_RS || {};
+      var sectors = sr.sectors || [];
+      var hasData = sr.data_available && sectors.length > 0;
+      function _vra(c,a){ return c.indexOf("var(")===0 ? "rgba(0,0,0,"+a+")" : (c+"22").slice(0,9); }
+      h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #a78bfa;">';
+      h += v8CardHeader('🔄','板块周期','各板块所处周期阶段（启动/主升/退潮/底部）','update_time',
+        {update_time:sr.update_time, slot:'周度', horizon:'中线'}, !hasData);
+      h += '<div style="padding:12px 14px;">';
+      if(!hasData){
+        h += '<div style="color:var(--dim);text-align:center;padding:16px">板块 RS 数据加载中…</div>';
+      } else {
+        // 周期判定逻辑：pct_5d + pct_20d 组合
+        var cycleMap = [];
+        sectors.forEach(function(s){
+          var d5 = s.pct_5d || 0, d20 = s.pct_20d || 0, dDay = s.pct_day || 0;
+          var cycle, cycColor;
+          if(d5 > 3 && d20 > 5){ cycle='🚀 主升'; cycColor='#ef4444'; }
+          else if(d5 > 1.5 && d20 > 0){ cycle='📈 启动'; cycColor='var(--up)'; }
+          else if(d5 < -1.5 && d20 < -5){ cycle='📉 退潮'; cycColor='var(--down)'; }
+          else if(d5 < -3 && d20 < -10){ cycle='⛏️ 底部'; cycColor='#38bdf8'; }
+          else{ cycle='➡️ 震荡'; cycColor='#94a3b8'; }
+          cycleMap.push({name:s.name, cycle:cycle, color:cycColor, d5:d5, d20:d20, dDay:dDay});
+        });
+        // 按 5日涨幅排序
+        cycleMap.sort(function(a,b){return b.d5-a.d5;});
+        // 统计各周期数量
+        var cycCounts = {}; cycleMap.forEach(function(c){ cycCounts[c.cycle]=(cycCounts[c.cycle]||0)+1; });
+        // 周期概览标签云
+        h += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">';
+        Object.keys(cycCounts).forEach(function(cyc){
+          var ci = cycleMap.find(function(x){return x.cycle===cyc;});
+          var cc = ci?ci.color:'#94a3b8';
+          h += '<span style="padding:3px 10px;background:'+_vra(cc,0.1)+';border:1px solid '+_vra(cc,0.25)+';border-radius:999px;font-size:11px;color:'+cc+';font-weight:700">'+cyc+' <span style="font-weight:400;color:var(--dim)">'+cycCounts[cyc]+'</span></span>';
+        });
+        h += '</div>';
+        // 板块表格（TOP15）
+        h += '<div style="font-size:11px;font-weight:700;color:var(--sub);margin:6px 0 4px">板块周期排行 TOP15</div>';
+        h += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
+        h += '<tr style="color:var(--dim);border-bottom:1px solid rgba(255,255,255,.1)">';
+        h += '<th style="text-align:left;padding:3px 6px">板块</th><th style="text-align:center;padding:3px 4px">周期</th><th style="text-align:right;padding:3px 4px">今日</th><th style="text-align:right;padding:3px 4px">5日</th><th style="text-align:right;padding:3px 4px">20日</th></tr>';
+        cycleMap.slice(0,15).forEach(function(s){
+          h += '<tr style="border-bottom:1px solid rgba(255,255,255,.04)">';
+          h += '<td style="padding:3px 6px;font-weight:600;color:var(--txt)">'+s.name+'</td>';
+          h += '<td style="text-align:center;padding:3px 4px;color:'+s.color+';font-weight:700">'+s.cycle+'</td>';
+          h += '<td style="text-align:right;padding:3px 4px;color:'+(s.dDay>=0?"var(--up)":"var(--down)")+'">'+(s.dDay>=0?"+":"-")+Math.abs(s.dDay).toFixed(2)+'%</td>';
+          h += '<td style="text-align:right;padding:3px 4px;color:'+(s.d5>=0?"var(--up)":"var(--down)")+'">'+(s.d5>=0?'+':'')+s.d5.toFixed(2)+'%</td>';
+          h += '<td style="text-align:right;padding:3px 4px;color:'+(s.d20>=0?"var(--up)":"var(--down)")+'">'+(s.d20>=0?'+':'')+s.d20.toFixed(2)+'%</td>';
+          h += '</tr>';
+        });
+        h += '</table></div>';
+      }
+      h += '</div></div>';
+    })();
 
     el.innerHTML=h;
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderUnlisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
@@ -9266,8 +9456,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       }else{sb.style.display='none';}
     }
     fillList(document.getElementById(p+'crdsList3'),l3,'<span style="color:var(--dim);">今日无</span>');
-    // 精选/进阶
-    var elite=d.elite||[],adv=d.advanced||[];
+    // 精选/进阶（score=0 的占位项不展示，主人令：'没有的就删除'）
+    var elite=(d.elite||[]).filter(function(s){return (s.score||0)>0;});
+    var adv=(d.advanced||[]).filter(function(s){return (s.score||0)>0;});
     document.getElementById(p+'crdsEliteCnt').textContent=elite.length;
     document.getElementById(p+'crdsAdvCnt').textContent=adv.length;
     // 「今日已跑完」灰色胶囊（无条件：d.update_time 是今天；CST 日期规避 UTC 跨天误判）
@@ -9296,13 +9487,6 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     (function(){var e=document.getElementById(p+'crdsAdvBody');if(!e)return;if(!adv.length){e.innerHTML='<span style="color:var(--dim);">今日无</span>';return;}
       e.innerHTML=adv.map(function(s){return s.name+'('+s.code+') CRDS='+s.score+'<br>';}).join('');
     })();
-    // 进阶去噪
-    var ah=document.getElementById(p+'crdsAdvHint'), ac=document.getElementById(p+'crdsAdvCnt');
-    if(ah){
-      var allZ=adv.length>0&&adv.every(function(s){return s.score===0;});
-      if(allZ){ah.innerHTML=' <span style="font-size:10px;color:#555;">（评分均0·仅放量2连板·非逆势·已折叠）</span>';if(ac)ac.style.color='#555';}
-      else{ah.innerHTML='';if(ac)ac.style.color='#BA7517';}
-    }
     // 历史
     var he=document.getElementById(p+'crdsHistory'), hist=d.history||[];
     if(he){
@@ -9337,6 +9521,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     DATA.gold_pool = window.GOLD_POOL||null;
     DATA.maharo = window.MAHORO||null;
     DATA.allsite = window.COCKPIT_TIER_RECOMMEND||null;
+    DATA.cockpit_tier = window.COCKPIT_TIER_RECOMMEND||null;
     DATA.candidate = window.CANDIDATE||null;
     DATA.backtest_comprehensive = window.BACKTEST_COMPREHENSIVE||null;
     DATA.cockpit_backtest = window.COCKPIT_BACKTEST||null;
