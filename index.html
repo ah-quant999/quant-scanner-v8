@@ -482,6 +482,30 @@ window.V8_CAL = {weeks:[],legend:[]};
     if(!d || isNaN(d.getTime())) return '';
     return d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
   };
+  /* 当前「交易日」字符串（主人令 2026-08-07：开盘 09:30 前都算上一交易日）
+     用途：盘后算法链「今日已跑完/已入仓」胶囊——6号盘后数据在7号 09:30 前仍判为「今日跑过」 */
+  window._tradeDayStr = function(){
+    var now = new Date();
+    var cst = now.toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false});
+    var m = cst.match(/(\d{4})\/(\d{2})\/(\d{2})[ T](\d{2}):(\d{2})/);
+    if(!m) return now.toISOString().slice(0,10);
+    var y=+m[1], mo=+m[2], d=+m[3], hh=+m[4], mm=+m[5];
+    var todayCST = new Date(Date.UTC(y, mo-1, d)); // UTC0点=CST8点，日期正确
+    var beforeOpen = (hh < 9 || (hh === 9 && mm < 30));
+    var base = todayCST;
+    if(beforeOpen){
+      for(var i=1;i<=7;i++){
+        var prev = new Date(todayCST.getTime() - i*864e5);
+        if(window._isAshareTradingDay(prev)){ base = prev; break; }
+      }
+    } else if(!window._isAshareTradingDay(todayCST)){
+      for(var j=1;j<=7;j++){
+        var prev2 = new Date(todayCST.getTime() - j*864e5);
+        if(window._isAshareTradingDay(prev2)){ base = prev2; break; }
+      }
+    }
+    return base.getUTCFullYear()+'-'+String(base.getUTCMonth()+1).padStart(2,'0')+'-'+String(base.getUTCDate()).padStart(2,'0');
+  };
   /* 统一相对时间：非交易日且数据日期为上一交易日，显示「上一交易日收盘」 */
   window._fmtAshareRel = function(ts){
     if(!ts) return '--';
@@ -7623,8 +7647,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     $('tcExtCount').textContent=ext.length;
     $('tcExtended').innerHTML=ext.length?ext.map(s=>renderStock(s,true,tm)).join(''):'<div class="tp-empty">暂无</div>';
     setBadge('tcTime','盘后','短线',data.update_time);
-    // 「今日已跑完」灰色胶囊（无条件：data.update_time 是今天；CST 日期规避 UTC 跨天误判）
-    var _todayStr = new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+    // 「今日已跑完」灰色胶囊（无条件：data.update_time 是当前交易日；开盘前归上一交易日）
+    var _todayStr = window._tradeDayStr();
     var _tcRun = document.getElementById('tcRunBadge');
     if(_tcRun){
       _tcRun.style.display = (data.update_time && String(data.update_time).slice(0,10) === _todayStr) ? 'inline-flex' : 'none';
@@ -7816,8 +7840,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     h+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:22px;">🌐</span>';
     h+='<div style="font-size:16px;font-weight:700;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">全站精选 <span style="color:#fbbf24;font-size:13px;letter-spacing:1px">⭐⭐⭐</span>';
     if(genTime) h+=_uBadge('盘后', '中线', genTime);
-    // 「今日已跑完」灰色胶囊（无条件显示，只要 update_time 是当天；CST 日期规避 UTC 跨天误判）
-    var _today = new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+    // 「今日已跑完」灰色胶囊（无条件显示，只要 gen_time 是当前交易日；开盘前归上一交易日）
+    var _today = window._tradeDayStr();
     if(genTime && String(genTime).slice(0,10) === _today){
       h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">✅ 今日已跑完</span>';
     }
@@ -7942,7 +7966,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(cockpitTs) h+=_uBadge('盘后','短线',cockpitTs);
     // 「今日已跑完」灰色胶囊（无条件显示，只看数据是否当天落地；CST 日期规避 UTC 跨天误判）
     var _cockpitData = window.COCKPIT_TIER_RECOMMEND || {};
-    var _cockpitFresh = (cockpitTs && String(_cockpitData.gen_time || _cockpitData.data_time || _cockpitData.update_time || cockpitTs).slice(0,10) === new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-'));
+    var _cockpitFresh = (cockpitTs && String(_cockpitData.gen_time || _cockpitData.data_time || _cockpitData.update_time || cockpitTs).slice(0,10) === window._tradeDayStr());
     if(_cockpitFresh) h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">✅ 今日已跑完</span>';
     // 今日已入仓胶囊：tier_a + tier_b 任意 > 0 才显示
     var _cta=(DATA.cockpit_tier&&DATA.cockpit_tier.tier_a)||[];
@@ -9436,8 +9460,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var adv=(d.advanced||[]).filter(function(s){return (s.score||0)>0;});
     document.getElementById(p+'crdsEliteCnt').textContent=elite.length;
     document.getElementById(p+'crdsAdvCnt').textContent=adv.length;
-    // 「今日已跑完」灰色胶囊（无条件：d.update_time 是今天；CST 日期规避 UTC 跨天误判）
-    var _todayStr3 = new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+    // 「今日已跑完」灰色胶囊（无条件：d.update_time 是当前交易日；开盘前归上一交易日）
+    var _todayStr3 = window._tradeDayStr();
     var _crdsRun = document.getElementById(p+'crdsRunBadge');
     if(_crdsRun){
       _crdsRun.style.display = (d.update_time && String(d.update_time).slice(0,10) === _todayStr3) ? 'inline-flex' : 'none';
@@ -9558,8 +9582,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var four = stocks.filter(function(s){ return s.four; }).length;
     function set(id,v){ var e=document.getElementById(id); if(e) e.textContent = v; }
     set('stfvQD', qd); set('stfvYZC', yzc); set('stfvJG', jg); set('stfvXC', xc); set('stfvFOUR', four);
-    // 「今日已跑完」灰色胶囊（无条件：d.update_time 是今天）
-    var _todayStr2 = new Date().toISOString().slice(0,10);
+    // 「今日已跑完」灰色胶囊（无条件：d.update_time 是当前交易日；开盘前归上一交易日，修 UTC 跨天早盘隐藏）
+    var _todayStr2 = window._tradeDayStr();
     var _fvRun = document.getElementById('stfvRunBadge');
     if(_fvRun){
       _fvRun.style.display = (d.update_time && String(d.update_time).slice(0,10) === _todayStr2) ? 'inline-flex' : 'none';
