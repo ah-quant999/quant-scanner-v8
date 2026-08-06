@@ -638,26 +638,44 @@ window.__judgmentCandidatesHTML = __judgmentCandidatesHTML;
 function _buildJudgmentEnvHTML(d){
   if(!d) return '<div style="color:var(--dim);padding:12px;text-align:center">环境态势数据加载中（盘前 08:25 自动生成）…</div>';
   var h = '';
-  // 0) 时事滚动（macro_brief 优先，避免整张卡看起来像固定模板）
-  var mb = d.macro_brief || {};
-  var news = mb.news_brief || [];
+  // 0) 时事滚动：优先用独立 MACRO_BRIEF（更全），回退到 JUDGMENT_DATA 内嵌 macro_brief
+  var fullMb = (typeof window !== 'undefined' && window.MACRO_BRIEF) || {};
+  var mb = (fullMb.headline ? fullMb : (d.macro_brief || {})) || {};
+  var news = (fullMb.news_brief && fullMb.news_brief.length ? fullMb.news_brief : (mb.news_brief || [])) || [];
   if(mb.headline || news.length){
     h += '<div style="margin-bottom:12px;padding:10px 12px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.22);border-radius:10px;font-size:13px;line-height:1.7">';
     if(mb.headline){
-      h += '<div style="font-size:12px;font-weight:700;color:#38bdf8;margin-bottom:5px">🌐 时事滚动 · '+mb.headline+'</div>';
+      h += '<div style="font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:5px">🌐 时事滚动 · '+mb.headline+'</div>';
     }
     if(news.length){
-      h += '<div style="display:flex;flex-direction:column;gap:4px">';
-      news.slice(0,3).forEach(function(n){
+      h += '<div style="display:flex;flex-direction:column;gap:5px">';
+      news.slice(0,4).forEach(function(n){
         var tag = n.tag || '宏观';
         var text = n.text || '';
-        h += '<div style="font-size:11px;color:var(--sub);line-height:1.55"><span style="color:#38bdf8;font-weight:700">'+tag+'</span> '+text+'</div>';
+        h += '<div style="font-size:12px;color:var(--sub);line-height:1.6"><span style="color:#38bdf8;font-weight:700">'+tag+'</span> '+text+'</div>';
       });
       h += '</div>';
     }
     if(mb.a_impact){
-      h += '<div style="margin-top:6px;padding:5px 8px;background:rgba(0,0,0,0.12);border-radius:5px;font-size:11px;color:var(--txt)"><b>对A股影响：</b>'+mb.a_impact+'</div>';
+      var impactColor = (mb.a_impact.indexOf('偏空')>=0) ? 'var(--down)' : ((mb.a_impact.indexOf('偏多')>=0) ? 'var(--up)' : 'var(--txt)');
+      h += '<div style="margin-top:8px;padding:6px 10px;background:rgba(0,0,0,0.12);border-radius:6px;font-size:12px;color:var(--txt)"><b>对A股影响：</b><span style="color:'+impactColor+'">'+mb.a_impact+'</span></div>';
     }
+    h += '</div>';
+  }
+  // 0.5) 关键数据（来自 MACRO_BRIEF，避免与环境态势重复展示死模板）
+  var keyNumbers = (fullMb.key_numbers && fullMb.key_numbers.length ? fullMb.key_numbers : (mb.key_numbers || [])) || [];
+  if(keyNumbers.length){
+    h += '<div style="font-weight:700;margin:8px 0 6px;color:var(--sub);font-size:12px">关键数据</div>';
+    h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px">';
+    keyNumbers.forEach(function(k){
+      var dColor = (k.delta.indexOf('\u2191')>=0 || k.delta.indexOf('\u2193')>=0)
+        ? ((k.delta.indexOf('\u2191')>=0) ? 'var(--up)' : 'var(--down)')
+        : 'var(--txt)';
+      h += '<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.18);border-radius:6px;padding:4px 9px;font-size:12px;line-height:1.5">'
+        + '<b style="color:var(--sub)">'+k.label+'</b>'
+        + '<span style="color:var(--txt);font-weight:600">'+k.value+'</span>'
+        + '<span style="color:'+dColor+';font-weight:700">'+k.delta+'</span></span>';
+    });
     h += '</div>';
   }
   // 1) 美股/宏观 + 结论 + 预警（置顶）；过滤掉旧的固定死文案
@@ -796,60 +814,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div id="v8TodayAll" style="font-size:13px;color:var(--txt);"></div>
     </div>
 
-    <!-- 2026-08-07 主人令：今日判定已整体迁移至 🔒 暂未上架 Tab，本页不再展示 -->
-
-    <!-- 今日宏观解读（每日盘前 · premarket 08:25 刷新 · 数据驱动） -->
-    <div class="card" style="margin-bottom:16px;border-left:4px solid var(--cyan);">
-      <h3><span class="ic">📊</span>今日宏观解读 <span id="macroInterpretTag" style="font-size:11px;font-weight:400;color:var(--dim)"></span></h3>
-      <div id="macroBody" style="font-size:13px;line-height:1.8;color:var(--txt)"></div>
-    </div>
-    <script>
-    (function(){
-      var b = document.getElementById('macroBody');
-      var tag = document.getElementById('macroInterpretTag');
-      if(!b){ if(tag) tag.textContent='渲染失败'; return; }
-      var d = window.MACRO_BRIEF;
-      var md = window.MACRO_DATA;
-      var ts = (d && d.update_time) || (md && (md.update_time || (md.global_macro && md.global_macro.usdcnh && md.global_macro.usdcnh.date))) || '--';
-      if(tag) tag.innerHTML = _uBadge('盘前','中线',ts);
-      if(!d && !md){ b.innerHTML='<p style="color:var(--dim)">宏观数据加载中（盘前 08:25 自动生成）...</p>'; return; }
-      var h = '';
-      if(d && d.headline){
-        h += '<p style="margin:8px 0"><b style="color:var(--up)">一句话结论：</b>'+d.headline+'</p>';
-      } else if(md){
-        h += '<p style="margin:8px 0;color:var(--dim)">宏观数据已更新，解读生成中…</p>';
-      }
-      if(d && d.a_impact){
-        var impactColor = (d.a_impact.indexOf('偏空')>=0) ? 'var(--down)' : ((d.a_impact.indexOf('偏多')>=0) ? 'var(--up)' : 'var(--txt)');
-        h += '<p style="margin:10px 0;padding:8px 12px;background:rgba(56,189,248,0.06);border-radius:8px;border-left:3px solid var(--cyan)">';
-        h += '<b>→ 对 A 股影响：</b><span style="color:'+impactColor+'">'+d.a_impact+'</span>';
-        h += '</p>';
-      }
-      if(d && d.key_numbers && d.key_numbers.length){
-        h += '<div style="font-weight:700;margin:8px 0 4px;color:var(--sub)">关键数据</div>';
-        h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0">';
-        d.key_numbers.forEach(function(k){
-          var dColor = (k.delta.indexOf('\u2191')>=0 || k.delta.indexOf('\u2193')>=0)
-            ? ((k.delta.indexOf('\u2191')>=0) ? 'var(--up)' : 'var(--down)')
-            : 'var(--txt)';
-          h += '<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.18);border-radius:6px;padding:3px 8px;font-size:11.5px;line-height:1.6">'
-            + '<b style="color:var(--sub)">'+k.label+'</b>'
-            + '<span style="color:var(--txt)">'+k.value+'</span>'
-            + '<span style="color:'+dColor+';font-weight:600">'+k.delta+'</span></span>';
-        });
-        h += '</div>';
-      }
-      if(d && d.news_brief && d.news_brief.length){
-        h += '<div style="font-weight:700;margin:12px 0 4px;color:var(--sub)">📰 时事要点（对 A 股有影响的）</div>';
-        h += '<ul style="margin:4px 0 4px 18px;padding:0">';
-        d.news_brief.forEach(function(n){
-          h += '<li style="margin:3px 0"><b style="color:var(--cyan)">'+n.tag+'</b> '+n.text+'</li>';
-        });
-        h += '</ul>';
-      }
-      b.innerHTML = h || '<p style="color:var(--dim)">宏观数据加载中…</p>';
-    })();
-    </script>
+    <!-- 2026-08-07 主人令：今日判定（含原宏观解读）已整体迁移至 🔒 暂未上架 Tab，本页不再展示 -->
 
     <!-- 打新速览 -->
     <div class="card" style="margin-bottom:16px">
@@ -4014,14 +3979,23 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <section id="sec-ul">
     <div class="sec-head"><h2>🧪 暂未上架</h2><span class="tag">仅管理员可见 · 实验区 · 未正式上架卡片</span></div>
 
-    <!-- 🔒 今日判定·环境态势（原 judgmentBody 理论段 · 2026-08-06 主人令管理员可见区，进入本 Tab 时由 renderUnlisted 填充） -->
+    <!-- 🔒 今日判定（原 judgmentBody 理论段 + 今日宏观解读合并 · 2026-08-07 主人令） -->
     <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;opacity:0.95;">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
-        <span style="font-size:14px;">⚖️</span><span style="font-weight:700;font-size:14px;color:var(--txt);">今日判定 · 环境态势</span>
-        <span style="font-size:11px;color:var(--sub);">（原 judgmentBody · 美股/技术/情绪/宏观/共同结论/危险信号/大盘）</span>
-      </div>
-      <div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);"></div>
+      <div id="judgmentCardHeader"></div>
+      <div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);padding:0 14px 12px;"></div>
     </div>
+    <script>
+    (function(){
+      var jd = window.JUDGMENT_DATA || {};
+      var mb = window.MACRO_BRIEF || {};
+      var ts = jd.update_time || mb.update_time || '';
+      var head = document.getElementById('judgmentCardHeader');
+      if(head){
+        head.innerHTML = v8CardHeader('⚖️','今日判定','宏观/美股/技术/情绪/共同结论/危险信号/大盘','update_time',
+          {update_time:ts, slot:'盘前', horizon:'短线'}, !ts);
+      }
+    })();
+    </script>
 
     <div id="unlistedPanel"></div>
   </section>
