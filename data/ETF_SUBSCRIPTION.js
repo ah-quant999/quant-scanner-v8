@@ -1,1 +1,1 @@
-window.ETF_SUBSCRIPTION = {"sh":[{"date":"7/8","date_raw":"2026-07-08","total_shares_bil":2163.87,"net_subscribe_bil":0.0}],"sh_all":[{"date":"7/8","date_raw":"2026-07-08","total_shares_bil":19086.64,"net_subscribe_bil":0.0}],"update_time":"2026-08-06 11:57:07"};
+window.ETF_SUBSCRIPTION = {"sh":[{"date":"7/8","date_raw":"2026-07-08","total_shares_bil":2163.87,"net_subscribe_bil":0.0}],"sh_all":[{"date":"7/8","date_raw":"2026-07-08","total_shares_bil":19086.64,"net_subscribe_bil":0.0}],"update_time":"2026-08-06 12:28:43"};
