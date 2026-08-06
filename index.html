@@ -8579,16 +8579,62 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       }
     }catch(e){}
     var h='';
-    // 🎯 今日判定 · 可入手候选（2026-08-07 主人令：从今日事件页移入实验区，与 🧭 决策四步配对）
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">';
-    var _judgeData = window.JUDGMENT_DATA || {};
-    h+=v8CardHeader('🎯','今日判定 · 可入手候选','实际股票代入（实验组 · 已从今日事件页移入）','update_time',
-      {update_time:_judgeData.update_time, slot:'盘前', horizon:'短线'}, !_judgeData.update_time);
-    h+='<div style="padding:12px 14px;">';
-    h+=(typeof window.__judgmentCandidatesHTML === 'function')
-      ? window.__judgmentCandidatesHTML()
-      : '<div style="color:var(--dim)">候选数据加载中…</div>';
-    h+='</div></div>';
+    // 🎯 今日判定 · 可入手候选 + 决策纪律（2026-08-07 主人令：合并为一卡，压缩版面）
+    (function(){
+      var jd = window.JUDGMENT_DATA || {};
+      var cr = window.CRISIS_DATA || {};
+      var crisisScore = (cr.currency||0)*0.4 + (cr.economy||0)*0.35 + (cr.global||0)*0.25;
+      var crisisPct = Math.round(crisisScore * 100);
+      var steps = [
+        {name:'① 环境', ok: crisisPct <= 50, detail: '危机'+crisisPct+'分'+(crisisPct<=50?'✅':'⚠️')},
+        {name:'② 选股', ok: !!(window.TRIPLE_CONSENSUS || window.COCKPIT_TIER_RECOMMEND), detail: (window.TRIPLE_CONSENSUS?'三重':'')+(window.COCKPIT_TIER_RECOMMEND?'驾驶舱':'')||'无'},
+        {name:'③ 出手', ok: !!(jd && jd.verdict && jd.verdict.indexOf('偏多')>=0), detail: (jd.verdict||'--')},
+        {name:'④ 风控', ok: true, detail: '止损-7% / +7%+12%+15%'}
+      ];
+      var rules = [
+        {t:'危机≥70空仓', ok: crisisPct < 70},
+        {t:'大盘-1.5%只逆势龙头', ok: true},
+        {t:'盈亏比<1.5不介入', ok: true},
+        {t:'单票≤20%', ok: true},
+        {t:'事件标红不开新仓', ok: true}
+      ];
+      var allOk = steps.every(function(s){return s.ok;}) && rules.every(function(r){return r.ok;});
+      function _vra(c,a){ return c.indexOf('var(')===0 ? "rgba(0,0,0,"+a+")" : c.replace(/[^0-9a-f#]/gi,"").length>4 ? c+"1f" : "rgba(0,0,0,"+a+")"; }
+      var verdictColor = allOk ? 'var(--up)' : (crisisPct >= 70 ? 'var(--down)' : '#f59e0b');
+      var verdictText = allOk ? '✅ 环境允许' : (crisisPct >= 70 ? '❌ 建议空仓' : '⚠️ 谨慎操作');
+      var hasData = jd.update_time || cr.update_time;
+      h += '<div class="card" style="margin-bottom:12px;border-left:4px solid #f59e0b;">';
+      h += v8CardHeader('🎯','今日判定 · 可入手候选 + 决策纪律','候选列表 + 操作纪律检查清单','update_time',
+        {update_time:(jd.update_time || cr.update_time), slot:'盘前', horizon:'短线'}, !hasData);
+      h += '<div style="padding:10px 12px;">';
+      // 总判横幅（紧凑）
+      h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:5px 10px;background:'+_vra(verdictColor,0.1)+';border:1px solid '+_vra(verdictColor,0.25)+';border-radius:6px;font-size:12px;">';
+      h += '<b style="color:'+verdictColor+'">'+verdictText+'</b>';
+      h += '<span style="color:var(--dim);font-size:10px">止损-7% · 短线+7% · 中线+12% · 强势+15%</span></div>';
+      // 两栏主体
+      h += '<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:12px;">';
+      // 左：候选列表
+      h += '<div>' + ((typeof window.__judgmentCandidatesHTML === 'function')
+        ? window.__judgmentCandidatesHTML()
+        : '<div style="color:var(--dim)">候选数据加载中…</div>') + '</div>';
+      // 右：决策四步 + 三不原则（紧凑）
+      h += '<div style="border-left:1px solid rgba(255,255,255,.06);padding-left:12px;">';
+      h += '<div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:4px">决策四步</div>';
+      steps.forEach(function(s){
+        h += '<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)">';
+        h += '<span style="font-weight:700;color:'+(s.ok?'var(--up)':'#f59e0b')+';font-size:11px;min-width:48px">'+s.name+'</span>';
+        h += '<span style="margin-left:auto;color:'+(s.ok?'var(--up)':'var(--down)')+';font-size:11px">'+(s.ok?'✅':'⚠️')+'</span></div>';
+        h += '<div style="color:var(--dim);font-size:9px;padding:0 0 4px 54px">'+s.detail+'</div>';
+      });
+      h += '<div style="font-size:11px;font-weight:700;color:#ef4444;margin:8px 0 3px">三不原则</div>';
+      h += '<div style="display:flex;flex-wrap:wrap;gap:3px">';
+      rules.forEach(function(r){
+        h += '<span style="padding:1px 6px;background:'+(r.ok?'rgba(34,197,94,.08)':'rgba(239,68,68,.08)')+';border:1px solid '+(r.ok?'rgba(34,197,94,.25)':'rgba(239,68,68,.25)')+';border-radius:999px;font-size:10px;color:'+(r.ok?'var(--up)':'var(--down)')+'">' + (r.ok?'✅':'❌') + ' ' + r.t + '</span>';
+      });
+      h += '</div></div></div>'; // 右栏 / 两栏
+      h += '</div></div>';
+    })();
+
 
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #7b1fa2;">';
     h+=v8CardHeader('🧪','实验选股调试专区','管理员可见：三重起涨 / CRDS逆势 / 候选池，验证中请勿依赖','update_time',window.SH_FIB);
@@ -8679,56 +8725,6 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     h+='</div>';
 
     // === 暂未上架实验区 · 5 张数据驱动卡（2026-08-07 主人令：今晚开始开发） ===
-
-    // ── 卡 1：🧭 决策四步 + 三不原则（参考卡，动态检查清单） ──
-    (function(){
-      var jd = window.JUDGMENT_DATA || {};
-      var cr = window.CRISIS_DATA || {};
-      var crisisScore = (cr.currency||0)*0.4 + (cr.economy||0)*0.35 + (cr.global||0)*0.25;
-      var crisisPct = Math.round(crisisScore * 100);
-      // 动态判断四步状态
-      var steps = [
-        {name:'① 环境择时', desc:'危机雷达 ≤50 且无重大利空', ok: crisisPct <= 50, detail: '危机雷达 '+crisisPct+'分'+(crisisPct<=50?' ✅':' ⚠️ 偏高')+(jd.warning?' · '+jd.warning:'')},
-        {name:'② 选股排序', desc:'按可信度从算法候选中选', ok: !!(window.TRIPLE_CONSENSUS || window.COCKPIT_TIER_RECOMMEND), detail: (window.TRIPLE_CONSENSUS?'三重共识 ':'')+(window.COCKPIT_TIER_RECOMMEND?'驾驶舱A档 ':'')||'暂无算法命中'},
-        {name:'③ 出手确认', desc:'信号+绿灯+大盘配合', ok: !!(jd && jd.verdict && jd.verdict.indexOf('偏多')>=0), detail: (jd.verdict||'--')+' · 大盘 '+(jd.market||'--')},
-        {name:'④ 持仓风控', desc:'止损-7% / 分批止盈', ok: true, detail: '硬止损 -7% · 短线+7% · 中线+12% · 强势+15%（始终生效）'},
-      ];
-      var rules = [
-        {t:'危机≥70 空仓', ok: crisisPct < 70},
-        {t:'大盘-1.5%只逆势龙头', ok: true}, // 需实时大盘数据，默认通过
-        {t:'盈亏比<1.5不介入', ok: true},
-        {t:'单票≤20%', ok: true},
-        {t:'事件标红不开新仓', ok: true},
-      ];
-      var allOk = steps.every(function(s){return s.ok;}) && rules.every(function(r){return r.ok;});
-      // 辅助：CSS变量→rgba（避免 .replace 引号嵌套问题）
-      function _vra(c,a){ return c.indexOf('var(')===0 ? "rgba(0,0,0,"+a+")" : c.replace(/[^0-9a-f#]/gi,"").length>4 ? c+"1f" : "rgba(0,0,0,"+a+")"; }
-      var verdictColor = allOk ? 'var(--up)' : (crisisPct >= 70 ? 'var(--down)' : '#f59e0b');
-      var verdictText = allOk ? '✅ 环境允许操作' : (crisisPct >= 70 ? '❌ 建议空仓观望' : '⚠️ 谨慎操作，严守纪律');
-      h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #94a3b8;">';
-      h += v8CardHeader('🧭','决策四步 + 三不原则','操作纪律参考卡（与 🎯 今日判定配对 · 动态检查清单）','update_time',
-        {update_time:(jd.update_time || cr.update_time), slot:'盘前', horizon:'短线'}, !(jd.update_time || cr.update_time));
-      h += '<div style="padding:12px 14px;">';
-      // 总判
-      h += '<div style="text-align:center;margin-bottom:10px;padding:8px;background:'+_vra(verdictColor,0.12)+';border-radius:8px;border:1px solid '+_vra(verdictColor,0.3)+'">';
-      h += '<span style="font-size:15px;font-weight:800;color:'+verdictColor+'">'+verdictText+'</span></div>';
-      // 四步
-      h += '<div style="font-weight:700;color:var(--sub);margin:8px 0 4px">决策四步</div>';
-      steps.forEach(function(s){
-        h += '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04)">';
-        h += '<span style="font-weight:700;color:'+(s.ok?'var(--up)':'#f59e0b')+';min-width:90px">'+s.name+'</span>';
-        h += '<span style="color:var(--dim);font-size:11px">'+s.desc+'</span>';
-        h += '<span style="margin-left:auto;color:'+(s.ok?'var(--up)':'var(--down)')+';font-size:12px">'+(s.ok?'✅':'⚠️')+'</span>';
-        h += '</div><div style="color:var(--dim);font-size:10px;padding:0 0 6px 96px">'+s.detail+'</div>';
-      });
-      // 三不
-      h += '<div style="font-weight:700;color:#ef4444;margin:10px 0 4px">三不原则</div>';
-      h += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
-      rules.forEach(function(r){
-        h += '<span style="padding:2px 8px;background:'+(r.ok?'rgba(34,197,94,.08)':'rgba(239,68,68,.08)')+';border:1px solid '+(r.ok?'rgba(34,197,94,.25)':'rgba(239,68,68,.25)')+';border-radius:999px;font-size:11px;color:'+(r.ok?'var(--up)':'var(--down)')+'">' + (r.ok?'✅':'❌') + ' ' + r.t + '</span>';
-      });
-      h += '</div></div></div>';
-    })();
 
     // ── 卡 2：🎭 情绪周期 · 连板天梯（合并紧凑版） ──
     (function(){
