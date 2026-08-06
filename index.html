@@ -590,9 +590,9 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <div class="tab" data-sec="rt" onclick="switchSec('rt',this)">📡 实时数据</div>
   <div class="tab" data-sec="ph" onclick="switchSec('ph',this)">🌙 盘后数据</div>
   <div class="tab" data-sec="st" onclick="switchSec('st',this)">🎯 选股策略</div>
-<div class="tab locked" data-sec="rc" data-lock="1" onclick="guardLock('rc',this)">🔒 共振日历 <span class="lk">[锁]</span></div>
-<div class="tab locked" data-sec="op" data-lock="1" onclick="guardLock('op',this)">🔒 运维 <span class="lk">[锁]</span></div>
-<div class="tab locked" data-sec="lg" data-lock="1" onclick="guardLock('lg',this)">🔒 逻辑详解 <span class="lk">[锁]</span></div>
+<div class="tab" data-sec="rc" onclick="switchSec('rc',this)">🧲 共振日历</div>
+  <div class="tab locked" data-sec="op" data-lock="1" onclick="guardLock('op',this)">🔒 运维 <span class="lk">[锁]</span></div>
+  <div class="tab locked" data-sec="lg" data-lock="1" onclick="guardLock('lg',this)">🔒 逻辑详解 <span class="lk">[锁]</span></div>
 </nav>
 
 <main>
@@ -2456,7 +2456,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <!-- ============ 共振日历（月历格式 · 机游/北向/洞察/猎手） ============ -->
   <!-- ============ 共振日历（全面重构） ============ -->
   <section id="sec-rc">
-    <div class="sec-head"><h2>📊 共振日历</h2><span class="tag">机游共振 · 北向席位 · 每日洞察 · 大牛股猎手（限管理员）</span></div>
+    <div class="sec-head"><h2>🧲 共振日历</h2><span class="tag">机游共振 · 北向席位 · 每日洞察 · 大牛股猎手</span></div>
 
     <style>
       .rc-tabs{display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap}
@@ -3741,7 +3741,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
     // Footer
     h += '<div style="margin-top:12px;font-size:10px;color:var(--dim);text-align:center">' + _uBadge('盘后', '短线', updateTime) + '</div>';
-    h += '<div style="margin-top:4px;font-size:10px;color:var(--sub);text-align:center">→ 详细分析见顶部 🔒 共振日历（管理员区）</div>';
+    h += '<div style="margin-top:4px;font-size:10px;color:var(--sub);text-align:center">→ 完整机游/北向/洞察/猎手分析见顶部 🧲 共振日历</div>';
 
     c.innerHTML = h;
     window.__hunterRendered = true;
