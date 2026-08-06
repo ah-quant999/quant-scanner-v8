@@ -81,6 +81,76 @@ def merge_industry_concepts(quote_data):
     return quote_data
 
 
+def merge_dividend(quote_data):
+    """合并 akshare stock_fhps_em() 全市场分红配送 → 每股股息率/EPS/BVPS/分红状态。
+
+    数据源：东方财富 stock_fhps_em（最新一期分红预案/实施情况，约 5.5 秒抓 3855 只）。
+    字段映射到 STOCK_QUOTE.stocks[code].dividend = {
+      yield: 0.0244 (2.44%),
+      cash_ratio: 9.8974 (%),
+      eps: 3.27,
+      bvps: 18.57,
+      cap_reserve: 9.57,
+      undist_profit: 8.68,
+      net_profit_yoy: 0.0900,
+      total_share: 29.12 (亿),
+      plan_date: '2024-03-19',
+      record_date: '2024-06-25',
+      ex_date: '2024-06-26',
+      progress: '实施分配',
+      announce_date: '2024-06-20',
+    }
+    """
+    try:
+        import akshare as ak
+    except ImportError:
+        print("⚠️ akshare 未安装，跳过分红合并")
+        return quote_data
+    try:
+        df = ak.stock_fhps_em()
+        if df is None or len(df) == 0:
+            print("⚠️ stock_fhps_em 返回空")
+            return quote_data
+        merged = 0
+        for _, r in df.iterrows():
+            code6 = str(r['代码']).strip()
+            # 形如 sh/sz603259
+            code8 = ('sh' if code6.startswith(('6', '9', '5')) else 'sz') + code6
+            if code8 not in quote_data:
+                continue
+            def _f(v):
+                try: return float(v)
+                except Exception: return None
+            def _s(v):
+                try:
+                    import pandas as _pd
+                    if _pd.isna(v): return None
+                except Exception:
+                    pass
+                if not v: return None
+                return str(v).strip()
+            quote_data[code8]['dividend'] = {
+                'yield': _f(r.get('现金分红-股息率')),     # 0.0244 = 2.44%
+                'cash_ratio': _f(r.get('现金分红-现金分红比例')),  # 9.8974%
+                'eps': _f(r.get('每股收益')),
+                'bvps': _f(r.get('每股净资产')),
+                'cap_reserve': _f(r.get('每股公积金')),
+                'undist_profit': _f(r.get('每股未分配利润')),
+                'net_profit_yoy': _f(r.get('净利润同比增长')),
+                'total_share_yi': _f(r.get('总股本')) / 1e8 if _f(r.get('总股本')) else None,  # 转为亿
+                'plan_date': _s(r.get('预案公告日')),
+                'record_date': _s(r.get('股权登记日')),
+                'ex_date': _s(r.get('除权除息日')),
+                'progress': _s(r.get('方案进度')),
+                'announce_date': _s(r.get('最新公告日期')),
+            }
+            merged += 1
+        print(f"✅ 合并分红配送：{merged}/{len(quote_data)} 只")
+    except Exception as e:
+        print(f"⚠️ 分红合并失败: {e}")
+    return quote_data
+
+
 def write_outputs(data):
     """同时写 raw_data/stock_quote.json 和 data/STOCK_QUOTE.js（双格式）。"""
     os.makedirs(RAW_DIR, exist_ok=True)
@@ -111,6 +181,7 @@ def main():
     data = fetch_all_spot()
     print(f"抓取完成：{len(data)} 只，{time.time()-t0:.1f}s")
     data = merge_industry_concepts(data)
+    data = merge_dividend(data)
     write_outputs(data)
     print(f"\n总计：{time.time()-t0:.1f}s")
     return 0
