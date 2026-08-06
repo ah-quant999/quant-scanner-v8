@@ -2477,16 +2477,17 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       .cal-head{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px}
       .cal-head span{text-align:center;font-size:11px;font-weight:700;color:var(--dim);padding:6px 0}
       .cal-head span.weekend{color:var(--gold)}
-      .cal-cell{min-height:58px;border:1px solid var(--border);border-radius:6px;padding:4px;cursor:pointer;transition:.15s;display:flex;flex-direction:column;position:relative;overflow:hidden;background:var(--bg2);font-size:10px;line-height:1.35}
+      .cal-cell{min-height:158px;border:1px solid var(--border);border-radius:8px;padding:6px 7px;cursor:pointer;transition:.15s;display:flex;flex-direction:column;position:relative;overflow:hidden;background:var(--bg2);font-size:10px;line-height:1.4}
       .cal-cell:hover{border-color:#38bdf8;box-shadow:0 0 0 1px rgba(56,189,248,.3);z-index:2}
       .cal-cell.today{border-color:#38bdf8;border-width:2px;background:rgba(56,189,248,.08)}
-      .cal-cell.empty{background:transparent;border-color:transparent;cursor:default;min-height:20px}
+      .cal-cell.empty{background:transparent;border-color:transparent;cursor:default;min-height:24px}
       .cal-cell.empty:hover{border-color:transparent;box-shadow:none}
-      .cal-date-num{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:2px}
+      .cal-date-num{font-size:13px;font-weight:700;color:var(--sub);margin-bottom:1px;display:flex;justify-content:space-between;align-items:baseline}
+      .cal-date-num .dow{font-size:9px;font-weight:500;color:var(--dim)}
       .cal-cell.today .cal-date-num{color:#38bdf8}
       .cal-cell.has-data .cal-date-num{color:var(--txt)}
-      .cal-net{font-size:10px;font-weight:700}
-      .cal-sub{font-size:9px;color:var(--dim);margin-top:1px}
+      .cal-net{font-size:11px;font-weight:700;line-height:1.3}
+      .cal-sub{font-size:9px;color:var(--dim);margin-top:1px;line-height:1.3}
       .c-up{color:var(--up)} .c-down{color:var(--down)} .c-gold{color:var(--gold)} .c-purple{color:var(--purple)}
       /* 当日龙虎榜详情（参照参考页：每个交易日完整 TOP5 列表） */
       .jy-week{margin-top:14px}
@@ -2786,17 +2787,54 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       if(hasData) cls += ' has-data';
 
       h += '<div class="' + cls + '" onclick="_rcClickJyDay(\'' + iso + '\')" data-date="' + iso + '">';
-      h += '<span class="cal-date-num">' + d + '</span>';
+      h += '<span class="cal-date-num"><span>' + d + '</span><span class="dow">' + (new Date(year, month, d).getDay()===0||new Date(year, month, d).getDay()===6?'周'+['日','一','二','三','四','五','六'][new Date(year, month, d).getDay()]:'周'+['日','一','二','三','四','五','六'][new Date(year, month, d).getDay()]) + '</span></span>';
 
       if(hasData){
         var dayStocks = (dayMap[iso] && dayMap[iso].stocks) || [];
         var jyArr = dayStocks.filter(function(s){ return (s.category||'')==='机游共振'; });
-        var dayNet = 0;
-        dayStocks.forEach(function(s){ dayNet += (s.inst_net_万||0) + (s.yz_net_万||0); });
+        var jgArr = dayStocks.filter(function(s){ return (s.category||'')==='机构独买'; });
+        var yzArr = dayStocks.filter(function(s){ return (s.category||'')==='游资独买'; });
+        var dayNet = 0, jgNet = 0, yzNet = 0;
+        dayStocks.forEach(function(s){
+          var inst = s.inst_net_万||0, yz = s.yz_net_万||0;
+          dayNet += inst + yz;
+          // 仅机构/游资独买的票计入各自净额（机游共振同时双方都在，单独统计不重复加）
+          if((s.category||'')==='机构独买') jgNet += inst;
+          if((s.category||'')==='游资独买') yzNet += yz;
+        });
+        // 星期几（短）
+        var dObj = new Date(year, month, d);
+        var dows = ['日','一','二','三','四','五','六'];
+        var dowChar = dows[dObj.getDay()];
+        // 净流入（亿元）
+        var netYi = (dayNet/10000).toFixed(2);
         var netColor = dayNet >= 0 ? 'c-up' : 'c-down';
-        h += '<div class="cal-stat" style="text-align:center;padding:3px 2px">';
-        h += '<div style="color:#a78bfa;font-weight:700;font-size:10px">★共振 ' + jyArr.length + '</div>';
-        h += '<div class="' + netColor + '" style="font-size:9px;font-weight:600">' + _rcFmtYi(dayNet) + '</div>';
+        // 预览股名（TOP1 机游共振；无则机构独买 TOP1；再无则游资独买 TOP1）
+        var preview = (jyArr[0] || jgArr[0] || yzArr[0] || {});
+        var previewName = preview.name || '';
+        // 大格子内容：日期+星期 / 净流入 / 共振数 / 机构独买 / 游资独买 / 振股预览
+        h += '<div class="cal-stat" style="flex:1;display:flex;flex-direction:column;gap:3px;padding-top:1px;min-height:0">';
+        // 1) 净流入
+        h += '<div class="cal-net ' + netColor + '" style="display:flex;align-items:baseline;gap:3px">净流入 <b style="font-size:13px">' + (dayNet>=0?'+':'') + netYi + '</b><span style="font-size:9px;opacity:0.7">亿</span></div>';
+        // 2) ★ 机游共振
+        h += '<div class="cal-sub" style="display:flex;align-items:center;gap:3px"><span style="color:#a78bfa;font-weight:700">★</span>机游 <b style="color:' + (jyArr.length?'#a78bfa':'var(--dim)') + '">' + jyArr.length + '</b><span style="color:var(--dim);margin:0 2px">·</span>机构 <b style="color:#38bdf8">' + jgArr.length + '</b><span style="color:var(--dim);margin:0 2px">·</span>游资 <b style="color:#f59e0b">' + yzArr.length + '</b></div>';
+        // 3) 机游共振股预览（最多 2 只名字）
+        if(jyArr.length > 0){
+          h += '<div class="cal-sub" style="line-height:1.3;max-height:30px;overflow:hidden"><span style="color:#a78bfa">★</span> ';
+          var names = jyArr.slice(0,2).map(function(s){return s.name||'';}).join(' · ');
+          h += names + (jyArr.length>2?' +'+(jyArr.length-2):'');
+          h += '</div>';
+        }
+        // 4) 机构 TOP1 + 净额（亿）
+        if(jgArr.length > 0){
+          var jgTop = jgArr.slice().sort(function(a,b){return (b.inst_net_万||0)-(a.inst_net_万||0);})[0];
+          h += '<div class="cal-sub" style="line-height:1.3"><span style="color:#38bdf8">▲</span> ' + (jgTop.name||'') + ' <b class="c-up" style="font-size:9px">+' + (jgTop.inst_net_万/10000).toFixed(2) + '亿</b></div>';
+        }
+        // 5) 游资 TOP1 + 净额（亿）
+        if(yzArr.length > 0){
+          var yzTop = yzArr.slice().sort(function(a,b){return (b.yz_net_万||0)-(a.yz_net_万||0);})[0];
+          h += '<div class="cal-sub" style="line-height:1.3"><span style="color:#f59e0b">▲</span> ' + (yzTop.name||'') + ' <b class="c-up" style="font-size:9px">+' + (yzTop.yz_net_万/10000).toFixed(2) + '亿</b></div>';
+        }
         h += '</div>';
       } else {
         // Weekend / no data
