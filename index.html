@@ -417,6 +417,7 @@ html>
     <script src="data/GOLD_POOL.js?v=20260806202820"></script>
     <script src="data/STOCK_LIST.js?v=20260806202820"></script>
     <script src="data/STOCK_PROFILE.js?v=20260806202820"></script>
+    <script src="data/STOCK_QUOTE.js?v=20260806205520"></script>
     <script src="data/MACRO_DATA.js?v=20260806202820"></script>
     <script src="data/MACRO_BRIEF.js?v=20260806202820"></script>
 <script src="data/NT_DATA.js?v=20260806202820"></script>
@@ -4774,23 +4775,65 @@ function switchSec(sec,el){
     return h;
   }
 
-  function getProfile(code){
+  function getProfile(code, item){
+    // 1. 优先 STOCK_QUOTE（v8 新增全市场基础行情+行业概念，5537 只覆盖）
+    const SQ = window.STOCK_QUOTE || {};
+    const sq = SQ.stocks || {};
+    const fc = (item && item.full_code) || code;
+    const fcLower = sq[fc] ? fc : sq[(item && (item.market||'')) + '_' + code] ? (item.market||'') + '_' + code : sq[code] ? code : null;
+    if(fcLower){
+      const q = sq[fcLower];
+      if(q.industry || q.concepts){
+        return {board:q.board||(item && item.board_label)||'', industry:q.industry||'-', concepts:q.concepts||[], from:'quote'};
+      }
+    }
+    // 2. fallback：STOCK_PROFILE（旧 v6 同步）
     const sp = window.STOCK_PROFILE || {};
     const p = sp.profiles && sp.profiles[code];
-    if(p) return p;
-    // fallback：候选池自带行业/概念
+    if(p) return Object.assign({from:'profile'}, p);
+    // 3. fallback：候选池自带行业/概念
     const cd = window.CANDIDATE || {};
     const stocks = cd.stocks || {};
     const key = Object.keys(stocks).find(k=>normCode(stocks[k].code)===normCode(code));
     if(key){
       const s=stocks[key];
-      return {industry:s.industry, concepts:(s.concepts||[]).slice(0,10)};
+      return {board:s.board_label||'', industry:s.industry||'-', concepts:(s.concepts||[]).slice(0,10), from:'candidate'};
     }
     return null;
   }
 
+  // 2026-08-06 新增：实时行情卡片（必有数据，全市场 5500+ 只覆盖）
+  function renderQuote(item, code){
+    const SQ = window.STOCK_QUOTE || {};
+    const sq = SQ.stocks || {};
+    const fc = item.full_code || ((item.market||'')+code);
+    const q = sq[fc];
+    if(!q || q.price==null) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">📊 实时行情：未收录</div>';
+    const pctCol = q.pct>=0?'var(--up)':'var(--down)';
+    const amountYi = q.amount ? (q.amount/1e8).toFixed(2)+'亿' : '-';
+    const volWan = q.volume ? (q.volume/1e4).toFixed(0)+'万手' : '-';
+    const h='<div style="padding:14px;background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(56,189,248,.03));border-radius:8px;border:1px solid rgba(56,189,248,.25);">'+
+      '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap;">'+
+        '<span style="font-size:13px;font-weight:700;color:var(--cyan);">📊 实时行情</span>'+
+        '<span style="font-size:24px;font-weight:800;color:var(--txt);">¥'+q.price.toFixed(2)+'</span>'+
+        '<span style="font-size:15px;font-weight:700;color:'+pctCol+';">'+(q.change>=0?'+':'')+q.change.toFixed(2)+'</span>'+
+        '<span style="font-size:15px;font-weight:700;color:'+pctCol+';">'+(q.pct>=0?'+':'')+q.pct.toFixed(2)+'%</span>'+
+      '</div>'+
+      '<div style="font-size:12px;color:var(--sub);line-height:1.8;display:grid;grid-template-columns:repeat(2,1fr);gap:2px 12px;">'+
+        '<div>今开 <b>'+(q.open||q.open===0?q.open.toFixed(2):'-')+'</b></div>'+
+        '<div>昨收 <b>'+(q.prev_close||q.prev_close===0?q.prev_close.toFixed(2):'-')+'</b></div>'+
+        '<div>最高 <b style="color:var(--up)">'+(q.high||q.high===0?q.high.toFixed(2):'-')+'</b></div>'+
+        '<div>最低 <b style="color:var(--down)">'+(q.low||q.low===0?q.low.toFixed(2):'-')+'</b></div>'+
+        '<div>成交量 <b>'+volWan+'</b></div>'+
+        '<div>成交额 <b>'+amountYi+'</b></div>'+
+      '</div>'+
+      '<div style="margin-top:8px;font-size:10px;color:var(--dim);">快照 '+q.snapshot_time+' · 数据源 akshare 新浪 · 全市场 '+SQ.meta.count+' 只</div>'+
+    '</div>';
+    return h;
+  }
+
   function renderProfile(item, code){
-    const p = getProfile(code);
+    const p = getProfile(code, item);
     const board = item.board_label || (p && p.board) || '-';
     if(!p) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">🏷️ 概念行业：未收录</div>';
     let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
@@ -4912,7 +4955,10 @@ function switchSec(sec,el){
     h+='</div></div>';
 
     h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:14px;">';
+    // 2026-08-06 升级：个股画像（必有数据）放最前 — 实时行情 + 概念行业（v8 新增全市场 5500+ 只覆盖）
+    h+=renderQuote(item, code);
     h+=renderProfile(item, code);
+    // 策略命中（仅覆盖策略入选股，可能为空）
     h+=renderStrategyHits(item, code);
     h+=renderRelatedFlow(item, code);
     h+=renderMulti(item, code);
