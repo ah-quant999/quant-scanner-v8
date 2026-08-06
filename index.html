@@ -4278,52 +4278,16 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
       </div>
 
       <div class="card">
-        <h3><span class="ic">🥇</span>核心原则：买卖只看三重共识</h3>
-        <div class="lg-box red">
-          <b>该看「三重共识」买卖，其他都是辅助/背景。</b><br>
-          · 🥇 三重共识：可直接作为买卖候选池<br>
-          · 🌐 全站精选（原驾驶舱A/B档）：扩大观察范围，不是最终买点<br>
-          · 🚀 驾驶舱：看市场环境和技术面背景<br>
-          · 📦 股池构成：只是背景信息，不用于买卖
-        </div>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">🧬</span>三重共识 - 说明</h3>
-        <div class="logic-h">判定公式</div>
-        <div class="logic-p">主站 TOP10（total_score ≥70） ∩ 驾驶舱 A档 ∩ 基本面质量 A档，三者同时满足即严格共识。</div>
-        <div class="logic-h">分组展示</div>
-        <div class="logic-p">· <b class="up">严格共识（3/3）</b>：无条件优先看<br>· <b style="color:var(--gold)">优先观察（2/3，total_score≥75）</b>：差1步<br>· <b style="color:var(--dim)">扩展观察（2/3，total_score&lt;75）</b>：差2步</div>
-        <div class="logic-h">历史追踪</div>
-        <div class="logic-p">持仓表、催化剂兑现、回测N日胜率、严格vs宽松、阈值敏感性、板块聚类、重叠度、每日入选历史。</div>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">🎯</span>选股驾驶舱 / 全站精选 - 说明</h3>
-        <div class="logic-h">驾驶舱定位</div>
-        <div class="logic-p">出手信号灯→宏观环境→最强赛道TOP5→共振候选→机构/龙虎榜验证→三重选股。用于确认市场环境和技术面背景。</div>
-        <div class="logic-h">全站精选</div>
-        <div class="logic-p">技术面形态+基本面质量分筛选后的观察池（A/B档）。A档进入三重共识候选，B档扩大观察范围。<br><b>B档准入条件</b>：必须满足「机构变红」或「三重信号共振」二者之一；仅「缠论买」一个信号不足以进入B档。</div>
-        <div class="logic-h">龙虎榜席位口径</div>
-        <div class="logic-p">龙虎榜明细按净买额排序，优先分析资金最活跃的前 N 只。「机构」「游资」「量化」「北向」「未识别」五类席位分账统计；其中「未识别」席位<b>不并入游资</b>，避免把无名营业部误判为游资共振。</div>
-        <div class="logic-h">基本面质量分</div>
-        <div class="logic-p">A=+40 / B=+5 / C=0 / D=-10。A档阈值已对齐真实上限 70 分。</div>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">🔤</span>四个基础信号 - 说明</h3>
-        <table class="lg-table">
-          <tr><th>信号</th><th>含义</th><th>技术定义</th></tr>
-          <tr><td><b class="up">C</b> 缠论买</td><td>技术拐点信号</td><td>日K底分型+MACD金叉/底背离</td></tr>
-          <tr><td><b style="color:var(--gold)">J</b> 金钻起涨/黄柱</td><td>金钻量化买点</td><td>DDX资金流入+阳线+涨幅&gt;2%触发起涨；金钻趋势&gt;最高价触发黄柱</td></tr>
-          <tr><td><b style="color:var(--cyan)">I</b> 机构变红</td><td>机构资金介入</td><td>收盘价高于牛线1；牛线1=WMA20(加权中间价MID9)</td></tr>
-          <tr><td><b class="down">T</b> 上涨趋势</td><td>趋势确认</td><td>EMA多头+量能+价格确认</td></tr>
-        </table>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">🔍</span>个股查询评分 - 说明</h3>
-        <div class="logic-h">满分100分</div>
+        <h3><span class="ic">🔍</span>个股查询 - 说明</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">全市场 A 股（5500+ 只）个股画像工具，不是选股算法，因此排在 tab 最左、不参与可信度排序。查任何股票都保证有数据（离线全市场行情缓存 + 行业概念 + 股息分红 + 止盈止损）。</div>
+        <div class="logic-h">数据覆盖（2026-08-06 升级）</div>
+        <div class="logic-p">· <b>实时行情</b>：全市场 5537 只（价格/涨跌/今开/昨收/最高/最低/量额）<br>· <b>概念行业</b>：5198 只 board/industry/concepts<br>· <b>股息分红</b>：3637 只（股息率/EPS/BVPS/分红比例/除权除息日/方案进度）</div>
+        <div class="logic-h">股息判断口径</div>
+        <div class="logic-p">· 股息率 ≥2.5% → 高股息，适合长期持有收息<br>· 1.5%-2.5% → 中等股息，股息+成长兼顾<br>· &lt;1.5% → 低股息，偏成长型<br>· 无分红记录 → 显示"暂无分红记录"（不造假）</div>
+        <div class="logic-h">止盈止损口径（v8 升级版，三档目标）</div>
+        <div class="logic-p">· <b>止损</b> = max(当前价×0.93, 当日最低价×0.99)，至少留 1% 缓冲<br>· <b>短线目标</b> = 当前价×1.07（+7%）· <b>中线目标</b> = 当前价×1.12（+12%）· <b>强势目标</b> = 当前价×1.15（+15%）<br>· <b>盈亏比</b> = 短线收益 / 止损亏损，≥2 优秀 / 1.5-2 一般 / &lt;1.5 较差<br>· 波动率 = max(当日振幅, 当前价×1.5%)，&gt;4% 高波动 / &gt;2% 中波动 / 其余低波动<br>· 操作提示按当日涨跌：涨 ≥5% 追高谨慎 / 跌 ≥5% 警惕破位 / 其余中性可分批建仓</div>
+        <div class="logic-h">评分模型（v6 遗留口径）</div>
         <table class="lg-table">
           <tr><th>因子</th><th>加分逻辑</th><th>上限</th></tr>
           <tr><td>当日涨幅</td><td>涨1%→+3分（涨停10%→+30分）</td><td>30</td></tr>
@@ -4334,13 +4298,16 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         </table>
         <div class="logic-h">标签判定</div>
         <div class="logic-p"><b class="up">BUY</b>：当日上涨且评分≥50 / <b style="color:var(--gold)">关注</b>：评分≥30但未达BUY / <b style="color:var(--dim)">观望</b>：评分&lt;30。</div>
-        <div class="logic-h">止损/目标价</div>
-        <div class="logic-p">止损 = max(当前价×0.93, 近10日最低价×0.98)，上限不超过当前价×0.95。目标价 = max(当前价×1.12, 近20日最高价)。K线不足时退化固定比例（-7%止损/+12%目标）。</div>
       </div>
 
       <div class="card">
-        <h3><span class="ic">🧬</span>三重共识评分·完整公式 - 说明</h3>
-        <div class="logic-p">原始加分 = 基础(~110) + 增强(±16) + 形态(~16) + 资金(~10) + 板块(~5) + 机构投行(~10) + 基本面(-10~+40) + 回测反哺(±10)，理论满分约 250。<br><b>最终 total_score 已归一化到 0~100</b>，因此 ≥80 分才是「精选」、≥70 分是「观察」，阈值语义与百分制一致。</div>
+        <h3><span class="ic">🥇</span>三重共识 - 说明</h3>
+        <div class="logic-h">判定公式</div>
+        <div class="logic-p">主站 TOP10（total_score ≥70） ∩ 驾驶舱 A档 ∩ 基本面质量 A档，三者同时满足即严格共识。可信度最高（⭐⭐⭐⭐⭐）——3 个独立维度一致才入选，命中即高质量。</div>
+        <div class="logic-h">分组展示</div>
+        <div class="logic-p">· <b class="up">严格共识（3/3）</b>：无条件优先看<br>· <b style="color:var(--gold)">优先观察（2/3，total_score≥75）</b>：差1步<br>· <b style="color:var(--dim)">扩展观察（2/3，total_score&lt;75）</b>：差2步</div>
+        <div class="logic-h">评分·完整公式</div>
+        <div class="logic-p">原始加分 = 基础(~110) + 增强(±16) + 形态(~16) + 资金(~10) + 板块(~5) + 机构投行(~10) + 基本面(-10~+40) + 回测反哺(±10)，理论满分约 250。<br><b>最终 total_score 已归一化到 0~100</b>，因此 ≥80 分才是「精选」、≥70 分是「观察」。</div>
         <table class="lg-table">
           <tr><th>维度</th><th>原始满分</th><th>细则</th></tr>
           <tr><td>缠论买</td><td>25</td><td>日K底分型+MACD金叉/底背离</td></tr>
@@ -4358,6 +4325,67 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         </table>
         <div class="logic-h">归一化口径</div>
         <div class="logic-p">total_score = min(100, 原始总分 / 250 × 100)。历史快照会同步回刷，保证「≥80 精选 / ≥70 观察」的阈值在所有日期口径一致。</div>
+        <div class="logic-h">历史追踪</div>
+        <div class="logic-p">持仓表、催化剂兑现、回测N日胜率、严格vs宽松、阈值敏感性、板块聚类、重叠度、每日入选历史。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🔥</span>四量终极 - 说明</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">游资点火 + 机构托底 + 当天金叉 + 四路翻多四条件<b>同时共振</b>才入选，命中即四路信号齐发。4 重共振 + 3 年回测验证，信号明确 → 可信度 ⭐⭐⭐⭐，排在驾驶舱前。</div>
+        <div class="logic-h">四个条件（全部满足 = QD 共振）</div>
+        <table class="lg-table">
+          <tr><th>条件</th><th>含义</th><th>技术定义</th></tr>
+          <tr><td>🔥 游资点火</td><td>短线资金启动信号</td><td>W2 线上穿 0 轴（CROSS(W2,0)）</td></tr>
+          <tr><td>🏦 机构托底</td><td>机构资金承接</td><td>收盘价 &gt; 牛线（机构成本线）</td></tr>
+          <tr><td>⚡ 当天金叉</td><td>四金叉任一触发</td><td>金钻起涨 / 缩量金叉 / 游资点火 / 主力资金 四者取或</td></tr>
+          <tr><td>📈 四路翻多</td><td>四路趋势全多</td><td>机构托底 且 主力资金≥0 且 W2≥0 且 V6≥0</td></tr>
+        </table>
+        <div class="logic-h">回测口径</div>
+        <div class="logic-p">对命中票回看近 3 年日K，统计 QD 信号日的 T+1/3/5/10/20 持有收益胜率/均值（非未来函数，不偷看未来）。</div>
+        <div class="logic-h">触发链路</div>
+        <div class="logic-p">成交量前 N 活跃股池 → 日K 抓取 → 逐只算 QD → 收集末根触发 QD 的票 → 产出命中清单（含组件灯 YZC/JG/XC/FOUR）。<br>空结果 = 当日无四路共振票（市场信号弱），属正常业务输出，绝不伪造。</div>
+        <div class="logic-h">持有期提示</div>
+        <div class="logic-p">四量终极命中按 T+1/3/5/10/20 持有期观测；卡片底部"⚡ 四路信号同时共振的当日候选 · 持有期 T+1/3/5/10/20 日可观测"。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🎯</span>驾驶舱 - 说明</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">出手信号灯→宏观环境→最强赛道TOP5→共振候选→机构/龙虎榜验证→三重选股。用于确认市场环境和技术面背景。A/B/C/D 多档分级，可按风险偏好选 → 可信度 ⭐⭐⭐⭐。</div>
+        <div class="logic-h">分级规则</div>
+        <div class="logic-p">· <b class="up">A档</b>：技术+质量+信号俱佳（最多 10 只），进入三重共识候选<br>· <b style="color:var(--gold)">B档</b>：扩大观察范围（最多 15 只）<br>· <b style="color:var(--dim)">C/D档</b>：低质量/弱信号，不展示</div>
+        <div class="logic-h">B档准入条件</div>
+        <div class="logic-p">必须满足「机构变红」或「三重信号共振」二者之一；仅「缠论买」一个信号不足以进入B档。</div>
+        <div class="logic-h">排序口径</div>
+        <div class="logic-p">A/B 档均按 total_score 降序 → quality_score → ema → signal_count → rsi 升序（RSI 过高靠后，防追高）。</div>
+        <div class="logic-h">龙虎榜席位口径</div>
+        <div class="logic-p">龙虎榜明细按净买额排序，优先分析资金最活跃的前 N 只。「机构」「游资」「量化」「北向」「未识别」五类席位分账统计；其中「未识别」席位<b>不并入游资</b>，避免把无名营业部误判为游资共振。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🌐</span>全站精选 - 说明</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">技术面形态+基本面质量分筛选后的观察池（A/B档）。A档进入三重共识候选，B档扩大观察范围。综合池机会多但单信号强度弱 → 可信度 ⭐⭐⭐。</div>
+        <div class="logic-h">股池构成</div>
+        <div class="logic-p">主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50 + 观澜台(自选+研报) + mahoro研报 → 多信号融合。</div>
+        <div class="logic-h">B档准入条件</div>
+        <div class="logic-p">必须满足「机构变红」或「三重信号共振」二者之一；仅「缠论买」一个信号不足以进入B档。</div>
+        <div class="logic-h">基本面质量分</div>
+        <div class="logic-p">A=+40 / B=+5 / C=0 / D=-10。A档阈值已对齐真实上限 70 分。</div>
+        <div class="logic-h">名字清洗（防研报/新闻稿污染名）</div>
+        <div class="logic-p">候选池名字优先东财权威名 &gt; 通达信名字 &gt; raw 干净名 &gt; 代码兜底；容忍港股 -W/-S/-R 双重上市后缀。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🔤</span>四个基础信号 - 说明</h3>
+        <table class="lg-table">
+          <tr><th>信号</th><th>含义</th><th>技术定义</th></tr>
+          <tr><td><b class="up">C</b> 缠论买</td><td>技术拐点信号</td><td>日K底分型+MACD金叉/底背离</td></tr>
+          <tr><td><b style="color:var(--gold)">J</b> 金钻起涨/黄柱</td><td>金钻量化买点</td><td>DDX资金流入+阳线+涨幅&gt;2%触发起涨；金钻趋势&gt;最高价触发黄柱</td></tr>
+          <tr><td><b style="color:var(--cyan)">I</b> 机构变红</td><td>机构资金介入</td><td>收盘价高于牛线1；牛线1=WMA20(加权中间价MID9)</td></tr>
+          <tr><td><b class="down">T</b> 上涨趋势</td><td>趋势确认</td><td>EMA多头+量能+价格确认</td></tr>
+        </table>
       </div>
 
       <div class="card">
@@ -4416,6 +4444,17 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
       <div class="logic-p"><b>涨停热力矩阵</b>：10日<b>概念板块</b>涨停家数热力矩阵，看板块热点持续性。<br><b>CRDS 逆势龙头</b>：<b>单只个股</b>的逆势涨停强度评分，看个股逆大盘的龙头成色。维度不同、不重复。</div>
         <div class="logic-h">输出链路</div>
         <div class="logic-p">calc_crds.py → <b>data/crds_result.json</b> → update_v8.py 注入 <b>window.CRDS_CARD_DATA</b> → 前端「逆势龙头」tab 渲染（含历史扫描累积追踪）。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🥇</span>核心原则：买卖只看三重共识</h3>
+        <div class="lg-box red">
+          <b>该看「三重共识」买卖，其他都是辅助/背景。</b><br>
+          · 🥇 三重共识：可直接作为买卖候选池<br>
+          · 🌐 全站精选（原驾驶舱A/B档）：扩大观察范围，不是最终买点<br>
+          · 🚀 驾驶舱：看市场环境和技术面背景<br>
+          · 📦 股池构成：只是背景信息，不用于买卖
+        </div>
       </div>
     </div>
 
