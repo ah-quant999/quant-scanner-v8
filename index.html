@@ -811,7 +811,25 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         var timeEl=$('aiSummaryTime');
         var contentEl=$('aiSummaryContent');
         if(!contentEl) return;
-        if(!d || !d.gen_time){
+        var isStale=false;
+        if(d && d.gen_time){
+          var genD=window._parseAsCST(d.gen_time);
+          if(genD){
+            var nowCSTStr=new Date().toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+            var mm=nowCSTStr.match(/(\d{4})\/(\d{2})\/(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
+            if(mm){
+              var genStr=genD.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
+              var gp=genStr.split('/');
+              var isSameDay = mm[1]===gp[0] && mm[2]===gp[1] && mm[3]===gp[2];
+              var minutes = parseInt(mm[4],10)*60 + parseInt(mm[5],10);
+              // 盘中快照：昨日数据可保留到今日 09:00 前，09:00 后清空等盘中刷新
+              if(!isSameDay && minutes >= 540){
+                isStale=true;
+              }
+            }
+          }
+        }
+        if(!d || !d.gen_time || isStale){
           contentEl.innerHTML='<div class="ipo-empty">AI市场速览数据暂不可用</div>';
         if(timeEl) timeEl.innerHTML = _uBadge('盘中','短线',null);
         return;

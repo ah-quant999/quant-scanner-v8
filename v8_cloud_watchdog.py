@@ -408,18 +408,41 @@ def main():
         if "__error__" not in commits and commits:
             dt = utc_to_cst(commits[0]["commit"]["author"]["date"])
             stale_min = (now_cst - dt).total_seconds() / 60
+
+        # 🔴 2026-08-06 修复判定盲点（勿回退）：
+        #   raw_data 目录的提交可能由 build / risk_gauge 等链路产生，会把「中国数据实际已停摆」
+        #   伪装成新鲜。08-06 事故实例：raw_data 最近提交 08:15 是 "v8 build: ... premarket"，
+        #   而真正的 "v8 cn fetch" 停在 00:05（停摆 9.5h），看门狗却判定 1.2h 新鲜 → 跳过派发，
+        #   兜底机制完全失效。故这里单独追踪 cn fetch 提交的新鲜度，取两者中更陈旧者作为派发依据。
+        cn_stale_min = None
+        cn_commits = api_get(f"https://api.github.com/repos/{REPO}/commits?path=raw_data&per_page=30")
+        if "__error__" not in cn_commits and cn_commits:
+            for c in cn_commits:
+                if "cn fetch" in c["commit"]["message"].lower():
+                    cn_dt = utc_to_cst(c["commit"]["author"]["date"])
+                    cn_stale_min = (now_cst - cn_dt).total_seconds() / 60
+                    break
+        _cands = [v for v in (stale_min, cn_stale_min) if v is not None]
+        effective_stale = max(_cands) if _cands else None
+
         weekday = now_cst.weekday()
         is_weekend = weekday >= 5
         active = (9 <= now_cst.hour <= 21) and (not is_weekend or now_cst.hour <= 18)
-        if stale_min is not None and stale_min > 150 and active:
+
+        def _age_detail():
+            a = f"{stale_min/60:.1f}h" if stale_min is not None else "N/A"
+            b = f"{cn_stale_min/60:.1f}h" if cn_stale_min is not None else "N/A"
+            return f"raw_data={a}, cn_fetch={b}"
+
+        if effective_stale is not None and effective_stale > 150 and active:
             cat = choose_category(now_cst)
             d_ok, d_msg = auto_dispatch(cat)
-            results.append(("auto_dispatch", d_ok, d_msg))
-        elif stale_min is not None and stale_min > 150 and not active:
-            results.append(("auto_dispatch", True, "数据陈旧但处于非活跃时段，跳过派发（防打扰）"))
+            results.append(("auto_dispatch", d_ok, f"{d_msg} [{_age_detail()}]"))
+        elif effective_stale is not None and effective_stale > 150 and not active:
+            results.append(("auto_dispatch", True,
+                            f"数据陈旧但处于非活跃时段，跳过派发（防打扰）[{_age_detail()}]"))
         else:
-            age = f"{stale_min/60:.1f}h" if stale_min is not None else "N/A"
-            results.append(("auto_dispatch", True, f"数据新鲜({age})，无需派发"))
+            results.append(("auto_dispatch", True, f"数据新鲜（{_age_detail()}），无需派发"))
 
     overall = all(ok for _, ok, _ in results)
     flag = "OK" if overall else "ALERT"
