@@ -2874,19 +2874,19 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       }
     }
     cardsJy.forEach(function(wk){
-      // 归类：把 jyDays 里的天按 Mon-Sun 落入对应周卡
+      // 归类：把 jyDays 里的天按日期日部分落入对应周范围 [start, end]
       var wkItems = jyDays.filter(function(dy){
         if(!dy || !dy.iso || dy.iso.length < 8) return false;
         var dyYr = parseInt(dy.iso.slice(0,4));
         var dyMo = parseInt(dy.iso.slice(4,6))-1;
+        if(dyYr !== year || dyMo !== month) return false;
         var dyi = parseInt(dy.iso.slice(6,8));
-        var w = _rcWeekRangeOf(dyYr, dyMo, dyi);
-        return w.mon.getTime() === wk.mon.getTime();
+        return dyi >= wk.start && dyi <= wk.end;
       });
       // 聚合本周所有 stocks
       var wStocks = [];
       wkItems.forEach(function(it){ wStocks = wStocks.concat(it.stocks || []); });
-      h += '<div class="wk-card"><div class="wk-card-hd"><span class="wk-card-title">第'+wk.no+'周 '+wk.monLabel+'-'+wk.sunLabel+'</span></div>';
+      h += '<div class="wk-card"><div class="wk-card-hd"><span class="wk-card-title">第'+wk.no+'周 '+wk.labelMon+'-'+wk.labelSun+(wk.isFull?'':' <span style="color:var(--dim);font-size:10px">(截断)</span>')+'</span></div>';
       if(wStocks.length === 0){
         h += '<div style="text-align:center;color:var(--dim);padding:20px;font-size:11px">该周暂无机游共振数据</div>';
       } else {
@@ -3250,13 +3250,12 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
           return sdd >= wk.start && sdd <= wk.end;
         });
       } else {
-        // 单日数据：仅当 lhbDate 落入本卡所在周时展示
-        var lhbMon = null;
+        // 单日数据：仅当 lhbDate 落入本卡所在周时展示（按日范围匹配，2026-08-06 修 wk.mon 引用）
+        var lhbDay = null;
         if(lhbDate && lhbDate.length >= 8){
-          var _ly = +lhbDate.slice(0,4), _lm = +lhbDate.slice(4,6)-1, _ld = +lhbDate.slice(6,8);
-          lhbMon = _rcWeekRangeOf(_ly, _lm, _ld).mon;
+          lhbDay = +lhbDate.slice(6,8);
         }
-        wkNorth = (lhbMon && lhbMon.getTime() === wk.mon.getTime()) ? northStocks : [];
+        wkNorth = (lhbDay && lhbDay >= wk.start && lhbDay <= wk.end) ? northStocks : [];
       }
       if(wkNorth.length > 0){
         var wBuy = wkNorth.filter(function(s){ return s._nb_net_万 > 0; }).sort(function(a,b){return b._nb_net_万 - a._nb_net_万;}).slice(0,10);
