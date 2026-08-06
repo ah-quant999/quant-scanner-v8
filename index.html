@@ -8857,51 +8857,65 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       var hasData = sr.data_available && sectors.length > 0;
       function _vra(c,a){ return c.indexOf("var(")===0 ? "rgba(0,0,0,"+a+")" : (c+"22").slice(0,9); }
       h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #a78bfa;">';
-      h += v8CardHeader('🔄','板块周期','各板块所处周期阶段（启动/主升/退潮/底部）','update_time',
+      h += v8CardHeader('🔄','板块周期','全量板块按 20 日涨幅排序 · 主升/启动/震荡/退潮/底部','update_time',
         {update_time:sr.update_time, slot:'周度', horizon:'中线'}, !hasData);
       h += '<div style="padding:12px 14px;">';
       if(!hasData){
         h += '<div style="color:var(--dim);text-align:center;padding:16px">板块 RS 数据加载中…</div>';
       } else {
-        // 周期判定逻辑：pct_5d + pct_20d 组合
-        var cycleMap = [];
+        // 周期判定：主升/启动/震荡/退潮/底部
+        var phaseMeta = {
+          '主升': {emoji:'🚀', color:'#ef4444', order:0},
+          '启动': {emoji:'📈', color:'#f59e0b', order:1},
+          '震荡': {emoji:'➡️', color:'#94a3b8', order:2},
+          '退潮': {emoji:'📉', color:'var(--down)', order:3},
+          '底部': {emoji:'⛏️', color:'#38bdf8', order:4}
+        };
+        var rows = [];
         sectors.forEach(function(s){
           var d5 = s.pct_5d || 0, d20 = s.pct_20d || 0, dDay = s.pct_day || 0;
-          var cycle, cycColor;
-          if(d5 > 3 && d20 > 5){ cycle='🚀 主升'; cycColor='#ef4444'; }
-          else if(d5 > 1.5 && d20 > 0){ cycle='📈 启动'; cycColor='var(--up)'; }
-          else if(d5 < -1.5 && d20 < -5){ cycle='📉 退潮'; cycColor='var(--down)'; }
-          else if(d5 < -3 && d20 < -10){ cycle='⛏️ 底部'; cycColor='#38bdf8'; }
-          else{ cycle='➡️ 震荡'; cycColor='#94a3b8'; }
-          cycleMap.push({name:s.name, cycle:cycle, color:cycColor, d5:d5, d20:d20, dDay:dDay});
+          var phase;
+          if(d5 > 3 && d20 > 5){ phase='主升'; }
+          else if(d5 > 1.5 && d20 > 0){ phase='启动'; }
+          else if(d5 < -3 && d20 < -10){ phase='底部'; }
+          else if(d5 < -1.5 && d20 < -5){ phase='退潮'; }
+          else{ phase='震荡'; }
+          var meta = phaseMeta[phase];
+          rows.push({name:s.name, phase:phase, emoji:meta.emoji, color:meta.color, order:meta.order, d5:d5, d20:d20, dDay:dDay});
         });
-        // 按 5日涨幅排序
-        cycleMap.sort(function(a,b){return b.d5-a.d5;});
-        // 统计各周期数量
-        var cycCounts = {}; cycleMap.forEach(function(c){ cycCounts[c.cycle]=(cycCounts[c.cycle]||0)+1; });
-        // 周期概览标签云
-        h += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">';
-        Object.keys(cycCounts).forEach(function(cyc){
-          var ci = cycleMap.find(function(x){return x.cycle===cyc;});
-          var cc = ci?ci.color:'#94a3b8';
-          h += '<span style="padding:3px 10px;background:'+_vra(cc,0.1)+';border:1px solid '+_vra(cc,0.25)+';border-radius:999px;font-size:11px;color:'+cc+';font-weight:700">'+cyc+' <span style="font-weight:400;color:var(--dim)">'+cycCounts[cyc]+'</span></span>';
+        // 先按周期顺序，再按 20 日涨幅降序
+        rows.sort(function(a,b){
+          if(a.order !== b.order) return a.order - b.order;
+          return b.d20 - a.d20;
+        });
+        // 统计
+        var counts = {}; rows.forEach(function(r){ counts[r.phase]=(counts[r.phase]||0)+1; });
+        var total = rows.length;
+        // 周期概览标签云（按 order）
+        var phaseOrder = ['主升','启动','震荡','退潮','底部'];
+        h += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">';
+        phaseOrder.forEach(function(p){
+          if(!counts[p]) return;
+          var m = phaseMeta[p];
+          h += '<span style="padding:3px 10px;background:'+_vra(m.color,0.1)+';border:1px solid '+_vra(m.color,0.25)+';border-radius:999px;font-size:11px;color:'+m.color+';font-weight:700">'+m.emoji+' '+p+' <span style="font-weight:400;color:var(--dim)">'+counts[p]+'</span></span>';
         });
         h += '</div>';
-        // 板块表格（TOP15）
-        h += '<div style="font-size:11px;font-weight:700;color:var(--sub);margin:6px 0 4px">板块周期排行 TOP15</div>';
-        h += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
-        h += '<tr style="color:var(--dim);border-bottom:1px solid rgba(255,255,255,.1)">';
-        h += '<th style="text-align:left;padding:3px 6px">板块</th><th style="text-align:center;padding:3px 4px">周期</th><th style="text-align:right;padding:3px 4px">今日</th><th style="text-align:right;padding:3px 4px">5日</th><th style="text-align:right;padding:3px 4px">20日</th></tr>';
-        cycleMap.slice(0,15).forEach(function(s){
+        h += '<div style="font-size:10px;color:var(--dim);margin:0 0 8px">共 '+total+' 个板块 · 每组按 20 日涨幅从大到小 · 可滚动查看全部</div>';
+        // 板块表格（全量，可滚动）
+        h += '<div style="overflow-x:auto;max-height:420px;overflow-y:auto;border:1px solid var(--border2);border-radius:8px">';
+        h += '<table style="width:100%;border-collapse:collapse;font-size:11px">';
+        h += '<thead style="position:sticky;top:0;background:var(--card);z-index:1"><tr style="color:var(--dim);border-bottom:1px solid rgba(255,255,255,.1)">';
+        h += '<th style="text-align:left;padding:4px 6px">板块</th><th style="text-align:center;padding:4px 4px">周期</th><th style="text-align:right;padding:4px 4px">今日</th><th style="text-align:right;padding:4px 4px">5日</th><th style="text-align:right;padding:4px 4px">20日</th></tr></thead><tbody>';
+        rows.forEach(function(s){
           h += '<tr style="border-bottom:1px solid rgba(255,255,255,.04)">';
           h += '<td style="padding:3px 6px;font-weight:600;color:var(--txt)">'+s.name+'</td>';
-          h += '<td style="text-align:center;padding:3px 4px;color:'+s.color+';font-weight:700">'+s.cycle+'</td>';
+          h += '<td style="text-align:center;padding:3px 4px;color:'+s.color+';font-weight:700">'+s.emoji+' '+s.phase+'</td>';
           h += '<td style="text-align:right;padding:3px 4px;color:'+(s.dDay>=0?"var(--up)":"var(--down)")+'">'+(s.dDay>=0?"+":"-")+Math.abs(s.dDay).toFixed(2)+'%</td>';
           h += '<td style="text-align:right;padding:3px 4px;color:'+(s.d5>=0?"var(--up)":"var(--down)")+'">'+(s.d5>=0?'+':'')+s.d5.toFixed(2)+'%</td>';
           h += '<td style="text-align:right;padding:3px 4px;color:'+(s.d20>=0?"var(--up)":"var(--down)")+'">'+(s.d20>=0?'+':'')+s.d20.toFixed(2)+'%</td>';
           h += '</tr>';
         });
-        h += '</table></div>';
+        h += '</tbody></table></div>';
       }
       h += '</div></div>';
     })();
