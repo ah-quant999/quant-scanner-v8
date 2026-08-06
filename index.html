@@ -533,11 +533,18 @@ function _uBadge(slot, horizon, ts, sub){
 }
 function setBadge(id, slot, horizon, ts, sub){
   var el = document.getElementById(id) || (typeof $ === 'function' ? $(id) : null);
-  if(!el) return;
-  // 2026-08-06 22:59 主人反馈：胶囊必须可见，不允许空容器
-  // ts/sub 都缺失时 → 显示「更新于 已加载」兜底（不要再 el.innerHTML='' 清空）
+  if(!el){
+    // 2026-08-06 23:18 主人反复反馈胶囊不见 — 显式告警（不静默 return）让浏览器 console 看到原因
+    console.warn('[setBadge] element NOT FOUND id=' + id);
+    return;
+  }
+  // ts/sub 都缺失时 → 显示「更新于 已加载」兜底
   if(!ts && !sub){ ts = '已加载'; }
   el.innerHTML = _uBadge(slot, horizon, ts, sub);
+  // 调试钩子：写入后立即验证长度
+  if(!el.innerHTML || el.innerHTML.length < 30){
+    console.warn('[setBadge] innerHTML empty/short id=' + id + ' len=' + el.innerHTML.length);
+  }
 }
 window._uBadge = _uBadge; window.setBadge = setBadge;
 </script>
