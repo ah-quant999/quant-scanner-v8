@@ -175,6 +175,53 @@ def write_outputs(data):
     print(f"✅ data/STOCK_QUOTE.js       {len(data)} stocks | {os.path.getsize(js_path)//1024} KB")
 
 
+def merge_fundamental_quality(quote_data):
+    """合并 raw_data/fundamental_quality.json → 财务画像（ROE/营收增速/综合评级/消息面加减分）。
+
+    数据源：v8 算法链产物 fundamental_quality.json（fetch_fundamental_quality.py 用 baostock 抓 ROE/营收增速）。
+    字段映射到 STOCK_QUOTE.stocks[code].fundamental = {
+      grade: 'A'/'B'/'C'/'D'/'',          # 综合评级：A=极致优质 / B=良好 / C=一般 / D=差 / ''=无数据中性
+      score: 70,                         # 质量分 0-100
+      roe: 20.5,                         # ROE 净资产收益率 %
+      revenue_growth: 25.3,             # 营收增速 %
+      eps: 3.27,                         # 每股收益
+      news_score: 5,                      # 消息面加减分 ±20（业绩预告/重大公告）
+      news_tags: ['业绩预增','重组'],     # 消息面标签
+    }
+    注意：fundamental_quality.json 只覆盖被选中的 213-700 只候选池股票，不是全市场。
+    未入选的股票 quote_data[code].fundamental 不会被合并（不造空白字段）。
+    fundamental_quality 的 code 是 sh_002335 格式（带下划线），需转 sh002335。
+    """
+    ic_path = os.path.abspath(os.path.join(ROOT, '..', 'raw_data', 'fundamental_quality.json'))
+    if not os.path.exists(ic_path):
+        print(f"⚠️ 未找到 {ic_path}，跳过财务画像合并（明日算法链跑完后会写）")
+        return quote_data
+    try:
+        with open(ic_path, encoding='utf-8') as f:
+            qual = json.load(f)
+        stocks = qual.get('stocks') or {}
+        merged = 0
+        for code_underscore, info in stocks.items():
+            # code 格式 sh_002335 → 转为 sh002335
+            code8 = code_underscore.replace('_', '') if '_' in code_underscore else code_underscore
+            if code8 not in quote_data:
+                continue
+            quote_data[code8]['fundamental'] = {
+                'grade': info.get('grade') or info.get('quality_grade') or '',
+                'score': info.get('score') or info.get('quality_score'),
+                'roe': info.get('roe'),
+                'revenue_growth': info.get('revenue_growth') or info.get('revenue'),
+                'eps': info.get('eps'),
+                'news_score': info.get('news', {}).get('score') if isinstance(info.get('news'), dict) else None,
+                'news_tags': info.get('news', {}).get('tags', []) if isinstance(info.get('news'), dict) else [],
+            }
+            merged += 1
+        print(f"✅ 合并财务画像：{merged}/{len(quote_data)} 只（仅候选池覆盖）")
+    except Exception as e:
+        print(f"⚠️ 财务画像合并失败: {e}")
+    return quote_data
+
+
 def main():
     t0 = time.time()
     print("开始抓取全市场 A 股实时行情（akshare 新浪接口）...")
@@ -182,6 +229,7 @@ def main():
     print(f"抓取完成：{len(data)} 只，{time.time()-t0:.1f}s")
     data = merge_industry_concepts(data)
     data = merge_dividend(data)
+    data = merge_fundamental_quality(data)
     write_outputs(data)
     print(f"\n总计：{time.time()-t0:.1f}s")
     return 0

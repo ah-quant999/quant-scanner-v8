@@ -4906,18 +4906,46 @@ function switchSec(sec,el){
     const pctCol = q.pct>=0?'var(--up)':'var(--down)';
     const amountYi = q.amount ? (q.amount/1e8).toFixed(2)+'亿' : '-';
     const volWan = q.volume ? (q.volume/1e4).toFixed(0)+'万手' : '-';
-    // 股息分红（v6 当时有，v8 补齐）
+    // === 综合评级（来自 fundamental_quality.json） ===
+    const f = q.fundamental || {};
+    const gradeMap = {A:{txt:'🟢 绩优', clr:'var(--up)', desc:'极致优质（ROE+营收双高）'},
+                       B:{txt:'🟢 良好', clr:'var(--up)', desc:'基本面良好'},
+                       C:{txt:'🟡 一般', clr:'var(--gold)', desc:'基本面一般'},
+                       D:{txt:'🔴 差',   clr:'var(--down)', desc:'基本面差'}};
+    const grade = f.grade ? gradeMap[f.grade] : null;
+    const scoreStr = f.score!=null ? f.score : null;
+    // === 股息分红字段 ===
     const d = q.dividend || {};
-    const dyPct = (d.yield!=null) ? (d.yield*100).toFixed(2)+'%' : '-';
+    const dyPct = (d.yield!=null) ? (d.yield*100).toFixed(2)+'%' : null;
     const dyColor = (d.yield!=null && d.yield>=0.02) ? 'var(--up)' : (d.yield!=null && d.yield>=0.01) ? 'var(--gold)' : 'var(--dim)';
-    const epsStr = (d.eps!=null) ? d.eps.toFixed(2) : '-';
-    const bvpsStr = (d.bvps!=null) ? d.bvps.toFixed(2) : '-';
-    const progStr = d.progress || '-';
-    const exStr = d.ex_date || '-';
+    const epsStr = d.eps!=null ? d.eps.toFixed(2) : null;
+    const bvpsStr = d.bvps!=null ? d.bvps.toFixed(2) : null;
+    const progStr = d.progress || null;
+    const exStr = d.ex_date || null;
     let dyBadge = '';
-    if(d.progress && /实施|已/.test(d.progress)) dyBadge = '<span style="font-size:10px;background:rgba(94,224,160,.15);color:var(--up);padding:1px 6px;border-radius:4px;margin-left:4px;">'+progStr+'</span>';
-    else if(d.progress) dyBadge = '<span style="font-size:10px;background:rgba(255,183,77,.15);color:var(--gold);padding:1px 6px;border-radius:4px;margin-left:4px;">'+progStr+'</span>';
-    const h='<div style="padding:14px;background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(56,189,248,.03));border-radius:8px;border:1px solid rgba(56,189,248,.25);">'+
+    if(progStr && /实施|已/.test(progStr)) dyBadge = '<span style="font-size:10px;background:rgba(94,224,160,.15);color:var(--up);padding:1px 6px;border-radius:4px;margin-left:4px;">'+progStr+'</span>';
+    else if(progStr) dyBadge = '<span style="font-size:10px;background:rgba(255,183,77,.15);color:var(--gold);padding:1px 6px;border-radius:4px;margin-left:4px;">'+progStr+'</span>';
+    // === 财务字段（无数据就不显示该行，删除空占位） ===
+    const finLines = [];
+    if(f.roe!=null) finLines.push({label:'ROE 净资产收益率', val:f.roe.toFixed(1)+'%', clr: f.roe>=15?'var(--up)':f.roe>=10?'var(--gold)':'var(--down)'});
+    if(f.revenue_growth!=null) finLines.push({label:'营收增速(近一期)', val:(f.revenue_growth>=0?'+':'')+f.revenue_growth.toFixed(1)+'%', clr: f.revenue_growth>=15?'var(--up)':f.revenue_growth>=0?'var(--gold)':'var(--down)'});
+    if(f.eps!=null) finLines.push({label:'每股收益 EPS', val:'¥'+f.eps.toFixed(2), clr:'var(--txt)'});
+    if(dyPct!=null) finLines.push({label:'股息率', val:dyPct, clr:dyColor});
+    if(bvpsStr!=null) finLines.push({label:'每股净资产 BVPS', val:'¥'+bvpsStr, clr:'var(--txt)'});
+    if(d.cash_ratio!=null) finLines.push({label:'分红比例', val:d.cash_ratio.toFixed(2)+'%', clr:'var(--sub)'});
+    if(d.net_profit_yoy!=null) finLines.push({label:'净利润同比增长', val:(d.net_profit_yoy>=0?'+':'')+(d.net_profit_yoy*100).toFixed(1)+'%', clr: d.net_profit_yoy>=0?'var(--up)':'var(--down)'});
+    if(d.total_share_yi!=null) finLines.push({label:'总股本', val:d.total_share_yi.toFixed(2)+'亿', clr:'var(--sub)'});
+    if(exStr) finLines.push({label:'除权除息日', val:exStr, clr:'var(--sub)'});
+    // 消息面加减分（业绩预告/重大公告）
+    const newsTags = (f.news_tags || []).join(' / ');
+    const newsScore = f.news_score;
+    let newsLine = '';
+    if(newsTags && newsScore!=null){
+      const newsColor = newsScore>0?'var(--up)':newsScore<0?'var(--down)':'var(--sub)';
+      newsLine = '<div style="margin-top:6px;font-size:11px;color:var(--sub)">消息面 <b style="color:'+newsColor+'">'+(newsScore>0?'+':'')+newsScore+'</b> · '+newsTags+'</div>';
+    }
+    // === 拼接 ===
+    let h='<div style="padding:14px;background:linear-gradient(135deg,rgba(56,189,248,.08),rgba(56,189,248,.03));border-radius:8px;border:1px solid rgba(56,189,248,.25);">'+
       '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:10px;flex-wrap:wrap;">'+
         '<span style="font-size:13px;font-weight:700;color:var(--cyan);">📊 实时行情</span>'+
         '<span style="font-size:24px;font-weight:800;color:var(--txt);">¥'+q.price.toFixed(2)+'</span>'+
@@ -4931,28 +4959,44 @@ function switchSec(sec,el){
         '<div>最低 <b style="color:var(--down)">'+(q.low||q.low===0?q.low.toFixed(2):'-')+'</b></div>'+
         '<div>成交量 <b>'+volWan+'</b></div>'+
         '<div>成交额 <b>'+amountYi+'</b></div>'+
-      '</div>'+
-      // 股息分红块（v6 当时有的字段，v8 补齐）
-      '<div style="margin-top:10px;padding-top:10px;border-top:1px dashed rgba(255,255,255,.08);">'+
+      '</div>';
+    // === 财务画像块（v6 当时有，v8 补齐多指标） ===
+    if(grade || finLines.length || newsLine){
+      h += '<div style="margin-top:10px;padding-top:10px;border-top:1px dashed rgba(255,255,255,.08);">';
+      // 综合评级 + 质量分（如有）
+      if(grade){
+        h += '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;flex-wrap:wrap;">'+
+          '<span style="font-size:12px;font-weight:700;color:var(--gold);">🧬 综合财务画像</span>'+
+          '<span style="font-size:16px;font-weight:800;color:'+grade.clr+';">'+grade.txt+'</span>'+
+          (scoreStr!=null?'<span style="font-size:11px;color:var(--sub);">· 质量分 <b>'+scoreStr+'</b>/100</span>':'')+
+          '<span style="font-size:10px;color:var(--dim);margin-left:auto">'+grade.desc+'</span>'+
+        '</div>';
+      }
+      // 多指标网格
+      if(finLines.length){
+        h += '<div style="font-size:12px;color:var(--sub);line-height:1.7;display:grid;grid-template-columns:repeat(2,1fr);gap:2px 12px;">';
+        finLines.forEach(ln=>{
+          h += '<div>'+ln.label+' <b style="color:'+ln.clr+'">'+ln.val+'</b></div>';
+        });
+        h += '</div>';
+      }
+      h += newsLine;
+      // 股息分红补充标识（实施分配/预案）
+      if(dyBadge) h += '<div style="margin-top:6px;font-size:11px;color:var(--sub)">💰 分红方案 '+dyBadge+'</div>';
+      h += '</div>';
+    }
+    // 分红标识补述（无评级但有分红）
+    else if(dyBadge){
+      h += '<div style="margin-top:10px;padding-top:10px;border-top:1px dashed rgba(255,255,255,.08);">'+
         '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px;flex-wrap:wrap;">'+
           '<span style="font-size:12px;font-weight:700;color:var(--gold);">💰 股息分红</span>'+
-          '<span style="font-size:18px;font-weight:800;color:'+dyColor+';">'+dyPct+'</span>'+
+          (dyPct?'<span style="font-size:18px;font-weight:800;color:'+dyColor+';">'+dyPct+'</span>':'')+
           dyBadge+
         '</div>'+
-        '<div style="font-size:12px;color:var(--sub);line-height:1.7;display:grid;grid-template-columns:repeat(2,1fr);gap:2px 12px;">'+
-          '<div>每股收益 EPS <b>'+epsStr+'</b></div>'+
-          '<div>每股净资产 BVPS <b>'+bvpsStr+'</b></div>'+
-          '<div>除权除息日 <b style="font-size:11px">'+exStr+'</b></div>'+
-          '<div>分红比例 <b>'+(d.cash_ratio!=null?d.cash_ratio.toFixed(2)+'%':'-')+'</b></div>'+
-        '</div>'+
-        (d.yield!=null ? (
-          d.yield >= 0.025 ? '<div style="margin-top:6px;font-size:11px;color:var(--up);">✅ 高股息（≥2.5%），适合长期持有收息</div>' :
-          d.yield >= 0.015 ? '<div style="margin-top:6px;font-size:11px;color:var(--gold);">⚖️ 中等股息（1.5-2.5%），股息+成长兼顾</div>' :
-          '<div style="margin-top:6px;font-size:11px;color:var(--dim);">📉 低股息（<1.5%），偏成长型，分红少</div>'
-        ) : '<div style="margin-top:6px;font-size:11px;color:var(--dim);">暂无分红记录</div>')+
-      '</div>'+
-      '<div style="margin-top:8px;font-size:10px;color:var(--dim);">快照 '+q.snapshot_time+' · 行情源 akshare 新浪 · 分红源 东财 stock_fhps_em</div>'+
-    '</div>';
+      '</div>';
+    }
+    h+='<div style="margin-top:8px;font-size:10px;color:var(--dim);">快照 '+q.snapshot_time+' · 行情源 akshare 新浪 · 分红源 东财 stock_fhps_em · 财务画像源 算法链 baostock</div>';
+    h+='</div>';
     return h;
   }
 
