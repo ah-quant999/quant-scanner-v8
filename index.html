@@ -2975,25 +2975,32 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     });
     h += '</div>';
 
-    // Category lists — 3 列网格 + 紧凑行高（2026-08-06 用户偏好：不要大版面）
-    [['机游共振','机游共振'],['机构独买','机构'],['游资独买','游资']].forEach(function(ci){
-      var arr = byCat[ci[0]] || [];
-      if(!arr.length) return;
-      var dotClr = ci[0]==='机游共振'?'#a78bfa':ci[0]==='机构独买'?'#38bdf8':'#f59e0b';
-      h += '<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:'+dotClr+';margin-bottom:4px">● '+ci[1]+' ('+arr.length+'只)</div>';
-      h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px 8px">';
-      arr.forEach(function(s){
-        var pct = s.pct || 0;
-        var instNet = s.inst_net_万||0, yzNet = s.yz_net_万||0;
-        h += '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:2px 4px;background:var(--bg2);border-radius:4px;font-size:10px;gap:4px">';
-        h += '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:42px">'+_rcEsc(s.name)+'</span>';
-        h += '<span style="color:'+(pct>=0?'var(--up)':'var(--down)')+';font-weight:600">'+(pct>=0?'+':'')+pct.toFixed(1)+'%</span>';
-        h += '<span style="color:'+(instNet>=0?'var(--up)':'var(--down)')+';font-weight:600">机'+_rcFmtYi(instNet)+'</span>';
-        h += '<span style="color:'+(yzNet>=0?'var(--up)':'var(--down)')+';font-weight:600">游'+_rcFmtYi(yzNet)+'</span>';
-        h += '</div>';
+    // 合并所有入选股票（机游共振+机构独买+游资独买）去重，按净买卖绝对值降序，单列大字连续（2026-08-06 用户偏好：不分组、字体大）
+    var allStocks = [];
+    var seen = {};
+    ['机游共振','机构独买','游资独买'].forEach(function(cat){
+      (byCat[cat]||[]).forEach(function(s){
+        var k = s.code||s.name;
+        if(seen[k]) return;
+        seen[k] = true;
+        s._net = (s.inst_net_万||0) + (s.yz_net_万||0);
+        allStocks.push(s);
       });
-      h += '</div></div>';
     });
+    allStocks.sort(function(a,b){ return Math.abs(b._net) - Math.abs(a._net); });
+    h += '<div style="margin-bottom:10px">';
+    h += '<div style="font-size:11px;font-weight:700;color:var(--dim);margin-bottom:6px">● 共振/机构/游资合并 · 按净买卖绝对值排序 · TOP'+Math.min(allStocks.length,15)+'</div>';
+    h += '<div style="display:flex;flex-direction:column;gap:2px">';
+    allStocks.slice(0,15).forEach(function(s){
+      var pct = s.pct || 0;
+      var net = s._net;
+      h += '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:5px 10px;background:var(--bg2);border-radius:5px;font-size:13px;gap:8px">';
+      h += '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+_rcEsc(s.name)+'</span>';
+      h += '<span style="color:'+(pct>=0?'var(--up)':'var(--down)')+';font-weight:600;font-size:12px">'+((pct>=0?'+':'')+pct.toFixed(1)+'%')+'</span>';
+      h += '<span style="color:'+(net>=0?'var(--up)':'var(--down)')+';font-weight:700;font-size:13px;min-width:60px;text-align:right">'+_rcFmtYi(net)+'</span>';
+      h += '</div>';
+    });
+    h += '</div></div>';
 
     h += '</div>';
     detail.innerHTML = h;
