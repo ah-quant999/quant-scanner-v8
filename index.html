@@ -8705,9 +8705,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         plan:'每个重要卡片（今日事件/今日判定/算法命中/候选池）加 🤖 按钮，点击调 LLM 生成 200 字解读：为什么今日某项关键？后续关注什么？raw_data 喂 LLM，无需新数据源，2-3 天可落地。',
         data:null, dataName:'无（基于现有 raw_data + LLM 调用）'},
       {icon:'🏔️', title:'连板天梯', color:'#ff7043',
-        sub:'首板/连板/炸板分层梯队',
+        sub:'首板/连板/炸板分层梯队（v8.6+ 后续）',
         cur:'只有涨停热力 heatmap',
-        plan:'可加「连板梯队」视图（LIMIT_UP_HEATMAP 数据已有，缺展示）',
+        plan:'v8.6+ 立项。可加「连板梯队」视图（LIMIT_UP_HEATMAP 数据已有，缺展示）',
         data:window.LIMIT_UP_HEATMAP, dataName:'LIMIT_UP_HEATMAP'},
       {icon:'🧭', title:'决策四步 + 三不原则（参考）', color:'#94a3b8',
         sub:'操作纪律参考卡（已从今日判定移出）',
@@ -8715,9 +8715,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         plan:'主人令「今日判定里不要理论，要实际可买股票」。本卡保留为<b>决策参考</b>（不实施买入），未来升级为单卡工具：4 步决策 + 5 条铁律 + 交互式检查清单（输入环境状态自动给"该不该买"答案）。当前内容：<br>· <b>决策四步</b>：①环境择时（今日事件日历+危机 ≤50）/②选股（按可信度 5 算法排序）/③出手确认（信号+绿灯+大盘）/④持仓风控（止损/止盈/分批）<br>· <b>三不原则</b>：危机≥70 空仓 / 大盘-1.5% 只逆势龙头 / 盈亏比<1.5 不介入 / 单票≤20% / 事件标红不开新仓',
         data:null, dataName:'无（参考卡，无数据源）'},
       {icon:'🔄', title:'板块周期', color:'#a78bfa',
-        sub:'板块处于 启动/主升/退潮 哪一阶段',
+        sub:'板块处于 启动/主升/退潮 哪一阶段（v8.6+ 后续）',
         cur:'只有资金流+RS 强度',
-        plan:'给 SECTOR_RS 加"周期定位"标签（可做）',
+        plan:'v8.6+ 立项。给 SECTOR_RS 加"周期定位"标签（可做）',
         data:window.SECTOR_RS, dataName:'SECTOR_RS'},
     ];
     planned.forEach(function(p){
