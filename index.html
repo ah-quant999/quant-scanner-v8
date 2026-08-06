@@ -4244,8 +4244,6 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p">v8_cn_fetch_cloud（盘前/盘中/盘后/周末，2026-08-05 起主力，云端）、v8_intraday_healer（2026-08-06 新增盘中自愈：09:03-15:33 每30分检测抓取过期自动补跑，防 schedule 漏档）、v8_safety_net（每30分 stale 兜底）、v8_algo_run（post_close 算法链，暂中国节点小九）、v8_backup（每日21:00备份）、runner_health_alert（非交易时段每2h runner 健康监控）。</div>
         <div class="logic-h">本机监督</div>
         <div class="logic-p">小九-v8云端管线看门狗：每天 08:00–22:00 每小时运行 v8_cloud_watchdog.py，检查 runner 在线、cn_fetch/build_deploy 状态、raw_data 陈旧度、站点存活。发现异常写 _v8_watchdog.log 并告警。</div>
-        <div class="logic-h">本机自动化模型（2026-08-06 主令）</div>
-        <div class="logic-p">14 个 WorkBuddy 自动化任务全部切换 <b>deepseek-v4-flash</b>（hy3 当日额度耗尽触发 429 致盘中兜底漏跑；已修 TZ 时区坑）。回 hy3 待主人通知，禁止自行切回/自行建定时。</div>
         <div class="logic-h">v6 状态</div>
         <div class="logic-p">2026-08-03 起，所有 v6 相关定时任务已全部停止；v6 仅在主人明确指令下由小九手动操作。</div>
       </div>
