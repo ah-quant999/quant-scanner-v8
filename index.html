@@ -2774,9 +2774,9 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     jyDays.forEach(function(dy){
       // dy 自身年月：lhbDate 可能在日历当前月之外（7/31 数据 + 8月日历），
       // 用 dy 自己的年/月算 weekRangeOf / wkIdx，避免错位。
-      var dyYr = parseInt(dy.date.slice(0,4));
-      var dyMo = parseInt(dy.date.slice(4,6)) - 1;
-      var dyi = parseInt(dy.date.slice(6));
+      var dyYr = parseInt(dy.iso.slice(0,4));
+      var dyMo = parseInt(dy.iso.slice(4,6)) - 1;
+      var dyi = parseInt(dy.iso.slice(6));
       var wr = _rcWeekRangeOf(dyYr, dyMo, dyi);
       var off0 = new Date(dyYr, dyMo, 1).getDay();
       var offset = (off0 === 0) ? 6 : (off0 - 1);
@@ -2791,14 +2791,14 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       h += '<div class="jy-week"><div class="jy-week-hd">第'+(wk+1)+'周 '+rangeLabel+'</div>';
       items.forEach(function(it){
         var dy = it.dy;
-        var dyi = parseInt(dy.date.slice(6));
+        var dyi = parseInt(dy.iso.slice(6));
         var dow = new Date(year, month, dyi).getDay();
         var dowStr = ['日','一','二','三','四','五','六'][dow];
         var dStocks = dy.stocks || [];
         var dJy = dStocks.filter(function(s){return (s.category||'')==='机游共振';});
         var dNet = 0; dStocks.forEach(function(s){ dNet += (s.inst_net_万||0)+(s.yz_net_万||0); });
         var dNetColor = dNet>=0?'c-up':'c-down';
-        var dispDate = dy.date.slice(0,4)+'/'+dy.date.slice(4,6)+'/'+dy.date.slice(6,8);
+        var dispDate = dy.iso.slice(0,4)+'/'+dy.iso.slice(4,6)+'/'+dy.iso.slice(6,8);
         h += '<div class="jy-day-card">';
         h += '<div class="jy-day-hd"><span class="jy-day-date">📅 '+dispDate+' 周'+dowStr+'</span>';
         h += '<span class="jy-badge" style="color:#a78bfa">★共振 '+dJy.length+'</span>';
@@ -2815,10 +2815,10 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     cardsJy.forEach(function(wk){
       // 归类：把 jyDays 里的天按 Mon-Sun 落入对应周卡
       var wkItems = jyDays.filter(function(dy){
-        if(!dy || !dy.date || dy.date.length < 8) return false;
-        var dyYr = parseInt(dy.date.slice(0,4));
-        var dyMo = parseInt(dy.date.slice(4,6))-1;
-        var dyi = parseInt(dy.date.slice(6,8));
+        if(!dy || !dy.iso || dy.iso.length < 8) return false;
+        var dyYr = parseInt(dy.iso.slice(0,4));
+        var dyMo = parseInt(dy.iso.slice(4,6))-1;
+        var dyi = parseInt(dy.iso.slice(6,8));
         var w = _rcWeekRangeOf(dyYr, dyMo, dyi);
         return w.mon.getTime() === wk.mon.getTime();
       });
