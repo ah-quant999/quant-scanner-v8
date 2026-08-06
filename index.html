@@ -3332,15 +3332,15 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     // Tag row
     h += '<div class="insight-tags" style="justify-content:center;margin-bottom:16px">';
     var tags = [
-      {t:'市场健康',c:scoreColor},
-      {t:'机游共振',c:'#a78bfa'},
-      {t:'情绪面',c:'#38bdf8'},
-      {t:'北向资金',c:'#f59e0b'},
-      {t:'龙头效应',c:'#ec4899'},
-      {t:'红三兵→家人',c:'var(--gold)'}
+      {t:'市场健康',c:scoreColor, title:'综合危机雷达分值，反映系统性风险水平（≥70 高风险 / ≥50 警戒 / <50 安全）'},
+      {t:'机游共振',c:'#a78bfa', title:'当日龙虎榜中机构和游资同时净买入的股票数（v6 四色块 ★块，阈值≥0.8亿）'},
+      {t:'情绪面',c:'#38bdf8', title:'涨跌家数/涨停跌停比/成交额 等市场情绪指标'},
+      {t:'北向资金',c:'#f59e0b', title:'龙虎榜中深股通/沪股通/外资券商席位的净买卖动向（口径≠全市场北向资金）'},
+      {t:'龙头效应',c:'#ec4899', title:'连板股/板块龙头股的高度与持续性'},
+      {t:'连阳接力·情绪回暖',c:'var(--gold)', title:'连续三根阳线（K线"红三兵"形态）+ 散户/家人们情绪回暖跟进 = 行情延续信号。原名"红三兵→家人"过于晦涩，2026-08-06 改名'}
     ];
     tags.forEach(function(tg){
-      h += '<span class="insight-tag" style="background:'+tg.c+'22;color:'+tg.c+';border:1px solid '+tg.c+'33">'+tg.t+'</span>';
+      h += '<span class="insight-tag" style="background:'+tg.c+'22;color:'+tg.c+';border:1px solid '+tg.c+'33;cursor:help" title="'+tg.title+'">'+tg.t+'</span>';
     });
     h += '</div>';
 
