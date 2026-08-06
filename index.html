@@ -2978,7 +2978,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     });
     h += '</div>';
 
-    // v6 六块分类 + 0.8亿阈值 + 互斥 + 大字（v6_memo line 405-406，2026-08-06 用户确认"机构独买独卖/游资独买独卖/机游共振"等按类型写清楚）
+    // v6 六块分类 + 0.8亿阈值 + 互斥 + 横排紧凑（v6_memo line 405-406，2026-08-06 用户"并排一行写"）
     var TH = 8000;
     var instBuy = (byCat['机构独买']||[]).filter(function(s){ return (s.inst_net_万||0) >= TH; }).sort(function(a,b){return b.inst_net_万 - a.inst_net_万;}).slice(0,5);
     var instSell = (byCat['机构独买']||[]).filter(function(s){ return (s.inst_net_万||0) <= -TH; }).sort(function(a,b){return a.inst_net_万 - b.inst_net_万;}).slice(0,5);
@@ -2988,19 +2988,21 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     var yzBuy = (byCat['游资独买']||[]).filter(function(s){ return (s.yz_net_万||0) >= TH; }).sort(function(a,b){return b.yz_net_万 - a.yz_net_万;}).slice(0,5);
     var yzSell = (byCat['游资独买']||[]).filter(function(s){ return (s.yz_net_万||0) <= -TH; }).sort(function(a,b){return a.yz_net_万 - b.yz_net_万;}).slice(0,5);
     function blk6(title, color, arr, valFn){
-      if(!arr.length) return '';
-      var inner = arr.map(function(s){
+      var cells = arr.map(function(s){
         var val = valFn(s);
         var pct = s.pct||0;
-        return '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:5px 10px;background:var(--bg2);border-radius:5px;font-size:14px;gap:8px">'
+        return '<div style="padding:3px 6px;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px">'
+          + '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:4px">'
           + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+_rcEsc(s.name)+'</span>'
-          + '<span style="color:'+(pct>=0?'var(--up)':'var(--down)')+';font-weight:600;font-size:12px">'+((pct>=0?'+':'')+pct.toFixed(1)+'%')+'</span>'
-          + '<span style="color:'+(val>=0?'var(--up)':'var(--down)')+';font-weight:700;font-size:14px;min-width:62px;text-align:right">'+_rcFmtYi(val)+'</span>'
+          + '<span style="color:'+(val>=0?'var(--up)':'var(--down)')+';font-weight:700;min-width:50px;text-align:right">'+_rcFmtYi(val)+'</span>'
+          + '</div>'
+          + '<div style="color:'+(pct>=0?'var(--up)':'var(--down)')+';font-size:10px;text-align:right;margin-top:1px">'+(pct>=0?'+':'')+pct.toFixed(1)+'%</div>'
           + '</div>';
       }).join('');
-      return '<div style="margin-bottom:12px"><div style="font-size:12px;font-weight:700;color:'+color+';margin-bottom:6px">'+title+' ('+arr.length+'只)</div><div style="display:flex;flex-direction:column;gap:2px">'+inner+'</div></div>';
+      var body = arr.length ? '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px 10px">'+cells+'</div>' : '<div style="padding:4px 8px;color:var(--dim);font-size:11px">— 无 —</div>';
+      return '<div style="margin-bottom:12px"><div style="font-size:12px;font-weight:700;color:'+color+';margin-bottom:5px">'+title+' ('+arr.length+'只)</div>'+body+'</div>';
     }
-    h += '<div style="font-size:12px;font-weight:700;color:var(--dim);margin-bottom:10px">● v6 六块分类 · 入榜阈值≥0.8亿</div>';
+    h += '<div style="font-size:12px;font-weight:700;color:var(--dim);margin-bottom:10px">● v6 六块分类 · 入榜阈值≥0.8亿 · 并排</div>';
     h += blk6('▲ 机构净买入（机构独买）', '#38bdf8', instBuy, function(s){return s.inst_net_万||0;});
     h += blk6('▼ 机构净卖出（机构独卖）', '#60a5fa', instSell, function(s){return s.inst_net_万||0;});
     h += blk6('★ 机游共振（机构+游资同时净买）', '#a78bfa', jyStocks, function(s){return (s.inst_net_万||0)+(s.yz_net_万||0);});
