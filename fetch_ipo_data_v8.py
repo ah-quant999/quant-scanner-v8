@@ -726,10 +726,8 @@ def calculate_scores(candidates, status_filter=None):
             recommend, tag_color, bg_color = "不建议申购", "#c62828", "#ffebee"
 
         # 价格未知的标注
-        if price <= 0:
-            recommend = "待定价"
-            tag_color = "#888"
-            bg_color = "#f5f5f5"
+        # 发行价未知时不再覆盖 recommend；前端已按 issue_price==0 归入「待定价」tab，
+        # recommend 保持按 score 阈值生成的建议等级，避免污染 shadowBlock 判断。
 
         # ── highlights：dims 已渲染发行价/板块/PE折价/PE/行业PE/申购日，这里补独特亮点 ──
         highlights = []

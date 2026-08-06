@@ -243,10 +243,178 @@ def _make_lite(name, obj):
                            'days': None,
                            'reason': '临近触发阈值(pct=%s, gap=%s)' % (r.get('pct'), r.get('gap'))})
         return {'update_time': obj.get('update_time'), 'stocks': stocks}
+    if name == 'IPO_DATA':
+        # 校正 recommend + 自动补全 shadows（依赖 stock_names.json / candidate_quotes.json）
+        return _build_ipo_shadows(obj)
     if name == 'W52_HIGH':
         lite = {k: v for k, v in obj.items() if k != 'stocks'}
         lite['_lite_note'] = 'stocks 完整列表已裁剪，仅保留 top_gainers 与 total'
         return lite
+    return obj
+
+
+# ── IPO 影子股与 recommend 校正 ──
+
+# 非推荐等级、不应出现在 recommend 字段的状态词
+_IPO_STATUS_WORDS = {
+    "待定价", "待上市", "待申购", "申购中", "今日上市", "上市首日",
+    "追踪中", "已上市", "过期", "", "—", "-",
+}
+
+# 判断 recommend 是否已包含有效建议等级
+_IPO_REC_PATTERNS = re.compile(r"强烈|建议|谨慎|不建议|放弃")
+
+# 明显属于市场/风格/指数的通用概念，不应拿来做关联匹配
+_IPO_GENERIC_CONCEPTS = {
+    "MSCI中国", "机构重仓", "证金持股", "富时罗素", "标准普尔", "沪股通", "深股通",
+    "融资融券", "破净股", "长期破净", "权重股", "上证180", "沪深300", "中证500",
+    "中证1000", "中证A500", "中证2000", "大盘股", "中盘股", "小盘股", "大盘价值",
+    "小盘成长", "低价股", "高价股", "ST板块", "壳资源", "重组", "次新股", "近期新高",
+    "近期新低", "预盈预增", "预亏预减", "高送转", "高分红", "高股息", "央企",
+    "地方国企", "国企改革", "央企国资改革", "地方国资改革", "债转股", "股权转让",
+    "股权激励", "员工持股", "回购", "举牌", "要约收购", "重大合同", "中标", "定增",
+    "外资背景", "台资背景", "高校背景", "军工背景", "QFII", "社保基金", "保险重仓",
+    "信托重仓", "基金重仓", "券商重仓", "国家队", "汇金", "养老金", "陆股通", "港股通",
+    "转融通", "两融标的", "融资融券标的", "节能环保", "碳中和", "碳交易", "ESG",
+}
+
+
+def _sanitize_ipo_recommend(stock):
+    """把被 status 污染的 recommend 字段按 score 重新映射为建议等级。"""
+    rec = (stock.get("recommend") or "").strip()
+    if rec and rec not in _IPO_STATUS_WORDS and _IPO_REC_PATTERNS.search(rec):
+        return stock
+    score = stock.get("score") or 0
+    if score >= 80:
+        rec, tc, bc = "强烈推荐申购", "#2e7d32", "#e8f5e9"
+    elif score >= 65:
+        rec, tc, bc = "建议申购", "#e65100", "#fff3e0"
+    elif score >= 50:
+        rec, tc, bc = "谨慎参与", "#f57f17", "#fffde7"
+    else:
+        rec, tc, bc = "不建议申购", "#c62828", "#ffebee"
+    stock["recommend"] = rec
+    stock["tag_color"] = tc
+    stock["bg_color"] = bc
+    return stock
+
+
+def _clean_concept_name(name):
+    """去掉「概念/板块/产业/主题」等后缀，提高 IPO 主营业务文本的匹配率。"""
+    return re.sub(r"(概念|板块|产业|主题|指数|风格)$", "", name).strip()
+
+
+def _build_ipo_shadows(obj):
+    """基于 stock_names.json 的行业/概念映射，为 IPO 自动生成影子股列表。
+
+    匹配逻辑（按优先级降序）：
+    1. 同行业精确匹配（+3 分，rel_type='同业'）
+    2. 主营业务文本命中 A 股概念关键词（+1 分，rel_type='供应链'）
+    3. 按总市值从大到小取 top 5，保证关联股质量
+    """
+    stocks = obj.get("stocks") if isinstance(obj, dict) else None
+    if not stocks:
+        return obj
+
+    # 读取全市场股票名称/行业/概念
+    names_path = RAW_DIR / "stock_names.json"
+    if not names_path.exists():
+        return obj
+    names_data = _load_json(names_path)
+    if not names_data or not isinstance(names_data, dict):
+        return obj
+    stock_items = names_data.get("data") or names_data.get("stocks") or []
+    if not stock_items:
+        return obj
+
+    # 读取候选行情（取涨跌幅）
+    quotes = {}
+    quotes_path = RAW_DIR / "candidate_quotes.json"
+    if quotes_path.exists():
+        qdata = _load_json(quotes_path)
+        if qdata and isinstance(qdata, dict):
+            for it in (qdata.get("items") or []):
+                c = str(it.get("code", ""))
+                if c:
+                    quotes[c] = it
+
+    candidates = []
+    for s in stock_items:
+        code = str(s.get("code", ""))
+        if not code:
+            continue
+        concepts = []
+        for c in (s.get("concepts") or []):
+            if not c or len(c) < 2:
+                continue
+            cc = _clean_concept_name(c)
+            if cc and cc not in _IPO_GENERIC_CONCEPTS:
+                concepts.append(cc)
+        candidates.append({
+            "code": code,
+            "name": s.get("name", ""),
+            "industry": (s.get("industry") or "").strip(),
+            "concepts": list(set(concepts)),
+            "mv": 0,
+        })
+
+    def _shadows_for(ipo):
+        ipo_code = str(ipo.get("code") or "")
+        fund = ipo.get("fundamentals") or {}
+        industry = (fund.get("industry") or ipo.get("industry_name") or "").strip()
+        text = " ".join([
+            industry,
+            fund.get("main_business") or "",
+            ipo.get("name") or "",
+            " ".join(ipo.get("highlights") or []),
+            ipo.get("track_label") or "",
+        ]).strip()
+        text_lower = text.lower()
+
+        # 若 industry 为空，尝试从业务文本提取候选概念（反向匹配）
+        ipo_concepts = set()
+        if text_lower:
+            all_concepts = set()
+            for cand in candidates:
+                all_concepts.update(cand["concepts"])
+            for c in all_concepts:
+                if c in text_lower:
+                    ipo_concepts.add(c)
+
+        scored = []
+        for cand in candidates:
+            if cand["code"] == ipo_code:
+                continue
+            score = 0
+            rel_type = "同业"
+            if industry and cand["industry"] == industry:
+                score += 3
+            else:
+                rel_type = "供应链"
+            matched = [c for c in cand["concepts"] if c in ipo_concepts]
+            if matched:
+                score += len(matched)
+            if score <= 0:
+                continue
+            q = quotes.get(cand["code"])
+            mv = q.get("total_mv") if q else 0
+            chg = q.get("chg") if q else None
+            scored.append({
+                "code": cand["code"],
+                "name": cand["name"],
+                "rel_type": rel_type,
+                "chg": chg,
+                "_score": score,
+                "_mv": mv or 0,
+            })
+        # 按匹配分降序，同分按总市值降序
+        scored.sort(key=lambda x: (-x["_score"], -x["_mv"]))
+        return [{"code": x["code"], "name": x["name"], "rel_type": x["rel_type"], "chg": x["chg"]}
+                for x in scored[:5]]
+
+    for s in stocks:
+        _sanitize_ipo_recommend(s)
+        s["shadows"] = _shadows_for(s)
     return obj
 
 
