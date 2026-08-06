@@ -609,7 +609,36 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     <!-- 今日判定（数据驱动 · premarket 08:25 刷新） -->
     <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
       <h3><span class="ic">⚖️</span>今日判定 <span id="judgmentTag" style="font-size:11px;font-weight:400;color:var(--dim)">--</span></h3>
+      <!-- 决策四步（2026-08-06 主人令·与今日判定卡集成） -->
+      <div style="margin-bottom:12px;padding:10px 12px;background:linear-gradient(135deg,rgba(56,189,248,0.06),rgba(245,158,11,0.06));border:1px solid rgba(255,255,255,.12);border-radius:10px;">
+        <div style="font-size:12px;font-weight:700;color:var(--txt);margin-bottom:6px;">🧭 决策四步：先看环境，再选标的，确认出手，纪律持仓</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:11px;">
+          <div style="padding:6px 8px;background:rgba(56,189,248,.10);border-radius:6px;border-left:3px solid var(--cyan);">
+            <div style="font-weight:700;color:var(--cyan);">① 环境择时</div>
+            <div style="color:var(--sub);margin-top:2px;">今日事件日历避开风险日 · 危机雷达 ≤50 才开新仓</div>
+          </div>
+          <div style="padding:6px 8px;background:rgba(167,139,250,.10);border-radius:6px;border-left:3px solid var(--purple);">
+            <div style="font-weight:700;color:var(--purple);">② 选股（按可信度）</div>
+            <div style="color:var(--sub);margin-top:2px;">🥇三重共识 → 🔥四量终极 → 🎯驾驶舱 → 🌐全站精选 → 📊逆势龙头(弱市)</div>
+          </div>
+          <div style="padding:6px 8px;background:rgba(94,224,160,.10);border-radius:6px;border-left:3px solid var(--up);">
+            <div style="font-weight:700;color:var(--up);">③ 出手确认</div>
+            <div style="color:var(--sub);margin-top:2px;">信号出现 + 环境绿灯 + 大盘跌 ≥1.5% 只认逆势龙头</div>
+          </div>
+          <div style="padding:6px 8px;background:rgba(255,183,77,.10);border-radius:6px;border-left:3px solid var(--gold);">
+            <div style="font-weight:700;color:var(--gold);">④ 持仓风控</div>
+            <div style="color:var(--sub);margin-top:2px;">止损 -7% 硬 · 止盈 +7%/+12%/+15% 分批 · 只浮盈加仓 · 到目标或破均减仓</div>
+          </div>
+        </div>
+      </div>
       <div id="judgmentBody" style="font-size:13px;line-height:1.8;color:var(--txt)"></div>
+      <!-- 三不原则（2026-08-06 主人令·决策四步底线铁律） -->
+      <div style="margin-top:10px;padding:8px 12px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:8px;font-size:11px;color:var(--txt);line-height:1.7;">
+        <b style="color:var(--down);">🚫 三不原则（站内工具明确口径）</b><br>
+        · <b>危机雷达 ≥70</b> → 空仓观望；50-70 → 仓位减半<br>
+        · <b>大盘单日跌 ≥1.5%</b> → 除逆势龙头外，其余策略全部观望<br>
+        · <b>盈亏比 &lt;1.5（短线止盈÷止损）</b> → 不介入；单票仓位 ≤20%；今日事件日历标红日（FOMC/CPI/交割/大解禁）→ 不开新仓
+      </div>
     </div>
     <script>
     (function(){
@@ -2809,31 +2838,21 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         // 净流入（亿元）
         var netYi = (dayNet/10000).toFixed(2);
         var netColor = dayNet >= 0 ? 'c-up' : 'c-down';
-        // 预览股名（TOP1 机游共振；无则机构独买 TOP1；再无则游资独买 TOP1）
-        var preview = (jyArr[0] || jgArr[0] || yzArr[0] || {});
-        var previewName = preview.name || '';
-        // 大格子内容：日期+星期 / 净流入 / 共振数 / 机构独买 / 游资独买 / 振股预览
+        // 预览股名（仅机游共振）——2026-08-06 主人令：大格子只写"共振的 N 只+净流入"，其他股不显示
+        var previewName = '';
+        // 大格子内容精简：日期+星期 / 净流入 / ★共振 N 只名单
         h += '<div class="cal-stat" style="flex:1;display:flex;flex-direction:column;gap:3px;padding-top:1px;min-height:0">';
         // 1) 净流入
         h += '<div class="cal-net ' + netColor + '" style="display:flex;align-items:baseline;gap:3px">净流入 <b style="font-size:13px">' + (dayNet>=0?'+':'') + netYi + '</b><span style="font-size:9px;opacity:0.7">亿</span></div>';
-        // 2) ★ 机游共振
-        h += '<div class="cal-sub" style="display:flex;align-items:center;gap:3px"><span style="color:#a78bfa;font-weight:700">★</span>机游 <b style="color:' + (jyArr.length?'#a78bfa':'var(--dim)') + '">' + jyArr.length + '</b><span style="color:var(--dim);margin:0 2px">·</span>机构 <b style="color:#38bdf8">' + jgArr.length + '</b><span style="color:var(--dim);margin:0 2px">·</span>游资 <b style="color:#f59e0b">' + yzArr.length + '</b></div>';
-        // 3) 机游共振股预览（最多 2 只名字）
+        // 2) ★ 共振 N 只名单（全部列出，机构独买/游资独买不显示在格子里——其他股主人不要）
         if(jyArr.length > 0){
-          h += '<div class="cal-sub" style="line-height:1.3;max-height:30px;overflow:hidden"><span style="color:#a78bfa">★</span> ';
-          var names = jyArr.slice(0,2).map(function(s){return s.name||'';}).join(' · ');
-          h += names + (jyArr.length>2?' +'+(jyArr.length-2):'');
+          h += '<div class="cal-sub" style="line-height:1.3;max-height:48px;overflow:hidden"><span style="color:#a78bfa;font-weight:700">★</span> 共振 <b style="color:#a78bfa">' + jyArr.length + '</b> · ';
+          var names = jyArr.map(function(s){return s.name||'';}).join(' · ');
+          h += names;
           h += '</div>';
-        }
-        // 4) 机构 TOP1 + 净额（亿）
-        if(jgArr.length > 0){
-          var jgTop = jgArr.slice().sort(function(a,b){return (b.inst_net_万||0)-(a.inst_net_万||0);})[0];
-          h += '<div class="cal-sub" style="line-height:1.3"><span style="color:#38bdf8">▲</span> ' + (jgTop.name||'') + ' <b class="c-up" style="font-size:9px">+' + (jgTop.inst_net_万/10000).toFixed(2) + '亿</b></div>';
-        }
-        // 5) 游资 TOP1 + 净额（亿）
-        if(yzArr.length > 0){
-          var yzTop = yzArr.slice().sort(function(a,b){return (b.yz_net_万||0)-(a.yz_net_万||0);})[0];
-          h += '<div class="cal-sub" style="line-height:1.3"><span style="color:#f59e0b">▲</span> ' + (yzTop.name||'') + ' <b class="c-up" style="font-size:9px">+' + (yzTop.yz_net_万/10000).toFixed(2) + '亿</b></div>';
+        } else {
+          // 无共振日只写"★共振 0"（不显示机构/游资）
+          h += '<div class="cal-sub"><span style="color:#a78bfa;font-weight:700">★</span> 共振 <b style="color:var(--dim)">0</b></div>';
         }
         h += '</div>';
       } else {
@@ -4330,6 +4349,25 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         · <b>字段说明</b>：ROE ≥15% 绿 / 10-15% 金 / &lt;10% 红；营收 ≥15% 绿 / ≥0% 金 / &lt;0% 红；分红比例来自东财 stock_fhps_em<br>
         · <b>不显示规则</b>：股票不在候选池 → 整张卡不渲染（不显示「无数据」占位，避免「每只都空着」）<br>
         · <b>v6 旧口径</b>（已停用）：「BUY 评分 ≥50」是 v6 当年个股查询评分模型，v8 升级为「综合财务画像多指标评级」，更客观（含 ROE/营收/分红多维度）。</div>
+        <div class="logic-h">综合财务画像 · 评分方法（如何评分）</div>
+        <div class="logic-p"><b>2026-08-06 主人令：把"综合财务画像"的评分方法写到此处</b>。<br>
+        评分来源：<b>raw_data/fundamental_quality.json</b>（v8 算法链 <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">algorithms/fetch_fundamental_quality.py</code> 用 baostock 抓取）。<br>
+        <b>5 个独立评分维度</b>（每维 0~100 → 加权汇总成最终 quality_score 0~100）：<br>
+        <table class="lg-table" style="margin-top:6px">
+          <tr><th>维度</th><th>计算口径</th><th>权重</th><th>优/中/差阈值</th></tr>
+          <tr><td><b>ROE 净资产收益率</b></td><td>最近一期年报 / 滚动 12 月 ROE%</td><td>30%</td><td>≥15% 优 / 10-15% 中 / &lt;10% 差</td></tr>
+          <tr><td><b>营收增速</b></td><td>最近一期同比营收%</td><td>25%</td><td>≥15% 优 / ≥0% 中 / &lt;0% 差</td></tr>
+          <tr><td><b>净利润同比增长</b></td><td>最近一期同比净利%</td><td>20%</td><td>≥20% 优 / ≥0% 中 / &lt;0% 差</td></tr>
+          <tr><td><b>每股净资产 BVPS</b></td><td>最近一期 BVPS 元</td><td>15%</td><td>≥10 优 / 5-10 中 / &lt;5 差</td></tr>
+          <tr><td><b>消息面加减分</b></td><td>业绩预告/重大公告/重组等信号</td><td>10%</td><td>+15 至 +25 利好 / -15 至 -25 利空</td></tr>
+        </table>
+        <br><b>最终评级（按 final_score）</b>：<br>
+        · 🟢 <b>A 绩优</b> ≥70 · 极致优质（ROE+营收双高，是赛道头部）<br>
+        · 🟢 <b>B 良好</b> 40-69 · 基本面良好（单一维度突出即可）<br>
+        · 🟡 <b>C 一般</b> 20-39 · 基本面一般（等待业绩拐点）<br>
+        · 🔴 <b>D 差</b> &lt;20 · 基本面差（避免介入）<br>
+        <b>字段显示规则</b>：每个字段独立 &lt; if 数据非空 &gt; 包裹，没数据整行不渲染（如某只股票没 BVPS，BVPS 行根本不显示，不留 "-"）。<br>
+        <b>不显示规则</b>：股票不在候选池 → 综合财务画像段不渲染（不显示「无财务数据」占位）；v8 全市场 5537 候选池内股票才有。</div>
         <div class="logic-h">止盈止损口径（v8 升级版，三档目标）</div>
         <div class="logic-p">· <b>止损</b> = max(当前价×0.93, 当日最低价×0.99)，至少留 1% 缓冲<br>· <b>短线目标</b> = 当前价×1.07（+7%）· <b>中线目标</b> = 当前价×1.12（+12%）· <b>强势目标</b> = 当前价×1.15（+15%）<br>· <b>盈亏比</b> = 短线收益 / 止损亏损，≥2 优秀 / 1.5-2 一般 / &lt;1.5 较差<br>· 波动率 = max(当日振幅, 当前价×1.5%)，&gt;4% 高波动 / &gt;2% 中波动 / 其余低波动<br>· 操作提示按当日涨跌：涨 ≥5% 追高谨慎 / 跌 ≥5% 警惕破位 / 其余中性可分批建仓</div>
         <div class="logic-h">个股查询网格卡片清单（2026-08-06 清理后）</div>
@@ -8603,8 +8641,19 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     }
     h+='</div>';
 
-    // === 4 个待开发卡片（用户 2026-08-06 令·KMO-STOCK-AI 可借鉴项·放暂未上架） ===
+    // === 暂未上架 v8.5 实验（主人 2026-08-06 22:39 令·选 A+B 先行） ===
     var planned = [
+      {icon:'🎭', title:'情绪周期', color:'#38bdf8',
+        sub:'情绪因子+情绪日报（v8.5 方案 A）',
+        cur:'已有预警/危机雷达 + 涨停热力 + ETF 申赎 + 龙虎榜（机构/游资活跃度）',
+        plan:'四源数据 → 4 阶段判定：<b>冰点（情绪低）→ 修复（情绪转好）→ 温和（情绪中性）→ 狂热（情绪高）→ 降温</b>。每阶段配套仓位建议（冰点空仓/修复 30%/温和 50%/狂热 70%→80%/降温 30%）。',
+        data:window.CRISIS_DATA, dataName:'CRISIS_DATA + LIMIT_UP_HEATMAP + ETF_INTRADAY_HEAT + LHB_DATA',
+        dataReady: true},
+      {icon:'📝', title:'AI 报告解读', color:'#22c55e',
+        sub:'让数据自动翻译成可读结论（v8.5 方案 B）',
+        cur:'每个卡是数据/列表，用户需自己解读',
+        plan:'每个重要卡片（今日事件/今日判定/算法命中/候选池）加 🤖 按钮，点击调 LLM 生成 200 字解读：为什么今日某项关键？后续关注什么？raw_data 喂 LLM，无需新数据源，2-3 天可落地。',
+        data:null, dataName:'无（基于现有 raw_data + LLM 调用）'},
       {icon:'🏔️', title:'连板天梯', color:'#ff7043',
         sub:'首板/连板/炸板分层梯队',
         cur:'只有涨停热力 heatmap',
@@ -8615,21 +8664,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         cur:'只有资金流+RS 强度',
         plan:'给 SECTOR_RS 加"周期定位"标签（可做）',
         data:window.SECTOR_RS, dataName:'SECTOR_RS'},
-      {icon:'📊', title:'情绪周期', color:'#38bdf8',
-        sub:'情绪因子+情绪日报',
-        cur:'有预警/危机雷达',
-        plan:'把 CRISIS_DATA 包装成"情绪周期"可视化',
-        data:window.CRISIS_DATA, dataName:'CRISIS_DATA'},
-      {icon:'🕸️', title:'AI 热点图谱', color:'#f59e0b',
-        sub:'题材图谱网络图',
-        cur:'概念排名列表',
-        plan:'概念热度可加图谱/力导向图（轻量）',
-        data:window.CONCEPT_RANKING, dataName:'CONCEPT_RANKING'}
     ];
     planned.forEach(function(p){
-      var has = !!(p.data && (p.data.items||p.data.data||p.data.update_time));
+      var has = p.dataReady || !!(p.data && (p.data.items||p.data.data||p.data.update_time));
       h+='<div class="card" style="margin-bottom:16px;border-left:4px solid '+p.color+';opacity:0.85;">';
-      h+=v8CardHeader(p.icon, p.title+' <span style="font-size:11px;color:#94a3b8;font-weight:400;">(计划中)</span>', p.plan, 'update_time', {update_time:''}, !has);
+      h+=v8CardHeader(p.icon, p.title+' <span style="font-size:11px;color:#94a3b8;font-weight:400;">(计划中 · 待实验)</span>', p.plan, 'update_time', {update_time:''}, !has);
       h+='<div style="padding:10px 14px;font-size:11px;color:var(--sub);line-height:1.6;">';
       h+='<div style="margin-bottom:4px;"><b style="color:var(--txt)">目标:</b> '+p.sub+'</div>';
       h+='<div style="margin-bottom:4px;"><b style="color:#94a3b8">现状:</b> '+p.cur+'</div>';
