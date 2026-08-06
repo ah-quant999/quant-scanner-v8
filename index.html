@@ -2576,14 +2576,17 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   /* ===== 工具：机游共振每日 TOP5 列表（参照参考页） ===== */
   function _rcJyDayListsHtml(stocks){
     function cat(c){ return (stocks||[]).filter(function(s){ return (s.category||'')===c; }); }
-    function t5(arr,key){ return arr.filter(function(s){return (s[key]||0)>0;}).sort(function(a,b){return (b[key]||0)-(a[key]||0);}).slice(0,5); }
-    function b5(arr,key){ return arr.filter(function(s){return (s[key]||0)<0;}).sort(function(a,b){return (a[key]||0)-(b[key]||0);}).slice(0,5); }
-    var jy = cat('机游共振').map(function(s){ s._net=(s.inst_net_万||0)+(s.yz_net_万||0); return s; });
+    // v6_memo line 405: 8000万门槛约0.8亿，低于不显示（2026-08-06 按 v6 规范补阈值）
+    var TH = 8000;
+    function t5(arr,key){ return arr.filter(function(s){ return Math.abs(s[key]||0) >= TH; }).sort(function(a,b){return (b[key]||0)-(a[key]||0);}).slice(0,5); }
+    function b5(arr,key){ return arr.filter(function(s){ return Math.abs(s[key]||0) >= TH; }).sort(function(a,b){return (a[key]||0)-(b[key]||0);}).slice(0,5); }
+    var jy = cat('机游共振').filter(function(s){ return Math.abs((s.inst_net_万||0)+(s.yz_net_万||0)) >= TH; })
+      .map(function(s){ s._net=(s.inst_net_万||0)+(s.yz_net_万||0); return s; }).slice(0,5);
     var instBuy = t5(cat('机构独买').concat(jy), 'inst_net_万');
     var instSell = b5(cat('机构独买').concat(jy), 'inst_net_万');
     var yzBuy = t5(cat('游资独买'), 'yz_net_万');
     var yzSell = b5(cat('游资独买'), 'yz_net_万');
-    var pureYz = cat('游资独买').filter(function(s){ return Math.abs(s.yz_net_万||0) > 5000; }).slice(0,5);
+    var pureYz = cat('游资独买').filter(function(s){ return Math.abs(s.yz_net_万||0) >= TH; }).slice(0,5);
     function blk(title,color,arr,key){
       if(!arr.length) return '';
       var inner = arr.map(function(s){
@@ -2975,32 +2978,46 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     });
     h += '</div>';
 
-    // 合并所有入选股票（机游共振+机构独买+游资独买）去重，按净买卖绝对值降序，单列大字连续（2026-08-06 用户偏好：不分组、字体大）
-    var allStocks = [];
+    // v6 四色块：🏦机构 / ⚡机游共振 / 🔥游资 / 🌎北向席位，互斥 + 0.8亿阈值（v6_memo line 405-406，2026-08-06）
+    var TH = 8000;
+    var all = [];
     var seen = {};
-    ['机游共振','机构独买','游资独买'].forEach(function(cat){
-      (byCat[cat]||[]).forEach(function(s){
-        var k = s.code||s.name;
-        if(seen[k]) return;
-        seen[k] = true;
-        s._net = (s.inst_net_万||0) + (s.yz_net_万||0);
-        allStocks.push(s);
-      });
+    (byCat['机游共振']||[]).concat(byCat['机构独买']||[]).concat(byCat['游资独买']||[]).forEach(function(s){
+      if(seen[s.code]) return;
+      seen[s.code] = true;
+      s._inst = s.inst_net_万||0;
+      s._yz = s.yz_net_万||0;
+      s._net = s._inst + s._yz;
+      var sx = (s.seats||{})['北向'];
+      s._nb_net = sx ? ((sx.buy||0) - (sx.sell||0)) : 0;
+      all.push(s);
     });
-    allStocks.sort(function(a,b){ return Math.abs(b._net) - Math.abs(a._net); });
-    h += '<div style="margin-bottom:10px">';
-    h += '<div style="font-size:11px;font-weight:700;color:var(--dim);margin-bottom:6px">● 共振/机构/游资合并 · 按净买卖绝对值排序 · TOP'+Math.min(allStocks.length,15)+'</div>';
-    h += '<div style="display:flex;flex-direction:column;gap:2px">';
-    allStocks.slice(0,15).forEach(function(s){
-      var pct = s.pct || 0;
-      var net = s._net;
-      h += '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:5px 10px;background:var(--bg2);border-radius:5px;font-size:13px;gap:8px">';
-      h += '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+_rcEsc(s.name)+'</span>';
-      h += '<span style="color:'+(pct>=0?'var(--up)':'var(--down)')+';font-weight:600;font-size:12px">'+((pct>=0?'+':'')+pct.toFixed(1)+'%')+'</span>';
-      h += '<span style="color:'+(net>=0?'var(--up)':'var(--down)')+';font-weight:700;font-size:13px;min-width:60px;text-align:right">'+_rcFmtYi(net)+'</span>';
-      h += '</div>';
-    });
-    h += '</div></div>';
+    // 互斥分块（v6 规则：北向加持股票只入北向块）
+    var nbStocks = all.filter(function(s){ return s._nb_net !== 0 && Math.abs(s._nb_net) >= TH; }).sort(function(a,b){return Math.abs(b._nb_net) - Math.abs(a._nb_net);});
+    var inNb = function(s){ for(var i=0;i<nbStocks.length;i++) if(nbStocks[i].code===s.code) return true; return false; };
+    var jyStocks = all.filter(function(s){ return !inNb(s) && (s.category||'')==='机游共振' && Math.abs(s._net) >= TH; }).sort(function(a,b){return Math.abs(b._net) - Math.abs(a._net);});
+    var inJNb = function(s){ return inNb(s) || jyStocks.some(function(x){return x.code===s.code;}); };
+    var instStocks = all.filter(function(s){ return !inJNb(s) && s._inst >= TH; }).sort(function(a,b){return b._inst - a._inst;});
+    var yzStocks = all.filter(function(s){ return !inJNb(s) && !instStocks.some(function(x){return x.code===s.code;}) && Math.abs(s._yz) >= TH; }).sort(function(a,b){return Math.abs(b._yz) - Math.abs(a._yz);});
+    // 四色块渲染（顺序按 v6：机构→共振→游资→北向）
+    function blk(title, color, arr, valFn, prefix){
+      if(!arr.length) return '';
+      var inner = arr.map(function(s){
+        var val = valFn(s);
+        var pct = s.pct||0;
+        return '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:5px 10px;background:var(--bg2);border-radius:5px;font-size:13px;gap:8px">'
+          + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+(prefix||'')+_rcEsc(s.name)+'</span>'
+          + '<span style="color:'+(pct>=0?'var(--up)':'var(--down)')+';font-weight:600;font-size:12px">'+((pct>=0?'+':'')+pct.toFixed(1)+'%')+'</span>'
+          + '<span style="color:'+(val>=0?'var(--up)':'var(--down)')+';font-weight:700;font-size:13px;min-width:60px;text-align:right">'+_rcFmtYi(val)+'</span>'
+          + '</div>';
+      }).join('');
+      return '<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:'+color+';margin-bottom:5px">'+title+' ('+arr.length+'只)</div><div style="display:flex;flex-direction:column;gap:2px">'+inner+'</div></div>';
+    }
+    h += '<div style="font-size:11px;font-weight:700;color:var(--dim);margin-bottom:8px">● v6 四色块 · 入榜阈值≥0.8亿 · 互斥分块</div>';
+    h += blk('🏦 机构净买入', '#38bdf8', instStocks, function(s){return s._inst;});
+    h += blk('⚡ 机游共振（合力）', '#a78bfa', jyStocks, function(s){return s._net;});
+    h += blk('🔥 游资净买入', '#f59e0b', yzStocks, function(s){return s._yz;});
+    h += blk('🌎 北向席位净买入', '#22c55e', nbStocks, function(s){return s._nb_net;});
 
     h += '</div>';
     detail.innerHTML = h;
@@ -3855,7 +3872,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
           <tr><td>14:30</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
           <tr><td>15:10</td><td>v8_cn_fetch_cloud</td><td>盘中末档（收盘前最后快照）</td><td>云端</td></tr>
           <tr style="background:rgba(56,189,248,.06);"><td>09:03-15:33 每30分</td><td>v8_intraday_healer</td><td>盘中自愈：检测抓取过期(>45min)自动补跑，防 GitHub schedule 漏档</td><td>云端</td></tr>
-          <tr><td>15:30</td><td>v8_cn_fetch_cloud</td><td>盘后（MARKET_FUND_FLOW_DATA 收盘累积 · ETF_DAILY_MONITOR / EXPERIMENT）</td><td>云端</td></tr>
+          <tr><td>15:45</td><td>v8_cn_fetch_cloud</td><td>盘后（T+1 龙虎榜·机游共振+北向席位数据产出·v6四色块入榜阈值≥0.8亿）</td><td>云端</td></tr>
           <tr><td>16:30</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓（恒指/港股候选/盘中模块收盘值）</td><td>云端</td></tr>
           <tr><td>盘中每30分</td><td>v8_risk_gauge</td><td>危机雷达/风险温度计实时刷新</td><td>云端</td></tr>
           <tr><td>工作日13/15/17/19/21点 · 周末0-20点每2h</td><td>runner_health_alert</td><td>Runner 健康监控（离线开 Issue；workflow 当前 active，无需手动 unpause）</td><td>云端</td></tr>
