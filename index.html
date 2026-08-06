@@ -547,6 +547,67 @@ function setBadge(id, slot, horizon, ts, sub){
   }
 }
 window._uBadge = _uBadge; window.setBadge = setBadge;
+
+/* ===== 🎯 今日判定 · 可入手候选 HTML 构建（2026-08-07 主人令：从今日事件页迁至暂未上架实验区） =====
+   数据：🥇三重共识 > 🥈驾驶舱 A 档 > 🥉金股池 + 四量终极；渲染时由 renderUnlisted 调用。 */
+function __judgmentCandidatesHTML(){
+  var SQ = window.STOCK_QUOTE || {};
+  var sq = SQ.stocks || {};
+  var tier_a = (window.COCKPIT_TIER_RECOMMEND && window.COCKPIT_TIER_RECOMMEND.tier_a) || [];
+  var gp = (window.GOLD_POOL && window.GOLD_POOL.stocks) || {};
+  var tc = (window.TRIPLE_CONSENSUS && window.TRIPLE_CONSENSUS.stocks) || {};
+  var fv = (window.FOUR_VOLUME && window.FOUR_VOLUME.stocks) || [];
+  var list = [];
+  Object.keys(tc).forEach(function(k){
+    var s = tc[k];
+    if(s){ list.push({src:'🥇 三重共识', code:s.code || (k.split('_')[1]||k), name:s.name||k, score:s.total_score||s.score, srcColor:'var(--purple)'}); }
+  });
+  tier_a.slice(0,8).forEach(function(s){
+    if(s){ list.push({src:'🎯 驾驶舱A档', code:s.code, name:s.name, score:s.total_score, srcColor:'#ffd54f'}); }
+  });
+  Object.keys(gp).slice(0,5).forEach(function(k){
+    var s = gp[k];
+    if(s && s.code && !list.some(function(x){return x.code===s.code;})){
+      list.push({src:'⭐ 金股池', code:s.code, name:s.name||k, score:s.signal_count||0, srcColor:'var(--up)'});
+    }
+  });
+  fv.slice(0,5).forEach(function(s){
+    if(s && s.code && !list.some(function(x){return x.code===s.code;})){
+      list.push({src:'🔥 四量终极', code:s.code, name:s.name, score:undefined, srcColor:'#ff7043'});
+    }
+  });
+  if(!list.length){
+    return '<div style="text-align:center;color:var(--dim);padding:8px 0">📭 今日 0 只入选 — 建议观望（决策四步/三不原则已合并入暂未上架实验区）</div>';
+  }
+  function _norm6(c){ return String(c||'').replace(/\D/g,''); }
+  var lines = [];
+  list.slice(0,10).forEach(function(s){
+    var nk = _norm6(s.code);
+    var q = sq['sz'+nk] || sq['sh'+nk] || sq['bj'+nk] || sq[nk];
+    var price = q ? q.price : null;
+    var pct = q ? q.pct : null;
+    var stop = price ? (Math.max(price*0.93, (q.low||price)*0.99)) : null;
+    var t1 = price ? price*1.07 : null;
+    var t2 = price ? price*1.12 : null;
+    var t3 = price ? price*1.15 : null;
+    var color = pct==null ? 'var(--dim)' : (pct>=0?'var(--up)':'var(--down)');
+    var scoreHTML = s.score!=null ? ' <b style="color:'+s.srcColor+'">'+s.score+'</b>' : '';
+    var priceHTML = price!=null ? '<span style="color:var(--txt);font-weight:700">¥'+price.toFixed(2)+'</span> <span style="color:'+color+';font-size:10px">'+(pct>=0?'+':'')+pct.toFixed(2)+'%</span>' : '<span style="color:var(--dim)">--</span>';
+    var planHTML = price!=null
+      ? '<span style="color:var(--down)">止损 ¥'+stop.toFixed(2)+'</span> · <span style="color:var(--up)">+7% ¥'+t1.toFixed(2)+'</span> · +12% ¥'+t2.toFixed(2)+' · +15% ¥'+t3.toFixed(2)+'</span>'
+      : '<span style="color:var(--dim)">价格未更新</span>';
+    lines.push('<div style="display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:baseline;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)">'
+      + '<span style="font-size:10px;color:'+s.srcColor+';min-width:74px;font-weight:700">'+s.src+scoreHTML+'</span>'
+      + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><b>'+(s.name||'--')+'</b> <span style="color:var(--dim);font-size:10px">'+s.code+'</span></span>'
+      + priceHTML
+      + planHTML
+      + '</div>');
+  });
+  return '<div style="font-size:12px;font-weight:700;color:var(--up);margin-bottom:6px">🎯 今日可入手候选 '+list.length+' 只 <span style="font-size:10px;color:var(--dim);font-weight:400">（按可信度排序：三重共识→驾驶舱A→金股池→四量终极）</span></div>'
+    + '<div style="font-size:10px;color:var(--dim);margin-bottom:4px">止损 -7%硬 / 短线 +7% / 中线 +12% / 强势 +15%</div>'
+    + lines.join('');
+}
+window.__judgmentCandidatesHTML = __judgmentCandidatesHTML;
 </script>
 <script src="data/CRDS_CARD_DATA.js?v=20260806233139"></script>
 <script src="data/TRIPLE_CONSENSUS.js?v=20260806233140"></script>
@@ -600,6 +661,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <div class="tab" data-sec="ph" onclick="switchSec('ph',this)">🌙 盘后数据</div>
   <div class="tab" data-sec="st" onclick="switchSec('st',this)">🎯 选股策略</div>
 <div class="tab" data-sec="rc" onclick="switchSec('rc',this)">🧲 共振日历</div>
+  <!-- 2026-08-07 主人令：暂未上架 从运维子 Tab 提升为一级 nav（仅管理员可见，guardLock 锁定） -->
+  <div class="tab locked" data-sec="ul" data-lock="1" onclick="guardLock('ul',this)">🔒 暂未上架 <span class="lk">[锁]</span></div>
   <div class="tab locked" data-sec="op" data-lock="1" onclick="guardLock('op',this)">🔒 运维 <span class="lk">[锁]</span></div>
   <div class="tab locked" data-sec="lg" data-lock="1" onclick="guardLock('lg',this)">🔒 逻辑详解 <span class="lk">[锁]</span></div>
 </nav>
@@ -619,7 +682,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
       <h3><span class="ic">⚖️</span>今日判定 <span id="judgmentTag" style="font-size:11px;font-weight:400;color:var(--dim)">--</span></h3>
       <!-- 🎯 今日可入手候选（实际股票代入；理论段已移到运维页·暂未上架区，2026-08-06 主人令） -->
-      <div id="judgmentCandidates" style="margin-top:14px;padding:12px;background:linear-gradient(135deg,rgba(94,224,160,.08),rgba(56,189,248,.04));border:1px solid rgba(94,224,160,.25);border-radius:10px;font-size:12px;color:var(--txt);line-height:1.7;"></div>
+      <!-- 🎯 今日可入手候选 2026-08-07 已迁至 🔒 暂未上架 Tab（实验区），本页仅保留迁移提示 -->
+      <div id="judgmentCandidates" style="margin-top:14px;padding:12px;background:linear-gradient(135deg,rgba(94,224,160,.08),rgba(56,189,248,.04));border:1px solid rgba(94,224,160,.25);border-radius:10px;font-size:12px;color:var(--txt);line-height:1.7;"><div style="text-align:center;color:var(--dim);padding:12px 0;line-height:1.9;">📦 今日判定 · 可入手候选已迁移至 <b style="color:var(--cyan)">🔒 暂未上架</b> Tab（实验）<br><span style="font-size:11px">与「决策四步 + 三不原则」参考卡配对 · 本页不再重复展示</span></div></div>
     </div>
     <!-- 🔒 今日判定·环境态势（管理员可见，在运维页·暂未上架区加载，原 judgmentBody 内容） -->
     <div id="judgmentBody" style="display:none"></div>
@@ -693,79 +757,10 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       }
       // 6) 多信号扫描 — 已删除（2026-08-05 用户反馈无用：北向永久停用、VIX/雷达/板块与今日宏观重复）
       body.innerHTML = h;
-      // 🔒 同步写入运维页·暂未上架区的「今日判定·环境态势」卡（2026-08-06 主人令：理论段挪到管理员可见区）
+      // 缓存环境态势 HTML，供暂未上架 Tab 的 judgmentBodyOp 在进入时填充（解析顺序早于该 DOM，不能直接同步写）
+      window.__judgmentEnvHTML_cache = h;
+      // 🔒 同步写入暂未上架 Tab 的「今日判定·环境态势」卡（2026-08-06 主人令：理论段挪到管理员可见区）
       try{ var opBody=document.getElementById('judgmentBodyOp'); if(opBody) opBody.innerHTML=h; }catch(e){}
-
-      // ========== 🎯 今日可入手候选（2026-08-06 主人令·实际股票代入，不是理论） ==========
-      // 优先级：🥇三重共识 > 🥈驾驶舱 A 档 > 🥉金股池 + 四量终极 > 候选池 350
-      var candBox = document.getElementById('judgmentCandidates');
-      if(!candBox) return;
-      var SQ = window.STOCK_QUOTE || {};
-      var sq = SQ.stocks || {};
-      var tier_a = (window.COCKPIT_TIER_RECOMMEND && window.COCKPIT_TIER_RECOMMEND.tier_a) || [];
-      var gp = (window.GOLD_POOL && window.GOLD_POOL.stocks) || {};
-      var tc = (window.TRIPLE_CONSENSUS && window.TRIPLE_CONSENSUS.stocks) || {};
-      var fv = (window.FOUR_VOLUME && window.FOUR_VOLUME.stocks) || [];
-      var cd = (window.CANDIDATE && window.CANDIDATE.stocks) || {};
-
-      // 收集候选（按可信度排序）
-      var list = [];
-      // 1) 三重共识 stocks（key=sz_002335）
-      Object.keys(tc).forEach(function(k){
-        var s = tc[k];
-        if(s){ list.push({src:'🥇 三重共识', code:s.code || (k.split('_')[1]||k), name:s.name||k, score:s.total_score||s.score, srcColor:'var(--purple)'}); }
-      });
-      // 2) 驾驶舱 A 档
-      tier_a.slice(0,8).forEach(function(s){
-        if(s){ list.push({src:'🎯 驾驶舱A档', code:s.code, name:s.name, score:s.total_score, srcColor:'#ffd54f'}); }
-      });
-      // 3) 金股池（无三重共识/驾驶舱命中时补位）
-      Object.keys(gp).slice(0,5).forEach(function(k){
-        var s = gp[k];
-        if(s && s.code && !list.some(function(x){return x.code===s.code;})){
-          list.push({src:'⭐ 金股池', code:s.code, name:s.name||k, score:s.signal_count||0, srcColor:'var(--up)'});
-        }
-      });
-      // 4) 四量终极 QD 共振
-      fv.slice(0,5).forEach(function(s){
-        if(s && s.code && !list.some(function(x){return x.code===s.code;})){
-          list.push({src:'🔥 四量终极', code:s.code, name:s.name, score:undefined, srcColor:'#ff7043'});
-        }
-      });
-
-      if(!list.length){
-        candBox.innerHTML = '<div style="text-align:center;color:var(--dim);padding:8px 0">📭 今日 0 只入选 — 建议观望（决策四步/三不原则已移到暂未上架参考）</div>';
-        return;
-      }
-
-      // 取实时价格计算止盈止损
-      function _norm6(c){ return String(c||'').replace(/\D/g,''); }
-      var lines = [];
-      list.slice(0,10).forEach(function(s){
-        var nk = _norm6(s.code);
-        var q = sq['sz'+nk] || sq['sh'+nk] || sq['bj'+nk] || sq[nk];
-        var price = q ? q.price : null;
-        var pct = q ? q.pct : null;
-        var stop = price ? (Math.max(price*0.93, (q.low||price)*0.99)) : null;
-        var t1 = price ? price*1.07 : null;
-        var t2 = price ? price*1.12 : null;
-        var t3 = price ? price*1.15 : null;
-        var color = pct==null ? 'var(--dim)' : (pct>=0?'var(--up)':'var(--down)');
-        var scoreHTML = s.score!=null ? ' <b style="color:'+s.srcColor+'">'+s.score+'</b>' : '';
-        var priceHTML = price!=null ? '<span style="color:var(--txt);font-weight:700">¥'+price.toFixed(2)+'</span> <span style="color:'+color+';font-size:10px">'+(pct>=0?'+':'')+pct.toFixed(2)+'%</span>' : '<span style="color:var(--dim)">--</span>';
-        var planHTML = price!=null
-          ? '<span style="color:var(--down)">止损 ¥'+stop.toFixed(2)+'</span> · <span style="color:var(--up)">+7% ¥'+t1.toFixed(2)+'</span> · +12% ¥'+t2.toFixed(2)+' · +15% ¥'+t3.toFixed(2)+'</span>'
-          : '<span style="color:var(--dim)">价格未更新</span>';
-        lines.push('<div style="display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:baseline;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)">'
-          + '<span style="font-size:10px;color:'+s.srcColor+';min-width:74px;font-weight:700">'+s.src+scoreHTML+'</span>'
-          + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><b>'+(s.name||'--')+'</b> <span style="color:var(--dim);font-size:10px">'+s.code+'</span></span>'
-          + priceHTML
-          + planHTML
-          + '</div>');
-      });
-      candBox.innerHTML = '<div style="font-size:12px;font-weight:700;color:var(--up);margin-bottom:6px">🎯 今日可入手候选 '+list.length+' 只 <span style="font-size:10px;color:var(--dim);font-weight:400">（按可信度排序：三重共识→驾驶舱A→金股池→四量终极）</span></div>'
-        + '<div style="font-size:10px;color:var(--dim);margin-bottom:4px">止损 -7%硬 / 短线 +7% / 中线 +12% / 强势 +15%</div>'
-        + lines.join('');
     })();
     </script>
 
@@ -3915,7 +3910,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
       <button class="op-tab-btn" data-op="2" onclick="opSwitchTab(2)">⏰ 任务运行看板 <span class="op-tab-time" id="opTab2Time"></span></button>
 
-      <button class="op-tab-btn" data-op="3" onclick="opSwitchTab(3)">🔒 暂未上架 <span style="font-size:10px;color:var(--dim);font-weight:500">管理员专享</span></button>
+      <!-- 2026-08-07 主人令：暂未上架 已提升为一级 nav Tab（🔒 暂未上架），不再作为运维子页 -->
 
       <button class="op-tab-btn" data-op="4" onclick="opSwitchTab(4)">已下架</button>
 
@@ -4000,17 +3995,6 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
     </div>
 
-    <div id="opTab3" class="op-tab-pane">
-      <!-- 🔒 今日判定·环境态势（2026-08-06 主人令：原 judgmentBody 理论段移到管理员可见区，自动加锁） -->
-      <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;opacity:0.95;">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
-          <span style="font-size:14px;">⚖️</span><span style="font-weight:700;font-size:14px;color:var(--txt);">今日判定 · 环境态势</span>
-          <span style="font-size:11px;color:var(--sub);">（原 judgmentBody · 美股/技术/情绪/宏观/共同结论/危险信号/大盘）</span>
-        </div>
-        <div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);"></div>
-      </div>
-      <div id="unlistedPanel"></div>
-    </div>
     <div id="opTab4" class="op-tab-pane"><div id="delistedPanel">
 
         <!-- 盘后概览：市场温度计分项 / 六维共振雷达 -->
@@ -4030,6 +4014,22 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     <!-- 温度计 + 雷达（从盘后数据区迁入） -->
 
     </div></div>
+  </section>
+
+  <!-- ============ 暂未上架（管理员 · 实验区 · 2026-08-07 提升为一级 Tab） ============ -->
+  <section id="sec-ul">
+    <div class="sec-head"><h2>🧪 暂未上架</h2><span class="tag">仅管理员可见 · 实验区 · 未正式上架卡片</span></div>
+
+    <!-- 🔒 今日判定·环境态势（原 judgmentBody 理论段 · 2026-08-06 主人令管理员可见区，进入本 Tab 时由 renderUnlisted 填充） -->
+    <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;opacity:0.95;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+        <span style="font-size:14px;">⚖️</span><span style="font-weight:700;font-size:14px;color:var(--txt);">今日判定 · 环境态势</span>
+        <span style="font-size:11px;color:var(--sub);">（原 judgmentBody · 美股/技术/情绪/宏观/共同结论/危险信号/大盘）</span>
+      </div>
+      <div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);"></div>
+    </div>
+
+    <div id="unlistedPanel"></div>
   </section>
 
   <!-- ============ 逻辑详解（管理员） ============ -->
@@ -4728,6 +4728,8 @@ function switchSec(sec,el){
     try{ window.opSwitchTab(1); }catch(e){}
   }
   if(sec==='op' && typeof window.__renderOps==='function') setTimeout(window.__renderOps,60);
+  // 暂未上架：进入时渲染实验区（renderUnlisted 内部有 rendered 防重；2026-08-07 一级 Tab）
+  if(sec==='ul' && typeof window.renderUnlisted==='function') setTimeout(window.renderUnlisted,60);
   // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
   if(sec==='ph' && typeof window._renderSecPh==='function') setTimeout(window._renderSecPh,80);
   if(sec==='st' && typeof window._renderSecSt==='function') setTimeout(window._renderSecSt,80);
@@ -8596,12 +8598,24 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(!el || el.dataset.rendered==='1') return;
     el.dataset.rendered='1';
     try{
+    // 填充「今日判定 · 环境态势」卡（理论段 HTML 在页面解析时已缓存到 window.__judgmentEnvHTML_cache）
+    try{ var opBody=document.getElementById('judgmentBodyOp'); if(opBody && window.__judgmentEnvHTML_cache) opBody.innerHTML=window.__judgmentEnvHTML_cache; }catch(e){}
     var h='';
-    // 2026-08-06 23:34 主人反馈"暂未上架里还显示四量终极"——老 build 缓存问题
-    // 加 build 时间戳让主人一眼判断是不是最新 build
+    // 2026-08-07 升级为一级 Tab：保留 render 时刻提示，用于判断浏览器是否加载最新构建
     h+='<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:6px;padding:6px 10px;margin-bottom:12px;font-size:11px;color:var(--sub);">';
-    h+='🔄 当前 render 时刻：<b>'+new Date().toISOString().replace("T"," ").slice(0,19)+' UTC</b> · master HEAD = <b>e614a55</b> · 如果你看到「🔥 四量终极」卡说明浏览器在加载<b>老 build 缓存</b>，按 <b>Ctrl+F5</b> 强制刷新';
+    h+='🔄 当前 render 时刻：<b>'+new Date().toISOString().replace("T"," ").slice(0,19)+' UTC</b> · 若内容疑似旧构建请按 <b>Ctrl+F5</b> 强制刷新';
     h+='</div>';
+
+    // 🎯 今日判定 · 可入手候选（2026-08-07 主人令：从今日事件页移入实验区，与 🧭 决策四步配对）
+    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">';
+    var _judgeData = window.JUDGMENT_DATA || {};
+    h+=v8CardHeader('🎯','今日判定 · 可入手候选','实际股票代入（实验组 · 已从今日事件页移入）','update_time',
+      {update_time:_judgeData.update_time, slot:'盘前', horizon:'短线'}, !_judgeData.update_time);
+    h+='<div style="padding:12px 14px;">';
+    h+=(typeof window.__judgmentCandidatesHTML === 'function')
+      ? window.__judgmentCandidatesHTML()
+      : '<div style="color:var(--dim)">候选数据加载中…</div>';
+    h+='</div></div>';
 
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #7b1fa2;">';
     h+=v8CardHeader('🧪','实验选股调试专区','管理员可见：三重起涨 / CRDS逆势 / 候选池，验证中请勿依赖','update_time',window.SH_FIB);
@@ -8724,6 +8738,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     // === 暂未上架 v8.5 实验（主人 2026-08-06 22:39 令·选 A+B 先行） ===
     var planned = [
+      {icon:'🧭', title:'决策四步 + 三不原则（参考）', color:'#94a3b8',
+        sub:'操作纪律参考卡（与 🎯 今日判定配对 · 2026-08-07 迁入暂未上架实验区）',
+        cur:'今日判定卡原展示：理论规则文字，实际无可买股票',
+        plan:'主人令「今日判定里不要理论，要实际可买股票」。本卡保留为<b>决策参考</b>（不实施买入），未来升级为单卡工具：4 步决策 + 5 条铁律 + 交互式检查清单（输入环境状态自动给"该不该买"答案）。当前内容：<br>· <b>决策四步</b>：①环境择时（今日事件日历+危机 ≤50）/②选股（按可信度 5 算法排序）/③出手确认（信号+绿灯+大盘）/④持仓风控（止损/止盈/分批）<br>· <b>三不原则</b>：危机≥70 空仓 / 大盘-1.5% 只逆势龙头 / 盈亏比<1.5 不介入 / 单票≤20% / 事件标红不开新仓',
+        data:null, dataName:'无（参考卡，无数据源）'},
       {icon:'🎭', title:'情绪周期', color:'#38bdf8',
         sub:'情绪因子+情绪日报（v8.5 方案 A）',
         cur:'已有预警/危机雷达 + 涨停热力 + ETF 申赎 + 龙虎榜（机构/游资活跃度）',
@@ -8740,11 +8759,6 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         cur:'只有涨停热力 heatmap',
         plan:'v8.6+ 立项。可加「连板梯队」视图（LIMIT_UP_HEATMAP 数据已有，缺展示）',
         data:window.LIMIT_UP_HEATMAP, dataName:'LIMIT_UP_HEATMAP'},
-      {icon:'🧭', title:'决策四步 + 三不原则（参考）', color:'#94a3b8',
-        sub:'操作纪律参考卡（已从今日判定移出）',
-        cur:'今日判定卡原展示：理论规则文字，实际无可买股票',
-        plan:'主人令「今日判定里不要理论，要实际可买股票」。本卡保留为<b>决策参考</b>（不实施买入），未来升级为单卡工具：4 步决策 + 5 条铁律 + 交互式检查清单（输入环境状态自动给"该不该买"答案）。当前内容：<br>· <b>决策四步</b>：①环境择时（今日事件日历+危机 ≤50）/②选股（按可信度 5 算法排序）/③出手确认（信号+绿灯+大盘）/④持仓风控（止损/止盈/分批）<br>· <b>三不原则</b>：危机≥70 空仓 / 大盘-1.5% 只逆势龙头 / 盈亏比<1.5 不介入 / 单票≤20% / 事件标红不开新仓',
-        data:null, dataName:'无（参考卡，无数据源）'},
       {icon:'🔄', title:'板块周期', color:'#a78bfa',
         sub:'板块处于 启动/主升/退潮 哪一阶段（v8.6+ 后续）',
         cur:'只有资金流+RS 强度',
