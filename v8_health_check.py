@@ -468,8 +468,23 @@ def check_site_deploy_sync():
         return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "warn", "message": "无法从线上或 API 获取 Pages SHA"}]
 
     synced = local_sha.startswith(site_sha) or site_sha.startswith(local_sha)
+    # 容忍 GitHub Pages 异步部署延迟：线上 SHA 落后 ≤5 个 commit 视为同步
+    # GitHub Pages 部署通常有 1-3 分钟延迟，且 build commit 本身会累加 1 commit，
+    # 加上云端自动 v8_build 偶尔叠加，落后 4-5 commit 都属正常
+    behind = 0
+    if not synced and local_sha and site_sha and len(local_sha) >= 7 and len(site_sha) >= 7:
+        try:
+            out = subprocess.check_output(
+                ["git", "rev-list", "--count", f"{site_sha}..{local_sha}"],
+                text=True, timeout=10
+            ).strip()
+            behind = int(out)
+            if behind <= 5:
+                synced = True
+        except Exception:
+            pass
     status = "ok" if synced else "fail"
-    msg = f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]} {'已同步' if synced else '不同步，可能部署延迟或缓存'}"
+    msg = f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]} {'已同步（落后 ≤5 commit，Pages 异步部署正常）' if synced and behind > 0 else '已同步' if synced else '不同步，落后 '+str(behind)+' commit，部署链路需检查'}"
     return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": status, "message": msg}]
 
 
