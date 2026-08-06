@@ -1,1 +1,1 @@
-window.TRIPLE_CONSENSUS = {"update_time":"2026-08-06 14:43:44","data_time":"2026-08-05 15:57:15","count":0,"near_miss_count":0,"criteria":"主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)）· 驾驶舱A档 · 基本面A档","near_miss_criteria":"以上三条满足任意两条（驾驶舱A/B档均计入）","stocks":[],"near_miss":[]};
+window.TRIPLE_CONSENSUS = {"update_time":"2026-08-06 15:24:51","data_time":"2026-08-05 15:57:15","count":0,"near_miss_count":0,"criteria":"主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)）· 驾驶舱A档 · 基本面A档","near_miss_criteria":"以上三条满足任意两条（驾驶舱A/B档均计入）","stocks":[],"near_miss":[]};
