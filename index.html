@@ -8302,6 +8302,41 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     }
     h+='</div>';
 
+    // === 4 个待开发卡片（用户 2026-08-06 令·KMO-STOCK-AI 可借鉴项·放暂未上架） ===
+    var planned = [
+      {icon:'🏔️', title:'连板天梯', color:'#ff7043',
+        sub:'首板/连板/炸板分层梯队',
+        cur:'只有涨停热力 heatmap',
+        plan:'可加「连板梯队」视图（LIMIT_UP_HEATMAP 数据已有，缺展示）',
+        data:window.LIMIT_UP_HEATMAP, dataName:'LIMIT_UP_HEATMAP'},
+      {icon:'🔄', title:'板块周期', color:'#a78bfa',
+        sub:'板块处于 启动/主升/退潮 哪一阶段',
+        cur:'只有资金流+RS 强度',
+        plan:'给 SECTOR_RS 加"周期定位"标签（可做）',
+        data:window.SECTOR_RS, dataName:'SECTOR_RS'},
+      {icon:'📊', title:'情绪周期', color:'#38bdf8',
+        sub:'情绪因子+情绪日报',
+        cur:'有预警/危机雷达',
+        plan:'把 CRISIS_DATA 包装成"情绪周期"可视化',
+        data:window.CRISIS_DATA, dataName:'CRISIS_DATA'},
+      {icon:'🕸️', title:'AI 热点图谱', color:'#f59e0b',
+        sub:'题材图谱网络图',
+        cur:'概念排名列表',
+        plan:'概念热度可加图谱/力导向图（轻量）',
+        data:window.CONCEPT_RANKING, dataName:'CONCEPT_RANKING'}
+    ];
+    planned.forEach(function(p){
+      var has = !!(p.data && (p.data.items||p.data.data||p.data.update_time));
+      h+='<div class="card" style="margin-bottom:16px;border-left:4px solid '+p.color+';opacity:0.85;">';
+      h+=v8CardHeader(p.icon, p.title+' <span style="font-size:11px;color:#94a3b8;font-weight:400;">(计划中)</span>', p.plan, 'update_time', {update_time:''}, !has);
+      h+='<div style="padding:10px 14px;font-size:11px;color:var(--sub);line-height:1.6;">';
+      h+='<div style="margin-bottom:4px;"><b style="color:var(--txt)">目标:</b> '+p.sub+'</div>';
+      h+='<div style="margin-bottom:4px;"><b style="color:#94a3b8">现状:</b> '+p.cur+'</div>';
+      h+='<div style="margin-bottom:4px;"><b style="color:'+p.color+'">计划:</b> '+p.plan+'</div>';
+      h+='<div style="color:var(--dim);font-size:10px;margin-top:6px;">📦 数据源 '+p.dataName+(has?' 已就绪':' 未填充')+'</div>';
+      h+='</div></div>';
+    });
+
     el.innerHTML=h;
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderUnlisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
   }
