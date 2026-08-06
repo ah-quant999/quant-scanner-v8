@@ -430,7 +430,7 @@ html>
 <script src="data/CFFEX_HOLDINGS.js?v=20260807002043"></script>
 <script src="data/IPO_DATA.js?v=20260807002044"></script>
     <script src="data/CRISIS_DATA.js?v=20260807002043"></script>
-    <script src="data/JUDGMENT_DATA.js?v=20260807002044"></script>
+    <script src="data/JUDGMENT_DATA.js?v=20260807065728"></script>
     <script>
 window.V8_CAL = {weeks:[],legend:[]};
 /* ===== 2026 A股交易日历（每年需更新） ===== */
@@ -638,10 +638,33 @@ window.__judgmentCandidatesHTML = __judgmentCandidatesHTML;
 function _buildJudgmentEnvHTML(d){
   if(!d) return '<div style="color:var(--dim);padding:12px;text-align:center">环境态势数据加载中（盘前 08:25 自动生成）…</div>';
   var h = '';
-  // 1) 美股 + 结论 + 预警（置顶）
-  if(d.us || d.verdict || d.warning){
+  // 0) 时事滚动（macro_brief 优先，避免整张卡看起来像固定模板）
+  var mb = d.macro_brief || {};
+  var news = mb.news_brief || [];
+  if(mb.headline || news.length){
+    h += '<div style="margin-bottom:12px;padding:10px 12px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.22);border-radius:10px;font-size:13px;line-height:1.7">';
+    if(mb.headline){
+      h += '<div style="font-size:12px;font-weight:700;color:#38bdf8;margin-bottom:5px">🌐 时事滚动 · '+mb.headline+'</div>';
+    }
+    if(news.length){
+      h += '<div style="display:flex;flex-direction:column;gap:4px">';
+      news.slice(0,3).forEach(function(n){
+        var tag = n.tag || '宏观';
+        var text = n.text || '';
+        h += '<div style="font-size:11px;color:var(--sub);line-height:1.55"><span style="color:#38bdf8;font-weight:700">'+tag+'</span> '+text+'</div>';
+      });
+      h += '</div>';
+    }
+    if(mb.a_impact){
+      h += '<div style="margin-top:6px;padding:5px 8px;background:rgba(0,0,0,0.12);border-radius:5px;font-size:11px;color:var(--txt)"><b>对A股影响：</b>'+mb.a_impact+'</div>';
+    }
+    h += '</div>';
+  }
+  // 1) 美股/宏观 + 结论 + 预警（置顶）；过滤掉旧的固定死文案
+  var usFixed = !d.us || /美股隔夜数据获取中|盘前研判以A股结构为主/.test(d.us);
+  if((d.us && !usFixed) || d.verdict || d.warning){
     h += '<div style="margin-bottom:12px;padding:10px 12px;background:linear-gradient(135deg,rgba(56,189,248,0.08),rgba(167,139,250,0.06));border:1px solid var(--border2);border-radius:10px;font-size:14px;line-height:1.7">';
-    if(d.us) h += '<p style="margin:3px 0"><b style="color:var(--sub)">美股：</b><span style="color:var(--up)">'+d.us+'</span></p>';
+    if(d.us && !usFixed) h += '<p style="margin:3px 0"><b style="color:var(--sub)">美股：</b><span style="color:var(--up)">'+d.us+'</span></p>';
     if(d.verdict) h += '<p style="margin:3px 0"><b style="color:var(--sub)">→ 结论：</b>'+d.verdict+'</p>';
     if(d.warning) h += '<p style="margin:3px 0;color:#f59e0b">⚠️ '+d.warning+'</p>';
     h += '</div>';
@@ -698,6 +721,8 @@ function _buildJudgmentEnvHTML(d){
     });
     h += '</div>';
   }
+  // 6) 数据来源 footer
+  h += '<div style="margin-top:8px;font-size:10px;color:var(--dim);text-align:right">基于当日指数/危机雷达/宏观数据自动生成 · 盘前 08:25 刷新</div>';
   return h || '<div style="color:var(--dim);padding:10px">今日暂无环境态势数据</div>';
 }
 window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
@@ -723,7 +748,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_SZ_HISTORY.js?v=20260807002044"></script>
 <script src="data/MAHORO.js?v=20260807002044"></script>
 <script src="data/CANDIDATE.js?v=20260807002043"></script>
-<script src="data/FOUR_VOLUME.js?v=20260807002039"></script>
+<script src="data/FOUR_VOLUME.js?v=20260806233350"></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=20260807002043"></script>
 <script src="data/COCKPIT_BACKTEST.js?v=20260807002043"></script>
 <script src="data/BACKTEST_TDX.js?v=20260807002043"></script>
@@ -736,7 +761,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CANDIDATE_QUOTES.js?v=20260807002043"></script>
 <script src="data/RISK_GAUGE.js?v=20260807002044"></script>
 <script src="data/RUNNER_STATUS.js?v=20260807002044"></script>
-<script src="data/HEALTH_CHECK.js?v=20260807002044"></script>
+<script src="data/HEALTH_CHECK.js?v=20260807063103"></script>
 </head>
 <body>
 

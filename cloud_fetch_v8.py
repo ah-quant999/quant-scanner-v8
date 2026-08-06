@@ -430,13 +430,19 @@ def f_judgment():
     else:
         market = "震荡分化（指数控盘方向不一）"
 
-    us = _fetch_us_overnight()
-    us_str = us if us else "美股隔夜数据获取中（盘前研判以 A 股结构为主）"
-
-    # ---- 读取同一次 premarket 已生成的 情绪面/宏观面 数据源 ----
+    # ---- 读取同一次 premarket 已生成的 情绪面/宏观面/宏观解读 数据源 ----
     crisis = _load_judgment_raw("CRISIS_DATA", "crisis_data.json")
     macro = _load_judgment_raw("MACRO_DATA", "macro_data.json")
     sff = _load_judgment_raw("SECTOR_FUND_FLOW", "sector_fund_flow.json")
+    mb = _load_judgment_raw("MACRO_BRIEF", "macro_brief.json")
+
+    us = _fetch_us_overnight()
+    if us:
+        us_str = us
+    else:
+        # 美股接口失败时，用宏观解读 headline 滚动替代，避免固定死文案
+        mb_headline = mb.get("headline", "")
+        us_str = f"外围宏观：{mb_headline}" if mb_headline else ""
 
     cs = crisis.get("score", crisis.get("crisis_score", 0)) or 0
     gm = macro.get("global_macro", {})
@@ -500,6 +506,11 @@ def f_judgment():
         "analysts": analysts,
         "consensus": consensus,
         "danger_signals": danger_signals,
+        "macro_brief": {
+            "headline": mb.get("headline", ""),
+            "news_brief": (mb.get("news_brief") or [])[:3],
+            "a_impact": mb.get("a_impact", ""),
+        },
         "update_time": now.strftime("%Y-%m-%d %H:%M:%S"),
         "auto": True,
     }
@@ -724,8 +735,8 @@ def f_macro_brief():
     }
 
 
-def _fetch_us_overnight():
-    """美股隔夜三大指数表现（最佳努力，失败返回空串）。"""
+def _fetch_us_overnight_em():
+    """美股隔夜三大指数表现（东方财富延迟镜像）。"""
     try:
         r = _requests.get(
             f"{_EM_DELAY}/api/qt/ulist.np/get",
@@ -746,6 +757,81 @@ def _fetch_us_overnight():
         return ("涨" if all_up else "跌") + "（" + "/".join(parts) + "）"
     except Exception:
         return ""
+
+
+def _fetch_us_overnight_yahoo():
+    """美股隔夜三大指数表现（Yahoo Finance 备用，适合海外 runner）。"""
+    try:
+        symbols = [("^GSPC", "标普500"), ("^IXIC", "纳斯达克"), ("^DJI", "道琼斯")]
+        parts = []
+        all_up = True
+        for sym, name in symbols:
+            r = _requests.get(
+                f"https://query1.finance.yahoo.com/v8/finance/chart/{sym}",
+                params={"interval": "1d", "range": "5d"},
+                headers={"User-Agent": "Mozilla/5.0"},
+                timeout=15,
+            )
+            j = r.json()
+            result = (j.get("chart", {}).get("result") or [None])[0]
+            if not result:
+                continue
+            meta = result.get("meta", {})
+            prev_close = meta.get("previousClose") or meta.get("chartPreviousClose")
+            closes = (result.get("indicators", {}).get("quote", [{}])[0].get("close") or [])
+            last_close = None
+            for c in reversed(closes):
+                if c is not None:
+                    last_close = c
+                    break
+            if not prev_close or not last_close:
+                continue
+            chg = (last_close - prev_close) / prev_close * 100
+            if chg < 0:
+                all_up = False
+            parts.append(f"{name}{chg:+.1f}%")
+        if parts:
+            return ("涨" if all_up else "跌") + "（" + "/".join(parts) + "）"
+    except Exception:
+        pass
+    return ""
+
+
+def _fetch_us_overnight_akshare():
+    """美股隔夜三大指数表现（akshare 新浪历史 K 线，中国网络最稳）。"""
+    try:
+        ak = get_ak()
+        mapping = [(".INX", "标普500"), (".IXIC", "纳斯达克"), (".DJI", "道琼斯")]
+        parts = []
+        all_up = True
+        for symbol, name in mapping:
+            df = ak.index_us_stock_sina(symbol=symbol)
+            if df is None or df.empty or len(df) < 2:
+                continue
+            prev = float(df.iloc[-2]["close"])
+            last = float(df.iloc[-1]["close"])
+            if not prev or not last:
+                continue
+            chg = (last - prev) / prev * 100
+            if chg < 0:
+                all_up = False
+            parts.append(f"{name}{chg:+.1f}%")
+        if parts:
+            return ("涨" if all_up else "跌") + "（" + "/".join(parts) + "）"
+    except Exception:
+        pass
+    return ""
+
+
+def _fetch_us_overnight():
+    """美股隔夜三大指数表现（EM 主 + akshare 备 + Yahoo 海外备）。"""
+    us = _fetch_us_overnight_em()
+    if us:
+        return us
+    us = _fetch_us_overnight_akshare()
+    if us:
+        return us
+    return _fetch_us_overnight_yahoo()
 
 
 def run(label, fn, retries=2):
