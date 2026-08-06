@@ -988,9 +988,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         var strats=d.strategies||[];
         if(strats.length){
           var sclr=colorMap.gold;
-          h+='<div style="padding:10px 18px;background:'+sclr.bg+';font-size:13px;line-height:1.7;color:var(--txt);">';
-          h+='<span style="padding:2px 8px;border-radius:4px;background:'+sclr.tag+';color:'+sclr.c+';margin-right:6px;">🎯 操作建议</span>';
-          h+=strats.join(' &nbsp;|&nbsp; ');
+          h+='<div style="padding:12px 16px;background:'+sclr.bg+';font-size:14px;line-height:1.7;color:var(--txt);">';
+          h+='<span style="padding:3px 9px;border-radius:4px;background:'+sclr.tag+';color:'+sclr.c+';margin-right:8px;font-weight:700;">🎯 操作建议</span>';
+          h+='<span style="color:var(--txt);">'+strats.join(' &nbsp;|&nbsp; ')+'</span>';
           h+='</div>';
         }
 
@@ -2546,21 +2546,21 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       .cal-nav-btn{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;border:1px solid var(--border);background:var(--bg2);color:var(--sub);font-size:11px;cursor:pointer;transition:.15s;user-select:none}
       .cal-nav-btn:hover{border-color:#38bdf8;color:#38bdf8;box-shadow:0 0 0 1px rgba(56,189,248,.3)}
       .cal-nav-btn:active{transform:scale(.94)}
-      .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px;overflow:hidden}
+      .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:8px;overflow:hidden}
       .cal-head{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px}
-      .cal-head span{text-align:center;font-size:11px;font-weight:700;color:var(--dim);padding:6px 0}
+      .cal-head span{text-align:center;font-size:12px;font-weight:700;color:var(--dim);padding:4px 0}
       .cal-head span.weekend{color:var(--gold)}
-      .cal-cell{min-height:158px;border:1px solid var(--border);border-radius:8px;padding:6px 7px;cursor:pointer;transition:.15s;display:flex;flex-direction:column;position:relative;overflow:hidden;background:var(--bg2);font-size:10px;line-height:1.4}
+      .cal-cell{min-height:90px;border:1px solid var(--border);border-radius:6px;padding:4px 5px;cursor:pointer;transition:.15s;display:flex;flex-direction:column;position:relative;overflow:hidden;background:var(--bg2);font-size:11px;line-height:1.25}
       .cal-cell:hover{border-color:#38bdf8;box-shadow:0 0 0 1px rgba(56,189,248,.3);z-index:2}
       .cal-cell.today{border-color:#38bdf8;border-width:2px;background:rgba(56,189,248,.08)}
-      .cal-cell.empty{background:transparent;border-color:transparent;cursor:default;min-height:24px}
+      .cal-cell.empty{background:transparent;border-color:transparent;cursor:default;min-height:20px}
       .cal-cell.empty:hover{border-color:transparent;box-shadow:none}
-      .cal-date-num{font-size:13px;font-weight:700;color:var(--sub);margin-bottom:1px;display:flex;justify-content:space-between;align-items:baseline}
-      .cal-date-num .dow{font-size:9px;font-weight:500;color:var(--dim)}
+      .cal-date-num{font-size:15px;font-weight:700;color:var(--sub);margin-bottom:2px;display:flex;justify-content:space-between;align-items:baseline}
+      .cal-date-num .dow{font-size:10px;font-weight:500;color:var(--dim)}
       .cal-cell.today .cal-date-num{color:#38bdf8}
       .cal-cell.has-data .cal-date-num{color:var(--txt)}
-      .cal-net{font-size:11px;font-weight:700;line-height:1.3}
-      .cal-sub{font-size:9px;color:var(--dim);margin-top:1px;line-height:1.3}
+      .cal-net{font-size:13px;font-weight:700;line-height:1.3}
+      .cal-sub{font-size:11px;color:var(--dim);margin-top:1px;line-height:1.3}
       .c-up{color:var(--up)} .c-down{color:var(--down)} .c-gold{color:var(--gold)} .c-purple{color:var(--purple)}
       /* 当日龙虎榜详情（参照参考页：每个交易日完整 TOP5 列表） */
       .jy-week{margin-top:14px}
@@ -2886,12 +2886,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         // 预览股名（仅机游共振）——2026-08-06 主人令：大格子只写"共振的 N 只+净流入"，其他股不显示
         var previewName = '';
         // 大格子内容精简：日期+星期 / 净流入 / ★共振 N 只名单
-        h += '<div class="cal-stat" style="flex:1;display:flex;flex-direction:column;gap:3px;padding-top:1px;min-height:0">';
+        h += '<div class="cal-stat" style="flex:1;display:flex;flex-direction:column;gap:2px;padding-top:1px;min-height:0">';
         // 1) 净流入
-        h += '<div class="cal-net ' + netColor + '" style="display:flex;align-items:baseline;gap:3px">净流入 <b style="font-size:13px">' + (dayNet>=0?'+':'') + netYi + '</b><span style="font-size:9px;opacity:0.7">亿</span></div>';
+        h += '<div class="cal-net ' + netColor + '" style="display:flex;align-items:baseline;gap:3px">净流入 <b style="font-size:14px">' + (dayNet>=0?'+':'') + netYi + '</b><span style="font-size:10px;opacity:0.7">亿</span></div>';
         // 2) ★ 共振 N 只名单（全部列出，机构独买/游资独买不显示在格子里——其他股主人不要）
         if(jyArr.length > 0){
-          h += '<div class="cal-sub" style="line-height:1.3;max-height:48px;overflow:hidden"><span style="color:#a78bfa;font-weight:700">★</span> 共振 <b style="color:#a78bfa">' + jyArr.length + '</b> · ';
+          h += '<div class="cal-sub" style="line-height:1.3;max-height:36px;overflow:hidden"><span style="color:#a78bfa;font-weight:700">★</span> 共振 <b style="color:#a78bfa">' + jyArr.length + '</b> · ';
           var names = jyArr.map(function(s){return s.name||'';}).join(' · ');
           h += names;
           h += '</div>';
@@ -3319,9 +3319,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         var nNet = 0;
         _dayNb.forEach(function(s){ nNet += (((s.seats['北向'].buy||0) - (s.seats['北向'].sell||0))); });
         var nColor = nNet >= 0 ? 'c-up' : 'c-down';
-        h += '<div class="cal-stat" style="text-align:center;padding:3px 2px">';
-        h += '<div style="color:#f59e0b;font-weight:700;font-size:10px">🌊北向 ' + _dayNb.length + '</div>';
-        h += '<div class="' + nColor + '" style="font-size:9px;font-weight:600">' + _rcFmtYi(nNet) + '</div>';
+        h += '<div class="cal-stat" style="text-align:center;padding:2px 1px">';
+        h += '<div style="color:#f59e0b;font-weight:700;font-size:12px">🌊北向 ' + _dayNb.length + '</div>';
+        h += '<div class="' + nColor + '" style="font-size:11px;font-weight:600">' + _rcFmtYi(nNet) + '</div>';
         h += '</div>';
       } else {
         var dow = new Date(year, month, d).getDay();
@@ -5067,14 +5067,14 @@ function switchSec(sec,el){
     h+='<span style="font-size:11px;color:var(--dim);margin-left:auto;">建议：'+ (riskReward>=2?'🟢 优秀，可介入':riskReward>=1.5?'🟡 一般，控制仓位':'🔴 较差，观望')+'</span>';
     h+='</div>';
     // 操作提示
-    h+='<div style="margin-top:8px;font-size:10px;color:var(--dim);line-height:1.6;padding-top:8px;border-top:1px dashed rgba(255,255,255,.06);">';
-    h+='💡 <b style="color:var(--sub)">操作建议</b>：';
-    h+='当前价 <b>¥'+price.toFixed(2)+'</b> 距止损 <b style="color:var(--up)">'+fmtP(stopLoss)+'</b> 缓冲 <b>'+expLoss.toFixed(1)+'%</b>；';
-    h+='到短线目标 <b style="color:var(--gold)">'+fmtP(target1)+'</b> 预期 <b>+'+expGain1.toFixed(1)+'%</b>；';
-    if(q.pct>=5) h+='<br>🔥 <b>当日已涨 '+q.pct.toFixed(2)+'%</b>，追高谨慎，建议等回踩均线介入；';
-    else if(q.pct<=-5) h+='<br>⚠️ <b>当日已跌 '+q.pct.toFixed(2)+'%</b>，距止损较近，警惕破位；';
-    else h+='<br>当前价位 <b>中性</b>（当日涨跌 <b>'+q.pct.toFixed(2)+'%</b>），可参考分批建仓；';
-    h+='<br>⚠️ 短线/中线/强势目标对应不同持有期（建议 5/15/30 日），非固定止损；';
+    h+='<div style="margin-top:10px;font-size:13px;color:var(--txt);line-height:1.7;padding:10px 12px;background:rgba(255,255,255,.04);border-radius:6px;">';
+    h+='<div style="font-weight:700;color:var(--sub);margin-bottom:4px;">💡 操作建议</div>';
+    h+='<div>当前价 <b>¥'+price.toFixed(2)+'</b> 距止损 <b style="color:var(--up)">'+fmtP(stopLoss)+'</b> 缓冲 <b>'+expLoss.toFixed(1)+'%</b>；';
+    h+='到短线目标 <b style="color:var(--gold)">'+fmtP(target1)+'</b> 预期 <b>+'+expGain1.toFixed(1)+'%</b>。</div>';
+    if(q.pct>=5) h+='<div style="margin-top:4px;color:#f59e0b;">🔥 <b>当日已涨 '+q.pct.toFixed(2)+'%</b>，追高谨慎，建议等回踩均线介入。</div>';
+    else if(q.pct<=-5) h+='<div style="margin-top:4px;color:#f59e0b;">⚠️ <b>当日已跌 '+q.pct.toFixed(2)+'%</b>，距止损较近，警惕破位。</div>';
+    else h+='<div style="margin-top:4px;">当前价位 <b>中性</b>（当日涨跌 <b>'+q.pct.toFixed(2)+'%</b>），可参考分批建仓。</div>';
+    h+='<div style="margin-top:4px;color:var(--dim);">短线/中线/强势目标对应不同持有期（建议 5/15/30 日），非固定止损。</div>';
     h+='</div>';
     h+='</div>';
     return h;
