@@ -2200,10 +2200,10 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     <div class="st-tabs">
       <button class="st-tab" data-st="query" onclick="switchSt('query')">🔍 个股查询</button>
       <button class="st-tab active" data-st="tc" onclick="switchSt('tc')">🥇 三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span></button>
+      <button class="st-tab" data-st="fv" onclick="switchSt('fv')">🔥 四量终极 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="cockpit" onclick="switchSt('cockpit')">🎯 驾驶舱 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="allsite" onclick="switchSt('allsite')">🌐 全站精选 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
-      <button class="st-tab" data-st="fv" onclick="switchSt('fv')">🔥 四量终极 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span><span style="margin-left:4px;color:var(--gold);font-size:10px;font-weight:600;background:rgba(245,158,11,.12);padding:1px 5px;border-radius:4px">新</span></button>
-      <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="color:#94a3b8;font-size:12px;letter-spacing:1px">⭐⭐</span></button>
+      <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用</span></button>
     </div>
 
     <!-- ===== TAB 页面：个股查询 ===== -->
@@ -2270,7 +2270,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     <!-- ===== TAB 页面：三重共识（默认展示） ===== -->
     <div id="st-tc" class="st-pane active">
       <div class="card">
-        <h3><span class="ic">🥇</span>严格三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span> <span style="font-size:11px;color:var(--sub);font-weight:400">最严</span> - 盘后 · <span class="fresh" id="tcTime">—</span> <span id="tcEnteredBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;vertical-align:middle">✅ 今日已入仓 <b id="tcEnteredCount" style="margin-left:2px">0</b></span></h3>
+        <h3><span class="ic">🥇</span>严格三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span> <span style="font-size:11px;color:var(--sub);font-weight:400">最严</span> - 盘后 · <span class="fresh" id="tcTime">—</span> <span id="tcRunBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);vertical-align:middle">✅ 今日已跑完</span> <span id="tcEnteredBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;vertical-align:middle">✅ 今日已入仓 <b id="tcEnteredCount" style="margin-left:2px">0</b></span></h3>
         <div id="tcConsensus" class="tp-stocklist"></div>
         <div class="note">筛选：主站TOP10≥70 且 驾驶舱A档 且 基本面A档。下方「优先/扩展观察」为差1步/差2步备选（主站评分≥75）。</div>
       </div>
@@ -2340,8 +2340,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
           🔥 <span style="font-weight:700;font-size:14px;color:var(--txt);">四量终极</span>
           <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span>
-          <span style="color:var(--gold);font-size:10px;font-weight:600;background:rgba(245,158,11,.12);padding:1px 6px;border-radius:4px">新加入</span>
           <span id="stfvTime" class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;"><span aria-hidden="true">🐻</span><span style="margin-left:4px">更新于</span><span style="color:#9fd0ff;font-weight:600;margin-left:4px">--</span></span>
+          <span id="stfvRunBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">✅ 今日已跑完</span>
           <span id="stfvEnteredBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;">✅ 今日已入仓 <b id="stfvEnteredCount" style="margin-left:2px">0</b></span>
         </div>
         <div id="stfvNote" style="font-size:11px;color:var(--dim);margin-bottom:10px;line-height:1.6;"></div>
@@ -2380,8 +2380,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     <div id="st-crds" class="st-pane"><div class="card" id="stv8CrdsCard">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
           📊 <span style="font-weight:700;font-size:14px;color:var(--txt);">CRDS · 逆势龙头</span>
-          <span style="color:#94a3b8;font-size:13px;letter-spacing:2px;margin-left:2px;font-weight:600">⭐⭐</span>
           <span style="margin-left:6px;font-size:10px;color:#94a3b8;font-weight:500;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用</span>
+          <span id="stcrdsRunBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);vertical-align:middle">✅ 今日已跑完</span>
           <span id="stcrdsEnteredBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;vertical-align:middle">✅ 今日已入仓 <b id="stcrdsEnteredCount" style="margin-left:2px">0</b></span>
           <span id="stcrdsTime" class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;"><span aria-hidden="true">🐻</span><span style="margin-left:4px">更新</span><span style="color:#9fd0ff;font-weight:600;margin-left:4px">…</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">盘后</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">短线</span></span>
         </div>
@@ -4255,22 +4255,26 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <table class="lg-table">
           <tr><th>序</th><th>算法</th><th>一句话定义</th><th>可信度</th></tr>
           <tr><td>2</td><td>🥇 三重共识</td><td>主站TOP10精选 + 驾驶舱A档 + 基本面A档（3 重过滤）</td><td><b style="color:#fbbf24">⭐⭐⭐⭐⭐</b> 最严</td></tr>
-          <tr><td>3</td><td>🎯 驾驶舱</td><td>A/B/C/D 成熟分级筛选</td><td><b style="color:#fbbf24">⭐⭐⭐⭐</b></td></tr>
-          <tr><td>4</td><td>🌐 全站精选</td><td>主板+创业+科创前100 + 港股前50 + 观澜 + maharo（多信号融合）</td><td><b style="color:#fbbf24">⭐⭐⭐</b></td></tr>
-          <tr><td>5</td><td>🔥 四量终极</td><td>游资点火+机构托底+当天金叉+四路翻多（4 重共振 + 3 年回测）</td><td><b style="color:#fbbf24">⭐⭐⭐⭐</b> <span style="color:var(--gold);font-size:10px;background:rgba(245,158,11,.12);padding:1px 5px;border-radius:4px">新加入</span></td></tr>
-          <tr><td>6</td><td>📊 逆势龙头</td><td>CRDS（弱市专用）</td><td><b style="color:#94a3b8">⭐⭐</b> 专用场景</td></tr>
+          <tr><td>3</td><td>🔥 四量终极</td><td>游资点火+机构托底+当天金叉+四路翻多（4 重共振 + 3 年回测）</td><td><b style="color:#fbbf24">⭐⭐⭐⭐</b></td></tr>
+          <tr><td>4</td><td>🎯 驾驶舱</td><td>A/B/C/D 成熟分级筛选</td><td><b style="color:#fbbf24">⭐⭐⭐⭐</b></td></tr>
+          <tr><td>5</td><td>🌐 全站精选</td><td>主板+创业+科创前100 + 港股前50 + 观澜 + maharo（多信号融合）</td><td><b style="color:#fbbf24">⭐⭐⭐</b></td></tr>
+          <tr><td>6</td><td>📊 逆势龙头</td><td>CRDS（弱市专用）</td><td><span style="font-size:10px;color:#94a3b8;font-weight:500;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用</span></td></tr>
         </table>
 
         <div class="logic-h">排序逻辑</div>
         <ul style="margin:6px 0 0 18px;font-size:13px;line-height:1.85;color:var(--txt);">
           <li><b>三重共识最可信</b>是因为它有 <b>3 个独立维度</b>（主站评分/驾驶舱分级/基本面质量）<b>一致才入选</b>，命中即高质量。</li>
+          <li><b>四量终极</b> 4 重共振 + 3 年回测验证，信号明确，排在驾驶舱前面因为<b>命中即四条件齐发</b>，回测稳健。</li>
           <li><b>驾驶舱</b>有 A/B/C/D 多档分级，可按风险偏好选。</li>
           <li><b>全站精选</b>是综合池，机会多但单信号强度弱。</li>
-          <li><b>四量终极</b>4 重共振 + 回测验证，信号明确。</li>
-          <li><b>逆势龙头 CRDS</b> 是<b>专用场景</b>（弱市找强势股），不通用——所以星级最低，挂在末尾。</li>
+          <li><b>逆势龙头 CRDS</b> 是<b>专用场景</b>（弱市找强势股），不通用——所以不挂星级，只标"弱市专用"挂在末尾。</li>
         </ul>
-        <div class="logic-h">「今日已入仓」标识</div>
-        <div class="logic-p">当某个算法的当日产物里有 ≥1 只入选股票时，<b>选股策略页对应 tab 卡片名旁</b>会自动出现绿色 ✅ 今日已入仓 N 胶囊；当日无入选则不显示，避免误把「算法已跑=必有结果」当成实际入选信号。</div>
+        <div class="logic-h">「今日已跑完」 vs 「今日已入仓」</div>
+        <div class="logic-p">两个标识是<b>独立维度</b>，不可混淆：<br>
+        · <b style="color:var(--sub)">今日已跑完</b>（灰色胶囊）：当算法链跑成功 + 数据 update_time 是当天 → <b>无条件显示</b>。哪怕市场差、入选=0 也会显示，证明"今天确实跑了"。<br>
+        · <b style="color:#15803d">今日已入仓 N</b>（绿色胶囊）：当算法的当日产物里有 ≥1 只入选股票才显示，N 是实际入选数。<br>
+        两者<b>可并存</b>（跑成功 + 有入选 = 两胶囊同时显示），也可仅显示"已跑完"（跑成功 + 0 入选 = 仅灰色胶囊，绝不伪造"已入仓"）。<br>
+        <b style="color:#ef5350">铁律</b>：所有数据必须及时真实准确，<b>不得造假</b>。今日 0 入选就是 0 入选，绝不显示绿色"已入仓"标骗用户。</div>
       </div>
 
       <div class="card">
@@ -7575,7 +7579,13 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     $('tcExtCount').textContent=ext.length;
     $('tcExtended').innerHTML=ext.length?ext.map(s=>renderStock(s,true,tm)).join(''):'<div class="tp-empty">暂无</div>';
     setBadge('tcTime','盘后','短线',data.update_time);
-    // 今日已入仓胶囊：严格共识 stocks > 0 才显示
+    // 「今日已跑完」灰色胶囊（无条件：data.update_time 是今天）
+    var _todayStr = new Date().toISOString().slice(0,10);
+    var _tcRun = document.getElementById('tcRunBadge');
+    if(_tcRun){
+      _tcRun.style.display = (data.update_time && String(data.update_time).slice(0,10) === _todayStr) ? 'inline-flex' : 'none';
+    }
+    // 「今日已入仓」胶囊：严格共识 stocks > 0 才显示
     var _eb=document.getElementById('tcEnteredBadge');
     var _ec=document.getElementById('tcEnteredCount');
     if(_eb&&_ec){
@@ -7758,6 +7768,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     h+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:22px;">🌐</span>';
     h+='<div style="font-size:16px;font-weight:700;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">全站精选 <span style="color:#fbbf24;font-size:13px;letter-spacing:1px">⭐⭐⭐</span>';
     if(genTime) h+=_uBadge('盘后', '中线', genTime);
+    // 「今日已跑完」灰色胶囊（无条件显示，只要 update_time 是当天）
+    var _today = new Date().toISOString().slice(0,10);
+    if(genTime && String(genTime).slice(0,10) === _today){
+      h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">✅ 今日已跑完</span>';
+    }
     // 今日已入仓胶囊：A+B 总入选数 > 0 才显示
     if(total>0){
       h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;">✅ 今日已入仓 <b style="margin-left:2px">'+total+'</b></span>';
@@ -7876,6 +7891,10 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     h+='<div style="background:linear-gradient(135deg,#13243f,#0e2747);color:#cfe3ff;border:1px solid #244066;border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">';
     h+='<span style="font-size:22px;">🎯</span><div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:700;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">选股驾驶舱 <span style="color:#fbbf24;font-size:13px;letter-spacing:1px">⭐⭐⭐⭐</span>';
     if(cockpitTs) h+=_uBadge('盘后','短线',cockpitTs);
+    // 「今日已跑完」灰色胶囊（无条件显示，只看数据是否当天落地）
+    var _cockpitData = window.COCKPIT_TIER_RECOMMEND || {};
+    var _cockpitFresh = (cockpitTs && String(_cockpitData.update_time || cockpitTs).slice(0,10) === new Date().toISOString().slice(0,10));
+    if(_cockpitFresh) h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">✅ 今日已跑完</span>';
     // 今日已入仓胶囊：tier_a + tier_b 任意 > 0 才显示
     var _cta=(DATA.cockpit_tier&&DATA.cockpit_tier.tier_a)||[];
     var _ctb=(DATA.cockpit_tier&&DATA.cockpit_tier.tier_b)||[];
@@ -9116,7 +9135,13 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var elite=d.elite||[],adv=d.advanced||[];
     document.getElementById(p+'crdsEliteCnt').textContent=elite.length;
     document.getElementById(p+'crdsAdvCnt').textContent=adv.length;
-    // 今日已入仓胶囊：elite + advanced > 0 才显示
+    // 「今日已跑完」灰色胶囊（无条件：d.update_time 是今天）
+    var _todayStr3 = new Date().toISOString().slice(0,10);
+    var _crdsRun = document.getElementById(p+'crdsRunBadge');
+    if(_crdsRun){
+      _crdsRun.style.display = (d.update_time && String(d.update_time).slice(0,10) === _todayStr3) ? 'inline-flex' : 'none';
+    }
+    // 「今日已入仓」胶囊：elite + advanced > 0 才显示
     (function(){
       var _eb=document.getElementById(p+'crdsEnteredBadge');
       var _ec=document.getElementById(p+'crdsEnteredCount');
@@ -9223,7 +9248,13 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var four = stocks.filter(function(s){ return s.four; }).length;
     function set(id,v){ var e=document.getElementById(id); if(e) e.textContent = v; }
     set('stfvQD', qd); set('stfvYZC', yzc); set('stfvJG', jg); set('stfvXC', xc); set('stfvFOUR', four);
-    // 今日已入仓胶囊：QD 共振 > 0 才显示
+    // 「今日已跑完」灰色胶囊（无条件：d.update_time 是今天）
+    var _todayStr2 = new Date().toISOString().slice(0,10);
+    var _fvRun = document.getElementById('stfvRunBadge');
+    if(_fvRun){
+      _fvRun.style.display = (d.update_time && String(d.update_time).slice(0,10) === _todayStr2) ? 'inline-flex' : 'none';
+    }
+    // 「今日已入仓」胶囊：QD 共振 > 0 才显示
     var _eb=document.getElementById('stfvEnteredBadge');
     var _ec=document.getElementById('stfvEnteredCount');
     if(_eb&&_ec){
