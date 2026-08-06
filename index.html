@@ -2202,6 +2202,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       <button class="st-tab active" data-st="tc" onclick="switchSt('tc')">🥇 三重共识</button>
       <button class="st-tab" data-st="cockpit" onclick="switchSt('cockpit')">🎯 驾驶舱</button>
       <button class="st-tab" data-st="allsite" onclick="switchSt('allsite')">🌐 全站精选</button>
+      <button class="st-tab" data-st="fv" onclick="switchSt('fv')">🔥 四量终极</button>
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头</button>
     </div>
 
@@ -2332,6 +2333,51 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
     <!-- ===== TAB 页面：全站精选 ===== -->
     <div id="st-allsite" class="st-pane"><div id="stAllsite"></div></div>
+
+    <!-- ===== TAB 页面：四量终极（2026-08-06 主人令·从暂未上架区移出·算法已跑通见人） ===== -->
+    <div id="st-fv" class="st-pane">
+      <div class="card" id="stfvCard">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+          🔥 <span style="font-weight:700;font-size:14px;color:var(--txt);">四量终极 · 选股</span>
+          <span id="stfvTime" class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;"><span aria-hidden="true">🐻</span><span style="margin-left:4px">更新</span><span style="color:#9fd0ff;font-weight:600;margin-left:4px">…</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">盘后</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">短线</span></span>
+        </div>
+        <div id="stfvNote" style="font-size:11px;color:var(--dim);margin-bottom:10px;line-height:1.6;"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:14px;">
+          <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">
+            <div style="font-size:10px;color:var(--dim);margin-bottom:4px;">🎯 QD 命中</div>
+            <div id="stfvQD" style="font-size:24px;font-weight:800;color:var(--orange);">0</div>
+            <div style="font-size:10px;color:var(--dim);">四路共振</div>
+          </div>
+          <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">
+            <div style="font-size:10px;color:var(--dim);margin-bottom:4px;">🔥 游资点火</div>
+            <div id="stfvYZC" style="font-size:24px;font-weight:800;color:var(--up);">0</div>
+            <div style="font-size:10px;color:var(--dim);">YZC 触发</div>
+          </div>
+          <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">
+            <div style="font-size:10px;color:var(--dim);margin-bottom:4px;">🏦 机构托底</div>
+            <div id="stfvJG" style="font-size:24px;font-weight:800;color:var(--cyan);">0</div>
+            <div style="font-size:10px;color:var(--dim);">JG 托底</div>
+          </div>
+          <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">
+            <div style="font-size:10px;color:var(--dim);margin-bottom:4px;">⚡ 当天金叉</div>
+            <div id="stfvXC" style="font-size:24px;font-weight:800;color:var(--gold);">0</div>
+            <div style="font-size:10px;color:var(--dim);">XC 金叉</div>
+          </div>
+          <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">
+            <div style="font-size:10px;color:var(--dim);margin-bottom:4px;">📈 四路翻多</div>
+            <div id="stfvFOUR" style="font-size:24px;font-weight:800;color:var(--purple);">0</div>
+            <div style="font-size:10px;color:var(--dim);">FOUR 信号</div>
+          </div>
+        </div>
+        <div id="stfvHits"></div>
+        <div style="margin-top:14px;padding:12px 14px;background:var(--card);border-radius:8px;border:1px solid var(--border);font-size:11px;color:var(--sub);line-height:1.7;">
+          <b>信号定义（忠实原文 2026-08-05）：</b><br>
+          <b>QD = YZC AND JG AND XC AND FOUR</b> — 游资点火（YZC = CROSS(W2,0)）+ 机构托底（JG = C>NLJ）+ 当天金叉（XC = JGC|SHC|YZC|ZLC 四金叉取或）+ 四路翻多（FOUR = JG &amp; GB1≥0 &amp; W2≥0 &amp; V6≥0）。<br>
+          回测：3 年日 K，T+1/3/5/10/20 持有收益胜率/均值（非未来函数）。<br>
+          数据源：本地双机走 mootdx/akshare；云端 GHA 走腾讯 GTimg 前复权日 K（与 scanner.fetch_a_daily 一致）。
+        </div>
+      </div>
+    </div>
 
     <!-- ===== TAB 页面：逆势龙头(CRDS) ===== -->
     <div id="st-crds" class="st-pane"><div class="card" id="stv8CrdsCard">
@@ -7514,10 +7560,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     else if(tab==='cockpit'){ if(!stRendered.cockpit){ stRendered.cockpit=1; try{ window.renderCockpit('stCockpit'); }catch(e){console.warn('驾驶舱渲染失败',e);} } }
     else if(tab==='allsite'){ if(!stRendered.allsite){ stRendered.allsite=1; try{ window.renderAllsite('stAllsite'); }catch(e){console.warn('全站精选渲染失败',e);} } }
     else if(tab==='crds'){ if(!stRendered.crds){ stRendered.crds=1; try{ window.renderV8Crds('st'); }catch(e){console.warn('逆势龙头渲染失败',e);} } }
+    else if(tab==='fv'){ renderFourVolume(); }
   }
   window.switchSt=function(n){
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
-    ['query','tc','cockpit','allsite','crds'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
+    ['query','tc','cockpit','allsite','fv','crds'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
     renderStTab(n);
   };
   function initTriple(){
@@ -8981,6 +9028,43 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   window.__renderOps=renderOps;
   window.renderCockpit=renderCockpit;
   window.renderV8Crds=renderV8Crds;
+
+  /* ===== 四量终极 · tab 渲染（2026-08-06 主人令·从暂未上架移出） ===== */
+  function renderFourVolume(){
+    var d = window.FOUR_VOLUME || {};
+    var timeEl = document.getElementById('stfvTime');
+    if(timeEl && d.update_time){
+      timeEl.innerHTML = _uBadge('盘后','短线',d.update_time);
+    }
+    var noteEl = document.getElementById('stfvNote');
+    if(noteEl) noteEl.innerHTML = '<b>📋 信号公式：</b>' + (d.note || '游资点火+机构托底+当天金叉+四路翻多');
+    var stocks = d.stocks || [];
+    var qd = stocks.filter(function(s){ return s.qd || (s.yzc && s.jg && s.xc && s.four); }).length;
+    var yzc = stocks.filter(function(s){ return s.yzc; }).length;
+    var jg = stocks.filter(function(s){ return s.jg; }).length;
+    var xc = stocks.filter(function(s){ return s.xc; }).length;
+    var four = stocks.filter(function(s){ return s.four; }).length;
+    function set(id,v){ var e=document.getElementById(id); if(e) e.textContent = v; }
+    set('stfvQD', qd); set('stfvYZC', yzc); set('stfvJG', jg); set('stfvXC', xc); set('stfvFOUR', four);
+    var hits = document.getElementById('stfvHits');
+    if(!hits) return;
+    if(!stocks.length){
+      hits.innerHTML = '<div style="padding:14px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.2);border-radius:8px;font-size:13px;color:var(--gold);text-align:center;">⚡ 四量终极信号暂未生成（盘后扫描填充）</div>';
+      return;
+    }
+    hits.innerHTML = '<h4 style="margin:14px 0 8px 0;font-size:13px;color:var(--txt);">🎯 QD 共振命中 <b style="color:var(--orange);">'+qd+'</b> 只</h4>' +
+      stocks.map(function(s){
+        var tags = [];
+        if(s.yzc) tags.push('<span style="background:rgba(239,83,80,.15);color:var(--up);padding:1px 6px;border-radius:4px;font-size:10px;">🔥 YZC</span>');
+        if(s.jg) tags.push('<span style="background:rgba(66,165,245,.15);color:var(--cyan);padding:1px 6px;border-radius:4px;font-size:10px;">🏦 JG</span>');
+        if(s.xc) tags.push('<span style="background:rgba(255,215,0,.15);color:var(--gold);padding:1px 6px;border-radius:4px;font-size:10px;">⚡ XC</span>');
+        if(s.four) tags.push('<span style="background:rgba(167,139,250,.15);color:var(--purple);padding:1px 6px;border-radius:4px;font-size:10px;">📈 FOUR</span>');
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:6px;">' +
+          '<div><b>'+(s.name||'')+'</b> <span style="color:var(--dim);font-size:11px;">'+(s.code||'')+'</span></div>' +
+          '<div style="display:flex;gap:4px;">'+tags.join('')+'</div>' +
+          '</div>';
+      }).join('');
+  }
   window.renderUnlisted=renderUnlisted;
   window.renderDelisted=renderDelisted;
 
