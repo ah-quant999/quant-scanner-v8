@@ -609,36 +609,9 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     <!-- 今日判定（数据驱动 · premarket 08:25 刷新） -->
     <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
       <h3><span class="ic">⚖️</span>今日判定 <span id="judgmentTag" style="font-size:11px;font-weight:400;color:var(--dim)">--</span></h3>
-      <!-- 决策四步（2026-08-06 主人令·与今日判定卡集成） -->
-      <div style="margin-bottom:12px;padding:10px 12px;background:linear-gradient(135deg,rgba(56,189,248,0.06),rgba(245,158,11,0.06));border:1px solid rgba(255,255,255,.12);border-radius:10px;">
-        <div style="font-size:12px;font-weight:700;color:var(--txt);margin-bottom:6px;">🧭 决策四步：先看环境，再选标的，确认出手，纪律持仓</div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:11px;">
-          <div style="padding:6px 8px;background:rgba(56,189,248,.10);border-radius:6px;border-left:3px solid var(--cyan);">
-            <div style="font-weight:700;color:var(--cyan);">① 环境择时</div>
-            <div style="color:var(--sub);margin-top:2px;">今日事件日历避开风险日 · 危机雷达 ≤50 才开新仓</div>
-          </div>
-          <div style="padding:6px 8px;background:rgba(167,139,250,.10);border-radius:6px;border-left:3px solid var(--purple);">
-            <div style="font-weight:700;color:var(--purple);">② 选股（按可信度）</div>
-            <div style="color:var(--sub);margin-top:2px;">🥇三重共识 → 🔥四量终极 → 🎯驾驶舱 → 🌐全站精选 → 📊逆势龙头(弱市)</div>
-          </div>
-          <div style="padding:6px 8px;background:rgba(94,224,160,.10);border-radius:6px;border-left:3px solid var(--up);">
-            <div style="font-weight:700;color:var(--up);">③ 出手确认</div>
-            <div style="color:var(--sub);margin-top:2px;">信号出现 + 环境绿灯 + 大盘跌 ≥1.5% 只认逆势龙头</div>
-          </div>
-          <div style="padding:6px 8px;background:rgba(255,183,77,.10);border-radius:6px;border-left:3px solid var(--gold);">
-            <div style="font-weight:700;color:var(--gold);">④ 持仓风控</div>
-            <div style="color:var(--sub);margin-top:2px;">止损 -7% 硬 · 止盈 +7%/+12%/+15% 分批 · 只浮盈加仓 · 到目标或破均减仓</div>
-          </div>
-        </div>
-      </div>
       <div id="judgmentBody" style="font-size:13px;line-height:1.8;color:var(--txt)"></div>
-      <!-- 三不原则（2026-08-06 主人令·决策四步底线铁律） -->
-      <div style="margin-top:10px;padding:8px 12px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:8px;font-size:11px;color:var(--txt);line-height:1.7;">
-        <b style="color:var(--down);">🚫 三不原则（站内工具明确口径）</b><br>
-        · <b>危机雷达 ≥70</b> → 空仓观望；50-70 → 仓位减半<br>
-        · <b>大盘单日跌 ≥1.5%</b> → 除逆势龙头外，其余策略全部观望<br>
-        · <b>盈亏比 &lt;1.5（短线止盈÷止损）</b> → 不介入；单票仓位 ≤20%；今日事件日历标红日（FOMC/CPI/交割/大解禁）→ 不开新仓
-      </div>
+      <!-- 🎯 今日可入手候选（2026-08-06 主人令·实际股票代入，决策四步/三不原则已移到暂未上架） -->
+      <div id="judgmentCandidates" style="margin-top:14px;padding:12px;background:linear-gradient(135deg,rgba(94,224,160,.08),rgba(56,189,248,.04));border:1px solid rgba(94,224,160,.25);border-radius:10px;font-size:12px;color:var(--txt);line-height:1.7;"></div>
     </div>
     <script>
     (function(){
@@ -710,6 +683,77 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       }
       // 6) 多信号扫描 — 已删除（2026-08-05 用户反馈无用：北向永久停用、VIX/雷达/板块与今日宏观重复）
       body.innerHTML = h;
+
+      // ========== 🎯 今日可入手候选（2026-08-06 主人令·实际股票代入，不是理论） ==========
+      // 优先级：🥇三重共识 > 🥈驾驶舱 A 档 > 🥉金股池 + 四量终极 > 候选池 350
+      var candBox = document.getElementById('judgmentCandidates');
+      if(!candBox) return;
+      var SQ = window.STOCK_QUOTE || {};
+      var sq = SQ.stocks || {};
+      var tier_a = (window.COCKPIT_TIER_RECOMMEND && window.COCKPIT_TIER_RECOMMEND.tier_a) || [];
+      var gp = (window.GOLD_POOL && window.GOLD_POOL.stocks) || {};
+      var tc = (window.TRIPLE_CONSENSUS && window.TRIPLE_CONSENSUS.stocks) || {};
+      var fv = (window.FOUR_VOLUME && window.FOUR_VOLUME.stocks) || [];
+      var cd = (window.CANDIDATE && window.CANDIDATE.stocks) || {};
+
+      // 收集候选（按可信度排序）
+      var list = [];
+      // 1) 三重共识 stocks（key=sz_002335）
+      Object.keys(tc).forEach(function(k){
+        var s = tc[k];
+        if(s){ list.push({src:'🥇 三重共识', code:s.code || (k.split('_')[1]||k), name:s.name||k, score:s.total_score||s.score, srcColor:'var(--purple)'}); }
+      });
+      // 2) 驾驶舱 A 档
+      tier_a.slice(0,8).forEach(function(s){
+        if(s){ list.push({src:'🎯 驾驶舱A档', code:s.code, name:s.name, score:s.total_score, srcColor:'#ffd54f'}); }
+      });
+      // 3) 金股池（无三重共识/驾驶舱命中时补位）
+      Object.keys(gp).slice(0,5).forEach(function(k){
+        var s = gp[k];
+        if(s && s.code && !list.some(function(x){return x.code===s.code;})){
+          list.push({src:'⭐ 金股池', code:s.code, name:s.name||k, score:s.signal_count||0, srcColor:'var(--up)'});
+        }
+      });
+      // 4) 四量终极 QD 共振
+      fv.slice(0,5).forEach(function(s){
+        if(s && s.code && !list.some(function(x){return x.code===s.code;})){
+          list.push({src:'🔥 四量终极', code:s.code, name:s.name, score:undefined, srcColor:'#ff7043'});
+        }
+      });
+
+      if(!list.length){
+        candBox.innerHTML = '<div style="text-align:center;color:var(--dim);padding:8px 0">📭 今日 0 只入选 — 建议观望（决策四步/三不原则已移到暂未上架参考）</div>';
+        return;
+      }
+
+      // 取实时价格计算止盈止损
+      function _norm6(c){ return String(c||'').replace(/\D/g,''); }
+      var lines = [];
+      list.slice(0,10).forEach(function(s){
+        var nk = _norm6(s.code);
+        var q = sq['sz'+nk] || sq['sh'+nk] || sq['bj'+nk] || sq[nk];
+        var price = q ? q.price : null;
+        var pct = q ? q.pct : null;
+        var stop = price ? (Math.max(price*0.93, (q.low||price)*0.99)) : null;
+        var t1 = price ? price*1.07 : null;
+        var t2 = price ? price*1.12 : null;
+        var t3 = price ? price*1.15 : null;
+        var color = pct==null ? 'var(--dim)' : (pct>=0?'var(--up)':'var(--down)');
+        var scoreHTML = s.score!=null ? ' <b style="color:'+s.srcColor+'">'+s.score+'</b>' : '';
+        var priceHTML = price!=null ? '<span style="color:var(--txt);font-weight:700">¥'+price.toFixed(2)+'</span> <span style="color:'+color+';font-size:10px">'+(pct>=0?'+':'')+pct.toFixed(2)+'%</span>' : '<span style="color:var(--dim)">--</span>';
+        var planHTML = price!=null
+          ? '<span style="color:var(--down)">止损 ¥'+stop.toFixed(2)+'</span> · <span style="color:var(--up)">+7% ¥'+t1.toFixed(2)+'</span> · +12% ¥'+t2.toFixed(2)+' · +15% ¥'+t3.toFixed(2)+'</span>'
+          : '<span style="color:var(--dim)">价格未更新</span>';
+        lines.push('<div style="display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:baseline;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)">'
+          + '<span style="font-size:10px;color:'+s.srcColor+';min-width:74px;font-weight:700">'+s.src+scoreHTML+'</span>'
+          + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><b>'+(s.name||'--')+'</b> <span style="color:var(--dim);font-size:10px">'+s.code+'</span></span>'
+          + priceHTML
+          + planHTML
+          + '</div>');
+      });
+      candBox.innerHTML = '<div style="font-size:12px;font-weight:700;color:var(--up);margin-bottom:6px">🎯 今日可入手候选 '+list.length+' 只 <span style="font-size:10px;color:var(--dim);font-weight:400">（按可信度排序：三重共识→驾驶舱A→金股池→四量终极）</span></div>'
+        + '<div style="font-size:10px;color:var(--dim);margin-bottom:4px">止损 -7%硬 / 短线 +7% / 中线 +12% / 强势 +15%</div>'
+        + lines.join('');
     })();
     </script>
 
@@ -8665,6 +8709,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         cur:'只有涨停热力 heatmap',
         plan:'可加「连板梯队」视图（LIMIT_UP_HEATMAP 数据已有，缺展示）',
         data:window.LIMIT_UP_HEATMAP, dataName:'LIMIT_UP_HEATMAP'},
+      {icon:'🧭', title:'决策四步 + 三不原则（参考）', color:'#94a3b8',
+        sub:'操作纪律参考卡（已从今日判定移出）',
+        cur:'今日判定卡原展示：理论规则文字，实际无可买股票',
+        plan:'主人令「今日判定里不要理论，要实际可买股票」。本卡保留为<b>决策参考</b>（不实施买入），未来升级为单卡工具：4 步决策 + 5 条铁律 + 交互式检查清单（输入环境状态自动给"该不该买"答案）。当前内容：<br>· <b>决策四步</b>：①环境择时（今日事件日历+危机 ≤50）/②选股（按可信度 5 算法排序）/③出手确认（信号+绿灯+大盘）/④持仓风控（止损/止盈/分批）<br>· <b>三不原则</b>：危机≥70 空仓 / 大盘-1.5% 只逆势龙头 / 盈亏比<1.5 不介入 / 单票≤20% / 事件标红不开新仓',
+        data:null, dataName:'无（参考卡，无数据源）'},
       {icon:'🔄', title:'板块周期', color:'#a78bfa',
         sub:'板块处于 启动/主升/退潮 哪一阶段',
         cur:'只有资金流+RS 强度',
