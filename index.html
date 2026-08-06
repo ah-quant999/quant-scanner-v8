@@ -8730,7 +8730,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       h += '</div></div></div>';
     })();
 
-    // ── 卡 2：🎭 情绪周期（CRISIS_DATA + LIMIT_UP_HEATMAP + LHB_DATA 四源综合） ──
+    // ── 卡 2：🎭 情绪周期 · 连板天梯（合并紧凑版） ──
     (function(){
       var cr = window.CRISIS_DATA || {};
       var lh = window.LIMIT_UP_HEATMAP || {};
@@ -8739,57 +8739,73 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       var crisisPct = Math.round(crisisScore * 100);
       var totalUp = lh.total || 0;
       var ladder = lh.ladder || {};
+      var top = lh.top || [];
       var lhbCount = (lhb.stocks && lhb.stocks.length) || 0;
-      // 计算机构净买入总额
-      var instNetSum = 0;
-      if(lhb.stocks) lhb.stocks.forEach(function(s){ instNetSum += (s.inst_net_万||0); });
-      // 四阶段判定
+      var highLbc = (ladder['3']||0)+(ladder['4']||0)+(ladder['5']||0)+(ladder['10']||0);
+      // 阶段判定
       var phase, phaseColor, phaseDesc, posAdvice;
-      if(crisisPct >= 70){ phase='冰点'; phaseColor='var(--down)'; phaseDesc='危机雷达高位，系统性风险显著'; posAdvice='空仓/≤10%试错'; }
-      else if(crisisPct >= 50){ phase='降温'; phaseColor='#f59e0b'; phaseDesc='风险累积，情绪从高位回落'; posAdvice='≤30%'; }
-      else if(totalUp >= 80 && (ladder['3']||0)+(ladder['4']||0)+(ladder['5']||0)+(ladder['10']||0) >= 15){ phase='狂热'; phaseColor='#ef4444'; phaseDesc='涨停泛滥+连板密集，追高风险大'; posAdvice='70%→80%注意兑现'; }
-      else if(totalUp >= 40 && crisisPct <= 30){ phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪中性偏暖，结构性行情'; posAdvice='50%'; }
-      else if(totalUp < 30 || crisisPct > 35){ phase='修复'; phaseColor='#38bdf8'; phaseDesc='情绪低位筑底，耐心等待信号'; posAdvice='30%'; }
-      else { phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪平稳过渡'; posAdvice='50%'; }
+      if(crisisPct >= 70){ phase='冰点'; phaseColor='var(--down)'; phaseDesc='危机雷达高位'; posAdvice='空仓'; }
+      else if(crisisPct >= 50){ phase='降温'; phaseColor='#f59e0b'; phaseDesc='风险累积'; posAdvice='≤30%'; }
+      else if(totalUp >= 80 && highLbc >= 15){ phase='狂热'; phaseColor='#ef4444'; phaseDesc='涨停泛滥'; posAdvice='兑现'; }
+      else if(totalUp >= 40 && crisisPct <= 30){ phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪偏暖'; posAdvice='50%'; }
+      else if(totalUp < 30 || crisisPct > 35){ phase='修复'; phaseColor='#38bdf8'; phaseDesc='低位筑底'; posAdvice='30%'; }
+      else { phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪平稳'; posAdvice='50%'; }
       function _vra(c,a){ return c.indexOf("var(")===0 ? "rgba(0,0,0,"+a+")" : (c+"22").slice(0,9); }
-      h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';
-      h += v8CardHeader('🎭','情绪周期','四源数据综合判定（危机雷达+涨停热力+连板梯队+龙虎榜）','update_time',
-        {update_time:(cr.update_time || lh.update_time), slot:'盘中', horizon:'短线'}, !(cr.update_time || lh.update_time));
-      h += '<div style="padding:12px 14px;">';
-      // 阶段大标签
-      h += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px;background:'+_vra(phaseColor,0.08)+';border-radius:8px;border:1px solid '+_vra(phaseColor,0.2)+'">';
-      h += '<span style="font-size:22px;font-weight:900;color:'+phaseColor+'">'+phase+'</span>';
-      h += '<div><div style="font-size:13px;font-weight:700;color:var(--txt)">'+phaseDesc+'</div>';
-      h += '<div style="font-size:11px;color:var(--sub)">建议仓位：<b style="color:'+phaseColor+'">'+posAdvice+'</b></div></div></div>';
-      // 四指标仪表盘
-      h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px">';
-      var meters = [
-        {label:'危机雷达', val:crisisPct, unit:'分', color: crisisPct>=70?'var(--down)':(crisisPct>=50?'#f59e0b':'var(--up)'), width: Math.min(100, crisisPct)},
-        {label:'涨停总数', val:totalUp, unit:'只', color: totalUp>=80?'#ef4444':(totalUp>=40?'var(--up)':'var(--down)'), width: Math.min(100, totalUp*1.2)},
-        {label:'高连板', val:(ladder['3']||0)+(ladder['4']||0)+(ladder['5']||0)+(ladder['10']||0), unit:'只', color: 'var(--up)', width: 0},
-        {label:'龙虎榜', val:lhbCount, unit:'只', color: 'var(--up)', width: 0},
+      var hasData = cr.update_time || lh.update_time;
+      h += '<div class="card" style="margin-bottom:12px;border-left:4px solid #38bdf8;">';
+      h += v8CardHeader('🎭','情绪周期 · 连板天梯','危机雷达+涨停热力+连板梯队+龙虎榜','update_time',
+        {update_time:(cr.update_time || lh.update_time), slot:'盘中', horizon:'短线'}, !hasData);
+      h += '<div style="padding:10px 12px;">';
+      // 阶段 + 四指标（单行紧凑）
+      h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">';
+      h += '<div style="display:flex;align-items:center;gap:6px;padding:6px 8px;background:'+_vra(phaseColor,0.08)+';border:1px solid '+_vra(phaseColor,0.2)+';border-radius:6px;min-width:0">';
+      h += '<span style="font-size:16px;font-weight:900;color:'+phaseColor+'">'+phase+'</span>';
+      h += '<div style="font-size:11px;color:var(--sub);white-space:nowrap">'+phaseDesc+' · 仓位 <b style="color:'+phaseColor+'">'+posAdvice+'</b></div></div>';
+      // 四指标小方块
+      var metrics = [
+        {l:'危机', v:crisisPct, u:'分', c: crisisPct>=70?'var(--down)':(crisisPct>=50?'#f59e0b':'var(--up)')},
+        {l:'涨停', v:totalUp, u:'只', c: totalUp>=80?'#ef4444':(totalUp>=40?'var(--up)':'var(--down)')},
+        {l:'高连', v:highLbc, u:'只', c: 'var(--up)'},
+        {l:'龙虎', v:lhbCount, u:'只', c: 'var(--up)'}
       ];
-      meters.forEach(function(m){
-        h += '<div style="background:rgba(255,255,255,.04);border-radius:6px;padding:8px;text-align:center">';
-        h += '<div style="font-size:10px;color:var(--dim)">'+m.label+'</div>';
-        h += '<div style="font-size:18px;font-weight:800;color:'+m.color+'">'+m.val+'</div>';
-        if(m.width>0){
-          h += '<div style="height:3px;background:rgba(255,255,255,.1);border-radius:2px;margin-top:4px"><div style="height:100%;width:'+m.width+'%;background:'+m.color+';border-radius:2px"></div></div>';
-        }
-        h += '</div>';
+      metrics.forEach(function(m){
+        h += '<div style="text-align:center;min-width:42px;padding:5px 4px;background:rgba(255,255,255,.04);border-radius:5px">';
+        h += '<div style="font-size:9px;color:var(--dim);transform:scale(.95)">'+m.l+'</div>';
+        h += '<div style="font-size:14px;font-weight:800;color:'+m.c+'">'+m.v+'<span style="font-size:8px;font-weight:500;color:var(--dim)">'+m.u+'</span></div></div>';
       });
       h += '</div>';
-      // 连板分布
-      if(lh.top && lh.top.length){
-        h += '<div style="font-size:11px;font-weight:700;color:var(--sub);margin:6px 0 4px">🔥 连板龙头 TOP8</div>';
-        h += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
-        lh.top.slice(0,8).forEach(function(t){
-          var lbcColor = t.lbc>=5 ? '#ef4444' : (t.lbc>=3 ? '#f59e0b' : 'var(--up)');
-          h += '<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;background:rgba(255,255,255,.05);border-radius:999px;font-size:11px">';
-          h += '<b style="color:var(--txt)">'+t.name+'</b>';
-          h += '<span style="color:'+lbcColor+';font-weight:700">'+t.lbc+'板</span>';
-          h += '<span style="color:var(--up)">+'+t.chg.toFixed(1)+'%</span>';
-          h += '</span>';
+      // 连板分布（紧凑横向条形）
+      if(lh.update_time && Object.keys(ladder).length){
+        var lbcKeys = Object.keys(ladder).sort(function(a,b){return parseInt(b)-parseInt(a);});
+        var maxLbc = 0; lbcKeys.forEach(function(k){ maxLbc=Math.max(maxLbc,ladder[k]); });
+        h += '<div style="font-size:10px;color:var(--sub);margin-bottom:5px">连板分布（共 '+totalUp+' 只涨停）</div>';
+        h += '<div style="display:flex;flex-direction:column;gap:2px;margin-bottom:8px">';
+        lbcKeys.forEach(function(k){
+          var v = ladder[k];
+          var pct = maxLbc>0 ? Math.round(v/maxLbc*100) : 0;
+          var lbl = k==='1'?'首板':k+'连板';
+          var barColor = parseInt(k)>=4 ? '#ef4444' : (parseInt(k)>=3 ? '#f59e0b' : (parseInt(k)>=2 ? '#38bdf8' : 'var(--up)'));
+          h += '<div style="display:flex;align-items:center;gap:5px">';
+          h += '<span style="font-size:10px;color:var(--sub);min-width:36px;text-align:right">'+lbl+'</span>';
+          h += '<div style="flex:1;height:14px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden">';
+          h += '<div style="width:'+pct+'%;height:100%;background:'+barColor+';border-radius:3px;display:flex;align-items:center;padding-left:4px">';
+          h += '<span style="font-size:9px;font-weight:700;color:#fff">'+v+'</span>';
+          h += '</div></div></div>';
+        });
+        h += '</div>';
+      }
+      // 高连板梯队（紧凑行）
+      var highLb = top.filter(function(t){return t.lbc>=3;}).sort(function(a,b){return b.lbc-a.lbc;}).slice(0,10);
+      if(highLb.length){
+        h += '<div style="font-size:10px;color:var(--sub);margin-bottom:4px">⚡ 高连板梯队（≥3板）</div>';
+        h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:4px">';
+        highLb.forEach(function(t){
+          var lbcColor = t.lbc>=5?'#ef4444':(t.lbc>=3?'#f59e0b':'var(--up)');
+          h += '<div style="display:flex;align-items:center;gap:4px;padding:3px 6px;background:rgba(255,255,255,.04);border-radius:4px;font-size:11px">';
+          h += '<span style="font-weight:800;color:'+lbcColor+';min-width:22px">'+t.lbc+'板</span>';
+          h += '<b style="color:var(--txt);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+t.name+'</b>';
+          h += '<span style="margin-left:auto;color:var(--up);font-size:10px">+'+t.chg.toFixed(1)+'%</span>';
+          h += '</div>';
         });
         h += '</div>';
       }
@@ -8810,67 +8826,6 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       h += '<li>对操作的具体建议是什么？</li>';
       h += '</ul>';
       h += '<div style="color:var(--dim);font-size:10px;margin-top:8px">📦 数据源：基于现有 raw_data + LLM API 调用（无需新数据采集）</div>';
-      h += '</div></div>';
-    })();
-
-    // ── 卡 4：⛰️ 连板天梯（LIMIT_UP_HEATMAP 数据驱动） ──
-    (function(){
-      var lh = window.LIMIT_UP_HEATMAP || {};
-      var ladder = lh.ladder || {};
-      var top = lh.top || [];
-      var hasData = lh.update_time;
-      h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #ff7043;">';
-      h += v8CardHeader('⛰️','连板天梯','首板/连板/炸板分层梯队（当日涨停结构）','update_time',
-        {update_time:lh.update_time, slot:'盘后', horizon:'短线'}, !hasData);
-      h += '<div style="padding:12px 14px;">';
-      if(!hasData){
-        h += '<div style="color:var(--dim);text-align:center;padding:16px">涨停数据加载中…</div>';
-      } else {
-        // 连板分布条形图
-        var lbcKeys = Object.keys(ladder).sort(function(a,b){return parseInt(b)-parseInt(a);});
-        var maxLbc = 0; lbcKeys.forEach(function(k){ maxLbc=Math.max(maxLbc,ladder[k]); });
-        h += '<div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:6px">连板分布（共 '+(lh.total||0)+' 只涨停）</div>';
-        h += '<div style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px">';
-        lbcKeys.forEach(function(k){
-          var v = ladder[k];
-          var pct = maxLbc>0 ? Math.round(v/maxLbc*100) : 0;
-          var lbl = k==='1'?'首板':k+'连板';
-          var barColor = parseInt(k)>=4 ? '#ef4444' : (parseInt(k)>=3 ? '#f59e0b' : (parseInt(k)>=2 ? '#38bdf8' : 'var(--up)'));
-          h += '<div style="display:flex;align-items:center;gap:6px">';
-          h += '<span style="font-size:11px;color:var(--sub);min-width:42px;text-align:right">'+lbl+'</span>';
-          h += '<div style="flex:1;height:18px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden">';
-          h += '<div style="width:'+pct+'%;height:100%;background:'+barColor+';border-radius:4px;display:flex;align-items:center;padding-left:6px">';
-          h += '<span style="font-size:10px;font-weight:700;color:#fff">'+v+'只</span>';
-          h += '</div></div></div>';
-        });
-        h += '</div>';
-        // 高连板个股列表
-        var highLb = top.filter(function(t){return t.lbc>=3;}).sort(function(a,b){return b.lbc-a.lbc;});
-        if(highLb.length){
-          h += '<div style="font-size:11px;font-weight:700;color:#f59e0b;margin:8px 0 4px">⚡ 高连板梯队（≥3板）</div>';
-          h += '<div style="display:flex;flex-direction:column;gap:2px">';
-          highLb.forEach(function(t){
-            h += '<div style="display:flex;align-items:center;gap:8px;padding:3px 6px;background:rgba(255,112,67,.05);border-radius:4px">';
-            h += '<span style="font-weight:800;color:#ef4444;min-width:28px;text-align:right">'+t.lbc+'板</span>';
-            h += '<b style="color:var(--txt);min-width:56px">'+t.name+'</b>';
-            h += '<span style="color:var(--dim);font-size:10px">'+t.code+'</span>';
-            h += '<span style="margin-left:auto;color:var(--up);font-weight:700;font-size:11px">+'+t.chg.toFixed(2)+'%</span>';
-            h += '</div>';
-          });
-          h += '</div>';
-        }
-        // 首板代表
-        var firstBoard = top.filter(function(t){return t.lbc===1;}).slice(0,5);
-        if(firstBoard.length){
-          h += '<div style="font-size:11px;font-weight:700;color:var(--up);margin:8px 0 4px">🔥 首板代表 TOP5</div>';
-          h += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
-          firstBoard.forEach(function(t){
-            h += '<span style="padding:2px 8px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:999px;font-size:11px">';
-            h += '<b>'+t.name+'</b> <span style="color:var(--up)">+'+t.chg.toFixed(1)+'%</span></span>';
-          });
-          h += '</div>';
-        }
-      }
       h += '</div></div>';
     })();
 
