@@ -3257,18 +3257,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       h += '<span style="color:var(--gold);font-weight:700">★北向参与 '+northStocksToday.length+'</span>';
       h += '<span style="color:'+(nbTotal>=0?'var(--up)':'var(--down)')+';font-weight:700">净流入 '+(nbTotal/10000>=0?'+':'')+(nbTotal/10000).toFixed(2)+'亿</span>';
       h += '</div>';
-      h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
-      h += '<div class="jy-day-card"><div class="jy-day-hd" style="color:var(--up)"><span>▲</span> 北向席位净买入 TOP10</div><div class="jy-day-body">';
-      nb.slice(0,10).forEach(function(s){
-        h += '<div class="jy-day-row"><span class="jy-day-name">'+_rcEsc(s.name)+'</span><span class="jy-day-val c-up">'+_rcFmtYi(s._nb_net_万)+'</span></div>';
-      });
-      h += '</div></div>';
-      h += '<div class="jy-day-card"><div class="jy-day-hd" style="color:var(--down)"><span>▼</span> 北向席位净卖出 TOP10</div><div class="jy-day-body">';
-      ns.slice(0,10).forEach(function(s){
-        h += '<div class="jy-day-row"><span class="jy-day-name">'+_rcEsc(s.name)+'</span><span class="jy-day-val c-down">'+_rcFmtYi(s._nb_net_万)+'</span></div>';
-      });
-      h += '</div></div>';
-      h += '</div>';
+      // 🔴 2026-08-06 主人令：页面级只显示摘要，TOP10 详情移到 modal（点日历格子查看）。避免重复。
+      h += '<div style="font-size:11px;color:var(--dim);margin-bottom:6px;">📌 净买卖 TOP10 详情见点击日历格子后的弹层</div>';
     }
     // Weekly summary (北向席位·月初截断+完整周+月末截断全覆盖，2026-08-06 修复)
     h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📊 周度汇总 · ' + (year) + '年' + (month+1) + '月北向席位</h3>';
@@ -3390,23 +3380,14 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     var dispDate = dateStr.slice(0,4)+'-'+dateStr.slice(4,6)+'-'+dateStr.slice(6,8);
     var h = '<div class="cal-detail-head"><h4>'+dispDate+'（'+wkLabel+'）北向席位详情</h4><span class="cal-detail-close" onclick="this.closest(\'.cal-detail\').classList.remove(\'show\')">✕</span></div>';
     h += '<div class="cal-detail-body">';
-    // 段 1：全部北向席位股票（按净买入排序）
-    h += '<div style="display:flex;align-items:baseline;gap:12px;font-size:11px;color:var(--dim);margin-bottom:6px;flex-wrap:wrap">';
-    h += '<span>📋 全部北向席位股票 <b style="color:var(--txt)">'+sorted.length+'</b> 只</span>';
-    h += '<span style="color:var(--gold)">★北向参与 '+sorted.length+'</span>';
+    // 🔴 2026-08-06 主人令：modal 只显示净买卖 TOP10 详情（页面级卡片显示摘要），避免重复
+    // 段 1（全部股票按净买入排序 3 列网格）已删除
+    // 段 2：净买入 TOP10 + 净卖出 TOP10（详情卡片）
+    h += '<div style="display:flex;align-items:baseline;gap:12px;font-size:11px;color:var(--dim);margin-bottom:8px;flex-wrap:wrap">';
+    h += '<span>📋 净买卖 TOP10 详情 · '+sorted.length+' 只有北向席位</span>';
     h += '<span style="color:'+(nbTotal>=0?'var(--up)':'var(--down)')+';font-weight:700">净流入 '+(nbTotal/10000>=0?'+':'')+(nbTotal/10000).toFixed(2)+'亿</span>';
     h += '</div>';
-    h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px 10px;font-size:11px">';
-    sorted.forEach(function(s){
-      h += '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04)">';
-      h += '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+_rcEsc(s.name)+'</span>';
-      h += '<span style="margin-left:6px;color:'+(s.pct>=0?'var(--up)':'var(--down)')+';font-size:10px">'+((s.pct>=0?'+':'')+(s.pct||0).toFixed(1)+'%')+'</span>';
-      h += '<span style="color:'+(s._nb_net_万>=0?'var(--up)':'var(--down)')+';font-weight:700;min-width:52px;text-align:right">'+_rcFmtYi(s._nb_net_万||0)+'</span>';
-      h += '</div>';
-    });
-    h += '</div>';
-    // 段 2：净买入 TOP10 + 净卖出 TOP10（详情卡片）
-    h += '<h3 style="margin-top:18px;font-size:14px;color:var(--txt)">📊 净买卖 TOP10（按北向席位净买入）</h3>';
+    h += '<h3 style="margin-top:6px;font-size:14px;color:var(--txt)">📊 净买卖 TOP10（按北向席位净买入）</h3>';
     h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
     h += '<div class="jy-day-card" style="margin-bottom:0"><div class="jy-day-hd" style="color:var(--up)"><span>▲</span> 净买入 TOP10</div><div class="jy-day-body">';
     if(nbTop.length){
