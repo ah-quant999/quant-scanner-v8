@@ -748,7 +748,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_SZ_HISTORY.js?v=20260807071321"></script>
 <script src="data/MAHORO.js?v=20260807071321"></script>
 <script src="data/CANDIDATE.js?v=20260807071321"></script>
-<script src="data/FOUR_VOLUME.js?v=20260807071316"></script>
+<script src="data/FOUR_VOLUME.js?v=20260806233350"></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=20260807071321"></script>
 <script src="data/COCKPIT_BACKTEST.js?v=20260807071321"></script>
 <script src="data/BACKTEST_TDX.js?v=20260807071321"></script>
@@ -761,7 +761,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CANDIDATE_QUOTES.js?v=20260807071321"></script>
 <script src="data/RISK_GAUGE.js?v=20260807071321"></script>
 <script src="data/RUNNER_STATUS.js?v=20260807071321"></script>
-<script src="data/HEALTH_CHECK.js?v=20260807071321"></script>
+<script src="data/HEALTH_CHECK.js?v=20260807071408"></script>
 </head>
 <body>
 
@@ -8627,6 +8627,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       function _vra(c,a){ return c.indexOf('var(')===0 ? "rgba(0,0,0,"+a+")" : c.replace(/[^0-9a-f#]/gi,"").length>4 ? c+"1f" : "rgba(0,0,0,"+a+")"; }
       var verdictColor = allOk ? 'var(--up)' : (crisisPct >= 70 ? 'var(--down)' : '#f59e0b');
       var verdictText = allOk ? '✅ 环境允许' : (crisisPct >= 70 ? '❌ 建议空仓' : '⚠️ 谨慎操作');
+      var posAdvice = crisisPct >= 70 ? '空仓' : (crisisPct >= 50 ? '轻仓' : (crisisPct >= 30 ? '中性' : '重仓'));
       var hasData = jd.update_time || cr.update_time;
       h += '<div class="card" style="margin-bottom:12px;border-left:4px solid #f59e0b;">';
       h += v8CardHeader('🎯','今日判定 · 可入手候选 + 决策纪律','候选列表 + 操作纪律检查清单','update_time',
@@ -8635,7 +8636,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       // 总判横幅（紧凑）：仅保留结论，止损止盈移到决策四步后
       h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:6px 12px;background:'+_vra(verdictColor,0.1)+';border:1px solid '+_vra(verdictColor,0.25)+';border-radius:6px;font-size:13px;">';
       h += '<b style="color:'+verdictColor+'">'+verdictText+'</b>';
-      h += '<span style="color:var(--dim);font-size:11px;margin-left:auto">'+crisisPct+'分危机 · '+posAdvice+'仓位</span></div>';
+      h += '<span style="color:var(--dim);font-size:11px;margin-left:auto">'+crisisPct+'分危机 · 仓位'+posAdvice+'</span></div>';
       // 两栏主体
       h += '<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:12px;">';
       // 左：候选列表
