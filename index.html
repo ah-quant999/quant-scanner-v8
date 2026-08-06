@@ -611,10 +611,11 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     <!-- 今日判定（数据驱动 · premarket 08:25 刷新） -->
     <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
       <h3><span class="ic">⚖️</span>今日判定 <span id="judgmentTag" style="font-size:11px;font-weight:400;color:var(--dim)">--</span></h3>
-      <div id="judgmentBody" style="font-size:13px;line-height:1.8;color:var(--txt)"></div>
-      <!-- 🎯 今日可入手候选（2026-08-06 主人令·实际股票代入，决策四步/三不原则已移到暂未上架） -->
+      <!-- 🎯 今日可入手候选（实际股票代入；理论段已移到运维页·暂未上架区，2026-08-06 主人令） -->
       <div id="judgmentCandidates" style="margin-top:14px;padding:12px;background:linear-gradient(135deg,rgba(94,224,160,.08),rgba(56,189,248,.04));border:1px solid rgba(94,224,160,.25);border-radius:10px;font-size:12px;color:var(--txt);line-height:1.7;"></div>
     </div>
+    <!-- 🔒 今日判定·环境态势（管理员可见，在运维页·暂未上架区加载，原 judgmentBody 内容） -->
+    <div id="judgmentBody" style="display:none"></div>
     <script>
     (function(){
       var d = window.JUDGMENT_DATA;
@@ -685,6 +686,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       }
       // 6) 多信号扫描 — 已删除（2026-08-05 用户反馈无用：北向永久停用、VIX/雷达/板块与今日宏观重复）
       body.innerHTML = h;
+      // 🔒 同步写入运维页·暂未上架区的「今日判定·环境态势」卡（2026-08-06 主人令：理论段挪到管理员可见区）
+      try{ var opBody=document.getElementById('judgmentBodyOp'); if(opBody) opBody.innerHTML=h; }catch(e){}
 
       // ========== 🎯 今日可入手候选（2026-08-06 主人令·实际股票代入，不是理论） ==========
       // 优先级：🥇三重共识 > 🥈驾驶舱 A 档 > 🥉金股池 + 四量终极 > 候选池 350
@@ -3905,7 +3908,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
       <button class="op-tab-btn" data-op="2" onclick="opSwitchTab(2)">⏰ 任务运行看板 <span class="op-tab-time" id="opTab2Time"></span></button>
 
-      <button class="op-tab-btn" data-op="3" onclick="opSwitchTab(3)">暂未上架</button>
+      <button class="op-tab-btn" data-op="3" onclick="opSwitchTab(3)">🔒 暂未上架 <span style="font-size:10px;color:var(--dim);font-weight:500">管理员专享</span></button>
 
       <button class="op-tab-btn" data-op="4" onclick="opSwitchTab(4)">已下架</button>
 
@@ -3990,7 +3993,17 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 
     </div>
 
-    <div id="opTab3" class="op-tab-pane"><div id="unlistedPanel"></div></div>
+    <div id="opTab3" class="op-tab-pane">
+      <!-- 🔒 今日判定·环境态势（2026-08-06 主人令：原 judgmentBody 理论段移到管理员可见区，自动加锁） -->
+      <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;opacity:0.95;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+          <span style="font-size:14px;">⚖️</span><span style="font-weight:700;font-size:14px;color:var(--txt);">今日判定 · 环境态势</span>
+          <span style="font-size:11px;color:var(--sub);">（原 judgmentBody · 美股/技术/情绪/宏观/共同结论/危险信号/大盘）</span>
+        </div>
+        <div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);"></div>
+      </div>
+      <div id="unlistedPanel"></div>
+    </div>
     <div id="opTab4" class="op-tab-pane"><div id="delistedPanel">
 
         <!-- 盘后概览：市场温度计分项 / 六维共振雷达 -->
