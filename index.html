@@ -8579,11 +8579,6 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       }
     }catch(e){}
     var h='';
-    // 2026-08-07 升级为一级 Tab：保留 render 时刻提示，用于判断浏览器是否加载最新构建
-    h+='<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:6px;padding:6px 10px;margin-bottom:12px;font-size:11px;color:var(--sub);">';
-    h+='🔄 当前 render 时刻：<b>'+new Date().toISOString().replace("T"," ").slice(0,19)+' UTC</b> · 若内容疑似旧构建请按 <b>Ctrl+F5</b> 强制刷新';
-    h+='</div>';
-
     // 🎯 今日判定 · 可入手候选（2026-08-07 主人令：从今日事件页移入实验区，与 🧭 决策四步配对）
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">';
     var _judgeData = window.JUDGMENT_DATA || {};
@@ -8647,37 +8642,6 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       h+='<div class="note" style="text-align:center;">调试区数据暂不可用</div>';
     }
     h+='</div></div>';
-
-    // 四量终极 选股卡片
-    var fv=window.FOUR_VOLUME||{};
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a5f3fc;">';
-    var fvT=fv.update_time?fv.update_time:'';
-    h+=v8CardHeader('🔥','四量终极 选股','游资点火+机构托底+当天金叉+四路翻多<span style="color:#94a3b8;">（盘后日线）</span>','update_time',{update_time:fvT},!fv||!fv.stocks||!fv.stocks.length);
-    if(fv&&fv.stocks&&fv.stocks.length){
-      h+='<div style="padding:12px 14px;">';
-      h+='<div style="font-size:12px;color:var(--sub);margin-bottom:10px;">共 <b>'+fv.total+'</b> 只触发 XG（按涨跌幅排序，最多显示20）</div>';
-      fv.stocks.slice(0,20).forEach(function(s){
-        h+='<div style="border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:8px;background:var(--bg2);">';
-        h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
-        h+='<b>'+s.name+'</b> <span style="color:var(--dim);font-size:11px;">'+s.code+'</span>';
-        h+='<span style="font-size:11px;color:var(--cyan);margin-left:auto;">'+s.board_label+'</span>';
-        h+='</div>';
-        h+='<div style="font-size:11px;color:var(--sub);margin-bottom:4px;">'+s.close+' · <span style="'+(s.pct_chg>=0?'color:var(--up)':'color:var(--down)')+'">'+(s.pct_chg>0?'+':'')+s.pct_chg+'%</span> · 换手'+(s.turnover_rate||0)+'% · '+(s.reason||'')+'</div>';
-        if(s.components){
-          h+='<div style="display:flex;flex-wrap:wrap;gap:4px;">';
-          [['游资点火','YZC'],['机构托底','JG'],['广度翻多','GB1'],['主力动量翻多','V6'],['机构金叉','JGC'],['散户金叉','SHC'],['主力金叉','ZLC']].forEach(function(p){
-            var on=s.components[p[0]];
-            h+='<span style="font-size:10px;padding:1px 6px;border-radius:10px;'+(on?'background:rgba(34,197,94,.18);color:var(--up);border:1px solid rgba(34,197,94,.4);':'background:rgba(120,120,120,.12);color:var(--dim);border:1px solid var(--border);')+'">'+p[0]+(on?'✓':'')+'</span>';
-          });
-          h+='</div>';
-        }
-        h+='</div>';
-      });
-      h+='</div>';
-    } else {
-      h+='<div class="note" style="padding:14px;text-align:center;">四量终极信号暂未生成（盘后扫描填充）</div>';
-    }
-    h+='</div>';
 
     var cp=window.CANDIDATE||{};
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #f9a8d4;">';
@@ -8863,7 +8827,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         h += '<div style="color:var(--dim);text-align:center;padding:16px">涨停数据加载中…</div>';
       } else {
         // 连板分布条形图
-        var lbcKeys = Object.keys(ladder).sort(function(a,b){return parseInt(a)-parseInt(b);});
+        var lbcKeys = Object.keys(ladder).sort(function(a,b){return parseInt(b)-parseInt(a);});
         var maxLbc = 0; lbcKeys.forEach(function(k){ maxLbc=Math.max(maxLbc,ladder[k]); });
         h += '<div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:6px">连板分布（共 '+(lh.total||0)+' 只涨停）</div>';
         h += '<div style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px">';
