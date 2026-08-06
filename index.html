@@ -2843,21 +2843,35 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       });
       h += '</div>'; // jy-month
     });
-    /* ===== 周度汇总（当月所有完整自然周·2026-08-06 按自然月） ===== */
+    /* ===== 周度汇总（月初截断 + 完整周 + 月末截断全覆盖，2026-08-06 修复） ===== */
     h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📊 周度汇总 · 机游共振 <span style="font-size:11px;color:var(--dim);font-weight:400">· 仅 '+year+'年'+(month+1)+'月</span></h3>';
     h += '<div class="week-cards">';
-    // 当月所有完整自然周（周一-周日都在当月内）
+    // 月内所有"周"：月初截断 + 完整自然周 + 月末截断
     var cardsJy = [];
     var _mdays = new Date(year, month+1, 0).getDate();
-    var _d = 1;
-    while(_d <= _mdays && new Date(year, month, _d).getDay() !== 1) _d++;
+    var _firstDow = new Date(year, month, 1).getDay(); // 0=周日
+    var _firstMon = 1 + ((8 - _firstDow) % 7); // 当月第一个周一
     var _wkn = 1;
-    while(_d <= _mdays){
-      var _wMon = new Date(year, month, _d);
-      var _wSun = new Date(year, month, _d+6);
-      if(_wSun.getMonth() !== month) break;
-      cardsJy.push({no:_wkn, mon:_wMon, sun:_wSun, monLabel:(_wMon.getMonth()+1)+'/'+_wMon.getDate(), sunLabel:(_wSun.getMonth()+1)+'/'+_wSun.getDate()});
-      _d += 7; _wkn++;
+    // 月初截断周（1 到 _firstMon-1）
+    if(1 < _firstMon){
+      cardsJy.push({no:_wkn, labelMon:(month+1)+'/1', labelSun:(month+1)+'/'+(_firstMon-1), start:1, end:_firstMon-1, isFull:false});
+      _wkn++;
+    }
+    // 完整自然周
+    for(var _d=_firstMon; _d<=_mdays; _d+=7){
+      var _end = Math.min(_d+6, _mdays);
+      cardsJy.push({no:_wkn, labelMon:(month+1)+'/'+_d, labelSun:(month+1)+'/'+_end, start:_d, end:_end, isFull:(_end-_d===6)});
+      _wkn++;
+      if(_end === _mdays) break;
+      // 如果剩余不足 7 天，月末截断周在循环外补
+      if(_d + 7 > _mdays){
+        var _nx = _d + 7;
+        if(_nx <= _mdays){
+          cardsJy.push({no:_wkn, labelMon:(month+1)+'/'+_nx, labelSun:(month+1)+'/'+_mdays, start:_nx, end:_mdays, isFull:false});
+          _wkn++;
+        }
+        break;
+      }
     }
     cardsJy.forEach(function(wk){
       // 归类：把 jyDays 里的天按 Mon-Sun 落入对应周卡
@@ -3197,31 +3211,43 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       h += '</div></div>';
       h += '</div>';
     }
-    // Weekly summary (北向席位·当月内所有完整自然周·2026-08-06 按自然月)
+    // Weekly summary (北向席位·月初截断+完整周+月末截断全覆盖，2026-08-06 修复)
     h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📊 周度汇总 · ' + (year) + '年' + (month+1) + '月北向席位</h3>';
     h += '<div class="week-cards">';
-    // 当月所有完整自然周（周一-周日都在当月内）
     var cardsNb = [];
-    var monthDays = new Date(year, month+1, 0).getDate();
-    var d = 1;
-    while(d <= monthDays && new Date(year, month, d).getDay() !== 1) d++;
+    var _nbMdays = new Date(year, month+1, 0).getDate();
+    var _nbFirstDow = new Date(year, month, 1).getDay();
+    var _nbFirstMon = 1 + ((8 - _nbFirstDow) % 7);
     var _wn = 1;
-    while(d <= monthDays){
-      var wMon = new Date(year, month, d);
-      var wSun = new Date(year, month, d+6);
-      if(wSun.getMonth() !== month) break;
-      cardsNb.push({no: _wn, mon: wMon, sun: wSun, monLabel: (wMon.getMonth()+1)+'/'+wMon.getDate(), sunLabel: (wSun.getMonth()+1)+'/'+wSun.getDate()});
-      d += 7; _wn++;
+    if(1 < _nbFirstMon){
+      cardsNb.push({no:_wn, labelMon:(month+1)+'/1', labelSun:(month+1)+'/'+(_nbFirstMon-1), start:1, end:_nbFirstMon-1, isFull:false});
+      _wn++;
+    }
+    for(var _d=_nbFirstMon; _d<=_nbMdays; _d+=7){
+      var _end = Math.min(_d+6, _nbMdays);
+      cardsNb.push({no:_wn, labelMon:(month+1)+'/'+_d, labelSun:(month+1)+'/'+_end, start:_d, end:_end, isFull:(_end-_d===6)});
+      _wn++;
+      if(_end === _nbMdays) break;
+      if(_d + 7 > _nbMdays){
+        var _nx = _d + 7;
+        if(_nx <= _nbMdays){
+          cardsNb.push({no:_wn, labelMon:(month+1)+'/'+_nx, labelSun:(month+1)+'/'+_nbMdays, start:_nx, end:_nbMdays, isFull:false});
+          _wn++;
+        }
+        break;
+      }
     }
     cardsNb.forEach(function(wk){
-      h += '<div class="wk-card"><div class="wk-card-hd"><span class="wk-card-title">第'+wk.no+'周 '+wk.monLabel+'-'+wk.sunLabel+'</span></div>';
+      h += '<div class="wk-card"><div class="wk-card-hd"><span class="wk-card-title">第'+wk.no+'周 '+wk.labelMon+'-'+wk.labelSun+(wk.isFull?'':' <span style="color:var(--dim);font-size:10px">(截断)</span>')+'</span></div>';
       var wkNorth;
       if(hasMultiDay){
         wkNorth = northStocks.filter(function(s){
           var sd = (s.date||'').replace(/-/g,'');
           if(sd.length < 8) return false;
-          var sy = +sd.slice(0,4), sm = +sd.slice(4,6)-1, sdd = +sd.slice(6,8);
-          return _rcWeekRangeOf(sy, sm, sdd).mon.getTime() === wk.mon.getTime();
+          var sdd = +sd.slice(6,8);
+          var sy = +sd.slice(0,4), sm = +sd.slice(4,6)-1;
+          if(sy !== year || sm !== month) return false;
+          return sdd >= wk.start && sdd <= wk.end;
         });
       } else {
         // 单日数据：仅当 lhbDate 落入本卡所在周时展示
