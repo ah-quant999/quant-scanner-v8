@@ -1,0 +1,58 @@
+# 九宝量化 v8.0 — 盘中云端自愈器（GitHub 云端 ubuntu-latest）
+#
+# 目的（2026-08-06 新增）：解决「GitHub schedule 漏档」导致盘中数据缺口的问题。
+#   主链 v8_cn_fetch_cloud 靠 schedule cron 触发，而 GitHub cron 不保证 100% 触发
+#   （实测 15:00 档漏触发），本机兜底又依赖小九开机。本 workflow 作为云端第二道
+#   保险：每 30 分钟（错开主链的整点+30 分，避免并发）检测 cn_fetch_cloud 最近成功
+#   运行是否过期（>45 分钟），过期则自动 dispatch 补跑。小九关机也完全不受影响。
+#
+# 三层冗余（由强到弱）：
+#   1. v8_cn_fetch_cloud 自带 schedule cron（主链）
+#   2. 本 workflow 云端盘中自愈（cron '3,33' 错开分钟，漏档互补）
+#   3. 本机 WorkBuddy 兜底自动化（小九开机时，每 30 分钟 dispatch）
+#
+# 设计原则：
+#   - 纯云端执行（ubuntu），不依赖 cn runner / 本机
+#   - 只做「诊断 + 开药方」，不自己抓数据（抓数据仍走 v8_cn_fetch_cloud）
+#   - 幂等：dispatch 由 cn_fetch 的 concurrency group 排队，重复派发无害
+
+name: "💊 v8 盘中云端自愈器(云端ubuntu)"
+
+on:
+  schedule:
+    # 工作日 09:03-15:33 CST 每 30 分钟（3,33 分错开主链的整点/半点，双 cron 同档漏的概率极低）
+    - cron: '3,33 1-7 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  intraday-heal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: "🩺 盘中自愈检查"
+        id: heal
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "=== 盘中自愈检查 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') ==="
+          python v8_intraday_healer.py
+
+      - name: "📊 摘要"
+        if: always()
+        run: |
+          echo "## 💊 v8 盘中云端自愈器 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')" >> $GITHUB_STEP_SUMMARY
+          echo "三层冗余：主链 cron + 云端盘中自愈 + 本机兜底。小九关机不受影响。" >> $GITHUB_STEP_SUMMARY

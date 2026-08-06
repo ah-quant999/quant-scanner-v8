@@ -76,7 +76,9 @@ jobs:
           echo "💊 发现 $FROZEN 个冻结模块，触发全量补跑"
 
           # 全量补跑最简单可靠——避免逐个分析类别
-          gh workflow run "🇨🇳 v8 中国数据抓取(cn)" \
+          # 2026-08-06 修正：dispatch 云端主链（ubuntu，不依赖 cn runner 在线），
+          # 原指向「v8 中国数据抓取(cn)」需 cn runner（小九/家里机器）在线，关机即失效
+          gh workflow run "🇨🇳 v8 中国数据抓取(云端)" \
             -R ah-quant999/quant-scanner-v8 \
             -f category=all \
             -f label="Self Healer 自动补跑（${FROZEN} frozen modules）"
