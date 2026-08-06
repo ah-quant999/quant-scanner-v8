@@ -747,32 +747,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div id="v8TodayAll" style="font-size:13px;color:var(--txt);"></div>
     </div>
 
-    <!-- 今日判定（数据驱动 · premarket 08:25 刷新） -->
-    <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
-      <h3><span class="ic">⚖️</span>今日判定 <span id="judgmentTag" style="font-size:11px;font-weight:400;color:var(--dim)">--</span></h3>
-      <!-- 🎯 今日可入手候选（实际股票代入；理论段已移到运维页·暂未上架区，2026-08-06 主人令） -->
-      <!-- 🎯 今日可入手候选 2026-08-07 已迁至 🔒 暂未上架 Tab（实验区），本页仅保留迁移提示 -->
-      <div id="judgmentCandidates" style="margin-top:14px;padding:12px;background:linear-gradient(135deg,rgba(94,224,160,.08),rgba(56,189,248,.04));border:1px solid rgba(94,224,160,.25);border-radius:10px;font-size:12px;color:var(--txt);line-height:1.7;"><div style="text-align:center;color:var(--dim);padding:12px 0;line-height:1.9;">📦 今日判定 · 可入手候选已迁移至 <b style="color:var(--cyan)">🔒 暂未上架</b> Tab（实验）<br><span style="font-size:11px">与「决策四步 + 三不原则」参考卡配对 · 本页不再重复展示</span></div></div>
-    </div>
-    <!-- 🔒 今日判定·环境态势（管理员可见，在运维页·暂未上架区加载，原 judgmentBody 内容） -->
-    <div id="judgmentBody" style="display:none"></div>
-    <script>
-    (function(){
-      var d = window.JUDGMENT_DATA;
-      var tag = document.getElementById('judgmentTag');
-      var body = document.getElementById('judgmentBody');
-      if(!d){ if(tag) tag.textContent='数据缺失'; return; }
-      if(tag) tag.innerHTML = _uBadge('盘前','短线',d.update_time);
-      // 用全局构建函数（2026-08-07 抽函数：供今日事件页 + 暂未上架 Tab 双向复用）
-      var h = (typeof window._buildJudgmentEnvHTML === 'function')
-        ? window._buildJudgmentEnvHTML(d)
-        : '<div style="color:var(--down);padding:10px">构建函数未加载</div>';
-      if(body) body.innerHTML = h;
-      // 缓存 + 尝试同步写暂未上架 Tab（DOM 可能尚未解析，fallback 在 renderUnlisted 里处理）
-      window.__judgmentEnvHTML_cache = h;
-      try{ var opBody=document.getElementById('judgmentBodyOp'); if(opBody) opBody.innerHTML=h; }catch(e){}
-    })();
-    </script>
+    <!-- 2026-08-07 主人令：今日判定已整体迁移至 🔒 暂未上架 Tab，本页不再展示 -->
 
     <!-- 今日宏观解读（每日盘前 · premarket 08:25 刷新 · 数据驱动） -->
     <div class="card" style="margin-bottom:16px;border-left:4px solid var(--cyan);">
