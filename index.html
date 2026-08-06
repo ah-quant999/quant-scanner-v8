@@ -4323,19 +4323,19 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">· <b>实时行情</b>：全市场 5537 只（价格/涨跌/今开/昨收/最高/最低/量额）<br>· <b>概念行业</b>：5198 只 board/industry/concepts<br>· <b>股息分红</b>：3637 只（股息率/EPS/BVPS/分红比例/除权除息日/方案进度）</div>
         <div class="logic-h">股息判断口径</div>
         <div class="logic-p">· 股息率 ≥2.5% → 高股息，适合长期持有收息<br>· 1.5%-2.5% → 中等股息，股息+成长兼顾<br>· &lt;1.5% → 低股息，偏成长型<br>· 无分红记录 → 显示"暂无分红记录"（不造假）</div>
+        <div class="logic-h">分析类卡片说明（综合财务画像）</div>
+        <div class="logic-p">仅在 <b>候选池入选股</b> 显示（fundamentals 来自 v8 算法链 baostock 计算），覆盖 200+ 只候选股。<br>
+        · <b>评分来源</b>：ROE（净资产收益率）+ 营收增速（近一期）+ 净利润同比增长 + 消息面加减分 → 综合质量分 0~100<br>
+        · <b>评级口径</b>：🟢 <b>绩优 A</b> ≥70（极致优质，ROE+营收双高） / 🟢 <b>良好 B</b> 40-69（基本面良好） / 🟡 <b>一般 C</b> 20-39 / 🔴 <b>差 D</b> &lt;20<br>
+        · <b>字段说明</b>：ROE ≥15% 绿 / 10-15% 金 / &lt;10% 红；营收 ≥15% 绿 / ≥0% 金 / &lt;0% 红；分红比例来自东财 stock_fhps_em<br>
+        · <b>不显示规则</b>：股票不在候选池 → 整张卡不渲染（不显示「无数据」占位，避免「每只都空着」）<br>
+        · <b>v6 旧口径</b>（已停用）：「BUY 评分 ≥50」是 v6 当年个股查询评分模型，v8 升级为「综合财务画像多指标评级」，更客观（含 ROE/营收/分红多维度）。</div>
         <div class="logic-h">止盈止损口径（v8 升级版，三档目标）</div>
         <div class="logic-p">· <b>止损</b> = max(当前价×0.93, 当日最低价×0.99)，至少留 1% 缓冲<br>· <b>短线目标</b> = 当前价×1.07（+7%）· <b>中线目标</b> = 当前价×1.12（+12%）· <b>强势目标</b> = 当前价×1.15（+15%）<br>· <b>盈亏比</b> = 短线收益 / 止损亏损，≥2 优秀 / 1.5-2 一般 / &lt;1.5 较差<br>· 波动率 = max(当日振幅, 当前价×1.5%)，&gt;4% 高波动 / &gt;2% 中波动 / 其余低波动<br>· 操作提示按当日涨跌：涨 ≥5% 追高谨慎 / 跌 ≥5% 警惕破位 / 其余中性可分批建仓</div>
-        <div class="logic-h">评分模型（v6 遗留口径）</div>
-        <table class="lg-table">
-          <tr><th>因子</th><th>加分逻辑</th><th>上限</th></tr>
-          <tr><td>当日涨幅</td><td>涨1%→+3分（涨停10%→+30分）</td><td>30</td></tr>
-          <tr><td>量比</td><td>(量比-1)×10，量比1.5→5分，3→20分</td><td>20</td></tr>
-          <tr><td>K线形态</td><td>bullish +8分/个，neutral +3分/个，bearish -5分/个</td><td>不限</td></tr>
-          <tr><td>开盘强度</td><td>高开→+15，平开→+5</td><td>15</td></tr>
-          <tr><td>收盘位置</td><td>收在最高价附近(&gt;98%)→+10，收&gt;开盘价→+5</td><td>10</td></tr>
-        </table>
-        <div class="logic-h">标签判定</div>
-        <div class="logic-p"><b class="up">BUY</b>：当日上涨且评分≥50 / <b style="color:var(--gold)">关注</b>：评分≥30但未达BUY / <b style="color:var(--dim)">观望</b>：评分&lt;30。</div>
+        <div class="logic-h">个股查询网格卡片清单（2026-08-06 清理后）</div>
+        <div class="logic-p">页面只保留「有数据才显示」的卡，<b>没有数据整张卡不渲染</b>，网格自动重排避免「每只都空着不好看」：<br>
+        · 📊 <b>实时行情</b>（全市场 5537 只必有 · 含分时概要 + 股息分红 + 综合财务画像）<br>· 🎯 <b>止盈止损</b>（基于实时行情 · 全市场 5537 只一定有）<br>· 🏷️ <b>概念行业</b>（4801 只候选池 + fallback 全市场 · 高覆盖）<br>· 🎖️ <b>选股策略命中</b>（候选池 350 只命中才显示，0 不渲染）<br>· 💧 <b>关联板块资金流向</b>（板块+概念有数据才显示，无不渲染）<br>· 🐉 <b>龙虎榜</b>（当日上榜 40 只才显示，非上榜日不渲染）<br>· 🚫 <b>停牌识别</b>（仅停牌股显示，未在停牌清单不渲染）<br>
+        · <b>已删除的永远空卡</b>：三重共识/全站精选/主力资金/近10日走势/EMA趋势/投行研报（事件型或需日 K 库——前者永远只对特定股票，后者需建库，工作量大；后续如需可单独立项做「日 K 行情库 v8.5」）</div>
       </div>
 
       <div class="card">
@@ -4735,55 +4735,17 @@ function switchSec(sec,el){
   function fmtPct(n){ if(n==null) return '-'; const v=Number(n); if(isNaN(v)) return '-'; const s=(v>=0?'+':'')+v.toFixed(2)+'%'; return '<span style="color:'+(v>=0?'var(--up)':'var(--down)')+'">'+s+'</span>'; }
   function fmtYi(n){ if(n==null) return '-'; const v=Number(n); if(isNaN(v)) return '-'; if(Math.abs(v)>=10000) return (v/10000).toFixed(2)+'亿'; return v.toFixed(0)+'万'; }
 
-  function renderMulti(item, code){
-    const top = window.TOP10_DAILY || {};
-    const arr = top.top10 || [];
-    const row = arr.find(r=>normCode(r.code)===normCode(code));
-    if(!row) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">🧬 三重共识：未收录</div>';
-    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
-    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:13px;font-weight:700;color:var(--purple);">🧬 三重共识</span>';
-    h+='<span style="margin-left:auto;font-size:20px;font-weight:800;color:'+(row.total_score>=80?'var(--up)':row.total_score>=70?'var(--gold)':'var(--cyan)')+'">'+row.total_score+'</span></div>';
-    h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
-    h+='<div>排名 <b>#'+row.rank+'</b> · 信号数 <b>'+row.sig_count+'</b> · 质量 <b>'+(row.quality_grade||'-')+'</b></div>';
-    h+='<div>胜率 <b>'+(row.win_rate||'-')+'%</b> · 止损 <b>'+(row.stop_loss||'-')+'</b> · 目标 <b>'+(row.target_price||'-')+'</b></div>';
-    if(row.signals){
-      const sigs=[];
-      if(row.signals.chan) sigs.push('缠论买');
-      if(row.signals.jinzuan) sigs.push('金钻');
-      if(row.signals.jigou) sigs.push('机构变红');
-      if(row.signals.trend) sigs.push('上涨趋势');
-      h+='<div style="margin-top:4px;">信号：'+(sigs.length?sigs.map(x=>'<span style="display:inline-block;background:rgba(56,189,248,.15);color:var(--cyan);padding:1px 6px;border-radius:4px;margin:2px 4px 2px 0;font-size:11px;">'+x+'</span>').join(''):'<span style="color:var(--dim)">无</span>')+'</div>';
-    }
-    h+='</div></div>';
-    return h;
-  }
-
-  function renderGoldPool(item, code){
-    const gp = window.GOLD_POOL || {};
-    const stocks = gp.stocks || {};
-    const row = stocks[fullKey(item)] || stocks[(item.market||'')+'_'+code] || stocks[code] || Object.values(stocks).find(s=>normCode(s.code)===normCode(code));
-    if(!row) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">⭐ 金股池：未收录</div>';
-    const latest = row.latest || row.history && row.history[row.history.length-1] || {};
-    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
-    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:13px;font-weight:700;color:var(--up);">⭐ 金股池</span>';
-    h+='<span style="margin-left:auto;font-size:12px;color:var(--dim);">信号累计 <b>'+(row.signal_count||0)+'</b></span></div>';
-    h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
-    const tags=[];
-    if(latest['缠论买_日K']) tags.push('缠论买');
-    if(latest['金钻_黄柱']) tags.push('金钻黄柱');
-    if(latest['四量图_机构变红']) tags.push('机构变红');
-    if(latest['上涨趋势']) tags.push('上涨趋势');
-    h+='<div>四格条：'+(tags.length?tags.map(x=>'<span style="display:inline-block;background:rgba(244,73,93,.15);color:var(--up);padding:1px 6px;border-radius:4px;margin:2px 4px 2px 0;font-size:11px;">'+x+'</span>').join(''):'<span style="color:var(--dim)">无信号</span>')+'</div>';
-    h+='<div>首次入选：<b>'+(row.first_date||'-')+'</b> · 最新价 <b>'+(latest.close||'-')+'</b> · 当日 <b>'+fmtPct(latest.pct_chg)+'</b></div>';
-    h+='</div></div>';
-    return h;
-  }
+  /* 2026-08-06 主人令：「永远空着的卡就删除，不要每只都空着不好看」
+     - 已删除 7 个重复/永远空函数：renderMulti / renderGoldPool / renderInst / renderPriceTrend / renderEma / renderReport / renderMahoro
+     - renderStrategyHits / renderRelatedFlow / renderLhb / renderSuspension 已改为「找不到就返回 ''」（不渲染占位）
+     - 个股查询网格仅含：renderQuote / renderStopStop / renderProfile / renderStrategyHits / renderRelatedFlow / renderLhb / renderSuspension
+     - 数据有就显示，没就整张不渲染 → 网格自动重排不空卡 */
 
   function renderLhb(item, code){
     const lhb = window.LHB_DATA || {};
     const arr = lhb.stocks || [];
     const row = arr.find(r=>normCode(r.code)===normCode(code));
-    if(!row) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">🐉 龙虎榜：未收录</div>';
+    if(!row) return '';
     let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
     h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:13px;font-weight:700;color:var(--cyan);">🐉 龙虎榜</span>';
     const catColor = row.category==='机游共振'?'var(--up)':row.category==='机构独买'?'var(--cyan)':row.category==='游资独买'?'var(--gold)':'var(--dim)';
@@ -4796,108 +4758,16 @@ function switchSec(sec,el){
     return h;
   }
 
-  function renderInst(item, code){
-    const it = window.INST_TRADE || {};
-    const arr = Array.isArray(it)?it:(it.stocks||[]);
-    const row = arr.find(r=>normCode(r.code)===normCode(code));
-    if(!row && !window.CAPITAL_FLOW_DATA) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">💰 主力资金：未收录</div>';
-    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
-    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:13px;font-weight:700;color:var(--up);">💰 主力资金</span></div>';
-    h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
-    if(row){
-      h+='<div>主力净买 <b style="color:'+(row.net>=0?'var(--up)':'var(--down)')+'">'+fmtYi(row.net)+'</b> · 连续 <b>'+(row.streak||'-')+'</b> 日</div>';
-      h+='<div>机构 <b>'+fmtYi(row.inst_net)+'</b> · 游资 <b>'+fmtYi(row.yz_net)+'</b></div>';
-    }else{
-      h+='<div>未找到该股主力明细</div>';
-    }
-    h+='</div></div>';
-    return h;
-  }
 
-  function renderPriceTrend(item, code){
-    const gp = window.GOLD_POOL || {};
-    const stocks = gp.stocks || {};
-    const row = stocks[fullKey(item)] || stocks[(item.market||'')+'_'+code] || stocks[code] || Object.values(stocks).find(s=>normCode(s.code)===normCode(code));
-    const hist = row && row.history ? row.history.slice(-10) : [];
-    if(!hist.length) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">📈 近10日走势：未收录</div>';
-    const W=260, H=80, PAD={l:30,r:10,t:10,b:20};
-    const vals = hist.map(d=>d.close||0);
-    const maxV = Math.max(...vals), minV = Math.min(...vals);
-    const range = maxV-minV || 1;
-    const gw = W-PAD.l-PAD.r, gh = H-PAD.t-PAD.b;
-    const pts = vals.map((v,i)=>{
-      const x = PAD.l + gw*(i/(vals.length-1||1));
-      const y = PAD.t + gh*(1-(v-minV)/range);
-      return x.toFixed(1)+','+y.toFixed(1);
-    }).join(' ');
-    let svg = '<svg width="100%" height="'+H+'" viewBox="0 0 '+W+' '+H+'" style="display:block;">';
-    svg += '<polyline points="'+pts+'" fill="none" stroke="'+(vals[vals.length-1]>=vals[0]?'var(--up)':'var(--down)')+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>';
-    vals.forEach((v,i)=>{
-      const x = PAD.l + gw*(i/(vals.length-1||1));
-      const y = PAD.t + gh*(1-(v-minV)/range);
-      svg += '<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="2" fill="var(--txt)"/>';
-    });
-    svg += '</svg>';
-    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
-    h+='<div style="font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:8px;">📈 近10日走势</div>';
-    h+=svg;
-    h+='<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--dim);margin-top:6px;"><span>'+hist[0].date+'</span><span>'+hist[hist.length-1].date+'</span></div>';
-    h+='</div>';
-    return h;
-  }
 
-  function renderEma(item, code){
-    const gp = window.GOLD_POOL || {};
-    const stocks = gp.stocks || {};
-    const row = stocks[fullKey(item)] || stocks[(item.market||'')+'_'+code] || stocks[code] || Object.values(stocks).find(s=>normCode(s.code)===normCode(code));
-    const latest = row && row.latest ? row.latest : (row && row.history ? row.history[row.history.length-1] : null);
-    if(!latest) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">📊 EMA趋势确认：未收录</div>';
-    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
-    h+='<div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px;">📊 EMA趋势确认</div>';
-    h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
-    const emaScore = latest['上涨趋势'] ? 7 : (latest['四量图_机构变红']?4:0);
-    h+='<div>趋势评分 <b style="color:'+(emaScore>=5?'var(--up)':'var(--dim)')+'">'+emaScore+'/7</b></div>';
-    const conds=[];
-    for(let i=1;i<=4;i++) if(latest['上涨趋势_条件'+i]) conds.push('条件'+i);
-    h+='<div>上涨条件：'+(conds.length?conds.join('、'):'<span style="color:var(--dim)">未满足</span>')+'</div>';
-    h+='</div></div>';
-    return h;
-  }
 
-  function renderReport(item, code){
-    const ar = window.ANALYST_RATINGS || {};
-    const arr = Array.isArray(ar)?ar:(ar.ratings||[]);
-    const row = arr.find(r=>normCode(r.code)===normCode(code));
-    if(!row) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">📰 研报覆盖：未收录</div>';
-    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
-    h+='<div style="font-size:13px;font-weight:700;color:var(--purple);margin-bottom:8px;">📰 研报覆盖</div>';
-    h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
-    h+='<div>评级 <b>'+(row.rating||'-')+'</b> · 推荐频次 <b>'+(row.count||'-')+'</b></div>';
-    h+='<div style="font-size:11px;color:var(--dim);margin-top:4px;">'+(row.date_range||row.latest_date||'-')+'</div>';
-    h+='</div></div>';
-    return h;
-  }
 
-  function renderMahoro(item, code){
-    const mh = window.MAHORO || {};
-    const signals = mh.signals || [];
-    const row = signals.find(r=>normCode(r.code||r.stock_code)===normCode(code));
-    if(!row) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">🏦 投行覆盖：未收录</div>';
-    let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
-    h+='<div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px;">🏦 投行覆盖</div>';
-    h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
-    const stance = row.stance || row.position || '中性';
-    h+='<div>立场 <b>'+stance+'</b> · 北向 <b>'+(row.north_flag||'-')+'</b></div>';
-    if(row.reason) h+='<div style="font-size:11px;color:var(--dim);margin-top:4px;">'+row.reason+'</div>';
-    h+='</div></div>';
-    return h;
-  }
 
   function renderSuspension(item, code){
     const alert = window.SUSPENSION_ALERT || {};
     const arr = alert.stocks || [];
     const row = arr.find(r=>normCode(r.code)===normCode(code));
-    if(!row) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">🚫 停牌识别：未在停牌清单中</div>';
+    if(!row) return '';
     let h='<div style="padding:12px;background:rgba(244,73,93,.08);border-radius:8px;border:1px solid rgba(244,73,93,.3);">';
     h+='<div style="font-size:13px;font-weight:700;color:var(--down);margin-bottom:8px;">🚫 停牌识别</div>';
     h+='<div style="font-size:12px;color:var(--sub);line-height:1.7;">';
@@ -5155,7 +5025,7 @@ function switchSec(sec,el){
     const frow = (fv.stocks||[]).find(r=>normCode(r.code)===nc);
     if(frow) hits.push({name:'🔥 四量终极', color:'#ff7043', detail:'游资+机构+金叉+四路翻多'});
 
-    if(!hits.length) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">🎖️ 选股策略命中：未收录</div>';
+    if(!hits.length) return '';
     let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
     h+='<div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px;">🎖️ 选股策略命中</div>';
     h+='<div style="display:flex;flex-direction:column;gap:6px;">';
@@ -5170,7 +5040,7 @@ function switchSec(sec,el){
 
   function renderRelatedFlow(item, code){
     const p = getProfile(code);
-    if(!p) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">💧 关联板块资金流向：无档案</div>';
+    if(!p) return '';
     const concepts = (p.concepts||[]).slice(0,8);
     const industry = p.industry || '';
     const rows=[];
@@ -5194,7 +5064,7 @@ function switchSec(sec,el){
       });
       if(srow && srow.net!=null) rows.push({name:srow.name||srow.sector_name, type:'板块', value:Number(srow.net), pct:srow.chg});
     }
-    if(!rows.length) return '<div style="padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);color:var(--dim);font-size:12px;">💧 关联板块资金流向：暂无匹配</div>';
+    if(!rows.length) return '';
     rows.sort(function(a,b){ return Math.abs(b.value)-Math.abs(a.value); });
     let h='<div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);">';
     h+='<div style="font-size:13px;font-weight:700;color:var(--up);margin-bottom:8px;">💧 关联板块资金流向</div>';
@@ -5226,21 +5096,17 @@ function switchSec(sec,el){
     h+='<span style="font-size:12px;color:var(--dim);font-family:monospace;">'+full+'</span>';
     h+='</div></div>';
 
+    // 2026-08-06 主人令·监控"未收录"：网格只放「有数据才显示」的卡
+    //  - renderQuote / StopStop / Profile：全市场 5537 只覆盖（必有）
+    //  - renderStrategyHits / RelatedFlow / Lhb：含"找不到就不渲染整张"守卫
+    //  - 删除原 renderMulti(renderStrategyHits 已含)/ GoldPool(重复)/ Report / Mahoro / Inst / PriceTrend / Ema（事件型永远空）
     h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:14px;">';
-    // 2026-08-06 升级：个股画像（必有数据）放最前 — 实时行情（含股息分红） + 止盈止损/目标位 + 概念行业（v8 新增全市场 5500+ 只覆盖）
     h+=renderQuote(item, code);
     h+=renderStopStop(item, code);
     h+=renderProfile(item, code);
-    // 策略命中（仅覆盖策略入选股，可能为空）
     h+=renderStrategyHits(item, code);
     h+=renderRelatedFlow(item, code);
-    h+=renderMulti(item, code);
-    h+=renderGoldPool(item, code);
     h+=renderLhb(item, code);
-    h+=renderInst(item, code);
-    h+=renderPriceTrend(item, code);
-    h+=renderEma(item, code);
-    h+=renderMahoro(item, code);
     h+='</div>';
     h+=renderSuspension(item, code);
     res.innerHTML = h;
