@@ -3195,10 +3195,22 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       h += '</div></div>';
       h += '</div>';
     }
-    // Weekly summary (北向席位·6 周卡片·以 today 为 anchor)
-    h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📊 周度汇总 · 北向席位</h3>';
+    // Weekly summary (北向席位·当月内所有完整自然周·2026-08-06 按自然月)
+    h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📊 周度汇总 · ' + (year) + '年' + (month+1) + '月北向席位</h3>';
     h += '<div class="week-cards">';
-    var cardsNb = _rc6WeekCards(todayStr);
+    // 当月所有完整自然周（周一-周日都在当月内）
+    var cardsNb = [];
+    var monthDays = new Date(year, month+1, 0).getDate();
+    var d = 1;
+    while(d <= monthDays && new Date(year, month, d).getDay() !== 1) d++;
+    var _wn = 1;
+    while(d <= monthDays){
+      var wMon = new Date(year, month, d);
+      var wSun = new Date(year, month, d+6);
+      if(wSun.getMonth() !== month) break;
+      cardsNb.push({no: _wn, mon: wMon, sun: wSun, monLabel: (wMon.getMonth()+1)+'/'+wMon.getDate(), sunLabel: (wSun.getMonth()+1)+'/'+wSun.getDate()});
+      d += 7; _wn++;
+    }
     cardsNb.forEach(function(wk){
       h += '<div class="wk-card"><div class="wk-card-hd"><span class="wk-card-title">第'+wk.no+'周 '+wk.monLabel+'-'+wk.sunLabel+'</span></div>';
       var wkNorth;
@@ -3233,15 +3245,16 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     });
     h += '</div>';
 
-    // Monthly summary (北向席位专属净买卖 buy-sell，非全机构 inst_net_万)
-    var _nbMonthLabel = (now.getMonth()+1) + '月';
-    if(lhbDate && lhbDate.length >= 8){
-      _nbMonthLabel = parseInt(lhbDate.slice(4,6)) + '月';
-    }
-    h += '<h3 style="margin-top:20px;font-size:15px;color:var(--txt)">📊 月度汇总 <span style="font-size:11px;color:var(--dim);font-weight:400">· ' + _nbMonthLabel + '龙虎榜北向席位净买卖（最新交易日 ' + (lhbDate?lhbDate.slice(0,4)+'/'+lhbDate.slice(4,6)+'/'+lhbDate.slice(6):'--') + '）</span></h3>';
+    // Monthly summary (北向席位·当月·2026-08-06 按自然月，过滤其他月)
+    var _monthNb = northStocks.filter(function(s){
+      var sd = (s.date||'').replace(/-/g,'');
+      if(sd.length < 8) return false;
+      return +sd.slice(0,4) === year && (+sd.slice(4,6)-1) === month;
+    });
+    h += '<h3 style="margin-top:20px;font-size:15px;color:var(--txt)">📊 月度汇总 <span style="font-size:11px;color:var(--dim);font-weight:400">· ' + (year) + '年' + (month+1) + '月龙虎榜北向席位净买卖（仅当月·' + _monthNb.length + '只有北向持仓）</span></h3>';
     h += '<div class="month-summary">';
-    var mNb = northStocks.filter(function(s){ return s._nb_net_万 > 0; }).sort(function(a,b){return b._nb_net_万 - a._nb_net_万;});
-    var mNs = northStocks.filter(function(s){ return s._nb_net_万 < 0; }).sort(function(a,b){return a._nb_net_万 - b._nb_net_万;});
+    var mNb = _monthNb.filter(function(s){ return s._nb_net_万 > 0; }).sort(function(a,b){return b._nb_net_万 - a._nb_net_万;});
+    var mNs = _monthNb.filter(function(s){ return s._nb_net_万 < 0; }).sort(function(a,b){return a._nb_net_万 - b._nb_net_万;});
     h += '<div class="ms-col"><div class="ms-title"><span style="color:var(--up)">▲</span> 净买入TOP10</div>';
     mNb.slice(0,10).forEach(function(s,idx){
       h += '<div class="ms-item"><span>'+(idx+1)+_rcEsc(s.name)+'<span class="ms-code">'+(s.code||'')+'</span></span><span class="ms-val c-up">'+_rcFmtYi(s._nb_net_万)+'</span></div>';
