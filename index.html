@@ -2947,21 +2947,24 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     });
     h += '</div>';
 
-    // Category tables
+    // Category lists — 3 列网格 + 紧凑行高（2026-08-06 用户偏好：不要大版面）
     [['机游共振','机游共振'],['机构独买','机构'],['游资独买','游资']].forEach(function(ci){
       var arr = byCat[ci[0]] || [];
       if(!arr.length) return;
       var dotClr = ci[0]==='机游共振'?'#a78bfa':ci[0]==='机构独买'?'#38bdf8':'#f59e0b';
-      h += '<div style="margin-bottom:12px"><div style="font-size:12px;font-weight:700;color:'+dotClr+';margin-bottom:6px">● '+ci[1]+' ('+arr.length+'只)</div>';
-      h += '<table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr style="color:var(--dim)"><th>名称</th><th style="text-align:right">涨跌%</th><th style="text-align:right">机构净入</th><th style="text-align:right">游资净入</th></tr></thead><tbody>';
+      h += '<div style="margin-bottom:10px"><div style="font-size:11px;font-weight:700;color:'+dotClr+';margin-bottom:4px">● '+ci[1]+' ('+arr.length+'只)</div>';
+      h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px 8px">';
       arr.forEach(function(s){
         var pct = s.pct || 0;
-        h += '<tr style="border-bottom:1px solid var(--border)"><td>'+_rcEsc(s.name)+'</td>';
-        h += '<td style="text-align:right;color:'+(pct>=0?'var(--up)':'var(--down)')+';font-weight:600">'+(pct>=0?'+':'')+pct.toFixed(1)+'%</td>';
-        h += '<td style="text-align:right;color:'+(s.inst_net_万>=0?'var(--up)':'var(--down)')+'">'+_rcFmtYi(s.inst_net_万)+'</td>';
-        h += '<td style="text-align:right;color:'+(s.yz_net_万>=0?'var(--up)':'var(--down)')+'">'+_rcFmtYi(s.yz_net_万)+'</td></tr>';
+        var instNet = s.inst_net_万||0, yzNet = s.yz_net_万||0;
+        h += '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:2px 4px;background:var(--bg2);border-radius:4px;font-size:10px;gap:4px">';
+        h += '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:42px">'+_rcEsc(s.name)+'</span>';
+        h += '<span style="color:'+(pct>=0?'var(--up)':'var(--down)')+';font-weight:600">'+(pct>=0?'+':'')+pct.toFixed(1)+'%</span>';
+        h += '<span style="color:'+(instNet>=0?'var(--up)':'var(--down)')+';font-weight:600">机'+_rcFmtYi(instNet)+'</span>';
+        h += '<span style="color:'+(yzNet>=0?'var(--up)':'var(--down)')+';font-weight:600">游'+_rcFmtYi(yzNet)+'</span>';
+        h += '</div>';
       });
-      h += '</tbody></table></div>';
+      h += '</div></div>';
     });
 
     h += '</div>';
