@@ -270,7 +270,6 @@ def write_four_volume_js(records, out_dir=DATA_DIR):
     data = {
         "update_time": update_time,
         "total": len(records),
-        "note": "四量终极 QD：游资点火(YZC)+机构托底(JG)+当天金叉(XC=四金叉或)+四路翻多(FOUR)，忠实原文 2026-08-05",
         "stocks": records,
     }
     path = os.path.join(out_dir, "FOUR_VOLUME.js")
