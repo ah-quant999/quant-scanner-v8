@@ -8593,6 +8593,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     el.dataset.rendered='1';
     try{
     var h='';
+    // 2026-08-06 23:34 主人反馈"暂未上架里还显示四量终极"——老 build 缓存问题
+    // 加 build 时间戳让主人一眼判断是不是最新 build
+    h+='<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:6px;padding:6px 10px;margin-bottom:12px;font-size:11px;color:var(--sub);">';
+    h+='🔄 当前 render 时刻：<b>'+new Date().toISOString().replace("T"," ").slice(0,19)+' UTC</b> · master HEAD = <b>e614a55</b> · 如果你看到「🔥 四量终极」卡说明浏览器在加载<b>老 build 缓存</b>，按 <b>Ctrl+F5</b> 强制刷新';
+    h+='</div>';
 
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #7b1fa2;">';
     h+=v8CardHeader('🧪','实验选股调试专区','管理员可见：三重起涨 / CRDS逆势 / 候选池，验证中请勿依赖','update_time',window.SH_FIB);
