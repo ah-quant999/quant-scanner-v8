@@ -9147,12 +9147,19 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       var hm = window._fmtHmCST ? window._fmtHmCST(t) : ('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2);
       return (diff<=0?'今日':diff===1?'昨日':diff+'天前')+' '+hm;
     }
-    // 2026-08-06 23:18 直接 innerHTML 强行写入（不走 setBadge 间接路径，主人无痕模式仍未见）
-    var timeEl=document.getElementById(p+'crdsTime');
-    if(timeEl){
-      var _ts=d && d.update_time ? d.update_time : '已加载';
-      timeEl.innerHTML = _uBadge('盘后','短线',_ts);
-    }
+    // 2026-08-06 23:18 → try/catch 包 + 双保险 fallback
+    try{
+      var timeEl=document.getElementById(p+'crdsTime');
+      if(timeEl){
+        var _ts=d && d.update_time ? d.update_time : '已加载';
+        var _html = _uBadge('盘后','短线',_ts);
+        if(_html && _html.length > 30){
+          timeEl.innerHTML = _html;
+        } else {
+          timeEl.innerHTML = '<span class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;"><span aria-hidden="true">🐻</span><span style="margin-left:4px">更新于</span><span style="color:#9fd0ff;font-weight:600;margin-left:4px">'+_ts+'</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">盘后</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">短线</span></span>';
+        }
+      }
+    }catch(e){ console.warn('[renderV8Crds] stcrdsTime write failed', e); }
     // 覆盖说明
     var covEl=document.getElementById(p+'crdsCoverage');
     if(covEl){
@@ -9344,12 +9351,20 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     // data.update_time 缺失（备份数据无时间戳）→ 显示「🐻 更新于 — · 盘后 · 短线」。
     // 2026-08-06 22:59 主人无痕模式截图四量终极仍不见胶囊 — 用 try/catch 包 + fallback 直接 innerHTML
     // 让胶囊必定可见（数据缺失时显示「已加载」，数据完整时显示「🐻 更新于 HH:MM · 盘后 · 短线」）
-    // 2026-08-06 23:18 主人截图四量终极仍未见胶囊 — 直接 innerHTML 强行写入（不走 setBadge 间接路径）
-    var _stfv=document.getElementById('stfvTime');
-    var _ts=d && d.update_time ? d.update_time : '已加载';
-    if(_stfv){
-      _stfv.innerHTML = _uBadge('盘后','短线',_ts);
-    }
+    // 2026-08-06 23:18 主人截图胶囊反复不见 → try/catch 包 _uBadge 调用 + 双保险 fallback
+    try{
+      var _stfv=document.getElementById('stfvTime');
+      var _ts=d && d.update_time ? d.update_time : '已加载';
+      if(_stfv){
+        var _badgeHtml = _uBadge('盘后','短线',_ts);
+        if(_badgeHtml && _badgeHtml.length > 30){
+          _stfv.innerHTML = _badgeHtml;
+        } else {
+          // _uBadge 异常返回空 → 强制 innerHTML 注入（保证胶囊可见）
+          _stfv.innerHTML = '<span class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;"><span aria-hidden="true">🐻</span><span style="margin-left:4px">更新于</span><span style="color:#9fd0ff;font-weight:600;margin-left:4px">'+_ts+'</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">盘后</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">短线</span></span>';
+        }
+      }
+    }catch(e){ console.warn('[renderFourVolume] stfvTime write failed', e); }
     var noteEl = document.getElementById('stfvNote');
     if(noteEl) noteEl.innerHTML = '⚡ 四路信号同时共振的当日候选 · 持有期 T+1/3/5/10/20 日可观测';
     var stocks = d.stocks || [];
