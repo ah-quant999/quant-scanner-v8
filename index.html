@@ -3156,12 +3156,15 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       h += '<div class="' + cls + '" onclick="_rcClickNorthDay(\'' + iso + '\')" data-date="' + iso + '">';
       h += '<span class="cal-date-num">' + d + '</span>';
 
-      if(hasData && northStocks.length > 0){
+      // 🔴 2026-08-06 修复：用当天 stocks 算北向 N（不是历史累计 northStocks.length=1444）
+      var _dayStocks = hasData ? ((dayMapNb[iso] && dayMapNb[iso].stocks) || []) : [];
+      var _dayNb = _dayStocks.filter(function(s){ var sx=(s.seats||{})['北向']; return sx && ((sx.buy||0)+(sx.sell||0)); });
+      if(hasData && _dayNb.length > 0){
         var nNet = 0;
-        northStocks.forEach(function(s){ nNet += (s._nb_net_万||0); });
+        _dayNb.forEach(function(s){ nNet += (((s.seats['北向'].buy||0) - (s.seats['北向'].sell||0))); });
         var nColor = nNet >= 0 ? 'c-up' : 'c-down';
         h += '<div class="cal-stat" style="text-align:center;padding:3px 2px">';
-        h += '<div style="color:#f59e0b;font-weight:700;font-size:10px">🌊北向 ' + northStocks.length + '</div>';
+        h += '<div style="color:#f59e0b;font-weight:700;font-size:10px">🌊北向 ' + _dayNb.length + '</div>';
         h += '<div class="' + nColor + '" style="font-size:9px;font-weight:600">' + _rcFmtYi(nNet) + '</div>';
         h += '</div>';
       } else {
@@ -3184,9 +3187,17 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     h += '<div id="northDayDetail" class="cal-detail"></div>';
 
     // ==== 最近交易日北向席位（截图2 样式：净买入TOP10 + 净卖出TOP10 卡片） ====
-    if(northStocks.length > 0 && lhbDate){
-      var nb = northStocks.filter(function(s){ return s._nb_net_万 > 0; }).sort(function(a,b){return b._nb_net_万 - a._nb_net_万;});
-      var ns = northStocks.filter(function(s){ return s._nb_net_万 < 0; }).sort(function(a,b){return a._nb_net_万 - b._nb_net_万;});
+    // 🔴 2026-08-06 修复：只用当天 stocks（不是 northStocks 历史累计 1444）
+    var _lastDayStocks = _nbDays.length ? (_nbDays[_nbDays.length-1].stocks || []) : [];
+    var northStocksToday = _lastDayStocks.filter(function(s){
+      var sx = (s.seats||{})['北向'];
+      return sx && ((sx.buy||0)+(sx.sell||0));
+    }).map(function(s){
+      return Object.assign({}, s, { _nb_net_万: ((s.seats['北向'].buy||0) - (s.seats['北向'].sell||0)) });
+    });
+    if(northStocksToday.length > 0 && lhbDate){
+      var nb = northStocksToday.filter(function(s){ return s._nb_net_万 > 0; }).sort(function(a,b){return b._nb_net_万 - a._nb_net_万;});
+      var ns = northStocksToday.filter(function(s){ return s._nb_net_万 < 0; }).sort(function(a,b){return a._nb_net_万 - b._nb_net_万;});
       var nbSum = nb.reduce(function(acc,s){return acc+s._nb_net_万;}, 0);
       var nsSum = ns.reduce(function(acc,s){return acc+s._nb_net_万;}, 0);
       var nbTotal = nbSum + nsSum;
@@ -3196,7 +3207,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📋 最近交易日龙虎榜北向席位</h3>';
       h += '<div style="display:flex;align-items:baseline;gap:14px;padding:0 4px;margin-bottom:10px;font-size:12px">';
       h += '<span style="color:var(--txt);font-weight:600">📅 '+lhbDate.slice(0,4)+'/'+lhbDate.slice(4,6)+'/'+lhbDate.slice(6)+' '+wkLabel+'</span>';
-      h += '<span style="color:var(--gold);font-weight:700">★北向参与 '+northStocks.length+'</span>';
+      h += '<span style="color:var(--gold);font-weight:700">★北向参与 '+northStocksToday.length+'</span>';
       h += '<span style="color:'+(nbTotal>=0?'var(--up)':'var(--down)')+';font-weight:700">净流入 '+(nbTotal/10000>=0?'+':'')+(nbTotal/10000).toFixed(2)+'亿</span>';
       h += '</div>';
       h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
