@@ -2770,9 +2770,13 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
     // Detail panel
     h += '<div id="jyDayDetail" class="cal-detail"></div>';
 
-    /* ===== 最近交易日龙虎榜详情（按自然月分组 + 月内按周排序，2026-08-06 修正） ===== */
-    h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📋 最近交易日龙虎榜</h3>';
-    var jyDays = days;
+    /* ===== 最近交易日龙虎榜详情（仅当月·2026-08-06 用户令「当月只能看到当月的」） ===== */
+    h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📋 最近交易日龙虎榜 <span style="font-size:11px;color:var(--dim);font-weight:400">· 仅 '+year+'年'+(month+1)+'月</span></h3>';
+    var jyDays = days.filter(function(d){
+      var dY = parseInt(d.iso.slice(0,4));
+      var dM = parseInt(d.iso.slice(4,6))-1;
+      return dY === year && dM === month;
+    });
 
     // 按自然月分组（key = YYYYMM）+ 月内按 wr.mon 时间戳排序
     var monthBuckets = {};
@@ -2839,10 +2843,22 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       });
       h += '</div>'; // jy-month
     });
-    /* ===== 周度汇总(6 周卡·以 today 为 anchor) ===== */
-    h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📊 周度汇总 · 机游共振</h3>';
+    /* ===== 周度汇总（当月所有完整自然周·2026-08-06 按自然月） ===== */
+    h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📊 周度汇总 · 机游共振 <span style="font-size:11px;color:var(--dim);font-weight:400">· 仅 '+year+'年'+(month+1)+'月</span></h3>';
     h += '<div class="week-cards">';
-    var cardsJy = _rc6WeekCards(todayStr);
+    // 当月所有完整自然周（周一-周日都在当月内）
+    var cardsJy = [];
+    var _mdays = new Date(year, month+1, 0).getDate();
+    var _d = 1;
+    while(_d <= _mdays && new Date(year, month, _d).getDay() !== 1) _d++;
+    var _wkn = 1;
+    while(_d <= _mdays){
+      var _wMon = new Date(year, month, _d);
+      var _wSun = new Date(year, month, _d+6);
+      if(_wSun.getMonth() !== month) break;
+      cardsJy.push({no:_wkn, mon:_wMon, sun:_wSun, monLabel:(_wMon.getMonth()+1)+'/'+_wMon.getDate(), sunLabel:(_wSun.getMonth()+1)+'/'+_wSun.getDate()});
+      _d += 7; _wkn++;
+    }
     cardsJy.forEach(function(wk){
       // 归类：把 jyDays 里的天按 Mon-Sun 落入对应周卡
       var wkItems = jyDays.filter(function(dy){
@@ -2894,14 +2910,9 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       h += '</div>';
     });
     h += '</div>';
-    /* ===== 月度汇总 ===== */
-    var _monthLabel;
-    if(lhbDate && lhbDate.length >= 8){
-      _monthLabel = parseInt(lhbDate.slice(4,6)) + '月';
-    } else {
-      _monthLabel = (now.getMonth()+1) + '月';
-    }
-    h += '<h3 style="margin-top:20px;font-size:15px;color:var(--txt)">📊 月度汇总 <span style="font-size:11px;color:var(--dim);font-weight:400">· ' + _monthLabel + '净买卖（最新交易日 ' + (lhbDate?lhbDate.slice(0,4)+'/'+lhbDate.slice(4,6)+'/'+lhbDate.slice(6):'--') + '）</span></h3>';
+    /* ===== 月度汇总（当前 calendar 月·2026-08-06 按自然月） ===== */
+    var _monthLabel = year + '年' + (month+1) + '月';
+    h += '<h3 style="margin-top:20px;font-size:15px;color:var(--txt)">📊 月度汇总 <span style="font-size:11px;color:var(--dim);font-weight:400">· ' + _monthLabel + '净买卖（仅当月·' + (lhbDate&&parseInt(lhbDate.slice(0,4))===year&&(parseInt(lhbDate.slice(4,6))-1)===month?(lhbDate.slice(0,4)+'/'+lhbDate.slice(4,6)+'/'+lhbDate.slice(6)):'--') + '）</span></h3>';
     h += '<div class="month-summary">';
 
     // Buy TOP10
