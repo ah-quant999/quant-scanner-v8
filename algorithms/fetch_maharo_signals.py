@@ -74,7 +74,12 @@ def http_get(url, cookies=""):
     """Simple HTTP GET"""
     import ssl
     ctx = ssl.create_default_context()
-    req = urllib.request.Request(url, headers={"Cookie": cookies} if cookies else {})
+    # 2026-08-06 修复：必须带 User-Agent，否则 mahoro.cn 拒绝（导致 cookie 复用检测永远失败 → 永远走发验证码分支）
+    ua = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)", "Accept": "application/json"}
+    headers = dict(ua)
+    if cookies:
+        headers["Cookie"] = cookies
+    req = urllib.request.Request(url, headers=headers)
     try:
         resp = urllib.request.urlopen(req, timeout=15, context=ctx)
         return json.load(resp)
@@ -87,6 +92,17 @@ def authenticate(email, non_interactive=False, code=None):
     非交互模式下：无有效 cookie 则直接返回 None，不阻塞。
     code 参数：直接使用提供的验证码，跳过 input()。
     """
+    # 2026-08-06 新增：支持环境变量 MAHORO_COOKIE（GitHub Actions secrets 注入，云端自动化用）
+    # 优先级：环境变量 > 本地文件。云端每次 checkout 无 cookie 文件（gitignore 屏蔽），
+    # 但 workflow 可从 repo secret 注入 MAHORO_COOKIE → 云端每天可真实拉取。
+    env_cookie = os.environ.get("MAHORO_COOKIE", "").strip()
+    if env_cookie:
+        test = http_get(MAHORO_API_SIGNALS + "?limit=1", env_cookie)
+        if test and test.get("signals") is not None:
+            print("  ✓ 复用环境变量 cookie")
+            return env_cookie
+        print("  ⚠️ 环境变量 cookie 已过期，需在 GitHub Secrets 更新 MAHORO_COOKIE")
+
     # Check saved cookies
     if os.path.exists(COOKIE_FILE):
         with open(COOKIE_FILE, "r") as f:
