@@ -2476,7 +2476,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       .ms-val{font-weight:700}
 
       /* 详情展开 */
-      .cal-detail{margin-top:14px;border:1px solid var(--border);border-radius:12px;background:var(--card);overflow:hidden;display:none}
+      .cal-detail{margin-top:14px;border:1px solid var(--border);border-radius:12px;background:var(--card);overflow:hidden;display:none;max-height:78vh}
+      .cal-detail>.cal-detail-body{overflow-y:auto;max-height:calc(78vh - 44px)}
       .cal-detail.show{display:block}
       .cal-detail-head{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg2)}
       .cal-detail-head h4{margin:0;font-size:14px;color:var(--txt)}
@@ -3320,19 +3321,55 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       var sx = s.seats['北向'] || {};
       return Object.assign({}, s, { _nb_net_万: (sx.buy||0) - (sx.sell||0) });
     });
+    // 按北向净买入降序排序（净买入>0 在前，<0 在后）
+    var sorted = northStocks.slice().sort(function(a,b){ return (b._nb_net_万||0) - (a._nb_net_万||0); });
+    var nbTop = sorted.filter(function(s){ return (s._nb_net_万||0) > 0; });
+    var nsTop = sorted.filter(function(s){ return (s._nb_net_万||0) < 0; }).reverse();
+    var nbTotal = nbTop.reduce(function(a,s){return a+s._nb_net_万;},0);
+    var wkdayMap = ['周日','周一','周二','周三','周四','周五','周六'];
+    var _ny = +dateStr.slice(0,4), _nm = +dateStr.slice(4,6)-1, _nd = +dateStr.slice(6,8);
+    var wkLabel = wkdayMap[new Date(_ny, _nm, _nd).getDay()];
     var dispDate = dateStr.slice(0,4)+'-'+dateStr.slice(4,6)+'-'+dateStr.slice(6,8);
-    var h = '<div class="cal-detail-head"><h4>'+dispDate+' 北向席位详情</h4><span class="cal-detail-close" onclick="this.closest(\'.cal-detail\').classList.remove(\'show\')">✕</span></div>';
+    var h = '<div class="cal-detail-head"><h4>'+dispDate+'（'+wkLabel+'）北向席位详情</h4><span class="cal-detail-close" onclick="this.closest(\'.cal-detail\').classList.remove(\'show\')">✕</span></div>';
     h += '<div class="cal-detail-body">';
-    // 2-3 列网格 + 紧凑行高（2026-08-06 用户偏好：不喜欢大版面）
+    // 段 1：全部北向席位股票（按净买入排序）
+    h += '<div style="display:flex;align-items:baseline;gap:12px;font-size:11px;color:var(--dim);margin-bottom:6px;flex-wrap:wrap">';
+    h += '<span>📋 全部北向席位股票 <b style="color:var(--txt)">'+sorted.length+'</b> 只</span>';
+    h += '<span style="color:var(--gold)">★北向参与 '+sorted.length+'</span>';
+    h += '<span style="color:'+(nbTotal>=0?'var(--up)':'var(--down)')+';font-weight:700">净流入 '+(nbTotal/10000>=0?'+':'')+(nbTotal/10000).toFixed(2)+'亿</span>';
+    h += '</div>';
     h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px 10px;font-size:11px">';
-    northStocks.forEach(function(s){
+    sorted.forEach(function(s){
       h += '<div style="display:flex;justify-content:space-between;align-items:baseline;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.04)">';
       h += '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+_rcEsc(s.name)+'</span>';
       h += '<span style="margin-left:6px;color:'+(s.pct>=0?'var(--up)':'var(--down)')+';font-size:10px">'+((s.pct>=0?'+':'')+(s.pct||0).toFixed(1)+'%')+'</span>';
       h += '<span style="color:'+(s._nb_net_万>=0?'var(--up)':'var(--down)')+';font-weight:700;min-width:52px;text-align:right">'+_rcFmtYi(s._nb_net_万||0)+'</span>';
       h += '</div>';
     });
+    h += '</div>';
+    // 段 2：净买入 TOP10 + 净卖出 TOP10（详情卡片）
+    h += '<h3 style="margin-top:18px;font-size:14px;color:var(--txt)">📊 净买卖 TOP10（按北向席位净买入）</h3>';
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+    h += '<div class="jy-day-card" style="margin-bottom:0"><div class="jy-day-hd" style="color:var(--up)"><span>▲</span> 净买入 TOP10</div><div class="jy-day-body">';
+    if(nbTop.length){
+      nbTop.slice(0,10).forEach(function(s){
+        h += '<div class="jy-day-row"><span class="jy-day-name">'+_rcEsc(s.name)+'</span><span class="jy-day-val c-up">'+_rcFmtYi(s._nb_net_万)+'</span></div>';
+      });
+    } else {
+      h += '<div style="text-align:center;color:var(--dim);padding:8px;font-size:11px">该日无净买入</div>';
+    }
     h += '</div></div>';
+    h += '<div class="jy-day-card" style="margin-bottom:0"><div class="jy-day-hd" style="color:var(--down)"><span>▼</span> 净卖出 TOP10</div><div class="jy-day-body">';
+    if(nsTop.length){
+      nsTop.slice(0,10).forEach(function(s){
+        h += '<div class="jy-day-row"><span class="jy-day-name">'+_rcEsc(s.name)+'</span><span class="jy-day-val c-down">'+_rcFmtYi(s._nb_net_万)+'</span></div>';
+      });
+    } else {
+      h += '<div style="text-align:center;color:var(--dim);padding:8px;font-size:11px">该日无净卖出</div>';
+    }
+    h += '</div></div>';
+    h += '</div>';
+    h += '</div>';
     detail.innerHTML = h;
     detail.className = 'cal-detail show';
   };
