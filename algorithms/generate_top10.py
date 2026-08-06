@@ -18,7 +18,8 @@ from datetime import datetime
 from fundamental_helper import fq_key_of, quality_points
 
 WORKSPACE = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(WORKSPACE, "..", "out")
+# 🔴 2026-08-06 修复：历史快照目录从 out/history（gitignore，云端丢）→ raw_data/history（git 跟踪 + api_push 推送持久化）
+DATA_DIR = os.path.join(WORKSPACE, "..", "raw_data")
 OUTPUT = os.path.join(DATA_DIR, "top10_daily.json")
 
 

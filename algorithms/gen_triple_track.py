@@ -31,7 +31,7 @@ except NameError:
 from datetime import datetime
 
 WORKSPACE = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(WORKSPACE, "..", "out")
+DATA_DIR = os.path.join(WORKSPACE, "..", "raw_data")  # 🔴 2026-08-06 改 raw_data：fundamental/top10/backtest 输入均已持久化在 raw_data（out/ 被 gitignore 云端丢）
 OUT = os.path.join(DATA_DIR, "triple_track.json")
 # 2026-08-06 补：line 57 `def load_meta_map(path=META_FILE)` 引用了本文件从未定义的 META_FILE
 # （复制自 gen_triple_consensus.py 时漏带常量），默认参数在定义时即求值 → 每轮 NameError 必崩，
@@ -91,7 +91,8 @@ def main():
     bc = load_json(os.path.join(DATA_DIR, "backtest_comprehensive.json"), {})
     cb = load_json(os.path.join(DATA_DIR, "cockpit_backtest.json"), {})
     top10 = load_json(os.path.join(DATA_DIR, "top10_daily.json"), {})
-    tier = load_json(os.path.join(DATA_DIR, "cockpit_tier_recommend_alimi.json"), {})
+    # 🔴 2026-08-06 改 v8 命名：stage_to_raw 提升为 raw_data/cockpit_tier_recommend.json
+    tier = load_json(os.path.join(DATA_DIR, "cockpit_tier_recommend.json"), {})
 
     fq_stocks = fq.get("stocks", {}) if isinstance(fq, dict) else {}
     gp_stocks = gold_pool.get("stocks", {}) if isinstance(gold_pool, dict) else {}

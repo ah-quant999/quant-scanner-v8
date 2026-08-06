@@ -21,7 +21,7 @@ except NameError:
 from datetime import datetime
 
 WORKSPACE = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(WORKSPACE, "..", "out")
+DATA_DIR = os.path.join(WORKSPACE, "..", "raw_data")  # 🔴 2026-08-06 改 raw_data：fundamental/top10/backtest 输入均已持久化在 raw_data（out/ 被 gitignore 云端丢）
 OUTPUT = os.path.join(DATA_DIR, "triple_consensus.json")
 META_FILE = os.path.join(WORKSPACE, "stock_industry_concepts.json")
 
@@ -101,7 +101,8 @@ def main():
     print("=" * 60)
 
     top10 = load_json(os.path.join(DATA_DIR, "top10_daily.json"), {})
-    tier = load_json(os.path.join(DATA_DIR, "cockpit_tier_recommend_alimi.json"), {})
+    # 🔴 2026-08-06 改 v8 命名：stage_to_raw 把 out/cockpit_tier_recommend_alimi.json 提升为 raw_data/cockpit_tier_recommend.json
+    tier = load_json(os.path.join(DATA_DIR, "cockpit_tier_recommend.json"), {})
     fundamental = load_json(os.path.join(DATA_DIR, "fundamental_quality.json"), {})
     gold_pool = load_json(os.path.join(DATA_DIR, "gold_pool.json"), {})
 

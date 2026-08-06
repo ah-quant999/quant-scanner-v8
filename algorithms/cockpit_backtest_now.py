@@ -27,8 +27,9 @@ from collections import defaultdict
 import baostock as bs
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-HIST_DIR = os.path.join(BASE, "..", "out", "history")
-OUT = os.path.join(BASE, "..", "out", "cockpit_backtest.json")
+# 🔴 2026-08-06 修复：历史快照目录从 out/history（gitignore，云端丢）→ raw_data/history
+HIST_DIR = os.path.join(BASE, "..", "raw_data", "history")
+OUT = os.path.join(BASE, "..", "raw_data", "cockpit_backtest.json")
 TODAY = datetime.now().strftime("%Y-%m-%d")
 
 

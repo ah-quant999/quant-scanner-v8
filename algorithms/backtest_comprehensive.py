@@ -38,9 +38,10 @@ import baostock as bs
 
 # ── 常量 ──
 BASE = os.path.dirname(os.path.abspath(__file__))
-HIST_DIR = os.path.join(BASE, "..", "out", "history")
+# 🔴 2026-08-06 修复：历史快照目录从 out/history（gitignore，云端丢）→ raw_data/history（git 跟踪 + api_push 推送持久化）
+HIST_DIR = os.path.join(BASE, "..", "raw_data", "history")
 BACKUP_DIR = os.path.join(BASE, "backup")  # 多个 backup_YYYYMMDD
-OUT = os.path.join(BASE, "..", "out", "backtest_comprehensive.json")
+OUT = os.path.join(BASE, "..", "raw_data", "backtest_comprehensive.json")
 TODAY = datetime.now()
 TODAY_STR = TODAY.strftime("%Y-%m-%d")
 

@@ -45,7 +45,9 @@ from datetime import datetime
 import baostock as bs
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(BASE, "..", "out")
+# 🔴 2026-08-06 修复：输出目录从 out/（gitignore，云端丢）→ raw_data/（git 跟踪 + api_push 推送持久化）。
+#   fundamental_quality 是 generate_top10 的 score_quality 上游，之前每次云端跑完丢失 → quality 分永远 0 → TOP10 永远 <70 → 回测无信号。
+DATA_DIR = os.path.join(BASE, "..", "raw_data")
 OUTPUT = os.path.join(DATA_DIR, "fundamental_quality.json")
 STOCK_NAMES = os.path.join(DATA_DIR, "stock_names.json")
 

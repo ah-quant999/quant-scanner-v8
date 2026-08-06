@@ -32,7 +32,8 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(BASE, "..", "out")
+# 🔴 2026-08-06 修复：历史快照目录从 out/（gitignore，云端丢）→ raw_data/
+DATA_DIR = os.path.join(BASE, "..", "raw_data")
 OUT = os.path.join(DATA_DIR, "backtest_tdx.json")
 TODAY = datetime.now().strftime("%Y-%m-%d")
 HOLD_DAYS = [1, 3, 5, 10, 20]  # 2026-07-26: 从 3d/5d 扩展到 1/3/5/10/20d

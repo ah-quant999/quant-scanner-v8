@@ -23,7 +23,7 @@ except NameError:
 from datetime import datetime, date
 
 WORKSPACE = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(WORKSPACE, "..", "out")
+DATA_DIR = os.path.join(WORKSPACE, "..", "raw_data")  # 🔴 2026-08-06 改 raw_data：fundamental/top10/backtest 输入均已持久化在 raw_data（out/ 被 gitignore 云端丢）
 OUTPUT = os.path.join(DATA_DIR, "triple_resonance_history.json")
 META_PREFIX = "_"
 

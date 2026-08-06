@@ -26,6 +26,10 @@ V8_ROOT = os.path.dirname(ALGO)
 #   脚本 BASE = algorithms/，故 BASE/../out = 仓库根/out（不是 algorithms/out）。
 #   原来这里写 ALGO/out 与脚本对不上 → reseed 灌到 algorithms/out 而脚本读仓库根/out → 全链找不到输入。
 OUT = os.path.join(V8_ROOT, "out")
+# 🔴 2026-08-06 修复：历史快照目录从 out/history（gitignore，云端丢）→ raw_data/history（git 跟踪 + api_push 持久化）。
+#   否则 backtest_tdx / backtest_comprehensive / cockpit_backtest_now 依赖的历史 top10/gold_pool 快照每次跑完丢失，
+#   回测永远只有当天/为空。stage_to_raw 不会处理 history 子目录，故直接落 raw_data/history 由 api_push 整体推送。
+HIST_OUT = os.path.join(V8_ROOT, "raw_data", "history")
 
 V6_DATA_DIR = os.environ.get("V6_DATA_DIR", r"E:\workspace\stock-scanner\data")
 PY = os.environ.get("V8_PYTHON", "python")
@@ -146,7 +150,7 @@ def step_seed_inputs():
     try:
         gp_src = os.path.join(OUT, "gold_pool.json")
         if os.path.exists(gp_src):
-            hist_dir = os.path.join(OUT, "history")
+            hist_dir = HIST_OUT
             os.makedirs(hist_dir, exist_ok=True)
             today_str = datetime.now().strftime("%Y%m%d")
             gp_snap = os.path.join(hist_dir, f"gold_pool_{today_str}.json")
