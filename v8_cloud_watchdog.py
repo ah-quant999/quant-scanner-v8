@@ -194,13 +194,26 @@ def in_schedule_window(kind, now_cst=None):
     now = now_cst or datetime.now(timezone(timedelta(hours=8)))
     h, wd = now.hour, now.weekday()
     weekend = wd >= 5
+    mins = h * 60 + now.minute       # 当日分钟数，用于精确到分钟的窗口边界
+
+    # 2026-08-06 第三十八轮修正【当日首刷盲区】：
+    #   旧窗口下界写成整点 8（= 08:00 起就算"应有调度"），但当日第一份数据其实来自
+    #   08:15 本地盘前全量 / 08:25 云端 cn_fetch_cloud(+约10分钟跑完)。
+    #   ⇒ 每个工作日 08:00-08:30 之间，raw_data 与 cn_fetch 必然还停在昨晚的时间戳，
+    #     必然判 FAIL，必然发一封"陈旧"告警邮件 —— 结构性误报，与真故障无法区分。
+    #   本轮实测坐实：08:14:22 巡检报 raw_data 8.1h + cn_fetch 14.7h 双 FAIL 并发信；
+    #     08:15:16 盘前自动化提交 7290336 后两项自动转绿，前后仅差 54 秒。
+    #   ⇒ 工作日下界统一后移到 08:45（08:25 cron + 跑完 + 推送的安全余量）。
+    #     整点巡检落在每小时 :14，边界取 08:45 意味着 08:14 豁免、09:14 起照常严查，
+    #     真故障最迟 09:14 必被抓到，不会漏。
+    PREMARKET_GUARD = 8 * 60 + 45    # 08:45
 
     if kind == "cn_fetch":
         if weekend:
             return 9 <= h <= 11          # 周末只有 09:00 一轮
         # 2026-08-06 修正：云端 v8_cn_fetch_cloud 除盘中槽外新增 16:30 港股补抓、
         # 17:00 与 21:00 两个全量兜底 cron，旧窗口 8-16 会把 17:00/21:00 故障静默掉。
-        return 8 <= h <= 22              # 云端 08:25~21:00（含 16:30/17:00/21:00 兜底）+1h 容错
+        return PREMARKET_GUARD <= mins and h <= 22   # 云端 08:25~21:00 + 容错
     if kind == "build_deploy":
         if weekend:
             return 9 <= h <= 22
@@ -208,7 +221,7 @@ def in_schedule_window(kind, now_cst=None):
     if kind == "raw_data":
         if weekend:
             return 9 <= h <= 22
-        return 8 <= h <= 22
+        return PREMARKET_GUARD <= mins and h <= 22
     return True
 
 
