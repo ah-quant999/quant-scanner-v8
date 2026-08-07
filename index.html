@@ -400,6 +400,7 @@ html>
     <script src="data/MACRO_BRIEF.js?v=20260807222544"></script>
 <script src="data/NT_DATA.js?v=202608071930"></script>
 <script src="data/LHB_DATA.js?v=20260807192639"></script>
+<script src="data/LHB_7D.js?v=20260807234429"></script>
 <script src="data/LHB_HISTORY.js?v=20260807154534"></script>
 <script src="data/CONCEPT_RANKING.js?v=20260807221523"></script>
 <script src="data/INDEX_QUOTES.js?v=20260807221522"></script>
@@ -1418,6 +1419,38 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           });
         }
 
+        // 7. 近7日累计（LHB_7D）
+        var d7=window.LHB_7D;
+        if(d7 && d7.range){
+          h+='<div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--border);">';
+          h+='<div style="font-size:12px;font-weight:800;color:var(--txt);margin-bottom:8px;">📅 近7日累计 ('+d7.range[0]+' ~ '+d7.range[1]+')</div>';
+
+          h+='<div style="font-size:11px;font-weight:700;color:#ffd54f;margin:8px 0 3px;">★ 7日机游共振 TOP5</div>';
+          if(d7.top_resonance && d7.top_resonance.length){
+            d7.top_resonance.forEach(function(s){
+              h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.combined_net, '#ffd54f',
+                '机'+sign(s.inst_net)+fmtWan(s.inst_net)+' / 游'+sign(s.yz_net)+fmtWan(s.yz_net));
+            });
+          } else { h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">—</div>'; }
+
+          h+='<div style="font-size:11px;font-weight:700;color:var(--cyan);margin:8px 0 3px;">▲ 7日机构净买入 TOP5</div>';
+          if(d7.top_inst_buy && d7.top_inst_buy.length){
+            d7.top_inst_buy.forEach(function(s){ h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.inst_net, 'var(--cyan)'); });
+          } else { h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">—</div>'; }
+
+          h+='<div style="font-size:11px;font-weight:700;color:var(--gold);margin:8px 0 3px;">▲ 7日游资净买入 TOP5</div>';
+          if(d7.top_yz_buy && d7.top_yz_buy.length){
+            d7.top_yz_buy.forEach(function(s){ h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.yz_net, 'var(--gold)'); });
+          } else { h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">—</div>'; }
+
+          h+='<div style="font-size:11px;font-weight:700;color:var(--sub);margin:8px 0 3px;">▼ 7日机构净卖出 TOP5</div>';
+          if(d7.top_inst_sell && d7.top_inst_sell.length){
+            d7.top_inst_sell.forEach(function(s){ h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.inst_net, 'var(--sub)'); });
+          } else { h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">—</div>'; }
+
+          h+='</div>';
+        }
+
         el.innerHTML=h;
         var mt=$('jyCalTime');
         if(mt && lhb.update_time) mt.innerHTML = _uBadge('盘后','短线',lhb.update_time);
@@ -1536,6 +1569,31 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
             });
             h+='</div></details>';
           }
+        }
+
+        // 近7日北向席位累计（LHB_7D）
+        var d7n=window.LHB_7D;
+        if(d7n && d7n.range){
+          h+='<div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--border);">';
+          h+='<div style="font-size:12px;font-weight:800;color:var(--txt);margin-bottom:8px;">📅 近7日北向席位累计 ('+d7n.range[0]+' ~ '+d7n.range[1]+')</div>';
+
+          h+='<div style="font-size:11px;font-weight:700;color:var(--north);margin:8px 0 3px;">▲ 7日北向席位净买入 TOP5</div>';
+          if(d7n.top_north_buy && d7n.top_north_buy.length){
+            d7n.top_north_buy.forEach(function(s){
+              h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.north_net, 'var(--north)',
+                '买'+fmtWan(s.north_buy)+'/卖'+fmtWan(s.north_sell));
+            });
+          } else { h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">—</div>'; }
+
+          h+='<div style="font-size:11px;font-weight:700;color:var(--sub);margin:8px 0 3px;">▼ 7日北向席位净卖出 TOP5</div>';
+          if(d7n.top_north_sell && d7n.top_north_sell.length){
+            d7n.top_north_sell.forEach(function(s){
+              h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.north_net, 'var(--sub)',
+                '买'+fmtWan(s.north_buy)+'/卖'+fmtWan(s.north_sell));
+            });
+          } else { h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">—</div>'; }
+
+          h+='</div>';
         }
 
         el.innerHTML=h;
@@ -8547,20 +8605,74 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       h += '</div></div>';
     })();
 
-    // ── 卡 3：📝 AI 报告解读（框架卡，标记需 LLM） ──
+    // ── 卡 3：📝 AI 报告解读（规则模板版，不调用 LLM） ──
     (function(){
-      h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #22c55e;opacity:0.9">';
-      h += v8CardHeader('📝','AI 报告解读','让数据自动翻译成可读结论（需 LLM 调用 · 当前仅框架）','update_time',
-        {update_time:'', slot:'T+1', horizon:'中线'}, true);
-      h += '<div style="padding:12px 14px;font-size:12px;line-height:1.7">';
-      h += '<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:6px;color:#f59e0b;font-weight:700;font-size:11px;margin-bottom:10px">🤖 未就绪 — 需接入 LLM 服务</div>';
-      h += '<div style="color:var(--sub);margin-bottom:8px"><b>设计目标：</b>每个重要卡片旁加 🤖 按钮，点击后调 LLM 生成 ~200 字自然语言解读：</div>';
-      h += '<ul style="color:var(--dim);padding-left:18px;margin:4px 0">';
-      h += '<li>为什么今日这项数据关键？</li>';
-      h += '<li>后续应该关注什么？</li>';
-      h += '<li>对操作的具体建议是什么？</li>';
-      h += '</ul>';
-      h += '<div style="color:var(--dim);font-size:10px;margin-top:8px">📦 数据源：基于现有 raw_data + LLM API 调用（无需新数据采集）</div>';
+      function fmtWan(w){
+        if(w==null) return '-';
+        var a=Math.abs(w);
+        if(a>=10000) return (w/10000).toFixed(2)+'亿';
+        return Math.round(w).toLocaleString('zh-CN')+'万';
+      }
+      function pickLatestTs(){
+        var ts='';
+        var sources=[window.CRISIS_DATA&&window.CRISIS_DATA.update_time, window.LIMIT_UP_HEATMAP&&window.LIMIT_UP_HEATMAP.update_time, window.LHB_DATA&&window.LHB_DATA.update_time];
+        sources.forEach(function(s){ if(s && s>ts) ts=s; });
+        return ts;
+      }
+
+      // 危机雷达分数
+      var cd=window.CRISIS_DATA||{};
+      var crisisScore=Math.round(((cd.currency||0)*0.40 + (cd.economy||0)*0.35 + (cd.global||0)*0.25)*100);
+      var crisisLevel=crisisScore<30?'低风险':crisisScore<50?'关注区':crisisScore<70?'警惕区':'高风险';
+      var crisisColor=crisisScore<30?'#22c55e':crisisScore<50?'#f59e0b':crisisScore<70?'#f97316':'#ef4444';
+
+      // 涨停数据
+      var lu=window.LIMIT_UP_HEATMAP||{};
+      var limitTotal=lu.total||0;
+      var ladder=lu.ladder||{};
+      var ladderKeys=Object.keys(ladder).map(Number);
+      var maxLadder=ladderKeys.length?Math.max.apply(null,ladderKeys):0;
+
+      // 龙虎榜数据
+      var lhb=window.LHB_DATA||{};
+      var lhbSummary=lhb.summary||{};
+      var lhbTotal=lhbSummary['总计']||(lhb.stocks&&lhb.stocks.length)||0;
+      var lhbRes=lhbSummary['机游共振']||0;
+
+      // 规则模板拼接
+      var parts=[];
+      // 环境
+      parts.push('危机雷达 <span style="color:'+crisisColor+';font-weight:800">'+crisisScore+'</span>（'+crisisLevel+'）。');
+      // 情绪
+      if(limitTotal>=80) parts.push('涨停家数达 '+limitTotal+' 家，情绪火热，高标 '+maxLadder+' 板，短线赚钱效应强。');
+      else if(limitTotal>=50) parts.push('涨停 '+limitTotal+' 家，情绪偏暖，连板高度 '+maxLadder+' 板。');
+      else if(limitTotal>=30) parts.push('涨停 '+limitTotal+' 家，情绪中性，高度 '+maxLadder+' 板。');
+      else parts.push('涨停仅 '+limitTotal+' 家，情绪偏冷，高度 '+maxLadder+' 板。');
+      // 资金
+      if(lhbRes>=5) parts.push('龙虎榜机游共振 '+lhbRes+' 只，机构与游资合力明显。');
+      else if(lhbRes>=1) parts.push('龙虎榜机游共振 '+lhbRes+' 只，资金分歧仍存。');
+      else parts.push('龙虎榜机游共振缺失，大资金观望。');
+      // 建议
+      if(crisisScore<30 && limitTotal>=50){
+        parts.push('建议：可积极参与主线，但高位股注意兑现。');
+      } else if(crisisScore>=50 || limitTotal<30){
+        parts.push('建议：控制仓位，优先防御或空仓观望。');
+      } else if(maxLadder>=4 && lhbRes>=3){
+        parts.push('建议：短线可试错龙头分歧转一致，设好止损。');
+      } else {
+        parts.push('建议：轻仓位做低位补涨，避免追涨。');
+      }
+
+      var aiText=parts.join('');
+      var aiTs=pickLatestTs();
+
+      h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #22c55e;opacity:0.95">';
+      h += v8CardHeader('📝','AI 报告解读','基于危机雷达、涨停梯队、龙虎榜数据的规则化市场解读','update_time',
+        {update_time:aiTs, slot:'盘后', horizon:'短线'}, true);
+      h += '<div style="padding:12px 14px;font-size:12px;line-height:1.7;color:var(--txt)">';
+      h += '<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:6px;color:#22c55e;font-weight:700;font-size:11px;margin-bottom:10px">🤖 规则模板解读 · 未调用 LLM</div>';
+      h += '<div style="text-align:justify;">'+aiText+'</div>';
+      h += '<div style="color:var(--dim);font-size:10px;margin-top:10px">📦 数据源：CRISIS_DATA + LIMIT_UP_HEATMAP + LHB_DATA · 每日盘后刷新</div>';
       h += '</div></div>';
     })();
 

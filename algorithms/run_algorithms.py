@@ -227,6 +227,20 @@ def step_append_lhb_history():
         print(f"  ⚠️ LHB 历史累积失败: {e}")
 
 
+def step_gen_lhb_7d():
+    """生成龙虎榜 7 日累计数据（机游共振 + 北向席位），输出 raw_data/lhb_7d.json + data/LHB_7D.js。
+    依赖 step_append_lhb_history 已把当日数据追加进 raw_data/lhb_history.json，同时读取 raw_data/lhb_data.json 当日明细兜底。"""
+    print("\n[2.6] 生成 LHB 7 日累计 → data/LHB_7D.js")
+    try:
+        r = subprocess.run([PY, "gen_lhb_7d.py"], cwd=ALGO)
+        if r.returncode == 0:
+            print("  ✅ LHB 7 日累计完成")
+        else:
+            print("  ⚠️ LHB 7 日累计脚本返回非零")
+    except Exception as e:
+        print(f"  ⚠️ LHB 7 日累计失败: {e}")
+
+
 def main():
     print(f"=== v8 算法编排  {datetime.now():%Y-%m-%d %H:%M:%S} ===")
     step_v8_self_sufficiency()  # 2026-08-02 原生化: 先自产 4 类上游输入
@@ -234,6 +248,7 @@ def main():
     step_run()
     n = step_stage()
     step_append_lhb_history()
+    step_gen_lhb_7d()
     step_push()
     print(f"\n=== 完成。staged {n} 个文件 ===")
 
