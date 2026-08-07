@@ -1528,10 +1528,30 @@ def f_crisis_data():
     # 全球维度：仍用保守估值（CN 网络难达 VIX/美债等实时源），但标注更清晰
     global_score = 0.40  # 中性
 
+    # 输出既保留扁平字段（兼容旧读取），也输出 indicators + score（前端 2026-08-07 后主要读取）
+    currency_val = round(currency_score, 3)
+    economy_val = round(economy / 100.0, 3) if economy else 0.50
+    global_val = round(global_score, 3)
+    total_score = round((currency_val * 0.40 + economy_val * 0.35 + global_val * 0.25) * 100, 1)
+    if total_score >= 70:
+        level = "危机"
+    elif total_score >= 50:
+        level = "警惕"
+    elif total_score >= 30:
+        level = "关注"
+    else:
+        level = "平稳"
     return {
-        "currency": round(currency_score, 3),
-        "economy": (round(economy / 100.0, 3) if economy else 0.50),
-        "global": round(global_score, 3),
+        "currency": currency_val,
+        "economy": economy_val,
+        "global": global_val,
+        "score": total_score,
+        "level": level,
+        "indicators": {
+            "currency": {"cat": "货币", "score": currency_val, "desc": "USD/CNY 汇率压力"},
+            "economy": {"cat": "经济", "score": economy_val, "desc": "中国制造业 PMI"},
+            "global": {"cat": "全球", "score": global_val, "desc": "全球风险情绪(VIX/美债等暂用中性估值)"},
+        },
         "pmi_value": economy,
         "usd_cny": usd_cny_latest,
         "note": f"经济维度=中国PMI真实值({economy or 'N/A'})；"
