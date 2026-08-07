@@ -14,9 +14,9 @@ import json
 import datetime
 from pathlib import Path
 
-# 🔴 2026-08-07 修复：以下产物由生成器【直写 raw_data/】（gen_triple_consensus /
+# 2026-08-07 修复：以下产物由生成器【直写 raw_data/】（gen_triple_consensus /
 # gen_triple_track 于 08-06 改造），out/ 下同名文件是历史僵尸副本。
-# 若继续搬运，会用 08-06 旧数据覆盖当日新结果 → 前端长期显示 3 天前数据。
+# 若继续搬运，会用 08-06 旧数据覆盖当日新结果 -> 前端长期显示 3 天前数据。
 SKIP_STAGE = {
     "triple_consensus.json",
     "triple_track.json",
@@ -62,16 +62,16 @@ def main():
         src = os.path.join(OUT, v6_name)
         if not os.path.exists(src):
             continue
-        # ① 生成器直写 raw_data 的产物，禁止再从 out/ 搬运覆盖
+        # (1) 生成器直写 raw_data 的产物，禁止再从 out/ 搬运覆盖
         if v6_name in SKIP_STAGE or v8_name in SKIP_STAGE:
-            print(f"  ⏭️ 跳过（生成器直写 raw_data）: {v6_name}")
+            print(f"  [skip] 生成器直写 raw_data: {v6_name}")
             continue
-        # ② 防僵尸覆盖：out 源比 raw 目标旧则拒绝搬运
+        # (2) 防僵尸覆盖：out 源比 raw 目标旧则拒绝搬运
         dst_path = os.path.join(RAW, v8_name)
         if os.path.exists(dst_path):
             s_date, d_date = _ts_date(src), _ts_date(dst_path)
             if s_date and d_date and s_date < d_date:
-                print(f"  🛡️ 跳过（out 更旧 {s_date} < raw {d_date}）: {v6_name}")
+                print(f"  [guard] out更旧({s_date}) < raw({d_date}): {v6_name}")
                 continue
         obj = s._load_json(src)
         if obj is None:
