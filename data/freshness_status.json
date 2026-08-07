@@ -1,14 +1,121 @@
 {
-  "check_time": "2026-08-06 11:26:25",
-  "last_trade_close": "2026-08-05 15:30:00",
-  "core_stale": [],
-  "warn_stale": [],
+  "check_time": "2026-08-07 03:42:21",
+  "last_trade_close": "2026-08-06 15:30:00",
+  "core_stale": [
+    {
+      "var": "VOLATILITY",
+      "reason": "更新于 08-04 23:36，落后 3 个交易日（阈值 1.08333）",
+      "category": "post_close"
+    }
+  ],
+  "warn_stale": [
+    {
+      "var": "GOLD_POOL",
+      "reason": "更新于 08-04 23:38，落后 3 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "CANDIDATE",
+      "reason": "更新于 08-04 23:35，落后 3 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "TRIPLE_CONSENSUS",
+      "reason": "更新于 08-04 23:36，落后 3 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "TRIPLE_TRACK",
+      "reason": "更新于 08-04 22:30，落后 3 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "TRIPLE_HISTORY",
+      "reason": "更新于 08-04 23:38，落后 3 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "COCKPIT_ADVICE",
+      "reason": "更新于 08-04 23:38，落后 3 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "COCKPIT_TIER_RECOMMEND",
+      "reason": "更新于 08-04 23:38，落后 3 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "COCKPIT_BACKTEST",
+      "reason": "更新于 08-04 23:36，落后 3 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "BACKTEST_COMPREHENSIVE",
+      "reason": "更新于 08-04 23:36，落后 3 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "BACKTEST_TDX",
+      "reason": "更新于 08-04 00:00，落后 3 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "CRDS_CARD_DATA",
+      "reason": "更新于 08-01 15:29，落后 4 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "LHB_DATA",
+      "reason": "更新于 08-04 23:35，落后 3 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "SH_FIB",
+      "reason": "更新于 08-04 23:33，落后 3 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "SZ_FIB",
+      "reason": "更新于 08-04 23:33，落后 3 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "SECTOR_RS",
+      "reason": "更新于 08-04 23:34，落后 3 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "MAHORO",
+      "reason": "更新于 08-01 15:36，落后 4 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "INST_TRADE",
+      "reason": "更新于 08-04 23:33，落后 3 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "NT_DATA",
+      "reason": "更新于 08-04 23:37，落后 3 个交易日（阈值 2）",
+      "category": "premarket"
+    },
+    {
+      "var": "TOP10_DAILY",
+      "reason": "更新于 08-04 23:36，落后 3 个交易日（阈值 2）",
+      "category": "post_close"
+    },
+    {
+      "var": "SUSPENSION_ALERT",
+      "reason": "更新于 08-04 23:36，落后 3 个交易日（阈值 2）",
+      "category": "premarket"
+    }
+  ],
   "frozen_stale": [],
   "no_update_time": [],
   "summary": {
     "total_checked": 46,
-    "core_stale": 0,
-    "warn_stale": 0,
+    "core_stale": 1,
+    "warn_stale": 20,
     "frozen_stale": 0,
     "no_timestamp": 0
   },
@@ -40,7 +147,6 @@
     "LIMIT_UP_HEATMAP": "intraday",
     "CANDIDATE_QUOTES": "intraday",
     "SH_SZ_HISTORY": "intraday",
-    "RISK_GAUGE": "intraday",
     "AI_MARKET_BRIEF": "intraday",
     "MARKET_FUND_FLOW_DATA": "post_close",
     "SECTOR_FUND_FLOW_TREND": "post_close",
