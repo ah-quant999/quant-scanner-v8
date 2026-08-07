@@ -767,21 +767,30 @@ def calculate_scores(candidates, status_filter=None):
 calculate_applying_scores = calculate_scores
 
 def process_listed_and_tracking(candidates):
-    """处理已上市新股：抓取行情并生成建议"""
+    """处理已上市新股：抓取行情并生成建议。
+    优先使用同花顺已提供的行情快照；缺失时尝试东财实时行情；失败亦不丢弃（确保今日上市可见）。
+    """
     results = []
     for c in candidates:
         if c["status"] not in ("listed_today", "tracking"):
             continue
-        
-        quote = fetch_realtime_quote(c["code"], c["market_code"])
-        if not quote:
-            continue
-        
+
+        # 1) 优先使用候选中已带有的同花顺行情快照
+        latest = c.get("latest_price", 0) or 0
+        open_price = c.get("open_price", 0) or 0
+        change_pct = c.get("change_pct", 0) or 0
+        turnover = c.get("turnover", 0) or 0
+
+        # 2) 快照缺失时再用东财行情补充
+        if not latest:
+            quote = fetch_realtime_quote(c["code"], c["market_code"])
+            if quote:
+                latest = quote.get("latest", latest) or latest
+                open_price = quote.get("open_price", open_price) or open_price
+                change_pct = quote.get("change_pct", change_pct) or change_pct
+                turnover = quote.get("turnover", turnover) or turnover
+
         issue_price = c["issue_price"]
-        latest = quote["latest"]
-        open_price = quote["open_price"]
-        change_pct = quote["change_pct"]
-        turnover = quote["turnover"]
         
         # 计算首日/累计收益率
         if issue_price > 0:
@@ -826,7 +835,7 @@ def process_listed_and_tracking(candidates):
 
 def fetch_recent_listed_ths(days=5):
     """从同花顺获取最近 N 天内已上市新股，填补东方财富申购接口不含已上市股的缺口。
-    这些股票上市后 5 日内进入 tracking 组，供 v8 "上市日追踪5日" 展示。
+    上市日期等于今日 → listed_today；过去 5 日内（不含今日）→ tracking。
     """
     import akshare as ak
     from datetime import datetime, timedelta
@@ -870,12 +879,20 @@ def fetch_recent_listed_ths(days=5):
         if not (start <= list_date <= today):
             continue
 
+        # 上市日期等于今日 → listed_today；其余最近 N 日 → tracking
+        status = "listed_today" if list_date == today else "tracking"
+
         # 与 fetch_ipo_list 保持一致的板块判定
         if code.startswith("688"): market_code = "KC"
         elif code.startswith("30"): market_code = "CY"
         elif code.startswith("92"): market_code = "BJ"
         elif code.startswith("00") or code.startswith("001"): market_code = "SZ"
         else: market_code = "SH"
+
+        # 同花顺已提供最新价/开盘价/涨跌幅，优先保存避免东财行情接口失败
+        ths_latest = float(row.get("最新价", 0) or 0)
+        ths_open = float(row.get("首日开盘价", 0) or 0)
+        ths_change = float(row.get("首日涨跌幅", 0) or 0)
 
         candidates.append({
             "code": code,
@@ -886,7 +903,7 @@ def fetch_recent_listed_ths(days=5):
             "market_code": market_code,
             "apply_date": "",
             "listing_date": listing_date,
-            "status": "tracking",
+            "status": status,
             "dec_sumfina": 0,
             "main_business": "",
             "industry_name": "",
@@ -894,6 +911,11 @@ def fetch_recent_listed_ths(days=5):
             "profit": 0,
             "is_profit": None,
             "predict_raise_funds": 0,
+            # 同花顺行情快照（东财接口不可用时兜底）
+            "latest_price": ths_latest,
+            "open_price": ths_open,
+            "change_pct": ths_change,  # 同花顺已为小数形式（4.0252 = 402.52%）
+            "turnover": 0,
         })
 
     print(f"  ✓ 同花顺最近{days}日上市: {len(candidates)} 只")
@@ -937,14 +959,23 @@ def generate_ipo_score():
     print("[1/5] 获取新股列表...")
     candidates = fetch_ipo_list()
 
-    # 1.5 补充东方财富申购接口缺失的"已上市"新股（上市后5日内进入 tracking）
+    # 1.5 补充/校正同花顺已上市新股（东财行情接口不稳定时，用同花顺行情快照兜底）
     print("[1.5/5] 补充同花顺已上市新股...")
     ths_listed = fetch_recent_listed_ths(days=5)
-    existing_codes = {c["code"] for c in candidates}
+    existing = {c["code"]: c for c in candidates}
     for c in ths_listed:
-        if c["code"] not in existing_codes:
+        if c["code"] not in existing:
             candidates.append(c)
-            existing_codes.add(c["code"])
+            existing[c["code"]] = c
+        else:
+            # 同花顺对已上市股更准确：覆盖状态、上市日期、行情快照
+            old = existing[c["code"]]
+            old["status"] = c["status"]
+            old["listing_date"] = c["listing_date"] or old["listing_date"]
+            old["issue_price"] = c["issue_price"] or old["issue_price"]
+            for k in ["latest_price", "open_price", "change_pct", "turnover"]:
+                if c.get(k):
+                    old[k] = c[k]
 
     applying_list = [c for c in candidates if c["status"] == "applying"]
     pre_listing_list = [c for c in candidates if c["status"] == "pre_listing"]

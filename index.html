@@ -402,7 +402,7 @@ html>
 <script src="data/AI_MARKET_BRIEF.js?v=20260807111701"></script>
 <script src="data/MARGIN_DATA.js?v=20260807111021"></script>
 <script src="data/CFFEX_HOLDINGS.js?v=20260807111021"></script>
-<script src="data/IPO_DATA.js?v=20260807111021"></script>
+<script src="data/IPO_DATA.js?v=20260807111410"></script>
     <script src="data/CRISIS_DATA.js?v=20260807111043"></script>
     <script src="data/JUDGMENT_DATA.js?v=20260807111130"></script>
     <script>
@@ -742,7 +742,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/V8_CAL.js"></script>
 <script src="data/W52_HIGH.js"></script>
 <script src="data/CANDIDATE_QUOTES.js?v=20260807111130"></script>
-<script src="data/RISK_GAUGE.js?v=20260804013004"></script>
 <script src="data/RUNNER_STATUS.js?v=20260807111701"></script>
 <script src="data/HEALTH_CHECK.js?v=20260807111706"></script>
 </head>
@@ -6765,8 +6764,6 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
           {name:'市场资金流向', source:'MARKET_FUND_FLOW_DATA', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'两市净流入'},
 
-          {name:'实时风险温度计', source:'CRISIS_DATA', freq:'盘中每30分', slots:['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'VIX/美债/汇率/北向'},
-
           {name:'市场预警', source:'MARKET_ALERTS', freq:'盘中实时', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'量价异常预警'}
 
         ]
@@ -6830,8 +6827,6 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         cards:[
 
           {name:'中国数据抓取 (v8_cn_fetch_cloud)', source:'RUNNER_STATUS', freq:'工作日 cron · 云端', slots:['08:25','09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:10','15:30','16:30','17:00','21:00'], note:'核心数据管线 · GitHub Actions 云端 ubuntu-latest 主链'},
-
-          {name:'实时风险温度计', source:'CRISIS_DATA', freq:'工作日盘中每30分', slots:['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'宏观指标实时刷新'},
 
           {name:'盘后算法链 (v8_algo_cloud)', source:'TRIPLE_CONSENSUS', freq:'工作日18:30主档', slots:['18:30'], note:'候选池/黄金池/三重共识/回测 · 已迁 GitHub Actions 云端 ubuntu-latest · 冗余由本机每30分检查dispatch兜底'},
 

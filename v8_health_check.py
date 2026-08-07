@@ -69,7 +69,6 @@ CARD_DEFS = [
     {"id": "CONCEPT_RANKING", "name": "概念排名", "page": "实时数据", "freq": "盘中每30分", "max_age": 90, "key_fields": ["items"]},
     {"id": "LIMIT_UP_HEATMAP", "name": "涨停热度", "page": "实时数据", "freq": "盘中每30分", "max_age": 90, "key_fields": ["top", "dates"]},
     {"id": "MARKET_FUND_FLOW_DATA", "name": "市场资金流向", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["daily"]},
-    {"id": "CRISIS_DATA", "name": "实时风险温度计", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["currency", "global"]},
     {"id": "MARKET_ALERTS", "name": "市场预警", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["indices"]},
     # 盘后数据
     {"id": "SH_FIB", "name": "市场温度计", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"]},
