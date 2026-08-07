@@ -5795,9 +5795,10 @@ function renderLimitUpHeatmap(){
     (fib.windows||[]).forEach(w=>{if(w.status==='future'&&(!nw||w.days_left<nw.days_left))nw=w;});
     if(!nw&&fib.next_cycle&&fib.next_cycle.length)nw=fib.next_cycle[0];
     if(nw){
-      $('phFibNext').textContent=nw.name||'--';
+      const daysLeft=nw.days_left>=0?nw.days_left:0;
+      $('phFibNext').textContent=daysLeft+'天';
       $('phFibNext').style.fontSize='20px';
-      $('phFibNextLbl').textContent=(nw.date||'')+(nw.desc?' · '+nw.desc:'');
+      $('phFibNextLbl').textContent=(nw.date||'')+' · '+(nw.name||'')+(nw.desc?' · '+nw.desc:'');
     }
     const badge=$('phFibBadge');
     if(badge){
@@ -6258,7 +6259,7 @@ function renderLimitUpHeatmap(){
     const netColor=net>0?'var(--up)':net<0?'var(--down)':'var(--dim)';
 
     let h1='';
-    h1+='<div class="sf-net-big"><span class="n" style="color:'+netColor+'">'+(net>0?'+':'')+net.toFixed(1)+'</span><span class="u" style="color:'+netColor+'">亿</span><span class="lbl">净额(行业)</span></div>';
+    h1+='<div class="sf-net-big"><span class="n" style="color:'+netColor+'">'+(net>0?'+':'')+net.toFixed(1)+'</span><span class="u" style="color:'+netColor+'">亿</span><span class="lbl" title="全部行业口径：流入 '+totalIn.toFixed(1)+'亿 - 流出 '+totalOut.toFixed(1)+'亿">净额(行业)</span></div>';
 
     const hugBlocks=si.filter(s=>(!s.type||s.type!=='概念')&&s.net>=10).slice(0,3);
     if(hugBlocks.length>0){
@@ -6355,9 +6356,9 @@ function renderLimitUpHeatmap(){
       const phaseOrder=['主升','启动','震荡','退潮','底部'];
       h3+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">';
       phaseOrder.forEach(function(p){
-        if(!counts[p]) return;
         const m=phaseMeta[p];
-        h3+='<span style="padding:2px 8px;background:'+_phaseVra(m.color,0.1)+';border:1px solid '+_phaseVra(m.color,0.25)+';border-radius:999px;font-size:11px;color:'+m.color+';font-weight:700">'+m.emoji+' '+p+' <span style="font-weight:400;color:var(--dim)">'+counts[p]+'</span></span>';
+        const cnt=counts[p]||0;
+        h3+='<span style="padding:2px 8px;background:'+_phaseVra(m.color,0.1)+';border:1px solid '+_phaseVra(m.color,0.25)+';border-radius:999px;font-size:11px;color:'+m.color+';font-weight:700">'+m.emoji+' '+p+' <span style="font-weight:400;color:var(--dim)">'+cnt+'</span></span>';
       });
       h3+='</div>';
       h3+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:5px;margin-bottom:10px;max-height:240px;overflow-y:auto;padding-right:2px">';
@@ -6437,7 +6438,15 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     catNames.forEach(cn=>{
       const c=etfHeat.categories[cn];
       if(!c){h+='<div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px"><div style="font-weight:700;margin-bottom:6px;color:'+colorMap[cn]+'">'+cn+' · 暂无数据</div><div style="color:var(--dim);font-size:11.5px">该分类 ETF 资金热度数据待数据管道补充</div></div>';return;}
-      const list=[].concat(c.top_inflow||[],c.top_outflow||[]).slice(0,5);
+      const list=[];
+      const seen=new Set();
+      [].concat(c.top_inflow||[],c.top_outflow||[]).forEach(function(x){
+        if(!x||!x.code||seen.has(x.code)) return;
+        seen.add(x.code);
+        list.push(x);
+      });
+      list.sort(function(a,b){return Math.abs(b.main_net_inflow||0)-Math.abs(a.main_net_inflow||0);});
+      list.splice(5);
       const maxAbs=Math.max.apply(null,list.map(x=>Math.abs(x.main_net_inflow||0)))||1;
       let rows='';
       list.forEach(x=>{
