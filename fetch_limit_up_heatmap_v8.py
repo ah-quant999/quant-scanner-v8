@@ -234,6 +234,24 @@ def build_heatmap(days_data):
     return unique_dates, sectors_output
 
 
+def _check_dates_integrity(existing_dates):
+    """检查已有日期序列是否完整覆盖最近10个交易日，防止丢列/错列。"""
+    if not existing_dates or len(existing_dates) < 10:
+        return False, f"日期不足10列 ({len(existing_dates)})"
+    if len(existing_dates) != len(set(existing_dates)):
+        return False, "存在重复日期"
+    expected = get_trade_dates(10)
+    expected_labels = {datetime.strptime(d, "%Y%m%d").strftime("%m/%d") for d in expected}
+    actual_set = set(existing_dates)
+    missing = expected_labels - actual_set
+    extra = actual_set - expected_labels
+    if missing:
+        return False, f"缺失交易日 {sorted(missing)}"
+    if extra:
+        return False, f"包含非最近10日日期 {sorted(extra)}"
+    return True, "OK"
+
+
 def needs_rebuild(existing):
     """判断是否需要全量重建"""
     dates = existing.get("dates", [])
@@ -268,6 +286,11 @@ def main():
     elif len(existing_dates) < 5:
         print(f"  📊 历史数据不足（{len(existing_dates)}列），触发全量重建")
         need_rebuild = True
+    else:
+        ok, reason = _check_dates_integrity(existing_dates)
+        if not ok:
+            print(f"  🧹 日期序列异常：{reason}，触发全量重建")
+            need_rebuild = True
 
     if need_rebuild:
         # ── 全量重建：拉取近10个交易日 ──
@@ -400,6 +423,11 @@ def generate():
         need_rebuild = True
     elif len(existing_dates) < 5:
         need_rebuild = True
+    else:
+        ok, reason = _check_dates_integrity(existing_dates)
+        if not ok:
+            print(f"  🧹 日期序列异常：{reason}，触发全量重建")
+            need_rebuild = True
 
     if need_rebuild:
         trade_dates = get_trade_dates(10)

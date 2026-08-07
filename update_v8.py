@@ -369,14 +369,31 @@ def _build_ipo_shadows(obj):
         ]).strip()
         text_lower = text.lower()
 
-        # 若 industry 为空，尝试从业务文本提取候选概念（反向匹配）
+        # ── 关键词双向匹配（2026-08-07 修复：原完整概念名子串匹配命中率极低）──
+        # 拆 IPO 文本为 ≥2 字关键词，拆概念名为 ≥2 字关键词，
+        # 任一方向命中即算概念关联（score +1），行业精确匹配仍 +3。
+        # 关键：长词也生成所有 2~4 字子串，解决「汽车座椅」vs「汽车」粒度不匹配。
+        import re as _re
+        _STOP = {'的','与','和','或','及','等','其','在','有','为','是','以','中','上','下','从事','研发','生产','销售','服务','提供','制造','开发','设计'}
+        def _kw(s):
+            base = set(w for w in _re.findall(r'[\u4e00-\u9fff]{2,}', s) if w not in _STOP)
+            # 对每个 ≥3 字词生成 2~4 字滑动窗口子串
+            extra = set()
+            for w in base:
+                for L in range(2, min(len(w), 4) + 1):
+                    for i in range(len(w) - L + 1):
+                        sub = w[i:i+L]
+                        if sub not in _STOP:
+                            extra.add(sub)
+            return base | extra
+
+        ipo_kws = _kw(text)
         ipo_concepts = set()
-        if text_lower:
-            all_concepts = set()
-            for cand in candidates:
-                all_concepts.update(cand["concepts"])
-            for c in all_concepts:
-                if c in text_lower:
+        for cand in candidates:
+            for c in cand["concepts"]:
+                c_kws = _kw(c)
+                # 双向：概念关键词 ∩ IPO关键词 非空 → 命中
+                if ipo_kws & c_kws:
                     ipo_concepts.add(c)
 
         scored = []
