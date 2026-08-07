@@ -288,8 +288,12 @@ html>
   /* IPO tabs */
   .ipo-tabs{display:flex;gap:8px;margin:6px 0 10px;flex-wrap:wrap}
   .ipo-tab{font-size:12px;font-weight:700;padding:6px 15px;border-radius:18px;border:1px solid var(--border);background:var(--card2);color:var(--sub);cursor:pointer;transition:.15s;font-family:inherit}
-  .ipo-tab:hover{border-color:var(--border2);color:var(--txt)}
-  .ipo-tab.active{background:var(--cyan);color:#04222b;border-color:var(--cyan)}
+  /* 三个 IPO tab 各自鲜艳色（2026-08-07 修复：原统一暗灰易被遗漏） */
+  .ipo-tab[data-cat="futureApply"]{background:linear-gradient(135deg,#0e6e4f,#0a9e6e);color:#eafff5;border-color:#0a9e6e;box-shadow:0 1px 5px rgba(10,158,110,.35)}
+  .ipo-tab[data-cat="pricing"]{background:linear-gradient(135deg,#7a5200,#c8901a);color:#fff7e6;border-color:#c8901a;box-shadow:0 1px 5px rgba(200,144,26,.35)}
+  .ipo-tab[data-cat="preListing"]{background:linear-gradient(135deg,#6e2d7a,#b04db4);color:#fceaff;border-color:#b04db4;box-shadow:0 1px 5px rgba(176,77,180,.35)}
+  .ipo-tab:hover{filter:brightness(1.22);transform:translateY(-1px)}
+  .ipo-tab.active{box-shadow:0 2px 14px rgba(255,255,255,.28);transform:translateY(-1px) scale(1.04);filter:brightness(1.12)}
   .ipo-tab-body{margin-top:10px;padding-top:8px;border-top:1px solid var(--border)}
   /* Post-market modules */
   .ph-fib-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0}
@@ -383,28 +387,28 @@ html>
   .tp-hist-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--sub);padding:3px 0}
   .tp-empty{color:var(--dim);text-align:center;padding:24px 10px;font-size:13px}
 </style>
-    <script src="data/ETF_INTRADAY_HEAT.js?v=20260807114432"></script>
-    <script src="data/SECTOR_FUND_FLOW.js?v=20260807114435"></script>
+    <script src="data/ETF_INTRADAY_HEAT.js?v=20260807120942"></script>
+    <script src="data/SECTOR_FUND_FLOW.js?v=20260807120942"></script>
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=202608042337"></script>
-    <script src="data/ANALYST_RATINGS.js?v=20260807113725"></script>
+    <script src="data/ANALYST_RATINGS.js?v=20260807120941"></script>
     <script src="data/SUSPENSION_ALERT.js?v=20260804233621"></script>
     <script src="data/GOLD_POOL.js?v=20260804233810"></script>
     <script src="data/STOCK_LIST.js?v=20260804233811"></script>
     <script src="data/STOCK_PROFILE.js?v=20260807120227"></script>
     <script src="data/STOCK_QUOTE.js?v=20260806220153"></script>
-    <script src="data/MACRO_DATA.js?v=20260807113634"></script>
-    <script src="data/MACRO_BRIEF.js?v=20260807113727"></script>
+    <script src="data/MACRO_DATA.js?v=20260807120857"></script>
+    <script src="data/MACRO_BRIEF.js?v=20260807120942"></script>
 <script src="data/NT_DATA.js?v=202608042337"></script>
 <script src="data/LHB_DATA.js?v=20260804233511"></script>
 <script src="data/LHB_HISTORY.js?v=20260807114013"></script>
-<script src="data/CONCEPT_RANKING.js?v=20260807114437"></script>
-<script src="data/INDEX_QUOTES.js?v=20260807114437"></script>
-<script src="data/AI_MARKET_BRIEF.js?v=20260807115850"></script>
-<script src="data/MARGIN_DATA.js?v=20260807113625"></script>
-<script src="data/CFFEX_HOLDINGS.js?v=20260807113625"></script>
-<script src="data/IPO_DATA.js?v=20260807120633"></script>
-    <script src="data/CRISIS_DATA.js?v=20260807114500"></script>
-    <script src="data/JUDGMENT_DATA.js?v=20260807113727"></script>
+<script src="data/CONCEPT_RANKING.js?v=20260807120942"></script>
+<script src="data/INDEX_QUOTES.js?v=20260807120942"></script>
+<script src="data/AI_MARKET_BRIEF.js?v=20260807120440"></script>
+<script src="data/MARGIN_DATA.js?v=20260807120847"></script>
+<script src="data/CFFEX_HOLDINGS.js?v=20260807120848"></script>
+<script src="data/IPO_DATA.js?v=20260807120847"></script>
+    <script src="data/CRISIS_DATA.js?v=20260807120909"></script>
+    <script src="data/JUDGMENT_DATA.js?v=20260807120942"></script>
     <script>
 window.V8_CAL = {weeks:[],legend:[]};
 /* ===== 2026 A股交易日历（每年需更新） ===== */
@@ -745,30 +749,30 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SZ_FIB.js?v=202608042333"></script>
 <script src="data/SECTOR_RS.js?v=202608042334"></script>
 <script src="data/INST_TRADE.js?v=20260804233358"></script>
-<script src="data/NORTH_FUND.js?v=20260807113722"></script>
-<script src="data/MARKET_ALERTS.js?v=20260807115604"></script>
-<script src="data/MARKET_FUND_FLOW_DATA.js?v=20260807113931"></script>
-<script src="data/ETF_SUBSCRIPTION.js?v=20260807113722"></script>
-<script src="data/LIMIT_UP_HEATMAP.js?v=20260807115832"></script>
-<script src="data/HERDING_DATA.js?v=20260807113643"></script>
+<script src="data/NORTH_FUND.js?v=20260807120939"></script>
+<script src="data/MARKET_ALERTS.js?v=20260807120942"></script>
+<script src="data/MARKET_FUND_FLOW_DATA.js?v=20260807120939"></script>
+<script src="data/ETF_SUBSCRIPTION.js?v=20260807120939"></script>
+<script src="data/LIMIT_UP_HEATMAP.js?v=20260807120942"></script>
+<script src="data/HERDING_DATA.js?v=20260807120909"></script>
 <script src="data/VOLATILITY.js?v=20260804233618"></script>
-<script src="data/CAPITAL_FLOW_DATA.js?v=20260807114504"></script>
-<script src="data/SH_SZ_HISTORY.js?v=20260807115520"></script>
+<script src="data/CAPITAL_FLOW_DATA.js?v=20260807120942"></script>
+<script src="data/SH_SZ_HISTORY.js?v=20260807120942"></script>
 <script src="data/MAHORO.js?v=20260801153625"></script>
 <script src="data/CANDIDATE.js?v=20260804233556"></script>
-<script src="data/FOUR_VOLUME.js?v=20260807120633"></script>
+<script src="data/FOUR_VOLUME.js?v=20260807120920"></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=20260804233608"></script>
 <script src="data/COCKPIT_BACKTEST.js?v=20260804233610"></script>
 <script src="data/BACKTEST_TDX.js?v=20260804"></script>
 <script src="data/EXPERIMENT.js?v=20260807113951"></script>
-<script src="data/ETF_PULSE.js?v=20260807115500"></script>
-<script src="data/ETF_DAILY_MONITOR.js?v=20260807115519"></script>
+<script src="data/ETF_PULSE.js?v=20260807120942"></script>
+<script src="data/ETF_DAILY_MONITOR.js?v=20260807120942"></script>
 <script src="data/TOP10_DAILY.js"></script>
 <script src="data/V8_CAL.js"></script>
 <script src="data/W52_HIGH.js"></script>
-<script src="data/CANDIDATE_QUOTES.js?v=20260807115519"></script>
-<script src="data/RUNNER_STATUS.js?v=20260807120440"></script>
-<script src="data/HEALTH_CHECK.js?v=20260807120638"></script>
+<script src="data/CANDIDATE_QUOTES.js?v=20260807120942"></script>
+<script src="data/RUNNER_STATUS.js?v=20260807120942"></script>
+<script src="data/HEALTH_CHECK.js?v=20260807121005"></script>
 </head>
 <body>
 
