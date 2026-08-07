@@ -135,36 +135,36 @@ html>
   .sf-block-trend .sf-block-title{color:#c4b5fd}
   .sf-block-icon{font-size:18px;line-height:1}
   .sf-net-big{text-align:center;margin-bottom:10px;padding:10px;background:var(--card2);border-radius:8px}
-  .sf-net-big .n{font-size:26px;font-weight:900}
-  .sf-net-big .u{font-size:13px;margin-left:4px}
-  .sf-net-big .lbl{font-size:10px;color:var(--dim);margin-left:6px}
-  .sf-line{font-size:12px;line-height:1.85;margin-bottom:6px}
+  .sf-net-big .n{font-size:28px;font-weight:900}
+  .sf-net-big .u{font-size:14px;margin-left:4px}
+  .sf-net-big .lbl{font-size:12px;color:var(--dim);margin-left:6px}
+  .sf-line{font-size:14px;line-height:1.9;margin-bottom:8px}
   .sf-line b{font-weight:700}
   .sf-tagline{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-  .sf-tag{font-size:11px;padding:3px 8px;border-radius:4px}
+  .sf-tag{font-size:13px;padding:4px 9px;border-radius:4px}
   .sf-tag-in{background:rgba(244,73,93,.14);color:#ff8a95}
   .sf-tag-out{background:rgba(31,209,123,.14);color:#7ee0a0}
   .sf-tag-new{background:rgba(56,189,248,.14);color:#7dd3fc}
   .sf-tag-rotate{background:rgba(251,191,36,.14);color:#fcd34d}
   .sf-tag-rebound{background:rgba(251,146,60,.14);color:#fdba74}
-  .sf-caution{padding:8px 10px;background:rgba(251,191,36,.10);border-left:3px solid #fbbf24;border-radius:0 8px 8px 0;margin-bottom:10px;font-size:12px;line-height:1.7;color:#fde68a}
-  .sf-rotate-table{width:100%;font-size:11px;border-collapse:collapse;line-height:1.6}
-  .sf-rotate-table td{padding:4px 6px;border:1px solid var(--border)}
+  .sf-caution{padding:9px 11px;background:rgba(251,191,36,.10);border-left:3px solid #fbbf24;border-radius:0 8px 8px 0;margin-bottom:10px;font-size:14px;line-height:1.8;color:#fde68a}
+  .sf-rotate-table{width:100%;font-size:13px;border-collapse:collapse;line-height:1.7}
+  .sf-rotate-table td{padding:5px 7px;border:1px solid var(--border)}
   .sf-rotate-table tr:first-child td{background:var(--bg2);color:var(--dim);font-weight:600}
   .sf-trend-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
   .sf-trend-card{background:var(--card2);border-radius:10px;overflow:hidden;border:1px solid var(--border)}
-  .sf-trend-head{padding:8px 10px;font-size:12px;font-weight:700;text-align:center;color:#fff}
+  .sf-trend-head{padding:8px 10px;font-size:13px;font-weight:700;text-align:center;color:#fff}
   .sf-trend-head-5{background:#534ab7}
   .sf-trend-head-10{background:#0d8a9c}
   .sf-trend-head-20{background:#7e57c2}
   .sf-trend-head-60{background:#5c6bc0}
-  .sf-trend-cols{display:flex;font-size:11px;line-height:1.85}
+  .sf-trend-cols{display:flex;font-size:13px;line-height:1.9}
   .sf-trend-col{flex:1;padding:8px;min-width:0}
   .sf-trend-col:first-child{border-right:1px solid var(--border)}
-  .sf-trend-col .col-title{font-weight:700;margin-bottom:4px}
+  .sf-trend-col .col-title{font-weight:700;margin-bottom:5px}
   .sf-trend-col .col-in{color:var(--up)}
   .sf-trend-col .col-out{color:var(--down)}
-  .sf-trend-row2{display:flex;justify-content:space-between;white-space:nowrap;overflow:hidden}
+  .sf-trend-row2{display:flex;justify-content:space-between;white-space:nowrap;overflow:hidden;padding:3px 0}
   .sf-trend-row2 span:first-child{overflow:hidden;text-overflow:ellipsis;padding-right:4px}
   @media(max-width:1200px){.sf-trend-grid{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:700px){.sf-trend-grid{grid-template-columns:1fr}}
@@ -6321,15 +6321,15 @@ function renderLimitUpHeatmap(){
 
     const hugBlocks=si.filter(s=>(!s.type||s.type!=='概念')&&s.net>=10).slice(0,3);
     if(hugBlocks.length>0){
-      h1+='<div class="sf-line"><b style="color:var(--purple)">🔥 当前抱团：</b>'+hugBlocks.map(s=>s.name+' <b style="color:var(--up)">+'+s.net.toFixed(1)+'亿</b>'+((s.consecutive_days||0)>1?' <span style="color:#ff9800;font-size:10px">连'+s.consecutive_days+'</span>':'')).join(' · ')+'</div>';
+      h1+='<div class="sf-line"><b style="color:var(--purple)">🔥 当前抱团：</b>'+hugBlocks.map(s=>s.name+' <b style="color:var(--up)">+'+s.net.toFixed(1)+'亿</b>'+((s.consecutive_days||0)>1?' <span style="color:#ff9800;font-size:12px">连'+s.consecutive_days+'</span>':'')).join(' · ')+'</div>';
     }
     const cTop=si.filter(s=>s.type==='概念').slice(0,5);
     if(cTop.length>0){
-      h1+='<div class="sf-line"><b style="color:var(--cyan)">🚀 概念接力：</b>'+cTop.map(s=>s.name+' <b style="color:var(--up)">+'+s.net.toFixed(1)+'亿</b>'+((s.consecutive_days||0)>1?' <span style="color:#ff9800;font-size:10px">连'+s.consecutive_days+'</span>':'')).join(' / ')+'</div>';
+      h1+='<div class="sf-line"><b style="color:var(--cyan)">🚀 概念接力：</b>'+cTop.map(s=>s.name+' <b style="color:var(--up)">+'+s.net.toFixed(1)+'亿</b>'+((s.consecutive_days||0)>1?' <span style="color:#ff9800;font-size:12px">连'+s.consecutive_days+'</span>':'')).join(' / ')+'</div>';
     }
     const iTop=si.filter(s=>!s.type||s.type!=='概念').slice(0,5);
     if(iTop.length>0){
-      h1+='<div class="sf-line"><b style="color:#fb923c">📊 行业流入：</b>'+iTop.map(s=>s.name+' <b style="color:var(--up)">+'+s.net.toFixed(1)+'亿</b>'+((s.consecutive_days||0)>1?' <span style="color:#ff9800;font-size:10px">连'+s.consecutive_days+'</span>':'')).join(' / ')+'</div>';
+      h1+='<div class="sf-line"><b style="color:#fb923c">📊 行业流入：</b>'+iTop.map(s=>s.name+' <b style="color:var(--up)">+'+s.net.toFixed(1)+'亿</b>'+((s.consecutive_days||0)>1?' <span style="color:#ff9800;font-size:12px">连'+s.consecutive_days+'</span>':'')).join(' / ')+'</div>';
     }
     $('sfBlock1').innerHTML=h1||'<div class="ipo-empty">暂无盘中数据</div>';
 
@@ -6363,8 +6363,8 @@ function renderLimitUpHeatmap(){
       h2+='<div class="sf-caution"><b>⚠️ 谨慎：</b>'+caut.map(s=>s.name+' <b style="color:var(--down)">'+s.net.toFixed(1)+'亿</b>').join(' · ')+'</div>';
     }
     if(so.length>0 || si.length>0){
-      h2+='<div style="font-weight:700;color:var(--purple);margin:8px 0 4px;font-size:12px">📊 轮动路线</div>';
-      h2+='<table class="sf-rotate-table"><tr><td style="width:38%">流出</td><td style="width:22%">性质</td><td>→ 流入</td></tr>';
+      h2+='<div style="font-weight:700;color:var(--purple);margin:8px 0 5px;font-size:14px">📊 轮动路线</div>';
+      h2+='<table class="sf-rotate-table"><tr><td style="width:38%;font-size:13px">流出</td><td style="width:22%;font-size:13px">性质</td><td style="font-size:13px">→ 流入</td></tr>';
       const trueOut2=so.filter(s=>(s.consecutive_days||0)>=2||(s.net_5d||0)<0);
       const rotOut2=so.filter(s=>(s.consecutive_days||0)<2&&(s.net_5d||0)>0);
       const maxR=Math.max(so.length, si.length);
@@ -6456,29 +6456,29 @@ function renderLimitUpHeatmap(){
       const inList=(dataArr||[]).filter(s=>s&&(s[netKey]||0)>0).sort((a,b)=>b[netKey]-a[netKey]).slice(0,3);
       const outList=(dataArr||[]).filter(s=>s&&(s[netKey]||0)<0).sort((a,b)=>a[netKey]-b[netKey]).slice(0,3);
       const hasData=(dataArr||[]).length>0;
-      let c='<div class="sf-trend-card" style="padding:6px"><div class="sf-trend-head '+headClass+'" style="font-size:11px;padding:4px 6px;margin:-6px -6px 5px -6px">'+title+'</div><div class="sf-trend-cols">';
-      c+='<div class="sf-trend-col"><div class="col-title col-in" style="font-size:10px;padding:2px 0">流入</div>';
-      if(inList.length){inList.forEach(s=>{c+='<div class="sf-trend-row2" style="padding:2px 0;font-size:10px"><span>'+s.name+'</span><span style="color:var(--up);flex-shrink:0">+'+(s[netKey]||0).toFixed(1)+'亿</span></div>';});}
-      else if(hasData){c+='<div style="color:var(--dim);font-size:10px;padding:2px 0">暂无</div>';}
-      else{c+='<div style="color:var(--dim);font-size:10px;padding:2px 0">暂无数据</div>';}
+      let c='<div class="sf-trend-card" style="padding:6px"><div class="sf-trend-head '+headClass+'" style="font-size:13px;padding:5px 6px;margin:-6px -6px 5px -6px">'+title+'</div><div class="sf-trend-cols">';
+      c+='<div class="sf-trend-col"><div class="col-title col-in" style="font-size:12px;padding:3px 0">流入</div>';
+      if(inList.length){inList.forEach(s=>{c+='<div class="sf-trend-row2" style="padding:3px 0;font-size:12px"><span>'+s.name+'</span><span style="color:var(--up);flex-shrink:0">+'+(s[netKey]||0).toFixed(1)+'亿</span></div>';});}
+      else if(hasData){c+='<div style="color:var(--dim);font-size:11px;padding:3px 0">暂无</div>';}
+      else{c+='<div style="color:var(--dim);font-size:11px;padding:3px 0">暂无数据</div>';}
       c+='</div>';
-      c+='<div class="sf-trend-col"><div class="col-title col-out" style="font-size:10px;padding:2px 0">流出</div>';
-      if(outList.length){outList.forEach(s=>{c+='<div class="sf-trend-row2" style="padding:2px 0;font-size:10px"><span>'+s.name+'</span><span style="color:var(--down);flex-shrink:0">'+(s[netKey]||0).toFixed(1)+'亿</span></div>';});}
-      else if(hasData){c+='<div style="color:var(--dim);font-size:10px;padding:2px 0">暂无</div>';}
-      else{c+='<div style="color:var(--dim);font-size:10px;padding:2px 0">暂无数据</div>';}
+      c+='<div class="sf-trend-col"><div class="col-title col-out" style="font-size:12px;padding:3px 0">流出</div>';
+      if(outList.length){outList.forEach(s=>{c+='<div class="sf-trend-row2" style="padding:3px 0;font-size:12px"><span>'+s.name+'</span><span style="color:var(--down);flex-shrink:0">'+(s[netKey]||0).toFixed(1)+'亿</span></div>';});}
+      else if(hasData){c+='<div style="color:var(--dim);font-size:11px;padding:3px 0">暂无</div>';}
+      else{c+='<div style="color:var(--dim);font-size:11px;padding:3px 0">暂无数据</div>';}
       c+='</div></div></div>';
       return c;
     }
     const sft=window.SECTOR_FUND_FLOW_TREND || {};
     const t5d=sft.trend_5d||[], t10d=sft.trend_10d||[], t20d=sft.trend_20d||[], t60d=sft.trend_60d||[];
-    h3+='<div style="font-size:11px;font-weight:700;color:var(--sub);margin:0 0 5px">资金验证</div>';
+    h3+='<div style="font-size:13px;font-weight:700;color:var(--sub);margin:0 0 5px">资金验证</div>';
     h3+='<div class="sf-trend-grid">';
     h3+=sfTrendCard('5日',t5d,'net_5d','sf-trend-head-5');
     h3+=sfTrendCard('10日',t10d,'net_10d','sf-trend-head-10');
     h3+=sfTrendCard('20日',t20d,'net_20d','sf-trend-head-20');
     h3+=sfTrendCard('60日',t60d,'net_60d','sf-trend-head-60');
     h3+='</div>';
-    h3+='<div style="font-size:10px;color:var(--dim);margin-top:6px;line-height:1.4;">📌 上半：板块按 20 日涨幅周期定位；下半：按主力资金净流入滚动累计验证。</div>';
+    h3+='<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.4;">📌 上半：板块按 20 日涨幅周期定位；下半：按主力资金净流入滚动累计验证。</div>';
     $('sfBlock3').innerHTML=h3;
 
     setBadge('phSectorTime','盘后','短线',d.update_time);
