@@ -37,7 +37,7 @@ on:
       - 'data/.workbuddy/**'   # 自愈调度锁文件改动也会触发重新构建 HEALTH_CHECK.js
   workflow_run:
     workflows:
-      - "🇨🇳 v8 中国数据抓取(cn)"
+      - "🇨🇳 v8 中国数据抓取(cn·应急)"
       - "🇨🇳 v8 中国数据抓取(云端)"
       - "☁️ v8 盘后算法链(云端)"
       - "🌍 v8 实时风险温度计"

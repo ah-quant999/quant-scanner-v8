@@ -74,7 +74,7 @@ jobs:
             "25 0 * * 1-5")
               echo "category=premarket" >> "$GITHUB_OUTPUT"
               echo "label=盘前" ;;
-            "*/30 1-7 * * 1-5")
+            "*/30 1-8 * * 1-5")
               echo "category=intraday" >> "$GITHUB_OUTPUT"
               echo "label=盘中" ;;
             "45 7 * * 1-5")
