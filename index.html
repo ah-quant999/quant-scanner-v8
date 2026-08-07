@@ -637,56 +637,57 @@ window.__judgmentCandidatesHTML = __judgmentCandidatesHTML;
 function _buildJudgmentEnvHTML(d){
   if(!d) return '<div style="color:var(--dim);padding:12px;text-align:center">环境态势数据加载中（盘前 08:25 自动生成）…</div>';
   var h = '';
-  // 0) 时事滚动：优先用独立 MACRO_BRIEF（更全），回退到 JUDGMENT_DATA 内嵌 macro_brief
+  // 1) 最终共同结论置顶
+  if(d.consensus){
+    var dir = d.consensus.indexOf('偏多')>=0 ? 'var(--up)' : (d.consensus.indexOf('偏空')>=0 ? 'var(--down)' : '#f59e0b');
+    h += '<div style="margin-bottom:10px;padding:8px 12px;background:'+dir+'15;border:1px solid '+dir+'40;border-radius:8px;font-size:13px;font-weight:700;color:'+dir+'">🤝 共同结论：'+d.consensus+'</div>';
+  }
+  // 2) 时事滚动（紧凑）
   var fullMb = (typeof window !== 'undefined' && window.MACRO_BRIEF) || {};
   var mb = (fullMb.headline ? fullMb : (d.macro_brief || {})) || {};
   var news = (fullMb.news_brief && fullMb.news_brief.length ? fullMb.news_brief : (mb.news_brief || [])) || [];
   if(mb.headline || news.length){
-    h += '<div style="margin-bottom:12px;padding:10px 12px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.22);border-radius:10px;font-size:13px;line-height:1.7">';
-    if(mb.headline){
-      h += '<div style="font-size:13px;font-weight:700;color:#38bdf8;margin-bottom:5px">🌐 时事滚动 · '+mb.headline+'</div>';
-    }
+    h += '<div style="margin-bottom:8px;padding:8px 10px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.22);border-radius:8px;font-size:12px;line-height:1.5">';
+    if(mb.headline) h += '<div style="font-weight:700;color:#38bdf8;margin-bottom:3px">🌐 时事滚动 · '+mb.headline+'</div>';
     if(news.length){
-      h += '<div style="display:flex;flex-direction:column;gap:5px">';
+      h += '<div style="display:flex;flex-wrap:wrap;gap:4px 10px">';
       news.slice(0,4).forEach(function(n){
-        var tag = n.tag || '宏观';
-        var text = n.text || '';
-        h += '<div style="font-size:12px;color:var(--sub);line-height:1.6"><span style="color:#38bdf8;font-weight:700">'+tag+'</span> '+text+'</div>';
+        h += '<span style="font-size:11px;color:var(--txt)"><b style="color:#38bdf8">'+(n.tag||'宏观')+'</b> '+(n.text||'')+'</span>';
       });
       h += '</div>';
     }
     if(mb.a_impact){
       var impactColor = (mb.a_impact.indexOf('偏空')>=0) ? 'var(--down)' : ((mb.a_impact.indexOf('偏多')>=0) ? 'var(--up)' : 'var(--txt)');
-      h += '<div style="margin-top:8px;padding:6px 10px;background:rgba(0,0,0,0.12);border-radius:6px;font-size:12px;color:var(--txt)"><b>对A股影响：</b><span style="color:'+impactColor+'">'+mb.a_impact+'</span></div>';
+      h += '<div style="margin-top:5px;font-size:11px;color:var(--sub)">对A股影响：<span style="color:'+impactColor+'">'+mb.a_impact+'</span></div>';
     }
     h += '</div>';
   }
-  // 0.5) 关键数据（来自 MACRO_BRIEF，避免与环境态势重复展示死模板）
+  // 3) 关键数据（无标题，pill 一行）
   var keyNumbers = (fullMb.key_numbers && fullMb.key_numbers.length ? fullMb.key_numbers : (mb.key_numbers || [])) || [];
   if(keyNumbers.length){
-    h += '<div style="font-weight:700;margin:8px 0 6px;color:var(--sub);font-size:12px">关键数据</div>';
-    h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px">';
+    h += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin:6px 0 10px">';
     keyNumbers.forEach(function(k){
       var dColor = (k.delta.indexOf('\u2191')>=0 || k.delta.indexOf('\u2193')>=0)
         ? ((k.delta.indexOf('\u2191')>=0) ? 'var(--up)' : 'var(--down)')
         : 'var(--txt)';
-      h += '<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.18);border-radius:6px;padding:4px 9px;font-size:12px;line-height:1.5">'
+      h += '<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.18);border-radius:6px;padding:3px 8px;font-size:11.5px;line-height:1.4">'
         + '<b style="color:var(--sub)">'+k.label+'</b>'
         + '<span style="color:var(--txt);font-weight:600">'+k.value+'</span>'
         + '<span style="color:'+dColor+';font-weight:700">'+k.delta+'</span></span>';
     });
     h += '</div>';
   }
-  // 1) 美股/宏观 + 结论 + 预警（置顶）；过滤掉旧的固定死文案
+  // 4) 美股 + 结论 + 警告 合并单行
   var usFixed = !d.us || /美股隔夜数据获取中|盘前研判以A股结构为主/.test(d.us);
   if((d.us && !usFixed) || d.verdict || d.warning){
-    h += '<div style="margin-bottom:12px;padding:10px 12px;background:linear-gradient(135deg,rgba(56,189,248,0.08),rgba(167,139,250,0.06));border:1px solid var(--border2);border-radius:10px;font-size:14px;line-height:1.7">';
-    if(d.us && !usFixed) h += '<p style="margin:3px 0"><b style="color:var(--sub)">美股：</b><span style="color:var(--up)">'+d.us+'</span></p>';
-    if(d.verdict) h += '<p style="margin:3px 0"><b style="color:var(--sub)">→ 结论：</b>'+d.verdict+'</p>';
-    if(d.warning) h += '<p style="margin:3px 0;color:#f59e0b">⚠️ '+d.warning+'</p>';
-    h += '</div>';
+    var parts = [];
+    if(d.us && !usFixed) parts.push('<b style="color:var(--sub)">美股</b> <span style="color:var(--up)">'+d.us+'</span>');
+    if(d.verdict) parts.push('<b style="color:var(--sub)">结论</b> '+d.verdict);
+    if(d.warning) parts.push('<span style="color:#f59e0b">⚠️ '+d.warning+'</span>');
+    h += '<div style="margin-bottom:10px;padding:8px 10px;background:linear-gradient(135deg,rgba(56,189,248,0.08),rgba(167,139,250,0.06));border:1px solid var(--border2);border-radius:8px;font-size:12px;line-height:1.5;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center">'
+      + parts.join('<span style="color:var(--dim)"> · </span>') + '</div>';
   }
-  // 2) 三大分析师 单行紧凑列表
+  // 5) 三大分析师（紧凑单行）
   var ans = d.analysts || [];
   if(ans.length){
     h += '<div style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px">';
@@ -695,51 +696,42 @@ function _buildJudgmentEnvHTML(d){
       var stars = '';
       for(var i=1;i<=5;i++) stars += (i<=rec ? '★' : '☆');
       var recColor = rec>=4 ? 'var(--up)' : (rec>=3 ? '#f59e0b' : 'var(--down)');
-      var dangerChip = (a.danger && a.danger.length)
-        ? ' <span style="color:var(--down);font-size:10.5px">⚠'+a.danger.join(' · ')+'</span>'
-        : '';
-      h += '<div style="display:grid;grid-template-columns:auto auto auto 1fr;gap:10px;padding:6px 10px;background:rgba(167,139,250,.05);border-radius:6px;border-left:3px solid var(--purple);font-size:11.5px;line-height:1.55;align-items:baseline">';
-      h += '<span style="font-weight:800;color:var(--txt);min-width:48px">'+a.name+'</span>';
-      h += '<span style="font-weight:700;color:var(--purple);min-width:60px">'+a.judgment+'</span>';
-      h += '<span style="font-weight:700;color:'+recColor+';letter-spacing:1px;min-width:48px">'+stars+'</span>';
-      h += '<span style="color:var(--sub)"><b style="color:var(--txt)">理由</b> '+a.reason+' · <b style="color:var(--down)">风险</b> '+a.risk+' · <b style="color:var(--up)">若必进场</b> '+a.if_must_enter+dangerChip+'</span>';
+      h += '<div style="display:flex;flex-wrap:wrap;gap:6px 10px;padding:5px 10px;background:rgba(167,139,250,.05);border-radius:6px;border-left:3px solid var(--purple);font-size:11.5px;line-height:1.5;align-items:center">';
+      h += '<span style="font-weight:800;color:var(--txt)">'+a.name+'</span>';
+      h += '<span style="font-weight:700;color:var(--purple)">'+a.judgment+'</span>';
+      h += '<span style="font-weight:700;color:'+recColor+';letter-spacing:1px">'+stars+'</span>';
+      h += '<span style="color:var(--sub)"><b style="color:var(--txt)">理由</b> '+a.reason+' · <b style="color:var(--down)">风险</b> '+a.risk+' · <b style="color:var(--up)">若必进场</b> '+a.if_must_enter+'</span>';
+      if(a.danger && a.danger.length) h += '<span style="color:var(--down);font-size:10.5px">⚠'+a.danger.join(' · ')+'</span>';
       h += '</div>';
     });
     h += '</div>';
   }
-  // 3) 共同结论
-  if(d.consensus){
-    var dir = d.consensus.indexOf('偏多')>=0 ? 'var(--up)' : (d.consensus.indexOf('偏空')>=0 ? 'var(--down)' : '#f59e0b');
-    h += '<div style="margin-bottom:10px;padding:9px 12px;background:'+dir+'15;border:1px solid '+dir+'40;border-radius:9px;font-size:13px;font-weight:700;color:'+dir+'">🤝 共同结论：'+d.consensus+'</div>';
-  }
-  // 4) 三大危险信号
+  // 6) 危险信号（标题+内容单行）
   var dg = d.danger_signals || [];
   if(dg.length){
-    h += '<div style="margin-bottom:12px;padding:9px 12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:9px">';
-    h += '<div style="font-size:12px;font-weight:700;color:var(--down);margin-bottom:5px">⚠️ 三大危险信号（双方一致认可）</div>';
-    h += '<div style="display:flex;flex-direction:column;gap:4px">';
+    h += '<div style="margin-bottom:10px;padding:6px 10px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.25);border-radius:8px;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:11.5px;line-height:1.5">';
+    h += '<b style="color:var(--down)">⚠️ 危险信号</b>';
     dg.slice(0,3).forEach(function(s,i){
-      var num = ['①','②','③'][i] || ('④'+i);
-      h += '<div style="font-size:11.5px;color:var(--txt);line-height:1.5"><span style="color:var(--down);font-weight:700">'+num+'</span> '+s+'</div>';
-    });
-    h += '</div></div>';
-  }
-  // 5) 大盘结构 + 指数标签
-  h += '<p style="margin:6px 0"><b style="color:var(--sub)">大盘：</b>'+(d.market||'')+'</p>';
-  if(d.indices && d.indices.length){
-    h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0">';
-    d.indices.forEach(function(r){
-      h += '<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.22);border-radius:999px;padding:3px 10px;font-size:12px;line-height:1.6">'
-        + '<b style="color:var(--txt)">'+r.name+'</b>'
-        + '<span style="color:var(--down)">控'+r.ctrl+'</span>'
-        + '<span style="color:var(--down)">财'+r.fs+'</span>'
-        + (r.warn?'<span style="color:#f59e0b;margin-left:2px">⚠️ '+r.warn+'</span>':'')
-        + '</span>';
+      h += '<span><span style="color:var(--down);font-weight:700">'+(['①','②','③'][i]||('④'+i))+'</span> '+s+'</span>';
     });
     h += '</div>';
   }
-  // 6) 数据来源 footer
-  h += '<div style="margin-top:8px;font-size:10px;color:var(--dim);text-align:right">基于当日指数/危机雷达/宏观数据自动生成 · 盘前 08:25 刷新</div>';
+  // 7) 大盘 + 指数标签 一行
+  if(d.market || (d.indices && d.indices.length)){
+    h += '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0;font-size:12px;line-height:1.5">';
+    if(d.market) h += '<span><b style="color:var(--sub)">大盘</b> '+d.market+'</span>';
+    if(d.indices && d.indices.length){
+      d.indices.forEach(function(r){
+        h += '<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.22);border-radius:999px;padding:2px 9px;font-size:11.5px;line-height:1.5">'
+          + '<b style="color:var(--txt)">'+r.name+'</b>'
+          + '<span style="color:var(--down)">控'+r.ctrl+'</span>'
+          + '<span style="color:var(--down)">财'+r.fs+'</span>'
+          + (r.warn?'<span style="color:#f59e0b;margin-left:2px">⚠ '+r.warn+'</span>':'')
+          + '</span>';
+      });
+    }
+    h += '</div>';
+  }
   return h || '<div style="color:var(--dim);padding:10px">今日暂无环境态势数据</div>';
 }
 window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
