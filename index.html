@@ -2666,14 +2666,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     function cat(c){ return (stocks||[]).filter(function(s){ return (s.category||'')===c; }); }
     // v6_memo line 405: 8000万门槛约0.8亿，低于不显示（2026-08-06 按 v6 规范补阈值）
     var TH = 8000;
-    function t5(arr,key){ return arr.filter(function(s){ return Math.abs(s[key]||0) >= TH; }).sort(function(a,b){return (b[key]||0)-(a[key]||0);}).slice(0,5); }
-    function b5(arr,key){ return arr.filter(function(s){ return Math.abs(s[key]||0) >= TH; }).sort(function(a,b){return (a[key]||0)-(b[key]||0);}).slice(0,5); }
+    // 卖出必须从全部股票的真实负净值里取，不能从「独买」类别里取最小正值（否则卖出也显示+）
+    var all = stocks || [];
+    var instBuy = all.filter(function(s){ return (s.inst_net_万||0) >= TH; }).sort(function(a,b){return b.inst_net_万 - a.inst_net_万;}).slice(0,5);
+    var instSell = all.filter(function(s){ return (s.inst_net_万||0) <= -TH; }).sort(function(a,b){return a.inst_net_万 - b.inst_net_万;}).slice(0,5);
+    var yzBuy = all.filter(function(s){ return (s.yz_net_万||0) >= TH; }).sort(function(a,b){return b.yz_net_万 - a.yz_net_万;}).slice(0,5);
+    var yzSell = all.filter(function(s){ return (s.yz_net_万||0) <= -TH; }).sort(function(a,b){return a.yz_net_万 - b.yz_net_万;}).slice(0,5);
     var jy = cat('机游共振').filter(function(s){ return Math.abs((s.inst_net_万||0)+(s.yz_net_万||0)) >= TH; })
-      .map(function(s){ s._net=(s.inst_net_万||0)+(s.yz_net_万||0); return s; }).slice(0,5);
-    var instBuy = t5(cat('机构独买').concat(jy), 'inst_net_万');
-    var instSell = b5(cat('机构独买').concat(jy), 'inst_net_万');
-    var yzBuy = t5(cat('游资独买'), 'yz_net_万');
-    var yzSell = b5(cat('游资独买'), 'yz_net_万');
+      .map(function(s){ s._net=(s.inst_net_万||0)+(s.yz_net_万||0); return s; }).sort(function(a,b){return b._net - a._net;}).slice(0,5);
     var pureYz = cat('游资独买').filter(function(s){ return Math.abs(s.yz_net_万||0) >= TH; }).slice(0,5);
     function blk(title,color,arr,key){
       if(!arr.length) return '';
@@ -3119,14 +3119,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     h += '</div>';
 
     // v6 六块分类 + 0.8亿阈值 + 互斥 + 横排紧凑（v6_memo line 405-406，2026-08-06 用户"并排一行写"）
+    // 注意：卖出要从全部股票（含不达标）的真实负净值取，不能从「独买」类别里取最小正值
     var TH = 8000;
-    var instBuy = (byCat['机构独买']||[]).filter(function(s){ return (s.inst_net_万||0) >= TH; }).sort(function(a,b){return b.inst_net_万 - a.inst_net_万;}).slice(0,5);
-    var instSell = (byCat['机构独买']||[]).filter(function(s){ return (s.inst_net_万||0) <= -TH; }).sort(function(a,b){return a.inst_net_万 - b.inst_net_万;}).slice(0,5);
+    var all = stocks;
+    var instBuy = all.filter(function(s){ return (s.inst_net_万||0) >= TH; }).sort(function(a,b){return b.inst_net_万 - a.inst_net_万;}).slice(0,5);
+    var instSell = all.filter(function(s){ return (s.inst_net_万||0) <= -TH; }).sort(function(a,b){return a.inst_net_万 - b.inst_net_万;}).slice(0,5);
     var jyStocks = (byCat['机游共振']||[]).filter(function(s){ return Math.abs((s.inst_net_万||0)+(s.yz_net_万||0)) >= TH; })
       .sort(function(a,b){return Math.abs((b.inst_net_万||0)+(b.yz_net_万||0)) - Math.abs((a.inst_net_万||0)+(a.yz_net_万||0));}).slice(0,5);
     var pureYz = (byCat['游资独买']||[]).filter(function(s){ return Math.abs(s.yz_net_万||0) >= TH*1.5; }).slice(0,5);
-    var yzBuy = (byCat['游资独买']||[]).filter(function(s){ return (s.yz_net_万||0) >= TH; }).sort(function(a,b){return b.yz_net_万 - a.yz_net_万;}).slice(0,5);
-    var yzSell = (byCat['游资独买']||[]).filter(function(s){ return (s.yz_net_万||0) <= -TH; }).sort(function(a,b){return a.yz_net_万 - b.yz_net_万;}).slice(0,5);
+    var yzBuy = all.filter(function(s){ return (s.yz_net_万||0) >= TH; }).sort(function(a,b){return b.yz_net_万 - a.yz_net_万;}).slice(0,5);
+    var yzSell = all.filter(function(s){ return (s.yz_net_万||0) <= -TH; }).sort(function(a,b){return a.yz_net_万 - b.yz_net_万;}).slice(0,5);
     function blk6(title, color, arr, valFn){
       // 单列紧凑卡片（不占大版面，2026-08-06 主人令）
       var cells = arr.map(function(s){
