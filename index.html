@@ -5641,9 +5641,8 @@ function renderLimitUpHeatmap(){
     return g;
   }
 
-  // 影子股小节：选 A — 仅「建议申购 / 强烈推荐」的 IPO 才展示关联股
+  // 影子股小节：所有有影子股数据的 IPO 均展示（含不建议申购）
   function shadowBlock(it, rec){
-    if(!/强烈推荐|建议申购/.test(rec||'')) return '';
     const sh=(it.shadows||[]).filter(Boolean);
     if(!sh.length) return '';
     const dot={'股权':'#f59e0b','供应链':'#60a5fa','客户':'#34d399','同业':'#c084fc'};
