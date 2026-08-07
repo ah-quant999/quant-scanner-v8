@@ -1,1 +1,1 @@
-window.INDEX_QUOTES = {"no_data":true,"premarket_cleared":true,"note":"盘前指数快照待开盘刷新","indices":[],"update_time":"2026-08-07 13:08:43","build_time":"2026-08-07 13:10:40"};
+window.INDEX_QUOTES = {"no_data":true,"premarket_cleared":true,"note":"盘前指数快照待开盘刷新","indices":[],"update_time":"2026-08-07 13:13:54","build_time":"2026-08-07 13:21:00"};
