@@ -1,5 +1,1 @@
-<<<<<<< Updated upstream
-window.CRISIS_DATA = {"currency":0.15,"economy":0.494,"global":0.4,"pmi_value":49.4,"usd_cny":6.7904,"note":"经济维度=中国PMI真实值(49.4)；货币维度=中国银行USD/CNY中间价(6.7904)；全球维度因VIX/美债等源CN不可达暂用中性估值","update_time":"2026-08-07 12:17:16","build_time":"2026-08-07 12:20:53"};
-=======
-window.CRISIS_DATA = {"currency":0.15,"economy":0.494,"global":0.4,"pmi_value":49.4,"usd_cny":6.7904,"note":"经济维度=中国PMI真实值(49.4)；货币维度=中国银行USD/CNY中间价(6.7904)；全球维度因VIX/美债等源CN不可达暂用中性估值","update_time":"2026-08-07 12:04:27","build_time":"2026-08-07 12:23:00"};
->>>>>>> Stashed changes
+window.CRISIS_DATA = {"currency":0.15,"economy":0.494,"global":0.4,"pmi_value":49.4,"usd_cny":6.7904,"note":"经济维度=中国PMI真实值(49.4)；货币维度=中国银行USD/CNY中间价(6.7904)；全球维度因VIX/美债等源CN不可达暂用中性估值","update_time":"2026-08-07 12:34:43","build_time":"2026-08-07 12:37:22"};
