@@ -1,1 +1,1 @@
-window.CANDIDATE = {"update_time":"2026-08-07 19:27:05","total":0,"source_dist":{},"stocks":{},"build_time":"2026-08-07 21:42:17"};
+window.CANDIDATE = {"update_time":"2026-08-07 19:27:05","total":0,"source_dist":{},"stocks":{},"build_time":"2026-08-07 22:01:26"};
