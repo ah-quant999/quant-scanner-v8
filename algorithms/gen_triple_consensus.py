@@ -23,6 +23,7 @@ from datetime import datetime
 WORKSPACE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(WORKSPACE, "..", "raw_data")  # 🔴 2026-08-06 改 raw_data：fundamental/top10/backtest 输入均已持久化在 raw_data（out/ 被 gitignore 云端丢）
 OUTPUT = os.path.join(DATA_DIR, "triple_consensus.json")
+HISTORY_FILE = os.path.join(DATA_DIR, "triple_resonance_history.json")
 META_FILE = os.path.join(WORKSPACE, "stock_industry_concepts.json")
 
 
@@ -96,6 +97,15 @@ def enrich_extra(record, code, gp_map, meta_map=None):
     return record
 
 
+def load_tracking_enter_dates():
+    """从历史追踪文件读取每只股的首次入选日期，用于区分"今日新入仓"与"持续持仓"。"""
+    hist = load_json(HISTORY_FILE, {})
+    tracking = hist.get("_tracking_latest", {})
+    if not isinstance(tracking, dict):
+        return {}
+    return {code: info.get("enter_date", "") for code, info in tracking.items() if info.get("enter_date")}
+
+
 def main():
     print(f"  三重共识选股  —  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 60)
@@ -148,6 +158,9 @@ def main():
     # 收集所有候选 code
     all_codes = set(top_map.keys()) | set(a_map.keys()) | set(b_map.keys())
 
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    tracking_enter = load_tracking_enter_dates()
+
     consensus = []
     near_miss = []
     for code in all_codes:
@@ -183,6 +196,7 @@ def main():
                 "sector_detail": top.get("sector_detail", ""),
                 "inst_detail": top.get("inst_detail", ""),
                 "win_rate": top.get("win_rate", None),
+                "enter_date": tracking_enter.get(code, today_str),
             }
             consensus.append(enrich_extra(rec, code, gp_map, meta_map))
             continue
@@ -217,6 +231,7 @@ def main():
                 "pct_chg_20d": src.get("pct_chg_20d", 0),
                 "signals": top.get("signals", {}) if top else {},
                 "sectors": src.get("sectors", []),
+                "enter_date": tracking_enter.get(code, today_str),
             }
             near_miss.append(enrich_extra(rec, code, gp_map, meta_map))
 

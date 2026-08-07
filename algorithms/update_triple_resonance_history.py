@@ -25,6 +25,7 @@ from datetime import datetime, date
 WORKSPACE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(WORKSPACE, "..", "raw_data")  # 🔴 2026-08-06 改 raw_data：fundamental/top10/backtest 输入均已持久化在 raw_data（out/ 被 gitignore 云端丢）
 OUTPUT = os.path.join(DATA_DIR, "triple_resonance_history.json")
+CONSENSUS_FILE = os.path.join(DATA_DIR, "triple_consensus.json")
 META_PREFIX = "_"
 
 
@@ -151,6 +152,18 @@ def main():
             tr["status"] = "dropped"
 
     history["_tracking_latest"] = tracking
+
+    # 同步回写 enter_date 到 triple_consensus.json，让前端能区分"今日新入仓"与"持续持仓"
+    consensus = load_json(CONSENSUS_FILE, {})
+    if consensus:
+        for grp_key in ("stocks", "near_miss"):
+            for s in consensus.get(grp_key, []) or []:
+                code = normalize_code(s.get("code", ""))
+                tr = tracking.get(code, {})
+                # 从未跟踪过的股票视为今日新入选
+                s["enter_date"] = tr.get("enter_date", today)
+        with open(CONSENSUS_FILE, "w", encoding="utf-8") as f:
+            json.dump(consensus, f, ensure_ascii=False, indent=2)
 
     # 元数据
     meta = history.get("_meta", {})

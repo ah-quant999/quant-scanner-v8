@@ -740,7 +740,7 @@ function _buildJudgmentEnvHTML(d){
 window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 </script>
 <script src="data/CRDS_CARD_DATA.js?v=20260807171706"></script>
-<script src="data/TRIPLE_CONSENSUS.js?v=20260807192912"></script>
+<script src="data/TRIPLE_CONSENSUS.js?v=202608072202"></script>
 <script src="data/TRIPLE_TRACK.js?v=20260807192912"></script>
 <script src="data/TRIPLE_HISTORY.js?v=20260807165809"></script>
 <script src="data/COCKPIT_TIER_RECOMMEND.js?v=20260807193637"></script>
@@ -4323,9 +4323,10 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-h">「今日已跑完」 vs 「今日已入仓」</div>
         <div class="logic-p">两个标识是<b>独立维度</b>，不可混淆：<br>
         · <b style="color:var(--sub)">今日已跑完</b>（灰色胶囊）：当算法链跑成功 + 数据 update_time 是当天 → <b>无条件显示</b>。哪怕市场差、入选=0 也会显示，证明"今天确实跑了"。<br>
-        · <b style="color:#15803d">今日已入仓 N</b>（绿色胶囊）：当算法的当日产物里有 ≥1 只入选股票才显示，N 是实际入选数。<br>
-        两者<b>可并存</b>（跑成功 + 有入选 = 两胶囊同时显示），也可仅显示"已跑完"（跑成功 + 0 入选 = 仅灰色胶囊，绝不伪造"已入仓"）。<br>
-        <b style="color:#ef5350">铁律</b>：所有数据必须及时真实准确，<b>不得造假</b>。今日 0 入选就是 0 入选，绝不显示绿色"已入仓"标骗用户。</div>
+        · <b style="color:#15803d">今日已入仓 N</b>（绿色胶囊）：仅当数据是今日、且股票的 <code>enter_date</code> 为今日时才显示，N 是"今日新入选"数量。<br>
+        · <b style="color:#15803d">持仓 N</b>：数据仍是今日，但当前入选股都是昨日延续持仓，没有新入选。<br>
+        两者<b>可并存</b>（跑成功 + 有今日新入选 = "已跑完"+"今日已入仓"同时显示）。<br>
+        <b style="color:#ef5350">铁律</b>：所有数据必须及时真实准确，<b>不得造假</b>。数据过期或 0 新入选时，绝不显示"今日已入仓"骗用户。</div>
       </div>
 
       <div class="card">
@@ -7392,12 +7393,31 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if(_tcInfo.show){ _tcRun.textContent = _tcInfo.label; _tcRun.style.display='inline-flex'; }
       else _tcRun.style.display='none';
     }
-    // 「今日已入仓」胶囊：严格共识 stocks > 0 才显示
+    // 「今日已入仓」胶囊：只看数据日期内、且 enter_date == 数据日期的"新入选"股票
+    // 2026-08-07 修复：原逻辑只看 stocks.length，无法区分昨天入仓/今天入仓，且跑失败后仍显示"今日"
     var _eb=document.getElementById('tcEnteredBadge');
     var _ec=document.getElementById('tcEnteredCount');
     if(_eb&&_ec){
-      if(stocks.length>0){
-        _ec.textContent=stocks.length;
+      var _dataDate = String(_tcTs).slice(0,10);
+      var _todayDate = window._tradeDayStr ? window._tradeDayStr() : _dataDate;
+      // 数据必须是"今天"（按交易日口径，09:30前仍算上一交易日）才允许显示"今日"
+      var _isFresh = (_dataDate === _todayDate && /^\d{4}-\d{2}-\d{2}$/.test(_dataDate));
+      var _newToday = 0;
+      if(_isFresh){
+        stocks.forEach(function(s){
+          if((s.enter_date || _dataDate) === _dataDate) _newToday++;
+        });
+      }
+      if(_newToday>0){
+        _eb.innerHTML = '✅ 今日已入仓 <b style="margin-left:2px">'+_newToday+'</b>';
+        _eb.style.display='inline-flex';
+      } else if(_isFresh && stocks.length>0){
+        // 数据是今天，但都是昨日延续持仓：显示"持仓 N"，避免误报"今日入仓"
+        _eb.innerHTML = '💼 持仓 <b style="margin-left:2px">'+stocks.length+'</b>';
+        _eb.style.display='inline-flex';
+      } else if(!_isFresh && stocks.length>0){
+        // 数据已过期：显示实际日期的入仓数，绝不写"今日"
+        _eb.innerHTML = '💼 '+_dataDate.slice(5)+' 持仓 <b style="margin-left:2px">'+stocks.length+'</b>';
         _eb.style.display='inline-flex';
       } else {
         _eb.style.display='none';
