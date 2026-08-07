@@ -1,145 +1,156 @@
 {
- "2026-08-07": [
-  {
-   "code": "02269",
-   "name": "药明生物",
-   "market": "hk",
-   "board": "港股",
-   "close": 40.62,
-   "pct_chg": 0.4,
-   "total_score": 22.4,
-   "quality_grade": "",
-   "industry": "",
-   "sectors": [],
-   "signal_count": 0,
-   "status": "near"
+  "2026-08-07": [
+    {
+      "code": "300760",
+      "name": "迈瑞医疗",
+      "market": "创业板",
+      "board": "创业板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 60,
+      "quality_grade": "A",
+      "industry": "专用设备制造业",
+      "sectors": [
+        "专用设备制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "600519",
+      "name": "贵州茅台",
+      "market": "沪市",
+      "board": "主板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 60,
+      "quality_grade": "A",
+      "industry": "酒、饮料和精制茶制造业",
+      "sectors": [
+        "酒、饮料和精制茶制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "000807",
+      "name": "云铝股份",
+      "market": "深市",
+      "board": "主板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 20,
+      "quality_grade": "A",
+      "industry": "有色金属冶炼和压延加工业",
+      "sectors": [
+        "有色金属冶炼和压延加工业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    }
+  ],
+  "_stock_price_history": {
+    "09988": {
+      "2026-08-07": 128.1
+    },
+    "02269": {
+      "2026-08-07": 40.62
+    },
+    "09626": {
+      "2026-08-07": 150.1
+    },
+    "01211": {
+      "2026-08-07": 93.8
+    },
+    "03690": {
+      "2026-08-07": 93.05
+    },
+    "600519": {
+      "2026-08-07": 0
+    },
+    "300760": {
+      "2026-08-07": 0
+    },
+    "000807": {
+      "2026-08-07": 0
+    }
   },
-  {
-   "code": "03690",
-   "name": "美团-W",
-   "market": "hk",
-   "board": "港股",
-   "close": 93.05,
-   "pct_chg": 0.38,
-   "total_score": 22.4,
-   "quality_grade": "",
-   "industry": "",
-   "sectors": [],
-   "signal_count": 0,
-   "status": "near"
+  "_tracking_latest": {
+    "02269": {
+      "enter_date": "2026-08-07",
+      "enter_close": 40.62,
+      "last_date": "2026-08-07",
+      "last_close": 40.62,
+      "status": "near",
+      "streak": 1,
+      "total_days": 1
+    },
+    "03690": {
+      "enter_date": "2026-08-07",
+      "enter_close": 93.05,
+      "last_date": "2026-08-07",
+      "last_close": 93.05,
+      "status": "near",
+      "streak": 1,
+      "total_days": 1
+    },
+    "09988": {
+      "enter_date": "2026-08-07",
+      "enter_close": 128.1,
+      "last_date": "2026-08-07",
+      "last_close": 128.1,
+      "status": "near",
+      "streak": 1,
+      "total_days": 1
+    },
+    "09626": {
+      "enter_date": "2026-08-07",
+      "enter_close": 150.1,
+      "last_date": "2026-08-07",
+      "last_close": 150.1,
+      "status": "near",
+      "streak": 1,
+      "total_days": 1
+    },
+    "01211": {
+      "enter_date": "2026-08-07",
+      "enter_close": 93.8,
+      "last_date": "2026-08-07",
+      "last_close": 93.8,
+      "status": "near",
+      "streak": 1,
+      "total_days": 1
+    },
+    "300760": {
+      "enter_date": "2026-08-07",
+      "enter_close": 0,
+      "last_date": "2026-08-07",
+      "last_close": 0,
+      "status": "near",
+      "streak": 1
+    },
+    "600519": {
+      "enter_date": "2026-08-07",
+      "enter_close": 0,
+      "last_date": "2026-08-07",
+      "last_close": 0,
+      "status": "near",
+      "streak": 1
+    },
+    "000807": {
+      "enter_date": "2026-08-07",
+      "enter_close": 0,
+      "last_date": "2026-08-07",
+      "last_close": 0,
+      "status": "near",
+      "streak": 1
+    }
   },
-  {
-   "code": "09988",
-   "name": "阿里巴巴-W",
-   "market": "hk",
-   "board": "港股",
-   "close": 128.1,
-   "pct_chg": 1.83,
-   "total_score": 22.4,
-   "quality_grade": "",
-   "industry": "",
-   "sectors": [],
-   "signal_count": 0,
-   "status": "near"
+  "_meta": {
+    "track_start": "2026-08-07",
+    "created": "2026-08-07 10:50:02",
+    "last_update": "2026-08-07 13:17:33",
+    "update_time": "2026-08-07 10:54:17"
   },
-  {
-   "code": "09626",
-   "name": "哔哩哔哩-W",
-   "market": "hk",
-   "board": "港股",
-   "close": 150.1,
-   "pct_chg": 0.27,
-   "total_score": 22.4,
-   "quality_grade": "",
-   "industry": "",
-   "sectors": [],
-   "signal_count": 0,
-   "status": "near"
-  },
-  {
-   "code": "01211",
-   "name": "比亚迪股份",
-   "market": "hk",
-   "board": "港股",
-   "close": 93.8,
-   "pct_chg": 0.37,
-   "total_score": 22.4,
-   "quality_grade": "",
-   "industry": "",
-   "sectors": [],
-   "signal_count": 0,
-   "status": "near"
-  }
- ],
- "_stock_price_history": {
-  "09988": {
-   "2026-08-07": 128.1
-  },
-  "02269": {
-   "2026-08-07": 40.62
-  },
-  "09626": {
-   "2026-08-07": 150.1
-  },
-  "01211": {
-   "2026-08-07": 93.8
-  },
-  "03690": {
-   "2026-08-07": 93.05
-  }
- },
- "_tracking_latest": {
-  "02269": {
-   "enter_date": "2026-08-07",
-   "enter_close": 40.62,
-   "last_date": "2026-08-07",
-   "last_close": 40.62,
-   "status": "near",
-   "streak": 1,
-   "total_days": 1
-  },
-  "03690": {
-   "enter_date": "2026-08-07",
-   "enter_close": 93.05,
-   "last_date": "2026-08-07",
-   "last_close": 93.05,
-   "status": "near",
-   "streak": 1,
-   "total_days": 1
-  },
-  "09988": {
-   "enter_date": "2026-08-07",
-   "enter_close": 128.1,
-   "last_date": "2026-08-07",
-   "last_close": 128.1,
-   "status": "near",
-   "streak": 1,
-   "total_days": 1
-  },
-  "09626": {
-   "enter_date": "2026-08-07",
-   "enter_close": 150.1,
-   "last_date": "2026-08-07",
-   "last_close": 150.1,
-   "status": "near",
-   "streak": 1,
-   "total_days": 1
-  },
-  "01211": {
-   "enter_date": "2026-08-07",
-   "enter_close": 93.8,
-   "last_date": "2026-08-07",
-   "last_close": 93.8,
-   "status": "near",
-   "streak": 1,
-   "total_days": 1
-  }
- },
- "_meta": {
-  "track_start": "2026-08-07",
-  "created": "2026-08-07 10:50:02",
-  "last_update": "2026-08-07 10:50:02",
   "update_time": "2026-08-07 10:54:17"
- },
- "update_time": "2026-08-07 10:54:17"
 }
