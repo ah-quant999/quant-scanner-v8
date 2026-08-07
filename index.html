@@ -6424,25 +6424,39 @@ function renderLimitUpHeatmap(){
       rows.sort(function(a,b){ if(a.order!==b.order) return a.order-b.order; return b.d20-a.d20; });
       const counts={}; rows.forEach(function(r){ counts[r.phase]=(counts[r.phase]||0)+1; });
       const phaseOrder=['主升','启动','震荡','退潮','底部'];
-      h3+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">';
+      // 按周期阶段分桶
+      const byPhase={}; phaseOrder.forEach(p=>byPhase[p]=[]);
+      rows.forEach(r=>byPhase[r.phase].push(r));
+
+      // 5 列胶囊 + 下拉列表式展示
+      h3+='<div style="display:flex;gap:8px;margin-bottom:10px;align-items:stretch">';
       phaseOrder.forEach(function(p){
         const m=phaseMeta[p];
-        const cnt=counts[p]||0;
-        h3+='<span style="padding:2px 8px;background:'+_phaseVra(m.color,0.1)+';border:1px solid '+_phaseVra(m.color,0.25)+';border-radius:999px;font-size:11px;color:'+m.color+';font-weight:700">'+m.emoji+' '+p+' <span style="font-weight:400;color:var(--dim)">'+cnt+'</span></span>';
-      });
-      h3+='</div>';
-      h3+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:5px;margin-bottom:10px;max-height:240px;overflow-y:auto;padding-right:2px">';
-      rows.forEach(function(s){
-        h3+='<div style="padding:5px 7px;background:rgba(255,255,255,.04);border:1px solid var(--border2);border-radius:6px;display:flex;flex-direction:column;gap:2px">';
-        h3+='<div style="display:flex;align-items:center;justify-content:space-between;gap:4px">';
-        h3+='<span style="font-size:11px;font-weight:600;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+s.name+'">'+s.name+'</span>';
-        h3+='<span style="font-size:10px;font-weight:700;color:'+s.color+';white-space:nowrap">'+s.emoji+' '+s.phase+'</span>';
-        h3+='</div>';
-        h3+='<div style="display:flex;gap:6px;font-size:10px;color:var(--dim)">';
-        h3+='<span>今<span style="color:'+(s.dDay>=0?'var(--up)':'var(--down)')+'">'+(s.dDay>=0?'+':'')+s.dDay.toFixed(1)+'%</span></span>';
-        h3+='<span>5日<span style="color:'+(s.d5>=0?'var(--up)':'var(--down)')+'">'+(s.d5>=0?'+':'')+s.d5.toFixed(1)+'%</span></span>';
-        h3+='<span>20日<span style="color:'+(s.d20>=0?'var(--up)':'var(--down)')+'">'+(s.d20>=0?'+':'')+s.d20.toFixed(1)+'%</span></span>';
-        h3+='</div>';
+        const list=byPhase[p]||[];
+        const cnt=list.length;
+        h3+='<div style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0;max-height:320px">';
+        // 胶囊标题
+        h3+='<div style="padding:5px 8px;background:'+_phaseVra(m.color,0.12)+';border:1px solid '+_phaseVra(m.color,0.3)+';border-radius:999px;text-align:center;font-size:13px;font-weight:800;color:'+m.color+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+m.emoji+' '+p+' <span style="font-weight:400;color:var(--dim)">'+cnt+'</span></div>';
+        // 下拉列表区
+        if(list.length){
+          h3+='<div style="flex:1;overflow-y:auto;border:1px solid var(--border2);border-radius:8px;background:rgba(255,255,255,.03);padding:4px;">';
+          list.forEach(function(s){
+            h3+='<div style="padding:7px 6px;border-bottom:1px solid var(--border2);">';
+            h3+='<div style="display:flex;align-items:center;justify-content:space-between;gap:4px;margin-bottom:3px">';
+            h3+='<span style="font-size:13px;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+s.name+'">'+s.name+'</span>';
+            h3+='<span style="font-size:12px;font-weight:700;color:'+s.color+';white-space:nowrap;flex-shrink:0">'+s.emoji+' '+s.phase+'</span>';
+            h3+='</div>';
+            h3+='<div style="display:flex;gap:8px;font-size:12px;color:var(--dim)">';
+            h3+='<span>今<span style="color:'+(s.dDay>=0?'var(--up)':'var(--down)')+'">'+(s.dDay>=0?'+':'')+s.dDay.toFixed(1)+'%</span></span>';
+            h3+='<span>5日<span style="color:'+(s.d5>=0?'var(--up)':'var(--down)')+'">'+(s.d5>=0?'+':'')+s.d5.toFixed(1)+'%</span></span>';
+            h3+='<span>20日<span style="color:'+(s.d20>=0?'var(--up)':'var(--down)')+'">'+(s.d20>=0?'+':'')+s.d20.toFixed(1)+'%</span></span>';
+            h3+='</div>';
+            h3+='</div>';
+          });
+          h3+='</div>';
+        } else {
+          h3+='<div style="flex:1;display:flex;align-items:center;justify-content:center;border:1px solid var(--border2);border-radius:8px;background:rgba(255,255,255,.03);color:var(--dim);font-size:12px;padding:8px;">暂无</div>';
+        }
         h3+='</div>';
       });
       h3+='</div>';
