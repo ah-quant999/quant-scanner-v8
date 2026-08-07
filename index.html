@@ -837,35 +837,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     };
     </script>
 
-    <!-- 🎯 今日可入手候选（2026-08-07 主人令：迁回今日事件，置于打新上方） -->
-    <div class="card" style="margin-bottom:16px;border-left:4px solid #ff7043;">
-      <div id="candidateCardHeader"></div>
-      <div id="candidateCardBody" style="padding:12px 14px;"></div>
-    </div>
-    <script>
-    /* 注册渲染函数：v8CardHeader / __judgmentCandidatesHTML 定义在后面脚本块，
-       此处只注册、不执行，由末尾 initCardBadges / switchSec('td') 统一触发。 */
-    window.__renderCandidateCard = function(){
-      var fvData = window.FOUR_VOLUME || {};
-      var head = document.getElementById('candidateCardHeader');
-      var body = document.getElementById('candidateCardBody');
-      if(body && body.dataset.rendered==='1') return;
-      if(head && typeof window.v8CardHeader === 'function'){
-        head.innerHTML = window.v8CardHeader('🎯','今日可入手候选','聚合 三重共识/驾驶舱A档/金股池/四量终极','update_time',
-          {update_time:fvData.update_time, slot:'盘后', horizon:'短线'},
-          !(fvData && fvData.stocks && fvData.stocks.length));
-      }
-      if(body){
-        body.dataset.rendered='1';
-        try{
-          body.innerHTML = (typeof window.__judgmentCandidatesHTML === 'function')
-            ? window.__judgmentCandidatesHTML()
-            : '<div class="note">可入手候选渲染函数未加载</div>';
-        }catch(e){ body.innerHTML = '<div class="note" style="color:var(--down)">可入手候选渲染异常：'+String(e)+'</div>'; }
-      }
-    };
-    </script>
-
     <!-- 打新速览 -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">🚀</span>打新速览 - 盘中 · <span class="fresh" id="ipoFresh">—</span></h3>
@@ -4714,9 +4685,8 @@ function switchSec(sec,el){
   if(sec==='op' && typeof window.__renderOps==='function') setTimeout(window.__renderOps,60);
   // 暂未上架：进入时渲染实验区（renderUnlisted 内部有 rendered 防重；2026-08-07 一级 Tab）
   if(sec==='ul' && typeof window.renderUnlisted==='function') setTimeout(window.renderUnlisted,60);
-  // 今日事件：今日判定环境态势卡 + 今日可入手候选已迁回，进入时触发渲染
+  // 今日事件：今日判定环境态势卡已迁回，进入时触发渲染
   if(sec==='td' && typeof window.__renderJudgmentBody==='function') setTimeout(window.__renderJudgmentBody,60);
-  if(sec==='td' && typeof window.__renderCandidateCard==='function') setTimeout(window.__renderCandidateCard,70);
   // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
   if(sec==='ph' && typeof window._renderSecPh==='function') setTimeout(window._renderSecPh,80);
   if(sec==='st' && typeof window._renderSecSt==='function') setTimeout(window._renderSecSt,80);
@@ -8475,6 +8445,22 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     // === 暂未上架实验区 · 5 张数据驱动卡（2026-08-07 主人令：今晚开始开发） ===
 
+    // ── 卡 1：🎯 今日可入手候选（2026-08-07 主人令：从今日事件迁回暂未上架，置于连板天梯上方） ──
+    (function(){
+      var fvData = window.FOUR_VOLUME || {};
+      h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #ff7043;">';
+      h += v8CardHeader('🎯','今日可入手候选','聚合 三重共识/驾驶舱A档/金股池/四量终极','update_time',
+        {update_time:fvData.update_time, slot:'盘后', horizon:'短线'},
+        !(fvData && fvData.stocks && fvData.stocks.length));
+      h += '<div style="padding:12px 14px;">';
+      try{
+        h += (typeof window.__judgmentCandidatesHTML === 'function')
+          ? window.__judgmentCandidatesHTML()
+          : '<div class="note">可入手候选渲染函数未加载</div>';
+      }catch(e){ h += '<div class="note" style="color:var(--down)">可入手候选渲染异常：'+String(e)+'</div>'; }
+      h += '</div></div>';
+    })();
+
     // ── 卡 2：🎭 情绪周期 · 连板天梯（合并紧凑版） ──
     (function(){
       var cr = window.CRISIS_DATA || {};
@@ -9415,10 +9401,9 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   // 选股策略 tab 上的 6 张算法卡（非 query/tc/cockpit/allsite/crds 的都有 lazy render，需要显式激活）
   tryRun('renderFourVolume', (typeof window.renderFourVolume==='function')?window.renderFourVolume:null, 'fv-badge init');
   tryRun('renderV8Crds-st',  (typeof window.renderV8Crds==='function')?function(){window.renderV8Crds('st');}:null, 'crds-badge init');
-  // 今日事件「今日判定」卡头+内容 + 今日可入手候选（脚本块位于 v8CardHeader 定义之前，只能延后到此处渲染）
+  // 今日事件「今日判定」卡头+内容（脚本块位于 v8CardHeader 定义之前，只能延后到此处渲染）
   tryRun('renderJudgmentHeader', window.__renderJudgmentHeader, 'judgment-header init');
   tryRun('renderJudgmentBody', window.__renderJudgmentBody, 'judgment-body init');
-  tryRun('renderCandidateCard', window.__renderCandidateCard, 'candidate-card init');
   // ⛓ 任何后续切到 fv/crds tab 也只是再跑一次幂等
 })();
 </script>
