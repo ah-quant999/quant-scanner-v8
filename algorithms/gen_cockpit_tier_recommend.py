@@ -55,8 +55,10 @@ def market_label(s):
     return "其他"
 
 
-def build_alimi(all_results, fq_map=FQ):
+def build_alimi(all_results, data_date=None, fq_map=FQ):
     """阿狸咪独立计算：基于 scan_result 新鲜数据，严格算法（双真+不超买+EMA完好）"""
+    if data_date is None:
+        data_date = datetime.now().strftime("%Y-%m-%d")
 
     def _q(s):
         fq = fq_map.get(fq_key_of(s.get("market"), s.get("code")), {})
@@ -117,6 +119,7 @@ def build_alimi(all_results, fq_map=FQ):
             "tech_score": x["tech_score"],
             "total_score": x["total_score"],
             "comment": x["comment"],
+            "enter_date": data_date,
         })
     tier_a_out = tier_a_out[:10]  # 最多 10 只
 
@@ -174,6 +177,7 @@ def build_alimi(all_results, fq_map=FQ):
             "quality_score": qscore,
             "quality_detail": qdetail,
             "comment": f"早期:{'+'.join(early_parts)}" + (f" · 基本面{qgrade}" if qgrade else ""),
+            "enter_date": data_date,
         })
 
     tier_b_raw.sort(key=lambda x: (-x.get("total_score", 0), -x.get("quality_score", 0), -x["score"], -x["ema"], x["rsi"]))
@@ -190,11 +194,14 @@ def main():
 
     all_results = scan_data["all_results"]
     scan_time = scan_data.get("scan_time", NOW)
+    # 数据日期：优先 scan_time 日期，否则今天；用于给每只股票打 enter_date。
+    data_date = (scan_time[:10] if isinstance(scan_time, str) and len(scan_time) >= 10
+                 else datetime.now().strftime("%Y-%m-%d"))
     total = len(all_results)
     print(f"  scan_result: {total} 只 · 扫描时间 {scan_time}")
 
     # 1. 阿狸咪独立计算
-    tier_a, tier_b = build_alimi(all_results)
+    tier_a, tier_b = build_alimi(all_results, data_date)
 
     # 2. 构建输出
     alimi = {

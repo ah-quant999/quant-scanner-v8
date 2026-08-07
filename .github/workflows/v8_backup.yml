@@ -1,6 +1,5 @@
-# 九宝量化 v8 — 每日自动备份 (21:00 CST)
-# cron 时间口径溯源：v6 cloud_backup.yml (现仅归档) 当时用 0 13 * * * (= 21:00 CST)，
-# v8 沿用同口径以便主人 23 点睡前能核对当天的 raw_data 健康度。
+# 九宝量化 v8 — 每日自动备份 (23:00 CST)
+# cron: 0 15 * * * (= 23:00 CST)。主人 23 点睡前核对当天 raw_data 健康度。
 # raw_data 由 git 历史 + Pages 回溯只是兜底，主动备份更稳。
 #
 # 本 workflow 不只备份，还承担【每日审计】职责（主人 2026-08-06 确立）：
@@ -10,11 +9,11 @@
 #   ④ 卡片徽章统一：verify_card_badges.py
 # 漂移均不阻断备份（continue-on-error），仅告警 + 落 HANDOVER_LOG.jsonl。
 
-name: "☁️ v8 每日自动备份 (21:00)"
+name: "☁️ v8 每日自动备份 (23:00)"
 
 on:
   schedule:
-    - cron: '0 13 * * *'    # 21:00 CST — 每天
+    - cron: '0 15 * * *'    # 23:00 CST — 每天
   workflow_dispatch:
 
 permissions:

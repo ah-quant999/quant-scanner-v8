@@ -27,7 +27,8 @@ window.FOUR_VOLUME={
    "four": true,
    "qd": true,
    "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
-   "signal_date": "2026-08-07"
+   "signal_date": "2026-08-07",
+   "enter_date": "2026-08-07"
   },
   {
    "code": "002080",
@@ -54,7 +55,8 @@ window.FOUR_VOLUME={
    "four": true,
    "qd": true,
    "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
-   "signal_date": "2026-08-07"
+   "signal_date": "2026-08-07",
+   "enter_date": "2026-08-07"
   },
   {
    "code": "002463",
@@ -81,7 +83,8 @@ window.FOUR_VOLUME={
    "four": true,
    "qd": true,
    "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
-   "signal_date": "2026-08-07"
+   "signal_date": "2026-08-07",
+   "enter_date": "2026-08-07"
   },
   {
    "code": "603799",
@@ -108,7 +111,8 @@ window.FOUR_VOLUME={
    "four": true,
    "qd": true,
    "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉",
-   "signal_date": "2026-08-07"
+   "signal_date": "2026-08-07",
+   "enter_date": "2026-08-07"
   },
   {
    "code": "300017",
@@ -135,7 +139,8 @@ window.FOUR_VOLUME={
    "four": true,
    "qd": true,
    "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
-   "signal_date": "2026-08-07"
+   "signal_date": "2026-08-07",
+   "enter_date": "2026-08-07"
   }
  ]
 };

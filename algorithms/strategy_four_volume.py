@@ -259,6 +259,8 @@ def scan_four_volume(top_cy=100, top_kc=100, top_zb=100, top_hk=50):
                 "qd": bool(last.get("四量终极_XG", False)),
                 "reason": _build_reason(comp),
                 "signal_date": str(last.get("date", "")) if "date" in df.columns else "",
+                # 2026-08-08 修复：给每只股票打 enter_date，前端「M-D已入仓」胶囊可区分当日新入选。
+                "enter_date": str(last.get("date", "")) if "date" in df.columns else datetime.now().strftime("%Y-%m-%d"),
             })
         except Exception as e:
             print(f"  [WARN] {code} 计算失败: {e}")

@@ -682,17 +682,21 @@ def calc_crds():
     print(f"  进阶级(两项满足):  {len(adv)} 只")
     print(f"  关注级(一项满足):  {len(watch_l)} 只")
 
+    # 数据日期：用于给每只股票打 enter_date，前端「M-D已入仓」胶囊依据。
+    data_date = datetime.now().strftime("%Y-%m-%d")
+
     # 5. 输出
     output = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "data_time": data_date + " 15:30:00",
         "total_scanned": len(results),
         "market_context": market_context,
         "cond1_list": [{"code": r["code"], "name": r["name"], "board_label": r["board_label"]} for r in cond1_list],
         "cond2_list": [{"code": r["code"], "name": r["name"], "board_label": r["board_label"]} for r in cond2_list],
         "cond3_list": [{"code": r["code"], "name": r["name"], "board_label": r["board_label"]} for r in cond3_list],
-        "elite":   [{"code": r["code"], "name": r["name"], "score": r["score"]} for r in sorted(elite, key=lambda x: -x["score"])],
-        "advanced": [{"code": r["code"], "name": r["name"], "score": r["score"]} for r in sorted(adv, key=lambda x: -x["score"])],
-        "watch":   [{"code": r["code"], "name": r["name"], "score": r["score"]} for r in sorted(watch_l, key=lambda x: -x["score"])],
+        "elite":   [{"code": r["code"], "name": r["name"], "score": r["score"], "enter_date": data_date} for r in sorted(elite, key=lambda x: -x["score"])],
+        "advanced": [{"code": r["code"], "name": r["name"], "score": r["score"], "enter_date": data_date} for r in sorted(adv, key=lambda x: -x["score"])],
+        "watch":   [{"code": r["code"], "name": r["name"], "score": r["score"], "enter_date": data_date} for r in sorted(watch_l, key=lambda x: -x["score"])],
         "detail": {r["code"]: {
             "name": r["name"],
             "score": r["score"],
