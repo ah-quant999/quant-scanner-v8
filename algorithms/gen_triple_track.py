@@ -178,7 +178,9 @@ def main():
         if not name:
             # 从掉出记录找名字
             for dk in date_keys:
-                for rr in (history.get(dk) or []):
+                for rr in (history.get(dk) if isinstance(history.get(dk), list) else []):
+                    if not isinstance(rr, dict):
+                        continue
                     if ncode(rr.get("code")) == code:
                         name = rr.get("name", "")
                         break
@@ -279,7 +281,9 @@ def main():
                 break
         if not row["name"]:
             for dk in date_keys:
-                for rr in (history.get(dk) or []):
+                for rr in (history.get(dk) if isinstance(history.get(dk), list) else []):
+                    if not isinstance(rr, dict):
+                        continue
                     if ncode(rr.get("code")) == code:
                         row["name"] = rr.get("name", "")
                         break
