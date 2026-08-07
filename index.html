@@ -6096,21 +6096,9 @@ function renderLimitUpHeatmap(){
   var __MFF_SHOW_CUM = true;
   var __MFF_CHART_INST = null;
   function mffFormatUpdateTime(ts, dailyArr){
-    // 日频数据：标题显示「数据最后日期」+「文件更新于」，避免只用 update_time 误导成「今日」。
-    var hm = '';
-    if(ts){
-      var d = window._parseAsCST ? window._parseAsCST(ts) : null;
-      hm = d && !isNaN(d.getTime()) ? window._fmtHmCST(d) : (ts.slice(11,16) || '');
-    }
-    if(!dailyArr || !dailyArr.length) return _uBadge('盘后','中长线', hm || ts);
-    var last = dailyArr[dailyArr.length-1].date || '';
-    if(last.length !== 8) return _uBadge('盘后','中长线', hm || ts);
-    var lastFmt = last.slice(0,4)+'-'+last.slice(4,6)+'-'+last.slice(6,8);
-    var now = new Date();
-    var todayStr = now.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
-    var today = todayStr.slice(0,4)+todayStr.slice(5,7)+todayStr.slice(8,10);
-    var lastLabel = (last === today) ? '今日' : '数据截至';
-    return _uBadge('盘后','中长线', hm, lastLabel + ' ' + lastFmt);
+    // 2026-08-08 统一成全站「更新于」胶囊：直接复用 _uBadge/_fmtAshareRel，
+    // 不再自定义 hm + 数据截至子文本，与大家保持一致。
+    return _uBadge('盘后','中长线', ts);
   }
   function renderMarketFundFlow(mff){
     var d = mff || {};
