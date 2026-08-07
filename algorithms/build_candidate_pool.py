@@ -447,7 +447,7 @@ def _norm(code, name, market_raw, full_code):
         return code, name, "hk", "港股"
     code = code.zfill(6)
     if code.startswith("6"):
-        market, board = "sh", ("科创板" if code.startswith("688") else "主板")
+        market, board = "sh", ("科创板" if code.startswith(("688", "689")) else "主板")
     elif code.startswith("3"):
         market, board = "sz", "创业板"
     elif code.startswith(("0", "2")):
