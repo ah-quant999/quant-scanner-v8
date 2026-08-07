@@ -78,6 +78,7 @@ DATA_SOURCES = {
     "ai_market_brief.json":        "AI_MARKET_BRIEF",
     "runner_status.json":          "RUNNER_STATUS",
     "risk_gauge.json":             "RISK_GAUGE",
+    "stock_quote.json":            "STOCK_QUOTE",
 }
 
 # 变量名 → 更新时段

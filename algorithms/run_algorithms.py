@@ -56,6 +56,7 @@ INPUTS_FROM_V6 = [
 ORDER = [
     "fetch_fundamental_quality.py",   # → fundamental_quality（输入给 top10/triple*）
     "fetch_stock_names.py",
+    "fetch_stock_quote_v8.py",         # → raw_data/stock_quote.json + data/STOCK_QUOTE.js（全市场实时报价快照，查股功能用）
     "fetch_sh_index_fib.py",
     "fetch_inst_trade.py",
     "fetch_sector_rs.py",
