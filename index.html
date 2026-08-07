@@ -3947,6 +3947,23 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         </div>
       </div>
     </div>
+    <!-- 🌡️ 实时风险联动温度计（数据停更+与今日判定重叠→已下架） -->
+    <div class="card" id="riskGaugeCard" style="margin-bottom:12px;border-left:4px solid #f59e0b;">
+      <h3><span class="ic">🌡️</span>实时风险联动温度计 <span class="fresh" id="riskGaugeTime">—</span></h3>
+      <div id="riskGaugeBody"><div class="ipo-empty">加载中…</div></div>
+    </div>
+    <!-- 🧭 决策中枢（数据停更+与今日判定重叠→已下架） -->
+    <div class="card hub-card" style="margin-bottom:16px">
+      <h3><span class="ic">🧭</span>决策中枢 · 战略→战术→选股 <span class="fresh" id="hubTime">—</span></h3>
+      <div id="hubBody">
+        <div class="hub-verdict" id="hubVerdict"><div class="hub-loading">加载中…</div></div>
+        <div class="grid g-3 hub-layers">
+          <div class="hub-layer hub-macro"><div class="hub-layer-title">🌍 宏观展望 · 战略层</div><div class="hub-cycle" id="hubCycle">--</div><div class="hub-layer-body" id="hubMacroBody">--</div></div>
+          <div class="hub-layer hub-tactical"><div class="hub-layer-title">🎯 战术驾驶舱</div><div class="hub-score-row" id="hubTacticalScore">--</div><div class="hub-layer-body" id="hubTacticalBody">--</div></div>
+          <div class="hub-layer hub-factor"><div class="hub-layer-title">⚡ 因子信号 · 选股层</div><div class="hub-factor-count" id="hubFactorCount">--</div><div class="hub-layer-body" id="hubFactorBody">即将接入日线因子模块</div></div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- ============ 暂未上架（管理员 · 实验区 · 2026-08-07 提升为一级 Tab） ============ -->
