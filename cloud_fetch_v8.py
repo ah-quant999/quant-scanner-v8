@@ -2461,6 +2461,99 @@ def f_v8_cal(today=None):
     }
 
 
+def _clear_intraday_for_premarket(category, only=None):
+    """盘前任务完成后，清空盘中/实时模块的当日数据，避免把昨日收盘数据挂到开盘前。
+    明确保留用户指定卡片：上证+深证成交金额/涨跌家数(SH_SZ_HISTORY)、
+    主力净流入(CAPITAL_FLOW_DATA)、涨停热力(LIMIT_UP_HEATMAP)。"""
+    if category != "premarket" or only is not None:
+        return
+    now = now_cst()
+    today_iso = now.strftime("%Y-%m-%d")
+    today_m_d = f"{now.month}/{now.day}"
+    today_mm_dd = now.strftime("%m/%d")
+    today_m_d_set = {today_m_d, today_mm_dd}
+    print(f"🧹 盘前清空盘中模块当日数据（{today_iso}）...")
+
+    # 明确保留的卡片：盘前不清空，保留历史/上一交易日数据
+    KEEP_VARS = {"SH_SZ_HISTORY", "CAPITAL_FLOW_DATA", "LIMIT_UP_HEATMAP"}
+
+    for var, cat in CATEGORY_MAP.items():
+        if "intraday" not in [x.strip() for x in cat.split(",")]:
+            continue
+        if var in KEEP_VARS:
+            continue
+        fname = VAR_TO_RAW.get(var)
+        if not fname:
+            continue
+        note_map = {
+            "ETF_DAILY_MONITOR": "盘前无主力净流入数据，开盘后自动刷新",
+            "ETF_PULSE": "未开盘/集合竞价中，量比与成交额尚未产生，开盘后自动刷新",
+            "ETF_INTRADAY_HEAT": "盘前 ETF 资金热度待刷新，开盘后自动更新",
+            "INDEX_QUOTES": "盘前指数快照待开盘刷新",
+            "CONCEPT_RANKING": "盘前概念排名待开盘刷新",
+            "CANDIDATE_QUOTES": "盘前候选池实时行情待开盘刷新",
+            "MARKET_ALERTS": "盘前市场预警待开盘刷新",
+            "SECTOR_FUND_FLOW": "盘前板块资金流待开盘刷新",
+        }
+        note = note_map.get(var, "盘前数据已清空，开盘后自动刷新")
+        stub = {"no_data": True, "premarket_cleared": True, "note": note}
+        if var == "ETF_INTRADAY_HEAT":
+            stub.update({"items": [], "inflow_top": [], "outflow_top": [], "categories": {}})
+        elif var == "INDEX_QUOTES":
+            stub["indices"] = []
+        elif var == "CONCEPT_RANKING":
+            stub["concepts"] = []
+        elif var == "CANDIDATE_QUOTES":
+            stub["quotes"] = []
+        elif var == "MARKET_ALERTS":
+            stub["alerts"] = []
+        elif var == "SECTOR_FUND_FLOW":
+            stub["sectors"] = []
+        save(var, stub)
+
+    # SH_SZ_HISTORY：保留历史序列，仅剔除今日记录
+    data = _load_judgment_raw("SH_SZ_HISTORY", VAR_TO_RAW.get("SH_SZ_HISTORY")) or {}
+    amount_history = data.get("amount_history") or []
+    daily_stats = data.get("daily_stats") or data.get("up_down") or []
+    new_amount = [r for r in amount_history if str(r.get("date")) not in today_m_d_set]
+    new_stats = [r for r in daily_stats if str(r.get("date")) not in today_m_d_set]
+    save("SH_SZ_HISTORY", {
+        "amount_history": new_amount,
+        "daily_stats": new_stats,
+        "up_down": new_stats,
+        "amount_last_date": new_amount[-1].get("date") if new_amount else "",
+        "up_down_last_date": new_stats[-1].get("date") if new_stats else "",
+        "premarket_cleared": True,
+        "note": "盘前已清空今日数据，开盘后自动刷新",
+    })
+
+    # LIMIT_UP_HEATMAP：保留近10日历史列，仅把今日列置空
+    data = _load_judgment_raw("LIMIT_UP_HEATMAP", VAR_TO_RAW.get("LIMIT_UP_HEATMAP")) or {}
+    sectors = data.get("sectors") or []
+    dates = data.get("dates") or []
+    if dates and sectors:
+        data.pop("ladder", None)
+        data.pop("top", None)
+        data["total"] = 0
+        for sec in sectors:
+            arr = sec.get("data") or []
+            if len(arr) == len(dates):
+                arr[-1] = 0
+            elif len(arr) == len(dates) - 1:
+                arr.append(0)
+    data["premarket_cleared"] = True
+    data["note"] = "盘前已清空今日涨停列，开盘后自动刷新"
+    save("LIMIT_UP_HEATMAP", data)
+
+    # CAPITAL_FLOW_DATA：保留（用户指定不清空），仅打标记
+    data = _load_judgment_raw("CAPITAL_FLOW_DATA", VAR_TO_RAW.get("CAPITAL_FLOW_DATA")) or {}
+    data["premarket_cleared"] = True
+    data["note"] = "盘前主力净流入为上一交易日收盘值，开盘后自动刷新"
+    save("CAPITAL_FLOW_DATA", data)
+
+    print(f"🧹 盘前清空完成（保留 SH_SZ_HISTORY/CAPITAL_FLOW_DATA/LIMIT_UP_HEATMAP）")
+
+
 def main(category=None, only=None):
     print(f"=== v8 云端抓取开始 {now_cst().isoformat(timespec='seconds')} "
           f"category={category or 'all'} ===")
@@ -2715,6 +2808,9 @@ def main(category=None, only=None):
         if target_vars is not None and var not in target_vars:
             continue
         run(var, fn)
+
+    # 盘前必须把盘中/实时模块的当日数据清空，避免昨日收盘数据挂到开盘前（仅在 premarket 阶段执行）
+    _clear_intraday_for_premarket(category, only=only)
 
     # 盘中/收盘/全量抓取后，用实时 raw_data 生成 AI 盘面解读（规则引擎，零成本，稳定可调试）
     # post_close 15:30 运行会生成「收盘」版解读，避免盘中 13:xx 的评论挂到次日。
