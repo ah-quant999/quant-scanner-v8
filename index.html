@@ -616,19 +616,18 @@ function __judgmentCandidatesHTML(){
     var t3 = price ? price*1.15 : null;
     var color = pct==null ? 'var(--dim)' : (pct>=0?'var(--up)':'var(--down)');
     var scoreHTML = s.score!=null ? ' <b style="color:'+s.srcColor+'">'+s.score+'</b>' : '';
-    var priceHTML = price!=null ? '<span style="color:var(--txt);font-weight:700">¥'+price.toFixed(2)+'</span> <span style="color:'+color+';font-size:10px">'+(pct>=0?'+':'')+pct.toFixed(2)+'%</span>' : '<span style="color:var(--dim)">--</span>';
+    var priceHTML = price!=null ? '<span style="color:var(--txt);font-weight:700">¥'+price.toFixed(2)+'</span> <span style="color:'+color+';font-size:10px">'+(pct>=0?'+':'')+pct.toFixed(2)+'%</span>' : '';
     var planHTML = price!=null
-      ? '<span style="color:var(--down)">止损 ¥'+stop.toFixed(2)+'</span> · <span style="color:var(--up)">+7% ¥'+t1.toFixed(2)+'</span> · +12% ¥'+t2.toFixed(2)+' · +15% ¥'+t3.toFixed(2)+'</span>'
-      : '<span style="color:var(--dim)">价格未更新</span>';
-    lines.push('<div style="display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:baseline;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04)">'
-      + '<span style="font-size:10px;color:'+s.srcColor+';min-width:74px;font-weight:700">'+s.src+scoreHTML+'</span>'
-      + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><b>'+(s.name||'--')+'</b> <span style="color:var(--dim);font-size:10px">'+s.code+'</span></span>'
-      + priceHTML
+      ? '<span style="color:var(--down);font-size:10px">止损 ¥'+stop.toFixed(2)+'</span> <span style="color:var(--up);font-size:10px">+7% ¥'+t1.toFixed(2)+'</span> <span style="color:var(--up);font-size:10px">+12% ¥'+t2.toFixed(2)+'</span> <span style="color:var(--up);font-size:10px">+15% ¥'+t3.toFixed(2)+'</span>'
+      : '<span style="color:var(--dim);font-size:10px">价格待更新 · 开盘后按现价计算</span>';
+    lines.push('<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px">'
+      + '<span style="white-space:nowrap;font-size:10px;color:'+s.srcColor+';font-weight:700">'+s.src+scoreHTML+'</span>'
+      + '<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><b>'+(s.name||'--')+'</b> <span style="color:var(--dim);font-size:10px">'+s.code+'</span></span>'
+      + (priceHTML ? priceHTML + ' ' : '')
       + planHTML
       + '</div>');
   });
-  return '<div style="font-size:12px;font-weight:700;color:var(--up);margin-bottom:6px">🎯 今日可入手候选 '+list.length+' 只 <span style="font-size:10px;color:var(--dim);font-weight:400">（按可信度排序：三重共识→驾驶舱A→金股池→四量终极）</span></div>'
-    + '<div style="font-size:10px;color:var(--dim);margin-bottom:4px">止损 -7%硬 / 短线 +7% / 中线 +12% / 强势 +15%</div>'
+  return '<div style="font-size:13px;font-weight:700;color:var(--up);margin-bottom:4px">🎯 今日可入手候选 '+list.length+' 只</div>'
     + lines.join('');
 }
 window.__judgmentCandidatesHTML = __judgmentCandidatesHTML;
@@ -8610,39 +8609,35 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       var verdictColor = allOk ? 'var(--up)' : (crisisPct >= 70 ? 'var(--down)' : '#f59e0b');
       var verdictText = allOk ? '✅ 环境允许' : (crisisPct >= 70 ? '❌ 建议空仓' : '⚠️ 谨慎操作');
       var posAdvice = crisisPct >= 70 ? '空仓' : (crisisPct >= 50 ? '轻仓' : (crisisPct >= 30 ? '中性' : '重仓'));
+      var consensus = jd.consensus || '';
       var hasData = jd.update_time || cr.update_time;
       h += '<div class="card" style="margin-bottom:12px;border-left:4px solid #f59e0b;">';
       h += v8CardHeader('🎯','今日判定 · 可入手候选 + 决策纪律','候选列表 + 操作纪律检查清单','update_time',
         {update_time:(jd.update_time || cr.update_time), slot:'盘前', horizon:'短线'}, !hasData);
       h += '<div style="padding:10px 12px;">';
-      // 总判横幅（紧凑）：仅保留结论，止损止盈移到决策四步后
-      h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:6px 12px;background:'+_vra(verdictColor,0.1)+';border:1px solid '+_vra(verdictColor,0.25)+';border-radius:6px;font-size:13px;">';
+      // 总判横幅：判断结论 + 危机分 + 仓位 + 共识（紧跟判断后面）
+      h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:6px 12px;background:'+_vra(verdictColor,0.1)+';border:1px solid '+_vra(verdictColor,0.25)+';border-radius:6px;font-size:13px;flex-wrap:wrap">';
       h += '<b style="color:'+verdictColor+'">'+verdictText+'</b>';
-      h += '<span style="color:var(--dim);font-size:11px;margin-left:auto">'+crisisPct+'分危机 · 仓位'+posAdvice+'</span></div>';
+      h += '<span style="color:var(--dim);font-size:11px;">'+crisisPct+'分危机 · 仓位'+posAdvice+(consensus?' · '+consensus:'')+'</span></div>';
       // 两栏主体
       h += '<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:12px;">';
       // 左：候选列表
       h += '<div>' + ((typeof window.__judgmentCandidatesHTML === 'function')
         ? window.__judgmentCandidatesHTML()
         : '<div style="color:var(--dim)">候选数据加载中…</div>') + '</div>';
-      // 右：决策四步 + 三不原则 + 风控止盈止损（紧凑）
+      // 右：决策四步（一行一个，只显示实际数值）+ 三不原则（一行紧凑）
       h += '<div style="border-left:1px solid rgba(255,255,255,.06);padding-left:12px;">';
       h += '<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:4px">决策四步</div>';
       steps.forEach(function(s){
-        h += '<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)">';
-        h += '<span style="font-weight:700;color:'+(s.ok?'var(--up)':'#f59e0b')+';font-size:12px;min-width:48px">'+s.name+'</span>';
-        h += '<span style="margin-left:auto;color:'+(s.ok?'var(--up)':'var(--down)')+';font-size:12px">'+(s.ok?'✅':'⚠️')+'</span></div>';
-        h += '<div style="color:var(--dim);font-size:10px;padding:0 0 4px 54px">'+s.detail+'</div>';
+        h += '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;">';
+        h += '<span style="font-weight:700;color:'+(s.ok?'var(--up)':'#f59e0b')+';min-width:44px">'+s.name+'</span>';
+        h += '<span style="flex:1;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+s.detail+'</span>';
+        h += '<span style="color:'+(s.ok?'var(--up)':'var(--down)')+'">'+(s.ok?'✅':'⚠️')+'</span></div>';
       });
-      // 风控止盈止损：放在决策四步后面、三不原则前面，字号放大
-      h += '<div style="margin:8px 0;padding:6px 10px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:6px;font-size:12px;line-height:1.6;">';
-      h += '<div style="font-weight:700;color:#f59e0b;margin-bottom:2px">🛡️ 止盈止损纪律</div>';
-      h += '<div style="color:var(--txt)">止损 <b style="color:var(--down)">-7%</b> · 短线止盈 <b style="color:var(--up)">+7%</b> · 中线止盈 <b style="color:var(--up)">+12%</b> · 强势止盈 <b style="color:var(--up)">+15%</b></div>';
-      h += '</div>';
-      h += '<div style="font-size:12px;font-weight:700;color:#ef4444;margin:8px 0 3px">三不原则</div>';
-      h += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
+      h += '<div style="font-size:12px;font-weight:700;color:#ef4444;margin:10px 0 4px">三不原则</div>';
+      h += '<div style="display:flex;flex-wrap:wrap;gap:4px;font-size:11px">';
       rules.forEach(function(r){
-        h += '<span style="padding:2px 7px;background:'+(r.ok?'rgba(34,197,94,.08)':'rgba(239,68,68,.08)')+';border:1px solid '+(r.ok?'rgba(34,197,94,.25)':'rgba(239,68,68,.25)')+';border-radius:999px;font-size:11px;color:'+(r.ok?'var(--up)':'var(--down)')+'">' + (r.ok?'✅':'❌') + ' ' + r.t + '</span>';
+        h += '<span style="padding:2px 7px;background:'+(r.ok?'rgba(34,197,94,.08)':'rgba(239,68,68,.08)')+';border:1px solid '+(r.ok?'rgba(34,197,94,.25)':'rgba(239,68,68,.25)')+';border-radius:999px;color:'+(r.ok?'var(--up)':'var(--down)')+'">' + (r.ok?'✅':'❌') + ' ' + r.t + '</span>';
       });
       h += '</div></div></div>'; // 右栏 / 两栏
       h += '</div></div>';
