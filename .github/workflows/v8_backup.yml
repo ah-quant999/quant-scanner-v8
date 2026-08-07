@@ -42,6 +42,22 @@ jobs:
             raw_data/*.json 2>/dev/null
           echo "✅ raw_data 关键文件已备份"
 
+      - name: "🛡️ 推送当天所有修改（防覆盖安全网）"
+        continue-on-error: true
+        run: |
+          git config user.name "v8-backup-bot" 2>/dev/null || true
+          git config user.email "bot@quant-scanner.local" 2>/dev/null || true
+          # 仅提交「已跟踪文件的改动 + 当天备份包」，不扫入未跟踪的实验残留
+          git add -u
+          git add backup/raw_data_backup_*.tar.gz 2>/dev/null || true
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "chore(v8): 每日安全网推送当天修改 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')" 2>/dev/null || true
+            git push origin main 2>&1 | tail -5
+            echo "✅ 当天修改已推送入库（防覆盖）"
+          else
+            echo "无待推送修改"
+          fi
+
       - name: 提交备份到 main
         continue-on-error: true
         run: |
