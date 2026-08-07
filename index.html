@@ -3087,16 +3087,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var yzBuy = all.filter(function(s){ return (s.yz_net_万||0) >= TH; }).sort(function(a,b){return b.yz_net_万 - a.yz_net_万;}).slice(0,5);
     var yzSell = all.filter(function(s){ return (s.yz_net_万||0) <= -TH; }).sort(function(a,b){return a.yz_net_万 - b.yz_net_万;}).slice(0,5);
     function blk6(title, color, arr, valFn){
-      // 单列紧凑卡片（不占大版面，2026-08-06 主人令）
+      // 单行紧凑卡片（2026-08-07 主人令：一只股票一行，名称+代码+金额+涨幅同行，字体放大）
       var cells = arr.map(function(s){
         var val = valFn(s);
         var pct = s.pct||0;
-        return '<div style="padding:2px 4px;border-bottom:1px solid rgba(255,255,255,.04);font-size:11px">'
-          + '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:4px">'
-          + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+_rcEsc(s.name)+'</span>'
-          + '<span style="color:'+(val>=0?'var(--up)':'var(--down)')+';font-weight:700;min-width:44px;text-align:right">'+_rcFmtYi(val)+'</span>'
-          + '</div>'
-          + '<div style="color:'+(pct>=0?'var(--up)':'var(--down)')+';font-size:9px;text-align:right;margin-top:1px">'+(pct>=0?'+':'')+pct.toFixed(1)+'%</div>'
+        var code = s.code || '';
+        return '<div style="padding:3px 4px;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:6px">'
+          + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;font-weight:600">'+_rcEsc(s.name)+(code?' <span style="color:var(--dim);font-weight:400;font-size:11px">'+code+'</span>':'')+'</span>'
+          + '<span style="color:'+(val>=0?'var(--up)':'var(--down)')+';font-weight:700;min-width:52px;text-align:right">'+_rcFmtYi(val)+'</span>'
+          + '<span style="color:'+(pct>=0?'var(--up)':'var(--down)')+';font-weight:700;min-width:48px;text-align:right">'+(pct>=0?'+':'')+pct.toFixed(1)+'%</span>'
           + '</div>';
       }).join('');
       var body = arr.length ? '<div>'+cells+'</div>' : '<div style="padding:4px 8px;color:var(--dim);font-size:10px;text-align:center">— 无 —</div>';
