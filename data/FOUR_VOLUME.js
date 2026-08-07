@@ -1,5 +1,5 @@
 window.FOUR_VOLUME={
- "update_time": "2026-08-07 12:59:29",
+ "update_time": "2026-08-07 13:03:41",
  "total": 4,
  "stocks": [
   {
@@ -7,9 +7,9 @@ window.FOUR_VOLUME={
    "name": "德福科技",
    "market": "sz",
    "board_label": "创业板",
-   "close": 90.4,
-   "pct_chg": 15.57,
-   "turnover_rate": 11.97,
+   "close": 91.04,
+   "pct_chg": 16.39,
+   "turnover_rate": 12.21,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -36,7 +36,7 @@ window.FOUR_VOLUME={
    "board_label": "主板",
    "close": 57.19,
    "pct_chg": 10.0,
-   "turnover_rate": 5.24,
+   "turnover_rate": 5.31,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -61,9 +61,9 @@ window.FOUR_VOLUME={
    "name": "华友钴业",
    "market": "sh",
    "board_label": "主板",
-   "close": 43.66,
-   "pct_chg": 5.46,
-   "turnover_rate": 6.54,
+   "close": 43.75,
+   "pct_chg": 5.68,
+   "turnover_rate": 6.61,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -88,9 +88,9 @@ window.FOUR_VOLUME={
    "name": "网宿科技",
    "market": "sz",
    "board_label": "创业板",
-   "close": 15.38,
-   "pct_chg": 4.41,
-   "turnover_rate": 11.91,
+   "close": 15.32,
+   "pct_chg": 4.01,
+   "turnover_rate": 12.02,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
