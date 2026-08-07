@@ -1,15 +1,15 @@
 window.FOUR_VOLUME={
- "update_time": "2026-08-07 12:57:18",
- "total": 6,
+ "update_time": "2026-08-07 12:59:29",
+ "total": 4,
  "stocks": [
   {
-   "code": "688020",
-   "name": "方邦股份",
-   "market": "sh",
-   "board_label": "科创板",
-   "close": 146.16,
-   "pct_chg": 20.0,
-   "turnover_rate": 0,
+   "code": "301511",
+   "name": "德福科技",
+   "market": "sz",
+   "board_label": "创业板",
+   "close": 90.4,
+   "pct_chg": 15.57,
+   "turnover_rate": 11.97,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -30,40 +30,13 @@ window.FOUR_VOLUME={
    "signal_date": "2026-08-07"
   },
   {
-   "code": "300558",
-   "name": "贝达药业",
-   "market": "sz",
-   "board_label": "创业板",
-   "close": 69.7,
-   "pct_chg": 13.54,
-   "turnover_rate": 0,
-   "mv_yi": 0,
-   "fund_type": "混合",
-   "components": {
-    "游资点火": true,
-    "机构托底": true,
-    "广度翻多": true,
-    "主力动量翻多": true,
-    "机构金叉": false,
-    "散户金叉": false,
-    "主力金叉": true
-   },
-   "yzc": true,
-   "jg": true,
-   "xc": true,
-   "four": true,
-   "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 主力金叉",
-   "signal_date": "2026-08-07"
-  },
-  {
    "code": "000831",
    "name": "中国稀土",
    "market": "sz",
    "board_label": "主板",
    "close": 57.19,
    "pct_chg": 10.0,
-   "turnover_rate": 0,
+   "turnover_rate": 5.24,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -84,13 +57,13 @@ window.FOUR_VOLUME={
    "signal_date": "2026-08-07"
   },
   {
-   "code": "001267",
-   "name": "汇绿生态",
-   "market": "sz",
+   "code": "603799",
+   "name": "华友钴业",
+   "market": "sh",
    "board_label": "主板",
-   "close": 42.69,
-   "pct_chg": 10.0,
-   "turnover_rate": 0,
+   "close": 43.66,
+   "pct_chg": 5.46,
+   "turnover_rate": 6.54,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -100,14 +73,14 @@ window.FOUR_VOLUME={
     "主力动量翻多": true,
     "机构金叉": true,
     "散户金叉": false,
-    "主力金叉": true
+    "主力金叉": false
    },
    "yzc": true,
    "jg": true,
    "xc": true,
    "four": true,
    "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉",
    "signal_date": "2026-08-07"
   },
   {
@@ -117,7 +90,7 @@ window.FOUR_VOLUME={
    "board_label": "创业板",
    "close": 15.38,
    "pct_chg": 4.41,
-   "turnover_rate": 0,
+   "turnover_rate": 11.91,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -135,33 +108,6 @@ window.FOUR_VOLUME={
    "four": true,
    "qd": true,
    "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
-   "signal_date": "2026-08-07"
-  },
-  {
-   "code": "300088",
-   "name": "长信科技",
-   "market": "sz",
-   "board_label": "创业板",
-   "close": 7.92,
-   "pct_chg": 1.15,
-   "turnover_rate": 0,
-   "mv_yi": 0,
-   "fund_type": "混合",
-   "components": {
-    "游资点火": true,
-    "机构托底": true,
-    "广度翻多": true,
-    "主力动量翻多": true,
-    "机构金叉": true,
-    "散户金叉": false,
-    "主力金叉": true
-   },
-   "yzc": true,
-   "jg": true,
-   "xc": true,
-   "four": true,
-   "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
    "signal_date": "2026-08-07"
   }
  ]
