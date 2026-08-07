@@ -3930,6 +3930,23 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 温度计 + 雷达（从盘后数据区迁入） -->
 
     </div></div>
+    <!-- 🌡️ 实时风险联动温度计（数据停更+与今日判定重叠→已下架） -->
+    <div class="card" id="riskGaugeCard" style="margin-bottom:12px;border-left:4px solid #f59e0b;">
+      <h3><span class="ic">🌡️</span>实时风险联动温度计 <span class="fresh" id="riskGaugeTime">—</span></h3>
+      <div id="riskGaugeBody"><div class="ipo-empty">加载中…</div></div>
+    </div>
+    <!-- 🧭 决策中枢（数据停更+与今日判定重叠→已下架） -->
+    <div class="card hub-card" style="margin-bottom:16px">
+      <h3><span class="ic">🧭</span>决策中枢 · 战略→战术→选股 <span class="fresh" id="hubTime">—</span></h3>
+      <div id="hubBody">
+        <div class="hub-verdict" id="hubVerdict"><div class="hub-loading">加载中…</div></div>
+        <div class="grid g-3 hub-layers">
+          <div class="hub-layer hub-macro"><div class="hub-layer-title">🌍 宏观展望 · 战略层</div><div class="hub-cycle" id="hubCycle">--</div><div class="hub-layer-body" id="hubMacroBody">--</div></div>
+          <div class="hub-layer hub-tactical"><div class="hub-layer-title">🎯 战术驾驶舱</div><div class="hub-score-row" id="hubTacticalScore">--</div><div class="hub-layer-body" id="hubTacticalBody">--</div></div>
+          <div class="hub-layer hub-factor"><div class="hub-layer-title">⚡ 因子信号 · 选股层</div><div class="hub-factor-count" id="hubFactorCount">--</div><div class="hub-layer-body" id="hubFactorBody">即将接入日线因子模块</div></div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- ============ 暂未上架（管理员 · 实验区 · 2026-08-07 提升为一级 Tab） ============ -->
@@ -3954,41 +3971,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         {update_time:ts, slot:'盘前', horizon:'短线'}, !ts);
     };
     </script>
-
-    <!-- 🌡️ 实时风险联动温度计（2026-08-07 主人令：从实时数据Tab移入暂未上架，与今日判定宏观指标重叠） -->
-    <div class="card" id="riskGaugeCard" style="margin-bottom:12px;border-left:4px solid #f59e0b;">
-      <h3><span class="ic">🌡️</span>实时风险联动温度计 <span class="fresh" id="riskGaugeTime">—</span></h3>
-      <div id="riskGaugeBody">
-        <div class="ipo-empty">加载中…</div>
-      </div>
-    </div>
-
-    <!-- 🧭 决策中枢：战略→战术→选股（2026-08-07 主人令：从盘后数据Tab移入暂未上架，与今日判定技术/情绪面重叠） -->
-    <div class="card hub-card" style="margin-bottom:16px">
-      <h3><span class="ic">🧭</span>决策中枢 · 战略→战术→选股 <span class="fresh" id="hubTime">—</span></h3>
-      <div id="hubBody">
-        <div class="hub-verdict" id="hubVerdict">
-          <div class="hub-loading">加载中…</div>
-        </div>
-        <div class="grid g-3 hub-layers">
-          <div class="hub-layer hub-macro">
-            <div class="hub-layer-title">🌍 宏观展望 · 战略层</div>
-            <div class="hub-cycle" id="hubCycle">--</div>
-            <div class="hub-layer-body" id="hubMacroBody">--</div>
-          </div>
-          <div class="hub-layer hub-tactical">
-            <div class="hub-layer-title">🎯 战术驾驶舱</div>
-            <div class="hub-score-row" id="hubTacticalScore">--</div>
-            <div class="hub-layer-body" id="hubTacticalBody">--</div>
-          </div>
-          <div class="hub-layer hub-factor">
-            <div class="hub-layer-title">⚡ 因子信号 · 选股层</div>
-            <div class="hub-factor-count" id="hubFactorCount">--</div>
-            <div class="hub-layer-body" id="hubFactorBody">即将接入日线因子模块</div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <div id="unlistedPanel"></div>
   </section>
@@ -5192,9 +5174,14 @@ function drawAmountChart(){
   const hist = data.amount_history || [];
   if(!hist.length) return;
 
+  // 盘前清空检测：data.premarket_cleared 或最后一条日期不是今天，都按盘前占位处理
+  const todayMD = new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'numeric',day:'numeric'});
+  const todayMD2 = new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'});
+  const premarketCleared = data.premarket_cleared || (hist.length && hist[hist.length-1].date !== todayMD && hist[hist.length-1].date !== todayMD2);
+
   // 时间标签先更新（不依赖 SVG 尺寸，避免无宽度时提前 return 导致标签空白）
   const tm = document.getElementById('amountUpdateTime');
-  if(tm && data.update_time) tm.innerHTML = _uBadge('盘中','短线',data.update_time);
+  if(tm && data.update_time) tm.innerHTML = _uBadge(premarketCleared?'盘前':'盘中','短线',data.update_time);
   const ld = document.getElementById('amountLastDate');
   if(ld) ld.textContent = data.amount_last_date ? '· 序列至 '+data.amount_last_date : '';
 
@@ -5255,16 +5242,20 @@ function drawAmountChart(){
 
   // 底部说明
   const note = document.getElementById('amountNote');
-  if(note && hist.length>=2){
-    const prev = hist[hist.length-2];
-    const chg = prev.total ? ((last.total-prev.total)/prev.total*100) : 0;
-    const chgStr = (chg>=0?'+':'')+chg.toFixed(1)+'%';
-    let desc = '温和波动';
-    if(chg>=15) desc = '明显放量';
-    else if(chg>=8) desc = '温和放大';
-    else if(chg<=-15) desc = '明显缩量';
-    else if(chg<=-8) desc = '成交萎缩';
-    note.textContent = '今日两市合计 '+last.total.toFixed(0)+' 亿元，较前日 '+chgStr+'，'+desc+'。';
+  if(note){
+    if(premarketCleared){
+      note.textContent = '⏳ 盘前数据待刷新，开盘后自动更新。';
+    }else if(hist.length>=2){
+      const prev = hist[hist.length-2];
+      const chg = prev.total ? ((last.total-prev.total)/prev.total*100) : 0;
+      const chgStr = (chg>=0?'+':'')+chg.toFixed(1)+'%';
+      let desc = '温和波动';
+      if(chg>=15) desc = '明显放量';
+      else if(chg>=8) desc = '温和放大';
+      else if(chg<=-15) desc = '明显缩量';
+      else if(chg<=-8) desc = '成交萎缩';
+      note.textContent = '今日两市合计 '+last.total.toFixed(0)+' 亿元，较前日 '+chgStr+'，'+desc+'。';
+    }
   }
 }
 
@@ -5274,9 +5265,14 @@ function drawUpDownChart(){
   const stats = data.daily_stats || [];
   if(!stats.length) return;
 
+  // 盘前清空检测
+  const todayMDu = new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'numeric',day:'numeric'});
+  const todayMDu2 = new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'});
+  const udPremarket = data.premarket_cleared || (filtered.length && filtered[filtered.length-1].date !== todayMDu && filtered[filtered.length-1].date !== todayMDu2);
+
   // 时间标签先更新（不依赖 SVG 尺寸）
   const tm = document.getElementById('upDownUpdateTime');
-  if(tm && data.update_time) tm.innerHTML = _uBadge('盘中','—',data.update_time);
+  if(tm && data.update_time) tm.innerHTML = _uBadge(udPremarket?'盘前':'盘中','—',data.update_time);
   const ld = document.getElementById('upDownLastDate');
   if(ld) ld.textContent = data.up_down_last_date ? '· 序列至 '+data.up_down_last_date : '';
 
@@ -5341,8 +5337,12 @@ function drawUpDownChart(){
 
   // 底部说明
   const note = document.getElementById('upDownNote');
-  if(note && udLast){
-    note.textContent = '红=上涨家数，绿=下跌家数。今日涨 '+udLast.up+' / 跌 '+udLast.down+' / 平 '+(udLast.flat||0)+'。涨跌比 '+(udLast.down?(udLast.up/udLast.down).toFixed(2):'—')+'。';
+  if(note){
+    if(udPremarket){
+      note.textContent = '⏳ 盘前数据待刷新，开盘后自动更新。';
+    }else if(udLast){
+      note.textContent = '红=上涨家数，绿=下跌家数。今日涨 '+udLast.up+' / 跌 '+udLast.down+' / 平 '+(udLast.flat||0)+'。涨跌比 '+(udLast.down?(udLast.up/udLast.down).toFixed(2):'—')+'。';
+    }
   }
 }
 
@@ -5365,7 +5365,7 @@ function renderLimitUpHeatmap(){
   if(!data || !data.dates || !data.sectors){ card.style.display='none'; return; }
 
   if(timeEl && data.update_time){
-    timeEl.innerHTML = _uBadge('盘中','短线',data.update_time);
+    timeEl.innerHTML = _uBadge(data.premarket_cleared?'盘前':'盘中','短线',data.update_time);
   }
 
   function isIgnite(sectorData,idx){
@@ -5447,7 +5447,12 @@ function renderLimitUpHeatmap(){
 
   const td=sorted.reduce(function(s,sec){return s+sec.data[ti];},0);
   const pd=sorted.reduce(function(s,sec){return s+sec.data[Math.max(0,ti-3)];},0);
-  analysis.push('💡 <b>全局：</b>'+(td>pd*1.2?'涨停效应扩大，短线情绪升温':td<pd*0.8?'涨停效应收缩，情绪降温':'涨停效应平稳')+'（当日'+td+'只 vs 3日前'+pd+'只）');
+  if(data.premarket_cleared){
+    analysis.unshift('⏳ <b>盘前占位：</b>今日涨停列已清空，开盘后自动刷新。');
+    analysis.push('💡 <b>全局：</b>盘前暂无涨停数据，开盘后自动更新。');
+  }else{
+    analysis.push('💡 <b>全局：</b>'+(td>pd*1.2?'涨停效应扩大，短线情绪升温':td<pd*0.8?'涨停效应收缩，情绪降温':'涨停效应平稳')+'（当日'+td+'只 vs 3日前'+pd+'只）');
+  }
   analysisEl.innerHTML=analysis.map(function(a){return '<div>'+a+'</div>';}).join('');
   analysisEl.style.display='block';
 }
@@ -6577,7 +6582,12 @@ function renderLimitUpHeatmap(){
 
   /* ---- ETF 资金热度（4 大类 TOP5流入+TOP5流出，横向 bar） ---- */
   function renderEtfHeatByCategory(etfHeat){
-    if(!etfHeat||!etfHeat.categories) return;
+    const el0=$('etfHeatSummary'), el1=$('etfHeatByCat');
+    if(!etfHeat||!etfHeat.categories || !Object.keys(etfHeat.categories).length){
+      if(el0) el0.innerHTML='';
+      if(el1) el1.innerHTML='<div class="ipo-empty">⏳ 盘前数据待刷新，开盘后自动更新</div>';
+      return;
+    }
 const catNames=['宽基','行业','主题','跨境','商品'];
     const colorMap={宽基:'var(--cyan)',行业:'var(--purple)',主题:'var(--gold)',跨境:'var(--pink)',商品:'var(--up)'};
     const fmtYi=v=>{const a=Math.abs(v);if(a>=1e8)return(v/1e8).toFixed(2)+'亿';if(a>=1e4)return(v/1e4).toFixed(1)+'万';return(v/1).toFixed(0);};
@@ -6590,7 +6600,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       const yi=c.net_inflow_yi||0, c2=yi>=0?'var(--up)':'var(--down)';
       shtml+='<span><span style="color:'+colorMap[cn]+';font-weight:700">'+cn+'</span> <span style="color:'+c2+';font-weight:700">'+(yi>=0?'+':'')+yi.toFixed(2)+'亿</span> · '+c.count+'只</span>';
     });
-    const el0=$('etfHeatSummary'); if(el0) el0.innerHTML=shtml;
+    if(el0) el0.innerHTML=shtml;
     // 4 大类
     let h='';
     catNames.forEach(cn=>{
@@ -6614,7 +6624,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       h+=rows;
       h+='</div>';
     });
-    const el1=$('etfHeatByCat'); if(el1) el1.innerHTML=h;
+    if(el1) el1.innerHTML=h;
     setBadge('etfHeatTime','盘中','短线',etfHeat.update_time);
   }
 
