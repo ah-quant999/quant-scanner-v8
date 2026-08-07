@@ -40,6 +40,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: v8-cn-fetch-cloud
@@ -118,3 +119,11 @@ jobs:
         shell: bash
         run: |
           python api_push_raw.py
+
+      - name: "🛰️ 云端兜底调度（算法链/温度计，幂等）"
+        if: success()
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python .github/scripts/cloud_dispatcher.py
