@@ -3986,7 +3986,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var ts = jd.update_time || mb.update_time || '';
       var head = document.getElementById('judgmentCardHeader');
       if(!head || typeof window.v8CardHeader !== 'function') return;
-      head.innerHTML = window.v8CardHeader('⚖️','今日判定','宏观/美股/技术/情绪/共同结论/危险信号/大盘','update_time',
+      head.innerHTML = window.v8CardHeader('⚖️','今日判定 · 环境综合','宏观/美股/技术/情绪/共同结论/危险信号/大盘','update_time',
         {update_time:ts, slot:'盘前', horizon:'短线'}, !ts);
     };
     </script>
@@ -8792,7 +8792,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         });
         h += '</div>';
       }
-      // 高连板梯队：明确列出，字号放大，去除下划线/复杂样式
+      // 高连板梯队：股票名写入划线格子，字体保持现有大小
       var highLb = top.filter(function(t){return t.lbc>=3;}).sort(function(a,b){return b.lbc-a.lbc;}).slice(0,12);
       if(highLb.length){
         h += '<div style="font-size:13px;font-weight:700;color:var(--sub);margin-bottom:6px">⚡ 高连板梯队（≥3板）</div>';
@@ -8801,7 +8801,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
           var lbcColor = t.lbc>=5?'#ef4444':(t.lbc>=3?'#f59e0b':'var(--up)');
           h += '<div style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:6px;font-size:13px">';
           h += '<span style="font-weight:800;color:'+lbcColor+';min-width:28px">'+t.lbc+'板</span>';
-          h += '<b style="color:var(--txt);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+t.name+'</b>';
+          h += '<b style="color:var(--txt);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-bottom:2px solid '+lbcColor+';padding-bottom:1px">'+t.name+'</b>';
           h += '<span style="margin-left:auto;color:var(--up);font-size:12px;font-weight:700">+'+t.chg.toFixed(1)+'%</span>';
           h += '</div>';
         });
