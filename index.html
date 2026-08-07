@@ -807,7 +807,35 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div id="v8TodayAll" style="font-size:13px;color:var(--txt);"></div>
     </div>
 
-    <!-- 2026-08-07 主人令：今日判定（含原宏观解读）已整体迁移至 🔒 暂未上架 Tab，本页不再展示 -->
+    <!-- ⚖️ 今日判定 · 环境综合（2026-08-07 迁回今日事件，置于打新上方） -->
+    <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;opacity:0.95;">
+      <div id="judgmentCardHeader"></div>
+      <div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);padding:0 14px 12px;"></div>
+    </div>
+    <script>
+    /* 注册渲染函数：v8CardHeader 与 _buildJudgmentEnvHTML 定义在后面脚本块，
+       此处只注册、不执行，由末尾 initCardBadges / switchSec-td 统一触发。 */
+    window.__renderJudgmentHeader = function(){
+      var jd = window.JUDGMENT_DATA || {};
+      var mb = window.MACRO_BRIEF || {};
+      var ts = jd.update_time || mb.update_time || '';
+      var head = document.getElementById('judgmentCardHeader');
+      if(!head || typeof window.v8CardHeader !== 'function') return;
+      head.innerHTML = window.v8CardHeader('⚖️','今日判定 · 环境综合','宏观/美股/技术/情绪/共同结论/危险信号/大盘','update_time',
+        {update_time:ts, slot:'盘前', horizon:'短线'}, !ts);
+    };
+    window.__renderJudgmentBody = function(){
+      var opBody=document.getElementById('judgmentBodyOp');
+      if(!opBody || opBody.dataset.rendered==='1') return;
+      opBody.dataset.rendered='1';
+      try{
+        opBody.innerHTML = window.__judgmentEnvHTML_cache
+          || ((typeof window._buildJudgmentEnvHTML === 'function')
+            ? window._buildJudgmentEnvHTML(window.JUDGMENT_DATA)
+            : '<div style="color:var(--dim);padding:10px">环境态势数据暂不可用</div>');
+      }catch(e){ console.error('renderJudgmentBody error',e); }
+    };
+    </script>
 
     <!-- 打新速览 -->
     <div class="card" style="margin-bottom:16px">
@@ -3932,25 +3960,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <section id="sec-ul">
     <div class="sec-head"><h2>🧪 暂未上架</h2><span class="tag">仅管理员可见 · 实验区 · 未正式上架卡片</span></div>
 
-    <!-- 🔒 今日判定（原 judgmentBody 理论段 + 今日宏观解读合并 · 2026-08-07 主人令） -->
-    <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;opacity:0.95;">
-      <div id="judgmentCardHeader"></div>
-      <div id="judgmentBodyOp" style="font-size:13px;line-height:1.8;color:var(--txt);padding:0 14px 12px;"></div>
-    </div>
-    <script>
-    /* 只注册不执行：v8CardHeader 定义在后面的脚本块，此处立即执行必抛 ReferenceError
-       导致整段 IIFE 静默中止、卡头永远空白（2026-08-07 修）。实际渲染由末尾 initCardBadges 触发。 */
-    window.__renderJudgmentHeader = function(){
-      var jd = window.JUDGMENT_DATA || {};
-      var mb = window.MACRO_BRIEF || {};
-      var ts = jd.update_time || mb.update_time || '';
-      var head = document.getElementById('judgmentCardHeader');
-      if(!head || typeof window.v8CardHeader !== 'function') return;
-      head.innerHTML = window.v8CardHeader('⚖️','今日判定 · 环境综合','宏观/美股/技术/情绪/共同结论/危险信号/大盘','update_time',
-        {update_time:ts, slot:'盘前', horizon:'短线'}, !ts);
-    };
-    </script>
-
     <div id="unlistedPanel"></div>
   </section>
 
@@ -4676,6 +4685,8 @@ function switchSec(sec,el){
   if(sec==='op' && typeof window.__renderOps==='function') setTimeout(window.__renderOps,60);
   // 暂未上架：进入时渲染实验区（renderUnlisted 内部有 rendered 防重；2026-08-07 一级 Tab）
   if(sec==='ul' && typeof window.renderUnlisted==='function') setTimeout(window.renderUnlisted,60);
+  // 今日事件：今日判定环境态势卡已迁回，进入时触发渲染
+  if(sec==='td' && typeof window.__renderJudgmentBody==='function') setTimeout(window.__renderJudgmentBody,60);
   // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
   if(sec==='ph' && typeof window._renderSecPh==='function') setTimeout(window._renderSecPh,80);
   if(sec==='st' && typeof window._renderSecSt==='function') setTimeout(window._renderSecSt,80);
@@ -8340,16 +8351,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(!el || el.dataset.rendered==='1') return;
     el.dataset.rendered='1';
     try{
-    // 填充「今日判定 · 环境态势」卡（优先用缓存；若缓存为空则即时从 JUDGMENT_DATA 重建——2026-08-07 修内容为空 bug）
-    try{
-      var opBody=document.getElementById('judgmentBodyOp');
-      if(opBody){
-        opBody.innerHTML = window.__judgmentEnvHTML_cache
-          || ((typeof window._buildJudgmentEnvHTML === 'function')
-            ? window._buildJudgmentEnvHTML(window.JUDGMENT_DATA)
-            : '<div style="color:var(--dim);padding:10px">环境态势数据暂不可用</div>');
-      }
-    }catch(e){}
+    // 填充「今日判定 · 环境态势」卡（2026-08-07 已迁回今日事件；函数注册在今日事件卡脚本块）
+    if(typeof window.__renderJudgmentBody==='function') window.__renderJudgmentBody();
     var h='';
 
     // 🎯 今日可入手候选（2026-08-07 主人令从今日事件页迁至暂未上架；renderUnlisted 重构时漏掉调用，本次补回）
@@ -9397,8 +9400,9 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   // 选股策略 tab 上的 6 张算法卡（非 query/tc/cockpit/allsite/crds 的都有 lazy render，需要显式激活）
   tryRun('renderFourVolume', (typeof window.renderFourVolume==='function')?window.renderFourVolume:null, 'fv-badge init');
   tryRun('renderV8Crds-st',  (typeof window.renderV8Crds==='function')?function(){window.renderV8Crds('st');}:null, 'crds-badge init');
-  // 暂未上架「今日判定」卡头（其脚本块位于 v8CardHeader 定义之前，只能延后到此处渲染）
+  // 今日事件「今日判定」卡头+内容（脚本块位于 v8CardHeader 定义之前，只能延后到此处渲染）
   tryRun('renderJudgmentHeader', window.__renderJudgmentHeader, 'judgment-header init');
+  tryRun('renderJudgmentBody', window.__renderJudgmentBody, 'judgment-body init');
   // ⛓ 任何后续切到 fv/crds tab 也只是再跑一次幂等
 })();
 </script>
