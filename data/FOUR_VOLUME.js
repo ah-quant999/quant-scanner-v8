@@ -1,15 +1,15 @@
 window.FOUR_VOLUME={
- "update_time": "2026-08-07 13:03:41",
- "total": 4,
+ "update_time": "2026-08-07 13:27:53",
+ "total": 3,
  "stocks": [
   {
    "code": "301511",
    "name": "德福科技",
    "market": "sz",
    "board_label": "创业板",
-   "close": 91.04,
-   "pct_chg": 16.39,
-   "turnover_rate": 12.21,
+   "close": 93.86,
+   "pct_chg": 19.99,
+   "turnover_rate": 14.1,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -30,40 +30,13 @@ window.FOUR_VOLUME={
    "signal_date": "2026-08-07"
   },
   {
-   "code": "000831",
-   "name": "中国稀土",
-   "market": "sz",
-   "board_label": "主板",
-   "close": 57.19,
-   "pct_chg": 10.0,
-   "turnover_rate": 5.31,
-   "mv_yi": 0,
-   "fund_type": "混合",
-   "components": {
-    "游资点火": true,
-    "机构托底": true,
-    "广度翻多": true,
-    "主力动量翻多": true,
-    "机构金叉": true,
-    "散户金叉": false,
-    "主力金叉": false
-   },
-   "yzc": true,
-   "jg": true,
-   "xc": true,
-   "four": true,
-   "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉",
-   "signal_date": "2026-08-07"
-  },
-  {
    "code": "603799",
    "name": "华友钴业",
    "market": "sh",
    "board_label": "主板",
-   "close": 43.75,
-   "pct_chg": 5.68,
-   "turnover_rate": 6.61,
+   "close": 43.92,
+   "pct_chg": 6.09,
+   "turnover_rate": 6.92,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -88,9 +61,9 @@ window.FOUR_VOLUME={
    "name": "网宿科技",
    "market": "sz",
    "board_label": "创业板",
-   "close": 15.32,
-   "pct_chg": 4.01,
-   "turnover_rate": 12.02,
+   "close": 15.53,
+   "pct_chg": 5.43,
+   "turnover_rate": 12.57,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
