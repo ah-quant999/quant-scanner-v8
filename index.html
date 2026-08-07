@@ -480,6 +480,31 @@ window.V8_CAL = {weeks:[],legend:[]};
     }
     return base.getUTCFullYear()+'-'+String(base.getUTCMonth()+1).padStart(2,'0')+'-'+String(base.getUTCDate()).padStart(2,'0');
   };
+  /* 统一「已跑完」胶囊文案（2026-08-07 修复：消除「昨日数据误报今日」歧义）
+   * 入参：gen_time / data_time / update_time 时间字符串
+   * 返回：{ show:Boolean, label:String }
+   * 规则：
+   *   数据日期 == 今天日历日期 → 「✅ 今日已跑完」
+   *   数据日期 == 昨天（或更早但≤30天）→ 「✅ MM-DD 已完成」（显示实际月/日）
+   *   无时间戳/超过30天 → 不显示
+   * 所有胶囊调用此函数，改一处全局生效。 */
+  window._runBadgeInfo = function(genTimeStr){
+    if(!genTimeStr) return { show:false, label:'' };
+    var dataDate = String(genTimeStr).slice(0,10);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(dataDate)) return { show:false, label:'' };
+    var now = new Date();
+    var cst = now.toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false});
+    var m = cst.match(/(\d{4})\/(\d{2})\/(\d{2})[ T](\d{2}):(\d{2})/);
+    if(!m) return { show:false, label:'' };
+    var todayCST = new Date(Date.UTC(+m[1], +m[2]-1, +m[3]));
+    var dp = dataDate.split('-').map(Number);
+    var dataDay = new Date(Date.UTC(dp[0], dp[1]-1, dp[2]));
+    var diff = Math.round((todayCST.getTime() - dataDay.getTime()) / 864e5);
+    if(diff < 0) return { show:false, label:'' }; // 未来时间
+    if(diff === 0) return { show:true, label:'✅ 今日已跑完' };
+    if(diff <= 30) return { show:true, label:'✅ '+dataDate.slice(5)+' 已完成' }; // "08-06 已完成"
+    return { show:false, label:'' };
+  };
   /* 统一相对时间：非交易日且数据日期为上一交易日，显示「上一交易日收盘」 */
   window._fmtAshareRel = function(ts){
     if(!ts) return '--';
@@ -7270,13 +7295,13 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     $('tcExtCount').textContent=ext.length;
     $('tcExtended').innerHTML=ext.length?ext.map(s=>renderStock(s,true,tm)).join(''):'<div class="tp-empty">暂无</div>';
     setBadge('tcTime','盘后','短线',data.update_time);
-    // 「今日已跑完」灰色胶囊（无条件：真实产出时间是当前交易日；开盘前归上一交易日）
-    // data_time = 算法真实产出时间，优先级高于 update_time（后者历史上曾被构建流程覆盖）
-    var _todayStr = window._tradeDayStr();
+    // 「已跑完」胶囊：统一调用 _runBadgeInfo，消除昨日数据误报今日（2026-08-07 修复）
     var _tcTs = data.data_time || data.gen_time || data.update_time || '';
+    var _tcInfo = window._runBadgeInfo(_tcTs);
     var _tcRun = document.getElementById('tcRunBadge');
     if(_tcRun){
-      _tcRun.style.display = (_tcTs && String(_tcTs).slice(0,10) === _todayStr) ? 'inline-flex' : 'none';
+      if(_tcInfo.show){ _tcRun.textContent = _tcInfo.label; _tcRun.style.display='inline-flex'; }
+      else _tcRun.style.display='none';
     }
     // 「今日已入仓」胶囊：严格共识 stocks > 0 才显示
     var _eb=document.getElementById('tcEnteredBadge');
@@ -7467,10 +7492,10 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     h+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:22px;">🌐</span>';
     h+='<div style="font-size:16px;font-weight:700;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">全站精选 <span style="color:#fbbf24;font-size:13px;letter-spacing:1px">⭐⭐⭐</span>';
     if(genTime) h+=_uBadge('盘后', '中线', genTime);
-    // 「今日已跑完」灰色胶囊（无条件显示，只要 gen_time 是当前交易日；开盘前归上一交易日）
-    var _today = window._tradeDayStr();
-    if(genTime && String(genTime).slice(0,10) === _today){
-      h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">✅ 今日已跑完</span>';
+    // 「已跑完」胶囊：统一调用 _runBadgeInfo（2026-08-07 修复）
+    var _fvInfo = window._runBadgeInfo(genTime);
+    if(_fvInfo.show){
+      h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">'+_fvInfo.label+'</span>';
     }
     // 今日已入仓胶囊：A+B 总入选数 > 0 才显示
     if(total>0){
@@ -7591,10 +7616,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     h+='<div style="background:linear-gradient(135deg,#13243f,#0e2747);color:#cfe3ff;border:1px solid #244066;border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">';
     h+='<span style="font-size:22px;">🎯</span><div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:700;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">选股驾驶舱 <span style="color:#fbbf24;font-size:13px;letter-spacing:1px">⭐⭐⭐⭐</span>';
     if(cockpitTs) h+=_uBadge('盘后','短线',cockpitTs);
-    // 「今日已跑完」灰色胶囊（无条件显示，只看数据是否当天落地；CST 日期规避 UTC 跨天误判）
+    // 「已跑完」胶囊：统一调用 _runBadgeInfo（2026-08-07 修复）
     var _cockpitData = window.COCKPIT_TIER_RECOMMEND || {};
-    var _cockpitFresh = (cockpitTs && String(_cockpitData.gen_time || _cockpitData.data_time || _cockpitData.update_time || cockpitTs).slice(0,10) === window._tradeDayStr());
-    if(_cockpitFresh) h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">✅ 今日已跑完</span>';
+    var _cockpitGenTs = _cockpitData.gen_time || _cockpitData.data_time || _cockpitData.update_time || cockpitTs;
+    var _cockpitInfo = window._runBadgeInfo(_cockpitGenTs);
+    if(_cockpitInfo.show) h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">'+_cockpitInfo.label+'</span>';
     // 今日已入仓胶囊：tier_a + tier_b 任意 > 0 才显示
     var _cta=(DATA.cockpit_tier&&DATA.cockpit_tier.tier_a)||[];
     var _ctb=(DATA.cockpit_tier&&DATA.cockpit_tier.tier_b)||[];
@@ -8983,12 +9009,13 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var adv=(d.advanced||[]).filter(function(s){return (s.score||0)>0;});
     document.getElementById(p+'crdsEliteCnt').textContent=elite.length;
     document.getElementById(p+'crdsAdvCnt').textContent=adv.length;
-    // 「今日已跑完」灰色胶囊（无条件：真实产出时间是当前交易日；开盘前归上一交易日）
-    var _todayStr3 = window._tradeDayStr();
+    // 「已跑完」胶囊：统一调用 _runBadgeInfo（2026-08-07 修复）
     var _crdsTs = d.data_time || d.gen_time || d.update_time || '';
+    var _crdsInfo = window._runBadgeInfo(_crdsTs);
     var _crdsRun = document.getElementById(p+'crdsRunBadge');
     if(_crdsRun){
-      _crdsRun.style.display = (_crdsTs && String(_crdsTs).slice(0,10) === _todayStr3) ? 'inline-flex' : 'none';
+      if(_crdsInfo.show){ _crdsRun.textContent = _crdsInfo.label; _crdsRun.style.display='inline-flex'; }
+      else _crdsRun.style.display='none';
     }
     // 「今日已入仓」胶囊：elite + advanced > 0 才显示
     (function(){
@@ -9106,12 +9133,13 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var four = stocks.filter(function(s){ return s.four; }).length;
     function set(id,v){ var e=document.getElementById(id); if(e) e.textContent = v; }
     set('stfvQD', qd); set('stfvYZC', yzc); set('stfvJG', jg); set('stfvXC', xc); set('stfvFOUR', four);
-    // 「今日已跑完」灰色胶囊（无条件：真实产出时间是当前交易日；开盘前归上一交易日，修 UTC 跨天早盘隐藏）
-    var _todayStr2 = window._tradeDayStr();
+    // 「已跑完」胶囊：统一调用 _runBadgeInfo（2026-08-07 修复）
     var _fvTs = d.data_time || d.gen_time || d.update_time || '';
+    var _fvInfo = window._runBadgeInfo(_fvTs);
     var _fvRun = document.getElementById('stfvRunBadge');
     if(_fvRun){
-      _fvRun.style.display = (_fvTs && String(_fvTs).slice(0,10) === _todayStr2) ? 'inline-flex' : 'none';
+      if(_fvInfo.show){ _fvRun.textContent = _fvInfo.label; _fvRun.style.display='inline-flex'; }
+      else _fvRun.style.display='none';
     }
     // 「今日已入仓」胶囊：QD 共振 > 0 才显示
     var _eb=document.getElementById('stfvEnteredBadge');
