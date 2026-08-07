@@ -109,6 +109,10 @@ def calc_siliang_ultimate_signal(df):
 
     非未来函数。输出 df 列：四量终极_*（JG/JGC/SHC/YZC/ZLC/GB1/W2/V6/XC/FOUR/XG）。
     """
+    # 列名兼容：数据源(fetch_a_daily/fetch_hk_daily)返回 volume，公式内部统一用 vol。
+    # 2026-08-07 修复：此前 vol 缺失直接走 early-return → 所有组件恒为 False → 0 命中。
+    if "vol" not in df.columns and "volume" in df.columns:
+        df = df.rename(columns={"volume": "vol"})
     req = ["close", "open", "high", "low", "vol"]
     if not all(k in df.columns for k in req):
         df["四量终极_XG"] = False
@@ -246,6 +250,13 @@ def scan_four_volume(top_cy=100, top_kc=100, top_zb=100, top_hk=50):
                 "mv_yi": round(mv_yi, 1) if mv_yi else 0,
                 "fund_type": fund_type or "混合",
                 "components": comp,
+                # 2026-08-07 修复：UI renderFourVolume 读顶层 yzc/jg/xc/four/qd 标记，
+                # 此前只写嵌套 components → 卡片永远显示 QD=0、无标签。现补齐顶层布尔。
+                "yzc": bool(comp.get("游资点火")),
+                "jg": bool(comp.get("机构托底")),
+                "xc": bool(last.get("四量终极_XC", False)),
+                "four": bool(last.get("四量终极_FOUR", False)),
+                "qd": bool(last.get("四量终极_XG", False)),
                 "reason": _build_reason(comp),
                 "signal_date": str(last.get("date", "")) if "date" in df.columns else "",
             })

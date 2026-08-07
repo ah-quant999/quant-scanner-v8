@@ -77,6 +77,7 @@ DATA_SOURCES = {
     "sh_sz_history.json":         "SH_SZ_HISTORY",
     "ai_market_brief.json":        "AI_MARKET_BRIEF",
     "runner_status.json":          "RUNNER_STATUS",
+    "risk_gauge.json":             "RISK_GAUGE",
 }
 
 # 变量名 → 更新时段
