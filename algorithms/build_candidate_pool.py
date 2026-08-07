@@ -23,8 +23,14 @@ import re
 import time
 import threading
 import gc
-import akshare as ak
-import requests as _requests
+try:
+    import akshare as ak
+except ModuleNotFoundError:
+    ak = None
+try:
+    import requests as _requests
+except ModuleNotFoundError:
+    _requests = None
 
 # ════════════════════════════════════════════════════════════════
 # 云端数据源：GitHub Actions 美区 runner 无法访问 akshare/东财/BaoStock，
@@ -50,14 +56,15 @@ def _is_cloud():
 # akshare 内部直接调 requests.get/post 但不传 timeout，家用机 WiFi 丢包时会
 # 永久挂起且无法被 batch_update.py 的进程级超时捕获。此处 monkey-patch
 # requests.Session.request，在未显式指定 timeout 时注入 (15,60)。
-_ORIG_SESSION_REQUEST = _requests.Session.request
+if _requests is not None:
+    _ORIG_SESSION_REQUEST = _requests.Session.request
 
-def _session_request_with_timeout(self, method, url, **kwargs):
-    if kwargs.get("timeout") is None:
-        kwargs["timeout"] = (15, 60)  # (connect, read)
-    return _ORIG_SESSION_REQUEST(self, method, url, **kwargs)
+    def _session_request_with_timeout(self, method, url, **kwargs):
+        if kwargs.get("timeout") is None:
+            kwargs["timeout"] = (15, 60)  # (connect, read)
+        return _ORIG_SESSION_REQUEST(self, method, url, **kwargs)
 
-_requests.Session.request = _session_request_with_timeout
+    _requests.Session.request = _session_request_with_timeout
 
 DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "out")
 OUT = os.path.join(DATA, "candidate_pool.json")
@@ -283,48 +290,72 @@ def _a_share_spot_mootdx():
             return None
 
 
-def _a_share_spot():
-    """A股行情获取：云端优先 GTimg → mootdx(通达信) → akshare(新浪/东财)兜底。"""
-    # 0) 云端 runner：mootdx/akshare 在美区网络几乎不可用，直接走腾讯 GTimg
-    if _is_cloud():
-        try:
-            t = time.time()
-            ig = _gtimg()
-            df = ig.fetch_gtimg_spot()
-            if df is not None and len(df):
-                # 转成本脚本统一格式：列名 代码/名称/成交额
-                df = df.rename(columns={"当前价": "price"})
-                print(f"  [A股] GTimg OK 行数={len(df)} {time.time()-t:.1f}s")
-                return df
-        except Exception as e:
-            print(f"  [A股] GTimg 失败: {type(e).__name__} {str(e)[:80]}")
+def _a_share_spot_gtimg():
+    """GTimg 新浪活跃股排行兜底：返回 DataFrame(代码/名称/成交额/_b)。
 
-    # 1) mootdx 优先（本机实测 22s/5000+只，稳定）
-    #    SKIP_MOOTDX=1 时强制跳过 mootdx 直走 akshare（诊断/网络异常时用）
-    if os.environ.get("SKIP_MOOTDX"):
-        df = None
-        print("  [A股] SKIP_MOOTDX 已设，跳过 mootdx")
-    else:
-        df = _a_share_spot_mootdx()
-    if df is not None and len(df):
+    适用场景：mootdx/akshare 均失败时（家用机网络异常或云端美区 runner）。
+    新浪排行按成交额排序，取主板/创业板/科创板各前 N 只，足以支撑候选池构建。
+    """
+    try:
+        t = time.time()
+        import pandas as pd
+        ig = _gtimg()
+        rows = ig.fetch_volume_top_stocks_gtimg(TOP_PER_BOARD, TOP_PER_BOARD, TOP_PER_BOARD, 0)
+        if not rows:
+            return None
+        df_rows = []
+        for r in rows:
+            code, name, market, board = r[0], r[1], r[2], r[3]
+            df_rows.append({"代码": code, "名称": name, "成交额": 0.0, "_b": board})
+        df = pd.DataFrame(df_rows)
+        print(f"  [A股-GTimg] OK 行数={len(df)} {time.time()-t:.1f}s")
         return df
+    except Exception as e:
+        print(f"  [A股-GTimg] 失败: {type(e).__name__} {str(e)[:80]}")
+        return None
+
+
+def _a_share_spot():
+    """A股行情获取：本地 mootdx → akshare → GTimg；云端 GTimg → akshare。"""
+    # 0) 本地 runner：mootdx 优先（本机实测 22s/5000+只，稳定）
+    if not _is_cloud() and not os.environ.get("SKIP_MOOTDX"):
+        df = _a_share_spot_mootdx()
+        if df is not None and len(df):
+            return df
+    else:
+        print("  [A股] 云端/SKIP_MOOTDX，跳过 mootdx")
+
+    # 1) 云端 runner：GTimg 优先（美区网络 mootdx/akshare 均不可靠）
+    if _is_cloud():
+        df = _a_share_spot_gtimg()
+        if df is not None and len(df):
+            return df
 
     # 2) akshare 兜底（外部网络可达场景）
-    print("  [A股] mootdx 失败，尝试 akshare...")
-    for fn in (ak.stock_zh_a_spot, ak.stock_zh_a_spot_em):
-        try:
-            t = time.time()
-            df = fn()
-            if df is not None and len(df):
-                print(f"  [A股] {fn.__name__} OK 行数={len(df)} {time.time()-t:.1f}s")
-                return df
-        except Exception as e:
-            print(f"  [A股] {fn.__name__} 失败: {type(e).__name__} {str(e)[:60]}")
-            time.sleep(2)
-    return None
+    if ak is not None:
+        print("  [A股] 尝试 akshare...")
+        for fn in (ak.stock_zh_a_spot, ak.stock_zh_a_spot_em):
+            try:
+                t = time.time()
+                df = fn()
+                if df is not None and len(df):
+                    print(f"  [A股] {fn.__name__} OK 行数={len(df)} {time.time()-t:.1f}s")
+                    return df
+            except Exception as e:
+                print(f"  [A股] {fn.__name__} 失败: {type(e).__name__} {str(e)[:60]}")
+                time.sleep(2)
+    else:
+        print("  [A股] akshare 未安装，跳过 akshare 兜底")
+
+    # 3) 最终兜底：GTimg 新浪排行（本地+云端通用，不依赖 akshare）
+    print("  [A股] 尝试 GTimg 新浪排行最终兜底...")
+    return _a_share_spot_gtimg()
 
 
 def _hk_spot():
+    if ak is None:
+        print("  [港股] akshare 未安装，跳过港股层")
+        return None
     # 家用机：新浪优先（已验证可靠），东财居家网络常挂死靠后
     for fn in (ak.stock_hk_spot, ak.stock_hk_spot_em):
         try:
@@ -336,6 +367,8 @@ def _hk_spot():
         except Exception as e:
             print(f"  [港股] {fn.__name__} 失败: {type(e).__name__} {str(e)[:60]}")
             time.sleep(2)
+    # GTimg 暂无港股成交额排行接口；港股缺失不阻断 A股候选池
+    print("  [港股] 无可用数据源，本次跳过港股层")
     return None
 
 

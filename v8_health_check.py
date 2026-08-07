@@ -492,23 +492,9 @@ def check_site_deploy_sync():
 
 
 def check_runner():
-    d = api_get(f"https://api.github.com/repos/{REPO}/actions/runners")
-    if "__error__" in d:
-        return [{"id": "runner", "name": "self-hosted runner", "page": "管线", "status": "fail", "message": f"API error {d['__error__']}: {d.get('__msg__', '')[:80]}"}]
-    runners = d.get("runners", [])
-    if not runners:
-        return [{"id": "runner", "name": "self-hosted runner", "page": "管线", "status": "fail", "message": "无 runner 记录"}]
-    msgs = []
-    status = "ok"
-    for r in runners:
-        online = r.get("status") == "online"
-        busy = r.get("busy", False)
-        msgs.append(f"{r['name']}: online={online}, busy={busy}")
-        if not online:
-            status = "fail"
-        elif busy:
-            status = "warn"
-    return [{"id": "runner", "name": "self-hosted runner", "page": "管线", "status": status, "message": "; ".join(msgs)}]
+    """self-hosted runner（lemoncat-cn）已弃用，全部 workflow 迁 GitHub Actions 云端 ubuntu-latest。
+    该检查项保留为历史占位，状态恒 ok，避免误告警。"""
+    return [{"id": "runner", "name": "self-hosted runner", "page": "管线", "status": "ok", "message": "已迁移至 GitHub Actions 云端 ubuntu-latest，本地 runner 监控已下线"}]
 
 
 def check_local_head_sync():

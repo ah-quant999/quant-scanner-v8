@@ -6952,13 +6952,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
         cards:[
 
-          {name:'中国数据抓取 (v8_cn_fetch_cloud)', source:'RUNNER_STATUS', freq:'工作日 cron · 云端', slots:['08:25','09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:10','15:30','16:30','17:00','21:00'], note:'核心数据管线 · GitHub Actions 云端 ubuntu-latest 主链'},
+          {name:'中国数据抓取 (v8_cn_fetch_cloud)', source:'RUNNER_STATUS', freq:'工作日 cron · 云端', slots:['08:25','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:20'], note:'核心数据管线 · GitHub Actions 云端 ubuntu-latest 主链（含 17:20 龙虎榜收盘后刷新）'},
 
           {name:'盘后算法链 (v8_algo_cloud)', source:'TRIPLE_CONSENSUS', freq:'工作日18:30主档', slots:['18:30'], note:'候选池/黄金池/三重共识/回测 · 已迁 GitHub Actions 云端 ubuntu-latest · 冗余由本机每30分检查dispatch兜底'},
 
-          {name:'每日数据体检', source:'HEALTH_CHECK', freq:'每日2次', slots:['09:00','17:00'], note:'数据完整性检查 · 覆盖构建/Runner/备份健康'},
-
-          {name:'Runner 健康监控', source:'RUNNER_STATUS_HEALTH', freq:'工作日5次+周末每2h', slots:['13:00','15:00','17:00','19:00','21:00'], note:'lemoncat-cn runner 离线告警 · 当前 workflow 已 active · 无需手动 unpause'},
+          {name:'每日数据体检', source:'HEALTH_CHECK', freq:'每日2次', slots:['09:00','17:00'], note:'数据完整性检查 · 覆盖构建/部署/备份健康'},
 
           {name:'盘中云端自愈 (v8_intraday_healer)', source:'RUNNER_STATUS', freq:'工作日09:03-15:33每30分', slots:['09:03','09:33','10:03','10:33','11:03','11:33','13:03','13:33','14:03','14:33','15:03','15:33'], note:'检测抓取过期(>45min)自动补跑 · 防 GitHub schedule 漏档 · 纯云端'},
 
