@@ -51,35 +51,39 @@ SITE_URL = "https://ah-quant999.github.io/quant-scanner-v8/"
 DATA_DIR = Path("data")
 RAW_DIR = Path("raw_data")
 
-# 关键卡片定义：页面 -> 卡片列表
+# 关键卡片定义：与 index.html「任务运行看板」名称/顺序/覆盖对齐
 # expected：频率说明；max_age：按时段动态计算，这里先给默认阈值（分钟）
 CARD_DEFS = [
     # 今日事件（盘前）
-    {"id": "MACRO_DATA", "name": "今日宏观解读", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["global_macro", "monetary"]},
+    {"id": "V8_CAL", "name": "重要事件日历", "page": "今日事件", "freq": "每周日+月末", "max_age": 1500, "key_fields": ["weeks", "month"]},
+    {"id": "IPO_DATA", "name": "打新研判", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["stocks"]},
     {"id": "JUDGMENT_DATA", "name": "今日判定", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["verdict", "indices"]},
-    {"id": "IPO_DATA", "name": "打新日历", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["stocks"]},
+    {"id": "MACRO_DATA", "name": "今日宏观解读", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["global_macro", "monetary"]},
     {"id": "NT_DATA", "name": "市场提示", "page": "今日事件", "freq": "每日盘前", "max_age": 720, "key_fields": ["alerts"]},
-    {"id": "V8_CAL", "name": "财经日历(月历)", "page": "今日事件", "freq": "每日盘前", "max_age": 1500, "key_fields": ["weeks", "month"]},
     # 实时数据
-    {"id": "CRISIS_DATA", "name": "实时风险联动温度计", "page": "实时数据", "freq": "盘中30分钟", "max_age": 60, "key_fields": ["currency", "global"]},
-    {"id": "MARKET_FUND_FLOW_DATA", "name": "四路资金流向", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["daily"]},
+    {"id": "INDEX_QUOTES", "name": "全球指数 / 股指期货", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["items"]},
+    {"id": "ETF_PULSE", "name": "ETF 盘中异动", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["etfs"]},
+    {"id": "ETF_INTRADAY_HEAT", "name": "ETF 资金热度", "page": "实时数据", "freq": "盘中实时 T+0", "max_age": 60, "key_fields": ["items"]},
+    {"id": "ETF_DAILY_MONITOR", "name": "ETF 日监控", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["top_inflow", "top_outflow"]},
+    {"id": "SECTOR_FUND_FLOW", "name": "板块资金流向", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["top_list"]},
+    {"id": "CONCEPT_RANKING", "name": "概念排名", "page": "实时数据", "freq": "盘中每30分", "max_age": 90, "key_fields": ["items"]},
+    {"id": "LIMIT_UP_HEATMAP", "name": "涨停热度", "page": "实时数据", "freq": "盘中每30分", "max_age": 90, "key_fields": ["top", "dates"]},
+    {"id": "MARKET_FUND_FLOW_DATA", "name": "市场资金流向", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["daily"]},
+    {"id": "CRISIS_DATA", "name": "实时风险温度计", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["currency", "global"]},
     {"id": "MARKET_ALERTS", "name": "市场预警", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["indices"]},
-    {"id": "INDEX_QUOTES", "name": "股指行情", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["items"]},
-    {"id": "ETF_PULSE", "name": "ETF 资金热度", "page": "实时数据", "freq": "盘中 T+0", "max_age": 60, "key_fields": ["etfs"]},
-    {"id": "ETF_INTRADAY_HEAT", "name": "ETF 盘中热度", "page": "实时数据", "freq": "盘中 T+0", "max_age": 60, "key_fields": ["items"]},
-    {"id": "ETF_DAILY_MONITOR", "name": "ETF 日线监控", "page": "实时数据", "freq": "盘中 T+0", "max_age": 60, "key_fields": ["top_inflow", "top_outflow"]},
-    {"id": "SECTOR_FUND_FLOW", "name": "板块资金流", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["top_list"]},
-    {"id": "CONCEPT_RANKING", "name": "概念排名", "page": "实时数据", "freq": "盘中实时", "max_age": 90, "key_fields": ["items"]},
-    {"id": "LIMIT_UP_HEATMAP", "name": "涨停热力图", "page": "实时数据", "freq": "盘中实时", "max_age": 90, "key_fields": ["top", "dates"]},
     # 盘后数据
-    {"id": "SH_FIB", "name": "上证斐波那契", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["windows", "current"]},
-    {"id": "MARGIN_DATA", "name": "融资融券", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["sh"]},
-    {"id": "CFFEX_HOLDINGS", "name": "期指持仓", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["items"]},
-    {"id": "CANDIDATE", "name": "候选池", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["stocks"]},
-    {"id": "GOLD_POOL", "name": "金股池", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["stocks"]},
-    {"id": "LHB_DATA", "name": "龙虎榜", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["stocks"]},
-    {"id": "INST_TRADE", "name": "机构交易", "page": "盘后数据", "freq": "收盘后", "max_age": 360, "key_fields": ["top_buy", "top_sell"]},
-    {"id": "TRIPLE_CONSENSUS", "name": "三重共识", "page": "选股策略", "freq": "收盘后", "max_age": 360, "key_fields": ["stocks"]},
+    {"id": "SH_FIB", "name": "市场温度计", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"]},
+    {"id": "MARGIN_DATA", "name": "融资融券", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["sh"]},
+    {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["items"]},
+    {"id": "CRISIS_DATA", "name": "危机雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["currency", "global"]},
+    {"id": "MARKET_FUND_FLOW_DATA", "name": "盘后资金流向", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["daily"]},
+    {"id": "CANDIDATE", "name": "候选池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"]},
+    {"id": "GOLD_POOL", "name": "黄金池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"]},
+    {"id": "LHB_DATA", "name": "龙虎榜", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"]},
+    {"id": "INST_TRADE", "name": "机构买卖", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top_buy", "top_sell"]},
+    {"id": "TRIPLE_CONSENSUS", "name": "三重共识", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"]},
+    # 选股策略
+    {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"]},
 ]
 
 
