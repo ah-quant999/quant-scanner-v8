@@ -3,182 +3,60 @@
     {
       "code": "300972",
       "name": "万辰集团",
-      "market": "sz",
+      "market": "创业板",
       "board": "创业板",
-      "close": 205.81,
-      "pct_chg": -5.81,
-      "total_score": 82,
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 85,
       "quality_grade": "A",
       "industry": "零售业",
       "sectors": [
         "零售业"
       ],
       "signal_count": 0,
-      "status": "strict"
+      "status": "near"
     },
     {
       "code": "600887",
       "name": "伊利股份",
       "market": "沪市",
       "board": "主板",
-      "close": 27.12,
-      "pct_chg": 0.07,
-      "total_score": 74,
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 77,
       "quality_grade": "A",
       "industry": "食品制造业",
       "sectors": [
         "食品制造业"
       ],
       "signal_count": 0,
-      "status": "strict"
-    },
-    {
-      "code": "300502",
-      "name": "新易盛",
-      "market": "sz",
-      "board": "创业板",
-      "close": 394.08,
-      "pct_chg": -0.49,
-      "total_score": 89,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
       "status": "near"
     },
     {
-      "code": "688525",
-      "name": "佰维存储",
-      "market": "sh",
-      "board": "科创板",
-      "close": 206.8,
-      "pct_chg": -8.49,
-      "total_score": 83,
-      "quality_grade": "A",
-      "industry": "",
-      "sectors": [],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "600183",
-      "name": "生益科技",
-      "market": "沪市",
-      "board": "主板",
-      "close": 102.03,
-      "pct_chg": -3.42,
-      "total_score": 83,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "02359",
-      "name": "药明康德",
-      "market": "hk",
-      "board": "港股",
-      "close": 162.9,
-      "pct_chg": 1.37,
-      "total_score": 83,
-      "quality_grade": "",
-      "industry": "",
-      "sectors": [],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "600519",
-      "name": "贵州茅台",
-      "market": "sh",
-      "board": "主板",
-      "close": 1358.98,
-      "pct_chg": 0.62,
-      "total_score": 77,
-      "quality_grade": "A",
-      "industry": "酒、饮料和精制茶制造业",
-      "sectors": [
-        "酒、饮料和精制茶制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "300001",
-      "name": "特锐德",
-      "market": "深市",
-      "board": "创业板",
-      "close": 37.91,
-      "pct_chg": 9.88,
-      "total_score": 77,
-      "quality_grade": "B",
-      "industry": "电气机械和器材制造业",
-      "sectors": [
-        "电气机械和器材制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "300476",
-      "name": "胜宏科技",
-      "market": "深市",
-      "board": "创业板",
-      "close": 189.3,
-      "pct_chg": -0.58,
-      "total_score": 71,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "000807",
-      "name": "云铝股份",
-      "market": "深市",
-      "board": "深市",
-      "close": 0,
-      "pct_chg": 0,
-      "total_score": 55,
-      "quality_grade": "A",
-      "industry": "",
-      "sectors": [],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "000792",
-      "name": "盐湖股份",
-      "market": "深市",
-      "board": "深市",
-      "close": 0,
-      "pct_chg": 0,
-      "total_score": 47,
-      "quality_grade": "A",
-      "industry": "化学原料和化学制品制造业",
-      "sectors": [
-        "化学原料和化学制品制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "300750",
-      "name": "宁德时代",
+      "code": "300033",
+      "name": "同花顺",
       "market": "创业板",
       "board": "创业板",
       "close": 0,
       "pct_chg": 0,
-      "total_score": 34,
+      "total_score": 65,
       "quality_grade": "A",
+      "industry": "其他金融业",
+      "sectors": [
+        "其他金融业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "000651",
+      "name": "格力电器",
+      "market": "深市",
+      "board": "主板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 50,
+      "quality_grade": "D",
       "industry": "电气机械和器材制造业",
       "sectors": [
         "电气机械和器材制造业"
@@ -219,7 +97,7 @@
       "2026-08-07": 0
     },
     "300972": {
-      "2026-08-07": 205.81
+      "2026-08-07": 0
     },
     "600183": {
       "2026-08-07": 102.03
@@ -231,7 +109,7 @@
       "2026-08-07": 189.3
     },
     "600887": {
-      "2026-08-07": 27.12
+      "2026-08-07": 0
     },
     "000792": {
       "2026-08-07": 0
@@ -241,6 +119,12 @@
     },
     "300502": {
       "2026-08-07": 394.08
+    },
+    "300033": {
+      "2026-08-07": 0
+    },
+    "000651": {
+      "2026-08-07": 0
     }
   },
   "_tracking_latest": {
@@ -317,16 +201,16 @@
       "enter_date": "2026-08-07",
       "enter_close": 205.81,
       "last_date": "2026-08-07",
-      "last_close": 205.81,
-      "status": "strict",
+      "last_close": 0,
+      "status": "near",
       "streak": 1
     },
     "600887": {
       "enter_date": "2026-08-07",
       "enter_close": 27.12,
       "last_date": "2026-08-07",
-      "last_close": 27.12,
-      "status": "strict",
+      "last_close": 0,
+      "status": "near",
       "streak": 1
     },
     "300502": {
@@ -392,12 +276,28 @@
       "last_close": 0,
       "status": "near",
       "streak": 1
+    },
+    "300033": {
+      "enter_date": "2026-08-07",
+      "enter_close": 0,
+      "last_date": "2026-08-07",
+      "last_close": 0,
+      "status": "near",
+      "streak": 1
+    },
+    "000651": {
+      "enter_date": "2026-08-07",
+      "enter_close": 0,
+      "last_date": "2026-08-07",
+      "last_close": 0,
+      "status": "near",
+      "streak": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-07",
     "created": "2026-08-07 10:50:02",
-    "last_update": "2026-08-07 17:18:37",
+    "last_update": "2026-08-07 19:29:12",
     "update_time": "2026-08-07 10:54:17"
   },
   "update_time": "2026-08-07 10:54:17"

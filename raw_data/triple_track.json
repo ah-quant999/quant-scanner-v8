@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-07 17:18:38",
+  "update_time": "2026-08-07 19:29:12",
   "data_date": "update_time",
   "track_start": "2026-08-07",
   "history_days": 2,
@@ -20,7 +20,7 @@
       "names": []
     },
     "cockpit_a": {
-      "count": 8,
+      "count": 10,
       "overlap": 0,
       "names": []
     },
