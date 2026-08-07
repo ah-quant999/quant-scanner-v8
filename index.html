@@ -8528,30 +8528,31 @@ const catNames=['宽基','行业','主题','跨境','商品'];
           if(!lbMap[k]) lbMap[k] = [];
           lbMap[k].push(t);
         });
-        h += '<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:8px">连板分布（共 '+totalUp+' 只涨停）</div>';
-        h += '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">';
+        h += '<div style="font-size:14px;font-weight:700;color:var(--sub);margin-bottom:10px">连板分布（共 '+totalUp+' 只涨停）</div>';
+        h += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">';
         lbcKeys.forEach(function(k){
           var v = ladder[k];
           var list = lbMap[k] || [];
           var lbl = k==='1'?'首板':k+'连板';
           var barColor = parseInt(k)>=4 ? '#ef4444' : (parseInt(k)>=3 ? '#f59e0b' : (parseInt(k)>=2 ? '#38bdf8' : 'var(--up)'));
-          var names = list.map(function(s){ return s.name+' ('+s.code+')'; });
+          var isFirst = k==='1';
           h += '<div style="display:flex;align-items:flex-start;gap:8px">';
-          h += '<div style="min-width:56px;text-align:right;flex-shrink:0;padding-top:1px">';
-          h += '<div style="font-size:12px;font-weight:700;color:'+barColor+'">'+lbl+'</div>';
-          h += '<div style="font-size:10px;color:var(--dim)">共'+v+'只</div>';
+          h += '<div style="min-width:58px;text-align:right;flex-shrink:0;padding-top:2px">';
+          h += '<div style="font-size:14px;font-weight:800;color:'+barColor+'">'+lbl+'</div>';
+          h += '<div style="font-size:11px;color:var(--dim)">共'+v+'只</div>';
           h += '</div>';
-          if(k==='1' && list.length > 6){
-            h += '<div style="flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:3px 6px">';
-            list.slice(0,6).forEach(function(s){
-              h += '<span style="font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+s.name+' ('+s.code+')">'+s.name+'</span>';
-            });
-            h += '</div>';
-            h += '<button onclick="showLbModal(\''+lbl+'\','+JSON.stringify(names)+')" style="flex-shrink:0;margin-top:1px;padding:2px 7px;border:1px solid var(--border2);border-radius:4px;background:rgba(255,255,255,.06);color:var(--sub);font-size:10px;cursor:pointer">展开 '+list.length+' 只</button>';
-          } else {
-            h += '<div style="flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:3px 6px">';
+          // 首板：横向滚动条显示全部；其余连板：网格展示
+          if(isFirst){
+            h += '<div style="flex:1;overflow-x:auto;-webkit-overflow-scrolling:touch">';
+            h += '<div style="display:flex;gap:6px;white-space:nowrap;padding-bottom:2px">';
             list.forEach(function(s){
-              h += '<span style="font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+s.name+' ('+s.code+')">'+s.name+'</span>';
+              h += '<span style="flex-shrink:0;font-size:13px;color:var(--text);background:rgba(255,255,255,.04);padding:3px 8px;border-radius:5px" title="'+s.name+' '+s.code+'">'+s.name+' <span style="color:var(--dim);font-size:11px">'+s.code+'</span></span>';
+            });
+            h += '</div></div>';
+          } else {
+            h += '<div style="flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:4px 8px">';
+            list.forEach(function(s){
+              h += '<span style="font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+s.name+' '+s.code+'">'+s.name+' <span style="color:var(--dim);font-size:11px">'+s.code+'</span></span>';
             });
             h += '</div>';
           }
