@@ -31,7 +31,6 @@ on:
       - 'v8_cloud_watchdog.py'
       - 'guard_index_sections.py'
       - 'guard_v8_freshness.py'
-      - 'extract_panels_v8.py'
       - 'algorithms/**'
       - 'v8_postclose_guard.py'
       - 'data/.workbuddy/**'   # 自愈调度锁文件改动也会触发重新构建 HEALTH_CHECK.js
