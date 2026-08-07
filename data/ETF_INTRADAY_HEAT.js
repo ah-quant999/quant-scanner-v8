@@ -1,1 +1,1 @@
-window.ETF_INTRADAY_HEAT = {"no_data":true,"premarket_cleared":true,"note":"盘前 ETF 资金热度待刷新，开盘后自动更新","items":[],"inflow_top":[],"outflow_top":[],"categories":{},"update_time":"2026-08-07 11:11:30","build_time":"2026-08-07 11:17:02"};
+window.ETF_INTRADAY_HEAT = {"no_data":true,"premarket_cleared":true,"note":"盘前 ETF 资金热度待刷新，开盘后自动更新","items":[],"inflow_top":[],"outflow_top":[],"categories":{},"update_time":"2026-08-07 11:33:47","build_time":"2026-08-07 11:34:23"};
