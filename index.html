@@ -760,7 +760,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_SZ_HISTORY.js?v=20260807124552"></script>
 <script src="data/MAHORO.js?v=20260807123556"></script>
 <script src="data/CANDIDATE.js?v=20260807104823"></script>
-<script src="data/FOUR_VOLUME.js?v=20260807125747"></script>
+    <script src="data/FOUR_VOLUME.js?v=20260807125747"></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=20260807125109"></script>
 <script src="data/COCKPIT_BACKTEST.js?v=20260803184607"></script>
 <script src="data/BACKTEST_TDX.js?v=20260807"></script>
@@ -8239,6 +8239,22 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       }
     }catch(e){}
     var h='';
+
+    // 🎯 今日可入手候选（2026-08-07 主人令从今日事件页迁至暂未上架；renderUnlisted 重构时漏掉调用，本次补回）
+    (function(){
+      var fvData = window.FOUR_VOLUME || {};
+      h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #ff7043;">';
+      h += v8CardHeader('🎯','今日可入手候选','聚合 三重共识/驾驶舱A档/金股池/四量终极','update_time',
+        {update_time:fvData.update_time, slot:'盘后', horizon:'短线'},
+        !(fvData && fvData.stocks && fvData.stocks.length));
+      h += '<div style="padding:12px 14px;">';
+      try{
+        h += (typeof window.__judgmentCandidatesHTML === 'function')
+          ? window.__judgmentCandidatesHTML()
+          : '<div class="note">可入手候选渲染函数未加载</div>';
+      }catch(e){ h += '<div class="note" style="color:var(--down)">可入手候选渲染异常：'+String(e)+'</div>'; }
+      h += '</div></div>';
+    })();
 
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #7b1fa2;">';
     h+=v8CardHeader('🧪','实验选股调试专区','管理员可见：三重起涨 / CRDS逆势 / 候选池，验证中请勿依赖','update_time',window.SH_FIB);
