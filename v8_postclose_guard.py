@@ -3,12 +3,25 @@
 九宝量化 v8.0 — 盘后数据守护脚本
 ================================
 作用：检测 lemoncat-cn runner 是否离线 / 盘后关键数据是否陈旧，
-      一旦发现缺失就自动 dispatch v8_cn_fetch 补救。
+      一旦发现缺失就自动 dispatch 补救。
 
 设计原则（落实主人「发现就马上修正」要求）：
 - 幂等：只在「交易日 且 已过 15:30 CST 且 盘后数据非今日」时才 action；
 - 自带 runner 离线检测，离线时只告警不空转；
 - 不依赖本地 git，全走 GitHub REST API（本机仅 api.github.com 可达）。
+
+🔴 2026-08-07 根因修复（勿回退）：
+   旧版只监控 3 个 fetch 产物（MARKET_FUND_FLOW / EXPERIMENT），
+   而真正会陈旧的是「盘后算法链产物」——候选池/黄金池/龙虎榜/机构买卖/
+   三重共识/市场温度计/市场提示（这些由 v8_algo_run.yml 产出，
+   旧版 POST_CLOSE_FILES 一个都没覆盖）→ 算法链一断就漏检，站点静默陈旧数天。
+   同时旧版只 dispatch 到 cn 自托管 runner (v8_cn_fetch.yml)，
+   该 runner 一离线 dispatch 就排队空转、永不执行（= 文档所述
+   "post_close self_heal 空转 + CN_WORKFLOW_ID 未对齐"）。
+   本轮对齐 v8_cloud_watchdog.py 的 08-06 修复：
+   - 补上算法链产物监控；
+   - **主派发改为云端 workflow**（v8_cn_fetch_cloud / v8_algo_cloud），
+     cn 自托管 runner 仅作「在线时才兜底」的二级回退，离线绝不空转。
 
 用法：
   python v8_postclose_guard.py            # 真实补救模式
@@ -27,12 +40,38 @@ REPO = "ah-quant999/quant-scanner-v8"
 API = "https://api.github.com"
 CST = timezone(timedelta(hours=8))
 
-# 盘后必须当日刷新的核心文件（update_time 应为今日）
-POST_CLOSE_FILES = [
+# ===== 盘后必须当日刷新的文件（update_time 应为今日） =====
+# ① 盘后 fetch 产物（v8_cn_fetch[_cloud] 产出）
+POST_CLOSE_FETCH_FILES = [
     "data/MARKET_FUND_FLOW_DATA.js",
     "data/EXPERIMENT.js",
     "raw_data/market_fund_flow_data.json",
 ]
+# ② 盘后算法链产物（v8_algo_run[_cloud] 产出）—— 旧版漏检的根因
+POST_CLOSE_ALGO_FILES = [
+    "data/CANDIDATE.js",
+    "data/GOLD_POOL.js",
+    "data/LHB_DATA.js",
+    "data/INST_TRADE.js",
+    "data/TRIPLE_CONSENSUS.js",
+    "data/SH_FIB.js",
+    "data/NT_DATA.js",
+    "raw_data/candidate.json",
+    "raw_data/gold_pool.json",
+    "raw_data/lhb_data.json",
+    "raw_data/inst_trade.json",
+    "raw_data/triple_consensus.json",
+    "raw_data/sh_fib.json",
+    "raw_data/nt_data.json",
+]
+
+# ===== workflow 派发目标 =====
+# 云端主力（ubuntu-latest，与 v8_cloud_watchdog.py CN_WORKFLOW_ID 对齐）
+WF_FETCH_CLOUD = 327687211   # v8_cn_fetch_cloud.yml
+WF_ALGO_CLOUD = 324119592    # v8_algo_cloud.yml（无 inputs，跑全链）
+# cn 自托管 runner 应急回退（仅当该 runner 在线时才用，避免离线空转）
+WF_FETCH_CN = 324135267      # v8_cn_fetch.yml
+WF_ALGO_CN = 324833339       # v8_algo_run.yml
 
 
 def get_token():
@@ -74,6 +113,7 @@ def file_update_time(path):
 
 
 def runner_offline():
+    """返回离线 runner 名称列表；空列表=全部在线。"""
     try:
         runners = api_get(f"/repos/{REPO}/actions/runners")
         return [r["name"] for r in runners.get("runners", []) if not r.get("online")]
@@ -81,11 +121,24 @@ def runner_offline():
         return [f"query_failed:{e}"]
 
 
-def dispatch(category):
-    api_post(
-        f"/repos/{REPO}/actions/workflows/v8_cn_fetch.yml/dispatches",
-        {"ref": "main", "inputs": {"category": category}},
+def dispatch(wf_id, category=None):
+    """派发指定 workflow。fetch 类可带 category；algo 类不传 inputs。"""
+    payload = {"ref": "main"}
+    if category:
+        payload["inputs"] = {"category": category}
+    return api_post(
+        f"/repos/{REPO}/actions/workflows/{wf_id}/dispatches",
+        payload,
     )
+
+
+def stale_in_group(files, today):
+    stale = []
+    for f in files:
+        ut = file_update_time(f)
+        if ut and not ut.startswith(today) and not ut.startswith("ERR"):
+            stale.append((f, ut))
+    return stale
 
 
 def main():
@@ -103,31 +156,56 @@ def main():
         print("  未到 15:30 盘后窗口，跳过")
         return
 
-    stale = []
-    for f in POST_CLOSE_FILES:
-        ut = file_update_time(f)
-        print(f"  {f}: {ut}")
-        if ut and not ut.startswith(today) and not ut.startswith("ERR"):
-            stale.append(f)
+    fetch_stale = stale_in_group(POST_CLOSE_FETCH_FILES, today)
+    algo_stale = stale_in_group(POST_CLOSE_ALGO_FILES, today)
 
-    if not stale:
+    print(f"  fetch 产物陈旧: {len(fetch_stale)} 个")
+    for f, ut in fetch_stale:
+        print(f"    - {f}: {ut}")
+    print(f"  算法链产物陈旧: {len(algo_stale)} 个")
+    for f, ut in algo_stale:
+        print(f"    - {f}: {ut}")
+
+    if not fetch_stale and not algo_stale:
         print("  ✅ 盘后数据已是最新，无需补救")
         return
 
     off = runner_offline()
+    cn_online = not off
     if off:
-        print(f"  ⚠️ runner 离线: {off} —— dispatch 会排队，请上机重启 runner 服务")
+        print(f"  ⚠️ cn runner 离线: {off} —— 不向其派发（避免空转），改用云端主力")
 
     if dry:
-        print(f"  [DRY-RUN] 将 dispatch: post_close, intraday（{len(stale)} 个文件陈旧）")
+        cats = []
+        if fetch_stale:
+            cats.append("fetch→cloud(327687211) category=all")
+        if algo_stale:
+            cats.append("algo→cloud(324119592)")
+        print(f"  [DRY-RUN] 将派发: {', '.join(cats)}（{len(fetch_stale)+len(algo_stale)} 个文件陈旧）")
         return
 
-    for cat in ("post_close", "intraday"):
+    # —— 真实派发：云端主力优先，cn runner 仅在线时兜底 ——
+    def _dispatch_with_fallback(kind, cloud_id, cn_id, category=None):
+        """先云端，失败且 cn 在线时回退 cn runner。返回 (ok, msg)。"""
         try:
-            dispatch(cat)
-            print(f"  ✅ 已 dispatch v8_cn_fetch category={cat}")
+            dispatch(cloud_id, category)
+            return True, f"云端 {cloud_id} 已派发" + (f" category={category}" if category else "")
         except Exception as e:
-            print(f"  ❌ dispatch {cat} 失败: {e}")
+            if cn_online:
+                try:
+                    dispatch(cn_id, category)
+                    return True, f"云端失败→cn 兜底 {cn_id} 已派发 ({e})"
+                except Exception as e2:
+                    return False, f"云端失败({e}) 且 cn 兜底也失败({e2})"
+            return False, f"云端失败({e})；cn runner 离线未兜底"
+
+    if fetch_stale:
+        ok, msg = _dispatch_with_fallback("fetch", WF_FETCH_CLOUD, WF_FETCH_CN, "all")
+        print(f"  [{'✅' if ok else '❌'}] fetch 补救: {msg}")
+
+    if algo_stale:
+        ok, msg = _dispatch_with_fallback("algo", WF_ALGO_CLOUD, WF_ALGO_CN, None)
+        print(f"  [{'✅' if ok else '❌'}] algo 补救: {msg}")
 
 
 if __name__ == "__main__":
