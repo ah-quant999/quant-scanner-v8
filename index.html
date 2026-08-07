@@ -60,32 +60,6 @@ html>
   .card h3 .fresh{font-size:11px;color:var(--dim);font-weight:400;white-space:nowrap}
   .card .fresh{font-size:11px;color:var(--dim);font-weight:400}
 
-  /* 决策中枢 */
-  .hub-card{border-color:var(--border2)}
-  .hub-verdict{display:flex;align-items:center;gap:16px;padding:14px 16px;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid var(--border2);border-radius:12px;margin-bottom:14px;flex-wrap:wrap}
-  .hub-verdict-score{font-size:46px;font-weight:800;line-height:1}
-  .hub-verdict-main{flex:1;min-width:220px}
-  .hub-verdict-title{font-size:16px;font-weight:700;margin-bottom:4px}
-  .hub-verdict-sub{font-size:12px;color:var(--sub);line-height:1.5}
-  .hub-verdict-action{font-size:12px;color:var(--dim);margin-top:6px}
-  .hub-layers{gap:12px}
-  .hub-layer{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px}
-  .hub-layer-title{font-size:12px;font-weight:700;color:var(--sub);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-  .hub-cycle{font-size:20px;font-weight:800;color:var(--gold);margin-bottom:8px}
-  .hub-layer-body{font-size:12px;color:var(--sub);line-height:1.6}
-  .hub-score-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:14px;font-weight:700}
-  .hub-score-num{font-size:26px;font-weight:800}
-  .hub-factor-count{font-size:26px;font-weight:800;color:var(--cyan);margin-bottom:8px}
-  .hub-loading{color:var(--dim);font-size:13px}
-  .hub-tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;border:1px solid var(--border2);margin:0 6px 6px 0}
-  .hub-tag.up{color:var(--up);border-color:var(--up)}
-  .hub-tag.down{color:var(--down);border-color:var(--down)}
-  .hub-tag.neutral{color:var(--gold);border-color:var(--gold)}
-  /* 因子卡 4 行样本预览：省略号截断，hover 看全 */
-  .hub-sample-rows{display:flex;flex-direction:column;gap:2px;font-size:10.5px;color:var(--sub);line-height:1.55;overflow:hidden}
-  .hub-sample-row{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:help;border-radius:3px;padding:0 2px}
-  .hub-sample-row:hover{background:rgba(56,189,248,0.08);color:var(--txt)}
-
   /* 实时数据卡片：走势图 + 标题行数字 */
   .rt-card h3{justify-content:space-between;flex-wrap:wrap;gap:6px 10px}
   .rt-summary{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;white-space:nowrap}
@@ -3924,46 +3898,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <svg class="radar" style="display:block;margin:0 auto" width="220" height="200" viewBox="-110 -110 220 220" id="radar"></svg>
       </div>
     </div>
-
-
-
-    <!-- 温度计 + 雷达（从盘后数据区迁入） -->
-
-    </div></div>
-    <!-- 🌡️ 实时风险联动温度计（数据停更+与今日判定重叠→已下架） -->
-    <div class="card" id="riskGaugeCard" style="margin-bottom:12px;border-left:4px solid #f59e0b;">
-      <h3><span class="ic">🌡️</span>实时风险联动温度计 <span class="fresh" id="riskGaugeTime">—</span></h3>
-      <div id="riskGaugeBody"><div class="ipo-empty">加载中…</div></div>
-    </div>
-    <!-- 🧭 决策中枢（数据停更+与今日判定重叠→已下架） -->
-    <div class="card hub-card" style="margin-bottom:16px">
-      <h3><span class="ic">🧭</span>决策中枢 · 战略→战术→选股 <span class="fresh" id="hubTime">—</span></h3>
-      <div id="hubBody">
-        <div class="hub-verdict" id="hubVerdict"><div class="hub-loading">加载中…</div></div>
-        <div class="grid g-3 hub-layers">
-          <div class="hub-layer hub-macro"><div class="hub-layer-title">🌍 宏观展望 · 战略层</div><div class="hub-cycle" id="hubCycle">--</div><div class="hub-layer-body" id="hubMacroBody">--</div></div>
-          <div class="hub-layer hub-tactical"><div class="hub-layer-title">🎯 战术驾驶舱</div><div class="hub-score-row" id="hubTacticalScore">--</div><div class="hub-layer-body" id="hubTacticalBody">--</div></div>
-          <div class="hub-layer hub-factor"><div class="hub-layer-title">⚡ 因子信号 · 选股层</div><div class="hub-factor-count" id="hubFactorCount">--</div><div class="hub-layer-body" id="hubFactorBody">即将接入日线因子模块</div></div>
-        </div>
-      </div>
-    </div>
-    <!-- 🌡️ 实时风险联动温度计（数据停更+与今日判定重叠→已下架） -->
-    <div class="card" id="riskGaugeCard" style="margin-bottom:12px;border-left:4px solid #f59e0b;">
-      <h3><span class="ic">🌡️</span>实时风险联动温度计 <span class="fresh" id="riskGaugeTime">—</span></h3>
-      <div id="riskGaugeBody"><div class="ipo-empty">加载中…</div></div>
-    </div>
-    <!-- 🧭 决策中枢（数据停更+与今日判定重叠→已下架） -->
-    <div class="card hub-card" style="margin-bottom:16px">
-      <h3><span class="ic">🧭</span>决策中枢 · 战略→战术→选股 <span class="fresh" id="hubTime">—</span></h3>
-      <div id="hubBody">
-        <div class="hub-verdict" id="hubVerdict"><div class="hub-loading">加载中…</div></div>
-        <div class="grid g-3 hub-layers">
-          <div class="hub-layer hub-macro"><div class="hub-layer-title">🌍 宏观展望 · 战略层</div><div class="hub-cycle" id="hubCycle">--</div><div class="hub-layer-body" id="hubMacroBody">--</div></div>
-          <div class="hub-layer hub-tactical"><div class="hub-layer-title">🎯 战术驾驶舱</div><div class="hub-score-row" id="hubTacticalScore">--</div><div class="hub-layer-body" id="hubTacticalBody">--</div></div>
-          <div class="hub-layer hub-factor"><div class="hub-layer-title">⚡ 因子信号 · 选股层</div><div class="hub-factor-count" id="hubFactorCount">--</div><div class="hub-layer-body" id="hubFactorBody">即将接入日线因子模块</div></div>
-        </div>
-      </div>
-    </div>
   </section>
 
   <!-- ============ 暂未上架（管理员 · 实验区 · 2026-08-07 提升为一级 Tab） ============ -->
@@ -5850,230 +5784,6 @@ function renderLimitUpHeatmap(){
     setBadge('phFibTime','盘后','中长线',fib.update_time);
   }
 
-  /* ---- 1.5 决策中枢：战略→战术→选股 ---- */
-  function renderDecisionHub(fib,margin,cffex,fomc,sf,crisis,macro,cand,quotes,inst,gold,top10){
-    const c=fib.current||{};
-    const declineDays=c.days_down||0, declinePct=c.total_pct||0;
-    const pmiLatest=crisis.pmi_value!=null?crisis.pmi_value:(macro.pmi&&macro.pmi.length?macro.pmi[macro.pmi.length-1].今值:null);
-    const m2=(macro.monetary&&macro.monetary.m2_yoy)?macro.monetary.m2_yoy.value:null;
-    const m2Prev=(macro.monetary&&macro.monetary.m2_yoy)?macro.monetary.m2_yoy.previous:null;
-    const cn10y=(macro.monetary&&macro.monetary.cn_bond_10y)?macro.monetary.cn_bond_10y.value:null;
-    const us10y=(macro.monetary&&macro.monetary.us_bond_10y)?macro.monetary.us_bond_10y.value:null;
-    const globalScore=(crisis.global!=null?crisis.global:0.5);
-    const crisisScore=((crisis.currency||0)+(crisis.economy||0)+(crisis.global||0))/3;
-
-    // 1. 宏观周期判断
-    let cycle='中性震荡', cycleColor='var(--gold)', styleBias='结构性行情，均衡配置';
-    if(globalScore>=0.6 || crisisScore>=0.55){
-      cycle='外部承压'; cycleColor='var(--down)'; styleBias='避险为主，高股息/现金流';
-    }else if(pmiLatest!=null && pmiLatest<49 && (m2!=null && (m2Prev==null || m2>=m2Prev))){
-      cycle='筑底修复'; cycleColor='var(--cyan)'; styleBias='超跌修复+成长试探，左侧布局';
-    }else if(pmiLatest!=null && pmiLatest>=50 && (cn10y!=null && cn10y<=2.0)){
-      cycle='扩张初期'; cycleColor='var(--up)'; styleBias='顺周期+低估值蓝筹';
-    }else if(pmiLatest!=null && pmiLatest>=49 && pmiLatest<50){
-      cycle='弱复苏'; cycleColor='var(--gold)'; styleBias='业绩确定性>主题，精选行业';
-    }
-
-    // 2. 战术评分（复用温度计逻辑）
-    let techScore=5;
-    if(declineDays>=30) techScore-=2;
-    else if(declineDays>=15) techScore-=1;
-    if(declinePct<=-5) techScore-=2;
-    else if(declinePct<=-3) techScore-=1;
-    techScore=Math.max(1,Math.min(10,techScore));
-
-    let rzLatest=0;
-    if(margin.sh&&margin.sh.length) rzLatest=margin.sh[margin.sh.length-1].rz_balance||0;
-    const sfIn=(sf.summary||{}).in_count||0, sfOut=(sf.summary||{}).out_count||0;
-    let fundScore=5;
-    if(rzLatest>=15000) fundScore+=2;
-    else if(rzLatest>=14500) fundScore+=1;
-    if(sfIn>sfOut) fundScore+=1;
-    else if(sfOut>sfIn) fundScore-=1;
-    if(sfIn>=8) fundScore+=1;
-    fundScore=Math.max(1,Math.min(10,fundScore));
-
-    const cffexNet=cffex.net_total||0;
-    let instScore=5;
-    if(cffexNet<-8000) instScore-=2;
-    else if(cffexNet<-3000) instScore-=1;
-    else if(cffexNet>3000) instScore+=1;
-    instScore=Math.max(1,Math.min(10,instScore));
-
-    const avgScore=Math.round((techScore+fundScore+instScore)/3);
-    const deg=avgScore*10;
-
-    // 3. 综合行动建议
-    let action='观望', actionColor='var(--gold)', position='5成';
-    if(cycle==='筑底修复' && avgScore>=5){ action='积极布局'; actionColor='var(--up)'; position='6-7成'; }
-    else if(cycle==='扩张初期' && avgScore>=6){ action='持仓待涨'; actionColor='var(--up)'; position='7-8成'; }
-    else if(cycle==='外部承压' || avgScore<4){ action='控制仓位'; actionColor='var(--down)'; position='3-4成'; }
-    else if(avgScore>=7){ action='偏积极'; actionColor='var(--up)'; position='6-7成'; }
-    else if(avgScore<=3){ action='防守'; actionColor='var(--down)'; position='3成以下'; }
-
-    // 4. 渲染
-    const hubVerdict=$('hubVerdict');
-    if(hubVerdict){
-            hubVerdict.innerHTML=
-        (function(){
-          var bannerBg = actionColor==='var(--up)'?'rgba(239,68,68,.10)':actionColor==='var(--down)'?'rgba(34,197,94,.10)':'rgba(234,179,8,.10)';
-          var tColor = techScore>=7?'var(--up)':techScore<=3?'var(--down)':'var(--gold)';
-          var fColor = fundScore>=7?'var(--up)':fundScore<=3?'var(--down)':'var(--gold)';
-          var iColor = instScore>=7?'var(--up)':instScore<=3?'var(--down)':'var(--gold)';
-          var crColor = crisisScore>=0.5?'var(--down)':'var(--cyan)';
-          // 显著标识 chip：粗边 + 浅底 + 粗体
-          var chip = function(c,col){return '<span style="display:inline-block;padding:4px 10px;border-radius:999px;border:1.5px solid '+col+';color:var(--txt);font-size:11.5px;font-weight:700;background:'+col+'11;white-space:nowrap">'+c+'</span>';};
-          return '<div style="border-left:6px solid '+actionColor+';background:'+bannerBg+';border-radius:14px;padding:12px 16px;">'+
-            '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">'+
-              // 左：行动建议（大字色块）
-              '<span style="font-size:24px;font-weight:900;color:'+actionColor+';white-space:nowrap;flex:0 0 auto;letter-spacing:1px">'+action+'</span>'+
-              // 中：所有内容变成一行（chip 群）
-              '<div style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;flex:1;min-width:0">'+
-                chip('周期 '+cycle, cycleColor)+
-                chip('仓位 '+position, actionColor)+
-                chip('技术面 '+techScore+'/10', tColor)+
-                chip('资金面 '+fundScore+'/10', fColor)+
-                chip('机构面 '+instScore+'/10', iColor)+
-                chip('危机雷达 '+(crisisScore*100).toFixed(0), crColor)+
-              '</div>'+
-              // 右：40° 战术温度（大色块保留）
-              '<div style="text-align:center;flex:0 0 auto;padding:8px 16px;border-radius:12px;background:'+actionColor+'22;border:2px solid '+actionColor+'55;box-shadow:0 0 0 3px '+actionColor+'0a;min-width:80px">'+
-                '<div style="font-size:38px;font-weight:900;line-height:1;color:'+actionColor+'">'+deg+'\u00b0</div>'+
-                '<div style="font-size:10px;color:'+actionColor+';margin-top:2px;font-weight:700;letter-spacing:.5px">战术温度</div>'+
-              '</div>'+
-            '</div>'+
-          '</div>';
-        })();
-    }
-
-    const hubCycle=$('hubCycle');
-    if(hubCycle) hubCycle.innerHTML='<span style="color:'+cycleColor+'">'+cycle+'</span>';
-
-    const macroBody=$('hubMacroBody');
-    if(macroBody){
-      const rows=[];
-      if(pmiLatest!=null) rows.push('PMI '+pmiLatest+(pmiLatest>=50?' 扩张':' 收缩'));
-      if(m2!=null) rows.push('M2 '+m2+'%'+(m2Prev!=null?(m2>=m2Prev?'↑':'↓'):''));
-      if(cn10y!=null) rows.push('中债10Y '+cn10y+'%');
-      if(us10y!=null && cn10y!=null) rows.push('中美利差 '+(cn10y-us10y).toFixed(2)+'%');
-      rows.push('危机雷达 '+(crisisScore*100).toFixed(0)+'/100');
-      macroBody.innerHTML=rows.length?rows.map(r=>'<div style="margin-bottom:4px">'+r+'</div>').join(''):'宏观数据加载中';
-    }
-
-    const hubTacticalScore=$('hubTacticalScore');
-    if(hubTacticalScore){
-      const color=deg>=70?'var(--up)':(deg>=50?'var(--gold)':'var(--down)');
-      hubTacticalScore.innerHTML='<span class="hub-score-num" style="color:'+color+'">'+deg+'°</span><span>'+(deg>=70?'偏热':(deg>=50?'中性':'偏冷'))+'</span>';
-    }
-
-    const latestTime=crisis.update_time||macro.update_time||fib.update_time;
-    setBadge('hubTime','盘后','中线',latestTime);
-
-    /* ---- 4 因子计算（共享给战术卡 hub-tag 行 + 因子卡样本预览） ---- */
-    const candStocks = (cand && cand.stocks) || {};
-    const quoteMap = {};
-    (quotes && quotes.items || []).forEach(q=>{ if(q && q.code) quoteMap[String(q.code)] = q; });
-    const instArr = (inst && inst.all) || [];
-    const instMap = {};
-    instArr.forEach(r=>{ if(r && r.code) instMap[String(r.code)] = r; });
-    const goldKeys = new Set(Object.keys((gold && gold.stocks) || {}));
-
-    // ① 龙头合力
-    const lead = [];
-    Object.entries(candStocks).forEach(([k, st])=>{
-      if(!st || !st.code) return;
-      const q = quoteMap[String(st.code)];
-      if(!q || q.chg==null) return;
-      if((st.sources||[]).length >= 2 && q.chg >= 5){
-        lead.push({code:st.code, name:st.name, chg:q.chg, sources:(st.sources||[]).length});
-      }
-    });
-    lead.sort((a,b)=>b.chg - a.chg);
-
-    // ② 主力通道
-    const instIn = instArr.filter(r=>r && r.buy_inst>0 && r.net_amt>0)
-      .sort((a,b)=>(b.net_amt||0)-(a.net_amt||0));
-
-    // ③ 超买超卖（单日涨幅极值代理：涨≥15% 或 跌≤-5%，与 RSI 公式无直接关系）
-    const rsiOver = [], rsiUnder = [];
-    Object.entries(candStocks).forEach(([k, st])=>{
-      if(!st || !st.code) return;
-      const q = quoteMap[String(st.code)];
-      if(!q || q.chg==null) return;
-      if(q.chg >= 15) rsiOver.push({code:st.code, name:st.name, chg:q.chg});
-      else if(q.chg <= -5) rsiUnder.push({code:st.code, name:st.name, chg:q.chg});
-    });
-    rsiOver.sort((a,b)=>b.chg-a.chg);
-    rsiUnder.sort((a,b)=>a.chg-b.chg);
-    const rsiCount = rsiOver.length + rsiUnder.length;
-
-    // ④ 资金排列
-    const arr = [];
-    Object.entries(candStocks).forEach(([k, st])=>{
-      if(!st || !st.code) return;
-      const code = String(st.code);
-      const q = quoteMap[code], ir = instMap[code];
-      if(!q || !ir) return;
-      if(q.chg>0 && (ir.net_amt||0)>0 && (ir.buy_inst||0)>0){
-        arr.push({code:st.code, name:st.name, chg:q.chg, net_amt:ir.net_amt||0, buy_inst:ir.buy_inst||0});
-      }
-    });
-    arr.sort((a,b)=>b.net_amt - a.net_amt);
-    const total = lead.length + instIn.length + rsiCount + arr.length;
-
-    /* ---- 战术卡：3 维度评分（阴跌磨底大徽章删除，与战略层重复） ---- */
-    const hubTacticalBody=$('hubTacticalBody');
-    if(hubTacticalBody){
-      const tColor = techScore>=7?'var(--up)':techScore<=3?'var(--down)':'var(--gold)';
-      const fColor = fundScore>=7?'var(--up)':fundScore<=3?'var(--down)':'var(--gold)';
-      const iColor = instScore>=7?'var(--up)':instScore<=3?'var(--down)':'var(--gold)';
-      hubTacticalBody.innerHTML =
-        '<div style="display:flex;flex-direction:column;gap:4px;font-size:11.5px;line-height:1.5;color:var(--sub);">'+
-          '<div><b style="color:'+tColor+'">📉 技术面 '+techScore+'/10</b> · '+(declineDays>0?'回调'+declineDays+'天':'震荡')+'</div>'+
-          '<div><b style="color:'+fColor+'">💰 资金面 '+fundScore+'/10</b> · 两融'+(rzLatest>=10000?(rzLatest/10000).toFixed(2)+'万亿':'--')+'</div>'+
-          '<div><b style="color:'+iColor+'">🏛 机构面 '+instScore+'/10</b> · 期指'+(cffexNet>0?'净多':'净空')+Math.abs(cffexNet)+'</div>'+
-        '</div>';
-    }
-
-    /* ---- 因子卡：顶部计数 + 4 行样本预览（4 hub-tag 已搬战术卡） ---- */
-    const hubFactorCount=$('hubFactorCount');
-    const hubFactorBody=$('hubFactorBody');
-    if(hubFactorCount && hubFactorBody){
-      hubFactorCount.textContent = total ? (total+' 触发') : '无触发';
-      hubFactorCount.style.color = total ? 'var(--up)' : 'var(--dim)';
-
-      // 4 行样本预览：CSS 截断 + hover title 看全（不撑大版面）
-      const escAttr = function(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; };
-      const leadFull = lead.length ? lead.slice(0,3).map(x=>x.name+' +'+x.chg.toFixed(1)+'%').join(' · ')+(lead.length>3?'（+'+ (lead.length-3) +'）':'') : '无';
-      const instFull = instIn.length ? instIn.slice(0,3).map(x=>x.name).join(' · ')+(instIn.length>3?'（+'+ (instIn.length-3) +'）':'') : '无';
-      const rsiFull = (rsiOver.length||rsiUnder.length)
-        ? (rsiOver.slice(0,2).map(x=>x.name+'+'+x.chg.toFixed(1)+'%').join(' / ')+
-           (rsiUnder.length?('  /  '+rsiUnder.slice(0,2).map(x=>x.name+x.chg.toFixed(1)+'%').join(' / ')):''))
-        : '无';
-      const arrFull = arr.length ? arr.slice(0,3).map(x=>x.name).join(' · ')+(arr.length>3?'（+'+ (arr.length-3) +'）':'') : '无';
-      const leadDisp = lead.length ? lead.slice(0,3).map(x=>x.name+' +'+x.chg.toFixed(1)+'%').join(' · ') : '无';
-      const instDisp = instIn.length ? instIn.slice(0,3).map(x=>x.name).join(' · ') : '无';
-      const rsiDisp = (rsiOver.length||rsiUnder.length)
-        ? (rsiOver.slice(0,2).map(x=>x.name+'+'+x.chg.toFixed(1)+'%').join(' / ')+
-           (rsiUnder.length?('  /  '+rsiUnder.slice(0,2).map(x=>x.name+x.chg.toFixed(1)+'%').join(' / ')):''))
-        : '无';
-      const arrDisp = arr.length ? arr.slice(0,3).map(x=>x.name).join(' · ') : '无';
-
-      hubFactorBody.innerHTML =
-        '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;">'+
-          '<span class="hub-tag '+(lead.length?'up':'neutral')+'">龙头合力 '+lead.length+'</span>'+
-          '<span class="hub-tag '+(instIn.length?'up':'neutral')+'">主力通道 '+instIn.length+'</span>'+
-          '<span class="hub-tag '+(rsiCount?'warn':'neutral')+'">超买超卖 '+rsiCount+'</span>'+
-          '<span class="hub-tag '+(arr.length?'gold':'neutral')+'">资金排列 '+arr.length+'</span>'+
-        '</div>'+
-        '<div class="hub-sample-rows">'+
-          '<div class="hub-sample-row" title="龙 '+escAttr(leadFull)+'"><b style="color:var(--up)">龙</b> '+leadDisp+'</div>'+
-          '<div class="hub-sample-row" title="主 '+escAttr(instFull)+'"><b style="color:var(--up)">主</b> '+instDisp+'</div>'+
-          '<div class="hub-sample-row" title="超 '+escAttr(rsiFull)+'"><b style="color:var(--gold)">超</b> '+rsiDisp+'</div>'+
-          '<div class="hub-sample-row" title="列 '+escAttr(arrFull)+'"><b style="color:var(--gold)">列</b> '+arrDisp+'</div>'+
-        '</div>';
-    }
-  }
 
   /* ---- 2. 短线/中线市场温度计（技术/资金/机构） ---- */
   function renderThermo(fib,margin,cffex,fomc,sf){
@@ -6968,102 +6678,6 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     setBadge('phMacroTime','盘后','中长线',m.update_time);
   }
 
-  /* ---- 实时风险联动温度计（紧凑版） ---- */
-  function renderRiskGauge(){
-    const D = window.RISK_GAUGE || {};
-    const indicators = D.indicators || [];
-    const body = $('riskGaugeBody');
-    if(!body) return;
-    if(!indicators.length){
-      body.innerHTML = '<div class="ipo-empty">暂无风险温度计数据（等待云端首次抓取）</div>';
-      return;
-    }
-
-    const colorMap = {green:'#22c55e', yellow:'#f59e0b', red:'#ef4444', gray:'#6b7280'};
-    const overall = D.overall || 'gray';
-    const overallLabels = {green:'观察', yellow:'警惕', red:'高危', gray:'待更新'};
-    const overallColor = colorMap[overall] || colorMap.gray;
-    const redCount = indicators.filter(function(it){ return it.status === 'red'; }).length;
-
-    // 阈值表（策略参数， rarely 变化）
-    const thresholds = {
-      USDJPY:     '< 155 或 > 163',
-      VIX:        '> 25 + 科技破位',
-      US10Y:      '> 4.5%',
-      USDCNH:     '离岸急跌',
-      NORTH_FUND: '连续大额净流出 + 人民币急贬'
-    };
-
-    // 分析解说：高了/低了分别代表什么
-    const analysis = {
-      USDJPY:'<b>高了</b>：日元过度贬值→日本当局干预风险↑，套息交易平仓易冲击全球流动性，港股/A股外资偏紧。<b>低了</b>：日元回流→新兴市场承压，但短期利好A股北向情绪。',
-      VIX:'<b>高了</b>：美股恐慌↑→科技成长/外资重仓股首当其冲，宜降仓位、加防御。<b>低了</b>：市场情绪平稳，可维持风险偏好，但低波动常伴随尾部风险积聚。',
-      US10Y:'<b>高了</b>：无风险利率压制成长股估值，美元走强→外资流出压力大。<b>低了</b>：降息预期升温，利好黄金、高股息、长久期资产。',
-      USDCNH:'<b>高了</b>（人民币贬值）：外资撤离A股/港股、进口型通胀抬头，核心资产承压。<b>低了</b>（人民币升值）：出口企业利润受压，但外资回流、人民币资产受青睐。',
-      NORTH_FUND:'<b>流出</b>：外资撤离A股，消费/医药/新能源等核心资产流动性受冲击。<b>流入</b>：外资回补，利好白马龙头、消费/科技主线。'
-    };
-
-    let h = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:8px 12px;border-radius:8px;background:'+overallColor+'15;">';
-    h += '<span style="width:10px;height:10px;border-radius:50%;background:'+overallColor+';"></span>';
-    h += '<span style="font-weight:700;color:'+overallColor+';">'+overallLabels[overall]+'</span>';
-    h += '<span style="font-size:12px;color:var(--dim);">红灯 '+redCount+'/4 · 任一亮红灯即警惕</span>';
-    h += '</div>';
-
-    // 指标小卡：5 列变紧凑
-    h += '<div class="grid g-5" style="gap:8px;margin-bottom:10px;">';
-    indicators.forEach(function(it){
-      const c = colorMap[it.status] || colorMap.gray;
-      const valText = it.value != null ? it.value + (it.unit || '') : '--';
-      const short = it.label.replace('美元兑日元','USDJPY').replace('VIX 恐慌指数','VIX').replace('10Y 美债收益率','10Y美债').replace('美元兑离岸人民币','USDCNH').replace('北向资金','北向');
-      h += '<div class="card" style="margin-bottom:0;background:rgba(255,255,255,.03);padding:8px 4px;text-align:center;">';
-      h += '<div style="font-size:11px;color:var(--dim);margin-bottom:3px;">'+short+'</div>';
-      h += '<div style="font-size:16px;font-weight:700;color:var(--txt);margin-bottom:2px;">'+valText+'</div>';
-      h += '<div style="font-size:11px;color:'+c+';">'+it.status_text+'</div>';
-      h += '</div>';
-    });
-    h += '</div>';
-
-    // 阈值矩阵：4 列（加分析解说）
-    h += '<table style="width:100%;border-collapse:collapse;font-size:11px;margin-bottom:10px;">';
-    h += '<thead><tr style="background:rgba(245,158,11,.12);"><th style="text-align:left;padding:5px 8px;border:1px solid var(--border);color:var(--txt);">指标</th><th style="text-align:left;padding:5px 8px;border:1px solid var(--border);color:var(--txt);">红灯阈值</th><th style="text-align:left;padding:5px 8px;border:1px solid var(--border);color:var(--txt);">当前</th><th style="text-align:left;padding:5px 8px;border:1px solid var(--border);color:var(--txt);">分析解说（高了/低了/流入流出意味着什么）</th></tr></thead><tbody>';
-    indicators.forEach(function(it){
-      const c = colorMap[it.status] || colorMap.gray;
-      const valText = it.value != null ? it.value + (it.unit || '') : '--';
-      h += '<tr><td style="padding:5px 8px;border:1px solid var(--border);color:var(--txt);">'+it.label+'</td>';
-      h += '<td style="padding:5px 8px;border:1px solid var(--border);color:var(--dim);">'+thresholds[it.name]+'</td>';
-      h += '<td style="padding:5px 8px;border:1px solid var(--border);color:'+c+';font-weight:600;white-space:nowrap;">'+valText+' '+it.status_text+'</td>';
-      h += '<td style="padding:5px 8px;border:1px solid var(--border);color:var(--sub);line-height:1.55;">'+(it.analysis || analysis[it.name] || '--')+'</td></tr>';
-    });
-    h += '</tbody></table>';
-
-    // 联动动作（压缩为 3 行）
-    h += '<div style="font-size:11px;color:var(--sub);line-height:1.7;margin-bottom:8px;">';
-    h += '<b>联动动作</b>：';
-    if(redCount === 0){
-      h += '<span style="color:'+overallColor+'">观察级</span>：三重共识标准不变。';
-    } else if(redCount === 1){
-      h += '<span style="color:#f59e0b">警惕级</span>：加北向&lt;3%、海外收入&lt;20%过滤，降低成长权重。';
-    } else if(redCount === 2){
-      h += '<span style="color:#f97316">减仓级</span>：仓位降20–40%，减高估值科技/出口链/外资重仓，增配黄金公用事业高股息。';
-    } else {
-      h += '<span style="color:#ef4444">清仓级</span>：权益仓位压至20%以下，仅保留现金/国债/黄金ETF。';
-    }
-    h += '</div>';
-
-    // 判定 + 免责声明
-    const verdict = D.verdict || (redCount===0 ? '未触发任何红灯，A股主驱动仍在国内政策/基本面，不构成清仓理由。' : '外围风险指标已亮红灯，按级别执行联动动作。');
-    h += '<div style="font-size:11px;color:var(--dim);line-height:1.6;background:rgba(255,255,255,.03);padding:8px 10px;border-radius:6px;margin-bottom:8px;">';
-    h += '<b>今日判定</b>：' + verdict;
-    h += '</div>';
-    h += '<div style="font-size:10px;color:var(--dim);line-height:1.5;">';
-    h += '本卡为分析框架，非投资建议。详细逻辑见 <a href="宏观解读_美日干预日元_2026-08-03.md" target="_blank" style="color:#60a5fa;">宏观解读_美日干预日元_2026-08-03.md</a>。';
-    h += '</div>';
-
-    body.innerHTML = h;
-    setBadge('riskGaugeTime','实时','—', D.update_time);
-  }
-
-
   function renderRunnerTrack(rs){
     const el = document.getElementById('runnerTrackBody');
     if(!el) return;
@@ -7122,8 +6736,6 @@ const catNames=['宽基','行业','主题','跨境','商品'];
           {name:'重要事件日历', source:'V8_CAL', freq:'每周日+月末', slots:['周日'], note:'非每日更新'},
 
           {name:'打新研判', source:'IPO_DATA', freq:'每日盘前', slots:['08:30'], note:'新股评分'},
-
-          {name:'盘前预判 / 决策中枢', source:'JUDGMENT_DATA', freq:'每日盘前', slots:['08:30'], note:'综合打分'},
 
           {name:'今日宏观解读', source:'MACRO_DATA', freq:'每日盘前', slots:['08:30'], note:'当前宏观总结分析'}
 
@@ -7578,14 +7190,12 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     // 3) 盘后数据：全部使用已注入的 window.* 变量（data/*.js 已在 <head> 同步加载）
     safe(renderFib, window.SH_FIB || {});
-    safe(renderDecisionHub, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, {}, window.SECTOR_FUND_FLOW || {}, window.CRISIS_DATA || {}, window.MACRO_DATA || {}, window.CANDIDATE || {}, window.CANDIDATE_QUOTES || {}, window.INST_TRADE || {}, window.GOLD_POOL || {}, window.TRIPLE_CONSENSUS || {});
     safe(renderThermo, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, {}, window.SECTOR_FUND_FLOW || {});
     safe(renderSixDim, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, window.CRISIS_DATA || {}, window.SECTOR_FUND_FLOW || {}, window.MARKET_FUND_FLOW_DATA || {});
     safe(renderCrisis, window.CRISIS_DATA || {});
     safe(renderMarketFundFlow, window.MARKET_FUND_FLOW_DATA || {});
     safe(renderSector, window.SECTOR_FUND_FLOW || {});
     safe(renderMacro, window.MACRO_DATA || {});
-    safe(renderRiskGauge);
     safe(renderRunnerTrack, window.RUNNER_STATUS || {});
     safe(renderTaskSchedule);
     safe(renderHealthCheck);
