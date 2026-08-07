@@ -1,1 +1,1 @@
-window.CRISIS_DATA = {"currency":0.15,"economy":0.494,"global":0.4,"pmi_value":49.4,"usd_cny":6.7904,"note":"经济维度=中国PMI真实值(49.4)；货币维度=中国银行USD/CNY中间价(6.7904)；全球维度因VIX/美债等源CN不可达暂用中性估值","update_time":"2026-08-07 09:41:43","build_time":"2026-08-07 09:43:55"};
+window.CRISIS_DATA = {"currency":0.15,"economy":0.494,"global":0.4,"pmi_value":49.4,"usd_cny":6.7904,"note":"经济维度=中国PMI真实值(49.4)；货币维度=中国银行USD/CNY中间价(6.7904)；全球维度因VIX/美债等源CN不可达暂用中性估值","update_time":"2026-08-07 09:44:42","build_time":"2026-08-07 09:48:15"};
