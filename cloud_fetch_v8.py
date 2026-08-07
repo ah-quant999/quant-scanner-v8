@@ -69,6 +69,7 @@ VAR_TO_RAW = {
     "CANDIDATE_QUOTES": "candidate_quotes.json",
     "SH_SZ_HISTORY": "sh_sz_history.json",
     "MARKET_ALERTS": "market_alerts.json",
+    "AVG_PRICE_DATA": "avg_price_data.json",
 }
 
 # 变量名 → 更新时段（与 update_v8.py 的 CATEGORY_MAP 对齐）
@@ -103,6 +104,8 @@ CATEGORY_MAP = {
     "MARKET_FUND_FLOW_DATA": "post_close",
     # 15:30 收盘数据：EXPERIMENT 等 akshare 可抓的 T+1 数据
     "EXPERIMENT": "post_close",
+    # 盘后：全A等权平均股价的日内变化 + 中期水位（一次抓取喂两处展示）
+    "AVG_PRICE_DATA": "post_close",
 }
 
 _ak = None
@@ -2755,6 +2758,75 @@ def main(category=None, only=None):
             "up_down_last_date": up_down_last_date,
         }
 
+    def f_avg_price():
+        """全A等权平均股价：一次抓取全部A股spot，同时产出
+        - 日内变化（等权涨跌幅均值）
+        - 中期水位（当前均价 vs 20日/60日均线位置）
+        供前端拆成两张独立卡片展示。"""
+        try:
+            ak = get_ak()
+            df = ak.stock_zh_a_spot_em()
+            if df is None or df.empty:
+                print("  ⚠️ 全A spot 返回空")
+                return {}
+            # 清洗：去掉无效价格和涨跌幅
+            df = df.dropna(subset=["最新价", "涨跌幅"])
+            df = df[(df["最新价"] > 0)]
+            if len(df) < 1000:
+                print(f"  ⚠️ 全A spot 有效样本仅 {len(df)} 只，放弃计算")
+                return {}
+            avg_price = float(df["最新价"].mean())
+            avg_change = float(df["涨跌幅"].mean())
+            count = int(len(df))
+            today_str = now_cst().strftime("%Y-%m-%d")
+
+            # 读取历史，用于计算均线与昨日对比
+            hist = []
+            prev_price = None
+            hist_path = RAW_DIR / "avg_price_data.json"
+            if hist_path.exists():
+                try:
+                    old = json.loads(hist_path.read_text(encoding="utf-8"))
+                    hist = old.get("history", [])
+                    for r in sorted(hist, key=lambda x: x.get("date", "")):
+                        if r.get("date") and r.get("date") != today_str:
+                            prev_price = r.get("avg_price")
+                except Exception:
+                    pass
+
+            # 去重 today's record 后追加
+            hist = [r for r in hist if r.get("date") != today_str]
+            hist.append({
+                "date": today_str,
+                "avg_price": round(avg_price, 4),
+                "avg_change_pct": round(avg_change, 4),
+                "count": count,
+            })
+            hist = sorted(hist, key=lambda x: x.get("date", ""))[-60:]
+
+            prices = [r["avg_price"] for r in hist]
+            ma20 = sum(prices[-20:]) / min(20, len(prices)) if prices else avg_price
+            ma60 = sum(prices[-60:]) / min(60, len(prices)) if prices else avg_price
+
+            pos20 = (avg_price - ma20) / ma20 * 100 if ma20 else 0
+            pos60 = (avg_price - ma60) / ma60 * 100 if ma60 else 0
+
+            return {
+                "date": today_str,
+                "avg_price": round(avg_price, 4),
+                "avg_change_pct": round(avg_change, 4),
+                "prev_avg_price": round(prev_price, 4) if prev_price else None,
+                "count": count,
+                "ma20": round(ma20, 4),
+                "ma60": round(ma60, 4),
+                "position_vs_ma20": round(pos20, 4),
+                "position_vs_ma60": round(pos60, 4),
+                "history": hist,
+            }
+        except Exception as e:
+            print(f"  ⚠️ 平均股价获取失败: {e}")
+            return {}
+
     tasks = [
         ("ETF_INTRADAY_HEAT", f_etf_intraday_heat),
         ("SECTOR_FUND_FLOW", f_sector_fund_flow),
@@ -2782,6 +2854,7 @@ def main(category=None, only=None):
         ("JUDGMENT_DATA", f_judgment),
         ("MACRO_BRIEF", f_macro_brief),
         ("MARKET_ALERTS", f_market_alerts),
+        ("AVG_PRICE_DATA", f_avg_price),
     ]
 
     def f_four_volume():

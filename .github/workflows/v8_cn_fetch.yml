@@ -121,6 +121,15 @@ jobs:
           Write-Host "本次类别: $cat"
           python cloud_fetch_v8.py --category $cat
 
+      - name: "🐉 刷新当日 LHB 数据（仅 post_close）"
+        if: steps.cat.outputs.category == 'post_close'
+        continue-on-error: true
+        shell: powershell
+        run: |
+          # fetch_lhb.py 产出 out/lhb_result.json；stage_to_raw 将其提升为 raw_data/lhb_data.json
+          python algorithms/fetch_lhb.py
+          python -c "import sys; sys.path.insert(0,'algorithms'); import stage_to_raw; stage_to_raw.main()"
+
       - name: "🐉 回填 LHB 历史（仅 post_close）"
         if: steps.cat.outputs.category == 'post_close'
         continue-on-error: true

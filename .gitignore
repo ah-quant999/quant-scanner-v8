@@ -26,6 +26,8 @@ data/zszxq_token.json
 algorithms/data/
 algorithms/out/
 out/
+# 运行时锁文件（PID，脚本并发互斥用，勿提交）
+algorithms/.scanner.lock
 # 冲突文件（双机同步残留）
 *-冲突-*
 *-conflict-*

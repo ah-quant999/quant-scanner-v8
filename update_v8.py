@@ -79,6 +79,7 @@ DATA_SOURCES = {
     "runner_status.json":          "RUNNER_STATUS",
     "risk_gauge.json":             "RISK_GAUGE",
     "stock_quote.json":            "STOCK_QUOTE",
+    "avg_price_data.json":         "AVG_PRICE_DATA",
 }
 
 # 变量名 → 更新时段
@@ -144,6 +145,7 @@ CATEGORY_MAP = {
     "EXPERIMENT": "post_close",
     "STOCK_LIST": "post_close",
     "STOCK_PROFILE": "post_close",
+    "AVG_PRICE_DATA": "post_close",
 }
 
 CATEGORY_LABEL = {
