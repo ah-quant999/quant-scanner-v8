@@ -24,7 +24,7 @@ def log(msg):
 def run(args, cwd=None):
     env = os.environ.copy()
     env['GIT_SSH_COMMAND'] = SSH_CMD
-    r = subprocess.run(args, capture_output=True, text=True, cwd=cwd, env=env, timeout=120)
+    r = subprocess.run(args, capture_output=True, text=True, cwd=cwd, env=env, timeout=420)
     if r.returncode != 0:
         log(f"⚠️  {' '.join(args)}: {r.stderr.strip()}")
     return r.returncode, r.stdout.strip(), r.stderr.strip()
