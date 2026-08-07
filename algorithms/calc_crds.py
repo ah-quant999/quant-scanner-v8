@@ -254,7 +254,9 @@ def get_market_context(mkt_df):
 
 
 def get_stock_kline(code):
-    """获取个股近期K线(含成交额)"""
+    """获取个股近期K线(含成交额)；只处理 A 股 6 位代码，过滤港股/北交所/基金等。"""
+    if not code or not re.fullmatch(r"\d{6}", str(code)):
+        return None
     prefix = "1" if (code.startswith("6") or code.startswith("688")) else "0"
     df = _query_kline(code, prefix, LOOKBACK_DAYS + MA_DAYS)
     if df is None or len(df) < LOOKBACK_DAYS:
@@ -531,27 +533,36 @@ def _load_scan_targets():
 
             if not stocks:
                 continue
+            # 兼容 dict 格式（如 gold_pool.json 的 stocks 为 {sh_600xxx: {...}}）
+            if isinstance(stocks, dict):
+                stocks = list(stocks.values())
 
-            # 标准化: 确保每项有 code 字段
+            # 标准化: 确保每项有 code 字段，且只保留 A 股 6 位代码
             _normalized = []
             _seen_codes = set()
             for s in stocks:
                 if isinstance(s, dict):
                     raw_code = str(s.get("code", "") or s.get("stock_code", "") or "")
                     nc = _re.sub(r'[^0-9]', '', raw_code)
-                    if not nc or nc in _seen_codes:
+                    # 过滤港股/基金/指数等非 A 股 6 位代码
+                    if not nc or len(nc) != 6 or nc in _seen_codes:
+                        continue
+                    # 进一步按 market/board 过滤港股（防止 5 位/7 位混进来）
+                    mk = str(s.get("market", "") or s.get("market_label", "")).lower()
+                    bd = str(s.get("board_label", "") or s.get("board", ""))
+                    if mk == "hk" or bd == "港股":
                         continue
                     _seen_codes.add(nc)
                     _normalized.append({
                         "code": nc,
                         "name": s.get("name", "") or s.get("stock_name", ""),
-                        "board_label": s.get("board_label", "") or s.get("board", ""),
+                        "board_label": bd,
                         "market_label": s.get("market_label", "") or s.get("market", ""),
                         "pct_chg": s.get("pct_chg", 0) or s.get("pctChg", 0) or s.get("change_pct", 0),
                     })
 
             if _normalized:
-                print(f"  [数据源] {label}: {_normalized} 只股票")
+                print(f"  [数据源] {label}: {len(_normalized)} 只股票")
                 return _normalized
         except Exception as e:
             print(f"  [跳过] {label}: {e}")
@@ -641,13 +652,17 @@ def calc_crds():
 
         print(f"\r  [{i+1}/{len(all_stocks)}] {code} {name} ({pct})...", end="", flush=True)
 
-        stock_df = get_stock_kline(code)
-        crds = calc_crds_for_stock(stock_df, mkt_df, code, name, board)
-        time.sleep(0.12)  # 东方财富限流友好间隔
-        if crds:
-            crds["name"] = _resolve_name(code, crds.get("name", name))
-            crds["market_label"] = s.get("market_label", "")
-            results.append(crds)
+        try:
+            stock_df = get_stock_kline(code)
+            crds = calc_crds_for_stock(stock_df, mkt_df, code, name, board)
+            time.sleep(0.12)  # 东方财富限流友好间隔
+            if crds:
+                crds["name"] = _resolve_name(code, crds.get("name", name))
+                crds["market_label"] = s.get("market_label", "")
+                results.append(crds)
+        except Exception as e:
+            print(f"\n  [WARN] {code} 计算异常: {e}")
+            continue
 
     # 4. 汇总
     print(f"\n  CRDS有效: {len(results)} 只")
