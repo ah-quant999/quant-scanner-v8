@@ -8607,31 +8607,23 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       h += v8CardHeader('🎯','今日判定 · 可入手候选 + 决策纪律','候选列表 + 操作纪律检查清单','update_time',
         {update_time:(jd.update_time || cr.update_time), slot:'盘前', horizon:'短线'}, !hasData);
       h += '<div style="padding:10px 12px;">';
-      // 总判横幅：判断结论 + 危机分 + 仓位 + 共识（紧跟判断后面）
+      // 总判横幅：判断结论 + 危机分 + 仓位 + 共识
       h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:6px 12px;background:'+_vra(verdictColor,0.1)+';border:1px solid '+_vra(verdictColor,0.25)+';border-radius:6px;font-size:13px;flex-wrap:wrap">';
       h += '<b style="color:'+verdictColor+'">'+verdictText+'</b>';
       h += '<span style="color:var(--dim);font-size:11px;">'+crisisPct+'分危机 · 仓位'+posAdvice+(consensus?' · '+consensus:'')+'</span></div>';
-      // 两栏主体
-      h += '<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:12px;">';
-      // 左：候选列表
-      h += '<div>' + ((typeof window.__judgmentCandidatesHTML === 'function')
-        ? window.__judgmentCandidatesHTML()
-        : '<div style="color:var(--dim)">候选数据加载中…</div>') + '</div>';
-      // 右：决策四步（一行一个，只显示实际数值）+ 三不原则（一行紧凑）
-      h += '<div style="border-left:1px solid rgba(255,255,255,.06);padding-left:12px;">';
-      h += '<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:4px">决策四步</div>';
+      // 决策四步+三不原则：一行横排（2026-08-07 主人令：合并成一行，放在谨慎操作下方）
+      h += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px;padding:5px 8px;background:rgba(255,255,255,.03);border-radius:6px;font-size:11px">';
       steps.forEach(function(s){
-        h += '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;">';
-        h += '<span style="font-weight:700;color:'+(s.ok?'var(--up)':'#f59e0b')+';min-width:44px">'+s.name+'</span>';
-        h += '<span style="flex:1;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+s.detail+'</span>';
-        h += '<span style="color:'+(s.ok?'var(--up)':'var(--down)')+'">'+(s.ok?'✅':'⚠️')+'</span></div>';
+        h += '<span style="padding:1px 7px;border-radius:999px;background:'+(s.ok?'rgba(34,197,94,.08)':'rgba(245,158,11,.12)')+';border:1px solid '+(s.ok?'rgba(34,197,94,.25)':'rgba(245,158,11,.3)')+';color:'+(s.ok?'var(--up)':'#f59e0b')+';font-weight:600;white-space:nowrap">'+s.name+' '+(s.ok?'✅':'⚠️')+' '+s.detail+'</span>';
       });
-      h += '<div style="font-size:12px;font-weight:700;color:#ef4444;margin:10px 0 4px">三不原则</div>';
-      h += '<div style="display:flex;flex-wrap:wrap;gap:4px;font-size:11px">';
       rules.forEach(function(r){
-        h += '<span style="padding:2px 7px;background:'+(r.ok?'rgba(34,197,94,.08)':'rgba(239,68,68,.08)')+';border:1px solid '+(r.ok?'rgba(34,197,94,.25)':'rgba(239,68,68,.25)')+';border-radius:999px;color:'+(r.ok?'var(--up)':'var(--down)')+'">' + (r.ok?'✅':'❌') + ' ' + r.t + '</span>';
+        h += '<span style="padding:1px 7px;border-radius:999px;background:'+(r.ok?'rgba(34,197,94,.08)':'rgba(239,68,68,.08)')+';border:1px solid '+(r.ok?'rgba(34,197,94,.25)':'rgba(239,68,68,.25)')+';color:'+(r.ok?'var(--up)':'var(--down)')+';white-space:nowrap">' + (r.ok?'✅':'❌') + ' ' + r.t + '</span>';
       });
-      h += '</div></div></div>'; // 右栏 / 两栏
+      h += '</div>';
+      // 候选列表（全宽）
+      h += ((typeof window.__judgmentCandidatesHTML === 'function')
+        ? window.__judgmentCandidatesHTML()
+        : '<div style="color:var(--dim)">候选数据加载中…</div>');
       h += '</div></div>';
     })();
 
