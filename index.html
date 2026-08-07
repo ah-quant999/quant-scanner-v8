@@ -9224,14 +9224,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     }
     hits.innerHTML = '<h4 style="margin:14px 0 8px 0;font-size:13px;color:var(--txt);">🎯 QD 共振命中 <b style="color:var(--orange);">'+qd+'</b> 只</h4>' +
       stocks.map(function(s){
-        var tags = [];
-        if(s.yzc) tags.push('<span style="background:rgba(239,83,80,.15);color:var(--up);padding:1px 6px;border-radius:4px;font-size:10px;">🔥 YZC</span>');
-        if(s.jg) tags.push('<span style="background:rgba(66,165,245,.15);color:var(--cyan);padding:1px 6px;border-radius:4px;font-size:10px;">🏦 JG</span>');
-        if(s.xc) tags.push('<span style="background:rgba(255,215,0,.15);color:var(--gold);padding:1px 6px;border-radius:4px;font-size:10px;">⚡ XC</span>');
-        if(s.four) tags.push('<span style="background:rgba(167,139,250,.15);color:var(--purple);padding:1px 6px;border-radius:4px;font-size:10px;">📈 FOUR</span>');
         return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:6px;">' +
           '<div><b>'+(s.name||'')+'</b> <span style="color:var(--dim);font-size:11px;">'+(s.code||'')+'</span></div>' +
-          '<div style="display:flex;gap:4px;">'+tags.join('')+'</div>' +
           '</div>';
       }).join('');
   }
