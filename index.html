@@ -2535,6 +2535,29 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="ph-fib-badge" id="phFibBadge">--</div>
     </div>
 
+    <!-- 板块资金三合一（v6 风格移植：盘中追热 + 收盘复盘 + 中期趋势） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📈</span>板块资金三合一 - 盘中+盘后+趋势 · <span class="fresh" id="phSectorTime">—</span></h3>
+
+      <!-- Block 1: 盘中追热 -->
+      <div class="sf-block sf-block-hot">
+        <div class="sf-block-title"><span class="sf-block-icon">🚀</span>盘中追热</div>
+        <div id="sfBlock1"><div class="ipo-empty">加载中…</div></div>
+      </div>
+
+      <!-- Block 2: 收盘复盘 -->
+      <div class="sf-block sf-block-close">
+        <div class="sf-block-title"><span class="sf-block-icon">🔥</span>收盘复盘</div>
+        <div id="sfBlock2"><div class="ipo-empty">加载中…</div></div>
+      </div>
+
+      <!-- Block 3: 板块周期（上半周期定位 + 下半资金验证） -->
+      <div class="sf-block sf-block-trend">
+        <div class="sf-block-title"><span class="sf-block-icon">🔄</span>板块周期</div>
+        <div id="sfBlock3"><div class="ipo-empty">加载中…</div></div>
+      </div>
+    </div>
+
     <!-- 资金流时间轴 · v6 一年样式（ECharts 双轴：单日柱状 + 累计折线） -->
     <div class="card" id="marketFundFlowCard" style="margin-bottom:16px">
       <h3><span class="ic">📊</span>资金流时间轴<span class="fresh" id="mffTime">—</span></h3>
@@ -2556,29 +2579,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div style="margin-top:6px;font-size:11px;color:var(--dim);line-height:1.5;">
           📌 口径说明：累计净流入 = 上证指数（000001）单日主力资金净流入的滚动累加；数据覆盖沪市全市场成分股，非仅宽基ETF。
         </div>
-      </div>
-    </div>
-
-    <!-- 板块资金三合一（v6 风格移植：盘中追热 + 收盘复盘 + 中期趋势） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📈</span>板块资金三合一 - 盘中+盘后+趋势 · <span class="fresh" id="phSectorTime">—</span></h3>
-
-      <!-- Block 1: 盘中追热 -->
-      <div class="sf-block sf-block-hot">
-        <div class="sf-block-title"><span class="sf-block-icon">🚀</span>盘中追热</div>
-        <div id="sfBlock1"><div class="ipo-empty">加载中…</div></div>
-      </div>
-
-      <!-- Block 2: 收盘复盘 -->
-      <div class="sf-block sf-block-close">
-        <div class="sf-block-title"><span class="sf-block-icon">🔥</span>收盘复盘</div>
-        <div id="sfBlock2"><div class="ipo-empty">加载中…</div></div>
-      </div>
-
-      <!-- Block 3: 板块周期（上半周期定位 + 下半资金验证） -->
-      <div class="sf-block sf-block-trend">
-        <div class="sf-block-title"><span class="sf-block-icon">🔄</span>板块周期</div>
-        <div id="sfBlock3"><div class="ipo-empty">加载中…</div></div>
       </div>
     </div>
 
