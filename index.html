@@ -4626,6 +4626,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">对命中票回看近 3 年日K，统计 QD 信号日的 T+1/3/5/10/20 持有收益胜率/均值（非未来函数，不偷看未来）。</div>
         <div class="logic-h">触发链路</div>
         <div class="logic-p">成交量前 N 活跃股池 → 日K 抓取 → 逐只算 QD → 收集末根触发 QD 的票 → 产出命中清单（含组件灯 YZC/JG/XC/FOUR）。<br>空结果 = 当日无四路共振票（市场信号弱），属正常业务输出，绝不伪造。</div>
+        <div class="logic-h">🔔 60m 共振（多周期加分 · 2026-08-09 新增）</div>
+        <div class="logic-p">后端 <code>final_recommend.py</code> 加载 <code>FOUR_VOLUME_60M.js</code> 构建命中查找表：四量终极路径遇「同算法多周期共振」额外 +0.8（QD/XG）或 +0.5，上限 4.5；命中后前端在卡片显示 🔔 60m共振 紫色徽章。属「多周期共振」增强，<b>不改变四条件硬门槛</b>。</div>
         <div class="logic-h">持有期提示</div>
         <div class="logic-p">四量终极命中按 T+1/3/5/10/20 持有期观测；卡片底部"⚡ 四路信号同时共振的当日候选 · 持有期 T+1/3/5/10/20 日可观测"。</div>
         <div class="logic-h">卡片每行字段口径</div>
@@ -4665,6 +4667,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">A=+40 / B=+5 / C=0 / D=-10。A档阈值已对齐真实上限 70 分。</div>
         <div class="logic-h">名字清洗（防研报/新闻稿污染名）</div>
         <div class="logic-p">候选池名字优先东财权威名 &gt; 通达信名字 &gt; raw 干净名 &gt; 代码兜底；容忍港股 -W/-S/-R 双重上市后缀。</div>
+        <div class="logic-h">🔔 60m 共振标签</div>
+        <div class="logic-p">候选池每只票的来源标签旁，若命中 <code>FOUR_VOLUME_60M</code> 多周期共振，会显示 🔔 60m 紫色标签，与主站/驾驶舱/四量等来源标签并列，便于一眼识别「多周期共振」标的。</div>
         <div class="logic-h">来源级监控（2026-08-08 新增）</div>
         <div class="logic-p">候选股池是下游金股池/评分/CRDS/四量终极等全部算法的<b>唯一输入宇宙</b>，其健康度直接影响全站结论可靠性。监控分两层：<br>· <b>night_watchdog.py --health</b>：每次巡检读取 candidate.json，拆分六大来源数量。成交额TOP三板任一&lt;80只→WARNING、=0→CRITICAL；港股/观澜台=0降级为WARNING（云端可能天然缺失）。同时检测垃圾名污染。<br>· <b>运维面板数据新鲜度</b>：CANDIDATE 行下方展示六来源彩色标签（✓绿/⚠黄/✗红），一目了然哪个来源异常。HEALTH_CHECK.js 整体条目仅反映 update_time，不拆分来源——来源级状态以上述两处为准。<br>        · <b>正常基线</b>：主板≈97-100 / 创业板=100 / 科创板=100 / maharo≈10-20；港股0-50（依赖akshare可用性）；观澜台0-N（依赖外部JSON更新）。三板合计≥280视为健康。</div>
       </div>
@@ -4677,6 +4681,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">· <b>🆕 新赛道发现</b>：当日行业净流入 TOP5（SECTOR_FUND_FLOW 行业类）<br>· <b>🔮 早期信号</b>：纯游资净买异动（游资净买&gt;0 且 机构净买≤0），按游资净买排序 TOP6<br>· <b>🔥 核心共振</b>：机构+游资双净买的「真启动」标的，按合计净买排序 TOP6</div>
         <div class="logic-h">数据口径</div>
         <div class="logic-p">机游共振来自 <code>LHB_DATA</code>（龙虎榜），<b>仅覆盖当日上榜异动股</b>，非全市场资金流；板块资金流为当日行业净流入。徽章与严格三重共识/四量终极同格式：🐻 盘后短线 + 🧺 MM-DD 已入仓 N（N=机构+游资双净买标的数）。</div>
+        <div class="logic-h">🔔 60min 动量延续（区分一日游 / 真启动）</div>
+        <div class="logic-p">后端对大牛股猎手路径加 <code>聪明钱进场 + 60min 动量延续</code> 评分（+0.5）：龙虎榜 T 日机游进场后，若 T+1 分钟级仍在，说明非「一日游」、是「真启动」。前端在核心共振卡每只票下显示 🔔 60m动量延续 标签——这正是大牛股猎手相对纯游资异动的核心增值点。</div>
         <div class="logic-h">使用边界</div>
         <div class="logic-p">样本小、偏短线情绪，<b>不单独作为买点</b>；需结合三重共识等做买卖决策。完整机游/北向/每日洞察分析见顶部 🧲 共振日历。</div>
       </div>
