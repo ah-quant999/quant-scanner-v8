@@ -74,6 +74,7 @@ ORDER = [
     "gen_triple_consensus.py",         # 读 top10 / cockpit_tier / fundamental / gold_pool
     "gen_triple_track.py",             # 读 triple_history / gold_pool / backtest / cockpit
     "calc_volatility_watch.py",         # → raw_data/volatility.json（v8 原生，独立无依赖）
+    "gen_stock_stop.py",                # → data/STOCK_STOP_DATA.js（ATR 精确止损止盈，读候选宇宙日K）
     # ── 孤儿模块原生化（2026-08-02）：原靠 v6→v8 sync_legacy 同步，现由 v8 直接产出 ──
     # 这些脚本直接写 raw_data/<name>.json（不经 out/），stage_to_raw 不二次处理，api_push 直接上传。
     "fetch_orphan_suspension.py",       # → raw_data/suspension_alert.json

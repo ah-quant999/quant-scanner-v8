@@ -78,7 +78,7 @@ def walk_raw():
 def walk_extra():
     """额外推送文件（不在 raw_data/，但由抓取脚本直接写 data/，如四量终极选股结果）。"""
     out = {}
-    extra = ["data/FOUR_VOLUME.js"]
+    extra = ["data/FOUR_VOLUME.js", "data/STOCK_STOP_DATA.js"]
     for rel in extra:
         if os.path.isfile(rel):
             with open(rel, "rb") as fh:
@@ -103,7 +103,7 @@ def main():
     existing = {}
     tfull = api("GET", f"/repos/{REPO}/git/trees/{base_tree}?recursive=1")
     for e in tfull.get("tree", []):
-        if (e["path"].startswith("raw_data/") or e["path"] == "data/FOUR_VOLUME.js") and e["type"] == "blob":
+        if (e["path"].startswith("raw_data/") or e["path"] == "data/FOUR_VOLUME.js" or e["path"] == "data/STOCK_STOP_DATA.js") and e["type"] == "blob":
             existing[e["path"]] = e["sha"]
 
     # 上传 blobs（幂等：内容相同则 sha 相同）
