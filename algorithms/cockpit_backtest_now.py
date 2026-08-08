@@ -233,7 +233,7 @@ def calc_backtest(signals):
 
             # 方案二统一止损止盈（只用入场日及之前的数据）
             board = sig.get("board") or board_from_code(sig["code"])
-            st = compute_stop_target(df.iloc[: entry_idx + 1], board=board)
+            st = compute_stop_target(df.iloc[: entry_idx + 1], board=board, strategy="cockpit")
             if st:
                 stop_loss = st["stop_loss"]
                 target_price = st["target_price"]

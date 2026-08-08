@@ -295,7 +295,7 @@ def calc_multi_hold(entry_date: str, entry_price: float, bsc: str, board: str = 
 
     # 用 entry 当日及之前数据算止损/止盈（非未来函数）
     df_entry = df_all.iloc[: entry_idx + 1].copy()
-    st = compute_stop_target(df_entry, board=board)
+    st = compute_stop_target(df_entry, board=board, strategy="comprehensive")
     if not st:
         # 历史数据不足时回退固定百分比
         stop_loss = real_entry_price * fixed_stop_pct(board)

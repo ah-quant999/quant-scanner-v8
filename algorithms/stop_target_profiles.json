@@ -1,0 +1,32 @@
+{
+  "_comment": "方案三产物：各策略止损/止盈口径配置。由 optimize_stop_target.py 回测结果生成。auto=沿用方案二默认口径。",
+  "tdx": {
+    "stop": "fixedP10",
+    "target": "rrK1.5",
+    "metrics": {
+      "win_rate": 47.16,
+      "avg_return": 1.444,
+      "profit_factor": 1.28,
+      "median_rr": 1.5,
+      "source": "stop_target_optimization.json 方案三回测(5168信号)"
+    }
+  },
+  "comprehensive": {
+    "stop": "auto",
+    "target": "auto",
+    "metrics": {
+      "note": "历史信号不足(截尾)，暂用方案二默认口径"
+    }
+  },
+  "cockpit": {
+    "stop": "auto",
+    "target": "auto",
+    "metrics": {
+      "note": "历史信号不足(截尾)，暂用方案二默认口径"
+    }
+  },
+  "default": {
+    "stop": "auto",
+    "target": "auto"
+  }
+}

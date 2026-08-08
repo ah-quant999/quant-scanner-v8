@@ -14,6 +14,10 @@
 
 返回 dict 与 gen_stock_stop.py 产出的单只股票字段保持一致。
 """
+import json
+import os
+
+import numpy as np
 import pandas as pd
 
 ATR_WINDOW = 14
@@ -37,11 +41,128 @@ def board_from_code(code) -> str:
     return "主板"
 
 
-def compute_stop_target(df: pd.DataFrame, board: str = "主板") -> dict | None:
-    """从日K DataFrame(date/open/close/high/low/...) 计算统一止损止盈。
+# ---------------------------------------------------------------------------
+# 方案三：分策略止损/止盈口径配置（不同策略可配不同口径）
+# ---------------------------------------------------------------------------
+_PROFILES_CACHE = None
 
-    df 至少需要 PRICE_WINDOW+1 根K线，close/high/low 为 float。
+
+def _load_profiles():
+    """加载 algorithms/stop_target_profiles.json。
+
+    格式：{"tdx": {"stop":"fixedP10","target":"rrK1.5"}, ...}
+    "auto" 或缺失 → 使用 方案二 默认口径（compute_stop_target_v2）。
     """
+    global _PROFILES_CACHE
+    if _PROFILES_CACHE is not None:
+        return _PROFILES_CACHE
+    p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "stop_target_profiles.json")
+    try:
+        with open(p, encoding="utf-8") as f:
+            _PROFILES_CACHE = json.load(f)
+    except Exception:
+        _PROFILES_CACHE = {}
+    return _PROFILES_CACHE
+
+
+def _parse_spec(spec):
+    """'fixedP10'→('fixedP',10) / 'rrK1.5'→('rrK',1.5) / 'prevHighN60'→('prevHighN',60)
+    / 'fibX0.618'→('fibX',0.618) / 'auto'/None→None"""
+    if not spec or str(spec).lower() == "auto":
+        return None
+    import re
+    m = re.match(r"^([A-Za-z]+?)([0-9.]+)$", str(spec))
+    if not m:
+        return None
+    return m.group(1), float(m.group(2))
+
+
+def compute_stop_target_by_rules(df, board, stop_rule, stop_param, target_rule, target_param):
+    """按显式规则（方案三优化结果）计算止损止盈，返回与 compute_stop_target 同构 dict。"""
+    if df is None or len(df) < max(ATR_WINDOW, PRICE_WINDOW) + 1:
+        return None
+    try:
+        close = float(df["close"].iloc[-1])
+        high = df["high"].astype(float)
+        low = df["low"].astype(float)
+        prev_close = df["close"].astype(float).shift(1)
+    except Exception:
+        return None
+    if close <= 0:
+        return None
+    tr = pd.concat([high - low, (high - prev_close).abs(), (low - prev_close).abs()], axis=1).max(axis=1)
+    atr = float(tr.tail(ATR_WINDOW).mean())
+    if atr <= 0:
+        return None
+
+    lows = low.to_numpy(dtype=float)
+    highs = high.to_numpy(dtype=float)
+
+    # 止损
+    if stop_rule == "lowN":
+        stop = float(np.min(lows[-int(stop_param):]))
+    elif stop_rule == "atrM":
+        stop = close - atr * stop_param
+    else:  # fixedP
+        stop = close * (1 - stop_param / 100.0)
+    if stop >= close:
+        stop = close * 0.5
+    stop = max(stop, close * 0.5)
+    risk = close - stop
+    if risk <= 0:
+        return None
+
+    # 止盈
+    if target_rule == "prevHighN":
+        target = float(np.max(highs[-int(target_param):]))
+    elif target_rule == "fibX":
+        wh = float(np.max(highs[-30:]))
+        wl = float(np.min(lows[-30:]))
+        target = wh - target_param * (wh - wl)
+    else:  # rrK
+        target = close + target_param * risk
+    if target <= close:
+        target = close + 2.0 * risk
+    reward = target - close
+    rr = round(reward / risk, 2) if risk > 0 else 0.0
+
+    return {
+        "close": round(close, 2),
+        "atr": round(atr, 3),
+        "board": board,
+        "stop_loss": round(stop, 2),
+        "stop_loss_method": f"{stop_rule}{stop_param}",
+        "target_price": round(target, 2),
+        "target_price_method": f"{target_rule}{target_param}",
+        "support": round(float(np.min(lows[-PRICE_WINDOW:])), 2),
+        "resistance": round(float(np.max(highs[-PRICE_WINDOW:])), 2),
+        "risk_reward": rr,
+        "risk_pct": round(risk / close * 100, 2),
+        "reward_pct": round(reward / close * 100, 2),
+        "profile": True,
+    }
+
+
+def compute_stop_target(df: pd.DataFrame, board: str = "主板", strategy: str = None) -> dict | None:
+    """从日K DataFrame 计算止损止盈。
+
+    - strategy=None（默认）：始终使用 方案二 默认口径（向后兼容，所有既有调用不变）。
+    - strategy 命中 stop_target_profiles.json 中的非 auto 配置：改用该策略优化后的口径。
+    """
+    if strategy:
+        prof = _load_profiles().get(strategy)
+        if prof:
+            sr = _parse_spec(prof.get("stop"))
+            tr = _parse_spec(prof.get("target"))
+            if sr and tr:
+                r = compute_stop_target_by_rules(df, board, sr[0], sr[1], tr[0], tr[1])
+                if r:
+                    return r
+    return _compute_stop_target_v2(df, board)
+
+
+def _compute_stop_target_v2(df: pd.DataFrame, board: str = "主板") -> dict | None:
+    """方案二统一口径（原 compute_stop_target 逻辑，保持不动）。"""
     if df is None or len(df) < max(ATR_WINDOW, PRICE_WINDOW) + 1:
         return None
     try:

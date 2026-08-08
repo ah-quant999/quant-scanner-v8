@@ -229,7 +229,7 @@ def calc_forward_return(rows, idx, hold_days, board="主板"):
 
     # 用 idx 当日及之前数据计算止损/止盈（非未来函数）
     df = pd.DataFrame(rows[: idx + 1])
-    st = compute_stop_target(df, board=board)
+    st = compute_stop_target(df, board=board, strategy="tdx")
     if st:
         stop_loss = st["stop_loss"]
         target_price = st["target_price"]
