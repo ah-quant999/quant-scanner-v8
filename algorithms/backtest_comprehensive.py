@@ -88,7 +88,13 @@ def bs_code(code: str, market: str = "") -> str | None:
 # ════════════════════════════════════════════
 
 def discover_top10_signals() -> list[dict]:
-    """从 data/history/top10_daily_*.json 提取三种策略信号"""
+    """从 data/history/top10_daily_*.json 提取三种策略信号
+
+    兼容两种评分口径：
+    - 旧数据：total_score 为 0~100 百分制，>=70 视为有效共振。
+    - 新数据（2026-08-01 后归一化）：total_score 上限 100 但实际分布偏低，
+      若某日无 >=70 的股票，则按 top10 内排名分层：前 3 名≈精选、4~6 名≈观察。
+    """
     signals = []
     if not os.path.isdir(HIST_DIR):
         return signals
@@ -100,10 +106,19 @@ def discover_top10_signals() -> list[dict]:
         date_str = parse_date(m.group(1))
         data = load_json(os.path.join(HIST_DIR, fn))
         top10 = data.get("top10", []) if isinstance(data, dict) else []
-        for s in top10:
+
+        # 按分数降序并带上原始排名（1-based）
+        ranked = sorted(
+            [(i, s) for i, s in enumerate(top10)],
+            key=lambda x: (x[1].get("total_score", 0) or 0),
+            reverse=True,
+        )
+        has_legacy_resonance = any(
+            (s.get("total_score", 0) or 0) >= 70 for _, s in ranked
+        )
+
+        for rank0, s in ranked:
             score = s.get("total_score", 0) or 0
-            if score < 70:
-                continue
             code = str(s.get("code", ""))
             market = str(s.get("market", ""))
             close = s.get("close", 0)
@@ -125,17 +140,29 @@ def discover_top10_signals() -> list[dict]:
                 "source": "top10_daily",
             }
 
-            # 按分数归入子策略
-            if score >= 80:
-                rec["strategy"] = "resonance_gte80"
-                signals.append(rec)
-            # resonance_gte70_lt80 & resonance_all 共用一个 rec
-            if 70 <= score < 80:
-                rec2 = {**rec, "strategy": "resonance_gte70_lt80"}
-                signals.append(rec2)
-            # 所有 >=70 的都归入 resonance_all
-            rec3 = {**rec, "strategy": "resonance_all"}
-            signals.append(rec3)
+            if has_legacy_resonance:
+                # 旧百分制口径：保留原有语义
+                if score >= 80:
+                    rec80 = {**rec, "strategy": "resonance_gte80"}
+                    signals.append(rec80)
+                if 70 <= score < 80:
+                    rec70 = {**rec, "strategy": "resonance_gte70_lt80"}
+                    signals.append(rec70)
+                if score >= 70:
+                    rec_all = {**rec, "strategy": "resonance_all"}
+                    signals.append(rec_all)
+            else:
+                # 新归一化口径：按 top10 内排名分层
+                rank = rank0 + 1
+                if rank <= 3:
+                    rec80 = {**rec, "strategy": "resonance_gte80"}
+                    signals.append(rec80)
+                if 4 <= rank <= 6:
+                    rec70 = {**rec, "strategy": "resonance_gte70_lt80"}
+                    signals.append(rec70)
+                if rank <= 6:
+                    rec_all = {**rec, "strategy": "resonance_all"}
+                    signals.append(rec_all)
 
     return signals
 

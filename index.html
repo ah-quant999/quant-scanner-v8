@@ -4328,6 +4328,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><td>70 ~ 79</td><td style="color:#f0b083;font-weight:700;">观察</td><td>仅计数，不详细展开（防视觉噪音）</td></tr>
           <tr><td>&lt; 70</td><td>不入选</td><td>top10_daily 排除</td></tr>
         </table>
+        <div class="logic-p"><b>综合回测口径</b>：当市场低迷、无 ≥70 分时，<code>backtest_comprehensive.py</code> 自动 fallback 为 top10 内排名分层——前 3 名对应「共振前3」、4~6 名对应「共振4-6」、前 6 名对应「共振前6」，保证回测每天都有可统计样本。</div>
 
         <div class="logic-h">⑤ 基础面质量档位（fundamental_quality.json）</div>
         <table class="lg-table">
@@ -8035,7 +8036,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         var rawStrategies=d.strategies_tested||Object.keys(overview);
         var strategies=rawStrategies.slice().sort(function(a,b){return (orderPref[a]||99)-(orderPref[b]||99);});
         var periods=d.hold_periods_tested||[1,3,5,10,20];
-        var labels={resonance_all:'共振≥70', resonance_gte80:'共振≥80', resonance_gte70_lt80:'共振70-79', signal_ge2:'信号≥2', signal_ge3:'信号≥3'};
+        var labels={resonance_all:'共振前6', resonance_gte80:'共振前3', resonance_gte70_lt80:'共振4-6', signal_ge2:'信号≥2', signal_ge3:'信号≥3'};
         var html='';
         html+='<div style="font-size:10px;color:#8aa0c2;margin-bottom:8px;">运行：'+(d.calc_time||'—')+'　策略数：'+strategies.length+'　持有期：'+periods.join('/')+'日　数据源：baostock 历史收盘价</div>';
         html+='<div style="font-size:10px;color:#ff6b81;background:rgba(255,107,129,.12);padding:4px 8px;border-radius:4px;margin-bottom:6px;">⚠️ <b>统计有效性提示</b>：样本&lt;30 的策略胜率/收益为<b>统计无效</b>，下表中已标红。仅作参考，不作决策依据。</div>';
