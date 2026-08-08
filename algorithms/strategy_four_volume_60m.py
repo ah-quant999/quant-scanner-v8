@@ -22,6 +22,7 @@ import sys
 import json
 import time
 import argparse
+import subprocess
 from datetime import datetime, timedelta
 
 import numpy as np
@@ -31,7 +32,18 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 ROOT = os.path.dirname(BASE_DIR)
-DATA_DIR = os.path.join(ROOT, "data")
+
+# 输出目录解析（v8 双机/预览架构，2026-08-09 修复）：
+#  1) 环境变量 V8_DATA_DIR 最高优先（云端/CI 可显式指定输出位置）；
+#  2) 本机若存在真实仓库 E:/workspace/stock-scanner（git 源），直接写入其 data/，
+#     便于生成后自动提交入库，避免数据只落在预览副本 quant-scanner-v8 而主站缺失；
+#  3) 否则沿用脚本所在仓库 ROOT/data（云端 checkout 场景）。
+_LOCAL_REPO = r"E:/workspace/stock-scanner"
+if os.path.isdir(os.path.join(_LOCAL_REPO, ".git")):
+    DATA_DIR = os.path.join(_LOCAL_REPO, "data")
+else:
+    DATA_DIR = os.path.join(ROOT, "data")
+DATA_DIR = os.environ.get("V8_DATA_DIR", DATA_DIR)
 os.makedirs(DATA_DIR, exist_ok=True)
 
 # ── 导入日线版的信号计算引擎（纯数学，周期无关）──
@@ -354,6 +366,63 @@ def backtest_four_volume_60m(years=1, top_cy=60, top_kc=60, top_zb=60):
     return summary
 
 
+def _find_git_root(path):
+    """从文件/目录向上查找最近的 .git 仓库根。"""
+    cur = os.path.abspath(path)
+    if os.path.isfile(cur):
+        cur = os.path.dirname(cur)
+    while True:
+        if os.path.isdir(os.path.join(cur, ".git")):
+            return cur
+        parent = os.path.dirname(cur)
+        if parent == cur:
+            return None
+        cur = parent
+
+
+def auto_commit_and_mirror(paths):
+    """生成后：把数据文件提交进真实仓库并推送，再镜像到本地预览副本（best-effort）。
+
+    目的：防止 60m 数据只落在预览副本 quant-scanner-v8 而真实仓库/主站缺失，
+    导致三处再次漂移（见 2026-08-09 审计）。仅在文件确实变更时才提交。
+    """
+    paths = [p for p in paths if p and os.path.exists(p)]
+    if not paths:
+        return
+    repo = _find_git_root(paths[0])
+    if repo:
+        try:
+            rels = [os.path.relpath(p, repo) for p in paths]
+            subprocess.run(["git", "add", *rels], cwd=repo, check=True)
+            st = subprocess.run(["git", "status", "--porcelain", *rels],
+                                cwd=repo, capture_output=True, text=True)
+            if st.stdout.strip():
+                msg = "data: 自动提交 60m 共振数据 " + ", ".join(
+                    os.path.basename(p) for p in paths)
+                subprocess.run(["git", "commit", "-m", msg], cwd=repo, check=True)
+                print(f"  ✅ 已提交至仓库 {repo}")
+                pr = subprocess.run(["git", "push", "origin", "main"], cwd=repo,
+                                    capture_output=True, text=True)
+                if pr.returncode == 0:
+                    print("  ✅ 已推送 origin/main")
+                else:
+                    print(f"  ⚠️ 推送暂被拒（可能需 rebase），稍后重试: {pr.stderr[:160]}")
+            else:
+                print("  （60m 数据无变化，跳过提交）")
+        except Exception as e:
+            print(f"  ⚠️ 自动提交失败（文件已生成，未入库）: {e}")
+    # 镜像到本地预览副本，保持书签 file:///.../quant-scanner-v8 同步
+    preview = r"E:/workspace/quant-scanner-v8/data"
+    if os.path.isdir(preview):
+        try:
+            import shutil
+            for p in paths:
+                shutil.copy2(p, os.path.join(preview, os.path.basename(p)))
+            print(f"  ✅ 已镜像到预览副本 {preview}")
+        except Exception as e:
+            print(f"  ⚠️ 镜像预览副本失败: {e}")
+
+
 def main():
     ap = argparse.ArgumentParser(description="四量终极 60分钟 选股策略（独立模块）")
     ap.add_argument("--backtest", type=int, default=0,
@@ -367,9 +436,13 @@ def main():
         pass
     records = scan_four_volume_60m(top_cy=args.top, top_kc=args.top,
                                    top_zb=args.top)
-    write_four_volume_60m_js(records)
+    js_path = write_four_volume_60m_js(records)
+    paths = [js_path]
     if args.backtest > 0:
         backtest_four_volume_60m(years=args.backtest)
+        paths.append(os.path.join(DATA_DIR, "FOUR_VOLUME_60M_BACKTEST.json"))
+    # 生成后自动提交入库并镜像到本地预览副本（best-effort，防三处漂移）
+    auto_commit_and_mirror(paths)
     return records
 
 
