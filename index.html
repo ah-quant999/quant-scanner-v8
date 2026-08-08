@@ -417,6 +417,7 @@ html>
 <script src="data/IPO_DATA.js?v=20260808164131"></script>
     <script src="data/CRISIS_DATA.js?v=20260808164250"></script>
     <script src="data/JUDGMENT_DATA.js?v=20260808164616"></script>
+    <script src="data/STOCK_RPS.js?v=20260808234200"></script>
     <script>
 window.V8_CAL = {weeks:[],legend:[]};
 /* ===== 2026 A股交易日历（每年需更新） ===== */
@@ -2377,6 +2378,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <button class="st-tab" data-st="allsite" onclick="switchSt('allsite')">🌐 全站精选 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用</span></button>
       <button class="st-tab" data-st="hunter" onclick="switchSt('hunter')">🐂 大牛股猎手 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">中线</span></button>
+      <button class="st-tab" data-st="rps" onclick="switchSt('rps')">📈 相对强度 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">RPS+RS</span></button>
     </div>
 
     <!-- ===== TAB 页面：大牛股猎手（2026-08-08 从「共振日历」迁入） ===== -->
@@ -2567,6 +2569,77 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         </div>
         <div id="stcrdsHistory" style="font-size:11px;color:var(--dim);"></div>
       </div></div><!--/st-crds-->
+
+    <!-- ===== TAB 页面：个股相对强度 (RPS + RS + 年线) ===== -->
+    <div id="st-rps" class="st-pane">
+      <div class="card" id="strpsCard">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+          📈 <span style="font-weight:700;font-size:14px;color:var(--txt);">个股相对强度 · RPS + RS + 年线</span>
+          <span style="margin-left:4px;font-size:10px;color:#94a3b8;font-weight:500;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">自下而上</span>
+          <span id="strpsTime"></span>
+          <span id="strpsRunBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);vertical-align:middle">✅ 已计算</span>
+        </div>
+        <div style="font-size:11px;color:var(--dim);margin-bottom:12px;line-height:1.6;">
+          排名池：候选池 universe（<span id="strpsUniCount">--</span>只）；指数：<span id="strpsIndexName">--</span>；A档硬门禁：站上250日线 + RS&gt;0 + RPSmax≥90。
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+          <label style="font-size:12px;color:var(--sub);">分层：</label>
+          <select id="strpsTierFilter" onchange="renderRpsScreen()" style="background:var(--bg2);color:var(--txt);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;">
+            <option value="all">全部</option>
+            <option value="A">A档（拿住别动）</option>
+            <option value="B">B档（强势观察）</option>
+            <option value="C">C档（关注）</option>
+          </select>
+          <label style="font-size:12px;color:var(--sub);margin-left:8px;">最小RPS：</label>
+          <select id="strpsRpsFilter" onchange="renderRpsScreen()" style="background:var(--bg2);color:var(--txt);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;">
+            <option value="0">0</option>
+            <option value="80">80</option>
+            <option value="90" selected>90</option>
+            <option value="95">95</option>
+          </select>
+          <button onclick="renderRpsScreen()" style="margin-left:auto;background:var(--cyan);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;">刷新</button>
+        </div>
+        <table id="strpsTable" style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead><tr style="border-bottom:1px solid var(--border);">
+            <th style="text-align:left;padding:6px;">名称</th>
+            <th style="text-align:center;padding:6px;">档</th>
+            <th style="text-align:center;padding:6px;">RPS50</th>
+            <th style="text-align:center;padding:6px;">RPS120</th>
+            <th style="text-align:center;padding:6px;">RPS250</th>
+            <th style="text-align:center;padding:6px;">RPSmax</th>
+            <th style="text-align:center;padding:6px;">RS</th>
+            <th style="text-align:center;padding:6px;">年线</th>
+            <th style="text-align:center;padding:6px;">收盘价</th>
+          </tr></thead>
+          <tbody id="strpsBody"></tbody>
+        </table>
+        <div id="strpsEmpty" style="display:none;padding:14px;color:var(--dim);font-size:13px;text-align:center;">暂无满足条件的个股</div>
+      </div>
+
+      <div class="card" id="strpsBacktestCard">
+        <h3><span class="ic">🔬</span>RPS 分层回测（历史模拟）</h3>
+        <div style="font-size:11px;color:var(--dim);margin-bottom:10px;">基于当前截面 RPS/RS/年线 做分层，用历史收益近似模拟持有 N 日的表现（样本为今日候选池，仅供内部验证）。</div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+          <label style="font-size:12px;color:var(--sub);">持有天数：</label>
+          <select id="strpsBtHold" onchange="renderRpsBacktest()" style="background:var(--bg2);color:var(--txt);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;">
+            <option value="5">5日</option>
+            <option value="10" selected>10日</option>
+            <option value="20">20日</option>
+          </select>
+          <label style="font-size:12px;color:var(--sub);margin-left:8px;">分层：</label>
+          <select id="strpsBtTier" onchange="renderRpsBacktest()" style="background:var(--bg2);color:var(--txt);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;">
+            <option value="A">A档</option>
+            <option value="B">B档</option>
+            <option value="C">C档</option>
+            <option value="AB">A+B档</option>
+            <option value="all">全部</option>
+          </select>
+          <button onclick="renderRpsBacktest()" style="margin-left:auto;background:var(--cyan);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;">运行回测</button>
+        </div>
+        <div id="strpsBtSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:12px;"></div>
+        <div id="strpsBtCurve" style="width:100%;height:200px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;position:relative;overflow:hidden;"></div>
+      </div>
+    </div><!--/st-rps-->
   </section>
 
 
@@ -7699,10 +7772,13 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     else if(tab==='fv'){ /* 跨脚本块：必须走 window，裸调用会 ReferenceError（2026-08-07 修） */
       if(!stRendered.fv){ stRendered.fv=1; }
       try{ window.renderFourVolume(); }catch(e){ console.warn('四量终极渲染失败',e); } }
+    else if(tab==='rps'){
+      if(!stRendered.rps){ stRendered.rps=1; }
+      try{ window.renderRpsScreen(); }catch(e){ console.warn('相对强度渲染失败',e); } }
   }
   window.switchSt=function(n){
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
-    ['tc','cockpit','allsite','fv','crds','hunter'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
+    ['tc','cockpit','allsite','fv','crds','hunter','rps'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
     renderStTab(n);
   };
   function initTriple(){
@@ -9467,6 +9543,155 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   window.renderCockpit=renderCockpit;
   window.renderV8Crds=renderV8Crds;
 
+  /* ===== 个股相对强度 RPS + RS + 年线（2026-08-08 新增） ===== */
+  function _rps$(id){ return document.getElementById(id); }
+  function _rpsEscapeHtml(s){
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function _buildRpsMap(){
+    var D=window.STOCK_RPS_DATA||{};
+    var m={};
+    (D.records||[]).forEach(function(r){ if(r && r.code) m[r.code]=r; });
+    return m;
+  }
+  window.__rpsMapByCode=null;
+  function _rpsBadge(tier){
+    var colors={A:'linear-gradient(135deg,#15803d,#22c55e)',B:'linear-gradient(135deg,#2563eb,#3b82f6)',C:'linear-gradient(135deg,#a16207,#eab308)'};
+    var c=colors[tier]||'var(--sub)';
+    return '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;color:#fff;background:'+c+';">'+tier+'</span>';
+  }
+  function _rpsCell(v, hi){
+    if(v==null) return '<span style="color:var(--dim)">—</span>';
+    v=Number(v);
+    var color= v>=90 ? '#22c55e' : v>=80 ? '#3b82f6' : v>=60 ? '#eab308' : '#94a3b8';
+    if(hi) color='#22c55e';
+    return '<span style="font-weight:700;color:'+color+'">'+v.toFixed(1)+'</span>';
+  }
+  function _rpsTrend(above){
+    return above
+      ? '<span style="color:#22c55e;font-weight:700">站上</span>'
+      : '<span style="color:#ef4444;font-weight:700">跌破</span>';
+  }
+  function _rpsName(name, code, market){
+    var prefix=(market||'').toLowerCase()==='sh'?'sh_':'sz_';
+    return '<span style="font-weight:700;color:var(--txt)">'+_rpsEscapeHtml(name)+'</span><br><span style="font-size:10px;color:var(--dim)">'+prefix+code+'</span>';
+  }
+  function renderRpsScreen(){
+    var D=window.STOCK_RPS_DATA||{};
+    var recs=D.records||[];
+    var time=D.update_time||'';
+    var uni=D.universe_count||0;
+    var idxName=D.index_name||'--';
+    var tierF=_rps$('strpsTierFilter')?_rps$('strpsTierFilter').value:'all';
+    var rpsMin=_rps$('strpsRpsFilter')?Number(_rps$('strpsRpsFilter').value):90;
+    var body=_rps$('strpsBody'); if(!body) return;
+    _rps$('strpsUniCount').textContent=uni;
+    _rps$('strpsIndexName').textContent=idxName;
+    if(_rps$('strpsTime')){
+      try{ _rps$('strpsTime').innerHTML=_uBadge('盘后','短线',time||'已加载'); }catch(e){ _rps$('strpsTime').textContent=time||''; }
+    }
+    var filtered=recs.filter(function(r){
+      if(!r) return false;
+      if(tierF!=='all' && (r.tier||'')!==tierF) return false;
+      return (r.rps_max||0)>=rpsMin;
+    });
+    filtered.sort(function(a,b){ return (b.rps_max||0)-(a.rps_max||0) || (b.rs||0)-(a.rs||0); });
+    var h='';
+    filtered.forEach(function(r){
+      var isHi50=(r.rps50||0)>=(r.rps_max||0);
+      var isHi120=(r.rps120||0)>=(r.rps_max||0);
+      var isHi250=(r.rps250||0)>=(r.rps_max||0);
+      h+='<tr style="border-bottom:1px solid rgba(148,163,184,.12);">'+
+        '<td style="padding:6px;">'+_rpsName(r.name,r.code,r.market)+'</td>'+
+        '<td style="text-align:center;padding:6px;">'+_rpsBadge(r.tier)+'</td>'+
+        '<td style="text-align:center;padding:6px;">'+_rpsCell(r.rps50,isHi50)+'</td>'+
+        '<td style="text-align:center;padding:6px;">'+_rpsCell(r.rps120,isHi120)+'</td>'+
+        '<td style="text-align:center;padding:6px;">'+_rpsCell(r.rps250,isHi250)+'</td>'+
+        '<td style="text-align:center;padding:6px;">'+_rpsCell(r.rps_max,true)+'</td>'+
+        '<td style="text-align:center;padding:6px;"><span style="font-weight:700;color:'+((r.rs||0)>0?'#22c55e':'#ef4444')+'">'+(r.rs==null?'—':Number(r.rs).toFixed(2))+'</span></td>'+
+        '<td style="text-align:center;padding:6px;">'+_rpsTrend(r.above_ma250)+'</td>'+
+        '<td style="text-align:center;padding:6px;">'+(r.close==null?'—':Number(r.close).toFixed(2))+'</td>'+
+      '</tr>';
+    });
+    body.innerHTML=h;
+    var empty=_rps$('strpsEmpty');
+    if(empty) empty.style.display=filtered.length?'none':'block';
+    var badge=_rps$('strpsRunBadge'); if(badge) badge.style.display='inline-block';
+  }
+  window.renderRpsScreen=renderRpsScreen;
+
+  function renderRpsBacktest(){
+    var D=window.STOCK_RPS_DATA||{};
+    var recs=D.records||[];
+    var hold=Number(_rps$('strpsBtHold').value)||10;
+    var tierF=_rps$('strpsBtTier').value||'A';
+    // 用历史已实现收益做近似：ret50 近似 50日收益，年化到持有期
+    var filtered=recs.filter(function(r){
+      if(!r || r.ret50==null) return false;
+      if(tierF==='all') return true;
+      if(tierF==='AB') return (r.tier==='A' || r.tier==='B');
+      return r.tier===tierF;
+    });
+    // 模拟：用 ret50 按 50日 线性折算到 hold 日 预期收益；同时记录 RS>0 / 年线 子集
+    var total=filtered.length;
+    if(total===0){
+      _rps$('strpsBtSummary').innerHTML='<div style="padding:12px;color:var(--dim)">无样本</div>';
+      _rps$('strpsBtCurve').innerHTML='';
+      return;
+    }
+    var rets=[], win=0, sum=0, max= -1e9, min=1e9;
+    var retsGate=[], winGate=0, sumGate=0, cntGate=0;
+    filtered.forEach(function(r){
+      var ret=(r.ret50/50)*hold; // 线性近似
+      rets.push(ret);
+      sum+=ret; max=Math.max(max,ret); min=Math.min(min,ret);
+      if(ret>0) win++;
+      if(r.above_ma250 && (r.rs||0)>0){
+        retsGate.push(ret); sumGate+=ret; cntGate++;
+        if(ret>0) winGate++;
+      }
+    });
+    var avg=sum/total, wr=win/total*100;
+    var avgGate=cntGate?sumGate/cntGate:null, wrGate=cntGate?winGate/cntGate*100:null;
+    var summary='<div style="padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">'+
+      '<div style="font-size:10px;color:var(--dim);margin-bottom:4px;">样本数</div><div style="font-size:20px;font-weight:800;color:var(--txt);">'+total+'</div></div>'+
+      '<div style="padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">'+
+      '<div style="font-size:10px;color:var(--dim);margin-bottom:4px;">胜率</div><div style="font-size:20px;font-weight:800;color:'+(wr>=50?'#22c55e':'#ef4444')+';">'+wr.toFixed(1)+'%</div></div>'+
+      '<div style="padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">'+
+      '<div style="font-size:10px;color:var(--dim);margin-bottom:4px;">平均收益</div><div style="font-size:20px;font-weight:800;color:'+(avg>=0?'#22c55e':'#ef4444')+';">'+avg.toFixed(2)+'%</div></div>'+
+      '<div style="padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">'+
+      '<div style="font-size:10px;color:var(--dim);margin-bottom:4px;">最佳/最差</div><div style="font-size:18px;font-weight:800;color:var(--txt);">'+max.toFixed(1)+'% / '+min.toFixed(1)+'%</div></div>';
+    if(cntGate>0){
+      summary+='<div style="padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">'+
+        '<div style="font-size:10px;color:var(--dim);margin-bottom:4px;">A档硬门禁(年线+RS>0)</div><div style="font-size:18px;font-weight:800;color:#22c55e;">胜'+wrGate.toFixed(1)+'% 均'+avgGate.toFixed(2)+'%</div></div>';
+    }
+    _rps$('strpsBtSummary').innerHTML=summary;
+    // 简单柱状图：按 ret 分桶
+    var bins=[-30,-15,-5,0,5,15,30], counts=bins.map(function(){return 0;});
+    rets.forEach(function(v){
+      if(v<-15) counts[0]++;
+      else if(v<-5) counts[1]++;
+      else if(v<0) counts[2]++;
+      else if(v<5) counts[3]++;
+      else if(v<15) counts[4]++;
+      else if(v<30) counts[5]++;
+      else counts[6]++;
+    });
+    var maxC=Math.max.apply(null,counts)||1;
+    var labels=['<-15','-15~-5','-5~0','0~5','5~15','15~30','>30'];
+    var bars=labels.map(function(l,i){
+      var h=(counts[i]/maxC*100).toFixed(1);
+      var color=i<3?'#ef4444':i<4?'#94a3b8':'#22c55e';
+      return '<div style="display:flex;align-items:flex-end;height:100%;flex-direction:column;justify-content:flex-end;flex:1;margin:0 3px;">'+
+        '<div style="width:100%;height:'+h+'%;background:'+color+';border-radius:4px 4px 0 0;min-height:2px;"></div>'+
+        '<div style="font-size:9px;color:var(--dim);text-align:center;margin-top:4px;white-space:nowrap;">'+l+'</div>'+
+        '<div style="font-size:9px;color:var(--sub);text-align:center;">'+counts[i]+'</div>'+
+      '</div>';
+    }).join('');
+    _rps$('strpsBtCurve').innerHTML='<div style="display:flex;align-items:flex-end;height:150px;padding:10px 20px 0 10px;">'+bars+'</div>';
+  }
+  window.renderRpsBacktest=renderRpsBacktest;
+
   /* ===== 四量终极 · tab 渲染（2026-08-06 主人令·从暂未上架移出） ===== */
   function renderFourVolume(){
     var d = window.FOUR_VOLUME || {};
@@ -9759,6 +9984,8 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   // 选股策略 tab 上的 6 张算法卡（非 query/tc/cockpit/allsite/crds 的都有 lazy render，需要显式激活）
   tryRun('renderFourVolume', (typeof window.renderFourVolume==='function')?window.renderFourVolume:null, 'fv-badge init');
   tryRun('renderV8Crds-st',  (typeof window.renderV8Crds==='function')?function(){window.renderV8Crds('st');}:null, 'crds-badge init');
+  tryRun('renderRpsScreen', (typeof window.renderRpsScreen==='function')?window.renderRpsScreen:null, 'rps init');
+  tryRun('renderRpsBacktest', (typeof window.renderRpsBacktest==='function')?window.renderRpsBacktest:null, 'rps-bt init');
   // 今日事件「今日判定」卡头+内容（脚本块位于 v8CardHeader 定义之前，只能延后到此处渲染）
   tryRun('renderJudgmentHeader', window.__renderJudgmentHeader, 'judgment-header init');
   tryRun('renderJudgmentBody', window.__renderJudgmentBody, 'judgment-body init');
@@ -9894,6 +10121,13 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     (s.sources||[]).forEach(function(src){ h+='<span class="fr-chip src">'+_fe(src)+'</span>'; });
     if(Number(s.sector_score||0)>0){
       h+='<span class="fr-chip" style="background:rgba(251,191,36,.12);color:var(--gold);border-color:rgba(251,191,36,.25)">📊 板块 +'+(s.sector_score||0).toFixed(1)+'</span>';
+    }
+    // 个股 RPS/RS 标签（2026-08-08 新增）
+    var rpsMap=window.__rpsMapByCode||(window.__rpsMapByCode=_buildRpsMap());
+    var rpsRec=rpsMap[(s.code||'')];
+    if(rpsRec && rpsRec.rps_max!=null){
+      var rpsColor=rpsRec.tier==='A'?'#22c55e':rpsRec.tier==='B'?'#3b82f6':'#eab308';
+      h+='<span class="fr-chip" style="background:'+rpsColor+'1a;color:'+rpsColor+';border-color:'+rpsColor+'40">📈 RPS '+rpsRec.rps_max.toFixed(0)+' '+rpsRec.tier+' · RS '+((rpsRec.rs||0)>0?'+':'')+(rpsRec.rs||0).toFixed(1)+'</span>';
     }
     h+='</div>';
 
