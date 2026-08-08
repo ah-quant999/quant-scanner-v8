@@ -13,6 +13,7 @@ v8 臃肿度与崩溃风险巡检（周末体检）
   python v8_bloat_check.py --alert   # 有严重风险时发送邮件
 """
 import argparse
+import html.parser
 import json
 import os
 import re
@@ -96,14 +97,36 @@ def check_lines(text):
     return [{"name": "index.html 行数", "status": status, "message": msg, "metric": lines}]
 
 
+class _ScriptCounter(html.parser.HTMLParser):
+    """用浏览器同款 HTML 解析统计 <script>/</script>，天然忽略注释与 script 内容里的字样。"""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=False)
+        self.opens = 0
+        self.closes = 0
+
+    def handle_starttag(self, tag, attrs):
+        if tag.lower() == "script":
+            self.opens += 1
+
+    def handle_endtag(self, tag):
+        if tag.lower() == "script":
+            self.closes += 1
+
+
 def check_script_balance(text):
-    """检查 <script> 与 </script> 是否成对，并统计 script 块数。"""
-    opens = [m.start() for m in re.finditer(r"<script[\s>]|<script\s", text, re.I)]
-    closes = [m.start() for m in re.finditer(r"</script\s*>", text, re.I)]
+    """检查 <script> 与 </script> 是否成对，并统计 script 块数。
+
+    用 HTMLParser 而非正则计数：JS 注释里的 '<script>' 字样（如
+    "// 在后续 <script> 块里定义"）不会污染统计。
+    """
+    counter = _ScriptCounter()
+    counter.feed(text)
+    opens, closes = counter.opens, counter.closes
     status = "ok"
-    msg = f"{len(opens)} 个 <script> 块，{len(closes)} 个 </script>"
-    metric = {"opens": len(opens), "closes": len(closes)}
-    if len(opens) != len(closes):
+    msg = f"{opens} 个 <script> 块，{closes} 个 </script>"
+    metric = {"opens": opens, "closes": closes}
+    if opens != closes:
         status = "fail"
         msg += "；SCRIPT 标签未配对，可能导致页面崩溃"
     return [{"name": "script 标签平衡", "status": status, "message": msg, "metric": metric}]
