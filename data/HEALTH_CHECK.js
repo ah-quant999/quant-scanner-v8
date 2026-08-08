@@ -1,5 +1,5 @@
 window.HEALTH_CHECK = {
-  "updated": "2026-08-08 23:59:49",
+  "updated": "2026-08-09 00:02:40",
   "overall": "ok",
   "summary": {
     "ok": 32,
@@ -15,8 +15,8 @@ window.HEALTH_CHECK = {
       "freq": "每周日+月末",
       "status": "ok",
       "last_update": "2026-08-08 16:46:04",
-      "age_min": 433.7,
-      "message": "更新于 今日 16:46"
+      "age_min": 435.1,
+      "message": "更新于 昨日 16:46"
     },
     {
       "id": "IPO_DATA",
@@ -25,8 +25,8 @@ window.HEALTH_CHECK = {
       "freq": "每日盘前",
       "status": "ok",
       "last_update": "2026-08-08 16:41:31",
-      "age_min": 438.3,
-      "message": "更新于 今日 16:41"
+      "age_min": 439.6,
+      "message": "更新于 昨日 16:41"
     },
     {
       "id": "JUDGMENT_DATA",
@@ -35,8 +35,8 @@ window.HEALTH_CHECK = {
       "freq": "每日盘前",
       "status": "ok",
       "last_update": "2026-08-08 16:46:16",
-      "age_min": 433.5,
-      "message": "更新于 今日 16:46"
+      "age_min": 434.9,
+      "message": "更新于 昨日 16:46"
     },
     {
       "id": "MACRO_DATA",
@@ -45,8 +45,8 @@ window.HEALTH_CHECK = {
       "freq": "每日盘前",
       "status": "ok",
       "last_update": "2026-08-08 16:42:20",
-      "age_min": 437.5,
-      "message": "更新于 今日 16:42"
+      "age_min": 438.8,
+      "message": "更新于 昨日 16:42"
     },
     {
       "id": "NT_DATA",
@@ -55,8 +55,8 @@ window.HEALTH_CHECK = {
       "freq": "每日盘前",
       "status": "ok",
       "last_update": "2026-08-08 13:42",
-      "age_min": 617.8,
-      "message": "更新于 今日 13:42"
+      "age_min": 619.2,
+      "message": "更新于 昨日 13:42"
     },
     {
       "id": "INDEX_QUOTES",
@@ -65,8 +65,8 @@ window.HEALTH_CHECK = {
       "freq": "盘中每30分",
       "status": "ok",
       "last_update": "2026-08-08 16:39:18",
-      "age_min": 440.5,
-      "message": "更新于 今日 16:39"
+      "age_min": 441.9,
+      "message": "更新于 昨日 16:39"
     },
     {
       "id": "ETF_PULSE",
@@ -75,8 +75,8 @@ window.HEALTH_CHECK = {
       "freq": "盘中实时",
       "status": "ok",
       "last_update": "2026-08-08 16:45:12",
-      "age_min": 434.6,
-      "message": "更新于 今日 16:45"
+      "age_min": 436.0,
+      "message": "更新于 昨日 16:45"
     },
     {
       "id": "ETF_INTRADAY_HEAT",
@@ -85,8 +85,8 @@ window.HEALTH_CHECK = {
       "freq": "盘中实时 T+0",
       "status": "ok",
       "last_update": "2026-08-08 16:39:11",
-      "age_min": 440.6,
-      "message": "更新于 今日 16:39"
+      "age_min": 442.0,
+      "message": "更新于 昨日 16:39"
     },
     {
       "id": "ETF_DAILY_MONITOR",
@@ -95,8 +95,8 @@ window.HEALTH_CHECK = {
       "freq": "盘中每30分",
       "status": "ok",
       "last_update": "2026-08-08 16:45:51",
-      "age_min": 433.9,
-      "message": "更新于 今日 16:45"
+      "age_min": 435.3,
+      "message": "更新于 昨日 16:45"
     },
     {
       "id": "SECTOR_FUND_FLOW",
@@ -105,8 +105,8 @@ window.HEALTH_CHECK = {
       "freq": "盘中每30分",
       "status": "ok",
       "last_update": "2026-08-08 16:39:16",
-      "age_min": 440.5,
-      "message": "更新于 今日 16:39"
+      "age_min": 441.9,
+      "message": "更新于 昨日 16:39"
     },
     {
       "id": "CONCEPT_RANKING",
@@ -115,8 +115,8 @@ window.HEALTH_CHECK = {
       "freq": "盘中每30分",
       "status": "ok",
       "last_update": "2026-08-08 16:39:19",
-      "age_min": 440.5,
-      "message": "更新于 今日 16:39"
+      "age_min": 441.9,
+      "message": "更新于 昨日 16:39"
     },
     {
       "id": "LIMIT_UP_HEATMAP",
@@ -125,8 +125,8 @@ window.HEALTH_CHECK = {
       "freq": "盘中每30分",
       "status": "ok",
       "last_update": "2026-08-08 16:42:53",
-      "age_min": 436.9,
-      "message": "更新于 今日 16:42"
+      "age_min": 438.3,
+      "message": "更新于 昨日 16:42"
     },
     {
       "id": "MARKET_FUND_FLOW_DATA",
@@ -135,8 +135,8 @@ window.HEALTH_CHECK = {
       "freq": "盘中每30分",
       "status": "ok",
       "last_update": "2026-08-08 16:44:32",
-      "age_min": 435.3,
-      "message": "更新于 今日 16:44"
+      "age_min": 436.6,
+      "message": "更新于 昨日 16:44"
     },
     {
       "id": "MARKET_ALERTS",
@@ -145,8 +145,8 @@ window.HEALTH_CHECK = {
       "freq": "盘中实时",
       "status": "ok",
       "last_update": "2026-08-08 16:47:29",
-      "age_min": 432.3,
-      "message": "更新于 今日 16:47"
+      "age_min": 433.7,
+      "message": "更新于 昨日 16:47"
     },
     {
       "id": "SH_FIB",
@@ -155,8 +155,8 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-07 17:14",
-      "age_min": 1845.8,
-      "message": "更新于 昨日 17:14"
+      "age_min": 1847.2,
+      "message": "更新于 2天前 17:14"
     },
     {
       "id": "MARGIN_DATA",
@@ -165,8 +165,8 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-08 10:53:59",
-      "age_min": 785.8,
-      "message": "更新于 今日 10:53"
+      "age_min": 787.2,
+      "message": "更新于 昨日 10:53"
     },
     {
       "id": "CFFEX_HOLDINGS",
@@ -175,8 +175,8 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-08 16:41:34",
-      "age_min": 438.2,
-      "message": "更新于 今日 16:41"
+      "age_min": 439.6,
+      "message": "更新于 昨日 16:41"
     },
     {
       "id": "CRISIS_DATA",
@@ -185,8 +185,8 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-08 16:42:50",
-      "age_min": 437.0,
-      "message": "更新于 今日 16:42"
+      "age_min": 438.3,
+      "message": "更新于 昨日 16:42"
     },
     {
       "id": "MARKET_FUND_FLOW_DATA",
@@ -195,8 +195,8 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-08 16:44:32",
-      "age_min": 435.3,
-      "message": "更新于 今日 16:44"
+      "age_min": 436.6,
+      "message": "更新于 昨日 16:44"
     },
     {
       "id": "CANDIDATE",
@@ -205,8 +205,8 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-07 17:18:10",
-      "age_min": 1841.6,
-      "message": "更新于 昨日 17:18"
+      "age_min": 1843.0,
+      "message": "更新于 2天前 17:18"
     },
     {
       "id": "GOLD_POOL",
@@ -215,8 +215,8 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-08 15:27:50",
-      "age_min": 512.0,
-      "message": "更新于 今日 15:27"
+      "age_min": 513.3,
+      "message": "更新于 昨日 15:27"
     },
     {
       "id": "LHB_DATA",
@@ -225,8 +225,8 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-07 17:15:25",
-      "age_min": 1844.4,
-      "message": "更新于 昨日 17:15"
+      "age_min": 1845.8,
+      "message": "更新于 2天前 17:15"
     },
     {
       "id": "INST_TRADE",
@@ -235,8 +235,8 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-07 17:14:08",
-      "age_min": 1845.7,
-      "message": "更新于 昨日 17:14"
+      "age_min": 1847.0,
+      "message": "更新于 2天前 17:14"
     },
     {
       "id": "TRIPLE_CONSENSUS",
@@ -245,8 +245,8 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "warn",
       "last_update": "2026-08-08 15:26:55",
-      "age_min": 512.9,
-      "message": "更新于 今日 15:26；关键字段空值：stocks"
+      "age_min": 514.3,
+      "message": "更新于 昨日 15:26；关键字段空值：stocks"
     },
     {
       "id": "FOUR_VOLUME",
@@ -255,8 +255,8 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-08 11:05:19",
-      "age_min": 774.5,
-      "message": "更新于 今日 11:05"
+      "age_min": 775.9,
+      "message": "更新于 昨日 11:05"
     },
     {
       "id": "raw_etf_pulse.json",
@@ -298,7 +298,7 @@ window.HEALTH_CHECK = {
       "name": "Pages 部署同步",
       "page": "管线",
       "status": "ok",
-      "message": "本地 HEAD f030ba9 / 线上 ec16645 已同步（落后 ≤5 commit，Pages 异步部署正常）"
+      "message": "本地 HEAD 24daefd / 线上 24daefd 已同步"
     },
     {
       "id": "runner",
@@ -312,7 +312,7 @@ window.HEALTH_CHECK = {
       "name": "本地与 origin/main 同步",
       "page": "管线",
       "status": "ok",
-      "message": "本地 f030ba9 / origin/main f030ba9 同步"
+      "message": "本地 24daefd / origin/main 24daefd 同步"
     }
   ]
 };
