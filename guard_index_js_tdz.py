@@ -28,6 +28,18 @@ KW = {'if', 'for', 'while', 'switch', 'catch', 'return', 'function', 'typeof',
       'new', 'await', 'else', 'do', 'try', 'delete', 'void', 'in', 'of', 'yield'}
 
 
+def _strip_comments(code):
+    """把 JS 注释替换为空格（保持字符/行位置不变），避免注释里的函数名被误识别为调用。
+    注意：为简化实现，字符串内部的 // 也会被替换，但这不会导致漏报真正的函数调用。"""
+    # 1) /* ... */ 块注释：替换为等长空格，保留内部换行符以保持行号
+    def repl_block(m):
+        return ''.join(' ' if c != '\n' else c for c in m.group(0))
+    code = re.sub(r'/\*.*?\*/', repl_block, code, flags=re.S)
+    # 2) // 行注释：从 // 到行尾替换为空格
+    code = re.sub(r'//[^\n]*', lambda m: ' ' * len(m.group(0)), code)
+    return code
+
+
 def scan(path='index.html'):
     src = open(path, encoding='utf-8').read()
     lines = src.split('\n')
@@ -55,7 +67,8 @@ def scan(path='index.html'):
 
     risks, guarded = [], []
     for bi, (boff, code) in enumerate(blocks):
-        for m in re.finditer(r'(' + ID + r')\s*\(', code):
+        code_no_comments = _strip_comments(code)
+        for m in re.finditer(r'(' + ID + r')\s*\(', code_no_comments):
             n = m.group(1)
             if n in KW or n not in defs:
                 continue
