@@ -5024,13 +5024,6 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
   </div>
 </div>
 
-<!-- 连板首板展开 modal -->
-<div class="mask" id="lbMask" onclick="if(event.target===this)closeLb()">
-  <div class="modal" style="max-width:680px">
-    <h3><span id="lbTitle"></span><span class="close" onclick="closeLb()">×</span></h3>
-    <div id="lbBody"></div>
-  </div>
-</div>
 
 <!-- 管理员锁 -->
 <div class="lockmask" id="lockMask">
@@ -5080,20 +5073,6 @@ function refreshAdminUI(){
 }
 refreshAdminUI();
 
-/* ===== 连板首板展开弹窗 ===== */
-function showLbModal(title, names){
-  var body = document.getElementById('lbBody');
-  var t = document.getElementById('lbTitle');
-  if(!body || !t) return;
-  t.textContent = title + '（共' + names.length + '只）';
-  var html = '';
-  names.forEach(function(n){
-    html += '<div style="padding:4px 6px;background:rgba(255,255,255,.05);border-radius:4px;color:var(--text);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+n+'">'+n+'</div>';
-  });
-  body.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px">' + html + '</div>';
-  document.getElementById('lbMask').classList.add('show');
-}
-function closeLb(){ document.getElementById('lbMask').classList.remove('show'); }
 
 /* ===== 板块切换 ===== */
 function switchSec(sec,el){
@@ -9013,7 +8992,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       html += '<span style="font-size:18px;font-weight:900;color:'+m.c+'">'+m.v+'<span style="font-size:11px;font-weight:700;margin-left:1px">'+m.u+'</span></span></div>';
     });
     html += '</div>';
-    // 连板分布：每行显示「连板标签 共N只」+ 股票名网格；首板用12只/行平铺
+    // 连板分布：每行显示「连板标签 共N只」+ 股票名网格；首板用10只/行平铺
     if(lh.update_time && Object.keys(ladder).length){
       var lbcKeys = Object.keys(ladder).sort(function(a,b){return parseInt(b)-parseInt(a);});
       var lbMap = {};
@@ -9037,12 +9016,12 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         html += '<div style="font-size:11px;color:var(--dim)">共'+(isFirst?lhbUniq.length:v)+'只</div>';
         html += '</div>';
         if(isFirst){
-          // 首板：12只/行全部平铺，不折叠（数据来自 LHB_DATA.stocks）
+          // 首板：10只/行全部平铺，不折叠；代码完整显示（数据来自 LHB_DATA.stocks）
           html += '<div style="flex:1;">';
           if(lhbUniq.length){
-            html += '<div style="display:grid;grid-template-columns:repeat(12, 1fr);gap:5px 6px;">';
+            html += '<div style="display:grid;grid-template-columns:repeat(10, minmax(0,1fr));gap:5px 6px;">';
             lhbUniq.forEach(function(s){
-              html += '<span style="font-size:11px;color:var(--text);background:var(--card2);padding:3px 5px;border-radius:4px;border:1px solid var(--border2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center;" title="'+s.name+' '+s.code+'">'+s.name+' <span style="color:var(--dim);font-size:10px">'+s.code+'</span></span>';
+              html += '<span style="font-size:11px;color:var(--text);background:var(--card2);padding:3px 5px;border-radius:4px;border:1px solid var(--border2);white-space:nowrap;overflow:visible;text-overflow:clip;text-align:center;" title="'+s.name+' '+s.code+'">'+s.name+' <span style="color:var(--dim);font-size:10px;letter-spacing:-0.2px;">'+s.code+'</span></span>';
             });
             html += '</div>';
           }
