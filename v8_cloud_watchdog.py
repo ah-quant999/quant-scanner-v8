@@ -258,13 +258,23 @@ def check_raw_data_stale(threshold_min=90):
 
 
 def check_site():
-    try:
-        req = urllib.request.Request(SITE_URL, method="HEAD")
-        with urllib.request.urlopen(req, timeout=15) as r:
-            code = r.status
-            return code == 200, f"site HTTP {code}"
-    except Exception as e:
-        return False, f"site unreachable: {e}"
+    """检查站点可达性（带 retry 吸收瞬时抖动）。"""
+    import time as _time
+    max_retries = 2
+    last_err = None
+    for attempt in range(max_retries + 1):
+        try:
+            req = urllib.request.Request(SITE_URL, method="HEAD")
+            with urllib.request.urlopen(req, timeout=15) as r:
+                code = r.status
+                if code == 200:
+                    return True, f"site HTTP {code}"
+                last_err = f"HTTP {code}"
+        except Exception as e:
+            last_err = e
+        if attempt < max_retries:
+            _time.sleep(3)
+    return False, f"site unreachable (已重试{max_retries}次): {last_err}"
 
 
 def choose_category(now_cst):

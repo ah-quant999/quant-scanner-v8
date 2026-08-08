@@ -179,6 +179,31 @@ def api_get(url):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# 带 retry 的 urlopen：吸收 GitHub Pages 瞬时 SSL/网络抖动，避免误报邮件
+# ─────────────────────────────────────────────────────────────────────────────
+SITE_MAX_RETRIES = 2       # 首次 + 最多重试 2 次
+_SITE_RETRY_DELAY_SEC = 3   # 重试间隔（秒）
+
+
+def _urlopen_retry(req_or_url, timeout=15, max_retries=None):
+    """带重试的 urlopen，返回 (response_bytes, None) 或 (None, error_str)。
+    用于 site 检测等对外请求，吸收瞬时抖动。"""
+    import time as _time
+    retries = max_retries or SITE_MAX_RETRIES
+    last_err = None
+    for attempt in range(retries + 1):
+        try:
+            with urllib.request.urlopen(req_or_url, timeout=timeout) as r:
+                return r.read(), None
+        except Exception as e:
+            last_err = e
+            if attempt < retries:
+                print(f"[RETRY] site urlopen 第{attempt+1}次失败({type(e).__name__})，{_SITE_RETRY_DELAY_SEC}s后重试...")
+                _time.sleep(_SITE_RETRY_DELAY_SEC)
+    return None, str(last_err)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # 自愈（detect-and-heal）：发现可修复的数据陈腐，主动派发对应类别刷新，而非只发邮件
 # ─────────────────────────────────────────────────────────────────────────────
 CN_WORKFLOW_ID = 324135267  # v8_cn_fetch workflow id（用于 API 派发刷新）
@@ -450,11 +475,14 @@ def check_site_deploy_sync():
     except Exception as e:
         return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "warn", "message": f"无法获取本地 HEAD: {e}"}]
 
-    # 线上站点 meta
+    # 线上站点 meta（带 retry 吸收瞬时抖动）
     try:
         req = urllib.request.Request(SITE_URL, headers={"User-Agent": "v8-health-check"})
-        with urllib.request.urlopen(req, timeout=15) as r:
-            html = r.read().decode("utf-8", "replace")
+        html_bytes, err = _urlopen_retry(req, timeout=15)
+        if err:
+            return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "warn",
+                     "message": f"站点不可达（已重试{SITE_MAX_RETRIES}次）: {err}"}]
+        html = html_bytes.decode("utf-8", "replace")
     except Exception as e:
         return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "fail", "message": f"站点不可达: {e}"}]
 
@@ -516,8 +544,11 @@ def check_site_dom(site_html=None):
     if site_html is None:
         try:
             req = urllib.request.Request(SITE_URL, headers={"User-Agent": "v8-health-check"})
-            with urllib.request.urlopen(req, timeout=15) as r:
-                site_html = r.read().decode("utf-8", "replace")
+            html_bytes, err = _urlopen_retry(req, timeout=15)
+            if err:
+                return [{"id": "dom_check", "name": "线上 DOM 空值检测", "page": "管线", "status": "warn",
+                         "message": f"拉取页面失败（已重试{SITE_MAX_RETRIES}次）: {err}"}]
+            site_html = html_bytes.decode("utf-8", "replace")
         except Exception as e:
             return [{"id": "dom_check", "name": "线上 DOM 空值检测", "page": "管线", "status": "warn", "message": f"拉取页面失败: {e}"}]
 
