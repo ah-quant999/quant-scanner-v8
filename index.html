@@ -4205,7 +4205,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <div class="card">
       <h3><span class="ic">💾</span>数据新鲜度 <span class="fresh" style="font-size:10px;color:var(--dim)">[动态]</span></h3>
       <table><thead><tr><th>文件</th><th>最后更新</th><th>状态</th></tr></thead><tbody id="freshnessTbody">
-        <tr id="freshRowCandidate"><td>盘后扫描</td><td id="freshTimeCandidate">--</td><td id="freshStatusCandidate"><span class="status-dot s-warn"></span>待扫描</td></tr>
+        <tr id="freshRowCandidate"><td>🧭 候选股池 <span style="font-size:10px;color:var(--dim)">(来源级)</span></td><td id="freshTimeCandidate">--</td><td id="freshStatusCandidate"><span class="status-dot s-warn"></span>待扫描</td></tr>
+        <tr id="freshRowCandidateSrc" style="display:none"><td colspan="3" id="freshCandidateSources"></td></tr>
         <tr id="freshRowGold"><td>黄金池</td><td id="freshTimeGold">--</td><td id="freshStatusGold"><span class="status-dot s-warn"></span>待扫描</td></tr>
         <tr id="freshRowConcept"><td>概念映射</td><td id="freshTimeConcept">--</td><td id="freshStatusConcept"><span class="status-dot s-warn"></span>待扫描</td></tr>
       </tbody></table>
@@ -4763,6 +4764,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">A=+40 / B=+5 / C=0 / D=-10。A档阈值已对齐真实上限 70 分。</div>
         <div class="logic-h">名字清洗（防研报/新闻稿污染名）</div>
         <div class="logic-p">候选池名字优先东财权威名 &gt; 通达信名字 &gt; raw 干净名 &gt; 代码兜底；容忍港股 -W/-S/-R 双重上市后缀。</div>
+        <div class="logic-h">来源级监控（2026-08-08 新增）</div>
+        <div class="logic-p">候选股池是下游金股池/评分/CRDS/四量终极等全部算法的<b>唯一输入宇宙</b>，其健康度直接影响全站结论可靠性。监控分两层：<br>· <b>night_watchdog.py --health</b>：每次巡检读取 candidate.json，拆分六大来源数量。成交额TOP三板任一&lt;80只→WARNING、=0→CRITICAL；港股/观澜台=0降级为WARNING（云端可能天然缺失）。同时检测垃圾名污染。<br>· <b>运维面板数据新鲜度</b>：CANDIDATE 行下方展示六来源彩色标签（✓绿/⚠黄/✗红），一目了然哪个来源异常。HEALTH_CHECK.js 整体条目仅反映 update_time，不拆分来源——来源级状态以上述两处为准。<br>· <b>正常基线</b>：主板≈97-100 / 创业板=100 / 科创板=100 / maharo≈10-20；港股0-50（依赖akshare可用性）；观澜台0-N（依赖外部JSON更新）。三板合计≥280视为健康。</div>
       </div>
 
       <div class="card">
@@ -4883,6 +4886,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p">v8_safety_net 每30分钟检查 raw_data 最新 commit，超过阈值自动 dispatch cn_fetch 全量兜底；阈值当前为1小时（方案B严格版待生效）。</div>
         <div class="logic-h">本机闸门</div>
         <div class="logic-p">v8_cloud_watchdog.py 核对核心 data/*.js 的 update_time，raw_data 超过90分钟无新 commit 即 ALERT；本机只告警/汇报，不自动覆盖数据。</div>
+        <div class="logic-h">候选股池来源级监控（2026-08-08 新增）</div>
+        <div class="logic-p">候选股池是全站算法链的<b>上游水源</b>（金股/CRDS/四量/评分全部从它取股）。除整体 update_time 外，新增来源级监控：<br>· <b>night_watchdog.py</b> 每次巡检拆分六大来源数量，成交额TOP三板归零→🔴CRITICAL、&lt;80%→⚠️WARNING；港股/观澜台归零→⚠️降级（云端可能天然缺失）。<br>· <b>运维面板数据新鲜度表格</b> CANDIDATE 行下方展示六来源彩色标签行，实时反映各源健康状态。<br>· <b>正常基线</b>：三板合计≥280只（主板97-100+创业100+科创100），maharo≥10只。低于此基线需排查 mootdx/akshare 是否挂了。</div>
       </div>
 
       <div class="card">
@@ -9513,6 +9518,30 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       statusEl.innerHTML = '<span class="status-dot '+cls+'"></span>'+txt;
     }
     setRow('Candidate', map['CANDIDATE']);
+    // 候选股池来源级子行（六大来源各自数量+颜色状态）
+    (function(){
+      var cand = window.CANDIDATE || {};
+      var sd = cand.source_dist || {};
+      var srcEl = document.getElementById('freshCandidateSources');
+      var rowEl = document.getElementById('freshRowCandidateSrc');
+      if(!srcEl || !rowEl) return;
+      var order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','观澜台','maharo研报'];
+      var expect = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50};
+      var html = '<div style="display:flex;flex-wrap:wrap;gap:4px 12px;padding:4px 0;font-size:11px;">';
+      order.forEach(function(s){
+        var cnt = sd[s]||0;
+        var exp = expect[s]||null;
+        var color, icon;
+        if(cnt === 0){ color = s==='港股成交前50'||s==='观澜台' ? '#f59e0b' : '#ef4444'; icon = '✗'; }
+        else if(exp && cnt < exp * 0.8){ color = '#f59e0b'; icon = '⚠'; }
+        else { color = '#22c55e'; icon = '✓'; }
+        var label = s.replace(/成交前\d+|研报/,'');
+        html += '<span title="'+s+'：'+cnt+'只'+(exp?'(期望≥'+exp+')':'')+'" style="background:'+color+'15;color:'+color+';border:1px solid '+color+'30;border-radius:4px;padding:2px 7px;white-space:nowrap">'+icon+' '+label+' '+cnt+'</span>';
+      });
+      html += '<span style="color:var(--dim);margin-left:auto">共 '+(cand.total||0)+' 只</span></div>';
+      srcEl.innerHTML = html;
+      rowEl.style.display = '';
+    })();
     setRow('Gold', map['GOLD_POOL']);
     // 概念映射：优先用概念排名，回退板块资金流
     setRow('Concept', map['CONCEPT_RANKING'] || map['SECTOR_FUND_FLOW']);
