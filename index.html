@@ -622,13 +622,14 @@ function __judgmentCandidatesHTML(){
   var raw = [];
   function _push(s){ if(s && s.code) raw.push(s); }
 
-  // 1) 三重共识
+  // 1) 三重共识（短线事件/共识驱动）
   (window.TRIPLE_CONSENSUS && window.TRIPLE_CONSENSUS.stocks || []).forEach(function(s){
     _push({
       code:s.code, name:s.name, market:(s.market||'sh'), board:(s.board||''),
       src:'三重共识', srcEmoji:'🥇', srcColor:'var(--purple)',
       score:+((s.total_score!=null?s.total_score:s.score)||0),
       buyScore:+((s.total_score!=null?s.total_score:s.score)||0),
+      horizon:'短线',
       close:s.close, pct:s.pct_chg,
       stopLoss:s.stop_loss, targetPrice:s.target_price,
       industry:s.industry||'', concepts:(s.concepts||[]).slice(0,4),
@@ -638,14 +639,25 @@ function __judgmentCandidatesHTML(){
     });
   });
 
-  // 2) 驾驶舱 A 档
+  // 2) 驾驶舱 A 档（中长线趋势质量）
   (window.COCKPIT_TIER_RECOMMEND && window.COCKPIT_TIER_RECOMMEND.tier_a || []).forEach(function(s){
     var isHk = (s.market||'') === '港股';
+    var tech = +((s.tech_score)||0);
+    var qs = +((s.quality_score)||0);
+    var rsi = +(s.rsi || 0);
+    var ret20 = +(s.ret20 || 0);
+    var ema = +(s.ema || 0);
+    // 港股/缺失基本面时 quality_score=0，total_score 全为 tech_score 容易扎堆 60；
+    // 用 rsi/ret20/ema 做微小增量打散，保留 0~100 区间。
+    var adjustedScore = qs > 0
+      ? (tech + qs)
+      : Math.min(100, tech + Math.max(0, 68-rsi)*0.25 + Math.max(0, 35-ret20)*0.15 + ema*0.35);
     _push({
       code:s.code, name:s.name, market:isHk?'hk':(s.market||'sh'), board:isHk?'港股':(s.board||''),
       src:'驾驶舱A档', srcEmoji:'🎯', srcColor:'#ffd54f',
-      score:+((s.total_score!=null?s.total_score:s.tech_score)||0),
-      buyScore:+((s.total_score!=null?s.total_score:s.tech_score)||0),
+      score:adjustedScore,
+      buyScore:adjustedScore,
+      horizon:'中长线',
       close:null, pct:null,
       stopLoss:null, targetPrice:null,
       industry:'', concepts:[],
@@ -655,7 +667,7 @@ function __judgmentCandidatesHTML(){
     });
   });
 
-  // 3) 四量终极（QD 共振）
+  // 3) 四量终极（QD 共振，短线量能突破）
   (window.FOUR_VOLUME && window.FOUR_VOLUME.stocks || []).forEach(function(s){
     var comp = s.components || {};
     var trueCount = Object.keys(comp).filter(function(k){return comp[k];}).length;
@@ -664,12 +676,13 @@ function __judgmentCandidatesHTML(){
       src:'四量终极', srcEmoji:'🔥', srcColor:'#ff7043',
       score:trueCount,
       buyScore:trueCount/7*100,
+      horizon:'短线',
       close:s.close, pct:s.pct_chg,
       stopLoss:null, targetPrice:null,
       industry:'', concepts:[],
       reason:s.reason || '',
       enterDate:s.enter_date,
-      worth: !!s.qd && trueCount >= 4
+      worth: !!s.qd && trueCount >= 5
     });
   });
 
@@ -758,11 +771,11 @@ function __judgmentCandidatesHTML(){
     return 'padding:1px 7px;border-radius:999px;background:'+bg+';border:1px solid '+bd+';color:'+clr+';font-weight:600;white-space:nowrap';
   };
   var stepsHTML = '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;padding:6px 8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;font-size:11px;line-height:1.5;">'
-    + '<span style="font-weight:700;color:var(--sub);white-space:nowrap">决策四步</span>'
+    + '<span style="font-weight:700;color:#ffffff;white-space:nowrap">决策四步</span>'
     + steps.map(function(s){ return '<span style="'+pillStyle(s.ok,'step')+'">'+s.name+' '+(s.ok?'✅':'⚠️')+' '+s.detail+'</span>'; }).join('')
     + '</div>';
   var rulesHTML = '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px;padding:6px 8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;font-size:11px;line-height:1.5;">'
-    + '<span style="font-weight:700;color:#ef4444;white-space:nowrap">三不原则</span>'
+    + '<span style="font-weight:700;color:#ffffff;white-space:nowrap">三不原则</span>'
     + rules.map(function(r){ return '<span style="'+pillStyle(r.ok,'rule')+'">'+(r.ok?'✅':'❌')+' '+r.t+'</span>'; }).join('')
     + '</div>';
 
@@ -781,7 +794,7 @@ function __judgmentCandidatesHTML(){
   }
   function _mkTag(text,cls){ return '<span class="tp-tag '+cls+'">'+text+'</span>'; }
 
-  var lines = list.map(function(s){
+  function _renderStock(s){
     var pctColor = s.pct==null ? 'var(--dim)' : (s.pct>=0?'var(--up)':'var(--down)');
     var pctText = s.pct==null ? '' : ((s.pct>=0?'+':'')+Number(s.pct).toFixed(2)+'%');
     var priceText = s.close==null ? '' : '¥'+Number(s.close).toFixed(2);
@@ -844,21 +857,40 @@ function __judgmentCandidatesHTML(){
       + sectorLine
       + plan
       + '</div>';
-  });
-
-  var showLines = lines.slice(0, 10);
-  var moreLines = lines.slice(10);
-  var expandId = 'tpCandExpand_' + Math.random().toString(36).slice(2, 8);
-  var listHTML = '<div class="tp-stocklist">' + showLines.join('') + '</div>';
-  if(moreLines.length){
-    listHTML += '<div id="' + expandId + '_more" style="display:none;" class="tp-stocklist">' + moreLines.join('') + '</div>'
-      + '<div style="margin-top:10px;text-align:center;">'
-      + '<button onclick="var el=document.getElementById(\'' + expandId + '_more\'); el.style.display=(el.style.display===\'none\'?\'block\':\'none\'); this.textContent=(el.style.display===\'none\'?\'+' + moreLines.length + ' 只 · 展开\':\'收起\')" '
-      + 'style="cursor:pointer;font-size:12px;font-weight:700;color:#38bdf8;background:rgba(56,189,248,.10);border:1px solid rgba(56,189,248,.25);border-radius:6px;padding:4px 10px;">+' + moreLines.length + ' 只 · 展开</button>'
-      + '</div>';
   }
 
-  return '<div style="font-size:13px;font-weight:700;color:var(--up);margin-bottom:4px">🎯 今日可入手候选 '+list.length+' 只</div>'
+  function _renderColumn(items, title, emoji, color){
+    if(!items.length){
+      return '<div style="padding:10px 0;text-align:center;color:var(--dim);font-size:12px">'+emoji+' '+title+'：暂无</div>';
+    }
+    var show = items.slice(0, 6);
+    var more = items.slice(6);
+    var expandId = 'tpCandExpand_' + title + '_' + Math.random().toString(36).slice(2, 8);
+    var html = '<div class="tp-stocklist">' + show.map(_renderStock).join('') + '</div>';
+    if(more.length){
+      html += '<div id="' + expandId + '_more" style="display:none;" class="tp-stocklist">' + more.map(_renderStock).join('') + '</div>'
+        + '<div style="margin-top:8px;text-align:center;">'
+        + '<button onclick="var el=document.getElementById(\'' + expandId + '_more\'); el.style.display=(el.style.display===\'none\'?\'block\':\'none\'); this.textContent=(el.style.display===\'none\'?\'+' + more.length + ' 只 · 展开\':\'收起\')" '
+        + 'style="cursor:pointer;font-size:11px;font-weight:700;color:'+color+';background:'+color+'14;border:1px solid '+color+'30;border-radius:6px;padding:3px 8px;">+' + more.length + ' 只 · 展开</button>'
+        + '</div>';
+    }
+    return html;
+  }
+
+  var shortList = list.filter(function(s){ return s.horizon === '短线'; });
+  var longList  = list.filter(function(s){ return s.horizon === '中长线'; });
+  var listHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">'
+    + '<div>'
+    + '<div style="font-size:12px;font-weight:800;color:#38bdf8;margin-bottom:6px;display:flex;align-items:center;gap:4px;">⚡ 短线候选 <span style="font-size:11px;font-weight:600;color:var(--dim)">('+shortList.length+')</span></div>'
+    + _renderColumn(shortList, '短线候选', '⚡', '#38bdf8')
+    + '</div>'
+    + '<div>'
+    + '<div style="font-size:12px;font-weight:800;color:#22c55e;margin-bottom:6px;display:flex;align-items:center;gap:4px;">🌿 中长线候选 <span style="font-size:11px;font-weight:600;color:var(--dim)">('+longList.length+')</span></div>'
+    + _renderColumn(longList, '中长线候选', '🌿', '#22c55e')
+    + '</div>'
+    + '</div>';
+
+  return '<div style="font-size:13px;font-weight:700;color:var(--up);margin-bottom:4px">🎯 今日可入手候选 '+list.length+' 只（短线'+shortList.length+' · 中长线'+longList.length+'）</div>'
     + stepsHTML
     + rulesHTML
     + '<div style="margin:6px 0 10px 0;padding:8px 10px;background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.25);border-radius:8px;font-size:12px;line-height:1.6;">'
