@@ -110,10 +110,21 @@ def main():
             print("⚠️ 关键容器 id=%s 缺失（概念热力图）" % cid)
             ok = False
 
+    # 体积上限校验（防巨型化复发）
+    _fsize = os.path.getsize(INDEX)
+    if _fsize > MAX_INDEX_BYTES:
+        print("❌ index.html 体积超标（%d 字节 / %.1f MB > 阈值 %.1f MB）！"
+              % (_fsize, _fsize / 1048576.0, MAX_INDEX_BYTES / 1048576.0))
+        print("   可能原因：data/*.js 被内联回 index.html。请检查构建流程，确保数据外置。")
+        ok = False
+    else:
+        print("✅ 体积正常（%d 字节 / %.1f MB，上限 %.1f MB）"
+              % (_fsize, _fsize / 1048576.0, MAX_INDEX_BYTES / 1048576.0))
+
     if not ok:
-        print("🚫 护栏失败：关键板块缺失/清空，已阻断部署。请先修复再推送。")
+        print("🚫 护栏失败：关键板块缺失/清空或体积超标，已阻断部署。请先修复再推送。")
         sys.exit(1)
-    print("✅ 护栏通过：关键板块齐全，允许部署。")
+    print("✅ 护栏通过：关键板块齐全且体积正常，允许部署。")
     sys.exit(0)
 
 

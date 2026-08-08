@@ -1042,6 +1042,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/MAHORO.js?v=20260808152750"></script>
 <script src="data/CANDIDATE.js?v=20260807171810"></script>
     <script src="data/FOUR_VOLUME.js?v=20260808223102"></script>
+    <script src="data/FOUR_VOLUME_60M.js?v=20260808223102"></script>
     <script src="data/STOCK_STOP_DATA.js?v=20260808201257"></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=20260808200915"></script>
 <script src="data/COCKPIT_BACKTEST.js?v=20260808200921"></script>
@@ -9821,6 +9822,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
           + '<span style="font-size:11px;color:var(--dim);">'+(s.code||'')+'</span>'
           + '<span style="font-size:10px;color:#9fd0ff;background:rgba(159,208,255,.1);border:1px solid rgba(159,208,255,.3);padding:1px 7px;border-radius:10px;">'+(s.board_label||'')+'</span>'
           + (s.qd?'<span style="font-size:10px;color:#fbbf24;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.35);padding:1px 7px;border-radius:10px;font-weight:700;">QD四量共振</span>':'')
+          + (function(){ try{ var _60m=(window.FOUR_VOLUME_60M&&window.FOUR_VOLUME_60M.stocks)||[]; var _hit=_60m.some(function(x){return (x.code||'')===((s.market||'')+(s.code||''))||(x.code||'')==(s.code||'');}); if(_hit) return '<span style="font-size:10px;color:#a78bfa;background:rgba(167,139,250,.14);border:1px solid rgba(167,139,250,.4);padding:1px 7px;border-radius:10px;font-weight:600;">🔔 60m共振</span>'; }catch(e){} return ''; })()
           + '<span style="margin-left:auto;font-size:13px;font-weight:700;color:'+((_pct||0)>=0?'var(--up)':'var(--down)')+';">'+( (_pct||0)>=0?'+':'')+(_fvNum(_pct,2))+'%</span>'
         + '</div>'
         + '<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--dim);margin-top:6px;">'
