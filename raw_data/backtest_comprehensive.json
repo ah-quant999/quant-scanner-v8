@@ -1,5 +1,5 @@
 {
-  "calc_time": "2026-08-07 19:29:11",
+  "calc_time": "2026-08-08 08:43:38",
   "method": "baostock 真实收盘价全面回测",
   "hold_periods_tested": [
     1,
@@ -8,15 +8,1154 @@
     10,
     20
   ],
-  "strategies_tested": [],
-  "overview": {},
-  "comparison": {
-    "hold_1d": {},
-    "hold_3d": {},
-    "hold_5d": {},
-    "hold_10d": {},
-    "hold_20d": {}
+  "strategies_tested": [
+    "resonance_all",
+    "resonance_gte70_lt80",
+    "resonance_gte80"
+  ],
+  "overview": {
+    "resonance_all": {
+      "total": 12,
+      "valid": 12,
+      "best_hold_days": 3,
+      "best_win_rate": 66.7,
+      "best_avg_return": 1.96,
+      "periods": {
+        "hold_1d": {
+          "count": 12,
+          "win": 1,
+          "loss": 5,
+          "draw": 6,
+          "win_rate": 16.7,
+          "avg_return": -1.44,
+          "median_return": 0,
+          "best_return": 1.6,
+          "worst_return": -5.13,
+          "std_return": 2.09,
+          "sharpe_ratio": -0.69
+        },
+        "hold_3d": {
+          "count": 12,
+          "win": 4,
+          "loss": 2,
+          "draw": 6,
+          "win_rate": 66.7,
+          "avg_return": 1.96,
+          "median_return": 0,
+          "best_return": 22.08,
+          "worst_return": -4.8,
+          "std_return": 6.59,
+          "sharpe_ratio": 0.3
+        },
+        "hold_5d": {
+          "count": 12,
+          "win": 4,
+          "loss": 2,
+          "draw": 6,
+          "win_rate": 66.7,
+          "avg_return": 3.0,
+          "median_return": 0,
+          "best_return": 31.42,
+          "worst_return": -5.2,
+          "std_return": 9.14,
+          "sharpe_ratio": 0.33
+        },
+        "hold_10d": {
+          "count": 12,
+          "win": 0,
+          "loss": 0,
+          "draw": 12,
+          "win_rate": 0,
+          "avg_return": 0.0,
+          "median_return": 0,
+          "best_return": 0,
+          "worst_return": 0,
+          "std_return": 0.0,
+          "sharpe_ratio": 0
+        },
+        "hold_20d": {
+          "count": 12,
+          "win": 0,
+          "loss": 0,
+          "draw": 12,
+          "win_rate": 0,
+          "avg_return": 0.0,
+          "median_return": 0,
+          "best_return": 0,
+          "worst_return": 0,
+          "std_return": 0.0,
+          "sharpe_ratio": 0
+        }
+      }
+    },
+    "resonance_gte70_lt80": {
+      "total": 6,
+      "valid": 6,
+      "best_hold_days": 3,
+      "best_win_rate": 66.7,
+      "best_avg_return": 3.39,
+      "periods": {
+        "hold_1d": {
+          "count": 6,
+          "win": 0,
+          "loss": 3,
+          "draw": 3,
+          "win_rate": 0.0,
+          "avg_return": -1.76,
+          "median_return": 0,
+          "best_return": 0,
+          "worst_return": -4.08,
+          "std_return": 1.82,
+          "sharpe_ratio": -0.97
+        },
+        "hold_3d": {
+          "count": 6,
+          "win": 2,
+          "loss": 1,
+          "draw": 3,
+          "win_rate": 66.7,
+          "avg_return": 3.39,
+          "median_return": 0,
+          "best_return": 22.08,
+          "worst_return": -3.72,
+          "std_return": 8.53,
+          "sharpe_ratio": 0.4
+        },
+        "hold_5d": {
+          "count": 6,
+          "win": 2,
+          "loss": 1,
+          "draw": 3,
+          "win_rate": 66.7,
+          "avg_return": 5.36,
+          "median_return": 0,
+          "best_return": 31.42,
+          "worst_return": -2.4,
+          "std_return": 11.76,
+          "sharpe_ratio": 0.46
+        },
+        "hold_10d": {
+          "count": 6,
+          "win": 0,
+          "loss": 0,
+          "draw": 6,
+          "win_rate": 0,
+          "avg_return": 0.0,
+          "median_return": 0,
+          "best_return": 0,
+          "worst_return": 0,
+          "std_return": 0.0,
+          "sharpe_ratio": 0
+        },
+        "hold_20d": {
+          "count": 6,
+          "win": 0,
+          "loss": 0,
+          "draw": 6,
+          "win_rate": 0,
+          "avg_return": 0.0,
+          "median_return": 0,
+          "best_return": 0,
+          "worst_return": 0,
+          "std_return": 0.0,
+          "sharpe_ratio": 0
+        }
+      }
+    },
+    "resonance_gte80": {
+      "total": 6,
+      "valid": 6,
+      "best_hold_days": 3,
+      "best_win_rate": 66.7,
+      "best_avg_return": 0.52,
+      "periods": {
+        "hold_1d": {
+          "count": 6,
+          "win": 1,
+          "loss": 2,
+          "draw": 3,
+          "win_rate": 33.3,
+          "avg_return": -1.12,
+          "median_return": 0,
+          "best_return": 1.6,
+          "worst_return": -5.13,
+          "std_return": 2.29,
+          "sharpe_ratio": -0.49
+        },
+        "hold_3d": {
+          "count": 6,
+          "win": 2,
+          "loss": 1,
+          "draw": 3,
+          "win_rate": 66.7,
+          "avg_return": 0.52,
+          "median_return": 0,
+          "best_return": 5.88,
+          "worst_return": -4.8,
+          "std_return": 3.17,
+          "sharpe_ratio": 0.16
+        },
+        "hold_5d": {
+          "count": 6,
+          "win": 2,
+          "loss": 1,
+          "draw": 3,
+          "win_rate": 66.7,
+          "avg_return": 0.63,
+          "median_return": 0,
+          "best_return": 8.91,
+          "worst_return": -5.2,
+          "std_return": 4.16,
+          "sharpe_ratio": 0.15
+        },
+        "hold_10d": {
+          "count": 6,
+          "win": 0,
+          "loss": 0,
+          "draw": 6,
+          "win_rate": 0,
+          "avg_return": 0.0,
+          "median_return": 0,
+          "best_return": 0,
+          "worst_return": 0,
+          "std_return": 0.0,
+          "sharpe_ratio": 0
+        },
+        "hold_20d": {
+          "count": 6,
+          "win": 0,
+          "loss": 0,
+          "draw": 6,
+          "win_rate": 0,
+          "avg_return": 0.0,
+          "median_return": 0,
+          "best_return": 0,
+          "worst_return": 0,
+          "std_return": 0.0,
+          "sharpe_ratio": 0
+        }
+      }
+    }
   },
-  "details": {},
-  "update_stamp": 1786102151
+  "comparison": {
+    "hold_1d": {
+      "resonance_all": {
+        "win_rate": 16.7,
+        "avg_return": -1.44,
+        "sharpe": -0.69,
+        "count": 12
+      },
+      "resonance_gte70_lt80": {
+        "win_rate": 0.0,
+        "avg_return": -1.76,
+        "sharpe": -0.97,
+        "count": 6
+      },
+      "resonance_gte80": {
+        "win_rate": 33.3,
+        "avg_return": -1.12,
+        "sharpe": -0.49,
+        "count": 6
+      }
+    },
+    "hold_3d": {
+      "resonance_all": {
+        "win_rate": 66.7,
+        "avg_return": 1.96,
+        "sharpe": 0.3,
+        "count": 12
+      },
+      "resonance_gte70_lt80": {
+        "win_rate": 66.7,
+        "avg_return": 3.39,
+        "sharpe": 0.4,
+        "count": 6
+      },
+      "resonance_gte80": {
+        "win_rate": 66.7,
+        "avg_return": 0.52,
+        "sharpe": 0.16,
+        "count": 6
+      }
+    },
+    "hold_5d": {
+      "resonance_all": {
+        "win_rate": 66.7,
+        "avg_return": 3.0,
+        "sharpe": 0.33,
+        "count": 12
+      },
+      "resonance_gte70_lt80": {
+        "win_rate": 66.7,
+        "avg_return": 5.36,
+        "sharpe": 0.46,
+        "count": 6
+      },
+      "resonance_gte80": {
+        "win_rate": 66.7,
+        "avg_return": 0.63,
+        "sharpe": 0.15,
+        "count": 6
+      }
+    },
+    "hold_10d": {
+      "resonance_all": {
+        "win_rate": 0,
+        "avg_return": 0.0,
+        "sharpe": 0,
+        "count": 12
+      },
+      "resonance_gte70_lt80": {
+        "win_rate": 0,
+        "avg_return": 0.0,
+        "sharpe": 0,
+        "count": 6
+      },
+      "resonance_gte80": {
+        "win_rate": 0,
+        "avg_return": 0.0,
+        "sharpe": 0,
+        "count": 6
+      }
+    },
+    "hold_20d": {
+      "resonance_all": {
+        "win_rate": 0,
+        "avg_return": 0.0,
+        "sharpe": 0,
+        "count": 12
+      },
+      "resonance_gte70_lt80": {
+        "win_rate": 0,
+        "avg_return": 0.0,
+        "sharpe": 0,
+        "count": 6
+      },
+      "resonance_gte80": {
+        "win_rate": 0,
+        "avg_return": 0.0,
+        "sharpe": 0,
+        "count": 6
+      }
+    }
+  },
+  "details": {
+    "resonance_all": {
+      "total_signals": 12,
+      "valid_signals": 12,
+      "best_hold_days": 3,
+      "best_hold_win_rate": 66.7,
+      "best_hold_avg_return": 1.96,
+      "periods": {
+        "hold_1d": {
+          "count": 12,
+          "win": 1,
+          "loss": 5,
+          "draw": 6,
+          "win_rate": 16.7,
+          "avg_return": -1.44,
+          "median_return": 0,
+          "best_return": 1.6,
+          "worst_return": -5.13,
+          "std_return": 2.09,
+          "sharpe_ratio": -0.69
+        },
+        "hold_3d": {
+          "count": 12,
+          "win": 4,
+          "loss": 2,
+          "draw": 6,
+          "win_rate": 66.7,
+          "avg_return": 1.96,
+          "median_return": 0,
+          "best_return": 22.08,
+          "worst_return": -4.8,
+          "std_return": 6.59,
+          "sharpe_ratio": 0.3
+        },
+        "hold_5d": {
+          "count": 12,
+          "win": 4,
+          "loss": 2,
+          "draw": 6,
+          "win_rate": 66.7,
+          "avg_return": 3.0,
+          "median_return": 0,
+          "best_return": 31.42,
+          "worst_return": -5.2,
+          "std_return": 9.14,
+          "sharpe_ratio": 0.33
+        },
+        "hold_10d": {
+          "count": 12,
+          "win": 0,
+          "loss": 0,
+          "draw": 12,
+          "win_rate": 0,
+          "avg_return": 0.0,
+          "median_return": 0,
+          "best_return": 0,
+          "worst_return": 0,
+          "std_return": 0.0,
+          "sharpe_ratio": 0
+        },
+        "hold_20d": {
+          "count": 12,
+          "win": 0,
+          "loss": 0,
+          "draw": 12,
+          "win_rate": 0,
+          "avg_return": 0.0,
+          "median_return": 0,
+          "best_return": 0,
+          "worst_return": 0,
+          "std_return": 0.0,
+          "sharpe_ratio": 0
+        }
+      },
+      "signals": [
+        {
+          "entry_date": "2026-07-31",
+          "code": "300001",
+          "name": "特锐德",
+          "market": "深市",
+          "board": "创业板",
+          "total_score": 34.4,
+          "entry_price": 35.1,
+          "bsc": "sz.300001",
+          "source": "top10_daily",
+          "strategy": "resonance_all",
+          "latest_date": "2026-08-07",
+          "latest_price": 35.13,
+          "hold_days": 5,
+          "max_drawdown": -3.06,
+          "latest_return": 0.09,
+          "hold_1d": {
+            "ret": 1.6,
+            "target_date": "2026-08-03",
+            "target_price": 35.66
+          },
+          "hold_3d": {
+            "ret": 2.05,
+            "target_date": "2026-08-05",
+            "target_price": 35.82
+          },
+          "hold_5d": {
+            "ret": 0.09,
+            "target_date": "2026-08-07",
+            "target_price": 35.13
+          }
+        },
+        {
+          "entry_date": "2026-07-31",
+          "code": "000651",
+          "name": "格力电器",
+          "market": "sz",
+          "board": "主板",
+          "total_score": 33.2,
+          "entry_price": 42.3,
+          "bsc": "sz.000651",
+          "source": "top10_daily",
+          "strategy": "resonance_all",
+          "latest_date": "2026-08-07",
+          "latest_price": 40.1,
+          "hold_days": 5,
+          "max_drawdown": -5.2,
+          "latest_return": -5.2,
+          "hold_1d": {
+            "ret": -3.17,
+            "target_date": "2026-08-03",
+            "target_price": 40.96
+          },
+          "hold_3d": {
+            "ret": -4.8,
+            "target_date": "2026-08-05",
+            "target_price": 40.27
+          },
+          "hold_5d": {
+            "ret": -5.2,
+            "target_date": "2026-08-07",
+            "target_price": 40.1
+          }
+        },
+        {
+          "entry_date": "2026-07-31",
+          "code": "000938",
+          "name": "紫光股份",
+          "market": "sz",
+          "board": "主板",
+          "total_score": 32.4,
+          "entry_price": 34.89,
+          "bsc": "sz.000938",
+          "source": "top10_daily",
+          "strategy": "resonance_all",
+          "latest_date": "2026-08-07",
+          "latest_price": 38.0,
+          "hold_days": 5,
+          "max_drawdown": -5.13,
+          "latest_return": 8.91,
+          "hold_1d": {
+            "ret": -5.13,
+            "target_date": "2026-08-03",
+            "target_price": 33.1
+          },
+          "hold_3d": {
+            "ret": 5.88,
+            "target_date": "2026-08-05",
+            "target_price": 36.94
+          },
+          "hold_5d": {
+            "ret": 8.91,
+            "target_date": "2026-08-07",
+            "target_price": 38.0
+          }
+        },
+        {
+          "entry_date": "2026-07-31",
+          "code": "300458",
+          "name": "全志科技",
+          "market": "sz",
+          "board": "创业板",
+          "total_score": 32.4,
+          "entry_price": 33.54,
+          "bsc": "sz.300458",
+          "source": "top10_daily",
+          "strategy": "resonance_all",
+          "latest_date": "2026-08-07",
+          "latest_price": 34.6,
+          "hold_days": 5,
+          "max_drawdown": -4.08,
+          "latest_return": 3.16,
+          "hold_1d": {
+            "ret": -4.08,
+            "target_date": "2026-08-03",
+            "target_price": 32.17
+          },
+          "hold_3d": {
+            "ret": 2.0,
+            "target_date": "2026-08-05",
+            "target_price": 34.21
+          },
+          "hold_5d": {
+            "ret": 3.16,
+            "target_date": "2026-08-07",
+            "target_price": 34.6
+          }
+        },
+        {
+          "entry_date": "2026-07-31",
+          "code": "601628",
+          "name": "中国人寿",
+          "market": "sh",
+          "board": "主板",
+          "total_score": 32.4,
+          "entry_price": 39.52,
+          "bsc": "sh.601628",
+          "source": "top10_daily",
+          "strategy": "resonance_all",
+          "latest_date": "2026-08-07",
+          "latest_price": 38.57,
+          "hold_days": 5,
+          "max_drawdown": -4.71,
+          "latest_return": -2.4,
+          "hold_1d": {
+            "ret": -2.56,
+            "target_date": "2026-08-03",
+            "target_price": 38.51
+          },
+          "hold_3d": {
+            "ret": -3.72,
+            "target_date": "2026-08-05",
+            "target_price": 38.05
+          },
+          "hold_5d": {
+            "ret": -2.4,
+            "target_date": "2026-08-07",
+            "target_price": 38.57
+          }
+        },
+        {
+          "entry_date": "2026-07-31",
+          "code": "688059",
+          "name": "华锐精",
+          "market": "sh",
+          "board": "科创板",
+          "total_score": 31.6,
+          "entry_price": 72.32,
+          "bsc": "sh.688059",
+          "source": "top10_daily",
+          "strategy": "resonance_all",
+          "latest_date": "2026-08-07",
+          "latest_price": 95.04,
+          "hold_days": 5,
+          "max_drawdown": -3.91,
+          "latest_return": 31.42,
+          "hold_1d": {
+            "ret": -3.91,
+            "target_date": "2026-08-03",
+            "target_price": 69.49
+          },
+          "hold_3d": {
+            "ret": 22.08,
+            "target_date": "2026-08-05",
+            "target_price": 88.29
+          },
+          "hold_5d": {
+            "ret": 31.42,
+            "target_date": "2026-08-07",
+            "target_price": 95.04
+          }
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "688183",
+          "name": "生益电子",
+          "market": "sh",
+          "board": "科创板",
+          "total_score": 36.4,
+          "entry_price": 118.78,
+          "bsc": "sh.688183",
+          "source": "top10_daily",
+          "strategy": "resonance_all",
+          "latest_date": "2026-08-07",
+          "latest_price": 118.78,
+          "hold_days": 0,
+          "max_drawdown": 0.0,
+          "latest_return": 0.0
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "688213",
+          "name": "思特威",
+          "market": "sh",
+          "board": "科创板",
+          "total_score": 31.2,
+          "entry_price": 93.89,
+          "bsc": "sh.688213",
+          "source": "top10_daily",
+          "strategy": "resonance_all",
+          "latest_date": "2026-08-07",
+          "latest_price": 93.89,
+          "hold_days": 0,
+          "max_drawdown": 0.0,
+          "latest_return": 0.0
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "688002",
+          "name": "睿创微纳",
+          "market": "sh",
+          "board": "科创板",
+          "total_score": 30.4,
+          "entry_price": 170.04,
+          "bsc": "sh.688002",
+          "source": "top10_daily",
+          "strategy": "resonance_all",
+          "latest_date": "2026-08-07",
+          "latest_price": 170.04,
+          "hold_days": 0,
+          "max_drawdown": 0.0,
+          "latest_return": 0.0
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "600489",
+          "name": "中金黄金",
+          "market": "sh",
+          "board": "主板",
+          "total_score": 30.4,
+          "entry_price": 26.1,
+          "bsc": "sh.600489",
+          "source": "top10_daily",
+          "strategy": "resonance_all",
+          "latest_date": "2026-08-07",
+          "latest_price": 26.1,
+          "hold_days": 0,
+          "max_drawdown": 0.0,
+          "latest_return": 0.0
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "688046",
+          "name": "药康生物",
+          "market": "sh",
+          "board": "科创板",
+          "total_score": 28.4,
+          "entry_price": 33.31,
+          "bsc": "sh.688046",
+          "source": "top10_daily",
+          "strategy": "resonance_all",
+          "latest_date": "2026-08-07",
+          "latest_price": 33.31,
+          "hold_days": 0,
+          "max_drawdown": 0.0,
+          "latest_return": 0.0
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "600664",
+          "name": "哈药股份",
+          "market": "sh",
+          "board": "主板",
+          "total_score": 28.4,
+          "entry_price": 6.84,
+          "bsc": "sh.600664",
+          "source": "top10_daily",
+          "strategy": "resonance_all",
+          "latest_date": "2026-08-07",
+          "latest_price": 6.84,
+          "hold_days": 0,
+          "max_drawdown": 0.0,
+          "latest_return": 0.0
+        }
+      ]
+    },
+    "resonance_gte70_lt80": {
+      "total_signals": 6,
+      "valid_signals": 6,
+      "best_hold_days": 3,
+      "best_hold_win_rate": 66.7,
+      "best_hold_avg_return": 3.39,
+      "periods": {
+        "hold_1d": {
+          "count": 6,
+          "win": 0,
+          "loss": 3,
+          "draw": 3,
+          "win_rate": 0.0,
+          "avg_return": -1.76,
+          "median_return": 0,
+          "best_return": 0,
+          "worst_return": -4.08,
+          "std_return": 1.82,
+          "sharpe_ratio": -0.97
+        },
+        "hold_3d": {
+          "count": 6,
+          "win": 2,
+          "loss": 1,
+          "draw": 3,
+          "win_rate": 66.7,
+          "avg_return": 3.39,
+          "median_return": 0,
+          "best_return": 22.08,
+          "worst_return": -3.72,
+          "std_return": 8.53,
+          "sharpe_ratio": 0.4
+        },
+        "hold_5d": {
+          "count": 6,
+          "win": 2,
+          "loss": 1,
+          "draw": 3,
+          "win_rate": 66.7,
+          "avg_return": 5.36,
+          "median_return": 0,
+          "best_return": 31.42,
+          "worst_return": -2.4,
+          "std_return": 11.76,
+          "sharpe_ratio": 0.46
+        },
+        "hold_10d": {
+          "count": 6,
+          "win": 0,
+          "loss": 0,
+          "draw": 6,
+          "win_rate": 0,
+          "avg_return": 0.0,
+          "median_return": 0,
+          "best_return": 0,
+          "worst_return": 0,
+          "std_return": 0.0,
+          "sharpe_ratio": 0
+        },
+        "hold_20d": {
+          "count": 6,
+          "win": 0,
+          "loss": 0,
+          "draw": 6,
+          "win_rate": 0,
+          "avg_return": 0.0,
+          "median_return": 0,
+          "best_return": 0,
+          "worst_return": 0,
+          "std_return": 0.0,
+          "sharpe_ratio": 0
+        }
+      },
+      "signals": [
+        {
+          "entry_date": "2026-07-31",
+          "code": "300458",
+          "name": "全志科技",
+          "market": "sz",
+          "board": "创业板",
+          "total_score": 32.4,
+          "entry_price": 33.54,
+          "bsc": "sz.300458",
+          "source": "top10_daily",
+          "strategy": "resonance_gte70_lt80",
+          "latest_date": "2026-08-07",
+          "latest_price": 34.6,
+          "hold_days": 5,
+          "max_drawdown": -4.08,
+          "latest_return": 3.16,
+          "hold_1d": {
+            "ret": -4.08,
+            "target_date": "2026-08-03",
+            "target_price": 32.17
+          },
+          "hold_3d": {
+            "ret": 2.0,
+            "target_date": "2026-08-05",
+            "target_price": 34.21
+          },
+          "hold_5d": {
+            "ret": 3.16,
+            "target_date": "2026-08-07",
+            "target_price": 34.6
+          }
+        },
+        {
+          "entry_date": "2026-07-31",
+          "code": "601628",
+          "name": "中国人寿",
+          "market": "sh",
+          "board": "主板",
+          "total_score": 32.4,
+          "entry_price": 39.52,
+          "bsc": "sh.601628",
+          "source": "top10_daily",
+          "strategy": "resonance_gte70_lt80",
+          "latest_date": "2026-08-07",
+          "latest_price": 38.57,
+          "hold_days": 5,
+          "max_drawdown": -4.71,
+          "latest_return": -2.4,
+          "hold_1d": {
+            "ret": -2.56,
+            "target_date": "2026-08-03",
+            "target_price": 38.51
+          },
+          "hold_3d": {
+            "ret": -3.72,
+            "target_date": "2026-08-05",
+            "target_price": 38.05
+          },
+          "hold_5d": {
+            "ret": -2.4,
+            "target_date": "2026-08-07",
+            "target_price": 38.57
+          }
+        },
+        {
+          "entry_date": "2026-07-31",
+          "code": "688059",
+          "name": "华锐精",
+          "market": "sh",
+          "board": "科创板",
+          "total_score": 31.6,
+          "entry_price": 72.32,
+          "bsc": "sh.688059",
+          "source": "top10_daily",
+          "strategy": "resonance_gte70_lt80",
+          "latest_date": "2026-08-07",
+          "latest_price": 95.04,
+          "hold_days": 5,
+          "max_drawdown": -3.91,
+          "latest_return": 31.42,
+          "hold_1d": {
+            "ret": -3.91,
+            "target_date": "2026-08-03",
+            "target_price": 69.49
+          },
+          "hold_3d": {
+            "ret": 22.08,
+            "target_date": "2026-08-05",
+            "target_price": 88.29
+          },
+          "hold_5d": {
+            "ret": 31.42,
+            "target_date": "2026-08-07",
+            "target_price": 95.04
+          }
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "600489",
+          "name": "中金黄金",
+          "market": "sh",
+          "board": "主板",
+          "total_score": 30.4,
+          "entry_price": 26.1,
+          "bsc": "sh.600489",
+          "source": "top10_daily",
+          "strategy": "resonance_gte70_lt80",
+          "latest_date": "2026-08-07",
+          "latest_price": 26.1,
+          "hold_days": 0,
+          "max_drawdown": 0.0,
+          "latest_return": 0.0
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "688046",
+          "name": "药康生物",
+          "market": "sh",
+          "board": "科创板",
+          "total_score": 28.4,
+          "entry_price": 33.31,
+          "bsc": "sh.688046",
+          "source": "top10_daily",
+          "strategy": "resonance_gte70_lt80",
+          "latest_date": "2026-08-07",
+          "latest_price": 33.31,
+          "hold_days": 0,
+          "max_drawdown": 0.0,
+          "latest_return": 0.0
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "600664",
+          "name": "哈药股份",
+          "market": "sh",
+          "board": "主板",
+          "total_score": 28.4,
+          "entry_price": 6.84,
+          "bsc": "sh.600664",
+          "source": "top10_daily",
+          "strategy": "resonance_gte70_lt80",
+          "latest_date": "2026-08-07",
+          "latest_price": 6.84,
+          "hold_days": 0,
+          "max_drawdown": 0.0,
+          "latest_return": 0.0
+        }
+      ]
+    },
+    "resonance_gte80": {
+      "total_signals": 6,
+      "valid_signals": 6,
+      "best_hold_days": 3,
+      "best_hold_win_rate": 66.7,
+      "best_hold_avg_return": 0.52,
+      "periods": {
+        "hold_1d": {
+          "count": 6,
+          "win": 1,
+          "loss": 2,
+          "draw": 3,
+          "win_rate": 33.3,
+          "avg_return": -1.12,
+          "median_return": 0,
+          "best_return": 1.6,
+          "worst_return": -5.13,
+          "std_return": 2.29,
+          "sharpe_ratio": -0.49
+        },
+        "hold_3d": {
+          "count": 6,
+          "win": 2,
+          "loss": 1,
+          "draw": 3,
+          "win_rate": 66.7,
+          "avg_return": 0.52,
+          "median_return": 0,
+          "best_return": 5.88,
+          "worst_return": -4.8,
+          "std_return": 3.17,
+          "sharpe_ratio": 0.16
+        },
+        "hold_5d": {
+          "count": 6,
+          "win": 2,
+          "loss": 1,
+          "draw": 3,
+          "win_rate": 66.7,
+          "avg_return": 0.63,
+          "median_return": 0,
+          "best_return": 8.91,
+          "worst_return": -5.2,
+          "std_return": 4.16,
+          "sharpe_ratio": 0.15
+        },
+        "hold_10d": {
+          "count": 6,
+          "win": 0,
+          "loss": 0,
+          "draw": 6,
+          "win_rate": 0,
+          "avg_return": 0.0,
+          "median_return": 0,
+          "best_return": 0,
+          "worst_return": 0,
+          "std_return": 0.0,
+          "sharpe_ratio": 0
+        },
+        "hold_20d": {
+          "count": 6,
+          "win": 0,
+          "loss": 0,
+          "draw": 6,
+          "win_rate": 0,
+          "avg_return": 0.0,
+          "median_return": 0,
+          "best_return": 0,
+          "worst_return": 0,
+          "std_return": 0.0,
+          "sharpe_ratio": 0
+        }
+      },
+      "signals": [
+        {
+          "entry_date": "2026-07-31",
+          "code": "300001",
+          "name": "特锐德",
+          "market": "深市",
+          "board": "创业板",
+          "total_score": 34.4,
+          "entry_price": 35.1,
+          "bsc": "sz.300001",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-07",
+          "latest_price": 35.13,
+          "hold_days": 5,
+          "max_drawdown": -3.06,
+          "latest_return": 0.09,
+          "hold_1d": {
+            "ret": 1.6,
+            "target_date": "2026-08-03",
+            "target_price": 35.66
+          },
+          "hold_3d": {
+            "ret": 2.05,
+            "target_date": "2026-08-05",
+            "target_price": 35.82
+          },
+          "hold_5d": {
+            "ret": 0.09,
+            "target_date": "2026-08-07",
+            "target_price": 35.13
+          }
+        },
+        {
+          "entry_date": "2026-07-31",
+          "code": "000651",
+          "name": "格力电器",
+          "market": "sz",
+          "board": "主板",
+          "total_score": 33.2,
+          "entry_price": 42.3,
+          "bsc": "sz.000651",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-07",
+          "latest_price": 40.1,
+          "hold_days": 5,
+          "max_drawdown": -5.2,
+          "latest_return": -5.2,
+          "hold_1d": {
+            "ret": -3.17,
+            "target_date": "2026-08-03",
+            "target_price": 40.96
+          },
+          "hold_3d": {
+            "ret": -4.8,
+            "target_date": "2026-08-05",
+            "target_price": 40.27
+          },
+          "hold_5d": {
+            "ret": -5.2,
+            "target_date": "2026-08-07",
+            "target_price": 40.1
+          }
+        },
+        {
+          "entry_date": "2026-07-31",
+          "code": "000938",
+          "name": "紫光股份",
+          "market": "sz",
+          "board": "主板",
+          "total_score": 32.4,
+          "entry_price": 34.89,
+          "bsc": "sz.000938",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-07",
+          "latest_price": 38.0,
+          "hold_days": 5,
+          "max_drawdown": -5.13,
+          "latest_return": 8.91,
+          "hold_1d": {
+            "ret": -5.13,
+            "target_date": "2026-08-03",
+            "target_price": 33.1
+          },
+          "hold_3d": {
+            "ret": 5.88,
+            "target_date": "2026-08-05",
+            "target_price": 36.94
+          },
+          "hold_5d": {
+            "ret": 8.91,
+            "target_date": "2026-08-07",
+            "target_price": 38.0
+          }
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "688183",
+          "name": "生益电子",
+          "market": "sh",
+          "board": "科创板",
+          "total_score": 36.4,
+          "entry_price": 118.78,
+          "bsc": "sh.688183",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-07",
+          "latest_price": 118.78,
+          "hold_days": 0,
+          "max_drawdown": 0.0,
+          "latest_return": 0.0
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "688213",
+          "name": "思特威",
+          "market": "sh",
+          "board": "科创板",
+          "total_score": 31.2,
+          "entry_price": 93.89,
+          "bsc": "sh.688213",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-07",
+          "latest_price": 93.89,
+          "hold_days": 0,
+          "max_drawdown": 0.0,
+          "latest_return": 0.0
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "688002",
+          "name": "睿创微纳",
+          "market": "sh",
+          "board": "科创板",
+          "total_score": 30.4,
+          "entry_price": 170.04,
+          "bsc": "sh.688002",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-07",
+          "latest_price": 170.04,
+          "hold_days": 0,
+          "max_drawdown": 0.0,
+          "latest_return": 0.0
+        }
+      ]
+    }
+  },
+  "update_stamp": 1786149818
 }
