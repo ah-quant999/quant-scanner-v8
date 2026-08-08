@@ -77,6 +77,13 @@ jobs:
           # 推送交由下一步兜底执行，这里不因非零退出码而 fail。
           exit 0
 
+      # 2026-08-08 修复：算法链产出 candidate.json 后，立即刷新候选池行情，
+      # 避免 runner 状态卡 CANDIDATE_QUOTES 长期显示「空」。
+      - name: "📈 刷新候选池行情（CANDIDATE_QUOTES）"
+        if: always()
+        run: |
+          python cloud_fetch_v8.py --only CANDIDATE_QUOTES || true
+
       - name: "📤 兜底推送（若上一步未推）"
         if: always()
         run: |

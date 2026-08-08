@@ -3965,11 +3965,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     </div>
 
     <div class="card">
-      <h3><span class="ic">💾</span>数据新鲜度 <span class="fresh" style="font-size:10px;color:var(--dim)">[静态]</span></h3>
-      <table><thead><tr><th>文件</th><th>最后更新</th><th>状态</th></tr></thead><tbody>
-        <tr><td>盘后扫描</td><td>--</td><td><span class="status-dot s-warn"></span>待扫描</td></tr>
-        <tr><td>黄金池</td><td>--</td><td><span class="status-dot s-warn"></span>待扫描</td></tr>
-        <tr><td>概念映射</td><td>--</td><td><span class="status-dot s-warn"></span>待扫描</td></tr>
+      <h3><span class="ic">💾</span>数据新鲜度 <span class="fresh" style="font-size:10px;color:var(--dim)">[动态]</span></h3>
+      <table><thead><tr><th>文件</th><th>最后更新</th><th>状态</th></tr></thead><tbody id="freshnessTbody">
+        <tr id="freshRowCandidate"><td>盘后扫描</td><td id="freshTimeCandidate">--</td><td id="freshStatusCandidate"><span class="status-dot s-warn"></span>待扫描</td></tr>
+        <tr id="freshRowGold"><td>黄金池</td><td id="freshTimeGold">--</td><td id="freshStatusGold"><span class="status-dot s-warn"></span>待扫描</td></tr>
+        <tr id="freshRowConcept"><td>概念映射</td><td id="freshTimeConcept">--</td><td id="freshStatusConcept"><span class="status-dot s-warn"></span>待扫描</td></tr>
       </tbody></table>
     </div>
 
@@ -9223,8 +9223,35 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     safe(renderCockpit);
     // 传 'st' 前缀：stcrdsTime / stcrdsCoverage 等 DOM id 在运维 section 下都带 st 前缀（2026-08-06 主人纠正：原调用未传前缀导致胶囊找不到）
     safe(function(){ renderV8Crds('st'); });
+    safe(renderDataFreshness);
   }
   window.__renderOps=renderOps;
+
+  /* ===== 运维面板：数据新鲜度动态渲染 ===== */
+  function renderDataFreshness(){
+    var hc = window.HEALTH_CHECK || {};
+    var items = hc.items || [];
+    var map = {};
+    items.forEach(function(it){ if(it && it.id) map[it.id] = it; });
+    function setRow(prefix, item){
+      var timeEl = document.getElementById('freshTime'+prefix);
+      var statusEl = document.getElementById('freshStatus'+prefix);
+      if(!timeEl || !statusEl) return;
+      if(!item || !item.last_update){
+        timeEl.textContent = '--';
+        statusEl.innerHTML = '<span class="status-dot s-warn"></span>待扫描';
+        return;
+      }
+      timeEl.textContent = item.last_update.slice(0,16).replace('T',' ');
+      var cls = item.status==='ok' ? 's-ok' : (item.status==='fail' ? 's-fail' : 's-warn');
+      var txt = item.status==='ok' ? '正常' : (item.status==='fail' ? '失败' : '待更新');
+      statusEl.innerHTML = '<span class="status-dot '+cls+'"></span>'+txt;
+    }
+    setRow('Candidate', map['CANDIDATE']);
+    setRow('Gold', map['GOLD_POOL']);
+    // 概念映射：优先用概念排名，回退板块资金流
+    setRow('Concept', map['CONCEPT_RANKING'] || map['SECTOR_FUND_FLOW']);
+  }
   window.renderCockpit=renderCockpit;
   window.renderV8Crds=renderV8Crds;
 
