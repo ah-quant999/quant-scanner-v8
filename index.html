@@ -8938,11 +8938,6 @@ const catNames=['宽基','行业','主题','跨境','商品'];
                 h += '<button onclick="showLbModal(\'首板明细\','+JSON.stringify(allNames).replace(/"/g,'&quot;')+')" style="cursor:pointer;font-size:12px;font-weight:700;color:#38bdf8;background:rgba(56,189,248,.10);border:1px solid rgba(56,189,248,.25);border-radius:6px;padding:4px 10px;white-space:nowrap;">+'+moreList.length+' 只 · 展开</button>';
               }
               h += '</div>';
-            } else if(v > 0){
-              h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
-              h += '<span style="font-size:12px;color:var(--dim);">首板共 '+v+' 只（涨停池全量明细）</span>';
-              h += '<button onclick="showLbModal(\'首板明细\',[\''+v+' 只首板股票（详见涨停热力矩阵全表）\'])" style="cursor:pointer;font-size:12px;font-weight:700;color:#38bdf8;background:rgba(56,189,248,.10);border:1px solid rgba(56,189,248,.25);border-radius:6px;padding:4px 10px;white-space:nowrap;">+'+v+' 只 · 展开</button>';
-              h += '</div>';
             }
             h += '</div>';
           } else {

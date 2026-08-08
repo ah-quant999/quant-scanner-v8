@@ -1601,10 +1601,19 @@ def f_limit_up_heatmap():
             for _, r in df.iterrows():
                 lb = int(r.get("连板数") or 0)
                 ladder[lb] = ladder.get(lb, 0) + 1
+            # 分层取样：高连板(lbc>=2)全量保留（通常<20只），
+            # 首板(lbc=1)取前 FIRST_BOARD_CAP 只（避免 top 膨胀过大）
+            FIRST_BOARD_CAP = 15
             top = []
-            for _, r in df.sort_values("连板数", ascending=False).head(8).iterrows():
+            high_board = df[df["连板数"] >= 2]
+            first_board = df[df["连板数"] == 1]
+            for _, r in high_board.sort_values("连板数", ascending=False).iterrows():
                 top.append({"name": r["名称"], "code": r["代码"],
                             "lbc": int(r.get("连板数") or 0),
+                            "chg": round(float(r.get("涨跌幅") or 0), 2)})
+            for _, r in first_board.head(FIRST_BOARD_CAP).iterrows():
+                top.append({"name": r["名称"], "code": r["代码"],
+                            "lbc": 1,
                             "chg": round(float(r.get("涨跌幅") or 0), 2)})
             result["ladder"] = ladder
             result["top"] = top
