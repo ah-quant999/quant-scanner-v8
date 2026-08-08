@@ -34,6 +34,70 @@ CRISIS_HIGH_THRESHOLD = 50  # 危机雷达≥50才并入逆势龙头
 SECTOR_TOP_N = 15
 TOP_N = 3
 
+# 常见港股/美股代码兜底名称表（当上游 name 缺失或等于 code 时使用）
+# 格式：统一用纯数字 code（无 hk/sh 前缀）作为 key
+NAME_FIX_MAP = {
+    "00700": "腾讯控股",
+    "09988": "阿里巴巴-W",
+    "01024": "快手-W",
+    "09618": "京东物流",
+    "01093": "石药集团",
+    "03690": "美团-W",
+    "01810": "小米集团-W",
+    "02331": "李宁",
+    "02015": "理想汽车-W",
+    "09888": "百度集团-SW",
+    "06060": "众安在线",
+    "01299": "友邦保险",
+    "02318": "中国平安",
+    "03988": "中国银行",
+    "01398": "工商银行",
+    "00939": "建设银行",
+    "01208": "五矿资源",
+    "00883": "中国海洋石油",
+    "00857": "中国石油股份",
+    "00386": "中国石油化工股份",
+    "02628": "中国人寿",
+    "02328": "中国财险",
+    "03328": "交通银行",
+    "06818": "中国光大银行",
+    "01988": "民生银行",
+    "01658": "邮储银行",
+    "01199": "中远海运港口",
+    "00489": "东风集团股份",
+    "01797": "新东方在线",
+    "02020": "安踏体育",
+    "02319": "蒙牛乳业",
+    "01898": "中煤能源",
+    "01088": "中国神华",
+    "00358": "江西铜业股份",
+    "02600": "中国铝业",
+    "01776": "广发证券",
+    "06837": "海通证券",
+    "06030": "中信证券",
+    "03908": "中金公司",
+    "06690": "海尔智家",
+    "09633": "农夫山泉",
+    "09868": "小鹏汽车-W",
+    "02018": "瑞声科技",
+    "02382": "舜宇光学科技",
+    "01478": "丘钛科技",
+    "02899": "紫金矿业",
+    "01787": "山东黄金",
+}
+
+
+def fix_name(code, name):
+    """如果 name 为空或与 code 相同，用兜底映射表/画像修复。"""
+    c = norm_code(code)
+    n = (name or "").strip()
+    if n and n != c:
+        return n
+    # 兜底映射
+    if c in NAME_FIX_MAP:
+        return NAME_FIX_MAP[c]
+    return n or c
+
 
 def load_js(name, var_name):
     """读取 data/xxx.js（window.X = {...}; 格式）并返回 JSON 对象"""
@@ -70,7 +134,12 @@ def norm_code(c):
 
 
 def market_prefix(code):
-    c = str(code or "")
+    c = str(code or "").strip()
+    if not c:
+        return "sz"
+    # 港股：5 位纯数字（A股为 6 位）
+    if c.isdigit() and len(c) == 5:
+        return "hk"
     if c.startswith(("300", "301")):
         return "sz"
     if c.startswith(("688", "689")):
@@ -84,8 +153,12 @@ def market_prefix(code):
     return "sz"
 
 
-def board_from_code(code):
+def board_from_code(code, market=None):
     c = str(code or "")
+    m = str(market or "").lower()
+    # 港股：5 位纯数字（A股为 6 位），或显式 market 为港股
+    if m in ("hk", "港股") or (c.isdigit() and len(c) == 5):
+        return "港股"
     if c.startswith(("300", "301")):
         return "创业板"
     if c.startswith("688"):
@@ -293,7 +366,7 @@ def main():
         r = pool[norm_code(code)]
         if not r["code"]:
             r["code"] = code
-            r["name"] = name
+            r["name"] = fix_name(code, name)
             r["market"] = market or market_prefix(code)
             r["board"] = board or board_from_code(code)
             # 从 STOCK_STOP_DATA 预填支撑/压力/ATR/止损/目标（如存在）
@@ -302,6 +375,10 @@ def main():
                 for k in ["support", "resistance", "atr", "stop_loss", "target_price", "risk_reward"]:
                     if ss.get(k) is not None:
                         r[k] = ss[k]
+        else:
+            # 已有记录时，若旧 name 为空/等于 code，尝试用新 name/映射表更新
+            if not r["name"] or r["name"] == r["code"]:
+                r["name"] = fix_name(code, name)
         return r
 
     # 1) 三重共识
@@ -477,10 +554,12 @@ def main():
         if s.get("first_date"):
             r["enter_dates"].append(s["first_date"])
 
-    # 补齐个股画像（行业/概念）
+    # 补齐个股画像（行业/概念/名称）
     for key, r in pool.items():
         prof = profiles.get(key) or profiles.get(norm_code(key))
         if prof:
+            if not r["name"] or r["name"] == r["code"]:
+                r["name"] = fix_name(r["code"], prof.get("name"))
             if not r["industry"]:
                 r["industry"] = prof.get("industry") or ""
             if prof.get("concepts"):
@@ -634,7 +713,7 @@ def main():
         out_stocks.append({
             "rank": len(out_stocks) + 1,
             "code": code,
-            "name": s["name"],
+            "name": fix_name(code, s["name"]),
             "market": market,
             "board": board,
             "horizon": horizon_for(s["sources"]),
@@ -674,7 +753,27 @@ def main():
         "strong_sectors": sorted(rel_set)[:20],
         "stocks": out_stocks,
         "all_candidates": [
-            {"code": x["key"], "name": x["name"], "final_score": x["final_score"], "resonance": x["resonance"], "sources": sorted(set(x["sources"]))}
+            {
+                "code": x["key"],
+                "name": fix_name(x["key"], x["name"]),
+                "market": {"sh": "沪市", "sz": "深市", "bj": "北交所", "hk": "港股"}.get((x["market"] or market_prefix(x["key"])).lower(), x["market"] or market_prefix(x["key"])),
+                "board": x["board"] or board_from_code(x["key"], x["market"]),
+                "horizon": horizon_for(x["sources"]),
+                "close": round(safe_float(x["close"]), 2) if safe_float(x["close"]) else None,
+                "pct_chg": safe_float(x["pct_chg"]),
+                "final_score": x["final_score"],
+                "resonance": x["resonance"],
+                "sources": sorted(set(x["sources"])),
+                "signals": sorted(set(x.get("signals") or []))[:6],
+                "industry": x.get("industry", ""),
+                "concepts": x.get("concepts", [])[:6],
+                "enter_date": (min([d for d in x.get("enter_dates", []) if d]) if x.get("enter_dates") else None) or datetime.now().strftime("%Y-%m-%d"),
+                "stop_loss": round(safe_float(x.get("stop_loss")), 2) if x.get("stop_loss") is not None else None,
+                "target_price": round(safe_float(x.get("target_price")), 2) if x.get("target_price") is not None else None,
+                "risk_reward": round(safe_float(x.get("risk_reward")), 2) if x.get("risk_reward") is not None else None,
+                "support": round(safe_float(x.get("support")), 2) if x.get("support") is not None else None,
+                "resistance": round(safe_float(x.get("resistance")), 2) if x.get("resistance") is not None else None,
+            }
             for x in scored[:30]
         ],
     }
