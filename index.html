@@ -1057,6 +1057,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/COCKPIT_BACKTEST.js?v=20260808200921"></script>
 <script src="data/BACKTEST_TDX.js?v=20260808"></script>
 <script src="data/EXPERIMENT.js?v=20260808164604"></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=20260808204530"></script>
 <script src="data/ETF_PULSE.js?v=20260808164512"></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=20260808164551"></script>
 <script src="data/TOP10_DAILY.js"></script>
@@ -1078,11 +1079,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 </header>
 
 <nav id="nav">
-  <div class="tab active" data-sec="td" onclick="switchSec('td',this)">📅 今日事件</div>
+  <!-- 2026-08-08 主人令：最终推荐 = 全站唯一买卖决策入口，优先级最高，置于首位并默认激活 -->
+  <div class="tab active" data-sec="final" onclick="switchSec('final',this)">🏆 最终推荐</div>
+  <div class="tab" data-sec="td" onclick="switchSec('td',this)">📅 今日事件</div>
   <div class="tab" data-sec="rt" onclick="switchSec('rt',this)">📡 实时数据</div>
   <div class="tab" data-sec="ph" onclick="switchSec('ph',this)">🌙 盘后数据</div>
-  <div class="tab" data-sec="st" onclick="switchSec('st',this)">🎯 选股策略</div>
 <div class="tab" data-sec="rc" onclick="switchSec('rc',this)">🧲 共振日历</div>
+  <!-- 2026-08-08 主人令：选股策略降级为「辅助策略池」，仅管理员可见，置于暂未上架左侧 -->
+  <div class="tab locked" data-sec="st" data-lock="1" onclick="guardLock('st',this)">🔒 选股策略 <span class="lk">[锁]</span></div>
   <!-- 2026-08-07 主人令：暂未上架 从运维子 Tab 提升为一级 nav（仅管理员可见，guardLock 锁定） -->
   <div class="tab locked" data-sec="ul" data-lock="1" onclick="guardLock('ul',this)">🔒 暂未上架 <span class="lk">[锁]</span></div>
   <div class="tab locked" data-sec="op" data-lock="1" onclick="guardLock('op',this)">🔒 运维 <span class="lk">[锁]</span></div>
@@ -1090,8 +1094,47 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 </nav>
 
 <main>
+  <!-- ============ 🏆 最终推荐（2026-08-08 新建：全站唯一买卖决策入口） ============ -->
+  <section id="sec-final" class="active">
+    <div class="sec-head"><h2>🏆 最终推荐</h2><span class="tag" id="finalHeaderTag">跨策略共振 + 板块强度加权 · Top3 · --</span></div>
+
+    <!-- 卡1：最终推荐 Top3 -->
+    <div class="card" style="margin-bottom:16px;border-left:4px solid #fbbf24;">
+      <h3><span class="ic">🏆</span>最终推荐 · Top<span id="finalTopN">3</span>
+        <span class="fresh" id="finalRecTime">—</span>
+        <span id="finalCrisisBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600"></span>
+      </h3>
+      <div id="finalRecBody" style="padding:4px 2px 2px;"><div class="note">加载中…</div></div>
+    </div>
+
+    <!-- 卡2：今日可入手候选（与暂未上架/今日事件同源，复用 __judgmentCandidatesHTML） -->
+    <div class="card" style="margin-bottom:16px;border-left:4px solid #ff7043;">
+      <h3><span class="ic">🎯</span>今日可入手候选 <span style="font-size:11px;color:var(--sub);font-weight:400">聚合 三重共识 / 驾驶舱A档 / 四量终极</span></h3>
+      <div id="finalCandBody" style="padding:12px 4px 2px;"><div class="note">加载中…</div></div>
+    </div>
+
+    <!-- 卡3：个股查询（2026-08-08 从「选股策略」迁移至此） -->
+    <div class="card">
+      <h3><span class="ic">🔍</span>个股查询 · 全站扩展信息</h3>
+      <div class="query-search-box" style="display:flex;gap:10px;margin-bottom:16px;background:linear-gradient(135deg,rgba(0,188,212,.12),rgba(56,189,248,.08));padding:14px 18px;border-radius:10px;box-shadow:0 1px 6px rgba(56,189,248,.1);position:relative;border:1px solid var(--border);">
+        <div style="position:relative;flex:1;">
+          <input type="text" id="v8QueryInput" placeholder="输入股票代码、拼音首字母或名称，如 600000、hlzj、茅台" onkeydown="if(event.key==='Enter')doV8Query()" oninput="showV8QueryDropdown(this.value)" onfocus="if(this.value.trim())showV8QueryDropdown(this.value)" style="width:100%;padding:11px 15px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;outline:none;transition:border-color .2s;background:var(--card);color:var(--txt);box-sizing:border-box;" />
+          <div id="v8QueryDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);border:1.5px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:320px;overflow-y:auto;z-index:1000;box-shadow:0 4px 16px rgba(0,0,0,.24);"></div>
+        </div>
+        <button class="btn" onclick="doV8Query()">查询分析</button>
+      </div>
+      <div id="v8QueryResult"></div>
+
+      <div style="padding:12px 16px;margin-top:10px;background:linear-gradient(135deg,rgba(0,188,212,.1),rgba(56,189,248,.06));border-radius:10px;border:1px solid var(--border);">
+        <div style="font-size:13px;color:var(--txt);margin-bottom:4px;"><strong>查询格式：</strong>输入股票代码、拼音首字母或中文名称</div>
+        <div style="font-size:13px;color:var(--txt);"><strong>覆盖范围：</strong>A股（主板 / 创业板 / 科创板 / 北交所）+ 港股 + 指数 + ETF，共 7000+ 只</div>
+      </div>
+    </div>
+
+  </section>
+
   <!-- ============ 今日事件 ============ -->
-  <section id="sec-td" class="active">
+  <section id="sec-td">
     <div class="sec-head"><h2>📅 今日事件</h2><span class="tag" id="tdHeaderTag">交易日历 + 打新速览 · --</span></div>
 
     <!-- 今日事件详情（日历事件） -->
@@ -2617,34 +2660,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <div class="sec-head"><h2>🎯 选股策略 · 三重共识</h2><span class="tag">主站TOP10≥70 · 驾驶舱A档 · 基本面A档 · 入选即跟踪</span></div>
     <!-- TAB 按钮行（横排，独立于内容区） -->
     <div class="st-tabs">
-      <button class="st-tab" data-st="query" onclick="switchSt('query')">🔍 个股查询</button>
       <button class="st-tab active" data-st="tc" onclick="switchSt('tc')">🥇 三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="fv" onclick="switchSt('fv')">🔥 四量终极 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="cockpit" onclick="switchSt('cockpit')">🎯 驾驶舱 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="allsite" onclick="switchSt('allsite')">🌐 全站精选 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用</span></button>
+      <button class="st-tab" data-st="hunter" onclick="switchSt('hunter')">🐂 大牛股猎手 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">中线</span></button>
     </div>
 
-    <!-- ===== TAB 页面：个股查询 ===== -->
-    <div id="st-query" class="st-pane">
-      <div class="card">
-        <h3><span class="ic">🔍</span>个股查询 · 全站扩展信息</h3>
-        <div class="query-search-box" style="display:flex;gap:10px;margin-bottom:16px;background:linear-gradient(135deg,rgba(0,188,212,.12),rgba(56,189,248,.08));padding:14px 18px;border-radius:10px;box-shadow:0 1px 6px rgba(56,189,248,.1);position:relative;border:1px solid var(--border);">
-          <div style="position:relative;flex:1;">
-            <input type="text" id="v8QueryInput" placeholder="输入股票代码、拼音首字母或名称，如 600000、hlzj、茅台" onkeydown="if(event.key==='Enter')doV8Query()" oninput="showV8QueryDropdown(this.value)" onfocus="if(this.value.trim())showV8QueryDropdown(this.value)" style="width:100%;padding:11px 15px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;outline:none;transition:border-color .2s;background:var(--card);color:var(--txt);box-sizing:border-box;" />
-            <div id="v8QueryDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);border:1.5px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:320px;overflow-y:auto;z-index:1000;box-shadow:0 4px 16px rgba(0,0,0,.24);"></div>
-          </div>
-          <button class="btn" onclick="doV8Query()">查询分析</button>
-        </div>
-        <div id="v8QueryResult"></div>
-
-        <div style="padding:12px 16px;margin-top:10px;background:linear-gradient(135deg,rgba(0,188,212,.1),rgba(56,189,248,.06));border-radius:10px;border:1px solid var(--border);">
-          <div style="font-size:13px;color:var(--txt);margin-bottom:4px;"><strong>查询格式：</strong>输入股票代码、拼音首字母或中文名称</div>
-          <div style="font-size:13px;color:var(--txt);"><strong>覆盖范围：</strong>A股（主板 / 创业板 / 科创板 / 北交所）+ 港股 + 指数 + ETF，共 7000+ 只</div>
-        </div>
-
-      </div>
-    </div><!--/st-query-->
+    <!-- ===== TAB 页面：大牛股猎手（2026-08-08 从「共振日历」迁入） ===== -->
+    <div id="st-hunter" class="st-pane">
+      <div id="hunterContainer"></div>
+    </div><!--/st-hunter-->
 
     <!-- ===== TAB 页面：三重共识（默认展示） ===== -->
     <div id="st-tc" class="st-pane active">
@@ -2945,7 +2972,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <button class="rc-tab-btn active" onclick="switchRcTab('tab1',this)">📅 机游共振日历</button>
       <button class="rc-tab-btn" onclick="switchRcTab('tab2',this)">🌊 北向席位日历</button>
       <button class="rc-tab-btn" onclick="switchRcTab('tab3',this)">🔍 每日洞察</button>
-      <button class="rc-tab-btn" onclick="switchRcTab('tab4',this)">🐂 大牛股猎手</button>
     </div>
 
     <!-- ===== TAB1: 机游共振日历 ===== -->
@@ -2963,10 +2989,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div id="insightContainer"></div>
     </div>
 
-    <!-- ===== TAB4: 大牛股猎手 ===== -->
-    <div id="rcTab4" class="rc-pane">
-      <div id="hunterContainer"></div>
-    </div>
+    <!-- ===== TAB4: 大牛股猎手 → 2026-08-08 主人令：已迁至「选股策略 · 大牛股猎手」（#st-hunter），此处仅保留说明 ===== -->
 
   </section>
 
@@ -2984,7 +3007,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     if(tabId === 'tab1' && !window.__jyCalRendered){ setTimeout(renderJyCalendar, 30); }
     if(tabId === 'tab2' && !window.__northCalRendered){ setTimeout(renderNorthCalendar, 30); }
     if(tabId === 'tab3' && !window.__insightRendered){ setTimeout(renderInsight, 30); }
-    if(tabId === 'tab4' && !window.__hunterRendered){ setTimeout(renderHunter, 30); }
+    /* tab4 大牛股猎手已迁至「选股策略」，见 window.renderHunter */
   }
 
   /* ===== 工具函数 ===== */
@@ -4173,7 +4196,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     // Footer
     h += '<div style="margin-top:12px;font-size:10px;color:var(--dim);text-align:center">' + _uBadge('盘后', '短线', updateTime) + '</div>';
-    h += '<div style="margin-top:4px;font-size:10px;color:var(--sub);text-align:center">→ 完整机游/北向/洞察/猎手分析见顶部 🧲 共振日历</div>';
+    h += '<div style="margin-top:4px;font-size:10px;color:var(--sub);text-align:center">→ 完整机游/北向/每日洞察分析见顶部 🧲 共振日历</div>';
 
     c.innerHTML = h;
     window.__hunterRendered = true;
@@ -4183,6 +4206,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       window.__hunterRendered = false;
     }
   }
+  /* 2026-08-08：大牛股猎手迁至「选股策略」tab，跨 script 块调用必须走 window */
+  window.renderHunter = renderHunter;
 
   /* Auto-render TAB1 on load */
   if(document.readyState === 'loading'){
@@ -5087,6 +5112,8 @@ function switchSec(sec,el){
   // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
   if(sec==='ph' && typeof window._renderSecPh==='function') setTimeout(window._renderSecPh,80);
   if(sec==='st' && typeof window._renderSecSt==='function') setTimeout(window._renderSecSt,80);
+  // 最终推荐：进入时渲染 Top3 + 今日可入手候选（个股查询为静态交互，无需渲染）
+  if(sec==='final' && typeof window.__renderFinalSec==='function') setTimeout(window.__renderFinalSec,60);
   // 实时数据：情绪周期·连板天梯迁到本区，进入时渲染
   if(sec==='rt' && typeof window.__renderCycleLadderCard==='function') setTimeout(window.__renderCycleLadderCard,60);
   // 共振日历：进入时确保默认 tab1（机游共振）渲染（rcTab1 默认 active，但 switchRcTab 仅在点 tab 时触发）
@@ -8054,9 +8081,10 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   let stRendered={};
   function renderStTab(tab){
     // 确保 op 标签的 DATA.*（驾驶舱/全站精选/逆势龙头读取的共享数据源）已从 window.X 填充
-    if(tab!=='tc' && tab!=='query'){ try{ if(window.__renderOps) window.__renderOps(); }catch(e){} }
-    if(tab==='query'){ /* 个股查询为静态交互，无需额外渲染 */ }
-    else if(tab==='tc'){ initTriple(); }
+    if(tab!=='tc'){ try{ if(window.__renderOps) window.__renderOps(); }catch(e){} }
+    if(tab==='tc'){ initTriple(); }
+    else if(tab==='hunter'){ /* 2026-08-08 从共振日历迁入；跨 script 块必须走 window */
+      if(!window.__hunterRendered){ try{ window.renderHunter(); }catch(e){ console.warn('大牛股猎手渲染失败',e); } } }
     else if(tab==='cockpit'){ if(!stRendered.cockpit){ stRendered.cockpit=1; try{ window.renderCockpit('stCockpit'); }catch(e){console.warn('驾驶舱渲染失败',e);} } }
     else if(tab==='allsite'){ if(!stRendered.allsite){ stRendered.allsite=1; try{ window.renderAllsite('stAllsite'); }catch(e){console.warn('全站精选渲染失败',e);} } }
     else if(tab==='crds'){ if(!stRendered.crds){ stRendered.crds=1; try{ window.renderV8Crds('st'); }catch(e){console.warn('逆势龙头渲染失败',e);} } }
@@ -8066,7 +8094,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   }
   window.switchSt=function(n){
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
-    ['query','tc','cockpit','allsite','fv','crds'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
+    ['tc','cockpit','allsite','fv','crds','hunter'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
     renderStTab(n);
   };
   function initTriple(){
@@ -8077,7 +8105,10 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(h)safe(renderHistory,h);
   }
   initTriple();
-  document.querySelectorAll('.tab[data-sec="st"]').forEach(t=>t.addEventListener('click',()=>setTimeout(initTriple,60)));
+  // 2026-08-08：选股策略已锁，仅管理员可见，但切 tab 时仍需刷新三重共识以防缓存
+  document.querySelectorAll('.tab[data-sec="st"]').forEach(t=>t.addEventListener('click', function(){
+    if(typeof isAdmin==='function' && isAdmin()) setTimeout(initTriple, 60);
+  }));
   // 2026-08-06 23:44 修复：胶囊激活 init 不放在这里 — renderFourVolume/renderV8Crds
   // 在后续 <script> 块里定义（7799 之后），此处还看不到它们。
   // 真正的 init 见末尾最后一个 <script> 块 (iife initCardBadges)，
@@ -10096,6 +10127,152 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   // 实时数据区：情绪周期·连板天梯（迁到涨停热力矩阵上方）
   tryRun('renderCycleLadderCard', window.__renderCycleLadderCard, 'cycle-ladder init');
   // ⛓ 任何后续切到 fv/crds tab 也只是再跑一次幂等
+})();
+</script>
+
+<!-- ===== 2026-08-08 主人令：🏆 最终推荐（全站唯一买卖决策入口） ===== -->
+<style>
+  .fr-card{background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:14px 16px;margin-bottom:12px;position:relative;overflow:hidden}
+  .fr-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#fbbf24,#f59e0b)}
+  .fr-card.r2::before{background:linear-gradient(180deg,#94a3b8,#64748b)}
+  .fr-card.r3::before{background:linear-gradient(180deg,#c2833f,#92400e)}
+  .fr-hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .fr-rank{font-size:20px;line-height:1}
+  .fr-name{font-size:18px;font-weight:800;color:var(--txt)}
+  .fr-code{font-size:13px;color:var(--sub);font-weight:600;font-family:ui-monospace,Menlo,monospace}
+  .fr-mk{font-size:10px;padding:1px 7px;border-radius:6px;background:rgba(56,189,248,.14);color:#38bdf8;border:1px solid rgba(56,189,248,.3)}
+  .fr-score{margin-left:auto;font-size:12px;color:var(--sub)}
+  .fr-score b{font-size:20px;color:var(--gold);font-weight:800}
+  .fr-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .fr-chip{font-size:11px;padding:2px 9px;border-radius:7px;background:rgba(167,139,250,.14);color:#a78bfa;border:1px solid rgba(167,139,250,.32);font-weight:600}
+  .fr-chip.sec{background:rgba(251,191,36,.14);color:var(--gold);border-color:rgba(251,191,36,.34)}
+  .fr-chip.res{background:rgba(244,73,93,.14);color:var(--up);border-color:rgba(244,73,93,.32)}
+  .fr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px;margin:10px 0 8px}
+  .fr-cell{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:6px 9px;text-align:center}
+  .fr-cell .k{font-size:10px;color:var(--dim);margin-bottom:2px}
+  .fr-cell .v{font-size:14px;font-weight:800;color:var(--txt)}
+  .fr-reason{font-size:12px;color:var(--sub);line-height:1.6;background:var(--bg2);border-radius:8px;padding:7px 10px;border:1px solid var(--border)}
+  .fr-cons{font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5}
+  .fr-allrow{display:flex;align-items:center;gap:8px;padding:5px 8px;border-bottom:1px dashed var(--border);font-size:12px}
+  .fr-allrow:last-child{border-bottom:none}
+</style>
+<script>
+(function(){
+  function _fe(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
+  function _fn(v,d){ return (v==null||isNaN(v))?'--':Number(v).toFixed(d==null?2:d); }
+  var MEDAL=['🥇','🥈','🥉'];
+
+  function stockCard(s,i){
+    var pc = Number(s.pct_chg||0);
+    var pcColor = pc>0?'var(--up)':(pc<0?'var(--down)':'var(--sub)');
+    var h='<div class="fr-card'+(i===1?' r2':(i===2?' r3':''))+'">';
+    h+='<div class="fr-hd">';
+    h+='<span class="fr-rank">'+(MEDAL[i]||('#'+(i+1)))+'</span>';
+    h+='<span class="fr-name">'+_fe(s.name)+'</span>';
+    h+='<span class="fr-code">'+_fe(s.code)+'</span>';
+    if(s.market) h+='<span class="fr-mk">'+_fe(s.market)+'</span>';
+    h+='<span class="fr-score">综合 <b>'+_fn(s.final_score,1)+'</b></span>';
+    h+='</div>';
+
+    // 来源 / 共振 / 板块 胶囊
+    h+='<div class="fr-chips">';
+    h+='<span class="fr-chip res">🔗 共振 '+(s.resonance||0)+' 源</span>';
+    (s.sources||[]).forEach(function(src){ h+='<span class="fr-chip">'+_fe(src)+'</span>'; });
+    if(Number(s.sector_score||0)>0){
+      h+='<span class="fr-chip sec">📊 板块 +'+_fn(s.sector_score,1)+(s.sector_hits&&s.sector_hits.length?' · '+_fe(s.sector_hits.join('/')):'')+'</span>';
+    }
+    h+='</div>';
+
+    // 价格 / 止损 / 目标 / 盈亏比
+    h+='<div class="fr-grid">';
+    h+='<div class="fr-cell"><div class="k">现价</div><div class="v">'+_fn(s.close)+'</div></div>';
+    h+='<div class="fr-cell"><div class="k">涨跌</div><div class="v" style="color:'+pcColor+'">'+(pc>0?'+':'')+_fn(pc)+'%</div></div>';
+    h+='<div class="fr-cell"><div class="k">止损</div><div class="v" style="color:var(--down)">'+_fn(s.stop_loss)+'</div></div>';
+    h+='<div class="fr-cell"><div class="k">目标</div><div class="v" style="color:var(--up)">'+_fn(s.target_price)+'</div></div>';
+    h+='<div class="fr-cell"><div class="k">盈亏比</div><div class="v" style="color:var(--gold)">'+_fn(s.risk_reward,1)+'</div></div>';
+    h+='</div>';
+
+    if(s.reason) h+='<div class="fr-reason"><b style="color:var(--txt)">入选依据：</b>'+_fe(s.reason)+'</div>';
+    var ind = s.industry?('行业：'+s.industry):'';
+    var cps = (s.concepts&&s.concepts.length)?('　概念：'+s.concepts.slice(0,6).join('、')):'';
+    if(ind||cps) h+='<div class="fr-cons">'+_fe(ind+cps)+'</div>';
+    h+='</div>';
+    return h;
+  }
+
+  function renderFinalRec(){
+    var el=document.getElementById('finalRecBody'); if(!el) return;
+    var D=window.FINAL_RECOMMEND_DATA||null;
+    if(!D || !D.stocks || !D.stocks.length){
+      el.innerHTML='<div class="note" style="padding:16px;text-align:center;color:var(--dim)">最终推荐数据暂不可用（等待盘后算法生成）</div>';
+      return;
+    }
+    var t=document.getElementById('finalRecTime'); if(t) t.textContent=D.update_time||'—';
+    var n=document.getElementById('finalTopN'); if(n) n.textContent=(D.stocks.length||3);
+    var tag=document.getElementById('finalHeaderTag');
+    if(tag) tag.textContent='跨策略共振 + 板块强度加权 · Top'+D.stocks.length+' · 候选池 '+(D.total_candidates||0)+' 只 · '+(D.update_time||'--');
+    var cb=document.getElementById('finalCrisisBadge');
+    if(cb){
+      cb.style.display='inline-block';
+      var hi=!!D.crisis_high;
+      cb.textContent=(hi?'⚠️ 危机雷达 '+_fn(D.crisis_score,1)+'（高位·逆势龙头已并入）':'🛡 危机雷达 '+_fn(D.crisis_score,1)+'（正常）');
+      cb.style.color = hi?'#fff':'var(--sub)';
+      cb.style.background = hi?'linear-gradient(135deg,#b91c1c,#ef4444)':'rgba(148,163,184,.15)';
+      cb.style.border = '1px solid '+(hi?'#ef4444':'rgba(148,163,184,.35)');
+    }
+
+    var h='';
+    // 强势板块条
+    if(D.strong_sectors && D.strong_sectors.length){
+      h+='<div style="margin-bottom:12px;padding:8px 12px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);border-radius:9px;font-size:12px;color:var(--sub)">';
+      h+='<b style="color:var(--gold)">📊 当前强势板块（相对强度 TOP）：</b>'+_fe(D.strong_sectors.join(' · '));
+      h+='</div>';
+    }
+    D.stocks.forEach(function(s,i){ h+=stockCard(s,i); });
+
+    // 全部候选（管理员/自定义用）
+    if(D.all_candidates && D.all_candidates.length){
+      h+='<details style="margin-top:10px"><summary style="cursor:pointer;font-size:12px;color:var(--sub);padding:6px 0">📋 展开全部候选（'+D.all_candidates.length+' 只，按综合分排序，自行取舍）</summary>';
+      h+='<div style="margin-top:8px;background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:6px 10px">';
+      D.all_candidates.forEach(function(c,i){
+        h+='<div class="fr-allrow">';
+        h+='<span style="width:24px;color:var(--dim)">'+(i+1)+'</span>';
+        h+='<span style="font-weight:700;color:var(--txt);min-width:76px">'+_fe(c.name)+'</span>';
+        h+='<span style="color:var(--sub);font-family:ui-monospace,monospace;min-width:62px">'+_fe(c.code)+'</span>';
+        h+='<span style="color:var(--gold);font-weight:700;min-width:44px">'+_fn(c.final_score,1)+'</span>';
+        h+='<span style="color:var(--up);min-width:44px">共振'+(c.resonance||0)+'</span>';
+        h+='<span style="color:var(--dim);font-size:11px">'+_fe((c.sources||[]).join(' / '))+'</span>';
+        h+='</div>';
+      });
+      h+='</div></details>';
+    }
+
+    // 纪律提示
+    h+='<div style="margin-top:12px;padding:10px 13px;background:rgba(244,73,93,.07);border:1px solid rgba(244,73,93,.24);border-radius:9px;font-size:12px;color:var(--sub);line-height:1.7">';
+    h+='<b style="color:var(--up)">⚠️ 交易纪律：</b>止损价 = max(20日低点, 现价×0.9, 现价−ATR×2)；目标价按盈亏比 1.5 反推。<b>破止损无条件离场</b>，不摊平、不扛单、不追高。';
+    h+='</div>';
+
+    el.innerHTML=h;
+  }
+
+  function renderFinalCand(){
+    var el=document.getElementById('finalCandBody'); if(!el) return;
+    try{
+      el.innerHTML = (typeof window.__judgmentCandidatesHTML==='function')
+        ? window.__judgmentCandidatesHTML()
+        : '<div class="note">可入手候选渲染函数未加载</div>';
+    }catch(e){
+      el.innerHTML='<div class="note" style="color:var(--down)">可入手候选渲染异常：'+_fe(String(e))+'</div>';
+    }
+  }
+
+  window.__renderFinalSec=function(){
+    try{ renderFinalRec(); }catch(e){ console.warn('最终推荐渲染失败',e); }
+    try{ renderFinalCand(); }catch(e){ console.warn('可入手候选渲染失败',e); }
+  };
+  // 首屏默认就是最终推荐，立即渲染
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', window.__renderFinalSec); }
+  else { window.__renderFinalSec(); }
 })();
 </script>
 </body>
