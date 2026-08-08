@@ -639,6 +639,13 @@ function __judgmentCandidatesHTML(){
       + '</div>');
   });
   return '<div style="font-size:13px;font-weight:700;color:var(--up);margin-bottom:4px">🎯 今日可入手候选 '+list.length+' 只</div>'
+    + '<div style="margin:6px 0 10px 0;padding:8px 10px;background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.25);border-radius:8px;font-size:12px;line-height:1.6;">'
+    + '<div style="font-weight:800;color:#f59e0b;margin-bottom:4px">🛡️ 止盈止损纪律</div>'
+    + '<span style="color:var(--down);font-weight:700;">止损 -7%</span> · '
+    + '<span style="color:var(--up);font-weight:700;">短线止盈 +7%</span> · '
+    + '<span style="color:var(--up);font-weight:700;">中线止盈 +12%</span> · '
+    + '<span style="color:var(--gold);font-weight:700;">强势止盈 +15%</span>'
+    + '</div>'
     + lines.join('');
 }
 window.__judgmentCandidatesHTML = __judgmentCandidatesHTML;
