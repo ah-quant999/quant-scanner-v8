@@ -876,6 +876,9 @@ tr:hover td { background: #fafbfc; }
 
       <!-- 资金抱团监控 — 2026-07-21 用户要求彻底删除 -->
 
+      <!-- 🎭 情绪周期·连板天梯（实时数据区，置于涨停热力矩阵上方） -->
+      <div id="cycleLadderCard" style="margin-bottom:12px;"></div>
+
       <!-- 🔥 涨停联动（盘中实时：开盘即可刷新） -->
       <div id="limitUpHeatCard" class="predict-card" style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);margin-bottom:10px;">
         <div style="background:linear-gradient(135deg,#fff3e0,#ffe082);color:#e65100;padding:12px 18px;font-size:15px;font-weight:700;text-align:center;">🔥 涨停联动<span style="font-size:10px;font-weight:400;color:#999;margin-left:4px;">盘中·实时</span> <span style="font-size:11px;font-weight:400;opacity:0.65;" id="limitUpHeatTime" class="card-time"></span></div>
@@ -344305,6 +344308,20 @@ function fmtDataTime(timeStr) {
   if (diffDays <= 7) { return { text: diffDays + '天前 ' + timePart, stale: true, critical: true, daysAgo: diffDays, mmdd: mmdd, time: timePart, ts: ts }; }
   return { text: diffDays + '天前 ' + timePart, stale: true, critical: true, daysAgo: diffDays, mmdd: mmdd, time: timePart, ts: ts };
 }
+/* 统一「持仓」胶囊（🧺 MM-DD 持仓 N，绿色渐变） */
+function _holdBadge(dateStr, count) {
+  var d = '';
+  if (dateStr) {
+    var m = String(dateStr).match(/\d{4}-(\d{2})-(\d{2})/);
+    if (m) d = m[1] + '-' + m[2];
+    else { m = String(dateStr).match(/^(\d{2})-(\d{2})$/); if (m) d = m[1] + '-' + m[2]; }
+  }
+  return '<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;padding:3px 10px;border-radius:10px;white-space:nowrap;">'
+    + '<span aria-hidden="true">🧺</span>'
+    + '<span>' + (d || '--') + ' 持仓 <b style="margin-left:2px">' + (count || 0) + '</b></span>'
+    + '</span>';
+}
+window._holdBadge = _holdBadge;
 
 function renderRecommend() {
   const section = document.getElementById('recommendSection');
@@ -357132,6 +357149,109 @@ function renderTop10Daily() {
   contentEl.innerHTML = h;
 }
 
+// ===== 🎭 情绪周期·连板天梯（实时数据区） =====
+// 首板平铺展示（一行9只），和其他连板一致，无进度条无弹窗
+window.__renderCycleLadderCard = function() {
+  var el = document.getElementById('cycleLadderCard');
+  if (!el) return;
+  var cr = window.CRISIS_DATA || {};
+  var lh = window.LIMIT_UP_HEATMAP || {};
+  var lhb = window.LHB_DATA || {};
+  var crisisScore = (cr.currency || 0) * 0.4 + (cr.economy || 0) * 0.35 + (cr.global || 0) * 0.25;
+  var crisisPct = Math.round(crisisScore * 100);
+  var totalUp = lh.total || 0;
+  var ladder = lh.ladder || {};
+  var top = lh.top || [];
+  var lhbCount = (lhb.stocks && lhb.stocks.length) || 0;
+  var highLbc = (ladder['3'] || 0) + (ladder['4'] || 0) + (ladder['5'] || 0) + (ladder['10'] || 0);
+
+  // 阶段判定
+  var phase, phaseColor, phaseDesc, posAdvice;
+  if (crisisPct >= 70) { phase = '冰点'; phaseColor = 'var(--down)'; phaseDesc = '危机雷达高位'; posAdvice = '空仓'; }
+  else if (crisisPct >= 50) { phase = '降温'; phaseColor = '#f59e0b'; phaseDesc = '风险累积'; posAdvice = '≤30%'; }
+  else if (totalUp >= 80 && highLbc >= 15) { phase = '狂热'; phaseColor = '#ef4444'; phaseDesc = '涨停泛滥'; posAdvice = '兑现'; }
+  else if (totalUp >= 40 && crisisPct <= 30) { phase = '温和'; phaseColor = 'var(--up)'; phaseDesc = '情绪偏暖'; posAdvice = '50%'; }
+  else if (totalUp < 30 || crisisPct > 35) { phase = '修复'; phaseColor = '#38bdf8'; phaseDesc = '低位筑底'; posAdvice = '30%'; }
+  else { phase = '温和'; phaseColor = 'var(--up)'; phaseDesc = '情绪平稳'; posAdvice = '50%'; }
+
+  function _vra(c, a) { return c.indexOf("var(") === 0 ? "rgba(0,0,0," + a + ")" : (c + "22").slice(0, 9); }
+  var hasData = cr.update_time || lh.update_time;
+  var html = '<div class="card" style="margin-bottom:12px;border-left:4px solid #38bdf8;">';
+  // 卡片标题（用 _uBadge 模式）
+  html += '<div style="display:flex;align-items:center;gap:8px;padding:12px 14px 8px;flex-wrap:wrap;">';
+  html += '<span style="font-size:15px;font-weight:800;color:#0c7b9e;">🎭 情绪周期·连板天梯</span>';
+  html += '<span style="font-size:11px;color:#888;">危机雷达+涨停热力+连板梯队+龙虎榜</span>';
+  if (hasData) {
+    html += '<span style="font-size:10px;color:#888;background:#f0f0f0;padding:2px 8px;border-radius:10px;margin-left:auto;">盘中 · 短线</span>';
+    html += '<span class="card-time" style="font-size:10px;color:#aaa;opacity:0.6;">🕐 ' + (lh.update_time || cr.update_time || '--') + '</span>';
+  }
+  html += '</div>';
+
+  html += '<div style="padding:10px 14px;">';
+  // 阶段 + 四指标
+  html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">';
+  html += '<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:' + _vra(phaseColor, 0.08) + ';border:1px solid ' + _vra(phaseColor, 0.2) + ';border-radius:8px;">';
+  html += '<span style="font-size:18px;font-weight:900;color:' + phaseColor + '">' + phase + '</span>';
+  html += '<span style="font-size:12px;color:#666;">' + phaseDesc + ' · 仓位 <b style="color:' + phaseColor + '">' + posAdvice + '</b></span></div>';
+
+  var metrics = [
+    { l: '危机', v: crisisPct, u: '分', c: crisisPct >= 70 ? 'var(--down)' : (crisisPct >= 50 ? '#f59e0b' : 'var(--up)') },
+    { l: '涨停', v: totalUp, u: '只', c: totalUp >= 80 ? '#ef4444' : (totalUp >= 40 ? 'var(--up)' : 'var(--down)') },
+    { l: '高连', v: highLbc, u: '只', c: 'var(--up)' },
+    { l: '龙虎', v: lhbCount, u: '只', c: 'var(--up)' }
+  ];
+  metrics.forEach(function(m) {
+    html += '<div style="display:flex;align-items:center;gap:4px;padding:5px 10px;background:#f8f9fa;border:1px solid #eee;border-radius:8px;">';
+    html += '<span style="font-size:12px;font-weight:600;color:#555">' + m.l + '</span>';
+    html += '<span style="font-size:16px;font-weight:900;color:' + m.c + '">' + m.v + '<span style="font-size:10px;font-weight:600;margin-left:1px">' + m.u + '</span></span></div>';
+  });
+  html += '</div>'; // end metrics row
+
+  // 连板分布：全部平铺，首板也一行9只，无折叠无弹窗
+  if (lh.update_time && Object.keys(ladder).length) {
+    var lbcKeys = Object.keys(ladder).sort(function(a, b) { return parseInt(b) - parseInt(a); });
+    var lbMap = {};
+    (top || []).forEach(function(t) {
+      var k = String(t.lbc || '1');
+      if (!lbMap[k]) lbMap[k] = [];
+      lbMap[k].push(t);
+    });
+    html += '<div style="font-size:13px;font-weight:700;color:#444;margin:8px 0 6px">连板分布（共' + totalUp + '只涨停）</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:6px;">';
+
+    var PER_ROW = 9;
+    lbcKeys.forEach(function(k) {
+      var v = ladder[k];
+      var list = lbMap[k] || [];
+      var lbl = k === '1' ? '首板' : k + '连板';
+      var barColor = parseInt(k) >= 4 ? '#ef4444' : (parseInt(k) >= 3 ? '#f59e0b' : (parseInt(k) >= 2 ? '#38bdf8' : 'var(--up)'));
+
+      html += '<div style="border-left:3px solid ' + barColor + ';padding:6px 10px;background:#fafbfc;border-radius:0 8px 8px 0;">';
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
+      html += '<span style="font-size:13px;font-weight:800;color:' + barColor + ';min-width:48px">' + lbl + '</span>';
+      html += '<span style="font-size:11px;color:#888;">共' + v + '只</span>';
+      html += '</div>';
+
+      // 股票名+代码 平铺，每行 PER_ROW 只
+      if (list.length) {
+        html += '<div style="display:flex;flex-wrap:wrap;gap:3px 6px;line-height:1.7;">';
+        for (var si = 0; si < list.length; si++) {
+          var s = list[si];
+          html += '<span style="font-size:12px;color:#333;background:#fff;border:1px solid #ddd;padding:2px 7px;border-radius:4px;white-space:nowrap;" title="' + (s.name || '') + ' ' + (s.code || '') + '">' + (s.name || '?') + ' <span style="color:#999;font-size:10px">' + (s.code || '') + '</span></span>';
+        }
+        html += '</div>';
+      } else {
+        html += '<div style="font-size:11px;color:#999;font-style:italic;">（明细股票暂缺）</div>';
+      }
+      html += '</div>'; // end this lbc group
+    });
+    html += '</div>'; // end all groups
+  }
+
+  html += '</div></div>'; // end padding + card
+  el.innerHTML = html;
+};
+
 // ===== 🔥 涨停联动（预判信号页） =====
 function renderLimitUpHeatmap() {
   var card = document.getElementById('limitUpHeatCard');
@@ -357212,101 +357332,6 @@ function renderLimitUpHeatmap() {
   analysis.push('💡 <b>全局：</b>'+(td>pd*1.2?'涨停效应扩大，短线情绪升温':td<pd*0.8?'涨停效应收缩，情绪降温':'涨停效应平稳')+'（当日'+td+'只 vs 3日前'+pd+'只）');
   analysisEl.innerHTML=analysis.map(function(a){return '<div style="line-height:1.7;">'+a+'</div>';}).join('');
   analysisEl.style.display='block';
-
-  // ── 首板卡片（连板梯队：从 LHB_DATA.stocks 取股票列表渲染）──
-  try { renderFirstBoardStripe(contentEl); } catch(e) { console.log('renderFirstBoardStripe error:', e.message); }
-}
-
-// ===== 首板卡片：标签行 + 全量明细 modal =====
-// 数据源：window.LHB_DATA.stocks（后续可切换到真正的连板分组数据）
-function renderFirstBoardStripe(containerEl) {
-  if (!containerEl) return;
-  var lhb = window.LHB_DATA || {};
-  var stocks = lhb.stocks || [];
-  if (!stocks.length) return;
-
-  // 去重（按 code）
-  var seen = {};
-  var uniq = [];
-  for (var i = 0; i < stocks.length; i++) {
-    var s = stocks[i];
-    if (!s.code || seen[s.code]) continue;
-    seen[s.code] = true;
-    uniq.push(s);
-  }
-  if (!uniq.length) return;
-
-  var total = uniq.length;
-  var SHOW = 9; // 一行显示数量
-
-  // 标签样式
-  function chip(s) {
-    return '<span style="display:inline-block;background:#f5f5f5;color:#333;border:1px solid #e0e0e0;border-radius:4px;padding:3px 8px;font-size:12px;font-weight:500;margin:3px 4px 3px 0;cursor:pointer;white-space:nowrap;user-select:none;" onclick="showFirstBoardModal()" title="'+s.name+' '+s.code+'">'+s.name+' <span style="color:#999;font-size:10px;font-weight:400;">'+s.code+'</span></span>';
-  }
-
-  var html = '';
-  html += '<div style="margin-top:12px;padding-top:10px;border-top:2px solid #e65100;">';
-  html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
-  html += '<span style="font-size:14px;font-weight:700;color:#c62828;">首板</span>';
-  html += '<span style="font-size:11px;color:#999;">共' + total + '只</span>';
-  if (total > SHOW) {
-    html += '<span style="font-size:11px;color:#1565c0;cursor:pointer;text-decoration:underline;" onclick="showFirstBoardModal()">查看全部 ▸</span>';
-  }
-  html += '</div>';
-  html += '<div style="line-height:1.8;">';
-  for (var j = 0; j < Math.min(SHOW, uniq.length); j++) {
-    html += chip(uniq[j]);
-  }
-  html += '</div>';
-  html += '</div>';
-
-  containerEl.insertAdjacentHTML('beforeend', html);
-}
-
-// 首板明细 modal（全部展示，一行9只，不折叠）
-function showFirstBoardModal() {
-  var lhb = window.LHB_DATA || {};
-  var stocks = lhb.stocks || [];
-  if (!stocks.length) return;
-
-  // 去重
-  var seen = {};
-  var uniq = [];
-  for (var i = 0; i < stocks.length; i++) {
-    var s = stocks[i];
-    if (!s.code || seen[s.code]) continue;
-    seen[s.code] = true;
-    uniq.push(s);
-  }
-  if (!uniq.length) return;
-
-  var PER_ROW = 9;
-  function chip(s) {
-    return '<span style="display:inline-block;background:#f5f5f5;color:#333;border:1px solid #e0e0e0;border-radius:4px;padding:6px 10px;font-size:13px;font-weight:500;margin:4px 6px 4px 0;cursor:pointer;white-space:nowrap;user-select:none;max-width:180px;overflow:hidden;text-ellipsis;">' +
-      s.name + ' <span style="color:#999;font-size:11px;font-weight:400;">' + s.code + '</span></span>';
-  }
-
-  var rows = [];
-  for (var start = 0; start < uniq.length; start += PER_ROW) {
-    var batch = uniq.slice(start, start + PER_ROW);
-    rows.push('<div style="display:flex;flex-wrap:wrap;gap:0;padding:4px 0;">' + batch.map(chip).join('') + '</div>');
-  }
-
-  var overlay = document.createElement('div');
-  overlay.id = 'firstBoardModalOverlay';
-  overlay.setAttribute('style', 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.45);z-index:99999;display:flex;align-items:center;justify-content:center;');
-  overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
-
-  overlay.innerHTML =
-    '<div style="background:#fff;border-radius:16px;width:min(720px,92vw);max-height:80vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.18);padding:20px 24px;position:relative;">' +
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">' +
-        '<div style="font-size:17px;font-weight:700;color:#c62828;">首板明细（共' + uniq.length + '只）</div>' +
-        '<span onclick="this.closest(\'#firstBoardModalOverlay\').remove()" style="cursor:pointer;font-size:22px;color:#999;line-height:1;user-select:none;padding:4px 8px;">&times;</span>' +
-      '</div>' +
-      '<div>' + rows.join('') + '</div>' +
-    '</div>';
-
-  document.body.appendChild(overlay);
 }
 
 // ===== 系统健康看板 =====
@@ -358288,8 +358313,11 @@ function buildAllsiteSelectionHTML(d) {
   h += '<div style="display:flex;align-items:center;gap:10px;">';
   h += '<span style="font-size:22px;">🌐</span>';
   h += '<div style="font-size:16px;font-weight:700;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">全站精选';
-  if(genTime){
-    h += '<span style="font-size:11px;font-weight:500;color:#7b1fa2;background:rgba(123,31,162,.08);padding:2px 8px;border-radius:8px;" title="cockpit_tier_recommend_alimi.json 生成时间：'+genTime+'">⏰ 更新于 '+fmtDataTime(genTime).text+'</span>';
+  if (genTime) {
+    h += '<span style="font-size:11px;font-weight:500;color:#7b1fa2;background:rgba(123,31,162,.08);padding:2px 8px;border-radius:8px;" title="cockpit_tier_recommend_alimi.json 生成时间：' + genTime + '">⏰ 更新于 ' + fmtDataTime(genTime).text + '</span>';
+  }
+  if (total > 0) {
+    h += _holdBadge(genTime, total);
   }
   h += '</div></div>';
   h += '</div>';
@@ -359082,6 +359110,7 @@ try { renderTrendFlow(); } catch(e) { console.log('renderTrendFlow error:', e.me
 try { renderSectorRS(); } catch(e) { console.log('renderSectorRS error:', e.message); }
 try { renderSectorRotation(); } catch(e) { console.log('renderSectorRotation error:', e.message); }
 try { renderTop10Daily(); } catch(e) { console.log('renderTop10Daily error:', e.message); }
+try { window.__renderCycleLadderCard(); } catch(e) { console.log('__renderCycleLadderCard error:', e.message); }
 try { renderLimitUpHeatmap(); } catch(e) { console.log('renderLimitUpHeatmap error:', e.message); }
 try { renderCapitalFlowCard(); } catch(e) { console.log('renderCapitalFlowCard error:', e.message); }
 // ⚠️ 以下渲染必须在 renderHealthDashboard 之前，否则健康检查时卡片仍 display:none
