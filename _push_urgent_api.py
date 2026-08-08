@@ -10,7 +10,7 @@ import urllib.request
 from pathlib import Path
 
 REPO = "ah-quant999/quant-scanner-v8"
-TOKEN = Path("E:/workspace/stock-scanner/.workbuddy/v8_gh_token.txt").read_text(encoding="utf-8").strip()
+TOKEN = Path("E:/workspace/quant-scanner-v8/.workbuddy/v8_gh_token.txt").read_text(encoding="utf-8").strip()
 FILE = sys.argv[1]
 MSG = sys.argv[2]
 

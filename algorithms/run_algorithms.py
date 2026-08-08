@@ -31,7 +31,7 @@ OUT = os.path.join(V8_ROOT, "out")
 #   回测永远只有当天/为空。stage_to_raw 不会处理 history 子目录，故直接落 raw_data/history 由 api_push 整体推送。
 HIST_OUT = os.path.join(V8_ROOT, "raw_data", "history")
 
-V6_DATA_DIR = os.environ.get("V6_DATA_DIR", r"E:\workspace\stock-scanner\data")
+V6_DATA_DIR = os.environ.get("V6_DATA_DIR", r"\E:\workspace\quant-scanner-v8\raw_data")
 PY = os.environ.get("V8_PYTHON", "python")
 
 # 本地测试可能传入 Git-Bash 风格路径（/c/Users/...），Windows CreateProcess 无法解析，

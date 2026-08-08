@@ -78,13 +78,13 @@ def load_today_handover_text():
         # 当天常规交接 / 紧急 / 周末改造 / 算法迁移 / 任何 *小九* / *阿狸咪* 8-06 文件
         if today_compact in fn or today_cst in fn:
             texts.append((fn, open(os.path.join(ROOT, fn), encoding="utf-8").read()))
-    # 也读 stock-scanner/.workbuddy/memory 里的当日记忆（跨仓视野）
-    mem_root = r"E:\workspace\stock-scanner\.workbuddy\memory"
+    # 也读 quant-scanner-v8/.workbuddy/memory 里的当日记忆（跨仓视野）
+    mem_root = r"E:\workspace\quant-scanner-v8\.workbuddy\memory"
     mem_file = os.path.join(mem_root, f"{today_cst}.md")
     if os.path.exists(mem_file):
         texts.append((f"memory/{today_cst}.md", open(mem_file, encoding="utf-8").read()))
     # 自动化 memory（automation-*.md）
-    auto_root = r"E:\workspace\stock-scanner\.workbuddy\automations"
+    auto_root = r"\E:\workspace\quant-scanner-v8\.workbuddy\automations"
     if os.path.isdir(auto_root):
         for ad in os.listdir(auto_root):
             mfile = os.path.join(auto_root, ad, "memory.md")

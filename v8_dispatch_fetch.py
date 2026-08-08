@@ -10,7 +10,7 @@ v8_dispatch_fetch.py — 经 GitHub REST API 主动派发 cn_fetch workflow
     python v8_dispatch_fetch.py post_close       # 收盘数据 + 龙虎榜回填
     python v8_dispatch_fetch.py premarket        # 盘前
 
-依赖: E:/workspace/stock-scanner/.workbuddy/v8_gh_token.txt （OAuth token，不入库）
+依赖: E:/workspace/quant-scanner-v8/.workbuddy/v8_gh_token.txt （OAuth token，不入库）
 """
 import sys
 import json
@@ -20,7 +20,7 @@ from datetime import datetime, timezone, timedelta
 
 REPO = "ah-quant999/quant-scanner-v8"
 WF_ID = 324135267  # v8_cn_fetch workflow id
-TOKEN_PATH = "E:/workspace/stock-scanner/.workbuddy/v8_gh_token.txt"
+TOKEN_PATH = "E:/workspace/quant-scanner-v8/.workbuddy/v8_gh_token.txt"
 VALID = {"premarket", "intraday", "post_close", "all"}
 
 

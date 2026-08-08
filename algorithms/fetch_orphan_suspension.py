@@ -12,7 +12,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "raw_data")
 OUTPUT = os.path.join(DATA_DIR, "suspension_alert.json")
 # 兼容旧路径（v6 数据源，扫描用）
-V6_DATA_DIR = os.environ.get("V6_DATA_DIR", r"E:\workspace\stock-scanner\data")
+V6_DATA_DIR = os.environ.get("V6_DATA_DIR", r"\E:\workspace\quant-scanner-v8\raw_data")
 
 TRIGGER_THRESHOLD = 20  # 连续3日偏离≥20%触发异动停牌
 

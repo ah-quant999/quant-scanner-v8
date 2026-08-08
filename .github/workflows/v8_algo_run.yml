@@ -102,7 +102,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       V8_PUSH: "1"
-      V6_DATA_DIR: "E:\\workspace\\stock-scanner\\data"
+      V6_DATA_DIR: "E:\\workspace\\quant-scanner-v8\\data"
     defaults:
       run:
         working-directory: ${{ github.workspace }}

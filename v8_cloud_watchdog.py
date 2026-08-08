@@ -62,7 +62,7 @@ def _load_token():
     if os.environ.get("V8_GITHUB_TOKEN"):
         return os.environ["V8_GITHUB_TOKEN"]
     candidates = [
-        Path("E:/workspace/stock-scanner/.workbuddy/v8_gh_token.txt"),
+        Path("E:/workspace/quant-scanner-v8/.workbuddy/v8_gh_token.txt"),
         Path.home() / ".workbuddy" / "v8_gh_token.txt",
     ]
     for p in candidates:
