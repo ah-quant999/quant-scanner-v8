@@ -125,6 +125,18 @@
     },
     "000651": {
       "2026-08-07": 0
+    },
+    "688183": {
+      "2026-08-08": 118.78
+    },
+    "688213": {
+      "2026-08-08": 93.89
+    },
+    "300199": {
+      "2026-08-08": 24.38
+    },
+    "600309": {
+      "2026-08-08": 75.72
     }
   },
   "_tracking_latest": {
@@ -133,7 +145,7 @@
       "enter_close": 40.62,
       "last_date": "2026-08-07",
       "last_close": 40.62,
-      "status": "near",
+      "status": "dropped",
       "streak": 1,
       "total_days": 1
     },
@@ -142,7 +154,7 @@
       "enter_close": 93.05,
       "last_date": "2026-08-07",
       "last_close": 93.05,
-      "status": "near",
+      "status": "dropped",
       "streak": 1,
       "total_days": 1
     },
@@ -151,7 +163,7 @@
       "enter_close": 128.1,
       "last_date": "2026-08-07",
       "last_close": 128.1,
-      "status": "near",
+      "status": "dropped",
       "streak": 1,
       "total_days": 1
     },
@@ -160,7 +172,7 @@
       "enter_close": 150.1,
       "last_date": "2026-08-07",
       "last_close": 150.1,
-      "status": "near",
+      "status": "dropped",
       "streak": 1,
       "total_days": 1
     },
@@ -169,7 +181,7 @@
       "enter_close": 93.8,
       "last_date": "2026-08-07",
       "last_close": 93.8,
-      "status": "near",
+      "status": "dropped",
       "streak": 1,
       "total_days": 1
     },
@@ -178,7 +190,7 @@
       "enter_close": 0,
       "last_date": "2026-08-07",
       "last_close": 0,
-      "status": "near",
+      "status": "dropped",
       "streak": 1
     },
     "600519": {
@@ -186,7 +198,7 @@
       "enter_close": 0,
       "last_date": "2026-08-07",
       "last_close": 1358.98,
-      "status": "near",
+      "status": "dropped",
       "streak": 1
     },
     "000807": {
@@ -194,7 +206,7 @@
       "enter_close": 0,
       "last_date": "2026-08-07",
       "last_close": 0,
-      "status": "near",
+      "status": "dropped",
       "streak": 1
     },
     "300972": {
@@ -202,7 +214,7 @@
       "enter_close": 205.81,
       "last_date": "2026-08-07",
       "last_close": 0,
-      "status": "near",
+      "status": "dropped",
       "streak": 1
     },
     "600887": {
@@ -210,7 +222,7 @@
       "enter_close": 27.12,
       "last_date": "2026-08-07",
       "last_close": 0,
-      "status": "near",
+      "status": "dropped",
       "streak": 1
     },
     "300502": {
@@ -218,7 +230,7 @@
       "enter_close": 394.08,
       "last_date": "2026-08-07",
       "last_close": 394.08,
-      "status": "near",
+      "status": "dropped",
       "streak": 1
     },
     "688525": {
@@ -226,7 +238,7 @@
       "enter_close": 206.8,
       "last_date": "2026-08-07",
       "last_close": 206.8,
-      "status": "near",
+      "status": "dropped",
       "streak": 1
     },
     "600183": {
@@ -234,7 +246,7 @@
       "enter_close": 102.03,
       "last_date": "2026-08-07",
       "last_close": 102.03,
-      "status": "near",
+      "status": "dropped",
       "streak": 1
     },
     "02359": {
@@ -242,7 +254,7 @@
       "enter_close": 162.9,
       "last_date": "2026-08-07",
       "last_close": 162.9,
-      "status": "near",
+      "status": "dropped",
       "streak": 1
     },
     "300001": {
@@ -250,7 +262,7 @@
       "enter_close": 37.91,
       "last_date": "2026-08-07",
       "last_close": 37.91,
-      "status": "near",
+      "status": "dropped",
       "streak": 1
     },
     "300476": {
@@ -258,7 +270,7 @@
       "enter_close": 189.3,
       "last_date": "2026-08-07",
       "last_close": 189.3,
-      "status": "near",
+      "status": "dropped",
       "streak": 1
     },
     "000792": {
@@ -266,7 +278,7 @@
       "enter_close": 0,
       "last_date": "2026-08-07",
       "last_close": 0,
-      "status": "near",
+      "status": "dropped",
       "streak": 1
     },
     "300750": {
@@ -274,7 +286,7 @@
       "enter_close": 0,
       "last_date": "2026-08-07",
       "last_close": 0,
-      "status": "near",
+      "status": "dropped",
       "streak": 1
     },
     "300033": {
@@ -282,7 +294,7 @@
       "enter_close": 0,
       "last_date": "2026-08-07",
       "last_close": 0,
-      "status": "near",
+      "status": "dropped",
       "streak": 1
     },
     "000651": {
@@ -290,15 +302,117 @@
       "enter_close": 0,
       "last_date": "2026-08-07",
       "last_close": 0,
-      "status": "near",
+      "status": "dropped",
       "streak": 1
+    },
+    "688183": {
+      "enter_date": "2026-08-08",
+      "enter_close": 118.78,
+      "last_date": "2026-08-08",
+      "last_close": 118.78,
+      "status": "strict",
+      "streak": 1,
+      "total_days": 1
+    },
+    "688213": {
+      "enter_date": "2026-08-08",
+      "enter_close": 93.89,
+      "last_date": "2026-08-08",
+      "last_close": 93.89,
+      "status": "near",
+      "streak": 1,
+      "total_days": 1
+    },
+    "300199": {
+      "enter_date": "2026-08-08",
+      "enter_close": 24.38,
+      "last_date": "2026-08-08",
+      "last_close": 24.38,
+      "status": "near",
+      "streak": 1,
+      "total_days": 1
+    },
+    "600309": {
+      "enter_date": "2026-08-08",
+      "enter_close": 75.72,
+      "last_date": "2026-08-08",
+      "last_close": 75.72,
+      "status": "near",
+      "streak": 1,
+      "total_days": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-07",
     "created": "2026-08-07 10:50:02",
-    "last_update": "2026-08-07 19:29:12",
+    "last_update": "2026-08-08 13:41:31",
     "update_time": "2026-08-07 10:54:17"
   },
-  "update_time": "2026-08-07 10:54:17"
+  "update_time": "2026-08-07 10:54:17",
+  "2026-08-08": [
+    {
+      "code": "688183",
+      "name": "生益电子",
+      "market": "sh",
+      "board": "科创板",
+      "close": 118.78,
+      "pct_chg": 9.78,
+      "total_score": 36.4,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "status": "strict"
+    },
+    {
+      "code": "688213",
+      "name": "思特威",
+      "market": "sh",
+      "board": "科创板",
+      "close": 93.89,
+      "pct_chg": 2.67,
+      "total_score": 31.2,
+      "quality_grade": "A",
+      "industry": "软件和信息技术服务业",
+      "sectors": [
+        "软件和信息技术服务业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "300199",
+      "name": "翰宇药业",
+      "market": "sz",
+      "board": "创业板",
+      "close": 24.38,
+      "pct_chg": 8.45,
+      "total_score": 28.4,
+      "quality_grade": "C",
+      "industry": "医药制造业",
+      "sectors": [
+        "医药制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "600309",
+      "name": "万华化学",
+      "market": "sh",
+      "board": "主板",
+      "close": 75.72,
+      "pct_chg": 1.0,
+      "total_score": 28.4,
+      "quality_grade": "C",
+      "industry": "化学原料和化学制品制造业",
+      "sectors": [
+        "化学原料和化学制品制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    }
+  ]
 }

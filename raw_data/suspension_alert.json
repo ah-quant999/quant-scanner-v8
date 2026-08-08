@@ -1,40 +1,28 @@
 {
-  "update_time": "2026-08-07 19:29:35",
+  "update_time": "2026-08-08 13:41:42",
   "suspended": [
     {
       "code": "200706",
       "name": "瓦轴B",
-      "days": 158,
-      "reason": "刊登重要公告"
-    },
-    {
-      "code": "300862",
-      "name": "蓝盾光电",
-      "days": 11,
+      "days": 159,
       "reason": "刊登重要公告"
     },
     {
       "code": "300333",
       "name": "兆日科技",
-      "days": 8,
+      "days": 9,
       "reason": "刊登重要公告"
     },
     {
       "code": "300246",
       "name": "宝莱特",
-      "days": 4,
+      "days": 5,
       "reason": "刊登重要公告"
     },
     {
       "code": "000838",
       "name": "*ST发展",
-      "days": 4,
-      "reason": "刊登重要公告"
-    },
-    {
-      "code": "300125",
-      "name": "*ST聆达",
-      "days": 1,
+      "days": 5,
       "reason": "刊登重要公告"
     }
   ],
