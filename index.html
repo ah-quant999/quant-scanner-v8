@@ -846,6 +846,18 @@ function __judgmentCandidatesHTML(){
       + '</div>';
   });
 
+  var showLines = lines.slice(0, 10);
+  var moreLines = lines.slice(10);
+  var expandId = 'tpCandExpand_' + Math.random().toString(36).slice(2, 8);
+  var listHTML = '<div class="tp-stocklist">' + showLines.join('') + '</div>';
+  if(moreLines.length){
+    listHTML += '<div id="' + expandId + '_more" style="display:none;" class="tp-stocklist">' + moreLines.join('') + '</div>'
+      + '<div style="margin-top:10px;text-align:center;">'
+      + '<button onclick="var el=document.getElementById(\'' + expandId + '_more\'); el.style.display=(el.style.display===\'none\'?\'block\':\'none\'); this.textContent=(el.style.display===\'none\'?\'+' + moreLines.length + ' 只 · 展开\':\'收起\')" '
+      + 'style="cursor:pointer;font-size:12px;font-weight:700;color:#38bdf8;background:rgba(56,189,248,.10);border:1px solid rgba(56,189,248,.25);border-radius:6px;padding:4px 10px;">+' + moreLines.length + ' 只 · 展开</button>'
+      + '</div>';
+  }
+
   return '<div style="font-size:13px;font-weight:700;color:var(--up);margin-bottom:4px">🎯 今日可入手候选 '+list.length+' 只</div>'
     + stepsHTML
     + rulesHTML
@@ -856,7 +868,7 @@ function __judgmentCandidatesHTML(){
     + '<span style="color:var(--dim);font-weight:700;">纪律参考 止损-7% / 止盈+7%+12%+15%</span>'
     + '<div style="margin-top:6px;font-size:11px;color:var(--dim);">说明：个股止损/止盈优先取算法 ATR 精确值（基于前复权日K，非未来函数）；港股/北交所等无精确数据者回退固定百分比参考值，仅作风控纪律，非精确测算。</div>'
     + '</div>'
-    + '<div class="tp-stocklist">' + lines.join('') + '</div>';
+    + listHTML;
 }
 window.__judgmentCandidatesHTML = __judgmentCandidatesHTML;
 
@@ -8888,6 +8900,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
                 var allNames = list.map(function(s){ return s.name+' '+s.code; });
                 h += '<button onclick="showLbModal(\'首板明细\','+JSON.stringify(allNames).replace(/"/g,'&quot;')+')" style="cursor:pointer;font-size:12px;font-weight:700;color:#38bdf8;background:rgba(56,189,248,.10);border:1px solid rgba(56,189,248,.25);border-radius:6px;padding:4px 10px;white-space:nowrap;">+'+moreList.length+' 只 · 展开</button>';
               }
+              h += '</div>';
+            } else if(v > 0){
+              h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
+              h += '<span style="font-size:12px;color:var(--dim);">首板共 '+v+' 只（涨停池全量明细）</span>';
+              h += '<button onclick="showLbModal(\'首板明细\',[\''+v+' 只首板股票（详见涨停热力矩阵全表）\'])" style="cursor:pointer;font-size:12px;font-weight:700;color:#38bdf8;background:rgba(56,189,248,.10);border:1px solid rgba(56,189,248,.25);border-radius:6px;padding:4px 10px;white-space:nowrap;">+'+v+' 只 · 展开</button>';
               h += '</div>';
             }
             h += '</div>';
