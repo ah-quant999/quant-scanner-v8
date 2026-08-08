@@ -1,17 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""gen_stock_stop.py — v8 算法精确止损/止盈（ATR 法）
+"""gen_stock_stop.py — v8 算法精确止损/止盈（方案二：三口径取最严）
 
 产出 data/STOCK_STOP_DATA.js（window.STOCK_STOP_DATA），为「今日可入手候选」卡片与
-个股查询界面提供基于真实波动率的止损/止盈，取代固定百分比参考值。
-
-算法（非未来函数，仅用截至当日的日K）：
-  - 经 data_source_gtimg.fetch_a_daily_gtimg 取前复权日K（腾讯，HTTP，云端/本机均可达）。
-  - ATR(14) = 真实波幅 TR 的 14 日均值；TR = max(H-L, |H-前收|, |L-前收|)。
-  - 止损 stop_loss = close - 2*ATR（风险预算约 2 日波幅）。
-  - 目标 target   = close + 3*ATR（盈亏比 1.5:1，满足「三不原则·盈亏比<1.5不介入」）。
-  - 支撑 support  = 近 20 日最低价；压力 resistance = 近 20 日最高价（展示用）。
-  - 港股/北交所 gtimg 日K不稳，跳过（前端回退固定百分比参考）。
+个股查询界面提供基于真实波动率 + 价格结构的止损/止盈。
 
 候选宇宙：TRIPLE_CONSENSUS + COCKPIT_TIER_RECOMMEND(tier_a) + FOUR_VOLUME + GOLD_POOL
 （金股池虽已移出候选卡，但其独立卡片与个股查询仍可用精确止损，故一并计算）。
@@ -28,11 +20,15 @@ DATA_DIR = os.path.join(V8_ROOT, "data")
 sys.path.insert(0, ALGO)
 
 from data_source_gtimg import fetch_a_daily_gtimg  # noqa: E402
-
-ATR_WINDOW = 14
-STOP_MULT = 2.0
-TARGET_MULT = 3.0
-SUPPORT_RESIST_WINDOW = 20
+from stop_target_logic import (  # noqa: E402
+    compute_stop_target,
+    fixed_stop_pct,
+    board_from_code,
+    ATR_WINDOW,
+    PRICE_WINDOW,
+    STOP_ATR_MULT,
+    RR_RATIO,
+)
 
 
 def load_js(name):
@@ -60,77 +56,52 @@ def gtimg_market(code, market_str):
 
 
 def collect_universe():
-    codes = {}  # code -> market_str
+    """code -> {market, board, name}。board 优先用源数据，缺失则按代码推断。"""
+    codes = {}
 
-    def add(code, market):
-        if code:
-            codes[str(code)] = market
+    def add(s):
+        if not s or not s.get("code"):
+            return
+        code = str(s.get("code"))
+        board = s.get("board") or s.get("board_label") or board_from_code(code)
+        codes[code] = {
+            "market": s.get("market", ""),
+            "board": board,
+            "name": s.get("name", ""),
+        }
 
     tc = load_js("TRIPLE_CONSENSUS.js")
     if tc:
         for s in tc.get("stocks", []) or []:
-            add(s.get("code"), s.get("market"))
+            add(s)
 
     cr = load_js("COCKPIT_TIER_RECOMMEND.js")
     if cr:
         for s in cr.get("tier_a", []) or []:
-            add(s.get("code"), s.get("market"))
+            add(s)
 
     fv = load_js("FOUR_VOLUME.js")
     if fv:
         for s in fv.get("stocks", []) or []:
-            add(s.get("code"), s.get("market"))
+            add(s)
 
     gp = load_js("GOLD_POOL.js")
     if gp:
         for k, s in (gp.get("stocks", {}) or {}).items():
-            add(s.get("code"), s.get("market"))
+            add(s)
 
     return codes
 
 
-def compute_kline_stats(df):
-    if df is None or len(df) < ATR_WINDOW + 1:
-        return None
-    close = float(df["close"].iloc[-1])
-    high = df["high"].astype(float)
-    low = df["low"].astype(float)
-    prev_close = df["close"].astype(float).shift(1)
-    tr = (
-        (high - low)
-        .combine(((high - prev_close).abs()), max)
-        .combine(((low - prev_close).abs()), max)
-    )
-    atr = float(tr.tail(ATR_WINDOW).mean())
-    if atr <= 0 or close <= 0:
-        return None
-    stop = close - STOP_MULT * atr
-    target = close + TARGET_MULT * atr
-    # 兜底：止损不得非正或高于收盘
-    stop = max(stop, close * 0.5)
-    if stop >= close:
-        stop = close * 0.93
-    support = float(low.tail(SUPPORT_RESIST_WINDOW).min())
-    resistance = float(high.tail(SUPPORT_RESIST_WINDOW).max())
-    return {
-        "atr": round(atr, 3),
-        "close": round(close, 2),
-        "stop_loss": round(stop, 2),
-        "target_price": round(target, 2),
-        "support": round(support, 2),
-        "resistance": round(resistance, 2),
-    }
-
-
 def main():
-    print(f"=== gen_stock_stop (ATR 精确止损止盈)  {datetime.now():%Y-%m-%d %H:%M:%S} ===")
+    print(f"=== gen_stock_stop (方案二三口径取最严)  {datetime.now():%Y-%m-%d %H:%M:%S} ===")
     universe = collect_universe()
     print(f"候选宇宙去重: {len(universe)} 只")
 
     stocks = {}
     ok = skip = fail = 0
-    for code, market_str in universe.items():
-        gmkt = gtimg_market(code, market_str)
+    for code, meta in universe.items():
+        gmkt = gtimg_market(code, meta["market"])
         if not gmkt:
             skip += 1
             continue
@@ -141,7 +112,7 @@ def main():
             print(f"  ⚠️ {code} 取K线异常: {e}")
             fail += 1
             continue
-        stats = compute_kline_stats(df)
+        stats = compute_stop_target(df, board=meta.get("board", "主板"))
         if not stats:
             fail += 1
             continue
@@ -149,9 +120,14 @@ def main():
         stocks[str(code)] = stats
         ok += 1
 
+    method_desc = (
+        f"止损三口径取最严：low20/ATR×2/fixed_pct; "
+        f"止盈三口径cascade：prev_high/fib618/R:R=2; "
+        f"窗口=近{PRICE_WINDOW}日"
+    )
     out = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "method": f"ATR({ATR_WINDOW}): 止损=收盘-{STOP_MULT:.0f}ATR, 目标=收盘+{TARGET_MULT:.0f}ATR (盈亏比1.5:1); 支撑/压力=近{SUPPORT_RESIST_WINDOW}日高低",
+        "method": method_desc,
         "count": len(stocks),
         "stocks": stocks,
     }

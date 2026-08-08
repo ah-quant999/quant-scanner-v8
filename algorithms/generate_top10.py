@@ -16,6 +16,7 @@ import sys
 from datetime import datetime
 
 from fundamental_helper import fq_key_of, quality_points
+from stop_target_logic import compute_stop_target_from_closes, board_from_code
 
 WORKSPACE = os.path.dirname(os.path.abspath(__file__))
 # 🔴 2026-08-06 修复：历史快照目录从 out/history（gitignore，云端丢）→ raw_data/history（git 跟踪 + api_push 推送持久化）
@@ -361,18 +362,18 @@ def main():
         recent5 = recent_closes[-5:] if len(recent_closes) >= 5 else recent_closes
         recent20 = recent_closes[-20:] if len(recent_closes) >= 20 else recent_closes
 
+        # 方案二统一口径（此处只有收盘价序列，用降级版：止损取最严、止盈 cascade 保证 R:R≥1.5）
+        stop_loss, target_price = 0, 0
+        stop_loss_method, target_price_method, risk_reward = "", "", 0
         if close_price and close_price > 0:
-            # 止损 = 收盘价×0.93 与 近5日最低价 取更紧者
-            pct_stop = round(close_price * 0.93, 2)
-            low5 = round(min(recent5), 2) if recent5 else pct_stop
-            stop_loss = min(pct_stop, low5)
-            # 目标 = 收盘价×1.12 与 近20日最高价 取更高者
-            pct_target = round(close_price * 1.12, 2)
-            high20 = round(max(recent20), 2) if recent20 else pct_target
-            target_price = max(pct_target, high20)
-        else:
-            stop_loss = 0
-            target_price = 0
+            _board = s.get("board_label", "") or board_from_code(raw_code)
+            _st = compute_stop_target_from_closes(recent_closes or [close_price], board=_board)
+            if _st:
+                stop_loss = _st["stop_loss"]
+                target_price = _st["target_price"]
+                stop_loss_method = _st["stop_loss_method"]
+                target_price_method = _st["target_price_method"]
+                risk_reward = _st["risk_reward"]
 
         # ── 基本面质量分（复用 fundamental_helper，与驾驶舱口径一致；
         #     含港股中性兜底：旧数据 hk 误标 D 自动修正为中性；含消息面加减分）──
@@ -415,6 +416,10 @@ def main():
             "sectors": stock_sectors[:8] if isinstance(stock_sectors, list) else [],
             "stop_loss": stop_loss,
             "target_price": target_price,
+            "stop_loss_method": stop_loss_method,
+            "target_price_method": target_price_method,
+            "risk_reward": risk_reward,
+            "stop_precise": False,
             "breakdown": {
                 "base": base,
                 "enhance": enhance,
@@ -465,6 +470,10 @@ def main():
             "sectors": s["sectors"],
             "stop_loss": s["stop_loss"],
             "target_price": s["target_price"],
+            "stop_loss_method": s.get("stop_loss_method", ""),
+            "target_price_method": s.get("target_price_method", ""),
+            "risk_reward": s.get("risk_reward", 0),
+            "stop_precise": s.get("stop_precise", False),
             "score_base": bd["base"],
             "score_enhance": bd["enhance"],
             "score_form": bd.get("form", 0),

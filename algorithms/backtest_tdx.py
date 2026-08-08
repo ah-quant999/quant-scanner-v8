@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """
-backtest_tdx.py — 通达信60天全量回测引擎 V3.1
-==========================================
+backtest_tdx.py — 通达信60天全量回测引擎 V3.2（方案二：止损止盈升级）
+==========================================================================
 用通达信K线拉金池股60天日K，计算全部可检测信号的T+1/T+3/T+5/T+10/T+20胜率。
+收益口径已升级为「统一止损止盈 + 提前出场」：
+  止损 = max(近20日低点, close-2ATR, 固定百分比)
+  止盈 = cascade：前高 → 0.618回撤位 → R:R=2对称位（盈亏比≥1.5）
+  ret_Nd 为提前出场后收益；raw_ret_Nd 为原持有期收盘价收益。
 
 可检测信号（价格/量可推导）：
   - 上涨趋势  (EMA7>EMA14>EMA20)
@@ -10,12 +14,12 @@ backtest_tdx.py — 通达信60天全量回测引擎 V3.1
   - 逆势红色  (大盘跌时个股涨)
   - 价格突破  (5日/20日新高)
   - 放量上涨  (量>1.5倍均值+收阳)
-  - 量价背离  (价新高但量萎缩)
+  - 量价背离  (价新高但量萎缩）
 
 不可检测（需外部数据）：
   - 金钻/黄柱 (需要XMA+DDX)
   - 机构变红  (需要机构数据)
-  - 机游共振  (需要龙虎榜席位)
+  - 机游共振  (需要龙虎榜席位）
 
 输出: data/backtest_tdx.json
 """
@@ -30,6 +34,14 @@ import sys
 import time
 from datetime import datetime, timedelta
 from collections import defaultdict
+
+import pandas as pd
+
+sys.path.insert(0, BASE)
+from stop_target_logic import (  # noqa: E402
+    compute_stop_target,
+    board_from_code,
+)
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 # 🔴 2026-08-06 修复：历史快照目录从 out/（gitignore，云端丢）→ raw_data/
@@ -201,17 +213,58 @@ def detect_signals(rows):
     return signals
 
 
-def calc_forward_return(rows, idx, hold_days):
-    """计算T+N日收益"""
+def calc_forward_return(rows, idx, hold_days, board="主板"):
+    """计算T+N日收益（方案二：按统一止损止盈口径模拟提前出场）。
+
+    返回 {"ret": 提前出场后收益, "raw_ret": 原持有期收盘价收益,
+          "exit_type": 'stop'/'target'/None, "stop_loss": ..., "target_price": ..., "risk_reward": ...}
+    """
     n = len(rows)
     target = idx + hold_days
     if target >= n:
         return None
     entry = rows[idx]["close"]
-    exit_ = rows[target]["close"]
     if entry <= 0:
         return None
-    return round((exit_ - entry) / entry * 100, 2)
+
+    # 用 idx 当日及之前数据计算止损/止盈（非未来函数）
+    df = pd.DataFrame(rows[: idx + 1])
+    st = compute_stop_target(df, board=board)
+    if st:
+        stop_loss = st["stop_loss"]
+        target_price = st["target_price"]
+        rr = st["risk_reward"]
+    else:
+        # 数据不足时回退固定百分比
+        stop_pct = 0.10 if board in ("创业板", "科创板") else 0.07
+        stop_loss = entry * (1 - stop_pct)
+        target_price = entry * (1 + max(0.105, stop_pct * 1.5))
+        rr = round((target_price - entry) / (entry - stop_loss), 2)
+
+    # 模拟每日 close 触发止损/止盈
+    exit_price = rows[target]["close"]
+    exit_type = None
+    for j in range(idx + 1, target + 1):
+        cp = rows[j]["close"]
+        if cp <= stop_loss:
+            exit_price = stop_loss
+            exit_type = "stop"
+            break
+        if cp >= target_price:
+            exit_price = target_price
+            exit_type = "target"
+            break
+
+    raw_ret = round((rows[target]["close"] - entry) / entry * 100, 2)
+    early_ret = round((exit_price - entry) / entry * 100, 2)
+    return {
+        "ret": early_ret,
+        "raw_ret": raw_ret,
+        "exit_type": exit_type,
+        "stop_loss": stop_loss,
+        "target_price": target_price,
+        "risk_reward": rr,
+    }
 
 
 def _load_historical_pool_union(current_gp):
@@ -284,7 +337,7 @@ def main():
         if key in stock_results:
             old_sigs = stock_results[key].get("signals") or {}
             has_all_periods = bool(old_sigs) and all(
-                f"ret_{d}d" in next(iter(old_sigs.values()), {})
+                f"ret_{d}d" in next(iter(old_sigs.values()), {}) and f"raw_ret_{d}d" in next(iter(old_sigs.values()), {})
                 for d in HOLD_DAYS
             )
             if has_all_periods:
@@ -316,10 +369,21 @@ def main():
 
             returns = {}
             wins = {}
+            raw_returns = {}
+            exit_types = {}
+            board = board_from_code(code)
             for d in HOLD_DAYS:
-                ret = calc_forward_return(rows, idx, d)
-                returns[f"ret_{d}d"] = ret
-                wins[f"win_{d}d"] = ret > 0 if ret is not None else None
+                res = calc_forward_return(rows, idx, d, board=board)
+                if res is None:
+                    returns[f"ret_{d}d"] = None
+                    wins[f"win_{d}d"] = None
+                    raw_returns[f"raw_ret_{d}d"] = None
+                    exit_types[f"exit_type_{d}d"] = None
+                else:
+                    returns[f"ret_{d}d"] = res["ret"]
+                    wins[f"win_{d}d"] = res["ret"] > 0
+                    raw_returns[f"raw_ret_{d}d"] = res["raw_ret"]
+                    exit_types[f"exit_type_{d}d"] = res["exit_type"]
 
             stock_signals[date] = {
                 "signals": {k: v for k, v in sigs.items() if v and k not in ("ge2_signals", "ge3_signals")},
@@ -329,6 +393,8 @@ def main():
                 "entry_price": rows[idx]["close"],
                 **returns,
                 **wins,
+                **raw_returns,
+                **exit_types,
             }
         
         stock_results[key] = {

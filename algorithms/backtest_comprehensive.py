@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-backtest_comprehensive.py — 全面回测引擎 V2
-============================================
-多策略 × 多持有期 × 真实收盘价 滚回回测
+backtest_comprehensive.py — 全面回测引擎 V2.5（方案二：止损止盈升级）
+=======================================================================
+多策略 × 多持有期 × 统一止损止盈口径 滚动回测
 
 数据流：
 1. 扫描 data/history/top10_daily_*.json 及 backup_*/data/scan_result.json
 2. 提取各策略的入场信号
-3. 用 baostock 拉历史日 K，算 1/3/5/10/20 日收益
-4. 输出 data/backtest_comprehensive.json
+3. 用 baostock 拉历史日 K，按方案二口径计算止损/止盈
+4. 模拟每日 close 触发止损/止盈的提前出场，输出 data/backtest_comprehensive.json
+
+止损止盈口径（方案二）：
+  止损 = max(近20日低点, close-2ATR, 固定百分比)
+  止盈 = cascade：前高 → 0.618回撤位 → R:R=2对称位，取满足盈亏比≥1.5的最严者
 
 支持策略：
   策略ID                    来源              分数门槛
@@ -35,6 +39,15 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 
 import baostock as bs
+
+import pandas as pd
+
+sys.path.insert(0, BASE)
+from stop_target_logic import (  # noqa: E402
+    compute_stop_target,
+    board_from_code,
+    fixed_stop_pct,
+)
 
 # ── 常量 ──
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -239,21 +252,21 @@ def collect_signals() -> list[dict]:
 # 第2步：价格回测（多持有期）
 # ════════════════════════════════════════════
 
-def calc_multi_hold(entry_date: str, entry_price: float, bsc: str) -> dict | None:
-    """拉 baostock 日 K，计算多持有期收益和最大回撤。
+def calc_multi_hold(entry_date: str, entry_price: float, bsc: str, board: str = "主板", code: str = "") -> dict | None:
+    """拉 baostock 日 K，计算多持有期收益、最大回撤，并按方案二止损/止盈口径模拟提前出场。
 
-    返回 {hold_1d:{ret, date}, hold_3d:{...}, ..., max_drawdown, exit_date}
+    返回 {hold_1d:{ret, date, exit_type}, ..., max_drawdown, latest_return, stop_loss, target_price, ...}
     若 baostock 无数据返回 None
     """
     if not BAOSTOCK_ENABLED:
-        # 假数据模式，仅用于测试
         return None
     entry_dt = datetime.strptime(entry_date, "%Y-%m-%d")
-    start = (entry_dt - timedelta(days=7)).strftime("%Y-%m-%d")
+    # 多取 30 天历史，保证能算近 20 日高低
+    start = (entry_dt - timedelta(days=35)).strftime("%Y-%m-%d")
     end = (entry_dt + timedelta(days=35)).strftime("%Y-%m-%d")
 
     rs = bs.query_history_k_data_plus(
-        bsc, fields="date,close",
+        bsc, fields="date,open,high,low,close,volume",
         start_date=start, end_date=end,
         frequency="d", adjustflag="2"
     )
@@ -264,61 +277,107 @@ def calc_multi_hold(entry_date: str, entry_price: float, bsc: str) -> dict | Non
         return None
 
     # 找到 <= entry_date 的最后一条（真实入场日/价）
-    entry_row = None
-    for r in reversed(rows):
-        if r[0] <= entry_date:
-            entry_row = r
+    entry_idx = None
+    for i in reversed(range(len(rows))):
+        if rows[i][0] <= entry_date:
+            entry_idx = i
             break
-    if not entry_row:
+    if entry_idx is None:
         return None
 
-    real_entry_date = entry_row[0]
-    real_entry_price = float(entry_row[1])
+    real_entry_date = rows[entry_idx][0]
+    real_entry_price = float(rows[entry_idx][4])
+
+    # 建 DataFrame（前复权）
+    df_all = pd.DataFrame(rows, columns=["date", "open", "high", "low", "close", "volume"])
+    for c in ["open", "high", "low", "close", "volume"]:
+        df_all[c] = pd.to_numeric(df_all[c], errors="coerce")
+
+    # 用 entry 当日及之前数据算止损/止盈（非未来函数）
+    df_entry = df_all.iloc[: entry_idx + 1].copy()
+    st = compute_stop_target(df_entry, board=board)
+    if not st:
+        # 历史数据不足时回退固定百分比
+        stop_loss = real_entry_price * fixed_stop_pct(board)
+        target_price = real_entry_price * (1 + 0.105)
+    else:
+        stop_loss = st["stop_loss"]
+        target_price = st["target_price"]
 
     # 入场后所有交易日
-    after = [r for r in rows if r[0] >= real_entry_date]
-    if not after:
+    after = df_all.iloc[entry_idx:].reset_index(drop=True)
+    if len(after) == 0:
         return None
 
-    # 计算 1/3/5/10/20 日后收益
+    # 模拟每日 close 触发止损/止盈（先触发先执行）
+    n = len(after)
+    exit_idx = n - 1
+    exit_price = float(after["close"].iloc[-1])
+    exit_type = None
+    for i in range(1, n):
+        cp = float(after["close"].iloc[i])
+        if cp <= stop_loss:
+            exit_idx = i
+            exit_price = stop_loss
+            exit_type = "stop"
+            break
+        if cp >= target_price:
+            exit_idx = i
+            exit_price = target_price
+            exit_type = "target"
+            break
+
+    exit_date = after["date"].iloc[exit_idx]
+
+    # 多持有期收益：若在该周期前已触发 stop/target，则按提前出场收益；否则按周期收盘价
     holds = {}
     for hp in HOLD_PERIODS:
-        # 2026-08-01 修正(P0)：原 idx=min(hp,len(after)-1) 会在入场距今不足 N 交易日时，
-        # 取最后一根可得价却仍标记为 hold_{N}d → 近期信号的长周期收益/胜率被短期价冒名顶替，
-        # 污染 10d/20d 胜率与 best_hold_days。对齐 backtest_tdx：周期不足则跳过该周期。
         if len(after) - 1 < hp:
             continue
-        idx = hp
-        hold_row = after[idx]
-        hp_ret = round((float(hold_row[1]) - real_entry_price) / real_entry_price * 100, 2)
+        if exit_idx <= hp:
+            # 周期内已提前出场
+            hp_ret = round((exit_price - real_entry_price) / real_entry_price * 100, 2)
+            hp_date = exit_date
+            hp_price = exit_price
+            hp_exit_type = exit_type
+        else:
+            # 未触发，按周期收盘价
+            hp_ret = round((float(after["close"].iloc[hp]) - real_entry_price) / real_entry_price * 100, 2)
+            hp_date = after["date"].iloc[hp]
+            hp_price = float(after["close"].iloc[hp])
+            hp_exit_type = None
         holds[f"hold_{hp}d"] = {
             "ret": hp_ret,
-            "target_date": hold_row[0],
-            "target_price": float(hold_row[1]),
+            "target_date": hp_date,
+            "target_price": hp_price,
+            "exit_type": hp_exit_type,
         }
 
-    # 最大回撤（入场后至最新）
+    # 最大回撤（按收盘价，入场后至实际出场日）
     peak = real_entry_price
     max_dd = 0.0
-    for r in after:
-        cp = float(r[1])
+    for i in range(exit_idx + 1):
+        cp = float(after["close"].iloc[i])
         if cp > peak:
             peak = cp
         dd = (cp - peak) / peak
         if dd < max_dd:
             max_dd = dd
 
-    # 最新价
-    last_row = after[-1]
-
     return {
         "entry_date": real_entry_date,
         "entry_price": real_entry_price,
-        "latest_date": last_row[0],
-        "latest_price": float(last_row[1]),
-        "hold_days": len(after) - 1,
+        "latest_date": after["date"].iloc[-1],
+        "latest_price": float(after["close"].iloc[-1]),
+        "hold_days": exit_idx,
         "max_drawdown": round(max_dd * 100, 2),
-        "latest_return": round((float(last_row[1]) - real_entry_price) / real_entry_price * 100, 2),
+        "latest_return": round((exit_price - real_entry_price) / real_entry_price * 100, 2) if exit_type else round((float(after["close"].iloc[-1]) - real_entry_price) / real_entry_price * 100, 2),
+        "stop_loss": stop_loss,
+        "target_price": target_price,
+        "risk_reward": st.get("risk_reward") if st else round((target_price - real_entry_price) / (real_entry_price - stop_loss), 2),
+        "exit_date": exit_date,
+        "exit_price": exit_price,
+        "exit_type": exit_type,
         **holds,
     }
 
@@ -345,8 +404,9 @@ def run_backtest(signals: list[dict]) -> dict:
         win_rate_data = {f"hold_{hp}d": {"win": 0, "loss": 0, "rets": []} for hp in HOLD_PERIODS}
 
         for i, sig in enumerate(group):
+            board = sig.get("board", "") or board_from_code(sig.get("code", ""))
             result = calc_multi_hold(
-                sig["entry_date"], sig["entry_price"], sig["bsc"]
+                sig["entry_date"], sig["entry_price"], sig["bsc"], board=board, code=sig.get("code", "")
             )
             if result is None:
                 continue
