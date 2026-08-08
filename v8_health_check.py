@@ -552,7 +552,11 @@ def check_site_dom(site_html=None):
         except Exception as e:
             return [{"id": "dom_check", "name": "线上 DOM 空值检测", "page": "管线", "status": "warn", "message": f"拉取页面失败: {e}"}]
 
-    critical_ids = ["riskGaugeBody", "todayEventsBody", "afterHoursBody", "strategyBody", "taskScheduleBody"]
+    # 2026-08-08 96轮适配：阿狸咪方案三重构后页面卡片改由 JS 从外部 data/*.js 动态渲染，
+    # 静态 HTML 内是空壳/“加载中…”占位符（旧 critical_ids 中 4 个 id 已删除）。
+    # 故改为：① 关键容器存在性检查（缺失=fail）；② 静态占位符（空/加载中）=warn（JS 渲染属常态）。
+    critical_ids = ["taskScheduleBody", "phMacroBody", "ttBackBody", "ttThrBody", "ttSvlBody", "ttTrackBody",
+                    "stcrdsAdvBody", "stcrdsEliteBody", "runnerTrackBody", "healthCheckBody"]
     results = []
     for cid in critical_ids:
         m = re.search(rf'id=["\']{re.escape(cid)}["\'][^>]*>(.*?)</[^>]+>', site_html, re.S)
@@ -560,9 +564,9 @@ def check_site_dom(site_html=None):
             results.append({"id": f"dom_{cid}", "name": f"DOM #{cid}", "page": "管线", "status": "fail", "message": "未找到元素"})
             continue
         content = m.group(1).strip()
-        bad = content == "" or "加载中" in content or content == "--" or len(content) < 20
-        status = "fail" if bad else "ok"
-        msg = "内容为空或仍在加载" if bad else f"内容长度 {len(content)}"
+        placeholder = content == "" or "加载中" in content or content == "--" or len(content) < 20
+        status = "warn" if placeholder else "ok"
+        msg = "静态占位符(JS渲染)" if placeholder else f"静态内容长度 {len(content)}"
         results.append({"id": f"dom_{cid}", "name": f"DOM #{cid}", "page": "管线", "status": status, "message": msg})
     return results
 
