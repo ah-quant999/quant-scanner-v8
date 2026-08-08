@@ -8598,9 +8598,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         {l:'龙虎', v:lhbCount, u:'只', c: 'var(--up)'}
       ];
       metrics.forEach(function(m){
-        h += '<div style="text-align:center;min-width:48px;padding:6px 5px;background:rgba(255,255,255,.04);border-radius:6px">';
-        h += '<div style="font-size:11px;color:var(--dim)">'+m.l+'</div>';
-        h += '<div style="font-size:16px;font-weight:800;color:'+m.c+'">'+m.v+'<span style="font-size:10px;font-weight:500;color:var(--dim)">'+m.u+'</span></div></div>';
+        h += '<div style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);border-radius:10px;min-width:72px;">';
+        h += '<span style="font-size:13px;font-weight:700;color:var(--txt)">'+m.l+'</span>';
+        h += '<span style="font-size:18px;font-weight:900;color:'+m.c+'">'+m.v+'<span style="font-size:11px;font-weight:700;margin-left:1px">'+m.u+'</span></span></div>';
       });
       h += '</div>';
       // 连板分布：每行显示「连板标签 共N只」+ 股票名网格；首板用横向进度条展示占比
@@ -8636,12 +8636,17 @@ const catNames=['宽基','行业','主题','跨境','商品'];
             h += '<span style="font-size:12px;color:var(--dim);white-space:nowrap;font-weight:700;">'+pct+'% · '+v+'只</span>';
             h += '</div>';
             if(list.length){
-              h += '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">';
-              h += '<div style="display:flex;gap:6px;white-space:nowrap;padding-bottom:2px">';
-              list.forEach(function(s){
-                h += '<span style="flex-shrink:0;font-size:13px;color:var(--text);background:rgba(255,255,255,.04);padding:3px 8px;border-radius:5px" title="'+s.name+' '+s.code+'">'+s.name+' <span style="color:var(--dim);font-size:11px">'+s.code+'</span></span>';
+              var showList = list.slice(0,10);
+              var moreList = list.slice(10);
+              h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
+              showList.forEach(function(s){
+                h += '<span style="font-size:13px;color:var(--text);background:rgba(255,255,255,.05);padding:4px 9px;border-radius:6px;border:1px solid rgba(255,255,255,.08);white-space:nowrap;" title="'+s.name+' '+s.code+'">'+s.name+' <span style="color:var(--dim);font-size:11px">'+s.code+'</span></span>';
               });
-              h += '</div></div>';
+              if(moreList.length){
+                var allNames = list.map(function(s){ return s.name+' '+s.code; });
+                h += '<button onclick="showLbModal(\'首板明细\','+JSON.stringify(allNames).replace(/"/g,'&quot;')+')" style="cursor:pointer;font-size:12px;font-weight:700;color:#38bdf8;background:rgba(56,189,248,.10);border:1px solid rgba(56,189,248,.25);border-radius:6px;padding:4px 10px;white-space:nowrap;">+'+moreList.length+' 只 · 展开</button>';
+              }
+              h += '</div>';
             }
             h += '</div>';
           } else {
