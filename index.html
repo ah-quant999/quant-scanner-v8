@@ -4519,6 +4519,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><td>4</td><td>🎯 驾驶舱</td><td>A/B/C/D 成熟分级筛选</td><td><b style="color:#fbbf24">⭐⭐⭐⭐</b></td></tr>
           <tr><td>5</td><td>🌐 全站精选</td><td>主板+创业+科创前100 + 港股前50 + 观澜 + maharo（多信号融合）</td><td><b style="color:#fbbf24">⭐⭐⭐</b></td></tr>
           <tr><td>6</td><td>📊 逆势龙头</td><td>CRDS（弱市专用）</td><td><span style="font-size:10px;color:#94a3b8;font-weight:500;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用</span></td></tr>
+          <tr><td>7</td><td>🐂 大牛股猎手</td><td>龙虎榜机游共振（机构+游资净买）+ 板块资金流 + 核心共振（中线）</td><td><b style="color:#fbbf24">⭐⭐⭐⭐</b></td></tr>
+          <tr><td>8</td><td>📈 相对强度</td><td>个股 RPS 百分位(50/120/250日) + 曼斯菲尔德 RS + 250日年线门禁（排名/筛选层）</td><td><b style="color:#fbbf24">⭐⭐⭐</b></td></tr>
         </table>
 
         <div class="logic-h">排序逻辑</div>
@@ -4529,7 +4531,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <li><b>全站精选</b>是综合池，机会多但单信号强度弱。</li>
           <li><b>逆势龙头 CRDS</b> 是<b>专用场景</b>（弱市找强势股），不通用——所以不挂星级，只标"弱市专用"挂在末尾。</li>
         </ul>
-        <div class="logic-h">「今日已跑完」 vs 「今日已入仓」</div>
+        <div class="logic-h">「今日已跑完」 vs 「已入仓」</div>
         <div class="logic-p">两个标识是<b>独立维度</b>，不可混淆：<br>
         · <b style="color:var(--sub)">今日已跑完 / MM-DD 已跑</b>（灰色胶囊）：当算法链跑成功 + 数据 update_time 是当天/近期 → <b>无条件显示</b>。哪怕市场差、入选=0 也会显示，证明"那天确实跑了"。<br>
         · <b style="color:#15803d">MM-DD 已入仓 N</b>（绿色胶囊）：当前严格三重共识入选股数量，日期为数据实际日期。只要还有入选股就显示，不再区分"今日新入选"还是"昨日延续"。<br>
@@ -4664,7 +4666,43 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-h">名字清洗（防研报/新闻稿污染名）</div>
         <div class="logic-p">候选池名字优先东财权威名 &gt; 通达信名字 &gt; raw 干净名 &gt; 代码兜底；容忍港股 -W/-S/-R 双重上市后缀。</div>
         <div class="logic-h">来源级监控（2026-08-08 新增）</div>
-        <div class="logic-p">候选股池是下游金股池/评分/CRDS/四量终极等全部算法的<b>唯一输入宇宙</b>，其健康度直接影响全站结论可靠性。监控分两层：<br>· <b>night_watchdog.py --health</b>：每次巡检读取 candidate.json，拆分六大来源数量。成交额TOP三板任一&lt;80只→WARNING、=0→CRITICAL；港股/观澜台=0降级为WARNING（云端可能天然缺失）。同时检测垃圾名污染。<br>· <b>运维面板数据新鲜度</b>：CANDIDATE 行下方展示六来源彩色标签（✓绿/⚠黄/✗红），一目了然哪个来源异常。HEALTH_CHECK.js 整体条目仅反映 update_time，不拆分来源——来源级状态以上述两处为准。<br>· <b>正常基线</b>：主板≈97-100 / 创业板=100 / 科创板=100 / maharo≈10-20；港股0-50（依赖akshare可用性）；观澜台0-N（依赖外部JSON更新）。三板合计≥280视为健康。</div>
+        <div class="logic-p">候选股池是下游金股池/评分/CRDS/四量终极等全部算法的<b>唯一输入宇宙</b>，其健康度直接影响全站结论可靠性。监控分两层：<br>· <b>night_watchdog.py --health</b>：每次巡检读取 candidate.json，拆分六大来源数量。成交额TOP三板任一&lt;80只→WARNING、=0→CRITICAL；港股/观澜台=0降级为WARNING（云端可能天然缺失）。同时检测垃圾名污染。<br>· <b>运维面板数据新鲜度</b>：CANDIDATE 行下方展示六来源彩色标签（✓绿/⚠黄/✗红），一目了然哪个来源异常。HEALTH_CHECK.js 整体条目仅反映 update_time，不拆分来源——来源级状态以上述两处为准。<br>        · <b>正常基线</b>：主板≈97-100 / 创业板=100 / 科创板=100 / maharo≈10-20；港股0-50（依赖akshare可用性）；观澜台0-N（依赖外部JSON更新）。三板合计≥280视为健康。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🐂</span>大牛股猎手 - 说明</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">基于<b>龙虎榜上榜个股</b>（机构 + 游资净买卖）的「机游共振」中线策略，核心区分「一日游」与「真启动」。2026-08-08 从「共振日历」迁入「选股策略」独立 tab（原标题残留的「大牛股猎手」字样已清除，功能卡仅保留此处）。</div>
+        <div class="logic-h">三栏结构</div>
+        <div class="logic-p">· <b>🆕 新赛道发现</b>：当日行业净流入 TOP5（SECTOR_FUND_FLOW 行业类）<br>· <b>🔮 早期信号</b>：纯游资净买异动（游资净买&gt;0 且 机构净买≤0），按游资净买排序 TOP6<br>· <b>🔥 核心共振</b>：机构+游资双净买的「真启动」标的，按合计净买排序 TOP6</div>
+        <div class="logic-h">数据口径</div>
+        <div class="logic-p">机游共振来自 <code>LHB_DATA</code>（龙虎榜），<b>仅覆盖当日上榜异动股</b>，非全市场资金流；板块资金流为当日行业净流入。徽章与严格三重共识/四量终极同格式：🐻 盘后短线 + 🧺 MM-DD 已入仓 N（N=机构+游资双净买标的数）。</div>
+        <div class="logic-h">使用边界</div>
+        <div class="logic-p">样本小、偏短线情绪，<b>不单独作为买点</b>；需结合三重共识等做买卖决策。完整机游/北向/每日洞察分析见顶部 🧲 共振日历。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">📈</span>相对强度 (RPS + RS + 年线) - 说明</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">个股相对强度排名（RPS）+ 曼斯菲尔德 RS + 年线状态，作为选股「<b>排名 / 筛选层</b>」，与板块 RPS（SECTOR_RS）形成「板块 → 个股」双层互验。2026-08-08 全量实施（算法 <code>calc_stock_rps.py</code> + 前端 📈 相对强度 tab + RPS 分层回测卡）。</div>
+        <div class="logic-h">计算口径</div>
+        <div class="logic-p">· <b>RPS</b> = 个股 N 日收益率在 universe 中的百分位排名 → rps50 / rps120 / rps250，取最大为 <b>rps_max</b>（0~100，≥90 为极强）。<br>· <b>RS</b> = 曼斯菲尔德相对强度（个股价格/基准指数价格的 ROC 比值），&gt;0 表示跑赢基准。<br>· <b>年线</b>：above_ma250（站上 250 日线）作为趋势门禁。<br>· 排名池：候选池 universe（当前约 310 只，可扩全市场 5537）。</div>
+        <div class="logic-h">A 档硬门禁（2026-08-08 实施）</div>
+        <div class="logic-p">站上 250 日线 <b>且</b> RS&gt;0 <b>且</b> RPSmax≥90 → 三重过滤才入 A 档；B/C 档为逐级放宽。A 档硬门禁结果同时叠加进「最终推荐」共振来源徽标，与板块 RPS 自上而下互验。</div>
+        <div class="logic-h">前端展示</div>
+        <div class="logic-p">· <b>📈 相对强度</b> tab：A/B/C 分层筛选 + 最小 RPS 阈值；表格列 RPS50/120/250/RPSmax/RS/年线状态/收盘价。<br>· <b>RPS 分层回测</b> 卡：基于当前截面用历史收益近似模拟持有 N 日表现（胜率 / 平均收益 / 最佳最差 + 收益分布柱状图 + A 档硬门禁子集对比）。</div>
+        <div class="logic-h">诚实标注</div>
+        <div class="logic-p">RS 分母实际用<b>上证指数(000001)兜底</b>（沪深300 本地取数返回 0 条），不影响 RPS 百分位计算；回测为截面历史模拟近似、非未来函数，仅供内部验证，不构成收益承诺。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🧲</span>共振日历 - 说明（顶部独立 section）</h3>
+        <div class="logic-h">三段结构</div>
+        <div class="logic-p">· <b>📅 机游共振日历</b>（jyCalContainer）：逐日展示龙虎榜「机游共振 / 机构独买 / 游资独买」上榜标的与净买额。<br>· <b>🌊 北向席位日历</b>（northCalContainer）：逐日北向席位净买卖明细与连续净买信号。<br>· <b>🔍 每日洞察</b>：涨跌概况 / 资金流向 / 热点板块 / 异动信号聚合。</div>
+        <div class="logic-h">数据口径</div>
+        <div class="logic-p">统一由 <code>window._rcDays()</code> 聚合 <b>LHB_HISTORY</b>（多日历史，保证 7 日连续数据）+ <b>LHB_DATA</b>（当日降级兜底）产出。2026-08-08 清理了与 sec-rc 新实现同名冲突的旧 <code>renderJyCalendar</code> / <code>renderNorthCalendar</code>（曾渲染进不存在容器，导致日历覆盖、7 日数据时有时无），现仅保留单一聚合实现。</div>
+        <div class="logic-h">与「大牛股猎手」的关系</div>
+        <div class="logic-p">大牛股猎手（选股策略 tab）是共振日历「机游共振」信号的<b>选股化落地</b>——把当日上榜的机游共振标的做成中线观察池；共振日历仍是完整的每日机游/北向/洞察总览。</div>
       </div>
 
       <div class="card">
