@@ -3958,7 +3958,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <tr><td>v8_intraday_healer</td><td>工作日09:03-15:33每30分</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>盘中自愈：检测 cn_fetch 过期(>45min)自动 dispatch 补跑 · 纯云端，小九关机不受影响</td></tr>
         <tr><td>v8_safety_net</td><td>每30分</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>raw_data stale 时兜底 dispatch</td></tr>
         <tr><td>v8_algo_cloud</td><td>18:30/20:00+兜底</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>收盘后算法数据生产（选股四模块+回测）</td></tr>
-        <tr><td>v8_backup</td><td>每日21:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>备份 raw_data / data / 交接文档</td></tr>
+        <tr><td>v8_backup</td><td>每日23:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>备份 raw_data / data / 交接文档（含 v6 备份保留策略：v8 稳定一周前不删）</td></tr>
         <tr><td>runner_health_alert</td><td>非交易时段每2h</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>lemoncat-cn runner 离线告警 + 自动恢复关闭 Issue</td></tr>
         <tr><td>小九-v8云端管线看门狗</td><td>08-22每小时</td><td><span class="status-dot s-ok"></span>ACTIVE</td><td>只监督、不部署、不抢跑</td></tr>
       </tbody></table>
@@ -4085,7 +4085,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           <tr><td>16:30</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓</td><td>港股16:00收盘后补抓恒指/港股候选/盘中模块收盘值（A股已收盘，不重复抓A股）</td></tr>
           <tr><td>盘中每30分</td><td>v8_risk_gauge</td><td>危机雷达</td><td>危机雷达/风险温度计实时刷新（美股开盘情绪覆盖 19:00-22:00 北京时间）</td></tr>
           <tr><td>18:30 / 20:00（主+冗余）</td><td>v8_algo_cloud</td><td>盘后算法（云端主链）</td><td>龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测/板块资金流趋势/停牌预警/市场预警/NT数据（已迁 GitHub 云端 ubuntu，20:30/20:50 兜底）</td></tr>
-          <tr><td>21:00</td><td>v8_backup</td><td>每日备份</td><td>备份 raw_data/*.json 防意外丢失（push 至 main）</td></tr>
+          <tr><td>23:00</td><td>v8_backup</td><td>每日备份</td><td>备份 raw_data/*.json 防意外丢失（push 至 main）</td></tr>
           <tr><td>09:00 / 17:00</td><td>v8_algo</td><td>体检</td><td>46 模块新鲜度体检（云端）</td></tr>
           <tr><td>非交易时段每2h</td><td>runner_health_alert</td><td>健康监控</td><td>lemoncat-cn runner 离线 → 开 Issue 告警（云端，工作日13-21点/周末0-20点）</td></tr>
           <tr><td>周六/周日 09:00</td><td>v8_cn_fetch_cloud</td><td>T+1 周度</td><td>日历/今日判定/IPO/两融/中金所/宏观/危机/北向/分析师/52周高/羊群效应统一刷新</td></tr>
@@ -4115,7 +4115,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           <tr><td>09:00</td><td>v8_algo</td><td>盘前预检（46模块新鲜度体检）</td><td>云端</td></tr>
           <tr><td>17:00</td><td>v8_algo</td><td>收盘后总检（46模块新鲜度体检）</td><td>云端</td></tr>
           <tr><td>18:30 / 20:00</td><td>v8_algo_cloud</td><td>盘后算法链（龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测）</td><td>GitHub 云端 ubuntu（主链；20:30/20:50 兜底）</td></tr>
-          <tr><td>21:00</td><td>v8_backup</td><td>每日自动备份 raw_data</td><td>云端</td></tr>
+          <tr><td>23:00</td><td>v8_backup</td><td>每日自动备份 raw_data</td><td>云端</td></tr>
           <tr style="background:rgba(56,189,248,.06);"><td colspan="4" style="text-align:center;font-size:12px;color:var(--dim);">↓ push raw_data → 自动触发 v8_build_deploy → GitHub Pages 部署</td></tr>
         </table>
 
@@ -4149,6 +4149,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
         <div class="logic-h">关键设计原则</div>
         <div class="logic-p"><b>龙虎榜必须等 17 点交易所发布后才能取完整数据</b>，因此盘后算法链固定在 18:30。盘中只刷新 T+0 快照，不跑盘后算法，避免用陈旧数据算出错误共识。<b>Safety Net</b>是保险机制——中国数据抓取已迁云端 24/7 在线，Safety Net 是「断线时自动补跑」而非「日常调度」。</div>
+        <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>盘后算法链顺序铁律（2026-08-08 修复）</b>：<code style="background:var(--bg2);padding:1px 4px;border-radius:3px">generate_top10.py</code> 必须在 <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">backtest_comprehensive.py</code> / <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">cockpit_backtest_now.py</code> <b>之前</b>执行——综合回测依赖 top10 当日快照（<code style="background:var(--bg2);padding:1px 4px;border-radius:3px">raw_data/history/top10_daily_YYYYMMDD.json</code>），顺序倒置会导致「综合回测」卡长期为空。当前固定顺序：build_candidate_pool → generate_top10 → backtest_tdx → backtest_comprehensive → cockpit_backtest_now。</div>
       </div>
 
       <div class="card">
@@ -4168,7 +4169,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           <tr><th>能力</th><th>v6 实现</th><th>v8 现状</th><th>优先级</th></tr>
           <tr><td>Safety Net 兜底</td><td>safety-net.yml 每15min轮询</td><td><span style="color:#38bdf8;">✅ 已建 v8_safety_net.yml</span></td><td>P0 必须</td></tr>
           <tr><td>云端自愈器</td><td>cloud_self_heal 周末T+1补全</td><td><span style="color:#38bdf8;">✅ 已建 v8_self_heal.yml</span></td><td>P1 应补</td></tr>
-          <tr><td>每日备份</td><td>cloud_backup.yml 21:00</td><td><span style="color:#38bdf8;">✅ 已建 v8_backup.yml 21:00</span></td><td>P2 可选</td></tr>
+          <tr><td>每日备份</td><td>cloud_backup.yml 21:00</td><td><span style="color:#38bdf8;">✅ 已建 v8_backup.yml 23:00</span></td><td>P2 可选</td></tr>
           <tr><td>心跳监控上云</td><td>peer_health_monitor 本机</td><td>✅ Actions 日志即心跳</td><td>P2 可选</td></tr>
           <tr><td>防误删清单</td><td>DO_NOT_DELETE.md + pre-commit hook</td><td><span style="color:#38bdf8;">✅ 已建 DO_NOT_DELETE.md</span></td><td>P0 必须</td></tr>
         </table>

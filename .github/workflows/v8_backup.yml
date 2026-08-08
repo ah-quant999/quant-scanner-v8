@@ -2,6 +2,11 @@
 # cron: 0 15 * * * (= 23:00 CST)。主人 23 点睡前核对当天 raw_data 健康度。
 # raw_data 由 git 历史 + Pages 回溯只是兜底，主动备份更稳。
 #
+# 📦 v6 备份保留策略（2026-08-07 主人令）：v6 历史备份（九宝量化v6.0_*.tar.gz /
+#   shared/九宝量化v6.0_*）在 v8 连续稳定运行满一周、且主人明确确认前，禁止任何清理/
+#   备份任务删除；删除前必须征求主人同意（下周末再确认）。v6 备份位于本地，云端清理
+#   不触及，本 workflow 仅做策略断言 + 落 HANDOVER_LOG，防误改。
+#
 # 本 workflow 不只备份，还承担【每日审计】职责（主人 2026-08-06 确立）：
 #   ① 与单位机小九交接：检查当天 HANDOVER_小九_YYYY-MM-DD.md 是否存在
 #   ② 当天修改审核通过防覆盖：拉今天 origin/main 全部人工 commit，关键词必须在交接文档中命中
@@ -63,6 +68,30 @@ jobs:
           git add backup/raw_data_backup_*.tar.gz 2>/dev/null || true
           git commit -m "backup: v8 每日自动备份 $(TZ=Asia/Shanghai date '+%Y-%m-%d')" 2>/dev/null || echo "无新备份"
           git push origin main 2>/dev/null || echo "推送跳过（无新内容）"
+
+      - name: "📦 v6 备份保留策略断言（主人令：v8 稳定一周前不删）"
+        continue-on-error: true
+        run: |
+          echo "── v6 备份保留策略（2026-08-07 主人令）──"
+          echo "v6 历史备份（九宝量化v6.0_*.tar.gz / shared/九宝量化v6.0_*）保留中："
+          echo "  · v8 连续稳定运行满一周且主人确认前，禁止任何清理任务删除 v6 备份；"
+          echo "  · 删除前必须征求主人同意（下周末再确认）。"
+          python3 - <<'PY'
+          import os, json
+          # 防御性断言：确保仓库内不会出现被 weekly_cleanup 误判的 v6/旧备份残留
+          suspicious = [f for f in os.listdir('.') if f.startswith('九宝量化v6') or f.startswith('backup_2026')]
+          if suspicious:
+              print("⚠️ 检测到仓库内疑似 v6/旧备份残留：", suspicious, "— 请人工确认非误入")
+          else:
+              print("✅ 仓库内无 v6/旧备份残留（v6 备份在本地，云端清理不触及，策略仅做断言）")
+          rec = {"time":"$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S')","mode":"v6_retention_guard",
+                 "policy":"keep_until_v8_stable_1week_and_owner_confirms","local_v6_backups_preserved":True}
+          try:
+              with open("HANDOVER_LOG.jsonl","a",encoding="utf-8") as fh:
+                  fh.write(json.dumps(rec, ensure_ascii=False)+"\n")
+          except Exception as e:
+              print("写日志跳过:", e)
+          PY
 
       - name: "🎯 v8 每日审计（与小九交接 + 防覆盖 + 运维页对齐 + 卡片徽章）"
         continue-on-error: true
