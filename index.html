@@ -7703,6 +7703,16 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;">✅ 今日已入仓 <b style="margin-left:2px">'+total+'</b></span>';
     }
     h+='</div></div></div>';
+    // 数据质量警示：若 A/B 档全部为港股（A股扫描缺失），挂红条提示，避免误导
+    if(total>0){
+      var _allSel = a.concat(b);
+      var _aShareCnt = _allSel.filter(function(s){ return s.market && !/港股|hk/i.test(s.market); }).length;
+      if(_aShareCnt===0){
+        h+='<div style="background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.35);border-radius:8px;padding:10px 14px;margin-bottom:14px;color:#ef5350;font-size:12px;line-height:1.6;">'
+          +'<b>⚠️ A股数据缺失</b>：当前全站精选仅含港股，原因是盘后扫描时 A股活跃股池抓取失败。下一盘后跑批（18:30）会自动重刷，也可手动触发 <code>v8_algo_cloud</code>。'
+          +'</div>';
+      }
+    }
     if(!total){ h+='<div class="note">当前无 A/B 档精选</div>'; }
     else {
       h+='<div style="background:#0f1a2e;border:1px solid #3a2230;border-radius:10px;padding:14px;margin-bottom:12px;">';
@@ -8786,43 +8796,6 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     el.dataset.rendered='1';
     try{
     var h='';
-
-    /* ── 分组标题：盘中 / T+0 ── */
-    h+='<div style="background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(245,158,11,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#f59e0b;border-radius:8px;margin:16px 0 10px 0;">⚡ 盘中 / T+0</div>';
-
-    /* 1. 国家队ETF */
-    var etfHeat=window.ETF_INTRADAY_HEAT||{}, etfHeatT=etfHeat.update_time||'';
-    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #f59e0b;">';
-    h+=v8CardHeader('🔥','国家队ETF','T+0·主要宽基ETF','update_time',{update_time:etfHeatT},!etfHeat||!etfHeat.items);
-    h+='<div style="padding:12px 14px;">';
-    if(etfHeat&&etfHeat.items&&etfHeat.items.length){
-      var stateCodes=['510300','510310','510330','510500','510050','159915','159949','588000','588080','512100','159845','563360'];
-      var stateMap={}; etfHeat.items.forEach(function(it){ stateMap[it['代码']]=it; });
-      var stateList=[]; stateCodes.forEach(function(c){ if(stateMap[c]) stateList.push(stateMap[c]); });
-      if(!stateList.length) stateList=etfHeat.items.slice(0,12);
-      var totalAmt=0, up=0, down=0; stateList.forEach(function(it){ totalAmt+=it['成交额']||0; if((it['涨跌幅']||0)>0) up++; else if((it['涨跌幅']||0)<0) down++; });
-      var avgChg=stateList.reduce(function(a,b){return a+(b['涨跌幅']||0);},0)/stateList.length;
-      var topAmt=stateList.slice().sort(function(a,b){return (b['成交额']||0)-(a['成交额']||0);})[0];
-      h+='<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;">';
-      h+='<div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:'+(avgChg>=0?'var(--up)':'var(--down)')+';">'+(avgChg>=0?'+':'')+avgChg.toFixed(2)+'%</div><div style="font-size:10px;color:var(--dim);">平均涨跌</div></div>';
-      h+='<div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--txt);">'+(totalAmt/1e8).toFixed(1)+'<span style="font-size:11px;color:var(--dim);">亿</span></div><div style="font-size:10px;color:var(--dim);">合计成交</div></div>';
-      h+='<div style="text-align:center;"><div style="font-size:14px;font-weight:700;color:var(--up);">'+up+'</div><div style="font-size:10px;color:var(--dim);">涨</div></div>';
-      h+='<div style="text-align:center;"><div style="font-size:14px;font-weight:700;color:var(--down);">'+down+'</div><div style="font-size:10px;color:var(--dim);">跌</div></div>';
-      if(topAmt){ h+='<div style="text-align:center;"><div style="font-size:11px;font-weight:700;color:var(--txt);max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+topAmt['名称']+'</div><div style="font-size:10px;color:var(--dim);">最活跃 '+(topAmt['成交额']/1e8).toFixed(1)+'亿</div></div>'; }
-      h+='</div>';
-      var ups=stateList.filter(function(it){return (it['涨跌幅']||0)>0;}).sort(function(a,b){return b['涨跌幅']-a['涨跌幅'];}).slice(0,3);
-      var downs=stateList.filter(function(it){return (it['涨跌幅']||0)<0;}).sort(function(a,b){return a['涨跌幅']-b['涨跌幅'];}).slice(0,3);
-      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">';
-      h+='<div><div style="font-size:11px;font-weight:700;color:var(--up);margin-bottom:4px;">▲ 上涨</div>';
-      ups.forEach(function(it){ h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px dashed var(--border);"><span>'+it['名称']+'</span><span style="color:var(--up);font-weight:700;">+'+it['涨跌幅'].toFixed(2)+'%</span></div>'; });
-      h+='</div>';
-      h+='<div><div style="font-size:11px;font-weight:700;color:var(--down);margin-bottom:4px;">▼ 下跌</div>';
-      downs.forEach(function(it){ h+='<div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:1px dashed var(--border);"><span>'+it['名称']+'</span><span style="color:var(--down);font-weight:700;">'+it['涨跌幅'].toFixed(2)+'%</span></div>'; });
-      h+='</div></div>';
-    } else {
-      h+='<div class="note" style="text-align:center;">ETF热度数据暂不可用</div>';
-    }
-    h+='</div></div>';
 
     /* ── 分组标题：盘后更新 ── */
     h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167,139,250,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#a78bfa;border-radius:8px;margin:16px 0 10px 0;">🌙 盘后更新</div>';

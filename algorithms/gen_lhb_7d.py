@@ -51,6 +51,7 @@ def aggregate_stock(days_data):
         "inst_buy": 0.0, "inst_sell": 0.0, "inst_net": 0.0,
         "yz_buy": 0.0, "yz_sell": 0.0, "yz_net": 0.0,
         "north_buy": 0.0, "north_sell": 0.0, "north_net": 0.0,
+        "combined_net": 0.0,
         "days": 0,
         "resonance_days": 0,
         "last_category": "",
@@ -77,6 +78,7 @@ def aggregate_stock(days_data):
             a["north_buy"] += nb_buy
             a["north_sell"] += nb_sell
             a["north_net"] += nb_buy - nb_sell
+            a["combined_net"] = a["inst_net"] + a["yz_net"]
             a["days"] += 1
             if s.get("category") == "机游共振":
                 a["resonance_days"] += 1

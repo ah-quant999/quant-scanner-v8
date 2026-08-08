@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-07 23:44:29",
+  "update_time": "2026-08-08 09:45:14",
   "range": [
     "2026-07-28",
     "2026-08-07"
@@ -271,7 +271,58 @@
       "resonance_days": 0
     }
   ],
-  "top_resonance": [],
+  "top_resonance": [
+    {
+      "code": "300308",
+      "name": "中际旭创",
+      "inst_net": 114844.8,
+      "yz_net": 66212.0,
+      "north_net": 102833.1,
+      "combined_net": 181056.8,
+      "days": 1,
+      "resonance_days": 1
+    },
+    {
+      "code": "300502",
+      "name": "新易盛",
+      "inst_net": 163269.7,
+      "yz_net": 4015.2,
+      "north_net": 25468.6,
+      "combined_net": 167284.9,
+      "days": 1,
+      "resonance_days": 0
+    },
+    {
+      "code": "300058",
+      "name": "蓝色光标",
+      "inst_net": 32127.3,
+      "yz_net": 20904.9,
+      "north_net": 27341.7,
+      "combined_net": 53032.2,
+      "days": 1,
+      "resonance_days": 1
+    },
+    {
+      "code": "002428",
+      "name": "云南锗业",
+      "inst_net": 31754.8,
+      "yz_net": 20738.1,
+      "north_net": 103242.9,
+      "combined_net": 52492.9,
+      "days": 2,
+      "resonance_days": 1
+    },
+    {
+      "code": "000831",
+      "name": "中国稀土",
+      "inst_net": 11162.9,
+      "yz_net": 39860.4,
+      "north_net": 12150.3,
+      "combined_net": 51023.3,
+      "days": 1,
+      "resonance_days": 1
+    }
+  ],
   "top_north_buy": [
     {
       "code": "002428",
