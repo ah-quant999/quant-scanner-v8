@@ -9334,12 +9334,78 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       hits.innerHTML = '<div style="padding:14px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.2);border-radius:8px;font-size:13px;color:var(--gold);text-align:center;">⚡ 四量终极信号暂未生成（盘后扫描填充）</div>';
       return;
     }
-    hits.innerHTML = '<h4 style="margin:14px 0 8px 0;font-size:13px;color:var(--txt);">🎯 QD 共振命中 <b style="color:var(--orange);">'+qd+'</b> 只</h4>' +
-      stocks.map(function(s){
-        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:6px;">' +
-          '<div><b>'+(s.name||'')+'</b> <span style="color:var(--dim);font-size:11px;">'+(s.code||'')+'</span></div>' +
-          '</div>';
-      }).join('');
+    // ── 2026-08-08 充实：每股一行富信息（实时行情/行业概念/组件灯/关联板块资金/参考止损止盈/操作建议）──
+    function _fvNum(v, d){ if(v===null||v===undefined||isNaN(v)) return '—'; return Number(v).toFixed(d===undefined?2:d); }
+    function _fvCompChip(label, on){
+      return '<span style="font-size:10px;padding:1px 7px;border-radius:10px;background:'+(on?'rgba(244,73,93,.14)':'rgba(255,255,255,.04)')+';color:'+(on?'#f4495d':'#5f7099')+';border:1px solid '+(on?'rgba(244,73,93,.4)':'rgba(255,255,255,.1)')+';">'+label+'</span>';
+    }
+    function _fvAdvice(s){
+      var p=[];
+      if(s.yzc&&s.jg) p.push('游资点火+机构托底，资金合力强');
+      else if(s.yzc) p.push('游资点火，短线情绪活跃');
+      else if(s.jg) p.push('机构托底，下方有支撑');
+      var xc=(s.components&&(s.components['机构金叉']||s.components['主力金叉']||s.components['散户金叉']));
+      if(xc) p.push('叠加均线金叉');
+      p.push('回踩不破参考止损可持有');
+      return p.join('，')+'；仓位建议≤2成';
+    }
+    var _sffMap={};
+    if(window.SECTOR_FUND_FLOW&&window.SECTOR_FUND_FLOW.sectors_in){
+      window.SECTOR_FUND_FLOW.sectors_in.forEach(function(x){ if(x&&x.name) _sffMap[x.name]=x; });
+    }
+    var _rows = stocks.map(function(s){
+      var _key=(s.market||'')+(s.code||'');
+      var _q=(window.STOCK_QUOTE&&window.STOCK_QUOTE.stocks)?window.STOCK_QUOTE.stocks[_key]:null;
+      var _price=(_q&&_q.price!=null)?_q.price:s.close;
+      var _pct=(_q&&_q.pct!=null)?_q.pct:s.pct_chg;
+      var _ind=(_q&&_q.industry)?_q.industry:'';
+      var _conc=(_q&&_q.concepts)?_q.concepts:[];
+      var _cmp=[
+        ['游资点火', s.yzc],
+        ['机构托底', s.jg],
+        ['广度翻多', s.components&&s.components['广度翻多']],
+        ['主力动量翻多', s.components&&s.components['主力动量翻多']],
+        ['机构金叉', s.components&&s.components['机构金叉']],
+        ['散户金叉', s.components&&s.components['散户金叉']],
+        ['主力金叉', s.components&&s.components['主力金叉']]
+      ];
+      var _chips=_cmp.map(function(c){ return _fvCompChip(c[0], !!c[1]); }).join('');
+      var _BROAD={'融资融券':1,'沪股通':1,'深股通':1,'MSCI中国':1,'标准普尔':1,'富时罗素':1};
+      var _flowNames=_conc.filter(function(n){ return _sffMap[n] && !_BROAD[n]; });
+      if(_flowNames.length<2){ _flowNames=_conc.filter(function(n){ return _sffMap[n]; }); }
+      _flowNames.sort(function(a,b){ return (_sffMap[b].net||0)-(_sffMap[a].net||0); });
+      var _flow=_flowNames.slice(0,3).map(function(n){
+        var x=_sffMap[n]; var _up=(x.net||0)>=0;
+        return '<span>'+n+' <b style="color:'+(_up?'#f4495d':'#1fd17b')+'">'+( _up?'+':'')+(_fvNum(x.net,1))+'亿</b> <span style="color:'+((x.chg||0)>=0?'#f4495d':'#1fd17b')+'">'+( (x.chg||0)>=0?'+':'')+(_fvNum(x.chg,2))+'%</span></span>';
+      }).join('<span style="color:var(--border);margin:0 6px;">·</span>');
+      var _stopPct=(s.board_label&&/创业板|科创板/.test(s.board_label))?0.90:0.93;
+      var _close=(s.close!=null)?s.close:_price;
+      var _refStop=_close*_stopPct, _refTarget=_close*1.12;
+      var _sd=(s.signal_date||'').replace(/^\d{4}-/,'').replace('-','-');
+      return '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;">'
+        + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+          + '<b style="font-size:14px;color:var(--txt);">'+(s.name||'')+'</b>'
+          + '<span style="font-size:11px;color:var(--dim);">'+(s.code||'')+'</span>'
+          + '<span style="font-size:10px;color:#9fd0ff;background:rgba(159,208,255,.1);border:1px solid rgba(159,208,255,.3);padding:1px 7px;border-radius:10px;">'+(s.board_label||'')+'</span>'
+          + (s.qd?'<span style="font-size:10px;color:#fbbf24;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.35);padding:1px 7px;border-radius:10px;font-weight:700;">QD四量共振</span>':'')
+          + '<span style="margin-left:auto;font-size:13px;font-weight:700;color:'+((_pct||0)>=0?'var(--up)':'var(--down)')+';">'+( (_pct||0)>=0?'+':'')+(_fvNum(_pct,2))+'%</span>'
+        + '</div>'
+        + '<div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--dim);margin-top:6px;">'
+          + '<span>现价 <b style="color:var(--txt);">'+(_fvNum(_price,2))+'</b></span>'
+          + '<span>换手 <b style="color:var(--txt);">'+(s.turnover_rate!=null?_fvNum(s.turnover_rate,2):'—')+'%</b></span>'
+          + (_ind?'<span style="max-width:60%;">行业 <b style="color:var(--txt);font-weight:500;">'+_ind+'</b></span>':'')
+        + '</div>'
+        + (_conc.length?'<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;">'+_conc.slice(0,5).map(function(c){return '<span style="font-size:10px;color:#7fb4ff;background:rgba(127,180,255,.1);border:1px solid rgba(127,180,255,.25);padding:1px 7px;border-radius:10px;">'+c+'</span>';}).join('')+'</div>':'')
+        + '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;">'+_chips+'</div>'
+        + (_flow?'<div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--dim);margin-top:7px;border-top:1px dashed var(--border);padding-top:7px;"><span style="color:#9fd0ff;">关联板块资金</span>'+_flow+'</div>':'')
+        + '<div style="font-size:11px;color:var(--dim);margin-top:7px;">'
+          + '参考<span style="color:#1fd17b;">止损 '+(_fvNum(_refStop,2))+'</span>（'+((1-_stopPct)*100).toFixed(0)+'%）· 参考<span style="color:#f4495d;">止盈 '+(_fvNum(_refTarget,2))+'</span>（+12%）'
+          + ' ｜ 操作：'+_fvAdvice(s)
+          + (_sd?' ｜ 信号日 '+_sd:'')
+        + '</div>'
+        + '</div>';
+    });
+    hits.innerHTML = '<h4 style="margin:14px 0 8px 0;font-size:13px;color:var(--txt);">🎯 QD 共振命中 <b style="color:#fbbf24;">'+qd+'</b> 只</h4>' + _rows.join('');
   }
   // 2026-08-06 23:48 修复：renderFourVolume 之前只在 IIFE 内部（被 switchSt 直接调用），
   // 末尾 initCardBadges 通过 window.renderFourVolume 找不到它 → 四量终极胶囊永远不显示。
