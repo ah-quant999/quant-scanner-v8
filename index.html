@@ -493,12 +493,12 @@ window.V8_CAL = {weeks:[],legend:[]};
     }
     return base.getUTCFullYear()+'-'+String(base.getUTCMonth()+1).padStart(2,'0')+'-'+String(base.getUTCDate()).padStart(2,'0');
   };
-  /* 统一「已跑完」胶囊文案（2026-08-07 修复：消除「昨日数据误报今日」歧义）
+  /* 统一「已跑完」胶囊文案（2026-08-09 修复：「已完成」→「已跑」，与「已入仓」成对）
    * 入参：gen_time / data_time / update_time 时间字符串
    * 返回：{ show:Boolean, label:String }
    * 规则：
    *   数据日期 == 今天日历日期 → 「✅ 今日已跑完」
-   *   数据日期 == 昨天（或更早但≤30天）→ 「✅ MM-DD 已完成」（显示实际月/日）
+   *   数据日期 == 昨天（或更早但≤30天）→ 「✅ MM-DD 已跑」（显示实际月/日）
    *   无时间戳/超过30天 → 不显示
    * 所有胶囊调用此函数，改一处全局生效。 */
   window._runBadgeInfo = function(genTimeStr){
@@ -515,7 +515,7 @@ window.V8_CAL = {weeks:[],legend:[]};
     var diff = Math.round((todayCST.getTime() - dataDay.getTime()) / 864e5);
     if(diff < 0) return { show:false, label:'' }; // 未来时间
     if(diff === 0) return { show:true, label:'✅ 今日已跑完' };
-    if(diff <= 30) return { show:true, label:'✅ '+dataDate.slice(5)+' 已完成' }; // "08-06 已完成"
+    if(diff <= 30) return { show:true, label:'✅ '+dataDate.slice(5)+' 已跑' }; // "08-06 已跑"
     return { show:false, label:'' };
   };
   /* 统一相对时间：非交易日且数据日期为上一交易日，显示「上一交易日收盘」 */
@@ -582,7 +582,9 @@ function setBadge(id, slot, horizon, ts, sub){
     console.warn('[setBadge] innerHTML empty/short id=' + id + ' len=' + el.innerHTML.length);
   }
 }
-/* 统一「持仓」胶囊（与 🧺 08-07 持仓 1 截图一致） */
+/* 统一「已入仓」胶囊（2026-08-09 修复：「持仓」→「已入仓」）
+ * 调用：_holdBadge(dateStr, count, label)
+ * 默认 label = '已入仓'；需要特殊含义可传 '信号'/'已跑' 等 */
 function _holdBadge(dateStr, count, label){
   var d = '';
   if(dateStr){
@@ -591,7 +593,7 @@ function _holdBadge(dateStr, count, label){
     if(m) d = m[1]+'-'+m[2];
     else { m = String(dateStr).match(/^(\d{2})-(\d{2})$/); if(m) d = m[1]+'-'+m[2]; }
   }
-  var lbl = label || '持仓';
+  var lbl = label || '已入仓';
   return '<span style="display:inline-flex;align-items:center;gap:4px;flex-shrink:0;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;padding:3px 10px;border-radius:10px;white-space:nowrap;">'
     + '<span aria-hidden="true">🧺</span>'
     + '<span>'+(d||'--')+' '+lbl+' <b style="margin-left:2px">'+(count||0)+'</b></span>'
@@ -2389,7 +2391,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- ===== TAB 页面：三重共识（默认展示） ===== -->
     <div id="st-tc" class="st-pane active">
       <div class="card">
-        <h3><span class="ic">🥇</span>严格三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span> <span style="font-size:11px;color:var(--sub);font-weight:400">最严</span> - 盘后 · <span class="fresh" id="tcTime">—</span> <span id="tcRunBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);vertical-align:middle">✅ 今日已跑完</span> <span id="tcEnteredBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;vertical-align:middle">✅ 今日已入仓 <b id="tcEnteredCount" style="margin-left:2px">0</b></span></h3>
+        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🥇</span>严格三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span> <span style="font-size:11px;color:var(--sub);font-weight:400">最严</span> <span style="color:var(--dim);font-weight:400">- 盘后 ·</span> <span class="fresh" id="tcTime">—</span> <span id="tcRunBadge" style="display:none;margin-left:0;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);vertical-align:middle">✅ 今日已跑完</span> <span id="tcEnteredBadge" style="display:none;vertical-align:middle;"></span></h3>
         <div id="tcConsensus" class="tp-stocklist"></div>
         <div class="note">筛选：主站TOP10≥70 且 驾驶舱A档 且 基本面A档。下方「优先/扩展观察」为差1步/差2步备选（主站评分≥75）。</div>
       </div>
@@ -2806,7 +2808,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      slot     — 盘前 / 盘中 / 盘后 / T+1 / 实时 / 周度 …
      horizon  — 短线 / 中线 / 长线 / 中长线 / —
      ts       — ISO 时间字符串或日期对象（空=显 —）
-     sub      — 副标签（可选，胶囊外独立小标，如「数据时间」「持仓连续 N 只」）
+     sub      — 副标签（可选，胶囊外独立小标，如「数据时间」「已入仓连续 N 只」）
      ────────────────────────────────────────────────────────── */
 
 
@@ -3896,7 +3898,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     h += '<span style="font-size:18px;font-weight:800;color:var(--txt)">🐂 大牛股猎手</span>';
     h += _uBadge('盘后', '短线', updateTime);
     if(_hunterCoreCount > 0){
-      h += _holdBadge(updateTime, _hunterCoreCount, '共振');
+      h += _holdBadge(updateTime, _hunterCoreCount, '已入仓');
     }
     h += '</div>';
     h += '<div style="font-size:11px;color:var(--dim);margin-bottom:10px;">机游共振 · 板块资金流 · 核心共振（仅龙虎榜覆盖个股）</div>';
@@ -4510,11 +4512,10 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         </ul>
         <div class="logic-h">「今日已跑完」 vs 「今日已入仓」</div>
         <div class="logic-p">两个标识是<b>独立维度</b>，不可混淆：<br>
-        · <b style="color:var(--sub)">今日已跑完</b>（灰色胶囊）：当算法链跑成功 + 数据 update_time 是当天 → <b>无条件显示</b>。哪怕市场差、入选=0 也会显示，证明"今天确实跑了"。<br>
-        · <b style="color:#15803d">今日已入仓 N</b>（绿色胶囊）：仅当数据是今日、且股票的 <code>enter_date</code> 为今日时才显示，N 是"今日新入选"数量。<br>
-        · <b style="color:#15803d">持仓 N</b>：数据仍是今日，但当前入选股都是昨日延续持仓，没有新入选。<br>
-        两者<b>可并存</b>（跑成功 + 有今日新入选 = "已跑完"+"今日已入仓"同时显示）。<br>
-        <b style="color:#ef5350">铁律</b>：所有数据必须及时真实准确，<b>不得造假</b>。数据过期或 0 新入选时，绝不显示"今日已入仓"骗用户。</div>
+        · <b style="color:var(--sub)">今日已跑完 / MM-DD 已跑</b>（灰色胶囊）：当算法链跑成功 + 数据 update_time 是当天/近期 → <b>无条件显示</b>。哪怕市场差、入选=0 也会显示，证明"那天确实跑了"。<br>
+        · <b style="color:#15803d">MM-DD 已入仓 N</b>（绿色胶囊）：当前严格三重共识入选股数量，日期为数据实际日期。只要还有入选股就显示，不再区分"今日新入选"还是"昨日延续"。<br>
+        两者<b>可并存</b>（跑成功 + 有入选股 = "已跑"+"已入仓"同时显示）。<br>
+        <b style="color:#ef5350">铁律</b>：所有数据必须及时真实准确，<b>不得造假</b>。数据过期或 0 入选时，绝不显示"已入仓"骗用户。</div>
       </div>
 
       <div class="card">
@@ -7639,31 +7640,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if(_tcInfo.show){ _tcRun.textContent = _tcInfo.label; _tcRun.style.display='inline-flex'; }
       else _tcRun.style.display='none';
     }
-    // 「今日已入仓」胶囊：只看数据日期内、且 enter_date == 数据日期的"新入选"股票
-    // 2026-08-07 修复：原逻辑只看 stocks.length，无法区分昨天入仓/今天入仓，且跑失败后仍显示"今日"
+    // 「已入仓」胶囊（2026-08-09 修复：「持仓」→「已入仓」，只要有严格股就显示，不再区分新/旧）
     var _eb=document.getElementById('tcEnteredBadge');
-    var _ec=document.getElementById('tcEnteredCount');
-    if(_eb&&_ec){
-      var _dataDate = String(_tcTs).slice(0,10);
-      var _todayDate = window._tradeDayStr ? window._tradeDayStr() : _dataDate;
-      // 数据必须是"今天"（按交易日口径，09:30前仍算上一交易日）才允许显示"今日"
-      var _isFresh = (_dataDate === _todayDate && /^\d{4}-\d{2}-\d{2}$/.test(_dataDate));
-      var _newToday = 0;
-      if(_isFresh){
-        stocks.forEach(function(s){
-          if((s.enter_date || _dataDate) === _dataDate) _newToday++;
-        });
-      }
-      if(_newToday>0){
-        _eb.innerHTML = '✅ 今日已入仓 <b style="margin-left:2px">'+_newToday+'</b>';
-        _eb.style.display='inline-flex';
-      } else if(_isFresh && stocks.length>0){
-        // 数据是今天，但都是昨日延续持仓：显示"持仓 N"，避免误报"今日入仓"
-        _eb.innerHTML = '💼 持仓 <b style="margin-left:2px">'+stocks.length+'</b>';
-        _eb.style.display='inline-flex';
-      } else if(!_isFresh && stocks.length>0){
-        // 数据已过期：显示实际日期的入仓数，绝不写"今日"
-        _eb.innerHTML = '💼 '+_dataDate.slice(5)+' 持仓 <b style="margin-left:2px">'+stocks.length+'</b>';
+    if(_eb){
+      if(stocks.length>0){
+        _eb.innerHTML = _holdBadge(_tcTs, stocks.length, '已入仓');
         _eb.style.display='inline-flex';
       } else {
         _eb.style.display='none';
@@ -7871,7 +7852,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(_fvInfo.show){
       h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">'+_fvInfo.label+'</span>';
     }
-    // 「持仓」胶囊：统一为 🧺 MM-DD 持仓 N
+    // 「已入仓」胶囊：统一为 🧺 MM-DD 已入仓 N
     if(total>0){
       h+=_holdBadge(genTime || d.update_time || '今日', total);
     }
@@ -8005,7 +7986,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var _cockpitGenTs = _cockpitData.gen_time || _cockpitData.data_time || _cockpitData.update_time || cockpitTs;
     var _cockpitInfo = window._runBadgeInfo(_cockpitGenTs);
     if(_cockpitInfo.show) h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">'+_cockpitInfo.label+'</span>';
-    // 「持仓」胶囊：统一为 🧺 MM-DD 持仓 N
+    // 「已入仓」胶囊：统一为 🧺 MM-DD 已入仓 N
     var _cta=(DATA.cockpit_tier&&DATA.cockpit_tier.tier_a)||[];
     var _ctb=(DATA.cockpit_tier&&DATA.cockpit_tier.tier_b)||[];
     var _ctTotal=_cta.length+_ctb.length;
@@ -9308,7 +9289,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if(_crdsInfo.show){ _crdsRun.textContent = _crdsInfo.label; _crdsRun.style.display='inline-flex'; }
       else _crdsRun.style.display='none';
     }
-    // 「持仓」胶囊：统一为 🧺 MM-DD 持仓 N
+    // 「已入仓」胶囊：统一为 🧺 MM-DD 已入仓 N
     (function(){
       var _hb=document.getElementById(p+'crdsHoldBadge');
       if(_hb){
@@ -9732,7 +9713,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if(_fvInfo.show){ _fvRun.textContent = _fvInfo.label; _fvRun.style.display='inline-flex'; }
       else _fvRun.style.display='none';
     }
-    // 「持仓」胶囊：统一为 🧺 MM-DD 持仓 N
+    // 「已入仓」胶囊：统一为 🧺 MM-DD 已入仓 N
     var _hb=document.getElementById('stfvHoldBadge');
     if(_hb){
       try{
