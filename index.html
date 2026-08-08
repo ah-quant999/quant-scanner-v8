@@ -8649,16 +8649,14 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if(m.horizon) horizon = m.horizon;
     }
     var badge = (t ? _uBadge(slot, horizon, dataObj ? dataObj.update_time : null) : '');
-    // 2026-08-08 一劳永逸：卡片头部允许换行，标题区可收缩，胶囊永不挤压覆盖
+    // 2026-08-09 全站统一：「更新于」胶囊必须紧跟卡名，不得靠右；
+    // subtitle 不再使用 flex:1 撑满空间挤压胶囊。
     var html='<div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;padding:10px 14px;border-bottom:1px solid var(--border);border-radius:12px 12px 0 0;min-width:0;">'
       +'<span style="font-size:15px;line-height:1;flex:0 0 auto;">'+icon+'</span>'
       +'<span style="font-size:14px;font-weight:800;color:var(--cyan);flex:0 0 auto;white-space:nowrap;">'+title+'</span>';
-    if(subtitle){ html+='<span style="font-size:11px;color:var(--dim);margin-left:4px;flex:1 1 auto;min-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+subtitle+'</span>'; }
-    else { html+='<span style="flex:1 1 auto;"></span>'; }
+    if(!hideTime && badge){ html+='<span style="flex:0 0 auto;">'+badge+'</span>'; }
     if(nodata){ html+='<span style="font-size:10px;color:var(--down);border:1px solid var(--down);border-radius:4px;padding:1px 5px;flex:0 0 auto;">无数据</span>'; }
-    if(hideTime){
-      // 不渲染胶囊；不加占位 span（卡片名 + subtitle 紧贴左侧，符合大卡规范）
-    }else if(badge){ html+='<span style="flex:0 0 auto;margin-left:auto;">'+badge+'</span>'; }
+    if(subtitle){ html+='<span style="font-size:11px;color:var(--dim);margin-left:4px;flex:0 1 auto;min-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+subtitle+'</span>'; }
     html+='</div>';
     return html;
   }
