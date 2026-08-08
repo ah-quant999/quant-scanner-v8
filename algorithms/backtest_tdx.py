@@ -235,11 +235,10 @@ def calc_forward_return(rows, idx, hold_days, board="主板"):
         target_price = st["target_price"]
         rr = st["risk_reward"]
     else:
-        # 数据不足时回退固定百分比
-        stop_pct = 0.10 if board in ("创业板", "科创板") else 0.07
-        stop_loss = entry * (1 - stop_pct)
-        target_price = entry * (1 + max(0.105, stop_pct * 1.5))
-        rr = round((target_price - entry) / (entry - stop_loss), 2)
+        # 数据不足时回退方案三统一口径：固定10%止损 + R:R=1.5止盈
+        stop_loss = entry * 0.90
+        target_price = entry * 1.15
+        rr = 1.5
 
     # 模拟每日 close 触发止损/止盈
     exit_price = rows[target]["close"]

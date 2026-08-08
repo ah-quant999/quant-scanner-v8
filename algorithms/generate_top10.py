@@ -362,12 +362,12 @@ def main():
         recent5 = recent_closes[-5:] if len(recent_closes) >= 5 else recent_closes
         recent20 = recent_closes[-20:] if len(recent_closes) >= 20 else recent_closes
 
-        # 方案二统一口径（此处只有收盘价序列，用降级版：止损取最严、止盈 cascade 保证 R:R≥1.5）
+        # 方案三统一口径（此处只有收盘价序列，用降级版：固定10%止损 + R:R=1.5止盈）
         stop_loss, target_price = 0, 0
         stop_loss_method, target_price_method, risk_reward = "", "", 0
         if close_price and close_price > 0:
             _board = s.get("board_label", "") or board_from_code(raw_code)
-            _st = compute_stop_target_from_closes(recent_closes or [close_price], board=_board)
+            _st = compute_stop_target_from_closes(recent_closes or [close_price], board=_board, strategy="general")
             if _st:
                 stop_loss = _st["stop_loss"]
                 target_price = _st["target_price"]

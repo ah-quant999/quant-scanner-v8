@@ -131,9 +131,9 @@ def compute_stop_target_by_rules(df, board, stop_rule, stop_param, target_rule, 
         "atr": round(atr, 3),
         "board": board,
         "stop_loss": round(stop, 2),
-        "stop_loss_method": f"{stop_rule}{stop_param}",
+        "stop_loss_method": f"{stop_rule}{int(stop_param) if stop_param == int(stop_param) else stop_param}",
         "target_price": round(target, 2),
-        "target_price_method": f"{target_rule}{target_param}",
+        "target_price_method": f"{target_rule}{int(target_param) if target_param == int(target_param) else target_param}",
         "support": round(float(np.min(lows[-PRICE_WINDOW:])), 2),
         "resistance": round(float(np.max(highs[-PRICE_WINDOW:])), 2),
         "risk_reward": rr,
@@ -146,18 +146,17 @@ def compute_stop_target_by_rules(df, board, stop_rule, stop_param, target_rule, 
 def compute_stop_target(df: pd.DataFrame, board: str = "主板", strategy: str = None) -> dict | None:
     """从日K DataFrame 计算止损止盈。
 
-    - strategy=None（默认）：始终使用 方案二 默认口径（向后兼容，所有既有调用不变）。
+    - strategy=None（默认）：先读取 profiles 中 "default" 配置；若 default 为 auto 则回退方案二口径。
     - strategy 命中 stop_target_profiles.json 中的非 auto 配置：改用该策略优化后的口径。
     """
-    if strategy:
-        prof = _load_profiles().get(strategy)
-        if prof:
-            sr = _parse_spec(prof.get("stop"))
-            tr = _parse_spec(prof.get("target"))
-            if sr and tr:
-                r = compute_stop_target_by_rules(df, board, sr[0], sr[1], tr[0], tr[1])
-                if r:
-                    return r
+    prof = _load_profiles().get(strategy or "default")
+    if prof:
+        sr = _parse_spec(prof.get("stop"))
+        tr = _parse_spec(prof.get("target"))
+        if sr and tr:
+            r = compute_stop_target_by_rules(df, board, sr[0], sr[1], tr[0], tr[1])
+            if r:
+                return r
     return _compute_stop_target_v2(df, board)
 
 
@@ -249,10 +248,11 @@ def _compute_stop_target_v2(df: pd.DataFrame, board: str = "主板") -> dict | N
     }
 
 
-def compute_stop_target_from_closes(closes, board: str = "主板") -> dict | None:
-    """降级版：只有收盘价序列（无 high/low）时使用，规则形状与 compute_stop_target 一致。
+def compute_stop_target_from_closes(closes, board: str = "主板", strategy: str = None) -> dict | None:
+    """降级版：只有收盘价序列（无 high/low）时使用。
 
-    用近 PRICE_WINDOW 日收盘价的极值代替真实高低点，无 ATR 口径。
+    - strategy=None（默认）：先读取 profiles 中 "default" 配置；若 default 为 auto 则回退方案二降级口径。
+    - 命中非 auto 配置时：仅支持 fixedP/rrK 组合（因无 high/low 无法算 prevHighN/fibX）。
     适用于 generate_top10.py 这类只能拿到 close 序列的场景。
     返回字段为 compute_stop_target 的子集，并带 precise=False 标记。
     """
@@ -264,6 +264,34 @@ def compute_stop_target_from_closes(closes, board: str = "主板") -> dict | Non
     window_high = max(win)
     window_low = min(win)
 
+    # 优先读取 profile（默认/general 等）
+    prof = _load_profiles().get(strategy or "default")
+    if prof:
+        sr = _parse_spec(prof.get("stop"))
+        tr = _parse_spec(prof.get("target"))
+        if sr and tr and sr[0] == "fixedP" and tr[0] == "rrK":
+            stop_param, target_param = sr[1], tr[1]
+            chosen_stop = close * (1 - stop_param / 100.0)
+            chosen_stop = max(chosen_stop, close * 0.5)
+            risk = close - chosen_stop
+            chosen_target = close + target_param * risk if risk > 0 else close * 1.03
+            chosen_target = max(chosen_target, close * 1.03)
+            reward = chosen_target - close
+            return {
+                "close": round(close, 2),
+                "board": board,
+                "precise": False,
+                "profile": True,
+                "stop_loss": round(chosen_stop, 2),
+                "stop_loss_method": f"fixedP{int(stop_param) if stop_param == int(stop_param) else stop_param}",
+                "target_price": round(chosen_target, 2),
+                "target_price_method": f"rrK{int(target_param) if target_param == int(target_param) else target_param}",
+                "risk_reward": round(reward / risk, 2) if risk > 0 else 0.0,
+                "risk_pct": round(risk / close * 100, 2),
+                "reward_pct": round(reward / close * 100, 2),
+            }
+
+    # 回退：方案二降级口径（low20 / fixed 取最严，cascade 止盈）
     fixed_pct = fixed_stop_pct(board)
     stop_candidates = {
         "low20": window_low,

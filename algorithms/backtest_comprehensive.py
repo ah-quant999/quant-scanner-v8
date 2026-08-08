@@ -297,9 +297,9 @@ def calc_multi_hold(entry_date: str, entry_price: float, bsc: str, board: str = 
     df_entry = df_all.iloc[: entry_idx + 1].copy()
     st = compute_stop_target(df_entry, board=board, strategy="comprehensive")
     if not st:
-        # 历史数据不足时回退固定百分比
-        stop_loss = real_entry_price * fixed_stop_pct(board)
-        target_price = real_entry_price * (1 + 0.105)
+        # 历史数据不足时回退方案三统一口径：固定10%止损 + R:R=1.5止盈
+        stop_loss = real_entry_price * 0.90
+        target_price = real_entry_price * 1.15
     else:
         stop_loss = st["stop_loss"]
         target_price = st["target_price"]

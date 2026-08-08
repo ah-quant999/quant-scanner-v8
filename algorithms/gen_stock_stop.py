@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""gen_stock_stop.py — v8 算法精确止损/止盈（方案二：三口径取最严）
+"""gen_stock_stop.py — v8 算法精确止损/止盈（方案三：全站统一 fixedP10/rrK1.5）
 
 产出 data/STOCK_STOP_DATA.js（window.STOCK_STOP_DATA），为「今日可入手候选」卡片与
-个股查询界面提供基于真实波动率 + 价格结构的止损/止盈。
+个股查询界面提供固定10%止损 + R:R=1.5止盈的统一口径。
 
 候选宇宙：TRIPLE_CONSENSUS + COCKPIT_TIER_RECOMMEND(tier_a) + FOUR_VOLUME + GOLD_POOL
 （金股池虽已移出候选卡，但其独立卡片与个股查询仍可用精确止损，故一并计算）。
@@ -22,12 +22,8 @@ sys.path.insert(0, ALGO)
 from data_source_gtimg import fetch_a_daily_gtimg  # noqa: E402
 from stop_target_logic import (  # noqa: E402
     compute_stop_target,
-    fixed_stop_pct,
     board_from_code,
-    ATR_WINDOW,
     PRICE_WINDOW,
-    STOP_ATR_MULT,
-    RR_RATIO,
 )
 
 
@@ -94,7 +90,7 @@ def collect_universe():
 
 
 def main():
-    print(f"=== gen_stock_stop (方案二三口径取最严)  {datetime.now():%Y-%m-%d %H:%M:%S} ===")
+    print(f"=== gen_stock_stop (方案三统一 fixedP10/rrK1.5)  {datetime.now():%Y-%m-%d %H:%M:%S} ===")
     universe = collect_universe()
     print(f"候选宇宙去重: {len(universe)} 只")
 
@@ -112,7 +108,7 @@ def main():
             print(f"  ⚠️ {code} 取K线异常: {e}")
             fail += 1
             continue
-        stats = compute_stop_target(df, board=meta.get("board", "主板"))
+        stats = compute_stop_target(df, board=meta.get("board", "主板"), strategy="general")
         if not stats:
             fail += 1
             continue
@@ -121,8 +117,7 @@ def main():
         ok += 1
 
     method_desc = (
-        f"止损三口径取最严：low20/ATR×2/fixed_pct; "
-        f"止盈三口径cascade：prev_high/fib618/R:R=2; "
+        "全站统一口径(方案三优化): 固定10%止损 + R:R=1.5止盈; "
         f"窗口=近{PRICE_WINDOW}日"
     )
     out = {

@@ -241,12 +241,11 @@ def calc_backtest(signals):
                 target_method = st["target_price_method"]
                 risk_reward = st["risk_reward"]
             else:
-                # 样本不足回退固定百分比，仍保证 R:R>=1.5
-                pct = 0.10 if board in ("创业板", "科创板") else 0.07
-                stop_loss = round(entry_price * (1 - pct), 2)
-                target_price = round(entry_price * (1 + max(0.105, pct * 1.5)), 2)
-                stop_method = "fixed"
-                target_method = "rr15"
+                # 样本不足回退方案三统一口径：固定10%止损 + R:R=1.5止盈
+                stop_loss = round(entry_price * 0.90, 2)
+                target_price = round(entry_price * 1.15, 2)
+                stop_method = "fixedP10"
+                target_method = "rrK1.5"
                 risk_reward = 1.5
 
             # 提前出场模拟（入场次日起逐日 close）
