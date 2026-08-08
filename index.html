@@ -3824,14 +3824,21 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var score = CR.score || 50;
     var scoreLvl = score >= 70 ? '高风险' : score >= 50 ? '警戒' : '安全';
     var scoreColor = score >= 70 ? 'var(--down)' : score >= 50 ? 'var(--gold)' : 'var(--up)';
-    var updateTime = CR.update_time || CD.update_time || CAND.update_time || '--';
+    // 每日洞察聚合多个数据源，取各源真实时间中最新的作为卡片时间戳
+    var updateTime = [
+      CR.update_time, CD.update_time, CAND.update_time,
+      SR.update_time, VOL.update_time, IQ.update_time,
+      LHB.update_time, NF.update_time, window.SH_SZ_HISTORY && window.SH_SZ_HISTORY.update_time
+    ].filter(Boolean).sort().pop() || '--';
 
     var h = '';
-    // Header
-    h += '<div style="text-align:center;margin-bottom:18px">';
+    // Header：标题与 🐻 胶囊统一放同一行，避免"盘后"与时间重复造成误解
+    h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px">';
+    h += '<div>';
     h += '<div style="font-size:18px;font-weight:800;color:var(--txt)">📊 每日市场洞察</div>';
     h += '<div style="font-size:11px;color:var(--dim);margin-top:4px">框架：结构面/情绪面/波动率/资金面/北向/龙头</div>';
-    h += '<div style="margin-top:6px;display:flex;justify-content:center">' + _uBadge('盘后', '短线', updateTime) + '</div>';
+    h += '</div>';
+    h += '<div>' + _uBadge('盘后', '短线', updateTime) + '</div>';
     h += '</div>';
 
     // Tag row
@@ -4046,10 +4053,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     function _pc(p){ return (p>=0?'+':'') + (p||0).toFixed(2) + '%'; }
 
     var h = '';
-    // Header
-    h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">';
-    h += '<div><span style="font-size:18px;font-weight:800;color:var(--txt)">🐂 大牛股猎手</span><span style="margin-left:8px">' + _uBadge('盘后', '短线', updateTime) + '</span></div>';
-    h += '<div style="font-size:11px;color:var(--dim)">机游共振 · 板块资金流 · 核心共振（仅龙虎榜覆盖个股）</div>';
+    // Header：标题与 🐻 胶囊统一放同一行（与严格三重共识/每日洞察格式一致）
+    h += '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:10px">';
+    h += '<div>';
+    h += '<div style="font-size:18px;font-weight:800;color:var(--txt)">🐂 大牛股猎手</div>';
+    h += '<div style="font-size:11px;color:var(--dim);margin-top:4px">机游共振 · 板块资金流 · 核心共振（仅龙虎榜覆盖个股）</div>';
+    h += '</div>';
+    h += '<div>' + _uBadge('盘后', '短线', updateTime) + '</div>';
     h += '</div>';
 
     // Description bar
@@ -4242,6 +4252,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <tr id="freshRowCandidateSrc" style="display:none"><td colspan="3" id="freshCandidateSources"></td></tr>
         <tr id="freshRowGold"><td>黄金池</td><td id="freshTimeGold">--</td><td id="freshStatusGold"><span class="status-dot s-warn"></span>待扫描</td></tr>
         <tr id="freshRowConcept"><td>概念映射</td><td id="freshTimeConcept">--</td><td id="freshStatusConcept"><span class="status-dot s-warn"></span>待扫描</td></tr>
+      </tbody></table>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;border-left:3px solid #f59e0b">
+      <h3><span class="ic">🔌</span>外部数据源 <span class="fresh" style="font-size:10px;color:var(--dim)">[候选股池上游]</span></h3>
+      <table><thead><tr><th>数据源</th><th>状态</th><th>诊断</th></tr></thead><tbody id="extSrcTbody">
+        <tr id="extSrcAkshare"><td>akshare（港股/行业）</td><td id="extSrcAkStatus"><span class="status-dot s-warn"></span>检测中</td><td id="extSrcAkDiag">—</td></tr>
+        <tr id="extSrcGuanlan"><td>观澜台（知识星球研报）</td><td id="extSrcGlStatus"><span class="status-dot s-warn"></span>检测中</td><td id="extSrcGlDiag">—</td></tr>
+        <tr id="extSrcMahoro"><td>maharo（投行信号）</td><td id="extSrcMhStatus"><span class="status-dot s-warn"></span>检测中</td><td id="extSrcMhDiag">—</td></tr>
       </tbody></table>
     </div>
 
@@ -7999,7 +8018,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     }
     // 「持仓」胶囊：统一为 🧺 MM-DD 持仓 N
     if(total>0){
-      h+=_holdBadge(genTime, total);
+      h+=_holdBadge(genTime || d.update_time || '今日', total);
     }
     h+='</div></div></div>';
     // 数据质量警示：若 A/B 档全部为港股（A股扫描缺失），挂红条提示，避免误导
@@ -8136,7 +8155,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var _ctb=(DATA.cockpit_tier&&DATA.cockpit_tier.tier_b)||[];
     var _ctTotal=_cta.length+_ctb.length;
     if(_ctTotal>0){
-      h+=_holdBadge(_cockpitGenTs, _ctTotal);
+      h+=_holdBadge(_cockpitGenTs || '今日', _ctTotal);
     }
     h+='</div><div style="font-size:11px;opacity:.85;">出手信号灯 → 大盘可操作区 → 最强赛道 → 共振候选 → 机构/龙虎榜验证 → 交易计划</div></div>';
     h+='</div>';
@@ -9449,7 +9468,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if(_hb){
         var _tot=elite.length+adv.length;
         if(_tot>0){
-          _hb.innerHTML=_holdBadge(_crdsTs, _tot);
+          _hb.innerHTML=_holdBadge(_crdsTs || '今日', _tot);
           _hb.style.display='inline-flex';
         } else {
           _hb.style.display='none';
@@ -9582,7 +9601,47 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     setRow('Gold', map['GOLD_POOL']);
     // 概念映射：优先用概念排名，回退板块资金流
     setRow('Concept', map['CONCEPT_RANKING'] || map['SECTOR_FUND_FLOW']);
+
+    // 外部数据源状态（候选股池上游依赖）
+    renderExtDataSources();
   }
+
+  function renderExtDataSources(){
+    // 从 candidate.json source_dist + CANDIDATE.js 推断外部数据源健康度
+    var cand = window.CANDIDATE || {};
+    var sd = cand.source_dist || {};
+
+    // akshare：港股>0 说明 akshare 港股接口可用（或 gold_pool 兜底生效）
+    var hkCnt = sd['港股成交前50'] || 0;
+    _setExtSrcRow('Akshare', hkCnt > 0, hkCnt > 0
+      ? '港股 '+hkCnt+'只（akshare实时或gold_pool兜底）'
+      : 'akshare港股接口不可达且gold_pool无港股数据——检查云端网络/akshare版本');
+
+    // 观澜台：观澜台>0 或 maharo>0（观澜台含自选+研报两个子来源）
+    var glCnt = (sd['观澜台'] || 0) + (sd['观澜台研报'] || 0);
+    _setExtSrcRow('Guanlan', glCnt > 0, glCnt > 0
+      ? '自选+研报共'+glCnt+'只'
+      : 'guanlan_*.json缺失或过期——检查ZSXQ_TOKEN Secret是否已配置/guanlan_extractor是否在算法链中运行');
+
+    // maharo 投行信号
+    var mhCnt = sd['maharo研报'] || 0;
+    _setExtSrcRow('Mahoro', mhCnt >= 5, mhCnt >= 5
+      ? 'maharo研报 '+mhCnt+'份（正常基线≥10）'
+      : '仅'+mhCnt+'份（期望≥10）——检查MAHORO_COOKIE Secret是否有效');
+  }
+
+  function _setExtSrcRow(prefix, ok, diag){
+    var stEl = document.getElementById('extSrc'+prefix+'Status');
+    var dgEl = document.getElementById('extSrc'+prefix+'Diag');
+    if(!stEl || !dgEl) return;
+    var cls = ok ? 's-ok' : 's-warn';
+    var txt = ok ? '正常' : '异常';
+    stEl.innerHTML = '<span class="status-dot '+cls+'"></span>'+txt;
+    dgEl.textContent = diag;
+    dgEl.style.color = ok ? 'var(--sub)' : '#f59e0b';
+    dgEl.style.fontSize = '11px';
+  }
+  window.renderExtDataSources=renderExtDataSources;
   window.renderCockpit=renderCockpit;
   window.renderV8Crds=renderV8Crds;
 
@@ -9629,12 +9688,14 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     // 「持仓」胶囊：统一为 🧺 MM-DD 持仓 N
     var _hb=document.getElementById('stfvHoldBadge');
     if(_hb){
-      if(qd>0){
-        _hb.innerHTML=_holdBadge(_fvTs, qd);
-        _hb.style.display='inline-flex';
-      } else {
-        _hb.style.display='none';
-      }
+      try{
+        if(qd>0){
+          _hb.innerHTML=_holdBadge(_fvTs || d.update_time || '今日', qd);
+          _hb.style.display='inline-flex';
+        } else {
+          _hb.style.display='none';
+        }
+      }catch(e){ console.warn('[renderFourVolume] stfvHoldBadge failed', e); }
     }
     var hits = document.getElementById('stfvHits');
     if(!hits) return;

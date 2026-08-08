@@ -372,6 +372,45 @@ def _hk_spot():
     return None
 
 
+def _hk_from_goldpool(limit, add):
+    """从 gold_pool.json 港股板块补入候选池（akshare 不可达时的兜底）。
+
+    gold_pool 由算法链上游 scanner.py 产出，含完整港股列表
+    （board_label=港股），不依赖外部 API，云端/本地均可靠。
+    """
+    gp_path = os.path.join(DATA, "gold_pool.json")
+    if not os.path.isfile(gp_path):
+        print("  [港股兜底] gold_pool.json 不存在，跳过")
+        return
+    try:
+        with open(gp_path, "r", encoding="utf-8") as f:
+            gp = json.load(f)
+    except Exception as e:
+        print(f"  [港股兜底] 读取失败: {e}")
+        return
+
+    hk_stocks = []
+    for k, v in gp.get("stocks", {}).items():
+        if v.get("board_label") == "港股" or v.get("market") == "hk":
+            code = str(v.get("code", "")).strip()
+            name = str(v.get("name", "")).strip()
+            if code and name:
+                hk_stocks.append((code, name))
+
+    if not hk_stocks:
+        print("  [港股兜底] gold_pool 中无港股板块数据")
+        return
+
+    count = 0
+    for code, name in hk_stocks[:limit]:
+        raw = "".join(ch for ch in code if ch.isdigit()).zfill(5)
+        if raw:
+            add(f"hk_{raw}", raw, name, "hk", "港股", f"港股gold_pool前{limit}")
+            count += 1
+
+    print(f"  [港股兜底] 从 gold_pool 补入 {count} 只（共{len(hk_stocks)}只候选）")
+
+
 # ---------- 工具 ----------
 def _enrich_industry_concepts(pool):
     """为候选股池补充 industry / concepts / board 字段。
@@ -573,21 +612,28 @@ def build():
                 if not raw:
                     continue
                 add(f"hk_{raw}", raw, r[name_col], "hk", "港股", f"港股成交前{HK_TOP}")
-            print(f"  [港股] 前{HK_TOP} 已并入")
+            print(f"  [港股] 前{HK_TOP} 已并入（akshare实时）")
         else:
             print("  [港股] 未找到成交额列，跳过")
     else:
-        print("  [港股] 行情获取失败，跳过该层（生产机将正常拉取）")
+        # ── 兜底：从 gold_pool.json 港股板块补入 ──
+        # akshare 在云端 runner 可能因网络/限速返回空（非安装问题），
+        # 而 gold_pool 由算法链上游产出，含完整港股列表（board_label=港股）。
+        _hk_from_goldpool(HK_TOP, add)
 
     # 3) 观澜台 自选
     try:
-        wl = json.load(open(os.path.join(DATA, "guanlan_watchlist.json"), encoding="utf-8"))
+        wl_path = os.path.join(DATA, "guanlan_watchlist.json")
+        wl = json.load(open(wl_path, encoding="utf-8"))
         for st in wl.get("stocks", []):
             code, name, mkt, board = _norm(st.get("code", ""), st.get("name", ""),
                                            st.get("market", ""), st.get("full_code", ""))
             if code:
                 add(f"{mkt}_{code}", code, name, mkt, board, "观澜台")
         print(f"  [观澜台] 自选 {len(wl.get('stocks', []))} 只已并入")
+    except FileNotFoundError:
+        print(f"  [观澜台] 自选文件不存在（{os.path.join(DATA, 'guanlan_watchlist.json')}）"
+              f"—— guanlan_extractor 可能未运行或 token 缺失")
     except Exception as e:
         print(f"  [观澜台] 自选读取失败: {e}")
 
@@ -603,6 +649,9 @@ def build():
                     add(f"{mkt}_{code}", code, name, mkt, board, "观澜台研报")
                     n += 1
         print(f"  [观澜台] 研报个股 {n} 只已并入")
+    except FileNotFoundError:
+        print(f"  [观澜台] 研报文件不存在（{os.path.join(DATA, 'guanlan_reports.json')}）"
+              f"—— guanlan_extractor 可能未运行或 token 缺失")
     except Exception as e:
         print(f"  [观澜台] 研报读取失败: {e}")
 

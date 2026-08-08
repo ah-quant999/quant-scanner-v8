@@ -53,6 +53,9 @@ jobs:
       #   通过 GitHub repo secret 注入，云端每天真实拉取。cookie 失效时更新该 secret 即可。
       #   设置路径：GitHub 仓库 → Settings → Secrets and variables → Actions → MAHORO_COOKIE
       MAHORO_COOKIE: ${{ secrets.MAHORO_COOKIE }}
+      # 观澜台(知识星球) token：与小九本地 data/zsxq_token.json 同值。
+      # 设置路径：GitHub 仓库 → Settings → Secrets → Actions → ZSXQ_TOKEN
+      ZSXQ_TOKEN: ${{ secrets.ZSXQ_TOKEN }}
     steps:
       - name: "📥 Checkout 源码（云端无需 safe-delete 钩子规避）"
         uses: actions/checkout@v4

@@ -250,15 +250,24 @@ def detect_exchange_hint(text, pos):
 
 
 def load_token():
-    """读取 token 字符串"""
+    """读取 token 字符串
+
+    优先级：环境变量 ZSXQ_TOKEN（云端 GitHub Secret 注入）> data/zsxq_token.json（本地文件）
+    """
+    # 1) 环境变量优先（云端 workflow 通过 secrets.ZSXQ_TOKEN 注入）
+    env_tok = os.environ.get("ZSXQ_TOKEN", "").strip()
+    if env_tok:
+        return env_tok
+
+    # 2) 回退本地文件
     if not os.path.exists(TOKEN_FILE):
-        print(f"  [ERR] token 文件不存在: {TOKEN_FILE}")
+        print(f"  [ERR] token 文件不存在: {TOKEN_FILE} 且无 ZSXQ_TOKEN 环境变量")
         return None
     with open(TOKEN_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
     tok = data.get("token", "")
     if not tok:
-        print(f"  [ERR] token 为空")
+        print(f"  [ERR] token 文件为空: {TOKEN_FILE}")
         return None
     return tok
 
