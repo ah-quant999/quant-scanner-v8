@@ -35,7 +35,7 @@ import urllib.request
 import urllib.error
 from datetime import datetime, timezone, timedelta
 
-TOKEN_FILE = r"E:/workspace/stock-scanner/.workbuddy/v8_gh_token.txt"
+TOKEN_FILE = r"E:/workspace/quant-scanner-v8/.workbuddy/v8_gh_token.txt"
 REPO = "ah-quant999/quant-scanner-v8"
 API = "https://api.github.com"
 CST = timezone(timedelta(hours=8))
