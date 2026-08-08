@@ -9563,12 +9563,21 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       order.forEach(function(s){
         var cnt = sd[s]||0;
         var exp = expect[s]||null;
-        var color, icon;
-        if(cnt === 0){ color = s==='港股成交前50'||s==='观澜台' ? '#f59e0b' : '#ef4444'; icon = '✗'; }
+        var color, icon, diagHint = '';
+        if(cnt === 0){ color = s==='港股成交前50'||s==='观澜台' ? '#f59e0b' : '#ef4444'; icon = '✗';
+          // 诊断提示（根据来源类型给不同原因）
+          if(s === '港股成交前50') diagHint = ' —— akshare不可用/云端无港股API';
+          else if(s === '观澜台') diagHint = ' —— guanlan_*.json缺失或过期(>7天)';
+          else diagHint = ' —— 数据源异常';
+        }
         else if(exp && cnt < exp * 0.8){ color = '#f59e0b'; icon = '⚠'; }
         else { color = '#22c55e'; icon = '✓'; }
         var label = s.replace(/成交前\d+|研报/,'');
-        html += '<span title="'+s+'：'+cnt+'只'+(exp?'(期望≥'+exp+')':'')+'" style="background:'+color+'15;color:'+color+';border:1px solid '+color+'30;border-radius:4px;padding:2px 7px;white-space:nowrap">'+icon+' '+label+' '+cnt+'</span>';
+        html += '<span title="'+s+'：'+cnt+'只'+(exp?'(期望≥'+exp+')':'')+diagHint+'" style="background:'+color+'15;color:'+color+';border:1px solid '+color+'30;border-radius:4px;padding:2px 7px;white-space:nowrap">'+icon+' '+label+' '+cnt+(diagHint?' <span style="opacity:0.6;font-size:10px">?</span>':'')+'</span>';
+        // 归零来源追加一行小字诊断（不依赖 tooltip）
+        if(cnt === 0 && diagHint){
+          html += '<span style="color:var(--dim);font-size:10px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle">'+diagHint+'</span>';
+        }
       });
       html += '<span style="color:var(--dim);margin-left:auto">共 '+(cand.total||0)+' 只</span></div>';
       srcEl.innerHTML = html;
