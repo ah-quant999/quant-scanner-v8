@@ -1,6 +1,6 @@
 {
-  "check_time": "2026-08-07 10:04:02",
-  "last_trade_close": "2026-08-06 15:30:00",
+  "check_time": "2026-08-08 02:47:53",
+  "last_trade_close": "2026-08-07 15:30:00",
   "core_stale": [],
   "warn_stale": [],
   "frozen_stale": [],
@@ -64,7 +64,8 @@
     "MAHORO": "post_close",
     "EXPERIMENT": "post_close",
     "STOCK_LIST": "post_close",
-    "STOCK_PROFILE": "post_close"
+    "STOCK_PROFILE": "post_close",
+    "AVG_PRICE_DATA": "post_close"
   },
   "category_label": {
     "premarket": "盘前",
