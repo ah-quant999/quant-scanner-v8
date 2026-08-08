@@ -1269,7 +1269,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="note" id="upDownNote">红=上涨家数，绿=下跌家数，灰=平盘。今日涨 -- / 跌 -- / 平 --。</div>
     </div>
 
-        <!-- 涨停热力矩阵（整行宽度） -->
+        <!-- 情绪周期·连板天梯（2026-08-08 从暂未上架迁到实时数据） -->
+    <div id="cycleLadderCard" style="margin-bottom:12px;"></div>
+
+    <!-- 涨停热力矩阵（整行宽度） -->
     <div class="card" id="limitUpHeatCard" style="margin-bottom:16px">
       <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近10日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">—</span></h3>
       <div id="limitUpHeatAnalysis" class="limit-up-analysis" style="display:none"></div>
@@ -5055,6 +5058,8 @@ function switchSec(sec,el){
   // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
   if(sec==='ph' && typeof window._renderSecPh==='function') setTimeout(window._renderSecPh,80);
   if(sec==='st' && typeof window._renderSecSt==='function') setTimeout(window._renderSecSt,80);
+  // 实时数据：情绪周期·连板天梯迁到本区，进入时渲染
+  if(sec==='rt' && typeof window.__renderCycleLadderCard==='function') setTimeout(window.__renderCycleLadderCard,60);
   // 共振日历：进入时确保默认 tab1（机游共振）渲染（rcTab1 默认 active，但 switchRcTab 仅在点 tab 时触发）
   if(sec==='rc' && typeof window.switchRcTab==='function') setTimeout(function(){ try{ window.switchRcTab('tab1', document.querySelector('.rc-tab-btn.active')); }catch(e){} }, 30);
   // tab 切换后 echarts 实例需要 resize（容器从 display:none 恢复时尺寸为 0）
@@ -8870,113 +8875,119 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       h += '</div></div>';
     })();
 
-    // ── 卡 2：🎭 情绪周期 · 连板天梯（合并紧凑版） ──
-    (function(){
-      var cr = window.CRISIS_DATA || {};
-      var lh = window.LIMIT_UP_HEATMAP || {};
-      var lhb = window.LHB_DATA || {};
-      var crisisScore = (cr.currency||0)*0.4 + (cr.economy||0)*0.35 + (cr.global||0)*0.25;
-      var crisisPct = Math.round(crisisScore * 100);
-      var totalUp = lh.total || 0;
-      var ladder = lh.ladder || {};
-      var top = lh.top || [];
-      var lhbCount = (lhb.stocks && lhb.stocks.length) || 0;
-      var highLbc = (ladder['3']||0)+(ladder['4']||0)+(ladder['5']||0)+(ladder['10']||0);
-      // 阶段判定
-      var phase, phaseColor, phaseDesc, posAdvice;
-      if(crisisPct >= 70){ phase='冰点'; phaseColor='var(--down)'; phaseDesc='危机雷达高位'; posAdvice='空仓'; }
-      else if(crisisPct >= 50){ phase='降温'; phaseColor='#f59e0b'; phaseDesc='风险累积'; posAdvice='≤30%'; }
-      else if(totalUp >= 80 && highLbc >= 15){ phase='狂热'; phaseColor='#ef4444'; phaseDesc='涨停泛滥'; posAdvice='兑现'; }
-      else if(totalUp >= 40 && crisisPct <= 30){ phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪偏暖'; posAdvice='50%'; }
-      else if(totalUp < 30 || crisisPct > 35){ phase='修复'; phaseColor='#38bdf8'; phaseDesc='低位筑底'; posAdvice='30%'; }
-      else { phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪平稳'; posAdvice='50%'; }
-      function _vra(c,a){ return c.indexOf("var(")===0 ? "rgba(0,0,0,"+a+")" : (c+"22").slice(0,9); }
-      var hasData = cr.update_time || lh.update_time;
-      h += '<div class="card" style="margin-bottom:12px;border-left:4px solid #38bdf8;">';
-      h += v8CardHeader('🎭','情绪周期 · 连板天梯','危机雷达+涨停热力+连板梯队+龙虎榜','update_time',
-        {update_time:(cr.update_time || lh.update_time), slot:'盘中', horizon:'短线'}, !hasData);
-      h += '<div style="padding:12px 14px;">';
-      // 阶段 + 四指标（字号放大，去掉 scale 压缩）
-      h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">';
-      h += '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:'+_vra(phaseColor,0.08)+';border:1px solid '+_vra(phaseColor,0.2)+';border-radius:8px;min-width:0">';
-      h += '<span style="font-size:20px;font-weight:900;color:'+phaseColor+'">'+phase+'</span>';
-      h += '<div style="font-size:13px;color:var(--sub);white-space:nowrap">'+phaseDesc+' · 仓位 <b style="color:'+phaseColor+'">'+posAdvice+'</b></div></div>';
-      // 四指标小方块
-      var metrics = [
-        {l:'危机', v:crisisPct, u:'分', c: crisisPct>=70?'var(--down)':(crisisPct>=50?'#f59e0b':'var(--up)')},
-        {l:'涨停', v:totalUp, u:'只', c: totalUp>=80?'#ef4444':(totalUp>=40?'var(--up)':'var(--down)')},
-        {l:'高连', v:highLbc, u:'只', c: 'var(--up)'},
-        {l:'龙虎', v:lhbCount, u:'只', c: 'var(--up)'}
-      ];
-      metrics.forEach(function(m){
-        h += '<div style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);border-radius:10px;min-width:72px;">';
-        h += '<span style="font-size:13px;font-weight:700;color:var(--txt)">'+m.l+'</span>';
-        h += '<span style="font-size:18px;font-weight:900;color:'+m.c+'">'+m.v+'<span style="font-size:11px;font-weight:700;margin-left:1px">'+m.u+'</span></span></div>';
-      });
-      h += '</div>';
-      // 连板分布：每行显示「连板标签 共N只」+ 股票名网格；首板用横向进度条展示占比
-      if(lh.update_time && Object.keys(ladder).length){
-        var lbcKeys = Object.keys(ladder).sort(function(a,b){return parseInt(b)-parseInt(a);});
-        var lbMap = {};
-        (top||[]).forEach(function(t){
-          var k = String(t.lbc||'1');
-          if(!lbMap[k]) lbMap[k] = [];
-          lbMap[k].push(t);
-        });
-        h += '<div style="font-size:14px;font-weight:700;color:var(--sub);margin-bottom:10px">连板分布（共 '+totalUp+' 只涨停）</div>';
-        h += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">';
-        lbcKeys.forEach(function(k){
-          var v = ladder[k];
-          var list = lbMap[k] || [];
-          var lbl = k==='1'?'首板':k+'连板';
-          var barColor = parseInt(k)>=4 ? '#ef4444' : (parseInt(k)>=3 ? '#f59e0b' : (parseInt(k)>=2 ? '#38bdf8' : 'var(--up)'));
-          var isFirst = k==='1';
-          var pct = totalUp>0 ? Math.round(v/totalUp*100) : 0;
-          h += '<div style="display:flex;align-items:flex-start;gap:8px">';
-          h += '<div style="min-width:58px;text-align:right;flex-shrink:0;padding-top:2px">';
-          h += '<div style="font-size:14px;font-weight:800;color:'+barColor+'">'+lbl+'</div>';
-          h += '<div style="font-size:11px;color:var(--dim)">共'+v+'只</div>';
-          h += '</div>';
-          if(isFirst){
-            // 首板：横向进度条 + 占比；如有明细再横向滚动展示
-            h += '<div style="flex:1;">';
-            h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">';
-            h += '<div style="flex:1;height:18px;background:rgba(255,255,255,.06);border-radius:9px;overflow:hidden;">';
-            h += '<div style="width:'+pct+'%;height:100%;background:linear-gradient(90deg,'+barColor+','+(barColor==='var(--up)'?'#ff8a80':barColor)+');border-radius:9px;"></div>';
-            h += '</div>';
-            h += '<span style="font-size:12px;color:var(--dim);white-space:nowrap;font-weight:700;">'+pct+'% · '+v+'只</span>';
-            h += '</div>';
-            if(list.length){
-              var showList = list.slice(0,10);
-              var moreList = list.slice(10);
-              h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
-              showList.forEach(function(s){
-                h += '<span style="font-size:13px;color:var(--text);background:rgba(255,255,255,.05);padding:4px 9px;border-radius:6px;border:1px solid rgba(255,255,255,.08);white-space:nowrap;" title="'+s.name+' '+s.code+'">'+s.name+' <span style="color:var(--dim);font-size:11px">'+s.code+'</span></span>';
-              });
-              if(moreList.length){
-                var allNames = list.map(function(s){ return s.name+' '+s.code; });
-                h += '<button onclick="showLbModal(\'首板明细\','+JSON.stringify(allNames).replace(/"/g,'&quot;')+')" style="cursor:pointer;font-size:12px;font-weight:700;color:#38bdf8;background:rgba(56,189,248,.10);border:1px solid rgba(56,189,248,.25);border-radius:6px;padding:4px 10px;white-space:nowrap;">+'+moreList.length+' 只 · 展开</button>';
-              }
-              h += '</div>';
-            }
-            h += '</div>';
-          } else {
-            h += '<div style="flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:4px 8px">';
-            list.forEach(function(s){
-              h += '<span style="font-size:13px;color:var(--text);white-space:nowrap;" title="'+s.name+' '+s.code+'">'+s.name+' <span style="color:var(--dim);font-size:11px">'+s.code+'</span></span>';
-            });
-            h += '</div>';
-          }
-          h += '</div>';
-        });
-        h += '</div>';
-      }
-      h += '</div></div>';
-    })();
+    // ── 🎭 情绪周期 · 连板天梯（合并紧凑版）已迁到实时数据区，见 window.__renderCycleLadderCard ──
 
     el.innerHTML=h;
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderUnlisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
   }
+
+  /* ===== 情绪周期 · 连板天梯（实时数据区） ===== */
+  function __renderCycleLadderCard(){
+    var el = document.getElementById('cycleLadderCard');
+    if(!el) return;
+    var cr = window.CRISIS_DATA || {};
+    var lh = window.LIMIT_UP_HEATMAP || {};
+    var lhb = window.LHB_DATA || {};
+    var crisisScore = (cr.currency||0)*0.4 + (cr.economy||0)*0.35 + (cr.global||0)*0.25;
+    var crisisPct = Math.round(crisisScore * 100);
+    var totalUp = lh.total || 0;
+    var ladder = lh.ladder || {};
+    var top = lh.top || [];
+    var lhbCount = (lhb.stocks && lhb.stocks.length) || 0;
+    var highLbc = (ladder['3']||0)+(ladder['4']||0)+(ladder['5']||0)+(ladder['10']||0);
+    // 阶段判定
+    var phase, phaseColor, phaseDesc, posAdvice;
+    if(crisisPct >= 70){ phase='冰点'; phaseColor='var(--down)'; phaseDesc='危机雷达高位'; posAdvice='空仓'; }
+    else if(crisisPct >= 50){ phase='降温'; phaseColor='#f59e0b'; phaseDesc='风险累积'; posAdvice='≤30%'; }
+    else if(totalUp >= 80 && highLbc >= 15){ phase='狂热'; phaseColor='#ef4444'; phaseDesc='涨停泛滥'; posAdvice='兑现'; }
+    else if(totalUp >= 40 && crisisPct <= 30){ phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪偏暖'; posAdvice='50%'; }
+    else if(totalUp < 30 || crisisPct > 35){ phase='修复'; phaseColor='#38bdf8'; phaseDesc='低位筑底'; posAdvice='30%'; }
+    else { phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪平稳'; posAdvice='50%'; }
+    function _vra(c,a){ return c.indexOf("var(")===0 ? "rgba(0,0,0,"+a+")" : (c+"22").slice(0,9); }
+    var hasData = cr.update_time || lh.update_time;
+    var html = '<div class="card" style="margin-bottom:12px;border-left:4px solid #38bdf8;">';
+    html += v8CardHeader('🎭','情绪周期 · 连板天梯','危机雷达+涨停热力+连板梯队+龙虎榜','update_time',
+      {update_time:(cr.update_time || lh.update_time), slot:'盘中', horizon:'短线'}, !hasData);
+    html += '<div style="padding:12px 14px;">';
+    // 阶段 + 四指标（字号放大，去掉 scale 压缩）
+    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">';
+    html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:'+_vra(phaseColor,0.08)+';border:1px solid '+_vra(phaseColor,0.2)+';border-radius:8px;min-width:0">';
+    html += '<span style="font-size:20px;font-weight:900;color:'+phaseColor+'">'+phase+'</span>';
+    html += '<div style="font-size:13px;color:var(--sub);white-space:nowrap">'+phaseDesc+' · 仓位 <b style="color:'+phaseColor+'">'+posAdvice+'</b></div></div>';
+    // 四指标小方块
+    var metrics = [
+      {l:'危机', v:crisisPct, u:'分', c: crisisPct>=70?'var(--down)':(crisisPct>=50?'#f59e0b':'var(--up)')},
+      {l:'涨停', v:totalUp, u:'只', c: totalUp>=80?'#ef4444':(totalUp>=40?'var(--up)':'var(--down)')},
+      {l:'高连', v:highLbc, u:'只', c: 'var(--up)'},
+      {l:'龙虎', v:lhbCount, u:'只', c: 'var(--up)'}
+    ];
+    metrics.forEach(function(m){
+      html += '<div style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);border-radius:10px;min-width:72px;">';
+      html += '<span style="font-size:13px;font-weight:700;color:var(--txt)">'+m.l+'</span>';
+      html += '<span style="font-size:18px;font-weight:900;color:'+m.c+'">'+m.v+'<span style="font-size:11px;font-weight:700;margin-left:1px">'+m.u+'</span></span></div>';
+    });
+    html += '</div>';
+    // 连板分布：每行显示「连板标签 共N只」+ 股票名网格；首板用横向进度条展示占比
+    if(lh.update_time && Object.keys(ladder).length){
+      var lbcKeys = Object.keys(ladder).sort(function(a,b){return parseInt(b)-parseInt(a);});
+      var lbMap = {};
+      (top||[]).forEach(function(t){
+        var k = String(t.lbc||'1');
+        if(!lbMap[k]) lbMap[k] = [];
+        lbMap[k].push(t);
+      });
+      html += '<div style="font-size:14px;font-weight:700;color:var(--sub);margin-bottom:10px">连板分布（共 '+totalUp+' 只涨停）</div>';
+      html += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">';
+      lbcKeys.forEach(function(k){
+        var v = ladder[k];
+        var list = lbMap[k] || [];
+        var lbl = k==='1'?'首板':k+'连板';
+        var barColor = parseInt(k)>=4 ? '#ef4444' : (parseInt(k)>=3 ? '#f59e0b' : (parseInt(k)>=2 ? '#38bdf8' : 'var(--up)'));
+        var isFirst = k==='1';
+        var pct = totalUp>0 ? Math.round(v/totalUp*100) : 0;
+        html += '<div style="display:flex;align-items:flex-start;gap:8px">';
+        html += '<div style="min-width:58px;text-align:right;flex-shrink:0;padding-top:2px">';
+        html += '<div style="font-size:14px;font-weight:800;color:'+barColor+'">'+lbl+'</div>';
+        html += '<div style="font-size:11px;color:var(--dim)">共'+v+'只</div>';
+        html += '</div>';
+        if(isFirst){
+          // 首板：横向进度条 + 占比；如有明细再横向滚动展示
+          html += '<div style="flex:1;">';
+          html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">';
+          html += '<div style="flex:1;height:18px;background:rgba(255,255,255,.06);border-radius:9px;overflow:hidden;">';
+          html += '<div style="width:'+pct+'%;height:100%;background:linear-gradient(90deg,'+barColor+','+(barColor==='var(--up)'?'#ff8a80':barColor)+');border-radius:9px;"></div>';
+          html += '</div>';
+          html += '<span style="font-size:12px;color:var(--dim);white-space:nowrap;font-weight:700;">'+pct+'% · '+v+'只</span>';
+          html += '</div>';
+          if(list.length){
+            var showList = list.slice(0,10);
+            var moreList = list.slice(10);
+            html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
+            showList.forEach(function(s){
+              html += '<span style="font-size:13px;color:var(--text);background:rgba(255,255,255,.05);padding:4px 9px;border-radius:6px;border:1px solid rgba(255,255,255,.08);white-space:nowrap;" title="'+s.name+' '+s.code+'">'+s.name+' <span style="color:var(--dim);font-size:11px">'+s.code+'</span></span>';
+            });
+            if(moreList.length){
+              var allNames = list.map(function(s){ return s.name+' '+s.code; });
+              html += '<button onclick="showLbModal(\'首板明细\','+JSON.stringify(allNames).replace(/"/g,'&quot;')+')" style="cursor:pointer;font-size:12px;font-weight:700;color:#38bdf8;background:rgba(56,189,248,.10);border:1px solid rgba(56,189,248,.25);border-radius:6px;padding:4px 10px;white-space:nowrap;">+'+moreList.length+' 只 · 展开</button>';
+            }
+            html += '</div>';
+          }
+          html += '</div>';
+        } else {
+          html += '<div style="flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:4px 8px">';
+          list.forEach(function(s){
+            html += '<span style="font-size:13px;color:var(--text);white-space:nowrap;" title="'+s.name+' '+s.code+'">'+s.name+' <span style="color:var(--dim);font-size:11px">'+s.code+'</span></span>';
+          });
+          html += '</div>';
+        }
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    html += '</div></div>';
+    el.innerHTML = html;
+  }
+  window.__renderCycleLadderCard = __renderCycleLadderCard;
 
   function drawV8MarginChart(){
     var data=window.MARGIN_DATA||{};
@@ -9940,6 +9951,8 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   // 今日事件「今日判定」卡头+内容（脚本块位于 v8CardHeader 定义之前，只能延后到此处渲染）
   tryRun('renderJudgmentHeader', window.__renderJudgmentHeader, 'judgment-header init');
   tryRun('renderJudgmentBody', window.__renderJudgmentBody, 'judgment-body init');
+  // 实时数据区：情绪周期·连板天梯（迁到涨停热力矩阵上方）
+  tryRun('renderCycleLadderCard', window.__renderCycleLadderCard, 'cycle-ladder init');
   // ⛓ 任何后续切到 fv/crds tab 也只是再跑一次幂等
 })();
 </script>
