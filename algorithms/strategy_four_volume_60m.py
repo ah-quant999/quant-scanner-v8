@@ -436,6 +436,11 @@ def main():
         pass
     records = scan_four_volume_60m(top_cy=args.top, top_kc=args.top,
                                    top_zb=args.top)
+    if not records:
+        # 0 命中通常是数据源异常（如 baostock 代码格式错误），写入空数据会污染
+        # 主站与预览副本。跳过写入/提交/镜像，保留上次有效数据。
+        print("  ⚠️ 60m 扫描命中 0 只，疑似数据源异常；跳过写入与提交，保留上次有效数据。")
+        return records
     js_path = write_four_volume_60m_js(records)
     paths = [js_path]
     if args.backtest > 0:
