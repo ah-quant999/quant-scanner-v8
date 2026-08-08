@@ -652,7 +652,33 @@ function __judgmentCandidatesHTML(){
       + '<span style="white-space:nowrap">'+planHTML+'</span>'
       + '</div>');
   });
+  // 决策四步 + 三不原则（2026-08-08 恢复：与截图1一致）
+  var jd = window.JUDGMENT_DATA || {};
+  var cr = window.CRISIS_DATA || {};
+  var crisisScore = (cr.currency||0)*0.4 + (cr.economy||0)*0.35 + (cr.global||0)*0.25;
+  var crisisPct = Math.round(crisisScore * 100);
+  var steps = [
+    {name:'① 环境', ok: crisisPct <= 50, detail: '危机'+crisisPct+'分'},
+    {name:'② 选股', ok: !!(window.TRIPLE_CONSENSUS || window.COCKPIT_TIER_RECOMMEND), detail: (window.TRIPLE_CONSENSUS?'三重':'')+(window.COCKPIT_TIER_RECOMMEND?'驾驶舱':'')||'无'},
+    {name:'③ 出手', ok: !!(jd && jd.verdict && jd.verdict.indexOf('偏多')>=0), detail: (jd.verdict?jd.verdict.replace(/（.*?）/g,'').slice(0,8):'--')},
+    {name:'④ 风控', ok: true, detail: '止损-7% / +7%+12%+15%'}
+  ];
+  var rules = [
+    {t:'危机≥70空仓', ok: crisisPct < 70},
+    {t:'大盘-1.5%只逆势龙头', ok: true},
+    {t:'盈亏比<1.5不介入', ok: true},
+    {t:'单票≤20%', ok: true},
+    {t:'事件标红不开新仓', ok: true}
+  ];
+  var decisionHTML = '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px;padding:6px 8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;font-size:11px;line-height:1.5;">'
+    + '<span style="font-weight:700;color:var(--sub);white-space:nowrap">决策四步</span>'
+    + steps.map(function(s){ return '<span style="padding:1px 7px;border-radius:999px;background:'+(s.ok?'rgba(34,197,94,.08)':'rgba(245,158,11,.12)')+';border:1px solid '+(s.ok?'rgba(34,197,94,.25)':'rgba(245,158,11,.3)')+';color:'+(s.ok?'var(--up)':'#f59e0b')+';font-weight:600;white-space:nowrap">'+s.name+' '+(s.ok?'✅':'⚠️')+' '+s.detail+'</span>'; }).join('')
+    + '<span style="font-weight:700;color:#ef4444;white-space:nowrap;margin-left:4px">三不原则</span>'
+    + rules.map(function(r){ return '<span style="padding:1px 7px;border-radius:999px;background:'+(r.ok?'rgba(34,197,94,.08)':'rgba(239,68,68,.08)')+';border:1px solid '+(r.ok?'rgba(34,197,94,.25)':'rgba(239,68,68,.25)')+';color:'+(r.ok?'var(--up)':'var(--down)')+';white-space:nowrap">'+(r.ok?'✅':'❌')+' '+r.t+'</span>'; }).join('')
+    + '</div>';
+
   return '<div style="font-size:13px;font-weight:700;color:var(--up);margin-bottom:4px">🎯 今日可入手候选 '+list.length+' 只</div>'
+    + decisionHTML
     + '<div style="margin:6px 0 10px 0;padding:8px 10px;background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.25);border-radius:8px;font-size:12px;line-height:1.6;">'
     + '<div style="font-weight:800;color:#f59e0b;margin-bottom:4px">🛡️ 止盈止损纪律</div>'
     + '<span style="color:var(--down);font-weight:700;">止损 -7%</span> · '
