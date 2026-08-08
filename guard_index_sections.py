@@ -33,6 +33,12 @@ REQUIRED_SECTIONS = {
 # 必须存在的独立容器 id（非整段 section，仅校验 id 存在）。
 # 注意：hmUpdateTime（完整热力矩阵）是用户刻意未恢复的，不纳入守护。
 # 注意：alertScanTime（系统告警）随动态监控区一起被用户删除，不纳入守护。
+# 体积上限（2026-08-08 新增）：防止数据被内联回 index.html 导致巨型化。
+# 当前正常值约 680KB（~10K 行），阈值留 2 倍余量。
+# 上次 6.8MB 巨型化的根因就是某次部署把 data/*.js 内联进 index.html，
+# 而旧版护栏只查下界不查上界，反而"越大越通过"放行了。
+MAX_INDEX_BYTES = 1_250_000  # 1.25 MB
+
 REQUIRED_IDS = [
     "conceptMapTime",   # 概念资金热力图（treemap）
 ]

@@ -11,6 +11,8 @@
   - raw_data/sector_rs.json     (板块相对强度)
   - raw_data/stock_profile.json (个股行业/概念)
   - raw_data/crisis_data.json   (危机雷达，决定是否并入逆势龙头)
+  - raw_data/cockpit_backtest.json (驾驶舱历史回测，用于 Top3 回测/跟踪)
+  - raw_data/triple_track.json     (三重跟踪告警，用于 Top3 跟踪)
 
 输出：
   - raw_data/final_recommend.json
@@ -31,6 +33,24 @@ DATA = os.path.join(ROOT, "data")
 CRISIS_HIGH_THRESHOLD = 50  # 危机雷达≥50才并入逆势龙头
 SECTOR_TOP_N = 15
 TOP_N = 3
+
+
+def load_js(name, var_name):
+    """读取 data/xxx.js（window.X = {...}; 格式）并返回 JSON 对象"""
+    path = os.path.join(DATA, name)
+    if not os.path.exists(path):
+        return {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+        text = text.strip()
+        if text.startswith("window." + var_name):
+            text = text.split("=", 1)[1]
+        text = text.rstrip(";\n ")
+        return json.loads(text)
+    except Exception as e:
+        print(f"[warn] 读取 JS 失败 {name}: {e}")
+        return {}
 
 
 def load_json(name):
@@ -124,11 +144,13 @@ def build_sector_maps(sector_rs):
 
 
 def sector_score_for(stock, rel_set, abs_set, score_map):
+    """返回 (板块加分, [hit对象, ...])。
+    hit 对象含 name/pct_5d/relative_5d/strong，便于前端展示「关联板块资金」。
+    """
     hits = []
     score = 0.0
     seen = set()
 
-    # 概念→强势板块别名映射（数据中概念名与板块名不完全一致）
     CONCEPT_ALIASES = {
         "黄金概念": "贵金属",
         "小金属概念": "小金属",
@@ -137,16 +159,25 @@ def sector_score_for(stock, rel_set, abs_set, score_map):
         "半导体概念": "半导体",
     }
 
+    def make_hit(name):
+        info = score_map.get(name) or {}
+        return {
+            "name": name,
+            "pct_5d": safe_float(info.get("pct_5d")),
+            "relative_5d": safe_float(info.get("relative_5d")),
+            "strong": name in rel_set,
+        }
+
     def hit(name):
         nonlocal score
         if name in seen:
             return
         seen.add(name)
         if name in rel_set:
-            hits.append(f"{name}(强)")
+            hits.append(make_hit(name))
             score += 1.0
         elif name in abs_set:
-            hits.append(name)
+            hits.append(make_hit(name))
             score += 0.5
 
     def hit_alias(name):
@@ -155,16 +186,14 @@ def sector_score_for(stock, rel_set, abs_set, score_map):
         if alias and alias != name:
             hit(alias)
 
-    # 行业
     ind = stock.get("industry") or ""
     if ind:
         hit_alias(ind)
 
-    # 概念
     for c in stock.get("concepts") or []:
         hit_alias(c)
 
-    # 名称/行业/概念中显含贵金属/黄金/小金属/有色的，直接补分（让黄金股在无精确板块名数据时也能被捞起）
+    # 名称/行业/概念中显含贵金属/黄金/小金属/有色的，直接补分
     name = stock.get("name", "")
     has_metal_keyword = (
         any(k in name for k in ("黄金", "中金", "银泰", "赤峰", "山东", "紫金", "湖南")) and "金" in name
@@ -173,9 +202,9 @@ def sector_score_for(stock, rel_set, abs_set, score_map):
         if isinstance(raw, str) and any(k in raw for k in ("黄金", "贵金属", "小金属", "有色金属")):
             has_metal_keyword = True
             break
-    if has_metal_keyword and not any("黄金" in h or "贵金属" in h or "小金属" in h or "有色" in h for h in hits):
+    if has_metal_keyword and not any("黄金" in h["name"] or "贵金属" in h["name"] or "小金属" in h["name"] or "有色" in h["name"] for h in hits):
         score += 0.8
-        hits.append("贵金属/有色(关键词)")
+        hits.append({"name": "贵金属/有色(关键词)", "pct_5d": 0.0, "relative_5d": 0.0, "strong": True})
 
     return round(score, 2), hits
 
@@ -193,6 +222,45 @@ def main():
 
     rel_set, abs_set, score_map = build_sector_maps(sector_rs)
 
+    # 读取 STOCK_STOP_DATA.js（支撑/压力/ATR）
+    stop_data = load_js("STOCK_STOP_DATA.js", "STOCK_STOP_DATA")
+    stop_stocks = stop_data.get("stocks") or {}
+
+    # 读取回测/跟踪数据（用于 Top3 卡片展示）
+    cb = load_json("cockpit_backtest.json")
+    cb_summary = {x.get("code"): x for x in (cb.get("stock_summary") or []) if x.get("code")}
+    cb_results = {}
+    for r in cb.get("results") or []:
+        code = r.get("code")
+        if not code:
+            continue
+        if code not in cb_results:
+            cb_results[code] = []
+        cb_results[code].append(r)
+    # 按 entry_date 取最新结果
+    for code in cb_results:
+        cb_results[code].sort(key=lambda x: x.get("entry_date", ""), reverse=True)
+
+    tt = load_json("triple_track.json")
+    tt_alerts = {}
+    for a in tt.get("alerts") or []:
+        code = a.get("code")
+        if not code:
+            continue
+        tt_alerts.setdefault(code, []).append(a)
+
+    # 综合回测策略级统计（个股无历史时作为策略置信度展示）
+    # cockpit_backtest.json 顶层字段即整体统计
+    strategy_backtest = {
+        "total": cb.get("total_count"),
+        "win_rate": cb.get("win_rate"),
+        "avg_return": cb.get("avg_return"),
+        "best_return": cb.get("best_return"),
+        "worst_return": cb.get("worst_return"),
+        "valid": cb.get("total_count"),
+        "best_hold_days": 3,  # 驾驶舱回测按固定窗口
+    }
+
     crisis_score = safe_float(crisis.get("score"), 0.0)
     crisis_high = crisis_score >= CRISIS_HIGH_THRESHOLD
 
@@ -208,11 +276,17 @@ def main():
         "stop_loss": None,
         "target_price": None,
         "risk_reward": None,
+        "support": None,
+        "resistance": None,
+        "atr": None,
         "sources": [],
         "source_scores": {},
         "industry": "",
         "concepts": [],
         "reasons": [],
+        "signals": [],           # 中文信号标签
+        "enter_dates": [],         # 各源记录的入选日
+        "sector_hits": [],         # 板块命中（带涨幅）
     })
 
     def ensure(code, name, market, board):
@@ -222,6 +296,12 @@ def main():
             r["name"] = name
             r["market"] = market or market_prefix(code)
             r["board"] = board or board_from_code(code)
+            # 从 STOCK_STOP_DATA 预填支撑/压力/ATR/止损/目标（如存在）
+            ss = stop_stocks.get(norm_code(code)) or stop_stocks.get(code)
+            if ss:
+                for k in ["support", "resistance", "atr", "stop_loss", "target_price", "risk_reward"]:
+                    if ss.get(k) is not None:
+                        r[k] = ss[k]
         return r
 
     # 1) 三重共识
@@ -243,6 +323,9 @@ def main():
             r["industry"] = r["industry"] or (s.get("industry") or "")
             r["concepts"] = list(set((r["concepts"] or []) + (s.get("concepts") or [])))
             r["reasons"].append(f"三重共识 评分{score:.0f}")
+            r["signals"].append("跨策略共振")
+            if s.get("enter_date"):
+                r["enter_dates"].append(s["enter_date"])
 
     # 2) 驾驶舱 A/B 档
     for tier, label in [("tier_a", "驾驶舱A档"), ("tier_b", "驾驶舱B档")]:
@@ -263,8 +346,19 @@ def main():
             r["industry"] = r["industry"] or (s.get("industry") or "")
             r["concepts"] = list(set((r["concepts"] or []) + (s.get("concepts") or [])))
             r["reasons"].append(f"{label} 技术{tech:.0f} 质量{qs:.0f}")
+            if s.get("comment"):
+                r["signals"].append(s["comment"])
+            if s.get("enter_date"):
+                r["enter_dates"].append(s["enter_date"])
 
     # 3) 四量终极 (top10_daily.top10)
+    SIG_MAP = {
+        "chan": "缠论买点",
+        "jinzuan": "金钻信号",
+        "jigou": "机构变红",
+        "trend": "上涨趋势",
+        "form_A": "形态A",
+    }
     for s in top10.get("top10") or []:
         code = s.get("code")
         if not code:
@@ -287,6 +381,15 @@ def main():
             r["industry"] = r["industry"] or ""
             r["concepts"] = list(set((r["concepts"] or []) + (s.get("sectors") or [])))
             r["reasons"].append(f"四量终极 信号{sig_count:.0f}项")
+            for k, label in SIG_MAP.items():
+                if s.get("signals", {}).get(k):
+                    r["signals"].append(label)
+            if qd:
+                r["signals"].append("主力动量翻多")
+            if s.get("enter_date"):
+                r["enter_dates"].append(s["enter_date"])
+            elif top10.get("update_time"):
+                r["enter_dates"].append(top10["update_time"][:10])
 
     # 4) 全站精选：与驾驶舱A/B档同源，不再重复计分，但保留源标签用于展示
     #    （后续 render 时可单独展示 A/B 档）
@@ -306,6 +409,9 @@ def main():
                 r["sources"].append(label)
                 r["source_scores"][label] = round(base, 2)
                 r["reasons"].append(f"{label} 评分{s.get('score')}")
+                r["signals"].append(f"{label}")
+                if s.get("enter_date"):
+                    r["enter_dates"].append(s["enter_date"])
 
     # 6) 大牛股猎手：龙虎榜机构+游资共振
     for s in lhb.get("stocks") or []:
@@ -322,6 +428,11 @@ def main():
             r["close"] = s.get("close") or r["close"]
             r["pct_chg"] = s.get("pct") or r["pct_chg"]
             r["reasons"].append(f"大牛股猎手 机构{inst/10000:.1f}亿+游资{yz/10000:.1f}亿")
+            r["signals"].append(s.get("category") or "机游共振")
+            if s.get("reason"):
+                r["signals"].append(s["reason"])
+            if lhb.get("date"):
+                r["enter_dates"].append(lhb["date"])
 
     # 7) 板块龙头：当前强势板块里的金股池成员（让“板块强→个股被推”生效）
     gp_stocks = gold_pool.get("stocks") or {}
@@ -355,7 +466,16 @@ def main():
         r["stop_loss"] = s.get("stop_loss") or r["stop_loss"]
         r["target_price"] = s.get("target_price") or r["target_price"]
         r["risk_reward"] = s.get("risk_reward") or r["risk_reward"]
-        r["reasons"].append(f"板块龙头 {','.join(sec_hits[:2])}")
+        r["reasons"].append(f"板块龙头 {','.join([h['name'] for h in sec_hits[:2]])}")
+        r["signals"].append("板块强势")
+        # 合并板块命中（去重），保留涨幅
+        existing = {h["name"] for h in r["sector_hits"]}
+        for h in sec_hits:
+            if h["name"] not in existing:
+                r["sector_hits"].append(h)
+                existing.add(h["name"])
+        if s.get("first_date"):
+            r["enter_dates"].append(s["first_date"])
 
     # 补齐个股画像（行业/概念）
     for key, r in pool.items():
@@ -371,18 +491,23 @@ def main():
     for key, r in pool.items():
         if len(r["sources"]) == 0:
             continue
-        sec_score, sec_hits = sector_score_for(r, rel_set, abs_set, score_map)
+        sec_score, fresh_hits = sector_score_for(r, rel_set, abs_set, score_map)
+        # 合并板块命中（板块龙头已写入部分命中）
+        existing = {h["name"] for h in r["sector_hits"]}
+        for h in fresh_hits:
+            if h["name"] not in existing:
+                r["sector_hits"].append(h)
+                existing.add(h["name"])
         resonance = len(set(r["sources"]))
         strength = sum(r["source_scores"].values())
         final_score = strength + resonance * 1.5 + sec_score
-        # 同分：共振次数多优先，其次源强度
         scored.append({
             **r,
             "key": key,
             "resonance": resonance,
             "strength": round(strength, 2),
             "sector_score": sec_score,
-            "sector_hits": sec_hits,
+            "sector_hits": r["sector_hits"],
             "final_score": round(final_score, 2),
         })
 
@@ -391,11 +516,30 @@ def main():
 
     top = scored[:TOP_N]
 
+    def horizon_for(sources):
+        short = {"四量终极", "大牛股猎手", "板块龙头"}
+        mid = {"三重共识", "驾驶舱A档", "驾驶舱B档"}
+        defense = {"逆势龙头·精锐", "逆势龙头·进阶", "逆势龙头·观察"}
+        srcs = set(sources)
+        has_short = bool(srcs & short)
+        has_mid = bool(srcs & mid)
+        has_defense = bool(srcs & defense)
+        if has_defense:
+            return "中线防御"
+        if has_short and has_mid:
+            return "短线/中线共振"
+        if has_short:
+            return "短线"
+        if has_mid:
+            return "中长线"
+        return "短线"
+
     # 清理输出字段
     out_stocks = []
     for s in top:
         code = norm_code(s["code"])
-        market = s["market"] or market_prefix(code)
+        # market 统一为交易所前缀；原始 s["market"] 可能是中文描述，不可靠
+        market = market_prefix(code)
         board = s["board"] or board_from_code(code)
         close = safe_float(s["close"])
         stop = s["stop_loss"]
@@ -407,27 +551,117 @@ def main():
             stop = round(close * pct, 2)
             target = round(close * (1 + (1 - pct) * 1.5), 2)
             rr = 1.5
+        # 关联板块资金：取命中板块涨幅前 4
+        sector_fund = []
+        for h in (s.get("sector_hits") or [])[:4]:
+            if "关键词" in h["name"]:
+                continue
+            sector_fund.append({
+                "name": h["name"],
+                "pct_5d": round(h["pct_5d"], 2),
+                "relative_5d": round(h["relative_5d"], 2),
+                "strong": h["strong"],
+            })
+        # 入选日：取各源最早日期，无则使用当前 update_time
+        enter_dates = [d for d in (s.get("enter_dates") or []) if d]
+        enter_date = min(enter_dates) if enter_dates else datetime.now().strftime("%Y-%m-%d")
+        signals = sorted(set(s.get("signals") or []))
+        if not signals:
+            # 兜底：根据来源生成一句信号
+            signals = [f"{src}共振" for src in sorted(set(s["sources"]))]
+
+        # ---- 回测 & 跟踪（当前 Top3 股票的历史表现与入选后状态） ----
+        summary = cb_summary.get(code)
+        latest_result = cb_results.get(code, [None])[0]
+        alerts = tt_alerts.get(code, [])
+
+        if summary and summary.get("signals", 0) > 0:
+            backtest = {
+                "signals": int(summary.get("signals") or 0),
+                "win_count": int(summary.get("win_count") or 0),
+                "loss_count": int(summary.get("loss_count") or 0),
+                "win_rate": round(safe_float(summary.get("win_rate")), 1),
+                "avg_return": round(safe_float(summary.get("avg_return")), 2),
+                "best_return": round(safe_float(summary.get("best_return")), 2),
+                "worst_return": round(safe_float(summary.get("worst_return")), 2),
+                "note": f"该股历史共触发 {summary.get('signals')} 次驾驶舱/共振信号",
+            }
+        elif strategy_backtest:
+            # 个股无历史：展示策略级回测作为参考
+            best_hold = strategy_backtest.get("best_hold_days")
+            backtest = {
+                "signals": int(strategy_backtest.get("total_signals") or strategy_backtest.get("valid_signals") or strategy_backtest.get("total") or 0),
+                "win_rate": round(safe_float(strategy_backtest.get("best_hold_win_rate") or strategy_backtest.get("win_rate")), 1),
+                "avg_return": round(safe_float(strategy_backtest.get("best_hold_avg_return") or strategy_backtest.get("avg_return")), 2),
+                "best_hold_days": best_hold,
+                "note": f"个股暂无历史信号，展示策略级统计（最佳持有 {best_hold} 天）",
+            }
+        else:
+            backtest = {"signals": 0, "win_rate": 0.0, "avg_return": 0.0, "note": "暂无回测数据"}
+
+        if latest_result:
+            entry_price = safe_float(latest_result.get("entry_price"))
+            latest_price = safe_float(latest_result.get("latest_price"))
+            ret = safe_float(latest_result.get("return_pct"))
+            tracking = {
+                "entry_date": latest_result.get("entry_date") or enter_date,
+                "entry_price": round(entry_price, 2) if entry_price else None,
+                "latest_price": round(latest_price, 2) if latest_price else None,
+                "return_pct": round(ret, 2),
+                "hold_days": int(latest_result.get("hold_days") or 1),
+                "exit_type": latest_result.get("exit_type") or "hold",
+                "stop_loss": round(safe_float(latest_result.get("stop_loss")), 2) if latest_result.get("stop_loss") is not None else None,
+                "target_price": round(safe_float(latest_result.get("target_price")), 2) if latest_result.get("target_price") is not None else None,
+                "note": "已入场跟踪中" if (latest_result.get("exit_type") == "hold" or latest_result.get("hold_days", 1) <= 1) else "已触发退出",
+            }
+        elif close:
+            # 没有历史跟踪记录：以今日入选价 = 当前价展示
+            tracking = {
+                "entry_date": enter_date,
+                "entry_price": round(close, 2),
+                "latest_price": round(close, 2),
+                "return_pct": 0.0,
+                "hold_days": 1,
+                "exit_type": "hold",
+                "note": "今日新入选，自动开始跟踪",
+            }
+        else:
+            tracking = {"entry_date": enter_date, "entry_price": None, "latest_price": None, "return_pct": None, "hold_days": 1, "exit_type": "hold", "note": "等待行情数据开始跟踪"}
+
+        if alerts:
+            tracking["alerts"] = alerts[:3]
+
         out_stocks.append({
             "rank": len(out_stocks) + 1,
             "code": code,
             "name": s["name"],
             "market": market,
             "board": board,
+            "horizon": horizon_for(s["sources"]),
             "close": round(close, 2) if close else None,
             "pct_chg": safe_float(s["pct_chg"]),
             "stop_loss": round(safe_float(stop), 2) if stop else None,
             "target_price": round(safe_float(target), 2) if target else None,
             "risk_reward": round(safe_float(rr), 2) if rr else None,
+            "support": round(safe_float(s.get("support")), 2) if s.get("support") else None,
+            "resistance": round(safe_float(s.get("resistance")), 2) if s.get("resistance") else None,
+            "atr": round(safe_float(s.get("atr")), 2) if s.get("atr") else None,
             "sources": sorted(set(s["sources"])),
             "source_scores": s["source_scores"],
             "resonance": s["resonance"],
             "strength": s["strength"],
             "sector_score": s["sector_score"],
             "sector_hits": s["sector_hits"],
+            "sector_fund": sector_fund,
             "final_score": s["final_score"],
+            "buy_score": s["final_score"],
+            "enter_date": enter_date,
+            "signals": signals[:8],
             "reason": "；".join(s["reasons"][:3]),
             "industry": s["industry"],
             "concepts": s["concepts"][:6],
+            "backtest": backtest,
+            "tracking": tracking,
         })
 
     result = {
