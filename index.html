@@ -559,7 +559,7 @@ function _uBadge(slot, horizon, ts, sub){
   }
   var sHTML = slot    ? '<span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">'+slot+'</span>' : '';
   var hHTML = horizon ? '<span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">'+horizon+'</span>' : '';
-  return '<span class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;">'
+  return '<span class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;flex-shrink:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;">'
     + '<span aria-hidden="true">🐻</span>'
     + '<span style="margin-left:4px">更新于</span>'
     + '<span style="color:#9fd0ff;font-weight:600;margin-left:4px">' + t + '</span>'
@@ -591,7 +591,7 @@ function _holdBadge(dateStr, count, label){
     else { m = String(dateStr).match(/^(\d{2})-(\d{2})$/); if(m) d = m[1]+'-'+m[2]; }
   }
   var lbl = label || '持仓';
-  return '<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;padding:3px 10px;border-radius:10px;white-space:nowrap;">'
+  return '<span style="display:inline-flex;align-items:center;gap:4px;flex-shrink:0;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;padding:3px 10px;border-radius:10px;white-space:nowrap;">'
     + '<span aria-hidden="true">🧺</span>'
     + '<span>'+(d||'--')+' '+lbl+' <b style="margin-left:2px">'+(count||0)+'</b></span>'
     + '</span>';
@@ -1653,299 +1653,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     })();
     </script>
 
-    <script>
-    /* ===== 机游共振日历详情（Coze 风 TOP5 表） ===== */
-    (function(){
-      const $=id=>document.getElementById(id);
-      function fmt(v){ return v==null||isNaN(v)?'--':Number(v).toFixed(2); }
-      function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
-      function fmtWan(w){
-        if(w==null) return '-';
-        var a=Math.abs(w);
-        if(a>=10000) return (w/10000).toFixed(2)+'亿';
-        return Math.round(w).toLocaleString('zh-CN')+'万';
-      }
-      function sign(w){ return w>=0 ? '+' : '-'; }
-
-      function topN(arr, key, n, asc){
-        var f=arr.filter(function(x){return (x[key]!=null)&&(asc?x[key]<0:x[key]>0);});
-        f.sort(function(a,b){return asc? a[key]-b[key] : b[key]-a[key];});
-        return f.slice(0,n);
-      }
-
-      function rowHtml(name, amt, cls, extra){
-        var s = sign(Math.abs(amt)>=0?amt:amt);
-        return '<div class="row" style="display:flex;justify-content:space-between;padding:2px 0;font-size:11px;">'
-          +'<span style="color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;">'+name+'</span>'
-          +'<span style="font-weight:700;white-space:nowrap;color:'+(cls||'var(--txt)')+';">'+s+fmtWan(amt)+(extra?' <span style="color:var(--dim);font-weight:400">'+extra+'</span>':'')+'</span>'
-          +'</div>';
-      }
-
-      function renderJyCalendar(){
-        var el=$('jyResonanceCal');
-        if(!el) return;
-        var lhb=window.LHB_DATA;
-        if(!lhb || !lhb.stocks){ el.innerHTML='<div class="ipo-empty">暂无龙虎榜数据</div>'; return; }
-
-        var stocks=lhb.stocks||[];
-        var summary=lhb.summary||{};
-        var lhbDate=String(lhb.date||'');
-
-        // --- 当日统计概览 ---
-        var h='<div style="background:var(--bg2);border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
-        h+='<div style="font-size:11px;color:var(--dim);margin-bottom:6px;">'
-          +(lhbDate.length===8?(lhbDate.slice(0,4)+'-'+lhbDate.slice(4,6)+'-'+lhbDate.slice(6,8)):'今日')+' 龙虎榜 · 共'+(summary['总计']||0)+'只上榜</div>';
-        h+='<div style="display:flex;gap:12px;flex-wrap:wrap;">';
-        var cats=[
-          {k:'机游共振',c:'#ffd54f',icon:'★'},
-          {k:'机构独买',c:'var(--cyan)',icon:'🏛️'},
-          {k:'游资独买',c:'var(--gold)',icon:'⚡'},
-          {k:'不达标',c:'var(--dim)',icon:'—'}
-        ];
-        cats.forEach(function(cat){
-          var n=summary[cat.k]||0;
-          h+='<div style="text-align:center;min-width:52px;"><div style="font-size:18px;font-weight:800;color:'+cat.c+';">'+n+'</div>';
-          h+='<div style="font-size:9px;color:var(--sub);">'+cat.icon+' '+cat.k+'</div></div>';
-        });
-        h+='</div></div>';
-
-        // --- Coze 风格 5 张表 ---
-
-        // 1. ▲ 机构净买入TOP5
-        var instB=topN(stocks,'inst_net_万',5,false);
-        h+='<div style="font-size:11px;font-weight:700;color:var(--cyan);margin:8px 0 3px;">▲ 机构净买入 TOP5</div>';
-        if(instB.length) instB.forEach(function(s){
-          h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.inst_net_万, 'var(--cyan)',
-            '买'+fmtWan(s.inst_buy_万)+'/卖'+fmtWan(s.inst_sell_万));
-        }); else h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">—</div>';
-
-        // 2. ▼ 机构净卖出TOP5
-        var instS=topN(stocks,'inst_net_万',5,true);
-        h+='<div style="font-size:11px;font-weight:700;color:var(--cyan);margin:8px 0 3px;">▼ 机构净卖出 TOP5</div>';
-        if(instS.length) instS.forEach(function(s){
-          h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.inst_net_万, 'var(--sub)',
-            '买'+fmtWan(s.inst_buy_万)+'/卖'+fmtWan(s.inst_sell_万));
-        }); else h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">—</div>';
-
-        // 3. ▲ 游资净买入TOP5
-        var yzB=topN(stocks,'yz_net_万',5,false);
-        h+='<div style="font-size:11px;font-weight:700;color:var(--gold);margin:8px 0 3px;">▲ 游资净买入 TOP5</div>';
-        if(yzB.length) yzB.forEach(function(s){
-          h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.yz_net_万, 'var(--gold)',
-            '买'+fmtWan(s.yz_buy_万)+'/卖'+fmtWan(s.yz_sell_万));
-        }); else h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">—</div>';
-
-        // 4. ▼ 游资净卖出TOP5
-        var yzS=topN(stocks,'yz_net_万',5,true);
-        h+='<div style="font-size:11px;font-weight:700;color:var(--gold);margin:8px 0 3px;">▼ 游资净卖出 TOP5</div>';
-        if(yzS.length) yzS.forEach(function(s){
-          h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.yz_net_万, 'var(--sub)',
-            '买'+fmtWan(s.yz_buy_万)+'/卖'+fmtWan(s.yz_sell_万));
-        }); else h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">—</div>';
-
-        // 5. ★ 机游共振（机构净买∩游资净买）
-        var res=stocks.filter(function(s){return s.category==='机游共振';});
-        h+='<div style="font-size:11px;font-weight:700;color:#ffd54f;margin:8px 0 3px;">★ 机游共振 ('+res.length+'只) <span style="color:var(--dim);font-weight:400;font-size:9px;">— 机构与游资同时净买入</span></div>';
-        if(res.length) res.forEach(function(s){
-          h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.inst_net_万+s.yz_net_万, '#ffd54f',
-            '机'+sign(s.inst_net_万)+fmtWan(s.inst_net_万)+' / 游'+sign(s.yz_net_万)+fmtWan(s.yz_net_万));
-        }); else h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">今日无共振标的</div>';
-
-        // 6. ⚡ 纯游资异动
-        var pure=stocks.filter(function(s){return s.category==='游资独买';}).slice(0,5);
-        if(pure.length){
-          h+='<div style="font-size:11px;font-weight:700;color:var(--gold);margin:8px 0 3px;">⚡ 纯游资强买 (前5)</div>';
-          pure.forEach(function(s){
-            h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.yz_net_万, 'var(--gold)');
-          });
-        }
-
-        // 7. 近7日累计（LHB_7D）
-        var d7=window.LHB_7D;
-        if(d7 && d7.range){
-          h+='<div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--border);">';
-          h+='<div style="font-size:12px;font-weight:800;color:var(--txt);margin-bottom:8px;">📅 近7日累计 ('+d7.range[0]+' ~ '+d7.range[1]+')</div>';
-
-          h+='<div style="font-size:11px;font-weight:700;color:#ffd54f;margin:8px 0 3px;">★ 7日机游共振 TOP5</div>';
-          if(d7.top_resonance && d7.top_resonance.length){
-            d7.top_resonance.forEach(function(s){
-              h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.combined_net, '#ffd54f',
-                '机'+sign(s.inst_net)+fmtWan(s.inst_net)+' / 游'+sign(s.yz_net)+fmtWan(s.yz_net));
-            });
-          } else { h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">—</div>'; }
-
-          h+='<div style="font-size:11px;font-weight:700;color:var(--cyan);margin:8px 0 3px;">▲ 7日机构净买入 TOP5</div>';
-          if(d7.top_inst_buy && d7.top_inst_buy.length){
-            d7.top_inst_buy.forEach(function(s){ h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.inst_net, 'var(--cyan)'); });
-          } else { h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">—</div>'; }
-
-          h+='<div style="font-size:11px;font-weight:700;color:var(--gold);margin:8px 0 3px;">▲ 7日游资净买入 TOP5</div>';
-          if(d7.top_yz_buy && d7.top_yz_buy.length){
-            d7.top_yz_buy.forEach(function(s){ h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.yz_net, 'var(--gold)'); });
-          } else { h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">—</div>'; }
-
-          h+='<div style="font-size:11px;font-weight:700;color:var(--sub);margin:8px 0 3px;">▼ 7日机构净卖出 TOP5</div>';
-          if(d7.top_inst_sell && d7.top_inst_sell.length){
-            d7.top_inst_sell.forEach(function(s){ h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.inst_net, 'var(--sub)'); });
-          } else { h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">—</div>'; }
-
-          h+='</div>';
-        }
-
-        el.innerHTML=h;
-        var mt=$('jyCalTime');
-        if(mt && lhb.update_time) mt.innerHTML = _uBadge('盘后','短线',lhb.update_time);
-      }
-
-      function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderJyCalendar);
-      else renderJyCalendar();
-    })();
-    </script>
-
-    <script>
-    /* ===== 北向席位日历（Coze 风：龙虎榜北向席位净买/卖 TOP5） ===== */
-    (function(){
-      const $=id=>document.getElementById(id);
-      function rel(ts){ return window._fmtAshareRel ? window._fmtAshareRel(ts) : String(ts); }
-      function fmtWan(w){
-        if(w==null) return '-';
-        var a=Math.abs(w);
-        if(a>=10000) return (w/10000).toFixed(2)+'亿';
-        return Math.round(w).toLocaleString('zh-CN')+'万';
-      }
-      function sign(w){ return w>=0 ? '+' : '-'; }
-
-      function topN(arr, key, n, asc){
-        var f=arr.filter(function(x){return (x[key]!=null)&&(asc?x[key]<0:x[key]>0);});
-        f.sort(function(a,b){return asc? a[key]-b[key] : b[key]-a[key];});
-        return f.slice(0,n);
-      }
-
-      function rowHtml(name, amt, cls, extra){
-        return '<div class="row" style="display:flex;justify-content:space-between;padding:2px 0;font-size:11px;">'
-          +'<span style="color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;">'+name+'</span>'
-          +'<span style="font-weight:700;white-space:nowrap;color:'+(cls||'var(--txt)')+';">'+sign(amt)+fmtWan(amt)
-          +(extra?' <span style="color:var(--dim);font-weight:400">'+extra+'</span>':'')
-          +'</span></div>';
-      }
-
-      function renderNorthCalendar(){
-        var el=$('northFundCal');
-        if(!el) return;
-        var lhb=window.LHB_DATA;
-
-        if(!lhb || !lhb.stocks){
-          el.innerHTML='<div class="ipo-empty">暂无龙虎榜数据（北向席位依赖龙虎榜披露）</div>';
-          return;
-        }
-
-        var stocks=lhb.stocks||[];
-        var lhbDate=String(lhb.date||'');
-
-        // 从 seats.北向 提取每只股票的北向净买卖
-        var northStocks=[];
-        stocks.forEach(function(s){
-          var seats=s.seats;
-          if(!seats || !seats['北向']) return;
-          var nb=seats['北向'].buy||0;
-          var ns=seats['北向'].sell||0;
-          var nnet=nb-ns;
-          if(nnet===0 && nb===0) return; // 无北向数据
-          northStocks.push({
-            code:s.code, name:s.name,
-            north_buy:nb, north_sell:ns, north_net:nnet,
-            pct:s.pct
-          });
-        });
-
-        var h='';
-
-        if(northStocks.length===0){
-          h+='<div style="text-align:center;padding:20px 0;">';
-          h+='<div style="font-size:24px;margin-bottom:6px;">📊</div>';
-          h+='<div style="font-size:12px;color:var(--sub);">今日龙虎榜暂无北向席位数据</div>';
-          h+='<div style="font-size:10px;color:var(--dim);margin-top:4px;">北向资金仅在有北向参与的上榜个股中披露</div>';
-          h+='</div>';
-        } else {
-          // 统计
-          var totalBuy=northStocks.reduce(function(s,x){return s+x.north_buy;},0);
-          var totalSell=northStocks.reduce(function(s,x){return s+x.north_sell;},0);
-          var totalNet=totalBuy-totalSell;
-
-          h+='<div style="background:var(--bg2);border-radius:8px;padding:8px 12px;margin-bottom:10px;">';
-          h+='<div style="font-size:11px;color:var(--dim);margin-bottom:4px">'
-            +(lhbDate.length===8?(lhbDate.slice(0,4)+'-'+lhbDate.slice(4,6)+'-'+lhbDate.slice(6,8)):'今日')
-            +' 龙虎榜北向席位 · '+northStocks.length+'只个股有北向参与</div>';
-          h+='<div style="display:flex;gap:16px;flex-wrap:wrap;">';
-          h+='<div><span style="color:var(--up);font-weight:700;">净买'+sign(totalNet)+fmtWan(totalNet)+'</span></div>';
-          h+='<div><span style="color:var(--sub);">买入 '+fmtWan(totalBuy)+'</span></div>';
-          h+='<div><span style="color:var(--sub);">卖出 '+fmtWan(totalSell)+'</span></div>';
-          h+='</div></div>';
-
-          // ▲ 北向净买入TOP5
-          var nbB=topN(northStocks,'north_net',5,false);
-          h+='<div style="font-size:11px;font-weight:700;color:var(--north);margin:8px 0 3px;">▲ 北向席位净买入 TOP5</div>';
-          nbB.forEach(function(s){
-            h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.north_net, 'var(--north)',
-              '买'+fmtWan(s.north_buy)+'/卖'+fmtWan(s.north_sell));
-          });
-
-          // ▼ 北向净卖出TOP5
-          var nbS=topN(northStocks,'north_net',5,true);
-          h+='<div style="font-size:11px;font-weight:700;color:var(--north);margin:8px 0 3px;">▼ 北向席位净卖出 TOP5</div>';
-          nbS.forEach(function(s){
-            h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.north_net, 'var(--sub)',
-              '买'+fmtWan(s.north_buy)+'/卖'+fmtWan(s.north_sell));
-          });
-
-          // 全部北向参与股列表（折叠）
-          if(northStocks.length>10){
-            h+='<details style="margin-top:8px;"><summary style="font-size:10px;color:var(--dim);cursor:pointer;">查看全部 '+northStocks.length+' 只北向参与股</summary>';
-            h+='<div style="margin-top:4px;display:flex;flex-direction:column;gap:2px;">';
-            northStocks.forEach(function(s){
-              h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.north_net,
-                s.north_net>0?'var(--north)':s.north_net<0?'var(--down)':'var(--dim)',
-                '买'+fmtWan(s.north_buy)+'/卖'+fmtWan(s.north_sell));
-            });
-            h+='</div></details>';
-          }
-        }
-
-        // 近7日北向席位累计（LHB_7D）
-        var d7n=window.LHB_7D;
-        if(d7n && d7n.range){
-          h+='<div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--border);">';
-          h+='<div style="font-size:12px;font-weight:800;color:var(--txt);margin-bottom:8px;">📅 近7日北向席位累计 ('+d7n.range[0]+' ~ '+d7n.range[1]+')</div>';
-
-          h+='<div style="font-size:11px;font-weight:700;color:var(--north);margin:8px 0 3px;">▲ 7日北向席位净买入 TOP5</div>';
-          if(d7n.top_north_buy && d7n.top_north_buy.length){
-            d7n.top_north_buy.forEach(function(s){
-              h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.north_net, 'var(--north)',
-                '买'+fmtWan(s.north_buy)+'/卖'+fmtWan(s.north_sell));
-            });
-          } else { h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">—</div>'; }
-
-          h+='<div style="font-size:11px;font-weight:700;color:var(--sub);margin:8px 0 3px;">▼ 7日北向席位净卖出 TOP5</div>';
-          if(d7n.top_north_sell && d7n.top_north_sell.length){
-            d7n.top_north_sell.forEach(function(s){
-              h+=rowHtml(s.name+' <span style="color:var(--dim);font-size:9px">'+s.code+'</span>', s.north_net, 'var(--sub)',
-                '买'+fmtWan(s.north_buy)+'/卖'+fmtWan(s.north_sell));
-            });
-          } else { h+='<div style="font-size:11px;color:var(--dim);padding:3px 0;">—</div>'; }
-
-          h+='</div>';
-        }
-
-        el.innerHTML=h;
-        var mt=$('northCalTime');
-        if(mt && lhb.update_time) mt.innerHTML = _uBadge('盘后','短线',lhb.update_time);
-      }
-
-      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderNorthCalendar);
-      else renderNorthCalendar();
-    })();
-    </script>
+    <!-- 2026-08-08 删除旧 renderJyCalendar / renderNorthCalendar：与 sec-rc 下新实现同名冲突，导致日历渲染/7日数据时有时无。 -->
 
     <script>
     /* ===== 近期历史日期线 + 点击展开当日详情 ===== */
@@ -2865,7 +2573,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <!-- ============ 共振日历（月历格式 · 机游/北向/洞察/猎手） ============ -->
   <!-- ============ 共振日历（全面重构） ============ -->
   <section id="sec-rc">
-    <div class="sec-head"><h2>🧲 共振日历</h2><span class="tag">机游共振 · 北向席位 · 每日洞察 · 大牛股猎手</span></div>
+    <div class="sec-head"><h2>🧲 共振日历</h2><span class="tag">机游共振 · 北向席位 · 每日洞察</span></div>
 
     <style>
       .rc-tabs{display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap}
@@ -4264,10 +3972,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     <div id="opTab1" class="op-tab-pane active">
 
-    <!-- 🤖 Runner 追踪（动态） -->
+    <!-- 🩺 数据健康总览：Runner 追踪 + 文件新鲜度 + 上游诊断 合并为一劳永逸式展示 -->
     <div class="card" style="margin-bottom:16px;border-left:3px solid var(--teal)">
-      <h3><span class="ic">🤖</span>Runner 追踪 <span class="fresh" style="font-size:10px">[动态]</span></h3>
-      <div id="runnerTrackBody"><div style="font-size:12px;color:var(--dim)">等待 runner 状态数据…</div></div>
+      <h3><span class="ic">🩺</span>数据健康总览 <span class="fresh" style="font-size:10px">[动态]</span></h3>
+      <div id="runnerTrackBody"><div style="font-size:12px;color:var(--dim)">等待数据健康状态…</div></div>
+      <!-- 失败/诊断详情始终放在卡片最下面 -->
+      <div id="opDiagDetails" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:none;">
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px;">⚠️ 失败/诊断详情</div>
+        <div id="opDiagBody" style="font-size:11px;color:var(--sub);line-height:1.6;"></div>
+      </div>
     </div>
 
     <!-- ═══════════════ 📋 静态配置区（部署时写入/手动维护） ═══════════════ -->
@@ -4285,9 +3998,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
       <div class="card">
         <h3><span class="ic">🖥️</span>双机状态 <span class="fresh" style="font-size:10px;color:var(--dim)">[静态]</span></h3>
-        <div class="kv"><span class="k">执行节点</span><span><span class="status-dot s-ok"></span>GitHub Actions 云端 ubuntu-latest（主链）</span></div>
-        <div class="kv"><span class="k">小九（单位机）</span><span><span class="status-dot s-warn"></span>仅应急 workflow_dispatch，不再跑 cron 主链（lemoncat-cn runner）</span></div>
-        <div class="kv"><span class="k">阿狸咪（家中机）</span><span><span class="status-dot s-ok"></span>夜间/周末待命 · 代码同步+手动 dispatch</span></div>
+        <div class="kv"><span class="k">执行节点</span><span><span class="status-dot s-ok"></span>GitHub Actions 云端 ubuntu-latest（主链：cn_fetch + algo_cloud + build_deploy）</span></div>
+        <div class="kv"><span class="k">小九（单位机）</span><span><span class="status-dot s-warn"></span>仅应急 workflow_dispatch，不再跑 cron 主链（lemoncat-cn runner · 云端管线看门狗）</span></div>
+        <div class="kv"><span class="k">阿狸咪（家中机）</span><span><span class="status-dot s-ok"></span>本地开发/预览（file:///E:/workspace/quant-scanner-v8/index.html），不接部署</span></div>
         <div class="kv"><span class="k">failover 守卫</span><span><span class="status-dot s-ok"></span>活跃</span></div>
       </div>
     </div>
@@ -4302,25 +4015,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <tr><td>v8_backup</td><td>每日23:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>备份 raw_data / data / 交接文档（含 v6 备份保留策略：v8 稳定一周前不删）</td></tr>
         <tr><td>runner_health_alert</td><td>非交易时段每2h</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>lemoncat-cn runner 离线告警 + 自动恢复关闭 Issue</td></tr>
         <tr><td>小九-v8云端管线看门狗</td><td>08-22每小时</td><td><span class="status-dot s-ok"></span>ACTIVE</td><td>只监督、不部署、不抢跑</td></tr>
-      </tbody></table>
-    </div>
-
-    <div class="card">
-      <h3><span class="ic">💾</span>数据新鲜度 <span class="fresh" style="font-size:10px;color:var(--dim)">[动态]</span></h3>
-      <table><thead><tr><th>文件</th><th>最后更新</th><th>状态</th></tr></thead><tbody id="freshnessTbody">
-        <tr id="freshRowCandidate"><td>🧭 候选股池 <span style="font-size:10px;color:var(--dim)">(来源级)</span></td><td id="freshTimeCandidate">--</td><td id="freshStatusCandidate"><span class="status-dot s-warn"></span>待扫描</td></tr>
-        <tr id="freshRowCandidateSrc" style="display:none"><td colspan="3" id="freshCandidateSources"></td></tr>
-        <tr id="freshRowGold"><td>黄金池</td><td id="freshTimeGold">--</td><td id="freshStatusGold"><span class="status-dot s-warn"></span>待扫描</td></tr>
-        <tr id="freshRowConcept"><td>概念映射</td><td id="freshTimeConcept">--</td><td id="freshStatusConcept"><span class="status-dot s-warn"></span>待扫描</td></tr>
-      </tbody></table>
-    </div>
-
-    <div class="card" style="margin-bottom:16px;border-left:3px solid #f59e0b">
-      <h3><span class="ic">🔌</span>外部数据源 <span class="fresh" style="font-size:10px;color:var(--dim)">[候选股池上游]</span></h3>
-      <table><thead><tr><th>数据源</th><th>状态</th><th>诊断</th></tr></thead><tbody id="extSrcTbody">
-        <tr id="extSrcAkshare"><td>akshare（港股/行业）</td><td id="extSrcAkStatus"><span class="status-dot s-warn"></span>检测中</td><td id="extSrcAkDiag">—</td></tr>
-        <tr id="extSrcGuanlan"><td>观澜台（知识星球研报）</td><td id="extSrcGlStatus"><span class="status-dot s-warn"></span>检测中</td><td id="extSrcGlDiag">—</td></tr>
-        <tr id="extSrcMahoro"><td>maharo（投行信号）</td><td id="extSrcMhStatus"><span class="status-dot s-warn"></span>检测中</td><td id="extSrcMhDiag">—</td></tr>
       </tbody></table>
     </div>
 
@@ -4979,13 +4673,13 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">部署链路</div>
         <div class="logic-p"><b>v8 独立仓库</b>：中国数据抓取（cn_fetch）→ 推送 raw_data → GitHub Actions 自动触发 build_deploy（workflow_run）→ 构建 data/*.js → 推 main → GitHub Pages 自动发布。小九本机<b>只监督、不手动部署</b>。</div>
         <div class="logic-h">双机状态</div>
-        <div class="logic-p"><b>小九（单位机）</b>：作为 GitHub self-hosted runner「中国节点」承接盘后算法链应急回退（<b>v8_algo_run</b> 仅 workflow_dispatch）；主链由 GitHub 云端 <b>v8_algo_cloud</b> 承担，并运行看门狗监督；<b>不手动跑数据、不手动部署</b>。<b>阿狸咪（家中机）</b>：已关机，长期决策不再接手任何部署/救火任务。<b>GitHub 云端（ubuntu runner）</b>：执行<b>中国数据抓取 v8_cn_fetch_cloud（2026-08-05 已迁）</b>+ 构建/部署/体检/备份/自愈/健康监控。<b>中国节点（lemoncat-cn）</b>：即小九单位机，2026-08-05 起仅剩盘后算法链依赖它。</div>
+        <div class="logic-p"><b>GitHub 云端（ubuntu runner）</b>：执行<b>中国数据抓取 v8_cn_fetch_cloud</b> + 盘后算法链 <b>v8_algo_cloud</b> + 构建/部署/体检/备份/自愈/健康监控；2026-08-05 起主链已全部云端化。<b>小九（单位机 / lemoncat-cn）</b>：仅作为 GitHub self-hosted runner 应急回退（workflow_dispatch），日常不跑 cron 主链；运行云端管线看门狗监督。<b>阿狸咪（家中机）</b>：本地开发/预览用（file:///E:/workspace/quant-scanner-v8/index.html），不上主站、不接部署/救火。</div>
       </div>
 
       <div class="card">
         <h3><span class="ic">⚙️</span>自动化任务 - 说明</h3>
         <div class="logic-h">云端调度</div>
-        <div class="logic-p">v8_cn_fetch_cloud（盘前/盘中/盘后/周末，2026-08-05 起主力，云端）、v8_intraday_healer（2026-08-06 新增盘中自愈：09:03-15:33 每30分检测抓取过期自动补跑，防 schedule 漏档）、v8_safety_net（每30分 stale 兜底）、v8_algo_run（post_close 算法链应急回退，workflow_dispatch；主链 v8_algo_cloud 在云端）、v8_backup（每日21:00备份）、runner_health_alert（非交易时段每2h runner 健康监控）。</div>
+        <div class="logic-p">v8_cn_fetch_cloud（盘前/盘中/盘后/周末，云端主链）、v8_intraday_healer（盘中自愈：09:03-15:33 每30分检测抓取过期自动补跑）、v8_safety_net（每30分 stale 兜底）、v8_algo_cloud（收盘后算法数据生产，云端主链；本机仅 workflow_dispatch 应急）、v8_backup（每日23:00备份）、runner_health_alert（非交易时段每2h runner 健康监控）。</div>
         <div class="logic-h">本机监督</div>
         <div class="logic-p">小九-v8云端管线看门狗：每天 08:00–22:00 每小时运行 v8_cloud_watchdog.py，检查 runner 在线、cn_fetch/build_deploy 状态、raw_data 陈旧度、站点存活。发现异常写 _v8_watchdog.log 并告警。</div>
         <div class="logic-h">v6 状态</div>
@@ -4999,7 +4693,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">本机闸门</div>
         <div class="logic-p">v8_cloud_watchdog.py 核对核心 data/*.js 的 update_time，raw_data 超过90分钟无新 commit 即 ALERT；本机只告警/汇报，不自动覆盖数据。</div>
         <div class="logic-h">候选股池来源级监控（2026-08-08 新增）</div>
-        <div class="logic-p">候选股池是全站算法链的<b>上游水源</b>（金股/CRDS/四量/评分全部从它取股）。除整体 update_time 外，新增来源级监控：<br>· <b>night_watchdog.py</b> 每次巡检拆分六大来源数量，成交额TOP三板归零→🔴CRITICAL、&lt;80%→⚠️WARNING；港股/观澜台归零→⚠️降级（云端可能天然缺失）。<br>· <b>运维面板数据新鲜度表格</b> CANDIDATE 行下方展示六来源彩色标签行，实时反映各源健康状态。<br>· <b>正常基线</b>：三板合计≥280只（主板97-100+创业100+科创100），maharo≥10只。低于此基线需排查 mootdx/akshare 是否挂了。</div>
+        <div class="logic-p">候选股池是全站算法链的<b>上游水源</b>（金股/CRDS/四量/评分全部从它取股）。除整体 update_time 外，运维面板「数据健康总览」已合并来源级监控：<br>· <b>night_watchdog.py</b> 每次巡检拆分六大来源数量，成交额TOP三板归零→🔴CRITICAL、&lt;80%→⚠️WARNING；港股/观澜台归零→⚠️降级（云端可能天然缺失）。<br>· <b>数据健康总览</b> CANDIDATE 行下方展示六来源彩色标签行，实时反映各源健康状态。<br>· <b>正常基线</b>：主板成交前100 + 创业板成交前100 + 科创板成交前100（三板合计≥300只），maharo≥10只。低于此基线需排查 mootdx/akshare 是否挂了。</div>
       </div>
 
       <div class="card">
@@ -7266,17 +6960,44 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       const dot = '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+color+';margin-right:4px;"></span>';
       watchHtml += '<span style="font-size:11px;color:var(--sub);margin-right:10px;">'+dot+key+'</span>';
     });
-    el.innerHTML =
-      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'+
-        '<span style="font-size:12px;color:var(--sub)">中国节点最后抓取</span>'+
-        '<b style="font-size:13px;">'+rel(rs.run_time)+'</b>'+
-        '<span style="font-size:11px;color:'+statusColor+';">● '+statusText+'</span>'+
+    // 2026-08-08 一劳永逸：Runner 追踪 + 文件新鲜度 + 上游诊断 合并为「数据健康总览」
+    const runnerHtml =
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'+
+        '<span style="font-size:12px;color:var(--sub);flex:0 0 auto;">中国节点最后抓取</span>'+
+        '<b style="font-size:13px;flex:0 0 auto;">'+rel(rs.run_time)+'</b>'+
+        '<span style="font-size:11px;color:'+statusColor+';flex:0 0 auto;">● '+statusText+'</span>'+
       '</div>'+
-      '<div style="font-size:11px;color:var(--dim);margin-bottom:6px;">'+
+      '<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">'+
         '共 '+total+' 模块 · 成功 '+ok+' · 空 '+empty+' · 失败 '+fail+
         (rs.hostname ? ' · 节点 '+_esc(rs.hostname) : '')+
       '</div>'+
-      '<div style="display:flex;flex-wrap:wrap;gap:4px 0;">'+watchHtml+'</div>';
+      '<div style="display:flex;flex-wrap:wrap;gap:4px 0;margin-bottom:10px;">'+watchHtml+'</div>';
+
+    const freshHtml =
+      '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">'+
+        '<div style="font-size:12px;font-weight:700;color:var(--txt);margin-bottom:8px;">💾 文件新鲜度</div>'+
+        '<table style="width:100%;font-size:11px;"><thead><tr><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">文件</th><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">最后更新</th><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">状态</th></tr></thead><tbody>'+
+          '<tr id="freshRowCandidate"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">🧭 候选股池 <span style="font-size:10px;color:var(--dim)">(来源级)</span></td><td id="freshTimeCandidate" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">--</td><td id="freshStatusCandidate" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>待扫描</td></tr>'+
+          '<tr id="freshRowCandidateSrc" style="display:none"><td colspan="3" id="freshCandidateSources" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"></td></tr>'+
+          '<tr id="freshRowGold"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">黄金池</td><td id="freshTimeGold" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">--</td><td id="freshStatusGold" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>待扫描</td></tr>'+
+          '<tr id="freshRowConcept"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">概念映射</td><td id="freshTimeConcept" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">--</td><td id="freshStatusConcept" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>待扫描</td></tr>'+
+        '</tbody></table>'+
+      '</div>';
+
+    const extHtml =
+      '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">'+
+        '<div style="font-size:12px;font-weight:700;color:var(--txt);margin-bottom:8px;">🔌 外部数据源（候选股池上游）</div>'+
+        '<table style="width:100%;font-size:11px;"><thead><tr><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">数据源</th><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">状态</th><th style="text-align:left;padding:4px 6px;color:var(--dim);border-bottom:1px solid var(--border)">诊断</th></tr></thead><tbody>'+
+          '<tr id="extSrcAkshare"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">akshare（港股/行业）</td><td id="extSrcAkStatus" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>检测中</td><td id="extSrcAkDiag" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--sub)">—</td></tr>'+
+          '<tr id="extSrcGuanlan"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">观澜台（知识星球研报）</td><td id="extSrcGlStatus" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>检测中</td><td id="extSrcGlDiag" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--sub)">—</td></tr>'+
+          '<tr id="extSrcMahoro"><td style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)">maharo（投行信号）</td><td id="extSrcMhStatus" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04)"><span class="status-dot s-warn"></span>检测中</td><td id="extSrcMhDiag" style="padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--sub)">—</td></tr>'+
+        '</tbody></table>'+
+      '</div>';
+
+    el.innerHTML = runnerHtml + freshHtml + extHtml;
+
+    // 统一渲染文件新鲜度与上游诊断，并收集失败原因到底部 opDiagDetails
+    try{ renderDataFreshness(); }catch(e){ console.warn('renderDataFreshness fail', e); }
   }
 
   /* ---- 任务运行看板（按前端页面→卡片顺序，每个时段成功✓失败✗） ---- */
@@ -8066,7 +7787,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var genTime=d.gen_time||d.data_time||'';
     var h='';
     h+='<div style="background:linear-gradient(135deg,#13243f,#0e2747);color:#cfe3ff;border:1px solid #244066;border-radius:10px;padding:14px 18px;margin-bottom:14px;">';
-    h+='<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:22px;">🌐</span>';
+    h+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><span style="font-size:22px;">🌐</span>';
     h+='<div style="font-size:16px;font-weight:700;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">全站精选 <span style="color:#fbbf24;font-size:13px;letter-spacing:1px">⭐⭐⭐</span>';
     if(genTime) h+=_uBadge('盘后', '中线', genTime);
     // 「已跑完」胶囊：统一调用 _runBadgeInfo（2026-08-07 修复）
@@ -8200,7 +7921,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     cockpitTs=_maxTs(cockpitTs,_pickTs(window.COCKPIT_TIER_RECOMMEND));
     var cockpitTsShort=_fmtCockpitRel(cockpitTs);
 
-    h+='<div style="background:linear-gradient(135deg,#13243f,#0e2747);color:#cfe3ff;border:1px solid #244066;border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:10px;">';
+    h+='<div style="background:linear-gradient(135deg,#13243f,#0e2747);color:#cfe3ff;border:1px solid #244066;border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">';
     h+='<span style="font-size:22px;">🎯</span><div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:700;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">选股驾驶舱 <span style="color:#fbbf24;font-size:13px;letter-spacing:1px">⭐⭐⭐⭐</span>';
     if(cockpitTs) h+=_uBadge('盘后','短线',cockpitTs);
     // 「已跑完」胶囊：统一调用 _runBadgeInfo（2026-08-07 修复）
@@ -8808,15 +8529,16 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if(m.horizon) horizon = m.horizon;
     }
     var badge = (t ? _uBadge(slot, horizon, dataObj ? dataObj.update_time : null) : '');
-    var html='<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);border-radius:12px 12px 0 0;">'
-      +'<span style="font-size:15px;line-height:1;">'+icon+'</span>'
-      +'<span style="font-size:14px;font-weight:800;color:var(--cyan);">'+title+'</span>';
-    if(subtitle){ html+='<span style="font-size:11px;color:var(--dim);margin-left:4px;">'+subtitle+'</span>'; }
-    if(nodata){ html+='<span style="font-size:10px;color:var(--down);border:1px solid var(--down);border-radius:4px;padding:1px 5px;margin-left:4px;">无数据</span>'; }
+    // 2026-08-08 一劳永逸：卡片头部允许换行，标题区可收缩，胶囊永不挤压覆盖
+    var html='<div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;padding:10px 14px;border-bottom:1px solid var(--border);border-radius:12px 12px 0 0;min-width:0;">'
+      +'<span style="font-size:15px;line-height:1;flex:0 0 auto;">'+icon+'</span>'
+      +'<span style="font-size:14px;font-weight:800;color:var(--cyan);flex:0 0 auto;white-space:nowrap;">'+title+'</span>';
+    if(subtitle){ html+='<span style="font-size:11px;color:var(--dim);margin-left:4px;flex:1 1 auto;min-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+subtitle+'</span>'; }
+    else { html+='<span style="flex:1 1 auto;"></span>'; }
+    if(nodata){ html+='<span style="font-size:10px;color:var(--down);border:1px solid var(--down);border-radius:4px;padding:1px 5px;flex:0 0 auto;">无数据</span>'; }
     if(hideTime){
       // 不渲染胶囊；不加占位 span（卡片名 + subtitle 紧贴左侧，符合大卡规范）
-    }else if(badge){ html+='<span style="margin-left:6px">'+badge+'</span>'; }
-    else { html+='<span style="margin-left:auto;"></span>'; }
+    }else if(badge){ html+='<span style="flex:0 0 auto;margin-left:auto;">'+badge+'</span>'; }
     html+='</div>';
     return html;
   }
@@ -9588,7 +9310,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     safe(renderCockpit);
     // 传 'st' 前缀：stcrdsTime / stcrdsCoverage 等 DOM id 在运维 section 下都带 st 前缀（2026-08-06 主人纠正：原调用未传前缀导致胶囊找不到）
     safe(function(){ renderV8Crds('st'); });
-    safe(renderDataFreshness);
+    // 数据健康总览由 renderRunnerTrack 统一渲染（含文件新鲜度+上游诊断），此处不再独立调用
   }
   window.__renderOps=renderOps;
 
@@ -9652,6 +9374,58 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     // 外部数据源状态（候选股池上游依赖）
     renderExtDataSources();
+
+    // 2026-08-08 一劳永逸：汇总所有非 OK 诊断到卡片底部「失败/诊断详情」
+    _renderOpDiagnostics();
+  }
+
+  function _renderOpDiagnostics(){
+    var diags = [];
+    // 1) Runner 模块失败/空
+    var rs = window.RUNNER_STATUS || {};
+    var modules = rs.modules || {};
+    Object.keys(modules).forEach(function(k){
+      var m = modules[k];
+      if(!m) return;
+      if(m.status === 'fail') diags.push('Runner 模块 <b>'+k+'</b> 失败：'+(m.message || '未知错误'));
+      else if(m.status === 'empty') diags.push('Runner 模块 <b>'+k+'</b> 返回空数据');
+    });
+    // 2) HEALTH_CHECK 失败项
+    var hc = window.HEALTH_CHECK || {};
+    (hc.items || []).forEach(function(it){
+      if(!it || it.status === 'ok') return;
+      diags.push('文件 <b>'+it.id+'</b> '+(it.status==='fail'?'失败':'待更新')+'：最后更新 '+(it.last_update || '--')+(it.message ? ' · '+it.message : ''));
+    });
+    // 3) 候选股池来源归零
+    var cand = window.CANDIDATE || {};
+    var sd = cand.source_dist || {};
+    var srcNames = {'主板成交前100':'主板成交前100','创业板成交前100':'创业板成交前100','科创板成交前100':'科创板成交前100','港股成交前50':'港股成交前50（akshare）','观澜台':'观澜台','maharo研报':'maharo研报'};
+    Object.keys(srcNames).forEach(function(k){
+      var cnt = sd[k] || 0;
+      if(cnt === 0){
+        var reason = k==='港股成交前50' ? 'akshare不可用/云端无港股API' : (k==='观澜台' ? 'guanlan_*.json缺失或过期(>7天)' : '数据源异常');
+        diags.push('候选股池来源 <b>'+srcNames[k]+'</b> 为 0：'+reason);
+      }
+    });
+    // 4) 外部数据源诊断（读取已渲染单元格）
+    [['Akshare','akshare（港股/行业）'],['Guanlan','观澜台（知识星球研报）'],['Mahoro','maharo（投行信号）']].forEach(function(p){
+      var stEl = document.getElementById('extSrc'+p[0]+'Status');
+      var dgEl = document.getElementById('extSrc'+p[0]+'Diag');
+      if(stEl && dgEl && stEl.textContent.indexOf('正常') === -1 && dgEl.textContent && dgEl.textContent !== '—'){
+        diags.push('外部数据源 <b>'+p[1]+'</b> 异常：'+dgEl.textContent);
+      }
+    });
+
+    var box = document.getElementById('opDiagDetails');
+    var body = document.getElementById('opDiagBody');
+    if(!box || !body) return;
+    if(diags.length === 0){
+      box.style.display = 'none';
+      body.innerHTML = '';
+    } else {
+      box.style.display = 'block';
+      body.innerHTML = diags.map(function(d){ return '<div style="margin-bottom:6px;padding-left:14px;position:relative;"><span style="position:absolute;left:0;color:var(--gold)">•</span>'+d+'</div>'; }).join('');
+    }
   }
 
   function renderExtDataSources(){
