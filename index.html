@@ -581,7 +581,20 @@ function setBadge(id, slot, horizon, ts, sub){
     console.warn('[setBadge] innerHTML empty/short id=' + id + ' len=' + el.innerHTML.length);
   }
 }
-window._uBadge = _uBadge; window.setBadge = setBadge;
+/* 统一「持仓」胶囊（与 🧺 08-07 持仓 1 截图一致） */
+function _holdBadge(dateStr, count){
+  var d = '';
+  if(dateStr){
+    var m = String(dateStr).match(/(\d{2})-(\d{2})/);
+    if(m) d = m[1]+'-'+m[2];
+    else { m = String(dateStr).match(/\d{4}-(\d{2})-(\d{2})/); if(m) d = m[1]+'-'+m[2]; }
+  }
+  return '<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;padding:3px 10px;border-radius:10px;white-space:nowrap;">'
+    + '<span aria-hidden="true">🧺</span>'
+    + '<span>'+(d||'--')+' 持仓 <b style="margin-left:2px">'+(count||0)+'</b></span>'
+    + '</span>';
+}
+window._uBadge = _uBadge; window.setBadge = setBadge; window._holdBadge = _holdBadge;
 
 /* ===== 🎯 今日判定 · 可入手候选 HTML 构建（2026-08-07 迁回今日事件页） =====
    数据：🥇三重共识 > 🥈驾驶舱 A 档 > 🥉金股池 + 四量终极；渲染由 initCardBadges / switchSec('td') 触发。 */
@@ -2266,6 +2279,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 斐波那契窗口 -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">📉</span>斐波那契窗口 · 当前回调状态<span class="fresh" id="phFibTime">—</span></h3>
+      <div style="font-size:11px;color:var(--dim);margin:-6px 0 10px 0;line-height:1.5;">📌 基于日K收盘数据计算，仅收盘后更新，盘前/盘中不刷新</div>
       <div class="ph-fib-grid" id="phFibGrid">
         <div class="ph-fib-card"><div class="ph-fib-val" id="phFibDays">--</div><div class="ph-fib-lbl">已回调交易日</div></div>
         <div class="ph-fib-card"><div class="ph-fib-val" id="phFibPct">--</div><div class="ph-fib-lbl">累计跌幅</div></div>
@@ -2439,7 +2453,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span>
           <span id="stfvTime"><span class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;"><span aria-hidden="true">🐻</span><span style="margin-left:4px">更新于</span><span style="color:#9fd0ff;font-weight:600;margin-left:4px">已加载</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">盘后</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">短线</span></span></span>
           <span id="stfvRunBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">✅ 今日已跑完</span>
-          <span id="stfvEnteredBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;">✅ 今日已入仓 <b id="stfvEnteredCount" style="margin-left:2px">0</b></span>
+          <span id="stfvHoldBadge" style="display:none;margin-left:6px;"></span>
         </div>
         <div id="stfvNote" style="font-size:11px;color:var(--dim);margin-bottom:10px;line-height:1.6;"></div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:14px;">
@@ -2480,7 +2494,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           <span style="margin-left:6px;font-size:10px;color:#94a3b8;font-weight:500;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用</span>
           <span id="stcrdsTime"><span class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;"><span aria-hidden="true">🐻</span><span style="margin-left:4px">更新于</span><span style="color:#9fd0ff;font-weight:600;margin-left:4px">已加载</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">盘后</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">短线</span></span></span>
           <span id="stcrdsRunBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);vertical-align:middle">✅ 今日已跑完</span>
-          <span id="stcrdsEnteredBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;vertical-align:middle">✅ 今日已入仓 <b id="stcrdsEnteredCount" style="margin-left:2px">0</b></span>
+          <span id="stcrdsHoldBadge" style="display:none;margin-left:6px;vertical-align:middle;"></span>
         </div>
         <div id="stcrdsCoverage" style="font-size:11px;color:var(--dim);margin-bottom:8px;line-height:1.6;"></div>
         <div id="stcrdsStandby" style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:8px;background:rgba(240,160,32,0.10);border-left:4px solid #f0a020;font-size:15px;font-weight:600;color:#e8b54a;line-height:1.65;letter-spacing:0.2px;"></div>
@@ -7583,7 +7597,12 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(meta.track_start)h+='<div class="tp-detail">追踪起始：'+meta.track_start+(meta.last_update?' · 最后更新 '+rel(meta.last_update):'')+'</div>';
     if(!dates.length){h+='<div class="tp-empty">暂无每日入选记录。</div>';$('ttHistory').innerHTML=h;return;}
     dates.forEach(d=>{
-      const arr=hist[d]||[];
+      const arr=(hist[d]||[]).slice().sort((a,b)=>{
+        const sa=(track[a.code]||{}).status||'near';
+        const sb=(track[b.code]||{}).status||'near';
+        const order={strict:0,near:1,dropped:2};
+        return (order[sa]??1)-(order[sb]??1);
+      });
       h+='<div class="tp-hist-date">📅 '+d+' · '+arr.length+' 只</div>';
       h+='<div class="tp-hist-grid">';
       arr.forEach(s=>{
@@ -7705,9 +7724,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(_fvInfo.show){
       h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">'+_fvInfo.label+'</span>';
     }
-    // 今日已入仓胶囊：A+B 总入选数 > 0 才显示
+    // 「持仓」胶囊：统一为 🧺 MM-DD 持仓 N
     if(total>0){
-      h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;">✅ 今日已入仓 <b style="margin-left:2px">'+total+'</b></span>';
+      h+=_holdBadge(genTime, total);
     }
     h+='</div></div></div>';
     // 数据质量警示：若 A/B 档全部为港股（A股扫描缺失），挂红条提示，避免误导
@@ -7839,12 +7858,12 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var _cockpitGenTs = _cockpitData.gen_time || _cockpitData.data_time || _cockpitData.update_time || cockpitTs;
     var _cockpitInfo = window._runBadgeInfo(_cockpitGenTs);
     if(_cockpitInfo.show) h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">'+_cockpitInfo.label+'</span>';
-    // 今日已入仓胶囊：tier_a + tier_b 任意 > 0 才显示
+    // 「持仓」胶囊：统一为 🧺 MM-DD 持仓 N
     var _cta=(DATA.cockpit_tier&&DATA.cockpit_tier.tier_a)||[];
     var _ctb=(DATA.cockpit_tier&&DATA.cockpit_tier.tier_b)||[];
     var _ctTotal=_cta.length+_ctb.length;
     if(_ctTotal>0){
-      h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;">✅ 今日已入仓 <b style="margin-left:2px">'+_ctTotal+'</b></span>';
+      h+=_holdBadge(_cockpitGenTs, _ctTotal);
     }
     h+='</div><div style="font-size:11px;opacity:.85;">出手信号灯 → 大盘可操作区 → 最强赛道 → 共振候选 → 机构/龙虎榜验证 → 交易计划</div></div>';
     h+='</div>';
@@ -9151,17 +9170,16 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if(_crdsInfo.show){ _crdsRun.textContent = _crdsInfo.label; _crdsRun.style.display='inline-flex'; }
       else _crdsRun.style.display='none';
     }
-    // 「今日已入仓」胶囊：elite + advanced > 0 才显示
+    // 「持仓」胶囊：统一为 🧺 MM-DD 持仓 N
     (function(){
-      var _eb=document.getElementById(p+'crdsEnteredBadge');
-      var _ec=document.getElementById(p+'crdsEnteredCount');
-      if(_eb&&_ec){
+      var _hb=document.getElementById(p+'crdsHoldBadge');
+      if(_hb){
         var _tot=elite.length+adv.length;
         if(_tot>0){
-          _ec.textContent=_tot;
-          _eb.style.display='inline-flex';
+          _hb.innerHTML=_holdBadge(_crdsTs, _tot);
+          _hb.style.display='inline-flex';
         } else {
-          _eb.style.display='none';
+          _hb.style.display='none';
         }
       }
     })();
@@ -9302,15 +9320,14 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if(_fvInfo.show){ _fvRun.textContent = _fvInfo.label; _fvRun.style.display='inline-flex'; }
       else _fvRun.style.display='none';
     }
-    // 「今日已入仓」胶囊：QD 共振 > 0 才显示
-    var _eb=document.getElementById('stfvEnteredBadge');
-    var _ec=document.getElementById('stfvEnteredCount');
-    if(_eb&&_ec){
+    // 「持仓」胶囊：统一为 🧺 MM-DD 持仓 N
+    var _hb=document.getElementById('stfvHoldBadge');
+    if(_hb){
       if(qd>0){
-        _ec.textContent=qd;
-        _eb.style.display='inline-flex';
+        _hb.innerHTML=_holdBadge(_fvTs, qd);
+        _hb.style.display='inline-flex';
       } else {
-        _eb.style.display='none';
+        _hb.style.display='none';
       }
     }
     var hits = document.getElementById('stfvHits');
