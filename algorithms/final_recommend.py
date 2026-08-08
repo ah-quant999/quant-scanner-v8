@@ -299,6 +299,15 @@ def main():
     stop_data = load_js("STOCK_STOP_DATA.js", "STOCK_STOP_DATA")
     stop_stocks = stop_data.get("stocks") or {}
 
+    # ── 读取 60min 四量终极共振数据（多周期确认）──
+    _60m_raw = load_js("FOUR_VOLUME_60M.js", "FOUR_VOLUME_60M")
+    _60m_hits = {}  # norm_code → {reason, signals[], qd, pct_chg, ...}
+    for item in (_60m_raw.get("hits") or _60m_raw.get("stocks") or []):
+        c = norm_code(item.get("code") or item.get("code"))
+        if c:
+            _60m_hits[c] = item
+    print(f"[info] 60m 四量数据: 加载 {len(_60m_hits)} 只命中")
+
     # 读取回测/跟踪数据（用于 Top3 卡片展示）
     cb = load_json("cockpit_backtest.json")
     cb_summary = {x.get("code"): x for x in (cb.get("stock_summary") or []) if x.get("code")}
@@ -423,6 +432,12 @@ def main():
             r["industry"] = r["industry"] or (s.get("industry") or "")
             r["concepts"] = list(set((r["concepts"] or []) + (s.get("concepts") or [])))
             r["reasons"].append(f"{label} 技术{tech:.0f} 质量{qs:.0f}")
+            # ── 60m 共振确认（A 档仅标签，不改变评分）──
+            _60m_a = _60m_hits.get(norm_code(code))
+            if _60m_a and tier == "tier_a":
+                r["signals"].append("60m共振确认")
+                r["_60m_resonance"] = True
+            # ── end 60m ──
             if s.get("comment"):
                 r["signals"].append(s["comment"])
             if s.get("enter_date"):
@@ -446,7 +461,16 @@ def main():
         src_score = sig_count * 0.6
         if qd:
             src_score += 0.5
-        src_score = round(min(4.0, max(0.0, src_score)), 2)
+        # ── 60min 多周期共振加分（同算法不同时间框架 = 经典共振）──
+        _60m_item = _60m_hits.get(norm_code(code))
+        if _60m_item:
+            _60m_qd = bool(_60m_item.get("qd") or _60m_item.get("XG"))
+            _60m_bonus = 0.8 if _60m_qd else 0.5
+            src_score += _60m_bonus
+            r["signals"].append("60min多周期共振")
+            r["_60m_resonance"] = True
+        # ── end 60m ──
+        src_score = round(min(4.5, max(0.0, src_score)), 2)
         if src_score > 0:
             r["sources"].append("四量终极")
             r["source_scores"]["四量终极"] = src_score
@@ -500,6 +524,15 @@ def main():
                 continue
             r = ensure(code, s.get("name"), "", "")
             src_score = min(3.5, 2.0 + (inst + yz) / 80000.0)
+            # ── 60min 动量延续确认（龙虎榜 T 日进场 → T+1 分钟级动量仍在 = 非一日游）──
+            _60m_lhb = _60m_hits.get(norm_code(code))
+            if _60m_lhb:
+                _60m_lhb_bonus = 0.5
+                src_score += _60m_lhb_bonus
+                r["signals"].append("60min动量延续")
+                r["_60m_resonance"] = True
+            # ── end 60m ──
+            src_score = round(min(4.0, src_score), 2)
             r["sources"].append("大牛股猎手")
             r["source_scores"]["大牛股猎手"] = round(src_score, 2)
             r["close"] = s.get("close") or r["close"]
@@ -736,6 +769,7 @@ def main():
             "buy_score": s["final_score"],
             "enter_date": enter_date,
             "signals": signals[:8],
+            "_60m_resonance": s.get("_60m_resonance", False),
             "reason": "；".join(s["reasons"][:3]),
             "industry": s["industry"],
             "concepts": s["concepts"][:6],

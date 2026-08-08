@@ -873,6 +873,16 @@ function __judgmentCandidatesHTML(){
       + tags
       + '<span style="margin-left:auto;display:flex;align-items:center;gap:6px;">'
       + '<span style="font-size:11px;padding:2px 7px;border-radius:999px;background:'+s.srcColor+'22;color:'+s.srcColor+';font-weight:700">'+s.srcEmoji+' '+s.src+(scoreText?' '+scoreText:'')+'</span>'
+      // ── 60m 共振标记（多策略统一）──
+      + (function(){
+        var _60d = window.FOUR_VOLUME_60M || {};
+        var _60h = (_60d.hits || _60d.stocks || []);
+        var _nc = String(s.code||'').replace(/\D/g,'');
+        var _hit = _60h.some(function(x){ return String(x.code||'').replace(/\D/g,'') === _nc; });
+        if(_hit) return '<span style="font-size:10px;color:#a78bfa;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);padding:1px 7px;border-radius:10px;font-weight:700;">🔔 60m</span>';
+        return '';
+      })()
+      // ── end 60m ──
       + (priceText ? '<span style="font-size:14px;font-weight:800;color:var(--txt)">'+priceText+'</span>' : '')
       + (pctText ? '<span style="font-size:12px;font-weight:700;color:'+pctColor+'">'+pctText+'</span>' : '')
       + '</span>'
@@ -3971,6 +3981,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         h += '<div style="display:flex;justify-content:space-between;font-size:11px;margin-top:2px">';
         h += '<span style="color:var(--up);font-weight:700">共振 ' + _yi(total) + '</span>';
         h += '<span class="c-' + ((s.pct||0)>=0?'up':'down') + '">' + _pc(s.pct) + '</span></div>';
+        // ── 60min 动量延续标记（龙虎榜 T 日进场 → T+1 分钟级仍在 = 非一日游）──
+        var _60mData = window.FOUR_VOLUME_60M || {};
+        var _60mHits = (_60mData.hits || _60mData.stocks || []);
+        var _code60 = (s.code||'').replace(/sh|sz|bj/g,'');
+        var _has60m = _60mHits.some(function(h){ return (h.code||'').replace(/sh|sz|bj/g,'') === _code60; });
+        if(_has60m){
+          h += '<div style="margin-top:3px"><span style="font-size:10px;color:#a78bfa;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);padding:1px 7px;border-radius:10px;font-weight:700;">🔔 60m动量延续</span></div>';
+        }
+        // ── end 60m ──
         h += '</div>';
       });
     } else {
@@ -10085,6 +10104,9 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       h+='<span class="fr-tag ind">'+_fe(shortInd)+'</span>';
     }
     h+='<span class="fr-score">买入评分 <b>'+_fn(s.buy_score||s.final_score,1)+'</b></span>';
+    if(s._60m_resonance){
+      h+='<span style="font-size:10px;color:#a78bfa;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);padding:1px 7px;border-radius:10px;font-weight:700;">🔔 60m共振</span>';
+    }
     h+='<span class="fr-enter">· 入选日 '+_fe(s.enter_date||'—')+'</span>';
     h+='<span class="fr-tag '+horizon[1]+'">'+_fe(horizon[0])+'</span>';
     h+='</div>';
