@@ -8228,7 +8228,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     /* v8 铁律：不发布 data/ 目录，禁止 fetch。从 update_v8.py 注入的 window.BACKTEST_TDX 读取 */
     var d = window.BACKTEST_TDX || null;
     if (!d) {
-      con.innerHTML = '<div style="text-align:center;padding:14px;color:#ffb74d;">⏳ 回测数据尚未生成（backtest_tdx.json 为空或不存在）<br><span style="font-size:10px;color:#8aa0c2;">每日盘后 scanner.py 跑完自动生成，约 2MB</span></div>';
+      con.innerHTML = '<div style="text-align:center;padding:14px;color:#ffb74d;">⏳ 回测数据尚未生成（backtest_tdx.json 为空或不存在）<br><span style="font-size:12px;color:#8aa0c2;">每日盘后 scanner.py 跑完自动生成，约 2MB</span></div>';
       return;
     }
     var sm = d.summary || {};
@@ -8239,21 +8239,21 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     items.sort(function(a, b){ return (b.win_rate_5d || 0) - (a.win_rate_5d || 0); });
     var periods = [1,3,5,10,20];
     if (!items.length) {
-      con.innerHTML = '<div style="text-align:center;padding:14px;color:#8aa0c2;">📭 暂无可用信号样本（summary为空）<br><span style="font-size:10px;">'+(d.calc_time||'数据已拉取')+'</span></div>';
+      con.innerHTML = '<div style="text-align:center;padding:14px;color:#8aa0c2;">📭 暂无可用信号样本（summary为空）<br><span style="font-size:12px;">'+(d.calc_time||'数据已拉取')+'</span></div>';
       return;
     }
     var labels = {trend_up:'📈上涨趋势', trend_down:'📉下跌趋势', chan_buy:'🟣缠论买点',
       contrarian:'🔴逆势红色', breakout_5d:'🚀5日突破', volume_surge:'💥放量上涨',
       divergence:'⚠️量价背离', ge2_signals:'🎯双信号', ge3_signals:'🎯三信号'};
     var lowSampleCount = items.filter(function(s){return (s.total||0)<30;}).length;
-    var html = '<div style="font-size:10px;color:#8aa0c2;margin-bottom:6px;">'+d.gold_pool_size+'只金池股×60日 · '+(d.calc_time||'')+' · 按T+5胜率降序</div>';
+    var html = '<div style="font-size:12px;color:#8aa0c2;margin-bottom:8px;">'+d.gold_pool_size+'只金池股×60日 · '+(d.calc_time||'')+' · 按T+5胜率降序</div>';
     if (lowSampleCount > 0) {
-      html += '<div style="font-size:10px;color:#ff6b81;background:rgba(255,107,129,.12);padding:4px 8px;border-radius:4px;margin-bottom:6px;">⚠️ <b>'+lowSampleCount+' 个信号样本<30</b>，胜率参考性低，红色行已标出。仅作排序参考，不作决策依据。</div>';
+      html += '<div style="font-size:12px;color:#ff6b81;background:rgba(255,107,129,.12);padding:6px 10px;border-radius:4px;margin-bottom:8px;">⚠️ <b>'+lowSampleCount+' 个信号样本<30</b>，胜率参考性低，红色行已标出。仅作排序参考，不作决策依据。</div>';
     }
-    html += '<table style="width:100%;font-size:11px;border-collapse:collapse;color:#dbe6f7;"><thead><tr style="background:#0c1626;">'+
-      '<th style="padding:3px 4px;text-align:left;">信号</th><th style="padding:3px 4px;text-align:center;">样本</th>';
+    html += '<table style="width:100%;font-size:13px;border-collapse:collapse;color:#dbe6f7;"><thead><tr style="background:#0c1626;">'+
+      '<th style="padding:4px 6px;text-align:left;">信号</th><th style="padding:4px 6px;text-align:center;">样本</th>';
     periods.forEach(function(pd){
-      html += '<th style="padding:3px 2px;text-align:center;font-size:10px;">T+'+pd+'胜</th><th style="padding:3px 2px;text-align:center;font-size:10px;">T+'+pd+'收益</th>';
+      html += '<th style="padding:4px 5px;text-align:center;font-size:12px;">T+'+pd+'胜</th><th style="padding:4px 5px;text-align:center;font-size:12px;">T+'+pd+'收益</th>';
     });
     html += '</tr></thead>';
     html += '<tbody id="rank-tbody">';
@@ -8265,8 +8265,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       var labelText = (rankBadge?rankBadge+' ':'') + (labels[s.key]||s.key);
       if (lowSample) labelText = '🚫 ' + labelText;
       var sampleText = lowSample ? '🚫 '+s.total+'（无效）' : s.total;
-      html += '<tr style="border-bottom:1px solid rgba(255,255,255,.06);background:'+rowBg+';"><td style="padding:2px 4px;white-space:nowrap;'+(lowSample?'color:#ff6b81;':'')+'">'+labelText+'</td>'+
-        '<td style="padding:2px 4px;text-align:center;color:'+(lowSample?'#ff6b81':'#dbe6f7')+';font-weight:'+(lowSample?'700':'400')+';">'+sampleText+'</td>';
+      html += '<tr style="border-bottom:1px solid rgba(255,255,255,.06);background:'+rowBg+';"><td style="padding:4px 6px;white-space:nowrap;'+(lowSample?'color:#ff6b81;':'')+'">'+labelText+'</td>'+
+        '<td style="padding:4px 6px;text-align:center;color:'+(lowSample?'#ff6b81':'#dbe6f7')+';font-weight:'+(lowSample?'700':'400')+';">'+sampleText+'</td>';
       periods.forEach(function(pd){
         var wr = s['win_rate_'+pd+'d'];
         var ar = s['avg_return_'+pd+'d'];
@@ -8275,12 +8275,12 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         var wrC = lowSample ? '#556' : arC;
         var retStr = hasData ? ((ar>=0?'+':'')+ar+'%') : '—';
         var wrStr = hasData ? (wr+'%') : '—';
-        html += '<td style="padding:2px 3px;text-align:center;color:'+wrC+';font-weight:600;'+(lowSample?'text-decoration:line-through;':'')+'">'+wrStr+'</td>'+
-          '<td style="padding:2px 3px;text-align:center;color:'+arC+';font-weight:600;">'+retStr+'</td>';
+        html += '<td style="padding:4px 5px;text-align:center;color:'+wrC+';font-weight:600;'+(lowSample?'text-decoration:line-through;':'')+'">'+wrStr+'</td>'+
+          '<td style="padding:4px 5px;text-align:center;color:'+arC+';font-weight:600;">'+retStr+'</td>';
       });
       html += '</tr>';
     });
-    html += '</tbody></table><div style="font-size:9px;color:#556;margin-top:4px;">⚠️ 熊市60日内全信号负收益。持续每日累积样本，30天后回测更具参考性。</div>';
+    html += '</tbody></table><div style="font-size:11px;color:#556;margin-top:6px;">⚠️ 熊市60日内全信号负收益。持续每日累积样本，30天后回测更具参考性。</div>';
     con.innerHTML = html;
     con.setAttribute('data-fetched', '1');
     window.__BACKTEST_TDX = d;

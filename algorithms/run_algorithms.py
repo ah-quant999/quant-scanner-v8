@@ -62,11 +62,12 @@ ORDER = [
     "fetch_sector_rs.py",
     "fetch_lhb.py",
     "calc_crds.py",
-    "build_candidate_pool.py",         # 读 guanlan/maharo 输入
+    "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool
+    "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
     "backtest_tdx.py",                 # 读 gold_pool 输入
-    "backtest_comprehensive.py",
-    "cockpit_backtest_now.py",
-    "generate_top10.py",               # 读 fundamental_quality / gold_pool
+    "backtest_comprehensive.py",       # 读 raw_data/history/top10_daily_YYYYMMDD.json（必须在 generate_top10 之后）
+    "cockpit_backtest_now.py",         # 读 raw_data/history/top10_daily_YYYYMMDD.json（必须在 generate_top10 之后）
+    "gen_cockpit_tier_recommend.py",   # 读 scan_result 输入
     "gen_cockpit_tier_recommend.py",   # 读 scan_result 输入
     "gen_cockpit_advice.py",           # 读 backtest_tdx
     "update_triple_resonance_history.py",  # 累积 triple_resonance_history
