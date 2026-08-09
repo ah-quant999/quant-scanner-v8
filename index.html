@@ -8553,6 +8553,15 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var risk = d.risk || '';
     var html = '';
     html += '<div style="background:linear-gradient(135deg,#13243f,#0e2747);color:#dbe6f7;border:1px solid rgba(127,180,255,.3);border-radius:10px;padding:12px 16px;box-shadow:0 2px 8px rgba(0,0,0,.3);">';
+    /* 铁律：信号日期若早于最近交易日，明确标注「较旧」，不得与「更新于」戳混同成新建议 */
+    var _sigDates = [];
+    (d.watch || []).concat(d.avoid || []).forEach(function(c){ if(c && c.signal_date) _sigDates.push(String(c.signal_date)); });
+    var _maxSig = _sigDates.length ? _sigDates.reduce(function(a,b){ return a > b ? a : b; }) : '';
+    var _maxSigStr = _maxSig ? (window._extractDateStr ? window._extractDateStr(_maxSig) : _maxSig.slice(0,10)) : '';
+    var _lastTrade = window._tradeDayStr ? window._tradeDayStr() : '';
+    if(_maxSigStr && _lastTrade && _maxSigStr < _lastTrade){
+      html += '<div style="font-size:12px;font-weight:700;color:#ffb74d;background:rgba(255,183,77,.12);border:1px solid rgba(255,183,77,.35);border-radius:8px;padding:6px 10px;margin-bottom:8px;line-height:1.5;">⚠️ 信号数据较旧（最新信号 ' + _maxSigStr.slice(5) + '）· 早于最近交易日 ' + _lastTrade.slice(5) + '，<b>非当日新信号，仅供参考</b>，请勿据此新建仓位。</div>';
+    }
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
     html += '<span style="font-size:15px;font-weight:800;">📊 回测驱动关注</span>';
     if(d.gen_time) html += _uBadge('盘后', '短线', d.gen_time);
