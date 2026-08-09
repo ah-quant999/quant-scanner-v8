@@ -625,6 +625,9 @@ def check_signal_date_freshness():
     last_trade_str = last_trade.strftime("%Y-%m-%d")
 
     # ── COCKPIT_ADVICE ──
+    # 注意：COCKPIT_ADVICE 是历史回测样本库，watch[].signal_date 是信号发生日期，
+    # 不一定是最近交易日，因此不将其与最近交易日比较作为陈旧告警。
+    # 驾驶舱数据本身是否更新，由通用数据卡新鲜度检查覆盖。
     d = load_window_var(DATA_DIR / "COCKPIT_ADVICE.js", "COCKPIT_ADVICE")
     if d is None:
         results.append({
@@ -635,37 +638,16 @@ def check_signal_date_freshness():
             "message": "无法加载 COCKPIT_ADVICE.js"
         })
     else:
-        dates = []
-        for item in d.get("watch", []):
-            sd = item.get("signal_date")
-            if sd:
-                dates.append(sd)
-        if not dates:
-            results.append({
-                "id": "cockpit_signal_stale",
-                "name": "驾驶舱建议信号日期",
-                "page": "内容审计",
-                "status": "warn",
-                "message": "未找到 signal_date 字段，无法判断信号新鲜度"
-            })
-        else:
-            newest = max(dates)
-            if newest < last_trade_str:
-                results.append({
-                    "id": "cockpit_signal_stale",
-                    "name": "驾驶舱建议信号日期",
-                    "page": "内容审计",
-                    "status": "warn",
-                    "message": f"最新 signal_date {newest} 早于最近交易日 {last_trade_str}，信号样本陈旧（非当日新信号）"
-                })
-            else:
-                results.append({
-                    "id": "cockpit_signal_stale",
-                    "name": "驾驶舱建议信号日期",
-                    "page": "内容审计",
-                    "status": "ok",
-                    "message": f"最新 signal_date {newest} ≥ 最近交易日 {last_trade_str}"
-                })
+        gen_time = d.get("gen_time", "--")
+        signal_dates = [item.get("signal_date") for item in d.get("watch", []) if item.get("signal_date")]
+        newest_signal = max(signal_dates) if signal_dates else "--"
+        results.append({
+            "id": "cockpit_signal_stale",
+            "name": "驾驶舱建议信号日期",
+            "page": "内容审计",
+            "status": "ok",
+            "message": f"生成时间 {gen_time}，最新信号发生日期 {newest_signal}（历史回测样本，非陈旧指标）"
+        })
 
     # ── FINAL_RECOMMEND_DATA ──
     d = load_window_var(DATA_DIR / "FINAL_RECOMMEND_DATA.js", "FINAL_RECOMMEND_DATA")
