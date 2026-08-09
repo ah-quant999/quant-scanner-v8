@@ -27,12 +27,11 @@ warnings.filterwarnings("ignore")
 
 # ============== 配置 ==============
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(BASE_DIR)
 # v8 原生化钩子（2026-08-02）：v8 仓通过 V8_OUT_DIR 环境变量重定向 DATA_DIR 到仓库根 out/
-_V8_OUT = os.environ.get("V8_OUT_DIR")
-if _V8_OUT:
-    DATA_DIR = _V8_OUT
-else:
-    DATA_DIR = os.path.join(BASE_DIR, "data")
+# 2026-08-10 修复：V8_OUT_DIR 为空字符串时统一回退到仓库根 out/，与 build_candidate_pool 口径一致。
+_V8_OUT = os.environ.get("V8_OUT_DIR") or os.path.join(REPO_ROOT, "out")
+DATA_DIR = _V8_OUT
 os.makedirs(DATA_DIR, exist_ok=True)
 
 OUTPUT_JSON = os.path.join(DATA_DIR, "scan_result.json")

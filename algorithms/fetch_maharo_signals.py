@@ -20,29 +20,17 @@ import json, os, sys, time, argparse
 import urllib.request, urllib.error
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(BASE_DIR)
 # v8 原生化钩子（2026-08-02）：v8 仓通过 V8_OUT_DIR 环境变量重定向 DATA_DIR 到仓库根 out/
-# 同时 v8 build_candidate_pool.py 读的是「mahoro_signals.json」（拼写 mahoro），
-# 而本脚本默认写「maharo_signals.json」（拼写 maharo）—— 在 v8 环境下改写为正确名
-_V8_OUT = os.environ.get("V8_OUT_DIR")
-if _V8_OUT:
-    DATA_DIR = _V8_OUT
-    GOLD_POOL_JSON = os.path.join(DATA_DIR, "gold_pool.json")
-    OUTPUT_JSON = os.path.join(DATA_DIR, "mahoro_signals.json")  # 拼写 mahoro 兼容下游
-    # v8 cookie 在 v8 data/（被 .gitignore 屏蔽），不在 v8 out/
-    COOKIE_FILE = os.path.join(os.path.dirname(_V8_OUT), "data", ".mahoro_cookies.txt")
-    os.makedirs(DATA_DIR, exist_ok=True)
-else:
-    DATA_DIR = os.path.join(BASE_DIR, "data")
-    OUTPUT_JSON = os.path.join(DATA_DIR, "maharo_signals.json")
-    GOLD_POOL_JSON = os.path.join(DATA_DIR, "gold_pool.json")
-    # 2026-08-09 修复：不设 V8_OUT_DIR 直接跑本脚本时，cookie 曾被写到
-    # algorithms/data/ —— 与 v8 环境下的 仓库根/data/ 不是同一处，导致
-    # 「本地登录成功但算法链仍读不到 cookie」。统一优先用仓库根 data/。
-    _REPO_DATA = os.path.join(os.path.dirname(BASE_DIR), "data")
-    COOKIE_FILE = os.path.join(
-        _REPO_DATA if os.path.isdir(_REPO_DATA) else DATA_DIR,
-        ".mahoro_cookies.txt",
-    )
+# 2026-08-10 修复：V8_OUT_DIR 被设为空字符串时（workflow env 与 input 同名导致），
+# 原 `if _V8_OUT:` 会把它当 False，导致与 build_candidate_pool.py 的读取目录不一致。
+# 统一口径：空/未设置时均回退到仓库根 out/，cookie 固定放在仓库根 data/。
+_V8_OUT = os.environ.get("V8_OUT_DIR") or os.path.join(REPO_ROOT, "out")
+DATA_DIR = _V8_OUT
+GOLD_POOL_JSON = os.path.join(DATA_DIR, "gold_pool.json")
+OUTPUT_JSON = os.path.join(DATA_DIR, "mahoro_signals.json")  # 拼写 mahoro 与下游一致
+COOKIE_FILE = os.path.join(REPO_ROOT, "data", ".mahoro_cookies.txt")
+os.makedirs(DATA_DIR, exist_ok=True)
 
 MAHORO_API_SIGNALS = "https://data.mahoro.cn/api/signals"
 MAHORO_AUTH_SEND = "https://data.mahoro.cn/api/auth/send-code"

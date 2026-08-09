@@ -722,7 +722,7 @@ def build():
         import os as _os
         wl = _os.path.join(DATA, "guanlan_watchlist.json")
         rp = _os.path.join(DATA, "guanlan_reports.json")
-        mh = _os.path.join(DATA, "maharo_signals.json")
+        mh = _os.path.join(DATA, "mahoro_signals.json")
         def _cnt(p, key):
             if not _os.path.exists(p):
                 return {"exists": False, "stocks": 0}

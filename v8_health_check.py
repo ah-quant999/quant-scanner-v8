@@ -634,14 +634,18 @@ def check_site_dom(site_html=None):
 
 
 def _last_trade_date(ref=None):
-    """返回 ref 日期之前（含）的最近一个 A 股交易日。"""
-    ref = ref or now_cst().date()
-    for i in range(30):
-        d = ref - timedelta(days=i)
-        dt = datetime(d.year, d.month, d.day, tzinfo=timezone(timedelta(hours=8)))
-        if not is_market_closed(dt):
-            return d
-    return None
+    """返回 ref 之前（含）的最近一个 A 股交易日。
+
+    关键：若 ref 在当天收盘（15:30）之前，则「最近交易日」应回退到上一交易日，
+    避免周一 07:36 早盘把 enter_date 上周五的数据误判为陈旧。
+    直接复用 last_trade_day_close() 的收盘时间口径。
+    """
+    ref = ref or now_cst()
+    if isinstance(ref, datetime):
+        dt = ref
+    else:
+        dt = datetime.combine(ref, datetime.min.time(), tzinfo=timezone(timedelta(hours=8)))
+    return last_trade_day_close(dt).date()
 
 
 def check_signal_date_freshness():

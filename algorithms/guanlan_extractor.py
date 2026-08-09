@@ -32,12 +32,13 @@ import requests as _requests
 from datetime import datetime, timedelta
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+REPO_ROOT = os.path.dirname(BASE_DIR)
 # v8 原生化钩子（2026-08-02）：v8 仓通过 V8_OUT_DIR 环境变量重定向 DATA_DIR 到仓库根 out/
-_V8_OUT = os.environ.get("V8_OUT_DIR")
-if _V8_OUT:
-    DATA_DIR = _V8_OUT
-else:
-    DATA_DIR = os.path.join(BASE_DIR, "data")
+# 2026-08-10 修复：V8_OUT_DIR 被设为空字符串时（workflow env 与 input 同名导致），
+# 原 `if _V8_OUT:` 会把它当 False，本脚本写 algorithms/data/ 而 build_candidate_pool.py
+# 读 out/，造成观澜台/maharo 来源恒为 0。空/未设置时统一回退到仓库根 out/。
+_V8_OUT = os.environ.get("V8_OUT_DIR") or os.path.join(REPO_ROOT, "out")
+DATA_DIR = _V8_OUT
 
 # 🔴 2026-08-09 修复：凭据路径不能跟着 DATA_DIR 走 out/。
 #    v8 环境下 V8_OUT_DIR=仓库根/out，原写法把 token 指向 out/zsxq_token.json——
