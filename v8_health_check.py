@@ -601,8 +601,120 @@ def check_site_dom(site_html=None):
     return results
 
 
-def build_report(cards, raw, site_sync, runner, local_sync, dom):
-    all_items = cards + raw + site_sync + runner + local_sync + dom
+def _last_trade_date(ref=None):
+    """返回 ref 日期之前（含）的最近一个 A 股交易日。"""
+    ref = ref or now_cst().date()
+    for i in range(30):
+        d = ref - timedelta(days=i)
+        dt = datetime(d.year, d.month, d.day, tzinfo=timezone(timedelta(hours=8)))
+        if not is_market_closed(dt):
+            return d
+    return None
+
+
+def check_signal_date_freshness():
+    """内容级陈旧检查：数据文件 update_time 新鲜，但内部信号/入选日期已落后最近交易日。
+
+    覆盖 COCKPIT_ADVICE (watch[].signal_date) 与 FINAL_RECOMMEND_DATA (stocks[].enter_date)。
+    使用 page="内容审计" 以绕过 self_heal 自动派发（内容级陈旧需算法/数据根治，不是简单刷新可修）。
+    """
+    results = []
+    last_trade = _last_trade_date()
+    if last_trade is None:
+        return results
+    last_trade_str = last_trade.strftime("%Y-%m-%d")
+
+    # ── COCKPIT_ADVICE ──
+    d = load_window_var(DATA_DIR / "COCKPIT_ADVICE.js", "COCKPIT_ADVICE")
+    if d is None:
+        results.append({
+            "id": "cockpit_signal_stale",
+            "name": "驾驶舱建议信号日期",
+            "page": "内容审计",
+            "status": "warn",
+            "message": "无法加载 COCKPIT_ADVICE.js"
+        })
+    else:
+        dates = []
+        for item in d.get("watch", []):
+            sd = item.get("signal_date")
+            if sd:
+                dates.append(sd)
+        if not dates:
+            results.append({
+                "id": "cockpit_signal_stale",
+                "name": "驾驶舱建议信号日期",
+                "page": "内容审计",
+                "status": "warn",
+                "message": "未找到 signal_date 字段，无法判断信号新鲜度"
+            })
+        else:
+            newest = max(dates)
+            if newest < last_trade_str:
+                results.append({
+                    "id": "cockpit_signal_stale",
+                    "name": "驾驶舱建议信号日期",
+                    "page": "内容审计",
+                    "status": "warn",
+                    "message": f"最新 signal_date {newest} 早于最近交易日 {last_trade_str}，信号样本陈旧（非当日新信号）"
+                })
+            else:
+                results.append({
+                    "id": "cockpit_signal_stale",
+                    "name": "驾驶舱建议信号日期",
+                    "page": "内容审计",
+                    "status": "ok",
+                    "message": f"最新 signal_date {newest} ≥ 最近交易日 {last_trade_str}"
+                })
+
+    # ── FINAL_RECOMMEND_DATA ──
+    d = load_window_var(DATA_DIR / "FINAL_RECOMMEND_DATA.js", "FINAL_RECOMMEND_DATA")
+    if d is None:
+        results.append({
+            "id": "final_enter_stale",
+            "name": "最终推荐入选日期",
+            "page": "内容审计",
+            "status": "warn",
+            "message": "无法加载 FINAL_RECOMMEND_DATA.js"
+        })
+    else:
+        dates = []
+        for s in d.get("stocks", []):
+            ed = s.get("enter_date")
+            if ed:
+                dates.append(ed)
+        if not dates:
+            results.append({
+                "id": "final_enter_stale",
+                "name": "最终推荐入选日期",
+                "page": "内容审计",
+                "status": "warn",
+                "message": "未找到 enter_date 字段，无法判断入选新鲜度"
+            })
+        else:
+            newest = max(dates)
+            if newest < last_trade_str:
+                results.append({
+                    "id": "final_enter_stale",
+                    "name": "最终推荐入选日期",
+                    "page": "内容审计",
+                    "status": "warn",
+                    "message": f"最新 enter_date {newest} 早于最近交易日 {last_trade_str}，最终推荐数据陈旧"
+                })
+            else:
+                results.append({
+                    "id": "final_enter_stale",
+                    "name": "最终推荐入选日期",
+                    "page": "内容审计",
+                    "status": "ok",
+                    "message": f"最新 enter_date {newest} ≥ 最近交易日 {last_trade_str}"
+                })
+
+    return results
+
+
+def build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh=None):
+    all_items = cards + raw + site_sync + runner + local_sync + dom + (signal_fresh or [])
     ok = sum(1 for x in all_items if x["status"] == "ok")
     warn = sum(1 for x in all_items if x["status"] == "warn")
     fail = sum(1 for x in all_items if x["status"] == "fail")
@@ -709,7 +821,9 @@ def main():
     if args.site:
         dom = check_site_dom()
 
-    report = build_report(cards, raw, site_sync, runner, local_sync, dom)
+    signal_fresh = check_signal_date_freshness()
+
+    report = build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh)
     write_health_js(report)
 
     # 打印摘要

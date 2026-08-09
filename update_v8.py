@@ -483,12 +483,12 @@ def _write_js(var_name, obj):
 
     if isinstance(lite_obj, list):
         # 顶层数组：包装成 dict（同步 sync_v6_to_v8 规则）
-        lite_obj = {"data": lite_obj, "update_time": _pick_ts(None), "build_time": now_ts}
+        lite_obj = {"data": lite_obj, "update_time": _pick_ts(None), "republish_time": now_ts}
     elif isinstance(lite_obj, dict):
         existing = lite_obj.get("update_time") or lite_obj.get("calc_time") or ""
         lite_obj["update_time"] = _pick_ts(existing)
-        # build_time 仅供排障，前端一律不得当作「更新于」展示
-        lite_obj["build_time"] = now_ts
+        # republish_time = 本次构建/重部署时间，仅用于排障与缓存戳，前端不得当作「数据时间」展示
+        lite_obj["republish_time"] = now_ts
 
     with open(out_path, "w", encoding='utf-8') as f:
         f.write(f"window.{var_name} = ")
