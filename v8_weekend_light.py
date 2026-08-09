@@ -95,6 +95,30 @@ def dispatch_build_deploy():
         return False
 
 
+def refresh_stock_metadata():
+    """周度全量股票基础元数据巡检：新股上市/退市检测，并更新行业/概念/拼音映射。"""
+    script = BASE / "algorithms" / "refresh_stock_metadata.py"
+    if not script.exists():
+        print(f"  ⚠️ 缺失 {script}，跳过元数据巡检")
+        return 1
+    print(f"  ▶ 运行 {script.name}")
+    r = subprocess.run(
+        [sys.executable, str(script)],
+        cwd=str(BASE),
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        timeout=1200,
+    )
+    tail = "\n".join((r.stdout or "").strip().splitlines()[-20:])
+    if tail:
+        print("  " + tail.replace("\n", "\n  "))
+    if r.returncode != 0:
+        err = "\n".join((r.stderr or "").strip().splitlines()[-10:])
+        print(f"  ⚠️ 元数据巡检退出码 {r.returncode}: {err}")
+    return r.returncode
+
+
 def main():
     dry = "--dry-run" in sys.argv
     now = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S")
@@ -105,7 +129,14 @@ def main():
     rc, out = read_handoff()
     print(out[:2000])
 
-    # 2. 写 WEEKEND_RUN.js
+    # 2. 周度股票基础元数据巡检（新股/退市/行业/概念/拼音）
+    print("\n## 周度股票基础元数据巡检（不抓行情）")
+    if dry:
+        print("[DRY-RUN] 将运行 refresh_stock_metadata.py")
+    else:
+        refresh_stock_metadata()
+
+    # 3. 写 WEEKEND_RUN.js
     print("\n## 注入 WEEKEND_RUN 标注")
     if dry:
         now = datetime.now()
@@ -113,7 +144,7 @@ def main():
     else:
         write_weekend_run()
 
-    # 3. dispatch build_deploy
+    # 4. dispatch build_deploy
     print("\n## 触发部署")
     if dry:
         print("[DRY-RUN] 将 dispatch v8_build_deploy.yml")

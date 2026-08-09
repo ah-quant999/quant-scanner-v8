@@ -80,6 +80,8 @@ DATA_SOURCES = {
     "risk_gauge.json":             "RISK_GAUGE",
     "stock_quote.json":            "STOCK_QUOTE",
     "avg_price_data.json":         "AVG_PRICE_DATA",
+    "weekend_meta_report.json":      "WEEKEND_META_REPORT",
+    "delisted_stocks.json":        "DELISTED_STOCKS",
 }
 
 # 变量名 → 更新时段

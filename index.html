@@ -400,7 +400,7 @@ html>
     <script src="data/ANALYST_RATINGS.js?v=20260808164601"></script>
     <script src="data/SUSPENSION_ALERT.js?v=20260808134142"></script>
     <script src="data/GOLD_POOL.js?v=20260808152750"></script>
-    <script src="data/STOCK_LIST.js?v=20260808152750"></script>
+    <script src="data/STOCK_LIST.js?v=20260809163946"></script>
     <script src="data/STOCK_PROFILE.js?v=20260807165809"></script>
     <script src="data/STOCK_QUOTE.js?v=20260808133356"></script>
     <script src="data/MACRO_DATA.js?v=20260808164220"></script>
@@ -417,7 +417,7 @@ html>
 <script src="data/IPO_DATA.js?v=20260808164131"></script>
     <script src="data/CRISIS_DATA.js?v=20260808164250"></script>
     <script src="data/JUDGMENT_DATA.js?v=20260808164616"></script>
-    <script src="data/STOCK_RPS.js?v=20260809160252"></script>
+    <script src="data/STOCK_RPS.js?v=20260808235925"></script>
     <script>
 window.V8_CAL = {weeks:[],legend:[]};
 /* ===== 2026 A股交易日历（每年需更新） ===== */
@@ -1087,22 +1087,22 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_SZ_HISTORY.js?v=20260808164612"></script>
 <script src="data/MAHORO.js?v=20260808152750"></script>
 <script src="data/CANDIDATE.js?v=20260807171810"></script>
-    <script src="data/FOUR_VOLUME.js?v=20260809160252"></script>
+    <script src="data/FOUR_VOLUME.js?v=20260808181501"></script>
     <script src="data/STOCK_STOP_DATA.js?v=20260808201257"></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=20260808200915"></script>
 <script src="data/COCKPIT_BACKTEST.js?v=20260808200921"></script>
 <script src="data/BACKTEST_TDX.js?v=20260808"></script>
 <script src="data/EXPERIMENT.js?v=20260808164604"></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=20260809160252"></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=20260808224805"></script>
 <script src="data/ETF_PULSE.js?v=20260808164512"></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=20260808164551"></script>
 <script src="data/TOP10_DAILY.js"></script>
-<script src="data/WEEKEND_RUN.js?v=20260809160252"></script>
+<script src="data/WEEKEND_RUN.js?v=20260808181501"></script>
 <script src="data/V8_CAL.js"></script>
 <script src="data/W52_HIGH.js"></script>
 <script src="data/CANDIDATE_QUOTES.js?v=20260808164608"></script>
 <script src="data/RUNNER_STATUS.js?v=20260808181501"></script>
-<script src="data/HEALTH_CHECK.js?v=20260809160256"></script>
+<script src="data/HEALTH_CHECK.js?v=20260809164018"></script>
 </head>
 <body>
 
@@ -4841,6 +4841,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>0-20点每2h</td><td>runner_health_alert</td><td>Runner 健康监控（离线开 Issue）</td><td>云端</td></tr>
           <tr><td>14:00</td><td>v8_self_heal</td><td>云端自愈器：检测陈旧模块 → 自动 re-fetch 补跑（2026-08-06 起 dispatch 云端主链，不再依赖 cn runner 在线）</td><td>云端</td></tr>
           <tr><td>15:30</td><td>周末选股四模块T+1更新部署</td><td>选股数据更新+部署+臃肿度/崩溃风险体检（v8_bloat_check.py --alert，仅周六）</td><td>本机</td></tr>
+          <tr style="background:rgba(56,189,248,.06);"><td>19:30</td><td>v8_weekend_light.py（WorkBuddy 周末轻量维护）</td><td>读交接 / 新股上市+退市股元数据巡检 / 更新 WEEKEND_RUN.js / dispatch 部署</td><td>本机（阿狸咪）</td></tr>
           <tr><td>21:00</td><td>cloud_weekly_cleanup</td><td>orphan 清理 + 新鲜度体检</td><td>云端</td></tr>
         </table>
 
@@ -4848,6 +4849,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <table class="lg-table">
           <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
           <tr><td>15:30</td><td>周末选股四模块T+1更新部署</td><td>选股数据更新+部署（不含臃肿度体检）</td><td>本机</td></tr>
+          <tr style="background:rgba(56,189,248,.06);"><td>19:30</td><td>v8_weekend_light.py（WorkBuddy 周末轻量维护）</td><td>读交接 / 新股上市+退市股元数据巡检 / 更新 WEEKEND_RUN.js / dispatch 部署</td><td>本机（阿狸咪）</td></tr>
           <tr><td>23:00</td><td>v8_cleanup</td><td>缓存/日志清理</td><td>云端 ubuntu</td></tr>
         </table>
 
@@ -4951,6 +4953,10 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p">· <b>update_time / calc_time / data_time</b> = 数据真实产生时间，前端「更新于」胶囊只读这些字段。<br>· <b>republish_time</b> = 本次构建/重部署时间（由 <code>update_v8.py</code> 注入），仅用于排障与 <code>?v=</code> 缓存戳，<b>不得当作数据时间展示</b>。原名 <code>build_time</code> 易产生歧义，已重命名。</div>
         <div class="logic-h">内容级陈旧检测</div>
         <div class="logic-p"><code>v8_health_check.py</code> 在常规「update_time 是否过期」之外，新增 <b>signal_date / enter_date 偏差检查</b>：<br>· 读取 <code>COCKPIT_ADVICE.watch[].signal_date</code> 与 <code>FINAL_RECOMMEND_DATA.stocks[].enter_date</code>，取最新日期与「最近交易日」比对。<br>· 若信号日期早于最近交易日，在健康检查中标记为 <b>内容审计 warn</b>，并绕过自动派发（内容级陈旧需算法/数据根治，不能简单刷新）。<br>· 同时，驾驶舱建议卡前端已加「⚠️ 信号数据较旧」横幅，明确告知非当日新信号。</div>
+        <div class="logic-h">T+N 信号台账深度检查</div>
+        <div class="logic-p"><code>v8_health_check.py</code> 扫描 <code>raw_data/history/top10_daily_YYYYMMDD.json</code>，统计最早/最新快照之间的 A 股交易日跨度。<br>· 若跨度 &lt; 20 个交易日（不足以支撑 T+20 跟踪），标 <b>warn</b>，提示需持续每日生成快照或补全历史。<br>· 2026-08-09 已从 <code>triple_history.json</code> 补全 07-26/27/30 与 08-03 共 4 个缺失快照，跨度从约 5 个交易日提升到 <b>10 个交易日</b>；但仍不足 20 日，需继续随每日运行自然累积。</div>
+        <div class="logic-h">新股上市 / 退市股 周度元数据巡检</div>
+        <div class="logic-p">已并入现有<b>周末轻量维护</b>任务（不新建 automation）：<br>· <code>v8_weekend_light.py</code> 调用 <code>algorithms/refresh_stock_metadata.py</code> 每周跑一次全量 A 股 + 港股名称列表。<br>· 与上周比对，识别<b>新股上市</b>（新增代码）和<b>退市股</b>（消失代码）。<br>· 为新股补充 <b>industry / board / concepts / pinyin</b> 静态映射（写入 <code>algorithms/stock_industry_concepts.json</code> 与 <code>algorithms/stock_pinyin.json</code>），确保个股查询、板块/行业/概念标签正确。<br>· 退市股归档至 <code>raw_data/delisted_stocks.json</code>，保留最后已知的板块/行业，不影响活跃股票列表。</div>
         <div class="logic-h">2026-08-09 审计结论</div>
         <div class="logic-p">展示层诚实：无硬编码假「今日」、无使用重打包戳冒充数据时间、?v= 缓存戳等于真实数据日期。当前检出 <b>COCKPIT_ADVICE 信号样本陈旧（最新 signal_date 2026-07-09，最近交易日 2026-08-07）</b>，已告警并加前端警示。完整报告见 <code>AUDIT_TIME_DATA_2026-08-09.html</code>。</div>
       </div>

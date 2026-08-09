@@ -713,8 +713,86 @@ def check_signal_date_freshness():
     return results
 
 
-def build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh=None):
-    all_items = cards + raw + site_sync + runner + local_sync + dom + (signal_fresh or [])
+def _count_trade_days(start, end):
+    """统计 [start, end] 之间的 A 股交易日数量（两端均含）。"""
+    if not start or not end or start > end:
+        return 0
+    cnt = 0
+    d = start
+    while d <= end:
+        dt = datetime(d.year, d.month, d.day, tzinfo=timezone(timedelta(hours=8)))
+        if not is_market_closed(dt):
+            cnt += 1
+        d += timedelta(days=1)
+    return cnt
+
+
+def check_top10_history_depth():
+    """T+N 信号台账深度检查：raw_data/history/top10_daily_YYYYMMDD.json 的最早/最新交易日跨度。
+
+    top10_daily 按日快照是 T+N 回测与跟踪的根本来源；跨度不足时 T+20 等长周期会缺样本。
+    使用 page="内容审计" 以绕过 self_heal 自动派发（历史深度只能随每日运行自然累积，不可简单刷新）。
+    """
+    results = []
+    hist_dir = DATA_DIR.parent / "raw_data" / "history"
+    if not hist_dir.exists():
+        results.append({
+            "id": "top10_history_depth",
+            "name": "T+N 信号台账深度",
+            "page": "内容审计",
+            "status": "warn",
+            "message": f"历史快照目录不存在: {hist_dir}",
+        })
+        return results
+
+    pat = re.compile(r"top10_daily_(\d{8})\.json$")
+    dates = []
+    for fn in hist_dir.iterdir():
+        m = pat.match(fn.name)
+        if not m:
+            continue
+        try:
+            dates.append(datetime.strptime(m.group(1), "%Y%m%d").date())
+        except Exception:
+            continue
+
+    if not dates:
+        results.append({
+            "id": "top10_history_depth",
+            "name": "T+N 信号台账深度",
+            "page": "内容审计",
+            "status": "warn",
+            "message": "未找到任何 top10_daily_YYYYMMDD.json 历史快照",
+        })
+        return results
+
+    earliest = min(dates)
+    latest = max(dates)
+    trade_days = _count_trade_days(earliest, latest)
+    required = 20  # 满足 T+20 所需的最小交易日跨度
+
+    if trade_days < required:
+        status = "warn"
+        msg = (f"top10_daily 历史跨度仅 {trade_days} 个交易日 "
+               f"({earliest} ~ {latest})，低于 T+20 所需的 {required} 个交易日；"
+               f"长周期回测/跟踪会缺样本，需持续每日生成快照或补全历史")
+    else:
+        status = "ok"
+        msg = (f"top10_daily 历史跨度 {trade_days} 个交易日 "
+               f"({earliest} ~ {latest})，满足 T+20 跟踪需求")
+
+    results.append({
+        "id": "top10_history_depth",
+        "name": "T+N 信号台账深度",
+        "page": "内容审计",
+        "status": status,
+        "message": msg,
+    })
+    return results
+
+
+def build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh=None, history_depth=None):
+    all_items = cards + raw + site_sync + runner + local_sync + dom + (signal_fresh or []) + (history_depth or [])
     ok = sum(1 for x in all_items if x["status"] == "ok")
     warn = sum(1 for x in all_items if x["status"] == "warn")
     fail = sum(1 for x in all_items if x["status"] == "fail")
@@ -822,8 +900,9 @@ def main():
         dom = check_site_dom()
 
     signal_fresh = check_signal_date_freshness()
+    history_depth = check_top10_history_depth()
 
-    report = build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh)
+    report = build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh, history_depth)
     write_health_js(report)
 
     # 打印摘要
