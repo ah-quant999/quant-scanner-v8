@@ -35,7 +35,14 @@ else:
     DATA_DIR = os.path.join(BASE_DIR, "data")
     OUTPUT_JSON = os.path.join(DATA_DIR, "maharo_signals.json")
     GOLD_POOL_JSON = os.path.join(DATA_DIR, "gold_pool.json")
-    COOKIE_FILE = os.path.join(DATA_DIR, ".mahoro_cookies.txt")
+    # 2026-08-09 修复：不设 V8_OUT_DIR 直接跑本脚本时，cookie 曾被写到
+    # algorithms/data/ —— 与 v8 环境下的 仓库根/data/ 不是同一处，导致
+    # 「本地登录成功但算法链仍读不到 cookie」。统一优先用仓库根 data/。
+    _REPO_DATA = os.path.join(os.path.dirname(BASE_DIR), "data")
+    COOKIE_FILE = os.path.join(
+        _REPO_DATA if os.path.isdir(_REPO_DATA) else DATA_DIR,
+        ".mahoro_cookies.txt",
+    )
 
 MAHORO_API_SIGNALS = "https://data.mahoro.cn/api/signals"
 MAHORO_AUTH_SEND = "https://data.mahoro.cn/api/auth/send-code"
