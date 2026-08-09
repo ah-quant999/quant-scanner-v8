@@ -75,6 +75,45 @@ h1{font-size:22px;font-weight:800;color:var(--txt);margin-bottom:8px;display:fle
 <!-- 重要日历由 data/V8_CAL.js 自动注入（cloud_fetch_v8.py 的 f_v8_cal 每日生成，自动切月） -->
 <script src="data/V8_CAL.js"></script>
 <script>
+// 2026-08-09 修复：V8_CAL.js 里的 today 是数据生成时刻写死的，calendar.html 单独页面也按实际北京时间重新计算。
+function _v8CalTodayKeys(cal){
+  var keys = {};
+  var baseMatch = String((cal||{}).month||'').match(/(\d{4})年(\d{1,2})月/);
+  var baseY = baseMatch ? +baseMatch[1] : (new Date().getFullYear());
+  var baseM = baseMatch ? +baseMatch[2] : ((new Date().getMonth())+1);
+  var now = new Date();
+  var tY, tM, tD;
+  try{
+    var fmt = new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
+    var p = {}; (fmt.formatToParts(now)||[]).forEach(function(part){ if(part && part.type) p[part.type]=part.value; });
+    tY = +p.year; tM = +p.month; tD = +p.day;
+  }catch(e){ tY = now.getFullYear(); tM = now.getMonth()+1; tD = now.getDate(); }
+  (cal.weeks||[]).forEach(function(w){
+    var range = String(w.dates||'').split('-');
+    if(range.length !== 2) return;
+    var parseMD = function(s){
+      var m = String(s).trim().match(/(\d{1,2})\/(\d{1,2})/);
+      return m ? {m:+m[1], d:+m[2]} : null;
+    };
+    var start = parseMD(range[0]);
+    if(!start) return;
+    var y = baseY;
+    if(start.m !== baseM){
+      if(start.m === 12 && baseM === 1) y = baseY - 1;
+      else if(start.m === 1 && baseM === 12) y = baseY + 1;
+    }
+    var cur = new Date(Date.UTC(y, start.m-1, start.d));
+    (w.days||[]).forEach(function(d){
+      if(!d) return;
+      if(tY === cur.getUTCFullYear() && tM === (cur.getUTCMonth()+1) && tD === cur.getUTCDate()){
+        keys[String(w.no)+'-'+String(d.num)] = true;
+      }
+      cur.setUTCDate(cur.getUTCDate()+1);
+    });
+  });
+  return keys;
+}
+
 // 渲染日历
 (function(){
   var D = window.V8_CAL || {weeks:[],legend:[]};
@@ -87,6 +126,7 @@ h1{font-size:22px;font-weight:800;color:var(--txt);margin-bottom:8px;display:fle
       return '<div class="event '+cls+'">'+mark+e.text+'</div>';
     }).join('');
   }
+  var todayKeys = _v8CalTodayKeys(D);
   var c = document.getElementById('v8calcontent');
   if(c){
     var html = '';
@@ -96,7 +136,7 @@ h1{font-size:22px;font-weight:800;color:var(--txt);margin-bottom:8px;display:fle
       html += days.map(function(d){return '<div class="head">'+d+'</div>';}).join('');
       w.days.forEach(function(d,i){
         var cl = d.dim ? 'day dim' : 'day';
-        if(d.today) cl += ' today';
+        if(todayKeys[String(w.no)+'-'+String(d.num)]) cl += ' today';
         html += '<div class="'+cl+'">';
         html += '<div class="day-num">'+d.num+'</div>';
         html += fmtEvents(d.events);

@@ -5811,6 +5811,45 @@ function renderLimitUpHeatmap(){
 (function(){
   var D = window.V8_CAL || {weeks:[],legend:[]};
   var days = ['周一','周二','周三','周四','周五','周六','周日'];
+
+  /* 2026-08-09 修复：V8_CAL.js 里的 today 是数据生成时刻写死的，前端根据实际北京时间重新计算。
+   * 依据 D.month 解析基础年月，再按 w.dates 的每周起始日期顺序推出每个格子的真实日期。 */
+  window._v8CalTodayKeys = function(cal){
+    var keys = {};
+    var baseMatch = String((cal||{}).month||'').match(/(\d{4})年(\d{1,2})月/);
+    var baseY = baseMatch ? +baseMatch[1] : (new Date().getFullYear());
+    var baseM = baseMatch ? +baseMatch[2] : ((new Date().getMonth())+1);
+    var now = new Date();
+    var parts = window._cstParts ? window._cstParts(now) : null;
+    var tY = parts ? parts.y : now.getFullYear();
+    var tM = parts ? parts.m : (now.getMonth()+1);
+    var tD = parts ? parts.d : now.getDate();
+    (cal.weeks||[]).forEach(function(w){
+      var range = String(w.dates||'').split('-');
+      if(range.length !== 2) return;
+      var parseMD = function(s){
+        var m = String(s).trim().match(/(\d{1,2})\/(\d{1,2})/);
+        return m ? {m:+m[1], d:+m[2]} : null;
+      };
+      var start = parseMD(range[0]);
+      if(!start) return;
+      var y = baseY;
+      if(start.m !== baseM){
+        if(start.m === 12 && baseM === 1) y = baseY - 1;       // 12月属于上一年
+        else if(start.m === 1 && baseM === 12) y = baseY + 1;  // 1月属于下一年
+      }
+      var cur = new Date(Date.UTC(y, start.m-1, start.d));
+      (w.days||[]).forEach(function(d){
+        if(!d) return;
+        if(tY === cur.getUTCFullYear() && tM === (cur.getUTCMonth()+1) && tD === cur.getUTCDate()){
+          keys[String(w.no)+'-'+String(d.num)] = true;
+        }
+        cur.setUTCDate(cur.getUTCDate()+1);
+      });
+    });
+    return keys;
+  };
+
   function fmtEvents(events){
     if(!events || !events.length) return '';
     return events.map(function(e){
@@ -5819,6 +5858,7 @@ function renderLimitUpHeatmap(){
       return '<div class="v8cal-event '+cls+'">'+mark+e.text+'</div>';
     }).join('');
   }
+  var todayKeys = window._v8CalTodayKeys(D);
   var c = document.getElementById('v8calcontent');
   if(c){
     var html = '';
@@ -5830,7 +5870,7 @@ function renderLimitUpHeatmap(){
       html += '<div class="v8cal-grid">';
       w.days.forEach(function(d){
         var cl = d.dim ? 'v8cal-day dim' : 'v8cal-day';
-        if(d.today) cl += ' today';
+        if(todayKeys[String(w.no)+'-'+String(d.num)]) cl += ' today';
         html += '<div class="'+cl+'">';
         html += '<div class="v8cal-day-num">'+d.num+'</div>';
         html += fmtEvents(d.events);
@@ -5879,20 +5919,18 @@ function renderLimitUpHeatmap(){
 /* ===== 今日事件卡：V8_CAL 日历事件 ===== */
 (function(){
   var D = window.V8_CAL || {weeks:[]};
-  var now = new Date();
-  var todayNum = now.getDate();
+  var todayKeys = window._v8CalTodayKeys ? window._v8CalTodayKeys(D) : {};
   var todayEvents = [];
-  var found = false;
   D.weeks.forEach(function(w){
     w.days.forEach(function(d){
-      if(d.today && !found){ todayEvents = d.events || []; found = true; }
-      else if(!found && d.num === todayNum){ todayEvents = d.events || []; }
+      if(todayKeys[String(w.no)+'-'+String(d.num)]){ todayEvents = d.events || []; }
     });
   });
   var dateEl = document.getElementById('v8DayDate');
   if(dateEl){
-    var m = now.getMonth() + 1;
-    dateEl.textContent = now.getFullYear() + '年' + m + '月' + todayNum + '日';
+    var parts = window._cstParts ? window._cstParts(new Date()) : null;
+    if(parts) dateEl.textContent = parts.y + '年' + parts.m + '月' + parts.d + '日';
+    else { var now = new Date(); dateEl.textContent = now.getFullYear() + '年' + (now.getMonth()+1) + '月' + now.getDate() + '日'; }
   }
   var box = document.getElementById('v8TodayAll');
   if(!box) return;
@@ -10003,6 +10041,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       return '<div class="v8cal-event '+cls+'">'+mark+e.text+'</div>';
     }).join('');
   }
+  var todayKeys = window._v8CalTodayKeys ? window._v8CalTodayKeys(D) : {};
   var c = document.getElementById('v8calcontent');
   if(c){
     var html = '';
@@ -10014,7 +10053,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       html += '<div class="v8cal-grid">';
       w.days.forEach(function(d){
         var cl = d.dim ? 'v8cal-day dim' : 'v8cal-day';
-        if(d.today) cl += ' today';
+        if(todayKeys[String(w.no)+'-'+String(d.num)]) cl += ' today';
         html += '<div class="'+cl+'">';
         html += '<div class="v8cal-day-num">'+d.num+'</div>';
         html += fmtEvents(d.events);
@@ -10066,19 +10105,18 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
 /* 今日事件卡兜底：V8_CAL 日历事件（确保执行） */
 (function(){
   var D = window.V8_CAL || {weeks:[]};
-  var now = new Date();
-  var todayNum = now.getDate();
+  var todayKeys = window._v8CalTodayKeys ? window._v8CalTodayKeys(D) : {};
   var todayEvents = [];
-  var found = false;
   D.weeks.forEach(function(w){
     w.days.forEach(function(d){
-      if(d.today && !found){ todayEvents = d.events || []; found = true; }
-      else if(!found && d.num === todayNum){ todayEvents = d.events || []; }
+      if(todayKeys[String(w.no)+'-'+String(d.num)]){ todayEvents = d.events || []; }
     });
   });
   var dateEl = document.getElementById('v8DayDate');
   if(dateEl){
-    dateEl.textContent = now.getFullYear() + '年' + (now.getMonth()+1) + '月' + todayNum + '日';
+    var parts = window._cstParts ? window._cstParts(new Date()) : null;
+    if(parts) dateEl.textContent = parts.y + '年' + parts.m + '月' + parts.d + '日';
+    else { var now = new Date(); dateEl.textContent = now.getFullYear() + '年' + (now.getMonth()+1) + '月' + now.getDate() + '日'; }
   }
   var box = document.getElementById('v8TodayAll');
   if(!box) return;
