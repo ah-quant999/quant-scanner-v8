@@ -19,6 +19,7 @@ nul
 data/.mahoro_cookies.txt
 data/.maharo_cookies.txt
 data/zsxq_token.json
+data/.github_pat.txt
 data/.wc_jwt_cache.json
 data/.neodata_token
 data/zszxq_token.json
