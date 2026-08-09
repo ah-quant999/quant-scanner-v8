@@ -2492,7 +2492,9 @@ def update_gold_pool_from_scan(output):
     # 候选股池（None = 未构建 → 旧逻辑不限制）
     cand = load_candidate_pool()
     cand_keys = set(cand.keys()) if cand else None
-    RESEARCH_SRC = ("观澜台", "观澜台研报", "maharo研报", "投行研报")
+    # 注："观澜台"(watchlist) 是 "观澜台研报" 的去重聚合，两者高度重叠，
+    # 故研报覆盖判定只保留真正的研报来源，避免同一只股票被重复加分。
+    RESEARCH_SRC = ("观澜台研报", "maharo研报", "投行研报")
 
     def _merge_sources(entry, extra):
         src = entry.setdefault("sources", [])
