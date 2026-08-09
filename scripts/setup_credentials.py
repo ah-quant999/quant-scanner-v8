@@ -61,24 +61,30 @@ def main():
         else:
             print("ℹ️ 未输入，未创建文件。\n")
 
-    # maharo cookie
-    print("【maharo 研报】")
-    print("获取方式：登录 maharo 网站 → F12 → Network → 抓任意 .json/.api 请求")
-    print("→ 复制 Request Headers 里的 Cookie 整串。")
-    print("请粘贴 cookie（粘贴完后按一次回车结束）：")
-    cookie = input_multiline(
-        "提示：如果 cookie 只有一行，粘贴后按两下回车即可。"
-    ).strip()
+    # mahoro cookie —— 邮箱验证码登录，不需要手动抓 cookie
+    print("【mahoro 研报 / 投行信号】")
+    print("mahoro.cn 用邮箱验证码登录，不需要去 F12 抓 cookie。")
+    ans = input("现在登录并刷新 cookie？(y/N)：").strip().lower()
 
-    if cookie:
-        with open(MAHARO_PATH, "w", encoding="utf-8") as f:
-            f.write(cookie)
-        print(f"✅ 已保存到 {MAHARO_PATH}\n")
+    if ans == "y":
+        sys.path.insert(0, os.path.join(ROOT, "algorithms"))
+        os.environ.setdefault("V8_OUT_DIR", os.path.join(ROOT, "out"))
+        try:
+            import fetch_maharo_signals as _m
+            email = input("邮箱（直接回车用默认 ljcat999@gmail.com）：").strip() \
+                or "ljcat999@gmail.com"
+            cookie = _m.authenticate(email, non_interactive=False)
+            if cookie:
+                print(f"✅ 登录成功，cookie 已写入 {MAHARO_PATH}\n")
+            else:
+                print("❌ 登录失败，稍后可重试。\n")
+        except Exception as e:
+            print(f"❌ 登录过程出错: {e}\n")
     else:
         if os.path.exists(MAHARO_PATH):
-            print("ℹ️ 未输入，保留现有文件。\n")
+            print("ℹ️ 已跳过，保留现有 cookie 文件。\n")
         else:
-            print("ℹ️ 未输入，未创建文件。\n")
+            print("ℹ️ 已跳过，未创建 cookie 文件。\n")
 
     print("=" * 60)
     print("配置完成。下一次运行 run_algorithms.py 时会自动读取这两个凭据。")
