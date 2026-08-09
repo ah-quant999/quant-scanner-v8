@@ -469,16 +469,32 @@ window.V8_CAL = {weeks:[],legend:[]};
     if(!d || isNaN(d.getTime())) return '';
     return d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
   };
+  /* 将任意 Date 拆成北京时间 (Asia/Shanghai) 的年/月/日/时/分。
+   * 用 Intl.DateTimeFormat.formatToParts 保证月日时分均为两位数，
+   * 避免 toLocaleString 在某些浏览器下返回 2026/8/9 导致正则匹配失败。 */
+  window._cstParts = function(d){
+    d = d || new Date();
+    var p = {year:'1970',month:'01',day:'01',hour:'00',minute:'00'};
+    try{
+      var fmt = new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});
+      (fmt.formatToParts(d)||[]).forEach(function(part){ if(part && part.type) p[part.type]=part.value; });
+    }catch(e){}
+    return {
+      y: +(p.year || d.getFullYear()),
+      m: +(p.month || d.getMonth()+1),
+      d: +(p.day || d.getDate()),
+      hh: +(p.hour || d.getHours()),
+      mm: +(p.minute || d.getMinutes())
+    };
+  };
   /* 当前「交易日」字符串（主人令 2026-08-07：开盘 09:30 前都算上一交易日）
      用途：盘后算法链「今日已跑完/已入仓」胶囊——6号盘后数据在7号 09:30 前仍判为「今日跑过」 */
   window._tradeDayStr = function(){
     var now = new Date();
-    var cst = now.toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false});
-    var m = cst.match(/(\d{4})\/(\d{2})\/(\d{2})[ T](\d{2}):(\d{2})/);
-    if(!m) return now.toISOString().slice(0,10);
-    var y=+m[1], mo=+m[2], d=+m[3], hh=+m[4], mm=+m[5];
-    var todayCST = new Date(Date.UTC(y, mo-1, d)); // UTC0点=CST8点，日期正确
-    var beforeOpen = (hh < 9 || (hh === 9 && mm < 30));
+    var parts = window._cstParts ? window._cstParts(now) : null;
+    if(!parts) return now.toISOString().slice(0,10);
+    var todayCST = new Date(Date.UTC(parts.y, parts.m-1, parts.d)); // UTC0点=CST8点，日期正确
+    var beforeOpen = (parts.hh < 9 || (parts.hh === 9 && parts.mm < 30));
     var base = todayCST;
     if(beforeOpen){
       for(var i=1;i<=7;i++){
@@ -507,6 +523,8 @@ window.V8_CAL = {weeks:[],legend:[]};
     // 优先用 _parseAsCST（支持 ISO / YYYY-MM-DD HH:MM:SS / 本地时间等多种格式）
     var d = window._parseAsCST ? window._parseAsCST(genTimeStr) : null;
     if(d && !isNaN(d.getTime())){
+      var parts = window._cstParts ? window._cstParts(d) : null;
+      if(parts) return String(parts.y)+'-'+String(parts.m).padStart(2,'0')+'-'+String(parts.d).padStart(2,'0');
       return d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
     }
     // fallback：直接 YYYY-MM-DD 前缀
@@ -518,10 +536,9 @@ window.V8_CAL = {weeks:[],legend:[]};
     var dataDate = window._extractDateStr(genTimeStr);
     if(!dataDate) return { show:false, label:'' };
     var now = new Date();
-    var cst = now.toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false});
-    var m = cst.match(/(\d{4})\/(\d{2})\/(\d{2})[ T](\d{2}):(\d{2})/);
-    if(!m) return { show:false, label:'' };
-    var todayCST = new Date(Date.UTC(+m[1], +m[2]-1, +m[3]));
+    var parts = window._cstParts ? window._cstParts(now) : null;
+    if(!parts) return { show:false, label:'' };
+    var todayCST = new Date(Date.UTC(parts.y, parts.m-1, parts.d));
     var dp = dataDate.split('-').map(Number);
     var dataDay = new Date(Date.UTC(dp[0], dp[1]-1, dp[2]));
     var diff = Math.round((todayCST.getTime() - dataDay.getTime()) / 864e5);
@@ -9719,11 +9736,21 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var badge=_rps$('strpsRunBadge');
     if(badge){
       var runInfo = window._runBadgeInfo ? window._runBadgeInfo(time||'') : {show:false};
+      var badgeText = '✅ 已计算';
       if(runInfo.show){
-        badge.textContent = runInfo.label.replace('已跑完','已计算').replace(' 已跑',' 已计算');
+        badgeText = runInfo.label.replace('已跑完','已计算').replace(' 已跑',' 已计算');
       } else {
-        badge.textContent = '✅ 已计算';
+        // 2026-08-09：_runBadgeInfo 失败时也从 calc_date/update_time 抠出日期，绝不再显示无日期「已计算」
+        var rawDate = D.calc_date || time || '';
+        var extracted = window._extractDateStr ? window._extractDateStr(rawDate) : '';
+        if(extracted){
+          var parts = window._cstParts ? window._cstParts(new Date()) : null;
+          var todayStr = parts ? (String(parts.y)+'-'+String(parts.m).padStart(2,'0')+'-'+String(parts.d).padStart(2,'0')) : '';
+          if(extracted === todayStr) badgeText = '✅ 今日已计算';
+          else badgeText = '✅ '+extracted.slice(5)+' 已计算';
+        }
       }
+      badge.textContent = badgeText;
       badge.style.display='inline-block';
     }
   }
