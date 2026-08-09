@@ -75,6 +75,36 @@ def walk_raw():
     return out
 
 
+_TS_KEYS = ("update_time", "gen_time", "calc_time", "run_time",
+            "fetch_time", "snapshot_time")
+
+
+def _blob_sha(content: bytes) -> str:
+    """按 git 规则计算 blob sha1，用于和远端 tree 里的 sha 直接比对。"""
+    h = hashlib.sha1()
+    h.update(b"blob %d\0" % len(content))
+    h.update(content)
+    return h.hexdigest()
+
+
+def _content_ts(content: bytes):
+    """从 JSON 内容里取顶层时间戳（精确到分钟的字符串），取不到返回 None。"""
+    try:
+        obj = json.loads(content.decode("utf-8"))
+    except Exception:
+        return None
+    if not isinstance(obj, dict):
+        return None
+    best = None
+    for k in _TS_KEYS:
+        v = obj.get(k)
+        if isinstance(v, str) and len(v) >= 16 and v[4] == "-":
+            s = v[:16]
+            if best is None or s > best:
+                best = s
+    return best
+
+
 def walk_extra():
     """额外推送文件（不在 raw_data/，但由抓取脚本直接写 data/，如四量终极选股结果）。"""
     out = {}
@@ -113,7 +143,34 @@ def main():
     import time as _t
     new_entries = {}
     failed_paths = []
+    unchanged = 0
+    regressed = []
     for path, content in files.items():
+        # ---- 2026-08-09 防倒退守卫 ----------------------------------------
+        # 根因：walk_raw() 全量读本地 raw_data/，而云端 job 从 checkout 到 push
+        # 有数分钟窗口；期间别的 workflow（算法链 / weekend t1）推了新数据，
+        # 本次 push 会用 checkout 时刻的旧内容把它覆盖回去（读-改-写竞态）。
+        # 实测 candidate.json 被 cn fetch 反复打回 08-04，前端连续多日显示旧数据。
+        local_sha = _blob_sha(content)
+        remote_sha = existing.get(path)
+        # (1) 内容完全一致：直接复用远端 sha，省一次 blob 上传
+        if remote_sha and local_sha == remote_sha:
+            unchanged += 1
+            continue
+        # (2) 内容不同：比对时间戳，本地更旧则保留远端版本，绝不覆盖
+        if remote_sha and path.endswith(".json"):
+            lts = _content_ts(content)
+            if lts:
+                rb = api("GET", f"/repos/{REPO}/git/blobs/{remote_sha}")
+                if "__error__" not in rb and rb.get("encoding") == "base64":
+                    try:
+                        rts = _content_ts(base64.b64decode(rb["content"]))
+                    except Exception:
+                        rts = None
+                    if rts and lts < rts:
+                        regressed.append((path, lts, rts))
+                        continue
+        # -------------------------------------------------------------------
         payload = {"content": base64.b64encode(content).decode(), "encoding": "base64"}
         b = None
         for attempt in range(3):
@@ -129,18 +186,21 @@ def main():
             continue
         new_entries[path] = b["sha"]
 
+    print(f"📊 未变化 {unchanged} / 防倒退跳过 {len(regressed)} / 待更新 {len(new_entries)}")
+    if regressed:
+        for p, lts, rts in regressed:
+            print(f"  🛡️ 防倒退跳过 {p}: 本地({lts}) < 远端({rts})")
     if failed_paths:
         print(f"⚠️ 共 {len(failed_paths)} 个文件上传失败，将保留远程旧版本: {failed_paths}")
     if not new_entries:
-        print("❌ 全部 blob 上传失败，终止推送"); sys.exit(1)
+        if failed_paths:
+            print("❌ 全部 blob 上传失败，终止推送"); sys.exit(1)
+        print("ℹ️ raw_data 无需更新（内容一致或均被防倒退守卫拦截），跳过提交"); sys.exit(0)
 
-    # 合并策略：保留远程已有的其他 raw_data 文件，只覆盖本地存在的文件。
+    # 合并策略：保留远程已有的其他 raw_data 文件，只覆盖本次确实更新的文件。
     # 这样 cloud_fetch --category 只更新当次类别，不会删掉盘前/盘后类别的文件。
     merged_entries = dict(existing)  # path -> sha
     merged_entries.update(new_entries)
-
-    if new_entries == existing:
-        print("ℹ️ raw_data 内容无变化，跳过提交"); sys.exit(0)
 
     tree_items = [{"path": p, "mode": "100644", "type": "blob", "sha": s}
                   for p, s in merged_entries.items()]
