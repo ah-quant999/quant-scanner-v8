@@ -418,7 +418,7 @@ html>
 <script src="data/IPO_DATA.js?v=20260809110150"></script>
     <script src="data/CRISIS_DATA.js?v=20260807221822"></script>
     <script src="data/JUDGMENT_DATA.js?v=20260809111006"></script>
-    <script src="data/STOCK_RPS.js?v=20260809211953"></script>
+    <script src="data/STOCK_RPS.js?v=20260808235925"></script>
     <script>
 window.V8_CAL = {weeks:[],legend:[]};
 /* ===== 2026 A股交易日历（每年需更新） ===== */
@@ -1088,7 +1088,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_SZ_HISTORY.js?v=20260809110933"></script>
 <script src="data/MAHORO.js?v=20260808152750"></script>
 <script src="data/CANDIDATE.js?v=20260807171810"></script>
-    <script src="data/FOUR_VOLUME.js?v=20260809211953"></script>
+    <script src="data/FOUR_VOLUME.js?v=20260809172123"></script>
     <script src="data/FOUR_VOLUME_60M.js?v=20260809073558"></script>
     <script src="data/STOCK_STOP_DATA.js?v=20260808201257"></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=20260808200915"></script>
@@ -1096,16 +1096,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/BACKTEST_TDX.js?v=20260804"></script>
 <script src="data/OPTIMIZED_STRATEGY.js?v=20260809"></script>
 <script src="data/EXPERIMENT.js?v=20260809110838"></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=20260809211953"></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=20260808224805"></script>
 <script src="data/ETF_PULSE.js?v=20260809110753"></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=20260809110827"></script>
 <script src="data/TOP10_DAILY.js"></script>
-<script src="data/WEEKEND_RUN.js?v=20260809211953"></script>
+<script src="data/WEEKEND_RUN.js?v=20260808181501"></script>
 <script src="data/V8_CAL.js"></script>
 <script src="data/W52_HIGH.js"></script>
 <script src="data/CANDIDATE_QUOTES.js?v=20260809110932"></script>
 <script src="data/RUNNER_STATUS.js?v=20260809211113"></script>
-<script src="data/HEALTH_CHECK.js?v=20260809211956"></script>
+<script src="data/HEALTH_CHECK.js?v=20260809212435"></script>
 </head>
 <body>
 
@@ -5460,6 +5460,18 @@ function switchSec(sec,el){
     const top = window.TOP10_DAILY || {};
     const trow = (top.top10||[]).find(r=>normCode(r.code)===nc);
     if(trow) hits.push({name:'🧬 三重共识', color:'var(--purple)', detail:'排名 #'+trow.rank+' · 评分 '+trow.total_score});
+    // 相对强度（大牛股猎手 RPS 分层）
+    const rpsD = window.STOCK_RPS_DATA || {};
+    const rpsRow = (rpsD.records||[]).find(r => normCode(r.code) === nc);
+    if(rpsRow){
+      const tier = rpsRow.tier || '-';
+      const tierColor = tier==='A' ? '#ffd54f' : tier==='B' ? '#4fc3f7' : tier==='C' ? '#94a3b8' : 'var(--dim)';
+      const rpsMax = rpsRow.rps_max != null ? Number(rpsRow.rps_max).toFixed(1) : '--';
+      const rps20 = rpsRow.rps50 != null ? Number(rpsRow.rps50).toFixed(1) : '--';
+      const rs = rpsRow.rs != null ? Number(rpsRow.rs).toFixed(2) : '--';
+      const maTag = rpsRow.above_ma250 ? '· 站上250日线' : (rpsRow.above_ma200 ? '· 站上200日线' : '');
+      hits.push({name:'📈 相对强度 '+tier+'档', color:tierColor, detail:'RPSmax '+rpsMax+' · 50日 '+rps20+' · RS '+rs+' '+maTag});
+    }
     // 金股池
     const gp = window.GOLD_POOL || {};
     const gstocks = gp.stocks || {};
