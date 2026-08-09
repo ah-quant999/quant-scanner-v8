@@ -50,6 +50,6 @@ jobs:
       - name: "🔑 发码 / 验证"
         continue-on-error: true
         run: |
-          export MAHORO_ACTION=verify
-          export MAHORO_CODE="045321"
+          export MAHORO_ACTION=send-code
+          export MAHORO_CODE=""
           python algorithms/fetch_maharo_signals.py --non-interactive
