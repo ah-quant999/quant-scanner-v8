@@ -23,7 +23,8 @@ def load_token():
         raw = raw[3:]
     return raw.decode("utf-8", "ignore").strip()
 
-def api_get(url, token):
+def api_get(path, token):
+    url = f"https://api.github.com{path}"
     req = urllib.request.Request(url, headers={
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
