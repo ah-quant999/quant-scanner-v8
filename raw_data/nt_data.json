@@ -1,17 +1,17 @@
 {
-  "update_time": "2026-08-10 00:01",
+  "update_time": "2026-08-10 00:51",
   "alerts": [
     {
       "type": "summary",
       "severity": "low",
       "message": "ETF监测中，12涨0跌",
-      "time": "00:01"
+      "time": "00:51"
     },
     {
       "type": "etf",
       "severity": "medium",
       "message": "医药ETF 大涨 4.49%",
-      "time": "00:01"
+      "time": "00:51"
     }
   ],
   "etfFlow": {
