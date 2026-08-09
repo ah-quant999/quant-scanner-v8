@@ -9703,6 +9703,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     (D.records||[]).forEach(function(r){ if(r && r.code) m[r.code]=r; });
     return m;
   }
+  window._buildRpsMap=_buildRpsMap;
   window.__rpsMapByCode=null;
   function _rpsBadge(tier){
     var colors={A:'linear-gradient(135deg,#15803d,#22c55e)',B:'linear-gradient(135deg,#2563eb,#3b82f6)',C:'linear-gradient(135deg,#a16207,#eab308)'};
