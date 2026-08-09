@@ -118,7 +118,6 @@ def authenticate(email, non_interactive=False, code=None):
         # 云端刷新支持：通过环境变量控制 mahoro 重登录动作（本机无法解析 data.maharo.cn，
         # 但云端 runner 可以；故发码/验证统一在云端完成，再让用户把新 cookie 回填 Secret）。
         action = os.environ.get("MAHORO_ACTION", "").strip().lower()
-        print(f"  [DEBUG] raw MAHORO_ACTION={os.environ.get('MAHORO_ACTION')!r} -> action={action!r}  MAHORO_CODE={os.environ.get('MAHORO_CODE')!r}  stdin_tty={sys.stdin.isatty()}  non_interactive={non_interactive}")
         if action == "send-code":
             resp, _ = http_post(MAHORO_AUTH_SEND, {"email": email})
             if resp and resp.get("ok"):
