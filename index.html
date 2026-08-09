@@ -1848,23 +1848,23 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         return d.length===8 ? (d.slice(0,4)+'-'+d.slice(4,6)+'-'+d.slice(6,8)) : d;
       }
       // 返回 [{iso, stocks, summary}]，按日期升序
+      // 按日期合并 LHB_HISTORY + LHB_DATA；LHB_DATA（当日最新）优先级更高，解决某日在 HISTORY 里空/缺失时"时有时无"。
       window._rcDays=function(){
-        var out=[];
+        var map={};
         var H=window.LHB_HISTORY;
         if(H && typeof H==='object'){
-          Object.keys(H).filter(function(k){ return /^\d{4}-\d{2}-\d{2}$/.test(k); }).sort().forEach(function(k){
+          Object.keys(H).filter(function(k){ return /^\d{4}-\d{2}-\d{2}$/.test(k); }).forEach(function(k){
             var d=H[k];
             if(!d || d.trading===false) return;
-            out.push({iso:k, stocks:d.stocks||[], summary:d.summary||{}});
+            map[k]={iso:k, stocks:d.stocks||[], summary:d.summary||{}};
           });
         }
-        if(!out.length){
-          var L=window.LHB_DATA;
-          if(L && L.stocks && L.stocks.length){
-            out.push({iso:toIso(L.date), stocks:L.stocks, summary:L.summary||{}});
-          }
+        var L=window.LHB_DATA;
+        if(L && L.stocks && L.stocks.length){
+          var iso=toIso(L.date);
+          map[iso]={iso:iso, stocks:L.stocks, summary:L.summary||{}};
         }
-        return out;
+        return Object.keys(map).sort().map(function(k){ return map[k]; });
       };
       // 抽取某日北向席位明细
       window._rcNorthOf=function(stocks){
@@ -2387,10 +2387,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <button class="st-tab active" data-st="tc" onclick="switchSt('tc')">🥇 三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="fv" onclick="switchSt('fv')">🔥 四量终极 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="cockpit" onclick="switchSt('cockpit')">🎯 驾驶舱 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
+      <button class="st-tab" data-st="hunter" onclick="switchSt('hunter')">🐂 大牛股猎手 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="allsite" onclick="switchSt('allsite')">🌐 全站精选 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
-      <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用</span></button>
-      <button class="st-tab" data-st="hunter" onclick="switchSt('hunter')">🐂 大牛股猎手 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">中线</span></button>
-      <button class="st-tab" data-st="rps" onclick="switchSt('rps')">📈 相对强度 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">RPS+RS</span></button>
+      <button class="st-tab" data-st="rps" onclick="switchSt('rps')">📈 相对强度 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
+      <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用·固定</span></button>
     </div>
 
     <!-- ===== TAB 页面：大牛股猎手（2026-08-08 从「共振日历」迁入） ===== -->
@@ -2606,9 +2606,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           <select id="strpsRpsFilter" onchange="renderRpsScreen()" style="background:var(--bg2);color:var(--txt);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;">
             <option value="0">0</option>
             <option value="80">80</option>
-            <option value="90" selected>90</option>
+            <option value="90" selected>90（推荐）</option>
             <option value="95">95</option>
           </select>
+          <span style="font-size:11px;color:var(--dim);">推荐 90：A档硬门禁阈值，兼顾数量与强度</span>
           <button onclick="renderRpsScreen()" style="margin-left:auto;background:var(--cyan);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;">刷新</button>
         </div>
         <table id="strpsTable" style="width:100%;border-collapse:collapse;font-size:12px;">
@@ -9071,15 +9072,24 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     h+='</div></div>';
 
     /* 3. 四路资金流向对比（龙虎榜席位口径） */
-    var lhb=window.LHB_DATA||{}, lhbT=lhb.update_time||'';
-    var hasLhb=lhb.stocks&&lhb.stocks.length;
+    // 2026-08-09 修：改用 _rcDays() 最新一日，避免 LHB_DATA 单独为空时 TOP3 也空。
+    var rcDays=window._rcDays&&window._rcDays()||[];
+    var latestDay=rcDays.length?rcDays[rcDays.length-1]:{};
+    var lhbStocks=latestDay.stocks||[];
+    var lhbSummary=latestDay.summary||{};
+    var lhbRaw=window.LHB_DATA||{};
+    var lhbT=latestDay.update_time||lhbRaw.update_time||'';
+    var lhbDate=latestDay.iso||(lhbRaw.date?String(lhbRaw.date).replace(/(\d{4})(\d{2})(\d{2})/,'$1/$2/$3'):'');
+    var commonBuy=lhbSummary.common_buy_stocks||lhbRaw.common_buy_stocks||[];
+    var commonSell=lhbSummary.common_sell_stocks||lhbRaw.common_sell_stocks||[];
+    var hasLhb=lhbStocks.length>0;
     h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #4527a0;">';
     h+=v8CardHeader('💰','四路资金流向对比','龙虎榜席位口径','update_time',{update_time:lhbT,slot:'盘后',horizon:'短线'},!hasLhb,false);
     h+='<div style="padding:12px 14px;">';
     if(hasLhb){
       function lhbNet(s,key){ var seat=s.seats&&s.seats[key]; return seat?(seat.buy||0)-(seat.sell||0):0; }
       var instNet=0, yzNet=0, bxNet=0, unNet=0;
-      lhb.stocks.forEach(function(s){ instNet+=s.inst_net_万||0; yzNet+=s.yz_net_万||0; bxNet+=lhbNet(s,'北向'); unNet+=lhbNet(s,'未识别'); });
+      lhbStocks.forEach(function(s){ instNet+=s.inst_net_万||0; yzNet+=s.yz_net_万||0; bxNet+=lhbNet(s,'北向'); unNet+=lhbNet(s,'未识别'); });
       function fmtNet(n){ return (n>=0?'+':'')+(n/1e4).toFixed(1)+'亿'; }
       function dirClass(n){ return n>=0?'up':'down'; }
       function dirStr(n){ return n>=0?'净流入':'净流出'; }
@@ -9094,8 +9104,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
           +'<td style="padding:6px 8px;border:1px solid var(--border);font-weight:600;white-space:nowrap;">'+label+'</td>'
           +'<td style="padding:6px 8px;border:1px solid var(--border);text-align:center;color:'+(dc==='up'?'var(--up)':'var(--down)')+';font-weight:600;">'+dirStr(net)+'</td>'
           +'<td style="padding:6px 8px;border:1px solid var(--border);text-align:center;color:'+(dc==='up'?'var(--up)':'var(--down)')+';font-weight:700;">'+fmtNet(net)+'</td>'
-          +'<td style="padding:6px 8px;border:1px solid var(--border);color:var(--up);">'+stocksTop(lhb.stocks,netFn,'buy')+'</td>'
-          +'<td style="padding:6px 8px;border:1px solid var(--border);color:var(--down);">'+stocksTop(lhb.stocks,netFn,'sell')+'</td>'
+          +'<td style="padding:6px 8px;border:1px solid var(--border);color:var(--up);">'+stocksTop(lhbStocks,netFn,'buy')+'</td>'
+          +'<td style="padding:6px 8px;border:1px solid var(--border);color:var(--down);">'+stocksTop(lhbStocks,netFn,'sell')+'</td>'
           +'</tr>';
       }
       function instFn(s){ return s.inst_net_万||0; }
@@ -9104,9 +9114,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       function unFn(s){ return lhbNet(s,'未识别'); }
 
       h+='<div style="margin-bottom:10px;padding:8px 10px;background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(86,71,135,.08));border:1px dashed rgba(167,139,250,.3);border-radius:8px;font-size:11px;color:var(--sub);line-height:1.6;">';
-      if(lhb.common_buy_stocks&&lhb.common_buy_stocks.length) h+='<span style="color:var(--up);">🔴 三方共振净买入：'+lhb.common_buy_stocks.slice(0,5).join('、')+'</span> ｜ ';
-      if(lhb.common_sell_stocks&&lhb.common_sell_stocks.length) h+='<span style="color:var(--down);">🟢 三方共振净卖出：'+lhb.common_sell_stocks.slice(0,5).join('、')+'</span>';
-      if(!((lhb.common_buy_stocks&&lhb.common_buy_stocks.length)||(lhb.common_sell_stocks&&lhb.common_sell_stocks.length))) h+='龙虎榜席位口径，仅覆盖当日异动上榜股。';
+      if(commonBuy.length) h+='<span style="color:var(--up);">🔴 三方共振净买入：'+commonBuy.slice(0,5).join('、')+'</span> ｜ ';
+      if(commonSell.length) h+='<span style="color:var(--down);">🟢 三方共振净卖出：'+commonSell.slice(0,5).join('、')+'</span>';
+      if(!(commonBuy.length||commonSell.length)) h+='龙虎榜席位口径，仅覆盖当日异动上榜股。';
       h+='</div>';
 
       h+='<table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
@@ -9122,7 +9132,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       h+=netRow('🌎 龙虎榜北向席位', bxNet, bxFn, 'rgba(240,248,255,.05)');
       h+=netRow('🌏 未识别席位', unNet, unFn, 'rgba(245,255,245,.05)');
       h+='</tbody></table>';
-      h+='<div style="margin-top:8px;font-size:10px;color:var(--dim);padding:0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">数据源：龙虎榜席位 '+lhb.date+'｜仅覆盖异动上榜股</div>';
+      h+='<div style="margin-top:8px;font-size:10px;color:var(--dim);padding:0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">数据源：龙虎榜席位 '+lhbDate+'｜仅覆盖异动上榜股</div>';
     } else {
       h+='<div class="note" style="text-align:center;">龙虎榜席位数据为空</div>';
     }
@@ -9637,7 +9647,13 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if(tierF!=='all' && (r.tier||'')!==tierF) return false;
       return (r.rps_max||0)>=rpsMin;
     });
-    filtered.sort(function(a,b){ return (b.rps_max||0)-(a.rps_max||0) || (b.rs||0)-(a.rs||0); });
+    // 2026-08-09：先按 A/B/C 档排，同档内按 rps_max 高→低，再按 rs 高→低
+    var tierOrder={A:0,B:1,C:2,D:3};
+    filtered.sort(function(a,b){
+      var ta=tierOrder[(a.tier||'D')]||3, tb=tierOrder[(b.tier||'D')]||3;
+      if(ta!==tb) return ta-tb;
+      return (b.rps_max||0)-(a.rps_max||0) || (b.rs||0)-(a.rs||0);
+    });
     var h='';
     filtered.forEach(function(r){
       var isHi50=(r.rps50||0)>=(r.rps_max||0);
