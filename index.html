@@ -2652,7 +2652,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           <label style="font-size:12px;color:var(--sub);">分层：</label>
           <select id="strpsTierFilter" onchange="renderRpsScreen()" style="background:var(--bg2);color:var(--txt);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;">
             <option value="all">全部</option>
-            <option value="A">A档（拿住别动）</option>
+            <option value="A" selected>A档（拿住别动）</option>
             <option value="B">B档（强势观察）</option>
             <option value="C">C档（关注）</option>
           </select>
@@ -4055,7 +4055,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     h += '</div>'; // hunter-grid
 
     // Footer
-    h += '<div style="margin-top:12px;font-size:10px;color:var(--dim);text-align:center">' + _uBadge('盘后', '短线', updateTime) + '</div>';
     h += '<div style="margin-top:4px;font-size:10px;color:var(--sub);text-align:center">→ 完整机游/北向/每日洞察分析见顶部 🧲 共振日历</div>';
 
     c.innerHTML = h;
@@ -9856,7 +9855,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var time=D.update_time||'';
     var uni=D.universe_count||0;
     var idxName=D.index_name||'--';
-    var tierF=_rps$('strpsTierFilter')?_rps$('strpsTierFilter').value:'all';
+    var tierF=_rps$('strpsTierFilter')?_rps$('strpsTierFilter').value:'A';
     var rpsMin=_rps$('strpsRpsFilter')?Number(_rps$('strpsRpsFilter').value):90;
     var body=_rps$('strpsBody'); if(!body) return;
     _rps$('strpsUniCount').textContent=uni;
