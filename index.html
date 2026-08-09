@@ -1181,6 +1181,21 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div style="font-size:13px;color:var(--txt);"><strong>覆盖范围：</strong>A股（主板 / 创业板 / 科创板 / 北交所）+ 港股 + 指数 + ETF，共 7000+ 只</div>
       </div>
 
+      <!-- 个股查询能力清单（与逻辑详解页保持一致） -->
+      <div style="padding:14px 16px;background:var(--card2);border-radius:10px;border:1px solid var(--border);">
+        <div style="font-size:13px;color:var(--txt);font-weight:700;margin-bottom:10px;">查询后会展示该标的在 v8 中的全站扩展信息：</div>
+        <ul style="margin:0;padding-left:20px;font-size:13px;line-height:1.9;color:var(--txt);list-style:none;">
+          <li>📊 <b>实时行情</b>：现价、涨跌幅、成交量/额、今开/昨收/最高/最低</li>
+          <li>🎯 <b>止盈止损</b>：止损位、目标位、盈亏比、操作建议</li>
+          <li>🏷 <b>概念行业概览</b>：板块、行业、题材概念标签</li>
+          <li>🎖️ <b>选股策略命中</b>：是否命中三重共识、金股池、候选池、驾驶舱 A/B 档、逆势龙头、四量终极</li>
+          <li>💧 <b>关联板块资金流向</b>：该股所属概念/板块当日资金流向</li>
+          <li>🐉 <b>龙虎榜</b>：上榜日期、机构/游资净买、上榜原因</li>
+          <li>🚫 <b>停牌识别</b>：停牌状态与原因</li>
+          <li>🌾 <b>基本面画像</b>：综合评级、ROE、营收增速、EPS、股息率、分红方案等</li>
+        </ul>
+      </div>
+
       <div id="v8QueryResult"></div>
     </div>
   </section>
@@ -4210,6 +4225,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="lg-tab" data-lg="ph" onclick="switchLg('ph',this)">🌙 盘后数据</div>
       <div class="lg-tab" data-lg="rc" onclick="switchLg('rc',this)">🧲 共振日历</div>
       <div class="lg-tab" data-lg="final" onclick="switchLg('final',this)">🏆 最终推荐</div>
+      <div class="lg-tab" data-lg="query" onclick="switchLg('query',this)">🔍 个股查询</div>
       <div class="lg-tab" data-lg="st" onclick="switchLg('st',this)">🎯 选股策略</div>
       <div class="lg-tab" data-lg="ul" onclick="switchLg('ul',this)">🔒 暂未上架</div>
       <div class="lg-tab" data-lg="op" onclick="switchLg('op',this)">🔒 运维</div>
@@ -4455,6 +4471,30 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">每只股票按命中策略数量与策略可信度加权；同策略多周期共振（如 60m 四量共振）额外加分；板块 RPS 强度作为权重放大器；最终得分归一化后取前 N。</div>
         <div class="logic-h">使用边界</div>
         <div class="logic-p">Top3 是「高置信候选」而非「必然买入」；仍需结合市场环境、仓位管理与个人风险偏好做最终决策。</div>
+      </div>
+    </div>
+
+    <!-- === 个股查询 === -->
+    <div class="lg-pane" id="lg-query">
+      <div class="card">
+        <h3><span class="ic">🔍</span>个股查询 - 说明</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">输入任意股票代码 / 拼音首字母 / 中文名称，查看该标的在 v8 中的全站扩展信息。不是选股算法，因此不参与策略可信度排序。</div>
+        <div class="logic-h">查询格式与覆盖范围</div>
+        <div class="logic-p">· <b>查询格式</b>：输入股票代码、拼音首字母或中文名称，如 600000、hlzj、茅台<br>· <b>覆盖范围</b>：A股（主板 / 创业板 / 科创板 / 北交所）+ 港股 + 指数 + ETF，共 7000+ 只</div>
+        <div class="logic-h">查询后会展示什么</div>
+        <div class="logic-p">
+          <ul style="margin:6px 0 0 18px;font-size:13px;line-height:1.9;color:var(--txt);">
+            <li>📊 <b>实时行情</b>：现价、涨跌幅、成交量/额、今开/昨收/最高/最低</li>
+            <li>🎯 <b>止盈止损</b>：止损位、目标位、盈亏比、操作建议</li>
+            <li>🏷 <b>概念行业概览</b>：板块、行业、题材概念标签</li>
+            <li>🎖️ <b>选股策略命中</b>：是否命中三重共识、金股池、候选池、驾驶舱 A/B 档、逆势龙头、四量终极</li>
+            <li>💧 <b>关联板块资金流向</b>：该股所属概念/板块当日资金流向</li>
+            <li>🐉 <b>龙虎榜</b>：上榜日期、机构/游资净买、上榜原因</li>
+            <li>🚫 <b>停牌识别</b>：停牌状态与原因</li>
+            <li>🌾 <b>基本面画像</b>：综合评级、ROE、营收增速、EPS、股息率、分红方案等</li>
+          </ul>
+        </div>
       </div>
     </div>
 
