@@ -3,14 +3,25 @@
 # 本机无法解析 data.maharo.cn（DNS getaddrinfo failed），但云端 runner 可以。
 # 故发码 / 验证统一在云端完成：
 #   - MAHORO_ACTION=send-code  → 向 ljcat999@gmail.com 发验证码
-#   - MAHORO_ACTION=verify     → 用 MAHORO_CODE 在云端登录，缓存新 cookie 并打印
-# 验证成功后，把日志里打印的新 cookie 回填到 GitHub Secret MAHORO_COOKIE。
+#   - MAHORO_ACTION=verify     → 用 MAHARO_CODE 在云端登录，缓存新 cookie 并打印
+# 验证成功后，把日志里打印的新 cookie 回填到 GitHub Secret MAHARO_COOKIE。
 #
-# 触发：gh / API dispatch（workflow_dispatch，无需 inputs）。
-name: "🔑 maharo 凭据刷新(云端)"
+# 触发：gh / API dispatch（workflow_dispatch，支持 mahoro_action / mahoro_code 两个 inputs）。
+name: "🔑 mahoro 凭据刷新(云端)"
 
 on:
   workflow_dispatch:
+    inputs:
+      mahoro_action:
+        description: "send-code | verify"
+        required: true
+        default: "send-code"
+        type: string
+      mahoro_code:
+        description: "邮箱验证码（verify 动作时填写）"
+        required: false
+        default: ""
+        type: string
 
 permissions:
   contents: write
@@ -22,8 +33,8 @@ jobs:
     env:
       TZ: Asia/Shanghai
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      MAHORO_ACTION: send-code
-      MAHORO_CODE: ""
+      MAHORO_ACTION: ${{ github.event.inputs.maharo_action }}
+      MAHARO_CODE: ${{ github.event.inputs.maharo_code }}
     steps:
       - name: "📥 Checkout"
         uses: actions/checkout@v4
