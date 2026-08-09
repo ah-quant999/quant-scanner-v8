@@ -418,7 +418,7 @@ html>
 <script src="data/IPO_DATA.js?v=20260809110150"></script>
     <script src="data/CRISIS_DATA.js?v=20260807221822"></script>
     <script src="data/JUDGMENT_DATA.js?v=20260809111006"></script>
-    <script src="data/STOCK_RPS.js?v=20260809225630"></script>
+    <script src="data/STOCK_RPS.js?v=20260808235925"></script>
     <script>
 window.V8_CAL = {weeks:[],legend:[]};
 /* ===== 2026 A股交易日历（每年需更新） ===== */
@@ -1088,7 +1088,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_SZ_HISTORY.js?v=20260809110933"></script>
 <script src="data/MAHORO.js?v=20260808152750"></script>
 <script src="data/CANDIDATE.js?v=20260807171810"></script>
-    <script src="data/FOUR_VOLUME.js?v=20260809225630"></script>
+    <script src="data/FOUR_VOLUME.js?v=20260809172123"></script>
     <script src="data/FOUR_VOLUME_60M.js?v=20260809073558"></script>
     <script src="data/STOCK_STOP_DATA.js?v=20260808201257"></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=20260808200915"></script>
@@ -1096,16 +1096,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/BACKTEST_TDX.js?v=20260804"></script>
 <script src="data/OPTIMIZED_STRATEGY.js?v=20260809"></script>
 <script src="data/EXPERIMENT.js?v=20260809110838"></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=20260809225630"></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=20260808224805"></script>
 <script src="data/ETF_PULSE.js?v=20260809110753"></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=20260809110827"></script>
 <script src="data/TOP10_DAILY.js"></script>
-<script src="data/WEEKEND_RUN.js?v=20260809225630"></script>
+<script src="data/WEEKEND_RUN.js?v=20260808181501"></script>
 <script src="data/V8_CAL.js"></script>
 <script src="data/W52_HIGH.js"></script>
 <script src="data/CANDIDATE_QUOTES.js?v=20260809110932"></script>
 <script src="data/RUNNER_STATUS.js?v=20260809211113"></script>
-<script src="data/HEALTH_CHECK.js?v=20260809225635"></script>
+<script src="data/HEALTH_CHECK.js?v=20260809230516"></script>
 </head>
 <body>
 
@@ -8214,14 +8214,18 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     cockpitTs=_maxTs(cockpitTs,_pickTs(DATA.lhb));
     cockpitTs=_maxTs(cockpitTs,_pickTs(DATA.inst_trade));
     cockpitTs=_maxTs(cockpitTs,_pickTs(window.COCKPIT_TIER_RECOMMEND));
-    var cockpitTsShort=_fmtCockpitRel(cockpitTs);
+
+    // 2026-08-09 修复：驾驶舱「更新于」与「已跑」必须基于同一口径。
+    // cockpitTs 是各数据源 update_time 的最大值（可能含本次 recovery/staging 时间），
+    // 而 COCKPIT_TIER_RECOMMEND 的 gen_time 才是数据内容真实生成日期。
+    // 统一用 _cockpitGenTs，避免「更新于今日 21:04」但「已跑 08-04」的矛盾。
+    var _cockpitData = window.COCKPIT_TIER_RECOMMEND || {};
+    var _cockpitGenTs = _cockpitData.gen_time || _cockpitData.data_time || _cockpitData.update_time || cockpitTs;
 
     h+='<div style="background:linear-gradient(135deg,#13243f,#0e2747);color:#cfe3ff;border:1px solid #244066;border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">';
     h+='<span style="font-size:22px;">🎯</span><div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:700;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">选股驾驶舱 <span style="color:#fbbf24;font-size:13px;letter-spacing:1px">⭐⭐⭐⭐</span>';
-    if(cockpitTs) h+=_uBadge('盘后','短线',cockpitTs);
+    if(_cockpitGenTs) h+=_uBadge('盘后','短线',_cockpitGenTs);
     // 「已跑完」胶囊：统一调用 _runBadgeInfo（2026-08-07 修复）
-    var _cockpitData = window.COCKPIT_TIER_RECOMMEND || {};
-    var _cockpitGenTs = _cockpitData.gen_time || _cockpitData.data_time || _cockpitData.update_time || cockpitTs;
     var _cockpitInfo = window._runBadgeInfo(_cockpitGenTs);
     if(_cockpitInfo.show) h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">'+_cockpitInfo.label+'</span>';
     // 「已入仓」胶囊：统一为 🧺 MM-DD 已入仓 N
