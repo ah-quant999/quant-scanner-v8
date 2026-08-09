@@ -425,6 +425,9 @@ def check_data_cards():
         empty_fields = []
         for f in d["key_fields"]:
             v = data.get(f)
+            # 结果池字段（如 stocks）空列表 = 正常业务状态（今日无入选），不算空值
+            if v == [] and f == "stocks":
+                continue
             if v is None or v == "" or v == [] or v == {} or v == "--" or v == "加载中":
                 empty_fields.append(f)
         if empty_fields and status == "ok":
