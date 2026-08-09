@@ -4780,7 +4780,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">定位</div>
         <div class="logic-p">仅管理员可见的实验区。放置已开发但尚未正式上架的卡片、调试工具或过渡性模块，避免在主站显示不稳定功能。</div>
         <div class="logic-h">当前内容</div>
-        <div class="logic-p">· <b>实验选股调试专区</b>：三重起涨 / CRDS逆势 / 候选池等验证中模块。<br>· <b>观测候选股池</b>：多源信号初筛池，按主板/创业板/科创板/港股/观澜台/maharo研报分组展示。<br>· <b>今日判定 · 环境态势</b>：已迁回「今日事件」页，此处不再重复。</div>
+        <div class="logic-p">· <b>观测候选股池</b>：多源信号初筛池，按主板/创业板/科创板/港股/观澜台/maharo研报分组展示。<br>· <b>实验选股调试专区</b>：三重起涨 / CRDS逆势 / 候选池等验证中模块。<br>· <b>今日判定 · 环境态势</b>：已迁回「今日事件」页，此处不再重复。</div>
         <div class="logic-h">与正式区关系</div>
         <div class="logic-p">经主人确认稳定的模块会逐步提升到一级 Tab 或正式卡片；确认废弃的模块会移除。用户不应把暂未上架内容作为买卖依据。</div>
       </div>
@@ -8840,6 +8840,41 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(typeof window.__renderJudgmentBody==='function') window.__renderJudgmentBody();
     var h='';
 
+    var cp=window.CANDIDATE||{};
+    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #f9a8d4;">';
+    var cpT=cp.update_time?cp.update_time:'';
+    h+=v8CardHeader('🧭','观测候选股池','多源信号初筛池','update_time',{update_time:cpT},!cp||!cp.stocks);
+    if(cp&&cp.stocks){
+      var total=cp.total||Object.keys(cp.stocks).length;
+      var order=['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','观澜台','maharo研报'];
+      var dist=cp.source_dist||{};
+      h+='<div style="padding:12px 14px;">';
+      h+='<div style="font-size:12px;color:var(--sub);margin-bottom:10px;">共 <b>'+total+'</b> 只（金股标 ★），按来源分组，点击展开。</div>';
+      order.forEach(function(src,idx){
+        var cnt=dist[src]||0;
+        var stocks=Object.values(cp.stocks).filter(function(s){return s&&s.sources&&s.sources.indexOf(src)>=0;}).slice(0,12);
+        h+='<details style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden;background:var(--bg2);">';
+        h+='<summary style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;list-style:none;font-size:12px;font-weight:600;">';
+        h+='<span style="font-size:11px;color:var(--dim);">▾</span>'+genericSource(src)+'<span style="font-size:12px;color:var(--cyan);margin-left:auto;">'+cnt+' 只</span>';
+        h+='</summary>';
+        h+='<div style="padding:8px 12px;">';
+        if(stocks.length){
+          h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;">';
+          stocks.forEach(function(s){
+            h+='<div style="background:var(--card2);border-radius:6px;padding:5px 8px;font-size:11px;"><b>'+s.name+'</b> <span style="color:var(--dim);">'+s.code+'</span></div>';
+          });
+          h+='</div>';
+        } else {
+          h+='<div style="font-size:11px;color:var(--dim);">该分类暂无数据</div>';
+        }
+        h+='</div></details>';
+      });
+      h+='</div>';
+    } else {
+      h+='<div class="note" style="padding:14px;text-align:center;">候选池数据暂不可用</div>';
+    }
+    h+='</div>';
+
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #7b1fa2;">';
     h+=v8CardHeader('🧪','实验选股调试专区','管理员可见：三重起涨 / CRDS逆势 / 候选池，验证中请勿依赖','update_time',window.SH_FIB);
     var fib=window.SH_FIB||{};
@@ -8892,41 +8927,6 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       h+='<div class="note" style="text-align:center;">调试区数据暂不可用</div>';
     }
     h+='</div></div>';
-
-    var cp=window.CANDIDATE||{};
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #f9a8d4;">';
-    var cpT=cp.update_time?cp.update_time:'';
-    h+=v8CardHeader('🧭','观测候选股池','多源信号初筛池','update_time',{update_time:cpT},!cp||!cp.stocks);
-    if(cp&&cp.stocks){
-      var total=cp.total||Object.keys(cp.stocks).length;
-      var order=['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','观澜台','maharo研报'];
-      var dist=cp.source_dist||{};
-      h+='<div style="padding:12px 14px;">';
-      h+='<div style="font-size:12px;color:var(--sub);margin-bottom:10px;">共 <b>'+total+'</b> 只（金股标 ★），按来源分组，点击展开。</div>';
-      order.forEach(function(src,idx){
-        var cnt=dist[src]||0;
-        var stocks=Object.values(cp.stocks).filter(function(s){return s&&s.sources&&s.sources.indexOf(src)>=0;}).slice(0,12);
-        h+='<details style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden;background:var(--bg2);">';
-        h+='<summary style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;list-style:none;font-size:12px;font-weight:600;">';
-        h+='<span style="font-size:11px;color:var(--dim);">▾</span>'+genericSource(src)+'<span style="font-size:12px;color:var(--cyan);margin-left:auto;">'+cnt+' 只</span>';
-        h+='</summary>';
-        h+='<div style="padding:8px 12px;">';
-        if(stocks.length){
-          h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;">';
-          stocks.forEach(function(s){
-            h+='<div style="background:var(--card2);border-radius:6px;padding:5px 8px;font-size:11px;"><b>'+s.name+'</b> <span style="color:var(--dim);">'+s.code+'</span></div>';
-          });
-          h+='</div>';
-        } else {
-          h+='<div style="font-size:11px;color:var(--dim);">该分类暂无数据</div>';
-        }
-        h+='</div></details>';
-      });
-      h+='</div>';
-    } else {
-      h+='<div class="note" style="padding:14px;text-align:center;">候选池数据暂不可用</div>';
-    }
-    h+='</div>';
 
     // === 暂未上架实验区 · 数据驱动卡（2026-08-08 主人令：今日可入手候选已迁入「最终推荐 · 今日推荐候选池」，此处不再重复渲染） ===
 
