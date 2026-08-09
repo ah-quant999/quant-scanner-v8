@@ -1,1 +1,1 @@
-window.AVG_PRICE_DATA = {"update_time":"2026-08-09 11:11:05","republish_time":"2026-08-09 21:04:55"};
+window.AVG_PRICE_DATA = {"update_time":"2026-08-08 16:47:38","republish_time":"2026-08-09 21:06:43"};
