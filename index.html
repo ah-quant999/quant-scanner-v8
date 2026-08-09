@@ -1094,6 +1094,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=20260804233608"></script>
 <script src="data/COCKPIT_BACKTEST.js?v=20260804233610"></script>
 <script src="data/BACKTEST_TDX.js?v=20260809"></script>
+<script src="data/OPTIMIZED_STRATEGY.js?v=20260809"></script>
 <script src="data/EXPERIMENT.js?v=20260807161447"></script>
 <script src="data/FINAL_RECOMMEND_DATA.js?v=20260809195641"></script>
 <script src="data/ETF_PULSE.js?v=20260807161144"></script>
@@ -8642,13 +8643,61 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     }
     con.innerHTML = buildCockpitAdviceHTML(d);
   }
+  function buildOptimizedStrategyCard(od){
+    var opt = od.optimized || {};
+    var base = od.baseline_ge3 || {};
+    var reg = od.current_regime || {};
+    var op = opt.periods || {};
+    var bp = base.periods || base;
+    var regimeLabel = {'stabilize':'企稳回升','rebound_diverge':'反弹分歧','grind':'阴跌磨底','panic':'恐慌下行'};
+    var rg = regimeLabel[reg.regime] || reg.regime || '未知';
+    var openTxt = reg.open_position ? '<span style="color:#5ee0a0;font-weight:700;">✅ 可开仓</span>' : '<span style="color:#ff6b81;font-weight:700;">⛔ 不开仓</span>';
+    var card = '<div style="background:linear-gradient(135deg,rgba(94,224,160,.12),rgba(94,224,160,.04));border:1px solid rgba(94,224,160,.35);border-radius:8px;padding:10px 12px;margin-bottom:14px;">';
+    card += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:14px;font-weight:700;color:#5ee0a0;">🎯 提胜率优化策略（①②③）</span>';
+    card += '<span style="font-size:12px;color:#8aa0c2;">当前市场：'+rg+' '+openTxt+'</span></div>';
+    card += '<div style="font-size:12px;color:#9fb3d1;margin-bottom:8px;">'+(od.method||'')+'</div>';
+    card += '<table style="width:100%;font-size:13px;border-collapse:collapse;color:#dbe6f7;"><thead><tr style="background:rgba(12,22,38,.6);">';
+    card += '<th style="padding:4px 6px;text-align:left;">口径</th><th style="padding:4px 6px;text-align:center;">样本</th><th style="padding:4px 6px;text-align:center;">T+5胜</th><th style="padding:4px 6px;text-align:center;">T+5收益</th><th style="padding:4px 6px;text-align:center;">T+10胜</th><th style="padding:4px 6px;text-align:center;">T+10收益</th></tr></thead><tbody>';
+    function _optRow(label, p, total, hl){
+      var bg = hl ? 'background:rgba(94,224,160,.12);' : '';
+      var wr5 = p['T+5'] ? p['T+5'].win_rate_pct : null;
+      var ar5 = p['T+5'] ? p['T+5'].avg_return_pct : null;
+      var wr10 = p['T+10'] ? p['T+10'].win_rate_pct : null;
+      var ar10 = p['T+10'] ? p['T+10'].avg_return_pct : null;
+      var c = function(v){ return v===null ? '#556' : (v>=0 ? '#ff6b81' : '#5ee0a0'); };
+      var s = function(v){ return v===null ? '—' : ((v>=0?'+':'')+v+'%'); };
+      var lblC = hl ? '#ff6b81' : '#dbe6f7';
+      return '<tr style="border-bottom:1px solid rgba(255,255,255,.06);'+bg+'"><td style="padding:4px 6px;white-space:nowrap;color:'+lblC+';font-weight:'+(hl?700:400)+';">'+label+'</td>'
+        +'<td style="padding:4px 6px;text-align:center;color:#8aa0c2;">'+(total||'—')+'</td>'
+        +'<td style="padding:4px 6px;text-align:center;color:'+c(wr5)+';font-weight:600;">'+(wr5===null?'—':wr5+'%')+'</td>'
+        +'<td style="padding:4px 6px;text-align:center;color:'+c(ar5)+';font-weight:600;">'+s(ar5)+'</td>'
+        +'<td style="padding:4px 6px;text-align:center;color:'+c(wr10)+';font-weight:600;">'+(wr10===null?'—':wr10+'%')+'</td>'
+        +'<td style="padding:4px 6px;text-align:center;color:'+c(ar10)+';font-weight:600;">'+s(ar10)+'</td></tr>';
+    }
+    card += _optRow(opt.label||'🎯 优化策略', op, opt.total_signals, true);
+    card += _optRow('基线(ge3全信号)', bp, base.total_signals, false);
+    card += '</tbody></table>';
+    var lift5 = (op['T+5']&&bp['T+5']) ? (op['T+5'].win_rate_pct - bp['T+5'].win_rate_pct) : null;
+    var lift10 = (op['T+10']&&bp['T+10']) ? (op['T+10'].win_rate_pct - bp['T+10'].win_rate_pct) : null;
+    var liftStr = '';
+    if (lift5!==null) liftStr += 'T+5胜率 +'+lift5.toFixed(1)+'pp';
+    if (lift10!==null) liftStr += (liftStr?'\u3000':'')+'T+10 +'+lift10.toFixed(1)+'pp';
+    card += '<div style="font-size:11px;color:#5ee0a0;margin-top:6px;">📈 '+liftStr+'　|　仅当市场处于「阴跌磨底/恐慌下行」regime 时开仓（数据驱动：坏状态正期望、好状态负期望）</div>';
+    card += '</div>';
+    return card;
+  }
+
   function renderBacktestTdx() {
     var con = $('cockpitBacktest60');
     if (!con) return;
     if (con.getAttribute('data-fetched')) return;
     /* v8 铁律：不发布 data/ 目录，禁止 fetch。从 update_v8.py 注入的 window.BACKTEST_TDX 读取 */
     var d = window.BACKTEST_TDX || null;
+    var od = window.OPTIMIZED_STRATEGY || null;
+    var optHtml = '';
+    if (od) { try { optHtml = buildOptimizedStrategyCard(od); } catch(e) { optHtml = ''; } }
     if (!d) {
+      if (optHtml) { con.innerHTML = optHtml; con.setAttribute('data-fetched','1'); return; }
       con.innerHTML = '<div style="text-align:center;padding:14px;color:#ffb74d;">⏳ 回测数据尚未生成（backtest_tdx.json 为空或不存在）<br><span style="font-size:12px;color:#8aa0c2;">每日盘后 scanner.py 跑完自动生成，约 2MB</span></div>';
       return;
     }
@@ -8667,7 +8716,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       contrarian:'🔴逆势红色', breakout_5d:'🚀5日突破', volume_surge:'💥放量上涨',
       divergence:'⚠️量价背离', ge2_signals:'🎯双信号', ge3_signals:'🎯三信号'};
     var lowSampleCount = items.filter(function(s){return (s.total||0)<30;}).length;
-    var html = '<div style="font-size:12px;color:#8aa0c2;margin-bottom:8px;">'+d.gold_pool_size+'只金池股×60日 · '+(d.calc_time||'')+' · 按T+5胜率降序</div>';
+    var html = optHtml + '<div style="font-size:12px;color:#8aa0c2;margin-bottom:8px;">'+d.gold_pool_size+'只金池股×60日 · '+(d.calc_time||'')+' · 按T+5胜率降序</div>';
     if (lowSampleCount > 0) {
       html += '<div style="font-size:12px;color:#ff6b81;background:rgba(255,107,129,.12);padding:6px 10px;border-radius:4px;margin-bottom:8px;">⚠️ <b>'+lowSampleCount+' 个信号样本<30</b>，胜率参考性低，红色行已标出。仅作排序参考，不作决策依据。</div>';
     }
