@@ -32,6 +32,7 @@ html>
   .tab.active{color:var(--cyan);border-bottom-color:var(--cyan)}
   .tab.locked{color:var(--lock)}
   .tab.locked .lk{font-size:11px}
+  .tab.admin-only{display:none}
 
   main{padding:22px 20px 60px;max-width:1320px;margin:0 auto}
   section{display:none;animation:fade .25s ease}
@@ -1123,11 +1124,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <div class="tab active" data-sec="final" onclick="switchSec('final',this)">🏆 最终推荐</div>
   <div class="tab" data-sec="query" onclick="switchSec('query',this)">🔍 个股查询</div>
   <!-- 2026-08-08 主人令：选股策略降级为「辅助策略池」，仅管理员可见，置于暂未上架左侧 -->
-  <div class="tab locked" data-sec="st" data-lock="1" onclick="guardLock('st',this)">🔒 选股策略 <span class="lk">[锁]</span></div>
+  <div class="tab locked admin-only" data-sec="st" data-lock="1" onclick="guardLock('st',this)">🔒 选股策略 <span class="lk">[锁]</span></div>
   <!-- 2026-08-07 主人令：暂未上架 从运维子 Tab 提升为一级 nav（仅管理员可见，guardLock 锁定） -->
-  <div class="tab locked" data-sec="ul" data-lock="1" onclick="guardLock('ul',this)">🔒 暂未上架 <span class="lk">[锁]</span></div>
-  <div class="tab locked" data-sec="op" data-lock="1" onclick="guardLock('op',this)">🔒 运维 <span class="lk">[锁]</span></div>
-  <div class="tab locked" data-sec="lg" data-lock="1" onclick="guardLock('lg',this)">🔒 逻辑详解 <span class="lk">[锁]</span></div>
+  <div class="tab locked admin-only" data-sec="ul" data-lock="1" onclick="guardLock('ul',this)">🔒 暂未上架 <span class="lk">[锁]</span></div>
+  <div class="tab locked admin-only" data-sec="op" data-lock="1" onclick="guardLock('op',this)">🔒 运维 <span class="lk">[锁]</span></div>
+  <div class="tab locked admin-only" data-sec="lg" data-lock="1" onclick="guardLock('lg',this)">🔒 逻辑详解 <span class="lk">[锁]</span></div>
 </nav>
 
 <main>
@@ -5015,6 +5016,7 @@ async function tryUnlock(){
     document.getElementById('adminBtn').textContent='退出';
     document.getElementById('adminBtn').setAttribute('onclick','logout()');
     document.querySelectorAll('.tab.locked').forEach(t=>{t.classList.remove('locked');const s=t.querySelector('.lk');if(s)s.remove();});
+    document.querySelectorAll('.tab.admin-only').forEach(t=>t.style.display='flex');
     switchSec('op',document.querySelector('[data-sec="op"]'));
   }else{
     document.getElementById('lockErr').textContent='口令错误，请重试';
@@ -5023,7 +5025,7 @@ async function tryUnlock(){
 function logout(){ try{ localStorage.removeItem('v8_admin'); }catch(e){} location.reload(); }
 function guardLock(sec,el){ if(isAdmin()){switchSec(sec,el);}else{openLock();} }
 function refreshAdminUI(){
-  if(isAdmin()){document.getElementById('adminState').innerHTML='<b>管理员已登录</b>';document.getElementById('adminBtn').textContent='退出';document.getElementById('adminBtn').setAttribute('onclick','logout()');document.querySelectorAll('.tab.locked').forEach(t=>{t.classList.remove('locked');const s=t.querySelector('.lk');if(s)s.remove();});}
+  if(isAdmin()){document.getElementById('adminState').innerHTML='<b>管理员已登录</b>';document.getElementById('adminBtn').textContent='退出';document.getElementById('adminBtn').setAttribute('onclick','logout()');document.querySelectorAll('.tab.locked').forEach(t=>{t.classList.remove('locked');const s=t.querySelector('.lk');if(s)s.remove();});document.querySelectorAll('.tab.admin-only').forEach(t=>t.style.display='flex');}
 }
 refreshAdminUI();
 
