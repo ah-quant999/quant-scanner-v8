@@ -1480,7 +1480,7 @@ def fetch_volume_top_stocks(top_cy=None, top_kc=None, top_zb=None, top_hk=None):
     for b, c in boards.items():
         print(f"    {b}: {c} 只")
 
-    # ── 合并投行研报关注池（30天内有出现）──
+    # ── 合并观澜台关注池（30天内有出现）──
     _wl_file = os.path.join(DATA_DIR, "guanlan_watchlist.json")
     if os.path.exists(_wl_file):
         try:
@@ -1511,14 +1511,14 @@ def fetch_volume_top_stocks(top_cy=None, top_kc=None, top_zb=None, top_hk=None):
                             _skipped += 1
                             continue
                         # (code, name, market, board_label, volume_amount, turnover_rate, mv_yi, fund_type)
-                        all_stocks.append((_code, _name, _mkt, "投行关注池", 0, 0, 0, "混合"))
+                        all_stocks.append((_code, _name, _mkt, "观澜台关注池", 0, 0, 0, "混合"))
                         _existing_codes.add(_code)
                         _added += 1
-            print(f"    投行研报关注池(30天): +{_added} 只")
+            print(f"    观澜台关注池(30天): +{_added} 只")
             if _skipped > 0:
                 print(f"    [跳过] {_skipped} 只代码格式不合法")
         except Exception as e:
-            print(f"  [投行研报] 读取关注池失败: {e}")
+            print(f"  [观澜台] 读取关注池失败: {e}")
 
     return all_stocks
 
@@ -2411,7 +2411,7 @@ def _repair_guanlan_name(name: str) -> str:
 
 
 def _convert_guanlan_to_pool_entry(gl_stock, today):
-    """将投行研报股票转换为金股池条目格式"""
+    """将观澜台股票转换为金股池条目格式"""
     code = str(gl_stock.get("code", ""))
     market_raw = gl_stock.get("market", "")
     full_code = gl_stock.get("full_code", "")
@@ -2457,7 +2457,7 @@ def _convert_guanlan_to_pool_entry(gl_stock, today):
         "first_signal": 0,
         "max_signal": 0,
         "history": [],
-        "sources": ["投行研报"],
+        "sources": ["观澜台"],
     }
 
 
@@ -2492,9 +2492,12 @@ def update_gold_pool_from_scan(output):
     # 候选股池（None = 未构建 → 旧逻辑不限制）
     cand = load_candidate_pool()
     cand_keys = set(cand.keys()) if cand else None
-    # 注："观澜台"(watchlist) 是 "观澜台研报" 的去重聚合，两者高度重叠，
-    # 故研报覆盖判定只保留真正的研报来源，避免同一只股票被重复加分。
-    RESEARCH_SRC = ("观澜台研报", "maharo研报", "投行研报")
+    # 注：
+    # - "观澜台"(watchlist) 是 "观澜台研报" 的去重聚合，两者高度重叠，
+    #   故不纳入研报覆盖判定。
+    # - "投行研报" 实际也来自观澜台 watchlist，是历史遗留名称，已统一改为 "观澜台"。
+    # 研报覆盖判定只保留真正的研报来源。
+    RESEARCH_SRC = ("观澜台研报", "maharo研报")
 
     def _merge_sources(entry, extra):
         src = entry.setdefault("sources", [])
@@ -3000,7 +3003,7 @@ def scan_market(scan_a=True, scan_hk=True, max_stocks=None, resume=False):
     if _bs_consecutive_fails >= _BS_FAIL_SKIP_THRESHOLD:
         print(f"  注: BaoStock 连续失败 {_bs_consecutive_fails} 次后已自动跳过")
 
-    # 投行研报扫描
+    # 观澜台扫描
     guanlan_data = None
     try:
         from guanlan_extractor import get_watchlist_for_dashboard, load_watchlist
@@ -3021,7 +3024,7 @@ def scan_market(scan_a=True, scan_hk=True, max_stocks=None, resume=False):
     # 排序: 信号数降序 → 涨跌幅降序
     results.sort(key=lambda x: (-x["signal_count"], -x.get("pct_chg", 0)))
 
-    # 交叉关联投行研报股票到扫描结果
+    # 交叉关联观澜台股票到扫描结果
     if guanlan_data and guanlan_data.get("stocks"):
         gl_codes = set()
         for gl_stock in guanlan_data["stocks"]:
@@ -3040,10 +3043,10 @@ def scan_market(scan_a=True, scan_hk=True, max_stocks=None, resume=False):
                     code_variants.append(scan_code.split(".")[0])
                 if any(cv in gl_codes for cv in code_variants):
                     sources = s.get("sources", [])
-                    if "投行研报" not in sources:
-                        sources.append("投行研报")
+                    if "观澜台" not in sources:
+                        sources.append("观澜台")
                         s["sources"] = sources
-        print(f"  投行研报关联完成")
+        print(f"  观澜台关联完成")
 
     # 输出JSON
     output = {
