@@ -259,10 +259,19 @@ def main():
     print("=== 拉取 mahoro 投行信号 ===\n")
     
     email = "ljcat999@gmail.com"
+    action = os.environ.get("MAHORO_ACTION", "").strip().lower()
     cookie = authenticate(email, non_interactive=args.non_interactive, code=args.code)
     if not cookie:
-        if args.non_interactive:
-            print("\n⏭️  跳过（非交互模式无有效 cookie）")
+        if action == "send-code":
+            # 云端代发验证码：发完即退出，不应视为失败
+            print("\n✅ 发码任务完成（无需继续拉取），请查收邮箱验证码后发给阿狸咪")
+            return 0
+        if action == "verify":
+            # 云端代登录：成功会返回 cookie；失败（验证码错等）也不阻塞流水线
+            print("\n⏭️  verify 模式：未拿到新 cookie（验证码可能错误），不阻塞")
+            return 0
+        if args.non_interactive or not sys.stdin.isatty():
+            print("\n⏭️  跳过（非交互/无终端：无有效 cookie）")
             print("  ⚠️ cookie 已过期或不存在，需要手动运行登录刷新")
             return 2  # 非零退出码，让 batch_update 能感知失败（不阻塞但可记录）
         print("\n❌ 登录失败")
