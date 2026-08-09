@@ -218,12 +218,12 @@ def step_push():
 def step_append_lhb_history():
     """累积龙虎榜历史（raw_data/lhb_data.json → raw_data/lhb_history.json），
     供 index.html 共振日历历史 + lhb_resonance/lhb_north_seat 独立页使用。
-    复用 sync_v6_to_v8 的成熟逻辑；lhb_data 由本链 fetch_lhb 产出并 stage 后已就位。"""
+    逻辑已内联在 stage_to_raw；lhb_data 由本链 fetch_lhb 产出并 stage 后已就位。"""
     print("\n[2.5] 累积 LHB 历史 → raw_data/lhb_history.json")
     try:
         sys.path.insert(0, ALGO)
-        import sync_v6_to_v8
-        sync_v6_to_v8._append_lhb_to_history()
+        import stage_to_raw
+        stage_to_raw.append_lhb_to_history()
         print("  ✅ LHB 历史累积完成")
     except Exception as e:
         print(f"  ⚠️ LHB 历史累积失败: {e}")
