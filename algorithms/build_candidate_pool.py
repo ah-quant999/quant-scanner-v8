@@ -640,6 +640,12 @@ def build():
     # 4) 观澜台 研报
     try:
         rp = json.load(open(os.path.join(DATA, "guanlan_reports.json"), encoding="utf-8"))
+        # 2026-08-09 修复：guanlan_extractor 产出的是
+        # {update_time, count, date_range, reports:[...]}，
+        # 原先直接 `for item in rp` 会遍历 dict 的键(str)，抛
+        # "'str' object has no attribute 'get'" → 研报来源恒为 0 只。
+        if isinstance(rp, dict):
+            rp = rp.get("reports") or []
         n = 0
         for item in rp:
             for st in item.get("stocks", []):
