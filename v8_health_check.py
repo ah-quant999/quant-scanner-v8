@@ -99,14 +99,38 @@ _HOLIDAYS_2026 = {
     "05-31", "06-01", "06-02",  # 端午
     "09-30", "10-01", "10-02", "10-03", "10-04", "10-05", "10-06", "10-07", "10-08",  # 国庆+中秋
 }
+# 补班日（周末但实际交易日）
+_MAKEUP_DAYS_2026 = {
+    "2026-01-04", "2026-02-14", "2026-02-28",
+    "2026-05-09", "2026-09-20", "2026-10-10",
+}
+
+
+def _is_trading_day(d) -> bool:
+    """判断某天是否为 A 股交易日（含补班日、剔除周末和节假日）。"""
+    if d.weekday() >= 5 and d.isoformat() not in _MAKEUP_DAYS_2026:
+        return False
+    return d.strftime("%m-%d") not in _HOLIDAYS_2026
 
 
 def is_market_closed(dt_cst=None):
     """判断给定北京时间是否为 A 股休市日（周末或法定节假日）。"""
     n = dt_cst or now_cst()
-    if n.weekday() >= 5:
-        return True
-    return n.strftime("%m-%d") in _HOLIDAYS_2026
+    return not _is_trading_day(n.date())
+
+
+def last_trade_day_close(now_cst_dt):
+    """返回最近交易日收盘时间（15:30），非交易日回退。"""
+    d = now_cst_dt.date()
+    while not _is_trading_day(d):
+        d -= timedelta(days=1)
+    close = datetime.combine(d, datetime.strptime("15:30", "%H:%M").time(), tzinfo=timezone(timedelta(hours=8)))
+    if now_cst_dt < close:
+        d -= timedelta(days=1)
+        while not _is_trading_day(d):
+            d -= timedelta(days=1)
+        close = datetime.combine(d, datetime.strptime("15:30", "%H:%M").time(), tzinfo=timezone(timedelta(hours=8)))
+    return close
 
 
 def fmt_rel_time(ts):
@@ -394,16 +418,16 @@ def adjust_max_age(def_max, page=None):
 
     if page in ("盘后数据", "选股策略"):
         # 盘后数据由 v8_algo_run 18:30 算法链产出，每个交易日仅一次。
-        # 关键：18:30 之外的所有时段，数据合理地来自「上一交易日 18:30」，
-        # 年龄可达 24h+，绝不能再用 360min 判 stale（否则夜间/白天必然满屏红灯）。
-        if is_trade_day and 19.0 <= h < 23.0:
-            # 当晚产出窗口（18:30 跑完 + 构建部署延迟）：必须是今晚的新数据，严格检查
+        # 关键：18:30 之外的所有时段，数据合理地来自「上一交易日收盘后」，
+        # 年龄可达 24h+，绝不能再用 360min 判 stale（否则夜间/白天/周末必然满屏红灯）。
+        close = last_trade_day_close(n)
+        hours_since_close = (n - close).total_seconds() / 3600
+        if hours_since_close < 8:
+            # 收盘后 8 小时内是新数据产出窗口（18:30 跑完 + 构建部署延迟），严格检查
             return min(def_max, 360)
-        if is_trade_day:
-            # 23:00~次日 19:00：数据来自上一交易日傍晚，允许 25h
-            return 1500
-        # 周末：覆盖到周一傍晚
-        return 2880
+        # 其他时段：阈值 = 自最近收盘以来分钟数 + 3 小时缓冲
+        # 自动覆盖夜间/周末/周一早盘，避免周五数据在周日夜间被 2880 分钟阈值误杀
+        return int(hours_since_close * 60) + 180
 
     # 未分类 / 管线类：沿用旧逻辑兜底
     if is_trade_day and ((9.5 <= h <= 11.5) or (13.0 <= h <= 15.0)):
@@ -441,8 +465,13 @@ def check_data_cards():
         age_min = (now_cst() - dt).total_seconds() / 60
         status = "ok" if age_min <= max_age else "fail"
 
+        page = d.get("page")
         # 周末/节假日不更新模块：直接放行，不判 stale、不判空值，避免误告警
         weekend_skip = d.get("weekend_update") is False and is_market_closed()
+        # 盘后数据 / 选股策略：周末/节假日停在最近交易日，同样放行并显示友好提示
+        if not weekend_skip and is_market_closed() and page in ("盘后数据", "选股策略"):
+            if dt and dt >= last_trade_day_close(now_cst()):
+                weekend_skip = True
 
         # 空值检测
         empty_fields = []
@@ -460,7 +489,8 @@ def check_data_cards():
         msg = f"更新于 {rel}"
         if weekend_skip:
             status = "ok"
-            msg = f"休市不更新（数据为上一交易日盘前）；{rel}"
+            phase = "盘后" if page in ("盘后数据", "选股策略") else "盘前"
+            msg = f"休市不更新（数据为上一交易日{phase}）；{rel}"
         elif empty_fields:
             msg += f"；关键字段空值：{', '.join(empty_fields)}"
         if status == "fail":
@@ -505,28 +535,30 @@ def check_site_deploy_sync():
     except Exception as e:
         return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "warn", "message": f"无法获取本地 HEAD: {e}"}]
 
+    site_sha = None
+    fetch_err = None
     # 线上站点 meta（带 retry 吸收瞬时抖动）
     try:
         req = urllib.request.Request(SITE_URL, headers={"User-Agent": "v8-health-check"})
         html_bytes, err = _urlopen_retry(req, timeout=15)
         if err:
-            return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "warn",
-                     "message": f"站点不可达（已重试{SITE_MAX_RETRIES}次）: {err}"}]
-        html = html_bytes.decode("utf-8", "replace")
+            fetch_err = err
+        else:
+            html = html_bytes.decode("utf-8", "replace")
+            m = re.search(r"v8-build-sha[:=]\s*([a-f0-9]{7,40})", html, re.I)
+            site_sha = m.group(1) if m else None
     except Exception as e:
-        return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "fail", "message": f"站点不可达: {e}"}]
+        fetch_err = e
 
-    # 尝试从 HTML 注释或脚本中找 commit sha
-    m = re.search(r"v8-build-sha[:=]\s*([a-f0-9]{7,40})", html, re.I)
-    site_sha = m.group(1) if m else None
+    # fallback：拿 GitHub Pages 的 latest deployment SHA（通过 GitHub API）
     if not site_sha:
-        # fallback：拿 GitHub Pages 的 latest deployment SHA（通过 GitHub API）
         deployments = api_get(f"https://api.github.com/repos/{REPO}/deployments?environment=github-pages&per_page=1")
         if isinstance(deployments, list) and deployments:
             site_sha = deployments[0].get("sha", "")[:7]
 
     if not site_sha:
-        return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "warn", "message": "无法从线上或 API 获取 Pages SHA"}]
+        return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "warn",
+                 "message": f"无法从线上或 API 获取 Pages SHA" + (f"（站点不可达：{fetch_err}）" if fetch_err else "")}]
 
     synced = local_sha.startswith(site_sha) or site_sha.startswith(local_sha)
     # 容忍 GitHub Pages 异步部署延迟：线上 SHA 落后 ≤5 个 commit 视为同步
