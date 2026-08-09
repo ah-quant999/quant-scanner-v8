@@ -159,7 +159,7 @@ def check_runner(heal=False):
     return ok, "; ".join(parts)
 
 
-def latest_workflow_run(name):
+def latest_workflow_run(name, skip_neutral=True):
     # list workflows then find by name
     wfs = api_get(f"https://api.github.com/repos/{REPO}/actions/workflows")
     if "__error__" in wfs:
@@ -171,12 +171,24 @@ def latest_workflow_run(name):
             break
     if not wf_id:
         return None, f"找不到 workflow '{name}'"
-    runs = api_get(f"https://api.github.com/repos/{REPO}/actions/workflows/{wf_id}/runs?per_page=1")
+    # 2026-08-09 第119轮修复【skipped 误报】：
+    #   GitHub Actions 并发触发时（如 workflow_run 与 push 同时命中），同一分钟内常出现
+    #   一条 conclusion=skipped 的 run 与一条 success 并存；旧实现 per_page=1 取最新一条，
+    #   恰好取到 skipped 即误判 FAIL 并发出告警邮件（实测 19:09 两条 run 并存致误报）。
+    #   ⇒ 跳过 neutral 结论（skipped/cancelled/neutral/action_required），取最近一条
+    #     有实际结论（success/failure）的 run；若整页全是 neutral 才退回第一条（真异常）。
+    NEUTRAL = ("skipped", "cancelled", "neutral", "action_required")
+    runs = api_get(f"https://api.github.com/repos/{REPO}/actions/workflows/{wf_id}/runs?per_page=20")
     if "__error__" in runs:
         return None, f"runs API error {runs['__error__']}"
     items = runs.get("workflow_runs", [])
     if not items:
         return None, "无运行记录"
+    if skip_neutral:
+        for r in items:
+            if r.get("conclusion") not in NEUTRAL:
+                return r, None
+        return items[0], None   # 全部 neutral：照常返回最新一条，由 check_workflow 判 FAIL
     return items[0], None
 
 
