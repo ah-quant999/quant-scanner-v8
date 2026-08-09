@@ -501,10 +501,22 @@ window.V8_CAL = {weeks:[],legend:[]};
    *   数据日期 == 昨天（或更早但≤30天）→ 「✅ MM-DD 已跑」（显示实际月/日）
    *   无时间戳/超过30天 → 不显示
    * 所有胶囊调用此函数，改一处全局生效。 */
+  /* 从任意时间字符串提取北京时间 YYYY-MM-DD */
+  window._extractDateStr = function(genTimeStr){
+    if(!genTimeStr) return '';
+    // 优先用 _parseAsCST（支持 ISO / YYYY-MM-DD HH:MM:SS / 本地时间等多种格式）
+    var d = window._parseAsCST ? window._parseAsCST(genTimeStr) : null;
+    if(d && !isNaN(d.getTime())){
+      return d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+    }
+    // fallback：直接 YYYY-MM-DD 前缀
+    var s = String(genTimeStr).slice(0,10);
+    if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+    return '';
+  };
   window._runBadgeInfo = function(genTimeStr){
-    if(!genTimeStr) return { show:false, label:'' };
-    var dataDate = String(genTimeStr).slice(0,10);
-    if(!/^\d{4}-\d{2}-\d{2}$/.test(dataDate)) return { show:false, label:'' };
+    var dataDate = window._extractDateStr(genTimeStr);
+    if(!dataDate) return { show:false, label:'' };
     var now = new Date();
     var cst = now.toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false});
     var m = cst.match(/(\d{4})\/(\d{2})\/(\d{2})[ T](\d{2}):(\d{2})/);
@@ -588,10 +600,14 @@ function setBadge(id, slot, horizon, ts, sub){
 function _holdBadge(dateStr, count, label){
   var d = '';
   if(dateStr){
-    // 优先识别 YYYY-MM-DD，避免 2026-08-07 被截成 26-08
-    var m = String(dateStr).match(/\d{4}-(\d{2})-(\d{2})/);
-    if(m) d = m[1]+'-'+m[2];
-    else { m = String(dateStr).match(/^(\d{2})-(\d{2})$/); if(m) d = m[1]+'-'+m[2]; }
+    // 2026-08-09 修复：兼容多种时间格式（YYYY-MM-DD HH:MM:SS / YYYYMMDD / ISO 等）
+    var ext = window._extractDateStr ? window._extractDateStr(dateStr) : '';
+    if(ext) d = ext.slice(5);
+    else {
+      var m = String(dateStr).match(/\d{4}-(\d{2})-(\d{2})/);
+      if(m) d = m[1]+'-'+m[2];
+      else { m = String(dateStr).match(/^(\d{2})-(\d{2})$/); if(m) d = m[1]+'-'+m[2]; }
+    }
   }
   var lbl = label || '已入仓';
   return '<span style="display:inline-flex;align-items:center;gap:4px;flex-shrink:0;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;padding:3px 10px;border-radius:10px;white-space:nowrap;">'
@@ -4169,11 +4185,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <div class="sec-head"><h2>📖 逻辑详解</h2><span class="tag">仅管理员可见 · 指标/策略/安全口径</span></div>
 
     <div class="lg-subtabs" id="lgSubtabs">
-      <div class="lg-tab active" data-lg="schedule" onclick="switchLg('schedule',this)">⏰ 定时任务</div>
-      <div class="lg-tab" data-lg="td" onclick="switchLg('td',this)">📅 今日事件</div>
+      <div class="lg-tab active" data-lg="td" onclick="switchLg('td',this)">📅 今日事件</div>
       <div class="lg-tab" data-lg="rt" onclick="switchLg('rt',this)">📡 实时数据</div>
       <div class="lg-tab" data-lg="ph" onclick="switchLg('ph',this)">🌙 盘后数据</div>
+      <div class="lg-tab" data-lg="rc" onclick="switchLg('rc',this)">🧲 共振日历</div>
+      <div class="lg-tab" data-lg="final" onclick="switchLg('final',this)">🏆 最终推荐</div>
       <div class="lg-tab" data-lg="st" onclick="switchLg('st',this)">🎯 选股策略</div>
+      <div class="lg-tab" data-lg="ul" onclick="switchLg('ul',this)">🔒 暂未上架</div>
       <div class="lg-tab" data-lg="op" onclick="switchLg('op',this)">🔒 运维</div>
       <div class="lg-tab" data-lg="v6" onclick="switchLg('v6',this)">📦 v6备忘录</div>
     </div>
@@ -4208,123 +4226,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div class="logic-p">事件必须带「相对时间」标签（今日/明日/X天后），不写裸日期。全天性事件置顶，盘中动态事件按触发时间倒序。</div>
       </div>
 
-    </div>
-
-    <!-- === 定时任务 === -->
-    <div class="lg-pane" id="lg-schedule">
-      <div class="card">
-        <h3><span class="ic">⏰</span>v8 定时任务矩阵（最新版，已对齐实际 workflow）</h3>
-        <div class="logic-p"><b>执行方说明（2026-08-06 更新）</b>：中国数据抓取已迁 <b>GitHub 云端 ubuntu-latest</b>（实测 push2delay 东财镜像 + akshare 从 GHA 可达，OK 10/11），<code>v8_cn_fetch_cloud</code> 自动调度跑在云端 24/7，<b>不依赖小九停电与否</b>。<b>2026-08-06 新增盘中自愈器 <code>v8_intraday_healer</code></b>：工作日 09:03-15:33 每 30 分钟检测抓取是否过期（>45 分钟）并自动 dispatch 补跑，同样纯云端执行，专门对付 GitHub schedule 漏档（实测 15:00 档会漏）。盘后算法链主链已迁 GitHub 云端 <code>v8_algo_cloud</code>（08-06 收敛 4→1 条 cron 修复静默失效），<code>v8_algo_run</code> 仅保留 workflow_dispatch 应急回退（cn runner 不再跑 cron 主链）；构建/部署/体检/清理/备份/自愈/健康监控全部云端。小九本机只运行看门狗监督 + 盘后算法链，不手动跑数据、不手动部署。</div>
-
-        <div class="logic-p">每次抓取后经 <code>api_push_raw</code> 推 <code>raw_data</code> → <code>v8_build_deploy</code> 自动 selective build + 部署 Pages，所以每个时间槽的“更新”必然触发对应前端的“部署”，不遗漏。</div>
-        <table class="lg-table">
-          <tr><th>时间槽</th><th>Workflow</th><th>类别</th><th>刷新的前端模块</th></tr>
-          <tr><td>08:25（工作日）/ 09:00（周六日）</td><td>v8_cn_fetch_cloud</td><td>盘前</td><td>今日事件(V8_CAL日历+今日判定JUDGMENT_DATA+打新)、IPO、两融、中金所持仓、宏观、危机雷达、北向、分析师评级、52周高、羊群效应、ETF申赎</td></tr>
-          <tr><td>09:40 / 10:00 / 10:30 / 11:00 / 11:30 / 13:00 / 13:30 / 14:00 / 14:30 / 15:10</td><td>v8_cn_fetch_cloud</td><td>盘中</td><td>指数行情、ETF脉搏、ETF盘中热度、ETF日监控(实时)、板块资金流、个股资金流、概念排行、涨停热力、候选池实时行情、成交金额/涨跌家数(SH_SZ_HISTORY)</td></tr>
-          <tr><td>15:30</td><td>v8_cn_fetch_cloud</td><td>盘后</td><td>EXPERIMENT、大盘资金流累积序列、ETF日监控再补抓(T+1收盘定稿)、龙虎榜历史回填</td></tr>
-          <tr><td>16:30</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓</td><td>港股16:00收盘后补抓恒指/港股候选/盘中模块收盘值（A股已收盘，不重复抓A股）</td></tr>
-          <tr><td>盘中每30分</td><td>v8_risk_gauge</td><td>危机雷达</td><td>危机雷达/风险温度计实时刷新（美股开盘情绪覆盖 19:00-22:00 北京时间）</td></tr>
-          <tr><td>18:30 / 20:00（主+冗余）</td><td>v8_algo_cloud</td><td>盘后算法（云端主链）</td><td>龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测/板块资金流趋势/停牌预警/市场预警/NT数据（已迁 GitHub 云端 ubuntu，20:30/20:50 兜底）</td></tr>
-          <tr><td>23:00</td><td>v8_backup</td><td>每日备份</td><td>备份 raw_data/*.json 防意外丢失（push 至 main）</td></tr>
-          <tr><td>09:00 / 17:00</td><td>v8_algo</td><td>体检</td><td>46 模块新鲜度体检（云端）</td></tr>
-          <tr><td>非交易时段每2h</td><td>runner_health_alert</td><td>健康监控</td><td>lemoncat-cn runner 离线 → 开 Issue 告警（云端，工作日13-21点/周末0-20点）</td></tr>
-          <tr><td>周六/周日 09:00</td><td>v8_cn_fetch_cloud</td><td>T+1 周度</td><td>日历/今日判定/IPO/两融/中金所/宏观/危机/北向/分析师/52周高/羊群效应统一刷新</td></tr>
-        </table>
-        <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>成交金额 / 涨跌家数</b> = 模块 <code>SH_SZ_HISTORY</code>，归属 <b>盘中 09:40–15:10 每 30 分钟</b> 自动抓取（v8_cn_fetch_cloud · 云端）。此前因上游 push2his 接口被 WAF 拦截导致序列冻结，已于今日改用 akshare 指数日线 + 全市场快照修复，恢复实时刷新。</div>
-        <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>盘后数据里「仍在盘中实时更新」的模块（易遗漏，特此单列）</b>：<code>ETF_DAILY_MONITOR</code>（ETF 日监控）在 <b>盘中 09:40–15:10 每 30 分钟</b> 实时刷新，且 <b>15:30 盘后再补抓一次</b> 做 T+1 日监控收盘定稿——它既出现在「实时数据区」实时卡，也会出现在「盘后数据」区，两端都不遗漏。<br>📌 <b>日频序列防漏跑 safety_net</b>：<code>MARKET_FUND_FLOW_DATA</code>（资金流时间轴·中长线）主档为 <b>盘后 15:30</b>，但因其是日频收盘累积序列、一旦 15:30 漏跑就会滞后一天，故额外在 <b>次日盘前 08:25</b> 补抓一次。其余纯盘后模块（EXPERIMENT / 龙虎榜历史回填）仅在 15:30 或 18:30 产出，盘中不刷新。所有前端模块均已落在上方「前端模块→时段」表与「工作日」逐档表中，无遗漏。</div>
-
-        <div class="logic-h">工作日</div>
-        <table class="lg-table">
-          <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
-          <tr><td>08:25</td><td>v8_cn_fetch_cloud</td><td>盘前（日历/今日判定/IPO/两融/中金所/宏观/危机/北向/分析师/52周高/羊群效应）</td><td>云端</td></tr>
-          <tr><td>09:40</td><td>v8_cn_fetch_cloud</td><td>盘中首档（开盘前首刷：指数/ETF/板块资金/概念排行/涨停热力/个股资金流）</td><td>云端</td></tr>
-          <tr><td>10:00</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
-          <tr><td>10:30</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
-          <tr><td>11:00</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
-          <tr><td>11:30</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
-          <tr><td>13:00</td><td>v8_cn_fetch_cloud</td><td>盘中（午后开盘）</td><td>云端</td></tr>
-          <tr><td>13:30</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
-          <tr><td>14:00</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
-          <tr><td>14:30</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
-          <tr><td>15:10</td><td>v8_cn_fetch_cloud</td><td>盘中末档（收盘前最后快照）</td><td>云端</td></tr>
-          <tr style="background:rgba(56,189,248,.06);"><td>09:03-15:33 每30分</td><td>v8_intraday_healer</td><td>盘中自愈：检测抓取过期(>45min)自动补跑，防 GitHub schedule 漏档</td><td>云端</td></tr>
-          <tr><td>15:45</td><td>v8_cn_fetch_cloud</td><td>盘后（T+1 龙虎榜·机游共振+北向席位数据产出·v6四色块入榜阈值≥0.8亿）</td><td>云端</td></tr>
-          <tr><td>16:30</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓（恒指/港股候选/盘中模块收盘值）</td><td>云端</td></tr>
-          <tr><td>盘中每30分</td><td>v8_risk_gauge</td><td>危机雷达/风险温度计实时刷新</td><td>云端</td></tr>
-          <tr><td>工作日13/15/17/19/21点 · 周末0-20点每2h</td><td>runner_health_alert</td><td>Runner 健康监控（离线开 Issue；workflow 当前 active，无需手动 unpause）</td><td>云端</td></tr>
-          <tr><td>09:00</td><td>v8_algo</td><td>盘前预检（46模块新鲜度体检）</td><td>云端</td></tr>
-          <tr><td>17:00</td><td>v8_algo</td><td>收盘后总检（46模块新鲜度体检）</td><td>云端</td></tr>
-          <tr><td>18:30 / 20:00</td><td>v8_algo_cloud</td><td>盘后算法链（龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测）</td><td>GitHub 云端 ubuntu（主链；20:30/20:50 兜底）</td></tr>
-          <tr><td>23:00</td><td>v8_backup</td><td>每日自动备份 raw_data</td><td>云端</td></tr>
-          <tr style="background:rgba(56,189,248,.06);"><td colspan="4" style="text-align:center;font-size:12px;color:var(--dim);">↓ push raw_data → 自动触发 v8_build_deploy → GitHub Pages 部署</td></tr>
-        </table>
-
-        <div class="logic-h">周六</div>
-        <table class="lg-table">
-          <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
-          <tr><td>09:00</td><td>v8_cn_fetch_cloud</td><td>T+1 周度/月度统一刷新（日历/今日判定/IPO/两融/宏观等）</td><td>云端</td></tr>
-          <tr><td>0-20点每2h</td><td>runner_health_alert</td><td>Runner 健康监控（离线开 Issue）</td><td>云端</td></tr>
-          <tr><td>14:00</td><td>v8_self_heal</td><td>云端自愈器：检测陈旧模块 → 自动 re-fetch 补跑（2026-08-06 起 dispatch 云端主链，不再依赖 cn runner 在线）</td><td>云端</td></tr>
-          <tr><td>15:30</td><td>周末选股四模块T+1更新部署</td><td>选股数据更新+部署+臃肿度/崩溃风险体检（v8_bloat_check.py --alert，仅周六）</td><td>本机</td></tr>
-          <tr><td>21:00</td><td>cloud_weekly_cleanup</td><td>orphan 清理 + 新鲜度体检</td><td>云端</td></tr>
-        </table>
-
-        <div class="logic-h">周日</div>
-        <table class="lg-table">
-          <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
-          <tr><td>15:30</td><td>周末选股四模块T+1更新部署</td><td>选股数据更新+部署（不含臃肿度体检）</td><td>本机</td></tr>
-          <tr><td>23:00</td><td>v8_cleanup</td><td>缓存/日志清理</td><td>云端 ubuntu</td></tr>
-        </table>
-
-        <div class="logic-h">应急（仅手动）</div>
-        <table class="lg-table">
-          <tr><th>Workflow</th><th>用途</th><th>触发方式</th></tr>
-          <tr><td>v8_sync_v6_data</td><td>v6→v8 数据桥（v8原生链故障时应急灌数据）</td><td>workflow_dispatch（无定时）</td></tr>
-          <tr><td>v8_cn_fetch（应急回退）</td><td>任意时段强制补跑（原中国节点自托管版，cron 已移除；云端版 v8_cn_fetch_cloud 为主力）</td><td>workflow_dispatch</td></tr>
-          <tr><td>v8_algo_run</td><td>强制重跑算法链（中国节点小九）</td><td>workflow_dispatch</td></tr>
-          <tr><td>v8_build_deploy</td><td>强制全量构建部署</td><td>workflow_dispatch</td></tr>
-          <tr><td>v8_safety_net</td><td>Safety Net 兜底监控（工作日 09:00~17:00 每20min）</td><td>cron + dispatch</td></tr>
-          <tr><td>runner_health_alert</td><td>Runner 离线即时告警（可手动触发立即检查）</td><td>workflow_dispatch</td></tr>
-        </table>
-
-        <div class="logic-h">关键设计原则</div>
-        <div class="logic-p"><b>龙虎榜必须等 17 点交易所发布后才能取完整数据</b>，因此盘后算法链固定在 18:30。盘中只刷新 T+0 快照，不跑盘后算法，避免用陈旧数据算出错误共识。<b>Safety Net</b>是保险机制——中国数据抓取已迁云端 24/7 在线，Safety Net 是「断线时自动补跑」而非「日常调度」。</div>
-        <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>盘后算法链顺序铁律（2026-08-08 修复）</b>：<code style="background:var(--bg2);padding:1px 4px;border-radius:3px">generate_top10.py</code> 必须在 <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">backtest_comprehensive.py</code> / <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">cockpit_backtest_now.py</code> <b>之前</b>执行——综合回测依赖 top10 当日快照（<code style="background:var(--bg2);padding:1px 4px;border-radius:3px">raw_data/history/top10_daily_YYYYMMDD.json</code>），顺序倒置会导致「综合回测」卡长期为空。当前固定顺序：build_candidate_pool → generate_top10 → backtest_tdx → backtest_comprehensive → cockpit_backtest_now。</div>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">🔄</span>盘中 vs 盘后分工</h3>
-        <table class="lg-table">
-          <tr><th>时段</th><th>职责</th><th>失败影响</th><th>兜底</th></tr>
-          <tr><td>盘前 08:25</td><td>把当日已知事件、预警、宏观状态准备好</td><td>事件/日历显示旧数据</td><td>Safety Net 2h 后补跑</td></tr>
-          <tr><td>盘中 09:40~15:10</td><td>刷新实时行情、资金、ETF、涨停热力</td><td>实时区时间戳停滞</td><td>盘中自愈器每30分检测补跑 + 下一档自动覆盖</td></tr>
-          <tr><td>盘后 18:30</td><td>基于完整收盘数据生成选股结果</td><td>三重共识/驾驶舱用隔夜数据</td><td>周六 self_heal 补跑</td></tr>
-          <tr><td>构建部署</td><td>raw_data push 触发 selective build → Pages</td><td>线上数据不更新</td><td>manual dispatch</td></tr>
-        </table>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">🛡️</span>v8 vs v6 遗产对比</h3>
-        <table class="lg-table">
-          <tr><th>能力</th><th>v6 实现</th><th>v8 现状</th><th>优先级</th></tr>
-          <tr><td>Safety Net 兜底</td><td>safety-net.yml 每15min轮询</td><td><span style="color:#38bdf8;">✅ 已建 v8_safety_net.yml</span></td><td>P0 必须</td></tr>
-          <tr><td>云端自愈器</td><td>cloud_self_heal 周末T+1补全</td><td><span style="color:#38bdf8;">✅ 已建 v8_self_heal.yml</span></td><td>P1 应补</td></tr>
-          <tr><td>每日备份</td><td>cloud_backup.yml 21:00</td><td><span style="color:#38bdf8;">✅ 已建 v8_backup.yml 23:00</span></td><td>P2 可选</td></tr>
-          <tr><td>心跳监控上云</td><td>peer_health_monitor 本机</td><td>✅ Actions 日志即心跳</td><td>P2 可选</td></tr>
-          <tr><td>防误删清单</td><td>DO_NOT_DELETE.md + pre-commit hook</td><td><span style="color:#38bdf8;">✅ 已建 DO_NOT_DELETE.md</span></td><td>P0 必须</td></tr>
-        </table>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">📝</span>本周待办/建议表</h3>
-        <div class="logic-p">主人在历史 HANDOVER 中规划的「建议项」，照搬待落地。本周（7/27~8/02）已完成：4 类上游原生化（89da5fc）· 每日洞察/大牛股猎手对标参考页重构（7466799）· 2 次周度锚点 bug 修复（300ec6d/589f601）· 北向席位 hasMultiDay 修复 + 月度汇总加日期注释（589f601）。</div>
-        <table class="lg-table">
-          <tr><th>时段</th><th>任务</th><th>建议</th><th>频次</th></tr>
-          <tr><td>14:06</td><td>v8_self_heal · 冻结模块诊断+补跑</td><td>⚠️ 建议并入 21:00 窗口，删掉这个独立 workflow</td><td>周度兜底</td></tr>
-          <tr><td>首周六</td><td>(建议)月度报告 + STOCK_LIST pinyin 重生 + 依赖体检</td><td><span class="op-tab-time" style="background:#3b82f6;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600">NEW</span> 加 if 首周六 guard 进 21:00 脚本</td><td>月度</td></tr>
-          <tr><td>首周日</td><td>(建议)旧数据归档 + git gc/pack + 备份轮转</td><td><span class="op-tab-time" style="background:#3b82f6;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600">NEW</span> 加 if 首周日 guard 进 23:00 脚本</td><td>月度</td></tr>
-        </table>
-      </div>
     </div>
 
     <!-- === 实时数据 === -->
@@ -4506,6 +4407,34 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">追踪四大类：货币（国债/LPR/OMO/M2）/ 全球（VIX/DXY/CNH/利差）/ 情绪（新增投资者）/ 经济（PMI/CPI/PPI/社融/出口）。月度⭐已更新 / ☆待更新；每日高频实时显示。</div>
         <div class="logic-h">危机监测·趋势对比</div>
         <div class="logic-p">监测SHIBOR隔夜、中美利差、PMI、社融增速、出口增速、VIX、铜金比共7项。与前值对比，趋势箭头↑恶化↓改善。评分：🔴2分危险 / 🟡1分关注 / 🟢0分安全；≥6高度警惕 / 3-5需要关注 / ＜3暂无异常。</div>
+      </div>
+    </div>
+
+    <!-- === 共振日历 === -->
+    <div class="lg-pane" id="lg-rc">
+      <div class="card">
+        <h3><span class="ic">🧲</span>共振日历 - 说明</h3>
+        <div class="logic-h">三段结构</div>
+        <div class="logic-p">· <b>📅 机游共振日历</b>（jyCalContainer）：逐日展示龙虎榜「机游共振 / 机构独买 / 游资独买」上榜标的与净买额。<br>· <b>🌊 北向席位日历</b>（northCalContainer）：逐日北向席位净买卖明细与连续净买信号。<br>· <b>🔍 每日洞察</b>：涨跌概况 / 资金流向 / 热点板块 / 异动信号聚合。</div>
+        <div class="logic-h">数据口径</div>
+        <div class="logic-p">统一由 <code>window._rcDays()</code> 聚合 <b>LHB_HISTORY</b>（多日历史，保证 7 日连续数据）+ <b>LHB_DATA</b>（当日降级兜底）产出。2026-08-08 清理了与 sec-rc 新实现同名冲突的旧 <code>renderJyCalendar</code> / <code>renderNorthCalendar</code>（曾渲染进不存在容器，导致日历覆盖、7 日数据时有时无），现仅保留单一聚合实现。</div>
+        <div class="logic-h">与「大牛股猎手」的关系</div>
+        <div class="logic-p">大牛股猎手（选股策略 tab）是共振日历「机游共振」信号的<b>选股化落地</b>——把当日上榜的机游共振标的做成中线观察池；共振日历仍是完整的每日机游/北向/洞察总览。</div>
+      </div>
+    </div>
+
+    <!-- === 最终推荐 === -->
+    <div class="lg-pane" id="lg-final">
+      <div class="card">
+        <h3><span class="ic">🏆</span>最终推荐 - 说明</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">2026-08-08 主人令：最终推荐 = 全站唯一买卖决策入口。聚合三重共识、四量终极、驾驶舱 A 档、全站精选、相对强度 A 档、大牛股猎手核心共振、CRDS 逆势龙头等多策略信号，按跨策略共振 + 板块强度加权排序，输出 Top3。</div>
+        <div class="logic-h">三子页</div>
+        <div class="logic-p">· <b>🏆 最终推荐 · Top3</b>：跨策略共振得分最高的 3 只，作为当日核心买卖观察。<br>· <b>🎯 今日推荐候选池</b>：Top3 之外仍满足至少两条独立策略共振的候选，供扩展观察。<br>· <b>🔍 个股查询</b>：输入任意股票代码/名称，查看其是否命中各策略层及基本面画像。</div>
+        <div class="logic-h">评分逻辑</div>
+        <div class="logic-p">每只股票按命中策略数量与策略可信度加权；同策略多周期共振（如 60m 四量共振）额外加分；板块 RPS 强度作为权重放大器；最终得分归一化后取前 N。</div>
+        <div class="logic-h">使用边界</div>
+        <div class="logic-p">Top3 是「高置信候选」而非「必然买入」；仍需结合市场环境、仓位管理与个人风险偏好做最终决策。</div>
       </div>
     </div>
 
@@ -4703,16 +4632,6 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
       </div>
 
       <div class="card">
-        <h3><span class="ic">🧲</span>共振日历 - 说明（顶部独立 section）</h3>
-        <div class="logic-h">三段结构</div>
-        <div class="logic-p">· <b>📅 机游共振日历</b>（jyCalContainer）：逐日展示龙虎榜「机游共振 / 机构独买 / 游资独买」上榜标的与净买额。<br>· <b>🌊 北向席位日历</b>（northCalContainer）：逐日北向席位净买卖明细与连续净买信号。<br>· <b>🔍 每日洞察</b>：涨跌概况 / 资金流向 / 热点板块 / 异动信号聚合。</div>
-        <div class="logic-h">数据口径</div>
-        <div class="logic-p">统一由 <code>window._rcDays()</code> 聚合 <b>LHB_HISTORY</b>（多日历史，保证 7 日连续数据）+ <b>LHB_DATA</b>（当日降级兜底）产出。2026-08-08 清理了与 sec-rc 新实现同名冲突的旧 <code>renderJyCalendar</code> / <code>renderNorthCalendar</code>（曾渲染进不存在容器，导致日历覆盖、7 日数据时有时无），现仅保留单一聚合实现。</div>
-        <div class="logic-h">与「大牛股猎手」的关系</div>
-        <div class="logic-p">大牛股猎手（选股策略 tab）是共振日历「机游共振」信号的<b>选股化落地</b>——把当日上榜的机游共振标的做成中线观察池；共振日历仍是完整的每日机游/北向/洞察总览。</div>
-      </div>
-
-      <div class="card">
         <h3><span class="ic">🔤</span>四个基础信号 - 说明</h3>
         <table class="lg-table">
           <tr><th>信号</th><th>含义</th><th>技术定义</th></tr>
@@ -4793,8 +4712,135 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
       </div>
     </div>
 
+    <!-- === 暂未上架 === -->
+    <div class="lg-pane" id="lg-ul">
+      <div class="card">
+        <h3><span class="ic">🧪</span>暂未上架 - 说明</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">仅管理员可见的实验区。放置已开发但尚未正式上架的卡片、调试工具或过渡性模块，避免在主站显示不稳定功能。</div>
+        <div class="logic-h">当前内容</div>
+        <div class="logic-p">· <b>实验选股调试专区</b>：三重起涨 / CRDS逆势 / 候选池等验证中模块。<br>· <b>观测候选股池</b>：多源信号初筛池，按主板/创业板/科创板/港股/观澜台/maharo研报分组展示。<br>· <b>今日判定 · 环境态势</b>：已迁回「今日事件」页，此处不再重复。</div>
+        <div class="logic-h">与正式区关系</div>
+        <div class="logic-p">经主人确认稳定的模块会逐步提升到一级 Tab 或正式卡片；确认废弃的模块会移除。用户不应把暂未上架内容作为买卖依据。</div>
+      </div>
+    </div>
+
     <!-- === 运维 === -->
     <div class="lg-pane" id="lg-op">
+      <div class="card">
+        <h3><span class="ic">⏰</span>v8 定时任务矩阵（最新版，已对齐实际 workflow）</h3>
+        <div class="logic-p"><b>执行方说明（2026-08-06 更新）</b>：中国数据抓取已迁 <b>GitHub 云端 ubuntu-latest</b>（实测 push2delay 东财镜像 + akshare 从 GHA 可达，OK 10/11），<code>v8_cn_fetch_cloud</code> 自动调度跑在云端 24/7，<b>不依赖小九停电与否</b>。<b>2026-08-06 新增盘中自愈器 <code>v8_intraday_healer</code></b>：工作日 09:03-15:33 每 30 分钟检测抓取是否过期（>45 分钟）并自动 dispatch 补跑，同样纯云端执行，专门对付 GitHub schedule 漏档（实测 15:00 档会漏）。盘后算法链主链已迁 GitHub 云端 <code>v8_algo_cloud</code>（08-06 收敛 4→1 条 cron 修复静默失效），<code>v8_algo_run</code> 仅保留 workflow_dispatch 应急回退（cn runner 不再跑 cron 主链）；构建/部署/体检/清理/备份/自愈/健康监控全部云端。小九本机只运行看门狗监督 + 盘后算法链，不手动跑数据、不手动部署。</div>
+
+        <div class="logic-p">每次抓取后经 <code>api_push_raw</code> 推 <code>raw_data</code> → <code>v8_build_deploy</code> 自动 selective build + 部署 Pages，所以每个时间槽的“更新”必然触发对应前端的“部署”，不遗漏。</div>
+        <table class="lg-table">
+          <tr><th>时间槽</th><th>Workflow</th><th>类别</th><th>刷新的前端模块</th></tr>
+          <tr><td>08:25（工作日）/ 09:00（周六日）</td><td>v8_cn_fetch_cloud</td><td>盘前</td><td>今日事件(V8_CAL日历+今日判定JUDGMENT_DATA+打新)、IPO、两融、中金所持仓、宏观、危机雷达、北向、分析师评级、52周高、羊群效应、ETF申赎</td></tr>
+          <tr><td>09:40 / 10:00 / 10:30 / 11:00 / 11:30 / 13:00 / 13:30 / 14:00 / 14:30 / 15:10</td><td>v8_cn_fetch_cloud</td><td>盘中</td><td>指数行情、ETF脉搏、ETF盘中热度、ETF日监控(实时)、板块资金流、个股资金流、概念排行、涨停热力、候选池实时行情、成交金额/涨跌家数(SH_SZ_HISTORY)</td></tr>
+          <tr><td>15:30</td><td>v8_cn_fetch_cloud</td><td>盘后</td><td>EXPERIMENT、大盘资金流累积序列、ETF日监控再补抓(T+1收盘定稿)、龙虎榜历史回填</td></tr>
+          <tr><td>16:30</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓</td><td>港股16:00收盘后补抓恒指/港股候选/盘中模块收盘值（A股已收盘，不重复抓A股）</td></tr>
+          <tr><td>盘中每30分</td><td>v8_risk_gauge</td><td>危机雷达</td><td>危机雷达/风险温度计实时刷新（美股开盘情绪覆盖 19:00-22:00 北京时间）</td></tr>
+          <tr><td>18:30 / 20:00（主+冗余）</td><td>v8_algo_cloud</td><td>盘后算法（云端主链）</td><td>龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测/板块资金流趋势/停牌预警/市场预警/NT数据（已迁 GitHub 云端 ubuntu，20:30/20:50 兜底）</td></tr>
+          <tr><td>23:00</td><td>v8_backup</td><td>每日备份</td><td>备份 raw_data/*.json 防意外丢失（push 至 main）</td></tr>
+          <tr><td>09:00 / 17:00</td><td>v8_algo</td><td>体检</td><td>46 模块新鲜度体检（云端）</td></tr>
+          <tr><td>非交易时段每2h</td><td>runner_health_alert</td><td>健康监控</td><td>lemoncat-cn runner 离线 → 开 Issue 告警（云端，工作日13-21点/周末0-20点）</td></tr>
+          <tr><td>周六/周日 09:00</td><td>v8_cn_fetch_cloud</td><td>T+1 周度</td><td>日历/今日判定/IPO/两融/中金所/宏观/危机/北向/分析师/52周高/羊群效应统一刷新</td></tr>
+        </table>
+        <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>成交金额 / 涨跌家数</b> = 模块 <code>SH_SZ_HISTORY</code>，归属 <b>盘中 09:40–15:10 每 30 分钟</b> 自动抓取（v8_cn_fetch_cloud · 云端）。此前因上游 push2his 接口被 WAF 拦截导致序列冻结，已于今日改用 akshare 指数日线 + 全市场快照修复，恢复实时刷新。</div>
+        <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>盘后数据里「仍在盘中实时更新」的模块（易遗漏，特此单列）</b>：<code>ETF_DAILY_MONITOR</code>（ETF 日监控）在 <b>盘中 09:40–15:10 每 30 分钟</b> 实时刷新，且 <b>15:30 盘后再补抓一次</b> 做 T+1 日监控收盘定稿——它既出现在「实时数据区」实时卡，也会出现在「盘后数据」区，两端都不遗漏。<br>📌 <b>日频序列防漏跑 safety_net</b>：<code>MARKET_FUND_FLOW_DATA</code>（资金流时间轴·中长线）主档为 <b>盘后 15:30</b>，但因其是日频收盘累积序列、一旦 15:30 漏跑就会滞后一天，故额外在 <b>次日盘前 08:25</b> 补抓一次。其余纯盘后模块（EXPERIMENT / 龙虎榜历史回填）仅在 15:30 或 18:30 产出，盘中不刷新。所有前端模块均已落在上方「前端模块→时段」表与「工作日」逐档表中，无遗漏。</div>
+
+        <div class="logic-h">工作日</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
+          <tr><td>08:25</td><td>v8_cn_fetch_cloud</td><td>盘前（日历/今日判定/IPO/两融/中金所/宏观/危机/北向/分析师/52周高/羊群效应）</td><td>云端</td></tr>
+          <tr><td>09:40</td><td>v8_cn_fetch_cloud</td><td>盘中首档（开盘前首刷：指数/ETF/板块资金/概念排行/涨停热力/个股资金流）</td><td>云端</td></tr>
+          <tr><td>10:00</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
+          <tr><td>10:30</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
+          <tr><td>11:00</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
+          <tr><td>11:30</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
+          <tr><td>13:00</td><td>v8_cn_fetch_cloud</td><td>盘中（午后开盘）</td><td>云端</td></tr>
+          <tr><td>13:30</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
+          <tr><td>14:00</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
+          <tr><td>14:30</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
+          <tr><td>15:10</td><td>v8_cn_fetch_cloud</td><td>盘中末档（收盘前最后快照）</td><td>云端</td></tr>
+          <tr style="background:rgba(56,189,248,.06);"><td>09:03-15:33 每30分</td><td>v8_intraday_healer</td><td>盘中自愈：检测抓取过期(>45min)自动补跑，防 GitHub schedule 漏档</td><td>云端</td></tr>
+          <tr><td>15:45</td><td>v8_cn_fetch_cloud</td><td>盘后（T+1 龙虎榜·机游共振+北向席位数据产出·v6四色块入榜阈值≥0.8亿）</td><td>云端</td></tr>
+          <tr><td>16:30</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓（恒指/港股候选/盘中模块收盘值）</td><td>云端</td></tr>
+          <tr><td>盘中每30分</td><td>v8_risk_gauge</td><td>危机雷达/风险温度计实时刷新</td><td>云端</td></tr>
+          <tr><td>工作日13/15/17/19/21点 · 周末0-20点每2h</td><td>runner_health_alert</td><td>Runner 健康监控（离线开 Issue；workflow 当前 active，无需手动 unpause）</td><td>云端</td></tr>
+          <tr><td>09:00</td><td>v8_algo</td><td>盘前预检（46模块新鲜度体检）</td><td>云端</td></tr>
+          <tr><td>17:00</td><td>v8_algo</td><td>收盘后总检（46模块新鲜度体检）</td><td>云端</td></tr>
+          <tr><td>18:30 / 20:00</td><td>v8_algo_cloud</td><td>盘后算法链（龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测）</td><td>GitHub 云端 ubuntu（主链；20:30/20:50 兜底）</td></tr>
+          <tr><td>23:00</td><td>v8_backup</td><td>每日自动备份 raw_data</td><td>云端</td></tr>
+          <tr style="background:rgba(56,189,248,.06);"><td colspan="4" style="text-align:center;font-size:12px;color:var(--dim);">↓ push raw_data → 自动触发 v8_build_deploy → GitHub Pages 部署</td></tr>
+        </table>
+
+        <div class="logic-h">周六</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
+          <tr><td>09:00</td><td>v8_cn_fetch_cloud</td><td>T+1 周度/月度统一刷新（日历/今日判定/IPO/两融/宏观等）</td><td>云端</td></tr>
+          <tr><td>0-20点每2h</td><td>runner_health_alert</td><td>Runner 健康监控（离线开 Issue）</td><td>云端</td></tr>
+          <tr><td>14:00</td><td>v8_self_heal</td><td>云端自愈器：检测陈旧模块 → 自动 re-fetch 补跑（2026-08-06 起 dispatch 云端主链，不再依赖 cn runner 在线）</td><td>云端</td></tr>
+          <tr><td>15:30</td><td>周末选股四模块T+1更新部署</td><td>选股数据更新+部署+臃肿度/崩溃风险体检（v8_bloat_check.py --alert，仅周六）</td><td>本机</td></tr>
+          <tr><td>21:00</td><td>cloud_weekly_cleanup</td><td>orphan 清理 + 新鲜度体检</td><td>云端</td></tr>
+        </table>
+
+        <div class="logic-h">周日</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
+          <tr><td>15:30</td><td>周末选股四模块T+1更新部署</td><td>选股数据更新+部署（不含臃肿度体检）</td><td>本机</td></tr>
+          <tr><td>23:00</td><td>v8_cleanup</td><td>缓存/日志清理</td><td>云端 ubuntu</td></tr>
+        </table>
+
+        <div class="logic-h">应急（仅手动）</div>
+        <table class="lg-table">
+          <tr><th>Workflow</th><th>用途</th><th>触发方式</th></tr>
+          <tr><td>v8_sync_v6_data</td><td>v6→v8 数据桥（v8原生链故障时应急灌数据）</td><td>workflow_dispatch（无定时）</td></tr>
+          <tr><td>v8_cn_fetch（应急回退）</td><td>任意时段强制补跑（原中国节点自托管版，cron 已移除；云端版 v8_cn_fetch_cloud 为主力）</td><td>workflow_dispatch</td></tr>
+          <tr><td>v8_algo_run</td><td>强制重跑算法链（中国节点小九）</td><td>workflow_dispatch</td></tr>
+          <tr><td>v8_build_deploy</td><td>强制全量构建部署</td><td>workflow_dispatch</td></tr>
+          <tr><td>v8_safety_net</td><td>Safety Net 兜底监控（工作日 09:00~17:00 每20min）</td><td>cron + dispatch</td></tr>
+          <tr><td>runner_health_alert</td><td>Runner 离线即时告警（可手动触发立即检查）</td><td>workflow_dispatch</td></tr>
+        </table>
+
+        <div class="logic-h">关键设计原则</div>
+        <div class="logic-p"><b>龙虎榜必须等 17 点交易所发布后才能取完整数据</b>，因此盘后算法链固定在 18:30。盘中只刷新 T+0 快照，不跑盘后算法，避免用陈旧数据算出错误共识。<b>Safety Net</b>是保险机制——中国数据抓取已迁云端 24/7 在线，Safety Net 是「断线时自动补跑」而非「日常调度」。</div>
+        <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>盘后算法链顺序铁律（2026-08-08 修复）</b>：<code style="background:var(--bg2);padding:1px 4px;border-radius:3px">generate_top10.py</code> 必须在 <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">backtest_comprehensive.py</code> / <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">cockpit_backtest_now.py</code> <b>之前</b>执行——综合回测依赖 top10 当日快照（<code style="background:var(--bg2);padding:1px 4px;border-radius:3px">raw_data/history/top10_daily_YYYYMMDD.json</code>），顺序倒置会导致「综合回测」卡长期为空。当前固定顺序：build_candidate_pool → generate_top10 → backtest_tdx → backtest_comprehensive → cockpit_backtest_now。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🔄</span>盘中 vs 盘后分工</h3>
+        <table class="lg-table">
+          <tr><th>时段</th><th>职责</th><th>失败影响</th><th>兜底</th></tr>
+          <tr><td>盘前 08:25</td><td>把当日已知事件、预警、宏观状态准备好</td><td>事件/日历显示旧数据</td><td>Safety Net 2h 后补跑</td></tr>
+          <tr><td>盘中 09:40~15:10</td><td>刷新实时行情、资金、ETF、涨停热力</td><td>实时区时间戳停滞</td><td>盘中自愈器每30分检测补跑 + 下一档自动覆盖</td></tr>
+          <tr><td>盘后 18:30</td><td>基于完整收盘数据生成选股结果</td><td>三重共识/驾驶舱用隔夜数据</td><td>周六 self_heal 补跑</td></tr>
+          <tr><td>构建部署</td><td>raw_data push 触发 selective build → Pages</td><td>线上数据不更新</td><td>manual dispatch</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🛡️</span>v8 vs v6 遗产对比</h3>
+        <table class="lg-table">
+          <tr><th>能力</th><th>v6 实现</th><th>v8 现状</th><th>优先级</th></tr>
+          <tr><td>Safety Net 兜底</td><td>safety-net.yml 每15min轮询</td><td><span style="color:#38bdf8;">✅ 已建 v8_safety_net.yml</span></td><td>P0 必须</td></tr>
+          <tr><td>云端自愈器</td><td>cloud_self_heal 周末T+1补全</td><td><span style="color:#38bdf8;">✅ 已建 v8_self_heal.yml</span></td><td>P1 应补</td></tr>
+          <tr><td>每日备份</td><td>cloud_backup.yml 21:00</td><td><span style="color:#38bdf8;">✅ 已建 v8_backup.yml 23:00</span></td><td>P2 可选</td></tr>
+          <tr><td>心跳监控上云</td><td>peer_health_monitor 本机</td><td>✅ Actions 日志即心跳</td><td>P2 可选</td></tr>
+          <tr><td>防误删清单</td><td>DO_NOT_DELETE.md + pre-commit hook</td><td><span style="color:#38bdf8;">✅ 已建 DO_NOT_DELETE.md</span></td><td>P0 必须</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">📝</span>本周待办/建议表</h3>
+        <div class="logic-p">主人在历史 HANDOVER 中规划的「建议项」，照搬待落地。本周（7/27~8/02）已完成：4 类上游原生化（89da5fc）· 每日洞察/大牛股猎手对标参考页重构（7466799）· 2 次周度锚点 bug 修复（300ec6d/589f601）· 北向席位 hasMultiDay 修复 + 月度汇总加日期注释（589f601）。</div>
+        <table class="lg-table">
+          <tr><th>时段</th><th>任务</th><th>建议</th><th>频次</th></tr>
+          <tr><td>14:06</td><td>v8_self_heal · 冻结模块诊断+补跑</td><td>⚠️ 建议并入 21:00 窗口，删掉这个独立 workflow</td><td>周度兜底</td></tr>
+          <tr><td>首周六</td><td>(建议)月度报告 + STOCK_LIST pinyin 重生 + 依赖体检</td><td><span class="op-tab-time" style="background:#3b82f6;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600">NEW</span> 加 if 首周六 guard 进 21:00 脚本</td><td>月度</td></tr>
+          <tr><td>首周日</td><td>(建议)旧数据归档 + git gc/pack + 备份轮转</td><td><span class="op-tab-time" style="background:#3b82f6;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600">NEW</span> 加 if 首周日 guard 进 23:00 脚本</td><td>月度</td></tr>
+        </table>
+      </div>
+
       <div class="card">
         <h3><span class="ic">🔒</span>数据安全口径 - 说明</h3>
         <div class="lg-box red">
@@ -7704,15 +7750,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if(_tcInfo.show){ _tcRun.textContent = _tcInfo.label; _tcRun.style.display='inline-flex'; }
       else _tcRun.style.display='none';
     }
-    // 「已入仓」胶囊（2026-08-09 修复：「持仓」→「已入仓」，只要有严格股就显示，不再区分新/旧）
+    // 「已入仓」胶囊：用户令 2026-08-09「已跑已入仓不要隐藏」——数据存在即显示，含 0 也显示
     var _eb=document.getElementById('tcEnteredBadge');
     if(_eb){
-      if(stocks.length>0){
-        _eb.innerHTML = _holdBadge(_tcTs, stocks.length, '已入仓');
-        _eb.style.display='inline-flex';
-      } else {
-        _eb.style.display='none';
-      }
+      _eb.innerHTML = _holdBadge(_tcTs, stocks.length, '已入仓');
+      _eb.style.display='inline-flex';
     }
   }
 
@@ -9674,7 +9716,16 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     body.innerHTML=h;
     var empty=_rps$('strpsEmpty');
     if(empty) empty.style.display=filtered.length?'none':'block';
-    var badge=_rps$('strpsRunBadge'); if(badge) badge.style.display='inline-block';
+    var badge=_rps$('strpsRunBadge');
+    if(badge){
+      var runInfo = window._runBadgeInfo ? window._runBadgeInfo(time||'') : {show:false};
+      if(runInfo.show){
+        badge.textContent = runInfo.label.replace('已跑完','已计算').replace(' 已跑',' 已计算');
+      } else {
+        badge.textContent = '✅ 已计算';
+      }
+      badge.style.display='inline-block';
+    }
   }
   window.renderRpsScreen=renderRpsScreen;
 
