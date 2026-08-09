@@ -105,14 +105,16 @@ def _code_to_baostock(code, market=None):
     """将 code+market 转为 baostock 格式 'sh.600519'。
 
     Args:
-        code: 6 位股票代码字符串
-        market: 'sh'/'sz'/'bj' 或 None（自动从 code 前缀推断）
+        code: 6 位股票代码字符串（兼容已带 'sh.600519' 前缀）
+        market: 'sh'/'sz'/'bj'、setcode '0'/'1'/'2'，或 None（自动推断）
 
     Returns:
         (bs_code, prefix) 如 ('sh.600519', 'sh')
     """
+    code = str(code).strip().split('.')[-1]
     if market:
-        prefix = market
+        # market 可能是 setcode（0/1/2）或 prefix（sh/sz/bj），统一转为 prefix
+        prefix = _BAOSTOCK_MARKET.get(str(market), market)
     else:
         prefix, _ = _CODE_PREFIX_MAP.get(code[0], ("sz", "0"))
     return f"{prefix}.{code}", prefix
@@ -132,8 +134,8 @@ def fetch_a_60min(code, market=None, bars=FETCH_60M_BARS):
     """
     bs_code, prefix = _code_to_baostock(code, market)
 
-    # 北交所 baostock 可能不支持 60min
-    if prefix == "bj":
+    # 北交所/港股 baostock 不支持 60min
+    if prefix in ("bj", "hk"):
         return None
 
     try:

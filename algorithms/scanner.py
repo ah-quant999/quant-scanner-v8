@@ -1411,10 +1411,10 @@ def _fetch_board_top(board_fs, board_label, top_n, fid="f6"):
 
 def fetch_volume_top_stocks(top_cy=None, top_kc=None, top_zb=None, top_hk=None):
     """获取按成交量排序的活跃股池(三重源: mootdx → 东方财富)"""
-    top_cy = top_cy or VOLUME_TOP_CY
-    top_kc = top_kc or VOLUME_TOP_KC
-    top_zb = top_zb or VOLUME_TOP_ZB
-    top_hk = top_hk or VOLUME_TOP_HK
+    top_cy = VOLUME_TOP_CY if top_cy is None else top_cy
+    top_kc = VOLUME_TOP_KC if top_kc is None else top_kc
+    top_zb = VOLUME_TOP_ZB if top_zb is None else top_zb
+    top_hk = VOLUME_TOP_HK if top_hk is None else top_hk
 
     # 云端 runner：直接走腾讯 GTimg
     if CLOUD_RUNNER:
