@@ -1121,6 +1121,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <div class="tab" data-sec="rc" onclick="switchSec('rc',this)">🧲 共振日历</div>
   <!-- 2026-08-08 主人令：最终推荐 = 全站唯一买卖决策入口，置于选股策略左侧并默认激活 -->
   <div class="tab active" data-sec="final" onclick="switchSec('final',this)">🏆 最终推荐</div>
+  <div class="tab" data-sec="query" onclick="switchSec('query',this)">🔍 个股查询</div>
   <!-- 2026-08-08 主人令：选股策略降级为「辅助策略池」，仅管理员可见，置于暂未上架左侧 -->
   <div class="tab locked" data-sec="st" data-lock="1" onclick="guardLock('st',this)">🔒 选股策略 <span class="lk">[锁]</span></div>
   <!-- 2026-08-07 主人令：暂未上架 从运维子 Tab 提升为一级 nav（仅管理员可见，guardLock 锁定） -->
@@ -1138,7 +1139,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <div class="final-tabs" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
       <button class="final-tab active" data-final="rec" onclick="switchFinalTab('rec')">🏆 最终推荐 · Top3</button>
       <button class="final-tab" data-final="cand" onclick="switchFinalTab('cand')">🎯 今日推荐候选池</button>
-      <button class="final-tab" data-final="query" onclick="switchFinalTab('query')">🔍 个股查询</button>
     </div>
 
     <!-- 子 Pane：最终推荐 Top3 -->
@@ -1160,26 +1160,29 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
     </div>
 
-    <!-- 子 Pane：个股查询 -->
-    <div id="final-pane-query" class="final-pane">
-      <div class="card">
-        <h3><span class="ic">🔍</span>个股查询 · 全站扩展信息</h3>
-        <div class="query-search-box" style="display:flex;gap:10px;margin-bottom:16px;background:linear-gradient(135deg,rgba(0,188,212,.12),rgba(56,189,248,.08));padding:14px 18px;border-radius:10px;box-shadow:0 1px 6px rgba(56,189,248,.1);position:relative;border:1px solid var(--border);">
-          <div style="position:relative;flex:1;">
-            <input type="text" id="v8QueryInput" placeholder="输入股票代码、拼音首字母或名称，如 600000、hlzj、茅台" onkeydown="if(event.key==='Enter')doV8Query()" oninput="showV8QueryDropdown(this.value)" onfocus="if(this.value.trim())showV8QueryDropdown(this.value)" style="width:100%;padding:11px 15px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;outline:none;transition:border-color .2s;background:var(--card);color:var(--txt);box-sizing:border-box;" />
-            <div id="v8QueryDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);border:1.5px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:320px;overflow-y:auto;z-index:1000;box-shadow:0 4px 16px rgba(0,0,0,.24);"></div>
-          </div>
-          <button class="btn" onclick="doV8Query()">查询分析</button>
-        </div>
-        <div id="v8QueryResult"></div>
+  </section>
 
-        <div style="padding:12px 16px;margin-top:10px;background:linear-gradient(135deg,rgba(0,188,212,.1),rgba(56,189,248,.06));border-radius:10px;border:1px solid var(--border);">
-          <div style="font-size:13px;color:var(--txt);margin-bottom:4px;"><strong>查询格式：</strong>输入股票代码、拼音首字母或中文名称</div>
-          <div style="font-size:13px;color:var(--txt);"><strong>覆盖范围：</strong>A股（主板 / 创业板 / 科创板 / 北交所）+ 港股 + 指数 + ETF，共 7000+ 只</div>
+  <!-- ============ 🔍 个股查询（2026-08-09 提升为一级导航） ============ -->
+  <section id="sec-query">
+    <div class="sec-head"><h2>🔍 个股查询</h2><span class="tag">输入代码/拼音/名称 · 查看实时行情 + 策略命中 + 龙虎榜 + 基本面画像</span></div>
+    <div class="card">
+      <h3><span class="ic">🔍</span>个股查询 · 全站扩展信息</h3>
+      <div class="query-search-box" style="display:flex;gap:10px;margin-bottom:12px;background:linear-gradient(135deg,rgba(0,188,212,.12),rgba(56,189,248,.08));padding:14px 18px;border-radius:10px;box-shadow:0 1px 6px rgba(56,189,248,.1);position:relative;border:1px solid var(--border);">
+        <div style="position:relative;flex:1;">
+          <input type="text" id="v8QueryInput" placeholder="输入股票代码、拼音首字母或名称，如 600000、hlzj、茅台" onkeydown="if(event.key==='Enter')doV8Query()" oninput="showV8QueryDropdown(this.value)" onfocus="if(this.value.trim())showV8QueryDropdown(this.value)" style="width:100%;padding:11px 15px;border:1.5px solid var(--border);border-radius:8px;font-size:15px;outline:none;transition:border-color .2s;background:var(--card);color:var(--txt);box-sizing:border-box;" />
+          <div id="v8QueryDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--card);border:1.5px solid var(--border);border-top:none;border-radius:0 0 8px 8px;max-height:320px;overflow-y:auto;z-index:1000;box-shadow:0 4px 16px rgba(0,0,0,.24);"></div>
         </div>
+        <button class="btn" onclick="doV8Query()">查询分析</button>
       </div>
-    </div>
 
+      <!-- 查询说明：放在输入框正下方 -->
+      <div style="padding:12px 16px;margin-bottom:14px;background:linear-gradient(135deg,rgba(0,188,212,.1),rgba(56,189,248,.06));border-radius:10px;border:1px solid var(--border);">
+        <div style="font-size:13px;color:var(--txt);margin-bottom:4px;"><strong>查询格式：</strong>输入股票代码、拼音首字母或中文名称</div>
+        <div style="font-size:13px;color:var(--txt);"><strong>覆盖范围：</strong>A股（主板 / 创业板 / 科创板 / 北交所）+ 港股 + 指数 + ETF，共 7000+ 只</div>
+      </div>
+
+      <div id="v8QueryResult"></div>
+    </div>
   </section>
 
   <!-- ============ 今日事件 ============ -->
@@ -4989,8 +4992,10 @@ function switchSec(sec,el){
   // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
   if(sec==='ph' && typeof window._renderSecPh==='function') setTimeout(window._renderSecPh,80);
   if(sec==='st' && typeof window._renderSecSt==='function') setTimeout(window._renderSecSt,80);
-  // 最终推荐：进入时渲染 Top3 + 今日可入手候选（个股查询为静态交互，无需渲染）
+  // 最终推荐：进入时渲染 Top3 + 今日可入手候选
   if(sec==='final' && typeof window.__renderFinalSec==='function') setTimeout(window.__renderFinalSec,60);
+  // 个股查询：静态交互，无需渲染；切换时隐藏下拉
+  if(sec==='query'){ var dd=document.getElementById('v8QueryDropdown'); if(dd) dd.style.display='none'; }
   // 实时数据：情绪周期·连板天梯迁到本区，进入时渲染
   if(sec==='rt' && typeof window.__renderCycleLadderCard==='function') setTimeout(window.__renderCycleLadderCard,60);
   // 共振日历：进入时确保默认 tab1（机游共振）渲染（rcTab1 默认 active，但 switchRcTab 仅在点 tab 时触发）
