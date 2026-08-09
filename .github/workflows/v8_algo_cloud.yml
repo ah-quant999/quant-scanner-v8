@@ -32,10 +32,12 @@ on:
     inputs:
       mahoro_action:
         description: 'maharo 刷新动作: none / send-code(发码到邮箱) / verify(用码登录)'
+        type: string
         required: false
         default: 'none'
       mahoro_code:
         description: 'maharo 验证码（verify 时使用，留空则发码）'
+        type: string
         required: false
         default: ''
 
