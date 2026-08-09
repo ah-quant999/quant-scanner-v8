@@ -69,6 +69,7 @@ DATA_SOURCES = {
     "backtest_comprehensive.json": "BACKTEST_COMPREHENSIVE",
     "cockpit_backtest.json":       "COCKPIT_BACKTEST",
     "backtest_tdx.json":           "BACKTEST_TDX",
+    "optimized_strategy.json":     "OPTIMIZED_STRATEGY",
     "experiment.json":             "EXPERIMENT",
     "etf_pulse.json":              "ETF_PULSE",
     "etf_daily_monitor.json":      "ETF_DAILY_MONITOR",

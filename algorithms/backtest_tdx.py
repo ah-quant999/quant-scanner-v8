@@ -24,6 +24,7 @@ backtest_tdx.py — 通达信60天全量回测引擎 V3.2（方案二：止损�
 输出: data/backtest_tdx.json
 """
 import json
+import math
 import os
 
 try:
@@ -49,6 +50,114 @@ DATA_DIR = os.path.join(BASE, "..", "raw_data")
 OUT = os.path.join(DATA_DIR, "backtest_tdx.json")
 TODAY = datetime.now().strftime("%Y-%m-%d")
 HOLD_DAYS = [1, 3, 5, 10, 20]  # 2026-07-26: 从 3d/5d 扩展到 1/3/5/10/20d
+
+# ═══ 2026-08-09 主人令：提胜率优化策略（①+②+③）═══
+# ① 持仓周期纪律：把最长持有期从 20d 收紧到 10d
+# ② 多源共振过滤：只做 ≥3 信号共振（ge3）
+# ③ 行情 regime 门控：上证+沪深300 定义市场状态；
+#    数据回测显示"企稳/反弹"段 ge3 信号整体负期望，"阴跌/恐慌"段 ge3 信号显著正期望，
+#    故优化策略只在 grind/panic  regimes 开仓，且允许全部 ge3 信号。
+OPTIMIZED = {
+    "enabled": True,
+    "max_hold_days": 10,          # ① 默认最长持有期
+    "min_signal_count": 3,        # ② ≥3 共振
+    "regime_signals": {           # ③ 市场状态 → 允许子信号
+        "stabilize": [],          # 好状态空仓
+        "rebound_diverge": [],    # 好状态空仓
+        "grind": ["trend_up", "trend_down", "chan_buy", "contrarian", "breakout_5d", "volume_surge", "divergence"],
+        "panic": ["trend_up", "trend_down", "chan_buy", "contrarian", "breakout_5d", "volume_surge", "divergence"],
+    },
+    "report_periods": [5, 10],    # 优化策略主要展示周期
+    "note": "数据驱动：仅在市场状态为 grind/panic 时开仓",
+}
+
+
+def _fetch_index_ohlc(code, prefix, days=150):
+    """从 baostock 拉取指数日K，返回 [(date, close)]"""
+    import baostock as bs
+    end = datetime.now().strftime("%Y-%m-%d")
+    start = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
+    bs.login()
+    rs = bs.query_history_k_data_plus(
+        f"{prefix}.{code}", "date,close", start_date=start, end_date=end,
+        frequency="d", adjustflag="3"
+    )
+    rows = []
+    while (rs.error_code == "0") & rs.next():
+        r = rs.get_row_data()
+        try:
+            rows.append((r[0], float(r[1])))
+        except Exception:
+            pass
+    bs.logout()
+    rows.sort(key=lambda x: x[0])
+    return rows
+
+
+def _compute_regime_series(rows):
+    """从指数 close 序列计算每日 regime（与 analyze_regime_filter.py 保持一致）"""
+    closes = [c for _, c in rows]
+    n = len(closes)
+    if n < 22:
+        return {}
+
+    log_rets = [math.log(closes[i] / closes[i - 1]) for i in range(1, n)]
+
+    def _std(xs):
+        m = sum(xs) / len(xs)
+        return math.sqrt(sum((x - m) ** 2 for x in xs) / (len(xs) - 1))
+
+    daily_vol = []
+    for i in range(19, len(log_rets)):
+        w = log_rets[i - 19:i + 1]
+        daily_vol.append(_std(w) * math.sqrt(252) * 100.0)
+
+    regime_by_date = {}
+    for i in range(21, n):
+        vol_idx = i - 21
+        if vol_idx < 5:
+            continue
+        vol_20d = daily_vol[vol_idx]
+        vol_20d_ago5 = daily_vol[vol_idx - 5]
+        vol_trend_pct = ((vol_20d - vol_20d_ago5) / vol_20d_ago5 * 100.0) if vol_20d_ago5 else 0.0
+        ret_20d = (closes[i] / closes[i - 20] - 1.0) * 100.0
+
+        if ret_20d >= 0 and vol_trend_pct < 0:
+            regime = "stabilize"
+        elif ret_20d < 0 and vol_trend_pct < 0:
+            regime = "grind"
+        elif ret_20d >= 0 and vol_trend_pct >= 0:
+            regime = "rebound_diverge"
+        else:
+            regime = "panic"
+        regime_by_date[rows[i][0]] = regime
+    return regime_by_date
+
+
+def _merge_market_regime():
+    """合并上证与沪深300 regime，取更悲观者。"""
+    priority = {"panic": 3, "grind": 2, "rebound_diverge": 1, "stabilize": 0}
+    sh_regime = _compute_regime_series(_fetch_index_ohlc("000001", "sh"))
+    hs300_regime = _compute_regime_series(_fetch_index_ohlc("000300", "sh"))
+    all_dates = set(sh_regime.keys()) | set(hs300_regime.keys())
+    merged = {}
+    for d in all_dates:
+        r1 = sh_regime.get(d, "stabilize")
+        r2 = hs300_regime.get(d, "stabilize")
+        merged[d] = r1 if priority.get(r1, 0) >= priority.get(r2, 0) else r2
+    return merged
+
+
+def passes_optimized_filter(sigs, market_regime):
+    """判断一组信号是否满足优化策略的入池条件：ge3 + 市场regime-信号匹配。"""
+    if not sigs.get("ge3_signals", False):
+        return False
+    regime = market_regime
+    if regime not in OPTIMIZED["regime_signals"]:
+        return False
+    allowed = OPTIMIZED["regime_signals"][regime]
+    active = {k for k, v in sigs.items() if v and not k.startswith("ge")}
+    return bool(active & set(allowed))
 
 def log(msg):
     print(f"  {msg}")
@@ -464,6 +573,29 @@ def main():
             if sd.get("ge3"):
                 _accumulate(summary["ge3_signals"], sd)
 
+    # ── 优化策略汇总（主人令 2026-08-09：①持仓周期 ②≥3共振 ③regime门控）──
+    log("计算市场 regime（上证+沪深300）...")
+    try:
+        market_regime = _merge_market_regime()
+        log(f"市场 regime 覆盖 {len(market_regime)} 个交易日")
+    except Exception as e:
+        log(f"⚠️ 市场 regime 计算失败，跳过优化策略汇总: {e}")
+        market_regime = {}
+
+    opt_summary = defaultdict(_new_summary)
+    opt_config = OPTIMIZED
+    if market_regime:
+        for key, sr in stock_results.items():
+            if "signals" not in sr:
+                continue
+            for date, sd in sr["signals"].items():
+                full_sigs = dict(sd.get("signals", {}))
+                full_sigs["ge2_signals"] = sd.get("ge2", False)
+                full_sigs["ge3_signals"] = sd.get("ge3", False)
+                if not passes_optimized_filter(full_sigs, market_regime.get(date)):
+                    continue
+                _accumulate(opt_summary["optimized"], sd)
+
     # 格式化
     signal_names = {
         "trend_up": "📈 上涨趋势",
@@ -475,6 +607,7 @@ def main():
         "divergence": "⚠️ 量价背离",
         "ge2_signals": "🎯 双信号共振",
         "ge3_signals": "🎯 三信号共振",
+        "optimized": "🎯 优化策略(≥3共振+regime+5~10d)",
     }
     
     result_data = {
@@ -517,6 +650,35 @@ def main():
         print(row)
         result_data["summary"][sig_key] = sd
     
+    # 输出优化策略汇总
+    if opt_summary:
+        opt = opt_summary["optimized"]
+        if opt["total"] > 0:
+            print(f"\n{'='*60}")
+            print(f"  优化策略汇总（≥3共振 + 市场regime空仓门控）")
+            print(f"  规则：{OPTIMIZED['min_signal_count']}信号共振；仅在阴跌/恐慌段开仓；企稳/反弹段空仓")
+            print(f"{'='*60}")
+            hdr = f"{'信号类型':<16} {'样本':>5}"
+            for d_ in OPTIMIZED["report_periods"]:
+                hdr += f" {'T+'+str(d_)+'胜率':>8} {'T+'+str(d_)+'收益':>9}"
+            print(hdr)
+            print(f"{'─'*len(hdr)}")
+            label = signal_names.get("optimized", "optimized")
+            row = f"  {label:<14} {opt['total']:>5}"
+            sd = {"label": label, "total": opt["total"], "config": OPTIMIZED}
+            for d_ in OPTIMIZED["report_periods"]:
+                decided = opt[f"win_{d_}d"] + opt[f"loss_{d_}d"]
+                wr = round(opt[f"win_{d_}d"] / decided * 100, 1) if decided else 0
+                ar = round(opt[f"total_ret_{d_}d"] / opt["total"], 2) if opt["total"] else 0
+                row += f" {wr:>6}%  {ar:>+8}%"
+                sd[f"win_{d_}d"] = opt[f"win_{d_}d"]
+                sd[f"loss_{d_}d"] = opt[f"loss_{d_}d"]
+                sd[f"draw_{d_}d"] = opt[f"draw_{d_}d"]
+                sd[f"win_rate_{d_}d"] = wr
+                sd[f"avg_return_{d_}d"] = ar
+            print(row)
+            result_data["optimized_summary"] = sd
+
     total_entries = sum(len(sr.get("signals", {})) for sr in stock_results.values())
     print(f"\n{'─'*56}")
     print(f"  总计: {len(gp_stocks)} 只股, {total_entries} 条信号")
