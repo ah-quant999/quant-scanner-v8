@@ -122,8 +122,11 @@ def authenticate(email, non_interactive=False, code=None):
                 return saved
             print(f"  ⚠️ cookie 已过期，需重新登录")
 
-    # 非交互模式：无有效 cookie → 跳过
-    if non_interactive:
+    # 非交互模式（含 CI 无 TTY）：无有效 cookie → 跳过
+    # 2026-08-09 修复：云端 runner 无终端（sys.stdin 不是 tty），若走到这里会触发
+    # input() → EOFError 崩溃，且被 run_algorithms 的 continue-on-error 包成「✅ 成功」假绿，
+    # 还会白发一次邮箱验证码。故无 TTY 时一律按非交互处理，干净跳过。
+    if non_interactive or not sys.stdin.isatty():
         print(f"  ⚠️ 非交互模式：无有效 cookie，跳过 mahoro 信号拉取")
         print(f"  💡 手动运行 `python fetch_mahoro_signals.py` 登录一次后可复用")
         return None

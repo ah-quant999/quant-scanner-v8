@@ -66,7 +66,11 @@ if _requests is not None:
 
     _requests.Session.request = _session_request_with_timeout
 
-DATA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "out")
+# 2026-08-09 修复：优先用 V8_OUT_DIR（run_algorithms 注入 = 与 guanlan_extractor /
+# fetch_maharo_signals 写入同目录），消除任何「脚本写 out/A、本脚本读 out/B」的口径偏差。
+# 兜底才用 algorithms/../out（与 guanlan 的 BASE/../out 等价）。
+_DATA_FALLBACK = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "out")
+DATA = os.environ.get("V8_OUT_DIR") or _DATA_FALLBACK
 OUT = os.path.join(DATA, "candidate_pool.json")
 
 # ════════════════════════════════════════════════════════════════
@@ -712,6 +716,48 @@ def build():
         json.dump(out, f, ensure_ascii=False, indent=2)
     print(f"\n✅ 候选股池构建完成：{len(pool)} 只")
     print("   来源分布:", dict(dist))
+    # 2026-08-09 调试：把读取侧的真实状态落盘，便于云端 run 后核验
+    # 「双源是否真的并入库」（step_run 吞掉了 stdout，CI 日志看不到内部打印）。
+    try:
+        import os as _os
+        wl = _os.path.join(DATA, "guanlan_watchlist.json")
+        rp = _os.path.join(DATA, "guanlan_reports.json")
+        mh = _os.path.join(DATA, "maharo_signals.json")
+        def _cnt(p, key):
+            if not _os.path.exists(p):
+                return {"exists": False, "stocks": 0}
+            try:
+                d = json.load(open(p, encoding="utf-8"))
+                if key == "stocks":
+                    return {"exists": True, "stocks": len(d.get("stocks", []))}
+                if key == "reports":
+                    rps = d.get("reports", d if isinstance(d, list) else [])
+                    return {"exists": True, "reports": len(rps),
+                            "stocks_in_reports": sum(len(x.get("stocks", [])) for x in rps)}
+                if key == "raw":
+                    return {"exists": True,
+                            "raw_signals": len(d.get("raw_signals", [])),
+                            "gold_pool_matches": len(d.get("gold_pool_matches", []))}
+            except Exception as e:
+                return {"exists": True, "error": str(e)[:80]}
+            return {"exists": True}
+        dbg = {"DATA": DATA, "V8_OUT_DIR": _os.environ.get("V8_OUT_DIR", ""),
+               "guanlan_watchlist": _cnt(wl, "stocks"),
+               "guanlan_reports": _cnt(rp, "reports"),
+               "maharo_signals": _cnt(mh, "raw"),
+               "source_dist": dict(dist)}
+        # 同时写 raw_data/（api_push 会推送），便于云端 run 后经 API 取回核验
+        _rd = _os.path.join(_os.path.dirname(DATA), "raw_data")
+        try:
+            _os.makedirs(_rd, exist_ok=True)
+            with open(_os.path.join(_rd, "build_candidate_debug.json"), "w", encoding="utf-8") as f:
+                json.dump(dbg, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
+        with open(_os.path.join(DATA, "build_candidate_debug.json"), "w", encoding="utf-8") as f:
+            json.dump(dbg, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"  [debug] 落盘失败: {e}")
     return out
 
 
