@@ -7262,9 +7262,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
           {name:'重要事件日历', source:'V8_CAL', freq:'每周日+月末', slots:['周日'], note:'非每日更新'},
 
-          {name:'打新研判', source:'IPO_DATA', freq:'每日盘前', slots:['08:30'], note:'新股评分'},
+          {name:'打新研判', source:'IPO_DATA', freq:'每日盘前', slots:['08:30'], weekendUpdate:false, note:'新股评分（仅交易日盘前更新）'},
 
-          {name:'今日宏观解读', source:'MACRO_DATA', freq:'每日盘前', slots:['08:30'], note:'当前宏观总结分析'}
+          {name:'今日宏观解读', source:'MACRO_DATA', freq:'每日盘前', slots:['08:30'], weekendUpdate:false, note:'当前宏观总结分析（仅交易日盘前更新）'}
 
         ]
 
@@ -7467,6 +7467,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
         const isTradeDay = window._isAshareTradingDay && window._isAshareTradingDay(now);
         const isMarketCard = /(盘中|工作日|cron|每日2次|收盘后)/i.test(c.freq || '');
+        const isWeekendSkipped = c.weekendUpdate === false;
 
         c.slots.forEach(function(s){
 
@@ -7490,8 +7491,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
           }
 
-          // 非交易日市场类卡片：未更新的过去槽位不标红叉，标「休」避免误导（2026-08-08 一劳永逸修复）
-          const isClosedSlot = !isTradeDay && isMarketCard && isPast && !ok && !isFuture;
+          // 非交易日市场类卡片 / 明确周末不更新卡片：未更新的过去槽位不标红叉，标「休」避免误导
+          const isClosedSlot = !isTradeDay && (isMarketCard || isWeekendSkipped) && isPast && !ok && !isFuture;
 
           if(isFuture) cPending++;
 

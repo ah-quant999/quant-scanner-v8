@@ -56,10 +56,10 @@ RAW_DIR = Path("raw_data")
 CARD_DEFS = [
     # 今日事件（盘前）
     {"id": "V8_CAL", "name": "重要事件日历", "page": "今日事件", "freq": "每周日+月末", "max_age": 1500, "key_fields": ["weeks", "month"]},
-    {"id": "IPO_DATA", "name": "打新研判", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["stocks"]},
-    {"id": "JUDGMENT_DATA", "name": "今日判定", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["verdict", "indices"]},
-    {"id": "MACRO_DATA", "name": "今日宏观解读", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["global_macro", "monetary"]},
-    {"id": "NT_DATA", "name": "市场提示", "page": "今日事件", "freq": "每日盘前", "max_age": 720, "key_fields": ["alerts"]},
+    {"id": "IPO_DATA", "name": "打新研判", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["stocks"], "weekend_update": False},
+    {"id": "JUDGMENT_DATA", "name": "今日判定", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["verdict", "indices"], "weekend_update": False},
+    {"id": "MACRO_DATA", "name": "今日宏观解读", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["global_macro", "monetary"], "weekend_update": False},
+    {"id": "NT_DATA", "name": "市场提示", "page": "今日事件", "freq": "每日盘前", "max_age": 720, "key_fields": ["alerts"], "weekend_update": False},
     # 实时数据
     {"id": "INDEX_QUOTES", "name": "全球指数 / 股指期货", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["items"]},
     {"id": "ETF_PULSE", "name": "ETF 盘中异动", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["etfs"]},
@@ -88,6 +88,25 @@ CARD_DEFS = [
 
 def now_cst():
     return datetime.now(timezone(timedelta(hours=8)))
+
+
+# 2026 年中国法定节假日（MM-DD），用于周末不更新模块的休市判定
+_HOLIDAYS_2026 = {
+    "01-01", "01-02", "01-03",  # 元旦
+    "01-28", "01-29", "01-30", "01-31", "02-01", "02-02", "02-03", "02-04",  # 春节
+    "04-04", "04-05", "04-06",  # 清明
+    "05-01", "05-02", "05-03", "05-04", "05-05",  # 劳动节
+    "05-31", "06-01", "06-02",  # 端午
+    "09-30", "10-01", "10-02", "10-03", "10-04", "10-05", "10-06", "10-07", "10-08",  # 国庆+中秋
+}
+
+
+def is_market_closed(dt_cst=None):
+    """判断给定北京时间是否为 A 股休市日（周末或法定节假日）。"""
+    n = dt_cst or now_cst()
+    if n.weekday() >= 5:
+        return True
+    return n.strftime("%m-%d") in _HOLIDAYS_2026
 
 
 def fmt_rel_time(ts):
@@ -421,20 +440,28 @@ def check_data_cards():
             continue
         age_min = (now_cst() - dt).total_seconds() / 60
         status = "ok" if age_min <= max_age else "fail"
+
+        # 周末/节假日不更新模块：直接放行，不判 stale、不判空值，避免误告警
+        weekend_skip = d.get("weekend_update") is False and is_market_closed()
+
         # 空值检测
         empty_fields = []
-        for f in d["key_fields"]:
-            v = data.get(f)
-            # 结果池字段（如 stocks）空列表 = 正常业务状态（今日无入选），不算空值
-            if v == [] and f == "stocks":
-                continue
-            if v is None or v == "" or v == [] or v == {} or v == "--" or v == "加载中":
-                empty_fields.append(f)
+        if not weekend_skip:
+            for f in d["key_fields"]:
+                v = data.get(f)
+                # 结果池字段（如 stocks）空列表 = 正常业务状态（今日无入选），不算空值
+                if v == [] and f == "stocks":
+                    continue
+                if v is None or v == "" or v == [] or v == {} or v == "--" or v == "加载中":
+                    empty_fields.append(f)
         if empty_fields and status == "ok":
             status = "warn"
         rel = fmt_rel_time(ts)
         msg = f"更新于 {rel}"
-        if empty_fields:
+        if weekend_skip:
+            status = "ok"
+            msg = f"休市不更新（数据为上一交易日盘前）；{rel}"
+        elif empty_fields:
             msg += f"；关键字段空值：{', '.join(empty_fields)}"
         if status == "fail":
             msg += f"；超过阈值 {max_age} 分钟"
