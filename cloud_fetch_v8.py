@@ -2499,6 +2499,10 @@ def _clear_intraday_for_premarket(category, only=None):
     主力净流入(CAPITAL_FLOW_DATA)、涨停热力(LIMIT_UP_HEATMAP)。"""
     if category != "premarket" or only is not None:
         return
+    # 周末/法定假日：不执行清空，保留最后一个交易日（周五）的收盘/盘中数据
+    if not _is_trading_day():
+        print(f"⏸️ 非A股交易日（周末/假期），跳过盘中模块清空，保留最后交易日数据")
+        return
     now = now_cst()
     today_iso = now.strftime("%Y-%m-%d")
     today_m_d = f"{now.month}/{now.day}"
@@ -2596,8 +2600,8 @@ def main(category=None, only=None):
     if category in ("intraday", "post_close") and not _is_trading_day(today):
         print(f"⏸️ 今日 {today} 非A股交易日，{category} 跳过，保留上一交易日收盘数据")
         return 0
-    if category == "premarket" and not is_saturday and not _is_trading_day(today):
-        print(f"⏸️ 今日 {today} 非A股交易日且非周六T+1，premarket 跳过")
+    if category == "premarket" and not _is_trading_day(today):
+        print(f"⏸️ 今日 {today} 非A股交易日（周末/假期），premarket 跳过清空，保留最后交易日数据")
         return 0
 
     # 分时段清理：只删除本次任务类别的 raw_data，避免盘中任务把盘前/盘后数据清掉
