@@ -29,6 +29,15 @@ on:
   schedule:
     - cron: '30 10 * * 1-5'  # 18:30 CST 盘后（龙虎榜18点后已发布 + 收盘数据 + 算法部署）主
   workflow_dispatch:
+    inputs:
+      mahoro_action:
+        description: 'maharo 刷新动作: none / send-code(发码到邮箱) / verify(用码登录)'
+        required: false
+        default: 'none'
+      mahoro_code:
+        description: 'maharo 验证码（verify 时使用，留空则发码）'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -53,6 +62,9 @@ jobs:
       #   通过 GitHub repo secret 注入，云端每天真实拉取。cookie 失效时更新该 secret 即可。
       #   设置路径：GitHub 仓库 → Settings → Secrets and variables → Actions → MAHORO_COOKIE
       MAHORO_COOKIE: ${{ secrets.MAHORO_COOKIE }}
+      # 2026-08-10 新增：云端代发 mahoro 验证码 / 代登录用的动作开关（本机无法解析 data.maharo.cn）
+      MAHORO_ACTION: ${{ github.event.inputs.maharo_action }}
+      MAHORO_CODE: ${{ github.event.inputs.maharo_code }}
       # 观澜台(知识星球) token：与小九本地 data/zsxq_token.json 同值。
       # 设置路径：GitHub 仓库 → Settings → Secrets → Actions → ZSXQ_TOKEN
       ZSXQ_TOKEN: ${{ secrets.ZSXQ_TOKEN }}

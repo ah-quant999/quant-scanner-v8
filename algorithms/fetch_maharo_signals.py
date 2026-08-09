@@ -127,8 +127,35 @@ def authenticate(email, non_interactive=False, code=None):
     # input() → EOFError 崩溃，且被 run_algorithms 的 continue-on-error 包成「✅ 成功」假绿，
     # 还会白发一次邮箱验证码。故无 TTY 时一律按非交互处理，干净跳过。
     if non_interactive or not sys.stdin.isatty():
-        print(f"  ⚠️ 非交互模式：无有效 cookie，跳过 mahoro 信号拉取")
-        print(f"  💡 手动运行 `python fetch_mahoro_signals.py` 登录一次后可复用")
+        # 云端刷新支持：通过环境变量控制 mahoro 重登录动作（本机无法解析 data.maharo.cn，
+        # 但云端 runner 可以；故发码/验证统一在云端完成，再让用户把新 cookie 回填 Secret）。
+        action = os.environ.get("MAHORO_ACTION", "").strip().lower()
+        if action == "send-code":
+            resp, _ = http_post(MAHORO_AUTH_SEND, {"email": email})
+            if resp and resp.get("ok"):
+                print(f"  [发码] 验证码已发送到 {email}，5分钟有效（请查收后把验证码发给阿狸咪）")
+            else:
+                print(f"  [发码失败] 发送验证码失败: {resp}")
+            return None
+        if action == "verify":
+            code = os.environ.get("MAHORO_CODE", "").strip()
+            if not code:
+                print("  [verify] MAHORO_ACTION=verify 但未提供 MAHORO_CODE")
+                return None
+            resp, cookies = http_post(MAHORO_AUTH_VERIFY, {"email": email, "code": code})
+            if not resp or not resp.get("ok"):
+                print(f"  [verify失败] 验证失败: {resp}")
+                return None
+            cookie_parts = [c.split(";")[0] for c in cookies]
+            cookie_str = "; ".join(cookie_parts)
+            if cookie_str:
+                with open(COOKIE_FILE, "w") as f:
+                    f.write(cookie_str)
+                print(f"  [登录成功] 新 cookie 已缓存: {cookie_str}")
+            return cookie_str
+        # 默认：正常跳过
+        print(f"  [跳过] 非交互模式：无有效 cookie，跳过 maharo 信号拉取")
+        print(f"  [提示] 手动运行 `python fetch_maharo_signals.py` 登录一次后可复用")
         return None
 
     # 交互模式：引导登录
