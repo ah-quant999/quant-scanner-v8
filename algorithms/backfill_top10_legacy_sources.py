@@ -8,11 +8,14 @@
 来源 2：九宝量化v6.0 260612 1500.tar.gz 的 backup_20260606 ~ backup_20260611
   - v6 没有 top10_daily_YYYYMMDD.json，只有 data/recommend.json。
   - 将 recommend.json 中的推荐列表转换为轻量 top10_daily 格式。
-  - 仅保留 code/name/board/close/pct_chg/total_score 等回测必需字段，
-    其余字段（sectors/score_*/signals 等）置空或默认值。
+
+来源 3：本地增量备份
+  - /e/workspace/backup_20260614_2100/stock-scanner_data/recommend.json
+  - /e/workspace/backup_20260615_2100/stock-scanner/data/recommend.json
+  - /e/workspace/stock-scanner/backup_202607*/data/history/top10_daily_*.json
 
 注意：
-  - 本脚本只读 v6/wt-cards 源，不写源。
+  - 本脚本只读历史源，不写源。
   - 生成文件写入 E:/workspace/stock-scanner/raw_data/history/。
   - 更新 raw_data/history/top10_daily_history.json 索引（生成入口使用的格式）。
 """
@@ -28,8 +31,15 @@ BASE = Path(__file__).resolve().parent.parent
 HIST_DIR = BASE / "raw_data" / "history"
 WT_CARDS_DIR = Path("E:/workspace/stock-scanner-wt-cards/data/history")
 V6_TAR = Path("E:/workspace/九宝量化v6.0 260612 1500.tar.gz")
+V8_BACKUP_ROOT = Path("E:/workspace/stock-scanner")
 
 V6_BACKUP_DATES = ["20260606", "20260607", "20260608", "20260609", "20260610", "20260611"]
+
+# v6 格式 recommend.json 的额外本地备份（日期 -> recommend.json 路径）
+EXTRA_V6_RECOMMEND = {
+    "20260614": Path("E:/workspace/backup_20260614_2100/stock-scanner_data/recommend.json"),
+    "20260615": Path("E:/workspace/backup_20260615_2100/stock-scanner/data/recommend.json"),
+}
 
 
 def load_json(path, default=None):
@@ -200,6 +210,76 @@ def backfill_v6_june():
     return created
 
 
+def backfill_extra_v6_recommend():
+    """转换本地额外 v6 格式 recommend.json（2026-06-14/15）。"""
+    created = []
+    for date_str, src in EXTRA_V6_RECOMMEND.items():
+        if not src.exists():
+            print(f"  ⚠️ {src} 不存在")
+            continue
+        recommend = load_json(src)
+        if not isinstance(recommend, list):
+            print(f"  ⚠️ {date_str} recommend.json not list")
+            continue
+        update_time = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:]} 15:00:00"
+        result = convert_v6_recommend_to_top10(recommend, date_str, update_time)
+        dst = HIST_DIR / f"top10_daily_{date_str}.json"
+        new_len = len(result["top10"])
+        if dst.exists():
+            old = load_json(dst)
+            old_len = len(old.get("top10", [])) if isinstance(old, dict) else 0
+            if new_len >= old_len:
+                save_json(dst, result)
+                created.append((date_str, f"overwritten {old_len}->{new_len}"))
+            else:
+                created.append((date_str, f"kept existing {old_len}>{new_len}"))
+        else:
+            save_json(dst, result)
+            created.append((date_str, f"new {new_len}"))
+    return created
+
+
+def backfill_v8_native_backups():
+    """从 stock-scanner/backup_2026*/data/history/ 复制 v8 原生 top10_daily 快照。
+
+    同一日期可能出现在多个备份目录中，保留 top10 条数最多的版本。
+    """
+    copied = []
+    skipped = []
+    candidates = {}
+    if not V8_BACKUP_ROOT.exists():
+        print(f"⚠️ v8 备份根目录不存在: {V8_BACKUP_ROOT}")
+        return copied, skipped
+
+    for src in sorted(V8_BACKUP_ROOT.glob("backup_*/data/history/top10_daily_2026*.json")):
+        data = load_json(src)
+        if not isinstance(data, dict) or "top10" not in data:
+            skipped.append((src.name, f"format invalid ({src.parent.parent.name})"))
+            continue
+        date_str = src.stem.split("_")[-1]
+        new_len = len(data.get("top10", []))
+        if date_str not in candidates or new_len >= len(candidates[date_str]["data"].get("top10", [])):
+            candidates[date_str] = {"data": data, "src": src}
+
+    for date_str in sorted(candidates):
+        data = candidates[date_str]["data"]
+        src_name = candidates[date_str]["src"].parent.parent.name
+        dst = HIST_DIR / f"top10_daily_{date_str}.json"
+        new_len = len(data.get("top10", []))
+        if dst.exists():
+            old = load_json(dst)
+            old_len = len(old.get("top10", [])) if isinstance(old, dict) else 0
+            if new_len >= old_len:
+                save_json(dst, data)
+                copied.append((f"top10_daily_{date_str}.json", f"overwritten {old_len}->{new_len} from {src_name}"))
+            else:
+                skipped.append((f"top10_daily_{date_str}.json", f"existing longer {old_len}>{new_len}"))
+        else:
+            save_json(dst, data)
+            copied.append((f"top10_daily_{date_str}.json", f"new {new_len} from {src_name}"))
+    return copied, skipped
+
+
 def update_history_index():
     """根据 raw_data/history/top10_daily_YYYYMMDD.json 重建 top10_daily_history.json。"""
     hist_file = HIST_DIR / "top10_daily_history.json"
@@ -225,15 +305,28 @@ def update_history_index():
 
 def main():
     HIST_DIR.mkdir(parents=True, exist_ok=True)
-    print("=== 来源 1: stock-scanner-wt-cards 2026-07 ===")
+
+    print("=== 来源 1: v8 原生备份 stock-scanner/backup_2026*/data/history ===")
+    copied, skipped = backfill_v8_native_backups()
+    for name, note in copied:
+        print(f"  ✅ {name}: {note}")
+    for name, note in skipped:
+        print(f"  ⏭️ {name}: {note}")
+
+    print("\n=== 来源 2: stock-scanner-wt-cards 2026-07（补 v8 备份未覆盖日期） ===")
     copied, skipped = backfill_wt_cards()
     for name, note in copied:
         print(f"  ✅ {name}: {note}")
     for name, note in skipped:
         print(f"  ⏭️ {name}: {note}")
 
-    print("\n=== 来源 2: v6 tar.gz 2026-06-06 ~ 06-11 ===")
+    print("\n=== 来源 3: v6 tar.gz 2026-06-06 ~ 06-11 ===")
     created = backfill_v6_june()
+    for date_str, note in created:
+        print(f"  ✅ top10_daily_{date_str}.json: {note}")
+
+    print("\n=== 来源 4: 本地额外 v6 recommend 2026-06-14/15 ===")
+    created = backfill_extra_v6_recommend()
     for date_str, note in created:
         print(f"  ✅ top10_daily_{date_str}.json: {note}")
 
@@ -245,7 +338,8 @@ def main():
     all_files = sorted(HIST_DIR.glob("top10_daily_202*.json"))
     print(f"\n=== 汇总 ===")
     print(f"raw_data/history/top10_daily_*.json 总数: {len(all_files)}")
-    print(f"日期跨度: {all_files[0].stem.split('_')[-1]} ~ {all_files[-1].stem.split('_')[-1]}")
+    if all_files:
+        print(f"日期跨度: {all_files[0].stem.split('_')[-1]} ~ {all_files[-1].stem.split('_')[-1]}")
 
 
 if __name__ == "__main__":
