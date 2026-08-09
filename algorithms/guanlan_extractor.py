@@ -38,7 +38,17 @@ if _V8_OUT:
     DATA_DIR = _V8_OUT
 else:
     DATA_DIR = os.path.join(BASE_DIR, "data")
-TOKEN_FILE = os.path.join(DATA_DIR, "zsxq_token.json")
+
+# 🔴 2026-08-09 修复：凭据路径不能跟着 DATA_DIR 走 out/。
+#    v8 环境下 V8_OUT_DIR=仓库根/out，原写法把 token 指向 out/zsxq_token.json——
+#    但 out/ 是中间产物目录（每轮被覆盖，也不在 .gitignore 的凭据保护清单里），
+#    用户按文档写入的 data/zsxq_token.json 永远读不到 → 观澜台恒为 0 只。
+#    统一为「仓库根/data/」，与 algorithms/fetch_maharo_signals.py 的 COOKIE_FILE 口径一致。
+_TOKEN_CANDIDATES = [
+    os.path.join(os.path.dirname(BASE_DIR), "data", "zsxq_token.json"),  # v8 标准位置（.gitignore 已保护）
+    os.path.join(DATA_DIR, "zsxq_token.json"),                            # 兼容旧路径（out/ 或 algorithms/data/）
+]
+TOKEN_FILE = next((p for p in _TOKEN_CANDIDATES if os.path.exists(p)), _TOKEN_CANDIDATES[0])
 
 # ── 星球配置 ──
 GROUPS = {

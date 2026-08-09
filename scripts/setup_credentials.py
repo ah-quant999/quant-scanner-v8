@@ -16,7 +16,10 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data")
 ZSXQ_PATH = os.path.join(DATA_DIR, "zsxq_token.json")
-MAHARO_PATH = os.path.join(DATA_DIR, ".maharo_cookies.txt")
+# ⚠️ 拼写必须是 mahoro（不是 maharo）——algorithms/fetch_maharo_signals.py
+#    读的是 data/.mahoro_cookies.txt。写错名字会导致凭据永远读不到，
+#    脚本静默走「无有效 cookie → 跳过」分支，研报来源恒为 0 只。
+MAHARO_PATH = os.path.join(DATA_DIR, ".mahoro_cookies.txt")
 
 
 def input_multiline(prompt):
