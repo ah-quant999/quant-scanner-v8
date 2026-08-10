@@ -1,114 +1,28 @@
 {
-  "update_time": "2026-08-10 19:12:21",
+  "update_time": "2026-08-10 19:11:48",
   "data_date": "2026-08-10",
   "track_start": "2026-08-10",
   "history_days": 2,
   "strict_count": 0,
-  "near_count": 5,
+  "near_count": 1,
   "tracked": [
     {
-      "code": "000506",
-      "name": "招金黄金",
-      "market": "sz",
-      "board": "主板",
+      "code": "01209",
+      "name": "华润万象生活",
+      "market": "hk",
+      "board": "港股",
       "status": "near",
-      "total_score": 34.4,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
+      "total_score": 25.2,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
       "signal_count": 0,
       "enter_date": "2026-08-10",
       "hold_days": 1,
       "consecutive_days": 1,
-      "first_close": 19.94,
-      "current_close": 19.94,
+      "first_close": 40.16,
+      "current_close": 40.16,
       "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "688213",
-      "name": "思特威",
-      "market": "sh",
-      "board": "科创板",
-      "status": "near",
-      "total_score": 34.0,
-      "quality_grade": "A",
-      "industry": "软件和信息技术服务业",
-      "sectors": [
-        "软件和信息技术服务业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-10",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 96.4,
-      "current_close": 96.4,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "688002",
-      "name": "睿创微纳",
-      "market": "sh",
-      "board": "科创板",
-      "status": "near",
-      "total_score": 29.6,
-      "quality_grade": "B",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-10",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 169.0,
-      "current_close": 169.0,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "688183",
-      "name": "生益电子",
-      "market": "sh",
-      "board": "科创板",
-      "status": "near",
-      "total_score": 28.8,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-10",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 112.32,
-      "current_close": 112.32,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "002714",
-      "name": "牧原股份",
-      "market": "深市",
-      "board": "主板",
-      "status": "near",
-      "total_score": 32,
-      "quality_grade": "A",
-      "industry": "畜牧业",
-      "sectors": [
-        "畜牧业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-10",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 0,
-      "current_close": null,
-      "pnl_pct": null,
       "catalysts": []
     }
   ],
@@ -116,57 +30,18 @@
   "sector_cluster": {
     "by_industry": [
       {
-        "industry": "计算机、通信和其他电子设备制造业",
-        "count": 2,
-        "names": [
-          "睿创微纳",
-          "生益电子"
-        ]
-      },
-      {
-        "industry": "有色金属矿采选业",
+        "industry": "未知",
         "count": 1,
         "names": [
-          "招金黄金"
-        ]
-      },
-      {
-        "industry": "软件和信息技术服务业",
-        "count": 1,
-        "names": [
-          "思特威"
-        ]
-      },
-      {
-        "industry": "畜牧业",
-        "count": 1,
-        "names": [
-          "牧原股份"
+          "华润万象生活"
         ]
       }
     ],
-    "by_sector": [
-      {
-        "sector": "计算机、通信和其他电子设备制造业",
-        "count": 2
-      },
-      {
-        "sector": "有色金属矿采选业",
-        "count": 1
-      },
-      {
-        "sector": "软件和信息技术服务业",
-        "count": 1
-      },
-      {
-        "sector": "畜牧业",
-        "count": 1
-      }
-    ],
-    "concentration": 40.0
+    "by_sector": [],
+    "concentration": 100.0
   },
   "overlap": {
-    "total_tracked": 5,
+    "total_tracked": 1,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
@@ -179,8 +54,10 @@
     },
     "cockpit_b": {
       "count": 7,
-      "overlap": 0,
-      "names": []
+      "overlap": 1,
+      "names": [
+        "华润万象生活"
+      ]
     }
   },
   "backtest_signal": {
