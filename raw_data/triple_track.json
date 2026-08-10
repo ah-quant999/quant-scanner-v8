@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-10 23:10:05",
+  "update_time": "2026-08-10 23:11:38",
   "data_date": "2026-08-10",
   "track_start": "2026-08-10",
   "history_days": 2,
@@ -112,9 +112,9 @@
     {
       "band": "≥80",
       "count": 63,
-      "win_rate_5d": 66.7,
-      "avg_ret_5d": 2.49,
-      "best_win_rate": 66.7,
+      "win_rate_5d": 60.6,
+      "avg_ret_5d": 1.74,
+      "best_win_rate": 60.6,
       "best_hold_days": 5
     },
     {
