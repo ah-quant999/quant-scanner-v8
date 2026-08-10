@@ -10491,27 +10491,19 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(empty) empty.style.display=filtered.length?'none':'block';
     var badge=_rps$('strpsRunBadge');
     if(badge){
-      var runInfo = window._runBadgeInfo ? window._runBadgeInfo(time||'') : {show:false};
+      // 2026-08-11：强制显示具体日期（MM-DD），不使用模糊的「今日」
+      var rawDate = D.calc_date || D.update_time || time || '';
+      var extracted = window._extractDateStr ? window._extractDateStr(rawDate) : '';
+      if(!extracted){ try{ extracted = String(rawDate).match(/\d{4}-\d{2}-\d{2}/)?String(rawDate).match(/\d{4}-\d{2}-\d{2}/)[0]:''; }catch(e){} }
       var badgeText = '✅ 已计算';
-      if(runInfo.show){
-        badgeText = runInfo.label.replace('已跑完','已计算').replace(' 已跑',' 已计算');
+      if(extracted){
+        // 始终显示 MM-DD 具体日期，与其他卡片格式一致
+        badgeText = '✅ '+extracted.slice(5)+' 已计算';
       } else {
-        // 2026-08-09/11：多层日期兜底，绝不再显示无日期「已计算」
-        var rawDate = D.calc_date || D.update_time || time || '';
-        var extracted = window._extractDateStr ? window._extractDateStr(rawDate) : '';
-        if(!extracted){ try{ extracted = String(rawDate).match(/\d{4}-\d{2}-\d{2}/)?String(rawDate).match(/\d{4}-\d{2}-\d{2}/)[0]:''; }catch(e){} }
-        if(extracted){
-          var parts = window._cstParts ? window._cstParts(new Date()) : null;
-          var todayStr = parts ? (String(parts.y)+'-'+String(parts.m).padStart(2,'0')+'-'+String(parts.d).padStart(2,'0')) : '';
-          if(extracted === todayStr) badgeText = '✅ 今日已计算';
-          else badgeText = '✅ '+extracted.slice(5)+' 已计算';
-        } else {
-          // 最终兜底：用 HEALTH_CHECK 或当前日期
-          var hc = window.HEALTH_CHECK || {}, hcDate = '';
-          try{ var hcIt=(hc.items||[]).find(function(x){return (x||{}).id==='STOCK_RPS'}); if(hcIt&&hcIt.last_update) hcDate=hcIt.last_update.slice(0,10); }catch(e){}
-          if(hcDate){ var tp=window._cstParts?window._cstParts(new Date()):null; var tStr=tp?(tp.y+'-'+String(tp.m).padStart(2,'0')+'-'+String(tp.d).padStart(2,'0')):''; badgeText = (hcDate===tStr?'✅ 今日':'✅ '+hcDate.slice(5))+' 已计算'; }
-          else badgeText = '✅ 已计算（日期未知）';
-        }
+        var hc = window.HEALTH_CHECK || {}, hcDate = '';
+        try{ var hcIt=(hc.items||[]).find(function(x){return (x||{}).id==='STOCK_RPS'}); if(hcIt&&hcIt.last_update) hcDate=hcIt.last_update.slice(0,10); }catch(e){}
+        if(hcDate) badgeText = '✅ '+hcDate.slice(5)+' 已计算';
+        else badgeText = '✅ 已计算（日期未知）';
       }
       badge.textContent = badgeText;
       badge.style.display='inline-block';
