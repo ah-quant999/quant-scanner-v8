@@ -9381,8 +9381,18 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
   /* ===== 📦 TOP3 持仓跟踪（2026-08-10 暂未上架·localStorage 持久化） ===== */
   var PF_KEY = 'v8_portfolio_positions';
+  // 预设种子数据（主人指定的 ETF 持仓，首次访问自动加载）
+  window._PF_SEED = [
+    {code:'159755', name:'锂电池ETF', full_code:'sz159755', market:'sz', date:'2026-08-11', price:1.85, qty:10000},
+    {code:'159665', name:'芯片ETF', full_code:'sz159665', market:'sz', date:'2026-08-11', price:1.42, qty:10000}
+  ];
   window._pfLoad = function(){
-    try { return JSON.parse(localStorage.getItem(PF_KEY)||'[]'); } catch(e){ return []; }
+    try {
+      var arr = JSON.parse(localStorage.getItem(PF_KEY)||'[]');
+      // 首次访问（空）→ 自动加载种子数据
+      if(!arr || !arr.length){ arr = window._PF_SEED || []; _pfSave(arr); }
+      return arr;
+    } catch(e){ return (window._PF_SEED || []); }
   };
   window._pfSave = function(arr){
     localStorage.setItem(PF_KEY, JSON.stringify(arr||[]));
@@ -9404,6 +9414,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if(r.name.toLowerCase().indexOf(ql)!==-1||(r.code||'').indexOf(nc)!==-1)
         {best={code:r.code,name:r.name,full_code:(r.market||'hk')+r.code,py:r.py||'',market:r.market||'hk'};bs=3;}
     }}}
+    // 兜底：纯数字代码或未知名称 → 允许录入（支持 ETF/新股等不在 STOCK_LIST 的标的）
+    if(!best && /^\d{5,6}$/.test(nc)){
+      var mk = nc.startsWith('688')?'bj':(nc.startsWith('30')?'sz':(nc.startsWith('6')?'sh':'sz'));
+      best={code:nc,name:q,full_code:mk+nc,py:'',market:mk}; bs=1;
+    }
     return best;
   };
   // 获取现价
