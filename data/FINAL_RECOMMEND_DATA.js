@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-10 22:08:01",
+  "update_time": "2026-08-10 22:13:25",
   "crisis_score": 33.3,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -78,7 +78,7 @@ window.FINAL_RECOMMEND_DATA = {
     {
       "rank": 2,
       "code": "09618",
-      "name": "京东集团-SW",
+      "name": "京东物流",
       "market": "hk",
       "board": "港股",
       "horizon": "短线/中线共振",
@@ -221,7 +221,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "09618",
-      "name": "京东集团-SW",
+      "name": "京东物流",
       "market": "港股",
       "board": "港股",
       "horizon": "短线/中线共振",
@@ -322,12 +322,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "通用设备制造业",
       "concepts": [
-        "融资融券",
-        "创业板综",
-        "百元股",
-        "半导体概念",
         "次新股",
-        "存储芯片"
+        "创业板综",
+        "先进封装",
+        "半导体概念",
+        "百元股",
+        "融资融券"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -355,12 +355,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "融资融券",
-        "央国企改革",
-        "电池技术",
-        "5G概念",
         "MLCC",
-        "虚拟机器人"
+        "融资融券",
+        "电池技术",
+        "虚拟机器人",
+        "AI眼镜",
+        "深成500"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -388,12 +388,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "电力、热力生产和供应业",
       "concepts": [
-        "充电桩",
-        "题材股",
-        "央国企改革",
         "光伏概念",
         "反转股",
-        "储能概念"
+        "充电桩",
+        "储能概念",
+        "新能源",
+        "央国企改革"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -423,10 +423,10 @@ window.FINAL_RECOMMEND_DATA = {
       "concepts": [
         "融资融券",
         "合成生物",
-        "体外诊断概念",
         "破发股",
-        "精准诊断",
-        "重组蛋白"
+        "重组蛋白",
+        "专精特新",
+        "体外诊断概念"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -454,12 +454,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "融资融券",
-        "央国企改革",
-        "创投",
-        "固态电池",
         "光伏概念",
-        "电池技术"
+        "数据中心",
+        "储能概念",
+        "融资融券",
+        "新能源",
+        "液冷概念"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -487,12 +487,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "3D玻璃",
-        "融资融券",
         "创业板综",
+        "融资融券",
         "柔性屏(折叠屏)",
         "破发股",
-        "深圳特区"
+        "深圳特区",
+        "3D玻璃"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -529,7 +529,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "09866",
-      "name": "蔚来-SW",
+      "name": "09866",
       "market": "港股",
       "board": "港股",
       "horizon": "短线",
@@ -837,7 +837,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "09999",
-      "name": "网易",
+      "name": "网易-S",
       "market": "港股",
       "board": "港股",
       "horizon": "中长线",
