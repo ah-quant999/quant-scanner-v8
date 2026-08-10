@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-10 21:03",
+  "update_time": "2026-08-10 21:04",
   "data_type": "real",
   "summary": {
     "in_count": 40,
@@ -21,8 +21,8 @@
     {
       "name": "贵金属",
       "net": 27.39,
-      "net_5d": 265.97,
-      "net_20d": 1400.7,
+      "net_5d": 399.04,
+      "net_20d": 2134.05,
       "type": "行业",
       "consecutive_days": 1,
       "trend": "in"
@@ -384,8 +384,8 @@
     {
       "name": "贵金属",
       "net": 27.39,
-      "net_5d": 265.97,
-      "net_20d": 1400.7,
+      "net_5d": 399.04,
+      "net_20d": 2134.05,
       "type": "行业",
       "consecutive_days": 1,
       "trend": "in"
@@ -899,8 +899,8 @@
     {
       "name": "贵金属",
       "net": 27.39,
-      "net_5d": 265.97,
-      "net_20d": 1400.7,
+      "net_5d": 399.04,
+      "net_20d": 2134.05,
       "type": "行业",
       "consecutive_days": 1,
       "trend": "in",
@@ -942,8 +942,8 @@
     {
       "name": "贵金属",
       "net": 27.39,
-      "net_5d": 265.97,
-      "net_20d": 1400.7,
+      "net_5d": 399.04,
+      "net_20d": 2134.05,
       "type": "行业",
       "consecutive_days": 1,
       "trend": "in",
