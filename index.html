@@ -1291,8 +1291,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
     </div>
 
-    <!-- 💰 平均股价（全A等权均价 + 20/60日水位） -->
-    <div id="avgPriceCard" style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">
+    <!-- 💰 平均股价（全A等权均价 + 20/60日水位）—— 2026-08-11 移至暂未上架实验区 -->
+    <div id="avgPriceCard" style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:none;">
       <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--border);">
         <span style="font-size:16px;font-weight:700;color:var(--txt);">💰 平均股价（全A等权）</span>
         <span style="font-size:12px;color:var(--sub);font-weight:400;" id="avgPriceTime">--</span>
@@ -2455,8 +2455,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
     </div>
 
-    <!-- 📌 概念/行业 → ETF·龙头 参考（仅研究参考，不构成投资建议） -->
-    <div class="card" style="margin-bottom:16px">
+    <!-- 📌 概念/行业 → ETF·龙头 参考（仅研究参考，不构成投资建议）—— 2026-08-11 移至暂未上架实验区 -->
+    <div class="card" style="margin-bottom:16px;display:none;">
       <h3><span class="ic">📌</span>概念/行业 → ETF·龙头 参考<span class="fresh" id="etfMapTime">—</span></h3>
       <div style="font-size:11px;color:var(--dim);margin:-4px 0 10px 0;line-height:1.5;">⚠️ 仅根据当前热点板块列出代表性 ETF 与龙头股，<b style="color:#fbbf24">不构成任何投资建议，请勿直接跟买</b>。ETF/个股以交易所最新公告为准。</div>
       <div id="etfMapBody"><div class="ipo-empty">加载中…</div></div>
@@ -9124,10 +9124,38 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     // === 暂未上架实验区 · 数据驱动卡（2026-08-08 主人令：今日可入手候选已迁入「最终推荐 · 今日推荐候选池」，此处不再重复渲染） ===
 
+    // ── 2026-08-11 移入：💰 平均股价（全A等权）—— 云端数据源不稳定，暂放实验区 ──
+    h+='<div id="unlistedAvgPrice" style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:16px 0;border-left:4px solid #f59e0b;">';
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--border);">';
+    h+='<span style="font-size:15px;font-weight:700;color:#fbbf24;">💰 平均股价（全A等权）</span>';
+    h+='<span style="font-size:11px;color:var(--dim);">实验区 · 云端抓取中时常空壳</span></div>';
+    h+='<div id="unlistedAvgPriceContent" style="padding:14px 18px;"><div class="note">加载中…</div></div>';
+    h+='</div>';
+
+    // ── 2026-08-11 移入：📌 ETF·龙头 参考 —— 仅研究参考，不构成投资建议 ──
+    h+='<div style="margin:16px 0;border-left:4px solid #a855f7;" class="card">';
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
+    h+='<span style="font-size:15px;font-weight:700;color:#c084fc;">📌 概念/行业 → ETF·龙头 参考</span>';
+    h+='<span style="font-size:11px;color:var(--dim);">实验区 · 不构成投资建议</span></div>';
+    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">⚠️ 仅根据当前热点板块列出代表性 ETF 与龙头股，<b style="color:#fbbf24">不构成任何投资建议</b>。</div>';
+    h+='<div id="unlistedEtfMapBody"><div class="note">加载中…</div></div>';
+    h+='</div>';
+
     // ── 🎭 情绪周期 · 连板天梯（合并紧凑版）已迁到实时数据区，见 window.__renderCycleLadderCard ──
 
     el.innerHTML=h;
     if(typeof window.renderPortfolio==='function') window.renderPortfolio();
+    // 2026-08-11：将原位置隐藏的卡内容克隆/渲染到暂未上架区
+    (function(){
+      // 平均股价：复用原 renderAvgPrice 逻辑到新容器
+      var srcEl=document.getElementById('avgPriceContent');
+      var dstEl=document.getElementById('unlistedAvgPriceContent');
+      if(srcEl && dstEl) dstEl.innerHTML = srcEl.innerHTML;
+      // ETF龙头参考：复用原 etfMapBody 内容
+      var etfSrc=document.getElementById('etfMapBody');
+      var etfDst=document.getElementById('unlistedEtfMapBody');
+      if(etfSrc && etfDst) etfDst.innerHTML = etfSrc.innerHTML;
+    })();
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderUnlisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
   }
 
@@ -11099,9 +11127,19 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       return;
     }
 
-    var all=D.all_candidates;
+    // 2026-08-11 修复：与Top3保持一致——A股优先展示，港股降权后排
+    var all=D.all_candidates.slice();
+    // 按市场分组：A股优先（与Top3的MIN_A_SHARES逻辑一致）
+    var aShares=[], hkStocks=[];
+    all.forEach(function(s){ var m=(s.market||''); if(m==='港股'||s.board==='港股') hkStocks.push(s); else aShares.push(s); });
+    // A股按分排序，港股按分排序
+    aShares.sort(function(a,b){return (b.final_score||0)-(a.final_score||0);});
+    hkStocks.sort(function(a,b){return (b.final_score||0)-(a.final_score||0);});
+    // 合并：A股在前，港股在后（带降权标记）
+    var ordered = aShares.concat(hkStocks);
+
     var shortList=[]; var longList=[];
-    all.forEach(function(s){
+    ordered.forEach(function(s){
       var h=fmtHorizon(s.horizon);
       if(h[0].indexOf('短线')>=0) shortList.push(s); else longList.push(s);
     });
@@ -11114,10 +11152,13 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     function _pctColor(p){ return p==null?'var(--dim)':(p>=0?'var(--up)':'var(--down)'); }
     function _renderStock(s){
       var board=s.board||fmtMarket(s.market,s.code);
+      var isHK = (s.market==='港股' || board==='港股');
       var pct=s.pct_chg;
       var price=s.close;
       var tags='';
       tags+=_mkTag(board, _boardColor(board));
+      // 2026-08-11：港股降权标记，与Top3逻辑一致
+      if(isHK) tags+='<span style="display:inline-block;padding:2px 7px;border-radius:999px;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b40;font-size:10px;font-weight:600;white-space:nowrap">⚠️已降权</span>';
       if(s.industry) tags+=_mkTag(s.industry, '#64748b');
       (s.concepts||[]).slice(0,4).forEach(function(c){ tags+=_mkTag(c, '#38bdf8'); });
       var srcColor={'三重共识':'var(--purple)','驾驶舱A档':'#ffd54f','驾驶舱B档':'#f59e0b','四量终极':'#ff7043','板块龙头':'#22c55e','大牛股猎手':'#ef4444','逆势龙头·精锐':'#06b6d4'};
@@ -11164,7 +11205,8 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       return '<div>'+items.map(_renderStock).join('')+'</div>';
     }
 
-    var h='<div style="font-size:13px;font-weight:700;color:var(--up);margin-bottom:4px">🎯 今日推荐候选池 '+all.length+' 只（短线'+shortList.length+' · 中长线'+longList.length+'）</div>';
+    var h='<div style="font-size:13px;font-weight:700;color:var(--up);margin-bottom:4px">🎯 今日推荐候选池 '+ordered.length+' 只（A股优先 · 港股已降权后排 · 短线'+shortList.length+' · 中长线'+longList.length+'）</div>';
+    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">与Top3一致：港股因HK_PENALTY=-1.5降权，A股保底占优。⚠️已降权=港股标记</div>';
     h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">'
       +'<div><div style="font-size:12px;font-weight:800;color:#38bdf8;margin-bottom:6px;display:flex;align-items:center;gap:4px;">⚡ 短线候选 <span style="font-size:11px;font-weight:600;color:var(--dim)">('+shortList.length+')</span></div>'+_renderColumn(shortList,'短线候选','⚡','#38bdf8')+'</div>'
       +'<div><div style="font-size:12px;font-weight:800;color:#22c55e;margin-bottom:6px;display:flex;align-items:center;gap:4px;">🌿 中长线候选 <span style="font-size:11px;font-weight:600;color:var(--dim)">('+longList.length+')</span></div>'+_renderColumn(longList,'中长线候选','🌿','#22c55e')+'</div>'
