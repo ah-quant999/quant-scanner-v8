@@ -1,5 +1,5 @@
 {
-  "calc_time": "2026-08-10 23:08:41",
+  "calc_time": "2026-08-10 23:30:52",
   "method": "baostock 真实收盘价全面回测",
   "hold_periods_tested": [
     1,
@@ -164,75 +164,75 @@
     },
     "resonance_gte80": {
       "total": 63,
-      "valid": 33,
+      "valid": 51,
       "best_hold_days": 5,
-      "best_win_rate": 60.6,
-      "best_avg_return": 1.74,
+      "best_win_rate": 66.7,
+      "best_avg_return": 2.49,
       "periods": {
         "hold_1d": {
-          "count": 33,
-          "win": 19,
-          "loss": 14,
+          "count": 51,
+          "win": 31,
+          "loss": 20,
           "draw": 0,
-          "win_rate": 57.6,
-          "avg_return": -0.46,
-          "median_return": 2.14,
-          "best_return": 10.97,
+          "win_rate": 60.8,
+          "avg_return": 0.74,
+          "median_return": 2.36,
+          "best_return": 13.68,
           "worst_return": -10.01,
-          "std_return": 6.59,
-          "sharpe_ratio": -0.07
+          "std_return": 6.43,
+          "sharpe_ratio": 0.12
         },
         "hold_3d": {
-          "count": 33,
-          "win": 15,
-          "loss": 18,
-          "draw": 0,
-          "win_rate": 45.5,
-          "avg_return": -1.37,
-          "median_return": -1.27,
+          "count": 51,
+          "win": 23,
+          "loss": 19,
+          "draw": 9,
+          "win_rate": 54.8,
+          "avg_return": 0.51,
+          "median_return": 0,
           "best_return": 15.0,
           "worst_return": -10.01,
-          "std_return": 7.75,
-          "sharpe_ratio": -0.18
+          "std_return": 7.57,
+          "sharpe_ratio": 0.07
         },
         "hold_5d": {
-          "count": 33,
-          "win": 20,
-          "loss": 13,
-          "draw": 0,
-          "win_rate": 60.6,
-          "avg_return": 1.74,
-          "median_return": 4.23,
+          "count": 51,
+          "win": 28,
+          "loss": 14,
+          "draw": 9,
+          "win_rate": 66.7,
+          "avg_return": 2.49,
+          "median_return": 1.4,
           "best_return": 15.0,
           "worst_return": -10.04,
-          "std_return": 10.31,
-          "sharpe_ratio": 0.17
+          "std_return": 9.2,
+          "sharpe_ratio": 0.27
         },
         "hold_10d": {
-          "count": 33,
+          "count": 51,
           "win": 4,
           "loss": 10,
-          "draw": 19,
+          "draw": 37,
           "win_rate": 28.6,
-          "avg_return": -1.31,
+          "avg_return": -0.85,
           "median_return": 0,
           "best_return": 15.0,
           "worst_return": -10.04,
-          "std_return": 6.8,
-          "sharpe_ratio": -0.19
+          "std_return": 5.51,
+          "sharpe_ratio": -0.15
         },
         "hold_20d": {
-          "count": 33,
+          "count": 51,
           "win": 2,
           "loss": 4,
-          "draw": 27,
+          "draw": 45,
           "win_rate": 33.3,
-          "avg_return": -0.3,
+          "avg_return": -0.2,
           "median_return": 0,
           "best_return": 15.0,
           "worst_return": -10.01,
-          "std_return": 5.07,
-          "sharpe_ratio": -0.06
+          "std_return": 4.08,
+          "sharpe_ratio": -0.05
         }
       }
     }
@@ -252,10 +252,10 @@
         "count": 120
       },
       "resonance_gte80": {
-        "win_rate": 57.6,
-        "avg_return": -0.46,
-        "sharpe": -0.07,
-        "count": 33
+        "win_rate": 60.8,
+        "avg_return": 0.74,
+        "sharpe": 0.12,
+        "count": 51
       }
     },
     "hold_3d": {
@@ -272,10 +272,10 @@
         "count": 120
       },
       "resonance_gte80": {
-        "win_rate": 45.5,
-        "avg_return": -1.37,
-        "sharpe": -0.18,
-        "count": 33
+        "win_rate": 54.8,
+        "avg_return": 0.51,
+        "sharpe": 0.07,
+        "count": 51
       }
     },
     "hold_5d": {
@@ -292,10 +292,10 @@
         "count": 120
       },
       "resonance_gte80": {
-        "win_rate": 60.6,
-        "avg_return": 1.74,
-        "sharpe": 0.17,
-        "count": 33
+        "win_rate": 66.7,
+        "avg_return": 2.49,
+        "sharpe": 0.27,
+        "count": 51
       }
     },
     "hold_10d": {
@@ -313,9 +313,9 @@
       },
       "resonance_gte80": {
         "win_rate": 28.6,
-        "avg_return": -1.31,
-        "sharpe": -0.19,
-        "count": 33
+        "avg_return": -0.85,
+        "sharpe": -0.15,
+        "count": 51
       }
     },
     "hold_20d": {
@@ -333,9 +333,9 @@
       },
       "resonance_gte80": {
         "win_rate": 33.3,
-        "avg_return": -0.3,
-        "sharpe": -0.06,
-        "count": 33
+        "avg_return": -0.2,
+        "sharpe": -0.05,
+        "count": 51
       }
     }
   },
@@ -13217,75 +13217,75 @@
     },
     "resonance_gte80": {
       "total_signals": 63,
-      "valid_signals": 33,
+      "valid_signals": 51,
       "best_hold_days": 5,
-      "best_hold_win_rate": 60.6,
-      "best_hold_avg_return": 1.74,
+      "best_hold_win_rate": 66.7,
+      "best_hold_avg_return": 2.49,
       "periods": {
         "hold_1d": {
-          "count": 33,
-          "win": 19,
-          "loss": 14,
+          "count": 51,
+          "win": 31,
+          "loss": 20,
           "draw": 0,
-          "win_rate": 57.6,
-          "avg_return": -0.46,
-          "median_return": 2.14,
-          "best_return": 10.97,
+          "win_rate": 60.8,
+          "avg_return": 0.74,
+          "median_return": 2.36,
+          "best_return": 13.68,
           "worst_return": -10.01,
-          "std_return": 6.59,
-          "sharpe_ratio": -0.07
+          "std_return": 6.43,
+          "sharpe_ratio": 0.12
         },
         "hold_3d": {
-          "count": 33,
-          "win": 15,
-          "loss": 18,
-          "draw": 0,
-          "win_rate": 45.5,
-          "avg_return": -1.37,
-          "median_return": -1.27,
+          "count": 51,
+          "win": 23,
+          "loss": 19,
+          "draw": 9,
+          "win_rate": 54.8,
+          "avg_return": 0.51,
+          "median_return": 0,
           "best_return": 15.0,
           "worst_return": -10.01,
-          "std_return": 7.75,
-          "sharpe_ratio": -0.18
+          "std_return": 7.57,
+          "sharpe_ratio": 0.07
         },
         "hold_5d": {
-          "count": 33,
-          "win": 20,
-          "loss": 13,
-          "draw": 0,
-          "win_rate": 60.6,
-          "avg_return": 1.74,
-          "median_return": 4.23,
+          "count": 51,
+          "win": 28,
+          "loss": 14,
+          "draw": 9,
+          "win_rate": 66.7,
+          "avg_return": 2.49,
+          "median_return": 1.4,
           "best_return": 15.0,
           "worst_return": -10.04,
-          "std_return": 10.31,
-          "sharpe_ratio": 0.17
+          "std_return": 9.2,
+          "sharpe_ratio": 0.27
         },
         "hold_10d": {
-          "count": 33,
+          "count": 51,
           "win": 4,
           "loss": 10,
-          "draw": 19,
+          "draw": 37,
           "win_rate": 28.6,
-          "avg_return": -1.31,
+          "avg_return": -0.85,
           "median_return": 0,
           "best_return": 15.0,
           "worst_return": -10.04,
-          "std_return": 6.8,
-          "sharpe_ratio": -0.19
+          "std_return": 5.51,
+          "sharpe_ratio": -0.15
         },
         "hold_20d": {
-          "count": 33,
+          "count": 51,
           "win": 2,
           "loss": 4,
-          "draw": 27,
+          "draw": 45,
           "win_rate": 33.3,
-          "avg_return": -0.3,
+          "avg_return": -0.2,
           "median_return": 0,
           "best_return": 15.0,
           "worst_return": -10.01,
-          "std_return": 5.07,
-          "sharpe_ratio": -0.06
+          "std_return": 4.08,
+          "sharpe_ratio": -0.05
         }
       },
       "signals": [
@@ -14761,9 +14761,639 @@
             "target_price": 56.46,
             "exit_type": "target"
           }
+        },
+        {
+          "entry_date": "2026-07-30",
+          "code": "002384",
+          "name": "东山精密",
+          "market": "sz",
+          "board": "主板",
+          "total_score": 86,
+          "entry_price": 161.8,
+          "bsc": "sz.002384",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 185.94,
+          "hold_days": 4,
+          "max_drawdown": -5.06,
+          "latest_return": 15.0,
+          "stop_loss": 145.62,
+          "target_price": 186.07,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-05",
+          "exit_price": 186.07,
+          "exit_type": "target",
+          "hold_1d": {
+            "ret": 5.98,
+            "target_date": "2026-07-31",
+            "target_price": 171.48,
+            "exit_type": null
+          },
+          "hold_3d": {
+            "ret": 10.69,
+            "target_date": "2026-08-04",
+            "target_price": 179.09,
+            "exit_type": null
+          },
+          "hold_5d": {
+            "ret": 15.0,
+            "target_date": "2026-08-05",
+            "target_price": 186.07,
+            "exit_type": "target"
+          }
+        },
+        {
+          "entry_date": "2026-07-30",
+          "code": "300001",
+          "name": "特锐德",
+          "market": "深市",
+          "board": "创业板",
+          "total_score": 82,
+          "entry_price": 33.71,
+          "bsc": "sz.300001",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 35.36,
+          "hold_days": 7,
+          "max_drawdown": -3.06,
+          "latest_return": 4.89,
+          "stop_loss": 30.34,
+          "target_price": 38.77,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-10",
+          "exit_price": 35.36,
+          "exit_type": null,
+          "hold_1d": {
+            "ret": 4.12,
+            "target_date": "2026-07-31",
+            "target_price": 35.1,
+            "exit_type": null
+          },
+          "hold_3d": {
+            "ret": 7.51,
+            "target_date": "2026-08-04",
+            "target_price": 36.24,
+            "exit_type": null
+          },
+          "hold_5d": {
+            "ret": 4.24,
+            "target_date": "2026-08-06",
+            "target_price": 35.14,
+            "exit_type": null
+          }
+        },
+        {
+          "entry_date": "2026-07-30",
+          "code": "002138",
+          "name": "顺络电子",
+          "market": "sz",
+          "board": "主板",
+          "total_score": 80,
+          "entry_price": 40.1,
+          "bsc": "sz.002138",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 48.1,
+          "hold_days": 3,
+          "max_drawdown": 0.0,
+          "latest_return": 14.99,
+          "stop_loss": 36.09,
+          "target_price": 46.11,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-04",
+          "exit_price": 46.11,
+          "exit_type": "target",
+          "hold_1d": {
+            "ret": 6.73,
+            "target_date": "2026-07-31",
+            "target_price": 42.8,
+            "exit_type": null
+          },
+          "hold_3d": {
+            "ret": 14.99,
+            "target_date": "2026-08-04",
+            "target_price": 46.11,
+            "exit_type": "target"
+          },
+          "hold_5d": {
+            "ret": 14.99,
+            "target_date": "2026-08-04",
+            "target_price": 46.11,
+            "exit_type": "target"
+          }
+        },
+        {
+          "entry_date": "2026-07-31",
+          "code": "300001",
+          "name": "特锐德",
+          "market": "深市",
+          "board": "创业板",
+          "total_score": 34.4,
+          "entry_price": 35.1,
+          "bsc": "sz.300001",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 35.36,
+          "hold_days": 6,
+          "max_drawdown": -3.06,
+          "latest_return": 0.74,
+          "stop_loss": 31.59,
+          "target_price": 40.36,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-10",
+          "exit_price": 35.36,
+          "exit_type": null,
+          "hold_1d": {
+            "ret": 1.6,
+            "target_date": "2026-08-03",
+            "target_price": 35.66,
+            "exit_type": null
+          },
+          "hold_3d": {
+            "ret": 2.05,
+            "target_date": "2026-08-05",
+            "target_price": 35.82,
+            "exit_type": null
+          },
+          "hold_5d": {
+            "ret": 0.09,
+            "target_date": "2026-08-07",
+            "target_price": 35.13,
+            "exit_type": null
+          }
+        },
+        {
+          "entry_date": "2026-07-31",
+          "code": "000651",
+          "name": "格力电器",
+          "market": "sz",
+          "board": "主板",
+          "total_score": 33.2,
+          "entry_price": 42.3,
+          "bsc": "sz.000651",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 40.67,
+          "hold_days": 6,
+          "max_drawdown": -5.2,
+          "latest_return": -3.85,
+          "stop_loss": 38.07,
+          "target_price": 48.64,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-10",
+          "exit_price": 40.67,
+          "exit_type": null,
+          "hold_1d": {
+            "ret": -3.17,
+            "target_date": "2026-08-03",
+            "target_price": 40.96,
+            "exit_type": null
+          },
+          "hold_3d": {
+            "ret": -4.8,
+            "target_date": "2026-08-05",
+            "target_price": 40.27,
+            "exit_type": null
+          },
+          "hold_5d": {
+            "ret": -5.2,
+            "target_date": "2026-08-07",
+            "target_price": 40.1,
+            "exit_type": null
+          }
+        },
+        {
+          "entry_date": "2026-07-31",
+          "code": "000938",
+          "name": "紫光股份",
+          "market": "sz",
+          "board": "主板",
+          "total_score": 32.4,
+          "entry_price": 34.89,
+          "bsc": "sz.000938",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 37.63,
+          "hold_days": 6,
+          "max_drawdown": -5.13,
+          "latest_return": 7.85,
+          "stop_loss": 31.4,
+          "target_price": 40.12,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-10",
+          "exit_price": 37.63,
+          "exit_type": null,
+          "hold_1d": {
+            "ret": -5.13,
+            "target_date": "2026-08-03",
+            "target_price": 33.1,
+            "exit_type": null
+          },
+          "hold_3d": {
+            "ret": 5.88,
+            "target_date": "2026-08-05",
+            "target_price": 36.94,
+            "exit_type": null
+          },
+          "hold_5d": {
+            "ret": 8.91,
+            "target_date": "2026-08-07",
+            "target_price": 38.0,
+            "exit_type": null
+          }
+        },
+        {
+          "entry_date": "2026-08-03",
+          "code": "300502",
+          "name": "新易盛",
+          "market": "sz",
+          "board": "创业板",
+          "total_score": 89,
+          "entry_price": 394.08,
+          "bsc": "sz.300502",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 399.6,
+          "hold_days": 5,
+          "max_drawdown": -10.8,
+          "latest_return": 1.4,
+          "stop_loss": 354.67,
+          "target_price": 453.19,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-10",
+          "exit_price": 399.6,
+          "exit_type": null,
+          "hold_1d": {
+            "ret": 13.68,
+            "target_date": "2026-08-04",
+            "target_price": 448.0,
+            "exit_type": null
+          },
+          "hold_3d": {
+            "ret": 7.05,
+            "target_date": "2026-08-06",
+            "target_price": 421.87,
+            "exit_type": null
+          },
+          "hold_5d": {
+            "ret": 1.4,
+            "target_date": "2026-08-10",
+            "target_price": 399.6,
+            "exit_type": null
+          }
+        },
+        {
+          "entry_date": "2026-08-03",
+          "code": "600183",
+          "name": "生益科技",
+          "market": "沪市",
+          "board": "主板",
+          "total_score": 83,
+          "entry_price": 102.03,
+          "bsc": "sh.600183",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 138.57,
+          "hold_days": 2,
+          "max_drawdown": 0.0,
+          "latest_return": 15.0,
+          "stop_loss": 91.83,
+          "target_price": 117.33,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-05",
+          "exit_price": 117.33,
+          "exit_type": "target",
+          "hold_1d": {
+            "ret": 10.0,
+            "target_date": "2026-08-04",
+            "target_price": 112.23,
+            "exit_type": null
+          },
+          "hold_3d": {
+            "ret": 15.0,
+            "target_date": "2026-08-05",
+            "target_price": 117.33,
+            "exit_type": "target"
+          },
+          "hold_5d": {
+            "ret": 15.0,
+            "target_date": "2026-08-05",
+            "target_price": 117.33,
+            "exit_type": "target"
+          }
+        },
+        {
+          "entry_date": "2026-08-03",
+          "code": "688525",
+          "name": "佰维存储",
+          "market": "sh",
+          "board": "科创板",
+          "total_score": 83,
+          "entry_price": 206.8,
+          "bsc": "sh.688525",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 242.0,
+          "hold_days": 4,
+          "max_drawdown": -0.06,
+          "latest_return": 15.0,
+          "stop_loss": 186.12,
+          "target_price": 237.82,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-07",
+          "exit_price": 237.82,
+          "exit_type": "target",
+          "hold_1d": {
+            "ret": 5.19,
+            "target_date": "2026-08-04",
+            "target_price": 217.53,
+            "exit_type": null
+          },
+          "hold_3d": {
+            "ret": 12.64,
+            "target_date": "2026-08-06",
+            "target_price": 232.94,
+            "exit_type": null
+          },
+          "hold_5d": {
+            "ret": 15.0,
+            "target_date": "2026-08-07",
+            "target_price": 237.82,
+            "exit_type": "target"
+          }
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "688183",
+          "name": "生益电子",
+          "market": "sh",
+          "board": "科创板",
+          "total_score": 36.4,
+          "entry_price": 118.78,
+          "bsc": "sh.688183",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 112.32,
+          "hold_days": 1,
+          "max_drawdown": -5.44,
+          "latest_return": -5.44,
+          "stop_loss": 106.9,
+          "target_price": 136.6,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-10",
+          "exit_price": 112.32,
+          "exit_type": null,
+          "hold_1d": {
+            "ret": -5.44,
+            "target_date": "2026-08-10",
+            "target_price": 112.32,
+            "exit_type": null
+          }
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "688213",
+          "name": "思特威",
+          "market": "sh",
+          "board": "科创板",
+          "total_score": 31.2,
+          "entry_price": 93.89,
+          "bsc": "sh.688213",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 96.4,
+          "hold_days": 1,
+          "max_drawdown": 0.0,
+          "latest_return": 2.67,
+          "stop_loss": 84.5,
+          "target_price": 107.97,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-10",
+          "exit_price": 96.4,
+          "exit_type": null,
+          "hold_1d": {
+            "ret": 2.67,
+            "target_date": "2026-08-10",
+            "target_price": 96.4,
+            "exit_type": null
+          }
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "688002",
+          "name": "睿创微纳",
+          "market": "sh",
+          "board": "科创板",
+          "total_score": 30.4,
+          "entry_price": 170.04,
+          "bsc": "sh.688002",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 169.0,
+          "hold_days": 1,
+          "max_drawdown": -0.61,
+          "latest_return": -0.61,
+          "stop_loss": 153.04,
+          "target_price": 195.55,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-10",
+          "exit_price": 169.0,
+          "exit_type": null,
+          "hold_1d": {
+            "ret": -0.61,
+            "target_date": "2026-08-10",
+            "target_price": 169.0,
+            "exit_type": null
+          }
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "600206",
+          "name": "有研新材",
+          "market": "sh",
+          "board": "主板",
+          "total_score": 25.6,
+          "entry_price": 48.17,
+          "bsc": "sh.600206",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 52.03,
+          "hold_days": 1,
+          "max_drawdown": 0.0,
+          "latest_return": 8.01,
+          "stop_loss": 43.35,
+          "target_price": 55.4,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-10",
+          "exit_price": 52.03,
+          "exit_type": null,
+          "hold_1d": {
+            "ret": 8.01,
+            "target_date": "2026-08-10",
+            "target_price": 52.03,
+            "exit_type": null
+          }
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "688392",
+          "name": "骄成超声",
+          "market": "sh",
+          "board": "科创板",
+          "total_score": 25.6,
+          "entry_price": 149.47,
+          "bsc": "sh.688392",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 152.0,
+          "hold_days": 1,
+          "max_drawdown": 0.0,
+          "latest_return": 1.69,
+          "stop_loss": 134.52,
+          "target_price": 171.89,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-10",
+          "exit_price": 152.0,
+          "exit_type": null,
+          "hold_1d": {
+            "ret": 1.69,
+            "target_date": "2026-08-10",
+            "target_price": 152.0,
+            "exit_type": null
+          }
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "600641",
+          "name": "先导基电",
+          "market": "sh",
+          "board": "主板",
+          "total_score": 25.6,
+          "entry_price": 31.28,
+          "bsc": "sh.600641",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 34.41,
+          "hold_days": 1,
+          "max_drawdown": 0.0,
+          "latest_return": 10.01,
+          "stop_loss": 28.15,
+          "target_price": 35.97,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-10",
+          "exit_price": 34.41,
+          "exit_type": null,
+          "hold_1d": {
+            "ret": 10.01,
+            "target_date": "2026-08-10",
+            "target_price": 34.41,
+            "exit_type": null
+          }
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "300613",
+          "name": "富瀚微",
+          "market": "sz",
+          "board": "创业板",
+          "total_score": 42.4,
+          "entry_price": 74.25,
+          "bsc": "sz.300613",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 74.15,
+          "hold_days": 1,
+          "max_drawdown": -0.13,
+          "latest_return": -0.13,
+          "stop_loss": 66.83,
+          "target_price": 85.39,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-10",
+          "exit_price": 74.15,
+          "exit_type": null,
+          "hold_1d": {
+            "ret": -0.13,
+            "target_date": "2026-08-10",
+            "target_price": 74.15,
+            "exit_type": null
+          }
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "688183",
+          "name": "生益电子",
+          "market": "sh",
+          "board": "科创板",
+          "total_score": 39.6,
+          "entry_price": 118.78,
+          "bsc": "sh.688183",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 112.32,
+          "hold_days": 1,
+          "max_drawdown": -5.44,
+          "latest_return": -5.44,
+          "stop_loss": 106.9,
+          "target_price": 136.6,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-10",
+          "exit_price": 112.32,
+          "exit_type": null,
+          "hold_1d": {
+            "ret": -5.44,
+            "target_date": "2026-08-10",
+            "target_price": 112.32,
+            "exit_type": null
+          }
+        },
+        {
+          "entry_date": "2026-08-07",
+          "code": "300209",
+          "name": "行云科技",
+          "market": "sz",
+          "board": "创业板",
+          "total_score": 38.4,
+          "entry_price": 37.19,
+          "bsc": "sz.300209",
+          "source": "top10_daily",
+          "strategy": "resonance_gte80",
+          "latest_date": "2026-08-10",
+          "latest_price": 38.39,
+          "hold_days": 1,
+          "max_drawdown": 0.0,
+          "latest_return": 3.23,
+          "stop_loss": 33.47,
+          "target_price": 42.77,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-10",
+          "exit_price": 38.39,
+          "exit_type": null,
+          "hold_1d": {
+            "ret": 3.23,
+            "target_date": "2026-08-10",
+            "target_price": 38.39,
+            "exit_type": null
+          }
         }
       ]
     }
   },
-  "update_stamp": 1786374521
+  "update_stamp": 1786375852
 }
