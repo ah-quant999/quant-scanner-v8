@@ -9,6 +9,7 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 window.TRIPLE_CONSENSUS = {"update_time":"2026-08-10 10:57:53","data_time":"2026-08-10 10:52:39","count":0,"near_miss_count":0,"criteria":"主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)）· 驾驶舱A档 · 基本面A档","near_miss_criteria":"以上三条满足任意两条（驾驶舱A/B档均计入）","stocks":[],"near_miss":[],"republish_time":"2026-08-10 15:36:20"};
 =======
 window.TRIPLE_CONSENSUS = {"update_time":"2026-08-10 10:57:53","data_time":"2026-08-10 10:52:39","count":0,"near_miss_count":0,"criteria":"主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)）· 驾驶舱A档 · 基本面A档","near_miss_criteria":"以上三条满足任意两条（驾驶舱A/B档均计入）","stocks":[],"near_miss":[],"republish_time":"2026-08-10 15:36:50"};
@@ -42,4 +43,7 @@ window.TRIPLE_CONSENSUS = {"update_time":"2026-08-10 10:57:53","data_time":"2026
 >>>>>>> Stashed changes
 =======
 window.TRIPLE_CONSENSUS = {"update_time":"2026-08-10 10:57:53","data_time":"2026-08-10 10:52:39","count":0,"near_miss_count":0,"criteria":"主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)）· 驾驶舱A档 · 基本面A档","near_miss_criteria":"以上三条满足任意两条（驾驶舱A/B档均计入）","stocks":[],"near_miss":[],"republish_time":"2026-08-10 15:41:34"};
+>>>>>>> Stashed changes
+=======
+window.TRIPLE_CONSENSUS = {"update_time":"2026-08-10 10:57:53","data_time":"2026-08-10 10:52:39","count":0,"near_miss_count":0,"criteria":"主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)）· 驾驶舱A档 · 基本面A档","near_miss_criteria":"以上三条满足任意两条（驾驶舱A/B档均计入）","stocks":[],"near_miss":[],"republish_time":"2026-08-10 15:42:21"};
 >>>>>>> Stashed changes
