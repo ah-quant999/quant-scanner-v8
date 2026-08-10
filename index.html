@@ -9119,7 +9119,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     h+='<span style="font-size:11px;color:var(--dim);">聚合 策略/资金/研报/回测/环境/基本面 → 0-100 综合分（实验·勿作为买卖依据）</span></div>';
     h+='<div style="display:flex;gap:10px;margin-bottom:10px;">';
     h+='<div style="position:relative;flex:1;">';
-    h+='<input id="stockDiagInput" placeholder="代码/拼音/名称，如 600519、zjxc、中际旭创" onkeydown="if(event.key===\'Enter\')doStockDiag()" oninput="showDiagDropdown(this.value)" onfocus="if(this.value.trim())showDiagDropdown(this.value)" onblur="var _t=this;setTimeout(function(){hideDiagDropdown()},200)" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--card);color:var(--txt);box-sizing:border-box;" />';
+    h+='<input id="stockDiagInput" placeholder="代码/拼音/名称，如 600519、zjxc、中际旭创" onkeydown="if(event.key===\'Enter\')doStockDiag()" oninput="showDiagDropdown(this.value)" onfocus="if(this.value.trim())showDiagDropdown(this.value)" onblur="var _t=this;setTimeout(function(){hideDiagDropdown()},200)" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;background:var(--card);color:var(--txt);box-sizing:border-box;" />';
     h+='<div id="stockDiagDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:200;max-height:220px;overflow-y:auto;background:var(--card);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;box-shadow:0 6px 20px rgba(0,0,0,.35);"></div>';
     h+='</div>';
     h+='<button class="btn" onclick="doStockDiag()">综合诊断</button>';
@@ -9136,7 +9136,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   }
 
   /* ===== 🧪 实验：个股全站综合诊断（2026-08-10 主人令·暂未上架实验区） ===== */
-  // 拼音下拉联想（复用 STOCK_LIST）
+  // 拼音下拉联想（复用 STOCK_LIST + FINAL_RECOMMEND_DATA 港股补充）
   window.showDiagDropdown = function(q){
     var dd=document.getElementById('stockDiagDropdown'); if(!dd)return;
     if(!q||q.length<1){dd.style.display='none';return;}
@@ -9146,13 +9146,20 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       var py=(s.py||'').toLowerCase(), sn=s.name.toLowerCase();
       if(py.indexOf(ql)===0||sn.indexOf(ql)!==-1||(s.code||'').indexOf(ql)!==-1)hits.push(s);
     }
+    if(hits.length<12){var fr=window.FINAL_RECOMMEND_DATA; if(fr&&fr.stocks){for(var j=0;j<fr.stocks.length&&hits.length<12;j++){var r=fr.stocks[j]; if(!r||!r.name)continue;
+      var rn=r.name.toLowerCase(), rc=(r.code||'').toLowerCase(), rpy=(r.py||'').toLowerCase();
+      if(rn.indexOf(ql)!==-1||rc.indexOf(ql)!==-1||rpy.indexOf(ql)===0){
+        var dup=false; for(var di=0;di<hits.length;di++){if(hits[di].code===r.code){dup=true;break;}}
+        if(!dup)hits.push({code:r.code,name:r.name,full_code:(r.market||'hk')+r.code,py:rpy||'',market:r.market||'hk',board:r.board||'港股'});
+      }
+    }}}
     if(!hits.length){dd.style.display='none';return;}
     var h=''; hits.forEach(function(s){
-      h+='<div style="padding:7px 12px;cursor:pointer;font-size:13px;color:var(--txt);border-bottom:1px solid rgba(255,255,255,.04);" onmouseover="this.style.background=\'rgba(123,31,162,.15)\'" onmouseout="this.style.background=\'\'" onclick="document.getElementById(\'stockDiagInput\').value=\''+s.name+'\';hideDiagDropdown();doStockDiag();">';
+      h+='<div style="padding:7px 12px;cursor:pointer;font-size:12px;color:var(--txt);border-bottom:1px solid rgba(255,255,255,.04);" onmouseover="this.style.background=\'rgba(123,31,162,.15)\'" onmouseout="this.style.background=\'\'" onclick="document.getElementById(\'stockDiagInput\').value=\''+s.name+'\';hideDiagDropdown();doStockDiag();">';
       h+='<span style="font-weight:600;">'+s.name+'</span> <span style="color:var(--dim);font-size:11px;font-family:monospace;margin-left:6px;">'+(s.full_code||s.code)+'</span> <span style="color:var(--cyan);font-size:11px;">'+(s.py||'')+'</span>';
       h+='</div>';
     });
-    dd.innerHTML=h; dd.style.display='block';
+    dd.innerHTML=h; dd.display='block';
   };
   window.hideDiagDropdown = function(){ var d=document.getElementById('stockDiagDropdown'); if(d)d.style.display='none'; };
 
@@ -9175,6 +9182,13 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       else { if(sc===qc)sc2=4; else if(sc.indexOf(qc)===0)sc2=3; if(sn.indexOf(ql)!==-1)sc2=Math.max(sc2,2); if(fc.indexOf(ql)!==-1)sc2=Math.max(sc2,1); if(py.indexOf(ql)!==-1)sc2=Math.max(sc2,py===ql?5:py.indexOf(ql)===0?4:3); }
       if(sc2>best && sc2>0){best=sc2;item=s;}
     }
+    // fallback：FINAL_RECOMMEND_DATA 中的港股等 STOCK_LIST 未覆盖标的
+    if(!item){var fr=window.FINAL_RECOMMEND_DATA; if(fr&&fr.stocks){for(var fi=0;fi<fr.stocks.length;fi++){var r=fr.stocks[fi]; if(!r||!r.name)continue;
+      var rn=r.name.toLowerCase(), rc=normCode(r.code||''), rpy=(r.py||'').toLowerCase(), fsc2=0;
+      if(isA){if(rn.indexOf(ql)!==-1)fsc2=3; if(rc.length>0&&ql.indexOf(rc)!==-1)fsc2=Math.max(fsc2,2);}
+      else{if(rc===qc)fsc=4; else if((r.code||'').indexOf(q)!==-1)fsc2=3; if(rn.indexOf(ql)!==-1)fsc2=Math.max(fsc2,2);}
+      if(fsc2>best){best=fsc2;item={code:r.code,name:r.name,full_code:(r.market||'hk')+r.code,py:rpy||'',market:r.market||'hk',board:r.board||'港股'};}
+    }}}
     if(!item){ res.innerHTML='<div class="note">未找到「'+q+'」，请检查代码或名称</div>'; return; }
     var code=item.code, ncode=normCode(code);
     var SQ=window.STOCK_QUOTE||{}; var sq=SQ.stocks||{};
@@ -9272,7 +9286,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var h='';
     h+='<div style="padding:16px;border-radius:10px;background:linear-gradient(135deg,rgba(123,31,162,.14),rgba(94,224,160,.05));border:1px solid rgba(167,139,250,.3);margin-bottom:12px;">';
     h+='<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">';
-    h+='<div style="text-align:center;"><div style="font-size:42px;font-weight:800;color:'+rcolor+';line-height:1;">'+total+'</div><div style="font-size:11px;color:var(--sub);">综合分 / 100</div></div>';
+    h+='<div style="text-align:center;"><div style="font-size:36px;font-weight:800;color:'+rcolor+';line-height:1;">'+total+'</div><div style="font-size:12px;color:var(--sub);">综合分 / 100</div></div>';
     h+='<div style="flex:1;min-width:200px;">';
     h+='<div style="font-size:18px;font-weight:700;color:var(--txt);">'+item.name+' <span style="font-size:12px;color:var(--dim);font-family:monospace;">'+full+'</span></div>';
     if(qo){
@@ -9291,7 +9305,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     dims.forEach(function(d){
       var pct=d.max>0?Math.round(d.score/d.max*100):0;
       var col=pct>=70?'var(--up)':pct>=45?'var(--gold)':pct>=25?'#94a3b8':'var(--down)';
-      h+='<div><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-bottom:3px;"><span>'+d.label+'</span><span>'+d.score+'/'+d.max+'</span></div>';
+      h+='<div><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-bottom:3px;"><span>'+d.label+'</span><span>'+d.score+'/'+d.max+'</span></div>';
       h+='<div style="height:7px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;"><div style="width:'+pct+'%;height:100%;background:'+col+';border-radius:4px;"></div></div></div>';
     });
     h+='</div>';
@@ -9302,7 +9316,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if(!d.evi.length)return;
       h+='<div style="padding:8px 10px;background:rgba(255,255,255,.04);border-radius:6px;border-left:3px solid var(--border);">';
       h+='<div style="font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:4px;">'+d.label+' · '+d.score+'/'+d.max+'</div>';
-      h+='<div style="font-size:11px;color:var(--sub);line-height:1.6;">'+d.evi.map(function(e){return '· '+e;}).join('<br>')+'</div>';
+      h+='<div style="font-size:12px;color:var(--sub);line-height:1.6;">'+d.evi.map(function(e){return '· '+e;}).join('<br>')+'</div>';
       h+='</div>';
     });
 
@@ -9310,7 +9324,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     h+='<div style="margin-top:10px;padding:10px;background:rgba(94,224,160,.04);border-radius:6px;border-left:3px solid var(--up);">';
     h+='<div style="font-size:12px;font-weight:700;color:var(--up);margin-bottom:5px;">📋 基础信息</div>';
     if(qo){
-      h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:4px 16px;font-size:11px;color:var(--sub);">';
+      h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:4px 16px;font-size:12px;color:var(--sub);">';
       if(qo.price!=null)h+='<div>现价：<b style="color:var(--txt)">'+fmtNum(qo.price)+'</b></div>';
       if(qo.pct!=null){var pc=Number(qo.pct);h+='<div>涨跌幅：<b style="color:'+(pc>=0?'var(--up)':'var(--down))')+'">'+(pc>=0?'+':'')+pc.toFixed(2)+'%</b></div>';}
       if(qo.volume)h+='<div>成交额：'+fmtYi(qo.volume)+'</div>';
