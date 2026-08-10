@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-10 21:04",
+  "update_time": "2026-08-10 21:55",
   "data_type": "real",
   "summary": {
     "in_count": 40,
@@ -66,8 +66,8 @@
     {
       "name": "白酒",
       "net": 19.21,
-      "net_5d": -11.98,
-      "net_20d": 378.36,
+      "net_5d": 7.51,
+      "net_20d": 517.12,
       "type": "行业",
       "consecutive_days": 1,
       "trend": "in"
@@ -429,8 +429,8 @@
     {
       "name": "白酒",
       "net": 19.21,
-      "net_5d": -11.98,
-      "net_20d": 378.36,
+      "net_5d": 7.51,
+      "net_20d": 517.12,
       "type": "行业",
       "consecutive_days": 1,
       "trend": "in"
@@ -929,8 +929,8 @@
     {
       "name": "白酒",
       "net": 19.21,
-      "net_5d": -11.98,
-      "net_20d": 378.36,
+      "net_5d": 7.51,
+      "net_20d": 517.12,
       "type": "行业",
       "consecutive_days": 1,
       "trend": "in",
@@ -960,21 +960,21 @@
       "net_60d": null
     },
     {
-      "name": "白酒概念",
-      "net": 20.4,
-      "net_5d": 8.66,
-      "net_20d": 402.48,
-      "type": "概念",
+      "name": "白酒",
+      "net": 19.21,
+      "net_5d": 7.51,
+      "net_20d": 517.12,
+      "type": "行业",
       "consecutive_days": 1,
       "trend": "in",
       "net_60d": null
     },
     {
-      "name": "白酒",
-      "net": 19.21,
-      "net_5d": -11.98,
-      "net_20d": 378.36,
-      "type": "行业",
+      "name": "白酒概念",
+      "net": 20.4,
+      "net_5d": 8.66,
+      "net_20d": 402.48,
+      "type": "概念",
       "consecutive_days": 1,
       "trend": "in",
       "net_60d": null

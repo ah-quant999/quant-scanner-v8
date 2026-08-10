@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-10 21:48:40",
+  "update_time": "2026-08-10 22:06:24",
   "crisis_score": 33.3,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -322,12 +322,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "通用设备制造业",
       "concepts": [
-        "先进封装",
-        "创业板综",
         "存储芯片",
-        "次新股",
-        "东方财富热股",
-        "百元股"
+        "创业板综",
+        "先进封装",
+        "融资融券",
+        "百元股",
+        "半导体概念"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -355,12 +355,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "央国企改革",
-        "虚拟机器人",
-        "AI眼镜",
-        "机器人概念",
         "5G概念",
-        "华为概念"
+        "电池技术",
+        "华为概念",
+        "MLCC",
+        "AI眼镜",
+        "央国企改革"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -388,12 +388,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "电力、热力生产和供应业",
       "concepts": [
+        "西部大开发",
+        "新能源",
+        "绿色电力",
         "央国企改革",
         "光伏概念",
-        "绿色电力",
-        "题材股",
-        "储能概念",
-        "新能源"
+        "储能概念"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -421,12 +421,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "专精特新",
-        "合成生物",
-        "重组蛋白",
         "体外诊断概念",
-        "精准诊断",
-        "融资融券"
+        "破发股",
+        "融资融券",
+        "重组蛋白",
+        "专精特新",
+        "精准诊断"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -454,12 +454,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "央国企改革",
-        "光伏概念",
-        "数据中心",
-        "液冷概念",
+        "电池技术",
         "创投",
-        "固态电池"
+        "新能源",
+        "液冷概念",
+        "央国企改革",
+        "融资融券"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -487,12 +487,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "柔性屏(折叠屏)",
-        "3D玻璃",
         "创业板综",
-        "深圳特区",
+        "破发股",
         "融资融券",
-        "破发股"
+        "3D玻璃",
+        "柔性屏(折叠屏)",
+        "深圳特区"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
