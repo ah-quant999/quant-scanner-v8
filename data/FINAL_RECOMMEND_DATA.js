@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-10 22:08:24",
+  "update_time": "2026-08-10 22:12:49",
   "crisis_score": 33.3,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -12,7 +12,7 @@ window.FINAL_RECOMMEND_DATA = {
     "半导体",
     "小金属",
     "电子化学品",
-    "自动化设备",
+    "能源金属",
     "贵金属",
     "通信设备",
     "非金属材料"
@@ -20,44 +20,62 @@ window.FINAL_RECOMMEND_DATA = {
   "stocks": [
     {
       "rank": 1,
-      "code": "09988",
-      "name": "阿里巴巴-W",
-      "market": "hk",
-      "board": "港股",
-      "horizon": "短线/中线共振",
-      "close": 126.7,
-      "pct_chg": 2.34,
-      "stop_loss": 114.03,
-      "target_price": 145.71,
-      "risk_reward": 1.5,
+      "code": "301583",
+      "name": "托伦斯",
+      "market": "sz",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": null,
+      "pct_chg": 9.7312,
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
       "support": null,
       "resistance": null,
       "atr": null,
       "sources": [
-        "四量终极",
-        "驾驶舱A档"
+        "大牛股猎手"
       ],
       "source_scores": {
-        "驾驶舱A档": 2.8,
-        "四量终极": 1.2
+        "大牛股猎手": 2.19
       },
-      "resonance": 2,
-      "strength": 4.0,
-      "sector_score": 0.0,
-      "sector_hits": [],
-      "sector_fund": [],
-      "final_score": 7.0,
-      "buy_score": 7.0,
-      "enter_date": "2026-08-10",
+      "resonance": 1,
+      "strength": 2.19,
+      "sector_score": 1.0,
+      "sector_hits": [
+        {
+          "name": "半导体",
+          "pct_5d": 18.6,
+          "relative_5d": 18.6,
+          "strong": true
+        }
+      ],
+      "sector_fund": [
+        {
+          "name": "半导体",
+          "pct_5d": 18.6,
+          "relative_5d": 18.6,
+          "strong": true
+        }
+      ],
+      "final_score": 4.69,
+      "buy_score": 4.69,
+      "enter_date": "20260810",
       "signals": [
-        "上涨趋势",
-        "双真+不超买+EMA完好",
-        "机构变红"
+        "日换手率达到30%的前5只证券",
+        "机构独买"
       ],
       "_60m_resonance": false,
-      "reason": "驾驶舱A档 技术60 质量0；四量终极 信号2项",
-      "industry": "",
-      "concepts": [],
+      "reason": "大牛股猎手 机构1.4亿+游资0.0亿",
+      "industry": "通用设备制造业",
+      "concepts": [
+        "创业板综",
+        "存储芯片",
+        "先进封装",
+        "东方财富热股",
+        "半导体概念",
+        "次新股"
+      ],
       "backtest": {
         "signals": 171,
         "win_rate": 51.5,
@@ -66,55 +84,59 @@ window.FINAL_RECOMMEND_DATA = {
         "note": "个股暂无历史信号，展示策略级统计（最佳持有 3 天）"
       },
       "tracking": {
-        "entry_date": "2026-08-10",
-        "entry_price": 126.7,
-        "latest_price": 126.7,
-        "return_pct": 0.0,
+        "entry_date": "20260810",
+        "entry_price": null,
+        "latest_price": null,
+        "return_pct": null,
         "hold_days": 1,
         "exit_type": "hold",
-        "note": "今日新入选，自动开始跟踪"
+        "note": "等待行情数据开始跟踪"
       }
     },
     {
       "rank": 2,
-      "code": "09618",
-      "name": "京东物流",
-      "market": "hk",
-      "board": "港股",
-      "horizon": "短线/中线共振",
-      "close": 130.4,
-      "pct_chg": 2.27,
-      "stop_loss": 117.36,
-      "target_price": 149.96,
-      "risk_reward": 1.5,
+      "code": "000636",
+      "name": "风华高科",
+      "market": "sz",
+      "board": "主板",
+      "horizon": "短线",
+      "close": null,
+      "pct_chg": 5.8501,
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
       "support": null,
       "resistance": null,
       "atr": null,
       "sources": [
-        "四量终极",
-        "驾驶舱A档"
+        "大牛股猎手"
       ],
       "source_scores": {
-        "驾驶舱A档": 2.8,
-        "四量终极": 1.2
+        "大牛股猎手": 2.25
       },
-      "resonance": 2,
-      "strength": 4.0,
+      "resonance": 1,
+      "strength": 2.25,
       "sector_score": 0.0,
       "sector_hits": [],
       "sector_fund": [],
-      "final_score": 7.0,
-      "buy_score": 7.0,
-      "enter_date": "2026-08-10",
+      "final_score": 3.75,
+      "buy_score": 3.75,
+      "enter_date": "20260810",
       "signals": [
-        "上涨趋势",
-        "双真+不超买+EMA完好",
-        "机构变红"
+        "日振幅值达到15%的前5只证券",
+        "游资独买"
       ],
       "_60m_resonance": false,
-      "reason": "驾驶舱A档 技术60 质量0；四量终极 信号2项",
-      "industry": "",
-      "concepts": [],
+      "reason": "大牛股猎手 机构0.1亿+游资1.9亿",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "concepts": [
+        "华为概念",
+        "MLCC",
+        "机器人概念",
+        "AI眼镜",
+        "央国企改革",
+        "融资融券"
+      ],
       "backtest": {
         "signals": 171,
         "win_rate": 51.5,
@@ -123,55 +145,59 @@ window.FINAL_RECOMMEND_DATA = {
         "note": "个股暂无历史信号，展示策略级统计（最佳持有 3 天）"
       },
       "tracking": {
-        "entry_date": "2026-08-10",
-        "entry_price": 130.4,
-        "latest_price": 130.4,
-        "return_pct": 0.0,
+        "entry_date": "20260810",
+        "entry_price": null,
+        "latest_price": null,
+        "return_pct": null,
         "hold_days": 1,
         "exit_type": "hold",
-        "note": "今日新入选，自动开始跟踪"
+        "note": "等待行情数据开始跟踪"
       }
     },
     {
       "rank": 3,
-      "code": "06618",
-      "name": "京东健康",
-      "market": "hk",
-      "board": "港股",
-      "horizon": "短线/中线共振",
-      "close": 40.08,
-      "pct_chg": 2.93,
-      "stop_loss": 36.07,
-      "target_price": 46.09,
-      "risk_reward": 1.5,
+      "code": "001258",
+      "name": "立新能源",
+      "market": "sz",
+      "board": "主板",
+      "horizon": "短线",
+      "close": null,
+      "pct_chg": 10.0304,
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
       "support": null,
       "resistance": null,
       "atr": null,
       "sources": [
-        "四量终极",
-        "驾驶舱A档"
+        "大牛股猎手"
       ],
       "source_scores": {
-        "驾驶舱A档": 2.71,
-        "四量终极": 1.2
+        "大牛股猎手": 2.18
       },
-      "resonance": 2,
-      "strength": 3.91,
+      "resonance": 1,
+      "strength": 2.18,
       "sector_score": 0.0,
       "sector_hits": [],
       "sector_fund": [],
-      "final_score": 6.91,
-      "buy_score": 6.91,
-      "enter_date": "2026-08-10",
+      "final_score": 3.68,
+      "buy_score": 3.68,
+      "enter_date": "20260810",
       "signals": [
-        "上涨趋势",
-        "双真+不超买+EMA完好",
-        "机构变红"
+        "日涨幅偏离值达到7%的前5只证券",
+        "游资独买"
       ],
       "_60m_resonance": false,
-      "reason": "驾驶舱A档 技术57 质量0；四量终极 信号2项",
-      "industry": "",
-      "concepts": [],
+      "reason": "大牛股猎手 机构0.4亿+游资1.0亿",
+      "industry": "电力、热力生产和供应业",
+      "concepts": [
+        "西部大开发",
+        "题材股",
+        "反转股",
+        "绿色电力",
+        "新能源",
+        "光伏概念"
+      ],
       "backtest": {
         "signals": 171,
         "win_rate": 51.5,
@@ -180,13 +206,13 @@ window.FINAL_RECOMMEND_DATA = {
         "note": "个股暂无历史信号，展示策略级统计（最佳持有 3 天）"
       },
       "tracking": {
-        "entry_date": "2026-08-10",
-        "entry_price": 40.08,
-        "latest_price": 40.08,
-        "return_pct": 0.0,
+        "entry_date": "20260810",
+        "entry_price": null,
+        "latest_price": null,
+        "return_pct": null,
         "hold_days": 1,
         "exit_type": "hold",
-        "note": "今日新入选，自动开始跟踪"
+        "note": "等待行情数据开始跟踪"
       }
     }
   ],
@@ -199,7 +225,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "短线/中线共振",
       "close": 126.7,
       "pct_chg": 2.34,
-      "final_score": 7.0,
+      "final_score": 5.5,
       "resonance": 2,
       "sources": [
         "四量终极",
@@ -227,7 +253,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "短线/中线共振",
       "close": 130.4,
       "pct_chg": 2.27,
-      "final_score": 7.0,
+      "final_score": 5.5,
       "resonance": 2,
       "sources": [
         "四量终极",
@@ -255,7 +281,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "短线/中线共振",
       "close": 40.08,
       "pct_chg": 2.93,
-      "final_score": 6.91,
+      "final_score": 5.41,
       "resonance": 2,
       "sources": [
         "四量终极",
@@ -283,7 +309,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "短线/中线共振",
       "close": 40.16,
       "pct_chg": 0.5,
-      "final_score": 5.2,
+      "final_score": 3.7,
       "resonance": 2,
       "sources": [
         "四量终极",
@@ -322,12 +348,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "通用设备制造业",
       "concepts": [
+        "创业板综",
+        "存储芯片",
+        "先进封装",
         "东方财富热股",
         "半导体概念",
-        "次新股",
-        "融资融券",
-        "先进封装",
-        "存储芯片"
+        "次新股"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -355,12 +381,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "央国企改革",
+        "华为概念",
         "MLCC",
-        "虚拟机器人",
-        "融资融券",
+        "机器人概念",
         "AI眼镜",
-        "华为概念"
+        "央国企改革",
+        "融资融券"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -388,12 +414,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "电力、热力生产和供应业",
       "concepts": [
-        "绿色电力",
-        "央国企改革",
         "西部大开发",
+        "题材股",
         "反转股",
+        "绿色电力",
         "新能源",
-        "东方财富热股"
+        "光伏概念"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -421,12 +447,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
+        "重组蛋白",
         "破发股",
         "精准诊断",
-        "融资融券",
-        "体外诊断概念",
         "合成生物",
-        "专精特新"
+        "专精特新",
+        "融资融券"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -454,12 +480,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "央国企改革",
-        "新能源",
-        "储能概念",
         "创投",
-        "液冷概念",
-        "电池技术"
+        "数据中心",
+        "固态电池",
+        "新能源",
+        "央国企改革",
+        "光伏概念"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -487,12 +513,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "破发股",
         "3D玻璃",
+        "柔性屏(折叠屏)",
         "深圳特区",
-        "融资融券",
         "创业板综",
-        "柔性屏(折叠屏)"
+        "破发股",
+        "融资融券"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -535,7 +561,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "短线",
       "close": 37.96,
       "pct_chg": 2.98,
-      "final_score": 2.7,
+      "final_score": 1.2,
       "resonance": 1,
       "sources": [
         "四量终极"
@@ -561,7 +587,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "短线",
       "close": 14.89,
       "pct_chg": 2.48,
-      "final_score": 2.7,
+      "final_score": 1.2,
       "resonance": 1,
       "sources": [
         "四量终极"
@@ -587,7 +613,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "短线",
       "close": 92.3,
       "pct_chg": 2.38,
-      "final_score": 2.7,
+      "final_score": 1.2,
       "resonance": 1,
       "sources": [
         "四量终极"
@@ -613,7 +639,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "短线",
       "close": 198.0,
       "pct_chg": 2.96,
-      "final_score": 2.7,
+      "final_score": 1.2,
       "resonance": 1,
       "sources": [
         "四量终极"
@@ -639,7 +665,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "短线",
       "close": 93.9,
       "pct_chg": 1.84,
-      "final_score": 2.7,
+      "final_score": 1.2,
       "resonance": 1,
       "sources": [
         "四量终极"
@@ -665,7 +691,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "短线",
       "close": 213.2,
       "pct_chg": 1.52,
-      "final_score": 2.7,
+      "final_score": 1.2,
       "resonance": 1,
       "sources": [
         "四量终极"
@@ -691,7 +717,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "短线",
       "close": 416.8,
       "pct_chg": 1.26,
-      "final_score": 2.7,
+      "final_score": 1.2,
       "resonance": 1,
       "sources": [
         "四量终极"
@@ -717,7 +743,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "短线",
       "close": 46.12,
       "pct_chg": 0.57,
-      "final_score": 2.7,
+      "final_score": 1.2,
       "resonance": 1,
       "sources": [
         "四量终极"
@@ -743,7 +769,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "中长线",
       "close": null,
       "pct_chg": 0.0,
-      "final_score": 2.5,
+      "final_score": 1.0,
       "resonance": 1,
       "sources": [
         "驾驶舱B档"
@@ -768,7 +794,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "中长线",
       "close": null,
       "pct_chg": 0.0,
-      "final_score": 2.5,
+      "final_score": 1.0,
       "resonance": 1,
       "sources": [
         "驾驶舱B档"
@@ -793,7 +819,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "中长线",
       "close": null,
       "pct_chg": 0.0,
-      "final_score": 2.5,
+      "final_score": 1.0,
       "resonance": 1,
       "sources": [
         "驾驶舱B档"
@@ -818,7 +844,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "中长线",
       "close": null,
       "pct_chg": 0.0,
-      "final_score": 2.5,
+      "final_score": 1.0,
       "resonance": 1,
       "sources": [
         "驾驶舱B档"
@@ -843,7 +869,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "中长线",
       "close": null,
       "pct_chg": 0.0,
-      "final_score": 2.5,
+      "final_score": 1.0,
       "resonance": 1,
       "sources": [
         "驾驶舱B档"
@@ -868,7 +894,7 @@ window.FINAL_RECOMMEND_DATA = {
       "horizon": "中长线",
       "close": null,
       "pct_chg": 0.0,
-      "final_score": 2.5,
+      "final_score": 1.0,
       "resonance": 1,
       "sources": [
         "驾驶舱B档"

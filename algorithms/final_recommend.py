@@ -33,6 +33,8 @@ DATA = os.path.join(ROOT, "data")
 CRISIS_HIGH_THRESHOLD = 50  # 危机雷达≥50才并入逆势龙头
 SECTOR_TOP_N = 15
 TOP_N = 3
+HK_PENALTY = 1.5        # 港股分值惩罚（用户主做 A 股，港股不应霸榜 TOP_N）
+MIN_A_SHARES_IN_TOP = max(1, TOP_N - 1)  # TOP_N 中至少保留 N-1 只 A 股
 
 # 常见港股/美股代码兜底名称表（当上游 name 缺失或等于 code 时使用）
 # 格式：统一用纯数字 code（无 hk/sh 前缀）作为 key
@@ -613,6 +615,9 @@ def main():
         resonance = len(set(r["sources"]))
         strength = sum(r["source_scores"].values())
         final_score = strength + resonance * 1.5 + sec_score
+        # 港股惩罚：用户主做 A 股，港股不应因多源共振天然霸榜
+        if r.get("board") == "港股" or market_prefix(r.get("code", "")) == "hk":
+            final_score -= HK_PENALTY
         scored.append({
             **r,
             "key": key,
@@ -626,7 +631,22 @@ def main():
     # 排序：先按共振次数，再按综合分，再按源强度（多源共振优先）
     scored.sort(key=lambda x: (x["resonance"], x["final_score"], x["strength"]), reverse=True)
 
-    top = scored[:TOP_N]
+    # ── A 股保底：TOP_N 中至少保留 MIN_A_SHARES_IN_TOP 只 A 股（用户主做 A 股）──
+    a_shares = [s for s in scored if s.get("board") != "港股" and market_prefix(s.get("code", "")) != "hk"]
+    hk_stocks = [s for s in scored if s.get("board") == "港股" or market_prefix(s.get("code", "")) == "hk"]
+    top = []
+    for s in a_shares:
+        if len(top) >= TOP_N:
+            break
+        top.append(s)
+    for s in hk_stocks:
+        if len(top) >= TOP_N:
+            break
+        if len(top) < MIN_A_SHARES_IN_TOP or (top and s["final_score"] > top[-1]["final_score"]):
+            top.append(s)
+            top.sort(key=lambda x: (x["resonance"], x["final_score"], x["strength"]), reverse=True)
+            top = top[:TOP_N]
+    # ── end A 股保底 ──
 
     def horizon_for(sources):
         short = {"四量终极", "大牛股猎手", "板块龙头"}
