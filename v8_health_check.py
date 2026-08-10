@@ -119,6 +119,15 @@ def is_market_closed(dt_cst=None):
     return not _is_trading_day(n.date())
 
 
+def is_intraday_session(dt_cst=None):
+    """判断给定北京时间是否处于 A 股盘中交易时段（09:30-11:30 或 13:00-15:00）的交易日。"""
+    n = dt_cst or now_cst()
+    if is_market_closed(n):
+        return False
+    h = n.hour + n.minute / 60.0
+    return (9.5 <= h <= 11.5) or (13.0 <= h <= 15.0)
+
+
 def last_trade_day_close(now_cst_dt):
     """返回最近交易日收盘时间（15:30），非交易日回退。"""
     d = now_cst_dt.date()
@@ -249,7 +258,7 @@ def _urlopen_retry(req_or_url, timeout=15, max_retries=None):
 # ─────────────────────────────────────────────────────────────────────────────
 # 自愈（detect-and-heal）：发现可修复的数据陈腐，主动派发对应类别刷新，而非只发邮件
 # ─────────────────────────────────────────────────────────────────────────────
-CN_WORKFLOW_ID = 324135267  # v8_cn_fetch workflow id（用于 API 派发刷新）
+CN_WORKFLOW_ID = 327687211  # v8_cn_fetch_cloud workflow id（云端 ubuntu 主力，用于 API 派发刷新）
 HEAL_DEBOUNCE_MIN = 25       # 同一类别最小派发间隔，避免每小时巡检重复触发
 ALERT_OVERDUE_MIN = 120      # 与 send_report_email 一致的「值得处理」阈值（分钟）
 
@@ -321,8 +330,10 @@ def self_heal(report):
 
     stale = [it for it in report["items"]
              if it.get("status") == "fail"
-             and it.get("age_min") is not None
-             and it["age_min"] >= ALERT_OVERDUE_MIN]
+             and (
+                 (it.get("age_min") is not None and it["age_min"] >= ALERT_OVERDUE_MIN)
+                 or it.get("premarket_cleared") is True
+             )]
     if not stale:
         return healed, failed
 
@@ -455,6 +466,18 @@ def check_data_cards():
         ts = data.get("update_time") or data.get("date") or data.get("lastUpdated") or "--"
         dt = parse_time(ts)
         max_age = adjust_max_age(d["max_age"], page=d.get("page"))
+
+        # 盘中 premarket_cleared 异常自愈检测：实时数据在交易时段被标记为盘前清空，属于误清空
+        prem_cleared = data.get("premarket_cleared") is True
+        if prem_cleared and page == "实时数据" and is_intraday_session():
+            results.append({
+                "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
+                "status": "fail", "last_update": str(ts), "age_min": 0,
+                "premarket_cleared": True,
+                "message": f"盘中交易时段被异常标记为 premarket_cleared（update_time={fmt_rel_time(ts)}）"
+            })
+            continue
+
         if dt is None:
             results.append({
                 "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
@@ -831,6 +854,14 @@ def write_health_js(report):
     print(f"[INFO] 已生成 {out_path}")
 
 
+def write_health_json(report):
+    """输出结构化 JSON 报告，供 v8_cloud_watchdog.py 做逐源 auto-dispatch 决策。"""
+    out_path = Path(".workbuddy") / "v8_health_report.json"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(report, ensure_ascii=False), encoding="utf-8")
+    print(f"[INFO] 已生成 {out_path}")
+
+
 def send_report_email(report, healed=None, failed=None):
     """发送健康检查邮件。
 
@@ -922,7 +953,6 @@ def main():
 
     report = build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh, history_depth)
     write_health_js(report)
-
     # 打印摘要
     print(f"[INFO] 总体: {report['overall']} | 统计: {report['summary']}")
     for item in report["items"]:
@@ -937,6 +967,9 @@ def main():
             print(f"  [HEAL✓] {h}")
         for f in failed:
             print(f"  [HEAL✗] {f}")
+
+    # 自愈后重写 JSON 报告，让 v8_cloud_watchdog.py 看到 heal 标记避免重复派发
+    write_health_json(report)
 
     if args.alert:
         send_report_email(report, healed=healed, failed=failed)

@@ -301,6 +301,108 @@ def choose_category(now_cst):
     return "all"
 
 
+# 健康检查报告卡片分组 -> 刷新类别映射（与 v8_health_check.py 保持一致）
+_PAGE_TO_CAT = {
+    "实时数据": "intraday",
+    "今日事件": "premarket",
+    "盘后数据": "post_close",
+    "选股策略": "post_close",
+}
+
+
+def _load_health_report():
+    """读取 v8_health_check.py 生成的结构化报告。"""
+    p = Path(".workbuddy/v8_health_report.json")
+    if not p.exists():
+        return None
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"[WARN] 读取 health report 失败: {e}")
+        return None
+
+
+def _is_dispatch_active(now_cst):
+    """判断是否处于允许自动派发的活跃时段（工作日 09-21，周末 ≤18）。"""
+    weekday = now_cst.weekday()
+    is_weekend = weekday >= 5
+    return (9 <= now_cst.hour <= 21) and (not is_weekend or now_cst.hour <= 18)
+
+
+def auto_dispatch_smart(now_cst, health_rc, health_out):
+    """基于健康检查逐源报告做智能派发，解决只看 raw_data commit 时间的粒度缺陷。
+
+    策略：
+      1. 优先读取 .workbuddy/v8_health_report.json 中未自愈的 fail 数据卡片；
+         按 page 归类为 category，每类只派发一次（去重 25 分钟）。
+      2. 若报告不可读或无 action 项，回退到旧逻辑：检查 raw_data/cn_fetch commit 时间。
+    """
+    if not _is_dispatch_active(now_cst):
+        return True, "当前非活跃时段，跳过自动派发（防打扰）"
+
+    report = _load_health_report()
+    dispatched_cats = []
+    failed_msgs = []
+
+    if report:
+        # 逐源 actionable 项：数据卡片 fail，且未被 self_heal 标记为「已自动派发刷新/已自愈】
+        actionable = {}
+        for it in report.get("items", []):
+            if it.get("status") != "fail":
+                continue
+            page = it.get("page")
+            cat = _PAGE_TO_CAT.get(page)
+            if not cat:
+                continue
+            heal = it.get("heal", "")
+            if heal.startswith("已自动派发刷新") or heal.startswith("已自愈"):
+                continue  # self_heal 已成功处理，不重复派发
+            actionable.setdefault(cat, []).append(it)
+
+        if actionable:
+            for cat, items in actionable.items():
+                names = [it.get("name", it.get("id", "?")) for it in items]
+                ok, msg = auto_dispatch(cat)
+                if ok:
+                    dispatched_cats.append(f"{cat}[{','.join(names)}]")
+                else:
+                    failed_msgs.append(f"{cat}: {msg}")
+            if dispatched_cats:
+                return True, f"基于 health report 逐源派发: {'; '.join(dispatched_cats)}" + (
+                    f" | 失败: {'; '.join(failed_msgs)}" if failed_msgs else "")
+            if failed_msgs:
+                return False, f"health report 派发全部失败: {'; '.join(failed_msgs)}"
+
+    # 回退：旧逻辑（raw_data / cn_fetch commit 时间）
+    commits = api_get(f"https://api.github.com/repos/{REPO}/commits?path=raw_data&per_page=1")
+    stale_min = None
+    if "__error__" not in commits and commits:
+        dt = utc_to_cst(commits[0]["commit"]["author"]["date"])
+        stale_min = (now_cst - dt).total_seconds() / 60
+
+    cn_stale_min = None
+    cn_commits = api_get(f"https://api.github.com/repos/{REPO}/commits?path=raw_data&per_page=30")
+    if "__error__" not in cn_commits and cn_commits:
+        for c in cn_commits:
+            if "cn fetch" in c["commit"]["message"].lower():
+                cn_dt = utc_to_cst(c["commit"]["author"]["date"])
+                cn_stale_min = (now_cst - cn_dt).total_seconds() / 60
+                break
+    _cands = [v for v in (stale_min, cn_stale_min) if v is not None]
+    effective_stale = max(_cands) if _cands else None
+
+    def _age_detail():
+        a = f"{stale_min/60:.1f}h" if stale_min is not None else "N/A"
+        b = f"{cn_stale_min/60:.1f}h" if cn_stale_min is not None else "N/A"
+        return f"raw_data={a}, cn_fetch={b}"
+
+    if effective_stale is not None and effective_stale > 150:
+        cat = choose_category(now_cst)
+        d_ok, d_msg = auto_dispatch(cat)
+        return d_ok, f"{d_msg} (commit 兜底 [{_age_detail()}])"
+    return True, f"数据新鲜/无 actionable 项（{_age_detail()}），无需派发"
+
+
 def auto_dispatch(cat):
     url = f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_WORKFLOW_ID}/dispatches"
     data = json.dumps({"ref": "main", "inputs": {"category": cat}}).encode("utf-8")
@@ -423,50 +525,24 @@ def main():
     ok, msg = check_site()
     results.append(("site", ok, msg))
 
-    # === 自动派发修复（紧急交接核心） ===
+    # === 健康检查（二期）：先跑，生成结构化报告供 auto_dispatch 做逐源决策 ===
+    health_rc, health_out = None, None
+    if args.health_check:
+        health_rc, health_out = run_health_check(alert=args.alert)
+        if health_rc != 0:
+            print(f"[ALERT] v8_health_check.py 返回非零: {health_rc}")
+
+    # === 自动派发修复（紧急交接核心）：基于健康检查逐源报告 + raw_data commit 兜底 ===
     if args.auto_dispatch:
-        commits = api_get(f"https://api.github.com/repos/{REPO}/commits?path=raw_data&per_page=1")
-        stale_min = None
-        if "__error__" not in commits and commits:
-            dt = utc_to_cst(commits[0]["commit"]["author"]["date"])
-            stale_min = (now_cst - dt).total_seconds() / 60
-
-        # 🔴 2026-08-06 修复判定盲点（勿回退）：
-        #   raw_data 目录的提交可能由 build / risk_gauge 等链路产生，会把「中国数据实际已停摆」
-        #   伪装成新鲜。08-06 事故实例：raw_data 最近提交 08:15 是 "v8 build: ... premarket"，
-        #   而真正的 "v8 cn fetch" 停在 00:05（停摆 9.5h），看门狗却判定 1.2h 新鲜 → 跳过派发，
-        #   兜底机制完全失效。故这里单独追踪 cn fetch 提交的新鲜度，取两者中更陈旧者作为派发依据。
-        cn_stale_min = None
-        cn_commits = api_get(f"https://api.github.com/repos/{REPO}/commits?path=raw_data&per_page=30")
-        if "__error__" not in cn_commits and cn_commits:
-            for c in cn_commits:
-                if "cn fetch" in c["commit"]["message"].lower():
-                    cn_dt = utc_to_cst(c["commit"]["author"]["date"])
-                    cn_stale_min = (now_cst - cn_dt).total_seconds() / 60
-                    break
-        _cands = [v for v in (stale_min, cn_stale_min) if v is not None]
-        effective_stale = max(_cands) if _cands else None
-
-        weekday = now_cst.weekday()
-        is_weekend = weekday >= 5
-        active = (9 <= now_cst.hour <= 21) and (not is_weekend or now_cst.hour <= 18)
-
-        def _age_detail():
-            a = f"{stale_min/60:.1f}h" if stale_min is not None else "N/A"
-            b = f"{cn_stale_min/60:.1f}h" if cn_stale_min is not None else "N/A"
-            return f"raw_data={a}, cn_fetch={b}"
-
-        if effective_stale is not None and effective_stale > 150 and active:
-            cat = choose_category(now_cst)
-            d_ok, d_msg = auto_dispatch(cat)
-            results.append(("auto_dispatch", d_ok, f"{d_msg} [{_age_detail()}]"))
-        elif effective_stale is not None and effective_stale > 150 and not active:
-            results.append(("auto_dispatch", True,
-                            f"数据陈旧但处于非活跃时段，跳过派发（防打扰）[{_age_detail()}]"))
-        else:
-            results.append(("auto_dispatch", True, f"数据新鲜（{_age_detail()}），无需派发"))
+        dispatched, dispatch_msg = auto_dispatch_smart(now_cst, health_rc, health_out)
+        results.append(("auto_dispatch", dispatched, dispatch_msg))
+    else:
+        results.append(("auto_dispatch", True, "自动派发已关闭（--no-auto-dispatch）"))
 
     overall = all(ok for _, ok, _ in results)
+    # health check 失败也算 overall 失败
+    if health_rc is not None and health_rc != 0:
+        overall = False
     flag = "OK" if overall else "ALERT"
 
     lines = [f"{now} | {flag} | watchdog check"]
@@ -480,15 +556,6 @@ def main():
         f.write(log_text)
 
     print(log_text, end="")
-
-    # === 健康检查（二期） ===
-    health_rc, health_out = None, None
-    if args.health_check:
-        health_rc, health_out = run_health_check(alert=args.alert)
-        # health check 失败也算 overall 失败
-        if health_rc != 0:
-            overall = False
-            print(f"[ALERT] v8_health_check.py 返回非零: {health_rc}")
 
     # === 邮件告警（三期） ===
     if args.alert and not overall:

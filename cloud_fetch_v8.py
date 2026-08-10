@@ -2496,7 +2496,10 @@ def f_v8_cal(today=None):
 def _clear_intraday_for_premarket(category, only=None):
     """盘前任务完成后，清空盘中/实时模块的当日数据，避免把昨日收盘数据挂到开盘前。
     明确保留用户指定卡片：上证+深证成交金额/涨跌家数(SH_SZ_HISTORY)、
-    主力净流入(CAPITAL_FLOW_DATA)、涨停热力(LIMIT_UP_HEATMAP)。"""
+    主力净流入(CAPITAL_FLOW_DATA)、涨停热力(LIMIT_UP_HEATMAP)。
+    
+    2026-08-10 盘中自愈加固：若当前已处于盘中/收盘后时段（非 00:00-09:30），
+    说明调用链有 bug 导致盘前清空逻辑在盘中被触发，直接拒绝执行，防止误清空。"""
     if category != "premarket" or only is not None:
         return
     # 周末/法定假日：不执行清空，保留最后一个交易日（周五）的收盘/盘中数据
@@ -2504,6 +2507,11 @@ def _clear_intraday_for_premarket(category, only=None):
         print(f"⏸️ 非A股交易日（周末/假期），跳过盘中模块清空，保留最后交易日数据")
         return
     now = now_cst()
+    h = now.hour + now.minute / 60.0
+    if h >= 9.5:  # 09:30 及以后属于盘中或收盘后，禁止执行盘前清空
+        print(f"🚨 盘中自愈守卫：当前 {now.strftime('%H:%M')} 已非盘前时段，"
+              f"拒绝执行 intraday 模块清空（防止 10:49 类误清空再次发生）")
+        return
     today_iso = now.strftime("%Y-%m-%d")
     today_m_d = f"{now.month}/{now.day}"
     today_mm_dd = now.strftime("%m/%d")
