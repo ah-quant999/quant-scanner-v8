@@ -1,11 +1,11 @@
 {
-  "update_time": "2026-08-10 19:13",
+  "update_time": "2026-08-10 19:39",
   "alerts": [
     {
       "type": "summary",
       "severity": "low",
       "message": "ETF监测中，9涨3跌",
-      "time": "19:13"
+      "time": "19:39"
     }
   ],
   "etfFlow": {
