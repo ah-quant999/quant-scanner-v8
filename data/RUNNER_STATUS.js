@@ -10,6 +10,7 @@
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 window.RUNNER_STATUS = {"run_time":"2026-08-10 18:08:21","category":"all","hostname":"","modules":{"CANDIDATE_QUOTES":{"status":"ok","msg":"成功"}},"summary":{"total":1,"ok":1,"empty":0,"fail":0},"update_time":"2026-08-10 18:08:49","republish_time":"2026-08-10 18:08:50"};
 =======
 window.RUNNER_STATUS = {"run_time":"2026-08-10 18:08:21","category":"all","hostname":"","modules":{"CANDIDATE_QUOTES":{"status":"ok","msg":"成功"}},"summary":{"total":1,"ok":1,"empty":0,"fail":0},"update_time":"2026-08-10 18:09:09","republish_time":"2026-08-10 18:09:17"};
@@ -46,4 +47,7 @@ window.RUNNER_STATUS = {"run_time":"2026-08-10 18:08:21","category":"all","hostn
 >>>>>>> Stashed changes
 =======
 window.RUNNER_STATUS = {"run_time":"2026-08-10 18:08:21","category":"all","hostname":"","modules":{"CANDIDATE_QUOTES":{"status":"ok","msg":"成功"}},"summary":{"total":1,"ok":1,"empty":0,"fail":0},"update_time":"2026-08-10 18:14:41","republish_time":"2026-08-10 18:14:46"};
+>>>>>>> Stashed changes
+=======
+window.RUNNER_STATUS = {"run_time":"2026-08-10 18:08:21","category":"all","hostname":"","modules":{"CANDIDATE_QUOTES":{"status":"ok","msg":"成功"}},"summary":{"total":1,"ok":1,"empty":0,"fail":0},"update_time":"2026-08-10 18:15:19","republish_time":"2026-08-10 18:15:21"};
 >>>>>>> Stashed changes
