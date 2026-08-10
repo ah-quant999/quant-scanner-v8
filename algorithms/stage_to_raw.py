@@ -162,8 +162,21 @@ def main():
         src = os.path.join(OUT, v6_name)
         if not os.path.exists(src):
             continue
-        # (1) 生成器直写 raw_data 的产物，禁止再从 out/ 搬运覆盖
+        # (1) 生成器直写 raw_data 的产物，禁止再从 out/ 搬运覆盖。
+        #     但若 v6/v8 命名不同（如 triple_resonance_history.json → triple_history.json），
+        #     生成器直写的是 raw_data/<v6_name>，需桥接复制到 raw_data/<v8_name>，
+        #     否则 update_v8 读 <v8_name> 永远拿到旧数据（2026-08-10 修复）。
         if v6_name in SKIP_STAGE or v8_name in SKIP_STAGE:
+            if v6_name != v8_name:
+                raw_src = os.path.join(RAW, v6_name)
+                if os.path.exists(raw_src):
+                    obj = _load_json(raw_src)
+                    if obj is not None:
+                        obj = _add_timestamp(obj)
+                        _save_json(Path(RAW) / v8_name, obj)
+                        promoted += 1
+                        print(f"  [bridge] raw_data/{v6_name} -> raw_data/{v8_name}")
+                        continue
             print(f"  [skip] 生成器直写 raw_data: {v6_name}")
             continue
         # (2) 防僵尸覆盖：out 源比 raw 目标旧则拒绝搬运
