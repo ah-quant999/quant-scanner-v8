@@ -1,1 +1,1 @@
-window.CANDIDATE_QUOTES = {"no_data":true,"premarket_cleared":true,"note":"盘前候选池实时行情待开盘刷新","quotes":[],"update_time":"2026-08-10 10:48:59","republish_time":"2026-08-10 10:49:38"};
+window.CANDIDATE_QUOTES = {"items":[{"code":"000050","name":"深天马Ａ","price":6.76,"chg":0.0,"total_mv":164.66,"float_mv":164.66}],"note":"候选池实时行情(涨跌幅/现价/市值)，来源东方财富push2delay","update_time":"2026-08-10 11:07:41","republish_time":"2026-08-10 11:08:03"};
