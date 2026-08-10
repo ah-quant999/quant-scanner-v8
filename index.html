@@ -9310,7 +9310,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(qo){
       h+='<div style="margin-top:4px;display:flex;gap:12px;flex-wrap:wrap;font-size:13px;">';
       if(qo.price!=null)h+='<span>现价 <b>'+fmtNum(qo.price)+'</b></span>';
-      if(qo.pct!=null){var pc=Number(qo.pct);h+='<span style="color:'+(pc>=0?'var(--up)':'var(--down))')+'">'+(pc>=0?'+':'')+pc.toFixed(2)+'%</span>';}
+      if(qo.pct!=null){var pc=Number(qo.pct);h+='<span style="color:'+(pc>=0?'var(--up)':'var(--down)')+'">'+(pc>=0?'+':'')+pc.toFixed(2)+'%</span>';}
       if(prof.industry&&prof.industry!=='-')h+='<span style="color:var(--cyan);">'+prof.industry+'</span>';
       if(prof.board)h+='<span style="color:var(--dim);font-size:11px;">'+prof.board+'</span>';
       h+='</div>';
@@ -9344,7 +9344,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(qo){
       h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:4px 16px;font-size:12px;color:var(--sub);">';
       if(qo.price!=null)h+='<div>现价：<b style="color:var(--txt)">'+fmtNum(qo.price)+'</b></div>';
-      if(qo.pct!=null){var pc=Number(qo.pct);h+='<div>涨跌幅：<b style="color:'+(pc>=0?'var(--up)':'var(--down))')+'">'+(pc>=0?'+':'')+pc.toFixed(2)+'%</b></div>';}
+      if(qo.pct!=null){var pc=Number(qo.pct);h+='<div>涨跌幅：<b style="color:'+(pc>=0?'var(--up)':'var(--down)')+'">'+(pc>=0?'+':'')+pc.toFixed(2)+'%</b></div>';}
       if(qo.volume)h+='<div>成交额：'+fmtYi(qo.volume)+'</div>';
       if(qo.turnover)h+='<div>换手率：'+qo.turnover.toFixed(2)+'%</div>';
       if(prof.industry&&prof.industry!=='-')h+='<div>行业：'+prof.industry+'</div>';
@@ -9490,7 +9490,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     h+='<div style="margin-top:10px;padding:10px;background:rgba(255,255,255,.04);border-radius:8px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:12px;">';
     h+='<span>持仓 <b>'+arr.length+'</b> 只</span>';
     h+='<span>总成本 <b>'+totalCost.toFixed(0)</b></span>';
-    h+='<span style="color:'+(totalPnl>=0?'var(--up)':'var(--down))+';">总盈亏 <b>'+(totalPnl>=0?'+':'')+totalPnl.toFixed(0)+'</b> ('+(totalPct>=0?'+':'')+totalPct.toFixed(2)+'%)</span>';
+    h+='<span style="color:'+(totalPnl>=0?'var(--up)':'var(--down)')+';">总盈亏 <b>'+(totalPnl>=0?'+':'')+totalPnl.toFixed(0)+'</b> ('+(totalPct>=0?'+':'')+totalPct.toFixed(2)+'%)</span>';
     h+='</div>';
     // 止损提醒
     var anyStopLoss=arr.some(function(p){var c=_pfGetQuote(p.code,p.market);return c&&(c-p.price)/p.price*100<=-10;});
