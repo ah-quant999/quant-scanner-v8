@@ -83,6 +83,11 @@ CARD_DEFS = [
     {"id": "TRIPLE_CONSENSUS", "name": "三重共识", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"]},
     # 选股策略
     {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"]},
+    {"id": "COCKPIT_ADVICE", "name": "驾驶舱", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["verdict", "watch"]},
+    {"id": "BIG_BULL_HUNTER", "name": "大牛股猎手", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"]},  # 派生自 lhb+inst_trade，data/BIG_BULL_HUNTER.js 待生成；当前复用源数据 lhb_data.js
+    {"id": "TOP10_DAILY", "name": "全站精选", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top10"]},
+    {"id": "STOCK_RPS", "name": "相对强度", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["records"], "_window_var": "STOCK_RPS_DATA"},  # 文件名 STOCK_RPS.js，但 window 变量名是 STOCK_RPS_DATA（历史遗留）
+    {"id": "CRDS_CARD_DATA", "name": "逆势龙头", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["elite", "watch"]},
 ]
 
 
@@ -601,7 +606,8 @@ def check_data_cards():
     today_str = now_cst().strftime("%Y-%m-%d")
     for d in CARD_DEFS:
         path = DATA_DIR / f"{d['id']}.js"
-        data = load_window_var(path, d["id"])
+        var_name = d.get("_window_var") or d["id"]
+        data = load_window_var(path, var_name)
         if data is None:
             results.append({
                 "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
