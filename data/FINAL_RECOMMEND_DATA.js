@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-10 23:48:47",
+  "update_time": "2026-08-11 00:21:45",
   "crisis_score": 33.3,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -69,12 +69,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构1.4亿+游资0.0亿",
       "industry": "通用设备制造业",
       "concepts": [
+        "次新股",
         "东方财富热股",
-        "创业板综",
-        "存储芯片",
-        "百元股",
         "先进封装",
-        "半导体概念"
+        "半导体概念",
+        "融资融券",
+        "百元股"
       ],
       "backtest": {
         "signals": 171,
@@ -130,12 +130,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构0.1亿+游资1.9亿",
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
+        "电池技术",
         "MLCC",
-        "机器人概念",
         "5G概念",
-        "华为概念",
-        "央国企改革",
-        "电池技术"
+        "虚拟机器人",
+        "AI眼镜",
+        "深成500"
       ],
       "backtest": {
         "signals": 171,
@@ -191,12 +191,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构0.4亿+游资1.0亿",
       "industry": "电力、热力生产和供应业",
       "concepts": [
-        "东方财富热股",
+        "反转股",
         "绿色电力",
-        "充电桩",
         "西部大开发",
+        "充电桩",
         "光伏概念",
-        "反转股"
+        "东方财富热股"
       ],
       "backtest": {
         "signals": 171,
@@ -247,7 +247,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "09618",
-      "name": "京东集团-SW",
+      "name": "京东物流",
       "market": "港股",
       "board": "港股",
       "horizon": "短线/中线共振",
@@ -348,12 +348,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "通用设备制造业",
       "concepts": [
+        "次新股",
         "东方财富热股",
-        "创业板综",
-        "存储芯片",
-        "百元股",
         "先进封装",
-        "半导体概念"
+        "半导体概念",
+        "融资融券",
+        "百元股"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -381,12 +381,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
+        "电池技术",
         "MLCC",
-        "机器人概念",
         "5G概念",
-        "华为概念",
-        "央国企改革",
-        "电池技术"
+        "虚拟机器人",
+        "AI眼镜",
+        "深成500"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -414,12 +414,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "电力、热力生产和供应业",
       "concepts": [
-        "东方财富热股",
+        "反转股",
         "绿色电力",
-        "充电桩",
         "西部大开发",
+        "充电桩",
         "光伏概念",
-        "反转股"
+        "东方财富热股"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -447,12 +447,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "专精特新",
         "精准诊断",
-        "重组蛋白",
         "合成生物",
         "破发股",
-        "体外诊断概念"
+        "体外诊断概念",
+        "融资融券",
+        "专精特新"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -480,12 +480,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
+        "电池技术",
         "数据中心",
         "液冷概念",
         "光伏概念",
-        "央国企改革",
-        "固态电池",
-        "电池技术"
+        "新能源",
+        "固态电池"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -513,12 +513,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "3D玻璃",
-        "创业板综",
+        "柔性屏(折叠屏)",
         "破发股",
-        "深圳特区",
         "融资融券",
-        "柔性屏(折叠屏)"
+        "深圳特区",
+        "创业板综",
+        "3D玻璃"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -555,7 +555,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "09866",
-      "name": "蔚来-SW",
+      "name": "09866",
       "market": "港股",
       "board": "港股",
       "horizon": "短线",
@@ -572,9 +572,35 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [],
-      "enter_date": "2026-08-10",
+      "enter_date": "2026-08-11",
       "stop_loss": 34.16,
       "target_price": 43.65,
+      "risk_reward": 1.5,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "02359",
+      "name": "药明康德",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "短线",
+      "close": 198.0,
+      "pct_chg": 2.96,
+      "final_score": 1.2,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-08-11",
+      "stop_loss": 178.2,
+      "target_price": 227.7,
       "risk_reward": 1.5,
       "support": null,
       "resistance": null
@@ -598,7 +624,7 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [],
-      "enter_date": "2026-08-10",
+      "enter_date": "2026-08-11",
       "stop_loss": 13.4,
       "target_price": 17.12,
       "risk_reward": 1.5,
@@ -624,35 +650,9 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [],
-      "enter_date": "2026-08-10",
+      "enter_date": "2026-08-11",
       "stop_loss": 83.07,
       "target_price": 106.15,
-      "risk_reward": 1.5,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "02359",
-      "name": "药明康德",
-      "market": "港股",
-      "board": "港股",
-      "horizon": "短线",
-      "close": 198.0,
-      "pct_chg": 2.96,
-      "final_score": 1.2,
-      "resonance": 1,
-      "sources": [
-        "四量终极"
-      ],
-      "signals": [
-        "上涨趋势",
-        "机构变红"
-      ],
-      "industry": "",
-      "concepts": [],
-      "enter_date": "2026-08-10",
-      "stop_loss": 178.2,
-      "target_price": 227.7,
       "risk_reward": 1.5,
       "support": null,
       "resistance": null
@@ -676,7 +676,7 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [],
-      "enter_date": "2026-08-10",
+      "enter_date": "2026-08-11",
       "stop_loss": 84.51,
       "target_price": 107.99,
       "risk_reward": 1.5,
@@ -702,7 +702,7 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [],
-      "enter_date": "2026-08-10",
+      "enter_date": "2026-08-11",
       "stop_loss": 191.88,
       "target_price": 245.18,
       "risk_reward": 1.5,
@@ -728,7 +728,7 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [],
-      "enter_date": "2026-08-10",
+      "enter_date": "2026-08-11",
       "stop_loss": 375.12,
       "target_price": 479.32,
       "risk_reward": 1.5,
@@ -754,7 +754,7 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [],
-      "enter_date": "2026-08-10",
+      "enter_date": "2026-08-11",
       "stop_loss": 41.51,
       "target_price": 53.04,
       "risk_reward": 1.5,
@@ -863,7 +863,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "09999",
-      "name": "网易",
+      "name": "网易-S",
       "market": "港股",
       "board": "港股",
       "horizon": "中长线",

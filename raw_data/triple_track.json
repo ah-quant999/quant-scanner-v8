@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-08-10 23:41:14",
-  "data_date": "2026-08-10",
-  "track_start": "2026-08-10",
-  "history_days": 2,
+  "update_time": "2026-08-11 00:13:21",
+  "data_date": "2026-08-11",
+  "track_start": "2026-08-11",
+  "history_days": 3,
   "strict_count": 0,
   "near_count": 1,
   "tracked": [
@@ -19,14 +19,63 @@
       "signal_count": 0,
       "enter_date": "2026-08-10",
       "hold_days": 1,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "first_close": 40.16,
       "current_close": 40.16,
       "pnl_pct": 0.0,
       "catalysts": []
     }
   ],
-  "alerts": [],
+  "alerts": [
+    {
+      "level": "warn",
+      "code": "300760",
+      "name": "",
+      "text": "(300760) 于 2026-08-10 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "600519",
+      "name": "",
+      "text": "(600519) 于 2026-08-10 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300613",
+      "name": "",
+      "text": "(300613) 于 2026-08-10 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "688183",
+      "name": "",
+      "text": "(688183) 于 2026-08-10 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300476",
+      "name": "",
+      "text": "(300476) 于 2026-08-10 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "688266",
+      "name": "",
+      "text": "(688266) 于 2026-08-10 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300972",
+      "name": "",
+      "text": "(300972) 于 2026-08-10 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300308",
+      "name": "",
+      "text": "(300308) 于 2026-08-10 跌出共识（曾连续 1 日）"
+    }
+  ],
   "sector_cluster": {
     "by_industry": [
       {
@@ -177,13 +226,13 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-08-10",
-    "history_days": 2,
+    "track_start": "2026-08-11",
+    "history_days": 3,
     "summary": {
       "1d": {
-        "count": 0,
-        "win_rate": null,
-        "avg_return": null
+        "count": 1,
+        "win_rate": 0.0,
+        "avg_return": 0.0
       },
       "3d": {
         "count": 0,
@@ -206,6 +255,15 @@
         "avg_return": null
       }
     },
-    "per_stock": []
+    "per_stock": [
+      {
+        "code": "01209",
+        "name": "华润万象生活",
+        "enter_date": "2026-08-10",
+        "offsets": {
+          "1d": 0.0
+        }
+      }
+    ]
   }
 }
