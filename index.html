@@ -9400,6 +9400,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
   /* ===== 📦 TOP3 持仓跟踪（2026-08-10 暂未上架·localStorage 持久化） ===== */
   var PF_KEY = 'v8_portfolio_positions';
+  var PF_MIGRATION_KEY = 'v8_pf_migration_v2'; // 数据迁移版本标记
   // 预设种子数据（主人指定的 ETF 持仓，首次访问自动加载）
   window._PF_SEED = [
     {code:'159755', name:'锂电池ETF', full_code:'sz159755', market:'sz', date:'2026-08-11', price:1.85, qty:10000},
@@ -9410,6 +9411,37 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       var arr = JSON.parse(localStorage.getItem(PF_KEY)||'[]');
       // 首次访问（空）→ 自动加载种子数据
       if(!arr || !arr.length){ arr = window._PF_SEED || []; _pfSave(arr); }
+      // 2026-08-11 v2 迁移：清理 _pfFindStock 空串 bug 导致的错误匹配数据
+      // 该 bug 在 06:38 前（commit e25e349c8 前）存在，会导致输入纯字母时匹配到错误股票
+      if(!localStorage.getItem(PF_MIGRATION_KEY) && arr.length > 0 && window._uniSearch){
+        var cleaned = [], changed = false;
+        for(var i=0;i<arr.length;i++){
+          var p = arr[i];
+          // 用当前正确的 _uniSearch 验证 code→name 映射
+          var verified = window._uniSearch(p.code, 1);
+          if(verified && verified.length && verified[0].code === p.code){
+            // code 能找到，检查 name 是否一致（允许小差异）
+            if(verified[0].name === p.name){
+              cleaned.push(p); // 正常数据，保留
+            } else {
+              // name 不一致 → 说明是 bug 期间错误匹配的数据
+              // 用正确的 name 替换，保留用户的 price/qty/date
+              cleaned.push({code:p.code,name:verified[0].name,full_code:verified[0].full_code||p.full_code,
+                market:verified[0].market||p.market,date:p.date,price:p.price,qty:p.qty,added_at:p.added_at});
+              changed = true;
+              console.warn('[持仓迁移] 修正条目:', p.name, '→', verified[0].name, '('+p.code+')');
+            }
+          } else {
+            // code 完全找不到 → 可能是无效代码，保留原样（可能是 ETF/新股）
+            cleaned.push(p);
+          }
+        }
+        if(changed){
+          _pfSave(cleaned);
+          arr = cleaned;
+        }
+        localStorage.setItem(PF_MIGRATION_KEY, '1'); // 标记迁移已完成
+      }
       return arr;
     } catch(e){ return (window._PF_SEED || []); }
   };
