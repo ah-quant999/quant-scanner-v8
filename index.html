@@ -9111,8 +9111,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     h+='<span style="font-size:15px;font-weight:700;color:#fbbf24;">📦 TOP3 持仓跟踪</span>';
     h+='<span style="font-size:11px;color:var(--dim);">记录持仓 · 自动跟踪盈亏 · 止损止盈提醒 · 异动监控</span></div>';
     // 录入表单
-    h+='<div style="display:grid;grid-template-columns:120px 100px 80px 70px auto;gap:6px 8px;margin-bottom:10px;align-items:end;">';
-    h+='<input id="pfCode" placeholder="代码/名称" onkeydown="if(event.key===\'Enter\')addPosition()" style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--card);color:var(--txt);box-sizing:border-box;" />';
+    h+='<div style="display:grid;grid-template-columns:120px 100px 80px 70px auto;gap:6px 8px;margin-bottom:10px;align-items:end;position:relative;">';
+    h+='<input id="pfCode" placeholder="代码/拼音/名称" onkeydown="if(event.key===\'Enter\')addPosition()" oninput="showPfDropdown(this.value)" onfocus="if(this.value.trim())showPfDropdown(this.value)" onblur="var _t=this;setTimeout(function(){hidePfDropdown()},200)" style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--card);color:var(--txt);box-sizing:border-box;" />';
+    h+='<div id="pfDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:100;background:var(--card);border:1px solid var(--border);border-radius:8px;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.4);"></div>';
+    h+='</div>';
+    h+='<div style="display:grid;grid-template-columns:100px 80px 70px auto;gap:6px 8px;margin-bottom:10px;align-items:end;">';
     h+='<input id="pfDate" type="date" style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--card);color:var(--txt);" />';
     h+='<input id="pfPrice" placeholder="买入价" type="number" step="0.01" style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--card);color:var(--txt);" />';
     h+='<input id="pfQty" placeholder="数量" type="number" style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--card);color:var(--txt);" />';
@@ -9186,6 +9189,22 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   };
   window.hideDiagDropdown = function(){ var d=document.getElementById('stockDiagDropdown'); if(d)d.style.display='none'; };
 
+  // 持仓录入下拉联想（2026-08-11 新增：防止再出现「录广钢气体出浦发银行」的匹配错误）
+  window.showPfDropdown = function(q){
+    var dd=document.getElementById('pfDropdown'); if(!dd)return;
+    if(!q||q.length<1){dd.style.display='none';return;}
+    var hits = [];
+    if(window._uniSearch) hits = window._uniSearch(q, 10);
+    if(!hits.length){dd.style.display='none';return;}
+    var h=''; hits.forEach(function(s){
+      h+='<div style="padding:7px 12px;cursor:pointer;font-size:12px;color:var(--txt);border-bottom:1px solid rgba(255,255,255,.04);" onmouseover="this.style.background=\'rgba(34,197,94,.15)\'" onmouseout="this.style.background=\'\'" onclick="document.getElementById(\'pfCode\').value=\''+s.name+'\';hidePfDropdown();">';
+      h+='<span style="font-weight:600;">'+s.name+'</span> <span style="color:var(--dim);font-size:11px;font-family:monospace;margin-left:6px;">'+(s.full_code||s.code)+'</span> <span style="color:var(--cyan);font-size:11px;">'+(s.py||'')+'</span>';
+      h+='</div>';
+    });
+    dd.innerHTML=h; dd.style.display='block';
+  };
+  window.hidePfDropdown = function(){ var d=document.getElementById('pfDropdown'); if(d)d.style.display='none'; };
+
   window.doStockDiag = function(){
     var box=document.getElementById('stockDiagInput');
     var res=document.getElementById('stockDiagResult');
@@ -9199,12 +9218,13 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     // 2026-08-11 一劳永逸：复用统一搜索内核
     var item = null;
     if(window._uniSearch) item = window._uniSearch(q, 1)[0] || null;
-    // fallback：FINAL_RECOMMEND_DATA 中的港股等 STOCK_LIST 未覆盖标的
-    if(!item){var fr=window.FINAL_RECOMMEND_DATA; if(fr&&fr.stocks){for(var fi=0;fi<fr.stocks.length;fi++){var r=fr.stocks[fi]; if(!r||!r.name)continue;
-      var rn=r.name.toLowerCase(), rc=normCode(r.code||''), rpy=(r.py||'').toLowerCase(), fsc2=0;
-      if(isA){if(rn.indexOf(ql)!==-1)fsc2=3; if(rc.length>0&&ql.indexOf(rc)!==-1)fsc2=Math.max(fsc2,2);}
-      else{if(rc===qc)fsc=4; else if((r.code||'').indexOf(q)!==-1)fsc2=3; if(rn.indexOf(ql)!==-1)fsc2=Math.max(fsc2,2);}
-      if(fsc2>best){best=fsc2;item={code:r.code,name:r.name,full_code:(r.market||'hk')+r.code,py:rpy||'',market:r.market||'hk',board:r.board||'港股'};}
+    // fallback：FINAL_RECOMMEND_DATA 中的港股等 STOCK_LIST 未覆盖标的（修复：不再引用未定义变量 isA/ql/qc/best）
+    if(!item){var fr=window.FINAL_RECOMMEND_DATA; if(fr&&fr.stocks){var _ql=q.toLowerCase(), _nc=normCode(q), _bs=-1;
+      for(var fi=0;fi<fr.stocks.length;fi++){var r=fr.stocks[fi]; if(!r||!r.name)continue;
+      var _rn=r.name.toLowerCase(), _rc=normCode(r.code||''), _rpy=(r.py||'').toLowerCase(), _sc=0;
+      if(_rn.indexOf(_ql)!==-1)_sc=Math.max(_sc,3); if(_rc&&_rc===_nc)_sc=Math.max(_sc,4);
+      if(_rpy.indexOf(_ql)!==-1)_sc=Math.max(_sc,_rpy===_ql?5:4);
+      if(_sc>_bs){_bs=_sc;item={code:r.code,name:r.name,full_code:(r.market||'hk')+r.code,py:_rpy||'',market:r.market||'hk',board:r.board||'港股'};}
     }}}
     if(!item){ res.innerHTML='<div class="note">未找到「'+q+'」，请检查代码或名称</div>'; return; }
     var code=item.code, ncode=normCode(code);
@@ -9396,15 +9416,23 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   window._pfSave = function(arr){
     localStorage.setItem(PF_KEY, JSON.stringify(arr||[]));
   };
-  // 匹配股票（复用 STOCK_LIST + FINAL_RECOMMEND_DATA）
+  // 匹配股票（2026-08-11 一劳永逸：复用 _uniSearch 统一搜索内核，消除空串 indexOf 等经典 bug）
   window._pfFindStock = function(q){
+    if(!q) return null;
+    // 优先使用统一搜索内核（覆盖 STOCK_LIST 全量 + 拼音/代码/名称）
+    if(window._uniSearch){
+      var hits = window._uniSearch(q, 1);
+      if(hits && hits.length) return {code:hits[0].code, name:hits[0].name, full_code:hits[0].full_code||hits[0].code, py:hits[0].py||'', market:hits[0].market||''};
+    }
+    // fallback：手写逻辑（仅当 _uniSearch 不存在时）
     var normCode=function(c){return String(c||'').replace(/\D/g,'').replace(/^[shszSHSZ]+/,'');};
     var nc=normCode(q), ql=(q||'').toLowerCase(), best=null, bs=-1;
     var list=window.STOCK_LIST; if(Array.isArray(list)){} else if(list&&Array.isArray(list.data))list=list.data; else list=[];
     for(var i=0;i<list.length;i++){var s=list[i];if(!s||!s.code)continue;
       var sc=normCode(s.code), sn=s.name.toLowerCase(), py=(s.py||'').toLowerCase();
       var sc2=0;
-      if(sc===nc)sc2=4; else if(sc.indexOf(nc)===0)sc2=3;
+      // 关键修复：nc 为空时不能走 code 前缀匹配（''.indexOf('')===0 永远为真！）
+      if(nc && sc===nc)sc2=4; else if(nc && sc.indexOf(nc)===0)sc2=3;
       if(sn.indexOf(ql)!==-1)sc2=Math.max(sc2,2);
       if(py.indexOf(ql)!==-1)sc2=Math.max(sc2,py===ql?5:4);
       if(sc2>bs){bs=sc2;best={code:s.code,name:s.name,full_code:s.full_code||s.code,py:s.py||'',market:s.market||''};}
