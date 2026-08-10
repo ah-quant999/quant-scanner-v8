@@ -10,6 +10,7 @@ window.HEALTH_CHECK = {
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   "updated": "2026-08-10 15:35:56",
 =======
   "updated": "2026-08-10 15:36:53",
@@ -87,6 +88,14 @@ window.HEALTH_CHECK = {
 =======
     "fail": 2,
 >>>>>>> Stashed changes
+=======
+  "updated": "2026-08-10 15:41:40",
+  "overall": "warn",
+  "summary": {
+    "ok": 33,
+    "warn": 1,
+    "fail": 2,
+>>>>>>> Stashed changes
     "total": 36
   },
   "items": [
@@ -97,6 +106,7 @@ window.HEALTH_CHECK = {
       "freq": "每周日+月末",
       "status": "ok",
       "last_update": "2026-08-10 10:48:56",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -142,6 +152,9 @@ window.HEALTH_CHECK = {
 =======
       "age_min": 292.1,
 >>>>>>> Stashed changes
+=======
+      "age_min": 292.7,
+>>>>>>> Stashed changes
       "message": "更新于 今日 10:48"
     },
     {
@@ -151,6 +164,7 @@ window.HEALTH_CHECK = {
       "freq": "每日盘前",
       "status": "ok",
       "last_update": "2026-08-10 10:43:51",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -196,6 +210,9 @@ window.HEALTH_CHECK = {
 =======
       "age_min": 297.1,
 >>>>>>> Stashed changes
+=======
+      "age_min": 297.7,
+>>>>>>> Stashed changes
       "message": "更新于 今日 10:43"
     },
     {
@@ -205,6 +222,7 @@ window.HEALTH_CHECK = {
       "freq": "每日盘前",
       "status": "ok",
       "last_update": "2026-08-10 10:48:59",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -250,6 +268,9 @@ window.HEALTH_CHECK = {
 =======
       "age_min": 292.0,
 >>>>>>> Stashed changes
+=======
+      "age_min": 292.6,
+>>>>>>> Stashed changes
       "message": "更新于 今日 10:48"
     },
     {
@@ -259,6 +280,7 @@ window.HEALTH_CHECK = {
       "freq": "每日盘前",
       "status": "ok",
       "last_update": "2026-08-10 10:44:38",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -304,6 +326,9 @@ window.HEALTH_CHECK = {
 =======
       "age_min": 296.4,
 >>>>>>> Stashed changes
+=======
+      "age_min": 297.0,
+>>>>>>> Stashed changes
       "message": "更新于 今日 10:44"
     },
     {
@@ -313,6 +338,7 @@ window.HEALTH_CHECK = {
       "freq": "每日盘前",
       "status": "ok",
       "last_update": "2026-08-10 10:59",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -358,6 +384,9 @@ window.HEALTH_CHECK = {
 =======
       "age_min": 282.0,
 >>>>>>> Stashed changes
+=======
+      "age_min": 282.6,
+>>>>>>> Stashed changes
       "message": "更新于 今日 10:59"
     },
     {
@@ -366,6 +395,7 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中每30分",
       "status": "ok",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -435,6 +465,11 @@ window.HEALTH_CHECK = {
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+      "last_update": "2026-08-10 15:32:48",
+      "age_min": 8.8,
+      "message": "更新于 今日 15:32"
+>>>>>>> Stashed changes
     },
     {
       "id": "ETF_PULSE",
@@ -442,6 +477,7 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中实时",
       "status": "ok",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -511,6 +547,11 @@ window.HEALTH_CHECK = {
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+      "last_update": "2026-08-10 15:33:50",
+      "age_min": 7.8,
+      "message": "更新于 今日 15:33"
+>>>>>>> Stashed changes
     },
     {
       "id": "ETF_INTRADAY_HEAT",
@@ -518,6 +559,7 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中实时 T+0",
       "status": "ok",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -587,6 +629,11 @@ window.HEALTH_CHECK = {
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+      "last_update": "2026-08-10 15:32:42",
+      "age_min": 8.9,
+      "message": "更新于 今日 15:32"
+>>>>>>> Stashed changes
     },
     {
       "id": "ETF_DAILY_MONITOR",
@@ -594,6 +641,7 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中每30分",
       "status": "ok",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -654,6 +702,11 @@ window.HEALTH_CHECK = {
       "age_min": 3.9,
       "message": "更新于 今日 15:37"
 >>>>>>> Stashed changes
+=======
+      "last_update": "2026-08-10 15:37:07",
+      "age_min": 4.5,
+      "message": "更新于 今日 15:37"
+>>>>>>> Stashed changes
     },
     {
       "id": "SECTOR_FUND_FLOW",
@@ -661,6 +714,7 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中每30分",
       "status": "ok",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -730,6 +784,11 @@ window.HEALTH_CHECK = {
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+      "last_update": "2026-08-10 15:32:47",
+      "age_min": 8.8,
+      "message": "更新于 今日 15:32"
+>>>>>>> Stashed changes
     },
     {
       "id": "CONCEPT_RANKING",
@@ -737,6 +796,7 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中每30分",
       "status": "ok",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -806,6 +866,11 @@ window.HEALTH_CHECK = {
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+      "last_update": "2026-08-10 15:32:49",
+      "age_min": 8.8,
+      "message": "更新于 今日 15:32"
+>>>>>>> Stashed changes
     },
     {
       "id": "LIMIT_UP_HEATMAP",
@@ -813,6 +878,7 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中每30分",
       "status": "ok",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -882,12 +948,18 @@ window.HEALTH_CHECK = {
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+      "last_update": "2026-08-10 15:33:11",
+      "age_min": 8.4,
+      "message": "更新于 今日 15:33"
+>>>>>>> Stashed changes
     },
     {
       "id": "MARKET_FUND_FLOW_DATA",
       "name": "市场资金流向",
       "page": "实时数据",
       "freq": "盘中每30分",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
       "status": "fail",
       "last_update": "2026-08-10 10:48:44",
@@ -939,6 +1011,12 @@ window.HEALTH_CHECK = {
       "age_min": 4.5,
       "message": "更新于 今日 15:36"
 >>>>>>> Stashed changes
+=======
+      "status": "ok",
+      "last_update": "2026-08-10 15:36:30",
+      "age_min": 5.1,
+      "message": "更新于 今日 15:36"
+>>>>>>> Stashed changes
     },
     {
       "id": "MARKET_ALERTS",
@@ -946,6 +1024,7 @@ window.HEALTH_CHECK = {
       "page": "实时数据",
       "freq": "盘中实时",
       "status": "ok",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -1005,6 +1084,11 @@ window.HEALTH_CHECK = {
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+      "last_update": "2026-08-10 15:35:28",
+      "age_min": 6.1,
+      "message": "更新于 今日 15:35"
+>>>>>>> Stashed changes
     },
     {
       "id": "SH_FIB",
@@ -1013,6 +1097,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 10:47",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -1058,6 +1143,9 @@ window.HEALTH_CHECK = {
 =======
       "age_min": 294.0,
 >>>>>>> Stashed changes
+=======
+      "age_min": 294.6,
+>>>>>>> Stashed changes
       "message": "更新于 今日 10:47"
     },
     {
@@ -1067,6 +1155,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 10:43:53",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -1112,6 +1201,9 @@ window.HEALTH_CHECK = {
 =======
       "age_min": 297.1,
 >>>>>>> Stashed changes
+=======
+      "age_min": 297.7,
+>>>>>>> Stashed changes
       "message": "更新于 今日 10:43"
     },
     {
@@ -1121,6 +1213,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 10:43:55",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -1166,6 +1259,9 @@ window.HEALTH_CHECK = {
 =======
       "age_min": 297.1,
 >>>>>>> Stashed changes
+=======
+      "age_min": 297.7,
+>>>>>>> Stashed changes
       "message": "更新于 今日 10:43"
     },
     {
@@ -1174,6 +1270,7 @@ window.HEALTH_CHECK = {
       "page": "盘后数据",
       "freq": "收盘后1次",
       "status": "ok",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -1243,6 +1340,11 @@ window.HEALTH_CHECK = {
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
+=======
+      "last_update": "2026-08-10 15:33:08",
+      "age_min": 8.5,
+      "message": "更新于 今日 15:33"
+>>>>>>> Stashed changes
     },
     {
       "id": "MARKET_FUND_FLOW_DATA",
@@ -1250,6 +1352,7 @@ window.HEALTH_CHECK = {
       "page": "盘后数据",
       "freq": "收盘后1次",
       "status": "ok",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
       "last_update": "2026-08-10 10:48:44",
 <<<<<<< Updated upstream
@@ -1299,6 +1402,11 @@ window.HEALTH_CHECK = {
       "age_min": 4.5,
       "message": "更新于 今日 15:36"
 >>>>>>> Stashed changes
+=======
+      "last_update": "2026-08-10 15:36:30",
+      "age_min": 5.1,
+      "message": "更新于 今日 15:36"
+>>>>>>> Stashed changes
     },
     {
       "id": "CANDIDATE",
@@ -1307,6 +1415,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 10:52:39",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -1352,6 +1461,9 @@ window.HEALTH_CHECK = {
 =======
       "age_min": 288.3,
 >>>>>>> Stashed changes
+=======
+      "age_min": 288.9,
+>>>>>>> Stashed changes
       "message": "更新于 今日 10:52"
     },
     {
@@ -1361,6 +1473,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 11:07:13",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -1406,6 +1519,9 @@ window.HEALTH_CHECK = {
 =======
       "age_min": 273.8,
 >>>>>>> Stashed changes
+=======
+      "age_min": 274.4,
+>>>>>>> Stashed changes
       "message": "更新于 今日 11:07"
     },
     {
@@ -1414,6 +1530,7 @@ window.HEALTH_CHECK = {
       "page": "盘后数据",
       "freq": "收盘后1次",
       "status": "ok",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
       "last_update": "2026-08-10 10:51:20",
 <<<<<<< Updated upstream
@@ -1463,6 +1580,11 @@ window.HEALTH_CHECK = {
       "age_min": 0.8,
       "message": "更新于 今日 15:40"
 >>>>>>> Stashed changes
+=======
+      "last_update": "2026-08-10 15:40:12",
+      "age_min": 1.4,
+      "message": "更新于 今日 15:40"
+>>>>>>> Stashed changes
     },
     {
       "id": "INST_TRADE",
@@ -1471,6 +1593,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 10:47:11",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -1516,6 +1639,9 @@ window.HEALTH_CHECK = {
 =======
       "age_min": 293.8,
 >>>>>>> Stashed changes
+=======
+      "age_min": 294.4,
+>>>>>>> Stashed changes
       "message": "更新于 今日 10:47"
     },
     {
@@ -1525,6 +1651,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 10:57:53",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -1570,6 +1697,9 @@ window.HEALTH_CHECK = {
 =======
       "age_min": 283.1,
 >>>>>>> Stashed changes
+=======
+      "age_min": 283.7,
+>>>>>>> Stashed changes
       "message": "更新于 今日 10:57"
     },
     {
@@ -1577,6 +1707,7 @@ window.HEALTH_CHECK = {
       "name": "四量终极",
       "page": "选股策略",
       "freq": "收盘后1次",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
       "status": "fail",
       "last_update": "2026-08-10 00:27:21",
@@ -1628,6 +1759,12 @@ window.HEALTH_CHECK = {
       "age_min": 1.9,
       "message": "更新于 今日 15:39"
 >>>>>>> Stashed changes
+=======
+      "status": "ok",
+      "last_update": "2026-08-10 15:39:04",
+      "age_min": 2.5,
+      "message": "更新于 今日 15:39"
+>>>>>>> Stashed changes
     },
     {
       "id": "raw_etf_pulse.json",
@@ -1668,6 +1805,7 @@ window.HEALTH_CHECK = {
       "id": "site_sync",
       "name": "Pages 部署同步",
       "page": "管线",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -1725,6 +1863,10 @@ window.HEALTH_CHECK = {
       "status": "fail",
       "message": "本地 HEAD a6354f2 / 线上 2b9e228 不同步，落后 0 commit，部署链路需检查"
 >>>>>>> Stashed changes
+=======
+      "status": "fail",
+      "message": "本地 HEAD 8e70414 / 线上 2b9e228 不同步，落后 0 commit，部署链路需检查"
+>>>>>>> Stashed changes
     },
     {
       "id": "runner",
@@ -1738,6 +1880,7 @@ window.HEALTH_CHECK = {
       "name": "本地与 origin/main 同步",
       "page": "管线",
       "status": "fail",
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
@@ -1782,6 +1925,9 @@ window.HEALTH_CHECK = {
 >>>>>>> Stashed changes
 =======
       "message": "本地 a6354f2 / origin/main 8e70414 本地落后，需 pull/push"
+>>>>>>> Stashed changes
+=======
+      "message": "本地 8e70414 / origin/main 94a5f93 本地落后，需 pull/push"
 >>>>>>> Stashed changes
     },
     {
