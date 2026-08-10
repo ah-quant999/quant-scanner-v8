@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-10 22:08:01",
+  "update_time": "2026-08-10 22:08:11",
   "crisis_score": 33.3,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -322,11 +322,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "通用设备制造业",
       "concepts": [
-        "融资融券",
-        "创业板综",
-        "百元股",
         "半导体概念",
+        "东方财富热股",
+        "百元股",
         "次新股",
+        "融资融券",
         "存储芯片"
       ],
       "enter_date": "20260810",
@@ -355,12 +355,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "融资融券",
-        "央国企改革",
-        "电池技术",
-        "5G概念",
+        "华为概念",
         "MLCC",
-        "虚拟机器人"
+        "央国企改革",
+        "虚拟机器人",
+        "5G概念",
+        "电池技术"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -389,11 +389,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "电力、热力生产和供应业",
       "concepts": [
         "充电桩",
-        "题材股",
+        "绿色电力",
         "央国企改革",
         "光伏概念",
-        "反转股",
-        "储能概念"
+        "新能源",
+        "东方财富热股"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -421,12 +421,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "融资融券",
-        "合成生物",
-        "体外诊断概念",
+        "专精特新",
         "破发股",
-        "精准诊断",
-        "重组蛋白"
+        "体外诊断概念",
+        "重组蛋白",
+        "合成生物",
+        "融资融券"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -454,12 +454,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "融资融券",
         "央国企改革",
-        "创投",
-        "固态电池",
         "光伏概念",
-        "电池技术"
+        "新能源",
+        "电池技术",
+        "数据中心",
+        "固态电池"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -487,12 +487,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "3D玻璃",
-        "融资融券",
-        "创业板综",
+        "深圳特区",
         "柔性屏(折叠屏)",
+        "融资融券",
         "破发股",
-        "深圳特区"
+        "3D玻璃",
+        "创业板综"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -529,7 +529,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "09866",
-      "name": "蔚来-SW",
+      "name": "09866",
       "market": "港股",
       "board": "港股",
       "horizon": "短线",
