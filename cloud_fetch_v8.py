@@ -105,7 +105,7 @@ CATEGORY_MAP = {
     # 15:30 收盘数据：EXPERIMENT 等 akshare 可抓的 T+1 数据
     "EXPERIMENT": "post_close",
     # 盘后：全A等权平均股价的日内变化 + 中期水位（一次抓取喂两处展示）
-    "AVG_PRICE_DATA": "post_close",
+    "AVG_PRICE_DATA": "intraday",
 }
 
 _ak = None
@@ -2807,25 +2807,34 @@ def main(category=None, only=None):
         }
 
     def f_avg_price():
-        """全A等权平均股价：一次抓取全部A股spot，同时产出
-        - 日内变化（等权涨跌幅均值）
-        - 中期水位（当前均价 vs 20日/60日均线位置）
-        供前端拆成两张独立卡片展示。"""
+        """全A等权平均股价：通过 em_clist(push2delay) 取全市场个股最新价/涨跌幅，
+        算等权均价 + 等权涨跌幅，并记录历史算 20/60 日水位。
+        2026-08-10 重构：原实现用 akshare.stock_zh_a_spot_em() 全量 spot，云端环境
+        持续返回空（缺包/超时），导致 AVG_PRICE_DATA 长期空壳、前端卡片无法渲染。
+        改为复用与资金流同源的 em_clist（_IND_FS，已验证云端可用）。"""
         try:
-            ak = get_ak()
-            df = ak.stock_zh_a_spot_em()
-            if df is None or df.empty:
-                print("  ⚠️ 全A spot 返回空")
+            fields = "f12,f14,f2,f3"
+            desc = em_clist(_IND_FS, fields, fid="f3", stat="1", pz=5000, po="1")
+            asc = em_clist(_IND_FS, fields, fid="f3", stat="1", pz=5000, po="0")
+            by_code = {}
+            for r in desc + asc:
+                code = str(r.get("f12") or "")
+                if not code:
+                    continue
+                price = float(r.get("f2") or 0)
+                chg = r.get("f3")
+                chg = float(chg) if chg is not None else None
+                if price > 0:
+                    by_code[code] = {"price": price, "chg": chg}
+            recs = list(by_code.values())
+            if len(recs) < 1000:
+                print(f"  ⚠️ 全A spot 有效样本仅 {len(recs)} 只，放弃计算")
                 return {}
-            # 清洗：去掉无效价格和涨跌幅
-            df = df.dropna(subset=["最新价", "涨跌幅"])
-            df = df[(df["最新价"] > 0)]
-            if len(df) < 1000:
-                print(f"  ⚠️ 全A spot 有效样本仅 {len(df)} 只，放弃计算")
-                return {}
-            avg_price = float(df["最新价"].mean())
-            avg_change = float(df["涨跌幅"].mean())
-            count = int(len(df))
+            prices = [r["price"] for r in recs]
+            avg_price = sum(prices) / len(prices)
+            chgs = [r["chg"] for r in recs if r["chg"] is not None]
+            avg_change = sum(chgs) / len(chgs) if chgs else 0.0
+            count = len(recs)
             today_str = now_cst().strftime("%Y-%m-%d")
 
             # 读取历史，用于计算均线与昨日对比
