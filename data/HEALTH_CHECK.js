@@ -1,5 +1,5 @@
 window.HEALTH_CHECK = {
-  "updated": "2026-08-10 22:38:02",
+  "updated": "2026-08-10 22:38:32",
   "overall": "ok",
   "summary": {
     "ok": 41,
@@ -15,7 +15,7 @@ window.HEALTH_CHECK = {
       "freq": "每周日+月末",
       "status": "ok",
       "last_update": "2026-08-10 17:48:08",
-      "age_min": 289.9,
+      "age_min": 290.4,
       "message": "更新于 今日 17:48"
     },
     {
@@ -25,7 +25,7 @@ window.HEALTH_CHECK = {
       "freq": "每日盘前",
       "status": "ok",
       "last_update": "2026-08-10 17:42:08",
-      "age_min": 295.9,
+      "age_min": 296.4,
       "message": "更新于 今日 17:42"
     },
     {
@@ -35,7 +35,7 @@ window.HEALTH_CHECK = {
       "freq": "每日盘前",
       "status": "ok",
       "last_update": "2026-08-10 17:48:12",
-      "age_min": 289.8,
+      "age_min": 290.3,
       "message": "更新于 今日 17:48"
     },
     {
@@ -45,7 +45,7 @@ window.HEALTH_CHECK = {
       "freq": "每日盘前",
       "status": "ok",
       "last_update": "2026-08-10 17:43:02",
-      "age_min": 295.0,
+      "age_min": 295.5,
       "message": "更新于 今日 17:43"
     },
     {
@@ -55,7 +55,7 @@ window.HEALTH_CHECK = {
       "freq": "每日盘前",
       "status": "ok",
       "last_update": "2026-08-10 22:25",
-      "age_min": 13.0,
+      "age_min": 13.5,
       "message": "更新于 今日 22:25"
     },
     {
@@ -65,7 +65,7 @@ window.HEALTH_CHECK = {
       "freq": "盘中每30分",
       "status": "ok",
       "last_update": "2026-08-10 17:32:47",
-      "age_min": 305.2,
+      "age_min": 305.7,
       "message": "更新于 今日 17:32"
     },
     {
@@ -75,7 +75,7 @@ window.HEALTH_CHECK = {
       "freq": "盘中实时",
       "status": "ok",
       "last_update": "2026-08-10 17:33:45",
-      "age_min": 304.3,
+      "age_min": 304.8,
       "message": "更新于 今日 17:33"
     },
     {
@@ -85,7 +85,7 @@ window.HEALTH_CHECK = {
       "freq": "盘中实时 T+0",
       "status": "ok",
       "last_update": "2026-08-10 17:31:39",
-      "age_min": 306.4,
+      "age_min": 306.9,
       "message": "更新于 今日 17:31"
     },
     {
@@ -95,7 +95,7 @@ window.HEALTH_CHECK = {
       "freq": "盘中每30分",
       "status": "ok",
       "last_update": "2026-08-10 22:15:02",
-      "age_min": 23.0,
+      "age_min": 23.5,
       "message": "更新于 今日 22:15"
     },
     {
@@ -105,7 +105,7 @@ window.HEALTH_CHECK = {
       "freq": "盘中每30分",
       "status": "ok",
       "last_update": "2026-08-10 17:32:46",
-      "age_min": 305.3,
+      "age_min": 305.8,
       "message": "更新于 今日 17:32"
     },
     {
@@ -115,7 +115,7 @@ window.HEALTH_CHECK = {
       "freq": "盘中每30分",
       "status": "ok",
       "last_update": "2026-08-10 17:32:47",
-      "age_min": 305.2,
+      "age_min": 305.7,
       "message": "更新于 今日 17:32"
     },
     {
@@ -125,7 +125,7 @@ window.HEALTH_CHECK = {
       "freq": "盘中每30分",
       "status": "ok",
       "last_update": "2026-08-10 17:33:01",
-      "age_min": 305.0,
+      "age_min": 305.5,
       "message": "更新于 今日 17:33"
     },
     {
@@ -135,7 +135,7 @@ window.HEALTH_CHECK = {
       "freq": "盘中每30分",
       "status": "ok",
       "last_update": "2026-08-10 22:14:26",
-      "age_min": 23.6,
+      "age_min": 24.1,
       "message": "更新于 今日 22:14"
     },
     {
@@ -145,7 +145,7 @@ window.HEALTH_CHECK = {
       "freq": "盘中实时",
       "status": "ok",
       "last_update": "2026-08-10 22:25:44",
-      "age_min": 12.3,
+      "age_min": 12.8,
       "message": "更新于 今日 22:25"
     },
     {
@@ -155,7 +155,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 21:38",
-      "age_min": 60.0,
+      "age_min": 60.5,
       "message": "更新于 今日 21:38"
     },
     {
@@ -165,7 +165,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 21:38",
-      "age_min": 60.0,
+      "age_min": 60.5,
       "message": "更新于 今日 21:38"
     },
     {
@@ -175,7 +175,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 17:42:11",
-      "age_min": 295.8,
+      "age_min": 296.3,
       "message": "更新于 今日 17:42"
     },
     {
@@ -185,7 +185,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 17:42:13",
-      "age_min": 295.8,
+      "age_min": 296.3,
       "message": "更新于 今日 17:42"
     },
     {
@@ -195,7 +195,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 17:43:28",
-      "age_min": 294.6,
+      "age_min": 295.1,
       "message": "更新于 今日 17:43"
     },
     {
@@ -205,7 +205,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 22:14:26",
-      "age_min": 23.6,
+      "age_min": 24.1,
       "message": "更新于 今日 22:14"
     },
     {
@@ -215,7 +215,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 21:44:01",
-      "age_min": 54.0,
+      "age_min": 54.5,
       "message": "更新于 今日 21:44"
     },
     {
@@ -225,7 +225,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 22:32:33",
-      "age_min": 5.5,
+      "age_min": 6.0,
       "message": "更新于 今日 22:32"
     },
     {
@@ -235,7 +235,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 22:18:08",
-      "age_min": 19.9,
+      "age_min": 20.4,
       "message": "更新于 今日 22:18"
     },
     {
@@ -245,7 +245,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 21:38:06",
-      "age_min": 59.9,
+      "age_min": 60.4,
       "message": "更新于 今日 21:38"
     },
     {
@@ -255,7 +255,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 22:23:03",
-      "age_min": 15.0,
+      "age_min": 15.5,
       "message": "更新于 今日 22:23"
     },
     {
@@ -265,7 +265,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 21:27:03",
-      "age_min": 71.0,
+      "age_min": 71.5,
       "message": "更新于 今日 21:27"
     },
     {
@@ -275,7 +275,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 17:55:24",
-      "age_min": 282.6,
+      "age_min": 283.1,
       "message": "更新于 今日 17:55"
     },
     {
@@ -285,7 +285,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 22:18:08",
-      "age_min": 19.9,
+      "age_min": 20.4,
       "message": "更新于 今日 22:18"
     },
     {
@@ -295,7 +295,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 22:02:12",
-      "age_min": 35.8,
+      "age_min": 36.3,
       "message": "更新于 今日 22:02"
     },
     {
@@ -305,7 +305,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 22:21:47",
-      "age_min": 16.2,
+      "age_min": 16.7,
       "message": "更新于 今日 22:21"
     },
     {
@@ -315,7 +315,7 @@ window.HEALTH_CHECK = {
       "freq": "收盘后1次",
       "status": "ok",
       "last_update": "2026-08-10 18:05:44",
-      "age_min": 272.3,
+      "age_min": 272.8,
       "message": "更新于 今日 18:05"
     },
     {
@@ -372,7 +372,7 @@ window.HEALTH_CHECK = {
       "name": "本地与 origin/main 同步",
       "page": "管线",
       "status": "ok",
-      "message": "本地 e0c48ca / origin/main e0c48ca 同步"
+      "message": "本地 8e56d4d / origin/main 8e56d4d 同步"
     },
     {
       "id": "cockpit_signal_stale",
