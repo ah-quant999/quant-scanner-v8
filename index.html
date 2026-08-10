@@ -9525,35 +9525,69 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var arr=_pfLoad().filter(function(p){return p.code!==code;});
     _pfSave(arr); renderPortfolio();
   };
-  // 渲染持仓列表
+  // 渲染持仓列表（增强版：止损止盈 + 持仓天数 + 回撤监控 + 卖出信号）
   window.renderPortfolio = function(){
     var el=document.getElementById('pfList'); if(!el)return;
     var arr=_pfLoad();
     if(!arr.length){el.innerHTML='<div class="note" style="text-align:center;font-size:12px;">暂无持仓记录，上方录入买入标的</div>';return;}
+    // 可配置阈值
+    var STOP_LOSS_PCT = -10;     // 止损线
+    var TAKE_PROFIT_PCT = 20;     // 止盈线
+    var DRAWDOWN_ALERT = 50;      // 从最高盈利回撤N%即提醒
     var h='<div style="font-size:12px;">';
     h+='<table style="width:100%;border-collapse:collapse;">';
     h+='<tr style="color:var(--sub);font-size:11px;border-bottom:1px solid rgba(255,255,255,.08);">';
     h+='<th style="padding:5px 6px;text-align:left;">名称</th><th style="padding:5px 6px;text-align:right;">买入</th><th style="padding:5px 6px;text-align:right;">现价</th>';
-    h+='<th style="padding:5px 6px;text-align:right;">涨跌</th><th style="padding:5px 6px;text-align:right;">盈亏</th><th style="padding:5px 6px;text-align:right;">盈亏%</th><th style="padding:5px 6px;">异动</th><th></th></tr>';
-    var totalPnl=0, totalCost=0;
+    h+='<th style="padding:5px 6px;text-align:right;">涨跌</th><th style="padding:5px 6px;text-align:right;">盈亏%</th>';
+    h+='<th style="padding:5px 6px;text-align:center;">天数</th><th style="padding:5px 6px;text-align:right;">最高/最低</th><th style="padding:5px 6px;">信号</th><th></th></tr>';
+    var totalPnl=0, totalCost=0, sellAlerts=[];
     arr.forEach(function(p){
       var curPrice=_pfGetQuote(p.code,p.market);
       var cost=p.price*p.qty; totalCost+=cost;
       var pnlAmt=0, pnlPct=0;
       if(curPrice&&curPrice>0){pnlAmt=(curPrice-p.price)*p.qty;pnlPct=(curPrice-p.price)/p.price*100;} totalPnl+=pnlAmt;
       var pctColor=pnlPct>=0?'var(--up)':'var(--down)';
-      var stopLoss=pnlPct<=-10?'background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);':'';
+      // 持仓天数
+      var daysHeld = 0;
+      try { var d=new Date(p.date); daysHeld=Math.max(1, Math.round((Date.now()-d.getTime())/86400000)); } catch(e){}
+      // 最高/最低价追踪（localStorage 持久化）
+      var pk='pf_track_'+p.code; var trk=JSON.parse(localStorage.getItem(pk)||'{}');
+      if(curPrice&&curPrice>0){
+        if(!trk.high||curPrice>trk.high)trk.high=curPrice;
+        if(!trk.low||curPrice<trk.low)trk.low=curPrice;
+        if(!trk.highDate)trk.highDate=new Date().toISOString().slice(0,10);
+        if(curPrice>=trk.high)trk.highDate=new Date().toISOString().slice(0,10);
+        localStorage.setItem(pk,JSON.stringify(trk));
+      }
+      var highPrice=(trk.high||curPrice||p.price), lowPrice=(trk.low||curPrice||p.price);
+      var maxGainPct = highPrice>0 ? ((highPrice-p.price)/p.price*100).toFixed(1) : '-';
+      var maxLossPct = lowPrice>0 ? ((lowPrice-p.price)/p.price*100).toFixed(1) : '-';
+      // 回撤计算
+      var drawdownPct = (highPrice>p.price && curPrice) ? ((curPrice-highPrice)/highPrice*100).toFixed(1) : 0;
+      // 信号判断
+      var signals=[], rowBg='';
+      if(pnlPct <= STOP_LOSS_PCT){ signals.push({t:'🔴止损',d:'跌幅'+pnlPct.toFixed(1)+'%，触及'+STOP_LOSS_PCT+'%止损线'}); rowBg='background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);'; sellAlerts.push(p.name+' 触发止损('+pnlPct.toFixed(1)+'%)'); }
+      else if(pnlPct >= TAKE_PROFIT_PCT){ signals.push({t:'🟢止盈',d:'盈利'+pnlPct.toFixed(1)+'%，考虑锁定利润'}); rowBg='background:rgba(34,197,94,.10);border:1px solid rgba(34,197,94,.25);'; }
+      else if(Number(drawdownPct) <= -DRAWDOWN_ALERT && pnlPct > 5){ signals.push({t:'🟡回撤',d:'从最高点回撤'+Math.abs(drawdownPct)+'%'}); rowBg='background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.25);'; }
+      else if(pnlPct < -5 && pnlPct > STOP_LOSS_PCT){ signals.push({t:'⚠️关注',d:'浮亏'+pnlPct.toFixed(1)+'%，接近止损'}); }
       var alerts=_pfCheckAlerts(p.code);
-      h+='<tr style="border-bottom:1px solid rgba(255,255,255,.04);'+stopLoss+'">';
-      h+='<td style="padding:6px;"><div style="font-weight:600;font-size:12px;">'+p.name+'</div><div style="font-size:10px;color:var(--dim);">'+p.full_code+' · '+p.date+'</div></td>';
+      alerts.forEach(function(a){ signals.push({t:a.type,d:a.desc}); });
+      // 行渲染
+      h+='<tr style="border-bottom:1px solid rgba(255,255,255,.04);'+rowBg+'">';
+      h+='<td style="padding:6px;"><div style="font-weight:600;font-size:12px;">'+p.name+'</div><div style="font-size:10px;color:var(--dim);">'+p.full_code+'</div></td>';
       h+='<td style="padding:6px;text-align:right;font-family:monospace;">'+p.price.toFixed(2)+'</td>';
       h+='<td style="padding:6px;text-align:right;font-family:monospace;font-weight:700;">'+(curPrice?curPrice.toFixed(2):'<span style="color:var(--dim)">-</span>')+'</td>';
       h+='<td style="padding:6px;text-align:right;font-family:monospace;color:'+pctColor+';">'+(curPrice?((curPrice>=p.price?'+':'')+(curPrice-p.price).toFixed(2)): '-')+'</td>';
-      h+='<td style="padding:6px;text-align:right;font-family:monospace;color:'+pctColor+';font-weight:700;">'+(pnlAmt!==0?(pnlAmt>=0?'+':'')+pnlAmt.toFixed(0):'-')+'</td>';
-      h+='<td style="padding:6px;text-align:right;font-family:monospace;color:'+pctColor+';font-weight:700;">'+(pnlPct!==0?(pnlPct>=0?'+':'')+pnlPct.toFixed(2)+'%': '-') + (pnlPct<=-10?' ⚠️止损线':'') + '</td>';
+      h+='<td style="padding:6px;text-align:right;font-family:monospace;color:'+pctColor+';font-weight:700;">'+(pnlPct!==0?(pnlPct>=0?'+':'')+pnlPct.toFixed(2)+'%':'-')+'</td>';
+      h+='<td style="padding:6px;text-align:center;font-size:11px;color:var(--sub);">'+daysHeld+'天</td>';
+      h+='<td style="padding:6px;text-align:right;font-family:monospace;font-size:10px;"><span style="color:var(--up)">'+maxGainPct+'%</span>/<span style="color:var(--down)">'+maxLossPct+'%</span></td>';
       h+='<td style="padding:6px;">';
-      alerts.forEach(function(a){h+='<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(245,158,11,.15);color:#fbbf24;margin:1px 2px;" title="'+a.desc+'">'+a.type+'</span>';});
-      if(!alerts.length)h+='<span style="color:var(--dim);font-size:10px;">-</span>';
+      signals.forEach(function(s){
+        var sc=s.t.indexOf('🔴')===0?'#ef4444':(s.t.indexOf('🟢')===0?'#22c55e':(s.t.indexOf('🟡')===0?'#f59e0b':'rgba(245,158,11,.15)'));
+        var tc=s.t.indexOf('🔴')===0?'#fca5a5':(s.t.indexOf('🟢')===0?'#86efac':(s.t.indexOf('🟡')===0?'#fde68a':'#fbbf24'));
+        h+='<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;background:'+sc+';color:'+tc+';margin:1px 2px;cursor:default;" title="'+s.d+'">'+s.t+'</span>';
+      });
+      if(!signals.length)h+='<span style="color:var(--dim);font-size:10px;">正常</span>';
       h+='</td>';
       h+='<td style="padding:6px;"><button onclick=\"removePosition(\''+p.code+'\')\" style="font-size:10px;padding:2px 8px;border:1px solid rgba(239,68,68,.3);color:var(--down);background:none;border-radius:4px;cursor:pointer;">删</button></td>';
       h+='</tr>';
@@ -9566,11 +9600,23 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     h+='<span>总成本 <b>'+totalCost.toFixed(0)+'</b></span>';
     h+='<span style="color:'+(totalPnl>=0?'var(--up)':'var(--down)')+';">总盈亏 <b>'+(totalPnl>=0?'+':'')+totalPnl.toFixed(0)+'</b> ('+(totalPct>=0?'+':'')+totalPct.toFixed(2)+'%)</span>';
     h+='</div>';
-    // 止损提醒
-    var anyStopLoss=arr.some(function(p){var c=_pfGetQuote(p.code,p.market);return c&&(c-p.price)/p.price*100<=-10;});
-    if(anyStopLoss){
-      h+='<div style="margin-top:8px;padding:8px 12px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:6px;font-size:12px;color:#fca5a5;">⚠️ 有持仓跌幅超过 10%，请注意止损！</div>';
+    // 卖出提醒面板
+    if(sellAlerts.length > 0 || arr.some(function(p){var c=_pfGetQuote(p.code,p.market);return c&&(c-p.price)/p.price*100<=-5;})){
+      h+='<div style="margin-top:10px;padding:12px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;">';
+      h+='<div style="font-weight:600;font-size:13px;color:#fca5a5;margin-bottom:6px;">🔔 卖出提醒</div>';
+      if(sellAlerts.length > 0){
+        sellAlerts.forEach(function(a){ h+='<div style="font-size:12px;color:#fca5a5;padding:2px 0;">• '+a+'</div>'; });
+      } else {
+        h+='<div style="font-size:11px;color:var(--dim);">有持仓浮亏超5%，请密切关注</div>';
+      }
+      h+='<div style="font-size:10px;color:var(--dim);margin-top:6px;">止损线 '+STOP_LOSS_PCT+'% · 止盈线 '+TAKE_PROFIT_PCT+'% · 回撤警戒 '+DRAWDOWN_ALERT+'%</div>';
+      h+='</div>';
     }
+    // 图例说明
+    h+='<div style="margin-top:8px;font-size:10px;color:var(--dim);display:flex;flex-wrap:wrap;gap:8px;">';
+    h+='<span>🔴=触发止损</span><span>🟢=触及止盈</span><span>🟡=高位回撤</span><span>⚠️=接近止损</span>';
+    h+='<span>最高/最低=持仓期间极值</span>';
+    h+='</div>';
     h+='</div>';
     el.innerHTML=h;
   };
