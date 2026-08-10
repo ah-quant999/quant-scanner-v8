@@ -2645,6 +2645,9 @@ def main(category=None, only=None):
     # 🔧 盘中额外补抓 CRISIS_DATA（危机温度计实时刷新，盘前仅一次不够）
     if category == "intraday" and target_vars is not None:
         target_vars.add("CRISIS_DATA")
+    # 🔧 盘中额外补抓 MARKET_FUND_FLOW_DATA（任务看板期望每 30 分钟刷新，否则会被判 stale）
+    if category == "intraday" and target_vars is not None:
+        target_vars.add("MARKET_FUND_FLOW_DATA")
 
     if only:
         print("  ⏭️ --only 模式，跳过 raw_data 清理（保留其他时段数据）")

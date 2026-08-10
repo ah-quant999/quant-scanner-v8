@@ -258,9 +258,10 @@ def _urlopen_retry(req_or_url, timeout=15, max_retries=None):
 # ─────────────────────────────────────────────────────────────────────────────
 # 自愈（detect-and-heal）：发现可修复的数据陈腐，主动派发对应类别刷新，而非只发邮件
 # ─────────────────────────────────────────────────────────────────────────────
-CN_WORKFLOW_ID = 327687211  # v8_cn_fetch_cloud workflow id（云端 ubuntu 主力，用于 API 派发刷新）
-HEAL_DEBOUNCE_MIN = 25       # 同一类别最小派发间隔，避免每小时巡检重复触发
-ALERT_OVERDUE_MIN = 120      # 与 send_report_email 一致的「值得处理」阈值（分钟）
+CN_WORKFLOW_ID = 327687211        # v8_cn_fetch_cloud workflow id（云端 ubuntu 主力，用于 API 派发刷新）
+BUILD_DEPLOY_WORKFLOW_ID = 324135263  # ☁️ v8 构建部署(云端ubuntu) workflow id
+HEAL_DEBOUNCE_MIN = 25           # 同一类别最小派发间隔，避免每小时巡检重复触发
+ALERT_OVERDUE_MIN = 120          # 与 send_report_email 一致的「值得处理」阈值（分钟）
 
 # 卡片分组 -> 刷新类别映射（与 cloud_fetch_v8.py / update_v8.py 的 CATEGORY_MAP 对应）
 PAGE_TO_CAT = {
@@ -293,6 +294,99 @@ def _dispatch_cn_fetch(cat):
         return False, f"派发异常: {e}"
 
 
+def _dispatch_build_deploy():
+    """经 GitHub API 派发 v8_build_deploy，触发 Pages 重新构建部署。"""
+    token = _load_token()
+    if not token:
+        return False, "无 GitHub token，无法派发"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{BUILD_DEPLOY_WORKFLOW_ID}/dispatches"
+    data = json.dumps({"ref": "main"}).encode("utf-8")
+    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return True, f"已派发 build_deploy (HTTP {r.status})"
+    except urllib.error.HTTPError as e:
+        return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
+    except Exception as e:
+        return False, f"派发异常: {e}"
+
+
+def _heal_local_sync():
+    """尝试让本地 HEAD 与 origin/main 对齐（fetch + ff-only，必要时 stash）。"""
+    try:
+        subprocess.run(["git", "fetch", "origin"], check=True, capture_output=True, text=True, timeout=60)
+        local = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, timeout=10).strip()
+        remote = subprocess.check_output(["git", "rev-parse", "origin/main"], text=True, timeout=10).strip()
+        if local == remote:
+            return True, f"本地已与 origin/main 同步 ({local[:7]})"
+        try:
+            behind = int(subprocess.check_output(
+                ["git", "rev-list", "--count", f"{local}..{remote}"],
+                text=True, timeout=10
+            ).strip())
+        except Exception:
+            return False, "无法判断本地与 origin/main 的祖先关系"
+        if behind == 0:
+            return False, f"本地 ({local[:7]}) 领先/分歧于 origin/main ({remote[:7]})，需人工处理"
+        # 工作树若脏，先 stash 再 ff-only，最后 pop
+        dirty = subprocess.run(
+            ["git", "status", "--porcelain"], capture_output=True, text=True, timeout=10
+        ).stdout.strip()
+        if dirty:
+            subprocess.run(["git", "stash", "push", "-m", "v8_health_check auto-stash"],
+                           check=True, capture_output=True, text=True, timeout=30)
+        subprocess.run(["git", "merge", "--ff-only", "origin/main"], check=True,
+                       capture_output=True, text=True, timeout=30)
+        if dirty:
+            try:
+                subprocess.run(["git", "stash", "pop"], check=False, capture_output=True, text=True, timeout=30)
+            except Exception:
+                pass
+        return True, f"本地已从 {local[:7]} ff 对齐到 origin/main {remote[:7]}"
+    except subprocess.CalledProcessError as e:
+        return False, f"git 命令失败: {e.stderr.strip()[:200]}"
+    except Exception as e:
+        return False, f"异常: {e}"
+
+
+def _heal_site_sync():
+    """先同步本地，再检查线上 Pages SHA；如仍不一致则派发 build_deploy。"""
+    local_ok, local_msg = _heal_local_sync()
+    if not local_ok:
+        return False, f"本地同步失败: {local_msg}"
+    try:
+        remote = subprocess.check_output(["git", "rev-parse", "origin/main"], text=True, timeout=10).strip()
+    except Exception as e:
+        return False, f"无法读取 origin/main: {e}"
+    deployments = api_get(f"https://api.github.com/repos/{REPO}/deployments?environment=github-pages&per_page=1")
+    if not isinstance(deployments, list) or not deployments:
+        return False, "无法从 GitHub API 获取 Pages 部署 SHA"
+    site_sha = deployments[0].get("sha", "")
+    if not site_sha:
+        return False, "GitHub API 返回的部署 SHA 为空"
+    if remote.startswith(site_sha) or site_sha.startswith(remote):
+        return True, f"Pages 已同步 ({site_sha[:7]} == origin/main {remote[:7]})"
+    # 防抖动：25 分钟内不重复派发
+    lock = _load_heal_lock()
+    now = now_cst()
+    last = lock.get("build_deploy")
+    if last:
+        last_dt = parse_time(last)
+        if last_dt and (now - last_dt).total_seconds() < HEAL_DEBOUNCE_MIN * 60:
+            return True, f"近 {HEAL_DEBOUNCE_MIN} 分钟内已派发 build_deploy，跳过重复"
+    ok, dmsg = _dispatch_build_deploy()
+    if ok:
+        lock["build_deploy"] = now.strftime("%Y-%m-%d %H:%M:%S")
+        _save_heal_lock(lock)
+        return True, f"已派发 build_deploy ({dmsg})"
+    return False, f"派发 build_deploy 失败: {dmsg}"
+
+
 def _heal_lock_path():
     return DATA_DIR / ".heal_dispatch.json"
 
@@ -314,42 +408,30 @@ def _save_heal_lock(lock):
 
 
 def self_heal(report):
-    """发现可自愈的数据陈腐问题时，主动派发对应类别刷新。
+    """发现可自愈的问题时主动修复：数据卡片派发对应类别刷新；管线/部署同步自动对齐。
 
     返回 (healed, failed) 两个文案列表：
-      - healed: 已自动派发刷新 / 近期已派发跳过重复
+      - healed: 已自动派发刷新 / 近期已派发跳过重复 / 已自动对齐
       - failed: 派发失败（需人工）
     同时给 report["items"] 中对应卡片打上 heal 标记（供前端展示「已自动修复」）。
-
-    仅处理「数据卡片」（实时数据/今日事件/盘后数据/选股策略）的陈腐；
-    管线类检查（本地/部署同步）不属于此处自愈范围，交给看门狗统一处理。
     """
     healed, failed = [], []
-    if report.get("overall") == "ok":
-        return healed, failed
+    lock = _load_heal_lock()
+    now = now_cst()
 
-    stale = [it for it in report["items"]
-             if it.get("status") == "fail"
-             and (
-                 (it.get("age_min") is not None and it["age_min"] >= ALERT_OVERDUE_MIN)
-                 or it.get("premarket_cleared") is True
-             )]
-    if not stale:
-        return healed, failed
+    # 所有 fail 项（数据卡片 + 管线类）
+    fail_items = [it for it in report["items"] if it.get("status") == "fail"]
 
-    # 按刷新类别归集（仅数据卡片）
+    # 1) 数据卡片自愈：满足年龄阈值或被异常清空
+    stale = [it for it in fail_items
+             if (it.get("age_min") is not None and it["age_min"] >= ALERT_OVERDUE_MIN)
+             or it.get("premarket_cleared") is True]
     cat_items = {}
     for it in stale:
         cat = PAGE_TO_CAT.get(it.get("page"))
-        if not cat:
-            continue  # 非数据卡片（管线类），交给看门狗
-        cat_items.setdefault(cat, []).append(it)
+        if cat:
+            cat_items.setdefault(cat, []).append(it)
 
-    if not cat_items:
-        return healed, failed
-
-    lock = _load_heal_lock()
-    now = now_cst()
     for cat, items in cat_items.items():
         names = [it.get("name", "") for it in items]
         last = lock.get(cat)
@@ -371,6 +453,27 @@ def self_heal(report):
             failed.append(f"[{cat}] {', '.join(names)}: 自动派发失败 ({dmsg})")
             for it in items:
                 it["heal"] = f"自愈失败: {dmsg}"
+
+    # 2) 管线类自愈：本地同步 / Pages 部署同步
+    for it in fail_items:
+        iid = it.get("id")
+        if iid == "local_sync":
+            ok, dmsg = _heal_local_sync()
+            if ok:
+                healed.append(f"[管线] {it['name']}: {dmsg}")
+                it["heal"] = f"已自动对齐: {dmsg}"
+            else:
+                failed.append(f"[管线] {it['name']}: {dmsg}")
+                it["heal"] = f"自愈失败: {dmsg}"
+        elif iid == "site_sync":
+            ok, dmsg = _heal_site_sync()
+            if ok:
+                healed.append(f"[管线] {it['name']}: {dmsg}")
+                it["heal"] = f"已自动处理: {dmsg}"
+            else:
+                failed.append(f"[管线] {it['name']}: {dmsg}")
+                it["heal"] = f"自愈失败: {dmsg}"
+
     _save_heal_lock(lock)
     return healed, failed
 
