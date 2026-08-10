@@ -9489,7 +9489,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var totalPct=totalCost>0?totalPnl/totalCost*100:0;
     h+='<div style="margin-top:10px;padding:10px;background:rgba(255,255,255,.04);border-radius:8px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:12px;">';
     h+='<span>持仓 <b>'+arr.length+'</b> 只</span>';
-    h+='<span>总成本 <b>'+totalCost.toFixed(0)</b></span>';
+    h+='<span>总成本 <b>'+totalCost.toFixed(0)+'</b></span>';
     h+='<span style="color:'+(totalPnl>=0?'var(--up)':'var(--down)')+';">总盈亏 <b>'+(totalPnl>=0?'+':'')+totalPnl.toFixed(0)+'</b> ('+(totalPct>=0?'+':'')+totalPct.toFixed(2)+'%)</span>';
     h+='</div>';
     // 止损提醒
