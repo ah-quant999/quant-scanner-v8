@@ -5200,65 +5200,38 @@ function switchSec(sec,el){
     if (sl && Array.isArray(sl.data)) return sl.data;
     return [];
   }
-  function findStocks(q, limit=8){
+  // 2026-08-11 一劳永逸：统一搜索内核（拼音/代码/名称），所有搜索入口复用此函数
+  function _uniSearch(q, limit){
     const list = stockListArray();
-    if(!q) return [];
-    const qc = normCode(q);
-    const ql = q.toLowerCase();
+    if(!q || !list.length) return [];
+    const qc = normCode(q), ql = q.toLowerCase();
     const isAlphaOnly = qc === '' && ql.length > 0;
-    // 打分排序：py前缀=4, py子串=3, name子串=2, code前缀=1, full_code子串=1
     const scored = [];
     for(let i=0;i<list.length;i++){
       const s=list[i]; if(!s||!s.code||!s.name) continue;
       const sc=normCode(s.code), sn=s.name.toLowerCase(), py=(s.py||'').toLowerCase(), fc=(s.full_code||'').toLowerCase();
       let score=0;
       if(isAlphaOnly){
-        // 纯字母搜索：拼音优先，不靠code空串匹配
-        if(py===ql) score=5;
-        else if(py.indexOf(ql)===0) score=4;
-        else if(py.indexOf(ql)!==-1) score=3;
-        else if(sn.indexOf(ql)!==-1) score=2;
+        if(py===ql) score=5; else if(py.indexOf(ql)===0) score=4;
+        else if(py.indexOf(ql)!==-1) score=3; else if(sn.indexOf(ql)!==-1) score=2;
         else if(fc.indexOf(ql)!==-1) score=1;
       } else {
-        if(sc===qc) score=4;
-        else if(sc.indexOf(qc)===0) score=3;
-        if(sn.indexOf(ql)!==-1) score=Math.max(score,2);
-        if(fc.indexOf(ql)!==-1) score=Math.max(score,1);
-        if(py.indexOf(ql)!==-1) score=Math.max(score, py===ql?5:py.indexOf(ql)===0?4:3);
-      }
-      if(score>0) scored.push({s,score,idx:i});
-    }
-    scored.sort((a,b)=>b.score-a.score||a.idx-b.idx);
-    return scored.slice(0,limit).map(x=>x.s);
-  }
-  function findOne(q){
-    const list = stockListArray();
-    const qc = normCode(q);
-    const ql = q.toLowerCase();
-    const isAlphaOnly = qc === '' && ql.length > 0;
-    // 精确匹配
-    let exact = list.find(s=>{
-      if(!s||!s.code||!s.name) return false;
-      return normCode(s.code)===qc || s.name===q || s.name.toLowerCase()===ql || (isAlphaOnly && (s.py||'').toLowerCase()===ql);
-    });
-    if(exact) return exact;
-    // 模糊匹配（打分取最高）
-    let best=null, bestScore=-1;
-    for(let i=0;i<list.length;i++){
-      const s=list[i]; if(!s||!s.code||!s.name) continue;
-      const sc=normCode(s.code), sn=s.name.toLowerCase(), py=(s.py||'').toLowerCase(), fc=(s.full_code||'').toLowerCase();
-      let score=0;
-      if(isAlphaOnly){
-        if(py.indexOf(ql)===0) score=4; else if(py.indexOf(ql)!==-1) score=3;
-        else if(sn.indexOf(ql)!==-1) score=2; else if(fc.indexOf(ql)!==-1) score=1;
-      } else {
-        if(sc.indexOf(qc)===0) score=3;
+        if(sc===qc) score=4; else if(sc.indexOf(qc)===0) score=3;
         if(sn.indexOf(ql)!==-1) score=Math.max(score,2);
         if(py.indexOf(ql)!==-1) score=Math.max(score,3);
+        if(fc.indexOf(ql)!==-1) score=Math.max(score,1);
       }
-      if(score>bestScore){ bestScore=score; best=s; }
+      if(score>0) scored.push({s, score, idx:i});
     }
-    return best;
+    scored.sort((a,b)=>b.score-a.score||a.idx-b.idx);
+    return scored.slice(0,limit||8).map(x=>x.s);
+  }
+  window._uniSearch = _uniSearch;
+  function findStocks(q, limit=8){ return _uniSearch(q, limit); }
+  // 2026-08-11 一劳永逸：复用统一搜索内核
+  function findOne(q){
+    const results = _uniSearch(q, 1);
+    return results.length ? results[0] : null;
   }
 
   window.showV8QueryDropdown = function(val){
@@ -7424,7 +7397,12 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         '</tbody></table>'+
       '</div>';
 
-    el.innerHTML = runnerHtml + freshHtml + extHtml;
+    // 2026-08-11 主人令：文件新鲜度 + 外部数据源改为并排双列布局
+    el.innerHTML = runnerHtml +
+      '<div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;">'+
+        '<div style="flex:1;min-width:280px;">'+freshHtml+'</div>'+
+        '<div style="flex:1;min-width:280px;">'+extHtml+'</div>'+
+      '</div>';
 
     // 2026-08-10 小九：接入孤儿数据源（RISK_GAUGE / WEEKEND_RUN / WEEKEND_META_REPORT）
     try {
@@ -9155,17 +9133,16 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
   /* ===== 🧪 实验：个股全站综合诊断（2026-08-10 主人令·暂未上架实验区） ===== */
   // 拼音下拉联想（复用 STOCK_LIST + FINAL_RECOMMEND_DATA 港股补充）
+  // 2026-08-11 一劳永逸：复用 window._uniSearch 统一搜索内核（个股查询 IIFE 已暴露）
   window.showDiagDropdown = function(q){
     var dd=document.getElementById('stockDiagDropdown'); if(!dd)return;
     if(!q||q.length<1){dd.style.display='none';return;}
-    var list=window.STOCK_LIST; if(Array.isArray(list)){} else if(list&&Array.isArray(list.data))list=list.data; else list=[];
-    var ql=q.toLowerCase(), hits=[];
-    for(var i=0;i<list.length&&hits.length<12;i++){var s=list[i]; if(!s||!s.code)continue;
-      var py=(s.py||'').toLowerCase(), sn=s.name.toLowerCase();
-      if(py.indexOf(ql)===0||sn.indexOf(ql)!==-1||(s.code||'').indexOf(ql)!==-1)hits.push(s);
-    }
-    if(hits.length<12){var fr=window.FINAL_RECOMMEND_DATA; if(fr&&fr.stocks){for(var j=0;j<fr.stocks.length&&hits.length<12;j++){var r=fr.stocks[j]; if(!r||!r.name)continue;
-      var rn=r.name.toLowerCase(), rc=(r.code||'').toLowerCase(), rpy=(r.py||'').toLowerCase();
+    var hits = [];
+    // 优先用统一搜索内核（覆盖 STOCK_LIST 全量 A 股）
+    if(window._uniSearch) hits = window._uniSearch(q, 12);
+    // 补充 FINAL_RECOMMEND_DATA 中的港股等 STOCK_LIST 未覆盖标的
+    if(hits.length < 12){var fr=window.FINAL_RECOMMEND_DATA; if(fr&&fr.stocks){for(var j=0;j<fr.stocks.length&&hits.length<12;j++){var r=fr.stocks[j]; if(!r||!r.name)continue;
+      var rn=r.name.toLowerCase(), rc=(r.code||'').toLowerCase(), rpy=(r.py||'').toLowerCase(), ql=q.toLowerCase();
       if(rn.indexOf(ql)!==-1||rc.indexOf(ql)!==-1||rpy.indexOf(ql)===0){
         var dup=false; for(var di=0;di<hits.length;di++){if(hits[di].code===r.code){dup=true;break;}}
         if(!dup)hits.push({code:r.code,name:r.name,full_code:(r.market||'hk')+r.code,py:rpy||'',market:r.market||'hk',board:r.board||'港股'});
@@ -9191,15 +9168,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     function fmtNum(n,d){ d=d==null?2:d; if(n==null)return '-'; var v=Number(n); return isNaN(v)?'-':v.toFixed(d); }
     function fmtPct(n){ if(n==null)return '-'; var v=Number(n); if(isNaN(v))return '-'; return (v>=0?'+':'')+v.toFixed(2)+'%'; }
     function fmtYi(n){ if(n==null)return '-'; var v=Number(n); if(isNaN(v))return '-'; if(Math.abs(v)>=10000)return (v/10000).toFixed(2)+'亿'; return v.toFixed(0)+'万'; }
-    // 模糊匹配（复用 STOCK_LIST）
-    var list=window.STOCK_LIST; if(Array.isArray(list)){} else if(list&&Array.isArray(list.data))list=list.data; else list=[];
-    var qc=normCode(q), ql=q.toLowerCase(), isA=(qc===''&&ql.length>0), item=null, best=-1;
-    for(var i=0;i<list.length;i++){var s=list[i]; if(!s||!s.code||!s.name)continue;
-      var sc=normCode(s.code), sn=s.name.toLowerCase(), py=(s.py||'').toLowerCase(), fc=(s.full_code||'').toLowerCase(), sc2=0;
-      if(isA){ if(py===ql)sc2=5; else if(py.indexOf(ql)===0)sc2=4; else if(py.indexOf(ql)!==-1)sc2=3; else if(sn.indexOf(ql)!==-1)sc2=2; else if(fc.indexOf(ql)!==-1)sc2=1; }
-      else { if(sc===qc)sc2=4; else if(sc.indexOf(qc)===0)sc2=3; if(sn.indexOf(ql)!==-1)sc2=Math.max(sc2,2); if(fc.indexOf(ql)!==-1)sc2=Math.max(sc2,1); if(py.indexOf(ql)!==-1)sc2=Math.max(sc2,py===ql?5:py.indexOf(ql)===0?4:3); }
-      if(sc2>best && sc2>0){best=sc2;item=s;}
-    }
+    // 2026-08-11 一劳永逸：复用统一搜索内核
+    var item = null;
+    if(window._uniSearch) item = window._uniSearch(q, 1)[0] || null;
     // fallback：FINAL_RECOMMEND_DATA 中的港股等 STOCK_LIST 未覆盖标的
     if(!item){var fr=window.FINAL_RECOMMEND_DATA; if(fr&&fr.stocks){for(var fi=0;fi<fr.stocks.length;fi++){var r=fr.stocks[fi]; if(!r||!r.name)continue;
       var rn=r.name.toLowerCase(), rc=normCode(r.code||''), rpy=(r.py||'').toLowerCase(), fsc2=0;
@@ -10469,14 +10440,21 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if(runInfo.show){
         badgeText = runInfo.label.replace('已跑完','已计算').replace(' 已跑',' 已计算');
       } else {
-        // 2026-08-09：_runBadgeInfo 失败时也从 calc_date/update_time 抠出日期，绝不再显示无日期「已计算」
-        var rawDate = D.calc_date || time || '';
+        // 2026-08-09/11：多层日期兜底，绝不再显示无日期「已计算」
+        var rawDate = D.calc_date || D.update_time || time || '';
         var extracted = window._extractDateStr ? window._extractDateStr(rawDate) : '';
+        if(!extracted){ try{ extracted = String(rawDate).match(/\d{4}-\d{2}-\d{2}/)?String(rawDate).match(/\d{4}-\d{2}-\d{2}/)[0]:''; }catch(e){} }
         if(extracted){
           var parts = window._cstParts ? window._cstParts(new Date()) : null;
           var todayStr = parts ? (String(parts.y)+'-'+String(parts.m).padStart(2,'0')+'-'+String(parts.d).padStart(2,'0')) : '';
           if(extracted === todayStr) badgeText = '✅ 今日已计算';
           else badgeText = '✅ '+extracted.slice(5)+' 已计算';
+        } else {
+          // 最终兜底：用 HEALTH_CHECK 或当前日期
+          var hc = window.HEALTH_CHECK || {}, hcDate = '';
+          try{ var hcIt=(hc.items||[]).find(function(x){return (x||{}).id==='STOCK_RPS'}); if(hcIt&&hcIt.last_update) hcDate=hcIt.last_update.slice(0,10); }catch(e){}
+          if(hcDate){ var tp=window._cstParts?window._cstParts(new Date()):null; var tStr=tp?(tp.y+'-'+String(tp.m).padStart(2,'0')+'-'+String(tp.d).padStart(2,'0')):''; badgeText = (hcDate===tStr?'✅ 今日':'✅ '+hcDate.slice(5))+' 已计算'; }
+          else badgeText = '✅ 已计算（日期未知）';
         }
       }
       badge.textContent = badgeText;
