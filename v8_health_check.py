@@ -72,6 +72,7 @@ CARD_DEFS = [
     {"id": "MARKET_ALERTS", "name": "市场预警", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["indices"]},
     # 盘后数据
     {"id": "SH_FIB", "name": "市场温度计", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"]},
+    {"id": "SIX_DIM_RADAR", "name": "六维共振雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"], "_source_file": "SH_FIB", "_window_var": "SH_FIB"},  # 与市场温度计同源(SH_FIB.js)，前端独立卡片展示六维评分视图
     {"id": "MARGIN_DATA", "name": "融资融券", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["sh"]},
     {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["items"]},
     {"id": "CRISIS_DATA", "name": "危机雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["currency", "global"]},
@@ -605,7 +606,8 @@ def check_data_cards():
     results = []
     today_str = now_cst().strftime("%Y-%m-%d")
     for d in CARD_DEFS:
-        path = DATA_DIR / f"{d['id']}.js"
+        source_id = d.get("_source_file") or d["id"]
+        path = DATA_DIR / f"{source_id}.js"
         var_name = d.get("_window_var") or d["id"]
         data = load_window_var(path, var_name)
         if data is None:
