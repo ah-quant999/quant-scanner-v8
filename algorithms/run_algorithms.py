@@ -62,11 +62,14 @@ ORDER = [
     "fetch_sector_rs.py",
     "fetch_lhb.py",
     "calc_crds.py",
-    "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool
+    "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
+    "calc_stock_rps.py",               # → data/STOCK_RPS.js（个股RPS+RS，读 candidate.json 做 universe）
     "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
     "backtest_tdx.py",                 # 读 gold_pool 输入
     "backtest_comprehensive.py",       # 读 raw_data/history/top10_daily_YYYYMMDD.json（必须在 generate_top10 之后）
     "cockpit_backtest_now.py",         # 读 raw_data/history/top10_daily_YYYYMMDD.json（必须在 generate_top10 之后）
+    "export_optimized_strategy.py",    # → raw_data/optimized_strategy.json（读 backtest_tdx.json 汇总优化策略效果）
+    "strategy_four_volume_60m.py",     # → data/FOUR_VOLUME_60M.js（四量终极60min版，baostock独立数据源）
     "gen_cockpit_tier_recommend.py",   # 读 scan_result 输入
     "gen_cockpit_tier_recommend.py",   # 读 scan_result 输入
     "gen_cockpit_advice.py",           # 读 backtest_tdx
@@ -81,6 +84,12 @@ ORDER = [
     "fetch_orphan_market_alerts.py",    # → raw_data/market_alerts.json
     "fetch_orphan_nt_data.py",          # → raw_data/nt_data.json
     "fetch_orphan_sector_fund_flow.py", # → raw_data/sector_fund_flow_trend.json (+ history 累加)
+    # ── 最终推荐（2026-08-10 补入：之前缺失导致 FINAL_RECOMMEND_DATA 等永远不刷新）──
+    # final_recommend.py 是整条管线的最终汇聚点，必须排在所有上游之后：
+    #   输入 = triple_consensus + cockpit_tier + top10_daily + crds + lhb + sector_rs +
+    #          crisis_data + cockpit_backtest + triple_track + four_volume_60m + stock_profile
+    #   输出 = raw_data/final_recommend.json + data/FINAL_RECOMMEND_DATA.js（Top3 + 全量推荐池）
+    "final_recommend.py",              # → FINAL_RECOMMEND_DATA.js（跨策略共振 Top3，管线最终产物）
 ]
 
 

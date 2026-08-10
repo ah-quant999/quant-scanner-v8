@@ -106,9 +106,22 @@ def _content_ts(content: bytes):
 
 
 def walk_extra():
-    """额外推送文件（不在 raw_data/，但由抓取脚本直接写 data/，如四量终极选股结果）。"""
+    """额外推送文件（不在 raw_data/，但由算法脚本直接写 data/）。
+
+    2026-08-10 补入：final_recommend / calc_stock_rps / strategy_four_volume_60m /
+    export_optimized_strategy 等脚本直接写 data/*.js 或 raw_data/*.json，
+    需在此注册才能被 api_push 推送到 main。
+    """
     out = {}
-    extra = ["data/FOUR_VOLUME.js", "data/STOCK_STOP_DATA.js"]
+    extra = [
+        "data/FOUR_VOLUME.js",          # 四量终极日线版（gen_triple_consensus 产出）
+        "data/STOCK_STOP_DATA.js",      # ATR止损止盈（gen_stock_stop 产出）
+        # ── 2026-08-10 补入：之前缺失导致这些文件永远不刷新 ──
+        "data/FINAL_RECOMMEND_DATA.js", # 跨策略共振 Top3（final_recommend.py 产出）
+        "data/STOCK_RPS.js",            # 个股相对强度 RPS+RS（calc_stock_rps.py 产出）
+        "data/FOUR_VOLUME_60M.js",      # 四量终极60min版（strategy_four_volume_60m.py 产出）
+        # optimized_strategy.json 在 raw_data/，由 walk_raw() 自动覆盖
+    ]
     for rel in extra:
         if os.path.isfile(rel):
             with open(rel, "rb") as fh:
@@ -133,7 +146,11 @@ def main():
     existing = {}
     tfull = api("GET", f"/repos/{REPO}/git/trees/{base_tree}?recursive=1")
     for e in tfull.get("tree", []):
-        if (e["path"].startswith("raw_data/") or e["path"] == "data/FOUR_VOLUME.js" or e["path"] == "data/STOCK_STOP_DATA.js") and e["type"] == "blob":
+        if (e["path"].startswith("raw_data/")
+            or e["path"] in ("data/FOUR_VOLUME.js", "data/STOCK_STOP_DATA.js",
+                              "data/FINAL_RECOMMEND_DATA.js", "data/STOCK_RPS.js",
+                              "data/FOUR_VOLUME_60M.js")
+            ) and e["type"] == "blob":
             existing[e["path"]] = e["sha"]
 
     # 上传 blobs（幂等：内容相同则 sha 相同）
