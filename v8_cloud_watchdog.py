@@ -428,11 +428,18 @@ def write_urgent(reason_lines):
     print(f"[INFO] 已写紧急文件 {p}")
 
 
-def run_health_check(alert=False):
-    """调用 v8_health_check.py 做完整前端健康检查。"""
+def run_health_check(alert=False, heal=True):
+    """调用 v8_health_check.py 做完整前端健康检查 + 自动治愈。
+
+    heal 默认 True：确保看门狗每次巡检都触发 self_heal（发现 fail 卡片即派发刷新），
+    不再依赖 v8_health_check.py 的 --heal 默认值。2026-08-10 修复：此前未显式传 --heal，
+    导致本机看门狗那路自愈形同虚设，运维 stale 全靠人工看图才发现。
+    """
     cmd = [sys.executable, "v8_health_check.py"]
     if alert:
         cmd.append("--alert")
+    if heal:
+        cmd.append("--heal")
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=300)
         return result.returncode, result.stdout + result.stderr

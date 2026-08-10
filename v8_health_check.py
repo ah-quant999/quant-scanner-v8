@@ -260,6 +260,7 @@ def _urlopen_retry(req_or_url, timeout=15, max_retries=None):
 # ─────────────────────────────────────────────────────────────────────────────
 CN_WORKFLOW_ID = 327687211        # v8_cn_fetch_cloud workflow id（云端 ubuntu 主力，用于 API 派发刷新）
 BUILD_DEPLOY_WORKFLOW_ID = 324135263  # ☁️ v8 构建部署(云端ubuntu) workflow id
+ALGO_RUN_WORKFLOW_ID = 324119592      # ☁️ v8 盘后算法链(云端) workflow id（重新产出 FINAL_RECOMMEND 等）
 HEAL_DEBOUNCE_MIN = 25           # 同一类别最小派发间隔，避免每小时巡检重复触发
 ALERT_OVERDUE_MIN = 120          # 与 send_report_email 一致的「值得处理」阈值（分钟）
 
@@ -288,6 +289,28 @@ def _dispatch_cn_fetch(cat):
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
             return True, f"已派发 cn_fetch category={cat} (HTTP {r.status})"
+    except urllib.error.HTTPError as e:
+        return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
+    except Exception as e:
+        return False, f"派发异常: {e}"
+
+
+def _dispatch_algo_run():
+    """经 GitHub API 派发 v8 盘后算法链(云端)，重新产出 FINAL_RECOMMEND_DATA 等选股结果。"""
+    token = _load_token()
+    if not token:
+        return False, "无 GitHub token，无法派发"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{ALGO_RUN_WORKFLOW_ID}/dispatches"
+    data = json.dumps({"ref": "main"}).encode("utf-8")
+    req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return True, f"已派发 algo_run(盘后算法链) (HTTP {r.status})"
     except urllib.error.HTTPError as e:
         return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
     except Exception as e:
@@ -333,20 +356,19 @@ def _heal_local_sync():
             return False, "无法判断本地与 origin/main 的祖先关系"
         if behind == 0:
             return False, f"本地 ({local[:7]}) 领先/分歧于 origin/main ({remote[:7]})，需人工处理"
-        # 工作树若脏，先 stash 再 ff-only，最后 pop
+        # 工作树若脏：跳过自动对齐（禁止 stash/pop）。
+        # 2026-08-10 一劳永逸修复（861ff16 事故机制复现）：
+        # 原实现 stash → ff-only → stash pop，pop 冲突时 check=False 不中止，
+        # 把 <<<<<<< 冲突标记留在 data/*.js 工作区、index 变 UU，并被后续 push 上线。
+        # update_v8 生成 data/*.js 后必然工作区脏 → 此时 stash/pop 必冲突。
+        # 修复：脏则跳过对齐，由调用方自行 commit 后再同步；云端 build 工作区干净时仍正常 ff-only。
         dirty = subprocess.run(
             ["git", "status", "--porcelain"], capture_output=True, text=True, timeout=10
         ).stdout.strip()
         if dirty:
-            subprocess.run(["git", "stash", "push", "-m", "v8_health_check auto-stash"],
-                           check=True, capture_output=True, text=True, timeout=30)
+            return True, f"工作区有未提交改动（{len(dirty.splitlines())} 项），跳过自动对齐（防 stash/pop 冲突污染 data/*.js）"
         subprocess.run(["git", "merge", "--ff-only", "origin/main"], check=True,
                        capture_output=True, text=True, timeout=30)
-        if dirty:
-            try:
-                subprocess.run(["git", "stash", "pop"], check=False, capture_output=True, text=True, timeout=30)
-            except Exception:
-                pass
         return True, f"本地已从 {local[:7]} ff 对齐到 origin/main {remote[:7]}"
     except subprocess.CalledProcessError as e:
         return False, f"git 命令失败: {e.stderr.strip()[:200]}"
@@ -421,6 +443,27 @@ def self_heal(report):
 
     # 所有 fail 项（数据卡片 + 管线类）
     fail_items = [it for it in report["items"] if it.get("status") == "fail"]
+
+    # 0) 内容审计类自愈：最终推荐入选日期陈旧 → 派发盘后算法链重新产出
+    #    （这类问题不在 fail_items 内，需单独识别 message 含「陈旧」的项）
+    for it in report["items"]:
+        if it.get("id") == "final_enter_stale" and "陈旧" in (it.get("message") or ""):
+            last = lock.get("algo_run")
+            if last:
+                last_dt = parse_time(last)
+                if last_dt and (now - last_dt).total_seconds() < HEAL_DEBOUNCE_MIN * 60:
+                    healed.append(f"[algo] {it['name']}: 近 {HEAL_DEBOUNCE_MIN} 分钟内已派发，跳过重复")
+                    it["heal"] = "已自愈(跳过重复): 近窗口内已派发盘后算法链"
+                    continue
+            ok, dmsg = _dispatch_algo_run()
+            if ok:
+                healed.append(f"[algo] {it['name']}: 已自动派发盘后算法链重新产出 ({dmsg})")
+                it["heal"] = "已自动派发盘后算法链"
+                lock["algo_run"] = now.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                failed.append(f"[algo] {it['name']}: 自动派发失败 ({dmsg})")
+                it["heal"] = f"自愈失败: {dmsg}"
+    _save_heal_lock(lock)
 
     # 1) 数据卡片自愈：满足年龄阈值或被异常清空
     stale = [it for it in fail_items
@@ -1064,7 +1107,9 @@ def main():
 
     # ── 自愈（默认开）：发现可修复陈腐即尝试派发刷新，而非只发邮件 ──
     healed, failed = [], []
-    if args.heal and report["overall"] != "ok":
+    if args.heal:
+        # 2026-08-10 修复：移除对 overall 的依赖——只要 heal 开就跑 self_heal，
+        # 内部自行判断 fail 卡片 / 内容审计陈旧项，确保「任何可自愈问题都自动派发」。
         healed, failed = self_heal(report)
         for h in healed:
             print(f"  [HEAL✓] {h}")
