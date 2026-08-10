@@ -1085,7 +1085,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/HERDING_DATA.js?v=20260810081047"></script>
 <script src="data/VOLATILITY.js?v=20260810081558"></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=20260810090355"></script>
-<script src="data/SH_SZ_HISTORY.js?v=20260810090355"></script>
+<script src="data/SH_SZ_HISTORY.js?v=20260809110933"></script>
 <script src="data/MAHORO.js?v=20260810074437"></script>
 <script src="data/CANDIDATE.js?v=20260810080337"></script>
     <script src="data/FOUR_VOLUME.js?v=20260810090852"></script>
@@ -7310,6 +7310,28 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       '</div>';
 
     el.innerHTML = runnerHtml + freshHtml + extHtml;
+
+    // 2026-08-10 小九：接入孤儿数据源（RISK_GAUGE / WEEKEND_RUN / WEEKEND_META_REPORT）
+    try {
+      let extra = '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">';
+      const rg = window.RISK_GAUGE || {};
+      if (rg && rg.overall) {
+        const rgColor = rg.overall === 'red' ? 'var(--up)' : (rg.overall === 'yellow' ? 'var(--gold)' : 'var(--down)');
+        extra += '<div style="font-size:12px;font-weight:700;color:var(--txt);margin-bottom:6px;">🚨 风险温度计 <span style="font-size:10px;color:var(--dim);font-weight:400">' + _esc(rg.update_time || '') + '</span></div>';
+        const rgVerdict = (rg.verdict || '').slice(0, 90);
+        extra += '<div style="font-size:11px;color:' + rgColor + ';line-height:1.5;margin-bottom:6px;">● ' + _esc(rgVerdict) + '…</div>';
+      }
+      const wr = window.WEEKEND_RUN || {};
+      if (wr && wr.last_run) {
+        extra += '<div style="font-size:11px;color:var(--sub);margin-top:4px;">🗓️ 周末轻量维护：' + _esc(wr.last_run) + '（' + _esc(wr.weekday || '') + '）' + _esc(wr.note || '') + '</div>';
+      }
+      const wm = window.WEEKEND_META_REPORT || {};
+      if (wm && wm.update_time) {
+        extra += '<div style="font-size:11px;color:var(--sub);">📑 元数据巡检：' + _esc(wm.update_time) + ' · 全市场 ' + (wm.total || 0) + ' 只 · 新上市 ' + (wm.new_listings_count || 0) + ' · 退市 ' + (wm.delisted_count || 0) + '</div>';
+      }
+      extra += '</div>';
+      el.innerHTML += extra;
+    } catch (e) { console.warn('extra orphan-data render fail', e); }
 
     // 统一渲染文件新鲜度与上游诊断，并收集失败原因到底部 opDiagDetails
     try{ renderDataFreshness(); }catch(e){ console.warn('renderDataFreshness fail', e); }
