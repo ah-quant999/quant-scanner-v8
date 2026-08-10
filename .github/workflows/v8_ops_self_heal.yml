@@ -53,7 +53,7 @@ jobs:
           echo "=== DEBUG: python version ===" && python --version
           echo "=== DEBUG: git log ===" && git log --oneline -3
           echo "=== DEBUG: data/STOCK_RPS time ===" && grep -o '"update_time": *"[0-9-]*"' data/STOCK_RPS.js 2>/dev/null | head -1 || echo "NO STOCK_RPS"
-          python v8_health_check.py --heal --alert 2>&1 | tee heal_output.txt; echo "PYTHON_EXIT=$?"
+          python v8_health_check.py --heal 2>&1 | tee heal_output.txt; echo "PYTHON_EXIT=$?"
 
           # 提取自愈结果用于摘要
           HEALED=$(grep -c "\[HEAL✓\]" heal_output.txt 2>/dev/null || echo "0")
