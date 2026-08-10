@@ -1,1 +1,1 @@
-window.CONCEPT_RANKING = {"no_data":true,"premarket_cleared":true,"note":"盘前概念排名待开盘刷新","concepts":[],"update_time":"2026-08-10 08:59:06","republish_time":"2026-08-10 09:01:40"};
+window.CONCEPT_RANKING = {"no_data":true,"premarket_cleared":true,"note":"盘前概念排名待开盘刷新","concepts":[],"update_time":"2026-08-10 09:03:55","republish_time":"2026-08-10 09:05:34"};
