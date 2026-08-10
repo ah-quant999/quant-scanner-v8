@@ -7558,7 +7558,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
           {name:'驾驶舱', source:'COCKPIT_ADVICE', freq:'收盘后1次', slots:['18:30'], note:'驾驶舱A/B档建议'},
 
-          {name:'大牛股猎手', source:'BIG_BULL_HUNTER', freq:'收盘后1次', slots:['18:30'], note:'机游共振中线策略（派生自龙虎榜+机构买卖）'},
+          {name:'大牛股猎手', source:'LHB_DATA', freq:'收盘后1次', slots:['18:30'], note:'机游共振中线策略（派生自龙虎榜+机构买卖）'},
 
           {name:'全站精选', source:'TOP10_DAILY', freq:'收盘后1次', slots:['18:30'], note:'主站TOP10精选池'},
 
@@ -9110,6 +9110,18 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     }
     h+='</div></div>';
 
+    // === 🧪 实验：个股全站综合诊断（2026-08-10 主人令：先放暂未上架实验区） ===
+    h+='<div class="card" style="margin:16px 0;border-left:4px solid #7b1fa2;background:linear-gradient(135deg,rgba(123,31,162,.1),rgba(123,31,162,.03));">';
+    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">';
+    h+='<span style="font-size:15px;font-weight:700;color:#d0bcff;">🧪 个股全站综合诊断</span>';
+    h+='<span style="font-size:11px;color:var(--dim);">聚合 策略/资金/研报/回测/环境/基本面 → 0-100 综合分（实验·勿作为买卖依据）</span></div>';
+    h+='<div style="display:flex;gap:10px;margin-bottom:10px;">';
+    h+='<input id="stockDiagInput" placeholder="代码/拼音/名称，如 600519、zjxc、中际旭创" onkeydown="if(event.key===\'Enter\')doStockDiag()" style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:var(--card);color:var(--txt);box-sizing:border-box;" />';
+    h+='<button class="btn" onclick="doStockDiag()">综合诊断</button>';
+    h+='</div>';
+    h+='<div id="stockDiagResult"></div>';
+    h+='</div>';
+
     // === 暂未上架实验区 · 数据驱动卡（2026-08-08 主人令：今日可入手候选已迁入「最终推荐 · 今日推荐候选池」，此处不再重复渲染） ===
 
     // ── 🎭 情绪周期 · 连板天梯（合并紧凑版）已迁到实时数据区，见 window.__renderCycleLadderCard ──
@@ -9117,6 +9129,152 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     el.innerHTML=h;
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderUnlisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
   }
+
+  /* ===== 🧪 实验：个股全站综合诊断（2026-08-10 主人令·暂未上架实验区） ===== */
+  window.doStockDiag = function(){
+    var box=document.getElementById('stockDiagInput');
+    var res=document.getElementById('stockDiagResult');
+    if(!box||!res) return;
+    var q=(box.value||'').trim();
+    if(!q){ res.innerHTML='<div class="note">请输入代码/拼音/名称</div>'; return; }
+    function normCode(c){ return String(c||'').replace(/\D/g,'').replace(/^[shszSHSZ]+/,'').replace(/_/g,''); }
+    function fmtNum(n,d){ d=d==null?2:d; if(n==null)return '-'; var v=Number(n); return isNaN(v)?'-':v.toFixed(d); }
+    function fmtPct(n){ if(n==null)return '-'; var v=Number(n); if(isNaN(v))return '-'; return (v>=0?'+':'')+v.toFixed(2)+'%'; }
+    function fmtYi(n){ if(n==null)return '-'; var v=Number(n); if(isNaN(v))return '-'; if(Math.abs(v)>=10000)return (v/10000).toFixed(2)+'亿'; return v.toFixed(0)+'万'; }
+    // 模糊匹配（复用 STOCK_LIST）
+    var list=window.STOCK_LIST; if(Array.isArray(list)){} else if(list&&Array.isArray(list.data))list=list.data; else list=[];
+    var qc=normCode(q), ql=q.toLowerCase(), isA=(qc===''&&ql.length>0), item=null, best=-1;
+    for(var i=0;i<list.length;i++){var s=list[i]; if(!s||!s.code||!s.name)continue;
+      var sc=normCode(s.code), sn=s.name.toLowerCase(), py=(s.py||'').toLowerCase(), fc=(s.full_code||'').toLowerCase(), sc2=0;
+      if(isA){ if(py===ql)sc2=5; else if(py.indexOf(ql)===0)sc2=4; else if(py.indexOf(ql)!==-1)sc2=3; else if(sn.indexOf(ql)!==-1)sc2=2; else if(fc.indexOf(ql)!==-1)sc2=1; }
+      else { if(sc===qc)sc2=4; else if(sc.indexOf(qc)===0)sc2=3; if(sn.indexOf(ql)!==-1)sc2=Math.max(sc2,2); if(fc.indexOf(ql)!==-1)sc2=Math.max(sc2,1); if(py.indexOf(ql)!==-1)sc2=Math.max(sc2,py===ql?5:py.indexOf(ql)===0?4:3); }
+      if(sc2>best && sc2>0){best=sc2;item=s;}
+    }
+    if(!item){ res.innerHTML='<div class="note">未找到「'+q+'」，请检查代码或名称</div>'; return; }
+    var code=item.code, ncode=normCode(code);
+    var SQ=window.STOCK_QUOTE||{}; var sq=SQ.stocks||{};
+    var full=item.full_code||((item.market||'')+code);
+    var qo=sq[full]||sq[(item.market||'')+'_'+code]||sq[code];
+    function getProfile(){ var prof=null;
+      if(qo&&(qo.industry||qo.concepts)) prof={board:qo.board||item.board_label||'',industry:qo.industry||'-',concepts:qo.concepts||[]};
+      if(!prof){ var sp=window.STOCK_PROFILE||{}; var p=sp.profiles&&sp.profiles[code]; if(p)prof={board:p.board||'',industry:p.industry||'-',concepts:p.concepts||[]}; }
+      if(!prof){ var cd=window.CANDIDATE||{}; var st=cd.stocks||{}; var k=Object.keys(st).find(function(kk){return normCode(st[kk].code)===ncode;}); if(k)prof={board:st[k].board_label||'',industry:st[k].industry||'-',concepts:(st[k].concepts||[]).slice(0,10)}; }
+      return prof;
+    }
+    function findArr(arr){ return (arr||[]).find(function(r){return normCode(r.code)===ncode;}); }
+    function findObjKey(obj){ var st=obj||{}; return Object.keys(st).find(function(k){return normCode((st[k]||{}).code)===ncode;}); }
+    var rps=findArr((window.STOCK_RPS_DATA||{}).records);
+    var top=findArr((window.TOP10_DAILY||{}).top10);
+    var gpK=findObjKey((window.GOLD_POOL||{}).stocks);
+    var cdK=findObjKey((window.CANDIDATE||{}).stocks);
+    var cpA=findArr((window.COCKPIT_TIER_RECOMMEND||{}).tier_a);
+    var cpB=findArr((window.COCKPIT_TIER_RECOMMEND||{}).tier_b);
+    var crds=window.CRDS_CARD_DATA||{};
+    var fv=findArr((window.FOUR_VOLUME||{}).stocks);
+    var fv60=findArr((window.FOUR_VOLUME_60M||{}).stocks);
+    var lhb=findArr((window.LHB_DATA||{}).stocks);
+    var ar=findArr((window.ANALYST_RATINGS||{}).ratings);
+    var mah=window.MAHARO||{}; var mahRow=(mah.raw_signals||[]).find(function(r){return normCode(r.code)===ncode;});
+    var ca=findArr((window.COCKPIT_ADVICE||{}).watch);
+    var btd=window.BACKTEST_TDX||{};
+    var rg=window.RISK_GAUGE||{}; var crisis=window.CRISIS_DATA||{}; var judge=window.JUDGMENT_DATA||{};
+    var prof=getProfile()||{};
+    // ---- 六维打分 ----
+    var strategy={score:0,evi:[]};
+    if(top){strategy.score+=12; strategy.evi.push('三重共识 排名#'+top.rank+'（评'+top.total_score+'）');}
+    if(gpK){strategy.score+=8; strategy.evi.push('金股池 累计信号'+(((window.GOLD_POOL||{}).stocks[gpK]||{}).signal_count||0));}
+    if(cdK){strategy.score+=6; strategy.evi.push('候选池（'+(((window.CANDIDATE||{}).stocks[cdK]||{}).sources||[]).join('/')+'）');}
+    if(cpA){strategy.score+=10; strategy.evi.push('驾驶舱A档 评'+cpA.total_score);}
+    else if(cpB){strategy.score+=5; strategy.evi.push('驾驶舱B档 评'+cpB.total_score);}
+    if(rps){var t=rps.tier; if(t==='A')strategy.score+=10; else if(t==='B')strategy.score+=6; else if(t==='C')strategy.score+=2; strategy.evi.push('相对强度'+t+'档 RPSmax'+(rps.rps_max!=null?Number(rps.rps_max).toFixed(1):'-')+(rps.above_ma250?'·站上250日线':''));}
+    if(fv){strategy.score+=6; strategy.evi.push('四量终极（日线）');}
+    if(fv60){strategy.score+=5; strategy.evi.push('四量60分（'+(fv60.reason||'')+'）');}
+    if(findArr(crds.cond1_list)){strategy.score+=5; strategy.evi.push('逆势龙头·条件①');}
+    else if(findArr(crds.cond2_list)){strategy.score+=5; strategy.evi.push('逆势龙头·条件②');}
+    else if(findArr(crds.cond3_list)){strategy.score+=5; strategy.evi.push('逆势龙头·条件③');}
+    strategy.score=Math.min(strategy.score,30); strategy.max=30; strategy.label='策略共振';
+    var capital={score:0,evi:[]};
+    if(lhb){ if(lhb.inst_net_万>0){capital.score+=6; capital.evi.push('龙虎榜机构净买'+fmtYi(lhb.inst_net_万));} if(lhb.yz_net_万>0){capital.score+=4; capital.evi.push('游资净买'+fmtYi(lhb.yz_net_万));} }
+    var cons=(prof.concepts||[]).slice(0,8); var ind=prof.industry||'';
+    var cr=window.CONCEPT_RANKING||{}; var clist=cr.list||cr.ranking||cr.data||[];
+    cons.forEach(function(c){var row=clist.find(function(r){return (r.name||r.concept||'')===c;}); if(row&&row.net_inflow!=null){ if(Number(row.net_inflow)>=0)capital.score+=2; capital.evi.push('概念['+c+']'+(Number(row.net_inflow)>=0?'+':'')+fmtYi(row.net_inflow));}});
+    var sf=window.SECTOR_FUND_FLOW||{}; var sall=(sf.sectors_in||[]).concat(sf.sectors_out||[]);
+    if(ind){var srow=sall.find(function(r){var n=r.name||r.sector_name||''; return ind.indexOf(n)!==-1||n.indexOf(ind.replace(/.*业/,''))!==-1;}); if(srow&&srow.net!=null){ if(Number(srow.net)>=0)capital.score+=4; capital.evi.push('板块['+(srow.name||srow.sector_name)+']'+(Number(srow.net)>=0?'+':'')+fmtYi(srow.net)); }}
+    capital.score=Math.min(capital.score,18); capital.max=18; capital.label='资金面';
+    var research={score:0,evi:[]};
+    if(ar){research.score+=8; research.evi.push('分析师TOP推荐：'+ar.rating);}
+    if(mahRow){research.score+=4; research.evi.push('投行信号（maharo）');}
+    research.score=Math.min(research.score,12); research.max=12; research.label='研报投行';
+    var backtest={score:0,evi:[]};
+    if(ca){ if((ca.best_ret||0)>0)backtest.score+=6; if((ca.ret_5d||0)>0)backtest.score+=4; backtest.evi.push('历史信号('+ca.signal_date+') 最佳+'+Number(ca.best_ret).toFixed(1)+'%·5日'+(ca.ret_5d!=null?Number(ca.ret_5d).toFixed(1)+'%':'')); }
+    else { var tu=btd.summary&&btd.summary.trend_up; if(tu) backtest.evi.push('无个股回测样本·参考全市场上涨趋势5日胜率'+tu.win_rate_5d+'%（均收+'+tu.avg_return_5d+'%）'); }
+    backtest.score=Math.min(backtest.score,10); backtest.max=10; backtest.label='回测验证';
+    var market_env={score:0,evi:[]};
+    var ov=rg.overall||'';
+    if(ov==='green'){market_env.score+=15; market_env.evi.push('风险温度计：绿');}
+    else if(ov==='yellow'){market_env.score+=8; market_env.evi.push('风险温度计：黄');}
+    else {market_env.evi.push('风险温度计：红（外部风险偏高）');}
+    if(rg.verdict) market_env.evi.push(rg.verdict.slice(0,50));
+    var cscore=crisis.score!=null?Number(crisis.score):null;
+    if(cscore!=null){ if(cscore>50)market_env.score-=5; market_env.evi.push('危机雷达 '+cscore+'（'+(crisis.level||'')+'）'); }
+    var jcons=judge.consensus||judge.verdict||''; if(jcons)market_env.evi.push('今日判定：'+jcons);
+    market_env.score=Math.max(0,Math.min(market_env.score,15)); market_env.max=15; market_env.label='市场环境';
+    var fundamental={score:0,evi:[]};
+    var f=qo&&qo.fundamental||{};
+    if(f.grade==='A')fundamental.score+=15; else if(f.grade==='B')fundamental.score+=11; else if(f.grade==='C')fundamental.score+=7; else if(f.grade==='D')fundamental.score+=3;
+    if(f.grade) fundamental.evi.push('财务画像'+f.grade+'（分'+f.score+'）');
+    if(f.roe!=null){ var add=f.roe>=15?8:f.roe>=10?5:2; fundamental.score=Math.max(fundamental.score,add); if(!f.grade)fundamental.evi.push('ROE '+f.roe.toFixed(1)+'%'); }
+    fundamental.score=Math.min(fundamental.score,15); fundamental.max=15; fundamental.label='基本面';
+    var dims=[strategy,capital,research,backtest,market_env,fundamental];
+    var sum=0,wsum=0; dims.forEach(function(d){sum+=d.score;wsum+=d.max;});
+    var total=wsum>0?Math.round(sum/wsum*100):0;
+    var rating,rcolor,remoji;
+    if(total>=70){rating='强烈关注';rcolor='var(--up)';remoji='🟢';}
+    else if(total>=55){rating='关注';rcolor='var(--gold)';remoji='🟡';}
+    else if(total>=40){rating='中性';rcolor='#94a3b8';remoji='⚪';}
+    else {rating='回避/观望';rcolor='var(--down)';remoji='🔴';}
+    var reasonParts=[];
+    if(strategy.evi.length)reasonParts.push(strategy.evi[0]);
+    if(research.evi.length)reasonParts.push(research.evi[0]);
+    if(capital.evi.length)reasonParts.push(capital.evi[0]);
+    var risks=[];
+    if(ov==='red') risks.push('外部环境偏高风险');
+    if(cscore!=null&&cscore>50) risks.push('危机雷达'+cscore+'偏高');
+    if(qo&&qo.pct>=5) risks.push('当日已涨'+fmtPct(qo.pct)+'追高谨慎');
+    if(qo&&qo.pct<=-5) risks.push('当日已跌'+fmtPct(qo.pct)+'警惕破位');
+    var reason=(reasonParts.length?reasonParts.slice(0,3).join('；'):'无显著正向信号')+(risks.length?'；⚠️'+risks[0]:'');
+    var h='';
+    h+='<div style="padding:16px;border-radius:10px;background:linear-gradient(135deg,rgba(123,31,162,.14),rgba(94,224,160,.05));border:1px solid rgba(167,139,250,.3);margin-bottom:12px;">';
+    h+='<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">';
+    h+='<div style="text-align:center;"><div style="font-size:42px;font-weight:800;color:'+rcolor+';line-height:1;">'+total+'</div><div style="font-size:11px;color:var(--sub);">综合分 / 100</div></div>';
+    h+='<div style="flex:1;min-width:200px;">';
+    h+='<div style="font-size:18px;font-weight:700;color:var(--txt);">'+item.name+' <span style="font-size:12px;color:var(--dim);font-family:monospace;">'+full+'</span></div>';
+    h+='<div style="margin-top:4px;font-size:15px;font-weight:700;color:'+rcolor+';">'+remoji+' '+rating+'</div>';
+    h+='<div style="margin-top:6px;font-size:12px;color:var(--txt);line-height:1.6;">'+reason+'</div></div></div>';
+    h+='<div style="margin-top:14px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px 18px;">';
+    dims.forEach(function(d){
+      var pct=d.max>0?Math.round(d.score/d.max*100):0;
+      var col=pct>=70?'var(--up)':pct>=45?'var(--gold)':pct>=25?'#94a3b8':'var(--down)';
+      h+='<div><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-bottom:3px;"><span>'+d.label+'</span><span>'+d.score+'/'+d.max+'</span></div>';
+      h+='<div style="height:7px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;"><div style="width:'+pct+'%;height:100%;background:'+col+';border-radius:4px;"></div></div></div>';
+    });
+    h+='</div>';
+    h+='<div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">';
+    dims.forEach(function(d){
+      if(!d.evi.length)return;
+      h+='<div style="padding:8px 10px;background:rgba(255,255,255,.04);border-radius:6px;border-left:3px solid var(--border);">';
+      h+='<div style="font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:4px;">'+d.label+' · '+d.score+'/'+d.max+'</div>';
+      h+='<div style="font-size:11px;color:var(--sub);line-height:1.6;">'+d.evi.map(function(e){return '· '+e;}).join('<br>')+'</div>';
+      h+='</div>';
+    });
+    h+='</div>';
+    h+='<div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">';
+    h+='<button class="btn" onclick="selectV8QueryStock(\''+code+'\')">打开完整个股查询 →</button>';
+    h+='<span style="font-size:11px;color:var(--dim);">综合分基于 6 维加权；非候选股高级维度(RPS/四量)无数据→该项偏低，属正常信息缺失</span>';
+    h+='</div>';
+    h+='</div>';
+    res.innerHTML=h;
+  };
 
   /* ===== 情绪周期 · 连板天梯（实时数据区） ===== */
   function __renderCycleLadderCard(){
