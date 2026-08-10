@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-08-10 11:07:13",
+  "update_time": "2026-08-10 18:07:44",
   "range": [
     "2026-07-28",
-    "2026-08-07"
+    "2026-08-10"
   ],
   "days_count": 7,
   "daily_summary": [
@@ -55,12 +55,12 @@
       "north_present": 66
     },
     {
-      "date": "2026-08-07",
+      "date": "2026-08-10",
       "total": 40,
-      "resonance": 2,
-      "inst_only": 1,
-      "yz_only": 7,
-      "north_present": 31
+      "resonance": 0,
+      "inst_only": 2,
+      "yz_only": 8,
+      "north_present": 24
     }
   ],
   "top_inst_buy": [
@@ -147,6 +147,16 @@
       "resonance_days": 0
     },
     {
+      "code": "603228",
+      "name": "景旺电子",
+      "inst_net": -150650.5,
+      "yz_net": 46380.8,
+      "north_net": 24229.1,
+      "combined_net": -104269.7,
+      "days": 2,
+      "resonance_days": 0
+    },
+    {
       "code": "688783",
       "name": "西安奕材",
       "inst_net": -87139.8,
@@ -154,16 +164,6 @@
       "north_net": 0.0,
       "combined_net": -61223.0,
       "days": 1,
-      "resonance_days": 0
-    },
-    {
-      "code": "603986",
-      "name": "兆易创新",
-      "inst_net": -80820.2,
-      "yz_net": 36122.1,
-      "north_net": 17788.2,
-      "combined_net": -44698.1,
-      "days": 2,
       "resonance_days": 0
     }
   ],
@@ -175,6 +175,26 @@
       "yz_net": 196009.7,
       "north_net": 91922.9,
       "combined_net": -94486.1,
+      "days": 2,
+      "resonance_days": 0
+    },
+    {
+      "code": "002428",
+      "name": "云南锗业",
+      "inst_net": 14851.1,
+      "yz_net": 105971.6,
+      "north_net": 42477.3,
+      "combined_net": 120822.7,
+      "days": 1,
+      "resonance_days": 1
+    },
+    {
+      "code": "000636",
+      "name": "风华高科",
+      "inst_net": -18872.0,
+      "yz_net": 68552.8,
+      "north_net": -12844.2,
+      "combined_net": 49680.8,
       "days": 2,
       "resonance_days": 0
     },
@@ -197,26 +217,6 @@
       "combined_net": 181056.8,
       "days": 1,
       "resonance_days": 1
-    },
-    {
-      "code": "000636",
-      "name": "风华高科",
-      "inst_net": -20088.6,
-      "yz_net": 49662.0,
-      "north_net": -34740.6,
-      "combined_net": 29573.4,
-      "days": 1,
-      "resonance_days": 0
-    },
-    {
-      "code": "600584",
-      "name": "长电科技",
-      "inst_net": 0.0,
-      "yz_net": 43775.6,
-      "north_net": 2905.0,
-      "combined_net": 43775.6,
-      "days": 2,
-      "resonance_days": 0
     }
   ],
   "top_yz_sell": [
@@ -293,6 +293,16 @@
       "resonance_days": 0
     },
     {
+      "code": "002428",
+      "name": "云南锗业",
+      "inst_net": 14851.1,
+      "yz_net": 105971.6,
+      "north_net": 42477.3,
+      "combined_net": 120822.7,
+      "days": 1,
+      "resonance_days": 1
+    },
+    {
       "code": "300058",
       "name": "蓝色光标",
       "inst_net": 32127.3,
@@ -303,37 +313,17 @@
       "resonance_days": 1
     },
     {
-      "code": "002428",
-      "name": "云南锗业",
-      "inst_net": 31754.8,
-      "yz_net": 20738.1,
-      "north_net": 103242.9,
-      "combined_net": 52492.9,
-      "days": 2,
-      "resonance_days": 1
-    },
-    {
-      "code": "000831",
-      "name": "中国稀土",
-      "inst_net": 11162.9,
-      "yz_net": 39860.4,
-      "north_net": 12150.3,
-      "combined_net": 51023.3,
+      "code": "300418",
+      "name": "昆仑万维",
+      "inst_net": 45769.8,
+      "yz_net": 3253.0,
+      "north_net": 45380.7,
+      "combined_net": 49022.8,
       "days": 1,
-      "resonance_days": 1
+      "resonance_days": 0
     }
   ],
   "top_north_buy": [
-    {
-      "code": "002428",
-      "name": "云南锗业",
-      "inst_net": 31754.8,
-      "yz_net": 20738.1,
-      "north_net": 103242.9,
-      "combined_net": 52492.9,
-      "days": 2,
-      "resonance_days": 1
-    },
     {
       "code": "300308",
       "name": "中际旭创",
@@ -371,6 +361,16 @@
       "yz_net": 0.0,
       "north_net": 47125.6,
       "combined_net": 15952.6,
+      "days": 1,
+      "resonance_days": 0
+    },
+    {
+      "code": "300418",
+      "name": "昆仑万维",
+      "inst_net": 45769.8,
+      "yz_net": 3253.0,
+      "north_net": 45380.7,
+      "combined_net": 49022.8,
       "days": 1,
       "resonance_days": 0
     }

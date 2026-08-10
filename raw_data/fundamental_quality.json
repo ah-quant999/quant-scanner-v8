@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-08-10 10:44:09",
-  "total": 11,
+  "update_time": "2026-08-10 17:40:22",
+  "total": 17,
   "grade_summary": {
     "A": 0,
     "B": 0,
     "C": 0,
     "D": 0,
-    "no_data": 11
+    "no_data": 17
   },
   "stocks": {
     "hk_00386": {
@@ -23,7 +23,21 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
-    "hk_00700": {
+    "hk_00883": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_01093": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_01109": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -44,7 +58,21 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
+    "hk_01211": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
     "hk_02269": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_02331": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -65,6 +93,20 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
+    "hk_06618": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_06862": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
     "hk_09618": {
       "score": 0,
       "grade": "",
@@ -72,7 +114,7 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
-    "hk_09987": {
+    "hk_09866": {
       "score": 0,
       "grade": "",
       "roe": null,
