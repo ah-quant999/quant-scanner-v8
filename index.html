@@ -9185,7 +9185,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       h+='<span style="font-weight:600;">'+s.name+'</span> <span style="color:var(--dim);font-size:11px;font-family:monospace;margin-left:6px;">'+(s.full_code||s.code)+'</span> <span style="color:var(--cyan);font-size:11px;">'+(s.py||'')+'</span>';
       h+='</div>';
     });
-    dd.innerHTML=h; dd.display='block';
+    dd.innerHTML=h; dd.style.display='block';
   };
   window.hideDiagDropdown = function(){ var d=document.getElementById('stockDiagDropdown'); if(d)d.style.display='none'; };
 
