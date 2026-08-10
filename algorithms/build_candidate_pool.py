@@ -641,7 +641,8 @@ def build():
     except Exception as e:
         print(f"  [观澜台] 自选读取失败: {e}")
 
-    # 4) 观澜台 研报
+    # 4) 观澜台 研报（合并入「观澜台」来源，不再单独计为「观澜台研报」——
+    #     2026-08-10 确认研报61只与自选100%重叠，去重）
     try:
         rp = json.load(open(os.path.join(DATA, "guanlan_reports.json"), encoding="utf-8"))
         # 2026-08-09 修复：guanlan_extractor 产出的是
@@ -656,9 +657,9 @@ def build():
                 code, name, mkt, board = _norm(st.get("code", ""), st.get("name", ""),
                                                st.get("market", ""), st.get("full_code", ""))
                 if code:
-                    add(f"{mkt}_{code}", code, name, mkt, board, "观澜台研报")
+                    add(f"{mkt}_{code}", code, name, mkt, board, "观澜台")  # ← 合并入观澜台
                     n += 1
-        print(f"  [观澜台] 研报个股 {n} 只已并入")
+        print(f"  [观澜台] 研报个股 {n} 只已并入观澜台（去重）")
     except FileNotFoundError:
         print(f"  [观澜台] 研报文件不存在（{os.path.join(DATA, 'guanlan_reports.json')}）"
               f"—— guanlan_extractor 可能未运行或 token 缺失")
