@@ -2548,7 +2548,10 @@ def _clear_intraday_for_premarket(category, only=None):
         save(var, stub)
 
     # SH_SZ_HISTORY：保留历史序列，仅剔除今日记录
-    data = _load_judgment_raw("SH_SZ_HISTORY", VAR_TO_RAW.get("SH_SZ_HISTORY")) or {}
+    # 2026-08-10 小九：盘前清空也读远端 main 基线，防止本地 raw_data 被旧数据污染时把历史交易日丢掉。
+    remote_baseline = _fetch_remote_raw("sh_sz_history.json")
+    data = remote_baseline or _load_judgment_raw(
+        "SH_SZ_HISTORY", VAR_TO_RAW.get("SH_SZ_HISTORY")) or {}
     amount_history = data.get("amount_history") or []
     daily_stats = data.get("daily_stats") or data.get("up_down") or []
     new_amount = [r for r in amount_history if str(r.get("date")) not in today_m_d_set]
@@ -2561,6 +2564,7 @@ def _clear_intraday_for_premarket(category, only=None):
         "up_down_last_date": new_stats[-1].get("date") if new_stats else "",
         "premarket_cleared": True,
         "note": "盘前已清空今日数据，开盘后自动刷新",
+        "baseline_source": "remote_main" if remote_baseline else "local",
     })
 
     # LIMIT_UP_HEATMAP：保留近10日历史列，仅把今日列置空
