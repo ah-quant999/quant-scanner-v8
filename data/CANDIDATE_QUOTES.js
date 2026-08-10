@@ -1,1 +1,1 @@
-window.CANDIDATE_QUOTES = {"items":[{"code":"000050","name":"深天马Ａ","price":6.73,"chg":-0.44,"total_mv":163.93,"float_mv":163.93}],"note":"候选池实时行情(涨跌幅/现价/市值)，来源东方财富push2delay","update_time":"2026-08-10 12:34:17","republish_time":"2026-08-10 12:35:54"};
+window.CANDIDATE_QUOTES = {"items":[{"code":"000050","name":"深天马Ａ","price":6.73,"chg":-0.44,"total_mv":163.93,"float_mv":163.93}],"note":"候选池实时行情(涨跌幅/现价/市值)，来源东方财富push2delay","update_time":"2026-08-10 13:09:30","republish_time":"2026-08-10 13:10:54"};
