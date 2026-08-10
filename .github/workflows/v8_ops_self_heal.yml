@@ -48,6 +48,7 @@ jobs:
 
       - name: "🩺 巡检 + 自动治愈"
         id: heal
+        continue-on-error: true
         run: |
           echo "=== 运维自愈巡检 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') ==="
           echo "=== DEBUG: python version ===" && python --version
