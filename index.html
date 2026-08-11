@@ -1447,7 +1447,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           else if(__hr<9){ __lb='盘前'; __pd='盘前'; }
           else if(__hr<15){ __lb='盘中'; __pd='盘中'; }
           else if(__hr<17){ __lb='盘后'; __pd='盘后'; }
-          else { __lb='昨日盘后'; __pd='盘后'; }
+          else { __lb='今日盘后'; __pd='盘后'; }
           timeEl.innerHTML = _uBadge(__lb,__pd,d.gen_time);
         }
         var h='';
@@ -1767,7 +1767,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           else if(_hr<9){ _lb='盘前'; _pd='盘前'; }
           else if(_hr<15){ _lb='盘中'; _pd='盘中'; }
           else if(_hr<17){ _lb='盘后'; _pd='盘后'; }
-          else { _lb='昨日盘后'; _pd='盘后'; }
+          else { _lb='今日盘后'; _pd='盘后'; }
           timeEl.innerHTML = _uBadge(_lb,_pd,updateTime);
         }
       }
