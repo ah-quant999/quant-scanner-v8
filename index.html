@@ -512,11 +512,16 @@ window.V8_CAL = {weeks:[],legend:[]};
     }
     return base.getUTCFullYear()+'-'+String(base.getUTCMonth()+1).padStart(2,'0')+'-'+String(base.getUTCDate()).padStart(2,'0');
   };
-  /* 统一「已跑完」胶囊文案（2026-08-09 修复：「已完成」→「已跑」，与「已入仓」成对）
+  /* 统一「已跑完」胶囊文案（2026-08-09 修复：「已完成」→「已跑」，与「已入仓」成对；
+   *  2026-08-11 主人令：分三态时段守卫——「盘中显示已跑完」违背直觉；
+   *  改为：盘前 不显示，盘中 ⏳ 今日盘中预览，盘后 ✅ 今日已跑完；旧日仍按 ✅ MM-DD 已跑）
    * 入参：gen_time / data_time / update_time 时间字符串
    * 返回：{ show:Boolean, label:String }
    * 规则：
-   *   数据日期 == 今天日历日期 → 「✅ 今日已跑完」
+   *   数据日期 == 今天日历日期：
+   *     - 当前 CST < 09:30  → 不显示（盘前还没开盘）
+   *     - 09:30 ≤ CST < 15:00 → ⏳ 今日盘中预览
+   *     - CST ≥ 15:00 → ✅ 今日已跑完
    *   数据日期 == 昨天（或更早但≤30天）→ 「✅ MM-DD 已跑」（显示实际月/日）
    *   无时间戳/超过30天 → 不显示
    * 所有胶囊调用此函数，改一处全局生效。 */
@@ -546,7 +551,14 @@ window.V8_CAL = {weeks:[],legend:[]};
     var dataDay = new Date(Date.UTC(dp[0], dp[1]-1, dp[2]));
     var diff = Math.round((todayCST.getTime() - dataDay.getTime()) / 864e5);
     if(diff < 0) return { show:false, label:'' }; // 未来时间
-    if(diff === 0) return { show:true, label:'✅ 今日已跑完' };
+    // 2026-08-11：分三态时段守卫（盘前/盘中/盘后），盘中不写"已跑完"
+    var isPre  = (parts.hh < 9) || (parts.hh === 9 && parts.mm < 30);
+    var isPost = (parts.hh >= 15);
+    if(diff === 0){
+      if(isPre)  return { show:false, label:'' };
+      if(!isPost) return { show:true, label:'⏳ 今日盘中预览' };
+      return { show:true, label:'✅ 今日已跑完' };
+    }
     if(diff <= 30) return { show:true, label:'✅ '+dataDate.slice(5)+' 已跑' }; // "08-06 已跑"
     return { show:false, label:'' };
   };
@@ -8348,9 +8360,22 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(_fvInfo.show){
       h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">'+_fvInfo.label+'</span>';
     }
-    // 「已入仓」胶囊：统一为 🧺 MM-DD 已入仓 N
+    // 「已入仓」胶囊：2026-08-11 分三态时段守卫（盘前/盘中/盘后），
+    //  盘前/盘中显示 ⏳ 预览 N（蓝色），盘后才用原 🧺 MM-DD 已入仓 N（绿色）。
+    //  其他位置（L3954/L4170/L8146/L8494/L10391/L10839）都是盘后算法链本身就不盘中刷数据，保持原 _holdBadge 不动。
     if(total>0){
-      h+=_holdBadge(genTime || d.update_time || '今日', total);
+      var _phP = window._cstParts ? window._cstParts(new Date()) : null;
+      var _phIsPre  = _phP && (_phP.hh < 9 || (_phP.hh === 9 && _phP.mm < 30));
+      var _phIsPost = _phP && _phP.hh >= 15;
+      if(!_phIsPost){
+        var _phLbl = _phIsPre ? '⏳ 待开盘（仍按昨日收盘预览）' : '⏳ 今日盘中预览';
+        h+='<span style="display:inline-flex;align-items:center;gap:4px;flex-shrink:0;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#1e3a8a,#3b82f6);border:1px solid #3b82f6;padding:3px 10px;border-radius:10px;white-space:nowrap;">'
+          + '<span aria-hidden="true">⏳</span>'
+          + '<span>'+_phLbl+' <b style="margin-left:2px">'+total+'</b></span>'
+          + '</span>';
+      } else {
+        h+=_holdBadge(genTime || d.update_time || '今日', total);
+      }
     }
     h+='</div></div></div>';
     // 数据质量警示：若 A/B 档全部为港股（A股扫描缺失），挂红条提示，避免误导
@@ -8358,8 +8383,14 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       var _allSel = a.concat(b);
       var _aShareCnt = _allSel.filter(function(s){ return s.market && !/港股|hk/i.test(s.market); }).length;
       if(_aShareCnt===0){
+        // 2026-08-11 主人令：18:30 是盘后跑批，不应该写死——盘中应该"下一轮盘中抓取"，盘后才说"18:30 自动重刷"
+        var _ph2 = window._cstParts ? window._cstParts(new Date()) : null;
+        var _ph2IsPost = _ph2 && _ph2.hh >= 15;
+        var _next = _ph2IsPost
+          ? '今日盘后跑批已完成，下一次盘后重刷约 18:30'
+          : '下一轮盘中抓取（一般 30 分钟内自动到位），也可手动触发 <code>v8_algo_cloud</code>';
         h+='<div style="background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.35);border-radius:8px;padding:10px 14px;margin-bottom:14px;color:#ef5350;font-size:12px;line-height:1.6;">'
-          +'<b>⚠️ A股数据缺失</b>：当前全站精选仅含港股，原因是盘后扫描时 A股活跃股池抓取失败。下一盘后跑批（18:30）会自动重刷，也可手动触发 <code>v8_algo_cloud</code>。'
+          +'<b>⚠️ A股数据缺失</b>：当前全站精选仅含港股，原因是盘后扫描时 A股活跃股池抓取失败。'+_next+'。'
           +'</div>';
       }
     }
