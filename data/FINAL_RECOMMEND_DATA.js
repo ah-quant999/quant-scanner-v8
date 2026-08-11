@@ -555,7 +555,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "09866",
-      "name": "09866",
+      "name": "蔚来-SW",
       "market": "港股",
       "board": "港股",
       "horizon": "短线",

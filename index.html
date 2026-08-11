@@ -1098,7 +1098,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/BACKTEST_TDX.js?v=20260811"></script>
 <script src="data/OPTIMIZED_STRATEGY.js?v=20260811"></script>
 <script src="data/EXPERIMENT.js?v=20260810233401"></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=20260811083018"></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=20260811084206"></script>
 <script src="data/ETF_PULSE.js?v=20260811081254"></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=20260811081254"></script>
 <script src="data/TOP10_DAILY.js"></script>
@@ -1324,22 +1324,34 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         // 空壳检测：有 update_time 但无 avg_price → 云端抓取失败
         var isShell = d && !d.avg_price && d.update_time;
         var isEmpty = !d || (!d.avg_price && !d.update_time);
+        // 2026-08-11 修复：识别"盘前正常清空"状态（premarket_cleared=true），与真抓取失败区分显示
+        var isPremarket = d && d.premarket_cleared === true && !d.avg_price;
         if(isEmpty || isShell){
           var ut = (d&&d.update_time) || '未知';
           var age = _dataAge(ut);
           var ageColor = age && age.hours > 48 ? 'var(--down)' : (age && age.hours > 24 ? '#f59e0b' : 'var(--sub)');
           var ageTxt = age ? (age.hours<1?'刚刚':age.hours<24?age.hours+'小时前':Math.floor(age.hours/24)+'天前') : '';
+          // 区分两种空壳：盘前正常清空 vs 真抓取失败——不同文案/图标/颜色
+          var titleText = isPremarket ? '平均股价 · 盘前待刷新' : '平均股价数据暂不可用';
+          var titleColor = isPremarket ? '#38bdf8' : '#fbbf24';
+          var iconText = isPremarket ? '🌅' : '⚠️';
+          var reasonText = isPremarket
+            ? '<div>原因：<b style="color:var(--cyan)">盘前正常清空</b>（08:30 前 avg_price() 不计算，避免使用昨日陈旧数据）</div>'
+            : '<div>原因：云端 <code>f_avg_price()</code> 抓取失败（取样不足或接口超时）</div>';
+          var statusText = isPremarket
+            ? '<div style="color:var(--cyan);margin-top:4px;">🟢 09:30 开盘后 intraday fetch 将自动刷新（首批约 09:35-09:45）</div>'
+            : '<div style="color:var(--down);margin-top:4px;">🔴 全A等权均价、MA20/MA60水位均无法计算</div>';
           cEl.innerHTML='<div style="padding:12px;">'+
             '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'+
-            '<span style="font-size:18px;">⚠️</span>'+
-            '<span style="font-weight:700;color:#fbbf24;font-size:14px;">平均股价数据暂不可用</span>'+
+            '<span style="font-size:18px;">'+iconText+'</span>'+
+            '<span style="font-weight:700;color:'+titleColor+';font-size:14px;">'+titleText+'</span>'+
             '</div>'+
             '<div style="font-size:12px;color:var(--dim);line-height:1.7;margin-left:26px;">'+
-            '<div>原因：云端 <code>f_avg_price()</code> 抓取失败（取样不足或接口超时）</div>'+
+            reasonText+
             '<div>最后更新：<b style="color:'+ageColor+'">'+ut.slice(5,16)+'</b> ('+ageTxt+')</div>'+
-            '<div style="color:var(--down);margin-top:4px;">🔴 全A等权均价、MA20/MA60水位均无法计算</div>'+
+            statusText+
             '</div></div>';
-          if(tEl) tEl.innerHTML = _uBadge('异常','短线',ut);
+          if(tEl) tEl.innerHTML = _uBadge(isPremarket?'盘前':'异常','短线',ut);
           return;
         }
         if(tEl) tEl.innerHTML = _uBadge('盘中','短线',d.update_time);
@@ -3981,8 +3993,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var riskItems = [];
     if(score >= 70) riskItems.push('危机雷达综合分≥70，系统性风险偏高');
     if(VOL.items && VOL.items[0] && (VOL.items[0].vol_ann||0) > 80) riskItems.push('年化波动率偏高，注意仓位控制');
-    var lhbRisk = _rcArr(LHB.stocks).filter(function(s){ return (s.inst_net_万||0)<0 && (s.yz_net_万||0)<0; });
-    if(lhbRisk.length > 0) riskItems.push(lhbRisk.length + '只龙虎榜个股机游共振卖出');
+    // 2026-08-11 修复：列出机游共振卖出的具体个股名称，不再只显示数量
+    var lhbRisk = _rcArr(LHB.stocks).filter(function(s){ return (s.inst_net_万||0)<0 && (s.yz_net_万||0)<0; })
+                      .sort(function(a,b){ return ((a.inst_net_万||0)+(a.yz_net_万||0))-((b.inst_net_万||0)+(b.yz_net_万||0)); }).slice(0,5);
+    if(lhbRisk.length > 0) {
+      var _riskNames = lhbRisk.map(function(s){return _rcEsc(s.name);}).join('、');
+      riskItems.push('龙虎榜机游共振卖出 '+lhbRisk.length+' 只：'+_riskNames);
+    }
     if(riskItems.length > 0){
       h += '<div class="insight-list">';
       riskItems.forEach(function(r){ h += '<div class="insight-li"><span style="color:var(--down)">●</span><span>' + r + '</span></div>'; });
@@ -4035,18 +4052,19 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     // Bottom row: Sector analysis cards
     h += '<div class="insight-grid">';
 
-    // 机游方向
-    h += '<div class="insight-card"><h4>⚡ 机游方向 <span style="font-size:10px;color:var(--purple);font-weight:400">机游共振</span></h4>';
-    h += '<p>机构+游资同时净买入方向，短期共识度高。</p>';
-    var jyStocks = _rcArr(LHB.stocks).filter(function(s){ return (s.inst_net_万||0)>0 && (s.yz_net_万||0)>0; })
-      .sort(function(a,b){ return ((b.inst_net_万||0)+(b.yz_net_万||0))-((a.inst_net_万||0)+(a.yz_net_万||0)); }).slice(0,5);
-    if(jyStocks.length > 0){
+    // 机构独买（2026-08-11 修复：原"机游方向"与上方"最强共振"重复显示同一批个股；
+    // 改为"机构独买"视角：机构净买入但游资未跟随（或反向卖出），与上方最强共振/纯游资异动/风险警示互补）
+    h += '<div class="insight-card"><h4>🏛️ 机构独买 <span style="font-size:10px;color:var(--cyan);font-weight:400">游资未参与</span></h4>';
+    h += '<p>机构净买入但游资未跟随（或反向卖出），纯机构观点的标的。</p>';
+    var instOnly = _rcArr(LHB.stocks).filter(function(s){ return (s.inst_net_万||0)>0 && (s.yz_net_万||0)<=0; })
+      .sort(function(a,b){ return (b.inst_net_万||0)-(a.inst_net_万||0); }).slice(0,5);
+    if(instOnly.length > 0){
       h += '<div class="insight-list">';
-      jyStocks.forEach(function(s){
-        h += '<div class="insight-li"><span>' + _rcEsc(s.name) + '</span><span class="c-purple">+' + _rcFmtYi(s.inst_net_万+s.yz_net_万) + '</span></div>';
+      instOnly.forEach(function(s){
+        h += '<div class="insight-li"><span>' + _rcEsc(s.name) + '</span><span class="c-up">+' + _rcFmtYi(s.inst_net_万) + '</span></div>';
       });
       h += '</div>';
-    } else { h += '<div style="color:var(--dim);font-size:11px">暂无机游共振信号</div>'; }
+    } else { h += '<div style="color:var(--dim);font-size:11px">暂无机构独买信号</div>'; }
     h += '</div>';
 
     // 情绪面
@@ -4074,29 +4092,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       });
       h += '</div>';
     } else { h += '<div style="color:var(--dim);font-size:11px">暂无板块数据</div>'; }
-    h += '</div>';
-
-    // 北向资金
-    h += '<div class="insight-card"><h4>🌊 北向资金 <span style="font-size:10px;color:#f59e0b;font-weight:400">陆股通</span></h4>';
-    if(NF.stopped){
-      h += '<p style="color:var(--gold)">⚠️ 已停更（2024-05起）</p>';
-    } else if(NF.net_buy != null){
-      h += '<div class="insight-list">';
-      h += '<div class="insight-li"><span>净买入</span><span class="c-' + (NF.net_buy>=0?'up':'down') + '">' + (NF.net_buy>=0?'+':'') + NF.net_buy.toFixed(1) + '亿</span></div>';
-      h += '</div>';
-    } else {
-      h += '<div style="color:var(--dim);font-size:11px">暂无数据</div>';
-    }
-    // Top sectors by capital flow
-    var CF = window.CAPITAL_FLOW_DATA;
-    if(CF && CF.data && CF.data.length){
-      var cfTop = CF.data.slice().sort(function(a,b){ return (b.net_inflow||0)-(a.net_inflow||0); }).slice(0,3);
-      h += '<div class="insight-list" style="margin-top:8px">';
-      cfTop.forEach(function(s){
-        h += '<div class="insight-li"><span>' + _rcEsc(s.name||'') + '</span><span class="c-up">' + ((s.net_inflow||0)>0?'+':'') + (s.net_inflow>=10000?(s.net_inflow/10000).toFixed(1)+'亿':(s.net_inflow||0).toFixed(0)+'万') + '</span></div>';
-      });
-      h += '</div>';
-    }
     h += '</div>';
 
     h += '</div>'; // insight-grid
@@ -9458,7 +9453,10 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   var PF_KEY = 'v8_portfolio_positions';
   var PF_MIGRATION_KEY = 'v8_pf_migration_v2'; // 数据迁移版本标记
   // 预设种子数据（主人指定的 ETF 持仓，首次访问自动加载）
+  // 2026-08-11 修复：添加 广钢气体(sh688548) 作为第三个默认持仓；
+  // 之前仅2只ETF，用户曾存的广钢气体丢失/未保存时无法恢复——纳入默认种子后首次访问自动出现
   window._PF_SEED = [
+    {code:'688548', name:'广钢气体', full_code:'sh688548', market:'sh', date:'2026-08-11', price:9.71, qty:1000},
     {code:'159755', name:'锂电池ETF', full_code:'sz159755', market:'sz', date:'2026-08-11', price:1.85, qty:10000},
     {code:'159665', name:'芯片ETF', full_code:'sz159665', market:'sz', date:'2026-08-11', price:1.42, qty:10000}
   ];
