@@ -91,7 +91,7 @@ CATEGORY_MAP = {
     "INDEX_QUOTES": "intraday",
     "ETF_PULSE": "intraday",
     "ETF_INTRADAY_HEAT": "intraday",
-    "ETF_DAILY_MONITOR": "intraday",
+    "ETF_DAILY_MONITOR": "post_close",  # T+1 盘后 17:00 出数，盘前保留昨日数据
     "ETF_SUBSCRIPTION": "premarket",  # T+1 盘后/盘前更新一次即可
     "SECTOR_FUND_FLOW": "intraday",
     "CAPITAL_FLOW_DATA": "intraday",
@@ -2575,22 +2575,34 @@ def _clear_intraday_for_premarket(category, only=None):
         "baseline_source": "remote_main" if remote_baseline else "local",
     })
 
-    # LIMIT_UP_HEATMAP：保留近10日历史列，仅把今日列置空
+    # LIMIT_UP_HEATMAP：保留近10日历史列，再追加今日占位列（开盘后首次 fetch 会替换为真实数据）
     data = _load_judgment_raw("LIMIT_UP_HEATMAP", VAR_TO_RAW.get("LIMIT_UP_HEATMAP")) or {}
     sectors = data.get("sectors") or []
     dates = data.get("dates") or []
+    today_md = now.strftime("%m/%d")  # e.g. "08/11"
     if dates and sectors:
         data.pop("ladder", None)
         data.pop("top", None)
         data["total"] = 0
-        for sec in sectors:
-            arr = sec.get("data") or []
-            if len(arr) == len(dates):
-                arr[-1] = 0
-            elif len(arr) == len(dates) - 1:
+        if dates[-1] != today_md:
+            # 日期数组里没有今日 → 追加今日占位列，每个 sector 的 data 末尾补 0
+            dates.append(today_md)
+            data["dates"] = dates
+            for sec in sectors:
+                arr = sec.get("data") or []
+                # 如果 arr 比旧的 dates 短，前面补 0 保持对齐
+                while len(arr) < len(dates) - 1:
+                    arr.insert(0, 0)
                 arr.append(0)
+                sec["data"] = arr
+        else:
+            # 日期里已有今日，仅把今日列置 0
+            for sec in sectors:
+                arr = sec.get("data") or []
+                if len(arr) == len(dates):
+                    arr[-1] = 0
     data["premarket_cleared"] = True
-    data["note"] = "盘前已清空今日涨停列，开盘后自动刷新"
+    data["note"] = "盘前占位今日涨停列，开盘后自动刷新"
     save("LIMIT_UP_HEATMAP", data)
 
     # CAPITAL_FLOW_DATA：保留（用户指定不清空），仅打标记

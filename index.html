@@ -1427,7 +1427,21 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         if(timeEl) timeEl.innerHTML = _uBadge('盘中','短线',null);
         return;
         }
-        if(timeEl) timeEl.innerHTML = _uBadge('盘中','短线',d.gen_time);
+        if(timeEl && d.gen_time){
+          // 动态判断时段：AI_MARKET_BRIEF 是盘后 00:30 生成的盘后源，常见 00:06 / 17:47 / 23:34
+          var __ts=new Date(d.gen_time.replace(/-/g,'/'));
+          var __now=new Date();
+          var __today=new Date(__now.getFullYear(),__now.getMonth(),__now.getDate()).getTime();
+          var __dToday=__ts.getTime()>=__today;
+          var __hr=__ts.getHours();
+          var __lb,__pd;
+          if(!__dToday){ __lb='昨日盘后'; __pd='盘后'; }
+          else if(__hr<9){ __lb='盘前'; __pd='盘前'; }
+          else if(__hr<15){ __lb='盘中'; __pd='盘中'; }
+          else if(__hr<17){ __lb='盘后'; __pd='盘后'; }
+          else { __lb='昨日盘后'; __pd='盘后'; }
+          timeEl.innerHTML = _uBadge(__lb,__pd,d.gen_time);
+        }
         var h='';
 
         // 1. 日内风向
@@ -7995,7 +8009,19 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     safe(renderEtfAnalysis, window.ETF_PULSE || {}, window.ETF_INTRADAY_HEAT || {}, window.ETF_DAILY_MONITOR || {});
 
     // 2) 板块资金三合一
-    safe(renderSector, window.SECTOR_FUND_FLOW || {});
+    // 2026-08-11 修复：板块资金三合一的"收盘复盘/中期趋势"用 SECTOR_FUND_FLOW_TREND（盘后源，有昨日数据 00:15/08:30 出数）
+    // SECTOR_FUND_FLOW 是盘中源（每 30 分刷新），盘前被清空；只有当它有真实数据时才优先用，否则回退 TREND。
+    // _rs_sectors 是 SECTOR_RS 的 17:47 盘后定稿板块周期数据。
+    (function(){
+      const sft = window.SECTOR_FUND_FLOW_TREND || {};
+      const sff = window.SECTOR_FUND_FLOW || {};
+      const srs = window.SECTOR_RS || {};
+      const sffLive = (sff.no_data === true || sff.premarket_cleared === true) ? false
+        : (((sff.sectors_in&&sff.sectors_in.length)||0) + ((sff.sectors_out&&sff.sectors_out.length)||0) + ((sff.top_list&&sff.top_list.length)||0) > 0);
+      const base = sffLive ? Object.assign({}, sft, sff) : sft;
+      base._rs_sectors = (srs && srs.sectors) || [];
+      safe(renderSector, base);
+    })();
 
     // 3) 盘后数据：全部使用已注入的 window.* 变量（data/*.js 已在 <head> 同步加载）
     safe(renderFib, window.SH_FIB || {});
@@ -8003,7 +8029,19 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     safe(renderSixDim, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, window.CRISIS_DATA || {}, window.SECTOR_FUND_FLOW || {}, window.MARKET_FUND_FLOW_DATA || {});
     safe(renderCrisis, window.CRISIS_DATA || {});
     safe(renderMarketFundFlow, window.MARKET_FUND_FLOW_DATA || {});
-    safe(renderSector, window.SECTOR_FUND_FLOW || {});
+    // 2026-08-11 修复：板块资金三合一的"收盘复盘/中期趋势"用 SECTOR_FUND_FLOW_TREND（盘后源，有昨日数据 00:15/08:30 出数）
+    // SECTOR_FUND_FLOW 是盘中源（每 30 分刷新），盘前被清空；只有当它有真实数据时才优先用，否则回退 TREND。
+    // _rs_sectors 是 SECTOR_RS 的 17:47 盘后定稿板块周期数据。
+    (function(){
+      const sft = window.SECTOR_FUND_FLOW_TREND || {};
+      const sff = window.SECTOR_FUND_FLOW || {};
+      const srs = window.SECTOR_RS || {};
+      const sffLive = (sff.no_data === true || sff.premarket_cleared === true) ? false
+        : (((sff.sectors_in&&sff.sectors_in.length)||0) + ((sff.sectors_out&&sff.sectors_out.length)||0) + ((sff.top_list&&sff.top_list.length)||0) > 0);
+      const base = sffLive ? Object.assign({}, sft, sff) : sft;
+      base._rs_sectors = (srs && srs.sectors) || [];
+      safe(renderSector, base);
+    })();
     safe(renderMacro, window.MACRO_DATA || {});
     safe(renderRunnerTrack, window.RUNNER_STATUS || {});
     safe(renderTaskSchedule);
