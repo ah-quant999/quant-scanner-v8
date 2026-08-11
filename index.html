@@ -1189,7 +1189,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 子 Pane：今日推荐候选池 -->
     <div id="final-pane-cand" class="final-pane">
       <div class="card" style="margin-bottom:16px;border-left:4px solid #ff7043;">
-        <h3><span class="ic">🎯</span>今日推荐候选池 <span style="font-size:11px;color:var(--sub);font-weight:400">聚合 三重共识 / 驾驶舱A档 / 四量终极</span></h3>
+        <h3><span class="ic">🎯</span>今日推荐候选池 <span style="font-size:11px;color:var(--sub);font-weight:400">聚合 三重共识 / 驾驶舱A档 / 四量终极</span>
+          <span class="fresh" id="finalCandTime"></span>
+          <span id="finalCandRunBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);"></span>
+          <span id="finalCandEnteredBadge" style="display:none"></span>
+        </h3>
         <div id="finalCandBody" style="padding:12px 4px 2px;"><div class="note">加载中…</div></div>
       </div>
     </div>
@@ -11655,7 +11659,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       el.innerHTML='<div class="note" style="padding:16px;text-align:center;color:var(--dim)">最终推荐数据暂不可用（等待盘后算法生成）</div>';
       return;
     }
-    var t=document.getElementById('finalRecTime'); if(t) t.textContent=D.update_time||'—';
+    var t=document.getElementById('finalRecTime'); if(t) setBadge(t, '盘后', '中线', D.update_time||'');
     var n=document.getElementById('finalTopN'); if(n) n.textContent=(D.stocks.length||3);
     var tag=document.getElementById('finalHeaderTag');
     if(tag) tag.textContent='跨策略共振 + 板块强度加权 · Top'+D.stocks.length+' · 候选池 '+(D.total_candidates||0)+' 只 · '+(D.update_time||'--');
@@ -11697,6 +11701,21 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     if(!D || !D.all_candidates || !D.all_candidates.length){
       el.innerHTML='<div class="note" style="padding:16px;text-align:center;color:var(--dim)">候选池数据暂不可用（等待盘后算法生成）</div>';
       return;
+    }
+    // 2026-08-12 主人令：卡头补齐「更新于+已跑+已入仓」胶囊（与Top3/全站精选保持一致）
+    var _fcTime = D.update_time||'';
+    var _fcTimeEl = document.getElementById('finalCandTime');
+    if(_fcTimeEl) setBadge(_fcTimeEl, '盘后', '中线', _fcTime);
+    var _fcRunEl = document.getElementById('finalCandRunBadge');
+    if(_fcRunEl){
+      var _fcInfo = window._runBadgeInfo(_fcTime);
+      if(_fcInfo.show){ _fcRunEl.textContent = _fcInfo.label; _fcRunEl.style.display='inline-flex'; }
+      else _fcRunEl.style.display='none';
+    }
+    var _fcEnterEl = document.getElementById('finalCandEnteredBadge');
+    if(_fcEnterEl){
+      _fcEnterEl.innerHTML = _holdBadge(_fcTime, D.all_candidates.length, '已入仓');
+      _fcEnterEl.style.display='inline-flex';
     }
 
     // 2026-08-11 修复：与Top3保持一致——A股优先展示，港股降权后排
