@@ -1,1 +1,1 @@
-window.AVG_PRICE_DATA = {"update_time":"2026-08-11 12:12:26","republish_time":"2026-08-11 12:47:22"};
+window.AVG_PRICE_DATA = {"date":"2026-08-11","avg_price":28.2943,"avg_change_pct":0.311,"prev_avg_price":null,"count":5283,"ma20":28.2943,"ma60":28.2943,"position_vs_ma20":0.0001,"position_vs_ma60":0.0001,"history":[{"date":"2026-08-11","avg_price":28.2943,"avg_change_pct":0.311,"count":5283}],"update_time":"2026-08-11 12:55:18","republish_time":"2026-08-11 12:55:46"};
