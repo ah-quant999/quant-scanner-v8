@@ -9823,18 +9823,14 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   };
 
   /* ===== 📦 TOP3 持仓跟踪（2026-08-10 暂未上架·localStorage 持久化） =====
-     2026-08-11 修复：种子里 ETF 代码/名称严格对照 STOCK_LIST 校准；
-     历史 bug：sz159865 是养殖ETF却被标"芯片ETF"——这是同一份种子里名称错配。 */
+     2026-08-12 主人令：删除 ETF 持仓种子（159755/159665），只保留 688548 广钢气体；ETF 是「又自己跑出来」的，
+     不属于主人录入数据，前端不应自动加载。 */
   var PF_KEY = 'v8_portfolio_positions';
-  var PF_MIGRATION_KEY = 'v8_pf_migration_v2'; // 数据迁移版本标记
-  var PF_SEED_VERSION = '3_2026-08-11';         // 2026-08-11 增量：名称校准后种子版本
-  // 预设种子数据（主人指定的 ETF 持仓 + 688548 广钢气体）
-  // 2026-08-11 校准：159755=锂电池ETF, 159665=芯片ETF, 159865=养殖ETF（不是芯片！）
-  // 通过 _uniSearch 在 _pfLoad 阶段自动校正名称错配
+  var PF_MIGRATION_KEY = 'v8_pf_migration_v3'; // 数据迁移版本标记
+  var PF_SEED_VERSION = '4_2026-08-12';         // 2026-08-12 增量：移除 ETF，只留 688548 广钢气体
+  // 预设种子数据（仅 688548 广钢气体；ETF 不再默认加载）
   window._PF_SEED = [
-    {code:'688548', name:'广钢气体', full_code:'sh688548', market:'sh', date:'2026-08-11', price:9.71, qty:1000},
-    {code:'159755', name:'锂电池ETF', full_code:'sz159755', market:'sz', date:'2026-08-11', price:1.85, qty:10000},
-    {code:'159665', name:'芯片ETF',   full_code:'sz159665', market:'sz', date:'2026-08-11', price:1.42, qty:10000}
+    {code:'688548', name:'广钢气体', full_code:'sh688548', market:'sh', date:'2026-08-11', price:9.71, qty:1000}
   ];
   window._pfLoad = function(){
     try {
@@ -9878,21 +9874,29 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       return arr;
     } catch(e){ return (window._PF_SEED || []); }
   };
-  // 2026-08-11：种子版本升级 v3 检测（旧版仅 2 只 ETF，没有 688548 广钢气体）
+  // 2026-08-12：种子迁移 v4 — 检测是否包含 688548 广钢气体；不含则补齐
+// 同时清理历史 ETF 种子（159755 锂电池ETF / 159665 芯片ETF）——主人令「不要 ETF，只留我录入的」
   window._pfMigrateSeedV3 = function(arr){
     var hasNewSeed = (arr||[]).some(function(p){ return p.code==='688548' && p.name==='广钢气体'; });
-    var hasOldCodeNameMismatch = (arr||[]).some(function(p){ return p.code==='159865' && /芯片/.test(p.name||''); });  // 历史错配：养殖ETF 误标"芯片ETF"
-    if(hasNewSeed && !hasOldCodeNameMismatch) return;  // 已就绪
-    var userExtra = (arr||[]).filter(function(p){
-      return p.code !== '688548' && p.code !== '159755' && p.code !== '159665' && p.code !== '159865';
+    // 清理旧版 ETF 种子（不管主人有没有手动加的，全部移除——ETF 不应作为默认持仓出现）
+    var beforeCount = (arr||[]).length;
+    var cleaned = (arr||[]).filter(function(p){
+      return p.code !== '159755' && p.code !== '159665' && p.code !== '159865';
     });
-    var newArr = (window._PF_SEED||[]).concat(userExtra);
-    _pfSave(newArr);
-    console.warn('[持仓种子v3迁移] 已补全新种子（广钢气体688548 + 锂电池ETF 159755 + 芯片ETF 159665），共', newArr.length, '只');
+    var removedEtf = beforeCount - cleaned.length;
+    if(!hasNewSeed){
+      // 把 688548 广钢气体作为种子补齐（只补这一只，不加 ETF）
+      cleaned = (window._PF_SEED||[]).concat(cleaned);
+    }
+    if(removedEtf > 0 || !hasNewSeed){
+      _pfSave(cleaned);
+      console.warn('[持仓种子v4迁移] 已移除', removedEtf, '只 ETF 持仓；当前', cleaned.length, '只');
+    }
+    return cleaned;
   };
-  // 2026-08-11 主人令：手动重置入口（数据丢失防护——确认后才清空）
+  // 2026-08-12 主人令：手动重置入口（数据丢失防护——确认后才清空）
   window._pfResetAll = function(){
-    var msg = '⚠️ 确认清空所有持仓（包括你手动添加的）并加载最新默认种子？\n\n种子包含 3 只：\n• 688548 广钢气体\n• 159755 锂电池ETF\n• 159665 芯片ETF\n\n此操作不可撤销。';
+    var msg = '⚠️ 确认清空所有持仓（包括你手动添加的）并加载最新默认种子？\n\n种子仅含 1 只：\n• 688548 广钢气体\n\n此操作不可撤销。';
     if(!confirm(msg)) return;
     localStorage.removeItem(PF_KEY);
     localStorage.removeItem(PF_MIGRATION_KEY);
