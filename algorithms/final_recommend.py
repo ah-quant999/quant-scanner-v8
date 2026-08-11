@@ -33,8 +33,13 @@ DATA = os.path.join(ROOT, "data")
 CRISIS_HIGH_THRESHOLD = 50  # 危机雷达≥50才并入逆势龙头
 SECTOR_TOP_N = 15
 TOP_N = 3
-HK_PENALTY = 1.5        # 港股分值惩罚（用户主做 A 股，港股不应霸榜 TOP_N）
-MIN_A_SHARES_IN_TOP = max(1, TOP_N - 1)  # TOP_N 中至少保留 N-1 只 A 股
+# 2026-08-11 主人令：去掉港股降权+去掉 A 股保底——「谁好谁上」原则。
+#   之前 HK_PENALTY=1.5 + hard_a=MIN_A_SHARES_IN_TOP-1=1 是「主做 A 股」假设下的保护，
+#   实际效果是市场歧视（港股凭空少 1.5 分）。现在改公平竞争，靠数据说话。
+#   监控兜底：Top3 出现「全港股」或「全 A 股」时，v8_health_check 会写 URGENT 告警，
+#   用于发现数据源异常（如港股 API 挂导致共振虚高、A 股 mootdx 挂导致扫描失败）。
+HK_PENALTY = 0          # 港股不再降权（之前 1.5）——2026-08-11 主人令
+MIN_A_SHARES_IN_TOP = 0  # A 股硬保底关闭（之前 max(1, TOP_N-1)=2）——公平竞争
 
 # 常见港股/美股代码兜底名称表（当上游 name 缺失或等于 code 时使用）
 # 格式：统一用纯数字 code（无 hk/sh 前缀）作为 key
@@ -651,23 +656,22 @@ def main():
     # 排序：先按共振次数，再按综合分，再按源强度（多源共振优先）
     scored.sort(key=lambda x: (x["resonance"], x["final_score"], x["strength"]), reverse=True)
 
-    # ── A 股保底：TOP_N 中至少保留 MIN_A_SHARES_IN_TOP 只 A 股（用户主做 A 股）──
-    # 2026-08-11 修复：原逻辑先 for s in a_shares 取满 TOP_N，再 for s in hk_stocks 判断——
-    #   导致 a_shares 直接灌满 3 个 slot，共振=2 的高分港股（09988/09618/06618）全部挡在 Top3 外面，
-    #   而 3 只大牛股猎手低分 A 股（3.68/3.75/4.69）强行霸榜 ——"其他算法没跑出来更好的"就是这个 bug。
-    # 现改为：先取 A 股前 (MIN_A_SHARES_IN_TOP-1) 只作为硬保底，
-    #         余下 slot 从 scored 全局高分（含 A 股+港股，港股已 HK_PENALTY 减分）填补——
-    #         共振次数高的港股就能挤进 Top3。
+    # ── Top3 选取（2026-08-11 主人令：公平竞争，谁好谁上）──
+    # 之前 A 股硬保底逻辑：先灌 A 股 + 余下从全局高分（已被 HK_PENALTY 减分）填。
+    #   实际效果：港股被歧视 + A 股被强保——两边都不公平。
+    # 现改为：完全去掉 A 股硬保底（hard_a=0），直接取 scored 全局高分前 TOP_N 名。
+    #   排序 key=(resonance, final_score, strength)——多源共振优先，分数次之，强度兜底。
+    # 监控兜底：v8_health_check 检查 Top3 市场分布，全港股/全 A 股写 URGENT 告警（数据源异常）。
     a_shares = [s for s in scored if s.get("board") != "港股" and market_prefix(s.get("code", "")) != "hk"]
     hk_stocks = [s for s in scored if s.get("board") == "港股" or market_prefix(s.get("code", "")) == "hk"]
     top = []
-    # 1) A 股硬保底 = MIN_A_SHARES_IN_TOP-1 只（=TOP_N-2 只，最少保留 1 只"硬 A 股"作为看 A 股主盘的入口）
-    hard_a = max(0, MIN_A_SHARES_IN_TOP - 1)
+    # 1) A 股硬保底 = 0（已关闭），直接进第 2 步
+    hard_a = MIN_A_SHARES_IN_TOP  # 现 = 0，立即 break
     for s in a_shares:
         if len(top) >= TOP_N or len(top) >= hard_a:
             break
         top.append(s)
-    # 2) 余下 slot 从 scored 全局高分填补（scored 已按 (resonance, final_score, strength) 排好）
+    # 2) 余下 slot 从 scored 全局高分填补（A 股 + 港股，按 (resonance, final_score, strength) 排序）
     top_codes = {t["key"] for t in top}
     for s in scored:
         if len(top) >= TOP_N:
@@ -679,7 +683,7 @@ def main():
     # 3) 排序保持 (resonance, final_score, strength) — 保证 Top3 顺序与候选池一致
     top.sort(key=lambda x: (x["resonance"], x["final_score"], x["strength"]), reverse=True)
     top = top[:TOP_N]
-    # ── end A 股保底 ──
+    # ── end 公平竞争 ──
 
     def horizon_for(sources, resonance=0, is_top=False):
         """horizon 判定
