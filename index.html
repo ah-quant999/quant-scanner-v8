@@ -10416,13 +10416,21 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       return (diff<=0?'今日':diff===1?'昨日':diff+'天前')+' '+hm;
     }
     // 2026-08-06 23:18 → try/catch 包 + 双保险 fallback
+    // 2026-08-11 统一口径：胶囊格式 = 今日 HH:MM · 状态关键词（如 出局/观望/正常）
+    // 状态关键词根据大盘有效性推导：失效→出局, 低效→观望, 其他→正常
     try{
       var timeEl=document.getElementById(p+'crdsTime');
       if(timeEl){
         var _ts=d && d.update_time ? d.update_time : '已加载';
+        var _validity = (mc && mc.validity) ? mc.validity : '未知';
+        var _statusKw = '';
+        if(_validity === '失效') _statusKw = ' · 出局';
+        else if(_validity === '低效') _statusKw = ' · 观望';
+        else if(_validity === '高有效' || _validity === '较有效' || _validity === '有效') _statusKw = ' · 正常';
         var _html = _uBadge('盘后','短线',_ts);
         if(_html && _html.length > 30){
-          timeEl.innerHTML = _html;
+          // 统一格式：在原 badge 后追加状态关键词
+          timeEl.innerHTML = _html + (_statusKw ? ' <span style="font-size:11px;font-weight:700;color:'+(_validity==='失效'?'#fca5a5':_validity==='低效'?'#fde68a':'#86efac')+';margin-left:6px;padding:2px 8px;border-radius:6px;background:'+(_validity==='失效'?'rgba(239,68,68,.15)':_validity==='低效'?'rgba(245,158,11,.15)':'rgba(34,197,94,.15)')+';">'+_statusKw.slice(3)+'</span>' : '');
         } else {
           timeEl.innerHTML = '<span class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;"><span aria-hidden="true">🐻</span><span style="margin-left:4px">更新于</span><span style="color:#9fd0ff;font-weight:600;margin-left:4px">'+_ts+'</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">盘后</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">短线</span></span>';
         }
