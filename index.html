@@ -9771,8 +9771,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     });
     h+='</div>';
 
-    // 各维度明细
-    h+='<div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">';
+    // 各维度明细（2 列网格，2026-08-12 主人令：综合诊断不要再分那么多行，参考个股查询的 4 列卡片紧凑度）
+    h+='<div style="margin-top:12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px;">';
     dims.forEach(function(d){
       if(!d.evi.length)return;
       h+='<div style="padding:8px 10px;background:rgba(255,255,255,.04);border-radius:6px;border-left:3px solid var(--border);">';
