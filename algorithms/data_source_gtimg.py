@@ -16,6 +16,7 @@ mootdx/东财不可达。接口与 scanner 期望完全一致：
 两者均为 HTTP JSON，无需本地库。
 """
 import json
+import os
 import time
 import urllib.request
 
@@ -25,6 +26,19 @@ KLINE_API = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
 RANK_API = "https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData"
 
 _UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+
+_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+_REPO_ROOT = os.path.dirname(_BASE_DIR)
+
+# 候选股池兜底源（build_candidate_pool.py 产出，与新浪排行 API 相互独立）
+# 2026-08-11 修复：新浪 hs_a 排行不可达时 _sina_rank() 静默返回空 →
+#   A股股池 0 只 → gold_pool 无 A股 → TOP10_DAILY 全港股 → 全站精选卡告警。
+#   改为从候选池回填活跃股，候选池每日由独立管线刷新，不会像硬编码池那样老化。
+_CAND_FALLBACK_PATHS = (
+    os.path.join(_REPO_ROOT, "raw_data", "candidate.json"),
+    os.path.join(_REPO_ROOT, "out", "candidate_pool.json"),
+    os.path.join(_BASE_DIR, "data", "candidate_pool.json"),
+)
 
 
 def _http(url, timeout=20, retries=3, referer="https://finance.sina.com.cn/"):
@@ -98,13 +112,70 @@ def _sina_rank(num=300):
     return arr[:num]
 
 
+def _board_of(code):
+    """按代码前缀判定板块，返回 (board_label, market)。"""
+    if code.startswith(("300", "301")):
+        return "创业板", "sz"
+    if code.startswith(("688", "689")):
+        return "科创板", "sh"
+    return "主板", ("sh" if code.startswith(("6", "9")) else "sz")
+
+
+def _fallback_from_candidate_pool(top_cy, top_kc, top_zb):
+    """排行 API 不可达时的兜底：从候选股池回填 A 股活跃股。
+
+    返回与 fetch_volume_top_stocks_gtimg 完全一致的元组列表；无可用候选池时返回 []。
+    """
+    for path in _CAND_FALLBACK_PATHS:
+        if not os.path.exists(path):
+            continue
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+        except Exception as e:  # noqa: BLE001
+            print(f"  [GTimg] 候选池兜底读取失败 {os.path.basename(path)}: {e}")
+            continue
+
+        stocks_obj = data.get("stocks") or {}
+        rows = stocks_obj.values() if isinstance(stocks_obj, dict) else stocks_obj
+        cy, kc, zb = [], [], []
+        for it in rows:
+            if not isinstance(it, dict):
+                continue
+            code = str(it.get("code") or "").strip()
+            if not code.isdigit() or len(code) != 6:
+                continue  # 跳过港股等非 A 股
+            name = it.get("name") or code
+            board, mkt_default = _board_of(code)
+            market = it.get("market") or mkt_default
+            row = (code, name, market, board, 0, 0, 0, "混合")
+            if board == "创业板":
+                cy.append(row)
+            elif board == "科创板":
+                kc.append(row)
+            else:
+                zb.append(row)
+
+        out = cy[:top_cy] + kc[:top_kc] + zb[:top_zb]
+        if out:
+            print(f"  [GTimg][兜底] 候选池 {os.path.basename(path)} "
+                  f"(更新于 {data.get('update_time', '未知')}): "
+                  f"创业{len(cy[:top_cy])} 科创{len(kc[:top_kc])} 主板{len(zb[:top_zb])}")
+            return out
+    print("  [GTimg][兜底] 无可用候选池，A股股池为空")
+    return []
+
+
 def fetch_volume_top_stocks_gtimg(top_cy=100, top_kc=100, top_zb=100, top_hk=50):
     """活跃股池：按成交额排序分流 创业板/科创板/主板。港股暂不支持（返回空）。"""
     try:
         rank = _sina_rank(max(top_cy + top_kc + top_zb, 300))
     except Exception as e:  # noqa: BLE001
         print(f"  [GTimg] 新浪活跃股排行失败: {e}")
-        return []
+        rank = []
+    if not rank:
+        print("  [GTimg] 新浪排行无数据，启用候选池兜底...")
+        return _fallback_from_candidate_pool(top_cy, top_kc, top_zb)
     cy, kc, zb = [], [], []
     for x in rank:
         sym = (x.get("symbol") or "").lower()
@@ -125,6 +196,17 @@ def fetch_volume_top_stocks_gtimg(top_cy=100, top_kc=100, top_zb=100, top_hk=50)
             zb.append((code, name, market, "主板", 0, to, 0, "混合"))
     stocks = cy[:top_cy] + kc[:top_kc] + zb[:top_zb]
     print(f"  [GTimg] 活跃股池: 创业{len(cy[:top_cy])} 科创{len(kc[:top_kc])} 主板{len(zb[:top_zb])}")
+
+    # 部分板块为空（排行页翻页中断等）→ 用候选池补齐缺失板块，不覆盖已抓到的
+    missing = [b for b, lst in (("创业板", cy), ("科创板", kc), ("主板", zb)) if not lst]
+    if missing:
+        print(f"  [GTimg] 板块缺失 {missing}，候选池补齐...")
+        have = {s[0] for s in stocks}
+        for row in _fallback_from_candidate_pool(top_cy, top_kc, top_zb):
+            if row[3] in missing and row[0] not in have:
+                stocks.append(row)
+                have.add(row[0])
+        print(f"  [GTimg] 补齐后股池: {len(stocks)} 只")
     return stocks
 
 
