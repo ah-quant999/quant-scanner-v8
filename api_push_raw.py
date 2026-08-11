@@ -160,9 +160,26 @@ def main():
         print("❌ 获取 main ref 失败:", ref.get("__msg__")); sys.exit(1)
     base_sha = ref["object"]["sha"]
     cmt = api("GET", f"/repos/{REPO}/git/commits/{base_sha}")
+    # 2026-08-11 修复（159 轮看门狗）：原来直接 cmt["tree"]["sha"]，网络异常时 api()
+    # 返回 {"__error__":...} → KeyError 未捕获 → traceback 崩溃，整批文件全丢
+    # （与 157 轮 IncompleteRead 同类：单点网络抖动毁掉全批推送）。
+    if "__error__" in cmt or "tree" not in cmt:
+        print("❌ 获取 base commit 失败:", cmt.get("__msg__")); sys.exit(1)
     base_tree = cmt["tree"]["sha"]
     existing = {}
     tfull = api("GET", f"/repos/{REPO}/git/trees/{base_tree}?recursive=1")
+    # 2026-08-11 修复（159 轮看门狗）·数据回退隐患根治：
+    # existing 是「防倒退守卫」的唯一基线。原代码用 tfull.get("tree", []) 兜底，
+    # 一旦这次 GET 失败或被 GitHub 截断，existing 会静默变成空/残缺 →
+    # 所有本地文件都被判为「远端没有」→ 守卫完全失效 → 用 checkout 时刻的旧内容
+    # 覆盖远端更新版本，正是 08-09 大范围数据回退故障的成因。
+    # 守卫基线不完整时必须中止，绝不能「无守卫裸推」。
+    if "__error__" in tfull or "tree" not in tfull:
+        print("❌ 获取 base tree 失败（防倒退守卫无基线，拒绝裸推）:", tfull.get("__msg__"))
+        sys.exit(1)
+    if tfull.get("truncated"):
+        print("❌ base tree 被 GitHub 截断（truncated=true），守卫基线残缺，拒绝裸推")
+        sys.exit(1)
     for e in tfull.get("tree", []):
         if (e["path"].startswith("raw_data/")
             or e["path"] in ("data/FOUR_VOLUME.js", "data/STOCK_STOP_DATA.js",
@@ -241,20 +258,34 @@ def main():
                   for p, s in merged_entries.items()]
 
     msg = "v8 cn fetch: " + now_cst().strftime("%Y-%m-%d %H:%M")
+    # 2026-08-11 修复（159 轮看门狗）：提交环节的三类「单点致命」问题一并根治——
+    #   ① r2/cmt2 直接下标取值，网络异常时 KeyError 崩溃（blob 已全部上传完却前功尽弃）；
+    #   ② 创建 tree / commit 失败即 sys.exit(1)，明明外层就是 3 次重试循环却不复用，
+    #      一次瞬时网络抖动 = 整批 raw_data 不落地（与 157 轮同一失败家族）。
+    # 改为：本轮任一步失败 → 记录原因 → continue 进入下一次重试；3 次耗尽才退出。
+    last_err = ""
     for attempt in range(1, 4):
         # 重新读取最新 main（与 build_deploy 并发安全）
         r2 = api("GET", f"/repos/{REPO}/git/refs/heads/main")
+        if "__error__" in r2 or "object" not in r2:
+            last_err = f"读取 main ref 失败: {r2.get('__msg__')}"
+            print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _t.sleep(2 ** attempt); continue
         base_sha2 = r2["object"]["sha"]
         cmt2 = api("GET", f"/repos/{REPO}/git/commits/{base_sha2}")
+        if "__error__" in cmt2 or "tree" not in cmt2:
+            last_err = f"读取 base commit 失败: {cmt2.get('__msg__')}"
+            print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _t.sleep(2 ** attempt); continue
         base_tree2 = cmt2["tree"]["sha"]
         new_tree = api("POST", f"/repos/{REPO}/git/trees",
                        {"base_tree": base_tree2, "tree": tree_items})
-        if "__error__" in new_tree:
-            print("❌ 创建 tree 失败:", new_tree.get("__msg__")); sys.exit(1)
+        if "__error__" in new_tree or "sha" not in new_tree:
+            last_err = f"创建 tree 失败: {new_tree.get('__msg__')}"
+            print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _t.sleep(2 ** attempt); continue
         commit = api("POST", f"/repos/{REPO}/git/commits",
                      {"message": msg, "tree": new_tree["sha"], "parents": [base_sha2]})
-        if "__error__" in commit:
-            print("❌ 创建 commit 失败:", commit.get("__msg__")); sys.exit(1)
+        if "__error__" in commit or "sha" not in commit:
+            last_err = f"创建 commit 失败: {commit.get('__msg__')}"
+            print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _t.sleep(2 ** attempt); continue
         # 2026-08-03 修复：改用 force=False，避免触发分支保护"Block force pushes"。
         # parent 始终为最新 main，重试逻辑已保证不会丢失他人提交。
         upd = api("PATCH", f"/repos/{REPO}/git/refs/heads/main",
@@ -268,7 +299,7 @@ def main():
             continue
         print(f"✅ raw_data 已推送（第 {attempt} 次）commit {commit['sha'][:8]}")
         sys.exit(0)
-    print("❌ 3 次重试后仍失败"); sys.exit(1)
+    print(f"❌ 3 次重试后仍失败{('：' + last_err) if last_err else ''}"); sys.exit(1)
 
 
 if __name__ == "__main__":
