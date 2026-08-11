@@ -241,14 +241,17 @@ def main():
             if s_ts and d_ts and s_ts < d_ts:
                 print(f"  [guard] out更旧({s_ts}) < raw({d_ts}): {v6_name}")
                 continue
-            # (2b) 丢源守卫：搬运会让 source_dist 少源则拒绝
-            #      2026-08-11 修复：out/candidate_pool.json 曾两次用少源版本覆盖
-            #      raw_data/candidate.json（观澜台/maharo 丢失 → 前端「公开资讯 0 只」）。
+# (2b) 丢源守卫：搬运会让 source_dist 少源则拒绝
+#      2026-08-11 修复：out/candidate_pool.json 曾两次用少源版本覆盖
+#      raw_data/candidate.json（观澜台/maharo 丢失 → 前端「公开资讯 0 只」）。
+#      2026-08-12 主人全面审核：发现历史丢源是「src（out）比 dst（raw）少源」的反向场景——
+#      out 端丢了观澜台/maharo 时，反过来覆盖 raw 端原本完整的 6 源。
+#      修复：双向检查 → src 缺源（dst 更全）也应拒绝搬运
             s_src, d_src = _source_names(src), _source_names(dst_path)
             if s_src is not None and d_src is not None:
-                lost = d_src - s_src
-                if lost:
-                    print(f"  [guard] 搬运会丢源 {sorted(lost)}，保留 raw: {v6_name}")
+                src_missing = d_src - s_src  # src 比 dst 少的源（dst 更全）
+                if src_missing:
+                    print(f"  [guard] src 比 dst 少源 {sorted(src_missing)}（dst 更全），保留 raw: {v6_name}")
                     continue
         obj = _load_json(src)
         if obj is None:
