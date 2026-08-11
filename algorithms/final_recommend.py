@@ -102,14 +102,22 @@ NAME_FIX_MAP = {
 
 
 def fix_name(code, name):
-    """如果 name 为空或与 code 相同，用兜底映射表/画像修复。"""
+    """如果 name 为空或与 code 相同，用兜底映射表/画像修复。
+
+    2026-08-11 修复：NAME_FIX_MAP 优先级 > profile name。
+    背景：stock_profile.json 中 09618 给的是「京东集团-SW」（错），而港交所标准名称是「京东物流」。
+    原逻辑「profile name 存在即用」会让上游 profile 的错误名称覆盖 NAME_FIX_MAP 标准名。
+    改为"标准名映射表兜底优先"，保证 09988/09618/09866/00700 等港股始终显示标准中文名。
+    """
     c = norm_code(code)
     n = (name or "").strip()
-    if n and n != c:
-        return n
-    # 兜底映射
+    # 1) 标准映射表优先（防 profile 错覆盖标准名）
     if c in NAME_FIX_MAP:
         return NAME_FIX_MAP[c]
+    # 2) profile name 合法时退回 profile
+    if n and n != c:
+        return n
+    # 3) 兜底
     return n or c
 
 
@@ -644,20 +652,33 @@ def main():
     scored.sort(key=lambda x: (x["resonance"], x["final_score"], x["strength"]), reverse=True)
 
     # ── A 股保底：TOP_N 中至少保留 MIN_A_SHARES_IN_TOP 只 A 股（用户主做 A 股）──
+    # 2026-08-11 修复：原逻辑先 for s in a_shares 取满 TOP_N，再 for s in hk_stocks 判断——
+    #   导致 a_shares 直接灌满 3 个 slot，共振=2 的高分港股（09988/09618/06618）全部挡在 Top3 外面，
+    #   而 3 只大牛股猎手低分 A 股（3.68/3.75/4.69）强行霸榜 ——"其他算法没跑出来更好的"就是这个 bug。
+    # 现改为：先取 A 股前 (MIN_A_SHARES_IN_TOP-1) 只作为硬保底，
+    #         余下 slot 从 scored 全局高分（含 A 股+港股，港股已 HK_PENALTY 减分）填补——
+    #         共振次数高的港股就能挤进 Top3。
     a_shares = [s for s in scored if s.get("board") != "港股" and market_prefix(s.get("code", "")) != "hk"]
     hk_stocks = [s for s in scored if s.get("board") == "港股" or market_prefix(s.get("code", "")) == "hk"]
     top = []
+    # 1) A 股硬保底 = MIN_A_SHARES_IN_TOP-1 只（=TOP_N-2 只，最少保留 1 只"硬 A 股"作为看 A 股主盘的入口）
+    hard_a = max(0, MIN_A_SHARES_IN_TOP - 1)
     for s in a_shares:
-        if len(top) >= TOP_N:
+        if len(top) >= TOP_N or len(top) >= hard_a:
             break
         top.append(s)
-    for s in hk_stocks:
+    # 2) 余下 slot 从 scored 全局高分填补（scored 已按 (resonance, final_score, strength) 排好）
+    top_codes = {t["key"] for t in top}
+    for s in scored:
         if len(top) >= TOP_N:
             break
-        if len(top) < MIN_A_SHARES_IN_TOP or (top and s["final_score"] > top[-1]["final_score"]):
-            top.append(s)
-            top.sort(key=lambda x: (x["resonance"], x["final_score"], x["strength"]), reverse=True)
-            top = top[:TOP_N]
+        if s["key"] in top_codes:
+            continue
+        top.append(s)
+        top_codes.add(s["key"])
+    # 3) 排序保持 (resonance, final_score, strength) — 保证 Top3 顺序与候选池一致
+    top.sort(key=lambda x: (x["resonance"], x["final_score"], x["strength"]), reverse=True)
+    top = top[:TOP_N]
     # ── end A 股保底 ──
 
     def horizon_for(sources):
