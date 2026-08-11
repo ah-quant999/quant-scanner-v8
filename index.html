@@ -920,22 +920,29 @@ function __judgmentCandidatesHTML(){
       + '<span class="tp-name">'+(s.name||'--')+'</span>'
       + tags
       + '<span style="margin-left:auto;display:flex;align-items:center;gap:6px;">'
-      + '<span style="font-size:11px;padding:2px 7px;border-radius:999px;background:'+s.srcColor+'22;color:'+s.srcColor+';font-weight:700">'+s.srcEmoji+' '+s.src+(scoreText?' '+scoreText:'')+'</span>'
-      // ── 60m 共振标记（多策略统一）──
+      // ── 多源共振标识（加大多源更醒目）──
+      + (function(){
+        var _srcs = (s.sources || []);
+        var _r = (_srcs.length >= 2) ? '多源共振' : (_srcs[0] || s.src || '');
+        var _c = (_srcs.length >= 2) ? '#f59e0b' : (s.srcColor || 'var(--dim)');
+        var _e = (_srcs.length >= 2) ? '🔥' : (s.srcEmoji || '');
+        var _sz = (_srcs.length >= 2) ? '13px' : '12px';
+        return '<span style="font-size:'+_sz+';padding:3px 10px;border-radius:999px;background:'+_c+'22;color:'+_c+';font-weight:800;letter-spacing:.3px;">'+_e+' '+_r+'</span>';
+      })()
+      // ── 60m 共振标记 ──
       + (function(){
         var _60d = window.FOUR_VOLUME_60M || {};
         var _60h = (_60d.hits || _60d.stocks || []);
         var _nc = String(s.code||'').replace(/\D/g,'');
         var _hit = _60h.some(function(x){ return String(x.code||'').replace(/\D/g,'') === _nc; });
-        if(_hit) return '<span style="font-size:10px;color:#a78bfa;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);padding:1px 7px;border-radius:10px;font-weight:700;">🔔 60m</span>';
+        if(_hit) return '<span style="font-size:11px;color:#a78bfa;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.40);padding:2px 8px;border-radius:10px;font-weight:800;">🔔 60m</span>';
         return '';
       })()
-      // ── end 60m ──
       + (priceText ? '<span style="font-size:14px;font-weight:800;color:var(--txt)">'+priceText+'</span>' : '')
       + (pctText ? '<span style="font-size:12px;font-weight:700;color:'+pctColor+'">'+pctText+'</span>' : '')
       + '</span>'
       + '</div>'
-      + '<div class="tp-meta">买入评分 <span class="tp-score">'+s.buyScore.toFixed(1)+'</span> · 入选日 '+(s.enterDate||'--')+'</div>'
+      + '<div class="tp-meta">入选日 '+(s.enterDate||'--')+'</div>'
       + reasonLine
       + sectorLine
       + plan
@@ -11290,10 +11297,6 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       var shortInd = s.industry.length>14 ? s.industry.slice(0,13)+'…' : s.industry;
       h+='<span class="fr-tag ind">'+_fe(shortInd)+'</span>';
     }
-    h+='<span class="fr-score">买入评分 <b>'+_fn(s.buy_score||s.final_score,1)+'</b></span>';
-    if(s._60m_resonance){
-      h+='<span style="font-size:10px;color:#a78bfa;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);padding:1px 7px;border-radius:10px;font-weight:700;">🔔 60m共振</span>';
-    }
     h+='<span class="fr-enter">· 入选日 '+_fe(s.enter_date||'—')+'</span>';
     h+='<span class="fr-tag '+horizon[1]+'">'+_fe(horizon[0])+'</span>';
     h+='</div>';
@@ -11478,7 +11481,9 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       if(s.industry) tags+=_mkTag(s.industry, '#64748b');
       (s.concepts||[]).slice(0,4).forEach(function(c){ tags+=_mkTag(c, '#38bdf8'); });
       var srcColor={'三重共识':'var(--purple)','驾驶舱A档':'#ffd54f','驾驶舱B档':'#f59e0b','四量终极':'#ff7043','板块龙头':'#22c55e','大牛股猎手':'#ef4444','逆势龙头·精锐':'#06b6d4'};
-      var srcChips=(s.sources||[]).map(function(src){ return '<span style="font-size:11px;padding:2px 7px;border-radius:999px;background:'+(srcColor[src]||'#64748b')+'22;color:'+(srcColor[src]||'#64748b')+';border:1px solid '+(srcColor[src]||'#64748b')+'40;font-weight:600;white-space:nowrap">'+_fe(src)+'</span>'; }).join('');
+      var _srcs = (s.sources||[]);
+      var _isMulti = (_srcs.length >= 2);
+      var srcChips=_srcs.map(function(src){ return '<span style="font-size:'+(_isMulti?'12px':'11px")+';padding:2px 8px;border-radius:999px;background:'+(srcColor[src]||(_isMulti?'#f59e0b':'#64748b'))+'22;color:'+(srcColor[src]||(_isMulti?'#f59e0b':'#64748b'))+';border:1px solid '+(srcColor[src]||(_isMulti?'#f59e0b':'#64748b'))+'40;font-weight:'+(_isMulti?'800':'600')+';white-space:nowrap">'+(_isMulti?'🔥 ':'')+_fe(src)+'</span>'; }).join('');
       var priceLine='';
       if(price!=null){
         var pctText = pct==null?'':((pct>=0?'+':'')+pct.toFixed(2)+'%');
@@ -11507,8 +11512,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
         +'<span style="margin-left:auto;display:flex;align-items:center;gap:6px;">'+priceLine+'</span>'
         +'</div>'
         +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">'
-        +'<span style="font-size:12px;font-weight:700;color:var(--gold)">买入评分 <b>'+_fn(s.final_score,1)+'</b></span>'
-        +'<span style="font-size:11px;color:var(--up);font-weight:700">共振'+s.resonance+'</span>'
+        +'<span style="font-size:11px;color:var(--up);font-weight:700">共振'+s.resonance+'源</span>'
         +'<span style="font-size:11px;color:var(--dim)">· 入选日 '+_fe(s.enter_date||'—')+'</span>'
         +'</div>'
         +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">'+srcChips+'</div>'
