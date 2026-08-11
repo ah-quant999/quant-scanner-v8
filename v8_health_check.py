@@ -220,7 +220,15 @@ def _load_token():
     return None
 
 
-def api_get(url):
+def api_get(url, max_retries=None):
+    """GitHub API GET，带重试。
+
+    2026-08-11 修：原实现一次失败即返回，遇到 SSL 握手超时 / 连接重置等瞬时抖动
+    就会让 check_site_deploy_sync 报「无法从线上或 API 获取 Pages SHA」误告警。
+    现对「可恢复失败」（网络异常、5xx、429 限流）重试，对确定性失败（401/403/404）
+    立即返回不浪费时间。
+    """
+    import time as _time
     token = _load_token()
     if not token:
         return {"__error__": 401, "__msg__": "no token"}
@@ -230,19 +238,34 @@ def api_get(url):
         "X-GitHub-Api-Version": "2022-11-28",
     }
     req = urllib.request.Request(url, headers=headers)
-    try:
-        with urllib.request.urlopen(req, timeout=30) as r:
-            return json.loads(r.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        return {"__error__": e.code, "__msg__": e.read().decode("utf-8", "replace")}
-    except Exception as e:
-        return {"__error__": 0, "__msg__": str(e)}
+    retries = SITE_MAX_RETRIES if max_retries is None else max_retries
+    last = {"__error__": 0, "__msg__": "unknown"}
+    for attempt in range(retries + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return json.loads(r.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            last = {"__error__": e.code, "__msg__": e.read().decode("utf-8", "replace")}
+            # 4xx 属确定性失败（无权限/不存在），重试无意义；仅 5xx 与 429 限流值得重试
+            if e.code < 500 and e.code != 429:
+                return last
+        except Exception as e:
+            last = {"__error__": 0, "__msg__": str(e)}
+        if attempt < retries:
+            print(f"[RETRY] api_get 第{attempt+1}次失败(code={last.get('__error__')})，"
+                  f"{_SITE_RETRY_DELAY_SEC}s 后重试... {url}")
+            _time.sleep(_SITE_RETRY_DELAY_SEC)
+    last["__msg__"] = f"连续 {retries + 1} 次请求均失败：{last.get('__msg__')}"
+    return last
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # 带 retry 的 urlopen：吸收 GitHub Pages 瞬时 SSL/网络抖动，避免误报邮件
 # ─────────────────────────────────────────────────────────────────────────────
-SITE_MAX_RETRIES = 2       # 首次 + 最多重试 2 次
+# 2026-08-11 由 2 提到 4：GitHub Pages / api.github.com 在云端 build 高频推送时段
+# （如 09:07-09:09 连续 6 次 build）会出现成片的 503 / SSL 握手超时，2 次重试不足以吸收，
+# 导致「Pages 部署同步」误报。5 次尝试 × 3s 间隔 ≈ 12s，代价可接受。
+SITE_MAX_RETRIES = 4       # 首次 + 最多重试 4 次
 _SITE_RETRY_DELAY_SEC = 3   # 重试间隔（秒）
 
 
@@ -569,11 +592,18 @@ def adjust_max_age(def_max, page=None):
             # 收盘后 1 小时宽限（收盘整理 + 构建部署延迟）
             return min(def_max, 120)
         # 盘前 / 夜间 / 周末：实时数据本就不预期更新，放过夜阈值
-        # 次日 09:30 才会有新数据，给到次日开盘都算正常
+        # 次日 09:30 才会有新数据，给到次日开盘都算正常。
+        # 2026-08-11 修：原固定 960（16h）会误杀「盘前保留昨日值」的卡片——
+        #   ETF_DAILY_MONITOR/CAPITAL_FLOW_DATA 等停在上一交易日 15:30 盘后定稿，
+        #   到次日 08:55 健康检查时已 17.4h（1045min）> 960 被判 fail。
+        #   改为「距最近收盘分钟数 + 3h 缓冲」自适应（与盘后数据同口径），
+        #   长假/周一早盘自动覆盖；真正连续多日不更新仍会超阈值告警。
+        close = last_trade_day_close(n)
+        stale_floor = int((n - close).total_seconds() / 60) + 180
         if is_trade_day and h < 9.5:
-            return 960  # 16h：从前一天收盘到当天开盘
+            return max(960, stale_floor)
         # 周末 /节假日：给 2880（48h，覆盖周末+周一开盘）
-        return 2880
+        return max(2880, stale_floor)
 
     if page == "今日事件":
         # 今日事件由 v8_cn_fetch 08:25 premarket 产出，每日仅一次
@@ -659,9 +689,14 @@ def check_data_cards():
             if dt and dt >= last_trade_day_close(now_cst()):
                 weekend_skip = True
 
+        # 盘前清空（premarket_cleared=true）是 cloud_fetch_v8._clear_intraday_for_premarket 的设计内行为：
+        # 实时数据在 09:30 开盘前本就无当日数据，字段为空属预期，不应报"关键字段空值"。
+        # 盘中被误清空的情况已由上方 prem_cleared + is_intraday_session() 分支判 fail，这里不重复。
+        prem_cleared_expected = prem_cleared and not is_intraday_session()
+
         # 空值检测
         empty_fields = []
-        if not weekend_skip:
+        if not weekend_skip and not prem_cleared_expected:
             for f in d["key_fields"]:
                 v = data.get(f)
                 # 结果池字段（如 stocks）空列表 = 正常业务状态（今日无入选），不算空值
@@ -677,6 +712,9 @@ def check_data_cards():
             status = "ok"
             phase = "盘后" if page in ("盘后数据", "选股策略") else "盘前"
             msg = f"休市不更新（数据为上一交易日{phase}）；{rel}"
+        elif prem_cleared_expected:
+            status = "ok"
+            msg = f"盘前已清空，等待开盘后刷新（预期行为）；{rel}"
         elif empty_fields:
             msg += f"；关键字段空值：{', '.join(empty_fields)}"
         if status == "fail":
@@ -739,34 +777,90 @@ def check_site_deploy_sync():
     except Exception as e:
         fetch_err = e
 
-    # fallback：拿 GitHub Pages 的 latest deployment SHA（通过 GitHub API）
+    # fallback 1：拿 GitHub Pages 的 latest deployment SHA（通过 GitHub API，已带重试）
+    api_err = None
     if not site_sha:
         deployments = api_get(f"https://api.github.com/repos/{REPO}/deployments?environment=github-pages&per_page=1")
         if isinstance(deployments, list) and deployments:
             site_sha = deployments[0].get("sha", "")[:7]
+        elif isinstance(deployments, dict):
+            api_err = deployments.get("__msg__")
+
+    # fallback 2：pages/builds/latest（deployments 为空时仍能拿到最近一次 Pages 构建的 commit）
+    if not site_sha:
+        latest = api_get(f"https://api.github.com/repos/{REPO}/pages/builds/latest")
+        if isinstance(latest, dict) and latest.get("commit"):
+            site_sha = str(latest.get("commit"))[:7]
+        elif isinstance(latest, dict) and not api_err:
+            api_err = latest.get("__msg__")
 
     if not site_sha:
+        # 三条通路（站点 meta / deployments / pages builds）全部失败，且每条都已重试 SITE_MAX_RETRIES 次，
+        # 基本可判定为网络瞬时抖动而非部署真故障 —— 保持 warn 但把原因写清楚，避免误导成部署挂了
+        detail = []
+        if fetch_err:
+            detail.append(f"站点不可达：{fetch_err}")
+        if api_err:
+            detail.append(f"API：{str(api_err)[:120]}")
         return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "warn",
-                 "message": f"无法从线上或 API 获取 Pages SHA" + (f"（站点不可达：{fetch_err}）" if fetch_err else "")}]
+                 "message": "无法获取 Pages SHA（站点 meta / deployments / pages-builds 三通路均在 "
+                            f"{SITE_MAX_RETRIES + 1} 次重试后失败，多为网络瞬时抖动，非部署故障）"
+                            + ("；" + "；".join(detail) if detail else "")}]
 
     synced = local_sha.startswith(site_sha) or site_sha.startswith(local_sha)
-    # 容忍 GitHub Pages 异步部署延迟：线上 SHA 落后 ≤5 个 commit 视为同步
-    # GitHub Pages 部署通常有 1-3 分钟延迟，且 build commit 本身会累加 1 commit，
-    # 加上云端自动 v8_build 偶尔叠加，落后 4-5 commit 都属正常
-    behind = 0
-    if not synced and local_sha and site_sha and len(local_sha) >= 7 and len(site_sha) >= 7:
+
+    # 2026-08-11 修：原逻辑只算 site..local（线上落后本地多少），
+    # 当「线上比本地新」（本机没 pull、云端刚 build 推了新 commit）时该值恒为 0，
+    # 却仍判 fail 并输出自相矛盾的「不同步，落后 0 commit」。
+    # 现同时计算两个方向，并在 site_sha 本地不存在时先 fetch，避免 rev-list 直接抛错。
+    def _rev_count(rng):
         try:
             out = subprocess.check_output(
-                ["git", "rev-list", "--count", f"{site_sha}..{local_sha}"],
-                text=True, timeout=10
+                ["git", "rev-list", "--count", rng], text=True, timeout=15,
+                stderr=subprocess.DEVNULL
             ).strip()
-            behind = int(out)
-            if behind <= 5:
-                synced = True
+            return int(out)
         except Exception:
-            pass
-    status = "ok" if synced else "fail"
-    msg = f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]} {'已同步（落后 ≤5 commit，Pages 异步部署正常）' if synced and behind > 0 else '已同步' if synced else '不同步，落后 '+str(behind)+' commit，部署链路需检查'}"
+            return None
+
+    behind = 0   # 线上落后本地的 commit 数（本地已 push、Pages 还没部署完）
+    ahead = 0    # 线上领先本地的 commit 数（云端 build 已推，本机没 pull）
+    if not synced and local_sha and site_sha and len(local_sha) >= 7 and len(site_sha) >= 7:
+        # site_sha 可能是云端刚推的、本地对象库还没有 → 先补一次 fetch 再比较
+        if subprocess.run(["git", "cat-file", "-e", f"{site_sha}^{{commit}}"],
+                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode != 0:
+            try:
+                subprocess.run(["git", "fetch", "origin", "--quiet"], timeout=90,
+                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            except Exception:
+                pass
+        behind = _rev_count(f"{site_sha}..{local_sha}")
+        ahead = _rev_count(f"{local_sha}..{site_sha}")
+
+    if behind is None or ahead is None:
+        # 两个方向都算不出来（site_sha 拉不到），只能判定为无法比较，不能武断报部署故障
+        return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": "warn",
+                 "message": f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]}："
+                            f"线上 commit 在本地对象库中不存在，无法比较（fetch 后自动恢复）"}]
+
+    if synced:
+        msg = f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]} 已同步"
+        status = "ok"
+    elif ahead > 0 and behind == 0:
+        # 线上纯领先本地：说明云端 build 已成功部署，本机只是没 pull —— 部署链路健康
+        status = "ok"
+        msg = (f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]} 已同步"
+               f"（线上领先本地 {ahead} commit，云端 build 已部署，本机待 pull，非部署故障）")
+    elif behind <= 5:
+        # 容忍 GitHub Pages 异步部署延迟：线上落后 ≤5 个 commit 视为同步
+        # Pages 部署通常有 1-3 分钟延迟，build commit 本身会累加 1 commit，云端 v8_build 偶尔叠加
+        status = "ok"
+        msg = (f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]} "
+               f"已同步（线上落后 {behind} commit ≤5，Pages 异步部署正常）")
+    else:
+        status = "fail"
+        msg = (f"本地 HEAD {local_sha[:7]} / 线上 {site_sha[:7]} "
+               f"不同步，线上落后 {behind} commit，部署链路需检查")
     return [{"id": "site_sync", "name": "Pages 部署同步", "page": "管线", "status": status, "message": msg}]
 
 

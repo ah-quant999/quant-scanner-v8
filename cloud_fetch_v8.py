@@ -91,7 +91,10 @@ CATEGORY_MAP = {
     "INDEX_QUOTES": "intraday",
     "ETF_PULSE": "intraday",
     "ETF_INTRADAY_HEAT": "intraday",
-    "ETF_DAILY_MONITOR": "post_close",  # T+1 盘后 17:00 出数，盘前保留昨日数据
+    # ETF_DAILY_MONITOR 归 intraday：CATEGORY_MAP 决定的是「抓取时段」（main() 的 target_vars 按 cat 筛选），
+    # 该卡片配合 ETF 三连板实时卡，盘中每 30 分需要刷新，改成 post_close 会把它踢出盘中抓取（2026-08-11 回归）。
+    # 「盘前不清空、保留昨日 T+1 收盘值」是另一个语义，由下方 _clear_intraday_for_premarket 的 KEEP_VARS 负责。
+    "ETF_DAILY_MONITOR": "intraday",
     "ETF_SUBSCRIPTION": "premarket",  # T+1 盘后/盘前更新一次即可
     "SECTOR_FUND_FLOW": "intraday",
     "CAPITAL_FLOW_DATA": "intraday",
@@ -2519,7 +2522,10 @@ def _clear_intraday_for_premarket(category, only=None):
     print(f"🧹 盘前清空盘中模块当日数据（{today_iso}）...")
 
     # 明确保留的卡片：盘前不清空，保留历史/上一交易日数据
-    KEEP_VARS = {"SH_SZ_HISTORY", "CAPITAL_FLOW_DATA", "LIMIT_UP_HEATMAP"}
+    # ETF_DAILY_MONITOR：T+1 主力净流入为盘后（15:30）定稿值，盘前清成空会让「日监控·主力净流入」
+    #   卡片在开盘前一片空白（阿狸咪 2026-08-11 反馈「这是盘后的啊，清空了干嘛」）。保留昨日值，
+    #   开盘后盘中 fetch 自然覆盖为当日数据。注意它在 CATEGORY_MAP 里仍是 intraday（保证盘中被抓）。
+    KEEP_VARS = {"SH_SZ_HISTORY", "CAPITAL_FLOW_DATA", "LIMIT_UP_HEATMAP", "ETF_DAILY_MONITOR"}
 
     for var, cat in CATEGORY_MAP.items():
         if "intraday" not in [x.strip() for x in cat.split(",")]:
@@ -2611,7 +2617,7 @@ def _clear_intraday_for_premarket(category, only=None):
     data["note"] = "盘前主力净流入为上一交易日收盘值，开盘后自动刷新"
     save("CAPITAL_FLOW_DATA", data)
 
-    print(f"🧹 盘前清空完成（保留 SH_SZ_HISTORY/CAPITAL_FLOW_DATA/LIMIT_UP_HEATMAP）")
+    print(f"🧹 盘前清空完成（保留 SH_SZ_HISTORY/CAPITAL_FLOW_DATA/LIMIT_UP_HEATMAP/ETF_DAILY_MONITOR）")
 
 
 def main(category=None, only=None):
