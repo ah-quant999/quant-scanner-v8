@@ -504,6 +504,11 @@ def _data_file_update_time(var_name):
     """获取 data/*.js 的 cache-busting 时间戳。
 
     优先读取文件内容中的 update_time/updated/run_time/calc_time（语义稳定），
+    但若文件 mtime 晚于语义时间（说明云端 build 流水线在语义时间之后又
+    republish 过——常见于 SH_FIB/SZ_FIB 这类每天 09:07 写一次 update_time、
+    但被云端 build 每隔几分钟 republish 的文件），则改用 mtime，避免
+    cache-buster 卡死在旧值导致浏览器/CDN 拿到 cached 旧版。
+
     失败则回退到文件 mtime。空文件返回空字符串。
     """
     path = DATA_DIR / f"{var_name}.js"
@@ -511,12 +516,25 @@ def _data_file_update_time(var_name):
         return ""
     try:
         text = path.read_text(encoding='utf-8')
+        semantic_ts = ""
         for key in ('"update_time":"', '"updated":"', '"run_time":"', '"calc_time":"'):
             m = re.search(re.escape(key) + r'([^"]+)"', text)
             if m:
-                return m.group(1)
-        mtime = path.stat().st_mtime
-        return datetime.fromtimestamp(mtime, tz=CST).strftime("%Y-%m-%d %H:%M:%S")
+                semantic_ts = m.group(1)
+                break
+        mtime_dt = datetime.fromtimestamp(path.stat().st_mtime, tz=CST)
+        if semantic_ts:
+            sem_dt = None
+            for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M"):
+                try:
+                    sem_dt = datetime.strptime(semantic_ts, fmt).replace(tzinfo=CST)
+                    break
+                except ValueError:
+                    continue
+            if sem_dt is None or sem_dt < mtime_dt:
+                return mtime_dt.strftime("%Y-%m-%d %H:%M:%S")
+            return semantic_ts
+        return mtime_dt.strftime("%Y-%m-%d %H:%M:%S")
     except Exception:
         return ""
 
