@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-11 18:06:22",
+  "update_time": "2026-08-11 19:52:11",
   "crisis_score": 33.3,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -317,10 +317,10 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "黄金概念",
-        "PCB",
         "一带一路",
-        "央国企改革"
+        "黄金概念",
+        "央国企改革",
+        "PCB"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -349,11 +349,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [
         "被动元件概念",
-        "半导体概念",
+        "5G概念",
+        "专精特新",
         "医疗器械概念",
-        "融资融券",
-        "创业板综",
-        "5G概念"
+        "MLCC",
+        "军工"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -381,12 +381,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "创新药",
-        "融资融券",
-        "创业板综",
-        "创新医疗服务",
         "专精特新",
-        "CRO"
+        "CRO",
+        "创新药",
+        "减肥药",
+        "融资融券",
+        "创新医疗服务"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -415,11 +415,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [
         "ChatGPT概念",
-        "参股银行",
+        "彩票概念",
         "数字经济",
         "文娱消费",
-        "彩票概念",
-        "算力概念"
+        "算力概念",
+        "数字水印"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -447,12 +447,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "趋势股",
+        "重组蛋白",
+        "CRO",
         "合成生物",
-        "病原体防治",
         "融资融券",
-        "破发股",
-        "创业板综"
+        "创新医疗服务",
+        "破发股"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -476,16 +476,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "signals": [
         "不达标",
-        "日涨幅达到15%的前5只证券"
+        "连续三个交易日内，涨幅偏离值累计达到30%的证券"
       ],
       "industry": "",
       "concepts": [
-        "影视概念",
-        "创业板综",
         "破增发价股",
         "短剧互动游戏",
+        "央国企改革",
+        "影视概念",
         "文娱消费",
-        "央国企改革"
+        "创业板综"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
