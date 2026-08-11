@@ -1303,8 +1303,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
     </div>
 
-    <!-- 💰 平均股价（全A等权均价 + 20/60日水位）—— 2026-08-11 移至暂未上架实验区 -->
-    <div id="avgPriceCard" style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:none;">
+    <!-- 💰 平均股价（全A等权均价 + 20/60日水位）—— 2026-08-11 主人令：移到实时数据区，跟随实时数据节奏 -->
+    <div id="avgPriceCard" style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">
       <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--border);">
         <span style="font-size:16px;font-weight:700;color:var(--txt);">💰 平均股价（全A等权）</span>
         <span style="font-size:12px;color:var(--sub);font-weight:400;" id="avgPriceTime">--</span>
@@ -9285,13 +9285,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     // === 暂未上架实验区 · 数据驱动卡（2026-08-08 主人令：今日可入手候选已迁入「最终推荐 · 今日推荐候选池」，此处不再重复渲染） ===
 
-    // ── 2026-08-11 移入：💰 平均股价（全A等权）—— 云端数据源不稳定，暂放实验区 ──
-    h+='<div id="unlistedAvgPrice" style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:16px 0;border-left:4px solid #f59e0b;">';
-    h+='<div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--border);">';
-    h+='<span style="font-size:15px;font-weight:700;color:#fbbf24;">💰 平均股价（全A等权）</span>';
-    h+='<span style="font-size:11px;color:var(--dim);">实验区 · 云端抓取中时常空壳</span></div>';
-    h+='<div id="unlistedAvgPriceContent" style="padding:14px 18px;"><div class="note">加载中…</div></div>';
-    h+='</div>';
+    // ── 2026-08-11 主人令：💰 平均股价（全A等权）已迁到「📡 实时数据」tab 跟随 AI 市场速览展示 ──
 
     // ── 2026-08-11 移入：📌 ETF·龙头 参考 —— 仅研究参考，不构成投资建议 ──
     h+='<div style="margin:16px 0;border-left:4px solid #a855f7;" class="card">';
@@ -9306,12 +9300,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     el.innerHTML=h;
     if(typeof window.renderPortfolio==='function') window.renderPortfolio();
-    // 2026-08-11：将原位置隐藏的卡内容克隆/渲染到暂未上架区
+    // 2026-08-11：平均股价已迁到实时数据区，无需克隆到实验区；仅 ETF 龙头参考仍需克隆
     (function(){
-      // 平均股价：复用原 renderAvgPrice 逻辑到新容器
-      var srcEl=document.getElementById('avgPriceContent');
-      var dstEl=document.getElementById('unlistedAvgPriceContent');
-      if(srcEl && dstEl) dstEl.innerHTML = srcEl.innerHTML;
       // ETF龙头参考：复用原 etfMapBody 内容
       var etfSrc=document.getElementById('etfMapBody');
       var etfDst=document.getElementById('unlistedEtfMapBody');
