@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-11 18:01:30",
+  "update_time": "2026-08-11 18:06:22",
   "crisis_score": 33.3,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -317,10 +317,10 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "央国企改革",
         "黄金概念",
+        "PCB",
         "一带一路",
-        "PCB"
+        "央国企改革"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -350,9 +350,9 @@ window.FINAL_RECOMMEND_DATA = {
       "concepts": [
         "被动元件概念",
         "半导体概念",
-        "军民融合",
+        "医疗器械概念",
         "融资融券",
-        "专精特新",
+        "创业板综",
         "5G概念"
       ],
       "enter_date": "20260811",
@@ -381,12 +381,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "创新医疗服务",
+        "创新药",
         "融资融券",
+        "创业板综",
+        "创新医疗服务",
         "专精特新",
-        "题材股",
-        "减肥药",
-        "创新药"
+        "CRO"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -414,12 +414,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "人工智能",
-        "云计算",
+        "ChatGPT概念",
+        "参股银行",
+        "数字经济",
         "文娱消费",
-        "算力概念",
         "彩票概念",
-        "ChatGPT概念"
+        "算力概念"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -448,11 +448,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [
         "趋势股",
-        "破发股",
+        "合成生物",
         "病原体防治",
-        "创新医疗服务",
         "融资融券",
-        "重组蛋白"
+        "破发股",
+        "创业板综"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -480,12 +480,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "短剧互动游戏",
         "影视概念",
-        "文娱消费",
+        "创业板综",
         "破增发价股",
-        "央国企改革",
-        "创业板综"
+        "短剧互动游戏",
+        "文娱消费",
+        "央国企改革"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
