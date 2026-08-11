@@ -116,7 +116,7 @@
   "_meta": {
     "track_start": "2026-08-09",
     "created": "2026-08-09 23:57:34",
-    "last_update": "2026-08-11 00:13:20"
+    "last_update": "2026-08-11 09:08:07"
   },
   "2026-08-10": [
     {
@@ -134,20 +134,5 @@
       "status": "near"
     }
   ],
-  "2026-08-11": [
-    {
-      "code": "01209",
-      "name": "华润万象生活",
-      "market": "hk",
-      "board": "港股",
-      "close": 40.16,
-      "pct_chg": 0.5,
-      "total_score": 25.2,
-      "quality_grade": "",
-      "industry": "",
-      "sectors": [],
-      "signal_count": 0,
-      "status": "near"
-    }
-  ]
+  "2026-08-11": []
 }
