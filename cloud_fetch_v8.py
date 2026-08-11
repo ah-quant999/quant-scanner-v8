@@ -1529,8 +1529,42 @@ def f_crisis_data():
     except Exception as e:
         print(f"    ⚠️ 汇率数据获取失败: {e}")
 
-    # 全球维度：仍用保守估值（CN 网络难达 VIX/美债等实时源），但标注更清晰
-    global_score = 0.40  # 中性
+    # 全球维度：2026-08-12 主人质疑分数始终 33.3 不变 → 根因是 global 写死 0.40
+# 改为：基于 MACRO_DATA 里日级 VIX + 美债 10Y 动态计算（CN 也可达）
+    global_score = 0.40  # 兜底中性值（MACRO_DATA 不可达时使用）
+    vix_score = None
+    bond_score = None
+    vix_v = 0
+    us10y_v = 0
+    try:
+        macro_path = Path(ROOT) / "raw_data" / "macro_data.json"
+        if macro_path.exists():
+            txt = macro_path.read_text(encoding="utf-8")
+            macro = json.loads(txt) if txt.strip().startswith("{") else {}
+            gm = (macro.get("global_macro") or {})
+            monetary = (macro.get("monetary") or {})
+            vix_v = float((gm.get("vix") or {}).get("value") or 0)
+            us10y_v = float((monetary.get("us_bond_10y") or {}).get("value") or 0)
+            # VIX 风险分（<15 极低 / 15-20 正常 / 20-25 警戒 / 25-30 警惕 / ≥30 危机）
+            if vix_v > 0:
+                if vix_v < 15: vix_score = 0.10
+                elif vix_v < 20: vix_score = 0.20
+                elif vix_v < 25: vix_score = 0.35
+                elif vix_v < 30: vix_score = 0.50
+                else: vix_score = min(0.80, 0.55 + (vix_v - 30) * 0.02)
+            # 美债 10Y 风险分（<3.5 宽松 / 3.5-4.0 正常 / 4.0-4.5 偏紧 / 4.5-4.8 警惕 / ≥4.8 高压）
+            if us10y_v > 0:
+                if us10y_v < 3.5: bond_score = 0.10
+                elif us10y_v < 4.0: bond_score = 0.20
+                elif us10y_v < 4.5: bond_score = 0.30
+                elif us10y_v < 4.8: bond_score = 0.45
+                else: bond_score = min(0.80, 0.50 + (us10y_v - 4.8) * 0.15)
+            # 综合：取均值（任一缺失则退化为另一维度）
+            parts = [x for x in [vix_score, bond_score] if x is not None]
+            if parts:
+                global_score = round(sum(parts) / len(parts), 3)
+    except Exception as e:
+        print(f"    ⚠️ 全球维度(MACRO_DATA)读取失败: {e}")
 
     # 输出既保留扁平字段（兼容旧读取），也输出 indicators + score（前端 2026-08-07 后主要读取）
     currency_val = round(currency_score, 3)
@@ -1554,13 +1588,13 @@ def f_crisis_data():
         "indicators": {
             "currency": {"cat": "货币", "score": currency_val, "desc": "USD/CNY 汇率压力"},
             "economy": {"cat": "经济", "score": economy_val, "desc": "中国制造业 PMI"},
-            "global": {"cat": "全球", "score": global_val, "desc": "全球风险情绪(VIX/美债等暂用中性估值)"},
+            "global": {"cat": "全球", "score": global_val, "desc": f"全球风险情绪=基于VIX({(vix_v or 0):.1f})+美债10Y({(us10y_v or 0):.2f}%)动态计算"},
         },
         "pmi_value": economy,
         "usd_cny": usd_cny_latest,
         "note": f"经济维度=中国PMI真实值({economy or 'N/A'})；"
                f"货币维度=中国银行USD/CNY中间价({usd_cny_latest or 'N/A'})；"
-               f"全球维度因VIX/美债等源CN不可达暂用中性估值",
+               f"全球维度=基于MACRO_DATA的VIX({(vix_v or 0):.1f})+美债10Y({(us10y_v or 0):.2f}%)日级数据动态计算",
     }
 
 def f_herding_data():

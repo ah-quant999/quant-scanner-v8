@@ -4022,6 +4022,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   function renderInsight(){
     var c = _rc$('insightContainer');
     if(!c) return;
+    // 红黄绿灯本地 helper（renderAiSummary 的 IIFE 局部不共享）
+    var LIGHTC = {green:'#1fd17b', yellow:'#fbbf24', red:'#f4495d'};
+    function lightText(c){ return c==='green'?LIGHTC.green:c==='red'?LIGHTC.red:c==='yellow'?LIGHTC.yellow:c==='gray'?'#94a3b8':'#38bdf8'; }
+    function lightDot(sig, sz){
+      sz = sz || 11;
+      var col = lightText(sig);
+      return '<span style="display:inline-block;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:'+col+';box-shadow:0 0 '+(sz+2)+'px '+col+'88;vertical-align:-1px"></span>';
+    }
     try{
     var CR = window.CRISIS_DATA || {};
     var CD = window.COCKPIT_ADVICE || {};
@@ -4035,8 +4043,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     function _rcArr(x){ if(!x) return []; if(Array.isArray(x)) return x; if(typeof x==='object') return Object.values(x); return []; }
 
     var score = CR.score || 50;
-    var scoreLvl = score >= 70 ? '高风险' : score >= 50 ? '警戒' : '安全';
-    var scoreColor = score >= 70 ? 'var(--down)' : score >= 50 ? 'var(--gold)' : 'var(--up)';
+    // 优先级：数据自带的 level 字段（生成端细分） > score 推断（兜底）
+    var levelMap = {'危机':'危机','高风险':'危机','警戒':'警戒','警惕':'警戒','关注':'关注','平稳':'平稳','安全':'关注'};
+    var dataLevel = levelMap[CR.level] || null;
+    var scoreLvl = dataLevel || (score >= 70 ? '高风险' : score >= 50 ? '警戒' : score >= 30 ? '关注' : '平稳');
+    var scoreColor = score >= 70 ? 'var(--down)' : score >= 50 ? 'var(--gold)' : score >= 30 ? 'var(--gold)' : 'var(--up)';
+    // 红黄绿灯映射：风险度反语义（高=危险/红，低=安全/绿）
+    var scoreLight = score >= 70 ? 'red' : score >= 50 ? 'yellow' : score >= 30 ? 'yellow' : 'green';
     // 每日洞察聚合多个数据源，取各源真实时间中最新的作为卡片时间戳
     var updateTime = [
       CR.update_time, CD.update_time, CAND.update_time,
@@ -4081,20 +4094,30 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     h += '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center">';
     h += '<div class="insight-score-ring" style="background:'+scoreColor+'15;border:2px solid '+scoreColor+'40">';
     h += '<div class="insight-score-val" style="color:'+scoreColor+'">' + score + '</div>';
-    h += '<div class="insight-score-lbl" style="color:'+scoreColor+'">' + scoreLvl + '</div>';
+    h += '<div class="insight-score-lbl" style="color:'+scoreColor+'">'+scoreLvl+'</div>';
+    h += '<div style="margin-top:6px;display:flex;justify-content:center;align-items:center;gap:6px;font-size:11px;color:var(--sub)">'
+      + lightDot(scoreLight, 12)
+      + '<span style="color:'+scoreColor+'">'+({'red':'警戒/危机','yellow':'关注','green':'平稳/安全'}[scoreLight])+'</span>'
+      + '</div>';
     h += '</div>';
     h += '<div style="margin-top:12px;font-size:12px;color:var(--txt);font-weight:600">市场情绪健康度</div>';
     h += '<div style="font-size:11px;color:var(--dim);margin-top:4px">综合危机雷达分值，反映系统性风险水平</div>';
 
-    // Sub metrics
-    var dims = CR.dimensions || {};
+    // Sub metrics（数据字段是 indicators，不是 dimensions —— 2026-08-12 修正）
+    var dims = CR.indicators || CR.dimensions || {};
     h += '<div style="margin-top:16px;text-align:left">';
     [['货币风险','currency'],['经济压力','economy'],['全球波动','global']].forEach(function(di){
       var v = dims[di[1]];
       if(v == null) return;
-      var vc = v >= 60 ? 'var(--down)' : v >= 35 ? 'var(--gold)' : 'var(--up)';
-      h += '<div style="margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--sub)">'+di[0]+'</span><span style="color:'+vc+';font-weight:700">'+v.toFixed(0)+'</span></div>';
-      h += '<div style="height:5px;border-radius:3px;background:var(--card);overflow:hidden"><div style="width:'+v+'%;height:100%;background:'+vc+';border-radius:3px"></div></div></div>';
+      // score 字段：0~1 范围（生成端 currency_val/economy_val/global_val）
+      var raw = (typeof v === 'object' && v.score != null) ? (+v.score) : (+v);
+      var pctVal = Math.round((raw || 0) * 100);
+      var dimColor = pctVal >= 60 ? 'var(--down)' : pctVal >= 35 ? 'var(--gold)' : 'var(--up)';
+      var dimLight = pctVal >= 60 ? 'red' : pctVal >= 35 ? 'yellow' : 'green';
+      h += '<div style="margin-bottom:10px">';
+      h += '<div style="display:flex;justify-content:space-between;font-size:11px;align-items:center"><span style="color:var(--sub)">'+di[0]+'</span><span style="color:'+dimColor+';font-weight:700;display:inline-flex;align-items:center;gap:5px">'+lightDot(dimLight,8)+pctVal+'</span></div>';
+      h += '<div style="height:5px;border-radius:3px;background:var(--card);overflow:hidden;margin-top:3px"><div style="width:'+pctVal+'%;height:100%;background:'+dimColor+';border-radius:3px"></div></div>';
+      h += '</div>';
     });
     h += '</div></div>'; // left col
 
