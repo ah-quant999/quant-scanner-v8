@@ -1665,7 +1665,21 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         });
         h+='</div>';
         el.innerHTML=h;
-        if(timeEl && updateTime) timeEl.innerHTML = _uBadge('盘中','短线',updateTime);
+        if(timeEl && updateTime){
+          // 动态判断时段：昨日盘后 / 盘前 / 盘中 / 盘后
+          var _ts=new Date(updateTime.replace(/-/g,'/'));
+          var _now=new Date();
+          var _today=new Date(_now.getFullYear(),_now.getMonth(),_now.getDate()).getTime();
+          var _dToday=_ts.getTime()>=_today;
+          var _hr=_ts.getHours();
+          var _lb,_pd;
+          if(!_dToday){ _lb='昨日盘后'; _pd='盘后'; }
+          else if(_hr<9){ _lb='盘前'; _pd='盘前'; }
+          else if(_hr<15){ _lb='盘中'; _pd='盘中'; }
+          else if(_hr<17){ _lb='盘后'; _pd='盘后'; }
+          else { _lb='昨日盘后'; _pd='盘后'; }
+          timeEl.innerHTML = _uBadge(_lb,_pd,updateTime);
+        }
       }
       if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderIndustryTree);
       else renderIndustryTree();
@@ -6823,9 +6837,11 @@ function renderLimitUpHeatmap(){
     if(!si.length && !so.length){
       const tl=d.top_list||[];
       if(!(tl.length>0 && d.update_time)){
-        const empty='<div style="text-align:center;padding:16px;color:var(--dim)">📭 暂无数据，等待盘中更新</div>';
+        const _sfNote=(d&&d.note)?d.note:'盘前板块数据待开盘刷新，开盘后自动更新';
+        const _sfPremkt=!!(d&&d.premarket_cleared);
+        const empty='<div style="text-align:center;padding:16px;color:var(--dim)">⏳ '+_sfNote+'</div>';
         $('sfBlock1').innerHTML=empty; $('sfBlock2').innerHTML=empty; $('sfBlock3').innerHTML=empty;
-        setBadge('phSectorTime','盘后','短线',d.update_time); return;
+        setBadge('phSectorTime',_sfPremkt?'盘前':'盘后','短线',d.update_time); return;
       }
       tl.filter(s=>s.net>0).sort((a,b)=>b.net-a.net).slice(0,10).forEach(s=>si.push(s));
       tl.filter(s=>s.net<0).sort((a,b)=>a.net-b.net).slice(0,10).forEach(s=>so.push(s));
@@ -7014,7 +7030,9 @@ function renderLimitUpHeatmap(){
     const el0=$('etfHeatSummary'), el1=$('etfHeatByCat');
     if(!etfHeat||!etfHeat.categories || !Object.keys(etfHeat.categories).length){
       if(el0) el0.innerHTML='';
-      if(el1) el1.innerHTML='<div class="ipo-empty">⏳ 盘前数据待刷新，开盘后自动更新</div>';
+      const _hNote=(etfHeat&&etfHeat.note)?etfHeat.note:'盘前数据待刷新，开盘后自动更新';
+      if(el1) el1.innerHTML='<div class="ipo-empty">⏳ '+_hNote+'</div>';
+      if(etfHeat&&etfHeat.update_time) setBadge('phEtfTime',(etfHeat.premarket_cleared?'盘前':'盘中'),'短线',etfHeat.update_time);
       return;
     }
 const catNames=['宽基','行业','主题','跨境','商品'];
