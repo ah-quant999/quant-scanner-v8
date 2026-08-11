@@ -4578,6 +4578,46 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
 
       <div class="card">
+        <h3><span class="ic">💰</span>AI 行平均股价买卖信号面板（何时到高点卖/何时可以买）- 说明</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">AI 主行平均股价（全 A 等权均价）下方的信号面板。基于 <code>AVG_PRICE_DATA</code> 的当前位置 / 均线偏离 / 单日涨跌 / 历史趋势四个维度自动计算买入或卖出信号，作为「市场水位」参考。</div>
+        <div class="logic-h">📉 卖出信号（到高点要卖）</div>
+        <table class="lg-table">
+          <tr><th>触发条件</th><th>信号</th></tr>
+          <tr><td>position_vs_ma20 &gt; 5%</td><td>🔴 远超 MA20 +X% · 高估</td></tr>
+          <tr><td>position_vs_ma20 &gt; 3%</td><td>🟠 偏离 MA20 +X% · 关注止盈</td></tr>
+          <tr><td>position_vs_ma60 &gt; 10%</td><td>🔴 远超 MA60 +X% · 严重高估</td></tr>
+          <tr><td>position_vs_ma60 &gt; 6%</td><td>🟠 偏离 MA60 +X% · 中期高估</td></tr>
+          <tr><td>avg_change_pct &lt; -1.5%</td><td>⚠️ 单日暴跌 X% · 恐慌</td></tr>
+          <tr><td>连涨 2 天后转跌</td><td>⚡ 连涨后回调 · 注意风险</td></tr>
+        </table>
+        <div class="logic-h">📈 买入信号（可以买入）</div>
+        <table class="lg-table">
+          <tr><th>触发条件</th><th>信号</th></tr>
+          <tr><td>position_vs_ma20 &lt; -3%</td><td>🟢 低于 MA20 X% · 短期超卖</td></tr>
+          <tr><td>position_vs_ma20 &lt; -5%</td><td>🟢 深破 MA20 X% · 可关注</td></tr>
+          <tr><td>position_vs_ma60 &lt; -5%</td><td>🟢 低于 MA60 X% · 中期低估·分批</td></tr>
+          <tr><td>position_vs_ma60 &lt; -8%</td><td>🟢 深破 MA60 X% · 建仓区间</td></tr>
+          <tr><td>avg_change_pct &gt; 1.5%</td><td>⚡ 单日暴涨 X% · 追高风险</td></tr>
+          <tr><td>连跌 2 天后转涨</td><td>🔄 连跌后首阳 · 反弹确认</td></tr>
+        </table>
+        <div class="logic-h">面板可视化设计</div>
+        <table class="lg-table">
+          <tr><th>信号组合</th><th>面板背景</th></tr>
+          <tr><td>仅卖出</td><td>🔴 红色 (rgba(239,68,68,.08))</td></tr>
+          <tr><td>仅买入</td><td>🟢 绿色 (rgba(34,197,94,.08))</td></tr>
+          <tr><td>同时有</td><td>🟠 橙色 (rgba(245,158,11,.06))</td></tr>
+          <tr><td>无信号</td><td>不显示面板</td></tr>
+        </table>
+        <div class="logic-h">数据源</div>
+        <div class="logic-p"><code>AVG_PRICE_DATA</code> 的 <code>avg_price</code> / <code>ma20</code> / <code>ma60</code> / <code>position_vs_ma20</code> / <code>position_vs_ma60</code> / <code>avg_change_pct</code> / <code>history[]</code>（近 N 日，用于连涨/连跌反转信号）。</div>
+        <div class="logic-h">今日示例（2026-08-11）</div>
+        <div class="logic-p"><code>avg_price=28.07 / ma20=28.07 / position_vs_ma20=0.0001%</code> → <b>无任何信号触发</b>（估值中性）。偏离变大时自动出信号。</div>
+        <div class="logic-h">代码位置</div>
+        <div class="logic-p"><code>index.html</code> block#21 「4b. 💰 平均股价」约 ~1487-1530 行（买卖信号计算 + 面板渲染）。</div>
+      </div>
+
+      <div class="card">
         <h3><span class="ic">🚦</span>市场健康度三灯 - 说明</h3>
         <div class="logic-h">三维判断</div>
         <table class="lg-table">
