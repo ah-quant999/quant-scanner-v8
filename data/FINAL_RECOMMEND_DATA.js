@@ -1,9 +1,9 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-11 17:50:23",
+  "update_time": "2026-08-11 18:01:30",
   "crisis_score": 33.3,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
-  "total_candidates": 22,
+  "total_candidates": 21,
   "top_n": 3,
   "strong_sectors": [
     "元件",
@@ -134,13 +134,13 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "rank": 3,
-      "code": "301583",
-      "name": "托伦斯",
+      "code": "301717",
+      "name": "超纯应材",
       "market": "sz",
       "board": "创业板",
       "horizon": "短线",
       "close": null,
-      "pct_chg": 9.7312,
+      "pct_chg": 662.2367,
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -151,45 +151,24 @@ window.FINAL_RECOMMEND_DATA = {
         "大牛股猎手"
       ],
       "source_scores": {
-        "大牛股猎手": 2.19
+        "大牛股猎手": 3.35
       },
       "resonance": 1,
-      "strength": 2.19,
-      "sector_score": 1.0,
-      "sector_hits": [
-        {
-          "name": "半导体",
-          "pct_5d": 18.6,
-          "relative_5d": 18.6,
-          "strong": true
-        }
-      ],
-      "sector_fund": [
-        {
-          "name": "半导体",
-          "pct_5d": 18.6,
-          "relative_5d": 18.6,
-          "strong": true
-        }
-      ],
-      "final_score": 4.69,
-      "buy_score": 4.69,
-      "enter_date": "20260810",
+      "strength": 3.35,
+      "sector_score": 0.0,
+      "sector_hits": [],
+      "sector_fund": [],
+      "final_score": 4.85,
+      "buy_score": 4.85,
+      "enter_date": "20260811",
       "signals": [
-        "日换手率达到30%的前5只证券",
-        "机构独买"
+        "无价格涨跌幅限制的证券",
+        "机游共振"
       ],
       "_60m_resonance": false,
-      "reason": "大牛股猎手 机构1.4亿+游资0.0亿",
-      "industry": "通用设备制造业",
-      "concepts": [
-        "次新股",
-        "百元股",
-        "半导体概念",
-        "东方财富热股",
-        "先进封装",
-        "创业板综"
-      ],
+      "reason": "大牛股猎手 机构7.7亿+游资3.1亿",
+      "industry": "",
+      "concepts": [],
       "backtest": {
         "signals": 171,
         "win_rate": 48.5,
@@ -198,7 +177,7 @@ window.FINAL_RECOMMEND_DATA = {
         "note": "个股暂无历史信号，展示策略级统计（最佳持有 3 天）"
       },
       "tracking": {
-        "entry_date": "20260810",
+        "entry_date": "20260811",
         "entry_price": null,
         "latest_price": null,
         "return_pct": null,
@@ -294,32 +273,89 @@ window.FINAL_RECOMMEND_DATA = {
       "resistance": null
     },
     {
-      "code": "301583",
-      "name": "托伦斯",
+      "code": "301717",
+      "name": "超纯应材",
       "market": "深市",
       "board": "创业板",
       "horizon": "短线",
       "close": null,
-      "pct_chg": 9.7312,
-      "final_score": 4.69,
+      "pct_chg": 662.2367,
+      "final_score": 4.85,
+      "resonance": 1,
+      "sources": [
+        "大牛股猎手"
+      ],
+      "signals": [
+        "无价格涨跌幅限制的证券",
+        "机游共振"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "20260811",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "002552",
+      "name": "宝鼎科技",
+      "market": "深市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": null,
+      "pct_chg": 4.2972,
+      "final_score": 4.62,
+      "resonance": 1,
+      "sources": [
+        "大牛股猎手"
+      ],
+      "signals": [
+        "不达标",
+        "连续三个交易日内，涨幅偏离值累计达到20%的证券"
+      ],
+      "industry": "计算机、通信和其他电子设备制造业",
+      "concepts": [
+        "央国企改革",
+        "黄金概念",
+        "一带一路",
+        "PCB"
+      ],
+      "enter_date": "20260811",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "301566",
+      "name": "达利凯普",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": null,
+      "pct_chg": 13.2129,
+      "final_score": 4.61,
       "resonance": 1,
       "sources": [
         "大牛股猎手"
       ],
       "signals": [
         "日换手率达到30%的前5只证券",
-        "机构独买"
+        "游资独买"
       ],
-      "industry": "通用设备制造业",
+      "industry": "",
       "concepts": [
-        "次新股",
-        "百元股",
+        "被动元件概念",
         "半导体概念",
-        "东方财富热股",
-        "先进封装",
-        "创业板综"
+        "军民融合",
+        "融资融券",
+        "专精特新",
+        "5G概念"
       ],
-      "enter_date": "20260810",
+      "enter_date": "20260811",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -327,32 +363,32 @@ window.FINAL_RECOMMEND_DATA = {
       "resistance": null
     },
     {
-      "code": "000636",
-      "name": "风华高科",
+      "code": "301520",
+      "name": "万邦医药",
       "market": "深市",
-      "board": "主板",
+      "board": "创业板",
       "horizon": "短线",
       "close": null,
-      "pct_chg": 5.8501,
-      "final_score": 3.75,
+      "pct_chg": 19.9966,
+      "final_score": 3.84,
       "resonance": 1,
       "sources": [
         "大牛股猎手"
       ],
       "signals": [
-        "日振幅值达到15%的前5只证券",
-        "游资独买"
+        "日涨幅达到15%的前5只证券",
+        "机游共振"
       ],
-      "industry": "计算机、通信和其他电子设备制造业",
+      "industry": "",
       "concepts": [
-        "5G概念",
-        "华为概念",
-        "机器人概念",
-        "电池技术",
-        "MLCC",
-        "融资融券"
+        "创新医疗服务",
+        "融资融券",
+        "专精特新",
+        "题材股",
+        "减肥药",
+        "创新药"
       ],
-      "enter_date": "20260810",
+      "enter_date": "20260811",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -360,14 +396,14 @@ window.FINAL_RECOMMEND_DATA = {
       "resistance": null
     },
     {
-      "code": "001258",
-      "name": "立新能源",
+      "code": "002229",
+      "name": "鸿博股份",
       "market": "深市",
       "board": "主板",
       "horizon": "短线",
       "close": null,
-      "pct_chg": 10.0304,
-      "final_score": 3.68,
+      "pct_chg": 10.0281,
+      "final_score": 3.63,
       "resonance": 1,
       "sources": [
         "大牛股猎手"
@@ -376,49 +412,16 @@ window.FINAL_RECOMMEND_DATA = {
         "日涨幅偏离值达到7%的前5只证券",
         "游资独买"
       ],
-      "industry": "电力、热力生产和供应业",
-      "concepts": [
-        "反转股",
-        "充电桩",
-        "新能源",
-        "西部大开发",
-        "绿色电力",
-        "题材股"
-      ],
-      "enter_date": "20260810",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "688137",
-      "name": "近岸蛋白",
-      "market": "沪市",
-      "board": "科创板",
-      "horizon": "短线",
-      "close": null,
-      "pct_chg": 17.5086,
-      "final_score": 3.61,
-      "resonance": 1,
-      "sources": [
-        "大牛股猎手"
-      ],
-      "signals": [
-        "不达标",
-        "有价格涨跌幅限制的日收盘价格涨幅达到15%的前五只证券"
-      ],
       "industry": "",
       "concepts": [
-        "重组蛋白",
-        "体外诊断概念",
-        "精准诊断",
-        "破发股",
-        "专精特新",
-        "融资融券"
+        "人工智能",
+        "云计算",
+        "文娱消费",
+        "算力概念",
+        "彩票概念",
+        "ChatGPT概念"
       ],
-      "enter_date": "20260810",
+      "enter_date": "20260811",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -426,46 +429,13 @@ window.FINAL_RECOMMEND_DATA = {
       "resistance": null
     },
     {
-      "code": "002580",
-      "name": "圣阳股份",
-      "market": "深市",
-      "board": "主板",
-      "horizon": "短线",
-      "close": null,
-      "pct_chg": 10.0105,
-      "final_score": 3.6,
-      "resonance": 1,
-      "sources": [
-        "大牛股猎手"
-      ],
-      "signals": [
-        "不达标",
-        "日涨幅偏离值达到7%的前5只证券"
-      ],
-      "industry": "",
-      "concepts": [
-        "新能源",
-        "液冷概念",
-        "数据中心",
-        "储能概念",
-        "创投",
-        "固态电池"
-      ],
-      "enter_date": "20260810",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "301051",
-      "name": "信濠光电",
+      "code": "301047",
+      "name": "义翘神州",
       "market": "深市",
       "board": "创业板",
       "horizon": "短线",
       "close": null,
-      "pct_chg": 19.9768,
+      "pct_chg": 4.7267,
       "final_score": 3.58,
       "resonance": 1,
       "sources": [
@@ -477,14 +447,14 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "柔性屏(折叠屏)",
+        "趋势股",
         "破发股",
-        "创业板综",
+        "病原体防治",
+        "创新医疗服务",
         "融资融券",
-        "3D玻璃",
-        "深圳特区"
+        "重组蛋白"
       ],
-      "enter_date": "20260810",
+      "enter_date": "20260811",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -492,13 +462,46 @@ window.FINAL_RECOMMEND_DATA = {
       "resistance": null
     },
     {
-      "code": "688203",
-      "name": "海正生材",
-      "market": "沪市",
-      "board": "科创板",
+      "code": "300426",
+      "name": "华智数媒",
+      "market": "深市",
+      "board": "创业板",
       "horizon": "短线",
       "close": null,
-      "pct_chg": 17.3578,
+      "pct_chg": 20.0,
+      "final_score": 3.55,
+      "resonance": 1,
+      "sources": [
+        "大牛股猎手"
+      ],
+      "signals": [
+        "不达标",
+        "日涨幅达到15%的前5只证券"
+      ],
+      "industry": "",
+      "concepts": [
+        "短剧互动游戏",
+        "影视概念",
+        "文娱消费",
+        "破增发价股",
+        "央国企改革",
+        "创业板综"
+      ],
+      "enter_date": "20260811",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "920117",
+      "name": "龙鑫智能",
+      "market": "北交所",
+      "board": "北交所",
+      "horizon": "短线",
+      "close": null,
+      "pct_chg": -3.3633,
       "final_score": 3.53,
       "resonance": 1,
       "sources": [
@@ -506,75 +509,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "signals": [
         "不达标",
-        "有价格涨跌幅限制的日收盘价格涨幅达到15%的前五只证券"
+        "当日换手率达到20%的前5只股票"
       ],
       "industry": "",
       "concepts": [],
-      "enter_date": "20260810",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "300274",
-      "name": "阳光电源",
-      "market": "创业板",
-      "board": "创业板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "电气机械和器材制造业",
-      "concepts": [
-        "氢能源",
-        "充电桩",
-        "宁组合",
-        "创业成份",
-        "储能概念",
-        "新能源车"
-      ],
-      "enter_date": "2026-08-11",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "300502",
-      "name": "新易盛",
-      "market": "创业板",
-      "board": "创业板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "计算机、通信和其他电子设备制造业",
-      "concepts": [
-        "5G概念",
-        "光通信模块",
-        "百元股",
-        "创业成份",
-        "东方财富热股",
-        "CPO概念"
-      ],
-      "enter_date": "2026-08-11",
+      "enter_date": "20260811",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
