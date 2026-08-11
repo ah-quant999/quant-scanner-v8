@@ -1494,6 +1494,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           h+=' &nbsp;|&nbsp; vs 20日线 '+_pt(ap.position_vs_ma20)+' <span style="color:var(--dim);font-size:11.5px;">(MA20 '+Number(ap.ma20).toFixed(2)+')</span>';
           h+=' &nbsp;|&nbsp; vs 60日线 '+_pt(ap.position_vs_ma60)+' <span style="color:var(--dim);font-size:11.5px;">(MA60 '+Number(ap.ma60).toFixed(2)+')</span>';
           h+=' &nbsp;|&nbsp; 样本 <b>'+(ap.count||'--')+'</b> 只';
+          // ── 异常警告（不静默吞掉）──
+          var _warns=[];
+          if(_chg!=null && _chg<-0.5) _warns.push('单日跌'+(_chg<0?'':'')+Number(_chg).toFixed(1)+'%');
+          if(ap.position_vs_ma20!=null && ap.position_vs_ma20<0) _warns.push('破MA20');
+          if(ap.position_vs_ma60!=null && ap.position_vs_ma60<0) _warns.push('破MA60');
+          if(_warns.length){
+            h+=' &nbsp;<span style="display:inline-block;padding:1px 7px;border-radius:3px;background:#b91c1c22;color:#f87171;font-size:11.5px;font-weight:700;margin-left:4px;">⚠ '+_warns.join(' / ')+'</span>';
+          }
           h+='</div>';
         })();
 
