@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-11 16:01:05",
+  "update_time": "2026-08-11 16:38:42",
   "data_date": "2026-08-11",
   "track_start": "2026-08-11",
   "history_days": 3,
@@ -25,7 +25,13 @@
       "first_close": 102.79,
       "current_close": 112.32,
       "pnl_pct": 9.27,
-      "catalysts": []
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "已兑现(价涨)"
+        }
+      ]
     },
     {
       "code": "601899",
@@ -254,12 +260,14 @@
       "names": []
     },
     "cockpit_a": {
-      "count": 3,
-      "overlap": 0,
-      "names": []
+      "count": 9,
+      "overlap": 1,
+      "names": [
+        "贵州茅台"
+      ]
     },
     "cockpit_b": {
-      "count": 7,
+      "count": 15,
       "overlap": 0,
       "names": []
     }
@@ -267,46 +275,46 @@
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测",
     "latest_date": "2026-08-10",
-    "total": 183,
+    "total": 188,
     "best_hold_days": 1,
     "periods": {
       "1d": {
         "win_rate": 55.9,
-        "avg_return": 0.33,
+        "avg_return": 0.32,
         "sharpe": 0.06,
-        "count": 171,
+        "count": 176,
         "best": 13.68,
         "worst": -10.01
       },
       "3d": {
         "win_rate": 36.4,
-        "avg_return": -1.26,
-        "sharpe": -0.18,
-        "count": 171,
+        "avg_return": -1.23,
+        "sharpe": -0.17,
+        "count": 176,
         "best": 15.0,
         "worst": -10.02
       },
       "5d": {
         "win_rate": 44.8,
-        "avg_return": -0.53,
+        "avg_return": -0.52,
         "sharpe": -0.06,
-        "count": 171,
+        "count": 176,
         "best": 15.0,
         "worst": -10.04
       },
       "10d": {
         "win_rate": 21.0,
-        "avg_return": -2.41,
-        "sharpe": -0.36,
-        "count": 171,
+        "avg_return": -2.34,
+        "sharpe": -0.35,
+        "count": 176,
         "best": 15.07,
         "worst": -10.04
       },
       "20d": {
         "win_rate": 20.0,
-        "avg_return": -0.58,
+        "avg_return": -0.57,
         "sharpe": -0.15,
-        "count": 171,
+        "count": 176,
         "best": 15.0,
         "worst": -10.02
       }
@@ -315,17 +323,17 @@
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 63,
+      "count": 66,
       "win_rate_5d": 66.7,
-      "avg_ret_5d": 2.49,
+      "avg_ret_5d": 2.35,
       "best_win_rate": 66.7,
       "best_hold_days": 5
     },
     {
       "band": "70~80",
-      "count": 120,
+      "count": 122,
       "win_rate_5d": 36.6,
-      "avg_ret_5d": -1.82,
+      "avg_ret_5d": -1.79,
       "best_win_rate": 53.8,
       "best_hold_days": 1
     }
@@ -335,8 +343,8 @@
       {
         "period": "1d",
         "strict_win": 55.9,
-        "strict_ret": 0.33,
-        "strict_count": 171,
+        "strict_ret": 0.32,
+        "strict_count": 176,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -344,8 +352,8 @@
       {
         "period": "3d",
         "strict_win": 36.4,
-        "strict_ret": -1.26,
-        "strict_count": 171,
+        "strict_ret": -1.23,
+        "strict_count": 176,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -353,8 +361,8 @@
       {
         "period": "5d",
         "strict_win": 44.8,
-        "strict_ret": -0.53,
-        "strict_count": 171,
+        "strict_ret": -0.52,
+        "strict_count": 176,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -362,8 +370,8 @@
       {
         "period": "10d",
         "strict_win": 21.0,
-        "strict_ret": -2.41,
-        "strict_count": 171,
+        "strict_ret": -2.34,
+        "strict_count": 176,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -371,8 +379,8 @@
       {
         "period": "20d",
         "strict_win": 20.0,
-        "strict_ret": -0.58,
-        "strict_count": 171,
+        "strict_ret": -0.57,
+        "strict_count": 176,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
