@@ -73,7 +73,14 @@ def main():
     print("=" * 60)
 
     # ── 1. 加载金股池 ──
-    gold_pool = load_json(os.path.join(DATA_DIR, "gold_pool.json"), {"stocks": {}})
+    # 🔴 2026-08-11 修复顺序缺陷：本轮 fresh gold_pool 由 scanner.py 直产到 out/，
+    #    raw_data/gold_pool.json 要等 stage_to_raw（run_algorithms step2）才刷新；
+    #    本脚本在 step1 运行，直接读 raw_data 会拿到上一轮的旧/空文件 → "金股池为空"跳过。
+    #    故优先读 out/gold_pool.json（本轮），回退 raw_data。
+    _out_gp = os.path.join(WORKSPACE, "..", "out", "gold_pool.json")
+    gold_pool = load_json(_out_gp, {})
+    if not (isinstance(gold_pool, dict) and gold_pool.get("stocks")):
+        gold_pool = load_json(os.path.join(DATA_DIR, "gold_pool.json"), {"stocks": {}})
     gp_stocks = gold_pool.get("stocks", {})
     if not gp_stocks:
         print("  ⚠️  金股池为空，跳过")

@@ -416,7 +416,23 @@ def main():
     print(f"{'='*60}\n")
 
     # 读金股池，并尝试用历史快照并集作为回测宇宙（纠偏幸存者偏差）
-    gp = json.load(open(os.path.join(DATA_DIR, "gold_pool.json"), "r", encoding="utf-8"))
+    # 🔴 2026-08-11 修复顺序缺陷 + 空文件容错：本轮 fresh gold_pool 由 scanner.py 直产到 out/，
+    #    raw_data/gold_pool.json 要等 stage_to_raw（step2）才刷新；本脚本在 step1 运行，
+    #    直接读 raw_data 会拿到上一轮的旧/空文件 → 空文件触发 JSONDecodeError 崩溃。
+    #    故优先读 out/gold_pool.json（本轮），回退 raw_data，并对损坏/空文件容错。
+    def _load_gold_pool():
+        for p in (os.path.join(BASE, "..", "out", "gold_pool.json"),
+                  os.path.join(DATA_DIR, "gold_pool.json")):
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    d = json.load(f)
+                if isinstance(d, dict) and d.get("stocks"):
+                    return d
+            except (FileNotFoundError, json.JSONDecodeError, OSError):
+                continue
+        return {"stocks": {}}
+
+    gp = _load_gold_pool()
     current_gp_stocks = gp.get("stocks", {})
     gp_stocks, survivor_bias_warning, snapshots_used = _load_historical_pool_union(current_gp_stocks)
     log(f"金股池: 当前 {len(current_gp_stocks)} 只 / 回测宇宙 {len(gp_stocks)} 只（历史快照 {snapshots_used} 个）")
