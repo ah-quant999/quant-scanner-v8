@@ -3984,16 +3984,20 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     // Right: Signal panels
     h += '<div class="insight-grid" style="grid-template-columns:1fr 1fr">';
 
-    // 明日关注
+    // 明日关注（2026-08-11 修复：原用 CAND.stocks.ema_score 但 CAND 只有 name/board/sources 导致全 0 分；
+    // 改用 FINAL_RECOMMEND.all_candidates.final_score 才是真正综合分）
     h += '<div class="insight-card" style="border-left-color:var(--gold)"><h4>⚡ 明日关注</h4>';
     h += '<p>高胜率信号组合，明日开盘重点跟踪标的。</p>';
-    var candList = _rcArr(CAND.stocks);
-    var recStocks = candList.slice(0, 5);
-    if(recStocks.length > 0){
+    var _FR = window.FINAL_RECOMMEND_DATA || {};
+    var _frList = _rcArr(_FR.all_candidates).slice().sort(function(a,b){ return (b.final_score||0)-(a.final_score||0); }).slice(0,5);
+    if(_frList.length > 0){
       h += '<div class="insight-list">';
-      recStocks.forEach(function(s){
-        var sc = s.ema_score || s.score || 0;
-        h += '<div class="insight-li"><span>' + _rcEsc(s.name) + '</span><span style="color:'+(sc>=70?'var(--up)':sc>=50?'var(--gold)':'var(--down)')+';font-weight:600">' + sc.toFixed(0) + '分</span></div>';
+      _frList.forEach(function(s){
+        var sc = +(s.final_score||0);
+        // final_score 是 0~10 量级：>=6 强、>=4 中、<4 弱
+        var col = sc>=6?'var(--up)':sc>=4?'var(--gold)':'var(--down)';
+        var mk = sc>=6?'★':sc>=4?'●':'○';
+        h += '<div class="insight-li"><span>' + mk + ' ' + _rcEsc(s.name) + ' <span style="font-size:10px;color:var(--dim)">' + _rcEsc(s.code) + '</span></span><span style="color:'+col+';font-weight:600">' + sc.toFixed(1) + '分</span></div>';
       });
       h += '</div>';
     } else {
@@ -4007,16 +4011,22 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var riskItems = [];
     if(score >= 70) riskItems.push('危机雷达综合分≥70，系统性风险偏高');
     if(VOL.items && VOL.items[0] && (VOL.items[0].vol_ann||0) > 80) riskItems.push('年化波动率偏高，注意仓位控制');
-    // 2026-08-11 修复：列出机游共振卖出的具体个股名称，不再只显示数量
+    // 2026-08-11 修复：风险卡片下方竖排个股，与明日关注卡片风格一致；
+    // 机游共振卖出按金额大小倒序（最严重排前），右侧显示总流出亿
     var lhbRisk = _rcArr(LHB.stocks).filter(function(s){ return (s.inst_net_万||0)<0 && (s.yz_net_万||0)<0; })
                       .sort(function(a,b){ return ((a.inst_net_万||0)+(a.yz_net_万||0))-((b.inst_net_万||0)+(b.yz_net_万||0)); }).slice(0,5);
-    if(lhbRisk.length > 0) {
-      var _riskNames = lhbRisk.map(function(s){return _rcEsc(s.name);}).join('、');
-      riskItems.push('龙虎榜机游共振卖出 '+lhbRisk.length+' 只：'+_riskNames);
-    }
     if(riskItems.length > 0){
-      h += '<div class="insight-list">';
+      h += '<div class="insight-list" style="margin-bottom:8px">';
       riskItems.forEach(function(r){ h += '<div class="insight-li"><span style="color:var(--down)">●</span><span>' + r + '</span></div>'; });
+      h += '</div>';
+    }
+    if(lhbRisk.length > 0) {
+      h += '<div style="font-size:10px;color:var(--down);font-weight:600;margin:6px 0 4px">机游共振卖出（金额倒序）</div>';
+      h += '<div class="insight-list">';
+      lhbRisk.forEach(function(s){
+        var _out = (s.inst_net_万||0) + (s.yz_net_万||0);  // 单位万元（已含负号）
+        h += '<div class="insight-li"><span style="color:var(--down)">▼</span><span>'+_rcEsc(s.name)+' <span style="font-size:10px;color:var(--dim)">'+_rcEsc(s.code||'')+'</span></span><span class="c-down" style="font-weight:600">'+_rcFmtYi(_out)+'</span></div>';
+      });
       h += '</div>';
     } else {
       h += '<div style="color:var(--up);font-size:11px">✅ 当前无显著风险信号</div>';
