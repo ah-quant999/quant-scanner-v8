@@ -989,11 +989,19 @@ window.__judgmentCandidatesHTML = __judgmentCandidatesHTML;
 function _buildJudgmentEnvHTML(d){
   if(!d) return '<div style="color:var(--dim);padding:12px;text-align:center">环境态势数据加载中（盘前 08:25 自动生成）…</div>';
   var h = '';
-  // 1) 最终共同结论置顶
-  if(d.consensus){
-    var dir = d.consensus.indexOf('偏多')>=0 ? 'var(--up)' : (d.consensus.indexOf('偏空')>=0 ? 'var(--down)' : '#f59e0b');
-    h += '<div style="margin-bottom:10px;padding:8px 12px;background:'+dir+'15;border:1px solid '+dir+'40;border-radius:8px;font-size:13px;font-weight:700;color:'+dir+'">🤝 共同结论：'+d.consensus+'</div>';
+  // 0) 红黄绿灯总览（交通灯语义：🟢积极 / 🟡观望 / 🔴防守）
+  var LIGHT = {green:'#1fd17b', yellow:'#fbbf24', red:'#f4495d'};
+  function lightDot(c,size){
+    size = size || 10;
+    return '<span style="display:inline-block;width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+c+';box-shadow:0 0 '+(size)+'px '+c+'88;vertical-align:-1px"></span>';
   }
+  var consTxt = d.consensus || d.verdict || '';
+  var lv = consTxt.indexOf('偏多')>=0 ? 'green' : (consTxt.indexOf('偏空')>=0 ? 'red' : 'yellow');
+  var lvColor = LIGHT[lv];
+  h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 12px;background:'+lvColor+'12;border:1px solid '+lvColor+'45;border-radius:8px;font-size:13px;flex-wrap:wrap">'
+    + '<span style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:'+lvColor+'">'+lightDot(lvColor,14)+'今日信号 · '+({green:'积极',yellow:'观望',red:'防守'}[lv])+'</span>'
+    + '<span style="font-size:11px;color:var(--sub)">'+consTxt+'</span>'
+    + '<span style="margin-left:auto;font-size:10px;color:var(--dim)">🟢 积极 · 🟡 观望 · 🔴 防守</span></div>';
   // 2) 时事滚动（紧凑）
   var fullMb = (typeof window !== 'undefined' && window.MACRO_BRIEF) || {};
   var mb = (fullMb.headline ? fullMb : (d.macro_brief || {})) || {};
@@ -1047,8 +1055,10 @@ function _buildJudgmentEnvHTML(d){
       var rec = a.recommendation || 0;
       var stars = '';
       for(var i=1;i<=5;i++) stars += (i<=rec ? '★' : '☆');
-      var recColor = rec>=4 ? 'var(--up)' : (rec>=3 ? '#f59e0b' : 'var(--down)');
+      var aLv = rec>=4 ? 'green' : (rec>=3 ? 'yellow' : 'red');
+      var recColor = LIGHT[aLv];
       h += '<div style="display:flex;flex-wrap:wrap;gap:6px 10px;padding:5px 10px;background:rgba(167,139,250,.05);border-radius:6px;border-left:3px solid var(--purple);font-size:11.5px;line-height:1.5;align-items:center">';
+      h += lightDot(recColor,9);
       h += '<span style="font-weight:800;color:var(--txt)">'+a.name+'</span>';
       h += '<span style="font-weight:700;color:var(--purple)">'+a.judgment+'</span>';
       h += '<span style="font-weight:700;color:'+recColor+';letter-spacing:1px">'+stars+'</span>';
