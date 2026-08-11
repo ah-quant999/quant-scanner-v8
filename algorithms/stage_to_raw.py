@@ -101,7 +101,8 @@ def _add_timestamp(obj):
 
 def append_lhb_to_history():
     """把最新一天的分类龙虎榜（raw_data/lhb_data.json）追加进 raw_data/lhb_history.json，
-    供机游共振 / 北向席位日历使用。已存在的日期跳过。"""
+    供机游共振 / 北向席位日历使用。
+    2026-08-11 修复：空壳占位符(trading=False/stocks=0)不再阻塞真实数据，改为覆盖更新。"""
     lhb = Path(RAW) / "lhb_data.json"
     if not lhb.exists():
         return False
@@ -116,8 +117,14 @@ def append_lhb_to_history():
     hist = {}
     if hist_path.exists():
         hist = _load_json(hist_path) or {}
+    # 修复：空壳占位符(trading=False 或 stocks 为空)应被真实数据覆盖，而非永久阻塞
     if iso in hist:
-        return False  # 当日已追加
+        existing = hist[iso]
+        has_real_data = existing.get("trading") is True and len(existing.get("stocks", [])) > 0
+        if has_real_data:
+            return False  # 真实数据已存在，跳过
+        print(f"  🔄 覆盖空壳占位 {iso}（原 trading={existing.get('trading')} "
+              f"stocks={len(existing.get('stocks', []))} → 新 {len(obj['stocks'])} 只）")
     hist[iso] = {
         "trading": True,
         "stocks": obj["stocks"],
