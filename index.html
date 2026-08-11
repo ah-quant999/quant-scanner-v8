@@ -1484,7 +1484,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           h+='</div>';
         });
 
-        // 4b. 💰 平均股价（全A等权）—— 紧凑行，紧跟大盘异动
+        // 4b. 💰 平均股价（全A等权）—— 紧凑行，紧跟大盘异动 + 买卖信号
         (function(){
           var ap=window.AVG_PRICE_DATA;
           if(!ap || !ap.avg_price) return;
@@ -1493,6 +1493,29 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var _cCol=_chg>=0?'var(--up)':(_chg<0?'var(--down)':'var(--sub)');
           var _cTxt=_chg==null?'--':((_chg>0?'+':'')+Number(_chg).toFixed(2)+'%');
           function _pt(v){ if(v==null||isNaN(v)) return '<span style="color:var(--sub)">--</span>'; var _c=v>=0?'var(--up)':'var(--down)'; return '<span style="color:'+_c+';font-weight:600;">'+(v>=0?'▲':'▼')+' '+(v>0?'+':'')+Number(v).toFixed(2)+'%</span>'; }
+
+          // ===== 买卖信号计算 =====
+          var _sigBuy=[], _sigSell=[];
+          var _p20=ap.position_vs_ma20, _p60=ap.position_vs_ma60;
+          if(_p20!=null && _p20>5) _sigSell.push('🔴 远超MA20 +'+_p20.toFixed(1)+'% · 高估');
+          else if(_p20!=null && _p20>3) _sigSell.push('🟠 偏离MA20 +'+_p20.toFixed(1)+'% · 关注止盈');
+          if(_p60!=null && _p60>10) _sigSell.push('🔴 远超MA60 +'+_p60.toFixed(1)+'% · 严重高估');
+          else if(_p60!=null && _p60>6) _sigSell.push('🟠 偏离MA60 +'+_p60.toFixed(1)+'% · 中期高估');
+          if(_p20!=null && _p20<-3) _sigBuy.push('🟢 低于MA20 '+_p20.toFixed(1)+'% · 短期超卖');
+          if(_p20!=null && _p20<-5) _sigBuy.push('🟢 深破MA20 '+_p20.toFixed(1)+'% · 可关注');
+          if(_p60!=null && _p60<-5) _sigBuy.push('🟢 低于MA60 '+_p60.toFixed(1)+'% · 中期低估·分批');
+          if(_p60!=null && _p60<-8) _sigBuy.push('🟢 深破MA60 '+_p60.toFixed(1)+'% · 建仓区间');
+          var _hist=ap.history||[];
+          if(_hist.length>=3){
+            var _d0=_hist[_hist.length-1], _d1=_hist[_hist.length-2], _d2=_hist[_hist.length-3];
+            if(_d2.avg_change_pct<0 && _d1.avg_change_pct<0 && _d0.avg_change_pct>0)
+              _sigBuy.push('🔄 连跌后首阳 · 反弹确认');
+            if(_d2.avg_change_pct>0 && _d1.avg_change_pct>0 && _d0.avg_change_pct<0)
+              _sigSell.push('⚡ 连涨后回调 · 注意风险');
+          }
+          if(_chg!=null && _chg<-1.5) _sigSell.push('⚠️ 单日暴跌 '+_chg.toFixed(1)+'% · 恐慌');
+          if(_chg!=null && _chg>1.5) _sigBuy.push('⚡ 单日暴涨 '+(+_chg).toFixed(1)+'% · 追高风险');
+
           h+='<div style="padding:10px 18px;background:'+ac.bg+';font-size:13px;line-height:1.8;color:var(--txt);">';
           h+='<span style="padding:2px 8px;border-radius:4px;background:'+ac.tag+';color:'+ac.c+';margin-right:6px;">💰 平均股价</span>';
           h+='<b style="font-size:15px;">'+Number(ap.avg_price).toFixed(2)+'</b>';
@@ -1501,13 +1524,30 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           h+=' &nbsp;|&nbsp; vs 20日线 '+_pt(ap.position_vs_ma20)+' <span style="color:var(--dim);font-size:11.5px;">(MA20 '+Number(ap.ma20).toFixed(2)+')</span>';
           h+=' &nbsp;|&nbsp; vs 60日线 '+_pt(ap.position_vs_ma60)+' <span style="color:var(--dim);font-size:11.5px;">(MA60 '+Number(ap.ma60).toFixed(2)+')</span>';
           h+=' &nbsp;|&nbsp; 样本 <b>'+(ap.count||'--')+'</b> 只';
-          // ── 异常警告（不静默吞掉）──
           var _warns=[];
           if(_chg!=null && _chg<-0.5) _warns.push('单日跌'+(_chg<0?'':'')+Number(_chg).toFixed(1)+'%');
           if(ap.position_vs_ma20!=null && ap.position_vs_ma20<0) _warns.push('破MA20');
           if(ap.position_vs_ma60!=null && ap.position_vs_ma60<0) _warns.push('破MA60');
           if(_warns.length){
             h+=' &nbsp;<span style="display:inline-block;padding:1px 7px;border-radius:3px;background:#b91c1c22;color:#f87171;font-size:11.5px;font-weight:700;margin-left:4px;">⚠ '+_warns.join(' / ')+'</span>';
+          }
+          // ── 买卖信号面板 ──
+          if(_sigSell.length || _sigBuy.length){
+            h+='<div style="margin-top:8px;padding:8px 12px;border-radius:6px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;';
+            if(_sigSell.length && !_sigBuy.length) h+='background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);';
+            else if(_sigBuy.length && !_sigSell.length) h+='background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);';
+            else h+='background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);';
+            h+='">';
+            if(_sigSell.length){
+              h+='<span style="font-size:11px;font-weight:700;color:#f87171;margin-right:4px;">📉 卖/减:</span>';
+              _sigSell.forEach(function(s){ h+='<span style="display:inline-block;font-size:10.5px;padding:2px 7px;border-radius:4px;background:rgba(239,68,68,.15);color:#fca5a5;white-space:nowrap;">'+s+'</span>'; });
+            }
+            if(_sigBuy.length){
+              if(_sigSell.length) h+='<span style="width:1px;height:14px;background:rgba(255,255,255,.15);margin:0 4px;"></span>';
+              h+='<span style="font-size:11px;font-weight:700;color:#4ade80;margin-right:4px;">📈 买/加:</span>';
+              _sigBuy.forEach(function(s){ h+='<span style="display:inline-block;font-size:10.5px;padding:2px 7px;border-radius:4px;background:rgba(34,197,94,.15);color:#86efac;white-space:nowrap;">'+s+'</span>'; });
+            }
+            h+='</div>';
           }
           h+='</div>';
         })();
