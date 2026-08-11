@@ -74,24 +74,32 @@ CARD_DEFS = [
     {"id": "MARKET_FUND_FLOW_DATA", "name": "市场资金流向", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["daily"]},
     {"id": "MARKET_ALERTS", "name": "市场预警", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["indices"]},
     # 盘后数据
-    {"id": "SH_FIB", "name": "市场温度计", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"]},
-    {"id": "SIX_DIM_RADAR", "name": "六维共振雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"], "_source_file": "SH_FIB", "_window_var": "SH_FIB"},  # 与市场温度计同源(SH_FIB.js)，前端独立卡片展示六维评分视图
+    # ── 自愈类别说明（2026-08-11 第158轮全表核对）──────────────────────────────
+    # cloud_fetch_v8.py 的 CATEGORY_MAP 中 post_close 只注册了 MARKET_FUND_FLOW_DATA / EXPERIMENT 两项。
+    # 下列卡片的 raw_data 实际由 algorithms/run_algorithms.py 链内脚本产出（fetch_sh_index_fib /
+    # build_candidate_pool / fetch_lhb / fetch_inst_trade / gen_triple_consensus / gen_cockpit_advice /
+    # generate_top10 / calc_stock_rps / calc_crds / strategy_four_volume_60m 等），
+    # 若沿用 PAGE_TO_CAT["盘后数据"|"选股策略"]="post_close" 派发 cn_fetch，**永远刷不到它们**，
+    # 且会白占 25 分钟 debounce 锁导致真正需要的派发被跳过（与 155 轮 NT_DATA 同一类缺陷）。
+    # 故统一显式覆盖 heal_cat="algo_run"。
+    {"id": "SH_FIB", "name": "市场温度计", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"], "heal_cat": "algo_run"},
+    {"id": "SIX_DIM_RADAR", "name": "六维共振雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"], "_source_file": "SH_FIB", "_window_var": "SH_FIB", "heal_cat": "algo_run"},  # 与市场温度计同源(SH_FIB.js)，前端独立卡片展示六维评分视图
     {"id": "MARGIN_DATA", "name": "融资融券", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["sh"]},
     {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["items"]},
     {"id": "CRISIS_DATA", "name": "危机雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["currency", "global"]},
     {"id": "MARKET_FUND_FLOW_DATA", "name": "盘后资金流向", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["daily"]},
-    {"id": "CANDIDATE", "name": "候选池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"]},
-    {"id": "GOLD_POOL", "name": "黄金池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"]},
-    {"id": "LHB_DATA", "name": "龙虎榜", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"]},
-    {"id": "INST_TRADE", "name": "机构买卖", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top_buy", "top_sell"]},
-    {"id": "TRIPLE_CONSENSUS", "name": "三重共识", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"]},
+    {"id": "CANDIDATE", "name": "候选池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
+    {"id": "GOLD_POOL", "name": "黄金池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
+    {"id": "LHB_DATA", "name": "龙虎榜", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
+    {"id": "INST_TRADE", "name": "机构买卖", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top_buy", "top_sell"], "heal_cat": "algo_run"},
+    {"id": "TRIPLE_CONSENSUS", "name": "三重共识", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
     # 选股策略
-    {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"]},
-    {"id": "COCKPIT_ADVICE", "name": "驾驶舱", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["verdict", "watch"]},
-    {"id": "BIG_BULL_HUNTER", "name": "大牛股猎手", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "_source_file": "LHB_DATA", "_window_var": "LHB_DATA"},  # 前端 renderHunter 直接读 LHB_DATA 派生的机游共振信号，无独立 BIG_BULL_HUNTER.js 文件
-    {"id": "TOP10_DAILY", "name": "全站精选", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top10"]},
-    {"id": "STOCK_RPS", "name": "相对强度", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["records"], "_window_var": "STOCK_RPS_DATA"},  # 文件名 STOCK_RPS.js，但 window 变量名是 STOCK_RPS_DATA（历史遗留）
-    {"id": "CRDS_CARD_DATA", "name": "逆势龙头", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["elite", "watch"]},
+    {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
+    {"id": "COCKPIT_ADVICE", "name": "驾驶舱", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["verdict", "watch"], "heal_cat": "algo_run"},
+    {"id": "BIG_BULL_HUNTER", "name": "大牛股猎手", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "_source_file": "LHB_DATA", "_window_var": "LHB_DATA", "heal_cat": "algo_run"},  # 前端 renderHunter 直接读 LHB_DATA 派生的机游共振信号，无独立 BIG_BULL_HUNTER.js 文件
+    {"id": "TOP10_DAILY", "name": "全站精选", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top10"], "heal_cat": "algo_run"},
+    {"id": "STOCK_RPS", "name": "相对强度", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["records"], "_window_var": "STOCK_RPS_DATA", "heal_cat": "algo_run"},  # 文件名 STOCK_RPS.js，但 window 变量名是 STOCK_RPS_DATA（历史遗留）
+    {"id": "CRDS_CARD_DATA", "name": "逆势龙头", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["elite", "watch"], "heal_cat": "algo_run"},
 ]
 
 
@@ -643,13 +651,21 @@ def adjust_max_age(def_max, page=None):
 def check_data_cards():
     results = []
     today_str = now_cst().strftime("%Y-%m-%d")
+
+    def _emit(d, row):
+        """统一出口：任何分支产出的检查项都必须继承 heal_cat，
+        否则 self_heal 会回落到 PAGE_TO_CAT 派发错误类别（158 轮加固）。"""
+        if d.get("heal_cat"):
+            row["heal_cat"] = d["heal_cat"]
+        results.append(row)
+
     for d in CARD_DEFS:
         source_id = d.get("_source_file") or d["id"]
         path = DATA_DIR / f"{source_id}.js"
         var_name = d.get("_window_var") or d["id"]
         data = load_window_var(path, var_name)
         if data is None:
-            results.append({
+            _emit(d, {
                 "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
                 "status": "fail", "last_update": "--", "age_min": None,
                 "message": f"找不到数据文件 {path.name} 或解析失败"
@@ -663,7 +679,7 @@ def check_data_cards():
         prem_cleared = data.get("premarket_cleared") is True
         # 注意：page 变量在下方才赋值，此处必须直接取 d["page"]，否则会误用上一轮循环的残留值
         if prem_cleared and d.get("page") == "实时数据" and is_intraday_session():
-            results.append({
+            _emit(d, {
                 "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
                 "status": "fail", "last_update": str(ts), "age_min": 0,
                 "premarket_cleared": True,
@@ -672,7 +688,7 @@ def check_data_cards():
             continue
 
         if dt is None:
-            results.append({
+            _emit(d, {
                 "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
                 "status": "warn", "last_update": str(ts), "age_min": None,
                 "message": "无法解析更新时间"
@@ -719,14 +735,11 @@ def check_data_cards():
             msg += f"；关键字段空值：{', '.join(empty_fields)}"
         if status == "fail":
             msg += f"；超过阈值 {max_age} 分钟"
-        row = {
+        _emit(d, {
             "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
             "status": status, "last_update": ts, "age_min": round(age_min, 1),
             "message": msg
-        }
-        if d.get("heal_cat"):
-            row["heal_cat"] = d["heal_cat"]
-        results.append(row)
+        })
     return results
 
 
