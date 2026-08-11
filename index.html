@@ -1319,88 +1319,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div class="ipo-empty">加载中…</div>
       </div>
     </div>
-    <script>
-    (function(){
-      var $=function(id){ return document.getElementById(id); };
-      function fmtPct(v){ return v==null||isNaN(v)?'--':(v>0?'+':'')+Number(v).toFixed(2)+'%'; }
-      // 数据年龄计算（用于空壳/陈旧告警）
-      function _dataAge(timeStr){
-        if(!timeStr) return null;
-        try{
-          var t = new Date(timeStr.replace(/\s+/,'T'));
-          if(isNaN(t.getTime())) return null;
-          var ms = Date.now() - t.getTime();
-          var hours = ms / 3600000;
-          return {ms:ms, hours:hours, days:Math.floor(hours/24)};
-        }catch(e){ return null; }
-      }
-      function renderAvgPrice(){
-        var d=window.AVG_PRICE_DATA;
-        var cEl=$('avgPriceContent');
-        var tEl=$('avgPriceTime');
-        if(!cEl) return;
-        // 空壳检测：有 update_time 但无 avg_price → 云端抓取失败
-        var isShell = d && !d.avg_price && d.update_time;
-        var isEmpty = !d || (!d.avg_price && !d.update_time);
-        // 2026-08-11 修复：识别"盘前正常清空"状态（premarket_cleared=true），与真抓取失败区分显示
-        var isPremarket = d && d.premarket_cleared === true && !d.avg_price;
-        if(isEmpty || isShell){
-          var ut = (d&&d.update_time) || '未知';
-          var age = _dataAge(ut);
-          var ageColor = age && age.hours > 48 ? 'var(--down)' : (age && age.hours > 24 ? '#f59e0b' : 'var(--sub)');
-          var ageTxt = age ? (age.hours<1?'刚刚':age.hours<24?age.hours+'小时前':Math.floor(age.hours/24)+'天前') : '';
-          // 区分两种空壳：盘前正常清空 vs 真抓取失败——不同文案/图标/颜色
-          var titleText = isPremarket ? '平均股价 · 盘前待刷新' : '平均股价数据暂不可用';
-          var titleColor = isPremarket ? '#38bdf8' : '#fbbf24';
-          var iconText = isPremarket ? '🌅' : '⚠️';
-          var reasonText = isPremarket
-            ? '<div>原因：<b style="color:var(--cyan)">盘前正常清空</b>（08:30 前 avg_price() 不计算，避免使用昨日陈旧数据）</div>'
-            : '<div>原因：云端 <code>f_avg_price()</code> 抓取失败（取样不足或接口超时）</div>';
-          var statusText = isPremarket
-            ? '<div style="color:var(--cyan);margin-top:4px;">🟢 09:30 开盘后 intraday fetch 将自动刷新（首批约 09:35-09:45）</div>'
-            : '<div style="color:var(--down);margin-top:4px;">🔴 全A等权均价、MA20/MA60水位均无法计算</div>';
-          cEl.innerHTML='<div style="padding:12px;">'+
-            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'+
-            '<span style="font-size:18px;">'+iconText+'</span>'+
-            '<span style="font-weight:700;color:'+titleColor+';font-size:14px;">'+titleText+'</span>'+
-            '</div>'+
-            '<div style="font-size:12px;color:var(--dim);line-height:1.7;margin-left:26px;">'+
-            reasonText+
-            '<div>最后更新：<b style="color:'+ageColor+'">'+ut.slice(5,16)+'</b> ('+ageTxt+')</div>'+
-            statusText+
-            '</div></div>';
-          if(tEl) tEl.innerHTML = _uBadge(isPremarket?'盘前':'异常','短线',ut);
-          return;
-        }
-        if(tEl) tEl.innerHTML = _uBadge('盘中','短线',d.update_time);
-        function posTag(v){
-          if(v==null||isNaN(v)) return '<span style="color:var(--sub)">--</span>';
-          var col = v>=0 ? 'var(--up)' : 'var(--down)';
-          var arrow = v>=0 ? '▲' : '▼';
-          return '<span style="color:'+col+';font-weight:700;">'+arrow+' '+fmtPct(v)+'</span>';
-        }
-        var chg = d.avg_change_pct;
-        var chgCol = chg>0 ? 'var(--up)' : (chg<0 ? 'var(--down)' : 'var(--sub)');
-        var diff = (d.prev_avg_price!=null) ? (d.avg_price - d.prev_avg_price) : null;
-        var diffTxt = diff==null ? '--' : (diff>=0?'+':'')+diff.toFixed(3);
-        var diffCol = diff==null ? 'var(--sub)' : (diff>=0?'var(--up)':'var(--down)');
-        var h='';
-        h+='<div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:12px;">';
-        h+='  <div><div style="font-size:11px;color:var(--dim);">全A等权均价</div><div style="font-size:30px;font-weight:800;color:var(--txt);line-height:1.1;">'+Number(d.avg_price).toFixed(2)+'</div></div>';
-        h+='  <div><div style="font-size:11px;color:var(--dim);">等权涨跌幅</div><div style="font-size:22px;font-weight:800;color:'+chgCol+';line-height:1.1;">'+fmtPct(chg)+'</div></div>';
-        h+='  <div><div style="font-size:11px;color:var(--dim);">较昨日</div><div style="font-size:16px;font-weight:700;color:'+diffCol+';line-height:1.2;">'+diffTxt+'</div></div>';
-        h+='</div>';
-        h+='<div style="display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--sub);">';
-        h+='  <div>vs 20日线 '+posTag(d.position_vs_ma20)+' <span style="color:var(--dim)">(MA20 '+Number(d.ma20).toFixed(2)+')</span></div>';
-        h+='  <div>vs 60日线 '+posTag(d.position_vs_ma60)+' <span style="color:var(--dim)">(MA60 '+Number(d.ma60).toFixed(2)+')</span></div>';
-        h+='  <div>样本 <b style="color:var(--txt)">'+ (d.count||'--') +'</b> 只</div>';
-        h+='</div>';
-        cEl.innerHTML=h;
-      }
-      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', renderAvgPrice);
-      else renderAvgPrice();
-    })();
-    </script>
+    <!-- 💰 平均股价独立卡片已删除（2026-08-12 主人令）：保留在 AI 市场速览紧凑版（renderAiSummary IIFE 内），不再单独 IIFE 渲染 -->
 
     <script>
     (function(){
@@ -4551,16 +4470,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <section id="sec-ul">
     <div class="sec-head"><h2>🧪 暂未上架</h2><span class="tag">仅管理员可见 · 实验区 · 未正式上架卡片</span></div>
 
-    <!-- 💰 平均股价（全A等权均价 + 20/60日水位）—— 2026-08-11 主人令：云端 f_avg_price() 抓取尚未稳定，暂回实验区，待数据可用后再定仪表盘位置 -->
-    <div id="avgPriceCard" style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">
-      <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--border);">
-        <span style="font-size:16px;font-weight:700;color:var(--txt);">💰 平均股价（全A等权）</span>
-        <span style="font-size:12px;color:var(--sub);font-weight:400;" id="avgPriceTime">--</span>
-      </div>
-      <div style="padding:14px 18px;" id="avgPriceContent">
-        <div class="ipo-empty">加载中…</div>
-      </div>
-    </div>
+    <!-- 💰 平均股价（全A等权）已于 2026-08-12 主人令从暂未上架移除，仅保留在「📡 实时数据」tab 跟随 AI 市场速览的紧凑版渲染 -->
 
     <div id="unlistedPanel"></div>
   </section>
@@ -4702,7 +4612,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div class="logic-h">今日示例（2026-08-11）</div>
         <div class="logic-p"><code>avg_price=28.07 / ma20=28.07 / position_vs_ma20=0.0001%</code> → <b>无任何信号触发</b>（估值中性）。偏离变大时自动出信号。</div>
         <div class="logic-h">代码位置</div>
-        <div class="logic-p"><code>index.html</code> block#21 「4b. 💰 平均股价」约 ~1487-1530 行（买卖信号计算 + 面板渲染）。</div>
+        <div class="logic-p"><code>index.html</code> 渲染在 <code>renderAiSummary()</code> IIFE 内「4b. 💰 平均股价」约 ~1512-1563 行（紧凑版 + 买卖信号面板，2026-08-12 起不再有独立卡片容器）。</div>
       </div>
 
       <div class="card">
