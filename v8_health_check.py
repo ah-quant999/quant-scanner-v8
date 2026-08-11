@@ -59,7 +59,10 @@ CARD_DEFS = [
     {"id": "IPO_DATA", "name": "打新研判", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["stocks"], "weekend_update": False},
     {"id": "JUDGMENT_DATA", "name": "今日判定", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["verdict", "indices"], "weekend_update": False},
     {"id": "MACRO_DATA", "name": "今日宏观解读", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["global_macro", "monetary"], "weekend_update": False},
-    {"id": "NT_DATA", "name": "市场提示", "page": "今日事件", "freq": "每日盘前", "max_age": 720, "key_fields": ["alerts"], "weekend_update": False},
+    # NT_DATA(nt_data.json) 由 algorithms/fetch_orphan_nt_data.py 产出，归 run_algorithms.py(算法链)，
+    # 不在 cloud_fetch_v8.py 的 premarket 注册表内 —— 按 page 映射派发 cn_fetch premarket 永远刷不到它，
+    # 故显式覆盖自愈类别为 algo_run（2026-08-11 第155轮看门狗定位并根治）。
+    {"id": "NT_DATA", "name": "市场提示", "page": "今日事件", "freq": "每日盘前", "max_age": 720, "key_fields": ["alerts"], "weekend_update": False, "heal_cat": "algo_run"},
     # 实时数据
     {"id": "INDEX_QUOTES", "name": "全球指数 / 股指期货", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["items"]},
     {"id": "ETF_PULSE", "name": "ETF 盘中异动", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["etfs"]},
@@ -477,7 +480,9 @@ def self_heal(report):
              or it.get("premarket_cleared") is True]
     cat_items = {}
     for it in stale:
-        cat = PAGE_TO_CAT.get(it.get("page"))
+        # heal_cat 显式覆盖优先：部分卡片虽挂在某页面下，实际由算法链(run_algorithms)产出，
+        # 按 page 映射派发 cn_fetch 永远刷不到（如 NT_DATA 市场提示），必须走 algo_run。
+        cat = it.get("heal_cat") or PAGE_TO_CAT.get(it.get("page"))
         if cat:
             cat_items.setdefault(cat, []).append(it)
 
@@ -492,7 +497,10 @@ def self_heal(report):
                 for it in items:
                     it["heal"] = f"已自愈(跳过重复): {msg}"
                 continue
-        ok, dmsg = _dispatch_cn_fetch(cat)
+        if cat == "algo_run":
+            ok, dmsg = _dispatch_algo_run()
+        else:
+            ok, dmsg = _dispatch_cn_fetch(cat)
         if ok:
             healed.append(f"[{cat}] {', '.join(names)}: 已自动派发刷新 ({dmsg})")
             for it in items:
@@ -623,7 +631,8 @@ def check_data_cards():
 
         # 盘中 premarket_cleared 异常自愈检测：实时数据在交易时段被标记为盘前清空，属于误清空
         prem_cleared = data.get("premarket_cleared") is True
-        if prem_cleared and page == "实时数据" and is_intraday_session():
+        # 注意：page 变量在下方才赋值，此处必须直接取 d["page"]，否则会误用上一轮循环的残留值
+        if prem_cleared and d.get("page") == "实时数据" and is_intraday_session():
             results.append({
                 "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
                 "status": "fail", "last_update": str(ts), "age_min": 0,
@@ -672,11 +681,14 @@ def check_data_cards():
             msg += f"；关键字段空值：{', '.join(empty_fields)}"
         if status == "fail":
             msg += f"；超过阈值 {max_age} 分钟"
-        results.append({
+        row = {
             "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
             "status": status, "last_update": ts, "age_min": round(age_min, 1),
             "message": msg
-        })
+        }
+        if d.get("heal_cat"):
+            row["heal_cat"] = d["heal_cat"]
+        results.append(row)
     return results
 
 
