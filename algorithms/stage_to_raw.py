@@ -136,6 +136,38 @@ _TS_KEYS = ("update_time", "gen_time", "calc_time", "run_time",
             "fetch_time", "snapshot_time")
 
 
+def _ts_full(path):
+    """取文件内容里的完整时间戳(YYYY-MM-DD HH:MM:SS)；取不到返回 ''。
+
+    2026-08-11 新增：原 _ts_date 只比到「日」，同一天内 out 旧版覆盖 raw 新版
+    不会被拦截（实例：out 08:00 的 4 源候选池覆盖 raw 06:59 的 6 源修复版）。
+    """
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            obj = json.load(f)
+        if isinstance(obj, dict):
+            for k in _TS_KEYS:
+                v = obj.get(k)
+                if isinstance(v, str) and len(v) >= 19:
+                    return v[:19].replace("T", " ")
+    except Exception:
+        pass
+    return ""
+
+
+def _source_names(path):
+    """取 source_dist 的有效源名集合（用于判定搬运是否会丢源）。取不到返回 None。"""
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            obj = json.load(f)
+        sd = obj.get("source_dist") if isinstance(obj, dict) else None
+        if isinstance(sd, dict) and sd:
+            return {k for k, v in sd.items() if v}
+    except Exception:
+        pass
+    return None
+
+
 def _ts_date(path):
     """取文件内容里的时间戳日期(YYYY-MM-DD)；无时间戳字段则回退到 mtime 日期。"""
     try:
@@ -186,6 +218,20 @@ def main():
             if s_date and d_date and s_date < d_date:
                 print(f"  [guard] out更旧({s_date}) < raw({d_date}): {v6_name}")
                 continue
+            # (2a) 同日内的时间戳倒退也要拦（原守卫只比到「日」，同日无效）
+            s_ts, d_ts = _ts_full(src), _ts_full(dst_path)
+            if s_ts and d_ts and s_ts < d_ts:
+                print(f"  [guard] out更旧({s_ts}) < raw({d_ts}): {v6_name}")
+                continue
+            # (2b) 丢源守卫：搬运会让 source_dist 少源则拒绝
+            #      2026-08-11 修复：out/candidate_pool.json 曾两次用少源版本覆盖
+            #      raw_data/candidate.json（观澜台/maharo 丢失 → 前端「公开资讯 0 只」）。
+            s_src, d_src = _source_names(src), _source_names(dst_path)
+            if s_src is not None and d_src is not None:
+                lost = d_src - s_src
+                if lost:
+                    print(f"  [guard] 搬运会丢源 {sorted(lost)}，保留 raw: {v6_name}")
+                    continue
         obj = _load_json(src)
         if obj is None:
             print(f"  ⚠️ 跳过（解析失败）: {v6_name}")
