@@ -681,7 +681,14 @@ def main():
     top = top[:TOP_N]
     # ── end A 股保底 ──
 
-    def horizon_for(sources):
+    def horizon_for(sources, resonance=0, is_top=False):
+        """horizon 判定
+        is_top=True (top3/Allsite A/B档 持仓层):
+          严格按 sources——主推"短线择时买入"，跨策略仍标"短线/中线共振"
+        is_top=False (候选池/research 视角):
+          放宽——含中线策略 或 多源短线共振 ≥2 自动归"中长线"，避免 longList 永远空
+        2026-08-11 主人令：候选池的中长线列之前永远"暂无"——是判定过严。
+        """
         short = {"四量终极", "大牛股猎手", "板块龙头"}
         mid = {"三重共识", "驾驶舱A档", "驾驶舱B档"}
         defense = {"逆势龙头·精锐", "逆势龙头·进阶", "逆势龙头·观察"}
@@ -691,11 +698,16 @@ def main():
         has_defense = bool(srcs & defense)
         if has_defense:
             return "中线防御"
-        if has_short and has_mid:
-            return "短线/中线共振"
-        if has_short:
+        if is_top:
+            # 严格按 sources 划分（top3 仍按短线择时语义）
+            if has_short and has_mid: return "短线/中线共振"
+            if has_short: return "短线"
+            if has_mid: return "中长线"
             return "短线"
+        # 候选池放宽：含中线策略 → 中长线 / 多源短线共振≥2 → 中长线
         if has_mid:
+            return "中长线"
+        if has_short and resonance >= 2:
             return "中长线"
         return "短线"
 
@@ -802,7 +814,7 @@ def main():
             "name": fix_name(code, s["name"]),
             "market": market,
             "board": board,
-            "horizon": horizon_for(s["sources"]),
+            "horizon": horizon_for(s["sources"], s.get("resonance",0), is_top=True),
             "close": round(close, 2) if close else None,
             "pct_chg": safe_float(s["pct_chg"]),
             "stop_loss": round(safe_float(stop), 2) if stop else None,
@@ -845,7 +857,7 @@ def main():
                 "name": fix_name(x["key"], x["name"]),
                 "market": {"sh": "沪市", "sz": "深市", "bj": "北交所", "hk": "港股"}.get((x["market"] or market_prefix(x["key"])).lower(), x["market"] or market_prefix(x["key"])),
                 "board": x["board"] or board_from_code(x["key"], x["market"]),
-                "horizon": horizon_for(x["sources"]),
+                "horizon": horizon_for(x["sources"], x.get("resonance",0)),
                 "close": round(safe_float(x["close"]), 2) if safe_float(x["close"]) else None,
                 "pct_chg": safe_float(x["pct_chg"]),
                 "final_score": x["final_score"],
