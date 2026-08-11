@@ -303,6 +303,11 @@ BUILD_DEPLOY_WORKFLOW_ID = 324135263  # ☁️ v8 构建部署(云端ubuntu) wor
 ALGO_RUN_WORKFLOW_ID = 324119592      # ☁️ v8 盘后算法链(云端) workflow id（重新产出 FINAL_RECOMMEND 等）
 HEAL_DEBOUNCE_MIN = 25           # 同一类别最小派发间隔，避免每小时巡检重复触发
 ALERT_OVERDUE_MIN = 120          # 与 send_report_email 一致的「值得处理」阈值（分钟）
+# 2026-08-11 漏洞 #1：自愈单次最多派发 N 个 workflow，防 runner 打爆/事件风暴
+MAX_DISPATCHES_PER_RUN = 5
+# 2026-08-11 漏洞 #3：管线耗时趋势监控——latest 超 avg+3σ 视为异常
+WORKFLOW_DURATION_HISTORY = '.workbuddy/workflow_durations.json'
+WORKFLOW_DURATION_SIGMA = 3.0
 
 # 卡片分组 -> 刷新类别映射（与 cloud_fetch_v8.py / update_v8.py 的 CATEGORY_MAP 对应）
 PAGE_TO_CAT = {
@@ -528,6 +533,13 @@ def self_heal(report):
                 for it in items:
                     it["heal"] = f"已自愈(跳过重复): {msg}"
                 continue
+        if _dispatch_count >= MAX_DISPATCHES_PER_RUN:
+            _dispatch_limit_hit.append(cat)
+            for it in items:
+                it["heal"] = f"已自愈(跳过): 达单次派发上限"
+            healed.append(f"[{cat}] {', '.join(names)}: 达单次派发上限({MAX_DISPATCHES_PER_RUN})，跳过")
+            continue
+        _dispatch_count += 1
         if cat == "algo_run":
             ok, dmsg = _dispatch_algo_run()
         else:
@@ -564,6 +576,63 @@ def self_heal(report):
 
     _save_heal_lock(lock)
     return healed, failed
+
+
+# 2026-08-11 漏洞 #3：管线耗时趋势监控
+def _check_workflow_durations(report):
+    import statistics
+    from pathlib import Path
+    hist_path = Path(WORKFLOW_DURATION_HISTORY)
+    history = {}
+    if hist_path.exists():
+        try:
+            history = json.loads(hist_path.read_text(encoding='utf-8'))
+        except Exception:
+            history = {}
+    now_iso = now_cst().strftime('%Y-%m-%dT%H:%M:%SZ')
+    new_history = {}
+    findings = []
+    targets = ['🩺 v8 运维看板常态自愈巡检(云端ubuntu)',
+               '🇨🇳 v8 中国数据抓取(云端)',
+               '☁️ v8 盘后算法链(云端)',
+               '☁️ v8 构建部署(云端ubuntu)']
+    for wf in targets:
+        runs = api_get(f'https://api.github.com/repos/{REPO}/actions/runs?per_page=30&status=completed')
+        if not isinstance(runs, dict):
+            continue
+        wf_runs = [r for r in runs.get('workflow_runs', []) if r.get('name') == wf and r.get('conclusion') == 'success']
+        if len(wf_runs) < 5:
+            continue
+        durs = []
+        for r in wf_runs:
+            try:
+                d = (parse_time(r['updated_at']) - parse_time(r['created_at'])).total_seconds()
+                if d > 0:
+                    durs.append(d)
+            except Exception:
+                pass
+        if len(durs) < 5:
+            continue
+        avg = statistics.mean(durs)
+        std = statistics.stdev(durs) if len(durs) > 1 else 0
+        latest = durs[0] if durs else 0
+        new_history[wf] = {'avg': round(avg, 1), 'std': round(std, 1),
+                           'latest': round(latest, 1), 'n': len(durs), 'updated': now_iso}
+        if std > 0 and latest > max(avg + WORKFLOW_DURATION_SIGMA * std, 600):
+            findings.append((wf, avg, std, latest))
+    try:
+        hist_path.parent.mkdir(parents=True, exist_ok=True)
+        hist_path.write_text(json.dumps(new_history, ensure_ascii=False, indent=2), encoding='utf-8')
+    except Exception:
+        pass
+    for wf, avg, std, latest in findings:
+        report['items'].append({
+            'id': f'workflow_duration_{abs(hash(wf)) % 100000}',
+            'name': f'管线耗时异常 · {wf[:24]}',
+            'page': '运维监控',
+            'status': 'warn',
+            'message': f'⚠️ 最新 {latest:.0f}s 远超均值 {avg:.0f}s+3σ({std:.0f}s),可能 runner 慢/API 卡'
+        })
 
 
 def write_urgent(reason_lines):
@@ -1245,6 +1314,11 @@ def main():
     history_depth = check_top10_history_depth()
 
     report = build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh, history_depth)
+    # 2026-08-11 漏洞 #3：管线耗时趋势监控（必须在 build_report 后但 self_heal 前,以便发现异常时纳入自愈决策）
+    try:
+        _check_workflow_durations(report)
+    except Exception as e:
+        print(f"[WARN] workflow duration check failed: {e}")
     write_health_js(report)
     # 打印摘要
     print(f"[INFO] 总体: {report['overall']} | 统计: {report['summary']}")
