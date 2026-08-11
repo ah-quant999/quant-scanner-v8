@@ -1302,17 +1302,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div class="ipo-empty">加载中…</div>
       </div>
     </div>
-
-    <!-- 💰 平均股价（全A等权均价 + 20/60日水位）—— 2026-08-11 主人令：移到实时数据区，跟随实时数据节奏 -->
-    <div id="avgPriceCard" style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">
-      <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--border);">
-        <span style="font-size:16px;font-weight:700;color:var(--txt);">💰 平均股价（全A等权）</span>
-        <span style="font-size:12px;color:var(--sub);font-weight:400;" id="avgPriceTime">--</span>
-      </div>
-      <div style="padding:14px 18px;" id="avgPriceContent">
-        <div class="ipo-empty">加载中…</div>
-      </div>
-    </div>
     <script>
     (function(){
       var $=function(id){ return document.getElementById(id); };
@@ -1487,6 +1476,26 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           h+=a.text;
           h+='</div>';
         });
+
+        // 4b. 💰 平均股价（全A等权）—— 紧凑行，紧跟大盘异动
+        (function(){
+          var ap=window.AVG_PRICE_DATA;
+          if(!ap || !ap.avg_price) return;
+          var ac=colorMap.cyan;
+          var _chg=ap.avg_change_pct;
+          var _cCol=_chg>=0?'var(--up)':(_chg<0?'var(--down)':'var(--sub)');
+          var _cTxt=_chg==null?'--':((_chg>0?'+':'')+Number(_chg).toFixed(2)+'%');
+          function _pt(v){ if(v==null||isNaN(v)) return '<span style="color:var(--sub)">--</span>'; var _c=v>=0?'var(--up)':'var(--down)'; return '<span style="color:'+_c+';font-weight:600;">'+(v>=0?'▲':'▼')+' '+(v>0?'+':'')+Number(v).toFixed(2)+'%</span>'; }
+          h+='<div style="padding:10px 18px;background:'+ac.bg+';font-size:13px;line-height:1.8;color:var(--txt);">';
+          h+='<span style="padding:2px 8px;border-radius:4px;background:'+ac.tag+';color:'+ac.c+';margin-right:6px;">💰 平均股价</span>';
+          h+='<b style="font-size:15px;">'+Number(ap.avg_price).toFixed(2)+'</b>';
+          h+=' <span style="color:'+_cCol+';font-weight:700;">'+_cTxt+'</span>';
+          if(ap.prev_avg_price!=null){ var _df=ap.avg_price-ap.prev_avg_price; h+=' <span style="color:'+(_df>=0?'var(--up)':'var(--down)')+';font-size:12px;">较昨日 '+(_df>=0?'+':'')+_df.toFixed(3)+'</span>'; }
+          h+=' &nbsp;|&nbsp; vs 20日线 '+_pt(ap.position_vs_ma20)+' <span style="color:var(--dim);font-size:11.5px;">(MA20 '+Number(ap.ma20).toFixed(2)+')</span>';
+          h+=' &nbsp;|&nbsp; vs 60日线 '+_pt(ap.position_vs_ma60)+' <span style="color:var(--dim);font-size:11.5px;">(MA60 '+Number(ap.ma60).toFixed(2)+')</span>';
+          h+=' &nbsp;|&nbsp; 样本 <b>'+(ap.count||'--')+'</b> 只';
+          h+='</div>';
+        })();
 
         // 5. 操作建议
         var strats=d.strategies||[];
@@ -4427,6 +4436,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <!-- ============ 暂未上架（管理员 · 实验区 · 2026-08-07 提升为一级 Tab） ============ -->
   <section id="sec-ul">
     <div class="sec-head"><h2>🧪 暂未上架</h2><span class="tag">仅管理员可见 · 实验区 · 未正式上架卡片</span></div>
+
+    <!-- 💰 平均股价（全A等权均价 + 20/60日水位）—— 2026-08-11 主人令：云端 f_avg_price() 抓取尚未稳定，暂回实验区，待数据可用后再定仪表盘位置 -->
+    <div id="avgPriceCard" style="background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,0.3);">
+      <div style="display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--border);">
+        <span style="font-size:16px;font-weight:700;color:var(--txt);">💰 平均股价（全A等权）</span>
+        <span style="font-size:12px;color:var(--sub);font-weight:400;" id="avgPriceTime">--</span>
+      </div>
+      <div style="padding:14px 18px;" id="avgPriceContent">
+        <div class="ipo-empty">加载中…</div>
+      </div>
+    </div>
 
     <div id="unlistedPanel"></div>
   </section>
@@ -9300,7 +9320,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     el.innerHTML=h;
     if(typeof window.renderPortfolio==='function') window.renderPortfolio();
-    // 2026-08-11：平均股价已迁到实时数据区，无需克隆到实验区；仅 ETF 龙头参考仍需克隆
+    // 2026-08-11：平均股价已迁回实验区 sec-ul（数据未就绪），无需克隆；仅 ETF 龙头参考仍需克隆
     (function(){
       // ETF龙头参考：复用原 etfMapBody 内容
       var etfSrc=document.getElementById('etfMapBody');
