@@ -178,11 +178,12 @@ _EM_HEADERS = {
     "Accept": "*/*",
 }
 
-def em_clist(fs, fields, fid="f62", stat="1", pz=5000, po="1", timeout=15):
+def em_clist(fs, fields, fid="f62", stat="1", pz=5000, po="1", pn=1, timeout=15):
     """东方财富 clist 接口（push2delay 镜像）。返回 data.diff 列表（每项为字段字典）。
-    po="1" 降序(取净流入最高)，po="0" 升序(取净流出最高)。"""
+    po="1" 降序(取净流入最高)，po="0" 升序(取净流出最高)。
+    pn 页码（默认 1），pz 单页大小（默认 5000，但 push2delay 实际硬截 100，分页需自循环）。"""
     params = {
-        "pn": "1", "pz": str(pz), "po": po, "np": "1", "fltt": "2", "invt": "2",
+        "pn": str(pn), "pz": str(pz), "po": po, "np": "1", "fltt": "2", "invt": "2",
         "ut": "b2884a393a59ad64002292a3e90d46a5",
         "fid": fid, "fs": fs, "stat": stat,
         "fields": fields, "_": int(time.time() * 1000),
@@ -2829,23 +2830,43 @@ def main(category=None, only=None):
         算等权均价 + 等权涨跌幅，并记录历史算 20/60 日水位。
         2026-08-10 重构：原实现用 akshare.stock_zh_a_spot_em() 全量 spot，云端环境
         持续返回空（缺包/超时），导致 AVG_PRICE_DATA 长期空壳、前端卡片无法渲染。
-        改为复用与资金流同源的 em_clist（_IND_FS，已验证云端可用）。"""
+        改为复用与资金流同源的 em_clist（_IND_FS，已验证云端可用）。
+        2026-08-11 修复：em_clist 用 fid=f3 排序时硬截 100 条（涨跌幅 TOP 100），
+        改用 fid=f12（代码）+ pn 分页遍历全市场 5293 只，阈值 1000→3000 适配全 A 样本量。"""
         try:
             fields = "f12,f14,f2,f3"
-            desc = em_clist(_IND_FS, fields, fid="f3", stat="1", pz=5000, po="1")
-            asc = em_clist(_IND_FS, fields, fid="f3", stat="1", pz=5000, po="0")
             by_code = {}
-            for r in desc + asc:
-                code = str(r.get("f12") or "")
-                if not code:
-                    continue
-                price = float(r.get("f2") or 0)
-                chg = r.get("f3")
-                chg = float(chg) if chg is not None else None
-                if price > 0:
-                    by_code[code] = {"price": price, "chg": chg}
+            # 2026-08-11 修复：push2delay 即便 pz=5000 实际只返 100 条；按代码(f12)分页遍历拿全量
+            PAGE_SIZE = 100
+            MAX_PAGES = 60  # 安全阀：A 股理论 5293 只，60 页足矣
+            pn = 1
+            while pn <= MAX_PAGES:
+                page = em_clist(_IND_FS, fields, fid="f12", stat="1", pz=PAGE_SIZE, po="1", pn=pn)
+                if not page:
+                    break  # 空页：已遍历至末尾
+                for r in page:
+                    code = str(r.get("f12") or "")
+                    if not code:
+                        continue
+                    # 处理 "-"（停牌/无成交）+ None
+                    price_raw = r.get("f2")
+                    chg_raw = r.get("f3")
+                    try:
+                        price = float(price_raw) if price_raw not in (None, "-", "") else 0
+                    except (ValueError, TypeError):
+                        price = 0
+                    try:
+                        chg = float(chg_raw) if chg_raw not in (None, "-", "") else None
+                    except (ValueError, TypeError):
+                        chg = None
+                    if price > 0:
+                        by_code[code] = {"price": price, "chg": chg}
+                if len(page) < PAGE_SIZE:
+                    break  # 末页不足 100 条：到底了
+                pn += 1
             recs = list(by_code.values())
-            if len(recs) < 1000:
+            # A 股理论 5293 只，停牌/无成交会少一些，≥3000 视为有效全市场样本
+            if len(recs) < 3000:
                 print(f"  ⚠️ 全A spot 有效样本仅 {len(recs)} 只，放弃计算")
                 return {}
             prices = [r["price"] for r in recs]
