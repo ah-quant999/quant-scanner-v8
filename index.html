@@ -3810,6 +3810,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       // 🔴 2026-08-06 修复：用当天 stocks 算北向 N（不是历史累计 northStocks.length=1444）
       var _dayStocks = hasData ? ((dayMapNb[iso] && dayMapNb[iso].stocks) || []) : [];
       var _dayNb = _dayStocks.filter(function(s){ var sx=(s.seats||{})['北向']; return sx && ((sx.buy||0)+(sx.sell||0)); });
+      // 🟡 2026-08-12 兜底：当天 stocks>0 但 seats 全空（骨架数据），提示"席位待补"
+      var _isSkeleton = _dayStocks.length > 0 && _dayNb.length === 0;
       if(hasData && _dayNb.length > 0){
         var nNet = 0;
         _dayNb.forEach(function(s){ nNet += (((s.seats['北向'].buy||0) - (s.seats['北向'].sell||0))); });
@@ -3817,6 +3819,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         h += '<div class="cal-stat" style="text-align:center;padding:2px 1px">';
         h += '<div style="color:#f59e0b;font-weight:700;font-size:12px">🌊北向 ' + _dayNb.length + '</div>';
         h += '<div class="' + nColor + '" style="font-size:11px;font-weight:600">' + _rcFmtYi(nNet) + '</div>';
+        h += '</div>';
+      } else if(hasData && _isSkeleton){
+        // 2026-08-12 兜底提示：当天数据只有骨架（trading=True + stocks>0 但 seats={}）
+        // 这种是历史回填时 akshare 席位 API 失败的产物，需要重跑 fetch_lhb
+        h += '<div class="cal-stat" style="text-align:center;padding:4px 2px;color:#fbbf24" title="该日上榜股列表已回填，但席位明细拉取失败——等待云端重跑 fetch_lhb 补回">';
+        h += '<div style="font-weight:700;font-size:11px">🟡席位待补</div>';
+        h += '<div style="font-size:10px;color:var(--dim)">'+_dayStocks.length+'只</div>';
         h += '</div>';
       } else {
         var dow = new Date(year, month, d).getDay();

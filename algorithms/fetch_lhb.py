@@ -21,7 +21,7 @@ import sys
 OUT = os.path.join(BASE, "..", "out", "lhb_result.json")
 THRESHOLD = 8000  # 强买阈值：净买入 > 8000万
 SEATS_PATH = os.path.join(os.path.dirname(__file__), "..", "out", "lhb_seats.json")
-DETAIL_LIMIT = 40  # 最多分析前40只股票的逐笔席位
+DETAIL_LIMIT = 90  # 最多分析前90只股票的逐笔席位（2026-08-12 主人质疑8/4/5/7/10北向日历空白：原 40 太少，北向在排序靠后；提到 90 覆盖全天上榜股）
 
 def log(msg):
     print(f"  {msg}", flush=True)

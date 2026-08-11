@@ -102,7 +102,9 @@ def _add_timestamp(obj):
 def append_lhb_to_history():
     """把最新一天的分类龙虎榜（raw_data/lhb_data.json）追加进 raw_data/lhb_history.json，
     供机游共振 / 北向席位日历使用。
-    2026-08-11 修复：空壳占位符(trading=False/stocks=0)不再阻塞真实数据，改为覆盖更新。"""
+    2026-08-11 修复：空壳占位符(trading=False/stocks=0)不再阻塞真实数据，改为覆盖更新。
+    2026-08-12 修复：骨架数据(trading=True 但 seats 全空)也允许覆盖——主人质疑北向席位日历 4 天空白，
+    原 c232edf5a 拉回了 trading+stocks 但 seats={}，需要让后续回填能覆盖。"""
     lhb = Path(RAW) / "lhb_data.json"
     if not lhb.exists():
         return False
@@ -117,14 +119,23 @@ def append_lhb_to_history():
     hist = {}
     if hist_path.exists():
         hist = _load_json(hist_path) or {}
-    # 修复：空壳占位符(trading=False 或 stocks 为空)应被真实数据覆盖，而非永久阻塞
+    # 修复：空壳占位符 OR 骨架数据(stocks>0 但所有股票 seats={})应被真实数据覆盖，而非永久阻塞
     if iso in hist:
         existing = hist[iso]
-        has_real_data = existing.get("trading") is True and len(existing.get("stocks", [])) > 0
+        existing_stocks = existing.get("stocks", []) or []
+        is_shell = existing.get("trading") is False or len(existing_stocks) == 0
+        # 骨架检测：trading=True 且 stocks>0，但所有股票的 seats 全空
+        is_skeleton = existing.get("trading") is True and len(existing_stocks) > 0 and all(
+            (not (s or {}).get("seats")) for s in existing_stocks
+        )
+        has_real_data = existing.get("trading") is True and len(existing_stocks) > 0 and not is_skeleton
         if has_real_data:
-            return False  # 真实数据已存在，跳过
-        print(f"  🔄 覆盖空壳占位 {iso}（原 trading={existing.get('trading')} "
-              f"stocks={len(existing.get('stocks', []))} → 新 {len(obj['stocks'])} 只）")
+            return False  # 真实数据（含 seats）已存在，跳过
+        if is_skeleton:
+            print(f"  🔄 覆盖骨架数据 {iso}（原 trading=True stocks={len(existing_stocks)} 但 seats 全空 → 新 {len(obj['stocks'])} 只）")
+        else:
+            print(f"  🔄 覆盖空壳占位 {iso}（原 trading={existing.get('trading')} "
+                  f"stocks={len(existing_stocks)} → 新 {len(obj['stocks'])} 只）")
     hist[iso] = {
         "trading": True,
         "stocks": obj["stocks"],
