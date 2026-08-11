@@ -1417,6 +1417,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       };
       function fmtPct(v){ return v==null||isNaN(v)?'--':(v>0?'+':'')+Number(v).toFixed(2)+'%'; }
       function lightText(c){ return c==='green'?'#1fd17b':c==='red'?'#f4495d':c==='yellow'?'#fbbf24':c==='gray'?'#94a3b8':'#38bdf8'; }
+      // 红黄绿灯点（signal → 颜色 → 发光圆点；用于 AI 市场速览每行标识）
+      function lightDot(sig, sz){
+        sz = sz || 11;
+        var c = lightText(sig);
+        return '<span style="display:inline-block;width:'+sz+'px;height:'+sz+'px;border-radius:50%;background:'+c+';box-shadow:0 0 '+(sz+2)+'px '+c+'88;vertical-align:-1px;margin-left:6px"></span>';
+      }
+      // 关键词兜底：没 signal 字段时按 text 推断
+      function _fallbackLight(text){
+        if(/赎回|撤离|低迷|净流出|大单流出|主力流出|抛压|防御属性弱化|领跌|大跌|冰点|偏弱|承压/.test(text)) return 'red';
+        if(/净流入|主力流入|主力流向|流入|领涨|大涨|占优|轮动|炽热|强势|偏强|高涨|偏暖/.test(text)) return 'green';
+        return 'yellow';
+      }
       function renderAiSummary(){
         var d=window.AI_MARKET_BRIEF;
         var timeEl=$('aiSummaryTime');
@@ -1466,7 +1478,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         var sent=d.sentiment||{};
         var sclr=colorMap.purple;
         h+='<div style="padding:10px 18px;background:'+sclr.bg+';font-size:13px;line-height:1.7;color:var(--txt);">';
-        h+='<span style="padding:2px 8px;border-radius:4px;background:'+sclr.tag+';color:'+sclr.c+';margin-right:6px;">🟣 日内风向</span>';
+        h+='<span style="padding:2px 8px;border-radius:4px;background:'+sclr.tag+';color:'+sclr.c+';">🟣 日内风向</span>';
+        h+=lightDot(sent.signal || _fallbackLight((sent.label||'')+' '+(sent.description||'')), 12);
         h+='<strong>'+sent.label+'</strong>，'+sent.description;
         if(sent.up_down_ratio!=null){
           h+=' &nbsp;|&nbsp; 涨跌比 <strong>'+sent.up_down_ratio+'</strong>（涨'+sent.up+' / 跌'+sent.down+' / 平'+sent.flat+'）';
@@ -1477,7 +1490,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         var health=d.health||{};
         var hclr=colorMap.green;
         h+='<div style="padding:10px 18px;background:'+hclr.bg+';font-size:13px;line-height:1.7;color:var(--txt);">';
-        h+='<span style="padding:2px 8px;border-radius:4px;background:'+hclr.tag+';color:'+hclr.c+';margin-right:6px;">🟢 市场健康度</span>';
+        h+='<span style="padding:2px 8px;border-radius:4px;background:'+hclr.tag+';color:'+hclr.c+';">🟢 市场健康度</span>';
+        h+=lightDot(health.signal || _fallbackLight((health.structure&&health.structure[0]||'')+' '+(health.fund&&health.fund[0]||'')+' '+(health.emotion&&health.emotion[0]||'')), 12);
         var hl=[health.structure, health.fund, health.emotion];
         var hparts=[];
         hl.forEach(function(x){ if(x && x[0]) hparts.push('<span style="color:'+lightText(x[1])+' ;font-weight:700;">'+x[0]+'</span>'); });
@@ -1489,7 +1503,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         anoms.forEach(function(a){
           var c=colorMap[a.color]||colorMap.gold;
           h+='<div style="padding:10px 18px;background:'+c.bg+';font-size:13px;line-height:1.7;color:var(--txt);">';
-          h+='<span style="padding:2px 8px;border-radius:4px;background:'+c.tag+';color:'+c.c+';margin-right:6px;">'+a.emoji+' '+a.tag+'</span>';
+          h+='<span style="padding:2px 8px;border-radius:4px;background:'+c.tag+';color:'+c.c+';">'+a.emoji+' '+a.tag+'</span>';
+          h+=lightDot(a.signal || _fallbackLight(a.text||''), 11);
           h+=a.text;
           h+='</div>';
         });
@@ -1527,7 +1542,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           if(_chg!=null && _chg>1.5) _sigBuy.push('⚡ 单日暴涨 '+(+_chg).toFixed(1)+'% · 追高风险');
 
           h+='<div style="padding:10px 18px;background:'+ac.bg+';font-size:13px;line-height:1.8;color:var(--txt);">';
-          h+='<span style="padding:2px 8px;border-radius:4px;background:'+ac.tag+';color:'+ac.c+';margin-right:6px;">💰 平均股价</span>';
+          h+='<span style="padding:2px 8px;border-radius:4px;background:'+ac.tag+';color:'+ac.c+';">💰 平均股价</span>';
+          h+=lightDot(_chg>0?'green':(_chg<-0.2?'red':'yellow'), 11);
           h+='<b style="font-size:15px;">'+Number(ap.avg_price).toFixed(2)+'</b>';
           h+=' <span style="color:'+_cCol+';font-weight:700;">'+_cTxt+'</span>';
           if(ap.prev_avg_price!=null){ var _df=ap.avg_price-ap.prev_avg_price; h+=' <span style="color:'+(_df>=0?'var(--up)':'var(--down)')+';font-size:12px;">较昨日 '+(_df>=0?'+':'')+_df.toFixed(3)+'</span>'; }
@@ -1567,8 +1583,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         if(strats.length){
           var sclr=colorMap.gold;
           h+='<div style="padding:12px 16px;background:'+sclr.bg+';font-size:14px;line-height:1.7;color:var(--txt);">';
-          h+='<span style="padding:3px 9px;border-radius:4px;background:'+sclr.tag+';color:'+sclr.c+';margin-right:8px;font-weight:700;">🎯 操作建议</span>';
-          h+='<span style="color:var(--txt);">'+strats.join(' &nbsp;|&nbsp; ')+'</span>';
+          h+='<span style="padding:3px 9px;border-radius:4px;background:'+sclr.tag+';color:'+sclr.c+';font-weight:700;">🎯 操作建议</span>';
+          h+=lightDot(strats[0].signal || _fallbackLight(strats[0].text||strats[0]||''), 12);
+          h+='<span style="color:var(--txt);">'+strats.map(function(s){return (typeof s==='object'?s.text:s);}).join(' &nbsp;|&nbsp; ')+'</span>';
           h+='</div>';
         }
 

@@ -60,21 +60,28 @@ def fmt_amount(v):
     return f"{float(v):.0f}亿"
 
 
+def _sentiment_signal(label):
+    """情绪 → 灯（红=防守/黄=观望/绿=积极）"""
+    if label in ("情绪高涨", "情绪偏暖", "情绪温和"): return "green"
+    if label in ("情绪冰点", "情绪偏冷"): return "red"
+    return "yellow"
+
+
 def classify_sentiment(sh_chg, up_down_ratio):
     """情绪定级"""
     if sh_chg >= 1.0 and up_down_ratio >= 2.0:
-        return "情绪高涨", "普涨格局，资金积极"
+        return "情绪高涨", "普涨格局，资金积极", "green"
     if sh_chg >= 0.5 and up_down_ratio >= 1.5:
-        return "情绪偏暖", "结构性上涨，热点活跃"
+        return "情绪偏暖", "结构性上涨，热点活跃", "green"
     if sh_chg <= -1.5 and up_down_ratio <= 0.5:
-        return "情绪冰点", "普跌格局，避险为主"
+        return "情绪冰点", "普跌格局，避险为主", "red"
     if sh_chg <= -0.5 and up_down_ratio <= 0.8:
-        return "情绪偏冷", "跌多涨少，谨慎操作"
+        return "情绪偏冷", "跌多涨少，谨慎操作", "red"
     if sh_chg >= 0.2 and up_down_ratio >= 1.0:
-        return "情绪温和", "震荡偏多，精选个股"
+        return "情绪温和", "震荡偏多，精选个股", "green"
     if sh_chg <= -0.2 and up_down_ratio < 1.0:
-        return "情绪谨慎", "震荡偏弱，控制仓位"
-    return "情绪震荡", "多空拉锯，观望为主"
+        return "情绪谨慎", "震荡偏弱，控制仓位", "yellow"
+    return "情绪震荡", "多空拉锯，观望为主", "yellow"
 
 
 # 东财概念列表里的"索引/通道/成分"类条目，不应作为真实概念热点展示
@@ -92,7 +99,7 @@ def real_concepts(items):
 
 
 def health_lights(indices, up_down_ratio, main_net):
-    """三灯：结构/资金/情绪"""
+    """三灯：结构/资金/情绪 + 整行聚合灯（取最差）"""
     # 结构：四大指数同向性 + 平均涨跌幅
     chgs = [it.get("chg", 0) for it in indices]
     avg_chg = sum(chgs) / len(chgs) if chgs else 0
@@ -136,11 +143,36 @@ def health_lights(indices, up_down_ratio, main_net):
     else:
         emotion = ("情绪震荡", "yellow")
 
-    return {"structure": structure, "fund": fund, "emotion": emotion}
+    # 整行聚合灯：取最差一档（red > yellow > green > gray）
+    PRIO = {"red": 3, "yellow": 2, "gray": 1, "green": 0}
+    overall = "green"
+    for _, c in (structure, fund, emotion):
+        if PRIO.get(c, 0) > PRIO.get(overall, 0):
+            overall = c
+    # 但若资金大幅流入且结构非红，可以缓和到 yellow
+    if overall == "green" and PRIO.get(emotion[1], 0) >= 2:
+        overall = "yellow"
+
+    return {"structure": structure, "fund": fund, "emotion": emotion, "signal": overall}
+
+
+def _anomaly_signal(text):
+    """anomaly text → 灯（关键词判定）"""
+    if any(k in text for k in ["赎回", "撤离", "低迷", "暴跌"]):
+        return "red"
+    if any(k in text for k in ["净流出", "流出", "领跌", "大跌"]):
+        return "red"
+    if any(k in text for k in ["炽热", "过热", "极端", "剧烈"]):
+        return "yellow"
+    if any(k in text for k in ["净流入", "流入", "领涨", "大涨", "占优", "轮动"]):
+        return "green"
+    if any(k in text for k in ["分化", "波动", "偏弱", "偏强", "震荡"]):
+        return "yellow"
+    return "yellow"
 
 
 def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, limitup):
-    """基于规则生成 3~5 条市场异动"""
+    """基于规则生成 3~5 条市场异动（每项附 signal 灯）"""
     anomalies = []
     by_code = {it["code"]: it for it in indices}
 
@@ -154,37 +186,45 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
         leader = max([sh, sz, cy, kc], key=lambda x: abs(x.get("chg", 0)))
         chg = leader.get("chg", 0)
         word = "大涨" if chg >= 0 else "大跌"
+        text = f"{leader.get('name', '领涨指数')} {word} {chg:+.2f}%，市场波动剧烈"
         anomalies.append({
             "tag": "大盘异动",
             "emoji": "📊",
-            "text": f"{leader.get('name', '领涨指数')} {word} {chg:+.2f}%，市场波动剧烈",
-            "color": "blue"
+            "text": text,
+            "color": "blue",
+            "signal": _anomaly_signal(text),
         })
     elif max_chg >= 1.0:
         leader = max([sh, sz, cy, kc], key=lambda x: abs(x.get("chg", 0)))
         chg = leader.get("chg", 0)
         word = "领涨" if chg >= 0 else "领跌"
+        text = f"{leader.get('name', '领涨指数')} {word} {chg:+.2f}%，市场{'偏强' if chg >= 0 else '偏弱'}"
         anomalies.append({
             "tag": "大盘异动",
             "emoji": "📊",
-            "text": f"{leader.get('name', '领涨指数')} {word} {chg:+.2f}%，市场{'偏强' if chg >= 0 else '偏弱'}",
-            "color": "blue"
+            "text": text,
+            "color": "blue",
+            "signal": _anomaly_signal(text),
         })
 
     # 2. 科创/创业板 vs 主板 分化
     if cy.get("chg", 0) - sh.get("chg", 0) >= 1.5:
+        text = f"创业板(+{cy.get('chg', 0):.2f}%) 明显强于沪指(+{sh.get('chg', 0):.2f}%)，成长风格占优"
         anomalies.append({
             "tag": "风格分化",
             "emoji": "⚡",
-            "text": f"创业板(+{cy.get('chg', 0):.2f}%) 明显强于沪指(+{sh.get('chg', 0):.2f}%)，成长风格占优",
-            "color": "purple"
+            "text": text,
+            "color": "purple",
+            "signal": "green",
         })
     elif sh.get("chg", 0) - cy.get("chg", 0) >= 1.5:
+        text = f"沪指(+{sh.get('chg', 0):.2f}%) 强于创业板(+{cy.get('chg', 0):.2f}%)，蓝筹防御占优"
         anomalies.append({
             "tag": "风格分化",
             "emoji": "⚡",
-            "text": f"沪指(+{sh.get('chg', 0):.2f}%) 强于创业板(+{cy.get('chg', 0):.2f}%)，蓝筹防御占优",
-            "color": "purple"
+            "text": text,
+            "color": "purple",
+            "signal": "yellow",
         })
 
     # 3. ETF 资金流向（宽基/行业）
@@ -195,19 +235,23 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
         cat_nets.sort(key=lambda x: x[1], reverse=True)
         if cat_nets and cat_nets[0][1] >= 5:
             top_cat, top_val = cat_nets[0]
+            text = f"{top_cat}ETF 净流入 {top_val:+.2f}亿，资金借道 ETF 布局{top_cat}"
             anomalies.append({
                 "tag": "ETF资金",
                 "emoji": "💰",
-                "text": f"{top_cat}ETF 净流入 {top_val:+.2f}亿，资金借道 ETF 布局{top_cat}",
-                "color": "gold"
+                "text": text,
+                "color": "gold",
+                "signal": "green",
             })
         if len(cat_nets) >= 2 and cat_nets[-1][1] <= -3:
             bot_cat, bot_val = cat_nets[-1]
+            text = f"{bot_cat}ETF 净流出 {bot_val:+.2f}亿，资金从{bot_cat}撤离"
             anomalies.append({
                 "tag": "ETF资金",
                 "emoji": "💰",
-                "text": f"{bot_cat}ETF 净流出 {bot_val:+.2f}亿，资金从{bot_cat}撤离",
-                "color": "gold"
+                "text": text,
+                "color": "gold",
+                "signal": "red",
             })
 
     # 4. 概念/行业异动（过滤索引类条目）
@@ -215,49 +259,59 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
         top = [c for c in real_concepts(concepts["items"]) if c.get("net", 0) > 0][:3]
         hot_concepts = [f"{c['name']}(+{c['net']:.1f}亿)" for c in top]
         if hot_concepts:
+            text = f"主力流向：{'、'.join(hot_concepts[:3])}"
             anomalies.append({
                 "tag": "概念热点",
                 "emoji": "🔥",
-                "text": f"主力流向：{'、'.join(hot_concepts[:3])}",
-                "color": "red"
+                "text": text,
+                "color": "red",
+                "signal": "green",
             })
 
     # 5. 个股主力异动
     if capital and capital.get("top_inflow"):
         top = capital["top_inflow"][:2]
         names = [f"{c['name']}(+{c['net']:.1f}亿)" for c in top]
+        text = f"主力大单流入：{'、'.join(names)}"
         anomalies.append({
             "tag": "个股异动",
             "emoji": "🚀",
-            "text": f"主力大单流入：{'、'.join(names)}",
-            "color": "cyan"
+            "text": text,
+            "color": "cyan",
+            "signal": "green",
         })
     if capital and capital.get("top_outflow"):
         bot = capital["top_outflow"][:2]
         names = [f"{c['name']}({c['net']:.1f}亿)" for c in bot]
+        text = f"主力大单流出：{'、'.join(names)}"
         anomalies.append({
             "tag": "个股异动",
             "emoji": "🚨",
-            "text": f"主力大单流出：{'、'.join(names)}",
-            "color": "cyan"
+            "text": text,
+            "color": "cyan",
+            "signal": "red",
         })
 
     # 6. 涨停家数异动
     if limitup and limitup.get("total"):
         total = limitup["total"]
         if total >= 80:
+            text = f"涨停 {total} 家，短线情绪炽热"
             anomalies.append({
                 "tag": "涨停热度",
                 "emoji": "🎆",
-                "text": f"涨停 {total} 家，短线情绪炽热",
-                "color": "red"
+                "text": text,
+                "color": "red",
+                "signal": "yellow",
             })
         elif total <= 30:
+            text = f"涨停仅 {total} 家，短线情绪低迷"
             anomalies.append({
                 "tag": "涨停热度",
                 "emoji": "❄️",
-                "text": f"涨停仅 {total} 家，短线情绪低迷",
-                "color": "blue"
+                "text": text,
+                "color": "blue",
+                "signal": "red",
             })
 
     # 去重并限制条数
@@ -271,8 +325,21 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
     return unique[:5]
 
 
+def _strategy_signal(text):
+    """策略文本 → 灯"""
+    if any(k in text for k in ["赎回", "撤离", "降低仓位", "防御属性弱化", "反弹或遇抛压"]):
+        return "red"
+    if any(k in text for k in ["减仓", "注意减仓", "赎回", "出货", "弱势"]):
+        return "red"
+    if any(k in text for k in ["可持筹待涨", "可加仓", "择机加仓", "加仓主线", "占优"]):
+        return "green"
+    if any(k in text for k in ["观望", "轻仓试错", "震荡", "控制仓位", "等待企稳", "风格占优"]):
+        return "yellow"
+    return "yellow"
+
+
 def build_strategy(sentiment_label, health, anomalies, indices, etf_daily):
-    """基于当前状态生成 1~2 条操作建议"""
+    """基于当前状态生成 1~2 条操作建议（每条带 signal）"""
     strategies = []
     by_code = {it["code"]: it for it in indices}
     sh = by_code.get("000001", {})
@@ -282,15 +349,20 @@ def build_strategy(sentiment_label, health, anomalies, indices, etf_daily):
 
     # 根据情绪、结构、资金综合给出仓位建议
     if sentiment_label in ("情绪高涨", "情绪偏暖") and structure_ok and fund_ok:
-        strategies.append("大盘量价配合、资金流入，可持筹待涨；追高需谨慎，优选领涨板块低位补涨。")
+        s = "大盘量价配合、资金流入，可持筹待涨；追高需谨慎，优选领涨板块低位补涨。"
+        strategies.append({"text": s, "signal": "green"})
     elif sentiment_label in ("情绪冰点", "情绪偏冷") and health["fund"][1] in ("red", "gray"):
-        strategies.append("市场情绪低迷、资金流出，建议控制仓位，避免追涨杀跌，等待企稳信号。")
+        s = "市场情绪低迷、资金流出，建议控制仓位，避免追涨杀跌，等待企稳信号。"
+        strategies.append({"text": s, "signal": "red"})
     elif structure_ok and fund_ok:
-        strategies.append("指数结构偏强且资金配合，可择机加仓主线板块，设置好止损。")
+        s = "指数结构偏强且资金配合，可择机加仓主线板块，设置好止损。"
+        strategies.append({"text": s, "signal": "green"})
     elif health["structure"][1] == "yellow" and health["emotion"][1] == "green":
-        strategies.append("指数震荡但个股活跃，可轻指数重个股，聚焦主力净流入前排概念。")
+        s = "指数震荡但个股活跃，可轻指数重个股，聚焦主力净流入前排概念。"
+        strategies.append({"text": s, "signal": "yellow"})
     else:
-        strategies.append("当前市场方向不明或资金犹豫，建议保持观望或轻仓试错，严格止损纪律。")
+        s = "当前市场方向不明或资金犹豫，建议保持观望或轻仓试错，严格止损纪律。"
+        strategies.append({"text": s, "signal": "yellow"})
 
     # ETF 资金流向提示：仅列出真正属于科技/成长或宽基的赎回品种
     if etf_daily and etf_daily.get("top_outflow"):
@@ -302,16 +374,20 @@ def build_strategy(sentiment_label, health, anomalies, indices, etf_daily):
                      if any(k in x.get("name", "") for k in broad_keys)]
         if tech_out:
             names = "、".join([x["name"] for x in tech_out[:2]])
-            strategies.append(f"科技/成长类 ETF 出现赎回({names})，反弹或遇抛压，注意减仓科技仓位。")
+            s = f"科技/成长类 ETF 出现赎回({names})，反弹或遇抛压，注意减仓科技仓位。"
+            strategies.append({"text": s, "signal": "red"})
         elif broad_out:
             names = "、".join([x["name"] for x in broad_out[:2]])
-            strategies.append(f"宽基 ETF 净流出({names})，机构配置意愿减弱，宜降低仓位。")
+            s = f"宽基 ETF 净流出({names})，机构配置意愿减弱，宜降低仓位。"
+            strategies.append({"text": s, "signal": "red"})
 
     # 若创业板强于主板，提示风格
     if cy.get("chg", 0) - sh.get("chg", 0) >= 1.0:
-        strategies.append("成长风格占优，可关注创业板/科创板中主力净流入个股；蓝筹防御属性弱化。")
+        s = "成长风格占优，可关注创业板/科创板中主力净流入个股；蓝筹防御属性弱化。"
+        strategies.append({"text": s, "signal": "yellow"})
     elif sh.get("chg", 0) - cy.get("chg", 0) >= 1.0:
-        strategies.append("蓝筹/价值风格占优，可关注上证50、沪深300 成分股；成长股承压。")
+        s = "蓝筹/价值风格占优，可关注上证50、沪深300 成分股；成长股承压。"
+        strategies.append({"text": s, "signal": "yellow"})
 
     return strategies[:2]
 
@@ -380,7 +456,7 @@ def main():
 
     # 日内风向
     sh_chg = sh.get("chg", 0)
-    sentiment_label, sentiment_desc = classify_sentiment(sh_chg, up_down_ratio or 0)
+    sentiment_label, sentiment_desc, sentiment_signal = classify_sentiment(sh_chg, up_down_ratio or 0)
 
     # 主力净流入估算：真实概念排名前十净流入之和（亿）
     real_items = real_concepts(concepts.get("items", [])) if concepts else []
@@ -429,6 +505,7 @@ def main():
         "sentiment": {
             "label": sentiment_label,
             "description": sentiment_desc,
+            "signal": sentiment_signal,
             "up": up,
             "down": down,
             "flat": flat,
