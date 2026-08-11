@@ -1,5 +1,5 @@
 window.FOUR_VOLUME_60M={
- "update_time": "2026-08-11 09:44:44",
+ "update_time": "2026-08-11 09:50:52",
  "total": 9,
  "period": "60m",
  "description": "四量终极 60分钟共振信号（加分因子，独立于日线版）",
@@ -11,8 +11,8 @@ window.FOUR_VOLUME_60M={
    "board_label": "科创板",
    "close": 37.59,
    "pct_chg": 17.32,
-   "turnover_rate": 1.73,
-   "mv_yi": 146.4,
+   "turnover_rate": 2.14,
+   "mv_yi": 146.6,
    "fund_type": "混合",
    "components": {
     "游资点火": true,
@@ -40,7 +40,7 @@ window.FOUR_VOLUME_60M={
    "board_label": "主板",
    "close": 9.99,
    "pct_chg": 12.0,
-   "turnover_rate": 7.64,
+   "turnover_rate": 7.79,
    "mv_yi": 157.3,
    "fund_type": "游资",
    "components": {
@@ -69,8 +69,8 @@ window.FOUR_VOLUME_60M={
    "board_label": "科创板",
    "close": 84.05,
    "pct_chg": -9.99,
-   "turnover_rate": 7.17,
-   "mv_yi": 66.3,
+   "turnover_rate": 8.41,
+   "mv_yi": 65.0,
    "fund_type": "游资",
    "components": {
     "游资点火": true,
@@ -98,8 +98,8 @@ window.FOUR_VOLUME_60M={
    "board_label": "科创板",
    "close": 61.89,
    "pct_chg": 8.66,
-   "turnover_rate": 2.81,
-   "mv_yi": 87.3,
+   "turnover_rate": 3.23,
+   "mv_yi": 87.9,
    "fund_type": "混合",
    "components": {
     "游资点火": true,
@@ -127,8 +127,8 @@ window.FOUR_VOLUME_60M={
    "board_label": "科创板",
    "close": 145.07,
    "pct_chg": 7.62,
-   "turnover_rate": 1.79,
-   "mv_yi": 254.4,
+   "turnover_rate": 2.23,
+   "mv_yi": 253.6,
    "fund_type": "混合",
    "components": {
     "游资点火": true,
@@ -156,8 +156,8 @@ window.FOUR_VOLUME_60M={
    "board_label": "科创板",
    "close": 168.15,
    "pct_chg": 4.36,
-   "turnover_rate": 0.56,
-   "mv_yi": 805.1,
+   "turnover_rate": 0.72,
+   "mv_yi": 811.2,
    "fund_type": "机构",
    "components": {
     "游资点火": true,
@@ -185,8 +185,8 @@ window.FOUR_VOLUME_60M={
    "board_label": "创业板",
    "close": 85.77,
    "pct_chg": -3.51,
-   "turnover_rate": 1.57,
-   "mv_yi": 543.3,
+   "turnover_rate": 2.03,
+   "mv_yi": 543.5,
    "fund_type": "机构",
    "components": {
     "游资点火": true,
@@ -214,8 +214,8 @@ window.FOUR_VOLUME_60M={
    "board_label": "科创板",
    "close": 103.99,
    "pct_chg": 2.96,
-   "turnover_rate": 0.36,
-   "mv_yi": 490.0,
+   "turnover_rate": 0.47,
+   "mv_yi": 491.1,
    "fund_type": "混合",
    "components": {
     "游资点火": true,
@@ -243,8 +243,8 @@ window.FOUR_VOLUME_60M={
    "board_label": "科创板",
    "close": 110.32,
    "pct_chg": 1.16,
-   "turnover_rate": 1.06,
-   "mv_yi": 290.2,
+   "turnover_rate": 1.29,
+   "mv_yi": 291.6,
    "fund_type": "混合",
    "components": {
     "游资点火": true,

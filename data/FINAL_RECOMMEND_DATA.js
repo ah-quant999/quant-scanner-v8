@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-11 09:50:52",
+  "update_time": "2026-08-11 10:02:56",
   "crisis_score": 33.3,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -84,12 +84,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "四量终极 信号2项；板块龙头 贵金属,小金属",
       "industry": "有色金属矿采选业",
       "concepts": [
-        "权重股",
         "磷化工",
         "黄金概念",
+        "东方财富热股",
+        "融资融券",
         "稀缺资源",
-        "小金属概念",
-        "东方财富热股"
+        "小金属概念"
       ],
       "backtest": {
         "signals": 1,
@@ -180,9 +180,9 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [
         "黄金概念",
-        "小金属概念",
         "一带一路",
         "东方财富热股",
+        "小金属概念",
         "央国企改革"
       ],
       "backtest": {
@@ -273,12 +273,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "四量终极 信号2项；板块龙头 小金属,半导体",
       "industry": "房地产业",
       "concepts": [
-        "参股银行",
-        "存储芯片",
-        "光伏概念",
-        "固态电池",
         "OLED",
-        "创投"
+        "固态电池",
+        "存储芯片",
+        "国产芯片",
+        "创投",
+        "光伏概念"
       ],
       "backtest": {
         "signals": 4,
@@ -325,12 +325,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "有色金属矿采选业",
       "concepts": [
-        "权重股",
         "磷化工",
         "黄金概念",
+        "东方财富热股",
+        "融资融券",
         "稀缺资源",
-        "小金属概念",
-        "东方财富热股"
+        "小金属概念"
       ],
       "enter_date": "2026-08-11",
       "stop_loss": 18.68,
@@ -361,9 +361,9 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [
         "黄金概念",
-        "小金属概念",
         "一带一路",
         "东方财富热股",
+        "小金属概念",
         "央国企改革"
       ],
       "enter_date": "2026-08-10",
@@ -394,12 +394,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "房地产业",
       "concepts": [
-        "参股银行",
-        "存储芯片",
-        "光伏概念",
-        "固态电池",
         "OLED",
-        "创投"
+        "固态电池",
+        "存储芯片",
+        "国产芯片",
+        "创投",
+        "光伏概念"
       ],
       "enter_date": "2026-08-07",
       "stop_loss": 28.15,
@@ -429,12 +429,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "有色金属矿采选业",
       "concepts": [
-        "权重股",
+        "一带一路",
         "反转股",
-        "稀缺资源",
-        "小金属概念",
         "贬值受益",
-        "一带一路"
+        "东方财富热股",
+        "融资融券",
+        "稀缺资源"
       ],
       "enter_date": "2026-08-11",
       "stop_loss": 31.91,
@@ -464,11 +464,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "有色金属矿采选业",
       "concepts": [
-        "百日新高",
         "近期新高",
+        "百日新高",
+        "东方财富热股",
         "新材料",
-        "小金属概念",
-        "电池技术",
+        "融资融券",
         "稀缺资源"
       ],
       "enter_date": "2026-08-11",
@@ -499,12 +499,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "软件和信息技术服务业",
       "concepts": [
-        "安防概念",
-        "小米概念",
+        "AI眼镜",
         "医疗器械概念",
+        "小米概念",
+        "国产芯片",
         "工业互联",
-        "AI芯片",
-        "人工智能"
+        "AI芯片"
       ],
       "enter_date": "2026-08-07",
       "stop_loss": 86.76,
@@ -535,11 +535,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "有色金属矿采选业",
       "concepts": [
         "中特估",
-        "中字头",
         "黄金概念",
-        "稀缺资源",
         "贬值受益",
-        "化债(AMC)概念"
+        "化债(AMC)概念",
+        "融资融券",
+        "稀缺资源"
       ],
       "enter_date": "2026-08-07",
       "stop_loss": 23.96,
@@ -594,16 +594,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
-        "深成500",
-        "华为概念",
-        "光伏概念",
         "光纤概念",
+        "第三代半导体",
+        "光伏概念",
+        "华为概念",
         "光通信模块",
-        "商业航天"
+        "稀缺资源"
       ],
       "enter_date": "2026-08-07",
-      "stop_loss": 89.06,
-      "target_price": 113.79,
+      "stop_loss": 89.3,
+      "target_price": 114.1,
       "risk_reward": 1.5,
       "support": 60.8,
       "resistance": 105.8
@@ -626,16 +626,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
-        "华为概念",
         "OLED",
-        "3D打印",
+        "5G概念",
         "医疗器械概念",
-        "中芯概念",
-        "国产芯片"
+        "国产芯片",
+        "华为概念",
+        "中芯概念"
       ],
       "enter_date": "2026-08-07",
-      "stop_loss": 46.53,
-      "target_price": 59.46,
+      "stop_loss": 48.14,
+      "target_price": 61.51,
       "risk_reward": 1.5,
       "support": 32.28,
       "resistance": 54.0
@@ -659,12 +659,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "通用设备制造业",
       "concepts": [
-        "次新股",
         "存储芯片",
-        "百元股",
+        "创业板综",
+        "次新股",
         "先进封装",
-        "半导体概念",
-        "东方财富热股"
+        "东方财富热股",
+        "融资融券"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -691,16 +691,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "专用设备制造业",
       "concepts": [
-        "存储芯片",
-        "工业气体",
         "磷化工",
-        "专精特新",
+        "存储芯片",
         "第三代半导体",
-        "中芯概念"
+        "氢能源",
+        "专精特新",
+        "碳化硅"
       ],
       "enter_date": "2026-08-07",
-      "stop_loss": 65.2,
-      "target_price": 83.32,
+      "stop_loss": 65.3,
+      "target_price": 83.44,
       "risk_reward": 1.5,
       "support": 39.0,
       "resistance": 74.66
@@ -723,16 +723,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "仪器仪表制造业",
       "concepts": [
-        "华为概念",
-        "存储芯片",
         "OLED",
-        "中芯概念",
-        "柔性屏(折叠屏)",
-        "国产芯片"
+        "创业成份",
+        "存储芯片",
+        "国产芯片",
+        "创业板综",
+        "华为概念"
       ],
       "enter_date": "2026-08-07",
-      "stop_loss": 203.62,
-      "target_price": 260.19,
+      "stop_loss": 202.23,
+      "target_price": 258.4,
       "risk_reward": 1.5,
       "support": 164.01,
       "resistance": 306.36
@@ -755,15 +755,15 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "通用设备制造业",
       "concepts": [
-        "百元股",
         "专精特新",
-        "光刻机(胶)",
+        "融资融券",
+        "百元股",
         "半导体概念",
-        "融资融券"
+        "光刻机(胶)"
       ],
       "enter_date": "2026-08-07",
-      "stop_loss": 190.11,
-      "target_price": 242.91,
+      "stop_loss": 188.11,
+      "target_price": 240.36,
       "risk_reward": 1.5,
       "support": 144.0,
       "resistance": 257.94
@@ -786,16 +786,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "专用设备制造业",
       "concepts": [
-        "华为概念",
-        "TOPCon电池",
-        "固态电池",
         "OLED",
+        "固态电池",
         "光纤概念",
-        "PCB"
+        "TOPCon电池",
+        "PCB",
+        "华为概念"
       ],
       "enter_date": "2026-08-07",
-      "stop_loss": 84.88,
-      "target_price": 108.46,
+      "stop_loss": 85.3,
+      "target_price": 109.0,
       "risk_reward": 1.5,
       "support": 80.32,
       "resistance": 122.2
@@ -818,16 +818,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "华为概念",
+        "AI眼镜",
+        "AIPC",
         "存储芯片",
-        "光通信模块",
         "小米概念",
-        "专精特新",
-        "中芯概念"
+        "国产芯片",
+        "专精特新"
       ],
       "enter_date": "2026-08-07",
-      "stop_loss": 116.18,
-      "target_price": 148.45,
+      "stop_loss": 115.39,
+      "target_price": 147.44,
       "risk_reward": 1.5,
       "support": 101.5,
       "resistance": 204.93
@@ -850,16 +850,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "化学原料和化学制品制造业",
       "concepts": [
-        "存储芯片",
-        "工业气体",
         "OLED",
-        "专精特新",
-        "中芯概念",
-        "光刻机(胶)"
+        "存储芯片",
+        "国产芯片",
+        "天然气",
+        "东方财富热股",
+        "专精特新"
       ],
       "enter_date": "2026-08-07",
-      "stop_loss": 135.24,
-      "target_price": 172.81,
+      "stop_loss": 136.97,
+      "target_price": 175.02,
       "risk_reward": 1.5,
       "support": 117.45,
       "resistance": 194.88
@@ -883,15 +883,15 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
         "存储芯片",
-        "百元股",
+        "国产芯片",
         "汽车芯片",
         "专精特新",
-        "国产芯片",
-        "半导体概念"
+        "融资融券",
+        "百元股"
       ],
       "enter_date": "2026-08-07",
-      "stop_loss": 101.03,
-      "target_price": 129.09,
+      "stop_loss": 100.99,
+      "target_price": 129.04,
       "risk_reward": 1.5,
       "support": 94.46,
       "resistance": 161.55
@@ -914,16 +914,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "中芯概念",
-        "光刻机(胶)",
-        "半导体概念",
         "高带宽内存",
         "融资融券",
-        "氟化工概念"
+        "中芯概念",
+        "氟化工概念",
+        "半导体概念",
+        "光刻机(胶)"
       ],
       "enter_date": "2026-08-07",
-      "stop_loss": 25.74,
-      "target_price": 32.89,
+      "stop_loss": 25.23,
+      "target_price": 32.23,
       "risk_reward": 1.5,
       "support": 18.05,
       "resistance": 30.12
@@ -946,13 +946,13 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "专用设备制造业",
       "concepts": [
-        "半导体概念",
         "融资融券",
+        "半导体概念",
         "央国企改革"
       ],
       "enter_date": "2026-08-07",
-      "stop_loss": 24.25,
-      "target_price": 30.98,
+      "stop_loss": 24.22,
+      "target_price": 30.95,
       "risk_reward": 1.5,
       "support": 21.27,
       "resistance": 38.1
@@ -976,15 +976,15 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "专用设备制造业",
       "concepts": [
         "存储芯片",
-        "百元股",
-        "专精特新",
-        "中芯概念",
         "趋势股",
-        "先进封装"
+        "高带宽内存",
+        "先进封装",
+        "专精特新",
+        "融资融券"
       ],
       "enter_date": "2026-08-07",
-      "stop_loss": 647.61,
-      "target_price": 827.51,
+      "stop_loss": 643.7,
+      "target_price": 822.5,
       "risk_reward": 1.5,
       "support": 570.0,
       "resistance": 877.7
@@ -1007,16 +1007,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "华为概念",
-        "工业气体",
         "粤港自贸",
-        "半导体概念",
+        "华为概念",
+        "融资融券",
+        "工业气体",
         "氦气概念",
-        "融资融券"
+        "半导体概念"
       ],
       "enter_date": "2026-08-07",
-      "stop_loss": 33.72,
-      "target_price": 43.09,
+      "stop_loss": 33.52,
+      "target_price": 42.84,
       "risk_reward": 1.5,
       "support": 28.69,
       "resistance": 43.46
@@ -1039,16 +1039,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "专用设备制造业",
       "concepts": [
-        "百元股",
-        "专精特新",
-        "中芯概念",
-        "半导体概念",
         "高带宽内存",
-        "融资融券"
+        "专精特新",
+        "融资融券",
+        "中芯概念",
+        "百元股",
+        "半导体概念"
       ],
       "enter_date": "2026-08-07",
-      "stop_loss": 324.23,
-      "target_price": 414.29,
+      "stop_loss": 317.97,
+      "target_price": 406.29,
       "risk_reward": 1.5,
       "support": 297.33,
       "resistance": 408.99
@@ -1071,16 +1071,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "百元股",
-        "工业气体",
         "固态电池",
-        "中芯概念",
         "光刻机(胶)",
-        "电池技术"
+        "融资融券",
+        "中芯概念",
+        "工业气体",
+        "百元股"
       ],
       "enter_date": "2026-08-10",
-      "stop_loss": 299.68,
-      "target_price": 382.93,
+      "stop_loss": 296.15,
+      "target_price": 378.41,
       "risk_reward": 1.5,
       "support": 161.37,
       "resistance": 334.0
@@ -1104,12 +1104,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "深成500",
+        "5G概念",
+        "AI眼镜",
+        "MLCC",
         "华为概念",
-        "虚拟机器人",
-        "电池技术",
-        "机器人概念",
-        "MLCC"
+        "融资融券",
+        "机器人概念"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -1137,16 +1137,16 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "电力、热力生产和供应业",
       "concepts": [
-        "光伏概念",
-        "充电桩",
-        "反转股",
         "新能源",
-        "绿色电力",
-        "题材股"
+        "充电桩",
+        "题材股",
+        "光伏概念",
+        "储能概念",
+        "反转股"
       ],
       "enter_date": "20260810",
-      "stop_loss": 12.67,
-      "target_price": 16.19,
+      "stop_loss": 12.96,
+      "target_price": 16.56,
       "risk_reward": 1.5,
       "support": 6.66,
       "resistance": 15.73
@@ -1170,12 +1170,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "合成生物",
-        "专精特新",
-        "破发股",
-        "精准诊断",
         "重组蛋白",
-        "体外诊断概念"
+        "体外诊断概念",
+        "专精特新",
+        "融资融券",
+        "精准诊断",
+        "破发股"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -1203,12 +1203,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "数据中心",
-        "光伏概念",
         "固态电池",
-        "创投",
         "新能源",
-        "液冷概念"
+        "数据中心",
+        "创投",
+        "光伏概念",
+        "储能概念"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -1236,12 +1236,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "深圳特区",
-        "3D玻璃",
-        "破发股",
         "柔性屏(折叠屏)",
         "创业板综",
-        "融资融券"
+        "融资融券",
+        "破发股",
+        "3D玻璃",
+        "深圳特区"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
