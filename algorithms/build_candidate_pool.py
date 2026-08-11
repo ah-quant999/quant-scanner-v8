@@ -203,6 +203,26 @@ def resolve_clean_name(code, market, raw_name):
 TOP_PER_BOARD = 100   # 主板/创业板/科创板 各取成交额前 N
 HK_TOP = 50           # 港股取成交额前 N
 
+# 港股精选代码池：HSI 蓝筹 + 港股通权重（稳定不易老化），用于 GTimg 批量行情兜底。
+# 2026-08-11 替代方案：akshare 港股双接口（stock_hk_spot / stock_hk_spot_em）在本机与云端均不可达，
+# 东财 clist 列表接口也不可达 → 改用「自有代码池 + GTimg 单票批量行情」（qt.gtimg.cn 双环境可达）。
+# 运行时 GTimg 对无效代码自动跳过（无 name/价格为 0 即丢弃），故少量代码偏差不会引发崩溃或脏数据。
+HK_UNIVERSE = [
+    "00700","09988","03690","01810","01299","00939","01398","03988","01658",
+    "03968","01288","01988","02318","02628","01339","02601","06030","00998",
+    "00941","00728","00762","00005","00011","02388","01024","09888","09999",
+    "09618","09626","02015","09866","09868","02020","02331","02313","01929",
+    "01109","00688","03311","00960","02007","00823","00001","00002","00003",
+    "00066","01038","01997","00027","01928","00267","00291","00241","01833",
+    "06618","02400","00268","01787","02899","03993","01772","01347","00981",
+    "01801","02269","02359","01177","01093","03692","01530","06160","00883",
+    "00857","00386","01088","01171","02380","00956","01250","01898","00168",
+    "00016","00012","00101","00868","03606","02382","02018","00285","06060",
+    "01336","02202","02777","01918","06862","03898","01877","02196","00347",
+    "00921","06099","06881","00390","01186","00902","09633","09987","06690",
+    "06969","09966","02039","06178","09961","06826","01772","01579","01810",
+]
+
 
 # ---------- 行情抓取（带回退） ----------
 def _a_share_spot_mootdx():
@@ -356,24 +376,79 @@ def _a_share_spot():
     return _a_share_spot_gtimg()
 
 
-def _hk_spot():
-    if ak is None:
-        print("  [港股] akshare 未安装，跳过港股层")
+def _hk_spot_gtimg():
+    """GTimg 港股批量行情兜底（akshare 不可达时启用）。
+
+    用自带精选港股代码池（HK_UNIVERSE：HSI 蓝筹 + 港股通权重，稳定不易老化）批量拉
+    qt.gtimg.cn 单票行情，按 成交额 = 现价 × 成交量 排序取前 HK_TOP。
+    GTimg 在本机与云端美区 runner 均可达（与 A股 gtimg 兜底同源）；无效代码会被自动跳过。
+    """
+    try:
+        import pandas as pd
+        import urllib.request, ssl
+        ctx = ssl.create_default_context()
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        codes = sorted(set(HK_UNIVERSE))
+        rows = []
+        for i in range(0, len(codes), 80):
+            batch = codes[i:i + 80]
+            q = "https://qt.gtimg.cn/q=" + ",".join("hk" + c for c in batch)
+            try:
+                req = urllib.request.Request(q, headers={
+                    "User-Agent": "Mozilla/5.0", "Referer": "https://gu.qq.com/"})
+                b = urllib.request.urlopen(req, timeout=12, context=ctx).read().decode("gbk", "ignore")
+            except Exception as e:
+                print(f"  [港股-GTimg] 批次失败: {type(e).__name__} {str(e)[:60]}")
+                continue
+            for line in b.split(";"):
+                line = line.strip()
+                if not line.startswith("v_hk"):
+                    continue
+                try:
+                    code = line[2:line.index("=")]
+                    payload = line[line.index('"') + 1:line.rindex('"')]
+                    f = payload.split("~")
+                    name = f[1]
+                    price = float(f[3]) if len(f) > 3 and f[3] else 0.0
+                    vol = float(f[6]) if len(f) > 6 and f[6] else 0.0
+                    if not name or price <= 0 or vol <= 0:
+                        continue
+                    rows.append({"代码": code, "名称": name, "成交额": price * vol})
+                except Exception:
+                    continue
+        if not rows:
+            print("  [港股-GTimg] 无有效数据")
+            return None
+        df = pd.DataFrame(rows)
+        print(f"  [港股-GTimg] OK 行数={len(df)}")
+        return df
+    except Exception as e:
+        print(f"  [港股-GTimg] 失败: {type(e).__name__} {str(e)[:60]}")
         return None
-    # 家用机：新浪优先（已验证可靠），东财居家网络常挂死靠后
-    for fn in (ak.stock_hk_spot, ak.stock_hk_spot_em):
-        try:
-            t = time.time()
-            df = fn()
-            if df is not None and len(df):
-                print(f"  [港股] {fn.__name__} OK 行数={len(df)} {time.time()-t:.1f}s")
-                return df
-        except Exception as e:
-            print(f"  [港股] {fn.__name__} 失败: {type(e).__name__} {str(e)[:60]}")
-            time.sleep(2)
+
+
+def _hk_spot():
+    # 1) akshare（本地可达时优先）：新浪 stock_hk_spot → 东财 stock_hk_spot_em
+    if ak is not None:
+        for fn in (ak.stock_hk_spot, ak.stock_hk_spot_em):
+            try:
+                t = time.time()
+                df = fn()
+                if df is not None and len(df):
+                    print(f"  [港股] {fn.__name__} OK 行数={len(df)} {time.time()-t:.1f}s")
+                    return df
+            except Exception as e:
+                print(f"  [港股] {fn.__name__} 失败: {type(e).__name__} {str(e)[:60]}")
+                time.sleep(2)
+    # 2) GTimg 批量行情兜底（双环境可达，akshare 不可达时主力路径）
+    df = _hk_spot_gtimg()
+    if df is not None and len(df):
+        return df
     # GTimg 暂无港股成交额排行接口；港股缺失不阻断 A股候选池
     print("  [港股] 无可用数据源，本次跳过港股层")
     return None
+
 
 
 def _hk_from_goldpool(limit, add):
