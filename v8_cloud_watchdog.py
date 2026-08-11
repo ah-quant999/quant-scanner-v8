@@ -160,36 +160,49 @@ def check_runner(heal=False):
 
 
 def latest_workflow_run(name, skip_neutral=True):
+    """返回 (最近一条已完成且有实际结论的 run, err, 正在运行中的 run 或 None)。"""
     # list workflows then find by name
     wfs = api_get(f"https://api.github.com/repos/{REPO}/actions/workflows")
     if "__error__" in wfs:
-        return None, f"workflows API error {wfs['__error__']}"
+        return None, f"workflows API error {wfs['__error__']}", None
     wf_id = None
     for w in wfs.get("workflows", []):
         if w["name"] == name:
             wf_id = w["id"]
             break
     if not wf_id:
-        return None, f"找不到 workflow '{name}'"
+        return None, f"找不到 workflow '{name}'", None
     # 2026-08-09 第119轮修复【skipped 误报】：
     #   GitHub Actions 并发触发时（如 workflow_run 与 push 同时命中），同一分钟内常出现
     #   一条 conclusion=skipped 的 run 与一条 success 并存；旧实现 per_page=1 取最新一条，
     #   恰好取到 skipped 即误判 FAIL 并发出告警邮件（实测 19:09 两条 run 并存致误报）。
     #   ⇒ 跳过 neutral 结论（skipped/cancelled/neutral/action_required），取最近一条
     #     有实际结论（success/failure）的 run；若整页全是 neutral 才退回第一条（真异常）。
+    # 2026-08-11 第156轮修复【in_progress 误报】：
+    #   status=in_progress/queued 的 run 其 conclusion 为 None，既不在 NEUTRAL 里，
+    #   旧实现会把它当成"最新有结论的 run"直接返回，check_workflow 再以
+    #   `con == "success"` 判定 → 每当巡检恰好撞上 cn_fetch 正在跑（交易时段高频 cron
+    #   下极常见）就误判 FAIL 并发出告警邮件（实测 09:18 cn_fetch 启动 4 分钟即误报）。
+    #   ⇒ 运行中的 run 单独摘出（running），不参与成败判定；成败仍看最近一条
+    #     已完成且非 neutral 的 run，由 check_workflow 组合判断。
     NEUTRAL = ("skipped", "cancelled", "neutral", "action_required")
     runs = api_get(f"https://api.github.com/repos/{REPO}/actions/workflows/{wf_id}/runs?per_page=20")
     if "__error__" in runs:
-        return None, f"runs API error {runs['__error__']}"
+        return None, f"runs API error {runs['__error__']}", None
     items = runs.get("workflow_runs", [])
     if not items:
-        return None, "无运行记录"
-    if skip_neutral:
-        for r in items:
-            if r.get("conclusion") not in NEUTRAL:
-                return r, None
-        return items[0], None   # 全部 neutral：照常返回最新一条，由 check_workflow 判 FAIL
-    return items[0], None
+        return None, "无运行记录", None
+    running = None
+    for r in items:
+        if r.get("status") != "completed":
+            if running is None:
+                running = r          # 记录最新一条运行中实例
+            continue
+        if skip_neutral and r.get("conclusion") in NEUTRAL:
+            continue
+        return r, None, running
+    # 整页全是 neutral / 全在运行中：退回第一条，由 check_workflow 兜底判定
+    return items[0], None, running
 
 
 def in_schedule_window(kind, now_cst=None):
@@ -237,14 +250,36 @@ def in_schedule_window(kind, now_cst=None):
     return True
 
 
+# 运行中的 workflow 允许的最长时长；超过视为卡死（v8 各 workflow 正常 2-15 分钟完成）
+RUNNING_GRACE_MIN = 45
+
+
 def check_workflow(name, label, max_age_min=None):
-    run, err = latest_workflow_run(name)
+    run, err, running = latest_workflow_run(name)
     if err:
         return False, err
+    now_cst = datetime.now(timezone(timedelta(hours=8)))
+
+    # ① 有正在运行的实例：运行中不是失败。未超时 → OK；超时 → 判卡死。
+    if running is not None:
+        r_created = utc_to_cst(running["created_at"])
+        r_age = (now_cst - r_created).total_seconds() / 60
+        r_str = r_created.strftime("%m-%d %H:%M") if r_created else "?"
+        if r_age <= RUNNING_GRACE_MIN:
+            tail = ""
+            if run is not None and run.get("status") == "completed":
+                p_created = utc_to_cst(run["created_at"])
+                tail = f"；上轮 {run.get('conclusion')} @ {p_created.strftime('%m-%d %H:%M')}"
+            return True, f"{label} 运行中({running['status']}) @ {r_str} (已 {fmt_age(r_age)}){tail}"
+        return False, f"{label} {running['status']} @ {r_str} 已 {fmt_age(r_age)} 未结束，疑似卡死"
+
+    if run is None:
+        return False, f"{label} 无可判定的运行记录"
+
+    # ② 无运行中实例：按最近一条已完成 run 判成败 + 新鲜度
     status = run["status"]
     con = run.get("conclusion")
     created = utc_to_cst(run["created_at"])
-    now_cst = datetime.now(timezone(timedelta(hours=8)))
     age_min = (now_cst - created).total_seconds() / 60
     created_str = created.strftime("%m-%d %H:%M") if created else "?"
     ok = status == "completed" and con == "success"
