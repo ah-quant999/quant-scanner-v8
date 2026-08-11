@@ -1,9 +1,9 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-11 17:00:34",
+  "update_time": "2026-08-11 17:50:23",
   "crisis_score": 33.3,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
-  "total_candidates": 19,
+  "total_candidates": 22,
   "top_n": 3,
   "strong_sectors": [
     "元件",
@@ -60,8 +60,8 @@ window.FINAL_RECOMMEND_DATA = {
       "concepts": [],
       "backtest": {
         "signals": 171,
-        "win_rate": 51.5,
-        "avg_return": 1.24,
+        "win_rate": 48.5,
+        "avg_return": 1.18,
         "best_hold_days": 3,
         "note": "个股暂无历史信号，展示策略级统计（最佳持有 3 天）"
       },
@@ -77,55 +77,55 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "rank": 2,
-      "code": "09988",
-      "name": "阿里巴巴-W",
+      "code": "00883",
+      "name": "中国海洋石油",
       "market": "hk",
       "board": "港股",
       "horizon": "短线/中线共振",
-      "close": 126.2,
-      "pct_chg": -0.39,
-      "stop_loss": 113.58,
-      "target_price": 145.13,
+      "close": 24.24,
+      "pct_chg": 3.59,
+      "stop_loss": 21.82,
+      "target_price": 27.88,
       "risk_reward": 1.5,
       "support": null,
       "resistance": null,
       "atr": null,
       "sources": [
         "四量终极",
-        "驾驶舱A档"
+        "驾驶舱B档"
       ],
       "source_scores": {
-        "驾驶舱A档": 2.8,
+        "驾驶舱B档": 1.0,
         "四量终极": 1.2
       },
       "resonance": 2,
-      "strength": 4.0,
+      "strength": 2.2,
       "sector_score": 0.0,
       "sector_hits": [],
       "sector_fund": [],
-      "final_score": 5.5,
-      "buy_score": 5.5,
+      "final_score": 3.7,
+      "buy_score": 3.7,
       "enter_date": "2026-08-11",
       "signals": [
-        "上涨趋势",
-        "双真+不超买+EMA完好",
-        "机构变红"
+        "早期:机构变红+缠论买",
+        "机构变红",
+        "缠论买点"
       ],
       "_60m_resonance": false,
-      "reason": "驾驶舱A档 技术60 质量0；四量终极 信号2项",
+      "reason": "驾驶舱B档 技术32 质量0；四量终极 信号2项",
       "industry": "",
       "concepts": [],
       "backtest": {
         "signals": 171,
-        "win_rate": 51.5,
-        "avg_return": 1.24,
+        "win_rate": 48.5,
+        "avg_return": 1.18,
         "best_hold_days": 3,
         "note": "个股暂无历史信号，展示策略级统计（最佳持有 3 天）"
       },
       "tracking": {
         "entry_date": "2026-08-11",
-        "entry_price": 126.2,
-        "latest_price": 126.2,
+        "entry_price": 24.24,
+        "latest_price": 24.24,
         "return_pct": 0.0,
         "hold_days": 1,
         "exit_type": "hold",
@@ -183,17 +183,17 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构1.4亿+游资0.0亿",
       "industry": "通用设备制造业",
       "concepts": [
-        "先进封装",
-        "融资融券",
-        "百元股",
-        "东方财富热股",
         "次新股",
-        "存储芯片"
+        "百元股",
+        "半导体概念",
+        "东方财富热股",
+        "先进封装",
+        "创业板综"
       ],
       "backtest": {
         "signals": 171,
-        "win_rate": 51.5,
-        "avg_return": 1.24,
+        "win_rate": 48.5,
+        "avg_return": 1.18,
         "best_hold_days": 3,
         "note": "个股暂无历史信号，展示策略级统计（最佳持有 3 天）"
       },
@@ -238,41 +238,13 @@ window.FINAL_RECOMMEND_DATA = {
       "resistance": null
     },
     {
-      "code": "09988",
-      "name": "阿里巴巴-W",
-      "market": "港股",
-      "board": "港股",
-      "horizon": "中长线",
-      "close": 126.2,
-      "pct_chg": -0.39,
-      "final_score": 5.5,
-      "resonance": 2,
-      "sources": [
-        "四量终极",
-        "驾驶舱A档"
-      ],
-      "signals": [
-        "上涨趋势",
-        "双真+不超买+EMA完好",
-        "机构变红"
-      ],
-      "industry": "",
-      "concepts": [],
-      "enter_date": "2026-08-11",
-      "stop_loss": 113.58,
-      "target_price": 145.13,
-      "risk_reward": 1.5,
-      "support": null,
-      "resistance": null
-    },
-    {
       "code": "00883",
       "name": "中国海洋石油",
       "market": "港股",
       "board": "港股",
       "horizon": "中长线",
-      "close": 24.3,
-      "pct_chg": 3.85,
+      "close": 24.24,
+      "pct_chg": 3.59,
       "final_score": 3.7,
       "resonance": 2,
       "sources": [
@@ -287,8 +259,8 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [],
       "enter_date": "2026-08-11",
-      "stop_loss": 21.87,
-      "target_price": 27.95,
+      "stop_loss": 21.82,
+      "target_price": 27.88,
       "risk_reward": 1.5,
       "support": null,
       "resistance": null
@@ -299,8 +271,8 @@ window.FINAL_RECOMMEND_DATA = {
       "market": "港股",
       "board": "港股",
       "horizon": "中长线",
-      "close": 39.86,
-      "pct_chg": -0.75,
+      "close": 39.82,
+      "pct_chg": -0.85,
       "final_score": 3.7,
       "resonance": 2,
       "sources": [
@@ -315,8 +287,8 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [],
       "enter_date": "2026-08-11",
-      "stop_loss": 35.87,
-      "target_price": 45.84,
+      "stop_loss": 35.84,
+      "target_price": 45.79,
       "risk_reward": 1.5,
       "support": null,
       "resistance": null
@@ -340,12 +312,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "通用设备制造业",
       "concepts": [
-        "先进封装",
-        "融资融券",
-        "百元股",
-        "东方财富热股",
         "次新股",
-        "存储芯片"
+        "百元股",
+        "半导体概念",
+        "东方财富热股",
+        "先进封装",
+        "创业板综"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -375,10 +347,10 @@ window.FINAL_RECOMMEND_DATA = {
       "concepts": [
         "5G概念",
         "华为概念",
-        "融资融券",
-        "虚拟机器人",
-        "央国企改革",
-        "机器人概念"
+        "机器人概念",
+        "电池技术",
+        "MLCC",
+        "融资融券"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -407,11 +379,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "电力、热力生产和供应业",
       "concepts": [
         "反转股",
-        "央国企改革",
-        "光伏概念",
-        "储能概念",
-        "东方财富热股",
-        "绿色电力"
+        "充电桩",
+        "新能源",
+        "西部大开发",
+        "绿色电力",
+        "题材股"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -439,12 +411,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "融资融券",
-        "合成生物",
-        "体外诊断概念",
         "重组蛋白",
+        "体外诊断概念",
+        "精准诊断",
         "破发股",
-        "专精特新"
+        "专精特新",
+        "融资融券"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -472,12 +444,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "融资融券",
-        "央国企改革",
         "新能源",
-        "固态电池",
-        "光伏概念",
-        "储能概念"
+        "液冷概念",
+        "数据中心",
+        "储能概念",
+        "创投",
+        "固态电池"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -505,12 +477,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "融资融券",
-        "深圳特区",
+        "柔性屏(折叠屏)",
         "破发股",
-        "3D玻璃",
         "创业板综",
-        "柔性屏(折叠屏)"
+        "融资融券",
+        "3D玻璃",
+        "深圳特区"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -539,6 +511,70 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [],
       "enter_date": "20260810",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "300274",
+      "name": "阳光电源",
+      "market": "创业板",
+      "board": "创业板",
+      "horizon": "中长线",
+      "close": null,
+      "pct_chg": 0.0,
+      "final_score": 2.5,
+      "resonance": 1,
+      "sources": [
+        "驾驶舱B档"
+      ],
+      "signals": [
+        "早期:机构变红"
+      ],
+      "industry": "电气机械和器材制造业",
+      "concepts": [
+        "氢能源",
+        "充电桩",
+        "宁组合",
+        "创业成份",
+        "储能概念",
+        "新能源车"
+      ],
+      "enter_date": "2026-08-11",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "300502",
+      "name": "新易盛",
+      "market": "创业板",
+      "board": "创业板",
+      "horizon": "中长线",
+      "close": null,
+      "pct_chg": 0.0,
+      "final_score": 2.5,
+      "resonance": 1,
+      "sources": [
+        "驾驶舱B档"
+      ],
+      "signals": [
+        "早期:机构变红"
+      ],
+      "industry": "计算机、通信和其他电子设备制造业",
+      "concepts": [
+        "5G概念",
+        "光通信模块",
+        "百元股",
+        "创业成份",
+        "东方财富热股",
+        "CPO概念"
+      ],
+      "enter_date": "2026-08-11",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -578,8 +614,8 @@ window.FINAL_RECOMMEND_DATA = {
       "market": "港股",
       "board": "港股",
       "horizon": "短线",
-      "close": 11.74,
-      "pct_chg": 2.26,
+      "close": 11.72,
+      "pct_chg": 2.09,
       "final_score": 1.2,
       "resonance": 1,
       "sources": [
@@ -592,8 +628,8 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [],
       "enter_date": "2026-08-11",
-      "stop_loss": 10.57,
-      "target_price": 13.5,
+      "stop_loss": 10.55,
+      "target_price": 13.48,
       "risk_reward": 1.5,
       "support": null,
       "resistance": null
@@ -604,8 +640,8 @@ window.FINAL_RECOMMEND_DATA = {
       "market": "港股",
       "board": "港股",
       "horizon": "短线",
-      "close": 218.4,
-      "pct_chg": 2.44,
+      "close": 218.8,
+      "pct_chg": 2.63,
       "final_score": 1.2,
       "resonance": 1,
       "sources": [
@@ -618,8 +654,8 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [],
       "enter_date": "2026-08-11",
-      "stop_loss": 196.56,
-      "target_price": 251.16,
+      "stop_loss": 196.92,
+      "target_price": 251.62,
       "risk_reward": 1.5,
       "support": null,
       "resistance": null
@@ -630,8 +666,8 @@ window.FINAL_RECOMMEND_DATA = {
       "market": "港股",
       "board": "港股",
       "horizon": "短线",
-      "close": 199.3,
-      "pct_chg": 0.66,
+      "close": 199.1,
+      "pct_chg": 0.56,
       "final_score": 1.2,
       "resonance": 1,
       "sources": [
@@ -644,8 +680,34 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [],
       "enter_date": "2026-08-11",
-      "stop_loss": 179.37,
-      "target_price": 229.2,
+      "stop_loss": 179.19,
+      "target_price": 228.96,
+      "risk_reward": 1.5,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "09988",
+      "name": "阿里巴巴-W",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "短线",
+      "close": 126.4,
+      "pct_chg": -0.24,
+      "final_score": 1.2,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-08-11",
+      "stop_loss": 113.76,
+      "target_price": 145.36,
       "risk_reward": 1.5,
       "support": null,
       "resistance": null
@@ -656,8 +718,8 @@ window.FINAL_RECOMMEND_DATA = {
       "market": "港股",
       "board": "港股",
       "horizon": "短线",
-      "close": 46.04,
-      "pct_chg": -0.17,
+      "close": 45.98,
+      "pct_chg": -0.3,
       "final_score": 1.2,
       "resonance": 1,
       "sources": [
@@ -670,9 +732,34 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [],
       "enter_date": "2026-08-11",
-      "stop_loss": 41.44,
-      "target_price": 52.95,
+      "stop_loss": 41.38,
+      "target_price": 52.88,
       "risk_reward": 1.5,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "09618",
+      "name": "京东物流",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "中长线",
+      "close": null,
+      "pct_chg": 0.0,
+      "final_score": 1.0,
+      "resonance": 1,
+      "sources": [
+        "驾驶舱B档"
+      ],
+      "signals": [
+        "早期:机构变红"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-08-11",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
       "support": null,
       "resistance": null
     },

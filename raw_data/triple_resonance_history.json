@@ -1,10 +1,178 @@
 {
-  "2026-08-11": [],
-  "_stock_price_history": {},
-  "_tracking_latest": {},
+  "2026-08-09": [],
+  "_stock_price_history": {
+    "688266": {
+      "2026-08-10": 107.29
+    },
+    "300613": {
+      "2026-08-10": 70.3
+    },
+    "688183": {
+      "2026-08-10": 102.79
+    },
+    "600519": {
+      "2026-08-10": 0
+    },
+    "300308": {
+      "2026-08-10": 1021.99
+    },
+    "300476": {
+      "2026-08-10": 201.8
+    },
+    "300760": {
+      "2026-08-10": 0
+    },
+    "300972": {
+      "2026-08-10": 205.81
+    },
+    "01209": {
+      "2026-08-10": 40.16,
+      "2026-08-11": 39.86
+    },
+    "00883": {
+      "2026-08-11": 24.3
+    }
+  },
+  "_tracking_latest": {
+    "300760": {
+      "enter_date": "2026-08-10",
+      "enter_close": 0,
+      "last_date": "2026-08-10",
+      "last_close": 0,
+      "status": "dropped",
+      "streak": 1,
+      "total_days": 1
+    },
+    "600519": {
+      "enter_date": "2026-08-10",
+      "enter_close": 0,
+      "last_date": "2026-08-10",
+      "last_close": 0,
+      "status": "dropped",
+      "streak": 1,
+      "total_days": 1
+    },
+    "300613": {
+      "enter_date": "2026-08-10",
+      "enter_close": 70.3,
+      "last_date": "2026-08-10",
+      "last_close": 70.3,
+      "status": "dropped",
+      "streak": 1,
+      "total_days": 1
+    },
+    "688183": {
+      "enter_date": "2026-08-10",
+      "enter_close": 102.79,
+      "last_date": "2026-08-10",
+      "last_close": 102.79,
+      "status": "dropped",
+      "streak": 1,
+      "total_days": 1
+    },
+    "300476": {
+      "enter_date": "2026-08-10",
+      "enter_close": 201.8,
+      "last_date": "2026-08-10",
+      "last_close": 201.8,
+      "status": "dropped",
+      "streak": 1,
+      "total_days": 1
+    },
+    "688266": {
+      "enter_date": "2026-08-10",
+      "enter_close": 107.29,
+      "last_date": "2026-08-10",
+      "last_close": 107.29,
+      "status": "dropped",
+      "streak": 1,
+      "total_days": 1
+    },
+    "300972": {
+      "enter_date": "2026-08-10",
+      "enter_close": 205.81,
+      "last_date": "2026-08-10",
+      "last_close": 205.81,
+      "status": "dropped",
+      "streak": 1,
+      "total_days": 1
+    },
+    "300308": {
+      "enter_date": "2026-08-10",
+      "enter_close": 1021.99,
+      "last_date": "2026-08-10",
+      "last_close": 1021.99,
+      "status": "dropped",
+      "streak": 1,
+      "total_days": 1
+    },
+    "01209": {
+      "enter_date": "2026-08-10",
+      "enter_close": 40.16,
+      "last_date": "2026-08-11",
+      "last_close": 39.86,
+      "status": "near",
+      "streak": 2,
+      "total_days": 1
+    },
+    "00883": {
+      "enter_date": "2026-08-11",
+      "enter_close": 24.3,
+      "last_date": "2026-08-11",
+      "last_close": 24.3,
+      "status": "near",
+      "streak": 1
+    }
+  },
   "_meta": {
-    "track_start": "2026-08-11",
-    "created": "2026-08-11 17:22:06",
-    "last_update": "2026-08-11 17:22:06"
-  }
+    "track_start": "2026-08-09",
+    "created": "2026-08-09 23:57:34",
+    "last_update": "2026-08-11 17:31:05"
+  },
+  "2026-08-10": [
+    {
+      "code": "01209",
+      "name": "华润万象生活",
+      "market": "hk",
+      "board": "港股",
+      "close": 40.16,
+      "pct_chg": 0.5,
+      "total_score": 25.2,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 0,
+      "status": "near"
+    }
+  ],
+  "2026-08-11": [
+    {
+      "code": "00883",
+      "name": "中国海洋石油",
+      "market": "hk",
+      "board": "港股",
+      "close": 24.3,
+      "pct_chg": 3.85,
+      "total_score": 25.2,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "01209",
+      "name": "华润万象生活",
+      "market": "hk",
+      "board": "港股",
+      "close": 39.86,
+      "pct_chg": -0.75,
+      "total_score": 25.2,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 0,
+      "status": "near"
+    }
+  ]
 }

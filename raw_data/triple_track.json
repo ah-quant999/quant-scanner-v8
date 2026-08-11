@@ -1,33 +1,133 @@
 {
-  "update_time": "2026-08-11 17:30:28",
+  "update_time": "2026-08-11 17:31:05",
   "data_date": "2026-08-11",
   "track_start": "2026-08-11",
-  "history_days": 1,
+  "history_days": 3,
   "strict_count": 0,
-  "near_count": 0,
-  "tracked": [],
-  "alerts": [],
+  "near_count": 2,
+  "tracked": [
+    {
+      "code": "00883",
+      "name": "中国海洋石油",
+      "market": "hk",
+      "board": "港股",
+      "status": "near",
+      "total_score": 25.2,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 0,
+      "enter_date": "2026-08-11",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 24.3,
+      "current_close": 24.3,
+      "pnl_pct": 0.0,
+      "catalysts": []
+    },
+    {
+      "code": "01209",
+      "name": "华润万象生活",
+      "market": "hk",
+      "board": "港股",
+      "status": "near",
+      "total_score": 25.2,
+      "quality_grade": "",
+      "industry": "",
+      "sectors": [],
+      "signal_count": 0,
+      "enter_date": "2026-08-10",
+      "hold_days": 1,
+      "consecutive_days": 2,
+      "first_close": 40.16,
+      "current_close": 39.86,
+      "pnl_pct": -0.75,
+      "catalysts": []
+    }
+  ],
+  "alerts": [
+    {
+      "level": "warn",
+      "code": "300760",
+      "name": "",
+      "text": "(300760) 于 2026-08-10 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "600519",
+      "name": "",
+      "text": "(600519) 于 2026-08-10 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300613",
+      "name": "",
+      "text": "(300613) 于 2026-08-10 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "688183",
+      "name": "",
+      "text": "(688183) 于 2026-08-10 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300476",
+      "name": "",
+      "text": "(300476) 于 2026-08-10 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "688266",
+      "name": "",
+      "text": "(688266) 于 2026-08-10 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300972",
+      "name": "",
+      "text": "(300972) 于 2026-08-10 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300308",
+      "name": "",
+      "text": "(300308) 于 2026-08-10 跌出共识（曾连续 1 日）"
+    }
+  ],
   "sector_cluster": {
-    "by_industry": [],
+    "by_industry": [
+      {
+        "industry": "未知",
+        "count": 2,
+        "names": [
+          "中国海洋石油",
+          "华润万象生活"
+        ]
+      }
+    ],
     "by_sector": [],
-    "concentration": 0
+    "concentration": 100.0
   },
   "overlap": {
-    "total_tracked": 0,
+    "total_tracked": 2,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
       "names": []
     },
     "cockpit_a": {
-      "count": 10,
+      "count": 1,
       "overlap": 0,
       "names": []
     },
     "cockpit_b": {
-      "count": 15,
-      "overlap": 0,
-      "names": []
+      "count": 8,
+      "overlap": 2,
+      "names": [
+        "中国海洋石油",
+        "华润万象生活"
+      ]
     }
   },
   "backtest_signal": {
@@ -61,9 +161,9 @@
         "worst": -10.04
       },
       "10d": {
-        "win_rate": 21.0,
-        "avg_return": -2.41,
-        "sharpe": -0.36,
+        "win_rate": 31.7,
+        "avg_return": -1.72,
+        "sharpe": -0.22,
         "count": 171,
         "best": 15.07,
         "worst": -10.04
@@ -83,7 +183,7 @@
       "band": "≥80",
       "count": 63,
       "win_rate_5d": 66.7,
-      "avg_ret_5d": 2.7,
+      "avg_ret_5d": 2.49,
       "best_win_rate": 66.7,
       "best_hold_days": 5
     },
@@ -127,8 +227,8 @@
       },
       {
         "period": "10d",
-        "strict_win": 21.0,
-        "strict_ret": -2.41,
+        "strict_win": 31.7,
+        "strict_ret": -1.72,
         "strict_count": 171,
         "loose_win": 0.0,
         "loose_ret": 0.0,
@@ -148,12 +248,12 @@
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
     "track_start": "2026-08-11",
-    "history_days": 1,
+    "history_days": 3,
     "summary": {
       "1d": {
-        "count": 0,
-        "win_rate": null,
-        "avg_return": null
+        "count": 1,
+        "win_rate": 0.0,
+        "avg_return": -0.75
       },
       "3d": {
         "count": 0,
@@ -176,6 +276,15 @@
         "avg_return": null
       }
     },
-    "per_stock": []
+    "per_stock": [
+      {
+        "code": "01209",
+        "name": "华润万象生活",
+        "enter_date": "2026-08-10",
+        "offsets": {
+          "1d": -0.75
+        }
+      }
+    ]
   }
 }
