@@ -4,6 +4,8 @@
 # 但 api.github.com 可达。故用 Git Database API 以「单次 commit」方式提交 raw_data。
 import os, sys, json, base64, hashlib, datetime
 import urllib.request, urllib.error
+import http.client
+import time as _time
 from zoneinfo import ZoneInfo
 
 CST = ZoneInfo("Asia/Shanghai")
@@ -43,23 +45,39 @@ def api(method, path, data=None):
     # 触发 TimeoutError 且未被捕获 → 整个推送进程崩溃（exit 1），54 个文件全部不落地。
     # 1) 超时放宽到 300s；2) 捕获网络类异常（TimeoutError/URLError/OSError）返回错误 dict，
     #    让调用方（blob 上传循环的 3 次重试 + 跳过）逻辑真正生效，而不是整体崩溃。
-    try:
-        with urllib.request.urlopen(req, timeout=300) as r:
-            txt = r.read().decode("utf-8")
-            return json.loads(txt) if txt else {}
-    except urllib.error.HTTPError as e:
-        body = e.read().decode("utf-8", "replace")
-        print(f"  ⚠️ API {method} {path} -> HTTP {e.code}")
+    # 2026-08-11 修复（157 轮看门狗）：上一版只捕获 (TimeoutError, URLError, OSError)，
+    # 但 http.client.IncompleteRead 继承自 HTTPException 而 **不是 OSError 子类**，
+    # 因此响应体被中途截断时异常逃逸 → 整个推送进程崩溃(exit 1) → 57 个文件全部不落地
+    # （实测 run 31452057629：读 blob 时 IncompleteRead(491873 read, 24313 more expected)，
+    #   ETF_DAILY_MONITOR 等盘中数据整批丢失，cn fetch 判 failure）。
+    # 修法：1) 异常元组补 http.client.HTTPException；
+    #      2) 幂等请求(GET)内建 3 次退避重读，抵御 cn runner 网络抖动，不再靠调用方兜底。
+    attempts = 3 if method.upper() == "GET" else 1
+    last_msg = ""
+    for i in range(attempts):
         try:
-            err = json.loads(body)
-            print(f"     message: {err.get('message')}")
-            print(f"     doc: {err.get('documentation_url')}")
-        except Exception:
-            print(f"     body: {body[:500]}")
-        return {"__error__": e.code, "__msg__": body}
-    except (TimeoutError, urllib.error.URLError, OSError) as e:
-        print(f"  ⚠️ API {method} {path} -> 网络异常 {type(e).__name__}: {e}")
-        return {"__error__": "network", "__msg__": str(e)}
+            with urllib.request.urlopen(req, timeout=300) as r:
+                txt = r.read().decode("utf-8")
+                return json.loads(txt) if txt else {}
+        except urllib.error.HTTPError as e:
+            body = e.read().decode("utf-8", "replace")
+            print(f"  ⚠️ API {method} {path} -> HTTP {e.code}")
+            try:
+                err = json.loads(body)
+                print(f"     message: {err.get('message')}")
+                print(f"     doc: {err.get('documentation_url')}")
+            except Exception:
+                print(f"     body: {body[:500]}")
+            return {"__error__": e.code, "__msg__": body}
+        except (TimeoutError, urllib.error.URLError, OSError,
+                http.client.HTTPException, json.JSONDecodeError) as e:
+            last_msg = f"{type(e).__name__}: {e}"
+            print(f"  ⚠️ API {method} {path} -> 网络异常 {last_msg}")
+            if i < attempts - 1:
+                wait = 2 ** i
+                print(f"     ↻ 幂等重试 {i + 1}/{attempts - 1}（{wait}s 后）")
+                _time.sleep(wait)
+    return {"__error__": "network", "__msg__": last_msg}
 
 
 def walk_raw():
