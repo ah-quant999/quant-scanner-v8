@@ -10367,43 +10367,53 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         pEl.textContent='';sEl.textContent='⚠️ 大盘环境判断数据未生成（CRDS 暂未跑或上游数据缺失）';
       }
     }
-    // 弱市专用兑现（2026-08-06 主人令"写出来的都要兑现"）
+    // 弱市专用兑现（2026-08-06 主人令"写出来的都要兑现" + 2026-08-11 主人令"统一口径，不准打架"）
+    // 修复要点：B 表禁止单独用 today_pct 再判一次，必须直接读 mc.validity 这个权威源结果——
+    //          权威源在 algorithms/calc_crds.py 第 215-242 行，是 5 档 single source of truth。
+    //          之前 B 表自创 -1.5/-0.5/+0.5 三道分档，导致 +0.89% 时上半"有效" / 下半"无效"自相矛盾。
     var wsb=document.getElementById(p+'crdsWeakSpec');
     if(wsb){
-      var shPct = (mc && mc.today_pct!=null) ? Number(mc.today_pct) : null;
       var validity = (mc && mc.validity) ? mc.validity : '未知';
-      // 信号价值判定（基于上证涨跌幅）
-      var advice, adviceColor, adviceIcon;
-      if(shPct==null){
-        advice = '大盘环境数据未生成，信号价值无法判定';
-        adviceColor = 'var(--dim)'; adviceIcon = '⚪';
-      } else if(shPct <= -1.5){
-        advice = '<b style="color:#5ee0a0;">🟢 强有效</b> · 大跌日（'+shPct.toFixed(2)+'%）逆势涨停极有意义，跟踪精选级标的';
-        adviceColor = 'var(--up)'; adviceIcon = '🟢';
-      } else if(shPct <= -0.5){
-        advice = '<b style="color:#ffb74d;">🟡 弱有效</b> · 震荡偏弱（'+shPct.toFixed(2)+'%）环境下信号可信度中等，关注进阶+关注级即可';
-        adviceColor = 'var(--gold)'; adviceIcon = '🟡';
-      } else if(shPct < 0.5){
-        advice = '<b style="color:#94a3b8;">⚪ 中性</b> · 大盘窄幅（'+shPct.toFixed(2)+'%）无明确逆势环境，CRDS 信号参考价值低';
-        adviceColor = 'var(--dim)'; adviceIcon = '⚪';
+      var todayPctStr = (mc && mc.today_pct!=null)
+        ? (mc.today_pct>=0?'+':'')+Number(mc.today_pct).toFixed(2)+'%'
+        : '';
+      // 5 档文案（与权威源 mc.validity 名字一一对应，色板沿用 mc.color，与 A'镜像表 100% 同步）
+      var advice, adviceColor;
+      if(validity === '高有效'){
+        advice = '<b style="color:#185FA5;">🟢 高有效</b> · 大盘大跌（'+todayPctStr+'）逆势涨停极有意义，跟踪精选级标的';
+        adviceColor = '#185FA5';
+      } else if(validity === '较有效'){
+        advice = '<b style="color:#1D9E75;">🟢 较有效</b> · 市场偏弱（'+todayPctStr+'）信号可信度中等，关注进阶+关注级即可';
+        adviceColor = '#1D9E75';
+      } else if(validity === '有效'){
+        advice = '<b style="color:#1D9E75;">🟢 有效</b> · 震荡市（'+todayPctStr+'）CRDS 可正常参考';
+        adviceColor = '#1D9E75';
+      } else if(validity === '低效'){
+        advice = '<b style="color:#BA7517;">⚠️ 低效</b> · 市场偏强（'+todayPctStr+'）信号意义降低，关注精选级即可';
+        adviceColor = '#BA7517';
+      } else if(validity === '失效'){
+        advice = '<b style="color:#999;">⚪ 失效</b> · 大盘大涨（'+todayPctStr+'）下"逆势"概念不成立，建议当日无视 CRDS 信号';
+        adviceColor = '#999';
       } else {
-        advice = '<b style="color:#ff6b81;">🔴 无效</b> · 大盘上涨（+'+shPct.toFixed(2)+'%）下"逆势"概念不成立，建议当日无视 CRDS 信号';
-        adviceColor = 'var(--down)'; adviceIcon = '🔴';
+        advice = '大盘环境数据未生成，信号价值无法判定';
+        adviceColor = 'var(--dim)';
       }
       wsb.style.display='block';
       wsb.style.borderLeftColor = adviceColor;
       wsb.innerHTML = ''+
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'+
           '<span style="font-size:13px;font-weight:700;color:var(--gold);">🎯 弱市专用兑现</span>'+
-          '<span style="margin-left:auto;font-size:11px;color:var(--dim);">触发阈值：上证单日跌 <b style="color:#5ee0a0;">-1.5%</b></span>'+
+          '<span style="margin-left:auto;font-size:11px;color:var(--dim);">信息源：<b style="color:var(--sub)">algorithms/calc_crds.py</b>（5 档唯一权威源）</span>'+
         '</div>'+
         '<div style="font-size:13px;line-height:1.7;color:var(--txt);">'+advice+'</div>'+
         '<div style="margin-top:6px;font-size:11px;color:var(--dim);line-height:1.6;">'+
           '📖 <b style="color:var(--sub)">为什么是"专用场景"</b>：CRDS 抓的是"大盘跌时还能涨"的票（逆势板），大盘上涨时所有股都涨，"逆势"概念不成立，'+
-          '入选门槛被稀释，**当日涨的票里 CRDS 信号没有区分度**。所以建议：<br>'+
-          '· 大盘跌 ≥1.5%：CRDS 精选级（3条件全满足）= 强势信号，可重点参考<br>'+
-          '· 大盘跌 0.5-1.5%：CRDS 进阶级 = 中等信号，轻仓试探<br>'+
-          '· 大盘跌 <0.5% 或上涨：CRDS 信号价值低，建议配合三重共识/驾驶舱 A 档判断'+
+          '入选门槛被稀释，**当日涨的票里 CRDS 信号没有区分度**。权威源 5 档分档（上证今日涨跌幅）：<br>'+
+          '· <b style="color:#185FA5;">高有效</b>：&lt;-2.0% 暴跌恐慌日信号最强，但需防系统性风险<br>'+
+          '· <b style="color:#1D9E75;">较有效</b>：-2.0% ~ -0.5% 市场偏弱，跟踪精选级<br>'+
+          '· <b style="color:#1D9E75;">有效</b>：-0.5% ~ +1.0% 震荡市，CRDS 可正常参考<br>'+
+          '· <b style="color:#BA7517;">低效</b>：+1.0% ~ +2.0% 市场偏强，信号意义降低<br>'+
+          '· <b style="color:#999;">失效</b>：≥+2.0% 大涨市，建议当日无视 CRDS 信号'+
         '</div>';
     }
     function fillList(listEl,arr,html){if(!arr||!arr.length){listEl.innerHTML=html;return;}
