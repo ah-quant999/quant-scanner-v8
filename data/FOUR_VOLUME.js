@@ -1,71 +1,15 @@
 window.FOUR_VOLUME={
- "update_time": "2026-08-10 23:35:40",
- "total": 3,
+ "update_time": "2026-08-11 16:12:00",
+ "total": 1,
  "stocks": [
   {
-   "code": "002409",
-   "name": "雅克科技",
-   "market": "sz",
-   "board_label": "主板",
-   "close": 155.24,
-   "pct_chg": 4.34,
-   "turnover_rate": 11.04,
-   "mv_yi": 0,
-   "fund_type": "混合",
-   "components": {
-    "游资点火": true,
-    "机构托底": true,
-    "广度翻多": true,
-    "主力动量翻多": true,
-    "机构金叉": false,
-    "散户金叉": true,
-    "主力金叉": false
-   },
-   "yzc": true,
-   "jg": true,
-   "xc": true,
-   "four": true,
-   "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
-   "signal_date": "2026-08-10",
-   "enter_date": "2026-08-10"
-  },
-  {
-   "code": "300666",
-   "name": "江丰电子",
-   "market": "sz",
-   "board_label": "创业板",
-   "close": 261.68,
-   "pct_chg": 3.62,
-   "turnover_rate": 10.08,
-   "mv_yi": 0,
-   "fund_type": "混合",
-   "components": {
-    "游资点火": true,
-    "机构托底": true,
-    "广度翻多": true,
-    "主力动量翻多": true,
-    "机构金叉": false,
-    "散户金叉": false,
-    "主力金叉": false
-   },
-   "yzc": true,
-   "jg": true,
-   "xc": true,
-   "four": true,
-   "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
-   "signal_date": "2026-08-10",
-   "enter_date": "2026-08-10"
-  },
-  {
-   "code": "600519",
-   "name": "贵州茅台",
+   "code": "600641",
+   "name": "先导基电",
    "market": "sh",
    "board_label": "主板",
-   "close": 1348.86,
-   "pct_chg": 3.03,
-   "turnover_rate": 0.5,
+   "close": 32.47,
+   "pct_chg": -5.64,
+   "turnover_rate": 16.17,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -73,7 +17,7 @@ window.FOUR_VOLUME={
     "机构托底": true,
     "广度翻多": true,
     "主力动量翻多": true,
-    "机构金叉": true,
+    "机构金叉": false,
     "散户金叉": false,
     "主力金叉": true
    },
@@ -82,9 +26,9 @@ window.FOUR_VOLUME={
    "xc": true,
    "four": true,
    "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
-   "signal_date": "2026-08-10",
-   "enter_date": "2026-08-10"
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 主力金叉",
+   "signal_date": "2026-08-11",
+   "enter_date": "2026-08-11"
   }
  ]
 };
