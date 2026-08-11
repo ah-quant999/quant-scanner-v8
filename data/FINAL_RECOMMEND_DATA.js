@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-11 17:18:57",
+  "update_time": "2026-08-11 17:00:34",
   "crisis_score": 33.3,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -184,11 +184,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "通用设备制造业",
       "concepts": [
         "先进封装",
-        "存储芯片",
         "融资融券",
-        "东方财富热股",
         "百元股",
-        "次新股"
+        "东方财富热股",
+        "次新股",
+        "存储芯片"
       ],
       "backtest": {
         "signals": 171,
@@ -341,11 +341,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "通用设备制造业",
       "concepts": [
         "先进封装",
-        "存储芯片",
         "融资融券",
-        "东方财富热股",
         "百元股",
-        "次新股"
+        "东方财富热股",
+        "次新股",
+        "存储芯片"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -373,12 +373,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "华为概念",
-        "电池技术",
-        "虚拟机器人",
         "5G概念",
-        "机器人概念",
-        "融资融券"
+        "华为概念",
+        "融资融券",
+        "虚拟机器人",
+        "央国企改革",
+        "机器人概念"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -406,12 +406,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "电力、热力生产和供应业",
       "concepts": [
-        "题材股",
-        "绿色电力",
+        "反转股",
+        "央国企改革",
+        "光伏概念",
         "储能概念",
-        "新能源",
-        "西部大开发",
-        "东方财富热股"
+        "东方财富热股",
+        "绿色电力"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -439,11 +439,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "破发股",
         "融资融券",
         "合成生物",
-        "精准诊断",
+        "体外诊断概念",
         "重组蛋白",
+        "破发股",
         "专精特新"
       ],
       "enter_date": "20260810",
@@ -472,12 +472,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "电池技术",
-        "创投",
-        "储能概念",
-        "新能源",
         "融资融券",
-        "固态电池"
+        "央国企改革",
+        "新能源",
+        "固态电池",
+        "光伏概念",
+        "储能概念"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
@@ -505,12 +505,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "破发股",
-        "深圳特区",
-        "3D玻璃",
-        "柔性屏(折叠屏)",
         "融资融券",
-        "创业板综"
+        "深圳特区",
+        "破发股",
+        "3D玻璃",
+        "创业板综",
+        "柔性屏(折叠屏)"
       ],
       "enter_date": "20260810",
       "stop_loss": null,
