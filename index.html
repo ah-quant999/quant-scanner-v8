@@ -2699,11 +2699,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div class="note">筛选：主站TOP10≥70 且 驾驶舱A档 且 基本面A档。下方「优先/扩展观察」为差1步/差2步备选（主站评分≥75）。</div>
       </div>
       <div class="card">
-        <h3><span class="ic">🎯</span>优先观察（差1步）· <span class="fresh" id="tcNearCount">0</span></h3>
+        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🎯</span>优先观察（差1步）· <span class="fresh" id="tcNearCount">0</span> <span style="font-size:11px;color:var(--sub);font-weight:400">- 盘后 ·</span> <span class="fresh" id="tcNearTime">—</span></h3>
         <div id="tcPriority" class="tp-stocklist"></div>
       </div>
       <div class="card">
-        <h3><span class="ic">🔮</span>扩展观察（差2步）· <span class="fresh" id="tcExtCount">0</span></h3>
+        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🔮</span>扩展观察（差2步）· <span class="fresh" id="tcExtCount">0</span> <span style="font-size:11px;color:var(--sub);font-weight:400">- 盘后 ·</span> <span class="fresh" id="tcExtTime">—</span></h3>
         <div id="tcExtended" class="tp-stocklist"></div>
       </div>
       <div class="card">
@@ -8773,6 +8773,10 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     const ext=near.filter(s=>(s.total_score||0)>=75&&(s.miss_steps||1)===2);
     $('tcNearCount').textContent=pri.length;
     $('tcPriority').innerHTML=pri.length?pri.map(s=>renderStock(s,true,tm)).join(''):'<div class="tp-empty">暂无</div>';
+    // 🔴 2026-08-12 审计修复：优先/扩展观察卡头补齐「更新于」胶囊（与严格共识卡同源 TRIPLE_CONSENSUS.update_time）
+    var _tcNearTime=$('tcNearTime'), _tcExtTime=$('tcExtTime');
+    if(_tcNearTime) setBadge('tcNearTime','盘后','短线',data.update_time);
+    if(_tcExtTime) setBadge('tcExtTime','盘后','短线',data.update_time);
     $('tcExtCount').textContent=ext.length;
     $('tcExtended').innerHTML=ext.length?ext.map(s=>renderStock(s,true,tm)).join(''):'<div class="tp-empty">暂无</div>';
     setBadge('tcTime','盘后','短线',data.update_time);
