@@ -5694,6 +5694,7 @@ function switchSec(sec,el){
   }
 
   window.showV8QueryDropdown = function(val){
+    try {
     const dd = _q$('v8QueryDropdown');
     if(!val.trim()){ dd.style.display='none'; dd.innerHTML=''; return; }
     const hits = findStocks(val, 8);
@@ -5704,6 +5705,12 @@ function switchSec(sec,el){
         '<span style="font-size:12px;color:var(--dim);font-family:monospace;margin-left:auto;">'+(s.full_code||s.code)+'</span></div>';
     }).join('');
     dd.style.display='block';
+    } catch(e) {
+      console.error('[showV8QueryDropdown]', e);
+      // 🔴 2026-08-12 主人紧急：抛错时显示具体错误，不再「什么都查不了」假象
+      var _errDd = _q$('v8QueryDropdown');
+      if(_errDd) _errDd.innerHTML = '<div style="padding:10px 14px;color:#ef5350;font-size:12px;background:rgba(239,83,80,.08);">⚠️ 下拉查询错误: '+(e.message||e)+'</div>';
+    }
   };
   window.selectV8QueryStock = function(code){
     const input = _q$('v8QueryInput');
@@ -6356,8 +6363,18 @@ function switchSec(sec,el){
 
   window.doV8Query = function(){
     const input = _q$('v8QueryInput');
-    const q = input.value.trim();
     const res = _q$('v8QueryResult');
+    if(!input || !res){
+      // 🔴 2026-08-12 主人紧急修复：DOM 元素未找到时显示错误（之前静默失败=「什么都查不了」假象）
+      var _e=document.createElement('div');
+      _e.style.cssText='padding:14px;background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.35);border-radius:8px;color:#ef5350;font-size:13px;margin-top:10px;';
+      _e.textContent='⚠️ DOM 未就绪：找不到 v8QueryInput/v8QueryResult 元素，请刷新页面重试。';
+      var _container=document.getElementById('v8QueryResult');
+      if(_container) _container.innerHTML=_e.outerHTML;
+      return;
+    }
+    try {
+    const q = input.value.trim();
     if(!q){ res.innerHTML='<div class="note">请输入代码或名称</div>'; return; }
     const item = findOne(q);
     if(!item){ res.innerHTML='<div class="note">未找到「'+q+'」，请检查代码或名称</div>'; return; }
@@ -6386,6 +6403,18 @@ function switchSec(sec,el){
     h+='</div>';
     h+=renderSuspension(item, code);
     res.innerHTML = h;
+    } catch(e) {
+      // 🔴 2026-08-12 主人紧急修复：JS 抛错时显式显示，不再「什么都查不了」假象
+      console.error('[doV8Query] 错误:', e);
+      res.innerHTML = '<div style="padding:14px;background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.35);border-radius:8px;color:#ef5350;font-size:12px;line-height:1.6;margin-bottom:14px;">'+
+        '<b>⚠️ 查询执行错误</b>（不是数据问题，是 JS 代码问题）：<br>'+
+        '<code style="display:block;margin-top:6px;padding:8px;background:rgba(0,0,0,.2);border-radius:4px;font-family:monospace;font-size:11px;white-space:pre-wrap;">'+
+        (e && e.message ? e.message.replace(/</g,'&lt;') : String(e)) + '\n' +
+        (e && e.stack ? e.stack.split('\n').slice(0,3).join('\n').replace(/</g,'&lt;') : '') +
+        '</code>'+
+        '<br>💡 解决方案：<b>F12 打开 Console</b> 看完整错误；或 Ctrl+F5 强刷重试；或等 v8_build_deploy 重部署（已派发）。'+
+        '</div>';
+    }
   };
 })();
 
