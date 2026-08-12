@@ -9,28 +9,28 @@
   },
   "optimized": {
     "label": "🎯 优化策略(≥3共振+regime+5~10d)",
-    "total_signals": 470,
+    "total_signals": 464,
     "periods": {
       "T+5": {
-        "win_rate_pct": 62.9,
-        "avg_return_pct": 5.84
+        "win_rate_pct": 58.7,
+        "avg_return_pct": 4.92
       },
       "T+10": {
-        "win_rate_pct": 59.3,
-        "avg_return_pct": 6.45
+        "win_rate_pct": 54.6,
+        "avg_return_pct": 5.32
       }
     }
   },
   "baseline_ge3": {
     "T+5": {
-      "win_rate_pct": 52.6,
-      "avg_return_pct": 2.69
+      "win_rate_pct": 50.2,
+      "avg_return_pct": 2.13
     },
     "T+10": {
-      "win_rate_pct": 50.9,
-      "avg_return_pct": 2.76
+      "win_rate_pct": 48.1,
+      "avg_return_pct": 2.08
     },
-    "total_signals": 861
+    "total_signals": 862
   },
   "config": {
     "enabled": true,
@@ -63,5 +63,10 @@
       10
     ],
     "note": "数据驱动：仅在市场状态为 grind/panic 时开仓"
+  },
+  "current_regime": {
+    "date": "2026-08-11",
+    "regime": "grind",
+    "open_position": true
   }
 }
