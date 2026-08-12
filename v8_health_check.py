@@ -1512,10 +1512,9 @@ def send_report_email(report, healed=None, failed=None):
             lines += ["", "以下项已自动派发刷新（无需人工）："]
             lines += [f"✓ {h}" for h in healed]
     elif healed:
-        subject = f"【v8已自愈】{len(healed)} 项数据陈腐已自动派发刷新 @ {report['updated']}"
-        lines = [f"v8 自愈巡检时间：{report['updated']}", "",
-                 "检测到以下数据陈腐，已自动派发对应类别刷新（runner 执行中，稍后线上刷新）："]
-        lines += [f"✓ {h}" for h in healed]
+        # 🔴 2026-08-12 主人令：全部自愈成功不发邮件(避免噪音),「只看有问题的」
+        #   如果有 fail 项需要人工,会进上面 if 分支(healed 也会列在最后)所以不影响
+        return False
     else:
         return False
 

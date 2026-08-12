@@ -670,7 +670,7 @@ function __judgmentCandidatesHTML(){
   function _push(s){ if(s && s.code) raw.push(s); }
 
   // 1) 三重共识（短线事件/共识驱动）
-  (window.TRIPLE_CONSENSUS && window.TRIPLE_CONSENSUS.stocks || []).forEach(function(s){
+  _safeArr(window.TRIPLE_CONSENSUS && window.TRIPLE_CONSENSUS.stocks).forEach(function(s){
     _push({
       code:s.code, name:s.name, market:(s.market||'sh'), board:(s.board||''),
       src:'三重共识', srcEmoji:'🥇', srcColor:'var(--purple)',
@@ -687,7 +687,7 @@ function __judgmentCandidatesHTML(){
   });
 
   // 2) 驾驶舱 A 档（中长线趋势质量）
-  (window.COCKPIT_TIER_RECOMMEND && window.COCKPIT_TIER_RECOMMEND.tier_a || []).forEach(function(s){
+  (window.COCKPIT_TIER_RECOMMEND && _safeArr(window.COCKPIT_TIER_RECOMMEND.tier_a)).forEach(function(s){
     var isHk = (s.market||'') === '港股';
     var tech = +((s.tech_score)||0);
     var qs = +((s.quality_score)||0);
@@ -715,7 +715,7 @@ function __judgmentCandidatesHTML(){
   });
 
   // 3) 四量终极（QD 共振，短线量能突破）
-  (window.FOUR_VOLUME && window.FOUR_VOLUME.stocks || []).forEach(function(s){
+  _safeArr(window.FOUR_VOLUME && window.FOUR_VOLUME.stocks).forEach(function(s){
     var comp = s.components || {};
     var trueCount = Object.keys(comp).filter(function(k){return comp[k];}).length;
     _push({
@@ -927,7 +927,7 @@ function __judgmentCandidatesHTML(){
       // ── 60m 共振标记 ──
       + (function(){
         var _60d = window.FOUR_VOLUME_60M || {};
-        var _60h = (_60d.hits || _60d.stocks || []);
+        var _60h = window._safeArr(_60d.hits || _60d.stocks);
         var _nc = String(s.code||'').replace(/\D/g,'');
         var _hit = _60h.some(function(x){ return String(x.code||'').replace(/\D/g,'') === _nc; });
         if(_hit) return '<span style="font-size:11px;color:#a78bfa;background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.40);padding:2px 8px;border-radius:10px;font-weight:800;">🔔 60m</span>';
@@ -2443,7 +2443,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         // 1) 核心共振标的：区间内共振次数 >= 2
         var freq={}, nameOf={};
         days.forEach(function(d){
-          d.stocks.forEach(function(s){
+          window._safeArr(d.stocks).forEach(function(s){
             nameOf[s.code]=s.name;
             if(s.category==='机游共振') freq[s.code]=(freq[s.code]||0)+1;
           });
@@ -2480,10 +2480,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         // 3) 新赛道发现：近5日共振 且 之前10日未出现
         var recent=days.slice(-5), prior=days.slice(-15,-5);
         var priorSet={};
-        prior.forEach(function(d){ d.stocks.forEach(function(s){ if(s.category==='机游共振') priorSet[s.code]=1; }); });
+        prior.forEach(function(d){ window._safeArr(d.stocks).forEach(function(s){ if(s.category==='机游共振') priorSet[s.code]=1; }); });
         var seen={}, fresh=[];
         recent.forEach(function(d){
-          d.stocks.forEach(function(s){
+          window._safeArr(d.stocks).forEach(function(s){
             if(s.category!=='机游共振') return;
             if(priorSet[s.code] || seen[s.code]) return;
             seen[s.code]=1;
@@ -3455,7 +3455,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       });
       // 聚合本周所有 stocks
       var wStocks = [];
-      wkItems.forEach(function(it){ wStocks = wStocks.concat(it.stocks || []); });
+      wkItems.forEach(function(it){ wStocks = wStocks.concat(window._safeArr(it.stocks)); });
       h += '<div class="wk-card"><div class="wk-card-hd"><span class="wk-card-title">第'+wk.no+'周 '+wk.labelMon+'-'+wk.labelSun+(wk.isFull?'':' <span style="color:var(--dim);font-size:10px">(截断)</span>')+'</span></div>';
       if(wStocks.length === 0){
         h += '<div style="text-align:center;color:var(--dim);padding:20px;font-size:11px">该周暂无机游共振数据</div>';
@@ -3542,7 +3542,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     if(!detail) return;
     var _day = null;
     (window._rcDays()||[]).forEach(function(d){ if(String(d.iso).replace(/-/g,'')===dateStr) _day=d; });
-    var stocks = _day ? (_day.stocks||[]) : [];
+    var stocks = _day ? window._safeArr(_day.stocks) : [];
     var lhbDate = dateStr;
 
     if(!_day || !stocks.length){
@@ -3674,7 +3674,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       return {iso:String(d.iso).replace(/-/g,''), stocks:d.stocks||[], summary:d.summary||{}};
     });
     var stocks = [];
-    _nbDays.forEach(function(d){ (d.stocks||[]).forEach(function(s){ s.date = d.iso; stocks.push(s); }); });
+    _nbDays.forEach(function(d){ window._safeArr(d.stocks).forEach(function(s){ s.date = d.iso; stocks.push(s); }); });
     var dayMapNb = {};
     _nbDays.forEach(function(d){ dayMapNb[d.iso] = d; });
     var lhbDate = _nbDays.length ? _nbDays[_nbDays.length-1].iso : '';
@@ -3773,7 +3773,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     // ==== 最近交易日北向席位（截图2 样式：净买入TOP10 + 净卖出TOP10 卡片） ====
     // 🔴 2026-08-06 修复：只用当天 stocks（不是 northStocks 历史累计 1444）
-    var _lastDayStocks = _nbDays.length ? (_nbDays[_nbDays.length-1].stocks || []) : [];
+    var _lastDayStocks = _nbDays.length ? window._safeArr(_nbDays[_nbDays.length-1].stocks) : [];
     var northStocksToday = _lastDayStocks.filter(function(s){
       var sx = (s.seats||{})['北向'];
       return sx && ((sx.buy||0)+(sx.sell||0));
@@ -3899,11 +3899,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     if(!detail) return;
     var _day = null;
     (window._rcDays()||[]).forEach(function(d){ if(String(d.iso).replace(/-/g,'')===dateStr) _day=d; });
-    if(!_day || !_day.stocks || !_day.stocks.length || !_day.stocks.some(function(s){ return (s.seats||{})['北向']; })){
+    if(!_day || !_day.stocks || !_day.stocks.length || !window._safeArr(_day.stocks).some(function(s){ return (s.seats||{})['北向']; })){
       detail.innerHTML = '<div class="cal-detail-body" style="text-align:center;color:var(--dim);padding:20px">该日暂无北向席位数据</div>';
       detail.className = 'cal-detail show'; return;
     }
-    var northStocks = (_day.stocks||[]).filter(function(s){ return (s.seats||{})['北向']; }).map(function(s){
+    var northStocks = window._safeArr(_day.stocks).filter(function(s){ return (s.seats||{})['北向']; }).map(function(s){
       var sx = s.seats['北向'] || {};
       return Object.assign({}, s, { _nb_net_万: (sx.buy||0) - (sx.sell||0) });
     });
@@ -4302,7 +4302,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         h += '<span class="c-' + ((s.pct||0)>=0?'up':'down') + '">' + _pc(s.pct) + '</span></div>';
         // ── 60min 动量延续标记（龙虎榜 T 日进场 → T+1 分钟级仍在 = 非一日游）──
         var _60mData = window.FOUR_VOLUME_60M || {};
-        var _60mHits = (_60mData.hits || _60mData.stocks || []);
+        var _60mHits = window._safeArr(_60mData.hits || _60mData.stocks);
         var _code60 = (s.code||'').replace(/sh|sz|bj/g,'');
         var _has60m = _60mHits.some(function(h){ return (h.code||'').replace(/sh|sz|bj/g,'') === _code60; });
         if(_has60m){
@@ -5648,6 +5648,18 @@ function switchSec(sec,el){
 (function(){
   const _q$ = id => document.getElementById(id);
   function normCode(c){ return String(c||'').replace(/\D/g,'').replace(/^[shszSHSZ]+/,'').replace(/_/g,''); }
+  // 🔴 2026-08-12 主人紧急修复：全站统一的 dict/array schema 兼容工具
+  //   根因：8 天 bug 真凶——多个地方用 `(stocks || []).forEach` 假设 stocks 是 array，
+  //   但当 stocks 是 dict（如 GOLD_POOL.stocks / 早期 TRIPLE_CONSENSUS.stocks）时，
+  //   `dict || []` 返回 dict（truthy），`.forEach` 在 dict 上炸 → TypeError → 整页查询崩
+  //   修复：所有「(xxx.stocks || []).方法(」改用 `_safeArr(xxx.stocks).方法(`
+  //   挂到 window 让其他 IIFE 共享（避免重复定义）
+  window._safeArr = function _safeArr(d){
+    if(!d) return [];
+    if(Array.isArray(d)) return d;
+    if(typeof d==='object') return Object.values(d);
+    return [];
+  };
   function fullKey(s){ return (s.market||'') + '_' + (s.code||''); }
   // STOCK_LIST 兼容两种 schema：直接数组（旧）或 {data:[...]} 包装（2026-08-02 收紧 update_time 后）
   function stockListArray(){
@@ -6101,7 +6113,7 @@ function switchSec(sec,el){
 
       // --- 收集推荐个股 ---
       var stocks = [];
-      var fs = (fr.stocks || []);
+      var fs = window._safeArr(fr.stocks);
       for(var i=0;i<fs.length;i++){
         var st=fs[i]; if(!st) continue;
         stocks.push({code:st.code||'?',name:st.name||'?',score:st.final_score||0,
@@ -6322,7 +6334,7 @@ function switchSec(sec,el){
     if(crdsCond) hits.push({name:'🐉 逆势龙头', color:'var(--down)', detail:crdsCond});
     // 四量终极
     const fv = window.FOUR_VOLUME || {};
-    const frow = (fv.stocks||[]).find(r=>normCode(r.code)===nc);
+    const frow = window._safeArr(fv.stocks).find(r=>normCode(r.code)===nc);
     if(frow) hits.push({name:'🔥 四量终极', color:'#ff7043', detail:'游资+机构+金叉+四路翻多'});
 
     if(!hits.length) return '';
@@ -10265,7 +10277,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var lhbCount = (lhb.stocks && lhb.stocks.length) || 0;
     // 首板平铺用：LHB_DATA.stocks 去重（首板个股明细从此取）
     var lhbSeen = {}, lhbUniq = [];
-    (lhb.stocks || []).forEach(function(s){
+    (window._safeArr(lhb.stocks)).forEach(function(s){
       if(s && s.code && !lhbSeen[s.code]){ lhbSeen[s.code]=true; lhbUniq.push(s); }
     });
     var highLbc = (ladder['3']||0)+(ladder['4']||0)+(ladder['5']||0)+(ladder['10']||0);
@@ -11857,7 +11869,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       h+='<b style="color:var(--gold)">📊 当前强势板块（相对强度 TOP）：</b>'+_fe(D.strong_sectors.join(' · '));
       h+='</div>';
     }
-    D.stocks.forEach(function(s,i){ h+=stockCard(s,i); });
+    window._safeArr(D.stocks).forEach(function(s,i){ h+=stockCard(s,i); });
 
     if(D.all_candidates && D.all_candidates.length){
       h+='<div style="margin-top:12px;padding:10px 12px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.22);border-radius:9px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">';
