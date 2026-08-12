@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-12 17:23:33",
+  "update_time": "2026-08-12 18:02:17",
   "crisis_score": 31.4,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -59,9 +59,9 @@
       "industry": "",
       "concepts": [],
       "backtest": {
-        "signals": 108,
-        "win_rate": 35.2,
-        "avg_return": -2.17,
+        "signals": 171,
+        "win_rate": 52.0,
+        "avg_return": 1.74,
         "best_hold_days": 3,
         "note": "个股暂无历史信号，展示策略级统计（最佳持有 3 天）"
       },
@@ -113,9 +113,9 @@
       "industry": "",
       "concepts": [],
       "backtest": {
-        "signals": 108,
-        "win_rate": 35.2,
-        "avg_return": -2.17,
+        "signals": 171,
+        "win_rate": 52.0,
+        "avg_return": 1.74,
         "best_hold_days": 3,
         "note": "个股暂无历史信号，展示策略级统计（最佳持有 3 天）"
       },
@@ -180,15 +180,15 @@
       "reason": "大牛股猎手 机构0.2亿+游资0.7亿",
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "央国企改革",
         "黄金概念",
+        "央国企改革",
         "一带一路",
         "PCB"
       ],
       "backtest": {
-        "signals": 108,
-        "win_rate": 35.2,
-        "avg_return": -2.17,
+        "signals": 171,
+        "win_rate": 52.0,
+        "avg_return": 1.74,
         "best_hold_days": 3,
         "note": "个股暂无历史信号，展示策略级统计（最佳持有 3 天）"
       },
@@ -277,8 +277,8 @@
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "央国企改革",
         "黄金概念",
+        "央国企改革",
         "一带一路",
         "PCB"
       ],
@@ -308,12 +308,12 @@
       ],
       "industry": "",
       "concepts": [
-        "5G概念",
-        "融资融券",
+        "医疗器械概念",
         "专精特新",
         "被动元件概念",
-        "军工",
-        "MLCC"
+        "半导体概念",
+        "创业板综",
+        "军工"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -341,12 +341,12 @@
       ],
       "industry": "",
       "concepts": [
-        "融资融券",
+        "CRO",
         "专精特新",
         "创新药",
-        "减肥药",
+        "题材股",
         "创业板综",
-        "CRO"
+        "减肥药"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -374,12 +374,12 @@
       ],
       "industry": "",
       "concepts": [
-        "ChatGPT概念",
-        "数字经济",
-        "文娱消费",
         "人工智能",
-        "数字水印",
-        "彩票概念"
+        "区块链",
+        "参股银行",
+        "彩票概念",
+        "数字经济",
+        "ChatGPT概念"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -407,12 +407,12 @@
       ],
       "industry": "",
       "concepts": [
-        "融资融券",
-        "重组蛋白",
-        "破发股",
+        "CRO",
+        "趋势股",
+        "合成生物",
         "创业板综",
-        "病原体防治",
-        "CRO"
+        "破发股",
+        "重组蛋白"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -440,12 +440,12 @@
       ],
       "industry": "",
       "concepts": [
-        "文娱消费",
         "影视概念",
-        "短剧互动游戏",
         "央国企改革",
+        "破增发价股",
         "创业板综",
-        "破增发价股"
+        "短剧互动游戏",
+        "文娱消费"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -499,12 +499,12 @@
       ],
       "industry": "",
       "concepts": [
-        "破发股",
-        "TOPCon电池",
-        "智慧城市",
-        "电商概念",
         "光伏概念",
-        "一带一路"
+        "电商概念",
+        "TOPCon电池",
+        "一带一路",
+        "婴童概念",
+        "味蕾经济"
       ],
       "enter_date": "20260811",
       "stop_loss": null,

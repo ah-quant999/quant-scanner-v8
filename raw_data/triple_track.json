@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-12 17:15:42",
+  "update_time": "2026-08-12 17:53:16",
   "data_date": "2026-08-12",
   "track_start": "2026-08-09",
   "history_days": 4,
@@ -9,27 +9,9 @@
   "alerts": [
     {
       "level": "warn",
-      "code": "300760",
-      "name": "",
-      "text": "(300760) 于 2026-08-10 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "warn",
-      "code": "600519",
-      "name": "",
-      "text": "(600519) 于 2026-08-10 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "warn",
       "code": "300613",
       "name": "",
       "text": "(300613) 于 2026-08-10 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "warn",
-      "code": "688183",
-      "name": "",
-      "text": "(688183) 于 2026-08-10 跌出共识（曾连续 1 日）"
     },
     {
       "level": "warn",
@@ -93,7 +75,7 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测",
-    "latest_date": "2026-08-11",
+    "latest_date": "2026-08-12",
     "total": 183,
     "best_hold_days": 1,
     "periods": {
@@ -106,11 +88,11 @@
         "worst": -10.01
       },
       "3d": {
-        "win_rate": 36.4,
-        "avg_return": -1.26,
-        "sharpe": -0.18,
+        "win_rate": 38.6,
+        "avg_return": -0.85,
+        "sharpe": -0.11,
         "count": 171,
-        "best": 15.0,
+        "best": 15.06,
         "worst": -10.02
       },
       "5d": {
@@ -122,9 +104,9 @@
         "worst": -10.04
       },
       "10d": {
-        "win_rate": 31.7,
-        "avg_return": -1.72,
-        "sharpe": -0.22,
+        "win_rate": 38.8,
+        "avg_return": -0.92,
+        "sharpe": -0.1,
         "count": 171,
         "best": 15.07,
         "worst": -10.04
@@ -170,8 +152,8 @@
       },
       {
         "period": "3d",
-        "strict_win": 36.4,
-        "strict_ret": -1.26,
+        "strict_win": 38.6,
+        "strict_ret": -0.85,
         "strict_count": 171,
         "loose_win": 0.0,
         "loose_ret": 0.0,
@@ -188,8 +170,8 @@
       },
       {
         "period": "10d",
-        "strict_win": 31.7,
-        "strict_ret": -1.72,
+        "strict_win": 38.8,
+        "strict_ret": -0.92,
         "strict_count": 171,
         "loose_win": 0.0,
         "loose_ret": 0.0,
