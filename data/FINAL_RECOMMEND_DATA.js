@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-12 19:42:48",
+  "update_time": "2026-08-12 19:50:05",
   "crisis_score": 31.4,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -126,12 +126,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构0.2亿+游资0.2亿",
       "industry": "通用设备制造业",
       "concepts": [
-        "创业板综",
-        "次新股",
-        "半导体概念",
-        "百元股",
         "东方财富热股",
-        "先进封装"
+        "创业板综",
+        "融资融券",
+        "存储芯片",
+        "次新股",
+        "百元股"
       ],
       "backtest": {
         "signals": 171,
@@ -201,9 +201,9 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构0.3亿+游资0.1亿",
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "黄金概念",
         "PCB",
         "一带一路",
+        "黄金概念",
         "央国企改革"
       ],
       "backtest": {
@@ -272,12 +272,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "通用设备制造业",
       "concepts": [
-        "创业板综",
-        "次新股",
-        "半导体概念",
-        "百元股",
         "东方财富热股",
-        "先进封装"
+        "创业板综",
+        "融资融券",
+        "存储芯片",
+        "次新股",
+        "百元股"
       ],
       "enter_date": "20260812",
       "stop_loss": null,
@@ -305,9 +305,9 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "黄金概念",
         "PCB",
         "一带一路",
+        "黄金概念",
         "央国企改革"
       ],
       "enter_date": "20260812",
@@ -337,9 +337,9 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [
         "养老金",
-        "长期破净",
         "融资融券",
-        "并购重组概念"
+        "并购重组概念",
+        "长期破净"
       ],
       "enter_date": "20260812",
       "stop_loss": null,
@@ -367,12 +367,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "电气机械和器材制造业",
       "concepts": [
-        "网络安全",
+        "光纤概念",
         "大数据",
         "北交所概念",
+        "5G概念",
         "融资融券",
-        "光纤概念",
-        "5G概念"
+        "网络安全"
       ],
       "enter_date": "20260812",
       "stop_loss": null,
@@ -401,11 +401,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [
         "低价股",
-        "破发股",
-        "肝炎概念",
-        "维生素",
+        "融资融券",
         "创新药",
-        "融资融券"
+        "病原体防治",
+        "维生素",
+        "破发股"
       ],
       "enter_date": "20260812",
       "stop_loss": null,
