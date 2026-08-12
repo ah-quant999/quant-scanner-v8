@@ -6065,25 +6065,29 @@ function switchSec(sec,el){
     else if(score<=-2){ verdict='🔴 建议减仓/观望'; vColor='var(--down)'; }
     else { verdict='⏸ 中性观望'; vColor='var(--gold)'; }
 
-    let h='<div style="padding:14px;margin-bottom:14px;background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(251,191,36,.03));border-radius:8px;border:1px solid rgba(251,191,36,.25);">';
-    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span style="font-size:13px;font-weight:700;color:var(--gold);">⚡ 操作信号</span><span style="font-size:14px;font-weight:800;color:'+vColor+';">'+verdict+'</span></div>';
+    // 🔴 2026-08-12 主人令：操作信号小卡化（与图2 4卡网格风格一致）——「一目了然」
+    //   之前是大块面板（padding:14px），现在改为紧凑 pill + 网格
+    let h='<div style="padding:8px 10px;margin-bottom:8px;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.18);border-radius:8px;">';
+    h+='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">';
+    h+='<span style="font-size:12px;font-weight:700;color:var(--gold);">⚡ 操作信号</span>';
+    h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:8px;font-size:11.5px;font-weight:700;color:#fff;background:'+vColor+';">'+verdict+'</span>';
     if(signals.length){
-      h+='<div style="display:flex;flex-direction:column;gap:6px;">';
+      // 信号小卡：grid 布局，每个信号一个 pill
+      h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-left:auto;">';
       signals.forEach(function(s){
-        const clr = s.c==='up'?'var(--up)':s.c==='down'?'var(--down)':'var(--sub)';
-        h+='<div style="display:flex;align-items:center;gap:8px;font-size:12px;padding:6px 8px;background:rgba(255,255,255,.04);border-radius:6px;"><span style="color:'+clr+';font-weight:700;">●</span><span style="color:var(--txt);">'+s.t+'</span><span style="color:'+clr+';margin-left:auto;font-size:11px;white-space:nowrap;">'+s.a+'</span></div>';
+        const clr = s.c==='up'?'#22c55e':s.c==='down'?'#ef4444':'#94a3b8';
+        const bg  = s.c==='up'?'rgba(34,197,94,.10)':s.c==='down'?'rgba(239,68,68,.10)':'rgba(148,163,184,.10)';
+        h+='<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:6px;font-size:10.5px;font-weight:600;background:'+bg+';color:'+clr+';border:1px solid '+clr+'30;white-space:nowrap;"><span>●</span>'+s.t+'</span>';
       });
       h+='</div>';
-    } else {
-      h+='<div style="font-size:12px;color:var(--dim);">当前无显著买卖信号，维持观望</div>';
     }
-    h+='</div>';
+    h+='</div></div>';
 
-    // 主线板块 + 推荐个股（2026-08-12：结论落地，不只给判断还要给标的）
-    var picks = _renderMainlinePicks(score);
-    if(picks) h+=picks;
-
-    h+='</div>';
+    // 🔴 2026-08-12 主人紧急修复：删 _renderMainlinePicks 调用
+    //   主人：「这个是干嘛的？为什么放个股查询里？没关联啊」
+    //   原因：_renderMainlinePicks 是「全市场主线板块+推荐关注」，与单只股票查询无关
+    //   之前误放在 renderTradeSignals（单只）里，导致查询 002739 时显示全市场 16 只候选
+    //   修复：单只查询只显示该股的操作信号；全市场主线板块改放「最终推荐」候选池底部
     return h;
   }
 
@@ -11971,20 +11975,19 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
           +'<span>压力 <b>¥'+_fn(s.resistance)+'</b></span>'
           +'</div>';
       }
-      return '<div style="padding:12px 14px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;">'
-        +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">'
-        +'<span style="font-size:16px;font-weight:800;color:var(--txt)">'+_fe(s.name)+'</span>'
-        +'<span style="font-family:ui-monospace,monospace;color:var(--dim);font-size:13px;">'+_fe(s.code)+'</span>'
+      return '<div style="padding:6px 8px;background:var(--card);border:1px solid var(--border);border-radius:6px;margin-bottom:4px;">'
+        +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'
+        +'<span style="font-size:13px;font-weight:700;color:var(--txt)">'+_fe(s.name)+'</span>'
+        +'<span style="font-family:ui-monospace,monospace;color:var(--dim);font-size:11px;">'+_fe(s.code)+'</span>'
         +tags
         +'<span style="margin-left:auto;display:flex;align-items:center;gap:6px;">'+priceLine+'</span>'
         +'</div>'
-        +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">'
-        +'<span style="font-size:11px;color:var(--up);font-weight:700">共振'+s.resonance+'源</span>'
-        +'<span style="font-size:11px;color:var(--dim)">· 入选日 '+_fe(s.enter_date||'—')+'</span>'
+        +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:10.5px;color:var(--dim);margin-top:2px;">'
+        +'<span style="color:var(--up);font-weight:700">共振'+s.resonance+'源</span>'
+        +'<span>· '+_fe(s.enter_date||'—')+'</span>'
+        +(s.signals&&s.signals.length?'<span style="color:var(--gold);">· '+(s.signals||[]).slice(0,3).map(_fe).join('+')+'</span>':'')
+        +(plan?'<span style="margin-left:auto;">'+plan+'</span>':'')
         +'</div>'
-        +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px;">'+srcChips+'</div>'
-        +(s.signals&&s.signals.length?'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px;">'+(s.signals||[]).slice(0,5).map(function(sig){ return '<span style="font-size:11px;color:var(--gold)">'+_fe(sig)+'</span>'; }).join('')+'</div>':'')
-        +plan
         +'</div>';
     }
     function _renderColumn(items, title, emoji, color){
@@ -11998,6 +12001,14 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       +'<div><div style="font-size:12px;font-weight:800;color:#38bdf8;margin-bottom:6px;display:flex;align-items:center;gap:4px;">⚡ 短线候选 <span style="font-size:11px;font-weight:600;color:var(--dim)">('+shortList.length+')</span></div>'+_renderColumn(shortList,'短线候选','⚡','#38bdf8')+'</div>'
       +'<div><div style="font-size:12px;font-weight:800;color:#22c55e;margin-bottom:6px;display:flex;align-items:center;gap:4px;">🌿 中长线候选 <span style="font-size:11px;font-weight:600;color:var(--dim)">('+longList.length+')</span></div>'+_renderColumn(longList,'中长线候选','🌿','#22c55e')+'</div>'
       +'</div>';
+
+    // 🔴 2026-08-12 主人修复：把 _renderMainlinePicks 挪到这里（候选池底部）
+    //   主人：「这个是干嘛的？为什么放个股查询里？没关联啊」——是因为之前 renderTradeSignals 误调
+    //   现在 _renderMainlinePicks 改放「最终推荐 · 今日推荐候选池」底部，
+    //   展示全市场主线板块+推荐关注（与单只股票查询分离，逻辑清晰）
+    var picks = _renderMainlinePicks(0);
+    if(picks) h += picks;
+
     el.innerHTML=h;
   }
 
