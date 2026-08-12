@@ -1181,10 +1181,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 子 Pane：今日推荐候选池 -->
     <div id="final-pane-cand" class="final-pane">
       <div class="card" style="margin-bottom:16px;border-left:4px solid #ff7043;">
-        <h3><span class="ic">🎯</span>今日推荐候选池 <span style="font-size:11px;color:var(--sub);font-weight:400">聚合 三重共识 / 驾驶舱A档 / 四量终极</span>
-          <span class="fresh" id="finalCandTime"></span>
-          <span id="finalCandRunBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);"></span>
-          <span id="finalCandEnteredBadge" style="display:none"></span>
+        <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">🎯</span>今日推荐候选池 <span style="font-size:11px;color:var(--sub);font-weight:400">聚合 三重共识 / 驾驶舱A档 / 四量终极</span>
+          <span id="finalCandBadges" style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;"></span>
         </h3>
         <div id="finalCandBody" style="padding:12px 4px 2px;"><div class="note">加载中…</div></div>
       </div>
@@ -8647,10 +8645,10 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     h+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><span style="font-size:22px;">🌐</span>';
     h+='<div style="font-size:16px;font-weight:700;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">全站精选 <span style="color:#fbbf24;font-size:13px;letter-spacing:1px">⭐⭐⭐</span>';
     if(genTime) h+=_uBadge('盘后', '中线', genTime);
-    // 「已跑完」胶囊：统一调用 _runBadgeInfo（2026-08-07 修复）
+    // 「已跑完」胶囊：_runBadgeInfo.label 已含 ✅，不再额外加
     var _fvInfo = window._runBadgeInfo(genTime);
     if(_fvInfo.show){
-      h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);white-space:nowrap">✅ '+_fvInfo.label+'</span>';
+      h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);white-space:nowrap">'+_fvInfo.label+'</span>';
     }
     // 「已入仓」胶囊：2026-08-11 分三态时段守卫（盘前/盘中/盘后），
     //  盘前/盘中显示 ⏳ 预览 N（蓝色），盘后才用原 🧺 MM-DD 已入仓 N（绿色）。
@@ -11724,21 +11722,26 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       el.innerHTML='<div class="note" style="padding:16px;text-align:center;color:var(--dim)">候选池数据暂不可用（等待盘后算法生成）</div>';
       return;
     }
-    // 2026-08-12 主人令：卡头补齐「更新于+已跑+已入仓」胶囊（与Top3/全站精选保持一致）
-    var _fcTime = D.update_time||'';
-    var _fcTimeEl = document.getElementById('finalCandTime');
-    if(_fcTimeEl) setBadge(_fcTimeEl, '盘后', '中线', _fcTime);
-    var _fcRunEl = document.getElementById('finalCandRunBadge');
-    if(_fcRunEl){
-      var _fcInfo = window._runBadgeInfo(_fcTime);
-      if(_fcInfo.show){ _fcRunEl.textContent = _fcInfo.label; _fcRunEl.style.display='inline-flex'; }
-      else _fcRunEl.style.display='none';
-    }
-    var _fcEnterEl = document.getElementById('finalCandEnteredBadge');
-    if(_fcEnterEl){
-      _fcEnterEl.innerHTML = _holdBadge(_fcTime, D.all_candidates.length, '已入仓');
-      _fcEnterEl.style.display='inline-flex';
-    }
+    // 状态徽标（与 Top3 统一轻量 pill 风格）
+    (function(){
+      var _fcUt=D.update_time||'';
+      var _fcDt='',_fcTm='',_fcSes='';
+      if(_fcUt){
+        var _fcM=_fcUt.match(/(\d{4}-\d{2}-\d{2})\s*(\d{1,2}:\d{2})/);
+        if(_fcM){ _fcDt=_fcM[1]; _fcTm=_fcM[2]; }
+        if(_fcTm){
+          var _fcH=parseInt(_fcTm.split(':')[0],10);
+          if(_fcH>=15&&_fcH<=23) _fcSes='盘后'; else if(_fcH>=9&&_fcH<15) _fcSes='盘中'; else if(_fcH>=0&&_fcH<9) _fcSes='盘前';
+        }
+      }
+      var _fcToday=_fcDt.replace(/-/g,'').slice(4)||'';
+      var _fcSB=document.getElementById('finalCandBadges'); if(_fcSB) {
+        var _fb1='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 '+_fcDt+' '+_fcTm+' '+(_fcSes?_fcSes+' ':'')+'</span>';
+        var _fb2='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);white-space:nowrap">✅ '+_fcToday+' 已跑</span>';
+        var _fb3='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.3);white-space:nowrap">📦 '+_fcToday+' 已入库 '+(D.all_candidates.length||0)+'</span>';
+        _fcSB.innerHTML=_fb1+_fb2+_fb3;
+      }
+    })();
 
     // 2026-08-11 修复：与Top3保持一致——A股优先展示，港股降权后排
     var all=D.all_candidates.slice();
