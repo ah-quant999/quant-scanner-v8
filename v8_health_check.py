@@ -485,6 +485,14 @@ def self_heal(report):
     healed, failed = [], []
     lock = _load_heal_lock()
     now = now_cst()
+    # 2026-08-12 修复 3d2a53b2 引入的 UnboundLocalError（根因级）：
+    # 「单次派发上限」守卫用到 _dispatch_count / _dispatch_limit_hit 两个局部变量，
+    # 但从未初始化 → 只要有任一数据卡进入派发分支就抛 UnboundLocalError，
+    # 导致 self_heal 整体中断（管线类 local_sync/site_sync 自愈也不执行），
+    # 且异常冒泡出 main() 使 v8_health_check.py 以 traceback rc=1 退出，
+    # 看门狗每轮固定误报「v8_health_check.py 返回非零: 1」。必须在函数入口初始化。
+    _dispatch_count = 0          # 本次运行已派发的 workflow 数
+    _dispatch_limit_hit = []     # 因达上限被跳过的类别（写回 report 供前端/邮件可见）
 
     # 所有 fail 项（数据卡片 + 管线类）
     fail_items = [it for it in report["items"] if it.get("status") == "fail"]
@@ -575,6 +583,9 @@ def self_heal(report):
                 it["heal"] = f"自愈失败: {dmsg}"
 
     _save_heal_lock(lock)
+    # 达上限被跳过的类别写回报告，避免「静默少派发」无处可查
+    if _dispatch_limit_hit:
+        report["heal_limit_hit"] = _dispatch_limit_hit
     return healed, failed
 
 
@@ -1331,7 +1342,16 @@ def main():
     if args.heal:
         # 2026-08-10 修复：移除对 overall 的依赖——只要 heal 开就跑 self_heal，
         # 内部自行判断 fail 卡片 / 内容审计陈旧项，确保「任何可自愈问题都自动派发」。
-        healed, failed = self_heal(report)
+        # 2026-08-12 加固：自愈内部异常不得连坐吞掉「报告落盘 + 邮件告警」两个下游动作
+        # （3d2a53b2 的 UnboundLocalError 就是这样让整个检查以 rc=1 崩退的）。
+        # 不静默 pass：异常写进 failed 列表并打印 traceback，保证在邮件/日志里可见。
+        try:
+            healed, failed = self_heal(report)
+        except Exception as e:
+            import traceback as _tb
+            _tb.print_exc()
+            failed = [f"[自愈异常] self_heal 内部错误，本轮未完成自愈: {type(e).__name__}: {e}"]
+            report["heal_error"] = f"{type(e).__name__}: {e}"
         for h in healed:
             print(f"  [HEAL✓] {h}")
         for f in failed:
