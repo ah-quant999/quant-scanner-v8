@@ -98,7 +98,7 @@ def main():
             item["net_5d"] = net_5d_val
         if net_10d_val != 0 and len(real_10) >= 10:
             item["net_10d"] = net_10d_val
-        if net_20d_val != 0 and len(real_20) >= 10:
+        if net_20d_val != 0 and len(real_20) >= 20:  # 2026-08-12 修：原写>=10，20日趋势需至少20天真实数据
             item["net_20d"] = net_20d_val
         if len(real_60) >= 60:
             item["net_60d"] = net_60d_val

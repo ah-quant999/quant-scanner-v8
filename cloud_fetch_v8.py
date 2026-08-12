@@ -982,6 +982,35 @@ def f_sector_fund_flow():
     items.sort(key=lambda x: x["net"], reverse=True)
     sectors_in = [x for x in items if x["net"] > 0]
     sectors_out = [x for x in items if x["net"] < 0]
+
+    # ── 2026-08-12 修复：同步追加 sector_fund_flow_history.json ──
+    # 原先 history 仅靠 akshare（fetch_orphan）写入，cloud runner 上 akshare 频繁失败
+    # 导致 trend_5d/10d/20d/60d 数据极度稀疏。现在每次 push2delay 抓取成功时
+    # 把当日 sectors_in/out 的 net 值也追加进 history → 每天都有数据入账。
+    try:
+        _hist_path = RAW_DIR / "sector_fund_flow_history.json"
+        _today_str = now_cst().strftime("%Y-%m-%d")
+        _history = {}
+        if _hist_path.exists():
+            try:
+                _history = json.loads(_hist_path.read_text(encoding="utf-8"))
+            except Exception:
+                _history = {}
+        _appended = 0
+        for _sec in sectors_in + sectors_out:
+            _name = _sec["name"]
+            if _name not in _history:
+                _history[_name] = []
+            # 去重：同日不重复追加
+            if not _history[_name] or _history[_name][-1].get("date") != _today_str:
+                _history[_name].append({"date": _today_str, "net": round(_sec["net"], 2)})
+                _appended += 1
+        if _appended > 0:
+            _hist_path.write_text(json.dumps(_history, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+            print(f"  📝 sector_fund_flow_history 追加 {_appended} 条 ({_today_str})")
+    except Exception as _he:
+        print(f"  ⚠️ sector_fund_flow_history 追加失败（不影响主数据）: {_he}")
+
     return {
         "sectors_in": sectors_in,
         "sectors_out": sectors_out,
