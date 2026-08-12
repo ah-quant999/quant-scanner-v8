@@ -476,8 +476,12 @@ def run_health_check(alert=False, heal=True):
     if heal:
         cmd.append("--heal")
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=300)
+        result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=480)
         return result.returncode, result.stdout + result.stderr
+    except subprocess.TimeoutExpired as e:
+        # 健康检查自身卡死（如 API 持续超时）→ 以专属 rc=3 返回，让看门狗兜底告警，
+        # 避免被 send_watchdog_alert 当成「无异常」静默吞掉（2026-08-12 第171轮）。
+        return 3, f"调用 v8_health_check.py 超时(>480s): {e}"
     except Exception as e:
         return 1, f"调用 v8_health_check.py 失败: {e}"
 
@@ -505,6 +509,14 @@ def send_watchdog_alert(now, results, health_rc=None, health_out=None):
     # 它已内置自愈（自动派发对应类别刷新）并发送「已自愈 / 需人工」邮件。
     # 此处不再重复告警，避免对同一次自愈既发「已自愈」又发「数据陈旧」造成噪声。
     health_alert_items = []
+    # 2026-08-12 第171轮修复：健康检查进程自身崩溃（rc not in {0,2}）时，
+    # v8_health_check.py 不会自发邮件，看门狗必须兜底告警，否则 9 张盘中卡陈旧等
+    # 真故障会被「无声漏报」。rc=2=有失败项(健康检查已自发邮件)，rc=0=全绿，
+    # 其余(1=进程崩退/3=看门狗侧超时)均视为崩溃需兜底。
+    if health_rc is not None and health_rc not in (0, 2):
+        health_alert_items.append(
+            f"✗ 健康检查进程异常(rc={health_rc})：未生成报告，可能漏报数据陈旧，请查 v8_health_check.py 日志"
+        )
 
     total_alerts = len(infra_fails) + len(health_alert_items)
     if total_alerts == 0:

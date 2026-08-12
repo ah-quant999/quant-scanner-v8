@@ -1367,4 +1367,48 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except SystemExit:
+        raise
+    except Exception as e:
+        # ── 顶层兜底守卫（2026-08-12 第171轮·一劳永逸）──────────────────────────────
+        # 此前 main() 内任一未捕获异常（API 超时/网络抖动/字段缺失等）都会让整个检查进程
+        # 以 rc=1 静默崩退：既不写 HEALTH_CHECK.js，也不发告警邮件，导致 9 张盘中卡陈旧
+        # 等真故障被「无声漏报」。round-166 只给 self_heal 加了 try/except，未覆盖 main() 其余
+        # 路径（check_* / build_report / write_health_js / _check_workflow_durations）。
+        # 此处兜底：任何崩溃都保证①报告落盘(overall=fail) ②邮件告警发出 ③以 rc=2 退出
+        # （rc=2 让看门狗识别为「有失败项、已由健康检查自发邮件」，不再被静默吞掉）。
+        import traceback as _tb
+        _tb.print_exc()
+        try:
+            _ts = now_cst().strftime("%Y-%m-%d %H:%M:%S")
+            _report = {
+                "updated": _ts,
+                "overall": "fail",
+                "summary": {"ok": 0, "warn": 0, "fail": 1, "total": 1},
+                "items": [{
+                    "id": "HEALTH_CHECK_CRASH",
+                    "name": "健康检查进程崩溃",
+                    "page": "—", "freq": "—", "status": "fail",
+                    "last_update": _ts, "age_min": 0,
+                    "message": f"{type(e).__name__}: {e}",
+                }],
+                "heal_error": f"{type(e).__name__}: {e}",
+            }
+            write_health_js(_report)
+            write_health_json(_report)
+            print(f"[GUARD] 兜底报告已写出 data/HEALTH_CHECK.js (overall=fail)")
+        except Exception as _e2:
+            print(f"[WARN] 兜底报告写出失败: {_e2}")
+        if send_alert:
+            try:
+                send_alert(
+                    "【v8需人工】健康检查进程崩溃(兜底rc=2)",
+                    f"v8_health_check.py 在主流程抛出未捕获异常，已兜底写出失败报告（overall=fail）。\n\n"
+                    f"{type(e).__name__}: {e}\n\n请查 v8_health_check.py 日志与 main() 调用链。",
+                )
+                print("[GUARD] 崩溃告警邮件已发送")
+            except Exception as _e3:
+                print(f"[WARN] 崩溃告警邮件发送失败: {_e3}")
+        sys.exit(2)
