@@ -5897,6 +5897,44 @@ function switchSec(sec,el){
       if(vs60!=null) maLine += ' · vs60日線 <span style="color:'+(vs60>=0?'var(--up)':'var(--down)')+'">'+(vs60>=0?'+':'')+vs60.toFixed(2)+'%</span><span style="color:var(--dim);font-size:11px;">(MA60:'+apd.ma60.toFixed(2)+')</span>';
       if(weak20||weak60) maLine += ' · <span style="color:var(--down)">⚠️弱MA'+(weak20?'20':'')+(weak20&&weak60?'/':'')+(weak60?'60':'')+'</span>';
       if(pCost!=null) maLine += ' · 持本:<b style="color:var(--txt)">¥'+pCost+(pHold!=null?(' '+pHold+'只'):'')+'</b>';
+      // ── 买卖信号（与 AI 主页平均股价面板同源逻辑，紧凑版适配个股卡） ──
+      var _sb=[], _ss=[];
+      var _pv20 = apd.position_vs_ma20, _pv60 = apd.position_vs_ma60;
+      if(_pv20!=null && _pv20>5) _ss.push('🔴远超MA20');
+      else if(_pv20!=null && _pv20>3) _ss.push('🟠偏高止盈');
+      if(_pv60!=null && _pv60>10) _ss.push('🔴严重高估');
+      else if(_pv60!=null && _pv60>6) _ss.push('🟠中期高估');
+      if(_pv20!=null && _pv20<-3) _sb.push('🟢短期超卖');
+      if(_pv20!=null && _pv20<-5) _sb.push('🟢可关注');
+      if(_pv60!=null && _pv60<-5) _sb.push('🟢中期低估');
+      if(_pv60!=null && _pv60<-8) _sb.push('🟢建仓区间');
+      var _hist=apd.history||[];
+      if(_hist.length>=3){
+        var _h0=_hist[_hist.length-1],_h1=_hist[_hist.length-2],_h2=_hist[_hist.length-3];
+        if(_h2.avg_change_pct<0&&_h1.avg_change_pct<0&&_h0.avg_change_pct>0) _sb.push('🔄连跌后首阳');
+        if(_h2.avg_change_pct>0&&_h1.avg_change_pct>0&&_h0.avg_change_pct<0) _ss.push('⚡连涨回调');
+      }
+      if(apPct<-1.5) _ss.push('⚠️单日暴跌');
+      if(apPct>1.5) _sb.push('⚡追高风险');
+      // 综合判定文案（一句话结论）
+      var _verdict='', _vClr='var(--gold)';
+      if(_ss.length>=2){ _verdict='🔴 高位警戒，严控仓位'; _vClr='var(--down)'; }
+      else if(_ss.length===1){ _verdict='🟠 偏高，注意风险'; _vClr='var(--down)'; }
+      else if(_sb.length>=2){ _verdict='🟢 水位偏低，可分批建仓'; _vClr='var(--up)'; }
+      else if(_sb.length===1){ _verdict='🟡 有超卖信号，轻仓试探'; _vClr='var(--gold)'; }
+      else { _verdict='⏸ 中性水位，观望为主'; _vClr='var(--sub)'; }
+      if(_sb.length||_ss.length||_verdict){
+        maLine += '<div style="margin-top:6px;padding-top:6px;border-top:1px dashed rgba(56,189,248,.15);display:flex;flex-wrap:wrap;gap:5px;align-items:center;">';
+        if(_verdict) maLine += '<span style="font-size:11.5px;font-weight:700;color:'+_vClr+';">'+_verdict+'</span>';
+        if(_ss.length){
+          maLine += '<span style="font-size:10px;color:#fca5a5;margin-left:4px;">'+_ss.join(' · ')+'</span>';
+        }
+        if(_sb.length){
+          if(_ss.length) maLine += '<span style="color:var(--dim);">|</span>';
+          maLine += '<span style="font-size:10px;color:#86efac;">'+_sb.join(' · ')+'</span>';
+        }
+        maLine += '</div>';
+      }
       maLine += '</div>';
       h += maLine;
     }
