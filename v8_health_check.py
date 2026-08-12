@@ -318,6 +318,35 @@ PAGE_TO_CAT = {
 }
 
 
+_PENDING_STATES = ("queued", "pending", "waiting", "requested")
+
+
+def _has_pending_run(workflow_id, headers):
+    """检查 workflow 是否已有「排队中(未开始)」运行；有则不应再派发。
+
+    2026-08-12 第172轮根因修复（与 v8_cloud_watchdog.py::has_pending_run 同源）：
+    云端 fetch/build workflow 均设 `concurrency: cancel-in-progress: false`，
+    GitHub 该模式下每个 group **只保留 1 个 pending run**，新的 workflow_dispatch
+    会把原先排队的那个 cancel 掉。同一轮巡检里看门狗 auto_dispatch 与本文件
+    self_heal 各派发一次 → 后者顶掉前者，实测导致盘中数据断档 69 分钟
+    (raw_data/index_quotes.json 提交 13:41:15 → 14:50:18)，9 张盘中卡集体转 FAIL。
+
+    仅在存在 pending run 时跳过（它必然会执行）；只有 in_progress 时照常派发。
+    查询异常返回 False，保守放行。
+    """
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{workflow_id}/runs?per_page=10"
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = json.loads(r.read().decode("utf-8"))
+        for run in data.get("workflow_runs") or []:
+            if (run.get("status") or "").lower() in _PENDING_STATES:
+                return True, run.get("created_at")
+        return False, None
+    except Exception:
+        return False, None
+
+
 def _dispatch_cn_fetch(cat):
     """经 GitHub API 派发 cn_fetch 刷新（自愈核心动作）。"""
     token = _load_token()
@@ -328,6 +357,10 @@ def _dispatch_cn_fetch(cat):
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
     }
+    pending, since = _has_pending_run(CN_WORKFLOW_ID, headers)
+    if pending:
+        return True, (f"已有排队中的 cn_fetch 运行(created {since})，跳过派发"
+                      f"（避免顶掉该 pending run）category={cat}")
     url = f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_WORKFLOW_ID}/dispatches"
     data = json.dumps({"ref": "main", "inputs": {"category": cat}}).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
@@ -350,6 +383,9 @@ def _dispatch_algo_run():
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
     }
+    pending, since = _has_pending_run(ALGO_RUN_WORKFLOW_ID, headers)
+    if pending:
+        return True, f"已有排队中的 algo_run 运行(created {since})，跳过派发（避免顶掉该 pending run）"
     url = f"https://api.github.com/repos/{REPO}/actions/workflows/{ALGO_RUN_WORKFLOW_ID}/dispatches"
     data = json.dumps({"ref": "main"}).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
@@ -372,6 +408,9 @@ def _dispatch_build_deploy():
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
     }
+    pending, since = _has_pending_run(BUILD_DEPLOY_WORKFLOW_ID, headers)
+    if pending:
+        return True, f"已有排队中的 build_deploy 运行(created {since})，跳过派发（避免顶掉该 pending run）"
     url = f"https://api.github.com/repos/{REPO}/actions/workflows/{BUILD_DEPLOY_WORKFLOW_ID}/dispatches"
     data = json.dumps({"ref": "main"}).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")

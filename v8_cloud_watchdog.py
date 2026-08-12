@@ -438,7 +438,52 @@ def auto_dispatch_smart(now_cst, health_rc, health_out):
     return True, f"数据新鲜/无 actionable 项（{_age_detail()}），无需派发"
 
 
+_PENDING_STATES = ("queued", "pending", "waiting", "requested")
+
+
+def has_pending_run(workflow_id, headers=None):
+    """检查指定 workflow 是否已有「排队中(未开始)」的运行。
+
+    2026-08-12 第172轮根因修复：v8_cn_fetch_cloud.yml 配置
+    `concurrency: {group: v8-cn-fetch-cloud, cancel-in-progress: false}`。
+    GitHub 在该模式下**每个 concurrency group 只保留 1 个 pending run**——
+    当已有一个 run 在跑、另一个在排队时，再来一次 workflow_dispatch 会把
+    **原先排队的那个直接 cancel 掉**，只留最新的。
+
+    实测证据（08-12）：14:25 dispatch → cancelled，14:35 dispatch → cancelled，
+    14:52 in_progress + 14:53 → cancelled；raw_data/index_quotes.json 提交史
+    13:41:15 之后直接跳到 14:50:18，**盘中数据断档 69 分钟**，9 张盘中卡
+    (INDEX_QUOTES/ETF_PULSE/SECTOR_FUND_FLOW/CONCEPT_RANKING/... ) 全部超 45min 阈值转 FAIL。
+    此现象在第 169/171/172 轮反复出现，此前被误判为「盘中过渡态」或「本地落后假阳性」。
+
+    自伤链路：同一次看门狗调用内，看门狗 auto_dispatch 与子进程
+    v8_health_check.py::self_heal **各派发一次** → 后者把前者的 pending run 顶掉，
+    等于每轮只有最后一次派发生效，且把已排队的刷新白白取消。
+
+    守卫策略：仅当已存在 pending(排队未开始) run 时跳过派发——因为它必然会跑，
+    再派发只会取消它、把刷新推迟一整轮。若只有 in_progress 而无 pending，
+    则允许派发（我方进入排队，不会取消任何人）。
+    查询失败时返回 False（保守放行，宁可多派发也不漏刷新）。
+    """
+    hdrs = headers or HEADERS
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{workflow_id}/runs?per_page=10"
+    try:
+        req = urllib.request.Request(url, headers=hdrs)
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = json.loads(r.read().decode("utf-8"))
+        for run in data.get("workflow_runs") or []:
+            if (run.get("status") or "").lower() in _PENDING_STATES:
+                return True, run.get("created_at")
+        return False, None
+    except Exception:
+        return False, None
+
+
 def auto_dispatch(cat):
+    pending, since = has_pending_run(CN_WORKFLOW_ID)
+    if pending:
+        return True, (f"已有排队中的 cn_fetch 运行(created {since})，跳过派发"
+                      f"（避免 concurrency 顶掉该 pending run 致刷新被取消）category={cat}")
     url = f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_WORKFLOW_ID}/dispatches"
     data = json.dumps({"ref": "main", "inputs": {"category": cat}}).encode("utf-8")
     req = urllib.request.Request(
