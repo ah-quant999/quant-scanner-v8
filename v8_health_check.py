@@ -610,6 +610,47 @@ def self_heal(report):
                 it["heal"] = f"自愈失败: {dmsg}"
     _save_heal_lock(lock)
 
+    # 0.5) 🔴 2026-08-12 主人紧急令：A 股覆盖 URGENT 自我修复
+    #    痛点：8 天三重共识全港股因 self_heal 只处理 fail 类项从未派发自愈。
+    #    现在 a_share_* 项的 heal_cat 已设 algo_run，但 status 是 warn（不进 cat_items 派发链）。
+    #    修复：单独遍历「warn + id 以 a_share_ 开头 + message 含 URGENT」的项，
+    #         派发 algo_run 让云端 scanner 用修过的路径（commit 045ac1c84）出 A 股金股池。
+    #    去抖：与 algo_run 共享 HEAL_DEBOUNCE_MIN 窗口（同属一类）。
+    urgnet_items = [it for it in report["items"]
+                    if it.get("id", "").startswith("a_share_")
+                    and it.get("status") == "warn"
+                    and "URGENT" in (it.get("message") or "")]
+    if urgnet_items:
+        last = lock.get("algo_run")
+        if last:
+            last_dt = parse_time(last)
+            if last_dt and (now - last_dt).total_seconds() < HEAL_DEBOUNCE_MIN * 60:
+                msg = f"近 {HEAL_DEBOUNCE_MIN} 分钟内已派发 algo_run，跳过重复 A 股自愈"
+                for it in urgnet_items:
+                    it["heal"] = f"已自愈(跳过重复): {msg}"
+                healed.append(f"[algo/A股自愈] {', '.join(it.get('name','') for it in urgnet_items)}: {msg}")
+            else:
+                if _dispatch_count >= MAX_DISPATCHES_PER_RUN:
+                    for it in urgnet_items:
+                        it["heal"] = "已自愈(跳过): 达单次派发上限"
+                    healed.append(f"[algo/A股自愈] A股全港股: 达单次派发上限({MAX_DISPATCHES_PER_RUN})，跳过")
+                else:
+                    _dispatch_count += 1
+                    ok, dmsg, dispatched = _dispatch_algo_run()
+                    if ok and dispatched:
+                        healed.append(f"[algo/A股自愈] {', '.join(it.get('name','') for it in urgnet_items)}: 🚨 URGENT 自动派发 algo_run 重跑（{dmsg}）→ 修复路径在 commit 045ac1c84")
+                        for it in urgnet_items:
+                            it["heal"] = f"🚨 URGENT 已自愈(已派发 algo_run 重跑): {dmsg}"
+                        lock["algo_run"] = now.strftime("%Y-%m-%d %H:%M:%S")
+                    elif ok:
+                        healed.append(f"[algo/A股自愈] A股全港股: {dmsg}")
+                        for it in urgnet_items:
+                            it["heal"] = f"已自愈(跳过): {dmsg}"
+                    else:
+                        failed.append(f"[algo/A股自愈] A股全港股: 自动派发失败 ({dmsg})")
+                        for it in urgnet_items:
+                            it["heal"] = f"自愈失败: {dmsg}"
+        _save_heal_lock(lock)
     # 1) 数据卡片自愈：满足年龄阈值或被异常清空
     stale = [it for it in fail_items
              if (it.get("age_min") is not None and it["age_min"] >= ALERT_OVERDUE_MIN)
