@@ -895,10 +895,12 @@ def check_data_cards():
         if not weekend_skip and not prem_cleared_expected:
             for f in d["key_fields"]:
                 v = data.get(f)
-                # 结果池字段（如 stocks）空列表 = 正常业务状态（今日无入选），不算空值
-                if v == [] and f == "stocks":
-                    continue
-                if v is None or v == "" or v == [] or v == {} or v == "--" or v == "加载中":
+                # 🔴 2026-08-12 修复：原 `if v == [] and f == "stocks": continue` 显式豁免空 stocks
+                # 是「8 天没人发现三重共识全港股/0 只」的主因——0 只本身可能弱市真实状态，但
+                # 「全港股 / A 股扫描缺失」是上游 scanner 路径 bug，必须告警。
+                # 现改为：空 stocks 仍豁免告警（不打扰弱市真实），但「全港股 / A 股扫描失败」
+                # 交给下方 check_a_share_coverage 专门检查（stocks 数 > 0 且 A 股数 = 0 → warn）。
+                if v is None or v == "" or v == {} or v == "--" or v == "加载中":
                     empty_fields.append(f)
         if empty_fields and status == "ok":
             status = "warn"
@@ -1227,6 +1229,88 @@ def check_signal_date_freshness():
     return results
 
 
+# 🔴 2026-08-12 主人紧急令：算法输出全港股/A股缺失 = 必须立即报警
+#   根因：check_signal_date_freshness 只盯 FINAL_RECOMMEND_DATA.stocks（全港股 Top3），
+#         候选池/黄金池/三重共识/驾驶舱等的「全港股」完全没被检查 → 8 天持续 bug 未发现。
+#   修复：本函数扫描所有主要 *_DATA.js 的 stocks 字段，A 股=0 且总数>0 → warn（标红 URGENT）。
+_A_SHARE_POOLS = [
+    # (data/*.js 路径, window var 名, 卡片名, heal_cat)
+    ("CANDIDATE.js",            "CANDIDATE",            "候选池",       "algo_run"),
+    ("GOLD_POOL.js",            "GOLD_POOL",            "黄金池",       "algo_run"),
+    ("TRIPLE_CONSENSUS.js",     "TRIPLE_CONSENSUS",     "三重共识",     "algo_run"),
+    ("COCKPIT_TIER_RECOMMEND.js","COCKPIT_TIER_RECOMMEND","驾驶舱分档",   "algo_run"),
+    ("CRDS_CARD_DATA.js",       "CRDS_CARD_DATA",       "逆势龙头",     "algo_run"),
+    ("FOUR_VOLUME.js",          "FOUR_VOLUME",          "四量终极",     "algo_run"),
+    ("MAHORO.js",               "MAHORO",               "国际投行信号", "algo_run"),
+    ("LHB_DATA.js",             "LHB_DATA",             "龙虎榜",       "cn_fetch"),
+]
+
+
+def check_a_share_coverage():
+    """🔴 2026-08-12 主人令：算法输出全港股/A股缺失 = 立即报警 + 定位回溯。
+
+    扫描所有主要数据池的 stocks 字段：
+      - 总数=0：弱市真实状态 → 弱 warn（不报邮件）
+      - 总数>0 且 A 股=0：A 股扫描失败/A 股 API 挂/上游 bug → URGENT warn（推邮件/告警）
+      - 总数>0 且 A 股>=1：OK
+    """
+    results = []
+    for fname, var, name, heal in _A_SHARE_POOLS:
+        path = DATA_DIR / fname
+        d = load_window_var(path, var)
+        if d is None:
+            # 缺文件由 check_data_cards 负责；这里跳过不重复
+            continue
+        # 兼容 stocks 是 dict/array 两种形态
+        stocks_raw = d.get("stocks", d.get("all_candidates", d.get("watch", d.get("tier_a", []))))
+        if isinstance(stocks_raw, dict):
+            stocks = list(stocks_raw.values())
+        else:
+            stocks = stocks_raw or []
+        total = len(stocks)
+        if total == 0:
+            # 0 只本身可能是弱市真实状态（不强告警），但要标注提示
+            results.append({
+                "id": f"a_share_{var.lower()}", "name": f"{name} A股覆盖",
+                "page": "内容审计", "heal_cat": heal,
+                "status": "warn",
+                "message": f"⚠️ {name} 今日 0 只（弱市真实状态可接受，但若其他池也 0 则排查上游；"
+                          f"若此池独立为 0 而其他池正常则不报警）"
+            })
+            continue
+        a_cnt = sum(1 for s in stocks if _is_a_share(s))
+        hk_cnt = total - a_cnt
+        if a_cnt == 0 and hk_cnt > 0:
+            # URGENT：A 股扫描失败 / 上游路径 bug（8 天 bug 主因）
+            results.append({
+                "id": f"a_share_{var.lower()}", "name": f"{name} A股覆盖",
+                "page": "内容审计", "heal_cat": heal,
+                "status": "warn",
+                "message": f"🚨 URGENT: {name} 全港股（{hk_cnt}/{total}），A 股扫描失败/上游路径 bug！"
+                          f"🚨 这是 8 天未发现 bug 的主因——必须立即回溯 scanner.load_candidate_pool / "
+                          f"mootdx A 股 / akshare 港股 API / build_candidate_pool 路径。"
+            })
+    return results
+
+
+def _is_a_share(s):
+    """判断股票是否 A 股（含主板/创业板/科创板/北交所）。"""
+    if not isinstance(s, dict):
+        return False
+    market = (s.get("market") or "").lower()
+    board = s.get("board") or s.get("board_label") or ""
+    code = str(s.get("code") or "")
+    # market 明确是 hk/港股 → 港股
+    if market in ("hk", "港股") or board == "港股" or "港股" in board:
+        return False
+    if market in ("sh", "sz", "bj") or board in ("主板","创业板","科创板","北交所"):
+        return True
+    # code 前缀兜底判断
+    if code.isdigit() and len(code) == 6:
+        return True
+    return False
+
+
 def _count_trade_days(start, end):
     """统计 [start, end] 之间的 A 股交易日数量（两端均含）。"""
     if not start or not end or start > end:
@@ -1305,8 +1389,8 @@ def check_top10_history_depth():
     return results
 
 
-def build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh=None, history_depth=None):
-    all_items = cards + raw + site_sync + runner + local_sync + dom + (signal_fresh or []) + (history_depth or [])
+def build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh=None, history_depth=None, a_share_cov=None):
+    all_items = cards + raw + site_sync + runner + local_sync + dom + (signal_fresh or []) + (history_depth or []) + (a_share_cov or [])
     ok = sum(1 for x in all_items if x["status"] == "ok")
     warn = sum(1 for x in all_items if x["status"] == "warn")
     fail = sum(1 for x in all_items if x["status"] == "fail")
@@ -1423,8 +1507,10 @@ def main():
 
     signal_fresh = check_signal_date_freshness()
     history_depth = check_top10_history_depth()
+    # 🔴 2026-08-12 主人紧急令：算法输出全港股/A股缺失必须立即报警
+    a_share_cov = check_a_share_coverage()
 
-    report = build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh, history_depth)
+    report = build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh, history_depth, a_share_cov=a_share_cov)
     # 2026-08-11 漏洞 #3：管线耗时趋势监控（必须在 build_report 后但 self_heal 前,以便发现异常时纳入自愈决策）
     try:
         _check_workflow_durations(report)
