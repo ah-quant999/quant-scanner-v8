@@ -11957,20 +11957,22 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
         priceLine='<span style="font-size:14px;font-weight:800;color:var(--txt)">¥'+_fn(price)+'</span>'+(pctText?'<span style="font-size:12px;font-weight:700;color:'+_pctColor(pct)+'">'+pctText+'</span>':'');
       }
       var plan='';
+      // 🔴 2026-08-13 主人令修正: plan 改成内联 span 紧跟信号(不再用 div 推到第3行/不靠右)
+      //   之前 div 形式 + margin-left:auto 推到右,主人「分析字段少了」错觉
       if(s.stop_loss!=null && s.target_price!=null && price!=null){
         var rr=s.risk_reward || 0;
         var rrColor = rr>=2?'var(--up)':(rr>=1.5?'var(--gold)':'var(--down)');
-        plan='<div style="display:flex;align-items:center;gap:12px;margin-top:6px;font-size:12px;color:var(--sub);flex-wrap:wrap">'
-          +'<span>🛑 止损 <b style="color:var(--down)">¥'+_fn(s.stop_loss)+'</b></span>'
-          +'<span>🎯 目标 <b style="color:var(--up)">¥'+_fn(s.target_price)+'</b></span>'
-          +'<span style="color:'+rrColor+';font-weight:700">盈亏比 1:'+_fn(rr,2)+'</span>'
-          +'</div>';
+        plan='<span style="color:var(--sub);">· 🛑 <b style="color:var(--down)">¥'+_fn(s.stop_loss)+'</b></span>'
+          +'<span style="color:var(--sub);">· 🎯 <b style="color:var(--up)">¥'+_fn(s.target_price)+'</b></span>'
+          +'<span style="color:'+rrColor+';font-weight:700">· 盈亏比 1:'+_fn(rr,2)+'</span>';
       } else if(s.support!=null && s.resistance!=null){
-        plan='<div style="display:flex;align-items:center;gap:12px;margin-top:6px;font-size:12px;color:var(--sub);flex-wrap:wrap">'
-          +'<span>支撑 <b>¥'+_fn(s.support)+'</b></span>'
-          +'<span>压力 <b>¥'+_fn(s.resistance)+'</b></span>'
-          +'</div>';
-      }
+        plan='<span style="color:var(--sub);">· 支撑 <b>¥'+_fn(s.support)+'</b></span>'
+          +'<span style="color:var(--sub);">· 压力 <b>¥'+_fn(s.resistance)+'</b></span>';
+      } else if(s.stop_loss!=null && s.target_price!=null){
+        // 没价格但有止损/目标——单独显示(之前条件缺 price 就漏掉)
+        plan='<span style="color:var(--sub);">· 🛑 <b style="color:var(--down)">¥'+_fn(s.stop_loss)+'</b></span>'
+          +'<span style="color:var(--sub);">· 🎯 <b style="color:var(--up)">¥'+_fn(s.target_price)+'</b></span>';
+
       return '<div style="padding:6px 8px;background:var(--card);border:1px solid var(--border);border-radius:6px;margin-bottom:4px;">'
         +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'
         +'<span style="font-size:13px;font-weight:700;color:var(--txt)">'+_fe(s.name)+'</span>'
@@ -11982,7 +11984,10 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
         +'<span style="color:var(--up);font-weight:700">共振'+s.resonance+'源</span>'
         +'<span>· '+_fe(s.enter_date||'—')+'</span>'
         +(s.signals&&s.signals.length?'<span style="color:var(--gold);">· '+(s.signals||[]).slice(0,3).map(_fe).join('+')+'</span>':'')
-        +(plan?'<span style="margin-left:auto;">'+plan+'</span>':'')
+        // 🔴 2026-08-13 主人令修正：plan 改用普通 inline flow，不再 margin-left:auto 推到右
+        //   之前 plan (止损/目标/盈亏比) 被推到右→主人「分析字段少了」错觉（实际在右边，主人没看到）
+        //   现改为 inline 紧跟信号后,即使 plan 没数据也不占位
+        +(plan||'')
         +'</div>'
         +'</div>';
     }
