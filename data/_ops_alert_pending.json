@@ -1,0 +1,64 @@
+{
+  "check_time": "2026-08-10 21:15:28",
+  "repo": "ah-quant999/quant-scanner-v8",
+  "health_summary": {
+    "ok": 37,
+    "warn": 1,
+    "fail": 4,
+    "total": 42
+  },
+  "anomaly_count": 3,
+  "anomalies": [
+    {
+      "name": "大牛股猎手",
+      "id": "BIG_BULL_HUNTER",
+      "page": "选股策略",
+      "status": "fail",
+      "message": "找不到数据文件 BIG_BULL_HUNTER.js 或解析失败",
+      "last_update": "--",
+      "heal": null
+    },
+    {
+      "name": "相对强度",
+      "id": "STOCK_RPS",
+      "page": "选股策略",
+      "status": "fail",
+      "message": "更新于 2天前 23:47；超过阈值 360 分钟",
+      "last_update": "2026-08-08 23:47:05",
+      "heal": null
+    },
+    {
+      "name": "最终推荐入选日期",
+      "id": "final_enter_stale",
+      "page": "内容审计",
+      "status": "warn",
+      "message": "最新 enter_date 2026-08-07 早于最近交易日 2026-08-10，最终推荐数据陈旧",
+      "last_update": null,
+      "heal": null
+    }
+  ],
+  "noise_count": 2,
+  "noise": [
+    {
+      "name": "Pages 部署同步",
+      "id": "site_sync",
+      "page": "管线",
+      "status": "fail",
+      "message": "本地 HEAD 84a9ec2 / 线上 d72f75d 不同步，落后 22 commit，部署链路需检查",
+      "last_update": null,
+      "heal": null
+    },
+    {
+      "name": "本地与 origin/main 同步",
+      "id": "local_sync",
+      "page": "管线",
+      "status": "fail",
+      "message": "本地 84a9ec2 / origin/main 47458e7 本地落后，需 pull/push",
+      "last_update": null,
+      "heal": null
+    }
+  ],
+  "signature": "BIG_BULL_HUNTER:fail|STOCK_RPS:fail|final_enter_stale:warn",
+  "notify": true,
+  "cooled": false
+}
