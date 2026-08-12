@@ -79,10 +79,54 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: "📦 安装 A股依赖（清华镜像）"
+      # 🔴 2026-08-12 第173轮根因修复：本步骤原先「只用清华镜像 + || true 吞失败」，
+      #   GitHub 云端 runner 是境外 IP，访问清华镜像会间歇性拿到**空索引**：
+      #     ERROR: Could not find a version that satisfies the requirement akshare
+      #            (from versions: none)
+      #   （run#94 08-12 15:39 真实日志，install 仅 5 秒即快速失败）
+      #   → `|| true` 把 pip 失败吞掉 → 末行 import 校验 ModuleNotFoundError → 本步骤
+      #   exit 1 → **整条盘后算法链 job 直接 fail，算法一行没跑** → 7 张盘后/选股卡
+      #   (市场温度计/六维共振雷达/候选池/机构买卖/三重共识/全站精选/逆势龙头)
+      #   停在上午 09:08 不刷新，逆势龙头更是停在 08-11 17:09。
+      #
+      #   决定性佐证：同为云端的姊妹 workflow v8_cn_fetch_cloud.yml 用的是**官方 PyPI
+      #   （无镜像）**，同一时刻 15:33 success；本 workflow 用清华镜像 15:39 fail。
+      #   云端 runner 在 GitHub 内网，官方 pypi.org 才是最快最稳的源，中国镜像只作兜底
+      #   （清华/阿里云镜像仍保留给 cn 自托管 runner 的 v8_algo_run.yml / v8_cn_fetch.yml 用）。
+      #
+      #   策略：官方源优先 → 清华 → 阿里云，每源重试 2 次，逐源做 import 实证校验；
+      #   三源全灭才 exit 1（此时确属真故障，必须显式失败而不是被 || true 掩盖）。
+      - name: "📦 安装 A股依赖（官方 PyPI 优先 + 双镜像兜底 + 重试）"
         run: |
-          pip install -q -i https://pypi.tuna.tsinghua.edu.cn/simple akshare pandas numpy requests baostock 2>&1 | tail -3 || true
-          pip install -q -i https://pypi.tuna.tsinghua.edu.cn/simple mootdx 2>&1 | tail -3 || true
+          CORE="akshare pandas numpy requests baostock"
+          ok=0
+          for IDX in "https://pypi.org/simple" \
+                     "https://pypi.tuna.tsinghua.edu.cn/simple" \
+                     "https://mirrors.aliyun.com/pypi/simple"; do
+            for TRY in 1 2; do
+              echo "=== pip install core [index=$IDX try=$TRY] ==="
+              if pip install -q --retries 3 --timeout 60 -i "$IDX" $CORE; then
+                if python -c "import akshare, pandas, numpy, requests"; then
+                  echo "core deps OK via $IDX (try=$TRY)"
+                  ok=1
+                  break
+                fi
+                echo "!! pip 退出码 0 但 import 校验未通过，继续换源/重试"
+              fi
+              echo "!! [$IDX] 第 $TRY 次安装失败"
+            done
+            # 注：GitHub 的 run: 默认 `bash -e`，此处用显式 if 而非 `[ ... ] && break`，
+            # 避免依赖 `set -e` 对 && 列表首命令失败的豁免语义（易踩坑）。
+            if [ "$ok" = "1" ]; then break; fi
+          done
+          if [ "$ok" != "1" ]; then
+            echo "::error::核心依赖安装失败（官方 PyPI / 清华 / 阿里云 各试 2 次全灭）"
+            exit 1
+          fi
+          # mootdx 为可选依赖（本 workflow SKIP_MOOTDX=1 不使用），装不上不阻断
+          pip install -q --retries 2 --timeout 40 mootdx \
+            || pip install -q --retries 2 --timeout 40 -i https://pypi.tuna.tsinghua.edu.cn/simple mootdx \
+            || echo "mootdx 未安装（可选依赖，SKIP_MOOTDX=1 不影响算法链）"
           python -c "import akshare, pandas, numpy, requests; print('deps ready')"
 
       - name: "🧮 运行盘后算法链 → raw_data/ → 推送"

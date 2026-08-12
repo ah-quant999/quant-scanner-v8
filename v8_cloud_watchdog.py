@@ -440,6 +440,11 @@ def auto_dispatch_smart(now_cst, health_rc, health_out):
 
 _PENDING_STATES = ("queued", "pending", "waiting", "requested")
 
+# 2026-08-12 第173轮：与 v8_health_check.py::_PENDING_MAX_AGE_MIN 同源同值。
+# pending 超该分钟数视为 GitHub 侧僵尸排队（实测 run#93 挂 queued 35min+ 不启动），
+# 不再阻断派发，否则第172轮守卫会让自愈对该 workflow 死锁整天。
+_PENDING_MAX_AGE_MIN = 15
+
 
 def has_pending_run(workflow_id, headers=None):
     """检查指定 workflow 是否已有「排队中(未开始)」的运行。
@@ -464,6 +469,9 @@ def has_pending_run(workflow_id, headers=None):
     再派发只会取消它、把刷新推迟一整轮。若只有 in_progress 而无 pending，
     则允许派发（我方进入排队，不会取消任何人）。
     查询失败时返回 False（保守放行，宁可多派发也不漏刷新）。
+
+    2026-08-12 第173轮加固：pending 年龄超 _PENDING_MAX_AGE_MIN 视为僵尸排队，
+    **不阻断派发**（否则卡死的 queued run 会让自愈对该 workflow 死锁整天）。
     """
     hdrs = headers or HEADERS
     url = f"https://api.github.com/repos/{REPO}/actions/workflows/{workflow_id}/runs?per_page=10"
@@ -471,9 +479,22 @@ def has_pending_run(workflow_id, headers=None):
         req = urllib.request.Request(url, headers=hdrs)
         with urllib.request.urlopen(req, timeout=20) as r:
             data = json.loads(r.read().decode("utf-8"))
+        now_utc = datetime.now(timezone.utc)
         for run in data.get("workflow_runs") or []:
-            if (run.get("status") or "").lower() in _PENDING_STATES:
-                return True, run.get("created_at")
+            if (run.get("status") or "").lower() not in _PENDING_STATES:
+                continue
+            created = run.get("created_at")
+            age_min = None
+            try:
+                dt = datetime.strptime(created, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+                age_min = (now_utc - dt).total_seconds() / 60
+            except Exception:
+                age_min = None
+            if age_min is not None and age_min > _PENDING_MAX_AGE_MIN:
+                print(f"[WARN] workflow {workflow_id} 存在僵尸 pending run(created {created}, "
+                      f"排队 {age_min:.0f}min > {_PENDING_MAX_AGE_MIN}min)，不阻断派发")
+                continue
+            return True, created
         return False, None
     except Exception:
         return False, None

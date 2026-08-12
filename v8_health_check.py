@@ -320,6 +320,14 @@ PAGE_TO_CAT = {
 
 _PENDING_STATES = ("queued", "pending", "waiting", "requested")
 
+# 2026-08-12 第173轮：pending 超过该分钟数视为 GitHub 侧「僵尸排队」，不再阻断派发。
+# 依据：云端 ubuntu-latest 的 workflow_dispatch 正常在秒级~1 分钟内取得 runner 并转
+# in_progress；实测 run#93(15:38:59) 挂在 queued 超 35 分钟仍未启动（job 标签
+# ubuntu-latest、started_at 已写但状态不动）= GitHub 侧分配卡死，它不会真正执行。
+# 若无年龄上限，第172轮守卫会把这种僵尸当成「必然会跑的排队」而永久跳过派发，
+# 自愈链路对该 workflow 直接死锁（GitHub 保留僵尸 run 可达 ~24h）。
+_PENDING_MAX_AGE_MIN = 15
+
 
 def _has_pending_run(workflow_id, headers):
     """检查 workflow 是否已有「排队中(未开始)」运行；有则不应再派发。
@@ -333,25 +341,47 @@ def _has_pending_run(workflow_id, headers):
 
     仅在存在 pending run 时跳过（它必然会执行）；只有 in_progress 时照常派发。
     查询异常返回 False，保守放行。
+
+    2026-08-12 第173轮加固：pending 年龄超 _PENDING_MAX_AGE_MIN 视为僵尸排队，
+    **不阻断派发**（否则一个卡死的 queued run 会让自愈对该 workflow 死锁整天）。
     """
     url = f"https://api.github.com/repos/{REPO}/actions/workflows/{workflow_id}/runs?per_page=10"
     try:
         req = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(req, timeout=20) as r:
             data = json.loads(r.read().decode("utf-8"))
+        now_utc = datetime.now(timezone.utc)
         for run in data.get("workflow_runs") or []:
-            if (run.get("status") or "").lower() in _PENDING_STATES:
-                return True, run.get("created_at")
+            if (run.get("status") or "").lower() not in _PENDING_STATES:
+                continue
+            created = run.get("created_at")
+            age_min = None
+            try:
+                dt = datetime.strptime(created, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+                age_min = (now_utc - dt).total_seconds() / 60
+            except Exception:
+                age_min = None
+            if age_min is not None and age_min > _PENDING_MAX_AGE_MIN:
+                # 僵尸排队：跳过它继续看下一条，不因它阻断派发
+                print(f"[WARN] workflow {workflow_id} 存在僵尸 pending run(created {created}, "
+                      f"排队 {age_min:.0f}min > {_PENDING_MAX_AGE_MIN}min)，不阻断派发")
+                continue
+            return True, created
         return False, None
     except Exception:
         return False, None
 
 
 def _dispatch_cn_fetch(cat):
-    """经 GitHub API 派发 cn_fetch 刷新（自愈核心动作）。"""
+    """经 GitHub API 派发 cn_fetch 刷新（自愈核心动作）。
+
+    返回三元组 (ok, msg, dispatched)：
+      ok         = 本次处理没有出错（含「因已有 pending 而跳过」这种正常情况）
+      dispatched = **真的发出了 POST**（决定是否刷新去抖锁；见第173轮说明）
+    """
     token = _load_token()
     if not token:
-        return False, "无 GitHub token，无法派发"
+        return False, "无 GitHub token，无法派发", False
     headers = {
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
@@ -360,24 +390,27 @@ def _dispatch_cn_fetch(cat):
     pending, since = _has_pending_run(CN_WORKFLOW_ID, headers)
     if pending:
         return True, (f"已有排队中的 cn_fetch 运行(created {since})，跳过派发"
-                      f"（避免顶掉该 pending run）category={cat}")
+                      f"（避免顶掉该 pending run）category={cat}"), False
     url = f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_WORKFLOW_ID}/dispatches"
     data = json.dumps({"ref": "main", "inputs": {"category": cat}}).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
-            return True, f"已派发 cn_fetch category={cat} (HTTP {r.status})"
+            return True, f"已派发 cn_fetch category={cat} (HTTP {r.status})", True
     except urllib.error.HTTPError as e:
-        return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
+        return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}", False
     except Exception as e:
-        return False, f"派发异常: {e}"
+        return False, f"派发异常: {e}", False
 
 
 def _dispatch_algo_run():
-    """经 GitHub API 派发 v8 盘后算法链(云端)，重新产出 FINAL_RECOMMEND_DATA 等选股结果。"""
+    """经 GitHub API 派发 v8 盘后算法链(云端)，重新产出 FINAL_RECOMMEND_DATA 等选股结果。
+
+    返回三元组 (ok, msg, dispatched)，语义同 _dispatch_cn_fetch。
+    """
     token = _load_token()
     if not token:
-        return False, "无 GitHub token，无法派发"
+        return False, "无 GitHub token，无法派发", False
     headers = {
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
@@ -385,24 +418,27 @@ def _dispatch_algo_run():
     }
     pending, since = _has_pending_run(ALGO_RUN_WORKFLOW_ID, headers)
     if pending:
-        return True, f"已有排队中的 algo_run 运行(created {since})，跳过派发（避免顶掉该 pending run）"
+        return True, f"已有排队中的 algo_run 运行(created {since})，跳过派发（避免顶掉该 pending run）", False
     url = f"https://api.github.com/repos/{REPO}/actions/workflows/{ALGO_RUN_WORKFLOW_ID}/dispatches"
     data = json.dumps({"ref": "main"}).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
-            return True, f"已派发 algo_run(盘后算法链) (HTTP {r.status})"
+            return True, f"已派发 algo_run(盘后算法链) (HTTP {r.status})", True
     except urllib.error.HTTPError as e:
-        return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
+        return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}", False
     except Exception as e:
-        return False, f"派发异常: {e}"
+        return False, f"派发异常: {e}", False
 
 
 def _dispatch_build_deploy():
-    """经 GitHub API 派发 v8_build_deploy，触发 Pages 重新构建部署。"""
+    """经 GitHub API 派发 v8_build_deploy，触发 Pages 重新构建部署。
+
+    返回三元组 (ok, msg, dispatched)，语义同 _dispatch_cn_fetch。
+    """
     token = _load_token()
     if not token:
-        return False, "无 GitHub token，无法派发"
+        return False, "无 GitHub token，无法派发", False
     headers = {
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
@@ -410,17 +446,17 @@ def _dispatch_build_deploy():
     }
     pending, since = _has_pending_run(BUILD_DEPLOY_WORKFLOW_ID, headers)
     if pending:
-        return True, f"已有排队中的 build_deploy 运行(created {since})，跳过派发（避免顶掉该 pending run）"
+        return True, f"已有排队中的 build_deploy 运行(created {since})，跳过派发（避免顶掉该 pending run）", False
     url = f"https://api.github.com/repos/{REPO}/actions/workflows/{BUILD_DEPLOY_WORKFLOW_ID}/dispatches"
     data = json.dumps({"ref": "main"}).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
-            return True, f"已派发 build_deploy (HTTP {r.status})"
+            return True, f"已派发 build_deploy (HTTP {r.status})", True
     except urllib.error.HTTPError as e:
-        return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
+        return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}", False
     except Exception as e:
-        return False, f"派发异常: {e}"
+        return False, f"派发异常: {e}", False
 
 
 def _heal_local_sync():
@@ -485,11 +521,14 @@ def _heal_site_sync():
         last_dt = parse_time(last)
         if last_dt and (now - last_dt).total_seconds() < HEAL_DEBOUNCE_MIN * 60:
             return True, f"近 {HEAL_DEBOUNCE_MIN} 分钟内已派发 build_deploy，跳过重复"
-    ok, dmsg = _dispatch_build_deploy()
+    ok, dmsg, dispatched = _dispatch_build_deploy()
     if ok:
-        lock["build_deploy"] = now.strftime("%Y-%m-%d %H:%M:%S")
-        _save_heal_lock(lock)
-        return True, f"已派发 build_deploy ({dmsg})"
+        # 第173轮：仅「真的发出 POST」才刷新去抖锁；因已有 pending 而跳过时不能记账，
+        # 否则会把 25 分钟去抖窗口白白消耗在一次没发生的派发上。
+        if dispatched:
+            lock["build_deploy"] = now.strftime("%Y-%m-%d %H:%M:%S")
+            _save_heal_lock(lock)
+        return True, f"已派发 build_deploy ({dmsg})" if dispatched else dmsg
     return False, f"派发 build_deploy 失败: {dmsg}"
 
 
@@ -547,11 +586,17 @@ def self_heal(report):
                     healed.append(f"[algo] {it['name']}: 近 {HEAL_DEBOUNCE_MIN} 分钟内已派发，跳过重复")
                     it["heal"] = "已自愈(跳过重复): 近窗口内已派发盘后算法链"
                     continue
-            ok, dmsg = _dispatch_algo_run()
+            ok, dmsg, dispatched = _dispatch_algo_run()
             if ok:
-                healed.append(f"[algo] {it['name']}: 已自动派发盘后算法链重新产出 ({dmsg})")
-                it["heal"] = "已自动派发盘后算法链"
-                lock["algo_run"] = now.strftime("%Y-%m-%d %H:%M:%S")
+                # 第173轮：跳过（已有 pending）不得记账，否则去抖窗口被空派发消耗；
+                # 文案也据实区分「已派发」与「跳过」，避免邮件谎报已自愈。
+                if dispatched:
+                    healed.append(f"[algo] {it['name']}: 已自动派发盘后算法链重新产出 ({dmsg})")
+                    it["heal"] = "已自动派发盘后算法链"
+                    lock["algo_run"] = now.strftime("%Y-%m-%d %H:%M:%S")
+                else:
+                    healed.append(f"[algo] {it['name']}: {dmsg}")
+                    it["heal"] = f"已自愈(跳过): {dmsg}"
             else:
                 failed.append(f"[algo] {it['name']}: 自动派发失败 ({dmsg})")
                 it["heal"] = f"自愈失败: {dmsg}"
@@ -588,14 +633,22 @@ def self_heal(report):
             continue
         _dispatch_count += 1
         if cat == "algo_run":
-            ok, dmsg = _dispatch_algo_run()
+            ok, dmsg, dispatched = _dispatch_algo_run()
         else:
-            ok, dmsg = _dispatch_cn_fetch(cat)
+            ok, dmsg, dispatched = _dispatch_cn_fetch(cat)
         if ok:
-            healed.append(f"[{cat}] {', '.join(names)}: 已自动派发刷新 ({dmsg})")
-            for it in items:
-                it["heal"] = f"已自动派发刷新({cat})"
-            lock[cat] = now.strftime("%Y-%m-%d %H:%M:%S")
+            # 第173轮：区分「真派发」与「因已有 pending 跳过」——后者不刷新去抖锁，
+            # 否则一个（可能是僵尸的）pending run 会让后续每轮都以「近25分钟已派发」
+            # 为由继续跳过，自愈永久空转却对外谎报「已自动派发刷新」。
+            if dispatched:
+                healed.append(f"[{cat}] {', '.join(names)}: 已自动派发刷新 ({dmsg})")
+                for it in items:
+                    it["heal"] = f"已自动派发刷新({cat})"
+                lock[cat] = now.strftime("%Y-%m-%d %H:%M:%S")
+            else:
+                healed.append(f"[{cat}] {', '.join(names)}: {dmsg}")
+                for it in items:
+                    it["heal"] = f"已自愈(跳过): {dmsg}"
         else:
             failed.append(f"[{cat}] {', '.join(names)}: 自动派发失败 ({dmsg})")
             for it in items:

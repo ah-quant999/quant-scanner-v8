@@ -42,8 +42,16 @@ jobs:
         with:
           python-version: "3.12"
 
+      # 2026-08-12 第173轮同类对齐：本 workflow 跑在云端 ubuntu-latest（境外 IP），
+      # 清华镜像会间歇性返回空索引（v8_algo_cloud.yml run#94 实证），云端一律以官方
+      # PyPI 为主源、清华仅作兜底。requests 在 ubuntu-latest 通常已预装，故保留 || true
+      # 不阻断（本步骤失败不代表真故障）。
       - name: "📦 安装依赖"
-        run: pip install -q -i https://pypi.tuna.tsinghua.edu.cn/simple requests 2>&1 | tail -2 || true
+        run: |
+          pip install -q --retries 3 --timeout 60 requests \
+            || pip install -q --retries 2 --timeout 40 -i https://pypi.tuna.tsinghua.edu.cn/simple requests \
+            || true
+          python -c "import requests; print('requests ready', requests.__version__)" || true
 
       - name: "🔑 发码 / 验证"
         continue-on-error: true
