@@ -11992,6 +11992,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
         // 没价格但有止损/目标——单独显示(之前条件缺 price 就漏掉)
         plan='<span style="color:var(--sub);">· 🛑 <b style="color:var(--down)">¥'+_fn(s.stop_loss)+'</b></span>'
           +'<span style="color:var(--sub);">· 🎯 <b style="color:var(--up)">¥'+_fn(s.target_price)+'</b></span>';
+      }
 
       return '<div style="padding:6px 8px;background:var(--card);border:1px solid var(--border);border-radius:6px;margin-bottom:4px;">'
         +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">'
