@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-12 19:11:16",
+  "update_time": "2026-08-12 19:11:37",
   "crisis_score": 31.4,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -126,12 +126,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构0.2亿+游资0.2亿",
       "industry": "通用设备制造业",
       "concepts": [
+        "融资融券",
+        "半导体概念",
+        "百元股",
         "存储芯片",
         "创业板综",
-        "融资融券",
-        "先进封装",
-        "东方财富热股",
-        "半导体概念"
+        "先进封装"
       ],
       "backtest": {
         "signals": 171,
@@ -201,10 +201,10 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构0.3亿+游资0.1亿",
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "PCB",
-        "黄金概念",
+        "一带一路",
         "央国企改革",
-        "一带一路"
+        "PCB",
+        "黄金概念"
       ],
       "backtest": {
         "signals": 171,
@@ -272,12 +272,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "通用设备制造业",
       "concepts": [
+        "融资融券",
+        "半导体概念",
+        "百元股",
         "存储芯片",
         "创业板综",
-        "融资融券",
-        "先进封装",
-        "东方财富热股",
-        "半导体概念"
+        "先进封装"
       ],
       "enter_date": "20260812",
       "stop_loss": null,
@@ -305,10 +305,10 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "PCB",
-        "黄金概念",
+        "一带一路",
         "央国企改革",
-        "一带一路"
+        "PCB",
+        "黄金概念"
       ],
       "enter_date": "20260812",
       "stop_loss": null,
@@ -336,10 +336,10 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "融资融券",
-        "长期破净",
         "养老金",
-        "并购重组概念"
+        "并购重组概念",
+        "长期破净",
+        "融资融券"
       ],
       "enter_date": "20260812",
       "stop_loss": null,
@@ -367,12 +367,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "电气机械和器材制造业",
       "concepts": [
-        "光纤概念",
         "融资融券",
-        "网络安全",
-        "大数据",
+        "通信技术",
+        "北交所概念",
         "5G概念",
-        "北交所概念"
+        "大数据",
+        "网络安全"
       ],
       "enter_date": "20260812",
       "stop_loss": null,
@@ -400,12 +400,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "低价股",
         "融资融券",
-        "创新药",
+        "维生素",
+        "低价股",
         "肝炎概念",
-        "病原体防治",
-        "维生素"
+        "破发股",
+        "创新药"
       ],
       "enter_date": "20260812",
       "stop_loss": null,
