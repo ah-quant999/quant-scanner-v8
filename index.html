@@ -9507,14 +9507,10 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         h+='<div style="font-size:15px;font-weight:700;color:#d0bcff;line-height:1.4;">'+next.name+' '+next.date+' '+_fmtWeekday(next.date)+'</div>';
         h+='<div style="font-size:11px;color:var(--sub);margin-top:3px;">距今 '+(next.days_left>=0?next.days_left:0)+' 天 · '+(next.desc||'')+'</div>';
         h+='</div>';
-        h+='<div style="font-size:11px;color:var(--sub);line-height:1.6;margin-bottom:2px;">📅 全部待观测窗口：</div>';
-        h+='<div style="font-size:11px;color:var(--txt);line-height:1.7;">';
-        var fibDescMap={'F(3)':'小反弹窗口','F(5)':'短期变盘','F(8)':'8日变盘','F(13)':'13日重要窗口','F(21)':'21日大窗口·中期转折','F(34)':'34日中期窗口·趋势确认','F(55)':'55日长期窗口·大周期拐点'};
+        h+='<div style="font-size:11px;color:var(--sub);margin-top:6px;line-height:1.8;">';
+        var fibDescMap={'F(3)':'小反弹','F(5)':'短期变盘','F(8)':'8日变盘','F(13)':'13日重要','F(21)':'中期转折','F(34)':'趋势确认','F(55)':'大周期拐点'};
         future.forEach(function(w){
-          h+='<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.06);padding:3px 0;">';
-          h+='<span>'+w.name+' <span style="color:var(--sub);">'+w.date+' '+_fmtWeekday(w.date)+'</span> <span style="color:'+(w.desc?'#a78bfa':'var(--dim)')+';font-size:10px;">'+(fibDescMap[w.name]||w.desc||'')+'</span></span>';
-          h+='<span style="color:var(--sub);">距今'+(w.days_left>=0?w.days_left:0)+'天</span>';
-          h+='</div>';
+          h+='<span style="display:inline-block;margin-right:12px;white-space:nowrap;color:var(--txt);">'+w.name+' <span style="color:#a78bfa">'+w.date.slice(5)+'</span> '+(fibDescMap[w.name]||'')+' <span style="color:var(--dim)">距'+(w.days_left>=0?w.days_left:0)+'天</span></span>';
         });
         h+='</div>';
       }
