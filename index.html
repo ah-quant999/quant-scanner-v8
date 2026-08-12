@@ -11869,7 +11869,23 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }
 
   function renderFinalCand(){
-    var el=document.getElementById('finalCandBody'); if(!el) return;
+    // 🔴 2026-08-12 主人令：整函数 try/catch + 错误显示（之前"加载中..."卡死是抛错被静默）
+    try {
+      renderFinalCandInner();
+    } catch(e) {
+      console.error('[renderFinalCand] 错误:', e);
+      var el=document.getElementById('finalCandBody');
+      if(el) el.innerHTML = '<div style="padding:14px;background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.35);border-radius:8px;color:#ef5350;font-size:12px;line-height:1.6;">'+
+        '<b>⚠️ 候选池渲染错误</b>(不是数据问题,是 JS 代码问题):<br>'+
+        '<code style="display:block;margin-top:6px;padding:8px;background:rgba(0,0,0,.2);border-radius:4px;font-family:monospace;font-size:11px;white-space:pre-wrap;">'+
+        (e && e.message ? e.message : String(e)) + '\n' +
+        (e && e.stack ? e.stack.split('\n').slice(0,4).join('\n') : '') +
+        '</code></div>';
+    }
+  }
+  function renderFinalCandInner(){
+    var sel=document.getElementById('finalCandBody'); if(!sel) return;
+    var el = sel;
     var D=window.FINAL_RECOMMEND_DATA||null;
     if(!D || !D.all_candidates || !D.all_candidates.length){
       el.innerHTML='<div class="note" style="padding:16px;text-align:center;color:var(--dim)">候选池数据暂不可用（等待盘后算法生成）</div>';
