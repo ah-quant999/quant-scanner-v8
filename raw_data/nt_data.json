@@ -1,17 +1,17 @@
 {
-  "update_time": "2026-08-12 20:59",
+  "update_time": "2026-08-12 21:08",
   "alerts": [
     {
       "type": "summary",
       "severity": "low",
       "message": "ETF监测中，11涨1跌",
-      "time": "20:59"
+      "time": "21:08"
     },
     {
       "type": "etf",
       "severity": "medium",
       "message": "5G通信ETF 大涨 3.05%",
-      "time": "21:00"
+      "time": "21:09"
     }
   ],
   "etfFlow": {

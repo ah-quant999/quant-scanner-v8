@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-12 21:00",
+  "update_time": "2026-08-12 21:09",
   "data_type": "real",
   "summary": {
     "in_count": 40,
@@ -120,7 +120,7 @@
     {
       "name": "半导体",
       "net": 128.03,
-      "net_5d": 2137.32,
+      "net_5d": 1674.3,
       "net_20d": 0,
       "type": "行业",
       "consecutive_days": 2,
@@ -336,8 +336,8 @@
     {
       "name": "阿里巴巴概念",
       "net": 61.96,
-      "net_5d": 372.87,
-      "net_20d": 4072.61,
+      "net_5d": 312.15,
+      "net_20d": 4836.14,
       "type": "概念",
       "consecutive_days": 2,
       "trend": "in"
@@ -354,8 +354,8 @@
     {
       "name": "比亚迪概念",
       "net": 57.2,
-      "net_5d": 1031.82,
-      "net_20d": -336.88,
+      "net_5d": 855.93,
+      "net_20d": 2276.99,
       "type": "概念",
       "consecutive_days": 2,
       "trend": "in"
@@ -483,7 +483,7 @@
     {
       "name": "半导体",
       "net": 128.03,
-      "net_5d": 2137.32,
+      "net_5d": 1674.3,
       "net_20d": 0,
       "type": "行业",
       "consecutive_days": 2,
@@ -699,8 +699,8 @@
     {
       "name": "阿里巴巴概念",
       "net": 61.96,
-      "net_5d": 372.87,
-      "net_20d": 4072.61,
+      "net_5d": 312.15,
+      "net_20d": 4836.14,
       "type": "概念",
       "consecutive_days": 2,
       "trend": "in"
@@ -717,8 +717,8 @@
     {
       "name": "比亚迪概念",
       "net": 57.2,
-      "net_5d": 1031.82,
-      "net_20d": -336.88,
+      "net_5d": 855.93,
+      "net_20d": 2276.99,
       "type": "概念",
       "consecutive_days": 2,
       "trend": "in"
@@ -899,7 +899,7 @@
     {
       "name": "半导体",
       "net": 128.03,
-      "net_5d": 2137.32,
+      "net_5d": 1674.3,
       "net_20d": 0,
       "type": "行业",
       "consecutive_days": 2,
@@ -909,8 +909,8 @@
     {
       "name": "比亚迪概念",
       "net": 57.2,
-      "net_5d": 1031.82,
-      "net_20d": -336.88,
+      "net_5d": 855.93,
+      "net_20d": 2276.99,
       "type": "概念",
       "consecutive_days": 2,
       "trend": "in",
@@ -919,8 +919,8 @@
     {
       "name": "阿里巴巴概念",
       "net": 61.96,
-      "net_5d": 372.87,
-      "net_20d": 4072.61,
+      "net_5d": 312.15,
+      "net_20d": 4836.14,
       "type": "概念",
       "consecutive_days": 2,
       "trend": "in",
@@ -932,8 +932,8 @@
     {
       "name": "阿里巴巴概念",
       "net": 61.96,
-      "net_5d": 372.87,
-      "net_20d": 4072.61,
+      "net_5d": 312.15,
+      "net_20d": 4836.14,
       "type": "概念",
       "consecutive_days": 2,
       "trend": "in",
@@ -942,8 +942,8 @@
     {
       "name": "比亚迪概念",
       "net": 57.2,
-      "net_5d": 1031.82,
-      "net_20d": -336.88,
+      "net_5d": 855.93,
+      "net_20d": 2276.99,
       "type": "概念",
       "consecutive_days": 2,
       "trend": "in",
