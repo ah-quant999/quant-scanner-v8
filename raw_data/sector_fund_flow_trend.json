@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-12 16:19",
+  "update_time": "2026-08-12 17:17",
   "data_type": "real",
   "summary": {
     "in_count": 40,
@@ -114,7 +114,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "行业",
-      "consecutive_days": 3,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -204,7 +204,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 3,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -267,7 +267,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 3,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -321,7 +321,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 1,
       "trend": "in"
     },
     {
@@ -477,7 +477,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "行业",
-      "consecutive_days": 3,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -567,7 +567,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 3,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -630,7 +630,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 3,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -684,7 +684,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 1,
       "trend": "in"
     },
     {
@@ -779,7 +779,7 @@
       "trend": "in"
     },
     "通信设备": {
-      "days": 3,
+      "days": 2,
       "trend": "in"
     },
     "半导体": {
@@ -819,7 +819,7 @@
       "trend": "in"
     },
     "小米概念": {
-      "days": 3,
+      "days": 2,
       "trend": "in"
     },
     "光伏概念": {
@@ -847,7 +847,7 @@
       "trend": "in"
     },
     "F5G概念": {
-      "days": 3,
+      "days": 2,
       "trend": "in"
     },
     "创投": {
@@ -871,7 +871,7 @@
       "trend": "in"
     },
     "MiniLED": {
-      "days": 2,
+      "days": 1,
       "trend": "in"
     },
     "第三代半导体": {
