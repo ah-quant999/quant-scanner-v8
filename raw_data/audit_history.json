@@ -1,0 +1,32 @@
+[
+ {
+  "date": "2026-08-12",
+  "time": "20:52:00",
+  "overall": "warn",
+  "summary": {
+   "ok": 41,
+   "warn": 4,
+   "fail": 1,
+   "total": 46
+  },
+  "warn_items": [
+   {
+    "id": "a_share_gold_pool",
+    "name": "黄金池 A股覆盖",
+    "message": "🚨 URGENT: 黄金池 全港股（5/5），A 股扫描失败/上游路径 bug！"
+   },
+   {
+    "id": "a_share_triple_consensus",
+    "name": "三重共识 A股覆盖",
+    "message": "⚠️ 三重共识 今日 0 只（弱市真实状态可接受）"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "local_head_sync",
+    "name": "本地与 origin/main 同步",
+    "message": "本地 8e110fc / origin/main 3d13d93 本地落后，需 pull/push"
+   }
+  ]
+ }
+]

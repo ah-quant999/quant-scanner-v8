@@ -1,0 +1,117 @@
+# 九宝量化 v8.0 — 🧾 每日全站审核（22:30 CST，每晚 23:00 备份前）
+#
+# 主人令（2026-08-12 20:52）：「每晚23点备份前，在云端运行，做一个全站审核的任务建议吗？
+#   你总是出错，很担心！」
+# 背景：8 天三重共识全港股 bug 因健康检查漏洞长期未发现（空 stocks 豁免 + 只盯 Top3）。
+#   本 workflow 作为每日「全站体检」：比 v8_backup（23:00 CST）早 30 分钟跑，
+#   用 v8_health_check.py 全量检查 + 自愈派发 + 邮件告警 + 审核历史落盘。
+#
+# 审核范围（v8_health_check.py 全部检查项）：
+#   1. check_data_cards        所有 data/*.js 更新新鲜度 + 关键字段空值
+#   2. check_a_share_coverage  8 大池 A 股覆盖（全港股/0 只 → URGENT 告警）  ← 主人紧急令
+#   3. check_raw_data          raw_data 关键文件完整性
+#   4. check_site_deploy_sync  GitHub Pages 部署同步（token 修复后不再误报）
+#   5. check_runner / check_local_head_sync  runner 与仓库同步
+#   6. check_signal_date_freshness / check_top10_history_depth  内容级陈旧
+#   7. _check_workflow_durations  管线耗时趋势
+#   8. --site: 线上 DOM 空值
+#
+# 动作：发现问题 → 自愈派发（--heal 默认开）→ 邮件告警（--alert）→
+#       审核历史写入 raw_data/audit_history.json → push 触发 build → 前端可看历史。
+
+name: "🧾 v8 每日全站审核(22:30 备份前)"
+
+on:
+  schedule:
+    # UTC 14:30 = CST 22:30（比 v8_backup 的 23:00 早 30 分钟）
+    - cron: '30 14 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: v8-daily-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      REPO: ah-quant999/quant-scanner-v8
+      # 🔴 2026-08-12 修复：用 PAT（含 repo+actions 权限），默认 GITHUB_TOKEN 权限不足
+      V8_GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: "🩺 全站审核（数据卡/覆盖/部署/内容）"
+        id: audit
+        continue-on-error: true
+        run: |
+          echo "=== 🧾 每日全站审核 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') ==="
+          python v8_health_check.py --alert --site 2>&1 | tee audit_output.txt
+          echo "AUDIT_EXIT=$?"
+          echo "PYTHON_EXIT=$?"
+
+      - name: "📦 追加审核历史（raw_data/audit_history.json）"
+        run: |
+          python - <<'EOF'
+          import json, os, datetime
+          # 读 health report（v8_health_check 已生成 .workbuddy/v8_health_report.json）
+          rep = {}
+          try:
+              rep = json.load(open('.workbuddy/v8_health_report.json', encoding='utf-8'))
+          except Exception as e:
+              print('health report 读取失败:', e)
+          rec = {
+              "date": datetime.datetime.now().strftime('%Y-%m-%d'),
+              "time": datetime.datetime.now().strftime('%H:%M:%S'),
+              "overall": rep.get("overall", "unknown"),
+              "summary": rep.get("summary", {}),
+              "warn_items": [{"id": x.get("id"), "name": x.get("name"), "message": (x.get("message") or "")[:120]}
+                             for x in rep.get("items", []) if x.get("status") == "warn"],
+              "fail_items": [{"id": x.get("id"), "name": x.get("name"), "message": (x.get("message") or "")[:120]}
+                             for x in rep.get("items", []) if x.get("status") == "fail"],
+          }
+          hist = []
+          try:
+              hist = json.load(open('raw_data/audit_history.json', encoding='utf-8'))
+          except Exception:
+              hist = []
+          # 同一天只保留最新一条（覆盖当天）
+          hist = [h for h in hist if h.get("date") != rec["date"]]
+          hist.append(rec)
+          hist = hist[-90:]  # 保留 90 天
+          with open('raw_data/audit_history.json', 'w', encoding='utf-8') as f:
+              json.dump(hist, f, ensure_ascii=False, indent=1)
+          print('✅ 审核记录:', rec["date"], rec["overall"], rec["summary"])
+          print('   warn:', len(rec["warn_items"]), 'fail:', len(rec["fail_items"]))
+          EOF
+
+      - name: "🚀 推送审核记录（触发 build_deploy 前端展示）"
+        run: |
+          git config user.name "v8-audit-bot"
+          git config user.email "v8-audit-bot@users.noreply.github.com"
+          git add raw_data/audit_history.json
+          if git diff --cached --quiet; then
+            echo "无审核记录变更，跳过 push"
+          else
+            git commit -m "audit: 每日全站审核 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
+            git push origin main 2>&1 | tail -2 || echo "push 失败（可能被云端 build 抢占，下次 cron 会自动重试）"
+          fi
+
+      - name: "📊 审核摘要"
+        if: always()
+        run: |
+          echo "## 🧾 v8 每日全站审核 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')" >> $GITHUB_STEP_SUMMARY
+          tail -30 audit_output.txt >> $GITHUB_STEP_SUMMARY || true
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**主人提醒**：发现问题已邮件告警（--alert）+ 自愈派发（--heal 默认开）。备份在 23:00 自动执行。" >> $GITHUB_STEP_SUMMARY
