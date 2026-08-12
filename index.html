@@ -10351,8 +10351,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     }
     var showCount=Math.min(shData.length,6);
     var idxStep=Math.max(1,Math.floor((shData.length-1)/(showCount-1)));
-    for(var si=0; si<shData.length; si+=idxStep){
-      var i=si>=shData.length?shData.length-1:si;
+    // 🔴 2026-08-12 修复：原循环 for(si=0; si<shData.length; si+=idxStep) 含最后一个，
+    // 与下方单独渲染的最后一个标签位置完全重叠→ 主人截图「8/0711」即为「8/07」与「11」挤压。
+    // 改为循环不包含最后一个，统一由下方单独高亮渲染。
+    for(var si=0; si<shData.length-1; si+=idxStep){
+      var i=si;
       var x=xScale(i);
       var dt=shData[i].date||'';
       if(dt && dt.length===8 && dt.indexOf('/')<0) dt=dt.slice(4,6)+'/'+dt.slice(6);
@@ -10415,8 +10418,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     }
     var showCount=Math.min(shData.length,6);
     var idxStep=Math.max(1,Math.floor((shData.length-1)/Math.max(1,showCount-1)));
-    for(var si=0; si<shData.length; si+=idxStep){
-      var i=si>=shData.length?shData.length-1:si;
+    // 🔴 2026-08-12 修复：与两融 chart 一致——循环不包含最后一个，避免与下方单独高亮重叠
+    for(var si=0; si<shData.length-1; si+=idxStep){
+      var i=si;
       var x=xScale(i);
       var dt=shData[i].date||'';
       if(dt && dt.length===8 && dt.indexOf('/')<0) dt=dt.slice(4,6)+'/'+dt.slice(6);
