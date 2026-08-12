@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-12 17:15:42",
+  "update_time": "2026-08-12 17:20:09",
   "data_date": "2026-08-12",
   "track_start": "2026-08-09",
   "history_days": 4,
@@ -9,27 +9,9 @@
   "alerts": [
     {
       "level": "warn",
-      "code": "300760",
-      "name": "",
-      "text": "(300760) 于 2026-08-10 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "warn",
-      "code": "600519",
-      "name": "",
-      "text": "(600519) 于 2026-08-10 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "warn",
       "code": "300613",
       "name": "",
       "text": "(300613) 于 2026-08-10 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "warn",
-      "code": "688183",
-      "name": "",
-      "text": "(688183) 于 2026-08-10 跌出共识（曾连续 1 日）"
     },
     {
       "level": "warn",
@@ -93,7 +75,7 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测",
-    "latest_date": "2026-08-11",
+    "latest_date": "2026-08-12",
     "total": 183,
     "best_hold_days": 1,
     "periods": {
