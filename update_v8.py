@@ -148,7 +148,15 @@ CATEGORY_MAP = {
     "EXPERIMENT": "post_close",
     "STOCK_LIST": "post_close",
     "STOCK_PROFILE": "post_close",
-    "AVG_PRICE_DATA": "post_close",
+    # 2026-08-12 根因修复：AVG_PRICE_DATA 在 cloud_fetch_v8.py 里是 intraday（盘中每周期抓），
+    # 此处却误标 post_close，造成两个问题：
+    #   ① `update_v8.py --category intraday` 静默跳过它 → 盘中 data/AVG_PRICE_DATA.js 不重建
+    #      （个股查询「平均股价/持仓摘要行」和 AI 速览买卖信号都读它，盘中会看到旧值）
+    #   ② --detect-changes 是「按类别」重建（build() line 618-624）：盘中推一个 avg_price_data.json
+    #      → 类别判成 post_close → 整个 post_close 类别（SH_FIB/SZ_FIB 等约30个文件）被重建 republish
+    #      → mtime 被刷新 → cache-buster 全天无意义抖动（长期记忆里那个怪现象的根源）
+    # 与 fetch 侧对齐为 intraday 后，两个问题一并消除。
+    "AVG_PRICE_DATA": "intraday",
 }
 
 CATEGORY_LABEL = {

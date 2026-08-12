@@ -1215,7 +1215,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div style="padding:14px 16px;background:var(--card2);border-radius:10px;border:1px solid var(--border);">
         <div style="font-size:13px;color:var(--txt);font-weight:700;margin-bottom:10px;">查询后会展示该标的在本站中的扩展信息：</div>
         <ul style="margin:0;padding:0;font-size:12.5px;line-height:1.9;color:var(--txt);list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:2px 24px;">
+          <li>⚡ <b>操作信号（置顶）</b>：6 维综合买卖判断 → 🟢偏多机会 / 🔴建议减仓 / ⏸中性观望</li>
           <li>📊 <b>实时行情</b>：现价、涨跌幅、成交量/额、今开/昨收/最高/最低</li>
+          <li>📐 <b>平均股价/持仓摘要</b>：全A等权均价 vs MA20/60 + 弱MA提示 + 我的持仓成本（实时行情卡内）</li>
           <li>🎯 <b>止盈止损</b>：止损位、目标位、盈亏比、操作建议</li>
           <li>🏷 <b>概念行业概览</b>：板块、行业、题材概念标签</li>
           <li>🎖️ <b>选股策略命中</b>：是否命中三重共识、金股池、候选池、驾驶舱 A/B 档、逆势龙头、四量终极</li>
@@ -4828,7 +4830,9 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-h">查询后会展示什么</div>
         <div class="logic-p">
           <ul style="margin:6px 0 0 0;padding:0;font-size:12.5px;line-height:1.9;color:var(--txt);list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:2px 24px;">
+            <li>⚡ <b>操作信号（置顶）</b>：6 维综合买卖判断 → 🟢偏多机会 / 🔴建议减仓 / ⏸中性观望</li>
             <li>📊 <b>实时行情</b>：现价、涨跌幅、成交量/额、今开/昨收/最高/最低</li>
+            <li>📐 <b>平均股价/持仓摘要</b>：全A等权均价 vs MA20/60 + 弱MA提示 + 我的持仓成本（实时行情卡内）</li>
             <li>🎯 <b>止盈止损</b>：止损位、目标位、盈亏比、操作建议</li>
             <li>🏷 <b>概念行业概览</b>：板块、行业、题材概念标签</li>
             <li>🎖️ <b>选股策略命中</b>：是否命中三重共识、金股池、候选池、驾驶舱 A/B 档、逆势龙头、四量终极</li>
@@ -4908,10 +4912,55 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <b>不显示规则</b>：股票不在候选池 → 综合财务画像段不渲染（不显示「无财务数据」占位）；v8 全市场 5537 候选池内股票才有。</div>
         <div class="logic-h">止盈止损口径（v8 升级版，三档目标）</div>
         <div class="logic-p">· <b>止损</b> = max(当前价×0.93, 当日最低价×0.99)，至少留 1% 缓冲<br>· <b>短线目标</b> = 当前价×1.07（+7%）· <b>中线目标</b> = 当前价×1.12（+12%）· <b>强势目标</b> = 当前价×1.15（+15%）<br>· <b>盈亏比</b> = 短线收益 / 止损亏损，≥2 优秀 / 1.5-2 一般 / &lt;1.5 较差<br>· 波动率 = max(当日振幅, 当前价×1.5%)，&gt;4% 高波动 / &gt;2% 中波动 / 其余低波动<br>· 操作提示按当日涨跌：涨 ≥5% 追高谨慎 / 跌 ≥5% 警惕破位 / 其余中性可分批建仓</div>
-        <div class="logic-h">个股查询网格卡片清单（2026-08-06 清理后）</div>
+        <div class="logic-h">个股查询网格卡片清单（2026-08-12 更新）</div>
         <div class="logic-p">页面只保留「有数据才显示」的卡，<b>没有数据整张卡不渲染</b>，网格自动重排避免「每只都空着不好看」：<br>
-        · 📊 <b>实时行情</b>（全市场 5537 只必有 · 含分时概要 + 股息分红 + 综合财务画像）<br>· 🎯 <b>止盈止损</b>（基于实时行情 · 全市场 5537 只一定有）<br>· 🏷️ <b>概念行业</b>（4801 只候选池 + fallback 全市场 · 高覆盖）<br>· 🎖️ <b>选股策略命中</b>（候选池 350 只命中才显示，0 不渲染）<br>· 💧 <b>关联板块资金流向</b>（板块+概念有数据才显示，无不渲染）<br>· 🐉 <b>龙虎榜</b>（当日上榜 40 只才显示，非上榜日不渲染）<br>· 🚫 <b>停牌识别</b>（仅停牌股显示，未在停牌清单不渲染）<br>
+        · ⚡ <b>操作信号</b>（<b style="color:var(--gold)">置顶整幅面板，非网格内卡片</b> · 有行情即出，结论先行）<br>
+        · 📊 <b>实时行情</b>（全市场 5537 只必有 · 含分时概要 + 股息分红 + 综合财务画像 + <b>📐平均股价/持仓摘要行</b>）<br>· 🎯 <b>止盈止损</b>（基于实时行情 · 全市场 5537 只一定有）<br>· 🏷️ <b>概念行业</b>（4801 只候选池 + fallback 全市场 · 高覆盖）<br>· 🎖️ <b>选股策略命中</b>（候选池 350 只命中才显示，0 不渲染）<br>· 💧 <b>关联板块资金流向</b>（板块+概念有数据才显示，无不渲染）<br>· 🐉 <b>龙虎榜</b>（当日上榜 40 只才显示，非上榜日不渲染）<br>· 🚫 <b>停牌识别</b>（仅停牌股显示，未在停牌清单不渲染）<br>
         · <b>已删除的永远空卡</b>：三重共识/全站精选/主力资金/近10日走势/EMA趋势/投行研报（事件型或需日 K 库——前者永远只对特定股票，后者需建库，工作量大；后续如需可单独立项做「日 K 行情库 v8.5」）</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">⚡</span>个股操作信号面板 - 说明（2026-08-12 新增）</h3>
+        <div class="logic-h">为什么做这个</div>
+        <div class="logic-p"><b>2026-08-12 主人令：「我希望给我买入卖出的判断，不纯是数据」</b>。原个股查询 6 张卡全是原始数据（价格/止损位/基本面/策略命中），要自己脑内综合才能得出结论。此面板把这些数据<b>汇总成一个明确结论</b>，并<b>置顶在网格之上</b>——先看判断，再看支撑数据。</div>
+        <div class="logic-h">判定规则（6 维打分 → 综合结论）</div>
+        <table class="lg-table">
+          <tr><th>维度</th><th>触发条件</th><th>给出的结论</th><th>分值</th></tr>
+          <tr><td rowspan="3"><b>① 持仓盈亏</b></td><td>浮盈 ≥ +20%</td><td>建议分批止盈</td><td style="color:var(--down)">-1</td></tr>
+          <tr><td>深套 ≤ -15%</td><td>补仓摊薄或止损抉择</td><td style="color:var(--down)">-1</td></tr>
+          <tr><td>其余区间</td><td>持有观察</td><td>0</td></tr>
+          <tr><td rowspan="4"><b>② 止损/目标位</b><br><span style="font-size:10px;color:var(--dim)">锚点：精算表优先<br>回落「我的持仓成本」</span></td><td>现价 ≤ 止损线</td><td>执行纪律离场</td><td style="color:var(--down)"><b>-3</b>（最重）</td></tr>
+          <tr><td>距止损线 &lt; 5%</td><td>高度警戒</td><td style="color:var(--down)">-1</td></tr>
+          <tr><td>已达/超过目标价</td><td>可获利了结</td><td style="color:var(--up)">+1</td></tr>
+          <tr><td>距目标价 ≤ 3%</td><td>准备了结</td><td style="color:var(--up)">+1</td></tr>
+          <tr><td rowspan="2"><b>③ 日内极值</b></td><td>涨幅 ≥ +9.5%（涨停/暴涨）</td><td>不追高</td><td style="color:var(--down)">-1</td></tr>
+          <tr><td>跌幅 ≤ -5%（暴跌）</td><td>超卖关注</td><td style="color:var(--up)">+1</td></tr>
+          <tr><td rowspan="2"><b>④ 基本面</b></td><td>财务画像评级 A（绩优）</td><td>回调逢低关注</td><td style="color:var(--up)">+1</td></tr>
+          <tr><td>财务画像评级 D（差）</td><td>规避</td><td style="color:var(--down)">-1</td></tr>
+          <tr><td rowspan="2"><b>⑤ 策略共振</b></td><td>≥ 3 个策略池同时命中</td><td>强共识买点</td><td style="color:var(--up)"><b>+2</b></td></tr>
+          <tr><td>1~2 个策略池命中</td><td>有支撑</td><td style="color:var(--up)">+命中数</td></tr>
+          <tr><td rowspan="2"><b>⑥ 量能异动</b></td><td>成交额 &gt; 3 亿 且 当日上涨</td><td>放量上攻·资金进场</td><td style="color:var(--up)">+1</td></tr>
+          <tr><td>成交额 &gt; 3 亿 且 当日下跌</td><td>放量下跌·资金出逃</td><td style="color:var(--down)">-1</td></tr>
+        </table>
+        <div class="logic-h">综合结论口径</div>
+        <div class="logic-p">· 总分 <b>≥ +2</b> → <b style="color:var(--up)">🟢 偏多机会</b><br>· 总分 <b>≤ -2</b> → <b style="color:var(--down)">🔴 建议减仓/观望</b><br>· 总分 <b>-1 ~ +1</b> → <b style="color:var(--gold)">⏸ 中性观望</b><br>
+        <b>设计取舍</b>：「已跌破止损线」给 -3 是刻意的——纪律优先于任何看多理由，单这一条就能把结论压成红灯。<b>无任何维度触发时</b>显示「当前无显著买卖信号，维持观望」，不强行编结论。</div>
+        <div class="logic-h">⚠️ 第②维为何不用「止盈止损」卡的兜底公式（2026-08-12 修正）</div>
+        <div class="logic-p">🎯止盈止损卡在缺精算数据时会回退 <code>止损位 = 现价×(1-7%)</code>（创业/科创/港股 10%）。这个位置<b>随现价浮动，与现价永远保持 7% 恒定距离</b>——代入「距止损 &lt;5%」判定则恒为 7%、永不成立，「已跌破」更不可能，整维退化成<b>死代码</b>。<br>
+        因此操作信号只认<b>与现价无关的绝对锚点</b>：① <code>STOCK_STOP_DATA</code> 精算位（近20日窗口 + 固定10%止损 + R:R=1.5，<b>当前仅收录少量个股</b>）；② <b>我的持仓成本</b>（成本×(1-7%) 为止损线、成本×(1+10.5%) 为目标线）。两者都没有时<b>整维静默、不出信号</b>，绝不用无信息量的公式伪造判断。<br>
+        <b>推论</b>：非持仓且未被精算收录的股票，第②维不参与打分——这是正确行为，不是缺陷。持仓股则一定有止损/目标判断，正好覆盖最需要纪律的场景。</div>
+        <div class="logic-h">策略共振统计哪 5 个池</div>
+        <div class="logic-p"><code>CANDIDATE</code>（候选池）· <code>GOLD_POOL</code>（金股池）· <code>COCKPIT_TIER_RECOMMEND</code>（驾驶舱分档）· <code>CRDS_CARD_DATA</code>（逆势龙头）· <code>FOUR_VOLUME</code>（四量终极）。同一只股票在几个池里就计几次，命中数越多说明多套独立算法在同一标的上取得一致，共识越强。</div>
+        <div class="logic-h">📐 平均股价/持仓摘要行（实时行情卡内）</div>
+        <div class="logic-p">位于实时行情卡底部的青色条，回答「<b>现在大盘水位如何 + 我这只的成本在哪</b>」：<br>
+        · <b>全A等权均价</b>及当日涨跌（<code>AVG_PRICE_DATA.avg_price / avg_change_pct</code>）<br>
+        · <b>vs 20日線 / 60日線</b> 偏离百分比 + 均线绝对值（<code>position_vs_ma20 / position_vs_ma60 / ma20 / ma60</code>）<br>
+        · <b>⚠️弱MA20/60</b>：均价跌破对应均线时亮红字，提示大盘处弱势环境，个股信号需打折看<br>
+        · <b>持本 ¥X N只</b>：我的真实持仓成本与股数（<code>PORTFOLIO_COST</code> 优先，回落 <code>PORTFOLIO_DATA.positions[].cost</code>）；非持仓股不显示该段</div>
+        <div class="logic-h">数据源与更新</div>
+        <div class="logic-p"><b>纯前端计算，无需新增云端任务</b>——所有输入均复用现有 data/*.js：<code>STOCK_QUOTE</code>（价格/涨跌/成交额/fundamental.grade）、<code>STOCK_STOP_DATA</code>（止损/目标位）、<code>PORTFOLIO_COST</code> + <code>PORTFOLIO_DATA</code>（持仓成本/股数，westock 云端同步）、<code>AVG_PRICE_DATA</code>（全A均价与均线）、5 个策略池。因此<b>刷新页面即随最新数据重算</b>，上午查和下午查会跟着实时变动。</div>
+        <div class="logic-h">代码位置</div>
+        <div class="logic-p"><code>index.html</code> → <code>renderTradeSignals(item, code)</code>（操作信号面板本体）、<code>renderQuote()</code> 内「平均股价/持仓/弱MA摘要行」段、<code>doV8Query()</code> 内 <code>renderTradeSignals</code> 置顶于网格之前。</div>
       </div>
 
       <div class="card">
@@ -5874,16 +5923,27 @@ function switchSec(sec,el){
       else { signals.push({t:'持仓盈亏 '+pl.toFixed(1)+'%',a:'持有观察',c:'sub'}); }
     }
 
-    // 2. 止损/目标位
+    // 2. 止损/目标位 —— 锚点必须与现价无关才有信息量
+    //    优先级：精算表(STOCK_STOP_DATA，当前仅少量股票) > 我的持仓成本 > 不出信号
+    //    ⚠️ 不可用 renderStopStop 的兜底公式(现价×(1-7%))：它与现价恒定距离，riskPct 恒为 7%，永不触发 → 死代码
     const ssd = (window.STOCK_STOP_DATA && window.STOCK_STOP_DATA.stocks) || {};
     const ss = ssd[String(code)] || ssd[fcode];
+    const _brd = item.board_label || (q.board||'');
+    const _stopPct = (_brd==='创业板'||_brd==='科创板'||_brd==='港股') ? 0.10 : 0.07;
+    let stopLine=null, targetLine=null, stopSrc='';
     if(ss && ss.stop_loss!=null){
-      const riskPct = (price-ss.stop_loss)/price*100;
-      if(riskPct<=0){ signals.push({t:'已触止损价',a:'执行纪律离场',c:'down'}); score-=3; }
-      else if(riskPct<5){ signals.push({t:'距止损仅 '+riskPct.toFixed(1)+'%',a:'高度警戒',c:'down'}); score-=1; }
-      if(ss.target_price!=null){
-        const rewPct=(ss.target_price-price)/price*100;
-        if(rewPct<=3){ signals.push({t:'接近目标价',a:'可获利了结',c:'up'}); score+=1; }
+      stopLine = ss.stop_loss; targetLine = ss.target_price; stopSrc='精算';
+    } else if(cost!=null && cost>0){
+      stopLine = cost*(1-_stopPct); targetLine = cost*(1+Math.max(0.105,_stopPct*1.5)); stopSrc='按成本';
+    }
+    if(stopLine!=null){
+      const riskPct = (price-stopLine)/price*100;
+      if(riskPct<=0){ signals.push({t:'已跌破止损线 ¥'+stopLine.toFixed(2)+'（'+stopSrc+'）',a:'执行纪律离场',c:'down'}); score-=3; }
+      else if(riskPct<5){ signals.push({t:'距止损线仅 '+riskPct.toFixed(1)+'%（¥'+stopLine.toFixed(2)+'）',a:'高度警戒',c:'down'}); score-=1; }
+      if(targetLine!=null){
+        const rewPct=(targetLine-price)/price*100;
+        if(rewPct<=0){ signals.push({t:'已达目标价 ¥'+targetLine.toFixed(2)+'（'+stopSrc+'）',a:'可获利了结',c:'up'}); score+=1; }
+        else if(rewPct<=3){ signals.push({t:'接近目标价（还差 '+rewPct.toFixed(1)+'%）',a:'准备了结',c:'up'}); score+=1; }
       }
     }
 
@@ -5924,7 +5984,7 @@ function switchSec(sec,el){
     else if(score<=-2){ verdict='🔴 建议减仓/观望'; vColor='var(--down)'; }
     else { verdict='⏸ 中性观望'; vColor='var(--gold)'; }
 
-    let h='<div style="padding:14px;background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(251,191,36,.03));border-radius:8px;border:1px solid rgba(251,191,36,.25);">';
+    let h='<div style="padding:14px;margin-bottom:14px;background:linear-gradient(135deg,rgba(251,191,36,.10),rgba(251,191,36,.03));border-radius:8px;border:1px solid rgba(251,191,36,.25);">';
     h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span style="font-size:13px;font-weight:700;color:var(--gold);">⚡ 操作信号</span><span style="font-size:14px;font-weight:800;color:'+vColor+';">'+verdict+'</span></div>';
     if(signals.length){
       h+='<div style="display:flex;flex-direction:column;gap:6px;">';
@@ -6171,6 +6231,8 @@ function switchSec(sec,el){
     //  - renderQuote / StopStop / Profile：全市场 5537 只覆盖（必有）
     //  - renderStrategyHits / RelatedFlow / Lhb：含"找不到就不渲染整张"守卫
     //  - 删除原 renderMulti(renderStrategyHits 已含)/ GoldPool(重复)/ Report / Mahoro / Inst / PriceTrend / Ema（事件型永远空）
+    // ⚡ 操作信号置顶（2026-08-12 主人令：要的是买卖判断，不纯是数据 → 结论先行，数据在后）
+    h+=renderTradeSignals(item, code);
     h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:14px;">';
     h+=renderQuote(item, code);
     h+=renderStopStop(item, code);
@@ -6179,7 +6241,6 @@ function switchSec(sec,el){
     h+=renderRelatedFlow(item, code);
     h+=renderLhb(item, code);
     h+='</div>';
-    h+=renderTradeSignals(item, code);
     h+=renderSuspension(item, code);
     res.innerHTML = h;
   };
@@ -7995,7 +8056,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
           {name:'市场资金流向', source:'MARKET_FUND_FLOW_DATA', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'两市净流入'},
 
-          {name:'市场预警', source:'MARKET_ALERTS', freq:'盘中实时', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'量价异常预警'}
+          {name:'市场预警', source:'MARKET_ALERTS', freq:'盘中实时', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'量价异常预警'},
+
+          {name:'📐 平均股价', source:'AVG_PRICE_DATA', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'全A等权均价+MA20/MA60水位（操作信号面板 + AI速览共用锚点）'}
 
         ]
 
@@ -8076,6 +8139,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
           {name:'盘中云端自愈 (v8_intraday_healer)', source:'RUNNER_STATUS', freq:'工作日09:03-15:33每30分', slots:['09:03','09:33','10:03','10:33','11:03','11:33','13:03','13:33','14:03','14:33','15:03','15:33'], note:'检测抓取过期(>45min)自动补跑 · 防 GitHub schedule 漏档 · 纯云端'},
 
           {name:'运维常态巡检 (v8_ops_self_heal)', source:'HEALTH_CHECK', freq:'每30分(云端cron)', slots:['00:30','01:00','01:30','02:00','02:30','03:00','03:30','04:00','04:30','05:00','05:30','06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00','22:30','23:00','23:30'], note:'v8_health_check.py --heal 全站42卡巡检+自动治愈 · 纯云端不依赖小九/阿狸咪'},
+
+          {name:'☁️ 持仓云端同步 (westock)', source:'PORTFOLIO / PORTFOLIO_COST', freq:'盘中每30分', slots:['09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'westock 双机同步·实时持仓成本（操作信号面板②维止损锚点）'}
 
         ]
 

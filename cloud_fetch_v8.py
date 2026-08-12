@@ -107,7 +107,8 @@ CATEGORY_MAP = {
     "MARKET_FUND_FLOW_DATA": "post_close",
     # 15:30 收盘数据：EXPERIMENT 等 akshare 可抓的 T+1 数据
     "EXPERIMENT": "post_close",
-    # 盘后：全A等权平均股价的日内变化 + 中期水位（一次抓取喂两处展示）
+    # 盘中：全A等权平均股价的日内变化 + 中期水位（一次抓取喂两处展示：AI 速览买卖信号 + 个股查询摘要行）
+    # 注：此处曾误写「盘后」注释但取值实为 intraday；2026-08-12 已把 update_v8.py CATEGORY_MAP 同步对齐为 intraday
     "AVG_PRICE_DATA": "intraday",
 }
 
