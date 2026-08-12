@@ -1492,6 +1492,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
             }
             h+='</div>';
           }
+          // ── 综合一句话结论（始终显示，无信号时给中性判断） ──
+          var _verdict='', _vClr='var(--gold)';
+          if(_sigSell.length>=2){ _verdict='🔴 高位警戒，严控仓位'; _vClr='#f87171'; }
+          else if(_sigSell.length===1){ _verdict='🟠 偏高，注意风险'; _vClr='#fbbf24'; }
+          else if(_sigBuy.length>=2){ _verdict='🟢 水位偏低，可分批建仓'; _vClr='#4ade80'; }
+          else if(_sigBuy.length===1){ _verdict='🟡 有超卖信号，轻仓试探'; _vClr='#fbbf24'; }
+          else { _verdict='⏸ 中性水位，观望为主'; _vClr='var(--sub)'; }
+          h+='<div style="margin-top:6px;padding-top:6px;border-top:1px dashed rgba(56,189,248,.2);font-size:11.5px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;">';
+          h+='<span style="font-weight:700;color:'+_vClr+';">'+_verdict+'</span>';
+          h+='</div>';
           h+='</div>';
         })();
 
