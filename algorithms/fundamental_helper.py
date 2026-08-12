@@ -66,6 +66,12 @@ def quality_points(fq):
     if grade == "D" and reason == "无基本面数据":
         grade = ""
 
+    # 🔴 2026-08-12 主人令：港股暂无基本面数据源（reason="港股暂无..."），
+    # 必须强制降权保持公平——否则港股仅靠技术面双真/EMA 等技术分就能与
+    # A 股 grade B(qs=5) 同台竞争甚至反超。qs 减 10，让其在 TOP10/驾驶舱评分中天然劣势
+    # （与 grade D 同档，但保留 grade="" 中性兜底，避免误判）。
+    is_hk = "港股" in reason
+
     roe = fq.get("roe")
     rev = fq.get("revenue_growth")
     if grade == "A":
@@ -86,6 +92,10 @@ def quality_points(fq):
         qs = -10
     else:
         qs = 0  # C 或 中性("")
+
+    # 港股降权（2026-08-12 主人令）：无基本面数据必须降权，否则对 A 股 grade B 不公平
+    if is_hk:
+        qs -= 10
 
     # 消息面加减分
     news = fq.get("news") or {}
