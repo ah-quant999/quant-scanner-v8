@@ -1214,7 +1214,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <!-- 个股查询能力清单（与逻辑详解页保持一致） -->
       <div style="padding:14px 16px;background:var(--card2);border-radius:10px;border:1px solid var(--border);">
         <div style="font-size:13px;color:var(--txt);font-weight:700;margin-bottom:10px;">查询后会展示该标的在本站中的扩展信息：</div>
-        <ul style="margin:0;padding:0;font-size:12.5px;line-height:1.9;color:var(--txt);list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:2px 24px;">
+        <ul style="margin:0;padding:0;font-size:12.5px;line-height:1.9;color:var(--txt);list-style:none;display:grid;grid-template-columns:1fr;gap:2px 0;">
           <li>⚡ <b>操作信号（置顶）</b>：6 维综合买卖判断 → 🟢偏多机会 / 🔴建议减仓 / ⏸中性观望</li>
           <li>📊 <b>实时行情</b>：现价、涨跌幅、成交量/额、今开/昨收/最高/最低</li>
           <li>📐 <b>平均股价/持仓摘要</b>：全A等权均价 vs MA20/60 + 弱MA提示 + 我的持仓成本（实时行情卡内）</li>
@@ -5657,10 +5657,13 @@ function switchSec(sec,el){
     return [];
   }
   // 2026-08-11 一劳永逸：统一搜索内核（拼音/代码/名称），所有搜索入口复用此函数
+  // 🔴 2026-08-12 修复：normCode 只剥 sh_/sz_/hk_/bj_ 前缀，对 query 含「名称+空格+代码」格式
+  //    失效（qc 含中文/空格 → sc===qc 永不匹配 → 返回空）。现对 query 再剥非数字字符
+  //    → 002739/儒意电影 002739/茅台 600519 等混合 query 都能按代码命中。
   function _uniSearch(q, limit){
     const list = stockListArray();
     if(!q || !list.length) return [];
-    const qc = normCode(q), ql = q.toLowerCase();
+    const qc = normCode(q).replace(/[^\d]/g, ''), ql = q.toLowerCase();
     const isAlphaOnly = qc === '' && ql.length > 0;
     const scored = [];
     for(let i=0;i<list.length;i++){
