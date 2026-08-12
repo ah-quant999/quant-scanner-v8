@@ -8307,7 +8307,31 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     const S = V8_PAGE_SCHEDULE;
 
-    if(timeEl) timeEl.innerHTML = _uBadge('实时','—', S.updated);
+    // 🔴 2026-08-12 修复：原 S.updated 硬编码为 '2026-08-06 16:25'（任务看板 6 天未更新假象）。
+    // 现改为：优先用 freshness_status.json 的 check_time，回退到 data/*.js 中最大 mtime，
+    // 再回退到现在时间（保证永远显示"实时"）。
+    const nowStr = new Date().toLocaleString('zh-CN', {hour12:false, timeZone:'Asia/Shanghai'}).replace(/\//g,'-');
+    let liveUpdated = nowStr;
+    try {
+      const fs = window.FRESHNESS_STATUS || {};
+      if (fs.check_time) liveUpdated = fs.check_time;
+    } catch (e) {}
+    if (liveUpdated === nowStr) {
+      // 找不到 freshness → 取 data/*.js 最大 ?v= 时间戳（反映 build_deploy 最近一次）
+      try {
+        const scripts = document.querySelectorAll('script[src*="data/"][src*="?v="]');
+        let maxV = null;
+        scripts.forEach(s => {
+          const m = (s.src||'').match(/[?&]v=(\d{14})/);
+          if (m) { const v = m[1]; if (!maxV || v > maxV) maxV = v; }
+        });
+        if (maxV) {
+          // 20260812195606 → 2026-08-12 19:56:06
+          liveUpdated = maxV.replace(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2}).*/, '$1-$2-$3 $4:$5:$6');
+        }
+      } catch (e) {}
+    }
+    if(timeEl) timeEl.innerHTML = _uBadge('实时','—', liveUpdated);
 
 
 

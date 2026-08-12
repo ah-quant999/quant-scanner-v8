@@ -51,7 +51,10 @@ jobs:
     timeout-minutes: 15
     env:
       REPO: ah-quant999/quant-scanner-v8
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # 🔴 2026-08-12 修复：原 GH_TOKEN=secrets.GITHUB_TOKEN（默认 actions token 权限不足，
+      # 调 /deployments 与 /pages/builds/latest 报 401，"API: no token" 误告警）。
+      # 现改用 V8_GITHUB_TOKEN=secrets.V8_GH_TOKEN（与 v8_build_deploy.yml 一致，PAT 含 repo+actions 权限）。
+      V8_GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:

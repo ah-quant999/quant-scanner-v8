@@ -217,14 +217,22 @@ def _load_token():
         v = os.environ.get(env_name)
         if v:
             return v
-    # 本机/开发环境：读 .workbuddy/v8_gh_token.txt
+    # 本机/开发环境：依次尝试多个候选（2026-08-12 增加 data/.github_pat.txt：
+    # 之前 v8_ops_self_heal 注入 GH_TOKEN=默认 token，云端 _load_token 回退到 quant-scanner-v8 旧路径失败；
+    # 现统一指向仓库内 data/.github_pat.txt（与 scripts/monitor_*.py 同源，最稳定））。
+    _this_dir = Path(__file__).resolve().parent
     candidates = [
-        Path("E:/workspace/quant-scanner-v8/.workbuddy/v8_gh_token.txt"),
-        Path.home() / ".workbuddy" / "v8_gh_token.txt",
+        _this_dir / "data" / ".github_pat.txt",          # 仓库根/data/.github_pat.txt（推荐）
+        Path.home() / ".workbuddy" / "v8_gh_token.txt",  # 用户级 workbuddy token
     ]
     for p in candidates:
         if p.exists():
-            return p.read_text(encoding="utf-8").strip()
+            try:
+                t = p.read_text(encoding="utf-8").strip().lstrip("\ufeff")
+                if t:
+                    return t
+            except Exception:
+                continue
     return None
 
 
