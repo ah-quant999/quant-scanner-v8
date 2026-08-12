@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-08-12 03:16:31",
+  "check_time": "2026-08-12 10:10:26",
   "last_trade_close": "2026-08-11 15:30:00",
   "core_stale": [],
   "warn_stale": [],
@@ -65,7 +65,7 @@
     "EXPERIMENT": "post_close",
     "STOCK_LIST": "post_close",
     "STOCK_PROFILE": "post_close",
-    "AVG_PRICE_DATA": "post_close"
+    "AVG_PRICE_DATA": "intraday"
   },
   "category_label": {
     "premarket": "盘前",
