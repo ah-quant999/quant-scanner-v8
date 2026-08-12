@@ -152,11 +152,43 @@ def _is_trading_day(d=None):
         pass
     return True
 
+def _is_empty_payload(obj):
+    """判断抓取结果是否为空/无效，避免把空壳数据写入 raw_data 并刷新 update_time。
+
+    空数据不写文件，远端在 api_push_raw.py 防倒退守卫下会保留上一版有效数据，
+    从而根治「抓取失败但 update_time 被刷新」的假刷新问题。
+    """
+    if obj is None:
+        return True
+    if isinstance(obj, (list, tuple, set)):
+        return len(obj) == 0
+    if isinstance(obj, dict):
+        # 仅含 update_time / 日期 / 空 data 占位也算空
+        if not obj:
+            return True
+        data = obj.get("data")
+        if data is not None and not data and len(obj) <= 3:
+            return True
+        # 对于非列表型 data，若核心字段全空也视为空
+        core_keys = ["items", "data", "records", "list", "history", "amount_history",
+                     "daily_stats", "up_down", "nodes", "edges"]
+        if not any(k in obj for k in core_keys):
+            if all(not v for v in obj.values() if v not in (True, False)):
+                return True
+    return False
+
+
 def save(var, obj):
     fname = VAR_TO_RAW.get(var)
     if not fname:
         return
     obj = obj if isinstance(obj, dict) else {"data": obj}
+    # 🛡️ 2026-08-12 根治假刷新：空/无效数据不写文件、不刷新 update_time，
+    #    保留远端旧数据供前端继续使用。
+    if _is_empty_payload(obj):
+        print(f"  ⚠️ {var}: 空/无效数据，跳过写入（保留远端旧数据）")
+        _run_status[var] = {"status": "empty", "msg": "空数据跳过"}
+        return
     obj["update_time"] = now_cst().strftime("%Y-%m-%d %H:%M:%S")
     path = RAW_DIR / fname
     with open(path, "w", encoding="utf-8") as f:
@@ -862,6 +894,20 @@ def run(label, fn, retries=2):
             time.sleep(2)
     print(f"  🚫 {label} 跳过，最终错误: {type(last_err).__name__}: {last_err}")
     time.sleep(0.5)
+
+
+def _has_critical_failures(category):
+    """判断本次抓取是否存在应让 workflow 失败的严重失败。
+
+    盘中/盘后/盘前任务中，目标类别涉及的核心变量只要有一个失败，即认为本次任务失败，
+    避免 workflow 继续推送空壳数据。
+    """
+    if not _run_status:
+        return False
+    # runner_status 不计入
+    fails = [k for k, v in _run_status.items()
+             if v.get("status") == "fail" and k != "RUNNER_STATUS"]
+    return bool(fails)
 
 # 涨停池缓存（避免 limit_up_heatmap / herding 重复抓取同一份数据）
 _zt_cache = {"date": None, "df": None}
@@ -3085,6 +3131,13 @@ def main(category=None, only=None):
 
     print(f"=== v8 云端抓取结束 {now_cst().isoformat(timespec='seconds')} ===")
     print(f"raw_data/ 文件数: {len(list(RAW_DIR.glob('*.json')))}")
+
+    # 🛡️ 2026-08-12 根治假刷新：有模块失败则返回非零，让 workflow 步骤失败，
+    #    从而不执行后续 push，避免把空壳数据提交到 main。
+    if _has_critical_failures(category):
+        fail_count = sum(1 for v in _run_status.values() if v.get("status") == "fail")
+        print(f"❌ {fail_count} 个模块抓取失败，整体任务标记失败，阻止空壳推送")
+        return 1
     return 0
 
 

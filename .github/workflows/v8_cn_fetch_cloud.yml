@@ -102,7 +102,8 @@ jobs:
           python -c "import akshare, pandas; print('akshare', akshare.__version__, '/ pandas', pandas.__version__)"
 
       - name: "📡 抓中国数据 → raw_data/（selective）"
-        continue-on-error: true
+        # 🛡️ 2026-08-12 移除 continue-on-error：抓取失败必须让 job 失败，
+        #    阻止 api_push_raw 把只刷了 update_time 的空壳数据推送到 main。
         shell: bash
         run: |
           cat="${{ steps.cat.outputs.category }}"

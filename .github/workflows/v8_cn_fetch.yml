@@ -114,7 +114,7 @@ jobs:
           python -c "import akshare; print('akshare', akshare.__version__)"
 
       - name: "📡 抓中国数据 → raw_data/（ selective ）"
-        continue-on-error: true
+        # 🛡️ 2026-08-12 移除 continue-on-error：与云端版一致，抓取失败必须阻止空壳推送。
         shell: powershell
         run: |
           $cat = "${{ steps.cat.outputs.category }}"
