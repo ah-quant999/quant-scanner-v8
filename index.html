@@ -1467,6 +1467,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           h+=' &nbsp;|&nbsp; vs 20日线 '+_pt(ap.position_vs_ma20)+' <span style="color:var(--dim);font-size:11.5px;">(MA20 '+Number(ap.ma20).toFixed(2)+')</span>';
           h+=' &nbsp;|&nbsp; vs 60日线 '+_pt(ap.position_vs_ma60)+' <span style="color:var(--dim);font-size:11.5px;">(MA60 '+Number(ap.ma60).toFixed(2)+')</span>';
           h+=' &nbsp;|&nbsp; 样本 <b>'+(ap.count||'--')+'</b> 只';
+          // ── 综合结论（行内追加，不另起一行） ──
+          var _verdict='', _vClr='var(--gold)';
+          if(_sigSell.length>=2){ _verdict=' 🔴 高位警戒'; _vClr='#f87171'; }
+          else if(_sigSell.length===1){ _verdict=' 🟠 偏高'; _vClr='#fbbf24'; }
+          else if(_sigBuy.length>=2){ _verdict=' 🟢 偏低可建仓'; _vClr='#4ade80'; }
+          else if(_sigBuy.length===1){ _verdict=' 🟡 超卖轻仓'; _vClr='#fbbf24'; }
+          else { _verdict=' ⏸ 中性观望'; _vClr='var(--sub)'; }
+          h+='<span style="margin-left:8px;font-weight:700;color:'+_vClr+';font-size:11.5px;">'+_verdict+'</span>';
           var _warns=[];
           if(_chg!=null && _chg<-0.5) _warns.push('单日跌'+(_chg<0?'':'')+Number(_chg).toFixed(1)+'%');
           if(ap.position_vs_ma20!=null && ap.position_vs_ma20<0) _warns.push('破MA20');
@@ -1492,16 +1500,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
             }
             h+='</div>';
           }
-          // ── 综合一句话结论（始终显示，无信号时给中性判断） ──
-          var _verdict='', _vClr='var(--gold)';
-          if(_sigSell.length>=2){ _verdict='🔴 高位警戒，严控仓位'; _vClr='#f87171'; }
-          else if(_sigSell.length===1){ _verdict='🟠 偏高，注意风险'; _vClr='#fbbf24'; }
-          else if(_sigBuy.length>=2){ _verdict='🟢 水位偏低，可分批建仓'; _vClr='#4ade80'; }
-          else if(_sigBuy.length===1){ _verdict='🟡 有超卖信号，轻仓试探'; _vClr='#fbbf24'; }
-          else { _verdict='⏸ 中性水位，观望为主'; _vClr='var(--sub)'; }
-          h+='<div style="margin-top:6px;padding-top:6px;border-top:1px dashed rgba(56,189,248,.2);font-size:11.5px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;">';
-          h+='<span style="font-weight:700;color:'+_vClr+';">'+_verdict+'</span>';
-          h+='</div>';
           h+='</div>';
         })();
 
@@ -5907,7 +5905,7 @@ function switchSec(sec,el){
       if(vs60!=null) maLine += ' · vs60日線 <span style="color:'+(vs60>=0?'var(--up)':'var(--down)')+'">'+(vs60>=0?'+':'')+vs60.toFixed(2)+'%</span><span style="color:var(--dim);font-size:11px;">(MA60:'+apd.ma60.toFixed(2)+')</span>';
       if(weak20||weak60) maLine += ' · <span style="color:var(--down)">⚠️弱MA'+(weak20?'20':'')+(weak20&&weak60?'/':'')+(weak60?'60':'')+'</span>';
       if(pCost!=null) maLine += ' · 持本:<b style="color:var(--txt)">¥'+pCost+(pHold!=null?(' '+pHold+'只'):'')+'</b>';
-      // ── 买卖信号（与 AI 主页平均股价面板同源逻辑，紧凑版适配个股卡） ──
+      // ── 综合结论（行内追加，不另起一行） ──
       var _sb=[], _ss=[];
       var _pv20 = apd.position_vs_ma20, _pv60 = apd.position_vs_ma60;
       if(_pv20!=null && _pv20>5) _ss.push('🔴远超MA20');
@@ -5926,25 +5924,13 @@ function switchSec(sec,el){
       }
       if(apPct<-1.5) _ss.push('⚠️单日暴跌');
       if(apPct>1.5) _sb.push('⚡追高风险');
-      // 综合判定文案（一句话结论）
       var _verdict='', _vClr='var(--gold)';
-      if(_ss.length>=2){ _verdict='🔴 高位警戒，严控仓位'; _vClr='var(--down)'; }
-      else if(_ss.length===1){ _verdict='🟠 偏高，注意风险'; _vClr='var(--down)'; }
-      else if(_sb.length>=2){ _verdict='🟢 水位偏低，可分批建仓'; _vClr='var(--up)'; }
-      else if(_sb.length===1){ _verdict='🟡 有超卖信号，轻仓试探'; _vClr='var(--gold)'; }
-      else { _verdict='⏸ 中性水位，观望为主'; _vClr='var(--sub)'; }
-      if(_sb.length||_ss.length||_verdict){
-        maLine += '<div style="margin-top:6px;padding-top:6px;border-top:1px dashed rgba(56,189,248,.15);display:flex;flex-wrap:wrap;gap:5px;align-items:center;">';
-        if(_verdict) maLine += '<span style="font-size:11.5px;font-weight:700;color:'+_vClr+';">'+_verdict+'</span>';
-        if(_ss.length){
-          maLine += '<span style="font-size:10px;color:#fca5a5;margin-left:4px;">'+_ss.join(' · ')+'</span>';
-        }
-        if(_sb.length){
-          if(_ss.length) maLine += '<span style="color:var(--dim);">|</span>';
-          maLine += '<span style="font-size:10px;color:#86efac;">'+_sb.join(' · ')+'</span>';
-        }
-        maLine += '</div>';
-      }
+      if(_ss.length>=2){ _verdict=' 🔴 高位警戒'; _vClr='var(--down)'; }
+      else if(_ss.length===1){ _verdict=' 🟠 偏高'; _vClr='var(--down)'; }
+      else if(_sb.length>=2){ _verdict=' 🟢 偏低可建仓'; _vClr='var(--up)'; }
+      else if(_sb.length===1){ _verdict=' 🟡 超卖轻仓'; _vClr='var(--gold)'; }
+      else { _verdict=' ⏸ 中性观望'; _vClr='var(--sub)'; }
+      maLine += '<span style="margin-left:8px;font-weight:700;color:'+_vClr+';font-size:11.5px;">'+_verdict+'</span>';
       maLine += '</div>';
       h += maLine;
     }
