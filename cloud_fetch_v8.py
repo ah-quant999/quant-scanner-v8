@@ -2389,6 +2389,44 @@ def f_v8_cal(today=None):
     dmlf = shift_weekend(date(y, m, 15))
     if dmlf.month == m:
         add(dmlf.day, "🇨🇳 MLF操作", "cb")
+    # 🔴 2026-08-12 主人令：8月日历审计发现自动生成缺美国宏观数据日
+    #   美国 PPI + 零售销售（约每月14日，8月14日附近；遇周末顺延到周一）
+    dppi = shift_weekend(date(y, m, 14))
+    if dppi.month == m:
+        add(dppi.day, "🇺🇸 美国PPI数据", "us")
+        add(dppi.day, "🇺🇸 美国零售销售", "us")
+    #   密歇根消费者信心指数（约每月第二个周五，8月14日附近）
+    dmich = nth_weekday(y, m, 2, 4)
+    if dmich.month == m:
+        add(dmich.day, "🇺🇸 密歇根消费者信心预公布", "us")
+    #   美国工业生产（约每月15日附近；与工业增加值/社零/固投不同日时加）
+    dind = shift_weekend(date(y, m, 15))
+    if dind.month == m and dind.day != dg.day:
+        add(dind.day, "🇺🇸 美国工业生产", "us")
+    #   费城联储制造业指数（约每月第三个周五，8月21日附近）
+    dphil = nth_weekday(y, m, 3, 4)
+    if dphil.month == m:
+        add(dphil.day, "🇺🇸 费城联储制造业指数", "us")
+    #   美国领先指标（约每月20日附近）
+    dlei = shift_weekend(date(y, m, 20))
+    if dlei.month == m:
+        add(dlei.day, "🇺🇸 美国领先指标", "us")
+    #   消费者信心指数（约每月第四个周三，8月26日附近）
+    dconf = nth_weekday(y, m, 4, 2)
+    if dconf.month == m:
+        add(dconf.day, "🇺🇸 消费者信心指数", "us")
+    #   新屋销售（约每月25日附近）
+    dhouse = shift_weekend(date(y, m, 25))
+    if dhouse.month == m:
+        add(dhouse.day, "🇺🇸 新屋销售", "us")
+    #   耐用品订单（约每月27日附近）
+    ddura = shift_weekend(date(y, m, 27))
+    if ddura.month == m:
+        add(ddura.day, "🇺🇸 耐用品订单", "us")
+    #   Jackson Hole 央行年会（每年 8 月底，2026/8/28-29，鲍威尔讲话核心）
+    if m == 8:
+        add(28, "🏛️ Jackson Hole 央行年会（鲍威尔讲话核心）", "cb")
+        add(29, "🏛️ Jackson Hole 鲍威尔讲话", "cb")
     # A股中报披露截止（8月31日）
     if m == 8:
         add(31, "🇨🇳 中报披露截止", "ipo")
