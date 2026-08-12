@@ -395,32 +395,32 @@ html>
   .tp-hist-cell .tp-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
   .tp-empty{color:var(--dim);text-align:center;padding:24px 10px;font-size:13px}
 </style>
-    <script src="data/ETF_INTRADAY_HEAT.js?v=20260812082113"></script>
-    <script src="data/SECTOR_FUND_FLOW.js?v=20260812082117"></script>
-    <script src="data/SECTOR_FUND_FLOW_TREND.js?v=20260812082117"></script>
-    <script src="data/ANALYST_RATINGS.js?v=20260812082113"></script>
-    <script src="data/SUSPENSION_ALERT.js?v=20260812082118"></script>
-    <script src="data/GOLD_POOL.js?v=20260812082113"></script>
-    <script src="data/STOCK_LIST.js?v=20260812082117"></script>
-    <script src="data/STOCK_PROFILE.js?v=20260812082117"></script>
-    <script src="data/STOCK_QUOTE.js?v=20260812082117"></script>
-    <script src="data/MACRO_DATA.js?v=20260812082117"></script>
-    <script src="data/MACRO_BRIEF.js?v=20260812082117"></script>
-<script src="data/NT_DATA.js?v=20260812082117"></script>
-<script src="data/LHB_DATA.js?v=20260812082117"></script>
+    <script src="data/ETF_INTRADAY_HEAT.js?v=20260812081804"></script>
+    <script src="data/SECTOR_FUND_FLOW.js?v=20260812081810"></script>
+    <script src="data/SECTOR_FUND_FLOW_TREND.js?v=20260812081810"></script>
+    <script src="data/ANALYST_RATINGS.js?v=20260812081803"></script>
+    <script src="data/SUSPENSION_ALERT.js?v=20260812081811"></script>
+    <script src="data/GOLD_POOL.js?v=20260812081804"></script>
+    <script src="data/STOCK_LIST.js?v=20260812081810"></script>
+    <script src="data/STOCK_PROFILE.js?v=20260812081810"></script>
+    <script src="data/STOCK_QUOTE.js?v=20260812081811"></script>
+    <script src="data/MACRO_DATA.js?v=20260812081810"></script>
+    <script src="data/MACRO_BRIEF.js?v=20260812081810"></script>
+<script src="data/NT_DATA.js?v=20260812081810"></script>
+<script src="data/LHB_DATA.js?v=20260812081810"></script>
 <script src="data/LHB_7D.js?v=20260807234429"></script>
-<script src="data/LHB_HISTORY.js?v=20260812082117"></script>
-<script src="data/CONCEPT_RANKING.js?v=20260812082113"></script>
-<script src="data/INDEX_QUOTES.js?v=20260812082113"></script>
-<script src="data/AI_MARKET_BRIEF.js?v=20260812082113"></script>
-<script src="data/MARGIN_DATA.js?v=20260812082117"></script>
-<script src="data/CFFEX_HOLDINGS.js?v=20260812082113"></script>
-<script src="data/IPO_DATA.js?v=20260812082117"></script>
-    <script src="data/CRISIS_DATA.js?v=20260812082113"></script>
-    <script src="data/JUDGMENT_DATA.js?v=20260812082117"></script>
-    <script src="data/STOCK_RPS.js?v=20260812082112"></script>
-    <script src="data/AVG_PRICE_DATA.js?v=20260812082113"></script>
-    <script src="data/CONCEPT_ETF_MAP.js?v=20260812082112"></script>
+<script src="data/LHB_HISTORY.js?v=20260812081810"></script>
+<script src="data/CONCEPT_RANKING.js?v=20260812081804"></script>
+<script src="data/INDEX_QUOTES.js?v=20260812081804"></script>
+<script src="data/AI_MARKET_BRIEF.js?v=20260812081803"></script>
+<script src="data/MARGIN_DATA.js?v=20260812081810"></script>
+<script src="data/CFFEX_HOLDINGS.js?v=20260812081804"></script>
+<script src="data/IPO_DATA.js?v=20260812081810"></script>
+    <script src="data/CRISIS_DATA.js?v=20260812081804"></script>
+    <script src="data/JUDGMENT_DATA.js?v=20260812081810"></script>
+    <script src="data/STOCK_RPS.js?v=20260812081453"></script>
+    <script src="data/AVG_PRICE_DATA.js?v=20260812081803"></script>
+    <script src="data/CONCEPT_ETF_MAP.js?v=20260810172838"></script>
     <script>
 window.V8_CAL = {weeks:[],legend:[]};
 /* ===== 2026 A股交易日历（每年需更新） ===== */
@@ -594,7 +594,6 @@ window.V8_CAL = {weeks:[],legend:[]};
    原始定义（line 2515+）会一并删除以避免重复。
    ================================================================ */
 function _uBadge(slot, horizon, ts, sub){
-  // 2026-08-06 23:18 主人截图仍未见胶囊 — 简化依赖，只用 _fmtAshareRel（已暴露 window）+ 字符串兜底
   var t = '—';
   if(ts){
     try{
@@ -602,13 +601,10 @@ function _uBadge(slot, horizon, ts, sub){
       t = rel || String(ts);
     } catch(e){ t = String(ts); }
   }
-  var sHTML = slot    ? '<span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">'+slot+'</span>' : '';
-  var hHTML = horizon ? '<span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">'+horizon+'</span>' : '';
-  return '<span class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;flex-shrink:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;">'
-    + '<span aria-hidden="true">🐻</span>'
-    + '<span style="margin-left:4px">更新于</span>'
-    + '<span style="color:#9fd0ff;font-weight:600;margin-left:4px">' + t + '</span>'
-    + sHTML + hHTML + '</span>'
+  var sHTML = slot ? ' '+slot : '';
+  var hHTML = horizon ? ' '+horizon : '';
+  // 统一轻量 pill 风格（与最终推荐 finalStatusBadges 一致）
+  return '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 '+t+sHTML+hHTML+'</span>'
     + (sub ? ' <span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">' + sub + '</span>' : '');
 }
 function setBadge(id, slot, horizon, ts, sub){
@@ -632,7 +628,6 @@ function setBadge(id, slot, horizon, ts, sub){
 function _holdBadge(dateStr, count, label){
   var d = '';
   if(dateStr){
-    // 2026-08-09 修复：兼容多种时间格式（YYYY-MM-DD HH:MM:SS / YYYYMMDD / ISO 等）
     var ext = window._extractDateStr ? window._extractDateStr(dateStr) : '';
     if(ext) d = ext.slice(5);
     else {
@@ -642,10 +637,8 @@ function _holdBadge(dateStr, count, label){
     }
   }
   var lbl = label || '已入仓';
-  return '<span style="display:inline-flex;align-items:center;gap:4px;flex-shrink:0;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#15803d,#22c55e);border:1px solid #22c55e;padding:3px 10px;border-radius:10px;white-space:nowrap;">'
-    + '<span aria-hidden="true">🧺</span>'
-    + '<span>'+(d||'--')+' '+lbl+' <b style="margin-left:2px">'+(count||0)+'</b></span>'
-    + '</span>';
+  // 统一轻量 pill 风格（与最终推荐 finalStatusBadges 一致）
+  return '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.3);white-space:nowrap">📦 '+(d||'--')+' '+lbl+' <b style="margin-left:2px">'+(count||0)+'</b></span>';
 }
 window._uBadge = _uBadge; window.setBadge = setBadge; window._holdBadge = _holdBadge;
 
@@ -1098,45 +1091,45 @@ function _buildJudgmentEnvHTML(d){
 }
 window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 </script>
-<script src="data/CRDS_CARD_DATA.js?v=20260812082113"></script>
-<script src="data/TRIPLE_CONSENSUS.js?v=20260812082118"></script>
-<script src="data/TRIPLE_TRACK.js?v=20260812082118"></script>
-<script src="data/TRIPLE_HISTORY.js?v=20260812082118"></script>
-<script src="data/COCKPIT_TIER_RECOMMEND.js?v=20260812082113"></script>
-<script src="data/COCKPIT_ADVICE.js?v=20260812082113"></script>
-<script src="data/SH_FIB.js?v=20260812082117"></script>
-<script src="data/SZ_FIB.js?v=20260812082118"></script>
-<script src="data/SECTOR_RS.js?v=20260812082117"></script>
-<script src="data/INST_TRADE.js?v=20260812082113"></script>
-<script src="data/NORTH_FUND.js?v=20260812082117"></script>
-<script src="data/MARKET_ALERTS.js?v=20260812082117"></script>
-<script src="data/MARKET_FUND_FLOW_DATA.js?v=20260812082117"></script>
-<script src="data/ETF_SUBSCRIPTION.js?v=20260812082113"></script>
-<script src="data/LIMIT_UP_HEATMAP.js?v=20260812082117"></script>
-<script src="data/HERDING_DATA.js?v=20260812082113"></script>
-<script src="data/VOLATILITY.js?v=20260812082118"></script>
-<script src="data/CAPITAL_FLOW_DATA.js?v=20260812082113"></script>
-<script src="data/SH_SZ_HISTORY.js?v=20260812082117"></script>
-<script src="data/MAHORO.js?v=20260812082117"></script>
-<script src="data/CANDIDATE.js?v=20260812082113"></script>
-    <script src="data/FOUR_VOLUME.js?v=20260812082112"></script>
+<script src="data/CRDS_CARD_DATA.js?v=20260812081804"></script>
+<script src="data/TRIPLE_CONSENSUS.js?v=20260812081811"></script>
+<script src="data/TRIPLE_TRACK.js?v=20260812081811"></script>
+<script src="data/TRIPLE_HISTORY.js?v=20260812081811"></script>
+<script src="data/COCKPIT_TIER_RECOMMEND.js?v=20260812081804"></script>
+<script src="data/COCKPIT_ADVICE.js?v=20260812081804"></script>
+<script src="data/SH_FIB.js?v=20260812081810"></script>
+<script src="data/SZ_FIB.js?v=20260812081811"></script>
+<script src="data/SECTOR_RS.js?v=20260812081810"></script>
+<script src="data/INST_TRADE.js?v=20260812081804"></script>
+<script src="data/NORTH_FUND.js?v=20260812081810"></script>
+<script src="data/MARKET_ALERTS.js?v=20260812081810"></script>
+<script src="data/MARKET_FUND_FLOW_DATA.js?v=20260812081810"></script>
+<script src="data/ETF_SUBSCRIPTION.js?v=20260812081804"></script>
+<script src="data/LIMIT_UP_HEATMAP.js?v=20260812081810"></script>
+<script src="data/HERDING_DATA.js?v=20260812081804"></script>
+<script src="data/VOLATILITY.js?v=20260812081811"></script>
+<script src="data/CAPITAL_FLOW_DATA.js?v=20260812081804"></script>
+<script src="data/SH_SZ_HISTORY.js?v=20260812081810"></script>
+<script src="data/MAHORO.js?v=20260812081810"></script>
+<script src="data/CANDIDATE.js?v=20260812081804"></script>
+    <script src="data/FOUR_VOLUME.js?v=20260812081453"></script>
     <script src="data/FOUR_VOLUME_60M.js?v=20260809073558"></script>
-    <script src="data/STOCK_STOP_DATA.js?v=20260812082112"></script>
-<script src="data/BACKTEST_COMPREHENSIVE.js?v=20260812082113"></script>
-<script src="data/COCKPIT_BACKTEST.js?v=20260812082113"></script>
-<script src="data/BACKTEST_TDX.js?v=20260812082113"></script>
-<script src="data/OPTIMIZED_STRATEGY.js?v=20260812082117"></script>
-<script src="data/EXPERIMENT.js?v=20260812082113"></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=20260812082112"></script>
-<script src="data/ETF_PULSE.js?v=20260812082113"></script>
-<script src="data/ETF_DAILY_MONITOR.js?v=20260812082113"></script>
+    <script src="data/STOCK_STOP_DATA.js?v=20260812081453"></script>
+<script src="data/BACKTEST_COMPREHENSIVE.js?v=20260812081803"></script>
+<script src="data/COCKPIT_BACKTEST.js?v=20260812081804"></script>
+<script src="data/BACKTEST_TDX.js?v=20260812081804"></script>
+<script src="data/OPTIMIZED_STRATEGY.js?v=20260812081810"></script>
+<script src="data/EXPERIMENT.js?v=20260812081804"></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=20260812081453"></script>
+<script src="data/ETF_PULSE.js?v=20260812081804"></script>
+<script src="data/ETF_DAILY_MONITOR.js?v=20260812081804"></script>
 <script src="data/TOP10_DAILY.js"></script>
-<script src="data/WEEKEND_RUN.js?v=20260812082112"></script>
+<script src="data/WEEKEND_RUN.js?v=20260810172835"></script>
 <script src="data/V8_CAL.js"></script>
 <script src="data/W52_HIGH.js"></script>
-<script src="data/CANDIDATE_QUOTES.js?v=20260812082113"></script>
-<script src="data/RUNNER_STATUS.js?v=20260812082117"></script>
-<script src="data/HEALTH_CHECK.js?v=20260812082123"></script>
+<script src="data/CANDIDATE_QUOTES.js?v=20260812081804"></script>
+<script src="data/RUNNER_STATUS.js?v=20260812081810"></script>
+<script src="data/HEALTH_CHECK.js?v=20260812081831"></script>
 </head>
 <body>
 
@@ -1178,9 +1171,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 子 Pane：最终推荐 Top3 -->
     <div id="final-pane-rec" class="final-pane active">
       <div class="card" style="margin-bottom:16px;border-left:4px solid #fbbf24;">
-        <h3><span class="ic">🏆</span>最终推荐 · Top<span id="finalTopN">3</span>
-          <span class="fresh" id="finalRecTime">—</span>
-          <span id="finalCrisisBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600"></span>
+        <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">🏆</span>最终推荐 · Top<span id="finalTopN">3</span>
+          <span id="finalStatusBadges" style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;"></span>
         </h3>
         <div id="finalRecBody" style="padding:4px 2px 2px;"><div class="note">加载中…</div></div>
       </div>
@@ -8658,7 +8650,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     // 「已跑完」胶囊：统一调用 _runBadgeInfo（2026-08-07 修复）
     var _fvInfo = window._runBadgeInfo(genTime);
     if(_fvInfo.show){
-      h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">'+_fvInfo.label+'</span>';
+      h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);white-space:nowrap">✅ '+_fvInfo.label+'</span>';
     }
     // 「已入仓」胶囊：2026-08-11 分三态时段守卫（盘前/盘中/盘后），
     //  盘前/盘中显示 ⏳ 预览 N（蓝色），盘后才用原 🧺 MM-DD 已入仓 N（绿色）。
@@ -8669,8 +8661,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       var _phIsPost = _phP && _phP.hh >= 15;
       if(!_phIsPost){
         var _phLbl = _phIsPre ? '⏳ 待开盘（仍按昨日收盘预览）' : '⏳ 今日盘中预览';
-        h+='<span style="display:inline-flex;align-items:center;gap:4px;flex-shrink:0;font-size:11px;font-weight:600;color:#fff;background:linear-gradient(135deg,#1e3a8a,#3b82f6);border:1px solid #3b82f6;padding:3px 10px;border-radius:10px;white-space:nowrap;">'
-          + '<span aria-hidden="true">⏳</span>'
+        h+='<span style="display:inline-flex;align-items:center;gap:4px;flex-shrink:0;font-size:11.5px;font-weight:600;color:#60a5fa;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.3);padding:3px 10px;border-radius:8px;white-space:nowrap;">'
           + '<span>'+_phLbl+' <b style="margin-left:2px">'+total+'</b></span>'
           + '</span>';
       } else {
@@ -11679,19 +11670,30 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       el.innerHTML='<div class="note" style="padding:16px;text-align:center;color:var(--dim)">最终推荐数据暂不可用（等待盘后算法生成）</div>';
       return;
     }
-    var t=document.getElementById('finalRecTime'); if(t) setBadge(t, '盘后', '中线', D.update_time||'');
     var n=document.getElementById('finalTopN'); if(n) n.textContent=(D.stocks.length||3);
     var tag=document.getElementById('finalHeaderTag');
-    if(tag) tag.textContent='跨策略共振 + 板块强度加权 · Top'+D.stocks.length+' · 候选池 '+(D.total_candidates||0)+' 只 · '+(D.update_time||'--');
-    var cb=document.getElementById('finalCrisisBadge');
-    if(cb){
-      cb.style.display='inline-block';
-      var hi=!!D.crisis_high;
-      cb.textContent=(hi?'⚠️ 危机雷达 '+_fn(D.crisis_score,1)+'（高位·逆势龙头已并入）':'🛡 危机雷达 '+_fn(D.crisis_score,1)+'（正常）');
-      cb.style.color = hi?'#fff':'var(--sub)';
-      cb.style.background = hi?'linear-gradient(135deg,#b91c1c,#ef4444)':'rgba(148,163,184,.15)';
-      cb.style.border = '1px solid '+(hi?'#ef4444':'rgba(148,163,184,.35)');
-    }
+    if(tag) tag.textContent='跨策略共振 + 板块强度加权 · Top'+D.stocks.length+' · 候选池 '+(D.total_candidates||0)+' 只';
+    // 状态徽标行（与全站精选统一 pill 风格）
+    (function(){
+      var sb=document.getElementById('finalStatusBadges'); if(!sb) return;
+      var ut=D.update_time||'';
+      var dtStr='', tmStr='', sessionTxt='';
+      if(ut){
+        var m=ut.match(/(\d{4}-\d{2}-\d{2})\s*(\d{1,2}:\d{2})/);
+        if(m){ dtStr=m[1]; tmStr=m[2]; }
+        if(tmStr){
+          var h=parseInt(tmStr.split(':')[0],10);
+          if(h>=15&&h<=23) sessionTxt='盘后'; else if(h>=9&&h<15) sessionTxt='盘中'; else if(h>=0&&h<9) sessionTxt='盘前';
+        }
+      }
+      var horizon=D.stocks[0]?D.stocks[0].horizon||'':'';
+      var hShort=(horizon.indexOf('短线')>=0?'短线':(horizon.indexOf('中线')>=0?'中线':''));
+      var today=dtStr.replace(/-/g,'').slice(4)||'';
+      var b1='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 '+dtStr+' '+tmStr+' '+(sessionTxt?sessionTxt+' ':'')+(hShort?hShort:'')+'</span>';
+      var b2='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);white-space:nowrap">✅ '+today+' 已跑</span>';
+      var b3='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.3);white-space:nowrap">📦 '+today+' 已入库 '+((D.total_candidates||D.stocks.length)||0)+'</span>';
+      sb.innerHTML=b1+b2+b3;
+    })();
 
     var h='';
     if(D.strong_sectors && D.strong_sectors.length){
