@@ -1,11 +1,19 @@
 {
-  "update_time": "2026-08-12 17:27:50",
+  "update_time": "2026-08-12 17:23:34",
   "range": [
-    "2026-08-04",
-    "2026-08-12"
+    "2026-08-03",
+    "2026-08-11"
   ],
   "days_count": 7,
   "daily_summary": [
+    {
+      "date": "2026-08-03",
+      "total": 40,
+      "resonance": 0,
+      "inst_only": 5,
+      "yz_only": 5,
+      "north_present": 22
+    },
     {
       "date": "2026-08-04",
       "total": 93,
@@ -48,19 +56,11 @@
     },
     {
       "date": "2026-08-11",
-      "total": 40,
+      "total": 61,
       "resonance": 2,
-      "inst_only": 1,
-      "yz_only": 7,
-      "north_present": 24
-    },
-    {
-      "date": "2026-08-12",
-      "total": 46,
-      "resonance": 0,
-      "inst_only": 1,
-      "yz_only": 9,
-      "north_present": 26
+      "inst_only": 2,
+      "yz_only": 8,
+      "north_present": 32
     }
   ],
   "top_inst_buy": [
@@ -95,6 +95,16 @@
       "resonance_days": 0
     },
     {
+      "code": "001309",
+      "name": "德明利",
+      "inst_net": 51298.5,
+      "yz_net": -98336.4,
+      "north_net": 3426.0,
+      "combined_net": -47037.9,
+      "days": 1,
+      "resonance_days": 0
+    },
+    {
       "code": "113708",
       "name": "曙26转债",
       "inst_net": 46661.3,
@@ -103,19 +113,29 @@
       "combined_net": 25605.1,
       "days": 1,
       "resonance_days": 0
-    },
-    {
-      "code": "688596",
-      "name": "正帆科技",
-      "inst_net": 45858.5,
-      "yz_net": -28780.9,
-      "north_net": -16065.0,
-      "combined_net": 17077.6,
-      "days": 2,
-      "resonance_days": 0
     }
   ],
   "top_inst_sell": [
+    {
+      "code": "603256",
+      "name": "宏和科技",
+      "inst_net": -85524.3,
+      "yz_net": 6220.1,
+      "north_net": 19864.0,
+      "combined_net": -79304.2,
+      "days": 2,
+      "resonance_days": 0
+    },
+    {
+      "code": "603986",
+      "name": "兆易创新",
+      "inst_net": -80820.2,
+      "yz_net": 58465.6,
+      "north_net": 612.1,
+      "combined_net": -22354.6,
+      "days": 1,
+      "resonance_days": 0
+    },
     {
       "code": "600988",
       "name": "赤峰黄金",
@@ -145,26 +165,6 @@
       "combined_net": -101799.2,
       "days": 2,
       "resonance_days": 0
-    },
-    {
-      "code": "002407",
-      "name": "多氟多",
-      "inst_net": -29479.2,
-      "yz_net": 1886.6,
-      "north_net": -5672.3,
-      "combined_net": -27592.6,
-      "days": 2,
-      "resonance_days": 0
-    },
-    {
-      "code": "603256",
-      "name": "宏和科技",
-      "inst_net": -29133.7,
-      "yz_net": -18702.9,
-      "north_net": -58.0,
-      "combined_net": -47836.6,
-      "days": 1,
-      "resonance_days": 0
     }
   ],
   "top_yz_buy": [
@@ -179,6 +179,16 @@
       "resonance_days": 0
     },
     {
+      "code": "603986",
+      "name": "兆易创新",
+      "inst_net": -80820.2,
+      "yz_net": 58465.6,
+      "north_net": 612.1,
+      "combined_net": -22354.6,
+      "days": 1,
+      "resonance_days": 0
+    },
+    {
       "code": "002428",
       "name": "云南锗业",
       "inst_net": 14851.1,
@@ -189,32 +199,22 @@
       "resonance_days": 1
     },
     {
-      "code": "110102",
-      "name": "江农转债",
-      "inst_net": 0.0,
-      "yz_net": NaN,
-      "north_net": 0.0,
-      "combined_net": NaN,
+      "code": "300613",
+      "name": "富瀚微",
+      "inst_net": -2966.4,
+      "yz_net": 39295.3,
+      "north_net": 1147.1,
+      "combined_net": 36328.9,
       "days": 1,
       "resonance_days": 0
     },
     {
-      "code": "118053",
-      "name": "正帆转债",
-      "inst_net": 0.0,
-      "yz_net": NaN,
-      "north_net": 0.0,
-      "combined_net": NaN,
-      "days": 2,
-      "resonance_days": 0
-    },
-    {
-      "code": "600664",
-      "name": "哈药股份",
-      "inst_net": 0.0,
-      "yz_net": 38260.6,
-      "north_net": 58845.9,
-      "combined_net": 38260.6,
+      "code": "000533",
+      "name": "顺钠股份",
+      "inst_net": -7308.6,
+      "yz_net": 17652.2,
+      "north_net": -4650.4,
+      "combined_net": 10343.6,
       "days": 2,
       "resonance_days": 0
     }
@@ -223,11 +223,11 @@
     {
       "code": "002354",
       "name": "天娱数科",
-      "inst_net": -14522.3,
-      "yz_net": -164109.0,
-      "north_net": -4775.6,
-      "combined_net": -178631.3,
-      "days": 7,
+      "inst_net": -9261.5,
+      "yz_net": -167256.2,
+      "north_net": -3518.2,
+      "combined_net": -176517.7,
+      "days": 6,
       "resonance_days": 0
     },
     {
@@ -238,6 +238,16 @@
       "north_net": 0.0,
       "combined_net": -100624.8,
       "days": 3,
+      "resonance_days": 0
+    },
+    {
+      "code": "001309",
+      "name": "德明利",
+      "inst_net": 51298.5,
+      "yz_net": -98336.4,
+      "north_net": 3426.0,
+      "combined_net": -47037.9,
+      "days": 1,
       "resonance_days": 0
     },
     {
@@ -258,16 +268,6 @@
       "north_net": -94478.3,
       "combined_net": 79299.2,
       "days": 1,
-      "resonance_days": 0
-    },
-    {
-      "code": "002212",
-      "name": "天融信",
-      "inst_net": 0.0,
-      "yz_net": -66166.0,
-      "north_net": 0.0,
-      "combined_net": -66166.0,
-      "days": 2,
       "resonance_days": 0
     }
   ],
@@ -303,23 +303,23 @@
       "resonance_days": 0
     },
     {
-      "code": "002379",
-      "name": "宏桥控股",
-      "inst_net": 3073.7,
-      "yz_net": 32660.0,
-      "north_net": 7381.7,
-      "combined_net": 35733.7,
-      "days": 1,
-      "resonance_days": 0
+      "code": "301520",
+      "name": "万邦医药",
+      "inst_net": 15752.0,
+      "yz_net": 16400.4,
+      "north_net": 0.0,
+      "combined_net": 32152.4,
+      "days": 7,
+      "resonance_days": 1
     },
     {
-      "code": "002491",
-      "name": "通鼎互联",
-      "inst_net": 403.4,
-      "yz_net": 22374.9,
-      "north_net": -4869.0,
-      "combined_net": 22778.3,
-      "days": 1,
+      "code": "002579",
+      "name": "中京电子",
+      "inst_net": 11964.1,
+      "yz_net": 3423.1,
+      "north_net": -353.3,
+      "combined_net": 15387.2,
+      "days": 2,
       "resonance_days": 0
     }
   ],
@@ -365,13 +365,13 @@
       "resonance_days": 0
     },
     {
-      "code": "601231",
-      "name": "环旭电子",
-      "inst_net": 4610.1,
-      "yz_net": 526.6,
-      "north_net": 22071.0,
-      "combined_net": 5136.7,
-      "days": 1,
+      "code": "001258",
+      "name": "立新能源",
+      "inst_net": 8124.6,
+      "yz_net": -16703.8,
+      "north_net": 24741.6,
+      "combined_net": -8579.2,
+      "days": 3,
       "resonance_days": 0
     }
   ],
@@ -409,11 +409,11 @@
     {
       "code": "002552",
       "name": "宝鼎科技",
-      "inst_net": 4432.5,
-      "yz_net": 8191.1,
-      "north_net": -38104.1,
-      "combined_net": 12623.6,
-      "days": 3,
+      "inst_net": 1922.0,
+      "yz_net": 7356.9,
+      "north_net": -37407.6,
+      "combined_net": 9278.9,
+      "days": 2,
       "resonance_days": 0
     },
     {
