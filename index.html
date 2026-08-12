@@ -1217,7 +1217,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <ul style="margin:0;padding:0;font-size:12.5px;line-height:1.9;color:var(--txt);list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:2px 24px;">
           <li>⚡ <b>操作信号（置顶）</b>：6 维综合买卖判断 → 🟢偏多机会 / 🔴建议减仓 / ⏸中性观望</li>
           <li>📊 <b>实时行情</b>：现价、涨跌幅、成交量/额、今开/昨收/最高/最低</li>
-          <li>📐 <b>平均股价/持仓摘要</b>：全A等权均价 vs MA20/60 + 弱MA提示 + 持仓成本（仅持仓时显示，实时行情卡内）</li>
+          <li>📐 <b>环境摘要（仅持仓时显示）</b>：持仓成本（实时行情卡内）</li>
           <li>🎯 <b>止盈止损</b>：止损位、目标位、盈亏比、操作建议</li>
           <li>🏷 <b>概念行业概览</b>：板块、行业、题材概念标签</li>
           <li>🎖️ <b>选股策略命中</b>：是否命中三重共识、金股池、候选池、驾驶舱 A/B 档、逆势龙头、四量终极</li>
@@ -4840,7 +4840,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <ul style="margin:6px 0 0 0;padding:0;font-size:12.5px;line-height:1.9;color:var(--txt);list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:2px 24px;">
             <li>⚡ <b>操作信号（置顶）</b>：6 维综合买卖判断 → 🟢偏多机会 / 🔴建议减仓 / ⏸中性观望</li>
             <li>📊 <b>实时行情</b>：现价、涨跌幅、成交量/额、今开/昨收/最高/最低</li>
-            <li>📐 <b>平均股价/持仓摘要</b>：全A等权均价 vs MA20/60 + 弱MA提示 + 持仓成本（仅持仓时显示，实时行情卡内）</li>
+            <li>📐 <b>环境摘要（仅持仓时显示）</b>：持仓成本（实时行情卡内）</li>
             <li>🎯 <b>止盈止损</b>：止损位、目标位、盈亏比、操作建议</li>
             <li>🏷 <b>概念行业概览</b>：板块、行业、题材概念标签</li>
             <li>🎖️ <b>选股策略命中</b>：是否命中三重共识、金股池、候选池、驾驶舱 A/B 档、逆势龙头、四量终极</li>
@@ -5906,56 +5906,12 @@ function switchSec(sec,el){
       '</div>';
     }
     h+='<div style="margin-top:8px;font-size:10px;color:var(--dim);">快照 '+q.snapshot_time+' · 行情源 akshare 新浪 · 分红源 东财 stock_fhps_em · 财务画像源 算法链 baostock</div>';
-    // === 平均股价/持仓/弱MA摘要行（大盘环境 + 个人持仓，2026-08-12 恢复） ===
-    const apd = window.AVG_PRICE_DATA || {};
-    if(apd && apd.avg_price!=null){
-      const ap = apd.avg_price;
-      const apPct = apd.avg_change_pct!=null ? apd.avg_change_pct : 0;
-      const vs20 = apd.position_vs_ma20!=null ? apd.position_vs_ma20*100 : null;
-      const vs60 = apd.position_vs_ma60!=null ? apd.position_vs_ma60*100 : null;
-      const weak20 = (apd.ma20!=null && ap < apd.ma20);
-      const weak60 = (apd.ma60!=null && ap < apd.ma60);
-      const PCD = window.PORTFOLIO_COST || {};
-      const PD = window.PORTFOLIO_DATA || {};
-      const fcode = item.full_code || ((item.market||'')+code);
-      const pos = (PD.positions||[]).filter(function(p){return (p.code===code)||(p.full_code===fcode);});
-      const pCost = PCD[code]!=null ? PCD[code] : (PCD[fcode]!=null?PCD[fcode]:(pos[0]?pos[0].cost:null));
-      const pHold = pos[0]?pos[0].volume:null;
-      let maLine = '<div style="margin-top:8px;padding:8px 10px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.18);border-radius:7px;font-size:12px;color:var(--sub);line-height:1.9;">';
-      maLine += '<b style="color:var(--cyan)">📐 平均股价</b> ¥'+ap.toFixed(2)+' <span style="color:'+(apPct>=0?'var(--up)':'var(--down)')+'">'+(apPct>=0?'+':'')+apPct.toFixed(2)+'%</span>';
-      if(vs20!=null) maLine += ' · vs20日線 <span style="color:'+(vs20>=0?'var(--up)':'var(--down)')+'">'+(vs20>=0?'+':'')+vs20.toFixed(2)+'%</span><span style="color:var(--dim);font-size:11px;">(MA20:'+apd.ma20.toFixed(2)+')</span>';
-      if(vs60!=null) maLine += ' · vs60日線 <span style="color:'+(vs60>=0?'var(--up)':'var(--down)')+'">'+(vs60>=0?'+':'')+vs60.toFixed(2)+'%</span><span style="color:var(--dim);font-size:11px;">(MA60:'+apd.ma60.toFixed(2)+')</span>';
-      if(weak20||weak60) maLine += ' · <span style="color:var(--down)">⚠️弱MA'+(weak20?'20':'')+(weak20&&weak60?'/':'')+(weak60?'60':'')+'</span>';
-      if(pCost!=null) maLine += ' · 持本:<b style="color:var(--txt)">¥'+pCost+(pHold!=null?(' '+pHold+'只'):'')+'</b>';
-      // ── 综合结论（行内追加，不另起一行） ──
-      var _sb=[], _ss=[];
-      var _pv20 = apd.position_vs_ma20, _pv60 = apd.position_vs_ma60;
-      if(_pv20!=null && _pv20>5) _ss.push('🔴远超MA20');
-      else if(_pv20!=null && _pv20>3) _ss.push('🟠偏高止盈');
-      if(_pv60!=null && _pv60>10) _ss.push('🔴严重高估');
-      else if(_pv60!=null && _pv60>6) _ss.push('🟠中期高估');
-      if(_pv20!=null && _pv20<-3) _sb.push('🟢短期超卖');
-      if(_pv20!=null && _pv20<-5) _sb.push('🟢可关注');
-      if(_pv60!=null && _pv60<-5) _sb.push('🟢中期低估');
-      if(_pv60!=null && _pv60<-8) _sb.push('🟢建仓区间');
-      var _hist=apd.history||[];
-      if(_hist.length>=3){
-        var _h0=_hist[_hist.length-1],_h1=_hist[_hist.length-2],_h2=_hist[_hist.length-3];
-        if(_h2.avg_change_pct<0&&_h1.avg_change_pct<0&&_h0.avg_change_pct>0) _sb.push('🔄连跌后首阳');
-        if(_h2.avg_change_pct>0&&_h1.avg_change_pct>0&&_h0.avg_change_pct<0) _ss.push('⚡连涨回调');
-      }
-      if(apPct<-1.5) _ss.push('⚠️单日暴跌');
-      if(apPct>1.5) _sb.push('⚡追高风险');
-      var _verdict='', _vClr='var(--gold)';
-      if(_ss.length>=2){ _verdict=' 🔴 高位警戒'; _vClr='var(--down)'; }
-      else if(_ss.length===1){ _verdict=' 🟠 偏高'; _vClr='var(--down)'; }
-      else if(_sb.length>=2){ _verdict=' 🟢 偏低可建仓'; _vClr='var(--up)'; }
-      else if(_sb.length===1){ _verdict=' 🟡 超卖轻仓'; _vClr='var(--gold)'; }
-      else { _verdict=' ⏸ 中性观望'; _vClr='var(--sub)'; }
-      maLine += '<span style="margin-left:8px;font-weight:700;color:'+_vClr+';font-size:11.5px;">'+_verdict+'</span>';
-      maLine += '</div>';
-      h += maLine;
-    }
+    // 🔴 2026-08-12 主人紧急修复：删除「平均股价/持仓/弱MA摘要行」
+    //   主人：「平均股价放个股查询里干嘛？！」
+    //   根因：这是 AVG_PRICE_DATA 全市场等权均价，与具体股票无关
+    //   之前 line 1220 帮助说明也标过「平均股价/持仓摘要」（实时行情卡内）
+    //   但 1320 注释已明确：「💰 平均股价独立卡片已删除（2026-08-12 主人令）：保留在 AI 市场速览紧凑版」
+    //   修复：单只股票查询不显示全市场平均股价——仅在「实时数据 → AI 市场速览」紧凑行展示
     h+='</div>';
     return h;
   }
