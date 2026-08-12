@@ -6007,18 +6007,37 @@ function switchSec(sec,el){
     else if(f.grade==='D'){ signals.push({t:'基本面差',a:'规避',c:'down'}); score-=1; }
 
     // 5. 策略共振（候选池/金股池/驾驶舱/CRDS/四量 任一命中即加分）
+    // 🔴 2026-08-12 主人紧急修复：_in 兼容 dict/array 两种 schema
+    //   根因：GOLD_POOL.stocks / CANDIDATE.stocks 都是 {key: stock} dict
+    //   而 .some() 只对 array 有效 → arr.some is not a function 抛错
+    //   → renderTradeSignals 整体崩 → 主人「什么都查不了」的真凶
     let hitN=0;
-    const _in=function(arr){ if(!arr) return false; return arr.some(function(x){ return (x&&(x.code===code||x.code===fcode||(x.stock&&(x.stock===code||x.stock===fcode)))); }); };
-    const cand = window.CANDIDATE_DATA||window.CANDIDATE||{};
-    const gold = window.GOLD_POOL||{};
+    const _in=function(arr){
+      if(!arr) return false;
+      const list = Array.isArray(arr) ? arr : Object.values(arr);
+      return list.some(function(x){
+        return (x && typeof x==='object' && (x.code===code || x.code===fcode || (x.stock && (x.stock===code || x.stock===fcode))));
+      });
+    };
+    // 兼容 dict/array 两种 schema：先提 stocks 字段
+    const candList = (window.CANDIDATE && (window.CANDIDATE.stocks || window.CANDIDATE.data))
+                  || (window.CANDIDATE_DATA && (window.CANDIDATE_DATA.stocks || window.CANDIDATE_DATA.data))
+                  || [];
+    const goldList = (window.GOLD_POOL && (window.GOLD_POOL.stocks || window.GOLD_POOL.candidates))
+                  || [];
+    // COCKPIT 优先用 tier_a/tier_b（array 数组）合并
     const cock = window.COCKPIT_TIER_RECOMMEND||{};
+    const cockList = [].concat(cock.tier_a||[], cock.tier_b||[]);
+    // CRDS 用 cond1_list/cond2_list/cond3_list/cond4_list（按实际 schema）
     const crds = window.CRDS_CARD_DATA||{};
-    const four = window.FOUR_VOLUME||{};
-    if(_in(cand.stocks)) hitN++;
-    if(_in(gold.stocks)) hitN++;
-    if(_in((cock.tiers||[]).reduce(function(a,t){return a.concat(t.stocks||[]);},[]))) hitN++;
-    if(_in(crds.stocks)) hitN++;
-    if(_in(four.stocks)) hitN++;
+    const crdsList = [].concat(crds.cond1_list||[], crds.cond2_list||[], crds.cond3_list||[], crds.cond4_list||[]);
+    // FOUR_VOLUME 用 stocks（array）
+    const fourList = (window.FOUR_VOLUME && window.FOUR_VOLUME.stocks) || [];
+    if(_in(candList)) hitN++;
+    if(_in(goldList)) hitN++;
+    if(_in(cockList)) hitN++;
+    if(_in(crdsList)) hitN++;
+    if(_in(fourList)) hitN++;
     if(hitN>=3){ signals.push({t:hitN+' 策略共振命中',a:'强共识买点',c:'up'}); score+=2; }
     else if(hitN>=1){ signals.push({t:hitN+' 策略命中',a:'有支撑',c:'sub'}); score+=hitN; }
 
