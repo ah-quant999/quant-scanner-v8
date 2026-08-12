@@ -4974,7 +4974,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         · 每只股票显示：<b>代码+名称</b> + 止损位(红) + 目标价(绿) + 3日回测收益 + 来源标签（如「四量终极+驾驶舱A档」）<br>
         · <b>无数据时整段静默不渲染</b>——不会出现空板块列表或空股列表占位</div>
         <div class="logic-h">代码位置</div>
-        <div class="logic-p"><code>index.html</code> → <code>renderTradeSignals(item, code)</code>（操作信号面板本体）、<code>_renderMainlinePicks(score)</code>（主线板块&推荐个股落地行）、<code>renderQuote()</code> 内「平均股价/持仓/弱MA摘要行」段、<code>doV8Query()</code> 内 <code>renderTradeSignals</code> 置顶于网格之前。</div>
+        <div class="logic-p"><code>index.html</code> → <code>renderTradeSignals(item, code)</code>（操作信号面板本体）、<code>renderQuote()</code> 内「行情快照+财务画像」段（平均股价已删除，2026-08-12 主人令）、<code>doV8Query()</code> 内 <code>renderTradeSignals</code> 置顶于网格之前。<br>
+        <b>2026-08-13 更新</b>：<code>_renderMainlinePicks(score)</code> 已废弃（被候选池底部调用时 ReferenceError：跨 IIFE 作用域隔离）。候选池底部不再重复显示主线板块（Top3 卡已有）。</div>
       </div>
 
       <div class="card">
@@ -11997,12 +11998,14 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       +'<div><div style="font-size:12px;font-weight:800;color:#22c55e;margin-bottom:6px;display:flex;align-items:center;gap:4px;">🌿 中长线候选 <span style="font-size:11px;font-weight:600;color:var(--dim)">('+longList.length+')</span></div>'+_renderColumn(longList,'中长线候选','🌿','#22c55e')+'</div>'
       +'</div>';
 
-    // 🔴 2026-08-12 主人修复：把 _renderMainlinePicks 挪到这里（候选池底部）
-    //   主人：「这个是干嘛的？为什么放个股查询里？没关联啊」——是因为之前 renderTradeSignals 误调
-    //   现在 _renderMainlinePicks 改放「最终推荐 · 今日推荐候选池」底部，
-    //   展示全市场主线板块+推荐关注（与单只股票查询分离，逻辑清晰）
-    var picks = _renderMainlinePicks(0);
-    if(picks) h += picks;
+    // 🔴 2026-08-13 主人令修复：删 _renderMainlinePicks 调用（之前挪到这里的）
+    //   主人截图错误：`ReferenceError: _renderMainlinePicks is not defined`
+    //   根因：_renderMainlinePicks 定义在另一个 IIFE（line 6053），renderFinalCand 在
+    //   不同 IIFE（line 11871）—— 作用域隔离，调用不到
+    //   主人原话：「这个是干嘛的？为什么放个股查询里？没关联啊」—— 之前挪到候选池底部
+    //   仍有「与个股查询无关联」语义问题
+    //   修复：直接删掉调用——候选池底部已有 16 只个股展示，主线板块信息在 renderFinalRec/Top3 已显示，
+    //   无需重复
 
     el.innerHTML=h;
   }
