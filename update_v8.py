@@ -558,7 +558,10 @@ def _rewrite_index_html_cache_busters():
     if not idx_path.exists():
         return
     html = idx_path.read_text(encoding='utf-8')
-    pat = re.compile(r'<script src="(data/[A-Z_]+\.js)(?:\?[^"]*)?"></script>')
+    # 🔴 2026-08-12 主人令修复：原 `[A-Z_]+` 不匹配含数字的变量名（V8_CAL/W52_HIGH/TOP10_DAILY）
+    #   → 这些文件永远不加 ?v= 缓存戳 → 浏览器/CDN 永远缓存旧版 → 主站/本地都不更新！
+    #   修复：加 0-9，匹配所有 data/*.js
+    pat = re.compile(r'<script src="(data/[A-Z0-9_]+\.js)(?:\?[^"]*)?"></script>')
 
     def repl(m):
         src = m.group(1)
