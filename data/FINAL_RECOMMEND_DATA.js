@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-12 18:02:17",
+  "update_time": "2026-08-12 18:15:11",
   "crisis_score": 31.4,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -180,10 +180,10 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构0.2亿+游资0.7亿",
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
+        "PCB",
         "黄金概念",
         "央国企改革",
-        "一带一路",
-        "PCB"
+        "一带一路"
       ],
       "backtest": {
         "signals": 171,
@@ -277,10 +277,10 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
+        "PCB",
         "黄金概念",
         "央国企改革",
-        "一带一路",
-        "PCB"
+        "一带一路"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -308,12 +308,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "医疗器械概念",
-        "专精特新",
         "被动元件概念",
-        "半导体概念",
         "创业板综",
-        "军工"
+        "半导体概念",
+        "融资融券",
+        "军工",
+        "军民融合"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -342,11 +342,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [
         "CRO",
+        "创业板综",
+        "融资融券",
         "专精特新",
         "创新药",
-        "题材股",
-        "创业板综",
-        "减肥药"
+        "创新医疗服务"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -374,12 +374,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "人工智能",
-        "区块链",
         "参股银行",
-        "彩票概念",
+        "数字水印",
+        "云计算",
         "数字经济",
-        "ChatGPT概念"
+        "区块链",
+        "文娱消费"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -407,12 +407,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
+        "病原体防治",
         "CRO",
-        "趋势股",
-        "合成生物",
         "创业板综",
-        "破发股",
-        "重组蛋白"
+        "融资融券",
+        "合成生物",
+        "趋势股"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -440,11 +440,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
+        "破增发价股",
+        "短剧互动游戏",
+        "创业板综",
         "影视概念",
         "央国企改革",
-        "破增发价股",
-        "创业板综",
-        "短剧互动游戏",
         "文娱消费"
       ],
       "enter_date": "20260811",
@@ -499,12 +499,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "光伏概念",
         "电商概念",
+        "乡村振兴",
         "TOPCon电池",
-        "一带一路",
-        "婴童概念",
-        "味蕾经济"
+        "乳业",
+        "破发股",
+        "婴童概念"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
