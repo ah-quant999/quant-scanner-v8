@@ -2423,10 +2423,12 @@ def f_v8_cal(today=None):
     ddura = shift_weekend(date(y, m, 27))
     if ddura.month == m:
         add(ddura.day, "🇺🇸 耐用品订单", "us")
-    #   Jackson Hole 央行年会（每年 8 月底，2026/8/28-29，鲍威尔讲话核心）
+    #   Jackson Hole 央行年会（每年 8 月底，2026/8/28-29，**美联储主席**就货币政策发言）
+    # 🔴 2026-08-12 主人令修正：之前写「鲍威尔讲话」是事实错误——Powell 2026/5/15 任期结束已退休
+    #   8 月讲话是候任/新任主席（避免写具体人名又错），所以只用「美联储主席」
     if m == 8:
-        add(28, "🏛️ Jackson Hole 央行年会（鲍威尔讲话核心）", "cb")
-        add(29, "🏛️ Jackson Hole 鲍威尔讲话", "cb")
+        add(28, "🏛️ Jackson Hole 央行年会（美联储主席讲话核心）", "cb")
+        add(29, "🏛️ Jackson Hole 美联储主席讲话", "cb")
     # A股中报披露截止（8月31日）
     if m == 8:
         add(31, "🇨🇳 中报披露截止", "ipo")
