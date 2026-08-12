@@ -2247,15 +2247,28 @@ def load_candidate_pool():
     """加载候选股池(build_candidate_pool.py 产出)。返回 stocks 字典或 None。
 
     None 表示尚未构建候选股池 → 金股选取走旧逻辑(不限制候选宇宙)。
+
+    🔴 2026-08-12 修复路径错位：stage_to_raw 自 08-04 起把 out/candidate_pool.json
+    改名搬运为 raw_data/candidate.json，旧路径 algorithms/data/candidate_pool.json
+    永不存在的；现按 out/candidate_pool.json（本轮直产）→ raw_data/candidate.json
+    （搬运产物）→ algorithms/data/candidate_pool.json（历史）依次查找。
     """
-    p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "candidate_pool.json")
-    if not os.path.exists(p):
-        return None
-    try:
-        d = json.load(open(p, encoding="utf-8"))
-        return d.get("stocks", {}) or {}
-    except Exception:
-        return None
+    _cand_candidates = (
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "out", "candidate_pool.json"),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "raw_data", "candidate.json"),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "candidate_pool.json"),
+    )
+    for p in _cand_candidates:
+        if not os.path.exists(p):
+            continue
+        try:
+            d = json.load(open(p, encoding="utf-8"))
+            stocks = d.get("stocks", {}) or {}
+            if stocks:
+                return stocks
+        except Exception:
+            continue
+    return None
 
 
 # 股票名称修复白名单

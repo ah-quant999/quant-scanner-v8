@@ -265,9 +265,14 @@ def fetch_news_signals(a_codes):
 
 
 def build_universe():
-    """取 candidate_pool + gold_pool 并集"""
+    """取 candidate_pool + gold_pool 并集
+    🔴 2026-08-12 修复：stage_to_raw 的 V6_TO_V8 映射自 08-04 起把
+    out/candidate_pool.json 改名搬运为 raw_data/candidate.json，raw_data 下
+    不存在 candidate_pool.json → universe 只剩 gold_pool（全港股）→
+    基本面 A 股全空 → 三重共识/TOP10 quality 分连续 8 天失效。
+    现改为 candidate_pool.json 优先、candidate.json 兜底。"""
     codes = set()
-    for fn in ("candidate_pool.json", "gold_pool.json"):
+    for fn in ("candidate_pool.json", "candidate.json", "gold_pool.json"):
         p = os.path.join(DATA_DIR, fn)
         d = load_json(p)
         codes.update(d.get("stocks", {}).keys())
@@ -282,9 +287,10 @@ def build_universe():
 
 
 def build_name_map():
-    """构建 code -> name 映射，优先候选池/金股池，再回退 stock_names.json"""
+    """构建 code -> name 映射，优先候选池/金股池，再回退 stock_names.json
+    （2026-08-12：同 build_universe，兼容 candidate.json 兜底）"""
     name_map = {}
-    for fn in ("candidate_pool.json", "gold_pool.json"):
+    for fn in ("candidate_pool.json", "candidate.json", "gold_pool.json"):
         p = os.path.join(DATA_DIR, fn)
         d = load_json(p, {})
         for k, v in d.get("stocks", {}).items():
