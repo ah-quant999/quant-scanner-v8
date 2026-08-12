@@ -29,8 +29,10 @@
 """
 import json
 import base64
+import http.client
 import re
 import sys
+import time
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone, timedelta
@@ -79,14 +81,36 @@ def get_token():
     return Path(TOKEN_FILE).read_text(encoding="utf-8").strip()
 
 
-def api_get(path):
-    req = urllib.request.Request(
-        API + path,
-        headers={"Authorization": "token " + TOKEN,
-                 "Accept": "application/vnd.github.v3+json"},
-    )
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return json.load(r)
+# 网络类异常元组。⚠️ 2026-08-11（165 轮）：http.client.IncompleteRead 继承
+# HTTPException，**不是 OSError 子类**（157 轮 api_push_raw.py 已被咬过一次），
+# 必须显式列出，否则响应体截断时异常逃逸。
+NET_ERRORS = (TimeoutError, urllib.error.URLError, OSError,
+              http.client.HTTPException, json.JSONDecodeError)
+GET_RETRY = 3
+
+
+def api_get(path, retry=GET_RETRY):
+    """GET 幂等，失败退避重试；重试耗尽后**抛出**，绝不返回降级值。"""
+    last = None
+    for i in range(retry):
+        try:
+            req = urllib.request.Request(
+                API + path,
+                headers={"Authorization": "token " + TOKEN,
+                         "Accept": "application/vnd.github.v3+json"},
+            )
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return json.load(r)
+        except urllib.error.HTTPError as e:
+            # 404 等确定性状态码不重试，交由调用方语义化处理
+            if e.code in (404, 401, 403):
+                raise
+            last = e
+        except NET_ERRORS as e:
+            last = e
+        if i < retry - 1:
+            time.sleep(2 ** i)
+    raise last
 
 
 def api_post(path, data):
@@ -103,13 +127,37 @@ def api_post(path, data):
 
 
 def file_update_time(path):
+    """返回 (kind, value)：
+       ("ok", "2026-08-11 15:31")  远端 update_time 读取成功
+       ("nofield", "NONE")         文件在但无 update_time 字段 → 按陈旧处理（真问题）
+       ("missing", "404")          远端文件不存在 → 按陈旧处理（真问题）
+       ("err", "<原因>")           基线获取失败 → **不得当作新鲜**，由 main 拒绝判定
+
+    🔴 2026-08-11 根因修复（165 轮看门狗，勿回退）：
+       旧版统一返回字符串，失败返 "ERR:xxx"，而 stale_in_group 用
+       `not ut.startswith("ERR")` 把 ERR 排除在陈旧之外 →
+       一旦 contents API 全挂（网络抖动 / token 过期 / 403 限流），
+       17 个文件全 ERR → stale 两个空列表 → 打印「✅ 盘后数据已是最新」exit 0。
+       守卫 100% 静默失效，且日志与退出码完全看不出异常
+       （调用它的自动化只记录「退出码 0，无 stderr」= 永远发现不了）。
+       这与 159 轮 api_push_raw.py 的「防倒退基线静默变空」同族：
+       **基线获取失败必须 fail-loud，绝不允许降级为「一切正常」。**
+    """
     try:
         d = api_get(f"/repos/{REPO}/contents/{path}?ref=main")
-        c = base64.b64decode(d["content"]).decode("utf-8", "ignore")
-        m = re.search(r'"update_time"\s*:\s*"([^"]+)"', c)
-        return m.group(1) if m else "NONE"
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return ("missing", "404 远端文件不存在")
+        return ("err", f"HTTP {e.code}")
     except Exception as e:
-        return f"ERR:{e}"
+        return ("err", f"{type(e).__name__}: {e}")
+    try:
+        c = base64.b64decode(d["content"]).decode("utf-8", "ignore")
+    except Exception as e:
+        # 内容字段缺失/解码失败属基线不可信，不能当新鲜
+        return ("err", f"content 解析失败 {type(e).__name__}: {e}")
+    m = re.search(r'"update_time"\s*:\s*"([^"]+)"', c)
+    return ("ok", m.group(1)) if m else ("nofield", "NONE")
 
 
 def runner_offline():
@@ -133,12 +181,20 @@ def dispatch(wf_id, category=None):
 
 
 def stale_in_group(files, today):
-    stale = []
+    """返回 (stale, errors)。
+       stale：确认非今日（含 missing/nofield，均为真问题）
+       errors：基线获取失败，**单独上报**，绝不静默并入「新鲜」
+    """
+    stale, errors = [], []
     for f in files:
-        ut = file_update_time(f)
-        if ut and not ut.startswith(today) and not ut.startswith("ERR"):
-            stale.append((f, ut))
-    return stale
+        kind, val = file_update_time(f)
+        if kind == "err":
+            errors.append((f, val))
+        elif kind in ("missing", "nofield"):
+            stale.append((f, val))
+        elif not val.startswith(today):
+            stale.append((f, val))
+    return stale, errors
 
 
 def main():
@@ -156,8 +212,9 @@ def main():
         print("  未到 15:30 盘后窗口，跳过")
         return
 
-    fetch_stale = stale_in_group(POST_CLOSE_FETCH_FILES, today)
-    algo_stale = stale_in_group(POST_CLOSE_ALGO_FILES, today)
+    fetch_stale, fetch_err = stale_in_group(POST_CLOSE_FETCH_FILES, today)
+    algo_stale, algo_err = stale_in_group(POST_CLOSE_ALGO_FILES, today)
+    errors = fetch_err + algo_err
 
     print(f"  fetch 产物陈旧: {len(fetch_stale)} 个")
     for f, ut in fetch_stale:
@@ -166,7 +223,18 @@ def main():
     for f, ut in algo_stale:
         print(f"    - {f}: {ut}")
 
+    # 🔴 基线不完整 → fail-loud（165 轮根因修复）。
+    # 有任何文件读不到远端 update_time，就没有资格宣称「已是最新」。
+    if errors:
+        print(f"  ❌ 基线获取失败 {len(errors)} 个文件（已重试 {GET_RETRY} 次）——"
+              f"拒绝判定「已是最新」，本轮检测结果不可信：")
+        for f, why in errors:
+            print(f"    - {f}: {why}")
+
     if not fetch_stale and not algo_stale:
+        if errors:
+            print("  ⚠️ 未发现确认陈旧项，但基线不完整，不作「无需补救」结论 → 退出码 2 供上游告警")
+            sys.exit(2)
         print("  ✅ 盘后数据已是最新，无需补救")
         return
 
@@ -199,13 +267,20 @@ def main():
                     return False, f"云端失败({e}) 且 cn 兜底也失败({e2})"
             return False, f"云端失败({e})；cn runner 离线未兜底"
 
+    failed = False
     if fetch_stale:
         ok, msg = _dispatch_with_fallback("fetch", WF_FETCH_CLOUD, WF_FETCH_CN, "all")
         print(f"  [{'✅' if ok else '❌'}] fetch 补救: {msg}")
+        failed = failed or not ok
 
     if algo_stale:
         ok, msg = _dispatch_with_fallback("algo", WF_ALGO_CLOUD, WF_ALGO_CN, None)
         print(f"  [{'✅' if ok else '❌'}] algo 补救: {msg}")
+        failed = failed or not ok
+
+    # 派发失败或基线不完整 → 非零退出，让上游自动化/看门狗能看见
+    if failed or errors:
+        sys.exit(2)
 
 
 if __name__ == "__main__":
