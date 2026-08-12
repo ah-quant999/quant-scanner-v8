@@ -100,13 +100,16 @@ jobs:
         run: |
           git config user.name "v8-audit-bot"
           git config user.email "v8-audit-bot@users.noreply.github.com"
-          git add raw_data/audit_history.json
-          if git diff --cached --quiet; then
-            echo "无审核记录变更，跳过 push"
-          else
-            git commit -m "audit: 每日全站审核 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
-            git push origin main 2>&1 | tail -2 || echo "push 失败（可能被云端 build 抢占，下次 cron 会自动重试）"
-          fi
+          # 🔴 2026-08-12 修复：
+          #   1) 原 `if git diff --cached --quiet` 云端偶发误判「无变更」跳过 push（实测 22:58 记录没推上去）
+          #   2) 原 `git push origin main` 用默认 remote 无 token → push 失败
+          #   → 无条件 commit + 用 PAT 带 token URL push（与 v8_build_deploy 一致）
+          REPO="https://x-access-token:${V8_GITHUB_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
+          git add -f raw_data/audit_history.json
+          git commit -m "audit: 每日全站审核 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')" 2>/dev/null \
+            || echo "⚠️ 无审核记录变更（git commit 无内容，跳过）"
+          git push "$REPO" HEAD:main 2>&1 | tail -2 \
+            || echo "push 失败（可能被云端 build 抢占，下次 cron 会自动重试）"
 
       - name: "📊 审核摘要"
         if: always()

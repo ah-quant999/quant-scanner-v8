@@ -1,7 +1,7 @@
 [
  {
   "date": "2026-08-12",
-  "time": "14:58:39",
+  "time": "22:58:00",
   "overall": "warn",
   "summary": {
    "ok": 41,
@@ -11,76 +11,31 @@
   },
   "warn_items": [
    {
-    "id": "dom_taskScheduleBody",
-    "name": "DOM #taskScheduleBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_phMacroBody",
-    "name": "DOM #phMacroBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttBackBody",
-    "name": "DOM #ttBackBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttThrBody",
-    "name": "DOM #ttThrBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttSvlBody",
-    "name": "DOM #ttSvlBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_ttTrackBody",
-    "name": "DOM #ttTrackBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_stcrdsAdvBody",
-    "name": "DOM #stcrdsAdvBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_stcrdsEliteBody",
-    "name": "DOM #stcrdsEliteBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
-    "id": "dom_healthCheckBody",
-    "name": "DOM #healthCheckBody",
-    "message": "静态占位符(JS渲染)"
-   },
-   {
     "id": "a_share_triple_consensus",
     "name": "三重共识 A股覆盖",
-    "message": "⚠️ 三重共识 今日 0 只（弱市真实状态可接受，但若其他池也 0 则排查上游；若此池独立为 0 而其他池正常则不报警）"
+    "message": "⚠️ 三重共识 今日 0 只（弱市真实状态可接受）"
    },
    {
     "id": "a_share_cockpit_tier_recommend",
     "name": "驾驶舱分档 A股覆盖",
-    "message": "⚠️ 驾驶舱分档 今日 0 只（弱市真实状态可接受，但若其他池也 0 则排查上游；若此池独立为 0 而其他池正常则不报警）"
+    "message": "⚠️ 驾驶舱分档 今日 0 只（弱市真实状态可接受）"
    },
    {
     "id": "a_share_mahoro",
     "name": "国际投行信号 A股覆盖",
-    "message": "⚠️ 国际投行信号 今日 0 只（弱市真实状态可接受，但若其他池也 0 则排查上游；若此池独立为 0 而其他池正常则不报警）"
+    "message": "⚠️ 国际投行信号 今日 0 只（弱市真实状态可接受）"
    }
   ],
   "fail_items": [
    {
     "id": "COCKPIT_ADVICE",
     "name": "驾驶舱",
-    "message": "更新于 今日 16:33；超过阈值 360 分钟"
+    "message": "更新于 今日 16:33；超过阈值 360 分钟（已自动派发 algo_run 自愈）"
    },
    {
     "id": "CRDS_CARD_DATA",
     "name": "逆势龙头",
-    "message": "更新于 今日 16:20；超过阈值 360 分钟"
+    "message": "更新于 今日 16:20；超过阈值 360 分钟（已自动派发 algo_run 自愈）"
    }
   ]
  }
