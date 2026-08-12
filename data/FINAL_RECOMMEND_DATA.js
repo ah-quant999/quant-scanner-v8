@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-12 17:22:58",
+  "update_time": "2026-08-12 17:23:33",
   "crisis_score": 31.4,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -59,9 +59,9 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [],
       "backtest": {
-        "signals": 0,
-        "win_rate": 0.0,
-        "avg_return": 0.0,
+        "signals": 108,
+        "win_rate": 35.2,
+        "avg_return": -2.17,
         "best_hold_days": 3,
         "note": "个股暂无历史信号，展示策略级统计（最佳持有 3 天）"
       },
@@ -113,9 +113,9 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [],
       "backtest": {
-        "signals": 0,
-        "win_rate": 0.0,
-        "avg_return": 0.0,
+        "signals": 108,
+        "win_rate": 35.2,
+        "avg_return": -2.17,
         "best_hold_days": 3,
         "note": "个股暂无历史信号，展示策略级统计（最佳持有 3 天）"
       },
@@ -180,15 +180,15 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构0.2亿+游资0.7亿",
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "一带一路",
-        "PCB",
         "央国企改革",
-        "黄金概念"
+        "黄金概念",
+        "一带一路",
+        "PCB"
       ],
       "backtest": {
-        "signals": 0,
-        "win_rate": 0.0,
-        "avg_return": 0.0,
+        "signals": 108,
+        "win_rate": 35.2,
+        "avg_return": -2.17,
         "best_hold_days": 3,
         "note": "个股暂无历史信号，展示策略级统计（最佳持有 3 天）"
       },
@@ -277,10 +277,10 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "一带一路",
-        "PCB",
         "央国企改革",
-        "黄金概念"
+        "黄金概念",
+        "一带一路",
+        "PCB"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -308,12 +308,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
+        "5G概念",
+        "融资融券",
         "专精特新",
+        "被动元件概念",
         "军工",
-        "半导体概念",
-        "创业板综",
-        "MLCC",
-        "被动元件概念"
+        "MLCC"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -341,12 +341,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
+        "融资融券",
         "专精特新",
-        "减肥药",
-        "创新医疗服务",
         "创新药",
+        "减肥药",
         "创业板综",
-        "融资融券"
+        "CRO"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -374,12 +374,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "云计算",
-        "数字水印",
+        "ChatGPT概念",
+        "数字经济",
+        "文娱消费",
         "人工智能",
-        "彩票概念",
-        "区块链",
-        "参股银行"
+        "数字水印",
+        "彩票概念"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -407,12 +407,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "趋势股",
+        "融资融券",
         "重组蛋白",
         "破发股",
-        "创新医疗服务",
         "创业板综",
-        "融资融券"
+        "病原体防治",
+        "CRO"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -440,12 +440,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "破增发价股",
-        "创业板综",
-        "短剧互动游戏",
+        "文娱消费",
         "影视概念",
+        "短剧互动游戏",
         "央国企改革",
-        "文娱消费"
+        "创业板综",
+        "破增发价股"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
@@ -499,12 +499,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "电商概念",
-        "乳业",
+        "破发股",
+        "TOPCon电池",
         "智慧城市",
-        "一带一路",
-        "乡村振兴",
-        "婴童概念"
+        "电商概念",
+        "光伏概念",
+        "一带一路"
       ],
       "enter_date": "20260811",
       "stop_loss": null,
