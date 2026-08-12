@@ -6943,22 +6943,43 @@ function renderLimitUpHeatmap(){
   }
 
   function renderCard(it, today){
-    const isLive=['listed_today','tracking'].includes(it.status);
+    const status=it.status||'';
+    const isLive=['listed_today','tracking'].includes(status);
+    const isPending=['pre_listing','applying'].includes(status);
     const score=it.score||0, arb=it.arbitrage_score||0, fund=it.fundamental_score||0;
-    const rec=it.recommend||'—';
-    // 统一映射：不再依赖数据自带的 tag_color/bg_color（数据源颜色不一致）
-    // ⚠️ 不建议必须在建议申购之前，否则"不建议申购"包含子串"建议申购"会被误匹配为红色
-    let tagColor, bgColor;
-    if(/不建议/.test(rec))                  { tagColor='#26a69a'; bgColor='rgba(38,166,154,.12)'; }
-    else if(/强烈推荐|建议申购/.test(rec))   { tagColor='#ef5350'; bgColor='rgba(239,83,80,.14)'; }
-    else if(/谨慎|观望/.test(rec))           { tagColor='#ffb74d'; bgColor='rgba(255,183,77,.12)'; }
-    else                                      { tagColor='#93a4c4'; bgColor='rgba(147,164,196,.12)'; }
+    // 🔴 2026-08-12 主人紧急修复：已上市卡片不应显示申购建议(「不建议申购」等)
+    //   主人：「上市了,要跟踪上市后的情况才对,还在显示不建议申购就不对」
+    //   修复:已上市(listed_today/tracking)→ 显示「跟踪期表现(破发/涨/震荡)」,
+    //   待申购/待定价(status=applying)→ 保留申购建议,
+    //   待上市(status=pre_listing)→ 保留申购建议 + 加「距上市N天」倒计时
+    let rec, tagColor, bgColor;
+    if(isLive){
+      const totalRet = it.total_return!=null ? it.total_return
+                    : (it.change_pct!=null ? it.change_pct : 0);
+      if(totalRet<=-3)      { rec='🔴 破发 '+totalRet.toFixed(1)+'%'; tagColor='#c62828'; bgColor='#ffebee'; }
+      else if(totalRet>=3)   { rec='🟢 涨 +'+totalRet.toFixed(1)+'%'; tagColor='#0d7d4a'; bgColor='#e8f5e9'; }
+      else if(totalRet===0)  { rec='⚪ 震荡 平';        tagColor='#888';    bgColor='#f5f5f5'; }
+      else if(totalRet<0)    { rec='🟡 微跌 '+totalRet.toFixed(1)+'%'; tagColor='#fb8c00'; bgColor='#fff3e0'; }
+      else                  { rec='🟢 微涨 +'+totalRet.toFixed(1)+'%'; tagColor='#0d7d4a'; bgColor='#e8f5e9'; }
+    } else {
+      // ⚠️ 不建议必须在建议申购之前,否则"不建议申购"包含子串"建议申购"会被误匹配为红色
+      rec=it.recommend||'—';
+      if(/不建议/.test(rec))                  { tagColor='#26a69a'; bgColor='rgba(38,166,154,.12)'; }
+      else if(/强烈推荐|建议申购/.test(rec))   { tagColor='#ef5350'; bgColor='rgba(239,83,80,.14)'; }
+      else if(/谨慎|观望/.test(rec))           { tagColor='#ffb74d'; bgColor='rgba(255,183,77,.12)'; }
+      else                                      { tagColor='#93a4c4'; bgColor='rgba(147,164,196,.12)'; }
+    }
     const highlights=(it.highlights||[]).filter(Boolean).slice(0,4);
     let extra;
     if(isLive){
       const ret=it.total_return!=null?it.total_return:0, latest=it.latest_price!=null?it.latest_price:(it.latest||0);
       extra=`<div style="font-size:11px;color:var(--sub)">较发行 <b class="${ret>=0?'up':'down'}">${ret>=0?'+':''}${ret.toFixed(1)}%</b>　现价 ¥${latest.toFixed(2)}</div>`;
-    }else{
+    } else if(status==='pre_listing'){
+      // 🔴 主人令:「待上市也要显示距上市N天」—— 申购已结束,核心是跟踪何时上市
+      const ad=it.apply_date?`申购 ${relDate(it.apply_date,today)}（${fmtDate(it.apply_date)}）`:'';
+      const ld=it.listing_date?`上市 ${relDate(it.listing_date,today)}（${fmtDate(it.listing_date)}）`:'';
+      extra=`<div style="font-size:11px;color:var(--sub)">${ad} ${ad&&ld?'· ':''}<b style="color:var(--gold)">${ld}</b></div>`;
+    } else {
       const ad=it.apply_date?`申购 ${relDate(it.apply_date,today)}（${fmtDate(it.apply_date)}）`:'';
       const ld=it.listing_date?`上市 ${relDate(it.listing_date,today)}（${fmtDate(it.listing_date)}）`:'';
       extra=`<div style="font-size:11px;color:var(--sub)">${ad||ld||''}</div>`;
