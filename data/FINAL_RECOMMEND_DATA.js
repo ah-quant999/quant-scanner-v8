@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-12 19:10:28",
+  "update_time": "2026-08-12 19:10:12",
   "crisis_score": 31.4,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -126,12 +126,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构0.2亿+游资0.2亿",
       "industry": "通用设备制造业",
       "concepts": [
+        "存储芯片",
         "半导体概念",
         "百元股",
-        "东方财富热股",
+        "先进封装",
         "融资融券",
-        "次新股",
-        "创业板综"
+        "次新股"
       ],
       "backtest": {
         "signals": 171,
@@ -201,10 +201,10 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构0.3亿+游资0.1亿",
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "黄金概念",
         "PCB",
+        "一带一路",
         "央国企改革",
-        "一带一路"
+        "黄金概念"
       ],
       "backtest": {
         "signals": 171,
@@ -272,12 +272,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "通用设备制造业",
       "concepts": [
+        "存储芯片",
         "半导体概念",
         "百元股",
-        "东方财富热股",
+        "先进封装",
         "融资融券",
-        "次新股",
-        "创业板综"
+        "次新股"
       ],
       "enter_date": "20260812",
       "stop_loss": null,
@@ -305,10 +305,10 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "黄金概念",
         "PCB",
+        "一带一路",
         "央国企改革",
-        "一带一路"
+        "黄金概念"
       ],
       "enter_date": "20260812",
       "stop_loss": null,
@@ -336,10 +336,10 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "长期破净",
+        "并购重组概念",
         "养老金",
-        "融资融券",
-        "并购重组概念"
+        "长期破净",
+        "融资融券"
       ],
       "enter_date": "20260812",
       "stop_loss": null,
@@ -367,11 +367,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "电气机械和器材制造业",
       "concepts": [
-        "北交所概念",
+        "通信技术",
         "网络安全",
-        "光纤概念",
-        "融资融券",
+        "北交所概念",
         "大数据",
+        "融资融券",
         "5G概念"
       ],
       "enter_date": "20260812",
@@ -400,11 +400,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
+        "病原体防治",
+        "低价股",
         "维生素",
         "创新药",
         "融资融券",
-        "肝炎概念",
-        "低价股",
         "破发股"
       ],
       "enter_date": "20260812",
@@ -429,7 +429,7 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "signals": [
         "不达标",
-        "当日价格振幅达到30%的前5只股票"
+        "当日收盘价涨幅达到20%的前5只股票"
       ],
       "industry": "",
       "concepts": [],
