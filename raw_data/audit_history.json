@@ -83,5 +83,155 @@
     "message": "更新于 今日 16:20；超过阈值 360 分钟"
    }
   ]
+ },
+ {
+  "date": "2026-08-13",
+  "time": "15:28:42",
+  "overall": "fail",
+  "summary": {
+   "ok": 27,
+   "warn": 11,
+   "fail": 16,
+   "total": 54
+  },
+  "warn_items": [
+   {
+    "id": "dom_taskScheduleBody",
+    "name": "DOM #taskScheduleBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_phMacroBody",
+    "name": "DOM #phMacroBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttBackBody",
+    "name": "DOM #ttBackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttThrBody",
+    "name": "DOM #ttThrBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttSvlBody",
+    "name": "DOM #ttSvlBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttTrackBody",
+    "name": "DOM #ttTrackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsAdvBody",
+    "name": "DOM #stcrdsAdvBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsEliteBody",
+    "name": "DOM #stcrdsEliteBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_healthCheckBody",
+    "name": "DOM #healthCheckBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "final_market_distribution",
+    "name": "最终推荐市场分布",
+    "message": "⚠️ Top3 全是A股（5 只全市场集中），疑似数据源异常：000100 MINIMAX-W; 688331 荣昌生物; 600489 中金黄金。排查候选池 / mootdx A股 / akshare 港股 API / maharo 信号"
+   },
+   {
+    "id": "a_share_mahoro",
+    "name": "国际投行信号 A股覆盖",
+    "message": "⚠️ 国际投行信号 今日 0 只（弱市真实状态可接受，但若其他池也 0 则排查上游；若此池独立为 0 而其他池正常则不报警）"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "SH_FIB",
+    "name": "市场温度计",
+    "message": "更新于 今日 17:06；超过阈值 360 分钟"
+   },
+   {
+    "id": "SIX_DIM_RADAR",
+    "name": "六维共振雷达",
+    "message": "更新于 今日 17:06；超过阈值 360 分钟"
+   },
+   {
+    "id": "MARGIN_DATA",
+    "name": "融资融券",
+    "message": "更新于 今日 11:05；超过阈值 360 分钟"
+   },
+   {
+    "id": "CFFEX_HOLDINGS",
+    "name": "股指期货持仓",
+    "message": "更新于 今日 11:05；超过阈值 360 分钟"
+   },
+   {
+    "id": "CRISIS_DATA",
+    "name": "危机雷达",
+    "message": "更新于 今日 15:15；超过阈值 360 分钟"
+   },
+   {
+    "id": "MARKET_FUND_FLOW_DATA",
+    "name": "盘后资金流向",
+    "message": "更新于 今日 15:39；超过阈值 360 分钟"
+   },
+   {
+    "id": "GOLD_POOL",
+    "name": "黄金池",
+    "message": "更新于 今日 17:18；超过阈值 360 分钟"
+   },
+   {
+    "id": "LHB_DATA",
+    "name": "龙虎榜",
+    "message": "更新于 今日 17:08；超过阈值 360 分钟"
+   },
+   {
+    "id": "INST_TRADE",
+    "name": "机构买卖",
+    "message": "更新于 今日 17:06；超过阈值 360 分钟"
+   },
+   {
+    "id": "TRIPLE_CONSENSUS",
+    "name": "三重共识",
+    "message": "更新于 今日 17:16；超过阈值 360 分钟"
+   },
+   {
+    "id": "FOUR_VOLUME",
+    "name": "四量终极",
+    "message": "更新于 今日 15:40；超过阈值 360 分钟"
+   },
+   {
+    "id": "COCKPIT_ADVICE",
+    "name": "驾驶舱",
+    "message": "更新于 今日 17:18；超过阈值 360 分钟"
+   },
+   {
+    "id": "BIG_BULL_HUNTER",
+    "name": "大牛股猎手",
+    "message": "更新于 今日 17:08；超过阈值 360 分钟"
+   },
+   {
+    "id": "TOP10_DAILY",
+    "name": "全站精选",
+    "message": "更新于 今日 17:12；超过阈值 360 分钟"
+   },
+   {
+    "id": "STOCK_RPS",
+    "name": "相对强度",
+    "message": "更新于 今日 17:12；超过阈值 360 分钟"
+   },
+   {
+    "id": "CRDS_CARD_DATA",
+    "name": "逆势龙头",
+    "message": "更新于 今日 17:08；超过阈值 360 分钟"
+   }
+  ]
  }
 ]
