@@ -74,6 +74,7 @@ jobs:
     steps:
       - name: "🕐 确定抓取类别"
         id: cat
+        shell: bash
         run: |
           CRON="${{ github.event.schedule }}"
           case "$CRON" in
