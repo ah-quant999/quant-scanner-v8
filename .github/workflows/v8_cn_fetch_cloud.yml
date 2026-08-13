@@ -105,11 +105,8 @@ jobs:
               echo "category=all" >> "$GITHUB_OUTPUT"
               echo "label=兜底(未匹配cron $CRON, 走all)" ;;
           esac
-          # 兜底：无论 case 命中与否，确保 category 输出有值（防 step 后续 ${{ steps.cat.outputs.category }} 为空）
-          if [ -z "${{ steps.cat.outputs.category }}" ]; then
-            echo "⚠️ category 输出为空，强制设为 all"
-            echo "category=all" >> "$GITHUB_OUTPUT"
-          fi
+          # 注：原 if 兜底（"${{ steps.cat.outputs.category }}"）已删——${{ }} 在 step 启动前展开为空，
+          #   即使 case 命中也会强制再 echo 一次，导致同一 output 键重复，GitHub Action 报错"Multiple outputs"
 
       - uses: actions/checkout@v4
         # 🛡️ 2026-08-13 14:54 根因修复（小九令）：原 checkout 默认 1 分钟超时，
