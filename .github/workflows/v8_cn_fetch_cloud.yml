@@ -24,7 +24,7 @@
 #                     CONCEPT_RANKING / LIMIT_UP_HEATMAP / AI_MARKET_BRIEF
 #   17:20  盘后：EXPERIMENT + MARKET_FUND_FLOW_DATA + 龙虎榜当日数据刷新
 #          （交易所 17:00 后才发布龙虎榜，故 post_close 从 15:45 推迟到 17:20）
-#   17:00/21:00 全量兜底（防 GitHub schedule 高负载丢触发）
+#   17:00/21:30 全量兜底（防 GitHub schedule 高负载丢触发；21:30 刚好美股开盘后捕获隔夜宏观变动）
 #   周六 09:00 / 周日 09:00  T+1 周度/月度统一刷新
 #
 # 🔴 2026-08-06 根因修复：GitHub Actions 单个 workflow 的 schedule 条目过多会静默失效。
@@ -40,7 +40,7 @@ on:
     - cron: '25 0 * * 1-5'     # 08:25 CST 盘前
     - cron: '*/30 1-8 * * 1-5' # 09:00-16:30 CST 盘中每30分钟（含 16:30 港股收盘补抓）
     - cron: '20 9 * * 1-5'     # 17:20 CST 盘后（龙虎榜 17:00 后发布）
-    - cron: '0 9,13 * * 1-5'   # 17:00/21:00 CST 全量兜底
+    - cron: '0 9,14 * * 1-5'   # 17:00/21:30 CST 全量兜底
     - cron: '0 1 * * 0,6'      # 周六/周日 09:00 CST 周度刷新
   workflow_dispatch:
     inputs:
