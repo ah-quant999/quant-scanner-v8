@@ -11944,7 +11944,11 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       var horizon=D.stocks[0]?D.stocks[0].horizon||'':'';
       var hShort=(horizon.indexOf('短线')>=0?'短线':(horizon.indexOf('中线')>=0?'中线':''));
       var today=dtStr.replace(/-/g,'').slice(4)||'';
-      var b1='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 '+dtStr+' '+tmStr+' '+(sessionTxt?sessionTxt+' ':'')+(hShort?hShort:'')+'</span>';
+      // 🔴 2026-08-13 主人令: Top3 徽章走 _fmtAshareRel 归一(今日 HH:MM/昨日 HH:MM),
+      //   与 renderFinalCandInner 12015 行 _fb1 行为一致; 不再裸日期, 与全站 _uBadge 对齐。
+      //   上次修 _fb1 时漏改这一处, 现在补回。dtStr/tmStr 保留供 b2/b3 / today 计算用。
+      var _utRel = (ut && window._fmtAshareRel) ? window._fmtAshareRel(ut) : (dtStr ? dtStr+' '+tmStr : '');
+      var b1='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 '+_utRel+' '+(sessionTxt?sessionTxt+' ':'')+(hShort?hShort:'')+'</span>';
       var b2='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);white-space:nowrap">✅ '+today+' 已跑</span>';
       var b3='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.3);white-space:nowrap">📦 '+today+' 已入库 '+((D.total_candidates||D.stocks.length)||0)+'</span>';
       sb.innerHTML=b1+b2+b3;
