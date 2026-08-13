@@ -4396,6 +4396,88 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     return '#fbbf24';
   }
 
+  // ═══ 2026-08-13 主人令：策略星级对比表（聚合已有4类回测数据） ═══
+  // 数据源：BACKTEST_COMPREHENSIVE(共振3档) + COCKPIT_BACKTEST(驾驶舱2档) +
+  //         BACKTEST_TDX(K线信号9个) + OPTIMIZED_STRATEGY(三信号优化)
+  // 综合分 = (胜率-50)×1 + 平均收益×8 + min(8, log10(样本)×2)
+  // 星级：≥30⭐⭐⭐⭐⭐ / ≥20⭐⭐⭐⭐ / ≥12⭐⭐⭐ / ≥6⭐⭐ / ≥0⭐ / <0无星
+  function _buildStrategyRating(){
+    var rows = [];
+    var bc = window.BACKTEST_COMPREHENSIVE || {};
+    var cb = window.COCKPIT_BACKTEST || {};
+    var bd = window.BACKTEST_TDX || {};
+    var op = window.OPTIMIZED_STRATEGY || {};
+
+    // ① 驾驶舱（COCKPIT_BACKTEST.by_score）
+    if(cb && cb.by_score){
+      var tierMap = {'gte80':'驾驶舱A档','gte70_lt80':'驾驶舱B档'};
+      Object.keys(cb.by_score).forEach(function(k){
+        var d = cb.by_score[k];
+        if(d && d.count){
+          rows.push({name:'🎯 '+ (tierMap[k]||k), cat:'驾驶舱', win_rate:d.win_rate, avg_return:d.avg_return, sample:d.count, extra:'当日前'+(k==='gte80'?'3':'4-6')+'名'});
+        }
+      });
+    }
+
+    // ② 共振（BACKTEST_COMPREHENSIVE.comparison.hold_1d）
+    if(bc && bc.comparison && bc.comparison.hold_1d){
+      var labelMap = {'resonance_all':'共振≥2 宽松','resonance_gte70_lt80':'共振70-79分','resonance_gte80':'共振≥80 严格'};
+      Object.keys(bc.comparison.hold_1d).forEach(function(k){
+        var d = bc.comparison.hold_1d[k];
+        if(d && d.count){
+          rows.push({name:'🧲 '+ (labelMap[k]||k), cat:'共振', win_rate:d.win_rate, avg_return:d.avg_return, sample:d.count, extra:'T+1'});
+        }
+      });
+    }
+
+    // ③ K线信号（BACKTEST_TDX.summary，取 T+1 主口径 + 标注 T+5）
+    if(bd && bd.summary){
+      var sigCat = {
+        trend_up:'趋势', trend_down:'趋势', chan_buy:'缠论', contrarian:'逆势',
+        breakout_5d:'突破', volume_surge:'放量', divergence:'背离',
+        ge2_signals:'共振', ge3_signals:'共振'
+      };
+      Object.keys(bd.summary).forEach(function(k){
+        var d = bd.summary[k];
+        if(d && d.total){
+          rows.push({
+            name:'📈 '+ (d.label||k), cat:'信号·'+(sigCat[k]||''),
+            win_rate:d.win_rate_1d, avg_return:d.avg_return_1d, sample:d.total,
+            extra:'T+5 '+(d.win_rate_5d!=null ? d.win_rate_5d.toFixed(1) : '—')+'%'
+          });
+        }
+      });
+    }
+
+    // ④ 三信号优化（OPTIMIZED_STRATEGY.baseline_ge3）
+    if(op && op.baseline_ge3){
+      var b3 = op.baseline_ge3;
+      rows.push({
+        name:'🎯 三信号共振(严格)', cat:'共振·优化',
+        win_rate:(b3.T+5||{}).win_rate_pct, avg_return:(b3.T+5||{}).avg_return_pct,
+        sample:(b3.T+5||{}).total_signals || (b3.total_signals) || 862,
+        extra:'T+5 优化版'
+      });
+    }
+
+    // 计算综合分 + 星级
+    rows.forEach(function(r){
+      if(r.win_rate == null) r.win_rate = 50;
+      if(r.avg_return == null) r.avg_return = 0;
+      var conf = Math.min(8, Math.log10(Math.max(1, r.sample)) * 2);
+      r.score = (r.win_rate - 50) + r.avg_return * 8 + conf;
+      if(r.score >= 30) r.stars = '⭐⭐⭐⭐⭐';
+      else if(r.score >= 20) r.stars = '⭐⭐⭐⭐';
+      else if(r.score >= 12) r.stars = '⭐⭐⭐';
+      else if(r.score >= 6) r.stars = '⭐⭐';
+      else if(r.score >= 0) r.stars = '⭐';
+      else r.stars = '—';
+    });
+    // 按综合分降序
+    rows.sort(function(a,b){ return b.score - a.score; });
+    return rows;
+  }
+
   window.__renderBacktestSection = function(){
     var dst = document.getElementById('btBody');
     if(!dst) return;
@@ -4408,6 +4490,42 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var cb = window.COCKPIT_BACKTEST || {};
 
     var html = '';
+
+    /* ── 0️⃣ 策略星级对比表（2026-08-13 主人令：全部策略一表看尽，按星级排序）── */
+    var starRows = _buildStrategyRating();
+    if(starRows.length){
+      html += '<div style="margin:14px 0;border-left:4px solid #f59e0b;" class="card">';
+      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
+      html += '<span style="font-size:15px;font-weight:700;color:#fbbf24;">⭐ 策略星级对比</span>';
+      html += '<span style="font-size:11px;color:var(--dim);">全部已回测策略一表看尽 · 按综合分降序 · 最高在最上</span>';
+      html += '</div>';
+      html += '<div style="font-size:10.5px;color:var(--dim);margin-bottom:8px;line-height:1.5;">综合分 = (胜率−50) + 平均收益×8 + 样本可信度（log10样本×2，上限8）。星级：≥30=⭐⭐⭐⭐⭐ / ≥20=⭐⭐⭐⭐ / ≥12=⭐⭐⭐ / ≥6=⭐⭐。来源：驾驶舱回测 + 综合回测 + K线信号60日 + 三信号优化。</div>';
+      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
+      html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+      html += '<th style="padding:7px 6px;text-align:left;color:var(--sub);">星级</th>';
+      html += '<th style="padding:7px 6px;text-align:left;color:var(--sub);">策略</th>';
+      html += '<th style="padding:7px 6px;text-align:right;color:var(--sub);">胜率</th>';
+      html += '<th style="padding:7px 6px;text-align:right;color:var(--sub);">平均收益</th>';
+      html += '<th style="padding:7px 6px;text-align:right;color:var(--sub);">样本</th>';
+      html += '<th style="padding:7px 6px;text-align:right;color:var(--sub);">综合分</th>';
+      html += '<th style="padding:7px 6px;text-align:left;color:var(--sub);">口径</th>';
+      html += '</tr></thead><tbody>';
+      starRows.forEach(function(r, i){
+        var bg = (i===0) ? 'background:rgba(245,158,11,.08);' : '';
+        var topBadge = (i===0) ? '<span style="color:#fbbf24;font-weight:700;"> 👑最强</span>' : '';
+        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+bg+'">';
+        html += '<td style="padding:7px 6px;color:#fbbf24;font-weight:700;white-space:nowrap;flex-shrink:0;">'+r.stars+'</td>';
+        html += '<td style="padding:7px 6px;font-weight:700;color:var(--txt);white-space:nowrap;">'+r.name+topBadge+'</td>';
+        html += '<td style="padding:7px 6px;text-align:right;font-weight:700;color:'+_colorNum(r.win_rate, 50)+';">'+ (typeof r.win_rate==='number' ? r.win_rate.toFixed(1) : r.win_rate)+'%</td>';
+        html += '<td style="padding:7px 6px;text-align:right;font-weight:600;color:'+_colorNum(r.avg_return, 0)+';">'+(r.avg_return>0?'+':'')+ (typeof r.avg_return==='number' ? r.avg_return.toFixed(2) : r.avg_return)+'%</td>';
+        html += '<td style="padding:7px 6px;text-align:right;color:var(--sub);">'+r.sample+'</td>';
+        html += '<td style="padding:7px 6px;text-align:right;font-weight:700;color:#fbbf24;">'+r.score.toFixed(1)+'</td>';
+        html += '<td style="padding:7px 6px;color:var(--dim);font-size:10.5px;white-space:nowrap;">'+r.extra+'</td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+      html += '</div>';
+    }
 
     /* ── ① TOP3 90 天跟踪（"执行效果"）── */
     html += '<div style="margin:14px 0;border-left:4px solid #fbbf24;" class="card">';
