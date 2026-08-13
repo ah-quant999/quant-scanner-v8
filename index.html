@@ -11341,16 +11341,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
           '<span style="font-size:13px;font-weight:700;color:var(--gold);">🎯 弱市专用兑现</span>'+
           '<span style="margin-left:auto;font-size:11px;color:var(--dim);">信息源：<b style="color:var(--sub)">algorithms/calc_crds.py</b>（5 档唯一权威源）</span>'+
         '</div>'+
-        '<div style="font-size:13px;line-height:1.7;color:var(--txt);">'+advice+'</div>'+
-        '<div style="margin-top:6px;font-size:11px;color:var(--dim);line-height:1.6;">'+
-          '📖 <b style="color:var(--sub)">为什么是"专用场景"</b>：CRDS 抓的是"大盘跌时还能涨"的票（逆势板），大盘上涨时所有股都涨，"逆势"概念不成立，'+
-          '入选门槛被稀释，**当日涨的票里 CRDS 信号没有区分度**。权威源 5 档分档（上证今日涨跌幅）：<br>'+
-          '· <b style="color:#185FA5;">高有效</b>：&lt;-2.0% 暴跌恐慌日信号最强，但需防系统性风险<br>'+
-          '· <b style="color:#1D9E75;">较有效</b>：-2.0% ~ -0.5% 市场偏弱，跟踪精选级<br>'+
-          '· <b style="color:#1D9E75;">有效</b>：-0.5% ~ +1.0% 震荡市，CRDS 可正常参考<br>'+
-          '· <b style="color:#BA7517;">低效</b>：+1.0% ~ +2.0% 市场偏强，信号意义降低<br>'+
-          '· <b style="color:#999;">失效</b>：≥+2.0% 大涨市，建议当日无视 CRDS 信号'+
-        '</div>';
+        '<div style="font-size:13px;line-height:1.7;color:var(--txt);">'+advice+'</div>';
     }
     function fillList(listEl,arr,html){if(!arr||!arr.length){listEl.innerHTML=html;return;}
       listEl.innerHTML=arr.map(function(s){return '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+s.name+'('+s.code+')</div>';}).join('');
