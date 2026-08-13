@@ -84,8 +84,22 @@ def walk_raw():
     out = {}
     if not os.path.isdir("raw_data"):
         return out
+    # 🛡️ 2026-08-14 防覆盖（主人令"防覆盖了？"）：算法产物只在家庭机 17:20 run_algorithms 跑，
+    #    cloud_fetch 不产出它们。但云端 runner 工作区里常有旧版副本，walk_raw 全量推
+    #    会覆盖 main 上的新版（实测 05:40 fetch 把 backtest_tdx.json 从 08-13 新版
+    #    142061 行覆盖回 08-04 旧版，策略回测页数据倒退）。
+    #    故此处排除算法产物，仅由 run_algorithms/本地推链维护。
+    _ALGO_RAW = {
+        "backtest_tdx.json",            # backtest_tdx.py（60日K线回测）
+        "backtest_comprehensive.json",  # backtest_comprehensive.py（多策略×多持有期）
+        "cockpit_backtest.json",        # cockpit_backtest_now.py（驾驶舱回测）
+        "optimized_strategy.json",      # export_optimized_strategy.py
+        "top3_track.json",              # gen_top3_track.py（TOP3 90天跟踪）
+    }
     for root, _dirs, files in os.walk("raw_data"):
         for f in files:
+            if f in _ALGO_RAW:
+                continue
             full = os.path.join(root, f)
             rel = os.path.relpath(full, ".").replace("\\", "/")
             with open(full, "rb") as fh:
