@@ -424,7 +424,9 @@ def main():
             continue
         r = ensure(code, s.get("name"), s.get("market"), s.get("board"))
         score = safe_float(s.get("total_score") or s.get("score"))
-        src_score = min(4.0, max(1.0, score / 20.0)) if score >= 25 else 0.0
+        # 2026-08-13 公平性修复：去掉 score>=25 硬门槛（低于直接出局=歧视），
+        # 改为统一归一化；入选即给基础分，避免强三重共识信号被误杀。
+        src_score = min(4.0, max(0.5, score / 25.0))
         if src_score > 0:
             r["sources"].append("三重共识")
             r["source_scores"]["三重共识"] = round(src_score, 2)
@@ -451,7 +453,9 @@ def main():
             qs = safe_float(s.get("quality_score"))
             total = safe_float(s.get("total_score")) or (tech + qs)
             if tier == "tier_a":
-                src_score = 2.5 + min(1.5, max(0.0, (total - 50) / 50.0 * 1.5))
+                # 2026-08-13 公平性修复：起点 2.5 偏高，驾驶舱A档天然占优；
+                # 降到 1.5 与其他源（四量/大牛股/板块龙头）同量级基准。
+                src_score = 1.5 + min(1.5, max(0.0, (total - 50) / 50.0 * 1.5))
             else:
                 src_score = 1.0
             r["sources"].append(label)
@@ -593,6 +597,8 @@ def main():
             continue
         # 只取每个强势板块里综合板块分最高的前若干只，避免噪声
         r = ensure(code, s.get("name"), s.get("market"), s.get("board"))
+        # 2026-08-13 公平性修复：板块龙头源分=入选权重(0.5)+板块强度(sec_score)，
+        # 末尾 sec_add 对已含板块龙头源的票置 0，避免板块被双重计价。
         src_score = round(min(3.0, 0.5 + sec_score), 2)
         r["sources"].append("板块龙头")
         r["source_scores"]["板块龙头"] = src_score
@@ -639,7 +645,10 @@ def main():
                 existing.add(h["name"])
         resonance = len(set(r["sources"]))
         strength = sum(r["source_scores"].values())
-        final_score = strength + resonance * 1.5 + sec_score
+        # 2026-08-13 公平性修复：若已是板块龙头源，板块强度已在源分体现，
+        # 此处只对非板块龙头票加全局板块加分，避免板块被双重计价。
+        sec_add = 0.0 if "板块龙头" in r["sources"] else sec_score
+        final_score = strength + resonance * 1.5 + sec_add
         # 港股惩罚：用户主做 A 股，港股不应因多源共振天然霸榜
         if r.get("board") == "港股" or market_prefix(r.get("code", "")) == "hk":
             final_score -= HK_PENALTY
@@ -654,7 +663,9 @@ def main():
         })
 
     # 排序：先按共振次数，再按综合分，再按源强度（多源共振优先）
-    scored.sort(key=lambda x: (x["resonance"], x["final_score"], x["strength"]), reverse=True)
+    # 2026-08-13 公平性修复：排序第一关键字改为 final_score（分数优先），
+    # 共振数/强度作次级 tie-breaker——公平计分后"最强"=分数最高，而非最多策略选中。
+    scored.sort(key=lambda x: (x["final_score"], x["resonance"], x["strength"]), reverse=True)
 
     # ── Top3 选取（2026-08-11 主人令：公平竞争，谁好谁上）──
     # 之前 A 股硬保底逻辑：先灌 A 股 + 余下从全局高分（已被 HK_PENALTY 减分）填。
@@ -690,7 +701,7 @@ def main():
         is_top=True (top3/Allsite A/B档 持仓层):
           严格按 sources——主推"短线择时买入"，跨策略仍标"短线/中线共振"
         is_top=False (候选池/research 视角):
-          放宽——含中线策略 或 多源短线共振 ≥2 自动归"中长线"，避免 longList 永远空
+          仅含中线策略源(mid)归"中长线"；纯短线策略源保持"短线"（2026-08-13 公平性修复：标签须反映策略真实属性）
         2026-08-11 主人令：候选池的中长线列之前永远"暂无"——是判定过严。
         """
         short = {"四量终极", "大牛股猎手", "板块龙头"}
@@ -708,7 +719,7 @@ def main():
             if has_short: return "短线"
             if has_mid: return "中长线"
             return "短线"
-        # 候选池放宽：含中线策略 → 中长线 / 多源短线共振≥2 → 中长线
+        # 候选池放宽：含中线策略源(mid)归中长线；纯短线共振≥2(多源交叉)也升中长线
         if has_mid:
             return "中长线"
         if has_short and resonance >= 2:

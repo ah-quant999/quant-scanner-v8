@@ -366,7 +366,7 @@ html>
   .tp-meta{font-size:12px;color:var(--sub);margin-top:5px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
   .tp-score{font-size:20px;font-weight:800;color:var(--purple);line-height:1}
   .tp-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible}
-  .tp-tag{font-size:10px;padding:2px 6px;border-radius:5px;background:var(--bg2);color:var(--sub)}
+  .tp-tag{font-size:10px;padding:2px 6px;border-radius:5px;background:var(--bg2);color:var(--sub);flex-shrink:0}
   .tp-tag.ind{background:rgba(56,189,248,.14);color:var(--cyan)}
   .tp-tag.sec{background:rgba(31,209,123,.12);color:var(--down)}
   .tp-tag.con{background:rgba(251,191,36,.14);color:var(--gold)}
@@ -11698,10 +11698,10 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   .fr-card.r3::before{background:linear-gradient(180deg,#c2833f,#92400e)}
 
   .fr-hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
-  .fr-rank{font-size:22px;line-height:1}
-  .fr-name{font-size:18px;font-weight:800;color:var(--txt)}
-  .fr-code{font-size:13px;color:var(--sub);font-weight:600;font-family:ui-monospace,Menlo,monospace}
-  .fr-tag{font-size:10px;padding:1px 8px;border-radius:6px;background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.25);font-weight:600;white-space:nowrap}
+  .fr-rank{font-size:22px;line-height:1;flex-shrink:0}
+  .fr-name{font-size:18px;font-weight:800;color:var(--txt);flex-shrink:0}
+  .fr-code{font-size:13px;color:var(--sub);font-weight:600;font-family:ui-monospace,Menlo,monospace;flex-shrink:0}
+  .fr-tag{font-size:10px;padding:1px 8px;border-radius:6px;background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.25);font-weight:600;white-space:nowrap;flex-shrink:0}
   .fr-tag.ind{background:rgba(167,139,250,.12);color:#a78bfa;border-color:rgba(167,139,250,.25)}
   .fr-tag.horizon-s{background:rgba(244,73,93,.12);color:var(--up);border-color:rgba(244,73,93,.25)}
   .fr-tag.horizon-m{background:rgba(31,209,123,.12);color:#1fd17b;border-color:rgba(31,209,123,.25)}
@@ -11713,7 +11713,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   .fr-enter{font-size:12px;color:var(--dim);white-space:nowrap}
 
   .fr-chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;overflow:visible}
-  .fr-chip{font-size:11px;padding:2px 9px;border-radius:7px;background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.25);font-weight:600}
+  .fr-chip{font-size:11px;padding:2px 9px;border-radius:7px;background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.25);font-weight:600;flex-shrink:0}
   .fr-chip.con{background:rgba(167,139,250,.12);color:#a78bfa;border-color:rgba(167,139,250,.25)}
   .fr-chip.src{background:rgba(34,211,238,.12);color:#22d3ee;border-color:rgba(34,211,238,.25)}
 
@@ -12039,7 +12039,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       var map={'主板':'#22c55e','创业板':'#f59e0b','科创板':'#a855f7','北交所':'#06b6d4','港股':'#6366f1','ST':'#ef4444'};
       return map[b] || map['主板'];
     }
-    function _mkTag(text, color){ return '<span style="display:inline-block;padding:2px 7px;border-radius:999px;background:'+color+'22;color:'+color+';border:1px solid '+color+'40;font-size:11px;font-weight:600;white-space:nowrap">'+_fe(text)+'</span>'; }
+    function _mkTag(text, color){ return '<span style="display:inline-block;padding:2px 7px;border-radius:999px;background:'+color+'22;color:'+color+';border:1px solid '+color+'40;font-size:11px;font-weight:600;white-space:nowrap;flex-shrink:0">'+_fe(text)+'</span>'; }
     function _pctColor(p){ return p==null?'var(--dim)':(p>=0?'var(--up)':'var(--down)'); }
     function _renderStock(s){
       var board=s.board||fmtMarket(s.market,s.code);
@@ -12050,13 +12050,13 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       tags+=_mkTag(board, _boardColor(board));
       // 2026-08-13 主人令：取消「已降权」市场歧视标签；港股暂无基本面数据源，
       // 以灰色信息标签「数据待补」提示，不压分、不警告。
-      if(isHK) tags+='<span style="display:inline-block;padding:2px 7px;border-radius:999px;background:#64748b22;color:#94a3b8;border:1px solid #64748b40;font-size:10px;font-weight:600;white-space:nowrap">数据待补</span>';
+      if(isHK) tags+='<span style="display:inline-block;padding:2px 7px;border-radius:999px;background:#64748b22;color:#94a3b8;border:1px solid #64748b40;font-size:10px;font-weight:600;white-space:nowrap;flex-shrink:0">数据待补</span>';
       if(s.industry) tags+=_mkTag(s.industry, '#64748b');
       (s.concepts||[]).slice(0,4).forEach(function(c){ tags+=_mkTag(c, '#38bdf8'); });
       var srcColor={'三重共识':'var(--purple)','驾驶舱A档':'#ffd54f','驾驶舱B档':'#f59e0b','四量终极':'#ff7043','板块龙头':'#22c55e','大牛股猎手':'#ef4444','逆势龙头·精锐':'#06b6d4'};
       var _srcs = (s.sources||[]);
       var _isMulti = (_srcs.length >= 2);
-      var srcChips=_srcs.map(function(src){ return '<span style="font-size:'+(_isMulti?'12px':'11px')+';padding:2px 8px;border-radius:999px;background:'+(srcColor[src]||(_isMulti?'#f59e0b':'#64748b'))+'22;color:'+(srcColor[src]||(_isMulti?'#f59e0b':'#64748b'))+';border:1px solid '+(srcColor[src]||(_isMulti?'#f59e0b':'#64748b'))+'40;font-weight:'+(_isMulti?'800':'600')+';white-space:nowrap">'+(_isMulti?'🔥 ':'')+_fe(src)+'</span>'; }).join('');
+      var srcChips=_srcs.map(function(src){ return '<span style="font-size:'+(_isMulti?'12px':'11px')+';padding:2px 8px;border-radius:999px;background:'+(srcColor[src]||(_isMulti?'#f59e0b':'#64748b'))+'22;color:'+(srcColor[src]||(_isMulti?'#f59e0b':'#64748b'))+';border:1px solid '+(srcColor[src]||(_isMulti?'#f59e0b':'#64748b'))+'40;font-weight:'+(_isMulti?'800':'600')+';white-space:nowrap;flex-shrink:0">'+(_isMulti?'🔥 ':'')+_fe(src)+'</span>'; }).join('');
       var priceLine='';
       if(price!=null){
         var pctText = pct==null?'':((pct>=0?'+':'')+pct.toFixed(2)+'%');
