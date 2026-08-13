@@ -32,7 +32,7 @@ DATA = os.path.join(ROOT, "data")
 
 CRISIS_HIGH_THRESHOLD = 50  # 危机雷达≥50才并入逆势龙头
 SECTOR_TOP_N = 15
-TOP_N = 3
+TOP_N = 5  # 2026-08-13 主人令：从 3 扩到 5（共振优先 + 分数其次，覆盖更多共识强票）
 # 2026-08-11 主人令：去掉港股降权+去掉 A 股保底——「谁好谁上」原则。
 #   之前 HK_PENALTY=1.5 + hard_a=MIN_A_SHARES_IN_TOP-1=1 是「主做 A 股」假设下的保护，
 #   实际效果是市场歧视（港股凭空少 1.5 分）。现在改公平竞争，靠数据说话。
