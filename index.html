@@ -1383,11 +1383,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var __dToday=__ts.getTime()>=__today;
           var __hr=__ts.getHours();
           var __lb,__pd;
-          if(!__dToday){ __lb='昨日盘后'; __pd='盘后'; }
+          if(!__dToday){ __lb='昨日盘后'; __pd='短线'; }
           else if(__hr<9){ __lb='盘前'; __pd=''; }
-          else if(__hr<15){ __lb='盘中'; __pd='盘中'; }
-          else if(__hr<17){ __lb='盘后'; __pd='盘后'; }
-          else { __lb='今日盘后'; __pd='盘后'; }
+          else if(__hr<15){ __lb='盘中'; __pd='短线'; }
+          else if(__hr<17){ __lb='盘后'; __pd='短线'; }
+          else { __lb='今日盘后'; __pd='短线'; }
           timeEl.innerHTML = _uBadge(__lb,__pd,d.gen_time);
         }
         var h='';
@@ -1716,11 +1716,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var _dToday=_ts.getTime()>=_today;
           var _hr=_ts.getHours();
           var _lb,_pd;
-          if(!_dToday){ _lb='昨日盘后'; _pd='盘后'; }
+          if(!_dToday){ _lb='昨日盘后'; _pd='短线'; }
           else if(_hr<9){ _lb='盘前'; _pd=''; }
-          else if(_hr<15){ _lb='盘中'; _pd='盘中'; }
-          else if(_hr<17){ _lb='盘后'; _pd='盘后'; }
-          else { _lb='今日盘后'; _pd='盘后'; }
+          else if(_hr<15){ _lb='盘中'; _pd='短线'; }
+          else if(_hr<17){ _lb='盘后'; _pd='短线'; }
+          else { _lb='今日盘后'; _pd='短线'; }
           timeEl.innerHTML = _uBadge(_lb,_pd,updateTime);
         }
       }
@@ -6442,6 +6442,13 @@ function drawAmountChart(){
   const gw = W - PAD.left - PAD.right;
   const gh = H - PAD.top - PAD.bottom;
 
+  // 按日期排序，防止数据源顺序错乱导致 x 轴时间乱跳（如 9/24 跑到 8/12 前）
+  hist.sort(function(a,b){
+    var ap=a.date.split('/').map(Number), bp=b.date.split('/').map(Number);
+    if(ap[0]!==bp[0]) return ap[0]-bp[0];
+    return ap[1]-bp[1];
+  });
+
   let maxV = 0; hist.forEach(d=>{ if(d.total>maxV) maxV=d.total; });
   maxV = Math.ceil(maxV/5000)*5000;
 
@@ -6452,15 +6459,20 @@ function drawAmountChart(){
     html += '<line x1="'+PAD.left+'" y1="'+y+'" x2="'+(W-PAD.right)+'" y2="'+y+'" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>';
     html += '<text x="'+(PAD.left-8)+'" y="'+(y+4)+'" text-anchor="end" font-size="10" fill="var(--dim)">'+v+'</text>';
   }
-  const step = Math.ceil(hist.length/7);
-  hist.forEach((d,i)=>{
-    if(i%step!==0 || i>=hist.length-2) return;
+  // x 轴日期标签：按交易天数间隔约 10 天（≈ 两周），避免最后两个日期黏在一起
+  const labelInterval = Math.max(5, Math.round(hist.length/7));
+  var lastLabelIdx = -labelInterval;
+  hist.forEach(function(d,i){
+    var isLast = i===hist.length-1;
+    var gapEnough = i - lastLabelIdx >= labelInterval;
+    var nearEnd = isLast && (i - lastLabelIdx) >= Math.max(3, Math.floor(labelInterval/2));
+    if(!gapEnough && !nearEnd) return;
     const x = PAD.left + gw*i/(hist.length-1);
-    html += '<text x="'+x+'" y="'+(H-10)+'" text-anchor="middle" font-size="10" fill="var(--dim)">'+d.date+'</text>';
+    html += '<text x="'+x+'" y="'+(H-10)+'" text-anchor="middle" font-size="10" fill="'+(isLast?'var(--txt)':'var(--dim)')+'"'+(isLast?' font-weight="bold"':'')+'>'+d.date+'</text>';
+    lastLabelIdx = i;
   });
   const last = hist[hist.length-1];
   const lx = PAD.left + gw;
-  html += '<text x="'+lx+'" y="'+(H-10)+'" text-anchor="middle" font-size="11" fill="var(--txt)" font-weight="bold">'+last.date+'</text>';
   html += '<circle cx="'+lx+'" cy="'+(PAD.top+gh*(1-last.total/maxV))+'" r="4" fill="#ffd54f" stroke="#fff" stroke-width="2"/>';
   html += '<text x="'+lx.toFixed(1)+'" y="'+(PAD.top-8).toFixed(1)+'" text-anchor="end" font-size="10" fill="#ffd54f" font-weight="700">'+last.total+'亿</text>';
   html += '<text x="'+(PAD.left+5)+'" y="'+(PAD.top-8)+'" font-size="11" fill="#ff80ab">● 上证</text>';
@@ -6537,6 +6549,13 @@ function drawUpDownChart(){
   var filtered = stats.filter(function(d){ return !holidayDates[d.date]; });
   if(!filtered.length) filtered = stats;
 
+  // 按日期排序，防止 x 轴日期错乱
+  filtered.sort(function(a,b){
+    var ap=a.date.split('/').map(Number), bp=b.date.split('/').map(Number);
+    if(ap[0]!==bp[0]) return ap[0]-bp[0];
+    return ap[1]-bp[1];
+  });
+
   const svg = document.getElementById('upDownChart');
   if(!svg) return;
   let W = svg.clientWidth || svg.getBoundingClientRect().width || 0;
@@ -6561,15 +6580,21 @@ function drawUpDownChart(){
 
   const barW = gw/filtered.length*0.6;
   const gap = gw/filtered.length;
+  // x 轴日期标签：约每 10 个交易日（≈ 两周）写一个，避免最后两个日期黏在一起
+  const udLabelInterval = Math.max(5, Math.round(filtered.length/7));
+  var lastUdLabelIdx = -udLabelInterval;
   filtered.forEach((d,i)=>{
     const x = PAD.left + gap*i + gap*0.2;
     const hUp = gh*d.up/maxV;
     const hDown = gh*d.down/maxV;
     html += '<rect x="'+x+'" y="'+(PAD.top+gh-hUp)+'" width="'+(barW*0.3)+'" height="'+hUp+'" fill="#ff5252" opacity="0.75" rx="2"/>';
     html += '<rect x="'+(x+barW*0.35)+'" y="'+(PAD.top+gh-hDown)+'" width="'+(barW*0.3)+'" height="'+hDown+'" fill="#69f0ae" opacity="0.65" rx="2"/>';
-    if(i%3===0 || i===filtered.length-1){
-      html += '<text x="'+(x+barW/2)+'" y="'+(H-10)+'" text-anchor="middle" font-size="9" fill="'+(i===filtered.length-1?'var(--txt)':'var(--dim)')+'"'+(i===filtered.length-1?' font-weight="bold"':'')+'>'+d.date+'</text>';
-    }
+    var isLast = i===filtered.length-1;
+    var gapEnough = i - lastUdLabelIdx >= udLabelInterval;
+    var nearEnd = isLast && (i - lastUdLabelIdx) >= Math.max(3, Math.floor(udLabelInterval/2));
+    if(!gapEnough && !nearEnd) return;
+    html += '<text x="'+(x+barW/2)+'" y="'+(H-10)+'" text-anchor="middle" font-size="9" fill="'+(isLast?'var(--txt)':'var(--dim)')+'"'+(isLast?' font-weight="bold"':'')+'>'+d.date+'</text>';
+    lastUdLabelIdx = i;
   });
 
   const udLast = filtered[filtered.length-1];
