@@ -15,7 +15,7 @@ html>
     --lock:#5f7099;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--txt);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:14px;line-height:1.5}
+  body{background:var(--bg);color:var(--txt);font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:14px;line-height:1.5;overflow-x:visible}
   a{color:var(--cyan);text-decoration:none}
 
   header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,#0e1626,#0a0e17);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;gap:16px}
@@ -34,7 +34,7 @@ html>
   .tab.locked .lk{font-size:11px}
   .tab.admin-only{display:none}
 
-  main{padding:22px 20px 60px;max-width:1320px;margin:0 auto}
+  main{padding:22px 20px 60px;max-width:1320px;margin:0 auto;overflow:visible}
   section{display:none;animation:fade .25s ease}
   section.active{display:block}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -55,7 +55,7 @@ html>
   .g-4{grid-template-columns:repeat(4,1fr)}
   .g-5{grid-template-columns:repeat(5,1fr)}
   @media(max-width:1080px){.g-2,.g-3,.g-4,.g-5{grid-template-columns:1fr}}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;overflow:visible}
   .card h3{font-size:14px;color:var(--sub);font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;line-height:1.4}
   .card h3 .ic{font-size:16px;line-height:1}
   .card h3 .fresh{font-size:11px;color:var(--dim);font-weight:400;white-space:nowrap}
@@ -355,7 +355,7 @@ html>
 
   /* 三重共识 / 历史追踪（选股策略 tab） */
   .tp-stocklist{display:flex;flex-direction:column;gap:10px}
-  .tp-stock{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 12px}
+  .tp-stock{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 12px;overflow:visible}
   .tp-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .tp-code{font-size:11px;color:var(--dim);font-family:ui-monospace,Menlo,monospace}
   .tp-name{font-size:15px;font-weight:800;color:var(--txt)}
@@ -365,7 +365,7 @@ html>
   .tp-badge.near{background:rgba(251,191,36,.16);color:var(--gold)}
   .tp-meta{font-size:12px;color:var(--sub);margin-top:5px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
   .tp-score{font-size:20px;font-weight:800;color:var(--purple);line-height:1}
-  .tp-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+  .tp-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;overflow:visible}
   .tp-tag{font-size:10px;padding:2px 6px;border-radius:5px;background:var(--bg2);color:var(--sub)}
   .tp-tag.ind{background:rgba(56,189,248,.14);color:var(--cyan)}
   .tp-tag.sec{background:rgba(31,209,123,.12);color:var(--down)}
@@ -11712,12 +11712,12 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   .fr-score b{font-size:20px;color:var(--gold);font-weight:800}
   .fr-enter{font-size:12px;color:var(--dim);white-space:nowrap}
 
-  .fr-chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+  .fr-chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;overflow:visible}
   .fr-chip{font-size:11px;padding:2px 9px;border-radius:7px;background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.25);font-weight:600}
   .fr-chip.con{background:rgba(167,139,250,.12);color:#a78bfa;border-color:rgba(167,139,250,.25)}
   .fr-chip.src{background:rgba(34,211,238,.12);color:#22d3ee;border-color:rgba(34,211,238,.25)}
 
-  .fr-signals{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+  .fr-signals{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;overflow:visible}
   .fr-sig{font-size:11px;padding:3px 9px;border-radius:7px;background:rgba(244,73,93,.12);color:var(--up);border:1px solid rgba(244,73,93,.25);font-weight:600}
 
   .fr-sector{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--sub);margin:8px 0;padding:8px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px}
