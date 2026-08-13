@@ -1014,7 +1014,13 @@ USE_MOOTDX_KLINE = os.environ.get("COMPUTERNAME", "").upper() == "LEMONCAT"
 
 # 云端模式 (GitHub Actions): 美区 runner 无法访问 akshare/东财/BaoStock/mootdx 通达信服务器，
 # 改走腾讯 GTimg（实时行情 + 前复权日K）。本地双机仍用 mootdx/akshare。
-CLOUD_RUNNER = os.environ.get("CLOUD_RUNNER", "").lower() == "true"
+# 2026-08-13 修复：v8_algo_cloud.yml 等 GitHub Actions workflow 未显式设 CLOUD_RUNNER，
+# 导致 scanner 在云端 runner 上仍走本地 mootdx/东财路径，A股活跃股池抓取失败，
+# 全站精选只剩港股。自动识别 GITHUB_ACTIONS 环境，双保险走腾讯 GTimg 数据源。
+CLOUD_RUNNER = (
+    os.environ.get("CLOUD_RUNNER", "").lower() == "true"
+    or os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
+)
 if CLOUD_RUNNER:
     _BS_FAIL_SKIP_THRESHOLD = 0  # 云端 baostock 不通, 跳过
     USE_MOOTDX_KLINE = False     # 云端 mootdx TCP 连不通，改 GTimg
