@@ -3899,7 +3899,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     // Footer
     h += '<div style="margin-top:12px;font-size:10px;color:var(--dim);text-align:center;line-height:1.6">';
     h += '龙虎榜北向席位日历 · 每日净买入TOP5 + 净卖出TOP5<br>';
-    h += '生成日期：' + ((window.LHB_DATA && window.LHB_DATA.update_time) || '--');
+    h += '数据更新：' + ((window.LHB_DATA && window.LHB_DATA.update_time) ? (window._fmtAshareRel ? window._fmtAshareRel(window.LHB_DATA.update_time) : window.LHB_DATA.update_time) : '—');
     h += '</div>';
 
     c.innerHTML = h;
@@ -8225,7 +8225,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       }
       const wm = window.WEEKEND_META_REPORT || {};
       if (wm && wm.update_time) {
-        extra += '<div style="font-size:11px;color:var(--sub);">📑 元数据巡检：' + _esc(wm.update_time) + ' · 全市场 ' + (wm.total || 0) + ' 只 · 新上市 ' + (wm.new_listings_count || 0) + ' · 退市 ' + (wm.delisted_count || 0) + '</div>';
+        extra += '<div style="font-size:11px;color:var(--sub);">📑 元数据巡检：' + _esc(wm.update_time && window._fmtAshareRel ? window._fmtAshareRel(wm.update_time) : (wm.update_time||'')) + ' · 全市场 ' + (wm.total || 0) + ' 只 · 新上市 ' + (wm.new_listings_count || 0) + ' · 退市 ' + (wm.delisted_count || 0) + '</div>';
       }
       extra += '</div>';
       el.innerHTML += extra;
