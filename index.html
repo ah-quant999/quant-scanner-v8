@@ -8861,10 +8861,11 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     const ext=near.filter(s=>(s.total_score||0)>=75&&(s.miss_steps||1)===2);
     $('tcNearCount').textContent=pri.length;
     $('tcPriority').innerHTML=pri.length?pri.map(s=>renderStock(s,true,tm)).join(''):'<div class="tp-empty">暂无</div>';
-    // 🔴 2026-08-12 审计修复：优先/扩展观察卡头补齐「更新于」胶囊（与严格共识卡同源 TRIPLE_CONSENSUS.update_time）
+    // 🔴 2026-08-13 主人令修正：同板块子卡不再重复「更新于」胶囊（顶部严格共识卡已 setBadge('tcTime',...) 显示一次）。
+    //   h3 内的 <span id="tcNearTime/tcExtTime"> 留空，避免信息冗余。
     var _tcNearTime=$('tcNearTime'), _tcExtTime=$('tcExtTime');
-    if(_tcNearTime) setBadge('tcNearTime','盘后','短线',data.update_time);
-    if(_tcExtTime) setBadge('tcExtTime','盘后','短线',data.update_time);
+    if(_tcNearTime) _tcNearTime.textContent = '';
+    if(_tcExtTime) _tcExtTime.textContent = '';
     $('tcExtCount').textContent=ext.length;
     $('tcExtended').innerHTML=ext.length?ext.map(s=>renderStock(s,true,tm)).join(''):'<div class="tp-empty">暂无</div>';
     setBadge('tcTime','盘后','短线',data.update_time);
@@ -8900,7 +8901,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   }
 
   function renderTrack(track){
-    setBadge('ttTime','盘后','短线',track.update_time);
+    // 🔴 2026-08-13 主人令修正：持仓盈亏跟踪卡不再重复「更新于」胶囊，留空让顶部「严格三重共识」卡统一显示。
+    var _tt=$('ttTime'); if(_tt) _tt.textContent = '';
     const trackStart=track.track_start||'';
     const needDaysMsg=trackStart?'（跟踪起始 '+trackStart+'，需累积足够交易日方可计算）':'';
     const tb=$('ttTrackBody');
@@ -11995,7 +11997,10 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     }
     // 状态徽标（与 Top3 统一轻量 pill 风格）
     (function(){
+      // 🔴 2026-08-13 主人令修正：胶囊内时间戳走 _fmtAshareRel 归一（今日 HH:MM / 昨日 HH:MM），
+      //   不再显示裸日期；与全站其它胶囊（_uBadge）保持一致。
       var _fcUt=D.update_time||'';
+      var _fcRel=(_fcUt && window._fmtAshareRel) ? window._fmtAshareRel(_fcUt) : '';
       var _fcDt='',_fcTm='',_fcSes='';
       if(_fcUt){
         var _fcM=_fcUt.match(/(\d{4}-\d{2}-\d{2})\s*(\d{1,2}:\d{2})/);
@@ -12007,7 +12012,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       }
       var _fcToday=_fcDt.replace(/-/g,'').slice(4)||'';
       var _fcSB=document.getElementById('finalCandBadges'); if(_fcSB) {
-        var _fb1='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 '+_fcDt+' '+_fcTm+' '+(_fcSes?_fcSes+' ':'')+'</span>';
+        var _fb1='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 '+(_fcRel||_fcUt)+' '+(_fcSes?_fcSes+' ':'')+'</span>';
         var _fb2='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);white-space:nowrap">✅ '+_fcToday+' 已跑</span>';
         var _fb3='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.3);white-space:nowrap">📦 '+_fcToday+' 已入库 '+(D.all_candidates.length||0)+'</span>';
         _fcSB.innerHTML=_fb1+_fb2+_fb3;
