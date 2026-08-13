@@ -1,6 +1,6 @@
 {
-  "DATA": "E:/workspace/quant-scanner-v8/out",
-  "V8_OUT_DIR": "E:/workspace/quant-scanner-v8/out",
+  "DATA": "E:\\workspace\\quant-scanner-v8\\algorithms\\..\\out",
+  "V8_OUT_DIR": "",
   "guanlan_watchlist": {
     "exists": false,
     "stocks": 0
