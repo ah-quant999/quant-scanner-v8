@@ -1157,6 +1157,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <div class="tab" data-sec="query" onclick="switchSec('query',this)">🔍 个股查询</div>
   <!-- 2026-08-08 主人令：选股策略降级为「辅助策略池」，仅管理员可见，置于暂未上架左侧 -->
   <div class="tab locked admin-only" data-sec="st" data-lock="1" onclick="guardLock('st',this)">🔒 选股策略 <span class="lk">[锁]</span></div>
+  <!-- 2026-08-13 主人令：策略回测（统一）— TOP3 跟踪 + 综合回测 + 信号 60 日回测 一个 tab 装完，仅管理员可见 -->
+  <div class="tab locked admin-only" data-sec="bt" data-lock="1" onclick="guardLock('bt',this)">🔒 策略回测 <span class="lk">[锁]</span></div>
   <!-- 2026-08-07 主人令：暂未上架 从运维子 Tab 提升为一级 nav（仅管理员可见，guardLock 锁定） -->
   <div class="tab locked admin-only" data-sec="ul" data-lock="1" onclick="guardLock('ul',this)">🔒 暂未上架 <span class="lk">[锁]</span></div>
   <div class="tab locked admin-only" data-sec="op" data-lock="1" onclick="guardLock('op',this)">🔒 运维 <span class="lk">[锁]</span></div>
@@ -4361,6 +4363,215 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   </script>
  
   
+ <!-- ============ 运维（管理员） ============ --</script>
+
+
+ <!-- ============ 🔒 策略回测（统一 · 2026-08-13 主人令） ============
+      一个 tab 装三块：① TOP3 90 天跟踪 ② 综合回测多策略×多持有期 ③ K线信号60日回测
+      解决"两边跑着看"问题，仅管理员可见。 -->
+  <section id="sec-bt">
+    <div class="sec-head"><h2>🔒 策略回测（统一）</h2><span class="tag">仅管理员可见 · TOP3跟踪 + 综合回测 + 信号60日 · 三块一站看完</span></div>
+    <div id="btBody"><div class="note">加载中…</div></div>
+  </section>
+
+
+<script>
+/* ═══════════ 🔒 策略回测（统一 · 2026-08-13）═══ 三个回测块一站看完 ═══════════
+   ① 🏆 TOP3 90 天跟踪  — TOP3_TRACK  →  验证"我刚推的票靠不靠谱"
+   ② 📊 综合回测 多策略×多持有期 — BACKTEST_COMPREHENSIVE → "我用的策略哪个最值钱"
+   ③ 📈 K线信号 60 日回测 — BACKTEST_TDX → "信号层有没有 alpha"
+   设计：简洁表格、胜率高亮（≥55% 绿 / ≤45% 红）、平均收益同色。
+*/
+(function(){
+  var rendered = false;
+  function _esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
+  function _colorNum(v, mid){
+    // 数值染色：>= mid+5 绿，<= mid-5 红，中间黄
+    if(v == null || v === '--' || v === '') return 'var(--sub)';
+    if(typeof v === 'string') v = parseFloat(v);
+    if(isNaN(v)) return 'var(--sub)';
+    if(mid == null) mid = 50;
+    if(v >= mid+5) return '#22c55e';
+    if(v <= mid-5) return '#f87171';
+    return '#fbbf24';
+  }
+
+  window.__renderBacktestSection = function(){
+    var dst = document.getElementById('btBody');
+    if(!dst) return;
+    if(rendered) return;
+    rendered = true;
+
+    var tt = window.TOP3_TRACK || {};
+    var bc = window.BACKTEST_COMPREHENSIVE || {};
+    var bd = window.BACKTEST_TDX || {};
+    var cb = window.COCKPIT_BACKTEST || {};
+
+    var html = '';
+
+    /* ── ① TOP3 90 天跟踪（"执行效果"）── */
+    html += '<div style="margin:14px 0;border-left:4px solid #fbbf24;" class="card">';
+    html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
+    html += '<span style="font-size:15px;font-weight:700;color:#fbbf24;">🏆 ① TOP3 90 天跟踪</span>';
+    html += '<span style="font-size:11px;color:var(--dim);">执行效果：刚推的票后来涨没涨？</span>';
+    html += '</div>';
+    var stats = tt.stats || {};
+    var dist = stats.tracking_distribution || {};
+    html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">';
+    html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">';
+    html += '<div style="font-size:10.5px;color:var(--dim);margin-bottom:3px;">窗口期</div>';
+    html += '<div style="font-size:18px;font-weight:700;color:#fbbf24;">'+(stats.window_days||90)+'天</div></div>';
+    html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">';
+    html += '<div style="font-size:10.5px;color:var(--dim);margin-bottom:3px;">正在跟踪</div>';
+    html += '<div style="font-size:18px;font-weight:700;color:var(--cyan);">'+(stats.tracking||0)+'只</div></div>';
+    html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">';
+    html += '<div style="font-size:10.5px;color:var(--dim);margin-bottom:3px;">达成胜率</div>';
+    html += '<div style="font-size:18px;font-weight:700;color:'+_colorNum(stats.win_rate, 50)+';">'+(stats.win_rate||0)+'%</div></div>';
+    html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">';
+    html += '<div style="font-size:10.5px;color:var(--dim);margin-bottom:3px;">平均收益</div>';
+    html += '<div style="font-size:18px;font-weight:700;color:'+_colorNum(stats.avg_return, 0)+';">'+(stats.avg_return>0?'+':'')+(stats.avg_return||0)+'%</div></div>';
+    html += '</div>';
+    // 排名分布
+    html += '<div style="font-size:11.5px;color:var(--sub);margin-bottom:6px;">排名分布：🥇 Rank1 <b>'+(dist.rank1||0)+'</b> / 🥈 Rank2 <b>'+(dist.rank2||0)+'</b> / 🥉 Rank3 <b>'+(dist.rank3||0)+'</b></div>';
+    // 跟踪表
+    var tracks = tt.tracking || [];
+    if(tracks.length){
+      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+      html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+      html += '<th style="padding:6px 4px;text-align:left;color:var(--sub);font-weight:600;">名次</th>';
+      html += '<th style="padding:6px 4px;text-align:left;color:var(--sub);font-weight:600;">名称/代码</th>';
+      html += '<th style="padding:6px 4px;text-align:left;color:var(--sub);font-weight:600;">入选日</th>';
+      html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">入场价</th>';
+      html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">最新价</th>';
+      html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">盈亏%</th>';
+      html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">峰值%</th>';
+      html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">天数</th>';
+      html += '<th style="padding:6px 4px;text-align:left;color:var(--sub);font-weight:600;">来源</th>';
+      html += '</tr></thead><tbody>';
+      var medals = ['🥇','🥈','🥉'];
+      tracks.forEach(function(t, i){
+        var med = medals[i] || '#'+(i+1);
+        var pct = t.last_pct == null ? null : Number(t.last_pct);
+        var peak = t.peak_pct == null ? null : Number(t.peak_pct);
+        var entry = t.entry_price == null ? '<span style="color:var(--dim);">待K线</span>' : Number(t.entry_price).toFixed(2);
+        var last = t.last_close == null ? '<span style="color:var(--dim);">—</span>' : Number(t.last_close).toFixed(2);
+        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+        html += '<td style="padding:6px 4px;font-weight:700;color:#fbbf24;">'+med+'</td>';
+        html += '<td style="padding:6px 4px;font-weight:700;color:var(--txt);">'+_esc(t.name)+' <span style="color:var(--dim);font-size:10.5px;font-family:ui-monospace,Menlo,monospace;">'+_esc(t.code)+'</span></td>';
+        html += '<td style="padding:6px 4px;color:var(--sub);">'+_esc(t.list_date_dashed||t.list_date)+'</td>';
+        html += '<td style="padding:6px 4px;text-align:right;color:var(--sub);font-family:ui-monospace,Menlo,monospace;">'+entry+'</td>';
+        html += '<td style="padding:6px 4px;text-align:right;color:var(--sub);font-family:ui-monospace,Menlo,monospace;">'+last+'</td>';
+        html += '<td style="padding:6px 4px;text-align:right;font-weight:700;color:'+_colorNum(pct, 0)+';">'+(pct==null?'—':(pct>0?'+':'')+pct.toFixed(2)+'%')+'</td>';
+        html += '<td style="padding:6px 4px;text-align:right;color:'+_colorNum(peak, 0)+';">'+(peak==null?'—':(peak>0?'+':'')+peak.toFixed(2)+'%')+'</td>';
+        html += '<td style="padding:6px 4px;text-align:right;color:var(--sub);">'+t.days_in+'</td>';
+        html += '<td style="padding:6px 4px;color:var(--dim);font-size:10.5px;">'+(t.list_sources||[]).join('·')+'</td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+    } else {
+      html += '<div class="note" style="text-align:center;">无跟踪样本</div>';
+    }
+    if(stats.samples === 0 && tracks.length){
+      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;">⏳ 历史成绩需待 TOP3 票 K 线收盘后再统计（当前样本 0，待积累）</div>';
+    }
+    html += '</div>';
+
+    /* ── ② 综合回测（多策略×多持有期）── */
+    html += '<div style="margin:14px 0;border-left:4px solid #38bdf8;" class="card">';
+    html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
+    html += '<span style="font-size:15px;font-weight:700;color:#38bdf8;">📊 ② 综合回测 · 多策略 × 多持有期</span>';
+    html += '<span style="font-size:11px;color:var(--dim);">策略本身价值：哪条策略最值钱？</span>';
+    html += '</div>';
+    if(bc.overview && bc.comparison){
+      var labelMap = {resonance_all:'共振≥2（宽松）', resonance_gte70_lt80:'共振70-79分', resonance_gte80:'共振≥80（严格）'};
+      var stratList = bc.strategies_tested || ['resonance_all','resonance_gte70_lt80','resonance_gte80'];
+      var holdList = bc.hold_periods_tested || [1,3,5,10,20];
+      // 表头：策略 × 持有期
+      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+      html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+      html += '<th style="padding:6px;text-align:left;color:var(--sub);">持有期</th>';
+      stratList.forEach(function(s){
+        html += '<th colspan="2" style="padding:6px;text-align:center;color:var(--sub);border-left:1px solid var(--border2);">'+_esc(labelMap[s]||s)+'</th>';
+      });
+      html += '</tr><tr style="background:var(--card2);border-bottom:1px solid var(--border);">';
+      html += '<th style="padding:4px 6px;"></th>';
+      stratList.forEach(function(){ html += '<th style="padding:4px;text-align:center;color:var(--dim);font-weight:500;font-size:10px;">胜率</th><th style="padding:4px;text-align:center;color:var(--dim);font-weight:500;font-size:10px;border-left:1px solid var(--border2);">收益</th>'; });
+      html += '</tr></thead><tbody>';
+      holdList.forEach(function(h){
+        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+        html += '<td style="padding:6px;color:var(--txt);font-weight:700;">T+'+h+'天</td>';
+        stratList.forEach(function(s){
+          var d = (bc.comparison['hold_'+h+'d']||{})[s] || {};
+          var wr = d.win_rate == null ? '—' : d.win_rate;
+          var ar = d.avg_return == null ? '—' : d.avg_return;
+          var first = (stratList.indexOf(s) === 0);
+          html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorNum(wr, 50)+';">'+(typeof wr === 'number' ? wr.toFixed(1) : wr)+'%</td>';
+          html += '<td style="padding:6px;text-align:center;color:'+_colorNum(ar, 0)+';'+(first?'':'border-left:1px solid var(--border2);')+'">'+(typeof ar === 'number' ? (ar>0?'+':'')+ar.toFixed(2) : ar)+'%</td>';
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+      // 副信息：方法 + 样本数
+      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">方法：'+_esc(bc.method||'baostock')+' · 数据 '+(bc.calc_time||'').substring(0,16)+' · <span style="color:#fbbf24">≥55%胜率+≥+0.5%收益 = 真值钱</span></div>';
+    } else {
+      html += '<div class="note">BACKTEST_COMPREHENSIVE 数据不可用</div>';
+    }
+    html += '</div>';
+
+    /* ── ③ K线信号 60 日回测（驾驶舱回测页复制过来的）── */
+    html += '<div style="margin:14px 0;border-left:4px solid #c084fc;" class="card">';
+    html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
+    html += '<span style="font-size:15px;font-weight:700;color:#c084fc;">📈 ③ K线信号 60 日回测</span>';
+    html += '<span style="font-size:11px;color:var(--dim);">信号层 alpha：9 个信号 × T+1/3/5/10/20</span>';
+    html += '</div>';
+    if(bd.summary){
+      var sigKeys = Object.keys(bd.summary);
+      var periods = [1,3,5,10,20];
+      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+      html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+      html += '<th style="padding:6px;text-align:left;color:var(--sub);">信号</th>';
+      html += '<th style="padding:6px;text-align:right;color:var(--sub);">样本</th>';
+      periods.forEach(function(p){
+        html += '<th colspan="2" style="padding:6px;text-align:center;color:var(--sub);border-left:1px solid var(--border2);">T+'+p+'</th>';
+      });
+      html += '</tr><tr style="background:var(--card2);border-bottom:1px solid var(--border);">';
+      html += '<th colspan="2" style="padding:4px;"></th>';
+      periods.forEach(function(){ html += '<th style="padding:3px;text-align:center;color:var(--dim);font-weight:500;font-size:10px;">胜率</th><th style="padding:3px;text-align:center;color:var(--dim);font-weight:500;font-size:10px;border-left:1px solid var(--border2);">收益</th>'; });
+      html += '</tr></thead><tbody>';
+      sigKeys.forEach(function(k){
+        var sig = bd.summary[k];
+        var label = sig.label || k;
+        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+        html += '<td style="padding:6px;color:var(--txt);font-weight:600;">'+_esc(label)+'</td>';
+        html += '<td style="padding:6px;text-align:right;color:var(--sub);">'+sig.total+'</td>';
+        periods.forEach(function(p){
+          var wr = sig['win_rate_'+p+'d'];
+          var ar = sig['avg_return_'+p+'d'];
+          html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorNum(wr, 50)+';">'+ (wr==null?'—':wr.toFixed(1))+'%</td>';
+          html += '<td style="padding:6px;text-align:center;color:'+_colorNum(ar, 0)+';border-left:1px solid var(--border2);">'+(ar==null?'—':(ar>0?'+':'')+ar.toFixed(2))+'%</td>';
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;">方法：'+_esc(bd.method||'baostock 60日K线')+' · 数据 '+(bd.update_time||'').substring(0,16)+' · <span style="color:#fbbf24">≥55%胜率且 T+5 仍正收益 = 真信号</span></div>';
+    } else {
+      html += '<div class="note">BACKTEST_TDX 数据不可用</div>';
+    }
+    html += '</div>';
+
+    dst.innerHTML = html;
+  };
+
+  // DOM ready hook
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', window.__renderBacktestSection);
+  } else {
+    setTimeout(window.__renderBacktestSection, 30);
+  }
+})();
+</script>
+
+
  <!-- ============ 运维（管理员） ============ -->
   <section id="sec-op">
     <div class="sec-head"><h2>🔒 运维面板</h2><span class="tag">仅管理员可见 · 部署/心跳/数据新鲜度</span></div>
