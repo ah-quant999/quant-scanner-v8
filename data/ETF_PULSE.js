@@ -1,1 +1,1 @@
-window.ETF_PULSE = {"no_data":true,"premarket_cleared":true,"note":"未开盘/集合竞价中，量比与成交额尚未产生，开盘后自动刷新","update_time":"2026-08-13 08:16:08","republish_time":"2026-08-13 08:16:59"};
+window.ETF_PULSE = {"no_data":true,"premarket_cleared":true,"note":"未开盘/集合竞价中，量比与成交额尚未产生，开盘后自动刷新","update_time":"2026-08-13 08:24:35","republish_time":"2026-08-13 08:25:17"};
