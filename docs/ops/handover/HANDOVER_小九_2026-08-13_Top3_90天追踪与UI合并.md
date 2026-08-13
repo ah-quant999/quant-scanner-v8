@@ -1,8 +1,9 @@
 # HANDOVER：Top3 90 天滚动追踪 + 个股卡片 UI 紧凑化
 
-> 生成时间：2026-08-13 08:33 CST  
+> 生成时间：2026-08-13 08:42 CST  
 > 主人决策：finalRec Top3 来源 / 入池即持仓 90 天滚动 / 回测+跟踪两行紧凑 / 小九全部负责  
-> 红线遵循：**`index.html` 未直接 commit**，改动已整理为 patch 文件，由阿狸咪/主人合并。
+> 红线遵循：**`index.html` 未直接 commit**，改动已整理为 patch 文件，由阿狸咪/主人合并。  
+> 更新：算法/数据层已 push 至 main（commit `aed21861`），patch 现在**仅包含 index.html UI 改动**。
 
 ---
 
@@ -42,33 +43,35 @@
 
 `docs/ops/handover/HANDOVER_小九_2026-08-13_Top3_追踪.patch`
 
-包含：
-- `algorithms/run_algorithms.py` 改动
-- `update_v8.py` 改动
-- `algorithms/gen_top3_track.py`（新文件）
-- `index.html` 改动（UI 紧凑 + script 注入）
+**注意**：算法/数据层已随 main 上线，本 patch **仅包含 `index.html` 改动**：
+- `data/TOP3_TRACK.js` script 注入
+- 个股卡片 fr-row 紧凑化
+- 回测 & 跟踪 10 KPI 紧凑化
 
 ---
 
 ## 二、如何应用
 
-### 算法/数据层（可立即应用）
+### 算法/数据层（已从 main pull，无需 patch）
 
 ```bash
 cd E:/workspace/quant-scanner-v8
-# 1. 应用 patch（自动跳过 index.html 部分冲突，需核对）
-git apply --check docs/ops/handover/HANDOVER_小九_2026-08-13_Top3_追踪.patch
-# 若无冲突：
-git apply docs/ops/handover/HANDOVER_小九_2026-08-13_Top3_追踪.patch
+git pull --ff-only origin main
 
-# 2. 单脚本验证
+# 验证单脚本
 python algorithms/gen_top3_track.py
 
-# 3. 确认 raw_data/top3_track.json + data/TOP3_TRACK.js 已生成
+# 确认 raw_data/top3_track.json + data/TOP3_TRACK.js 已生成
 ls -l raw_data/top3_track.json data/TOP3_TRACK.js
 ```
 
-### index.html 部分（阿狸咪确认后合并）
+### index.html 部分（应用 patch 或手动复制）
+
+```bash
+# 仅对 index.html 应用 UI patch
+git apply --check docs/ops/handover/HANDOVER_小九_2026-08-13_Top3_追踪.patch
+git apply docs/ops/handover/HANDOVER_小九_2026-08-13_Top3_追踪.patch
+```
 
 如果担心 patch 自动合并覆盖你的 WIP，可以只对 `index.html` 手动复制 3 处：
 
@@ -104,17 +107,18 @@ python -c "import json; d=json.load(open('raw_data/top3_track.json')); print(d['
 - ✅ `algorithms/gen_top3_track.py` 已单脚本跑通，生成 `data/TOP3_TRACK.js`（首日为 3 只 tracking / 0 history）
 - ✅ `update_v8.py` 已接入 `TOP3_TRACK`
 - ✅ `run_algorithms.py` 已接入
+- ✅ 算法/数据层已 push 至 origin main（`aed21861`）
 - ⚠️ `index.html` 未 commit，patch 待应用
-- ⚠️ 新文件 `algorithms/gen_top3_track.py` 未提交（当前为 untracked，在 patch 中）
 
 ---
 
 ## 五、部署注意事项
 
-- `data/TOP3_TRACK.js` 后续由算法自动产出，首次需要把 `data/TOP3_TRACK.js` 与 `raw_data/top3_track.json` 一起推 main。
-- `index.html` 的 cache-buster `v=20260813082900` 需与 `TOP3_TRACK.js` 真实更新时间对齐；后续由 `update_v8.py` 自动重写为最新 mtime。
-- 盘后算法链跑完后，HEALTH_CHECK.js 会自动把 `TOP3_TRACK` 纳入监控；目前若前端不加卡片，健康检查只会把它当作普通数据文件判陈旧。
+- `data/TOP3_TRACK.js` 与 `raw_data/top3_track.json` 已随算法层 push 至 main；云端 runner 盘后会自动重建。
+- `index.html` 的 cache-buster 已由 `update_v8.py` 自动对齐 `TOP3_TRACK.js` 真实更新时间（当前 `v=20260813085528`）。
+- 应用本 patch 后建议跑 `python guard_index_sections.py` 与 `python v8_health_check.py` 确认护栏通过。
+- 盘后算法链跑完后，`HEALTH_CHECK.js` 会自动把 `TOP3_TRACK` 纳入监控。
 
 ---
 
-*小九 2026-08-13 08:33 CST*
+*小九 2026-08-13 08:56 CST*
