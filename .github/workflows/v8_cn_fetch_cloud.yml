@@ -5,9 +5,13 @@
 #   经美国 IP 抓取频繁超时/残缺，导致 2026-08-13 09:40 盘中数据缺口。
 #   cloud_fetch_v8.py 头部亦明示「美国 runner 抓 A 股中国源会 60s 超时」。
 #   故本 workflow 改为优先 runs-on: [self-hosted, cn]（小九/备用机中国 IP，全量可抓）。
-#   ⚠️ 注意：曾尝试加 fallback-to-github-hosted-runner: true 做「cn 离线降级 ubuntu」，
-#   但该 key 仅对 larger/auto-scaling runner 有效，标准 self-hosted runner 会触发 GitHub
-#   工作流解析 422（实测 2026-08-13 11:47 提交后两云 workflow 全部无法触发）。已删除。
+#   ⚠️ 2026-08-13 11:47 提交 1fe4f8c7 把 runs-on 写成映射形态
+#      runs-on: { group: self-hosted, labels: [cn], fallback-to-github-hosted-runner: true }
+#   有两处致命错：① fallback-to-github-hosted-runner 仅对 larger/auto-scaling runner 有效，
+#      标准 self-hosted 触发 GitHub 工作流解析 422（两云 workflow 自 11:47 起完全无法触发）；
+#   ② group: self-hosted 无效——本仓库 self-hosted runner（lemoncat-cn）属于 Default 组、
+#      标签为 [self-hosted, cn]，并无名为 self-hosted 的组，故映射形态匹配不到 runner，
+#      任务 1 秒 completed failure（无 step）。已改为正确数组形态 runs-on: [self-hosted, cn]。
 #   cn 离线兜底走看门狗 CN_WORKFLOW_ID_FALLBACK（v8_cn_fetch.yml 应急）+ 防倒退守卫。
 #   分时段 selective fetch，逻辑与 v8_cn_fetch.yml 一致。
 #
@@ -56,9 +60,7 @@ concurrency:
 
 jobs:
   fetch:
-    runs-on:
-      group: self-hosted
-      labels: [cn]
+    runs-on: [self-hosted, cn]
     timeout-minutes: 20
     env:
       # 🔴 2026-08-06 00:10 必须保留：云端 runner 默认 UTC，朴素 datetime.now() 写出的
