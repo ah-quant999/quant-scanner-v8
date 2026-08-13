@@ -53,9 +53,31 @@ def main():
     run(["git", "fetch", "origin"], check=True)
     rb = run(["git", "rebase", "origin/main"])
     if rb.returncode != 0:
-        run(["git", "rebase", "--abort"])
-        print("❌ rebase 冲突，已 abort，未推送（人工介入）")
-        sys.exit(1)
+        # 云端频繁重建 data/STOCK_QUOTE.js / raw_data/stock_quote.json → 大概率冲突。
+        # 自愈：对冲突的数据文件取 origin 干净版，再依据 raw_data 重建 STOCK_QUOTE.js，
+        # 重新跑 refresh 补回 cninfo 分红，避免手解 5MB JSON 冲突标记。
+        print("⚠️ rebase 冲突，尝试自愈（重建生成文件）...")
+        st = run(["git", "status", "--porcelain"], capture_output=True, text=True)
+        conflicted = [ln.split()[-1] for ln in st.stdout.splitlines()
+                      if ln[:2] in ("UU", "AA", "UA", "AU") or ln[0] == "U" or ln[1] == "U"]
+        if "data/STOCK_QUOTE.js" in conflicted:
+            run(["git", "checkout", "--ours", "data/STOCK_QUOTE.js"])
+        if "raw_data/stock_quote.json" in conflicted:
+            run(["git", "checkout", "--ours", "raw_data/stock_quote.json"])
+            # 取回 origin 干净版后，重新跑 refresh 把 cninfo 分红补到最新 base 上
+            run([PY, "algorithms/refresh_dividend_cninfo.py"])
+        # 无论哪种冲突，最终都用 raw_data 重建一次 STOCK_QUOTE.js 保证一致
+        run([PY, "-c",
+             "import json,sys;sys.path.insert(0,'.');import update_v8;"
+             "q=json.load(open('raw_data/stock_quote.json',encoding='utf-8'));"
+             "update_v8._write_js('STOCK_QUOTE',q)"])
+        run(["git", "add"] + FILES)
+        rb2 = run(["git", "rebase", "--continue"],
+                  env={**os.environ, "GIT_EDITOR": "true"})
+        if rb2.returncode != 0:
+            run(["git", "rebase", "--abort"])
+            print("❌ rebase 自愈失败，已 abort，未推送（人工介入）")
+            sys.exit(1)
 
     print("== 5/5 push ==")
     p = run(["git", "push", "origin", "main"])
