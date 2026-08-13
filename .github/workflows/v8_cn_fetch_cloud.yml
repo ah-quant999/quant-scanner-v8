@@ -1,8 +1,13 @@
-# 九宝量化 v8.0 — 中国数据抓取（GitHub 云端 ubuntu-latest）
+# 九宝量化 v8.0 — 中国数据抓取（GitHub 云端，优先走 [self-hosted, cn] 中国 IP）
 #
-# 2026-08-05 新增：探针实测 push2delay 东财镜像 + akshare 从 GHA 全部可达（OK 10/11），
-# 故新增本 workflow 作为云端主力，让小九(lemoncat-cn)停电/离线不再影响中国数据。
-# 分时段 selective fetch，逻辑与 v8_cn_fetch.yml 一致，仅 runner 改为 ubuntu-latest。
+# 🔴 2026-08-13 根因修复（小九令）：2026-08-05 的探针结论「ubuntu-latest 能抓」不可靠——
+#   盘中模块（INDEX_QUOTES / SECTOR_FUND_FLOW / CONCEPT_RANKING / AI_MARKET_BRIEF 等）
+#   经美国 IP 抓取频繁超时/残缺，导致 2026-08-13 09:40 盘中数据缺口。
+#   cloud_fetch_v8.py 头部亦明示「美国 runner 抓 A 股中国源会 60s 超时」。
+#   故本 workflow 改为优先 runs-on: [self-hosted, cn]（小九/备用机中国 IP，全量可抓），
+#   并加 fallback-to-github-hosted-runner: true —— cn runner 离线（如小九出差关机）时
+#   自动降级 ubuntu-latest，此时 api_push_raw 防倒退守卫会跳过陈旧/部分数据，不覆盖好数据。
+#   分时段 selective fetch，逻辑与 v8_cn_fetch.yml 一致。
 #
 # 时段映射（北京时间）：
 #   08:25  盘前：V8_CAL / IPO_DATA / MARGIN_DATA / CFFEX_HOLDINGS / MACRO_DATA /
@@ -49,7 +54,10 @@ concurrency:
 
 jobs:
   fetch:
-    runs-on: ubuntu-latest
+    runs-on:
+      group: self-hosted
+      labels: [cn]
+      fallback-to-github-hosted-runner: true
     timeout-minutes: 20
     env:
       # 🔴 2026-08-06 00:10 必须保留：云端 runner 默认 UTC，朴素 datetime.now() 写出的
