@@ -81,6 +81,7 @@ DATA_SOURCES = {
     "risk_gauge.json":             "RISK_GAUGE",
     "stock_quote.json":            "STOCK_QUOTE",
     "avg_price_data.json":         "AVG_PRICE_DATA",
+    "top3_track.json":             "TOP3_TRACK",  # 2026-08-13 finalRec Top3 90 天滚动追踪
     "weekend_meta_report.json":      "WEEKEND_META_REPORT",
     "delisted_stocks.json":        "DELISTED_STOCKS",
 }
@@ -157,6 +158,8 @@ CATEGORY_MAP = {
     #      → mtime 被刷新 → cache-buster 全天无意义抖动（长期记忆里那个怪现象的根源）
     # 与 fetch 侧对齐为 intraday 后，两个问题一并消除。
     "AVG_PRICE_DATA": "intraday",
+    # 2026-08-13：TOP3_TRACK 依赖 final_recommend，归属盘后（与 finalRec 同节奏）
+    "TOP3_TRACK": "post_close",
 }
 
 CATEGORY_LABEL = {

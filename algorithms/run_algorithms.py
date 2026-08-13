@@ -90,6 +90,7 @@ ORDER = [
     #          crisis_data + cockpit_backtest + triple_track + four_volume_60m + stock_profile
     #   输出 = raw_data/final_recommend.json + data/FINAL_RECOMMEND_DATA.js（Top3 + 全量推荐池）
     "final_recommend.py",              # → FINAL_RECOMMEND_DATA.js（跨策略共振 Top3，管线最终产物）
+    "gen_top3_track.py",               # → TOP3_TRACK.js（finalRec Top3 90 天滚动追踪盘，2026-08-13）
 ]
 
 
