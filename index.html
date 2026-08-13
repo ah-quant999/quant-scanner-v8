@@ -11927,7 +11927,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     }
     var n=document.getElementById('finalTopN'); if(n) n.textContent=(D.stocks.length||3);
     var tag=document.getElementById('finalHeaderTag');
-    if(tag) tag.textContent='跨策略共振 + 板块强度加权 · Top'+D.stocks.length+' · 候选池 '+(D.total_candidates||0)+' 只';
+    if(tag) tag.textContent='双轨排名 · Top'+D.stocks.length+'（分数最强 + 共振最强）· 候选池 '+(D.total_candidates||0)+' 只';
     // 状态徽标行（与全站精选统一 pill 风格）
     (function(){
       var sb=document.getElementById('finalStatusBadges'); if(!sb) return;
@@ -11961,6 +11961,19 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       h+='</div>';
     }
     window._safeArr(D.stocks).forEach(function(s,i){ h+=stockCard(s,i); });
+
+    // ── 2026-08-13 双轨排名：共振最强（独立于上方分数最强）──
+    var cons = window._safeArr(D.consensus_stocks);
+    if(cons.length && cons.length !== D.stocks.length){
+      h+='<div style="margin-top:16px;padding:10px 14px;background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.25);border-radius:10px;">';
+      h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">';
+      h+='<span style="font-size:15px;font-weight:800;color:#a78bfa">🔗 共振最强 · Top'+cons.length+'</span>';
+      h+='<span style="font-size:11px;color:var(--dim)">多策略交叉验证优先，抗单一策略失效</span>';
+      h+='</div>';
+      cons.forEach(function(s,i){ h+=stockCard(s,i); });
+      h+='</div>';
+    }
+    // ── end 双轨 ──
 
     if(D.all_candidates && D.all_candidates.length){
       h+='<div style="margin-top:12px;padding:10px 12px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.22);border-radius:9px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">';

@@ -691,9 +691,14 @@ def main():
             continue
         top.append(s)
         top_codes.add(s["key"])
-    # 3) 排序保持 (resonance, final_score, strength) — 保证 Top3 顺序与候选池一致
-    top.sort(key=lambda x: (x["resonance"], x["final_score"], x["strength"]), reverse=True)
+    # 3) 双轨排名（2026-08-13 主人令：共振最强 + 分数最强分开展示）
+    #    top = 分数最强（公平计分后"绝对最强"）
+    #    consensus_top = 共振最强（多策略交叉验证，抗单一策略失效）
+    top.sort(key=lambda x: (x["final_score"], x["resonance"], x["strength"]), reverse=True)
     top = top[:TOP_N]
+    # ── 共振最强副本（独立排序，不覆盖 top）──
+    consensus_sorted = sorted(scored, key=lambda x: (x["resonance"], x["final_score"], x["strength"]), reverse=True)
+    consensus_top = consensus_sorted[:TOP_N]
     # ── end 公平竞争 ──
 
     def horizon_for(sources, resonance=0, is_top=False):
@@ -857,6 +862,67 @@ def main():
             "tracking": tracking,
         })
 
+    # ── 共振最强列表（双轨排名第二轨）──
+    consensus_stocks = []
+    for s in consensus_top:
+        code = s["key"]
+        # 去重：已在分数最强中的不再重复构建完整数据
+        # 但 consensus_stocks 需要独立 rank 和排序语义，所以仍完整构建
+        market = {"sh": "沪市", "sz": "深市", "bj": "北交所", "hk": "港股"}.get((s["market"] or market_prefix(code)).lower(), s["market"] or market_prefix(code))
+        board = s["board"] or board_from_code(code, s["market"])
+        close = safe_float(s.get("close"))
+        stop = s.get("stop_loss")
+        target = s.get("target_price")
+        rr = s.get("risk_reward")
+        enter_date = s.get("enter_dates")[0] if s.get("enter_dates") else ""
+        alerts = [a for a in (s.get("alerts") or []) if a not in ("已入库",)]
+        if enter_date and close:
+            tracking = {
+                "entry_date": enter_date,
+                "entry_price": round(close, 2),
+                "latest_price": round(close, 2),
+                "return_pct": 0.0,
+                "hold_days": 1,
+                "exit_type": "hold",
+                "note": "今日新入选，自动开始跟踪",
+            }
+        else:
+            tracking = {"entry_date": enter_date, "entry_price": None, "latest_price": None, "return_pct": None, "hold_days": 1, "exit_type": "hold", "note": "等待行情数据开始跟踪"}
+        if alerts:
+            tracking["alerts"] = alerts[:3]
+        consensus_stocks.append({
+            "rank": len(consensus_stocks) + 1,
+            "code": code,
+            "name": fix_name(code, s["name"]),
+            "market": market,
+            "board": board,
+            "horizon": horizon_for(s["sources"], s.get("resonance",0), is_top=True),
+            "close": round(close, 2) if close else None,
+            "pct_chg": safe_float(s["pct_chg"]),
+            "stop_loss": round(safe_float(stop), 2) if stop else None,
+            "target_price": round(safe_float(target), 2) if target else None,
+            "risk_reward": round(safe_float(rr), 2) if rr else None,
+            "support": round(safe_float(s.get("support")), 2) if s.get("support") else None,
+            "resistance": round(safe_float(s.get("resistance")), 2) if s.get("resistance") else None,
+            "atr": round(safe_float(s.get("atr")), 2) if s.get("atr") else None,
+            "sources": sorted(set(s["sources"])),
+            "source_scores": s["source_scores"],
+            "resonance": s["resonance"],
+            "strength": s["strength"],
+            "final_score": s["final_score"],
+            "sector_score": s.get("sector_score", 0),
+            "sector_hits": s.get("sector_hits", []),
+            "enter_date": enter_date,
+            "signals": s["signals"][:8],
+            "_60m_resonance": s.get("_60m_resonance", False),
+            "reason": "；".join(s["reasons"][:3]),
+            "industry": s["industry"],
+            "concepts": s["concepts"][:6],
+            "backtest": {},  # 共振最强不重复跑回测
+            "tracking": tracking,
+        })
+    # ── end 双轨 ──
+
     result = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "crisis_score": round(crisis_score, 1),
@@ -866,6 +932,7 @@ def main():
         "top_n": TOP_N,
         "strong_sectors": sorted(rel_set)[:20],
         "stocks": out_stocks,
+        "consensus_stocks": consensus_stocks,  # 2026-08-13 双轨：共振最强排名（独立于 stocks 分数最强）
         "all_candidates": [
             {
                 "code": x["key"],
