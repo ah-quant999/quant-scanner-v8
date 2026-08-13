@@ -1,0 +1,120 @@
+# 九宝量化 v8.0 — 云端健康巡检（合并版·随定时任务自愈 + 每日体检）
+#
+# 2026-08-13 合并自以下 5 个冗余自愈器（消除"每 30/15/6 分钟轮询"的碎片化）：
+#   - v8_intraday_healer.yml   （盘中云端自愈器）
+#   - v8_safety_net.yml        （cn_fetch safety_net）
+#   - v8_self_heal.yml         （周六冻结模块补跑）
+#   - v8_ops_self_heal.yml     （运维看板常态自愈巡检）
+#   - v8_algo.yml              （每日数据体检）
+#
+# 合并原则（用户令 2026-08-13：云端全权 + 合并 + 不每分钟轮询 + 跟定时任务走）：
+#   1. 主触发 = workflow_run：cn_fetch(云端) / 盘后算法链(云端) / 构建部署 一完成 → 立即巡检+自愈。
+#      数据刚抓完/算完就查，比固定 30 分钟轮询更及时、更省资源。
+#   2. 兜底 = schedule：每 60 分钟一次（仅 09:08-21:08 用户在线时段），防 workflow_run 漏触发。
+#      夜间 21:08-09:08 完全静音（不跑不自愈不告警，睡眠免打扰）。
+#   3. 本 workflow 只做「诊断 + 一键派发治愈」，不自己抓数据（抓数据走 v8_cn_fetch_cloud，
+#      跑在 [self-hosted, cn] 中国 IP；自愈派发同理指向该 workflow）。
+#
+# 自愈能力（来自 v8_health_check.py --heal，已含防雪崩守卫 MAX_DISPATCHES_PER_RUN）：
+#   - 检测全部前端数据卡片新鲜度 + 空值 + 管线同步；
+#   - 发现 fail 卡片即按 page→category 逐源自动派发对应 cn_fetch / algo_run 刷新；
+#   - 本地/部署不同步自动对齐 + 派发 build_deploy。
+# 另跑 guard_v8_freshness.py 写 data/freshness_status.json 供运维面板读取（原 v8_algo.yml 职责）。
+#
+# 纯云端执行（ubuntu-latest），不依赖 cn runner 在线——派发动作经 API 触达 cn runner。
+
+name: "🩺 v8 云端健康巡检(合并·自愈+体检)"
+
+on:
+  # 主触发：上游一完成立即巡检（最及时）
+  workflow_run:
+    workflows:
+      - "🇨🇳 v8 中国数据抓取(云端)"
+      - "☁️ v8 盘后算法链(云端)"
+      - "☁️ v8 构建部署(云端ubuntu)"
+    types: [completed]
+    branches: [main]
+  # 兜底：每 60 分钟（跟随定时任务节奏，不每 30 分轮询）
+  schedule:
+    # 北京 09:08-21:08 每整点后 8 分（UTC 1-13 点）
+    - cron: '8 1,2,3,4,5,6,7,8,9,10,11,12,13 * * 1-5'
+    # 周末 09:08-14:08 每整点后 8 分
+    - cron: '8 1,2,3,4,5,6 * * 0,6'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "强制运行（忽略去抖锁）"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write
+  actions: write            # 必须：dispatch 其他 workflow 做派发治愈
+
+jobs:
+  health-patrol:
+    runs-on: ubuntu-latest   # 巡检器只诊断+派发 API，美国 IP 即可
+    timeout-minutes: 15
+    env:
+      REPO: ah-quant999/quant-scanner-v8
+      # 派发治愈用 PAT（含 repo+actions 权限），与 v8_build_deploy.yml 一致
+      V8_GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: "🩺 巡检 + 自动治愈（一站式）"
+        id: heal
+        continue-on-error: true
+        run: |
+          echo "=== 运维自愈巡检 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') ==="
+          python v8_health_check.py --heal 2>&1 | tee heal_output.txt; echo "PYTHON_EXIT=$?"
+          HEALED=$(grep -c "\[HEAL✓\]" heal_output.txt 2>/dev/null || echo "0")
+          FAILED=$(grep -c "\[HEAL✗\]" heal_output.txt 2>/dev/null || echo "0")
+          FAIL=$(grep -c "\[FAIL\]" heal_output.txt 2>/dev/null || echo "0")
+          echo "healed=$HEALED" >> "$GITHUB_OUTPUT"
+          echo "failed=$FAILED" >> "$GITHUB_OUTPUT"
+          echo "fail=$FAIL" >> "$GITHUB_OUTPUT"
+          echo "💊 自动治愈 $HEALED 项 / 失败 $FAILED 项 / 仍 fail $FAIL 项"
+
+      - name: "📊 写 freshness_status.json（供面板读取）"
+        if: always()
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python guard_v8_freshness.py | tee guard_output.txt || true
+          git config user.name "v8-cloud-bot"
+          git config user.email "v8-bot@users.noreply.github.com"
+          git add -f data/freshness_status.json
+          if git diff --cached --quiet; then
+            echo "ℹ️ 体检结果无变化"
+          else
+            git commit -m "v8 healthcheck: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
+            REPO="https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
+            for i in 1 2 3; do
+              if git push "$REPO" HEAD:main; then echo "✅ 体检报告已提交（第 $i 次）"; break; fi
+              git fetch "$REPO" main && git rebase FETCH_HEAD || git rebase --abort
+            done
+          fi
+
+      - name: "📊 巡检摘要"
+        if: always()
+        run: |
+          echo "## v8 云端健康巡检 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')" >> $GITHUB_STEP_SUMMARY
+          echo "- 自动治愈: ${{ steps.heal.outputs.healed }} 项" >> $GITHUB_STEP_SUMMARY
+          echo "- 自愈失败: ${{ steps.heal.outputs.failed }} 项" >> $GITHUB_STEP_SUMMARY
+          echo "- 仍 fail: ${{ steps.heal.outputs.fail }} 项" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -n 40 heal_output.txt 2>/dev/null >> $GITHUB_STEP_SUMMARY || echo "无输出" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: "🚨 自愈失败升级"
+        if: steps.heal.outputs.failed != '0' && steps.heal.outputs.failed != ''
+        run: |
+          echo "::warning::运维自愈有 ${{ steps.heal.outputs.failed }} 项失败，需人工介入（见邮件/URGENT 文件）"
