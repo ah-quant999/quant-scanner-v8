@@ -5062,7 +5062,9 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-h">B档准入条件</div>
         <div class="logic-p">必须满足「机构变红」或「三重信号共振」二者之一；仅「缠论买」一个信号不足以进入B档。</div>
         <div class="logic-h">基本面质量分</div>
-        <div class="logic-p">A=+40 / B=+5 / C=0 / D=-10。A档阈值已对齐真实上限 70 分。</div>
+        <div class="logic-p">A=+40 / B=+5 / C=0 / D=-10。A档阈值已对齐真实上限 70 分。<br><b>公平性原则（2026-08-13）</b>：缺失基本面数据统一按中性 0 分处理，不区分 A股/港股；市场来源本身不是负面信号，加分只给真实正面信号，扣分只给真实负面信号。港股暂无基本面数据源，不再强制 -10 降权。</div>
+        <div class="logic-h">候选池排序与标签</div>
+        <div class="logic-p">A股与港股<b>统一按 final_score 综合分排序</b>，不再 A股优先、不再港股后排。港股因数据源缺失，以灰色「数据待补」信息标签提示，不显示橙色「⚠️已降权」警告。</div>
         <div class="logic-h">名字清洗（防研报/新闻稿污染名）</div>
         <div class="logic-p">候选池名字优先东财权威名 &gt; 通达信名字 &gt; raw 干净名 &gt; 代码兜底；容忍港股 -W/-S/-R 双重上市后缀。</div>
         <div class="logic-h">🔔 60m 共振标签</div>
@@ -11945,16 +11947,11 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       }
     })();
 
-    // 2026-08-11 修复：与Top3保持一致——A股优先展示，港股降权后排
+    // 2026-08-13 主人令：候选池统一按 final_score 排序，不再 A股/港股分组。
+    // 公平原则：市场来源本身不是负面信号，谁分高谁靠前。
     var all=D.all_candidates.slice();
-    // 按市场分组：A股优先（与Top3的MIN_A_SHARES逻辑一致）
-    var aShares=[], hkStocks=[];
-    all.forEach(function(s){ var m=(s.market||''); if(m==='港股'||s.board==='港股') hkStocks.push(s); else aShares.push(s); });
-    // A股按分排序，港股按分排序
-    aShares.sort(function(a,b){return (b.final_score||0)-(a.final_score||0);});
-    hkStocks.sort(function(a,b){return (b.final_score||0)-(a.final_score||0);});
-    // 合并：A股在前，港股在后（带降权标记）
-    var ordered = aShares.concat(hkStocks);
+    all.sort(function(a,b){return (b.final_score||0)-(a.final_score||0);});
+    var ordered = all;
 
     var shortList=[]; var longList=[];
     ordered.forEach(function(s){
@@ -11975,8 +11972,9 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       var price=s.close;
       var tags='';
       tags+=_mkTag(board, _boardColor(board));
-      // 2026-08-11：港股降权标记，与Top3逻辑一致
-      if(isHK) tags+='<span style="display:inline-block;padding:2px 7px;border-radius:999px;background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b40;font-size:10px;font-weight:600;white-space:nowrap">⚠️已降权</span>';
+      // 2026-08-13 主人令：取消「已降权」市场歧视标签；港股暂无基本面数据源，
+      // 以灰色信息标签「数据待补」提示，不压分、不警告。
+      if(isHK) tags+='<span style="display:inline-block;padding:2px 7px;border-radius:999px;background:#64748b22;color:#94a3b8;border:1px solid #64748b40;font-size:10px;font-weight:600;white-space:nowrap">数据待补</span>';
       if(s.industry) tags+=_mkTag(s.industry, '#64748b');
       (s.concepts||[]).slice(0,4).forEach(function(c){ tags+=_mkTag(c, '#38bdf8'); });
       var srcColor={'三重共识':'var(--purple)','驾驶舱A档':'#ffd54f','驾驶舱B档':'#f59e0b','四量终极':'#ff7043','板块龙头':'#22c55e','大牛股猎手':'#ef4444','逆势龙头·精锐':'#06b6d4'};
@@ -12036,8 +12034,8 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
       return '<div>'+items.map(_renderStock).join('')+'</div>';
     }
 
-    var h='<div style="font-size:13px;font-weight:700;color:var(--up);margin-bottom:4px">🎯 今日推荐候选池 '+ordered.length+' 只（A股优先 · 港股已降权后排 · 短线'+shortList.length+' · 中长线'+longList.length+'）</div>';
-    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">与Top3一致：港股因HK_PENALTY=-1.5降权，A股保底占优。⚠️已降权=港股标记</div>';
+    var h='<div style="font-size:13px;font-weight:700;color:var(--up);margin-bottom:4px">🎯 今日推荐候选池 '+ordered.length+' 只（按综合分排序 · 短线'+shortList.length+' · 中长线'+longList.length+'）</div>';
+    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">公平原则：A股/港股统一按 final_score 排序，市场来源本身不是负面信号。港股因暂无基本面数据源，标记「数据待补」（灰色信息标签，不降权）。</div>';
     h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">'
       +'<div><div style="font-size:12px;font-weight:800;color:#38bdf8;margin-bottom:6px;display:flex;align-items:center;gap:4px;">⚡ 短线候选 <span style="font-size:11px;font-weight:600;color:var(--dim)">('+shortList.length+')</span></div>'+_renderColumn(shortList,'短线候选','⚡','#38bdf8')+'</div>'
       +'<div><div style="font-size:12px;font-weight:800;color:#22c55e;margin-bottom:6px;display:flex;align-items:center;gap:4px;">🌿 中长线候选 <span style="font-size:11px;font-weight:600;color:var(--dim)">('+longList.length+')</span></div>'+_renderColumn(longList,'中长线候选','🌿','#22c55e')+'</div>'

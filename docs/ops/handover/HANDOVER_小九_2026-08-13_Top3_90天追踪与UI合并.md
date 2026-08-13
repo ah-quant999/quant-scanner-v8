@@ -120,8 +120,38 @@ python -c "import json; d=json.load(open('raw_data/top3_track.json')); print(d['
    - 已暂停：`小九-v8管线看门狗(每2h自动修复·紧急交接)`（被每小时紧急交接通道超集覆盖）
    - 已暂停：`小九-盘中云端任务定时触发+监控兜底`（被盘中实时数据刷新兜底覆盖）
    - 保留：`小九-v8每小时紧急交接通道(看门狗+自动修复)`、`小九-v8盘中实时数据刷新兜底(每30分)`
-3. **IPO 上市后建议显示 bug**：`update_v8.py::_sanitize_ipo_recommend` 会误把 `tracking_advice()` 生成的「强势上涨，可考虑追入」「表现良好，观望等回调」等建议覆盖成「不建议申购」。这个 bug 会让上市后大涨的新股也显示「不建议申购」，与申购期真实建议无关。建议另起 issue 修复 `_sanitize_ipo_recommend` 对 `status==='tracking'`/`'listed_today'` 的豁免逻辑。
+3. **IPO 上市后建议显示 bug（已修复）**：`update_v8.py::_sanitize_ipo_recommend` 已豁免 `status==='tracking'`/`'listed_today'`，不再把追入/首日建议覆盖成「不建议申购」。commit `c1ef3801` 已 push，同时升级了 IPO 情绪分因子。
 
 ---
 
-*小九 2026-08-13 08:59 CST*
+## 2026-08-13 09:18 追加：港股/A股公平性改造（主人令）
+
+### 改动点
+1. **`algorithms/fundamental_helper.py`**
+   - 移除 reason 含「港股」时的强制 -10 降权。
+   - 缺失基本面数据（含港股暂无数据源）统一按中性 0 分处理。
+   - 原则：市场来源本身不是负面信号；加分只给真实正面信号，扣分只给真实负面信号。
+
+2. **`index.html` 候选池（`renderFinalCandInner`）**
+   - 取消 A股/港股分组排序，统一按 `final_score` 综合分排序。
+   - 移除橙色「⚠️已降权」标签。
+   - 港股因暂无基本面数据源，显示灰色信息标签「数据待补」。
+   - 标题/说明同步更新，不再出现「A股优先·港股已降权后排」。
+
+3. **逻辑详解页（`index.html`「全站精选 - 说明」卡片）**
+   - 新增「候选池排序与标签」条目。
+   - 更新「基本面质量分」条目，写入公平性原则备忘。
+
+### 影响范围
+- `generate_top10.py` / `gen_cockpit_tier_recommend.py` / `gen_cockpit_advice.py` 均通过 `fundamental_helper.quality_points()` 读取基本面分，改造后港股质量分从 -10 升至 0。
+- `final_recommend.py` 早在 2026-08-11 已设 `HK_PENALTY=0`，本次与其对齐。
+- 候选池前端展示不再市场歧视，与 Top3 公平竞争逻辑一致。
+
+### 给阿狸咪的交接
+- 云端 runner 盘后执行 `run_algorithms.py` 时会自动继承 `fundamental_helper.py` 新逻辑；无需额外脚本改动。
+- 若发现港股在候选池/Top10/驾驶舱排名明显上升，属预期行为（中性 0 分替代 -10 分），不是数据源异常。
+- 健康检查中「全港股 Top3」等兜底告警仍保留，用于发现 akshare 港股接口异常导致的虚高。
+
+---
+
+*小九 2026-08-13 09:18 CST*

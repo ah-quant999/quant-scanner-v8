@@ -9,10 +9,12 @@ fundamental_helper.py — 基本面分数复用模块（金股观测 / 驾驶舱
   - load_fundamental(path)    : 读取 stocks 映射
   - quality_points(fq)        : 计算 (quality_score, grade, detail)，与 generate_top10 口径一致
                                 A=15~25 / B=5 / D=-10 / C或中性=0；叠加消息面 news ±15(截断)
-                                港股中性兜底：reason 含「港股」则 grade="" 不扣分
+                                缺失基本面数据统一按中性 0 分处理，不区分 A股/港股。
                                 （兼容 2026-07-25 修复前旧数据把港股误标 D 的情况）
 
 设计目的：金股观测与驾驶舱使用完全相同的评分逻辑，避免两套面板分数不一致。
+公平性原则（2026-08-13 主人令）：市场来源本身不是负面信号；缺数据 = 中性 0 分；
+加分只给真实正面信号，扣分只给真实负面信号。
 """
 import os
 import json
@@ -63,14 +65,10 @@ def quality_points(fq):
     reason = fq.get("reason", "") or ""
     # 中性兜底：2026-07-25 修复前，无基本面数据的股票（含港股）被误判为 D 冤扣 -10。
     # 修复后无数据应为中性 grade="" 。此处对陈旧数据做兼容修正，避免金股/驾驶舱误罚。
-    if grade == "D" and reason == "无基本面数据":
+    # 2026-08-13 主人令：移除港股专属 -10 惩罚。缺数据统一按中性 0 分处理，
+    # 市场来源本身不是负面信号，加分扣分只看真实基本面信号。
+    if grade == "D" and (reason == "无基本面数据" or "港股暂无" in reason):
         grade = ""
-
-    # 🔴 2026-08-12 主人令：港股暂无基本面数据源（reason="港股暂无..."），
-    # 必须强制降权保持公平——否则港股仅靠技术面双真/EMA 等技术分就能与
-    # A 股 grade B(qs=5) 同台竞争甚至反超。qs 减 10，让其在 TOP10/驾驶舱评分中天然劣势
-    # （与 grade D 同档，但保留 grade="" 中性兜底，避免误判）。
-    is_hk = "港股" in reason
 
     roe = fq.get("roe")
     rev = fq.get("revenue_growth")
@@ -91,11 +89,7 @@ def quality_points(fq):
     elif grade == "D":
         qs = -10
     else:
-        qs = 0  # C 或 中性("")
-
-    # 港股降权（2026-08-12 主人令）：无基本面数据必须降权，否则对 A 股 grade B 不公平
-    if is_hk:
-        qs -= 10
+        qs = 0  # C 或 中性("")；缺失数据统一中性 0 分，不区分市场
 
     # 消息面加减分
     news = fq.get("news") or {}
