@@ -1,15 +1,43 @@
 window.FOUR_VOLUME={
- "update_time": "2026-08-12 22:35:44",
- "total": 1,
+ "update_time": "2026-08-13 15:40:03",
+ "total": 3,
  "stocks": [
   {
-   "code": "300395",
-   "name": "菲利华",
+   "code": "603296",
+   "name": "华勤技术",
+   "market": "sh",
+   "board_label": "主板",
+   "close": 85.97,
+   "pct_chg": 8.8,
+   "turnover_rate": 6.28,
+   "mv_yi": 0,
+   "fund_type": "混合",
+   "components": {
+    "游资点火": true,
+    "机构托底": true,
+    "广度翻多": true,
+    "主力动量翻多": true,
+    "机构金叉": true,
+    "散户金叉": true,
+    "主力金叉": true
+   },
+   "yzc": true,
+   "jg": true,
+   "xc": true,
+   "four": true,
+   "qd": true,
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 散户金叉 + 主力金叉",
+   "signal_date": "2026-08-13",
+   "enter_date": "2026-08-13"
+  },
+  {
+   "code": "000100",
+   "name": "MINIMAX-W",
    "market": "sz",
-   "board_label": "创业板",
-   "close": 94.99,
-   "pct_chg": 8.02,
-   "turnover_rate": 8.86,
+   "board_label": "主板",
+   "close": 5.17,
+   "pct_chg": 1.57,
+   "turnover_rate": 4.27,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -27,8 +55,36 @@ window.FOUR_VOLUME={
    "four": true,
    "qd": true,
    "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
-   "signal_date": "2026-08-12",
-   "enter_date": "2026-08-12"
+   "signal_date": "2026-08-13",
+   "enter_date": "2026-08-13"
+  },
+  {
+   "code": "002491",
+   "name": "通鼎互联",
+   "market": "sz",
+   "board_label": "主板",
+   "close": 18.94,
+   "pct_chg": 0.53,
+   "turnover_rate": 28.08,
+   "mv_yi": 0,
+   "fund_type": "混合",
+   "components": {
+    "游资点火": true,
+    "机构托底": true,
+    "广度翻多": true,
+    "主力动量翻多": true,
+    "机构金叉": false,
+    "散户金叉": false,
+    "主力金叉": false
+   },
+   "yzc": true,
+   "jg": true,
+   "xc": true,
+   "four": true,
+   "qd": true,
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+   "signal_date": "2026-08-13",
+   "enter_date": "2026-08-13"
   }
  ]
 };
