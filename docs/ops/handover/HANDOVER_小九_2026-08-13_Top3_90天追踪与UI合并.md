@@ -107,18 +107,21 @@ python -c "import json; d=json.load(open('raw_data/top3_track.json')); print(d['
 - ✅ `algorithms/gen_top3_track.py` 已单脚本跑通，生成 `data/TOP3_TRACK.js`（首日为 3 只 tracking / 0 history）
 - ✅ `update_v8.py` 已接入 `TOP3_TRACK`
 - ✅ `run_algorithms.py` 已接入
-- ✅ 算法/数据层已 push 至 origin main（`aed21861`）
-- ⚠️ `index.html` 未 commit，patch 待应用
+- ✅ 算法/数据层已 push 至 origin main
+- ✅ `index.html` UI 紧凑化 + `TOP3_TRACK.js` 注入已 push 至 origin main（`d05b2c18`）
+- ✅ `guard_index_sections.py` 与 `v8_health_check.py` 护栏通过
 
 ---
 
-## 五、部署注意事项
+## 五、给阿狸咪的交接说明
 
-- `data/TOP3_TRACK.js` 与 `raw_data/top3_track.json` 已随算法层 push 至 main；云端 runner 盘后会自动重建。
-- `index.html` 的 cache-buster 已由 `update_v8.py` 自动对齐 `TOP3_TRACK.js` 真实更新时间（当前 `v=20260813085528`）。
-- 应用本 patch 后建议跑 `python guard_index_sections.py` 与 `python v8_health_check.py` 确认护栏通过。
-- 盘后算法链跑完后，`HEALTH_CHECK.js` 会自动把 `TOP3_TRACK` 纳入监控。
+1. **Top3 追踪盘已上线**：算法层（`gen_top3_track.py`）+ 数据层（`TOP3_TRACK.js`）+ 前端渲染均已入库，`index.html` 已注入 `data/TOP3_TRACK.js`。后续由盘后算法链自动产出，无需手动干预。
+2. **自动化精简**：已按主人要求暂停 2 个功能重叠的 automation（保留发现错误-自愈闭环）：
+   - 已暂停：`小九-v8管线看门狗(每2h自动修复·紧急交接)`（被每小时紧急交接通道超集覆盖）
+   - 已暂停：`小九-盘中云端任务定时触发+监控兜底`（被盘中实时数据刷新兜底覆盖）
+   - 保留：`小九-v8每小时紧急交接通道(看门狗+自动修复)`、`小九-v8盘中实时数据刷新兜底(每30分)`
+3. **IPO 上市后建议显示 bug**：`update_v8.py::_sanitize_ipo_recommend` 会误把 `tracking_advice()` 生成的「强势上涨，可考虑追入」「表现良好，观望等回调」等建议覆盖成「不建议申购」。这个 bug 会让上市后大涨的新股也显示「不建议申购」，与申购期真实建议无关。建议另起 issue 修复 `_sanitize_ipo_recommend` 对 `status==='tracking'`/`'listed_today'` 的豁免逻辑。
 
 ---
 
-*小九 2026-08-13 08:56 CST*
+*小九 2026-08-13 08:59 CST*
