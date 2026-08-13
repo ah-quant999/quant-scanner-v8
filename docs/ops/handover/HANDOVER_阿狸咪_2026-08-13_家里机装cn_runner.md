@@ -62,7 +62,7 @@ C:/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.ex
 - **小九在线时**：v8_cn_fetch_cloud 自动调度到小九本机（最近一次跑的优先）
 - **小九出差关机**：自动调度到你阿狸咪机器，盘中数据照常每 30 分刷新
 - **都关机**：fallback ubuntu-latest（美国 IP）+ 防倒退守卫，不会覆盖已有好数据
-- **服务自启**：电脑开机后 30 秒内服务自动连回 GitHub，无需手动启动
+- **自启方式**：本机用「Startup 文件夹快捷方式」自启（登录 Windows 后自动连回 GitHub）。注意：不是系统服务——`svc.cmd install` / `config.cmd --runasservice` 在本机均因管理员权限不足失败（错误 5），故改用快捷方式，**需登录后才会起、未登录锁屏时不跑**。小九机为真正的系统服务（开机即连、无需登录）。
 
 ## 故障排查
 
@@ -78,12 +78,13 @@ C:/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.ex
 - 90% 是网络问题：`Test-NetConnection github.com -Port 443` 应通
 - 若家里有 IPv6 防火墙先关掉（GitHub runner 走 IPv4 但 IPv6 路由器干扰很常见）
 
-### 装了不想跑
+### 不想跑了 / 卸载
 ```powershell
-# 1) 停服
-D:\actions\cn-runner\svc.cmd stop
-D:\actions\cn-runner\svc.cmd uninstall
-# 2) 从仓库移除 (需要 token)
+# 1) 停掉当前进程
+taskkill /F /IM Runner.Listener.exe /IM Runner.Worker.exe 2>$null
+# 2) 删开机自启快捷方式（用户级，不需要管理员）
+Remove-Item "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\GitHub Runner alimi-cn.lnk" -Force
+# 3) 从仓库移除注册 (需要 token)
 D:\actions\cn-runner\config.cmd remove --token 'ARXXX...'
 ```
 
@@ -112,7 +113,7 @@ D:\actions\cn-runner\config.cmd remove --token 'ARXXX...'
 
 ## 残留 / 待跟进
 - **PAT 申请**：主人(GITHUB 账号)的 PAT 还需要一次手动创建（上面 Step 5），token scope 选 `repo` 即可。
-- **服务启动方式**：用 `svc.cmd install` 装为系统服务，开机 30 秒内自连；如改成"手动启动"模式（`svc.cmd install --manual`），则每次开机要手动 `svc.cmd start`。
+- **自启方式（已定稿）**：本机用 Startup 文件夹快捷方式（`$env:APPDATA\...\Startup\GitHub Runner alimi-cn.lnk`），非系统服务。`svc.cmd install` / `config.cmd --runasservice` 在本机因管理员权限不足失败（错误 5）。若日后要升级为真服务，需在「以管理员身份运行」且账户有 SeServiceLogonRight 的 PowerShell 里重跑 `.\config.cmd ... --runasservice`。
 - **跑挂频率**：阿狸咪机器本身网络健康 + 7×24 不掉 = 几乎不会掉；任何时候挂掉，GitHub 自动转给小九，再挂就 fallback ubuntu。
 - **token 30 天过期**：30 天后再去 Settings→Runners 拿一次，跑脚本（脚本支持幂等，会自动 `--replace`）。
 
