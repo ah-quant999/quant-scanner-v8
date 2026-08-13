@@ -1,19 +1,11 @@
 {
-  "update_time": "2026-08-13 15:46:44",
+  "update_time": "2026-08-13 17:18:23",
   "range": [
-    "2026-08-04",
-    "2026-08-12"
+    "2026-08-05",
+    "2026-08-13"
   ],
   "days_count": 7,
   "daily_summary": [
-    {
-      "date": "2026-08-04",
-      "total": 93,
-      "resonance": 0,
-      "inst_only": 0,
-      "yz_only": 11,
-      "north_present": 0
-    },
     {
       "date": "2026-08-05",
       "total": 72,
@@ -61,6 +53,14 @@
       "inst_only": 1,
       "yz_only": 9,
       "north_present": 26
+    },
+    {
+      "date": "2026-08-13",
+      "total": 71,
+      "resonance": 1,
+      "inst_only": 2,
+      "yz_only": 8,
+      "north_present": 28
     }
   ],
   "top_inst_buy": [
@@ -133,7 +133,7 @@
       "yz_net": 18697.5,
       "north_net": -57616.2,
       "combined_net": -38400.2,
-      "days": 2,
+      "days": 1,
       "resonance_days": 0
     },
     {
@@ -168,6 +168,16 @@
     }
   ],
   "top_yz_buy": [
+    {
+      "code": "000887",
+      "name": "中鼎股份",
+      "inst_net": 243.3,
+      "yz_net": 77642.3,
+      "north_net": 6031.1,
+      "combined_net": 77885.6,
+      "days": 1,
+      "resonance_days": 0
+    },
     {
       "code": "600206",
       "name": "有研新材",
@@ -207,29 +217,9 @@
       "combined_net": NaN,
       "days": 2,
       "resonance_days": 0
-    },
-    {
-      "code": "600664",
-      "name": "哈药股份",
-      "inst_net": 0.0,
-      "yz_net": 38260.6,
-      "north_net": 58845.9,
-      "combined_net": 38260.6,
-      "days": 2,
-      "resonance_days": 0
     }
   ],
   "top_yz_sell": [
-    {
-      "code": "002354",
-      "name": "天娱数科",
-      "inst_net": -14522.3,
-      "yz_net": -164109.0,
-      "north_net": -4775.6,
-      "combined_net": -178631.3,
-      "days": 7,
-      "resonance_days": 0
-    },
     {
       "code": "301080",
       "name": "百普赛斯",
@@ -269,6 +259,16 @@
       "combined_net": -66166.0,
       "days": 2,
       "resonance_days": 0
+    },
+    {
+      "code": "605376",
+      "name": "博迁新材",
+      "inst_net": 34397.6,
+      "yz_net": -65142.8,
+      "north_net": -17002.0,
+      "combined_net": -30745.2,
+      "days": 1,
+      "resonance_days": 0
     }
   ],
   "top_resonance": [
@@ -281,6 +281,16 @@
       "combined_net": 107952.6,
       "days": 1,
       "resonance_days": 1
+    },
+    {
+      "code": "000887",
+      "name": "中鼎股份",
+      "inst_net": 243.3,
+      "yz_net": 77642.3,
+      "north_net": 6031.1,
+      "combined_net": 77885.6,
+      "days": 1,
+      "resonance_days": 0
     },
     {
       "code": "002428",
@@ -309,16 +319,6 @@
       "yz_net": 32660.0,
       "north_net": 7381.7,
       "combined_net": 35733.7,
-      "days": 1,
-      "resonance_days": 0
-    },
-    {
-      "code": "002491",
-      "name": "通鼎互联",
-      "inst_net": 403.4,
-      "yz_net": 22374.9,
-      "north_net": -4869.0,
-      "combined_net": 22778.3,
       "days": 1,
       "resonance_days": 0
     }
@@ -403,7 +403,7 @@
       "yz_net": 18697.5,
       "north_net": -57616.2,
       "combined_net": -38400.2,
-      "days": 2,
+      "days": 1,
       "resonance_days": 0
     },
     {
