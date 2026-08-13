@@ -9996,6 +9996,41 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     // ── 2026-08-11 主人令：💰 平均股价（全A等权）已迁到「📡 实时数据」tab 跟随 AI 市场速览展示 ──
 
+    // ════ 2026-08-13 主人令：暂未上架三张新卡（涨价榜/情绪周期/潜力挖掘）══ 做好非试验，观察试运行 ═══
+
+    // ── 💹 商品涨价弹性榜（事件驱动：高手"涨价完冲就好了"实战经验）
+    var ce = window.COMMODITY_ELASTICITY || {};
+    h += '<div style="margin:16px 0;border-left:4px solid #f59e0b;" class="card">';
+    h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">';
+    h += '<span style="font-size:15px;font-weight:700;color:#fbbf24;">💹 商品涨价弹性榜</span>';
+    h += '<span style="font-size:10.5px;padding:2px 8px;border-radius:8px;font-weight:600;background:rgba(245,158,11,.12);color:#fbbf24;border:1px solid rgba(245,158,11,.3);">🧪 试运行 · 仅观察</span>';
+    h += '<span style="font-size:11px;color:var(--dim);">涨价完冲就好了 · A 股弹性标的清单</span></div>';
+    h += '<div style="font-size:11px;color:var(--dim);margin-bottom:10px;line-height:1.6;">监控 10 个大宗品价格，列出"涨价受益最大"的 A 股弹性标的。弹性系数 = 偏离 30 日均值 × 业务占比 × 杠杆 1.5（简化估算）。<b style="color:#fbbf24">实验区，不构成投资建议</b>。</div>';
+    var _ceBody = '<div id="ceBody"><div class="note">加载中…</div></div>';
+    h += _ceBody;
+    h += '</div>';
+
+    // ── 🌡️ 情绪周期定位（高手"情绪冰点后的报复性连板行情"实战经验）
+    var sc = window.SENTIMENT_CYCLE || {};
+    h += '<div style="margin:16px 0;border-left:4px solid #06b6d4;" class="card">';
+    h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">';
+    h += '<span style="font-size:15px;font-weight:700;color:#22d3ee;">🌡️ 情绪周期定位</span>';
+    h += '<span style="font-size:10.5px;padding:2px 8px;border-radius:8px;font-weight:600;background:rgba(6,182,212,.12);color:#22d3ee;border:1px solid rgba(6,182,212,.3);">🧪 试运行 · 仅观察</span>';
+    h += '<span style="font-size:11px;color:var(--dim);">冰点 → 报复性连板窗口 · 自动识别</span></div>';
+    h += '<div id="scBody"><div class="note">加载中…</div></div>';
+    h += '</div>';
+
+    // ── 🔮 潜力挖掘（高手"想象空间大的价值投资"实战经验）
+    var pp = window.POTENTIAL_PICKS || {};
+    h += '<div style="margin:16px 0;border-left:4px solid #a78bfa;" class="card">';
+    h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">';
+    h += '<span style="font-size:15px;font-weight:700;color:#c4b5fd;">🔮 潜力挖掘</span>';
+    h += '<span style="font-size:10.5px;padding:2px 8px;border-radius:8px;font-weight:600;background:rgba(167,139,250,.12);color:#c4b5fd;border:1px solid rgba(167,139,250,.3);">🧪 试运行 · 仅观察</span>';
+    h += '<span style="font-size:11px;color:var(--dim);">热门概念 × 温和涨幅 × 活跃度</span></div>';
+    h += '<div style="font-size:11px;color:var(--dim);margin-bottom:10px;line-height:1.6;">"未被炒高的想象空间股"：当日涨幅温和（-3%~+5%，未透支）+ 拥有热门概念（有故事）+ 成交活跃（市场关注）。<b style="color:#c4b5fd">实验区，不构成投资建议</b>。⚠️ 估值分位待 fetch_fundamental_quality 接入后升级。</div>';
+    h += '<div id="ppBody"><div class="note">加载中…</div></div>';
+    h += '</div>';
+
     // ── 2026-08-11 移入：📌 ETF·龙头 参考 —— 仅研究参考，不构成投资建议 ──
     h+='<div style="margin:16px 0;border-left:4px solid #a855f7;" class="card">';
     h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
@@ -10009,6 +10044,10 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     el.innerHTML=h;
     if(typeof window.renderPortfolio==='function') window.renderPortfolio();
+    // 2026-08-13 主人令：填充三张新卡（涨价榜/情绪周期/潜力挖掘）
+    if(typeof window._fillCommodityElasticity==='function') window._fillCommodityElasticity();
+    if(typeof window._fillSentimentCycle==='function') window._fillSentimentCycle();
+    if(typeof window._fillPotentialPicks==='function') window._fillPotentialPicks();
     // 2026-08-11：平均股价已迁回实验区 sec-ul（数据未就绪），无需克隆；仅 ETF 龙头参考仍需克隆
     (function(){
       // ETF龙头参考：复用原 etfMapBody 内容
@@ -10018,6 +10057,172 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     })();
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderUnlisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
   }
+
+  /* ═══════════ 2026-08-13 三张新卡填充函数（涨价榜/情绪周期/潜力挖掘）══ 暂未上架观察 ═══════════ */
+
+  // 💹 商品涨价弹性榜
+  window._fillCommodityElasticity = function(){
+    var ce = window.COMMODITY_ELASTICITY;
+    var dst = document.getElementById('ceBody');
+    if(!dst) return;
+    if(!ce || !ce.commodities || !ce.commodities.length){
+      dst.innerHTML = '<div class="note">COMMODITY_ELASTICITY 数据不可用</div>';
+      return;
+    }
+    var hotCnt = ce.hot_count || 0;
+    var html = '';
+    html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:12px;color:var(--sub);">';
+    html += '<span>共 <b style="color:#fbbf24">'+hotCnt+'/'+ce.total_commodities+'</b> 个商品进入涨价窗口（偏离≥'+ce.hot_threshold_pct+'%）</span>';
+    html += '<span style="color:var(--dim);margin-left:8px;">· 数据 '+(ce.data_date||'')+'</span>';
+    html += '</div>';
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;">';
+    ce.commodities.forEach(function(c){
+      var hotCls = c.is_hot ? 'background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.45);' : 'background:rgba(100,116,139,.06);border-color:rgba(100,116,139,.18);';
+      var devStr = (c.dev_pct > 0 ? '+' : '') + c.dev_pct + '%';
+      var devColor = c.dev_pct >= 3 ? '#fbbf24' : (c.dev_pct <= -3 ? '#f87171' : '#94a3b8');
+      html += '<div style="border:1px solid;border-radius:8px;padding:10px;'+hotCls+'">';
+      html += '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">';
+      html += '<span style="font-weight:700;color:#fbbf24;font-size:14px;">'+(c.is_hot?'🔥 ':'')+c.name+'</span>';
+      html += '<span style="font-size:11px;color:'+devColor+';font-weight:700;">'+devStr+'</span>';
+      html += '</div>';
+      html += '<div style="font-size:11px;color:var(--sub);margin-bottom:6px;">现价 <b style="color:var(--txt)">'+c.current_price+'</b> '+c.unit;
+      if (c.baseline_30d) html += ' · 30日均 '+c.baseline_30d;
+      html += '</div>';
+      // 弹性 Top3
+      c.stocks.slice(0,3).forEach(function(s){
+        var eColor = s.elasticity_pct >= 3 ? '#fbbf24' : (s.elasticity_pct >= 0 ? '#22c55e' : '#f87171');
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:2px 0;border-bottom:1px dashed rgba(148,163,184,.15);">';
+        html += '<span><b>'+s.name+'</b> <span style="color:var(--dim);font-size:10px;">'+s.code+' · '+(s.business_pct*100|0)+%</span></span>';
+        html += '<span style="color:'+eColor+';font-weight:600;">'+ (s.elasticity_pct>0?'+':'') + s.elasticity_pct+'%</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+    if (ce.note) html += '<div style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.5;">'+ce.note+'</div>';
+    dst.innerHTML = html;
+  };
+
+  // 🌡️ 情绪周期定位
+  window._fillSentimentCycle = function(){
+    var sc = window.SENTIMENT_CYCLE;
+    var dst = document.getElementById('scBody');
+    if(!dst) return;
+    if(!sc || !sc.phase){
+      dst.innerHTML = '<div class="note">SENTIMENT_CYCLE 数据不可用</div>';
+      return;
+    }
+    var m = sc.metrics || {};
+    var html = '';
+    // 顶部：phase 大色块
+    html += '<div style="background:linear-gradient(135deg,'+sc.color+'22,'+sc.color+'08);border:2px solid '+sc.color+';border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">';
+    html += '<div style="text-align:center;min-width:120px;">';
+    html += '<div style="font-size:11px;color:var(--dim);">当前阶段</div>';
+    html += '<div style="font-size:24px;font-weight:800;color:'+sc.color+';line-height:1.1;">'+sc.phase+'</div>';
+    html += '</div>';
+    html += '<div style="text-align:center;min-width:80px;">';
+    html += '<div style="font-size:11px;color:var(--dim);">情绪分</div>';
+    html += '<div style="font-size:22px;font-weight:700;color:var(--txt);line-height:1.1;">'+sc.score+'</div>';
+    html += '</div>';
+    html += '<div style="text-align:center;min-width:80px;">';
+    html += '<div style="font-size:11px;color:var(--dim);">环比</div>';
+    html += '<div style="font-size:18px;font-weight:700;color:'+(sc.delta_pct>=0?'var(--up)':'var(--down)')+';line-height:1.1;">'+(sc.delta_pct>0?'+':'')+sc.delta_pct+'%</div>';
+    html += '</div>';
+    html += '<div style="flex:1;min-width:200px;font-size:13px;color:var(--txt);line-height:1.5;">'+sc.advice+'</div>';
+    html += '</div>';
+    // 指标行
+    html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;">';
+    var metrics = [
+      {label:'涨停家数', value:m.total_up, unit:'家', color:'#fbbf24'},
+      {label:'最高连板', value:m.max_ladder+'板', unit:'', color:'#22d3ee'},
+      {label:'≥3板家数', value:m.high_ladder_count, unit:'家', color:'#c4b5fd'},
+      {label:'活跃板块', value:m.sectors_count, unit:'个', color:'#22c55e'},
+    ];
+    metrics.forEach(function(mt){
+      html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center;">';
+      html += '<div style="font-size:10.5px;color:var(--dim);margin-bottom:3px;">'+mt.label+'</div>';
+      html += '<div style="font-size:18px;font-weight:700;color:'+mt.color+';">'+mt.value+'<span style="font-size:11px;color:var(--dim);font-weight:400;"> '+mt.unit+'</span></div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    // 连板梯队
+    if (sc.ladder_dist && Object.keys(sc.ladder_dist).length){
+      html += '<div style="font-size:11.5px;color:var(--sub);margin-bottom:4px;">📊 连板梯队：</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">';
+      Object.keys(sc.ladder_dist).forEach(function(k){
+        var n = sc.ladder_dist[k];
+        var bg = parseInt(k) >= 3 ? 'background:rgba(167,139,250,.18);border-color:rgba(167,139,250,.5);' : 'background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.3);';
+        html += '<span style="display:inline-block;padding:4px 10px;border:1px solid;border-radius:6px;font-size:12px;font-weight:600;color:#c4b5fd;'+bg+'">'+k+'板 <b style="color:var(--txt);margin-left:4px;">'+n+'只</b></span>';
+      });
+      html += '</div>';
+    }
+    // 龙头
+    if (sc.leaders && sc.leaders.length){
+      html += '<div style="font-size:11.5px;color:var(--sub);margin-bottom:4px;">🏆 龙头连板：</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+      sc.leaders.forEach(function(l){
+        html += '<span style="display:inline-block;padding:4px 10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:6px;font-size:12px;color:#22c55e;font-weight:600;">'+l.name+' <b style="color:var(--txt);margin-left:2px;">'+l.lbc+'板</b></span>';
+      });
+      html += '</div>';
+    }
+    if (sc.note) html += '<div style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.5;">'+sc.note+'</div>';
+    dst.innerHTML = html;
+  };
+
+  // 🔮 潜力挖掘
+  window._fillPotentialPicks = function(){
+    var pp = window.POTENTIAL_PICKS;
+    var dst = document.getElementById('ppBody');
+    if(!dst) return;
+    if(!pp || !pp.picks || !pp.picks.length){
+      dst.innerHTML = '<div class="note">POTENTIAL_PICKS 数据不可用</div>';
+      return;
+    }
+    var html = '';
+    // 头部：热门概念标签
+    if (pp.hot_concepts && pp.hot_concepts.length){
+      html += '<div style="font-size:11.5px;color:var(--sub);margin-bottom:6px;">🔥 当前热门概念（前 1/3 共 '+pp.hot_concepts_count+' 个）：</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;">';
+      pp.hot_concepts.slice(0,10).forEach(function(cn){
+        html += '<span style="display:inline-block;padding:3px 8px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);border-radius:6px;font-size:11.5px;color:#c4b5fd;font-weight:600;">'+cn+'</span>';
+      });
+      html += '</div>';
+    }
+    // 表格
+    html += '<div style="overflow-x:auto;">';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+    html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+    html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">#</th>';
+    html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">名称</th>';
+    html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">代码</th>';
+    html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">当日%</th>';
+    html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">热门数</th>';
+    html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">综合分</th>';
+    html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">热门概念</th>';
+    html += '</tr></thead><tbody>';
+    pp.picks.forEach(function(p, i){
+      var pctColor = p.pct > 0 ? 'var(--up)' : (p.pct < 0 ? 'var(--down)' : 'var(--sub)');
+      var scoreColor = p.total_score >= 9 ? '#c4b5fd' : (p.total_score >= 7 ? '#a78bfa' : '#7c3aed');
+      html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+      html += '<td style="padding:7px 6px;color:var(--dim);">'+(i+1)+'</td>';
+      html += '<td style="padding:7px 6px;font-weight:700;color:var(--txt);">'+p.name+'</td>';
+      html += '<td style="padding:7px 6px;color:var(--sub);font-family:ui-monospace,Menlo,monospace;">'+p.code+'</td>';
+      html += '<td style="padding:7px 6px;text-align:right;color:'+pctColor+';font-weight:600;">'+(p.pct>0?'+':'')+p.pct+'%</td>';
+      html += '<td style="padding:7px 6px;text-align:right;color:#c4b5fd;font-weight:600;">'+p.hot_count+'</td>';
+      html += '<td style="padding:7px 6px;text-align:right;color:'+scoreColor+';font-weight:700;">'+p.total_score+'</td>';
+      html += '<td style="padding:7px 6px;color:var(--sub);font-size:11px;">'+p.hot_concepts.join(' · ')+'</td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    // 限制说明
+    if (pp.limitations && pp.limitations.length){
+      html += '<div style="font-size:11px;color:var(--dim);margin-top:10px;padding:8px 10px;background:rgba(167,139,250,.05);border-radius:6px;line-height:1.6;">';
+      html += '<b style="color:#c4b5fd">⚠️ 当前限制：</b><br>';
+      pp.limitations.forEach(function(l){ html += '· '+l+'<br>'; });
+      html += '</div>';
+    }
+    dst.innerHTML = html;
+  };
 
   /* ===== 📦 TOP3 持仓跟踪（2026-08-10 暂未上架·localStorage 持久化） =====
      2026-08-12 主人令：删除 ETF 持仓种子（159755/159665），只保留 688548 广钢气体；ETF 是「又自己跑出来」的，
