@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-13 15:40:57",
-  "total_scored": 120,
+  "update_time": "2026-08-13 15:52:14",
+  "total_scored": 125,
   "count_80plus": 0,
   "max_score": 36.0,
   "top10": [
@@ -258,6 +258,48 @@
     },
     {
       "rank": 7,
+      "code": "300502",
+      "name": "新易盛",
+      "market": "sz",
+      "board": "创业板",
+      "sig_count": 1,
+      "close": 429.9,
+      "pct_chg": 0.4,
+      "pct_chg_20d": 0,
+      "total_score": 30.0,
+      "sectors": [],
+      "stop_loss": 386.91,
+      "target_price": 494.38,
+      "stop_loss_method": "fixedP10",
+      "target_price_method": "rrK1.5",
+      "risk_reward": 1.5,
+      "stop_precise": false,
+      "score_base": 25,
+      "score_enhance": 0,
+      "score_form": 6,
+      "score_fund": 0,
+      "score_sector": 0,
+      "score_inst": 0,
+      "score_quality": 38,
+      "score_backtest": 6,
+      "win_rate": 62.2,
+      "quality_grade": "A",
+      "signals": {
+        "chan": false,
+        "jinzuan": false,
+        "jigou": true,
+        "trend": false,
+        "form_A": false
+      },
+      "consecutive_days": 0,
+      "form_detail": "非涨停",
+      "fund_detail": "",
+      "sector_detail": "",
+      "inst_detail": "",
+      "quality_detail": "ROE优质(72.6%) | 营收高增(130.2%) | 消息:中报预增"
+    },
+    {
+      "rank": 8,
       "code": "688183",
       "name": "生益电子",
       "market": "sh",
@@ -299,7 +341,7 @@
       "quality_detail": "ROE优质(29.4%) | 营收高增(100.3%) | 消息:中报预增"
     },
     {
-      "rank": 8,
+      "rank": 9,
       "code": "600309",
       "name": "万华化学",
       "market": "sh",
@@ -341,7 +383,7 @@
       "quality_detail": "ROE一般(12.3%) | 营收高增(65.9%) | 消息:中报预增"
     },
     {
-      "rank": 9,
+      "rank": 10,
       "code": "000100",
       "name": "MINIMAX-W",
       "market": "sz",
@@ -383,7 +425,7 @@
       "quality_detail": "ROE偏低(7.9%) | 营收高增(49.1%) | 消息:中报预增"
     },
     {
-      "rank": 10,
+      "rank": 11,
       "code": "000603",
       "name": "中油燃气",
       "market": "sz",
@@ -425,7 +467,7 @@
       "quality_detail": "ROE一般(10.8%) | 营收增长(14.3%) | 消息:中报预增"
     },
     {
-      "rank": 11,
+      "rank": 12,
       "code": "000333",
       "name": "美的集团",
       "market": "sz",
@@ -467,7 +509,7 @@
       "quality_detail": "ROE良好(20.0%) | 营收高增(75.6%)"
     },
     {
-      "rank": 12,
+      "rank": 13,
       "code": "300759",
       "name": "康龙化成",
       "market": "sz",
@@ -509,7 +551,7 @@
       "quality_detail": "ROE一般(11.6%) | 营收高增(55.3%) | 消息:中报略增"
     },
     {
-      "rank": 13,
+      "rank": 14,
       "code": "688213",
       "name": "思特威",
       "market": "sh",
@@ -551,7 +593,7 @@
       "quality_detail": ""
     },
     {
-      "rank": 14,
+      "rank": 15,
       "code": "300209",
       "name": "行云科技",
       "market": "sz",
@@ -593,7 +635,7 @@
       "quality_detail": "ROE差(1.3%) | 营收增长(10.7%) | 消息:中报预增"
     },
     {
-      "rank": 15,
+      "rank": 16,
       "code": "688202",
       "name": "美迪西",
       "market": "sh",
@@ -635,7 +677,7 @@
       "quality_detail": "ROE差(-8.2%) | 营收高增(42.7%) | 消息:中报扭亏"
     },
     {
-      "rank": 16,
+      "rank": 17,
       "code": "300558",
       "name": "贝达药业",
       "market": "sz",
@@ -677,7 +719,7 @@
       "quality_detail": "ROE偏低(5.0%) | 营收高增(36.3%) | 消息:中报略增"
     },
     {
-      "rank": 17,
+      "rank": 18,
       "code": "002714",
       "name": "牧原股份",
       "market": "sz",
@@ -719,7 +761,7 @@
       "quality_detail": ""
     },
     {
-      "rank": 18,
+      "rank": 19,
       "code": "300498",
       "name": "温氏股份",
       "market": "sz",
@@ -761,7 +803,7 @@
       "quality_detail": ""
     },
     {
-      "rank": 19,
+      "rank": 20,
       "code": "300207",
       "name": "欣旺达",
       "market": "sz",
@@ -801,48 +843,6 @@
       "sector_detail": "",
       "inst_detail": "",
       "quality_detail": ""
-    },
-    {
-      "rank": 20,
-      "code": "603127",
-      "name": "昭衍新药",
-      "market": "sh",
-      "board": "主板",
-      "sig_count": 2,
-      "close": 52.8,
-      "pct_chg": 3.75,
-      "pct_chg_20d": 0,
-      "total_score": 24.0,
-      "sectors": [],
-      "stop_loss": 47.52,
-      "target_price": 60.72,
-      "stop_loss_method": "fixedP10",
-      "target_price_method": "rrK1.5",
-      "risk_reward": 1.5,
-      "stop_precise": false,
-      "score_base": 50,
-      "score_enhance": 0,
-      "score_form": 6,
-      "score_fund": 0,
-      "score_sector": 0,
-      "score_inst": 0,
-      "score_quality": 5,
-      "score_backtest": -1,
-      "win_rate": 48.7,
-      "quality_grade": "D",
-      "signals": {
-        "chan": false,
-        "jinzuan": false,
-        "jigou": true,
-        "trend": true,
-        "form_A": false
-      },
-      "consecutive_days": 0,
-      "form_detail": "非涨停",
-      "fund_detail": "",
-      "sector_detail": "",
-      "inst_detail": "",
-      "quality_detail": "ROE差(3.6%) | 营收增长(17.4%) | 消息:中报预增"
     }
   ]
 }
