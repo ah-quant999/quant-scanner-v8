@@ -4,10 +4,15 @@
 v6 是 lazy 实时查询（akshare 按需调，慢）；v8 改成离线缓存（全市场抓取，每日盘中 + 盘后
 各跑一次，data/STOCK_QUOTE.js 嵌入 v8 站点，查询秒出）。
 
-数据源：akshare.stock_zh_a_spot()（新浪接口，~5500 只，27 秒，14 列基础行情）。
-akshare.stock_zh_a_spot_em()（东财接口，字段更全但云端 + 阿狸咪都连接超时，故走新浪）。
+数据源：
+  - A 股：akshare.stock_zh_a_spot()（新浪接口，~5500 只，27 秒，14 列基础行情）
+  - 港股：akshare.stock_hk_spot()（新浪接口，~2800 只）
+  - ETF：akshare.fund_etf_spot_em()（东财接口，~1500 只）
 
-输出：raw_data/stock_quote.json + data/STOCK_QUOTE.js（键 = shXXXXXX/szXXXXXX/bjXXXXXX）。
+2026-08-13 修复：原 STOCK_QUOTE 只含 A 股，导致个股查询搜到港股/ETF 后详情页显示「未收录」。
+现合并 A 股 + 港股 + ETF，统一键为 shXXXXXX/szXXXXXX/bjXXXXXX/hkXXXXX/sh/sz15XXXX。
+
+输出：raw_data/stock_quote.json + data/STOCK_QUOTE.js。
 """
 import akshare as ak
 import json
@@ -21,6 +26,15 @@ REPO_ROOT = os.path.dirname(ROOT)                                    # 仓库根
 RAW_DIR = os.path.join(REPO_ROOT, 'raw_data')
 DATA_DIR = os.path.join(REPO_ROOT, 'data')
 ic_path = os.path.abspath(os.path.join(ROOT, 'stock_industry_concepts.json'))  # algorithms/ 里
+
+def _safe_float(v):
+    try:
+        if v in (None, '', '-'):
+            return None
+        return float(v)
+    except Exception:
+        return None
+
 
 def fetch_all_spot():
     """全市场 A 股实时行情（约 5537 只，14 列，27s）。"""
@@ -41,15 +55,15 @@ def fetch_all_spot():
         try:
             out[code] = {
                 'name': r['name'],
-                'price': float(r['price']) if r['price'] not in (None, '', '-') else None,
-                'change': float(r['change']) if r['change'] not in (None, '', '-') else None,
-                'pct': float(r['pct']) if r['pct'] not in (None, '', '-') else None,
-                'prev_close': float(r['prev_close']) if r['prev_close'] not in (None, '', '-') else None,
-                'open': float(r['open']) if r['open'] not in (None, '', '-') else None,
-                'high': float(r['high']) if r['high'] not in (None, '', '-') else None,
-                'low': float(r['low']) if r['low'] not in (None, '', '-') else None,
-                'volume': float(r['volume']) if r['volume'] not in (None, '', '-') else None,
-                'amount': float(r['amount']) if r['amount'] not in (None, '', '-') else None,
+                'price': _safe_float(r['price']),
+                'change': _safe_float(r['change']),
+                'pct': _safe_float(r['pct']),
+                'prev_close': _safe_float(r['prev_close']),
+                'open': _safe_float(r['open']),
+                'high': _safe_float(r['high']),
+                'low': _safe_float(r['low']),
+                'volume': _safe_float(r['volume']),
+                'amount': _safe_float(r['amount']),
                 'snapshot_time': r['snapshot_time'],
             }
         except Exception:
@@ -57,8 +71,93 @@ def fetch_all_spot():
     return out
 
 
+def fetch_hk_spot():
+    """港股实时行情（akshare 新浪接口，约 2800 只）。"""
+    try:
+        df = ak.stock_hk_spot()
+    except Exception as e:
+        print(f"⚠️ 港股行情获取失败: {type(e).__name__} {str(e)[:60]}")
+        return {}
+    if df is None or df.empty:
+        print("⚠️ 港股行情返回空")
+        return {}
+    out = {}
+    now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).strftime('%H:%M:%S')
+    for _, r in df.iterrows():
+        code = str(r.get('代码', '')).strip()
+        name = str(r.get('中文名称', '')).strip()
+        if not code or not name or not code.isdigit():
+            continue
+        code = code.zfill(5)
+        key = 'hk' + code
+        try:
+            out[key] = {
+                'name': name,
+                'price': _safe_float(r.get('最新价')),
+                'change': _safe_float(r.get('涨跌额')),
+                'pct': _safe_float(r.get('涨跌幅')),
+                'prev_close': _safe_float(r.get('昨收')),
+                'open': _safe_float(r.get('今开')),
+                'high': _safe_float(r.get('最高')),
+                'low': _safe_float(r.get('最低')),
+                'volume': _safe_float(r.get('成交量')),
+                'amount': _safe_float(r.get('成交额')),
+                'snapshot_time': now,
+                'board': '港股',
+                'industry': '',
+                'concepts': [],
+            }
+        except Exception:
+            continue
+    print(f"✅ 港股行情：{len(out)} 只")
+    return out
+
+
+def fetch_etf_spot():
+    """ETF 实时行情（akshare 东财接口，约 1500 只）。"""
+    try:
+        df = ak.fund_etf_spot_em()
+    except Exception as e:
+        print(f"⚠️ ETF 行情获取失败: {type(e).__name__} {str(e)[:60]}")
+        return {}
+    if df is None or df.empty:
+        print("⚠️ ETF 行情返回空")
+        return {}
+    out = {}
+    now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).strftime('%H:%M:%S')
+    for _, r in df.iterrows():
+        code = str(r.get('代码', '')).strip()
+        name = str(r.get('名称', '')).strip()
+        if not code or not name or not code.isdigit() or len(code) != 6:
+            continue
+        prefix = 'sh' if code.startswith('5') else 'sz'
+        key = prefix + code
+        try:
+            out[key] = {
+                'name': name,
+                'price': _safe_float(r.get('最新价')),
+                'change': _safe_float(r.get('涨跌额')),
+                'pct': _safe_float(r.get('涨跌幅')),
+                'prev_close': _safe_float(r.get('昨收')),
+                'open': _safe_float(r.get('开盘价')),
+                'high': _safe_float(r.get('最高价')),
+                'low': _safe_float(r.get('最低价')),
+                'volume': _safe_float(r.get('成交量')),
+                'amount': _safe_float(r.get('成交额')),
+                'snapshot_time': now,
+                'board': 'ETF',
+                'industry': '',
+                'concepts': [],
+            }
+        except Exception:
+            continue
+    print(f"✅ ETF 行情：{len(out)} 只")
+    return out
+
+
 def merge_industry_concepts(quote_data):
-    """合并 algorithms/stock_industry_concepts.json（v8 已 7000+ 只映射）→ board/industry/concepts。"""
+    """合并 algorithms/stock_industry_concepts.json（v8 已 7000+ 只映射）→ board/industry/concepts。
+    港股/ETF 已在 fetch_hk_spot/fetch_etf_spot 中设置 board，此处跳过。"""
     ic_path = os.path.abspath(os.path.join(ROOT, 'stock_industry_concepts.json'))
     if not os.path.exists(ic_path):
         print(f"⚠️ 未找到 {ic_path}，跳过行业概念合并")
@@ -68,7 +167,10 @@ def merge_industry_concepts(quote_data):
             ic = json.load(f)
         merged = 0
         for code, info in quote_data.items():
-            # code 形如 sh603259，取 6 位数字
+            # 跳过港股/ETF：只给 A 股/北交所补行业概念
+            if code.startswith('hk') or info.get('board') == 'ETF':
+                continue
+            # code 形如 sh603259/bj920000，取 6 位数字
             code6 = code[2:] if len(code) == 8 else code
             if code6 in ic:
                 info['board'] = ic[code6].get('board', '')
@@ -114,9 +216,11 @@ def merge_dividend(quote_data):
         merged = 0
         for _, r in df.iterrows():
             code6 = str(r['代码']).strip()
-            # 形如 sh/sz603259
+            if not code6.isdigit() or len(code6) != 6:
+                continue
+            # 形如 sh/sz603259；ETF 以 5/15/16 开头也跳过（fund_etf_spot_em 代码在此列但无分红）
             code8 = ('sh' if code6.startswith(('6', '9', '5')) else 'sz') + code6
-            if code8 not in quote_data:
+            if code8 not in quote_data or code8.startswith('hk') or quote_data[code8].get('board') == 'ETF':
                 continue
             def _f(v):
                 try: return float(v)
@@ -156,10 +260,16 @@ def write_outputs(data):
     os.makedirs(RAW_DIR, exist_ok=True)
     os.makedirs(DATA_DIR, exist_ok=True)
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
+    a_count = sum(1 for k in data if k.startswith(('sh','sz','bj')) and data[k].get('board') != 'ETF')
+    hk_count = sum(1 for k in data if k.startswith('hk'))
+    etf_count = sum(1 for k in data if data[k].get('board') == 'ETF')
     meta = {
         'update_time': now.strftime('%Y-%m-%d %H:%M:%S'),
-        'source': 'akshare.stock_zh_a_spot (新浪) + algorithms/stock_industry_concepts.json',
+        'source': 'akshare.stock_zh_a_spot(新浪A股)+stock_hk_spot(新浪港股)+fund_etf_spot_em(东财ETF)+algorithms/stock_industry_concepts.json',
         'count': len(data),
+        'a_count': a_count,
+        'hk_count': hk_count,
+        'etf_count': etf_count,
         'fields': ['name','price','change','pct','prev_close','open','high','low','volume','amount','snapshot_time','board','industry','concepts'],
     }
     # raw_data/stock_quote.json（云端抓取落盘位置）
@@ -224,9 +334,19 @@ def merge_fundamental_quality(quote_data):
 
 def main():
     t0 = time.time()
-    print("开始抓取全市场 A 股实时行情（akshare 新浪接口）...")
+    print("开始抓取全市场实时行情...")
     data = fetch_all_spot()
-    print(f"抓取完成：{len(data)} 只，{time.time()-t0:.1f}s")
+    print(f"A股：{len(data)} 只，{time.time()-t0:.1f}s")
+    hk_data = fetch_hk_spot()
+    etf_data = fetch_etf_spot()
+    # 合并：A 股为基础，港股/ETF 补充（不覆盖 A 股）
+    for k, v in hk_data.items():
+        if k not in data:
+            data[k] = v
+    for k, v in etf_data.items():
+        if k not in data:
+            data[k] = v
+    print(f"合并后：{len(data)} 只")
     data = merge_industry_concepts(data)
     data = merge_dividend(data)
     data = merge_fundamental_quality(data)

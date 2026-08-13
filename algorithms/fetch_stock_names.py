@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""获取 A 股 + 港股全量股票名称列表（每周更新一次即可）"""
+"""获取 A 股 + 港股 + ETF 全量股票名称列表（每周更新一次即可）
+
+2026-08-13 修复：原脚本只产出 A 股，导致个股查询搜不到港股/ETF。
+现加入：
+  - ETF：akshare.fund_etf_spot_em() 全量 (~1500 只)
+  - 港股：akshare.stock_hk_spot() 新浪接口优先，失败则 stock_hk_spot_em() 兜底
+所有标的统一附加 market / full_code / py 字段，供 index.html _uniSearch 使用。
+"""
 
 import json, os, re, time
 from datetime import datetime
@@ -34,13 +41,25 @@ def _fallback_py(name):
     return "".join(letters)
 
 
+def _generate_py(name):
+    """用 pypinyin 生成中文名首字母；未安装或失败则 fallback。"""
+    if not name:
+        return ""
+    try:
+        from pypinyin import lazy_pinyin
+        return "".join([p[0].lower() for p in lazy_pinyin(name) if p]).lower()
+    except Exception:
+        return _fallback_py(name)
+
+
 def _attach_py(stocks):
     """给股票列表附加 py 字段。"""
     py_map = _load_pinyin_map()
     for s in stocks:
         code = str(s.get("code", "")).strip()
         name = s.get("name", "")
-        s["py"] = py_map.get(code) or _fallback_py(name)
+        # A 股优先用本地静态拼音映射；港股/ETF 动态生成
+        s["py"] = py_map.get(code) or _generate_py(name)
     return stocks
 
 
@@ -148,9 +167,66 @@ def _fetch_a_share_via_sina():
                 break
     return result
 
+def _fetch_hk_stocks():
+    """抓取港股全量代码→名称。优先新浪 stock_hk_spot，失败再试东财 stock_hk_spot_em。"""
+    try:
+        import akshare as ak
+    except Exception as e:
+        print(f"  ⚠️ akshare 未安装，跳过港股: {e}")
+        return []
+    for fn in (ak.stock_hk_spot, ak.stock_hk_spot_em):
+        try:
+            df = fn()
+            if df is None or df.empty:
+                continue
+            code_col = "代码" if "代码" in df.columns else "code"
+            name_col = "名称" if "名称" in df.columns else ("中文名称" if "中文名称" in df.columns else "name")
+            result = []
+            for _, row in df.iterrows():
+                code = str(row.get(code_col, "")).strip()
+                name = str(row.get(name_col, "")).strip()
+                if not code or not name or not code.isdigit():
+                    continue
+                code = code.zfill(5)
+                result.append({"code": code, "name": name, "full_code": "hk" + code, "market": "hk"})
+            print(f"  ✅ 港股: {fn.__name__} {len(result)} 只")
+            return result
+        except Exception as e:
+            print(f"  ⚠️ 港股 {fn.__name__} 失败: {type(e).__name__} {str(e)[:60]}")
+            time.sleep(1)
+    return []
+
+
+def _fetch_etf_stocks():
+    """抓取 ETF 全量代码→名称。"""
+    try:
+        import akshare as ak
+    except Exception as e:
+        print(f"  ⚠️ akshare 未安装，跳过 ETF: {e}")
+        return []
+    try:
+        df = ak.fund_etf_spot_em()
+        if df is None or df.empty:
+            print("  ⚠️ ETF 无数据")
+            return []
+        result = []
+        for _, row in df.iterrows():
+            code = str(row.get("代码", "")).strip()
+            name = str(row.get("名称", "")).strip()
+            if not code or not name or not code.isdigit() or len(code) != 6:
+                continue
+            prefix = "sh" if code.startswith("5") else "sz"
+            result.append({"code": code, "name": name, "full_code": prefix + code, "market": "etf"})
+        print(f"  ✅ ETF: {len(result)} 只")
+        return result
+    except Exception as e:
+        print(f"  ⚠️ ETF 获取失败: {type(e).__name__} {str(e)[:60]}")
+        return []
+
+
 def main():
     print("=" * 50)
-    print("  A 股 + 港股全量股票名称列表更新")
+    print("  A 股 + 港股 + ETF 全量股票名称列表更新")
     print("=" * 50)
 
     all_stocks = []
@@ -170,7 +246,7 @@ def main():
                     if not code or not name:
                         continue
                     prefix = "sz" if code.startswith(("0", "3")) else "sh"
-                    a_stocks.append({"code": code, "name": name, "full_code": prefix + code})
+                    a_stocks.append({"code": code, "name": name, "full_code": prefix + code, "market": prefix})
         except Exception as e:
             print(f"  ⚠️ A股获取失败: {e}")
 
@@ -181,31 +257,24 @@ def main():
         print("  ⚠️ A股全失败，跳过")
 
     # ── 港股 ──
-    try:
-        import akshare as ak
-        time.sleep(1)  # 避免请求过于密集
-        df_hk = ak.stock_hk_spot_em()
-        if df_hk is None or df_hk.empty:
-            print("  ⚠️ 港股无数据")
-        else:
-            hk_count = 0
-            for _, row in df_hk.iterrows():
-                code = str(row.get("代码", "")).strip()
-                name = str(row.get("名称", "")).strip()
-                if not code or not name:
-                    continue
-                # 去重：跳过已在A股列表中的相同code
-                if any(s["code"] == code for s in all_stocks):
-                    continue
-                all_stocks.append({
-                    "code": code,
-                    "name": name,
-                    "full_code": "hk" + code,
-                })
-                hk_count += 1
-            print(f"  ✅ 港股: {hk_count} 只")
-    except Exception as e:
-        print(f"  ⚠️ 港股获取失败: {e}")
+    time.sleep(1)
+    hk_stocks = _fetch_hk_stocks()
+    if hk_stocks:
+        seen = {s["code"] for s in all_stocks}
+        for s in hk_stocks:
+            if s["code"] not in seen:
+                all_stocks.append(s)
+                seen.add(s["code"])
+
+    # ── ETF ──
+    time.sleep(1)
+    etf_stocks = _fetch_etf_stocks()
+    if etf_stocks:
+        seen = {s["code"] for s in all_stocks}
+        for s in etf_stocks:
+            if s["code"] not in seen:
+                all_stocks.append(s)
+                seen.add(s["code"])
 
     if len(all_stocks) < 4000:
         # 抓取不足：保留旧文件，但仍把 py / 行业 / 概念 / 板块 重新合并进去，避免数据回退
@@ -216,8 +285,13 @@ def main():
             if isinstance(old, dict):
                 old = old.get("data", old)
             if isinstance(old, list) and len(old) >= 4000:
-                all_stocks = old
-                print(f"  ✅ 沿用旧文件 {len(all_stocks)} 只，继续补全元数据")
+                # 合并旧文件，保留旧文件里的港股/ETF 以防本次抓失败
+                old_seen = {s["code"] for s in all_stocks}
+                for s in old:
+                    if s.get("code") not in old_seen:
+                        all_stocks.append(s)
+                        old_seen.add(s["code"])
+                print(f"  ✅ 沿用旧文件补全后 {len(all_stocks)} 只，继续补全元数据")
             else:
                 print("  ⚠️ 旧文件也不足，放弃写入")
                 return
