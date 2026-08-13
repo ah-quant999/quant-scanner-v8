@@ -76,7 +76,7 @@ jobs:
         id: cat
         shell: bash
         run: |
-          DISPATCH_CAT="${{ github.event.inputs.category }}"
+          DISPATCH_CAT="${{ inputs.category }}"
           if [ -n "$DISPATCH_CAT" ]; then
             echo "category=$DISPATCH_CAT" >> "$GITHUB_OUTPUT"
             echo "label=手动派发($DISPATCH_CAT)"
