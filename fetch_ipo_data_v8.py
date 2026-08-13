@@ -673,10 +673,142 @@ def calc_fundamental(c):
     }
 
 
+# ── IPO 情绪/热度因子（2026-08-13 升级） ──
+
+def _load_sector_rs():
+    """读取板块相对强弱数据，用于 IPO 行业情绪分。"""
+    try:
+        path = os.path.join(DATA_DIR, "sector_rs.json")
+        if not os.path.exists(path):
+            return None
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if not data.get("data_available"):
+            return None
+        sectors = data.get("sectors") or []
+        if not sectors:
+            return None
+        return sectors
+    except Exception as e:
+        print(f"  ⚠️ 读取 sector_rs.json 失败: {e}")
+        return None
+
+
+def _industry_momentum_score(industry_name, sectors):
+    """基于行业近5日/20日涨幅在全市场的排名给分（0-12）。"""
+    if not sectors or not industry_name:
+        return 8.0
+    matched = [s for s in sectors if s.get("name") == industry_name]
+    if not matched:
+        matched = [s for s in sectors
+                   if industry_name in s.get("name", "")
+                   or s.get("name", "") in industry_name]
+    if not matched:
+        return 8.0
+    s = matched[0]
+    pct_5d = s.get("pct_5d", 0) or 0
+    pct_20d = s.get("pct_20d", 0) or 0
+
+    all_5d = sorted([x.get("pct_5d", 0) or 0 for x in sectors])
+    all_20d = sorted([x.get("pct_20d", 0) or 0 for x in sectors])
+
+    def _rank_score(val, all_vals, top, mid, low):
+        if not all_vals:
+            return mid
+        rank_pct = sum(1 for v in all_vals if v <= val) / len(all_vals)
+        if rank_pct >= 0.8:
+            return top
+        if rank_pct >= 0.6:
+            return top * 0.7
+        if rank_pct >= 0.4:
+            return mid
+        if rank_pct >= 0.2:
+            return low
+        return low * 0.5
+
+    score_5d = _rank_score(pct_5d, all_5d, 7, 4, 2)
+    score_20d = _rank_score(pct_20d, all_20d, 5, 3, 1)
+    return round(score_5d + score_20d, 1)
+
+
+def _load_limit_up_heat():
+    """读取涨停heatmap，用于 IPO 行业短线情绪。"""
+    try:
+        path = os.path.join(DATA_DIR, "limit_up_heatmap.json")
+        if not os.path.exists(path):
+            return None
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"  ⚠️ 读取 limit_up_heatmap.json 失败: {e}")
+        return None
+
+
+def _limit_up_heat_score(industry_name, heat_data):
+    """基于行业近5日涨停数均值排名给分（0-3）。"""
+    if not heat_data or not industry_name:
+        return 2.0
+    sectors = heat_data.get("sectors") or []
+    if not sectors:
+        return 2.0
+    matched = [s for s in sectors if s.get("name") == industry_name]
+    if not matched:
+        matched = [s for s in sectors
+                   if industry_name in s.get("name", "")
+                   or s.get("name", "") in industry_name]
+    if not matched:
+        return 2.0
+    s = matched[0]
+    data = s.get("data", [])[:-1]  # 去掉今日（盘前可能是0）
+    if not data:
+        return 2.0
+    avg = sum(data) / len(data)
+    all_avgs = []
+    for x in sectors:
+        xd = x.get("data", [])[:-1]
+        if xd:
+            all_avgs.append(sum(xd) / len(xd))
+    if not all_avgs:
+        return 2.0
+
+    rank_pct = sum(1 for v in all_avgs if v <= avg) / len(all_avgs)
+    if rank_pct >= 0.8:
+        return 3
+    if rank_pct >= 0.6:
+        return 2.5
+    if rank_pct >= 0.4:
+        return 2
+    if rank_pct >= 0.2:
+        return 1.5
+    return 1
+
+
+def _oversubscription_sentiment_score(over_ratio):
+    """超募倍数反映申购情绪：1.5倍+给高分（0-4）。"""
+    if over_ratio is None:
+        return 2
+    if over_ratio >= 2.0:
+        return 4
+    if over_ratio >= 1.5:
+        return 3
+    if over_ratio >= 1.2:
+        return 2
+    if over_ratio >= 1.0:
+        return 1
+    return 0.5
+
+
 def calculate_scores(candidates, status_filter=None):
     """计算申购/待上市新股的评分（双维度：套利分 + 基本面分）
     status_filter: None=全部, 或指定列表如 ["applying", "pre_listing"]
+
+    2026-08-13 升级：heat_score 从固定 15 改为动态情绪分（0-15），
+    综合行业近5日/20日涨幅排名、行业涨停heatmap排名、超募倍数，
+    更好识别高涨幅潜力标的。
     """
+    sector_rs = _load_sector_rs()
+    heat_data = _load_limit_up_heat()
+
     results = []
     for c in candidates:
         if status_filter and c["status"] not in status_filter:
@@ -685,6 +817,7 @@ def calculate_scores(candidates, status_filter=None):
         price = c["issue_price"]
         board = board_name(c["market_code"])
         industry_pe = c.get("industry_pe", 20)
+        industry_name = (c.get("industry_name") or "").strip()
 
         # 发行PE：优先用 AFTER_ISSUE_PE，否则估算
         issue_pe = c.get("issue_pe", 0) or 0
@@ -703,15 +836,21 @@ def calculate_scores(candidates, status_filter=None):
         price_score = score_price(price) if price > 0 else 10
         # 板块溢价
         board_bonus = board_score(board)
-        # 行业热度（默认中等）
-        heat_score = 15
 
-        # ── 套利维度（原打新评分逻辑）──
+        # ── 基本面维度（先算，需要其中的超募倍数做情绪分）──
+        fundamental_score, fund_detail = calc_fundamental(c)
+
+        # 情绪/热度（0-15）：行业动量 + 涨停heatmap + 超募情绪
+        heat_score = min(15, round(
+            _industry_momentum_score(industry_name, sector_rs)
+            + _limit_up_heat_score(industry_name, heat_data)
+            + _oversubscription_sentiment_score(fund_detail.get("over_subscription")),
+            1
+        ))
+
+        # ── 套利维度 ──
         arbitrage_raw = pe_score + heat_score + price_score + board_bonus
         arbitrage_score = round(min(arbitrage_raw, 90) / 90 * 100)
-
-        # ── 基本面维度（对所有 IPO 生效，基于发行披露可得信号）──
-        fundamental_score, fund_detail = calc_fundamental(c)
 
         # 总分：套利 60% + 基本面 40%
         total = round(arbitrage_score * 0.6 + fundamental_score * 0.4)
@@ -743,6 +882,10 @@ def calculate_scores(candidates, status_filter=None):
             highlights.append(f"募资{c['dec_sumfina']:.0f}亿")
         if board in ("沪市主板", "深市主板"):
             highlights.append(f"{board}流动性溢价")
+        if heat_score >= 12:
+            highlights.append(f"情绪分{heat_score:.0f}·热度高")
+        elif heat_score <= 6:
+            highlights.append(f"情绪分{heat_score:.0f}·偏冷")
 
         actual_status = "pre_listing" if c["status"] == "pre_listing" else "applying"
         results.append({
@@ -756,6 +899,7 @@ def calculate_scores(candidates, status_filter=None):
             # ── 双维度分列：套利分 + 基本面分 + 结构化基本面 ──
             "arbitrage_score": arbitrage_score,
             "fundamental_score": fundamental_score,
+            "heat_score": heat_score,
             "fundamentals": fund_detail,
             "highlights": highlights[:5],
             "status": actual_status,

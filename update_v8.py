@@ -296,10 +296,28 @@ _IPO_GENERIC_CONCEPTS = {
 
 
 def _sanitize_ipo_recommend(stock):
-    """把被 status 污染的 recommend 字段按 score 重新映射为建议等级。"""
+    """把被 status 污染的 recommend 字段按 score 重新映射为建议等级。
+
+    注意：上市后（tracking / listed_today）的追入建议由 fetch_ipo_data_v8.py
+    的 tracking_advice() 生成，含 emoji 与状态描述，不能按申购 score 覆盖为
+    「不建议申购」。该 bug 曾于 2026-08-13 导致杰理科技/超纯应材等暴涨 tracking
+    股被错误显示为不建议申购。
+    """
+    status = (stock.get("status") or "").strip()
     rec = (stock.get("recommend") or "").strip()
+
+    # 上市后状态：保留追入/首日建议，仅缺失时兜底
+    if status in ("tracking", "listed_today"):
+        if not rec:
+            stock["recommend"] = "数据不足，无法判断"
+            stock["tag_color"] = "#999"
+            stock["bg_color"] = "#f5f5f5"
+        return stock
+
+    # 已有有效申购建议等级时直接保留
     if rec and rec not in _IPO_STATUS_WORDS and _IPO_REC_PATTERNS.search(rec):
         return stock
+
     score = stock.get("score") or 0
     if score >= 80:
         rec, tc, bc = "强烈推荐申购", "#2e7d32", "#e8f5e9"
