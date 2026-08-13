@@ -93,13 +93,22 @@ jobs:
             "20 9 * * 1-5")
               echo "category=post_close" >> "$GITHUB_OUTPUT"
               echo "label=盘后" ;;
-            "0 9,13 * * 1-5"|"0 1 * * 0,6")
+            # 🛡️ 2026-08-13 23:1x 根因修复（小九令）：原 case 写 "0 9,13" 但 yml cron 是 '0 9,14'
+            #   （注释里写"17:00/21:30" 实际 cron 是 22:00），case 不匹配导致 step 2 失败
+            #   → 整个 fetch job 失败、main 上 raw_data 缺口无人补（从 14:44 起 4 次连续失败）。
+            #   兜底：任何未匹配 cron 统一走 "all" 全量，避免因注释/cron 不同步而漏跑。
+            "0 9,14 * * 1-5"|"0 9,13 * * 1-5"|"0 1 * * 0,6")
               echo "category=all" >> "$GITHUB_OUTPUT"
               echo "label=全量兜底" ;;
             *)
               echo "category=all" >> "$GITHUB_OUTPUT"
-              echo "label=全量兜底" ;;
+              echo "label=兜底(未匹配cron $CRON, 走all)" ;;
           esac
+          # 兜底：无论 case 命中与否，确保 category 输出有值（防 step 后续 ${{ steps.cat.outputs.category }} 为空）
+          if [ -z "${{ steps.cat.outputs.category }}" ]; then
+            echo "⚠️ category 输出为空，强制设为 all"
+            echo "category=all" >> "$GITHUB_OUTPUT"
+          fi
 
       - uses: actions/checkout@v4
         # 🛡️ 2026-08-13 14:54 根因修复（小九令）：原 checkout 默认 1 分钟超时，

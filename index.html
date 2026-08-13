@@ -10749,15 +10749,23 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   // 删除持仓
   window.removePosition = function(code){
     var arr=_pfLoad().filter(function(p){return p.code!==code;});
-    _pfSave(arr); renderPortfolio();
+    _pfSave(arr);
+    // 2026-08-13 主人令：PORTFOLIO_DATA 来自云端同步，光删 localStorage 不够。
+    // 加黑名单 v8_pf_hidden，下次 fetch 把广钢气体之类被删除的同步过滤掉（主人手动用 westock App 删云端后清空黑名单）。
+    var hidden=JSON.parse(localStorage.getItem('v8_pf_hidden')||'[]');
+    if(hidden.indexOf(code)===-1){ hidden.push(code); localStorage.setItem('v8_pf_hidden', JSON.stringify(hidden)); }
+    renderPortfolio();
   };
   // 渲染持仓列表（增强版：止损止盈 + 持仓天数 + 回撤监控 + 卖出信号）
   window.renderPortfolio = function(){
     var el=document.getElementById('pfList'); if(!el)return;
     // 2026-08-12 主人令：优先用 westock 云端数据（PORTFOLIO_DATA，双机同步+实时行情），localStorage 为 fallback
     var arr=[];
+    // 2026-08-13 主人令：黑名单过滤（用户在前端点了删除但云端还没同步前，渲染时跳过）
+    var hidden=JSON.parse(localStorage.getItem('v8_pf_hidden')||'[]');
+    var _notHidden=function(p){ return hidden.indexOf(p.code) === -1; };
     if(window.PORTFOLIO_DATA && window.PORTFOLIO_DATA.positions && window.PORTFOLIO_DATA.positions.length){
-      arr = window.PORTFOLIO_DATA.positions.map(function(p){
+      arr = window.PORTFOLIO_DATA.positions.filter(_notHidden).map(function(p){
         return {
           code:p.code, name:p.name, full_code:(p.market||'')+p.code, market:p.market||'sh',
           date:p.buy_date||'', price:Number(p.cost_price||0), qty:Number(p.qty||0),
@@ -10765,7 +10773,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         };
       });
     } else {
-      arr=_pfLoad();
+      arr=_pfLoad().filter(_notHidden);
     }
     if(!arr.length){el.innerHTML='<div class="note" style="text-align:center;font-size:12px;">暂无持仓记录，上方录入买入标的</div>';return;}
     // 可配置阈值
@@ -11103,8 +11111,9 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
   function renderDelisted(){
     var el=$('delistedPanel');
-    if(!el || el.dataset.rendered==='1') return;
-    el.dataset.rendered='1';
+    if(!el) return;
+    // 2026-08-13 主人令：去掉 dataset.rendered 缓存——已下架 Tab 每次切入都重渲染最新数据。
+    // 原缓存导致 raw_data 更新后页面看不到（数据停在早盘 11:xx/15:xx），主人怀疑"没更新"。
     try{
     var h='';
 
