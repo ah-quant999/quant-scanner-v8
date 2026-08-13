@@ -39,3 +39,11 @@ _*.py
 # 自愈派发防抖锁（运行时本地文件，不入库）
 data/.heal_dispatch.json
 data/FOUR_VOLUME_BACKTEST.json
+
+# 紧急交接/看门狗留痕（云端每小时重建并曾由 v8_cleanup.yml `git add -A` 回推仓库；
+# 根因修复：根目录 URGENT_*.md 永不入库，避免 git status 反复被污染。
+# 正式交接通道在 docs/ops/urgent/，不被此规则影响。以下 3 份含根因/交接信息，显式保留。）
+/URGENT_*.md
+!/URGENT_阿狸咪_2026-08-08_添加ZSXQ_TOKEN_Secret.md
+!/URGENT_小九_2026-08-11_19-43_根治项+模型全切.md
+!/URGENT_小九_2026-08-10_0117_v8健康自检告警.md
