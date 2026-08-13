@@ -338,8 +338,26 @@ def _strategy_signal(text):
     return "yellow"
 
 
-def build_strategy(sentiment_label, health, anomalies, indices, etf_daily):
-    """基于当前状态生成 1~2 条操作建议（每条带 signal）"""
+def _top_real_concepts(concepts, n=3):
+    """取真实概念净流入前 n 名（仅正流入），返回名称列表"""
+    if not concepts:
+        return []
+    items = real_concepts(concepts.get("items", []))
+    items = [c for c in items if c.get("net", 0) > 0]
+    items.sort(key=lambda x: x.get("net", 0), reverse=True)
+    return [c["name"] for c in items[:n]]
+
+
+def _top_picks(capital, n=2):
+    """取主力净流入个股前 n 名，返回 {code,name,net} 列表"""
+    if not capital or not capital.get("top_inflow"):
+        return []
+    picks = capital["top_inflow"][:n]
+    return [{"code": p.get("code", ""), "name": p.get("name", ""), "net": round(p.get("net", 0), 2)} for p in picks]
+
+
+def build_strategy(sentiment_label, health, anomalies, indices, etf_daily, concepts=None, capital=None):
+    """基于当前状态生成 1~2 条操作建议（每条带 signal），并把主线板块/推荐个股落地到文本"""
     strategies = []
     by_code = {it["code"]: it for it in indices}
     sh = by_code.get("000001", {})
@@ -347,18 +365,24 @@ def build_strategy(sentiment_label, health, anomalies, indices, etf_daily):
     structure_ok = health["structure"][1] == "green"
     fund_ok = health["fund"][1] == "green"
 
+    # 主线板块 & 推荐个股（用于把模糊建议落地为具体名称）
+    sectors = _top_real_concepts(concepts, 3)
+    picks = _top_picks(capital, 2)
+    sector_str = "、".join(sectors) if sectors else "领涨板块"
+    pick_str = "、".join([p["name"] for p in picks]) if picks else "主力净流入前排个股"
+
     # 根据情绪、结构、资金综合给出仓位建议
     if sentiment_label in ("情绪高涨", "情绪偏暖") and structure_ok and fund_ok:
-        s = "大盘量价配合、资金流入，可持筹待涨；追高需谨慎，优选领涨板块低位补涨。"
+        s = f"大盘量价配合、资金流入，可持筹待涨；追高需谨慎，优选{sector_str}低位补涨，关注{pick_str}。"
         strategies.append({"text": s, "signal": "green"})
     elif sentiment_label in ("情绪冰点", "情绪偏冷") and health["fund"][1] in ("red", "gray"):
         s = "市场情绪低迷、资金流出，建议控制仓位，避免追涨杀跌，等待企稳信号。"
         strategies.append({"text": s, "signal": "red"})
     elif structure_ok and fund_ok:
-        s = "指数结构偏强且资金配合，可择机加仓主线板块，设置好止损。"
+        s = f"指数结构偏强且资金配合，可择机加仓{sector_str}，关注{pick_str}，设置好止损。"
         strategies.append({"text": s, "signal": "green"})
     elif health["structure"][1] == "yellow" and health["emotion"][1] == "green":
-        s = "指数震荡但个股活跃，可轻指数重个股，聚焦主力净流入前排概念。"
+        s = f"指数震荡但个股活跃，可轻指数重个股，聚焦{sector_str}，关注{pick_str}。"
         strategies.append({"text": s, "signal": "yellow"})
     else:
         s = "当前市场方向不明或资金犹豫，建议保持观望或轻仓试错，严格止损纪律。"
@@ -478,7 +502,11 @@ def main():
     anomalies = detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, limitup)
 
     # 操作建议
-    strategies = build_strategy(sentiment_label, health, anomalies, indices, etf_daily)
+    strategies = build_strategy(sentiment_label, health, anomalies, indices, etf_daily, concepts, capital)
+
+    # 主线板块 & 推荐个股（结构化落地，供前端展示）
+    mainline_sectors = _top_real_concepts(concepts, 5)
+    mainline_picks = _top_picks(capital, 3)
 
     # ETF 资金解读（类似截图风格）
     etf_insight = []
@@ -516,6 +544,8 @@ def main():
         "amount_total": amount_total,
         "anomalies": anomalies,
         "strategies": strategies,
+        "mainline_sectors": mainline_sectors,
+        "mainline_picks": mainline_picks,
         "etf_insight": etf_insight,
         "closing_summary": closing_summary,
         "note": f"由{market_status}数据规则生成，非投资建议",
