@@ -706,6 +706,32 @@ def run_health_check():
         print(f"[WARN] 健康检查调用失败: {e}")
 
 
+def run_experiment_cards():
+    """2026-08-13 主人令：暂未上架三张新卡（涨价弹性榜/情绪周期/潜力挖掘）随数据刷新自动重算。
+    三脚本读 data/*.js（build 刚生成的），写 data/COMMODITY_ELASTICITY.js 等。
+    任何模块失败不阻断主流程（仅告警），避免拖垮云端抓取。
+    """
+    import subprocess
+    algo_dir = Path(__file__).resolve().parent / "algorithms"
+    for script in ("calc_commodity_elasticity.py", "calc_sentiment_cycle.py", "calc_potential_picks.py"):
+        path = algo_dir / script
+        if not path.exists():
+            print(f"[experiment] ⚠️ 缺失 {script}，跳过")
+            continue
+        print(f"[experiment] ▶ {script} ({datetime.now():%H:%M:%S})")
+        try:
+            r = subprocess.run([sys.executable, str(path)], cwd=str(algo_dir),
+                               capture_output=True, text=True, timeout=300)
+            if r.returncode == 0:
+                last = [l for l in r.stdout.strip().splitlines() if l.strip()][-1:] or [""]
+                print(f"[experiment]   ✅ {last[0][:80]}")
+            else:
+                print(f"[experiment]   ⚠️ {script} 退出码 {r.returncode}")
+                print("     " + "\n     ".join(r.stdout.strip().splitlines()[-2:] + r.stderr.strip().splitlines()[-2:])[:300])
+        except Exception as e:
+            print(f"[experiment]   ⚠️ {script} 异常: {e}")
+
+
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="v8 data builder")
@@ -718,6 +744,7 @@ def main():
     if rc == 0:
         run_health_check()
         _rewrite_index_html_cache_busters()
+        run_experiment_cards()
     return rc
 
 
