@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-13 08:58:01",
+  "update_time": "2026-08-13 09:22:59",
   "crisis_score": 30.2,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -15,8 +15,8 @@
     "小金属",
     "生物制品",
     "电子化学品",
-    "自动化设备",
-    "贵金属"
+    "贵金属",
+    "通信设备"
   ],
   "stocks": [
     {
@@ -49,7 +49,7 @@
       "sector_fund": [],
       "final_score": 5.2,
       "buy_score": 5.2,
-      "enter_date": "2026-08-12",
+      "enter_date": "2026-08-13",
       "signals": [
         "早期:机构变红+缠论买",
         "机构变红",
@@ -67,7 +67,7 @@
         "note": "个股暂无历史信号，展示策略级统计（最佳持有 3 天）"
       },
       "tracking": {
-        "entry_date": "2026-08-12",
+        "entry_date": "2026-08-13",
         "entry_price": 11.66,
         "latest_price": 11.66,
         "return_pct": 0.0,
@@ -103,16 +103,16 @@
       "sector_hits": [
         {
           "name": "半导体",
-          "pct_5d": 11.35,
-          "relative_5d": 11.35,
+          "pct_5d": 7.55,
+          "relative_5d": 7.55,
           "strong": true
         }
       ],
       "sector_fund": [
         {
           "name": "半导体",
-          "pct_5d": 11.35,
-          "relative_5d": 11.35,
+          "pct_5d": 7.55,
+          "relative_5d": 7.55,
           "strong": true
         }
       ],
@@ -127,12 +127,12 @@
       "reason": "大牛股猎手 机构0.2亿+游资0.2亿",
       "industry": "通用设备制造业",
       "concepts": [
+        "百元股",
         "东方财富热股",
-        "创业板综",
         "次新股",
-        "半导体概念",
-        "存储芯片",
-        "百元股"
+        "创业板综",
+        "先进封装",
+        "存储芯片"
       ],
       "backtest": {
         "signals": 171,
@@ -178,16 +178,16 @@
       "sector_hits": [
         {
           "name": "贵金属",
-          "pct_5d": 14.31,
-          "relative_5d": 14.31,
+          "pct_5d": 8.22,
+          "relative_5d": 8.22,
           "strong": true
         }
       ],
       "sector_fund": [
         {
           "name": "贵金属",
-          "pct_5d": 14.31,
-          "relative_5d": 14.31,
+          "pct_5d": 8.22,
+          "relative_5d": 8.22,
           "strong": true
         }
       ],
@@ -202,10 +202,10 @@
       "reason": "大牛股猎手 机构0.3亿+游资0.1亿",
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "PCB",
-        "央国企改革",
+        "黄金概念",
         "一带一路",
-        "黄金概念"
+        "央国企改革",
+        "PCB"
       ],
       "backtest": {
         "signals": 171,
@@ -247,7 +247,7 @@
       ],
       "industry": "",
       "concepts": [],
-      "enter_date": "2026-08-12",
+      "enter_date": "2026-08-13",
       "stop_loss": 10.49,
       "target_price": 13.41,
       "risk_reward": 1.5,
@@ -273,12 +273,12 @@
       ],
       "industry": "通用设备制造业",
       "concepts": [
+        "百元股",
         "东方财富热股",
-        "创业板综",
         "次新股",
-        "半导体概念",
-        "存储芯片",
-        "百元股"
+        "创业板综",
+        "先进封装",
+        "存储芯片"
       ],
       "enter_date": "20260812",
       "stop_loss": null,
@@ -306,10 +306,10 @@
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "PCB",
-        "央国企改革",
+        "黄金概念",
         "一带一路",
-        "黄金概念"
+        "央国企改革",
+        "PCB"
       ],
       "enter_date": "20260812",
       "stop_loss": null,
@@ -368,12 +368,12 @@
       ],
       "industry": "电气机械和器材制造业",
       "concepts": [
-        "光纤概念",
         "5G概念",
-        "通信技术",
+        "网络安全",
+        "大数据",
         "北交所概念",
-        "融资融券",
-        "网络安全"
+        "通信技术",
+        "融资融券"
       ],
       "enter_date": "20260812",
       "stop_loss": null,
@@ -402,11 +402,11 @@
       "industry": "",
       "concepts": [
         "破发股",
-        "创新药",
-        "维生素",
         "低价股",
         "肝炎概念",
-        "融资融券"
+        "维生素",
+        "创新药",
+        "病原体防治"
       ],
       "enter_date": "20260812",
       "stop_loss": null,
@@ -546,56 +546,6 @@
       "resistance": null
     },
     {
-      "code": "01209",
-      "name": "华润万象生活",
-      "market": "港股",
-      "board": "港股",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "",
-      "concepts": [],
-      "enter_date": "2026-08-12",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "09988",
-      "name": "阿里巴巴-W",
-      "market": "港股",
-      "board": "港股",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "",
-      "concepts": [],
-      "enter_date": "2026-08-12",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
       "code": "00883",
       "name": "中国海洋石油",
       "market": "港股",
@@ -613,7 +563,7 @@
       ],
       "industry": "",
       "concepts": [],
-      "enter_date": "2026-08-12",
+      "enter_date": "2026-08-13",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -638,7 +588,7 @@
       ],
       "industry": "",
       "concepts": [],
-      "enter_date": "2026-08-12",
+      "enter_date": "2026-08-13",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -663,7 +613,57 @@
       ],
       "industry": "",
       "concepts": [],
-      "enter_date": "2026-08-12",
+      "enter_date": "2026-08-13",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "01209",
+      "name": "华润万象生活",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "中长线",
+      "close": null,
+      "pct_chg": 0.0,
+      "final_score": 2.5,
+      "resonance": 1,
+      "sources": [
+        "驾驶舱B档"
+      ],
+      "signals": [
+        "早期:机构变红"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-08-13",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "09988",
+      "name": "阿里巴巴-W",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "中长线",
+      "close": null,
+      "pct_chg": 0.0,
+      "final_score": 2.5,
+      "resonance": 1,
+      "sources": [
+        "驾驶舱B档"
+      ],
+      "signals": [
+        "早期:机构变红"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-08-13",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
