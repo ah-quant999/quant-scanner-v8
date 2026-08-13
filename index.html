@@ -6980,11 +6980,11 @@ function renderLimitUpHeatmap(){
       // 🔴 主人令:「待上市也要显示距上市N天」—— 申购已结束,核心是跟踪何时上市
       const ad=it.apply_date?`申购 ${relDate(it.apply_date,today)}（${fmtDate(it.apply_date)}）`:'';
       const ld=it.listing_date?`上市 ${relDate(it.listing_date,today)}（${fmtDate(it.listing_date)}）`:'';
-      extra=`<div style="font-size:11px;color:var(--sub)">${ad} ${ad&&ld?'· ':''}<b style="color:var(--gold)">${ld}</b></div>`;
+      extra=`<div style="font-size:11px;color:var(--sub);line-height:1.45">${ad}${ad&&ld?'<br>':''}${ld?`<b style="color:var(--gold)">${ld}</b>`:''}</div>`;
     } else {
       const ad=it.apply_date?`申购 ${relDate(it.apply_date,today)}（${fmtDate(it.apply_date)}）`:'';
       const ld=it.listing_date?`上市 ${relDate(it.listing_date,today)}（${fmtDate(it.listing_date)}）`:'';
-      extra=`<div style="font-size:11px;color:var(--sub)">${ad||ld||''}</div>`;
+      extra=`<div style="font-size:11px;color:var(--sub);line-height:1.45">${ad}${ad&&ld?'<br>':''}${ld||''}</div>`;
     }
     return `<div class="ipo-card">
       <div class="ipo-head">
