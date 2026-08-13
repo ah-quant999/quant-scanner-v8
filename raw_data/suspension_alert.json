@@ -1,33 +1,39 @@
 {
-  "update_time": "2026-08-12 21:36:21",
+  "update_time": "2026-08-13 08:38:00",
   "suspended": [
     {
       "code": "200706",
       "name": "瓦轴B",
-      "days": 163,
+      "days": 164,
       "reason": "刊登重要公告"
     },
     {
       "code": "300333",
       "name": "兆日科技",
-      "days": 13,
+      "days": 14,
       "reason": "刊登重要公告"
     },
     {
       "code": "600984",
       "name": "建设机械",
-      "days": 1,
+      "days": 2,
       "reason": "拟筹划重大资产重组"
     },
     {
       "code": "603221",
       "name": "爱丽家居",
-      "days": 1,
+      "days": 2,
       "reason": "交易异常波动"
     },
     {
       "code": "688646",
-      "name": "ST逸飞",
+      "name": "逸飞激光",
+      "days": 1,
+      "reason": "刊登重要公告"
+    },
+    {
+      "code": "300176",
+      "name": "鸿特科技",
       "days": 0,
       "reason": "刊登重要公告"
     }
