@@ -73,15 +73,7 @@ jobs:
         working-directory: ${{ github.workspace }}
     steps:
       - name: "🕐 确定抓取类别"
-        id: cat
-        shell: bash
         run: |
-          DISPATCH_CAT="${{ inputs.category }}"
-          if [ -n "$DISPATCH_CAT" ]; then
-            echo "category=$DISPATCH_CAT" >> "$GITHUB_OUTPUT"
-            echo "label=手动派发($DISPATCH_CAT)"
-            exit 0
-          fi
           CRON="${{ github.event.schedule }}"
           case "$CRON" in
             "25 0 * * 1-5")
