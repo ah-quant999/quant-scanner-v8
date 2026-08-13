@@ -49,7 +49,6 @@ jobs:
     runs-on:
       group: self-hosted
       labels: [cn]
-      fallback-to-github-hosted-runner: true
     timeout-minutes: 120
     env:
       # 🔴 2026-08-06 00:10 必须保留：云端 runner 默认 UTC，脚本里凡是用朴素 datetime.now()

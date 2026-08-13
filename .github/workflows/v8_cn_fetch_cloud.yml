@@ -4,9 +4,11 @@
 #   盘中模块（INDEX_QUOTES / SECTOR_FUND_FLOW / CONCEPT_RANKING / AI_MARKET_BRIEF 等）
 #   经美国 IP 抓取频繁超时/残缺，导致 2026-08-13 09:40 盘中数据缺口。
 #   cloud_fetch_v8.py 头部亦明示「美国 runner 抓 A 股中国源会 60s 超时」。
-#   故本 workflow 改为优先 runs-on: [self-hosted, cn]（小九/备用机中国 IP，全量可抓），
-#   并加 fallback-to-github-hosted-runner: true —— cn runner 离线（如小九出差关机）时
-#   自动降级 ubuntu-latest，此时 api_push_raw 防倒退守卫会跳过陈旧/部分数据，不覆盖好数据。
+#   故本 workflow 改为优先 runs-on: [self-hosted, cn]（小九/备用机中国 IP，全量可抓）。
+#   ⚠️ 注意：曾尝试加 fallback-to-github-hosted-runner: true 做「cn 离线降级 ubuntu」，
+#   但该 key 仅对 larger/auto-scaling runner 有效，标准 self-hosted runner 会触发 GitHub
+#   工作流解析 422（实测 2026-08-13 11:47 提交后两云 workflow 全部无法触发）。已删除。
+#   cn 离线兜底走看门狗 CN_WORKFLOW_ID_FALLBACK（v8_cn_fetch.yml 应急）+ 防倒退守卫。
 #   分时段 selective fetch，逻辑与 v8_cn_fetch.yml 一致。
 #
 # 时段映射（北京时间）：
@@ -57,7 +59,6 @@ jobs:
     runs-on:
       group: self-hosted
       labels: [cn]
-      fallback-to-github-hosted-runner: true
     timeout-minutes: 20
     env:
       # 🔴 2026-08-06 00:10 必须保留：云端 runner 默认 UTC，朴素 datetime.now() 写出的
