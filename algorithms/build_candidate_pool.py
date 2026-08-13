@@ -454,9 +454,12 @@ def _hk_spot():
 def _hk_from_goldpool(limit, add):
     """从 gold_pool.json 港股板块补入候选池（akshare 不可达时的兜底）。
 
-    gold_pool 由算法链上游 scanner.py 产出，含完整港股列表
-    （board_label=港股），不依赖外部 API，云端/本地均可靠。
+    🔴 2026-08-13 用户指令：禁止无条件补入港股。
+    原因：gold_pool 满港股时，兜底会把候选池全部刷成港股，遮蔽 A 股候选。
+    保留该函数仅供并发 HK_TOP-only 单独跑批时显式调用（极少见）。
+    普通流水线里请走 akshare 主源；akshare 失败时空也优于错港股。
     """
+    return  # 🚫 已禁用无条件兜底，避免 A 股候选池被港股刷屏
     gp_path = os.path.join(DATA, "gold_pool.json")
     if not os.path.isfile(gp_path):
         print("  [港股兜底] gold_pool.json 不存在，跳过")

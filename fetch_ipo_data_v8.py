@@ -194,82 +194,165 @@ def calculate_bond_scores(bonds):
     return results
 
 
+def _sina_bond_quote(code, market_code):
+    """可转债专用行情：新浪 hq.sinajs.cn（用户允许换接口）。
+
+    URL: https://hq.sinajs.cn/list={market}{code}（如 sh110103, sz127115）
+    返回 CSV 字段顺序：名称, 开, 昨收, 现价, 最高, 最低, 买价, 卖价, 成交量, 成交额, ...
+    因子：f43 不再除 100（已是元）；f47 成交额已是元。
+    返回 None 表示接口不可用，需上层 fallback。
+    """
+    prefix = "sh" if str(market_code).upper() in ("SH",) else "sz"
+    url = f"https://hq.sinajs.cn/list={prefix}{code}"
+    try:
+        raw = http_get(url)
+        # http_get 默认会 json.loads，sina 返回 CB 第一行带 var hq_str_xxx="..."; 需直接用 text
+        # 改成 urllib 文本读取绕过 JSON 解析
+        import urllib.request
+        req = urllib.request.Request(url, headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Referer": "https://finance.sina.com.cn/",
+            "Accept": "*/*",
+        })
+        with urllib.request.urlopen(req, timeout=10, context=_ssl_ctx()) as resp:
+            txt = resp.read().decode("gbk", errors="ignore")
+        # 匹配 "..." 内容
+        import re as _re
+        m = _re.search(r'"([^"]*)"', txt)
+        if not m:
+            return None
+        parts = m.group(1).split(",")
+        if len(parts) < 6:
+            return None
+        def _f(x):
+            try: return float(x)
+            except: return 0.0
+        # sina 可转债字段：0名字,1今开,2昨收,3现价,4最高,5最低,6买入,7卖出,8成交量,9成交额
+        open_p = _f(parts[1])
+        prev_close = _f(parts[2])
+        latest = _f(parts[3])
+        turnover_yuan = _f(parts[9])  # 元
+        turnover = turnover_yuan / 1e4  # 转为万元（与 f168 口径接近）
+        return {
+            "latest": latest,
+            "open_price": open_p,
+            "prev_close": prev_close,
+            "change_pct": (latest - prev_close) / prev_close * 100 if prev_close > 0 else 0,
+            "turnover": turnover,
+        }
+    except Exception as e:
+        print(f"    ⚠️ sina转债 {code} 行情失败: {e}")
+        return None
+
+
 def process_bond_listed(bonds):
-    """处理可转债上市首日/追踪 —— 基于实时行情给双维度分"""
+    """处理可转债上市首日/追踪 —— 基于实时行情给双维度分
+
+    2026-08-13 修复：
+      1) 之前没设 b["board"]，导致渲染层无法识别"可转债"标签（红 A bug）。
+      2) 东财 push2 不返回可转债真实行情，强行除 100 会算出 1300 假价（红 A bug）。
+         改为优先 sina hq.sinajs.cn 专用接口（用户允许换接口），回退 None 不再假算。
+      3) quote 双源失败时，latest/change_pct/total_return 写 None，渲染层读 None 应标"行情暂缺"。
+    """
     results = []
     for b in bonds:
         issue_price = 100.0  # 可转债面值
-        # 获取实时行情
-        quote = fetch_realtime_quote(b["code"], b.get("market_code", "SH"))
-        if quote:
+        market_code = b.get("market_code", "SH")
+
+        # 三源 fallback：sina(转债专用) → 东财通用 → None（不再假算）
+        quote = _sina_bond_quote(b["code"], market_code)
+        if not quote:
+            quote = fetch_realtime_quote(b["code"], market_code)
+
+        if quote and quote.get("latest"):
             latest = quote["latest"]
             open_p = quote["open_price"]
-            prev_close = quote["prev_close"]
             change_pct = quote["change_pct"]
             turnover = quote["turnover"]
-            total_return = (latest - issue_price) / issue_price * 100 if latest > 0 else 0
-            open_return = (open_p - issue_price) / issue_price * 100 if open_p > 0 else 0
+            total_return = (latest - issue_price) / issue_price * 100 if latest > 0 else None
+            open_return = (open_p - issue_price) / issue_price * 100 if open_p > 0 else None
         else:
-            latest = issue_price
-            open_p = issue_price
-            change_pct = 0
-            turnover = 0
-            total_return = 0
-            open_return = 0
+            # 双源全挂：不假算 None，让渲染层显示"行情暂缺"
+            latest = None
+            open_p = None
+            change_pct = None
+            turnover = None
+            total_return = None
+            open_return = None
 
-        # ── 套利分：上市涨幅/热度（越高越好）
-        arbitrage = 50
-        if total_return > 10:      arbitrage += 30
-        elif total_return > 5:     arbitrage += 25
-        elif total_return > 2:     arbitrage += 15
-        elif total_return > 0:     arbitrage += 5
-        elif total_return < -5:    arbitrage -= 20
-        elif total_return < 0:     arbitrage -= 10
-        arbitrage = max(0, min(arbitrage, 85))
-
-        # ── 基本面分：流动性/成交额 + 债底安全
-        fundamental = 40
-        # turnover 单位可能是万元级，按常见行情接口口径处理
-        turnover_wan = turnover / 10000 if turnover > 1000 else turnover
-        if turnover_wan > 1000:       fundamental += 20
-        elif turnover_wan > 500:      fundamental += 15
-        elif turnover_wan > 100:      fundamental += 10
-        elif turnover_wan > 10:       fundamental += 5
-        fundamental = min(fundamental, 75)
-
-        score = int(round(arbitrage * 0.6 + fundamental * 0.4))
-
-        # 追踪建议
-        if b["status"] == "tracking":
-            advice, tcol, bg = tracking_advice(issue_price, latest, change_pct, turnover)
+        # 双源都失败：不再假算，直接走"行情暂缺"分支
+        if latest is None:
+            score = 0
+            arbitrage = 0
+            fundamental = 0
+            if b["status"] == "tracking":
+                advice, tcol, bg = "数据不足，需重试", "#999", "#f5f5f5"
+            else:
+                advice = "行情暂缺"
+                tcol = "#999"
+                bg = "#f5f5f5"
+            highlights = ["行情暂缺", "—"]
         else:
-            advice = "上市首日"
-            tcol = "#0d7d4a"
-            bg = "#e8f5e9"
+            # ── 套利分：上市涨幅/热度（越高越好）
+            arbitrage = 50
+            if total_return > 10:      arbitrage += 30
+            elif total_return > 5:     arbitrage += 25
+            elif total_return > 2:     arbitrage += 15
+            elif total_return > 0:     arbitrage += 5
+            elif total_return < -5:    arbitrage -= 20
+            elif total_return < 0:     arbitrage -= 10
+            arbitrage = max(0, min(arbitrage, 85))
 
-        b["latest"] = round(latest, 2)
-        b["open_price"] = round(open_p, 2)
-        b["change_pct"] = round(change_pct, 2)
-        b["turnover"] = round(turnover, 2)
-        b["total_return"] = round(total_return, 1)
-        b["open_return"] = round(open_return, 1)
+            # ── 基本面分：流动性/成交额 + 债底安全
+            fundamental = 40
+            # turnover 单位可能是万元级，按常见行情接口口径处理
+            turnover_wan = turnover / 10000 if turnover > 1000 else turnover
+            if turnover_wan > 1000:       fundamental += 20
+            elif turnover_wan > 500:      fundamental += 15
+            elif turnover_wan > 100:      fundamental += 10
+            elif turnover_wan > 10:       fundamental += 5
+            fundamental = min(fundamental, 75)
+
+            score = int(round(arbitrage * 0.6 + fundamental * 0.4))
+
+            # 追踪建议
+            if b["status"] == "tracking":
+                advice, tcol, bg = tracking_advice(issue_price, latest, change_pct, turnover)
+            else:
+                advice = "上市首日"
+                tcol = "#0d7d4a"
+                bg = "#e8f5e9"
+
+            highlights = [
+                f"较发行 {total_return:+.1f}%",
+                f"现价 ¥{latest:.2f}",
+            ]
+            if b["status"] == "tracking":
+                highlights.append(advice)
+
+        # 写入数据字段（保留 None 不假算，渲染层处理 None → "行情暂缺"）
+        b["latest"] = None if latest is None else round(latest, 2)
+        b["open_price"] = None if open_p is None else round(open_p, 2)
+        b["change_pct"] = None if change_pct is None else round(change_pct, 2)
+        b["turnover"] = None if turnover is None else round(turnover, 2)
+        b["total_return"] = None if total_return is None else round(total_return, 1)
+        b["open_return"] = None if open_return is None else round(open_return, 1)
         b["score"] = score
         b["arbitrage_score"] = arbitrage
         b["fundamental_score"] = fundamental
         b["recommend"] = advice
         b["tag_color"] = tcol
         b["bg_color"] = bg
+        # 🔴 2026-08-13 修复：之前 process_bond_listed 从未写 board，导致渲染层
+        # 拿不到"可转债"标签，3 张转债卡片显示为同一通用标签。
+        b["board"] = "可转债"
+        b["market"] = b.get("market_code", "SH").lower()  # 渲染层多维列表用得上
         b["fundamentals"] = {
             "track": "可转债",
-            "total_return": round(total_return, 1),
-            "turnover": round(turnover, 2),
+            "total_return": b["total_return"],
+            "turnover": b["turnover"],
         }
-        b["highlights"] = [
-            f"较发行 {total_return:+.1f}%",
-            f"现价 ¥{latest:.2f}",
-        ]
-        if b["status"] == "tracking":
-            b["highlights"].append(advice)
+        b["highlights"] = highlights
         results.append(b)
     return results
 
