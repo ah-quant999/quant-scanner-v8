@@ -159,19 +159,29 @@ def check_runner(heal=False):
     return ok, "; ".join(parts)
 
 
-def latest_workflow_run(name, skip_neutral=True):
-    """返回 (最近一条已完成且有实际结论的 run, err, 正在运行中的 run 或 None)。"""
-    # list workflows then find by name
-    wfs = api_get(f"https://api.github.com/repos/{REPO}/actions/workflows")
-    if "__error__" in wfs:
-        return None, f"workflows API error {wfs['__error__']}", None
-    wf_id = None
-    for w in wfs.get("workflows", []):
-        if w["name"] == name:
-            wf_id = w["id"]
-            break
-    if not wf_id:
-        return None, f"找不到 workflow '{name}'", None
+def latest_workflow_run(name=None, skip_neutral=True, workflow_id=None):
+    """返回 (最近一条已完成且有实际结论的 run, err, 正在运行中的 run 或 None)。
+
+    2026-08-13 第180轮修复【cn_fetch 假 FAIL】：GitHub Actions 的 workflow 显示名
+    会被缓存/回退为文件名（实测 v8_cn_fetch_cloud.yml 的注册名变成
+    '.github/workflows/v8_cn_fetch_cloud.yml'），硬编码显示名查找失配即误报 FAIL 并发
+    告警邮件。⇒ 优先用稳定 workflow_id 解析（与 auto_dispatch 派发同源），显示名仅作
+    兜底/错误信息，杜绝名称漂移导致的假 FAIL。
+    """
+    if workflow_id is not None:
+        wf_id = workflow_id
+    else:
+        # list workflows then find by name
+        wfs = api_get(f"https://api.github.com/repos/{REPO}/actions/workflows")
+        if "__error__" in wfs:
+            return None, f"workflows API error {wfs['__error__']}", None
+        wf_id = None
+        for w in wfs.get("workflows", []):
+            if w["name"] == name:
+                wf_id = w["id"]
+                break
+        if not wf_id:
+            return None, f"找不到 workflow '{name}'", None
     # 2026-08-09 第119轮修复【skipped 误报】：
     #   GitHub Actions 并发触发时（如 workflow_run 与 push 同时命中），同一分钟内常出现
     #   一条 conclusion=skipped 的 run 与一条 success 并存；旧实现 per_page=1 取最新一条，
@@ -190,8 +200,13 @@ def latest_workflow_run(name, skip_neutral=True):
     if "__error__" in runs:
         return None, f"runs API error {runs['__error__']}", None
     items = runs.get("workflow_runs", [])
+    # 2026-08-13 第180轮修复【push 噪声假 FAIL】：推送 workflow 文件会触发 push 事件运行，
+    # 常在提交瞬时态以 0 job 形式瞬间 failure（非数据刷新故障）。数据新鲜度只看
+    # schedule / workflow_dispatch 触发的运行，忽略 push 噪声；盘中每30分钟有定时运行、
+    # 夜间本就豁免，忽略 push 不会漏判真故障（raw_data commit 亦独立校验）。
+    items = [r for r in items if r.get("event") != "push"]
     if not items:
-        return None, "无运行记录", None
+        return None, "无运行记录(push事件已忽略)", None
     running = None
     for r in items:
         if r.get("status") != "completed":
@@ -254,8 +269,8 @@ def in_schedule_window(kind, now_cst=None):
 RUNNING_GRACE_MIN = 45
 
 
-def check_workflow(name, label, max_age_min=None):
-    run, err, running = latest_workflow_run(name)
+def check_workflow(name, label, max_age_min=None, workflow_id=None):
+    run, err, running = latest_workflow_run(name, workflow_id=workflow_id)
     if err:
         return False, err
     now_cst = datetime.now(timezone(timedelta(hours=8)))
@@ -627,7 +642,7 @@ def main():
     ok, msg = check_runner(heal=args.heal)
     results.append(("runner", ok, msg))
 
-    ok, msg = check_workflow(CN_WORKFLOW_NAME, "cn_fetch", max_age_min=120)
+    ok, msg = check_workflow(CN_WORKFLOW_NAME, "cn_fetch", max_age_min=120, workflow_id=CN_WORKFLOW_ID)
     if not ok and not in_schedule_window("cn_fetch", now_cst):
         ok, msg = True, msg + " —— 非调度时段，豁免（cn_fetch 工作日 08:25-21:00 有 cron，周末仅 09:00）"
     results.append(("cn_fetch", ok, msg))
