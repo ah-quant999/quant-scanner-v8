@@ -1133,6 +1133,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CANDIDATE_QUOTES.js?v=20260813222509"></script>
 <script src="data/RUNNER_STATUS.js?v=20260813222510"></script>
 <script src="data/HEALTH_CHECK.js?v=20260813222516"></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=20260813222510"></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=20260813222510"></script>
+    <script src="data/POTENTIAL_PICKS.js?v=20260813222510"></script> (fix: 暂未上架三张新卡修复)
 </head>
 <body>
 
@@ -10092,7 +10095,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       c.stocks.slice(0,3).forEach(function(s){
         var eColor = s.elasticity_pct >= 3 ? '#fbbf24' : (s.elasticity_pct >= 0 ? '#22c55e' : '#f87171');
         html += '<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:2px 0;border-bottom:1px dashed rgba(148,163,184,.15);">';
-        html += '<span><b>'+s.name+'</b> <span style="color:var(--dim);font-size:10px;">'+s.code+' · '+(s.business_pct*100|0)+%</span></span>';
+        html += '<span><b>'+s.name+'</b> <span style="color:var(--dim);font-size:10px;">'+s.code+' · '+(s.business_pct*100|0)+'%</span></span>';
         html += '<span style="color:'+eColor+';font-weight:600;">'+ (s.elasticity_pct>0?'+':'') + s.elasticity_pct+'%</span>';
         html += '</div>';
       });
