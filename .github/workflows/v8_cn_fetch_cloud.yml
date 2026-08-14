@@ -68,6 +68,10 @@ jobs:
       #   显式声明时区后与中国节点产出一致；显式带 tzinfo 的写法不受影响，不会双重偏移。
       TZ: Asia/Shanghai
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # 🔴 2026-08-14 根因修复（小九令）：WorkBuddy safe-delete 批量删除守卫默认阈值 50，
+      #   actions/checkout@v4 清理 .git 需删 430+ 文件，100% 被拦截导致 cn_fetch_cloud 全败。
+      #   在 job env 显式提高阈值到 1000，直接覆盖 runner 默认；与下方 checkout clean:false 形成双重保险。
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 1000
     defaults:
       run:
         working-directory: ${{ github.workspace }}
