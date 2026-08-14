@@ -1297,37 +1297,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     };
     </script>
 
-    <!-- 🌏 海外/亚太股市观测（2026-08-14 新增：恒生·日经225·韩国KOSPI·台湾加权，对A股有传导） -->
-    <div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">
-      <div id="overseasCardHeader"></div>
-      <div id="overseasBody" style="font-size:13px;line-height:1.8;color:var(--txt);padding:0 14px 12px;"></div>
-    </div>
-    <script>
-    window.__renderOverseasMarkets = function(){
-      var head = document.getElementById('overseasCardHeader');
-      var body = document.getElementById('overseasBody');
-      if(!head || typeof window.v8CardHeader !== 'function') return;
-      var d = window.OVERSEAS_MARKETS || {};
-      var ts = d.update_time || '';
-      head.innerHTML = window.v8CardHeader('🌏','海外/亚太股市观测','恒生·日经225·韩国KOSPI·台湾加权','update_time',
-        {update_time:ts, slot:'盘前', horizon:'短线'}, !ts);
-      if(!body) return;
-      if(!d.indices || !d.indices.length){
-        body.innerHTML = '<div class="note">数据未接入（接口暂不可达）。</div>';
-        return;
-      }
-      var rows = d.indices.map(function(x){
-        var val = x.value==null ? '--' : Number(x.value).toLocaleString('zh-CN');
-        var pct = x.chg_pct==null ? '--' : (x.chg_pct>0?'+':'')+x.chg_pct.toFixed(2)+'%';
-        var col = x.chg_pct==null ? 'var(--dim)' : (x.chg_pct>0 ? '#ef5350' : '#26a69a'); // 红涨绿跌
-        var cur = x.currency||'';
-        return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--border);">'
-          + '<span>'+x.name+' <span style="color:var(--dim);font-size:11px">'+cur+'</span></span>'
-          + '<span><b style="color:'+col+'">'+val+'</b> <span style="color:'+col+'">'+pct+'</span></span></div>';
-      }).join('');
-      body.innerHTML = rows + '<div class="note" style="margin-top:8px">'+ (d.bias?('亚太偏好：'+d.bias+'。'):'') + (d.note||'') +'</div>';
-    };
-    </script>
 
     <!-- 打新速览 -->
     <div class="card" style="margin-bottom:16px">
@@ -6033,7 +6002,6 @@ function switchSec(sec,el){
   if(sec==='ul' && typeof window.renderUnlisted==='function') setTimeout(window.renderUnlisted,60);
   // 今日事件：今日判定环境态势卡已迁回，进入时触发渲染
   if(sec==='td' && typeof window.__renderJudgmentBody==='function') setTimeout(window.__renderJudgmentBody,60);
-  if(sec==='td' && typeof window.__renderOverseasMarkets==='function') setTimeout(window.__renderOverseasMarkets,60);
   // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
   if(sec==='ph' && typeof window._renderSecPh==='function') setTimeout(window._renderSecPh,80);
   if(sec==='st' && typeof window._renderSecSt==='function') setTimeout(window._renderSecSt,80);
@@ -12281,7 +12249,6 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   // 今日事件「今日判定」卡头+内容（脚本块位于 v8CardHeader 定义之前，只能延后到此处渲染）
   tryRun('renderJudgmentHeader', window.__renderJudgmentHeader, 'judgment-header init');
   tryRun('renderJudgmentBody', window.__renderJudgmentBody, 'judgment-body init');
-  tryRun('renderOverseasMarkets', window.__renderOverseasMarkets, 'overseas-markets init');
   // 实时数据区：情绪周期·连板天梯（迁到涨停热力矩阵上方）
   tryRun('renderCycleLadderCard', window.__renderCycleLadderCard, 'cycle-ladder init');
   // ⛓ 任何后续切到 fv/crds tab 也只是再跑一次幂等
