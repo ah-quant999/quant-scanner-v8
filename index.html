@@ -1095,17 +1095,18 @@ function _buildJudgmentEnvHTML(d){
     });
     h += '</div>';
   }
-  // 7) 大盘 + 指数标签 一行
+  // 7) 大盘 + 指数标签 一行（亚太 pill 同款样式）
   if(d.market || (d.indices && d.indices.length)){
-    h += '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0;font-size:12px;line-height:1.5">';
-    if(d.market) h += '<span><b style="color:var(--sub)">大盘</b> '+d.market+'</span>';
+    h += '<div style="margin-bottom:6px;padding:6px 10px;background:rgba(167,139,250,0.05);border-radius:8px;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center">';
+    if(d.market) h += '<b style="color:#a78bfa;font-size:11px">📊 大盘</b> <span style="font-size:11.5px;color:var(--sub)">'+d.market+'</span>';
     if(d.indices && d.indices.length){
       d.indices.forEach(function(r){
-        h += '<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(167,139,250,0.10);border:1px solid rgba(167,139,250,0.22);border-radius:999px;padding:2px 9px;font-size:11.5px;line-height:1.5">'
-          + '<b style="color:var(--txt)">'+r.name+'</b>'
-          + '<span style="color:var(--down)">控'+r.ctrl+'</span>'
-          + '<span style="color:var(--down)">财'+r.fs+'</span>'
-          + (r.warn?'<span style="color:#f59e0b;margin-left:2px">⚠ '+r.warn+'</span>':'')
+        var _ic = (r.ctrl && r.ctrl.indexOf('-')>=0) ? 'var(--down)' : ((r.ctrl && r.ctrl.indexOf('+')>=0) ? 'var(--up)' : 'var(--dim)');
+        h += '<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.18);border-radius:5px;padding:2px 7px;font-size:11px;line-height:1.4">'
+          +'<b style="color:var(--sub)">'+r.name+'</b>'
+          +'<span style="color:'+_ic+';font-weight:700">'+r.ctrl+'</span>'
+          +'<span style="color:var(--dim);font-size:10px">财'+r.fs+'</span>'
+          + (r.warn?'<span style="color:#f59e0b;margin-left:2px;font-size:10px">⚠</span>':'')
           + '</span>';
       });
     }
