@@ -127,8 +127,12 @@ jobs:
           python-version: "3.13"
 
       - name: "📦 安装依赖"
+        # 🔴 2026-08-14 主人令永久修复：裸 `pip` 在 Windows runner 默认 PowerShell 下找不到
+        #   （pip: ObjectNotFound，导致今天下午 13:40-14:04 云端链路 5 连败）。
+        #   改用 `python -m pip`（不依赖 PATH），并显式 shell: bash 与其余 step 一致。
+        shell: bash
         run: |
-          pip install akshare pandas requests --quiet
+          python -m pip install akshare pandas requests --quiet
           python -c "import akshare, pandas; print('akshare', akshare.__version__, '/ pandas', pandas.__version__)"
 
       - name: "📡 抓中国数据 → raw_data/（selective）"
