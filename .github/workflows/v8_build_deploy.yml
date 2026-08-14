@@ -25,6 +25,8 @@ on:
     branches: [main]
     paths:
       - 'raw_data/**'
+      - 'data/**'
+      - '!data/freshness_status.json'
       - 'index.html'
       - 'update_v8.py'
       - 'v8_health_check.py'
