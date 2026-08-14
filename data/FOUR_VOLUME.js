@@ -1,15 +1,15 @@
 window.FOUR_VOLUME={
- "update_time": "2026-08-14 05:39:09",
- "total": 3,
+ "update_time": "2026-08-14 23:20:20",
+ "total": 2,
  "stocks": [
   {
-   "code": "603296",
-   "name": "华勤技术",
+   "code": "600498",
+   "name": "烽火通信",
    "market": "sh",
    "board_label": "主板",
-   "close": 85.97,
-   "pct_chg": 8.8,
-   "turnover_rate": 6.28,
+   "close": 40.9,
+   "pct_chg": 4.68,
+   "turnover_rate": 8.37,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -17,27 +17,27 @@ window.FOUR_VOLUME={
     "机构托底": true,
     "广度翻多": true,
     "主力动量翻多": true,
-    "机构金叉": true,
+    "机构金叉": false,
     "散户金叉": true,
-    "主力金叉": true
+    "主力金叉": false
    },
    "yzc": true,
    "jg": true,
    "xc": true,
    "four": true,
    "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 散户金叉 + 主力金叉",
-   "signal_date": "2026-08-13",
-   "enter_date": "2026-08-13"
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+   "signal_date": "2026-08-14",
+   "enter_date": "2026-08-14"
   },
   {
-   "code": "000100",
-   "name": "TCL科技",
+   "code": "002353",
+   "name": "杰瑞股份",
    "market": "sz",
    "board_label": "主板",
-   "close": 5.17,
-   "pct_chg": 1.57,
-   "turnover_rate": 4.27,
+   "close": 150.99,
+   "pct_chg": 4.43,
+   "turnover_rate": 4.03,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -46,7 +46,7 @@ window.FOUR_VOLUME={
     "广度翻多": true,
     "主力动量翻多": true,
     "机构金叉": false,
-    "散户金叉": false,
+    "散户金叉": true,
     "主力金叉": false
    },
    "yzc": true,
@@ -54,37 +54,9 @@ window.FOUR_VOLUME={
    "xc": true,
    "four": true,
    "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
-   "signal_date": "2026-08-13",
-   "enter_date": "2026-08-13"
-  },
-  {
-   "code": "002491",
-   "name": "通鼎互联",
-   "market": "sz",
-   "board_label": "主板",
-   "close": 18.94,
-   "pct_chg": 0.53,
-   "turnover_rate": 28.08,
-   "mv_yi": 0,
-   "fund_type": "混合",
-   "components": {
-    "游资点火": true,
-    "机构托底": true,
-    "广度翻多": true,
-    "主力动量翻多": true,
-    "机构金叉": false,
-    "散户金叉": false,
-    "主力金叉": false
-   },
-   "yzc": true,
-   "jg": true,
-   "xc": true,
-   "four": true,
-   "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
-   "signal_date": "2026-08-13",
-   "enter_date": "2026-08-13"
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+   "signal_date": "2026-08-14",
+   "enter_date": "2026-08-14"
   }
  ]
 };
