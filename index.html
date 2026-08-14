@@ -451,6 +451,30 @@ window.V8_CAL = {weeks:[],legend:[]};
     var wd = d.getDay();
     return wd !== 0 && wd !== 6;
   };
+  /* ---- 时段统一判断（盘前/盘中/盘后/今日盘后）----
+   * 2026-08-15 主人令：盘中边界延长到 15:30（A 股 15:00 收盘，盘后数据生成通常 15:30 后），
+   *   避免 15:00-15:30 之间刷出的日内实时数据被标"盘后"误读。
+   * 传入 ts（"YYYY-MM-DD HH:MM:SS" 字符串或 Date），返回 {slot, horizon}
+   * - horizon 默认 '短线'（盘后/盘中），盘前为空
+   * - 昨日数据 → '昨日盘后'
+   * - 9:00-15:30 今日 → '盘中'
+   * - 15:30-17:00 今日 → '盘后'
+   * - 17:00+ 今日 → '今日盘后'
+   * - 盘前 9:00 前今日 → '盘前'
+   */
+  window._slotByTs = function(ts){
+    var _d = (ts instanceof Date) ? ts : new Date(String(ts).replace(/-/g,'/'));
+    if(!_d || isNaN(_d.getTime())) return {slot:'盘中', horizon:'短线'};
+    var _now = new Date();
+    var _today0 = new Date(_now.getFullYear(), _now.getMonth(), _now.getDate()).getTime();
+    var _dToday = _d.getTime() >= _today0;
+    var _hr = _d.getHours() + _d.getMinutes()/60;
+    if(!_dToday) return {slot:'昨日盘后', horizon:'短线'};
+    if(_hr < 9)  return {slot:'盘前', horizon:''};
+    if(_hr < 15.5) return {slot:'盘中', horizon:'短线'}; // 2026-08-15: 9:00-15:30 算盘中
+    if(_hr < 17) return {slot:'盘后', horizon:'短线'};
+    return {slot:'今日盘后', horizon:'短线'};
+  };
   /* ---- 中国时间（Asia/Shanghai）统一解析与格式化 ---- */
   window._parseAsCST = function(ts){
     if(!ts) return null;
@@ -1415,25 +1439,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         if(!d || !d.gen_time || isStale){
           contentEl.innerHTML='<div class="ipo-empty">AI市场速览数据暂不可用</div>';
         if(timeEl){
-      var _ipoHr = new Date().getHours();
-      var _ipoSlot = (_ipoHr < 9) ? '盘前' : (_ipoHr < 15) ? '盘中' : (_ipoHr < 17) ? '盘后' : '今日盘后';
+      // 2026-08-15 改用统一 _slotByTs（基于 ts，不是当前时间，避免盘后数据显示"盘前"）
+      var _ipoSlot = window._slotByTs(d.gen_time || new Date()).slot;
       timeEl.innerHTML = _uBadge(_ipoSlot,'短线',null);
     }
         return;
         }
         if(timeEl && d.gen_time){
-          // 动态判断时段：AI_MARKET_BRIEF 是盘后 00:30 生成的盘后源，常见 00:06 / 17:47 / 23:34
-          var __ts=new Date(d.gen_time.replace(/-/g,'/'));
-          var __now=new Date();
-          var __today=new Date(__now.getFullYear(),__now.getMonth(),__now.getDate()).getTime();
-          var __dToday=__ts.getTime()>=__today;
-          var __hr=__ts.getHours();
-          var __lb,__pd;
-          if(!__dToday){ __lb='昨日盘后'; __pd='短线'; }
-          else if(__hr<9){ __lb='盘前'; __pd=''; }
-          else if(__hr<15){ __lb='盘中'; __pd='短线'; }
-          else if(__hr<17){ __lb='盘后'; __pd='短线'; }
-          else { __lb='今日盘后'; __pd='短线'; }
+          // 2026-08-15 改用统一 _slotByTs（盘中边界 9:00-15:30，盘后 15:30-17:00）
+          var __slotMeta = window._slotByTs(d.gen_time);
+          var __lb = __slotMeta.slot;
+          var __pd = __slotMeta.horizon;
           timeEl.innerHTML = _uBadge(__lb,__pd,d.gen_time);
         }
         var h='';
@@ -2465,87 +2481,49 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     })();
     </script>
 
-    <!-- 行业树图 · 细分赛道（盘中实时数据源 SECTOR_FUND_FLOW，置于实时数据页最下方） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🏭</span>行业树图 · 细分赛道 · <span class="fresh" id="htUpdateTime">—</span></h3>
-      <div id="industryTreemap" style="min-height:260px;max-height:360px;overflow:auto;"></div>
-      <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:6px;flex-wrap:wrap;align-items:center;">
-        <span>大块=行业 &nbsp; 小块=个股</span>
-        <span>颜色=涨跌 &nbsp; 面积≈市值</span>
+    <!-- 🌡️ 情绪周期 · 阶段胶囊（2026-08-15 主人令：行业树图删除后，此处显示当前阶段+仓位+情绪偏暖+更新时间） -->
+    <div class="card" style="margin-bottom:12px;border-left:4px solid #38bdf8;">
+      <div style="padding:12px 14px;">
+        <div id="cyclePhaseInlineBody" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;"></div>
       </div>
     </div>
-
     <script>
     (function(){
-      var $=function(id){return document.getElementById(id)};
-      function fmt(v){return v==null?'--':Number(v).toFixed(2)}
-      function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
-      function renderIndustryTree(){
-        var el=$('industryTreemap');
+      function _paintCyclePhaseInline(){
+        var el = document.getElementById('cyclePhaseInlineBody');
         if(!el) return;
-        var timeEl=$('htUpdateTime');
-        // 优先用盘中实时资金流 SECTOR_FUND_FLOW（每30分刷新），无数据时回落到盘后 SECTOR_RS
-        var SF=window.SECTOR_FUND_FLOW;
-        var SR=window.SECTOR_RS;
-        var sectors=[], updateTime=null, source='SECTOR_FUND_FLOW';
-        if(SF && (SF.sectors_in||SF.sectors_out)){
-          var all=(SF.sectors_in||[]).concat(SF.sectors_out||[]);
-          sectors=all.map(function(s){ return {name:s.name, pct_day:s.chg}; }).filter(function(s){ return s.pct_day!=null; });
-          updateTime=SF.update_time;
-        }else if(SR && SR.sectors && SR.sectors.length){
-          sectors=SR.sectors.map(function(s){ return {name:s.name||s.sector_name, pct_day:s.pct_day}; });
-          updateTime=SR.update_time;
-          source='SECTOR_RS';
+        var cr = window.CRISIS_DATA || {};
+        var lh = window.LIMIT_UP_HEATMAP || {};
+        var crisisScore = (cr.currency||0)*0.4 + (cr.economy||0)*0.35 + (cr.global||0)*0.25;
+        var crisisPct = Math.round(crisisScore * 100);
+        var totalUp = lh.total || 0;
+        var ladder = lh.ladder || {};
+        var highLbc = (ladder['3']||0)+(ladder['4']||0)+(ladder['5']||0)+(ladder['10']||0);
+        var phase, phaseColor, phaseDesc, posAdvice;
+        if(crisisPct >= 70){ phase='冰点'; phaseColor='var(--down)'; phaseDesc='危机雷达高位'; posAdvice='空仓'; }
+        else if(crisisPct >= 50){ phase='降温'; phaseColor='#f59e0b'; phaseDesc='风险累积'; posAdvice='≤30%'; }
+        else if(totalUp >= 80 && highLbc >= 15){ phase='狂热'; phaseColor='#ef4444'; phaseDesc='涨停泛滥'; posAdvice='兑现'; }
+        else if(totalUp >= 40 && crisisPct <= 30){ phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪偏暖'; posAdvice='50%'; }
+        else if(totalUp < 30 || crisisPct > 35){ phase='修复'; phaseColor='#38bdf8'; phaseDesc='低位筑底'; posAdvice='30%'; }
+        else { phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪平稳'; posAdvice='50%'; }
+        var updateTime = cr.update_time || lh.update_time || null;
+        var slotMeta = window._slotByTs ? window._slotByTs(updateTime) : {slot:'盘中', horizon:'短线'};
+        var h = '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:'+(phaseColor+'22')+';border:2px solid '+phaseColor+';border-radius:10px;flex:1;min-width:0;">';
+        h += '<span style="font-size:11px;color:var(--dim);">当前阶段</span>';
+        h += '<span style="font-size:22px;font-weight:900;color:'+phaseColor+';line-height:1;">'+phase+'</span>';
+        h += '<div style="font-size:13px;color:var(--sub);">'+phaseDesc+' · 仓位 <b style="color:'+phaseColor+'">'+posAdvice+'</b></div>';
+        h += '</div>';
+        if(updateTime){
+          h += '<span style="font-size:12px;color:var(--dim);font-weight:500;">'+slotMeta.slot+' '+slotMeta.horizon+'</span>';
         }
-        if(!sectors.length){
-          el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">暂无行业板块数据</div>';
-          if(timeEl) timeEl.innerHTML = '';
-          return;
-        }
-        sectors=sectors.slice().sort(function(a,b){
-          return Math.abs(b.pct_day||0)-Math.abs(a.pct_day||0);
-        }).slice(0,50);
-        var maxVal=Math.abs(sectors[0].pct_day||0)||1;
-        var h='<div style="display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start;padding:4px">';
-        sectors.forEach(function(s){
-          var pct=s.pct_day||0;
-          var up=pct>0, down=pct<0;
-          var bg=up?'var(--up)':down?'var(--down)':'var(--dim)';
-          var txt=(up||down)?'#fff':'var(--txt)';
-          var area=Math.sqrt(Math.abs(pct))/Math.sqrt(maxVal);
-          var px=Math.max(40, Math.round(area*100));
-          var name=s.name||'未知';
-          h+='<div style="width:'+px+'px;height:'+px+'px;background:'+bg+';color:'+txt;
-          h+=';border-radius:8px;padding:6px;display:flex;flex-direction:column';
-          h+=';justify-content:center;align-items:center;text-align:center';
-          h+=';font-size:11px;line-height:1.2;box-shadow:0 1px 4px rgba(0,0,0,.3);overflow:hidden;cursor:default">';
-          h+='<div style="font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">'+esc(name)+'</div>';
-          h+='<div style="font-size:10px;opacity:.85">'+(pct>0?'+':'')+fmt(pct)+'%</div>';
-          h+='</div>';
-        });
-        h+='</div>';
-        el.innerHTML=h;
-        if(timeEl && updateTime){
-          // 动态判断时段：昨日盘后 / 盘前 / 盘中 / 盘后
-          var _ts=new Date(updateTime.replace(/-/g,'/'));
-          var _now=new Date();
-          var _today=new Date(_now.getFullYear(),_now.getMonth(),_now.getDate()).getTime();
-          var _dToday=_ts.getTime()>=_today;
-          var _hr=_ts.getHours();
-          var _lb,_pd;
-          if(!_dToday){ _lb='昨日盘后'; _pd='短线'; }
-          else if(_hr<9){ _lb='盘前'; _pd=''; }
-          else if(_hr<15){ _lb='盘中'; _pd='短线'; }
-          else if(_hr<17){ _lb='盘后'; _pd='短线'; }
-          else { _lb='今日盘后'; _pd='短线'; }
-          timeEl.innerHTML = _uBadge(_lb,_pd,updateTime);
-        }
+        el.innerHTML = h;
       }
-      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderIndustryTree);
-      else renderIndustryTree();
-      window._renderIndustryTree=renderIndustryTree;
+      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',_paintCyclePhaseInline);
+      else _paintCyclePhaseInline();
+      window._paintCyclePhaseInline = _paintCyclePhaseInline;
     })();
     </script>
+
 
     <!-- 📈 上证+深证 每日成交金额（实时页最下面 · 2026-08-14 主人令迁移） -->
     <div class="card" style="margin-bottom:16px">
@@ -3761,10 +3739,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + (NF.net_buy != null ? 1 : 0);
     h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">';
     h += '<span style="font-size:21px;font-weight:800;color:var(--txt)">📊 每日市场洞察</span>';
-    // 2026-08-14 修复：时段标签动态判断（原写死"盘后"导致 08:16 盘前数据也显示"盘后"）
-    var _miHr = new Date().getHours();
-    var _miSlot = (_miHr < 9) ? '盘前' : (_miHr < 15) ? '盘中' : (_miHr < 17) ? '盘后' : '今日盘后';
-    var _miHoriz = (_miHr >= 9 && _miHr < 17) ? '短线' : '';
+    // 2026-08-15 改用统一 _slotByTs（盘中边界 9:00-15:30）
+    var _miMeta = window._slotByTs(updateTime);
+    var _miSlot = _miMeta.slot;
+    var _miHoriz = _miMeta.horizon;
     h += _uBadge(_miSlot, _miHoriz, updateTime);
     if(_insightSignalCount > 0){
       h += _holdBadge(updateTime, _insightSignalCount, '信号');
@@ -10373,19 +10351,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:'+_vra(phaseColor,0.08)+';border:1px solid '+_vra(phaseColor,0.2)+';border-radius:8px;min-width:0">';
     html += '<span style="font-size:20px;font-weight:900;color:'+phaseColor+'">'+phase+'</span>';
     html += '<div style="font-size:13px;color:var(--sub);white-space:nowrap">'+phaseDesc+' · 仓位 <b style="color:'+phaseColor+'">'+posAdvice+'</b></div></div>';
-    // 四指标小方块
-    var metrics = [
-      {l:'危机', v:crisisPct, u:'分', c: crisisPct>=70?'var(--down)':(crisisPct>=50?'#f59e0b':'var(--up)')},
-      {l:'涨停', v:totalUp, u:'只', c: totalUp>=80?'#ef4444':(totalUp>=40?'var(--up)':'var(--down)')},
-      {l:'高连', v:highLbc, u:'只', c: 'var(--up)'},
-      {l:'龙虎', v:lhbCount, u:'只', c: 'var(--up)'}
-    ];
-    metrics.forEach(function(m){
-      html += '<div style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);border-radius:10px;min-width:72px;">';
-      html += '<span style="font-size:13px;font-weight:700;color:var(--txt)">'+m.l+'</span>';
-      html += '<span style="font-size:18px;font-weight:900;color:'+m.c+'">'+m.v+'<span style="font-size:11px;font-weight:700;margin-left:1px">'+m.u+'</span></span></div>';
-    });
-    html += '</div>';
+    // 2026-08-15 主人令：删掉 4 指标小方块（保留阶段+仓位显示已足够，避免与情绪周期其他卡片重复）
     // ── 2026-08-14 主人令：情绪周期定位精简为单一指标行 ──
     var sc = window.SENTIMENT_CYCLE || {};
     var scm = sc.metrics || {};
