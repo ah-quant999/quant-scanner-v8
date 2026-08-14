@@ -101,9 +101,12 @@ for p in sorted(DATA.glob("*.js")):
     if sz < mn:
         bad.append((name, sz, mn, "过小(疑似shell)"))
         continue
-    head = p.read_text(encoding="utf-8", errors="ignore")[:60]
-    if not head.lstrip().startswith("window."):
-        bad.append((name, sz, mn, "首行非 window. 赋值(格式异常)"))
+    # 2026-08-14 修复：部分文件首行是注释（CONCEPT_ETF_MAP/PORTFOLIO/PORTFOLIO_COST），
+    # 首行 startswith("window.") 会误伤。改为全文必须含 `window.<NAME> =` 赋值。
+    text = p.read_text(encoding="utf-8", errors="ignore")
+    var_name = name[:-3]
+    if f"window.{var_name} =" not in text and f"window.{var_name}=" not in text:
+        bad.append((name, sz, mn, "无 window.<NAME> = 赋值(格式异常)"))
 
 if actual_total < MIN_TOTAL:
     bad.append(("ALL data/*.js total", actual_total, MIN_TOTAL, "总体积过小(大面积shell)"))
