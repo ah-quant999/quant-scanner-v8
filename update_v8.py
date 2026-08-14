@@ -8,7 +8,7 @@
 - 删除死数据文件 RECOMMEND / SCAN_DATA 的映射。
 """
 
-import json, os, re, subprocess, sys
+import json, os, re, subprocess, sys, hashlib
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -531,51 +531,53 @@ def _write_js(var_name, obj):
     return out_path
 
 
-def _data_file_update_time(var_name):
-    """获取 data/*.js 的 cache-busting 时间戳。
+def _cache_bust_token(var_name):
+    """cache-busting 令牌：基于【去除易变时间戳后的内容哈希】。
 
-    优先读取文件内容中的 update_time/updated/run_time/calc_time（语义稳定），
-    但若文件 mtime 晚于语义时间（说明云端 build 流水线在语义时间之后又
-    republish 过——常见于 SH_FIB/SZ_FIB 这类每天 09:07 写一次 update_time、
-    但被云端 build 每隔几分钟 republish 的文件），则改用 mtime，避免
-    cache-buster 卡死在旧值导致浏览器/CDN 拿到 cached 旧版。
+    ⚠️ 2026-08-14 一劳永逸修复（主人报「主站从昨天开始转很久才打开」）：
+    原 _data_file_update_time 用 max(语义时间, mtime) 作 ?v=。但 _write_js 每次
+    构建都注入 republish_time=now，且云端 build 每隔几分钟就 republish 一次
+    data 文件 → mtime 与文件内容(含 republish_time)都变 → ?v 全变 →
+    浏览器与 GitHub Pages CDN(max-age=600) 缓存全部失效 →
+    每次打开主站都重下 8.9MB(72 个 render-blocking 脚本) → 白屏转圈。
 
-    失败则回退到文件 mtime。空文件返回空字符串。
+    现改为：读取 data/<var>.js，去掉易变时间戳字段(republish_time/update_time/
+    calc_time/run_time)后做 MD5(取前 10 位十六进制)。
+      · 内容真不变 → 令牌不变 → 浏览器/CDN 缓存常驻 → 秒开
+      · 内容真变   → 令牌变   → 正确失效，拿到新版
+    彻底解耦 build 频次与缓存失效，根除「频繁 republish 打爆缓存」。
     """
     path = DATA_DIR / f"{var_name}.js"
     if not path.exists():
         return ""
     try:
         text = path.read_text(encoding='utf-8')
-        semantic_ts = ""
-        for key in ('"update_time":"', '"updated":"', '"run_time":"', '"calc_time":"'):
-            m = re.search(re.escape(key) + r'([^"]+)"', text)
-            if m:
-                semantic_ts = m.group(1)
-                break
-        mtime_dt = datetime.fromtimestamp(path.stat().st_mtime, tz=CST)
-        if semantic_ts:
-            sem_dt = None
-            for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M"):
-                try:
-                    sem_dt = datetime.strptime(semantic_ts, fmt).replace(tzinfo=CST)
-                    break
-                except ValueError:
-                    continue
-            if sem_dt is None or sem_dt < mtime_dt:
-                return mtime_dt.strftime("%Y-%m-%d %H:%M:%S")
-            return semantic_ts
-        return mtime_dt.strftime("%Y-%m-%d %H:%M:%S")
+        # 去掉 "window.VAR = " 前缀与结尾 ";" ，拿到纯 JSON 体
+        idx = text.find('=', text.find('window.'))
+        body = text[idx + 1:].strip() if idx != -1 else text.strip()
+        if body.endswith(';'):
+            body = body[:-1]
+        try:
+            obj = json.loads(body)
+        except Exception:
+            # 极端兜底：解析失败则退回整文件哈希（至少内容稳定即令牌稳定）
+            return hashlib.md5(text.encode('utf-8')).hexdigest()[:10]
+        if isinstance(obj, dict):
+            for k in ("republish_time", "update_time", "calc_time", "run_time"):
+                obj.pop(k, None)
+        norm = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+        return hashlib.md5(norm.encode('utf-8')).hexdigest()[:10]
     except Exception:
         return ""
 
 
 def _rewrite_index_html_cache_busters():
-    """为 index.html 中 data/*.js 引用追加基于文件更新时间的 cache-busting 参数。
+    """为 index.html 中 data/*.js 引用追加基于【内容哈希】的 cache-busting 参数。
 
-    核心用途：防止浏览器/CDN 在数据更新后继续返回旧 data/*.js（典型问题：
-    AI市场速览已生成新数据，但页面仍显示旧时间戳）。
-    只有文件本身的时间戳发生变化时，对应的 URL 才会变化，未变更文件保持原 URL。
+    核心用途：防止浏览器/CDN 在数据更新后继续返回旧 data/*.js。
+    令牌由 _cache_bust_token 计算（去易变时间戳后的内容 MD5）：
+    未变更文件保持原 ?v → 缓存常驻秒开；内容真变 → ?v 变 → 正确失效。
+    同时为所有 data 脚本注入 defer，避免 <head> 内同步加载阻塞首屏渲染。
     """
     idx_path = ROOT / "index.html"
     if not idx_path.exists():
@@ -589,10 +591,12 @@ def _rewrite_index_html_cache_busters():
     def repl(m):
         src = m.group(1)
         var_name = src.split('/')[-1].replace('.js', '')
-        ts = _data_file_update_time(var_name)
-        if ts:
-            ts_compact = re.sub(r'[^\d]', '', ts)
-            return f'<script src="{src}?v={ts_compact}"></script>'
+        token = _cache_bust_token(var_name)
+        if token:
+            # 🛡️ 2026-08-14 修复：data 脚本加 defer，不再阻塞 HTML 解析/渲染
+            #   （72 个脚本共 8.9MB 原在 <head> 同步加载 → 白屏转圈；
+            #    defer 后并行下载、DOMContentLoaded 前按序执行，渲染函数均已就绪）
+            return f'<script src="{src}?v={token}" defer></script>'
         return m.group(0)
 
     new_html = pat.sub(repl, html)
