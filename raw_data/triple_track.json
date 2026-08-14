@@ -1,38 +1,11 @@
 {
-  "update_time": "2026-08-14 17:35:57",
+  "update_time": "2026-08-14 17:36:31",
   "data_date": "2026-08-14",
   "track_start": "2026-08-14",
   "history_days": 6,
-  "strict_count": 1,
-  "near_count": 9,
+  "strict_count": 0,
+  "near_count": 7,
   "tracked": [
-    {
-      "code": "688331",
-      "name": "荣昌生物",
-      "market": "sh",
-      "board": "科创板",
-      "status": "strict",
-      "total_score": 34.8,
-      "quality_grade": "A",
-      "industry": "医药制造业",
-      "sectors": [
-        "医药制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-13",
-      "hold_days": 1,
-      "consecutive_days": 2,
-      "first_close": 131.87,
-      "current_close": 131.87,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
     {
       "code": "603993",
       "name": "洛阳钼业",
@@ -88,48 +61,6 @@
       ]
     },
     {
-      "code": "000975",
-      "name": "山金国际",
-      "market": "sz",
-      "board": "主板",
-      "status": "near",
-      "total_score": 34.8,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-14",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 25.96,
-      "current_close": 25.96,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "000506",
-      "name": "中国食品",
-      "market": "sz",
-      "board": "主板",
-      "status": "near",
-      "total_score": 34.8,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-14",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 17.55,
-      "current_close": 17.55,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
       "code": "601168",
       "name": "西部矿业",
       "market": "sh",
@@ -157,65 +88,23 @@
       ]
     },
     {
-      "code": "688213",
-      "name": "思特威",
+      "code": "688331",
+      "name": "荣昌生物",
       "market": "sh",
       "board": "科创板",
       "status": "near",
-      "total_score": 32.8,
+      "total_score": 34.8,
       "quality_grade": "A",
-      "industry": "软件和信息技术服务业",
+      "industry": "医药制造业",
       "sectors": [
-        "软件和信息技术服务业"
+        "医药制造业"
       ],
       "signal_count": 0,
-      "enter_date": "2026-08-14",
+      "enter_date": "2026-08-13",
       "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 99.25,
-      "current_close": 99.25,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "600489",
-      "name": "中金黄金",
-      "market": "sh",
-      "board": "主板",
-      "status": "near",
-      "total_score": 30.0,
-      "quality_grade": "B",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-14",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 25.56,
-      "current_close": 25.56,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "688002",
-      "name": "睿创微纳",
-      "market": "sh",
-      "board": "科创板",
-      "status": "near",
-      "total_score": 30.0,
-      "quality_grade": "B",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-14",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 166.25,
-      "current_close": 166.25,
+      "consecutive_days": 2,
+      "first_close": 131.87,
+      "current_close": 131.87,
       "pnl_pct": 0.0,
       "catalysts": [
         {
@@ -226,16 +115,58 @@
       ]
     },
     {
-      "code": "300274",
-      "name": "阳光电源",
+      "code": "600519",
+      "name": "贵州茅台",
+      "market": "沪市",
+      "board": "主板",
+      "status": "near",
+      "total_score": 60,
+      "quality_grade": "A",
+      "industry": "酒、饮料和精制茶制造业",
+      "sectors": [
+        "酒、饮料和精制茶制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-10",
+      "hold_days": 2,
+      "consecutive_days": 1,
+      "first_close": 0,
+      "current_close": null,
+      "pnl_pct": null,
+      "catalysts": []
+    },
+    {
+      "code": "300760",
+      "name": "迈瑞医疗",
       "market": "创业板",
       "board": "创业板",
       "status": "near",
+      "total_score": 60,
+      "quality_grade": "A",
+      "industry": "专用设备制造业",
+      "sectors": [
+        "专用设备制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-10",
+      "hold_days": 2,
+      "consecutive_days": 1,
+      "first_close": 0,
+      "current_close": null,
+      "pnl_pct": null,
+      "catalysts": []
+    },
+    {
+      "code": "000807",
+      "name": "云铝股份",
+      "market": "深市",
+      "board": "主板",
+      "status": "near",
       "total_score": 20,
       "quality_grade": "A",
-      "industry": "电气机械和器材制造业",
+      "industry": "有色金属冶炼和压延加工业",
       "sectors": [
-        "电气机械和器材制造业"
+        "有色金属冶炼和压延加工业"
       ],
       "signal_count": 0,
       "enter_date": "2026-08-14",
@@ -244,22 +175,16 @@
       "first_close": 0,
       "current_close": null,
       "pnl_pct": null,
-      "catalysts": []
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "—"
+        }
+      ]
     }
   ],
   "alerts": [
-    {
-      "level": "warn",
-      "code": "300760",
-      "name": "",
-      "text": "(300760) 于 2026-08-12 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "warn",
-      "code": "600519",
-      "name": "",
-      "text": "(600519) 于 2026-08-12 跌出共识（曾连续 1 日）"
-    },
     {
       "level": "warn",
       "code": "300613",
@@ -313,14 +238,11 @@
     "by_industry": [
       {
         "industry": "有色金属矿采选业",
-        "count": 6,
+        "count": 3,
         "names": [
           "洛阳钼业",
           "紫金矿业",
-          "山金国际",
-          "中国食品",
-          "西部矿业",
-          "中金黄金"
+          "西部矿业"
         ]
       },
       {
@@ -331,53 +253,53 @@
         ]
       },
       {
-        "industry": "软件和信息技术服务业",
+        "industry": "酒、饮料和精制茶制造业",
         "count": 1,
         "names": [
-          "思特威"
+          "贵州茅台"
         ]
       },
       {
-        "industry": "计算机、通信和其他电子设备制造业",
+        "industry": "专用设备制造业",
         "count": 1,
         "names": [
-          "睿创微纳"
+          "迈瑞医疗"
         ]
       },
       {
-        "industry": "电气机械和器材制造业",
+        "industry": "有色金属冶炼和压延加工业",
         "count": 1,
         "names": [
-          "阳光电源"
+          "云铝股份"
         ]
       }
     ],
     "by_sector": [
       {
         "sector": "有色金属矿采选业",
-        "count": 6
+        "count": 3
       },
       {
         "sector": "医药制造业",
         "count": 1
       },
       {
-        "sector": "软件和信息技术服务业",
+        "sector": "酒、饮料和精制茶制造业",
         "count": 1
       },
       {
-        "sector": "计算机、通信和其他电子设备制造业",
+        "sector": "专用设备制造业",
         "count": 1
       },
       {
-        "sector": "电气机械和器材制造业",
+        "sector": "有色金属冶炼和压延加工业",
         "count": 1
       }
     ],
-    "concentration": 60.0
+    "concentration": 42.86
   },
   "overlap": {
-    "total_tracked": 10,
+    "total_tracked": 7,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
@@ -385,13 +307,18 @@
     },
     "cockpit_a": {
       "count": 9,
-      "overlap": 0,
-      "names": []
+      "overlap": 2,
+      "names": [
+        "贵州茅台",
+        "迈瑞医疗"
+      ]
     },
     "cockpit_b": {
       "count": 15,
-      "overlap": 0,
-      "names": []
+      "overlap": 1,
+      "names": [
+        "云铝股份"
+      ]
     }
   },
   "backtest_signal": {
@@ -401,42 +328,42 @@
     "best_hold_days": 1,
     "periods": {
       "1d": {
-        "win_rate": 56.8,
-        "avg_return": 0.34,
-        "sharpe": 0.06,
-        "count": 183,
-        "best": 13.68,
+        "win_rate": 54.9,
+        "avg_return": -0.08,
+        "sharpe": -0.01,
+        "count": 143,
+        "best": 10.97,
         "worst": -10.01
       },
       "3d": {
-        "win_rate": 38.6,
-        "avg_return": -0.8,
-        "sharpe": -0.11,
-        "count": 183,
-        "best": 15.06,
+        "win_rate": 33.6,
+        "avg_return": -1.93,
+        "sharpe": -0.26,
+        "count": 143,
+        "best": 15.0,
         "worst": -10.02
       },
       "5d": {
-        "win_rate": 46.8,
-        "avg_return": -0.16,
-        "sharpe": -0.02,
-        "count": 183,
-        "best": 15.06,
+        "win_rate": 42.7,
+        "avg_return": -1.08,
+        "sharpe": -0.11,
+        "count": 143,
+        "best": 15.0,
         "worst": -10.04
       },
       "10d": {
-        "win_rate": 47.6,
-        "avg_return": 0.63,
-        "sharpe": 0.06,
-        "count": 183,
+        "win_rate": 46.4,
+        "avg_return": 0.53,
+        "sharpe": 0.05,
+        "count": 143,
         "best": 15.07,
         "worst": -10.04
       },
       "20d": {
         "win_rate": 18.2,
-        "avg_return": -0.66,
-        "sharpe": -0.17,
-        "count": 183,
+        "avg_return": -0.84,
+        "sharpe": -0.2,
+        "count": 143,
         "best": 15.0,
         "worst": -10.04
       }
@@ -446,17 +373,17 @@
     {
       "band": "≥80",
       "count": 69,
-      "win_rate_5d": 100.0,
-      "avg_ret_5d": 6.1,
-      "best_win_rate": 100.0,
-      "best_hold_days": 1
+      "win_rate_5d": 80.6,
+      "avg_ret_5d": 5.34,
+      "best_win_rate": 84.2,
+      "best_hold_days": 10
     },
     {
       "band": "70~80",
       "count": 126,
-      "win_rate_5d": 20.5,
-      "avg_ret_5d": -4.75,
-      "best_win_rate": 63.4,
+      "win_rate_5d": 0.0,
+      "avg_ret_5d": 0.0,
+      "best_win_rate": 0.0,
       "best_hold_days": 1
     }
   ],
@@ -464,36 +391,36 @@
     "periods": [
       {
         "period": "1d",
-        "strict_win": 56.8,
-        "strict_ret": 0.34,
-        "strict_count": 183,
+        "strict_win": 54.9,
+        "strict_ret": -0.08,
+        "strict_count": 143,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "3d",
-        "strict_win": 38.6,
-        "strict_ret": -0.8,
-        "strict_count": 183,
+        "strict_win": 33.6,
+        "strict_ret": -1.93,
+        "strict_count": 143,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "5d",
-        "strict_win": 46.8,
-        "strict_ret": -0.16,
-        "strict_count": 183,
+        "strict_win": 42.7,
+        "strict_ret": -1.08,
+        "strict_count": 143,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "10d",
-        "strict_win": 47.6,
-        "strict_ret": 0.63,
-        "strict_count": 183,
+        "strict_win": 46.4,
+        "strict_ret": 0.53,
+        "strict_count": 143,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -501,8 +428,8 @@
       {
         "period": "20d",
         "strict_win": 18.2,
-        "strict_ret": -0.66,
-        "strict_count": 183,
+        "strict_ret": -0.84,
+        "strict_count": 143,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0

@@ -53,7 +53,7 @@
         "大牛股猎手"
       ],
       "entry_price": null,
-      "last_close": 161.85,
+      "last_close": 155.1,
       "last_pct": null,
       "peak_pct": null,
       "days_in": 7,
@@ -75,7 +75,7 @@
         "大牛股猎手"
       ],
       "entry_price": null,
-      "last_close": 60.65,
+      "last_close": 58.66,
       "last_pct": null,
       "peak_pct": null,
       "days_in": 7,
@@ -97,9 +97,9 @@
         "四量终极"
       ],
       "entry_price": 18.41,
-      "last_close": 18.44,
-      "last_pct": 0.16,
-      "peak_pct": 0.16,
+      "last_close": 18.41,
+      "last_pct": 0.0,
+      "peak_pct": 0.0,
       "days_in": 2,
       "appear_count": 1,
       "last_seen": "20260813",
@@ -121,8 +121,8 @@
         "驾驶舱A档"
       ],
       "entry_price": 5.17,
-      "last_close": 5.14,
-      "last_pct": -0.58,
+      "last_close": 5.17,
+      "last_pct": 0.0,
       "peak_pct": 0.0,
       "days_in": 1,
       "appear_count": 1,
@@ -147,8 +147,8 @@
         "驾驶舱A档"
       ],
       "entry_price": 131.87,
-      "last_close": 130.97,
-      "last_pct": -0.68,
+      "last_close": 131.87,
+      "last_pct": 0.0,
       "peak_pct": 0.0,
       "days_in": 1,
       "appear_count": 1,
@@ -173,8 +173,8 @@
         "驾驶舱B档"
       ],
       "entry_price": 24.31,
-      "last_close": 24.27,
-      "last_pct": -0.16,
+      "last_close": 24.31,
+      "last_pct": 0.0,
       "peak_pct": 0.0,
       "days_in": 1,
       "appear_count": 1,
@@ -188,17 +188,17 @@
       "first_list": "20260813"
     },
     {
-      "code": "300534",
-      "name": "陇神戎发",
+      "code": "300613",
+      "name": "富瀚微",
       "list_date": "20260814",
       "list_date_dashed": "2026-08-14",
       "list_rank": 1,
       "list_sources": [
-        "四量终极",
-        "大牛股猎手"
+        "板块龙头",
+        "驾驶舱A档"
       ],
-      "entry_price": 18.9,
-      "last_close": 18.9,
+      "entry_price": 75.66,
+      "last_close": 75.66,
       "last_pct": 0.0,
       "peak_pct": 0.0,
       "days_in": 0,
@@ -206,23 +206,23 @@
       "last_seen": "20260814",
       "last_rank": 1,
       "last_sources": [
-        "四量终极",
-        "大牛股猎手"
+        "板块龙头",
+        "驾驶舱A档"
       ],
       "first_list": "20260814"
     },
     {
-      "code": "300613",
-      "name": "富瀚微",
+      "code": "600111",
+      "name": "北方稀土",
       "list_date": "20260814",
       "list_date_dashed": "2026-08-14",
       "list_rank": 2,
       "list_sources": [
-        "板块龙头",
-        "驾驶舱A档"
+        "四量终极",
+        "板块龙头"
       ],
-      "entry_price": 75.91,
-      "last_close": 75.91,
+      "entry_price": 41.02,
+      "last_close": 41.02,
       "last_pct": 0.0,
       "peak_pct": 0.0,
       "days_in": 0,
@@ -230,23 +230,23 @@
       "last_seen": "20260814",
       "last_rank": 2,
       "last_sources": [
-        "板块龙头",
-        "驾驶舱A档"
+        "四量终极",
+        "板块龙头"
       ],
       "first_list": "20260814"
     },
     {
-      "code": "300404",
-      "name": "博济医药",
+      "code": "600362",
+      "name": "江西铜业",
       "list_date": "20260814",
       "list_date_dashed": "2026-08-14",
       "list_rank": 3,
       "list_sources": [
-        "四量终极",
-        "大牛股猎手"
+        "板块龙头",
+        "驾驶舱B档"
       ],
-      "entry_price": 17.34,
-      "last_close": 17.34,
+      "entry_price": 44.36,
+      "last_close": 44.36,
       "last_pct": 0.0,
       "peak_pct": 0.0,
       "days_in": 0,
@@ -254,8 +254,8 @@
       "last_seen": "20260814",
       "last_rank": 3,
       "last_sources": [
-        "四量终极",
-        "大牛股猎手"
+        "板块龙头",
+        "驾驶舱B档"
       ],
       "first_list": "20260814"
     }

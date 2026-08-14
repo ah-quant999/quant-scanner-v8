@@ -1576,24 +1576,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     </script>
 
 
-    <!-- 上证+深证成交额 -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📈</span>上证+深证 每日成交金额（亿元）<span class="fresh" id="amountUpdateTime">—</span><span class="fresh" id="amountLastDate" style="margin-left:8px;font-weight:400;"></span></h3>
-      <div id="amountChartContainer" style="width:100%;height:260px;position:relative;overflow:visible;">
-        <svg id="amountChart" width="100%" height="260" style="overflow:visible;" overflow="visible"></svg>
-      </div>
-      <div class="note" id="amountNote" style="margin-top:10px;line-height:1.7">今日两市合计 -- 亿元，较前日 --%，--。</div>
-    </div>
-
-    <!-- 近一月涨跌家数统计 -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🏘️</span>近一月 涨跌家数统计<span class="fresh" id="upDownUpdateTime">—</span><span class="fresh" id="upDownLastDate" style="margin-left:8px;font-weight:400;"></span></h3>
-      <div id="upDownChartContainer" style="width:100%;height:260px;position:relative;overflow:visible;">
-        <svg id="upDownChart" width="100%" height="260" style="overflow:visible;" overflow="visible"></svg>
-      </div>
-      <div class="note" id="upDownNote">红=上涨家数，绿=下跌家数，灰=平盘。今日涨 -- / 跌 -- / 平 --。</div>
-    </div>
-
         <!-- 情绪周期·连板天梯（2026-08-08 从暂未上架迁到实时数据） -->
     <div id="cycleLadderCard" style="margin-bottom:12px;"></div>
 
@@ -2555,6 +2537,24 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       window._renderIndustryTree=renderIndustryTree;
     })();
     </script>
+
+    <!-- 📈 上证+深证 每日成交金额（实时页最下面 · 2026-08-14 主人令迁移） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📈</span>上证+深证 每日成交金额（亿元）<span class="fresh" id="amountUpdateTime">—</span><span class="fresh" id="amountLastDate" style="margin-left:8px;font-weight:400;"></span></h3>
+      <div id="amountChartContainer" style="width:100%;height:260px;position:relative;overflow:visible;">
+        <svg id="amountChart" width="100%" height="260" style="overflow:visible;" overflow="visible"></svg>
+      </div>
+      <div class="note" id="amountNote" style="margin-top:10px;line-height:1.7">今日两市合计 -- 亿元，较前日 --%，--。</div>
+    </div>
+
+    <!-- 🏘️ 近一月 涨跌家数统计（实时页最下面 · 2026-08-14 主人令迁移） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🏘️</span>近一月 涨跌家数统计<span class="fresh" id="upDownUpdateTime">—</span><span class="fresh" id="upDownLastDate" style="margin-left:8px;font-weight:400;"></span></h3>
+      <div id="upDownChartContainer" style="width:100%;height:260px;position:relative;overflow:visible;">
+        <svg id="upDownChart" width="100%" height="260" style="overflow:visible;" overflow="visible"></svg>
+      </div>
+      <div class="note" id="upDownNote">红=上涨家数，绿=下跌家数，灰=平盘。今日涨 -- / 跌 -- / 平 --。</div>
+    </div>
 
   </section>
 
@@ -5082,6 +5082,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div class="logic-p">输入代码或名称，聚合三重共识评分、金股池状态、主力资金、近10日走势等。</div>
         <div class="logic-h">ETF资金热度</div>
         <div class="logic-p">宽基指数ETF每日净申购赎回份额折线图，T+0实时估算国家队动向。数据源：etf_intraday_heat.json（akshare fund_etf_hist_em）。展示沪深300/中证500/创业板/科创50/上证50等主要宽基ETF。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🎭</span>情绪周期 · 连板天梯 - 说明</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">基于危机雷达 + 涨停热力实时合成的短线情绪定位卡。顶部阶段（冰点/降温/修复/温和/狂热）决定仓位建议；下方「连板分布」列出各连板层级具体个股。</div>
+        <div class="logic-h">阶段判定口径</div>
+        <div class="logic-p">危机雷达分值 ≥70 → 冰点（空仓）；50–70 → 降温（≤30%）；涨停≥80且高连板≥15 → 狂热（兑现）；涨停≥40且危机≤30 → 温和（50%）；涨停&lt;30或危机&gt;35 → 修复（30%）。</div>
+        <div class="logic-h">情绪分 / 环比 / 最高板 / 活跃板块</div>
+        <div class="logic-p">情绪分由危机雷达与涨停热度合成（0–100）；环比读 SENTIMENT_CYCLE.delta_pct；最高板与活跃板块为 SENTIMENT_CYCLE.metrics 结构化字段。</div>
+        <div class="logic-h">短线极端状态注释（原卡片底部提示）</div>
+        <div class="logic-p">冰点 = 涨停&lt;30家且最高板≤2（报复性窗口临近）；高潮 = 涨停≥80且最高板≥5；退潮 = 较前日-30%+。</div>
       </div>
 
     </div>
@@ -10694,9 +10706,22 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   window._pfSave = function(arr){
     localStorage.setItem(PF_KEY, JSON.stringify(arr||[]));
   };
-  // 匹配股票（2026-08-11 一劳永逸：复用 _uniSearch 统一搜索内核，消除空串 indexOf 等经典 bug）
+  // 匹配股票（2026-08-14 修复：支持港股 code 与 hk 前缀输入，避免 5 位代码被错判为 A股）
   window._pfFindStock = function(q){
     if(!q) return null;
+    var qt=(q||'').trim().toUpperCase();
+    // 明确含 hk/HK/.HK 前缀 → 直接锁定港股
+    if(qt.indexOf('HK')===0 || qt.indexOf('.HK')!==-1){
+      var hkCode=qt.replace(/^HK/,'').replace(/\.HK$/,'').replace(/\D/g,'');
+      if(/^\d{1,5}$/.test(hkCode)){
+        hkCode=hkCode.padStart(5,'0');
+        var hkName=null;
+        // 尝试从行情数据拿名称
+        var SQ=window.STOCK_QUOTE||{}, st=SQ.stocks||{};
+        var qo=st['hk'+hkCode]; if(qo&&qo.name) hkName=qo.name;
+        return {code:hkCode, name:(hkName||hkCode), full_code:'hk'+hkCode, py:'', market:'hk'};
+      }
+    }
     // 优先使用统一搜索内核（覆盖 STOCK_LIST 全量 + 拼音/代码/名称）
     if(window._uniSearch){
       var hits = window._uniSearch(q, 1);
@@ -10719,14 +10744,24 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if(r.name.toLowerCase().indexOf(ql)!==-1||(r.code||'').indexOf(nc)!==-1)
         {best={code:r.code,name:r.name,full_code:(r.market||'hk')+r.code,py:r.py||'',market:r.market||'hk'};bs=3;}
     }}}
-    // 兜底：纯数字代码或未知名称 → 允许录入（支持 ETF/新股等不在 STOCK_LIST 的标的）
+    // 兜底：纯数字代码 → 5位优先港股，6位按 A股规则（支持 ETF/新股等不在 STOCK_LIST 的标的）
     if(!best && /^\d{5,6}$/.test(nc)){
-      var mk = nc.startsWith('688')?'bj':(nc.startsWith('30')?'sz':(nc.startsWith('6')?'sh':'sz'));
-      best={code:nc,name:q,full_code:mk+nc,py:'',market:mk}; bs=1;
+      var mk;
+      if(nc.length===5){
+        mk='hk'; // 5 位数字优先识别为港股
+      } else {
+        mk = nc.startsWith('688')?'bj':(nc.startsWith('30')?'sz':(nc.startsWith('6')?'sh':'sz'));
+      }
+      var fallName=q;
+      if(mk==='hk'){
+        var qo=(window.STOCK_QUOTE||{}).stocks||{}; var qok=qo['hk'+nc];
+        if(qok&&qok.name) fallName=qok.name;
+      }
+      best={code:nc,name:fallName,full_code:mk+nc,py:'',market:mk}; bs=1;
     }
     return best;
   };
-  // 持仓录入下拉提示（2026-08-13 补：原 showPfDropdown/hidePfDropdown 缺失，导致首字母搜索无响应）
+  // 持仓录入下拉提示（2026-08-14 修复：保存完整 stock 信息，选择后按 code 精确匹配，避免同名 A/H 股混淆）
   window.showPfDropdown = function(q){
     var dd = document.getElementById('pfDropdown');
     if(!dd) return;
@@ -10736,8 +10771,10 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(!hits || !hits.length){ dd.style.display='none'; dd.innerHTML=''; return; }
     var h = '';
     hits.forEach(function(s){
-      var label = (s.name||'') + ' <span style="color:var(--dim);font-size:11px;">' + (s.full_code||s.code||'') + '</span>';
-      h += '<div data-name="' + (s.name||'') + '" style="padding:7px 10px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;" onmousedown="event.preventDefault();_pfSelectDropdown(this);">' + label + '</div>';
+      var isHk=(s.market==='hk'||String(s.full_code||'').toLowerCase().indexOf('hk')===0);
+      var tag=isHk?'港股':(s.market==='sh'?'沪':(s.market==='sz'?'深':(s.market==='bj'?'北交':'')));
+      var label = (s.name||'') + ' <span style="color:var(--dim);font-size:11px;">' + (s.full_code||s.code||'') + (tag?' · '+tag:'') + '</span>';
+      h += '<div data-name="' + (s.name||'') + '" data-code="' + (s.code||'') + '" data-full_code="' + (s.full_code||'') + '" data-market="' + (s.market||'') + '" style="padding:7px 10px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;" onmousedown="event.preventDefault();_pfSelectDropdown(this);">' + label + '</div>';
     });
     dd.innerHTML = h;
     dd.style.display = 'block';
@@ -10745,18 +10782,19 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   window._pfSelectDropdown = function(el){
     var codeEl = document.getElementById('pfCode');
     if(!codeEl) return;
-    codeEl.value = el.getAttribute('data-name');
+    // 用完整代码回填，确保 addPosition 精确识别（尤其同名 A/H 股）
+    codeEl.value = el.getAttribute('data-full_code') || el.getAttribute('data-code') || el.getAttribute('data-name');
     hidePfDropdown();
   };
   window.hidePfDropdown = function(){
     var dd = document.getElementById('pfDropdown');
     if(dd){ dd.style.display='none'; dd.innerHTML=''; }
   };
-  // 获取现价
+  // 获取现价（2026-08-14 修复：支持港股 hk 键）
   window._pfGetQuote = function(code, market){
     var SQ=window.STOCK_QUOTE||{}; var st=SQ.stocks||{};
     var full=((market||'')+code).replace(/^_/,'');
-    var qo=st[full]||st[market+'_'+code]||st[code]||st['sh'+code]||st['sz'+code];
+    var qo=st[full]||st[market+'_'+code]||st[code]||st['sh'+code]||st['sz'+code]||st['hk'+code];
     if(qo&&qo.price!=null)return Number(qo.price);
     return null;
   };
@@ -10812,8 +10850,16 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var _notHidden=function(p){ return hidden.indexOf(p.code) === -1; };
     if(window.PORTFOLIO_DATA && window.PORTFOLIO_DATA.positions && window.PORTFOLIO_DATA.positions.length){
       arr = window.PORTFOLIO_DATA.positions.filter(_notHidden).map(function(p){
+        // 2026-08-14 修复：westock 云端 code 可能是完整代码（如 hk02865），需拆出 market+裸 code
+        var rawCode=p.code||'';
+        var mkt=(p.market||'').toLowerCase();
+        if(rawCode.length>2 && /^(sh|sz|hk|bj)/.test(rawCode.toLowerCase())){
+          mkt=rawCode.slice(0,2).toLowerCase();
+          rawCode=rawCode.slice(2);
+        }
+        if(!mkt) mkt='sh';
         return {
-          code:p.code, name:p.name, full_code:(p.market||'')+p.code, market:p.market||'sh',
+          code:rawCode, name:p.name, full_code:mkt+rawCode, market:mkt,
           date:p.buy_date||'', price:Number(p.cost_price||0), qty:Number(p.qty||0),
           _live:(p.live_price!=null?Number(p.live_price):null), _pending:!!p.pending
         };
@@ -10966,53 +11012,37 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       html += '<span style="font-size:18px;font-weight:900;color:'+m.c+'">'+m.v+'<span style="font-size:11px;font-weight:700;margin-left:1px">'+m.u+'</span></span></div>';
     });
     html += '</div>';
-    // ── 2026-08-14 主人令：合并情绪周期定位（情绪分/环比/连板梯队/龙头）──
+    // ── 2026-08-14 主人令：情绪周期定位精简为单一指标行 ──
     var sc = window.SENTIMENT_CYCLE || {};
     var scm = sc.metrics || {};
     var liveScore = Math.round(Math.max(0, Math.min(100, 100 - crisisPct*0.6 + Math.min(totalUp,100)*0.25)));
     var score = (sc.score > 0) ? Math.round((liveScore + sc.score) / 2) : liveScore;
-    // 情绪分 + 环比 行
-    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">';
-    html += '<div style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:8px;">';
+    // 情绪分 / 环比 / 最高板 / 活跃板块 合并成一行
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">';
+    html += '<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:8px;">';
     html += '<span style="font-size:11px;color:var(--dim);">情绪分</span>';
-    html += '<span style="font-size:20px;font-weight:800;color:#38bdf8">'+score+'</span>';
+    html += '<span style="font-size:18px;font-weight:800;color:#38bdf8">'+score+'</span>';
     html += '</div>';
     if(sc.delta_pct !== undefined && sc.delta_pct !== null){
-      html += '<div style="display:flex;align-items:center;gap:6px;padding:7px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;">';
+      html += '<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;">';
       html += '<span style="font-size:11px;color:var(--dim);">环比</span>';
-      html += '<span style="font-size:16px;font-weight:700;color:'+(sc.delta_pct>=0?'var(--up)':'var(--down)')+'">'+(sc.delta_pct>0?'+':'')+sc.delta_pct+'%</span>';
+      html += '<span style="font-size:15px;font-weight:700;color:'+(sc.delta_pct>=0?'var(--up)':'var(--down)')+'">'+(sc.delta_pct>0?'+':'')+sc.delta_pct+'%</span>';
       html += '</div>';
     }
-    // 补充指标：最高板/活跃板块（SENTIMENT_CYCLE 独有）
     if(scm.max_ladder){
-      html += '<div style="font-size:11px;color:var(--dim);padding:7px 0;">最高 <b style="color:#22d3ee;font-size:15px;font-weight:800">'+scm.max_ladder+'</b> 板</div>';
+      html += '<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.18);border-radius:8px;">';
+      html += '<span style="font-size:11px;color:var(--dim);">最高</span>';
+      html += '<span style="font-size:15px;font-weight:800;color:#22d3ee">'+scm.max_ladder+'</span><span style="font-size:11px;color:var(--dim);">板</span>';
+      html += '</div>';
     }
     if(scm.sectors_count){
-      html += '<div style="font-size:11px;color:var(--dim);padding:7px 0;">活跃 <b style="color:#22c55e;font-size:15px;font-weight:800">'+scm.sectors_count+'</b> 板块</div>';
+      html += '<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.18);border-radius:8px;">';
+      html += '<span style="font-size:11px;color:var(--dim);">活跃</span>';
+      html += '<span style="font-size:15px;font-weight:800;color:#22c55e">'+scm.sectors_count+'</span><span style="font-size:11px;color:var(--dim);">板块</span>';
+      html += '</div>';
     }
     html += '</div>';
-    // 连板梯队标签（SENTIMENT_CYCLE 结构化数据）
-    if(sc.ladder_dist && Object.keys(sc.ladder_dist).length){
-      html += '<div style="font-size:11.5px;color:var(--sub);margin-bottom:4px;">📊 连板梯队：</div>';
-      html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">';
-      Object.keys(sc.ladder_dist).forEach(function(k){
-        var n = sc.ladder_dist[k];
-        var bg = parseInt(k) >= 3 ? 'background:rgba(167,139,250,.18);border-color:rgba(167,139,250,.5);' : 'background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.3);';
-        html += '<span style="display:inline-block;padding:4px 10px;border:1px solid;border-radius:6px;font-size:12px;font-weight:600;color:#c4b5fd;'+bg+'">'+k+'板 <b style="color:var(--txt);margin-left:4px;">'+n+'只</b></span>';
-      });
-      html += '</div>';
-    }
-    // 龙头连板（SENTIMENT_CYCLE 结构化数据）
-    if(sc.leaders && sc.leaders.length){
-      html += '<div style="font-size:11.5px;color:var(--sub);margin-bottom:4px;">🏆 龙头连板：</div>';
-      html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">';
-      sc.leaders.forEach(function(l){
-        html += '<span style="display:inline-block;padding:4px 10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:6px;font-size:12px;color:#22c55e;font-weight:600;">'+l.name+' <b style="color:var(--txt);margin-left:2px;">'+l.lbc+'板</b></span>';
-      });
-      html += '</div>';
-    }
-    if(sc.note) html += '<div style="font-size:11px;color:var(--dim);margin-bottom:10px;line-height:1.5;">'+sc.note+'</div>';
-    // ── 合并结束，下面继续保留连板分布明细 ──
+    // 连板分布明细保留；连板梯队/龙头连板徽章已删除（与下方明细重复）
     // 连板分布：每行显示「连板标签 共N只」+ 股票名网格；首板用10只/行平铺
     if(lh.update_time && Object.keys(ladder).length){
       var lbcKeys = Object.keys(ladder).sort(function(a,b){return parseInt(b)-parseInt(a);});
