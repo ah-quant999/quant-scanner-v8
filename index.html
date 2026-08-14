@@ -4487,7 +4487,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     if(op && op.baseline_ge3){
       var b3 = op.baseline_ge3;
       rows.push({
-        name:'🎯 三信号共振(严格)', cat:'共振·优化',
+        name:'🎯 三信号共振(严格)', cat:'共振·优化', isOpt:true,
         win_rate:(b3.T+5||{}).win_rate_pct, avg_return:(b3.T+5||{}).avg_return_pct,
         sample:(b3.T+5||{}).total_signals || (b3.total_signals) || 862,
         extra:'T+5 优化版'
@@ -4545,11 +4545,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '<th style="padding:7px 6px;text-align:left;color:var(--sub);">口径</th>';
       html += '</tr></thead><tbody>';
       starRows.forEach(function(r, i){
-        var bg = (i===0) ? 'background:rgba(245,158,11,.08);' : '';
-        var topBadge = (i===0) ? '<span style="color:#fbbf24;font-weight:700;"> 👑最强</span>' : '';
+        var isOpt = r.isOpt;
+        var bg = isOpt ? 'background:linear-gradient(90deg,rgba(245,158,11,.16),rgba(245,158,11,.06));border-left:3px solid #f59e0b;' : ((i===0 && !isOpt) ? 'background:rgba(245,158,11,.08);' : '');
+        var badge = isOpt ? '<span style="color:#f59e0b;font-weight:800;"> 🏆最优策略</span>' : ((i===0) ? '<span style="color:#fbbf24;font-weight:700;"> 👑最强</span>' : '');
         html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+bg+'">';
-        html += '<td class="no-shrink"  style="padding:7px 6px;color:#fbbf24;font-weight:700;white-space:nowrap">'+r.stars+'</td>';
-        html += '<td style="padding:7px 6px;font-weight:700;color:var(--txt);white-space:nowrap;">'+r.name+topBadge+'</td>';
+        html += '<td class="no-shrink"  style="padding:7px 6px;color:'+(isOpt?'#f59e0b':'#fbbf24')+';font-weight:800;white-space:nowrap">'+r.stars+'</td>';
+        html += '<td style="padding:7px 6px;font-weight:800;color:'+(isOpt?'#f59e0b':'var(--txt)')+';white-space:nowrap;">'+r.name+badge+'</td>';
         html += '<td style="padding:7px 6px;text-align:right;font-weight:700;color:'+_colorNum(r.win_rate, 50)+';">'+ (typeof r.win_rate==='number' ? r.win_rate.toFixed(1) : r.win_rate)+'%</td>';
         html += '<td style="padding:7px 6px;text-align:right;font-weight:600;color:'+_colorNum(r.avg_return, 0)+';">'+(r.avg_return>0?'+':'')+ (typeof r.avg_return==='number' ? r.avg_return.toFixed(2) : r.avg_return)+'%</td>';
         html += '<td style="padding:7px 6px;text-align:right;color:var(--sub);">'+r.sample+'</td>';
@@ -4621,7 +4622,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       });
       html += '</tbody></table></div>';
     } else {
-      html += '<div class="note" style="text-align:center;">无跟踪样本</div>';
+      var _onlineDays = (tt.online_days != null) ? tt.online_days : (stats.window_days ? (90 - (stats.window_days)) : '—');
+      html += '<div style="text-align:center;padding:14px 10px;background:rgba(245,158,11,.06);border:1px dashed rgba(245,158,11,.25);border-radius:8px;font-size:12px;color:var(--sub);">';
+      html += '⏳ 跟踪功能上线第 <b style="color:#f59e0b;font-weight:700">'+(tt.online_days||'1')+'</b> 天，历史成绩待积累<br>';
+      html += '<span style="font-size:11px;color:var(--dim)">待 TOP3 候选票 K 线收盘后自动统计胜率/收益（当前样本 0）</span>';
+      html += '</div>';
     }
     if(stats.samples === 0 && tracks.length){
       html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;">⏳ 历史成绩需待 TOP3 票 K 线收盘后再统计（当前样本 0，待积累）</div>';
