@@ -10480,32 +10480,53 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     dst.innerHTML = html;
   };
 
-  // 🌡️ 情绪周期定位
+  // 🌡️ 情绪周期定位（2026-08-14 主人令：外框阶段用实时计算取真实值，明细展开不变）
   window._fillSentimentCycle = function(){
-    var sc = window.SENTIMENT_CYCLE;
     var dst = document.getElementById('scBody');
     if(!dst) return;
-    if(!sc || !sc.phase){
-      dst.innerHTML = '<div class="note">SENTIMENT_CYCLE 数据不可用</div>';
-      return;
-    }
+    var sc = window.SENTIMENT_CYCLE || {};
     var m = sc.metrics || {};
+
+    // ── 外框阶段：实时计算（与 __renderCycleLadderCard 同源，解决"温和 vs 狂热"歧义）──
+    var cr = window.CRISIS_DATA || {};
+    var lh = window.LIMIT_UP_HEATMAP || {};
+    var lhb = window.LHB_DATA || {};
+    var crisisScore = (cr.currency||0)*0.4 + (cr.economy||0)*0.35 + (cr.global||0)*0.25;
+    var crisisPct = Math.round(crisisScore * 100);
+    var totalUp = lh.total || 0;
+    var ladder = lh.ladder || {};
+    var highLbc = (ladder['3']||0)+(ladder['4']||0)+(ladder['5']||0)+(ladder['10']||0);
+    var lhbCount = (lhb.stocks && lhb.stocks.length) || 0;
+    var phase, phaseColor, phaseDesc, posAdvice;
+    if(crisisPct >= 70){ phase='冰点'; phaseColor='var(--down)'; phaseDesc='危机雷达高位'; posAdvice='空仓'; }
+    else if(crisisPct >= 50){ phase='降温'; phaseColor='#f59e0b'; phaseDesc='风险累积'; posAdvice='≤30%'; }
+    else if(totalUp >= 80 && highLbc >= 15){ phase='狂热'; phaseColor='#ef4444'; phaseDesc='涨停泛滥'; posAdvice='兑现'; }
+    else if(totalUp >= 40 && crisisPct <= 30){ phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪偏暖'; posAdvice='50%'; }
+    else if(totalUp < 30 || crisisPct > 35){ phase='修复'; phaseColor='#38bdf8'; phaseDesc='低位筑底'; posAdvice='30%'; }
+    else { phase='温和'; phaseColor='var(--up)'; phaseDesc='情绪平稳'; posAdvice='50%'; }
+
+    // 情绪分：用实时数据合成（危机反转 + 涨停热度），保留 SENTIMENT_CYCLE 做fallback
+    var liveScore = Math.round(Math.max(0, Math.min(100, 100 - crisisPct*0.6 + Math.min(totalUp,100)*0.25)));
+    var score = (sc.score > 0) ? Math.round((liveScore + sc.score) / 2) : liveScore;
+    var delta_pct = sc.delta_pct || 0;
+    var advice = sc.advice || (phaseDesc+' · 建议'+posAdvice+'仓位');
+
     var html = '';
-    // 顶部：phase 大色块
-    html += '<div style="background:linear-gradient(135deg,'+sc.color+'22,'+sc.color+'08);border:2px solid '+sc.color+';border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">';
+    // 顶部：phase 大色块（实时计算值）
+    html += '<div style="background:linear-gradient(135deg,'+phaseColor+'22,'+phaseColor+'08);border:2px solid '+phaseColor+';border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">';
     html += '<div style="text-align:center;min-width:120px;">';
     html += '<div style="font-size:11px;color:var(--dim);">当前阶段</div>';
-    html += '<div style="font-size:24px;font-weight:800;color:'+sc.color+';line-height:1.1;">'+sc.phase+'</div>';
+    html += '<div style="font-size:24px;font-weight:800;color:'+phaseColor+';line-height:1.1;">'+phase+'</div>';
     html += '</div>';
     html += '<div style="text-align:center;min-width:80px;">';
     html += '<div style="font-size:11px;color:var(--dim);">情绪分</div>';
-    html += '<div style="font-size:22px;font-weight:700;color:var(--txt);line-height:1.1;">'+sc.score+'</div>';
+    html += '<div style="font-size:22px;font-weight:700;color:var(--txt);line-height:1.1;">'+score+'</div>';
     html += '</div>';
     html += '<div style="text-align:center;min-width:80px;">';
     html += '<div style="font-size:11px;color:var(--dim);">环比</div>';
-    html += '<div style="font-size:18px;font-weight:700;color:'+(sc.delta_pct>=0?'var(--up)':'var(--down)')+';line-height:1.1;">'+(sc.delta_pct>0?'+':'')+sc.delta_pct+'%</div>';
+    html += '<div style="font-size:18px;font-weight:700;color:'+(delta_pct>=0?'var(--up)':'var(--down)')+';line-height:1.1;">'+(delta_pct>0?'+':'')+delta_pct+'%</div>';
     html += '</div>';
-    html += '<div style="flex:1;min-width:200px;font-size:13px;color:var(--txt);line-height:1.5;">'+sc.advice+'</div>';
+    html += '<div style="flex:1;min-width:200px;font-size:13px;color:var(--txt);line-height:1.5;">'+advice+'</div>';
     html += '</div>';
     // 指标行
     html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;">';
