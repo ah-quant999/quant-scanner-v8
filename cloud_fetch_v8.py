@@ -111,7 +111,7 @@ CATEGORY_MAP = {
     # 盘中：全A等权平均股价的日内变化 + 中期水位（一次抓取喂两处展示：AI 速览买卖信号 + 个股查询摘要行）
     # 注：此处曾误写「盘后」注释但取值实为 intraday；2026-08-12 已把 update_v8.py CATEGORY_MAP 同步对齐为 intraday
     "AVG_PRICE_DATA": "intraday",
-    "OVERSEAS_MARKETS": "premarket",  # 海外/亚太股市观测（日经/KOSPI/台湾加权），盘前抓取前一交易日收盘
+    "OVERSEAS_MARKETS": "intraday",  # 亚太市场(日经/恒生/KOSPI/台湾)：交易时段实时更新，盘中每轮刷新
 }
 
 _ak = None
