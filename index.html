@@ -2738,7 +2738,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <button class="st-tab" data-st="allsite" onclick="switchSt('allsite')">🌐 全站精选 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
       <button class="st-tab" data-st="rps" onclick="switchSt('rps')">📈 相对强度 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用·固定</span></button>
-      <button class="st-tab" data-st="pr" onclick="switchSt('pr')">🔮 潜力参考 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#c4b5fd;background:rgba(167,139,250,.12);padding:1px 6px;border-radius:4px">试运行</span></button>
+      <button class="st-tab" data-st="pr" onclick="switchSt('pr')">🔮 潜力参考</button>
     </div>
 
     <!-- ===== TAB 页面：大牛股猎手（2026-08-08 从「共振日历」迁入） ===== -->
@@ -3007,14 +3007,19 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <!-- 🌡️ 情绪周期定位已合并至实时数据区「情绪周期·连板天梯」(cycleLadderCard)，2026-08-14 主人令 -->
       <!-- 🔮 潜力挖掘（热门概念×温和涨幅×活跃度） -->
       <div class="card" style="margin-bottom:16px">
-        <h3><span class="ic">🔮</span>潜力挖掘 <span style="font-size:10.5px;padding:2px 8px;border-radius:8px;font-weight:600;background:rgba(167,139,250,.12);color:#c4b5fd;border:1px solid rgba(167,139,250,.3);">🧪 试运行</span></h3>
+        <h3><span class="ic">🔮</span>潜力挖掘</h3>
         <div id="ppBody"><div class="note">加载中…</div></div>
       </div>
       <!-- 📌 ETF·龙头 参考（概念→ETF映射+龙头股） -->
       <div class="card" style="margin-bottom:16px">
-        <h3><span class="ic">📌</span>概念/行业 → ETF·龙头 参考 <span style="font-size:11px;color:var(--dim);">实验区 · 不构成投资建议</span></h3>
+        <h3><span class="ic">📌</span>概念/行业 → ETF·龙头 参考 <span style="font-size:11px;color:var(--dim);">不构成投资建议</span></h3>
         <div style="font-size:11px;color:var(--dim);margin-bottom:8px;">⚠️ 仅根据当前热点板块列出代表性 ETF 与龙头股，<b style="color:#fbbf24">不构成任何投资建议</b>。</div>
         <div id="prEtfMapBody"><div class="note">加载中…</div></div>
+      </div>
+      <!-- 💹 商品涨价弹性榜（事件驱动：大宗品涨价→A股弹性标的） -->
+      <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
+        <h3><span class="ic">💹</span>商品涨价弹性榜 <span style="font-size:11px;color:var(--dim);">事件驱动 · 涨价完冲就好了</span></h3>
+        <div id="ceBody"><div class="note">加载中…</div></div>
       </div>
     </div><!--/st-pr-->
 
@@ -9402,6 +9407,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         var etfDst=document.getElementById('prEtfMapBody');
         if(etfSrc && etfDst) etfDst.innerHTML = etfSrc.innerHTML;
       }catch(e){ console.warn('ETF龙头克隆失败',e); }
+      try{ if(typeof window._fillCommodityElasticity==='function') window._fillCommodityElasticity(); }catch(e){ console.warn('商品涨价弹性榜渲染失败',e); }
     }
   }
   window.switchSt=function(n){
@@ -10409,21 +10415,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     // ── 2026-08-11 主人令：💰 平均股价（全A等权）已迁到「📡 实时数据」tab 跟随 AI 市场速览展示 ──
 
-    // ════ 2026-08-13 主人令：暂未上架三张新卡（涨价榜/情绪周期/潜力挖掘）══ 做好非试验，观察试运行 ═══
-
-    // ── 💹 商品涨价弹性榜（事件驱动：高手"涨价完冲就好了"实战经验）
-    var ce = window.COMMODITY_ELASTICITY || {};
-    h += '<div style="margin:16px 0;border-left:4px solid #f59e0b;" class="card">';
-    h += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">';
-    h += '<span style="font-size:15px;font-weight:700;color:#fbbf24;">💹 商品涨价弹性榜</span>';
-    h += '<span style="font-size:10.5px;padding:2px 8px;border-radius:8px;font-weight:600;background:rgba(245,158,11,.12);color:#fbbf24;border:1px solid rgba(245,158,11,.3);">🧪 试运行 · 仅观察</span>';
-    h += '<span style="font-size:11px;color:var(--dim);">涨价完冲就好了 · A 股弹性标的清单</span>';
-    h += _uBadge((ce||{}).slot, (ce||{}).horizon, (ce||{}).update_time);
-    h += '</div>';
-    h += '<div style="font-size:11px;color:var(--dim);margin-bottom:10px;line-height:1.6;">监控 10 个大宗品价格，列出"涨价受益最大"的 A 股弹性标的。弹性系数 = 偏离 30 日均值 × 业务占比 × 杠杆 1.5（简化估算）。<b style="color:#fbbf24">实验区，不构成投资建议</b>。</div>';
-    var _ceBody = '<div id="ceBody"><div class="note">加载中…</div></div>';
-    h += _ceBody;
-    h += '</div>';
+    // ════ 2026-08-14 主人令：商品涨价弹性榜已迁至选股策略子TAB「潜力参考」(st-pr)，此处不再渲染 ═══
 
     // 2026-08-14 主人令：情绪周期定位/潜力挖掘 已迁至选股策略子TAB「潜力参考」(st-pr)，此处不再重复渲染
     // 2026-08-14 主人令：ETF·龙头参考 已迁至选股策略子TAB「潜力参考」(st-pr)，此处不再重复渲染
@@ -10432,9 +10424,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     el.innerHTML=h;
     if(typeof window.renderPortfolio==='function') window.renderPortfolio();
-    // 2026-08-13 主人令：填充三张新卡（涨价榜/情绪周期/潜力挖掘）
-    if(typeof window._fillCommodityElasticity==='function') window._fillCommodityElasticity();
-    // 2026-08-14 主人令：情绪周期/潜力挖掘/ETF龙头 fill 改由 switchSt('pr') 触发（已迁选股策略子TAB）
+    // 2026-08-14 主人令：涨价榜/情绪周期/潜力挖掘/ETF龙头 fill 改由 switchSt('pr') 触发（已迁选股策略子TAB）
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderUnlisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
   }
 
