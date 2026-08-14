@@ -5,6 +5,7 @@
 规则：
 - 关键 data/*.js 必须存在且字节数 >= 阈值（阈值远小于正常体积，只拦 shell/空文件）。
 - 首行必须是 `window.<NAME> =` 形式（非报错页/空文件）。
+- 全部 data/*.js 合计必须 >= 1MB（防止大面积被 shell 覆盖）。
 - 任一不达标 -> exit 1，CI 据此阻断部署，保留上一次 good data。
 依赖：仅标准库
 """
@@ -24,19 +25,88 @@ MIN_SIZE = {
     "GOLD_POOL.js": 8000,
     "LHB_DATA.js": 8000,
     "COCKPIT_BACKTEST.js": 40000,
+    "JUDGMENT_DATA.js": 576,
+    "V8_CAL.js": 1754,
+    "CRISIS_DATA.js": 331,
+    "MACRO_BRIEF.js": 492,
+    "SENTIMENT_CYCLE.js": 392,
+    "RISK_GAUGE.js": 741,
+    "LIMIT_UP_HEATMAP.js": 748,
+    "OVERSEAS_MARKETS.js": 360,
+    "MARKET_ALERTS.js": 319,
+    "AVG_PRICE_DATA.js": 307,
+    "INST_TRADE.js": 4756,
+    "IPO_DATA.js": 7655,
+    "LHB_7D.js": 1826,
+    "LHB_HISTORY.js": 295035,
+    "SECTOR_FUND_FLOW_TREND.js": 3378,
+    "SECTOR_RS.js": 21907,
+    "STOCK_LIST.js": 628871,
+    "STOCK_PROFILE.js": 222906,
+    "STOCK_STOP_DATA.js": 8526,
+    "TRIPLE_CONSENSUS.js": 2193,
+    "TRIPLE_TRACK.js": 2234,
+    "TRIPLE_HISTORY.js": 563,
+    "MAHORO.js": 8608,
+    "MARKET_FUND_FLOW_DATA.js": 8950,
+    "MARGIN_DATA.js": 2680,
+    "ETF_SUBSCRIPTION.js": 3292,
+    "ETF_INTRADAY_HEAT.js": 7911,
+    "CONCEPT_RANKING.js": 2461,
+    "CONCEPT_ETF_MAP.js": 3564,
+    "COMMODITY_ELASTICITY.js": 2126,
+    "COCKPIT_TIER_RECOMMEND.js": 1964,
+    "CAPITAL_FLOW_DATA.js": 1195,
+    "POTENTIAL_PICKS.js": 1281,
+    "BACKTEST_TDX.js": 1350,
+    "BACKTEST_COMPREHENSIVE.js": 1395,
+    "OPTIMIZED_STRATEGY.js": 342,
+    "INDEX_QUOTES.js": 348,
+    "FOUR_VOLUME.js": 669,
+    "FOUR_VOLUME_60M.js": 895,
+    "VOLATILITY.js": 716,
+    "NT_DATA.js": 628,
+    "ANALYST_RATINGS.js": 1076,
+    "SH_SZ_HISTORY.js": 5755,
+    "CFFEX_HOLDINGS.js": 1773,
+    "ETF_PULSE.js": 371,
+    "SUSPENSION_ALERT.js": 448,
+    "W52_HIGH.js": 312,
+    "SH_FIB.js": 750,
+    "SZ_FIB.js": 769,
+    "MACRO_DATA.js": 823,
+    "EXPERIMENT.js": 961,
+    "CRDS_CARD_DATA.js": 11284,
+    "HEALTH_CHECK.js": 3972,
+    "RUNNER_STATUS.js": 442,
+    "RUNNER_STATUS_HEALTH.js": 93,
+    "PORTFOLIO.js": 426,
+    "PORTFOLIO_COST.js": 383,
+    "HERDING_DATA.js": 203,
+    "NORTH_FUND.js": 94,
+    "WEEKEND_RUN.js": 89,
+    "WEEKEND_META_REPORT.js": 106
 }
+MIN_TOTAL = 1000000
 
 bad = []
-for name, mn in MIN_SIZE.items():
-    p = DATA / name
-    if not p.exists():
-        bad.append((name, 0, mn, "缺失")); continue
+actual_total = 0
+for p in sorted(DATA.glob("*.js")):
+    name = p.name
     sz = p.stat().st_size
+    actual_total += sz
+    if name not in MIN_SIZE:
+        continue
+    mn = MIN_SIZE[name]
     if sz < mn:
-        bad.append((name, sz, mn, "过小(疑似shell)")); continue
+        bad.append((name, sz, mn, "过小(疑似shell)"))
+        continue
     head = p.read_text(encoding="utf-8", errors="ignore")[:60]
     if not head.lstrip().startswith("window."):
         bad.append((name, sz, mn, "首行非 window. 赋值(格式异常)"))
+
+if actual_total < MIN_TOTAL:
+    bad.append(("ALL data/*.js total", actual_total, MIN_TOTAL, "总体积过小(大面积shell)"))
 
 if bad:
     print("X 部署前校验失败，疑似空/陈旧 raw_data 生成 shell，阻断部署：".replace("X","❌"))
@@ -44,4 +114,4 @@ if bad:
         print(f"   {name}: {sz}B ({why}, 阈值 {mn}B)")
     sys.exit(1)
 
-print(f"OK 部署前校验通过：{len(MIN_SIZE)} 个关键产物均非空且格式正常".replace("OK","✅"))
+print(f"OK 部署前校验通过：{len(MIN_SIZE)} 个关键产物均非空，data/*.js 总体积 {actual_total}B".replace("OK","✅"))
