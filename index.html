@@ -2470,58 +2470,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     })();
     </script>
 
-  </section>
-
-
-
-
-
-  <!-- ============ 盘后数据 ============ -->
-  <section id="sec-ph">
-    <div class="sec-head"><h2>🌙 盘后数据</h2><span class="tag">收盘后生成</span></div>
-
-    
-    <!-- 斐波那契窗口 -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📉</span>斐波那契窗口 · 当前回调状态<span class="fresh" id="phFibTime">—</span></h3>
-      <div style="font-size:11px;color:var(--dim);margin:-6px 0 10px 0;line-height:1.5;">📌 基于日K收盘数据计算，仅收盘后更新，盘前/盘中不刷新</div>
-      <div class="ph-fib-grid" id="phFibGrid">
-        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibDays">--</div><div class="ph-fib-lbl">已回调交易日</div></div>
-        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibPct">--</div><div class="ph-fib-lbl">累计跌幅</div></div>
-        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibPoints">--</div><div class="ph-fib-lbl">下跌点数</div></div>
-        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibNext">--</div><div class="ph-fib-lbl" id="phFibNextLbl">下一窗口跟踪</div></div>
-      </div>
-      <div class="ph-fib-badge" id="phFibBadge">--</div>
-    </div>
-
-    <!-- 板块资金三合一（v6 风格移植：盘中追热 + 收盘复盘 + 中期趋势） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📈</span>板块资金三合一 - 盘中+盘后+趋势 · <span class="fresh" id="phSectorTime">—</span></h3>
-
-      <!-- Block 1: 盘中追热 -->
-      <div class="sf-block sf-block-hot">
-        <div class="sf-block-title"><span class="sf-block-icon">🚀</span>盘中追热</div>
-        <div id="sfBlock1"><div class="ipo-empty">加载中…</div></div>
-      </div>
-
-      <!-- Block 2: 收盘复盘 -->
-      <div class="sf-block sf-block-close">
-        <div class="sf-block-title"><span class="sf-block-icon">🔥</span>收盘复盘</div>
-        <div id="sfBlock2"><div class="ipo-empty">加载中…</div></div>
-      </div>
-
-      <!-- Block 3: 板块周期（上半周期定位 + 下半资金验证） -->
-      <div class="sf-block sf-block-trend">
-        <div class="sf-block-title"><span class="sf-block-icon">🔄</span>板块周期</div>
-        <div id="sfBlock3"><div class="ipo-empty">加载中…</div></div>
-      </div>
-    </div>
-
-
-
-    <!-- 行业树图 · 细分赛道（盘后数据源，从实时数据区移入） -->
-
-    <!-- 行业树图 · 细分赛道 -->
+    <!-- 行业树图 · 细分赛道（盘中实时数据源 SECTOR_FUND_FLOW，置于实时数据页最下方） -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">🏭</span>行业树图 · 细分赛道 · <span class="fresh" id="htUpdateTime">—</span></h3>
       <div id="industryTreemap" style="min-height:260px;max-height:360px;overflow:auto;"></div>
@@ -2531,13 +2480,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
     </div>
 
-
     <script>
     (function(){
       var $=function(id){return document.getElementById(id)};
       function fmt(v){return v==null?'--':Number(v).toFixed(2)}
       function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
-      function rel(ts){return window._fmtAshareRel?window._fmtAshareRel(ts):String(ts)}
       function renderIndustryTree(){
         var el=$('industryTreemap');
         if(!el) return;
@@ -2604,6 +2551,56 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       window._renderIndustryTree=renderIndustryTree;
     })();
     </script>
+
+  </section>
+
+
+
+
+
+  <!-- ============ 盘后数据 ============ -->
+  <section id="sec-ph">
+    <div class="sec-head"><h2>🌙 盘后数据</h2><span class="tag">收盘后生成</span></div>
+
+    
+    <!-- 斐波那契窗口 -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📉</span>斐波那契窗口 · 当前回调状态<span class="fresh" id="phFibTime">—</span></h3>
+      <div style="font-size:11px;color:var(--dim);margin:-6px 0 10px 0;line-height:1.5;">📌 基于日K收盘数据计算，仅收盘后更新，盘前/盘中不刷新</div>
+      <div class="ph-fib-grid" id="phFibGrid">
+        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibDays">--</div><div class="ph-fib-lbl">已回调交易日</div></div>
+        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibPct">--</div><div class="ph-fib-lbl">累计跌幅</div></div>
+        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibPoints">--</div><div class="ph-fib-lbl">下跌点数</div></div>
+        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibNext">--</div><div class="ph-fib-lbl" id="phFibNextLbl">下一窗口跟踪</div></div>
+      </div>
+      <div class="ph-fib-badge" id="phFibBadge">--</div>
+    </div>
+
+    <!-- 板块资金三合一（v6 风格移植：盘中追热 + 收盘复盘 + 中期趋势） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📈</span>板块资金三合一 - 盘中+盘后+趋势 · <span class="fresh" id="phSectorTime">—</span></h3>
+
+      <!-- Block 1: 盘中追热 -->
+      <div class="sf-block sf-block-hot">
+        <div class="sf-block-title"><span class="sf-block-icon">🚀</span>盘中追热</div>
+        <div id="sfBlock1"><div class="ipo-empty">加载中…</div></div>
+      </div>
+
+      <!-- Block 2: 收盘复盘 -->
+      <div class="sf-block sf-block-close">
+        <div class="sf-block-title"><span class="sf-block-icon">🔥</span>收盘复盘</div>
+        <div id="sfBlock2"><div class="ipo-empty">加载中…</div></div>
+      </div>
+
+      <!-- Block 3: 板块周期（上半周期定位 + 下半资金验证） -->
+      <div class="sf-block sf-block-trend">
+        <div class="sf-block-title"><span class="sf-block-icon">🔄</span>板块周期</div>
+        <div id="sfBlock3"><div class="ipo-empty">加载中…</div></div>
+      </div>
+    </div>
+
+
+
     <!-- 📌 概念/行业 → ETF·龙头 参考（仅研究参考，不构成投资建议）—— 2026-08-11 移至暂未上架实验区 -->
     <div class="card" style="margin-bottom:16px;display:none;">
       <h3><span class="ic">📌</span>概念/行业 → ETF·龙头 参考<span class="fresh" id="etfMapTime">—</span></h3>
