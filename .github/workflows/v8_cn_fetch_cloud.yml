@@ -109,9 +109,14 @@ jobs:
         #   失败时不 retry——直接 fail，让 v8_health_patrol 自愈派发；
         #   但配合 v8_health_patrol 的「无数据即派发」护栏（见 step 4 末尾），
         #   5 分钟内会被新派发接手，不会卡死。
+        # 🔴 2026-08-14 根因修复（小九令）：actions/checkout@v4 默认会先执行 git clean -ffdx，
+        #   本机 self-hosted runner 的 worktree 被 WorkBuddy safe-delete 守卫按 50 文件阈值拦截
+        #   （.git 需清理 430 个文件），导致 checkout step 100% 失败（77/77 runs）。
+        #   加 clean: false 跳过 git clean 批量删，直接复用/覆盖现有 worktree，彻底绕开阈值。
         with:
           fetch-depth: 1
           timeout-minutes: 5
+          clean: false
 
       - uses: actions/setup-python@v5
         with:
