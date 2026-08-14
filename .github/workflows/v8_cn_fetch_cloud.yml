@@ -106,20 +106,20 @@ jobs:
           # 注：原 if 兜底已删（重复 echo 同一 output 键会导致 GitHub Action 报 Multiple outputs）
 
       - uses: actions/checkout@v4
+        timeout-minutes: 5
         # 🛡️ 2026-08-13 14:54 根因修复（小九令）：原 checkout 默认 1 分钟超时，
         #   self-hosted cn runner 在中国 IP 拉 GitHub 偶发 60s 超时（#194 step 3 failure
         #   根因），导致整个 fetch job 失败、main 上 raw_data 缺口无人补。
         #   改 timeout=5min（容忍网络抖动）+ fetch-depth=1（默认，已省带宽）。
-        #   失败时不 retry——直接 fail，让 v8_health_patrol 自愈派发；
-        #   但配合 v8_health_patrol 的「无数据即派发」护栏（见 step 4 末尾），
-        #   5 分钟内会被新派发接手，不会卡死。
+        #   ⚠️ timeout-minutes 必须放在 step 级（与 uses 同级），不能放在 actions/checkout 的 with 里，
+        #   否则 actions/checkout@v4 会报 "Unexpected input(s) 'timeout-minutes'" 并忽略整个 with 块，
+        #   导致 clean:false 失效，safe-delete 继续拦截（2026-08-14 16:37 实测）。
         # 🔴 2026-08-14 根因修复（小九令）：actions/checkout@v4 默认会先执行 git clean -ffdx，
         #   本机 self-hosted runner 的 worktree 被 WorkBuddy safe-delete 守卫按 50 文件阈值拦截
         #   （.git 需清理 430 个文件），导致 checkout step 100% 失败（77/77 runs）。
         #   加 clean: false 跳过 git clean 批量删，直接复用/覆盖现有 worktree，彻底绕开阈值。
         with:
           fetch-depth: 1
-          timeout-minutes: 5
           clean: false
 
       - uses: actions/setup-python@v5

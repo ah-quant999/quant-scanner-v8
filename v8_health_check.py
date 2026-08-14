@@ -1101,9 +1101,127 @@ def check_site_deploy_sync():
 
 
 def check_runner():
-    """self-hosted runner（lemoncat-cn）已弃用，全部 workflow 迁 GitHub Actions 云端 ubuntu-latest。
-    该检查项保留为历史占位，状态恒 ok，避免误告警。"""
-    return [{"id": "runner", "name": "self-hosted runner", "page": "管线", "status": "ok", "message": "已迁移至 GitHub Actions 云端 ubuntu-latest，本地 runner 监控已下线"}]
+    """self-hosted runner 健康检查（多源融合）。
+
+    1. 优先读 data/RUNNER_STATUS.js（本地 runner 守护 v8_runner_guard.py 产出，
+       经 update_v8.py 从 raw_data/runner_status.json 生成）。
+    2. 若不存在则回退读 raw_data/runner_status.json。
+    3. 同时用 GitHub API 检查 cn_fetch 最近运行中连续失败 / checkout 失败，
+       作为云端视角的交叉验证。
+    """
+    results = []
+    runner_status = None
+
+    # 1. 读本地 runner 守护上报的状态
+    rs_path = DATA_DIR / "RUNNER_STATUS.js"
+    if rs_path.exists():
+        runner_status = load_window_var(rs_path, "RUNNER_STATUS")
+    else:
+        rs_raw = RAW_DIR / "runner_status.json"
+        if rs_raw.exists():
+            try:
+                runner_status = json.loads(rs_raw.read_text(encoding="utf-8"))
+            except Exception:
+                runner_status = None
+
+    local_msg = "本地 runner 守护未上报状态"
+    if runner_status:
+        st = runner_status.get("status", "unknown")
+        msg = runner_status.get("message", "无详情")
+        if st == "ok":
+            results.append({"id": "runner_local", "name": "runner 本地检测", "page": "管线", "status": "ok", "message": msg})
+        elif st == "warn":
+            results.append({"id": "runner_local", "name": "runner 本地检测", "page": "管线", "status": "warn", "message": msg})
+        else:
+            results.append({"id": "runner_local", "name": "runner 本地检测", "page": "管线", "status": "fail", "message": msg})
+        local_msg = msg
+
+    # 2. GitHub API 视角：连续失败 / checkout 失败
+    token = _load_token()
+    if token:
+        url = f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_WORKFLOW_ID}/runs?per_page=10"
+        data = api_get(url)
+        if data and "__error__" not in data:
+            runs = data.get("workflow_runs", [])
+            consecutive = 0
+            for r in runs:
+                if r.get("conclusion") == "failure":
+                    consecutive += 1
+                elif r.get("conclusion") in ("success", "cancelled"):
+                    # cancelled 也会中断失败 streak（超时被取消不算连续失败）
+                    break
+                elif r.get("status") in ("in_progress", "queued", "pending"):
+                    break
+            checkout_failures = 0
+            latest_fail = next((r for r in runs if r.get("conclusion") == "failure"), None)
+            if latest_fail:
+                jdata = api_get(latest_fail.get("jobs_url", ""))
+                if jdata and "__error__" not in jdata:
+                    for job in jdata.get("jobs", []):
+                        for step in job.get("steps", []):
+                            if "checkout" in (step.get("name") or "").lower() and step.get("conclusion") == "failure":
+                                checkout_failures += 1
+
+            latest = runs[0] if runs else None
+            latest_failed = latest and latest.get("conclusion") == "failure"
+
+            # 检测 stuck in_progress
+            stuck_min = 0
+            if latest and latest.get("status") == "in_progress":
+                try:
+                    started = datetime.strptime(latest.get("started_at") or latest.get("created_at"), "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+                    stuck_min = int((datetime.now(timezone.utc) - started).total_seconds() / 60)
+                except Exception:
+                    stuck_min = 0
+
+            is_fail = (latest_failed and checkout_failures > 0) or consecutive >= 3
+            is_warn = (latest_failed and not is_fail) or (latest and latest.get("status") == "in_progress" and stuck_min > 10)
+
+            if is_fail:
+                results.append({
+                    "id": "runner_github",
+                    "name": "runner GitHub API 检测",
+                    "page": "管线",
+                    "status": "fail",
+                    "message": f"cn_fetch 最新失败且 checkout 失败 / 连续失败 {consecutive} 次（本地状态: {local_msg}）",
+                })
+            elif is_warn:
+                stuck_info = f"，最新 run 卡住 {stuck_min} 分钟" if stuck_min > 0 else ""
+                results.append({
+                    "id": "runner_github",
+                    "name": "runner GitHub API 检测",
+                    "page": "管线",
+                    "status": "warn",
+                    "message": f"cn_fetch 最新一次失败（非 checkout，连续 {consecutive} 次）{stuck_info}（本地状态: {local_msg}）",
+                })
+            else:
+                results.append({
+                    "id": "runner_github",
+                    "name": "runner GitHub API 检测",
+                    "page": "管线",
+                    "status": "ok",
+                    "message": f"最近运行正常（本地状态: {local_msg}）",
+                })
+        else:
+            err = data.get("__msg__", "unknown") if isinstance(data, dict) else "API 失败"
+            results.append({"id": "runner_github", "name": "runner GitHub API 检测", "page": "管线", "status": "warn", "message": f"API 查询失败: {err}"})
+    else:
+        results.append({"id": "runner_github", "name": "runner GitHub API 检测", "page": "管线", "status": "warn", "message": "无 token，跳过 GitHub API 检测"})
+
+    # 汇总：任一 fail 则总体 fail
+    overall = "ok"
+    if any(r["status"] == "fail" for r in results):
+        overall = "fail"
+    elif any(r["status"] == "warn" for r in results):
+        overall = "warn"
+
+    return results + [{
+        "id": "runner",
+        "name": "self-hosted runner",
+        "page": "管线",
+        "status": overall,
+        "message": " | ".join(f"{r['name']}:{r['status']}-{r['message']}" for r in results),
+    }]
 
 
 def check_local_head_sync():
