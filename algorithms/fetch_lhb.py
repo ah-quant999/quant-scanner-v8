@@ -71,6 +71,48 @@ def get_date_str(target_date=None):
         target_date = target_date - datetime.timedelta(days=1)
     return target_date.strftime("%Y%m%d")
 
+_TRADE_CAL_CACHE = {"ts": 0, "set": None}
+_TRADE_CAL_TTL = 24 * 3600  # 24h 缓存一次
+
+def _get_trade_cal():
+    """从 akshare 拉取交易日历（带缓存）。失败返回 None。"""
+    import time
+    if time.time() - _TRADE_CAL_CACHE["ts"] < _TRADE_CAL_TTL and _TRADE_CAL_CACHE["set"] is not None:
+        return _TRADE_CAL_CACHE["set"]
+    try:
+        df = ak.tool_trade_date_hist_sina()
+        if df is None or len(df) == 0:
+            return None
+        cal = set(str(d) for d in df["trade_date"].tolist())
+        _TRADE_CAL_CACHE["set"] = cal
+        _TRADE_CAL_CACHE["ts"] = time.time()
+        return cal
+    except Exception as e:
+        log(f"⚠️ 拉取交易日历失败: {e}，回退到周末判定")
+        return None
+
+def is_trading_day(date_str):
+    """判断给定日期是否为真实交易日（用于防 API 抖动把交易日误标 trading=False）。
+    优先级：交易日历 > 周末判定 > 默认 True（保守不写占位）。
+    返回 True 表示是交易日，False 表示非交易日（可写占位）。
+    """
+    if len(date_str) == 8:
+        try:
+            d = datetime.date(int(date_str[:4]), int(date_str[4:6]), int(date_str[6:]))
+        except Exception:
+            return True
+    else:
+        try:
+            d = datetime.datetime.strptime(date_str, "%Y-%m-%d").date()
+        except Exception:
+            return True
+    if d.weekday() >= 5:
+        return False
+    cal = _get_trade_cal()
+    if cal is not None:
+        return d.strftime("%Y-%m-%d") in cal
+    return True  # 查不到日历时保守：视为交易日（不写占位）
+
 def fetch_lhb_list(date_str):
     try:
         df = ak.stock_lhb_detail_em(start_date=date_str, end_date=date_str)
@@ -208,9 +250,15 @@ def main():
 
     stocks = fetch_lhb_list(date_str)
     if not stocks:
-        print("无龙虎榜数据（节假日或数据尚未发布）")
-        # 非周末空数据 → 写节假日占位，避免历史日历显示陈旧数据
-        _update_lhb_history({}, date_str, trading=False)
+        # ★ 2026-08-14 主人令永久修复：API 抖动也会返回空，不能仅凭"接口空数据"就写 trading=False。
+        # 真实教训：2026-08-04~13 因 cn runner 网络抖动，ak 接口返回空，
+        #   fetch_lhb 把 7 个正常交易日误标为非交易日 → 共振日历显示空白 → 主人截图报错。
+        # 永久解法：先用交易日历校验；只有日历确认是非交易日才写占位；否则只打日志不写。
+        if not is_trading_day(date_str):
+            print(f"  📅 {date_str} 经交易日历确认为非交易日，写占位 trading=False")
+            _update_lhb_history({}, date_str, trading=False)
+        else:
+            print(f"  ⚠️ {date_str} 交易日历显示为交易日，但龙虎榜接口空数据 —— API 抖动/限流，**不写占位**以免污染历史日历")
         return
 
     # 按龙虎榜净买额绝对值排序，只分析前 DETAIL_LIMIT 只（防超时/限流）
