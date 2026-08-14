@@ -3016,18 +3016,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <!-- 🌡️ 情绪周期定位已合并至实时数据区「情绪周期·连板天梯」(cycleLadderCard)，2026-08-14 主人令 -->
       <!-- 🔮 潜力挖掘（热门概念×温和涨幅×活跃度） -->
       <div class="card" style="margin-bottom:16px">
-        <h3><span class="ic">🔮</span>潜力挖掘</h3>
+        <h3><span class="ic">🔮</span>潜力挖掘 <span class="fresh" id="prPPFresh">—</span></h3>
         <div id="ppBody"><div class="note">加载中…</div></div>
       </div>
       <!-- 📌 ETF·龙头 参考（概念→ETF映射+龙头股） -->
       <div class="card" style="margin-bottom:16px">
-        <h3><span class="ic">📌</span>概念/行业 → ETF·龙头 参考 <span style="font-size:11px;color:var(--dim);">不构成投资建议</span></h3>
+        <h3><span class="ic">📌</span>概念/行业 → ETF·龙头 参考 <span class="fresh" id="prEtfFresh">—</span> <span style="font-size:11px;color:var(--dim);">不构成投资建议</span></h3>
         <div style="font-size:11px;color:var(--dim);margin-bottom:8px;">⚠️ 仅根据当前热点板块列出代表性 ETF 与龙头股，<b style="color:#fbbf24">不构成任何投资建议</b>。</div>
         <div id="prEtfMapBody"><div class="note">加载中…</div></div>
       </div>
       <!-- 💹 商品涨价弹性榜（事件驱动：大宗品涨价→A股弹性标的） -->
       <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
-        <h3><span class="ic">💹</span>商品涨价弹性榜 <span style="font-size:11px;color:var(--dim);">事件驱动 · 涨价完冲就好了</span></h3>
+        <h3><span class="ic">💹</span>商品涨价弹性榜 <span class="fresh" id="prCEFresh">—</span> <span style="font-size:11px;color:var(--dim);">事件驱动 · 涨价完冲就好了</span></h3>
         <div id="ceBody"><div class="note">加载中…</div></div>
       </div>
     </div><!--/st-pr-->
@@ -9107,6 +9107,10 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         var etfSrc=document.getElementById('etfMapBody');
         var etfDst=document.getElementById('prEtfMapBody');
         if(etfSrc && etfDst) etfDst.innerHTML = etfSrc.innerHTML;
+        // ⚖️ 2026-08-14 主人令：加"更新于"统一胶囊（ETF龙头卡）
+        var em = window.CONCEPT_ETF_MAP || {};
+        var tm=document.getElementById('prEtfFresh');
+        if(tm) tm.innerHTML = _uBadge('盘后','短线',em.update_time||null);
       }catch(e){ console.warn('ETF龙头克隆失败',e); }
       try{ if(typeof window._fillCommodityElasticity==='function') window._fillCommodityElasticity(); }catch(e){ console.warn('商品涨价弹性榜渲染失败',e); }
     }
@@ -10116,6 +10120,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   // 💹 商品涨价弹性榜
   window._fillCommodityElasticity = function(){
     var ce = window.COMMODITY_ELASTICITY;
+    // ⚖️ 2026-08-14 主人令：加"更新于"统一胶囊（涨价榜卡）
+    try{ var tm=document.getElementById('prCEFresh'); if(tm) tm.innerHTML = _uBadge('盘后','短线',(ce&&ce.update_time)||null); }catch(e){}
     var dst = document.getElementById('ceBody');
     if(!dst) return;
     if(!ce || !ce.commodities || !ce.commodities.length){
@@ -10264,6 +10270,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   // 🔮 潜力挖掘
   window._fillPotentialPicks = function(){
     var pp = window.POTENTIAL_PICKS;
+    // ⚖️ 2026-08-14 主人令：加"更新于"统一胶囊（潜力挖掘卡）
+    try{ var tm=document.getElementById('prPPFresh'); if(tm) tm.innerHTML = _uBadge('盘后','短线',(pp&&pp.update_time)||null); }catch(e){}
     var dst = document.getElementById('ppBody');
     if(!dst) return;
     if(!pp || !pp.picks || !pp.picks.length){
