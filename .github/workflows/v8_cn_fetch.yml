@@ -40,6 +40,9 @@ jobs:
     timeout-minutes: 20
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # ⛔️ 2026-08-14 主人令永久修复：WorkBuddy safe-delete 批量删除守卫默认阈值 50
+      #   （alimi-cn 实测 966 文件，100% 被拦、所有 [self-hosted, cn] workflow 必须显式抬到 1000。
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 1000
     defaults:
       run:
         working-directory: ${{ github.workspace }}
