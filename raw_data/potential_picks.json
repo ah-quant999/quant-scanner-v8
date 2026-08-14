@@ -1,239 +1,260 @@
 {
-  "update_time": "2026-08-13 23:10:33",
-  "data_date": "2026-08-13",
+  "update_time": "2026-08-14 17:39:29",
+  "data_date": "2026-08-14",
   "source": "CONCEPT_RANKING × STOCK_PROFILE × STOCK_QUOTE",
   "hot_concepts_count": 33,
   "hot_concepts": [
-    "算力概念",
-    "CRO",
-    "创新药",
-    "WiFi",
-    "东数西算",
-    "金融地产风格",
-    "英伟达概念",
+    "光通信模块",
+    "5G概念",
     "CPO概念",
-    "CAR-T细胞疗法",
-    "液冷概念"
+    "通信技术",
+    "算力概念",
+    "液冷概念",
+    "F5G概念",
+    "光纤概念",
+    "一带一路",
+    "华为概念"
   ],
   "picks": [
     {
-      "code": "300149",
-      "name": "睿智医药",
-      "pct": 5.0,
-      "amount_yi": 9.5,
+      "code": "600498",
+      "name": "烽火通信",
+      "pct": 4.68,
+      "amount_yi": 42.84,
       "hot_concepts": [
-        "CAR-T细胞疗法",
-        "CRO",
-        "创新医疗服务",
-        "创新药"
-      ],
-      "hot_count": 4,
-      "total_score": 10.04
-    },
-    {
-      "code": "603629",
-      "name": "利通电子",
-      "pct": 4.72,
-      "amount_yi": 73.15,
-      "hot_concepts": [
+        "5G概念",
+        "CPO概念",
+        "F5G概念",
+        "IPv6",
+        "一带一路",
         "云计算",
-        "算力概念",
-        "英伟达概念"
+        "光纤概念",
+        "光通信模块"
       ],
-      "hot_count": 3,
-      "total_score": 9.88
+      "hot_count": 8,
+      "total_score": 15.93
     },
     {
-      "code": "603259",
-      "name": "药明康德",
-      "pct": 2.07,
-      "amount_yi": 120.28,
+      "code": "002281",
+      "name": "光迅科技",
+      "pct": 3.61,
+      "amount_yi": 74.52,
       "hot_concepts": [
-        "CAR-T细胞疗法",
-        "CRO",
-        "创新医疗服务",
-        "创新药"
-      ],
-      "hot_count": 4,
-      "total_score": 9.63
-    },
-    {
-      "code": "002317",
-      "name": "众生药业",
-      "pct": 3.76,
-      "amount_yi": 20.26,
-      "hot_concepts": [
-        "中药概念",
-        "创新药",
-        "流感",
-        "病原体防治"
-      ],
-      "hot_count": 4,
-      "total_score": 9.54
-    },
-    {
-      "code": "600721",
-      "name": "百花医药",
-      "pct": 3.35,
-      "amount_yi": 25.72,
-      "hot_concepts": [
-        "CRO",
-        "创新医疗服务",
-        "流感",
-        "病原体防治"
-      ],
-      "hot_count": 4,
-      "total_score": 9.36
-    },
-    {
-      "code": "301047",
-      "name": "义翘神州",
-      "pct": 3.18,
-      "amount_yi": 18.63,
-      "hot_concepts": [
-        "CRO",
-        "创新医疗服务",
-        "病原体防治",
-        "重组蛋白"
-      ],
-      "hot_count": 4,
-      "total_score": 9.35
-    },
-    {
-      "code": "300363",
-      "name": "博腾股份",
-      "pct": 3.85,
-      "amount_yi": 13.36,
-      "hot_concepts": [
-        "CAR-T细胞疗法",
-        "CRO",
-        "创新医疗服务",
-        "流感"
-      ],
-      "hot_count": 4,
-      "total_score": 9.22
-    },
-    {
-      "code": "600222",
-      "name": "太龙药业",
-      "pct": 2.8,
-      "amount_yi": 2.72,
-      "hot_concepts": [
-        "CRO",
-        "中药概念",
-        "创新医疗服务",
-        "创新药",
-        "流感",
-        "病原体防治"
-      ],
-      "hot_count": 6,
-      "total_score": 9.11
-    },
-    {
-      "code": "300347",
-      "name": "泰格医药",
-      "pct": 3.02,
-      "amount_yi": 16.18,
-      "hot_concepts": [
-        "CRO",
-        "创新医疗服务",
-        "创新药"
-      ],
-      "hot_count": 3,
-      "total_score": 8.96
-    },
-    {
-      "code": "688062",
-      "name": "迈威生物",
-      "pct": 4.5,
-      "amount_yi": 5.41,
-      "hot_concepts": [
-        "CAR-T细胞疗法",
-        "创新药",
-        "病原体防治",
-        "重组蛋白"
-      ],
-      "hot_count": 4,
-      "total_score": 8.72
-    },
-    {
-      "code": "603567",
-      "name": "珍宝岛",
-      "pct": 1.89,
-      "amount_yi": 7.09,
-      "hot_concepts": [
-        "中药概念",
-        "创新药",
-        "流感",
-        "特色药",
-        "独家药品",
-        "病原体防治",
-        "破净股"
+        "5G概念",
+        "CPO概念",
+        "F5G概念",
+        "一带一路",
+        "光纤概念",
+        "光通信模块",
+        "华为概念"
       ],
       "hot_count": 7,
-      "total_score": 8.6
+      "total_score": 15.25
     },
     {
-      "code": "603127",
-      "name": "昭衍新药",
-      "pct": 1.47,
-      "amount_yi": 28.25,
+      "code": "600105",
+      "name": "永鼎股份",
+      "pct": 1.4,
+      "amount_yi": 73.04,
       "hot_concepts": [
-        "CRO",
-        "创新医疗服务",
-        "创新药"
+        "5G概念",
+        "CPO概念",
+        "一带一路",
+        "光纤概念",
+        "光通信模块",
+        "华为概念",
+        "大数据"
       ],
-      "hot_count": 3,
-      "total_score": 8.57
+      "hot_count": 7,
+      "total_score": 13.6
     },
     {
-      "code": "603881",
-      "name": "数据港",
-      "pct": -1.79,
-      "amount_yi": 21.51,
+      "code": "000070",
+      "name": "特发信息",
+      "pct": 5.0,
+      "amount_yi": 11.59,
       "hot_concepts": [
-        "东数西算",
-        "云计算",
-        "液冷概念",
+        "5G概念",
+        "CPO概念",
+        "F5G概念",
+        "光纤概念",
+        "华为概念",
+        "大数据"
+      ],
+      "hot_count": 6,
+      "total_score": 13.13
+    },
+    {
+      "code": "300394",
+      "name": "天孚通信",
+      "pct": 4.1,
+      "amount_yi": 137.35,
+      "hot_concepts": [
+        "5G概念",
+        "CPO概念",
+        "光纤概念",
+        "华为概念",
+        "算力概念"
+      ],
+      "hot_count": 5,
+      "total_score": 13.08
+    },
+    {
+      "code": "688313",
+      "name": "仕佳光子",
+      "pct": 1.55,
+      "amount_yi": 25.45,
+      "hot_concepts": [
+        "5G概念",
+        "CPO概念",
+        "F5G概念",
+        "光纤概念",
+        "光通信模块",
+        "数据中心"
+      ],
+      "hot_count": 6,
+      "total_score": 13.07
+    },
+    {
+      "code": "300502",
+      "name": "新易盛",
+      "pct": 4.23,
+      "amount_yi": 171.52,
+      "hot_concepts": [
+        "5G概念",
+        "CPO概念",
+        "光通信模块",
         "算力概念"
       ],
       "hot_count": 4,
-      "total_score": 8.46
+      "total_score": 12.96
     },
     {
-      "code": "688068",
-      "name": "热景生物",
-      "pct": 4.53,
-      "amount_yi": 8.93,
+      "code": "002902",
+      "name": "铭普光磁",
+      "pct": 3.1,
+      "amount_yi": 3.93,
       "hot_concepts": [
-        "体外诊断概念",
-        "创新药",
-        "流感",
-        "病原体防治"
+        "5G概念",
+        "CPO概念",
+        "F5G概念",
+        "光纤概念",
+        "光通信模块",
+        "华为概念"
       ],
-      "hot_count": 4,
-      "total_score": 8.46
+      "hot_count": 6,
+      "total_score": 12.51
     },
     {
-      "code": "300181",
-      "name": "佐力药业",
-      "pct": 2.48,
-      "amount_yi": 7.99,
+      "code": "002491",
+      "name": "通鼎互联",
+      "pct": 3.75,
+      "amount_yi": 55.39,
       "hot_concepts": [
-        "CAR-T细胞疗法",
-        "中药概念",
-        "创新药",
-        "特色药",
-        "独家药品"
+        "5G概念",
+        "光纤概念",
+        "大数据",
+        "网络安全",
+        "通信技术"
       ],
       "hot_count": 5,
-      "total_score": 8.4
+      "total_score": 12.03
+    },
+    {
+      "code": "300308",
+      "name": "中际旭创",
+      "pct": 2.38,
+      "amount_yi": 186.91,
+      "hot_concepts": [
+        "5G概念",
+        "CPO概念",
+        "F5G概念",
+        "光通信模块"
+      ],
+      "hot_count": 4,
+      "total_score": 11.97
+    },
+    {
+      "code": "300620",
+      "name": "光库科技",
+      "pct": 2.47,
+      "amount_yi": 38.44,
+      "hot_concepts": [
+        "5G概念",
+        "CPO概念",
+        "光纤概念",
+        "光通信模块"
+      ],
+      "hot_count": 4,
+      "total_score": 11.95
+    },
+    {
+      "code": "300852",
+      "name": "四会富仕",
+      "pct": 3.54,
+      "amount_yi": 2.92,
+      "hot_concepts": [
+        "5G概念",
+        "CPO概念",
+        "PCB",
+        "光通信模块",
+        "通信技术"
+      ],
+      "hot_count": 5,
+      "total_score": 11.74
+    },
+    {
+      "code": "603220",
+      "name": "中贝通信",
+      "pct": 2.78,
+      "amount_yi": 9.89,
+      "hot_concepts": [
+        "5G概念",
+        "6G概念",
+        "CPO概念",
+        "F5G概念",
+        "一带一路",
+        "物联网"
+      ],
+      "hot_count": 6,
+      "total_score": 11.69
+    },
+    {
+      "code": "002475",
+      "name": "立讯精密",
+      "pct": 0.93,
+      "amount_yi": 40.39,
+      "hot_concepts": [
+        "5G概念",
+        "CPO概念",
+        "光通信模块",
+        "华为概念",
+        "数据中心"
+      ],
+      "hot_count": 5,
+      "total_score": 11.49
+    },
+    {
+      "code": "300252",
+      "name": "金信诺",
+      "pct": 3.26,
+      "amount_yi": 3.26,
+      "hot_concepts": [
+        "5G概念",
+        "6G概念",
+        "F5G概念",
+        "PCB",
+        "光纤概念",
+        "光通信模块"
+      ],
+      "hot_count": 6,
+      "total_score": 11.45
     }
   ],
   "rejected_summary": {
-    "no_hot_concept": 3118,
-    "too_hot": 74,
-    "too_cold": 143,
+    "no_hot_concept": 2708,
+    "too_hot": 128,
+    "too_cold": 91,
     "small_mv": 0,
     "big_mv": 0,
     "no_quote": 0

@@ -1,9 +1,9 @@
 {
-  "update_time": "2026-08-13 17:18",
+  "update_time": "2026-08-14 17:38",
   "window_days": 90,
   "stats": {
     "window_days": 90,
-    "tracking": 7,
+    "tracking": 10,
     "exit_target": 0,
     "exit_stop": 0,
     "exit_timeout": 0,
@@ -13,9 +13,9 @@
     "max_return": 0,
     "max_loss": 0,
     "tracking_distribution": {
-      "rank1": 3,
-      "rank2": 2,
-      "rank3": 2
+      "rank1": 4,
+      "rank2": 3,
+      "rank3": 3
     }
   },
   "tracking": [
@@ -33,7 +33,7 @@
       "last_close": null,
       "last_pct": null,
       "peak_pct": null,
-      "days_in": 6,
+      "days_in": 7,
       "appear_count": 1,
       "last_seen": "20260813",
       "last_rank": 1,
@@ -53,10 +53,10 @@
         "大牛股猎手"
       ],
       "entry_price": null,
-      "last_close": 155.1,
+      "last_close": 161.85,
       "last_pct": null,
       "peak_pct": null,
-      "days_in": 6,
+      "days_in": 7,
       "appear_count": 1,
       "last_seen": "20260813",
       "last_rank": 2,
@@ -75,10 +75,10 @@
         "大牛股猎手"
       ],
       "entry_price": null,
-      "last_close": 58.66,
+      "last_close": 60.65,
       "last_pct": null,
       "peak_pct": null,
-      "days_in": 6,
+      "days_in": 7,
       "appear_count": 1,
       "last_seen": "20260813",
       "last_rank": 3,
@@ -97,10 +97,10 @@
         "四量终极"
       ],
       "entry_price": 18.41,
-      "last_close": 18.41,
-      "last_pct": 0.0,
-      "peak_pct": 0.0,
-      "days_in": 1,
+      "last_close": 18.44,
+      "last_pct": 0.16,
+      "peak_pct": 0.16,
+      "days_in": 2,
       "appear_count": 1,
       "last_seen": "20260813",
       "last_rank": 1,
@@ -121,10 +121,10 @@
         "驾驶舱A档"
       ],
       "entry_price": 5.17,
-      "last_close": 5.17,
-      "last_pct": 0.0,
+      "last_close": 5.14,
+      "last_pct": -0.58,
       "peak_pct": 0.0,
-      "days_in": 0,
+      "days_in": 1,
       "appear_count": 1,
       "last_seen": "20260813",
       "last_rank": 1,
@@ -147,10 +147,10 @@
         "驾驶舱A档"
       ],
       "entry_price": 131.87,
-      "last_close": 131.87,
-      "last_pct": 0.0,
+      "last_close": 130.97,
+      "last_pct": -0.68,
       "peak_pct": 0.0,
-      "days_in": 0,
+      "days_in": 1,
       "appear_count": 1,
       "last_seen": "20260813",
       "last_rank": 2,
@@ -173,10 +173,10 @@
         "驾驶舱B档"
       ],
       "entry_price": 24.31,
-      "last_close": 24.31,
-      "last_pct": 0.0,
+      "last_close": 24.27,
+      "last_pct": -0.16,
       "peak_pct": 0.0,
-      "days_in": 0,
+      "days_in": 1,
       "appear_count": 1,
       "last_seen": "20260813",
       "last_rank": 3,
@@ -186,12 +186,84 @@
         "驾驶舱B档"
       ],
       "first_list": "20260813"
+    },
+    {
+      "code": "300534",
+      "name": "陇神戎发",
+      "list_date": "20260814",
+      "list_date_dashed": "2026-08-14",
+      "list_rank": 1,
+      "list_sources": [
+        "四量终极",
+        "大牛股猎手"
+      ],
+      "entry_price": 18.9,
+      "last_close": 18.9,
+      "last_pct": 0.0,
+      "peak_pct": 0.0,
+      "days_in": 0,
+      "appear_count": 1,
+      "last_seen": "20260814",
+      "last_rank": 1,
+      "last_sources": [
+        "四量终极",
+        "大牛股猎手"
+      ],
+      "first_list": "20260814"
+    },
+    {
+      "code": "300613",
+      "name": "富瀚微",
+      "list_date": "20260814",
+      "list_date_dashed": "2026-08-14",
+      "list_rank": 2,
+      "list_sources": [
+        "板块龙头",
+        "驾驶舱A档"
+      ],
+      "entry_price": 75.91,
+      "last_close": 75.91,
+      "last_pct": 0.0,
+      "peak_pct": 0.0,
+      "days_in": 0,
+      "appear_count": 1,
+      "last_seen": "20260814",
+      "last_rank": 2,
+      "last_sources": [
+        "板块龙头",
+        "驾驶舱A档"
+      ],
+      "first_list": "20260814"
+    },
+    {
+      "code": "300404",
+      "name": "博济医药",
+      "list_date": "20260814",
+      "list_date_dashed": "2026-08-14",
+      "list_rank": 3,
+      "list_sources": [
+        "四量终极",
+        "大牛股猎手"
+      ],
+      "entry_price": 17.34,
+      "last_close": 17.34,
+      "last_pct": 0.0,
+      "peak_pct": 0.0,
+      "days_in": 0,
+      "appear_count": 1,
+      "last_seen": "20260814",
+      "last_rank": 3,
+      "last_sources": [
+        "四量终极",
+        "大牛股猎手"
+      ],
+      "first_list": "20260814"
     }
   ],
   "history": [],
   "_meta": {
     "version": "v1",
-    "schema_date": "2026-08-13",
+    "schema_date": "2026-08-14",
     "note": "90 天滚动追踪 finalRec Top3；entry=上榜日收盘，exit 判定=stoploss/target/timeout"
   }
 }

@@ -37,16 +37,38 @@
       "2026-08-11": 24.24
     },
     "601168": {
-      "2026-08-13": 42.45
+      "2026-08-13": 42.45,
+      "2026-08-14": 42.45
     },
     "603993": {
-      "2026-08-13": 20.75
+      "2026-08-13": 20.75,
+      "2026-08-14": 20.75
     },
     "688331": {
-      "2026-08-13": 131.87
+      "2026-08-13": 131.87,
+      "2026-08-14": 131.87
     },
     "601899": {
-      "2026-08-13": 35.45
+      "2026-08-13": 35.45,
+      "2026-08-14": 35.45
+    },
+    "300274": {
+      "2026-08-14": 0
+    },
+    "688213": {
+      "2026-08-14": 99.25
+    },
+    "000506": {
+      "2026-08-14": 17.55
+    },
+    "000975": {
+      "2026-08-14": 25.96
+    },
+    "600489": {
+      "2026-08-14": 25.56
+    },
+    "688002": {
+      "2026-08-14": 166.25
     }
   },
   "_tracking_latest": {
@@ -82,7 +104,7 @@
       "enter_close": 102.79,
       "last_date": "2026-08-13",
       "last_close": 109.85,
-      "status": "near",
+      "status": "dropped",
       "streak": 1,
       "total_days": 1
     },
@@ -142,40 +164,98 @@
     "601899": {
       "enter_date": "2026-08-13",
       "enter_close": 35.45,
-      "last_date": "2026-08-13",
+      "last_date": "2026-08-14",
       "last_close": 35.45,
       "status": "near",
-      "streak": 1
+      "streak": 2,
+      "total_days": 1
     },
     "603993": {
       "enter_date": "2026-08-13",
       "enter_close": 20.75,
-      "last_date": "2026-08-13",
+      "last_date": "2026-08-14",
       "last_close": 20.75,
       "status": "near",
-      "streak": 1
+      "streak": 2,
+      "total_days": 1
     },
     "688331": {
       "enter_date": "2026-08-13",
       "enter_close": 131.87,
-      "last_date": "2026-08-13",
+      "last_date": "2026-08-14",
       "last_close": 131.87,
-      "status": "near",
-      "streak": 1
+      "status": "strict",
+      "streak": 2,
+      "total_days": 1
     },
     "601168": {
       "enter_date": "2026-08-13",
       "enter_close": 42.45,
-      "last_date": "2026-08-13",
+      "last_date": "2026-08-14",
       "last_close": 42.45,
       "status": "near",
-      "streak": 1
+      "streak": 2,
+      "total_days": 1
+    },
+    "000975": {
+      "enter_date": "2026-08-14",
+      "enter_close": 25.96,
+      "last_date": "2026-08-14",
+      "last_close": 25.96,
+      "status": "near",
+      "streak": 1,
+      "total_days": 1
+    },
+    "000506": {
+      "enter_date": "2026-08-14",
+      "enter_close": 17.55,
+      "last_date": "2026-08-14",
+      "last_close": 17.55,
+      "status": "near",
+      "streak": 1,
+      "total_days": 1
+    },
+    "688213": {
+      "enter_date": "2026-08-14",
+      "enter_close": 99.25,
+      "last_date": "2026-08-14",
+      "last_close": 99.25,
+      "status": "near",
+      "streak": 1,
+      "total_days": 1
+    },
+    "600489": {
+      "enter_date": "2026-08-14",
+      "enter_close": 25.56,
+      "last_date": "2026-08-14",
+      "last_close": 25.56,
+      "status": "near",
+      "streak": 1,
+      "total_days": 1
+    },
+    "688002": {
+      "enter_date": "2026-08-14",
+      "enter_close": 166.25,
+      "last_date": "2026-08-14",
+      "last_close": 166.25,
+      "status": "near",
+      "streak": 1,
+      "total_days": 1
+    },
+    "300274": {
+      "enter_date": "2026-08-14",
+      "enter_close": 0,
+      "last_date": "2026-08-14",
+      "last_close": 0,
+      "status": "near",
+      "streak": 1,
+      "total_days": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-09",
     "created": "2026-08-09 23:57:34",
-    "last_update": "2026-08-13 17:16:01"
+    "last_update": "2026-08-14 17:35:56"
   },
   "2026-08-10": [
     {
@@ -301,6 +381,168 @@
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
         "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    }
+  ],
+  "2026-08-14": [
+    {
+      "code": "688331",
+      "name": "荣昌生物",
+      "market": "sh",
+      "board": "科创板",
+      "close": 131.87,
+      "pct_chg": 1.63,
+      "total_score": 34.8,
+      "quality_grade": "A",
+      "industry": "医药制造业",
+      "sectors": [
+        "医药制造业"
+      ],
+      "signal_count": 0,
+      "status": "strict"
+    },
+    {
+      "code": "603993",
+      "name": "洛阳钼业",
+      "market": "sh",
+      "board": "主板",
+      "close": 20.75,
+      "pct_chg": -0.38,
+      "total_score": 36.0,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "601899",
+      "name": "紫金矿业",
+      "market": "sh",
+      "board": "主板",
+      "close": 35.45,
+      "pct_chg": 0.85,
+      "total_score": 36.0,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "000975",
+      "name": "山金国际",
+      "market": "sz",
+      "board": "主板",
+      "close": 25.96,
+      "pct_chg": -4.35,
+      "total_score": 34.8,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "000506",
+      "name": "中国食品",
+      "market": "sz",
+      "board": "主板",
+      "close": 17.55,
+      "pct_chg": -7.92,
+      "total_score": 34.8,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "601168",
+      "name": "西部矿业",
+      "market": "sh",
+      "board": "主板",
+      "close": 42.45,
+      "pct_chg": -1.44,
+      "total_score": 34.8,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "688213",
+      "name": "思特威",
+      "market": "sh",
+      "board": "科创板",
+      "close": 99.25,
+      "pct_chg": 2.96,
+      "total_score": 32.8,
+      "quality_grade": "A",
+      "industry": "软件和信息技术服务业",
+      "sectors": [
+        "软件和信息技术服务业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "600489",
+      "name": "中金黄金",
+      "market": "sh",
+      "board": "主板",
+      "close": 25.56,
+      "pct_chg": 2.44,
+      "total_score": 30.0,
+      "quality_grade": "B",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "688002",
+      "name": "睿创微纳",
+      "market": "sh",
+      "board": "科创板",
+      "close": 166.25,
+      "pct_chg": -0.84,
+      "total_score": 30.0,
+      "quality_grade": "B",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "300274",
+      "name": "阳光电源",
+      "market": "创业板",
+      "board": "创业板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 20,
+      "quality_grade": "A",
+      "industry": "电气机械和器材制造业",
+      "sectors": [
+        "电气机械和器材制造业"
       ],
       "signal_count": 0,
       "status": "near"
