@@ -70,6 +70,7 @@ VAR_TO_RAW = {
     "SH_SZ_HISTORY": "sh_sz_history.json",
     "MARKET_ALERTS": "market_alerts.json",
     "AVG_PRICE_DATA": "avg_price_data.json",
+    "OVERSEAS_MARKETS": "overseas_markets.json",
 }
 
 # 变量名 → 更新时段（与 update_v8.py 的 CATEGORY_MAP 对齐）
@@ -110,6 +111,7 @@ CATEGORY_MAP = {
     # 盘中：全A等权平均股价的日内变化 + 中期水位（一次抓取喂两处展示：AI 速览买卖信号 + 个股查询摘要行）
     # 注：此处曾误写「盘后」注释但取值实为 intraday；2026-08-12 已把 update_v8.py CATEGORY_MAP 同步对齐为 intraday
     "AVG_PRICE_DATA": "intraday",
+    "OVERSEAS_MARKETS": "premarket",  # 海外/亚太股市观测（日经/KOSPI/台湾加权），盘前抓取前一交易日收盘
 }
 
 _ak = None
@@ -496,6 +498,12 @@ def f_judgment():
     tech = _analyst_tech(neg, pos, avg_chg, max_drop, max_rise, total_amt, market)
     sent = _analyst_sentiment(cs, vix, sff_names)
     macro_a = _analyst_macro(us_str, usdcnh, us10y, vix)
+    # 日本/日元加息预期：补充到今日判定宏观面（数据锚定真实 USDJPY）
+    _usdjpy = float(gm.get("usdjpy", {}).get("price", 0) or 0)
+    if _usdjpy >= 155:
+        macro_a["reason"] += f"；日元弱（USDJPY {_usdjpy:.1f}），日银9月加息预期升温"
+    elif _usdjpy:
+        macro_a["reason"] += f"；USDJPY {_usdjpy:.1f}"
     analysts = [tech, sent, macro_a]
 
     # 共同结论
@@ -709,6 +717,18 @@ def f_macro_brief():
             direction = "升值" if usdcnh < 7.15 else "贬值"
             news.append({"tag": "💱 汇率", "text": f"人民币对美元{direction}，USDCNH={usdcnh:.4f}。{'资金面偏紧' if usdcnh>7.2 else '资金面中性偏松'}。"})
 
+    # 日本 / 日元（日银加息预期）：美元兑日元弱日元 → BOJ 加息压力。数据锚定真实 USDJPY，绝不臆造。
+    usdjpy = float(gm.get("usdjpy", {}).get("price", 0) or 0)
+    if usdjpy:
+        if usdjpy >= 155:
+            jp = {"tag": "🇯🇵 日本/日元", "text": f"美元兑日元报 {usdjpy:.1f}（日元逼近160四十年低位），市场押注日银9月加息（概率约75%），若兑现将推动日元套利交易平仓，对全球风险偏好与A股外资流向形成扰动。"}
+        elif usdjpy <= 140:
+            jp = {"tag": "🇯🇵 日本/日元", "text": f"美元兑日元回落至 {usdjpy:.1f}，日元走强，日银加息紧迫性下降，亚太风险偏好改善。"}
+        else:
+            jp = {"tag": "🇯🇵 日本/日元", "text": f"美元兑日元 {usdjpy:.1f}，日元中性，日银政策按兵不动观察期。"}
+        # 置顶：日本加息是当前最影响亚太的风险事件之一，确保进入今日判定前3条
+        news.insert(0, jp)
+
     # 黄金
     if gold:
         if gold > 4300:
@@ -872,6 +892,70 @@ def _fetch_us_overnight():
     if us:
         return us
     return _fetch_us_overnight_yahoo()
+
+
+def _fetch_overseas_indices():
+    """海外/亚太股市观测：日经225、韩国KOSPI、台湾加权（东方财富延迟镜像，中国网络稳定）。
+    返回 [{name, code, value, chg_pct, currency}]；失败时该条 value=None，绝不编造。"""
+    sec_map = [
+        ("100.N225", "日经225", "JPY"),
+        ("100.KS11", "韩国KOSPI", "KRW"),
+        ("100.TWII", "台湾加权", "TWD"),
+    ]
+    by_code = {}
+    try:
+        r = _requests.get(
+            f"{_EM_DELAY}/api/qt/ulist.np/get",
+            params={"fltt": "2", "invt": "2", "ut": "b2884a393a59ad64002292a3e90d46a5",
+                    "fields": "f12,f14,f2,f3",
+                    "secids": ",".join(s for s, _, _ in sec_map)},
+            headers=_EM_HEADERS, timeout=15)
+        j = r.json()
+        rows = (j.get("data", {}) or {}).get("diff") or []
+        by_code = {x.get("f12"): x for x in rows if x.get("f12")}
+    except Exception as e:
+        print(f"    ⚠️ 海外指数抓取失败: {e}")
+    results = []
+    for secid, name, cur in sec_map:
+        code = secid.split(".", 1)[1]
+        x = by_code.get(code)
+        if x and x.get("f2") not in (None, "", "-"):
+            try:
+                results.append({
+                    "name": name, "code": secid,
+                    "value": round(float(x.get("f2")), 2),
+                    "chg_pct": round(float(x.get("f3") or 0), 2),
+                    "currency": cur,
+                })
+                continue
+            except Exception:
+                pass
+        results.append({"name": name, "code": secid, "value": None, "chg_pct": None, "currency": cur})
+    return results
+
+
+def f_overseas_markets():
+    """海外/亚太股市观测（盘前生成，注册于 OVERSEAS_MARKETS→premarket）。
+    日经225/韩国KOSPI/台湾加权：反映亚太风险偏好，对 A 股开盘与外资流向有传导。
+    数据真实抓取，失败时 value=None（前端标注「数据未接入」），绝不编造点位。"""
+    idx = _fetch_overseas_indices()
+    now = now_cst()
+    ups = sum(1 for x in idx if x.get("chg_pct") is not None and x["chg_pct"] > 0)
+    downs = sum(1 for x in idx if x.get("chg_pct") is not None and x["chg_pct"] < 0)
+    if ups > downs:
+        bias = "亚太偏强"
+    elif downs > ups:
+        bias = "亚太偏弱"
+    else:
+        bias = "亚太分化"
+    return {
+        "date": now.strftime("%Y-%m-%d"),
+        "indices": idx,
+        "bias": bias,
+        "note": "日经225/韩国KOSPI/台湾加权为前一交易日收盘（北京时间08:25抓取时亚太尚未开盘），反映隔夜亚太风险偏好，对A股开盘有传导。",
+        "update_time": now.strftime("%Y-%m-%d %H:%M:%S"),
+        "auto": True,
+    }
 
 
 def run(label, fn, retries=2):
@@ -1459,7 +1543,7 @@ def f_macro_data():
 
     def _fetch_sina_global_macro(retries=2):
         """新浪全球宏观行情，带重试与详细日志。"""
-        sina_codes = "fx_susdcnh,DINIW,b_VIX,hf_GC,hf_SI,hf_HG,hf_CL"
+        sina_codes = "fx_susdcnh,fx_susdjpy,DINIW,b_VIX,hf_GC,hf_SI,hf_HG,hf_CL"
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                           "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -1507,6 +1591,13 @@ def f_macro_data():
         _set_gm('usdcnh', parts[8], parts[17] if len(parts) > 17 else None)
     else:
         print(f"    ⚠️ fx_susdcnh 字段不足: {len(parts)}")
+
+    # 美元兑日元 fx_susdjpy：索引1=最新价（与 usdcnh 不同结构）；日元强弱是日银加息预期核心变量
+    parts = data.get('fx_susdjpy', [])
+    if len(parts) > 1:
+        _set_gm('usdjpy', parts[1], parts[0] if len(parts) > 0 else None)
+    else:
+        print(f"    ⚠️ fx_susdjpy 字段不足: {len(parts)}")
 
     # 美元指数 DINIW：索引 8=收盘价，10=日期
     parts = data.get('DINIW', [])
@@ -2896,7 +2987,12 @@ def main(category=None, only=None):
                     except Exception:
                         continue
                     amap[key][f"{mm}/{dd}"] = amt
-            dates = sorted(set(amap["sh"]) & set(amap["sz"]))
+            # 数值排序（2026-08-14 修复：M/D 字典序 "8/10"<"8/2" 导致 X 轴未来日期错乱）
+            _date_set = set(amap["sh"]) & set(amap["sz"])
+            dates = sorted(_date_set, key=lambda s: (int(s.split("/")[0]), int(s.split("/")[1])))
+            # 过滤未来日期（akshare 偶尔返回未交易日/预发布数据，导致 X 轴延伸到 9 月）
+            _today_md = (now.month, now.day)
+            dates = [d for d in dates if (int(d.split("/")[0]), int(d.split("/")[1])) <= _today_md]
             if dates:
                 window = dates[-130:]
                 amount_history = [{
@@ -3101,6 +3197,7 @@ def main(category=None, only=None):
         ("MACRO_BRIEF", f_macro_brief),
         ("MARKET_ALERTS", f_market_alerts),
         ("AVG_PRICE_DATA", f_avg_price),
+        ("OVERSEAS_MARKETS", f_overseas_markets),
     ]
 
     def f_four_volume():

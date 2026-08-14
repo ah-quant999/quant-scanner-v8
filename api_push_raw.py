@@ -89,16 +89,18 @@ def walk_raw():
     #    会覆盖 main 上的新版（实测 05:40 fetch 把 backtest_tdx.json 从 08-13 新版
     #    142061 行覆盖回 08-04 旧版，策略回测页数据倒退）。
     #    故此处排除算法产物，仅由 run_algorithms/本地推链维护。
-    _ALGO_RAW = {
-        "backtest_tdx.json",            # backtest_tdx.py（60日K线回测）
-        "backtest_comprehensive.json",  # backtest_comprehensive.py（多策略×多持有期）
-        "cockpit_backtest.json",        # cockpit_backtest_now.py（驾驶舱回测）
-        "optimized_strategy.json",      # export_optimized_strategy.py
-        "top3_track.json",              # gen_top3_track.py（TOP3 90天跟踪）
-    }
+    #    2026-08-14 升级：由写死集合改为「词根前缀」自动匹配，新增算法脚本产物
+    #    （如 backtest_xxx / top3_track_xxx / cockpit_backtest_xxx / optimized_strategy_xxx）
+    #    自动纳入排除，根除「漏把新算法产物加进排除表导致再被覆盖」的根因。
+    _ALGO_RAW_PREFIXES = (
+        "backtest",          # backtest_tdx.py / backtest_comprehensive.py 等
+        "cockpit_backtest",  # cockpit_backtest_now.py
+        "optimized_strategy",# export_optimized_strategy.py
+        "top3_track",        # gen_top3_track.py
+    )
     for root, _dirs, files in os.walk("raw_data"):
         for f in files:
-            if f in _ALGO_RAW:
+            if f.startswith(_ALGO_RAW_PREFIXES):
                 continue
             full = os.path.join(root, f)
             rel = os.path.relpath(full, ".").replace("\\", "/")
@@ -152,7 +154,7 @@ def walk_extra():
         "data/FINAL_RECOMMEND_DATA.js", # 跨策略共振 Top3（final_recommend.py 产出）
         "data/STOCK_RPS.js",            # 个股相对强度 RPS+RS（calc_stock_rps.py 产出）
         "data/FOUR_VOLUME_60M.js",      # 四量终极60min版（strategy_four_volume_60m.py 产出）
-        # optimized_strategy.json 在 raw_data/，由 walk_raw() 自动覆盖
+        # optimized_strategy.json 在 raw_data/，由 walk_raw() 按算法产物前缀自动排除（不推送，免覆盖）
     ]
     for rel in extra:
         if os.path.isfile(rel):

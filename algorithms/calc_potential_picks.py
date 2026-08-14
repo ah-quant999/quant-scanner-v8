@@ -13,6 +13,7 @@ v8 当前无 PE/PB 财务数据，估值分位无法精确算，本期用"市值
 """
 import json
 import os
+import re
 from datetime import datetime
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -70,7 +71,12 @@ def main():
 
     # 2. 提取行情（市值 + 当日涨幅）
     stocks_quote = sq.get("stocks", {}) or {}
-    # 注：stocks_quote 的 key 是 full_code (sh600000)，需要映射成纯 6 位 code
+    # 建「纯数字 code -> full_code」字典，避免每支股票 O(n) endswith 扫描 + 防错配
+    code_to_qkey = {}
+    for qk in stocks_quote:
+        digits = re.sub(r"\D", "", str(qk))
+        if digits:
+            code_to_qkey[digits] = qk
 
     # 3. 从 STOCK_PROFILE.profiles 提取成分股
     profiles = sp.get("profiles", {}) or {}
@@ -86,12 +92,9 @@ def main():
             rejected["no_hot_concept"] += 1
             continue
 
-        # 找行情
-        qkey = None
-        for qk in stocks_quote:
-            if qk.endswith(code):
-                qkey = qk
-                break
+        # 找行情（用纯数字 code 字典 O(1) 映射，替代原 O(n) endswith 扫描）
+        ckey = re.sub(r"\D", "", str(code))
+        qkey = code_to_qkey.get(ckey)
         if not qkey:
             rejected["no_quote"] += 1
             continue

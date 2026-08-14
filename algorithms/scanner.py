@@ -23,6 +23,10 @@ import pandas as pd
 import requests
 import re
 
+# 名称归一化共享模块（2026-08-14 抽出，消除与 final_recommend/build_candidate_pool/guanlan_extractor 的重复）
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from name_utils import strip_entitlement_prefix  # noqa: E402
+
 warnings.filterwarnings("ignore")
 
 # ============== 配置 ==============
@@ -2344,7 +2348,7 @@ def _em_name_s(code, market):
 
 def _norm_name_s(n):
     s = str(n).strip()
-    s = re.sub(r'^(XD|XR|DR|N)', '', s)
+    s = strip_entitlement_prefix(s)
     s = s.replace('Ａ', 'A').replace('Ｂ', 'B')
     s = re.sub(r'(股份)?有限公司$', '', s)
     s = re.sub(r'[（(].*?[)）]$', '', s)
@@ -2390,7 +2394,7 @@ def _repair_guanlan_name(name: str) -> str:
         return name
 
     # 0. 去权/新股前缀
-    name = re.sub(r'^(XD|XR|DR|N)', '', name)
+    name = strip_entitlement_prefix(name)
 
     # 1. 去掉句子前缀(扩展开, 覆盖"我们也看好/通过与/闪电式完成"等)
     garbage_prefixes = ['我们也看好', '我们看好', '我们给予', '我们推荐', '我们建议',

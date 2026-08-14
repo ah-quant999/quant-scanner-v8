@@ -20,9 +20,14 @@ except NameError:
     BASE = os.path.dirname(os.path.abspath(__file__))
 import json
 import re
+import sys
 import time
 import threading
 import gc
+
+# 名称归一化共享模块（2026-08-14 抽出，消除与 final_recommend/guanlan_extractor/scanner 的重复）
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from name_utils import strip_entitlement_prefix  # noqa: E402
 try:
     import akshare as ak
 except ModuleNotFoundError:
@@ -165,7 +170,7 @@ def _em_name(code, market):
 def _norm_name(n):
     """去除权/新股前缀、全角字母、有限公司/括号后缀。"""
     s = str(n).strip()
-    s = re.sub(r'^(XD|XR|DR|N)', '', s)
+    s = strip_entitlement_prefix(s)
     s = s.replace('Ａ', 'A').replace('Ｂ', 'B')
     s = re.sub(r'(股份)?有限公司$', '', s)
     s = re.sub(r'[（(].*?[)）]$', '', s)

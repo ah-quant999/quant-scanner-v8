@@ -28,6 +28,10 @@ import re
 import sys
 import time
 import urllib.request
+
+# 名称归一化共享模块（2026-08-14 抽出，消除与 final_recommend/build_candidate_pool/scanner 的重复）
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from name_utils import strip_entitlement_prefix  # noqa: E402
 import requests as _requests
 from datetime import datetime, timedelta
 
@@ -212,7 +216,7 @@ def _em_name(code, exchange):
 
 def _norm_name(n):
     s = str(n).strip()
-    s = re.sub(r'^(XD|XR|DR|N)', '', s)
+    s = strip_entitlement_prefix(s)
     s = s.replace('Ａ', 'A').replace('Ｂ', 'B')
     s = re.sub(r'(股份)?有限公司$', '', s)
     s = re.sub(r'[（(].*?[)）]$', '', s)
