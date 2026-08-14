@@ -1291,12 +1291,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     window.__renderJudgmentBody = function(){
       var opBody=document.getElementById('judgmentBodyOp');
       if(!opBody || opBody.dataset.rendered==='1') return;
-      opBody.dataset.rendered='1';
       try{
-        opBody.innerHTML = window.__judgmentEnvHTML_cache
+        var html = window.__judgmentEnvHTML_cache
           || ((typeof window._buildJudgmentEnvHTML === 'function')
             ? window._buildJudgmentEnvHTML(window.JUDGMENT_DATA)
             : '<div style="color:var(--dim);padding:10px">环境态势数据暂不可用</div>');
+        opBody.innerHTML = html;
+        // 仅在数据已就绪（非 loading 占位）时标记为已完成渲染，允许后续跳过
+        if(html && !html.includes('环境态势数据加载中') && !html.includes('暂不可用')){
+          opBody.dataset.rendered='1';
+        }
       }catch(e){ console.error('renderJudgmentBody error',e); }
     };
     </script>
