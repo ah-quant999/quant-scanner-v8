@@ -895,9 +895,10 @@ def _fetch_us_overnight():
 
 
 def _fetch_overseas_indices():
-    """海外/亚太股市观测：日经225、韩国KOSPI、台湾加权（东方财富延迟镜像，中国网络稳定）。
+    """海外/亚太股市观测：恒生指数、日经225、韩国KOSPI、台湾加权（东方财富延迟镜像，中国网络稳定）。
     返回 [{name, code, value, chg_pct, currency}]；失败时该条 value=None，绝不编造。"""
     sec_map = [
+        ("100.HSI", "恒生指数", "HKD"),
         ("100.N225", "日经225", "JPY"),
         ("100.KS11", "韩国KOSPI", "KRW"),
         ("100.TWII", "台湾加权", "TWD"),
@@ -936,7 +937,7 @@ def _fetch_overseas_indices():
 
 def f_overseas_markets():
     """海外/亚太股市观测（盘前生成，注册于 OVERSEAS_MARKETS→premarket）。
-    日经225/韩国KOSPI/台湾加权：反映亚太风险偏好，对 A 股开盘与外资流向有传导。
+    恒生指数/日经225/韩国KOSPI/台湾加权：反映亚太风险偏好，对 A 股开盘与外资流向有传导。
     数据真实抓取，失败时 value=None（前端标注「数据未接入」），绝不编造点位。"""
     idx = _fetch_overseas_indices()
     now = now_cst()
@@ -952,7 +953,7 @@ def f_overseas_markets():
         "date": now.strftime("%Y-%m-%d"),
         "indices": idx,
         "bias": bias,
-        "note": "日经225/韩国KOSPI/台湾加权为前一交易日收盘（北京时间08:25抓取时亚太尚未开盘），反映隔夜亚太风险偏好，对A股开盘有传导。",
+        "note": "恒生指数/日经225/韩国KOSPI/台湾加权为前一交易日收盘（北京时间08:25抓取时亚太尚未开盘），反映隔夜亚太风险偏好，对A股开盘有传导。",
         "update_time": now.strftime("%Y-%m-%d %H:%M:%S"),
         "auto": True,
     }
