@@ -8,7 +8,7 @@
 - 删除死数据文件 RECOMMEND / SCAN_DATA 的映射。
 """
 
-import json, os, re, subprocess, sys, hashlib
+import json, os, re, subprocess, sys
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -81,7 +81,6 @@ DATA_SOURCES = {
     "risk_gauge.json":             "RISK_GAUGE",
     "stock_quote.json":            "STOCK_QUOTE",
     "avg_price_data.json":         "AVG_PRICE_DATA",
-    "overseas_markets.json":       "OVERSEAS_MARKETS",
     "top3_track.json":             "TOP3_TRACK",  # 2026-08-13 finalRec Top3 90 天滚动追踪
     "weekend_meta_report.json":      "WEEKEND_META_REPORT",
     "delisted_stocks.json":        "DELISTED_STOCKS",
@@ -159,7 +158,6 @@ CATEGORY_MAP = {
     #      → mtime 被刷新 → cache-buster 全天无意义抖动（长期记忆里那个怪现象的根源）
     # 与 fetch 侧对齐为 intraday 后，两个问题一并消除。
     "AVG_PRICE_DATA": "intraday",
-    "OVERSEAS_MARKETS": "premarket",
     # 2026-08-13：TOP3_TRACK 依赖 final_recommend，归属盘后（与 finalRec 同节奏）
     "TOP3_TRACK": "post_close",
 }
@@ -531,53 +529,37 @@ def _write_js(var_name, obj):
     return out_path
 
 
-def _cache_bust_token(var_name):
-    """cache-busting 令牌：基于【去除易变时间戳后的内容哈希】。
+def _data_file_update_time(var_name):
+    """获取 data/*.js 的 cache-busting 标记。
 
-    ⚠️ 2026-08-14 一劳永逸修复（主人报「主站从昨天开始转很久才打开」）：
-    原 _data_file_update_time 用 max(语义时间, mtime) 作 ?v=。但 _write_js 每次
-    构建都注入 republish_time=now，且云端 build 每隔几分钟就 republish 一次
-    data 文件 → mtime 与文件内容(含 republish_time)都变 → ?v 全变 →
-    浏览器与 GitHub Pages CDN(max-age=600) 缓存全部失效 →
-    每次打开主站都重下 8.9MB(72 个 render-blocking 脚本) → 白屏转圈。
+    ★ 2026-08-14 主人令永久修复（主站刷新慢根因）：
+    原实现优先语义时间、mtime 晚则用 mtime——云端 build 每几分钟 republish 一次
+    data 文件，mtime 每次都变 → index.html 里 73 个 ?v= 每次 build 全变 →
+    浏览器/CDN 缓存全部失效 → 每次刷新都全量重下 10MB+ → 主站"刷新非常慢"。
 
-    现改为：读取 data/<var>.js，去掉易变时间戳字段(republish_time/update_time/
-    calc_time/run_time)后做 MD5(取前 10 位十六进制)。
-      · 内容真不变 → 令牌不变 → 浏览器/CDN 缓存常驻 → 秒开
-      · 内容真变   → 令牌变   → 正确失效，拿到新版
-    彻底解耦 build 频次与缓存失效，根除「频繁 republish 打爆缓存」。
+    改为「内容哈希」：取文件内容 sha1 前 10 位。内容没变 → URL 不变 → 缓存命中；
+    内容真变了（数据更新）→ 哈希变 → 只重下变化的文件。语义时间仅作可读性兜底。
+
+    失败则回退到语义时间/mtime。空文件返回空字符串。
     """
     path = DATA_DIR / f"{var_name}.js"
     if not path.exists():
         return ""
     try:
         text = path.read_text(encoding='utf-8')
-        # 去掉 "window.VAR = " 前缀与结尾 ";" ，拿到纯 JSON 体
-        idx = text.find('=', text.find('window.'))
-        body = text[idx + 1:].strip() if idx != -1 else text.strip()
-        if body.endswith(';'):
-            body = body[:-1]
-        try:
-            obj = json.loads(body)
-        except Exception:
-            # 极端兜底：解析失败则退回整文件哈希（至少内容稳定即令牌稳定）
-            return hashlib.md5(text.encode('utf-8')).hexdigest()[:10]
-        if isinstance(obj, dict):
-            for k in ("republish_time", "update_time", "calc_time", "run_time"):
-                obj.pop(k, None)
-        norm = json.dumps(obj, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
-        return hashlib.md5(norm.encode('utf-8')).hexdigest()[:10]
+        # 内容哈希优先：稳定、内容不变则 URL 不变
+        import hashlib
+        return hashlib.sha1(text.encode('utf-8')).hexdigest()[:10]
     except Exception:
         return ""
 
 
 def _rewrite_index_html_cache_busters():
-    """为 index.html 中 data/*.js 引用追加基于【内容哈希】的 cache-busting 参数。
+    """为 index.html 中 data/*.js 引用追加基于文件更新时间的 cache-busting 参数。
 
-    核心用途：防止浏览器/CDN 在数据更新后继续返回旧 data/*.js。
-    令牌由 _cache_bust_token 计算（去易变时间戳后的内容 MD5）：
-    未变更文件保持原 ?v → 缓存常驻秒开；内容真变 → ?v 变 → 正确失效。
-    同时为所有 data 脚本注入 defer，避免 <head> 内同步加载阻塞首屏渲染。
+    核心用途：防止浏览器/CDN 在数据更新后继续返回旧 data/*.js（典型问题：
+    AI市场速览已生成新数据，但页面仍显示旧时间戳）。
+    只有文件本身的时间戳发生变化时，对应的 URL 才会变化，未变更文件保持原 URL。
     """
     idx_path = ROOT / "index.html"
     if not idx_path.exists():
@@ -591,12 +573,10 @@ def _rewrite_index_html_cache_busters():
     def repl(m):
         src = m.group(1)
         var_name = src.split('/')[-1].replace('.js', '')
-        token = _cache_bust_token(var_name)
-        if token:
-            # 🛡️ 2026-08-14 修复：data 脚本加 defer，不再阻塞 HTML 解析/渲染
-            #   （72 个脚本共 8.9MB 原在 <head> 同步加载 → 白屏转圈；
-            #    defer 后并行下载、DOMContentLoaded 前按序执行，渲染函数均已就绪）
-            return f'<script src="{src}?v={token}" defer></script>'
+        ts = _data_file_update_time(var_name)
+        if ts:
+            # 内容哈希（含字母数字）直接作为 ?v=；不再 strip 非数字（原逻辑会删掉哈希字母）
+            return f'<script src="{src}?v={ts}"></script>'
         return m.group(0)
 
     new_html = pat.sub(repl, html)
