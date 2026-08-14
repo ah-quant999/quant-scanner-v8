@@ -75,7 +75,14 @@ jobs:
       ZSXQ_TOKEN: ${{ secrets.ZSXQ_TOKEN }}
     steps:
       - name: "📥 Checkout 源码（云端无需 safe-delete 钩子规避）"
+        # 🔴 2026-08-14 主人令永久修复：与 v8_cn_fetch_cloud 同款问题——
+        #   actions/checkout@v4 默认 git clean -ffdx 在 Windows self-hosted runner 上
+        #   被 WorkBuddy safe-delete 守卫按 50 文件阈值拦截（alimi-cn 实测 966 文件），
+        #   导致 checkout 100% 失败。加 clean: false 跳过批量清理，直接复用/覆盖 worktree。
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          clean: false
 
       - name: "🐍 配置 Python"
         uses: actions/setup-python@v5
