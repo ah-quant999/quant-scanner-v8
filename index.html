@@ -7978,7 +7978,7 @@ function renderLimitUpHeatmap(){
     }
     const iTop=si.filter(s=>!s.type||s.type!=='概念').slice(0,5);
     if(iTop.length>0){
-      h1+='<div class="sf-line"><b style="color:#fb923c">📊 行业流入：</b>'+iTop.map(s=>s.name+' <b style="color:var(--up)">+'+s.net.toFixed(1)+'亿</b>'+((s.consecutive_days||0)>1?' <span style="color:#ff9800;font-size:12px">连'+s.consecutive_days+'</span>':'')).join(' / ')+'</div>';
+      h1+='<div class="sf-line"><b style="color:#fb923c">📊 行业流入：</b><span style="display:inline-flex;align-items:center;padding:1px 7px;border-radius:6px;font-size:10.5px;font-weight:600;background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.3);margin-left:4px;white-space:nowrap">盘中实时</span>'+iTop.map(s=>s.name+' <b style="color:var(--up)">+'+s.net.toFixed(1)+'亿</b>'+((s.consecutive_days||0)>1?' <span style="color:#ff9800;font-size:12px">连'+s.consecutive_days+'</span>':'')).join(' / ')+'</div>';
     }
     $('sfBlock1').innerHTML=h1||'<div class="ipo-empty">暂无盘中数据</div>';
 
