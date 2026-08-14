@@ -67,6 +67,12 @@ jobs:
         with:
           python-version: '3.13'
 
+      - name: "🛡️ 确保 .nojekyll 存在（防 Jekyll 因 _ 前缀目录报错致整站构建失败）"
+        run: |
+          if [ ! -f .nojekyll ]; then printf '
+' > .nojekyll; echo "rebuild missing .nojekyll"; else echo ".nojekyll ok"; fi
+          git add -f .nojekyll
+
       - name: "🛡️ 护栏：校验关键板块未被误删/清空"
         run: python guard_index_sections.py
 
@@ -88,6 +94,9 @@ jobs:
             python update_v8.py --detect-changes
           fi
 
+      - name: "🛡️ 部署前校验：关键 data/*.js 非空（防空 raw_data 覆盖成 shell 致整站空）"
+        run: python v8_deploy_guard.py
+
       - name: "📤 部署到 main（GitHub Pages 源）"
         env:
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -101,7 +110,7 @@ jobs:
           #   正确做法：push 被拒 = 远端已前进，同步远端后用最新 raw_data 重新全量构建，
           #   产物由构建决定而非由合并决定，天然无冲突且不会用旧产物覆盖新数据。
           for i in 1 2 3; do
-            git add -f data/ index.html
+            git add -f data/ index.html .nojekyll
             if git diff --cached --quiet; then
               echo "ℹ️ 无数据变化，跳过部署（远端已是最新构建）"
               exit 0
@@ -113,6 +122,6 @@ jobs:
             echo "⚠️ push 被拒（远端已前进），同步远端并按最新 raw_data 全量重建后重试 ($i/3)"
             git fetch "$REPO" main
             git reset --hard FETCH_HEAD
-            python update_v8.py
+            python update_v8.py --detect-changes
           done
           echo "❌ 3 次重试后仍失败"; exit 1
