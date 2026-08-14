@@ -12337,13 +12337,6 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   .fr-extra{font-size:12px;color:var(--dim);margin-top:8px;line-height:1.7}
 
     .fr-reason{font-size:12px;color:var(--sub);line-height:1.6;background:var(--bg2);border-radius:8px;padding:8px 10px;border:1px solid var(--border);margin-top:8px}
-    .fr-bt{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:10px}
-    .fr-bt-title{font-size:12px;font-weight:800;color:var(--txt);margin-bottom:8px;display:flex;align-items:center;gap:6px}
-    .fr-bt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:8px;margin-bottom:8px}
-    .fr-bt-cell{background:var(--card2);border:1px solid var(--border2);border-radius:6px;padding:5px 6px;text-align:center}
-    .fr-bt-cell .k{font-size:10px;color:var(--dim);margin-bottom:1px}
-    .fr-bt-cell .v{font-size:13px;font-weight:800;color:var(--txt)}
-    .fr-bt-note{font-size:11px;color:var(--dim);line-height:1.5}
     .fr-allrow{display:flex;align-items:center;gap:8px;padding:5px 8px;border-bottom:1px dashed var(--border);font-size:12px}
     .fr-allrow:last-child{border-bottom:none}
 </style>
@@ -12463,42 +12456,6 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     if(s.support!=null) h+='支撑 <b>¥'+_fn(s.support)+'</b> · ';
     if(s.resistance!=null) h+='压力 <b>¥'+_fn(s.resistance)+'</b> · ';
     if(s.atr!=null) h+='ATR <b>'+_fn(s.atr)+'</b>';
-    h+='</div>';
-
-    // 回测 & 跟踪
-    var bt = s.backtest || {};
-    var tr = s.tracking || {};
-    h+='<div class="fr-bt">';
-    h+='<div class="fr-bt-title">📈 回测 & 跟踪（策略统计 + 本次入池跟踪）</div>';
-    // 2026-08-13：10 KPI 合并为 2 行，提高信息密度
-    (function(){
-      var winColor  = (bt.win_rate>=50?'var(--up)':'var(--gold)');
-      var avgColor  = (bt.avg_return>0?'var(--up)':(bt.avg_return<0?'var(--down)':'var(--sub)'));
-      var retColor  = (tr.return_pct>0?'var(--up)':(tr.return_pct<0?'var(--down)':'var(--sub)'));
-      var statusTxt = tr.exit_type==='hold'?'持有中':(tr.exit_type==='stop'?'已止损':(tr.exit_type==='target'?'已止盈':(tr.exit_type||'--')));
-      var holdTxt   = (tr.hold_days||1)+'天';
-      h+='<div class="fr-bt-grid" style="grid-template-columns:1fr;gap:3px">';
-      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px">';
-      h+='<span>📊 <b>'+(bt.signals||0)+'</b> 信号 · 胜率 <b style="color:'+winColor+'">'+(bt.win_rate!=null?bt.win_rate.toFixed(1):'--')+'%</b> · 均收 <b style="color:'+avgColor+'">'+(bt.avg_return!=null?(bt.avg_return>0?'+':'')+bt.avg_return.toFixed(2)+'%':'--')+'</b></span>';
-      if(bt.best_return!=null) h+='<span>🔥 最佳 +'+(bt.best_return.toFixed(1))+'%</span>';
-      if(bt.worst_return!=null) h+='<span>❄️ 最差 '+(bt.worst_return.toFixed(1))+'%</span>';
-      h+='</div>';
-      h+='<div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px">';
-      h+='<span>🕒 入选 <b>'+_fe(tr.entry_date||'--')+'</b> 入价 ¥'+_fn(tr.entry_price)+' → 现 ¥'+_fn(tr.latest_price||s.close)+' <b style="color:'+retColor+'">'+(tr.return_pct!=null?(tr.return_pct>0?'+':'')+tr.return_pct.toFixed(2)+'%':'--')+'</b></span>';
-      h+='<span>⏳ 持 '+holdTxt+' · '+statusTxt+'</span>';
-      h+='</div>';
-      h+='</div>';
-    })();
-    if(bt.note || tr.note){
-      h+='<div class="fr-bt-note">'+(bt.note||'')+(bt.note&&tr.note?' · ':'')+(tr.note||'')+'</div>';
-    }
-    if(tr.alerts && tr.alerts.length){
-      h+='<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">';
-      tr.alerts.forEach(function(a){
-        h+='<span style="font-size:11px;padding:2px 8px;border-radius:6px;background:rgba(239,68,68,.12);color:var(--down);border:1px solid rgba(239,68,68,.25)">⚠️ '+_fe(a.text||a.level||'跟踪告警')+'</span>';
-      });
-      h+='</div>';
-    }
     h+='</div>';
 
     if(s.reason) h+='<div class="fr-reason"><b style="color:var(--txt)">入选依据：</b>'+_fe(s.reason)+'</div>';
