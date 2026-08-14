@@ -10144,8 +10144,17 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       // 弹性 Top3
       c.stocks.slice(0,3).forEach(function(s){
         var eColor = s.elasticity_pct >= 3 ? '#fbbf24' : (s.elasticity_pct >= 0 ? '#22c55e' : '#f87171');
+        var sq = (window.STOCK_QUOTE && window.STOCK_QUOTE.stocks) ? window.STOCK_QUOTE.stocks[s.code] : null;
+        var dv = sq ? sq.dividend : null;
+        // ⚖️ 2026-08-14 主人令：三张新卡加分红方案跟踪
+        var dyChip = '';
+        if (dv && dv.cash_ratio != null){
+          var dyColor = dv.cash_ratio >= 30 ? '#fbbf24' : (dv.cash_ratio >= 10 ? '#22c55e' : '#94a3b8');
+          var prog = dv.progress && /实施|已/.test(dv.progress) ? '已实施' : (dv.progress || '预案');
+          dyChip = '<span style="margin-left:6px;font-size:9.5px;padding:1px 5px;border-radius:3px;background:rgba(251,146,60,.15);color:'+dyColor+';font-weight:700;">💰'+dv.cash_ratio.toFixed(1)+'%·'+prog+'</span>';
+        }
         html += '<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:2px 0;border-bottom:1px dashed rgba(148,163,184,.15);">';
-        html += '<span><b>'+s.name+'</b> <span style="color:var(--dim);font-size:10px;">'+s.code+' · '+(s.business_pct*100|0)+'%</span></span>';
+        html += '<span><b>'+s.name+'</b>> <span style="color:var(--dim);font-size:10px;">'+s.code+' · '+(s.business_pct*100|0)+'%</span>'+dyChip+'</span>';
         html += '<span style="color:'+eColor+';font-weight:600;">'+ (s.elasticity_pct>0?'+':'') + s.elasticity_pct+'%</span>';
         html += '</div>';
       });
@@ -10230,12 +10239,21 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       });
       html += '</div>';
     }
-    // 龙头
+    // 龙头（含分红方案跟踪）
     if (sc.leaders && sc.leaders.length){
       html += '<div style="font-size:11.5px;color:var(--sub);margin-bottom:4px;">🏆 龙头连板：</div>';
       html += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
       sc.leaders.forEach(function(l){
-        html += '<span style="display:inline-block;padding:4px 10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:6px;font-size:12px;color:#22c55e;font-weight:600;">'+l.name+' <b style="color:var(--txt);margin-left:2px;">'+l.lbc+'板</b></span>';
+        // ⚖️ 2026-08-14 主人令：三张新卡加分红方案跟踪（情绪龙头 chip 后追加）
+        var sq = (window.STOCK_QUOTE && window.STOCK_QUOTE.stocks) ? window.STOCK_QUOTE.stocks[l.code] : null;
+        var dv = sq ? sq.dividend : null;
+        var dyTag = '';
+        if (dv && dv.cash_ratio != null){
+          var dC = dv.cash_ratio >= 30 ? '#fbbf24' : (dv.cash_ratio >= 10 ? '#22c55e' : '#94a3b8');
+          var prog = dv.progress && /实施|已/.test(dv.progress) ? '已实施' : (dv.progress || '预案');
+          dyTag = '<span style="margin-left:4px;font-size:9.5px;padding:1px 5px;border-radius:3px;background:rgba(251,146,60,.15);color:'+dC+';font-weight:600;">💰'+dv.cash_ratio.toFixed(1)+'%·'+prog+'</span>';
+        }
+        html += '<span style="display:inline-block;padding:4px 10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:6px;font-size:12px;color:#22c55e;font-weight:600;">'+l.name+' <b style="color:var(--txt);margin-left:2px;">'+l.lbc+'板</b>'+dyTag+'</span>';
       });
       html += '</div>';
     }
@@ -10270,6 +10288,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">名称</th>';
     html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">代码</th>';
     html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">当日%</th>';
+    // ⚖️ 2026-08-14 主人令：三张新卡加分红方案跟踪（表头插入分红方案列）
+    html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">分红方案</th>';
     html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">热门数</th>';
     html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">综合分</th>';
     html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">热门概念</th>';
@@ -10282,6 +10302,18 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       html += '<td style="padding:7px 6px;font-weight:700;color:var(--txt);">'+p.name+'</td>';
       html += '<td style="padding:7px 6px;color:var(--sub);font-family:ui-monospace,Menlo,monospace;">'+p.code+'</td>';
       html += '<td style="padding:7px 6px;text-align:right;color:'+pctColor+';font-weight:600;">'+(p.pct>0?'+':'')+p.pct+'%</td>';
+      // ⚖️ 2026-08-14 主人令：三张新卡加分红方案跟踪
+      var sq = (window.STOCK_QUOTE && window.STOCK_QUOTE.stocks) ? window.STOCK_QUOTE.stocks[p.code] : null;
+      var dv = sq ? sq.dividend : null;
+      var dyCell = '<span style="color:var(--dim);font-size:10px;">-</span>';
+      if (dv && dv.cash_ratio != null){
+        var dyColor = dv.cash_ratio >= 30 ? '#fbbf24' : (dv.cash_ratio >= 10 ? '#22c55e' : '#94a3b8');
+        var prog = dv.progress && /实施|已/.test(dv.progress) ? '已实施' : (dv.progress || '预案');
+        dyCell = '<span style="font-size:11px;color:'+dyColor+';font-weight:700;">'+dv.cash_ratio.toFixed(1)+'%</span>'
+              + '<br><span style="font-size:9.5px;color:var(--dim);">'+prog+'</span>'
+              + (dv.ex_date ? '<br><span style="font-size:9.5px;color:var(--sub);">除'+dv.ex_date.slice(5)+'</span>' : '');
+      }
+      html += '<td style="padding:7px 6px;text-align:right;font-size:10.5px;">'+dyCell+'</td>';
       html += '<td style="padding:7px 6px;text-align:right;color:#c4b5fd;font-weight:600;">'+p.hot_count+'</td>';
       html += '<td style="padding:7px 6px;text-align:right;color:'+scoreColor+';font-weight:700;">'+p.total_score+'</td>';
       html += '<td style="padding:7px 6px;color:var(--sub);font-size:11px;">'+p.hot_concepts.join(' · ')+'</td>';
