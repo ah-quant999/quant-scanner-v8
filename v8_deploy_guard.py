@@ -10,6 +10,7 @@
 依赖：仅标准库
 """
 import sys
+import re
 from pathlib import Path
 
 DATA = Path(__file__).resolve().parent / "data"
@@ -102,10 +103,10 @@ for p in sorted(DATA.glob("*.js")):
         bad.append((name, sz, mn, "过小(疑似shell)"))
         continue
     # 2026-08-14 修复：部分文件首行是注释（CONCEPT_ETF_MAP/PORTFOLIO/PORTFOLIO_COST），
-    # 首行 startswith("window.") 会误伤。改为全文必须含 `window.<NAME> =` 赋值。
+    # 且变量名可能与文件名不一致（PORTFOLIO.js → window.PORTFOLIO_DATA）。
+    # 首行 startswith("window.") 会误伤 → 改为全文正则匹配任意 `window.<NAME> =` 赋值。
     text = p.read_text(encoding="utf-8", errors="ignore")
-    var_name = name[:-3]
-    if f"window.{var_name} =" not in text and f"window.{var_name}=" not in text:
+    if not re.search(r"window\.[A-Z_0-9]+\s*=", text):
         bad.append((name, sz, mn, "无 window.<NAME> = 赋值(格式异常)"))
 
 if actual_total < MIN_TOTAL:
