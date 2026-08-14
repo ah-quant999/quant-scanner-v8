@@ -69,8 +69,7 @@ jobs:
 
       - name: "🛡️ 确保 .nojekyll 存在（防 Jekyll 因 _ 前缀目录报错致整站构建失败）"
         run: |
-          if [ ! -f .nojekyll ]; then printf '
-' > .nojekyll; echo "rebuild missing .nojekyll"; else echo ".nojekyll ok"; fi
+          if [ ! -f .nojekyll ]; then touch .nojekyll; echo "rebuild missing .nojekyll"; else echo ".nojekyll ok"; fi
           git add -f .nojekyll
 
       - name: "🛡️ 护栏：校验关键板块未被误删/清空"
