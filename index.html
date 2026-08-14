@@ -8763,7 +8763,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
           {name:'运维常态巡检 (v8_ops_self_heal)', source:'HEALTH_CHECK', freq:'每30分(云端cron)', slots:['00:30','01:00','01:30','02:00','02:30','03:00','03:30','04:00','04:30','05:00','05:30','06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00','22:30','23:00','23:30'], note:'v8_health_check.py --heal 全站42卡巡检+自动治愈 · 纯云端不依赖小九/阿狸咪'},
 
-          {name:'☁️ 持仓云端同步 (westock)', source:'PORTFOLIO / PORTFOLIO_COST', freq:'盘中每30分', slots:['09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'westock 双机同步·实时持仓成本（操作信号面板②维止损锚点）'}
+          {name:'☁️ 持仓云端同步 (westock)', source:'PORTFOLIO_DATA', freq:'盘中每30分', slots:['09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'westock 双机同步·实时持仓成本（操作信号面板②维止损锚点）'}
 
         ]
 
@@ -8787,17 +8787,22 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
     const S = V8_PAGE_SCHEDULE;
 
-    // 🔴 2026-08-12 修复：原 S.updated 硬编码为 '2026-08-06 16:25'（任务看板 6 天未更新假象）。
-    // 现改为取所有候选中**最新**的时间戳（取最大值，反映真实"最新刷新"）：
-    //   1. data/*.js 中最大的 ?v= 时间戳（build_deploy 最近一次 — 最准）
-    //   2. freshness_status.json 的 check_time（巡检时间，可能较旧）
-    //   3. 当前时间（兜底，保证"实时"）
+    // 🔴 2026-08-14 修复：?v 缓存戳已从 14 位时间戳改为内容哈希，无法反解时间。
+    // 改为扫描所有 window.* data 对象中的时间字段，取最新值；兜底当前时间。
     const nowStr = new Date().toLocaleString('zh-CN', {hour12:false, timeZone:'Asia/Shanghai'}).replace(/\//g,'-');
     const cands = [];
-    document.querySelectorAll('script[src*="data/"][src*="?v="]').forEach(s => {
-      const m = (s.src||'').match(/[?&]v=(\d{14})/);
-      if (m) cands.push(m[1].replace(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2}).*/, '$1-$2-$3 $4:$5:$6'));
-    });
+    const timeFields = ['update_time','last_update','run_time','updated','calc_time','data_time','republish_time','checked_at_bj','checked_at_utc'];
+    for (const k of Object.keys(window)) {
+      if (k === 'window' || k === 'self' || k === 'top' || k === 'location') continue;
+      try {
+        const v = window[k];
+        if (!v || typeof v !== 'object') continue;
+        for (const f of timeFields) {
+          const t = v[f];
+          if (t && typeof t === 'string' && /^\d{4}-\d{2}-\d{2}/.test(t)) cands.push(t);
+        }
+      } catch (e) {}
+    }
     try {
       const fs = window.FRESHNESS_STATUS || {};
       if (fs.check_time) cands.push(fs.check_time);
@@ -8865,7 +8870,14 @@ const catNames=['宽基','行业','主题','跨境','商品'];
 
       pg.cards.forEach(function(c){
 
-        const data = window[c.source] || {};
+        // 2026-08-14 修复：source 可能含 '/' 或空格（如 "PORTFOLIO / PORTFOLIO_COST"），
+        // 拆分后取任一存在的 window 变量；否则该卡永远读不到 update_time，全 slot 标红。
+        const srcCandidates = String(c.source || '').split('/').map(function(s){return s.trim();}).filter(Boolean);
+        let data = {};
+        for (let i=0;i<srcCandidates.length;i++){
+          const src = srcCandidates[i];
+          if (window[src]) { data = window[src]; break; }
+        }
 
         // 字段兼容：RUNNER_STATUS_HEALTH 用 checked_at_bj（非 update_time），
         // 其余卡用 update_time/last_update/run_time/updated（2026-08-06 红叉审计修复）
