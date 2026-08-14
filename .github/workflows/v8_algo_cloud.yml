@@ -57,6 +57,9 @@ jobs:
       #   （显式带 tzinfo 的写法不受本变量影响，不会双重偏移。）
       TZ: Asia/Shanghai
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # ⛔️ 2026-08-14 主人令永久修复：WorkBuddy safe-delete 批量删除守卫默认阈值 50
+      #   （alimi-cn 实测 966 文件，100% 被拦、所有 [self-hosted, cn] workflow 必须显式抬到 1000。
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 1000
       V8_PUSH: "1"
       SKIP_MOOTDX: "1"
       # 2026-08-13 修复：云端 runner 必须走腾讯 GTimg 数据源(mootdx/东财在境外不稳定)，
