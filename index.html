@@ -1180,8 +1180,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <div class="tab" data-sec="query" onclick="switchSec('query',this)">🔍 个股查询</div>
   <!-- 2026-08-08 主人令：选股策略降级为「辅助策略池」，仅管理员可见，置于暂未上架左侧 -->
   <div class="tab locked admin-only" data-sec="st" data-lock="1" onclick="guardLock('st',this)">🔒 选股策略 <span class="lk">[锁]</span></div>
-  <!-- 2026-08-14 主人令：潜力参考（情绪周期+潜力挖掘+ETF龙头）独立TAB，从实时/盘后/实验区归拢 -->
-  <div class="tab locked admin-only" data-sec="pr" data-lock="1" onclick="guardLock('pr',this)">🔒 潜力参考 <span class="lk">[锁]</span></div>
   <!-- 2026-08-13 主人令：策略回测（统一）— TOP3 跟踪 + 综合回测 + 信号 60 日回测 一个 tab 装完，仅管理员可见 -->
   <div class="tab locked admin-only" data-sec="bt" data-lock="1" onclick="guardLock('bt',this)">🔒 策略回测 <span class="lk">[锁]</span></div>
   <!-- 2026-08-07 主人令：暂未上架 从运维子 Tab 提升为一级 nav（仅管理员可见，guardLock 锁定） -->
@@ -2728,27 +2726,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
   </section>
 
-  <!-- ============ 潜力参考（2026-08-14 新建：情绪周期+潜力挖掘+ETF龙头 归拢） ============ -->
-  <section id="sec-pr">
-    <div class="sec-head"><h2>🔮 潜力参考</h2><span class="tag">潜力挖掘 · ETF·龙头 · 试运行</span></div>
-
-    <!-- 🌡️ 情绪周期定位已合并至实时数据区「情绪周期·连板天梯」(cycleLadderCard)，2026-08-14 主人令 -->
-
-    <!-- 🔮 潜力挖掘（热门概念×温和涨幅×活跃度） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🔮</span>潜力挖掘 <span style="font-size:10.5px;padding:2px 8px;border-radius:8px;font-weight:600;background:rgba(167,139,250,.12);color:#c4b5fd;border:1px solid rgba(167,139,250,.3);">🧪 试运行</span></h3>
-      <div id="ppBody"><div class="note">加载中…</div></div>
-    </div>
-
-    <!-- 📌 ETF·龙头 参考（概念→ETF映射+龙头股） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📌</span>概念/行业 → ETF·龙头 参考 <span style="font-size:11px;color:var(--dim);">实验区 · 不构成投资建议</span></h3>
-      <div style="font-size:11px;color:var(--dim);margin-bottom:8px;">⚠️ 仅根据当前热点板块列出代表性 ETF 与龙头股，<b style="color:#fbbf24">不构成任何投资建议</b>。</div>
-      <div id="prEtfMapBody"><div class="note">加载中…</div></div>
-    </div>
-
-  </section>
-
   <!-- ============ 选股策略 ============ -->
   <section id="sec-st">
     <div class="sec-head"><h2>🎯 选股策略 · 三重共识</h2><span class="tag">主站TOP10≥70 · 驾驶舱A档 · 基本面A档 · 入选即跟踪</span></div>
@@ -2761,6 +2738,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <button class="st-tab" data-st="allsite" onclick="switchSt('allsite')">🌐 全站精选 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
       <button class="st-tab" data-st="rps" onclick="switchSt('rps')">📈 相对强度 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用·固定</span></button>
+      <button class="st-tab" data-st="pr" onclick="switchSt('pr')">🔮 潜力参考 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#c4b5fd;background:rgba(167,139,250,.12);padding:1px 6px;border-radius:4px">试运行</span></button>
     </div>
 
     <!-- ===== TAB 页面：大牛股猎手（2026-08-08 从「共振日历」迁入） ===== -->
@@ -3023,6 +3001,23 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div id="strpsBtCurve" style="width:100%;height:200px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;position:relative;overflow:hidden;"></div>
       </div>
     </div><!--/st-rps-->
+
+    <!-- ===== TAB：潜力参考（选股策略最后一张子TAB · 2026-08-14 主人令：从总导航一级TAB移至此处） ===== -->
+    <div id="st-pr" class="st-pane">
+      <!-- 🌡️ 情绪周期定位已合并至实时数据区「情绪周期·连板天梯」(cycleLadderCard)，2026-08-14 主人令 -->
+      <!-- 🔮 潜力挖掘（热门概念×温和涨幅×活跃度） -->
+      <div class="card" style="margin-bottom:16px">
+        <h3><span class="ic">🔮</span>潜力挖掘 <span style="font-size:10.5px;padding:2px 8px;border-radius:8px;font-weight:600;background:rgba(167,139,250,.12);color:#c4b5fd;border:1px solid rgba(167,139,250,.3);">🧪 试运行</span></h3>
+        <div id="ppBody"><div class="note">加载中…</div></div>
+      </div>
+      <!-- 📌 ETF·龙头 参考（概念→ETF映射+龙头股） -->
+      <div class="card" style="margin-bottom:16px">
+        <h3><span class="ic">📌</span>概念/行业 → ETF·龙头 参考 <span style="font-size:11px;color:var(--dim);">实验区 · 不构成投资建议</span></h3>
+        <div style="font-size:11px;color:var(--dim);margin-bottom:8px;">⚠️ 仅根据当前热点板块列出代表性 ETF 与龙头股，<b style="color:#fbbf24">不构成任何投资建议</b>。</div>
+        <div id="prEtfMapBody"><div class="note">加载中…</div></div>
+      </div>
+    </div><!--/st-pr-->
+
   </section>
 
 
@@ -6044,15 +6039,7 @@ function switchSec(sec,el){
   if(sec==='query'){ var dd=document.getElementById('v8QueryDropdown'); if(dd) dd.style.display='none'; }
   // 实时数据：情绪周期·连板天梯迁到本区，进入时渲染
   if(sec==='rt' && typeof window.__renderCycleLadderCard==='function') setTimeout(window.__renderCycleLadderCard,60);
-  // 潜力参考：潜力挖掘+ETF龙头（情绪周期已合并至实时数据区 cycleLadderCard）
-  if(sec==='pr'){
-    if(typeof window._fillPotentialPicks==='function') setTimeout(window._fillPotentialPicks,80);
-    (function(){
-      var etfSrc=document.getElementById('etfMapBody');
-      var etfDst=document.getElementById('prEtfMapBody');
-      if(etfSrc && etfDst) etfDst.innerHTML = etfSrc.innerHTML;
-    })();
-  }
+  // 潜力参考（pr）已改为选股策略(st)内部子TAB，由 switchSt('pr') 触发，此处不重复处理
   // 共振日历：进入时确保默认 tab1（机游共振）渲染（rcTab1 默认 active，但 switchRcTab 仅在点 tab 时触发）
   if(sec==='rc' && typeof window.switchRcTab==='function') setTimeout(function(){ try{ window.switchRcTab('tab1', document.querySelector('.rc-tab-btn.active')); }catch(e){} }, 30);
   // tab 切换后 echarts 实例需要 resize（容器从 display:none 恢复时尺寸为 0）
@@ -9395,10 +9382,19 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     else if(tab==='rps'){
       if(!stRendered.rps){ stRendered.rps=1; }
       try{ window.renderRpsScreen(); }catch(e){ console.warn('相对强度渲染失败',e); } }
+    else if(tab==='pr'){
+      if(!stRendered.pr){ stRendered.pr=1; }
+      try{ if(typeof window._fillPotentialPicks==='function') window._fillPotentialPicks(); }catch(e){ console.warn('潜力挖掘渲染失败',e); }
+      try{
+        var etfSrc=document.getElementById('etfMapBody');
+        var etfDst=document.getElementById('prEtfMapBody');
+        if(etfSrc && etfDst) etfDst.innerHTML = etfSrc.innerHTML;
+      }catch(e){ console.warn('ETF龙头克隆失败',e); }
+    }
   }
   window.switchSt=function(n){
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
-    ['tc','cockpit','allsite','fv','crds','hunter','rps'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
+    ['tc','cockpit','allsite','fv','crds','hunter','rps','pr'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
     renderStTab(n);
   };
   function initTriple(){
@@ -10417,8 +10413,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     h += _ceBody;
     h += '</div>';
 
-    // 2026-08-14 主人令：情绪周期定位/潜力挖掘 已迁至潜力参考页(sec-pr)，此处不再重复渲染
-    // 2026-08-14 主人令：ETF·龙头参考 已迁至潜力参考页(sec-pr)，此处不再重复渲染
+    // 2026-08-14 主人令：情绪周期定位/潜力挖掘 已迁至选股策略子TAB「潜力参考」(st-pr)，此处不再重复渲染
+    // 2026-08-14 主人令：ETF·龙头参考 已迁至选股策略子TAB「潜力参考」(st-pr)，此处不再重复渲染
 
     // ── 🎭 情绪周期 · 连板天梯（合并紧凑版）已迁到实时数据区，见 window.__renderCycleLadderCard ──
 
@@ -10426,7 +10422,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     if(typeof window.renderPortfolio==='function') window.renderPortfolio();
     // 2026-08-13 主人令：填充三张新卡（涨价榜/情绪周期/潜力挖掘）
     if(typeof window._fillCommodityElasticity==='function') window._fillCommodityElasticity();
-    // 2026-08-14 主人令：情绪周期/潜力挖掘/ETF龙头 fill 改由 switchSec('pr') 触发（已迁潜力参考页）
+    // 2026-08-14 主人令：情绪周期/潜力挖掘/ETF龙头 fill 改由 switchSt('pr') 触发（已迁选股策略子TAB）
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderUnlisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
   }
 
