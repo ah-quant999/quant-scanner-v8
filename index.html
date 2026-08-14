@@ -985,7 +985,12 @@ window.__judgmentCandidatesHTML = __judgmentCandidatesHTML;
 /* ===== ⚖️ 今日判定·环境态势 HTML 构建（2026-08-07 抽全局：供今日事件页 + 暂未上架 Tab 双向复用） =====
    数据源：JUDGMENT_DATA（每日盘前 08:25 刷新）。动态时事驱动，不写固定文字。 */
 function _buildJudgmentEnvHTML(d){
-  if(!d) return '<div style="color:var(--dim);padding:12px;text-align:center">环境态势数据加载中（盘前 08:25 自动生成）…</div>';
+  // 🛡️ 2026-08-14 一劳永逸修复：返回空时显示"等待盘前 08:25 自动生成"占位
+  if(!d) return '<div style="color:var(--dim);padding:14px;text-align:center;line-height:1.7">'
+    + '<div style="font-size:13px;color:#fbbf24;margin-bottom:4px">⏳ 等待数据生成中…</div>'
+    + '<div style="font-size:11px">盘前 08:25 自动生成 · 云端抓取中或非交易日</div>'
+    + '<div style="font-size:10.5px;margin-top:6px;color:var(--sub)">生成后会自动刷新，无需手动操作</div>'
+    + '</div>';
   var h = '';
   // 0) 红黄绿灯总览（交通灯语义：🟢积极 / 🟡观望 / 🔴防守）
   var LIGHT = {green:'#1fd17b', yellow:'#fbbf24', red:'#f4495d'};
@@ -1285,23 +1290,35 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var ts = jd.update_time || mb.update_time || '';
       var head = document.getElementById('judgmentCardHeader');
       if(!head || typeof window.v8CardHeader !== 'function') return;
+      // 🛡️ 2026-08-14 一劳永逸式修复（主人令"空的！一劳永逸式修复！"）：不传 !ts，
+      //   避免 ts 为空瞬间误报"无数值"（dataset.rendered='1' 拦截 + render 时序问题）。
       head.innerHTML = window.v8CardHeader('⚖️','今日判定 · 环境综合','宏观/美股/技术/情绪/共同结论/危险信号/大盘','update_time',
-        {update_time:ts, slot:'盘前', horizon:'短线'}, !ts);
+        {update_time:ts, slot:'盘前', horizon:'短线'}, false);
     };
     window.__renderJudgmentBody = function(){
       var opBody=document.getElementById('judgmentBodyOp');
-      if(!opBody || opBody.dataset.rendered==='1') return;
+      if(!opBody) return;
       try{
-        var html = window.__judgmentEnvHTML_cache
+        opBody.innerHTML = window.__judgmentEnvHTML_cache
           || ((typeof window._buildJudgmentEnvHTML === 'function')
             ? window._buildJudgmentEnvHTML(window.JUDGMENT_DATA)
             : '<div style="color:var(--dim);padding:10px">环境态势数据暂不可用</div>');
-        opBody.innerHTML = html;
-        // 仅在数据已就绪（非 loading 占位）时标记为已完成渲染，允许后续跳过
-        if(html && !html.includes('环境态势数据加载中') && !html.includes('暂不可用')){
-          opBody.dataset.rendered='1';
-        }
       }catch(e){ console.error('renderJudgmentBody error',e); }
+    };
+    // 🛡️ 2026-08-14 一劳永逸：数据未就绪时重试保底（500ms × 5 次）
+    window.__retryJudgmentRender = function(){
+      var tries = 0;
+      var tick = function(){
+        var jd = window.JUDGMENT_DATA || {};
+        var mb = window.MACRO_BRIEF || {};
+        if ((jd.update_time || mb.update_time) && typeof window._buildJudgmentEnvHTML === 'function') {
+          window.__renderJudgmentHeader();
+          window.__renderJudgmentBody();
+          return;
+        }
+        if (++tries < 5) setTimeout(tick, 500);
+      };
+      tick();
     };
     </script>
 
@@ -1326,15 +1343,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="note">双维度 = 套利评分（收益弹性）+ 基本面评分（安全边际）。综合分 = 套利×60% + 基本面×40%。</div>
     </div>
 
-    <!-- 重要事件日历（完整周历 · 与 calendar.html 同源） -->
-    <div class="card">
-      <h3><span class="ic">📅</span>重要事件日历 - 中长线 · <span class="fresh" id="v8caltime">每周日更新</span></h3>
-      <div id="v8calcontent"></div>
-      <div style="margin-top:20px">
-        <div style="font-weight:800;margin-bottom:14px;font-size:15px">🎨 色块标注说明</div>
-        <div class="v8cal-legend-grid" id="v8callegend"></div>
-      </div>
-    </div>
+    <!-- ⚖️ 2026-08-14 主人令："这个没用，删了吧"：重要事件日历（完整周历·中长期）已删除——保留日历改由 sec-rc 处理 -->
   </section>
 
   <!-- ============ 实时数据 ============ -->
@@ -3146,10 +3155,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div id="jyCalContainer"></div>
     </div>
 
-    <!-- ===== TAB2: 北向席位日历 ===== -->
-    <div id="rcTab2" class="rc-pane">
-      <div id="northCalContainer"></div>
-    </div>
+    <!-- ⚖️ 2026-08-14 主人令："这个没用，删了吧"：TAB2 北向日历 HTML 已删除 -->
 
     <!-- ===== TAB3: 每日洞察 ===== -->
     <div id="rcTab3" class="rc-pane">
@@ -3172,7 +3178,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     window.__rcActiveTab = tabId;
     // Lazy render on first visit（机游/北向已拆成独立 tab）
     if(tabId === 'tab1' && !window.__jyCalRendered){ setTimeout(renderJyCalendar, 30); }
-    if(tabId === 'tab2' && !window.__northCalRendered){ setTimeout(renderNorthCalendar, 30); }
+    // ⚖️ 2026-08-14 主人令："这个没用，删了吧"：tab2 北向日历调用已删除
     if(tabId === 'tab3' && !window.__insightRendered){ setTimeout(renderInsight, 30); }
     /* tab4 大牛股猎手已迁至「选股策略」，见 window.renderHunter */
   }
@@ -3713,329 +3719,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   // 北向资金日历翻月按钮（2026-08-06 主人确立：前后月翻页）
   window._northCalNav = function(delta){
     window.__northCalState.m += delta;
-    if(window.__northCalState.m < 0){ window.__northCalState.m = 11; window.__northCalState.y--; }
-    else if(window.__northCalState.m > 11){ window.__northCalState.m = 0; window.__northCalState.y++; }
-    var c = _rc$('northCalContainer'); if(c) c.innerHTML = '';
-    window.__northCalRendered = false;
-    try{ renderNorthCalendar(); }catch(e){ console.warn('北向翻月渲染失败', e); }
-  };
-  window._northCalPrev = function(){ window._northCalNav(-1); };
-  window._northCalNext = function(){ window._northCalNav(1); };
-  function renderNorthCalendar(){
-    var c = _rc$('northCalContainer');
-    if(!c) return;
-    try{
-    var NF = window.NORTH_FUND || {};
+  // ⚖️ 2026-08-14 主人令："这个没用，删了吧"：TAB2 北向日历 IIFE（state / 翻月 / renderNorthCalendar / _rcClickNorthDay 等）整段已删除
 
-    var year = window.__northCalState.y, month = window.__northCalState.m;
-
-    var h = '';
-    h += '<div class="cal-header-row">';
-    h += '<span class="cal-title">🌊 北向资金日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span> ' + _uBadge('盘后', '短线', NF.update_time) + '</span>';
-    h += '<span class="cal-meta">'
-       + '<button class="cal-nav-btn" onclick="_northCalPrev()" title="上个月">◀</button>'
-       + ' <span id="northCalYearMonth">' + year + '年' + (month+1) + '月</span> '
-       + '<button class="cal-nav-btn" onclick="_northCalNext()" title="下个月">▶</button>'
-       + '</span>';
-    h += '</div>';
-
-    // Notice box（精简·去掉过期"已停更"信息）
-    h += '<div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:11px;line-height:1.7;color:var(--sub)">';
-    h += '<strong style="color:var(--gold)">说明：</strong><br>';
-    h += '1. 本页统计龙虎榜中「深股通/沪股通专用 + 瑞银/高盛/摩根等外资券商」席位净买卖动向（数据来自沪深交易所龙虎榜北向席位明细）。<br>';
-    h += '2. 口径：仅覆盖当日上龙虎榜的个股，精确但非全市场北向资金流。每日盘后更新。';
-    h += '</div>';
-
-    // Calendar using LHB_HISTORY (多日) + 降级 LHB_DATA（补回7月等历史月）
-    var _nbDays = (window._rcDays() || []).map(function(d){
-      return {iso:String(d.iso).replace(/-/g,''), stocks:d.stocks||[], summary:d.summary||{}};
-    });
-    var stocks = [];
-    _nbDays.forEach(function(d){ window._safeArr(d.stocks).forEach(function(s){ s.date = d.iso; stocks.push(s); }); });
-    var dayMapNb = {};
-    _nbDays.forEach(function(d){ dayMapNb[d.iso] = d; });
-    var lhbDate = _nbDays.length ? _nbDays[_nbDays.length-1].iso : '';
-    var hasMultiDay = _nbDays.length > 1;
-
-    // 默认月份回落：当前月无数据则落到最近有数据月份（补回7月）
-    var _nbPrefix = String(year)+String(month+1).padStart(2,'0');
-    if(!_nbDays.some(function(d){ return d.iso.indexOf(_nbPrefix)===0; }) && _nbDays.length){
-      var _nbLast = _nbDays[_nbDays.length-1].iso;
-      year = parseInt(_nbLast.slice(0,4),10); month = parseInt(_nbLast.slice(4,6),10)-1;
-      window.__northCalState.y = year; window.__northCalState.m = month;
-    }
-
-    var now = new Date();
-    var firstDay = new Date(year, month, 1).getDay();
-    var monOffset = firstDay === 0 ? 6 : firstDay - 1;
-    var daysInMonth = new Date(year, month+1, 0).getDate();
-    var todayStr = String(now.getFullYear())+String(now.getMonth()+1).padStart(2,'0')+String(now.getDate()).padStart(2,'0');
-
-    // Extract north-bound stocks from LHB (北向席位 buy-sell 净买卖)
-    var northStocks = [];
-    stocks.forEach(function(s){
-      var sx = (s.seats || {})['北向'] || null;
-      if(sx){
-        s._nb_net_万 = ((sx.buy||0) - (sx.sell||0));
-        northStocks.push(s);
-      }
-    });
-
-    // Legend
-    h += '<div style="display:flex;gap:12px;font-size:10px;color:var(--dim);margin-bottom:10px;flex-wrap:wrap">';
-    h += '<span><span style="color:var(--up);font-weight:700">▲</span> 净买入TOP5</span>';
-    h += '<span><span style="color:var(--down);font-weight:700">▼</span> 净卖出TOP5</span>';
-    h += '<span><span style="color:var(--up);font-weight:700">净流入</span></span>';
-    h += '<span><span style="color:var(--dim)">休市</span></span>';
-    h += '</div>';
-
-    // Grid
-    h += '<div class="cal-head">';
-    ['一','二','三','四','五','六','日'].forEach(function(d,i){
-      h += '<span' + (i>=5 ? ' class="weekend"' : '') + '>' + d + '</span>';
-    });
-    h += '</div>';
-    h += '<div class="cal-grid">';
-    for(var e = 0; e < monOffset; e++) h += '<div class="cal-cell empty"></div>';
-
-    for(var d = 1; d <= daysInMonth; d++){
-      var iso = String(year)+String(month+1).padStart(2,'0')+String(d).padStart(2,'0');
-      var isToday = iso === todayStr;
-      var hasData = !!dayMapNb[iso];
-      var cls = 'cal-cell';
-      if(isToday) cls += ' today';
-      if(hasData) cls += ' has-data';
-
-      h += '<div class="' + cls + '" onclick="_rcClickNorthDay(\'' + iso + '\')" data-date="' + iso + '">';
-      h += '<span class="cal-date-num">' + d + '</span>';
-
-      // 🔴 2026-08-06 修复：用当天 stocks 算北向 N（不是历史累计 northStocks.length=1444）
-      var _dayStocks = hasData ? ((dayMapNb[iso] && dayMapNb[iso].stocks) || []) : [];
-      var _dayNb = _dayStocks.filter(function(s){ var sx=(s.seats||{})['北向']; return sx && ((sx.buy||0)+(sx.sell||0)); });
-      // 🟡 2026-08-12 兜底：当天 stocks>0 但 seats 全空（骨架数据），提示"席位待补"
-      var _isSkeleton = _dayStocks.length > 0 && _dayNb.length === 0;
-      if(hasData && _dayNb.length > 0){
-        var nNet = 0;
-        _dayNb.forEach(function(s){ nNet += (((s.seats['北向'].buy||0) - (s.seats['北向'].sell||0))); });
-        var nColor = nNet >= 0 ? 'c-up' : 'c-down';
-        h += '<div class="cal-stat" style="text-align:center;padding:2px 1px">';
-        h += '<div style="color:#f59e0b;font-weight:700;font-size:12px">🌊北向 ' + _dayNb.length + '</div>';
-        h += '<div class="' + nColor + '" style="font-size:11px;font-weight:600">' + _rcFmtYi(nNet) + '</div>';
-        h += '</div>';
-      } else if(hasData && _isSkeleton){
-        // 2026-08-12 兜底提示：当天数据只有骨架（trading=True + stocks>0 但 seats={}）
-        // 这种是历史回填时 akshare 席位 API 失败的产物，需要重跑 fetch_lhb
-        h += '<div class="cal-stat" style="text-align:center;padding:4px 2px;color:#fbbf24" title="该日上榜股列表已回填，但席位明细拉取失败——等待云端重跑 fetch_lhb 补回">';
-        h += '<div style="font-weight:700;font-size:11px">🟡席位待补</div>';
-        h += '<div style="font-size:10px;color:var(--dim)">'+_dayStocks.length+'只</div>';
-        h += '</div>';
-      } else {
-        var dow = new Date(year, month, d).getDay();
-        if(dow === 0 || dow === 6){
-          h += '<div class="cal-stat" style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);opacity:0.4">休市</div>';
-        } else if(d > parseInt(lhbDate.slice(6)||'31')){
-          h += '<div class="cal-stat" style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);opacity:0.25">--</div>';
-        } else {
-          h += '<div class="cal-stat" style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);opacity:0.3">—</div>';
-        }
-      }
-      h += '</div>';
-    }
-    var tc2 = monOffset + daysInMonth;
-    var rem2 = tc2 % 7;
-    if(rem2 > 0) for(var e2 = 0; e2 < 7 - rem2; e2++) h += '<div class="cal-cell empty"></div>';
-    h += '</div>';
-
-    h += '<div id="northDayDetail" class="cal-detail"></div>';
-
-    // ==== 最近交易日北向席位（截图2 样式：净买入TOP10 + 净卖出TOP10 卡片） ====
-    // 🔴 2026-08-06 修复：只用当天 stocks（不是 northStocks 历史累计 1444）
-    var _lastDayStocks = _nbDays.length ? window._safeArr(_nbDays[_nbDays.length-1].stocks) : [];
-    var northStocksToday = _lastDayStocks.filter(function(s){
-      var sx = (s.seats||{})['北向'];
-      return sx && ((sx.buy||0)+(sx.sell||0));
-    }).map(function(s){
-      return Object.assign({}, s, { _nb_net_万: ((s.seats['北向'].buy||0) - (s.seats['北向'].sell||0)) });
-    });
-    if(northStocksToday.length > 0 && lhbDate){
-      var nb = northStocksToday.filter(function(s){ return s._nb_net_万 > 0; }).sort(function(a,b){return b._nb_net_万 - a._nb_net_万;});
-      var ns = northStocksToday.filter(function(s){ return s._nb_net_万 < 0; }).sort(function(a,b){return a._nb_net_万 - b._nb_net_万;});
-      var nbSum = nb.reduce(function(acc,s){return acc+s._nb_net_万;}, 0);
-      var nsSum = ns.reduce(function(acc,s){return acc+s._nb_net_万;}, 0);
-      var nbTotal = nbSum + nsSum;
-      var wkdayMap = ['周日','周一','周二','周三','周四','周五','周六'];
-      var dyMo = parseInt(lhbDate.slice(4,6)), dyDy = parseInt(lhbDate.slice(6));
-      var wkLabel = wkdayMap[new Date(parseInt(lhbDate.slice(0,4)), dyMo-1, dyDy).getDay()];
-      h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📋 最近交易日龙虎榜北向席位</h3>';
-      h += '<div style="display:flex;align-items:baseline;gap:14px;padding:0 4px;margin-bottom:10px;font-size:12px">';
-      h += '<span style="color:var(--txt);font-weight:600">📅 '+lhbDate.slice(0,4)+'/'+lhbDate.slice(4,6)+'/'+lhbDate.slice(6)+' '+wkLabel+'</span>';
-      h += '<span style="color:var(--gold);font-weight:700">★北向参与 '+northStocksToday.length+'</span>';
-      h += '<span style="color:'+(nbTotal>=0?'var(--up)':'var(--down)')+';font-weight:700">净流入 '+(nbTotal/10000>=0?'+':'')+(nbTotal/10000).toFixed(2)+'亿</span>';
-      h += '</div>';
-      // 🔴 2026-08-06 主人令：页面级只显示摘要，TOP10 详情移到 modal（点日历格子查看）。避免重复。
-      h += '<div style="font-size:11px;color:var(--dim);margin-bottom:6px;">📌 净买卖 TOP10 详情见点击日历格子后的弹层</div>';
-    }
-    // Weekly summary (北向席位·月初截断+完整周+月末截断全覆盖，2026-08-06 修复)
-    h += '<h3 style="margin-top:24px;font-size:15px;color:var(--txt)">📊 周度汇总 · ' + (year) + '年' + (month+1) + '月北向席位</h3>';
-    h += '<div class="week-cards">';
-    var cardsNb = [];
-    var _nbMdays = new Date(year, month+1, 0).getDate();
-    var _nbFirstDow = new Date(year, month, 1).getDay();
-    var _nbFirstMon = 1 + ((8 - _nbFirstDow) % 7);
-    var _wn = 1;
-    if(1 < _nbFirstMon){
-      cardsNb.push({no:_wn, labelMon:(month+1)+'/1', labelSun:(month+1)+'/'+(_nbFirstMon-1), start:1, end:_nbFirstMon-1, isFull:false});
-      _wn++;
-    }
-    for(var _d=_nbFirstMon; _d<=_nbMdays; _d+=7){
-      var _end = Math.min(_d+6, _nbMdays);
-      cardsNb.push({no:_wn, labelMon:(month+1)+'/'+_d, labelSun:(month+1)+'/'+_end, start:_d, end:_end, isFull:(_end-_d===6)});
-      _wn++;
-      if(_end === _nbMdays) break;
-      if(_d + 7 > _nbMdays){
-        var _nx = _d + 7;
-        if(_nx <= _nbMdays){
-          cardsNb.push({no:_wn, labelMon:(month+1)+'/'+_nx, labelSun:(month+1)+'/'+_nbMdays, start:_nx, end:_nbMdays, isFull:false});
-          _wn++;
-        }
-        break;
-      }
-    }
-    cardsNb.forEach(function(wk){
-      h += '<div class="wk-card"><div class="wk-card-hd"><span class="wk-card-title">第'+wk.no+'周 '+wk.labelMon+'-'+wk.labelSun+(wk.isFull?'':' <span style="color:var(--dim);font-size:10px">(截断)</span>')+'</span></div>';
-      var wkNorth;
-      if(hasMultiDay){
-        wkNorth = northStocks.filter(function(s){
-          var sd = (s.date||'').replace(/-/g,'');
-          if(sd.length < 8) return false;
-          var sdd = +sd.slice(6,8);
-          var sy = +sd.slice(0,4), sm = +sd.slice(4,6)-1;
-          if(sy !== year || sm !== month) return false;
-          return sdd >= wk.start && sdd <= wk.end;
-        });
-      } else {
-        // 单日数据：仅当 lhbDate 落入本卡所在周时展示（按日范围匹配，2026-08-06 修 wk.mon 引用）
-        var lhbDay = null;
-        if(lhbDate && lhbDate.length >= 8){
-          lhbDay = +lhbDate.slice(6,8);
-        }
-        wkNorth = (lhbDay && lhbDay >= wk.start && lhbDay <= wk.end) ? northStocks : [];
-      }
-      if(wkNorth.length > 0){
-        var wBuy = wkNorth.filter(function(s){ return s._nb_net_万 > 0; }).sort(function(a,b){return b._nb_net_万 - a._nb_net_万;}).slice(0,10);
-        var wSell = wkNorth.filter(function(s){ return s._nb_net_万 < 0; }).sort(function(a,b){return a._nb_net_万 - b._nb_net_万;}).slice(0,10);
-        h += '<div class="wk-badge buy">✅ 买入TOP10</div><div class="wk-list">';
-        wBuy.forEach(function(s){ h += '<div class="wk-item"><span>'+_rcEsc(s.name)+'</span><span class="c-up">'+_rcFmtYi(s._nb_net_万)+'</span></div>'; });
-        h += '</div><div class="wk-badge sell">❌ 卖出TOP10</div><div class="wk-list">';
-        wSell.forEach(function(s){ h += '<div class="wk-item"><span>'+_rcEsc(s.name)+'</span><span class="c-down">'+_rcFmtYi(s._nb_net_万)+'</span></div>'; });
-        h += '</div>';
-      } else {
-        h += '<div style="text-align:center;color:var(--dim);padding:20px;font-size:12px">该周暂无北向席位数据</div>';
-      }
-      h += '</div>';
-    });
-    h += '</div>';
-
-    // Monthly summary (北向席位·当月·2026-08-06 按自然月，过滤其他月)
-    var _monthNb = northStocks.filter(function(s){
-      var sd = (s.date||'').replace(/-/g,'');
-      if(sd.length < 8) return false;
-      return +sd.slice(0,4) === year && (+sd.slice(4,6)-1) === month;
-    });
-    h += '<h3 style="margin-top:20px;font-size:15px;color:var(--txt)">📊 月度汇总 <span style="font-size:11px;color:var(--dim);font-weight:400">· ' + (year) + '年' + (month+1) + '月龙虎榜北向席位净买卖（仅当月·' + _monthNb.length + '只有北向持仓）</span></h3>';
-    h += '<div class="month-summary">';
-    var mNb = _monthNb.filter(function(s){ return s._nb_net_万 > 0; }).sort(function(a,b){return b._nb_net_万 - a._nb_net_万;});
-    var mNs = _monthNb.filter(function(s){ return s._nb_net_万 < 0; }).sort(function(a,b){return a._nb_net_万 - b._nb_net_万;});
-    h += '<div class="ms-col"><div class="ms-title"><span style="color:var(--up)">▲</span> 净买入TOP10</div>';
-    mNb.slice(0,10).forEach(function(s,idx){
-      h += '<div class="ms-item"><span>'+(idx+1)+_rcEsc(s.name)+'<span class="ms-code">'+(s.code||'')+'</span></span><span class="ms-val c-up">'+_rcFmtYi(s._nb_net_万)+'</span></div>';
-    });
-    h += '</div><div class="ms-col"><div class="ms-title"><span style="color:var(--down)">▼</span> 净卖出TOP10</div>';
-    mNs.slice(0,10).forEach(function(s,idx){
-      h += '<div class="ms-item"><span>'+(idx+1)+_rcEsc(s.name)+'<span class="ms-code">'+(s.code||'')+'</span></span><span class="ms-val c-down">'+_rcFmtYi(s._nb_net_万)+'</span></div>';
-    });
-    h += '</div></div>';
-
-    // Footer
-    h += '<div style="margin-top:12px;font-size:10px;color:var(--dim);text-align:center;line-height:1.6">';
-    h += '龙虎榜北向席位日历 · 每日净买入TOP5 + 净卖出TOP5<br>';
-    h += '数据更新：' + ((window.LHB_DATA && window.LHB_DATA.update_time) ? (window._fmtAshareRel ? window._fmtAshareRel(window.LHB_DATA.update_time) : window.LHB_DATA.update_time) : '—');
-    h += '</div>';
-
-    c.innerHTML = h;
-    window.__northCalRendered = true;
-    }catch(e){
-      console.error('北向资金日历渲染失败', e);
-      c.innerHTML = '<div style="text-align:center;padding:40px;color:var(--dim);">北向资金日历加载失败，请刷新重试<br><span style="font-size:11px;">'+(e&&e.message?String(e.message):'未知错误')+'</span></div>';
-      window.__northCalRendered = false;
-    }
-  }
-
-  window._rcClickNorthDay = function(dateStr){
-    var detail = _rc$('northDayDetail');
-    if(!detail) return;
-    var _day = null;
-    (window._rcDays()||[]).forEach(function(d){ if(String(d.iso).replace(/-/g,'')===dateStr) _day=d; });
-    if(!_day || !_day.stocks || !_day.stocks.length || !window._safeArr(_day.stocks).some(function(s){ return (s.seats||{})['北向']; })){
-      detail.innerHTML = '<div class="cal-detail-body" style="text-align:center;color:var(--dim);padding:20px">该日暂无北向席位数据</div>';
-      detail.className = 'cal-detail show'; return;
-    }
-    var northStocks = window._safeArr(_day.stocks).filter(function(s){ return (s.seats||{})['北向']; }).map(function(s){
-      var sx = s.seats['北向'] || {};
-      return Object.assign({}, s, { _nb_net_万: (sx.buy||0) - (sx.sell||0) });
-    });
-    // 按北向净买入降序排序（净买入>0 在前，<0 在后）
-    var sorted = northStocks.slice().sort(function(a,b){ return (b._nb_net_万||0) - (a._nb_net_万||0); });
-    var nbTop = sorted.filter(function(s){ return (s._nb_net_万||0) > 0; });
-    var nsTop = sorted.filter(function(s){ return (s._nb_net_万||0) < 0; }).reverse();
-    var nbTotal = nbTop.reduce(function(a,s){return a+s._nb_net_万;},0);
-    var wkdayMap = ['周日','周一','周二','周三','周四','周五','周六'];
-    var _ny = +dateStr.slice(0,4), _nm = +dateStr.slice(4,6)-1, _nd = +dateStr.slice(6,8);
-    var wkLabel = wkdayMap[new Date(_ny, _nm, _nd).getDay()];
-    var dispDate = dateStr.slice(0,4)+'-'+dateStr.slice(4,6)+'-'+dateStr.slice(6,8);
-    var h = '<div class="cal-detail-head"><h4>'+dispDate+'（'+wkLabel+'）北向席位详情</h4><span class="cal-detail-close" onclick="this.closest(\'.cal-detail\').classList.remove(\'show\')">✕</span></div>';
-    h += '<div class="cal-detail-body">';
-    // 🔴 2026-08-06 主人令：modal 只显示净买卖 TOP10 详情（页面级卡片显示摘要），避免重复
-    // 段 1（全部股票按净买入排序 3 列网格）已删除
-    // 段 2：净买入 TOP10 + 净卖出 TOP10（详情卡片）
-    h += '<div style="display:flex;align-items:baseline;gap:12px;font-size:11px;color:var(--dim);margin-bottom:8px;flex-wrap:wrap">';
-    h += '<span>📋 净买卖 TOP10 详情 · '+sorted.length+' 只有北向席位</span>';
-    h += '<span style="color:'+(nbTotal>=0?'var(--up)':'var(--down)')+';font-weight:700">净流入 '+(nbTotal/10000>=0?'+':'')+(nbTotal/10000).toFixed(2)+'亿</span>';
-    h += '</div>';
-    h += '<h3 style="margin-top:6px;font-size:14px;color:var(--txt)">📊 净买卖 TOP10（按北向席位净买入）</h3>';
-    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
-    h += '<div class="jy-day-card" style="margin-bottom:0"><div class="jy-day-hd" style="color:var(--up)"><span>▲</span> 净买入 TOP10</div><div class="jy-day-body">';
-    if(nbTop.length){
-      nbTop.slice(0,10).forEach(function(s){
-        h += '<div class="jy-day-row"><span class="jy-day-name">'+_rcEsc(s.name)+'</span><span class="jy-day-val c-up">'+_rcFmtYi(s._nb_net_万)+'</span></div>';
-      });
-    } else {
-      h += '<div style="text-align:center;color:var(--dim);padding:8px;font-size:11px">该日无净买入</div>';
-    }
-    h += '</div></div>';
-    h += '<div class="jy-day-card" style="margin-bottom:0"><div class="jy-day-hd" style="color:var(--down)"><span>▼</span> 净卖出 TOP10</div><div class="jy-day-body">';
-    if(nsTop.length){
-      nsTop.slice(0,10).forEach(function(s){
-        h += '<div class="jy-day-row"><span class="jy-day-name">'+_rcEsc(s.name)+'</span><span class="jy-day-val c-down">'+_rcFmtYi(s._nb_net_万)+'</span></div>';
-      });
-    } else {
-      h += '<div style="text-align:center;color:var(--dim);padding:8px;font-size:11px">该日无净卖出</div>';
-    }
-    h += '</div></div>';
-    h += '</div>';
-    h += '</div>';
-    detail.innerHTML = h;
-    detail.className = 'cal-detail show';
-  };
-
-  /* ===== TAB3: 每日洞察（参照截图12） ===== */
-  window.__insightRendered = false;
-  function renderInsight(){
-    var c = _rc$('insightContainer');
-    if(!c) return;
-    // 红黄绿灯本地 helper（renderAiSummary 的 IIFE 局部不共享）
-    var LIGHTC = {green:'#1fd17b', yellow:'#fbbf24', red:'#f4495d'};
-    function lightText(c){ return c==='green'?LIGHTC.green:c==='red'?LIGHTC.red:c==='yellow'?LIGHTC.yellow:c==='gray'?'#94a3b8':'#38bdf8'; }
     function lightDot(sig, sz){
       sz = sz || 11;
       var col = lightText(sig);
@@ -6046,7 +5731,11 @@ function switchSec(sec,el){
   // 暂未上架：进入时渲染实验区（renderUnlisted 内部有 rendered 防重；2026-08-07 一级 Tab）
   if(sec==='ul' && typeof window.renderUnlisted==='function') setTimeout(window.renderUnlisted,60);
   // 今日事件：今日判定环境态势卡已迁回，进入时触发渲染
-  if(sec==='td' && typeof window.__renderJudgmentBody==='function') setTimeout(window.__renderJudgmentBody,60);
+  if(sec==='td' && typeof window.__renderJudgmentBody==='function'){
+    setTimeout(window.__renderJudgmentBody,60);
+    setTimeout(window.__renderJudgmentHeader,60);
+    if(typeof window.__retryJudgmentRender==='function') setTimeout(window.__retryJudgmentRender, 200);
+  }
   // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
   if(sec==='ph' && typeof window._renderSecPh==='function') setTimeout(window._renderSecPh,80);
   if(sec==='st' && typeof window._renderSecSt==='function') setTimeout(window._renderSecSt,80);
@@ -10402,26 +10091,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     }
     h+='</div></div>';
 
-    // === 📦 TOP3 持仓跟踪（2026-08-10 主人令·暂未上架实验区·独立卡片） ===
-    h+='<div class="card" style="margin:16px 0;border-left:4px solid #f59e0b;background:linear-gradient(135deg,rgba(245,158,11,.1),rgba(245,158,11,.03));">';
-    h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">';
-    h+='<span style="font-size:15px;font-weight:700;color:#fbbf24;">📦 TOP3 持仓跟踪</span>';
-    h+='<span id="pfSourceBadge" style="font-size:10.5px;padding:2px 8px;border-radius:8px;font-weight:600;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);">☁️ westock 云端同步 · 实时</span>';
-    h+='<span style="font-size:11px;color:var(--dim);">记录持仓 · 自动跟踪盈亏 · 止损止盈提醒 · 异动监控</span></div>';
-    // 录入表单
-    h+='<div style="display:grid;grid-template-columns:120px 100px 80px 70px auto;gap:6px 8px;margin-bottom:10px;align-items:end;position:relative;">';
-    h+='<input id="pfCode" placeholder="代码/拼音/名称" onkeydown="if(event.key===\'Enter\')addPosition()" oninput="showPfDropdown(this.value)" onfocus="if(this.value.trim())showPfDropdown(this.value)" onblur="var _t=this;setTimeout(function(){hidePfDropdown()},200)" style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--card);color:var(--txt);box-sizing:border-box;" />';
-    h+='<div id="pfDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:100;background:var(--card);border:1px solid var(--border);border-radius:8px;max-height:220px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.4);"></div>';
-    h+='</div>';
-    h+='<div style="display:grid;grid-template-columns:100px 80px 70px auto;gap:6px 8px;margin-bottom:10px;align-items:end;">';
-    h+='<input id="pfDate" type="date" style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--card);color:var(--txt);" />';
-    h+='<input id="pfPrice" placeholder="买入价" type="number" step="0.01" style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--card);color:var(--txt);" />';
-    h+='<input id="pfQty" placeholder="数量" type="number" style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--card);color:var(--txt);" />';
-    h+='<button class="btn" onclick="addPosition()" style="font-size:12px;padding:7px 14px;">+ 加入持仓</button>';
-    h+='</div>';
-    // 持仓列表容器
-    h+='<div id="pfList"></div>';
-    h+='</div>';
+    // ⚖️ 2026-08-14 主人令："这个没用，删了吧"：TOP3 持仓跟踪卡片 HTML 已删除
+    h+='';
 
     // === 暂未上架实验区 · 数据驱动卡（2026-08-08 主人令：今日可入手候选已迁入「最终推荐 · 今日推荐候选池」，此处不再重复渲染） ===
 
@@ -10435,7 +10106,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     // ── 🎭 情绪周期 · 连板天梯（合并紧凑版）已迁到实时数据区，见 window.__renderCycleLadderCard ──
 
     el.innerHTML=h;
-    if(typeof window.renderPortfolio==='function') window.renderPortfolio();
+    // ⚖️ 2026-08-14 主人令：renderPortfolio 调用已删除（持仓跟踪卡整段移除）
     // 2026-08-14 主人令：涨价榜/情绪周期/潜力挖掘/ETF龙头 fill 改由 switchSt('pr') 触发（已迁选股策略子TAB）
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderUnlisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
   }
@@ -10621,345 +10292,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   };
 
   /* ===== 📦 TOP3 持仓跟踪（2026-08-10 暂未上架·localStorage 持久化） =====
-     2026-08-12 主人令：删除 ETF 持仓种子（159755/159665），只保留 688548 广钢气体；ETF 是「又自己跑出来」的，
-     不属于主人录入数据，前端不应自动加载。 */
-  var PF_KEY = 'v8_portfolio_positions';
-  var PF_MIGRATION_KEY = 'v8_pf_migration_v3'; // 数据迁移版本标记
-  var PF_SEED_VERSION = '4_2026-08-12';         // 2026-08-12 增量：移除 ETF，只留 688548 广钢气体
-  // 预设种子数据（仅 688548 广钢气体；ETF 不再默认加载）
-  window._PF_SEED = [
-    {code:'688548', name:'广钢气体', full_code:'sh688548', market:'sh', date:'2026-08-11', price:9.71, qty:1000}
-  ];
-  window._pfLoad = function(){
-    try {
-      var arr = JSON.parse(localStorage.getItem(PF_KEY)||'[]');
-      // 首次访问（空）→ 自动加载种子数据
-      if(!arr || !arr.length){ arr = window._PF_SEED || []; _pfSave(arr); }
-      // 2026-08-11 v2 迁移：清理 _pfFindStock 空串 bug 导致的错误匹配数据
-      // 该 bug 在 06:38 前（commit e25e349c8 前）存在，会导致输入纯字母时匹配到错误股票
-      if(!localStorage.getItem(PF_MIGRATION_KEY) && arr.length > 0 && window._uniSearch){
-        var cleaned = [], changed = false;
-        for(var i=0;i<arr.length;i++){
-          var p = arr[i];
-          // 用当前正确的 _uniSearch 验证 code→name 映射
-          var verified = window._uniSearch(p.code, 1);
-          if(verified && verified.length && verified[0].code === p.code){
-            // code 能找到，检查 name 是否一致（允许小差异）
-            if(verified[0].name === p.name){
-              cleaned.push(p); // 正常数据，保留
-            } else {
-              // name 不一致 → 说明是 bug 期间错误匹配的数据
-              // 用正确的 name 替换，保留用户的 price/qty/date
-              cleaned.push({code:p.code,name:verified[0].name,full_code:verified[0].full_code||p.full_code,
-                market:verified[0].market||p.market,date:p.date,price:p.price,qty:p.qty,added_at:p.added_at});
-              changed = true;
-              console.warn('[持仓迁移] 修正条目:', p.name, '→', verified[0].name, '('+p.code+')');
-            }
-          } else {
-            // code 完全找不到 → 可能是无效代码，保留原样（可能是 ETF/新股）
-            cleaned.push(p);
-          }
-        }
-        if(changed){
-          _pfSave(cleaned);
-          arr = cleaned;
-        }
-        localStorage.setItem(PF_MIGRATION_KEY, '1'); // 标记迁移已完成
-      }
-      // 2026-08-11 修复：检测 localStorage 是否包含新版种子（688548 广钢气体 + 159665 芯片ETF）；
-      // 不含则合并新种子——保留用户手动添加的非种子持仓（如有），再追加种子 3 只到顶部
-      try { window._pfMigrateSeedV3 && window._pfMigrateSeedV3(arr); } catch(e){ console.warn('seed migrate err:', e); }
-      return arr;
-    } catch(e){ return (window._PF_SEED || []); }
-  };
-  // 2026-08-12：种子迁移 v4 — 检测是否包含 688548 广钢气体；不含则补齐
-// 同时清理历史 ETF 种子（159755 锂电池ETF / 159665 芯片ETF）——主人令「不要 ETF，只留我录入的」
-  window._pfMigrateSeedV3 = function(arr){
-    var hasNewSeed = (arr||[]).some(function(p){ return p.code==='688548' && p.name==='广钢气体'; });
-    // 清理旧版 ETF 种子（不管主人有没有手动加的，全部移除——ETF 不应作为默认持仓出现）
-    var beforeCount = (arr||[]).length;
-    var cleaned = (arr||[]).filter(function(p){
-      return p.code !== '159755' && p.code !== '159665' && p.code !== '159865';
-    });
-    var removedEtf = beforeCount - cleaned.length;
-    if(!hasNewSeed){
-      // 把 688548 广钢气体作为种子补齐（只补这一只，不加 ETF）
-      cleaned = (window._PF_SEED||[]).concat(cleaned);
-    }
-    if(removedEtf > 0 || !hasNewSeed){
-      _pfSave(cleaned);
-      console.warn('[持仓种子v4迁移] 已移除', removedEtf, '只 ETF 持仓；当前', cleaned.length, '只');
-    }
-    return cleaned;
-  };
-  // 2026-08-12 主人令：手动重置入口（数据丢失防护——确认后才清空）
-  window._pfResetAll = function(){
-    var msg = '⚠️ 确认清空所有持仓（包括你手动添加的）并加载最新默认种子？\n\n种子仅含 1 只：\n• 688548 广钢气体\n\n此操作不可撤销。';
-    if(!confirm(msg)) return;
-    localStorage.removeItem(PF_KEY);
-    localStorage.removeItem(PF_MIGRATION_KEY);
-    var seed = (window._PF_SEED||[]).slice();
-    _pfSave(seed);
-    if(typeof window.renderPortfolio==='function') window.renderPortfolio();
-    alert('✅ 已重置为最新种子（' + seed.length + ' 只）');
-  };
-  window._pfSave = function(arr){
-    localStorage.setItem(PF_KEY, JSON.stringify(arr||[]));
-  };
-  // 匹配股票（2026-08-14 修复：支持港股 code 与 hk 前缀输入，避免 5 位代码被错判为 A股）
-  window._pfFindStock = function(q){
-    if(!q) return null;
-    var qt=(q||'').trim().toUpperCase();
-    // 明确含 hk/HK/.HK 前缀 → 直接锁定港股
-    if(qt.indexOf('HK')===0 || qt.indexOf('.HK')!==-1){
-      var hkCode=qt.replace(/^HK/,'').replace(/\.HK$/,'').replace(/\D/g,'');
-      if(/^\d{1,5}$/.test(hkCode)){
-        hkCode=hkCode.padStart(5,'0');
-        var hkName=null;
-        // 尝试从行情数据拿名称
-        var SQ=window.STOCK_QUOTE||{}, st=SQ.stocks||{};
-        var qo=st['hk'+hkCode]; if(qo&&qo.name) hkName=qo.name;
-        return {code:hkCode, name:(hkName||hkCode), full_code:'hk'+hkCode, py:'', market:'hk'};
-      }
-    }
-    // 优先使用统一搜索内核（覆盖 STOCK_LIST 全量 + 拼音/代码/名称）
-    if(window._uniSearch){
-      var hits = window._uniSearch(q, 1);
-      if(hits && hits.length) return {code:hits[0].code, name:hits[0].name, full_code:hits[0].full_code||hits[0].code, py:hits[0].py||'', market:hits[0].market||''};
-    }
-    // fallback：手写逻辑（仅当 _uniSearch 不存在时）
-    var normCode=function(c){return String(c||'').replace(/\D/g,'').replace(/^[shszSHSZ]+/,'');};
-    var nc=normCode(q), ql=(q||'').toLowerCase(), best=null, bs=-1;
-    var list=window.STOCK_LIST; if(Array.isArray(list)){} else if(list&&Array.isArray(list.data))list=list.data; else list=[];
-    for(var i=0;i<list.length;i++){var s=list[i];if(!s||!s.code)continue;
-      var sc=normCode(s.code), sn=s.name.toLowerCase(), py=(s.py||'').toLowerCase();
-      var sc2=0;
-      // 关键修复：nc 为空时不能走 code 前缀匹配（''.indexOf('')===0 永远为真！）
-      if(nc && sc===nc)sc2=4; else if(nc && sc.indexOf(nc)===0)sc2=3;
-      if(sn.indexOf(ql)!==-1)sc2=Math.max(sc2,2);
-      if(py.indexOf(ql)!==-1)sc2=Math.max(sc2,py===ql?5:4);
-      if(sc2>bs){bs=sc2;best={code:s.code,name:s.name,full_code:s.full_code||s.code,py:s.py||'',market:s.market||''};}
-    }
-    if(!best){var fr=window.FINAL_RECOMMEND_DATA;if(fr&&fr.stocks){for(var j=0;j<fr.stocks.length;j++){var r=fr.stocks[j];if(!r)continue;
-      if(r.name.toLowerCase().indexOf(ql)!==-1||(r.code||'').indexOf(nc)!==-1)
-        {best={code:r.code,name:r.name,full_code:(r.market||'hk')+r.code,py:r.py||'',market:r.market||'hk'};bs=3;}
-    }}}
-    // 兜底：纯数字代码 → 5位优先港股，6位按 A股规则（支持 ETF/新股等不在 STOCK_LIST 的标的）
-    if(!best && /^\d{5,6}$/.test(nc)){
-      var mk;
-      if(nc.length===5){
-        mk='hk'; // 5 位数字优先识别为港股
-      } else {
-        mk = nc.startsWith('688')?'bj':(nc.startsWith('30')?'sz':(nc.startsWith('6')?'sh':'sz'));
-      }
-      var fallName=q;
-      if(mk==='hk'){
-        var qo=(window.STOCK_QUOTE||{}).stocks||{}; var qok=qo['hk'+nc];
-        if(qok&&qok.name) fallName=qok.name;
-      }
-      best={code:nc,name:fallName,full_code:mk+nc,py:'',market:mk}; bs=1;
-    }
-    return best;
-  };
-  // 持仓录入下拉提示（2026-08-14 修复：保存完整 stock 信息，选择后按 code 精确匹配，避免同名 A/H 股混淆）
-  window.showPfDropdown = function(q){
-    var dd = document.getElementById('pfDropdown');
-    if(!dd) return;
-    if(!q || !q.trim()){ dd.style.display='none'; dd.innerHTML=''; return; }
-    if(!window._uniSearch){ dd.style.display='none'; return; }
-    var hits = window._uniSearch(q.trim(), 8);
-    if(!hits || !hits.length){ dd.style.display='none'; dd.innerHTML=''; return; }
-    var h = '';
-    hits.forEach(function(s){
-      var isHk=(s.market==='hk'||String(s.full_code||'').toLowerCase().indexOf('hk')===0);
-      var tag=isHk?'港股':(s.market==='sh'?'沪':(s.market==='sz'?'深':(s.market==='bj'?'北交':'')));
-      var label = (s.name||'') + ' <span style="color:var(--dim);font-size:11px;">' + (s.full_code||s.code||'') + (tag?' · '+tag:'') + '</span>';
-      h += '<div data-name="' + (s.name||'') + '" data-code="' + (s.code||'') + '" data-full_code="' + (s.full_code||'') + '" data-market="' + (s.market||'') + '" style="padding:7px 10px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;" onmousedown="event.preventDefault();_pfSelectDropdown(this);">' + label + '</div>';
-    });
-    dd.innerHTML = h;
-    dd.style.display = 'block';
-  };
-  window._pfSelectDropdown = function(el){
-    var codeEl = document.getElementById('pfCode');
-    if(!codeEl) return;
-    // 用完整代码回填，确保 addPosition 精确识别（尤其同名 A/H 股）
-    codeEl.value = el.getAttribute('data-full_code') || el.getAttribute('data-code') || el.getAttribute('data-name');
-    hidePfDropdown();
-  };
-  window.hidePfDropdown = function(){
-    var dd = document.getElementById('pfDropdown');
-    if(dd){ dd.style.display='none'; dd.innerHTML=''; }
-  };
-  // 获取现价（2026-08-14 修复：支持港股 hk 键）
-  window._pfGetQuote = function(code, market){
-    var SQ=window.STOCK_QUOTE||{}; var st=SQ.stocks||{};
-    var full=((market||'')+code).replace(/^_/,'');
-    var qo=st[full]||st[market+'_'+code]||st[code]||st['sh'+code]||st['sz'+code]||st['hk'+code];
-    if(qo&&qo.price!=null)return Number(qo.price);
-    return null;
-  };
-  // 检查异动（龙虎榜/四量/大牛猎手）
-  window._pfCheckAlerts = function(code){
-    var alerts=[], normCode=function(c){return String(c||'').replace(/\D/g,'').replace(/^[shszSHSZ]+/,'');};
-    var nc=normCode(code);
-    function findIn(arr){return (arr||[]).find(function(r){return normCode(r.code)===nc;});}
-    function findInObj(obj){var o=obj||{};var k=Object.keys(o).find(function(kk){return normCode((o[kk]||{}).code)===nc;});return k?o[kk]:null;}
-    var lhb=findIn((window.LHB_DATA||{}).stocks); if(lhb)alerts.push({type:'龙虎榜',desc:'机构净买'+(lhb.inst_net_万>0?'+':'')+(lhb.inst_net_万||0)+'万'});
-    var fv=findIn((window.FOUR_VOLUME||{}).stocks); if(fv)alerts.push({type:'四量终极',desc:'日线突破信号'});
-    var fv60=findIn((window.FOUR_VOLUME_60M||{}).stocks); if(fv60)alerts.push({type:'四量60分',desc:(fv60.reason||'')+'信号'});
-    var crds=window.CRDS_CARD_DATA||{};
-    if(findIn(crds.cond1_list))alerts.push({type:'逆势龙头',desc:'条件①命中'});
-    else if(findIn(crds.cond2_list))alerts.push({type:'逆势龙头',desc:'条件②命中'});
-    else if(findIn(crds.cond3_list))alerts.push({type:'逆势龙头',desc:'条件③命中'});
-    return alerts;
-  };
-  // 加入持仓
-  window.addPosition = function(){
-    var codeEl=document.getElementById('pfCode'), dateEl=document.getElementById('pfDate');
-    var priceEl=document.getElementById('pfPrice'), qtyEl=document.getElementById('pfQty');
-    var q=(codeEl.value||'').trim(); if(!q){alert('请输入代码或名称');return;}
-    var stock=_pfFindStock(q); if(!stock){alert('未找到「'+q+'」');return;}
-    var date=dateEl.value||new Date().toISOString().slice(0,10);
-    var price=Number(priceEl.value); if(!price||price<=0){alert('请输入有效买入价');return;}
-    var qty=Number(qtyEl.value)||100;
-    var arr=_pfLoad();
-    // 去重：同一代码只保留最新
-    arr=arr.filter(function(p){return p.code!==stock.code;});
-    arr.push({code:stock.code,name:stock.name,full_code:stock.full_code,market:stock.market,date:date,price:price,qty:qty,added_at:new Date().toISOString()});
-    _pfSave(arr);
-    codeEl.value='';priceEl.value='';qtyEl.value='';
-    renderPortfolio();
-  };
-  // 删除持仓
-  window.removePosition = function(code){
-    var arr=_pfLoad().filter(function(p){return p.code!==code;});
-    _pfSave(arr);
-    // 2026-08-13 主人令：PORTFOLIO_DATA 来自云端同步，光删 localStorage 不够。
-    // 加黑名单 v8_pf_hidden，下次 fetch 把广钢气体之类被删除的同步过滤掉（主人手动用 westock App 删云端后清空黑名单）。
-    var hidden=JSON.parse(localStorage.getItem('v8_pf_hidden')||'[]');
-    if(hidden.indexOf(code)===-1){ hidden.push(code); localStorage.setItem('v8_pf_hidden', JSON.stringify(hidden)); }
-    renderPortfolio();
-  };
-  // 渲染持仓列表（增强版：止损止盈 + 持仓天数 + 回撤监控 + 卖出信号）
-  window.renderPortfolio = function(){
-    var el=document.getElementById('pfList'); if(!el)return;
-    // 2026-08-12 主人令：优先用 westock 云端数据（PORTFOLIO_DATA，双机同步+实时行情），localStorage 为 fallback
-    var arr=[];
-    // 2026-08-13 主人令：黑名单过滤（用户在前端点了删除但云端还没同步前，渲染时跳过）
-    var hidden=JSON.parse(localStorage.getItem('v8_pf_hidden')||'[]');
-    var _notHidden=function(p){ return hidden.indexOf(p.code) === -1; };
-    if(window.PORTFOLIO_DATA && window.PORTFOLIO_DATA.positions && window.PORTFOLIO_DATA.positions.length){
-      arr = window.PORTFOLIO_DATA.positions.filter(_notHidden).map(function(p){
-        // 2026-08-14 修复：westock 云端 code 可能是完整代码（如 hk02865），需拆出 market+裸 code
-        var rawCode=p.code||'';
-        var mkt=(p.market||'').toLowerCase();
-        if(rawCode.length>2 && /^(sh|sz|hk|bj)/.test(rawCode.toLowerCase())){
-          mkt=rawCode.slice(0,2).toLowerCase();
-          rawCode=rawCode.slice(2);
-        }
-        if(!mkt) mkt='sh';
-        return {
-          code:rawCode, name:p.name, full_code:mkt+rawCode, market:mkt,
-          date:p.buy_date||'', price:Number(p.cost_price||0), qty:Number(p.qty||0),
-          _live:(p.live_price!=null?Number(p.live_price):null), _pending:!!p.pending
-        };
-      });
-    } else {
-      arr=_pfLoad().filter(_notHidden);
-    }
-    if(!arr.length){el.innerHTML='<div class="note" style="text-align:center;font-size:12px;">暂无持仓记录，上方录入买入标的</div>';return;}
-    // 可配置阈值
-    var STOP_LOSS_PCT = -10;     // 止损线
-    var TAKE_PROFIT_PCT = 20;     // 止盈线
-    var DRAWDOWN_ALERT = 50;      // 从最高盈利回撤N%即提醒
-    var h='<div style="font-size:12px;">';
-    h+='<table style="width:100%;border-collapse:collapse;">';
-    h+='<tr style="color:var(--sub);font-size:11px;border-bottom:1px solid rgba(255,255,255,.08);">';
-    h+='<th style="padding:5px 6px;text-align:left;">名称</th><th style="padding:5px 6px;text-align:right;">买入</th><th style="padding:5px 6px;text-align:right;">现价</th>';
-    h+='<th style="padding:5px 6px;text-align:right;">涨跌</th><th style="padding:5px 6px;text-align:right;">盈亏%</th>';
-    h+='<th style="padding:5px 6px;text-align:center;">天数</th><th style="padding:5px 6px;text-align:right;">最高/最低</th><th style="padding:5px 6px;">信号</th><th></th></tr>';
-    var totalPnl=0, totalCost=0, sellAlerts=[];
-    arr.forEach(function(p){
-      var curPrice=(p._live!=null && p._live>0)?p._live:_pfGetQuote(p.code,p.market);
-      var cost=p.price*p.qty; totalCost+=cost;
-      var pnlAmt=0, pnlPct=0;
-      if(curPrice&&curPrice>0){pnlAmt=(curPrice-p.price)*p.qty;pnlPct=(curPrice-p.price)/p.price*100;} totalPnl+=pnlAmt;
-      var pctColor=pnlPct>=0?'var(--up)':'var(--down)';
-      // 持仓天数
-      var daysHeld = 0;
-      try { var d=new Date(p.date); daysHeld=Math.max(1, Math.round((Date.now()-d.getTime())/86400000)); } catch(e){}
-      // 最高/最低价追踪（localStorage 持久化）
-      var pk='pf_track_'+p.code; var trk=JSON.parse(localStorage.getItem(pk)||'{}');
-      if(curPrice&&curPrice>0){
-        if(!trk.high||curPrice>trk.high)trk.high=curPrice;
-        if(!trk.low||curPrice<trk.low)trk.low=curPrice;
-        if(!trk.highDate)trk.highDate=new Date().toISOString().slice(0,10);
-        if(curPrice>=trk.high)trk.highDate=new Date().toISOString().slice(0,10);
-        localStorage.setItem(pk,JSON.stringify(trk));
-      }
-      var highPrice=(trk.high||curPrice||p.price), lowPrice=(trk.low||curPrice||p.price);
-      var maxGainPct = highPrice>0 ? ((highPrice-p.price)/p.price*100).toFixed(1) : '-';
-      var maxLossPct = lowPrice>0 ? ((lowPrice-p.price)/p.price*100).toFixed(1) : '-';
-      // 回撤计算
-      var drawdownPct = (highPrice>p.price && curPrice) ? ((curPrice-highPrice)/highPrice*100).toFixed(1) : 0;
-      // 信号判断
-      var signals=[], rowBg='';
-      if(pnlPct <= STOP_LOSS_PCT){ signals.push({t:'🔴止损',d:'跌幅'+pnlPct.toFixed(1)+'%，触及'+STOP_LOSS_PCT+'%止损线'}); rowBg='background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);'; sellAlerts.push(p.name+' 触发止损('+pnlPct.toFixed(1)+'%)'); }
-      else if(pnlPct >= TAKE_PROFIT_PCT){ signals.push({t:'🟢止盈',d:'盈利'+pnlPct.toFixed(1)+'%，考虑锁定利润'}); rowBg='background:rgba(34,197,94,.10);border:1px solid rgba(34,197,94,.25);'; }
-      else if(Number(drawdownPct) <= -DRAWDOWN_ALERT && pnlPct > 5){ signals.push({t:'🟡回撤',d:'从最高点回撤'+Math.abs(drawdownPct)+'%'}); rowBg='background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.25);'; }
-      else if(pnlPct < -5 && pnlPct > STOP_LOSS_PCT){ signals.push({t:'⚠️关注',d:'浮亏'+pnlPct.toFixed(1)+'%，接近止损'}); }
-      var alerts=_pfCheckAlerts(p.code);
-      alerts.forEach(function(a){ signals.push({t:a.type,d:a.desc}); });
-      // 行渲染
-      h+='<tr style="border-bottom:1px solid rgba(255,255,255,.04);'+rowBg+'">';
-      h+='<td style="padding:6px;"><div style="font-weight:600;font-size:12px;">'+p.name+(p._pending?' <span style="font-size:9px;color:#fbbf24;background:rgba(245,158,11,.15);padding:1px 5px;border-radius:4px;margin-left:4px;">⏳待同步</span>':'')+'</div><div style="font-size:10px;color:var(--dim);">'+p.full_code+'</div></td>';
-      h+='<td style="padding:6px;text-align:right;font-family:monospace;">'+p.price.toFixed(2)+'</td>';
-      h+='<td style="padding:6px;text-align:right;font-family:monospace;font-weight:700;">'+(curPrice?curPrice.toFixed(2):'<span style="color:var(--dim)">-</span>')+'</td>';
-      h+='<td style="padding:6px;text-align:right;font-family:monospace;color:'+pctColor+';">'+(curPrice?((curPrice>=p.price?'+':'')+(curPrice-p.price).toFixed(2)): '-')+'</td>';
-      h+='<td style="padding:6px;text-align:right;font-family:monospace;color:'+pctColor+';font-weight:700;">'+(pnlPct!==0?(pnlPct>=0?'+':'')+pnlPct.toFixed(2)+'%':'-')+'</td>';
-      h+='<td style="padding:6px;text-align:center;font-size:11px;color:var(--sub);">'+daysHeld+'天</td>';
-      h+='<td style="padding:6px;text-align:right;font-family:monospace;font-size:10px;"><span style="color:var(--up)">'+maxGainPct+'%</span>/<span style="color:var(--down)">'+maxLossPct+'%</span></td>';
-      h+='<td style="padding:6px;">';
-      signals.forEach(function(s){
-        var sc=s.t.indexOf('🔴')===0?'#ef4444':(s.t.indexOf('🟢')===0?'#22c55e':(s.t.indexOf('🟡')===0?'#f59e0b':'rgba(245,158,11,.15)'));
-        var tc=s.t.indexOf('🔴')===0?'#fca5a5':(s.t.indexOf('🟢')===0?'#86efac':(s.t.indexOf('🟡')===0?'#fde68a':'#fbbf24'));
-        h+='<span style="display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;background:'+sc+';color:'+tc+';margin:1px 2px;cursor:default;" title="'+s.d+'">'+s.t+'</span>';
-      });
-      if(!signals.length)h+='<span style="color:var(--dim);font-size:10px;">正常</span>';
-      h+='</td>';
-      h+='<td style="padding:6px;"><button onclick=\"removePosition(\''+p.code+'\')\" style="font-size:10px;padding:2px 8px;border:1px solid rgba(239,68,68,.3);color:var(--down);background:none;border-radius:4px;cursor:pointer;">删</button></td>';
-      h+='</tr>';
-    });
-    h+='</table>';
-    // 汇总行
-    var totalPct=totalCost>0?totalPnl/totalCost*100:0;
-    h+='<div style="margin-top:10px;padding:10px;background:rgba(255,255,255,.04);border-radius:8px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:12px;">';
-    h+='<span>持仓 <b>'+arr.length+'</b> 只</span>';
-    h+='<span>总成本 <b>'+totalCost.toFixed(0)+'</b></span>';
-    h+='<span style="color:'+(totalPnl>=0?'var(--up)':'var(--down)')+';">总盈亏 <b>'+(totalPnl>=0?'+':'')+totalPnl.toFixed(0)+'</b> ('+(totalPct>=0?'+':'')+totalPct.toFixed(2)+'%)</span>';
-    h+='</div>';
-    // 卖出提醒面板
-    if(sellAlerts.length > 0 || arr.some(function(p){var c=_pfGetQuote(p.code,p.market);return c&&(c-p.price)/p.price*100<=-5;})){
-      h+='<div style="margin-top:10px;padding:12px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;">';
-      h+='<div style="font-weight:600;font-size:13px;color:#fca5a5;margin-bottom:6px;">🔔 卖出提醒</div>';
-      if(sellAlerts.length > 0){
-        sellAlerts.forEach(function(a){ h+='<div style="font-size:12px;color:#fca5a5;padding:2px 0;">• '+a+'</div>'; });
-      } else {
-        h+='<div style="font-size:11px;color:var(--dim);">有持仓浮亏超5%，请密切关注</div>';
-      }
-      h+='<div style="font-size:10px;color:var(--dim);margin-top:6px;">止损线 '+STOP_LOSS_PCT+'% · 止盈线 '+TAKE_PROFIT_PCT+'% · 回撤警戒 '+DRAWDOWN_ALERT+'%</div>';
-      h+='</div>';
-    }
-    // 图例说明
-    h+='<div style="margin-top:8px;font-size:10px;color:var(--dim);display:flex;flex-wrap:wrap;gap:8px;">';
-    h+='<span>🔴=触发止损</span><span>🟢=触及止盈</span><span>🟡=高位回撤</span><span>⚠️=接近止损</span>';
-    h+='<span>最高/最低=持仓期间极值</span>';
-    h+='</div>';
-    h+='</div>';
-    el.innerHTML=h;
-  };
-  // 初始化日期默认值
-  (function(){ var d=document.getElementById('pfDate'); if(d && !d.value) d.value=new Date().toISOString().slice(0,10); })();
+  // ⚖️ 2026-08-14 主人令："这个没用，删了吧"：TOP3 持仓跟踪 IIFE 整段已删除（340 行：PF_KEY / _PF_SEED / _pfLoad / _pfSave / _pfMigrate / addPosition / removePosition / renderPortfolio / showPfDropdown 等）
+
 
   /* ===== 情绪周期 · 连板天梯（实时数据区） ===== */
   function __renderCycleLadderCard(){
@@ -11337,72 +10671,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     }
     h+='</div></div>';
 
-    /* 3. 四路资金流向对比（龙虎榜席位口径） */
-    // 2026-08-09 修：改用 _rcDays() 最新一日，避免 LHB_DATA 单独为空时 TOP3 也空。
-    var rcDays=window._rcDays&&window._rcDays()||[];
-    var latestDay=rcDays.length?rcDays[rcDays.length-1]:{};
-    var lhbStocks=latestDay.stocks||[];
-    var lhbSummary=latestDay.summary||{};
-    var lhbRaw=window.LHB_DATA||{};
-    var lhbT=latestDay.update_time||lhbRaw.update_time||'';
-    var lhbDate=latestDay.iso||(lhbRaw.date?String(lhbRaw.date).replace(/(\d{4})(\d{2})(\d{2})/,'$1/$2/$3'):'');
-    var commonBuy=lhbSummary.common_buy_stocks||lhbRaw.common_buy_stocks||[];
-    var commonSell=lhbSummary.common_sell_stocks||lhbRaw.common_sell_stocks||[];
-    var hasLhb=lhbStocks.length>0;
-    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #4527a0;">';
-    h+=v8CardHeader('💰','四路资金流向对比','龙虎榜席位口径','update_time',{update_time:lhbT,slot:'盘后',horizon:'短线'},!hasLhb,false);
-    h+='<div style="padding:12px 14px;">';
-    if(hasLhb){
-      function lhbNet(s,key){ var seat=s.seats&&s.seats[key]; return seat?(seat.buy||0)-(seat.sell||0):0; }
-      var instNet=0, yzNet=0, bxNet=0, unNet=0;
-      lhbStocks.forEach(function(s){ instNet+=s.inst_net_万||0; yzNet+=s.yz_net_万||0; bxNet+=lhbNet(s,'北向'); unNet+=lhbNet(s,'未识别'); });
-      function fmtNet(n){ return (n>=0?'+':'')+(n/1e4).toFixed(1)+'亿'; }
-      function dirClass(n){ return n>=0?'up':'down'; }
-      function dirStr(n){ return n>=0?'净流入':'净流出'; }
-      function stocksTop(arr, netFn, buyOrSell){
-        var sorted=arr.slice().sort(function(a,b){return netFn(b)-netFn(a);});
-        if(buyOrSell==='buy') return sorted.slice(0,3).map(function(s){return s.name+'('+(netFn(s)/1e4).toFixed(1)+')';}).join('、');
-        return sorted.slice(-3).reverse().map(function(s){return s.name+'('+(-netFn(s)/1e4).toFixed(1)+')';}).join('、');
-      }
-      function netRow(label, net, netFn, color){
-        var dc=dirClass(net);
-        return '<tr style="background:'+color+';">'
-          +'<td style="padding:6px 8px;border:1px solid var(--border);font-weight:600;white-space:nowrap;">'+label+'</td>'
-          +'<td style="padding:6px 8px;border:1px solid var(--border);text-align:center;color:'+(dc==='up'?'var(--up)':'var(--down)')+';font-weight:600;">'+dirStr(net)+'</td>'
-          +'<td style="padding:6px 8px;border:1px solid var(--border);text-align:center;color:'+(dc==='up'?'var(--up)':'var(--down)')+';font-weight:700;">'+fmtNet(net)+'</td>'
-          +'<td style="padding:6px 8px;border:1px solid var(--border);color:var(--up);">'+stocksTop(lhbStocks,netFn,'buy')+'</td>'
-          +'<td style="padding:6px 8px;border:1px solid var(--border);color:var(--down);">'+stocksTop(lhbStocks,netFn,'sell')+'</td>'
-          +'</tr>';
-      }
-      function instFn(s){ return s.inst_net_万||0; }
-      function yzFn(s){ return s.yz_net_万||0; }
-      function bxFn(s){ return lhbNet(s,'北向'); }
-      function unFn(s){ return lhbNet(s,'未识别'); }
-
-      h+='<div style="margin-bottom:10px;padding:8px 10px;background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(86,71,135,.08));border:1px dashed rgba(167,139,250,.3);border-radius:8px;font-size:11px;color:var(--sub);line-height:1.6;">';
-      if(commonBuy.length) h+='<span style="color:var(--up);">🔴 三方共振净买入：'+commonBuy.slice(0,5).join('、')+'</span> ｜ ';
-      if(commonSell.length) h+='<span style="color:var(--down);">🟢 三方共振净卖出：'+commonSell.slice(0,5).join('、')+'</span>';
-      if(!(commonBuy.length||commonSell.length)) h+='龙虎榜席位口径，仅覆盖当日异动上榜股。';
-      h+='</div>';
-
-      h+='<table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
-      h+='<thead><tr style="background:#3C3489;color:#fff;">';
-      h+='<th style="text-align:left;padding:6px 8px;border:1px solid #2A2470;font-weight:500;">维度</th>';
-      h+='<th style="text-align:center;padding:6px 8px;border:1px solid #2A2470;font-weight:500;">方向</th>';
-      h+='<th style="text-align:center;padding:6px 8px;border:1px solid #2A2470;font-weight:500;">净额</th>';
-      h+='<th style="text-align:center;padding:6px 8px;border:1px solid #2A2470;font-weight:500;">净买入TOP3</th>';
-      h+='<th style="text-align:center;padding:6px 8px;border:1px solid #2A2470;font-weight:500;">净卖出TOP3</th>';
-      h+='</tr></thead><tbody>';
-      h+=netRow('🏦 机构席位', instNet, instFn, 'rgba(255,245,245,.05)');
-      h+=netRow('🚀 游资席位', yzNet, yzFn, 'rgba(245,245,255,.05)');
-      h+=netRow('🌎 龙虎榜北向席位', bxNet, bxFn, 'rgba(240,248,255,.05)');
-      h+=netRow('🌏 未识别席位', unNet, unFn, 'rgba(245,255,245,.05)');
-      h+='</tbody></table>';
-      h+='<div style="margin-top:8px;font-size:10px;color:var(--dim);padding:0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">数据源：龙虎榜席位 '+lhbDate+'｜仅覆盖异动上榜股</div>';
-    } else {
-      h+='<div class="note" style="text-align:center;">龙虎榜席位数据为空</div>';
-    }
-    h+='</div></div>';
+    // ⚖️ 2026-08-14 主人令："这个没关联了吧，没有的话也删除"：四路资金流向对比整段已删除（65 行）
 
     /* ── 分组标题：T+1 盘后更新 ── */
     h+='<div style="background:linear-gradient(135deg,rgba(56,189,248,.18),rgba(56,189,248,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#38bdf8;border-radius:8px;margin:16px 0 10px 0;">📅 T+1 盘后更新</div>';
