@@ -104,6 +104,8 @@ jobs:
       - name: "📤 部署到 main（GitHub Pages 源）"
         env:
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # push 被拒后重试时会重新跑 update_v8.py -> v8_health_check.py，必须同样带 token
+          V8_GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
         run: |
           git config user.name "v8-cloud-bot"
           git config user.email "v8-bot@users.noreply.github.com"
