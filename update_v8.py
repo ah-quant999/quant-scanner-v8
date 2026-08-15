@@ -735,8 +735,11 @@ def main():
     rc = build(category=args.category, detect_changes=args.detect_changes)
     if rc == 0:
         run_health_check()
-        _rewrite_index_html_cache_busters()
         run_experiment_cards()
+        # 2026-08-15 缓存戳铁律修复：必须在全部数据生成（含 run_experiment_cards
+        # 重写的 COMMODITY_ELASTICITY.js 等）之后才算 ?v，否则 ?v 与最终文件内容
+        # 不符 → CDN 吐旧副本。
+        _rewrite_index_html_cache_busters()
     return rc
 
 
