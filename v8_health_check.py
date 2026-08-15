@@ -247,7 +247,7 @@ def api_get(url, max_retries=None):
     import time as _time
     token = _load_token()
     if not token:
-        return {"__error__": 401, "__msg__": "no token"}
+        return {"__error__": 401, "__msg__": "no token：请在 repo secrets 配置 V8_GH_TOKEN，或在本地放置 data/.github_pat.txt"}
     headers = {
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
@@ -1126,8 +1126,29 @@ def check_runner():
 
     local_msg = "本地 runner 守护未上报状态"
     if runner_status:
-        st = runner_status.get("status", "unknown")
-        msg = runner_status.get("message", "无详情")
+        # 2026-08-15 一劳永逸：兼容两种 runner_status 格式
+        #   · cloud_fetch_v8.py 生成格式：{run_time, category, hostname, modules, summary}
+        #   · v8_runner_guard.py 旧格式：{status, message, process, service, ...}
+        if "status" in runner_status:
+            st = runner_status.get("status", "unknown")
+            msg = runner_status.get("message", "无详情")
+        else:
+            summary = runner_status.get("summary") or {}
+            total = summary.get("total", 0)
+            ok = summary.get("ok", 0)
+            empty = summary.get("empty", 0)
+            fail = summary.get("fail", 0)
+            run_time = runner_status.get("run_time", "--")
+            hostname = runner_status.get("hostname", "未知节点")
+            if fail > 0:
+                st = "fail"
+                msg = f"{hostname} 最近抓取 {run_time}，{total} 模块中失败 {fail} / 空 {empty} / 成功 {ok}"
+            elif empty > 0:
+                st = "warn"
+                msg = f"{hostname} 最近抓取 {run_time}，{total} 模块中空 {empty} / 成功 {ok}"
+            else:
+                st = "ok"
+                msg = f"{hostname} 最近抓取 {run_time}，{total} 个模块全部成功"
         if st == "ok":
             results.append({"id": "runner_local", "name": "runner 本地检测", "page": "管线", "status": "ok", "message": msg})
         elif st == "warn":
@@ -1206,7 +1227,7 @@ def check_runner():
             err = data.get("__msg__", "unknown") if isinstance(data, dict) else "API 失败"
             results.append({"id": "runner_github", "name": "runner GitHub API 检测", "page": "管线", "status": "warn", "message": f"API 查询失败: {err}"})
     else:
-        results.append({"id": "runner_github", "name": "runner GitHub API 检测", "page": "管线", "status": "warn", "message": "无 token，跳过 GitHub API 检测"})
+        results.append({"id": "runner_github", "name": "runner GitHub API 检测", "page": "管线", "status": "warn", "message": "无 token，跳过 GitHub API 检测（请在 repo secrets 配置 V8_GH_TOKEN）"})
 
     # 汇总：任一 fail 则总体 fail
     overall = "ok"

@@ -1184,7 +1184,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/W52_HIGH.js?v=c87593123a" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=0be3ac9627" defer></script>
 <script src="data/RUNNER_STATUS.js?v=09b70b1d97" defer></script>
-<script src="data/HEALTH_CHECK.js?v=4d5c13db30" defer></script>
+<script src="data/HEALTH_CHECK.js?v=1c8c593e85" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=29a44e024c" defer></script>
     <script src="data/SENTIMENT_CYCLE.js?v=af7068d09e" defer></script>
     <script src="data/POTENTIAL_PICKS.js?v=6e132591c2" defer></script>
@@ -10472,9 +10472,8 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       html += _sentimentBadge('活跃', scm.sectors_count, '板块', 'var(--up)');
     }
 
-    // 四指标小方块（危机/涨停/高连/龙虎）
+    // 四指标小方块（涨停/高连/龙虎 - 危机已删除 2026-08-15 主人令）
     var metrics = [
-      {l:'危机', v:crisisPct, u:'分', c: crisisPct>=70?'var(--down)':(crisisPct>=50?'#f59e0b':'var(--up)')},
       {l:'涨停', v:totalUp, u:'只', c: totalUp>=80?'#ef4444':(totalUp>=40?'var(--up)':'var(--down)')},
       {l:'高连', v:highLbc, u:'只', c: 'var(--up)'},
       {l:'龙虎', v:lhbCount, u:'只', c: 'var(--up)'}
