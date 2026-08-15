@@ -417,10 +417,30 @@ def f_judgment():
     v3 多模型共识版(2026-08-05)：拆成 技术面/情绪面/宏观面 三个独立分析师视角，
     各自输出 核心判断/推荐度(1-5星)/关键理由/风险评估/若必须进场，再聚合
     共同结论 + 三大危险信号（双方一致认可），前端渲染为对比表 + 共识区。
+
+    🛡️ 2026-08-15 主人令：周六/周日非交易日不重新生成判定（保留周五数据），仅刷新 update_time=周五。
     """
     now = now_cst()
     today = now.date()
     md = f"{today.month}/{today.day}"
+
+    # 🛡️ 2026-08-15 非交易日守卫：保留周五判定，不重算
+    if not _is_trading_day(today):
+        existing = {}
+        try:
+            p = Path(RAW_DIR) / 'judgment_data.json'
+            if p.exists():
+                existing = json.loads(p.read_text(encoding='utf-8'))
+        except Exception:
+            pass
+        if existing and existing.get('update_time'):
+            # 保留周五完整数据，仅在 body 上标"非交易日沿用"
+            existing['_weekend_inherit'] = True
+            existing['_weekend_note'] = f'周末沿用 {existing.get("date", "")} 判定·原始跑数据'
+            print(f'⏭️ {today} 非交易日：沿用 {existing.get("date")} 判定（不重算）')
+            return existing
+        # 没有历史数据，回落到正常计算
+        print(f'⚠️ {today} 非交易日但无历史判定，回落到实时计算')
 
     # 取指数行情
     idx_data = {}
