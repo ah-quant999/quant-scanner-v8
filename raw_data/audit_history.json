@@ -1,0 +1,71 @@
+[
+ {
+  "date": "2026-08-15",
+  "time": "16:26:44",
+  "overall": "ok",
+  "summary": {
+   "ok": 46,
+   "warn": 11,
+   "fail": 0,
+   "total": 57
+  },
+  "warn_items": [
+   {
+    "id": "dom_taskScheduleBody",
+    "name": "DOM #taskScheduleBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_phMacroBody",
+    "name": "DOM #phMacroBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttBackBody",
+    "name": "DOM #ttBackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttThrBody",
+    "name": "DOM #ttThrBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttSvlBody",
+    "name": "DOM #ttSvlBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttTrackBody",
+    "name": "DOM #ttTrackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsAdvBody",
+    "name": "DOM #stcrdsAdvBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsEliteBody",
+    "name": "DOM #stcrdsEliteBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_healthCheckBody",
+    "name": "DOM #healthCheckBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "a_share_triple_consensus",
+    "name": "三重共识 A股覆盖",
+    "message": "⚠️ 三重共识 今日 0 只（弱市真实状态可接受，但若其他池也 0 则排查上游；若此池独立为 0 而其他池正常则不报警）"
+   },
+   {
+    "id": "a_share_mahoro",
+    "name": "国际投行信号 A股覆盖",
+    "message": "⚠️ 国际投行信号 今日 0 只（弱市真实状态可接受，但若其他池也 0 则排查上游；若此池独立为 0 而其他池正常则不报警）"
+   }
+  ],
+  "fail_items": []
+ }
+]
