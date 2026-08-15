@@ -183,6 +183,28 @@ def merge_industry_concepts(quote_data):
     return quote_data
 
 
+def _fmt_dividend_plan(r):
+    """把 stock_fhps_em 的送转/现金比例字段转成人类可读的分红方案字符串。
+    字段含义均为「每10股」：现金分红比例 4.2 = 10派4.2元；
+    送转比例 0.5 = 10送5股；转股比例 0.3 = 10转增3股。"""
+    def _to_float(v):
+        try: return float(v)
+        except Exception: return None
+    parts = []
+    cash = _to_float(r.get('现金分红-现金分红比例'))
+    give = _to_float(r.get('送转股份-送转比例'))      # 送股比例
+    conv = _to_float(r.get('送转股份-转股比例'))      # 转股比例
+    if give and give > 0:
+        parts.append(f"10送{give:.1f}".rstrip('0').rstrip('.') + "股")
+    if conv and conv > 0:
+        parts.append(f"10转{conv:.1f}".rstrip('0').rstrip('.') + "股")
+    if cash and cash > 0:
+        parts.append(f"10派{cash:.2f}".rstrip('0').rstrip('.') + "元")
+    if not parts:
+        return None
+    return "；".join(parts)
+
+
 def merge_dividend(quote_data):
     """合并 akshare stock_fhps_em() 全市场分红配送 → 每股股息率/EPS/BVPS/分红状态。
 
@@ -201,6 +223,7 @@ def merge_dividend(quote_data):
       ex_date: '2024-06-26',
       progress: '实施分配',
       announce_date: '2024-06-20',
+      desc: '10派4.2元' or '10送2转3派4.2元',
     }
     """
     try:
@@ -233,6 +256,10 @@ def merge_dividend(quote_data):
                     pass
                 if not v: return None
                 return str(v).strip()
+            existing = quote_data[code8].get('dividend') or {}
+            new_desc = _fmt_dividend_plan(r)
+            # 若已有 cninfo 的 desc（更权威），保留；否则用 stock_fhps_em 生成
+            desc = existing.get('desc') if existing.get('desc') else new_desc
             quote_data[code8]['dividend'] = {
                 'yield': _f(r.get('现金分红-股息率')),     # 0.0244 = 2.44%
                 'cash_ratio': _f(r.get('现金分红-现金分红比例')),  # 9.8974%
@@ -247,6 +274,7 @@ def merge_dividend(quote_data):
                 'ex_date': _s(r.get('除权除息日')),
                 'progress': _s(r.get('方案进度')),
                 'announce_date': _s(r.get('最新公告日期')),
+                'desc': desc,
             }
             merged += 1
         print(f"✅ 合并分红配送：{merged}/{len(quote_data)} 只")
