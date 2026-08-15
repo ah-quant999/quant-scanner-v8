@@ -10394,31 +10394,18 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     html += v8CardHeader('🎭','情绪周期 · 连板天梯','危机雷达+涨停热力+连板梯队+龙虎榜','update_time',
       {update_time:updateTime, slot:_cycleSlot.slot, horizon:_cycleSlot.horizon}, !hasData);
     html += '<div style="padding:12px 14px;">';
-    // 阶段 + 四指标（字号放大，去掉 scale 压缩）
-    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">';
-    html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:'+_vra(phaseColor,0.08)+';border:1px solid '+_vra(phaseColor,0.2)+';border-radius:8px;min-width:0">';
-    html += '<span style="font-size:20px;font-weight:900;color:'+phaseColor+'">'+phase+'</span>';
-    html += '<div style="font-size:13px;color:var(--sub);white-space:nowrap">'+phaseDesc+' · 仓位 <b style="color:'+phaseColor+'">'+posAdvice+'</b></div></div>';
-    // 四指标小方块
-    var metrics = [
-      {l:'危机', v:crisisPct, u:'分', c: crisisPct>=70?'var(--down)':(crisisPct>=50?'#f59e0b':'var(--up)')},
-      {l:'涨停', v:totalUp, u:'只', c: totalUp>=80?'#ef4444':(totalUp>=40?'var(--up)':'var(--down)')},
-      {l:'高连', v:highLbc, u:'只', c: 'var(--up)'},
-      {l:'龙虎', v:lhbCount, u:'只', c: 'var(--up)'}
-    ];
-    metrics.forEach(function(m){
-      html += '<div style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);border-radius:10px;min-width:72px;">';
-      html += '<span style="font-size:13px;font-weight:700;color:var(--txt)">'+m.l+'</span>';
-      html += '<span style="font-size:18px;font-weight:900;color:'+m.c+'">'+m.v+'<span style="font-size:11px;font-weight:700;margin-left:1px">'+m.u+'</span></span></div>';
-    });
-    html += '</div>';
-    // ── 2026-08-14 主人令：情绪周期定位精简为单一指标行 ──
     var sc = window.SENTIMENT_CYCLE || {};
     var scm = sc.metrics || {};
     var liveScore = Math.round(Math.max(0, Math.min(100, 100 - crisisPct*0.6 + Math.min(totalUp,100)*0.25)));
     var score = (sc.score > 0) ? Math.round((liveScore + sc.score) / 2) : liveScore;
-    // 情绪分 / 环比 / 最高板 / 活跃板块 合并成一行
-    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">';
+
+    // 阶段 + 四指标（字号放大，去掉 scale 压缩）
+    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">';
+
+    html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:'+_vra(phaseColor,0.08)+';border:1px solid '+_vra(phaseColor,0.2)+';border-radius:8px;min-width:0">';
+    html += '<span style="font-size:20px;font-weight:900;color:'+phaseColor+'">'+phase+'</span>';
+    html += '<div style="font-size:13px;color:var(--sub);white-space:nowrap">'+phaseDesc+' · 仓位 <b style="color:'+phaseColor+'">'+posAdvice+'</b></div></div>';
+    // 情绪分 / 环比 / 最高板 / 活跃板块 紧跟阶段
     html += '<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:8px;">';
     html += '<span style="font-size:11px;color:var(--dim);">情绪分</span>';
     html += '<span style="font-size:18px;font-weight:800;color:#38bdf8">'+score+'</span>';
@@ -10441,6 +10428,19 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       html += '<span style="font-size:15px;font-weight:800;color:#22c55e">'+scm.sectors_count+'</span><span style="font-size:11px;color:var(--dim);">板块</span>';
       html += '</div>';
     }
+
+    // 四指标小方块
+    var metrics = [
+      {l:'危机', v:crisisPct, u:'分', c: crisisPct>=70?'var(--down)':(crisisPct>=50?'#f59e0b':'var(--up)')},
+      {l:'涨停', v:totalUp, u:'只', c: totalUp>=80?'#ef4444':(totalUp>=40?'var(--up)':'var(--down)')},
+      {l:'高连', v:highLbc, u:'只', c: 'var(--up)'},
+      {l:'龙虎', v:lhbCount, u:'只', c: 'var(--up)'}
+    ];
+    metrics.forEach(function(m){
+      html += '<div style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);border-radius:10px;min-width:72px;">';
+      html += '<span style="font-size:13px;font-weight:700;color:var(--txt)">'+m.l+'</span>';
+      html += '<span style="font-size:18px;font-weight:900;color:'+m.c+'">'+m.v+'<span style="font-size:11px;font-weight:700;margin-left:1px">'+m.u+'</span></span></div>';
+    });
     html += '</div>';
     // 连板分布明细保留；连板梯队/龙头连板徽章已删除（与下方明细重复）
     // 连板分布：每行显示「连板标签 共N只」+ 股票名网格；首板用10只/行平铺
