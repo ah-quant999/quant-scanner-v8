@@ -423,7 +423,7 @@ html>
     <script src="data/OVERSEAS_MARKETS.js?v=6c43b8a8f8" defer></script>
     <script src="data/STOCK_RPS.js?v=68d9cad903" defer></script>
     <script src="data/AVG_PRICE_DATA.js?v=61f2f9d7e0" defer></script>
-    <script src="data/CONCEPT_ETF_MAP.js?v=0cad2b3680" defer></script>
+    <script src="data/CONCEPT_ETF_MAP.js?v=572e8965fb" defer></script>
     <script src="data/PORTFOLIO_COST.js?v=6c6515f693" defer></script>
     <script src="data/PORTFOLIO.js?v=47c11631ae" defer></script>
     <script>
@@ -2719,16 +2719,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <h3><span class="ic">🔮</span>潜力挖掘 <span class="fresh" id="prPPFresh">—</span></h3>
         <div id="ppBody"><div class="note">加载中…</div></div>
       </div>
+      <!-- 💹 商品涨价弹性榜（事件驱动：大宗品涨价→A股弹性标的） -->
+      <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
+        <h3><span class="ic">💹</span>商品涨价弹性榜 <span class="fresh" id="prCEFresh">—</span> <span style="font-size:11px;color:var(--dim);">事件驱动 · 涨价完冲就好了</span></h3>
+        <div id="ceBody"><div class="note">加载中…</div></div>
+      </div>
       <!-- 📌 ETF·龙头 参考（概念→ETF映射+龙头股） -->
       <div class="card" style="margin-bottom:16px">
         <h3><span class="ic">📌</span>概念/行业 → ETF·龙头 参考 <span class="fresh" id="prEtfFresh">—</span> <span style="font-size:11px;color:var(--dim);">不构成投资建议</span></h3>
         <div style="font-size:11px;color:var(--dim);margin-bottom:8px;">⚠️ 仅根据当前热点板块列出代表性 ETF 与龙头股，<b style="color:#fbbf24">不构成任何投资建议</b>。</div>
         <div id="prEtfMapBody"><div class="note">加载中…</div></div>
-      </div>
-      <!-- 💹 商品涨价弹性榜（事件驱动：大宗品涨价→A股弹性标的） -->
-      <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
-        <h3><span class="ic">💹</span>商品涨价弹性榜 <span class="fresh" id="prCEFresh">—</span> <span style="font-size:11px;color:var(--dim);">事件驱动 · 涨价完冲就好了</span></h3>
-        <div id="ceBody"><div class="note">加载中…</div></div>
       </div>
     </div><!--/st-pr-->
 
@@ -4136,7 +4136,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       一个 tab 装三块：① TOP3 90 天跟踪 ② 综合回测多策略×多持有期 ③ K线信号60日回测
       解决"两边跑着看"问题，仅管理员可见。 -->
   <section id="sec-bt">
-    <div class="sec-head"><h2>🔒 策略回测（统一）</h2><span class="tag">仅管理员可见 · TOP3跟踪 + 综合回测 + 信号60日 · 三块一站看完</span></div>
+    <div class="sec-head"><h2>🔒 策略回测（统一）</h2><span class="tag">仅管理员可见 · TOP3跟踪 + 综合回测 + 信号60日 · 三块一站看完</span><span class="fresh" id="btFresh">—</span></div>
     <div id="btBody"><div class="note">加载中…</div></div>
   </section>
 
@@ -4254,6 +4254,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var bc = window.BACKTEST_COMPREHENSIVE || {};
     var bd = window.BACKTEST_TDX || {};
     var cb = window.COCKPIT_BACKTEST || {};
+
+    // 取各回测数据源中最新的 calc_time/update_time 作为统一"更新于"时间
+    var btTimes = [];
+    if(tt.update_time) btTimes.push(tt.update_time);
+    if(bc.calc_time) btTimes.push(bc.calc_time);
+    if(bd.calc_time) btTimes.push(bd.calc_time);
+    if(cb.calc_time) btTimes.push(cb.calc_time);
+    var btLatest = btTimes.sort().slice(-1)[0] || null;
+    var btFresh = document.getElementById('btFresh');
+    if(btFresh && typeof _uBadge === 'function'){
+      btFresh.innerHTML = _uBadge('盘后','回测', btLatest);
+    }
 
     var html = '';
 
