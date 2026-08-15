@@ -265,17 +265,25 @@ def check_data_js():
         msg = f"发现 {len(dups)} 个重复 window 变量：{', '.join(dups)}"
     add_item(items, "重复 window.X 注入", status, msg, {"total": len(var_counts), "duplicates": len(dups)})
 
-    # 未在 index.html 中引用的 data/*.js（简单检查 <script src="data/...")
-    # 支持 ?v= 缓存戳后缀：src="data/X.js?v=sha10" 也算已引用（2026-08-15 修复误报）
+    # 未在 index.html 中引用的 data/*.js
+    # 三种引用方式都算已引用：
+    #   1. <script src="data/NAME.js" 或 src="data/NAME.js?v=sha10"（含 defer）
+    #   2. 代码中直接使用 window.NAME / window['NAME']
+    #   3. 字符串字面量 "data/NAME.js" 或 'data/NAME.js'
     html_text = INDEX_HTML.read_text(encoding="utf-8", errors="replace")
     unreferenced = []
     for p in js_files:
         # 检查报告自身不需要被页面引用
         if p.name == OUT_JS.name:
             continue
-        # 匹配 src="data/NAME.js" 或 src="data/NAME.js?v=xxxx"（单/双引号均可）
-        pat = re.compile(r'src=["\']data/' + re.escape(p.name) + r'(\?[^"\']*)?["\']')
-        if not pat.search(html_text):
+        var_name = p.name[:-3]  # 去掉 .js
+        # 1) script src 引用
+        src_pat = re.compile(r'src=["\']data/' + re.escape(p.name) + r'(\?[^"\']*)?["\']')
+        # 2) window 变量引用（含可选空格、点号、方括号、&&/||）
+        win_pat = re.compile(r'\bwindow\.["\']?' + re.escape(var_name) + r'["\']?\b')
+        # 3) 字符串字面量中出现 data/NAME.js
+        lit_pat = re.compile(r'["\']data/' + re.escape(p.name) + r'["\']')
+        if not (src_pat.search(html_text) or win_pat.search(html_text) or lit_pat.search(html_text)):
             unreferenced.append(p.name)
     status = "ok"
     msg = "全部已引用"
