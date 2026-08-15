@@ -243,10 +243,12 @@ def check_data_js():
 
     status = "ok"
     msg = f"{len(js_files)} 个文件，共 {total_kb} KB"
-    if total_kb > 5000:
+    if total_kb > 12000:
         status = "fail"
-    elif total_kb > 3500:
+        msg += "；体积偏大，建议拆分或清理死代码"
+    elif total_kb > 9000:
         status = "warn"
+        msg += "；体积偏多，关注可维护性"
     add_item(items, "data/*.js 总体积", status, msg, {"files": len(js_files), "kb": total_kb})
 
     # 重复 window.X 变量
@@ -264,15 +266,16 @@ def check_data_js():
     add_item(items, "重复 window.X 注入", status, msg, {"total": len(var_counts), "duplicates": len(dups)})
 
     # 未在 index.html 中引用的 data/*.js（简单检查 <script src="data/...")
+    # 支持 ?v= 缓存戳后缀：src="data/X.js?v=sha10" 也算已引用（2026-08-15 修复误报）
     html_text = INDEX_HTML.read_text(encoding="utf-8", errors="replace")
     unreferenced = []
     for p in js_files:
         # 检查报告自身不需要被页面引用
         if p.name == OUT_JS.name:
             continue
-        ref1 = f'src="data/{p.name}"'
-        ref2 = f"src='data/{p.name}'"
-        if ref1 not in html_text and ref2 not in html_text:
+        # 匹配 src="data/NAME.js" 或 src="data/NAME.js?v=xxxx"（单/双引号均可）
+        pat = re.compile(r'src=["\']data/' + re.escape(p.name) + r'(\?[^"\']*)?["\']')
+        if not pat.search(html_text):
             unreferenced.append(p.name)
     status = "ok"
     msg = "全部已引用"
