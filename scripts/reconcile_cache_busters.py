@@ -7,9 +7,14 @@
 若按「检出文件」重算 ?v，会算到旧哈希、误判「已一致」→ 缓存戳长期失配、CDN 持续
 吐旧副本（正是防覆盖铁律最忌的回归）。
 
-修复：CI 环境（存在 GITHUB_TOKEN）下，直接用 GitHub Contents API 拉取「线上真实服务
-版本」的数据文件内容来算 ?v（与浏览器/CDN 实际拿到的完全一致），彻底摆脱 checkout
-陈旧 blob 的影响；本地无 token 时回退磁盘文件（本地生成的数据即最新）。
+修复：CI 环境（存在 GITHUB_TOKEN）下，直接用 GitHub 「Git Database API」拉取线上真实
+服务版本的数据文件内容来算 ?v（与浏览器/CDN 实际拿到的完全一致），彻底摆脱 checkout
+陈旧 blob / Contents API >1MB 截断 的影响：
+  - 先取 main 的 git tree（path→blob sha 映射，缓存一次）；
+  - 再经 /git/blobs/{sha} 取完整内容（该接口不对 >1MB 文件截断，Contents API 会截断）。
+本地无 token 时回退磁盘文件（本地生成的数据即最新）。
+
+所有 ?v 计算均与 update_v8._rewrite 完全一致：中性化 republish_time 后取 sha1 前 10 位。
 """
 import re
 import hashlib
@@ -28,16 +33,33 @@ def neutral_sha(text: str) -> str:
     return hashlib.sha1(neutral.encode("utf-8")).hexdigest()[:10]
 
 
-def _api_text(repo: str, path: str, token: str):
-    """经 GitHub Contents API 取线上真实文件内容；失败返回 None。"""
-    url = f"https://api.github.com/repos/{repo}/contents/{path}?ref=main"
-    req = urllib.request.Request(url, headers={
+def _hdr(token):
+    return {
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
         "User-Agent": "reconcile",
-    })
+    }
+
+
+def _repo_tree(repo: str, token: str):
+    """取 main 的 git tree（path→blob sha），缓存一次。失败返回空 dict。"""
+    url = f"https://api.github.com/repos/{repo}/git/trees/main?recursive=1"
     try:
-        with urllib.request.urlopen(req, timeout=60) as r:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=_hdr(token)), timeout=120) as r:
+            d = json.loads(r.read().decode("utf-8"))
+        return {e["path"]: e["sha"] for e in d.get("tree", []) if e["type"] == "blob"}
+    except Exception:
+        return {}
+
+
+def _api_text_blob(repo: str, path: str, token: str, tree: dict):
+    """经 Git blobs API 取完整文件内容（>1MB 不截断）。失败返回 None。"""
+    sha = tree.get(path)
+    if not sha:
+        return None
+    url = f"https://api.github.com/repos/{repo}/git/blobs/{sha}"
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=_hdr(token)), timeout=120) as r:
             d = json.loads(r.read().decode("utf-8"))
         if isinstance(d, dict) and "content" in d:
             return base64.b64decode(d["content"]).decode("utf-8", "replace")
@@ -46,10 +68,10 @@ def _api_text(repo: str, path: str, token: str):
     return None
 
 
-def content_for(fname: str, data_dir: pathlib.Path, repo: str, token: str):
-    """优先线上真实版本（CI 且 token 可用），回退本地磁盘。"""
+def content_for(fname: str, data_dir: pathlib.Path, repo: str, token: str, tree: dict):
+    """优先线上真实版本（CI 且 token 可用，走 git blobs API 取完整内容），回退本地磁盘。"""
     if token and repo:
-        t = _api_text(repo, f"data/{fname}", token)
+        t = _api_text_blob(repo, f"data/{fname}", token, tree)
         if t is not None:
             return t
     p = data_dir / fname
@@ -67,6 +89,7 @@ def main():
 
     token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
     repo = os.environ.get("GITHUB_REPOSITORY") or "ah-quant999/quant-scanner-v8"
+    tree = _repo_tree(repo, token) if (token and repo) else {}
 
     html = idx.read_text(encoding="utf-8")
     # 全量匹配 index.html 中所有「带引号」的 data/X.js(?:\?v=...)? 出现
@@ -76,7 +99,7 @@ def main():
     def repl(m):
         q1, src, q2 = m.group(1), m.group(2), m.group(3)
         fname = src.split("/")[-1]
-        txt = content_for(fname, data_dir, repo, token)
+        txt = content_for(fname, data_dir, repo, token, tree)
         if txt is None:
             return m.group(0)
         return f"{q1}{src}?v={neutral_sha(txt)}{q2}"
@@ -84,7 +107,7 @@ def main():
     new_html = pat.sub(repl, html)
     if new_html != html:
         idx.write_text(new_html, encoding="utf-8")
-        print("✅ 部署前 ?v 已强对齐（基于线上真实数据）")
+        print("✅ 部署前 ?v 已强对齐（基于线上真实数据，git blobs API）")
     else:
         print("ℹ️ 部署前 ?v 已一致，无需改动")
 
