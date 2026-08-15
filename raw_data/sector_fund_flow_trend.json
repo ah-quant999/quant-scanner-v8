@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-14 17:37",
+  "update_time": "2026-08-15 20:10",
   "data_type": "real",
   "summary": {
     "in_count": 40,
@@ -897,6 +897,116 @@
   },
   "trend_5d": [
     {
+      "name": "通信设备",
+      "net": 117.55,
+      "net_5d": 554.55,
+      "net_20d": 0,
+      "type": "行业",
+      "consecutive_days": 4,
+      "trend": "in",
+      "net_60d": null
+    },
+    {
+      "name": "华为概念",
+      "net": 35.65,
+      "net_5d": 387.13,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_60d": null
+    },
+    {
+      "name": "光纤概念",
+      "net": 68.17,
+      "net_5d": 327.42,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_60d": null
+    },
+    {
+      "name": "2026中报预增",
+      "net": 79.81,
+      "net_5d": 282.43,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_60d": null
+    },
+    {
+      "name": "存储芯片",
+      "net": 50.82,
+      "net_5d": 265.1,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 1,
+      "trend": "in",
+      "net_60d": null
+    },
+    {
+      "name": "F5G概念",
+      "net": 77.44,
+      "net_5d": 213.38,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 4,
+      "trend": "in",
+      "net_60d": null
+    },
+    {
+      "name": "物联网",
+      "net": 31.01,
+      "net_5d": 148.62,
+      "net_20d": 0,
+      "net_60d": null,
+      "type": "行业",
+      "consecutive_days": 1,
+      "trend": "in"
+    },
+    {
+      "name": "先进封装",
+      "net": -34.71,
+      "net_5d": 128.01,
+      "net_20d": 0,
+      "net_60d": null,
+      "type": "行业",
+      "consecutive_days": 4,
+      "trend": "out"
+    },
+    {
+      "name": "小米概念",
+      "net": -19.9,
+      "net_5d": 97.76,
+      "net_20d": 0,
+      "net_60d": null,
+      "type": "概念",
+      "consecutive_days": 3,
+      "trend": "out"
+    },
+    {
+      "name": "银行",
+      "net": 2.13,
+      "net_5d": 69.43,
+      "net_20d": 0,
+      "net_60d": null,
+      "type": "行业",
+      "consecutive_days": 5,
+      "trend": "in"
+    },
+    {
+      "name": "光伏概念",
+      "net": -51.05,
+      "net_5d": 65.93,
+      "net_20d": 0,
+      "net_60d": null,
+      "type": "概念",
+      "consecutive_days": 3,
+      "trend": "out"
+    },
+    {
       "name": "长三角一体化",
       "net": 52.94,
       "net_5d": 65.08,
@@ -920,5 +1030,6 @@
       "net_60d": null
     }
   ],
-  "trend_60d": []
+  "trend_60d": [],
+  "data_note": "基于合并后的 history 回填 5/10/20/60 日累计（家里机无 akshare）"
 }
