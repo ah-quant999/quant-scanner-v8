@@ -82,6 +82,7 @@ DATA_SOURCES = {
     "stock_quote.json":            "STOCK_QUOTE",
     "avg_price_data.json":         "AVG_PRICE_DATA",
     "top5_track.json":             "TOP5_TRACK",  # 2026-08-13 finalRec Top5 90 天滚动追踪（2026-08-15 改自 TOP3）
+    "algo_track.json":              "ALGO_TRACK",   # 2026-08-15 三算法独立追踪（四量终极/板块龙头/大牛股猎手）
     "weekend_meta_report.json":      "WEEKEND_META_REPORT",
     "delisted_stocks.json":        "DELISTED_STOCKS",
 }
@@ -160,6 +161,8 @@ CATEGORY_MAP = {
     "AVG_PRICE_DATA": "intraday",
     # 2026-08-13：TOP5_TRACK 依赖 final_recommend，归属盘后（与 finalRec 同节奏）（2026-08-15 改自 TOP3）
     "TOP5_TRACK": "post_close",
+    # 2026-08-15：ALGO_TRACK 依赖 FINAL_RECOMMEND_DATA + FOUR_VOLUME，归属盘后
+    "ALGO_TRACK": "post_close",
 }
 
 CATEGORY_LABEL = {
