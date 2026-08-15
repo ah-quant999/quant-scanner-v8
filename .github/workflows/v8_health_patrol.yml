@@ -31,7 +31,7 @@ on:
     workflows:
       - "🇨🇳 v8 中国数据抓取(云端)"
       - "☁️ v8 盘后算法链(云端)"
-      - "☁️ v8 构建部署(云端ubuntu)"
+      # 注：build_deploy 自身已跑 health_check + 自愈，patrol 不再对其重复巡检，省 PAT（避免双跑 health_check）
     types: [completed]
     branches: [main]
   # 兜底：每 60 分钟（跟随定时任务节奏，不每 30 分轮询）
