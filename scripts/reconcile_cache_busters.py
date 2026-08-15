@@ -2,25 +2,60 @@
 # -*- coding: utf-8 -*-
 """reconcile_cache_busters.py — 部署前 ?v 强对齐（防覆盖铁律根因修复）。
 
-在 v8_build_deploy.yml 的部署步骤里、git add 之前运行：用「当前磁盘上
-data/*.js 的真实内容」重算 index.html 每个 data/*.js 引用的 ?v（内容 sha1[:10]，
-中性化 republish_time 构建时间戳），使本次提交 index.html 与即将 git add 的
-data 文件严格一致，彻底杜绝 build 内 _rewrite 与最终落库文件因重生/reset 竞态
-导致的缓存戳失配（CDN 吐旧副本）。
+根因（2026-08-15 实测）：CI 的 actions/checkout 检出 main 时，data/*.js 中部分文件
+偶发检出「旧 blob」（与 raw.githubusercontent / Contents API 实际服务的版本不一致）。
+若按「检出文件」重算 ?v，会算到旧哈希、误判「已一致」→ 缓存戳长期失配、CDN 持续
+吐旧副本（正是防覆盖铁律最忌的回归）。
 
-与 update_v8.py 的 _data_file_update_time 中性化逻辑保持一致。
+修复：CI 环境（存在 GITHUB_TOKEN）下，直接用 GitHub Contents API 拉取「线上真实服务
+版本」的数据文件内容来算 ?v（与浏览器/CDN 实际拿到的完全一致），彻底摆脱 checkout
+陈旧 blob 的影响；本地无 token 时回退磁盘文件（本地生成的数据即最新）。
 """
 import re
 import hashlib
 import pathlib
+import os
+import base64
+import json
+import urllib.request
 
 ROOT = pathlib.Path(".")
 
 
 def neutral_sha(text: str) -> str:
-    """内容哈希（中性化 republish_time 构建时间戳），与 update_v8.py 一致。"""
+    """内容哈希（中性化 republish_time 构建时间戳），与 update_v8._rewrite 完全一致。"""
     neutral = re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', text)
     return hashlib.sha1(neutral.encode("utf-8")).hexdigest()[:10]
+
+
+def _api_text(repo: str, path: str, token: str):
+    """经 GitHub Contents API 取线上真实文件内容；失败返回 None。"""
+    url = f"https://api.github.com/repos/{repo}/contents/{path}?ref=main"
+    req = urllib.request.Request(url, headers={
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "reconcile",
+    })
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            d = json.loads(r.read().decode("utf-8"))
+        if isinstance(d, dict) and "content" in d:
+            return base64.b64decode(d["content"]).decode("utf-8", "replace")
+    except Exception:
+        return None
+    return None
+
+
+def content_for(fname: str, data_dir: pathlib.Path, repo: str, token: str):
+    """优先线上真实版本（CI 且 token 可用），回退本地磁盘。"""
+    if token and repo:
+        t = _api_text(repo, f"data/{fname}", token)
+        if t is not None:
+            return t
+    p = data_dir / fname
+    if p.exists():
+        return p.read_text(encoding="utf-8")
+    return None
 
 
 def main():
@@ -30,26 +65,26 @@ def main():
         print("ℹ️ index.html 不存在，跳过 ?v 对齐")
         return
 
+    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+    repo = os.environ.get("GITHUB_REPOSITORY") or "ah-quant999/quant-scanner-v8"
+
     html = idx.read_text(encoding="utf-8")
-    # 🔴 2026-08-15 根因修复（与 update_v8._rewrite 保持完全一致）：
-    # 原正则只匹配 `<script src="data/X.js..."></script>` 整段，漏掉 A2 懒加载
-    # `var BIG=[{...,url:'data/X.js?v=...'}]` 与 `fetch('data/X.js?v=...')` 里的字符串
-    # 引用 → 这些 ?v 永远不重算，CDN 长期吐旧副本。改为全量匹配所有带引号的
-    # data/X.js(?:\?v=...)? 出现（script 标签 / fetch / BIG 数组均引号包裹）。
+    # 全量匹配 index.html 中所有「带引号」的 data/X.js(?:\?v=...)? 出现
+    # （script 标签 / fetch / BIG 数组均引号包裹），与 update_v8._rewrite 完全一致。
     pat = re.compile(r'([\'"])(data/[A-Z0-9_]+\.js)(?:\?[^"\'>\s]+)?([\'"])')
 
     def repl(m):
         q1, src, q2 = m.group(1), m.group(2), m.group(3)
-        f = data_dir / src.split("/")[-1]
-        if not f.exists():
+        fname = src.split("/")[-1]
+        txt = content_for(fname, data_dir, repo, token)
+        if txt is None:
             return m.group(0)
-        ts = neutral_sha(f.read_text(encoding="utf-8"))
-        return f"{q1}{src}?v={ts}{q2}"
+        return f"{q1}{src}?v={neutral_sha(txt)}{q2}"
 
     new_html = pat.sub(repl, html)
     if new_html != html:
         idx.write_text(new_html, encoding="utf-8")
-        print("✅ 部署前 ?v 已强对齐")
+        print("✅ 部署前 ?v 已强对齐（基于线上真实数据）")
     else:
         print("ℹ️ 部署前 ?v 已一致，无需改动")
 
