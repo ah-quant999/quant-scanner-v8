@@ -63,7 +63,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2   # 需要 HEAD~1 做 detect_changes
+          # ★ 2026-08-15 根治 build clobber：必须全量克隆（fetch-depth: 0），否则浅克隆
+          #   reset --hard FETCH_HEAD 拉不到 cn 单独推送的 5 个 extra 文件（STOCK_RPS 等）
+          #   最新 blob，本地副本落后 → ?v 算成陈旧值 → CDN 吐旧副本。全量克隆保证
+          #   reset 后本地 data/*.js 与线上严格一致，?v 一律取本地文件即权威。
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
