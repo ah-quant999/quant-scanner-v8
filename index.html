@@ -1151,6 +1151,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/TRIPLE_HISTORY.js?v=de3fb6cb40" defer></script>
 <script src="data/COCKPIT_TIER_RECOMMEND.js?v=eee6ff4feb" defer></script>
 <script src="data/COCKPIT_ADVICE.js?v=eb110f94ec" defer></script>
+<script src="data/V8_CAL.js?v=49ff629c55" defer></script>
 <script src="data/SH_FIB.js?v=0d1386b766" defer></script>
 <script src="data/SZ_FIB.js?v=12ff178f1e" defer></script>
 <script src="data/SECTOR_RS.js?v=ae851508d3" defer></script>
@@ -1180,7 +1181,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/ETF_DAILY_MONITOR.js?v=d39f30e99c" defer></script>
 <script src="data/TOP10_DAILY.js?v=fb8beeb30f" defer></script>
 <script src="data/WEEKEND_RUN.js?v=2d09a38d14" defer></script>
-<script src="data/V8_CAL.js?v=53e667425f" defer></script>
 <script src="data/W52_HIGH.js?v=c87593123a" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=0be3ac9627" defer></script>
 <script src="data/RUNNER_STATUS.js?v=09b70b1d97" defer></script>
@@ -1316,8 +1316,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       if(!head || typeof window.v8CardHeader !== 'function') return;
       // 🛡️ 2026-08-14 一劳永逸式修复（主人令"空的！一劳永逸式修复！"）：不传 !ts，
       //   避免 ts 为空瞬间误报"无数值"（dataset.rendered='1' 拦截 + render 时序问题）。
+      // 🛡️ 2026-08-15 时段标签走统一 _slotByTs（盘中边界 9:00-15:30），禁止硬编码盘前。
+      var _jdSlot = (ts && window._slotByTs) ? window._slotByTs(ts) : {slot:'盘前', horizon:'短线'};
       head.innerHTML = window.v8CardHeader('⚖️','今日判定 · 环境综合','宏观/美股/技术/情绪/共同结论/危险信号/大盘','update_time',
-        {update_time:ts, slot:'盘前', horizon:'短线'}, false);
+        {update_time:ts, slot:_jdSlot.slot, horizon:_jdSlot.horizon}, false);
     };
     window.__renderJudgmentBody = function(){
       var opBody=document.getElementById('judgmentBodyOp');
@@ -1367,7 +1369,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="note">双维度 = 套利评分（收益弹性）+ 基本面评分（安全边际）。综合分 = 套利×60% + 基本面×40%。</div>
     </div>
 
-    <!-- ⚖️ 2026-08-14 主人令："这个没用，删了吧"：重要事件日历（完整周历·中长期）已删除——保留日历改由 sec-rc 处理 -->
+    <!-- 重要事件日历（完整周历 · 与 calendar.html 同源） -->
+    <div class="card">
+      <h3><span class="ic">📅</span>重要事件日历 - 中长线 · <span class="fresh" id="v8caltime">每周日更新</span></h3>
+      <div id="v8calcontent"></div>
+      <div style="margin-top:20px">
+        <div style="font-weight:800;margin-bottom:14px;font-size:15px">🎨 色块标注说明</div>
+        <div class="v8cal-legend-grid" id="v8callegend"></div>
+      </div>
+    </div>
   </section>
 
   <!-- ============ 实时数据 ============ -->
