@@ -116,6 +116,16 @@ jobs:
           #   正确做法：push 被拒 = 远端已前进，同步远端后用最新 raw_data 重新全量构建，
           #   产物由构建决定而非由合并决定，天然无冲突且不会用旧产物覆盖新数据。
           for i in 1 2 3; do
+            # 🔒 取远端最新 main（含阿狸咪/cn 直接推仓的 data/*.js），消除 push 事件
+            #   checkout 滞后导致的 ?v 陈旧失配：先 sync 远端再 reconcile，确保 ?v 对齐到
+            #   「当前线上最新数据」而非构建机滞后副本（2026-08-15 缓存戳铁律根因修复·续）。
+            #   这 5 个文件(FOUR_VOLUME/FOUR_VOLUME_60M/STOCK_RPS/STOCK_STOP_DATA/
+            #   FINAL_RECOMMEND_DATA) 只由 cn 直接推，update_v8 不重建，构建机 checkout
+            #   若落后 cn 最新推送就会拿到旧内容算旧 ?v → CDN 吐旧副本。先 reset 到
+            #   FETCH_HEAD 即拿到 cn 最新版，reconcile 即可对齐。
+            git fetch "$REPO" main
+            git reset --hard FETCH_HEAD
+            python update_v8.py --detect-changes
             # 🔒 部署前 ?v 强对齐（2026-08-15 缓存戳铁律根因修复）：
             # 用「当前磁盘上 data/*.js 真实内容」重算 index.html 每个 ?v，确保本次提交
             # 的 index.html 与即将 git add 的 data 文件严格一致，彻底杜绝 build 内
