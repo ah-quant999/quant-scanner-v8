@@ -11,7 +11,13 @@
 
 输出：
   - raw_data/algo_track.json
-  - data/ALGO_TRACK.js
+
+  ⚠️ 2026-08-15 防覆盖铁律根因修复：本脚本**禁止**再写 data/ALGO_TRACK.js。
+     data/ALGO_TRACK.js 必须由 build/deploy 流水线（update_v8.py 的 _make_js +
+     _rewrite_index_html_cache_busters）从 raw_data/algo_track.json 重生，
+     否则双写竞态 → 算法链写的新时间戳文件与流水线算出的 ?v 赛跑，
+     造成 index.html ?v 与文件内容 sha 不符 → CDN 吐旧副本（缓存戳失配）。
+     流水线才是 data/ALGO_TRACK.js 的唯一写者。
 
 维护逻辑（与 gen_top5_track.py 同构）：
   - 每日盘后跑批：将今日各算法信号入追踪池
@@ -404,20 +410,16 @@ def main():
     }
 
     # ---- 6. 写入 ----
+    # ⚠️ 只写 raw_data/algo_track.json。data/ALGO_TRACK.js 由 build/deploy 流水线重生，
+    #   本脚本不得写，否则双写竞态击穿 ?v 防覆盖铁律（2026-08-15 根因修复）。
     RAW.mkdir(exist_ok=True)
-    DATA.mkdir(exist_ok=True)
 
     raw_path = RAW / "algo_track.json"
     with open(raw_path, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
     print(f"  ✅ {raw_path.name}")
-
-    js_path = DATA / "ALGO_TRACK.js"
-    js = "window.ALGO_TRACK = " + json.dumps(result, ensure_ascii=False, indent=2) + ";"
-    with open(js_path, "w", encoding="utf-8") as f:
-        f.write(js)
-    print(f"  ✅ {js_path.name}")
     print(f"  📊 总览={json.dumps(total_stats, ensure_ascii=False)}")
+    print(f"  ℹ️ data/ALGO_TRACK.js 由 v8_build_deploy.yml(update_v8.py) 从本文件重生，此处不写")
 
 
 if __name__ == "__main__":
