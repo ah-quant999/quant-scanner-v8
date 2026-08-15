@@ -197,3 +197,37 @@ jobs:
         if: steps.trading.outputs.is_trading_day == 'true'
         run: |
           python api_push_raw.py || true
+
+      # 🔴 2026-08-15 防覆盖铁律修复：run_algorithms 刚重写 data/ALGO_TRACK.js（带新时间戳），
+      #   但 index.html 的 ?v 不会自动跟着变 → CDN 吐旧 ALGO_TRACK 副本。
+      #   此步只在算法链收尾重算 ALGO_TRACK.js 的 ?v 并推送 index.html（Contents API，避开 cn git 墙）。
+      #   只改 ALGO_TRACK 一项，不碰 COMMODITY 等（避免用陈旧本地文件覆盖 build/deploy 已对齐的 ?v）。
+      - name: "🔄 同步 ALGO_TRACK 缓存戳 ?v 并推送 index.html"
+        if: steps.trading.outputs.is_trading_day == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'PY'
+          import os, re, hashlib, base64, json, urllib.request
+          TOK = os.environ["GITHUB_TOKEN"]
+          REPO = "ah-quant999/quant-scanner-v8"
+          API = "https://api.github.com/repos/" + REPO
+          H = {"Authorization": "Bearer " + TOK, "Content-Type": "application/json", "Accept": "application/vnd.github+json"}
+          ROOT = "."
+          idx = os.path.join(ROOT, "index.html")
+          html = open(idx, encoding="utf-8").read()
+          p = os.path.join(ROOT, "data", "ALGO_TRACK.js")
+          t = hashlib.sha1(open(p, encoding="utf-8").read().encode()).hexdigest()[:10] if os.path.exists(p) else ""
+          if not t:
+              print("ALGO_TRACK.js 缺失，跳过")
+              raise SystemExit(0)
+          new = re.sub(r'(ALGO_TRACK\.js)\?v=\w+', r'\1?v=' + t, html)
+          if new == html:
+              print("ALGO_TRACK ?v 已是最新，无需推送")
+          else:
+              open(idx, "w", encoding="utf-8").write(new)
+              meta = json.loads(urllib.request.urlopen(urllib.request.Request(API + "/contents/index.html?ref=main", headers=H)).read())
+              body = json.dumps({"message": "chore: 算法链后同步 ALGO_TRACK ?v（防覆盖）", "content": base64.b64encode(new.encode()).decode(), "sha": meta["sha"]}).encode()
+              req = urllib.request.Request(API + "/contents/index.html", data=body, headers=H, method="PUT")
+              print("push index.html ALGO_TRACK ?v:", urllib.request.urlopen(req).getcode(), "v=", t)
+          PY
