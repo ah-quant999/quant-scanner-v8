@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""gen_top3_track.py — finalRec Top3 90 天滚动追踪盘
+"""gen_top5_track.py — finalRec Top5 90 天滚动追踪盘
 
 输入：
-  - raw_data/final_recommend.json （今日 Top3）
+  - raw_data/final_recommend.json （今日 Top5）
   - raw_data/stock_quote.json （今日收盘价）
   - raw_data/stock_stop.json （每只股的精确止损/止盈）
-  - 上期 raw_data/top3_track.json （追踪池 + 历史归档，优先远端 main）
+  - 上期 raw_data/top5_track.json （追踪池 + 历史归档，优先远端 main）
 
 输出：
-  - raw_data/top3_track.json
-  - data/TOP3_TRACK.js
+  - raw_data/top5_track.json
+  - data/TOP5_TRACK.js
 
 维护逻辑：
-  - 每日 15:30 盘后跑批：将今日 Top3 入追踪池（已经存在的跳过，仅更新）
+  - 每日 15:30 盘后跑批：将今日 Top5 入追踪池（已经存在的跳过，仅更新）
   - 每只在追踪池的股：每天追加价格 → 判定 exit（stop/target/timeout≥90天）
   - exit 的标的从 tracking 移到 history，保留为归档样本
   - history 仅保留 90 天内的样本（按 exit_date 滚动裁剪）
@@ -92,7 +92,7 @@ def _load_remote_or_local(name):
     try:
         import urllib.request
         url = f"https://raw.githubusercontent.com/ah-quant999/quant-scanner-v8/main/raw_data/{name}"
-        req = urllib.request.Request(url, headers={"User-Agent": "v8-gen-top3-track"})
+        req = urllib.request.Request(url, headers={"User-Agent": "v8-gen-top5-track"})
         with urllib.request.urlopen(req, timeout=15) as r:
             return json.loads(r.read().decode("utf-8"))
     except Exception as e:
@@ -164,22 +164,22 @@ def _stop_map(stock_stop):
 
 
 def main():
-    print(f"\n[gen_top3_track] {datetime.now():%Y-%m-%d %H:%M:%S}  90 天滚动追踪")
+    print(f"\n[gen_top5_track] {datetime.now():%Y-%m-%d %H:%M:%S}  90 天滚动追踪")
     now = _now_cst()
     today = _today_str()
     today_dashed = _today_str_dashed()
     cutoff_90d = (now - timedelta(days=WINDOW_DAYS)).strftime("%Y%m%d")
 
-    # ---- 1. 读今日 Top3 ----
+    # ---- 1. 读今日 Top5 ----
     final_rec = _load_json(RAW / "final_recommend.json")
-    today_top3 = []
+    today_top5 = []
     if final_rec:
-        for s in (final_rec.get("stocks") or [])[:3]:
+        for s in (final_rec.get("stocks") or [])[:5]:
             code = s.get("code")
             if code:
-                today_top3.append(s)
-    print(f"  ▶ 今日 Top3 = {len(today_top3)} 只: " +
-          ", ".join(f"{s.get('name')}({s.get('code')})" for s in today_top3))
+                today_top5.append(s)
+    print(f"  ▶ 今日 Top5 = {len(today_top5)} 只: " +
+          ", ".join(f"{s.get('name')}({s.get('code')})" for s in today_top5))
 
     # ---- 2. 读今日行情 ----
     stock_quote = _load_json(RAW / "stock_quote.json")
@@ -190,7 +190,7 @@ def main():
     smap = _stop_map(stock_stop)
 
     # ---- 4. 读 baseline（远端 main 优先 → 本地）----
-    baseline = _load_remote_or_local("top3_track.json") or {}
+    baseline = _load_remote_or_local("top5_track.json") or {}
     prev_tracking_list = baseline.get("tracking") or []
     prev_history_list  = baseline.get("history")  or []
 
@@ -201,7 +201,7 @@ def main():
     # ---- 5. 维护：把上期追踪池股票推进一步 ----
     new_tracking = []
     new_history  = list(prev_history_list)
-    top3_codes   = {str(s.get("code")) for s in today_top3}
+    top5_codes   = {str(s.get("code")) for s in today_top5}
 
     # 退出累计峰值
     for code, old in list(prev_tracking.items()):
@@ -260,8 +260,8 @@ def main():
                 "days_in":    new_days_in,
             })
 
-    # ---- 6. 今日 Top3 入池（新上榜 / 已存在续追踪）----
-    for s in today_top3:
+    # ---- 6. 今日 Top5 入池（新上榜 / 已存在续追踪）----
+    for s in today_top5:
         code = str(s.get("code"))
         name = s.get("name")
         rank = s.get("rank")
@@ -328,6 +328,8 @@ def main():
             "rank1": sum(1 for t in new_tracking if t.get("last_rank") == 1),
             "rank2": sum(1 for t in new_tracking if t.get("last_rank") == 2),
             "rank3": sum(1 for t in new_tracking if t.get("last_rank") == 3),
+            "rank4": sum(1 for t in new_tracking if t.get("last_rank") == 4),
+            "rank5": sum(1 for t in new_tracking if t.get("last_rank") == 5),
         },
     }
 
@@ -340,7 +342,7 @@ def main():
         "_meta": {
             "version": "v1",
             "schema_date": today_dashed,
-            "note": "90 天滚动追踪 finalRec Top3；entry=上榜日收盘，exit 判定=stoploss/target/timeout",
+            "note": "90 天滚动追踪 finalRec Top5；entry=上榜日收盘，exit 判定=stoploss/target/timeout",
         },
     }
 
@@ -348,13 +350,13 @@ def main():
     RAW.mkdir(exist_ok=True)
     DATA.mkdir(exist_ok=True)
 
-    raw_path = RAW / "top3_track.json"
+    raw_path = RAW / "top5_track.json"
     with open(raw_path, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
     print(f"  ✅ {raw_path.name}  tracking={len(new_tracking)} history={len(history_90d)}")
 
-    js_path = DATA / "TOP3_TRACK.js"
-    js = "window.TOP3_TRACK = " + json.dumps(result, ensure_ascii=False, indent=2) + ";"
+    js_path = DATA / "TOP5_TRACK.js"
+    js = "window.TOP5_TRACK = " + json.dumps(result, ensure_ascii=False, indent=2) + ";"
     with open(js_path, "w", encoding="utf-8") as f:
         f.write(js)
     print(f"  ✅ {js_path.name}")

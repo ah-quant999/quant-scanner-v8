@@ -96,7 +96,7 @@ def walk_raw():
         "backtest",          # backtest_tdx.py / backtest_comprehensive.py 等
         "cockpit_backtest",  # cockpit_backtest_now.py
         "optimized_strategy",# export_optimized_strategy.py
-        "top3_track",        # gen_top3_track.py
+        "top5_track",        # gen_top5_track.py（2026-08-15 改自 top3_track）
     )
     for root, _dirs, files in os.walk("raw_data"):
         for f in files:

@@ -88,9 +88,9 @@ ORDER = [
     # final_recommend.py 是整条管线的最终汇聚点，必须排在所有上游之后：
     #   输入 = triple_consensus + cockpit_tier + top10_daily + crds + lhb + sector_rs +
     #          crisis_data + cockpit_backtest + triple_track + four_volume_60m + stock_profile
-    #   输出 = raw_data/final_recommend.json + data/FINAL_RECOMMEND_DATA.js（Top3 + 全量推荐池）
-    "final_recommend.py",              # → FINAL_RECOMMEND_DATA.js（跨策略共振 Top3，管线最终产物）
-    "gen_top3_track.py",               # → TOP3_TRACK.js（finalRec Top3 90 天滚动追踪盘，2026-08-13）
+    #   输出 = raw_data/final_recommend.json + data/FINAL_RECOMMEND_DATA.js（Top5 + 全量推荐池）
+    "final_recommend.py",              # → FINAL_RECOMMEND_DATA.js（跨策略共振 Top5，管线最终产物）
+    "gen_top5_track.py",               # → TOP5_TRACK.js（finalRec Top5 90 天滚动追踪盘，2026-08-13 落地/2026-08-15 改自 TOP3）
 ]
 
 

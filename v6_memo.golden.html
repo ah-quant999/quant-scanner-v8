@@ -156,7 +156,7 @@ table td, table th, table tr { color: #333 !important; }
         <div style="margin-bottom:10px;padding:8px 12px;background:#e8f5e9;border-left:4px solid #43a047;border-radius:6px;">
           <b>➕ 新增模块（2026-08-13~15）</b>
           <ul style="margin:6px 0 0 18px;padding:0;">
-            <li><b>🔒 策略回测（统一 Tab · sec-bt）</b>：TOP3 跟踪 + 综合回测 + 信号 60 日回测三块一站，顶部统一「🦊 更新于」胶囊；数据源 backtest_tdx.json / backtest_comprehensive.json（算法产物受 api_push_raw 防覆盖保护）。</li>
+            <li><b>🔒 策略回测（统一 Tab · sec-bt）</b>：TOP5 跟踪 + 综合回测 + 信号 60 日回测三块一站，顶部统一「🦊 更新于」胶囊；数据源 backtest_tdx.json / backtest_comprehensive.json（算法产物受 api_push_raw 防覆盖保护）。</li>
             <li><b>📦 潜力参考（选股策略子TAB · st-pr）</b>：潜力挖掘 + ETF·龙头参考 + 商品涨价弹性榜三张卡，全带统一「🦊 更新于」胶囊（_uBadge）+ 💰分红方案 chip（读 STOCK_QUOTE.dividend）。</li>
             <li><b>🦊 全站「更新于」统一胶囊</b>：_uBadge（🦊 更新于 盘后 · 短线 · 相对时间），今日判定卡不再误报「无数值」（去掉 dataset.rendered 缓存 + 500ms×5 重试保底）。</li>
           </ul>
@@ -165,7 +165,7 @@ table td, table th, table tr { color: #333 !important; }
           <b>🔧 关键修复（2026-08-13~15）</b>
           <ul style="margin:6px 0 0 18px;padding:0;">
             <li><b>v8_cn_fetch_cloud.yml 盘后档连续失败</b>：case cron '0 9,13' vs '0 9,14' 不匹配 → 修复 case 接受两种 + 未匹配兜底 all；<b>Windows self-hosted runner 必须显式 shell: bash</b>（默认 PowerShell 不认 case 语法）；注释里不要写 ${{ }}（GitHub 表达式解析器连注释都求值）。</li>
-            <li><b>api_push_raw.py walk_raw() 防覆盖</b>：排除算法产物（backtest_tdx / backtest_comprehensive / cockpit_backtest / optimized_strategy / top3_track）——cloud_fetch 不产出却会覆盖家庭机 17:20 run_algorithms 的新版。</li>
+            <li><b>api_push_raw.py walk_raw() 防覆盖</b>：排除算法产物（backtest_tdx / backtest_comprehensive / cockpit_backtest / optimized_strategy / top5_track）——cloud_fetch 不产出却会覆盖家庭机 17:20 run_algorithms 的新版。</li>
             <li><b>cloud_fetch_v8.py f_judgment() 非交易日守卫</b>：周六/周日不重算「今日判定」，保留周五 15:20 完整数据（前端显示「上一交易日收盘 15:20」），避免周末生成无意义新判定。</li>
             <li><b>CDN cache-buster 铁律</b>：?v= 必须用内容 sha1 前10位（绝不能用 mtime）；数据内容变 → 同时更新 index.html 的 ?v= + 重新 push，否则 CDN 吐旧缓存（本次 JUDGMENT_DATA.js?v=eaf65b175a → ba643f9c76）。</li>
           </ul>
