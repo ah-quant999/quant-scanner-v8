@@ -8,8 +8,11 @@
 # 本 workflow 是「缓存戳自愈器」：
 #   1) 监听 data/** / raw_data/** 的每一次 push（即任何 data 变更的瞬间）→ 立即重算 ?v；
 #   2) 每 15 分钟兜底巡检一次（防 schedule 偶发静默失效 + 兜底短时漂移）；
-#   3) 用「当前仓库 data/*.js 真实内容」重算 index.html 全部 ?v（中性化 republish_time，
-#      与 update_v8._rewrite 完全一致），仅在 ?v 真变化时才 commit+push。
+#   3) 重算时**优先用 GitHub Contents API 拉取线上真实服务版本**（raw.githubusercontent 实际
+#      吐给浏览器/CDN 的内容）来算 ?v，而非依赖 actions/checkout 检出的文件——实测 checkout
+#      对部分 data/*.js 会检出「旧 blob」，导致按磁盘算 ?v 误判「已一致」、缓存戳长期失配。
+#      API 取到的内容即用户真实拿到的内容，?v 与之严格一致，CDN 不再吐旧副本。
+#   4) 仅在 ?v 真变化时才 commit+push。
 #
 # 与 build_deploy 的关系：
 #   - 本 workflow 推送 index.html 会触发 build_deploy（其 paths 含 index.html），
@@ -50,7 +53,9 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: "🔄 重算 index.html 全部 ?v 对齐当前 data 内容（中性化 republish_time）"
+      - name: "🔄 重算 index.html 全部 ?v 对齐线上真实 data 内容（中性化 republish_time）"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python scripts/reconcile_cache_busters.py
 
       - name: "📤 推送（仅当 ?v 真变化）"
