@@ -1365,25 +1365,21 @@ def check_signal_date_freshness():
                     "message": f"最新 enter_date {newest} ≥ 最近交易日 {last_trade_str}"
                 })
 
-        # 2026-08-11 主人令：去掉 HK_PENALTY 后增加 Top3 市场分布异常监控——
-        #   全港股/全 A 股说明数据源异常（如港股 API 挂导致共振虚高、A 股 mootdx 挂导致扫描失败），
-        #   不再是「排序逻辑问题」而是「数据源问题」，必须 URGENT 告警。
+        # 2026-08-15 主人令：Top3 市场分布只展示、不误报。
+        #   去掉 crude 的「全 A 股/全港股 = 数据源异常」判断——A 股占绝大多数是常态，
+        #   真正的「A 股缺失」由下方 check_a_share_coverage() 统一扫描所有主要数据池捕获。
         stocks = d.get("stocks", [])
         if stocks:
-            is_all_hk = all((s.get("board") == "港股" or s.get("market") == "hk") for s in stocks)
-            is_all_a = all(s.get("board") != "港股" and s.get("market") != "hk" for s in stocks)
-            if is_all_hk or is_all_a:
-                markets = ["港股" if is_all_hk else "A股"][0]
-                codes = [f"{s.get('code')} {s.get('name')}" for s in stocks]
-                results.append({
-                    "id": "final_market_distribution",
-                    "name": "最终推荐市场分布",
-                    "page": "内容审计",
-                    "status": "warn",
-                    "message": f"⚠️ Top3 全是{markets}（{len(stocks)} 只全市场集中），"
-                              f"疑似数据源异常：{'; '.join(codes[:3])}。"
-                              f"排查候选池 / mootdx A股 / akshare 港股 API / maharo 信号源。"
-                })
+            a_cnt = sum(1 for s in stocks if _is_a_share(s))
+            hk_cnt = len(stocks) - a_cnt
+            markets_str = f"A股{a_cnt}只 / 港股{hk_cnt}只"
+            results.append({
+                "id": "final_market_distribution",
+                "name": "最终推荐市场分布",
+                "page": "内容审计",
+                "status": "ok",
+                "message": f"Top{len(stocks)} 市场分布：{markets_str}"
+            })
 
     return results
 
@@ -1402,6 +1398,7 @@ _A_SHARE_POOLS = [
     ("FOUR_VOLUME.js",          "FOUR_VOLUME",          "四量终极",     "algo_run"),
     ("MAHORO.js",               "MAHORO",               "国际投行信号", "algo_run"),
     ("LHB_DATA.js",             "LHB_DATA",             "龙虎榜",       "cn_fetch"),
+    ("FINAL_RECOMMEND_DATA.js", "FINAL_RECOMMEND_DATA", "最终推荐",     "algo_run"),
 ]
 
 
