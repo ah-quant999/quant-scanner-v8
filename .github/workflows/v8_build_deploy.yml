@@ -116,6 +116,34 @@ jobs:
           #   正确做法：push 被拒 = 远端已前进，同步远端后用最新 raw_data 重新全量构建，
           #   产物由构建决定而非由合并决定，天然无冲突且不会用旧产物覆盖新数据。
           for i in 1 2 3; do
+            # 🔒 部署前 ?v 强对齐（2026-08-15 缓存戳铁律根因修复）：
+            # 用「当前磁盘上 data/*.js 真实内容」重算 index.html 每个 ?v，确保本次提交
+            # 的 index.html 与即将 git add 的 data 文件严格一致，彻底杜绝 build 内
+            # _rewrite 与最终落库文件因重生/reset 竞态导致的缓存戳失配（CDN 吐旧副本）。
+            # 每次重试都重跑，保证任意尝试提交前 ?v 都对齐。
+            python - <<'PY'
+            import re, hashlib, pathlib
+            DATA = pathlib.Path("data")
+            IDX = pathlib.Path("index.html")
+            def neutral(p):
+                t = p.read_text(encoding="utf-8")
+                return hashlib.sha1(re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', t).encode()).hexdigest()[:10]
+            html = IDX.read_text(encoding="utf-8")
+            pat = re.compile(r'(<script src=")(data/[A-Z0-9_]+\.js)(?:\?[^"]*)?("[^>]*></script>)')
+            def repl(m):
+                pre, src, suf = m.group(1), m.group(2), m.group(3)
+                f = DATA / src.split("/")[-1]
+                if not f.exists():
+                    return m.group(0)
+                ts = neutral(f)
+                return f"{pre}{src}?v={ts}{suf}"
+            new = pat.sub(repl, html)
+            if new != html:
+                IDX.write_text(new, encoding="utf-8")
+                print("✅ 部署前 ?v 已强对齐")
+            else:
+                print("ℹ️ 部署前 ?v 已一致，无需改动")
+            PY
             git add -f data/ index.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py
             if git diff --cached --quiet; then
               echo "ℹ️ 无数据变化，跳过部署（远端已是最新构建）"
