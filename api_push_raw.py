@@ -2,7 +2,7 @@
 # api_push_raw.py — 经 GitHub REST API 把 raw_data/ 推送到 main
 # 绕过 git：本机(cn runner, NETWORK SERVICE)无法直连 github.com 的 git/HTTPS 协议，
 # 但 api.github.com 可达。故用 Git Database API 以「单次 commit」方式提交 raw_data。
-import os, sys, json, base64, hashlib, datetime
+import os, sys, json, base64, hashlib, datetime, re
 import urllib.request, urllib.error
 import http.client
 import time as _time
@@ -165,6 +165,52 @@ def walk_extra():
     return out
 
 
+# ── 2026-08-15 根治「cn 单独推送 5 个 extra 文件后 ?v 失配」────────────────
+# 根因：api_push_raw 经 Git Database API 推送 data/FOUR_VOLUME.js 等 5 个
+# extra 文件，但从不更新 index.html 的 ?v；新内容上线后，直到 reconcile
+# workflow 跑（最多 ~15min 窗口）?v 一直指向旧哈希 → CDN/浏览器吐旧副本。
+# 修复：cn 推送这 5 个文件的同时，在本提交内原子更新 index.html 对应 ?v，
+# 使 ?v 与本次推送内容严格一致，彻底消除该窗口。
+# 说明：无论 build / cn / 盘后算法链谁推送 data，reconcile workflow 仍是
+# 全局自愈兜底；此处只是把「最高频的 cn extra 推送」做成零窗口。
+_EXTRA_FILES = (
+    "data/FOUR_VOLUME.js",
+    "data/STOCK_STOP_DATA.js",
+    "data/FINAL_RECOMMEND_DATA.js",
+    "data/STOCK_RPS.js",
+    "data/FOUR_VOLUME_60M.js",
+)
+_RE_V = re.compile(r'([\'"])(data/[A-Z0-9_]+\.js)(?:\?[^"\'>\s]+)?([\'"])')
+
+
+def _neutral_sha(content: bytes) -> str:
+    """与 update_v8._rewrite / reconcile_cache_busters 完全一致的中性化哈希：
+    先剔除 republish_time 的构建时间戳（非数据本体），再取 sha1 前 10 位。"""
+    try:
+        text = content.decode("utf-8")
+    except Exception:
+        text = content.decode("utf-8", "replace")
+    neutral = re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', text)
+    return hashlib.sha1(neutral.encode("utf-8")).hexdigest()[:10]
+
+
+def _stamp_index_v(index_text: str, changed: dict) -> tuple:
+    """对 index.html 文本，为 changed 中每个 data/X.js 用其新内容重算 ?v 并替换。
+    changed: { "data/FOUR_VOLUME.js": b"..." }。
+    返回 (new_text, changed_bool)。空内容(未就绪)不写空 ?v，保留原 ?v 等下次对齐。
+    """
+    def repl(m):
+        q1, src, q2 = m.group(1), m.group(2), m.group(3)
+        if src in changed:
+            data = changed[src]
+            if not data.strip():
+                return m.group(0)
+            return f"{q1}{src}?v={_neutral_sha(data)}{q2}"
+        return m.group(0)
+    new = _RE_V.sub(repl, index_text)
+    return new, new != index_text
+
+
 def main():
     files = walk_raw()
     files.update(walk_extra())
@@ -255,6 +301,31 @@ def main():
             failed_paths.append(path)
             continue
         new_entries[path] = b["sha"]
+
+    # ── 2026-08-15 根治「cn 单独推送 5 个 extra 文件后 ?v 失配」────────────
+    # 仅当本次确实推送了 5 个 extra 文件中的一个，才原子更新 index.html 对应 ?v，
+    # 使 ?v 与本次落库内容严格一致，消除「新数据上线 ~ reconcile 跑之前」的失配窗口。
+    # 若 index.html 拉取/改写/上传任一步失败，则跳过（交由 reconcile workflow 自愈），
+    # 绝不因此阻断整批 raw_data 推送。
+    extra_changed = {p: files[p] for p in _EXTRA_FILES if p in new_entries}
+    if extra_changed:
+        idx_meta = api("GET", f"/repos/{REPO}/contents/index.html")
+        if "__error__" not in idx_meta and "content" in idx_meta:
+            idx_text = base64.b64decode(idx_meta["content"]).decode("utf-8", "replace")
+            new_idx, idx_changed = _stamp_index_v(idx_text, extra_changed)
+            if idx_changed:
+                ib = api("POST", f"/repos/{REPO}/git/blobs",
+                         {"content": base64.b64encode(new_idx.encode("utf-8")).decode(),
+                          "encoding": "base64"})
+                if "__error__" not in ib and "sha" in ib:
+                    new_entries["index.html"] = ib["sha"]
+                    print("✅ index.html ?v 已随 5 个 extra 文件原子更新")
+                else:
+                    print("  ⚠️ index.html blob 上传失败，?v 将交由 reconcile 自愈")
+            else:
+                print("ℹ️ index.html ?v 已一致，无需改动")
+        else:
+            print("  ⚠️ 拉取 index.html 失败，?v 将交由 reconcile 自愈")
 
     print(f"📊 未变化 {unchanged} / 防倒退跳过 {len(regressed)} / 待更新 {len(new_entries)}")
     if regressed:
