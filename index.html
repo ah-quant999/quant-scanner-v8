@@ -1219,10 +1219,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/W52_HIGH.js?v=3c02f11640" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=32315d9aea" defer></script>
 <script src="data/RUNNER_STATUS.js?v=4efc4d6266" defer></script>
-<script src="data/HEALTH_CHECK.js?v=78b702ec49" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=cf12768694" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=fb630fd669" defer></script>
-    <script src="data/POTENTIAL_PICKS.js?v=eade6b7210" defer></script>
+<script src="data/HEALTH_CHECK.js?v=5ac3ed9033" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=66bff1eecb" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=065834aaec" defer></script>
+    <script src="data/POTENTIAL_PICKS.js?v=b068ca9c73" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -5795,7 +5795,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
     <div class="lg-pane" id="lg-v6">
       <div id="v6MemoWrap" style="position:relative;width:100%;height:calc(100vh - 180px);border-radius:14px;overflow:hidden;background:var(--bg2);border:1px solid var(--border);">
         <div id="v6MemoStatus" style="position:absolute;top:6px;left:8px;z-index:10;font-size:11px;color:var(--sub);background:rgba(0,0,0,.55);padding:3px 8px;border-radius:4px;pointer-events:none;">⏳ v6 备忘录加载中…</div>
-        <iframe id="v6MemoFrame" src="v6_memo.html?v=dd16f42be4" style="width:100%;height:100%;border:none;" onload="(function(){try{var f=document.getElementById('v6MemoFrame');var s=document.getElementById('v6MemoStatus');if(s){var h=f.contentWindow.document.body.scrollHeight;s.innerHTML=f.contentWindow.document.body.scrollHeight<200?'⚠️ v6 备忘录内容太短 ('+h+'px)':h>0?'✅ v6 备忘录已加载 ('+h+'px)':'⚠️ v6 备忘录 body 为空';}}catch(e){console.error('v6 memo onload err',e);}})();window.__v6MemoLoaded=true;(function(){var d=document.getElementById('v6MemoFrame');try{if(d&&d.contentWindow&&d.contentWindow.document&&d.contentWindow.document.body){var h=d.contentWindow.document.body.scrollHeight;if(h<200){document.getElementById('v6MemoError').style.display='flex';}}}catch(e){}})();" onerror="document.getElementById('v6MemoStatus').innerHTML='❌ v6 备忘录加载失败';document.getElementById('v6MemoError').style.display='flex';"></iframe>
+        <iframe id="v6MemoFrame" src="v6_memo.html?v=65107c0a3b" style="width:100%;height:100%;border:none;" onload="(function(){try{var f=document.getElementById('v6MemoFrame');var s=document.getElementById('v6MemoStatus');if(s){var h=f.contentWindow.document.body.scrollHeight;s.innerHTML=f.contentWindow.document.body.scrollHeight<200?'⚠️ v6 备忘录内容太短 ('+h+'px)':h>0?'✅ v6 备忘录已加载 ('+h+'px)':'⚠️ v6 备忘录 body 为空';}}catch(e){console.error('v6 memo onload err',e);}})();window.__v6MemoLoaded=true;(function(){var d=document.getElementById('v6MemoFrame');try{if(d&&d.contentWindow&&d.contentWindow.document&&d.contentWindow.document.body){var h=d.contentWindow.document.body.scrollHeight;if(h<200){document.getElementById('v6MemoError').style.display='flex';}}}catch(e){}})();" onerror="document.getElementById('v6MemoStatus').innerHTML='❌ v6 备忘录加载失败';document.getElementById('v6MemoError').style.display='flex';"></iframe>
         <div id="v6MemoError" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:var(--bg2);flex-direction:column;gap:12px;text-align:center;padding:20px;">
           <div style="font-size:15px;color:var(--sub)">v6 备忘录加载失败或内容为空</div>
           <div style="font-size:12px;color:var(--dim)">可能是 CDN 缓存了旧版本，请点击下方按钮强制刷新</div>
@@ -10274,6 +10274,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   /* ═══════════ 2026-08-13 三张新卡填充函数（涨价榜/情绪周期/潜力挖掘）══ 暂未上架观察 ═══════════ */
 
   // 💹 商品涨价弹性榜（2026-08-15 主人令：三段分组卡片，参考板块周期轮动路线表风格）
+  // 💹 商品涨价弹性榜（2026-08-15 主人令：多列紧凑 grid，全部品种不隐藏）
   window._fillCommodityElasticity = function(){
     var ce = window.COMMODITY_ELASTICITY;
     try{ var tm=document.getElementById('prCEFresh'); if(tm) tm.innerHTML = _uBadge('盘后','短线',(ce&&ce.update_time)||null); }catch(e){}
@@ -10290,7 +10291,6 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       else coolList.push(c);
     });
 
-    // ── 辅助：渲染一只弹性标的行 ──
     function _stockRow(s){
       var eColor = s.elasticity_pct >= 3 ? '#fbbf24' : (s.elasticity_pct >= 0 ? '#22c55e' : '#f87171');
       var sq = (window.STOCK_QUOTE && window.STOCK_QUOTE.stocks) ? window.STOCK_QUOTE.stocks[s.code] : null;
@@ -10299,112 +10299,99 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       if (dv && dv.cash_ratio != null){
         var dyColor = dv.cash_ratio >= 30 ? '#fbbf24' : (dv.cash_ratio >= 10 ? '#22c55e' : '#94a3b8');
         var prog = dv.progress && /实施|已/.test(dv.progress) ? '已实施' : (dv.progress || '预案');
-        dyChip = '<span style="margin-left:6px;font-size:9.5px;padding:1px 5px;border-radius:3px;background:rgba(251,146,60,.15);color:'+dyColor+';font-weight:700;">💰'+dv.cash_ratio.toFixed(1)+'%·'+prog+'</span>';
+        dyChip = '<span style="margin-left:4px;font-size:9px;padding:0 3px;border-radius:2px;background:rgba(251,146,60,.12);color:'+dyColor+';font-weight:600;">💰'+dv.cash_ratio.toFixed(1)+'%</span>';
       }
-      return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:3px 0;border-bottom:1px dashed rgba(148,163,184,.12);">'
-        + '<span><b>'+s.name+'</b> <span style="color:var(--dim);font-size:10px;">'+s.code+' · '+(s.business_pct*100|0)+'%</span>'+dyChip+'</span>'
-        + '<span style="color:'+eColor+';font-weight:600;">'+ (s.elasticity_pct>0?'+':'') + s.elasticity_pct+'%</span>'
+      return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:10.5px;padding:1.5px 0;border-bottom:1px dashed rgba(148,163,184,.10);">'
+        + '<span><b>'+s.name+'</b> <span style="color:var(--dim);font-size:9.5px;">'+s.code+' · '+(s.business_pct*100|0)+'%</span>'+dyChip+'</span>'
+        + '<span style="color:'+eColor+';font-weight:600;flex-shrink:0;margin-left:4px;">'+ (s.elasticity_pct>0?'+':'') + s.elasticity_pct+'%</span>'
         + '</div>';
     }
 
-    // ── 辅助：渲染一个商品卡片（通用）──
-    function _commodityCard(c, opts){
+    function _miniCard(c, opts){
       var dev = c.dev_pct || 0;
-      var devStr = (dev > 0 ? '+' : '') + dev + '%';
+      var devStr = (dev > 0 ? '+' : '') + dev.toFixed(1) + '%';
       var devColor = dev >= 3 ? '#fbbf24' : (dev <= -3 ? '#f87171' : '#94a3b8');
-      var bg = opts.bg || 'rgba(245,158,11,.12)';
-      var border = opts.border || 'rgba(245,158,11,.45)';
+      var bg = opts.bg || 'rgba(245,158,11,.08)';
+      var border = opts.border || 'rgba(245,158,11,.35)';
       var icon = opts.icon || '';
-      var titleColor = opts.titleColor || '#fbbf24';
-
-      var html = '';
-      html += '<div style="border:1px solid '+border+';border-radius:8px;padding:10px 12px;background:'+bg+';margin-bottom:6px;">';
-      // 卡头：品名 + 偏离
-      html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">';
-      html += '<span style="font-weight:700;color:'+titleColor+';font-size:14px;">'+icon+' '+c.name+'</span>';
-      html += '<span style="font-size:12px;color:'+devColor+';font-weight:700;">'+devStr+'</span>';
-      html += '</div>';
-      // 价格行
+      var tc = opts.titleColor || '#fbbf24';
+      var h = '';
+      h += '<div style="border:1px solid '+border+';border-radius:7px;padding:8px 10px;background:'+bg+';">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">';
+      h += '<span style="font-weight:700;color:'+tc+';font-size:13px;white-space:nowrap;">'+icon+' '+c.name+'</span>';
+      h += '<span style="font-size:11.5px;color:'+devColor+';font-weight:700;flex-shrink:0;margin-left:6px;">'+devStr+'</span>';
+      h += '</div>';
       if(opts.showPrice !== false){
-        html += '<div style="font-size:11px;color:var(--sub);margin-bottom:6px;">现价 <b style="color:var(--txt)">'+c.current_price+'</b> '+c.unit;
-        if (c.baseline_30d) html += ' · 基准 '+c.baseline_30d;
-        if (c.exchange) html += ' · '+c.exchange;
-        html += '</div>';
+        h += '<div style="font-size:10px;color:var(--sub);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">';
+        h += c.current_price+' '+c.unit;
+        if (c.exchange) h += ' · '+c.exchange;
+        h += '</div>';
       }
-      // 状态文案或弹性标的列表
       if(opts.statusText){
-        html += '<div style="font-size:11.5px;color:'+(opts.statusColor||'var(--dim)')+';padding:4px 0;">'+opts.statusText+'</div>';
+        h += '<div style="font-size:10.5px;color:'+(opts.statusColor||'var(--dim)')+';padding:2px 0;">'+opts.statusText+'</div>';
       }
       if(c.stocks && c.stocks.length > 0 && opts.showStocks){
-        var showStocks = c.stocks.slice(0, opts.maxStocks || 5);
-        var extraCount = c.stocks.length - (opts.maxStocks || 5);
-        showStocks.forEach(function(s){ html += _stockRow(s); });
-        if(extraCount > 0){
-          html += '<div style="font-size:10px;color:var(--dim);padding-top:3px;">+ '+extraCount+' 只相关标的已折叠</div>';
-        }
+        var ss = c.stocks.slice(0, opts.maxStocks || 4);
+        ss.forEach(function(s){ h += _stockRow(s); });
+        var extra = c.stocks.length - (opts.maxStocks || 4);
+        if(extra > 0) h += '<div style="font-size:9.5px;color:var(--dim);padding-top:2px;">+ '+extra+' 只已折叠</div>';
       }
-      html += '</div>';
-      return html;
+      h += '</div>';
+      return h;
     }
 
     var html = '';
-    // 顶栏统计
-    html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;font-size:12px;color:var(--sub);flex-wrap:wrap;">';
-    html += '<span><b style="color:#fbbf24">'+hotList.length+'</b>/<b>'+ce.total_commodities+'</b> 个进入涨价窗口</span>';
-    html += '<span style="color:var(--dim);">·</span>';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11.5px;color:var(--sub);flex-wrap:wrap;">';
+    html += '<span><b style="color:#fbbf24">'+hotList.length+'</b>/<b>'+ce.total_commodities+'</b> 涨价窗口</span>';
     html += '<span>平/跌 <b style="color:#94a3b8">'+coolList.length+'</b></span>';
-    html += '<span style="color:var(--dim);">·</span>';
-    html += '<span>暂无数据 <b style="color:var(--dim)">'+unavailList.length+'</b></span>';
-    html += '<span style="color:var(--dim);margin-left:8px;">· 数据 '+(ce.data_date||'')+'</span>';
+    if(unavailList.length > 0) html += '<span>无数据 <b style="color:var(--dim)">'+unavailList.length+'</b></span>';
+    html += '<span style="color:var(--dim);margin-left:auto;">'+(ce.data_date||'')+'</span>';
     html += '</div>';
 
-    // ══ ══ 涨价窗口商品：每品种独立卡片，列弹性标的前5，其余折叠 ══ ══
     if(hotList.length > 0){
-      html += '<div style="font-size:12px;font-weight:700;color:#fbbf24;margin:6px 0 8px;">🔥 涨价窗口（偏离≥'+(ce.hot_threshold_pct||3)+'%）— 弹性标的</div>';
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin-bottom:10px;">';
       hotList.forEach(function(c){
-        html += _commodityCard(c, {
-          icon:'🔥', bg:'rgba(245,158,11,.10)', border:'rgba(245,158,11,.40)',
-          titleColor:'#fbbf24', showStocks:true, maxStocks:5
+        html += _miniCard(c, {
+          icon:'🔥', bg:'rgba(245,158,11,.08)', border:'rgba(245,158,11,.35)',
+          titleColor:'#fbbf24', showStocks:true, maxStocks:4
         });
       });
+      html += '</div>';
     }
 
-    // ══ ══ 未达阈值商品：独立卡片，写状态文案 ══ ══
     if(coolList.length > 0){
-      html += '<div style="font-size:12px;font-weight:700;color:#94a3b8;margin:14px 0 8px;">❄ 未达涨价阈值</div>';
+      html += '<div style="font-size:11px;font-weight:600;color:#94a3b8;margin:8px 0 4px;">❄ 未达阈值</div>';
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;">';
       coolList.forEach(function(c){
         var dev = c.dev_pct || 0;
-        var devStr = (dev > 0 ? '+' : '') + dev + '%';
+        var devStr = (dev > 0 ? '+' : '') + dev.toFixed(1) + '%';
         var isDown = dev < -0.5;
-        var statusIcon = isDown ? '📉' : '➖';
-        var statusText = isDown
-          ? statusIcon + ' 今日价格下跌 ' + devStr
-          : statusIcon + ' 今日无涨价（偏离 ' + devStr + '，未达 '+ce.hot_threshold_pct+'% 阈值）';
-        var statusColor = isDown ? '#f87171' : '#94a3b8';
-        html += _commodityCard(c, {
-          icon:'', bg:'rgba(148,163,184,.05)', border:'rgba(148,163,184,.20)',
-          titleColor:'var(--txt)', showStocks:false,
-          statusText:statusText, statusColor:statusColor
+        var st = isDown ? '📉 下跌 '+devStr : '➖ 无涨价('+devStr+')';
+        html += _miniCard(c, {
+          icon:'', bg:'rgba(148,163,184,.04)', border:'rgba(148,163,184,.16)',
+          titleColor:'var(--txt)', showPrice:true, showStocks:false,
+          statusText:st, statusColor:isDown?'#f87171':'#94a3b8'
         });
       });
+      html += '</div>';
     }
 
-    // ══ ══ 不可用品种：灰色占位卡片 ══ ══
     if(unavailList.length > 0){
-      html += '<div style="font-size:12px;font-weight:700;color:var(--dim);margin:14px 0 8px;">⛔ 暂无数据品种</div>';
+      html += '<div style="font-size:11px;font-weight:600;color:var(--dim);margin:10px 0 4px;">⛔ 暂无数据</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
       unavailList.forEach(function(c){
-        var reason = c.unavailable_reason || '数据源暂无报价';
-        html += _commodityCard(c, {
-          icon:'', bg:'rgba(148,163,184,.03)', border:'rgba(148,163,184,.18)',
-          titleColor:'var(--dim)', showPrice:false, showStocks:false,
-          statusText:'⛔ '+reason, statusColor:'var(--dim)'
-        });
+        var reason = c.unavailable_reason || '无报价';
+        html += '<span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--dim);background:rgba(148,163,184,.06);border:1px dashed rgba(148,163,184,.15);border-radius:5px;padding:3px 8px;">';
+        html += '<b>'+c.name+'</b><span>'+reason+'</span>';
+        html += '</span>';
       });
+      html += '</div>';
     }
 
-    if (ce.note) html += '<div style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5;">'+ce.note+'</div>';
+    if (ce.note) html += '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.4;">'+ce.note+'</div>';
     dst.innerHTML = html;
   };
+
 
   // 🌡️ 情绪周期定位（2026-08-14 主人令：外框阶段用实时计算取真实值，明细展开不变）
   window._fillSentimentCycle = function(){
