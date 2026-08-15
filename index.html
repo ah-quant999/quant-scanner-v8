@@ -1379,7 +1379,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="note">双维度 = 套利评分（收益弹性）+ 基本面评分（安全边际）。综合分 = 套利×60% + 基本面×40%。</div>
     </div>
 
-    <!-- ⚖️ 2026-08-14 主人令："这个没用，删了吧"：重要事件日历（完整周历·中长期）已删除——保留日历改由 sec-rc 处理 -->
+    <!-- 重要事件日历（完整周历 · 与 calendar.html 同源） -->
+    <div class="card">
+      <h3><span class="ic">📅</span>重要事件日历 - 中长线 · <span class="fresh" id="v8caltime">每周日更新</span></h3>
+      <div id="v8calcontent"></div>
+      <div style="margin-top:20px">
+        <div style="font-weight:800;margin-bottom:14px;font-size:15px">🎨 色块标注说明</div>
+        <div class="v8cal-legend-grid" id="v8callegend"></div>
+      </div>
+    </div>
   </section>
 
   <!-- ============ 实时数据 ============ -->
@@ -4638,8 +4646,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- === 今日事件 === -->
     <div class="lg-pane active" id="lg-td">
       <div class="card">
-        <h3><span class="ic">📅</span>重要事件日历 - 说明 <span style="font-size:11px;color:var(--down);">（2026-08-14 主人令已删）</span></h3>
-        <div class="logic-p"><s>月度日历视图，标注当日各类市场事件，用于预判宏观/政策/资金面窗口。中长线视角，每周日更新、月底补全下月。标签体系：今天 / 重要政策 / 央行·LPR / 中国数据 / FOMC / 期权交割 / 期货交割 / A50交割 / 休市（港股/美股）/ SG公假 / 财报（美股绿/韩股灰/台股靛）/ 苹果·华为发布。同一天多个事件时自动去重。</s><br><b>已于 2026-08-14 主人令删除</b>（「这个没用，删了吧」）——完整周历卡片（v8calcontent / v8caltime）从 sec-td 移除；V8_CAL 日历数据仍抓取（供 calendar.html / 打新等复用），前端渲染函数 __renderV8CalFull/__renderV8CalToday 因容器缺失自动空转。</div>
+        <h3><span class="ic">📅</span>重要事件日历 - 说明</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">月度日历视图，标注当日各类市场事件，用于预判宏观/政策/资金面窗口。中长线视角，每周日更新、月底补全下月。</div>
+        <div class="logic-h">标签体系</div>
+        <div class="logic-p">今天 / 重要政策 / 央行·LPR / 中国数据 / FOMC / 期权交割 / 期货交割 / A50交割 / 休市（港股/美股）/ SG公假 / 财报（美股绿/韩股灰/台股靛）/ 苹果·华为发布。</div>
+        <div class="logic-h">去重规则</div>
+        <div class="logic-p">同一天多个事件时自动去重，保留最详细版本，避免「港股休市」与「港股休市（xxx）」重复显示。</div>
       </div>
 
       <div class="card">
