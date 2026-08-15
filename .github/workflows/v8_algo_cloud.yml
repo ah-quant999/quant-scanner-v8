@@ -27,7 +27,9 @@ on:
   #   只需 18:30 主档成功一次即可；冗余兜底由「本机 WorkBuddy 每30分检查 + dispatch」承担，
   #   不再依赖 GitHub schedule 多条冗余。
   schedule:
-    - cron: '30 10 * * 1-5'  # 18:30 CST 盘后（龙虎榜18点后已发布 + 收盘数据 + 算法部署）主
+    # 2026-08-15 一劳永逸修复：cron 从 1-5 改为每天，内部用 A 股交易日历判断，
+    # 非交易日自动跳过，避免周末/节假日无意义覆盖，同时覆盖调休上班日（股市开市）。
+    - cron: '30 10 * * *'  # 18:30 CST 每天触发，内部交易日历 gate
   workflow_dispatch:
     inputs:
       mahoro_action:
@@ -142,7 +144,13 @@ jobs:
             || echo "mootdx 未安装（可选依赖，SKIP_MOOTDX=1 不影响算法链）"
           python -c "import akshare, pandas, numpy, requests; print('deps ready')"
 
+      - name: "📅 交易日历 gate"
+        id: trading
+        run: |
+          python algorithms/check_trading_day.py
+
       - name: "🧮 运行盘后算法链 → raw_data/ → 推送"
+        if: steps.trading.outputs.is_trading_day == 'true'
         run: |
           set +e
           python algorithms/run_algorithms.py
@@ -154,11 +162,11 @@ jobs:
       # 2026-08-08 修复：算法链产出 candidate.json 后，立即刷新候选池行情，
       # 避免 runner 状态卡 CANDIDATE_QUOTES 长期显示「空」。
       - name: "📈 刷新候选池行情（CANDIDATE_QUOTES）"
-        if: always()
+        if: steps.trading.outputs.is_trading_day == 'true'
         run: |
           python cloud_fetch_v8.py --only CANDIDATE_QUOTES || true
 
       - name: "📤 兜底推送（若上一步未推）"
-        if: always()
+        if: steps.trading.outputs.is_trading_day == 'true'
         run: |
           python api_push_raw.py || true
