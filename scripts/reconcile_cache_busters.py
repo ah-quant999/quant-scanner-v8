@@ -31,15 +31,20 @@ def main():
         return
 
     html = idx.read_text(encoding="utf-8")
-    pat = re.compile(r'(<script src=")(data/[A-Z0-9_]+\.js)(?:\?[^"]*)?("[^>]*></script>)')
+    # 🔴 2026-08-15 根因修复（与 update_v8._rewrite 保持完全一致）：
+    # 原正则只匹配 `<script src="data/X.js..."></script>` 整段，漏掉 A2 懒加载
+    # `var BIG=[{...,url:'data/X.js?v=...'}]` 与 `fetch('data/X.js?v=...')` 里的字符串
+    # 引用 → 这些 ?v 永远不重算，CDN 长期吐旧副本。改为全量匹配所有带引号的
+    # data/X.js(?:\?v=...)? 出现（script 标签 / fetch / BIG 数组均引号包裹）。
+    pat = re.compile(r'([\'"])(data/[A-Z0-9_]+\.js)(?:\?[^"\'>\s]+)?([\'"])')
 
     def repl(m):
-        pre, src, suf = m.group(1), m.group(2), m.group(3)
+        q1, src, q2 = m.group(1), m.group(2), m.group(3)
         f = data_dir / src.split("/")[-1]
         if not f.exists():
             return m.group(0)
         ts = neutral_sha(f.read_text(encoding="utf-8"))
-        return f"{pre}{src}?v={ts}{suf}"
+        return f"{q1}{src}?v={ts}{q2}"
 
     new_html = pat.sub(repl, html)
     if new_html != html:
