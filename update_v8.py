@@ -18,12 +18,6 @@ RAW_DIR = ROOT / "raw_data"
 DATA_DIR = ROOT / "data"
 CST = ZoneInfo("Asia/Shanghai")
 
-# 2026-08-15 缓存戳铁律根治：本次 update_v8.py 运行中由 _write_js 实际重写的变量名。
-# _data_file_update_time 据此区分：本次重写过的文件用「本地新鲜内容」算 ?v（本地即权威）；
-# 未重写的文件（典型如 cn 单独推送的 FOUR_VOLUME/STOCK_RPS 等 5 个 extra 文件，本地 checkout
-# 可能落后线上）改用「线上真实内容」算 ?v，避免 build 写出陈旧 ?v 被 CDN 吐旧副本。
-REWRITTEN_VARS = set()
-
 def now_cst():
     """返回中国标准时间（Asia/Shanghai）的当前 datetime。"""
     return datetime.now(CST)
@@ -535,49 +529,7 @@ def _write_js(var_name, obj):
         f.write(f"window.{var_name} = ")
         json.dump(lite_obj, f, ensure_ascii=False, separators=(',', ':'))
         f.write(";\n")
-    REWRITTEN_VARS.add(var_name)
     return out_path
-
-
-def _live_neutral_sha(var_name):
-    """从线上 git blobs API 取 data/<var>.js 真实内容，算中性化 sha1 前 10 位。
-
-    用途：构建机本地 checkout 可能落后线上（如 cn 单独推送的 5 个 extra 文件），
-    若直接 hash 本地会写出陈旧 ?v → CDN 吐旧副本。本函数取「线上实际服务」的内容
-    算 ?v，与 reconcile_cache_busters.py 完全一致。无 token / 网络失败 / 文件缺失
-    时返回 None，由调用方回退本地。
-    """
-    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
-    repo = os.environ.get("GITHUB_REPOSITORY") or "ah-quant999/quant-scanner-v8"
-    if not token:
-        return None
-    try:
-        import urllib.request, base64, hashlib
-        cache = getattr(_live_neutral_sha, "_tree", None)
-        if cache is None or cache.get("_repo") != repo:
-            url = f"https://api.github.com/repos/{repo}/git/trees/main?recursive=1"
-            req = urllib.request.Request(url, headers={
-                "Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json", "User-Agent": "update-v8"})
-            with urllib.request.urlopen(req, timeout=30) as r:
-                tj = json.loads(r.read().decode("utf-8"))
-            cache = {i["path"]: i["sha"] for i in tj.get("tree", []) if i["type"] == "blob"}
-            cache["_repo"] = repo
-            _live_neutral_sha._tree = cache
-        sha = cache.get(f"data/{var_name}.js")
-        if not sha:
-            return None
-        url = f"https://api.github.com/repos/{repo}/git/blobs/{sha}"
-        req = urllib.request.Request(url, headers={
-            "Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json", "User-Agent": "update-v8"})
-        with urllib.request.urlopen(req, timeout=30) as r:
-            bj = json.loads(r.read().decode("utf-8"))
-        content = bj.get("content", "")
-        text = base64.b64decode(content).decode("utf-8", "replace") if bj.get("encoding") == "base64" else content
-        neutral = re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', text)
-        return hashlib.sha1(neutral.encode("utf-8")).hexdigest()[:10]
-    except Exception as e:
-        print(f"⚠️ 线上 ?v 获取失败 {var_name}: {e}")
-        return None
 
 
 def _data_file_update_time(var_name):
@@ -591,30 +543,21 @@ def _data_file_update_time(var_name):
     改为「内容哈希」：取文件内容 sha1 前 10 位。内容没变 → URL 不变 → 缓存命中；
     内容真变了（数据更新）→ 哈希变 → 只重下变化的文件。语义时间仅作可读性兜底。
 
-    失败则回退到语义时间/mtime。空文件返回空字符串。
+    失败则回退到空字符串。空文件返回空字符串。
 
-    ★ 2026-08-15 根治「build 覆盖 reconcile 致次日 ?v 失配」：
-    本次 update_v8.py 运行真正重写过的文件（REWRITTEN_VARS）——本地新鲜内容即权威，
-    直接用本地内容算 ?v；未重写的文件（典型如 cn 单独推送的 5 个 extra 文件，本地
-    checkout 落后线上）改用「线上真实内容」（git blobs API）算 ?v，确保 ?v 永远与
-    「线上实际服务的数据」对齐，build 不再写出陈旧 ?v、不再 clobber reconcile。
+    ★ 2026-08-15 根治「build clobber reconcile / CI API 节流致次日 ?v 失配」：
+    ?v 一律取自「即将提交到仓库的本地 data/<var>.js 文件本身」——本地文件即权威，
+    ?v 与落库文件天然一致，不再依赖线上 API（CI 偶发节流会把回退值算成陈旧本地副本
+    致失配），也不因 build 内部 reset/重跑竞态产生新旧内容错位。跨流水线的最终一致性
+    （如 cn 单独推送的 5 个 extra 文件被别处再次更新）由独立 reconcile workflow
+    （git blobs API 取线上真实内容）每 15 分钟自愈。
     """
-    # 本次已重写的文件：本地新鲜内容即权威
-    if var_name in REWRITTEN_VARS:
-        path = DATA_DIR / f"{var_name}.js"
-        if path.exists():
-            try:
-                text = path.read_text(encoding='utf-8')
-                import hashlib
-                neutral = re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', text)
-                return hashlib.sha1(neutral.encode('utf-8')).hexdigest()[:10]
-            except Exception:
-                return ""
-        # 本地缺失则落到线上兜底
-    # 未重写（或本地缺失）：优先线上真实内容，失败回退本地
-    live = _live_neutral_sha(var_name)
-    if live:
-        return live
+    # ★ 2026-08-15 根治「build clobber reconcile / CI API 节流致次日 ?v 失配」：
+    # ?v 一律取自「即将提交到仓库的本地 data/<var>.js 文件本身」——本地文件即权威，
+    # ?v 与落库文件天然一致，不再依赖线上 API（CI 偶发节流会把回退值算成陈旧本地副本
+    # 致失配），也不因 build 内部 reset/重跑竞态产生新旧内容错位。
+    # 跨流水线的最终一致性（如 cn 单独推送的 5 个 extra 文件被别处再次更新）由独立
+    # reconcile workflow（git blobs API 取线上真实内容）每 15 分钟自愈。
     path = DATA_DIR / f"{var_name}.js"
     if not path.exists():
         return ""
