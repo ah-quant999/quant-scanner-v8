@@ -139,6 +139,39 @@ table td, table th, table tr { color: #333 !important; }
       </div>
     </div>
 
+
+    <div style="background:#fff;border:2px solid #1a237e;border-radius:10px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-bottom:18px;">
+      <h3 style="margin-bottom:12px;font-size:16px;">🛡️ v8 最新变更备忘（2026-08-14/15 · 阿狸咪执行，务必与当前版本对应）</h3>
+      <div style="font-size:12px;line-height:1.9;color:#333;">
+        <div style="margin-bottom:10px;padding:8px 12px;background:#e8eaf6;border-left:4px solid #3f51b5;border-radius:6px;">
+          <b>📋 已删除模块（主人令 · 2026-08-14/15）</b>
+          <ul style="margin:6px 0 0 18px;padding:0;">
+            <li><b>📦 TOP3 持仓跟踪</b>（暂未上架实验区）：renderPortfolio / addPosition / removePosition / _PF_SEED / _pfLoad / _pfSave 全部移除。持仓改用 westock App 云端（PORTFOLIO_DATA / PORTFOLIO_COST）。</li>
+            <li><b>🌊 北向席位日历</b>（共振日历 TAB2）：northCalContainer / renderNorthCalendar / _northCalNav / _rcClickNorthDay 全部移除；LHB_HISTORY 数据仍保留供个股查询/机游日历复用。</li>
+            <li><b>📅 重要事件日历（完整周历·中长期）</b>（今日事件页）：v8calcontent / v8caltime 卡片移除；V8_CAL 数据仍抓取供 calendar.html / 打新复用。</li>
+            <li><b>💰 四路资金流向对比</b>（暂未上架已下架区）：与龙虎榜数据重复，整卡移除。</li>
+            <li><b>🎭 情绪周期·连板天梯「危机」指标 pill</b>（2026-08-15）：四指标改三指标（涨停/高连/龙虎），危机分仍参与阶段判定但不再单独展示。</li>
+          </ul>
+        </div>
+        <div style="margin-bottom:10px;padding:8px 12px;background:#e8f5e9;border-left:4px solid #43a047;border-radius:6px;">
+          <b>➕ 新增模块（2026-08-13~15）</b>
+          <ul style="margin:6px 0 0 18px;padding:0;">
+            <li><b>🔒 策略回测（统一 Tab · sec-bt）</b>：TOP3 跟踪 + 综合回测 + 信号 60 日回测三块一站，顶部统一「🦊 更新于」胶囊；数据源 backtest_tdx.json / backtest_comprehensive.json（算法产物受 api_push_raw 防覆盖保护）。</li>
+            <li><b>📦 潜力参考（选股策略子TAB · st-pr）</b>：潜力挖掘 + ETF·龙头参考 + 商品涨价弹性榜三张卡，全带统一「🦊 更新于」胶囊（_uBadge）+ 💰分红方案 chip（读 STOCK_QUOTE.dividend）。</li>
+            <li><b>🦊 全站「更新于」统一胶囊</b>：_uBadge（🦊 更新于 盘后 · 短线 · 相对时间），今日判定卡不再误报「无数值」（去掉 dataset.rendered 缓存 + 500ms×5 重试保底）。</li>
+          </ul>
+        </div>
+        <div style="margin-bottom:10px;padding:8px 12px;background:#fff3e0;border-left:4px solid #fb8c00;border-radius:6px;">
+          <b>🔧 关键修复（2026-08-13~15）</b>
+          <ul style="margin:6px 0 0 18px;padding:0;">
+            <li><b>v8_cn_fetch_cloud.yml 盘后档连续失败</b>：case cron '0 9,13' vs '0 9,14' 不匹配 → 修复 case 接受两种 + 未匹配兜底 all；<b>Windows self-hosted runner 必须显式 shell: bash</b>（默认 PowerShell 不认 case 语法）；注释里不要写 ${{ }}（GitHub 表达式解析器连注释都求值）。</li>
+            <li><b>api_push_raw.py walk_raw() 防覆盖</b>：排除算法产物（backtest_tdx / backtest_comprehensive / cockpit_backtest / optimized_strategy / top3_track）——cloud_fetch 不产出却会覆盖家庭机 17:20 run_algorithms 的新版。</li>
+            <li><b>cloud_fetch_v8.py f_judgment() 非交易日守卫</b>：周六/周日不重算「今日判定」，保留周五 15:20 完整数据（前端显示「上一交易日收盘 15:20」），避免周末生成无意义新判定。</li>
+            <li><b>CDN cache-buster 铁律</b>：?v= 必须用内容 sha1 前10位（绝不能用 mtime）；数据内容变 → 同时更新 index.html 的 ?v= + 重新 push，否则 CDN 吐旧缓存（本次 JUDGMENT_DATA.js?v=eaf65b175a → ba643f9c76）。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
     <h3 style="margin-bottom:12px;font-size:16px;">📊 选股逻辑详解</h3>
 
     <!-- 铁律 -->
