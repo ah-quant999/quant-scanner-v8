@@ -1,0 +1,83 @@
+window.BLOAT_CHECK = {
+  "updated": "2026-08-15 22:24:10",
+  "overall": "ok",
+  "summary": {
+    "ok": 7,
+    "warn": 2,
+    "fail": 0,
+    "total": 9
+  },
+  "items": [
+    {
+      "name": "index.html 体积",
+      "status": "warn",
+      "message": "848.3 KB；体积偏大，建议拆分或清理死代码",
+      "metric": 848.3
+    },
+    {
+      "name": "index.html 行数",
+      "status": "ok",
+      "message": "12301 行",
+      "metric": 12301
+    },
+    {
+      "name": "script 标签平衡",
+      "status": "ok",
+      "message": "97 个 <script> 块，97 个 </script>",
+      "metric": {
+        "opens": 97,
+        "closes": 97
+      }
+    },
+    {
+      "name": "重复 id 检查",
+      "status": "ok",
+      "message": "共 276 个 id，无重复",
+      "metric": {
+        "total": 276,
+        "duplicates": 0
+      }
+    },
+    {
+      "name": "顶层重复函数",
+      "status": "ok",
+      "message": "顶层 function 15 个，无重复",
+      "metric": {
+        "total": 15,
+        "duplicates": 0
+      }
+    },
+    {
+      "name": "node --check 语法闸门",
+      "status": "ok",
+      "message": "语法检查通过（97 个 script 块）",
+      "metric": 97
+    },
+    {
+      "name": "data/*.js 总体积",
+      "status": "warn",
+      "message": "74 个文件，共 9614.0 KB；体积偏多，关注可维护性",
+      "metric": {
+        "files": 74,
+        "kb": 9614.0
+      }
+    },
+    {
+      "name": "重复 window.X 注入",
+      "status": "ok",
+      "message": "74 个 window.X 注入，无重复",
+      "metric": {
+        "total": 74,
+        "duplicates": 0
+      }
+    },
+    {
+      "name": "data/*.js 引用检查",
+      "status": "ok",
+      "message": "全部已引用",
+      "metric": {
+        "unreferenced": 0
+      }
+    }
+  ]
+};
