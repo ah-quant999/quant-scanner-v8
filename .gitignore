@@ -47,3 +47,8 @@ data/FOUR_VOLUME_BACKTEST.json
 !/URGENT_阿狸咪_2026-08-08_添加ZSXQ_TOKEN_Secret.md
 !/URGENT_小九_2026-08-11_19-43_根治项+模型全切.md
 !/URGENT_小九_2026-08-10_0117_v8健康自检告警.md
+
+# 本地 npm 安装产物（非仓库依赖，勿提交；防止 19M node_modules 污染仓库）
+node_modules/
+package-lock.json
+package.json
