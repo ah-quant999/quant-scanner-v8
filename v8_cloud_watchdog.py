@@ -200,13 +200,17 @@ def latest_workflow_run(name=None, skip_neutral=True, workflow_id=None):
     if "__error__" in runs:
         return None, f"runs API error {runs['__error__']}", None
     items = runs.get("workflow_runs", [])
-    # 2026-08-13 第180轮修复【push 噪声假 FAIL】：推送 workflow 文件会触发 push 事件运行，
-    # 常在提交瞬时态以 0 job 形式瞬间 failure（非数据刷新故障）。数据新鲜度只看
-    # schedule / workflow_dispatch 触发的运行，忽略 push 噪声；盘中每30分钟有定时运行、
-    # 夜间本就豁免，忽略 push 不会漏判真故障（raw_data commit 亦独立校验）。
-    items = [r for r in items if r.get("event") != "push"]
+    # 2026-08-15 修正【build_deploy 误报告警·根因】：
+    #   旧逻辑在下方全局丢弃 event=="push" 的运行。但 build_deploy 的真实构建 100% 由
+    #   push raw_data/data/index.html 触发（见 v8_build_deploy.yml 的 on.push.paths），
+    #   丢弃后 latest_workflow_run 只能回退到最旧的「非 push」运行——常为 concurrency
+    #   导致的 skipped 瞬时态（被新 run 取代），check_workflow 据此误判 FAIL 并每小时发邮件。
+    #   ⇒ 不再全局丢弃 push；最近的 push success 即视为管线健康证据（真故障也不会漏判，
+    #     因为 failure 结论本就不在 NEUTRAL 内，仍会被正常捕获）。
+    #   注：历史上担心的「push 0-job 瞬时 failure」在当前 paths 下不会发生——push 工作流
+    #   YAML 本身不在触发路径内，真正的 push 构建失败理应告警。
     if not items:
-        return None, "无运行记录(push事件已忽略)", None
+        return None, "无运行记录", None
     running = None
     for r in items:
         if r.get("status") != "completed":
