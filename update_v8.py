@@ -568,15 +568,18 @@ def _rewrite_index_html_cache_busters():
     # 🔴 2026-08-12 主人令修复：原 `[A-Z_]+` 不匹配含数字的变量名（V8_CAL/W52_HIGH/TOP10_DAILY）
     #   → 这些文件永远不加 ?v= 缓存戳 → 浏览器/CDN 永远缓存旧版 → 主站/本地都不更新！
     #   修复：加 0-9，匹配所有 data/*.js
-    pat = re.compile(r'<script src="(data/[A-Z0-9_]+\.js)(?:\?[^"]*)?"></script>')
+    # 🔴 2026-08-15 根因修复：原正则不匹配 `<script src="..." defer></script>`，
+    #   导致 index.html 里所有含 defer 的 data/*.js 缓存戳永远不更新，主站长期回旧版。
+    #   改为捕获 tag 前缀/后缀，保留 defer 等全部属性。
+    pat = re.compile(r'(<script src=")(data/[A-Z0-9_]+\.js)(?:\?[^"]*)?("[^>]*></script>)')
 
     def repl(m):
-        src = m.group(1)
+        prefix, src, suffix = m.group(1), m.group(2), m.group(3)
         var_name = src.split('/')[-1].replace('.js', '')
         ts = _data_file_update_time(var_name)
         if ts:
             # 内容哈希（含字母数字）直接作为 ?v=；不再 strip 非数字（原逻辑会删掉哈希字母）
-            return f'<script src="{src}?v={ts}"></script>'
+            return f'{prefix}{src}?v={ts}{suffix}'
         return m.group(0)
 
     new_html = pat.sub(repl, html)
