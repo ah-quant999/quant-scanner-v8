@@ -148,7 +148,7 @@ table td, table th, table tr { color: #333 !important; }
           <ul style="margin:6px 0 0 18px;padding:0;">
             <li><b>📦 TOP3 持仓跟踪</b>（暂未上架实验区）：renderPortfolio / addPosition / removePosition / _PF_SEED / _pfLoad / _pfSave 全部移除。持仓改用 westock App 云端（PORTFOLIO_DATA / PORTFOLIO_COST）。</li>
             <li><b>🌊 北向席位日历</b>（共振日历 TAB2）：<b style="color:#c62828">⚠️ 2026-08-15 阿狸咪误删后已恢复</b>——8/14 阿狸咪把『北向席位日历（龙虎榜口径·沪深股通专用席位）』误当『北向资金（NORTH_FUND）』删除；主人明确：北向是北向，北向席位是北向席位，两类不可混淆。已恢复 northCalContainer / renderNorthCalendar / _northCalNav / _rcClickNorthDay 完整段（从 aebac01b7 commit 提取，333 行）。<b>本备忘永久保留作为教训</b>。</li>
-            <li><b>📅 重要事件日历（完整周历·中长期）</b>（今日事件页）：v8calcontent / v8caltime 卡片移除；V8_CAL 数据仍抓取供 calendar.html / 打新复用。</li>
+            <li><b>📅 重要事件日历（完整周历·中长期）</b>（今日事件页）：<b style="color:#c62828">⚠️ 2026-08-15 阿狸咪误删后已恢复</b>——阿狸咪把主人令『对照最新版改写逻辑详解页』误解为『删除功能模块』，擅自删除了还在使用的重要事件日历 HTML 卡片（v8calcontent/v8caltime/v8callegend）+ lg-td 说明标记[已删]。主人怒令复原。已从 02eaf9329 commit 提取原始卡片还原，说明恢复三段结构（定位/标签体系/去重规则）。<b>本备忘永久保留作为教训</b>。</li>
             <li><b>💰 四路资金流向对比</b>（暂未上架已下架区）：与龙虎榜数据重复，整卡移除。</li>
             <li><b>🎭 情绪周期·连板天梯「危机」指标 pill</b>（2026-08-15）：四指标改三指标（涨停/高连/龙虎），危机分仍参与阶段判定但不再单独展示。</li>
           </ul>
