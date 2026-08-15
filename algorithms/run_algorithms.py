@@ -91,6 +91,7 @@ ORDER = [
     #   输出 = raw_data/final_recommend.json + data/FINAL_RECOMMEND_DATA.js（Top5 + 全量推荐池）
     "final_recommend.py",              # → FINAL_RECOMMEND_DATA.js（跨策略共振 Top5，管线最终产物）
     "gen_top5_track.py",               # → TOP5_TRACK.js（finalRec Top5 90 天滚动追踪盘，2026-08-13 落地/2026-08-15 改自 TOP3）
+    "gen_algo_track.py",                # → ALGO_TRACK.js（四量终极/板块龙头/大牛股猎手 独立追踪，2026-08-15 落地）
 ]
 
 
