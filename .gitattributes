@@ -4,6 +4,7 @@
 *.yaml text eol=lf
 *.sh  text eol=lf
 *.py  text eol=lf
+
 # v6备忘录 防覆盖：钉死 LF，保证本机(Windows CRLF)与 CI(Linux)/origin 计算的内容 sha 一致，
 # 从而 index.html 的 ?v= 缓存戳永远等于实际部署文件 sha，杜绝 CDN 按旧 URL 吐旧副本。
 v6_memo.html        text eol=lf
