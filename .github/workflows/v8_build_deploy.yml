@@ -107,14 +107,13 @@ jobs:
       - name: "📤 部署到 main（GitHub Pages 源）"
         env:
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # ★ 2026-08-15 根治 build clobber：reconcile_cache_busters.py 与 update_v8.py 都需
-          #   GITHUB_TOKEN 才能取线上真实 data/*.js 内容（git blobs API）对齐 ?v；
-          #   缺此变量二者都会回退到落后本地 checkout → 写出陈旧 ?v → CDN 吐旧副本。
+          # ★ 2026-08-15 根治 build clobber：update_v8.py 的 ?v 计算需 GITHUB_TOKEN 才能
+          #   取线上真实 data/*.js 内容（git blobs API）对齐 ?v（仅用于 cn 单独推送的 5 个
+          #   extra 文件；构建机自身重写的文件用本地新鲜内容）。reconcile_cache_busters.py
+          #   步骤已从 build 移除——它在单提交构建里无法同时正确服务「本地新文件」与「线上
+          #   extra 文件」，会 clobber update_v8.py 已写对的 ?v。独立 reconcile workflow 仍用
+          #   线上做全局自愈（每 15 分钟 + 推送触发）。
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # ★ 2026-08-15 根治 build clobber：reconcile_cache_busters.py 在 build 内部必须
-          #   用 LOCAL 磁盘（本轮 reset+重写后的产物即权威），不能用线上 API（会拿到本轮
-          #   新数据 push 前的旧版本 → ?v 与落库文件失配）。独立 reconcile workflow 仍用线上。
-          RECONCILE_LOCAL: "1"
           # push 被拒后重试时会重新跑 update_v8.py -> v8_health_check.py，必须同样带 token
           V8_GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
         run: |
@@ -136,13 +135,11 @@ jobs:
             #   FETCH_HEAD 即拿到 cn 最新版，reconcile 即可对齐。
             git fetch "$REPO" main
             git reset --hard FETCH_HEAD
+            # ★ update_v8.py 是 build 内 ?v 的唯一权威：自身重写过的文件用本地新鲜内容，
+            #   cn 单独推送的 5 个 extra 文件用线上真实内容（GITHUB_TOKEN 经 git blobs API）。
+            #   二者都已中性化 republish_time 后取 sha1 前 10 位，与独立 reconcile 完全一致。
+            #   —— 此处不再跑 reconcile_cache_busters.py（单提交构建里它无法同时正确，会 clobber）。
             python update_v8.py --detect-changes
-            # 🔒 部署前 ?v 强对齐（2026-08-15 缓存戳铁律根因修复）：
-            # 用「当前磁盘上 data/*.js 真实内容」重算 index.html 每个 ?v，确保本次提交
-            # 的 index.html 与即将 git add 的 data 文件严格一致，彻底杜绝 build 内
-            # _rewrite 与最终落库文件因重生/reset 竞态导致的缓存戳失配（CDN 吐旧副本）。
-            # 每次重试都重跑，保证任意尝试提交前 ?v 都对齐。
-            python scripts/reconcile_cache_busters.py
             git add -f data/ index.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py
             if git diff --cached --quiet; then
               echo "ℹ️ 无数据变化，跳过部署（远端已是最新构建）"
