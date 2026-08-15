@@ -77,6 +77,9 @@ jobs:
       - name: "🛡️ 护栏：校验关键板块未被误删/清空"
         run: python guard_index_sections.py
 
+      - name: "🛡️ 护栏：v6备忘录 防覆盖（缺失/截断自愈 + 缓存击穿）"
+        run: python guard_v6_memo.py
+
       - name: "🏗️ 构建 data/*.js（selective）"
         env:
           # V8_GH_TOKEN 是含 actions:read+list runners 权限的 PAT（已存为 repo secret）。
@@ -111,7 +114,7 @@ jobs:
           #   正确做法：push 被拒 = 远端已前进，同步远端后用最新 raw_data 重新全量构建，
           #   产物由构建决定而非由合并决定，天然无冲突且不会用旧产物覆盖新数据。
           for i in 1 2 3; do
-            git add -f data/ index.html .nojekyll
+            git add -f data/ index.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py
             if git diff --cached --quiet; then
               echo "ℹ️ 无数据变化，跳过部署（远端已是最新构建）"
               exit 0
