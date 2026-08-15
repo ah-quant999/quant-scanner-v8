@@ -4148,6 +4148,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       解决"两边跑着看"问题，仅管理员可见。 -->
   <section id="sec-bt">
     <div class="sec-head"><h2>🔒 策略回测（统一）</h2><span class="tag">仅管理员可见 · TOP3跟踪 + 综合回测 + 信号60日 · 三块一站看完</span><span class="fresh" id="btFresh">—</span></div>
+    <div id="btSummary" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0 4px;padding:8px 12px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);border-radius:10px;font-size:11.5px;"><span style="color:var(--dim);font-weight:600;">📊 回测总览</span><span style="color:var(--sub);">加载中…</span></div>
     <div id="btBody"><div class="note">加载中…</div></div>
   </section>
 
@@ -4277,6 +4278,49 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     if(btFresh && typeof _uBadge === 'function'){
       btFresh.innerHTML = _uBadge('盘后','回测', btLatest);
     }
+
+    /* ── 📊 回测总览胶囊（三块核心指标一行看完）── */
+    (function(){
+      var sum = document.getElementById('btSummary');
+      if(!sum) return;
+      var pills = [];
+      // TOP3 跟踪
+      var ts = tt.stats || {};
+      if(ts.win_rate != null){
+        pills.push('<span style="padding:2px 8px;border-radius:6px;font-weight:700;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);">TOP3 '+ts.win_rate+'%</span>');
+      }
+      if(ts.tracking != null){
+        pills.push('<span style="color:var(--sub);font-size:10.5px;">跟踪 '+ts.tracking+'只</span>');
+      }
+      // 综合回测最佳
+      if(bc.comparison){
+        var bestWR = 0, bestLabel = '', bestAR = 0;
+        ['hold_5d','hold_10d','hold_3d'].forEach(function(hp){
+          var row = bc.comparison[hp] || {};
+          var strict = row['resonance_gte80'] || {};
+          if(strict.win_rate > bestWR){ bestWR = strict.win_rate; bestAR = strict.avg_return||0; bestLabel = hp.replace('hold_','T+').replace('d','天'); }
+        });
+        if(bestWR > 0){
+          pills.push('<span style="padding:2px 8px;border-radius:6px;font-weight:700;background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.3);">共振≥80 '+bestLabel+' '+bestWR+'%'+(bestAR>0?' ·+'+bestAR.toFixed(1)+'%':'')+'</span>');
+        }
+      }
+      // K线信号最佳
+      if(bd.summary){
+        var sigBest = {wr:0, label:'', ar:0};
+        Object.keys(bd.summary).forEach(function(k){
+          var s = bd.summary[k];
+          var w5 = s.win_rate_5d; if(w5!=null && w5>sigBest.wr){ sigBest.wr=w5; sigBest.label=s.label||k; sigBest.ar=s.avg_return_5d||0; }
+        });
+        if(sigBest.wr > 0){
+          pills.push('<span style="padding:2px 8px;border-radius:6px;font-weight:700;background:rgba(192,132,252,.12);color:#c084fc;border:1px solid rgba(192,132,252,.3);">'+sigBest.label+' T+5 '+sigBest.wr+'%'+(sigBest.ar>0?' ·+'+sigBest.ar.toFixed(1)+'%':'')+'</span>');
+        }
+      }
+      // 样本提示
+      if(bc.overview && bc.overview.total_samples){
+        pills.push('<span style="color:var(--dim);font-size:10.5px;">综合样本 '+bc.overview.total_samples+'</span>');
+      }
+      sum.innerHTML = '<span style="color:var(--dim);font-weight:600;">📊 回测总览</span>' + (pills.length ? ' ' + pills.join(' ') : ' <span style="color:var(--sub);">暂无数据</span>');
+    })();
 
     var html = '';
 
