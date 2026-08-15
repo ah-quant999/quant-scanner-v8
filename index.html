@@ -1219,10 +1219,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/W52_HIGH.js?v=3c02f11640" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=32315d9aea" defer></script>
 <script src="data/RUNNER_STATUS.js?v=4efc4d6266" defer></script>
-<script src="data/HEALTH_CHECK.js?v=5ac3ed9033" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=66bff1eecb" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=065834aaec" defer></script>
-    <script src="data/POTENTIAL_PICKS.js?v=b068ca9c73" defer></script>
+<script src="data/HEALTH_CHECK.js?v=78b702ec49" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=cf12768694" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=fb630fd669" defer></script>
+    <script src="data/POTENTIAL_PICKS.js?v=eade6b7210" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -5795,7 +5795,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
     <div class="lg-pane" id="lg-v6">
       <div id="v6MemoWrap" style="position:relative;width:100%;height:calc(100vh - 180px);border-radius:14px;overflow:hidden;background:var(--bg2);border:1px solid var(--border);">
         <div id="v6MemoStatus" style="position:absolute;top:6px;left:8px;z-index:10;font-size:11px;color:var(--sub);background:rgba(0,0,0,.55);padding:3px 8px;border-radius:4px;pointer-events:none;">⏳ v6 备忘录加载中…</div>
-        <iframe id="v6MemoFrame" src="v6_memo.html?v=65107c0a3b" style="width:100%;height:100%;border:none;" onload="(function(){try{var f=document.getElementById('v6MemoFrame');var s=document.getElementById('v6MemoStatus');if(s){var h=f.contentWindow.document.body.scrollHeight;s.innerHTML=f.contentWindow.document.body.scrollHeight<200?'⚠️ v6 备忘录内容太短 ('+h+'px)':h>0?'✅ v6 备忘录已加载 ('+h+'px)':'⚠️ v6 备忘录 body 为空';}}catch(e){console.error('v6 memo onload err',e);}})();window.__v6MemoLoaded=true;(function(){var d=document.getElementById('v6MemoFrame');try{if(d&&d.contentWindow&&d.contentWindow.document&&d.contentWindow.document.body){var h=d.contentWindow.document.body.scrollHeight;if(h<200){document.getElementById('v6MemoError').style.display='flex';}}}catch(e){}})();" onerror="document.getElementById('v6MemoStatus').innerHTML='❌ v6 备忘录加载失败';document.getElementById('v6MemoError').style.display='flex';"></iframe>
+        <iframe id="v6MemoFrame" src="v6_memo.html?v=dd16f42be4" style="width:100%;height:100%;border:none;" onload="(function(){try{var f=document.getElementById('v6MemoFrame');var s=document.getElementById('v6MemoStatus');if(s){var h=f.contentWindow.document.body.scrollHeight;s.innerHTML=f.contentWindow.document.body.scrollHeight<200?'⚠️ v6 备忘录内容太短 ('+h+'px)':h>0?'✅ v6 备忘录已加载 ('+h+'px)':'⚠️ v6 备忘录 body 为空';}}catch(e){console.error('v6 memo onload err',e);}})();window.__v6MemoLoaded=true;(function(){var d=document.getElementById('v6MemoFrame');try{if(d&&d.contentWindow&&d.contentWindow.document&&d.contentWindow.document.body){var h=d.contentWindow.document.body.scrollHeight;if(h<200){document.getElementById('v6MemoError').style.display='flex';}}}catch(e){}})();" onerror="document.getElementById('v6MemoStatus').innerHTML='❌ v6 备忘录加载失败';document.getElementById('v6MemoError').style.display='flex';"></iframe>
         <div id="v6MemoError" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:var(--bg2);flex-direction:column;gap:12px;text-align:center;padding:20px;">
           <div style="font-size:15px;color:var(--sub)">v6 备忘录加载失败或内容为空</div>
           <div style="font-size:12px;color:var(--dim)">可能是 CDN 缓存了旧版本，请点击下方按钮强制刷新</div>
