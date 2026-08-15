@@ -419,7 +419,7 @@ html>
 <script src="data/CFFEX_HOLDINGS.js?v=4f7fdcc771" defer></script>
 <script src="data/IPO_DATA.js?v=464aad5abc" defer></script>
     <script src="data/CRISIS_DATA.js?v=e9849bdc4b" defer></script>
-    <script src="data/JUDGMENT_DATA.js?v=ba643f9c76" defer></script>
+    <script src="data/JUDGMENT_DATA.js?v=eaf65b175a" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=6c43b8a8f8" defer></script>
     <script src="data/STOCK_RPS.js?v=68d9cad903" defer></script>
     <script src="data/AVG_PRICE_DATA.js?v=61f2f9d7e0" defer></script>
@@ -1325,14 +1325,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var opBody=document.getElementById('judgmentBodyOp');
       if(!opBody) return;
       try{
-        opBody.innerHTML = window.__judgmentEnvHTML_cache
-          || ((typeof window._buildJudgmentEnvHTML === 'function')
-            ? window._buildJudgmentEnvHTML(window.JUDGMENT_DATA)
-            : '<div style="color:var(--dim);padding:10px">环境态势数据暂不可用</div>');
+        var jd = window.JUDGMENT_DATA || {};
+        if(!jd.update_time || typeof window._buildJudgmentEnvHTML !== 'function'){
+          opBody.innerHTML = '<div style="color:var(--dim);padding:14px;text-align:center;line-height:1.7">'
+            + '<div style="font-size:13px;color:#fbbf24;margin-bottom:4px">⏳ 环境态势数据加载中…</div>'
+            + '<div style="font-size:12px;color:var(--dim)">数据依赖每日盘前 08:25 自动生成</div></div>';
+          return;
+        }
+        opBody.innerHTML = window._buildJudgmentEnvHTML(jd);
       }catch(e){ console.error('renderJudgmentBody error',e); }
     };
     // 🛡️ 2026-08-14 一劳永逸：数据未就绪时重试保底（500ms × 5 次）
-    window.__retryJudgmentRender = function(){
+    window.__retryJudgmentRender = function(maxTries){
       var tries = 0;
       var tick = function(){
         var jd = window.JUDGMENT_DATA || {};
@@ -1342,7 +1346,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           window.__renderJudgmentBody();
           return;
         }
-        if (++tries < 5) setTimeout(tick, 500);
+        if(typeof window.__renderJudgmentBody === 'function') window.__renderJudgmentBody();
+        if (++tries < (maxTries || 30)) setTimeout(tick, 500);
+        else console.warn('[judgment retry] 超过最大重试次数，数据仍未就绪');
       };
       tick();
     };
@@ -5666,7 +5672,14 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
 
     <!-- === v6备忘录（逻辑详解页最右侧子tab，仅管理员可见） === -->
     <div class="lg-pane" id="lg-v6">
-      <iframe src="v6_memo.html?v=95315ba64a" style="width:100%;height:calc(100vh - 180px);border:none;border-radius:14px;background:#f5f7fa;" id="v6MemoFrame"></iframe>
+      <div id="v6MemoWrap" style="position:relative;width:100%;height:calc(100vh - 180px);border-radius:14px;overflow:hidden;background:var(--bg2);border:1px solid var(--border);">
+        <iframe id="v6MemoFrame" src="v6_memo.html?v=95315ba64a" style="width:100%;height:100%;border:none;" onload="(function(){var d=document.getElementById('v6MemoFrame');try{if(d&&d.contentWindow&&d.contentWindow.document&&d.contentWindow.document.body){var h=d.contentWindow.document.body.scrollHeight;if(h<200){document.getElementById('v6MemoError').style.display='flex';}}}catch(e){}})();" onerror="document.getElementById('v6MemoError').style.display='flex';"></iframe>
+        <div id="v6MemoError" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:var(--bg2);flex-direction:column;gap:12px;text-align:center;padding:20px;">
+          <div style="font-size:15px;color:var(--sub)">v6 备忘录加载失败或内容为空</div>
+          <div style="font-size:12px;color:var(--dim)">可能是 CDN 缓存了旧版本，请点击下方按钮强制刷新</div>
+          <button class="btn" onclick="var f=document.getElementById('v6MemoFrame');f.src=f.src.replace(/&refresh=\d+/,'')+'&refresh='+Date.now();document.getElementById('v6MemoError').style.display='none';" style="padding:8px 18px;font-size:13px;">🔄 强制刷新 v6 备忘录</button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -10405,31 +10418,21 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:'+_vra(phaseColor,0.08)+';border:1px solid '+_vra(phaseColor,0.2)+';border-radius:8px;min-width:0">';
     html += '<span style="font-size:20px;font-weight:900;color:'+phaseColor+'">'+phase+'</span>';
     html += '<div style="font-size:13px;color:var(--sub);white-space:nowrap">'+phaseDesc+' · 仓位 <b style="color:'+phaseColor+'">'+posAdvice+'</b></div></div>';
-    // 情绪分 / 环比 / 最高板 / 活跃板块 紧跟阶段
-    html += '<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:8px;">';
-    html += '<span style="font-size:11px;color:var(--dim);">情绪分</span>';
-    html += '<span style="font-size:18px;font-weight:800;color:#38bdf8">'+score+'</span>';
-    html += '</div>';
-    if(sc.delta_pct !== undefined && sc.delta_pct !== null){
-      html += '<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;">';
-      html += '<span style="font-size:11px;color:var(--dim);">环比</span>';
-      html += '<span style="font-size:15px;font-weight:700;color:'+(sc.delta_pct>=0?'var(--up)':'var(--down)')+'">'+(sc.delta_pct>0?'+':'')+sc.delta_pct+'%</span>';
-      html += '</div>';
+    // 情绪分 / 环比 / 活跃板块 紧跟阶段（统一深色卡片样式）
+    function _sentimentBadge(label, value, unit, color){
+      return '<div style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10);border-radius:10px;min-width:72px;">'
+        + '<span style="font-size:13px;font-weight:700;color:var(--txt)">'+label+'</span>'
+        + '<span style="font-size:18px;font-weight:900;color:'+color+'">'+value+'<span style="font-size:11px;font-weight:700;margin-left:1px">'+unit+'</span></span></div>';
     }
-    if(scm.max_ladder){
-      html += '<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.18);border-radius:8px;">';
-      html += '<span style="font-size:11px;color:var(--dim);">最高</span>';
-      html += '<span style="font-size:15px;font-weight:800;color:#22d3ee">'+scm.max_ladder+'</span><span style="font-size:11px;color:var(--dim);">板</span>';
-      html += '</div>';
+    html += _sentimentBadge('情绪分', score, '', '#38bdf8');
+    if(sc.delta_pct !== undefined && sc.delta_pct !== null){
+      html += _sentimentBadge('环比', (sc.delta_pct>0?'+':'')+sc.delta_pct+'%', '', sc.delta_pct>=0?'var(--up)':'var(--down)');
     }
     if(scm.sectors_count){
-      html += '<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.18);border-radius:8px;">';
-      html += '<span style="font-size:11px;color:var(--dim);">活跃</span>';
-      html += '<span style="font-size:15px;font-weight:800;color:#22c55e">'+scm.sectors_count+'</span><span style="font-size:11px;color:var(--dim);">板块</span>';
-      html += '</div>';
+      html += _sentimentBadge('活跃', scm.sectors_count, '板块', '#22c55e');
     }
 
-    // 四指标小方块
+    // 四指标小方块（危机/涨停/高连/龙虎）
     var metrics = [
       {l:'危机', v:crisisPct, u:'分', c: crisisPct>=70?'var(--down)':(crisisPct>=50?'#f59e0b':'var(--up)')},
       {l:'涨停', v:totalUp, u:'只', c: totalUp>=80?'#ef4444':(totalUp>=40?'var(--up)':'var(--down)')},
