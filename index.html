@@ -1219,10 +1219,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/W52_HIGH.js?v=3c02f11640" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=32315d9aea" defer></script>
 <script src="data/RUNNER_STATUS.js?v=4efc4d6266" defer></script>
-<script src="data/HEALTH_CHECK.js?v=1dc0840105" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=be919b7ff6" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=eceb92bbfa" defer></script>
-    <script src="data/POTENTIAL_PICKS.js?v=a2d57ac9c7" defer></script>
+<script src="data/HEALTH_CHECK.js?v=5ac3ed9033" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=66bff1eecb" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=065834aaec" defer></script>
+    <script src="data/POTENTIAL_PICKS.js?v=b068ca9c73" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -1248,7 +1248,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <div class="tab" data-sec="query" onclick="switchSec('query',this)">🔍 个股查询</div>
   <!-- 2026-08-08 主人令：选股策略降级为「辅助策略池」，仅管理员可见，置于暂未上架左侧 -->
   <div class="tab locked admin-only" data-sec="st" data-lock="1" onclick="guardLock('st',this)">🔒 选股策略 <span class="lk">[锁]</span></div>
-  <!-- 2026-08-13 主人令：策略回测（统一）— TOP3 跟踪 + 综合回测 + 信号 60 日回测 一个 tab 装完，仅管理员可见 -->
+  <!-- 2026-08-13 主人令：策略回测（统一）— TOP5 跟踪 + 综合回测 + 信号 60 日回测 一个 tab 装完，仅管理员可见 -->
   <div class="tab locked admin-only" data-sec="bt" data-lock="1" onclick="guardLock('bt',this)">🔒 策略回测 <span class="lk">[锁]</span></div>
   <!-- 2026-08-07 主人令：暂未上架 从运维子 Tab 提升为一级 nav（仅管理员可见，guardLock 锁定） -->
   <div class="tab locked admin-only" data-sec="ul" data-lock="1" onclick="guardLock('ul',this)">🔒 暂未上架 <span class="lk">[锁]</span></div>
@@ -4179,10 +4179,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 
  <!-- ============ 🔒 策略回测（统一 · 2026-08-13 主人令） ============
-      一个 tab 装三块：① TOP3 90 天跟踪 ② 综合回测多策略×多持有期 ③ K线信号60日回测
+      一个 tab 装三块：① TOP5 90天跟踪 ② 综合回测多策略×多持有期 ③ K线信号60日回测
       解决"两边跑着看"问题，仅管理员可见。 -->
   <section id="sec-bt">
-    <div class="sec-head"><h2>🔒 策略回测（统一）</h2><span class="tag">仅管理员可见 · TOP3跟踪 + 综合回测 + 信号60日 · 三块一站看完</span><span class="fresh" id="btFresh">—</span></div>
+    <div class="sec-head"><h2>🔒 策略回测（统一）</h2><span class="tag">仅管理员可见 · TOP5跟踪 + 综合回测 + 信号60日 · 三块一站看完</span><span class="fresh" id="btFresh">—</span></div>
     <div id="btSummary" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0 4px;padding:8px 12px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);border-radius:10px;font-size:11.5px;"><span style="color:var(--dim);font-weight:600;">📊 回测总览</span><span style="color:var(--sub);">加载中…</span></div>
     <div id="btBody"><div class="note">加载中…</div></div>
   </section>
@@ -4190,7 +4190,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 <script>
 /* ═══════════ 🔒 策略回测（统一 · 2026-08-13）═══ 三个回测块一站看完 ═══════════
-   ① 🏆 TOP3 90 天跟踪  — TOP3_TRACK  →  验证"我刚推的票靠不靠谱"
+   ① 🏆 TOP5 90天跟踪  — TOP5_TRACK  →  验证"我刚推的票靠不靠谱"
    ② 📊 综合回测 多策略×多持有期 — BACKTEST_COMPREHENSIVE → "我用的策略哪个最值钱"
    ③ 📈 K线信号 60 日回测 — BACKTEST_TDX → "信号层有没有 alpha"
    设计：简洁表格、胜率高亮（≥55% 绿 / ≤45% 红）、平均收益同色。
@@ -4297,7 +4297,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     if(rendered) return;
     rendered = true;
 
-    var tt = window.TOP3_TRACK || {};
+    var tt = window.TOP5_TRACK || {};
     var bc = window.BACKTEST_COMPREHENSIVE || {};
     var bd = window.BACKTEST_TDX || {};
     var cb = window.COCKPIT_BACKTEST || {};
@@ -4314,35 +4314,41 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       btFresh.innerHTML = _uBadge('盘后','回测', btLatest);
     }
 
-    /* ── 📊 回测总览胶囊（实战导向：TOP5追踪 + 策略胜率对比）── */
+    /* ── 📊 实战回测胶囊（只留有真实数字的，砍掉占位文案）── */
     (function(){
       var sum = document.getElementById('btSummary');
       if(!sum) return;
       var pills = [];
 
-      // ① TOP5 追踪实盘状态
-      var ts = tt.stats || {};
-      var top5Html = '';
-      if(ts.tracking != null){
-        top5Html = 'TOP5 <b>' + ts.tracking + '只</b>追踪中';
-        if(ts.samples > 0) top5Html += ' · <b style="color:#22c55e;">' + ts.win_rate + '%</b>胜率';
-        else top5Html += ' · <span style="color:var(--dim);">待平仓</span>';
-      }
-      if(top5Html) pills.push('<span style="padding:2px 8px;border-radius:6px;font-weight:700;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);">' + top5Html + '</span>');
-
-      // ② 驾驶舱策略回测（唯一有完整实盘级数据的选股策略）
+      // ① 驾驶舱实盘回测（唯一有完整实盘级数据的选股策略）
       var cb = window.COCKPIT_BACKTEST || {};
-      if(cb.win_rate != null && cb.total_count > 0){
-        pills.push('<span style="padding:2px 8px;border-radius:6px;font-weight:700;background:rgba(34,197,94,.10);color:#22c55e;border:1px solid rgba(34,197,94,.3);">🎯驾驶舱 '+cb.win_rate+'% ·+'+cb.avg_return.toFixed(1)+'%<span style="font-weight:400;color:var(--sub);font-size:10px;">(n='+cb.total_count+')</span></span>');
-        // A档 vs B档 对比
-        if(cb.by_score){
-          var aT = cb.by_score.gte80, bT = cb.by_score.gte70_lt80;
-          if(aT && aT.win_rate != null) pills.push('<span style="color:var(--sub);font-size:10.5px;">A档前3 '+aT.win_rate+'% vs B档'+(bT&&bT.win_rate!=null?bT.win_rate+'%':'—')+'</span>');
+      if(cb.total_count > 0){
+        var wr = (cb.win_count||0) / cb.total_count * 100;
+        var ar = cb.avg_return || 0;
+        pills.push('<span style="padding:2px 8px;border-radius:6px;font-weight:700;background:rgba(34,197,94,.10);color:#22c55e;border:1px solid rgba(34,197,94,.3);">🎯驾驶舱 '+wr.toFixed(1)+'% ·'+(ar>=0?'+':'')+ar.toFixed(1)+'%<span style="font-weight:400;color:var(--sub);font-size:10px;">(n='+cb.total_count+')</span></span>');
+      }
+
+      // ② TOP5 追踪状态
+      var ts = tt.stats || {};
+      if(ts.tracking != null){
+        var tHtml = 'TOP5 <b>'+ts.tracking+'只</b>追踪中';
+        if(ts.samples > 0) tHtml += ' · <b style="color:#22c55e;">'+ts.win_rate+'%</b>胜率';
+        else tHtml += ' · <span style="color:var(--dim);">待平仓</span>';
+        pills.push('<span style="padding:2px 8px;border-radius:6px;font-weight:700;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);">'+tHtml+'</span>');
+      }
+
+      // ③ TDX信号最强策略（从BACKTEST_TDX取T+5胜率最高的）
+      var bd = window.BACKTEST_TDX || {};
+      if(bd.summary){
+        var bestSig = null, bestWr5 = 0;
+        Object.keys(bd.summary).forEach(function(k){
+          var s = bd.summary[k];
+          if(s['win_rate_5d'] > bestWr5){ bestWr5 = s['win_rate_5d']; bestSig = s; }
+        });
+        if(bestSig){
+          pills.push('<span style="padding:2px 8px;border-radius:6px;font-weight:700;background:rgba(168,85,247,.10);color:#a855f7;border:1px solid rgba(168,85,247,.3);">🚀'+bestSig.label.replace(/[🔥💥🎯⚠️🟣🔴📈📉]/g,'').trim()+' T+5 '+bestWr5.toFixed(1)+'%<span style="font-weight:400;color:var(--sub);font-size:10px;">(n='+bestSig.total+')</span></span>');
         }
       }
-
-      // ③ 其他选股策略数据状态（四量终极回测文件为空、板块龙头/大牛猎手无独立回测）
-      pills.push('<span style="color:var(--dim);font-size:10px;">四量终极:待跑 · 板块龙头/大牛猎手:独立回测待建</span>');
 
       sum.innerHTML = '<span style="color:var(--dim);font-weight:600;">📊 实战回测</span>' + (pills.length ? ' ' + pills.join(' ') : ' <span style="color:var(--sub);">暂无数据</span>');
     })();
@@ -4386,10 +4392,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '</div>';
     }
 
-    /* ── ① TOP3 90 天跟踪（"执行效果"）── */
+    /* ── ① TOP5 90天跟踪（"执行效果"）── */
     html += '<div style="margin:14px 0;border-left:4px solid #fbbf24;" class="card">';
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
-    html += '<span style="font-size:15px;font-weight:700;color:#fbbf24;">🏆 ① TOP3 90 天跟踪</span>';
+    html += '<span style="font-size:15px;font-weight:700;color:#fbbf24;">🏆 ① TOP5 90天跟踪</span>';
     html += '<span style="font-size:11px;color:var(--dim);">执行效果：刚推的票后来涨没涨？</span>';
     html += '</div>';
     var stats = tt.stats || {};
@@ -4449,11 +4455,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var _onlineDays = (tt.online_days != null) ? tt.online_days : (stats.window_days ? (90 - (stats.window_days)) : '—');
       html += '<div style="text-align:center;padding:14px 10px;background:rgba(245,158,11,.06);border:1px dashed rgba(245,158,11,.25);border-radius:8px;font-size:12px;color:var(--sub);">';
       html += '⏳ 跟踪功能上线第 <b style="color:#f59e0b;font-weight:700">'+(tt.online_days||'1')+'</b> 天，历史成绩待积累<br>';
-      html += '<span style="font-size:11px;color:var(--dim)">待 TOP3 候选票 K 线收盘后自动统计胜率/收益（当前样本 0）</span>';
+      html += '<span style="font-size:11px;color:var(--dim)">待 TOP5 候选票 K 线收盘后自动统计胜率/收益（当前样本 0）</span>';
       html += '</div>';
     }
     if(stats.samples === 0 && tracks.length){
-      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;">⏳ 历史成绩需待 TOP3 票 K 线收盘后再统计（当前样本 0，待积累）</div>';
+      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;">⏳ 历史成绩需待 TOP5 票 K 线收盘后再统计（当前样本 0，待积累）</div>';
     }
     html += '</div>';
 
@@ -5410,9 +5416,9 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
       <div class="card">
         <h3><span class="ic">🔒</span>策略回测（统一 Tab · 2026-08-13 主人令）- 说明</h3>
         <div class="logic-h">定位</div>
-        <div class="logic-p">独立一级 Tab（<code>sec-bt</code>，仅管理员可见）。2026-08-13 主人令：<b>TOP3 跟踪 + 综合回测 + 信号 60 日回测</b> 三个回测块一站看完，替代分散的旧回测入口。顶部有统一「🦊 更新于」胶囊（<code>btFresh</code>）。</div>
+        <div class="logic-p">独立一级 Tab（<code>sec-bt</code>，仅管理员可见）。2026-08-13 主人令：<b>TOP5 跟踪 + 综合回测 + 信号 60 日回测</b> 三个回测块一站看完，替代分散的旧回测入口。顶部有统一「🦊 更新于」胶囊（<code>btFresh</code>）。</div>
         <div class="logic-h">三块内容</div>
-        <div class="logic-p">· <b>🥇 TOP3 跟踪</b>（<code>renderBtTop3Track</code>）：三重共识 Top3 逐日跟踪（入选日 → 90 天收益曲线）。<br>· <b>📊 综合回测</b>（<code>renderBtBacktest</code>）：多策略 × 多持有期胜率/收益矩阵（严格 vs 宽松口径）。<br>· <b>📶 信号 60 日回测</b>（<code>renderBtSignals60</code>）：关键信号未来 60 日表现（T+1/T+3/T+5/T+10/T+20）。</div>
+        <div class="logic-p">· <b>🥇 TOP5 跟踪</b>（<code>renderBtTop5Track</code>）：三重共识 Top5 逐日跟踪（入选日 → 90 天收益曲线）。<br>· <b>📊 综合回测</b>（<code>renderBtBacktest</code>）：多策略 × 多持有期胜率/收益矩阵（严格 vs 宽松口径）。<br>· <b>📶 信号 60 日回测</b>（<code>renderBtSignals60</code>）：关键信号未来 60 日表现（T+1/T+3/T+5/T+10/T+20）。</div>
         <div class="logic-h">数据源</div>
         <div class="logic-p"><code>raw_data/backtest_tdx.json</code>（<code>backtest_tdx.py</code> 产出：60日K线全量回测）+ <code>backtest_comprehensive.json</code>（多策略×多持有期）。<b>算法产物受防覆盖保护</b>（2026-08-14 起 <code>api_push_raw.py walk_raw()</code> 排除 backtest_tdx / backtest_comprehensive / cockpit_backtest / optimized_strategy / top3_track，仅由家庭机 17:20 run_algorithms 维护）。</div>
       </div>
@@ -5789,7 +5795,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
     <div class="lg-pane" id="lg-v6">
       <div id="v6MemoWrap" style="position:relative;width:100%;height:calc(100vh - 180px);border-radius:14px;overflow:hidden;background:var(--bg2);border:1px solid var(--border);">
         <div id="v6MemoStatus" style="position:absolute;top:6px;left:8px;z-index:10;font-size:11px;color:var(--sub);background:rgba(0,0,0,.55);padding:3px 8px;border-radius:4px;pointer-events:none;">⏳ v6 备忘录加载中…</div>
-        <iframe id="v6MemoFrame" src="v6_memo.html?v=dd16f42be4" style="width:100%;height:100%;border:none;" onload="(function(){try{var f=document.getElementById('v6MemoFrame');var s=document.getElementById('v6MemoStatus');if(s){var h=f.contentWindow.document.body.scrollHeight;s.innerHTML=f.contentWindow.document.body.scrollHeight<200?'⚠️ v6 备忘录内容太短 ('+h+'px)':h>0?'✅ v6 备忘录已加载 ('+h+'px)':'⚠️ v6 备忘录 body 为空';}}catch(e){console.error('v6 memo onload err',e);}})();window.__v6MemoLoaded=true;(function(){var d=document.getElementById('v6MemoFrame');try{if(d&&d.contentWindow&&d.contentWindow.document&&d.contentWindow.document.body){var h=d.contentWindow.document.body.scrollHeight;if(h<200){document.getElementById('v6MemoError').style.display='flex';}}}catch(e){}})();" onerror="document.getElementById('v6MemoStatus').innerHTML='❌ v6 备忘录加载失败';document.getElementById('v6MemoError').style.display='flex';"></iframe>
+        <iframe id="v6MemoFrame" src="v6_memo.html?v=65107c0a3b" style="width:100%;height:100%;border:none;" onload="(function(){try{var f=document.getElementById('v6MemoFrame');var s=document.getElementById('v6MemoStatus');if(s){var h=f.contentWindow.document.body.scrollHeight;s.innerHTML=f.contentWindow.document.body.scrollHeight<200?'⚠️ v6 备忘录内容太短 ('+h+'px)':h>0?'✅ v6 备忘录已加载 ('+h+'px)':'⚠️ v6 备忘录 body 为空';}}catch(e){console.error('v6 memo onload err',e);}})();window.__v6MemoLoaded=true;(function(){var d=document.getElementById('v6MemoFrame');try{if(d&&d.contentWindow&&d.contentWindow.document&&d.contentWindow.document.body){var h=d.contentWindow.document.body.scrollHeight;if(h<200){document.getElementById('v6MemoError').style.display='flex';}}}catch(e){}})();" onerror="document.getElementById('v6MemoStatus').innerHTML='❌ v6 备忘录加载失败';document.getElementById('v6MemoError').style.display='flex';"></iframe>
         <div id="v6MemoError" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:var(--bg2);flex-direction:column;gap:12px;text-align:center;padding:20px;">
           <div style="font-size:15px;color:var(--sub)">v6 备忘录加载失败或内容为空</div>
           <div style="font-size:12px;color:var(--dim)">可能是 CDN 缓存了旧版本，请点击下方按钮强制刷新</div>
