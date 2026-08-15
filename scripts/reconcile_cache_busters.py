@@ -102,6 +102,10 @@ def main():
         txt = content_for(fname, data_dir, repo, token, tree)
         if txt is None:
             return m.group(0)
+        # 🔴 空文件(被并发重写瞬间清空/未就绪)不写空 ?v（sha1("")[:10]=da39a3ee5e），
+        #   否则污染缓存戳、永不 bust。保留原 ?v 等文件就绪后下次构建再对齐。
+        if not txt.strip():
+            return m.group(0)
         return f"{q1}{src}?v={neutral_sha(txt)}{q2}"
 
     new_html = pat.sub(repl, html)
