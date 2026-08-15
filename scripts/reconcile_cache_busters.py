@@ -69,7 +69,20 @@ def _api_text_blob(repo: str, path: str, token: str, tree: dict):
 
 
 def content_for(fname: str, data_dir: pathlib.Path, repo: str, token: str, tree: dict):
-    """优先线上真实版本（CI 且 token 可用，走 git blobs API 取完整内容），回退本地磁盘。"""
+    """内容来源策略：
+    - RECONCILE_LOCAL=1（build 内部调用）：强制用本地磁盘文件。build 已 `git reset
+      --hard FETCH_HEAD` + 本地重写产出「即将提交的内容」，本地即权威；若改用线上
+      API 反而会拿到「尚未 push 的本轮新数据」之前的旧版本，导致 ?v 与本轮落库文件
+      失配（CDN 吐旧副本）。本地磁盘即本轮真实产物，必须用本地。
+    - 否则（独立 reconcile workflow）：CI 且 token 可用时优先线上真实版本
+      （git blobs API 取完整内容，避开 checkout 陈旧 blob / Contents API >1MB 截断），
+      回退本地磁盘。
+    """
+    if os.environ.get("RECONCILE_LOCAL"):
+        p = data_dir / fname
+        if p.exists():
+            return p.read_text(encoding="utf-8")
+        return None
     if token and repo:
         t = _api_text_blob(repo, f"data/{fname}", token, tree)
         if t is not None:
@@ -109,11 +122,12 @@ def main():
         return f"{q1}{src}?v={neutral_sha(txt)}{q2}"
 
     new_html = pat.sub(repl, html)
+    mode = "本地磁盘(RECONCILE_LOCAL)" if os.environ.get("RECONCILE_LOCAL") else "线上真实数据(git blobs API)"
     if new_html != html:
         idx.write_text(new_html, encoding="utf-8")
-        print("✅ 部署前 ?v 已强对齐（基于线上真实数据，git blobs API）")
+        print(f"✅ 部署前 ?v 已强对齐（基于{mode}）")
     else:
-        print("ℹ️ 部署前 ?v 已一致，无需改动")
+        print(f"ℹ️ 部署前 ?v 已一致，无需改动（{mode}）")
 
 
 if __name__ == "__main__":
