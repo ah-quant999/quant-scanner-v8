@@ -13,7 +13,20 @@
 |---------|---------|------------|
 | `index.html` | 主站单页面（全站 UI + 数据注入 + 逻辑详解） | 唯一入口，432KB，全站核心 |
 | `calendar.html` | 共振日历月历视图 | index.html 内链跳转目标 |
-| `v6_memo.html` | v6 遗留参考页（运维面板引用） | 迁移过渡期保留 |
+| `v6_memo.html` | v6 遗留参考页（逻辑详解页「📦 v6备忘录」子tab 经 iframe 引用） | 迁移过渡期保留 + 主人 2026-08-15 令：永久防覆盖 |
+| `v6_memo.golden.html` | `v6_memo.html` 的**黄金备份**（guard_v6_memo.py 自愈源） | 防覆盖二道防线，禁止删除，否则自愈失效 |
+| `guard_v6_memo.py` | v6备忘录 防覆盖护栏（完整性自检 + git/黄金备份自愈 + iframe 缓存击穿） | 部署闸门，禁止删除 |
+
+## 🔴 v6备忘录 防覆盖铁律（2026-08-15 主人令）
+
+> **逻辑详解页「📦 v6备忘录」子 tab 经 `<iframe src="v6_memo.html?v=<sha10>">` 加载，是 v6→v8 迁移唯一保留的算法逻辑详解参考页。**
+> 历史上曾因"V6 覆盖 v8" + CDN 按完整 URL 缓存旧/截断副本，导致它看似"没了"。
+> 永久防护（三重）：
+> 1. **完整性自愈**：`guard_v6_memo.py` 在每次部署前运行，若 `v6_memo.html` 缺失/截断（<60KB），自动从 git HEAD → `v6_memo.golden.html` 还原。
+> 2. **入口守护**：index.html 必须保留 `data-lg="v6"` 子tab + `id="lg-v6"` 面板 + iframe 引用，缺失即 FAIL 部署（阻断丢失态上线）。
+> 3. **缓存击穿**：iframe `src` 强制带 `?v=<内容sha10>`（与全站 data/*.js 同口径，用内容 sha 非 mtime），内容变化即换 key，CDN 必重拉，杜绝旧副本复发。
+>
+> **任何清理/重构/瘦身任务（含 v8_cleanup / cloud_weekly_cleanup / 手动）均不得删除 `v6_memo.html` / `v6_memo.golden.html` / `guard_v6_memo.py`，也不得移除 index.html 中的 v6 备忘录入口。**
 
 ## 🔴 v6 历史备份（本地 · 保留中 · 禁止删除）
 
