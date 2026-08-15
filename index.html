@@ -6873,13 +6873,13 @@ function renderLimitUpHeatmap(){
 })();
 
 /* ===== 完整周历渲染（V8_CAL 数据 · 与 calendar.html 同源） ===== */
-(function(){
+window.__renderV8CalFull = function(){
   var D = window.V8_CAL || {weeks:[],legend:[]};
   var days = ['周一','周二','周三','周四','周五','周六','周日'];
 
   /* 2026-08-09 修复：V8_CAL.js 里的 today 是数据生成时刻写死的，前端根据实际北京时间重新计算。
    * 依据 D.month 解析基础年月，再按 w.dates 的每周起始日期顺序推出每个格子的真实日期。 */
-  window._v8CalTodayKeys = function(cal){
+  window._v8CalTodayKeys = window._v8CalTodayKeys || function(cal){
     var keys = {};
     var baseMatch = String((cal||{}).month||'').match(/(\d{4})年(\d{1,2})月/);
     var baseY = baseMatch ? +baseMatch[1] : (new Date().getFullYear());
@@ -6943,7 +6943,7 @@ function renderLimitUpHeatmap(){
       });
       html += '</div>';
     });
-    c.innerHTML = html || '<div style="padding:16px;color:var(--dim);font-size:13px">暂无日历数据</div>';
+    c.innerHTML = html || '<div style="padding:16px;color:var(--dim);font-size:13px">⏳ 日历数据加载中…</div>';
   }
   var lg = document.getElementById('v8callegend');
   if(lg){
@@ -6979,7 +6979,8 @@ function renderLimitUpHeatmap(){
   }
   var tm = document.getElementById('v8caltime');
   if(tm && D.update_time) tm.innerHTML = _uBadge('周度','中长线',D.update_time);
-})();
+};
+window.__renderV8CalFull();
 
 /* ===== 今日事件卡：V8_CAL 日历事件 ===== */
 (function(){
@@ -11541,81 +11542,14 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
 
 <!-- ===== 独立脚本：V8_CAL 日历 + 今日事件（确保执行） ===== -->
 <script>
-/* 完整周历渲染 */
-(function(){
-  var D = window.V8_CAL || {weeks:[],legend:[]};
-  var days = ['周一','周二','周三','周四','周五','周六','周日'];
-  function fmtEvents(events){
-    if(!events || !events.length) return '';
-    return events.map(function(e){
-      var cls = e.cls || 'data';
-      var mark = e.released ? '<span class="ck">✅已发</span>' : '';
-      return '<div class="v8cal-event '+cls+'">'+mark+e.text+'</div>';
-    }).join('');
-  }
-  var todayKeys = window._v8CalTodayKeys ? window._v8CalTodayKeys(D) : {};
-  var c = document.getElementById('v8calcontent');
-  if(c){
-    var html = '';
-    if(D.weeks && D.weeks.length){
-      html += '<div class="v8cal-grid v8cal-headrow">' + days.map(function(d){return '<div class="v8cal-head">'+d+'</div>';}).join('') + '</div>';
-    }
-    D.weeks.forEach(function(w){
-      html += '<div class="v8cal-week-label">第'+w.no+'周 ' + w.dates + '</div>';
-      html += '<div class="v8cal-grid">';
-      w.days.forEach(function(d){
-        var cl = d.dim ? 'v8cal-day dim' : 'v8cal-day';
-        if(todayKeys[String(w.no)+'-'+String(d.num)]) cl += ' today';
-        html += '<div class="'+cl+'">';
-        html += '<div class="v8cal-day-num">'+d.num+'</div>';
-        html += fmtEvents(d.events);
-        html += '</div>';
-      });
-      html += '</div>';
-    });
-    c.innerHTML = html || '<div style="padding:16px;color:#888;font-size:13px">暂无日历数据</div>';
-  }
-  var lg = document.getElementById('v8callegend');
-  if(lg){
-    function hx(h){h=h.replace('#','');return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}
-    var LG=[
-      {n:'重要政策',c:'#c62828',d:'中国政府/监管机构发布的重大政策、法规、规划等',i:['关注国务院/证监会/交易所重大发布']},
-      {n:'央行/LPR',c:'#1565c0',d:'央行货币政策、利率决议、LPR报价等',i:['7月 LPR利率报价（1年期/5年期以上）— 每月20日']},
-      {n:'中国数据',c:'#f57f17',d:'中国宏观经济数据发布',i:['CPI/PPI — 每月9日前后','工业增加值/社零/固投 — 每月15日前后','PMI — 每月最后一日']},
-      {n:'财报截止',c:'#673ab7',d:'A股财报披露法定截止日',i:['7/15 🇨🇳 A股半年报预告强制截止日']},
-      {n:'期权交割',c:'#00838f',d:'各交易所期权合约到期日，涉及多空博弈',i:['中金所股指期权 — 每月第三个周五','各商品交易所期权到期日 — 每月约13-20日间']},
-      {n:'期货交割',c:'#1d6f42',d:'期货合约最后交易日，交割前后波动加大',i:['中金所IF/IH/IC/IM股指期货 — 每月第三个周五','各交易所2607合约最后交易日 — 约每月中旬']},
-      {n:'A50交割',c:'#e91e63',d:'新加坡富时A50期货交割日，外资对冲A股关键窗口',i:['2026年7月 — 倒数第二个工作日','⚠️ 交割前1-2周可能出现提前移仓波动']},
-      {n:'港股休市',c:'#ef5350',d:'香港交易所休市日，港股通/沪深股通同步暂停',i:['7/1 🇭🇰 港股休市']},
-      {n:'台股财报',c:'#ff9800',d:'台股关注股票',i:['台积电TSMC','联发科MediaTek']},
-      {n:'苹果/华为发布',c:'#37474f',d:'两大科技巨头新品发布/重要财报',i:['苹果Q3财报 — 7月最后一周']},
-      {n:'FOMC',c:'#9c27b0',d:'美联储货币政策会议，全球资本市场核心事件',i:['7/29-30 FOMC利率决议 北京时间7/30凌晨']},
-      {n:'美股休市',c:'#42a5f5',d:'NYSE/Nasdaq休市日',i:['7/3 🇺🇸 美股休市']},
-      {n:'美股财报',c:'#66bb6a',d:'美股关注股票',i:['特斯拉TSLA','谷歌GOOGL','微软MSFT','苹果AAPL','亚马逊AMZN','Meta','英伟达NVDA','美光MU']},
-      {n:'欧股财报',c:'#26a69a',d:'欧股关注股票',i:['ASML阿斯麦']},
-      {n:'日股财报',c:'#ab47bc',d:'日股关注股票',i:['铠侠Kioxia','东京电子','爱德万测试']},
-      {n:'韩股财报',c:'#00acc1',d:'韩股关注股票',i:['三星电子','SK海力士']},
-      {n:'SG公假',c:'#8e24aa',d:'新加坡公共假期',i:['本月新加坡无公共假期']},
-      {n:'财新PMI',c:'#5c6bc0',d:'财新PMI 行业数据',i:['财新PMI 行业数据']}
-    ];
-    lg.innerHTML = LG.map(function(l){
-      var rgb=hx(l.c);
-      var bg='rgba('+rgb.join(',')+',.14)';
-      var rest = l.d + (l.i && l.i.length ? ' · ' + l.i.join(' / ') : '');
-      return '<div class="v8cal-legend-item" title="'+String(l.n+' — '+rest).replace(/"/g,'&quot;')+'" style="border-left-color:'+l.c+';background:'+bg+'">'
-        + '<div class="lname"><span class="swatch" style="background:'+l.c+'"></span>'+l.n+'</div>'
-        + '<div class="lrest">'+rest+'</div></div>';
-    }).join('');
-  }
-  var tm = document.getElementById('v8caltime');
-  if(tm && D.update_time) tm.innerHTML = _uBadge('周度','中长线',D.update_time);
-  var tht = document.getElementById('tdHeaderTag');
-  // section header 大卡不写具体时间（主人 2026-08-06 06:54 明确指示）
-  if(tht) tht.textContent = '交易日历 + 打新速览';
-})();
+/* 完整周历渲染（兜底重绘：defer 数据脚本执行后由 DOMContentLoaded 再次触发） */
+window.__renderV8CalFull && window.__renderV8CalFull();
+var tht = document.getElementById('tdHeaderTag');
+// section header 大卡不写具体时间（主人 2026-08-06 06:54 明确指示）
+if(tht) tht.textContent = '交易日历 + 打新速览';
 
 /* 今日事件卡兜底：V8_CAL 日历事件（确保执行） */
-(function(){
+window.__renderV8CalToday = function(){
   var D = window.V8_CAL || {weeks:[]};
   var todayKeys = window._v8CalTodayKeys ? window._v8CalTodayKeys(D) : {};
   var todayEvents = [];
@@ -11652,7 +11586,8 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     html += '<div style="color:#888;padding:8px 0">📅 今日日历无标注事件</div>';
   }
   box.innerHTML = html || '<div style="color:#888;padding:12px">加载中…</div>';
-})();
+};
+window.__renderV8CalToday();
 </script>
 <!-- ===== 2026-08-06 23:46 修复：胶囊激活 init（紧跟所有 render 函数定义后） ===== -->
 <script>
@@ -11675,6 +11610,35 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   // 今日事件「今日判定」卡头+内容（脚本块位于 v8CardHeader 定义之前，只能延后到此处渲染）
   tryRun('renderJudgmentHeader', window.__renderJudgmentHeader, 'judgment-header init');
   tryRun('renderJudgmentBody', window.__renderJudgmentBody, 'judgment-body init');
+  // 2026-08-15 修复：data/*.js 用 defer，内联渲染在解析阶段读到空占位；DOMContentLoaded 时 defer 已执行，重绘兜底
+  if(typeof document !== 'undefined'){
+    var _v8CalRetryDone = false;
+    var _jdRetryDone = false;
+    function doV8CalRetry(){
+      if(_v8CalRetryDone) return;
+      _v8CalRetryDone = true;
+      try{
+        if(typeof window.__renderV8CalFull==='function') window.__renderV8CalFull();
+        if(typeof window.__renderV8CalToday==='function') window.__renderV8CalToday();
+      }catch(e){ console.warn('[v8cal DOMContentLoaded retry]', e); }
+    }
+    function doJdRetry(){
+      if(_jdRetryDone) return;
+      _jdRetryDone = true;
+      try{
+        if(typeof window.__retryJudgmentRender==='function') window.__retryJudgmentRender();
+      }catch(e){ console.warn('[judgment DOMContentLoaded retry]', e); }
+    }
+    if(document.readyState === 'loading'){
+      document.addEventListener('DOMContentLoaded', function(){ doV8CalRetry(); doJdRetry(); });
+    } else {
+      doV8CalRetry();
+      doJdRetry();
+    }
+    // 额外再拍一次：defer 脚本可能在 DOMContentLoaded 之后才全部跑完
+    setTimeout(function(){ doV8CalRetry(); doJdRetry(); }, 400);
+    setTimeout(function(){ doV8CalRetry(); doJdRetry(); }, 1200);
+  }
   // 实时数据区：情绪周期·连板天梯（迁到涨停热力矩阵上方）
   tryRun('renderCycleLadderCard', window.__renderCycleLadderCard, 'cycle-ladder init');
   // ⛓ 任何后续切到 fv/crds tab 也只是再跑一次幂等
