@@ -111,6 +111,10 @@ jobs:
           #   GITHUB_TOKEN 才能取线上真实 data/*.js 内容（git blobs API）对齐 ?v；
           #   缺此变量二者都会回退到落后本地 checkout → 写出陈旧 ?v → CDN 吐旧副本。
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # ★ 2026-08-15 根治 build clobber：reconcile_cache_busters.py 在 build 内部必须
+          #   用 LOCAL 磁盘（本轮 reset+重写后的产物即权威），不能用线上 API（会拿到本轮
+          #   新数据 push 前的旧版本 → ?v 与落库文件失配）。独立 reconcile workflow 仍用线上。
+          RECONCILE_LOCAL: "1"
           # push 被拒后重试时会重新跑 update_v8.py -> v8_health_check.py，必须同样带 token
           V8_GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
         run: |
