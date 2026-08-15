@@ -419,7 +419,7 @@ html>
 <script src="data/CFFEX_HOLDINGS.js?v=4f7fdcc771" defer></script>
 <script src="data/IPO_DATA.js?v=464aad5abc" defer></script>
     <script src="data/CRISIS_DATA.js?v=e9849bdc4b" defer></script>
-    <script src="data/JUDGMENT_DATA.js?v=ba643f9c76" defer></script>
+    <script src="data/JUDGMENT_DATA.js?v=eaf65b175a" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=6c43b8a8f8" defer></script>
     <script src="data/STOCK_RPS.js?v=68d9cad903" defer></script>
     <script src="data/AVG_PRICE_DATA.js?v=61f2f9d7e0" defer></script>
@@ -1130,10 +1130,18 @@ function _buildJudgmentEnvHTML(d){
     if(d.market) h += '<b style="color:#a78bfa;font-size:11px">📊 大盘</b> <span style="font-size:11.5px;color:var(--sub)">'+d.market+'</span>';
     if(d.indices && d.indices.length){
       d.indices.forEach(function(r){
-        var _ic = (r.ctrl && r.ctrl.indexOf('-')>=0) ? 'var(--down)' : ((r.ctrl && r.ctrl.indexOf('+')>=0) ? 'var(--up)' : 'var(--dim)');
+        // 🛡️ 2026-08-15：后端 JUDGMENT_DATA 的 ctrl 可能是数字或字符串，统一格式化
+        var ctrlVal = (r.ctrl == null) ? '' : r.ctrl;
+        var ctrlStr = '';
+        if (typeof ctrlVal === 'number') {
+          ctrlStr = (ctrlVal > 0 ? '+' : (ctrlVal < 0 ? '' : '')) + ctrlVal.toFixed(2) + '%';
+        } else {
+          ctrlStr = String(ctrlVal);
+        }
+        var _ic = (ctrlStr.indexOf('-')>=0) ? 'var(--down)' : ((ctrlStr.indexOf('+')>=0) ? 'var(--up)' : 'var(--dim)');
         h += '<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.18);border-radius:5px;padding:2px 7px;font-size:11px;line-height:1.4">'
           +'<b style="color:var(--sub)">'+r.name+'</b>'
-          +'<span style="color:'+_ic+';font-weight:700">'+r.ctrl+'</span>'
+          +'<span style="color:'+_ic+';font-weight:700">'+ctrlStr+'</span>'
           +'<span style="color:var(--dim);font-size:10px">财'+r.fs+'</span>'
           + (r.warn?'<span style="color:#f59e0b;margin-left:2px;font-size:10px">⚠</span>':'')
           + '</span>';
@@ -1325,11 +1333,28 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var opBody=document.getElementById('judgmentBodyOp');
       if(!opBody) return;
       try{
-        opBody.innerHTML = window.__judgmentEnvHTML_cache
-          || ((typeof window._buildJudgmentEnvHTML === 'function')
-            ? window._buildJudgmentEnvHTML(window.JUDGMENT_DATA)
-            : '<div style="color:var(--dim);padding:10px">环境态势数据暂不可用</div>');
-      }catch(e){ console.error('renderJudgmentBody error',e); }
+        var jd = window.JUDGMENT_DATA;
+        if(!jd || !jd.update_time){
+          // 数据未就绪时保留占位，但只在真正无数据时显示；避免 stale 缓存把空占位卡死
+          if(opBody.innerHTML.indexOf('等待数据生成中')<0){
+            opBody.innerHTML = '<div style="color:var(--dim);padding:14px;text-align:center;line-height:1.7">'
+              + '<div style="font-size:13px;color:#fbbf24;margin-bottom:4px">⏳ 等待数据生成中…</div>'
+              + '<div style="font-size:11px">盘前 08:25 自动生成 · 云端抓取中或非交易日</div>'
+              + '<div style="font-size:10.5px;margin-top:6px;color:var(--sub)">生成后会自动刷新，无需手动操作</div>'
+              + '</div>';
+          }
+          return;
+        }
+        opBody.innerHTML = (typeof window._buildJudgmentEnvHTML === 'function')
+          ? window._buildJudgmentEnvHTML(jd)
+          : '<div style="color:var(--dim);padding:10px">环境态势数据暂不可用</div>';
+      }catch(e){
+        console.error('renderJudgmentBody error',e);
+        // 🛡️ 2026-08-15：不要把"等待数据生成中"卡死；出错时提示并保留重试入口
+        if(opBody.innerHTML.indexOf('等待数据生成中')>=0){
+          opBody.innerHTML = '<div style="color:var(--dim);padding:10px">环境态势渲染异常，请刷新页面重试。<br><span style="font-size:11px;color:var(--sub)">'+String(e.message||e).replace(/</g,'&lt;')+'</span></div>';
+        }
+      }
     };
     // 🛡️ 2026-08-14 一劳永逸：数据未就绪时重试保底（500ms × 5 次）
     window.__retryJudgmentRender = function(){
@@ -5666,7 +5691,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
 
     <!-- === v6备忘录（逻辑详解页最右侧子tab，仅管理员可见） === -->
     <div class="lg-pane" id="lg-v6">
-      <iframe src="v6_memo.html?v=95315ba64a" style="width:100%;height:calc(100vh - 180px);border:none;border-radius:14px;background:#f5f7fa;" id="v6MemoFrame"></iframe>
+      <iframe src="v6_memo.html?v=b0c103ec41" style="width:100%;height:calc(100vh - 180px);border:none;border-radius:14px;background:#f5f7fa;" id="v6MemoFrame"></iframe>
     </div>
   </section>
 
