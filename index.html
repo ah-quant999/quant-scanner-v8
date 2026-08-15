@@ -1188,6 +1188,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/COMMODITY_ELASTICITY.js?v=29a44e024c" defer></script>
     <script src="data/SENTIMENT_CYCLE.js?v=af7068d09e" defer></script>
     <script src="data/POTENTIAL_PICKS.js?v=6e132591c2" defer></script>
+<!-- build-bump: 2026-08-15T17:55:00+08:00 force-refresh -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
 </head>
 <body>
 
@@ -5685,13 +5689,36 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
     <!-- === v6备忘录（逻辑详解页最右侧子tab，仅管理员可见） === -->
     <div class="lg-pane" id="lg-v6">
       <div id="v6MemoWrap" style="position:relative;width:100%;height:calc(100vh - 180px);border-radius:14px;overflow:hidden;background:var(--bg2);border:1px solid var(--border);">
-        <iframe id="v6MemoFrame" src="v6_memo.html?v=95315ba64a" style="width:100%;height:100%;border:none;" onload="(function(){var d=document.getElementById('v6MemoFrame');try{if(d&&d.contentWindow&&d.contentWindow.document&&d.contentWindow.document.body){var h=d.contentWindow.document.body.scrollHeight;if(h<200){document.getElementById('v6MemoError').style.display='flex';}}}catch(e){}})();" onerror="document.getElementById('v6MemoError').style.display='flex';"></iframe>
+        <iframe id="v6MemoFrame" src="v6_memo.html?v=95315ba64a" style="width:100%;height:100%;border:none;" onload="window.__v6MemoLoaded=true;(function(){var d=document.getElementById('v6MemoFrame');try{if(d&&d.contentWindow&&d.contentWindow.document&&d.contentWindow.document.body){var h=d.contentWindow.document.body.scrollHeight;if(h<200){document.getElementById('v6MemoError').style.display='flex';}}}catch(e){}})();" onerror="document.getElementById('v6MemoError').style.display='flex';"></iframe>
         <div id="v6MemoError" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;background:var(--bg2);flex-direction:column;gap:12px;text-align:center;padding:20px;">
           <div style="font-size:15px;color:var(--sub)">v6 备忘录加载失败或内容为空</div>
           <div style="font-size:12px;color:var(--dim)">可能是 CDN 缓存了旧版本，请点击下方按钮强制刷新</div>
-          <button class="btn" onclick="var f=document.getElementById('v6MemoFrame');f.src=f.src.replace(/&refresh=\d+/,'')+'&refresh='+Date.now();document.getElementById('v6MemoError').style.display='none';" style="padding:8px 18px;font-size:13px;">🔄 强制刷新 v6 备忘录</button>
+          <button class="btn" onclick="var f=document.getElementById('v6MemoFrame');f.src=f.src.replace(/&refresh=\d+/,'')+'&refresh='+Date.now();document.getElementById('v6MemoError').style.display='none';window.__v6MemoLoaded=true;" style="padding:8px 18px;font-size:13px;">🔄 强制刷新 v6 备忘录</button>
         </div>
       </div>
+      <script>
+      (function(){
+        var checkCount=0;
+        var timer=setInterval(function(){
+          var wrap=document.getElementById('v6MemoWrap');
+          var frame=document.getElementById('v6MemoFrame');
+          var err=document.getElementById('v6MemoError');
+          if(!frame || !wrap){ clearInterval(timer); return; }
+          if(++checkCount >= 12){
+            clearInterval(timer);
+            if(!window.__v6MemoLoaded){
+              frame.src = frame.src.replace(/&refresh=\d+/,'') + '&refresh=' + Date.now();
+            }
+            return;
+          }
+          if(err && err.style.display === 'flex' && !window.__v6MemoAutoRetried){
+            window.__v6MemoAutoRetried = true;
+            frame.src = frame.src.replace(/&refresh=\d+/,'') + '&refresh=' + Date.now();
+            err.style.display = 'none';
+          }
+        }, 250);
+      })();
+      </script>
     </div>
   </section>
 
@@ -10436,12 +10463,13 @@ const catNames=['宽基','行业','主题','跨境','商品'];
         + '<span style="font-size:13px;font-weight:700;color:var(--txt)">'+label+'</span>'
         + '<span style="font-size:18px;font-weight:900;color:'+color+'">'+value+'<span style="font-size:11px;font-weight:700;margin-left:1px">'+unit+'</span></span></div>';
     }
-    html += _sentimentBadge('情绪分', score, '', '#38bdf8');
+    var scoreColor = score>=70 ? 'var(--up)' : (score>=40 ? '#f59e0b' : 'var(--down)');
+    html += _sentimentBadge('情绪分', score+'/100', '', scoreColor);
     if(sc.delta_pct !== undefined && sc.delta_pct !== null){
       html += _sentimentBadge('环比', (sc.delta_pct>0?'+':'')+sc.delta_pct+'%', '', sc.delta_pct>=0?'var(--up)':'var(--down)');
     }
     if(scm.sectors_count){
-      html += _sentimentBadge('活跃', scm.sectors_count, '板块', '#22c55e');
+      html += _sentimentBadge('活跃', scm.sectors_count, '板块', 'var(--up)');
     }
 
     // 四指标小方块（危机/涨停/高连/龙虎）
