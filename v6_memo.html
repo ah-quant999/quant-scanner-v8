@@ -1117,6 +1117,116 @@ SEL:ZCNT>=2 AND ZDOWN>=1 AND VRMAX>=2.0 AND VR3>=1.5 AND CRDS>=15;</div>
         <b>风险控制</b>：所有推荐股都附带 <code>day_risk × 2</code> 止损，单股最大损失不超过总仓位 2%。
       </div>
     </div>
+
+    <!-- 4.7 个股动量算法·板块共振回测 -->
+    <div style="margin-bottom:18px;padding:14px 18px;background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+      <h4 style="margin:0 0 8px;font-size:14px;color:#6a1b9a;border-left:4px solid #6a1b9a;padding-left:8px;">🚀 4.7 个股动量算法·板块共振回测（2026-08-16）</h4>
+
+      <div style="font-size:12px;line-height:1.85;margin-bottom:10px;">
+        <b>背景</b>：个股动量 V2 算法基于甲午月/乙未月共 39 日盘后选股 PDF 的 OCR 抽取，产出每日「共识股」（多维度动量信号交叉确认的个股）。本节回答：<b>共识股所在板块的阶段（主升/启动/震荡/退潮/底部）是否影响 T+5 收益？</b>
+      </div>
+
+      <!-- 一、阶段规则定义 -->
+      <div style="padding:10px 14px;background:#e8f5e9;border-radius:8px;font-size:12px;line-height:1.85;margin-bottom:10px;">
+        <b style="color:#2e7d32;font-size:13px;">一、板块阶段规则（申万一级 · 31 行业）</b><br>
+        以板块 <code>pct_5d</code>（5 日涨幅）和 <code>pct_20d</code>（20 日涨幅）为判定依据，将板块分为 5 个阶段：
+        <table style="width:100%;margin-top:6px;border-collapse:collapse;font-size:11.5px;">
+          <thead><tr style="background:#2e7d32;color:#fff;">
+            <th style="padding:5px 8px;border:1px solid #ddd;">阶段</th><th style="padding:5px 8px;border:1px solid #ddd;">条件</th><th style="padding:5px 8px;border:1px solid #ddd;">含义</th></tr></thead>
+          <tbody>
+            <tr style="background:#ffebee;"><td style="padding:5px 8px;border:1px solid #ddd;font-weight:600;">🚀 主升</td><td style="padding:5px 8px;border:1px solid #ddd;"><code>pct_5d &gt; 3%</code> 且 <code>pct_20d &gt; 5%</code></td><td style="padding:5px 8px;border:1px solid #ddd;">强势主升浪，板块已大幅上涨</td></tr>
+            <tr style="background:#fff8e1;"><td style="padding:5px 8px;border:1px solid #ddd;font-weight:600;">📈 启动</td><td style="padding:5px 8px;border:1px solid #ddd;"><code>pct_5d &gt; 1.5%</code> 且 <code>pct_20d &gt; 0%</code></td><td style="padding:5px 8px;border:1px solid #ddd;">刚启动，短期有动能</td></tr>
+            <tr style="background:#e3f2fd;"><td style="padding:5px 8px;border:1px solid #ddd;font-weight:600;">🌊 震荡</td><td style="padding:5px 8px;border:1px solid #ddd;">默认（不满足以上任一）</td><td style="padding:5px 8px;border:1px solid #ddd;">横盘整理，方向不明</td></tr>
+            <tr style="background:#fce4ec;"><td style="padding:5px 8px;border:1px solid #ddd;font-weight:600;">📉 退潮</td><td style="padding:5px 8px;border:1px solid #ddd;"><code>pct_5d &lt; -1.5%</code> 且 <code>pct_20d &lt; -5%</code></td><td style="padding:5px 8px;border:1px solid #ddd;">趋势性下跌，资金撤离</td></tr>
+            <tr style="background:#f3e5f5;"><td style="padding:5px 8px;border:1px solid #ddd;font-weight:600;">⛏️ 底部</td><td style="padding:5px 8px;border:1px solid #ddd;"><code>pct_5d &lt; -3%</code> 且 <code>pct_20d &lt; -10%</code></td><td style="padding:5px 8px;border:1px solid #ddd;">深度调整后超跌区域</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 二、共振假设回测 → 反向结论 -->
+      <div style="padding:10px 14px;background:#fce4ec;border-radius:8px;font-size:12px;line-height:1.85;margin-bottom:10px;">
+        <b style="color:#c62828;font-size:13px;">二、板块共振假设回测 → 🔴 反向结论</b><br>
+        <b>原假设</b>：「共识股 + 所在板块处于主升/启动阶段 = 顺风顺水，胜率更高」<br>
+        <b>实际数据（N=385 条共识记录，T+5 真实收益）</b>：
+        <table style="width:100%;margin-top:6px;border-collapse:collapse;font-size:11.5px;">
+          <thead><tr style="background:#c62828;color:#fff;">
+            <th style="padding:5px 8px;border:1px solid #ddd;">分组</th><th style="padding:5px 8px;border:1px solid #ddd;">N</th><th style="padding:5px 8px;border:1px solid #ddd;">胜率</th><th style="padding:5px 8px;border:1px solid #ddd;">T+5 均收益</th><th style="padding:5px 8px;border:1px solid #ddd;">T+5 中位</th><th style="padding:5px 8px;border:1px solid #ddd;">判断</th></tr></thead>
+          <tbody>
+            <tr style="background:#ffebee;font-weight:600;"><td>共识股 ALL（基准）</td><td>385</td><td>42.1%</td><td>−1.18%</td><td>−1.63%</td><td>—</td></tr>
+            <tr style="background:#ffcdd2;"><td>✅ 无风组（震荡+退潮+底部）</td><td>138</td><td style="color:#2e7d32;font-weight:700;">52.9%</td><td style="color:#2e7d32;font-weight:700;">+2.87%</td><td>+0.48%</td><td style="color:#2e7d32;">✅ 最优</td></tr>
+            <tr style="background:#ef9a9a;"><td>❌ 顺风组（主升+启动）</td><td>155</td><td style="color:#c62828;font-weight:700;">16.8%</td><td style="color:#c62828;font-weight:700;">−8.40%</td><td>−7.78%</td><td style="color:#c62828;">❌ 最差</td></tr>
+            <tr><td>　└ 主升 alone</td><td>106</td><td style="color:#c62828;">17.0%</td><td style="color:#c62828;font-weight:700;">−10.41%</td><td>−10.27%</td><td style="color:#c62828;">追高陷阱</td></tr>
+            <tr style="background:#f5f5f5;"><td>　└ 启动 alone</td><td>49</td><td style="color:#c62828;">16.3%</td><td style="color:#c62828;">−4.06%</td><td>−3.91%</td><td style="color:#c62828;">亦差</td></tr>
+            <tr style="background:#e8f5e9;"><td>　└ 震荡 alone</td><td>129</td><td style="color:#2e7d32;">50.4%</td><td style="color:#2e7d32;font-weight:700;">+2.45%</td><td>+0.04%</td><td style="color:#2e7d32;">稳健正收益</td></tr>
+            <tr style="background:#e0f2f1;"><td>　└ 退潮 alone</td><td>9</td><td style="color:#2e7d32;">88.9%</td><td style="color:#2e7d32;font-weight:700;">+8.90%</td><td>+9.95%</td><td style="color:#f57f17;">⚠️ N=9 过小</td></tr>
+            <tr style="background:#f3e5f5;"><td>　└ 无K线（排除）</td><td>92</td><td>68.5%</td><td>+4.93%</td><td>+2.56%</td><td style="color:#666;">早期日期缺K线</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:8px;padding:8px 12px;background:#c8e6c9;border-radius:6px;border-left:4px solid #2e7d32;">
+          <b style="color:#1b5e20;">📌 核心发现——反向过滤</b>：<br>
+          • 共识股在<b>已主升/启动的板块中表现极差</b>（T+5 均 −8.40%~−10.41%），本质是<b>追高+均值回归</b>。<br>
+          • 共识股在<b>震荡板块表现最好</b>（N=129, 胜率 50.4%, T+5 +2.45%）——动量信号在未被充分定价的板块更有效。<br>
+          • <b>操作建议：剔除主升/启动板块的共识股，优先选择震荡板块的共识股。</b>
+        </div>
+      </div>
+
+      <!-- 三、退出纪律 -->
+      <div style="padding:10px 14px;background:#fff8e1;border-radius:8px;font-size:12px;line-height:1.85;margin-bottom:10px;">
+        <b style="color:#e65100;font-size:13px;">三、退出纪律（全站统一 fixedP10 / rrK1.5）</b><br>
+        <b>口径</b>：止损 = 入场价 × 0.90（固定 −10%）；止盈 = 入场价 × 1.15（R:R = 1.5）；配置源 <code>algorithms/stop_target_profiles.json</code>。<br>
+        <b>T+5 模拟纪律回测（N=385）</b>：
+        <table style="width:100%;margin-top:6px;border-collapse:collapse;font-size:11.5px;">
+          <thead><tr style="background:#e65100;color:#fff;">
+            <th style="padding:5px 8px;border:1px solid #ddd;">指标</th><th style="padding:5px 8px;border:1px solid #ddd;">裸持 T+5</th><th style="padding:5px 8px;border:1px solid #ddd;">纪律 T+5</th><th style="padding:5px 8px;border:1px solid #ddd;">变化</th></tr></thead>
+          <tbody>
+            <tr><td style="padding:5px 8px;border:1px solid #ddd;">均收益</td><td>−1.18%</td><td>−0.75%</td><td style="color:#2e7d32;">+0.43pp</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:5px 8px;border:1px solid #ddd;">触发止损</td><td>—</td><td>25.7%（封顶 −10%）</td><td>单笔最大亏损锁定</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid #ddd;">触发止盈</td><td>—</td><td>11.4%（+15%）</td><td style="color:#2e7d32;">锁定利润</td></tr>
+            <tr style="background:#fafafa;"><td style="padding:5px 8px;border:1px solid #ddd;">未触发</td><td>—</td><td>62.9%</td><td>持仓至 T+5</td></tr>
+          </tbody>
+        </table>
+        <b>结论</b>：纪律本身不创造 alpha（均收益仅微优 0.43pp），但核心价值是<b>单笔最大亏损锁死 −10%</b>，防止极端回撤。配合反向过滤（只选震荡板块）后效果更佳。
+      </div>
+
+      <!-- 四、最终策略建议 -->
+      <div style="padding:10px 14px;background:#e8eaf6;border-radius:8px;font-size:12px;line-height:1.85;margin-bottom:10px;">
+        <b style="color:#283593;font-size:13px;">四、最终策略建议——到底看什么？</b><br>
+        <table style="width:100%;margin-top:6px;border-collapse:collapse;font-size:11.5px;">
+          <thead><tr style="background:#283593;color:#fff;">
+            <th style="padding:6px 10px;border:1px solid #ddd;width:22%;">优先级</th><th style="padding:6px 10px;border:1px solid #ddd;">策略</th><th style="padding:6px 10px;border:1px solid #ddd;">预期胜率</th><th style="padding:6px 10px;border:1px solid #ddd;">预期 T+5</th><th style="padding:6px 10px;border:1px solid #ddd;">依据</th></tr></thead>
+          <tbody>
+            <tr style="background:#c8e6c9;font-weight:600;">
+              <td style="padding:6px 10px;border:1px solid #ddd;">🥇 首选</td>
+              <td style="padding:6px 10px;border:1px solid #ddd;"><b>震荡板块共识股 + 固定止损</b><br><span style="color:#666;font-size:10.5px;">选股→过滤掉主升/启动板块→入场×0.9止损</span></td>
+              <td style="padding:6px 10px;border:1px solid #ddd;color:#2e7d32;font-weight:700;">~50%</td>
+              <td style="padding:6px 10px;border:1px solid #ddd;color:#2e7d32;">+2~3%</td>
+              <td style="padding:6px 10px;border:1px solid #ddd;">震荡 alone N=129 数据</td>
+            </tr>
+            <tr style="background:#fff8e1;">
+              <td style="padding:6px 10px;border:1px solid #ddd;">🥈 备选</td>
+              <td style="padding:6px 10px;border:1px solid #ddd;"><b>无风组共识股（震荡+退潮+底部）</b><br><span style="color:#666;font-size:10.5px;">不追主升/启动，接受退潮/底部左侧交易</span></td>
+              <td style="padding:6px 10px;border:1px solid #ddd;color:#2e7d32;font-weight:700;">~53%</td>
+              <td style="padding:6px 10px;border:1px solid #ddd;color:#2e7d32;">+2.9%</td>
+              <td style="padding:6px 10px;border:1px solid #ddd;">无风组 N=138 数据</td>
+            </tr>
+            <tr style="background:#ffcdd2;">
+              <td style="padding:6px 10px;border:1px solid #ddd;">🚫 避免</td>
+              <td style="padding:6px 10px;border:1px solid #ddd;"><b>主升/启动板块共识股</b><br><span style="color:#666;font-size:10.5px;">无论共识强度多高，都不追已大涨板块</span></td>
+              <td style="padding:6px 10px;border:1px solid #ddd;color:#c62828;font-weight:700;">~17%</td>
+              <td style="padding:6px 10px;border:1px solid #ddd;color:#c62828;font-weight:700;">−8~-10%</td>
+              <td style="padding:6px 10px;border:1px solid #ddd;">顺风组 N=155 数据</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="margin-top:8px;padding:8px 12px;background:#3949ab;color:#fff;border-radius:6px;font-size:11.5px;">
+          <b>一句话总结</b>：动量共识股的收益来源是<b>「未被充分定价的板块中的动量确认信号</b>」，不是「顺势追高」。板块越热（主升/启动），共识股越容易追高被套。<b>胜率和收益最高的组合：震荡板块 + 动量共识 + 固定10%止损</b>。
+        </div>
+      </div>
+
+      <div style="font-size:11px;color:#888;line-height:1.6;margin-top:8px;padding:6px 10px;background:#fafafa;border-radius:4px;">
+        <b>方法论备注</b>：① 阶段由入选日板块 pct_5d/pct_20d 反推（无历史阶段快照）；② 92/385 因早期日期缺K线被排除（可能偏向近期数据）；③ 退潮 N=9 样本过小，+8.90% 不可推广；④ 行业 RS 用板块内共识股均值代理（可能高估但方向稳健）；⑤ 数据区间为甲午月/乙未月共 39 日（2026 年 6 月初~7 月中）。
+      </div>
+    </div>
   </div>
 
   <!-- 九、全站核心算法一致性审计 -->
