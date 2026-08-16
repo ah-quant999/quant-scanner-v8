@@ -1,200 +1,11 @@
 {
-  "update_time": "2026-08-17 00:19:06",
+  "update_time": "2026-08-17 01:06:21",
   "data_date": "2026-08-17",
   "track_start": "2026-08-17",
   "history_days": 1,
   "strict_count": 0,
-  "near_count": 12,
+  "near_count": 5,
   "tracked": [
-    {
-      "code": "601899",
-      "name": "紫金矿业",
-      "market": "sh",
-      "board": "主板",
-      "status": "near",
-      "total_score": 37.2,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 35.45,
-      "current_close": 35.45,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "603993",
-      "name": "洛阳钼业",
-      "market": "sh",
-      "board": "主板",
-      "status": "near",
-      "total_score": 37.2,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 20.75,
-      "current_close": 20.75,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "000975",
-      "name": "山金国际",
-      "market": "sz",
-      "board": "主板",
-      "status": "near",
-      "total_score": 36.0,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 25.96,
-      "current_close": 25.96,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "601168",
-      "name": "西部矿业",
-      "market": "sh",
-      "board": "主板",
-      "status": "near",
-      "total_score": 36.0,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 42.45,
-      "current_close": 42.45,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "000506",
-      "name": "中国食品",
-      "market": "sz",
-      "board": "主板",
-      "status": "near",
-      "total_score": 36.0,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 17.55,
-      "current_close": 17.55,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "688213",
-      "name": "思特威",
-      "market": "sh",
-      "board": "科创板",
-      "status": "near",
-      "total_score": 32.0,
-      "quality_grade": "A",
-      "industry": "软件和信息技术服务业",
-      "sectors": [
-        "软件和信息技术服务业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 99.25,
-      "current_close": 99.25,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报略增",
-          "score": 5,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "300502",
-      "name": "新易盛",
-      "market": "sz",
-      "board": "创业板",
-      "status": "near",
-      "total_score": 30.0,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 448.08,
-      "current_close": 448.08,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
     {
       "code": "300857",
       "name": "协创数据",
@@ -244,33 +55,6 @@
       "catalysts": []
     },
     {
-      "code": "688331",
-      "name": "荣昌生物",
-      "market": "科创板",
-      "board": "科创板",
-      "status": "near",
-      "total_score": 20,
-      "quality_grade": "A",
-      "industry": "医药制造业",
-      "sectors": [
-        "医药制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 0,
-      "current_close": null,
-      "pnl_pct": null,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "—"
-        }
-      ]
-    },
-    {
       "code": "002916",
       "name": "深南电路",
       "market": "深市",
@@ -317,37 +101,45 @@
       "current_close": null,
       "pnl_pct": null,
       "catalysts": []
+    },
+    {
+      "code": "688331",
+      "name": "荣昌生物",
+      "market": "科创板",
+      "board": "科创板",
+      "status": "near",
+      "total_score": 20,
+      "quality_grade": "A",
+      "industry": "医药制造业",
+      "sectors": [
+        "医药制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 0,
+      "current_close": null,
+      "pnl_pct": null,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "—"
+        }
+      ]
     }
   ],
   "alerts": [],
   "sector_cluster": {
     "by_industry": [
       {
-        "industry": "有色金属矿采选业",
-        "count": 5,
-        "names": [
-          "紫金矿业",
-          "洛阳钼业",
-          "山金国际",
-          "西部矿业",
-          "中国食品"
-        ]
-      },
-      {
         "industry": "计算机、通信和其他电子设备制造业",
-        "count": 4,
+        "count": 3,
         "names": [
-          "新易盛",
           "协创数据",
           "深南电路",
           "胜宏科技"
-        ]
-      },
-      {
-        "industry": "软件和信息技术服务业",
-        "count": 1,
-        "names": [
-          "思特威"
         ]
       },
       {
@@ -367,16 +159,8 @@
     ],
     "by_sector": [
       {
-        "sector": "有色金属矿采选业",
-        "count": 5
-      },
-      {
         "sector": "计算机、通信和其他电子设备制造业",
-        "count": 4
-      },
-      {
-        "sector": "软件和信息技术服务业",
-        "count": 1
+        "count": 3
       },
       {
         "sector": "电气机械和器材制造业",
@@ -387,29 +171,25 @@
         "count": 1
       }
     ],
-    "concentration": 41.67
+    "concentration": 60.0
   },
   "overlap": {
-    "total_tracked": 12,
+    "total_tracked": 5,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
       "names": []
     },
     "cockpit_a": {
-      "count": 8,
+      "count": 0,
       "overlap": 0,
       "names": []
     },
     "cockpit_b": {
       "count": 15,
-      "overlap": 5,
+      "overlap": 1,
       "names": [
-        "协创数据",
-        "阳光电源",
-        "荣昌生物",
-        "深南电路",
-        "胜宏科技"
+        "协创数据"
       ]
     }
   },
