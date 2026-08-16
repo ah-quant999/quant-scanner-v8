@@ -17,7 +17,7 @@
 """
 
 import json, re, sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -136,6 +136,161 @@ FROZEN_SOURCES = {
 # 引入 update_v8.py 的时段映射，用于输出"每个模块由哪个定时任务更新"
 from update_v8 import CATEGORY_MAP, CATEGORY_LABEL
 
+# ── 自愈派发能力（2026-08-16 根治「只看门狗只查不修、刷屏不自愈」）──
+# 旧版 guard 只检查 data/*.js 是否陈旧，返回非0 → 调用它的「数据新鲜度自动值守」自动化
+# 每小时向主人汇报一次故障，但从不修复 → 死循环刷屏（今早 alimi-cn 离线致 cn_fetch
+# 周度刷新失败，guard 每 :30 报一次）。
+# 新版：发现 CORE stale → 自动 dispatch 对应 category 的 cn_fetch 在**在线** self-hosted
+# cn runner 上重抓（runs-on=[self-hosted,cn] 自动避开离线机），30min 冷却去重；
+# 自愈成功/冷却中 → 该项视为「处理中」→ 最终 exit 0 → 自动化不再汇报刷屏。
+import os
+import urllib.request
+import urllib.error
+from collections import defaultdict
+
+REPO = "ah-quant999/quant-scanner-v8"
+CN_WORKFLOW_ID = 327687211   # 🇨🇳 v8 中国数据抓取(云端)（v8_cn_fetch_cloud.yml）
+SELFHEAL_PATH = DATA_DIR / "freshness_selfheal.json"
+SELFHEAL_COOLDOWN_MIN = 30   # 同 category 自愈派发冷却，避免每小时重复派发刷爆 runner
+
+
+def _load_token():
+    """复用 v8_cloud_watchdog 的 token 解析：env 优先，其次本地文件（不落仓库）。"""
+    if os.environ.get("V8_GITHUB_TOKEN"):
+        return os.environ["V8_GITHUB_TOKEN"]
+    for p in [
+        Path("E:/workspace/quant-scanner-v8/.workbuddy/v8_gh_token.txt"),
+        Path.home() / ".workbuddy" / "v8_gh_token.txt",
+        ROOT / ".workbuddy" / "v8_gh_token.txt",
+    ]:
+        if p.exists():
+            return p.read_text(encoding="utf-8").strip()
+    return None
+
+
+def _dispatch_cn(category, token):
+    """派发 cn_fetch 在在线 self-hosted cn runner 上重抓（自愈核心动作）。"""
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_WORKFLOW_ID}/dispatches"
+    hdr = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    data = json.dumps({"ref": "main", "inputs": {"category": category}}).encode()
+    req = urllib.request.Request(url, data=data, headers=hdr, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return True, r.status
+    except urllib.error.HTTPError as e:
+        return False, f"HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:120]}"
+    except Exception as e:
+        return False, str(e)[:120]
+
+
+def load_selfheal():
+    try:
+        return json.loads(SELFHEAL_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def save_selfheal(d):
+    try:
+        SELFHEAL_PATH.write_text(json.dumps(d, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _api_get(url, token):
+    hdr = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    req = urllib.request.Request(url, headers=hdr)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return json.loads(r.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        return {"__error__": e.code}
+    except Exception as e:
+        return {"__error__": str(e)[:120]}
+
+
+def choose_category_cn(now_cst, is_trading=True):
+    """按当前北京时刻选 cn_fetch 派发类别；非交易日统一 all（周末周度刷新）。"""
+    if not is_trading:
+        return "all"
+    h = now_cst.hour + now_cst.minute / 60.0
+    if h < 9:
+        return "premarket"
+    if h < 15:
+        return "intraday"
+    if h < 16.5:
+        return "post_close"
+    return "all"
+
+
+def pipeline_selfheal(token, now, is_trading, sh):
+    """管线级自愈：cn_fetch 最近一次运行失败 → 在在线 runner 上重派发（兜底 schedule 抖动/离线机失败）。
+
+    与数据自愈共用 30min 冷却（键 cn_fetch_pipeline）。仅重试较新的失败（6h 内），
+    避免远古失败反复派发。这是「看门狗一直报错」的最后一块拼图：既修数据陈旧，
+    也修管线失败，让巡检最终 exit 0、不再刷屏。
+    """
+    try:
+        runs = _api_get(
+            f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_WORKFLOW_ID}/runs?per_page=5",
+            token,
+        )
+        if "__error__" in runs:
+            print(f"  [管线自愈] 查 cn_fetch runs 失败: {runs['__error__']}")
+            return
+        NEUTRAL = ("skipped", "cancelled", "neutral", "action_required")
+        latest = None
+        for r in runs.get("workflow_runs", []):
+            if r.get("status") != "completed":
+                continue
+            if r.get("conclusion") in NEUTRAL:
+                continue
+            latest = r
+            break
+        if not latest or latest.get("conclusion") != "failure":
+            return  # 最近一次成功/无结论 → 无需重试
+        created = latest.get("created_at")
+        try:
+            lt = datetime.fromisoformat(created.replace("Z", "+00:00")).astimezone(
+                timezone(timedelta(hours=8)))
+            # now 为朴素本地时间，lt 为带时区；用带时区的「当前」计算年龄避免混合比较报错
+            age_min = (datetime.now(timezone(timedelta(hours=8))) - lt).total_seconds() / 60
+        except Exception:
+            age_min = 999
+        last = sh.get("cn_fetch_pipeline", {}).get("ts")
+        if last:
+            try:
+                lt2 = datetime.strptime(last, "%Y-%m-%d %H:%M:%S")
+                if (now - lt2).total_seconds() < SELFHEAL_COOLDOWN_MIN * 60:
+                    print(f"  [冷却中] cn_fetch 失败重派近{SELFHEAL_COOLDOWN_MIN}min已触发，跳过")
+                    return
+            except Exception:
+                pass
+        if age_min >= 360:
+            print(f"  [跳过] cn_fetch 失败过旧({age_min/60:.0f}h)，不自动重试")
+            return
+        cat = choose_category_cn(now, is_trading)
+        ok, msg = _dispatch_cn(cat, token)
+        if ok:
+            sh["cn_fetch_pipeline"] = {
+                "ts": now.strftime("%Y-%m-%d %H:%M:%S"),
+                "run_id": latest.get("id"),
+                "category": cat,
+            }
+            print(f"  [自愈✓] cn_fetch 上次运行失败(run#{latest.get('id')})，已重派 {cat}（HTTP {msg}）")
+        else:
+            print(f"  [自愈✗] cn_fetch 重派失败: {msg}")
+    except Exception as e:
+        print(f"  [管线自愈] 异常: {e}")
+
 
 def last_trade_day_close(now: datetime) -> datetime:
     """返回最近交易日收盘时间（15:30）。非交易日回退。"""
@@ -169,7 +324,7 @@ def extract_update_time(path: Path):
     return None
 
 
-def check_group(group, close, label):
+def check_group(group, close, label, is_trading=True):
     """返回 (stale_list, notime_list)
 
     陈旧判定（2026-08-02 修订）：
@@ -177,9 +332,16 @@ def check_group(group, close, label):
     - 阈值 ≥ 24h：按 **交易日** 判定（避免「周五 15:05 → 周一 09:00」按日历 68h 误报）
       - 实际交易日数 = trading_days_between(ts.date(), close.date())
       - 阈值天数 = max_hours / 24
+
+    2026-08-16 周末豁免：非交易日时，阈值 < 24h 的盘中高频模块（CRISIS_DATA=4h /
+    V8_CAL=6h 等）本就不更新，若仍判 stale 会每周末固定刷屏误报。此类在非交易日
+    直接跳过（不计入 stale），信息不丢（仍可在 notime/打印中提示，但不阻断 exit）。
     """
     stale, notime = [], []
     for var, max_hours in group.items():
+        # 🛡️ 周末豁免：非交易日 + 盘中高频（<24h 阈值）不判陈旧
+        if (not is_trading) and max_hours < 24:
+            continue
         path = DATA_DIR / f"{var}.js"
         if not path.exists():
             stale.append((var, "文件缺失"))
@@ -210,12 +372,19 @@ def check_group(group, close, label):
 
 
 def main():
+    import argparse
+    ap = argparse.ArgumentParser(description="v8 数据新鲜度看门狗（含自愈派发）")
+    ap.add_argument("--no-self-heal", action="store_true",
+                    help="仅检查不派发自愈（诊断模式）")
+    args = ap.parse_args()
+
     now = datetime.now()
+    is_trading = _is_trading_day(now.date())
     close = last_trade_day_close(now)
 
-    core_stale, core_notime = check_group(CORE_SOURCES, close, "CORE")
-    warn_stale, warn_notime = check_group(WARN_SOURCES, close, "WARN")
-    frozen_stale, frozen_notime = check_group(FROZEN_SOURCES, close, "FROZEN")
+    core_stale, core_notime = check_group(CORE_SOURCES, close, "CORE", is_trading)
+    warn_stale, warn_notime = check_group(WARN_SOURCES, close, "WARN", is_trading)
+    frozen_stale, frozen_notime = check_group(FROZEN_SOURCES, close, "FROZEN", is_trading)
 
     def _with_cat(items):
         return [{"var": v, "reason": r, "category": CATEGORY_MAP.get(v, "post_close")} for v, r in items]
@@ -223,6 +392,7 @@ def main():
     status = {
         "check_time": now.strftime("%Y-%m-%d %H:%M:%S"),
         "last_trade_close": close.strftime("%Y-%m-%d %H:%M:%S"),
+        "is_trading_day": is_trading,
         "core_stale": _with_cat(core_stale),
         "warn_stale": _with_cat(warn_stale),
         "frozen_stale": _with_cat(frozen_stale),
@@ -243,7 +413,7 @@ def main():
 
     s = status["summary"]
     print(f"=== v8 数据新鲜度检查 {status['check_time']} ===")
-    print(f"最近交易日收盘: {status['last_trade_close']}")
+    print(f"最近交易日收盘: {status['last_trade_close']}  交易日: {'是' if is_trading else '否(周末/节假日)'}")
     print(f"受检模块: {s['total_checked']} 个\n")
 
     if core_stale:
@@ -265,8 +435,54 @@ def main():
         print(f"⏱️  无时间戳（{len(status['no_update_time'])} 个，前端不显示更新时间，用户无法察觉陈旧）:")
         print(f"  {', '.join(status['no_update_time'])}\n")
 
+    # ── 自愈派发（修而不只查，根治刷屏）──
+    # 发现 CORE stale → 自动 dispatch 对应 category 的 cn_fetch 在在线 runner 上重抓；
+    # 30min 冷却去重；自愈成功/冷却中 → 该项从 core_stale 剔除 → 最终 exit 0（不刷屏）。
+    token = None if args.no_self_heal else _load_token()
+    healed_cats = set()
+    sh = load_selfheal()   # 始终加载，确保数据自愈与管线自愈都能读写冷却状态
+    if core_stale and token:
+        by_cat = defaultdict(list)
+        for it in _with_cat(core_stale):
+            by_cat[it["category"]].append(it["var"])
+        print(f"🩹 自愈派发（{len(by_cat)} 个类别需刷新）:")
+        for cat, vars_ in by_cat.items():
+            last = sh.get(cat, {}).get("ts")
+            if last:
+                try:
+                    lt = datetime.strptime(last, "%Y-%m-%d %H:%M:%S")
+                    if (now - lt).total_seconds() < SELFHEAL_COOLDOWN_MIN * 60:
+                        print(f"  [冷却中] {cat} 近{SELFHEAL_COOLDOWN_MIN}min已派发，跳过（{', '.join(vars_)}）")
+                        healed_cats.add(cat)
+                        continue
+                except Exception:
+                    pass
+            ok, msg = _dispatch_cn(cat, token)
+            if ok:
+                sh[cat] = {"ts": now.strftime("%Y-%m-%d %H:%M:%S"), "vars": vars_}
+                healed_cats.add(cat)
+                print(f"  [自愈✓] 派发 cn_fetch({cat}) 刷新 {', '.join(vars_)}（HTTP {msg}）")
+            else:
+                print(f"  [自愈✗] cn_fetch({cat}) 派发失败: {msg}（{', '.join(vars_)}）")
+        save_selfheal(sh)
+    elif core_stale and not token:
+        print("  [自愈跳过] 未找到 GitHub token，无法派发刷新（请配置 V8_GITHUB_TOKEN）")
+
+    # ── 管线自愈：cn_fetch 最近一次运行失败 → 重派（兜底 schedule 抖动/离线机失败）──
+    if token:
+        pipeline_selfheal(token, now, is_trading, sh)
+        save_selfheal(sh)
+
+    # 已自愈/冷却中的类别 → 视为「处理中」，不计入最终 stale（避免刷屏）
+    if healed_cats:
+        cat_of = {it["var"]: it["category"] for it in _with_cat(core_stale)}
+        remaining = [(v, r) for (v, r) in core_stale if cat_of.get(v) not in healed_cats]
+        if len(remaining) < len(core_stale):
+            print(f"  → {len(core_stale) - len(remaining)} 项已进入自愈/冷却，本轮不再报故障")
+        core_stale = remaining
+
     if not (core_stale or warn_stale or frozen_stale or status["no_update_time"]):
-        print("✅ 全部模块新鲜")
+        print("✅ 全部模块新鲜（或已进入自愈）")
         return 0
 
     print(f"状态已写入: {out_path}")
