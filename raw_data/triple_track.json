@@ -1,64 +1,52 @@
 {
-  "update_time": "2026-08-15 15:26:54",
-  "data_date": "2026-08-15",
-  "track_start": "2026-08-15",
-  "history_days": 7,
+  "update_time": "2026-08-16 15:27:26",
+  "data_date": "2026-08-16",
+  "track_start": "2026-08-16",
+  "history_days": 1,
   "strict_count": 0,
-  "near_count": 9,
+  "near_count": 12,
   "tracked": [
-    {
-      "code": "601899",
-      "name": "紫金矿业",
-      "market": "sh",
-      "board": "主板",
-      "status": "near",
-      "total_score": 36.0,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-13",
-      "hold_days": 2,
-      "consecutive_days": 3,
-      "first_close": 35.45,
-      "current_close": 35.45,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
     {
       "code": "603993",
       "name": "洛阳钼业",
       "market": "sh",
       "board": "主板",
       "status": "near",
-      "total_score": 36.0,
+      "total_score": 37.2,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
         "有色金属矿采选业"
       ],
       "signal_count": 0,
-      "enter_date": "2026-08-13",
-      "hold_days": 2,
-      "consecutive_days": 3,
+      "enter_date": "2026-08-16",
+      "hold_days": 1,
+      "consecutive_days": 1,
       "first_close": 20.75,
       "current_close": 20.75,
       "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
+      "catalysts": []
+    },
+    {
+      "code": "601899",
+      "name": "紫金矿业",
+      "market": "sh",
+      "board": "主板",
+      "status": "near",
+      "total_score": 37.2,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-16",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 35.45,
+      "current_close": 35.45,
+      "pnl_pct": 0.0,
+      "catalysts": []
     },
     {
       "code": "000506",
@@ -66,26 +54,20 @@
       "market": "sz",
       "board": "主板",
       "status": "near",
-      "total_score": 34.8,
+      "total_score": 36.0,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
         "有色金属矿采选业"
       ],
       "signal_count": 0,
-      "enter_date": "2026-08-15",
+      "enter_date": "2026-08-16",
       "hold_days": 1,
       "consecutive_days": 1,
       "first_close": 17.55,
       "current_close": 17.55,
       "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
+      "catalysts": []
     },
     {
       "code": "601168",
@@ -93,26 +75,20 @@
       "market": "sh",
       "board": "主板",
       "status": "near",
-      "total_score": 34.8,
+      "total_score": 36.0,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
         "有色金属矿采选业"
       ],
       "signal_count": 0,
-      "enter_date": "2026-08-13",
-      "hold_days": 2,
-      "consecutive_days": 3,
+      "enter_date": "2026-08-16",
+      "hold_days": 1,
+      "consecutive_days": 1,
       "first_close": 42.45,
       "current_close": 42.45,
       "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
+      "catalysts": []
     },
     {
       "code": "000975",
@@ -120,26 +96,20 @@
       "market": "sz",
       "board": "主板",
       "status": "near",
-      "total_score": 34.8,
+      "total_score": 36.0,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
         "有色金属矿采选业"
       ],
       "signal_count": 0,
-      "enter_date": "2026-08-15",
+      "enter_date": "2026-08-16",
       "hold_days": 1,
       "consecutive_days": 1,
       "first_close": 25.96,
       "current_close": 25.96,
       "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
+      "catalysts": []
     },
     {
       "code": "688213",
@@ -147,164 +117,170 @@
       "market": "sh",
       "board": "科创板",
       "status": "near",
-      "total_score": 32.8,
+      "total_score": 32.0,
       "quality_grade": "A",
       "industry": "软件和信息技术服务业",
       "sectors": [
         "软件和信息技术服务业"
       ],
       "signal_count": 0,
-      "enter_date": "2026-08-15",
+      "enter_date": "2026-08-16",
       "hold_days": 1,
       "consecutive_days": 1,
       "first_close": 99.25,
       "current_close": 99.25,
       "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报略增",
-          "score": 5,
-          "reaction": "观察中"
-        }
-      ]
+      "catalysts": []
     },
     {
-      "code": "300760",
-      "name": "迈瑞医疗",
-      "market": "创业板",
+      "code": "300502",
+      "name": "新易盛",
+      "market": "sz",
       "board": "创业板",
       "status": "near",
-      "total_score": 60,
+      "total_score": 30.0,
       "quality_grade": "A",
-      "industry": "专用设备制造业",
+      "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "专用设备制造业"
+        "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 0,
-      "enter_date": "2026-08-10",
-      "hold_days": 3,
-      "consecutive_days": 2,
-      "first_close": 0,
-      "current_close": null,
-      "pnl_pct": null,
+      "enter_date": "2026-08-16",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 448.08,
+      "current_close": 448.08,
+      "pnl_pct": 0.0,
       "catalysts": []
     },
     {
-      "code": "600519",
-      "name": "贵州茅台",
-      "market": "沪市",
-      "board": "主板",
-      "status": "near",
-      "total_score": 60,
-      "quality_grade": "A",
-      "industry": "酒、饮料和精制茶制造业",
-      "sectors": [
-        "酒、饮料和精制茶制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-10",
-      "hold_days": 3,
-      "consecutive_days": 2,
-      "first_close": 0,
-      "current_close": null,
-      "pnl_pct": null,
-      "catalysts": []
-    },
-    {
-      "code": "000807",
-      "name": "云铝股份",
+      "code": "002916",
+      "name": "深南电路",
       "market": "深市",
       "board": "主板",
       "status": "near",
       "total_score": 20,
       "quality_grade": "A",
-      "industry": "有色金属冶炼和压延加工业",
+      "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "有色金属冶炼和压延加工业"
+        "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 0,
-      "enter_date": "2026-08-14",
-      "hold_days": 2,
-      "consecutive_days": 2,
+      "enter_date": "2026-08-16",
+      "hold_days": 1,
+      "consecutive_days": 1,
       "first_close": 0,
       "current_close": null,
       "pnl_pct": null,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "—"
-        }
-      ]
-    }
-  ],
-  "alerts": [
-    {
-      "level": "warn",
-      "code": "300613",
-      "name": "",
-      "text": "(300613) 于 2026-08-10 跌出共识（曾连续 1 日）"
+      "catalysts": []
     },
     {
-      "level": "warn",
-      "code": "688183",
-      "name": "生益电子",
-      "text": "生益电子(688183) 于 2026-08-13 跌出共识（曾连续 1 日）"
+      "code": "300274",
+      "name": "阳光电源",
+      "market": "创业板",
+      "board": "创业板",
+      "status": "near",
+      "total_score": 20,
+      "quality_grade": "A",
+      "industry": "电气机械和器材制造业",
+      "sectors": [
+        "电气机械和器材制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-16",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 0,
+      "current_close": null,
+      "pnl_pct": null,
+      "catalysts": []
     },
     {
-      "level": "warn",
-      "code": "300476",
-      "name": "",
-      "text": "(300476) 于 2026-08-10 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "warn",
-      "code": "688266",
-      "name": "",
-      "text": "(688266) 于 2026-08-10 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "warn",
-      "code": "300972",
-      "name": "",
-      "text": "(300972) 于 2026-08-10 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "warn",
-      "code": "300308",
-      "name": "",
-      "text": "(300308) 于 2026-08-10 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "warn",
-      "code": "01209",
-      "name": "华润万象生活",
-      "text": "华润万象生活(01209) 于 2026-08-11 跌出共识（曾连续 2 日）"
-    },
-    {
-      "level": "warn",
-      "code": "00883",
-      "name": "中国海洋石油",
-      "text": "中国海洋石油(00883) 于 2026-08-11 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "warn",
       "code": "688331",
       "name": "荣昌生物",
-      "text": "荣昌生物(688331) 于 2026-08-14 跌出共识（曾连续 2 日）"
+      "market": "科创板",
+      "board": "科创板",
+      "status": "near",
+      "total_score": 20,
+      "quality_grade": "A",
+      "industry": "医药制造业",
+      "sectors": [
+        "医药制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-16",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 0,
+      "current_close": null,
+      "pnl_pct": null,
+      "catalysts": []
+    },
+    {
+      "code": "300857",
+      "name": "协创数据",
+      "market": "创业板",
+      "board": "创业板",
+      "status": "near",
+      "total_score": 20,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-16",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 0,
+      "current_close": null,
+      "pnl_pct": null,
+      "catalysts": []
+    },
+    {
+      "code": "300476",
+      "name": "胜宏科技",
+      "market": "创业板",
+      "board": "创业板",
+      "status": "near",
+      "total_score": 20,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-16",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 0,
+      "current_close": null,
+      "pnl_pct": null,
+      "catalysts": []
     }
   ],
+  "alerts": [],
   "sector_cluster": {
     "by_industry": [
       {
         "industry": "有色金属矿采选业",
         "count": 5,
         "names": [
-          "紫金矿业",
           "洛阳钼业",
+          "紫金矿业",
           "中国食品",
           "西部矿业",
           "山金国际"
+        ]
+      },
+      {
+        "industry": "计算机、通信和其他电子设备制造业",
+        "count": 4,
+        "names": [
+          "新易盛",
+          "深南电路",
+          "协创数据",
+          "胜宏科技"
         ]
       },
       {
@@ -315,24 +291,17 @@
         ]
       },
       {
-        "industry": "专用设备制造业",
+        "industry": "电气机械和器材制造业",
         "count": 1,
         "names": [
-          "迈瑞医疗"
+          "阳光电源"
         ]
       },
       {
-        "industry": "酒、饮料和精制茶制造业",
+        "industry": "医药制造业",
         "count": 1,
         "names": [
-          "贵州茅台"
-        ]
-      },
-      {
-        "industry": "有色金属冶炼和压延加工业",
-        "count": 1,
-        "names": [
-          "云铝股份"
+          "荣昌生物"
         ]
       }
     ],
@@ -342,26 +311,26 @@
         "count": 5
       },
       {
+        "sector": "计算机、通信和其他电子设备制造业",
+        "count": 4
+      },
+      {
         "sector": "软件和信息技术服务业",
         "count": 1
       },
       {
-        "sector": "专用设备制造业",
+        "sector": "电气机械和器材制造业",
         "count": 1
       },
       {
-        "sector": "酒、饮料和精制茶制造业",
-        "count": 1
-      },
-      {
-        "sector": "有色金属冶炼和压延加工业",
+        "sector": "医药制造业",
         "count": 1
       }
     ],
-    "concentration": 55.56
+    "concentration": 41.67
   },
   "overlap": {
-    "total_tracked": 9,
+    "total_tracked": 12,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
@@ -374,8 +343,14 @@
     },
     "cockpit_b": {
       "count": 15,
-      "overlap": 0,
-      "names": []
+      "overlap": 5,
+      "names": [
+        "深南电路",
+        "阳光电源",
+        "荣昌生物",
+        "协创数据",
+        "胜宏科技"
+      ]
     }
   },
   "backtest_signal": {
@@ -495,18 +470,18 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-08-15",
-    "history_days": 7,
+    "track_start": "2026-08-16",
+    "history_days": 1,
     "summary": {
       "1d": {
-        "count": 5,
-        "win_rate": 0.0,
-        "avg_return": -0.17
+        "count": 0,
+        "win_rate": null,
+        "avg_return": null
       },
       "3d": {
-        "count": 1,
-        "win_rate": 100.0,
-        "avg_return": 6.87
+        "count": 0,
+        "win_rate": null,
+        "avg_return": null
       },
       "5d": {
         "count": 0,
@@ -524,55 +499,6 @@
         "avg_return": null
       }
     },
-    "per_stock": [
-      {
-        "code": "688183",
-        "name": "生益电子",
-        "enter_date": "2026-08-10",
-        "offsets": {
-          "3d": 6.87
-        }
-      },
-      {
-        "code": "01209",
-        "name": "华润万象生活",
-        "enter_date": "2026-08-10",
-        "offsets": {
-          "1d": -0.85
-        }
-      },
-      {
-        "code": "601899",
-        "name": "紫金矿业",
-        "enter_date": "2026-08-13",
-        "offsets": {
-          "1d": 0.0
-        }
-      },
-      {
-        "code": "603993",
-        "name": "洛阳钼业",
-        "enter_date": "2026-08-13",
-        "offsets": {
-          "1d": 0.0
-        }
-      },
-      {
-        "code": "688331",
-        "name": "荣昌生物",
-        "enter_date": "2026-08-13",
-        "offsets": {
-          "1d": 0.0
-        }
-      },
-      {
-        "code": "601168",
-        "name": "西部矿业",
-        "enter_date": "2026-08-13",
-        "offsets": {
-          "1d": 0.0
-        }
-      }
-    ]
+    "per_stock": []
   }
 }

@@ -1,11 +1,13 @@
 {
-  "update_time": "2026-08-15 21:32:52",
+  "update_time": "2026-08-16 15:28:22",
   "data_date": "2026-08-15",
-  "source": "双通道: MACRO_DATA(gold/silver/copper/oil) + westock-mcp期货(LME/NYMEX/CBOT共11个)",
+  "source": "三通道: MACRO_DATA(gold/silver/copper/oil) + westock-mcp国际期货(LME/NYMEX/CBOT共11个) + eastmoney-push2国内期货(GFEX碳酸锂+ZCE纯碱)",
   "hot_count": 10,
   "available_count": 15,
-  "total_commodities": 20,
+  "total_commodities": 18,
   "hot_threshold_pct": 3.0,
+  "hot_zscore": 2.0,
+  "zscore_enabled_count": 0,
   "commodities": [
     {
       "key": "tin",
@@ -21,6 +23,10 @@
       "dev_pct": 69.66,
       "is_hot": true,
       "hot_basis": "参考基准=近期均值参考(非实时历史)",
+      "z_score": null,
+      "ma30": null,
+      "std30": null,
+      "use_zscore": false,
       "stocks": [
         {
           "code": "000960",
@@ -52,6 +58,10 @@
       "dev_pct": 27.3,
       "is_hot": true,
       "hot_basis": "参考基准=近期均值参考(非实时历史)",
+      "z_score": null,
+      "ma30": null,
+      "std30": null,
+      "use_zscore": false,
       "stocks": [
         {
           "code": "000807",
@@ -97,6 +107,10 @@
       "dev_pct": 14.83,
       "is_hot": true,
       "hot_basis": "参考基准=近期均值参考(非实时历史)",
+      "z_score": null,
+      "ma30": null,
+      "std30": null,
+      "use_zscore": false,
       "stocks": [
         {
           "code": "002385",
@@ -128,6 +142,10 @@
       "dev_pct": 10.99,
       "is_hot": true,
       "hot_basis": "参考基准=近期均值参考(非实时历史)",
+      "z_score": null,
+      "ma30": null,
+      "std30": null,
+      "use_zscore": false,
       "stocks": [
         {
           "code": "601020",
@@ -173,6 +191,10 @@
       "dev_pct": 8.25,
       "is_hot": true,
       "hot_basis": "参考基准=近期均值参考(非实时历史)",
+      "z_score": null,
+      "ma30": null,
+      "std30": null,
+      "use_zscore": false,
       "stocks": [
         {
           "code": "000630",
@@ -225,6 +247,10 @@
       "dev_pct": 7.54,
       "is_hot": true,
       "hot_basis": "参考基准=近期均值参考(非实时历史)",
+      "z_score": null,
+      "ma30": null,
+      "std30": null,
+      "use_zscore": false,
       "stocks": [
         {
           "code": "600497",
@@ -270,6 +296,10 @@
       "dev_pct": 5.16,
       "is_hot": true,
       "hot_basis": "参考基准=近期均值参考(非实时历史)",
+      "z_score": null,
+      "ma30": null,
+      "std30": null,
+      "use_zscore": false,
       "stocks": [
         {
           "code": "002385",
@@ -308,6 +338,10 @@
       "dev_pct": 5.04,
       "is_hot": true,
       "hot_basis": "参考基准=近期均值参考(非实时历史)",
+      "z_score": null,
+      "ma30": null,
+      "std30": null,
+      "use_zscore": false,
       "stocks": [
         {
           "code": "600938",
@@ -353,6 +387,10 @@
       "dev_pct": 4.34,
       "is_hot": true,
       "hot_basis": "参考基准=近期均值参考(非实时历史)",
+      "z_score": null,
+      "ma30": null,
+      "std30": null,
+      "use_zscore": false,
       "stocks": [
         {
           "code": "600988",
@@ -405,6 +443,10 @@
       "dev_pct": 3.59,
       "is_hot": true,
       "hot_basis": "参考基准=近期均值参考(非实时历史)",
+      "z_score": null,
+      "ma30": null,
+      "std30": null,
+      "use_zscore": false,
       "stocks": [
         {
           "code": "000876",
@@ -443,6 +485,10 @@
       "dev_pct": 0.39,
       "is_hot": false,
       "hot_basis": "参考基准=近期均值参考(非实时历史)",
+      "z_score": null,
+      "ma30": null,
+      "std30": null,
+      "use_zscore": false,
       "stocks": [
         {
           "code": "600459",
@@ -481,6 +527,10 @@
       "dev_pct": -1.11,
       "is_hot": false,
       "hot_basis": "参考基准=近期均值参考(非实时历史)",
+      "z_score": null,
+      "ma30": null,
+      "std30": null,
+      "use_zscore": false,
       "stocks": [
         {
           "code": "601168",
@@ -526,6 +576,10 @@
       "dev_pct": -5.96,
       "is_hot": false,
       "hot_basis": "参考基准=近期均值参考(非实时历史)",
+      "z_score": null,
+      "ma30": null,
+      "std30": null,
+      "use_zscore": false,
       "stocks": [
         {
           "code": "002340",
@@ -564,6 +618,10 @@
       "dev_pct": -9.73,
       "is_hot": false,
       "hot_basis": "参考基准=近期均值参考(非实时历史)",
+      "z_score": null,
+      "ma30": null,
+      "std30": null,
+      "use_zscore": false,
       "stocks": [
         {
           "code": "000603",
@@ -595,6 +653,10 @@
       "dev_pct": -22.43,
       "is_hot": false,
       "hot_basis": "参考基准=近期均值参考(非实时历史)",
+      "z_score": null,
+      "ma30": null,
+      "std30": null,
+      "use_zscore": false,
       "stocks": [
         {
           "code": "601857",
@@ -629,68 +691,10 @@
   ],
   "unavailable": [
     {
-      "key": "lithium",
-      "name": "锂(碳酸锂)",
-      "available": false,
-      "reason": "国内期货/现货品种，westock-mcp 仅覆盖国际品种（COMEX/LME/NYMEX/CBOT）。需接入万得/同花顺期货接口。",
-      "stocks": [
-        {
-          "code": "002466",
-          "name": "天齐锂业",
-          "business_pct": 0.75,
-          "note": "锂矿+锂盐"
-        },
-        {
-          "code": "002460",
-          "name": "赣锋锂业",
-          "business_pct": 0.8,
-          "note": "全产业链"
-        },
-        {
-          "code": "000792",
-          "name": "盐湖股份",
-          "business_pct": 0.55,
-          "note": "盐湖提锂"
-        },
-        {
-          "code": "000408",
-          "name": "藏格矿业",
-          "business_pct": 0.45,
-          "note": "钾锂双驱"
-        }
-      ]
-    },
-    {
-      "key": "soda_ash",
-      "name": "纯碱",
-      "available": false,
-      "reason": "国内期货/现货品种，westock-mcp 仅覆盖国际品种（COMEX/LME/NYMEX/CBOT）。需接入万得/同花顺期货接口。",
-      "stocks": [
-        {
-          "code": "000683",
-          "name": "远兴能源",
-          "business_pct": 0.85,
-          "note": "天然碱低成本"
-        },
-        {
-          "code": "000822",
-          "name": "山东海化",
-          "business_pct": 0.75,
-          "note": "纯碱+小苏打"
-        },
-        {
-          "code": "000707",
-          "name": "双环科技",
-          "business_pct": 0.9,
-          "note": "联碱法"
-        }
-      ]
-    },
-    {
       "key": "phosphate",
       "name": "磷化工",
       "available": false,
-      "reason": "国内期货/现货品种，westock-mcp 仅覆盖国际品种（COMEX/LME/NYMEX/CBOT）。需接入万得/同花顺期货接口。",
+      "reason": "磷化工为现货景气指数（非标准化期货合约），无免费实时API。数据源为SMM上海有色/百川盈孚等付费指数。如需接入可考虑：①用相关A股板块指数代理 ②接入付费数据源。",
       "stocks": [
         {
           "code": "600096",
@@ -716,7 +720,7 @@
       "key": "vitamin",
       "name": "维生素",
       "available": false,
-      "reason": "国内期货/现货品种，westock-mcp 仅覆盖国际品种（COMEX/LME/NYMEX/CBOT）。需接入万得/同花顺期货接口。",
+      "reason": "维生素为现货景气指数（非标准化期货合约），无免费实时API。数据源为SMM上海有色/百川盈孚等付费指数。如需接入可考虑：①用相关A股板块指数代理 ②接入付费数据源。",
       "stocks": [
         {
           "code": "002001",
@@ -742,7 +746,7 @@
       "key": "rare_earth",
       "name": "稀土",
       "available": false,
-      "reason": "国内期货/现货品种，westock-mcp 仅覆盖国际品种（COMEX/LME/NYMEX/CBOT）。需接入万得/同花顺期货接口。",
+      "reason": "稀土为现货景气指数（非标准化期货合约），无免费实时API。数据源为SMM上海有色/百川盈孚等付费指数。如需接入可考虑：①用相关A股板块指数代理 ②接入付费数据源。",
       "stocks": [
         {
           "code": "600111",
@@ -765,5 +769,5 @@
       ]
     }
   ],
-  "note": "涨价窗口：有实时价的商品相对参考基准涨幅 ≥ 3.0%。弹性系数 = 偏离度 × 业务占比 × 杠杆 1.5（简化估算）。已接入 15 个国际品种（贵金属4 + 基本金属6 + 能源2 + 农产品3），数据源：MACRO_DATA + westock-mcp 期货实时行情。未接入 5 个国内品种（锂(碳酸锂)、纯碱、磷化工、维生素、稀土），原因：均为国内期货/现货，需万得/同花顺等国内数据源。基准为近期均值参考值（非实时 30 日均线），待后续升级为真实历史序列。"
+  "note": "涨价窗口：有实时价的商品相对参考基准涨幅 ≥ 3.0% (或 |z-score| ≥ 2.0)。弹性系数 = 偏离度 × 业务占比 × 杠杆 1.5（简化估算）。已接入 15 个品种（贵金属4 + 基本金属6 + 能源2 + 农产品3 + 国内期货2），其中 0 个已启用30日滚动z-score真实基准。数据源：MACRO_DATA + westock-mcp期货 + eastmoney push2国内期货。未接入 3 个现货指数品种（磷化工、维生素、稀土）。基准升级（2026-08-16）：静态均值 → 30日滚动z-score（μ±σ），积累满10日自动切换，不足日回退静态兜底。"
 }
