@@ -67,5 +67,70 @@
    }
   ],
   "fail_items": []
+ },
+ {
+  "date": "2026-08-16",
+  "time": "14:46:02",
+  "overall": "warn",
+  "summary": {
+   "ok": 47,
+   "warn": 9,
+   "fail": 1,
+   "total": 57
+  },
+  "warn_items": [
+   {
+    "id": "dom_taskScheduleBody",
+    "name": "DOM #taskScheduleBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttBackBody",
+    "name": "DOM #ttBackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttThrBody",
+    "name": "DOM #ttThrBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttSvlBody",
+    "name": "DOM #ttSvlBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttTrackBody",
+    "name": "DOM #ttTrackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsAdvBody",
+    "name": "DOM #stcrdsAdvBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsEliteBody",
+    "name": "DOM #stcrdsEliteBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_healthCheckBody",
+    "name": "DOM #healthCheckBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "final_enter_stale",
+    "name": "最终推荐入选日期",
+    "message": "最新 enter_date 2026-08-11 早于最近交易日 2026-08-14，最终推荐数据陈旧"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "dom_phMacroBody",
+    "name": "DOM #phMacroBody",
+    "message": "未找到元素"
+   }
+  ]
  }
 ]
