@@ -92,34 +92,14 @@ jobs:
           fetch-depth: 1
           clean: false
 
-      - name: "🐍 配置 Python（本机 Python 3.12，避免 actions/setup-python 从 github.com 下载超时）"
-        run: |
-          # 2026-08-15 根因修复：alimi-cn 自托管 runner 无法从 github.com 下载 Python 安装包
-          # （setup-python 的缓存未命中时会去 actions/python-versions 下载，连接超时导致整链失败）。
-          # 改用本机已安装的 Python 3.12，直接注入 PATH，不依赖网络下载。
-          PY_CANDIDATES=(
-            "/c/Users/HH20210606/AppData/Local/Programs/Python/Python312/python.exe"
-            "C:/Users/HH20210606/AppData/Local/Programs/Python/Python312/python.exe"
-          )
-          PYTHON_EXE=""
-          for p in "${PY_CANDIDATES[@]}"; do
-            if [ -x "$p" ]; then
-              PYTHON_EXE="$p"
-              break
-            fi
-          done
-          if [ -z "$PYTHON_EXE" ]; then
-            echo "::error::未找到本机 Python 3.12，候选路径: ${PY_CANDIDATES[*]}"
-            exit 1
-          fi
-          echo "PYTHON_EXE=$PYTHON_EXE"
-          "$PYTHON_EXE" --version
-          "$PYTHON_EXE" -m pip --version
-          # 暴露给后续 step
-          PY_DIR=$(dirname "$PYTHON_EXE")
-          echo "$PY_DIR" >> "$GITHUB_PATH"
-          echo "$PY_DIR/Scripts" >> "$GITHUB_PATH"
-          echo "PYTHON=$PYTHON_EXE" >> "$GITHUB_ENV"
+      # 🔴 2026-08-16 根治：原「硬编码 Python 3.12 路径」探测在 alimi-cn runner 上找不到
+      #   → 整条算法链在第一步就 exit 1（连续 5 次 failure，大牛股猎手/RPS/四量终极等全部停更）。
+      #   数据抓取链 v8_cn_fetch_cloud.yml 早已改回 actions/setup-python@v5 + 3.13 且稳定成功，
+      #   证明 setup-python 在当前 cn runner 上可用（旧「无法下载」注释已过时）。直接对齐之。
+      - name: "🐍 配置 Python (setup-python 3.13)"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
 
       # 🔴 2026-08-12 第173轮根因修复：本步骤原先「只用清华镜像 + || true 吞失败」，
       #   GitHub 云端 runner 是境外 IP，访问清华镜像会间歇性拿到**空索引**：
@@ -147,7 +127,7 @@ jobs:
                      "https://mirrors.aliyun.com/pypi/simple"; do
             for TRY in 1 2; do
               echo "=== pip install core [index=$IDX try=$TRY] ==="
-              if pip install -q --retries 3 --timeout 60 -i "$IDX" $CORE; then
+              if python -m pip install -q --retries 3 --timeout 60 -i "$IDX" $CORE; then
                 if python -c "import akshare, pandas, numpy, requests"; then
                   echo "core deps OK via $IDX (try=$TRY)"
                   ok=1
