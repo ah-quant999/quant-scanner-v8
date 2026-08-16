@@ -144,6 +144,16 @@ jobs:
             #   二者都已中性化 republish_time 后取 sha1 前 10 位，与独立 reconcile 完全一致。
             #   —— 此处不再跑 reconcile_cache_busters.py（单提交构建里它无法同时正确，会 clobber）。
             python update_v8.py --detect-changes
+            # ★★ 2026-08-16 根治「逻辑详解页 v6备忘录 一直打不开」★★
+            #   根因：上面第 85 行的 guard_v6_memo.py 已正确把 index.html 的
+            #   iframe 戳改成 sha10(v6_memo.html)，但紧接着的 `git reset --hard FETCH_HEAD`
+            #   把该修正整个擦回远端旧值；而 update_v8.py 只重算 data/*.js 的 ?v、
+            #   完全不碰 v6_memo.html 的戳 → 提交出去的 v6 戳永远停在远端旧值，
+            #   浏览器/CDN 便一直按旧 URL 吐早已作废的旧副本 → 页面空白。
+            #   （独立 reconcile workflow 的正则只匹配 data/[A-Z0-9_]+\.js，也不覆盖 v6_memo，
+            #    故此戳无任何自愈网 —— 必须在 reset 之后重跑 guard 才能对齐。）
+            #   修复：reset 之后重新执行 guard，使 v6 戳与实际落库内容严格一致。
+            python guard_v6_memo.py
             git add -f data/ index.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py
             if git diff --cached --quiet; then
               echo "ℹ️ 无数据变化，跳过部署（远端已是最新构建）"
@@ -157,5 +167,8 @@ jobs:
             git fetch "$REPO" main
             git reset --hard FETCH_HEAD
             python update_v8.py --detect-changes
+            # ★ 同上：reset 已擦掉 v6 戳修正，重试路径也必须重跑 guard 对齐（否则重试成功的
+            #   那一趟提交仍带旧 v6 戳，v6备忘录继续打不开）。
+            python guard_v6_memo.py
           done
           echo "❌ 3 次重试后仍失败"; exit 1
