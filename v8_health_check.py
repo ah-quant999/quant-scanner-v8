@@ -21,7 +21,7 @@ import subprocess
 import sys
 import urllib.request
 import urllib.error
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, date
 from pathlib import Path
 
 # 夜间静音时段（北京时间）：22:00-07:00 不发邮件，避免打扰休息。
@@ -1446,14 +1446,25 @@ def check_a_share_coverage():
             stocks = stocks_raw or []
         total = len(stocks)
         if total == 0:
-            # 0 只本身可能是弱市真实状态（不强告警），但要标注提示
-            results.append({
-                "id": f"a_share_{var.lower()}", "name": f"{name} A股覆盖",
-                "page": "内容审计", "heal_cat": heal,
-                "status": "warn",
-                "message": f"⚠️ {name} 今日 0 只（弱市真实状态可接受，但若其他池也 0 则排查上游；"
-                          f"若此池独立为 0 而其他池正常则不报警）"
-            })
+            # 2026-08-16 一劳永逸修复：非交易日算法链不运行→stocks=0 是正常现象，不应亮黄灯。
+            # 仅在交易日+总数=0 时才报 warn（弱市/上游故障需排查）。
+            today_is_trade = _is_trading_day(date.today())
+            if not today_is_trade:
+                results.append({
+                    "id": f"a_share_{var.lower()}", "name": f"{name} A股覆盖",
+                    "page": "内容审计", "heal_cat": heal,
+                    "status": "ok",
+                    "message": f"{name} 今日 0 只（非交易日，算法链未运行，属正常现象）"
+                })
+            else:
+                # 交易日但 0 只：弱市真实状态或上游故障
+                results.append({
+                    "id": f"a_share_{var.lower()}", "name": f"{name} A股覆盖",
+                    "page": "内容审计", "heal_cat": heal,
+                    "status": "warn",
+                    "message": f"⚠️ {name} 今日 0 只（交易日无数据，可能弱市或上游故障；"
+                              f"若其他池也 0 则排查上游；若此池独立为 0 而其他池正常则不报警）"
+                })
             continue
         a_cnt = sum(1 for s in stocks if _is_a_share(s))
         hk_cnt = total - a_cnt
