@@ -805,6 +805,76 @@ table td, table th, table tr { color: #333 !important; }
       </div>
     </div>
 
+    <!-- 7.6 个股动量状态（暂未上架区 · 2026-08-16 新增） -->
+    <div style="margin-bottom:16px;">
+      <h4 style="margin:0 0 10px;font-size:14px;color:#a855f7;border-left:4px solid #a855f7;padding-left:8px;">🚀 7.6 个股动量状态（sec-st 暂未上架 · OCR 实验卡）</h4>
+
+      <div style="padding:10px 14px;background:#faf5ff;border-radius:8px;margin-bottom:12px;">
+        <b style="display:block;margin-bottom:6px;color:#a855f7;">📌 定位</b>
+        <p style="margin:0;line-height:1.7;font-size:11.5px;">
+        每日盘后选股 PDF（甲午月/乙未月共39天）经 OCR 抽取后的结构化展示。
+        覆盖 6 个动量分类：短线选股 / 反弹 / 反弹01 / 超跌反弹 / 加速 / 强势。
+        核心信号：<b>跨分类共识</b>——同一天被 ≥2 个分类同时推荐的股票。
+        </p>
+      </div>
+
+      <div style="padding:10px 14px;background:#f5f3ff;border-radius:8px;margin-bottom:12px;">
+        <b style="display:block;margin-bottom:6px;color:#a855f7;">📊 数据源</b>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <thead>
+            <tr style="background:#ede9fe;color:#1a1a2e;">
+              <th style="text-align:left;padding:5px 8px;border:1px solid #d8d0f0;">数据源</th>
+              <th style="text-align:center;padding:5px 8px;border:1px solid #d8d0f0;">格式</th>
+              <th style="text-align:left;padding:5px 8px;border:1px solid #d8d0f0;">内容</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="padding:5px 8px;border:1px solid #ddd;">选股PDF</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">图片表格</td><td style="padding:5px 8px;border:1px solid #ddd;">每日6类×10只=约60只股票（代码/名称/涨跌幅）</td></tr>
+            <tr style="background:#fff;"><td style="padding:5px 8px;border:1px solid #ddd;">文本层</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">纯文本</td><td style="padding:5px 8px;border:1px solid #ddd;">分类标签 + 跨分类共识清单（仅部分日期有）</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid #ddd;">OCR引擎</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">ddddocr</td><td style="padding:5px 8px;border:1px solid #ddd;">230张图片批量抽取→stock_picks_structured.json</td></tr>
+            <tr style="background:#fff;"><td style="padding:5px 8px;border:1px solid #ddd;">回测行情</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">westock-mcp K线</td><td style="padding:5px 8px;border:1px solid #ddd;">前复权日K → T+1/T+3/T+5 收益计算</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="padding:10px 14px;background:#fef3f2;border-radius:8px;margin-bottom:12px;">
+        <b style="display:block;margin-bottom:6px;color:#dc2626;">⚠️ POC 回测结果（2026-06-10 单日 · 非最终结论）</b>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <thead>
+            <tr style="background:#fecaca;color:#1a1a2e;">
+              <th style="text-align:left;padding:5px 8px;border:1px solid #fcd0c0;">周期</th>
+              <th style="text-align:center;padding:5px 8px;border:1px solid #fcd0c0;">★共识(6只)</th>
+              <th style="text-align:center;padding:5px 8px;border:1px solid #fcd0c0;">☆非共识(21只)</th>
+              <th style="text-align:center;padding:5px 8px;border:1px solid #fcd0c0;">Alpha</th>
+              <th style="text-align:center;padding:5px 8px;border:1px solid #fcd0c0;">胜率差</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="padding:5px 8px;border:1px solid #ddd;">T+1</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;color:var(--up);">+0.75%</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">+0.15%</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;"><b>+0.60%</b></td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">50% vs 48%</td></tr>
+            <tr style="background:#fff;"><td style="padding:5px 8px;border:1px solid #ddd;">T+3</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;color:var(--up);">+6.70%</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">+2.11%</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;"><b style="color:#dc2626;">+4.59%</b></td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">67% vs 62%</td></tr>
+            <tr><td style="padding:5px 8px;border:1px solid #ddd;">T+5</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;color:var(--up);font-weight:700;">+17.97%</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">+1.70%</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;"><b style="color:#dc2626;font-size:13px;">+16.27%</b></td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;"><b>83% vs 48%</b></td></tr>
+          </tbody>
+        </table>
+        <span style="font-size:10.5px;color:#666;display:block;margin-top:6px;">
+        ⚠️ 仅1天样本(27只票)，统计显著性有限。需39天全量OCR完成后验证是否系统性Alpha。
+        TOP3共识贡献者：达瑞电子(+32.4%) / 聚石化学(+29.9%) / 雅克科技(+20.7%)。
+        </span>
+      </div>
+
+      <div style="padding:10px 14px;background:#ecfdf5;border-radius:8px;">
+        <b style="display:block;margin-bottom:6px;color:#059669;">✅ 落地三步状态</b>
+        <ol style="margin:0;padding-left:18px;font-size:11.5px;line-height:1.8;">
+          <li><b>OCR抽取</b>: ✅ POC完成(1天手动) / ⏳ 全量39天等待ddddocr安装后批量跑</li>
+          <li><b>回测验证</b>: ✅ POC通过(T+5 Alpha +16.27%) / ⏳ 全量39天待OCR完成后自动跑</li>
+          <li><b>前端集成</b>: ✅ 卡片已加入renderUnlisted(sec-st) + STOCK_MOMENTUM_STATE.js种子数据已创建</li>
+        </ol>
+        <span style="font-size:10.5px;color:#666;display:block;margin-top:6px;">
+        当前状态：<b>暂不进推荐</b>（纯观测），等全量回测确认后再决定是否提升到正式推荐。
+        数据文件：data/STOCK_MOMENTUM_STATE.js（当前为POC种子数据，全量OCR后替换）
+        </span>
+      </div>
+    </div>
+
     <!-- 八、CRDS 逆势龙头评分（暂未上架区） -->
     <div style="margin-bottom:16px;">
       <h4 style="margin:0 0 10px;font-size:14px;color:#3C3489;border-left:4px solid #3C3489;padding-left:8px;">📊 CRDS 逆势龙头评分（暂未上架区）</h4>
