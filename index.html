@@ -1245,8 +1245,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/SENTIMENT_CYCLE.js?v=ef0f48a631" defer></script>
     <script src="data/POTENTIAL_PICKS.js?v=69f74f1700" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE.js?v=040b757ece" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=bce26fdb14" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=cf763c9b96" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=78434bce87" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=fd1814c867" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -10267,7 +10267,7 @@ function drawUpDownChart(){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=bce26fdb14';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=78434bce87';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
