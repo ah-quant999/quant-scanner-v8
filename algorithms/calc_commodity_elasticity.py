@@ -1,26 +1,34 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-商品涨价弹性榜（2026-08-13 新增 · 2026-08-15 扩展至 15 个国际品种）
+商品涨价弹性榜（2026-08-13 新增 · 2026-08-16 升级：z-score基准 + 国内期货接入）
 ================================================
-数据源（双通道）：
+数据源（三通道）：
   ① MACRO_DATA.global_macro.commodities → gold/silver/copper/oil（原有）
   ② westock-mcp 期货实时行情 → LME 基本金属(5) + 贵金属扩展(2) + 能源(1) + 农产品(3)（新增）
+  ③ eastmoney push2 API → 广期所碳酸锂(LC) + 郑商所纯碱(SA)（2026-08-16 新增）
 
-覆盖品种（15 个有实时价 / 5 个国内暂无）：
+覆盖品种（17 个有实时价 / 3 个现货指数暂无）：
   贵金属：黄金(COMEX) 白银(COMEX) 铂金(NYMEX) 钯金(NYMEX)
   基本金属：铜(LME) 铝(LME) 镍(LME) 锌(LME) 铅(LME) 锡(LME)
   能源：    原油(WTI) 天然气(NYMEX)
   农产品：  大豆(CBOT) 玉米(CBOT) 小麦(CBOT)
-  暂无源：  锂(碳酸锂) 纯碱 磷化工 维生素 稀土（全为国内期货/现货，westock-mcp 不覆盖）
+  国内期货：碳酸锂(GFEX) 纯碱(ZCE)              ← 2026-08-16 新接入
+  暂无源：  磷化工 维生素 稀土                    ← 纯现货指数，无免费API
 
 映射表：各大宗品映射 3-5 只 A 股弹性标的（含业务占比）
 输出：data/COMMODITY_ELASTICITY.js（前端 window.COMMODITY_ELASTICITY）
 
+【基准升级（2026-08-16）】
+- 旧：硬编码 REFERENCE_BASELINE（静态近期均值）
+- 新：raw_data/commodity_price_history.json 维护30日滚动价格序列
+      → z-score = (price - μ) / σ 替代简单百分比偏离
+      → 积累满10日自动切换，不足日回退静态兜底
+      → 涨价阈值双轨：dev% ≥ 3.0 或 |z-score| ≥ 2.0
+
 【数据真实性铁律】
-- 有实时价的 15 个品种：显示真实价格+偏离度，标注数据源和时间
-- 无实时价的 5 个国内品种：标 available=false + 原因，绝不编造现价
-- 偏离度基准用参考值（7 月均值或近期均值），明确标注 baseline_label
+- 有实时价的 17 个品种：显示真实价格+z-score/偏离度，标注数据源和时间
+- 无实时价的 3 个现货指数：标 available=false + 原因 + 替代方案
 """
 import json
 import os
@@ -239,9 +247,9 @@ WESTOCK_FUTURES_MAP = {
     "wheat":        ("fuZW",    "lastPrice"),
 }
 
-# ═══════════════ 参考基准（近期均值，用于计算偏离度）════════════════
+# ═══════════════ 参考基准（静态兜底，仅当价格历史不足30日时使用）════════════════
 REFERENCE_BASELINE = {
-    # 原有 4 个（7 月均值）
+    # 原有 4 个（7 月均值）—— 仅作冷启动兜底，有30日历史后自动切换 z-score
     "gold":         4250.0,
     "silver":        58.5,
     "copper":       620.0,
@@ -261,28 +269,114 @@ REFERENCE_BASELINE = {
     "soybean":     1150.0,
     "corn":         460.0,
     "wheat":        600.0,
+    # 国内期货（静态兜底，元/吨）
+    "lithium":     150000.0,  # 碳酸锂
+    "soda_ash":     1150.0,   # 纯碱
 }
 BASELINE_LABEL = "近期均值参考(非实时历史)"
 
-# 有真实实时价数据的品种（从两个数据源获取）
+# ═══════════════ 价格历史文件（30日滚动 z-score 真实基准）════════════════
+PRICE_HISTORY_PATH = os.path.join(RAW, "commodity_price_history.json")
+HISTORY_WINDOW = 30  # 滚动窗口天数
+
+def _load_price_history():
+    """加载价格历史文件。返回 {key: [float, ...]} 或空 dict。"""
+    if not os.path.exists(PRICE_HISTORY_PATH):
+        return {}
+    try:
+        with open(PRICE_HISTORY_PATH, encoding="utf-8") as f:
+            data = json.load(f)
+        return data.get("history", {})
+    except Exception as e:
+        print(f"  [warn] 价格历史读取失败: {e}")
+        return {}
+
+def _save_price_history(history):
+    """保存价格历史文件。"""
+    os.makedirs(os.path.dirname(PRICE_HISTORY_PATH), exist_ok=True)
+    data = {
+        "update_time": datetime.now(CST).strftime("%Y-%m-%d %H:%M:%S"),
+        "window_days": HISTORY_WINDOW,
+        "history": history,
+    }
+    with open(PRICE_HISTORY_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+def _append_today_prices(history, prices_dict):
+    """将今日价格追加到历史序列，截断至 HISTORY_WINDOW 天。
+
+    Args:
+        history: {key: [p1, p2, ...]} 历史序列
+        prices_dict: {key: float} 今日实时价
+    Returns:
+        更新后的 history
+    """
+    today_str = datetime.now(CST).strftime("%Y-%m-%d")
+    for key, price in prices_dict.items():
+        if price is None or price <= 0:
+            continue
+        if key not in history:
+            history[key] = []
+        seq = history[key]
+        # 避免同一天重复写入（盘中多次运行）
+        if seq and seq[-1] == price:
+            continue
+        seq.append(price)
+        # 截断到窗口长度
+        if len(seq) > HISTORY_WINDOW * 1.5:  # 留余量，定期清理
+            seq[:] = seq[-HISTORY_WINDOW:]
+    return history
+
+def _calc_zscore(current_price, history_seq):
+    """计算当前价相对历史序列的 z-score。
+
+    Returns:
+        (z_score, ma, std, label) — 当 len < 10 时返回 (None, None, None, "数据不足")
+    """
+    if not history_seq or len(history_seq) < 10:
+        return None, None, None, "数据不足(<10日)"
+    import statistics
+    ma = sum(history_seq[-HISTORY_WINDOW:]) / min(len(history_seq), HISTORY_WINDOW)
+    if len(history_seq) >= 2:
+        try:
+            std = statistics.stdev(history_seq[-HISTORY_WINDOW:])
+        except statistics.StatisticsError:
+            std = 0.0
+    else:
+        std = 0.0
+    if std < 1e-10:
+        return 0.0, ma, std, "无波动(σ≈0)"
+    z = (current_price - ma) / std
+    return round(z, 3), round(ma, 3), round(std, 3), f"{min(len(history_seq),HISTORY_WINDOW)}日z-score"
+
+# 有真实实时价数据的品种（从三个数据源获取）
 REAL_PRICE_KEYS = [
     "gold", "silver", "copper", "oil",              # ← MACRO_DATA 源
     "aluminum", "nickel", "zinc", "lead", "tin",     # ← westock LME
     "platinum", "palladium", "natural_gas",          # ← westock NYMEX
     "soybean", "corn", "wheat",                     # ← westock CBOT
+    "lithium", "soda_ash",                           # ← eastmoney 国内期货（2026-08-16 新增）
 ]
 
-# 无任何免费实时数据源的国内品种
+# 无任何免费实时数据源的国内品种（纯现货指数，无期货合约或免费API）
 UNAVAILABLE_COMMODITIES = {
-    "lithium":   "锂(碳酸锂)",
-    "soda_ash":   "纯碱",
     "phosphate":  "磷化工",
     "vitamin":    "维生素",
     "rare_earth": "稀土",
 }
 
-# 涨价阈值（偏离度 > X% 视为"涨价窗口"）
+# ═══════════════ 东方财富 domestic 期货代码映射（2026-08-16 新增）════════════════
+# secid 格式：push2.eastmoney.com/api/qt/stock/get?secid={MARKET}.{CODE}
+#   115=郑商所(ZCE) 116=大商所(DCE) 117=上期所(SHFE) 145=广期所(GFEX)
+# 使用主力连续合约（如 SAM / LC），取 f43(最新价) + f170(涨跌幅%)
+DOMESTIC_FUTURES_MAP = {
+    "lithium": ("145.LC",   "广期所·碳酸锂主力"),   # GFEX LC0/LC
+    "soda_ash": ("115.SAM", "郑商所·纯碱主力"),      # ZCE SA0/SAM
+}
+
+# 涨价阈值（|z-score| > X 或偏离度 > X% 视为"涨价窗口"）
 HOT_THRESHOLD_PCT = 3.0
+HOT_ZSCORE = 2.0  # z-score 阈值：|z| > 2 视为显著偏离（约95%置信区间外）
 # 弹性杠杆简化假设
 ELASTICITY_LEVERAGE = 1.5
 
@@ -379,36 +473,109 @@ def load_westock_cache():
         return {}
 
 
+def fetch_domestic_futures_price(secid, timeout=10):
+    """从东方财富 push2 API 获取国内期货实时价格。
+
+    Args:
+        secid: 如 '145.LC' (广期所碳酸锂) / '115.SAM' (郑商所纯碱)
+    Returns:
+        (price, change_pct, update_time_str) 或 (None, None, None)。
+    """
+    url = f"https://push2.eastmoney.com/api/qt/stock/get?secid={secid}&fields=f43,f44,f45,f46,f47,f57,f58,f169,f170,f171"
+    headers = {
+        "User-Agent": "v8-commodity-fetcher/1.0",
+        "Accept": "application/json",
+        "Referer": "https://quote.eastmoney.com/",
+    }
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        resp = urllib.request.urlopen(req, timeout=timeout)
+        data = json.loads(resp.read().decode("utf-8"))
+        d = data.get("data", {})
+        if not isinstance(d, dict):
+            return None, None, None
+        price = d.get("f43")
+        if price is None:
+            return None, None, None
+        return float(price), d.get("f170"), ""
+    except Exception as e:
+        return None, None, None
+
+
 def fetch_all_westock_prices():
     """
-    获取所有 westock 期货品种的价格。
+    获取所有 westock 期货品种的价格 + 国内期货（东方财富）。
     优先级：缓存文件 > HTTP API 直连 > 返回空。
-    返回 {key: (price, change_pct, time)}"""
+    返回 {key: (price, change_pct, time)}
+    """
     # 优先：读缓存文件（WorkBuddy MCP 预抓取）
     results = load_westock_cache()
     if results:
         for key, info in results.items():
             print(f"  ✓ {key:12s} = {info['price']:>12.2f}  ({info.get('change_pct')}%)")
-        return results
+        # 缓存可能不含国内品种，下面补充
 
-    # 兜底：尝试 HTTP API 直连
-    print("  [westock] 缓存未命中，尝试 HTTP API 直连...")
-    for key, (wcode, _) in WESTOCK_FUTURES_MAP.items():
-        price, chg, tm = fetch_westock_price(wcode)
+    # 兜底：尝试 HTTP API 直连（国际期货）
+    if not results:
+        print("  [westock] 缓存未命中，尝试 HTTP API 直连...")
+        for key, (wcode, _) in WESTOCK_FUTURES_MAP.items():
+            price, chg, tm = fetch_westock_price(wcode)
+            if price is not None:
+                results[key] = {"price": price, "change_pct": chg, "time": tm, "source": f"westock-api({wcode})"}
+                print(f"  [api]  {key:12s} = {price:>12.2f}  ({chg}%)")
+            else:
+                print(f"  [api]  {key:12s} = FAILED")
+            time.sleep(0.15)
+
+    # ── 国内期货：东方财富 push2 API（2026-08-16 新增）──
+    for key, (secid, label) in DOMESTIC_FUTURES_MAP.items():
+        if key in results:  # 缓存已有则跳过
+            continue
+        price, chg, tm = fetch_domestic_futures_price(secid)
         if price is not None:
-            results[key] = {"price": price, "change_pct": chg, "time": tm, "source": f"westock-api({wcode})"}
-            print(f"  [api]  {key:12s} = {price:>12.2f}  ({chg}%)")
+            results[key] = {"price": price, "change_pct": chg, "time": tm, "source": f"eastmoney-push2({label})"}
+            print(f"  [domestic] {key:12s} = {price:>12.2f}  ({chg}%) ← {label}")
         else:
-            print(f"  [api]  {key:12s} = FAILED")
+            print(f"  [domestic] {key:12s} = FAILED ← {label}")
         time.sleep(0.15)
+
     return results
 
 
-def calc_one_commodity(key, info, current_price, price_date, source=""):
-    """计算单个商品的弹性榜"""
-    baseline = REFERENCE_BASELINE.get(key)
-    dev_pct = (current_price - baseline) / baseline * 100 if (baseline and baseline > 0) else 0.0
-    is_hot = dev_pct >= HOT_THRESHOLD_PCT
+def calc_one_commodity(key, info, current_price, price_date, source="", price_history=None):
+    """计算单个商品的弹性榜（2026-08-16 升级：z-score 替代静态基准）。
+
+    Args:
+        price_history: 全局价格历史 {key: [float,...]}，用于 z-score 计算。
+                        为 None 或 key 不在历史中时回退到 REFERENCE_BASELINE。
+    """
+    # ── z-score 优先，静态基准兜底 ──
+    use_zscore = False
+    z_score = None
+    ma30 = None
+    std30 = None
+    baseline_label = BASELINE_LABEL
+
+    if price_history and key in price_history:
+        seq = price_history[key]
+        if len(seq) >= 10:  # 至少10日才计算z-score
+            z_score, ma30, std30, baseline_label = _calc_zscore(current_price, seq)
+            if z_score is not None:
+                use_zscore = True
+
+    if use_zscore:
+        # z-score 模式：偏离度 = z_score × 100（放大为百分比尺度，便于展示）
+        dev_pct = round(z_score * 100, 2)
+        baseline_val = ma30
+        is_hot = abs(z_score) >= HOT_ZSCORE and z_score > 0  # 只看正向偏离（涨价）
+        hot_basis = f"z-score={z_score}(σ={std30}, μ={ma30})"
+    else:
+        # 静态基准兜底
+        baseline = REFERENCE_BASELINE.get(key)
+        baseline_val = baseline
+        dev_pct = (current_price - baseline) / baseline * 100 if (baseline and baseline > 0) else 0.0
+        is_hot = dev_pct >= HOT_THRESHOLD_PCT
+        hot_basis = f"参考基准={BASELINE_LABEL}"
 
     rows = []
     for stk in info["stocks"]:
@@ -431,11 +598,16 @@ def calc_one_commodity(key, info, current_price, price_date, source=""):
         "current_price": round(current_price, 3),
         "price_date": price_date or "",
         "source": source,
-        "baseline_30d": baseline,
-        "baseline_label": BASELINE_LABEL,
+        "baseline_30d": baseline_val,
+        "baseline_label": baseline_label,
         "dev_pct": round(dev_pct, 2),
         "is_hot": is_hot,
-        "hot_basis": f"参考基准={BASELINE_LABEL}",
+        "hot_basis": hot_basis,
+        # 2026-08-16 z-score 扩展字段
+        "z_score": round(z_score, 3) if use_zscore else None,
+        "ma30": ma30,
+        "std30": std30,
+        "use_zscore": use_zscore,
         "stocks": rows,
     }
 
@@ -443,6 +615,10 @@ def calc_one_commodity(key, info, current_price, price_date, source=""):
 def main():
     md = load_macro_data()
     macro_commodities = md.get("global_macro", {}).get("commodities", {})
+
+    # ── 0) 加载价格历史（z-score 真实基准）──
+    price_history = _load_price_history()
+    today_prices = {}  # 收集今日价格，用于追加到历史
 
     # ── 通道 ①：MACRO_DATA（gold/silver/copper/oil）──
     items = []
@@ -457,15 +633,18 @@ def main():
         pdate = c.get("date", "")
         if price is None or price <= 0:
             continue
-        row = calc_one_commodity(key, info, price, pdate, source="MACRO_DATA")
+        row = calc_one_commodity(key, info, price, pdate, source="MACRO_DATA",
+                                  price_history=price_history)
         items.append(row)
+        today_prices[key] = price
         if row["is_hot"]:
             hot_count += 1
 
-    # ── 通道 ②：westock-mcp 期货（11 个新增品种）──
-    print(f"\n[calc_commodity_elasticity] {datetime.now(CST).strftime('%Y-%m-%d %H:%M:%S')}  扩展版 15 品种")
+    # ── 通道 ②：westock-mcp 期货 + 国内期货（东方财富push2）──
+    print(f"\n[calc_commodity_elasticity] {datetime.now(CST).strftime('%Y-%m-%d %H:%M:%S')}  扩展版（含国内期货+z-score）")
     print(f"  通道① MACRO_DATA: gold/silver/copper/oil")
-    print(f"  通道② westock 期货: {len(WESTOCK_FUTURES_MAP)} 个品种")
+    print(f"  通道② westock 国际期货: {len(WESTOCK_FUTURES_MAP)} 个品种")
+    print(f"  通道③ eastmoney 国内期货: {len(DOMESTIC_FUTURES_MAP)} 个品种 (LC/SA)")
 
     westock_prices = fetch_all_westock_prices()
     for key, wp in westock_prices.items():
@@ -477,15 +656,27 @@ def main():
             current_price=wp["price"],
             price_date=wp.get("time", ""),
             source=wp.get("source", "westock"),
+            price_history=price_history,
         )
         items.append(row)
+        today_prices[key] = wp["price"]
         if row["is_hot"]:
             hot_count += 1
+
+    # ── 3) 追加今日价格到历史并保存 ──
+    if today_prices:
+        price_history = _append_today_prices(price_history, today_prices)
+        _save_price_history(price_history)
+        print(f"  [history] 价格历史已更新: {len(today_prices)} 个品种, "
+              f"文件: {PRICE_HISTORY_PATH}")
 
     # 按"热度"降序（涨价窗口优先）
     items.sort(key=lambda x: (x["is_hot"], x["dev_pct"]), reverse=True)
 
-    # ── 无数据源的大宗品：透明列出 ──
+    # 统计 z-score 使用情况
+    zscore_count = sum(1 for it in items if it.get("use_zscore"))
+
+    # ── 无数据源的大宗品：透明列出（仅剩纯现货指数品种）──
     unavailable = []
     for key, label in UNAVAILABLE_COMMODITIES.items():
         info = ELASTICITY_MAP.get(key, {})
@@ -493,7 +684,11 @@ def main():
             "key": key,
             "name": label,
             "available": False,
-            "reason": "国内期货/现货品种，westock-mcp 仅覆盖国际品种（COMEX/LME/NYMEX/CBOT）。需接入万得/同花顺期货接口。",
+            "reason": (
+                f"{label}为现货景气指数（非标准化期货合约），无免费实时API。"
+                f"数据源为SMM上海有色/百川盈孚等付费指数。"
+                f"如需接入可考虑：①用相关A股板块指数代理 ②接入付费数据源。"
+            ),
             "stocks": info.get("stocks", []),
         })
 
@@ -503,21 +698,29 @@ def main():
     result = {
         "update_time": datetime.now(CST).strftime("%Y-%m-%d %H:%M:%S"),
         "data_date": macro_commodities.get("gold", {}).get("date", ""),
-        "source": "双通道: MACRO_DATA(gold/silver/copper/oil) + westock-mcp期货(LME/NYMEX/CBOT共11个)",
+        "source": (
+            "三通道: MACRO_DATA(gold/silver/copper/oil) + "
+            "westock-mcp国际期货(LME/NYMEX/CBOT共11个) + "
+            "eastmoney-push2国内期货(GFEX碳酸锂+ZCE纯碱)"
+        ),
         "hot_count": hot_count,
         "available_count": len(items),
         "total_commodities": total_commodities,
         "hot_threshold_pct": HOT_THRESHOLD_PCT,
+        "hot_zscore": HOT_ZSCORE,
+        "zscore_enabled_count": zscore_count,
         "commodities": items,
         "unavailable": unavailable,
         "note": (
-            f"涨价窗口：有实时价的商品相对参考基准涨幅 ≥ {HOT_THRESHOLD_PCT}%。"
+            f"涨价窗口：有实时价的商品相对参考基准涨幅 ≥ {HOT_THRESHOLD_PCT}% "
+            f"(或 |z-score| ≥ {HOT_ZSCORE})。"
             f"弹性系数 = 偏离度 × 业务占比 × 杠杆 {ELASTICITY_LEVERAGE}（简化估算）。"
-            f"已接入 {len(items)} 个国际品种（贵金属4 + 基本金属6 + 能源2 + 农产品3），"
-            f"数据源：MACRO_DATA + westock-mcp 期货实时行情。"
-            f"未接入 {len(unavailable)} 个国内品种（{unavailable_names}），"
-            f"原因：均为国内期货/现货，需万得/同花顺等国内数据源。"
-            f"基准为近期均值参考值（非实时 30 日均线），待后续升级为真实历史序列。"
+            f"已接入 {len(items)} 个品种（贵金属4 + 基本金属6 + 能源2 + 农产品3 + 国内期货2），"
+            f"其中 {zscore_count} 个已启用30日滚动z-score真实基准。"
+            f"数据源：MACRO_DATA + westock-mcp期货 + eastmoney push2国内期货。"
+            f"未接入 {len(unavailable)} 个现货指数品种（{unavailable_names}）。"
+            f"基准升级（2026-08-16）：静态均值 → 30日滚动z-score（μ±σ），"
+            f"积累满10日自动切换，不足日回退静态兜底。"
         ),
     }
 
