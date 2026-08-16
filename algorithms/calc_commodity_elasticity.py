@@ -622,6 +622,7 @@ def main():
 
     # ── 通道 ①：MACRO_DATA（gold/silver/copper/oil）──
     items = []
+    processed_keys = set()   # 已拿到实时价的品种，避免丢到 unavailable
     hot_count = 0
     macro_sources = ["gold", "silver", "copper", "oil"]
     for key in macro_sources:
@@ -636,6 +637,7 @@ def main():
         row = calc_one_commodity(key, info, price, pdate, source="MACRO_DATA",
                                   price_history=price_history)
         items.append(row)
+        processed_keys.add(key)
         today_prices[key] = price
         if row["is_hot"]:
             hot_count += 1
@@ -659,6 +661,7 @@ def main():
             price_history=price_history,
         )
         items.append(row)
+        processed_keys.add(key)
         today_prices[key] = wp["price"]
         if row["is_hot"]:
             hot_count += 1
@@ -676,19 +679,29 @@ def main():
     # 统计 z-score 使用情况
     zscore_count = sum(1 for it in items if it.get("use_zscore"))
 
-    # ── 无数据源的大宗品：透明列出（仅剩纯现货指数品种）──
+    # ── 未拿到实时价的品种：透明列出，避免从卡片里「消失」──
     unavailable = []
-    for key, label in UNAVAILABLE_COMMODITIES.items():
-        info = ELASTICITY_MAP.get(key, {})
+    for key, info in ELASTICITY_MAP.items():
+        if key in processed_keys:
+            continue
+        label = info.get("name", key)
+        if key in UNAVAILABLE_COMMODITIES:
+            reason = (
+                f"{label}为现货景气指数（非标准化期货合约），无免费实时API。"
+                f"数据源为SMM上海有色/百川盈孚等付费指数。"
+                f"如需接入可考虑：①用相关A股板块指数代理 ②接入付费数据源。"
+            )
+        else:
+            # 有数据源配置但本次未返回价格（如国内期货 API 受限、网络抖动、非交易时段）
+            reason = (
+                f"{label}已配置数据源但本次未取到实时价（API未返回/非交易时段/网络受限），"
+                f"暂以「暂无数据」展示，不伪造价格。下次刷新会自动补回。"
+            )
         unavailable.append({
             "key": key,
             "name": label,
             "available": False,
-            "reason": (
-                f"{label}为现货景气指数（非标准化期货合约），无免费实时API。"
-                f"数据源为SMM上海有色/百川盈孚等付费指数。"
-                f"如需接入可考虑：①用相关A股板块指数代理 ②接入付费数据源。"
-            ),
+            "reason": reason,
             "stocks": info.get("stocks", []),
         })
 
@@ -715,10 +728,11 @@ def main():
             f"涨价窗口：有实时价的商品相对参考基准涨幅 ≥ {HOT_THRESHOLD_PCT}% "
             f"(或 |z-score| ≥ {HOT_ZSCORE})。"
             f"弹性系数 = 偏离度 × 业务占比 × 杠杆 {ELASTICITY_LEVERAGE}（简化估算）。"
-            f"已接入 {len(items)} 个品种（贵金属4 + 基本金属6 + 能源2 + 农产品3 + 国内期货2），"
+            f"已拿到实时价 {len(items)} 个品种（含贵金属/基本金属/能源/农产品/国内期货）。"
             f"其中 {zscore_count} 个已启用30日滚动z-score真实基准。"
             f"数据源：MACRO_DATA + westock-mcp期货 + eastmoney push2国内期货。"
-            f"未接入 {len(unavailable)} 个现货指数品种（{unavailable_names}）。"
+            f"另有 {len(unavailable)} 个品种本次未展示实时价（{unavailable_names}），"
+            f"原因见「逻辑详解 > 潜力参考 > 商品涨价弹性榜 · 数据源与计算逻辑」。"
             f"基准升级（2026-08-16）：静态均值 → 30日滚动z-score（μ±σ），"
             f"积累满10日自动切换，不足日回退静态兜底。"
         ),
