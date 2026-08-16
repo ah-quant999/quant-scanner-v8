@@ -12,7 +12,7 @@
   "maharo_signals": {
     "exists": true,
     "raw_signals": 4,
-    "gold_pool_matches": 6
+    "gold_pool_matches": 8
   },
   "source_dist": {
     "主板成交前100": 57,
