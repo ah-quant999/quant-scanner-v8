@@ -162,6 +162,47 @@ def main():
         except Exception:
             pass
 
+    # 6) 关键数据源陈旧度（个股查询/龙虎榜/算法）— 2026-08-16 主人令"个股查询上周四数据"
+    #    根因是浏览器内存缓存（tab 长期不刷新），但兜底也应在审计里报警数据本身陈旧。
+    #    简单估算最近交易日（忽略节假日，v8_health_check 里有更精确日历）。
+    from datetime import datetime, timedelta
+    now = datetime.now()
+    wd = now.weekday()
+    if wd == 5:
+        recent_trade = now.date()  # 周六：今天已是周末，等价周五
+    elif wd == 6:
+        recent_trade = (now - timedelta(days=2)).date()  # 周日→上周五
+    elif wd == 0:
+        recent_trade = (now - timedelta(days=3)).date()  # 周一→上周五
+    else:
+        recent_trade = (now - timedelta(days=1)).date()  # 周二~五→昨天
+    def _file_date(remote_path, field):
+        try:
+            req = urllib.request.Request(f"{SITE}/{remote_path}",
+                                          headers={"Cache-Control": "no-cache", "User-Agent": "audit"})
+            data = urllib.request.urlopen(req, timeout=60).read().decode("utf-8", "replace")
+            import re as _re
+            m = _re.search(r'"' + field + r'"\s*:\s*"([^"]*)"', data[:4000])
+            if not m: return None
+            v = m.group(1)
+            if len(v) == 8 and v.isdigit():  # YYYYMMDD
+                return datetime.strptime(v, "%Y%m%d").date()
+            return datetime.strptime(v[:10], "%Y-%m-%d").date()
+        except Exception:
+            return None
+    sources = [
+        ("STOCK_QUOTE.js", "update_time", "个股查询实时行情"),
+        ("LHB_DATA.js", "date", "龙虎榜"),
+        ("ALGO_TRACK.js", "update_time", "算法跟踪"),
+        ("FINAL_RECOMMEND_DATA.js", "update_time", "最终推荐"),
+    ]
+    for path, field, name in sources:
+        d = _file_date(path, field)
+        if d is None:
+            problems.append("⚠️ 数据陈旧度检查失败: %s（%s 字段缺失或下载失败）" % (name, field))
+        elif d < recent_trade:
+            problems.append("⚠️ %s 数据陈旧: %s（最近交易日 %s）" % (name, d, recent_trade))
+
     print("发现失配 %d 项：" % len(problems))
     print("\n".join(" - " + p for p in problems) or
           "✅ 全链路对齐：?v 真一致、五组件同步、双机 model 全 deepseek-v4-flash、受保护文件完整")
