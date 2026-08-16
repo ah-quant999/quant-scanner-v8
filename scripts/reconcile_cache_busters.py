@@ -68,6 +68,61 @@ def _api_text_blob(repo: str, path: str, token: str, tree: dict):
     return None
 
 
+def _api_bytes_blob(repo: str, path: str, token: str, tree: dict):
+    """经 Git blobs API 取完整文件「原始字节」（不做 utf-8 解码，保证 sha1 字节级精确）。
+
+    ⚠️ v6_memo.html 的 ?v 必须按原始字节算 sha1（与 guard_v6_memo.sha10_of 的
+    open(path,'rb') 完全一致）。若改用 _api_text_blob（decode 带 replace）会破坏
+    字节精度，导致 reconcile 与 guard 算出不同戳、互相来回改写，比不修更糟。
+    """
+    sha = tree.get(path)
+    if not sha:
+        return None
+    url = f"https://api.github.com/repos/{repo}/git/blobs/{sha}"
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=_hdr(token)), timeout=120) as r:
+            d = json.loads(r.read().decode("utf-8"))
+        if isinstance(d, dict) and "content" in d:
+            return base64.b64decode(d["content"])
+    except Exception:
+        return None
+    return None
+
+
+def reconcile_v6_memo(html: str, repo: str, token: str, tree: dict) -> str:
+    """对齐「逻辑详解页 v6备忘录」iframe 的 ?v 戳（第二道保险）。
+
+    ★ 2026-08-16 新增。根因：v6_memo.html 的缓存戳此前【无任何自愈网】——
+      本函数之前的 data/*.js 正则 (data/[A-Z0-9_]+\\.js) 完全不匹配 v6_memo.html，
+      而唯一会写该戳的 guard_v6_memo.py 在 build 里的修正会被紧随其后的
+      `git reset --hard FETCH_HEAD` 擦掉，于是戳长期停在远端旧值，浏览器/CDN
+      一直按旧 URL 吐早已作废的旧副本 → v6备忘录页面空白、反复"修不好"。
+      build 侧已在 reset 之后重跑 guard 根治；此处作为独立 15 分钟自愈兜底。
+
+    算法与 guard_v6_memo.sha10_of 严格一致：原始字节 sha1 前 10 位（不中性化）。
+    """
+    if "v6_memo.html" not in html:
+        return html
+    raw = None
+    if not os.environ.get("RECONCILE_LOCAL") and token and repo:
+        raw = _api_bytes_blob(repo, "v6_memo.html", token, tree)
+    if raw is None:
+        p = ROOT / "v6_memo.html"
+        if p.exists():
+            raw = p.read_bytes()
+    # 缺失或明显被截断（<60KB，同 guard 的 MIN_BYTES 口径）时不动戳，交 guard 自愈
+    if not raw or len(raw) < 60_000:
+        print("⚠️ v6_memo.html 不可用/过短，跳过 v6 ?v 对齐（交 guard_v6_memo.py 自愈）")
+        return html
+    true_sha = hashlib.sha1(raw).hexdigest()[:10]
+    new_html, n = re.subn(
+        r'(src="v6_memo\.html)(?:\?v=[0-9a-fA-F]+)?(")',
+        rf'\1?v={true_sha}\2', html)
+    if n and new_html != html:
+        print(f"🔄 v6备忘录 ?v 已对齐 → ?v={true_sha}")
+    return new_html
+
+
 def content_for(fname: str, data_dir: pathlib.Path, repo: str, token: str, tree: dict):
     """内容来源策略：
     - RECONCILE_LOCAL=1（build 内部调用）：强制用本地磁盘文件。build 已 `git reset
@@ -122,6 +177,8 @@ def main():
         return f"{q1}{src}?v={neutral_sha(txt)}{q2}"
 
     new_html = pat.sub(repl, html)
+    # ★ 2026-08-16：v6备忘录 iframe 戳同样纳入自愈（此前无任何自愈网，详见 reconcile_v6_memo）
+    new_html = reconcile_v6_memo(new_html, repo, token, tree)
     mode = "本地磁盘(RECONCILE_LOCAL)" if os.environ.get("RECONCILE_LOCAL") else "线上真实数据(git blobs API)"
     if new_html != html:
         idx.write_text(new_html, encoding="utf-8")
