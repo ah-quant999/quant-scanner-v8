@@ -1,10 +1,10 @@
 {
-  "update_time": "2026-08-16 15:28:22",
+  "update_time": "2026-08-16 16:54:30",
   "data_date": "2026-08-15",
   "source": "三通道: MACRO_DATA(gold/silver/copper/oil) + westock-mcp国际期货(LME/NYMEX/CBOT共11个) + eastmoney-push2国内期货(GFEX碳酸锂+ZCE纯碱)",
   "hot_count": 10,
   "available_count": 15,
-  "total_commodities": 18,
+  "total_commodities": 20,
   "hot_threshold_pct": 3.0,
   "hot_zscore": 2.0,
   "zscore_enabled_count": 0,
@@ -691,6 +691,64 @@
   ],
   "unavailable": [
     {
+      "key": "lithium",
+      "name": "锂(碳酸锂)",
+      "available": false,
+      "reason": "锂(碳酸锂)已配置数据源但本次未取到实时价（API未返回/非交易时段/网络受限），暂以「暂无数据」展示，不伪造价格。下次刷新会自动补回。",
+      "stocks": [
+        {
+          "code": "002466",
+          "name": "天齐锂业",
+          "business_pct": 0.75,
+          "note": "锂矿+锂盐"
+        },
+        {
+          "code": "002460",
+          "name": "赣锋锂业",
+          "business_pct": 0.8,
+          "note": "全产业链"
+        },
+        {
+          "code": "000792",
+          "name": "盐湖股份",
+          "business_pct": 0.55,
+          "note": "盐湖提锂"
+        },
+        {
+          "code": "000408",
+          "name": "藏格矿业",
+          "business_pct": 0.45,
+          "note": "钾锂双驱"
+        }
+      ]
+    },
+    {
+      "key": "soda_ash",
+      "name": "纯碱",
+      "available": false,
+      "reason": "纯碱已配置数据源但本次未取到实时价（API未返回/非交易时段/网络受限），暂以「暂无数据」展示，不伪造价格。下次刷新会自动补回。",
+      "stocks": [
+        {
+          "code": "000683",
+          "name": "远兴能源",
+          "business_pct": 0.85,
+          "note": "天然碱低成本"
+        },
+        {
+          "code": "000822",
+          "name": "山东海化",
+          "business_pct": 0.75,
+          "note": "纯碱+小苏打"
+        },
+        {
+          "code": "000707",
+          "name": "双环科技",
+          "business_pct": 0.9,
+          "note": "联碱法"
+        }
+      ]
+    },
+    {
       "key": "phosphate",
       "name": "磷化工",
       "available": false,
@@ -769,5 +827,5 @@
       ]
     }
   ],
-  "note": "涨价窗口：有实时价的商品相对参考基准涨幅 ≥ 3.0% (或 |z-score| ≥ 2.0)。弹性系数 = 偏离度 × 业务占比 × 杠杆 1.5（简化估算）。已接入 15 个品种（贵金属4 + 基本金属6 + 能源2 + 农产品3 + 国内期货2），其中 0 个已启用30日滚动z-score真实基准。数据源：MACRO_DATA + westock-mcp期货 + eastmoney push2国内期货。未接入 3 个现货指数品种（磷化工、维生素、稀土）。基准升级（2026-08-16）：静态均值 → 30日滚动z-score（μ±σ），积累满10日自动切换，不足日回退静态兜底。"
+  "note": "涨价窗口：有实时价的商品相对参考基准涨幅 ≥ 3.0% (或 |z-score| ≥ 2.0)。弹性系数 = 偏离度 × 业务占比 × 杠杆 1.5（简化估算）。已拿到实时价 15 个品种（含贵金属/基本金属/能源/农产品/国内期货）。其中 0 个已启用30日滚动z-score真实基准。数据源：MACRO_DATA + westock-mcp期货 + eastmoney push2国内期货。另有 5 个品种本次未展示实时价（锂(碳酸锂)、纯碱、磷化工、维生素、稀土），原因见「逻辑详解 > 潜力参考 > 商品涨价弹性榜 · 数据源与计算逻辑」。基准升级（2026-08-16）：静态均值 → 30日滚动z-score（μ±σ），积累满10日自动切换，不足日回退静态兜底。"
 }
