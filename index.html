@@ -4295,26 +4295,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         }
       }
 
-      // ④ 三算法独立追踪（四量终极/板块龙头/大牛股猎手）
-      var at = window.ALGO_TRACK || {};
-      if(at.total_stats){
-        var algoNames = {'four_volume':'四量','sector_lead':'龙头','big_bull':'大牛'};
-        var algoFullNames = {'four_volume':'四量终极(游资+机构+广度+动量)','sector_lead':'板块龙头(强势股聚类)','big_bull':'大牛猎手(主升浪)'};
-        var algoColors = {'four_volume':'#ff7043','sector_lead':'#22c55e','big_bull':'#ef4444'};
-        Object.keys(at.total_stats).forEach(function(k){
-          var s = at.total_stats[k];
-          if(s.tracking > 0 || s.history_samples > 0){
-            var label = algoNames[k] || k;
-            var fullName = algoFullNames[k] || label;
-            var clr = algoColors[k] || '#94a3b8';
-            var txt = label+' '+s.tracking+'只';
-            if(s.history_samples > 0) txt += ' · <b style="color:'+clr+';">'+(s.win_rate*100).toFixed(0)+'%</b>胜';
-            else txt += ' · <span style="color:var(--dim);font-size:10px;">追踪中</span>';
-            pills.push('<span style="padding:2px 8px;border-radius:6px;font-weight:700;background:'+clr.replace(')','.12)')+';color:'+clr+';border:1px solid '+clr.replace(')','.30)')+';white-space:nowrap;display:inline-block;" title="'+fullName+'（'+s.tracking+'只跟踪中）">'+txt+'</span>');
-          }
-        });
-      }
-
       sum.innerHTML = '<span style="color:var(--dim);font-weight:600;">📊 实战回测</span>' + (pills.length ? ' ' + pills.join(' ') : ' <span style="color:var(--sub);">暂无数据</span>');
     })();
 
