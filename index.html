@@ -5757,7 +5757,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">2026-08-09 审计结论</div>
         <div class="logic-p">展示层诚实：无硬编码假「今日」、无使用重打包戳冒充数据时间、?v= 缓存戳等于真实数据日期。当前检出 <b>COCKPIT_ADVICE 信号样本陈旧（最新 signal_date 2026-07-09，最近交易日 2026-08-07）</b>，已告警并加前端警示。完整报告见 <code>AUDIT_TIME_DATA_2026-08-09.html</code>。</div>
       </div>
-    </div>
+    </div><!-- /lg-op: 强制闭合，防止浏览器将后续 lg-v6 解析进 lg-op 内部 -->
 
     <!-- === v6备忘录（逻辑详解页最右侧子tab，仅管理员可见） === -->
     <div class="lg-pane" id="lg-v6">
