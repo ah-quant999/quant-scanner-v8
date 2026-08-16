@@ -616,6 +616,26 @@ def _rewrite_index_html_cache_busters():
         print("✅ index.html cache-busting 参数已更新")
 
 
+def _ensure_momentum_loader():
+    """确保 index.html 含 STOCK_MOMENTUM_STATE.js 加载标签（构建机偶发以陈旧 checkout 重置
+    index.html 会冲掉手动加的 head 标签，导致「个股动量状态」卡显示「数据不可用」）。
+    每次构建强制补回；缓存戳逻辑随后为其写入正确的 ?v=。"""
+    idx_path = ROOT / "index.html"
+    if not idx_path.exists():
+        return
+    html = idx_path.read_text(encoding='utf-8')
+    if "data/STOCK_MOMENTUM_STATE.js" in html:
+        return  # 已存在（含 ?v 或刚注入），交给缓存戳逻辑处理
+    tag = '<script src="data/STOCK_MOMENTUM_STATE.js" defer></script>'
+    marker = '<script src="data/POTENTIAL_PICKS.js'
+    if marker in html:
+        html = html.replace(marker, marker + "\n    " + tag, 1)
+    else:
+        html = html.replace("</head>", tag + "\n</head>", 1)
+    idx_path.write_text(html, encoding='utf-8')
+    print("✅ 已补回 STOCK_MOMENTUM_STATE.js 加载标签（防构建冲掉）")
+
+
 def _var_category(var_name):
     c = CATEGORY_MAP.get(var_name, "post_close")
     # 支持多类别（逗号分隔），如 "premarket,intraday"
@@ -764,6 +784,7 @@ def main():
         # 2026-08-15 缓存戳铁律修复：必须在全部数据生成（含 run_experiment_cards
         # 重写的 COMMODITY_ELASTICITY.js 等）之后才算 ?v，否则 ?v 与最终文件内容
         # 不符 → CDN 吐旧副本。
+        _ensure_momentum_loader()
         _rewrite_index_html_cache_busters()
     return rc
 
