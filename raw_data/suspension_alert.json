@@ -1,28 +1,28 @@
 {
-  "update_time": "2026-08-14 17:36:28",
+  "update_time": "2026-08-16 19:38:05",
   "suspended": [
     {
       "code": "200706",
       "name": "瓦轴B",
-      "days": 165,
+      "days": 167,
       "reason": "刊登重要公告"
     },
     {
       "code": "600984",
       "name": "建设机械",
-      "days": 3,
+      "days": 5,
       "reason": "拟筹划重大资产重组"
     },
     {
       "code": "603221",
       "name": "爱丽家居",
-      "days": 3,
+      "days": 5,
       "reason": "交易异常波动"
     },
     {
       "code": "300176",
       "name": "鸿特科技",
-      "days": 1,
+      "days": 3,
       "reason": "刊登重要公告"
     }
   ],
