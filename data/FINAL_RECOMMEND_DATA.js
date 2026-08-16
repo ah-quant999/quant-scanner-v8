@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-17 05:11:59",
+  "update_time": "2026-08-17 05:32:33",
   "crisis_score": 30.2,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -75,11 +75,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
         "融资融券",
-        "新材料",
+        "电池技术",
+        "央国企改革",
         "小金属概念",
         "西部大开发",
-        "锂电池概念",
-        "电池技术"
+        "稀土永磁"
       ],
       "backtest": {
         "signals": 1,
@@ -150,12 +150,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "四量终极 信号2项；板块龙头 贵金属/有色(关键词)",
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
-        "华为概念",
+        "国产芯片",
         "5G概念",
+        "华为概念",
         "3D打印",
-        "OLED",
-        "医疗器械概念",
-        "半导体概念"
+        "半导体概念",
+        "央国企改革"
       ],
       "backtest": {
         "signals": 2,
@@ -231,11 +231,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [
         "融资融券",
-        "小金属概念",
-        "深成500",
         "央国企改革",
+        "小金属概念",
         "稀土永磁",
-        "中字头"
+        "中字头",
+        "深成500"
       ],
       "backtest": {
         "signals": 201,
@@ -306,11 +306,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [
         "融资融券",
-        "汽车拆解",
         "垃圾分类",
+        "人工智能",
         "节能环保",
         "稀土永磁",
-        "人工智能"
+        "汽车拆解"
       ],
       "backtest": {
         "signals": 201,
@@ -366,12 +366,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构1.8亿+游资2.9亿",
       "industry": "软件和信息技术服务业",
       "concepts": [
-        "华为概念",
-        "创业成份",
         "元宇宙概念",
+        "创业成份",
         "互联网服务",
         "创业板综",
-        "AIGC概念"
+        "华为概念",
+        "IPv6"
       ],
       "backtest": {
         "signals": 201,
@@ -438,11 +438,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
         "融资融券",
-        "新材料",
+        "电池技术",
+        "央国企改革",
         "小金属概念",
         "西部大开发",
-        "锂电池概念",
-        "电池技术"
+        "稀土永磁"
       ],
       "backtest": {},
       "tracking": {
@@ -500,12 +500,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "四量终极 信号2项；板块龙头 贵金属/有色(关键词)",
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
-        "华为概念",
+        "国产芯片",
         "5G概念",
+        "华为概念",
         "3D打印",
-        "OLED",
-        "医疗器械概念",
-        "半导体概念"
+        "半导体概念",
+        "央国企改革"
       ],
       "backtest": {},
       "tracking": {
@@ -561,11 +561,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [
         "融资融券",
-        "小金属概念",
-        "深成500",
         "央国企改革",
+        "小金属概念",
         "稀土永磁",
-        "中字头"
+        "中字头",
+        "深成500"
       ],
       "backtest": {},
       "tracking": {
@@ -621,11 +621,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [
         "融资融券",
-        "汽车拆解",
         "垃圾分类",
+        "人工智能",
         "节能环保",
         "稀土永磁",
-        "人工智能"
+        "汽车拆解"
       ],
       "backtest": {},
       "tracking": {
@@ -673,12 +673,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构1.8亿+游资2.9亿",
       "industry": "软件和信息技术服务业",
       "concepts": [
-        "华为概念",
-        "创业成份",
         "元宇宙概念",
+        "创业成份",
         "互联网服务",
         "创业板综",
-        "AIGC概念"
+        "华为概念",
+        "IPv6"
       ],
       "backtest": {},
       "tracking": {
@@ -715,11 +715,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
         "融资融券",
-        "新材料",
+        "电池技术",
+        "央国企改革",
         "小金属概念",
         "西部大开发",
-        "锂电池概念",
-        "电池技术"
+        "稀土永磁"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 38.39,
@@ -749,12 +749,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
-        "华为概念",
+        "国产芯片",
         "5G概念",
+        "华为概念",
         "3D打印",
-        "OLED",
-        "医疗器械概念",
-        "半导体概念"
+        "半导体概念",
+        "央国企改革"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 45.7,
@@ -783,11 +783,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [
         "融资融券",
-        "小金属概念",
-        "深成500",
         "央国企改革",
+        "小金属概念",
         "稀土永磁",
-        "中字头"
+        "中字头",
+        "深成500"
       ],
       "enter_date": "20260814",
       "stop_loss": null,
@@ -816,11 +816,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [
         "融资融券",
-        "汽车拆解",
         "垃圾分类",
+        "人工智能",
         "节能环保",
         "稀土永磁",
-        "人工智能"
+        "汽车拆解"
       ],
       "enter_date": "20260814",
       "stop_loss": null,
@@ -848,12 +848,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "软件和信息技术服务业",
       "concepts": [
-        "华为概念",
-        "创业成份",
         "元宇宙概念",
+        "创业成份",
         "互联网服务",
         "创业板综",
-        "AIGC概念"
+        "华为概念",
+        "IPv6"
       ],
       "enter_date": "20260814",
       "stop_loss": null,
@@ -881,11 +881,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "柔性屏(折叠屏)",
+        "国产芯片",
         "充电桩",
+        "柔性屏(折叠屏)",
+        "电网概念",
         "创业板综",
-        "电子车牌",
-        "OLED",
         "半导体概念"
       ],
       "enter_date": "20260814",
@@ -914,12 +914,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "专精特新",
-        "华为概念",
         "5G概念",
+        "卫星互联网",
         "军工",
-        "IGBT概念",
-        "半导体概念"
+        "半导体概念",
+        "华为概念",
+        "央国企改革"
       ],
       "enter_date": "20260814",
       "stop_loss": null,
@@ -948,11 +948,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [
         "融资融券",
-        "5G概念",
         "毫米波概念",
         "创业板综",
+        "人形机器人",
         "通信技术",
-        "人形机器人"
+        "5G概念"
       ],
       "enter_date": "20260814",
       "stop_loss": null,
@@ -1033,12 +1033,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "专用设备制造业",
       "concepts": [
-        "海工装备",
+        "数据中心",
         "东方财富热股",
-        "中俄贸易概念",
-        "油气设服",
         "天然气",
-        "油气资源"
+        "海工装备",
+        "动力电池回收",
+        "油气设服"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 135.89,
@@ -1065,12 +1065,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "金属制品业",
       "concepts": [
-        "可控核聚变",
-        "新材料",
+        "创投",
         "工业母机",
-        "小金属概念",
-        "海南自贸",
-        "医疗器械概念"
+        "PCB",
+        "可控核聚变",
+        "央国企改革",
+        "小金属概念"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": null,
@@ -1099,11 +1099,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "",
       "concepts": [
         "融资融券",
-        "病原体防治",
         "维生素",
+        "创新药",
         "破发股",
         "低价股",
-        "创新药"
+        "病原体防治"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 4.08,
@@ -1131,12 +1131,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
+        "历史新高",
         "创业成份",
-        "CPO概念",
-        "WiFi",
-        "国资云概念",
         "创业板综",
-        "历史新高"
+        "东方财富热股",
+        "国资云概念",
+        "央国企改革"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 129.51,
@@ -1164,12 +1164,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "零售业",
       "concepts": [
-        "电商概念",
-        "内贸流通",
+        "纳米银",
+        "跨境电商",
         "互联网服务",
         "创业板综",
-        "纳米银",
-        "跨境电商"
+        "内贸流通",
+        "算力概念"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 35.04,
@@ -1199,10 +1199,10 @@ window.FINAL_RECOMMEND_DATA = {
       "concepts": [
         "融资融券",
         "创业成份",
-        "CRO",
-        "AI制药（医疗）",
+        "趋势股",
         "创业板综",
-        "深成500"
+        "AI制药（医疗）",
+        "CRO"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 44.21,
@@ -1230,11 +1230,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
+        "商业航天",
+        "PCB",
         "华为概念",
-        "特斯拉概念",
-        "5G概念",
-        "CPO概念",
-        "深圳特区",
+        "无人驾驶",
+        "英伟达概念",
         "OLED"
       ],
       "enter_date": "2026-08-17",
@@ -1264,11 +1264,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "研究和试验发展",
       "concepts": [
         "融资融券",
-        "CRO",
         "独角兽",
-        "CAR-T细胞疗法",
+        "创新医疗服务",
         "权重股",
-        "创新医疗服务"
+        "百元股",
+        "创新药"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 143.32,
@@ -1295,10 +1295,10 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "信创",
         "F5G概念",
         "5G概念",
-        "CPO概念",
+        "WiFi",
+        "信创",
         "东方财富热股",
         "人脑工程"
       ],
@@ -1327,12 +1327,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "华为概念",
-        "信创",
         "F5G概念",
-        "5G概念",
-        "CPO概念",
-        "液冷概念"
+        "信创",
+        "华为概念",
+        "智能家居",
+        "液冷概念",
+        "新型工业化"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": null,
@@ -1359,12 +1359,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "CPO概念",
         "AI眼镜",
         "AI应用",
+        "DeepSeek概念",
         "EDR概念",
-        "AIGC概念",
-        "DeepSeek概念"
+        "人形机器人",
+        "云计算"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": null,
@@ -1391,12 +1391,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "5G概念",
-        "CPO概念",
-        "深圳特区",
+        "国产芯片",
         "创业板综",
+        "百元股",
         "深成500",
-        "光通信模块"
+        "光通信模块",
+        "深圳特区"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": null,
@@ -1423,12 +1423,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "软件和信息技术服务业",
       "concepts": [
-        "专精特新",
-        "信创",
-        "大数据",
         "互联网服务",
+        "大数据",
+        "信创",
         "创业板综",
-        "云计算"
+        "人工智能",
+        "ChatGPT概念"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": null,
@@ -1455,12 +1455,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "专精特新",
-        "华为概念",
-        "创业成份",
+        "国产芯片",
         "F5G概念",
         "5G概念",
-        "CPO概念"
+        "创业成份",
+        "创业板综",
+        "华为概念"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": null,
@@ -1487,12 +1487,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "电气机械和器材制造业",
       "concepts": [
-        "专精特新",
+        "国产芯片",
+        "5G概念",
+        "大数据",
         "华为概念",
         "可控核聚变",
-        "5G概念",
-        "CPO概念",
-        "大数据"
+        "光通信模块"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": null,
@@ -1519,12 +1519,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "华为概念",
-        "光纤概念",
+        "国产芯片",
         "F5G概念",
-        "5G概念",
-        "CPO概念",
-        "国产芯片"
+        "东方财富热股",
+        "华为概念",
+        "央国企改革",
+        "光通信模块"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": null,
@@ -1551,12 +1551,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "非金属矿物制品业",
       "concepts": [
-        "PEEK材料概念",
         "融资融券",
-        "新材料",
-        "养老金",
+        "PCB",
         "DeepSeek概念",
-        "东方财富热股"
+        "东方财富热股",
+        "央国企改革",
+        "PEEK材料概念"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 39.95,
@@ -1583,11 +1583,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "电气机械和器材制造业",
       "concepts": [
-        "5G概念",
-        "3D打印",
-        "CPO概念",
-        "OLED",
+        "储能概念",
         "6G概念",
+        "PCB",
+        "3D打印",
+        "东方财富热股",
         "东数西算"
       ],
       "enter_date": "2026-08-17",
@@ -1615,12 +1615,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "光纤概念",
         "F5G概念",
-        "5G概念",
-        "CPO概念",
-        "光通信模块",
-        "卫星互联网"
+        "卫星互联网",
+        "中特估",
+        "云计算",
+        "IPv6",
+        "光通信模块"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 36.81,
@@ -1647,12 +1647,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "电气机械和器材制造业",
       "concepts": [
-        "华为概念",
-        "光纤概念",
-        "5G概念",
-        "CPO概念",
         "F5G概念",
-        "大数据"
+        "6G概念",
+        "大数据",
+        "东方财富热股",
+        "华为概念",
+        "光通信模块"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": null,
