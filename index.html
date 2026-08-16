@@ -1237,6 +1237,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/POTENTIAL_PICKS.js?v=69f74f1700" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE.js?v=040b757ece" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=773846ab5b" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=1f88a9c77c" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -10594,6 +10595,53 @@ function drawUpDownChart(){
     h+='<div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.3);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.7;color:var(--sub);">';
     h+='📌 暂未上架观察：本卡为热点板块→ETF/龙头映射参考，属研究信号，未纳入任何推荐链路。';
     h+='</div>';
+    h+='</div>';
+
+    // ── 🎯 动量共识筛选（2026-08-16 新增 · 共同点规则自动筛选，与🚀动量卡并列跟踪）──
+    var _mf = window.MOMENTUM_FILTER;
+    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a855f7;">';
+    h+='<h3 style="font-size:14px;margin-bottom:8px;"><span class="ic">🎯</span>动量共识筛选 <span style="font-size:10px;color:#f59e0b;font-weight:400">共同点规则 · 自动重算</span></h3>';
+    if(!_mf || !_mf.candidates || !_mf.candidates.length){
+      h+='<div class="note">MOMENTUM_FILTER 数据不可用（构建时由 momentum_common_filter.py --emit-js 生成）</div>';
+    } else {
+      var _s=_mf.stats||{};
+      h+='<div style="font-size:11.5px;color:var(--sub);line-height:1.8;margin-bottom:10px;">';
+      h+='筛选链：S1 连涨≥5天 → S2 回撤≤10% → S3 剔除主升/启动板块。T+5 胜率 '
+        + (_s.s1_win||'--')+'%('+(_s.s1||0)+'只) → '+( _s.s2_win||'--')+'%('+(_s.s2||0)+'只) → <b style="color:#c4b5fd;">'+( _s.s3_win||'--')+'%('+(_s.s3||0)+'只)</b>。'
+        + '<br>当前候选 <b style="color:#c4b5fd;">'+_mf.candidates.length+' 只</b>（去重），按连涨天数排序；⚠️=板块阶段未匹配需人工确认。'
+        + '<span style="color:var(--dim);float:right;">更新 '+((_mf.generated||'').slice(5,16))+'</span></div>';
+      h+='<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+      h+='<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+      h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">#</th>';
+      h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">名称</th>';
+      h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">代码</th>';
+      h+='<th style="padding:6px 5px;text-align:right;color:var(--sub);">连涨</th>';
+      h+='<th style="padding:6px 5px;text-align:right;color:var(--sub);">入选日%</th>';
+      h+='<th style="padding:6px 5px;text-align:right;color:var(--sub);">T+5%</th>';
+      h+='<th style="padding:6px 5px;text-align:right;color:var(--sub);">回撤%</th>';
+      h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">阶段</th>';
+      h+='</tr></thead><tbody>';
+      _mf.candidates.slice(0,20).forEach(function(r,i){
+        var t5=r.t5_gain_pct, t5Color = t5>0?'var(--up)':(t5<0?'var(--down)':'var(--sub)');
+        var stage=r.stage||'未匹配';
+        var stageColor = stage==='震荡'?'#38bdf8':(stage==='退潮'?'#f59e0b':(stage==='底部'?'#22c55e':(stage==='主升'||stage==='启动')?'#ef4444':'#94a3b8'));
+        var flag = stage==='' ? ' ⚠️' : '';
+        h+='<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+        h+='<td style="padding:5px 5px;color:var(--dim);">'+(i+1)+'</td>';
+        h+='<td style="padding:5px 5px;font-weight:600;color:var(--txt);">'+r.name+'</td>';
+        h+='<td style="padding:5px 5px;color:var(--sub);font-family:ui-monospace,Menlo,monospace;">'+r.code+'</td>';
+        h+='<td style="padding:5px 5px;text-align:right;color:#c4b5fd;font-weight:700;">'+r.consecutive_up_days+'</td>';
+        h+='<td style="padding:5px 5px;text-align:right;color:var(--sub);">'+(r.sel_change_pct!=null?Number(r.sel_change_pct).toFixed(1):'--')+'%</td>';
+        h+='<td style="padding:5px 5px;text-align:right;color:'+t5Color+';font-weight:600;">'+(t5!=null?(t5>0?'+':'')+t5.toFixed(1):'--')+'%</td>';
+        h+='<td style="padding:5px 5px;text-align:right;color:'+(r.max_drawdown_pct>5?'#fbbf24':'var(--sub)')+';">'+(r.max_drawdown_pct!=null?r.max_drawdown_pct.toFixed(1):'--')+'%</td>';
+        h+='<td style="padding:5px 5px;color:'+stageColor+';font-size:11px;">'+stage+flag+'</td>';
+        h+='</tr>';
+      });
+      h+='</tbody></table></div>';
+      h+='<div style="background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.3);border-radius:7px;padding:8px 10px;font-size:11.5px;line-height:1.7;color:var(--sub);margin-top:8px;">';
+      h+='🎯 <b>与 🚀 动量卡一起跟踪 1-2 周</b>：对照共同点结论是否持续有效（连涨≥5 是唯一强筛选因子；入选日涨幅/共识次数无区分度）。每周日可由小九跑对比报告。筛选器随构建自动重算（update_v8.py run_experiment_cards → momentum_common_filter.py --emit-js）。';
+      h+='</div>';
+    }
     h+='</div>';
 
     el.innerHTML=h;

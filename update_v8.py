@@ -746,6 +746,8 @@ def run_health_check():
 def run_experiment_cards():
     """2026-08-13 主人令：暂未上架三张新卡（涨价弹性榜/情绪周期/潜力挖掘）随数据刷新自动重算。
     三脚本读 data/*.js（build 刚生成的），写 data/COMMODITY_ELASTICITY.js 等。
+    2026-08-16 主人令：新增动量共识筛选器（momentum_common_filter.py --emit-js →
+    data/MOMENTUM_FILTER.js），与动量卡一起跟踪。
     任何模块失败不阻断主流程（仅告警），避免拖垮云端抓取。
     """
     import subprocess
@@ -767,6 +769,24 @@ def run_experiment_cards():
                 print("     " + "\n     ".join(r.stdout.strip().splitlines()[-2:] + r.stderr.strip().splitlines()[-2:])[:300])
         except Exception as e:
             print(f"[experiment]   ⚠️ {script} 异常: {e}")
+
+    # 2026-08-16 主人令：动量共识筛选器（读 data/STOCK_MOMENTUM_STATE_V2.js + STOCK_QUOTE + SECTOR_RS）
+    filter_py = Path(__file__).resolve().parent / "scripts" / "momentum_common_filter.py"
+    if filter_py.exists():
+        print(f"[experiment] ▶ momentum_common_filter.py --emit-js ({datetime.now():%H:%M:%S})")
+        try:
+            r = subprocess.run([sys.executable, str(filter_py), "--emit-js"],
+                               capture_output=True, text=True, timeout=300)
+            if r.returncode == 0:
+                last = [l for l in r.stdout.strip().splitlines() if l.strip()][-1:] or [""]
+                print(f"[experiment]   ✅ {last[0][:80]}")
+            else:
+                print(f"[experiment]   ⚠️ momentum_common_filter 退出码 {r.returncode}")
+                print("     " + "\n     ".join(r.stdout.strip().splitlines()[-2:] + r.stderr.strip().splitlines()[-2:])[:300])
+        except Exception as e:
+            print(f"[experiment]   ⚠️ momentum_common_filter 异常: {e}")
+    else:
+        print("[experiment] ⚠️ 缺失 scripts/momentum_common_filter.py，跳过")
 
 
 def main():
