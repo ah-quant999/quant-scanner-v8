@@ -157,6 +157,21 @@ table td, table th, table tr { color: #333 !important; }
           <b>➕ 新增模块（2026-08-13~15）</b>
           <ul style="margin:6px 0 0 18px;padding:0;">
             <li><b>🔒 策略回测（统一 Tab · sec-bt）</b>：TOP5 跟踪 + 综合回测 + 信号 60 日回测三块一站，顶部统一「🦊 更新于」胶囊；数据源 backtest_tdx.json / backtest_comprehensive.json（算法产物受 api_push_raw 防覆盖保护）。</li>
+            <li><b>✅/❌ 回测数据真实性铁律（2026-08-16 备忘）</b>：
+              <ul style="margin:4px 0 0 16px;padding:0;font-size:11.5px;">
+                <li><b style="color:#22c55e;">✅ 真实回测（3个源，星级表仅列这些）</b>：
+                  <br>① <code>BACKTEST_COMPREHENSIVE</code> → baostock 真实收盘价全回测，143样本，method=<code>baostock 真实收盘价全面回测</code>
+                  <br>② <code>COCKPIT_BACKTEST</code> → 驾驶舱实盘级A/B档回测
+                  <br>③ <code>BACKTEST_TDX</code> → 通达信60日K线信号9类全量回测
+                </li>
+                <li><b style="color:#ef4444;">❌ 已屏蔽假数据（2026-08-16 移除）</b>：
+                  <br><code>OPTIMIZED_STRATEGY.baseline_ge3</code> → 合成基线，total_signals=862 假样本，win_rate=50.2%（≈随机无 alpha）
+                  <br>屏蔽方式：<code>_real_tracked</code> 标志为 None → 星级表代码 <code>if(op.baseline_ge3._real_tracked)</code> 直接跳过
+                  <br>同时加真实门槛：<code>sample&gt;0 && win_rate!=null && avg_return!=null</code> 三条件缺一即剔除
+                </li>
+                <li><b>前端标识</b>：综合回测表头带 <span style="background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:1px 8px;font-size:10px;">✅ 真实baostock全回测</span> 绿标；星级表头带 <span style="background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:1px 8px;font-size:10px;">✅ 全部真实跟踪</span> 绿标</li>
+              </ul>
+            </li>
             <li><b>📦 潜力参考（选股策略子TAB · st-pr）</b>：潜力挖掘 + ETF·龙头参考 + 商品涨价弹性榜三张卡，全带统一「🦊 更新于」胶囊（_uBadge）+ 💰分红方案 chip（读 STOCK_QUOTE.dividend）。</li>
             <li><b>🦊 全站「更新于」统一胶囊</b>：_uBadge（🦊 更新于 盘后 · 短线 · 相对时间），今日判定卡不再误报「无数值」（去掉 dataset.rendered 缓存 + 500ms×5 重试保底）。</li>
           </ul>
