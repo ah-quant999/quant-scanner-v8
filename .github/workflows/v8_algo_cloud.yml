@@ -287,7 +287,16 @@ jobs:
           idx = os.path.join(ROOT, "index.html")
           html = open(idx, encoding="utf-8").read()
           p = os.path.join(ROOT, "data", "ALGO_TRACK.js")
-          t = hashlib.sha1(open(p, encoding="utf-8").read().encode()).hexdigest()[:10] if os.path.exists(p) else ""
+          # ★ 2026-08-16 审计修复：必须与 build/reconcile 的 ?v 计算逐字符一致——
+          #   ① 取原始字节（非 read().encode()，避免 Windows CRLF→LF 归一化致 sha 偏移）；
+          #   ② 中性化 republish_time 构建时间戳（_write_js 每次注入，否则 ?v 随构建时刻漂）。
+          #   否则写出的 ?v 与 reconcile 算出的不一致 → ALGO_TRACK 缓存戳失配 → CDN 吐旧副本。
+          if os.path.exists(p):
+              _b = open(p, "rb").read()
+              _neutral = re.sub(rb'"republish_time"\s*:\s*"[^"]*"', b'"republish_time":""', _b)
+              t = hashlib.sha1(_neutral).hexdigest()[:10]
+          else:
+              t = ""
           if not t:
               print("ALGO_TRACK.js 缺失，跳过")
               raise SystemExit(0)
