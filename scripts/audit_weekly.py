@@ -179,8 +179,9 @@ def main():
     def _file_date(remote_path, field):
         try:
             req = urllib.request.Request(f"{SITE}/{remote_path}",
-                                          headers={"Cache-Control": "no-cache", "User-Agent": "audit"})
-            data = urllib.request.urlopen(req, timeout=120).read().decode("utf-8", "replace")
+                                          headers={"Cache-Control": "no-cache", "User-Agent": "audit",
+                                                   "Range": "bytes=0-4095"})  # 只取 head 4KB，避免大文件下载超时
+            data = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "replace")
             import re as _re
             m = _re.search(r'"' + field + r'"\s*:\s*"([^"]*)"', data[:4000])
             if not m: return None
