@@ -270,12 +270,19 @@ def in_schedule_window(kind, now_cst=None):
         # 17:00 与 21:00 两个全量兜底 cron，旧窗口 8-16 会把 17:00/21:00 故障静默掉。
         return PREMARKET_GUARD <= mins and h <= 22   # 云端 08:25~21:00 + 容错
     if kind == "build_deploy":
+        # 🛡️ 2026-08-16 根治「周末刷邮件」：build_deploy 仅由上游 push 触发，周末无盘后
+        #   算法链、通常无人 push，最近成功停留 >120min 属设计预期。旧逻辑周末 9-22 严查
+        #   → 每轮 FAIL 刷邮件。⇒ 周末整段豁免（真构建故障由 site HTTP 200 检查 + 云端
+        #   build workflow 失败兜底，不会漏报）。
         if weekend:
-            return 9 <= h <= 22
+            return False
         return 8 <= h <= 22              # 盘后算法链 20:00 后仍会触发构建
     if kind == "raw_data":
+        # 🛡️ 2026-08-16 根治「周末刷邮件」：raw_data 由 cn_fetch 产生，周末仅在 09:00~11:00
+        #   有抓取轮次，11:00 之后停更属预期。旧逻辑周末 9-22 全严查 → 11:00 后必超 90min
+        #   阈值每轮 FAIL 刷邮件。⇒ 周末仅 9-11 严查，其余时段豁免。
         if weekend:
-            return 9 <= h <= 22
+            return 9 <= h <= 11
         return PREMARKET_GUARD <= mins and h <= 22
     return True
 
@@ -582,6 +589,15 @@ def run_health_check(alert=False, heal=True):
         return 1, f"调用 v8_health_check.py 失败: {e}"
 
 
+def _save_alert_state(path, ts, key):
+    """持久化最近一次邮件告警的去抖状态（本机运行态，不进仓库）。"""
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"last_ts": ts, "last_key": key}), encoding="utf-8")
+    except Exception:
+        pass
+
+
 def send_watchdog_alert(now, results, health_rc=None, health_out=None):
     """发送看门狗汇总告警邮件；邮件失败时写 URGENT 文件。
 
@@ -619,10 +635,27 @@ def send_watchdog_alert(now, results, health_rc=None, health_out=None):
         print(f"[INFO] watchdog 跳过邮件：无管线异常且健康检查无超阈 ≥ {ALERT_OVERDUE_MIN}min 的项")
         return False
 
+    # 🛡️ 2026-08-16 邮件去抖：同组异常 30min 内只发一封，避免真故障（或周末结构性误报）刷屏
+    state_path = Path(".workbuddy/v8_watchdog_alert_state.json")
+    try:
+        st = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else {}
+    except Exception:
+        st = {}
+    key = "|".join(sorted(name for name, ok, msg in results if not ok))
+    now_epoch = now_cst.timestamp()
+    DEDUPE_MIN = 30
+    if st.get("last_ts") and st.get("last_key") == key and (now_epoch - st["last_ts"]) < DEDUPE_MIN * 60:
+        print(f"[INFO] 邮件去抖：同组异常[{key}] 距上次告警 {int((now_epoch - st['last_ts']) / 60)}min "
+              f"< {DEDUPE_MIN}min，跳过邮件（仅写 URGENT 留痕）")
+        write_urgent(infra_fails + health_alert_items)
+        _save_alert_state(state_path, now_epoch, key)
+        return False
+
     if quiet:
         print(f"[INFO] 当前处于夜间静音时段（{QUIET_HOURS_START}:00-{QUIET_HOURS_END}:00），"
               f"跳过邮件告警，改写入 URGENT 文件留痕（共 {total_alerts} 项异常）")
         write_urgent(infra_fails + health_alert_items)
+        _save_alert_state(state_path, now_epoch, key)
         return False
 
     subject = f"【v8看门狗告警】{total_alerts}项异常 @ {now}"
@@ -634,6 +667,7 @@ def send_watchdog_alert(now, results, health_rc=None, health_out=None):
     ok = send_alert(subject, "\n".join(lines))
     if not ok:
         write_urgent(infra_fails + health_alert_items)
+    _save_alert_state(state_path, now_epoch, key)
     return ok
 
 
@@ -669,7 +703,7 @@ def main():
 
     raw_ok, raw_msg = check_raw_data_stale(threshold_min=90)
     if not raw_ok and not in_schedule_window("raw_data", now_cst):
-        raw_ok, raw_msg = True, raw_msg + " —— 非调度时段，豁免（夜间数据不刷新属预期）"
+        raw_ok, raw_msg = True, raw_msg + " —— 非调度时段，豁免（周末/夜间数据不刷新属预期）"
     results.append(("raw_data_fresh", raw_ok, raw_msg))
 
     ok, msg = check_site()
@@ -707,7 +741,15 @@ def main():
 
     print(log_text, end="")
 
-    # === 邮件告警（三期） ===
+    # === 自愈优先（2026-08-16 一劳永逸）：告警前先对 cn_fetch/raw_data 真故障派发重抓 ===
+    # 即便本机以 --no-auto-dispatch 运行，真故障也应先自愈，而非直接刷邮件（去抖止刷）。
+    if not overall and _is_dispatch_active(now_cst):
+        for name, ok, msg in list(results):
+            if not ok and name in ("cn_fetch", "raw_data_fresh"):
+                d_ok, d_msg = auto_dispatch(choose_category(now_cst))
+                print(f"[HEAL] {name} FAIL → 已派发 cn_fetch 自愈: {d_msg}")
+
+    # === 邮件告警 ===
     if args.alert and not overall:
         send_watchdog_alert(now, results, health_rc=health_rc, health_out=health_out)
 
