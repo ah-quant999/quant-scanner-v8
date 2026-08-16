@@ -142,20 +142,31 @@ def check_runner(heal=False):
     runners = d.get("runners", [])
     if not runners:
         return False, "无 self-hosted runner"
+    # 🛡️ 2026-08-16 双机互备修复（根治「单台离线 → 误报 FAIL 刷屏」）：
+    #   双机设计工作日小九(lemoncat-cn)/周末阿狸咪(alimi-cn) 互备，cn_fetch 的
+    #   runs-on=[self-hosted, cn] 会自动选**任一在线**机接任务。故只要有一台 cn
+    #   runner 在线，cn_fetch 就能跑，整体视为 OK；离线机仅附注提示（信息不丢），
+    #   不再判 FAIL。仅当**全部** cn runner 离线才真 FAIL（数据必然停更）。
+    online = [r for r in runners if r.get("status") == "online"]
+    offline = [r for r in runners if r.get("status") != "online"]
     parts = []
-    ok = True
+    ok = len(online) > 0
     for r in runners:
-        online = r.get("status") == "online"
+        on = r.get("status") == "online"
         busy = r.get("busy", False)
-        parts.append(f"{r['name']}: online={online}, busy={busy}")
-        if not online:
-            ok = False
-            if heal:
-                if not is_runner_process_alive():
-                    started, msg = start_runner()
-                    parts.append(f"heal={started}({msg})")
-                else:
-                    parts.append("heal=skipped(local process alive, waiting GitHub connect)")
+        parts.append(f"{r['name']}: online={on}, busy={busy}")
+        if not on and heal:
+            if not is_runner_process_alive():
+                started, msg = start_runner()
+                parts.append(f"heal={started}({msg})")
+            else:
+                parts.append("heal=skipped(local process alive, waiting GitHub connect)")
+    if offline:
+        names = ", ".join(r["name"] for r in offline)
+        if ok:
+            parts.append(f"注: {names} 离线（有在线备用机，cn_fetch 可自动兜底，不阻断）")
+        else:
+            parts.append(f"⚠ 全部 cn runner 离线: {names}")
     return ok, "; ".join(parts)
 
 
