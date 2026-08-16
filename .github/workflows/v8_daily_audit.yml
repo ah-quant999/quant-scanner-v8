@@ -61,6 +61,55 @@ jobs:
           echo "AUDIT_EXIT=$?"
           echo "PYTHON_EXIT=$?"
 
+      - name: "🔒 ?v 真失配 + 受保护文件核验（audit_weekly --cloud）"
+        continue-on-error: true
+        run: |
+          python scripts/audit_weekly.py --cloud 2>&1 | tail -40 || true
+
+      - name: "🔧 ?v 失配自动自愈（CDN 权威 fix + Contents API 直推，省主人手动）"
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'EOF'
+          import subprocess, os, re, base64, json, urllib.request, datetime
+          # 1) 再跑一次 audit 判断是否真有 ?v 失配
+          out = subprocess.run(["python", "scripts/audit_weekly.py", "--cloud"],
+                                capture_output=True, text=True).stdout
+          if "?v失配" not in out:
+              print("✅ 无 ?v 失配，无需自愈")
+              raise SystemExit(0)
+          # 2) 以 CDN 真实内容重算 ?v（fix_cachebusters_cdn 直接下载 github.io，云端可达）
+          subprocess.run(["python", "scripts/fix_cachebusters_cdn.py"], check=True)
+          # 3) Contents API 直推 index.html（默认 GITHUB_TOKEN 可写 contents，无 PAT secret 问题）
+          tok = os.environ["GH_TOKEN"]; REPO = "ah-quant999/quant-scanner-v8"
+          H = {"Authorization": "Bearer " + tok, "Accept": "application/vnd.github+json",
+               "Content-Type": "application/json", "User-Agent": "audit-heal"}
+          path = "index.html"; data = open(path, "rb").read()
+          sha = None
+          try:
+              r = json.load(urllib.request.urlopen(urllib.request.Request(
+                  f"https://api.github.com/repos/{REPO}/contents/{path}", headers=H), timeout=60))
+              sha = r["sha"]
+          except Exception:
+              pass
+          body = {"message": "audit-heal: ?v 对齐 CDN 真实内容 " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                  "content": base64.b64encode(data).decode(), "branch": "main"}
+          if sha:
+              body["sha"] = sha
+          req = urllib.request.Request(f"https://api.github.com/repos/{REPO}/contents/{path}",
+                                       data=json.dumps(body).encode(), headers=H, method="PUT")
+          urllib.request.urlopen(req, timeout=120)
+          # 4) 触发 Pages 构建
+          try:
+              req = urllib.request.Request(f"https://api.github.com/repos/{REPO}/pages/builds",
+                                           data=b"{}", headers=H, method="POST")
+              urllib.request.urlopen(req, timeout=60)
+          except Exception as e:
+              print("⚠️ pages build 触发警告:", e)
+          print("✅ 已自愈：?v 对齐 CDN 真实内容并直推 index.html")
+          EOF
+
       - name: "📦 追加审核历史（raw_data/audit_history.json）"
         run: |
           python - <<'EOF'
