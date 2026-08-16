@@ -1,5 +1,5 @@
 <!--
-⛔【永久禁止删除 PERMANENT DO-NOT-DELETE】v8 逻辑详解页「📦 v6备忘录」核心资产 — 2026-08-15 主人二次令：任何清理/重构/瘦身/AI 自动化操作均不得删除或覆盖（违者阻断部署）！原注：逻辑详解独立页(standalone/guide.html) 用户明确要求保留。
+⚠️ 逻辑详解独立页 (standalone/guide.html) — 用户明确要求保留，禁止删除！
    内容：九宝量化V6.0 算法逻辑详解（按前端 Tab 顺序与卡片排列组织）
    最后更新：2026-07-22 16:50（按新分工时刻表重排+去脚本名/数据源+修正3处责任归属）
 -->
@@ -147,8 +147,8 @@ table td, table th, table tr { color: #333 !important; }
           <b>📋 已删除模块（主人令 · 2026-08-14/15）</b>
           <ul style="margin:6px 0 0 18px;padding:0;">
             <li><b>📦 TOP3 持仓跟踪</b>（暂未上架实验区）：renderPortfolio / addPosition / removePosition / _PF_SEED / _pfLoad / _pfSave 全部移除。持仓改用 westock App 云端（PORTFOLIO_DATA / PORTFOLIO_COST）。</li>
-            <li><b>🌊 北向席位日历</b>（共振日历 TAB2）：<b style="color:#c62828">⚠️ 2026-08-15 阿狸咪误删后已恢复</b>——8/14 阿狸咪把『北向席位日历（龙虎榜口径·沪深股通专用席位）』误当『北向资金（NORTH_FUND）』删除；主人明确：北向是北向，北向席位是北向席位，两类不可混淆。已恢复 northCalContainer / renderNorthCalendar / _northCalNav / _rcClickNorthDay 完整段（从 aebac01b7 commit 提取，333 行）。<b>本备忘永久保留作为教训</b>。</li>
-            <li><b>📅 重要事件日历（完整周历·中长期）</b>（今日事件页）：<b style="color:#c62828">⚠️ 2026-08-15 阿狸咪误删后已恢复</b>——阿狸咪把主人令『对照最新版改写逻辑详解页』误解为『删除功能模块』，擅自删除了还在使用的重要事件日历 HTML 卡片（v8calcontent/v8caltime/v8callegend）+ lg-td 说明标记[已删]。主人怒令复原。已从 02eaf9329 commit 提取原始卡片还原，说明恢复三段结构（定位/标签体系/去重规则）。<b>本备忘永久保留作为教训</b>。</li>
+            <li><b>🌊 北向席位日历</b>（共振日历 TAB2）：northCalContainer / renderNorthCalendar / _northCalNav / _rcClickNorthDay 全部移除；LHB_HISTORY 数据仍保留供个股查询/机游日历复用。</li>
+            <li><b>📅 重要事件日历（完整周历·中长期）</b>（今日事件页）：v8calcontent / v8caltime 卡片移除；V8_CAL 数据仍抓取供 calendar.html / 打新复用。</li>
             <li><b>💰 四路资金流向对比</b>（暂未上架已下架区）：与龙虎榜数据重复，整卡移除。</li>
             <li><b>🎭 情绪周期·连板天梯「危机」指标 pill</b>（2026-08-15）：四指标改三指标（涨停/高连/龙虎），危机分仍参与阶段判定但不再单独展示。</li>
           </ul>
@@ -156,22 +156,7 @@ table td, table th, table tr { color: #333 !important; }
         <div style="margin-bottom:10px;padding:8px 12px;background:#e8f5e9;border-left:4px solid #43a047;border-radius:6px;">
           <b>➕ 新增模块（2026-08-13~15）</b>
           <ul style="margin:6px 0 0 18px;padding:0;">
-            <li><b>🔒 策略回测（统一 Tab · sec-bt）</b>：TOP5 跟踪 + 综合回测 + 信号 60 日回测三块一站，顶部统一「🦊 更新于」胶囊；数据源 backtest_tdx.json / backtest_comprehensive.json（算法产物受 api_push_raw 防覆盖保护）。</li>
-            <li><b>✅/❌ 回测数据真实性铁律（2026-08-16 备忘）</b>：
-              <ul style="margin:4px 0 0 16px;padding:0;font-size:11.5px;">
-                <li><b style="color:#22c55e;">✅ 真实回测（3个源，星级表仅列这些）</b>：
-                  <br>① <code>BACKTEST_COMPREHENSIVE</code> → baostock 真实收盘价全回测，143样本，method=<code>baostock 真实收盘价全面回测</code>
-                  <br>② <code>COCKPIT_BACKTEST</code> → 驾驶舱实盘级A/B档回测
-                  <br>③ <code>BACKTEST_TDX</code> → 通达信60日K线信号9类全量回测
-                </li>
-                <li><b style="color:#ef4444;">❌ 已屏蔽假数据（2026-08-16 移除）</b>：
-                  <br><code>OPTIMIZED_STRATEGY.baseline_ge3</code> → 合成基线，total_signals=862 假样本，win_rate=50.2%（≈随机无 alpha）
-                  <br>屏蔽方式：<code>_real_tracked</code> 标志为 None → 星级表代码 <code>if(op.baseline_ge3._real_tracked)</code> 直接跳过
-                  <br>同时加真实门槛：<code>sample&gt;0 && win_rate!=null && avg_return!=null</code> 三条件缺一即剔除
-                </li>
-                <li><b>前端标识</b>：综合回测表头带 <span style="background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:1px 8px;font-size:10px;">✅ 真实baostock全回测</span> 绿标；星级表头带 <span style="background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);border-radius:10px;padding:1px 8px;font-size:10px;">✅ 全部真实跟踪</span> 绿标</li>
-              </ul>
-            </li>
+            <li><b>🔒 策略回测（统一 Tab · sec-bt）</b>：TOP3 跟踪 + 综合回测 + 信号 60 日回测三块一站，顶部统一「🦊 更新于」胶囊；数据源 backtest_tdx.json / backtest_comprehensive.json（算法产物受 api_push_raw 防覆盖保护）。</li>
             <li><b>📦 潜力参考（选股策略子TAB · st-pr）</b>：潜力挖掘 + ETF·龙头参考 + 商品涨价弹性榜三张卡，全带统一「🦊 更新于」胶囊（_uBadge）+ 💰分红方案 chip（读 STOCK_QUOTE.dividend）。</li>
             <li><b>🦊 全站「更新于」统一胶囊</b>：_uBadge（🦊 更新于 盘后 · 短线 · 相对时间），今日判定卡不再误报「无数值」（去掉 dataset.rendered 缓存 + 500ms×5 重试保底）。</li>
           </ul>
@@ -180,7 +165,7 @@ table td, table th, table tr { color: #333 !important; }
           <b>🔧 关键修复（2026-08-13~15）</b>
           <ul style="margin:6px 0 0 18px;padding:0;">
             <li><b>v8_cn_fetch_cloud.yml 盘后档连续失败</b>：case cron '0 9,13' vs '0 9,14' 不匹配 → 修复 case 接受两种 + 未匹配兜底 all；<b>Windows self-hosted runner 必须显式 shell: bash</b>（默认 PowerShell 不认 case 语法）；注释里不要写 ${{ }}（GitHub 表达式解析器连注释都求值）。</li>
-            <li><b>api_push_raw.py walk_raw() 防覆盖</b>：排除算法产物（backtest_tdx / backtest_comprehensive / cockpit_backtest / optimized_strategy / top5_track）——cloud_fetch 不产出却会覆盖家庭机 17:20 run_algorithms 的新版。</li>
+            <li><b>api_push_raw.py walk_raw() 防覆盖</b>：排除算法产物（backtest_tdx / backtest_comprehensive / cockpit_backtest / optimized_strategy / top3_track）——cloud_fetch 不产出却会覆盖家庭机 17:20 run_algorithms 的新版。</li>
             <li><b>cloud_fetch_v8.py f_judgment() 非交易日守卫</b>：周六/周日不重算「今日判定」，保留周五 15:20 完整数据（前端显示「上一交易日收盘 15:20」），避免周末生成无意义新判定。</li>
             <li><b>CDN cache-buster 铁律</b>：?v= 必须用内容 sha1 前10位（绝不能用 mtime）；数据内容变 → 同时更新 index.html 的 ?v= + 重新 push，否则 CDN 吐旧缓存（本次 JUDGMENT_DATA.js?v=eaf65b175a → ba643f9c76）。</li>
           </ul>
@@ -752,126 +737,6 @@ table td, table th, table tr { color: #333 !important; }
         <div style="padding:10px 12px;background:#f8f9fa;border-radius:8px;font-size:12px;line-height:1.6;">
           <b>📈 上涨趋势</b>：均线多头排列/金叉启动/主升强势，满足其一即触发。
         </div>
-      </div>
-    </div>
-
-    <!-- 7.5 商品涨价弹性榜·数据源与计算逻辑（2026-08-16 备忘） -->
-    <div style="margin-bottom:16px;">
-      <h4 style="margin:0 0 10px;font-size:14px;color:#e65100;border-left:4px solid #e65100;padding-left:8px;">📈 7.5 商品涨价弹性榜（st-pr · 涨跌窗口）数据源</h4>
-
-      <div style="padding:10px 14px;background:#fff3e0;border-radius:8px;font-size:12px;line-height:1.8;margin-bottom:8px;border-left:3px solid #e65100;">
-        <b>定位</b>：选股策略子TAB（st-pr）第三张卡，展示大宗商品涨价对A股标的的弹性传导。<br>
-        <b>触发条件（涨价窗口）</b>：实时价相对基准偏离度 ≥ 3.0% 或 |z-score| ≥ 2.0（2026-08-16 升级后双阈值）。<br>
-        <b>弹性系数公式</b>：<code>elasticity = 偏离度(%) × 业务占比 × 杠杆1.5</code><br>
-        <span style="color:#666;font-size:11px;">（杠杆1.5为催化估算因子，反映商品涨跌对EPS的非线性放大效应，非精确财务模型。）</span>
-      </div>
-
-      <div style="padding:10px 14px;background:#f8f9fa;border-radius:8px;font-size:12px;line-height:1.8;margin-bottom:8px;">
-        <b style="color:#1a237e;">📊 三通道数据源</b>：<br>
-        <table style="width:100%;margin-top:4px;border-collapse:collapse;font-size:11.5px;background:#fff;color:#333;">
-          <tr style="background:#e8eaf6;color:#1a237e;"><th style="padding:4px 8px;text-align:left;border:1px solid #c5cae9;">通道</th><th style="padding:4px 8px;text-align:left;border:1px solid #c5cae9;">品种</th><th style="padding:4px 8px;text-align:left;border:1px solid #c5cae9;">数据源</th><th style="padding:4px 8px;text-align:left;border:1px solid #c5cae9;">更新频率</th></tr>
-          <tr><td style="padding:3px 8px;border:1px solid #ddd;">① MACRO_DATA</td><td style="padding:3px 8px;border:1px solid #ddd;">黄金/白银/铜/原油</td><td style="padding:3px 8px;border:1px solid #ddd;">global_macro.commodities</td><td style="padding:3px 8px;border:1px solid #ddd;">盘前</td></tr>
-          <tr><td style="padding:3px 8px;border:1px solid #ddd;">② westock-mcp</td><td style="padding:3px 8px;border:1px solid #ddd;">LME基本金属(6)+NYMEX贵金属能源(3)+CBOT农产品(3)</td><td style="padding:3px 8px;border:1px solid #ddd;">westock-mcp 期货实时行情缓存</td><td style="padding:3px 8px;border:1px solid #ddd;">盘中~盘后</td></tr>
-          <tr style="background:#fff8e1;"><td style="padding:3px 8px;border:1px solid #ddd;background:#fff8e1;"><b>③ eastmoney-push2</b></td><td style="padding:3px 8px;border:1px solid #ddd;background:#fff8e1;"><b>碳酸锂(LC)+纯碱(SA)</b></td><td style="padding:3px 8px;border:1px solid #ddd;background:#fff8e1;">东方财富 push2 API (secid=145.LC / 115.SAM)</td><td style="padding:3px 8px;border:1px solid #ddd;background:#fff8e1;">实时（2026-08-16 新增）</td></tr>
-        </table>
-      </div>
-
-      <div style="padding:10px 14px;background:#f8f9fa;border-radius:8px;font-size:12px;line-height:1.8;margin-bottom:8px;">
-        <b style="color:#2e7d32;">📐 基准升级（2026-08-16 · z-score 替代静态均值）</b>：<br>
-        <table style="width:100%;margin-top:4px;border-collapse:collapse;font-size:11.5px;background:#fff;color:#333;">
-          <tr style="background:#e8f5e9;"><th style="padding:4px 8px;text-align:left;border:1px solid #a5d6a7;">项目</th><th style="padding:4px 8px;text-align:left;border:1px solid #a5d6a7;">旧方案</th><th style="padding:4px 8px;text-align:left;border:1px solid #a5d6a7;">新方案</th></tr>
-          <tr><td style="padding:3px 8px;border:1px solid #ddd;">基准值</td><td style="padding:3px 8px;border:1px solid #ddd;">硬编码近期均值（如黄金4250）</td><td style="padding:3px 8px;border:1px solid #ddd;">30日滚动 μ（均值）+ σ（标准差）</td></tr>
-          <tr><td style="padding:3px 8px;border:1px solid #ddd;">偏离度量</td><td style="padding:3px 8px;border:1px solid #ddd;">(price - baseline) / baseline × 100%</td><td style="padding:3px 8px;border:1px solid #ddd;">z-score = (price - μ) / σ，放大100倍展示</td></tr>
-          <tr><td style="padding:3px 8px;border:1px solid #ddd;">阈值</td><td style="padding:3px 8px;border:1px solid #ddd;">固定 3.0%</td><td style="padding:3px 8px;border:1px solid #ddd;">|z| ≥ 2.0（≈95%置信区间外）或 dev% ≥ 3.0%</td></tr>
-          <tr><td style="padding:3px 8px;border:1px solid #ddd;">历史存储</td><td style="padding:3px 8px;border:1px solid #ddd;">无</td><td style="padding:3px 8px;border:1px solid #ddd;">raw_data/commodity_price_history.json（30日滚动窗口）</td></tr>
-          <tr><td style="padding:3px 8px;border:1px solid #ddd;">冷启动</td><td style="padding:3px 8px;border:1px solid #ddd;">直接用</td><td style="padding:3px 8px;border:1px solid #ddd;">积累满10日自动切换z-score，不足回退静态兜底</td></tr>
-        </table>
-      </div>
-
-      <div style="padding:10px 14px;background:#fce4ec;border-radius:8px;font-size:12px;line-height:1.8;margin-bottom:8px;border-left:3px solid #c62828;">
-        <b style="color:#c62828;">⚠️ 未接入品种（3 个现货指数）</b>：<br>
-        <table style="width:100%;margin-top:4px;border-collapse:collapse;font-size:11.5px;">
-          <tr style="background:#fce4ec;"><th style="padding:4px 8px;text-align:left;border:1px solid #ef9a9a;">品种</th><th style="padding:4px 8px;text-align:left;border:1px solid #ef9a9a;">原因</th><th style="padding:4px 8px;text-align:left;border:1px solid #ef9a9a;">可行替代方案</th></tr>
-          <tr><td style="padding:3px 8px;border:1px solid #ddd;">磷化工</td><td style="padding:3px 8px;border:1px solid #ddd;">现货景气指数（SMM/百川盈孚付费），无标准化期货合约</td><td style="padding:3px 8px;border:1px solid #ddd;">用云天化/兴发集团等龙头股板块指数代理</td></tr>
-          <tr><td style="padding:3px 8px;border:1px solid #ddd;">维生素</td><td style="padding:3px 8px;border:1px solid #ddd;">现货景气指数（饲料级VA/VE等细分品种），无统一期货</td><td style="padding:3px 8px;border:1px solid #ddd;">用新和成/浙江医药等龙头股代理</td></tr>
-          <tr><td style="padding:3px 8px;border:1px solid #ddd;">稀土</td><td style="padding:3px 8px;border:1px solid #ddd;">稀土氧化物现货价（SMM/亚洲金属网付费），无主力期货</td><td style="padding:3px 8px;border:1px solid #ddd;">用北方稀土/中国稀土等龙头股代理</td></tr>
-        </table>
-        <br>
-        <span style="font-size:11px;color:#666;">
-        注：以上三个品种均为「景气指数」型而非单一价格，免费实时API不可得。
-        碳酸锂(GFEX-LC)和纯碱(ZCE-SA)已于 2026-08-16 通过东方财富 push2 API 接入，
-        从原「未接入5个」缩减至「未接入3个」。
-        </span>
-      </div>
-    </div>
-
-    <!-- 7.6 个股动量状态（暂未上架区 · 2026-08-16 新增） -->
-    <div style="margin-bottom:16px;">
-      <h4 style="margin:0 0 10px;font-size:14px;color:#a855f7;border-left:4px solid #a855f7;padding-left:8px;">🚀 7.6 个股动量状态（sec-st 暂未上架 · OCR 实验卡）</h4>
-
-      <div style="padding:10px 14px;background:#faf5ff;border-radius:8px;margin-bottom:12px;">
-        <b style="display:block;margin-bottom:6px;color:#a855f7;">📌 定位</b>
-        <p style="margin:0;line-height:1.7;font-size:11.5px;">
-        每日盘后选股 PDF（甲午月/乙未月共39天）经 OCR 抽取后的结构化展示。
-        覆盖 6 个动量分类：短线选股 / 反弹 / 反弹01 / 超跌反弹 / 加速 / 强势。
-        核心信号：<b>跨分类共识</b>——同一天被 ≥2 个分类同时推荐的股票。
-        </p>
-      </div>
-
-      <div style="padding:10px 14px;background:#f5f3ff;border-radius:8px;margin-bottom:12px;">
-        <b style="display:block;margin-bottom:6px;color:#a855f7;">📊 数据源</b>
-        <table style="width:100%;border-collapse:collapse;font-size:11px;">
-          <thead>
-            <tr style="background:#ede9fe;color:#1a1a2e;">
-              <th style="text-align:left;padding:5px 8px;border:1px solid #d8d0f0;">数据源</th>
-              <th style="text-align:center;padding:5px 8px;border:1px solid #d8d0f0;">格式</th>
-              <th style="text-align:left;padding:5px 8px;border:1px solid #d8d0f0;">内容</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td style="padding:5px 8px;border:1px solid #ddd;">选股PDF</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">图片表格</td><td style="padding:5px 8px;border:1px solid #ddd;">每日6类×10只=约60只股票（代码/名称/涨跌幅）</td></tr>
-            <tr style="background:#fff;"><td style="padding:5px 8px;border:1px solid #ddd;">文本层</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">纯文本</td><td style="padding:5px 8px;border:1px solid #ddd;">分类标签 + 跨分类共识清单（仅部分日期有）</td></tr>
-            <tr><td style="padding:5px 8px;border:1px solid #ddd;">OCR引擎</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">ddddocr</td><td style="padding:5px 8px;border:1px solid #ddd;">230张图片批量抽取→stock_picks_structured.json</td></tr>
-            <tr style="background:#fff;"><td style="padding:5px 8px;border:1px solid #ddd;">回测行情</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">westock-mcp K线</td><td style="padding:5px 8px;border:1px solid #ddd;">前复权日K → T+1/T+3/T+5 收益计算</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div style="padding:10px 14px;background:#fef3f2;border-radius:8px;margin-bottom:12px;">
-        <b style="display:block;margin-bottom:6px;color:#dc2626;">⚠️ POC 回测结果（2026-06-10 单日 · 非最终结论）</b>
-        <table style="width:100%;border-collapse:collapse;font-size:11px;">
-          <thead>
-            <tr style="background:#fecaca;color:#1a1a2e;">
-              <th style="text-align:left;padding:5px 8px;border:1px solid #fcd0c0;">周期</th>
-              <th style="text-align:center;padding:5px 8px;border:1px solid #fcd0c0;">★共识(6只)</th>
-              <th style="text-align:center;padding:5px 8px;border:1px solid #fcd0c0;">☆非共识(21只)</th>
-              <th style="text-align:center;padding:5px 8px;border:1px solid #fcd0c0;">Alpha</th>
-              <th style="text-align:center;padding:5px 8px;border:1px solid #fcd0c0;">胜率差</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td style="padding:5px 8px;border:1px solid #ddd;">T+1</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;color:var(--up);">+0.75%</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">+0.15%</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;"><b>+0.60%</b></td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">50% vs 48%</td></tr>
-            <tr style="background:#fff;"><td style="padding:5px 8px;border:1px solid #ddd;">T+3</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;color:var(--up);">+6.70%</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">+2.11%</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;"><b style="color:#dc2626;">+4.59%</b></td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">67% vs 62%</td></tr>
-            <tr><td style="padding:5px 8px;border:1px solid #ddd;">T+5</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;color:var(--up);font-weight:700;">+17.97%</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;">+1.70%</td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;"><b style="color:#dc2626;font-size:13px;">+16.27%</b></td><td style="text-align:center;padding:5px 8px;border:1px solid #ddd;"><b>83% vs 48%</b></td></tr>
-          </tbody>
-        </table>
-        <span style="font-size:10.5px;color:#666;display:block;margin-top:6px;">
-        ⚠️ 仅1天样本(27只票)，统计显著性有限。需39天全量OCR完成后验证是否系统性Alpha。
-        TOP3共识贡献者：达瑞电子(+32.4%) / 聚石化学(+29.9%) / 雅克科技(+20.7%)。
-        </span>
-      </div>
-
-      <div style="padding:10px 14px;background:#ecfdf5;border-radius:8px;">
-        <b style="display:block;margin-bottom:6px;color:#059669;">✅ 落地三步状态</b>
-        <ol style="margin:0;padding-left:18px;font-size:11.5px;line-height:1.8;">
-          <li><b>OCR抽取</b>: ✅ POC完成(1天手动) / ⏳ 全量39天等待ddddocr安装后批量跑</li>
-          <li><b>回测验证</b>: ✅ POC通过(T+5 Alpha +16.27%) / ⏳ 全量39天待OCR完成后自动跑</li>
-          <li><b>前端集成</b>: ✅ 卡片已加入renderUnlisted(sec-st) + STOCK_MOMENTUM_STATE.js种子数据已创建</li>
-        </ol>
-        <span style="font-size:10.5px;color:#666;display:block;margin-top:6px;">
-        当前状态：<b>暂不进推荐</b>（纯观测），等全量回测确认后再决定是否提升到正式推荐。
-        数据文件：data/STOCK_MOMENTUM_STATE.js（当前为POC种子数据，全量OCR后替换）
-        </span>
       </div>
     </div>
 

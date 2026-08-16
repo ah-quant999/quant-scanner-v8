@@ -267,7 +267,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 161.17,
        "cum_pct": 161.17
       }
-     ]
+     ],
+     "entry_price": 71.64,
+     "stop_price": 64.48,
+     "target_price": 82.39,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+1",
+     "exit_window_ok": true
     },
     {
      "code": "600460",
@@ -360,7 +369,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 54.66,
        "cum_pct": 54.66
       }
-     ]
+     ],
+     "entry_price": 35.29,
+     "stop_price": 31.76,
+     "target_price": 40.58,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "600707",
@@ -453,7 +471,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 54.37,
        "cum_pct": 54.37
       }
-     ]
+     ],
+     "entry_price": 11.44,
+     "stop_price": 10.3,
+     "target_price": 13.16,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "688106",
@@ -546,7 +573,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 12.44,
        "cum_pct": 12.44
       }
-     ]
+     ],
+     "entry_price": 32.81,
+     "stop_price": 29.53,
+     "target_price": 37.73,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "001229",
@@ -639,7 +675,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 49.72,
        "cum_pct": 49.72
       }
-     ]
+     ],
+     "entry_price": 28.52,
+     "stop_price": 25.67,
+     "target_price": 32.8,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "300373",
@@ -732,7 +777,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 49.53,
        "cum_pct": 49.53
       }
-     ]
+     ],
+     "entry_price": 105.15,
+     "stop_price": 94.64,
+     "target_price": 120.92,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "002409",
@@ -825,7 +879,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 47.72,
        "cum_pct": 47.72
       }
-     ]
+     ],
+     "entry_price": 122.55,
+     "stop_price": 110.3,
+     "target_price": 140.93,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "688388",
@@ -919,7 +982,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 32.77,
        "cum_pct": 32.77
       }
-     ]
+     ],
+     "entry_price": 33.78,
+     "stop_price": 30.4,
+     "target_price": 38.85,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "688396",
@@ -1012,7 +1084,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 41.79,
        "cum_pct": 41.79
       }
-     ]
+     ],
+     "entry_price": 68.8,
+     "stop_price": 61.92,
+     "target_price": 79.12,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "301132",
@@ -1106,7 +1187,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 29.86,
        "cum_pct": 29.86
       }
-     ]
+     ],
+     "entry_price": 40.12,
+     "stop_price": 36.11,
+     "target_price": 46.14,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "002025",
@@ -1200,7 +1290,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 29.62,
        "cum_pct": 29.62
       }
-     ]
+     ],
+     "entry_price": 66.48,
+     "stop_price": 59.83,
+     "target_price": 76.45,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "603001",
@@ -1294,7 +1393,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -10.6,
        "cum_pct": -10.6
       }
-     ]
+     ],
+     "entry_price": 10.38,
+     "stop_price": 9.34,
+     "target_price": 11.94,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "300592",
@@ -1387,7 +1495,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 34.47,
        "cum_pct": 34.47
       }
-     ]
+     ],
+     "entry_price": 13.84,
+     "stop_price": 12.46,
+     "target_price": 15.92,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "301379",
@@ -1480,7 +1597,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 22.25,
        "cum_pct": 22.25
       }
-     ]
+     ],
+     "entry_price": 26.7,
+     "stop_price": 24.03,
+     "target_price": 30.7,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "603903",
@@ -1574,7 +1700,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 31.89,
        "cum_pct": 31.89
       }
-     ]
+     ],
+     "entry_price": 12.01,
+     "stop_price": 10.81,
+     "target_price": 13.81,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002979",
@@ -1667,7 +1802,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 10.48,
        "cum_pct": 10.48
       }
-     ]
+     ],
+     "entry_price": 55.53,
+     "stop_price": 49.98,
+     "target_price": 63.86,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "300346",
@@ -1760,7 +1904,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 9.8,
        "cum_pct": 9.8
       }
-     ]
+     ],
+     "entry_price": 70.8,
+     "stop_price": 63.72,
+     "target_price": 81.42,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "600288",
@@ -1853,7 +2006,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 29.17,
        "cum_pct": 29.17
       }
-     ]
+     ],
+     "entry_price": 13.3,
+     "stop_price": 11.97,
+     "target_price": 15.29,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "688368",
@@ -1946,7 +2108,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 28.81,
        "cum_pct": 28.81
       }
-     ]
+     ],
+     "entry_price": 172.43,
+     "stop_price": 155.19,
+     "target_price": 198.29,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "300174",
@@ -2039,7 +2210,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 12.96,
        "cum_pct": 12.96
       }
-     ]
+     ],
+     "entry_price": 25.78,
+     "stop_price": 23.2,
+     "target_price": 29.65,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300576",
@@ -2132,7 +2312,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 25.9,
        "cum_pct": 25.9
       }
-     ]
+     ],
+     "entry_price": 41.93,
+     "stop_price": 37.74,
+     "target_price": 48.22,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "300726",
@@ -2225,7 +2414,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 16.79,
        "cum_pct": 16.79
       }
-     ]
+     ],
+     "entry_price": 72.41,
+     "stop_price": 65.17,
+     "target_price": 83.27,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "688711",
@@ -2318,7 +2516,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 18.86,
        "cum_pct": 18.86
       }
-     ]
+     ],
+     "entry_price": 35.69,
+     "stop_price": 32.12,
+     "target_price": 41.04,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688629",
@@ -2411,7 +2618,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 19.59,
        "cum_pct": 19.59
       }
-     ]
+     ],
+     "entry_price": 171,
+     "stop_price": 153.9,
+     "target_price": 196.65,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "002422",
@@ -2504,7 +2720,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 14.4,
        "cum_pct": 14.4
       }
-     ]
+     ],
+     "entry_price": 39.16,
+     "stop_price": 35.24,
+     "target_price": 45.03,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "688237",
@@ -2597,7 +2822,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 21.23,
        "cum_pct": 21.23
       }
-     ]
+     ],
+     "entry_price": 53.99,
+     "stop_price": 48.59,
+     "target_price": 62.09,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "605208",
@@ -2690,7 +2924,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 21.07,
        "cum_pct": 21.07
       }
-     ]
+     ],
+     "entry_price": 15.95,
+     "stop_price": 14.36,
+     "target_price": 18.34,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300503",
@@ -2784,7 +3027,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -8.03,
        "cum_pct": -8.03
       }
-     ]
+     ],
+     "entry_price": 92.3,
+     "stop_price": 83.07,
+     "target_price": 106.14,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "002850",
@@ -2877,7 +3129,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 1.43,
        "cum_pct": 1.43
       }
-     ]
+     ],
+     "entry_price": 189.3,
+     "stop_price": 170.37,
+     "target_price": 217.69,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "688733",
@@ -2970,7 +3231,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 1.53,
        "cum_pct": 1.53
       }
-     ]
+     ],
+     "entry_price": 39.12,
+     "stop_price": 35.21,
+     "target_price": 44.99,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300679",
@@ -3064,7 +3334,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -2.01,
        "cum_pct": -2.01
       }
-     ]
+     ],
+     "entry_price": 61.22,
+     "stop_price": 55.1,
+     "target_price": 70.4,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "603725",
@@ -3158,7 +3437,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 6.5,
        "cum_pct": 6.5
       }
-     ]
+     ],
+     "entry_price": 12.31,
+     "stop_price": 11.08,
+     "target_price": 14.16,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "002430",
@@ -3251,7 +3539,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -5.29,
        "cum_pct": -5.29
       }
-     ]
+     ],
+     "entry_price": 27.6,
+     "stop_price": 24.84,
+     "target_price": 31.74,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301678",
@@ -3344,7 +3641,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -6.44,
        "cum_pct": -6.44
       }
-     ]
+     ],
+     "entry_price": 67.38,
+     "stop_price": 60.64,
+     "target_price": 77.49,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "300878",
@@ -3438,7 +3744,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 2.22,
        "cum_pct": 2.22
       }
-     ]
+     ],
+     "entry_price": 33.73,
+     "stop_price": 30.36,
+     "target_price": 38.79,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300811",
@@ -3531,7 +3846,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 3.19,
        "cum_pct": 3.19
       }
-     ]
+     ],
+     "entry_price": 91.96,
+     "stop_price": 82.76,
+     "target_price": 105.75,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "603661",
@@ -3624,7 +3948,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 3.22,
        "cum_pct": 3.22
       }
-     ]
+     ],
+     "entry_price": 35.73,
+     "stop_price": 32.16,
+     "target_price": 41.09,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000593",
@@ -3717,7 +4050,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -4.9,
        "cum_pct": -4.9
       }
-     ]
+     ],
+     "entry_price": 22.67,
+     "stop_price": 20.4,
+     "target_price": 26.07,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "605580",
@@ -3810,7 +4152,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -3.63,
        "cum_pct": -3.63
       }
-     ]
+     ],
+     "entry_price": 26.43,
+     "stop_price": 23.79,
+     "target_price": 30.39,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "000301",
@@ -3903,7 +4254,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -3.41,
        "cum_pct": -3.41
       }
-     ]
+     ],
+     "entry_price": 12.02,
+     "stop_price": 10.82,
+     "target_price": 13.82,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688117",
@@ -3996,7 +4356,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 4.93,
        "cum_pct": 4.93
       }
-     ]
+     ],
+     "entry_price": 26.78,
+     "stop_price": 24.1,
+     "target_price": 30.8,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603379",
@@ -4089,7 +4458,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 10.97,
        "cum_pct": 10.97
       }
-     ]
+     ],
+     "entry_price": 60.7,
+     "stop_price": 54.63,
+     "target_price": 69.8,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600962",
@@ -4183,7 +4561,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -10.51,
        "cum_pct": -10.51
       }
-     ]
+     ],
+     "entry_price": 26.36,
+     "stop_price": 23.72,
+     "target_price": 30.31,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688335",
@@ -4276,7 +4663,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -7.07,
        "cum_pct": -7.07
       }
-     ]
+     ],
+     "entry_price": 29.85,
+     "stop_price": 26.87,
+     "target_price": 34.33,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301617",
@@ -4369,7 +4765,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 13.31,
        "cum_pct": 13.31
       }
-     ]
+     ],
+     "entry_price": 52.95,
+     "stop_price": 47.66,
+     "target_price": 60.89,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "605358",
@@ -4462,7 +4867,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -9.57,
        "cum_pct": -9.57
       }
-     ]
+     ],
+     "entry_price": 70.35,
+     "stop_price": 63.31,
+     "target_price": 80.9,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "605228",
@@ -4555,7 +4969,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 6.45,
        "cum_pct": 6.45
       }
-     ]
+     ],
+     "entry_price": 13.17,
+     "stop_price": 11.85,
+     "target_price": 15.15,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603662",
@@ -4650,7 +5073,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -17.68,
        "cum_pct": -17.68
       }
-     ]
+     ],
+     "entry_price": 70.81,
+     "stop_price": 63.73,
+     "target_price": 81.43,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688603",
@@ -4743,7 +5175,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 12.29,
        "cum_pct": 12.29
       }
-     ]
+     ],
+     "entry_price": 185.19,
+     "stop_price": 166.67,
+     "target_price": 212.97,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "601339",
@@ -4836,7 +5277,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 7.84,
        "cum_pct": 7.84
       }
-     ]
+     ],
+     "entry_price": 7.4,
+     "stop_price": 6.66,
+     "target_price": 8.51,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000521",
@@ -4930,7 +5380,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -2.19,
        "cum_pct": -2.19
       }
-     ]
+     ],
+     "entry_price": 5.49,
+     "stop_price": 4.94,
+     "target_price": 6.31,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603722",
@@ -5023,7 +5482,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -26.57,
        "cum_pct": -26.57
       }
-     ]
+     ],
+     "entry_price": 39.6,
+     "stop_price": 35.64,
+     "target_price": 45.54,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002587",
@@ -5116,7 +5584,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 7.73,
        "cum_pct": 7.73
       }
-     ]
+     ],
+     "entry_price": 6.99,
+     "stop_price": 6.29,
+     "target_price": 8.04,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "601108",
@@ -5210,7 +5687,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 11.07,
        "cum_pct": 11.07
       }
-     ]
+     ],
+     "entry_price": 8.22,
+     "stop_price": 7.4,
+     "target_price": 9.45,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603687",
@@ -5303,7 +5789,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -19.3,
        "cum_pct": -19.3
       }
-     ]
+     ],
+     "entry_price": 18.81,
+     "stop_price": 16.93,
+     "target_price": 21.63,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002993",
@@ -5396,7 +5891,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -3.13,
        "cum_pct": -3.13
       }
-     ]
+     ],
+     "entry_price": 65.45,
+     "stop_price": 58.91,
+     "target_price": 75.27,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300093",
@@ -5489,7 +5993,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -6.14,
        "cum_pct": -6.14
       }
-     ]
+     ],
+     "entry_price": 24.6,
+     "stop_price": 22.14,
+     "target_price": 28.29,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301033",
@@ -5583,7 +6096,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -1.73,
        "cum_pct": -1.73
       }
-     ]
+     ],
+     "entry_price": 54.19,
+     "stop_price": 48.77,
+     "target_price": 62.32,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688071",
@@ -5677,7 +6199,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -14.98,
        "cum_pct": -14.98
       }
-     ]
+     ],
+     "entry_price": 36.44,
+     "stop_price": 32.8,
+     "target_price": 41.91,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002458",
@@ -5770,7 +6301,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 5.5,
        "cum_pct": 5.5
       }
-     ]
+     ],
+     "entry_price": 8.55,
+     "stop_price": 7.7,
+     "target_price": 9.83,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "601066",
@@ -5863,7 +6403,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 4.64,
        "cum_pct": 4.64
       }
-     ]
+     ],
+     "entry_price": 27.39,
+     "stop_price": 24.65,
+     "target_price": 31.5,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603211",
@@ -5956,7 +6505,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -9.65,
        "cum_pct": -9.65
       }
-     ]
+     ],
+     "entry_price": 35.86,
+     "stop_price": 32.27,
+     "target_price": 41.24,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "001313",
@@ -6049,7 +6607,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -1.67,
        "cum_pct": -1.67
       }
-     ]
+     ],
+     "entry_price": 7.8,
+     "stop_price": 7.02,
+     "target_price": 8.97,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301365",
@@ -6142,7 +6709,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -2.35,
        "cum_pct": -2.35
       }
-     ]
+     ],
+     "entry_price": 37.91,
+     "stop_price": 34.12,
+     "target_price": 43.6,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600367",
@@ -6235,7 +6811,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -29.34,
        "cum_pct": -29.34
       }
-     ]
+     ],
+     "entry_price": 58.28,
+     "stop_price": 52.45,
+     "target_price": 67.02,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002126",
@@ -6328,7 +6913,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -4.79,
        "cum_pct": -4.79
       }
-     ]
+     ],
+     "entry_price": 50.48,
+     "stop_price": 45.43,
+     "target_price": 58.05,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300376",
@@ -6421,7 +7015,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -3.37,
        "cum_pct": -3.37
       }
-     ]
+     ],
+     "entry_price": 5.94,
+     "stop_price": 5.35,
+     "target_price": 6.83,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300568",
@@ -6514,7 +7117,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -17.52,
        "cum_pct": -17.52
       }
-     ]
+     ],
+     "entry_price": 18.72,
+     "stop_price": 16.85,
+     "target_price": 21.53,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600203",
@@ -6607,7 +7219,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -12.16,
        "cum_pct": -12.16
       }
-     ]
+     ],
+     "entry_price": 12.34,
+     "stop_price": 11.11,
+     "target_price": 14.19,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "001400",
@@ -6700,7 +7321,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -9.94,
        "cum_pct": -9.94
       }
-     ]
+     ],
+     "entry_price": 115.37,
+     "stop_price": 103.83,
+     "target_price": 132.68,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301000",
@@ -6793,7 +7423,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -19.91,
        "cum_pct": -19.91
       }
-     ]
+     ],
+     "entry_price": 32.74,
+     "stop_price": 29.47,
+     "target_price": 37.65,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688418",
@@ -6886,7 +7525,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -15.79,
        "cum_pct": -15.79
       }
-     ]
+     ],
+     "entry_price": 48.08,
+     "stop_price": 43.27,
+     "target_price": 55.29,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002225",
@@ -6979,7 +7627,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -3.55,
        "cum_pct": -3.55
       }
-     ]
+     ],
+     "entry_price": 4.51,
+     "stop_price": 4.06,
+     "target_price": 5.19,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600237",
@@ -7072,7 +7729,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -13.78,
        "cum_pct": -13.78
       }
-     ]
+     ],
+     "entry_price": 12.99,
+     "stop_price": 11.69,
+     "target_price": 14.94,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002871",
@@ -7165,7 +7831,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -4.99,
        "cum_pct": -4.99
       }
-     ]
+     ],
+     "entry_price": 21.46,
+     "stop_price": 19.31,
+     "target_price": 24.68,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "605060",
@@ -7258,7 +7933,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -16.85,
        "cum_pct": -16.85
       }
-     ]
+     ],
+     "entry_price": 53.25,
+     "stop_price": 47.93,
+     "target_price": 61.24,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603327",
@@ -7351,7 +8035,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -20.6,
        "cum_pct": -20.6
       }
-     ]
+     ],
+     "entry_price": 10.68,
+     "stop_price": 9.61,
+     "target_price": 12.28,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "003009",
@@ -7444,7 +8137,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -5.77,
        "cum_pct": -5.77
       }
-     ]
+     ],
+     "entry_price": 59.96,
+     "stop_price": 53.96,
+     "target_price": 68.95,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301596",
@@ -7537,7 +8239,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 7.08,
        "cum_pct": 7.08
       }
-     ]
+     ],
+     "entry_price": 59.74,
+     "stop_price": 53.77,
+     "target_price": 68.7,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "000545",
@@ -7630,7 +8341,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 2.26,
        "cum_pct": 2.26
       }
-     ]
+     ],
+     "entry_price": 2.65,
+     "stop_price": 2.38,
+     "target_price": 3.05,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000034",
@@ -7723,7 +8443,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -6.23,
        "cum_pct": -6.23
       }
-     ]
+     ],
+     "entry_price": 27.75,
+     "stop_price": 24.98,
+     "target_price": 31.91,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603856",
@@ -7816,7 +8545,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 5.98,
        "cum_pct": 5.98
       }
-     ]
+     ],
+     "entry_price": 12.55,
+     "stop_price": 11.3,
+     "target_price": 14.43,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688093",
@@ -7909,7 +8647,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -11.29,
        "cum_pct": -11.29
       }
-     ]
+     ],
+     "entry_price": 34.72,
+     "stop_price": 31.25,
+     "target_price": 39.93,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300244",
@@ -8002,7 +8749,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 0.67,
        "cum_pct": 0.67
       }
-     ]
+     ],
+     "entry_price": 19.29,
+     "stop_price": 17.36,
+     "target_price": 22.18,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688227",
@@ -8095,7 +8851,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -2.12,
        "cum_pct": -2.12
       }
-     ]
+     ],
+     "entry_price": 102.3,
+     "stop_price": 92.07,
+     "target_price": 117.64,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002353",
@@ -8188,7 +8953,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -27.26,
        "cum_pct": -27.26
       }
-     ]
+     ],
+     "entry_price": 161.46,
+     "stop_price": 145.31,
+     "target_price": 185.68,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688758",
@@ -8281,7 +9055,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 4.27,
        "cum_pct": 4.27
       }
-     ]
+     ],
+     "entry_price": 21.56,
+     "stop_price": 19.4,
+     "target_price": 24.79,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301213",
@@ -8374,7 +9157,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -3.71,
        "cum_pct": -3.71
       }
-     ]
+     ],
+     "entry_price": 52.3,
+     "stop_price": 47.07,
+     "target_price": 60.14,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688153",
@@ -8467,7 +9259,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -4.43,
        "cum_pct": -4.43
       }
-     ]
+     ],
+     "entry_price": 32.04,
+     "stop_price": 28.84,
+     "target_price": 36.85,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300192",
@@ -8561,7 +9362,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -8.84,
        "cum_pct": -8.84
       }
-     ]
+     ],
+     "entry_price": 12.44,
+     "stop_price": 11.2,
+     "target_price": 14.31,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300474",
@@ -8654,7 +9464,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -1.27,
        "cum_pct": -1.27
       }
-     ]
+     ],
+     "entry_price": 60.48,
+     "stop_price": 54.43,
+     "target_price": 69.55,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300257",
@@ -8748,7 +9567,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -13.28,
        "cum_pct": -13.28
       }
-     ]
+     ],
+     "entry_price": 28.68,
+     "stop_price": 25.81,
+     "target_price": 32.98,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000722",
@@ -8841,7 +9669,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -22.03,
        "cum_pct": -22.03
       }
-     ]
+     ],
+     "entry_price": 15.07,
+     "stop_price": 13.56,
+     "target_price": 17.33,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "300238",
@@ -8934,7 +9771,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -4.42,
        "cum_pct": -4.42
       }
-     ]
+     ],
+     "entry_price": 11.77,
+     "stop_price": 10.59,
+     "target_price": 13.54,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600179",
@@ -9028,7 +9874,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -1.75,
        "cum_pct": -1.75
       }
-     ]
+     ],
+     "entry_price": 4.56,
+     "stop_price": 4.1,
+     "target_price": 5.24,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600739",
@@ -9121,7 +9976,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 4.96,
        "cum_pct": 4.96
       }
-     ]
+     ],
+     "entry_price": 10.29,
+     "stop_price": 9.26,
+     "target_price": 11.83,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600096",
@@ -9215,7 +10079,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -6.89,
        "cum_pct": -6.89
       }
-     ]
+     ],
+     "entry_price": 32.53,
+     "stop_price": 29.28,
+     "target_price": 37.41,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603916",
@@ -9308,7 +10181,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -18.37,
        "cum_pct": -18.37
       }
-     ]
+     ],
+     "entry_price": 14.7,
+     "stop_price": 13.23,
+     "target_price": 16.9,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301418",
@@ -9401,7 +10283,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -21.2,
        "cum_pct": -21.2
       }
-     ]
+     ],
+     "entry_price": 54.63,
+     "stop_price": 49.17,
+     "target_price": 62.82,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600843",
@@ -9495,7 +10386,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -6.76,
        "cum_pct": -6.76
       }
-     ]
+     ],
+     "entry_price": 8.58,
+     "stop_price": 7.72,
+     "target_price": 9.87,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300127",
@@ -9588,7 +10488,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -16.31,
        "cum_pct": -16.31
       }
-     ]
+     ],
+     "entry_price": 28.58,
+     "stop_price": 25.72,
+     "target_price": 32.87,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688239",
@@ -9682,7 +10591,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -23.8,
        "cum_pct": -23.8
       }
-     ]
+     ],
+     "entry_price": 59.83,
+     "stop_price": 53.85,
+     "target_price": 68.8,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688589",
@@ -9776,7 +10694,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -12.53,
        "cum_pct": -12.53
       }
-     ]
+     ],
+     "entry_price": 22.98,
+     "stop_price": 20.68,
+     "target_price": 26.43,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301363",
@@ -9870,7 +10797,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -8.43,
        "cum_pct": -8.43
       }
-     ]
+     ],
+     "entry_price": 20.88,
+     "stop_price": 18.79,
+     "target_price": 24.01,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300357",
@@ -9963,7 +10899,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 0.98,
        "cum_pct": 0.98
       }
-     ]
+     ],
+     "entry_price": 23.47,
+     "stop_price": 21.12,
+     "target_price": 26.99,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301557",
@@ -10056,7 +11001,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -1.86,
        "cum_pct": -1.86
       }
-     ]
+     ],
+     "entry_price": 90.73,
+     "stop_price": 81.66,
+     "target_price": 104.34,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000521",
@@ -10149,7 +11103,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -8.17,
        "cum_pct": -8.17
       }
-     ]
+     ],
+     "entry_price": 5.51,
+     "stop_price": 4.96,
+     "target_price": 6.34,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002335",
@@ -10242,7 +11205,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -15.27,
        "cum_pct": -15.27
       }
-     ]
+     ],
+     "entry_price": 42.25,
+     "stop_price": 38.02,
+     "target_price": 48.59,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "002669",
@@ -10335,7 +11307,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -31.73,
        "cum_pct": -31.73
       }
-     ]
+     ],
+     "entry_price": 17.84,
+     "stop_price": 16.06,
+     "target_price": 20.52,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "000958",
@@ -10428,7 +11409,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -10.45,
        "cum_pct": -10.45
       }
-     ]
+     ],
+     "entry_price": 6.41,
+     "stop_price": 5.77,
+     "target_price": 7.37,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688381",
@@ -10521,7 +11511,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -13.49,
        "cum_pct": -13.49
       }
-     ]
+     ],
+     "entry_price": 51.9,
+     "stop_price": 46.71,
+     "target_price": 59.68,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300390",
@@ -10615,7 +11614,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -30.86,
        "cum_pct": -30.86
       }
-     ]
+     ],
+     "entry_price": 93.51,
+     "stop_price": 84.16,
+     "target_price": 107.54,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301591",
@@ -10708,7 +11716,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -26.6,
        "cum_pct": -26.6
       }
-     ]
+     ],
+     "entry_price": 56.36,
+     "stop_price": 50.72,
+     "target_price": 64.81,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "600459",
@@ -10801,7 +11818,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -17.57,
        "cum_pct": -17.57
       }
-     ]
+     ],
+     "entry_price": 28.34,
+     "stop_price": 25.51,
+     "target_price": 32.59,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600862",
@@ -10894,7 +11920,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -6.22,
        "cum_pct": -6.22
       }
-     ]
+     ],
+     "entry_price": 18.65,
+     "stop_price": 16.79,
+     "target_price": 21.45,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600030",
@@ -10987,7 +12022,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 2.06,
        "cum_pct": 2.06
       }
-     ]
+     ],
+     "entry_price": 28.64,
+     "stop_price": 25.78,
+     "target_price": 32.94,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "601555",
@@ -11080,7 +12124,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 1.4,
        "cum_pct": 1.4
       }
-     ]
+     ],
+     "entry_price": 7.84,
+     "stop_price": 7.06,
+     "target_price": 9.02,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600390",
@@ -11173,7 +12226,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 2.7,
        "cum_pct": 2.7
       }
-     ]
+     ],
+     "entry_price": 4.81,
+     "stop_price": 4.33,
+     "target_price": 5.53,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600867",
@@ -11266,7 +12328,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 0.37,
        "cum_pct": 0.37
       }
-     ]
+     ],
+     "entry_price": 8.17,
+     "stop_price": 7.35,
+     "target_price": 9.4,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "601788",
@@ -11359,7 +12430,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 2.46,
        "cum_pct": 2.46
       }
-     ]
+     ],
+     "entry_price": 15.05,
+     "stop_price": 13.55,
+     "target_price": 17.31,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600322",
@@ -11453,7 +12533,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -5.94,
        "cum_pct": -5.94
       }
-     ]
+     ],
+     "entry_price": 2.86,
+     "stop_price": 2.57,
+     "target_price": 3.29,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "603288",
@@ -11546,7 +12635,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -0.2,
        "cum_pct": -0.2
       }
-     ]
+     ],
+     "entry_price": 34.18,
+     "stop_price": 30.76,
+     "target_price": 39.31,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600007",
@@ -11639,7 +12737,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -14.31,
        "cum_pct": -14.31
       }
-     ]
+     ],
+     "entry_price": 21.18,
+     "stop_price": 19.06,
+     "target_price": 24.36,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "601878",
@@ -11732,7 +12839,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 1.15,
        "cum_pct": 1.15
       }
-     ]
+     ],
+     "entry_price": 9.57,
+     "stop_price": 8.61,
+     "target_price": 11.01,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002500",
@@ -11825,7 +12941,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 2.28,
        "cum_pct": 2.28
       }
-     ]
+     ],
+     "entry_price": 5.26,
+     "stop_price": 4.73,
+     "target_price": 6.05,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688148",
@@ -11918,7 +13043,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -27.09,
        "cum_pct": -27.09
       }
-     ]
+     ],
+     "entry_price": 9.23,
+     "stop_price": 8.31,
+     "target_price": 10.61,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "601319",
@@ -12011,7 +13145,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 2.25,
        "cum_pct": 2.25
       }
-     ]
+     ],
+     "entry_price": 7.11,
+     "stop_price": 6.4,
+     "target_price": 8.18,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300998",
@@ -12105,7 +13248,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -2.92,
        "cum_pct": -2.92
       }
-     ]
+     ],
+     "entry_price": 29.1,
+     "stop_price": 26.19,
+     "target_price": 33.46,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000623",
@@ -12198,7 +13350,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 2.04,
        "cum_pct": 2.04
       }
-     ]
+     ],
+     "entry_price": 18.1,
+     "stop_price": 16.29,
+     "target_price": 20.82,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301581",
@@ -12291,7 +13452,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -27.4,
        "cum_pct": -27.4
       }
-     ]
+     ],
+     "entry_price": 49.93,
+     "stop_price": 44.94,
+     "target_price": 57.42,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "688411",
@@ -12384,7 +13554,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -27.1,
        "cum_pct": -27.1
       }
-     ]
+     ],
+     "entry_price": 286,
+     "stop_price": 257.4,
+     "target_price": 328.9,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "688259",
@@ -12478,7 +13657,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -13.36,
        "cum_pct": -13.36
       }
-     ]
+     ],
+     "entry_price": 39.07,
+     "stop_price": 35.16,
+     "target_price": 44.93,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "601990",
@@ -12571,7 +13759,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 1.79,
        "cum_pct": 1.79
       }
-     ]
+     ],
+     "entry_price": 6.7,
+     "stop_price": 6.03,
+     "target_price": 7.7,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688711",
@@ -12664,7 +13861,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -29.98,
        "cum_pct": -29.98
       }
-     ]
+     ],
+     "entry_price": 44.7,
+     "stop_price": 40.23,
+     "target_price": 51.41,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "601688",
@@ -12757,7 +13963,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 0.09,
        "cum_pct": 0.09
       }
-     ]
+     ],
+     "entry_price": 21.29,
+     "stop_price": 19.16,
+     "target_price": 24.48,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002736",
@@ -12850,7 +14065,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 1.64,
        "cum_pct": 1.64
       }
-     ]
+     ],
+     "entry_price": 10.37,
+     "stop_price": 9.33,
+     "target_price": 11.93,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688798",
@@ -12944,7 +14168,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -13.39,
        "cum_pct": -13.39
       }
-     ]
+     ],
+     "entry_price": 73.32,
+     "stop_price": 65.99,
+     "target_price": 84.32,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000166",
@@ -13038,7 +14271,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 1.53,
        "cum_pct": 1.53
       }
-     ]
+     ],
+     "entry_price": 4.59,
+     "stop_price": 4.13,
+     "target_price": 5.28,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600369",
@@ -13131,7 +14373,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 0.74,
        "cum_pct": 0.74
       }
-     ]
+     ],
+     "entry_price": 4.07,
+     "stop_price": 3.66,
+     "target_price": 4.68,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300756",
@@ -13225,7 +14476,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -19.33,
        "cum_pct": -19.33
       }
-     ]
+     ],
+     "entry_price": 33.05,
+     "stop_price": 29.74,
+     "target_price": 38.01,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600346",
@@ -13318,7 +14578,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 0.48,
        "cum_pct": 0.48
       }
-     ]
+     ],
+     "entry_price": 18.65,
+     "stop_price": 16.79,
+     "target_price": 21.45,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000037",
@@ -13411,7 +14680,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -22.94,
        "cum_pct": -22.94
       }
-     ]
+     ],
+     "entry_price": 11.51,
+     "stop_price": 10.36,
+     "target_price": 13.24,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "002670",
@@ -13504,7 +14782,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -0.81,
        "cum_pct": -0.81
       }
-     ]
+     ],
+     "entry_price": 12.28,
+     "stop_price": 11.05,
+     "target_price": 14.12,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000623",
@@ -13597,7 +14884,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 1.3,
        "cum_pct": 1.3
       }
-     ]
+     ],
+     "entry_price": 18.42,
+     "stop_price": 16.58,
+     "target_price": 21.18,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301275",
@@ -13691,7 +14987,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -10.65,
        "cum_pct": -10.65
       }
-     ]
+     ],
+     "entry_price": 44.9,
+     "stop_price": 40.41,
+     "target_price": 51.63,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688592",
@@ -13785,7 +15090,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -10.61,
        "cum_pct": -10.61
       }
-     ]
+     ],
+     "entry_price": 29.6,
+     "stop_price": 26.64,
+     "target_price": 34.04,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600529",
@@ -13878,7 +15192,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -2.86,
        "cum_pct": -2.86
       }
-     ]
+     ],
+     "entry_price": 18.9,
+     "stop_price": 17.01,
+     "target_price": 21.73,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301500",
@@ -13974,7 +15297,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -19.75,
        "cum_pct": -19.75
       }
-     ]
+     ],
+     "entry_price": 28.86,
+     "stop_price": 25.97,
+     "target_price": 33.19,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300105",
@@ -14067,7 +15399,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -9.79,
        "cum_pct": -9.79
       }
-     ]
+     ],
+     "entry_price": 7.66,
+     "stop_price": 6.89,
+     "target_price": 8.81,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300812",
@@ -14160,7 +15501,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -26.95,
        "cum_pct": -26.95
       }
-     ]
+     ],
+     "entry_price": 29.31,
+     "stop_price": 26.38,
+     "target_price": 33.71,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "603992",
@@ -14253,7 +15603,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -24.51,
        "cum_pct": -24.51
       }
-     ]
+     ],
+     "entry_price": 32.4,
+     "stop_price": 29.16,
+     "target_price": 37.26,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "002577",
@@ -14346,7 +15705,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 1.08,
        "cum_pct": 1.08
       }
-     ]
+     ],
+     "entry_price": 19.52,
+     "stop_price": 17.57,
+     "target_price": 22.45,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002332",
@@ -14439,7 +15807,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -5.84,
        "cum_pct": -5.84
       }
-     ]
+     ],
+     "entry_price": 8.56,
+     "stop_price": 7.7,
+     "target_price": 9.84,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "601236",
@@ -14533,7 +15910,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 0.71,
        "cum_pct": 0.71
       }
-     ]
+     ],
+     "entry_price": 7.07,
+     "stop_price": 6.36,
+     "target_price": 8.13,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688633",
@@ -14626,7 +16012,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -19.61,
        "cum_pct": -19.61
       }
-     ]
+     ],
+     "entry_price": 30.04,
+     "stop_price": 27.04,
+     "target_price": 34.55,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "601336",
@@ -14719,7 +16114,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 0.27,
        "cum_pct": 0.27
       }
-     ]
+     ],
+     "entry_price": 63.32,
+     "stop_price": 56.99,
+     "target_price": 72.82,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002364",
@@ -14812,7 +16216,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 0.25,
        "cum_pct": 0.25
       }
-     ]
+     ],
+     "entry_price": 55.04,
+     "stop_price": 49.54,
+     "target_price": 63.3,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "688049",
@@ -14905,7 +16318,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -10.53,
        "cum_pct": -10.53
       }
-     ]
+     ],
+     "entry_price": 46.91,
+     "stop_price": 42.22,
+     "target_price": 53.95,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688691",
@@ -14998,7 +16420,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -10.57,
        "cum_pct": -10.57
       }
-     ]
+     ],
+     "entry_price": 115.93,
+     "stop_price": 104.34,
+     "target_price": 133.32,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "688303",
@@ -15091,7 +16522,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -20.31,
        "cum_pct": -20.31
       }
-     ]
+     ],
+     "entry_price": 21.91,
+     "stop_price": 19.72,
+     "target_price": 25.2,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "600179",
@@ -15185,7 +16625,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -10.12,
        "cum_pct": -10.12
       }
-     ]
+     ],
+     "entry_price": 4.84,
+     "stop_price": 4.36,
+     "target_price": 5.57,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603955",
@@ -15278,7 +16727,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -20.55,
        "cum_pct": -20.55
       }
-     ]
+     ],
+     "entry_price": 24.91,
+     "stop_price": 22.42,
+     "target_price": 28.65,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "001335",
@@ -15371,7 +16829,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -7.37,
        "cum_pct": -7.37
       }
-     ]
+     ],
+     "entry_price": 49.77,
+     "stop_price": 44.79,
+     "target_price": 57.24,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002637",
@@ -15464,7 +16931,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -14.81,
        "cum_pct": -14.81
       }
-     ]
+     ],
+     "entry_price": 12.56,
+     "stop_price": 11.3,
+     "target_price": 14.44,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "300811",
@@ -15558,7 +17034,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -21.06,
        "cum_pct": -21.06
       }
-     ]
+     ],
+     "entry_price": 100.65,
+     "stop_price": 90.59,
+     "target_price": 115.75,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "000887",
@@ -15651,7 +17136,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -19.96,
        "cum_pct": -19.96
       }
-     ]
+     ],
+     "entry_price": 22.35,
+     "stop_price": 20.12,
+     "target_price": 25.7,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "301000",
@@ -15744,7 +17238,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -7.04,
        "cum_pct": -7.04
       }
-     ]
+     ],
+     "entry_price": 35.22,
+     "stop_price": 31.7,
+     "target_price": 40.5,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "001218",
@@ -15837,7 +17340,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -10.57,
        "cum_pct": -10.57
       }
-     ]
+     ],
+     "entry_price": 26.68,
+     "stop_price": 24.01,
+     "target_price": 30.68,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "688657",
@@ -15930,7 +17442,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -9.0,
        "cum_pct": -9.0
       }
-     ]
+     ],
+     "entry_price": 39.46,
+     "stop_price": 35.51,
+     "target_price": 45.38,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "001226",
@@ -16023,7 +17544,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -10.95,
        "cum_pct": -10.95
       }
-     ]
+     ],
+     "entry_price": 54.14,
+     "stop_price": 48.73,
+     "target_price": 62.26,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "600390",
@@ -16117,7 +17647,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -2.24,
        "cum_pct": -2.24
       }
-     ]
+     ],
+     "entry_price": 4.9,
+     "stop_price": 4.41,
+     "target_price": 5.63,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002057",
@@ -16210,7 +17749,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -11.17,
        "cum_pct": -11.17
       }
-     ]
+     ],
+     "entry_price": 13.34,
+     "stop_price": 12.01,
+     "target_price": 15.34,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "002378",
@@ -16303,7 +17851,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -24.83,
        "cum_pct": -24.83
       }
-     ]
+     ],
+     "entry_price": 40.4,
+     "stop_price": 36.36,
+     "target_price": 46.46,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+1",
+     "exit_window_ok": true
     },
     {
      "code": "003013",
@@ -16396,7 +17953,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -15.3,
        "cum_pct": -15.3
       }
-     ]
+     ],
+     "entry_price": 16.67,
+     "stop_price": 15.0,
+     "target_price": 19.17,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "603015",
@@ -16491,7 +18057,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -15.25,
        "cum_pct": -15.25
       }
-     ]
+     ],
+     "entry_price": 12.98,
+     "stop_price": 11.68,
+     "target_price": 14.93,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002014",
@@ -16584,7 +18159,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -4.19,
        "cum_pct": -4.19
       }
-     ]
+     ],
+     "entry_price": 11.46,
+     "stop_price": 10.31,
+     "target_price": 13.18,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "600682",
@@ -16677,7 +18261,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -9.95,
        "cum_pct": -9.95
       }
-     ]
+     ],
+     "entry_price": 5.93,
+     "stop_price": 5.34,
+     "target_price": 6.82,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "601916",
@@ -16770,7 +18363,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -6.46,
        "cum_pct": -6.46
       }
-     ]
+     ],
+     "entry_price": 2.94,
+     "stop_price": 2.65,
+     "target_price": 3.38,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "000859",
@@ -16863,7 +18465,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -25.06,
        "cum_pct": -25.06
       }
-     ]
+     ],
+     "entry_price": 12.01,
+     "stop_price": 10.81,
+     "target_price": 13.81,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "301322",
@@ -16956,7 +18567,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -27.92,
        "cum_pct": -27.92
       }
-     ]
+     ],
+     "entry_price": 63.75,
+     "stop_price": 57.38,
+     "target_price": 73.31,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "002876",
@@ -17049,7 +18669,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -12.65,
        "cum_pct": -12.65
       }
-     ]
+     ],
+     "entry_price": 35.26,
+     "stop_price": 31.73,
+     "target_price": 40.55,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002191",
@@ -17142,7 +18771,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -10.24,
        "cum_pct": -10.24
       }
-     ]
+     ],
+     "entry_price": 4.2,
+     "stop_price": 3.78,
+     "target_price": 4.83,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002518",
@@ -17236,7 +18874,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -22.3,
        "cum_pct": -22.3
       }
-     ]
+     ],
+     "entry_price": 54.43,
+     "stop_price": 48.99,
+     "target_price": 62.59,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "600605",
@@ -17330,7 +18977,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -16.05,
        "cum_pct": -16.05
       }
-     ]
+     ],
+     "entry_price": 31.15,
+     "stop_price": 28.04,
+     "target_price": 35.82,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "300657",
@@ -17424,7 +19080,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -16.98,
        "cum_pct": -16.98
       }
-     ]
+     ],
+     "entry_price": 46.3,
+     "stop_price": 41.67,
+     "target_price": 53.24,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "000099",
@@ -17517,7 +19182,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -16.15,
        "cum_pct": -16.15
       }
-     ]
+     ],
+     "entry_price": 16.16,
+     "stop_price": 14.54,
+     "target_price": 18.58,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "688260",
@@ -17610,7 +19284,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -36.44,
        "cum_pct": -36.44
       }
-     ]
+     ],
+     "entry_price": 144,
+     "stop_price": 129.6,
+     "target_price": 165.6,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "600330",
@@ -17703,7 +19386,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -29.44,
        "cum_pct": -29.44
       }
-     ]
+     ],
+     "entry_price": 35.6,
+     "stop_price": 32.04,
+     "target_price": 40.94,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "300502",
@@ -17796,7 +19488,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -10.65,
        "cum_pct": -10.65
       }
-     ]
+     ],
+     "entry_price": 610.49,
+     "stop_price": 549.44,
+     "target_price": 702.06,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "300264",
@@ -17889,7 +19590,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -20.16,
        "cum_pct": -20.16
       }
-     ]
+     ],
+     "entry_price": 9.77,
+     "stop_price": 8.79,
+     "target_price": 11.24,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+1",
+     "exit_window_ok": true
     },
     {
      "code": "000921",
@@ -17983,7 +19693,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -12.84,
        "cum_pct": -12.84
       }
-     ]
+     ],
+     "entry_price": 26.64,
+     "stop_price": 23.98,
+     "target_price": 30.64,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301133",
@@ -18076,7 +19795,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -24.42,
        "cum_pct": -24.42
       }
-     ]
+     ],
+     "entry_price": 41.2,
+     "stop_price": 37.08,
+     "target_price": 47.38,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688018",
@@ -18170,7 +19898,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -5.68,
        "cum_pct": -5.68
       }
-     ]
+     ],
+     "entry_price": 127.92,
+     "stop_price": 115.13,
+     "target_price": 147.11,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300201",
@@ -18263,7 +20000,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -22.64,
        "cum_pct": -22.64
       }
-     ]
+     ],
+     "entry_price": 21.07,
+     "stop_price": 18.96,
+     "target_price": 24.23,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "003015",
@@ -18356,7 +20102,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -15.66,
        "cum_pct": -15.66
       }
-     ]
+     ],
+     "entry_price": 13.03,
+     "stop_price": 11.73,
+     "target_price": 14.98,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "601112",
@@ -18449,7 +20204,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -14.43,
        "cum_pct": -14.43
       }
-     ]
+     ],
+     "entry_price": 18.23,
+     "stop_price": 16.41,
+     "target_price": 20.96,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "301513",
@@ -18542,7 +20306,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -24.5,
        "cum_pct": -24.5
       }
-     ]
+     ],
+     "entry_price": 69.47,
+     "stop_price": 62.52,
+     "target_price": 79.89,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "301238",
@@ -18635,7 +20408,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -32.79,
        "cum_pct": -32.79
       }
-     ]
+     ],
+     "entry_price": 24.4,
+     "stop_price": 21.96,
+     "target_price": 28.06,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "688358",
@@ -18730,7 +20512,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -14.18,
        "cum_pct": -14.18
       }
-     ]
+     ],
+     "entry_price": 35.05,
+     "stop_price": 31.54,
+     "target_price": 40.31,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "601136",
@@ -18825,7 +20616,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -4.55,
        "cum_pct": -4.55
       }
-     ]
+     ],
+     "entry_price": 14.73,
+     "stop_price": 13.26,
+     "target_price": 16.94,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688318",
@@ -18919,7 +20719,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -12.27,
        "cum_pct": -12.27
       }
-     ]
+     ],
+     "entry_price": 81.5,
+     "stop_price": 73.35,
+     "target_price": 93.72,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "300082",
@@ -19013,7 +20822,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -24.1,
        "cum_pct": -24.1
       }
-     ]
+     ],
+     "entry_price": 9.71,
+     "stop_price": 8.74,
+     "target_price": 11.17,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "603499",
@@ -19107,7 +20925,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -15.69,
        "cum_pct": -15.69
       }
-     ]
+     ],
+     "entry_price": 14.47,
+     "stop_price": 13.02,
+     "target_price": 16.64,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "300399",
@@ -19201,7 +21028,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -18.66,
        "cum_pct": -18.66
       }
-     ]
+     ],
+     "entry_price": 20.58,
+     "stop_price": 18.52,
+     "target_price": 23.67,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "002136",
@@ -19295,7 +21131,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -13.73,
        "cum_pct": -13.73
       }
-     ]
+     ],
+     "entry_price": 13.55,
+     "stop_price": 12.2,
+     "target_price": 15.58,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "001324",
@@ -19388,7 +21233,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -5.1,
        "cum_pct": -5.1
       }
-     ]
+     ],
+     "entry_price": 20,
+     "stop_price": 18.0,
+     "target_price": 23.0,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300758",
@@ -19481,7 +21335,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -19.66,
        "cum_pct": -19.66
       }
-     ]
+     ],
+     "entry_price": 12.82,
+     "stop_price": 11.54,
+     "target_price": 14.74,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "300483",
@@ -19574,7 +21437,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -12.3,
        "cum_pct": -12.3
       }
-     ]
+     ],
+     "entry_price": 20,
+     "stop_price": 18.0,
+     "target_price": 23.0,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "688116",
@@ -19667,7 +21539,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -27.41,
        "cum_pct": -27.41
       }
-     ]
+     ],
+     "entry_price": 42.58,
+     "stop_price": 38.32,
+     "target_price": 48.97,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "300986",
@@ -19760,7 +21641,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -19.23,
        "cum_pct": -19.23
       }
-     ]
+     ],
+     "entry_price": 13.52,
+     "stop_price": 12.17,
+     "target_price": 15.55,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "603014",
@@ -19853,7 +21743,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -7.44,
        "cum_pct": -7.44
       }
-     ]
+     ],
+     "entry_price": 36,
+     "stop_price": 32.4,
+     "target_price": 41.4,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300187",
@@ -19946,7 +21845,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -12.29,
        "cum_pct": -12.29
       }
-     ]
+     ],
+     "entry_price": 5.45,
+     "stop_price": 4.91,
+     "target_price": 6.27,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002978",
@@ -20039,7 +21947,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -3.95,
        "cum_pct": -3.95
       }
-     ]
+     ],
+     "entry_price": 27.11,
+     "stop_price": 24.4,
+     "target_price": 31.18,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300380",
@@ -20132,7 +22049,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -12.27,
        "cum_pct": -12.27
       }
-     ]
+     ],
+     "entry_price": 32.51,
+     "stop_price": 29.26,
+     "target_price": 37.39,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "300890",
@@ -20225,7 +22151,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -25.18,
        "cum_pct": -25.18
       }
-     ]
+     ],
+     "entry_price": 34.59,
+     "stop_price": 31.13,
+     "target_price": 39.78,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "301608",
@@ -20318,7 +22253,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -12.77,
        "cum_pct": -12.77
       }
-     ]
+     ],
+     "entry_price": 52.38,
+     "stop_price": 47.14,
+     "target_price": 60.24,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002673",
@@ -20411,7 +22355,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -0.89,
        "cum_pct": -0.89
       }
-     ]
+     ],
+     "entry_price": 6.73,
+     "stop_price": 6.06,
+     "target_price": 7.74,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688299",
@@ -20504,7 +22457,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -22.06,
        "cum_pct": -22.06
       }
-     ]
+     ],
+     "entry_price": 17.18,
+     "stop_price": 15.46,
+     "target_price": 19.76,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "600063",
@@ -20597,7 +22559,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -30.5,
        "cum_pct": -30.5
       }
-     ]
+     ],
+     "entry_price": 8.23,
+     "stop_price": 7.41,
+     "target_price": 9.46,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "301246",
@@ -20690,7 +22661,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -25.05,
        "cum_pct": -25.05
       }
-     ]
+     ],
+     "entry_price": 28.94,
+     "stop_price": 26.05,
+     "target_price": 33.28,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "300560",
@@ -20783,7 +22763,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -30.91,
        "cum_pct": -30.91
       }
-     ]
+     ],
+     "entry_price": 21.84,
+     "stop_price": 19.66,
+     "target_price": 25.12,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "002392",
@@ -20876,7 +22865,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -18.63,
        "cum_pct": -18.63
       }
-     ]
+     ],
+     "entry_price": 8.75,
+     "stop_price": 7.88,
+     "target_price": 10.06,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "002258",
@@ -20969,7 +22967,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -5.28,
        "cum_pct": -5.28
       }
-     ]
+     ],
+     "entry_price": 13.83,
+     "stop_price": 12.45,
+     "target_price": 15.9,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300641",
@@ -21062,7 +23069,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -13.52,
        "cum_pct": -13.52
       }
-     ]
+     ],
+     "entry_price": 16.64,
+     "stop_price": 14.98,
+     "target_price": 19.14,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "301069",
@@ -21155,7 +23171,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -23.86,
        "cum_pct": -23.86
       }
-     ]
+     ],
+     "entry_price": 21.75,
+     "stop_price": 19.57,
+     "target_price": 25.01,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "000967",
@@ -21248,7 +23273,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -29.28,
        "cum_pct": -29.28
       }
-     ]
+     ],
+     "entry_price": 10.35,
+     "stop_price": 9.31,
+     "target_price": 11.9,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     }
    ]
   },
@@ -21509,7 +23543,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 135.96,
        "cum_pct": 135.96
       }
-     ]
+     ],
+     "entry_price": 25.25,
+     "stop_price": 22.73,
+     "target_price": 29.04,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "002827",
@@ -21602,7 +23645,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 93.48,
        "cum_pct": 93.48
       }
-     ]
+     ],
+     "entry_price": 25.45,
+     "stop_price": 22.91,
+     "target_price": 29.27,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "605179",
@@ -21695,7 +23747,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 89.9,
        "cum_pct": 89.9
       }
-     ]
+     ],
+     "entry_price": 14.55,
+     "stop_price": 13.1,
+     "target_price": 16.73,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "600664",
@@ -21788,7 +23849,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 60.24,
        "cum_pct": 60.24
       }
-     ]
+     ],
+     "entry_price": 3.37,
+     "stop_price": 3.03,
+     "target_price": 3.88,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "688046",
@@ -21867,7 +23937,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 52.14,
        "cum_pct": 52.14
       }
-     ]
+     ],
+     "entry_price": 26.62,
+     "stop_price": 23.96,
+     "target_price": 30.61,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "300779",
@@ -21961,7 +24040,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 45.02,
        "cum_pct": 45.02
       }
-     ]
+     ],
+     "entry_price": 56.84,
+     "stop_price": 51.16,
+     "target_price": 65.37,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "688105",
@@ -22040,7 +24128,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 35.27,
        "cum_pct": 35.27
       }
-     ]
+     ],
+     "entry_price": 18.46,
+     "stop_price": 16.61,
+     "target_price": 21.23,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "603228",
@@ -22126,7 +24223,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 31.12,
        "cum_pct": 31.12
       }
-     ]
+     ],
+     "entry_price": 74.75,
+     "stop_price": 67.28,
+     "target_price": 85.96,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "603990",
@@ -22198,7 +24304,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 22.28,
        "cum_pct": 22.28
       }
-     ]
+     ],
+     "entry_price": 19.12,
+     "stop_price": 17.21,
+     "target_price": 21.99,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "003020",
@@ -22291,7 +24406,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -2.64,
        "cum_pct": -2.64
       }
-     ]
+     ],
+     "entry_price": 17.04,
+     "stop_price": 15.34,
+     "target_price": 19.6,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "600428",
@@ -22384,7 +24508,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 19.61,
        "cum_pct": 19.61
       }
-     ]
+     ],
+     "entry_price": 8.67,
+     "stop_price": 7.8,
+     "target_price": 9.97,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "300105",
@@ -22477,7 +24610,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 12.35,
        "cum_pct": 12.35
       }
-     ]
+     ],
+     "entry_price": 8.18,
+     "stop_price": 7.36,
+     "target_price": 9.41,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688293",
@@ -22557,7 +24699,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 21.05,
        "cum_pct": 21.05
       }
-     ]
+     ],
+     "entry_price": 54.83,
+     "stop_price": 49.35,
+     "target_price": 63.05,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "000426",
@@ -22636,7 +24787,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 13.85,
        "cum_pct": 13.85
       }
-     ]
+     ],
+     "entry_price": 33.28,
+     "stop_price": 29.95,
+     "target_price": 38.27,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "688166",
@@ -22722,7 +24882,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 16.69,
        "cum_pct": 16.69
       }
-     ]
+     ],
+     "entry_price": 34.57,
+     "stop_price": 31.11,
+     "target_price": 39.76,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000506",
@@ -22815,7 +24984,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 19.97,
        "cum_pct": 19.97
       }
-     ]
+     ],
+     "entry_price": 13.02,
+     "stop_price": 11.72,
+     "target_price": 14.97,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300071",
@@ -22908,7 +25086,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -2.43,
        "cum_pct": -2.43
       }
-     ]
+     ],
+     "entry_price": 4.12,
+     "stop_price": 3.71,
+     "target_price": 4.74,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+1",
+     "exit_window_ok": true
     },
     {
      "code": "300483",
@@ -23001,7 +25188,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 18.3,
        "cum_pct": 18.3
       }
-     ]
+     ],
+     "entry_price": 18.8,
+     "stop_price": 16.92,
+     "target_price": 21.62,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002258",
@@ -23094,7 +25290,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 6.1,
        "cum_pct": 6.1
       }
-     ]
+     ],
+     "entry_price": 13.78,
+     "stop_price": 12.4,
+     "target_price": 15.85,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600267",
@@ -23173,7 +25378,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 16.71,
        "cum_pct": 16.71
       }
-     ]
+     ],
+     "entry_price": 12.15,
+     "stop_price": 10.94,
+     "target_price": 13.97,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "target",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "301367",
@@ -23266,7 +25480,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 4.16,
        "cum_pct": 4.16
       }
-     ]
+     ],
+     "entry_price": 44.99,
+     "stop_price": 40.49,
+     "target_price": 51.74,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600602",
@@ -23360,7 +25583,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 16.69,
        "cum_pct": 16.69
       }
-     ]
+     ],
+     "entry_price": 17.62,
+     "stop_price": 15.86,
+     "target_price": 20.26,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "601666",
@@ -23454,7 +25686,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 12.9,
        "cum_pct": 12.9
       }
-     ]
+     ],
+     "entry_price": 8.14,
+     "stop_price": 7.33,
+     "target_price": 9.36,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000975",
@@ -23547,7 +25788,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 10.21,
        "cum_pct": 10.21
       }
-     ]
+     ],
+     "entry_price": 20.47,
+     "stop_price": 18.42,
+     "target_price": 23.54,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "601899",
@@ -23640,7 +25890,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 9.05,
        "cum_pct": 9.05
       }
-     ]
+     ],
+     "entry_price": 29.06,
+     "stop_price": 26.15,
+     "target_price": 33.42,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002141",
@@ -23733,7 +25992,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 3.43,
        "cum_pct": 3.43
       }
-     ]
+     ],
+     "entry_price": 5.54,
+     "stop_price": 4.99,
+     "target_price": 6.37,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301333",
@@ -23826,7 +26094,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -9.1,
        "cum_pct": -9.1
       }
-     ]
+     ],
+     "entry_price": 52.44,
+     "stop_price": 47.2,
+     "target_price": 60.31,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603087",
@@ -23919,7 +26196,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 13.35,
        "cum_pct": 13.35
       }
-     ]
+     ],
+     "entry_price": 68.11,
+     "stop_price": 61.3,
+     "target_price": 78.33,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002250",
@@ -24014,7 +26300,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 2.85,
        "cum_pct": 2.85
       }
-     ]
+     ],
+     "entry_price": 15.09,
+     "stop_price": 13.58,
+     "target_price": 17.35,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300062",
@@ -24107,7 +26402,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 4.72,
        "cum_pct": 4.72
       }
-     ]
+     ],
+     "entry_price": 6.35,
+     "stop_price": 5.71,
+     "target_price": 7.3,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002998",
@@ -24200,7 +26504,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 12.41,
        "cum_pct": 12.41
       }
-     ]
+     ],
+     "entry_price": 7.01,
+     "stop_price": 6.31,
+     "target_price": 8.06,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600829",
@@ -24294,7 +26607,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 12.49,
        "cum_pct": 12.49
       }
-     ]
+     ],
+     "entry_price": 9.37,
+     "stop_price": 8.43,
+     "target_price": 10.78,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002345",
@@ -24387,7 +26709,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 12.13,
        "cum_pct": 12.13
       }
-     ]
+     ],
+     "entry_price": 10.39,
+     "stop_price": 9.35,
+     "target_price": 11.95,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000595",
@@ -24473,7 +26804,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 0.17,
        "cum_pct": 0.17
       }
-     ]
+     ],
+     "entry_price": 5.96,
+     "stop_price": 5.36,
+     "target_price": 6.85,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603296",
@@ -24566,7 +26906,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -3.95,
        "cum_pct": -3.95
       }
-     ]
+     ],
+     "entry_price": 79.7,
+     "stop_price": 71.73,
+     "target_price": 91.66,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301230",
@@ -24659,7 +27008,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -19.88,
        "cum_pct": -19.88
       }
-     ]
+     ],
+     "entry_price": 30.83,
+     "stop_price": 27.75,
+     "target_price": 35.45,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002067",
@@ -24752,7 +27110,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 10.92,
        "cum_pct": 10.92
       }
-     ]
+     ],
+     "entry_price": 4.12,
+     "stop_price": 3.71,
+     "target_price": 4.74,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300654",
@@ -24845,7 +27212,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 10.07,
        "cum_pct": 10.07
       }
-     ]
+     ],
+     "entry_price": 10.23,
+     "stop_price": 9.21,
+     "target_price": 11.76,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301008",
@@ -24938,7 +27314,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 11.04,
        "cum_pct": 11.04
       }
-     ]
+     ],
+     "entry_price": 30.44,
+     "stop_price": 27.4,
+     "target_price": 35.01,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600489",
@@ -25031,7 +27416,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 7.28,
        "cum_pct": 7.28
       }
-     ]
+     ],
+     "entry_price": 20.32,
+     "stop_price": 18.29,
+     "target_price": 23.37,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300157",
@@ -25124,7 +27518,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 3.15,
        "cum_pct": 3.15
       }
-     ]
+     ],
+     "entry_price": 4.13,
+     "stop_price": 3.72,
+     "target_price": 4.75,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300191",
@@ -25218,7 +27621,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -2.31,
        "cum_pct": -2.31
       }
-     ]
+     ],
+     "entry_price": 28.58,
+     "stop_price": 25.72,
+     "target_price": 32.87,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002920",
@@ -25311,7 +27723,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 9.87,
        "cum_pct": 9.87
       }
-     ]
+     ],
+     "entry_price": 84.53,
+     "stop_price": 76.08,
+     "target_price": 97.21,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603556",
@@ -25405,7 +27826,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 2.65,
        "cum_pct": 2.65
       }
-     ]
+     ],
+     "entry_price": 24.54,
+     "stop_price": 22.09,
+     "target_price": 28.22,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603444",
@@ -25499,7 +27929,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 10.25,
        "cum_pct": 10.25
       }
-     ]
+     ],
+     "entry_price": 356,
+     "stop_price": 320.4,
+     "target_price": 409.4,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300261",
@@ -25592,7 +28031,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 8.11,
        "cum_pct": 8.11
       }
-     ]
+     ],
+     "entry_price": 4.93,
+     "stop_price": 4.44,
+     "target_price": 5.67,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002414",
@@ -25685,7 +28133,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 3.38,
        "cum_pct": 3.38
       }
-     ]
+     ],
+     "entry_price": 13.31,
+     "stop_price": 11.98,
+     "target_price": 15.31,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002250",
@@ -25766,7 +28223,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 3.32,
        "cum_pct": 3.32
       }
-     ]
+     ],
+     "entry_price": 15.95,
+     "stop_price": 14.36,
+     "target_price": 18.34,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "601003",
@@ -25859,7 +28325,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 0.0,
        "cum_pct": 0.0
       }
-     ]
+     ],
+     "entry_price": 3.81,
+     "stop_price": 3.43,
+     "target_price": 4.38,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300069",
@@ -25953,7 +28428,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -20.97,
        "cum_pct": -20.97
       }
-     ]
+     ],
+     "entry_price": 36.86,
+     "stop_price": 33.17,
+     "target_price": 42.39,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "688475",
@@ -26047,7 +28531,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 8.84,
        "cum_pct": 8.84
       }
-     ]
+     ],
+     "entry_price": 27.73,
+     "stop_price": 24.96,
+     "target_price": 31.89,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000703",
@@ -26140,7 +28633,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 5.23,
        "cum_pct": 5.23
       }
-     ]
+     ],
+     "entry_price": 14.54,
+     "stop_price": 13.09,
+     "target_price": 16.72,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600594",
@@ -26233,7 +28735,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -0.6,
        "cum_pct": -0.6
       }
-     ]
+     ],
+     "entry_price": 3.32,
+     "stop_price": 2.99,
+     "target_price": 3.82,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002292",
@@ -26329,7 +28840,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 8.63,
        "cum_pct": 8.63
       }
-     ]
+     ],
+     "entry_price": 7.76,
+     "stop_price": 6.98,
+     "target_price": 8.92,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600298",
@@ -26422,7 +28942,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 7.47,
        "cum_pct": 7.47
       }
-     ]
+     ],
+     "entry_price": 40.05,
+     "stop_price": 36.05,
+     "target_price": 46.06,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000059",
@@ -26515,7 +29044,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 6.56,
        "cum_pct": 6.56
       }
-     ]
+     ],
+     "entry_price": 4.27,
+     "stop_price": 3.84,
+     "target_price": 4.91,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600756",
@@ -26608,7 +29146,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 1.56,
        "cum_pct": 1.56
       }
-     ]
+     ],
+     "entry_price": 15.39,
+     "stop_price": 13.85,
+     "target_price": 17.7,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002115",
@@ -26703,7 +29250,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 8.28,
        "cum_pct": 8.28
       }
-     ]
+     ],
+     "entry_price": 11.23,
+     "stop_price": 10.11,
+     "target_price": 12.91,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300783",
@@ -26797,7 +29353,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 4.94,
        "cum_pct": 4.94
       }
-     ]
+     ],
+     "entry_price": 17.01,
+     "stop_price": 15.31,
+     "target_price": 19.56,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000951",
@@ -26891,7 +29456,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -1.05,
        "cum_pct": -1.05
       }
-     ]
+     ],
+     "entry_price": 22,
+     "stop_price": 19.8,
+     "target_price": 25.3,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002439",
@@ -26984,7 +29558,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 7.74,
        "cum_pct": 7.74
       }
-     ]
+     ],
+     "entry_price": 13.3,
+     "stop_price": 11.97,
+     "target_price": 15.29,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600671",
@@ -27077,7 +29660,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 4.42,
        "cum_pct": 4.42
       }
-     ]
+     ],
+     "entry_price": 20.59,
+     "stop_price": 18.53,
+     "target_price": 23.68,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "001314",
@@ -27171,7 +29763,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -19.53,
        "cum_pct": -19.53
       }
-     ]
+     ],
+     "entry_price": 58.27,
+     "stop_price": 52.44,
+     "target_price": 67.01,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002677",
@@ -27264,7 +29865,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 7.6,
        "cum_pct": 7.6
       }
-     ]
+     ],
+     "entry_price": 6.45,
+     "stop_price": 5.81,
+     "target_price": 7.42,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300002",
@@ -27357,7 +29967,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 2.42,
        "cum_pct": 2.42
       }
-     ]
+     ],
+     "entry_price": 8.27,
+     "stop_price": 7.44,
+     "target_price": 9.51,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603178",
@@ -27450,7 +30069,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 4.51,
        "cum_pct": 4.51
       }
-     ]
+     ],
+     "entry_price": 16.63,
+     "stop_price": 14.97,
+     "target_price": 19.12,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "001208",
@@ -27536,7 +30164,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 2.25,
        "cum_pct": 2.25
       }
-     ]
+     ],
+     "entry_price": 14.66,
+     "stop_price": 13.19,
+     "target_price": 16.86,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600754",
@@ -27629,7 +30266,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 7.03,
        "cum_pct": 7.03
       }
-     ]
+     ],
+     "entry_price": 18.64,
+     "stop_price": 16.78,
+     "target_price": 21.44,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300622",
@@ -27723,7 +30369,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 3.51,
        "cum_pct": 3.51
       }
-     ]
+     ],
+     "entry_price": 15.11,
+     "stop_price": 13.6,
+     "target_price": 17.38,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000990",
@@ -27816,7 +30471,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 4.31,
        "cum_pct": 4.31
       }
-     ]
+     ],
+     "entry_price": 6.49,
+     "stop_price": 5.84,
+     "target_price": 7.46,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603341",
@@ -27909,7 +30573,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -3.94,
        "cum_pct": -3.94
       }
-     ]
+     ],
+     "entry_price": 39.85,
+     "stop_price": 35.87,
+     "target_price": 45.83,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002115",
@@ -28002,7 +30675,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -5.66,
        "cum_pct": -5.66
       }
-     ]
+     ],
+     "entry_price": 10.95,
+     "stop_price": 9.86,
+     "target_price": 12.59,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002707",
@@ -28096,7 +30778,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 4.84,
        "cum_pct": 4.84
       }
-     ]
+     ],
+     "entry_price": 4.96,
+     "stop_price": 4.46,
+     "target_price": 5.7,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300143",
@@ -28190,7 +30881,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 5.74,
        "cum_pct": 5.74
       }
-     ]
+     ],
+     "entry_price": 7.32,
+     "stop_price": 6.59,
+     "target_price": 8.42,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002945",
@@ -28283,7 +30983,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 2.16,
        "cum_pct": 2.16
       }
-     ]
+     ],
+     "entry_price": 14.37,
+     "stop_price": 12.93,
+     "target_price": 16.53,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603630",
@@ -28376,7 +31085,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 5.54,
        "cum_pct": 5.54
       }
-     ]
+     ],
+     "entry_price": 14.43,
+     "stop_price": 12.99,
+     "target_price": 16.59,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600871",
@@ -28469,7 +31187,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 4.15,
        "cum_pct": 4.15
       }
-     ]
+     ],
+     "entry_price": 2.17,
+     "stop_price": 1.95,
+     "target_price": 2.5,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002907",
@@ -28562,7 +31289,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -12.05,
        "cum_pct": -12.05
       }
-     ]
+     ],
+     "entry_price": 14.36,
+     "stop_price": 12.92,
+     "target_price": 16.51,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300805",
@@ -28655,7 +31391,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 1.46,
        "cum_pct": 1.46
       }
-     ]
+     ],
+     "entry_price": 8.24,
+     "stop_price": 7.42,
+     "target_price": 9.48,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603068",
@@ -28727,7 +31472,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 4.49,
        "cum_pct": 4.49
       }
-     ]
+     ],
+     "entry_price": 39.66,
+     "stop_price": 35.69,
+     "target_price": 45.61,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "603444",
@@ -28820,7 +31574,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 1.83,
        "cum_pct": 1.83
       }
-     ]
+     ],
+     "entry_price": 376.43,
+     "stop_price": 338.79,
+     "target_price": 432.89,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002412",
@@ -28899,7 +31662,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 4.42,
        "cum_pct": 4.42
       }
-     ]
+     ],
+     "entry_price": 7.01,
+     "stop_price": 6.31,
+     "target_price": 8.06,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301085",
@@ -28992,7 +31764,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -0.54,
        "cum_pct": -0.54
       }
-     ]
+     ],
+     "entry_price": 61.51,
+     "stop_price": 55.36,
+     "target_price": 70.74,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "603998",
@@ -29085,7 +31866,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -6.54,
        "cum_pct": -6.54
       }
-     ]
+     ],
+     "entry_price": 9.78,
+     "stop_price": 8.8,
+     "target_price": 11.25,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300294",
@@ -29178,7 +31968,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 2.75,
        "cum_pct": 2.75
       }
-     ]
+     ],
+     "entry_price": 15.3,
+     "stop_price": 13.77,
+     "target_price": 17.59,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "001378",
@@ -29271,7 +32070,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -23.13,
        "cum_pct": -23.13
       }
-     ]
+     ],
+     "entry_price": 20.49,
+     "stop_price": 18.44,
+     "target_price": 23.56,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600727",
@@ -29364,7 +32172,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 3.8,
        "cum_pct": 3.8
       }
-     ]
+     ],
+     "entry_price": 7.36,
+     "stop_price": 6.62,
+     "target_price": 8.46,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002642",
@@ -29457,7 +32274,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 2.75,
        "cum_pct": 2.75
       }
-     ]
+     ],
+     "entry_price": 7.26,
+     "stop_price": 6.53,
+     "target_price": 8.35,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300244",
@@ -29551,7 +32377,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -23.46,
        "cum_pct": -23.46
       }
-     ]
+     ],
+     "entry_price": 20.46,
+     "stop_price": 18.41,
+     "target_price": 23.53,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "301587",
@@ -29637,7 +32472,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 0.0,
        "cum_pct": 0.0
       }
-     ]
+     ],
+     "entry_price": 21.27,
+     "stop_price": 19.14,
+     "target_price": 24.46,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002007",
@@ -29730,7 +32574,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -0.08,
        "cum_pct": -0.08
       }
-     ]
+     ],
+     "entry_price": 13.26,
+     "stop_price": 11.93,
+     "target_price": 15.25,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600918",
@@ -29824,7 +32677,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 0.18,
        "cum_pct": 0.18
       }
-     ]
+     ],
+     "entry_price": 5.55,
+     "stop_price": 5.0,
+     "target_price": 6.38,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002364",
@@ -29917,7 +32779,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -28.7,
        "cum_pct": -28.7
       }
-     ]
+     ],
+     "entry_price": 54.42,
+     "stop_price": 48.98,
+     "target_price": 62.58,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "688508",
@@ -30010,7 +32881,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -29.16,
        "cum_pct": -29.16
       }
-     ]
+     ],
+     "entry_price": 98.09,
+     "stop_price": 88.28,
+     "target_price": 112.8,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "002847",
@@ -30103,7 +32983,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -2.02,
        "cum_pct": -2.02
       }
-     ]
+     ],
+     "entry_price": 50.99,
+     "stop_price": 45.89,
+     "target_price": 58.64,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301369",
@@ -30196,7 +33085,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -37.61,
        "cum_pct": -37.61
       }
-     ]
+     ],
+     "entry_price": 235.5,
+     "stop_price": 211.95,
+     "target_price": 270.82,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "301295",
@@ -30289,7 +33187,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -31.24,
        "cum_pct": -31.24
       }
-     ]
+     ],
+     "entry_price": 48.66,
+     "stop_price": 43.79,
+     "target_price": 55.96,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "000905",
@@ -30382,7 +33289,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 0.47,
        "cum_pct": 0.47
       }
-     ]
+     ],
+     "entry_price": 8.57,
+     "stop_price": 7.71,
+     "target_price": 9.86,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600511",
@@ -30475,7 +33391,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -1.44,
        "cum_pct": -1.44
       }
-     ]
+     ],
+     "entry_price": 27.75,
+     "stop_price": 24.98,
+     "target_price": 31.91,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "601369",
@@ -30568,7 +33493,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -2.54,
        "cum_pct": -2.54
       }
-     ]
+     ],
+     "entry_price": 9.45,
+     "stop_price": 8.5,
+     "target_price": 10.87,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002156",
@@ -30661,7 +33595,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -22.56,
        "cum_pct": -22.56
       }
-     ]
+     ],
+     "entry_price": 74.9,
+     "stop_price": 67.41,
+     "target_price": 86.14,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "601555",
@@ -30754,7 +33697,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 1.91,
        "cum_pct": 1.91
       }
-     ]
+     ],
+     "entry_price": 7.85,
+     "stop_price": 7.06,
+     "target_price": 9.03,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688016",
@@ -30847,7 +33799,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -1.55,
        "cum_pct": -1.55
       }
-     ]
+     ],
+     "entry_price": 92.1,
+     "stop_price": 82.89,
+     "target_price": 105.91,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688002",
@@ -30940,7 +33901,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -6.05,
        "cum_pct": -6.05
       }
-     ]
+     ],
+     "entry_price": 150.67,
+     "stop_price": 135.6,
+     "target_price": 173.27,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002039",
@@ -31033,7 +34003,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -2.46,
        "cum_pct": -2.46
       }
-     ]
+     ],
+     "entry_price": 19.9,
+     "stop_price": 17.91,
+     "target_price": 22.88,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300640",
@@ -31126,7 +34105,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -8.52,
        "cum_pct": -8.52
       }
-     ]
+     ],
+     "entry_price": 6.22,
+     "stop_price": 5.6,
+     "target_price": 7.15,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "601375",
@@ -31220,7 +34208,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -0.24,
        "cum_pct": -0.24
       }
-     ]
+     ],
+     "entry_price": 4.13,
+     "stop_price": 3.72,
+     "target_price": 4.75,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300441",
@@ -31313,7 +34310,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -7.89,
        "cum_pct": -7.89
       }
-     ]
+     ],
+     "entry_price": 6.72,
+     "stop_price": 6.05,
+     "target_price": 7.73,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "601369",
@@ -31406,7 +34412,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 1.05,
        "cum_pct": 1.05
       }
-     ]
+     ],
+     "entry_price": 9.5,
+     "stop_price": 8.55,
+     "target_price": 10.92,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688691",
@@ -31499,7 +34514,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -35.69,
        "cum_pct": -35.69
       }
-     ]
+     ],
+     "entry_price": 113.98,
+     "stop_price": 102.58,
+     "target_price": 131.08,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "002019",
@@ -31592,7 +34616,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 1.66,
        "cum_pct": 1.66
       }
-     ]
+     ],
+     "entry_price": 10.24,
+     "stop_price": 9.22,
+     "target_price": 11.78,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600109",
@@ -31685,7 +34718,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 1.15,
        "cum_pct": 1.15
       }
-     ]
+     ],
+     "entry_price": 8.66,
+     "stop_price": 7.79,
+     "target_price": 9.96,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "601101",
@@ -31778,7 +34820,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -9.13,
        "cum_pct": -9.13
       }
-     ]
+     ],
+     "entry_price": 11.83,
+     "stop_price": 10.65,
+     "target_price": 13.6,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "603233",
@@ -31871,7 +34922,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 0.11,
        "cum_pct": 0.11
       }
-     ]
+     ],
+     "entry_price": 18.84,
+     "stop_price": 16.96,
+     "target_price": 21.67,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600332",
@@ -31964,7 +35024,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -2.23,
        "cum_pct": -2.23
       }
-     ]
+     ],
+     "entry_price": 21.98,
+     "stop_price": 19.78,
+     "target_price": 25.28,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688046",
@@ -32058,7 +35127,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": 0.96,
        "cum_pct": 0.96
       }
-     ]
+     ],
+     "entry_price": 27,
+     "stop_price": 24.3,
+     "target_price": 31.05,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600895",
@@ -32130,7 +35208,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -1.36,
        "cum_pct": -1.36
       }
-     ]
+     ],
+     "entry_price": 33.15,
+     "stop_price": 29.84,
+     "target_price": 38.12,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600222",
@@ -32223,7 +35310,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -11.38,
        "cum_pct": -11.38
       }
-     ]
+     ],
+     "entry_price": 7.82,
+     "stop_price": 7.04,
+     "target_price": 8.99,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301345",
@@ -32316,7 +35412,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -1.23,
        "cum_pct": -1.23
       }
-     ]
+     ],
+     "entry_price": 256.9,
+     "stop_price": 231.21,
+     "target_price": 295.43,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "300475",
@@ -32409,7 +35514,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -39.15,
        "cum_pct": -39.15
       }
-     ]
+     ],
+     "entry_price": 267.9,
+     "stop_price": 241.11,
+     "target_price": 308.08,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "001287",
@@ -32502,7 +35616,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -27.24,
        "cum_pct": -27.24
       }
-     ]
+     ],
+     "entry_price": 30.76,
+     "stop_price": 27.68,
+     "target_price": 35.37,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "000623",
@@ -32595,7 +35718,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -0.77,
        "cum_pct": -0.77
       }
-     ]
+     ],
+     "entry_price": 18.24,
+     "stop_price": 16.42,
+     "target_price": 20.98,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600058",
@@ -32688,7 +35820,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -25.58,
        "cum_pct": -25.58
       }
-     ]
+     ],
+     "entry_price": 11.3,
+     "stop_price": 10.17,
+     "target_price": 12.99,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "000513",
@@ -32781,7 +35922,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -1.03,
        "cum_pct": -1.03
       }
-     ]
+     ],
+     "entry_price": 30.92,
+     "stop_price": 27.83,
+     "target_price": 35.56,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600060",
@@ -32874,7 +36024,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -1.31,
        "cum_pct": -1.31
       }
-     ]
+     ],
+     "entry_price": 26.71,
+     "stop_price": 24.04,
+     "target_price": 30.72,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000685",
@@ -32967,7 +36126,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -0.18,
        "cum_pct": -0.18
       }
-     ]
+     ],
+     "entry_price": 11.15,
+     "stop_price": 10.04,
+     "target_price": 12.82,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "000685",
@@ -33060,7 +36228,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -1.08,
        "cum_pct": -1.08
       }
-     ]
+     ],
+     "entry_price": 11.13,
+     "stop_price": 10.02,
+     "target_price": 12.8,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "601059",
@@ -33153,7 +36330,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -0.78,
        "cum_pct": -0.78
       }
-     ]
+     ],
+     "entry_price": 16.77,
+     "stop_price": 15.09,
+     "target_price": 19.29,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300469",
@@ -33247,7 +36433,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -29.91,
        "cum_pct": -29.91
       }
-     ]
+     ],
+     "entry_price": 59.64,
+     "stop_price": 53.68,
+     "target_price": 68.59,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+5",
+     "exit_window_ok": true
     },
     {
      "code": "300871",
@@ -33341,7 +36536,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -13.65,
        "cum_pct": -13.65
       }
-     ]
+     ],
+     "entry_price": 24.25,
+     "stop_price": 21.82,
+     "target_price": 27.89,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "601066",
@@ -33434,7 +36638,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -8.16,
        "cum_pct": -8.16
       }
-     ]
+     ],
+     "entry_price": 29.3,
+     "stop_price": 26.37,
+     "target_price": 33.7,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688798",
@@ -33528,7 +36741,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -21.45,
        "cum_pct": -21.45
       }
-     ]
+     ],
+     "entry_price": 72.5,
+     "stop_price": 65.25,
+     "target_price": 83.38,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "688049",
@@ -33621,7 +36843,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -8.62,
        "cum_pct": -8.62
       }
-     ]
+     ],
+     "entry_price": 45.36,
+     "stop_price": 40.82,
+     "target_price": 52.16,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "688252",
@@ -33715,7 +36946,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -28.69,
        "cum_pct": -28.69
       }
-     ]
+     ],
+     "entry_price": 23.39,
+     "stop_price": 21.05,
+     "target_price": 26.9,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "603160",
@@ -33808,7 +37048,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -17.8,
        "cum_pct": -17.8
       }
-     ]
+     ],
+     "entry_price": 60.49,
+     "stop_price": 54.44,
+     "target_price": 69.56,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "688535",
@@ -33901,7 +37150,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -43.26,
        "cum_pct": -43.26
       }
-     ]
+     ],
+     "entry_price": 179.2,
+     "stop_price": 161.28,
+     "target_price": 206.08,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "000672",
@@ -33994,7 +37252,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -31.06,
        "cum_pct": -31.06
       }
-     ]
+     ],
+     "entry_price": 21.8,
+     "stop_price": 19.62,
+     "target_price": 25.07,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "301005",
@@ -34090,7 +37357,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -45.51,
        "cum_pct": -45.51
       }
-     ]
+     ],
+     "entry_price": 114.88,
+     "stop_price": 103.39,
+     "target_price": 132.11,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+1",
+     "exit_window_ok": true
     },
     {
      "code": "002524",
@@ -34184,7 +37460,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -8.73,
        "cum_pct": -8.73
       }
-     ]
+     ],
+     "entry_price": 3.78,
+     "stop_price": 3.4,
+     "target_price": 4.35,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "301306",
@@ -34278,7 +37563,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -49.33,
        "cum_pct": -49.33
       }
-     ]
+     ],
+     "entry_price": 167.8,
+     "stop_price": 151.02,
+     "target_price": 192.97,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+1",
+     "exit_window_ok": true
     },
     {
      "code": "688523",
@@ -34371,7 +37665,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -33.8,
        "cum_pct": -33.8
       }
-     ]
+     ],
+     "entry_price": 61.18,
+     "stop_price": 55.06,
+     "target_price": 70.36,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "301696",
@@ -34464,7 +37767,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -25.07,
        "cum_pct": -25.07
       }
-     ]
+     ],
+     "entry_price": 125.19,
+     "stop_price": 112.67,
+     "target_price": 143.97,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "300442",
@@ -34557,7 +37869,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -21.22,
        "cum_pct": -21.22
       }
-     ]
+     ],
+     "entry_price": 82.25,
+     "stop_price": 74.03,
+     "target_price": 94.59,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "000810",
@@ -34650,7 +37971,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -29.21,
        "cum_pct": -29.21
       }
-     ]
+     ],
+     "entry_price": 12.84,
+     "stop_price": 11.56,
+     "target_price": 14.77,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+1",
+     "exit_window_ok": true
     },
     {
      "code": "605377",
@@ -34743,7 +38073,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -10.76,
        "cum_pct": -10.76
       }
-     ]
+     ],
+     "entry_price": 10.13,
+     "stop_price": 9.12,
+     "target_price": 11.65,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "002158",
@@ -34836,7 +38175,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -32.61,
        "cum_pct": -32.61
       }
-     ]
+     ],
+     "entry_price": 36.89,
+     "stop_price": 33.2,
+     "target_price": 42.42,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+1",
+     "exit_window_ok": true
     },
     {
      "code": "002976",
@@ -34929,7 +38277,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -29.46,
        "cum_pct": -29.46
       }
-     ]
+     ],
+     "entry_price": 26.65,
+     "stop_price": 23.98,
+     "target_price": 30.65,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "000049",
@@ -35023,7 +38380,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -1.33,
        "cum_pct": -1.33
       }
-     ]
+     ],
+     "entry_price": 24.82,
+     "stop_price": 22.34,
+     "target_price": 28.54,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300912",
@@ -35116,7 +38482,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -17.3,
        "cum_pct": -17.3
       }
-     ]
+     ],
+     "entry_price": 27.68,
+     "stop_price": 24.91,
+     "target_price": 31.83,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "601199",
@@ -35210,7 +38585,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -11.11,
        "cum_pct": -11.11
       }
-     ]
+     ],
+     "entry_price": 6.21,
+     "stop_price": 5.59,
+     "target_price": 7.14,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300426",
@@ -35303,7 +38687,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -12.89,
        "cum_pct": -12.89
       }
-     ]
+     ],
+     "entry_price": 6.05,
+     "stop_price": 5.45,
+     "target_price": 6.96,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "301199",
@@ -35396,7 +38789,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -16.4,
        "cum_pct": -16.4
       }
-     ]
+     ],
+     "entry_price": 20.12,
+     "stop_price": 18.11,
+     "target_price": 23.14,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+2",
+     "exit_window_ok": true
     },
     {
      "code": "688522",
@@ -35489,7 +38891,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -8.76,
        "cum_pct": -8.76
       }
-     ]
+     ],
+     "entry_price": 20.88,
+     "stop_price": 18.79,
+     "target_price": 24.01,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "300135",
@@ -35582,7 +38993,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -5.48,
        "cum_pct": -5.48
       }
-     ]
+     ],
+     "entry_price": 3.47,
+     "stop_price": 3.12,
+     "target_price": 3.99,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+4",
+     "exit_window_ok": true
     },
     {
      "code": "688981",
@@ -35675,7 +39095,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -24.31,
        "cum_pct": -24.31
       }
-     ]
+     ],
+     "entry_price": 160,
+     "stop_price": 144.0,
+     "target_price": 184.0,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "stop",
+     "exit_day": "T+3",
+     "exit_window_ok": true
     },
     {
      "code": "603236",
@@ -35769,7 +39198,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -8.03,
        "cum_pct": -8.03
       }
-     ]
+     ],
+     "entry_price": 51.45,
+     "stop_price": 46.31,
+     "target_price": 59.17,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "300510",
@@ -35862,7 +39300,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -5.19,
        "cum_pct": -5.19
       }
-     ]
+     ],
+     "entry_price": 3.66,
+     "stop_price": 3.29,
+     "target_price": 4.21,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "601881",
@@ -35955,7 +39402,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -3.27,
        "cum_pct": -3.27
       }
-     ]
+     ],
+     "entry_price": 12.86,
+     "stop_price": 11.57,
+     "target_price": 14.79,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     },
     {
      "code": "600177",
@@ -36049,7 +39505,16 @@ window.STOCK_MOMENTUM_ENHANCED = {
        "return_pct": -1.27,
        "cum_pct": -1.27
       }
-     ]
+     ],
+     "entry_price": 7.88,
+     "stop_price": 7.09,
+     "target_price": 9.06,
+     "risk_pct": 10.0,
+     "reward_pct": 15.0,
+     "risk_reward": 1.5,
+     "exit_type": "none",
+     "exit_day": null,
+     "exit_window_ok": true
     }
    ]
   }
@@ -36994,5 +40459,80 @@ window.STOCK_MOMENTUM_ENHANCED = {
     ]
    ]
   }
+ },
+ "stopTargetProfile": {
+  "spec": {
+   "stop": "fixedP10",
+   "stop_desc": "固定10%止损（入场价×0.90）",
+   "target": "rrK1.5",
+   "target_desc": "R:R=1.5 止盈（入场价×1.15）",
+   "risk_pct": 10.0,
+   "reward_pct": 15.0,
+   "risk_reward": 1.5,
+   "source": "algorithms/stop_target_profiles.json 方案三全站统一口径"
+  },
+  "full_window_backtest": {
+   "n": 385,
+   "n_stop": 99,
+   "p_stop": 25.7,
+   "n_target": 44,
+   "p_target": 11.4,
+   "n_none": 242,
+   "p_none": 62.9,
+   "disc_mean": -0.75,
+   "naive_mean": -1.18
+  },
+  "note": "full_window_backtest 仅统计入选日距今≥5个交易日的样本（窗口完整可公平比较T+5）；近期样本 exit_window_ok=False 未计入。"
+ },
+ "sectorConfluence": {
+  "hypothesis": "板块处于「主升/启动」+ 个股动量共识 → 提高胜率？",
+  "verdict": "REJECTED（反向）",
+  "verdict_text": "实测「主升/启动」板块中的共识股反而显著跑输；「震荡」板块中的共识股最优。说明追高（已在主升/启动）回撤大，震荡中启动的共识股更有空间。",
+  "baseline_all": {
+   "n": 385,
+   "win": 42.1,
+   "mean_t5": -1.18
+  },
+  "tailwind": {
+   "label": "顺风组(主升+启动)",
+   "n": 155,
+   "win": 16.8,
+   "mean_t5": -8.4
+  },
+  "nowind": {
+   "label": "无风组(震荡+退潮+底部)",
+   "n": 138,
+   "win": 52.9,
+   "mean_t5": 2.87
+  },
+  "by_stage": {
+   "震荡": {
+    "n": 129,
+    "win": 50.4,
+    "mean_t5": 2.45
+   },
+   "退潮": {
+    "n": 9,
+    "win": 88.9,
+    "mean_t5": 8.9
+   },
+   "启动": {
+    "n": 49,
+    "win": 16.3,
+    "mean_t5": -4.06
+   },
+   "主升": {
+    "n": 106,
+    "win": 17.0,
+    "mean_t5": -10.41
+   },
+   "无K线": {
+    "n": 92,
+    "win": 68.5,
+    "mean_t5": 4.93
+   }
+  },
+  "recommendation": "选股输出应【反向过滤】：剔除入选日所属板块处于「主升/启动」的共识股；优先「震荡」板块中出共识的个股。",
+  "caveat": "92/385因入选日过早无法算20日板块RS被排除；板块RS用同板块内共识股代理（方向稳健）；退潮 N=9 样本偏小。"
  }
 };
