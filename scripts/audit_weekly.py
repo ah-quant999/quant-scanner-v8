@@ -60,10 +60,16 @@ def git_show(rel):
 
 
 def main():
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--cloud", action="store_true",
+                    help="云端运行模式：跳过本机 workbuddy.db 核验与本地 HEAD 检查（DB 仅本机有）")
+    args = ap.parse_args()
     problems = []
-    print("=== 周末全量审计 @ %s ===" % ROOT.name)
-    # 先轻量 fetch，保证 origin/main 最新
-    subprocess.run(["git", "fetch", "origin", "main"], cwd=str(ROOT), timeout=60)
+    print("=== 周末全量审计 @ %s %s ===" % (ROOT.name, "(云端模式)" if args.cloud else ""))
+    # 先轻量 fetch，保证 origin/main 最新（本机 cn git 墙下失败无害；云端正常）
+    if not args.cloud:
+        subprocess.run(["git", "fetch", "origin", "main"], cwd=str(ROOT), timeout=60)
 
     # 1) ?v 真失配
     idx_online = download("%s/index.html" % SITE)
@@ -116,8 +122,11 @@ def main():
             if neut(org) != neut(loc):
                 problems.append("workflow 不一致: %s (本地 vs origin/main)" % w.name)
 
-    # 3) 双机自动化 model 落库核验
-    if DB.exists():
+    # 3) 双机自动化 model 落库核验（仅本机 workbuddy.db；云端 --cloud 跳过，
+    #    双机 model 由双机交接脚本人工核对，见 HANDOVER_2026-08-16_审计自动化.md）
+    if args.cloud:
+        print("  ℹ️ (info) 云端模式：跳过双机 model 核验（需本机 workbuddy.db，由双机交接脚本人工核对）")
+    elif DB.exists():
         conn = sqlite3.connect(str(DB))
         rows = conn.execute(
             "SELECT id,name,model_id,status FROM automations WHERE status='ACTIVE'").fetchall()
@@ -126,7 +135,7 @@ def main():
             if (r[2] or "NULL") != "deepseek-v4-flash":
                 problems.append("自动化 model 异常: %s | %s | model=%s" % (r[0], r[1], r[2] or "NULL"))
     else:
-        problems.append("workbuddy.db 缺失，无法核验双机 model")
+        print("  ℹ️ (info) workbuddy.db 不存在，跳过双机 model 核验（由双机交接脚本人工核对）")
 
     # 4) 受保护文件完整性
     v6 = ROOT / "v6_memo.html"
@@ -139,16 +148,19 @@ def main():
     if "northCalContainer" not in idx_txt or "renderNorthCalendar" not in idx_txt:
         problems.append("⚠️ 受保护: 北向席位日历标记缺失(northCalContainer/renderNorthCalendar)")
 
-    # 5) 本地 HEAD vs origin/main
-    try:
-        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(ROOT),
-                              capture_output=True, text=True).stdout.strip()
-        omain = subprocess.run(["git", "rev-parse", "origin/main"], cwd=str(ROOT),
-                               capture_output=True, text=True).stdout.strip()
-        if head != omain:
-            problems.append("本地 HEAD(%s) != origin/main(%s)" % (head[:10], omain[:10]))
-    except Exception:
-        pass
+    # 5) 本地 HEAD vs origin/main（云端 --cloud 跳过：checkout 即 main，无参考意义）
+    if args.cloud:
+        print("  ℹ️ (info) 云端模式：跳过本地 HEAD vs origin/main（checkout 即 main）")
+    else:
+        try:
+            head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=str(ROOT),
+                                  capture_output=True, text=True).stdout.strip()
+            omain = subprocess.run(["git", "rev-parse", "origin/main"], cwd=str(ROOT),
+                                   capture_output=True, text=True).stdout.strip()
+            if head != omain:
+                problems.append("本地 HEAD(%s) != origin/main(%s)" % (head[:10], omain[:10]))
+        except Exception:
+            pass
 
     print("发现失配 %d 项：" % len(problems))
     print("\n".join(" - " + p for p in problems) or
