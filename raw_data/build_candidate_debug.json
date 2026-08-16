@@ -1,0 +1,24 @@
+{
+  "DATA": "D:\\actions-runner-v8\\_work\\quant-scanner-v8\\quant-scanner-v8\\algorithms\\..\\out",
+  "V8_OUT_DIR": "",
+  "guanlan_watchlist": {
+    "exists": true,
+    "stocks": 0
+  },
+  "guanlan_reports": {
+    "exists": false,
+    "stocks": 0
+  },
+  "maharo_signals": {
+    "exists": true,
+    "raw_signals": 3,
+    "gold_pool_matches": 2
+  },
+  "source_dist": {
+    "主板成交前100": 57,
+    "maharo研报": 10,
+    "创业板成交前100": 29,
+    "科创板成交前100": 14,
+    "港股成交前50": 50
+  }
+}

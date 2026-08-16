@@ -1,19 +1,396 @@
 {
-  "update_time": "2026-08-16 19:37:39",
-  "data_date": "2026-08-16",
-  "track_start": "2026-08-16",
+  "update_time": "2026-08-17 00:19:06",
+  "data_date": "2026-08-17",
+  "track_start": "2026-08-17",
   "history_days": 1,
   "strict_count": 0,
-  "near_count": 0,
-  "tracked": [],
+  "near_count": 12,
+  "tracked": [
+    {
+      "code": "601899",
+      "name": "紫金矿业",
+      "market": "sh",
+      "board": "主板",
+      "status": "near",
+      "total_score": 37.2,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 35.45,
+      "current_close": 35.45,
+      "pnl_pct": 0.0,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
+      "code": "603993",
+      "name": "洛阳钼业",
+      "market": "sh",
+      "board": "主板",
+      "status": "near",
+      "total_score": 37.2,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 20.75,
+      "current_close": 20.75,
+      "pnl_pct": 0.0,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
+      "code": "000975",
+      "name": "山金国际",
+      "market": "sz",
+      "board": "主板",
+      "status": "near",
+      "total_score": 36.0,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 25.96,
+      "current_close": 25.96,
+      "pnl_pct": 0.0,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
+      "code": "601168",
+      "name": "西部矿业",
+      "market": "sh",
+      "board": "主板",
+      "status": "near",
+      "total_score": 36.0,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 42.45,
+      "current_close": 42.45,
+      "pnl_pct": 0.0,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
+      "code": "000506",
+      "name": "中国食品",
+      "market": "sz",
+      "board": "主板",
+      "status": "near",
+      "total_score": 36.0,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 17.55,
+      "current_close": 17.55,
+      "pnl_pct": 0.0,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
+      "code": "688213",
+      "name": "思特威",
+      "market": "sh",
+      "board": "科创板",
+      "status": "near",
+      "total_score": 32.0,
+      "quality_grade": "A",
+      "industry": "软件和信息技术服务业",
+      "sectors": [
+        "软件和信息技术服务业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 99.25,
+      "current_close": 99.25,
+      "pnl_pct": 0.0,
+      "catalysts": [
+        {
+          "tag": "中报略增",
+          "score": 5,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
+      "code": "300502",
+      "name": "新易盛",
+      "market": "sz",
+      "board": "创业板",
+      "status": "near",
+      "total_score": 30.0,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 448.08,
+      "current_close": 448.08,
+      "pnl_pct": 0.0,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
+      "code": "300857",
+      "name": "协创数据",
+      "market": "创业板",
+      "board": "创业板",
+      "status": "near",
+      "total_score": 20,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 0,
+      "current_close": null,
+      "pnl_pct": null,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "—"
+        }
+      ]
+    },
+    {
+      "code": "300274",
+      "name": "阳光电源",
+      "market": "创业板",
+      "board": "创业板",
+      "status": "near",
+      "total_score": 20,
+      "quality_grade": "A",
+      "industry": "电气机械和器材制造业",
+      "sectors": [
+        "电气机械和器材制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 0,
+      "current_close": null,
+      "pnl_pct": null,
+      "catalysts": []
+    },
+    {
+      "code": "688331",
+      "name": "荣昌生物",
+      "market": "科创板",
+      "board": "科创板",
+      "status": "near",
+      "total_score": 20,
+      "quality_grade": "A",
+      "industry": "医药制造业",
+      "sectors": [
+        "医药制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 0,
+      "current_close": null,
+      "pnl_pct": null,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "—"
+        }
+      ]
+    },
+    {
+      "code": "002916",
+      "name": "深南电路",
+      "market": "深市",
+      "board": "主板",
+      "status": "near",
+      "total_score": 20,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 0,
+      "current_close": null,
+      "pnl_pct": null,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "—"
+        }
+      ]
+    },
+    {
+      "code": "300476",
+      "name": "胜宏科技",
+      "market": "创业板",
+      "board": "创业板",
+      "status": "near",
+      "total_score": 20,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 0,
+      "current_close": null,
+      "pnl_pct": null,
+      "catalysts": []
+    }
+  ],
   "alerts": [],
   "sector_cluster": {
-    "by_industry": [],
-    "by_sector": [],
-    "concentration": 0
+    "by_industry": [
+      {
+        "industry": "有色金属矿采选业",
+        "count": 5,
+        "names": [
+          "紫金矿业",
+          "洛阳钼业",
+          "山金国际",
+          "西部矿业",
+          "中国食品"
+        ]
+      },
+      {
+        "industry": "计算机、通信和其他电子设备制造业",
+        "count": 4,
+        "names": [
+          "新易盛",
+          "协创数据",
+          "深南电路",
+          "胜宏科技"
+        ]
+      },
+      {
+        "industry": "软件和信息技术服务业",
+        "count": 1,
+        "names": [
+          "思特威"
+        ]
+      },
+      {
+        "industry": "电气机械和器材制造业",
+        "count": 1,
+        "names": [
+          "阳光电源"
+        ]
+      },
+      {
+        "industry": "医药制造业",
+        "count": 1,
+        "names": [
+          "荣昌生物"
+        ]
+      }
+    ],
+    "by_sector": [
+      {
+        "sector": "有色金属矿采选业",
+        "count": 5
+      },
+      {
+        "sector": "计算机、通信和其他电子设备制造业",
+        "count": 4
+      },
+      {
+        "sector": "软件和信息技术服务业",
+        "count": 1
+      },
+      {
+        "sector": "电气机械和器材制造业",
+        "count": 1
+      },
+      {
+        "sector": "医药制造业",
+        "count": 1
+      }
+    ],
+    "concentration": 41.67
   },
   "overlap": {
-    "total_tracked": 0,
+    "total_tracked": 12,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
@@ -26,53 +403,59 @@
     },
     "cockpit_b": {
       "count": 15,
-      "overlap": 0,
-      "names": []
+      "overlap": 5,
+      "names": [
+        "协创数据",
+        "阳光电源",
+        "荣昌生物",
+        "深南电路",
+        "胜宏科技"
+      ]
     }
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测",
     "latest_date": "2026-08-14",
-    "total": 207,
+    "total": 213,
     "best_hold_days": 1,
     "periods": {
       "1d": {
         "win_rate": 56.8,
-        "avg_return": 0.32,
+        "avg_return": 0.31,
         "sharpe": 0.06,
-        "count": 195,
+        "count": 201,
         "best": 13.68,
         "worst": -10.01
       },
       "3d": {
         "win_rate": 38.6,
-        "avg_return": -0.75,
+        "avg_return": -0.73,
         "sharpe": -0.1,
-        "count": 195,
+        "count": 201,
         "best": 15.06,
         "worst": -10.02
       },
       "5d": {
         "win_rate": 46.8,
-        "avg_return": -0.15,
+        "avg_return": -0.14,
         "sharpe": -0.02,
-        "count": 195,
+        "count": 201,
         "best": 15.06,
         "worst": -10.04
       },
       "10d": {
         "win_rate": 47.6,
-        "avg_return": 0.59,
+        "avg_return": 0.57,
         "sharpe": 0.06,
-        "count": 195,
+        "count": 201,
         "best": 15.07,
         "worst": -10.04
       },
       "20d": {
         "win_rate": 18.2,
-        "avg_return": -0.62,
+        "avg_return": -0.6,
         "sharpe": -0.17,
-        "count": 195,
+        "count": 201,
         "best": 15.0,
         "worst": -10.04
       }
@@ -81,17 +464,17 @@
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 75,
+      "count": 78,
       "win_rate_5d": 66.7,
-      "avg_ret_5d": 2.54,
+      "avg_ret_5d": 2.43,
       "best_win_rate": 66.7,
       "best_hold_days": 5
     },
     {
       "band": "70~80",
-      "count": 132,
+      "count": 135,
       "win_rate_5d": 38.3,
-      "avg_ret_5d": -1.43,
+      "avg_ret_5d": -1.4,
       "best_win_rate": 54.1,
       "best_hold_days": 1
     }
@@ -101,8 +484,8 @@
       {
         "period": "1d",
         "strict_win": 56.8,
-        "strict_ret": 0.32,
-        "strict_count": 195,
+        "strict_ret": 0.31,
+        "strict_count": 201,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -110,8 +493,8 @@
       {
         "period": "3d",
         "strict_win": 38.6,
-        "strict_ret": -0.75,
-        "strict_count": 195,
+        "strict_ret": -0.73,
+        "strict_count": 201,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -119,8 +502,8 @@
       {
         "period": "5d",
         "strict_win": 46.8,
-        "strict_ret": -0.15,
-        "strict_count": 195,
+        "strict_ret": -0.14,
+        "strict_count": 201,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -128,8 +511,8 @@
       {
         "period": "10d",
         "strict_win": 47.6,
-        "strict_ret": 0.59,
-        "strict_count": 195,
+        "strict_ret": 0.57,
+        "strict_count": 201,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -137,8 +520,8 @@
       {
         "period": "20d",
         "strict_win": 18.2,
-        "strict_ret": -0.62,
-        "strict_count": 195,
+        "strict_ret": -0.6,
+        "strict_count": 201,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -147,7 +530,7 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-08-16",
+    "track_start": "2026-08-17",
     "history_days": 1,
     "summary": {
       "1d": {
