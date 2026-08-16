@@ -10827,7 +10827,8 @@ function drawUpDownChart(){
     dst.innerHTML = html;
   };
 
-  // 🔮 潜力挖掘
+  // 🔮 潜力挖掘 2.0（2026-08-16 升级：成交额列 + 大涨幅警示 + 概念可筛选 + 综合分可视化 + 情绪周期联动）
+  window._ppFilterConcept = null;
   window._fillPotentialPicks = function(){
     var pp = window.POTENTIAL_PICKS;
     // ⚖️ 2026-08-14 主人令：加"更新于"统一胶囊（潜力挖掘卡）
@@ -10839,16 +10840,47 @@ function drawUpDownChart(){
       return;
     }
     var html = '';
-    // 头部：热门概念标签
+
+    // ── 顶部：情绪周期联动适配条（读 CRISIS_DATA 危机雷达）──
+    var phase='', advice='', pColor='var(--sub)';
+    var cr = window.CRISIS_DATA || {};
+    var crisisScore = (cr.currency||0)*0.4 + (cr.economy||0)*0.35 + (cr.global||0)*0.25;
+    var crisisPct = Math.round(crisisScore*100);
+    if(crisisPct>=70){ phase='冰点'; pColor='var(--down)'; advice='情绪冰点，潜力信号可靠性下降，建议降仓观望'; }
+    else if(crisisPct>=50){ phase='降温'; pColor='#f59e0b'; advice='风险累积，潜力挖掘仅作观察，仓位≤30%'; }
+    else if(crisisPct<=30){ phase='温和'; pColor='var(--up)'; advice='情绪温和偏暖，潜力挖掘可正常使用'; }
+    else { phase='修复'; pColor='#38bdf8'; advice='低位筑底期，潜力挖掘可小仓试错'; }
+    html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:7px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.15);font-size:12px;margin-bottom:10px;">';
+    html += '<span style="font-weight:700;color:'+pColor+';">情绪·'+phase+'</span>';
+    html += '<span style="color:var(--dim);">危机雷达 '+crisisPct+'/100</span>';
+    html += '<span style="color:var(--sub);flex:1;min-width:0;">'+advice+'</span></div>';
+
+    // ── 头部：热门概念标签（可点击筛选）──
     if (pp.hot_concepts && pp.hot_concepts.length){
-      html += '<div style="font-size:11.5px;color:var(--sub);margin-bottom:6px;">🔥 当前热门概念（前 1/3 共 '+pp.hot_concepts_count+' 个）：</div>';
-      html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;">';
+      html += '<div style="font-size:11.5px;color:var(--sub);margin-bottom:6px;">🔥 当前热门概念（共 '+pp.hot_concepts_count+' 个，点击筛选）：</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">';
       pp.hot_concepts.slice(0,10).forEach(function(cn){
-        html += '<span style="display:inline-block;padding:3px 8px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);border-radius:6px;font-size:11.5px;color:#c4b5fd;font-weight:600;">'+cn+'</span>';
+        var active = (_ppFilterConcept===cn);
+        var bg = active ? 'rgba(167,139,250,.35)' : 'rgba(167,139,250,.12)';
+        var bd = active ? 'rgba(167,139,250,.7)' : 'rgba(167,139,250,.35)';
+        html += '<span onclick="window._ppFilterConcept=\''+cn+'\';window._fillPotentialPicks();" style="cursor:pointer;display:inline-block;padding:3px 8px;background:'+bg+';border:1px solid '+bd+';border-radius:6px;font-size:11.5px;color:#c4b5fd;font-weight:600;">'+cn+'</span>';
       });
       html += '</div>';
+      if(_ppFilterConcept){
+        html += '<div style="font-size:11.5px;color:#c4b5fd;margin-bottom:8px;">已筛选概念：<b>'+_ppFilterConcept+'</b> <span onclick="window._ppFilterConcept=null;window._fillPotentialPicks();" style="cursor:pointer;color:var(--dim);text-decoration:underline;">清除</span></div>';
+      }
     }
-    // 表格
+
+    // ── 表格 ──
+    var rows = pp.picks.slice();
+    if(_ppFilterConcept){
+      rows = rows.filter(function(p){ return (p.hot_concepts||[]).indexOf(_ppFilterConcept)>=0; });
+    }
+    if(!rows.length){
+      html += '<div class="note">该概念下暂无潜力股</div>';
+      dst.innerHTML = html;
+      return;
+    }
     html += '<div style="overflow-x:auto;">';
     html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
     html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
@@ -10856,21 +10888,26 @@ function drawUpDownChart(){
     html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">名称</th>';
     html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">代码</th>';
     html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">当日%</th>';
-    // ⚖️ 2026-08-14 主人令：三张新卡加分红方案跟踪（表头插入分红方案列）
+    html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">成交额亿</th>';
     html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">分红方案</th>';
     html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">热门数</th>';
     html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">综合分</th>';
-    html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">热门概念</th>';
+    html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">热门概念(点选)</th>';
     html += '</tr></thead><tbody>';
-    pp.picks.forEach(function(p, i){
+    rows.forEach(function(p, i){
       var pctColor = p.pct > 0 ? 'var(--up)' : (p.pct < 0 ? 'var(--down)' : 'var(--sub)');
+      var hot = p.pct > 7;
+      var pctTxt = (p.pct>0?'+':'')+p.pct+'%' + (hot ? ' ⚠️' : '');
       var scoreColor = p.total_score >= 9 ? '#c4b5fd' : (p.total_score >= 7 ? '#a78bfa' : '#7c3aed');
-      html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+      var amtColor = (p.amount_yi||0) >= 100 ? '#f87171' : ((p.amount_yi||0) >= 50 ? '#fbbf24' : 'var(--sub)');
+      var scoreW = Math.min(100, Math.round((p.total_score/16)*100));
+      html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+(hot?'background:rgba(248,113,113,.06);':'')+'">';
       html += '<td style="padding:7px 6px;color:var(--dim);">'+(i+1)+'</td>';
       html += '<td style="padding:7px 6px;font-weight:700;color:var(--txt);">'+p.name+'</td>';
       html += '<td style="padding:7px 6px;color:var(--sub);font-family:ui-monospace,Menlo,monospace;">'+p.code+'</td>';
-      html += '<td style="padding:7px 6px;text-align:right;color:'+pctColor+';font-weight:600;">'+(p.pct>0?'+':'')+p.pct+'%</td>';
-      // ⚖️ 2026-08-14 主人令：三张新卡加分红方案跟踪
+      html += '<td style="padding:7px 6px;text-align:right;color:'+pctColor+';font-weight:600;">'+pctTxt+'</td>';
+      html += '<td style="padding:7px 6px;text-align:right;color:'+amtColor+';font-weight:600;">'+(p.amount_yi!=null?p.amount_yi:'-')+'</td>';
+      // 分红方案（沿用 2026-08-14 主人令逻辑）
       var sq = (window.STOCK_QUOTE && window.STOCK_QUOTE.stocks) ? window.STOCK_QUOTE.stocks[p.code] : null;
       var dv = sq ? sq.dividend : null;
       var dyCell = '<span style="color:var(--dim);font-size:10px;">-</span>';
@@ -10883,11 +10920,33 @@ function drawUpDownChart(){
       }
       html += '<td style="padding:7px 6px;text-align:right;font-size:10.5px;">'+dyCell+'</td>';
       html += '<td style="padding:7px 6px;text-align:right;color:#c4b5fd;font-weight:600;">'+p.hot_count+'</td>';
-      html += '<td style="padding:7px 6px;text-align:right;color:'+scoreColor+';font-weight:700;">'+p.total_score+'</td>';
-      html += '<td style="padding:7px 6px;color:var(--sub);font-size:11px;">'+p.hot_concepts.join(' · ')+'</td>';
+      html += '<td style="padding:7px 6px;text-align:right;">'
+            + '<div style="font-weight:700;color:'+scoreColor+';font-size:13px;">'+p.total_score+'</div>'
+            + '<div style="background:rgba(148,163,184,.15);border-radius:3px;height:4px;margin-top:2px;width:48px;margin-left:auto;">'
+            + '<div style="background:'+scoreColor+';height:100%;border-radius:3px;width:'+scoreW+'%;min-width:2px;"></div></div></td>';
+      var consHtml = (p.hot_concepts||[]).map(function(cn){
+        var act = _ppFilterConcept===cn ? 'font-weight:700;text-decoration:underline;' : '';
+        return '<span onclick="window._ppFilterConcept=\''+cn+'\';window._fillPotentialPicks();" style="cursor:pointer;color:#a78bfa;'+act+'">'+cn+'</span>';
+      }).join(' · ');
+      html += '<td style="padding:7px 6px;color:var(--sub);font-size:11px;">'+consHtml+'</td>';
       html += '</tr>';
     });
     html += '</tbody></table></div>';
+
+    // ── 底部升级备注：先跑1-2周再决策 ──
+    try { var _due = new Date(Date.now() + 14*24*3600*1000).toLocaleDateString('zh-CN'); } catch(e) { var _due = '2周后'; }
+    html += '<hr style="border:none;border-top:1px dashed rgba(167,139,250,.25);margin:12px 0;">';
+    html += '<div style="background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.3);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.7;">';
+    html += '<div style="font-size:13px;font-weight:700;color:#a78bfa;margin-bottom:6px;">📌 升级说明（2026-08-16）：先跑 1-2 周再决策</div>';
+    html += '<div style="color:var(--dim);margin-bottom:4px;">本卡已升级 2.0：新增成交额列、大涨幅⚠️警示、概念可点击筛选、综合分可视化、顶部情绪周期联动。当前仅作「热度观察」，尚无历史胜率验证。</div>';
+    html += '<div>满足以下观察结论，再决定是否加做「历史回测」（持有3/5/10天胜率）：</div>';
+    html += '<div>① 1-2 周内概念主线（光通信/CPO/5G）持续，非一日游；</div>';
+    html += '<div>② 综合分≥12 个股次日延续性较好（非高开低走）；</div>';
+    html += '<div>③ 成交额≥50亿的票确实走出超额收益；</div>';
+    html += '<div>④ 情绪联动提示与实际涨跌方向大致吻合。</div>';
+    html += '<div style="margin-top:4px;color:var(--sub);">复核起点：'+_due+'（每周日可跑对比报告）。未达则继续维持观察，不盲目升级为买卖信号。</div>';
+    html += '</div>';
+
     dst.innerHTML = html;
   };
 
