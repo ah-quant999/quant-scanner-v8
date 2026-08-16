@@ -2354,7 +2354,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
     </div>
 
-    <!-- 📌 概念/行业 → ETF·龙头 参考（仅研究参考，不构成投资建议）—— 2026-08-11 移至暂未上架实验区 -->
+    <!-- 📌 概念/行业 → ETF·龙头 参考（仅研究参考，不构成投资建议）—— 2026-08-16 主人令迁至「暂未上架」实验区（renderUnlisted），此处保留隐藏源容器供克隆渲染 -->
     <div class="card" style="margin-bottom:16px;display:none;">
       <h3><span class="ic">📌</span>概念/行业 → ETF·龙头 参考<span class="fresh" id="etfMapTime">—</span></h3>
       <div style="font-size:11px;color:var(--dim);margin:-4px 0 10px 0;line-height:1.5;">⚠️ 仅根据当前热点板块列出代表性 ETF 与龙头股，<b style="color:#fbbf24">不构成任何投资建议，请勿直接跟买</b>。ETF/个股以交易所最新公告为准。</div>
@@ -5379,14 +5379,14 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">三块内容</div>
         <div class="logic-p">· <b>🥇 TOP5 跟踪</b>（<code>renderBtTop5Track</code>）：三重共识 Top5 逐日跟踪（入选日 → 90 天收益曲线）。<br>· <b>📊 综合回测</b>（<code>renderBtBacktest</code>）：多策略 × 多持有期胜率/收益矩阵（严格 vs 宽松口径）。<br>· <b>📶 信号 60 日回测</b>（<code>renderBtSignals60</code>）：关键信号未来 60 日表现（T+1/T+3/T+5/T+10/T+20）。</div>
         <div class="logic-h">数据源</div>
-        <div class="logic-p"><code>raw_data/backtest_tdx.json</code>（<code>backtest_tdx.py</code> 产出：60日K线全量回测）+ <code>backtest_comprehensive.json</code>（多策略×多持有期）。<b>算法产物受防覆盖保护</b>（2026-08-14 起 <code>api_push_raw.py walk_raw()</code> 排除 backtest_tdx / backtest_comprehensive / cockpit_backtest / optimized_strategy / top3_track，仅由家庭机 17:20 run_algorithms 维护）。</div>
+        <div class="logic-p"><code>raw_data/backtest_tdx.json</code>（<code>backtest_tdx.py</code> 产出：60日K线全量回测）+ <code>backtest_comprehensive.json</code>（多策略×多持有期）。<b>2026-08-16 前端改造</b>：改为读 <code>window.BACKTEST_COMPREHENSIVE</code> / <code>window.COCKPIT_BACKTEST</code> 注入（<code>data/BACKTEST_COMPREHENSIVE.js?v=</code> / <code>data/COCKPIT_BACKTEST.js?v=</code>），不再 <code>fetch('../data/')</code>（原调用必 404）。<b>算法产物受防覆盖保护</b>（2026-08-14 起 <code>api_push_raw.py walk_raw()</code> 排除 backtest_tdx / backtest_comprehensive / cockpit_backtest / optimized_strategy / top3_track，仅由家庭机 17:20 run_algorithms 维护）。</div>
       </div>
       <div class="card">
         <h3><span class="ic">📦</span>潜力参考（st-pr 子TAB · 2026-08-14 主人令）- 说明</h3>
         <div class="logic-h">定位</div>
-        <div class="logic-p">选股策略最后一个子TAB「潜力参考」（<code>st-pr</code>，2026-08-14 主人令从总导航一级 Tab 移至此处）。<b style="color:#f59e0b">2026-08-16 主人令：🔮 潜力挖掘 & 📌 ETF·龙头参考 两张实验卡已迁至「暂未上架」实验观察区（renderUnlisted），与 🚀 个股动量状态并列，统一跟踪 1-2 周后决定是否纳入正式推荐</b>；原 st-pr 容器保留「已迁移」提示。商品涨价弹性榜已在实时数据区独立展示。</div>
+        <div class="logic-p">选股策略最后一个子TAB「潜力参考」（<code>st-pr</code>，2026-08-14 主人令从总导航一级 Tab 移至此处）。<b style="color:#f59e0b">2026-08-16 主人令：🔮 潜力挖掘 & 📌 ETF·龙头参考 两张实验卡已迁至「暂未上架」实验观察区（renderUnlisted），与 🚀 个股动量状态并列，统一跟踪 1-2 周后决定是否纳入正式推荐</b>；原 st-pr 容器保留「已迁移」提示。💹 商品涨价弹性榜已在<b>盘后数据区</b>独立展示（sec-ph 顶部，斐波窗口下方）。</div>
         <div class="logic-h">三张卡</div>
-        <div class="logic-p">· <b>🔮 潜力挖掘</b>（<code>POTENTIAL_PICKS</code>）：热门概念 × 温和涨幅 × 活跃度评分表（#/名称/代码/当日%/分红方案/热门数/综合分/热门概念）。<b style="color:#f59e0b">→ 现位于「暂未上架」</b>。<br>· <b>📌 概念/行业 → ETF·龙头 参考</b>（<code>CONCEPT_ETF_MAP</code>）：热点板块 → 代表性 ETF + 龙头股映射。<b style="color:#f59e0b">→ 现位于「暂未上架」</b>。<br>· <b>💹 商品涨价弹性榜</b>（<code>COMMODITY_ELASTICITY</code>）：大宗品涨价 → A 股弹性标的。<b style="color:#f59e0b">→ 已在实时数据区独立展示</b>。</div>
+        <div class="logic-p">· <b>🔮 潜力挖掘</b>（<code>POTENTIAL_PICKS</code>）：热门概念 × 温和涨幅 × 活跃度评分表（#/名称/代码/当日%/分红方案/热门数/综合分/热门概念）。<b style="color:#f59e0b">→ 现位于「暂未上架」</b>。<br>· <b>📌 概念/行业 → ETF·龙头 参考</b>（<code>CONCEPT_ETF_MAP</code>）：热点板块 → 代表性 ETF + 龙头股映射。<b style="color:#f59e0b">→ 现位于「暂未上架」</b>。<br>· <b>💹 商品涨价弹性榜</b>（<code>COMMODITY_ELASTICITY</code>）：大宗品涨价 → A 股弹性标的。<b style="color:#f59e0b">→ 现位于盘后数据区（sec-ph）</b>。</div>
 
         <div class="logic-h">💹 商品涨价弹性榜 · 数据源与计算逻辑（2026-08-16）</div>
         <div class="logic-p"><b>数据源（三通道）</b>：<br>① <code>MACRO_DATA.global_macro.commodities</code> → 黄金 / 白银 / 铜 / 原油（4 个，日频）；<br>② <code>westock-mcp</code> 国际期货实时行情 → LME 基本金属（铜/铝/镍/锌/铅/锡 6 个）+ NYMEX 贵金属/能源（铂金/钯金/天然气 3 个）+ CBOT 农产品（大豆/玉米/小麦 3 个），共 11 个；<br>③ 东方财富 <code>push2.eastmoney.com</code> 国内期货 → 广期所碳酸锂（<code>145.LC</code>）+ 郑商所纯碱（<code>115.SAM</code>），2 个。<br><b>覆盖品种</b>：理论上 17 个有实时价品种 + 3 个纯现货指数品种；实际能拿到数据即显示，拿不到标为「暂无数据」。<br><b>未接入（无免费实时 API）</b>：磷化工 / 维生素 / 稀土。三者均为现货景气指数（非标准化期货合约），数据源为 SMM 上海有色 / 百川盈孚等付费指数；前端透明展示为「暂无数据」并附原因，不伪造价格。<br><b>涨价阈值</b>：偏离度 ≥ 3.0% <b>或</b> |z-score| ≥ 2.0 视为「涨价窗口」。<br><b>弹性公式</b>：<code>elasticity_pct = dev_pct × business_pct × 1.5</code>，其中 <code>business_pct</code> 为 A 股标的主营业务占比。<br><b>基准升级（2026-08-16）</b>：由静态硬编码均值升级为 30 日滚动 z-score（μ±σ）。价格历史存 <code>raw_data/commodity_price_history.json</code>，积累满 10 日自动切换，不足日回退静态兜底。<br><b>更新频率</b>：随 <code>v8_cn_fetch_cloud</code> 每次抓取后触发 <code>v8_build_deploy</code> → <code>update_v8.py</code> → <code>run_experiment_cards()</code> 自动重算，盘中约每 30 分钟刷新。</div>
@@ -5402,8 +5402,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <h3><span class="ic">🧪</span>暂未上架 - 说明</h3>
         <div class="logic-h">定位</div>
         <div class="logic-p">仅管理员可见的实验区。放置已开发但尚未正式上架的卡片、调试工具或过渡性模块，避免在主站显示不稳定功能。</div>
-        <div class="logic-h">当前内容</div>
-        <div class="logic-p">· <b>实验选股调试专区</b>：三重起涨 / CRDS逆势 / 候选池等验证中模块。<br>· <b>今日判定 · 环境态势</b>：已迁回「今日事件」页，此处不再重复。<br>· <s>📦 TOP3 持仓跟踪</s>：<b>已于 2026-08-14 主人令删除</b>（持仓跟踪卡片 + renderPortfolio / addPosition / removePosition / _PF_SEED / _pfLoad / _pfSave 全部移除；主人改用 westock App 云端持仓）。<br>· <s>💰 四路资金流向对比</s>：<b>已于 2026-08-14 主人令删除</b>（与 LHB 数据重复，不再单独渲染）。</div>
+        <div class="logic-h">当前内容（2026-08-16 更新）</div>
+        <div class="logic-p">· <b>🚀 个股动量状态</b>（2026-08-16 新增）：每日盘后选股 PDF → OCR 抽取 → 跨分类共识股（<code>STOCK_MOMENTUM_STATE</code>）+ V2 K线验证增强分析（<code>STOCK_MOMENTUM_ENHANCED</code>，360 只前复权日K验证，走势分类：可精选/连续涨不回撤/强势股/观察用）。卡尾带「合并进「最终推荐」判定」备注：5 条硬指标（可精选池稳定 ≥5 只 / 连续 2 周 T+5 胜率 ≥70% 且均值&gt;0 / 最大回撤中位数 ≤5% / 与 Top5 重合度 &lt;50% / 震荡板块最优结论未被推翻），跟踪 1-2 周后决定是否合并。<br>· <b>🔮 潜力挖掘</b>（2026-08-16 从选股策略 st-pr 迁入）：热门概念 × 温和涨幅 × 活跃度评分表 2.0（情绪周期联动 + 概念点击筛选 + 成交额列 + 大涨幅⚠️警示 + 综合分可视化）。底部带「先跑 1-2 周再决策」备注：概念主线持续 / 综合分≥12 次日延续 / 成交额≥50亿超额 / 情绪联动吻合，4 条满足再做历史回测。<br>· <b>📌 概念/行业 → ETF·龙头 参考</b>（2026-08-16 从选股策略 st-pr 迁入）：热点板块 → 代表性 ETF + 龙头股映射（<code>CONCEPT_ETF_MAP</code>），底部带「暂未上架观察」备注。<br>· <b>实验选股调试专区</b>：三重起涨 / CRDS逆势 / 候选池等验证中模块。<br>· <b>今日判定 · 环境态势</b>：已迁回「今日事件」页，此处不再重复。<br>· <s>📦 TOP3 持仓跟踪</s>：<b>已于 2026-08-14 主人令删除</b>（持仓跟踪卡片 + renderPortfolio / addPosition / removePosition / _PF_SEED / _pfLoad / _pfSave 全部移除；主人改用 westock App 云端持仓）。<br>· <s>💰 四路资金流向对比</s>：<b>已于 2026-08-14 主人令删除</b>（与 LHB 数据重复，不再单独渲染）。</div>
         <div class="logic-h">与正式区关系</div>
         <div class="logic-p">经主人确认稳定的模块会逐步提升到一级 Tab 或正式卡片；确认废弃的模块会移除。用户不应把暂未上架内容作为买卖依据。</div>
       </div>
