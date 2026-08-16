@@ -27,10 +27,17 @@ import urllib.request
 ROOT = pathlib.Path(".")
 
 
-def neutral_sha(text: str) -> str:
-    """内容哈希（中性化 republish_time 构建时间戳），与 update_v8._rewrite 完全一致。"""
-    neutral = re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', text)
-    return hashlib.sha1(neutral.encode("utf-8")).hexdigest()[:10]
+def neutral_sha_bytes(b: bytes) -> str:
+    """内容哈希（中性化 republish_time 构建时间戳），与 update_v8._rewrite 完全一致。
+
+    ★ 2026-08-16 修复：入参改为原始字节。此前 content_for 返回文本（read_text 在 Windows
+    会把 CRLF 归一化为 LF），导致算出的 ?v 是「LF 版内容 sha」，而 Blobs API 实际推送的是
+    磁盘原始字节（CRLF）→ 线上真实服务内容的 sha 与 index.html 的 ?v 永远不相等
+    （正是 v6_memo 铁律最忌的缓存戳失配复发）。改为对原始字节求 sha，?v 即严格等于
+    CDN 实际吐出的文件 sha。
+    """
+    neutral = re.sub(rb'"republish_time"\s*:\s*"[^"]*"', b'"republish_time":""', b)
+    return hashlib.sha1(neutral).hexdigest()[:10]
 
 
 def _hdr(token):
@@ -50,22 +57,6 @@ def _repo_tree(repo: str, token: str):
         return {e["path"]: e["sha"] for e in d.get("tree", []) if e["type"] == "blob"}
     except Exception:
         return {}
-
-
-def _api_text_blob(repo: str, path: str, token: str, tree: dict):
-    """经 Git blobs API 取完整文件内容（>1MB 不截断）。失败返回 None。"""
-    sha = tree.get(path)
-    if not sha:
-        return None
-    url = f"https://api.github.com/repos/{repo}/git/blobs/{sha}"
-    try:
-        with urllib.request.urlopen(urllib.request.Request(url, headers=_hdr(token)), timeout=120) as r:
-            d = json.loads(r.read().decode("utf-8"))
-        if isinstance(d, dict) and "content" in d:
-            return base64.b64decode(d["content"]).decode("utf-8", "replace")
-    except Exception:
-        return None
-    return None
 
 
 def _api_bytes_blob(repo: str, path: str, token: str, tree: dict):
@@ -124,7 +115,7 @@ def reconcile_v6_memo(html: str, repo: str, token: str, tree: dict) -> str:
 
 
 def content_for(fname: str, data_dir: pathlib.Path, repo: str, token: str, tree: dict):
-    """内容来源策略：
+    """内容来源策略（★ 2026-08-16 起返回原始字节，确保 ?v == 线上真实内容 sha）：
     - RECONCILE_LOCAL=1（build 内部调用）：强制用本地磁盘文件。build 已 `git reset
       --hard FETCH_HEAD` + 本地重写产出「即将提交的内容」，本地即权威；若改用线上
       API 反而会拿到「尚未 push 的本轮新数据」之前的旧版本，导致 ?v 与本轮落库文件
@@ -136,15 +127,15 @@ def content_for(fname: str, data_dir: pathlib.Path, repo: str, token: str, tree:
     if os.environ.get("RECONCILE_LOCAL"):
         p = data_dir / fname
         if p.exists():
-            return p.read_text(encoding="utf-8")
+            return p.read_bytes()
         return None
     if token and repo:
-        t = _api_text_blob(repo, f"data/{fname}", token, tree)
-        if t is not None:
-            return t
+        b = _api_bytes_blob(repo, f"data/{fname}", token, tree)
+        if b is not None:
+            return b
     p = data_dir / fname
     if p.exists():
-        return p.read_text(encoding="utf-8")
+        return p.read_bytes()
     return None
 
 
@@ -174,7 +165,7 @@ def main():
         #   否则污染缓存戳、永不 bust。保留原 ?v 等文件就绪后下次构建再对齐。
         if not txt.strip():
             return m.group(0)
-        return f"{q1}{src}?v={neutral_sha(txt)}{q2}"
+        return f"{q1}{src}?v={neutral_sha_bytes(txt)}{q2}"
 
     new_html = pat.sub(repl, html)
     # ★ 2026-08-16：v6备忘录 iframe 戳同样纳入自愈（此前无任何自愈网，详见 reconcile_v6_memo）
