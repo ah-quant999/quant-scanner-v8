@@ -26,6 +26,7 @@ def now_cst():
 DATA_SOURCES = {
     "etf_intraday_heat.json":      "ETF_INTRADAY_HEAT",
     "sector_fund_flow.json":       "SECTOR_FUND_FLOW",
+    "sector_fund_flow_intraday.json": "SECTOR_FUND_FLOW_INTRADAY",  # 分时累计曲线快照
     "sector_fund_flow_trend.json": "SECTOR_FUND_FLOW_TREND",
     "gold_pool.json":              "GOLD_POOL",
     "stock_names.json":            "STOCK_LIST",

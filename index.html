@@ -2380,6 +2380,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div class="sf-block-title"><span class="sf-block-icon">🔄</span>板块周期</div>
         <div id="sfBlock3"><div class="ipo-empty">加载中…</div></div>
       </div>
+
+      <!-- Block 4: 分时累计曲线（2026-08-17 新增：多板块主力净额日内走势 + 上证对照） -->
+      <div class="sf-block" style="border-top:1px solid rgba(255,255,255,.06);padding-top:12px;margin-top:4px">
+        <div class="sf-block-title"><span class="sf-block-icon">📉</span>分时累计曲线<span style="display:inline-flex;align-items:center;padding:1px 7px;border-radius:6px;font-size:10.5px;font-weight:600;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);margin-left:6px;white-space:nowrap">~10min</span><span class="fresh" id="sfChartFresh" style="margin-left:6px">—</span></div>
+        <div id="sfIntradayChart" style="width:100%;height:320px;min-height:280px;background:rgba(0,0,0,.2);border-radius:8px;overflow:hidden"><div class="ipo-empty" style="padding:20px;line-height:2">加载中…（盘中每 10 分钟自动追加数据点）</div></div>
+        <div id="sfChartLegend" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:11px"></div>
+      </div>
     </div>
 
     <!-- 📌 概念/行业 → ETF·龙头 参考（仅研究参考，不构成投资建议）—— 2026-08-16 主人令迁至「暂未上架」实验区（renderUnlisted），此处保留隐藏源容器供克隆渲染 -->
@@ -9029,6 +9036,161 @@ window.__renderV8CalFull();
     setBadge('phSectorTime','盘后','短线',d.update_time);
   }
 
+  /* ---- 分时累计曲线（板块主力净额日内走势 + 上证对照） ---- */
+  window._renderSfIntradayChart = function _renderSfIntradayChart(data){
+    const container = $('sfIntradayChart');
+    const legendEl = $('sfChartLegend');
+    if(!container) return;
+    if(!data || !data.snapshots || !data.snapshots.length){
+      container.innerHTML = '<div class="ipo-empty" style="padding:24px;line-height:1.8">⏳ 暂无分时数据（盘中每 10 分钟自动积累数据点，约需 2-3 个点后出图）</div>';
+      if(legendEl) legendEl.innerHTML = '';
+      setBadge('sfChartFresh','—','','');
+      return;
+    }
+    // 更新新鲜度
+    const lastSnap = data.snapshots[data.snapshots.length - 1];
+    setBadge('sfChartFresh', lastSnap.time || '', '短线', data.date || '');
+
+    const snaps = data.snapshots;
+    const times = snaps.map(s => s.time);
+
+    // 收集所有出现过的板块名 + 出现频次排序（取 Top8 展示）
+    const sectorCounts = {};
+    snaps.forEach(s => {
+      (s.sectors_in || []).forEach(sec => { sectorCounts[sec.name] = (sectorCounts[sec.name]||0) + 1; });
+    });
+    const topSectors = Object.entries(sectorCounts)
+      .sort((a,b) => b[1] - a[1])
+      .slice(0, 8)
+      .map(([name]) => name);
+
+    // 预设色板（区分度高，暗色主题友好）
+    const colors = ['#22c55e','#3b82f6','#f59e0b','#ef4444','#a855f7','#06b6d4','#ec4899','#84cc16'];
+    const sectorColor = {};
+    topSectors.forEach((name, i) => { sectorColor[name] = colors[i % colors.length]; });
+
+    // 构建系列：每个 Top 板块一条线 + 上证指数虚线
+    const series = [];
+    const lineStyle = { width: 2 };
+
+    // 板块净额系列
+    topSectors.forEach(name => {
+      const values = snaps.map(s => {
+        const found = (s.sectors_in || []).find(sec => sec.name === name);
+        return found ? found.net : null;
+      });
+      series.push({
+        name: name,
+        type: 'line',
+        data: values,
+        smooth: true,
+        symbol: 'none',
+        lineStyle: { ...lineStyle, color: sectorColor[name] },
+        itemStyle: { color: sectorColor[name] },
+        yAxisIndex: 0,
+      });
+    });
+
+    // 上证涨跌幅系列（右轴）
+    const idxValues = snaps.map(s => s.index_chg != null ? s.index_chg : null);
+    series.push({
+      name: '上证指数',
+      type: 'line',
+      data: idxValues,
+      smooth: true,
+      symbol: 'circle',
+      symbolSize: 4,
+      lineStyle: { width: 1.5, type: 'dashed', color: '#94a3b8' },
+      itemStyle: { color: '#94a3b8' },
+      yAxisIndex: 1,
+    });
+
+    // 用 echarts.init 或轻量方案：直接用原生 canvas/SVG 绘制避免依赖
+    // 检查是否已加载 ECharts
+    if(typeof echarts !== 'undefined'){
+      let chart = echarts.getInstanceByDom(container);
+      if(!chart) chart = echarts.init(container, null, { renderer: 'canvas' });
+      chart.setOption({
+        backgroundColor: 'transparent',
+        tooltip: {
+          trigger: 'axis',
+          backgroundColor: 'rgba(17,24,39,.95)',
+          borderColor: 'rgba(255,255,255,.1)',
+          textStyle: { color: '#e2e8f0', fontSize: 12 },
+          formatter: function(params){
+            let h = '<div style="font-weight:700;margin-bottom:4px">' + params[0].axisValue + '</div>';
+            params.forEach(p => {
+              if(p.value == null) return;
+              const isIdx = p.seriesName === '上证指数';
+              const val = isIdx ? (p.value >= 0 ? '+' : '') + p.value + '%' : p.value + '亿';
+              const dot = '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + p.color + ';margin-right:6px"></span>';
+              h += '<div style="line-height:1.6">' + dot + p.seriesName + ': <b>' + val + '</b></div>';
+            });
+            return h;
+          },
+        },
+        legend: { show: false },  // 自定义 legend 在外部
+        grid: { top: 20, right: 60, bottom: 30, left: 10, containLabel: true },
+        xAxis: {
+          type: 'category',
+          data: times,
+          axisLine: { lineStyle: { color: 'rgba(255,255,255,.15)' } },
+          axisLabel: { color: 'rgba(255,255,255,.5)', fontSize: 10, interval: Math.floor(times.length / 8) },
+          axisTick: { show: false },
+        },
+        yAxis: [
+          {
+            type: 'value',
+            name: '净额(亿)',
+            position: 'left',
+            axisLine: { show: true, lineStyle: { color: 'rgba(34,197,94,.3)' } },
+            axisLabel: { color: 'rgba(255,255,255,.5)', fontSize: 10, formatter: '{value}亿' },
+            splitLine: { lineStyle: { color: 'rgba(255,255,255,.04)' } },
+          },
+          {
+            type: 'value',
+            name: '涨幅%',
+            position: 'right',
+            axisLine: { show: true, lineStyle: { color: 'rgba(148,163,184,.3)' } },
+            axisLabel: { color: 'rgba(255,255,255,.5)', fontSize: 10, formatter: '{value}%' },
+            splitLine: { show: false },
+          },
+        ],
+        series: series,
+        animationDuration: 600,
+      }, { notMerge: false });
+      // 自定义图例
+      if(legendEl){
+        let lg = '';
+        topSectors.forEach(name => {
+          lg += '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)"><span style="width:10px;height:3px;border-radius:2px;background:'+sectorColor[name]+'"></span>'+name+'</span>';
+        });
+        lg += '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,.04);border:1px dashed rgba(148,163,184,.3)"><span style="width:10px;height:3px;border-radius:2px;background:#94a3b8;opacity:.5"></span>上证···</span>';
+        legendEl.innerHTML = lg;
+      }
+      window._sfIntradayChart = chart;
+    } else {
+      // ECharts 未加载时降级为表格
+      let tbl = '<table style="width:100%;font-size:11px;border-collapse:collapse"><tr style="color:var(--dim)"><th style="padding:4px;text-align:left">时间</th>';
+      topSectors.forEach(n => { tbl += '<th style="padding:4px;text-align:right;color:'+sectorColor[n]+'">'+n+'</th>'; });
+      tbl += '<th style="padding:4px;text-align:right;color:#94a3b8">上证%</th></tr>';
+      snaps.forEach(s => {
+        tbl += '<tr><td style="padding:4px;color:var(--dim)">'+s.time+'</td>';
+        topSectors.forEach(n => {
+          const f = (s.sectors_in||[]).find(x=>x.name===n);
+          const v = f ? f.net : '-';
+          const c = v > 0 ? 'var(--up)' : v < 0 ? 'var(--down)' : 'var(--text)';
+          tbl += '<td style="padding:4px;text-align:right;color:'+c+';font-weight:600">'+(v==='-'?'-':v)+'</td>';
+        });
+        const ic = s.index_chg != null ? (s.index_chg>=0?'+':'')+s.index_chg+'%' : '-';
+        tbl += '<td style="padding:4px;text-align:right;color:#94a3b8">'+ic+'</td></tr>';
+      });
+      tbl += '</table>';
+      container.innerHTML = tbl;
+      if(legendEl) legendEl.innerHTML = '';
+    }
+  };
+
   /* ---- ETF 资金热度（4 大类 TOP5流入+TOP5流出，横向 bar） ---- */
   function renderEtfHeatByCategory(etfHeat){
     const el0=$('etfHeatSummary'), el1=$('etfHeatByCat');
@@ -10426,6 +10588,8 @@ function drawUpDownChart(){
       const base = sffLive ? Object.assign({}, sft, sff) : sft;
       base._rs_sectors = (srs && srs.sectors) || [];
       safe(renderSector, base);
+      // 分时累计曲线（独立数据源，有快照就画）
+      safe(window._renderSfIntradayChart, window.SECTOR_FUND_FLOW_INTRADAY || null);
     })();
 
     // 3) 盘后数据：全部使用已注入的 window.* 变量（data/*.js 已在 <head> 同步加载）
@@ -10446,6 +10610,7 @@ function drawUpDownChart(){
       const base = sffLive ? Object.assign({}, sft, sff) : sft;
       base._rs_sectors = (srs && srs.sectors) || [];
       safe(renderSector, base);
+      safe(window._renderSfIntradayChart, window.SECTOR_FUND_FLOW_INTRADAY || null);
     })();
     // 已下架：safe(renderMacro, window.MACRO_DATA || {});
     safe(renderRunnerTrack, window.RUNNER_STATUS || {});

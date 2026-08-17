@@ -45,6 +45,7 @@ RAW_DIR.mkdir(exist_ok=True)
 VAR_TO_RAW = {
     "ETF_INTRADAY_HEAT": "etf_intraday_heat.json",
     "SECTOR_FUND_FLOW": "sector_fund_flow.json",
+    "SECTOR_FUND_FLOW_INTRADAY": "sector_fund_flow_intraday.json",  # 分时累计曲线（每10min快照追加）
     "CONCEPT_RANKING": "concept_ranking.json",
     "IPO_DATA": "ipo_score.json",
     "MARGIN_DATA": "margin_data.json",
@@ -98,6 +99,7 @@ CATEGORY_MAP = {
     "ETF_DAILY_MONITOR": "intraday",
     "ETF_SUBSCRIPTION": "premarket",  # T+1 盘后/盘前更新一次即可
     "SECTOR_FUND_FLOW": "intraday",
+    "SECTOR_FUND_FLOW_INTRADAY": "intraday",  # 分时快照，跟随 SECTOR_FUND_FLOW 同周期
     "CAPITAL_FLOW_DATA": "intraday",
     "CONCEPT_RANKING": "intraday",
     "LIMIT_UP_HEATMAP": "intraday",
@@ -1161,6 +1163,56 @@ def f_sector_fund_flow():
             print(f"  📝 sector_fund_flow_history 追加 {_appended} 条 ({_today_str})")
     except Exception as _he:
         print(f"  ⚠️ sector_fund_flow_history 追加失败（不影响主数据）: {_he}")
+
+    # ── 分时累计曲线快照（2026-08-17 新增：每10min追加一次，前端画多板块折线图） ──
+    # 设计：每次快照存 Top15 流入 + Top5 流出 + 上证涨跌幅，一天积累 ~24 点
+    # 文件每日盘前(pre market)自动清空，盘中只追加不覆盖
+    _intraday_path = RAW_DIR / "sector_fund_flow_intraday.json"
+    try:
+        _now_ts = now_cst().strftime("%H:%M")
+        _today_str = now_cst().strftime("%Y-%m-%d")
+        _intraday_data = {"date": _today_str, "snapshots": []}
+        if _intraday_path.exists():
+            try:
+                _existing = json.loads(_intraday_path.read_text(encoding="utf-8"))
+                # 盘日切换则清空旧数据
+                if _existing.get("date") == _today_str:
+                    _intraday_data = _existing
+            except Exception:
+                pass
+
+        # 取上证指数当前涨跌幅%（用于双轴对照）
+        _idx_chg = 0.0
+        try:
+            _idx_rows = em_ulist_np(secid="1.000001", fields="f3")  # 上证涨跌幅
+            if _idx_rows:
+                _idx_chg = round(float(_idx_rows[0].get("f3", 0)), 2)
+        except Exception:
+            pass
+
+        # 快照：Top15流入 + Top5流出（控制数据量）
+        _top_in = [{"name": s["name"], "net": round(s["net"], 2)} for s in sectors_in[:15]]
+        _top_out = [{"name": s["name"], "net": round(s["net"], 2)} for s in sectors_out[:5]]
+
+        _snapshot = {
+            "time": _now_ts,
+            "sectors_in": _top_in,
+            "sectors_out": _top_out,
+            "index_chg": _idx_chg,
+        }
+        _intraday_data["snapshots"].append(_snapshot)
+
+        # 保留最近 80 个快照（约 13 小时 × 10min，足够覆盖延时长交易）
+        if len(_intraday_data["snapshots"]) > 80:
+            _intraday_data["snapshots"] = _intraday_data["snapshots"][-80:]
+
+        _intraday_path.write_text(
+            json.dumps(_intraday_data, ensure_ascii=False, separators=(",", ":")),
+            encoding="utf-8",
+        )
+        print(f"  📈 sector_fund_flow_intraday 快照 {_now_ts} ({len(_top_in)}进{len(_top_out)}出)")
+    except Exception as _ie:
+        print(f"  ⚠️ sector_fund_flow_intraday 快照失败: {_ie}")
 
     return {
         "sectors_in": sectors_in,
