@@ -1,10 +1,10 @@
 {
-  "update_time": "2026-08-17 08:20:09",
+  "update_time": "2026-08-17 09:42:53",
   "data_date": "2026-08-17",
-  "source": "三通道: MACRO_DATA(gold/silver/copper/oil) + westock-mcp国际期货(LME/NYMEX/CBOT共11个) + eastmoney-push2国内期货(GFEX碳酸锂+ZCE纯碱)",
+  "source": "三通道: MACRO_DATA(gold/silver/copper/oil) + westock-mcp国际期货(LME/NYMEX/CBOT共11个) + eastmoney-push2国内期货(GFEX碳酸锂+ZCE纯碱) + akshare国内期货(铁矿石/螺纹钢/PTA/橡胶/焦煤/焦炭/豆油/棉花/白糖/玻璃)",
   "hot_count": 10,
-  "available_count": 15,
-  "total_commodities": 20,
+  "available_count": 16,
+  "total_commodities": 30,
   "hot_threshold_pct": 3.0,
   "hot_zscore": 2.0,
   "zscore_enabled_count": 0,
@@ -472,6 +472,55 @@
       ]
     },
     {
+      "key": "pta",
+      "name": "PTA",
+      "unit": "元/吨",
+      "exchange": "国内期货(ZCE)",
+      "available": true,
+      "current_price": 5844.0,
+      "price_date": "2026-08-17 09:42:39",
+      "source": "akshare(PTA连续)",
+      "baseline_30d": 5700.0,
+      "baseline_label": "近期均值参考(非实时历史)",
+      "dev_pct": 2.53,
+      "is_hot": false,
+      "hot_basis": "参考基准=近期均值参考(非实时历史)",
+      "z_score": null,
+      "ma30": null,
+      "std30": null,
+      "use_zscore": false,
+      "stocks": [
+        {
+          "code": "600346",
+          "name": "恒逸石化",
+          "business_pct": 0.55,
+          "elasticity_pct": 2.08,
+          "note": "PTA+聚酯长丝"
+        },
+        {
+          "code": "000703",
+          "name": "恒力石化",
+          "business_pct": 0.45,
+          "elasticity_pct": 1.71,
+          "note": "PTA+炼化一体化"
+        },
+        {
+          "code": "002493",
+          "name": "荣盛石化",
+          "business_pct": 0.4,
+          "elasticity_pct": 1.52,
+          "note": "PTA+聚酯"
+        },
+        {
+          "code": "601233",
+          "name": "桐昆股份",
+          "business_pct": 0.35,
+          "elasticity_pct": 1.33,
+          "note": "下游聚酯龙头"
+        }
+      ]
+    },
+    {
       "key": "platinum",
       "name": "铂金",
       "unit": "$/oz",
@@ -749,6 +798,240 @@
       ]
     },
     {
+      "key": "iron_ore",
+      "name": "铁矿石",
+      "available": false,
+      "reason": "铁矿石已配置数据源但本次未取到实时价（API未返回/非交易时段/网络受限），暂以「暂无数据」展示，不伪造价格。下次刷新会自动补回。",
+      "stocks": [
+        {
+          "code": "000709",
+          "name": "河钢股份",
+          "business_pct": 0.8,
+          "note": "钢铁龙头"
+        },
+        {
+          "code": "600581",
+          "name": "八一钢铁",
+          "business_pct": 0.85,
+          "note": "新疆钢企"
+        },
+        {
+          "code": "002110",
+          "name": "三钢闽光",
+          "business_pct": 0.9,
+          "note": "福建钢企"
+        },
+        {
+          "code": "000717",
+          "name": "韶钢松山",
+          "business_pct": 0.85,
+          "note": "华南钢企"
+        }
+      ]
+    },
+    {
+      "key": "rebar",
+      "name": "螺纹钢",
+      "available": false,
+      "reason": "螺纹钢已配置数据源但本次未取到实时价（API未返回/非交易时段/网络受限），暂以「暂无数据」展示，不伪造价格。下次刷新会自动补回。",
+      "stocks": [
+        {
+          "code": "002110",
+          "name": "三钢闽光",
+          "business_pct": 0.7,
+          "note": "建筑钢材"
+        },
+        {
+          "code": "600808",
+          "name": "马钢股份",
+          "business_pct": 0.55,
+          "note": "板材+长材"
+        },
+        {
+          "code": "000709",
+          "name": "河钢股份",
+          "business_pct": 0.5,
+          "note": "综合钢企"
+        },
+        {
+          "code": "601003",
+          "name": "柳钢股份",
+          "business_pct": 0.75,
+          "note": "华南螺纹"
+        }
+      ]
+    },
+    {
+      "key": "rubber",
+      "name": "天然橡胶",
+      "available": false,
+      "reason": "天然橡胶已配置数据源但本次未取到实时价（API未返回/非交易时段/网络受限），暂以「暂无数据」展示，不伪造价格。下次刷新会自动补回。",
+      "stocks": [
+        {
+          "code": "601058",
+          "name": "赛轮轮胎",
+          "business_pct": 0.8,
+          "note": "轮胎制造"
+        },
+        {
+          "code": "601163",
+          "name": "玲珑轮胎",
+          "business_pct": 0.75,
+          "note": "轮胎龙头"
+        },
+        {
+          "code": "603077",
+          "name": "华谊集团",
+          "business_pct": 0.3,
+          "note": "橡胶化工"
+        }
+      ]
+    },
+    {
+      "key": "coking_coal",
+      "name": "焦煤",
+      "available": false,
+      "reason": "焦煤已配置数据源但本次未取到实时价（API未返回/非交易时段/网络受限），暂以「暂无数据」展示，不伪造价格。下次刷新会自动补回。",
+      "stocks": [
+        {
+          "code": "000983",
+          "name": "山西焦煤",
+          "business_pct": 0.85,
+          "note": "焦煤龙头"
+        },
+        {
+          "code": "601001",
+          "name": "大同煤业",
+          "business_pct": 0.65,
+          "note": "动力煤+焦煤"
+        },
+        {
+          "code": "600740",
+          "name": "山西焦化",
+          "business_pct": 0.7,
+          "note": "焦炭+焦煤"
+        }
+      ]
+    },
+    {
+      "key": "coke",
+      "name": "焦炭",
+      "available": false,
+      "reason": "焦炭已配置数据源但本次未取到实时价（API未返回/非交易时段/网络受限），暂以「暂无数据」展示，不伪造价格。下次刷新会自动补回。",
+      "stocks": [
+        {
+          "code": "600740",
+          "name": "山西焦化",
+          "business_pct": 0.55,
+          "note": "焦炭+焦煤"
+        },
+        {
+          "code": "000937",
+          "name": "冀中能源",
+          "business_pct": 0.35,
+          "note": "焦煤+焦炭"
+        },
+        {
+          "code": "601011",
+          "name": "宝泰隆",
+          "business_pct": 0.5,
+          "note": "独立焦化"
+        }
+      ]
+    },
+    {
+      "key": "soybean_oil",
+      "name": "豆油",
+      "available": false,
+      "reason": "豆油已配置数据源但本次未取到实时价（API未返回/非交易时段/网络受限），暂以「暂无数据」展示，不伪造价格。下次刷新会自动补回。",
+      "stocks": [
+        {
+          "code": "000630",
+          "name": "西王食品",
+          "business_pct": 0.7,
+          "note": "玉米油+豆油"
+        },
+        {
+          "code": "300139",
+          "name": "晓程科技",
+          "business_pct": 0.3,
+          "note": "粮油加工"
+        },
+        {
+          "code": "002286",
+          "name": "保龄宝",
+          "business_pct": 0.25,
+          "note": "功能糖+粮油"
+        }
+      ]
+    },
+    {
+      "key": "cotton",
+      "name": "棉花",
+      "available": false,
+      "reason": "棉花已配置数据源但本次未取到实时价（API未返回/非交易时段/网络受限），暂以「暂无数据」展示，不伪造价格。下次刷新会自动补回。",
+      "stocks": [
+        {
+          "code": "600540",
+          "name": "新赛股份",
+          "business_pct": 0.7,
+          "note": "棉花种植+加工"
+        },
+        {
+          "code": "002042",
+          "name": "华孚时尚",
+          "business_pct": 0.6,
+          "note": "纺织龙头"
+        },
+        {
+          "code": "002294",
+          "name": "信隆健康",
+          "business_pct": 0.25,
+          "note": "纺织配件"
+        }
+      ]
+    },
+    {
+      "key": "sugar",
+      "name": "白糖",
+      "available": false,
+      "reason": "白糖已配置数据源但本次未取到实时价（API未返回/非交易时段/网络受限），暂以「暂无数据」展示，不伪造价格。下次刷新会自动补回。",
+      "stocks": [
+        {
+          "code": "600737",
+          "name": "中粮糖业",
+          "business_pct": 0.85,
+          "note": "糖业全产业链"
+        },
+        {
+          "code": "000911",
+          "name": "南宁糖业",
+          "business_pct": 0.9,
+          "note": "制糖龙头"
+        }
+      ]
+    },
+    {
+      "key": "glass",
+      "name": "玻璃",
+      "available": false,
+      "reason": "玻璃已配置数据源但本次未取到实时价（API未返回/非交易时段/网络受限），暂以「暂无数据」展示，不伪造价格。下次刷新会自动补回。",
+      "stocks": [
+        {
+          "code": "600586",
+          "name": "金晶科技",
+          "business_pct": 0.75,
+          "note": "玻璃原片"
+        },
+        {
+          "code": "601636",
+          "name": "旗滨集团",
+          "business_pct": 0.85,
+          "note": "玻璃龙头"
+        }
+      ]
+    },
+    {
       "key": "phosphate",
       "name": "磷化工",
       "available": false,
@@ -827,5 +1110,5 @@
       ]
     }
   ],
-  "note": "涨价窗口：有实时价的商品相对参考基准涨幅 ≥ 3.0% (或 |z-score| ≥ 2.0)。弹性系数 = 偏离度 × 业务占比 × 杠杆 1.5（简化估算）。已拿到实时价 15 个品种（含贵金属/基本金属/能源/农产品/国内期货）。其中 0 个已启用30日滚动z-score真实基准。数据源：MACRO_DATA + westock-mcp期货 + eastmoney push2国内期货。另有 5 个品种本次未展示实时价（锂(碳酸锂)、纯碱、磷化工、维生素、稀土），原因见「逻辑详解 > 潜力参考 > 商品涨价弹性榜 · 数据源与计算逻辑」。基准升级（2026-08-16）：静态均值 → 30日滚动z-score（μ±σ），积累满10日自动切换，不足日回退静态兜底。"
+  "note": "涨价窗口：有实时价的商品相对参考基准涨幅 ≥ 3.0% (或 |z-score| ≥ 2.0)。弹性系数 = 偏离度 × 业务占比 × 杠杆 1.5（简化估算）。已拿到实时价 16 个品种（含贵金属/基本金属/能源/农产品/国内期货）。其中 0 个已启用30日滚动z-score真实基准。数据源：MACRO_DATA + westock-mcp期货 + eastmoney push2国内期货。另有 14 个品种本次未展示实时价（锂(碳酸锂)、纯碱、铁矿石、螺纹钢、天然橡胶、焦煤、焦炭、豆油、棉花、白糖、玻璃、磷化工、维生素、稀土），原因见「逻辑详解 > 潜力参考 > 商品涨价弹性榜 · 数据源与计算逻辑」。基准升级（2026-08-16）：静态均值 → 30日滚动z-score（μ±σ），积累满10日自动切换，不足日回退静态兜底。"
 }
