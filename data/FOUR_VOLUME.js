@@ -1,15 +1,15 @@
 window.FOUR_VOLUME={
- "update_time": "2026-08-17 10:26:59",
+ "update_time": "2026-08-17 10:54:50",
  "total": 1,
  "stocks": [
   {
    "code": "002028",
-   "name": "映美控股",
+   "name": "思源电气",
    "market": "sz",
    "board_label": "主板",
    "close": 183.15,
    "pct_chg": 10.0,
-   "turnover_rate": 1.95,
+   "turnover_rate": 1.98,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
