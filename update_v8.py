@@ -647,27 +647,68 @@ def _file_category(filename):
     return _var_category(var_name) if var_name else []
 
 
-def _list_changed_raw_files():
-    """通过 git diff HEAD~1..HEAD 找出变化的 raw_data 文件（用于 v6 push 触发构建）。"""
+def _extract_js_object(out_path):
+    """从 data/X.js 提取 `window.VAR = <json>;` 内嵌的 JSON 对象/数组。失败返回 None。"""
     try:
-        result = subprocess.run(
-            ["git", "diff", "--name-only", "HEAD~1", "HEAD"],
-            cwd=ROOT, capture_output=True, text=True, check=False, timeout=30
-        )
-        if result.returncode != 0:
-            # 可能是第一次提交或浅克隆，尝试 HEAD
-            result = subprocess.run(
-                ["git", "diff", "--name-only", "HEAD"],
-                cwd=ROOT, capture_output=True, text=True, check=False, timeout=30
-            )
-        if result.returncode != 0:
-            return []
-        changed = [line.strip() for line in result.stdout.splitlines()
-                   if line.strip().startswith("raw_data/")]
-        return [Path(ROOT) / p for p in changed]
+        text = out_path.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        return None
+    m = re.search(r"window\.[A-Z_0-9]+\s*=\s*(\{.*\}|\[.*\])\s*;?\s*$", text, re.S)
+    if not m:
+        return None
+    try:
+        return json.loads(m.group(1))
+    except Exception:
+        return None
+
+
+def _neutralize(obj):
+    """中性化非数据字段（republish_time/update_time 为时间戳，不反映核心数据变化），
+    仅用于「内容是否变化」判等，避免构建时刻差异造成误判/死循环重建。"""
+    if isinstance(obj, dict):
+        o = dict(obj)
+        o.pop("republish_time", None)
+        o.pop("update_time", None)
+        return o
+    return obj
+
+
+def _list_changed_raw_files():
+    """检测哪些 raw_data 与已部署 data/*.js 内容不一致（commit 无关，根治漏检）。
+
+    旧实现 `git diff HEAD~1..HEAD` 只比对最近一次提交的差异，在 CI 并发/多次推送
+    场景下 HEAD 常指向非 raw_data 提交（如守卫修复、healthcheck、westock 推送），
+    导致盘中抓取的 raw_data 变化被静默漏检 → data/*.js 永远停在盘前清空态
+    （2026-08-17 主站全天盘前 bug 根因）。
+
+    改为：直接比较 raw_data/X.json 解析对象与已部署 data/X.js 内嵌对象
+    （中性化 republish_time/update_time 后）是否一致，内容不同即视为变化。
+    完全脱离 HEAD 依赖，且自校正（重建后内容一致则不再重建，不会死循环）。
+    单个文件比对异常时保守视为「已变化」；整体异常时回退为「全部重建」（安全而非静默跳过）。
+    """
+    results = []
+    try:
+        for raw_path in sorted(RAW_DIR.glob("*.json")):
+            var_name = DATA_SOURCES.get(raw_path.name)
+            if not var_name:
+                continue
+            out_path = DATA_DIR / f"{var_name}.js"
+            raw_obj = _load_json(raw_path)
+            if raw_obj is None:
+                continue
+            if not out_path.exists():
+                results.append(raw_path)
+                continue
+            data_obj = _extract_js_object(out_path)
+            if data_obj is None:
+                results.append(raw_path)
+                continue
+            if _neutralize(raw_obj) != _neutralize(data_obj):
+                results.append(raw_path)
+        return results
     except Exception as e:
-        print(f"  ⚠️  git diff 检测失败: {e}")
-        return []
+        print(f"  ⚠️  内容比对异常，回退为全部重建: {e}")
+        return [p for p in RAW_DIR.glob("*.json") if DATA_SOURCES.get(p.name)]
 
 
 def build(category=None, detect_changes=False):
