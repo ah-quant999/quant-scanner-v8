@@ -193,22 +193,27 @@ def parse_time(s):
 
 
 def load_window_var(path, var_name):
-    """从 data/*.js 读取 window.X = {...}; 并解析为 dict。"""
+    """从 data/*.js 读取 window.X = {...}; 并解析为 dict（兼容 IIFE 壳）。"""
     if not path.exists():
         return None
     text = path.read_text(encoding="utf-8")
     # 去掉 BOM
     text = text.lstrip("\ufeff")
-    m = re.search(rf"window\.{re.escape(var_name)}\s*=\s*([\s\S]*?);\s*\n", text)
-    if not m:
-        # 尝试更宽松的匹配
-        m = re.search(rf"window\.{re.escape(var_name)}\s*=\s*(\{{[\s\S]*?\}})\s*;", text)
-        if not m:
+    # 直接对象形式 window.X = {...};
+    m = re.search(rf"window\.{re.escape(var_name)}\s*=\s*(\{{[\s\S]*?\}})\s*;", text)
+    if m:
+        try:
+            return json.loads(m.group(1))
+        except Exception:
+            pass  # 落到 IIFE 分支
+    # IIFE 壳：window.X = (function(){ var data = {...}; ... })()
+    m2 = re.search(rf"window\.{re.escape(var_name)}\s*=\s*\(function[\s\S]*?var\s+data\s*=\s*(\{{[\s\S]*?\}})\s*;", text)
+    if m2:
+        try:
+            return json.loads(m2.group(1))
+        except Exception:
             return None
-    try:
-        return json.loads(m.group(1))
-    except Exception:
-        return None
+    return None
 
 
 def _load_token():
@@ -380,6 +385,28 @@ def _has_pending_run(workflow_id, headers):
         return False, None
 
 
+def _cn_runner_available():
+    """检查 self-hosted cn runner 是否至少有 1 台 online（防自愈派发风暴）。
+
+    2026-08-17 主人怒令发现：alimi-cn offline + lemoncat busy 时，health_patrol
+    每分钟兜底 + self_heal 派发 → 每 6 分钟无完成就再 dispatch → 派发全部 Set up job
+    失败 → 死循环风暴（当晚 14:02-14:09 连续 8+ 个 failure/cancelled）。
+    修法：派发前先查 runner 状态，全 offline 则跳过本轮派发（留到 runner 恢复）。
+    """
+    try:
+        req = urllib.request.Request(
+            f"https://api.github.com/repos/{REPO}/actions/runners",
+            headers={"Authorization": f"Bearer {_load_token()}",
+                     "Accept": "application/vnd.github+json"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            d = json.loads(r.read().decode("utf-8"))
+        online = [x for x in d.get("runners", []) if x.get("status") == "online"]
+        return bool(online), [x.get("name", "?") for x in online]
+    except Exception:
+        # API 失败时保守放行（宁可派发也不漏报）
+        return True, ["?"]
+
+
 def _dispatch_cn_fetch(cat):
     """经 GitHub API 派发 cn_fetch 刷新（自愈核心动作）。
 
@@ -390,6 +417,10 @@ def _dispatch_cn_fetch(cat):
     token = _load_token()
     if not token:
         return False, "无 GitHub token，无法派发", False
+    # 2026-08-17 防风暴：cn runner 全 offline 时派发必失败 → 跳过本轮
+    avail, online = _cn_runner_available()
+    if not avail:
+        return True, f"cn runner 全 offline（在线={online}），跳过派发防风暴（待 runner 恢复）", False
     headers = {
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
@@ -419,6 +450,10 @@ def _dispatch_algo_run():
     token = _load_token()
     if not token:
         return False, "无 GitHub token，无法派发", False
+    # 2026-08-17 防风暴：algo_run 也用 self-hosted cn runner
+    avail, online = _cn_runner_available()
+    if not avail:
+        return True, f"cn runner 全 offline（在线={online}），跳过 algo_run 派发防风暴", False
     headers = {
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
@@ -994,6 +1029,121 @@ def check_data_cards():
             "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
             "status": status, "last_update": ts, "age_min": round(age_min, 1),
             "message": msg
+        })
+    return results
+
+
+# ── 2026-08-17 主人怒令「每个前端的算法都全面审计」：53 个 data/*.js 不在 CARD_DEFS 从未被审计 ──
+# CARD_DEFS 只覆盖 28 张主卡；SECTOR_RS/SENTIMENT_CYCLE/COMMODITY_ELASTICITY/MAHORO/NORTH_FUND/
+# STOCK_QUOTE/STOCK_MOMENTUM_STATE(W2)/TRIPLE_HISTORY/W52_HIGH/STOCK_PROFILE 等 53 个文件
+# 既不在 CARD_DEFS 也不在 check_a_share_coverage → 陈旧 3 天没人报警（今晚主人连续质问的根因）。
+# 一劳永逸修法：本函数自动扫描 data/*.js 全集，未登记 CARD_DEFS 的按「通用规则」审计：
+#   通用规则 = ①有 update_time/date 且 ≤ 24h 红线（_hard_cap_for_owner_rule）②文件可解析 ③非空
+# 未来新增 data 文件自动纳入审计，无需手工维护 CARD_DEFS。
+_KNOWN_EXTRA_PAGES = {
+    # 部分已登记 CARD_DEFS 的 id 会在这里被跳过（不重复审计）
+}
+# window 变量名 ≠ 文件名 的别名映射（文件 id → window 变量名候选）
+_WINDOW_VAR_ALIASES = {
+    "STOCK_MOMENTUM_STATE_V2": ["STOCK_MOMENTUM_ENHANCED"],
+    "PORTFOLIO": ["PORTFOLIO_DATA"],
+    "STOCK_RPS": ["STOCK_RPS_DATA"],
+}
+# 低频/非每日更新数据（24h 红线不适用，但超过 7 天仍报 warn）：
+#   STOCK_PROFILE 个股资料库（月度刷新） / WEEKEND_META_REPORT 周末复盘（周末生成）
+#   PORTFOLIO 用户真实持仓（手动更新） / PORTFOLIO_COST 持仓成本基准（手动）
+#   CONCEPT_ETF_MAP 概念ETF静态映射（研究参考） / OPTIMIZED_STRATEGY 优化策略（回测产物）
+#   BACKTEST_TDX 回测结果（参数变更才重跑） / BLOAT_CHECK 体积检查（build 时） / HEALTH_CHECK 本检查自产
+#   RUNNER_STATUS_HEALTH runner 心跳（1 分钟级自愈，另有专门检查）
+_LOW_FREQ_FILES = {
+    "STOCK_PROFILE", "WEEKEND_META_REPORT", "PORTFOLIO", "PORTFOLIO_COST",
+    "CONCEPT_ETF_MAP", "OPTIMIZED_STRATEGY", "BACKTEST_TDX", "BLOAT_CHECK",
+    "HEALTH_CHECK", "RUNNER_STATUS_HEALTH",
+}
+def check_all_data_files():
+    """全量审计 data/*.js：已登记 CARD_DEFS 的跳过（check_data_cards 管），其余全部按通用规则查。
+
+    通用规则（对未知文件）：
+      · 文件缺失/不可解析 → fail
+      · 无 update_time/date/generated/lastUpdated 字段 → warn（无法判龄）
+      · age > 24h 红线（交易日）/ T+1 18:30（非交易日）→ fail
+      · 空 dict / 全空 list → warn（弱市或数据源待接入，非致命）
+      · 以上均通过 → ok
+    """
+    results = []
+    known_ids = {d["id"] for d in CARD_DEFS}
+    # 同源派生卡（前端复用同一 JS 文件，不单独算文件）
+    derived = {"BIG_BULL_HUNTER", "SIX_DIM_RADAR"}
+    for p in sorted(DATA_DIR.glob("*.js")):
+        vid = p.name[:-3]
+        if vid in known_ids or vid in derived:
+            continue
+        data = load_window_var(p, vid)
+        # 2026-08-17 兼容 window 变量名 ≠ 文件名（STOCK_MOMENTUM_STATE_V2.js → window.STOCK_MOMENTUM_ENHANCED）
+        if data is None:
+            for alias in _WINDOW_VAR_ALIASES.get(vid, []):
+                data = load_window_var(p, alias)
+                if data is not None:
+                    break
+        if data is None:
+            # 2026-08-17 特例：非严格 JSON 的静态映射文件（CONCEPT_ETF_MAP 用 JS 注释+无引号键），
+            # 解析必然失败但文件真实存在且体积正常 → 按「低频静态映射」检查，不误报缺失
+            if vid in _LOW_FREQ_FILES and p.stat().st_size > 2000:
+                results.append({
+                    "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
+                    "status": "ok", "last_update": "静态映射", "age_min": None,
+                    "heal_cat": "algo_run",
+                    "message": f"{p.name} 静态映射文件（非严格 JSON，按体积检查 OK，{p.stat().st_size//1024}KB）",
+                })
+                continue
+            results.append({
+                "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
+                "status": "fail", "last_update": "--", "age_min": None,
+                "heal_cat": "algo_run",  # 文件缺失 → 算法链重跑可重建
+                "message": f"{p.name} 缺失或解析失败（未被 CARD_DEFS 登记）",
+            })
+            continue
+        ts = data.get("update_time") or data.get("date") or data.get("generated") \
+            or data.get("generated_time") or data.get("lastUpdated") or data.get("updated") or "--"
+        if isinstance(ts, str) and ts == "--" and isinstance(data, dict):
+            # 2026-08-17 嵌套时间戳（meta.generated / data_date 等）
+            meta = data.get("meta") if isinstance(data.get("meta"), dict) else {}
+            ts = (meta.get("generated") or meta.get("update_time") or meta.get("updated")
+                  or data.get("data_date") or data.get("updated_at") or "--")
+        dt = parse_time(ts) if isinstance(ts, str) else None
+        if dt is None:
+            # 有数据但无时间戳：无法判龄 → warn（不 fail，避免误报）
+            results.append({
+                "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
+                "status": "warn", "last_update": str(ts)[:16], "age_min": None,
+                "heal_cat": "algo_run",
+                "message": f"{p.name} 无 update_time/date/generated 时间戳，无法判龄（缺审计登记）",
+            })
+            continue
+        age_min = (now_cst() - dt).total_seconds() / 60
+        if vid in _LOW_FREQ_FILES:
+            # 低频文件：24h 红线不适用，但 7 天未动仍 warn
+            cap = 7 * 24 * 60
+            status = "warn" if age_min > cap else "ok"
+            rel = fmt_rel_time(str(ts)[:19])
+            msg = f"{p.name} 更新于 {rel}（低频数据，7 天红线）"
+        else:
+            cap = _hard_cap_for_owner_rule()
+            # 已登记 CARD_DEFS 的卡在 check_data_cards 用 d.max_age 判定；未知卡统一走 24h/T+1 红线
+            status = "ok" if age_min <= cap else "fail"
+            rel = fmt_rel_time(str(ts)[:19])
+            msg = f"{p.name} 更新于 {rel}"
+            if status == "fail":
+                msg += f"；超过通用红线 {cap} 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+            # 空内容检测（不把空 list 当错误，弱市合法）
+            elif isinstance(data, dict) and not data:
+                status = "warn"
+                msg += "；内容为空 dict"
+        results.append({
+            "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
+            "status": status, "last_update": str(ts)[:19], "age_min": round(age_min, 1),
+            "heal_cat": "algo_run",
+            "message": msg,
         })
     return results
 
@@ -1658,8 +1808,8 @@ def check_top10_history_depth():
     return results
 
 
-def build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh=None, history_depth=None, a_share_cov=None):
-    all_items = cards + raw + site_sync + runner + local_sync + dom + (signal_fresh or []) + (history_depth or []) + (a_share_cov or [])
+def build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh=None, history_depth=None, a_share_cov=None, all_data=None):
+    all_items = cards + raw + site_sync + runner + local_sync + dom + (signal_fresh or []) + (history_depth or []) + (a_share_cov or []) + (all_data or [])
     ok = sum(1 for x in all_items if x["status"] == "ok")
     warn = sum(1 for x in all_items if x["status"] == "warn")
     fail = sum(1 for x in all_items if x["status"] == "fail")
@@ -1765,6 +1915,7 @@ def main():
     print(f"[INFO] v8 health check start @ {now_cst().strftime('%Y-%m-%d %H:%M:%S')}")
 
     cards = check_data_cards()
+    all_data = check_all_data_files()  # 🔴 2026-08-17 主人怒令：全面审计（53 个未登记文件全量覆盖）
     raw = check_raw_data()
     site_sync = check_site_deploy_sync()
     runner = check_runner()
@@ -1778,7 +1929,7 @@ def main():
     # 🔴 2026-08-12 主人紧急令：算法输出全港股/A股缺失必须立即报警
     a_share_cov = check_a_share_coverage()
 
-    report = build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh, history_depth, a_share_cov=a_share_cov)
+    report = build_report(cards, raw, site_sync, runner, local_sync, dom, signal_fresh, history_depth, a_share_cov=a_share_cov, all_data=all_data)
     # 2026-08-11 漏洞 #3：管线耗时趋势监控（必须在 build_report 后但 self_heal 前,以便发现异常时纳入自愈决策）
     try:
         _check_workflow_durations(report)
