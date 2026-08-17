@@ -1343,6 +1343,17 @@ SEL:ZCNT>=2 AND ZDOWN>=1 AND VRMAX>=2.0 AND VR3>=1.5 AND CRDS>=15;</div>
       // 否则让浏览器按 href="index.html" 正常跳
     });
   })();
+  // 通知父页面（index.html iframe 容器）内容已就绪，避免父页面在隐藏态误判为空白
+  try {
+    window.__v6Ready = true;
+    var _vh = document.body ? document.body.scrollHeight : 0;
+    if (window.self !== window.top) {
+      window.parent.postMessage({ __v6memo: 'ready', height: _vh }, '*');
+    }
+  } catch (e) {}
+  window.addEventListener('load', function(){
+    try { if (window.self !== window.top) window.parent.postMessage({ __v6memo: 'ready', height: document.body ? document.body.scrollHeight : 0 }, '*'); } catch(e){}
+  });
 </script>
 </body>
 </html>
