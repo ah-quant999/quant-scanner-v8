@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-08-18 00:40:39",
-  "data_time": "2026-08-18 00:35:27",
+  "update_time": "2026-08-18 01:31:34",
+  "data_time": "2026-08-18 01:25:10",
   "count": 0,
-  "near_miss_count": 5,
+  "near_miss_count": 4,
   "criteria": "主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)）· 驾驶舱A档 · 基本面A档",
   "near_miss_criteria": "以上三条满足任意两条（驾驶舱A/B档均计入）",
   "stocks": [],
@@ -201,51 +201,6 @@
         "最近多板",
         "智能家居",
         "近期新高"
-      ]
-    },
-    {
-      "code": "300604",
-      "name": "长川科技",
-      "market": "创业板",
-      "board": "创业板",
-      "total_score": 22,
-      "top10_rank": 0,
-      "a_score": 0,
-      "quality_grade": "A",
-      "in_top10": false,
-      "in_tier_a": false,
-      "in_tier_b": true,
-      "in_good_fund": true,
-      "miss_steps": 2,
-      "close": 0,
-      "pct_chg": 0,
-      "pct_chg_20d": 0,
-      "signals": {},
-      "sectors": [
-        "专用设备制造业"
-      ],
-      "enter_date": "2026-08-17",
-      "industry": "专用设备制造业",
-      "concepts": [
-        "MSCI中国",
-        "2026中报预增",
-        "百元股",
-        "深股通",
-        "基金重仓",
-        "大盘股",
-        "深成500",
-        "专精特新",
-        "存储芯片",
-        "中证500",
-        "大盘成长",
-        "创业成份",
-        "科技风格",
-        "半导体概念",
-        "融资融券",
-        "创业板综",
-        "最近多板",
-        "2025三季报预增",
-        "国产芯片"
       ]
     },
     {
