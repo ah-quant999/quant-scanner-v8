@@ -158,6 +158,15 @@ jobs:
           python algorithms/fetch_sector_rs.py
           python -c "import sys; sys.path.insert(0,'algorithms'); import stage_to_raw; stage_to_raw.main()"
 
+      # 2026-08-17 主人令：ETF 三件套（POTENTIAL_PICKS / ETF_PULSE / ETF_INTRADAY_HEAT / ETF_DAILY_MONITOR）之前无任何 workflow 触发，3 天没更新
+      # calc_potential_picks.py 已由 update_v8.py 实验链路自动跑；这里新增 ETF 三件套（intraday 与 post_close 都跑，post_close 跑一次兜底）
+      - name: "💹 ETF 三件套数据生成（post_close 兜底）"
+        if: steps.cat.outputs.category == 'post_close'
+        continue-on-error: true
+        shell: powershell
+        run: |
+          python algorithms/calc_etf_intraday.py
+
       - name: "📤 经 API 推送 raw_data/ 到 main"
         shell: powershell
         run: |
