@@ -8853,8 +8853,8 @@ function drawUpDownChart(){
         }
 
         // 字段兼容：RUNNER_STATUS_HEALTH 用 checked_at_bj（非 update_time），
-        // 其余卡用 update_time/last_update/run_time/updated（2026-08-06 红叉审计修复）
-        const _tsRaw = data.update_time || data.last_update || data.run_time || data.updated
+        // 其余卡用 update_time/last_update/run_time/updated/updated_at（2026-08-06 红叉审计修复 + 08-17 补 updated_at）
+        const _tsRaw = data.update_time || data.updated_at || data.last_update || data.run_time || data.updated
           || data.checked_at_bj || data.checked_at_utc;
 
         const lastTs = parseTs(_tsRaw);
