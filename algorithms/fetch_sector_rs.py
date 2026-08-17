@@ -19,6 +19,68 @@ BASE = os.path.dirname(os.path.abspath(__file__))   # 迁移守卫漏注入（�
 OUT = os.path.join(BASE, "..", "out", "sector_rs.json")
 NEODATA_URL = "https://copilot.tencent.com/agenttool/v1/neodata"
 
+# 2026-08-17 主人令：阶段快照存 raw_data/ 供前端"今日 vs 上次"对比
+# 每次盘后跑成功时，把今日 phases append 到 sector_phase_history.json（云端持久化）
+RAW_DIR = os.path.join(BASE, "..", "raw_data")
+PHASE_HISTORY_PATH = os.path.join(RAW_DIR, "sector_phase_history.json")
+PHASE_BUCKETS = ['主升', '启动', '震荡', '退潮', '底部']
+
+
+def _phase_of(s):
+    """前端一致的阶段判定（与 index.html line 6482-6487 完全一致）。"""
+    d5 = s.get('pct_5d') or 0
+    d20 = s.get('pct_20d') or 0
+    if d5 > 3 and d20 > 5:
+        return '主升'
+    if d5 > 1.5 and d20 > 0:
+        return '启动'
+    if d5 < -3 and d20 < -10:
+        return '底部'
+    if d5 < -1.5 and d20 < -5:
+        return '退潮'
+    return '震荡'
+
+
+def _save_phase_snapshot(sectors, update_time_str, today_str):
+    """把今日 phase 快照写入 raw_data/sector_phase_history.json（累积历史）。
+
+    格式：{"version":1, "snaps":[{"date","update_time","phases":{name→phase}}]}
+    同一日重复跑 → 覆盖当日；新一日 → append；最多保留 30 天（防止 raw_data 无限增长）。
+    """
+    phases = {s['name']: _phase_of(s) for s in sectors if s.get('name')}
+    if not phases:
+        log("  [phase_history] sectors 为空，跳过快照")
+        return
+
+    # 读现有
+    history = {"version": 1, "snaps": []}
+    if os.path.exists(PHASE_HISTORY_PATH):
+        try:
+            with open(PHASE_HISTORY_PATH, 'r', encoding='utf-8') as f:
+                history = json.load(f)
+        except Exception as e:
+            log(f"  [phase_history] 读历史失败: {e}，重建")
+
+    snaps = history.get("snaps", [])
+    # 覆盖当日
+    snaps = [s for s in snaps if s.get("date") != today_str]
+    snaps.append({
+        "date": today_str,
+        "update_time": update_time_str,
+        "phases": phases,
+    })
+    # 保留最近 30 天
+    snaps = snaps[-30:]
+
+    history["version"] = 1
+    history["snaps"] = snaps
+    try:
+        with open(PHASE_HISTORY_PATH, 'w', encoding='utf-8') as f:
+            json.dump(history, f, ensure_ascii=False, indent=2)
+        log(f"  [phase_history] 已存今日快照 ({len(phases)} 板块 phase)，共 {len(snaps)} 天")
+    except Exception as e:
+        log(f"  [phase_history] 写历史失败: {e}")
+
 # 读取neodata token（优先用仓库内的 .neodata_token）
 TOKEN_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".neodata_token")
 token = None
@@ -213,6 +275,7 @@ def main():
             with open(OUT, 'w', encoding='utf-8') as f:
                 json.dump(result, f, ensure_ascii=False, indent=2)
             log(f"✅ 已保存 (来源: neodata, {len(sectors)}板块)")
+            _save_phase_snapshot(sectors, now_str, now_str[:10])
             record_success(__file__)
             return
         else:
@@ -229,6 +292,7 @@ def main():
         with open(OUT, 'w', encoding='utf-8') as f:
             json.dump(result, f, ensure_ascii=False, indent=2)
         log(f"✅ 已保存 (来源: 同花顺, {len(result.get('sectors',[]))}板块)")
+        _save_phase_snapshot(result.get("sectors", []), now_str, now_str[:10])
         record_success(__file__)
         return
     except Exception as e:
