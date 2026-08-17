@@ -177,6 +177,14 @@ jobs:
           python algorithms/fetch_sector_rs.py
           python -c "import sys; sys.path.insert(0,'algorithms'); import stage_to_raw; stage_to_raw.main()"
 
+      # 2026-08-17 主人令：ETF 三件套（calc_etf_intraday.py）之前无 workflow 触发
+      - name: "💹 ETF 三件套数据生成（post_close 兜底）"
+        if: steps.cat.outputs.category == 'post_close'
+        continue-on-error: true
+        shell: bash
+        run: |
+          python algorithms/calc_etf_intraday.py
+
       - name: "📤 推送 raw_data/ 到 main（Contents API）"
         shell: bash
         run: |
