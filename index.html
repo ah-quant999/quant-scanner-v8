@@ -10363,7 +10363,7 @@ function drawUpDownChart(){
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a855f7;">';
     h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
     h+='<span style="font-size:15px;font-weight:700;color:#a855f7;">🚀 个股动量状态</span>';
-    h+='<span class="fresh" id="smsFresh">—</span>';
+    (function(){ var _s0=window.STOCK_MOMENTUM_STATE; var _d0=_s0?(_s0.date||(_s0.days&&_s0.days.length&&_s0.days[_s0.days.length-1].date)):null; if(_d0){ h+='<span style="font-size:11px;color:var(--dim);font-weight:400;">盘后更新于 '+_d0.slice(5,16)+'</span>'; } })();
     h+='<span style="font-size:12px;color:var(--dim);">OCR抽取 · 跨分类共识 · 暂不进推荐</span>';
     h+='</div>';
     var _sms = window.STOCK_MOMENTUM_STATE;
