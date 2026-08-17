@@ -156,6 +156,9 @@ def walk_extra():
         "data/FINAL_RECOMMEND_DATA.js", # 跨策略共振 Top3（final_recommend.py 产出）
         "data/STOCK_RPS.js",            # 个股相对强度 RPS+RS（calc_stock_rps.py 产出）
         "data/FOUR_VOLUME_60M.js",      # 四量终极60min版（strategy_four_volume_60m.py 产出）
+        # ── 2026-08-17 补入：商品涨价弹性榜（calc_commodity_elasticity.py 产出）──
+        # 之前未注册，导致国内期货 LC/SA 数据永远不显示；现加入云端自动跑 + 推送
+        "data/COMMODITY_ELASTICITY.js",
         # optimized_strategy.json 在 raw_data/，由 walk_raw() 按算法产物前缀自动排除（不推送，免覆盖）
     ]
     for rel in extra:
