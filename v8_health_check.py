@@ -84,10 +84,10 @@ CARD_DEFS = [
     # 故统一显式覆盖 heal_cat="algo_run"。
     {"id": "SH_FIB", "name": "市场温度计", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"], "heal_cat": "algo_run"},
     {"id": "SIX_DIM_RADAR", "name": "六维共振雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"], "_source_file": "SH_FIB", "_window_var": "SH_FIB", "heal_cat": "algo_run"},  # 与市场温度计同源(SH_FIB.js)，前端独立卡片展示六维评分视图
-    {"id": "MARGIN_DATA", "name": "融资融券", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["sh"]},
-    {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["items"]},
-    {"id": "CRISIS_DATA", "name": "危机雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["currency", "global"]},
-    {"id": "MARKET_FUND_FLOW_DATA", "name": "盘后资金流向", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["daily"]},
+    {"id": "MARGIN_DATA", "name": "融资融券", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["sh"], "heal_cat": "premarket"},  # cloud_fetch_v8.py 把它注册在 premarket（line 81），不在 post_close 注册
+    {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["items"], "heal_cat": "premarket"},  # 同上
+    {"id": "CRISIS_DATA", "name": "危机雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["currency", "global"], "heal_cat": "premarket"},  # 危机雷达每日 08:25 跑一次
+    {"id": "MARKET_FUND_FLOW_DATA", "name": "盘后资金流向", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["daily"], "heal_cat": "premarket"},  # 资金流日频时间轴——08:25 必跑一次（防漏跑）
     {"id": "CANDIDATE", "name": "候选池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
     {"id": "GOLD_POOL", "name": "黄金池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
     {"id": "LHB_DATA", "name": "龙虎榜", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
@@ -869,6 +869,34 @@ def adjust_max_age(def_max, page=None):
     return def_max
 
 
+def _hard_cap_for_owner_rule(n=None):
+    """🛡 主人铁律 2026-08-17（命令式）·一劳永逸：交易日超 24h 必报+自愈闭环；周末/假期延算到 T+1 18:30。
+
+    返回硬上限（分钟）:
+      · 交易日：24h（即 1440 min）。任何 data 陈旧超 24h = fail + 强制 self_heal
+      · 非交易日（周末/节假日）：自最近一次收盘以来到「下一个交易日 18:30 盘后跑完」的分钟数。
+        例：周五 15:30 出的数据，最迟应在「下周一 18:30」前出现新值 → 上限 72h 整（4320 min）。
+        长假也按 next_trade_day 自动顺延，不写死。
+
+    接入方式：所有 adjust_max_age 返回值再 min(def_max, this) 一次。
+    """
+    n = n or now_cst()
+    if not is_market_closed(n):
+        # 交易日红线：24h
+        return 24 * 60
+    # 非交易日：T+1 18:30 - 上次收盘（自适应长假/连休）
+    last_close = last_trade_day_close(n)
+    d = n.date() + timedelta(days=1)
+    while not _is_trading_day(d):
+        d += timedelta(days=1)
+    # T+1 18:30 = 下一个交易日盘后跑完时间
+    t1_done = datetime.combine(d, datetime.strptime("18:30", "%H:%M").time(),
+                                tzinfo=timezone(timedelta(hours=8)))
+    cap = int((t1_done - last_close).total_seconds() / 60)
+    # 下限保护：算出来不能 < 24h，否则同日连休 1 天就崩
+    return max(24 * 60, cap)
+
+
 def check_data_cards():
     results = []
     today_str = now_cst().strftime("%Y-%m-%d")
@@ -895,6 +923,9 @@ def check_data_cards():
         ts = data.get("update_time") or data.get("date") or data.get("lastUpdated") or "--"
         dt = parse_time(ts)
         max_age = adjust_max_age(d["max_age"], page=d.get("page"))
+        # 🛡 主人铁律 2026-08-17：交易日超 24h 必报；非交易日 T+1 18:30
+        # 硬 cap 必须在 adjust_max_age 之后叠加，否则盘中/盘后自适应逻辑被绕过
+        max_age = min(max_age, _hard_cap_for_owner_rule())
 
         # 盘中 premarket_cleared 异常自愈检测：实时数据在交易时段被标记为盘前清空，属于误清空
         prem_cleared = data.get("premarket_cleared") is True
