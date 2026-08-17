@@ -441,7 +441,7 @@ window.__domReadyFns=[];
     <script src="data/CRISIS_DATA.js?v=2e1034a80e" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=7df706483e" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=139fd6f5be" defer></script>
-    <script src="data/STOCK_RPS.js?v=94fa8539af" defer></script>
+    <script src="data/STOCK_RPS.js?v=e38bdd30b0" defer></script>
     <script src="data/AVG_PRICE_DATA.js?v=ceda57899f" defer></script>
     <script src="data/CONCEPT_ETF_MAP.js?v=572e8965fb" defer></script>
     <script src="data/PORTFOLIO_COST.js?v=6c6515f693" defer></script>
@@ -1042,12 +1042,6 @@ function _buildJudgmentEnvHTML(d){
     size = size || 10;
     return '<span style="display:inline-block;width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+c+';box-shadow:0 0 '+(size)+'px '+c+'88;vertical-align:-1px"></span>';
   }
-  // 🛡 2026-08-18 06:32 主人令修复：所有子块必须有「更新于 HH:MM」戳
-  var _jdUt = d.update_time || (typeof window !== 'undefined' && window.MACRO_BRIEF ? window.MACRO_BRIEF.update_time : '') || '';
-  var _jdUtRel = '';
-  try { _jdUtRel = (_jdUt && window._fmtAshareRel) ? window._fmtAshareRel(_jdUt) : (_jdUt || ''); } catch(e) { _jdUtRel = _jdUt; }
-  var _jdUtSlot = (_jdUt && window._slotByTs) ? window._slotByTs(_jdUt) : {slot:'盘前', horizon:'短线'};
-  var _jdWholeBadge = _jdUt ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap;margin-left:auto">🦊 更新于 '+_jdUtRel+' '+( _jdUtSlot.slot||'盘前')+' '+( _jdUtSlot.horizon||'短线')+'</span>' : '';
   var consTxt = d.consensus || d.verdict || '';
   var warnTxt = d.warning || '';
   var lv = consTxt.indexOf('偏多')>=0 ? 'green' : (consTxt.indexOf('偏空')>=0 ? 'red' : 'yellow');
@@ -1056,15 +1050,13 @@ function _buildJudgmentEnvHTML(d){
     + '<span style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:'+lvColor+'">'+lightDot(lvColor,14)+'今日信号 · '+({green:'积极',yellow:'观望',red:'防守'}[lv])+'</span>'
     + '<span style="font-size:11px;color:var(--sub)">'+consTxt+'</span>'
     + (warnTxt ? '<span style="display:inline-flex;align-items:center;gap:3px;background:#f59e0b18;border:1px solid #f59e0b40;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:#f59e0b;margin-left:4px">⚠️ '+warnTxt+'</span>' : '')
-    + _jdWholeBadge
-    + '</div>'
-    + '<div style="font-size:10px;color:var(--dim);margin:-6px 0 8px 4px">🟢 积极 · 🟡 观望 · 🔴 防守</div>';  // 2) 时事滚动（紧凑）
+    + '<span style="margin-left:auto;font-size:10px;color:var(--dim)">🟢 积极 · 🟡 观望 · 🔴 防守</span></div>';  // 2) 时事滚动（紧凑）
   var fullMb = (typeof window !== 'undefined' && window.MACRO_BRIEF) || {};
   var mb = (fullMb.headline ? fullMb : (d.macro_brief || {})) || {};
   var news = (fullMb.news_brief && fullMb.news_brief.length ? fullMb.news_brief : (mb.news_brief || [])) || [];
   if(mb.headline || news.length){
     h += '<div style="margin-bottom:8px;padding:8px 10px;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.22);border-radius:8px;font-size:12px;line-height:1.5">';
-    if(mb.headline) h += '<div style="display:flex;align-items:flex-start;gap:6px"><span style="font-weight:700;color:#38bdf8;flex:1">🌐 时事滚动 · '+mb.headline+'</span>'+(_jdUt?'<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap;flex:0 0 auto">🦊 更新于 '+_jdUtRel+'</span>':'')+'</div>';
+    if(mb.headline) h += '<div style="font-weight:700;color:#38bdf8;margin-bottom:3px">🌐 时事滚动 · '+mb.headline+'</div>';
     if(news.length){
       h += '<div style="display:flex;flex-wrap:wrap;gap:4px 10px">';
       news.slice(0,4).forEach(function(n){
@@ -1091,7 +1083,6 @@ function _buildJudgmentEnvHTML(d){
         + '<span style="color:var(--txt);font-weight:600">'+k.value+'</span>'
         + '<span style="color:'+dColor+';font-weight:700">'+k.delta+'</span></span>';
     });
-    h += (_jdUt?'<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 关键数据 '+_jdUtRel+'</span>':'');
     h += '</div>';
   }
   // 4) 三大股市概览：A股 / 美股 / 亚太 三卡并列（2026-08-15 主人令：放一起、一目了然）
@@ -1171,7 +1162,6 @@ function _buildJudgmentEnvHTML(d){
 
     if(cards.length){
       h += '<div style="margin-bottom:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:stretch">'+cards.join('')+'</div>';
-      h += (_jdUt?'<div style="font-size:11px;color:var(--dim);text-align:right;margin:-4px 0 6px"><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 三大股市 '+_jdUtRel+'</span></div>':'');
     }
   })();
   // 5) 三大分析师（紧凑单行）
@@ -1194,7 +1184,6 @@ function _buildJudgmentEnvHTML(d){
       h += '</div>';
     });
     h += '</div>';
-    h += (_jdUt?'<div style="font-size:11px;color:var(--dim);text-align:right;margin:-4px 0 6px"><span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 三大分析师 '+_jdUtRel+'</span></div>':'');
   }
   // 6) 危险信号（标题+内容单行）
   var dg = d.danger_signals || [];
@@ -1204,9 +1193,6 @@ function _buildJudgmentEnvHTML(d){
     dg.slice(0,3).forEach(function(s,i){
       h += '<span><span style="color:var(--down);font-weight:700">'+(['①','②','③'][i]||('④'+i))+'</span> '+s+'</span>';
     });
-    if(_jdUt){
-      h += '<span style="margin-left:auto;display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 '+_jdUtRel+'</span>';
-    }
     h += '</div>';
   }
   return h || '<div style="color:var(--dim);padding:10px">今日暂无环境态势数据</div>';
@@ -1236,15 +1222,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_SZ_HISTORY.js?v=416978f159" defer></script>
 <script src="data/MAHORO.js?v=6cc3d0e797" defer></script>
 <script src="data/CANDIDATE.js?v=8dd9e2a103" defer></script>
-    <script src="data/FOUR_VOLUME.js?v=95585570d0" defer></script>
-    <script src="data/FOUR_VOLUME_60M.js?v=f1f793e3bf" defer></script>
-    <script src="data/STOCK_STOP_DATA.js?v=5d5357d795" defer></script>
+    <script src="data/FOUR_VOLUME.js?v=0fcf9ceffb" defer></script>
+    <script src="data/FOUR_VOLUME_60M.js?v=d78a27d032" defer></script>
+    <script src="data/STOCK_STOP_DATA.js?v=9f2a373d81" defer></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=f8ed2d90b3" defer></script>
 <script src="data/COCKPIT_BACKTEST.js?v=34d373ded9" defer></script>
 <script src="data/BACKTEST_TDX.js?v=38f7d7a002" defer></script>
 <script src="data/OPTIMIZED_STRATEGY.js?v=16b8b7fd93" defer></script>
 <script src="data/EXPERIMENT.js?v=d57b514ea5" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=4d78d082dc" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=d4b7d5a032" defer></script>
 <script src="data/TOP5_TRACK.js?v=e0b423d487" defer></script>
 <script src="data/ALGO_TRACK.js?v=b77681e49d" defer></script>
 <script src="data/ETF_PULSE.js?v=94a99cb06c" defer></script>
@@ -1254,10 +1240,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/W52_HIGH.js?v=ce85287fd0" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=83a802e965" defer></script>
 <script src="data/RUNNER_STATUS.js?v=70de2d8ca5" defer></script>
-<script src="data/HEALTH_CHECK.js?v=6c0cea4f38" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=ef07a56b07" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=27090dae08" defer></script>
-    <script src="data/POTENTIAL_PICKS.js?v=d42ce581f6" defer></script>
+<script src="data/HEALTH_CHECK.js?v=52db83d77e" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=28210c4b94" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=0224878843" defer></script>
+    <script src="data/POTENTIAL_PICKS.js?v=f06ddd9324" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE.js?v=f135754004" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=0dcbab52a2" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=49ba72d042" defer></script>
