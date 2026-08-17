@@ -1632,9 +1632,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
                            || (_sigSell.length===1 && _sigBuy.length===0 && _sigSell[0].indexOf('单日暴跌')>=0);
           if(_sigSell.length || _sigBuy.length){
             if(_isWeakSingle){
-              // 单条弱信号：内联小字融入主行末尾，不另起面板
+              // 单条弱信号：醒目彩色徽章（重要提示必须显眼）
               var _ws = _sigBuy[0] || _sigSell[0];
-              h+=' &nbsp;<span style="font-size:10.5px;color:var(--dim);opacity:.75;">('+_ws+')</span>';
+              var _isBuy = _sigBuy.length===1;
+              var _bc = _isBuy ? '34,197,94' : '239,68,68';  // green / red
+              var _fc = _isBuy ? '16,185,129' : '248,113,113';  // brighter green / red
+              h+=' &nbsp;<span style="display:inline-flex;align-items:center;padding:1px 8px;border-radius:4px;font-size:11.5px;font-weight:700;'+
+                 'background:rgba('+_bc+',.15);border:1px solid rgba('+_bc+',.45);color:#'+(_isBuy?'22c55e':'ef4444')+';'+
+                 'box-shadow:0 0 6px rgba('+_bc+',.25);letter-spacing:.3px;">'+_ws+'</span>';
             } else {
               // 多条/强信号：独立面板
               h+='<div style="margin-top:8px;padding:8px 12px;border-radius:6px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;';
