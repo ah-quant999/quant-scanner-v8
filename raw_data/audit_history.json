@@ -132,5 +132,125 @@
     "message": "未找到元素"
    }
   ]
+ },
+ {
+  "date": "2026-08-17",
+  "time": "14:51:15",
+  "overall": "fail",
+  "summary": {
+   "ok": 90,
+   "warn": 15,
+   "fail": 6,
+   "total": 111
+  },
+  "warn_items": [
+   {
+    "id": "dom_taskScheduleBody",
+    "name": "DOM #taskScheduleBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttBackBody",
+    "name": "DOM #ttBackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttThrBody",
+    "name": "DOM #ttThrBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttSvlBody",
+    "name": "DOM #ttSvlBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttTrackBody",
+    "name": "DOM #ttTrackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsAdvBody",
+    "name": "DOM #stcrdsAdvBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsEliteBody",
+    "name": "DOM #stcrdsEliteBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_healthCheckBody",
+    "name": "DOM #healthCheckBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "all_BACKTEST_TDX",
+    "name": "BACKTEST_TDX",
+    "message": "BACKTEST_TDX.js 无 update_time/date/generated 时间戳，无法判龄（缺审计登记）"
+   },
+   {
+    "id": "all_OPTIMIZED_STRATEGY",
+    "name": "OPTIMIZED_STRATEGY",
+    "message": "OPTIMIZED_STRATEGY.js 无 update_time/date/generated 时间戳，无法判龄（缺审计登记）"
+   },
+   {
+    "id": "all_PORTFOLIO_COST",
+    "name": "PORTFOLIO_COST",
+    "message": "PORTFOLIO_COST.js 无 update_time/date/generated 时间戳，无法判龄（缺审计登记）"
+   },
+   {
+    "id": "all_RUNNER_STATUS_HEALTH",
+    "name": "RUNNER_STATUS_HEALTH",
+    "message": "RUNNER_STATUS_HEALTH.js 无 update_time/date/generated 时间戳，无法判龄（缺审计登记）"
+   },
+   {
+    "id": "all_STOCK_PROFILE",
+    "name": "STOCK_PROFILE",
+    "message": "STOCK_PROFILE.js 更新于 08-07 16:58（低频数据，7 天红线）"
+   },
+   {
+    "id": "all_WEEKEND_META_REPORT",
+    "name": "WEEKEND_META_REPORT",
+    "message": "WEEKEND_META_REPORT.js 更新于 08-09 16:39（低频数据，7 天红线）"
+   },
+   {
+    "id": "all_WEEKEND_RUN",
+    "name": "WEEKEND_RUN",
+    "message": "WEEKEND_RUN.js 无 update_time/date/generated 时间戳，无法判龄（缺审计登记）"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "ETF_PULSE",
+    "name": "ETF 盘中异动",
+    "message": "更新于 昨日 14:17；超过阈值 1440 分钟"
+   },
+   {
+    "id": "ETF_INTRADAY_HEAT",
+    "name": "ETF 资金热度",
+    "message": "更新于 昨日 14:12；超过阈值 1440 分钟"
+   },
+   {
+    "id": "ETF_DAILY_MONITOR",
+    "name": "ETF 日监控",
+    "message": "更新于 昨日 14:17；超过阈值 1440 分钟"
+   },
+   {
+    "id": "dom_phMacroBody",
+    "name": "DOM #phMacroBody",
+    "message": "未找到元素"
+   },
+   {
+    "id": "all_OVERSEAS_MARKETS",
+    "name": "OVERSEAS_MARKETS",
+    "message": "OVERSEAS_MARKETS.js 更新于 3天前 15:42；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_TRIPLE_HISTORY",
+    "name": "TRIPLE_HISTORY",
+    "message": "TRIPLE_HISTORY.js 更新于 3天前 15:29；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   }
+  ]
  }
 ]
