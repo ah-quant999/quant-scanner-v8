@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-17 09:29:06",
+  "update_time": "2026-08-17 16:57:40",
   "data_date": "2026-08-17",
   "track_start": "2026-08-17",
   "history_days": 1,
@@ -61,16 +61,14 @@
       "names": []
     },
     "cockpit_a": {
-      "count": 0,
+      "count": 10,
       "overlap": 0,
       "names": []
     },
     "cockpit_b": {
       "count": 15,
-      "overlap": 1,
-      "names": [
-        "协创数据"
-      ]
+      "overlap": 0,
+      "names": []
     }
   },
   "backtest_signal": {
