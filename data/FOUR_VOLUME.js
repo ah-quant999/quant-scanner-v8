@@ -1,5 +1,5 @@
 window.FOUR_VOLUME={
- "update_time": "2026-08-17 10:15:19",
+ "update_time": "2026-08-17 10:26:59",
  "total": 1,
  "stocks": [
   {
@@ -9,7 +9,7 @@ window.FOUR_VOLUME={
    "board_label": "主板",
    "close": 183.15,
    "pct_chg": 10.0,
-   "turnover_rate": 1.91,
+   "turnover_rate": 1.95,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
