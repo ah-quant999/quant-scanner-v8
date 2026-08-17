@@ -86,7 +86,8 @@
       "2026-08-17": 17.55
     },
     "300274": {
-      "2026-08-17": 0
+      "2026-08-17": 0,
+      "2026-08-18": 0
     },
     "688331": {
       "2026-08-17": 0
@@ -98,7 +99,8 @@
       "2026-08-17": 42.45
     },
     "601899": {
-      "2026-08-17": 33.36
+      "2026-08-17": 33.36,
+      "2026-08-18": 33.36
     },
     "300476": {
       "2026-08-17": 0
@@ -119,31 +121,34 @@
       "2026-08-17": 0
     },
     "002371": {
-      "2026-08-17": 765.97
+      "2026-08-17": 765.97,
+      "2026-08-18": 765.97
     },
     "300604": {
-      "2026-08-17": 0
+      "2026-08-17": 0,
+      "2026-08-18": 0
     },
     "002396": {
-      "2026-08-17": 33.91
+      "2026-08-17": 33.91,
+      "2026-08-18": 33.91
     }
   },
   "_tracking_latest": {
     "601899": {
       "enter_date": "2026-08-17",
       "enter_close": 35.45,
-      "last_date": "2026-08-17",
+      "last_date": "2026-08-18",
       "last_close": 33.36,
       "status": "near",
-      "streak": 1,
-      "total_days": 1
+      "streak": 2,
+      "total_days": 2
     },
     "603993": {
       "enter_date": "2026-08-17",
       "enter_close": 20.75,
       "last_date": "2026-08-17",
       "last_close": 20.75,
-      "status": "near",
+      "status": "dropped",
       "streak": 1,
       "total_days": 1
     },
@@ -152,7 +157,7 @@
       "enter_close": 25.96,
       "last_date": "2026-08-17",
       "last_close": 25.96,
-      "status": "near",
+      "status": "dropped",
       "streak": 1,
       "total_days": 1
     },
@@ -161,7 +166,7 @@
       "enter_close": 42.45,
       "last_date": "2026-08-17",
       "last_close": 42.45,
-      "status": "near",
+      "status": "dropped",
       "streak": 1,
       "total_days": 1
     },
@@ -170,7 +175,7 @@
       "enter_close": 17.55,
       "last_date": "2026-08-17",
       "last_close": 17.55,
-      "status": "near",
+      "status": "dropped",
       "streak": 1,
       "total_days": 1
     },
@@ -179,7 +184,7 @@
       "enter_close": 99.25,
       "last_date": "2026-08-17",
       "last_close": 99.25,
-      "status": "near",
+      "status": "dropped",
       "streak": 1,
       "total_days": 1
     },
@@ -188,7 +193,7 @@
       "enter_close": 448.08,
       "last_date": "2026-08-17",
       "last_close": 448.08,
-      "status": "near",
+      "status": "dropped",
       "streak": 1,
       "total_days": 1
     },
@@ -197,25 +202,25 @@
       "enter_close": 0,
       "last_date": "2026-08-17",
       "last_close": 0,
-      "status": "near",
+      "status": "dropped",
       "streak": 1,
       "total_days": 1
     },
     "300274": {
       "enter_date": "2026-08-17",
       "enter_close": 0,
-      "last_date": "2026-08-17",
+      "last_date": "2026-08-18",
       "last_close": 0,
       "status": "near",
-      "streak": 1,
-      "total_days": 1
+      "streak": 2,
+      "total_days": 2
     },
     "688331": {
       "enter_date": "2026-08-17",
       "enter_close": 0,
       "last_date": "2026-08-17",
       "last_close": 0,
-      "status": "near",
+      "status": "dropped",
       "streak": 1,
       "total_days": 1
     },
@@ -224,7 +229,7 @@
       "enter_close": 0,
       "last_date": "2026-08-17",
       "last_close": 0,
-      "status": "near",
+      "status": "dropped",
       "streak": 1,
       "total_days": 1
     },
@@ -233,38 +238,123 @@
       "enter_close": 0,
       "last_date": "2026-08-17",
       "last_close": 0,
-      "status": "near",
+      "status": "dropped",
       "streak": 1,
       "total_days": 1
     },
     "002371": {
       "enter_date": "2026-08-17",
       "enter_close": 765.97,
-      "last_date": "2026-08-17",
+      "last_date": "2026-08-18",
       "last_close": 765.97,
       "status": "near",
-      "streak": 1
+      "streak": 2,
+      "total_days": 1
     },
     "002396": {
       "enter_date": "2026-08-17",
       "enter_close": 33.91,
-      "last_date": "2026-08-17",
+      "last_date": "2026-08-18",
       "last_close": 33.91,
       "status": "near",
-      "streak": 1
+      "streak": 2,
+      "total_days": 1
     },
     "300604": {
       "enter_date": "2026-08-17",
       "enter_close": 0,
-      "last_date": "2026-08-17",
+      "last_date": "2026-08-18",
       "last_close": 0,
       "status": "near",
-      "streak": 1
+      "streak": 2,
+      "total_days": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-08-17 19:58:53"
-  }
+    "last_update": "2026-08-18 00:40:39"
+  },
+  "2026-08-18": [
+    {
+      "code": "601899",
+      "name": "紫金矿业",
+      "market": "sh",
+      "board": "主板",
+      "close": 33.36,
+      "pct_chg": 2.55,
+      "total_score": 39.2,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "002371",
+      "name": "北方华创",
+      "market": "sz",
+      "board": "主板",
+      "close": 765.97,
+      "pct_chg": 3.7,
+      "total_score": 33.2,
+      "quality_grade": "B",
+      "industry": "专用设备制造业",
+      "sectors": [
+        "专用设备制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "002396",
+      "name": "星网锐捷",
+      "market": "sz",
+      "board": "主板",
+      "close": 33.91,
+      "pct_chg": 3.8,
+      "total_score": 32.0,
+      "quality_grade": "C",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "300604",
+      "name": "长川科技",
+      "market": "创业板",
+      "board": "创业板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 22,
+      "quality_grade": "A",
+      "industry": "专用设备制造业",
+      "sectors": [
+        "专用设备制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "300274",
+      "name": "阳光电源",
+      "market": "创业板",
+      "board": "创业板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 20,
+      "quality_grade": "A",
+      "industry": "电气机械和器材制造业",
+      "sectors": [
+        "电气机械和器材制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    }
+  ]
 }

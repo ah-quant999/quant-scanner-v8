@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-17 19:58:53",
-  "data_time": "2026-08-17 19:53:46",
+  "update_time": "2026-08-18 00:40:39",
+  "data_time": "2026-08-18 00:35:27",
   "count": 0,
   "near_miss_count": 5,
   "criteria": "主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)）· 驾驶舱A档 · 基本面A档",
@@ -70,7 +70,7 @@
       "name": "北方华创",
       "market": "sz",
       "board": "主板",
-      "total_score": 33.2,
+      "total_score": 34.0,
       "top10_rank": 3,
       "a_score": 59,
       "quality_grade": "B",
