@@ -1,5 +1,5 @@
 window.STOCK_RPS_DATA = {
-  "update_time": "2026-08-18 05:54:40",
+  "update_time": "2026-08-18 05:15:23",
   "universe_count": 206,
   "valid_count": 156,
   "index_code": "000300",
@@ -385,7 +385,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "002396",
-      "name": "星网锐捷",
+      "name": "青城新药－B",
       "market": "sz",
       "board": "主板",
       "close": 32.67,
@@ -427,7 +427,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "000636",
-      "name": "风华高科",
+      "name": "KLN",
       "market": "sz",
       "board": "主板",
       "close": 62.73,
@@ -490,7 +490,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "002281",
-      "name": "光迅科技",
+      "name": "兴泸水务",
       "market": "sz",
       "board": "主板",
       "close": 191.52,
@@ -553,7 +553,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "000938",
-      "name": "紫光股份",
+      "name": "民生国际",
       "market": "sz",
       "board": "主板",
       "close": 39.95,
@@ -742,7 +742,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "002409",
-      "name": "雅克科技",
+      "name": "洲际船务",
       "market": "sz",
       "board": "主板",
       "close": 151.22,
@@ -973,7 +973,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "002407",
-      "name": "多氟多",
+      "name": "高视医疗",
       "market": "sz",
       "board": "主板",
       "close": 39.16,
@@ -994,7 +994,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "000657",
-      "name": "中钨高新",
+      "name": "环科国际",
       "market": "sz",
       "board": "主板",
       "close": 68.29,
@@ -1057,7 +1057,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "002371",
-      "name": "北方华创",
+      "name": "创联控股",
       "market": "sz",
       "board": "主板",
       "close": 738.66,
@@ -1141,7 +1141,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "002008",
-      "name": "大族激光",
+      "name": "凤凰卫视",
       "market": "sz",
       "board": "主板",
       "close": 99.0,
@@ -1204,7 +1204,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "002415",
-      "name": "海康威视",
+      "name": "梅斯健康",
       "market": "sz",
       "board": "主板",
       "close": 34.88,
@@ -1246,7 +1246,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "000831",
-      "name": "中国稀土",
+      "name": "利亚零售",
       "market": "sz",
       "board": "主板",
       "close": 60.95,
@@ -1750,7 +1750,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "002436",
-      "name": "兴森科技",
+      "name": "凌雄科技",
       "market": "sz",
       "board": "主板",
       "close": 34.82,
@@ -1855,7 +1855,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "000021",
-      "name": "深科技",
+      "name": "大中华控股",
       "market": "sz",
       "board": "主板",
       "close": 40.23,
@@ -2170,7 +2170,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "002156",
-      "name": "通富微电",
+      "name": "建发物业",
       "market": "sz",
       "board": "主板",
       "close": 62.96,
@@ -2191,7 +2191,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "000725",
-      "name": "京东方A",
+      "name": "恒都集团",
       "market": "sz",
       "board": "主板",
       "close": 5.81,
@@ -2359,7 +2359,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "002185",
-      "name": "华天科技",
+      "name": "百心安－B",
       "market": "sz",
       "board": "主板",
       "close": 17.98,
@@ -2443,7 +2443,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "000063",
-      "name": "中兴通讯",
+      "name": "中亚烯谷集团",
       "market": "sz",
       "board": "主板",
       "close": 35.05,
@@ -2506,7 +2506,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "002230",
-      "name": "科大讯飞",
+      "name": "羚邦集团",
       "market": "sz",
       "board": "主板",
       "close": 41.94,
@@ -2695,7 +2695,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "002126",
-      "name": "银轮股份",
+      "name": "药明巨诺－B",
       "market": "sz",
       "board": "主板",
       "close": 44.46,
@@ -2926,7 +2926,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "002460",
-      "name": "赣锋锂业",
+      "name": "华润饮料",
       "market": "sz",
       "board": "主板",
       "close": 54.28,
@@ -2947,7 +2947,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "002600",
-      "name": "领益智造",
+      "name": "中国铝业",
       "market": "sz",
       "board": "主板",
       "close": 12.98,
@@ -2968,7 +2968,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "002335",
-      "name": "科华数据",
+      "name": "麦科医药－B",
       "market": "sz",
       "board": "主板",
       "close": 33.08,
