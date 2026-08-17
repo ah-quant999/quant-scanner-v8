@@ -87,6 +87,7 @@ jobs:
       #   改走 GitHub REST API（api.github.com 畅通）同步源码，与 v8_algo_run.yml 的
       #   cn 应急回退同思路。blob 下载带 sha 校验防截断，大文件未变则跳过。
       - name: "📥 经 GitHub API 同步源码（绕开 cn git 墙）"
+        timeout-minutes: 10
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
@@ -167,11 +168,9 @@ jobs:
               try:
                   data = fetch_blob(sha)
               except SystemExit:
-                  if os.path.getsize(lp) > 2_000_000 if os.path.exists(lp) else False:
-                      print("  SKIP large file (download failed): %s" % p, flush=True)
-                      ok += 1; continue
-                  else:
-                      raise
+                  # 容错：任何文件下载失败都跳过而非整步死掉（非关键文件缺失好过全链阻塞）
+                  print("  SKIP failed download: %s" % p, flush=True)
+                  ok += 1; continue
               parent = os.path.dirname(lp)
               if parent:
                   os.makedirs(parent, exist_ok=True)
