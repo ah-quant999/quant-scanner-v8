@@ -139,11 +139,15 @@
 10037:        html += '<span onclick="window._ppFilterConcept=''+cn+'';window._fillPotentialPicks();" style="cursor:pointer;display:inline-block;padding:3px 8px;background:'+bg+';border:1px solid '+bd+';border-radius:6px;font-size:11.5px;color:#c4b5fd;font-weight:600;">'+cn+'</span>';
 10100:        return '<span onclick="window._ppFilterConcept=''+cn+'';window._fillPotentialPicks();" style="cursor:pointer;color:#a78bfa;'+act+'">'+cn+'</span>'; 任何 onclick 含  拼接的代码必须重构
 
-## 🦊 子块「更新于」戳铁律（2026-08-18 06:32 主人令）
-- 主人原话：「今日判定卡片名更新于那些全没了」= body 内部 6 个子块都缺戳,不是卡头
-- 一劳永逸修复：`_buildJudgmentEnvHTML(d)` 内每个子块（信号灯/时事/关键数据/3 大股市/3 大分析师/危险信号）都加「🦊 更新于 XX」stamp
-- 通用铁律：**所有含数据块的卡必须在每个子块都加「更新于」戳**，不能只靠 v8CardHeader 卡头一次
-- 同模式审计清单：grep 函数体（`_buildJudgmentEnvHTML` / `_buildStockRun` / `_buildFibHTML` / `_buildCockpitHTML` / `renderJcardHTML` / `renderKlineData` 等），查每个子块是否都 stamp
+## 🦊 「更新于」戳铁律（2026-08-18 06:32 + 07:11 两次主人令修正）
+- 06:32 主人原话：「今日判定卡片名更新于那些全没了」
+- 07:11 主人怒令：「谁让你这么写的！我允许了你就乱改！更新于统一格式跟在卡片名后面就够了。一张卡里都是同时更新的，你刚做的多余的更新于删了不需要」
+- **正确定义**：每个卡只有**卡头 v8CardHeader 1 次**「🦊 更新于 HH:MM 短线/中线/中长线」戳，**子块不重复**。同一张卡的 update_time 是同一个时刻
+- **铁律（永久）**：
+  1. 只在 v8CardHeader 卡头加 1 个 stamp（已有 _uBadge 机制）
+  2. **禁止**在 body 子块（时事滚动/关键数据/3 大股市/3 大分析师/危险信号 等）重复加 stamp
+  3. 审计：grep `h += .* 更新于 .* stamp\|(_jdUt` 临时变量名 → 全部清掉
+- **教训**：主人没明确说「每个子块都加」时，自己脑补=灾难。永远按主人字面要求做，不延伸
 
 ## ⏰ 本地 ↔ 云端同步铁律（永久 · 2026-08-17 主人发现）
 - **主人 22:34 发现**：主人截图看到「平均股价 29.391 +1.78% / 样本 5281 只」，但本地 `data/AVG_PRICE_DATA.js` 一直是 8-16 旧版 **28.5565**（avg_price_data.json 也是 8-16 17:25）。主人看到「被覆盖」实际是**本地 git main 落后云端 origin main 1 小时**——本机 git push 失败后我用 Contents API 推了部分文件，但**没 fetch origin 同步云端**，主人打开的页面渲染的是云端 CDN 真版本，本地仓库却停留在 19:34 之前
