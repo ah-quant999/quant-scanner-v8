@@ -1,5 +1,5 @@
 window.FOUR_VOLUME={
- "update_time": "2026-08-17 13:47:50",
+ "update_time": "2026-08-17 15:30:23",
  "total": 1,
  "stocks": [
   {
@@ -7,9 +7,9 @@ window.FOUR_VOLUME={
    "name": "长芯博创",
    "market": "sz",
    "board_label": "创业板",
-   "close": 216.45,
-   "pct_chg": 11.19,
-   "turnover_rate": 6.25,
+   "close": 219.0,
+   "pct_chg": 12.5,
+   "turnover_rate": 7.22,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
