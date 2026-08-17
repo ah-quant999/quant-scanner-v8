@@ -168,6 +168,15 @@ jobs:
         run: |
           python algorithms/calc_commodity_elasticity.py
 
+      # 2026-08-17 主人令：板块周期 fetch_sector_rs 之前从未自动跑过，导致 3 天前数据陈旧
+      - name: "🔄 板块相对强度重算（仅 post_close）"
+        if: steps.cat.outputs.category == 'post_close'
+        continue-on-error: true
+        shell: bash
+        run: |
+          python algorithms/fetch_sector_rs.py
+          python -c "import sys; sys.path.insert(0,'algorithms'); import stage_to_raw; stage_to_raw.main()"
+
       - name: "📤 推送 raw_data/ 到 main（Contents API）"
         shell: bash
         run: |
