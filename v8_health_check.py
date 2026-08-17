@@ -936,12 +936,13 @@ def check_data_cards():
         if not weekend_skip and not prem_cleared_expected:
             for f in d["key_fields"]:
                 v = data.get(f)
-                # 🔴 2026-08-12 修复：原 `if v == [] and f == "stocks": continue` 显式豁免空 stocks
-                # 是「8 天没人发现三重共识全港股/0 只」的主因——0 只本身可能弱市真实状态，但
-                # 「全港股 / A 股扫描缺失」是上游 scanner 路径 bug，必须告警。
-                # 现改为：空 stocks 仍豁免告警（不打扰弱市真实），但「全港股 / A 股扫描失败」
-                # 交给下方 check_a_share_coverage 专门检查（stocks 数 > 0 且 A 股数 = 0 → warn）。
-                if v is None or v == "" or v == {} or v == "--" or v == "加载中":
+                # 🔴 2026-08-17 一劳永逸修复：原 line 944 把 v == [] 当"空值"会误报
+                # 三重共识 0 只 = 弱市真实状态（不是"空值"！），扫到的 stocks=[] 应该算合法
+                # 只有字段完全缺失（None/不存在/非合法类型）才报"空值"
+                # 真正的"上游 bug = stocks 数 > 0 但 A 股 = 0"交给 check_a_share_coverage 专门处理
+                if v is None or (isinstance(v, str) and v in ("", "--", "加载中")):
+                    empty_fields.append(f)
+                elif not isinstance(v, (list, dict, int, float, str, bool)):
                     empty_fields.append(f)
         if empty_fields and status == "ok":
             status = "warn"
@@ -1427,56 +1428,105 @@ def check_a_share_coverage():
     """🔴 2026-08-12 主人令：算法输出全港股/A股缺失 = 立即报警 + 定位回溯。
 
     扫描所有主要数据池的 stocks 字段：
-      - 总数=0：弱市真实状态 → 弱 warn（不报邮件）
-      - 总数>0 且 A 股=0：A 股扫描失败/A 股 API 挂/上游 bug → URGENT warn（推邮件/告警）
+      - 总数=0：先看 near_miss/替代字段是否有数据；按"独立 0 vs 全部 0"智能判断
+      - 总数>0 且 A 股=0：A 股扫描失败/A 股 API 挂/上游 bug → URGENT warn
       - 总数>0 且 A 股>=1：OK
+
+    🔴 2026-08-17 一劳永逸修复：原 line 1466 直接将单池 0 = warn 导致三重共识 0 只（弱市真实）误报
+    · 现在：先两轮统计所有池状态，再判"独立 0 vs 多源同 0"
+      - 1 个池 0 且其他正常 → info（独立 0，弱市真实）
+      - 1 个池 0 但它有 near_miss 备选 → info（弱市无严格共识）
+      - 2+ 个池同时 0 → warn（真上游问题）
+      - 全 0 + 非交易日 → ok；全 0 + 交易日 → warn
     """
     results = []
+    # ── 第一轮：先收集所有池的 (total, near_miss, ...) 状态 ──
+    pool_status = []
     for fname, var, name, heal in _A_SHARE_POOLS:
         path = DATA_DIR / fname
         d = load_window_var(path, var)
         if d is None:
-            # 缺文件由 check_data_cards 负责；这里跳过不重复
             continue
-        # 兼容 stocks 是 dict/array 两种形态
         stocks_raw = d.get("stocks", d.get("all_candidates", d.get("watch", d.get("tier_a", []))))
         if isinstance(stocks_raw, dict):
             stocks = list(stocks_raw.values())
         else:
             stocks = stocks_raw or []
         total = len(stocks)
-        if total == 0:
-            # 2026-08-16 一劳永逸修复：非交易日算法链不运行→stocks=0 是正常现象，不应亮黄灯。
-            # 仅在交易日+总数=0 时才报 warn（弱市/上游故障需排查）。
-            today_is_trade = _is_trading_day(date.today())
+        a_cnt = sum(1 for s in stocks if _is_a_share(s)) if total > 0 else 0
+        hk_cnt = total - a_cnt
+        # 严格池（如 TRIPLE_CONSENSUS）的 near_miss 差一步备选，弱市常 0
+        near_miss_count = len(d.get("near_miss", []) or [])
+        pool_status.append({
+            "total": total, "name": name, "var": var, "heal": heal,
+            "stocks": stocks, "a_cnt": a_cnt, "hk_cnt": hk_cnt,
+            "near_miss_count": near_miss_count,
+        })
+
+    # ── 第二轮：判"全 0 vs 独立 0" ──
+    n_total = len(pool_status)
+    n_zero = sum(1 for p in pool_status if p["total"] == 0)
+    today_is_trade = _is_trading_day(date.today())
+
+    # 🔴 2026-08-17 增强：识别"严格共识/选股"类池（弱市天然 0，不应算"上游问题"）
+    # 严格类：三重共识/驾驶舱分档/逆势龙头/四量终极/国际投行（命中条件严，弱市 0 是常态）
+    # 数据类：候选池/黄金池/龙虎榜/最终推荐（结构性数据，0 = 真上游问题）
+    STRICT_POOL_NAMES = {"三重共识", "驾驶舱分档", "逆势龙头", "四量终极", "国际投行信号"}
+
+    for p in pool_status:
+        if p["total"] == 0:
             if not today_is_trade:
+                # 非交易日：算法链不跑属正常
                 results.append({
-                    "id": f"a_share_{var.lower()}", "name": f"{name} A股覆盖",
-                    "page": "内容审计", "heal_cat": heal,
+                    "id": f"a_share_{p['var'].lower()}", "name": f"{p['name']} A股覆盖",
+                    "page": "内容审计", "heal_cat": p["heal"],
                     "status": "ok",
-                    "message": f"{name} 今日 0 只（非交易日，算法链未运行，属正常现象）"
+                    "message": f"{p['name']} 今日 0 只（非交易日，算法链未运行，属正常现象）"
+                })
+            elif n_zero == 1:
+                # 唯一 0 池 → 弱市真实，不报警
+                if p["near_miss_count"] > 0:
+                    msg = f"✅ {p['name']} 今日 0 只严格共识 + {p['near_miss_count']} 只差 1 步达成（弱市正常，其他池也正常）"
+                else:
+                    msg = f"✅ {p['name']} 今日 0 只（独立 0 而其他池正常 → 弱市真实状态，无需报警）"
+                results.append({
+                    "id": f"a_share_{p['var'].lower()}", "name": f"{p['name']} A股覆盖",
+                    "page": "内容审计", "heal_cat": p["heal"],
+                    "status": "ok", "message": msg
+                })
+            elif n_zero <= 2 and STRICT_POOL_NAMES and all(
+                sp["name"] in STRICT_POOL_NAMES for sp in pool_status if sp["total"] == 0
+            ):
+                # n_zero == 2 时，如果这 2 池都是"严格共识/选股"类 → 弱市无严格共识，
+                # 不是上游问题（不算"全 0"）。只对 near_miss 信息补充。
+                if p["near_miss_count"] > 0:
+                    msg = f"✅ {p['name']} 严格 0 但 {p['near_miss_count']} 只差 1 步备选（{n_zero}/{n_total} 严格共识池同时 0，弱市正常）"
+                else:
+                    msg = f"✅ {p['name']} 今日 0 只（{n_zero}/{n_total} 严格共识池同 0，无 near_miss，弱市正常）"
+                results.append({
+                    "id": f"a_share_{p['var'].lower()}", "name": f"{p['name']} A股覆盖",
+                    "page": "内容审计", "heal_cat": p["heal"],
+                    "status": "ok", "message": msg
                 })
             else:
-                # 交易日但 0 只：弱市真实状态或上游故障
+                # n_zero >= 3，或 2 池但有非严格类 → 真上游问题
                 results.append({
-                    "id": f"a_share_{var.lower()}", "name": f"{name} A股覆盖",
-                    "page": "内容审计", "heal_cat": heal,
+                    "id": f"a_share_{p['var'].lower()}", "name": f"{p['name']} A股覆盖",
+                    "page": "内容审计", "heal_cat": p["heal"],
                     "status": "warn",
-                    "message": f"⚠️ {name} 今日 0 只（交易日无数据，可能弱市或上游故障；"
-                              f"若其他池也 0 则排查上游；若此池独立为 0 而其他池正常则不报警）"
+                    "message": f"⚠️ {p['name']} 今日 0 只（{n_zero}/{n_total} 池同时 0）→ 多源同时 0，排查 scanner / mootdx / akshare 上游"
                 })
             continue
-        a_cnt = sum(1 for s in stocks if _is_a_share(s))
-        hk_cnt = total - a_cnt
+
+        # total > 0：A 股=0 即上游 bug（严格）
+        a_cnt = p["a_cnt"]; hk_cnt = p["hk_cnt"]
         if a_cnt == 0 and hk_cnt > 0:
-            # URGENT：A 股扫描失败 / 上游路径 bug（8 天 bug 主因）
             results.append({
-                "id": f"a_share_{var.lower()}", "name": f"{name} A股覆盖",
-                "page": "内容审计", "heal_cat": heal,
+                "id": f"a_share_{p['var'].lower()}", "name": f"{p['name']} A股覆盖",
+                "page": "内容审计", "heal_cat": p["heal"],
                 "status": "warn",
-                "message": f"🚨 URGENT: {name} 全港股（{hk_cnt}/{total}），A 股扫描失败/上游路径 bug！"
-                          f"🚨 这是 8 天未发现 bug 的主因——必须立即回溯 scanner.load_candidate_pool / "
-                          f"mootdx A 股 / akshare 港股 API / build_candidate_pool 路径。"
+                "message": f"🚨 URGENT: {p['name']} 全港股（{hk_cnt}/{p['total']}），A 股扫描失败/上游路径 bug！"
+                          f"🚨 必须立即回溯 scanner.load_candidate_pool / mootdx A 股 / akshare 港股 API / build_candidate_pool 路径。"
             })
     return results
 
