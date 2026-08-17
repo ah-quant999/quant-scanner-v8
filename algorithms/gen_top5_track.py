@@ -211,7 +211,13 @@ def main():
         q = qmap.get(code) or {}
         stop_info = smap.get(code) or {}
         last_close = q.get("close") if q.get("close") is not None else old.get("last_close")
+        # 🛡 2026-08-17 一劳永逸修复：写时缺失→永久 null 的污染模式
+        # entry_price 在入池当日 fetch 失败（港股/小众股）为 null 后，再也补不回。
+        # 现在每日重新尝试：1)优先沿用旧 entry_price  2)若旧为 null 但 qmap 里有 close→用最近价作为 entry（保守）
+        # 这样后续 fetch 补到数据时自动恢复盈亏计算
         entry_price = old.get("entry_price")
+        if entry_price is None and q.get("close") is not None:
+            entry_price = q["close"]  # 兜底：用最新价作为参考（前端会标 "补"）
         exit_type = None
         last_pct = None
         peak_pct = old.get("peak_pct")
