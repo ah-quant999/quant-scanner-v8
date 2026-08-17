@@ -135,20 +135,29 @@ jobs:
       - name: "🐍 安装 akshare 依赖（轻量：仅本次需要的）"
         run: |
           set -e
+          # 复用 v8_algo_cloud 的安装命令：python -m pip + 官方源优先 + 双镜像兜底 + import 校验
+          # （之前用 `pip install` 失败——cn runner 的 PATH 中 pip 可能指向其他 Python）
+          CORE="akshare pandas numpy requests"
           ok=0
-          for src in "" "-i https://pypi.tuna.tsinghua.edu.cn/simple" "-i https://mirrors.aliyun.com/pypi/simple/"; do
-            for try in 1 2; do
-              if pip install -q --retries 2 --timeout 40 $src akshare pandas numpy requests; then
-                ok=1; break 2
+          for IDX in "https://pypi.org/simple" \
+                     "https://pypi.tuna.tsinghua.edu.cn/simple" \
+                     "https://mirrors.aliyun.com/pypi/simple"; do
+            for TRY in 1 2; do
+              echo "=== pip install [index=$IDX try=$TRY] ==="
+              if python -m pip install -q --retries 3 --timeout 60 -i "$IDX" $CORE; then
+                if python -c "import akshare, pandas, numpy, requests; print('deps OK via', '$IDX', 'try=', $TRY)"; then
+                  ok=1; break 2
+                fi
+                echo "!! pip exit 0 but import 校验失败，继续换源/重试"
               fi
-              echo "  pip retry $try (src='$src')"
+              echo "!! [$IDX] 第 $TRY 次安装失败"
             done
           done
           if [ "$ok" != "1" ]; then
-            echo "::error::依赖安装失败"
+            echo "::error::依赖安装失败（三源全灭）"
             exit 1
           fi
-          python -c "import akshare, pandas, numpy, requests; print('deps ready')"
+          echo "✅ akshare 依赖装好"
 
       - name: "📅 交易日历 gate（非交易日自动跳过）"
         id: trading
