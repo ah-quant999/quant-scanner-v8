@@ -377,7 +377,8 @@ def main():
     for strat, rs in by_strat.items():
         print(f"\n--- 策略 [{strat}] 信号数={len(rs)} ---")
         res = backtest_combo(rs, combos)
-        best, top10 = select_best(res)
+        sel = select_best(res)
+        best, top10 = (sel if sel is not None else (None, []))
         results_all[strat] = {
             "signal_count": len(rs),
             "combo_count_tested": len(res),

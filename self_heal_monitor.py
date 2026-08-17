@@ -178,17 +178,50 @@ def _push_candidate(merge_result):
     added_val = stats.get("added", 0)
     msg = "fix(candidate): 自愈并入观澜台(+" + str(added_val) + ") [self_heal_monitor]"
     try:
-        subprocess.run(
+        # 先检查是否有未解决的冲突
+        check_r = subprocess.run(
+            ["git", "status", "--porcelain"],
+            capture_output=True, text=True, cwd=str(ROOT), timeout=15
+        )
+        if "UU" in check_r.stdout or "AA" in check_r.stdout or "DU" in check_r.stdout:
+            log("检测到未解决冲突，先 abort rebase...", "WARN")
+            subprocess.run(["git", "rebase", "--abort"], capture_output=True, timeout=15, cwd=str(ROOT))
+            # 重新合并（因为 abort 会丢弃工作区改动）
+            retry_merge = _merge_guanlan_to_candidate()
+            if not retry_merge["success"]:
+                return {"success": False, "message": "冲突abort后重合并失败: " + retry_merge["message"]}
+            merge_result = retry_merge
+
+        # 同步远端
+        pull_r = subprocess.run(
             ["git", "pull", "--rebase", "--autostash", "origin", "main"],
             capture_output=True, text=True, cwd=str(ROOT), timeout=60
         )
-        # rebase 可能覆盖合并结果，重新检查
-        d = json.load(open(CANDIDATE_FILE, encoding="utf-8"))
-        if "观澜台" not in (d.get("source_dist") or {}):
-            log("rebase 后观澜台被覆盖，重新并入...", "WARN")
-            retry = _merge_guanlan_to_candidate()
-            if not retry["success"]:
-                return {"success": False, "message": "重复合并失败: " + retry["message"]}
+        # 检查 rebase 后是否有冲突
+        status_r = subprocess.run(
+            ["git", "status", "--porcelain"],
+            capture_output=True, text=True, cwd=str(ROOT), timeout=15
+        )
+        if "UU" in status_r.stdout or "AA" in status_r.stdout:
+            log("rebase 后出现冲突，自动解决...", "WARN")
+            # 对冲突文件取 --theirs（远端版本），只保留 candidate.json 的本地改动
+            for line in status_r.stdout.strip().splitlines():
+                fpath = line[3:] if len(line) > 3 else ""
+                if line.startswith("UU") and "candidate" not in fpath:
+                    subprocess.run(["git", "checkout", "--theirs", fpath],
+                                   capture_output=True, timeout=10, cwd=str(ROOT))
+                    subprocess.run(["git", "add", fpath],
+                                   capture_output=True, timeout=10, cwd=str(ROOT))
+            # 重新检查 candidate 是否被覆盖
+            d = json.load(open(CANDIDATE_FILE, encoding="utf-8"))
+            if "观澜台" not in (d.get("source_dist") or {}):
+                log("rebase 冲突导致观澜台被覆盖，重新并入...", "WARN")
+                retry2 = _merge_guanlan_to_candidate()
+                if not retry2["success"]:
+                    return {"success": False, "message": "冲突后重合并失败: " + retry2["message"]}
+                subprocess.run(["git", "add", str(CANDIDATE_FILE)],
+                               capture_output=True, timeout=10, cwd=str(ROOT))
+
         r = subprocess.run(
             ["git", "add", str(CANDIDATE_FILE)],
             capture_output=True, text=True, cwd=str(ROOT), timeout=30

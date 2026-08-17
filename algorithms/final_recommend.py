@@ -294,6 +294,23 @@ def main():
     crisis_score = safe_float(crisis.get("score"), 0.0)
     crisis_high = crisis_score >= CRISIS_HIGH_THRESHOLD
 
+    # ── 市场状态 regime 门控（回测验证提升胜率，见 backtest_tdx.json optimized_summary）──
+    # stabilize / rebound_diverge = 好状态：历史回测该阶段 ≥3 共振信号整体负期望 → 应少推/观察
+    # grind / panic               = 可开仓状态 → 正常推
+    try:
+        from regime_filter import get_current_regime, is_open_regime
+        _regime_info = get_current_regime()
+        _open_regime = bool(_regime_info and is_open_regime(_regime_info.get("regime")))
+    except Exception as e:
+        print(f"  [warn] regime 门控不可用，跳过: {e}")
+        _regime_info = None
+        _open_regime = True  # 失败时默认正常推，不破坏原有逻辑
+    _regime_name = (_regime_info or {}).get("regime")
+    _regime_date = (_regime_info or {}).get("date")
+    _effective_top_n = TOP_N if _open_regime else max(2, TOP_N // 2)
+    _action_label = "买入" if _open_regime else "观察（市场企稳/反弹，历史回测负期望）"
+    print(f"[regime] 市场状态={_regime_name}({_regime_date}) 开仓={_open_regime} 推票数 {TOP_N}→{_effective_top_n}")
+
     profiles = (profile or {}).get("profiles") or {}
 
     pool = defaultdict(lambda: {
@@ -600,13 +617,13 @@ def main():
     # 1) A 股硬保底 = 0（已关闭），直接进第 2 步
     hard_a = MIN_A_SHARES_IN_TOP  # 现 = 0，立即 break
     for s in a_shares:
-        if len(top) >= TOP_N or len(top) >= hard_a:
+        if len(top) >= _effective_top_n or len(top) >= hard_a:
             break
         top.append(s)
     # 2) 余下 slot 从 scored 全局高分填补（A 股 + 港股，按 (resonance, final_score, strength) 排序）
     top_codes = {t["key"] for t in top}
     for s in scored:
-        if len(top) >= TOP_N:
+        if len(top) >= _effective_top_n:
             break
         if s["key"] in top_codes:
             continue
@@ -616,10 +633,10 @@ def main():
     #    top = 分数最强（公平计分后"绝对最强"）
     #    consensus_top = 共振最强（多策略交叉验证，抗单一策略失效）
     top.sort(key=lambda x: (x["final_score"], x["resonance"], x["strength"]), reverse=True)
-    top = top[:TOP_N]
+    top = top[:_effective_top_n]
     # ── 共振最强副本（独立排序，不覆盖 top）──
     consensus_sorted = sorted(scored, key=lambda x: (x["resonance"], x["final_score"], x["strength"]), reverse=True)
-    consensus_top = consensus_sorted[:TOP_N]
+    consensus_top = consensus_sorted[:_effective_top_n]
     # ── end 公平竞争 ──
 
     def horizon_for(sources, resonance=0, is_top=False):
@@ -781,6 +798,8 @@ def main():
             "concepts": s["concepts"][:6],
             "backtest": backtest,
             "tracking": tracking,
+            "action": _action_label,
+            "market_regime": _regime_name,
         })
 
     # ── 共振最强列表（双轨排名第二轨）──
@@ -841,6 +860,8 @@ def main():
             "concepts": s["concepts"][:6],
             "backtest": {},  # 共振最强不重复跑回测
             "tracking": tracking,
+            "action": _action_label,
+            "market_regime": _regime_name,
         })
     # ── end 双轨 ──
 
@@ -850,7 +871,13 @@ def main():
         "crisis_high": crisis_high,
         "crisis_note": "逆势龙头已并入" if crisis_high else "危机雷达未达高位，逆势龙头暂不并入",
         "total_candidates": len(scored),
-        "top_n": TOP_N,
+        "top_n": _effective_top_n,
+        "market_regime": {
+            "date": _regime_date,
+            "regime": _regime_name,
+            "open": _open_regime,
+            "note": "grind/panic=可开仓(正常推)；stabilize/rebound=历史回测≥3共振负期望，应观察/少推",
+        },
         "strong_sectors": sorted(rel_set)[:20],
         "stocks": out_stocks,
         "consensus_stocks": consensus_stocks,  # 2026-08-13 双轨：共振最强排名（独立于 stocks 分数最强）
