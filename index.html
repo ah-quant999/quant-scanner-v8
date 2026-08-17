@@ -9891,6 +9891,8 @@ function drawUpDownChart(){
     } catch (e) { console.warn('extra orphan-data render fail', e); }
 
     // 统一渲染文件新鲜度与上游诊断，并收集失败原因到底部 opDiagDetails
+    // 防御：renderDataFreshness 定义在下游 <script> 块（行 13125），此处调用时可能尚未解析
+    try{ (window.renderDataFreshness || function(){}); }catch(e){}
     try{ renderDataFreshness(); }catch(e){ console.warn('renderDataFreshness fail', e); }
   }
 
@@ -13122,7 +13124,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
   window.__renderOps=renderOps;
 
   /* ===== 运维面板：数据新鲜度动态渲染 ===== */
-  function renderDataFreshness(){
+  window.renderDataFreshness = function renderDataFreshness(){
     var hc = window.HEALTH_CHECK || {};
     var items = hc.items || [];
     var map = {};
