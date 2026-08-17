@@ -1,1 +1,1 @@
-window.RUNNER_STATUS = {"run_time":"2026-08-17 17:04:33","category":"all","hostname":"LEMONCAT","modules":{"CANDIDATE_QUOTES":{"status":"ok","msg":"成功"}},"summary":{"total":1,"ok":1,"empty":0,"fail":0},"update_time":"2026-08-17 17:26:00","republish_time":"2026-08-17 17:26:20"};
+window.RUNNER_STATUS = {"run_time":"2026-08-17 17:04:33","category":"all","hostname":"LEMONCAT","modules":{"CANDIDATE_QUOTES":{"status":"ok","msg":"成功"}},"summary":{"total":1,"ok":1,"empty":0,"fail":0},"update_time":"2026-08-17 17:12:41","republish_time":"2026-08-17 17:13:05"};
