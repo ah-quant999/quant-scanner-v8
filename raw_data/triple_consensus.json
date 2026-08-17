@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-18 03:56:47",
-  "data_time": "2026-08-18 03:53:50",
+  "update_time": "2026-08-18 04:17:34",
+  "data_time": "2026-08-18 04:14:09",
   "count": 0,
   "near_miss_count": 4,
   "criteria": "主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)）· 驾驶舱A档 · 基本面A档",
@@ -67,7 +67,7 @@
     },
     {
       "code": "002371",
-      "name": "创联控股",
+      "name": "北方华创",
       "market": "sz",
       "board": "主板",
       "total_score": 34.0,
@@ -133,7 +133,7 @@
     },
     {
       "code": "002396",
-      "name": "青城新药－B",
+      "name": "星网锐捷",
       "market": "sz",
       "board": "主板",
       "total_score": 32.0,
