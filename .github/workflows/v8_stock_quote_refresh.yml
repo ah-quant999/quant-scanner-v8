@@ -23,10 +23,11 @@
 
 name: "📈 v8 STOCK_QUOTE 轻量 refresh"
 
-schedule:
-  # 盘后兜底：17:00 CST（早于 cn_fetch 17:20 龙虎榜，akshare 当日收盘已稳定）
-  - cron: '0 9 * * *'
-workflow_dispatch:
+on:
+  schedule:
+    # 盘后兜底：17:00 CST（早于 cn_fetch 17:20 龙虎榜，akshare 当日收盘已稳定）
+    - cron: '0 9 * * *'
+  workflow_dispatch:
     inputs:
       skip_trading_day_gate:
         description: '跳过交易日历 gate（应急手动触发时用）'
