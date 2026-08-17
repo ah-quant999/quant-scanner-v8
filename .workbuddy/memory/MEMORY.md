@@ -120,6 +120,25 @@
 - **教训**：任何显示「+N more」类折叠提示必须用 `<button>` 或带 onclick 的元素，**禁用纯 `<div>` 文案**——避免主人点了没反应以为"被覆盖了"
 - **同模式威胁清单**：grep `+N more` / `+N 只` / `点击查看更多` / `展开全部` 等文案，确认都带 onclick
 
+## 🛡 jsx-attr-onclick 铁律（2026-08-18 07:02 主人令）
+- 主人原话:「空了！运维和逻辑详解页导航按不了！昨晚做了什么把主站弄崩了！全面修复」
+- 根因:onclick 内字符串拼接多 escape 极易错(昨晚 22:25 + 22:55 + 今早 06:32 三次修复连续引入 3 个错位)
+- 铁律:**所有 onclick 内容只能调用函数名**(),禁用字符串拼接()
+- 必须配  属性存值,JS 函数内  取值
+- **新代码前必跑 node --check**:index.html 25 个内联 script 全跑语法校验(0 错才能 commit)
+- 审计 grep:1895:              +(hasData?'onclick="window._showLhbDay(''+iso+'')" title="'+esc(iso)+'"':'')
+1992:            +'title="'+esc(title)+'" onclick="window._showLhbDay(''+d+'')">';
+3078:      h += '<div class="' + cls + '" onclick="_rcClickJyDay('' + iso + '')" data-date="' + iso + '">';
+3537:      h += '<div class="' + cls + '" onclick="_rcClickNorthDay('' + iso + '')" data-date="' + iso + '">';
+4732:          <button class="btn" onclick="var f=document.getElementById('v6MemoFrame');f.src=f.src.replace(/&refresh=\d+/,'')+'&refresh='+Date.now();document.getElementById('v6MemoError').style.display='none';window.__v6MemoLoaded=true;" style="padding:8px 18px;font-size:13px;">🔄 强制刷新 v6 备忘录</button>
+4937:      return '<div style="display:flex;align-items:center;gap:8px;padding:9px 15px;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--border);" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background=''" onclick="selectV8QueryStock(''+s.code+'')">'+
+8772:    filterBtns+='<button onclick="cockpitSetFilter('all')" style="padding:4px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #6c7bd6;background:rgba(108,123,214,.18);color:#cfe3ff;">全部('+top10.length+')</button>';
+8774:      filterBtns+='<button onclick="cockpitSetFilter(''+name.replace(/"/g,'')+'')" style="padding:4px 12px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid #3a6fb0;background:rgba(56,150,200,.16);color:#9fd0ff;">'+name+'</button>';
+9430:        if(stocks.length > 8) h+='<div data-total="'+(stocks.length-8)+'" style="color:#a855f7;font-size:12px;text-align:center;padding:2px;cursor:pointer;user-select:none;font-weight:600;" data-togglecat="'+catsn+'" onclick="window.__v8ToggleCatMore(this)">... +' + (stocks.length-8) + ' more (点击展开)▼</div>';
+9513:            if(p.leaders.length > 8) h+='<div data-leadersmore="'+pname+'" data-total="'+(p.leaders.length-8)+'" style="color:#a855f7;font-size:12px;text-align:center;padding:2px;cursor:pointer;user-select:none;font-weight:600;" data-togglelm="'+pname+'" onclick="window.__v8ToggleLeadersMore(this)">... +' + (p.leaders.length-8) + ' 只更多（点击展开）▼</div>';
+10037:        html += '<span onclick="window._ppFilterConcept=''+cn+'';window._fillPotentialPicks();" style="cursor:pointer;display:inline-block;padding:3px 8px;background:'+bg+';border:1px solid '+bd+';border-radius:6px;font-size:11.5px;color:#c4b5fd;font-weight:600;">'+cn+'</span>';
+10100:        return '<span onclick="window._ppFilterConcept=''+cn+'';window._fillPotentialPicks();" style="cursor:pointer;color:#a78bfa;'+act+'">'+cn+'</span>'; 任何 onclick 含  拼接的代码必须重构
+
 ## 🦊 子块「更新于」戳铁律（2026-08-18 06:32 主人令）
 - 主人原话：「今日判定卡片名更新于那些全没了」= body 内部 6 个子块都缺戳,不是卡头
 - 一劳永逸修复：`_buildJudgmentEnvHTML(d)` 内每个子块（信号灯/时事/关键数据/3 大股市/3 大分析师/危险信号）都加「🦊 更新于 XX」stamp
