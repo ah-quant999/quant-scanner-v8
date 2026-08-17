@@ -70,12 +70,13 @@ def build():
 
     # 1) ETF_INTRADAY_HEAT
     items, err = fetch_etf_list()
+    # 🛡 2026-08-17 主人怒令发现：网络失败时写 error=True 空结构会覆盖小九真版本（1564 只真数据全没了）
+    # 一劳永逸修：网络失败直接 sys.exit(0) 不写任何文件，保留 raw_data/etf_*.json 现有真数据
+    # 云端自托管 runner 没这个问题（云端可直连 eastmoney），本守卫只防家里机被风控覆盖
     if items is None:
-        result_heat = {
-            "update_time": now, "items": [], "inflow_top": [], "outflow_top": [],
-            "categories": {}, "note": f"eastmoney push2 失败: {err}（云端应能拉到）",
-            "error": True,
-        }
+        print(f"  ❌ eastmoney push2 失败: {err} — 不写盘，保留现有 raw_data/etf_*.json（避免覆盖小九真版本）")
+        print(f"  ℹ️  家里机网络风控，请云端 v8_cn_fetch_cloud.yml category=intraday 重跑补救")
+        sys.exit(0)
     else:
         # 按主力净流入排序
         items_sorted = sorted(items, key=lambda x: x.get("main_net_inflow", 0), reverse=True)
