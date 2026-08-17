@@ -83,33 +83,57 @@ def main():
         sys.exit(1)
 
     h = open(INDEX, encoding="utf-8").read()
+    # 2026-08-17 支持两种渲染模式：iframe（旧）或 fetch() 注入（新，一劳永逸）
+    has_iframe = 'src="v6_memo.html' in h
+    has_fetch = ('__v6MemoLoad' in h) and ('v6MemoBody' in h)
     checks = {
         "子tab data-lg=\"v6\"": 'data-lg="v6"',
         "面板 id=\"lg-v6\"": 'id="lg-v6"',
-        "iframe src=\"v6_memo.html\"": 'src="v6_memo.html',
+        "v6 渲染入口(iframe 或 fetch)": None,  # 下面单独判
     }
-    missing = [k for k, v in checks.items() if v not in h]
+    missing = []
+    for k, v in list(checks.items())[:-1]:  # 跳过最后一项
+        if v not in h:
+            missing.append(k)
+    if not has_iframe and not has_fetch:
+        missing.append("v6 渲染入口(iframe src 或 __v6MemoLoad)")
     if missing:
-        print("❌ index.html 缺失 v6备忘录 入口：%s —— 阻断部署（请手动从已知良好提交恢复 index.html 的 v6 子tab/面板/iframe）" % "、".join(missing))
+        print("❌ index.html 缺失 v6备忘录 入口：%s —— 阻断部署" % "、".join(missing))
         ok = False
     else:
-        print("✅ index.html 保留 v6备忘录 子tab/面板/iframe")
+        mode = "fetch()注入" if has_fetch else "iframe"
+        print("✅ index.html 保留 v6备忘录 子tab/面板/%s" % mode)
 
-    # ── 3) 缓存击穿：iframe src 强制带内容 sha 版本戳 ────────────────
-    # 每次构建都按当前 v6_memo.html 内容重算 sha10，内容不变则不改动 index.html。
+    # ── 3) 缓存击穿：版本戳 ─────────────────────────────────────
     new_sha = sha10_of(MEMO)
-    pat = re.compile(r'src="v6_memo\.html(?:\?v=[0-9a-fA-F]+)?"')
-    m = pat.search(h)
-    if not m:
-        print("❌ 未在 index.html 找到 v6_memo.html 的 iframe src，阻断部署")
-        sys.exit(1)
-    new_src = 'src="v6_memo.html?v=%s"' % new_sha
-    if m.group(0) != new_src:
-        h2 = pat.sub(new_src, h, count=1)
-        open(INDEX, "w", encoding="utf-8").write(h2)
-        print("🔄 已更新 v6备忘录 iframe 缓存戳 → ?v=%s（强制 CDN 刷新）" % new_sha)
+    if has_iframe:
+        # 旧模式：更新 iframe src 的 ?v= 参数
+        pat = re.compile(r'src="v6_memo\.html(?:\?v=[0-9a-fA-F]+)?"')
+        m = pat.search(h)
+        if not m:
+            print("❌ 未在 index.html 找到 v6_memo.html 的 iframe src，阻断部署")
+            sys.exit(1)
+        new_src = 'src="v6_memo.html?v=%s"' % new_sha
+        if m.group(0) != new_src:
+            h2 = pat.sub(new_src, h, count=1)
+            open(INDEX, "w", encoding="utf-8").write(h2)
+            print("🔄 已更新 v6备忘录 iframe 缓存戳 → ?v=%s" % new_sha)
+        else:
+            print("✅ v6备忘录 iframe 缓存戳已是最新（?v=%s）" % new_sha)
+    elif has_fetch:
+        # 新模式：更新 __v6MemoLoad 内的 fetch URL ?v= 参数
+        pat = re.compile(r"v6_memo\.html\?v=[0-9a-fA-F]+")
+        m = pat.search(h)
+        new_url = 'v6_memo.html?v=%s' % new_sha
+        if m and m.group(0) != new_url:
+            h2 = pat.sub(new_url, h, count=1)
+            open(INDEX, "w", encoding="utf-8").write(h2)
+            print("🔄 已更新 v6备忘录 fetch URL 缓存戳 → ?v=%s" % new_sha)
+        else:
+            print("✅ v6备忘录 fetch URL 缓存戳已是最新（?v=%s）" % new_sha)
     else:
-        print("✅ v6备忘录 iframe 缓存戳已是最新（?v=%s）" % new_sha)
+        print("❌ 无 v6 渲染入口可更新缓存戳，阻断部署")
+        sys.exit(1)
 
     if not ok:
         print("🚫 护栏失败：v6备忘录 入口缺失，已阻断部署。请先修复 index.html 再推送。")

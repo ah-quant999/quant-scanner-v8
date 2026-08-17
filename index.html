@@ -5763,55 +5763,18 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
     </div><!-- /lg-op: 强制闭合，防止浏览器将后续 lg-v6 解析进 lg-op 内部 -->
 
     <!-- === v6备忘录（逻辑详解页最右侧子tab，仅管理员可见） === -->
+    <!-- 2026-08-17 一劳永逸：废除 iframe（隐藏态 scrollHeight=0 / 跨域 / 可见性 三重陷阱），
+         改用 fetch() 同源注入 body 内层内容，彻底消除所有渲染假象。 -->
     <div class="lg-pane" id="lg-v6">
-      <div id="v6MemoWrap" style="position:relative;width:100%;height:calc(100vh - 160px);min-height:500px;border-radius:14px;overflow:auto;background:#f5f7fa;border:1px solid var(--border);">
-        <div id="v6MemoStatus" style="position:absolute;top:6px;left:8px;z-index:20;font-size:11px;color:#555;background:rgba(255,255,255,.85);padding:3px 8px;border-radius:4px;pointer-events:none;border:1px solid #ddd;">⏳ v6 备忘录加载中…</div>
-        <iframe id="v6MemoFrame" src="v6_memo.html?v=88f66b73cb" loading="eager" title="v6备忘录" style="display:block;width:100%;min-height:480px;height:100%;border:none;background:#f5f7fa;" onload="(function(){try{var f=document.getElementById('v6MemoFrame');var s=document.getElementById('v6MemoStatus');var w=document.getElementById('v6MemoWrap');window.__v6MemoLoaded=true;var pane=document.getElementById('lg-v6');if(s){if(f.contentWindow&&f.contentWindow.document&&f.contentWindow.document.body){var h=f.contentWindow.document.body.scrollHeight;s.innerHTML=h>0?'✅ v6 备忘录已加载 ('+h+'px)':'⏳ 加载中(隐藏态重读中)…';}else{s.innerHTML='✅ v6 备忘录 iframe 已加载';}if(w)w.style.background='#f5f7fa';}}catch(e){console.error('v6 memo onload err',e);if(s)s.innerHTML='✅ v6 备忘录已加载(跨域保护)';}})();" onerror="document.getElementById('v6MemoStatus').innerHTML='❌ v6 备忘录加载失败';document.getElementById('v6MemoError').style.display='flex';"></iframe>
-        <div id="v6MemoError" style="display:none;position:relative;left:0;right:0;bottom:0;background:rgba(220,60,60,.92);color:#fff;flex-direction:column;gap:8px;text-align:center;padding:14px 20px;border-top:2px solid #c00;margin:8px;border-radius:8px;">
-          <div style="font-size:15px;font-weight:600">❌ v6 备忘录加载失败或内容为空</div>
-          <div style="font-size:12px;color:#ffcccc">可能是 CDN 缓存了旧版本，请点击下方按钮强制刷新</div>
-          <button class="btn" onclick="var f=document.getElementById('v6MemoFrame');f.src=f.src.replace(/&refresh=\d+/,'')+'&refresh='+Date.now();this.parentElement.style.display='none';window.__v6MemoLoaded=true;" style="padding:8px 18px;font-size:13px;">🔄 强制刷新 v6 备忘录</button>
+      <div id="v6MemoWrap" style="position:relative;width:100%;min-height:500px;border-radius:14px;overflow:auto;background:#f5f7fa;border:1px solid var(--border);padding:16px 20px;box-sizing:border-box;">
+        <div id="v6MemoStatus" style="font-size:12px;color:#666;margin-bottom:10px;padding:4px 0;">⏳ v6 备忘录加载中…</div>
+        <div id="v6MemoBody" style="color:#333;line-height:1.7;"></div>
+        <div id="v6MemoError" style="display:none;background:rgba(220,60,60,.92);color:#fff;padding:14px 20px;border-radius:8px;margin-top:10px;">
+          <div style="font-size:15px;font-weight:600">❌ v6 备忘录加载失败</div>
+          <div style="font-size:12px;color:#ffcccc;margin-top:4px;">网络错误或文件不存在，请稍后重试</div>
+          <button class="btn" onclick="window.__v6MemoLoad&&window.__v6MemoLoad()" style="padding:8px 18px;font-size:13px;margin-top:8px;">🔄 重试</button>
         </div>
       </div>
-      <script>
-      // v6 备忘录 iframe 跨文档就绪信号（子页 postMessage 通知，避免依赖隐藏态 scrollHeight 误判）
-      window.addEventListener('message', function(ev){
-        try{
-          var d = ev.data || {};
-          if(d && d.__v6memo === 'ready'){
-            var s=document.getElementById('v6MemoStatus');
-            var err=document.getElementById('v6MemoError');
-            window.__v6MemoLoaded = true;
-            if(err) err.style.display='none';
-            if(s) s.innerHTML='✅ v6 备忘录已加载 ('+(d.height||0)+'px)';
-          }
-        }catch(e){}
-      });
-      (function(){
-        var checkCount=0;
-        var timer=setInterval(function(){
-          var wrap=document.getElementById('v6MemoWrap');
-          var frame=document.getElementById('v6MemoFrame');
-          var err=document.getElementById('v6MemoError');
-          if(!frame || !wrap){ clearInterval(timer); return; }
-          if(++checkCount >= 12){
-            clearInterval(timer);
-            // 仅当子页始终未发来 ready 信号时才兜底强制刷新一次
-            if(!window.__v6MemoLoaded){
-              var cur=frame.getAttribute('src'); var p=cur.split('?'); var qs=(p[1]||'').replace(/&?refresh=\d+/g,'');
-              frame.src=p[0]+'?'+qs+'&refresh='+Date.now();
-            }
-            return;
-          }
-          if(err && err.style.display === 'flex' && !window.__v6MemoAutoRetried){
-            window.__v6MemoAutoRetried = true;
-            var cur2=frame.getAttribute('src'); var p2=cur2.split('?'); var qs2=(p2[1]||'').replace(/&?refresh=\d+/g,'');
-            frame.src=p2[0]+'?'+qs2+'&refresh='+Date.now();
-            err.style.display = 'none';
-          }
-        }, 250);
-      })();
-      </script>
     </div>
   </section>
 
@@ -7422,7 +7385,7 @@ window.__renderV8CalFull();
       h+='<div style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.7">⚠️ 高分预警：'+
         worst.map(x=>x.name+'('+Math.round(x.score)+')').join('、')+'</div>';
     }
-    $('phCrisisBody').innerHTML=h;
+    var cb=$('phCrisisBody'); if(cb) cb.innerHTML=h;
     setBadge('phCrisisTime','盘中','短线',cr.update_time);
   }
 
@@ -12320,26 +12283,48 @@ function switchLg(id,el){
   if(pane) pane.classList.add('active');
   if(el) el.classList.add('active');
   if(id==='v6'){
+    // 2026-08-17 一劳永逸：废除 iframe，改用 fetch() 同源注入 body 内容
     setTimeout(function(){
-      var d=document.getElementById('v6MemoFrame');
-      var w=document.getElementById('v6MemoWrap');
-      if(!d) return;
-      // 显式确保包裹层可见（防止任何 CSS 继承/层叠导致不可见）
-      if(w){ w.style.display=''; w.style.visibility='visible'; w.style.background='#f5f7fa'; w.style.overflow='auto'; }
-      // 每次打开强制重新加载（保留内容缓存戳 + 追加刷新戳），确保最新内容并重新触发 ready 信号
-      try{
-        var cur=d.getAttribute('src');
-        var parts=cur.split('?');
-        var base=parts[0];
-        var qs=(parts[1]||'').replace(/&?refresh=\d+/g,'');
-        d.src=base+'?'+qs+'&refresh='+Date.now();
-        d.style.display='block';
-        d.style.visibility='visible';
-        window.__v6MemoLoaded=false;
-      }catch(e){}
-    },60);
+      window.__v6MemoLoad && window.__v6MemoLoad();
+    },30);
   }
 }
+
+/* ---- v6 备忘录 fetch() 注入器（2026-08-17 一劳永逸，替代 iframe） ---- */
+window.__v6MemoLoad = function(){
+  var body = document.getElementById('v6MemoBody');
+  var status = document.getElementById('v6MemoStatus');
+  var err = document.getElementById('v6MemoError');
+  if(!body){ return; }
+  if(status) status.innerHTML = '⏳ v6 备忘录加载中…';
+  if(err) err.style.display = 'none';
+  // cache-buster 用 v6_memo.html 的文件修改时间（guard_v6_memo.py 维护）
+  var url = 'v6_memo.html?v=88f66b73cb&t=' + Date.now();
+  fetch(url, {cache: 'no-store'}).then(function(resp){
+    if(!resp.ok) throw new Error('HTTP ' + resp.status);
+    return resp.text();
+  }).then(function(html){
+    // 提取 <body> 内层内容（同源 fetch 无跨域问题）
+    var bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+    var content = bodyMatch ? bodyMatch[1] : html;
+    // 注入容器
+    body.innerHTML = content;
+    if(status) status.innerHTML = '✅ v6 备忘录已加载 (' + content.length + ' chars)';
+    // 执行子页内联脚本（样式/交互）
+    var scripts = body.querySelectorAll('script');
+    scripts.forEach(function(s){
+      var ns = document.createElement('script');
+      ns.textContent = s.textContent;
+      s.parentNode.replaceChild(ns, s);
+    });
+  }).catch(function(e){
+    console.error('v6 memo fetch err', e);
+    if(status) status.innerHTML = '❌ v6 备忘录加载失败';
+    if(err) err.style.display = 'block';
+    body.innerHTML = '';
+  });
+};
+
 // v8 数据注入（不动 HTML，只填已有元素）
 try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
 try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
