@@ -160,6 +160,14 @@ jobs:
         run: |
           python backfill_lhb_history.py
 
+      # 2026-08-17 主人令：calc_commodity_elasticity.py 加入云端自动跑（之前从未自动跑过，导致国内期货 LC/SA 永远不显示）
+      - name: "💹 商品涨价弹性榜重算（仅 post_close）"
+        if: steps.cat.outputs.category == 'post_close'
+        continue-on-error: true
+        shell: bash
+        run: |
+          python algorithms/calc_commodity_elasticity.py
+
       - name: "📤 推送 raw_data/ 到 main（Contents API）"
         shell: bash
         run: |
