@@ -1,8 +1,8 @@
 {
-  "DATA": "E:/workspace/quant-scanner-v8/out",
-  "V8_OUT_DIR": "E:/workspace/quant-scanner-v8/out",
+  "DATA": "D:\\actions-runner-v8\\_work\\quant-scanner-v8\\quant-scanner-v8\\algorithms\\..\\out",
+  "V8_OUT_DIR": "",
   "guanlan_watchlist": {
-    "exists": false,
+    "exists": true,
     "stocks": 0
   },
   "guanlan_reports": {
@@ -12,13 +12,13 @@
   "maharo_signals": {
     "exists": true,
     "raw_signals": 20,
-    "gold_pool_matches": 9
+    "gold_pool_matches": 7
   },
   "source_dist": {
-    "主板成交前100": 97,
-    "maharo研报": 20,
-    "创业板成交前100": 100,
-    "科创板成交前100": 100,
+    "主板成交前100": 53,
+    "maharo研报": 19,
+    "创业板成交前100": 28,
+    "科创板成交前100": 19,
     "港股成交前50": 50
   }
 }
