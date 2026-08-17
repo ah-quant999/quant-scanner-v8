@@ -11,6 +11,7 @@
 """
 import sys
 import re
+import json
 from pathlib import Path
 
 DATA = Path(__file__).resolve().parent / "data"
@@ -90,6 +91,34 @@ MIN_SIZE = {
 }
 MIN_TOTAL = 1000000
 
+def _is_valid_js_data(text):
+    """判定 data/*.js 是否为合法 JSON 数据（非 shell/错误页）。
+
+    合法：含 `window.<NAME> =` 且其后内容能解析为 JSON 对象/数组。
+    真 shell：HTML 错误页 / null / undefined / 截断 / 报错字符串，绝不合法 JSON。
+
+    2026-08-17 修复背景：系统会刻意产出两类「体积偏小但合法」的文件，
+    旧逻辑用固定 MIN_SIZE 阈值把它们误判成 shell，导致全部构建被拦截部署、
+    实时数据卡死数小时：
+      (a) 盘前清空/无信号占位符：{"no_data":true,"premarket_cleared":true,...}
+          或 {"total":0,"stocks":[]}
+      (b) 天然偏小的真实数据：CRDS(少数股) / STOCK_STOP(15只) /
+          TRIPLE_CONSENSUS(count:0) —— 都是有效 JSON，仅样本少。
+    故「过小」不再直接判 shell，仅当「过小且无法解析为合法 JSON」才拦截。
+    """
+    m = re.search(r"window\.[A-Z_0-9]+\s*=\s*(.*)", text, re.S)
+    if not m:
+        return False
+    body = m.group(1).strip().rstrip(";").strip()
+    if not body:
+        return False
+    try:
+        json.loads(body)
+        return True
+    except Exception:
+        return False
+
+
 bad = []
 actual_total = 0
 for p in sorted(DATA.glob("*.js")):
@@ -100,7 +129,14 @@ for p in sorted(DATA.glob("*.js")):
         continue
     mn = MIN_SIZE[name]
     if sz < mn:
-        bad.append((name, sz, mn, "过小(疑似shell)"))
+        # ★ 2026-08-17 修复：尺寸过小不再直接判 shell。
+        #   仅当「小且无法解析为合法 JSON」才是真 shell（HTML错误页/null/截断）。
+        #   合法空占位符与天然偏小真实数据均含合法 JSON，放行。
+        text = p.read_text(encoding="utf-8", errors="ignore")
+        if _is_valid_js_data(text):
+            print(f"   ℹ️ {name}: {sz}B 合法 JSON(空占位符或天然小数据)，放行")
+            continue
+        bad.append((name, sz, mn, "过小且非合法JSON(疑似shell)"))
         continue
     # 2026-08-14 修复：部分文件首行是注释（CONCEPT_ETF_MAP/PORTFOLIO/PORTFOLIO_COST），
     # 且变量名可能与文件名不一致（PORTFOLIO.js → window.PORTFOLIO_DATA）。
