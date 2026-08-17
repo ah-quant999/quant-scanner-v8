@@ -1,1 +1,1 @@
-{"run_time":"2026-08-17 08:52:38","category":"all","hostname":"LEMONCAT","modules":{"CANDIDATE_QUOTES":{"status":"empty","msg":"返回空"}},"summary":{"total":1,"ok":0,"empty":1,"fail":0}}
+{"run_time":"2026-08-17 09:12:13","category":"all","hostname":"LEMONCAT","modules":{"CANDIDATE_QUOTES":{"status":"empty","msg":"返回空"}},"summary":{"total":1,"ok":0,"empty":1,"fail":0}}
