@@ -1,9 +1,9 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-17 09:09:28",
+  "update_time": "2026-08-17 09:30:51",
   "crisis_score": 30.2,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
-  "total_candidates": 34,
+  "total_candidates": 43,
   "top_n": 5,
   "strong_sectors": [
     "其他电源设备",
@@ -32,9 +32,9 @@ window.FINAL_RECOMMEND_DATA = {
       "stop_loss": 38.39,
       "target_price": 49.06,
       "risk_reward": 1.5,
-      "support": 36.69,
+      "support": 37.65,
       "resistance": 45.1,
-      "atr": 1.44,
+      "atr": 1.37,
       "sources": [
         "四量终极",
         "板块龙头"
@@ -74,12 +74,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "四量终极 信号2项；板块龙头 小金属",
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
-        "西部大开发",
         "电池技术",
-        "央国企改革",
+        "锂电池概念",
+        "新材料",
         "稀缺资源",
-        "小金属概念",
-        "新材料"
+        "央国企改革",
+        "西部大开发"
       ],
       "backtest": {
         "signals": 1,
@@ -117,7 +117,7 @@ window.FINAL_RECOMMEND_DATA = {
       "risk_reward": 1.5,
       "support": 32.28,
       "resistance": 54.69,
-      "atr": 3.76,
+      "atr": 3.44,
       "sources": [
         "四量终极",
         "板块龙头"
@@ -151,11 +151,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
         "OLED",
+        "中芯概念",
+        "5G概念",
         "半导体概念",
-        "央国企改革",
-        "医疗器械概念",
-        "国产芯片",
-        "华为概念"
+        "华为概念",
+        "央国企改革"
       ],
       "backtest": {
         "signals": 2,
@@ -230,12 +230,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构2.5亿+游资0.3亿",
       "industry": "",
       "concepts": [
-        "央国企改革",
-        "小金属概念",
-        "中字头",
         "深成500",
+        "央国企改革",
+        "融资融券",
         "稀土永磁",
-        "融资融券"
+        "小金属概念",
+        "中字头"
       ],
       "backtest": {
         "signals": 201,
@@ -305,12 +305,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构0.1亿+游资0.3亿",
       "industry": "",
       "concepts": [
-        "一带一路",
-        "节能环保",
-        "汽车拆解",
-        "人工智能",
         "垃圾分类",
-        "稀土永磁"
+        "节能环保",
+        "融资融券",
+        "人工智能",
+        "稀土永磁",
+        "一带一路"
       ],
       "backtest": {
         "signals": 201,
@@ -366,12 +366,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构1.8亿+游资2.9亿",
       "industry": "软件和信息技术服务业",
       "concepts": [
-        "一带一路",
-        "创业成份",
-        "华为概念",
-        "元宇宙概念",
+        "AIGC概念",
+        "创业板综",
+        "云计算",
         "IPv6",
-        "人工智能"
+        "华为概念",
+        "创业成份"
       ],
       "backtest": {
         "signals": 201,
@@ -404,9 +404,9 @@ window.FINAL_RECOMMEND_DATA = {
       "stop_loss": 38.39,
       "target_price": 49.06,
       "risk_reward": 1.5,
-      "support": 36.69,
+      "support": 37.65,
       "resistance": 45.1,
-      "atr": 1.44,
+      "atr": 1.37,
       "sources": [
         "四量终极",
         "板块龙头"
@@ -437,12 +437,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "四量终极 信号2项；板块龙头 小金属",
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
-        "西部大开发",
         "电池技术",
-        "央国企改革",
+        "锂电池概念",
+        "新材料",
         "稀缺资源",
-        "小金属概念",
-        "新材料"
+        "央国企改革",
+        "西部大开发"
       ],
       "backtest": {},
       "tracking": {
@@ -469,7 +469,7 @@ window.FINAL_RECOMMEND_DATA = {
       "risk_reward": 1.5,
       "support": 32.28,
       "resistance": 54.69,
-      "atr": 3.76,
+      "atr": 3.44,
       "sources": [
         "四量终极",
         "板块龙头"
@@ -501,11 +501,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
         "OLED",
+        "中芯概念",
+        "5G概念",
         "半导体概念",
-        "央国企改革",
-        "医疗器械概念",
-        "国产芯片",
-        "华为概念"
+        "华为概念",
+        "央国企改革"
       ],
       "backtest": {},
       "tracking": {
@@ -560,12 +560,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构2.5亿+游资0.3亿",
       "industry": "",
       "concepts": [
-        "央国企改革",
-        "小金属概念",
-        "中字头",
         "深成500",
+        "央国企改革",
+        "融资融券",
         "稀土永磁",
-        "融资融券"
+        "小金属概念",
+        "中字头"
       ],
       "backtest": {},
       "tracking": {
@@ -620,12 +620,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构0.1亿+游资0.3亿",
       "industry": "",
       "concepts": [
-        "一带一路",
-        "节能环保",
-        "汽车拆解",
-        "人工智能",
         "垃圾分类",
-        "稀土永磁"
+        "节能环保",
+        "融资融券",
+        "人工智能",
+        "稀土永磁",
+        "一带一路"
       ],
       "backtest": {},
       "tracking": {
@@ -673,12 +673,12 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "大牛股猎手 机构1.8亿+游资2.9亿",
       "industry": "软件和信息技术服务业",
       "concepts": [
-        "一带一路",
-        "创业成份",
-        "华为概念",
-        "元宇宙概念",
+        "AIGC概念",
+        "创业板综",
+        "云计算",
         "IPv6",
-        "人工智能"
+        "华为概念",
+        "创业成份"
       ],
       "backtest": {},
       "tracking": {
@@ -714,18 +714,18 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
-        "西部大开发",
         "电池技术",
-        "央国企改革",
+        "锂电池概念",
+        "新材料",
         "稀缺资源",
-        "小金属概念",
-        "新材料"
+        "央国企改革",
+        "西部大开发"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 38.39,
       "target_price": 49.06,
       "risk_reward": 1.5,
-      "support": 36.69,
+      "support": 37.65,
       "resistance": 45.1
     },
     {
@@ -750,11 +750,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
         "OLED",
+        "中芯概念",
+        "5G概念",
         "半导体概念",
-        "央国企改革",
-        "医疗器械概念",
-        "国产芯片",
-        "华为概念"
+        "华为概念",
+        "央国企改革"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 45.7,
@@ -782,12 +782,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "央国企改革",
-        "小金属概念",
-        "中字头",
         "深成500",
+        "央国企改革",
+        "融资融券",
         "稀土永磁",
-        "融资融券"
+        "小金属概念",
+        "中字头"
       ],
       "enter_date": "20260814",
       "stop_loss": null,
@@ -815,12 +815,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "一带一路",
-        "节能环保",
-        "汽车拆解",
-        "人工智能",
         "垃圾分类",
-        "稀土永磁"
+        "节能环保",
+        "融资融券",
+        "人工智能",
+        "稀土永磁",
+        "一带一路"
       ],
       "enter_date": "20260814",
       "stop_loss": null,
@@ -848,12 +848,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "软件和信息技术服务业",
       "concepts": [
-        "一带一路",
-        "创业成份",
-        "华为概念",
-        "元宇宙概念",
+        "AIGC概念",
+        "创业板综",
+        "云计算",
         "IPv6",
-        "人工智能"
+        "华为概念",
+        "创业成份"
       ],
       "enter_date": "20260814",
       "stop_loss": null,
@@ -881,12 +881,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
+        "创业板综",
         "OLED",
+        "智能电网",
+        "破发股",
         "半导体概念",
-        "柔性屏(折叠屏)",
-        "国产芯片",
-        "电网概念",
-        "充电桩"
+        "柔性屏(折叠屏)"
       ],
       "enter_date": "20260814",
       "stop_loss": null,
@@ -914,12 +914,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "卫星互联网",
+        "专精特新",
+        "深成500",
+        "5G概念",
         "半导体概念",
-        "IGBT概念",
-        "央国企改革",
-        "军工",
-        "专精特新"
+        "华为概念",
+        "卫星互联网"
       ],
       "enter_date": "20260814",
       "stop_loss": null,
@@ -947,11 +947,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "毫米波概念",
+        "创业板综",
         "人形机器人",
         "5G概念",
         "通信技术",
-        "创业板综",
+        "毫米波概念",
         "融资融券"
       ],
       "enter_date": "20260814",
@@ -1014,40 +1014,6 @@ window.FINAL_RECOMMEND_DATA = {
       "resistance": null
     },
     {
-      "code": "002353",
-      "name": "杰瑞股份",
-      "market": "深市",
-      "board": "主板",
-      "horizon": "短线",
-      "close": 150.99,
-      "pct_chg": 4.43,
-      "final_score": 3.5,
-      "resonance": 1,
-      "sources": [
-        "四量终极"
-      ],
-      "signals": [
-        "60min多周期共振",
-        "机构变红",
-        "缠论买点"
-      ],
-      "industry": "专用设备制造业",
-      "concepts": [
-        "动力电池回收",
-        "一带一路",
-        "天然气",
-        "数据中心",
-        "油气设服",
-        "东方财富热股"
-      ],
-      "enter_date": "2026-08-17",
-      "stop_loss": 135.89,
-      "target_price": 173.64,
-      "risk_reward": 1.5,
-      "support": 105.0,
-      "resistance": 154.45
-    },
-    {
       "code": "000657",
       "name": "环科国际",
       "market": "深市",
@@ -1065,12 +1031,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "金属制品业",
       "concepts": [
-        "PCB",
+        "可控核聚变",
         "创投",
+        "新材料",
         "央国企改革",
         "海南自贸",
-        "医疗器械概念",
-        "小金属概念"
+        "医疗器械概念"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": null,
@@ -1098,12 +1064,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "肝炎概念",
-        "创新药",
         "病原体防治",
-        "破发股",
         "维生素",
-        "低价股"
+        "低价股",
+        "破发股",
+        "融资融券",
+        "创新药"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 4.08,
@@ -1131,12 +1097,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "历史新高",
+        "AIGC概念",
+        "创业板综",
         "国资云概念",
         "央国企改革",
-        "东方财富热股",
-        "AI智能体",
-        "CPO概念"
+        "CPO概念",
+        "WiFi"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 129.51,
@@ -1144,6 +1110,105 @@ window.FINAL_RECOMMEND_DATA = {
       "risk_reward": 1.5,
       "support": 89.0,
       "resistance": 148.8
+    },
+    {
+      "code": "002558",
+      "name": "晋商银行",
+      "market": "深市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": 28.84,
+      "pct_chg": 0.95,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "机构变红",
+        "缠论买点"
+      ],
+      "industry": "互联网和相关服务",
+      "concepts": [
+        "AIGC概念",
+        "创投",
+        "参股保险",
+        "文娱消费",
+        "华为概念",
+        "人工智能"
+      ],
+      "enter_date": "2026-08-17",
+      "stop_loss": 25.96,
+      "target_price": 33.17,
+      "risk_reward": 1.5,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "600664",
+      "name": "哈药股份",
+      "market": "沪市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": 8.91,
+      "pct_chg": 0.56,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "医药制造业",
+      "concepts": [
+        "病原体防治",
+        "百日新高",
+        "破增发价股",
+        "中药概念",
+        "创新药",
+        "东北振兴"
+      ],
+      "enter_date": "2026-08-17",
+      "stop_loss": 8.02,
+      "target_price": 10.25,
+      "risk_reward": 1.5,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "688046",
+      "name": "药康生物",
+      "market": "沪市",
+      "board": "科创板",
+      "horizon": "短线",
+      "close": 40.5,
+      "pct_chg": -1.1,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "",
+      "concepts": [
+        "专精特新",
+        "趋势股",
+        "融资融券",
+        "CRO",
+        "创新药",
+        "科创板做市股"
+      ],
+      "enter_date": "2026-08-17",
+      "stop_loss": 36.45,
+      "target_price": 46.57,
+      "risk_reward": 1.5,
+      "support": null,
+      "resistance": null
     },
     {
       "code": "300209",
@@ -1164,12 +1229,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "零售业",
       "concepts": [
+        "创业板综",
         "跨境电商",
-        "纳米银",
-        "人工智能",
         "电商概念",
-        "内贸流通",
-        "算力概念"
+        "算力概念",
+        "人工智能",
+        "纳米银"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 35.04,
@@ -1197,19 +1262,78 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "研究和试验发展",
       "concepts": [
-        "CRO",
-        "AI制药（医疗）",
+        "创业板综",
+        "深成500",
+        "创业成份",
         "趋势股",
-        "人工智能",
-        "创新医疗服务",
-        "创业板综"
+        "AI制药（医疗）",
+        "CRO"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 44.21,
       "target_price": 56.49,
       "risk_reward": 1.5,
-      "support": 34.5,
+      "support": 34.83,
       "resistance": 51.3
+    },
+    {
+      "code": "688202",
+      "name": "美迪西",
+      "market": "沪市",
+      "board": "科创板",
+      "horizon": "短线",
+      "close": 108.76,
+      "pct_chg": 1.31,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "研究和试验发展",
+      "concepts": [],
+      "enter_date": "2026-08-17",
+      "stop_loss": 97.88,
+      "target_price": 125.07,
+      "risk_reward": 1.5,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "002353",
+      "name": "杰瑞股份",
+      "market": "深市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": 150.99,
+      "pct_chg": 4.43,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "机构变红",
+        "缠论买点"
+      ],
+      "industry": "专用设备制造业",
+      "concepts": [
+        "海工装备",
+        "天然气",
+        "油气设服",
+        "油气资源",
+        "一带一路",
+        "动力电池回收"
+      ],
+      "enter_date": "2026-08-17",
+      "stop_loss": 135.89,
+      "target_price": 173.64,
+      "risk_reward": 1.5,
+      "support": 105.0,
+      "resistance": 154.45
     },
     {
       "code": "603228",
@@ -1230,11 +1354,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "OLED",
-        "英伟达概念",
-        "PCB",
-        "无人驾驶",
         "商业航天",
+        "无人驾驶",
+        "OLED",
+        "特斯拉概念",
+        "5G概念",
         "华为概念"
       ],
       "enter_date": "2026-08-17",
@@ -1263,19 +1387,210 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "研究和试验发展",
       "concepts": [
-        "CRO",
-        "创新药",
-        "茅指数",
-        "独角兽",
         "百元股",
-        "创新医疗服务"
+        "独角兽",
+        "权重股",
+        "CAR-T细胞疗法",
+        "宁组合",
+        "融资融券"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 143.32,
       "target_price": 183.13,
       "risk_reward": 1.5,
-      "support": 117.01,
+      "support": 120.8,
       "resistance": 166.66
+    },
+    {
+      "code": "300832",
+      "name": "新产业",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": 51.24,
+      "pct_chg": 3.22,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "医药制造业",
+      "concepts": [
+        "病原体防治",
+        "创业板综",
+        "深成500",
+        "精准医疗",
+        "创业成份",
+        "深圳特区"
+      ],
+      "enter_date": "2026-08-17",
+      "stop_loss": 46.12,
+      "target_price": 58.93,
+      "risk_reward": 1.5,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "301080",
+      "name": "百普赛斯",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": 90.21,
+      "pct_chg": 2.27,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "",
+      "concepts": [
+        "病原体防治",
+        "创业板综",
+        "专精特新",
+        "CAR-T细胞疗法",
+        "趋势股",
+        "AI制药（医疗）"
+      ],
+      "enter_date": "2026-08-17",
+      "stop_loss": 81.19,
+      "target_price": 103.74,
+      "risk_reward": 1.5,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "300534",
+      "name": "陇神戎发",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": 18.9,
+      "pct_chg": -0.11,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "医药制造业",
+      "concepts": [
+        "创业板综",
+        "参股券商",
+        "央国企改革",
+        "中药概念",
+        "趋势股",
+        "西部大开发"
+      ],
+      "enter_date": "2026-08-17",
+      "stop_loss": 17.01,
+      "target_price": 21.73,
+      "risk_reward": 1.5,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "688222",
+      "name": "成都先导",
+      "market": "沪市",
+      "board": "科创板",
+      "horizon": "短线",
+      "close": 38.64,
+      "pct_chg": -3.06,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "研究和试验发展",
+      "concepts": [],
+      "enter_date": "2026-08-17",
+      "stop_loss": 34.78,
+      "target_price": 44.44,
+      "risk_reward": 1.5,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "300404",
+      "name": "博济医药",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": 17.34,
+      "pct_chg": 20.0,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "",
+      "concepts": [
+        "DeepSeek概念",
+        "创业板综",
+        "人脑工程",
+        "专精特新",
+        "减肥药",
+        "中药概念"
+      ],
+      "enter_date": "2026-08-17",
+      "stop_loss": 15.61,
+      "target_price": 19.94,
+      "risk_reward": 1.5,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "301047",
+      "name": "义翘神州",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": 130.15,
+      "pct_chg": 8.46,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "",
+      "concepts": [
+        "病原体防治",
+        "创业板综",
+        "合成生物",
+        "破发股",
+        "趋势股",
+        "融资融券"
+      ],
+      "enter_date": "2026-08-17",
+      "stop_loss": 117.14,
+      "target_price": 149.67,
+      "risk_reward": 1.5,
+      "support": null,
+      "resistance": null
     },
     {
       "code": "002396",
@@ -1295,12 +1610,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "信创",
+        "AIGC概念",
+        "人脑工程",
         "5G概念",
-        "F5G概念",
-        "CPO概念",
         "IPv6",
-        "东方财富热股"
+        "CPO概念",
+        "F5G概念"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": null,
@@ -1327,332 +1642,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "智能家居",
         "液冷概念",
+        "5G概念",
         "信创",
-        "光通信模块",
-        "华为概念",
-        "5G概念"
-      ],
-      "enter_date": "2026-08-17",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "300857",
-      "name": "协创数据",
-      "market": "创业板",
-      "board": "创业板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "计算机、通信和其他电子设备制造业",
-      "concepts": [
-        "AI眼镜",
-        "AIGC概念",
-        "人形机器人",
-        "AI智能体",
         "CPO概念",
-        "人工智能"
-      ],
-      "enter_date": "2026-08-17",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "300570",
-      "name": "太辰光",
-      "market": "创业板",
-      "board": "创业板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "计算机、通信和其他电子设备制造业",
-      "concepts": [
-        "物联网",
-        "国产芯片",
-        "光通信模块",
-        "光纤概念",
-        "5G概念",
-        "百元股"
-      ],
-      "enter_date": "2026-08-17",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "301396",
-      "name": "宏景科技",
-      "market": "创业板",
-      "board": "创业板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "软件和信息技术服务业",
-      "concepts": [
-        "新型城镇化",
-        "专精特新",
-        "信创",
-        "大数据",
-        "AI智能体",
-        "人工智能"
-      ],
-      "enter_date": "2026-08-17",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "300548",
-      "name": "长芯博创",
-      "market": "创业板",
-      "board": "创业板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "计算机、通信和其他电子设备制造业",
-      "concepts": [
-        "专精特新",
-        "国产芯片",
-        "光通信模块",
-        "华为概念",
-        "光纤概念",
-        "5G概念"
-      ],
-      "enter_date": "2026-08-17",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "600105",
-      "name": "永鼎股份",
-      "market": "沪市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "电气机械和器材制造业",
-      "concepts": [
-        "一带一路",
-        "专精特新",
-        "国产芯片",
-        "光通信模块",
-        "华为概念",
-        "光纤概念"
-      ],
-      "enter_date": "2026-08-17",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "002281",
-      "name": "兴泸水务",
-      "market": "深市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "计算机、通信和其他电子设备制造业",
-      "concepts": [
-        "一带一路",
-        "央国企改革",
-        "国产芯片",
-        "光通信模块",
-        "华为概念",
-        "光纤概念"
-      ],
-      "enter_date": "2026-08-17",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "600176",
-      "name": "中国巨石",
-      "market": "沪市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "非金属矿物制品业",
-      "concepts": [
-        "一带一路",
-        "PCB",
-        "央国企改革",
-        "PEEK材料概念",
-        "新材料",
-        "东方财富热股"
-      ],
-      "enter_date": "2026-08-17",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "600522",
-      "name": "中天科技",
-      "market": "沪市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "电气机械和器材制造业",
-      "concepts": [
-        "OLED",
-        "一带一路",
-        "PCB",
-        "储能概念",
-        "5G概念",
-        "东方财富热股"
-      ],
-      "enter_date": "2026-08-17",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "600498",
-      "name": "烽火通信",
-      "market": "沪市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "计算机、通信和其他电子设备制造业",
-      "concepts": [
-        "一带一路",
-        "卫星互联网",
-        "中特估",
-        "光通信模块",
-        "光纤概念",
-        "5G概念"
-      ],
-      "enter_date": "2026-08-17",
-      "stop_loss": 36.81,
-      "target_price": 47.03,
-      "risk_reward": 1.5,
-      "support": 31.36,
-      "resistance": 41.3
-    },
-    {
-      "code": "600487",
-      "name": "亨通光电",
-      "market": "沪市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "电气机械和器材制造业",
-      "concepts": [
-        "一带一路",
-        "光通信模块",
-        "华为概念",
-        "光纤概念",
-        "5G概念",
-        "F5G概念"
+        "F5G概念",
+        "WiFi"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": null,
