@@ -1,129 +1,17 @@
 {
   "2026-08-17": [
     {
-      "code": "601899",
-      "name": "紫金矿业",
-      "market": "sh",
-      "board": "主板",
-      "close": 35.45,
-      "pct_chg": 0.85,
-      "total_score": 37.2,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "603993",
-      "name": "洛阳钼业",
-      "market": "sh",
-      "board": "主板",
-      "close": 20.75,
-      "pct_chg": -0.38,
-      "total_score": 37.2,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "601168",
-      "name": "西部矿业",
-      "market": "sh",
-      "board": "主板",
-      "close": 42.45,
-      "pct_chg": -1.44,
-      "total_score": 36.0,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "002371",
-      "name": "创联控股",
-      "market": "sz",
-      "board": "主板",
-      "close": 765.97,
-      "pct_chg": 3.7,
-      "total_score": 32.8,
-      "quality_grade": "B",
-      "industry": "专用设备制造业",
-      "sectors": [
-        "专用设备制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "300502",
-      "name": "新易盛",
-      "market": "sz",
-      "board": "创业板",
-      "close": 466.68,
-      "pct_chg": 4.15,
-      "total_score": 30.0,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "300054",
-      "name": "鼎龙股份",
-      "market": "sz",
-      "board": "创业板",
-      "close": 81.3,
-      "pct_chg": 6.78,
-      "total_score": 29.2,
-      "quality_grade": "C",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "300604",
-      "name": "长川科技",
+      "code": "300857",
+      "name": "协创数据",
       "market": "创业板",
       "board": "创业板",
       "close": 0,
       "pct_chg": 0,
       "total_score": 25,
       "quality_grade": "A",
-      "industry": "专用设备制造业",
+      "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "专用设备制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "300274",
-      "name": "阳光电源",
-      "market": "创业板",
-      "board": "创业板",
-      "close": 0,
-      "pct_chg": 0,
-      "total_score": 22,
-      "quality_grade": "A",
-      "industry": "电气机械和器材制造业",
-      "sectors": [
-        "电气机械和器材制造业"
+        "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 0,
       "status": "near"
@@ -152,7 +40,7 @@
       "2026-08-17": 0
     },
     "300502": {
-      "2026-08-17": 466.68
+      "2026-08-17": 448.08
     },
     "688213": {
       "2026-08-17": 99.25
@@ -164,15 +52,6 @@
       "2026-08-17": 0
     },
     "300857": {
-      "2026-08-17": 0
-    },
-    "300054": {
-      "2026-08-17": 81.3
-    },
-    "002371": {
-      "2026-08-17": 765.97
-    },
-    "300604": {
       "2026-08-17": 0
     }
   },
@@ -235,7 +114,7 @@
       "enter_date": "2026-08-17",
       "enter_close": 448.08,
       "last_date": "2026-08-17",
-      "last_close": 466.68,
+      "last_close": 448.08,
       "status": "near",
       "streak": 1,
       "total_days": 1
@@ -284,35 +163,11 @@
       "status": "near",
       "streak": 1,
       "total_days": 1
-    },
-    "002371": {
-      "enter_date": "2026-08-17",
-      "enter_close": 765.97,
-      "last_date": "2026-08-17",
-      "last_close": 765.97,
-      "status": "near",
-      "streak": 1
-    },
-    "300054": {
-      "enter_date": "2026-08-17",
-      "enter_close": 81.3,
-      "last_date": "2026-08-17",
-      "last_close": 81.3,
-      "status": "near",
-      "streak": 1
-    },
-    "300604": {
-      "enter_date": "2026-08-17",
-      "enter_close": 0,
-      "last_date": "2026-08-17",
-      "last_close": 0,
-      "status": "near",
-      "streak": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-08-17 17:47:49"
+    "last_update": "2026-08-17 09:29:06"
   }
 }
