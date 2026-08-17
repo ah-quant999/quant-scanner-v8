@@ -5764,13 +5764,13 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
 
     <!-- === v6备忘录（逻辑详解页最右侧子tab，仅管理员可见） === -->
     <div class="lg-pane" id="lg-v6">
-      <div id="v6MemoWrap" style="position:relative;width:100%;height:calc(100vh - 180px);border-radius:14px;overflow:hidden;background:var(--bg2);border:1px solid var(--border);">
-        <div id="v6MemoStatus" style="position:absolute;top:6px;left:8px;z-index:10;font-size:11px;color:var(--sub);background:rgba(0,0,0,.55);padding:3px 8px;border-radius:4px;pointer-events:none;">⏳ v6 备忘录加载中…</div>
-        <iframe id="v6MemoFrame" src="v6_memo.html?v=88f66b73cb" style="display:block;width:100%;height:100%;border:none;" onload="(function(){try{var f=document.getElementById('v6MemoFrame');var s=document.getElementById('v6MemoStatus');window.__v6MemoLoaded=true;var pane=document.getElementById('lg-v6');if(s&&pane&&pane.classList.contains('active')){var h=f.contentWindow.document.body.scrollHeight;s.innerHTML=h>0?'✅ v6 备忘录已加载 ('+h+'px)':'⏳ v6 备忘录加载中…';}}catch(e){console.error('v6 memo onload err',e);}})();" onerror="document.getElementById('v6MemoStatus').innerHTML='❌ v6 备忘录加载失败';document.getElementById('v6MemoError').style.display='flex';"></iframe>
-        <div id="v6MemoError" style="display:none;position:absolute;left:0;right:0;bottom:0;background:rgba(4,8,16,.92);flex-direction:column;gap:8px;text-align:center;padding:14px 20px;border-top:1px solid var(--border);">
-          <div style="font-size:15px;color:var(--sub)">v6 备忘录加载失败或内容为空</div>
-          <div style="font-size:12px;color:var(--dim)">可能是 CDN 缓存了旧版本，请点击下方按钮强制刷新</div>
-          <button class="btn" onclick="var f=document.getElementById('v6MemoFrame');f.src=f.src.replace(/&refresh=\d+/,'')+'&refresh='+Date.now();document.getElementById('v6MemoError').style.display='none';window.__v6MemoLoaded=true;" style="padding:8px 18px;font-size:13px;">🔄 强制刷新 v6 备忘录</button>
+      <div id="v6MemoWrap" style="position:relative;width:100%;height:calc(100vh - 160px);min-height:500px;border-radius:14px;overflow:auto;background:#f5f7fa;border:1px solid var(--border);">
+        <div id="v6MemoStatus" style="position:absolute;top:6px;left:8px;z-index:20;font-size:11px;color:#555;background:rgba(255,255,255,.85);padding:3px 8px;border-radius:4px;pointer-events:none;border:1px solid #ddd;">⏳ v6 备忘录加载中…</div>
+        <iframe id="v6MemoFrame" src="v6_memo.html?v=88f66b73cb" loading="eager" title="v6备忘录" style="display:block;width:100%;min-height:480px;height:100%;border:none;background:#f5f7fa;" onload="(function(){try{var f=document.getElementById('v6MemoFrame');var s=document.getElementById('v6MemoStatus');var w=document.getElementById('v6MemoWrap');window.__v6MemoLoaded=true;var pane=document.getElementById('lg-v6');if(s){if(f.contentWindow&&f.contentWindow.document&&f.contentWindow.document.body){var h=f.contentWindow.document.body.scrollHeight;s.innerHTML=h>0?'✅ v6 备忘录已加载 ('+h+'px)':'⏳ 加载中(隐藏态重读中)…';}else{s.innerHTML='✅ v6 备忘录 iframe 已加载';}if(w)w.style.background='#f5f7fa';}}catch(e){console.error('v6 memo onload err',e);if(s)s.innerHTML='✅ v6 备忘录已加载(跨域保护)';}})();" onerror="document.getElementById('v6MemoStatus').innerHTML='❌ v6 备忘录加载失败';document.getElementById('v6MemoError').style.display='flex';"></iframe>
+        <div id="v6MemoError" style="display:none;position:relative;left:0;right:0;bottom:0;background:rgba(220,60,60,.92);color:#fff;flex-direction:column;gap:8px;text-align:center;padding:14px 20px;border-top:2px solid #c00;margin:8px;border-radius:8px;">
+          <div style="font-size:15px;font-weight:600">❌ v6 备忘录加载失败或内容为空</div>
+          <div style="font-size:12px;color:#ffcccc">可能是 CDN 缓存了旧版本，请点击下方按钮强制刷新</div>
+          <button class="btn" onclick="var f=document.getElementById('v6MemoFrame');f.src=f.src.replace(/&refresh=\d+/,'')+'&refresh='+Date.now();this.parentElement.style.display='none';window.__v6MemoLoaded=true;" style="padding:8px 18px;font-size:13px;">🔄 强制刷新 v6 备忘录</button>
         </div>
       </div>
       <script>
@@ -12322,7 +12322,10 @@ function switchLg(id,el){
   if(id==='v6'){
     setTimeout(function(){
       var d=document.getElementById('v6MemoFrame');
+      var w=document.getElementById('v6MemoWrap');
       if(!d) return;
+      // 显式确保包裹层可见（防止任何 CSS 继承/层叠导致不可见）
+      if(w){ w.style.display=''; w.style.visibility='visible'; w.style.background='#f5f7fa'; w.style.overflow='auto'; }
       // 每次打开强制重新加载（保留内容缓存戳 + 追加刷新戳），确保最新内容并重新触发 ready 信号
       try{
         var cur=d.getAttribute('src');
@@ -12330,6 +12333,8 @@ function switchLg(id,el){
         var base=parts[0];
         var qs=(parts[1]||'').replace(/&?refresh=\d+/g,'');
         d.src=base+'?'+qs+'&refresh='+Date.now();
+        d.style.display='block';
+        d.style.visibility='visible';
         window.__v6MemoLoaded=false;
       }catch(e){}
     },60);
