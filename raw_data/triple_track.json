@@ -1,10 +1,10 @@
 {
-  "update_time": "2026-08-18 01:31:35",
+  "update_time": "2026-08-18 02:34:21",
   "data_date": "2026-08-18",
   "track_start": "2026-08-18",
   "history_days": 2,
   "strict_count": 0,
-  "near_count": 5,
+  "near_count": 4,
   "tracked": [
     {
       "code": "601899",
@@ -83,33 +83,6 @@
           "tag": "收购",
           "score": 20,
           "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "300604",
-      "name": "长川科技",
-      "market": "创业板",
-      "board": "创业板",
-      "status": "near",
-      "total_score": 22,
-      "quality_grade": "A",
-      "industry": "专用设备制造业",
-      "sectors": [
-        "专用设备制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 1,
-      "consecutive_days": 2,
-      "first_close": 0,
-      "current_close": null,
-      "pnl_pct": null,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "—"
         }
       ]
     },
@@ -200,18 +173,17 @@
   "sector_cluster": {
     "by_industry": [
       {
-        "industry": "专用设备制造业",
-        "count": 2,
-        "names": [
-          "北方华创",
-          "长川科技"
-        ]
-      },
-      {
         "industry": "有色金属矿采选业",
         "count": 1,
         "names": [
           "紫金矿业"
+        ]
+      },
+      {
+        "industry": "专用设备制造业",
+        "count": 1,
+        "names": [
+          "北方华创"
         ]
       },
       {
@@ -231,11 +203,11 @@
     ],
     "by_sector": [
       {
-        "sector": "专用设备制造业",
-        "count": 2
+        "sector": "有色金属矿采选业",
+        "count": 1
       },
       {
-        "sector": "有色金属矿采选业",
+        "sector": "专用设备制造业",
         "count": 1
       },
       {
@@ -247,10 +219,10 @@
         "count": 1
       }
     ],
-    "concentration": 40.0
+    "concentration": 25.0
   },
   "overlap": {
-    "total_tracked": 5,
+    "total_tracked": 4,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,

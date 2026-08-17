@@ -273,7 +273,7 @@
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-08-18 01:31:34"
+    "last_update": "2026-08-18 02:34:21"
   },
   "2026-08-18": [
     {
@@ -320,22 +320,6 @@
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
         "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "300604",
-      "name": "长川科技",
-      "market": "创业板",
-      "board": "创业板",
-      "close": 0,
-      "pct_chg": 0,
-      "total_score": 22,
-      "quality_grade": "A",
-      "industry": "专用设备制造业",
-      "sectors": [
-        "专用设备制造业"
       ],
       "signal_count": 0,
       "status": "near"
