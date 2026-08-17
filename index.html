@@ -1241,10 +1241,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/W52_HIGH.js?v=ce85287fd0" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=83a802e965" defer></script>
 <script src="data/RUNNER_STATUS.js?v=70de2d8ca5" defer></script>
-<script src="data/HEALTH_CHECK.js?v=44aefa5bf3" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=3731057295" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=4cbbdb1cca" defer></script>
-    <script src="data/POTENTIAL_PICKS.js?v=3f7b11fb82" defer></script>
+<script src="data/HEALTH_CHECK.js?v=52db83d77e" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=28210c4b94" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=0224878843" defer></script>
+    <script src="data/POTENTIAL_PICKS.js?v=f06ddd9324" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE.js?v=f135754004" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=0dcbab52a2" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=49ba72d042" defer></script>
@@ -4702,7 +4702,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div class="logic-p">
           v6 → v8 数据同步桥的算法详解（v8_cal / sector_fund_flow / backtest 等的源计算逻辑）。<br>
           guard_v6_memo.py 部署闸门：缺失或截断 &lt; 60KB 自动从 git HEAD → <code>v6_memo.golden.html</code> 自愈。<br>
-          v6_memo.html?v=88f66b73cb / v6_memo.golden.html / guard_v6_memo.py / v6 历史备份（tar.gz）— <b>DO_NOT_DELETE</b>（永久铁律，v8 稳定满一周前不删 v6 备份）。
+          v6_memo.html / v6_memo.golden.html / guard_v6_memo.py / v6 历史备份（tar.gz）— <b>DO_NOT_DELETE</b>（永久铁律，v8 稳定满一周前不删 v6 备份）。
         </div>
       </div>
     </div>
@@ -6521,45 +6521,47 @@ window.__renderV8CalFull();
         if(prev && prev !== r.phase) _transitions[r.name] = {from: prev, to: r.phase};
       });
 
-      // ── 阶段迁移对比表（2026-08-17 主人令：盘后数据出来后自动生成"今日 vs 上次"对比）──
+      // ── 今日阶段迁移（2026-08-17 22:55 主人令改：不要累积！只显示当天有变化的板块，一行一条） ──
+      //   例：「黄金板块：🚀主升 → ➡️震荡」按板块名+「从旧阶段 → 新阶段」一行
+      //   数据源：SECTOR_PHASE_HISTORY.js（云端持久化），盘后自动累积 snaps
       if (_prevSnap && Object.keys(_prevMap).length) {
-        var _prevCounts = {};
-        Object.keys(_prevMap).forEach(function(k){ _prevCounts[_prevMap[k]] = (_prevCounts[_prevMap[k]]||0) + 1; });
-        var _curCounts = {};
-        Object.keys(_newPhases).forEach(function(k){ _curCounts[_newPhases[k]] = (_curCounts[_newPhases[k]]||0) + 1; });
-        var _phaseOrder = ['主升','启动','震荡','退潮','底部'];
         var _phaseEmoji = {'主升':'🚀','启动':'📈','震荡':'➡️','退潮':'📉','底部':'⛏️'};
         var _phaseColor = {'主升':'#ef4444','启动':'#f59e0b','震荡':'#94a3b8','退潮':'var(--down)','底部':'#38bdf8'};
         var _prevDateStr = (_prevSnap.date || '').slice(0,10);
         var _prevTimeStr = (_prevSnap.update_time || '').slice(11,16);
         var _curDateStr = (sr.data_date || '').slice(0,10);
         var _curTimeStr = (sr.update_time || '').slice(11,16);
-        var _transCount = Object.keys(_transitions).length;
+        var _transList = [];
+        rows.forEach(function(r){
+          var t = _transitions[r.name];
+          if(t) _transList.push({name: r.name, from: t.from, to: t.to});
+        });
         h3 += '<div style="margin-bottom:14px;padding:10px 14px;background:linear-gradient(135deg,rgba(168,85,247,.06),rgba(99,102,241,.04));border:1px solid rgba(168,85,247,.2);border-radius:8px;">';
         h3 += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">';
-        h3 += '<div style="font-size:13px;font-weight:700;color:#c084fc;">🔁 阶段迁移对比（盘后自动累积）</div>';
-        h3 += '<div style="font-size:11px;color:var(--dim);">'+_transCount+' 个板块阶段变化 · 数据源 <code>SECTOR_PHASE_HISTORY.js</code></div>';
+        h3 += '<div style="font-size:13px;font-weight:700;color:#c084fc;">🔁 今日阶段迁移（'+_prevDateStr+' '+'+_prevTimeStr+' → '+_curDateStr+' '+'+_curTimeStr+'）</div>';
+        h3 += '<div style="font-size:11px;color:var(--dim);">数据源 <code>SECTOR_PHASE_HISTORY.js</code></div>';
         h3 += '</div>';
-        h3 += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
-        h3 += '<tr style="border-bottom:1px solid var(--border2);"><th style="text-align:left;padding:6px;font-weight:600;color:var(--sub);">阶段</th>';
-        h3 += '<th style="text-align:right;padding:6px;font-weight:600;color:var(--sub);">旧 ('+_prevDateStr+' '+_prevTimeStr+')</th>';
-        h3 += '<th style="text-align:right;padding:6px;font-weight:600;color:var(--sub);">新 ('+_curDateStr+' '+_curTimeStr+')</th>';
-        h3 += '<th style="text-align:right;padding:6px;font-weight:600;color:var(--sub);">Δ</th></tr>';
-        _phaseOrder.forEach(function(p){
-          var prevN = _prevCounts[p] || 0;
-          var curN = _curCounts[p] || 0;
-          var diff = curN - prevN;
-          if (prevN === 0 && curN === 0) return;  // 跳过空阶段
-          var diffStr = diff > 0 ? '+'+diff : (diff < 0 ? String(diff) : '±0');
-          var diffColor = diff > 0 ? '#22c55e' : (diff < 0 ? '#f87171' : 'var(--dim)');
-          h3 += '<tr style="border-bottom:1px solid rgba(148,163,184,.08);">';
-          h3 += '<td style="padding:6px;"><span style="color:'+_phaseColor[p]+';font-weight:700;">'+_phaseEmoji[p]+' '+p+'</span></td>';
-          h3 += '<td style="text-align:right;padding:6px;color:var(--sub);">'+prevN+'</td>';
-          h3 += '<td style="text-align:right;padding:6px;font-weight:700;color:'+_phaseColor[p]+';">'+curN+'</td>';
-          h3 += '<td style="text-align:right;padding:6px;font-weight:600;color:'+diffColor+';">'+diffStr+'</td>';
-          h3 += '</tr>';
-        });
-        h3 += '</table>';
+        if(_transList.length === 0){
+          h3 += '<div style="font-size:12px;color:var(--dim);text-align:center;padding:14px 0;">📭 今日无板块阶段变化（'+_prevDateStr+' '+'+_prevTimeStr+' → '+_curDateStr+' '+'+_curTimeStr+' 期间）</div>';
+        } else {
+          // 按板块名中文拼音排序
+          _transList.sort(function(a,b){ return (a.name||'').localeCompare(b.name, 'zh-CN'); });
+          h3 += '<div style="display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto;">';
+          _transList.forEach(function(t){
+            var fromEmoji = _phaseEmoji[t.from] || '';
+            var toEmoji = _phaseEmoji[t.to] || '';
+            var fromColor = _phaseColor[t.from] || 'var(--sub)';
+            var toColor = _phaseColor[t.to] || 'var(--sub)';
+            h3 += '<div style="display:flex;align-items:center;gap:6px;padding:4px 8px;border-bottom:1px dashed rgba(148,163,184,.08);font-size:12px;">';
+            h3 += '<b style="min-width:90px;max-width:110px;color:var(--txt);">'+t.name+'</b>';
+            h3 += '<span style="color:'+fromColor+';font-weight:700;">'+fromEmoji+t.from+'</span>';
+            h3 += '<span style="color:var(--dim);font-weight:700;">→</span>';
+            h3 += '<span style="color:'+toColor+';font-weight:700;">'+toEmoji+t.to+'</span>';
+            h3 += '</div>';
+          });
+          h3 += '</div>';
+          h3 += '<div style="margin-top:6px;font-size:11px;color:var(--sub);text-align:right;">共 '+_transList.length+' 个板块今日有迁移</div>';
+        }
         h3 += '</div>';
       }
 
