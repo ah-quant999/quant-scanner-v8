@@ -7,7 +7,7 @@
       "board": "主板",
       "close": 33.36,
       "pct_chg": 2.55,
-      "total_score": 37.2,
+      "total_score": 39.2,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
@@ -23,7 +23,7 @@
       "board": "主板",
       "close": 765.97,
       "pct_chg": 3.7,
-      "total_score": 32.8,
+      "total_score": 33.2,
       "quality_grade": "B",
       "industry": "专用设备制造业",
       "sectors": [
@@ -39,7 +39,7 @@
       "board": "主板",
       "close": 33.91,
       "pct_chg": 3.8,
-      "total_score": 29.2,
+      "total_score": 32.0,
       "quality_grade": "C",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
@@ -55,7 +55,7 @@
       "board": "创业板",
       "close": 0,
       "pct_chg": 0,
-      "total_score": 25,
+      "total_score": 22,
       "quality_grade": "A",
       "industry": "专用设备制造业",
       "sectors": [
@@ -71,7 +71,7 @@
       "board": "创业板",
       "close": 0,
       "pct_chg": 0,
-      "total_score": 22,
+      "total_score": 20,
       "quality_grade": "A",
       "industry": "电气机械和器材制造业",
       "sectors": [
@@ -265,6 +265,6 @@
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-08-17 18:42:20"
+    "last_update": "2026-08-17 19:26:54"
   }
 }

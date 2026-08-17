@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-17 18:42:20",
+  "update_time": "2026-08-17 19:26:55",
   "data_date": "2026-08-17",
   "track_start": "2026-08-17",
   "history_days": 1,
@@ -12,7 +12,7 @@
       "market": "sh",
       "board": "主板",
       "status": "near",
-      "total_score": 37.2,
+      "total_score": 39.2,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
@@ -39,7 +39,7 @@
       "market": "sz",
       "board": "主板",
       "status": "near",
-      "total_score": 32.8,
+      "total_score": 33.2,
       "quality_grade": "B",
       "industry": "专用设备制造业",
       "sectors": [
@@ -60,7 +60,7 @@
       "market": "sz",
       "board": "主板",
       "status": "near",
-      "total_score": 29.2,
+      "total_score": 32.0,
       "quality_grade": "C",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
@@ -92,7 +92,7 @@
       "market": "创业板",
       "board": "创业板",
       "status": "near",
-      "total_score": 25,
+      "total_score": 22,
       "quality_grade": "A",
       "industry": "专用设备制造业",
       "sectors": [
@@ -119,7 +119,7 @@
       "market": "创业板",
       "board": "创业板",
       "status": "near",
-      "total_score": 22,
+      "total_score": 20,
       "quality_grade": "A",
       "industry": "电气机械和器材制造业",
       "sectors": [
