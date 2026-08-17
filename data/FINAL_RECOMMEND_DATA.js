@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-18 04:39:50",
+  "update_time": "2026-08-18 05:01:07",
   "crisis_score": 31.4,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -29,7 +29,7 @@ window.FINAL_RECOMMEND_DATA = {
     {
       "rank": 1,
       "code": "002371",
-      "name": "北方华创",
+      "name": "创联控股",
       "market": "sz",
       "board": "主板",
       "horizon": "短线/中线共振",
@@ -84,11 +84,11 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "驾驶舱A档 技术59 质量0；四量终极 信号3项；板块龙头 半导体",
       "industry": "专用设备制造业",
       "concepts": [
-        "光刻机(胶)",
-        "光伏概念",
+        "半导体概念",
+        "中芯概念",
+        "央国企改革",
         "华为海思",
-        "东方财富热股",
-        "国产芯片",
+        "OLED",
         "华为概念"
       ],
       "backtest": {
@@ -118,7 +118,7 @@ window.FINAL_RECOMMEND_DATA = {
     {
       "rank": 2,
       "code": "002156",
-      "name": "通富微电",
+      "name": "建发物业",
       "market": "sz",
       "board": "主板",
       "horizon": "短线/中线共振",
@@ -169,11 +169,11 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "驾驶舱B档 技术20 质量0；大牛股猎手 机构1.7亿+游资3.1亿",
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "华为海思",
+        "AIPC",
         "智能穿戴",
-        "东方财富热股",
+        "华为海思",
         "CPO概念",
-        "国产芯片",
+        "存储芯片",
         "华为概念"
       ],
       "backtest": {
@@ -200,7 +200,7 @@ window.FINAL_RECOMMEND_DATA = {
     {
       "rank": 1,
       "code": "002371",
-      "name": "北方华创",
+      "name": "创联控股",
       "market": "深市",
       "board": "主板",
       "horizon": "短线/中线共振",
@@ -246,11 +246,11 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "驾驶舱A档 技术59 质量0；四量终极 信号3项；板块龙头 半导体",
       "industry": "专用设备制造业",
       "concepts": [
-        "光刻机(胶)",
-        "光伏概念",
+        "半导体概念",
+        "中芯概念",
+        "央国企改革",
         "华为海思",
-        "东方财富热股",
-        "国产芯片",
+        "OLED",
         "华为概念"
       ],
       "backtest": {},
@@ -269,7 +269,7 @@ window.FINAL_RECOMMEND_DATA = {
     {
       "rank": 2,
       "code": "002156",
-      "name": "通富微电",
+      "name": "建发物业",
       "market": "深市",
       "board": "主板",
       "horizon": "短线/中线共振",
@@ -311,11 +311,11 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "驾驶舱B档 技术20 质量0；大牛股猎手 机构1.7亿+游资3.1亿",
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "华为海思",
+        "AIPC",
         "智能穿戴",
-        "东方财富热股",
+        "华为海思",
         "CPO概念",
-        "国产芯片",
+        "存储芯片",
         "华为概念"
       ],
       "backtest": {},
@@ -335,7 +335,7 @@ window.FINAL_RECOMMEND_DATA = {
   "all_candidates": [
     {
       "code": "002371",
-      "name": "北方华创",
+      "name": "创联控股",
       "market": "深市",
       "board": "主板",
       "horizon": "中长线",
@@ -357,11 +357,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "专用设备制造业",
       "concepts": [
-        "光刻机(胶)",
-        "光伏概念",
+        "半导体概念",
+        "中芯概念",
+        "央国企改革",
         "华为海思",
-        "东方财富热股",
-        "国产芯片",
+        "OLED",
         "华为概念"
       ],
       "enter_date": "2026-08-17",
@@ -373,7 +373,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "002156",
-      "name": "通富微电",
+      "name": "建发物业",
       "market": "深市",
       "board": "主板",
       "horizon": "中长线",
@@ -392,11 +392,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "华为海思",
+        "AIPC",
         "智能穿戴",
-        "东方财富热股",
+        "华为海思",
         "CPO概念",
-        "国产芯片",
+        "存储芯片",
         "华为概念"
       ],
       "enter_date": "2026-08-18",
@@ -428,11 +428,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "软件和信息技术服务业",
       "concepts": [
         "百日新高",
-        "融资融券",
         "百元股",
-        "国产芯片",
+        "近期新高",
         "工业互联",
-        "近期新高"
+        "融资融券",
+        "国产芯片"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 379.53,
@@ -443,7 +443,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "002396",
-      "name": "星网锐捷",
+      "name": "青城新药－B",
       "market": "深市",
       "board": "主板",
       "horizon": "中长线",
@@ -462,12 +462,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "东方财富热股",
-        "CPO概念",
-        "5G概念",
         "F5G概念",
-        "IPv6",
-        "人工智能"
+        "人脑工程",
+        "5G概念",
+        "AIGC概念",
+        "CPO概念",
+        "信创"
       ],
       "enter_date": "2026-08-18",
       "stop_loss": 31.54,
@@ -497,11 +497,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "有色金属矿采选业",
       "concepts": [
+        "央国企改革",
+        "贬值受益",
         "一带一路",
-        "融资融券",
         "稀缺资源",
-        "东方财富热股",
-        "小金属概念",
+        "融资融券",
         "锂矿概念"
       ],
       "enter_date": "2026-08-17",
@@ -532,12 +532,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
-        "融资融券",
-        "西部大开发",
-        "稀缺资源",
         "电池技术",
-        "小金属概念",
-        "稀土永磁"
+        "央国企改革",
+        "新材料",
+        "锂电池概念",
+        "西部大开发",
+        "稀缺资源"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 39.67,
@@ -567,12 +567,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
+        "抖音概念(字节概念)",
         "百元股",
+        "信创",
         "AI芯片",
-        "专精特新",
-        "国产芯片",
-        "DeepSeek概念",
-        "权重股"
+        "权重股",
+        "国产芯片"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 259.92,
@@ -600,11 +600,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "专用设备制造业",
       "concepts": [
-        "机器视觉",
-        "专精特新",
-        "PCB",
-        "股权激励",
         "机器人概念",
+        "机器视觉",
+        "英伟达概念",
+        "无人驾驶",
+        "PCB",
         "苹果概念"
       ],
       "enter_date": "20260817",
@@ -633,11 +633,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "融资融券",
-        "专精特新",
-        "智慧城市",
         "节能环保",
+        "智慧城市",
+        "创业板综",
         "华为概念",
+        "融资融券",
         "破发股"
       ],
       "enter_date": "20260817",
@@ -665,12 +665,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
+        "中芯概念",
+        "央国企改革",
         "5G概念",
-        "医疗器械概念",
-        "国产芯片",
         "传感器",
-        "华为概念",
-        "OLED"
+        "OLED",
+        "3D打印"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 50.27,
@@ -698,12 +698,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "光纤概念",
-        "百元股",
-        "深圳特区",
-        "CPO概念",
         "5G概念",
-        "国产芯片"
+        "深成500",
+        "光通信模块",
+        "CPO概念",
+        "百元股",
+        "创业板综"
       ],
       "enter_date": "20260817",
       "stop_loss": null,
@@ -731,12 +731,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "融资融券",
-        "PCB",
-        "新能源车",
-        "创业板综",
         "车联网(车路云)",
-        "无人驾驶"
+        "无人驾驶",
+        "新能源车",
+        "PCB",
+        "创业板综",
+        "融资融券"
       ],
       "enter_date": "20260817",
       "stop_loss": null,
@@ -764,11 +764,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "水的生产和供应业",
       "concepts": [
-        "融资融券",
-        "专精特新",
         "节能环保",
-        "垃圾分类",
+        "转债标的",
         "创业板综",
+        "绿色电力",
+        "融资融券",
         "生物质能发电"
       ],
       "enter_date": "20260817",
@@ -797,12 +797,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
+        "农业种植",
+        "水产概念",
+        "创业板综",
         "融资融券",
         "海南自贸",
-        "粮食概念",
-        "土地流转",
-        "水产概念",
-        "创业板综"
+        "粮食概念"
       ],
       "enter_date": "20260817",
       "stop_loss": null,
@@ -839,7 +839,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "002409",
-      "name": "雅克科技",
+      "name": "洲际船务",
       "market": "深市",
       "board": "主板",
       "horizon": "中长线",
@@ -855,12 +855,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "化学原料和化学制品制造业",
       "concepts": [
-        "光刻机(胶)",
+        "中芯概念",
+        "存储芯片",
+        "OLED",
         "工业气体",
         "东方财富热股",
-        "专精特新",
-        "国产芯片",
-        "存储芯片"
+        "国产芯片"
       ],
       "enter_date": "2026-08-18",
       "stop_loss": null,
@@ -887,11 +887,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "深成500",
-        "国产芯片",
-        "华为概念",
-        "存储芯片",
+        "中芯概念",
+        "创业成份",
         "新材料",
+        "深成500",
+        "存储芯片",
         "OLED"
       ],
       "enter_date": "2026-08-18",
@@ -903,7 +903,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "000021",
-      "name": "深科技",
+      "name": "大中华控股",
       "market": "深市",
       "board": "主板",
       "horizon": "中长线",
@@ -919,12 +919,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "东方财富热股",
-        "医疗器械概念",
-        "国产芯片",
-        "储能概念",
         "央国企改革",
-        "新能源车"
+        "新能源车",
+        "区块链",
+        "存储芯片",
+        "储能概念",
+        "东方财富热股"
       ],
       "enter_date": "2026-08-18",
       "stop_loss": null,
@@ -935,7 +935,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "002185",
-      "name": "华天科技",
+      "name": "百心安－B",
       "market": "深市",
       "board": "主板",
       "horizon": "中长线",
@@ -951,12 +951,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "华为海思",
-        "东方财富热股",
-        "CPO概念",
         "5G概念",
-        "国产芯片",
-        "人工智能"
+        "华为海思",
+        "CPO概念",
+        "传感器",
+        "华为概念",
+        "东方财富热股"
       ],
       "enter_date": "2026-08-18",
       "stop_loss": null,
@@ -983,11 +983,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "华为海思",
-        "东方财富热股",
-        "CPO概念",
-        "国产芯片",
         "IGBT概念",
+        "中芯概念",
+        "央国企改革",
+        "华为海思",
+        "CPO概念",
         "存储芯片"
       ],
       "enter_date": "2026-08-18",
@@ -1015,11 +1015,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "软件和信息技术服务业",
       "concepts": [
+        "汽车芯片",
+        "无人驾驶",
+        "新能源车",
         "百元股",
-        "专精特新",
-        "小米概念",
         "储能概念",
-        "人工智能",
         "华为概念"
       ],
       "enter_date": "2026-08-18",
@@ -1047,12 +1047,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "东方财富热股",
-        "国产芯片",
-        "无线耳机",
         "人形机器人",
-        "人工智能",
-        "传感器"
+        "传感器",
+        "存储芯片",
+        "央视50_",
+        "AI眼镜",
+        "东方财富热股"
       ],
       "enter_date": "2026-08-18",
       "stop_loss": null,
@@ -1063,7 +1063,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "002008",
-      "name": "大族激光",
+      "name": "凤凰卫视",
       "market": "深市",
       "board": "主板",
       "horizon": "中长线",
@@ -1079,12 +1079,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "专用设备制造业",
       "concepts": [
-        "MiniLED",
-        "光刻机(胶)",
-        "TOPCon电池",
-        "光纤概念",
+        "半导体概念",
+        "固态电池",
         "PCB",
-        "华为概念"
+        "OLED",
+        "3D打印",
+        "TOPCon电池"
       ],
       "enter_date": "2026-08-18",
       "stop_loss": null,
@@ -1111,12 +1111,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "电气机械和器材制造业",
       "concepts": [
+        "创业成份",
         "宁组合",
-        "储能概念",
-        "权重股",
-        "华为概念",
+        "固态电池",
         "动力电池回收",
-        "创业成份"
+        "新能源车",
+        "储能概念"
       ],
       "enter_date": "2026-08-18",
       "stop_loss": 359.98,
@@ -1143,11 +1143,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "专用设备制造业",
       "concepts": [
-        "科创板做市股",
-        "百元股",
+        "中芯概念",
         "宁组合",
-        "国产芯片",
-        "股权激励",
+        "LED概念",
+        "百元股",
+        "区块链",
         "存储芯片"
       ],
       "enter_date": "2026-08-17",
@@ -1175,10 +1175,10 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
+        "中芯概念",
         "宁组合",
-        "国产芯片",
-        "无线耳机",
-        "小米概念",
+        "无人驾驶",
+        "3D摄像头",
         "传感器",
         "华为概念"
       ],
@@ -1207,12 +1207,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "废弃资源综合利用业",
       "concepts": [
-        "融资融券",
-        "东方财富热股",
+        "节能环保",
         "深成500",
-        "专精特新",
-        "稀土永磁",
-        "超跌股"
+        "转债标的",
+        "超跌股",
+        "创业板综",
+        "融资融券"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 68.09,
@@ -1239,12 +1239,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "专用设备制造业",
       "concepts": [
-        "工业气体",
-        "专精特新",
-        "氢能源",
+        "中芯概念",
+        "碳化硅",
         "第三代半导体",
-        "氦气概念",
-        "存储芯片"
+        "存储芯片",
+        "磷化工",
+        "工业气体"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 65.0,
@@ -1271,12 +1271,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "软件和信息技术服务业",
       "concepts": [
-        "百元股",
-        "国产芯片",
-        "人工智能",
+        "无人驾驶",
         "上海自贸",
+        "百元股",
         "数字货币",
-        "先进封装"
+        "AI眼镜",
+        "国产芯片"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 203.67,
@@ -1303,12 +1303,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "化学原料和化学制品制造业",
       "concepts": [
-        "深圳特区",
-        "深成500",
-        "DeepSeek概念",
+        "新材料",
         "机器人概念",
+        "深成500",
         "固态电池",
-        "新能源车"
+        "新能源车",
+        "创业板综"
       ],
       "enter_date": "2026-08-17",
       "stop_loss": 13.63,

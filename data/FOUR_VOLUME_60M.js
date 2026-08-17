@@ -1,5 +1,5 @@
 window.FOUR_VOLUME_60M={
- "update_time": "2026-08-18 04:37:50",
+ "update_time": "2026-08-18 04:59:16",
  "total": 7,
  "period": "60m",
  "description": "四量终极 60分钟共振信号（加分因子，独立于日线版）",
@@ -180,7 +180,7 @@ window.FOUR_VOLUME_60M={
   },
   {
    "code": "002436",
-   "name": "兴森科技",
+   "name": "凌雄科技",
    "market": "sz",
    "board_label": "主板",
    "close": 36.16,

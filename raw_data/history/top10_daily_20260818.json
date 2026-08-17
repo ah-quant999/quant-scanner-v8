@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-18 04:33:36",
+  "update_time": "2026-08-18 04:56:33",
   "total_scored": 71,
   "count_80plus": 0,
   "max_score": 39.2,
@@ -91,7 +91,7 @@
     {
       "rank": 3,
       "code": "002371",
-      "name": "创联控股",
+      "name": "北方华创",
       "market": "sz",
       "board": "主板",
       "sig_count": 3,
@@ -259,7 +259,7 @@
     {
       "rank": 7,
       "code": "002396",
-      "name": "青城新药－B",
+      "name": "星网锐捷",
       "market": "sz",
       "board": "主板",
       "sig_count": 2,
@@ -595,7 +595,7 @@
     {
       "rank": 15,
       "code": "000725",
-      "name": "恒都集团",
+      "name": "京东方A",
       "market": "sz",
       "board": "主板",
       "sig_count": 2,
