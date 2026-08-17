@@ -2350,6 +2350,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div id="ceBody"><div class="note">加载中…</div></div>
     </div>
 
+    <!-- 🎯 盘后信号聚合追踪（多策略交叉汇总，仿PDF盘后选股方法论） -->
+    <div class="card" style="margin-bottom:16px;border-left:4px solid #a78bfa;">
+      <h3><span class="ic">🎯</span>盘后信号聚合 · 强势突破追踪 <span class="fresh" id="prSigConvFresh">—</span></h3>
+      <div style="font-size:11px;color:var(--dim);margin:-4px 0 10px 0;line-height:1.5;">
+        聚合 v8 全部策略信号 → 5 类归口 → 交叉汇总。出现 ≥2 类为<strong style="color:#fbbf24">共振标的</strong>，≥3 类为<strong style="color:#f87171">高置信</strong>。商品关联标注来自涨价弹性榜。
+      </div>
+      <div id="sigConvBody"><div class="note">加载中…</div></div>
+    </div>
+
     <!-- 板块资金三合一（v6 风格移植：盘中追热 + 收盘复盘 + 中期趋势） -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">📈</span>板块资金三合一 - 盘中+盘后+趋势 · <span class="fresh" id="phSectorTime">—</span></h3>
@@ -10444,6 +10453,8 @@ function drawUpDownChart(){
     safe(renderHealthCheck);
     // 2026-08-16: 商品涨价弹性榜已从选股策略TAB移至盘后数据section，需在此处渲染
     try{ if(typeof window._fillCommodityElasticity==='function') window._fillCommodityElasticity(); }catch(e){ console.warn('商品涨价弹性榜渲染失败',e); }
+    // 2026-08-17: 盘后信号聚合追踪（多策略交叉汇总）
+    try{ if(typeof window._fillSignalConvergence==='function') window._fillSignalConvergence(); }catch(e){ console.warn('盘后信号聚合渲染失败',e); }
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initPostMarket);
   else initPostMarket();
@@ -12208,6 +12219,91 @@ function drawUpDownChart(){
     dst.innerHTML = html;
   };
 
+  // 🎯 盘后信号聚合追踪（2026-08-17：仿PDF盘后选股方法论·多策略交叉汇总）
+  window._fillSignalConvergence = function(){
+    var dst = document.getElementById('sigConvBody');
+    try{ var tm=document.getElementById('prSigConvFresh'); if(tm) tm.innerHTML = _uBadge('盘后','聚合',null); }catch(e){}
+    if(!dst) return;
+    var stockCats = {};
+    function addStock(code,name,cat,tag){
+      if(!code||code==='--'||code==='null') return;
+      var k=String(code);
+      if(!stockCats[k]) stockCats[k]={name:name||k,cats:[],tags:[],commodity:null};
+      if(stockCats[k].cats.indexOf(cat)<0) stockCats[k].cats.push(cat);
+      if(tag&&stockCats[k].tags.indexOf(tag)<0) stockCats[k].tags.push(tag);
+    }
+    var crds=window.CRDS_CARD_DATA||{}; if(crds.stocks) crds.stocks.forEach(function(s){addStock(s.code,s.name,'加速','CRDS'+(s.score>=80?'·高分':''));});
+    var gp=window.GOLD_POOL||{}; if(gp.picks) gp.picks.forEach(function(s){addStock(s.code,s.name,'短线买点','金股池');});
+    var cnd=window.CANDIDATE_DATA||{}; if(cnd.stocks) cnd.stocks.forEach(function(s){addStock(s.code,s.name,'短线买点','候选池');});
+    var tc=window.THREE_CONSENSUS||{}; if(tc.picks) tc.picks.forEach(function(s){addStock(s.code,s.name,'短线买点',s.tier?'三重'+s.tier:'三重共识');});
+    var cockpit=window.COCKPIT_TIER_RECOMMEND||{};
+    if(cockpit.A) cockpit.A.forEach(function(s){addStock(s.code,s.name,'加速','驾驶舱A');});
+    if(cockpit.B) cockpit.B.forEach(function(s){addStock(s.code,s.name,'反弹','驾驶舱B');});
+    var fv=window.FOUR_VOLUME||{}; if(fv.picks) fv.picks.forEach(function(s){addStock(s.code,s.name,'强势','四量终极');});
+    var fr=window.FINAL_RECOMMEND_DATA||{}; if(fr.recommendations) fr.recommendations.forEach(function(s){addStock(s.code,s.name,'强势','最终推荐');});
+    var hunter=window.HUNTER_DATA||{}; if(hunter.core_resonance) hunter.core_resonance.forEach(function(s){addStock(s.code,s.name,'加速','核心共振');});
+    var rps=window.RPS_DATA||{}; if(rps.top_tier) rps.top_tier.forEach(function(s){addStock(s.code,s.name,'强势','RPS-A');});
+
+    // 商品关联
+    var ce=window.COMMODITY_ELASTICITY||{}, hotCommodities=[];
+    if(ce.commodities) ce.commodities.forEach(function(c){
+      if(c.is_hot&&c.stocks){ hotCommodities.push(c.name); c.stocks.forEach(function(s){var k=String(s.code);if(stockCats[k])stockCats[k].commodity=c.name;});}
+    });
+
+    // 汇总排序
+    var allStocks=Object.keys(stockCats).map(function(k){return Object.assign({code:k},stockCats[k]);});
+    allStocks.sort(function(a,b){if(b.cats.length!==a.cats.length)return b.cats.length-a.cats.length;var o={强势:5,加速:4,短线买点:3,反弹:2,超跌反弹:1};return(Math.max(0,...b.cats.map(function(c){return o[c]||0;})))-(Math.max(0,...a.cats.map(function(c){return o[c]||0;})));});
+    var converged=allStocks.filter(function(s){return s.cats.length>=2;});
+    var singleCats=allStocks.filter(function(s){return s.cats.length===1;});
+
+    var h='', catCounts={短线买点:0,反弹:0,超跌反弹:0,加速:0,强势:0};
+    Object.keys(stockCats).forEach(function(k){stockCats[k].cats.forEach(function(c){catCounts[c]=(catCounts[c]||0)+1;});});
+
+    // 统计标签栏
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">';
+    var clrs={短线买点:'38bdf8',反弹:'22c55e',超跌反弹:'4ade80',加速:'f59e0b',强势:'f87171'};
+    Object.keys(clrs).forEach(function(c){var n=catCounts[c]||0;
+      h+='<span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:600;border:1px solid rgba('+c2r(clrs[c])+',.3);background:rgba('+c2r(clrs[c])+',.12);color:#'+clrs[c]+';">'+c+' <b>'+n+'</b></span>';});
+    h+='<span style="font-size:11px;color:var(--dim);margin-left:auto;">共 '+allStocks.length+' 只 · 交叉 '+converged.length+' 只</span></div>';
+
+    // 共振主表
+    if(converged.length>0){
+      h+='<div style="font-size:11.5px;font-weight:700;color:#fbbf24;margin:8px 0 6px;">🔥 多策略共振标的（≥2 类交叉）</div>';
+      h+='<table style="width:100%;border-collapse:collapse;font-size:11.5px;"><tr style="color:var(--dim);font-size:10.5px;">';
+      h+='<th style="text-align:left;padding:4px 6px;border-bottom:1px solid var(--border);">代码</th><th style="text-align:left;padding:4px 6px;border-bottom:1px solid var(--border);">名称</th><th style="text-align:center;padding:4px 6px;border-bottom:1px solid var(--border);">#</th><th style="text-align:left;padding:4px 6px;border-bottom:1px solid var(--border);">信号分类</th></tr>';
+      converged.forEach(function(s){
+        var hi=s.cats.length>=3, acc=(s.cats.indexOf('加速')>=0&&s.cats.indexOf('强势')>=0);
+        h+='<tr style="background:'+(hi?'rgba(248,113,113,.06)':acc?'rgba(245,158,11,.05)':'transparent')+'">';
+        h+='<td style="padding:3px 6px;font-weight:700;white-space:nowrap;">'+s.code+'</td>';
+        h+='<td style="padding:3px 6px;white-space:nowrap;">'+s.name+(s.commodity?' <span style="font-size:9px;color:#f59e0b;background:rgba(245,158,11,.10);padding:0 4px;border-radius:3px;">📦'+s.commodity+'</span>':'')+'</td>';
+        h+='<td style="text-align:center;padding:3px 6px;"><span style="display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;border-radius:50%;font-weight:800;font-size:12px;background:'+(hi?'rgba(239,68,68,.15)':acc?'rgba(245,158,11,.15)':'rgba(167,139,250,.12))+';color:'+(hi?'#f87171':acc?'#f59e0b':'#a78bfa')+';">'+s.cats.length+'</span></td>';
+        h+='<td style="padding:3px 6px;display:flex;flex-wrap:wrap;gap:3px;">';
+        s.cats.forEach(function(c){h+='<span style="font-size:10px;padding:1px 6px;border-radius:4px;white-space:nowrap;border:1px solid rgba('+c2r(clrs[c])+',.35);background:rgba('+c2r(clrs[c])+',.12);color:#'+clrs[c]+';">'+c+'</span>';});
+        if(acc) h+='<span style="font-size:9px;color:#f59e0b;font-weight:700;margin-left:4px;">⚡强势突破</span>';
+        if(hi) h+='<span style="font-size:9px;color:#f87171;font-weight:700;margin-left:4px;">★高置信</span>';
+        h+='</td></tr>';
+      });
+      h+='</table>';
+    }
+
+    // 单信号折叠
+    if(singleCats.length>0){
+      h+='<details style="margin-top:10px;"><summary style="cursor:pointer;font-size:11px;color:var(--sub);font-weight:600;padding:4px 0;">📋 单信号标的 ('+singleCats.length+' 只) <span style="font-weight:400;color:var(--dim);">— 点击展开</span></summary>';
+      h+='<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;padding:6px;background:rgba(148,163,184,.04);border-radius:6px;">';
+      singleCats.forEach(function(s){var c=s.cats[0];
+        h+='<span style="font-size:10px;padding:2px 7px;border-radius:4px;white-space:nowrap;border:1px solid rgba('+c2r(clrs[c])+',.3);background:rgba('+c2r(clrs[c])+',.12);color:#'+clrs[c]+';"><b>'+s.name+'</b> <span style="opacity:.6">'+s.code+'</span>'+(s.commodity?' 📦'+s.commodity:'')+'</span>';});
+      h+='</div></details>';
+    }
+
+    // 商品联动提示
+    if(hotCommodities.length>0){
+      h+='<div style="margin-top:10px;padding:8px 10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:6px;font-size:10.5px;color:var(--sub);line-height:1.6;">';
+      h+='<b style="color:#f59e0b;">📦 商品联动：</b>当前涨价窗口 '+hotCommodities.join('、')+' 。商品弹性标的若同时命中<strong style="color:#f59e0b">加速+强势</strong>，为「商品×动量」双驱动机会。</div>';
+    }
+    if(allStocks.length===0) h+='<div class="note">今日暂无策略信号数据（盘后算法运行后更新）</div>';
+    dst.innerHTML=h;
+  };
+  function c2r(hex){if(hex.length===3)hex=hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];return parseInt(hex.slice(0,2),16)+','+parseInt(hex.slice(2,4),16)+','+parseInt(hex.slice(4,6),16);}
 
   // 🌡️ 情绪周期定位（2026-08-14 主人令：外框阶段用实时计算取真实值，明细展开不变）
   window._fillSentimentCycle = function(){
@@ -13724,6 +13820,8 @@ window.__renderV8CalToday();
   tryRun('renderCycleLadderCard', window.__renderCycleLadderCard, 'cycle-ladder init');
   // 2026-08-16 修复：商品涨价弹性榜也在实时数据区，需在此处触发渲染（之前仅在盘后数据/选股策略>潜力参考触发）
   tryRun('fillCommodityElasticity', window._fillCommodityElasticity, 'commodity elasticity init');
+  // 2026-08-17: 盘后信号聚合追踪
+  tryRun('fillSignalConvergence', window._fillSignalConvergence, 'signal convergence init');
   // ⛓ 任何后续切到 fv/crds tab 也只是再跑一次幂等
 })();
 </script>
