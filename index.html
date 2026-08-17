@@ -10381,7 +10381,7 @@ function drawUpDownChart(){
     _sms = _smsDay || _smsRaw;
     if(_sms && _sms.date && _sms.categories){
       var _smsCats = ['短线选股','反弹','反弹01','超跌反弹','加速','强势'];
-      h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">';
+      h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%/3,220px),1fr));gap:8px;margin-bottom:10px;">';
       _smsCats.forEach(function(cat){
         var stocks = _sms.categories[cat] || [];
         if(!stocks.length) return;
@@ -10439,12 +10439,13 @@ function drawUpDownChart(){
         h+='<hr style="border:none;border-top:1px dashed rgba(168,85,247,.25);margin:12px 0;">';
         h+='<div style="font-size:13px;font-weight:700;color:#a855f7;margin-bottom:8px;">📊 入选后连续涨 & 走势特征（K线真实验证）</div>';
 
-        // ── 1. 符合概览：按时间段分组 ──
+        // ── 1. 符合概览：按时间段分组（2列并排，全展开不折叠）──
         h+='<div style="font-size:12px;font-weight:700;color:#c084fc;margin:10px 0 6px;">符合概览</div>';
+        h+='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">';
         Object.keys(_enh.periods).forEach(function(pname){
           var p = _enh.periods[pname];
           if(!p || !p.count) return;
-          h+='<div style="background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.18);border-radius:7px;padding:8px 10px;margin-bottom:8px;">';
+          h+='<div style="background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.18);border-radius:7px;padding:8px 10px;">';
           h+='<div style="font-size:12px;font-weight:700;color:#a855f7;margin-bottom:6px;">'+pname+' <span style="color:var(--dim);font-weight:400;font-size:11px">'+p.count+'只</span></div>';
 
           // 领涨股 Top 8
@@ -10460,9 +10461,9 @@ function drawUpDownChart(){
             h+=leaderParts.join('、');
             h+='</div>';
 
-            // 领涨股详细列表
-            h+='<div style="display:flex;flex-direction:column;gap:2px;max-height:180px;overflow-y:auto;">';
-            top8.forEach(function(l){
+            // 领涨股详细列表（全展开，不折叠）
+            h+='<div style="display:flex;flex-direction:column;gap:2px;">';
+            p.leaders.forEach(function(l){
               var patColor = l.pattern === '连续涨不回撤' ? '#22c55e' : (l.pattern === '强势股' ? '#f59e0b' : '#94a3b8');
               var patTag = '<span style="background:'+patColor+'15;color:'+patColor+';font-size:11px;padding:0 4px;border-radius:3px;font-weight:600;">'+l.pattern+'</span>';
               var gColor = (l.max_gain_pct||0) > 0 ? 'var(--up)' : 'var(--down)';
@@ -10479,10 +10480,10 @@ function drawUpDownChart(){
               h+='</div>';
             });
             h+='</div>';
-            if(p.leaders.length > 8) h+='<div style="color:var(--dim);font-size:12px;text-align:center;padding:2px;">... +'+(p.leaders.length-8)+' 只</div>';
           }
-          h+='</div>';  // /period card
+          h+='</div>';  // /period card (grid cell)
         });
+        h+='</div>';  // /符合概览 grid
 
         // ── 2. 归纳走势特征 ──
         if(_enh.patternStats){
@@ -10651,6 +10652,45 @@ function drawUpDownChart(){
       h+='🎯 <b>与 🚀 动量卡一起跟踪 1-2 周</b>：对照无泄漏结论是否持续有效（「超跌反弹」OCR标签 + 入选前连涨≤1 是真实信号；入选后走势字段禁作筛选条件）。每周日可由小九跑对比报告。筛选器随构建自动重算（update_v8.py run_experiment_cards → momentum_common_filter.py --emit-js）。';
       h+='</div>';
     }
+    h+='</div>';
+
+    // ── 📐 通达信选股公式（2026-08-17 接入阿狸咪 TDX 三件套）──
+    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #818cf8;">';
+    h+='<h3 style="font-size:14px;margin-bottom:8px;"><span class="ic">📐</span>通达信选股公式 <span style="font-size:10px;color:#818cf8;font-weight:400">动量三件套·手动盘后选</span></h3>';
+    h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
+    // ── 公式1：反弹选股 ──
+    h+='<div style="background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.25);border-radius:8px;padding:10px 12px;">';
+    h+='<div style="font-size:12.5px;font-weight:700;color:#3b82f6;margin-bottom:6px;">🔵 反弹选股</div>';
+    h+='<div style="font-size:11.5px;line-height:1.9;color:var(--sub);">'
+      + '<b>核心：</b>MACD零轴下 + 绿柱缩短/拐头/金叉 + ROE&gt;0 + 量不再萎缩<br>'
+      + '<b>门槛：</b>成交额 ≥10亿（可按盘面调）<br>'
+      + '<b>超跌反弹加码：</b>跌破5日线 + 10日振幅≥12%<br>'
+      + '<b style="color:#22c55e">★ 底背离（胜率加倍）：</b>价格新低 + MACD柱未新低，最严输出<br>'
+      + '<b>三档输出：</b>标准反弹 / 宽松反弹(去波动) / 底背离反弹(最严)</div>';
+    h+='</div>';
+    // ── 公式2：强势股选股 ──
+    h+='<div style="background:rgba(168,85,247,.05);border:1px solid rgba(168,85,247,.25);border-radius:8px;padding:10px 12px;">';
+    h+='<div style="font-size:12.5px;font-weight:700;color:#a855f7;margin-bottom:6px;">🟣 强势股选股</div>';
+    h+='<div style="font-size:11.5px;line-height:1.9;color:var(--sub);">'
+      + '<b>核心：</b>MACD零轴上 + 5/10/20多头排列 + 站上60日线<br>'
+      + '<b>关键信号：</b>回踩金叉（先死叉再金叉=回踩后重新向上）<br>'
+      + '<b>门槛：</b>成交额 ≥20亿 + 量能放大(&gt;5日均量×1.2)<br>'
+      + '<b>三档输出：</b>标准强势 / 严苛强势(MACD柱放大+涨幅≥3%) / 放宽强势(去60日线)</div>';
+    h+='</div>';
+    // ── 公式3：加速突破选股 ──
+    h+='<div style="background:rgba(217,70,239,.05);border:1px solid rgba(217,70,239,.25);border-radius:8px;padding:10px 12px;">';
+    h+='<div style="font-size:12.5px;font-weight:700;color:#d946ef;margin-bottom:6px;">🟪 加速突破选股</div>';
+    h+='<div style="font-size:11.5px;line-height:1.9;color:var(--sub);">'
+      + '<b>核心：</b>强势股条件 + 突破20日新高 + 量能持续放大 + 涨幅≥5%<br>'
+      + '<b>门槛：</b>成交额 ≥30亿（最高门槛，精选）<br>'
+      + '<b>突破定义：</b>收盘价≥20日最高价×99%（允许0.1%误差）<br>'
+      + '<b>放量要求：</b>近3天至少2天放量（容许单日洗盘）<br>'
+      + '<b>三档输出：</b>标准加速 / 严苛加速(突破60日+7%+) / 放宽加速(10日+3%)</div>';
+    h+='</div>';
+    h+='</div>';  // /3公式 grid
+    h+='<div style="background:rgba(129,140,248,.06);border:1px solid rgba(129,140,248,.3);border-radius:7px;padding:8px 10px;font-size:11.5px;line-height:1.7;color:var(--sub);margin-top:8px;">';
+    h+='📌 <b>用法</b>：通达信→功能→选股器→条件选股→新建，粘贴 <code style="background:rgba(129,140,248,.15);padding:1px 4px;border-radius:3px;font-size:11px;">tdx_formulas/</code> 对应 .txt 全部内容。<b>行情好放宽、行情差严苛</b>，只改顶部参数行。与上方🚀动量卡同源——反弹类T+5胜率66.2%(+3.55%)与OCR「超跌反弹」60.3%互相印证。';
+    h+='</div>';
     h+='</div>';
 
     // ── 📊 行业分布·月度对比（2026-08-16 新增：吃微信报告「连续上涨股票分析报告」结论）──
