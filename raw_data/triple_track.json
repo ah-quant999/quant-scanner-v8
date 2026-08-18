@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-18 16:01:54",
+  "update_time": "2026-08-18 18:15:09",
   "data_date": "2026-08-18",
   "track_start": "2026-08-18",
   "history_days": 2,
@@ -229,19 +229,16 @@
       "names": []
     },
     "cockpit_a": {
-      "count": 4,
-      "overlap": 2,
+      "count": 10,
+      "overlap": 1,
       "names": [
-        "北方华创",
-        "星网锐捷"
+        "北方华创"
       ]
     },
     "cockpit_b": {
       "count": 15,
-      "overlap": 1,
-      "names": [
-        "阳光电源"
-      ]
+      "overlap": 0,
+      "names": []
     }
   },
   "backtest_signal": {
