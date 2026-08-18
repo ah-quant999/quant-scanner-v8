@@ -8731,6 +8731,9 @@ function drawUpDownChart(){
 
     const todayStr = [now.getFullYear(), String(now.getMonth()+1).padStart(2,'0'), String(now.getDate()).padStart(2,'0')].join('-');
 
+    // 2026-08-19 修复：dcc699333 引入 today0_start 引用但从未定义 → renderTaskSchedule 崩溃
+    const today0_start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
     function parseTs(t){
 
       if(!t) return null;
@@ -11947,6 +11950,8 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     // 2026-08-08 一劳永逸：汇总所有非 OK 诊断到卡片底部「失败/诊断详情」
     _renderOpDiagnostics();
   }
+  // 2026-08-19 修复：renderDataFreshness 定义在本 IIFE 内，renderRunnerTrack（另一块）调用时未定义
+  window.renderDataFreshness = renderDataFreshness;
 
   function _renderOpDiagnostics(){
     var diags = [];
