@@ -74,6 +74,11 @@ DATA_SOURCES = {
     "experiment.json":             "EXPERIMENT",
     "etf_pulse.json":              "ETF_PULSE",
     "etf_daily_monitor.json":      "ETF_DAILY_MONITOR",
+    # 🛡 2026-08-18 一劳永逸式修复：原 DATA_SOURCES 缺 overseas_markets.json 映射，
+    #   update_v8 永远不生成 data/OVERSEAS_MARKETS.js，导致该卡 4 天没更新被健康巡检报 fail。
+    #   根本原因：raw_data/overseas_markets.json 由 cloud_fetch_v8.py 抓（line 116 注册 intraday），
+    #   但 update_v8 转换层漏挂，data/*.js 永远停在 8/14 旧版本。
+    "overseas_markets.json":       "OVERSEAS_MARKETS",
     "v8_cal.json":                 "V8_CAL",
     "candidate_quotes.json":       "CANDIDATE_QUOTES",
     "sh_sz_history.json":         "SH_SZ_HISTORY",
@@ -86,6 +91,9 @@ DATA_SOURCES = {
     "algo_track.json":              "ALGO_TRACK",   # 2026-08-15 三算法独立追踪（四量终极/板块龙头/大牛股猎手）
     "weekend_meta_report.json":      "WEEKEND_META_REPORT",
     "delisted_stocks.json":        "DELISTED_STOCKS",
+    # 🛡 2026-08-18 一劳永逸式修复：补入 weekend_run.json → WEEKEND_RUN 映射
+    #   原 update_v8 漏挂此映射 → data/WEEKEND_RUN.js 永远不被重新生成 → 健康巡检永远 warn
+    "weekend_run.json":            "WEEKEND_RUN",
 }
 
 # 变量名 → 更新时段

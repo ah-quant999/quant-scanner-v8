@@ -171,3 +171,15 @@ jobs:
         shell: powershell
         run: |
           python api_push_raw.py
+
+      # 🛡 2026-08-18 一劳永逸式修复：抓完 raw_data 立即跑 update_v8 + health_check
+      #   防止 raw_data 新了但 data/*.js 仍是昨日旧值（10 fail 假陈旧根因）
+      - name: "🔄 重生成 data/*.js (update_v8)"
+        shell: powershell
+        run: |
+          python update_v8.py
+
+      - name: "🩺 刷新 HEALTH_CHECK.js (v8_health_check)"
+        shell: powershell
+        run: |
+          python v8_health_check.py

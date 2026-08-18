@@ -190,6 +190,20 @@ jobs:
         run: |
           python api_push_raw.py
 
+      # 🛡 2026-08-18 一劳永逸式修复：抓完 raw_data 之后立即跑 update_v8.py 重新生成 data/*.js，
+      #   并跑 v8_health_check.py 刷新 HEALTH_CHECK.js——否则 raw_data 新了但 data/*.js 还是昨日
+      #   旧值，前端健康巡检就会报一堆「假陈旧 X」（主人怒令 2026-08-18 08:30 看到的 10 fail
+      #   根因就是缺这两步）。把诊断 + 自愈 + 重新发布 全部在一个 workflow 内闭环完成。
+      - name: "🔄 重生成 data/*.js (update_v8)"
+        shell: bash
+        run: |
+          python update_v8.py
+
+      - name: "🩺 刷新 HEALTH_CHECK.js (v8_health_check)"
+        shell: bash
+        run: |
+          python v8_health_check.py
+
       - name: "🛰️ 云端兜底调度（算法链/温度计，幂等）"
         if: success()
         continue-on-error: true

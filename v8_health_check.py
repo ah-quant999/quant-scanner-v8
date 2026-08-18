@@ -1055,10 +1055,13 @@ _WINDOW_VAR_ALIASES = {
 #   CONCEPT_ETF_MAP 概念ETF静态映射（研究参考） / OPTIMIZED_STRATEGY 优化策略（回测产物）
 #   BACKTEST_TDX 回测结果（参数变更才重跑） / BLOAT_CHECK 体积检查（build 时） / HEALTH_CHECK 本检查自产
 #   RUNNER_STATUS_HEALTH runner 心跳（1 分钟级自愈，另有专门检查）
+# 🛡 2026-08-18 一劳永逸补入：
+#   WEEKEND_RUN 周度运行汇总（周末/月初自动跑，工作日基本无变化）→ 加入白名单避免误报 warn
 _LOW_FREQ_FILES = {
     "STOCK_PROFILE", "WEEKEND_META_REPORT", "PORTFOLIO", "PORTFOLIO_COST",
     "CONCEPT_ETF_MAP", "OPTIMIZED_STRATEGY", "BACKTEST_TDX", "BLOAT_CHECK",
     "HEALTH_CHECK", "RUNNER_STATUS_HEALTH",
+    "WEEKEND_RUN",
 }
 def check_all_data_files():
     """全量审计 data/*.js：已登记 CARD_DEFS 的跳过（check_data_cards 管），其余全部按通用规则查。
@@ -1111,8 +1114,22 @@ def check_all_data_files():
             ts = (meta.get("generated") or meta.get("update_time") or meta.get("updated")
                   or data.get("data_date") or data.get("updated_at") or "--")
         dt = parse_time(ts) if isinstance(ts, str) else None
+        # 🛡 2026-08-18 一劳永逸式修复：把 _LOW_FREQ_FILES 判断前移到「无时间戳」分支之前。
+        #   原 line 1114 `if dt is None: warn + continue` 永远先 return，
+        #   _LOW_FREQ_FILES（line 1124）根本走不到 → BACKTEST_TDX/OPTIMIZED_STRATEGY/
+        #   PORTFOLIO_COST/RUNNER_STATUS_HEALTH/WEEKEND_RUN 5 张低频卡 100% 误报 warn。
+        #   正确顺序：先看是否低频白名单 → 友好 OK；不在白名单才走时间戳 warn。
+        if vid in _LOW_FREQ_FILES:
+            rel = str(ts)[:19] if ts and ts != "--" else "—"
+            results.append({
+                "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
+                "status": "ok", "last_update": rel, "age_min": None,
+                "heal_cat": "algo_run",
+                "message": f"{p.name} 低频/手动维护文件（白名单内，无时间戳属正常，{p.stat().st_size//1024}KB）",
+            })
+            continue
         if dt is None:
-            # 有数据但无时间戳：无法判龄 → warn（不 fail，避免误报）
+            # 有数据但无时间戳且不在 _LOW_FREQ_FILES：无法判龄 → warn（不 fail，避免误报）
             results.append({
                 "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
                 "status": "warn", "last_update": str(ts)[:16], "age_min": None,
@@ -1121,24 +1138,18 @@ def check_all_data_files():
             })
             continue
         age_min = (now_cst() - dt).total_seconds() / 60
-        if vid in _LOW_FREQ_FILES:
-            # 低频文件：24h 红线不适用，但 7 天未动仍 warn
-            cap = 7 * 24 * 60
-            status = "warn" if age_min > cap else "ok"
-            rel = fmt_rel_time(str(ts)[:19])
-            msg = f"{p.name} 更新于 {rel}（低频数据，7 天红线）"
-        else:
-            cap = _hard_cap_for_owner_rule()
-            # 已登记 CARD_DEFS 的卡在 check_data_cards 用 d.max_age 判定；未知卡统一走 24h/T+1 红线
-            status = "ok" if age_min <= cap else "fail"
-            rel = fmt_rel_time(str(ts)[:19])
-            msg = f"{p.name} 更新于 {rel}"
-            if status == "fail":
-                msg += f"；超过通用红线 {cap} 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
-            # 空内容检测（不把空 list 当错误，弱市合法）
-            elif isinstance(data, dict) and not data:
-                status = "warn"
-                msg += "；内容为空 dict"
+        # 此时 vid 已知 dt 不为 None，_LOW_FREQ_FILES 在上面已 continue 排除
+        cap = _hard_cap_for_owner_rule()
+        # 已登记 CARD_DEFS 的卡在 check_data_cards 用 d.max_age 判定；未知卡统一走 24h/T+1 红线
+        status = "ok" if age_min <= cap else "fail"
+        rel = fmt_rel_time(str(ts)[:19])
+        msg = f"{p.name} 更新于 {rel}"
+        if status == "fail":
+            msg += f"；超过通用红线 {cap} 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+        # 空内容检测（不把空 list 当错误，弱市合法）
+        elif isinstance(data, dict) and not data:
+            status = "warn"
+            msg += "；内容为空 dict"
         results.append({
             "id": f"all_{vid}", "name": vid, "page": "全量数据", "freq": "—",
             "status": status, "last_update": str(ts)[:19], "age_min": round(age_min, 1),

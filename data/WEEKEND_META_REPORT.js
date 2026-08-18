@@ -1,1 +1,1 @@
-window.WEEKEND_META_REPORT = {"update_time":"2026-08-09 16:39:46","total":5205,"new_listings_count":0,"delisted_count":0,"new_listings":[],"delisted":[],"meta_enriched":0,"republish_time":"2026-08-17 21:51:47"};
+window.WEEKEND_META_REPORT = {"update_time":"2026-08-18 08:43:04","total":6786,"new_listings_count":1,"delisted_count":0,"new_listings":["688826 频准激光"],"delisted":[],"meta_enriched":1,"republish_time":"2026-08-18 08:43:07"};
