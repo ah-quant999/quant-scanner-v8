@@ -1707,16 +1707,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         </div>
       </div>
 
-      <!-- Block 3: 日监控·主力净流入 (底, T+1·盘后专享) -->
-      <div class="sf-block sf-block-trend">
-        <div class="sf-block-title"><span class="sf-block-icon">📊</span>日监控·主力净流入 <span style="font-size:10px;color:var(--dim);font-weight:600">T+1·盘后专享（盘前/盘中不出）</span></div>
-        <div id="etfDailyBlock"><div class="ipo-empty">加载中…</div></div>
-      </div>
-      <div class="note">盘中异动=ETF 5 分钟量能脉冲异动；资金热度=宽基 ETF 净申赎份额趋势；日监控=全市场 ETF 当日主力净流入排名（需盘后 T+1 更新）。三者维度互补，不构成重复。</div>
-
-      <!-- 📊 主力净额分时累计曲线（盘中分时 + 盘后定基合并成一条线，2026-08-18 主人令：放到 ETF 三合一 与上方主力日监控联动） -->
+      <!-- 📊 主力净额分时累计曲线（盘中分时 + 盘后定基合并成一条线，2026-08-18 主人令：放到 ETF 三合一 Block 3 上方 与下方主力日监控 T+0 联动） -->
       <div class="card" style="margin-bottom:16px">
-        <h3><span class="ic">📈</span>主力净额分时累计曲线 - 盘中每30分快照 · <span class="fresh" id="sfIntradayTime">—</span> <span style="font-size:10px;color:#a78bfa;font-weight:600">↕ 与上方主力日监控 T+1 联动</span></h3>
+        <h3><span class="ic">📈</span>主力净额分时累计曲线 - 盘中每30分快照 · <span class="fresh" id="sfIntradayTime">—</span> <span style="font-size:10px;color:#a78bfa;font-weight:600">↕ 与下方主力日监控 T+0 联动</span></h3>
         <div style="font-size:11px;color:var(--dim);margin:-4px 0 10px 0;line-height:1.5;">
           📌 <b>实时数据源</b> SECTOR_FUND_FLOW_INTRADAY（cn_fetch 每30分钟快照 Top15流入+Top5流出）。
           盘前清空、盘中累积、盘后自然定基——一段连续 time-series 即完整曲线。
@@ -1724,7 +1717,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         </div>
         <div id="sfIntradayChart" style="width:100%;height:420px;"><div class="ipo-empty">加载中…</div></div>
       </div>
-    </div>
+
+      <!-- Block 3: 日监控·主力净流入 (底, T+0·盘后定基) -->
+      <div class="sf-block sf-block-trend">
+        <div class="sf-block-title"><span class="sf-block-icon">📊</span>日监控·主力净流入 <span style="font-size:10px;color:var(--dim);font-weight:600">T+0·盘后定基（盘前空·盘中累积·15:10/15:30 定基）</span></div>
+        <div id="etfDailyBlock"><div class="ipo-empty">加载中…</div></div>
+      </div>
+      <div class="note">盘中异动=ETF 5 分钟量能脉冲异动；资金热度=宽基 ETF 净申赎份额趋势；日监控=全市场 ETF 当日主力净流入排名（盘后定基）。三者维度互补，不构成重复。</div>
+
+          </div>
 
     <!-- 概念资金热力图 · 大小=净流入 · 颜色=涨跌 -->
     <div class="card" style="margin-bottom:16px">
@@ -2369,88 +2370,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
     </div>
 
-    <!-- 📊 主力净额分时累计曲线 已迁至 ETF 三合一 Block 3 下方（与主力日监控 T+1 联动），此处删除避免重复 -->
-
-    <!-- 📌 概念/行业 → ETF·龙头 参考（仅研究参考，不构成投资建议）— 2026-08-18 主人令放回「实时数据」TAB -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📌</span>概念/行业 → ETF·龙头 参考<span class="fresh" id="etfMapTime">—</span></h3>
-      <div style="font-size:11px;color:var(--dim);margin:-4px 0 10px 0;line-height:1.5;">⚠️ 仅根据当前热点板块列出代表性 ETF 与龙头股，<b style="color:#fbbf24">不构成任何投资建议，请勿直接跟买</b>。ETF/个股以交易所最新公告为准。</div>
-      <div id="etfMapBody"><div class="ipo-empty">加载中…</div></div>
-    </div>
-
-    <!-- 概念资金热力图 · 大小=净流入 · 颜色=涨跌 -->
-      function renderEtfMap(){
-        var cEl=$('etfMapBody');
-        var tEl=$('etfMapTime');
-        if(!cEl) return;
-        var cr=window.CONCEPT_RANKING||{};
-        var sff=window.SECTOR_FUND_FLOW||{};
-        // 数据源时间戳（取最新的）
-        var crTime = (cr.update_time || '');
-        var sffTime = (sff.update_time || '');
-        var latestTime = crTime && sffTime ? ((crTime>sffTime)?crTime:sffTime) : (crTime||sffTime);
-        // 空壳/无数据检测
-        var hasCrData = cr.items && cr.items.length;
-        var hasSffData = sff.sectors_in && sff.sectors_in.length;
-        if(!hasCrData && !hasSffData){
-          var ut = latestTime || '未知';
-          var age = typeof _dataAge==='function'?_dataAge(ut):null;
-          var ageColor = age && age.hours > 48 ? 'var(--down)' : (age && age.hours > 24 ? '#f59e0b' : 'var(--sub)');
-          var ageTxt = age ? (age.hours<1?'刚刚':age.hours<24?age.hours+'小时前':Math.floor(age.hours/24)+'天前') : '';
-          cEl.innerHTML='<div style="padding:12px;">'+
-            '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'+
-            '<span style="font-size:18px;">⚠️</span>'+
-            '<span style="font-weight:700;color:#fbbf24;font-size:14px;">热点板块数据暂不可用</span>'+
-            '</div>'+
-            '<div style="font-size:12px;color:var(--dim);line-height:1.7;margin-left:26px;">'+
-            '<div>原因：概念排名(CONCEPT_RANKING)和行业资金流(SECTOR_FUND_FLOW)均无数据</div>'+
-            '<div>最后更新：<b style="color:'+ageColor+'">'+ut.slice(5,16)+'</b> ('+ageTxt+')</div>'+
-            '<div style="color:#f59e0b;margin-top:4px;">🔶 ETF映射和龙头股参考无法生成</div>'+
-            '</div></div>';
-          if(tEl) tEl.innerHTML = _uBadge('异常','短线',latestTime||'—');
-          return;
-        }
-        // 有数据时显示时间戳
-        if(tEl && latestTime) tEl.innerHTML = _uBadge('盘中','短线',latestTime);
-        var rows=[];
-        (cr.items||[]).slice().sort(function(a,b){ return (b.net||0)-(a.net||0); }).slice(0,8).forEach(function(it){
-          rows.push({ name:it.name, net:it.net, chg:it.chg, type:'概念', map:lookup(it.name) });
-        });
-        var seen={};
-        (sff.sectors_in||[]).filter(function(s){ return s.type==='行业'; }).slice(0,6).forEach(function(s){
-          if(seen[s.name]) return; seen[s.name]=1;
-          rows.push({ name:s.name, net:s.net, chg:s.chg, type:'行业', map:lookup(s.name) });
-        });
-        if(!rows.length){
-          cEl.innerHTML='<div class="ipo-empty">暂无热点板块数据</div>';
-          return;
-        }
-        var h='<div style="display:flex;flex-direction:column;gap:8px;">';
-        rows.forEach(function(r){
-          var netCol = (r.net||0)>=0 ? 'var(--up)' : 'var(--down)';
-          h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);font-size:13px;flex-wrap:wrap;">';
-          h+='  <span style="font-weight:700;color:var(--txt);min-width:96px;">'+r.name+'</span>';
-          h+='  <span style="color:'+netCol+';font-weight:700;min-width:78px;">'+((r.net>=0?'+':'')+(r.net||0).toFixed(2)+'亿')+'</span>';
-          if(r.map && r.map.etf){
-            h+='  <span style="color:var(--cyan);font-weight:600;">🎯 '+r.map.etf.code+' '+r.map.etf.name+'</span>';
-          } else {
-            h+='  <span style="color:var(--dim);">🎯 ETF暂无映射</span>';
-          }
-          if(r.map && r.map.leaders && r.map.leaders.length){
-            h+='  <span style="color:var(--sub);">龙头：'+r.map.leaders.map(function(l){ return l.code+' '+l.name; }).join(' / ')+'</span>';
-          }
-          h+='</div>';
-        });
-        h+='</div>';
-        cEl.innerHTML=h;
-        var tEl=$('etfMapTime');
-        if(tEl) tEl.innerHTML = cr.update_time || sff.update_time || '—';
-      }
-      if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', renderEtfMap);
-      else renderEtfMap();
-    })();
-    </script>
-
+    
     <!-- 已下架：资金流时间轴（2026-08-16 主人令） -->
 
     <!-- 已下架：宏观观测（2026-08-16 主人令） -->
