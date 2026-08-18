@@ -258,6 +258,12 @@ def main():
             print(f"  ⚠️ 跳过（解析失败）: {v6_name}")
             continue
         obj = _add_timestamp(obj)
+        # 2026-08-18 补：sector_rs.json 兜底注入 data_date（板块周期卡比对锚点）
+        if v8_name == "sector_rs.json" and isinstance(obj, dict):
+            if not obj.get("data_date"):
+                ut = obj.get("update_time") or ""
+                obj["data_date"] = ut[:10] if len(ut) >= 10 else now_cst().strftime("%Y-%m-%d")
+                print(f"  [fix] sector_rs.json 兜底注入 data_date={obj['data_date']}")
         _save_json(Path(RAW) / v8_name, obj)
         promoted += 1
         print(f"  ✅ {v6_name} -> raw_data/{v8_name}")

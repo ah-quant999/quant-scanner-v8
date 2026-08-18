@@ -301,7 +301,7 @@ def main():
     # ===== 全部失败: 写入空结构 =====
     empty_lists = {f"strong_{k}": [] for k, _ in WINDOWS}
     empty_lists.update({f"strong_relative_{k}": [] for k, _ in WINDOWS})
-    result = {"update_time": now_str, "data_available": False, "sectors": [], "weak_5d": [], "anti_drop": [],
+    result = {"update_time": now_str, "data_date": now_str[:10], "data_available": False, "sectors": [], "weak_5d": [], "anti_drop": [],
               "index": {}, **empty_lists}
     with open(OUT, 'w', encoding='utf-8') as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
@@ -327,6 +327,7 @@ def _build_result(sectors, benchmark, now_str, source="unknown"):
 
     result = {
         "update_time": now_str,
+        "data_date": now_str[:10],   # 2026-08-18 补：板块周期卡比对锚点
         "data_available": True,
         "source": source,
         "sectors": sectors,

@@ -434,14 +434,14 @@ window.__domReadyFns=[];
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
 <script src="data/CONCEPT_RANKING.js?v=1ac4a3e235" defer></script>
 <script src="data/INDEX_QUOTES.js?v=dbefa7f15e" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=979bf447e0" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=0f08775ee7" defer></script>
 <script src="data/MARGIN_DATA.js?v=9f981fbfd8" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=471fcf257c" defer></script>
 <script src="data/IPO_DATA.js?v=fe6f3d254a" defer></script>
     <script src="data/CRISIS_DATA.js?v=f3dce7b96e" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=6d19487bf7" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=828af30552" defer></script>
-    <script src="data/STOCK_RPS.js?v=ed90bfb776" defer></script>
+    <script src="data/STOCK_RPS.js?v=bd89e95759" defer></script>
     <script src="data/AVG_PRICE_DATA.js?v=8a220b02c2" defer></script>
     <script src="data/CONCEPT_ETF_MAP.js?v=572e8965fb" defer></script>
     <script src="data/PORTFOLIO_COST.js?v=6c6515f693" defer></script>
@@ -1208,8 +1208,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/V8_CAL.js?v=41792aa0de"></script>
 <script src="data/SH_FIB.js?v=c9e04bdc38" defer></script>
 <script src="data/SZ_FIB.js?v=9aae138662" defer></script>
-<script src="data/SECTOR_RS.js?v=ef3e864189" defer></script>
-<script src="data/SECTOR_PHASE_HISTORY.js?v=27366d6ec0" defer></script>
+<script src="data/SECTOR_RS.js?v=ad2989cc60" defer></script>
+<script src="data/SECTOR_PHASE_HISTORY.js?v=69b93e59a5" defer></script>
 <script src="data/INST_TRADE.js?v=18c78bf3a7" defer></script>
 <script src="data/NORTH_FUND.js?v=71183dfbb2" defer></script>
 <script src="data/MARKET_ALERTS.js?v=46e62a9819" defer></script>
@@ -1222,15 +1222,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_SZ_HISTORY.js?v=624e434e31" defer></script>
 <script src="data/MAHORO.js?v=708f8ec817" defer></script>
 <script src="data/CANDIDATE.js?v=0348347ddc" defer></script>
-    <script src="data/FOUR_VOLUME.js?v=dcffefe3cc" defer></script>
-    <script src="data/FOUR_VOLUME_60M.js?v=00a5ab8f13" defer></script>
-    <script src="data/STOCK_STOP_DATA.js?v=1df154bc79" defer></script>
+    <script src="data/FOUR_VOLUME.js?v=5a51eb75bd" defer></script>
+    <script src="data/FOUR_VOLUME_60M.js?v=3bd1f2bb73" defer></script>
+    <script src="data/STOCK_STOP_DATA.js?v=33fada33ff" defer></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=da66715a7c" defer></script>
 <script src="data/COCKPIT_BACKTEST.js?v=718d599e0b" defer></script>
 <script src="data/BACKTEST_TDX.js?v=5fcc5b6962" defer></script>
 <script src="data/OPTIMIZED_STRATEGY.js?v=584d55096f" defer></script>
 <script src="data/EXPERIMENT.js?v=464754e619" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=5b036b644e" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=50371552d9" defer></script>
 <script src="data/TOP5_TRACK.js?v=1f7c0510fa" defer></script>
 <script src="data/ALGO_TRACK.js?v=05f841df22" defer></script>
 <script src="data/ETF_PULSE.js?v=8f9ac19b55" defer></script>
@@ -1240,10 +1240,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/W52_HIGH.js?v=3eddfeab46" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=46665cf3e0" defer></script>
 <script src="data/RUNNER_STATUS.js?v=2e764de448" defer></script>
-<script src="data/HEALTH_CHECK.js?v=528c20d05c" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=7526864253" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=6bed673d70" defer></script>
-    <script src="data/POTENTIAL_PICKS.js?v=296a737f1f" defer></script>
+<script src="data/HEALTH_CHECK.js?v=a62337fd16" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=a3c6c8dc5d" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=bace030957" defer></script>
+    <script src="data/POTENTIAL_PICKS.js?v=6dbf9197b6" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE.js?v=f135754004" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=0dcbab52a2" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=9c5aef89a0" defer></script>
@@ -2356,6 +2356,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div class="sf-block-title"><span class="sf-block-icon">🔄</span>板块周期</div>
         <div id="sfBlock3"><div class="ipo-empty">加载中…</div></div>
       </div>
+    </div>
+
+    <!-- 📊 主力净额分时累计曲线（盘中分时 + 盘后定基合并成一条线，2026-08-18 加） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📈</span>主力净额分时累计曲线 - 盘中每30分快照 · <span class="fresh" id="sfIntradayTime">—</span></h3>
+      <div style="font-size:11px;color:var(--dim);margin:-4px 0 10px 0;line-height:1.5;">
+        📌 <b>实时数据源</b> SECTOR_FUND_FLOW_INTRADAY（cn_fetch 每30分钟快照 Top15流入+Top5流出）。
+        盘前清空、盘中累积、盘后自然定基——一段连续 time-series 即完整曲线。
+        <b style="color:#f59e0b">不依赖高频 tick</b>，调度与你"不要太频繁"偏好一致。
+      </div>
+      <div id="sfIntradayChart" style="width:100%;height:420px;"><div class="ipo-empty">加载中…</div></div>
     </div>
 
     <!-- 📌 概念/行业 → ETF·龙头 参考（仅研究参考，不构成投资建议）—— 2026-08-18 主人令迁至「暂未上架 > 调试专区」，此处保留隐藏源容器供克隆渲染 -->
@@ -7631,6 +7642,93 @@ window.__renderV8CalFull();
     setBadge('phSectorTime','盘后','短线',d.update_time);
   }
 
+  /* ---- 主力净额分时累计曲线（盘中分时 + 盘后定基合并成一条线，2026-08-18 加） ---- */
+  // 解析 SECTOR_FUND_FLOW_INTRADAY.snapshots 为 ECharts 多板块折线
+  // 每个快照存 Top15 流入 + Top5 流出；同一板块在不同快照里的 net 累积成连续折线
+  // 板块级（数据源已有）；个股级需另加源（push2detail 主力净额分时），后续单独做
+  var _SF_INTRADAY_CHART = null;
+  function renderSfIntradayChart(){
+    var dom=$('sfIntradayChart');
+    if(!dom) return;
+    var d=window.SECTOR_FUND_FLOW_INTRADAY;
+    if(!d || !d.snapshots || d.snapshots.length<2){
+      dom.innerHTML='<div class="ipo-empty">📭 暂无盘中分时数据（盘中每30分快照，盘前自动清空）</div>';
+      var tEl=$('sfIntradayTime'); if(tEl) tEl.innerHTML='—';
+      return;
+    }
+    var snaps=d.snapshots;
+    // 收集所有出现过的板块名（流入+流出合并，按累计绝对值选 Top15 画线，避免 20 条线过密）
+    var acc={};
+    snaps.forEach(function(s){
+      s.sectors_in.concat(s.sectors_out).forEach(function(x){
+        if(!acc[x.name]) acc[x.name]=0;
+        acc[x.name]+=Math.abs(x.net||0);
+      });
+    });
+    var ranked=Object.keys(acc).map(function(k){return {name:k,abs:acc[k]};}).sort(function(a,b){return b.abs-a.abs;});
+    // 选 Top12 流入 + Top5 流出，但合计不超过 20 条
+    var picked=new Set();
+    ranked.filter(function(_,i){return i<12;}).forEach(function(r){picked.add(r.name);});
+    ranked.filter(function(r){return !picked.has(r.name);}).slice(0,8).forEach(function(r){picked.add(r.name);});
+    var lines=Array.from(picked).slice(0,20);
+
+    var xData=snaps.map(function(s){return s.time;});
+    var series=lines.map(function(name){
+      var data=snaps.map(function(s){
+        var hit=s.sectors_in.concat(s.sectors_out).find(function(x){return x.name===name;});
+        return hit?(hit.net||0):null;
+      });
+      // 流入板块红色、流出板块绿色，与 UI 偏好一致
+      var isOut=(data[data.length-1]||0)<0;
+      var color=isOut?'#10b981':'#ef4444';
+      return {
+        name:name, type:'line', smooth:true, data:data, showSymbol:false,
+        lineStyle:{width:1.4, color:color},
+        itemStyle:{color:color},
+        emphasis:{focus:'series', lineStyle:{width:2.5}},
+        connectNulls:true
+      };
+    });
+    // 副轴：上证指数涨跌幅（虚线）
+    var idxData=snaps.map(function(s){return s.index_chg||0;});
+    var idxSeries={name:'上证涨跌幅(%)',type:'line',yAxisIndex:1,data:idxData,smooth:true,
+      showSymbol:false,lineStyle:{width:1,type:'dashed',color:'#94a3b8'},
+      tooltip:{valueFormatter:function(v){return (v>=0?'+':'')+v.toFixed(2)+'%';}}};
+
+    if(_SF_INTRADAY_CHART) _SF_INTRADAY_CHART.dispose();
+    _SF_INTRADAY_CHART=echarts.init(dom, null, {renderer:'canvas'});
+    _SF_INTRADAY_CHART.setOption({
+      title:[{text:'主力净额分时累计曲线（板块 Top12流入+Top8流出，红涨绿跌）',left:'center',top:0,
+              textStyle:{fontSize:12,color:'#94a3b8'}},
+             {text:'快照: '+snaps.length+' 个｜'+snaps[0].time+' → '+snaps[snaps.length-1].time,right:'right',top:0,
+              textStyle:{fontSize:11,color:'#64748b'}}],
+      tooltip:{trigger:'axis', axisPointer:{type:'cross'}, backgroundColor:'rgba(15,23,42,.92)',
+               borderColor:'#334155', textStyle:{color:'#e2e8f0'},
+               valueFormatter:function(v){return (v!=null?(v>=0?'+':'')+v.toFixed(1)+'亿':'-');}},
+      legend:{type:'scroll', top:25, data:lines.concat(['上证涨跌幅(%)']),
+              textStyle:{fontSize:11,color:'#cbd5e1'}},
+      grid:{top:80, left:65, right:65, bottom:50},
+      xAxis:{type:'category', data:xData, boundaryGap:false,
+             axisLine:{lineStyle:{color:'#475569'}}, axisLabel:{color:'#94a3b8', fontSize:11}},
+      yAxis:[{type:'value', name:'累计净额（亿）', nameTextStyle:{color:'#94a3b8'},
+              axisLine:{lineStyle:{color:'#475569'}}, splitLine:{lineStyle:{color:'#1e293b'}},
+              axisLabel:{color:'#94a3b8', formatter:function(v){return v>=0?'+'+v:v;}}},
+             {type:'value', name:'指数 %', position:'right',
+              axisLine:{lineStyle:{color:'#475569'}}, splitLine:{show:false},
+              axisLabel:{color:'#94a3b8', formatter:function(v){return (v>=0?'+':'')+v+'%';}}}],
+      dataZoom:[{type:'inside', start:0, end:100}, {type:'slider', height:18, bottom:8,
+                 fillerColor:'rgba(56,189,248,.15)', borderColor:'#334155',
+                 textStyle:{color:'#94a3b8'}}],
+      series:series.concat([idxSeries])
+    });
+    var tEl=$('sfIntradayTime');
+    if(tEl) tEl.innerHTML=_uBadge('盘中','短线',snaps[snaps.length-1].time+'（共 '+snaps.length+' 快照）');
+    // 注册到 _secPhCharts（已存在，专用于 sec-ph 内的 ECharts 在 tab 切换时自动 resize）
+    // 同时保留 __MFF_RESIZE_HANDLERS 兼容（防御性）
+    if(window._secPhCharts) window._secPhCharts.push(_SF_INTRADAY_CHART);
+    if(window.__MFF_RESIZE_HANDLERS) window.__MFF_RESIZE_HANDLERS.push(function(){_SF_INTRADAY_CHART&&_SF_INTRADAY_CHART.resize();});
+  }
+
   /* ---- ETF 资金热度（4 大类 TOP5流入+TOP5流出，横向 bar） ---- */
   function renderEtfHeatByCategory(etfHeat){
     const el0=$('etfHeatSummary'), el1=$('etfHeatByCat');
@@ -9047,6 +9145,8 @@ function drawUpDownChart(){
       base._rs_sectors = (srs && srs.sectors) || [];
       safe(renderSector, base);
     })();
+    // 2026-08-18 主人令：主力净额分时累计曲线（盘中分时+盘后定基合并）
+    safe(renderSfIntradayChart, window.SECTOR_FUND_FLOW_INTRADAY || {});
     // 已下架：safe(renderMacro, window.MACRO_DATA || {});
     safe(renderRunnerTrack, window.RUNNER_STATUS || {});
     safe(renderTaskSchedule);
@@ -12863,7 +12963,7 @@ window.__renderV8CalToday();
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=8886e50808'},
     {name:'STOCK_PROFILE', url:'data/STOCK_PROFILE.js?v=f23feb0264'},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=19b70e6700'},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=8e506c9c9b'},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=2ea54aef31'}
   ];
   function loadOne(item, done){
