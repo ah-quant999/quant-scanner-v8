@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-19 04:49:57",
-  "data_time": "2026-08-19 04:46:23",
+  "update_time": "2026-08-19 05:31:43",
+  "data_time": "2026-08-19 05:28:24",
   "count": 1,
   "near_miss_count": 6,
   "criteria": "主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)）· 驾驶舱A档 · 基本面A档",
@@ -196,7 +196,7 @@
     },
     {
       "code": "002371",
-      "name": "北方华创",
+      "name": "创联控股",
       "market": "sz",
       "board": "主板",
       "total_score": 34.8,
