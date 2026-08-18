@@ -5653,8 +5653,14 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
     </div>
 
     <!-- === v6备忘录（逻辑详解页最右侧子tab，仅管理员可见） === -->
-    <div class="lg-pane" id="lg-v6">
-      <iframe src="v6_memo.html?v=88f66b73cb" style="width:100%;height:calc(100vh - 180px);border:none;border-radius:14px;background:#f5f7fa;" id="v6MemoFrame"></iframe>
+    <div class="lg-pane" id="lg-v6" style="position:relative;">
+      <iframe src="v6_memo.html?v=5833f12a5f" style="width:100%;height:calc(100vh - 180px);border:none;border-radius:14px;background:#f5f7fa;" id="v6MemoFrame" onload="window.__v6MemoLoaded && window.__v6MemoLoaded()"></iframe>
+      <div id="v6MemoStatus" style="position:absolute;top:12px;right:16px;padding:5px 10px;border-radius:8px;font-size:12px;font-weight:600;background:rgba(13,20,35,.75);color:#38bdf8;border:1px solid rgba(56,189,248,.3);z-index:10;pointer-events:none;display:none;">加载中…</div>
+      <div id="v6MemoError" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:var(--bg);border-radius:14px;z-index:20;text-align:center;padding:24px;">
+        <div style="font-size:18px;font-weight:700;color:#f87171;">⚠️ v6 备忘录加载失败</div>
+        <div style="font-size:13px;color:var(--sub);max-width:420px;line-height:1.8;">iframe 嵌入可能因浏览器隐私策略或缓存未刷新导致空白。<br>可点击下方按钮在新标签页直接打开。</div>
+        <a href="v6_memo.html?v=5833f12a5f" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:10px;background:#38bdf8;color:#0a0e17;font-size:14px;font-weight:700;text-decoration:none;">📦 直接打开 v6 备忘录</a>
+      </div>
     </div>
   </section>
 
@@ -12244,19 +12250,52 @@ function switchLg(id,el){
   if(pane) pane.classList.add('active');
   if(el) el.classList.add('active');
   if(id==='v6'){
-    setTimeout(function(){
-      var d=document.getElementById('v6MemoFrame');
-      var err=document.getElementById('v6MemoError');
-      if(!d||!err) return;
+    var d=document.getElementById('v6MemoFrame');
+    var err=document.getElementById('v6MemoError');
+    var st=document.getElementById('v6MemoStatus');
+    if(d&&err){
+      err.style.display='none';
+      // 2026-08-18 修复：iframe 父元素默认 display:none，某些浏览器不会及时初始化；
+      // 切到 v6 tab 时若 src 未变或缓存异常，强制重载一次保证内容真正加载。
       try{
-        if(d.contentWindow&&d.contentWindow.document&&d.contentWindow.document.body){
-          var h=d.contentWindow.document.body.scrollHeight;
-          if(h>=200){ err.style.display='none'; var s=document.getElementById('v6MemoStatus'); if(s) s.innerHTML='✅ v6 备忘录已加载 ('+h+'px)'; }
+        var src = d.getAttribute('src') || '';
+        if(src.indexOf('?')>-1 && !d.__v6Reloaded){
+          d.__v6Reloaded = true;
+          d.src = src;
         }
       }catch(e){}
-    },500);
+    }
+    if(st){
+      st.style.display='inline-flex';
+      st.innerHTML='📦 v6 备忘录加载中…';
+    }
+    // 3 秒后兜底检测：若未收到子页 ready/未触发 onload，则显示直接打开按钮
+    clearTimeout(window.__v6MemoCheckT);
+    window.__v6MemoCheckT = setTimeout(function(){
+      if(!window.__v6MemoReady){
+        if(err) err.style.display='flex';
+        if(st) st.style.display='none';
+      }
+    }, 3500);
   }
 }
+
+// v6 备忘录加载完成回调（iframe onload + 子页 postMessage ready 双保险）
+window.__v6MemoLoaded = function(){
+  window.__v6MemoReady = true;
+  var err=document.getElementById('v6MemoError');
+  var st=document.getElementById('v6MemoStatus');
+  if(err) err.style.display='none';
+  if(st){ st.style.display='inline-flex'; st.innerHTML='✅ v6 备忘录已加载'; }
+  clearTimeout(window.__v6MemoCheckT);
+};
+
+// 监听 v6_memo.html 子页就绪信号
+window.addEventListener('message', function(e){
+  if(e.data && e.data.__v6memo==='ready'){
+    window.__v6MemoLoaded();
+  }
+}, false);
 // v8 数据注入（不动 HTML，只填已有元素）
 try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
 try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
