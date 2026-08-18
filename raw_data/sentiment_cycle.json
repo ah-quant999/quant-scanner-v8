@@ -1,11 +1,11 @@
 {
-  "update_time": "2026-08-18 08:43:22",
-  "data_date": "2026-08-18",
+  "update_time": "2026-08-18 08:43:05",
+  "data_date": "2026-08-17",
   "source": "LIMIT_UP_HEATMAP",
   "phase": "狂热",
   "color": "#ef4444",
   "score": 80.0,
-  "delta_pct": 10500.0,
+  "delta_pct": 0.0,
   "advice": "🔥 情绪狂热：警惕追高，等待分歧后的二波机会",
   "metrics": {
     "total_up": 106,
@@ -39,6 +39,6 @@
       "chg": 10.02
     }
   ],
-  "prev_total": 1,
+  "prev_total": 0,
   "note": "冰点=涨停<30家且最高板≤2（报复性窗口临近）；高潮=涨停≥80且最高板≥5；退潮=较昨日-30%+"
 }
