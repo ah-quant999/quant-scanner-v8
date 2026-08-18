@@ -4637,13 +4637,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
   <!-- ============ 逻辑详解（管理员） ============ -->
   <section id="sec-lg">
-    <div class="sec-head"><h2>📖 逻辑详解</h2><span class="tag">仅管理员可见 · 总览/指标/策略/安全口径/v6备忘录</span></div>
+    <div class="sec-head"><h2>📖 逻辑详解</h2><span class="tag">仅管理员可见 · 指标/策略/安全口径</span></div>
 
     <div class="lg-subtabs" id="lgSubtabs">
       <div class="lg-tab active" data-lg="ov" onclick="switchLg('ov',this)">📊 总览</div>
-      <div class="lg-tab" data-lg="metric" onclick="switchLg('metric',this)">📈 指标</div>
-      <div class="lg-tab" data-lg="strategy" onclick="switchLg('strategy',this)">🎯 策略</div>
-      <div class="lg-tab" data-lg="security" onclick="switchLg('security',this)">🛡️ 安全口径</div>
       <div class="lg-tab" data-lg="v6" onclick="switchLg('v6',this)">📦 v6备忘录</div>
     </div>
 
@@ -4709,49 +4706,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
     </div>
 
-
-    <!-- === 指标（2026-08-18 主人令：恢复 3 个轻量子 tab） === -->
-    <div class="lg-pane" id="lg-metric" style="display:none">
-      <div class="card">
-        <h3><span class="ic">📈</span>v8 数据源指标总览</h3>
-        <div class="logic-p">
-          <b>1. 盘前（08:25）</b>：JUDGMENT_DATA · MACRO_DATA · IPO_DATA · NT_DATA · <a href="javascript:switchSec('td')" style="color:var(--cyan)">→ 今日事件</a><br>
-          <b>2. 盘中（09:30-15:00）</b>：INDEX_QUOTES · STOCK_QUOTE · SECTOR_RS · 实时资金流 · <a href="javascript:switchSec('rt')" style="color:var(--cyan)">→ 实时数据</a><br>
-          <b>3. 盘后（18:30+）</b>：CRDS_CARD_DATA · TRIPLE_CONSENSUS · TOP10_DAILY · 4 模式产出 · <a href="javascript:switchSec('ph')" style="color:var(--cyan)">→ 盘后数据</a><br>
-          <b>4. 周末/月</b>：WEEKEND_META_REPORT · WEEKEND_RUN · SECTOR_PHASE_HISTORY<br>
-          <b>5. 实时行情（每 30 分刷新）</b>：ETF_PULSE / INTRADAY_HEAT / DAILY_MONITOR / SUSPENSION_ALERT / OVERSEAS_MARKETS · <a href="javascript:switchSec('rt')" style="color:var(--cyan)">→ 实时数据</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- === 策略（2026-08-18 主人令：恢复 3 个轻量子 tab） === -->
-    <div class="lg-pane" id="lg-strategy" style="display:none">
-      <div class="card">
-        <h3><span class="ic">🎯</span>v8 选股策略逻辑</h3>
-        <div class="logic-p">
-          <b>① 主站TOP10≥70</b>：cross-multi-signal 评分 ≥70 的股票 · 数据源 TRIPLE_CONSENSUS<br>
-          <b>② 驾驶舱 A 档</b>：基本面 A 档 + 评分 ≥70 · 数据源 COCKPIT_TIER_RECOMMEND<br>
-          <b>③ 基本面 A 档</b>：申万行业 + ROE + PE 分位 · 数据源 STOCK_PROFILE<br>
-          <b>④ 入选即跟踪</b>：每日定时 TOP5_TRACK.js 跟踪 90 天盈亏<br>
-          <b>⑤ 驾驶舱选股回测</b>：唯一有完整实盘级数据的回测 · <a href="javascript:switchSec('bt')" style="color:var(--cyan)">→ 策略回测</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- === 安全口径（2026-08-18 主人令：恢复 3 个轻量子 tab） === -->
-    <div class="lg-pane" id="lg-security" style="display:none">
-      <div class="card">
-        <h3><span class="ic">🛡️</span>v8 安全口径铁律</h3>
-        <div class="logic-p">
-          <b>① 24h 红线</b>：交易日任何 data 超 24h 必须 fail + self_heal 派发（_hard_cap_for_owner_rule）<br>
-          <b>② T+1 18:30 延算</b>：非交易日按 next_trade_day 18:30 算（自适应长假）<br>
-          <b>③ 弱市真 0 ≠ 覆盖</b>：算法可能筛出 0 只，不是 bug<br>
-          <b>④ 写时缺失→永久 null 污染模式</b>：任何 entry_price 写入 null 锁死盈亏计算（已修 gen_top5_track）<br>
-          <b>⑤ 网络失败 sys.exit(0)</b>：calc_etf_intraday 等不写空结构覆盖真数据<br>
-          <b>⑥ v6 备忘录永久铁律</b>：DO_NOT_DELETE 任何清理任务不得删 v6_memo.html
-        </div>
-      </div>
-    </div>
 
     <!-- === v6备忘录（逻辑详解页最右侧子tab，仅管理员可见） === -->
     <div class="lg-pane" id="lg-v6">
@@ -8788,6 +8742,43 @@ function drawUpDownChart(){
     s2More+='</div>';
     s2+='<div id="cockpitSectorMore" style="display:block;margin-top:10px;">'+s2More+'</div>';
     h+=cockpitBlock('② 最强赛道 TOP5',s2,'#e0996b','#f0b083');
+
+    // ── ②·5 驾驶舱 A/B 档推荐（直接列出回测口径的 A/B 档股票，2026-08-18 主人令）──
+    var _ctr = window.COCKPIT_TIER_RECOMMEND || {};
+    var _tierA = _safeArr(_ctr.tier_a);
+    var _tierB = _safeArr(_ctr.tier_b);
+    var _tierHtml = '<div style="display:flex;flex-direction:column;gap:10px;">';
+    if(_tierA.length){
+      _tierHtml += '<div><div style="font-size:12px;font-weight:700;color:#ffd54f;margin-bottom:6px;">🅰️ A档（回测最强口径）— '+_tierA.length+'只</div>';
+      _tierHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+      _tierA.forEach(function(s){
+        _tierHtml += '<div style="display:flex;align-items:center;gap:5px;background:rgba(255,213,79,.12);border:1px solid rgba(255,213,79,.35);border-radius:6px;padding:5px 10px;font-size:12px;color:#e6eefc;">';
+        _tierHtml += '<span style="font-weight:700;">'+(s.name||'?')+'</span>';
+        _tierHtml += '<span style="color:#8aa0c2;font-size:10px;">'+(s.code||'?')+'</span>';
+        _tierHtml += '<span style="color:#8aa0c2;font-size:10px;">RSI '+(s.rsi||'-')+' · 20日 '+(s.ret20||'-')+'% · EMA '+(s.ema||'-')+'</span>';
+        _tierHtml += '</div>';
+      });
+      _tierHtml += '</div></div>';
+    }
+    if(_tierB.length){
+      _tierHtml += '<div><div style="font-size:12px;font-weight:700;color:#f0b083;margin-bottom:6px;">🅱️ B档（强势观察）— '+_tierB.length+'只</div>';
+      _tierHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+      _tierB.slice(0,10).forEach(function(s){
+        _tierHtml += '<div style="display:flex;align-items:center;gap:5px;background:rgba(240,176,131,.12);border:1px solid rgba(240,176,131,.35);border-radius:6px;padding:4px 8px;font-size:11px;color:#e6eefc;">';
+        _tierHtml += '<span style="font-weight:700;">'+(s.name||'?')+'</span>';
+        _tierHtml += '<span style="color:#8aa0c2;font-size:10px;">'+(s.code||'?')+'</span>';
+        _tierHtml += '</div>';
+      });
+      if(_tierB.length>10) _tierHtml += '<span style="color:#8aa0c2;font-size:11px;align-self:center;">+'+(_tierB.length-10)+' 只</span>';
+      _tierHtml += '</div></div>';
+    }
+    if(!_tierA.length && !_tierB.length){
+      _tierHtml += '<div style="font-size:12px;color:#8aa0c2;">暂无 A/B 档推荐数据</div>';
+    }
+    if(_tierA.length){
+      _tierHtml += '<div style="font-size:11px;color:#8aa0c2;margin-top:2px;">A档规则：上涨趋势 & 机构变红 & RSI&lt;68 & 20日涨幅&lt;35% & EMA≥5 & 非涨停</div>';
+    }
+    h+=cockpitBlock('②·5 驾驶舱 A/B 档推荐（回测最强口径）',_tierHtml,'#ffd54f','#ffe082');
 
     var top10=(DATA.top10_daily||{}).top10||[];
     var s80=top10.filter(function(s){return s.total_score>=80;});
