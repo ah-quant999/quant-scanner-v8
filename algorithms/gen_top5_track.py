@@ -125,7 +125,7 @@ def _quote_map(stock_quote):
         if not code_key:
             continue
         code_clean = str(code_key).lower()
-        for prefix in ("sh", "sz", "bj"):
+        for prefix in ("sh", "sz", "bj", "hk"):
             if code_clean.startswith(prefix):
                 code_clean = code_clean[2:]
                 break
@@ -214,10 +214,17 @@ def main():
         # 🛡 2026-08-17 一劳永逸修复：写时缺失→永久 null 的污染模式
         # entry_price 在入池当日 fetch 失败（港股/小众股）为 null 后，再也补不回。
         # 现在每日重新尝试：1)优先沿用旧 entry_price  2)若旧为 null 但 qmap 里有 close→用最近价作为 entry（保守）
+        # 3) 若 qmap 无 close 但旧 last_close 有值→用旧 last_close 兜底（至少能算盈亏）
         # 这样后续 fetch 补到数据时自动恢复盈亏计算
         entry_price = old.get("entry_price")
-        if entry_price is None and q.get("close") is not None:
-            entry_price = q["close"]  # 兜底：用最新价作为参考（前端会标 "补"）
+        entry_price_fallback = False
+        if entry_price is None:
+            if q.get("close") is not None:
+                entry_price = q["close"]
+                entry_price_fallback = True
+            elif old.get("last_close") is not None:
+                entry_price = old["last_close"]
+                entry_price_fallback = True
         exit_type = None
         last_pct = None
         peak_pct = old.get("peak_pct")
@@ -249,21 +256,25 @@ def main():
                 "list_rank": old.get("list_rank"),
                 "list_sources": old.get("list_sources", []),
                 "entry_price": entry_price,
+                "entry_price_fallback": entry_price_fallback or old.get("entry_price_fallback", False),
                 "exit_price":  last_close,
                 "peak_pct":    peak_pct,
                 "exit_pct":    last_pct,
                 "exit_type":   exit_type,
                 "days_in":     new_days_in,
+                "entry_price_fallback": entry_price_fallback or old.get("entry_price_fallback", False),
             })
             print(f"    🚪 出场 {old.get('name')}({code}) {exit_type} 盈亏 {last_pct}% 当日 {new_days_in} 天")
         else:
             # 续追踪
             new_tracking.append({
                 **old,
+                "entry_price": entry_price,
                 "last_close": last_close,
                 "last_pct":   last_pct,
                 "peak_pct":   peak_pct,
                 "days_in":    new_days_in,
+                "entry_price_fallback": entry_price_fallback or old.get("entry_price_fallback", False),
             })
 
     # ---- 6. 今日 Top5 入池（新上榜 / 已存在续追踪）----
