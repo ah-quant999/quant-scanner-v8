@@ -2459,8 +2459,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- TAB 按钮行（横排，独立于内容区） -->
     <div class="st-tabs">
       <button class="st-tab active" data-st="tc" onclick="switchSt('tc')">🥇 三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span></button>
-      <button class="st-tab" data-st="fv" onclick="switchSt('fv')">🔥 四量终极 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="cockpit" onclick="switchSt('cockpit')">🎯 驾驶舱 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
+      <button class="st-tab" data-st="fv" onclick="switchSt('fv')">🔥 四量终极 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="hunter" onclick="switchSt('hunter')">🐂 大牛股猎手 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="allsite" onclick="switchSt('allsite')">🌐 全站精选 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
       <button class="st-tab" data-st="rps" onclick="switchSt('rps')">📈 相对强度 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
@@ -10314,14 +10314,59 @@ function drawUpDownChart(){
     h+='<b style="color:#38bdf8;">② 观察池</b>：本卡「🚀 个股动量状态」共识股（当日 ≥2 分类同时看好）仅观察，① 清单 ∩ ② 共识 = 加分项。<br>';
     h+='<b style="color:#a78bfa;">③ 纪律</b>：止损 入场×0.90（-10% 封顶）｜止盈 前60日高点。避开「主升/启动」板块（追高回撤大，回测反向）。';
     h+='</div></div></div>';
+    // ── 🎯 动量共识筛选（2026-08-16 无未来函数版，移入强势突破 pane1）──
+    var _mf = window.MOMENTUM_FILTER;
+    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a855f7;">';
+    h+='<h3 style="font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">🎯</span>动量共识筛选 <span style="font-size:10px;color:#f59e0b;font-weight:400">无未来函数 · 自动重算</span>';
+    h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 今日 18:00 今日盘后 短线</span></h3>';
+    if(!_mf || !_mf.candidates || !_mf.candidates.length){
+      h+='<div class="note">MOMENTUM_FILTER 数据不可用（构建时由 momentum_common_filter.py --emit-js 生成）</div>';
+    } else {
+      var _s=_mf.stats||{};
+      h+='<div style="font-size:13px;color:var(--sub);line-height:1.8;margin-bottom:10px;">';
+      h+='⚠️ <b style="color:#fbbf24">2026-08-16 修正为无未来函数版</b>：原「连涨≥5/回撤≤10%」为入选后数据（未来信息，胜率虚高已废弃）。现仅用入选日当天可知条件：'
+        + 'S1 含「超跌反弹」OCR标签 → S2 入选前连涨≤1 → S3 剔除主升/启动板块。T+5 胜率 '
+        + (_s.s1_win||'--')+'%('+(_s.s1||0)+'只) → '+( _s.s2_win||'--')+'%('+(_s.s2||0)+'只) → <b style="color:#c4b5fd;">'+( _s.s3_win||'--')+'%('+(_s.s3||0)+'只)</b>（基线 '+( _s.base_win||'--')+'%）。'
+        + '<br>当前候选 <b style="color:#c4b5fd;">'+_mf.candidates.length+' 只</b>（去重）；T+5 列为历史结果仅参考，非筛选条件。'
+        + '<span style="color:var(--dim);float:right;">更新 '+((_mf.generated||'').slice(5,16))+'</span></div>';
+      h+='<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;">';
+      h+='<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+      h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">#</th>';
+      h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">名称</th>';
+      h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">代码</th>';
+      h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">入选日</th>';
+      h+='<th style="padding:6px 5px;text-align:right;color:var(--sub);">前连涨</th>';
+      h+='<th style="padding:6px 5px;text-align:right;color:var(--sub);">入选日%</th>';
+      h+='<th style="padding:6px 5px;text-align:right;color:var(--sub);">T+5%</th>';
+      h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">阶段</th>';
+      h+='</tr></thead><tbody>';
+      _mf.candidates.slice(0,20).forEach(function(r,i){
+        var t5=r.t5_gain_pct, t5Color = t5>0?'var(--up)':(t5<0?'var(--down)':'var(--sub)');
+        var stage=r.stage||'无K线';
+        var stageColor = stage==='震荡'?'#38bdf8':(stage==='退潮'?'#f59e0b':(stage==='底部'?'#22c55e':(stage==='主升'||stage==='启动')?'#ef4444':'#94a3b8'));
+        h+='<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+        h+='<td style="padding:5px 5px;color:var(--dim);">'+(i+1)+'</td>';
+        h+='<td style="padding:5px 5px;font-weight:600;color:var(--txt);">'+r.name+'</td>';
+        h+='<td style="padding:5px 5px;color:var(--sub);font-family:ui-monospace,Menlo,monospace;">'+r.code+'</td>';
+        h+='<td style="padding:5px 5px;color:var(--dim);font-size:10.5px;">'+((r.date||'').slice(5))+'</td>';
+        h+='<td style="padding:5px 5px;text-align:right;color:#c4b5fd;font-weight:700;">'+(r.consec_before!=null?r.consec_before:'--')+'天</td>';
+        h+='<td style="padding:5px 5px;text-align:right;color:var(--sub);">'+(r.sel_change_pct!=null?Number(r.sel_change_pct).toFixed(1):'--')+'%</td>';
+        h+='<td style="padding:5px 5px;text-align:right;color:'+t5Color+';font-weight:600;">'+(t5!=null?(t5>0?'+':'')+t5.toFixed(1):'--')+'%</td>';
+        h+='<td style="padding:5px 5px;color:'+stageColor+';font-size:11px;">'+stage+'</td>';
+        h+='</tr>';
+      });
+      h+='</tbody></table></div>';
+      h+='<div style="background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.3);border-radius:7px;padding:8px 10px;font-size:13px;line-height:1.7;color:var(--sub);margin-top:8px;">';
+      h+='🎯 <b>与 🚀 动量卡一起跟踪 1-2 周</b>：对照无泄漏结论是否持续有效（「超跌反弹」OCR标签 + 入选前连涨≤1 是真实信号；入选后走势字段禁作筛选条件）。每周日可由小九跑对比报告。筛选器随构建自动重算（update_v8.py run_experiment_cards → momentum_common_filter.py --emit-js）。';
+      h+='</div>';
+    }
+    
     // ── 🚀 个股动量状态（2026-08-16 新增 · 暂未上架实验区）──
     // 数据源：每日盘后选股 PDF → OCR 抽取 → STOCK_MOMENTUM_STATE.js
     // 核心信号：跨分类共识（≥2个分类同时推荐的股票）→ POC 回测 T+5 Alpha +16.27%
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a855f7;">';
     h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
     h+='<span style="font-size:15px;font-weight:700;color:#a855f7;">🚀 个股动量状态</span>';
-    // 2026-08-17 主人令：强势突破 TAB 统一盘后短线更新 → 在第一张卡片名后面(不靠右)加更新于胶囊，与 _uBadge 同款
-    h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 今日 18:00 今日盘后 短线</span>';
     h+='<span style="font-size:12px;color:var(--dim);">OCR抽取 · 跨分类共识 · 暂不进推荐</span>';
     h+='</div>';
     var _sms = window.STOCK_MOMENTUM_STATE;
@@ -10349,19 +10394,17 @@ function drawUpDownChart(){
         h+='<div style="background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);border-radius:7px;padding:6px 8px;">';
         h+='<div style="font-size:12px;font-weight:700;color:#a855f7;margin-bottom:4px;display:flex;justify-content:space-between;">';
         h+='<span>'+cat+'</span><span style="color:var(--dim);font-weight:400;font-size:12px;">'+stocks.length+'只</span></div>';
-        h+='<div style="font-size:12px;max-height:120px;overflow-y:auto;">';
-        // 🛡 2026-08-17 主人令修复：原 slice(0,8) + 「+N more」纯 div 文案不可点 —— 现全部渲染 + 默认折叠 + +N 真按钮可点展开
+        h+='<div style="font-size:13px;max-height:260px;overflow-y:auto;">';
+        // 2026-08-18 主人令：全部列出，不折叠
         stocks.forEach(function(s, si){
           var isCons = consInCat.some(function(c){ return c.code===s.code; });
           var tag = isCons ? '<span style="background:#a855f7;color:#fff;font-size:11px;padding:0 3px;border-radius:2px;margin-left:3px;">★'+(isCons.count||2)+'</span>' : '';
           var cColor = (s.change_pct||0) >= 0 ? 'var(--up)' : 'var(--down)';
-          var showStyle = (si < 8) ? '' : 'display:none';
-          h+='<div data-catmore="'+catsn+'" style="display:flex;justify-content:space-between;padding:1.5px 0;border-bottom:1px dashed rgba(148,163,184,.08);'+showStyle+'">';
-          h+='<span>'+(isCons?'<b>':'')+s.name+'<span style="color:var(--dim);font-size:11px">'+s.code+'</span>'+tag+(isCons?'</b>':'')+'</span>';
-          h+='<span style="color:'+cColor+';font-weight:600;flex-shrink:0;font-size:12px;">'+((s.change_pct||0)>0?'+':'')+(s.change_pct||0).toFixed(2)+'%</span>';
+          h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px dashed rgba(148,163,184,.08);">';
+          h+='<span>'+(isCons?'<b>':'')+s.name+'<span style="color:var(--dim);font-size:12px">'+s.code+'</span>'+tag+(isCons?'</b>':'')+'</span>';
+          h+='<span style="color:'+cColor+';font-weight:600;flex-shrink:0;font-size:13px;">'+((s.change_pct||0)>0?'+':'')+(s.change_pct||0).toFixed(2)+'%</span>';
         h+='</div>';
         });
-        if(stocks.length > 8) h+='<div data-total="'+(stocks.length-8)+'" style="color:#a855f7;font-size:12px;text-align:center;padding:2px;cursor:pointer;user-select:none;font-weight:600;" data-togglecat="'+catsn+'" onclick="window.__v8ToggleCatMore(this)">... +' + (stocks.length-8) + ' more (点击展开)▼</div>';
         h+='</div></div>';  // /cat card
       });
       h+='</div>';  // /grid
@@ -10571,54 +10614,7 @@ function drawUpDownChart(){
     }
     h+='</div>';  // /个股动量状态卡
 
-    // ── 🎯 动量共识筛选（2026-08-16 无未来函数版，移入强势突破 pane1）──
-    var _mf = window.MOMENTUM_FILTER;
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a855f7;">';
-    h+='<h3 style="font-size:14px;margin-bottom:8px;"><span class="ic">🎯</span>动量共识筛选 <span style="font-size:10px;color:#f59e0b;font-weight:400">无未来函数 · 自动重算</span></h3>';
-    if(!_mf || !_mf.candidates || !_mf.candidates.length){
-      h+='<div class="note">MOMENTUM_FILTER 数据不可用（构建时由 momentum_common_filter.py --emit-js 生成）</div>';
-    } else {
-      var _s=_mf.stats||{};
-      h+='<div style="font-size:11.5px;color:var(--sub);line-height:1.8;margin-bottom:10px;">';
-      h+='⚠️ <b style="color:#fbbf24">2026-08-16 修正为无未来函数版</b>：原「连涨≥5/回撤≤10%」为入选后数据（未来信息，胜率虚高已废弃）。现仅用入选日当天可知条件：'
-        + 'S1 含「超跌反弹」OCR标签 → S2 入选前连涨≤1 → S3 剔除主升/启动板块。T+5 胜率 '
-        + (_s.s1_win||'--')+'%('+(_s.s1||0)+'只) → '+( _s.s2_win||'--')+'%('+(_s.s2||0)+'只) → <b style="color:#c4b5fd;">'+( _s.s3_win||'--')+'%('+(_s.s3||0)+'只)</b>（基线 '+( _s.base_win||'--')+'%）。'
-        + '<br>当前候选 <b style="color:#c4b5fd;">'+_mf.candidates.length+' 只</b>（去重）；T+5 列为历史结果仅参考，非筛选条件。'
-        + '<span style="color:var(--dim);float:right;">更新 '+((_mf.generated||'').slice(5,16))+'</span></div>';
-      h+='<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
-      h+='<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">#</th>';
-      h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">名称</th>';
-      h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">代码</th>';
-      h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">入选日</th>';
-      h+='<th style="padding:6px 5px;text-align:right;color:var(--sub);">前连涨</th>';
-      h+='<th style="padding:6px 5px;text-align:right;color:var(--sub);">入选日%</th>';
-      h+='<th style="padding:6px 5px;text-align:right;color:var(--sub);">T+5%</th>';
-      h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">阶段</th>';
-      h+='</tr></thead><tbody>';
-      _mf.candidates.slice(0,20).forEach(function(r,i){
-        var t5=r.t5_gain_pct, t5Color = t5>0?'var(--up)':(t5<0?'var(--down)':'var(--sub)');
-        var stage=r.stage||'无K线';
-        var stageColor = stage==='震荡'?'#38bdf8':(stage==='退潮'?'#f59e0b':(stage==='底部'?'#22c55e':(stage==='主升'||stage==='启动')?'#ef4444':'#94a3b8'));
-        h+='<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
-        h+='<td style="padding:5px 5px;color:var(--dim);">'+(i+1)+'</td>';
-        h+='<td style="padding:5px 5px;font-weight:600;color:var(--txt);">'+r.name+'</td>';
-        h+='<td style="padding:5px 5px;color:var(--sub);font-family:ui-monospace,Menlo,monospace;">'+r.code+'</td>';
-        h+='<td style="padding:5px 5px;color:var(--dim);font-size:10.5px;">'+((r.date||'').slice(5))+'</td>';
-        h+='<td style="padding:5px 5px;text-align:right;color:#c4b5fd;font-weight:700;">'+(r.consec_before!=null?r.consec_before:'--')+'天</td>';
-        h+='<td style="padding:5px 5px;text-align:right;color:var(--sub);">'+(r.sel_change_pct!=null?Number(r.sel_change_pct).toFixed(1):'--')+'%</td>';
-        h+='<td style="padding:5px 5px;text-align:right;color:'+t5Color+';font-weight:600;">'+(t5!=null?(t5>0?'+':'')+t5.toFixed(1):'--')+'%</td>';
-        h+='<td style="padding:5px 5px;color:'+stageColor+';font-size:11px;">'+stage+'</td>';
-        h+='</tr>';
-      });
-      h+='</tbody></table></div>';
-      h+='<div style="background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.3);border-radius:7px;padding:8px 10px;font-size:11.5px;line-height:1.7;color:var(--sub);margin-top:8px;">';
-      h+='🎯 <b>与 🚀 动量卡一起跟踪 1-2 周</b>：对照无泄漏结论是否持续有效（「超跌反弹」OCR标签 + 入选前连涨≤1 是真实信号；入选后走势字段禁作筛选条件）。每周日可由小九跑对比报告。筛选器随构建自动重算（update_v8.py run_experiment_cards → momentum_common_filter.py --emit-js）。';
-      h+='</div>';
-    }
-    h+='</div>';
-
-    // ── 📊 行业分布·月度对比（2026-08-16 新增：吃微信报告「连续上涨股票分析报告」结论）──
+        // ── 📊 行业分布·月度对比（2026-08-16 新增：吃微信报告「连续上涨股票分析报告」结论）──
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">';
     h+='<h3 style="font-size:14px;margin-bottom:8px;"><span class="ic">📊</span>行业分布 · 月度对比 <span style="font-size:10px;color:#f59e0b;font-weight:400">甲午 vs 乙未</span></h3>';
     h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
