@@ -10672,13 +10672,18 @@ function drawUpDownChart(){
 
     // ── pane2: 🔮 潜力挖掘 ──
     h+='<div class="ul-pane" id="ulPanePP">';
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a78bfa;">';
+    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';
     h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
-    h+='<span style="font-size:15px;font-weight:700;color:#a78bfa;">🔮 潜力挖掘</span>';
-    h+='<span class="fresh" id="prPPFresh">—</span>';
-    h+='<span style="font-size:12px;color:var(--dim);">热门概念 × 温和涨幅 × 活跃度 · 暂未上架·观察</span>';
+    h+='<span style="font-size:15px;font-weight:700;color:#38bdf8;">📌 概念/行业 → ETF·龙头 参考</span>';
+    h+='<span class="fresh" id="prPPEtfFresh">—</span>';
+    h+='<span style="font-size:12px;color:var(--dim);">潜力挖掘·参考 · 不构成投资建议</span>';
     h+='</div>';
-    h+='<div id="ppBody"><div class="note">加载中…</div></div>';
+    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">⚠️ 仅根据当前热点板块列出代表性 ETF 与龙头股，<b style="color:#fbbf24">不构成任何投资建议</b>。本卡与「调试专区」数据源一致（共享内容）。</div>';
+    h+='<div id="ppEtfMapBody"><div class="note">加载中…</div></div>';
+    h+='<hr style="border:none;border-top:1px dashed rgba(56,189,248,.25);margin:12px 0;">';
+    h+='<div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.3);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.7;color:var(--sub);">';
+    h+='📌 潜力挖掘：本卡为热点板块→ETF/龙头映射参考，属研究信号，未纳入任何推荐链路。';
+    h+='</div>';
     h+='</div>';
     h+='</div>';  // /ulPanePP
 
@@ -10686,12 +10691,18 @@ function drawUpDownChart(){
     // 2026-08-16/18 主人令：潜力挖掘 从选股策略·潜力参考(st-pr) 迁至暂未上架；ETF·龙头参考 迁入调试专区
     try{ if(typeof window._fillPotentialPicks==='function') window._fillPotentialPicks(); }catch(e){ console.warn('潜力挖掘渲染失败',e); }
     try{
-      var etfSrc=document.getElementById('etfMapBody');
-      var etfDst=document.getElementById('dbgEtfMapBody');
-      if(etfSrc && etfDst) etfDst.innerHTML = etfSrc.innerHTML;
+      // 2026-08-18 主人令：ETF·龙头参考 同时显示在「潜力挖掘 + 调试专区」两个子Tab
+      //   - 调试专区 dbgEtfMapBody 由 pane4-2 内的 ETF·龙头卡（line 10327-10340）渲染（CONCEPT_ETF_MAP 数据 → renderEtfMap / 已有克隆逻辑）
+      //   - 潜力挖掘 ppEtfMapBody = 克隆 dbgEtfMapBody 内容（共享数据源）
+      var etfSrc=document.getElementById('dbgEtfMapBody');
+      var etfDstPP=document.getElementById('ppEtfMapBody');
+      if(etfSrc && etfDstPP) etfDstPP.innerHTML = etfSrc.innerHTML;
       var em = window.CONCEPT_ETF_MAP || {};
       var tm=document.getElementById('prEtfFresh');
-      if(tm) tm.innerHTML = _uBadge('盘后','短线',em.update_time||null);
+      var tmPP=document.getElementById('prPPEtfFresh');
+      var _etfBadge = _uBadge('盘后','短线',em.update_time||null);
+      if(tm) tm.innerHTML = _etfBadge;
+      if(tmPP) tmPP.innerHTML = _etfBadge;
     }catch(e){ console.warn('ETF龙头克隆失败',e); }
     // 2026-08-16 子Tab 切换函数
     window.__ulSwitch = function(btn, tab){
