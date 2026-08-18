@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-18 14:08:27",
+  "update_time": "2026-08-18 15:11:43",
   "data_date": "2026-08-18",
   "source": "CONCEPT_RANKING × STOCK_PROFILE × STOCK_QUOTE",
   "hot_concepts_count": 33,
@@ -7,13 +7,13 @@
     "农业种植",
     "粮食概念",
     "转基因",
-    "猪肉概念",
-    "土地流转",
     "乡村振兴",
-    "水产概念",
-    "预制菜概念",
+    "土地流转",
+    "猪肉概念",
+    "华为欧拉",
     "红利股",
-    "煤化工概念"
+    "机器人执行器",
+    "水产概念"
   ],
   "picks": [
     {
@@ -28,7 +28,7 @@
         "转基因"
       ],
       "hot_count": 4,
-      "total_score": 10.79
+      "total_score": 11.23
     },
     {
       "code": "600371",
@@ -42,7 +42,7 @@
         "转基因"
       ],
       "hot_count": 4,
-      "total_score": 10.33
+      "total_score": 10.77
     },
     {
       "code": "600598",
@@ -56,7 +56,7 @@
         "粮食概念"
       ],
       "hot_count": 4,
-      "total_score": 10.12
+      "total_score": 10.44
     },
     {
       "code": "600108",
@@ -70,7 +70,7 @@
         "粮食概念"
       ],
       "hot_count": 4,
-      "total_score": 10.04
+      "total_score": 10.36
     },
     {
       "code": "600359",
@@ -84,7 +84,7 @@
         "粮食概念"
       ],
       "hot_count": 4,
-      "total_score": 9.83
+      "total_score": 10.15
     },
     {
       "code": "600737",
@@ -97,23 +97,7 @@
         "调味品概念"
       ],
       "hot_count": 3,
-      "total_score": 9.45
-    },
-    {
-      "code": "002385",
-      "name": "大北农",
-      "pct": 2.68,
-      "amount_yi": 2.66,
-      "hot_concepts": [
-        "乡村振兴",
-        "乳业",
-        "农业种植",
-        "合成生物",
-        "水产概念",
-        "猪肉概念"
-      ],
-      "hot_count": 6,
-      "total_score": 9.37
+      "total_score": 9.68
     },
     {
       "code": "000716",
@@ -126,7 +110,7 @@
         "粮食概念"
       ],
       "hot_count": 3,
-      "total_score": 9.33
+      "total_score": 9.67
     },
     {
       "code": "300087",
@@ -139,7 +123,7 @@
         "转基因"
       ],
       "hot_count": 3,
-      "total_score": 9.21
+      "total_score": 9.44
     },
     {
       "code": "000713",
@@ -153,7 +137,21 @@
         "草甘膦"
       ],
       "hot_count": 4,
-      "total_score": 9.01
+      "total_score": 9.36
+    },
+    {
+      "code": "002385",
+      "name": "大北农",
+      "pct": 2.68,
+      "amount_yi": 2.66,
+      "hot_concepts": [
+        "乡村振兴",
+        "农业种植",
+        "水产概念",
+        "猪肉概念"
+      ],
+      "hot_count": 4,
+      "total_score": 8.89
     },
     {
       "code": "002556",
@@ -167,20 +165,7 @@
         "煤化工概念"
       ],
       "hot_count": 4,
-      "total_score": 8.41
-    },
-    {
-      "code": "601118",
-      "name": "海南橡胶",
-      "pct": 2.84,
-      "amount_yi": 3.41,
-      "hot_concepts": [
-        "乡村振兴",
-        "农业种植",
-        "土地流转"
-      ],
-      "hot_count": 3,
-      "total_score": 8.25
+      "total_score": 8.65
     },
     {
       "code": "002999",
@@ -193,7 +178,20 @@
         "粮食概念"
       ],
       "hot_count": 3,
-      "total_score": 8.25
+      "total_score": 8.59
+    },
+    {
+      "code": "601118",
+      "name": "海南橡胶",
+      "pct": 2.84,
+      "amount_yi": 3.41,
+      "hot_concepts": [
+        "乡村振兴",
+        "农业种植",
+        "土地流转"
+      ],
+      "hot_count": 3,
+      "total_score": 8.48
     },
     {
       "code": "002215",
@@ -208,7 +206,7 @@
         "生态农业"
       ],
       "hot_count": 5,
-      "total_score": 8.15
+      "total_score": 8.37
     },
     {
       "code": "600540",
@@ -220,13 +218,13 @@
         "粮食概念"
       ],
       "hot_count": 2,
-      "total_score": 7.67
+      "total_score": 7.8
     }
   ],
   "rejected_summary": {
-    "no_hot_concept": 3880,
-    "too_hot": 65,
-    "too_cold": 12,
+    "no_hot_concept": 3936,
+    "too_hot": 62,
+    "too_cold": 9,
     "small_mv": 0,
     "big_mv": 0,
     "no_quote": 0

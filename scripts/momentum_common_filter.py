@@ -73,17 +73,24 @@ def main():
     # S3 剔除主升/启动板块（方向成立；无K线不剔除——R6 实测剔除后反而变差）
     S3 = [r for r in S2 if r.get("stage") not in ("主升", "启动")]
 
+    def pct(sel, i, default=0):
+        return sel[i] if sel else default
+
     s0, s1, s2, s3 = t5(rows), t5(S1), t5(S2), t5(S3)
     print("=" * 72)
     print("无泄漏筛选链 T+5 表现（385 次出现，全部条件=入选日当天可知）")
     print("=" * 72)
-    print(f"  基线（全部）                n={s0[0]:3d}  胜率 {s0[1]:5.1f}%  均值 {s0[2]:+6.2f}%")
-    print(f"  S1 含「超跌反弹」标签        n={s1[0]:3d}  胜率 {s1[1]:5.1f}%  均值 {s1[2]:+6.2f}%")
-    print(f"  S2 +入选前连涨≤1            n={s2[0]:3d}  胜率 {s2[1]:5.1f}%  均值 {s2[2]:+6.2f}%")
-    print(f"  S3 +剔除主升/启动板块        n={s3[0]:3d}  胜率 {s3[1]:5.1f}%  均值 {s3[2]:+6.2f}%")
+    print(f"  基线（全部）                n={pct(s0,0):3d}  胜率 {pct(s0,1):5.1f}%  均值 {pct(s0,2):+6.2f}%")
+    print(f"  S1 含「超跌反弹」标签        n={pct(s1,0):3d}  胜率 {pct(s1,1):5.1f}%  均值 {pct(s1,2):+6.2f}%")
+    print(f"  S2 +入选前连涨≤1            n={pct(s2,0):3d}  胜率 {pct(s2,1):5.1f}%  均值 {pct(s2,2):+6.2f}%")
+    print(f"  S3 +剔除主升/启动板块        n={pct(s3,0):3d}  胜率 {pct(s3,1):5.1f}%  均值 {pct(s3,2):+6.2f}%")
 
     # ─────────── 候选清单（去重，取最新出现）───────────
-    final = S3 if s3 and s3[0] else S2
+    # 空集防御：S3→S2→S1→全量 逐级降级，确保 --emit-js 永不因空集崩溃
+    final = S3 if (s3 and s3[0]) else (S2 if (s2 and s2[0]) else (S1 if (s1 and s1[0]) else rows))
+    chain_name = ("S3 超跌反弹+连涨≤1+非主升/启动" if final is S3 else
+                  "S2 超跌反弹+连涨≤1" if final is S2 else
+                  "S1 含超跌反弹" if final is S1 else "全量(降级)")
     by_code_sel = {}
     for r in sorted(final, key=lambda x: x["date"], reverse=True):
         by_code_sel.setdefault(r["code"], r)
@@ -91,7 +98,7 @@ def main():
     cands.sort(key=lambda r: (r.get("consec_before") is not None, r.get("consec_before") or 9, r.get("sel_change_pct") or 0))
 
     print("\n" + "=" * 72)
-    print(f"候选清单（含超跌反弹 + 入选前连涨≤1 + 非主升/启动，去重 {len(cands)} 只）")
+    print(f"候选清单（{chain_name}，去重 {len(cands)} 只）")
     print("=" * 72)
     print(f"  {'代码':<8}{'名称':<10}{'行业':<18}{'入选日':>11}{'入选前连涨':>8}{'入选日%':>8}{'T+5%':>8}")
     for r in cands[:30]:
@@ -106,10 +113,10 @@ def main():
         "generated": now,
         "method": "无未来函数版(2026-08-16修正)：仅入选日当天可知条件",
         "rule": {"S1_ocr_label_超跌反弹": True, "S2_consec_before_le1": True, "S3_exclude_leadup_launch": True},
-        "stats": {"total": s0[0], "base_win": round(s0[1], 1), "base_mean": round(s0[2], 2),
-                  "s1": s1[0], "s1_win": round(s1[1], 1), "s1_mean": round(s1[2], 2),
-                  "s2": s2[0], "s2_win": round(s2[1], 1), "s2_mean": round(s2[2], 2),
-                  "s3": s3[0], "s3_win": round(s3[1], 1), "s3_mean": round(s3[2], 2)},
+        "stats": {"total": pct(s0,0), "base_win": round(pct(s0,1), 1), "base_mean": round(pct(s0,2), 2),
+                  "s1": pct(s1,0), "s1_win": round(pct(s1,1), 1), "s1_mean": round(pct(s1,2), 2),
+                  "s2": pct(s2,0), "s2_win": round(pct(s2,1), 1), "s2_mean": round(pct(s2,2), 2),
+                  "s3": pct(s3,0), "s3_win": round(pct(s3,1), 1), "s3_mean": round(pct(s3,2), 2)},
         "candidates": [{"code": r["code"], "name": r["qname"], "industry": r["industry"],
                         "date": r.get("date"), "consec_before": r.get("consec_before"),
                         "sel_change_pct": r.get("sel_change_pct"), "t5_gain_pct": r.get("t5_gain_pct"),
