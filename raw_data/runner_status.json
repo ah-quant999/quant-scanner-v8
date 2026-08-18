@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-18 19:11:18",
+  "update_time": "2026-08-18 20:11:08",
   "status": "ok",
   "process": {
     "ok": true,
@@ -18,20 +18,20 @@
   "worker_logs": {
     "ok": true,
     "errors": [],
-    "scanned": 2,
+    "scanned": 1,
     "message": "最近日志无错误"
   },
   "github": {
     "ok": true,
     "consecutive_failures": 0,
     "checkout_failures": 1,
-    "latest_run_id": 32127069032,
+    "latest_run_id": 32131779133,
     "latest_failed": false,
-    "latest_status": "queued",
+    "latest_status": "pending",
     "stuck_min": 0,
     "is_fail": false,
     "is_warn": false,
-    "message": "self-hosted 最近 15 条中连续失败 0 次，checkout 失败 1 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) queued"
+    "message": "self-hosted 最近 15 条中连续失败 0 次，checkout 失败 1 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) pending"
   },
   "runner_env": {
     "ok": true,
@@ -41,5 +41,5 @@
   "actions_taken": [
     "checkout 失败为网络型（github.com:443 超时），无需清空 _work，等待网络恢复"
   ],
-  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 1 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) queued"
+  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 1 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) pending"
 }
