@@ -111,7 +111,8 @@
       "2026-08-19": 269.4
     },
     "300502": {
-      "2026-08-17": 448.08
+      "2026-08-17": 448.08,
+      "2026-08-19": 0
     },
     "688213": {
       "2026-08-17": 99.25
@@ -138,6 +139,9 @@
     "002396": {
       "2026-08-17": 33.91,
       "2026-08-18": 33.91
+    },
+    "688012": {
+      "2026-08-19": 398.33
     }
   },
   "_tracking_latest": {
@@ -198,9 +202,9 @@
     "300502": {
       "enter_date": "2026-08-17",
       "enter_close": 448.08,
-      "last_date": "2026-08-17",
-      "last_close": 448.08,
-      "status": "dropped",
+      "last_date": "2026-08-19",
+      "last_close": 0,
+      "status": "near",
       "streak": 1,
       "total_days": 1
     },
@@ -275,12 +279,20 @@
       "status": "strict",
       "streak": 3,
       "total_days": 2
+    },
+    "688012": {
+      "enter_date": "2026-08-19",
+      "enter_close": 398.33,
+      "last_date": "2026-08-19",
+      "last_close": 398.33,
+      "status": "near",
+      "streak": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-08-19 01:40:12"
+    "last_update": "2026-08-19 03:28:47"
   },
   "2026-08-18": [
     {
@@ -421,6 +433,38 @@
       "close": 269.4,
       "pct_chg": -2.39,
       "total_score": 33.2,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "688012",
+      "name": "中微公司",
+      "market": "sh",
+      "board": "科创板",
+      "close": 398.33,
+      "pct_chg": 2.71,
+      "total_score": 32.0,
+      "quality_grade": "C",
+      "industry": "专用设备制造业",
+      "sectors": [
+        "专用设备制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "300502",
+      "name": "新易盛",
+      "market": "创业板",
+      "board": "创业板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 17,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [

@@ -1,10 +1,10 @@
 {
-  "update_time": "2026-08-19 01:40:12",
+  "update_time": "2026-08-19 03:28:47",
   "data_date": "2026-08-19",
   "track_start": "2026-08-19",
   "history_days": 3,
   "strict_count": 1,
-  "near_count": 3,
+  "near_count": 5,
   "tracked": [
     {
       "code": "002371",
@@ -46,6 +46,33 @@
       "first_close": 33.36,
       "current_close": 33.56,
       "pnl_pct": 0.6,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
+      "code": "688012",
+      "name": "中微公司",
+      "market": "sh",
+      "board": "科创板",
+      "status": "near",
+      "total_score": 32.0,
+      "quality_grade": "C",
+      "industry": "专用设备制造业",
+      "sectors": [
+        "专用设备制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-19",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 398.33,
+      "current_close": 398.33,
+      "pnl_pct": 0.0,
       "catalysts": [
         {
           "tag": "中报预增",
@@ -101,6 +128,33 @@
       "current_close": 269.4,
       "pnl_pct": null,
       "catalysts": []
+    },
+    {
+      "code": "300502",
+      "name": "新易盛",
+      "market": "创业板",
+      "board": "创业板",
+      "status": "near",
+      "total_score": 17,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 448.08,
+      "current_close": null,
+      "pnl_pct": null,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "—"
+        }
+      ]
     }
   ],
   "alerts": [
@@ -127,12 +181,6 @@
       "code": "688213",
       "name": "",
       "text": "(688213) 于 2026-08-17 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "warn",
-      "code": "300502",
-      "name": "",
-      "text": "(300502) 于 2026-08-17 跌出共识（曾连续 1 日）"
     },
     {
       "level": "warn",
@@ -175,10 +223,19 @@
     "by_industry": [
       {
         "industry": "专用设备制造业",
-        "count": 2,
+        "count": 3,
         "names": [
           "北方华创",
+          "中微公司",
           "长川科技"
+        ]
+      },
+      {
+        "industry": "计算机、通信和其他电子设备制造业",
+        "count": 2,
+        "names": [
+          "胜宏科技",
+          "新易盛"
         ]
       },
       {
@@ -187,33 +244,26 @@
         "names": [
           "紫金矿业"
         ]
-      },
-      {
-        "industry": "计算机、通信和其他电子设备制造业",
-        "count": 1,
-        "names": [
-          "胜宏科技"
-        ]
       }
     ],
     "by_sector": [
       {
         "sector": "专用设备制造业",
+        "count": 3
+      },
+      {
+        "sector": "计算机、通信和其他电子设备制造业",
         "count": 2
       },
       {
         "sector": "有色金属矿采选业",
-        "count": 1
-      },
-      {
-        "sector": "计算机、通信和其他电子设备制造业",
         "count": 1
       }
     ],
     "concentration": 50.0
   },
   "overlap": {
-    "total_tracked": 4,
+    "total_tracked": 6,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
@@ -221,16 +271,19 @@
     },
     "cockpit_a": {
       "count": 8,
-      "overlap": 2,
+      "overlap": 3,
       "names": [
         "北方华创",
+        "中微公司",
         "长川科技"
       ]
     },
     "cockpit_b": {
       "count": 15,
-      "overlap": 0,
-      "names": []
+      "overlap": 1,
+      "names": [
+        "新易盛"
+      ]
     }
   },
   "backtest_signal": {
