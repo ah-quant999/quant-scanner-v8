@@ -26,7 +26,7 @@
   --json     输出 raw_data/momentum_filter_result.json
   --emit-js  输出 data/MOMENTUM_FILTER.js（构建管线 update_v8.py 挂载，随构建自动重算）
 """
-import json, re, sys, statistics
+import json, re, sys, statistics, os
 from collections import defaultdict
 from pathlib import Path
 
@@ -130,6 +130,26 @@ def main():
         out["republish_time"] = now
         js = "window.MOMENTUM_FILTER = " + json.dumps(out, ensure_ascii=False) + ";\n"
         js_path = f"{ROOT}/data/MOMENTUM_FILTER.js"
+        # ★★ 2026-08-18 死循环根治：republish_time=now 每次必变 → 文件必变 → build 必提交
+        #    → 触发自身/reconcile → 死循环（今日 359 提交实证）。写文件前中性化
+        #    republish_time + generated 比较，状态未变则不动文件。
+        try:
+            import re as _re
+            if os.path.exists(js_path):
+                with open(js_path, "r", encoding="utf-8") as f:
+                    old_js = f.read()
+                def _strip(s):
+                    s = _re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', s)
+                    s = _re.sub(r'"generated"\s*:\s*"[^"]*"', '"generated":""', s)
+                    return s
+                print("DBG old_len", len(old_js), "js_len", len(js), file=sys.stderr);
+                _so, _sn = _strip(old_js), _strip(js);
+                print("DBG equal", _so == _sn, file=sys.stderr);
+                if _so == _sn:
+                    print(f"⏭️  MOMENTUM_FILTER 状态未变，跳过重写（幂等）→ {now}")
+                    return
+        except Exception:
+            pass
         with open(js_path, "w", encoding="utf-8") as f:
             f.write(js)
         print(f"✅ 已输出 data/MOMENTUM_FILTER.js（{len(cands)} 只候选）→ {now}")

@@ -534,6 +534,25 @@ def _write_js(var_name, obj):
         # republish_time = 本次构建/重部署时间，仅用于排障与缓存戳，前端不得当作「数据时间」展示
         lite_obj["republish_time"] = now_ts
 
+    # ★★ 2026-08-18 主人令「每次更新部署都是错的」根因根治：构建幂等化 ★★
+    #   死循环机制（今日 359 提交实证）：
+    #     republish_time 每轮构建必变 → 69 个 data/*.js 文件内容每轮必变 →
+    #     build 提交 → 触发 cache_buster_reconcile → 改 index.html ?v → 再触发 build
+    #     → 无限循环，每次部署都错。
+    #   修复：写文件前先与现有文件比较「中性化 republish_time 后」的内容，
+    #    真实数据未变则跳过重写（republish_time 保持旧值）→ git diff 为空 →
+    #    build 不提交 → 死循环断开。?v 中性化逻辑与 _sha10 完全一致。
+    try:
+        if out_path.exists():
+            old_text = out_path.read_text(encoding='utf-8')
+            new_text = f"window.{var_name} = " + json.dumps(lite_obj, ensure_ascii=False, separators=(',', ':')) + ";\n"
+            _neut = lambda t: re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', t)
+            if _neut(old_text) == _neut(new_text):
+                print(f"  ⏭️  {var_name} 数据未变，跳过重写（幂等）")
+                return out_path
+    except Exception:
+        pass
+
     with open(out_path, "w", encoding='utf-8') as f:
         f.write(f"window.{var_name} = ")
         json.dump(lite_obj, f, ensure_ascii=False, separators=(',', ':'))

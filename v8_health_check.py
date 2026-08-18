@@ -1870,6 +1870,26 @@ def write_health_js(report):
     out_path = DATA_DIR / "HEALTH_CHECK.js"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     js = "window.HEALTH_CHECK = " + json.dumps(report, ensure_ascii=False, indent=2) + ";\n"
+    # ★★ 2026-08-18 主人令「每次更新部署都是错的」根因根治：HEALTH_CHECK 幂等化 ★★
+    #   死循环环节：① updated 字段每次构建必变 ② age_min（数据年龄分钟数）随当前
+    #   时间流逝每次必变 → HEALTH_CHECK.js 内容必变 → build 的 git diff 永不空 →
+    #   每次必提交 → 触发自身/reconcile → 死循环（今日 359 提交实证）。
+    #   修复：写文件前做 JSON 深度比较（剔除 updated/age_min 动态字段），状态未变
+    #   则完全不动文件。age_min 由前端基于 last_update 自行换算。
+    try:
+        if out_path.exists():
+            old_js = out_path.read_text(encoding="utf-8")
+            def _core(s):
+                d = json.loads(s.split("= ", 1)[1].rsplit(";", 1)[0])
+                d.pop("updated", None)
+                for it in d.get("items", []):
+                    it.pop("age_min", None)
+                return json.dumps(d, ensure_ascii=False, sort_keys=True)
+            if _core(old_js) == _core(js):
+                print(f"[INFO] HEALTH_CHECK 状态未变，跳过重写（幂等）")
+                return
+    except Exception:
+        pass
     out_path.write_text(js, encoding="utf-8")
     print(f"[INFO] 已生成 {out_path}")
 

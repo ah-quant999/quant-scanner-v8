@@ -408,6 +408,21 @@ def main():
         "category_label": CATEGORY_LABEL,
     }
     out_path = DATA_DIR / "freshness_status.json"
+    # ★★ 2026-08-18 主人令「每次更新部署都是错的」根因根治：幽灵提交幂等化 ★★
+    #   死循环源头：check_time 每次运行必变 → freshness_status.json 内容必变 →
+    #   health_patrol 每分钟写它 → 每次触发 build/reconcile → 今日 77 次 healthcheck 提交。
+    #   修复：写文件前比较「去掉 check_time 后的状态内容」，状态未变则完全不动文件
+    #   （check_time 保持旧值）→ git diff 为空 → 不提交 → 幽灵提交消失。
+    #   注意：状态真变化时 check_time 会随新内容一并更新，语义正确。
+    try:
+        if out_path.exists():
+            old = json.loads(out_path.read_text(encoding="utf-8"))
+            _strip_ts = lambda d: {k: v for k, v in d.items() if k != "check_time"}
+            if _strip_ts(old) == _strip_ts(status):
+                print(f"⏭️  新鲜度状态未变，跳过重写（幂等，check_time 保持 {old.get('check_time')}）")
+                status = old  # 用旧对象继续打印
+    except Exception:
+        pass
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(status, f, ensure_ascii=False, indent=2)
 
