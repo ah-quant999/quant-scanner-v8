@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-18 11:39:12",
+  "update_time": "2026-08-18 14:08:27",
   "data_date": "2026-08-18",
   "source": "CONCEPT_RANKING × STOCK_PROFILE × STOCK_QUOTE",
   "hot_concepts_count": 33,
@@ -9,11 +9,11 @@
     "转基因",
     "猪肉概念",
     "土地流转",
-    "煤化工概念",
+    "乡村振兴",
     "水产概念",
     "预制菜概念",
-    "乡村振兴",
-    "红利股"
+    "红利股",
+    "煤化工概念"
   ],
   "picks": [
     {
@@ -28,7 +28,7 @@
         "转基因"
       ],
       "hot_count": 4,
-      "total_score": 10.51
+      "total_score": 10.79
     },
     {
       "code": "600371",
@@ -42,7 +42,7 @@
         "转基因"
       ],
       "hot_count": 4,
-      "total_score": 10.05
+      "total_score": 10.33
     },
     {
       "code": "600598",
@@ -56,7 +56,7 @@
         "粮食概念"
       ],
       "hot_count": 4,
-      "total_score": 9.77
+      "total_score": 10.12
     },
     {
       "code": "600108",
@@ -70,7 +70,7 @@
         "粮食概念"
       ],
       "hot_count": 4,
-      "total_score": 9.68
+      "total_score": 10.04
     },
     {
       "code": "600359",
@@ -84,33 +84,20 @@
         "粮食概念"
       ],
       "hot_count": 4,
-      "total_score": 9.48
+      "total_score": 9.83
     },
     {
-      "code": "300087",
-      "name": "ST荃银",
-      "pct": 3.42,
-      "amount_yi": 1.04,
-      "hot_concepts": [
-        "农业种植",
-        "粮食概念",
-        "转基因"
-      ],
-      "hot_count": 3,
-      "total_score": 9.28
-    },
-    {
-      "code": "000716",
-      "name": "黑芝麻",
-      "pct": 3.73,
-      "amount_yi": 4.55,
+      "code": "600737",
+      "name": "中粮糖业",
+      "pct": 4.98,
+      "amount_yi": 9.8,
       "hot_concepts": [
         "乡村振兴",
         "农业种植",
-        "粮食概念"
+        "调味品概念"
       ],
       "hot_count": 3,
-      "total_score": 8.98
+      "total_score": 9.45
     },
     {
       "code": "002385",
@@ -126,20 +113,33 @@
         "猪肉概念"
       ],
       "hot_count": 6,
-      "total_score": 8.86
+      "total_score": 9.37
     },
     {
-      "code": "600737",
-      "name": "中粮糖业",
-      "pct": 4.98,
-      "amount_yi": 9.8,
+      "code": "000716",
+      "name": "黑芝麻",
+      "pct": 3.73,
+      "amount_yi": 4.55,
       "hot_concepts": [
         "乡村振兴",
         "农业种植",
-        "调味品概念"
+        "粮食概念"
       ],
       "hot_count": 3,
-      "total_score": 8.81
+      "total_score": 9.33
+    },
+    {
+      "code": "300087",
+      "name": "ST荃银",
+      "pct": 3.42,
+      "amount_yi": 1.04,
+      "hot_concepts": [
+        "农业种植",
+        "粮食概念",
+        "转基因"
+      ],
+      "hot_count": 3,
+      "total_score": 9.21
     },
     {
       "code": "000713",
@@ -153,7 +153,7 @@
         "草甘膦"
       ],
       "hot_count": 4,
-      "total_score": 8.58
+      "total_score": 9.01
     },
     {
       "code": "002556",
@@ -167,20 +167,7 @@
         "煤化工概念"
       ],
       "hot_count": 4,
-      "total_score": 8.15
-    },
-    {
-      "code": "002999",
-      "name": "天禾股份",
-      "pct": 2.41,
-      "amount_yi": 0.36,
-      "hot_concepts": [
-        "乡村振兴",
-        "农业种植",
-        "粮食概念"
-      ],
-      "hot_count": 3,
-      "total_score": 7.9
+      "total_score": 8.41
     },
     {
       "code": "601118",
@@ -193,19 +180,20 @@
         "土地流转"
       ],
       "hot_count": 3,
-      "total_score": 7.83
+      "total_score": 8.25
     },
     {
-      "code": "600540",
-      "name": "新赛股份",
-      "pct": 4.66,
-      "amount_yi": 1.47,
+      "code": "002999",
+      "name": "天禾股份",
+      "pct": 2.41,
+      "amount_yi": 0.36,
       "hot_concepts": [
+        "乡村振兴",
         "农业种植",
         "粮食概念"
       ],
-      "hot_count": 2,
-      "total_score": 7.67
+      "hot_count": 3,
+      "total_score": 8.25
     },
     {
       "code": "002215",
@@ -220,13 +208,25 @@
         "生态农业"
       ],
       "hot_count": 5,
-      "total_score": 7.59
+      "total_score": 8.15
+    },
+    {
+      "code": "600540",
+      "name": "新赛股份",
+      "pct": 4.66,
+      "amount_yi": 1.47,
+      "hot_concepts": [
+        "农业种植",
+        "粮食概念"
+      ],
+      "hot_count": 2,
+      "total_score": 7.67
     }
   ],
   "rejected_summary": {
     "no_hot_concept": 3880,
-    "too_hot": 59,
-    "too_cold": 13,
+    "too_hot": 65,
+    "too_cold": 12,
     "small_mv": 0,
     "big_mv": 0,
     "no_quote": 0
