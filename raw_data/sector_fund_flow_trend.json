@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-08-18 16:03",
+  "update_time": "2026-08-19 01:05",
   "data_type": "real",
   "summary": {
     "in_count": 40,
     "out_count": 0,
     "in_text": "银行(26.3亿)、高股息精选(24.9亿)、电子纸(21.6亿)、跨境支付(CIPS)(16.1亿)、智慧灯杆(14.7亿)",
     "out_text": "无",
-    "alert": "🔥 40个板块大幅流入；🚀 银行+26.3亿(连8天)、高股息精选+24.9亿(连2天)、电子纸+21.6亿"
+    "alert": "🔥 40个板块大幅流入；🚀 银行+26.3亿、高股息精选+24.9亿(连3天)、电子纸+21.6亿(连2天)"
   },
   "sectors_in": [
     {
@@ -16,7 +16,7 @@
       "net_20d": 0,
       "type": "行业",
       "source": "本地累加",
-      "consecutive_days": 8,
+      "consecutive_days": 1,
       "trend": "in"
     },
     {
@@ -25,7 +25,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
@@ -34,7 +34,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -59,10 +59,10 @@
       "name": "光学光电子",
       "net": 13.16,
       "net_5d": -38.41,
-      "net_20d": 1772.97,
+      "net_20d": 1548.69,
       "type": "行业",
       "source": "本地累加",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -78,10 +78,10 @@
       "name": "光伏设备",
       "net": 11.25,
       "net_5d": -33.5,
-      "net_20d": 911.42,
+      "net_20d": 871.47,
       "type": "行业",
       "source": "本地累加",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -108,17 +108,17 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
       "name": "BC电池",
       "net": 8.75,
       "net_5d": 15.08,
-      "net_20d": 1120.25,
+      "net_20d": 978.35,
       "type": "概念",
       "source": "本地累加",
-      "consecutive_days": 6,
+      "consecutive_days": 7,
       "trend": "in"
     },
     {
@@ -127,7 +127,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -137,7 +137,7 @@
       "net_20d": 0,
       "type": "行业",
       "source": "本地累加",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
@@ -146,7 +146,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
@@ -164,7 +164,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
@@ -182,7 +182,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -191,7 +191,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
@@ -200,7 +200,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
@@ -209,14 +209,14 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
       "name": "电机",
       "net": 5.0,
-      "net_5d": 5.96,
-      "net_20d": 175.24,
+      "net_5d": 6.08,
+      "net_20d": 175.27,
       "type": "行业",
       "consecutive_days": 1,
       "trend": "in"
@@ -233,8 +233,8 @@
     {
       "name": "港口航运",
       "net": 3.94,
-      "net_5d": -4.01,
-      "net_20d": 92.0,
+      "net_5d": 5.51,
+      "net_20d": 114.48,
       "type": "行业",
       "consecutive_days": 1,
       "trend": "in"
@@ -246,7 +246,7 @@
       "net_20d": 0,
       "type": "概念",
       "source": "本地累加",
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in"
     },
     {
@@ -265,7 +265,7 @@
       "net_20d": 0,
       "type": "行业",
       "source": "本地累加",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -310,7 +310,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "行业",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
@@ -356,7 +356,7 @@
       "net_20d": 0,
       "type": "概念",
       "source": "本地累加",
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in"
     },
     {
@@ -374,7 +374,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     }
   ],
@@ -387,7 +387,7 @@
       "net_20d": 0,
       "type": "行业",
       "source": "本地累加",
-      "consecutive_days": 8,
+      "consecutive_days": 1,
       "trend": "in"
     },
     {
@@ -396,7 +396,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
@@ -405,7 +405,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -430,10 +430,10 @@
       "name": "光学光电子",
       "net": 13.16,
       "net_5d": -38.41,
-      "net_20d": 1772.97,
+      "net_20d": 1548.69,
       "type": "行业",
       "source": "本地累加",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -449,10 +449,10 @@
       "name": "光伏设备",
       "net": 11.25,
       "net_5d": -33.5,
-      "net_20d": 911.42,
+      "net_20d": 871.47,
       "type": "行业",
       "source": "本地累加",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -479,17 +479,17 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
       "name": "BC电池",
       "net": 8.75,
       "net_5d": 15.08,
-      "net_20d": 1120.25,
+      "net_20d": 978.35,
       "type": "概念",
       "source": "本地累加",
-      "consecutive_days": 6,
+      "consecutive_days": 7,
       "trend": "in"
     },
     {
@@ -498,7 +498,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -508,7 +508,7 @@
       "net_20d": 0,
       "type": "行业",
       "source": "本地累加",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
@@ -517,7 +517,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
@@ -535,7 +535,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
@@ -553,7 +553,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -562,7 +562,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
@@ -571,7 +571,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in"
     },
     {
@@ -580,14 +580,14 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
       "name": "电机",
       "net": 5.0,
-      "net_5d": 5.96,
-      "net_20d": 175.24,
+      "net_5d": 6.08,
+      "net_20d": 175.27,
       "type": "行业",
       "consecutive_days": 1,
       "trend": "in"
@@ -604,8 +604,8 @@
     {
       "name": "港口航运",
       "net": 3.94,
-      "net_5d": -4.01,
-      "net_20d": 92.0,
+      "net_5d": 5.51,
+      "net_20d": 114.48,
       "type": "行业",
       "consecutive_days": 1,
       "trend": "in"
@@ -617,7 +617,7 @@
       "net_20d": 0,
       "type": "概念",
       "source": "本地累加",
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in"
     },
     {
@@ -636,7 +636,7 @@
       "net_20d": 0,
       "type": "行业",
       "source": "本地累加",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -681,7 +681,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "行业",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in"
     },
     {
@@ -727,7 +727,7 @@
       "net_20d": 0,
       "type": "概念",
       "source": "本地累加",
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in"
     },
     {
@@ -745,21 +745,21 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     }
   ],
   "consecutive": {
     "银行": {
-      "days": 8,
+      "days": 1,
       "trend": "in"
     },
     "高股息精选": {
-      "days": 2,
+      "days": 3,
       "trend": "in"
     },
     "电子纸": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "跨境支付(CIPS)": {
@@ -771,7 +771,7 @@
       "trend": "in"
     },
     "光学光电子": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "猪肉": {
@@ -779,7 +779,7 @@
       "trend": "in"
     },
     "光伏设备": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "种植业与林业": {
@@ -791,23 +791,23 @@
       "trend": "in"
     },
     "农业种植": {
-      "days": 2,
+      "days": 3,
       "trend": "in"
     },
     "BC电池": {
-      "days": 6,
+      "days": 7,
       "trend": "in"
     },
     "MicroLED概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "养殖业": {
-      "days": 4,
+      "days": 5,
       "trend": "in"
     },
     "转基因": {
-      "days": 2,
+      "days": 3,
       "trend": "in"
     },
     "农村电商": {
@@ -815,7 +815,7 @@
       "trend": "in"
     },
     "粮食概念": {
-      "days": 2,
+      "days": 3,
       "trend": "in"
     },
     "民营医院": {
@@ -823,19 +823,19 @@
       "trend": "in"
     },
     "生态农业": {
-      "days": 1,
-      "trend": "in"
-    },
-    "煤化工概念": {
       "days": 2,
       "trend": "in"
     },
+    "煤化工概念": {
+      "days": 3,
+      "trend": "in"
+    },
     "HJT电池": {
-      "days": 4,
+      "days": 5,
       "trend": "in"
     },
     "TOPCON电池": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "电机": {
@@ -851,7 +851,7 @@
       "trend": "in"
     },
     "土地流转": {
-      "days": 5,
+      "days": 6,
       "trend": "in"
     },
     "大豆": {
@@ -859,7 +859,7 @@
       "trend": "in"
     },
     "农化制品": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "养鸡": {
@@ -879,7 +879,7 @@
       "trend": "in"
     },
     "农产品加工": {
-      "days": 2,
+      "days": 3,
       "trend": "in"
     },
     "油气开采及服务": {
@@ -899,7 +899,7 @@
       "trend": "in"
     },
     "页岩气": {
-      "days": 5,
+      "days": 6,
       "trend": "in"
     },
     "动物疫苗": {
@@ -907,7 +907,7 @@
       "trend": "in"
     },
     "可燃冰": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     }
   },
@@ -1050,11 +1050,11 @@
     {
       "name": "光学光电子",
       "net": 13.16,
-      "net_5d": -36.02,
-      "net_20d": 1772.97,
+      "net_5d": -19.99,
+      "net_20d": 1548.69,
       "type": "行业",
       "source": "本地累加",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
       "net_5d_days": 5,
       "net_60d": null
@@ -1062,11 +1062,11 @@
     {
       "name": "BC电池",
       "net": 8.75,
-      "net_5d": 22.23,
-      "net_20d": 1120.25,
+      "net_5d": 20.46,
+      "net_20d": 978.35,
       "type": "概念",
       "source": "本地累加",
-      "consecutive_days": 6,
+      "consecutive_days": 7,
       "trend": "in",
       "net_5d_days": 5,
       "net_60d": null
@@ -1074,11 +1074,11 @@
     {
       "name": "光伏设备",
       "net": 11.25,
-      "net_5d": -35.42,
-      "net_20d": 911.42,
+      "net_5d": -5.79,
+      "net_20d": 871.47,
       "type": "行业",
       "source": "本地累加",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
       "net_5d_days": 5,
       "net_60d": null
@@ -1086,8 +1086,8 @@
     {
       "name": "电机",
       "net": 5.0,
-      "net_5d": 5.96,
-      "net_20d": 175.24,
+      "net_5d": 6.08,
+      "net_20d": 175.27,
       "type": "行业",
       "consecutive_days": 1,
       "trend": "in",
@@ -1096,8 +1096,8 @@
     {
       "name": "港口航运",
       "net": 3.94,
-      "net_5d": -4.01,
-      "net_20d": 92.0,
+      "net_5d": 5.51,
+      "net_20d": 114.48,
       "type": "行业",
       "consecutive_days": 1,
       "trend": "in",

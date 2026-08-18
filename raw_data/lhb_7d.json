@@ -1,19 +1,11 @@
 {
-  "update_time": "2026-08-18 16:09:17",
+  "update_time": "2026-08-19 01:10:21",
   "range": [
-    "2026-08-07",
-    "2026-08-17"
+    "2026-08-10",
+    "2026-08-18"
   ],
   "days_count": 7,
   "daily_summary": [
-    {
-      "date": "2026-08-07",
-      "total": 68,
-      "resonance": 0,
-      "inst_only": 0,
-      "yz_only": 13,
-      "north_present": 0
-    },
     {
       "date": "2026-08-10",
       "total": 70,
@@ -61,17 +53,25 @@
       "inst_only": 2,
       "yz_only": 8,
       "north_present": 29
+    },
+    {
+      "date": "2026-08-18",
+      "total": 72,
+      "resonance": 0,
+      "inst_only": 2,
+      "yz_only": 12,
+      "north_present": 32
     }
   ],
   "top_inst_buy": [
     {
       "code": "301717",
       "name": "超纯应材",
-      "inst_net": 76680.7,
-      "yz_net": 31271.9,
+      "inst_net": 70678.9,
+      "yz_net": 40072.9,
       "north_net": 0.0,
-      "combined_net": 107952.6,
-      "days": 1,
+      "combined_net": 110751.8,
+      "days": 2,
       "resonance_days": 1
     },
     {
@@ -105,13 +105,13 @@
       "resonance_days": 0
     },
     {
-      "code": "000831",
-      "name": "中国稀土",
-      "inst_net": 25309.7,
-      "yz_net": 9637.3,
-      "north_net": 23581.9,
-      "combined_net": 34947.0,
-      "days": 2,
+      "code": "300243",
+      "name": "瑞丰高材",
+      "inst_net": 25829.6,
+      "yz_net": -3676.4,
+      "north_net": 0.0,
+      "combined_net": 22153.2,
+      "days": 1,
       "resonance_days": 0
     }
   ],
@@ -127,13 +127,13 @@
       "resonance_days": 0
     },
     {
-      "code": "002437",
-      "name": "誉衡药业",
-      "inst_net": -34635.7,
-      "yz_net": 25453.6,
-      "north_net": 19761.9,
-      "combined_net": -9182.1,
-      "days": 5,
+      "code": "688503",
+      "name": "聚和材料",
+      "inst_net": -40317.2,
+      "yz_net": 46416.9,
+      "north_net": 16603.9,
+      "combined_net": 6099.7,
+      "days": 2,
       "resonance_days": 0
     },
     {
@@ -147,23 +147,23 @@
       "resonance_days": 0
     },
     {
-      "code": "000779",
-      "name": "甘咨询",
-      "inst_net": -27023.2,
-      "yz_net": -2951.3,
-      "north_net": 0.0,
-      "combined_net": -29974.5,
-      "days": 7,
+      "code": "300558",
+      "name": "贝达药业",
+      "inst_net": -28535.0,
+      "yz_net": 13173.1,
+      "north_net": -2808.2,
+      "combined_net": -15361.9,
+      "days": 1,
       "resonance_days": 0
     },
     {
-      "code": "002081",
-      "name": "金螳螂",
-      "inst_net": -16428.2,
-      "yz_net": 31858.0,
-      "north_net": 11063.0,
-      "combined_net": 15429.8,
-      "days": 3,
+      "code": "000779",
+      "name": "甘咨询",
+      "inst_net": -27023.2,
+      "yz_net": -1009.3,
+      "north_net": 0.0,
+      "combined_net": -28032.5,
+      "days": 6,
       "resonance_days": 0
     }
   ],
@@ -189,33 +189,33 @@
       "resonance_days": 0
     },
     {
-      "code": "600664",
-      "name": "哈药股份",
-      "inst_net": 0.0,
-      "yz_net": 40952.4,
-      "north_net": 63449.2,
-      "combined_net": 40952.4,
-      "days": 1,
+      "code": "300684",
+      "name": "中石科技",
+      "inst_net": -23037.9,
+      "yz_net": 54147.0,
+      "north_net": 53062.5,
+      "combined_net": 31109.1,
+      "days": 2,
       "resonance_days": 0
     },
     {
-      "code": "603236",
-      "name": "移远通信",
-      "inst_net": 0.0,
-      "yz_net": 34711.3,
-      "north_net": 0.0,
-      "combined_net": 34711.3,
-      "days": 1,
+      "code": "688503",
+      "name": "聚和材料",
+      "inst_net": -40317.2,
+      "yz_net": 46416.9,
+      "north_net": 16603.9,
+      "combined_net": 6099.7,
+      "days": 2,
       "resonance_days": 0
     },
     {
-      "code": "002379",
-      "name": "宏桥控股",
-      "inst_net": 3073.7,
-      "yz_net": 32660.0,
-      "north_net": 7381.7,
-      "combined_net": 35733.7,
-      "days": 1,
+      "code": "000620",
+      "name": "盈新发展",
+      "inst_net": -2171.6,
+      "yz_net": 44187.6,
+      "north_net": 22863.4,
+      "combined_net": 42016.0,
+      "days": 2,
       "resonance_days": 0
     }
   ],
@@ -227,16 +227,6 @@
       "yz_net": -100624.8,
       "north_net": 0.0,
       "combined_net": -100624.8,
-      "days": 3,
-      "resonance_days": 0
-    },
-    {
-      "code": "002212",
-      "name": "天融信",
-      "inst_net": 0.0,
-      "yz_net": -66166.0,
-      "north_net": 0.0,
-      "combined_net": -66166.0,
       "days": 2,
       "resonance_days": 0
     },
@@ -251,16 +241,6 @@
       "resonance_days": 0
     },
     {
-      "code": "300476",
-      "name": "胜宏科技",
-      "inst_net": 0.0,
-      "yz_net": -47736.1,
-      "north_net": 0.0,
-      "combined_net": -47736.1,
-      "days": 1,
-      "resonance_days": 0
-    },
-    {
       "code": "000506",
       "name": "招金黄金",
       "inst_net": 0.0,
@@ -269,17 +249,37 @@
       "combined_net": -46859.6,
       "days": 2,
       "resonance_days": 0
+    },
+    {
+      "code": "600667",
+      "name": "太极实业",
+      "inst_net": 0.0,
+      "yz_net": -40758.2,
+      "north_net": -2220.3,
+      "combined_net": -40758.2,
+      "days": 3,
+      "resonance_days": 0
+    },
+    {
+      "code": "000802",
+      "name": "北京文化",
+      "inst_net": -2409.6,
+      "yz_net": -39986.7,
+      "north_net": 0.0,
+      "combined_net": -42396.3,
+      "days": 5,
+      "resonance_days": 0
     }
   ],
   "top_resonance": [
     {
       "code": "301717",
       "name": "超纯应材",
-      "inst_net": 76680.7,
-      "yz_net": 31271.9,
+      "inst_net": 70678.9,
+      "yz_net": 40072.9,
       "north_net": 0.0,
-      "combined_net": 107952.6,
-      "days": 1,
+      "combined_net": 110751.8,
+      "days": 2,
       "resonance_days": 1
     },
     {
@@ -345,6 +345,16 @@
       "resonance_days": 1
     },
     {
+      "code": "300684",
+      "name": "中石科技",
+      "inst_net": -23037.9,
+      "yz_net": 54147.0,
+      "north_net": 53062.5,
+      "combined_net": 31109.1,
+      "days": 2,
+      "resonance_days": 0
+    },
+    {
       "code": "300017",
       "name": "网宿科技",
       "inst_net": 18404.0,
@@ -362,16 +372,6 @@
       "north_net": 25007.2,
       "combined_net": -64198.7,
       "days": 1,
-      "resonance_days": 0
-    },
-    {
-      "code": "000831",
-      "name": "中国稀土",
-      "inst_net": 25309.7,
-      "yz_net": 9637.3,
-      "north_net": 23581.9,
-      "combined_net": 34947.0,
-      "days": 2,
       "resonance_days": 0
     }
   ],

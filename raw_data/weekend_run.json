@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-18 16:09:15",
-  "generated": "2026-08-18 16:09:15",
+  "update_time": "2026-08-19 01:10:20",
+  "generated": "2026-08-19 01:10:20",
   "period_start": "2026-08-10",
   "period_end": "2026-08-16",
   "stats": {
@@ -10,11 +10,11 @@
     "ok_files": 9,
     "missing_files": 1,
     "latest_health": {
-      "ok": 81,
-      "warn": 8,
-      "fail": 21,
-      "total": 111,
-      "updated": "2026-08-18 16:02:10"
+      "ok": 100,
+      "warn": 0,
+      "fail": 0,
+      "total": 101,
+      "updated": "2026-08-18 10:18:58"
     }
   },
   "freshness": [
@@ -22,57 +22,57 @@
       "file": "lhb_data.json",
       "label": "龙虎榜",
       "status": "ok",
-      "update_time": "2026-08-18 08:54:45",
-      "size_kb": 22.7
+      "update_time": "2026-08-18 17:57:18",
+      "size_kb": 28.6
     },
     {
       "file": "triple_history.json",
       "label": "三重共振历史",
       "status": "ok",
-      "update_time": "2026-08-18 09:40:10",
-      "size_kb": 5.1
+      "update_time": "2026-08-18 18:15:10",
+      "size_kb": 7.9
     },
     {
       "file": "top10_daily.json",
       "label": "全站精选",
       "status": "ok",
-      "update_time": "2026-08-18 15:50:26",
-      "size_kb": 21.8
+      "update_time": "2026-08-19 00:59:28",
+      "size_kb": 21.9
     },
     {
       "file": "cockpit_tier_recommend.json",
       "label": "驾驶舱分档",
       "status": "ok",
-      "update_time": "2026-08-18 09:09:13",
-      "size_kb": 5.3
+      "update_time": "2026-08-18 18:15:08",
+      "size_kb": 6.9
     },
     {
       "file": "sector_rs.json",
       "label": "板块相对强度",
       "status": "ok",
-      "update_time": "2026-08-18 08:53",
+      "update_time": "2026-08-18 17:26",
       "size_kb": 70.3
     },
     {
       "file": "final_recommend.json",
       "label": "最终推荐池",
       "status": "ok",
-      "update_time": "2026-08-18 16:04:44",
-      "size_kb": 32.3
+      "update_time": "2026-08-19 01:06:19",
+      "size_kb": 44.2
     },
     {
       "file": "gold_pool.json",
       "label": "黄金池",
       "status": "ok",
-      "update_time": "2026-08-18 09:09:13",
-      "size_kb": 142.1
+      "update_time": "2026-08-18 18:15:08",
+      "size_kb": 568.9
     },
     {
       "file": "candidate.json",
       "label": "候选池",
       "status": "ok",
-      "update_time": "2026-08-18 08:57:58",
-      "size_kb": 87.7
+      "update_time": "2026-08-18 17:36:42",
+      "size_kb": 157.0
     },
     {
       "file": "four_volume.json",
@@ -84,8 +84,8 @@
       "file": "crds_card_data.json",
       "label": "逆势龙头",
       "status": "ok",
-      "update_time": "2026-08-18 08:57:30",
-      "size_kb": 15.3
+      "update_time": "2026-08-18 17:32:58",
+      "size_kb": 45.5
     }
   ],
   "source_note": "v8 周度运行汇总（轻量，离线可跑；由 algorithms/run_algorithms.py 周末链路调用）"

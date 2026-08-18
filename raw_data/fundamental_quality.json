@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-08-18 15:34:27",
-  "total": 233,
+  "update_time": "2026-08-19 00:51:00",
+  "total": 456,
   "grade_summary": {
-    "A": 18,
-    "B": 22,
-    "C": 74,
-    "D": 60,
-    "no_data": 59
+    "A": 33,
+    "B": 34,
+    "C": 156,
+    "D": 156,
+    "no_data": 77
   },
   "stocks": {
     "hk_00005": {
@@ -44,6 +44,27 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
+    "hk_00268": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_00291": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_00386": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
     "hk_00388": {
       "score": 0,
       "grade": "",
@@ -58,7 +79,35 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
+    "hk_00669": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
     "hk_00700": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_00762": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_00857": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_00863": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -107,6 +156,13 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
+    "hk_01038": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
     "hk_01081": {
       "score": 0,
       "grade": "",
@@ -114,7 +170,28 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
+    "hk_01093": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_01177": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
     "hk_01208": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_01209": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -156,6 +233,13 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
+    "hk_01519": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
     "hk_01548": {
       "score": 0,
       "grade": "",
@@ -191,13 +275,6 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
-    "hk_01919": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "港股暂无基本面数据源(中性不扣分)"
-    },
     "hk_02039": {
       "score": 0,
       "grade": "",
@@ -205,7 +282,7 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
-    "hk_02099": {
+    "hk_02252": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -240,7 +317,21 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
+    "hk_02331": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
     "hk_02359": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_02382": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -262,6 +353,13 @@
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
     "hk_02513": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_02556": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -296,7 +394,21 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
+    "hk_03696": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
     "hk_03750": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_03887": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -310,7 +422,7 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
-    "hk_03993": {
+    "hk_03988": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -331,7 +443,21 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
+    "hk_06618": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
     "hk_06809": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_06862": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -373,7 +499,7 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
-    "hk_09888": {
+    "hk_09866": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -394,7 +520,7 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
-    "hk_09961": {
+    "hk_09987": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -422,12 +548,25 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
-    "sh_600104": {
+    "sh_600030": {
       "score": 30,
       "grade": "D",
-      "roe": 3.4452000000000003,
-      "revenue_growth": 68.45320000000001,
-      "reason": "ROE差(3.4%) | 营收高增(68.5%)"
+      "roe": 9.8121,
+      "revenue_growth": 3.9474,
+      "reason": "ROE偏低(9.8%) | 营收持平(3.9%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sh_600096": {
+      "score": 55,
+      "grade": "C",
+      "roe": 11.741,
+      "revenue_growth": 44.4241,
+      "reason": "ROE一般(11.7%) | 营收高增(44.4%)"
     },
     "sh_600105": {
       "score": 45,
@@ -454,6 +593,20 @@
           "中报预增"
         ]
       }
+    },
+    "sh_600141": {
+      "score": 45,
+      "grade": "C",
+      "roe": 6.8645,
+      "revenue_growth": 58.7171,
+      "reason": "ROE偏低(6.9%) | 营收高增(58.7%)"
+    },
+    "sh_600172": {
+      "score": 25,
+      "grade": "D",
+      "roe": -91.78190000000001,
+      "revenue_growth": 17.9421,
+      "reason": "ROE差(-91.8%) | 营收增长(17.9%)"
     },
     "sh_600176": {
       "score": 55,
@@ -501,6 +654,19 @@
       "revenue_growth": 81.33550000000001,
       "reason": "ROE差(4.3%) | 营收高增(81.3%)"
     },
+    "sh_600267": {
+      "score": 45,
+      "grade": "C",
+      "roe": 6.3806,
+      "revenue_growth": 68.0094,
+      "reason": "ROE偏低(6.4%) | 营收高增(68.0%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
     "sh_600276": {
       "score": 55,
       "grade": "C",
@@ -508,16 +674,82 @@
       "revenue_growth": 52.7144,
       "reason": "ROE一般(14.4%) | 营收高增(52.7%)"
     },
-    "sh_600298": {
+    "sh_600309": {
+      "score": 55,
+      "grade": "C",
+      "roe": 12.3462,
+      "revenue_growth": 65.9486,
+      "reason": "ROE一般(12.3%) | 营收高增(65.9%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sh_600330": {
+      "score": 30,
+      "grade": "D",
+      "roe": -2.0946,
+      "revenue_growth": 27.4953,
+      "reason": "ROE差(-2.1%) | 营收高增(27.5%)",
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报首亏"
+        ]
+      }
+    },
+    "sh_600353": {
       "score": 45,
       "grade": "C",
-      "roe": 7.1995000000000005,
-      "revenue_growth": 35.6444,
-      "reason": "ROE偏低(7.2%) | 营收高增(35.6%)",
+      "roe": 8.7037,
+      "revenue_growth": 48.5014,
+      "reason": "ROE偏低(8.7%) | 营收高增(48.5%)"
+    },
+    "sh_600362": {
+      "score": 45,
+      "grade": "C",
+      "roe": 8.9563,
+      "revenue_growth": 264.4965,
+      "reason": "ROE偏低(9.0%) | 营收高增(264.5%)",
       "news": {
-        "score": 8,
+        "score": 15,
         "tags": [
-          "回购"
+          "中报预增"
+        ]
+      }
+    },
+    "sh_600378": {
+      "score": 45,
+      "grade": "C",
+      "roe": 8.1772,
+      "revenue_growth": 53.9343,
+      "reason": "ROE偏低(8.2%) | 营收高增(53.9%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "一季报预增"
+        ]
+      }
+    },
+    "sh_600396": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.1094999999999997,
+      "revenue_growth": 29.8025,
+      "reason": "ROE差(2.1%) | 营收高增(29.8%)"
+    },
+    "sh_600397": {
+      "score": 30,
+      "grade": "D",
+      "roe": -136.03050000000002,
+      "revenue_growth": 77.0539,
+      "reason": "ROE差(-136.0%) | 营收高增(77.1%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报扭亏"
         ]
       }
     },
@@ -527,6 +759,13 @@
       "roe": -148.02960000000002,
       "revenue_growth": 27.4439,
       "reason": "ROE差(-148.0%) | 营收高增(27.4%)"
+    },
+    "sh_600418": {
+      "score": 30,
+      "grade": "D",
+      "roe": -16.1766,
+      "revenue_growth": 93.1738,
+      "reason": "ROE差(-16.2%) | 营收高增(93.2%)"
     },
     "sh_600460": {
       "score": 30,
@@ -547,6 +786,19 @@
       "roe": 8.8875,
       "revenue_growth": 96.3325,
       "reason": "ROE偏低(8.9%) | 营收高增(96.3%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sh_600489": {
+      "score": 65,
+      "grade": "B",
+      "roe": 17.095,
+      "revenue_growth": 133.8098,
+      "reason": "ROE良好(17.1%) | 营收高增(133.8%)",
       "news": {
         "score": 15,
         "tags": [
@@ -581,6 +833,13 @@
         ]
       }
     },
+    "sh_600547": {
+      "score": 55,
+      "grade": "C",
+      "roe": 11.4621,
+      "revenue_growth": 63.007000000000005,
+      "reason": "ROE一般(11.5%) | 营收高增(63.0%)"
+    },
     "sh_600549": {
       "score": 55,
       "grade": "C",
@@ -614,12 +873,38 @@
         ]
       }
     },
+    "sh_600601": {
+      "score": 55,
+      "grade": "C",
+      "roe": 10.8057,
+      "revenue_growth": 58.898700000000005,
+      "reason": "ROE一般(10.8%) | 营收高增(58.9%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
     "sh_600602": {
       "score": 30,
       "grade": "D",
       "roe": 4.023899999999999,
       "revenue_growth": 75.8811,
       "reason": "ROE差(4.0%) | 营收高增(75.9%)"
+    },
+    "sh_600641": {
+      "score": 15,
+      "grade": "D",
+      "roe": 2.5391,
+      "revenue_growth": 9.3135,
+      "reason": "ROE差(2.5%) | 营收持平(9.3%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
     },
     "sh_600664": {
       "score": 45,
@@ -648,12 +933,58 @@
       "revenue_growth": 91.7829,
       "reason": "ROE偏低(8.7%) | 营收高增(91.8%)"
     },
-    "sh_601099": {
-      "score": 15,
+    "sh_600703": {
+      "score": 30,
       "grade": "D",
-      "roe": 2.147,
-      "revenue_growth": 6.9234,
-      "reason": "ROE差(2.1%) | 营收持平(6.9%)"
+      "roe": -0.9844999999999999,
+      "revenue_growth": 30.6016,
+      "reason": "ROE差(-1.0%) | 营收高增(30.6%)",
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报首亏"
+        ]
+      }
+    },
+    "sh_600707": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.7282,
+      "revenue_growth": 26.953100000000003,
+      "reason": "ROE差(1.7%) | 营收高增(27.0%)",
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报预减"
+        ]
+      }
+    },
+    "sh_600721": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.215,
+      "revenue_growth": 35.1084,
+      "reason": "ROE偏低(5.2%) | 营收高增(35.1%)"
+    },
+    "sh_600744": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.0957,
+      "revenue_growth": 27.4949,
+      "reason": "ROE偏低(5.1%) | 营收高增(27.5%)",
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报预减"
+        ]
+      }
+    },
+    "sh_600869": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.3979,
+      "revenue_growth": 136.1813,
+      "reason": "ROE差(1.4%) | 营收高增(136.2%)"
     },
     "sh_601100": {
       "score": 65,
@@ -675,6 +1006,19 @@
         ]
       }
     },
+    "sh_601168": {
+      "score": 70,
+      "grade": "A",
+      "roe": 20.4052,
+      "revenue_growth": 62.6336,
+      "reason": "ROE优质(20.4%) | 营收高增(62.6%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
     "sh_601208": {
       "score": 45,
       "grade": "C",
@@ -688,25 +1032,26 @@
         ]
       }
     },
-    "sh_601238": {
+    "sh_601288": {
       "score": 30,
       "grade": "D",
-      "roe": -8.0002,
-      "revenue_growth": 43.1569,
-      "reason": "ROE差(-8.0%) | 营收高增(43.2%)"
+      "roe": 9.1985,
+      "revenue_growth": 1.5764,
+      "reason": "ROE偏低(9.2%) | 营收持平(1.6%)"
     },
-    "sh_601633": {
-      "score": 55,
+    "sh_601318": {
+      "score": 40,
       "grade": "C",
-      "roe": 11.8232,
-      "revenue_growth": 100.6992,
-      "reason": "ROE一般(11.8%) | 营收高增(100.7%)",
-      "news": {
-        "score": -15,
-        "tags": [
-          "中报预减"
-        ]
-      }
+      "roe": 13.973700000000001,
+      "revenue_growth": 7.8232,
+      "reason": "ROE一般(14.0%) | 营收持平(7.8%)"
+    },
+    "sh_601398": {
+      "score": 30,
+      "grade": "D",
+      "roe": 8.9739,
+      "revenue_growth": 1.6389,
+      "reason": "ROE偏低(9.0%) | 营收持平(1.6%)"
     },
     "sh_601689": {
       "score": 55,
@@ -741,6 +1086,26 @@
         ]
       }
     },
+    "sh_601991": {
+      "score": 45,
+      "grade": "C",
+      "roe": 9.4146,
+      "revenue_growth": 36.9609,
+      "reason": "ROE偏低(9.4%) | 营收高增(37.0%)"
+    },
+    "sh_603002": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.0255999999999998,
+      "revenue_growth": 59.6997,
+      "reason": "ROE差(1.0%) | 营收高增(59.7%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
     "sh_603019": {
       "score": 55,
       "grade": "C",
@@ -761,16 +1126,36 @@
         ]
       }
     },
-    "sh_603138": {
+    "sh_603118": {
       "score": 30,
       "grade": "D",
-      "roe": -5.6846,
-      "revenue_growth": 44.445800000000006,
-      "reason": "ROE差(-5.7%) | 营收高增(44.4%)",
+      "roe": 1.5527,
+      "revenue_growth": 89.9741,
+      "reason": "ROE差(1.6%) | 营收高增(90.0%)"
+    },
+    "sh_603127": {
+      "score": 25,
+      "grade": "D",
+      "roe": 3.6313999999999997,
+      "revenue_growth": 17.3773,
+      "reason": "ROE差(3.6%) | 营收增长(17.4%)",
       "news": {
-        "score": -5,
+        "score": 15,
         "tags": [
-          "中报略减"
+          "中报预增"
+        ]
+      }
+    },
+    "sh_603186": {
+      "score": 65,
+      "grade": "B",
+      "roe": 17.3701,
+      "revenue_growth": 70.2044,
+      "reason": "ROE良好(17.4%) | 营收高增(70.2%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
         ]
       }
     },
@@ -800,19 +1185,6 @@
       "roe": 13.5915,
       "revenue_growth": 26.344299999999997,
       "reason": "ROE一般(13.6%) | 营收高增(26.3%)"
-    },
-    "sh_603501": {
-      "score": 65,
-      "grade": "B",
-      "roe": 15.448400000000001,
-      "revenue_growth": 69.8959,
-      "reason": "ROE良好(15.4%) | 营收高增(69.9%)",
-      "news": {
-        "score": -5,
-        "tags": [
-          "一季报略减"
-        ]
-      }
     },
     "sh_603618": {
       "score": 30,
@@ -854,6 +1226,26 @@
       "revenue_growth": 64.0761,
       "reason": "ROE差(2.1%) | 营收高增(64.1%)"
     },
+    "sh_603773": {
+      "score": 30,
+      "grade": "D",
+      "roe": -13.4417,
+      "revenue_growth": 57.513400000000004,
+      "reason": "ROE差(-13.4%) | 营收高增(57.5%)",
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
+    },
+    "sh_603799": {
+      "score": 55,
+      "grade": "C",
+      "roe": 14.336699999999999,
+      "revenue_growth": 54.737,
+      "reason": "ROE一般(14.3%) | 营收高增(54.7%)"
+    },
     "sh_603893": {
       "score": 70,
       "grade": "A",
@@ -894,6 +1286,53 @@
         ]
       }
     },
+    "sh_605358": {
+      "score": 25,
+      "grade": "D",
+      "roe": 0.9372,
+      "revenue_growth": 10.7147,
+      "reason": "ROE差(0.9%) | 营收增长(10.7%)",
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
+    },
+    "sh_605376": {
+      "score": 55,
+      "grade": "C",
+      "roe": 13.4896,
+      "revenue_growth": 56.852999999999994,
+      "reason": "ROE一般(13.5%) | 营收高增(56.9%)"
+    },
+    "sh_688001": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.3295,
+      "revenue_growth": 41.1068,
+      "reason": "ROE差(2.3%) | 营收高增(41.1%)"
+    },
+    "sh_688002": {
+      "score": 65,
+      "grade": "B",
+      "roe": 17.0683,
+      "revenue_growth": 38.5475,
+      "reason": "ROE良好(17.1%) | 营收高增(38.5%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sh_688003": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.8684000000000003,
+      "revenue_growth": 41.970800000000004,
+      "reason": "ROE差(3.9%) | 营收高增(42.0%)"
+    },
     "sh_688008": {
       "score": 65,
       "grade": "B",
@@ -927,6 +1366,47 @@
       "revenue_growth": 14.8537,
       "reason": "ROE差(3.6%) | 营收增长(14.9%)"
     },
+    "sh_688019": {
+      "score": 70,
+      "grade": "A",
+      "roe": 25.1496,
+      "revenue_growth": 58.9909,
+      "reason": "ROE优质(25.1%) | 营收高增(59.0%)"
+    },
+    "sh_688025": {
+      "score": 55,
+      "grade": "C",
+      "roe": 12.867400000000002,
+      "revenue_growth": 67.4996,
+      "reason": "ROE一般(12.9%) | 营收高增(67.5%)"
+    },
+    "sh_688035": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.8808,
+      "revenue_growth": 25.5366,
+      "reason": "ROE差(2.9%) | 营收高增(25.5%)"
+    },
+    "sh_688036": {
+      "score": 45,
+      "grade": "C",
+      "roe": 8.5077,
+      "revenue_growth": 74.9317,
+      "reason": "ROE偏低(8.5%) | 营收高增(74.9%)",
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
+    },
+    "sh_688037": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.6152,
+      "revenue_growth": 32.3695,
+      "reason": "ROE差(2.6%) | 营收高增(32.4%)"
+    },
     "sh_688041": {
       "score": 45,
       "grade": "C",
@@ -953,12 +1433,79 @@
         ]
       }
     },
+    "sh_688048": {
+      "score": 25,
+      "grade": "D",
+      "roe": 0.7261,
+      "revenue_growth": 14.330699999999998,
+      "reason": "ROE差(0.7%) | 营收增长(14.3%)"
+    },
     "sh_688072": {
       "score": 65,
       "grade": "B",
       "roe": 15.5878,
       "revenue_growth": 37.106,
       "reason": "ROE良好(15.6%) | 营收高增(37.1%)"
+    },
+    "sh_688073": {
+      "score": 45,
+      "grade": "C",
+      "roe": 7.4519,
+      "revenue_growth": 53.651700000000005,
+      "reason": "ROE偏低(7.5%) | 营收高增(53.7%)"
+    },
+    "sh_688082": {
+      "score": 40,
+      "grade": "C",
+      "roe": 7.0447999999999995,
+      "revenue_growth": 18.7636,
+      "reason": "ROE偏低(7.0%) | 营收增长(18.8%)"
+    },
+    "sh_688099": {
+      "score": 55,
+      "grade": "C",
+      "roe": 12.7069,
+      "revenue_growth": 84.86160000000001,
+      "reason": "ROE一般(12.7%) | 营收高增(84.9%)",
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
+    },
+    "sh_688102": {
+      "score": 45,
+      "grade": "C",
+      "roe": 9.6858,
+      "revenue_growth": 59.3976,
+      "reason": "ROE偏低(9.7%) | 营收高增(59.4%)"
+    },
+    "sh_688110": {
+      "score": 30,
+      "grade": "D",
+      "roe": -5.8208,
+      "revenue_growth": 25.0015,
+      "reason": "ROE差(-5.8%) | 营收高增(25.0%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报扭亏"
+        ]
+      }
+    },
+    "sh_688111": {
+      "score": 65,
+      "grade": "B",
+      "roe": 15.1718,
+      "revenue_growth": 34.8047,
+      "reason": "ROE良好(15.2%) | 营收高增(34.8%)",
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
     },
     "sh_688114": {
       "score": 30,
@@ -967,12 +1514,46 @@
       "revenue_growth": 27.095999999999997,
       "reason": "ROE差(-2.9%) | 营收高增(27.1%)"
     },
+    "sh_688120": {
+      "score": 65,
+      "grade": "B",
+      "roe": 15.5578,
+      "revenue_growth": 37.350899999999996,
+      "reason": "ROE良好(15.6%) | 营收高增(37.4%)"
+    },
+    "sh_688123": {
+      "score": 60,
+      "grade": "B",
+      "roe": 18.2858,
+      "revenue_growth": 19.9911,
+      "reason": "ROE良好(18.3%) | 营收增长(20.0%)",
+      "news": {
+        "score": -5,
+        "tags": [
+          "中报略减"
+        ]
+      }
+    },
+    "sh_688126": {
+      "score": 25,
+      "grade": "D",
+      "roe": -10.3169,
+      "revenue_growth": 11.7864,
+      "reason": "ROE差(-10.3%) | 营收增长(11.8%)"
+    },
     "sh_688141": {
       "score": 30,
       "grade": "D",
       "roe": -39.9208,
       "revenue_growth": 55.61430000000001,
       "reason": "ROE差(-39.9%) | 营收高增(55.6%)"
+    },
+    "sh_688143": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.9,
+      "revenue_growth": 23.1142,
+      "reason": "ROE差(1.9%) | 营收高增(23.1%)"
     },
     "sh_688146": {
       "score": 45,
@@ -981,12 +1562,33 @@
       "revenue_growth": 25.5828,
       "reason": "ROE偏低(5.9%) | 营收高增(25.6%)"
     },
+    "sh_688147": {
+      "score": 45,
+      "grade": "C",
+      "roe": 7.891900000000001,
+      "revenue_growth": 29.3724,
+      "reason": "ROE偏低(7.9%) | 营收高增(29.4%)"
+    },
+    "sh_688158": {
+      "score": 30,
+      "grade": "D",
+      "roe": -3.0575,
+      "revenue_growth": 48.786699999999996,
+      "reason": "ROE差(-3.1%) | 营收高增(48.8%)"
+    },
     "sh_688167": {
       "score": 25,
       "grade": "D",
       "roe": -2.9917,
       "revenue_growth": 13.6601,
       "reason": "ROE差(-3.0%) | 营收增长(13.7%)"
+    },
+    "sh_688169": {
+      "score": 55,
+      "grade": "C",
+      "roe": 10.1438,
+      "revenue_growth": 100.63359999999999,
+      "reason": "ROE一般(10.1%) | 营收高增(100.6%)"
     },
     "sh_688180": {
       "score": 30,
@@ -1008,6 +1610,26 @@
         ]
       }
     },
+    "sh_688195": {
+      "score": 45,
+      "grade": "C",
+      "roe": 7.396800000000001,
+      "revenue_growth": 41.8159,
+      "reason": "ROE偏低(7.4%) | 营收高增(41.8%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sh_688200": {
+      "score": 55,
+      "grade": "C",
+      "roe": 14.0176,
+      "revenue_growth": 32.4091,
+      "reason": "ROE一般(14.0%) | 营收高增(32.4%)"
+    },
     "sh_688202": {
       "score": 30,
       "grade": "D",
@@ -1021,12 +1643,72 @@
         ]
       }
     },
+    "sh_688205": {
+      "score": 25,
+      "grade": "D",
+      "roe": 4.1187000000000005,
+      "revenue_growth": 18.4452,
+      "reason": "ROE差(4.1%) | 营收增长(18.4%)",
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
+    },
+    "sh_688213": {
+      "score": 70,
+      "grade": "A",
+      "roe": 21.2778,
+      "revenue_growth": 96.8424,
+      "reason": "ROE优质(21.3%) | 营收高增(96.8%)",
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
+    },
+    "sh_688220": {
+      "score": 30,
+      "grade": "D",
+      "roe": -7.007199999999999,
+      "revenue_growth": 56.4738,
+      "reason": "ROE差(-7.0%) | 营收高增(56.5%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报扭亏"
+        ]
+      }
+    },
     "sh_688222": {
       "score": 45,
       "grade": "C",
       "roe": 7.567500000000001,
       "revenue_growth": 28.323500000000003,
       "reason": "ROE偏低(7.6%) | 营收高增(28.3%)"
+    },
+    "sh_688233": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.5409,
+      "revenue_growth": 21.4904,
+      "reason": "ROE偏低(5.5%) | 营收高增(21.5%)"
+    },
+    "sh_688234": {
+      "score": 25,
+      "grade": "D",
+      "roe": -3.3366,
+      "revenue_growth": 17.294999999999998,
+      "reason": "ROE差(-3.3%) | 营收增长(17.3%)"
+    },
+    "sh_688235": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.3296,
+      "revenue_growth": 76.343,
+      "reason": "ROE偏低(5.3%) | 营收高增(76.3%)"
     },
     "sh_688249": {
       "score": 30,
@@ -1042,12 +1724,58 @@
       "revenue_growth": 37.9023,
       "reason": "ROE良好(18.2%) | 营收高增(37.9%)"
     },
+    "sh_688257": {
+      "score": 45,
+      "grade": "C",
+      "roe": 9.921299999999999,
+      "revenue_growth": 56.1932,
+      "reason": "ROE偏低(9.9%) | 营收高增(56.2%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
     "sh_688260": {
       "score": 30,
       "grade": "D",
       "roe": -69.1528,
       "revenue_growth": 22.2923,
       "reason": "ROE差(-69.2%) | 营收高增(22.3%)"
+    },
+    "sh_688268": {
+      "score": 45,
+      "grade": "C",
+      "roe": 6.8313,
+      "revenue_growth": 41.2193,
+      "reason": "ROE偏低(6.8%) | 营收高增(41.2%)",
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
+    },
+    "sh_688300": {
+      "score": 45,
+      "grade": "C",
+      "roe": 8.5355,
+      "revenue_growth": 24.0931,
+      "reason": "ROE偏低(8.5%) | 营收高增(24.1%)"
+    },
+    "sh_688308": {
+      "score": 30,
+      "grade": "D",
+      "roe": 4.0035,
+      "revenue_growth": 37.3759,
+      "reason": "ROE差(4.0%) | 营收高增(37.4%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报扭亏"
+        ]
+      }
     },
     "sh_688313": {
       "score": 65,
@@ -1063,6 +1791,19 @@
       "revenue_growth": 27.907700000000002,
       "reason": "ROE差(4.4%) | 营收高增(27.9%)"
     },
+    "sh_688331": {
+      "score": 70,
+      "grade": "A",
+      "roe": 25.3672,
+      "revenue_growth": 51.0105,
+      "reason": "ROE优质(25.4%) | 营收高增(51.0%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
     "sh_688347": {
       "score": 25,
       "grade": "D",
@@ -1077,6 +1818,73 @@
       "revenue_growth": 33.813700000000004,
       "reason": "ROE差(1.6%) | 营收高增(33.8%)"
     },
+    "sh_688362": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.1927,
+      "revenue_growth": 30.495299999999997,
+      "reason": "ROE差(3.2%) | 营收高增(30.5%)"
+    },
+    "sh_688372": {
+      "score": 55,
+      "grade": "C",
+      "roe": 10.854800000000001,
+      "revenue_growth": 24.9044,
+      "reason": "ROE一般(10.9%) | 营收高增(24.9%)"
+    },
+    "sh_688380": {
+      "score": 40,
+      "grade": "C",
+      "roe": 5.3585,
+      "revenue_growth": 19.4312,
+      "reason": "ROE偏低(5.4%) | 营收增长(19.4%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sh_688385": {
+      "score": 55,
+      "grade": "C",
+      "roe": 12.945200000000002,
+      "revenue_growth": 23.2344,
+      "reason": "ROE一般(12.9%) | 营收高增(23.2%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sh_688388": {
+      "score": 30,
+      "grade": "D",
+      "roe": 0.8239,
+      "revenue_growth": 69.4393,
+      "reason": "ROE差(0.8%) | 营收高增(69.4%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sh_688392": {
+      "score": 45,
+      "grade": "C",
+      "roe": 6.7303,
+      "revenue_growth": 34.4129,
+      "reason": "ROE偏低(6.7%) | 营收高增(34.4%)"
+    },
+    "sh_688396": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.9172,
+      "revenue_growth": 37.033300000000004,
+      "reason": "ROE差(2.9%) | 营收高增(37.0%)"
+    },
     "sh_688400": {
       "score": 30,
       "grade": "D",
@@ -1090,6 +1898,60 @@
         ]
       }
     },
+    "sh_688403": {
+      "score": 25,
+      "grade": "D",
+      "roe": 0.1245,
+      "revenue_growth": 18.7909,
+      "reason": "ROE差(0.1%) | 营收增长(18.8%)"
+    },
+    "sh_688409": {
+      "score": 30,
+      "grade": "D",
+      "roe": -0.1905,
+      "revenue_growth": 41.1032,
+      "reason": "ROE差(-0.2%) | 营收高增(41.1%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sh_688428": {
+      "score": 45,
+      "grade": "C",
+      "roe": 8.891,
+      "revenue_growth": 23.4778,
+      "reason": "ROE偏低(8.9%) | 营收高增(23.5%)"
+    },
+    "sh_688432": {
+      "score": 25,
+      "grade": "D",
+      "roe": 2.9243,
+      "revenue_growth": 11.9294,
+      "reason": "ROE差(2.9%) | 营收增长(11.9%)"
+    },
+    "sh_688449": {
+      "score": 45,
+      "grade": "C",
+      "roe": 7.8637,
+      "revenue_growth": 59.7611,
+      "reason": "ROE偏低(7.9%) | 营收高增(59.8%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sh_688456": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.6585,
+      "revenue_growth": 201.8889,
+      "reason": "ROE偏低(5.7%) | 营收高增(201.9%)"
+    },
     "sh_688469": {
       "score": 25,
       "grade": "D",
@@ -1097,12 +1959,60 @@
       "revenue_growth": 13.444600000000001,
       "reason": "ROE差(2.1%) | 营收增长(13.4%)"
     },
+    "sh_688485": {
+      "score": 25,
+      "grade": "D",
+      "roe": -1.1433,
+      "revenue_growth": 15.7446,
+      "reason": "ROE差(-1.1%) | 营收增长(15.7%)"
+    },
     "sh_688498": {
       "score": 45,
       "grade": "C",
       "roe": 8.6684,
       "revenue_growth": 25.457400000000003,
       "reason": "ROE偏低(8.7%) | 营收高增(25.5%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sh_688502": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.7983999999999996,
+      "revenue_growth": 38.428200000000004,
+      "reason": "ROE差(3.8%) | 营收高增(38.4%)"
+    },
+    "sh_688503": {
+      "score": 45,
+      "grade": "C",
+      "roe": 8.6945,
+      "revenue_growth": 146.2606,
+      "reason": "ROE偏低(8.7%) | 营收高增(146.3%)"
+    },
+    "sh_688507": {
+      "score": 25,
+      "grade": "D",
+      "roe": 1.1035,
+      "revenue_growth": 14.2418,
+      "reason": "ROE差(1.1%) | 营收增长(14.2%)"
+    },
+    "sh_688508": {
+      "score": 40,
+      "grade": "C",
+      "roe": 5.6076,
+      "revenue_growth": 19.0046,
+      "reason": "ROE偏低(5.6%) | 营收增长(19.0%)"
+    },
+    "sh_688519": {
+      "score": 45,
+      "grade": "C",
+      "roe": 9.0582,
+      "revenue_growth": 98.7954,
+      "reason": "ROE偏低(9.1%) | 营收高增(98.8%)",
       "news": {
         "score": 15,
         "tags": [
@@ -1130,12 +2040,93 @@
         ]
       }
     },
+    "sh_688530": {
+      "score": 30,
+      "grade": "D",
+      "roe": -4.8146,
+      "revenue_growth": 43.8941,
+      "reason": "ROE差(-4.8%) | 营收高增(43.9%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报扭亏"
+        ]
+      }
+    },
+    "sh_688536": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.0044999999999997,
+      "revenue_growth": 32.7449,
+      "reason": "ROE差(3.0%) | 营收高增(32.7%)"
+    },
+    "sh_688545": {
+      "score": 30,
+      "grade": "D",
+      "roe": 4.1551,
+      "revenue_growth": 21.052100000000003,
+      "reason": "ROE差(4.2%) | 营收高增(21.1%)"
+    },
+    "sh_688548": {
+      "score": 30,
+      "grade": "D",
+      "roe": 4.8318,
+      "revenue_growth": 28.7737,
+      "reason": "ROE差(4.8%) | 营收高增(28.8%)",
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
+    },
     "sh_688549": {
       "score": 25,
       "grade": "D",
       "roe": 0.46699999999999997,
       "revenue_growth": 19.098399999999998,
       "reason": "ROE差(0.5%) | 营收增长(19.1%)"
+    },
+    "sh_688559": {
+      "score": 30,
+      "grade": "D",
+      "roe": -31.4311,
+      "revenue_growth": 33.0673,
+      "reason": "ROE差(-31.4%) | 营收高增(33.1%)"
+    },
+    "sh_688578": {
+      "score": 70,
+      "grade": "A",
+      "roe": 35.4052,
+      "revenue_growth": 75.0656,
+      "reason": "ROE优质(35.4%) | 营收高增(75.1%)",
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
+    },
+    "sh_688584": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.0311999999999997,
+      "revenue_growth": 27.6522,
+      "reason": "ROE差(3.0%) | 营收高增(27.7%)"
+    },
+    "sh_688585": {
+      "score": 30,
+      "grade": "D",
+      "roe": -13.1973,
+      "revenue_growth": 34.9064,
+      "reason": "ROE差(-13.2%) | 营收高增(34.9%)"
+    },
+    "sh_688593": {
+      "score": 30,
+      "grade": "D",
+      "roe": 0.5826,
+      "revenue_growth": 33.5005,
+      "reason": "ROE差(0.6%) | 营收高增(33.5%)"
     },
     "sh_688596": {
       "score": 30,
@@ -1144,12 +2135,114 @@
       "revenue_growth": 44.0845,
       "reason": "ROE差(3.8%) | 营收高增(44.1%)"
     },
+    "sh_688598": {
+      "score": 25,
+      "grade": "D",
+      "roe": -28.157700000000002,
+      "revenue_growth": 14.124600000000001,
+      "reason": "ROE差(-28.2%) | 营收增长(14.1%)"
+    },
+    "sh_688627": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.7979,
+      "revenue_growth": 51.5591,
+      "reason": "ROE差(3.8%) | 营收高增(51.6%)"
+    },
+    "sh_688629": {
+      "score": 70,
+      "grade": "A",
+      "roe": 21.8497,
+      "revenue_growth": 75.873,
+      "reason": "ROE优质(21.8%) | 营收高增(75.9%)"
+    },
+    "sh_688630": {
+      "score": 55,
+      "grade": "C",
+      "roe": 13.266300000000001,
+      "revenue_growth": 47.6885,
+      "reason": "ROE一般(13.3%) | 营收高增(47.7%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "一季报预增"
+        ]
+      }
+    },
+    "sh_688635": {
+      "score": 65,
+      "grade": "B",
+      "roe": 18.0955,
+      "revenue_growth": 34.9479,
+      "reason": "ROE良好(18.1%) | 营收高增(34.9%)",
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
+    },
+    "sh_688652": {
+      "score": 45,
+      "grade": "C",
+      "roe": 6.9192,
+      "revenue_growth": 32.3094,
+      "reason": "ROE偏低(6.9%) | 营收高增(32.3%)"
+    },
+    "sh_688662": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.5137,
+      "revenue_growth": 54.796,
+      "reason": "ROE偏低(5.5%) | 营收高增(54.8%)"
+    },
+    "sh_688668": {
+      "score": 45,
+      "grade": "C",
+      "roe": 8.6721,
+      "revenue_growth": 32.100699999999996,
+      "reason": "ROE偏低(8.7%) | 营收高增(32.1%)",
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
+    },
+    "sh_688676": {
+      "score": 55,
+      "grade": "C",
+      "roe": 13.6268,
+      "revenue_growth": 66.2983,
+      "reason": "ROE一般(13.6%) | 营收高增(66.3%)"
+    },
+    "sh_688677": {
+      "score": 55,
+      "grade": "C",
+      "roe": 12.8838,
+      "revenue_growth": 38.9432,
+      "reason": "ROE一般(12.9%) | 营收高增(38.9%)"
+    },
+    "sh_688700": {
+      "score": 40,
+      "grade": "C",
+      "roe": 5.258100000000001,
+      "revenue_growth": 17.6448,
+      "reason": "ROE偏低(5.3%) | 营收增长(17.6%)"
+    },
     "sh_688702": {
       "score": 30,
       "grade": "D",
       "roe": -6.569700000000001,
       "revenue_growth": 44.283,
       "reason": "ROE差(-6.6%) | 营收高增(44.3%)"
+    },
+    "sh_688729": {
+      "score": 45,
+      "grade": "C",
+      "roe": 9.0456,
+      "revenue_growth": 47.583,
+      "reason": "ROE偏低(9.0%) | 营收高增(47.6%)"
     },
     "sh_688766": {
       "score": 45,
@@ -1164,16 +2257,43 @@
         ]
       }
     },
-    "sh_688825": {
+    "sh_688777": {
       "score": 30,
       "grade": "D",
-      "roe": 3.8195,
-      "revenue_growth": 20.3159,
-      "reason": "ROE差(3.8%) | 营收高增(20.3%)",
+      "roe": 4.3465,
+      "revenue_growth": 43.4674,
+      "reason": "ROE差(4.3%) | 营收高增(43.5%)"
+    },
+    "sh_688783": {
+      "score": 25,
+      "grade": "D",
+      "roe": -7.0531,
+      "revenue_growth": 13.8994,
+      "reason": "ROE差(-7.1%) | 营收增长(13.9%)"
+    },
+    "sh_688797": {
+      "score": 70,
+      "grade": "A",
+      "roe": 20.718600000000002,
+      "revenue_growth": 60.0332,
+      "reason": "ROE优质(20.7%) | 营收高增(60.0%)",
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
+    },
+    "sh_688802": {
+      "score": 25,
+      "grade": "D",
+      "roe": -11.0075,
+      "revenue_growth": 18.7206,
+      "reason": "ROE差(-11.0%) | 营收增长(18.7%)",
       "news": {
         "score": 15,
         "tags": [
-          "中报扭亏"
+          "一季报预增"
         ]
       }
     },
@@ -1198,16 +2318,88 @@
       "revenue_growth": 63.000299999999996,
       "reason": "ROE偏低(7.6%) | 营收高增(63.0%)"
     },
-    "sz_000625": {
+    "sz_000066": {
+      "score": 30,
+      "grade": "D",
+      "roe": -0.5006,
+      "revenue_growth": 48.9345,
+      "reason": "ROE差(-0.5%) | 营收高增(48.9%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_000100": {
       "score": 45,
       "grade": "C",
-      "roe": 5.2955000000000005,
-      "revenue_growth": 79.78020000000001,
-      "reason": "ROE偏低(5.3%) | 营收高增(79.8%)",
+      "roe": 7.8827,
+      "revenue_growth": 49.058099999999996,
+      "reason": "ROE偏低(7.9%) | 营收高增(49.1%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_000333": {
+      "score": 65,
+      "grade": "B",
+      "roe": 19.9765,
+      "revenue_growth": 75.5891,
+      "reason": "ROE良好(20.0%) | 营收高增(75.6%)"
+    },
+    "sz_000408": {
+      "score": 65,
+      "grade": "B",
+      "roe": 21.7587,
+      "revenue_growth": 11.3784,
+      "reason": "ROE优质(21.8%) | 营收增长(11.4%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_000506": {
+      "score": 70,
+      "grade": "A",
+      "roe": 28.3358,
+      "revenue_growth": 24.134800000000002,
+      "reason": "ROE优质(28.3%) | 营收高增(24.1%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_000592": {
+      "score": 30,
+      "grade": "D",
+      "roe": -6.1727,
+      "revenue_growth": 38.2257,
+      "reason": "ROE差(-6.2%) | 营收高增(38.2%)",
       "news": {
         "score": -15,
         "tags": [
-          "中报预减"
+          "中报首亏"
+        ]
+      }
+    },
+    "sz_000603": {
+      "score": 50,
+      "grade": "C",
+      "roe": 10.7595,
+      "revenue_growth": 14.284099999999999,
+      "reason": "ROE一般(10.8%) | 营收增长(14.3%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
         ]
       }
     },
@@ -1237,12 +2429,45 @@
         ]
       }
     },
+    "sz_000661": {
+      "score": 30,
+      "grade": "D",
+      "roe": 0.6886,
+      "revenue_growth": 39.5315,
+      "reason": "ROE差(0.7%) | 营收高增(39.5%)",
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报预减"
+        ]
+      }
+    },
     "sz_000725": {
       "score": 30,
       "grade": "D",
       "roe": 4.3804,
       "revenue_growth": 47.23,
       "reason": "ROE差(4.4%) | 营收高增(47.2%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_000802": {
+      "score": 15,
+      "grade": "D",
+      "roe": -6.4117,
+      "revenue_growth": 5.7223999999999995,
+      "reason": "ROE差(-6.4%) | 营收持平(5.7%)"
+    },
+    "sz_000807": {
+      "score": 70,
+      "grade": "A",
+      "roe": 20.0643,
+      "revenue_growth": 139.50979999999998,
+      "reason": "ROE优质(20.1%) | 营收高增(139.5%)",
       "news": {
         "score": 15,
         "tags": [
@@ -1257,12 +2482,12 @@
       "revenue_growth": 14.546999999999999,
       "reason": "ROE差(4.9%) | 营收增长(14.5%)"
     },
-    "sz_000831": {
-      "score": 30,
-      "grade": "D",
-      "roe": 4.802,
-      "revenue_growth": 28.1656,
-      "reason": "ROE差(4.8%) | 营收高增(28.2%)"
+    "sz_000887": {
+      "score": 55,
+      "grade": "C",
+      "roe": 11.6118,
+      "revenue_growth": 76.8822,
+      "reason": "ROE一般(11.6%) | 营收高增(76.9%)"
     },
     "sz_000938": {
       "score": 55,
@@ -1270,6 +2495,32 @@
       "roe": 12.0057,
       "revenue_growth": 104.51520000000001,
       "reason": "ROE一般(12.0%) | 营收高增(104.5%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_000960": {
+      "score": 45,
+      "grade": "C",
+      "roe": 9.2283,
+      "revenue_growth": 113.25480000000002,
+      "reason": "ROE偏低(9.2%) | 营收高增(113.3%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_000975": {
+      "score": 70,
+      "grade": "A",
+      "roe": 21.303,
+      "revenue_growth": 88.1041,
+      "reason": "ROE优质(21.3%) | 营收高增(88.1%)",
       "news": {
         "score": 15,
         "tags": [
@@ -1303,6 +2554,19 @@
         ]
       }
     },
+    "sz_001258": {
+      "score": 15,
+      "grade": "D",
+      "roe": 2.3813,
+      "revenue_growth": 3.4412,
+      "reason": "ROE差(2.4%) | 营收持平(3.4%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
     "sz_001309": {
       "score": 70,
       "grade": "A",
@@ -1329,6 +2593,20 @@
         ]
       }
     },
+    "sz_002015": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.4325,
+      "revenue_growth": 26.1181,
+      "reason": "ROE差(3.4%) | 营收高增(26.1%)"
+    },
+    "sz_002028": {
+      "score": 45,
+      "grade": "C",
+      "roe": 9.1634,
+      "revenue_growth": 34.2978,
+      "reason": "ROE偏低(9.2%) | 营收高增(34.3%)"
+    },
     "sz_002046": {
       "score": 45,
       "grade": "C",
@@ -1350,12 +2628,46 @@
       "revenue_growth": 72.3214,
       "reason": "ROE良好(15.9%) | 营收高增(72.3%)"
     },
+    "sz_002080": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.9904,
+      "revenue_growth": 24.1339,
+      "reason": "ROE偏低(6.0%) | 营收高增(24.1%)"
+    },
+    "sz_002081": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.2411000000000003,
+      "revenue_growth": 50.019800000000004,
+      "reason": "ROE差(3.2%) | 营收高增(50.0%)"
+    },
     "sz_002126": {
       "score": 55,
       "grade": "C",
       "roe": 14.108699999999999,
       "revenue_growth": 77.9245,
       "reason": "ROE一般(14.1%) | 营收高增(77.9%)"
+    },
+    "sz_002131": {
+      "score": 30,
+      "grade": "D",
+      "roe": 0.26280000000000003,
+      "revenue_growth": 92.2052,
+      "reason": "ROE差(0.3%) | 营收高增(92.2%)",
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报预减"
+        ]
+      }
+    },
+    "sz_002141": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.936,
+      "revenue_growth": 86.4266,
+      "reason": "ROE差(1.9%) | 营收高增(86.4%)"
     },
     "sz_002156": {
       "score": 45,
@@ -1370,6 +2682,13 @@
         ]
       }
     },
+    "sz_002173": {
+      "score": 25,
+      "grade": "D",
+      "roe": -3.1071999999999997,
+      "revenue_growth": 15.975,
+      "reason": "ROE差(-3.1%) | 营收增长(16.0%)"
+    },
     "sz_002185": {
       "score": 30,
       "grade": "D",
@@ -1382,6 +2701,13 @@
           "中报预增"
         ]
       }
+    },
+    "sz_002202": {
+      "score": 45,
+      "grade": "C",
+      "roe": 6.7696000000000005,
+      "revenue_growth": 45.3957,
+      "reason": "ROE偏低(6.8%) | 营收高增(45.4%)"
     },
     "sz_002230": {
       "score": 30,
@@ -1396,6 +2722,13 @@
       "roe": 11.3246,
       "revenue_growth": 111.4659,
       "reason": "ROE一般(11.3%) | 营收高增(111.5%)"
+    },
+    "sz_002261": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.6861,
+      "revenue_growth": 31.9261,
+      "reason": "ROE差(2.7%) | 营收高增(31.9%)"
     },
     "sz_002281": {
       "score": 45,
@@ -1429,13 +2762,6 @@
       "roe": 5.1647,
       "revenue_growth": 19.4319,
       "reason": "ROE偏低(5.2%) | 营收增长(19.4%)"
-    },
-    "sz_002364": {
-      "score": 45,
-      "grade": "C",
-      "roe": 5.1514999999999995,
-      "revenue_growth": 53.2817,
-      "reason": "ROE偏低(5.2%) | 营收高增(53.3%)"
     },
     "sz_002371": {
       "score": 65,
@@ -1504,6 +2830,19 @@
       "roe": 1.3823999999999999,
       "revenue_growth": 32.3669,
       "reason": "ROE差(1.4%) | 营收高增(32.4%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_002432": {
+      "score": 40,
+      "grade": "C",
+      "roe": 10.649799999999999,
+      "revenue_growth": 4.9081,
+      "reason": "ROE一般(10.6%) | 营收持平(4.9%)",
       "news": {
         "score": 15,
         "tags": [
@@ -1643,6 +2982,33 @@
         ]
       }
     },
+    "sz_002714": {
+      "score": 70,
+      "grade": "A",
+      "roe": 20.6877,
+      "revenue_growth": 80.2165,
+      "reason": "ROE优质(20.7%) | 营收高增(80.2%)",
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报首亏"
+        ]
+      }
+    },
+    "sz_002739": {
+      "score": 45,
+      "grade": "C",
+      "roe": 7.141699999999999,
+      "revenue_growth": 54.0628,
+      "reason": "ROE偏低(7.1%) | 营收高增(54.1%)",
+      "news": {
+        "score": -7,
+        "tags": [
+          "中报首亏",
+          "回购"
+        ]
+      }
+    },
     "sz_002747": {
       "score": 30,
       "grade": "D",
@@ -1656,6 +3022,20 @@
         ]
       }
     },
+    "sz_002821": {
+      "score": 45,
+      "grade": "C",
+      "roe": 6.5693,
+      "revenue_growth": 33.7167,
+      "reason": "ROE偏低(6.6%) | 营收高增(33.7%)"
+    },
+    "sz_002851": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.3833,
+      "revenue_growth": 73.6591,
+      "reason": "ROE差(2.4%) | 营收高增(73.7%)"
+    },
     "sz_002916": {
       "score": 70,
       "grade": "A",
@@ -1668,6 +3048,20 @@
           "中报预增"
         ]
       }
+    },
+    "sz_002938": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.7469,
+      "revenue_growth": 33.2911,
+      "reason": "ROE差(3.7%) | 营收高增(33.3%)"
+    },
+    "sz_003031": {
+      "score": 45,
+      "grade": "C",
+      "roe": 9.0408,
+      "revenue_growth": 35.9018,
+      "reason": "ROE偏低(9.0%) | 营收高增(35.9%)"
     },
     "sz_300012": {
       "score": 45,
@@ -1709,12 +3103,80 @@
       "revenue_growth": 34.933,
       "reason": "ROE差(-9.3%) | 营收高增(34.9%)"
     },
+    "sz_300033": {
+      "score": 70,
+      "grade": "A",
+      "roe": 36.7012,
+      "revenue_growth": 44.9765,
+      "reason": "ROE优质(36.7%) | 营收高增(45.0%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_300054": {
+      "score": 55,
+      "grade": "C",
+      "roe": 14.8368,
+      "revenue_growth": 44.4694,
+      "reason": "ROE一般(14.8%) | 营收高增(44.5%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
     "sz_300058": {
       "score": 30,
       "grade": "D",
       "roe": 2.9022,
       "revenue_growth": 289.1673,
       "reason": "ROE差(2.9%) | 营收高增(289.2%)"
+    },
+    "sz_300059": {
+      "score": 40,
+      "grade": "C",
+      "roe": 14.0028,
+      "revenue_growth": 4.595400000000001,
+      "reason": "ROE一般(14.0%) | 营收持平(4.6%)"
+    },
+    "sz_300065": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.3234999999999997,
+      "revenue_growth": 29.3594,
+      "reason": "ROE差(2.3%) | 营收高增(29.4%)"
+    },
+    "sz_300067": {
+      "score": 30,
+      "grade": "D",
+      "roe": -2.5193,
+      "revenue_growth": 28.2522,
+      "reason": "ROE差(-2.5%) | 营收高增(28.3%)"
+    },
+    "sz_300083": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.7838000000000003,
+      "revenue_growth": 48.2652,
+      "reason": "ROE差(2.8%) | 营收高增(48.3%)"
+    },
+    "sz_300085": {
+      "score": 30,
+      "grade": "D",
+      "roe": -27.310499999999998,
+      "revenue_growth": 75.435,
+      "reason": "ROE差(-27.3%) | 营收高增(75.4%)"
+    },
+    "sz_300088": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.4028,
+      "revenue_growth": 67.55449999999999,
+      "reason": "ROE差(2.4%) | 营收高增(67.6%)"
     },
     "sz_300115": {
       "score": 45,
@@ -1729,6 +3191,81 @@
       "roe": 15.9438,
       "revenue_growth": 70.2058,
       "reason": "ROE良好(15.9%) | 营收高增(70.2%)"
+    },
+    "sz_300131": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.5152999999999999,
+      "revenue_growth": 154.6015,
+      "reason": "ROE差(1.5%) | 营收高增(154.6%)"
+    },
+    "sz_300136": {
+      "score": 45,
+      "grade": "C",
+      "roe": 9.300799999999999,
+      "revenue_growth": 66.217,
+      "reason": "ROE偏低(9.3%) | 营收高增(66.2%)"
+    },
+    "sz_300139": {
+      "score": 25,
+      "grade": "D",
+      "roe": 4.7389,
+      "revenue_growth": 19.5874,
+      "reason": "ROE差(4.7%) | 营收增长(19.6%)"
+    },
+    "sz_300142": {
+      "score": 25,
+      "grade": "D",
+      "roe": 1.9694,
+      "revenue_growth": 18.05,
+      "reason": "ROE差(2.0%) | 营收增长(18.1%)"
+    },
+    "sz_300164": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.6263,
+      "revenue_growth": 57.5831,
+      "reason": "ROE差(2.6%) | 营收高增(57.6%)"
+    },
+    "sz_300179": {
+      "score": 45,
+      "grade": "C",
+      "roe": 7.5979,
+      "revenue_growth": 26.6428,
+      "reason": "ROE偏低(7.6%) | 营收高增(26.6%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_300189": {
+      "score": 65,
+      "grade": "B",
+      "roe": 15.134500000000001,
+      "revenue_growth": 20.220399999999998,
+      "reason": "ROE良好(15.1%) | 营收高增(20.2%)"
+    },
+    "sz_300199": {
+      "score": 45,
+      "grade": "C",
+      "roe": 6.1329,
+      "revenue_growth": 31.3639,
+      "reason": "ROE偏低(6.1%) | 营收高增(31.4%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_300204": {
+      "score": 25,
+      "grade": "D",
+      "roe": -8.8872,
+      "revenue_growth": 18.232499999999998,
+      "reason": "ROE差(-8.9%) | 营收增长(18.2%)"
     },
     "sz_300207": {
       "score": 30,
@@ -1763,6 +3300,19 @@
         ]
       }
     },
+    "sz_300243": {
+      "score": 30,
+      "grade": "D",
+      "roe": 4.3774,
+      "revenue_growth": 47.2627,
+      "reason": "ROE差(4.4%) | 营收高增(47.3%)",
+      "news": {
+        "score": 10,
+        "tags": [
+          "收购"
+        ]
+      }
+    },
     "sz_300274": {
       "score": 70,
       "grade": "A",
@@ -1784,12 +3334,93 @@
       "revenue_growth": 103.1348,
       "reason": "ROE优质(44.2%) | 营收高增(103.1%)"
     },
+    "sz_300311": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.4561,
+      "revenue_growth": 37.9509,
+      "reason": "ROE差(3.5%) | 营收高增(38.0%)"
+    },
+    "sz_300319": {
+      "score": 45,
+      "grade": "C",
+      "roe": 6.760199999999999,
+      "revenue_growth": 53.2403,
+      "reason": "ROE偏低(6.8%) | 营收高增(53.2%)"
+    },
+    "sz_300339": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.7626999999999997,
+      "revenue_growth": 70.9702,
+      "reason": "ROE差(2.8%) | 营收高增(71.0%)"
+    },
+    "sz_300346": {
+      "score": 45,
+      "grade": "C",
+      "roe": 9.2934,
+      "revenue_growth": 40.8858,
+      "reason": "ROE偏低(9.3%) | 营收高增(40.9%)"
+    },
     "sz_300347": {
       "score": 30,
       "grade": "D",
       "roe": 4.2656,
       "revenue_growth": 23.9622,
       "reason": "ROE差(4.3%) | 营收高增(24.0%)"
+    },
+    "sz_300363": {
+      "score": 30,
+      "grade": "D",
+      "roe": 1.8266,
+      "revenue_growth": 39.383,
+      "reason": "ROE差(1.8%) | 营收高增(39.4%)",
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报首亏"
+        ]
+      }
+    },
+    "sz_300364": {
+      "score": 30,
+      "grade": "D",
+      "roe": -104.7461,
+      "revenue_growth": 103.6378,
+      "reason": "ROE差(-104.7%) | 营收高增(103.6%)"
+    },
+    "sz_300369": {
+      "score": 30,
+      "grade": "D",
+      "roe": -1.7541000000000002,
+      "revenue_growth": 54.1217,
+      "reason": "ROE差(-1.8%) | 营收高增(54.1%)"
+    },
+    "sz_300373": {
+      "score": 55,
+      "grade": "C",
+      "roe": 13.7487,
+      "revenue_growth": 46.068,
+      "reason": "ROE一般(13.7%) | 营收高增(46.1%)",
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
+    },
+    "sz_300390": {
+      "score": 65,
+      "grade": "B",
+      "roe": 18.2827,
+      "revenue_growth": 30.5052,
+      "reason": "ROE良好(18.3%) | 营收高增(30.5%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报扭亏"
+        ]
+      }
     },
     "sz_300394": {
       "score": 70,
@@ -1803,6 +3434,26 @@
           "中报略增"
         ]
       }
+    },
+    "sz_300395": {
+      "score": 55,
+      "grade": "C",
+      "roe": 10.122499999999999,
+      "revenue_growth": 29.973699999999997,
+      "reason": "ROE一般(10.1%) | 营收高增(30.0%)",
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
+    },
+    "sz_300398": {
+      "score": 45,
+      "grade": "C",
+      "roe": 8.7426,
+      "revenue_growth": 47.468500000000006,
+      "reason": "ROE偏低(8.7%) | 营收高增(47.5%)"
     },
     "sz_300404": {
       "score": 30,
@@ -1824,6 +3475,13 @@
         ]
       }
     },
+    "sz_300418": {
+      "score": 30,
+      "grade": "D",
+      "roe": -11.603,
+      "revenue_growth": 40.078599999999994,
+      "reason": "ROE差(-11.6%) | 营收高增(40.1%)"
+    },
     "sz_300433": {
       "score": 45,
       "grade": "C",
@@ -1837,6 +3495,13 @@
       "roe": 42.7562,
       "revenue_growth": 15.3337,
       "reason": "ROE优质(42.8%) | 营收增长(15.3%)"
+    },
+    "sz_300454": {
+      "score": 30,
+      "grade": "D",
+      "roe": 4.1644,
+      "revenue_growth": 50.4726,
+      "reason": "ROE差(4.2%) | 营收高增(50.5%)"
     },
     "sz_300458": {
       "score": 45,
@@ -1871,6 +3536,20 @@
       "revenue_growth": 70.90180000000001,
       "reason": "ROE优质(33.8%) | 营收高增(70.9%)"
     },
+    "sz_300489": {
+      "score": 30,
+      "grade": "D",
+      "roe": -5.3155,
+      "revenue_growth": 49.0745,
+      "reason": "ROE差(-5.3%) | 营收高增(49.1%)"
+    },
+    "sz_300498": {
+      "score": 55,
+      "grade": "C",
+      "roe": 12.683,
+      "revenue_growth": 112.63380000000001,
+      "reason": "ROE一般(12.7%) | 营收高增(112.6%)"
+    },
     "sz_300502": {
       "score": 70,
       "grade": "A",
@@ -1889,7 +3568,20 @@
       "grade": "B",
       "roe": 15.656300000000002,
       "revenue_growth": 32.628099999999996,
-      "reason": "ROE良好(15.7%) | 营收高增(32.6%)"
+      "reason": "ROE良好(15.7%) | 营收高增(32.6%)",
+      "news": {
+        "score": 8,
+        "tags": [
+          "回购"
+        ]
+      }
+    },
+    "sz_300506": {
+      "score": 25,
+      "grade": "D",
+      "roe": -9.1575,
+      "revenue_growth": 15.165999999999999,
+      "reason": "ROE差(-9.2%) | 营收增长(15.2%)"
     },
     "sz_300534": {
       "score": 45,
@@ -1911,6 +3603,26 @@
         ]
       }
     },
+    "sz_300558": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.018199999999999,
+      "revenue_growth": 36.2614,
+      "reason": "ROE偏低(5.0%) | 营收高增(36.3%)",
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
+    },
+    "sz_300567": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.1016,
+      "revenue_growth": 30.8127,
+      "reason": "ROE差(2.1%) | 营收高增(30.8%)"
+    },
     "sz_300568": {
       "score": 25,
       "grade": "D",
@@ -1931,12 +3643,51 @@
       "revenue_growth": 75.49810000000001,
       "reason": "ROE良好(18.4%) | 营收高增(75.5%)"
     },
+    "sz_300602": {
+      "score": 45,
+      "grade": "C",
+      "roe": 9.1662,
+      "revenue_growth": 75.6179,
+      "reason": "ROE偏低(9.2%) | 营收高增(75.6%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
     "sz_300604": {
       "score": 70,
       "grade": "A",
       "roe": 33.1698,
       "revenue_growth": 58.2327,
       "reason": "ROE优质(33.2%) | 营收高增(58.2%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_300607": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.6078,
+      "revenue_growth": 41.3087,
+      "reason": "ROE差(2.6%) | 营收高增(41.3%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_300613": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.1129,
+      "revenue_growth": 42.086400000000005,
+      "reason": "ROE偏低(5.1%) | 营收高增(42.1%)",
       "news": {
         "score": 15,
         "tags": [
@@ -1957,6 +3708,13 @@
         ]
       }
     },
+    "sz_300661": {
+      "score": 55,
+      "grade": "C",
+      "roe": 11.0477,
+      "revenue_growth": 61.264799999999994,
+      "reason": "ROE一般(11.0%) | 营收高增(61.3%)"
+    },
     "sz_300666": {
       "score": 55,
       "grade": "C",
@@ -1970,6 +3728,27 @@
         ]
       }
     },
+    "sz_300672": {
+      "score": 30,
+      "grade": "D",
+      "roe": -5.9137,
+      "revenue_growth": 25.0989,
+      "reason": "ROE差(-5.9%) | 营收高增(25.1%)"
+    },
+    "sz_300679": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.4467,
+      "revenue_growth": 71.5169,
+      "reason": "ROE偏低(5.4%) | 营收高增(71.5%)"
+    },
+    "sz_300684": {
+      "score": 65,
+      "grade": "B",
+      "roe": 16.0608,
+      "revenue_growth": 70.2896,
+      "reason": "ROE良好(16.1%) | 营收高增(70.3%)"
+    },
     "sz_300718": {
       "score": 65,
       "grade": "B",
@@ -1977,12 +3756,39 @@
       "revenue_growth": 60.0676,
       "reason": "ROE良好(15.0%) | 营收高增(60.1%)"
     },
+    "sz_300720": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.9536000000000002,
+      "revenue_growth": 35.4815,
+      "reason": "ROE差(4.0%) | 营收高增(35.5%)"
+    },
+    "sz_300724": {
+      "score": 70,
+      "grade": "A",
+      "roe": 21.434800000000003,
+      "revenue_growth": 52.916399999999996,
+      "reason": "ROE优质(21.4%) | 营收高增(52.9%)",
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报预减"
+        ]
+      }
+    },
     "sz_300725": {
       "score": 25,
       "grade": "D",
       "roe": 1.8304,
       "revenue_growth": 16.6539,
       "reason": "ROE差(1.8%) | 营收增长(16.7%)"
+    },
+    "sz_300738": {
+      "score": 30,
+      "grade": "D",
+      "roe": 5.2255,
+      "revenue_growth": 9.1203,
+      "reason": "ROE偏低(5.2%) | 营收持平(9.1%)"
     },
     "sz_300748": {
       "score": 45,
@@ -2004,6 +3810,20 @@
       "revenue_growth": 26.201999999999998,
       "reason": "ROE一般(12.1%) | 营收高增(26.2%)"
     },
+    "sz_300751": {
+      "score": 45,
+      "grade": "C",
+      "roe": 9.3236,
+      "revenue_growth": 35.924800000000005,
+      "reason": "ROE偏低(9.3%) | 营收高增(35.9%)"
+    },
+    "sz_300757": {
+      "score": 30,
+      "grade": "D",
+      "roe": -4.9563999999999995,
+      "revenue_growth": 31.623099999999997,
+      "reason": "ROE差(-5.0%) | 营收高增(31.6%)"
+    },
     "sz_300759": {
       "score": 55,
       "grade": "C",
@@ -2017,12 +3837,52 @@
         ]
       }
     },
+    "sz_300765": {
+      "score": 70,
+      "grade": "A",
+      "roe": 38.1951,
+      "revenue_growth": 43.2478,
+      "reason": "ROE优质(38.2%) | 营收高增(43.2%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报扭亏"
+        ]
+      }
+    },
+    "sz_300776": {
+      "score": 55,
+      "grade": "C",
+      "roe": 14.065900000000001,
+      "revenue_growth": 30.633300000000002,
+      "reason": "ROE一般(14.1%) | 营收高增(30.6%)"
+    },
     "sz_300779": {
       "score": 30,
       "grade": "D",
       "roe": 4.243,
       "revenue_growth": 20.4731,
       "reason": "ROE差(4.2%) | 营收高增(20.5%)"
+    },
+    "sz_300795": {
+      "score": 70,
+      "grade": "A",
+      "roe": 21.413,
+      "revenue_growth": 92.04090000000001,
+      "reason": "ROE优质(21.4%) | 营收高增(92.0%)",
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报首亏"
+        ]
+      }
+    },
+    "sz_300806": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.6692,
+      "revenue_growth": 39.4927,
+      "reason": "ROE差(2.7%) | 营收高增(39.5%)"
     },
     "sz_300811": {
       "score": 65,
@@ -2031,12 +3891,39 @@
       "revenue_growth": 51.118300000000005,
       "reason": "ROE良好(15.7%) | 营收高增(51.1%)"
     },
+    "sz_300814": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.352,
+      "revenue_growth": 35.523900000000005,
+      "reason": "ROE差(2.4%) | 营收高增(35.5%)"
+    },
+    "sz_300821": {
+      "score": 30,
+      "grade": "D",
+      "roe": -0.3928,
+      "revenue_growth": 61.5298,
+      "reason": "ROE差(-0.4%) | 营收高增(61.5%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
     "sz_300832": {
       "score": 45,
       "grade": "C",
       "roe": 9.5806,
       "revenue_growth": 24.5653,
       "reason": "ROE偏低(9.6%) | 营收高增(24.6%)"
+    },
+    "sz_300843": {
+      "score": 45,
+      "grade": "C",
+      "roe": 7.1476,
+      "revenue_growth": 66.6675,
+      "reason": "ROE偏低(7.1%) | 营收高增(66.7%)"
     },
     "sz_300857": {
       "score": 70,
@@ -2051,6 +3938,27 @@
         ]
       }
     },
+    "sz_300862": {
+      "score": 25,
+      "grade": "D",
+      "roe": -4.4658999999999995,
+      "revenue_growth": 15.9856,
+      "reason": "ROE差(-4.5%) | 营收增长(16.0%)"
+    },
+    "sz_300870": {
+      "score": 55,
+      "grade": "C",
+      "roe": 10.1298,
+      "revenue_growth": 83.1183,
+      "reason": "ROE一般(10.1%) | 营收高增(83.1%)"
+    },
+    "sz_300903": {
+      "score": 30,
+      "grade": "D",
+      "roe": -14.265500000000001,
+      "revenue_growth": 53.1307,
+      "reason": "ROE差(-14.3%) | 营收高增(53.1%)"
+    },
     "sz_300953": {
       "score": 55,
       "grade": "C",
@@ -2064,6 +3972,41 @@
         ]
       }
     },
+    "sz_300975": {
+      "score": 55,
+      "grade": "C",
+      "roe": 13.1954,
+      "revenue_growth": 112.01589999999999,
+      "reason": "ROE一般(13.2%) | 营收高增(112.0%)"
+    },
+    "sz_300996": {
+      "score": 45,
+      "grade": "C",
+      "roe": 5.7008,
+      "revenue_growth": 47.57,
+      "reason": "ROE偏低(5.7%) | 营收高增(47.6%)"
+    },
+    "sz_301005": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.1477,
+      "revenue_growth": 68.4528,
+      "reason": "ROE差(2.1%) | 营收高增(68.5%)"
+    },
+    "sz_301013": {
+      "score": 30,
+      "grade": "D",
+      "roe": -22.2526,
+      "revenue_growth": 30.8697,
+      "reason": "ROE差(-22.3%) | 营收高增(30.9%)"
+    },
+    "sz_301018": {
+      "score": 45,
+      "grade": "C",
+      "roe": 8.241800000000001,
+      "revenue_growth": 71.9401,
+      "reason": "ROE偏低(8.2%) | 营收高增(71.9%)"
+    },
     "sz_301047": {
       "score": 25,
       "grade": "D",
@@ -2071,12 +4014,32 @@
       "revenue_growth": 12.064,
       "reason": "ROE差(2.7%) | 营收增长(12.1%)"
     },
+    "sz_301071": {
+      "score": 15,
+      "grade": "D",
+      "roe": 1.6877,
+      "revenue_growth": 6.522799999999999,
+      "reason": "ROE差(1.7%) | 营收持平(6.5%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
     "sz_301080": {
       "score": 45,
       "grade": "C",
       "roe": 6.2794,
       "revenue_growth": 28.2945,
       "reason": "ROE偏低(6.3%) | 营收高增(28.3%)"
+    },
+    "sz_301127": {
+      "score": 45,
+      "grade": "C",
+      "roe": 6.6252,
+      "revenue_growth": 20.043,
+      "reason": "ROE偏低(6.6%) | 营收高增(20.0%)"
     },
     "sz_301165": {
       "score": 55,
@@ -2091,6 +4054,40 @@
         ]
       }
     },
+    "sz_301171": {
+      "score": 30,
+      "grade": "D",
+      "roe": 4.3476,
+      "revenue_growth": 62.304700000000004,
+      "reason": "ROE差(4.3%) | 营收高增(62.3%)"
+    },
+    "sz_301188": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.5364,
+      "revenue_growth": 38.7841,
+      "reason": "ROE差(2.5%) | 营收高增(38.8%)"
+    },
+    "sz_301200": {
+      "score": 55,
+      "grade": "C",
+      "roe": 14.722,
+      "revenue_growth": 64.85889999999999,
+      "reason": "ROE一般(14.7%) | 营收高增(64.9%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_301205": {
+      "score": 45,
+      "grade": "C",
+      "roe": 6.5863000000000005,
+      "revenue_growth": 47.9516,
+      "reason": "ROE偏低(6.6%) | 营收高增(48.0%)"
+    },
     "sz_301217": {
       "score": 30,
       "grade": "D",
@@ -2104,12 +4101,25 @@
         ]
       }
     },
-    "sz_301230": {
+    "sz_301236": {
       "score": 30,
       "grade": "D",
-      "roe": 3.3673,
-      "revenue_growth": 52.33560000000001,
-      "reason": "ROE差(3.4%) | 营收高增(52.3%)"
+      "roe": 1.9667000000000001,
+      "revenue_growth": 138.7084,
+      "reason": "ROE差(2.0%) | 营收高增(138.7%)"
+    },
+    "sz_301282": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.2055,
+      "revenue_growth": 37.0603,
+      "reason": "ROE差(3.2%) | 营收高增(37.1%)",
+      "news": {
+        "score": 5,
+        "tags": [
+          "中报略增"
+        ]
+      }
     },
     "sz_301308": {
       "score": 70,
@@ -2124,12 +4134,32 @@
         ]
       }
     },
+    "sz_301319": {
+      "score": 30,
+      "grade": "D",
+      "roe": 4.367299999999999,
+      "revenue_growth": 53.3214,
+      "reason": "ROE差(4.4%) | 营收高增(53.3%)"
+    },
     "sz_301358": {
       "score": 55,
       "grade": "C",
       "roe": 10.4307,
       "revenue_growth": 99.734,
       "reason": "ROE一般(10.4%) | 营收高增(99.7%)"
+    },
+    "sz_301377": {
+      "score": 65,
+      "grade": "B",
+      "roe": 16.9221,
+      "revenue_growth": 53.198299999999996,
+      "reason": "ROE良好(16.9%) | 营收高增(53.2%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
     },
     "sz_301396": {
       "score": 30,
@@ -2145,19 +4175,25 @@
       "revenue_growth": 72.2545,
       "reason": "ROE差(2.8%) | 营收高增(72.3%)"
     },
-    "sz_301520": {
-      "score": 25,
-      "grade": "D",
-      "roe": 2.4059,
-      "revenue_growth": 17.1024,
-      "reason": "ROE差(2.4%) | 营收增长(17.1%)"
-    },
     "sz_301526": {
       "score": 30,
       "grade": "D",
       "roe": 3.363,
       "revenue_growth": 39.193099999999994,
       "reason": "ROE差(3.4%) | 营收高增(39.2%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
+    "sz_301536": {
+      "score": 45,
+      "grade": "C",
+      "roe": 9.9385,
+      "revenue_growth": 62.475899999999996,
+      "reason": "ROE偏低(9.9%) | 营收高增(62.5%)",
       "news": {
         "score": 15,
         "tags": [
