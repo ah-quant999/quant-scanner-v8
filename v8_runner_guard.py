@@ -408,102 +408,66 @@ def write_status_file(status_dict):
 
 
 def push_status_file(path):
-    """提交并推送 runner_status.json（健壮版，根治 autostash 拖红线 UU）。
+    """推送 runner_status.json 到 main（Contents API 单文件直推，根治本地 git 死锁）。
 
-    历史教训（2026-08-14~18 连续 10+ 轮老 bug）：
-      naive 版 `git commit`(10s) + `git pull --rebase --autostash` 会把本地未提交
-      改动（含红线 index.html/HEALTH_CHECK.js）一并自动 stash，rebase 后 autostash
-      pop 冲突 → 红线落 `UU` 未解决态 → 下轮 pull 报 "unmerged files" 死锁。
-      2026-08-18 15:09 恢复完整版后仍带 --autostash，再次复现 UU（79 标记）→ 已根治。
-
-    根治设计（显式 stash 管理，杜绝 autostash）：
-      1. fetch → 无变更则跳过
-      2. 只 add/commit 指定 path（60s 超时，TimeoutExpired 后校验 git log -1）
-      3. rebase 前显式 `git stash push -m guard-<ts>` 暂存全部未提交改动
-      4. `git pull --rebase origin main`（无 --autostash）：
-           · rebase 阶段冲突仅 runner_status.json（其余文件未提交不参与 rebase）
-             → 取 --theirs（=本地新版本）→ add → GIT_EDITOR=true continue
-           · 若出现其他文件冲突 → abort 报告，绝不自动覆盖
-      5. push（FF，严禁 --force）
-      6. `git stash pop` 恢复本地改动：pop 冲突 → 对冲突文件取 stash 版
-         （--theirs=本地 live 改动，如 update_v8 刚刷新的数据文件）→ add → drop，
-         不丢本地改动、不留 UU、不产生 stash 泄漏
+    历史教训（2026-08-14~18 连续 10+ 轮老 bug，本机环境已实测多种方案）：
+      ① naive 版 `git commit`(10s) + `git pull --rebase --autostash`：
+         autostash 把红线/数据文件拖入冲突 → UU → 下轮 "unmerged files" 断链。
+      ② 显式 stash 管理（15:18 实测）：本机是坚果云同步目录 + update_v8/cloud_fetch
+         持续写 data/*.js，rebase 阶段工作树无法保持干净 → 70+ 文件冲突。
+      → 彻底放弃本地 git push 链路，改 GitHub Contents API 单文件直推：
+        只 PUT raw_data/runner_status.json 一个文件（铁律「只 push 状态文件」完全满足），
+        不 commit、不 stash、不 rebase、不碰本地工作树/红线文件，绝无 UU 可能。
+        Contents API 写 main 同样触发云端 build → data/RUNNER_STATUS.js 更新。
     """
+    token = _load_token()
+    if not token:
+        return False, "无 GitHub token，无法 Contents API 推送"
+
+    api = f"https://api.github.com/repos/{REPO}/contents/raw_data/runner_status.json"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "Content-Type": "application/json",
+    }
     try:
-        def _git(args, timeout=60, check=True, capture=True, env_extra=None):
-            env = dict(os.environ)
-            if env_extra:
-                env.update(env_extra)
-            r = subprocess.run(["git"] + args, capture_output=capture, text=True,
-                               encoding="utf-8", errors="replace", timeout=timeout, env=env)
-            if check and r.returncode != 0:
-                raise subprocess.CalledProcessError(r.returncode, ["git"] + args, r.stdout, r.stderr)
-            return r
-
-        _git(["fetch", "origin", "main"], timeout=60)
-        r = _git(["status", "--short", "--", str(path)], check=False, timeout=10)
-        if not r.stdout.strip():
-            return True, "无变更，跳过推送"
-
-        msg = f"data: runner 状态上报 {now_cst().strftime('%Y%m%d-%H%M')}"
+        import base64
+        content = path.read_bytes()
+        # 1) 获取远端当前 sha（避免覆盖他人新提交；404=首次创建）
+        req = urllib.request.Request(api, headers=headers, method="GET")
+        sha = None
+        remote_b64 = ""
         try:
-            _git(["add", "--", str(path)], timeout=15)
-            _git(["commit", "-m", msg, "--", str(path)], timeout=60)
-        except subprocess.TimeoutExpired:
-            # 超时≠失败：校验 commit 是否已落盘
-            chk = _git(["log", "-1", "--oneline"], check=False, timeout=10)
-            if "runner 状态上报" not in chk.stdout:
-                raise
-
-        # 显式 stash 未提交改动（红线/数据文件都在内），rebase 后 pop 恢复
-        stashed = False
-        dirty = _git(["status", "--porcelain"], check=False, timeout=10).stdout.strip()
-        if dirty:
-            ts = now_cst().strftime('%H%M%S')
-            sr = _git(["stash", "push", "-m", f"guard-{ts}"], check=False, timeout=30)
-            if sr.returncode == 0:
-                stashed = True
-
-        # rebase（无 --autostash）
-        r = _git(["pull", "--rebase", "origin", "main"], check=False, timeout=120)
-        if r.returncode != 0:
-            st = _git(["status", "--porcelain"], check=False, timeout=10).stdout
-            uu = [ln[3:].strip() for ln in st.splitlines() if ln.startswith("UU ")]
-            if uu and all(u == str(path) for u in uu):
-                # 仅 runner_status.json 冲突（rebase 阶段只有已提交文件会冲突）
-                for cf in uu:
-                    _git(["checkout", "--theirs", "--", cf], check=False, timeout=15)
-                    _git(["add", "--", cf], check=False, timeout=10)
-                _git(["rebase", "--continue"], check=True, timeout=60,
-                     env_extra={"GIT_EDITOR": "true"})
-            elif uu:
-                _git(["rebase", "--abort"], check=False, timeout=30)
-                return False, f"rebase 冲突于非状态文件 {uu}，已中止（绝不自动覆盖）"
-            else:
-                return False, f"pull 失败(无 UU 冲突): {r.stderr[:200]}"
-
-        _git(["push", "origin", "main"], timeout=60)
-
-        # 恢复本地改动
-        if stashed:
-            pr = _git(["stash", "pop"], check=False, timeout=30)
-            if pr.returncode != 0:
-                st2 = _git(["status", "--porcelain"], check=False, timeout=10).stdout
-                uu2 = [ln[3:].strip() for ln in st2.splitlines() if ln.startswith("UU ")]
-                for cf in uu2:
-                    # pop 冲突：stash 内容=本地 live 改动，取 --theirs 保留本地版
-                    _git(["checkout", "--theirs", "--", cf], check=False, timeout=15)
-                    _git(["add", "--", cf], check=False, timeout=10)
-                _git(["stash", "drop"], check=False, timeout=15)
-                if uu2:
-                    return True, f"已推送（stash pop 冲突 {len(uu2)} 文件，已保留本地 live 版）"
-        return True, "已推送"
-    except subprocess.TimeoutExpired as e:
-        return False, f"git 超时: {e}"
-    except subprocess.CalledProcessError as e:
-        return False, f"git 失败: {e}"
+            with urllib.request.urlopen(req, timeout=25) as r:
+                remote = json.loads(r.read().decode("utf-8"))
+                sha = remote.get("sha")
+                remote_b64 = remote.get("content", "")
+        except urllib.error.HTTPError as e:
+            if e.code != 404:
+                return False, f"GET sha 失败: HTTP {e.code}"
+        # 2) 远端内容与本地相同 → 跳过推送
+        if sha and remote_b64:
+            try:
+                if base64.b64decode(remote_b64.replace("\n", "")) == content:
+                    return True, "远端已是最新，跳过推送"
+            except Exception:
+                pass
+        # 3) PUT 覆盖
+        payload = {
+            "message": f"data: runner 状态上报 {now_cst().strftime('%Y%m%d-%H%M')}",
+            "content": base64.b64encode(content).decode("utf-8"),
+        }
+        if sha:
+            payload["sha"] = sha
+        body = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(api, data=body, headers=headers, method="PUT")
+        with urllib.request.urlopen(req, timeout=25) as r:
+            return True, f"Contents API 已推送 (HTTP {r.status})"
+    except urllib.error.HTTPError as e:
+        return False, f"Contents API 失败: HTTP {e.code}: {e.read().decode('utf-8','replace')[:200]}"
     except Exception as e:
-        return False, f"异常: {e}"
+        return False, f"Contents API 异常: {e}"
 
 
 def decide_overall(process_ok, service_exists, service_ok, log_ok, github, env_ok):
