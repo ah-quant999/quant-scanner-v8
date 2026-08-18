@@ -252,5 +252,95 @@
     "message": "TRIPLE_HISTORY.js 更新于 3天前 15:29；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
    }
   ]
+ },
+ {
+  "date": "2026-08-18",
+  "time": "14:59:35",
+  "overall": "fail",
+  "summary": {
+   "ok": 95,
+   "warn": 10,
+   "fail": 5,
+   "total": 110
+  },
+  "warn_items": [
+   {
+    "id": "runner_local",
+    "name": "runner 本地检测",
+    "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 1 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(cn·应急) 失败"
+   },
+   {
+    "id": "runner",
+    "name": "self-hosted runner",
+    "message": "runner 本地检测:warn-runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 1 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数"
+   },
+   {
+    "id": "dom_taskScheduleBody",
+    "name": "DOM #taskScheduleBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttBackBody",
+    "name": "DOM #ttBackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttThrBody",
+    "name": "DOM #ttThrBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttSvlBody",
+    "name": "DOM #ttSvlBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttTrackBody",
+    "name": "DOM #ttTrackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsAdvBody",
+    "name": "DOM #stcrdsAdvBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsEliteBody",
+    "name": "DOM #stcrdsEliteBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_healthCheckBody",
+    "name": "DOM #healthCheckBody",
+    "message": "静态占位符(JS渲染)"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "MARGIN_DATA",
+    "name": "融资融券",
+    "message": "更新于 今日 16:15；超过阈值 360 分钟"
+   },
+   {
+    "id": "TOP10_DAILY",
+    "name": "全站精选",
+    "message": "更新于 今日 15:50；超过阈值 360 分钟"
+   },
+   {
+    "id": "dom_phMacroBody",
+    "name": "DOM #phMacroBody",
+    "message": "未找到元素"
+   },
+   {
+    "id": "all_STOCK_MOMENTUM_STATE",
+    "name": "STOCK_MOMENTUM_STATE",
+    "message": "STOCK_MOMENTUM_STATE.js 更新于 昨日 20:38；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_STOCK_MOMENTUM_STATE_V2",
+    "name": "STOCK_MOMENTUM_STATE_V2",
+    "message": "STOCK_MOMENTUM_STATE_V2.js 更新于 昨日 20:58；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   }
+  ]
  }
 ]
