@@ -1717,11 +1717,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <!-- 📊 主力净额分时累计曲线（盘中分时 + 盘后定基合并成一条线，2026-08-18 主人令：放到 ETF 三合一 Block 3 上方 与下方主力日监控 T+0 联动） -->
       <div class="card" style="margin-bottom:16px">
         <h3><span class="ic">📈</span>主力净额分时累计曲线 - 盘中每30分快照 · <span class="fresh" id="sfIntradayTime">—</span> <span style="font-size:10px;color:#a78bfa;font-weight:600">↕ 与下方主力日监控 T+0 联动</span></h3>
-        <div style="font-size:11px;color:var(--dim);margin:-4px 0 10px 0;line-height:1.5;">
-          📌 <b>实时数据源</b> SECTOR_FUND_FLOW_INTRADAY（cn_fetch 每30分钟快照 Top15流入+Top5流出）。
-          盘前清空、盘中累积、盘后自然定基——一段连续 time-series 即完整曲线。
-          <b style="color:#f59e0b">不依赖高频 tick</b>，调度与你"不要太频繁"偏好一致。
-        </div>
         <div id="sfIntradayChart" style="width:100%;height:420px;"><div class="ipo-empty">加载中…</div></div>
       </div>
 
@@ -4770,6 +4765,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div class="logic-p">输入代码或名称，聚合三重共识评分、金股池状态、主力资金、近10日走势等。</div>
         <div class="logic-h">ETF资金热度</div>
         <div class="logic-p">宽基指数ETF每日净申购赎回份额折线图，T+0实时估算国家队动向。数据源：etf_intraday_heat.json（akshare fund_etf_hist_em）。展示沪深300/中证500/创业板/科创50/上证50等主要宽基ETF。</div>
+        <div class="logic-h">主力净额分时累计曲线（2026-08-18 主人令：数据源说明从卡片移到逻辑详解）</div>
+        <div class="logic-p">📌 <b>实时数据源</b> SECTOR_FUND_FLOW_INTRADAY（cn_fetch 每30分钟快照 Top15流入+Top5流出）。盘前清空、盘中累积、盘后自然定基——一段连续 time-series 即完整曲线。<b style="color:#f59e0b">不依赖高频 tick</b>，调度与你"不要太频繁"偏好一致。</div>
       </div>
 
     </div>
