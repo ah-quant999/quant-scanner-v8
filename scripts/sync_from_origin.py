@@ -74,12 +74,28 @@ FILES = [
 
 
 def fetch_content(path):
-    """经 Contents API 拉云端 main 某文件内容 + sha。"""
+    """经 Contents API 拉云端 main 某文件内容 + sha。
+    ⚠️ 2026-08-18 主人令修复：>1MB 文件 Contents API 返回 content=""（GitHub 限制），
+       改用 raw.githubusercontent.com 拉真实内容。
+    """
     url = f"https://api.github.com/repos/{REPO}/contents/{path}?ref=main"
     req = urllib.request.Request(url, headers=HEADERS)
     with urllib.request.urlopen(req, timeout=60) as r:
         d = json.loads(r.read().decode("utf-8"))
-    content = base64.b64decode(d.get("content", "")).decode("utf-8")
+    size = d.get("size", 0)
+    content_b64 = d.get("content", "") or ""
+    if content_b64 and size < 1024 * 1024:
+        # <1MB: 走 base64
+        try:
+            content = base64.b64decode(content_b64).decode("utf-8")
+            return content, d.get("sha", "")
+        except Exception:
+            pass
+    # ≥1MB 或 base64 解码失败: 走 raw URL（HTTP 302 重定向到 CDN）
+    raw_url = f"https://raw.githubusercontent.com/{REPO}/main/{path}"
+    raw_req = urllib.request.Request(raw_url, headers={"User-Agent": "v8-sync-raw"})
+    with urllib.request.urlopen(raw_req, timeout=120) as r2:
+        content = r2.read().decode("utf-8", errors="replace")
     return content, d.get("sha", "")
 
 
