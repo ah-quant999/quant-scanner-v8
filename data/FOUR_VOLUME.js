@@ -1,5 +1,5 @@
 window.FOUR_VOLUME={
- "update_time": "2026-08-18 15:35:23",
+ "update_time": "2026-08-18 13:37:16",
  "total": 3,
  "stocks": [
   {
@@ -9,7 +9,7 @@ window.FOUR_VOLUME={
    "board_label": "创业板",
    "close": 97.0,
    "pct_chg": 20.0,
-   "turnover_rate": 24.55,
+   "turnover_rate": 19.72,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -35,9 +35,9 @@ window.FOUR_VOLUME={
    "name": "沃格光电",
    "market": "sh",
    "board_label": "主板",
-   "close": 112.0,
-   "pct_chg": 7.19,
-   "turnover_rate": 17.6,
+   "close": 111.33,
+   "pct_chg": 6.55,
+   "turnover_rate": 14.51,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -63,9 +63,9 @@ window.FOUR_VOLUME={
    "name": "华正新材",
    "market": "sh",
    "board_label": "主板",
-   "close": 184.2,
-   "pct_chg": -0.06,
-   "turnover_rate": 19.67,
+   "close": 185.34,
+   "pct_chg": 0.56,
+   "turnover_rate": 16.19,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
