@@ -10699,9 +10699,54 @@ function drawUpDownChart(){
     // 2026-08-16/18 主人令：潜力挖掘 从选股策略·潜力参考(st-pr) 迁至暂未上架；ETF·龙头参考 迁入调试专区
     try{ if(typeof window._fillPotentialPicks==='function') window._fillPotentialPicks(); }catch(e){ console.warn('潜力挖掘渲染失败',e); }
     try{
-      // 2026-08-18 主人令：ETF·龙头参考 同时显示在「潜力挖掘 + 调试专区」两个子Tab
-      //   - 调试专区 dbgEtfMapBody 由 pane4-2 内的 ETF·龙头卡（line 10327-10340）渲染（CONCEPT_ETF_MAP 数据 → renderEtfMap / 已有克隆逻辑）
-      //   - 潜力挖掘 ppEtfMapBody = 克隆 dbgEtfMapBody 内容（共享数据源）
+      // 🛡 2026-08-18 主人令：ETF·龙头参考 直接渲染（不依赖已删的 etfMapBody 克隆）
+      //   数据源：CONCEPT_RANKING.items（概念 top 8）+ SECTOR_FUND_FLOW.sectors_in（行业 top 6）
+      //   ETF 映射：CONCEPT_ETF_MAP（板块名 → {etf, leaders}）
+      var cEl = document.getElementById('dbgEtfMapBody');
+      if(cEl){
+        var cr = window.CONCEPT_RANKING || {};
+        var sff = window.SECTOR_FUND_FLOW || {};
+        var emap = window.CONCEPT_ETF_MAP || {};
+        var crItems = (cr.items||[]).slice(0,8);
+        var sffIn = (sff.sectors_in||[]).filter(function(s){return s && s.type==='行业';}).slice(0,6);
+        var rows = [];
+        var seen = {};
+        // 概念 top 8（按 net 倒序，前 8 名）
+        (crItems||[]).sort(function(a,b){return (b.net||0)-(a.net||0);}).slice(0,8).forEach(function(it){
+          if(!it || !it.name) return;
+          seen[it.name]=1;
+          rows.push({ name:it.name, net:it.net||0, chg:it.chg||0, type:'概念', map: emap[it.name]||null });
+        });
+        // 行业 top 6（去重）
+        (sffIn||[]).sort(function(a,b){return (b.net||0)-(a.net||0);}).slice(0,6).forEach(function(s){
+          if(!s || !s.name || seen[s.name]) return;
+          seen[s.name]=1;
+          rows.push({ name:s.name, net:s.net||0, chg:s.chg||0, type:'行业', map: emap[s.name]||null });
+        });
+        if(!rows.length){
+          cEl.innerHTML='<div class="ipo-empty">暂无热点板块数据</div>';
+        } else {
+          var h='<div style="display:flex;flex-direction:column;gap:8px;">';
+          rows.forEach(function(r){
+            var netCol = (r.net>=0)?'var(--up)':'var(--down)';
+            h+='<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);font-size:13px;flex-wrap:wrap;">';
+            h+='  <span style="font-weight:700;color:var(--txt);min-width:96px;">'+r.name+'</span>';
+            h+='  <span style="color:'+netCol+';font-weight:700;min-width:78px;">'+((r.net>=0?'+':'')+r.net.toFixed(2))+'亿</span>';
+            if(r.map && r.map.etf){
+              h+='  <span style="color:var(--cyan);font-weight:600;">🎯 '+r.map.etf.code+' '+r.map.etf.name+'</span>';
+            } else {
+              h+='  <span style="color:var(--dim);">🎯 ETF暂无映射</span>';
+            }
+            if(r.map && r.map.leaders && r.map.leaders.length){
+              h+='  <span style="color:var(--sub);">龙头：'+r.map.leaders.map(function(l){return l.code+' '+l.name;}).join(' / ')+'</span>';
+            }
+            h+='</div>';
+          });
+          h+='</div>';
+          cEl.innerHTML = h;
+        }
+      }
+      // 同步克隆到潜力挖掘 pane
       var etfSrc=document.getElementById('dbgEtfMapBody');
       var etfDstPP=document.getElementById('ppEtfMapBody');
       if(etfSrc && etfDstPP) etfDstPP.innerHTML = etfSrc.innerHTML;
@@ -10711,7 +10756,7 @@ function drawUpDownChart(){
       var _etfBadge = _uBadge('盘后','短线',em.update_time||null);
       if(tm) tm.innerHTML = _etfBadge;
       if(tmPP) tmPP.innerHTML = _etfBadge;
-    }catch(e){ console.warn('ETF龙头克隆失败',e); }
+    }catch(e){ console.warn('ETF龙头渲染失败',e); }
     // 2026-08-16 子Tab 切换函数
     window.__ulSwitch = function(btn, tab){
       var panes = document.querySelectorAll('#sec-ul .ul-pane');
