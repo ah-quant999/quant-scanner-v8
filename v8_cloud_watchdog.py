@@ -295,7 +295,7 @@ RUNNING_GRACE_MIN = 45
 def check_workflow(name, label, max_age_min=None, workflow_id=None):
     run, err, running = latest_workflow_run(name, workflow_id=workflow_id)
     if err:
-        return False, err
+        return False, err, False
     now_cst = datetime.now(timezone(timedelta(hours=8)))
 
     # ① 有正在运行的实例：运行中不是失败。未超时 → OK；超时 → 判卡死。
@@ -308,11 +308,11 @@ def check_workflow(name, label, max_age_min=None, workflow_id=None):
             if run is not None and run.get("status") == "completed":
                 p_created = utc_to_cst(run["created_at"])
                 tail = f"；上轮 {run.get('conclusion')} @ {p_created.strftime('%m-%d %H:%M')}"
-            return True, f"{label} 运行中({running['status']}) @ {r_str} (已 {fmt_age(r_age)}){tail}"
-        return False, f"{label} {running['status']} @ {r_str} 已 {fmt_age(r_age)} 未结束，疑似卡死"
+            return True, f"{label} 运行中({running['status']}) @ {r_str} (已 {fmt_age(r_age)}){tail}", False
+        return False, f"{label} {running['status']} @ {r_str} 已 {fmt_age(r_age)} 未结束，疑似卡死", False
 
     if run is None:
-        return False, f"{label} 无可判定的运行记录"
+        return False, f"{label} 无可判定的运行记录", False
 
     # ② 无运行中实例：按最近一条已完成 run 判成败 + 新鲜度
     status = run["status"]
