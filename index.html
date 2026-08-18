@@ -8831,11 +8831,15 @@ function drawUpDownChart(){
             // 放宽不掩盖真实漏跑：盘中30分钟节奏的卡片若真的整档没跑（如数据停在 08:12、
             // 09:40/10:00 两个槽位已过），差值 >45min 仍会正确标红。
 
-            const SLOT_LEAD_GRACE_MIN = 45;
-
-            const grace = new Date(sd.getTime() - SLOT_LEAD_GRACE_MIN*60000);
-
-            ok = lastTs >= grace;
+            // 🛡 2026-08-18 主人令：槽位宽容 ±60min（一劳永逸防误判红叉）
+            //   原逻辑只做「前置宽容 45min」：数据必须 >= 槽位-45min，导致「数据提前更新」误判红叉
+            //   （例：候选池算法 17:36 出数，18:30 槽位 → 17:36 < 17:45 → 红叉，但数据明明已出）
+            //   新逻辑：数据在「槽位 ±60min」窗口内都算 ✓——前置漂移（提前跑）与排程漂移（晚跑）都不误判
+            //   真漏跑仍正确标红：数据停 08:12，9:40/10:00 槽位 → 08:12 < 08:40（9:40-60min）→ ✗
+            const SLOT_GRACE_MIN = 60;
+            const graceStart = new Date(sd.getTime() - SLOT_GRACE_MIN*60000);
+            const graceEnd = new Date(sd.getTime() + SLOT_GRACE_MIN*60000);
+            ok = lastTs >= graceStart && lastTs <= graceEnd;
 
           }
 
