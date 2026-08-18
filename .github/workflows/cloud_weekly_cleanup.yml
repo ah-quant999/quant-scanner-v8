@@ -47,9 +47,8 @@ jobs:
           RAW_DIR = ROOT / 'raw_data'
           DATA_DIR = ROOT / 'data'
 
-          # 读取 DATA_SOURCES 映射
+          # 读取 DATA_SOURCES 映射（update_v8.py 转换层用的）
           src = Path('update_v8.py').read_text(encoding='utf-8')
-          # 简单提取 DATA_SOURCES dict
           m = re.search(r'DATA_SOURCES\s*=\s*\{([^}]+)\}', src, re.S)
           mapped_files = set()
           if m:
@@ -62,18 +61,61 @@ jobs:
           index = Path('index.html').read_text(encoding='utf-8')
           referenced = set(re.findall(r'data/([A-Z_0-9]+)\.js', index))
 
+          # 🛡 2026-08-18 一劳永逸修复：原逻辑把「不在 DATA_SOURCES 映射」等同于 orphan，
+          # 但 v8 大量生成器直写的 raw_data（尤其是历史累积账本）并不在 update_v8 映射里，
+          # 导致 sector_fund_flow_history / triple_resonance_history / commodity_price_history 等
+          # 每周被误删，数据越清越少。现改为：必须同时满足「不在映射/引用」且「不在保护名单」才删除。
+          PROTECTED_RAW = {
+              # 历史累积账本（删除后趋势窗口会永久变空）
+              "audit_history.json",
+              "commodity_price_history.json",
+              "commodity_prices_cache.json",
+              "lhb_history.json",
+              "sector_fund_flow_history.json",
+              "sector_fund_flow_intraday.json",
+              "triple_history.json",
+              "triple_resonance_history.json",
+              # 生成器直写、update_v8 不映射但算法链/前端真实依赖的中间产物
+              "build_candidate_debug.json",
+              "commodity_elasticity.json",
+              "final_recommend.json",
+              "fundamental_quality.json",
+              "lhb_7d.json",
+              "potential_picks.json",
+              "sentiment_cycle.json",
+              "stock_rps.json",
+              "stop_target_optimization.json",
+          }
+          PROTECTED_DATA = {
+              # 守护/中间文件，不被 index.html 直接引用但生产流程需要
+              "freshness_selfheal.json",
+              ".heal_dispatch.json",
+              "freshness_status.json",
+              ".github_pat.txt",
+          }
+          # 保留目录：历史快照、回测产物等整体保护
+          PROTECTED_DIRS = {"history", "backtest", "optimize"}
+
           removed_raw = []
           if RAW_DIR.exists():
               for p in RAW_DIR.glob('*.json'):
+                  if p.name in PROTECTED_RAW:
+                      continue
                   if p.name not in mapped_files:
                       p.unlink()
                       removed_raw.append(p.name)
+              # 保护子目录不被整体删除，仅清理其内部 orphan（暂不删子目录文件）
+              for d in RAW_DIR.iterdir():
+                  if d.is_dir() and d.name in PROTECTED_DIRS:
+                      print(f"[保护] 目录 {d.name}/ 保留")
 
           removed_data = []
           if DATA_DIR.exists():
               for p in DATA_DIR.glob('*.js'):
                   var_name = p.stem
                   json_name = var_name + '.json'
+                  if var_name in PROTECTED_DATA or json_name in PROTECTED_DATA:
+                      continue
                   # 不在映射且不被 index.html 引用
                   if json_name not in mapped_files and var_name not in referenced:
                       p.unlink()
