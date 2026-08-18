@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-商品涨价弹性榜（2026-08-13 新增 · 2026-08-16 升级：z-score基准 + 国内期货接入）
+商品涨价弹性榜（2026-08-13 新增 · 2026-08-16 升级：z-score基准 + 国内期货接入
+              · 2026-08-18 升级：Sina免费外盘期货兜底，阿狸咪家用网络可用）
 ================================================
 数据源（三通道）：
   ① MACRO_DATA.global_macro.commodities → gold/silver/copper/oil（原有）
-  ② westock-mcp 期货实时行情 → LME 基本金属(5) + 贵金属扩展(2) + 能源(1) + 农产品(3)（新增）
+  ② Sina 免费外盘期货接口 → LME/NYMEX/CBOT 共 15 个品种（2026-08-18 新增）
+    · westock-mcp 缓存新鲜时仍优先使用 westock；缓存缺失/陈旧时自动降级到 Sina
+    · 无需认证，中美 IP 均可访问，解决阿狸咪家 westock-mcp 不可用问题
   ③ eastmoney push2 API → 广期所碳酸锂(LC) + 郑商所纯碱(SA)（2026-08-16 新增）
 
-覆盖品种（17 个有实时价 / 3 个现货指数暂无）：
+覆盖品种（15 个有实时价 / 5 个暂无）：
   贵金属：黄金(COMEX) 白银(COMEX) 铂金(NYMEX) 钯金(NYMEX)
   基本金属：铜(LME) 铝(LME) 镍(LME) 锌(LME) 铅(LME) 锡(LME)
   能源：    原油(WTI) 天然气(NYMEX)
   农产品：  大豆(CBOT) 玉米(CBOT) 小麦(CBOT)
-  国内期货：碳酸锂(GFEX) 纯碱(ZCE)              ← 2026-08-16 新接入
+  国内期货：碳酸锂(GFEX) 纯碱(ZCE)
   暂无源：  磷化工 维生素 稀土                    ← 纯现货指数，无免费API
 
 映射表：各大宗品映射 3-5 只 A 股弹性标的（含业务占比）
@@ -27,11 +30,12 @@
       → 涨价阈值双轨：dev% ≥ 3.0 或 |z-score| ≥ 2.0
 
 【数据真实性铁律】
-- 有实时价的 17 个品种：显示真实价格+z-score/偏离度，标注数据源和时间
-- 无实时价的 3 个现货指数：标 available=false + 原因 + 替代方案
+- 有实时价的 15 个国际品种：显示真实价格+z-score/偏离度，标注数据源和时间
+- 暂无源的 5 个品种（含国内期货 LC/SA 本次未取到）：标 available=false + 原因
 """
 import json
 import os
+import re
 import time
 import urllib.request
 import urllib.error
@@ -246,6 +250,32 @@ WESTOCK_FUTURES_MAP = {
     "corn":         ("fuZC",    "lastPrice"),
     "wheat":        ("fuZW",    "lastPrice"),
 }
+
+# ═══════════════ 新浪财经外盘期货免费源映射 ═══════════════
+# 2026-08-18 新增：为阿狸咪家用网络（westock-mcp 不可用）提供免费兜底。
+# Sina 接口无需认证、中美 IP 均可访问，覆盖 LME/NYMEX/CBOT 大部分品种。
+# 返回字段: [0]=最新价 [6]=时间 [8]=昨收/结算价 [12]=日期 [13]=中文名
+SINA_FUTURES_MAP = {
+    # LME 基本金属（$/吨）
+    "copper":       "hf_CAD",   # 伦铜（LME 3个月铜）
+    "aluminum":     "hf_AHD",   # 伦铝
+    "nickel":       "hf_NID",   # 伦镍
+    "zinc":         "hf_ZSD",   # 伦锌
+    "lead":         "hf_PBD",   # 伦铅
+    "tin":          "hf_SND",   # 伦锡
+    # COMEX/NYMEX 贵金属+能源
+    "gold":         "hf_GC",    # COMEX黄金（$/oz）
+    "silver":       "hf_SI",    # COMEX白银（$/oz）
+    "platinum":     "hf_XPT",   # NYMEX铂金（$/oz）
+    "palladium":    "hf_XPD",   # NYMEX钯金（$/oz）
+    "oil":          "hf_CL",    # WTI原油（$/bbl）
+    "natural_gas":  "hf_NG",    # NYMEX天然气（$/MMBtu）
+    # CBOT 农产品（美分/蒲式耳）
+    "soybean":      "hf_S",     # 美豆
+    "corn":         "hf_C",     # 美玉米
+    "wheat":        "hf_W",     # 美小麦
+}
+SINA_CACHE_TTL_SECONDS = 3600  # westock 缓存超过 1 小时视为陈旧，降级到 Sina
 
 # ═══════════════ 参考基准（静态兜底，仅当价格历史不足30日时使用）════════════════
 REFERENCE_BASELINE = {
@@ -502,23 +532,147 @@ def fetch_domestic_futures_price(secid, timeout=10):
         return None, None, None
 
 
+def _parse_sina_change_pct(fields):
+    """从 Sina 外盘期货返回字段中计算涨跌幅(%)。
+
+    fields[0]=最新价, fields[8]=昨收/结算价。Sina 不直接返回涨跌幅时，
+    用 (最新-昨收)/昨收 计算。昨收缺失则用 fields[7] 开盘价兜底。
+    """
+    try:
+        price = float(fields[0])
+        prev = None
+        if len(fields) > 8 and fields[8]:
+            prev = float(fields[8])
+        elif len(fields) > 7 and fields[7]:
+            prev = float(fields[7])
+        if price and prev and abs(prev) > 1e-9:
+            return round((price - prev) / prev * 100, 3)
+    except (ValueError, TypeError):
+        pass
+    return 0.0
+
+
+def fetch_sina_futures_prices(timeout=15):
+    """
+    从新浪财经免费外盘期货接口批量获取实时价格。
+    无需认证，中美 IP 均可访问，作为 westock-mcp 的免费兜底源。
+
+    返回 {key: {"price": float, "change_pct": float, "time": str, "source": str}}
+    """
+    codes = [code for code in SINA_FUTURES_MAP.values()]
+    url = "https://hq.sinajs.cn/list=" + ",".join(codes)
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+        "Referer": "https://finance.sina.com.cn/futures/",
+        "Accept": "*/*",
+    }
+    results = {}
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        resp = urllib.request.urlopen(req, timeout=timeout).read()
+        # Sina 返回 GBK 编码
+        text = resp.decode("gbk", errors="ignore")
+    except Exception as e:
+        print(f"  [sina] 接口请求失败: {e}")
+        return results
+
+    # 反向查找 key -> code
+    code_to_key = {code: key for key, code in SINA_FUTURES_MAP.items()}
+    for key, code in SINA_FUTURES_MAP.items():
+        m = re.search(rf'var hq_str_{code}="([^"]*)";', text)
+        if not m:
+            print(f"  [sina] {key:12s} ({code}): 无返回")
+            continue
+        fields = m.group(1).split(",")
+        if not fields or not fields[0]:
+            print(f"  [sina] {key:12s} ({code}): 空数据")
+            continue
+        try:
+            price = float(fields[0])
+        except (ValueError, TypeError):
+            print(f"  [sina] {key:12s} ({code}): 价格解析失败")
+            continue
+        chg_pct = _parse_sina_change_pct(fields)
+        utime = fields[6] if len(fields) > 6 else ""
+        udate = fields[12] if len(fields) > 12 else ""
+        time_str = f"{udate} {utime}".strip()
+        label = fields[13] if len(fields) > 13 else code
+        results[key] = {
+            "price": price,
+            "change_pct": chg_pct,
+            "time": time_str,
+            "source": f"sina-futures({label})",
+        }
+        print(f"  [sina] {key:12s} = {price:>12.2f} ({chg_pct:+.2f}%) ← {label}")
+
+    return results
+
+
+def _cache_is_fresh(cache):
+    """判断 westock 缓存是否在 SINA_CACHE_TTL_SECONDS 内。"""
+    if not cache:
+        return False
+    ft = cache.get("fetch_time", "")
+    if not ft:
+        return False
+    try:
+        dt = datetime.strptime(ft, "%Y-%m-%d %H:%M:%S")
+        age = datetime.now(CST).replace(tzinfo=None) - dt
+        return age.total_seconds() < SINA_CACHE_TTL_SECONDS
+    except Exception:
+        return False
+
+
 def fetch_all_westock_prices():
     """
     获取所有 westock 期货品种的价格 + 国内期货（东方财富）。
-    优先级：缓存文件 > HTTP API 直连 > 返回空。
+    优先级：westock 缓存(新鲜) > Sina 免费外盘 > westock HTTP API 直连 > 返回空。
     返回 {key: (price, change_pct, time)}
     """
-    # 优先：读缓存文件（WorkBuddy MCP 预抓取）
-    results = load_westock_cache()
-    if results:
-        for key, info in results.items():
-            print(f"  ✓ {key:12s} = {info['price']:>12.2f}  ({info.get('change_pct')}%)")
-        # 缓存可能不含国内品种，下面补充
+    # ── 0) 读取 westock 缓存，并判断新鲜度 ──
+    raw_cache = load_westock_cache()
+    results = {}
+    cache_fresh = False
+    cache_fetch_time = ""
+    cache_path = os.path.join(RAW, "commodity_prices_cache.json")
+    try:
+        with open(cache_path, encoding="utf-8") as f:
+            full_cache = json.load(f)
+        cache_fetch_time = full_cache.get("fetch_time", "")
+    except Exception:
+        pass
 
-    # 兜底：尝试 HTTP API 直连（国际期货）
-    if not results:
-        print("  [westock] 缓存未命中，尝试 HTTP API 直连...")
-        for key, (wcode, _) in WESTOCK_FUTURES_MAP.items():
+    if raw_cache:
+        cache_fresh = _cache_is_fresh({"fetch_time": cache_fetch_time})
+        if cache_fresh:
+            for key, info in raw_cache.items():
+                results[key] = info
+                print(f"  ✓ {key:12s} = {info['price']:>12.2f}  ({info.get('change_pct')}%) [westock-cache]")
+        else:
+            age = "unknown"
+            if cache_fetch_time:
+                try:
+                    dt = datetime.strptime(cache_fetch_time, "%Y-%m-%d %H:%M:%S")
+                    age_sec = (datetime.now(CST).replace(tzinfo=None) - dt).total_seconds()
+                    age = f"{age_sec/3600:.1f}h"
+                except Exception:
+                    pass
+            print(f"  [westock] 缓存陈旧({age})，改用 Sina 免费源兜底...")
+
+    # ── 1) Sina 免费外盘期货（westock-mcp 不可用/缓存陈旧时的免费兜底）──
+    if not cache_fresh:
+        sina_prices = fetch_sina_futures_prices()
+        # 用 Sina 结果补充/覆盖（覆盖缓存中的旧数据）
+        for key, info in sina_prices.items():
+            results[key] = info
+
+    # ── 2) 兜底：westock HTTP API 直连（国际期货）──
+    # 仅当 Sina 未覆盖的品种才尝试
+    missing_keys = [k for k, _ in WESTOCK_FUTURES_MAP.items() if k not in results]
+    if missing_keys:
+        print(f"  [westock] Sina 未覆盖 {len(missing_keys)} 个品种，尝试 westock HTTP API...")
+        for key in missing_keys:
+            wcode, _ = WESTOCK_FUTURES_MAP[key]
             price, chg, tm = fetch_westock_price(wcode)
             if price is not None:
                 results[key] = {"price": price, "change_pct": chg, "time": tm, "source": f"westock-api({wcode})"}
@@ -527,9 +681,9 @@ def fetch_all_westock_prices():
                 print(f"  [api]  {key:12s} = FAILED")
             time.sleep(0.15)
 
-    # ── 国内期货：东方财富 push2 API（2026-08-16 新增）──
+    # ── 3) 国内期货：东方财富 push2 API（2026-08-16 新增）──
     for key, (secid, label) in DOMESTIC_FUTURES_MAP.items():
-        if key in results:  # 缓存已有则跳过
+        if key in results:  # 不覆盖
             continue
         price, chg, tm = fetch_domestic_futures_price(secid)
         if price is not None:
@@ -652,6 +806,9 @@ def main():
     for key, wp in westock_prices.items():
         if key not in ELASTICITY_MAP:
             continue
+        # 跳过 MACRO_DATA 已覆盖的品种（gold/silver/copper/oil），避免重复
+        if key in processed_keys:
+            continue
         info = ELASTICITY_MAP[key]
         row = calc_one_commodity(
             key, info,
@@ -713,7 +870,7 @@ def main():
         "data_date": macro_commodities.get("gold", {}).get("date", ""),
         "source": (
             "三通道: MACRO_DATA(gold/silver/copper/oil) + "
-            "westock-mcp国际期货(LME/NYMEX/CBOT共11个) + "
+            "Sina免费外盘期货(LME/NYMEX/CBOT共15个，westock-mcp不可用/缓存陈旧时兜底) + "
             "eastmoney-push2国内期货(GFEX碳酸锂+ZCE纯碱)"
         ),
         "hot_count": hot_count,
