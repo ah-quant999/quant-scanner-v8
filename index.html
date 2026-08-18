@@ -9604,6 +9604,42 @@ function drawUpDownChart(){
     h+='</div>';
     h+='</div>';
 
+    // ── 驾驶舱 A/B 档推荐（直接列出回测口径的 A/B 档股票，2026-08-18 主人令）──
+    var _ctr = window.COCKPIT_TIER_RECOMMEND || {};
+    var _tierA = _safeArr(_ctr.tier_a);
+    var _tierB = _safeArr(_ctr.tier_b);
+    var _tierHtml = '<div style="display:flex;flex-direction:column;gap:10px;">';
+    if(_tierA.length){
+      _tierHtml += '<div><div style="font-size:12px;font-weight:700;color:#ffd54f;margin-bottom:6px;">🅰️ A档（回测最强口径）— '+_tierA.length+'只</div>';
+      _tierHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+      _tierA.forEach(function(s){
+        _tierHtml += '<div style="display:flex;align-items:center;gap:5px;background:rgba(255,213,79,.12);border:1px solid rgba(255,213,79,.35);border-radius:6px;padding:5px 10px;font-size:12px;color:#e6eefc;">';
+        _tierHtml += '<span style="font-weight:700;">'+(s.name||'?')+'</span>';
+        _tierHtml += '<span style="color:#8aa0c2;font-size:10px;">'+(s.code||'?')+'</span>';
+        _tierHtml += '<span style="color:#8aa0c2;font-size:10px;">RSI '+(s.rsi||'-')+' · 20日 '+(s.ret20||'-')+'% · EMA '+(s.ema||'-')+'</span>';
+        _tierHtml += '</div>';
+      });
+      _tierHtml += '</div></div>';
+    }
+    if(_tierB.length){
+      _tierHtml += '<div><div style="font-size:12px;font-weight:700;color:#f0b083;margin-bottom:6px;">🅱️ B档（强势观察）— '+_tierB.length+'只</div>';
+      _tierHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+      _tierB.slice(0,10).forEach(function(s){
+        _tierHtml += '<div style="display:flex;align-items:center;gap:5px;background:rgba(240,176,131,.12);border:1px solid rgba(240,176,131,.35);border-radius:6px;padding:4px 8px;font-size:11px;color:#e6eefc;">';
+        _tierHtml += '<span style="font-weight:700;">'+(s.name||'?')+'</span>';
+        _tierHtml += '<span style="color:#8aa0c2;font-size:10px;">'+(s.code||'?')+'</span>';
+        _tierHtml += '</div>';
+      });
+      if(_tierB.length>10) _tierHtml += '<span style="color:#8aa0c2;font-size:11px;align-self:center;">+'+(_tierB.length-10)+' 只</span>';
+      _tierHtml += '</div></div>';
+    }
+    if(!_tierA.length && !_tierB.length){
+      _tierHtml += '<div style="font-size:12px;color:#8aa0c2;">暂无 A/B 档推荐数据</div>';
+    }
+    if(_tierA.length){
+      _tierHtml += '<div style="font-size:11px;color:#8aa0c2;margin-top:2px;">A档规则：上涨趋势 & 机构变红 & RSI&lt;68 & 20日涨幅&lt;35% & EMA≥5 & 非涨停</div>';
+    }
+    h+=cockpitBlock('驾驶舱 A/B 档推荐（回测最强口径）',_tierHtml,'#ffd54f','#ffe082');
     var fib=DATA.sh_fib||DATA.sz_fib||{};
     var cur=fib.current||{};
     var win=fib.windows||[];
@@ -9663,42 +9699,6 @@ function drawUpDownChart(){
     s2+='<div id="cockpitSectorMore" style="display:block;margin-top:10px;">'+s2More+'</div>';
     h+=cockpitBlock('② 最强赛道 TOP5',s2,'#e0996b','#f0b083');
 
-    // ── ②·5 驾驶舱 A/B 档推荐（直接列出回测口径的 A/B 档股票，2026-08-18 主人令）──
-    var _ctr = window.COCKPIT_TIER_RECOMMEND || {};
-    var _tierA = _safeArr(_ctr.tier_a);
-    var _tierB = _safeArr(_ctr.tier_b);
-    var _tierHtml = '<div style="display:flex;flex-direction:column;gap:10px;">';
-    if(_tierA.length){
-      _tierHtml += '<div><div style="font-size:12px;font-weight:700;color:#ffd54f;margin-bottom:6px;">🅰️ A档（回测最强口径）— '+_tierA.length+'只</div>';
-      _tierHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
-      _tierA.forEach(function(s){
-        _tierHtml += '<div style="display:flex;align-items:center;gap:5px;background:rgba(255,213,79,.12);border:1px solid rgba(255,213,79,.35);border-radius:6px;padding:5px 10px;font-size:12px;color:#e6eefc;">';
-        _tierHtml += '<span style="font-weight:700;">'+(s.name||'?')+'</span>';
-        _tierHtml += '<span style="color:#8aa0c2;font-size:10px;">'+(s.code||'?')+'</span>';
-        _tierHtml += '<span style="color:#8aa0c2;font-size:10px;">RSI '+(s.rsi||'-')+' · 20日 '+(s.ret20||'-')+'% · EMA '+(s.ema||'-')+'</span>';
-        _tierHtml += '</div>';
-      });
-      _tierHtml += '</div></div>';
-    }
-    if(_tierB.length){
-      _tierHtml += '<div><div style="font-size:12px;font-weight:700;color:#f0b083;margin-bottom:6px;">🅱️ B档（强势观察）— '+_tierB.length+'只</div>';
-      _tierHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
-      _tierB.slice(0,10).forEach(function(s){
-        _tierHtml += '<div style="display:flex;align-items:center;gap:5px;background:rgba(240,176,131,.12);border:1px solid rgba(240,176,131,.35);border-radius:6px;padding:4px 8px;font-size:11px;color:#e6eefc;">';
-        _tierHtml += '<span style="font-weight:700;">'+(s.name||'?')+'</span>';
-        _tierHtml += '<span style="color:#8aa0c2;font-size:10px;">'+(s.code||'?')+'</span>';
-        _tierHtml += '</div>';
-      });
-      if(_tierB.length>10) _tierHtml += '<span style="color:#8aa0c2;font-size:11px;align-self:center;">+'+(_tierB.length-10)+' 只</span>';
-      _tierHtml += '</div></div>';
-    }
-    if(!_tierA.length && !_tierB.length){
-      _tierHtml += '<div style="font-size:12px;color:#8aa0c2;">暂无 A/B 档推荐数据</div>';
-    }
-    if(_tierA.length){
-      _tierHtml += '<div style="font-size:11px;color:#8aa0c2;margin-top:2px;">A档规则：上涨趋势 & 机构变红 & RSI&lt;68 & 20日涨幅&lt;35% & EMA≥5 & 非涨停</div>';
-    }
-    h+=cockpitBlock('②·5 驾驶舱 A/B 档推荐（回测最强口径）',_tierHtml,'#ffd54f','#ffe082');
 
     var top10=(DATA.top10_daily||{}).top10||[];
     var s80=top10.filter(function(s){return s.total_score>=80;});
