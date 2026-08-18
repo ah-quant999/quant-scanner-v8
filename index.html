@@ -10327,8 +10327,17 @@ function drawUpDownChart(){
 
     // ── 🎭 情绪周期 · 连板天梯（合并紧凑版）已迁到实时数据区，见 window.__renderCycleLadderCard ──
 
-    // ── pane1: 🚀 强势突破（动量共识筛选 + 本页速读 + 个股动量状态）──
+    // ── pane1: 🚀 强势突破（本页速读 + 动量共识筛选 + 个股动量状态）──
     h+='<div class="ul-pane active" id="ulPaneStrong">';
+    // ── 2026-08-17 主人令：本页速读卡（一句话看懂"该看什么买卖"）──
+    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #22c55e;">';
+    h+='<div style="padding:10px 14px;">';
+    h+='<div style="font-size:13px;font-weight:800;color:#22c55e;margin-bottom:6px;">🔰 本页速读 · 该看什么（3 句话）</div>';
+    h+='<div style="font-size:12px;line-height:1.9;color:var(--sub);">';
+    h+='<b style="color:#22c55e;">① 能直接用的</b>：下方「🎯 动量共识筛选」表格 = 候选清单（T+5 胜率 66.7%），买票先看这张。<br>';
+    h+='<b style="color:#38bdf8;">② 观察池</b>：本卡「🚀 个股动量状态」共识股（当日 ≥2 分类同时看好）仅观察，① 清单 ∩ ② 共识 = 加分项。<br>';
+    h+='<b style="color:#a78bfa;">③ 纪律</b>：止损 入场×0.90（-10% 封顶）｜止盈 前60日高点。避开「主升/启动」板块（追高回撤大，回测反向）。';
+    h+='</div></div></div>';
     // ── 🎯 动量共识筛选（2026-08-16 无未来函数版，移入强势突破 pane1）──
     var _mf = window.MOMENTUM_FILTER;
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a855f7;">';
@@ -10376,15 +10385,6 @@ function drawUpDownChart(){
       h+='</div>';
     }
     
-    // ── 2026-08-17 主人令：本页速读卡（一句话看懂"该看什么买卖"）──
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #22c55e;">';
-    h+='<div style="padding:10px 14px;">';
-    h+='<div style="font-size:13px;font-weight:800;color:#22c55e;margin-bottom:6px;">🔰 本页速读 · 该看什么（3 句话）</div>';
-    h+='<div style="font-size:12px;line-height:1.9;color:var(--sub);">';
-    h+='<b style="color:#22c55e;">① 能直接用的</b>：上方「🎯 动量共识筛选」表格 = 候选清单（T+5 胜率 66.7%），买票先看这张。<br>';
-    h+='<b style="color:#38bdf8;">② 观察池</b>：本卡「🚀 个股动量状态」共识股（当日 ≥2 分类同时看好）仅观察，① 清单 ∩ ② 共识 = 加分项。<br>';
-    h+='<b style="color:#a78bfa;">③ 纪律</b>：止损 入场×0.90（-10% 封顶）｜止盈 前60日高点。避开「主升/启动」板块（追高回撤大，回测反向）。';
-    h+='</div></div></div>';
     // ── 🚀 个股动量状态（2026-08-16 新增 · 暂未上架实验区）──
     // 数据源：每日盘后选股 PDF → OCR 抽取 → STOCK_MOMENTUM_STATE.js
     // 核心信号：跨分类共识（≥2个分类同时推荐的股票）→ POC 回测 T+5 Alpha +16.27%
@@ -10408,7 +10408,7 @@ function drawUpDownChart(){
     _sms = _smsDay || _smsRaw;
     if(_sms && _sms.date && _sms.categories){
       var _smsCats = ['短线选股','反弹','反弹01','超跌反弹','加速','强势'];
-      h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px;">';
+      h+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px;">';
       var _catIdx = 0;
       _smsCats.forEach(function(cat){
         var stocks = _sms.categories[cat] || [];
@@ -10468,12 +10468,13 @@ function drawUpDownChart(){
         h+='<hr style="border:none;border-top:1px dashed rgba(168,85,247,.25);margin:12px 0;">';
         h+='<div style="font-size:13px;font-weight:700;color:#a855f7;margin-bottom:8px;">📊 入选后连续涨 & 走势特征（K线真实验证）</div>';
 
-        // ── 1. 符合概览：按时间段分组 ──
+        // ── 1. 符合概览：按时间段分组（2026-08-18 主人令：并排一行2列）──
         h+='<div style="font-size:12px;font-weight:700;color:#c084fc;margin:10px 0 6px;">符合概览</div>';
+        h+='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">';
         Object.keys(_enh.periods).forEach(function(pname){
           var p = _enh.periods[pname];
           if(!p || !p.count) return;
-          h+='<div style="background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.18);border-radius:7px;padding:8px 10px;margin-bottom:8px;">';
+          h+='<div style="background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.18);border-radius:7px;padding:8px 10px;">';
           h+='<div style="font-size:12px;font-weight:700;color:#a855f7;margin-bottom:6px;">'+pname+' <span style="color:var(--dim);font-weight:400;font-size:11px">'+p.count+'只</span></div>';
 
           // 领涨股
@@ -10515,6 +10516,7 @@ function drawUpDownChart(){
           }
           h+='</div>';  // /period card
         });
+        h+='</div>';  // /2-column grid
 
         // ── 2. 归纳走势特征 ──
         if(_enh.patternStats){
