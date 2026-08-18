@@ -261,14 +261,18 @@ def check_momentum_state():
         return False, None, 999, "FILE_MISSING"
     try:
         src = open(MOMENTUM_FILE, encoding="utf-8").read()
-        m = re.search(r"'date':\s*'(\d{4}-\d{2}-\d{2})'", src)
-        if not m:
-            m2 = re.search(r"generated:\s*'(\d{4}-\d{2}-\d{2})", src)
-            last_day = m2.group(1) if m2 else None
-            if not last_day:
-                return False, None, 999, "无法解析日期"
-        else:
-            last_day = m.group(1)
+        # 兼容单/双引号：优先 meta.generated（文件生成时间），
+        # 其次取 days 中最大 date（历史窗口最新日），两者取最新。
+        candidates = []
+        mg = re.search(r"['\"]generated['\"]\s*:\s*['\"](\d{4}-\d{2}-\d{2})", src)
+        if mg:
+            candidates.append(mg.group(1))
+        md = re.findall(r"['\"]date['\"]\s*:\s*['\"](\d{4}-\d{2}-\d{2})['\"]", src)
+        if md:
+            candidates.append(max(md))
+        if not candidates:
+            return False, None, 999, "无法解析日期"
+        last_day = max(candidates)
         last_dt = datetime.strptime(last_day, "%Y-%m-%d").replace(tzinfo=CST)
         age_days = (now_cst().date() - last_dt.date()).days
         is_fresh = age_days <= MOMENTUM_MAX_STALE_DAYS
