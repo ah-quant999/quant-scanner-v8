@@ -1,5 +1,5 @@
 window.FOUR_VOLUME_60M={
- "update_time": "2026-08-19 03:51:32",
+ "update_time": "2026-08-19 04:24:36",
  "total": 1,
  "period": "60m",
  "description": "四量终极 60分钟共振信号（加分因子，独立于日线版）",

@@ -90,7 +90,8 @@
       "2026-08-18": 0
     },
     "688331": {
-      "2026-08-17": 0
+      "2026-08-17": 0,
+      "2026-08-19": 133.52
     },
     "603993": {
       "2026-08-17": 20.75,
@@ -142,6 +143,9 @@
     },
     "688012": {
       "2026-08-19": 398.33
+    },
+    "300765": {
+      "2026-08-19": 44.4
     }
   },
   "_tracking_latest": {
@@ -229,9 +233,9 @@
     "688331": {
       "enter_date": "2026-08-17",
       "enter_close": 0,
-      "last_date": "2026-08-17",
-      "last_close": 0,
-      "status": "dropped",
+      "last_date": "2026-08-19",
+      "last_close": 133.52,
+      "status": "near",
       "streak": 1,
       "total_days": 1
     },
@@ -287,12 +291,20 @@
       "last_close": 398.33,
       "status": "near",
       "streak": 1
+    },
+    "300765": {
+      "enter_date": "2026-08-19",
+      "enter_close": 44.4,
+      "last_date": "2026-08-19",
+      "last_close": 44.4,
+      "status": "near",
+      "streak": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-08-19 03:51:33"
+    "last_update": "2026-08-19 04:24:38"
   },
   "2026-08-18": [
     {
@@ -394,6 +406,22 @@
       "status": "strict"
     },
     {
+      "code": "300765",
+      "name": "石药创新",
+      "market": "sz",
+      "board": "创业板",
+      "close": 44.4,
+      "pct_chg": -0.09,
+      "total_score": 40.0,
+      "quality_grade": "A",
+      "industry": "食品制造业",
+      "sectors": [
+        "食品制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
       "code": "601899",
       "name": "紫金矿业",
       "market": "sh",
@@ -405,6 +433,22 @@
       "industry": "有色金属矿采选业",
       "sectors": [
         "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "688331",
+      "name": "荣昌生物",
+      "market": "sh",
+      "board": "科创板",
+      "close": 133.52,
+      "pct_chg": -0.35,
+      "total_score": 38.8,
+      "quality_grade": "A",
+      "industry": "医药制造业",
+      "sectors": [
+        "医药制造业"
       ],
       "signal_count": 0,
       "status": "near"
@@ -437,22 +481,6 @@
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
         "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "688012",
-      "name": "中微公司",
-      "market": "sh",
-      "board": "科创板",
-      "close": 398.33,
-      "pct_chg": 2.71,
-      "total_score": 32.0,
-      "quality_grade": "C",
-      "industry": "专用设备制造业",
-      "sectors": [
-        "专用设备制造业"
       ],
       "signal_count": 0,
       "status": "near"
