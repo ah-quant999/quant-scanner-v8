@@ -8872,7 +8872,7 @@ function drawUpDownChart(){
               (lastTs.getTime() >= now.getTime() - HOURS_TODAY_FLOOR*3600*1000);
             if(!ok && todayFloorOk){
               ok = true;
-
+            }
           }
 
           // 非交易日市场类卡片 / 明确周末不更新卡片：未更新的过去槽位不标红叉，标「休」避免误导
