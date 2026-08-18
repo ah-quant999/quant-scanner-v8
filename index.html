@@ -10303,17 +10303,8 @@ function drawUpDownChart(){
 
     // ── 🎭 情绪周期 · 连板天梯（合并紧凑版）已迁到实时数据区，见 window.__renderCycleLadderCard ──
 
-    // ── pane1: 🚀 强势突破（动量状态 + 无泄漏精选候选 + 行业分布，合并）──
+    // ── pane1: 🚀 强势突破（动量共识筛选 + 本页速读 + 个股动量状态）──
     h+='<div class="ul-pane active" id="ulPaneStrong">';
-    // ── 2026-08-17 主人令：本页速读卡（一句话看懂"该看什么买卖"）──
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #22c55e;">';
-    h+='<div style="padding:10px 14px;">';
-    h+='<div style="font-size:13px;font-weight:800;color:#22c55e;margin-bottom:6px;">🔰 本页速读 · 该看什么（3 句话）</div>';
-    h+='<div style="font-size:12px;line-height:1.9;color:var(--sub);">';
-    h+='<b style="color:#22c55e;">① 能直接用的</b>：下方「🎯 动量共识筛选」表格 = 候选清单（T+5 胜率 66.7%），买票先看这张。<br>';
-    h+='<b style="color:#38bdf8;">② 观察池</b>：本卡「🚀 个股动量状态」共识股（当日 ≥2 分类同时看好）仅观察，① 清单 ∩ ② 共识 = 加分项。<br>';
-    h+='<b style="color:#a78bfa;">③ 纪律</b>：止损 入场×0.90（-10% 封顶）｜止盈 前60日高点。避开「主升/启动」板块（追高回撤大，回测反向）。';
-    h+='</div></div></div>';
     // ── 🎯 动量共识筛选（2026-08-16 无未来函数版，移入强势突破 pane1）──
     var _mf = window.MOMENTUM_FILTER;
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a855f7;">';
@@ -10361,6 +10352,15 @@ function drawUpDownChart(){
       h+='</div>';
     }
     
+    // ── 2026-08-17 主人令：本页速读卡（一句话看懂"该看什么买卖"）──
+    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #22c55e;">';
+    h+='<div style="padding:10px 14px;">';
+    h+='<div style="font-size:13px;font-weight:800;color:#22c55e;margin-bottom:6px;">🔰 本页速读 · 该看什么（3 句话）</div>';
+    h+='<div style="font-size:12px;line-height:1.9;color:var(--sub);">';
+    h+='<b style="color:#22c55e;">① 能直接用的</b>：上方「🎯 动量共识筛选」表格 = 候选清单（T+5 胜率 66.7%），买票先看这张。<br>';
+    h+='<b style="color:#38bdf8;">② 观察池</b>：本卡「🚀 个股动量状态」共识股（当日 ≥2 分类同时看好）仅观察，① 清单 ∩ ② 共识 = 加分项。<br>';
+    h+='<b style="color:#a78bfa;">③ 纪律</b>：止损 入场×0.90（-10% 封顶）｜止盈 前60日高点。避开「主升/启动」板块（追高回撤大，回测反向）。';
+    h+='</div></div></div>';
     // ── 🚀 个股动量状态（2026-08-16 新增 · 暂未上架实验区）──
     // 数据源：每日盘后选股 PDF → OCR 抽取 → STOCK_MOMENTUM_STATE.js
     // 核心信号：跨分类共识（≥2个分类同时推荐的股票）→ POC 回测 T+5 Alpha +16.27%
@@ -10613,29 +10613,6 @@ function drawUpDownChart(){
       h+='<div class="note" style="text-align:center;">STOCK_MOMENTUM_STATE 数据不可用<br><span style="color:var(--dim);font-size:12px;">需完成39天PDF OCR抽取后生成</span></div>';
     }
     h+='</div>';  // /个股动量状态卡
-
-        // ── 📊 行业分布·月度对比（2026-08-16 新增：吃微信报告「连续上涨股票分析报告」结论）──
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">';
-    h+='<h3 style="font-size:14px;margin-bottom:8px;"><span class="ic">📊</span>行业分布 · 月度对比 <span style="font-size:10px;color:#f59e0b;font-weight:400">甲午 vs 乙未</span></h3>';
-    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">';
-    h+='<div style="background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:10px 12px;">';
-    h+='<div style="font-size:12.5px;font-weight:700;color:#f59e0b;margin-bottom:6px;">☀️ 甲午月（6.5-7.7）· 连续上涨 26 只</div>';
-    h+='<div style="font-size:11.5px;line-height:1.9;color:var(--sub);">'
-      + '· <b style="color:#38bdf8">科技/电子 13 只（50%）</b>：富信科技+161%、士兰微+41.5%、扬杰科技+30.7%、满坤科技+32.6%、魅视科技+31.5%、震有科技+28.2%、新恒汇+16.2%…<br>'
-      + '· 化工/材料 5 只（亚太实业+33.2%、三美股份+11.5%、天安新材+17.9%…）<br>'
-      + '· 新能源 3 只（科达利+19.5%、金刚光伏+10.8%…）｜医药 3 只（九芝堂+23.6%、以岭药业+14.8%、圣诺生物+14.6%）<br>'
-      + '<b style="color:#f59e0b">月运吻合度：高度符合「科技内部分化」</b>（强势科技股持续走强）</div>';
-    h+='</div>';
-    h+='<div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.25);border-radius:8px;padding:10px 12px;">';
-    h+='<div style="font-size:12.5px;font-weight:700;color:#22c55e;margin-bottom:6px;">🌙 乙未月（7.7-8.7）· 连续上涨 7 只</div>';
-    h+='<div style="font-size:11.5px;line-height:1.9;color:var(--sub);">'
-      + '· <b style="color:#22c55e">医药 3 只</b>：哈药股份+58.2%、立方制药+28.6%、药康生物+25.1%<br>'
-      + '· 民爆 1 只（高争民爆+114.5%）｜食品 1 只（一鸣食品+60.4%）｜环保 1 只（惠城环保+39.8%）｜有色 1 只（兴业银锡+18.6%）<br>'
-      + '<b style="color:#22c55e">月运吻合度：部分符合「午未合火」</b>（火性行业医药/民爆接力；农业/科技未兑现）</div>';
-    h+='</div>';
-    h+='</div>';
-    h+='<div class="note" style="font-size:11.5px;margin-top:8px;color:var(--dim);">数据来源：《连续上涨股票分析报告》(2026-08-16)：43 份盘后选股 PDF → 428 只，筛「选出后连涨≥3天且区间涨幅≥10%」得 33 只。⚠️ 该报告 5 条件选股公式经无泄漏回测无预测力（胜率36%<基线42%），仅行业分布/月运结论可作参考。</div>';
-    h+='</div>';
 
     h+='</div>';  // /ulPaneStrong
 
