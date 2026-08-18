@@ -4222,7 +4222,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '<span style="font-size:11px;color:var(--dim);">全部已回测策略一表看尽 · 按综合分降序 · 最高在最上</span>';
       html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);">✅ 全部真实跟踪</span>';
       html += '</div>';
-      html += '<div style="font-size:10.5px;color:var(--dim);margin-bottom:8px;line-height:1.5;">综合分 = (胜率−50) + 平均收益×8 + 样本可信度（log10样本×2，上限8）。星级：≥30=⭐⭐⭐⭐⭐ / ≥20=⭐⭐⭐⭐ / ≥12=⭐⭐⭐ / ≥6=⭐⭐。<b style="color:#fbbf24;">仅列真实算法跟踪回测</b>：驾驶舱回测 + 综合回测 + K线信号60日；合成基线（样本伪造/胜率≈随机）已剔除。</div>';
+      html += '<div style="font-size:10.5px;color:var(--dim);margin-bottom:8px;line-height:1.5;">综合分 = (胜率−50) + 平均收益×8 + 样本可信度（log10样本×2，上限8）。星级：≥30=⭐⭐⭐⭐⭐ / ≥20=⭐⭐⭐⭐ / ≥12=⭐⭐⭐ / ≥6=⭐⭐。<b style="color:#fbbf24;">仅列真实算法跟踪回测</b>：驾驶舱回测 + 综合回测 + K线信号60日；合成基线（样本伪造/胜率≈随机）已剔除。<br><b style="color:var(--cyan);">口径说明</b>：<b>驾驶舱/综合回测</b> = 滚动回测所有历史入场信号的平均（"n=样本"是历史入场信号数，非天数）；<b>K线信号</b> = 最近 60 日 9 个通达信公式的回测均值（每日 1 条快照）。</div>';
       html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
       html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
       html += '<th style="padding:7px 6px;text-align:left;color:var(--sub);">星级</th>';
