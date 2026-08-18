@@ -7391,23 +7391,23 @@ window.__renderV8CalFull();
         if(_transList.length === 0){
           h3 += '<div style="font-size:12px;color:var(--dim);text-align:center;padding:14px 0;">📭 今日无板块阶段变化（'+_prevDateStr+' '+_prevTimeStr+' → '+_curDateStr+' '+_curTimeStr+' 期间）</div>';
         } else {
-          // 按板块名中文拼音排序
+          // 2026-08-19 主人令：字体 12px + 一行多列 grid 布局 + 不用下拉 + 全部展现 + 统一排序
           _transList.sort(function(a,b){ return (a.name||'').localeCompare(b.name, 'zh-CN'); });
-          h3 += '<div style="display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto;">';
+          h3 += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;">';
           _transList.forEach(function(t){
             var fromEmoji = _phaseEmoji[t.from] || '';
             var toEmoji = _phaseEmoji[t.to] || '';
             var fromColor = _phaseColor[t.from] || 'var(--sub)';
             var toColor = _phaseColor[t.to] || 'var(--sub)';
-            h3 += '<div style="display:flex;align-items:center;gap:6px;padding:4px 8px;border-bottom:1px dashed rgba(148,163,184,.08);font-size:12px;">';
-            h3 += '<b style="min-width:90px;max-width:110px;color:var(--txt);">'+t.name+'</b>';
-            h3 += '<span style="color:'+fromColor+';font-weight:700;">'+fromEmoji+t.from+'</span>';
+            h3 += '<div style="display:flex;align-items:center;gap:5px;padding:5px 8px;border-bottom:1px dashed rgba(148,163,184,.08);font-size:12px;background:rgba(255,255,255,.02);border-radius:4px;">';
+            h3 += '<b style="min-width:80px;max-width:100px;color:var(--txt);font-size:12px;">'+t.name+'</b>';
+            h3 += '<span style="color:'+fromColor+';font-weight:700;font-size:12px;">'+fromEmoji+t.from+'</span>';
             h3 += '<span style="color:var(--dim);font-weight:700;">→</span>';
-            h3 += '<span style="color:'+toColor+';font-weight:700;">'+toEmoji+t.to+'</span>';
+            h3 += '<span style="color:'+toColor+';font-weight:700;font-size:12px;">'+toEmoji+t.to+'</span>';
             h3 += '</div>';
           });
           h3 += '</div>';
-          h3 += '<div style="margin-top:6px;font-size:11px;color:var(--sub);text-align:right;">共 '+_transList.length+' 个板块今日有迁移</div>';
+          h3 += '<div style="margin-top:6px;font-size:12px;color:var(--sub);text-align:right;">共 '+_transList.length+' 个板块今日有迁移（统一按拼音排序）</div>';
         }
         h3 += '</div>';
       }
@@ -7755,17 +7755,17 @@ const catNames=['宽基','行业','主题','跨境','商品'];
   function renderEtfDaily(daily){
     var el=document.getElementById('etfDailyBlock');
     if(!el) return;
-    // 2026-08-18 主人令：T+1 盘后专享，盘前/盘中不出数据（避免误导用户）
+    // 2026-08-19 主人令修复：文案对齐卡标题"T+0·盘后定基（盘前空·盘中累积·15:10/15:30 定基）"
     var _now=new Date();
     var _hr=_now.getHours()+_now.getMinutes()/60;
-    var _slotNow=_hr<9?'盘前':_hr<15.5?'盘中':_hr<17?'盘后':'今日盘后';
-    if(_hr<15.5){
-      el.innerHTML='<div class="ipo-empty">⏳ T+1 盘后专享数据，盘后 15:30 后自动更新（当前 '+_slotNow+'）</div>';
+    var _slotNow=_hr<9.5?'盘前':_hr<15.5?'盘中':'盘后';
+    if(_hr<9.5){
+      el.innerHTML='<div class="ipo-empty">⏳ T+0·盘后定基（盘前空·盘中累积·15:10/15:30 定基）<br><span style="color:var(--dim);font-size:11px">当前 '+_slotNow+' · 09:40 起每 30 分盘中累积</span></div>';
       if(daily&&daily.update_time) setBadge('phEtfTime','盘后','短线',daily.update_time);
       return;
     }
     if(!daily||daily.no_data||!daily.top_inflow){
-      var dmsg=(daily&&daily.note)?daily.note:'日监控数据尚未生成，盘后 T+1 自动更新';
+      var dmsg=(daily&&daily.note)?daily.note:'日监控数据尚未生成，盘中累积中';
       el.innerHTML='<div class="ipo-empty">⏳ '+dmsg+'</div>';
       if(daily&&daily.update_time) setBadge('phEtfTime','盘中','短线',daily.update_time);
       return;
