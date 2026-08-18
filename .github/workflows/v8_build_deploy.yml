@@ -139,7 +139,17 @@ jobs:
             #   若落后 cn 最新推送就会拿到旧内容算旧 ?v → CDN 吐旧副本。先 reset 到
             #   FETCH_HEAD 即拿到 cn 最新版，reconcile 即可对齐。
             git fetch "$REPO" main
+            # ★★ 2026-08-18 根因修复：build bot 不要擦除人工前端改动 ★★
+            #   `git reset --hard FETCH_HEAD` 会把 index.html 上的人工 UI 修改（如 v6备忘录
+            #   iframe 加载兜底、子 tab 顺序调整、卡片增删）全部擦回远端旧版。此处先备份
+            #   本地 index.html，reset 后立即恢复；后续 update_v8.py 只会更新 data/*.js
+            #   的 ?v 戳、guard_v6_memo.py 只会刷新 v6_memo.html 的戳，不会破坏人工改动。
+            cp index.html /tmp/index.html.manual
             git reset --hard FETCH_HEAD
+            cp /tmp/index.html.manual index.html
+            # 同步 cn runner 单独推送的 5 个 extra 文件（update_v8.py 不重建这些），
+            #   确保 ?v 计算基于线上真实最新内容。
+            git checkout FETCH_HEAD -- data/FOUR_VOLUME.js data/FOUR_VOLUME_60M.js data/STOCK_RPS.js data/STOCK_STOP_DATA.js data/FINAL_RECOMMEND_DATA.js
             # ★ update_v8.py 是 build 内 ?v 的唯一权威：自身重写过的文件用本地新鲜内容，
             #   cn 单独推送的 5 个 extra 文件用线上真实内容（GITHUB_TOKEN 经 git blobs API）。
             #   二者都已中性化 republish_time 后取 sha1 前 10 位，与独立 reconcile 完全一致。
@@ -171,7 +181,11 @@ jobs:
             fi
             echo "⚠️ push 被拒（远端已前进），同步远端并按最新 raw_data 全量重建后重试 ($i/3)"
             git fetch "$REPO" main
+            # 重试路径同样备份/恢复 index.html，避免人工前端改动被擦除
+            cp index.html /tmp/index.html.manual
             git reset --hard FETCH_HEAD
+            cp /tmp/index.html.manual index.html
+            git checkout FETCH_HEAD -- data/FOUR_VOLUME.js data/FOUR_VOLUME_60M.js data/STOCK_RPS.js data/STOCK_STOP_DATA.js data/FINAL_RECOMMEND_DATA.js
             # 🔴 2026-08-18 根因修复：重试路径同样必须全量构建，不能用 --detect-changes
             #   （原因同上：reset 后 HEAD~1..HEAD 已无法反映 raw_data 的真实变化）。
             python update_v8.py
