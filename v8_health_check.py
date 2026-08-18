@@ -1464,14 +1464,22 @@ def check_runner():
 
 
 def check_local_head_sync():
-    """检查本地 HEAD 是否与 origin/main 一致。"""
+    """检查本地 HEAD 是否与 origin/main 一致。
+
+    2026-08-18 主人建议：一劳永逸把「本地落后于 origin/main」降为 info。
+    根因：云端 Pages 每次构建会重写 index.html（cn-extra data 文件 ?v= 刷新），
+    致 origin/main 永远比本地「前进 1~3 个 commit」，本地若未做新提交则每次必报 fail。
+    视作「云端 build 副作用 → 本地落后属预期」，降级 info 不再触发自愈/告警。
+    派发链 (self_heal) 仍按原 iid=local_sync 调用 _heal_local_sync() 做软对齐，不影响修复能力。
+    """
     try:
         subprocess.run(["git", "fetch", "origin"], check=True, timeout=30)
         local = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, timeout=10).strip()
         remote = subprocess.check_output(["git", "rev-parse", "origin/main"], text=True, timeout=10).strip()
         synced = local == remote
-        status = "ok" if synced else "fail"
-        msg = f"本地 {local[:7]} / origin/main {remote[:7]} {'同步' if synced else '本地落后，需 pull/push'}"
+        # 2026-08-18 降级：fail → info（云端 build 重写 index.html 属预期，非真实落后）
+        status = "ok" if synced else "info"
+        msg = f"本地 {local[:7]} / origin/main {remote[:7]} {'同步' if synced else '本地落后（Pages build 重写 index.html 属预期，已降级 info 不报警）'}"
         return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线", "status": status, "message": msg}]
     except Exception as e:
         return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线", "status": "warn", "message": f"检查失败: {e}"}]
