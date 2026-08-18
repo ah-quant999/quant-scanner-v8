@@ -190,10 +190,15 @@ jobs:
         run: |
           python api_push_raw.py
 
-      # 🛡 2026-08-18 一劳永逸式修复：抓完 raw_data 之后立即跑 update_v8.py 重新生成 data/*.js，
-      #   并跑 v8_health_check.py 刷新 HEALTH_CHECK.js——否则 raw_data 新了但 data/*.js 还是昨日
-      #   旧值，前端健康巡检就会报一堆「假陈旧 X」（主人怒令 2026-08-18 08:30 看到的 10 fail
-      #   根因就是缺这两步）。把诊断 + 自愈 + 重新发布 全部在一个 workflow 内闭环完成。
+      # 🛡 2026-08-18 主人紧急令根治：抓完 raw_data 之后立即桥接（bridge_raw_data.py）
+      #   + 重生成 data/*.js（update_v8.py）+ 刷新 HEALTH_CHECK.js（v8_health_check.py），
+      #   闭环 4 步：fetch → bridge → update_v8 → health_check。否则 raw_data 新了但
+      #   data/*.js 还是昨日旧值（如 TRIPLE_HISTORY 4 天前的根因就是缺 bridge 这步）。
+      - name: "🔗 桥接 raw_data 内部改名（bridge_raw_data.py）"
+        shell: bash
+        run: |
+          python algorithms/bridge_raw_data.py
+
       - name: "🔄 重生成 data/*.js (update_v8)"
         shell: bash
         run: |

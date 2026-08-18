@@ -904,20 +904,44 @@ def adjust_max_age(def_max, page=None):
     return def_max
 
 
-def _hard_cap_for_owner_rule(n=None):
-    """🛡 主人铁律 2026-08-17（命令式）·一劳永逸：交易日超 24h 必报+自愈闭环；周末/假期延算到 T+1 18:30。
+def _hard_cap_for_owner_rule(n=None, page=None):
+    """🛡 主人铁律 2026-08-18 终极收紧：按 page × 分时段红线。
 
-    返回硬上限（分钟）:
-      · 交易日：24h（即 1440 min）。任何 data 陈旧超 24h = fail + 强制 self_heal
-      · 非交易日（周末/节假日）：自最近一次收盘以来到「下一个交易日 18:30 盘后跑完」的分钟数。
-        例：周五 15:30 出的数据，最迟应在「下周一 18:30」前出现新值 → 上限 72h 整（4320 min）。
-        长假也按 next_trade_day 自动顺延，不写死。
+    按 page 区分（仅实时数据走 2h 红线，盘后/选股/今日事件保留 24h 兜底）：
+
+    实时数据（real-time / 盘中秒级刷新的卡）：
+      · 交易日盘中（09:00-15:30）：**2h（120 min）** — 主人原话「超过2小时就报警+自愈闭环」
+      · 交易日盘后（15:30-20:00）：4h — cn_fetch post_close 17:20 跑完留缓冲
+      · 交易日盘前（08:00-09:00）：6h — premarket 8:25 必跑，留 6h 兜底隔夜漏抓
+      · 夜间：24h — 非交易时段实时数据停滞正常
+
+    盘后数据 / 选股策略 / 今日事件 / 其他：保留原 24h 红线
+      （这些页合理保留上一交易日数据；adjust_max_age 已自带分时自适应，无需再绑）
+
+    非交易日（周末/节假日）：T+1 18:30 - 上次收盘（自适应长假/连休，下限 24h）
 
     接入方式：所有 adjust_max_age 返回值再 min(def_max, this) 一次。
+
+    历史：
+      · 2026-08-17 v1：24h 统一红线（主人最初记忆版本）
+      · 2026-08-18 v2：主人再次令「超过2小时就报警自愈」→ 仅实时数据页收紧到 2h，
+        全 page 统一收紧会误伤盘后数据（昨日 17:30 出的 post_close 数据自然 < 24h 旧，
+        但盘中 09:00-15:30 距上次收盘 17.5h，按通用 2h 红线会被误报 fail）
     """
     n = n or now_cst()
     if not is_market_closed(n):
-        # 交易日红线：24h
+        if page == "实时数据":
+            h = n.hour + n.minute / 60.0
+            # 盘中（09:00-15:30）：2h 红线——主人原话
+            if 9.0 <= h < 15.5:
+                return 120
+            # 盘后窗口（15:30-20:00）：4h — cn_fetch post_close 17:20 跑完留 2h 余量
+            if 15.5 <= h < 20.0:
+                return 240
+            # 盘前窗口（08:00-09:00）：6h — premarket 8:25 必跑，留 6h 兜底隔夜漏抓
+            if 8.0 <= h < 9.0:
+                return 360
+        # 其他 page 或夜间：24h — 数据合理停滞（非实时数据由 adjust_max_age 自适应）
         return 24 * 60
     # 非交易日：T+1 18:30 - 上次收盘（自适应长假/连休）
     last_close = last_trade_day_close(n)
@@ -958,9 +982,9 @@ def check_data_cards():
         ts = data.get("update_time") or data.get("date") or data.get("lastUpdated") or "--"
         dt = parse_time(ts)
         max_age = adjust_max_age(d["max_age"], page=d.get("page"))
-        # 🛡 主人铁律 2026-08-17：交易日超 24h 必报；非交易日 T+1 18:30
+        # 🛡 主人铁律 2026-08-18：分 page × 分时段红线（仅实时数据盘中 2h / 其他 24h）
         # 硬 cap 必须在 adjust_max_age 之后叠加，否则盘中/盘后自适应逻辑被绕过
-        max_age = min(max_age, _hard_cap_for_owner_rule())
+        max_age = min(max_age, _hard_cap_for_owner_rule(page=d.get("page")))
 
         # 盘中 premarket_cleared 异常自愈检测：实时数据在交易时段被标记为盘前清空，属于误清空
         prem_cleared = data.get("premarket_cleared") is True
@@ -1139,7 +1163,8 @@ def check_all_data_files():
             continue
         age_min = (now_cst() - dt).total_seconds() / 60
         # 此时 vid 已知 dt 不为 None，_LOW_FREQ_FILES 在上面已 continue 排除
-        cap = _hard_cap_for_owner_rule()
+        # 未知卡未登记 CARD_DEFS，按「全量数据」page 走（不分实时数据 2h 红线，避免误伤）
+        cap = _hard_cap_for_owner_rule(page="全量数据")
         # 已登记 CARD_DEFS 的卡在 check_data_cards 用 d.max_age 判定；未知卡统一走 24h/T+1 红线
         status = "ok" if age_min <= cap else "fail"
         rel = fmt_rel_time(str(ts)[:19])

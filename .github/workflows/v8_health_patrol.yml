@@ -95,6 +95,36 @@ jobs:
           echo "fail=$FAIL" >> "$GITHUB_OUTPUT"
           echo "💊 自动治愈 $HEALED 项 / 失败 $FAILED 项 / 仍 fail $FAIL 项"
 
+      # 🛡 2026-08-18 主人紧急令根治：派发自愈后等 10 分钟再验一次，避免「派发→同一数据未变
+      #   →再派发→空转」循环；这是「4 天没跑没发现」的根因之一——algo_run 派发无数次，bridge
+      #   断点未修，永远回到同一陈旧数据。仅当本次有 healed 项且派发了非 skip 类才进入验证。
+      - name: "🔁 自愈验证：10 分钟后回查仍 fail → 升级告警"
+        if: steps.heal.outputs.healed != '0' && steps.heal.outputs.healed != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🛌 等 10 分钟让 cn_fetch/algo_run 完成数据更新..."
+          sleep 600
+          echo "=== 验证回查 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') ==="
+          python v8_health_check.py --no-heal 2>&1 | tee verify_output.txt || true
+          REMAIN_FAIL=$(grep -c '"status": "fail"' verify_output.txt 2>/dev/null || echo "0")
+          NEW_OK=$(grep -c '"status": "ok"' verify_output.txt 2>/dev/null || echo "0")
+          echo "verify_fail=$REMAIN_FAIL" >> "$GITHUB_OUTPUT"
+          echo "verify_ok=$NEW_OK" >> "$GITHUB_OUTPUT"
+          if [ "$REMAIN_FAIL" -gt 0 ]; then
+            echo "🚨 自愈后仍有 $REMAIN_FAIL 项 fail，可能结构性断点（algo_run→bridge_raw_data 未生效等），已发邮件升级"
+            echo "::error::自愈闭环未达成 — $REMAIN_FAIL 项 10 分钟后仍 fail（详见 verify_output.txt）"
+            # 标记升级：写入 urgent 标记文件供下次日审计读取
+            python -c "import json,os,datetime;d={};ts=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S');
+p='.workbuddy/self_heal_escalations.json';
+try:d=json.load(open(p,encoding='utf-8'))
+except:d=[]
+d.append({'ts':ts,'remaining_fail':int(os.environ.get('REMAIN_FAIL',0)),'detail':'自愈闭环未达成'});
+open(p,'w',encoding='utf-8').write(json.dumps(d[-30:],ensure_ascii=False,indent=1))"
+          else
+            echo "✅ 自愈闭环达成：$NEW_OK 项全 OK"
+          fi
+
       - name: "🚨 缺口兜底：近 6 分钟无 cn_fetch / algo_run 完成就派发"
         # 🛡️ 2026-08-13 14:57 根因修复（小九令）：health-patrol #24 失败 + build #1425 skipped
         #   后，cn_fetch 下一次 schedule 要等 30 分钟（盘中每 30 分），期间 14:57-15:30

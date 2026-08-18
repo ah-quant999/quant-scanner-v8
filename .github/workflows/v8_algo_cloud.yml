@@ -255,6 +255,14 @@ jobs:
           # 推送交由下一步兜底执行，这里不因非零退出码而 fail。
           exit 0
 
+      # 🛡 2026-08-18 主人紧急令根治：算法链收尾前先做 4 件事，确保 data/*.js 与 HEALTH_CHECK.js
+      #   必刷新——bridge_raw_data 防 raw_data 内部改名断点（如 triple_resonance_history → triple_history），
+      #   update_v8 重生成 data/*.js，v8_health_check 刷新 HEALTH_CHECK.js。
+      - name: "🔗 桥接 raw_data 内部改名（bridge_raw_data.py）"
+        if: steps.trading.outputs.is_trading_day == 'true'
+        run: |
+          python algorithms/bridge_raw_data.py || true
+
       # 2026-08-08 修复：算法链产出 candidate.json 后，立即刷新候选池行情，
       # 避免 runner 状态卡 CANDIDATE_QUOTES 长期显示「空」。
       - name: "📈 刷新候选池行情（CANDIDATE_QUOTES）"

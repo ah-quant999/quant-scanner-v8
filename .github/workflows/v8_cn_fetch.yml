@@ -172,8 +172,16 @@ jobs:
         run: |
           python api_push_raw.py
 
-      # 🛡 2026-08-18 一劳永逸式修复：抓完 raw_data 立即跑 update_v8 + health_check
-      #   防止 raw_data 新了但 data/*.js 仍是昨日旧值（10 fail 假陈旧根因）
+      # 🛡 2026-08-18 主人紧急令根治：抓完 raw_data 立即跑 4 步闭环
+      #   bridge_raw_data → update_v8 → health_check。bridge_raw_data 是关键，
+      #   防止 raw_data 内部改名断点（如 triple_resonance_history → triple_history）让
+      #   update_v8 永远读到 4 天前的旧 raw_data/triple_history.json。
+      - name: "🔗 桥接 raw_data 内部改名（bridge_raw_data.py）"
+        shell: powershell
+        continue-on-error: true
+        run: |
+          python algorithms/bridge_raw_data.py
+
       - name: "🔄 重生成 data/*.js (update_v8)"
         shell: powershell
         run: |

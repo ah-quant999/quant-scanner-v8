@@ -244,19 +244,14 @@ jobs:
         run: |
           python algorithms/run_algorithms.py
 
-      # 🛡 2026-08-18 一劳永逸式修复：算法链跑完后追加两件收尾（防 4 天前 TRIPLE_HISTORY 复发）
-      #   1) 单独跑 update_triple_resonance_history.py（run_algorithms 链中已有，但万一被
-      #      continue-on-error 跳过，这里兜底再跑一次）+ 桥接到 raw_data/triple_history.json
-      #   2) 跑 update_v8.py + v8_health_check.py 重新生成 data/*.js + HEALTH_CHECK.js
-      - name: "🔁 三重共振历史兜底（防 4 天前 TRIPLE_HISTORY 复发）"
+      # 🛡 2026-08-18 主人紧急令根治：算法链收尾前先做 4 件事，确保 data/*.js 与 HEALTH_CHECK.js
+      #   必刷新——bridge_raw_data 防 raw_data 内部改名断点（如 triple_resonance_history → triple_history），
+      #   update_v8 重生成 data/*.js，v8_health_check 刷新 HEALTH_CHECK.js。
+      - name: "🔗 桥接 raw_data 内部改名（bridge_raw_data.py）"
         shell: powershell
         continue-on-error: true
         run: |
-          python algorithms/update_triple_resonance_history.py
-          # 桥接：raw_data/triple_resonance_history.json → raw_data/triple_history.json
-          #   stage_to_raw 默认从 out/ 读源（已弃用），需手 cp + 注入 update_time
-          $now = (Get-Date -Format "yyyy-MM-dd HH:mm:ss")
-          python -c "import json,os,sys;from datetime import datetime,timedelta,timezone;src=open(r'raw_data\triple_resonance_history.json',encoding='utf-8');d=json.load(src);src.close();now=datetime.now(timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M:%S');d['update_time']=now;d['republish_time']=now;dst=open(r'raw_data\triple_history.json','w',encoding='utf-8');json.dump(d,dst,ensure_ascii=False,separators=(',',':'));dst.close();print('  [bridge] triple_resonance_history.json -> triple_history.json (',now,')')"
+          python algorithms/bridge_raw_data.py
 
       - name: "🔄 重生成 data/*.js (update_v8)"
         shell: powershell

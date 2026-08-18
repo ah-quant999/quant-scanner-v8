@@ -1,5 +1,5 @@
 window.FOUR_VOLUME_60M={
- "update_time": "2026-08-18 08:41:11",
+ "update_time": "2026-08-18 09:04:38",
  "total": 7,
  "period": "60m",
  "description": "四量终极 60分钟共振信号（加分因子，独立于日线版）",
@@ -11,7 +11,7 @@ window.FOUR_VOLUME_60M={
    "board_label": "主板",
    "close": 30.37,
    "pct_chg": 10.24,
-   "turnover_rate": 18.24,
+   "turnover_rate": 0,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -40,7 +40,7 @@ window.FOUR_VOLUME_60M={
    "board_label": "主板",
    "close": 63.6,
    "pct_chg": 7.03,
-   "turnover_rate": 12.18,
+   "turnover_rate": 0,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -69,7 +69,7 @@ window.FOUR_VOLUME_60M={
    "board_label": "创业板",
    "close": 150.35,
    "pct_chg": 5.4,
-   "turnover_rate": 10.96,
+   "turnover_rate": 0,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -98,7 +98,7 @@ window.FOUR_VOLUME_60M={
    "board_label": "科创板",
    "close": 417.04,
    "pct_chg": 5.34,
-   "turnover_rate": 4.89,
+   "turnover_rate": 0,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -127,7 +127,7 @@ window.FOUR_VOLUME_60M={
    "board_label": "科创板",
    "close": 134.0,
    "pct_chg": -4.04,
-   "turnover_rate": 6.28,
+   "turnover_rate": 0,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -156,7 +156,7 @@ window.FOUR_VOLUME_60M={
    "board_label": "主板",
    "close": 35.18,
    "pct_chg": 2.99,
-   "turnover_rate": 10.44,
+   "turnover_rate": 0,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -185,7 +185,7 @@ window.FOUR_VOLUME_60M={
    "board_label": "主板",
    "close": 36.16,
    "pct_chg": 2.79,
-   "turnover_rate": 10.17,
+   "turnover_rate": 0,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
