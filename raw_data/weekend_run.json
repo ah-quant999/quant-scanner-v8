@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-18 08:41:17",
-  "generated": "2026-08-18 08:41:17",
+  "update_time": "2026-08-18 09:09:12",
+  "generated": "2026-08-18 09:09:12",
   "period_start": "2026-08-10",
   "period_end": "2026-08-16",
   "stats": {
@@ -9,69 +9,63 @@
     "tracked_files": 10,
     "ok_files": 9,
     "missing_files": 1,
-    "latest_health": {
-      "ok": 98,
-      "warn": 3,
-      "fail": 0,
-      "total": 101,
-      "updated": "2026-08-18 08:39:47"
-    }
+    "latest_health": null
   },
   "freshness": [
     {
       "file": "lhb_data.json",
       "label": "龙虎榜",
       "status": "ok",
-      "update_time": "2026-08-18 08:07:24",
+      "update_time": "2026-08-18 08:30:20",
       "size_kb": 22.7
     },
     {
       "file": "triple_history.json",
       "label": "三重共振历史",
       "status": "ok",
-      "update_time": "2026-08-18 08:39:13",
-      "size_kb": 5.1
+      "update_time": "2026-08-14 15:29:01",
+      "size_kb": 1.8
     },
     {
       "file": "top10_daily.json",
       "label": "全站精选",
       "status": "ok",
-      "update_time": "2026-08-18 08:12:18",
+      "update_time": "2026-08-18 09:02:29",
       "size_kb": 21.8
     },
     {
       "file": "cockpit_tier_recommend.json",
       "label": "驾驶舱分档",
       "status": "ok",
-      "update_time": "2026-08-18 08:19:32",
+      "update_time": "2026-08-18 08:44:12",
       "size_kb": 5.3
     },
     {
       "file": "sector_rs.json",
       "label": "板块相对强度",
       "status": "ok",
-      "update_time": "2026-08-18 08:06",
+      "update_time": "2026-08-18 08:28",
       "size_kb": 70.3
     },
     {
       "file": "final_recommend.json",
       "label": "最终推荐池",
       "status": "ok",
-      "update_time": "2026-08-18 08:18:08",
-      "size_kb": 32.2
+      "update_time": "2026-08-18 09:06:36",
+      "size_kb": 32.1
     },
     {
       "file": "gold_pool.json",
       "label": "黄金池",
       "status": "ok",
-      "update_time": "2026-08-18 08:19:32",
+      "update_time": "2026-08-18 08:44:12",
       "size_kb": 142.1
     },
     {
       "file": "candidate.json",
       "label": "候选池",
       "status": "ok",
-      "update_time": "2026-08-18 08:08:02",
+      "update_time": "2026-08-18 08:30:59",
       "size_kb": 88.3
     },
     {
@@ -84,7 +78,7 @@
       "file": "crds_card_data.json",
       "label": "逆势龙头",
       "status": "ok",
-      "update_time": "2026-08-18 08:07:43",
+      "update_time": "2026-08-18 08:30:39",
       "size_kb": 16.7
     }
   ],
