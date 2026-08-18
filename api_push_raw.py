@@ -338,7 +338,10 @@ def main():
         print(f"⚠️ 共 {len(failed_paths)} 个文件上传失败，将保留远程旧版本: {failed_paths}")
     if not new_entries:
         if failed_paths:
-            print("❌ 全部 blob 上传失败，终止推送"); sys.exit(1)
+            # 🔴 2026-08-18 主人根治令：全部 blob 上传失败 ≠ 错误。保留远程旧版本
+            #   正常退出（exit 0），避免看门狗/云端 workflow 因「无新数据可推」误判为失败
+            #   而派发兜底、烧小九 token。数据基础仍由云端下次 fetch 尝试。
+            print("ℹ️ 本地 blob 全部上传失败，保留远程旧版本（不算错误）"); sys.exit(0)
         print("ℹ️ raw_data 无需更新（内容一致或均被防倒退守卫拦截），跳过提交"); sys.exit(0)
 
     # 合并策略：保留远程已有的其他 raw_data 文件，只覆盖本次确实更新的文件。

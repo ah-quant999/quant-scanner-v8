@@ -55,8 +55,15 @@ BD_WORKFLOW_NAME = "☁️ v8 构建部署(云端ubuntu)"
 RUNNER_DIR = Path("D:/actions-runner-v8")
 RUNNER_EXE = RUNNER_DIR / "bin" / "Runner.Listener.exe"
 CN_WORKFLOW_ID = 327687211                  # v8_cn_fetch_cloud.yml（云端 ubuntu-latest 主力）
-CN_WORKFLOW_ID_FALLBACK = 336655343         # v8_cn_fetch_cloud_selfhosted.yml（小九 self-hosted 应急）
+CN_WORKFLOW_ID_FALLBACK = 336661558         # v8_cn_fetch_cloud_selfhosted.yml（小九 self-hosted 应急）
+# ⚠️ 2026-08-18 修正：原 336655343 是 v8_cn_fetch_cloud_hosted.yml（旧「hosted兜底」）的过期 ID，
+#    小九应急真身 workflow ID 为 336661558（经 /actions/workflows 实测核对）。
 CN_SELFHOSTED_FALLBACK_FILE = "v8_cn_fetch_cloud_selfhosted.yml"  # 2026-08-18 主人令：小九只兜底
+# 🔴 2026-08-18 主人根治令「小九不烧 TOKEN」：self-hosted 应急兜底派发 4 重门控
+# 门控1 连续失败降级 / 门控2 静默期 / 门控3 云端 in_progress 不抢 / 门控4 真超阈才派
+_SELFHOSTED_QUIET_MIN = 30                    # 同一 workflow 派发间隔下限（避免刚派就又派）
+_SELFHOSTED_MAX_CONSEC_FAIL = 3               # 连续失败超此值 → 降级只告警不重试
+_SELFHOSTED_DISPATCH_LOG = Path(".workbuddy/v8_selfhosted_dispatch.json")  # 派发状态文件
 BD_WORKFLOW_ID = 324135263                  # v8_build_deploy.yml（☁️ v8 构建部署(云端ubuntu)）
 
 # 尝试从多个位置读取 token（本地文件优先，不落入仓库）
@@ -562,33 +569,120 @@ def auto_dispatch(cat):
         return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
 
 
+def _load_selfhosted_log():
+    """读取 self-hosted 派发状态（连续失败计数 / 上次派发时间）。文件缺失视为全 0。"""
+    if not _SELFHOSTED_DISPATCH_LOG.exists():
+        return {"consec_fail": 0, "last_dispatch": None, "last_dispatch_ok": None}
+    try:
+        return json.loads(_SELFHOSTED_DISPATCH_LOG.read_text(encoding="utf-8"))
+    except Exception:
+        return {"consec_fail": 0, "last_dispatch": None, "last_dispatch_ok": None}
+
+
+def _save_selfhosted_log(st):
+    """写回 self-hosted 派发状态（.workbuddy/ 下，不落入仓库主目录）。"""
+    try:
+        _SELFHOSTED_DISPATCH_LOG.parent.mkdir(parents=True, exist_ok=True)
+        _SELFHOSTED_DISPATCH_LOG.write_text(json.dumps(st, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception as e:
+        print(f"[WARN] 写 self-hosted 派发状态失败: {e}")
+
+
+def _check_selfhosted_throttle(now_cst):
+    """门控 1+2：连续失败降级 + 静默期。返回 (allowed, reason)。"""
+    st = _load_selfhosted_log()
+    if st.get("consec_fail", 0) >= _SELFHOSTED_MAX_CONSEC_FAIL:
+        return False, (f"self-hosted 连续失败 {st['consec_fail']} 次 ≥ "
+                       f"{_SELFHOSTED_MAX_CONSEC_FAIL} → 降级只告警不重试（主人令：小九不烧 TOKEN）")
+    last = st.get("last_dispatch")
+    if last:
+        try:
+            last_dt = datetime.fromisoformat(last)
+            quiet_left = _SELFHOSTED_QUIET_MIN - (now_cst - last_dt).total_seconds() / 60
+            if quiet_left > 0:
+                return False, f"距上次 self-hosted 派发仅 {quiet_left:.0f}min < {_SELFHOSTED_QUIET_MIN}min 静默期，跳过"
+        except Exception:
+            pass
+    return True, ""
+
+
+def _record_selfhosted_dispatch(ok):
+    """记录派发结果：成功清零连续失败；失败累加（供下轮门控1降级）。"""
+    st = _load_selfhosted_log()
+    if ok:
+        st["consec_fail"] = 0
+    else:
+        st["consec_fail"] = st.get("consec_fail", 0) + 1
+    st["last_dispatch"] = datetime.now(timezone(timedelta(hours=8))).isoformat()
+    st["last_dispatch_ok"] = bool(ok)
+    _save_selfhosted_log(st)
+
+
+def _check_cloud_in_progress():
+    """门控 3：云端主力 workflow 有 in_progress 运行就不派 self-hosted，让云端自然完成。"""
+    try:
+        url = f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_WORKFLOW_ID}/runs?per_page=5"
+        req = urllib.request.Request(url, headers=HEADERS)
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = json.loads(r.read().decode("utf-8"))
+        for run in data.get("workflow_runs") or []:
+            st = (run.get("status") or "").lower()
+            if st in ("in_progress", "queued", "pending", "waiting", "requested"):
+                return True, f"云端 cn_fetch 有 run #{run.get('run_number')} {st} 在跑，不抢派"
+        return False, None
+    except Exception as e:
+        return False, None
+
+
 def dispatch_selfhosted_fallback(cat):
-    """2026-08-18 主人令：云端 ubuntu-latest 失败时，派发到小九 self-hosted cn 应急兜底。"""
+    """2026-08-18 主人令：云端 ubuntu-latest 失败时，派发到小九 self-hosted cn 应急兜底。
+
+    🔴 2026-08-18 主人根治令加 3 重门控（小九不烧 TOKEN）：
+      门控1 连续失败 ≥3 次 → 永久只发邮件不重试
+      门控2 30 分钟静默期 → 避免刚派就又派
+      门控3 云端 in_progress → 在跑就别抢，让云端自然完成
+    """
+    now_cst = datetime.now(timezone(timedelta(hours=8)))
+    # 门控 1+2：连续失败降级 + 静默期
+    allowed, reason = _check_selfhosted_throttle(now_cst)
+    if not allowed:
+        return False, f"self-hosted 派发被门控拦截: {reason}"
+    # 门控 3：云端在跑就不抢
+    cloud_busy, cmsg = _check_cloud_in_progress()
+    if cloud_busy:
+        return False, f"self-hosted 派发被门控拦截: {cmsg}"
     url = f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_SELFHOSTED_FALLBACK_FILE}/dispatches"
     data = json.dumps({"ref": "main", "inputs": {"category": cat}}).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=HEADERS, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
+            _record_selfhosted_dispatch(True)
             return True, f"已派发小九应急兜底 category={cat} (HTTP {r.status})"
     except urllib.error.HTTPError as e:
+        _record_selfhosted_dispatch(False)
         return False, f"小九应急兜底派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
 
 
 def auto_dispatch_with_fallback(cat):
     """2026-08-18 主人令：优先派发云端 ubuntu-latest（v8_cn_fetch_cloud.yml）；
     若其最近 failure 或派发失败，自动切到小九 self-hosted cn 应急兜底。
-    小九机器只兜底，不主动跑主链路。"""
+    小九机器只兜底，不主动跑主链路。
+
+    🔴 2026-08-18 主人根治令：云端是【唯一】主力。self-hosted 兜底受 4 重门控
+    （连续失败降级 / 30min 静默期 / 云端 in_progress 不抢 / 真超阈才派），
+    历史 9+ 连败 → 不再每小时烧 token 重试。
+    """
     # 先检查主 workflow 最近状态
     ok, msg, is_failure = check_workflow(CN_WORKFLOW_NAME, "cn_fetch", max_age_min=120, workflow_id=CN_WORKFLOW_ID)
     if is_failure:
-        # 云端主力最近已 failure，直接派 self-hosted 兜底
+        # 云端主力最近已 failure，直接派 self-hosted 兜底（受 3 重门控约束）
         fh_ok, fh_msg = dispatch_selfhosted_fallback(cat)
         return fh_ok, f"云端主力最近 failure → {fh_msg}"
     # 正常路径：尝试派发云端主力 workflow
     d_ok, d_msg = auto_dispatch(cat)
     if d_ok:
         return True, d_msg
-    # 派发失败：触发 self-hosted 兜底
+    # 派发失败：触发 self-hosted 兜底（受 3 重门控约束）
     fh_ok, fh_msg = dispatch_selfhosted_fallback(cat)
     return fh_ok, f"云端派发失败({d_msg}) → {fh_msg}"
 

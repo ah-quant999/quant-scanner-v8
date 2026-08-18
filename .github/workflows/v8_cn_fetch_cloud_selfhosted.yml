@@ -136,6 +136,8 @@ jobs:
           python algorithms/calc_etf_intraday.py
 
       - name: "📤 推送 raw_data/ 到 main（Contents API）"
+        # 🔴 2026-08-18 主人根治令：消费层软失败。推送失败不阻断后续 bridge/update_v8/health_check。
+        continue-on-error: true
         shell: bash
         run: |
           python api_push_raw.py
@@ -150,11 +152,15 @@ jobs:
           python algorithms/bridge_raw_data.py
 
       - name: "🔄 重生成 data/*.js (update_v8)"
+        # 🔴 2026-08-18 主人根治令：消费层软失败。
+        continue-on-error: true
         shell: bash
         run: |
           python update_v8.py
 
       - name: "🩺 刷新 HEALTH_CHECK.js (v8_health_check)"
+        # 🔴 2026-08-18 主人根治令：health_check 硬失败曾 3 次拖垮 workflow → 软失败只留痕。
+        continue-on-error: true
         shell: bash
         run: |
           python v8_health_check.py
