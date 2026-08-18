@@ -46,18 +46,18 @@ except Exception:
 
 REPO = "ah-quant999/quant-scanner-v8"
 SITE_URL = "https://ah-quant999.github.io/quant-scanner-v8/"
-# 2026-08-06 修正：阿狸咪 08-05 把中国数据抓取迁到云端 ubuntu，workflow 改名 + 新 id。
-# 旧常量 "(cn)" / 324135267 已两个都不匹配 → 夜间靠 in_schedule_window 豁免掩盖成"假绿"，
-# 白天调度窗口内会每小时误报一封告警邮件。此处切到云端主力，自建 runner 版降级为应急备份。
-CN_WORKFLOW_NAME = "🇨🇳 v8 中国数据抓取(云端)"          # v8_cn_fetch_cloud.yml（主力）
-CN_WORKFLOW_NAME_FALLBACK = "🇨🇳 v8 中国数据抓取(cn·应急)"  # v8_cn_fetch.yml（自建 runner 应急）
+# 2026-08-18 主人令：云端 ubuntu-latest 才是主力，小九 self-hosted cn 只兜底。
+# v8_cn_fetch_cloud.yml 固定 ubuntu-latest；v8_cn_fetch_cloud_selfhosted.yml 固定 [self-hosted, cn]，
+# 仅由看门狗在云端连续失败时 dispatch。
+CN_WORKFLOW_NAME = "🇨🇳 v8 中国数据抓取(云端)"              # v8_cn_fetch_cloud.yml（云端主力）
+CN_WORKFLOW_NAME_FALLBACK = "🇨🇳 v8 中国数据抓取(云端·小九应急)"  # v8_cn_fetch_cloud_selfhosted.yml（应急）
 BD_WORKFLOW_NAME = "☁️ v8 构建部署(云端ubuntu)"
 RUNNER_DIR = Path("D:/actions-runner-v8")
 RUNNER_EXE = RUNNER_DIR / "bin" / "Runner.Listener.exe"
-CN_WORKFLOW_ID = 327687211           # v8_cn_fetch_cloud.yml（云端 ubuntu 主力，用于 API 派发）
-CN_WORKFLOW_ID_FALLBACK = 324135267  # v8_cn_fetch.yml（自建 cn runner 应急）
-CN_HOSTED_FALLBACK_FILE = "v8_cn_fetch_cloud_hosted.yml"  # 2026-08-18 新增：self-hosted 网络中断时 GitHub hosted runner 兜底
-BD_WORKFLOW_ID = 324135263           # v8_build_deploy.yml（☁️ v8 构建部署(云端ubuntu)）
+CN_WORKFLOW_ID = 327687211                  # v8_cn_fetch_cloud.yml（云端 ubuntu-latest 主力）
+CN_WORKFLOW_ID_FALLBACK = 336655343         # v8_cn_fetch_cloud_selfhosted.yml（小九 self-hosted 应急）
+CN_SELFHOSTED_FALLBACK_FILE = "v8_cn_fetch_cloud_selfhosted.yml"  # 2026-08-18 主人令：小九只兜底
+BD_WORKFLOW_ID = 324135263                  # v8_build_deploy.yml（☁️ v8 构建部署(云端ubuntu)）
 
 # 尝试从多个位置读取 token（本地文件优先，不落入仓库）
 def _load_token():
@@ -562,35 +562,35 @@ def auto_dispatch(cat):
         return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
 
 
-def dispatch_hosted_fallback(cat):
-    """2026-08-18 新增：self-hosted cn runner 网络中断时，派发到 GitHub hosted runner 兜底。
-    使用 workflow 文件名（无需预先知道 workflow_id）。"""
-    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_HOSTED_FALLBACK_FILE}/dispatches"
+def dispatch_selfhosted_fallback(cat):
+    """2026-08-18 主人令：云端 ubuntu-latest 失败时，派发到小九 self-hosted cn 应急兜底。"""
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_SELFHOSTED_FALLBACK_FILE}/dispatches"
     data = json.dumps({"ref": "main", "inputs": {"category": cat}}).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=HEADERS, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
-            return True, f"已派发 hosted fallback category={cat} (HTTP {r.status})"
+            return True, f"已派发小九应急兜底 category={cat} (HTTP {r.status})"
     except urllib.error.HTTPError as e:
-        return False, f"hosted fallback 派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
+        return False, f"小九应急兜底派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
 
 
 def auto_dispatch_with_fallback(cat):
-    """2026-08-18 新增：优先派发 self-hosted cn；若其最近为 failure 或派发失败，
-    自动切到 GitHub hosted runner 兜底，避免单点网络故障导致盘中数据断流。"""
+    """2026-08-18 主人令：优先派发云端 ubuntu-latest（v8_cn_fetch_cloud.yml）；
+    若其最近 failure 或派发失败，自动切到小九 self-hosted cn 应急兜底。
+    小九机器只兜底，不主动跑主链路。"""
     # 先检查主 workflow 最近状态
     ok, msg, is_failure = check_workflow(CN_WORKFLOW_NAME, "cn_fetch", max_age_min=120, workflow_id=CN_WORKFLOW_ID)
     if is_failure:
-        # 主 workflow 最近已 failure（如 checkout 网络问题），直接派 fallback
-        fh_ok, fh_msg = dispatch_hosted_fallback(cat)
-        return fh_ok, f"self-hosted cn 最近 failure → {fh_msg}"
-    # 正常路径：尝试派发主 workflow
+        # 云端主力最近已 failure，直接派 self-hosted 兜底
+        fh_ok, fh_msg = dispatch_selfhosted_fallback(cat)
+        return fh_ok, f"云端主力最近 failure → {fh_msg}"
+    # 正常路径：尝试派发云端主力 workflow
     d_ok, d_msg = auto_dispatch(cat)
     if d_ok:
         return True, d_msg
-    # 派发失败：触发兜底
-    fh_ok, fh_msg = dispatch_hosted_fallback(cat)
-    return fh_ok, f"self-hosted 派发失败({d_msg}) → {fh_msg}"
+    # 派发失败：触发 self-hosted 兜底
+    fh_ok, fh_msg = dispatch_selfhosted_fallback(cat)
+    return fh_ok, f"云端派发失败({d_msg}) → {fh_msg}"
 
 
 def write_urgent(reason_lines):
