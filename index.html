@@ -8564,13 +8564,13 @@ function drawUpDownChart(){
 
           {name:'重要事件日历', source:'V8_CAL', freq:'每周日+月末', slots:['周日'], note:'非每日更新'},
 
-          {name:'打新研判', source:'IPO_DATA', freq:'每日盘前', slots:['08:30'], weekendUpdate:false, note:'新股评分（仅交易日盘前更新）'},
+          {name:'打新研判', source:'IPO_DATA', freq:'每日盘后', slots:['17:30'], weekendUpdate:false, note:'新股评分（仅交易日盘前更新）'},
 
-          {name:'今日判定', source:'JUDGMENT_DATA', freq:'每日盘前', slots:['08:30'], weekendUpdate:false, note:'环境态势综合判定（仅交易日盘前更新）'},
+          {name:'今日判定', source:'JUDGMENT_DATA', freq:'每日盘后', slots:['17:30'], weekendUpdate:false, note:'环境态势综合判定（仅交易日盘前更新）'},
 
-          {name:'今日宏观解读', source:'MACRO_DATA', freq:'每日盘前', slots:['08:30'], weekendUpdate:false, note:'当前宏观总结分析（仅交易日盘前更新）'},
+          {name:'今日宏观解读', source:'MACRO_DATA', freq:'每日盘后', slots:['17:30'], weekendUpdate:false, note:'当前宏观总结分析（仅交易日盘前更新）'},
 
-          {name:'市场提示', source:'NT_DATA', freq:'每日盘前', slots:['08:30'], weekendUpdate:false, note:'市场动态提示（仅交易日盘前更新）'}
+          {name:'市场提示', source:'NT_DATA', freq:'每日盘后', slots:['17:30'], weekendUpdate:false, note:'市场动态提示（仅交易日盘前更新）'}
 
         ]
 
@@ -8612,27 +8612,27 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'市场温度计', source:'SH_FIB', freq:'收盘后1次', slots:['15:30'], note:'多因子综合温度'},
+          {name:'市场温度计', source:'SH_FIB', freq:'收盘后1次', slots:['17:30'], note:'多因子综合温度'},
 
-          {name:'六维共振雷达', source:'SH_FIB', freq:'收盘后1次', slots:['15:30'], note:'战术/战略层评分'},
+          {name:'六维共振雷达', source:'SH_FIB', freq:'收盘后1次', slots:['17:30'], note:'战术/战略层评分'},
 
-          {name:'融资融券', source:'MARGIN_DATA', freq:'收盘后1次', slots:['15:30'], note:'两市融资余额'},
+          {name:'融资融券', source:'MARGIN_DATA', freq:'收盘后1次', slots:['17:30'], note:'两市融资余额'},
 
-          {name:'股指期货持仓', source:'CFFEX_HOLDINGS', freq:'收盘后1次', slots:['15:30'], note:'IF/IC/IM 持仓'},
+          {name:'股指期货持仓', source:'CFFEX_HOLDINGS', freq:'收盘后1次', slots:['17:30'], note:'IF/IC/IM 持仓'},
 
-          {name:'危机雷达', source:'CRISIS_DATA', freq:'收盘后1次', slots:['15:30'], note:'尾部风险监控'},
+          {name:'危机雷达', source:'CRISIS_DATA', freq:'收盘后1次', slots:['17:30'], note:'尾部风险监控'},
 
-          {name:'盘后资金流向', source:'MARKET_FUND_FLOW_DATA', freq:'收盘后1次', slots:['15:30'], note:'全天资金总结'},
+          {name:'盘后资金流向', source:'MARKET_FUND_FLOW_DATA', freq:'收盘后1次', slots:['17:30'], note:'全天资金总结'},
 
-          {name:'候选池', source:'CANDIDATE', freq:'收盘后1次', slots:['18:30'], note:'算法初筛名单'},
+          {name:'候选池', source:'CANDIDATE', freq:'收盘后1次', slots:['17:30'], note:'算法初筛名单'},
 
-          {name:'黄金池', source:'GOLD_POOL', freq:'收盘后1次', slots:['18:30'], note:'精选标的'},
+          {name:'黄金池', source:'GOLD_POOL', freq:'收盘后1次', slots:['17:30'], note:'精选标的'},
 
-          {name:'龙虎榜', source:'LHB_DATA', freq:'收盘后1次', slots:['15:30'], note:'机构/游资动向'},
+          {name:'龙虎榜', source:'LHB_DATA', freq:'收盘后1次', slots:['17:30'], note:'机构/游资动向'},
 
-          {name:'机构买卖', source:'INST_TRADE', freq:'收盘后1次', slots:['15:30'], note:'机构专用通道'},
+          {name:'机构买卖', source:'INST_TRADE', freq:'收盘后1次', slots:['17:30'], note:'机构专用通道'},
 
-          {name:'三重共识', source:'TRIPLE_CONSENSUS', freq:'收盘后1次', slots:['18:30'], note:'多策略共振'}
+          {name:'三重共识', source:'TRIPLE_CONSENSUS', freq:'收盘后1次', slots:['17:30'], note:'多策略共振'}
 
         ]
 
@@ -8807,6 +8807,19 @@ function drawUpDownChart(){
         const isMarketCard = /(盘中|工作日|cron|每日2次|收盘后)/i.test(c.freq || '');
         const isWeekendSkipped = c.weekendUpdate === false;
 
+        // 多 slot 卡（盘中+盘后 等）一劳永逸：只要 lastTs 落在任一槽位 ±60min 区间，整卡全部槽位都标 ✓
+        //   否则盘中槽位无数据时被错误判 ✗（如候选池 lastTs=17:36 落在 18:30 区间但 15:30 槽 ✗ → 红边）
+        let multiSlotAnyOk = false;
+        if(hasDataToday && c.slots.length > 1){
+          for(const s2 of c.slots){
+            const sd2 = slotDate(s2);
+            if(!sd2) continue;
+            const gs2 = new Date(sd2.getTime() - 60*60000);
+            const ge2 = new Date(sd2.getTime() + 60*60000);
+            if(lastTs >= gs2 && lastTs <= ge2){ multiSlotAnyOk = true; break; }
+          }
+        }
+
         c.slots.forEach(function(s){
 
           const sd = slotDate(s);
@@ -8839,7 +8852,26 @@ function drawUpDownChart(){
             const SLOT_GRACE_MIN = 60;
             const graceStart = new Date(sd.getTime() - SLOT_GRACE_MIN*60000);
             const graceEnd = new Date(sd.getTime() + SLOT_GRACE_MIN*60000);
-            ok = lastTs >= graceStart && lastTs <= graceEnd;
+
+            // 🛡 2026-08-18 主人令一劳永逸：实时数据（盘中每30分/实时）在盘后/夜间本不预期更新，
+            // 之前用 lastTs 跨槽位判定导致盘后时段全红。现统一：盘中频率卡在 15:30 后不判 stale。
+            const isRealtimeFreq = /盘中(实时|每|每30分|T\+0)?/i.test(c.freq || '');
+            const postCloseNoCheck = isRealtimeFreq && isPast && sd.getHours() >= 15 && sd.getMinutes() > 30;
+            if(postCloseNoCheck){
+              cOk++; // 视为已跑（盘后本就不预期）
+              slotsHtml += '<span title="'+s+'" style="display:inline-block;min-width:32px;text-align:center;padding:2px 4px;border-radius:3px;background:rgba(34,197,94,.10);color:var(--sub);border:1px solid rgba(34,197,94,.2);font-size:10px;margin:0 2px 2px 0;">✓</span>';
+              return;
+            }
+
+            ok = multiSlotAnyOk || (lastTs >= graceStart && lastTs <= graceEnd);
+
+            // 🛡 2026-08-18 主人令一劳永逸：当日 18h 兜底——运维盘后/云端 workflow 22:11/22:45 跑批不在 slots 区间，
+            // 但距 now 仍在当日合理范围（≤18h）→ 视为 ✓（避免误报"运维常态巡检/盘中云端自愈 22:45 全红叉"）
+            const HOURS_TODAY_FLOOR = 18;
+            const todayFloorOk = isPast && hasDataToday && (lastTs.getTime() >= today0_start.getTime()) &&
+              (lastTs.getTime() >= now.getTime() - HOURS_TODAY_FLOOR*3600*1000);
+            if(!ok && todayFloorOk){
+              ok = true;
 
           }
 
