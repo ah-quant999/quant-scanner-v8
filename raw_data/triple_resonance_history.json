@@ -103,7 +103,7 @@
     "601899": {
       "2026-08-17": 33.36,
       "2026-08-18": 35.45,
-      "2026-08-19": 35.45
+      "2026-08-19": 33.56
     },
     "300476": {
       "2026-08-17": 0,
@@ -145,7 +145,7 @@
       "enter_date": "2026-08-17",
       "enter_close": 35.45,
       "last_date": "2026-08-19",
-      "last_close": 35.45,
+      "last_close": 33.56,
       "status": "near",
       "streak": 3,
       "total_days": 3
@@ -280,7 +280,7 @@
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-08-19 01:04:06"
+    "last_update": "2026-08-19 01:40:12"
   },
   "2026-08-18": [
     {
@@ -382,29 +382,13 @@
       "status": "strict"
     },
     {
-      "code": "603993",
-      "name": "洛阳钼业",
-      "market": "sh",
-      "board": "主板",
-      "close": 20.75,
-      "pct_chg": -0.38,
-      "total_score": 40.0,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
       "code": "601899",
       "name": "紫金矿业",
       "market": "sh",
       "board": "主板",
-      "close": 35.45,
-      "pct_chg": 0.85,
-      "total_score": 40.0,
+      "close": 33.56,
+      "pct_chg": 0.6,
+      "total_score": 39.2,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
@@ -420,7 +404,7 @@
       "board": "主板",
       "close": 777.0,
       "pct_chg": 1.44,
-      "total_score": 34.0,
+      "total_score": 34.8,
       "quality_grade": "B",
       "industry": "专用设备制造业",
       "sectors": [

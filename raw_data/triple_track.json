@@ -1,45 +1,18 @@
 {
-  "update_time": "2026-08-19 01:04:07",
+  "update_time": "2026-08-19 01:40:12",
   "data_date": "2026-08-19",
   "track_start": "2026-08-19",
   "history_days": 3,
   "strict_count": 1,
-  "near_count": 4,
+  "near_count": 3,
   "tracked": [
-    {
-      "code": "601899",
-      "name": "紫金矿业",
-      "market": "sh",
-      "board": "主板",
-      "status": "near",
-      "total_score": 40.0,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 3,
-      "consecutive_days": 3,
-      "first_close": 33.36,
-      "current_close": 35.45,
-      "pnl_pct": 6.26,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "已兑现(价涨)"
-        }
-      ]
-    },
     {
       "code": "002371",
       "name": "北方华创",
       "market": "sz",
       "board": "主板",
       "status": "near",
-      "total_score": 34.0,
+      "total_score": 34.8,
       "quality_grade": "B",
       "industry": "专用设备制造业",
       "sectors": [
@@ -55,12 +28,12 @@
       "catalysts": []
     },
     {
-      "code": "603993",
-      "name": "洛阳钼业",
+      "code": "601899",
+      "name": "紫金矿业",
       "market": "sh",
       "board": "主板",
       "status": "near",
-      "total_score": 40.0,
+      "total_score": 39.2,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
@@ -68,11 +41,11 @@
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
-      "hold_days": 2,
-      "consecutive_days": 2,
-      "first_close": 20.75,
-      "current_close": 20.75,
-      "pnl_pct": 0.0,
+      "hold_days": 3,
+      "consecutive_days": 3,
+      "first_close": 33.36,
+      "current_close": 33.56,
+      "pnl_pct": 0.6,
       "catalysts": [
         {
           "tag": "中报预增",
@@ -201,19 +174,18 @@
   "sector_cluster": {
     "by_industry": [
       {
-        "industry": "有色金属矿采选业",
-        "count": 2,
-        "names": [
-          "紫金矿业",
-          "洛阳钼业"
-        ]
-      },
-      {
         "industry": "专用设备制造业",
         "count": 2,
         "names": [
           "北方华创",
           "长川科技"
+        ]
+      },
+      {
+        "industry": "有色金属矿采选业",
+        "count": 1,
+        "names": [
+          "紫金矿业"
         ]
       },
       {
@@ -226,29 +198,29 @@
     ],
     "by_sector": [
       {
-        "sector": "有色金属矿采选业",
+        "sector": "专用设备制造业",
         "count": 2
       },
       {
-        "sector": "专用设备制造业",
-        "count": 2
+        "sector": "有色金属矿采选业",
+        "count": 1
       },
       {
         "sector": "计算机、通信和其他电子设备制造业",
         "count": 1
       }
     ],
-    "concentration": 40.0
+    "concentration": 50.0
   },
   "overlap": {
-    "total_tracked": 5,
+    "total_tracked": 4,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
       "names": []
     },
     "cockpit_a": {
-      "count": 10,
+      "count": 8,
       "overlap": 2,
       "names": [
         "北方华创",
