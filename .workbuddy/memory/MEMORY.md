@@ -17,6 +17,15 @@
 - **defer 时序**：`data/*.js` 带 defer，内联脚本先执行读到空占位 → 渲染代码必须改为具名函数 + `DOMContentLoaded`/`setTimeout` 兜底重绘；占位文案写"加载中…"非"暂无数据"。
 - **时段标签**：一律调 `window._slotByTs(ts)`（盘中边界 9:00-15:30），禁止硬编码 `_hr<15` 或写死"盘前/盘后"。
 
+## 前端 TAB 权威结构（改 index.html 前必读，2026-08-18 更新）
+- **总导航一级 TAB**：今日事件(sec-final)→实时数据(sec-rt)→盘后数据(sec-ph)→共振日历(sec-td)→最终推荐(sec-rc)→个股查询(sec-query)→🔒选股策略(sec-st)→🔒策略回测(sec-bt)→🔒暂未上架(sec-ul)→🔒运维(sec-op)→🔒逻辑详解(sec-lg)
+- **选股策略(sec-st) 子TAB**：三重共识(tc)→四量终极→驾驶舱(cockpit)→大牛股猎手(hunter)→全站精选(allsite)→相对强度(rps)→逆势龙头(crds)→🔮潜力参考(pr)
+- **潜力参考(st-pr) 二卡**：① 🔮潜力挖掘 ppBody ← `_fillPotentialPicks` / POTENTIAL_PICKS.js；② 💹商品涨价弹性榜 ceBody ← `_fillCommodityElasticity` / COMMODITY_ELASTICITY.js
+- **暂未上架(sec-ul) 子TAB**：🚀强势突破(ulPaneStrong) → 🔮潜力挖掘(ulPanePP) → 🧪调试专区(ulPaneDbg)
+- **调试专区(ulPaneDbg) 二卡**：① 🧪实验选股调试专区（SH_FIB 窗口/缠论视角/失效应对）；② 📌概念/行业 → ETF·龙头 参考（dbgEtfMapBody ← etfMapBody 隐藏源容器克隆）
+- **三大易踩坑**：① 潜力参考**已无 ETF·龙头卡**（2026-08-18 迁入调试专区）；② 情绪周期定位**已合并进实时数据区「🎭情绪周期·连板天梯」单卡**；③ 商品涨价弹性榜**已不在实验区**。
+- 云端巡检(.py)/workflow(.yml) 均不依赖 sec-pr/st-pr 父容器，仅按 DOM id 校验 → ppBody/ceBody/dbgEtfMapBody id 保持不变即无需改巡检脚本。
+
 ## 止损止盈 / 增量缓存
 - 全站统一 `fixedP10/rrK1.5`，配置中心 `algorithms/stop_target_profiles.json`，勿在业务代码写死。
 - `backtest_tdx.py` 读自身输出 `raw_data/backtest_tdx.json` 跳已有回测 → 参数变更后必须删该 JSON 再重跑（用 Python os.remove，别用 rm -f 会被 safe-delete 钩子拦）。
