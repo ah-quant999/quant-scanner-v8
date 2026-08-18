@@ -3,7 +3,7 @@
 """
 v8_urgent_listener.py — 紧急指令监听 + 健康检查（v8 去 v6 化版）
 =========================================================
-监听 docs/ops/urgent/ 下的 URGENT_*.md 文件，读取最新内容并：
+监听 URGENT_*.md（docs/ops/urgent/ 与仓库根目录双位置），读取最新内容并：
 1. 运行 guard_v8_freshness.py 生成数据新鲜度报告；
 2. 根据文件内容中的关键词自动 dispatch 对应 workflow；
 3. 输出摘要供 automation 向主人汇报。
@@ -52,8 +52,21 @@ def _load_token():
     return None
 
 
+def _scan_urgent_files():
+    """扫描全部 URGENT 落盘位置（去重）：
+    1. docs/ops/urgent/（历史位置，v8 去 v6 化前）
+    2. 仓库根目录（小九 08-10 起使用，如 URGENT_小九_2026-08-18_*.md）
+    """
+    paths = set()
+    for d in (URGENT_DIR, BASE):
+        if d.is_dir():
+            for p in d.glob("URGENT_*.md"):
+                paths.add(p.resolve())
+    return paths
+
+
 def recent_urgent_files(n=5):
-    files = sorted(glob.glob(str(URGENT_DIR / "URGENT_*.md")), key=os.path.getmtime, reverse=True)
+    files = sorted(_scan_urgent_files(), key=os.path.getmtime, reverse=True)
     return files[:n]
 
 
