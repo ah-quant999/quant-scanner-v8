@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-19 06:52:15",
+  "update_time": "2026-08-19 07:19:31",
   "data_date": "2026-08-19",
   "track_start": "2026-08-19",
   "history_days": 3,
@@ -8,7 +8,7 @@
   "tracked": [
     {
       "code": "002371",
-      "name": "创联控股",
+      "name": "北方华创",
       "market": "sz",
       "board": "主板",
       "status": "near",
@@ -246,7 +246,7 @@
         "industry": "专用设备制造业",
         "count": 2,
         "names": [
-          "创联控股",
+          "北方华创",
           "长川科技"
         ]
       },
@@ -312,19 +312,17 @@
       "names": []
     },
     "cockpit_a": {
-      "count": 8,
+      "count": 10,
       "overlap": 2,
       "names": [
-        "创联控股",
+        "北方华创",
         "长川科技"
       ]
     },
     "cockpit_b": {
       "count": 15,
-      "overlap": 1,
-      "names": [
-        "新易盛"
-      ]
+      "overlap": 0,
+      "names": []
     }
   },
   "backtest_signal": {
@@ -492,7 +490,7 @@
       },
       {
         "code": "002371",
-        "name": "创联控股",
+        "name": "北方华创",
         "enter_date": "2026-08-17",
         "offsets": {
           "1d": 1.44
