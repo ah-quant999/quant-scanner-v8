@@ -56,6 +56,7 @@ RUNNER_DIR = Path("D:/actions-runner-v8")
 RUNNER_EXE = RUNNER_DIR / "bin" / "Runner.Listener.exe"
 CN_WORKFLOW_ID = 327687211           # v8_cn_fetch_cloud.yml（云端 ubuntu 主力，用于 API 派发）
 CN_WORKFLOW_ID_FALLBACK = 324135267  # v8_cn_fetch.yml（自建 cn runner 应急）
+BD_WORKFLOW_ID = 324135263           # v8_build_deploy.yml（☁️ v8 构建部署(云端ubuntu)）
 
 # 尝试从多个位置读取 token（本地文件优先，不落入仓库）
 def _load_token():
@@ -322,8 +323,11 @@ def check_workflow(name, label, max_age_min=None, workflow_id=None):
     ok = status == "completed" and con == "success"
     if max_age_min and age_min > max_age_min:
         ok = False
+    # 2026-08-18 第250轮修复【假绿盲区】：显式 failure 绝不受窗口/时段豁免，否则夜间/周末的
+    # 真实构建失败会被 `in_schedule_window` 无条件掩成 OK（r230-r235 连续 7 轮假绿实证）。
+    is_explicit_failure = status == "completed" and con == "failure"
     detail = f"{label} {status}/{con} @ {created_str} (age {fmt_age(age_min)})"
-    return ok, detail
+    return ok, detail, is_explicit_failure
 
 
 def check_raw_data_stale(threshold_min=90):
@@ -691,13 +695,13 @@ def main():
     ok, msg = check_runner(heal=args.heal)
     results.append(("runner", ok, msg))
 
-    ok, msg = check_workflow(CN_WORKFLOW_NAME, "cn_fetch", max_age_min=120, workflow_id=CN_WORKFLOW_ID)
-    if not ok and not in_schedule_window("cn_fetch", now_cst):
+    ok, msg, is_failure = check_workflow(CN_WORKFLOW_NAME, "cn_fetch", max_age_min=120, workflow_id=CN_WORKFLOW_ID)
+    if not ok and not is_failure and not in_schedule_window("cn_fetch", now_cst):
         ok, msg = True, msg + " —— 非调度时段，豁免（cn_fetch 工作日 08:25-21:00 有 cron，周末仅 09:00）"
     results.append(("cn_fetch", ok, msg))
 
-    ok, msg = check_workflow(BD_WORKFLOW_NAME, "build_deploy", max_age_min=120)
-    if not ok and not in_schedule_window("build_deploy", now_cst):
+    ok, msg, is_failure = check_workflow(BD_WORKFLOW_NAME, "build_deploy", max_age_min=120, workflow_id=BD_WORKFLOW_ID)
+    if not ok and not is_failure and not in_schedule_window("build_deploy", now_cst):
         ok, msg = True, msg + " —— 非调度时段，豁免（夜间无上游推送属预期）"
     results.append(("build_deploy", ok, msg))
 
