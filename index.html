@@ -10715,17 +10715,32 @@ function drawUpDownChart(){
         var sffIn = (sff.sectors_in||[]).filter(function(s){return s && s.type==='行业';}).slice(0,6);
         var rows = [];
         var seen = {};
+        // 🛡 2026-08-18 主人令：CONCEPT_RANKING 板块名 ≠ CONCEPT_ETF_MAP key（如"农业种植"≠"农业"），需要 fuzzy 匹配
+        function _emapLookup(name){
+          if(!name) return null;
+          if(emap[name]) return emap[name];
+          // 双向 substring 匹配：先看 emap 里哪个 key 被 name 包含，再看 name 被哪个 emap key 包含
+          for(var k in emap){
+            if(k==='update_time') continue;
+            if(name.indexOf(k)>=0) return emap[k];
+          }
+          for(var k2 in emap){
+            if(k2==='update_time') continue;
+            if(k2.indexOf(name)>=0) return emap[k2];
+          }
+          return null;
+        }
         // 概念 top 8（按 net 倒序，前 8 名）
         (crItems||[]).sort(function(a,b){return (b.net||0)-(a.net||0);}).slice(0,8).forEach(function(it){
           if(!it || !it.name) return;
           seen[it.name]=1;
-          rows.push({ name:it.name, net:it.net||0, chg:it.chg||0, type:'概念', map: emap[it.name]||null });
+          rows.push({ name:it.name, net:it.net||0, chg:it.chg||0, type:'概念', map: _emapLookup(it.name) });
         });
         // 行业 top 6（去重）
         (sffIn||[]).sort(function(a,b){return (b.net||0)-(a.net||0);}).slice(0,6).forEach(function(s){
           if(!s || !s.name || seen[s.name]) return;
           seen[s.name]=1;
-          rows.push({ name:s.name, net:s.net||0, chg:s.chg||0, type:'行业', map: emap[s.name]||null });
+          rows.push({ name:s.name, net:s.net||0, chg:s.chg||0, type:'行业', map: _emapLookup(s.name) });
         });
         if(!rows.length){
           cEl.innerHTML='<div class="ipo-empty">暂无热点板块数据</div>';
