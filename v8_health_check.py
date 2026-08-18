@@ -84,8 +84,8 @@ CARD_DEFS = [
     # 故统一显式覆盖 heal_cat="algo_run"。
     {"id": "SH_FIB", "name": "市场温度计", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"], "heal_cat": "algo_run"},
     {"id": "SIX_DIM_RADAR", "name": "六维共振雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"], "_source_file": "SH_FIB", "_window_var": "SH_FIB", "heal_cat": "algo_run"},  # 与市场温度计同源(SH_FIB.js)，前端独立卡片展示六维评分视图
-    {"id": "MARGIN_DATA", "name": "融资融券", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["sh"], "heal_cat": "premarket"},  # cloud_fetch_v8.py 把它注册在 premarket（line 81），不在 post_close 注册
-    {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["items"], "heal_cat": "premarket"},  # 同上
+    {"id": "MARGIN_DATA", "name": "融资融券", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["sh"], "heal_cat": "post_close"},  # 2026-08-18 主人令一劳永逸：交易所每日16:15发布1次，360min 阈值导致 22:15 必误报 → 1440（24h，符合主人 24h 铁律）
+    {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["items"], "heal_cat": "post_close"},  # 同上：交易所日更数据，1440（24h）
     {"id": "CRISIS_DATA", "name": "危机雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["currency", "global"], "heal_cat": "premarket"},  # 危机雷达每日 08:25 跑一次
     {"id": "MARKET_FUND_FLOW_DATA", "name": "盘后资金流向", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["daily"], "heal_cat": "premarket"},  # 资金流日频时间轴——08:25 必跑一次（防漏跑）
     {"id": "CANDIDATE", "name": "候选池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
@@ -1931,6 +1931,11 @@ def send_report_email(report, healed=None, failed=None):
             continue
         if it.get("heal", "").startswith("已自动"):
             continue  # 已自愈，无需人工
+        # 🛡 2026-08-18 主人令一劳永逸：OCR 抽取数据（STOCK_MOMENTUM_STATE/V2）需要人工提供盘后选股 PDF
+        # 才能刷新（OCR 管线等输入，自动巡检永远无法修复）→ 免邮件（看板红叉保留提示主人给 PDF），
+        # 避免每晚 22:30 定时邮件轰炸主人。
+        if it.get("id", "").startswith("all_STOCK_MOMENTUM_STATE"):
+            continue
         remaining.append(it)
 
     quiet = in_quiet_hours()
