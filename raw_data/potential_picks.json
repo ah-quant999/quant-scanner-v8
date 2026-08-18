@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-18 15:11:43",
+  "update_time": "2026-08-18 16:14:21",
   "data_date": "2026-08-18",
   "source": "CONCEPT_RANKING × STOCK_PROFILE × STOCK_QUOTE",
   "hot_concepts_count": 33,
@@ -10,10 +10,10 @@
     "乡村振兴",
     "土地流转",
     "猪肉概念",
+    "减速器",
     "华为欧拉",
-    "红利股",
     "机器人执行器",
-    "水产概念"
+    "红利股"
   ],
   "picks": [
     {
@@ -28,7 +28,7 @@
         "转基因"
       ],
       "hot_count": 4,
-      "total_score": 11.23
+      "total_score": 11.46
     },
     {
       "code": "600371",
@@ -42,7 +42,7 @@
         "转基因"
       ],
       "hot_count": 4,
-      "total_score": 10.77
+      "total_score": 11.0
     },
     {
       "code": "600598",
@@ -56,7 +56,7 @@
         "粮食概念"
       ],
       "hot_count": 4,
-      "total_score": 10.44
+      "total_score": 10.55
     },
     {
       "code": "600108",
@@ -70,7 +70,7 @@
         "粮食概念"
       ],
       "hot_count": 4,
-      "total_score": 10.36
+      "total_score": 10.47
     },
     {
       "code": "600359",
@@ -84,20 +84,7 @@
         "粮食概念"
       ],
       "hot_count": 4,
-      "total_score": 10.15
-    },
-    {
-      "code": "600737",
-      "name": "中粮糖业",
-      "pct": 4.98,
-      "amount_yi": 9.8,
-      "hot_concepts": [
-        "乡村振兴",
-        "农业种植",
-        "调味品概念"
-      ],
-      "hot_count": 3,
-      "total_score": 9.68
+      "total_score": 10.26
     },
     {
       "code": "000716",
@@ -110,7 +97,20 @@
         "粮食概念"
       ],
       "hot_count": 3,
-      "total_score": 9.67
+      "total_score": 9.79
+    },
+    {
+      "code": "600737",
+      "name": "中粮糖业",
+      "pct": 4.98,
+      "amount_yi": 9.8,
+      "hot_concepts": [
+        "乡村振兴",
+        "农业种植",
+        "调味品概念"
+      ],
+      "hot_count": 3,
+      "total_score": 9.74
     },
     {
       "code": "300087",
@@ -123,7 +123,7 @@
         "转基因"
       ],
       "hot_count": 3,
-      "total_score": 9.44
+      "total_score": 9.65
     },
     {
       "code": "000713",
@@ -137,7 +137,7 @@
         "草甘膦"
       ],
       "hot_count": 4,
-      "total_score": 9.36
+      "total_score": 9.53
     },
     {
       "code": "002385",
@@ -146,12 +146,26 @@
       "amount_yi": 2.66,
       "hot_concepts": [
         "乡村振兴",
+        "乳业",
         "农业种植",
         "水产概念",
         "猪肉概念"
       ],
-      "hot_count": 4,
-      "total_score": 8.89
+      "hot_count": 5,
+      "total_score": 9.31
+    },
+    {
+      "code": "002999",
+      "name": "天禾股份",
+      "pct": 2.41,
+      "amount_yi": 0.36,
+      "hot_concepts": [
+        "乡村振兴",
+        "农业种植",
+        "粮食概念"
+      ],
+      "hot_count": 3,
+      "total_score": 8.71
     },
     {
       "code": "002556",
@@ -165,20 +179,7 @@
         "煤化工概念"
       ],
       "hot_count": 4,
-      "total_score": 8.65
-    },
-    {
-      "code": "002999",
-      "name": "天禾股份",
-      "pct": 2.41,
-      "amount_yi": 0.36,
-      "hot_concepts": [
-        "乡村振兴",
-        "农业种植",
-        "粮食概念"
-      ],
-      "hot_count": 3,
-      "total_score": 8.59
+      "total_score": 8.68
     },
     {
       "code": "601118",
@@ -191,7 +192,7 @@
         "土地流转"
       ],
       "hot_count": 3,
-      "total_score": 8.48
+      "total_score": 8.52
     },
     {
       "code": "002215",
@@ -201,12 +202,11 @@
       "hot_concepts": [
         "乡村振兴",
         "农业种植",
-        "农药兽药",
         "土地流转",
         "生态农业"
       ],
-      "hot_count": 5,
-      "total_score": 8.37
+      "hot_count": 4,
+      "total_score": 8.17
     },
     {
       "code": "600540",
@@ -218,13 +218,13 @@
         "粮食概念"
       ],
       "hot_count": 2,
-      "total_score": 7.8
+      "total_score": 7.9
     }
   ],
   "rejected_summary": {
-    "no_hot_concept": 3936,
-    "too_hot": 62,
-    "too_cold": 9,
+    "no_hot_concept": 3633,
+    "too_hot": 69,
+    "too_cold": 11,
     "small_mv": 0,
     "big_mv": 0,
     "no_quote": 0
