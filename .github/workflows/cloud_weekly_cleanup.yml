@@ -92,6 +92,13 @@ jobs:
               ".heal_dispatch.json",
               "freshness_status.json",
               ".github_pat.txt",
+              # 🛡 2026-08-18 全仓库审计：以下 data/*.js 由生成器直写或前端以 window.XXX 注入，
+              # 不在 DATA_SOURCES 映射且不被 `data/XXX.js` 正则引用， weekly cleanup 会误删，必须保护。
+              "BLOAT_CHECK",
+              "RISK_GAUGE",
+              "RUNNER_STATUS_HEALTH",
+              "SECTOR_FUND_FLOW_INTRADAY",
+              "WEEKEND_META_REPORT",
           }
           # 保留目录：历史快照、回测产物等整体保护
           PROTECTED_DIRS = {"history", "backtest", "optimize"}
