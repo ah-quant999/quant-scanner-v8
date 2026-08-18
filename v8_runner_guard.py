@@ -313,7 +313,14 @@ def check_github_runs(token, workflow_ids, lookback_hours=24, max_runs=15):
 
 
 def check_runner_env():
-    """检查 runner .env 是否配置了 safe-delete 阈值。"""
+    """检查 runner .env 是否配置了 safe-delete 阈值。
+
+    2026-08-19 主人令：一劳永逸式修复，把推荐阈值从 500 提高到 2000。
+    理由：lemoncat-cn runner 跑算法链/cloud_weekly_cleanup 时一次性 unlink 数百个
+    raw_data/*.json（top10_daily 历史快照清理等），旧阈值 500/默认 50 频繁触发
+    SAFE_DELETE_BULK_CONFIRM_REQUIRED 拦截 → workflow 失败。
+    2000 覆盖 v8 当前所有批量清理场景（top10_daily 历史最长 ~1800+），留余量。
+    """
     env_file = RUNNER_DIR / ".env"
     if not env_file.exists():
         return {"ok": False, "threshold": None, "message": ".env 不存在"}
@@ -321,8 +328,55 @@ def check_runner_env():
     m = re.search(r"CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD\s*=\s*(\d+)", text)
     if m:
         threshold = int(m.group(1))
-        return {"ok": threshold >= 500, "threshold": threshold, "message": f"阈值={threshold}"}
+        return {"ok": threshold >= 2000, "threshold": threshold, "message": f"阈值={threshold}（一劳永逸目标 2000）"}
     return {"ok": False, "threshold": None, "message": "未配置 CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD"}
+
+
+def ensure_safe_delete_threshold(target=2000, env_file=None):
+    """一劳永逸式修复：确保 runner .env 中 CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD >= target。
+
+    - 不存在 → 创建 .env（保留 runner 原有 env 变量），追加新行
+    - 存在但 < target → 原地替换为 target
+    - 存在且 >= target → 无变更
+
+    返回: {"changed": bool, "old": int|None, "new": int|None, "env_file": Path}
+    """
+    if env_file is None:
+        env_file = RUNNER_DIR / ".env"
+    env_file = Path(env_file)
+    result = {"changed": False, "old": None, "new": None, "env_file": env_file}
+    if env_file.exists():
+        text = env_file.read_text(encoding="utf-8", errors="replace")
+        m = re.search(r"^CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD\s*=\s*(\d+)\s*$", text, re.M)
+        if m:
+            old = int(m.group(1))
+            result["old"] = old
+            if old >= target:
+                result["new"] = old
+                return result
+            new_text = re.sub(
+                r"^CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD\s*=\s*\d+\s*$",
+                f"CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD={target}",
+                text, flags=re.M,
+            )
+            env_file.write_text(new_text, encoding="utf-8")
+            result["changed"] = True
+            result["new"] = target
+            return result
+    # .env 不存在或未配置 → 追加
+    if env_file.exists():
+        text = env_file.read_text(encoding="utf-8", errors="replace")
+    else:
+        text = ""
+    env_file.parent.mkdir(parents=True, exist_ok=True)
+    if text and not text.endswith("\n"):
+        text += "\n"
+    text += f"\n# WorkBuddy safe-delete 批量删除阈值（一劳永逸 2026-08-19 主人令，提高到 {target}）\n"
+    text += f"CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD={target}\n"
+    env_file.write_text(text, encoding="utf-8")
+    result["changed"] = True
+    result["new"] = target
+    return result
 
 
 def restart_runner_service():
