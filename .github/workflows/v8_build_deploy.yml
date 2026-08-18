@@ -144,7 +144,12 @@ jobs:
             #   cn 单独推送的 5 个 extra 文件用线上真实内容（GITHUB_TOKEN 经 git blobs API）。
             #   二者都已中性化 republish_time 后取 sha1 前 10 位，与独立 reconcile 完全一致。
             #   —— 此处不再跑 reconcile_cache_busters.py（单提交构建里它无法同时正确，会 clobber）。
-            python update_v8.py --detect-changes
+            # 🔴 2026-08-18 根因修复：sync 远端后必须全量构建。原 --detect-changes 在
+            #   `git reset --hard FETCH_HEAD` 后，HEAD~1..HEAD 的 diff 已经看不到 raw_data
+            #   变化（变化被包含在更早的远端提交里），导致 detect_changes 返回 0 个变化、
+            #   跳过所有 data/*.js 重建 → 盘中数据永远停留在旧版本。注释已要求"全量重建"，
+            #   实现却用了 detect_changes，这是实现与注释不一致的致命 bug。
+            python update_v8.py
             # ★★ 2026-08-16 根治「逻辑详解页 v6备忘录 一直打不开」★★
             #   根因：上面第 85 行的 guard_v6_memo.py 已正确把 index.html 的
             #   iframe 戳改成 sha10(v6_memo.html)，但紧接着的 `git reset --hard FETCH_HEAD`
@@ -167,7 +172,9 @@ jobs:
             echo "⚠️ push 被拒（远端已前进），同步远端并按最新 raw_data 全量重建后重试 ($i/3)"
             git fetch "$REPO" main
             git reset --hard FETCH_HEAD
-            python update_v8.py --detect-changes
+            # 🔴 2026-08-18 根因修复：重试路径同样必须全量构建，不能用 --detect-changes
+            #   （原因同上：reset 后 HEAD~1..HEAD 已无法反映 raw_data 的真实变化）。
+            python update_v8.py
             # ★ 同上：reset 已擦掉 v6 戳修正，重试路径也必须重跑 guard 对齐（否则重试成功的
             #   那一趟提交仍带旧 v6 戳，v6备忘录继续打不开）。
             python guard_v6_memo.py
