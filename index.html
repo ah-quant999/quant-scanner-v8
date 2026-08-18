@@ -9624,13 +9624,13 @@ function drawUpDownChart(){
     if(_tierB.length){
       _tierHtml += '<div><div style="font-size:12px;font-weight:700;color:#f0b083;margin-bottom:6px;">🅱️ B档（强势观察）— '+_tierB.length+'只</div>';
       _tierHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
-      _tierB.slice(0,10).forEach(function(s){
+      // 2026-08-18 主人令：B档全部列出，不再折叠
+      _tierB.forEach(function(s){
         _tierHtml += '<div style="display:flex;align-items:center;gap:5px;background:rgba(240,176,131,.12);border:1px solid rgba(240,176,131,.35);border-radius:6px;padding:4px 8px;font-size:11px;color:#e6eefc;">';
         _tierHtml += '<span style="font-weight:700;">'+(s.name||'?')+'</span>';
         _tierHtml += '<span style="color:#8aa0c2;font-size:10px;">'+(s.code||'?')+'</span>';
         _tierHtml += '</div>';
       });
-      if(_tierB.length>10) _tierHtml += '<span style="color:#8aa0c2;font-size:11px;align-self:center;">+'+(_tierB.length-10)+' 只</span>';
       _tierHtml += '</div></div>';
     }
     if(!_tierA.length && !_tierB.length){
