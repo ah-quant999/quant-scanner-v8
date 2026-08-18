@@ -7545,7 +7545,15 @@ window.__renderV8CalFull();
       return c;
     }
     const sft=window.SECTOR_FUND_FLOW_TREND || {};
-    const t5d=sft.trend_5d||[], t10d=sft.trend_10d||[], t20d=sft.trend_20d||[], t60d=sft.trend_60d||[];
+    // 🛡 2026-08-18 主人令：资金验证"流出"列修复
+    //   - 原代码从 trend_5d/trend_10d/trend_20d/trend_60d 取数据，但这些数组只含净流入 top（正值）→ 流出列"暂无"
+    //   - 修复：从 sectors_in（全 40 个板块，含 netKey 正负）按 netKey 拆分流入流出
+    const sfIn = (sft.sectors_in || []);
+    function sfByNet(key){
+      // 只保留该 key 有非零数据的板块（0 视为无数据）
+      return sfIn.filter(function(s){ return s && (s[key]||0)!==0; });
+    }
+    const t5d=sfByNet('net_5d'), t10d=sfByNet('net_10d'), t20d=sfByNet('net_20d'), t60d=sfByNet('net_60d');
     h3+='<div style="font-size:13px;font-weight:700;color:var(--sub);margin:0 0 5px">资金验证</div>';
     h3+='<div class="sf-trend-grid">';
     h3+=sfTrendCard('5日',t5d,'net_5d','sf-trend-head-5');
