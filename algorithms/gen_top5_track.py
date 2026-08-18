@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""gen_top5_track.py — finalRec Top5 90 天滚动追踪盘
+"""gen_top5_track.py — finalRec Top5 多窗口滚动追踪盘
 
 输入：
   - raw_data/final_recommend.json （今日 Top5）
@@ -36,7 +36,8 @@ ROOT = Path(__file__).resolve().parent.parent
 RAW = ROOT / "raw_data"
 DATA = ROOT / "data"
 
-WINDOW_DAYS = 90  # 滚动窗口
+WINDOWS = [5, 10, 20, 30, 60, 90, 180]  # 累积滚动窗口（按可积累性递进展示）
+MAX_WINDOW = max(WINDOWS)
 
 
 def _now_cst():
@@ -164,11 +165,11 @@ def _stop_map(stock_stop):
 
 
 def main():
-    print(f"\n[gen_top5_track] {datetime.now():%Y-%m-%d %H:%M:%S}  90 天滚动追踪")
+    print(f"\n[gen_top5_track] {datetime.now():%Y-%m-%d %H:%M:%S}  Top5 多窗口滚动追踪")
     now = _now_cst()
     today = _today_str()
     today_dashed = _today_str_dashed()
-    cutoff_90d = (now - timedelta(days=WINDOW_DAYS)).strftime("%Y%m%d")
+    cutoffs = {w: (now - timedelta(days=w)).strftime("%Y%m%d") for w in WINDOWS}
 
     # ---- 1. 读今日 Top5 ----
     final_rec = _load_json(RAW / "final_recommend.json")
@@ -243,7 +244,7 @@ def main():
             elif tp and last_close >= tp:
                 exit_type = "target"
 
-        if exit_type is None and new_days_in >= WINDOW_DAYS:
+        if exit_type is None and new_days_in >= MAX_WINDOW:
             exit_type = "timeout"
 
         if exit_type:
@@ -318,48 +319,60 @@ def main():
         })
         print(f"    🆕 入池 {name}({code}) rank={rank} entry={close}")
 
-    # ---- 7. 计算 stats ----
-    history_90d = [h for h in new_history if (h.get("exit_date") or "") >= cutoff_90d]
-    win  = sum(1 for h in history_90d if h.get("exit_type") == "target")
-    loss = sum(1 for h in history_90d if h.get("exit_type") == "stop")
-    timeout = sum(1 for h in history_90d if h.get("exit_type") == "timeout")
-    total_decided = win + loss
-    win_rate  = round(win / total_decided, 4) if total_decided else 0
-    exit_pcts = [h.get("exit_pct") for h in history_90d if h.get("exit_pct") is not None]
-    avg_return = round(sum(exit_pcts) / len(exit_pcts), 2) if exit_pcts else 0
-    max_return = max(exit_pcts) if exit_pcts else 0
-    max_loss   = min(exit_pcts) if exit_pcts else 0
+    # ---- 7. 计算 stats（多窗口累积） ----
+    def _calc_window_stats(history, window):
+        """计算单个窗口的统计指标。"""
+        cutoff = cutoffs[window]
+        hist = [h for h in history if (h.get("exit_date") or "") >= cutoff]
+        win  = sum(1 for h in hist if h.get("exit_type") == "target")
+        loss = sum(1 for h in hist if h.get("exit_type") == "stop")
+        timeout = sum(1 for h in hist if h.get("exit_type") == "timeout")
+        total_decided = win + loss
+        win_rate  = round(win / total_decided, 4) if total_decided else 0
+        exit_pcts = [h.get("exit_pct") for h in hist if h.get("exit_pct") is not None]
+        avg_return = round(sum(exit_pcts) / len(exit_pcts), 2) if exit_pcts else 0
+        max_return = max(exit_pcts) if exit_pcts else 0
+        max_loss   = min(exit_pcts) if exit_pcts else 0
+        return {
+            "window_days": window,
+            "tracking":    len(new_tracking),  # 正在跟踪数与窗口无关
+            "exit_target": win,
+            "exit_stop":   loss,
+            "exit_timeout": timeout,
+            "samples":     len(hist),
+            "win_rate":    win_rate,
+            "avg_return":  avg_return,
+            "max_return":  max_return,
+            "max_loss":    max_loss,
+        }
 
-    stats = {
-        "window_days":   WINDOW_DAYS,
-        "tracking":      len(new_tracking),
-        "exit_target":   win,
-        "exit_stop":     loss,
-        "exit_timeout":  timeout,
-        "samples":       len(history_90d),
-        "win_rate":      win_rate,
-        "avg_return":    avg_return,
-        "max_return":    max_return,
-        "max_loss":      max_loss,
-        "tracking_distribution": {
-            "rank1": sum(1 for t in new_tracking if t.get("last_rank") == 1),
-            "rank2": sum(1 for t in new_tracking if t.get("last_rank") == 2),
-            "rank3": sum(1 for t in new_tracking if t.get("last_rank") == 3),
-            "rank4": sum(1 for t in new_tracking if t.get("last_rank") == 4),
-            "rank5": sum(1 for t in new_tracking if t.get("last_rank") == 5),
-        },
+    stats_by_window = {str(w) + "d": _calc_window_stats(new_history, w) for w in WINDOWS}
+    # 顶层保留 90d 作为默认/兼容
+    stats = stats_by_window["90d"]
+    stats["tracking_distribution"] = {
+        "rank1": sum(1 for t in new_tracking if t.get("last_rank") == 1),
+        "rank2": sum(1 for t in new_tracking if t.get("last_rank") == 2),
+        "rank3": sum(1 for t in new_tracking if t.get("last_rank") == 3),
+        "rank4": sum(1 for t in new_tracking if t.get("last_rank") == 4),
+        "rank5": sum(1 for t in new_tracking if t.get("last_rank") == 5),
     }
+
+    # 保留 180 天历史，满足最长窗口
+    history_max = [h for h in new_history if (h.get("exit_date") or "") >= cutoffs[MAX_WINDOW]]
 
     result = {
         "update_time": now.strftime("%Y-%m-%d %H:%M"),
-        "window_days": WINDOW_DAYS,
+        "window_days": 90,  # 默认展示窗口
+        "max_window_days": MAX_WINDOW,
+        "windows": WINDOWS,
         "stats":       stats,
+        "stats_by_window": stats_by_window,
         "tracking":    new_tracking,
-        "history":     history_90d,
+        "history":     history_max,
         "_meta": {
-            "version": "v1",
+            "version": "v2",
             "schema_date": today_dashed,
-            "note": "90 天滚动追踪 finalRec Top5；entry=上榜日收盘，exit 判定=stoploss/target/timeout",
+            "note": "finalRec Top5 滚动追踪；多窗口 5/10/20/30/60/90/180 天累积统计；entry=上榜日收盘，exit 判定=stoploss/target/timeout",
         },
     }
 
@@ -370,7 +383,7 @@ def main():
     raw_path = RAW / "top5_track.json"
     with open(raw_path, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
-    print(f"  ✅ {raw_path.name}  tracking={len(new_tracking)} history={len(history_90d)}")
+    print(f"  ✅ {raw_path.name}  tracking={len(new_tracking)} history={len(history_max)}")
 
     js_path = DATA / "TOP5_TRACK.js"
     js = "window.TOP5_TRACK = " + json.dumps(result, ensure_ascii=False, indent=2) + ";"

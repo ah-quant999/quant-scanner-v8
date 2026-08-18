@@ -4325,28 +4325,46 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '</div>';
     }
 
-    /* ── ① TOP5 90天跟踪（"执行效果"）── */
+    /* ── ① TOP5 滚动跟踪（多窗口累积执行效果）── */
     html += '<div style="margin:14px 0;border-left:4px solid #fbbf24;" class="card">';
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
-    html += '<span style="font-size:15px;font-weight:700;color:#fbbf24;">🏆 ① TOP5 90天跟踪</span>';
+    html += '<span style="font-size:15px;font-weight:700;color:#fbbf24;">🏆 ① TOP5 滚动跟踪</span>';
     html += '<span style="font-size:11px;color:var(--dim);">执行效果：刚推的票后来涨没涨？</span>';
+    html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);">正在跟踪 '+(tt.stats && tt.stats.tracking || 0)+' 只</span>';
     html += '</div>';
     var stats = tt.stats || {};
     var dist = stats.tracking_distribution || {};
-    html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">';
-    html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">';
-    html += '<div style="font-size:10.5px;color:var(--dim);margin-bottom:3px;">窗口期</div>';
-    html += '<div style="font-size:18px;font-weight:700;color:#fbbf24;">'+(stats.window_days||90)+'天</div></div>';
-    html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">';
-    html += '<div style="font-size:10.5px;color:var(--dim);margin-bottom:3px;">正在跟踪</div>';
-    html += '<div style="font-size:18px;font-weight:700;color:var(--cyan);">'+(stats.tracking||0)+'只</div></div>';
-    html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">';
-    html += '<div style="font-size:10.5px;color:var(--dim);margin-bottom:3px;">达成胜率</div>';
-    html += '<div style="font-size:18px;font-weight:700;color:'+_colorNum(stats.win_rate, 50)+';">'+(stats.win_rate||0)+'%</div></div>';
-    html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;">';
-    html += '<div style="font-size:10.5px;color:var(--dim);margin-bottom:3px;">平均收益</div>';
-    html += '<div style="font-size:18px;font-weight:700;color:'+_colorNum(stats.avg_return, 0)+';">'+(stats.avg_return>0?'+':'')+(stats.avg_return||0)+'%</div></div>';
-    html += '</div>';
+    // 多窗口累积矩阵（5d→180d，样本随时间自然积累）
+    var sbw = tt.stats_by_window || {};
+    var winRows = [['5d','5天'],['10d','10天'],['20d','20天'],['30d','30天'],['60d','60天'],['90d','90天'],['180d','180天']];
+    html += '<div style="overflow-x:auto;margin-bottom:12px;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+    html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+    html += '<th style="padding:6px 4px;text-align:left;color:var(--sub);font-weight:600;">窗口</th>';
+    html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">样本</th>';
+    html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">达成胜率</th>';
+    html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">平均收益</th>';
+    html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">最高</th>';
+    html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">最低</th>';
+    html += '</tr></thead><tbody>';
+    winRows.forEach(function(row){
+      var key=row[0], label=row[1];
+      var wst = sbw[key] || {};
+      var samples = wst.samples || 0;
+      var wr = wst.win_rate != null ? Math.round(wst.win_rate * 100) : (key === '90d' && stats.win_rate != null ? Math.round(stats.win_rate * 100) : 0);
+      var avg = wst.avg_return != null ? wst.avg_return : (key === '90d' ? stats.avg_return : 0);
+      var mx = wst.max_return != null ? wst.max_return : (key === '90d' ? stats.max_return : 0);
+      var mn = wst.max_loss != null ? wst.max_loss : (key === '90d' ? stats.max_loss : 0);
+      var faded = samples === 0;
+      html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+      html += '<td style="padding:6px 4px;font-weight:600;color:'+(faded?'var(--dim)':'#fbbf24')+';">'+label+'</td>';
+      html += '<td style="padding:6px 4px;text-align:right;color:'+(faded?'var(--dim)':'var(--txt)')+';">'+(samples||'—')+'</td>';
+      html += '<td style="padding:6px 4px;text-align:right;font-weight:700;color:'+(faded?'var(--dim)':_colorNum(wr,50))+';">'+(samples?(wr+'%'):'待积累')+'</td>';
+      html += '<td style="padding:6px 4px;text-align:right;font-weight:700;color:'+(faded?'var(--dim)':_colorNum(avg,0))+';">'+(samples?((avg>0?'+':'')+avg+'%'):'—')+'</td>';
+      html += '<td style="padding:6px 4px;text-align:right;color:'+(faded?'var(--dim)':_colorNum(mx,0))+';">'+(samples?((mx>0?'+':'')+mx+'%'):'—')+'</td>';
+      html += '<td style="padding:6px 4px;text-align:right;color:'+(faded?'var(--dim)':_colorNum(mn,0))+';">'+(samples?((mn>0?'+':'')+mn+'%'):'—')+'</td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
     // 排名分布
     html += '<div style="font-size:11.5px;color:var(--sub);margin-bottom:6px;">排名分布：🥇 Rank1 <b>'+(dist.rank1||0)+'</b> / 🥈 Rank2 <b>'+(dist.rank2||0)+'</b> / 🥉 Rank3 <b>'+(dist.rank3||0)+'</b></div>';
     // 跟踪表
