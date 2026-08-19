@@ -99,6 +99,9 @@ DATA_SOURCES = {
     # 🛡 2026-08-18 一劳永逸式修复：补入 weekend_run.json → WEEKEND_RUN 映射
     #   原 update_v8 漏挂此映射 → data/WEEKEND_RUN.js 永远不被重新生成 → 健康巡检永远 warn
     "weekend_run.json":            "WEEKEND_RUN",
+    # 2026-08-19 主人令：路径概率预测卡（艾略特波浪+江恩+缠论+形态匹配），需 5 年长 K 线
+    "index_history.json":          "INDEX_HISTORY",
+    "market_path_probability.json": "MARKET_PATH_PROBABILITY",
 }
 
 # 变量名 → 更新时段
@@ -178,6 +181,9 @@ CATEGORY_MAP = {
     "TOP5_TRACK": "post_close",
     # 2026-08-15：ALGO_TRACK 依赖 FINAL_RECOMMEND_DATA + FOUR_VOLUME，归属盘后
     "ALGO_TRACK": "post_close",
+    # 2026-08-19：路径概率预测卡数据源（盘后跑，与算法链节奏一致）
+    "INDEX_HISTORY": "post_close",
+    "MARKET_PATH_PROBABILITY": "post_close",
 }
 
 CATEGORY_LABEL = {
