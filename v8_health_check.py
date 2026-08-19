@@ -58,7 +58,7 @@ CARD_DEFS = [
     {"id": "V8_CAL", "name": "重要事件日历", "page": "今日事件", "freq": "每周日+月末", "max_age": 1500, "key_fields": ["weeks", "month"]},
     {"id": "IPO_DATA", "name": "打新研判", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["stocks"], "weekend_update": False},
     {"id": "JUDGMENT_DATA", "name": "今日判定", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["verdict", "indices"], "weekend_update": False},
-    {"id": "MACRO_DATA", "name": "今日宏观解读", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["global_macro", "monetary"], "weekend_update": False},
+    {"id": "MACRO_DATA", "name": "今日宏观解读", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["global_macro", "monetary"], "weekend_update": False, "manual_dep": True, "manual_note": "人工撰写宏观解读（管线仅补cpi/pmi，rich结构需主人更新）"},
     # NT_DATA(nt_data.json) 由 algorithms/fetch_orphan_nt_data.py 产出，归 run_algorithms.py(算法链)，
     # 不在 cloud_fetch_v8.py 的 premarket 注册表内 —— 按 page 映射派发 cn_fetch premarket 永远刷不到它，
     # 故显式覆盖自愈类别为 algo_run（2026-08-11 第155轮看门狗定位并根治）。
@@ -67,7 +67,7 @@ CARD_DEFS = [
     {"id": "INDEX_QUOTES", "name": "全球指数 / 股指期货", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["items"]},
     {"id": "ETF_PULSE", "name": "ETF 盘中异动", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["etfs"]},
     {"id": "ETF_INTRADAY_HEAT", "name": "ETF 资金热度", "page": "实时数据", "freq": "盘中实时 T+0", "max_age": 60, "key_fields": ["items"]},
-    {"id": "ETF_DAILY_MONITOR", "name": "ETF 日监控", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["top_inflow", "top_outflow"]},
+    {"id": "ETF_DAILY_MONITOR", "name": "ETF 日监控", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["top_inflow", "top_outflow"], "premarket_keep": True},
     {"id": "SECTOR_FUND_FLOW", "name": "板块资金流向", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["top_list"]},
     {"id": "CONCEPT_RANKING", "name": "概念排名", "page": "实时数据", "freq": "盘中每30分", "max_age": 90, "key_fields": ["items"]},
     {"id": "LIMIT_UP_HEATMAP", "name": "涨停热度", "page": "实时数据", "freq": "盘中每30分", "max_age": 90, "key_fields": ["top", "dates"]},
@@ -186,10 +186,13 @@ def parse_time(s):
     try:
         return datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone(timedelta(hours=8)))
     except Exception:
-        try:
-            return datetime.strptime(s, "%Y-%m-%d %H:%M").replace(tzinfo=timezone(timedelta(hours=8)))
-        except Exception:
-            return None
+            try:
+                return datetime.strptime(s, "%Y-%m-%d %H:%M").replace(tzinfo=timezone(timedelta(hours=8)))
+            except Exception:
+                try:
+                    return datetime.strptime(s, "%Y-%m-%d").replace(tzinfo=timezone(timedelta(hours=8)))
+                except Exception:
+                    return None
 
 
 def load_window_var(path, var_name):
@@ -1008,6 +1011,11 @@ def check_data_cards():
         age_min = (now_cst() - dt).total_seconds() / 60
         status = "ok" if age_min <= max_age else "fail"
 
+        # 🛡 2026-08-19 修：人工维护卡（今日宏观解读=主人撰写宏观解读，管线只补cpi/pmi）
+        #   陈旧属预期，降 warn 不误报 fail（看板保留提示主人更新）。
+        if d.get("manual_dep") and age_min > max_age:
+            status = "warn"
+
         page = d.get("page")
         # 周末/节假日不更新模块：直接放行，不判 stale、不判空值，避免误告警
         weekend_skip = d.get("weekend_update") is False and is_market_closed()
@@ -1019,7 +1027,9 @@ def check_data_cards():
         # 盘前清空（premarket_cleared=true）是 cloud_fetch_v8._clear_intraday_for_premarket 的设计内行为：
         # 实时数据在 09:30 开盘前本就无当日数据，字段为空属预期，不应报"关键字段空值"。
         # 盘中被误清空的情况已由上方 prem_cleared + is_intraday_session() 分支判 fail，这里不重复。
-        prem_cleared_expected = prem_cleared and not is_intraday_session()
+        # 🛡 2026-08-19 修：ETF_DAILY_MONITOR 等 KEEP_VARS 卡盘前保留上一交易日(T+1)收盘值，
+        #   盘前不刷新属设计行为（同 premarket_cleared 预期），盘前判 OK、开盘后由盘中刷新覆盖。
+        prem_cleared_expected = (prem_cleared or d.get("premarket_keep")) and not is_intraday_session()
 
         # 空值检测
         empty_fields = []
@@ -1131,7 +1141,8 @@ def check_all_data_files():
             })
             continue
         ts = data.get("update_time") or data.get("date") or data.get("generated") \
-            or data.get("generated_time") or data.get("lastUpdated") or data.get("updated") or "--"
+            or data.get("generated_time") or data.get("generated_at") \
+            or data.get("lastUpdated") or data.get("updated") or "--"
         if isinstance(ts, str) and ts == "--" and isinstance(data, dict):
             # 2026-08-17 嵌套时间戳（meta.generated / data_date 等）
             meta = data.get("meta") if isinstance(data.get("meta"), dict) else {}
@@ -1167,10 +1178,20 @@ def check_all_data_files():
         cap = _hard_cap_for_owner_rule(page="全量数据")
         # 已登记 CARD_DEFS 的卡在 check_data_cards 用 d.max_age 判定；未知卡统一走 24h/T+1 红线
         status = "ok" if age_min <= cap else "fail"
+        # 🛡 2026-08-19 修：OCR 人工依赖卡（MOMENTUM_FILTER / STOCK_MOMENTUM_STATE / V2）
+        #   数据源=盘后选股 PDF OCR，无 PDF 输入自动巡检永远无法刷新 → 陈旧属预期，
+        #   降级 warn 不误报 fail（与 self_heal_monitor.py P0-2 方针一致）。
+        #   真异常（文件缺失/解析失败）已在上方 fail，此处只处理「文件在但陈旧」。
+        ocr_note = ""
+        if status == "fail" and "MOMENTUM" in vid:
+            status = "warn"
+            ocr_note = "（OCR 人工依赖：需主人提供盘后选股 PDF 刷新，自动巡检无法修复 → 降级 warn）"
         rel = fmt_rel_time(str(ts)[:19])
         msg = f"{p.name} 更新于 {rel}"
         if status == "fail":
             msg += f"；超过通用红线 {cap} 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+        elif ocr_note:
+            msg += ocr_note
         # 空内容检测（不把空 list 当错误，弱市合法）
         elif isinstance(data, dict) and not data:
             status = "warn"
@@ -1934,7 +1955,7 @@ def send_report_email(report, healed=None, failed=None):
         # 🛡 2026-08-18 主人令一劳永逸：OCR 抽取数据（STOCK_MOMENTUM_STATE/V2）需要人工提供盘后选股 PDF
         # 才能刷新（OCR 管线等输入，自动巡检永远无法修复）→ 免邮件（看板红叉保留提示主人给 PDF），
         # 避免每晚 22:30 定时邮件轰炸主人。
-        if it.get("id", "").startswith("all_STOCK_MOMENTUM_STATE"):
+        if "MOMENTUM" in it.get("id", ""):
             continue
         remaining.append(it)
 
