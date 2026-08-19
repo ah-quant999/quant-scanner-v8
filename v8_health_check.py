@@ -1009,7 +1009,18 @@ def check_data_cards():
             })
             continue
         age_min = (now_cst() - dt).total_seconds() / 60
-        status = "ok" if age_min <= max_age else "fail"
+        # 🛡 2026-08-19 主人令一劳永逸修复：盘后数据/选股策略 卡片由算法链每日刷新一次
+        #   （盘前 07:xx 产出当日版本，盘后 18:30 产出收盘版）。当前阈值在「收盘后 8h 内」
+        #   分支返回 360min，但 16:00 时数据实为当日 07:xx 盘前版（已 ~9h），被误报 fail，
+        #   造成每日 13:00–18:30 满屏红（14 卡）。这类卡每日仅更新一次，最新版本即「当日数据」，
+        #   合理新鲜度应为 24h，不应以盘中 360min 误杀。
+        #   规则：last_update 属当天 且 为 algo_run 日更卡 → 阈值放大到 24h 放行；
+        #   昨日及更早数据（如 COCKPIT_ADVICE / BACKTEST 系列）不受影响，仍按自适应阈值判 fail，
+        #   待 18:30 盘后链刷新后转绿。空值检查（下方）仍生效，不会掩盖真问题。
+        _updated_today = dt.date() == now_cst().date()
+        _daily_card = d.get("page") in ("盘后数据", "选股策略") and d.get("heal_cat") == "algo_run"
+        _max_age_eff = max_age if not (_updated_today and _daily_card) else 24 * 60
+        status = "ok" if age_min <= _max_age_eff else "fail"
 
         # 🛡 2026-08-19 修：人工维护卡（今日宏观解读=主人撰写宏观解读，管线只补cpi/pmi）
         #   陈旧属预期，降 warn 不误报 fail（看板保留提示主人更新）。
