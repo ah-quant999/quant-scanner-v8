@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-18 16:04",
+  "update_time": "2026-08-19 16:03",
   "window_days": 90,
   "max_window_days": 180,
   "windows": [
@@ -13,7 +13,7 @@
   ],
   "stats": {
     "window_days": 90,
-    "tracking": 18,
+    "tracking": 22,
     "exit_target": 0,
     "exit_stop": 0,
     "exit_timeout": 0,
@@ -24,16 +24,16 @@
     "max_loss": 0,
     "tracking_distribution": {
       "rank1": 5,
-      "rank2": 5,
-      "rank3": 5,
-      "rank4": 2,
-      "rank5": 1
+      "rank2": 6,
+      "rank3": 6,
+      "rank4": 3,
+      "rank5": 2
     }
   },
   "stats_by_window": {
     "5d": {
       "window_days": 5,
-      "tracking": 18,
+      "tracking": 22,
       "exit_target": 0,
       "exit_stop": 0,
       "exit_timeout": 0,
@@ -45,7 +45,7 @@
     },
     "10d": {
       "window_days": 10,
-      "tracking": 18,
+      "tracking": 22,
       "exit_target": 0,
       "exit_stop": 0,
       "exit_timeout": 0,
@@ -57,7 +57,7 @@
     },
     "20d": {
       "window_days": 20,
-      "tracking": 18,
+      "tracking": 22,
       "exit_target": 0,
       "exit_stop": 0,
       "exit_timeout": 0,
@@ -69,7 +69,7 @@
     },
     "30d": {
       "window_days": 30,
-      "tracking": 18,
+      "tracking": 22,
       "exit_target": 0,
       "exit_stop": 0,
       "exit_timeout": 0,
@@ -81,7 +81,7 @@
     },
     "60d": {
       "window_days": 60,
-      "tracking": 18,
+      "tracking": 22,
       "exit_target": 0,
       "exit_stop": 0,
       "exit_timeout": 0,
@@ -93,7 +93,7 @@
     },
     "90d": {
       "window_days": 90,
-      "tracking": 18,
+      "tracking": 22,
       "exit_target": 0,
       "exit_stop": 0,
       "exit_timeout": 0,
@@ -104,15 +104,15 @@
       "max_loss": 0,
       "tracking_distribution": {
         "rank1": 5,
-        "rank2": 5,
-        "rank3": 5,
-        "rank4": 2,
-        "rank5": 1
+        "rank2": 6,
+        "rank3": 6,
+        "rank4": 3,
+        "rank5": 2
       }
     },
     "180d": {
       "window_days": 180,
-      "tracking": 18,
+      "tracking": 22,
       "exit_target": 0,
       "exit_stop": 0,
       "exit_timeout": 0,
@@ -135,10 +135,10 @@
         "驾驶舱B档"
       ],
       "entry_price": 11.25,
-      "last_close": 11.53,
-      "last_pct": 2.49,
+      "last_close": 11.25,
+      "last_pct": 0.0,
       "peak_pct": 2.49,
-      "days_in": 13,
+      "days_in": 14,
       "appear_count": 1,
       "last_seen": "20260813",
       "last_rank": 1,
@@ -159,10 +159,10 @@
         "大牛股猎手"
       ],
       "entry_price": 160.32,
-      "last_close": 161.12,
-      "last_pct": 0.5,
+      "last_close": 160.32,
+      "last_pct": 0.0,
       "peak_pct": 0.5,
-      "days_in": 13,
+      "days_in": 14,
       "appear_count": 1,
       "last_seen": "20260813",
       "last_rank": 2,
@@ -182,10 +182,10 @@
         "大牛股猎手"
       ],
       "entry_price": 62.0,
-      "last_close": 57.6,
-      "last_pct": -7.1,
+      "last_close": 62.0,
+      "last_pct": 0.0,
       "peak_pct": 0.0,
-      "days_in": 13,
+      "days_in": 14,
       "appear_count": 1,
       "last_seen": "20260813",
       "last_rank": 3,
@@ -205,10 +205,10 @@
         "四量终极"
       ],
       "entry_price": 18.41,
-      "last_close": 18.82,
-      "last_pct": 2.23,
+      "last_close": 19.13,
+      "last_pct": 3.91,
       "peak_pct": 3.91,
-      "days_in": 8,
+      "days_in": 9,
       "appear_count": 1,
       "last_seen": "20260817",
       "last_rank": 1,
@@ -231,10 +231,10 @@
         "驾驶舱A档"
       ],
       "entry_price": 5.17,
-      "last_close": 5.24,
-      "last_pct": 1.35,
+      "last_close": 5.19,
+      "last_pct": 0.39,
       "peak_pct": 1.35,
-      "days_in": 7,
+      "days_in": 8,
       "appear_count": 1,
       "last_seen": "20260813",
       "last_rank": 1,
@@ -258,10 +258,10 @@
         "驾驶舱A档"
       ],
       "entry_price": 131.87,
-      "last_close": 133.52,
-      "last_pct": 1.25,
+      "last_close": 133.99,
+      "last_pct": 1.61,
       "peak_pct": 1.61,
-      "days_in": 7,
+      "days_in": 8,
       "appear_count": 1,
       "last_seen": "20260813",
       "last_rank": 2,
@@ -285,10 +285,10 @@
         "驾驶舱B档"
       ],
       "entry_price": 24.31,
-      "last_close": 25.35,
-      "last_pct": 4.28,
+      "last_close": 25.48,
+      "last_pct": 4.81,
       "peak_pct": 4.81,
-      "days_in": 7,
+      "days_in": 8,
       "appear_count": 1,
       "last_seen": "20260813",
       "last_rank": 3,
@@ -311,10 +311,10 @@
         "驾驶舱A档"
       ],
       "entry_price": 75.66,
-      "last_close": 76.18,
-      "last_pct": 0.69,
+      "last_close": 78.41,
+      "last_pct": 3.63,
       "peak_pct": 3.63,
-      "days_in": 6,
+      "days_in": 7,
       "appear_count": 1,
       "last_seen": "20260814",
       "last_rank": 1,
@@ -336,10 +336,10 @@
         "板块龙头"
       ],
       "entry_price": 41.02,
-      "last_close": 42.06,
-      "last_pct": 2.54,
+      "last_close": 42.78,
+      "last_pct": 4.29,
       "peak_pct": 4.29,
-      "days_in": 6,
+      "days_in": 7,
       "appear_count": 1,
       "last_seen": "20260814",
       "last_rank": 2,
@@ -361,10 +361,10 @@
         "驾驶舱B档"
       ],
       "entry_price": 44.36,
-      "last_close": 46.6,
-      "last_pct": 5.05,
+      "last_close": 47.72,
+      "last_pct": 7.57,
       "peak_pct": 7.57,
-      "days_in": 6,
+      "days_in": 7,
       "appear_count": 1,
       "last_seen": "20260814",
       "last_rank": 3,
@@ -386,10 +386,10 @@
         "板块龙头"
       ],
       "entry_price": 17.64,
-      "last_close": 18.52,
-      "last_pct": 4.99,
+      "last_close": 17.75,
+      "last_pct": 0.62,
       "peak_pct": 4.99,
-      "days_in": 5,
+      "days_in": 6,
       "appear_count": 1,
       "last_seen": "20260816",
       "last_rank": 2,
@@ -411,10 +411,10 @@
         "板块龙头"
       ],
       "entry_price": 25.77,
-      "last_close": 26.97,
-      "last_pct": 4.66,
+      "last_close": 26.92,
+      "last_pct": 4.46,
       "peak_pct": 4.66,
-      "days_in": 5,
+      "days_in": 6,
       "appear_count": 1,
       "last_seen": "20260816",
       "last_rank": 3,
@@ -436,10 +436,10 @@
         "驾驶舱A档"
       ],
       "entry_price": 50.78,
-      "last_close": 57.72,
-      "last_pct": 13.67,
+      "last_close": 55.86,
+      "last_pct": 10.0,
       "peak_pct": 13.67,
-      "days_in": 5,
+      "days_in": 6,
       "appear_count": 1,
       "last_seen": "20260816",
       "last_rank": 4,
@@ -461,10 +461,10 @@
         "板块龙头"
       ],
       "entry_price": 32.53,
-      "last_close": 33.56,
-      "last_pct": 3.17,
+      "last_close": 33.36,
+      "last_pct": 2.55,
       "peak_pct": 3.17,
-      "days_in": 5,
+      "days_in": 6,
       "appear_count": 1,
       "last_seen": "20260817",
       "last_rank": 4,
@@ -486,15 +486,14 @@
         "驾驶舱A档"
       ],
       "entry_price": 765.97,
-      "last_close": 777.0,
-      "last_pct": 1.44,
+      "last_close": 765.97,
+      "last_pct": 0.0,
       "peak_pct": 1.44,
-      "days_in": 4,
+      "days_in": 5,
       "appear_count": 1,
-      "last_seen": "20260818",
-      "last_rank": 1,
+      "last_seen": "20260819",
+      "last_rank": 2,
       "last_sources": [
-        "四量终极",
         "板块龙头",
         "驾驶舱A档"
       ],
@@ -512,10 +511,10 @@
         "驾驶舱A档"
       ],
       "entry_price": 33.91,
-      "last_close": 32.76,
-      "last_pct": -3.39,
+      "last_close": 33.91,
+      "last_pct": 0.0,
       "peak_pct": 0.0,
-      "days_in": 4,
+      "days_in": 5,
       "appear_count": 1,
       "last_seen": "20260817",
       "last_rank": 3,
@@ -537,10 +536,10 @@
         "板块龙头"
       ],
       "entry_price": 39.34,
-      "last_close": 38.95,
-      "last_pct": -0.99,
+      "last_close": 39.34,
+      "last_pct": 0.0,
       "peak_pct": 0.0,
-      "days_in": 4,
+      "days_in": 5,
       "appear_count": 1,
       "last_seen": "20260817",
       "last_rank": 5,
@@ -562,10 +561,10 @@
         "驾驶舱B档"
       ],
       "entry_price": 69.26,
-      "last_close": 70.66,
-      "last_pct": 2.02,
+      "last_close": 69.26,
+      "last_pct": 0.0,
       "peak_pct": 2.02,
-      "days_in": 3,
+      "days_in": 4,
       "appear_count": 1,
       "last_seen": "20260818",
       "last_rank": 2,
@@ -575,12 +574,108 @@
       ],
       "first_list": "20260818",
       "entry_price_fallback": false
+    },
+    {
+      "code": "300189",
+      "name": "神农种业",
+      "list_date": "20260819",
+      "list_date_dashed": "2026-08-19",
+      "list_rank": 1,
+      "list_sources": [
+        "四量终极",
+        "大牛股猎手"
+      ],
+      "entry_price": 5.19,
+      "last_close": 5.19,
+      "last_pct": 0.0,
+      "peak_pct": 0.0,
+      "days_in": 0,
+      "appear_count": 1,
+      "last_seen": "20260819",
+      "last_rank": 1,
+      "last_sources": [
+        "四量终极",
+        "大牛股猎手"
+      ],
+      "first_list": "20260819"
+    },
+    {
+      "code": "300604",
+      "name": "长川科技",
+      "list_date": "20260819",
+      "list_date_dashed": "2026-08-19",
+      "list_rank": 3,
+      "list_sources": [
+        "板块龙头",
+        "驾驶舱A档"
+      ],
+      "entry_price": 302.57,
+      "last_close": 302.57,
+      "last_pct": 0.0,
+      "peak_pct": 0.0,
+      "days_in": 0,
+      "appear_count": 1,
+      "last_seen": "20260819",
+      "last_rank": 3,
+      "last_sources": [
+        "板块龙头",
+        "驾驶舱A档"
+      ],
+      "first_list": "20260819"
+    },
+    {
+      "code": "688012",
+      "name": "中微公司",
+      "list_date": "20260819",
+      "list_date_dashed": "2026-08-19",
+      "list_rank": 4,
+      "list_sources": [
+        "板块龙头",
+        "驾驶舱A档"
+      ],
+      "entry_price": 387.82,
+      "last_close": 387.82,
+      "last_pct": 0.0,
+      "peak_pct": 0.0,
+      "days_in": 0,
+      "appear_count": 1,
+      "last_seen": "20260819",
+      "last_rank": 4,
+      "last_sources": [
+        "板块龙头",
+        "驾驶舱A档"
+      ],
+      "first_list": "20260819"
+    },
+    {
+      "code": "688702",
+      "name": "盛科通信",
+      "list_date": "20260819",
+      "list_date_dashed": "2026-08-19",
+      "list_rank": 5,
+      "list_sources": [
+        "板块龙头",
+        "驾驶舱A档"
+      ],
+      "entry_price": 421.7,
+      "last_close": 421.7,
+      "last_pct": 0.0,
+      "peak_pct": 0.0,
+      "days_in": 0,
+      "appear_count": 1,
+      "last_seen": "20260819",
+      "last_rank": 5,
+      "last_sources": [
+        "板块龙头",
+        "驾驶舱A档"
+      ],
+      "first_list": "20260819"
     }
   ],
   "history": [],
   "_meta": {
     "version": "v2",
-    "schema_date": "2026-08-18",
+    "schema_date": "2026-08-19",
     "note": "finalRec Top5 滚动追踪；多窗口 5/10/20/30/60/90/180 天累积统计；entry=上榜日收盘，exit 判定=stoploss/target/timeout"
   }
 }

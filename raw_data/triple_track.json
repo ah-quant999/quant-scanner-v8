@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-19 07:19:31",
+  "update_time": "2026-08-19 15:56:57",
   "data_date": "2026-08-19",
   "track_start": "2026-08-19",
   "history_days": 3,
@@ -157,10 +157,10 @@
       "catalysts": []
     },
     {
-      "code": "300502",
-      "name": "新易盛",
-      "market": "创业板",
-      "board": "创业板",
+      "code": "688019",
+      "name": "安集科技",
+      "market": "科创板",
+      "board": "科创板",
       "status": "near",
       "total_score": 17,
       "quality_grade": "A",
@@ -169,19 +169,13 @@
         "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 0,
-      "enter_date": "2026-08-17",
+      "enter_date": "2026-08-19",
       "hold_days": 1,
       "consecutive_days": 1,
-      "first_close": 448.08,
+      "first_close": 0,
       "current_close": null,
       "pnl_pct": null,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "—"
-        }
-      ]
+      "catalysts": []
     }
   ],
   "alerts": [
@@ -255,7 +249,7 @@
         "count": 2,
         "names": [
           "胜宏科技",
-          "新易盛"
+          "安集科技"
         ]
       },
       {
@@ -312,7 +306,7 @@
       "names": []
     },
     "cockpit_a": {
-      "count": 10,
+      "count": 8,
       "overlap": 2,
       "names": [
         "北方华创",
