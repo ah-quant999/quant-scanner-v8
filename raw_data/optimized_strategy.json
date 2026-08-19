@@ -64,9 +64,5 @@
     ],
     "note": "数据驱动：仅在市场状态为 grind/panic 时开仓"
   },
-  "current_regime": {
-    "date": "2026-08-18",
-    "regime": "grind",
-    "open_position": true
-  }
+  "current_regime_error": "No module named 'pandas'"
 }

@@ -91,7 +91,7 @@
     },
     "688331": {
       "2026-08-17": 0,
-      "2026-08-19": 133.52
+      "2026-08-19": 128.31
     },
     "603993": {
       "2026-08-17": 20.75,
@@ -104,7 +104,7 @@
     "601899": {
       "2026-08-17": 33.36,
       "2026-08-18": 35.45,
-      "2026-08-19": 33.56
+      "2026-08-19": 35.45
     },
     "300476": {
       "2026-08-17": 0,
@@ -135,7 +135,7 @@
     "300604": {
       "2026-08-17": 0,
       "2026-08-18": 301.03,
-      "2026-08-19": 301.03
+      "2026-08-19": 0
     },
     "002396": {
       "2026-08-17": 33.91,
@@ -145,7 +145,7 @@
       "2026-08-19": 398.33
     },
     "300765": {
-      "2026-08-19": 44.4
+      "2026-08-19": 43.15
     },
     "688019": {
       "2026-08-19": 0
@@ -156,7 +156,7 @@
       "enter_date": "2026-08-17",
       "enter_close": 35.45,
       "last_date": "2026-08-19",
-      "last_close": 33.56,
+      "last_close": 35.45,
       "status": "near",
       "streak": 3,
       "total_days": 3
@@ -237,7 +237,7 @@
       "enter_date": "2026-08-17",
       "enter_close": 0,
       "last_date": "2026-08-19",
-      "last_close": 133.52,
+      "last_close": 128.31,
       "status": "near",
       "streak": 1,
       "total_days": 1
@@ -282,8 +282,8 @@
       "enter_date": "2026-08-17",
       "enter_close": 0,
       "last_date": "2026-08-19",
-      "last_close": 301.03,
-      "status": "strict",
+      "last_close": 0,
+      "status": "near",
       "streak": 3,
       "total_days": 2
     },
@@ -299,7 +299,7 @@
       "enter_date": "2026-08-19",
       "enter_close": 44.4,
       "last_date": "2026-08-19",
-      "last_close": 44.4,
+      "last_close": 43.15,
       "status": "near",
       "streak": 1
     },
@@ -315,7 +315,7 @@
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-08-19 15:56:56"
+    "last_update": "2026-08-19 16:18:04"
   },
   "2026-08-18": [
     {
@@ -403,26 +403,58 @@
     {
       "code": "300604",
       "name": "长川科技",
-      "market": "sz",
+      "market": "创业板",
       "board": "创业板",
-      "close": 301.03,
-      "pct_chg": -0.51,
-      "total_score": 40.0,
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 60,
       "quality_grade": "A",
       "industry": "专用设备制造业",
       "sectors": [
         "专用设备制造业"
       ],
       "signal_count": 0,
-      "status": "strict"
+      "status": "near"
+    },
+    {
+      "code": "603993",
+      "name": "洛阳钼业",
+      "market": "sh",
+      "board": "主板",
+      "close": 20.75,
+      "pct_chg": -0.38,
+      "total_score": 40.0,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "601899",
+      "name": "紫金矿业",
+      "market": "sh",
+      "board": "主板",
+      "close": 35.45,
+      "pct_chg": 0.85,
+      "total_score": 40.0,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "status": "near"
     },
     {
       "code": "300765",
       "name": "石药创新",
       "market": "sz",
       "board": "创业板",
-      "close": 44.4,
-      "pct_chg": -0.09,
+      "close": 43.15,
+      "pct_chg": -2.82,
       "total_score": 40.0,
       "quality_grade": "A",
       "industry": "食品制造业",
@@ -433,29 +465,13 @@
       "status": "near"
     },
     {
-      "code": "601899",
-      "name": "紫金矿业",
-      "market": "sh",
-      "board": "主板",
-      "close": 33.56,
-      "pct_chg": 0.6,
-      "total_score": 39.2,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
       "code": "688331",
       "name": "荣昌生物",
       "market": "sh",
       "board": "科创板",
-      "close": 133.52,
-      "pct_chg": -0.35,
-      "total_score": 38.8,
+      "close": 128.31,
+      "pct_chg": -3.9,
+      "total_score": 28.4,
       "quality_grade": "A",
       "industry": "医药制造业",
       "sectors": [
@@ -465,42 +481,10 @@
       "status": "near"
     },
     {
-      "code": "002371",
-      "name": "北方华创",
-      "market": "sz",
-      "board": "主板",
-      "close": 777.0,
-      "pct_chg": 1.44,
-      "total_score": 34.8,
-      "quality_grade": "B",
-      "industry": "专用设备制造业",
-      "sectors": [
-        "专用设备制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "300476",
-      "name": "胜宏科技",
-      "market": "sz",
+      "code": "300502",
+      "name": "新易盛",
+      "market": "创业板",
       "board": "创业板",
-      "close": 269.4,
-      "pct_chg": -2.39,
-      "total_score": 33.2,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "688019",
-      "name": "安集科技",
-      "market": "科创板",
-      "board": "科创板",
       "close": 0,
       "pct_chg": 0,
       "total_score": 17,

@@ -1,172 +1,21 @@
 {
-  "update_time": "2026-08-19 15:59",
+  "update_time": "2026-08-19 16:18",
   "alerts": [
     {
       "type": "summary",
-      "severity": "medium",
-      "message": "ETF监测中，0涨12跌",
-      "time": "15:59"
-    },
-    {
-      "type": "etf",
-      "severity": "medium",
-      "message": "南方中证500ETF 大跌 4.65%",
-      "time": "15:59"
-    },
-    {
-      "type": "etf",
-      "severity": "high",
-      "message": "华夏中证1000ETF 大跌 5.29%",
-      "time": "15:59"
-    },
-    {
-      "type": "etf",
-      "severity": "high",
-      "message": "华夏科创50ETF 大跌 6.73%",
-      "time": "15:59"
-    },
-    {
-      "type": "etf",
-      "severity": "high",
-      "message": "5G通信ETF 大跌 8.08%",
-      "time": "15:59"
-    },
-    {
-      "type": "etf",
-      "severity": "high",
-      "message": "芯片ETF 大跌 7.99%",
-      "time": "15:59"
+      "severity": "low",
+      "message": "ETF监测中，0涨0跌",
+      "time": "16:18"
     }
   ],
   "etfFlow": {
-    "etfs": [
-      {
-        "code": "510300",
-        "name": "华泰柏瑞沪深300ETF",
-        "type": "宽基",
-        "price": 4.654,
-        "change_pct": -2.78,
-        "volume": 15327229.0,
-        "amount": 7147497737.0,
-        "amplitude": 2.55
-      },
-      {
-        "code": "510310",
-        "name": "易方达沪深300ETF",
-        "type": "宽基",
-        "price": 4.515,
-        "change_pct": -2.82,
-        "volume": 2810508.0,
-        "amount": 1273870557.0,
-        "amplitude": 2.54
-      },
-      {
-        "code": "159919",
-        "name": "嘉实沪深300ETF",
-        "type": "宽基",
-        "price": 4.85,
-        "change_pct": -2.92,
-        "volume": 2303998.0,
-        "amount": 1124228894.4,
-        "amplitude": 2.28
-      },
-      {
-        "code": "510330",
-        "name": "华夏沪深300ETF",
-        "type": "宽基",
-        "price": 4.848,
-        "change_pct": -2.87,
-        "volume": 1730781.0,
-        "amount": 841807608.0,
-        "amplitude": 2.44
-      },
-      {
-        "code": "510050",
-        "name": "华夏上证50ETF",
-        "type": "宽基",
-        "price": 2.999,
-        "change_pct": -1.58,
-        "volume": 5977939.0,
-        "amount": 1793302912.0,
-        "amplitude": 1.58
-      },
-      {
-        "code": "510500",
-        "name": "南方中证500ETF",
-        "type": "宽基",
-        "price": 7.804,
-        "change_pct": -4.65,
-        "volume": 4830535.0,
-        "amount": 3807705937.0,
-        "amplitude": 3.71
-      },
-      {
-        "code": "159845",
-        "name": "华夏中证1000ETF",
-        "type": "宽基",
-        "price": 3.132,
-        "change_pct": -5.29,
-        "volume": 8562862.0,
-        "amount": 2713603757.638,
-        "amplitude": 4.29
-      },
-      {
-        "code": "588000",
-        "name": "华夏科创50ETF",
-        "type": "宽基",
-        "price": 1.761,
-        "change_pct": -6.73,
-        "volume": 60778574.0,
-        "amount": 10889020913.0,
-        "amplitude": 5.3
-      },
-      {
-        "code": "512690",
-        "name": "酒ETF",
-        "type": "行业",
-        "price": 0.425,
-        "change_pct": -1.85,
-        "volume": 9269838.0,
-        "amount": 396139294.0,
-        "amplitude": 2.54
-      },
-      {
-        "code": "515050",
-        "name": "5G通信ETF",
-        "type": "行业",
-        "price": 1.012,
-        "change_pct": -8.08,
-        "volume": 14959068.0,
-        "amount": 1555636843.0,
-        "amplitude": 6.27
-      },
-      {
-        "code": "159995",
-        "name": "芯片ETF",
-        "type": "行业",
-        "price": 1.163,
-        "change_pct": -7.99,
-        "volume": 11813891.0,
-        "amount": 1403348757.582,
-        "amplitude": 5.93
-      },
-      {
-        "code": "512010",
-        "name": "医药ETF",
-        "type": "行业",
-        "price": 0.396,
-        "change_pct": -1.25,
-        "volume": 12044848.0,
-        "amount": 478646656.0,
-        "amplitude": 2.0
-      }
-    ],
+    "etfs": [],
     "summary": {
       "total": 12,
-      "valid": 12,
+      "valid": 0,
       "up": 0,
-      "down": 12,
-      "alerts_count": 5
+      "down": 0,
+      "alerts_count": 0
     }
   },
   "calendar": []

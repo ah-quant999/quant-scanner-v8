@@ -1,39 +1,18 @@
 {
-  "update_time": "2026-08-19 15:56:57",
+  "update_time": "2026-08-19 16:18:05",
   "data_date": "2026-08-19",
   "track_start": "2026-08-19",
   "history_days": 3,
-  "strict_count": 1,
+  "strict_count": 0,
   "near_count": 6,
   "tracked": [
-    {
-      "code": "002371",
-      "name": "北方华创",
-      "market": "sz",
-      "board": "主板",
-      "status": "near",
-      "total_score": 34.8,
-      "quality_grade": "B",
-      "industry": "专用设备制造业",
-      "sectors": [
-        "专用设备制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 2,
-      "consecutive_days": 3,
-      "first_close": 765.97,
-      "current_close": 777.0,
-      "pnl_pct": 1.44,
-      "catalysts": []
-    },
     {
       "code": "601899",
       "name": "紫金矿业",
       "market": "sh",
       "board": "主板",
       "status": "near",
-      "total_score": 39.2,
+      "total_score": 40.0,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
@@ -44,8 +23,35 @@
       "hold_days": 3,
       "consecutive_days": 3,
       "first_close": 33.36,
-      "current_close": 33.56,
-      "pnl_pct": 0.6,
+      "current_close": 35.45,
+      "pnl_pct": 6.26,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "已兑现(价涨)"
+        }
+      ]
+    },
+    {
+      "code": "603993",
+      "name": "洛阳钼业",
+      "market": "sh",
+      "board": "主板",
+      "status": "near",
+      "total_score": 40.0,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 2,
+      "consecutive_days": 2,
+      "first_close": 20.75,
+      "current_close": 20.75,
+      "pnl_pct": 0.0,
       "catalysts": [
         {
           "tag": "中报预增",
@@ -70,8 +76,8 @@
       "enter_date": "2026-08-19",
       "hold_days": 1,
       "consecutive_days": 1,
-      "first_close": 44.4,
-      "current_close": 44.4,
+      "first_close": 43.15,
+      "current_close": 43.15,
       "pnl_pct": 0.0,
       "catalysts": [
         {
@@ -84,10 +90,10 @@
     {
       "code": "300604",
       "name": "长川科技",
-      "market": "sz",
+      "market": "创业板",
       "board": "创业板",
-      "status": "strict",
-      "total_score": 40.0,
+      "status": "near",
+      "total_score": 60,
       "quality_grade": "A",
       "industry": "专用设备制造业",
       "sectors": [
@@ -98,7 +104,7 @@
       "hold_days": 2,
       "consecutive_days": 3,
       "first_close": 0,
-      "current_close": 301.03,
+      "current_close": null,
       "pnl_pct": null,
       "catalysts": [
         {
@@ -114,7 +120,7 @@
       "market": "sh",
       "board": "科创板",
       "status": "near",
-      "total_score": 38.8,
+      "total_score": 28.4,
       "quality_grade": "A",
       "industry": "医药制造业",
       "sectors": [
@@ -125,7 +131,7 @@
       "hold_days": 1,
       "consecutive_days": 1,
       "first_close": 0,
-      "current_close": 133.52,
+      "current_close": 128.31,
       "pnl_pct": null,
       "catalysts": [
         {
@@ -136,31 +142,10 @@
       ]
     },
     {
-      "code": "300476",
-      "name": "胜宏科技",
-      "market": "sz",
+      "code": "300502",
+      "name": "新易盛",
+      "market": "创业板",
       "board": "创业板",
-      "status": "near",
-      "total_score": 33.2,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 2,
-      "consecutive_days": 2,
-      "first_close": 0,
-      "current_close": 269.4,
-      "pnl_pct": null,
-      "catalysts": []
-    },
-    {
-      "code": "688019",
-      "name": "安集科技",
-      "market": "科创板",
-      "board": "科创板",
       "status": "near",
       "total_score": 17,
       "quality_grade": "A",
@@ -169,13 +154,19 @@
         "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 0,
-      "enter_date": "2026-08-19",
+      "enter_date": "2026-08-17",
       "hold_days": 1,
       "consecutive_days": 1,
-      "first_close": 0,
+      "first_close": 448.08,
       "current_close": null,
       "pnl_pct": null,
-      "catalysts": []
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "—"
+        }
+      ]
     }
   ],
   "alerts": [
@@ -226,37 +217,16 @@
       "code": "002396",
       "name": "青城新药－B",
       "text": "青城新药－B(002396) 于 2026-08-18 跌出共识（曾连续 2 日）"
-    },
-    {
-      "level": "good",
-      "code": "300604",
-      "name": "长川科技",
-      "text": "长川科技(300604) 连续 3 日稳居严格共识（高质量）"
     }
   ],
   "sector_cluster": {
     "by_industry": [
       {
-        "industry": "专用设备制造业",
-        "count": 2,
-        "names": [
-          "北方华创",
-          "长川科技"
-        ]
-      },
-      {
-        "industry": "计算机、通信和其他电子设备制造业",
-        "count": 2,
-        "names": [
-          "胜宏科技",
-          "安集科技"
-        ]
-      },
-      {
         "industry": "有色金属矿采选业",
-        "count": 1,
+        "count": 2,
         "names": [
-          "紫金矿业"
+          "紫金矿业",
+          "洛阳钼业"
         ]
       },
       {
@@ -267,51 +237,62 @@
         ]
       },
       {
+        "industry": "专用设备制造业",
+        "count": 1,
+        "names": [
+          "长川科技"
+        ]
+      },
+      {
         "industry": "医药制造业",
         "count": 1,
         "names": [
           "荣昌生物"
         ]
+      },
+      {
+        "industry": "计算机、通信和其他电子设备制造业",
+        "count": 1,
+        "names": [
+          "新易盛"
+        ]
       }
     ],
     "by_sector": [
       {
-        "sector": "专用设备制造业",
-        "count": 2
-      },
-      {
-        "sector": "计算机、通信和其他电子设备制造业",
-        "count": 2
-      },
-      {
         "sector": "有色金属矿采选业",
-        "count": 1
+        "count": 2
       },
       {
         "sector": "食品制造业",
         "count": 1
       },
       {
+        "sector": "专用设备制造业",
+        "count": 1
+      },
+      {
         "sector": "医药制造业",
+        "count": 1
+      },
+      {
+        "sector": "计算机、通信和其他电子设备制造业",
         "count": 1
       }
     ],
-    "concentration": 28.57
+    "concentration": 33.33
   },
   "overlap": {
-    "total_tracked": 7,
+    "total_tracked": 6,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
       "names": []
     },
     "cockpit_a": {
-      "count": 8,
-      "overlap": 2,
-      "names": [
-        "北方华创",
-        "长川科技"
-      ]
+      "count": 6,
+      "overlap": 0,
+      "names": []
     },
     "cockpit_b": {
       "count": 15,
@@ -484,7 +465,7 @@
       },
       {
         "code": "002371",
-        "name": "北方华创",
+        "name": "创联控股",
         "enter_date": "2026-08-17",
         "offsets": {
           "1d": 1.44

@@ -879,6 +879,10 @@ def fetch_sector_flow():
     # 🛡 2026-08-19 主人令一劳永逸修复：对 candidate_list 做 net_5d/10d/20d/60d 累加
     #   原代码先累加 sectors_in/out（那时 sectors_in/out 还没 append 仍空 list → 循环无效）。
     #   同时也修阈值：10/20/60 日一律 >=3（history.max=9 天，原 >=20 永不可能满足）。层级最稳。
+    # 🛡 2026-08-19 主人令一劳永逸修复：阈值改回严格 5/10/20/60。
+    #   旧阈值 >=3 会让 history 只有 9 天时，10/20/60 三个窗口都凑「全部 history 求和」
+    #   → 同值 = 卡片「10日/20日/60日 完全相同」体感 bug（用户截图）。
+    #   现 history < N 天时字段保留 None，UI 资金验证列会显「(实X天) + 暂无数据」。
     seen_names = set()
     for item in candidate_list:
         nm = item.get("name", "")
@@ -894,18 +898,24 @@ def fetch_sector_flow():
         real_10, net_10d_val = _real_n(hist, 10)
         real_20, net_20d_val = _real_n(hist, 20)
         real_60, net_60d_val = _real_n(hist, 60)
-        if net_5d_val != 0 and len(real_5) >= 3:
+        if net_5d_val != 0 and len(real_5) >= 5:
             item["net_5d"] = net_5d_val
             item["net_5d_days"] = len(real_5)
-        if net_10d_val != 0 and len(real_10) >= 3:
+        if net_10d_val != 0 and len(real_10) >= 10:
             item["net_10d"] = net_10d_val
             item["net_10d_days"] = len(real_10)
-        if net_20d_val != 0 and len(real_20) >= 3:
+        if net_20d_val != 0 and len(real_20) >= 20:
             item["net_20d"] = net_20d_val
             item["net_20d_days"] = len(real_20)
-        if net_60d_val != 0 and len(real_60) >= 3:
+        if net_60d_val != 0 and len(real_60) >= 60:
             item["net_60d"] = net_60d_val
             item["net_60d_days"] = len(real_60)
+        # 一劳永逸兜底：写实 *_days 字段，sectors_in/out 同步时不再乱 fallback
+        real_all = [h for h in hist if not h.get("carried")]
+        for k in ("net_5d", "net_10d", "net_20d", "net_60d"):
+            days_field = k + "_days"
+            if item.get(days_field) is None:
+                item[days_field] = len(real_all)
 
 
     trend_5d = sorted([x for x in candidate_list if x.get("net_5d") is not None and x["net_5d"] != 0],
