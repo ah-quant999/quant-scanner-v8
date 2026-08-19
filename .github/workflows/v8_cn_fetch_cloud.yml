@@ -79,7 +79,7 @@ jobs:
               echo "category=premarket" >> "$GITHUB_OUTPUT"
               echo "label=盘前" ;;
             # 🛡 2026-08-19 主人令：盘中 cron 拆 2 段（午休 12:00/12:30 不跑）
-            "*/30 1-3 * * 1-5"|"*/30 5-8 * * 1-5"|"*/30 1-8 * * 1-5")
+            "*/30 1-3 * * 1-5"|"*/30 5-8 * * 1-5")
               echo "category=intraday" >> "$GITHUB_OUTPUT"
               echo "label=盘中" ;;
             "20 9 * * 1-5")
