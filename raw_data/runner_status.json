@@ -1,13 +1,12 @@
 {
-  "update_time": "2026-08-19 16:11:53",
-  "status": "ok",
+  "update_time": "2026-08-19 17:12:00",
+  "status": "fail",
   "process": {
     "ok": true,
     "listener": true,
-    "worker": true,
+    "worker": false,
     "details": [
-      "runner.listener",
-      "runner.worker"
+      "runner.listener"
     ]
   },
   "service": {
@@ -18,20 +17,20 @@
   "worker_logs": {
     "ok": true,
     "errors": [],
-    "scanned": 4,
+    "scanned": 2,
     "message": "最近日志无错误"
   },
   "github": {
-    "ok": true,
-    "consecutive_failures": 0,
+    "ok": false,
+    "consecutive_failures": 3,
     "checkout_failures": 0,
     "latest_run_id": 32228227706,
-    "latest_failed": false,
-    "latest_status": "queued",
+    "latest_failed": true,
+    "latest_status": "completed",
     "stuck_min": 0,
-    "is_fail": false,
+    "is_fail": true,
     "is_warn": false,
-    "message": "self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(cn·应急) queued"
+    "message": "self-hosted 最近 15 条中连续失败 3 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(cn·应急) 失败"
   },
   "runner_env": {
     "ok": true,
@@ -39,5 +38,5 @@
     "message": "阈值=100000（一劳永逸目标 2000）"
   },
   "actions_taken": [],
-  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(cn·应急) queued"
+  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 3 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(cn·应急) 失败"
 }
