@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-08-18 15:40:45",
+  "check_time": "2026-08-19 14:48:09",
   "last_trade_close": "2026-08-18 15:30:00",
   "is_trading_day": true,
   "core_stale": [],
@@ -36,6 +36,7 @@
     "ETF_SUBSCRIPTION": "premarket",
     "ETF_DAILY_MONITOR": "intraday",
     "SECTOR_FUND_FLOW": "intraday",
+    "SECTOR_FUND_FLOW_INTRADAY": "intraday",
     "CAPITAL_FLOW_DATA": "intraday",
     "CONCEPT_RANKING": "intraday",
     "LIMIT_UP_HEATMAP": "intraday",
@@ -68,7 +69,11 @@
     "STOCK_PROFILE": "post_close",
     "AVG_PRICE_DATA": "intraday",
     "TOP5_TRACK": "post_close",
-    "ALGO_TRACK": "post_close"
+    "ALGO_TRACK": "post_close",
+    "INDEX_HISTORY": "post_close",
+    "MARKET_PATH_PROBABILITY": "post_close",
+    "MARKET_REGIME": "post_close",
+    "SECTOR_RECOMMENDATION": "post_close"
   },
   "category_label": {
     "premarket": "盘前",
