@@ -5681,7 +5681,8 @@ function switchSec(sec,el){
   }
   // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
   if(sec==='ph' && typeof window._renderSecPh==='function') setTimeout(window._renderSecPh,80);
-  if(sec==='st' && typeof window._renderSecSt==='function') setTimeout(window._renderSecSt,80);
+  // 选股策略页：渲染入口是 window.switchSt('tc')（_renderSecSt 从未定义，2026-08-19 修复）
+  if(sec==='st' && typeof window.switchSt==='function') setTimeout(function(){ try{ window.switchSt('tc'); }catch(e){} },80);
   // 最终推荐：进入时渲染 Top3 + 今日可入手候选
   if(sec==='final' && typeof window.__renderFinalSec==='function') setTimeout(window.__renderFinalSec,60);
   // 个股查询：静态交互，无需渲染；切换时隐藏下拉
@@ -10404,7 +10405,7 @@ function drawUpDownChart(){
     h+='</div>';
     h+='<div style="background:rgba(206,147,216,.08);border:1px solid rgba(206,147,216,.25);border-radius:8px;padding:10px 12px;">';
     h+='<div style="font-size:11px;color:var(--sub);">📈 累计胜率 <span style="color:var(--dim)">('+(habSum.tracked_picks||0)+' picks · '+(habSum.days||0)+' 日)</span></div>';
-    h+='<div style="font-size:14px;margin-top:4px;">T+1: <b>'+(habSum.T+1_rate||0)+'%</b> · T+5: <b>'+(habSum.T+5_rate||0)+'%</b> · T+10: <b>'+(habSum.T+10_rate||0)+'%</b></div>';
+    h+='<div style="font-size:14px;margin-top:4px;">T+1: <b>'+(habSum.tracked_picks? (100*habSum['T+1_hit']/habSum.tracked_picks).toFixed(1):0)+'%</b> · T+5: <b>'+(habSum.tracked_picks? (100*habSum['T+5_hit']/habSum.tracked_picks).toFixed(1):0)+'%</b> · T+10: <b>'+(habSum.tracked_picks? (100*habSum['T+10_hit']/habSum.tracked_picks).toFixed(1):0)+'%</b></div>';
     h+='<div style="font-size:11px;color:var(--sub);margin-top:4px;">命中阈值 T+N 收盘涨幅 ≥ 5%</div>';
     h+='</div>';
     h+='</div>';
