@@ -189,6 +189,9 @@ _EXTRA_FILES = (
     # 🛡 2026-08-19：H 反推算法相关文件注册到 ?v 重写集，确保 api_push 推送后 index.html 同步对齐缓存戳
     "data/H_AUTO_BUY.js",
     "data/H_AUTO_BUY_TRACK.js",
+    # 2026-08-19：路径概率预测卡（艾略特+江恩+缠论+形态匹配）注册到 ?v 重写集
+    "data/INDEX_HISTORY.js",
+    "data/MARKET_PATH_PROBABILITY.js",
 )
 _RE_V = re.compile(r'([\'"])(data/[A-Z0-9_]+\.js)(?:\?[^"\'>\s]+)?([\'"])')
 
