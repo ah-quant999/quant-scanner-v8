@@ -192,6 +192,10 @@ _EXTRA_FILES = (
     # 2026-08-19：路径概率预测卡（艾略特+江恩+缠论+形态匹配）注册到 ?v 重写集
     "data/INDEX_HISTORY.js",
     "data/MARKET_PATH_PROBABILITY.js",
+    # 2026-08-19：板块推荐框架（宏观+板块RS+资金流+周期融合）注册到 ?v 重写集
+    "data/MACRO.js",
+    "data/MARKET_REGIME.js",
+    "data/SECTOR_RECOMMENDATION.js",
 )
 _RE_V = re.compile(r'([\'"])(data/[A-Z0-9_]+\.js)(?:\?[^"\'>\s]+)?([\'"])')
 
