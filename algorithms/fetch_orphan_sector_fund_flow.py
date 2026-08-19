@@ -897,7 +897,10 @@ def fetch_sector_flow():
         if net_10d_val != 0 and len(real_10) >= 3:
             item["net_10d"] = net_10d_val
             item["net_10d_days"] = len(real_10)
-        if net_20d_val != 0 and len(real_20) >= 20:  # 2026-08-12 修：原写>=10，20日趋势需至少20天真实数据
+        # 🛡 2026-08-19 主人令一劳永逸修复：20 日阈值从 `>=20` 降到 `>=3`（同 10/60 日一致）。
+        #   根因 history.max=9 天，`>=20` 永不可能满足 → 20日永远"暂无"。
+        #   数据带 _days 字段注明实际窗口（多数 4-9 天），渲染层无须改。
+        if net_20d_val != 0 and len(real_20) >= 3:
             item["net_20d"] = net_20d_val
             item["net_20d_days"] = len(real_20)
         if net_60d_val != 0 and len(real_60) >= 3:

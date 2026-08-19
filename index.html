@@ -419,7 +419,7 @@ window.__domReadyFns=[];
 </style>
     <script src="data/ETF_INTRADAY_HEAT.js?v=5560161a22" defer></script>
     <script src="data/SECTOR_FUND_FLOW.js?v=8f08e46a67" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_TREND.js?v=c784cbea71" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_TREND.js?v=f18f0962b9" defer></script>
     <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=1bd5f330b2" defer></script>
     <script src="data/ANALYST_RATINGS.js?v=82d8b3b4c5" defer></script>
     <script src="data/SUSPENSION_ALERT.js?v=b966474051" defer></script>
@@ -438,10 +438,10 @@ window.__domReadyFns=[];
 <script src="data/AI_MARKET_BRIEF.js?v=ed105d0821" defer></script>
 <script src="data/MARGIN_DATA.js?v=49adea8248" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=e89d0ffb7b" defer></script>
-<script src="data/IPO_DATA.js?v=ed26a5b2ac" defer></script>
+<script src="data/IPO_DATA.js?v=9fe411d522" defer></script>
     <script src="data/CRISIS_DATA.js?v=1d0d8267f5" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=fa9b9f9edb" defer></script>
-    <script src="data/OVERSEAS_MARKETS.js?v=f190967ec4" defer></script>
+    <script src="data/OVERSEAS_MARKETS.js?v=6fabab5325" defer></script>
     <script src="data/STOCK_RPS.js?v=080e1e5009" defer></script>
     <!-- 🛡 2026-08-19：H 反推短线买点（data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js）反推代码 + 跟踪回测，独立于 PDF OCR
          v= 占位由 api_push_raw._stamp_index_v 在每日推送后自动重写为新 sha，确保 CDN 不缓存旧版 -->
@@ -1214,11 +1214,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_FIB.js?v=19243735f3" defer></script>
 <script src="data/SZ_FIB.js?v=241b9be075" defer></script>
 <script src="data/SECTOR_RS.js?v=236fe2a09b" defer></script>
-<script src="data/SECTOR_PHASE_HISTORY.js?v=c62ebf3e2f" defer></script>
+<script src="data/SECTOR_PHASE_HISTORY.js?v=92b609d6c1" defer></script>
 <script src="data/INST_TRADE.js?v=d727a0d04b" defer></script>
 <script src="data/NORTH_FUND.js?v=40aca41964" defer></script>
 <script src="data/MARKET_ALERTS.js?v=6e0d2bf4ef" defer></script>
-<script src="data/MARKET_FUND_FLOW_DATA.js?v=7c6f3681bc" defer></script>
+<script src="data/MARKET_FUND_FLOW_DATA.js?v=0b1c00115b" defer></script>
 <script src="data/ETF_SUBSCRIPTION.js?v=94a9b15d23" defer></script>
 <script src="data/LIMIT_UP_HEATMAP.js?v=a2bede0b80" defer></script>
 <script src="data/HERDING_DATA.js?v=98c8896edd" defer></script>
@@ -1244,11 +1244,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/WEEKEND_RUN.js?v=3a4d7f2104" defer></script>
 <script src="data/W52_HIGH.js?v=5feac36f7b" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=505db0f2f2" defer></script>
-<script src="data/RUNNER_STATUS.js?v=a3e6a2a2b0" defer></script>
-<script src="data/HEALTH_CHECK.js?v=4e9fef85cd" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=39ea96e6eb" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=614d11f001" defer></script>
-    <script src="data/POTENTIAL_PICKS.js?v=2103994770" defer></script>
+<script src="data/RUNNER_STATUS.js?v=c76d4df13c" defer></script>
+<script src="data/HEALTH_CHECK.js?v=e94ba0f138" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=a31a24781f" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=4aa1c40d5e" defer></script>
+    <script src="data/POTENTIAL_PICKS.js?v=e1169604f1" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE.js?v=f135754004" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=0dcbab52a2" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=9c5aef89a0" defer></script>
@@ -6944,7 +6944,7 @@ window.__renderV8CalFull();
       applyData(window.IPO_DATA);
     }else{
       // 优先 fetch data/IPO_DATA.js?v=bf5d738bc6（真实数据文件），其次 data/ipo_score.json（兼容旧路径）
-      fetch('data/IPO_DATA.js?v=ed26a5b2ac')
+      fetch('data/IPO_DATA.js?v=9fe411d522')
         .then(r=>{ if(!r.ok) throw new Error('data/IPO_DATA.js?v=bf5d738bc6 http '+r.status); return r.text(); })
         .then(txt=>{ const m=txt.match(/window\.IPO_DATA\s*=\s*({[\s\S]+?});?\s*$/); if(!m) throw new Error('no IPO_DATA found'); return JSON.parse(m[1]); })
         .then(applyData)
@@ -7567,8 +7567,16 @@ window.__renderV8CalFull();
     const sft=window.SECTOR_FUND_FLOW_TREND || {};
     // 🛡 2026-08-18 主人令：资金验证"流出"列修复
     //   - 原代码从 trend_5d/trend_10d/trend_20d/trend_60d 取数据，但这些数组只含净流入 top（正值）→ 流出列"暂无"
-    //   - 修复：从 sectors_in（全 40 个板块，含 netKey 正负）按 netKey 拆分流入流出
-    const sfIn = (sft.sectors_in || []);
+    //   - 修复：从 sectors_in ∪ sectors_out（去重 by name；fetcher 输出两榜），按 netKey 拆分流入流出
+    // 🛡 2026-08-19 一劳永逸：union sectors_in + sectors_out 让 5/10/20/60 日取宽集合，避免"今日爆发新板块"误判全列暂无
+    const _sfSeen=new Set();
+    const _sfAll=[];
+    (sft.sectors_in||[]).concat(sft.sectors_out||[]).forEach(function(s){
+      if(!s||!s.name||_sfSeen.has(s.name)) return;
+      _sfSeen.add(s.name);
+      _sfAll.push(s);
+    });
+    const sfIn = _sfAll;
     function sfByNet(key){
       // 只保留该 key 有非零数据的板块（0 视为无数据）
       return sfIn.filter(function(s){ return s && (s[key]||0)!==0; });
@@ -8915,8 +8923,9 @@ function drawUpDownChart(){
 
         // 字段兼容：RUNNER_STATUS_HEALTH 用 checked_at_bj（非 update_time），
         // 其余卡用 update_time/last_update/run_time/updated（2026-08-06 红叉审计修复）
+        // 🛡 2026-08-19 主人令修复：westock-mcp PORTFOLIO 用 updated_at 键（实网数据），原代码未读 → renderTaskSchedule 一律"无"+"X"
         const _tsRaw = data.update_time || data.last_update || data.run_time || data.updated
-          || data.checked_at_bj || data.checked_at_utc;
+          || data.updated_at || data.checked_at_bj || data.checked_at_utc;
 
         const lastTs = parseTs(_tsRaw);
 
@@ -10522,6 +10531,26 @@ function drawUpDownChart(){
     //   完全独立于 PDF / OCR，每交易日 18:30 由 run_algorithms.py 自动化产出。
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #ce93d8;">';
     h+=v8CardHeader('🧬','H 反推短线买点','反推代码每日盘后自跑 + 跟踪回测，admin 可见','update_time',window.H_AUTO_BUY);
+    // 🛡 2026-08-19 一劳永逸修复：H 卡 4 时段更新标识（commit 23a5eb5e5 实际只改 fetcher/data，没动 index.html——本补完整 4 时段渲染）
+    //   · 盘前 = snapshot_date + snapshot_time（行情快照）
+    //   · 盘后 = generated_at（auto_run_dn_algorithm 跑批时间）
+    //   · 短信 = first_run（track_h_auto_buy 首次跟踪）
+    //   · 长线 = by_date 最末日期
+    try{
+      var hab2 = window.H_AUTO_BUY || {};
+      var habt2 = window.H_AUTO_BUY_TRACK || {};
+      var _slotPre = (hab2.snapshot_date && hab2.snapshot_time) ? hab2.snapshot_date + ' ' + String(hab2.snapshot_time).slice(0,8) : (hab2.snapshot_date || '—');
+      var _slotPost = hab2.generated_at || '—';
+      var _slotSms = habt2.first_run || habt2.update_time || '—';
+      var _byDates = Object.keys(habt2.by_date || {}).sort();
+      var _slotLn = _byDates.length ? _byDates[_byDates.length-1] : '—';
+      h += '<div style="display:flex;flex-wrap:wrap;gap:8px 14px;padding:6px 14px 0;font-size:11px;color:var(--sub);">';
+      h += '<span><span style="color:#f59e0b">●</span> 盘前 <b style="color:var(--txt)">'+_slotPre+'</b></span>';
+      h += '<span><span style="color:#10b981">●</span> 盘后 <b style="color:var(--txt)">'+_slotPost+'</b></span>';
+      h += '<span><span style="color:#3b82f6">●</span> 短信 <b style="color:var(--txt)">'+_slotSms+'</b></span>';
+      h += '<span><span style="color:#8b5cf6">●</span> 长线 <b style="color:var(--txt)">'+_slotLn+'</b></span>';
+      h += '</div>';
+    }catch(_hSlotErr){ try{console.warn('h_slot_render',_hSlotErr);}catch(_){} }
     h+='<div style="padding:12px 14px;">';
     var hab=window.H_AUTO_BUY||{};
     var habt=window.H_AUTO_BUY_TRACK||{};
@@ -13259,7 +13288,7 @@ window.__renderV8CalToday();
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=fb5190121b'},
     {name:'STOCK_PROFILE', url:'data/STOCK_PROFILE.js?v=f23feb0264'},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=04ca62600c'},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=6f69e3b30f'},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=9f64b8dc73'}
   ];
   function loadOne(item, done){
