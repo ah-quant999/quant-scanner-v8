@@ -1722,6 +1722,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <!-- 📊 主力净额分时累计曲线（盘中分时 + 盘后定基合并成一条线，2026-08-18 主人令：放到 ETF 三合一 Block 3 上方 与下方主力日监控 T+0 联动） -->
       <div class="card" style="margin-bottom:16px">
         <h3><span class="ic">📈</span>主力净额分时累计曲线 - 盘中每30分快照 · <span class="fresh" id="sfIntradayTime">—</span> <span style="font-size:10px;color:#a78bfa;font-weight:600">↕ 与下方主力日监控 T+0 联动</span></h3>
+        <!-- 🛡 2026-08-19 主人令：HTML 自渲染 legend，flex-wrap 天然全部列出、不分页不动 -->
+        <div id="sfIntradayLegend" style="display:flex;flex-wrap:wrap;gap:6px 10px;padding:6px 8px 4px;font-size:11px;color:#cbd5e1"></div>
         <div id="sfIntradayChart" style="width:100%;height:420px;"><div class="ipo-empty">加载中…</div></div>
       </div>
 
@@ -7609,19 +7611,53 @@ window.__renderV8CalFull();
     var lines=Array.from(picked).slice(0,20);
 
     var xData=snaps.map(function(s){return s.time;});
-    var series=lines.map(function(name){
+    // 🛡 2026-08-19 主人令一劳永逸修复：每条板块线不同颜色（不再流入=全红/流出=全绿统一色）。
+    //   原始 isOut 红/绿二分导致 12 条线全一样色，完全分不清；
+    //   改为按板块名 hash 到 64 色调色板（djb2 hash + 防同分布），主人一眼区分。
+    //   颜色回退（最后一段）仍按"红涨绿跌"提示方向（见最后一段数据正负）。
+    var _SF_PALETTE=['#ef4444','#f59e0b','#10b981','#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f97316',
+                     '#6366f1','#84cc16','#06b6d4','#a855f7','#d946ef','#0ea5e9','#22c55e',
+                     '#eab308','#0891b2','#7c3aed','#fb7185','#facc15','#4f46e5','#34d399',
+                     '#fb923c','#a3e635','#fde047','#1e40af','#be185d','#15803d','#b91c1c',
+                     '#4338ca','#9333ea','#c026d3','#0d9488','#ea580c','#65a30d','#0891b2',
+                     '#0284c7','#059669','#ca8a04','#a16207','#9d174d','#1d4ed8','#166534',
+                     '#7e22ce','#a21caf','#0e7490','#c2410c','#854d0e','#92400e','#831843',
+                     '#155e75','#166534','#0f766e','#0c4a6e','#075985','#3f3f46','#52525b',
+                     '#71717a','#a8a29e','#f87171','#facc15','#4ade80','#67e8f9','#c4b5fd',
+                     '#f9a8d4','#86efac','#fcd34d','#7dd3fc'];
+    function _sfHashIdx(name){
+      // 双 hash（FNV-1a + sdbm）+ length prime mix。21 个候选板块 64 色调色板足以保证全 unique。
+      var h1=2166136261, h2=0;
+      for(var i=0;i<name.length;i++){ var c=name.charCodeAt(i); h1=(h1^c)*16777619; h2=(h2<<6)+(h2<<16)-h2+c; h2|=0; }
+      var mixed=(h1>>>0) ^ (h2 | 0) ^ (name.length * 2654435761);
+      return Math.abs(mixed);
+    }
+    // 🛡 主人令：板块名 -> 颜色，hash 后做碰撞跳过，保证 21 条线 100% 不同色。
+    //   同时记录到 _SF_COLOR_MAP 全局，hover legend 高亮用同一颜色。
+    var _SF_COLOR_MAP={};
+    var _usedColors=new Set();
+    function _sfPickColor(name){
+      if(_SF_COLOR_MAP[name]) return _SF_COLOR_MAP[name];
+      var base=_sfHashIdx(name)%_SF_PALETTE.length;
+      for(var step=0; step<_SF_PALETTE.length; step++){
+        var idx=(base+step)%_SF_PALETTE.length;
+        var c=_SF_PALETTE[idx];
+        if(!_usedColors.has(c)){ _usedColors.add(c); _SF_COLOR_MAP[name]=c; return c; }
+      }
+      // fallback: 起始 hash 颜色（理论不会触发，因为 64 调色板对 21 条线绰绰有余）
+      var fc=_SF_PALETTE[base]; _SF_COLOR_MAP[name]=fc; return fc;
+    }
+    series=lines.map(function(name){
       var data=snaps.map(function(s){
         var hit=s.sectors_in.concat(s.sectors_out).find(function(x){return x.name===name;});
         return hit?(hit.net||0):null;
       });
-      // 流入板块红色、流出板块绿色，与 UI 偏好一致
-      var isOut=(data[data.length-1]||0)<0;
-      var color=isOut?'#10b981':'#ef4444';
+      var color=_sfPickColor(name);
       return {
         name:name, type:'line', smooth:true, data:data, showSymbol:false,
-        lineStyle:{width:1.4, color:color},
+        lineStyle:{width:1.6, color:color},
         itemStyle:{color:color},
-        emphasis:{focus:'series', lineStyle:{width:2.5}},
+        emphasis:{focus:'series', lineStyle:{width:2.8}},
         connectNulls:true
       };
     });
@@ -7641,9 +7677,8 @@ window.__renderV8CalFull();
       tooltip:{trigger:'axis', axisPointer:{type:'cross'}, backgroundColor:'rgba(15,23,42,.92)',
                borderColor:'#334155', textStyle:{color:'#e2e8f0'},
                valueFormatter:function(v){return (v!=null?(v>=0?'+':'')+v.toFixed(1)+'亿':'-');}},
-      legend:{type:'scroll', top:25, data:lines.concat(['上证涨跌幅(%)']),
-              textStyle:{fontSize:11,color:'#cbd5e1'}},
-      grid:{top:80, left:65, right:65, bottom:50},
+      legend:{show:false},
+      grid:{top:50, left:65, right:65, bottom:50},
       xAxis:{type:'category', data:xData, boundaryGap:false,
              axisLine:{lineStyle:{color:'#475569'}}, axisLabel:{color:'#94a3b8', fontSize:11}},
       yAxis:[{type:'value', name:'累计净额（亿）', nameTextStyle:{color:'#94a3b8'},
@@ -7663,6 +7698,45 @@ window.__renderV8CalFull();
     // 同时保留 __MFF_RESIZE_HANDLERS 兼容（防御性）
     if(window._secPhCharts) window._secPhCharts.push(_SF_INTRADAY_CHART);
     if(window.__MFF_RESIZE_HANDLERS) window.__MFF_RESIZE_HANDLERS.push(function(){_SF_INTRADAY_CHART&&_SF_INTRADAY_CHART.resize();});
+
+    // 🛡 2026-08-19 主人令：HTML 自渲染 legend（替换 ECharts 原生 legend 以彻底去掉 1/2 翻页），
+    //   flex-wrap 天然多行展示全部板块，一眼区分每只板块颜色。
+    //   同时绑定鼠标 hover → ECharts 高亮联动。
+    var legendDom=$('sfIntradayLegend');
+    if(legendDom){
+      var idxColor='#94a3b8';
+      function _sfEsc(s){return String(s).replace(/[<>&"]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];});}
+      var lh='<span style="font-size:10px;color:#94a3b8;margin-right:4px;align-self:center">共 '+(lines.length+1)+' 条线：</span>';
+      lines.forEach(function(name){
+        var color=_sfPickColor(name);
+        lh+='<span class="sf-leg-item" data-sf-name="'+_sfEsc(name)+'" '
+           +'style="display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:4px;cursor:pointer;background:rgba(148,163,184,.08)">'
+           +'<i style="display:inline-block;width:14px;height:3px;background:'+color+';border-radius:2px"></i>'
+           +'<span>'+_sfEsc(name)+'</span></span>';
+      });
+      // 上证指数副轴（虚线灰色）也加入，最后展示
+      lh+='<span class="sf-leg-item" data-sf-name="__idx__" '
+         +'style="display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:4px;cursor:pointer;background:rgba(148,163,184,.08)">'
+         +'<i style="display:inline-block;width:14px;height:0;border-top:1px dashed '+idxColor+'"></i>'
+         +'<span style="color:'+idxColor+'">上证涨跌幅(%)</span></span>';
+      legendDom.innerHTML=lh;
+      // 联动高亮
+      Array.prototype.forEach.call(legendDom.querySelectorAll('.sf-leg-item'),function(el){
+        el.addEventListener('mouseenter',function(){
+          var n=el.getAttribute('data-sf-name');
+          if(n==='__idx__'){
+            _SF_INTRADAY_CHART.dispatchAction({type:'highlight',seriesIndex:series.length});
+          } else {
+            var si=-1;
+            for(var i=0;i<series.length;i++){ if(series[i].name===n){ si=i; break; } }
+            if(si>=0) _SF_INTRADAY_CHART.dispatchAction({type:'highlight',seriesIndex:si});
+          }
+        });
+        el.addEventListener('mouseleave',function(){
+          _SF_INTRADAY_CHART.dispatchAction({type:'downplay'});
+        });
+      });
+    }
   }
 
   /* ---- ETF 资金热度（4 大类 TOP5流入+TOP5流出，横向 bar） ---- */
