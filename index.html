@@ -7565,10 +7565,22 @@ window.__renderV8CalFull();
     // 资金验证
     function sfTrendCard(title,dataArr,netKey,headClass){
       // 🛡 2026-08-19 主人令一劳永逸修复：slice 从 3 放宽到 6（资金验证列空间够，避免"sector 只 3 行"体感太差）。
+      // 🛡 2026-08-19 追加：当历史窗口不足目标天数时，在标题显示真实天数（如"10日(实9天)"），
+      //   避免 10日/60日 因历史不足而数值完全相同，用户误以为数据写错。
       const inList=(dataArr||[]).filter(s=>s&&(s[netKey]||0)>0).sort((a,b)=>b[netKey]-a[netKey]).slice(0,6);
       const outList=(dataArr||[]).filter(s=>s&&(s[netKey]||0)<0).sort((a,b)=>a[netKey]-b[netKey]).slice(0,6);
       const hasData=(dataArr||[]).length>0;
-      let c='<div class="sf-trend-card" style="padding:6px"><div class="sf-trend-head '+headClass+'" style="font-size:13px;padding:5px 6px;margin:-6px -6px 5px -6px">'+title+'</div><div class="sf-trend-cols">';
+      const daysKey=netKey+'_days';
+      const expectedDays=parseInt((netKey.match(/net_(\d+)d/)||[0,0])[1],10)||0;
+      let actualDays=0;
+      for(let i=0;i<(dataArr||[]).length;i++){
+        const d0=(dataArr||[])[i];
+        if(d0 && d0[daysKey]){ actualDays=d0[daysKey]; break; }
+      }
+      const showTitle=(actualDays && actualDays<expectedDays)
+        ? (title+'<span style="font-size:10px;font-weight:400;opacity:.75;margin-left:3px">(实'+actualDays+'天)</span>')
+        : title;
+      let c='<div class="sf-trend-card" style="padding:6px"><div class="sf-trend-head '+headClass+'" style="font-size:13px;padding:5px 6px;margin:-6px -6px 5px -6px">'+showTitle+'</div><div class="sf-trend-cols">';
       c+='<div class="sf-trend-col"><div class="col-title col-in" style="font-size:12px;padding:3px 0">流入</div>';
       if(inList.length){inList.forEach(s=>{c+='<div class="sf-trend-row2" style="padding:3px 0;font-size:12px"><span>'+s.name+'</span><span class="no-shrink"  style="color:var(--up)">+'+(s[netKey]||0).toFixed(1)+'亿</span></div>';});}
       else if(hasData){c+='<div style="color:var(--dim);font-size:12px;padding:3px 0">暂无</div>';}

@@ -208,8 +208,10 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
         })
 
     # 2. 科创/创业板 vs 主板 分化
+    # 🛡 2026-08-19 主人令一劳永逸修复：涨跌幅格式化由硬编 "+{x:.2f}%" 改为 "{x:+.2f}%"，
+    #   避免下跌时输出 "+-2.40%" 这种双重符号，确保涨+跌-语义统一。
     if cy.get("chg", 0) - sh.get("chg", 0) >= 1.5:
-        text = f"创业板(+{cy.get('chg', 0):.2f}%) 明显强于沪指(+{sh.get('chg', 0):.2f}%)，成长风格占优"
+        text = f"创业板({cy.get('chg', 0):+.2f}%) 明显强于沪指({sh.get('chg', 0):+.2f}%)，成长风格占优"
         anomalies.append({
             "tag": "风格分化",
             "emoji": "⚡",
@@ -218,7 +220,7 @@ def detect_anomalies(indices, concepts, sectors, etf_heat, etf_daily, capital, l
             "signal": "green",
         })
     elif sh.get("chg", 0) - cy.get("chg", 0) >= 1.5:
-        text = f"沪指(+{sh.get('chg', 0):.2f}%) 强于创业板(+{cy.get('chg', 0):.2f}%)，蓝筹防御占优"
+        text = f"沪指({sh.get('chg', 0):+.2f}%) 强于创业板({cy.get('chg', 0):+.2f}%)，蓝筹防御占优"
         anomalies.append({
             "tag": "风格分化",
             "emoji": "⚡",

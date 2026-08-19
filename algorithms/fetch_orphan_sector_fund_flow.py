@@ -948,6 +948,9 @@ def fetch_sector_flow():
     # 🛡 2026-08-19 主人令一劳永逸修复：从 candidate_list 按 name 同步 net_5d/10d/20d/60d
     #   到 sectors_in/out（top_list 引用，但 candidate_list 是 dict 浅拷贝，identity 不同，
     #   不能直接引用；只能按 name 显式复制）。
+    # 🛡 2026-08-19 追加：同步 *_days 字段到 sectors_in/out，让 UI 资金验证卡片显示
+    #   "10日(实9天)" 这类真实窗口标注，避免 10日/60日 因历史不足而数值完全相同、
+    #   用户误以为数据写错。
     cand_map_sync = {c["name"]: c for c in candidate_list}
     for item in result["sectors_in"] + result["sectors_out"]:
         nm = item.get("name", "")
@@ -956,6 +959,9 @@ def fetch_sector_flow():
             continue
         for k in ("net_5d", "net_10d", "net_20d", "net_60d"):
             if item.get(k) in (None, 0) and c.get(k) not in (None, 0):
+                item[k] = c[k]
+        for k in ("net_5d_days", "net_10d_days", "net_20d_days", "net_60d_days"):
+            if k in c and k not in item:
                 item[k] = c[k]
 
     in_names = [f"{s['name']}({s['net']:.1f}亿)" for s in result["sectors_in"]]
