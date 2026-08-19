@@ -231,6 +231,13 @@ def sector_score_for(stock, rel_set, abs_set, score_map):
 
 
 def main():
+    # 🛡 2026-08-19 阿狸咪根治（主人令「所有算法链安排在数据全部出来后跑」）：
+    # final_recommend 依赖港股 + 龙虎榜数据。港股 16:30 / 龙虎榜 17:30 才完整就绪，
+    # 此前小九 16:18 本地手动跑过一次，导致 17 张盘后/选股卡数据不准。
+    # 加时间守门：早于数据就绪时间直接 sys.exit(1)；workflow_dispatch 应急可设
+    # TIME_GATE_BYPASS=1 跳过（云端 algo_cloud 18:30 跑不会撞门）。
+    from utils.time_gate import check, markets_required
+    check(markets_required(['hk', 'lhb']), by='final_recommend')
     triple = load_json("triple_consensus.json")
     cockpit = load_json("cockpit_tier_recommend.json")
     top10 = load_json("top10_daily.json")
