@@ -7595,20 +7595,38 @@ window.__renderV8CalFull();
       return;
     }
     var snaps=d.snapshots;
-    // 收集所有出现过的板块名（流入+流出合并，按累计绝对值选 Top15 画线，避免 20 条线过密）
-    var acc={};
+    // 🛡 2026-08-19 主人令「一劳永逸+赶紧修复」: 跳过盘前 08:31 全市场累计快照
+    //   (08:31 是盘前「全市场累计」口径，与盘中分时不可同日而语，会把 Y 轴拉到 36+ 拉胯所有盘中曲线堆底角)
+    //   仅在「08:31 + 后续 snapshots>=2」时跳过，避免误伤纯盘中场景
+    if(snaps.length >= 3 && snaps[0] && /^\s*08:3[01]\s*$/.test(snaps[0].time||'')){
+      snaps = snaps.slice(1);
+    }
+    // 🛡 2026-08-19: 改板块选法 = 「跨 snap 出现频次 ≥ 半数 AND 该 snap 内 net 不小」
+    //   (旧选法「全局累计绝对值 Top」会把盘前 1-2 个快照独有的大额板块选上，后续 snaps 全 null → 曲线贴底)
+    //   频次优先保证每条线都有连续数据点，曲线有意义
+    var freq={}, maxAbsByName={};
     snaps.forEach(function(s){
       s.sectors_in.concat(s.sectors_out).forEach(function(x){
-        if(!acc[x.name]) acc[x.name]=0;
-        acc[x.name]+=Math.abs(x.net||0);
+        var n=x.name, v=Math.abs(x.net||0);
+        freq[n]=(freq[n]||0)+1;
+        if(v > (maxAbsByName[n]||0)) maxAbsByName[n]=v;
       });
     });
-    var ranked=Object.keys(acc).map(function(k){return {name:k,abs:acc[k]};}).sort(function(a,b){return b.abs-a.abs;});
-    // 选 Top12 流入 + Top5 流出，但合计不超过 20 条
-    var picked=new Set();
-    ranked.filter(function(_,i){return i<12;}).forEach(function(r){picked.add(r.name);});
-    ranked.filter(function(r){return !picked.has(r.name);}).slice(0,8).forEach(function(r){picked.add(r.name);});
-    var lines=Array.from(picked).slice(0,20);
+    var minFreq=Math.max(2, Math.ceil(snaps.length*0.6));  // 至少出现 2 次 OR 60% snap
+    var ranked=Object.keys(freq).filter(function(n){return freq[n]>=minFreq;})
+      .map(function(n){return {name:n, freq:freq[n], abs:maxAbsByName[n]};})
+      .sort(function(a,b){
+        // 主排序：跨 snap 累计绝对值（让重要板块靠前）
+        var sa=0, sb=0;
+        snaps.forEach(function(s){
+          s.sectors_in.concat(s.sectors_out).forEach(function(x){
+            if(x.name===a.name) sa+=Math.abs(x.net||0);
+            if(x.name===b.name) sb+=Math.abs(x.net||0);
+          });
+        });
+        return sb-sa;
+      });
+    var lines=ranked.slice(0,20).map(function(r){return r.name;});
 
     var xData=snaps.map(function(s){return s.time;});
     // 🛡 2026-08-19 主人令一劳永逸修复：每条板块线不同颜色（不再流入=全红/流出=全绿统一色）。
@@ -7682,9 +7700,12 @@ window.__renderV8CalFull();
       xAxis:{type:'category', data:xData, boundaryGap:false,
              axisLine:{lineStyle:{color:'#475569'}}, axisLabel:{color:'#94a3b8', fontSize:11}},
       yAxis:[{type:'value', name:'累计净额（亿）', nameTextStyle:{color:'#94a3b8'},
+              min:function(v){return Math.min(0, v.min - Math.abs(v.min)*0.1);},
+              max:function(v){return Math.max(0, v.max + Math.abs(v.max)*0.15);},
               axisLine:{lineStyle:{color:'#475569'}}, splitLine:{lineStyle:{color:'#1e293b'}},
               axisLabel:{color:'#94a3b8', formatter:function(v){return v>=0?'+'+v:v;}}},
              {type:'value', name:'指数 %', position:'right',
+              min:-5, max:5,
               axisLine:{lineStyle:{color:'#475569'}}, splitLine:{show:false},
               axisLabel:{color:'#94a3b8', formatter:function(v){return (v>=0?'+':'')+v+'%';}}}],
       dataZoom:[{type:'inside', start:0, end:100}, {type:'slider', height:18, bottom:8,
