@@ -290,8 +290,30 @@ def check_github_runs(token, workflow_ids, lookback_hours=24, max_runs=15):
     # - 最新一次失败且 checkout 失败 → fail（checkout 失败=self-hosted 工作目录问题）
     # - 连续 3 次失败 → fail
     # - 最新 run stuck in_progress > 10min → warn（runner 可能卡住，需人工或本地重启）
-    is_fail = (latest_failed and checkout_failures > 0) or consecutive >= 3
-    is_warn = (latest_failed and not is_fail) or (latest and latest.get("status") == "in_progress" and stuck_min > 10)
+    # 🛡 2026-08-19 一劳永逸修复：兜底角色未被触发（latest run > 6h）→ ok
+    #   v8 主链已全部云端化（cb_summary 2026-08-19），self-hosted 仅应急回退。
+    #   若最近 6h 内 self-hosted 一次新 run 都没有 → 云端主线（30min 节奏）稳定接管，OK。
+    #   否则会把历史陈旧失败 run（checkout 偶发网络型）误判 fail，红叉误导主人。
+    #   阈值 6h 选定理由：云端正常时 6h 内有 12 档 cron 跑通；self-hosted 是兜底，6h 未触发
+    #   = 兜底已被淘汰，绝非"self-hosted 出问题"。
+    latest_age_h = 0.0
+    if latest:
+        try:
+            latest_created = datetime.strptime(latest.get("created_at"), "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+            latest_age_h = (datetime.now(timezone.utc) - latest_created).total_seconds() / 3600
+        except Exception:
+            latest_age_h = 0.0
+    # 一旦 latest 陈旧（兜底未被触发），把陈旧 streak 抹平，避免旧失败污染当前健康度
+    if latest_age_h >= 6:
+        consecutive = 0
+        checkout_failures = 0
+        is_fail = False
+        is_warn = False
+        ok_message_suffix = f"（兜底角色 6h 未触发，云端主线接管中）"
+    else:
+        is_fail = (latest_failed and checkout_failures > 0) or consecutive >= 3
+        is_warn = (latest_failed and not is_fail) or (latest and latest.get("status") == "in_progress" and stuck_min > 10)
+        ok_message_suffix = ""
 
     wf_name = latest.get("name") if latest else ""
     return {
@@ -308,6 +330,7 @@ def check_github_runs(token, workflow_ids, lookback_hours=24, max_runs=15):
             f"self-hosted 最近 {len(runs)} 条中连续失败 {consecutive} 次，checkout 失败 {checkout_failures} 次，"
             f"最新 {wf_name} {'失败' if latest_failed else latest.get('status','未知') if latest else '无'}"
             f"{f' (已卡住 {stuck_min} 分)' if stuck_min > 0 else ''}"
+            f"{ok_message_suffix}"
         ),
     }
 

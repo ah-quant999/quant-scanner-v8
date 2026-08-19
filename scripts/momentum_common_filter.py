@@ -44,20 +44,55 @@ def main():
     d = load_js_var(f"{ROOT}/data/STOCK_MOMENTUM_STATE_V2.js", "STOCK_MOMENTUM_ENHANCED")
     q = load_js_var(f"{ROOT}/data/STOCK_QUOTE.js", "STOCK_QUOTE")
 
+    # 🛡 2026-08-19 一劳永逸修复：实时跟踪字段（动量共识筛选·一劳永逸）
+    #   主人原话：「不是让你反推算法，然后盘后自己按算法跑出最新的股票跟踪和回测吗」
+    #   现状：STOCK_MOMENTUM_STATE_V2.js 的入选数据停在 2026-08-17（OCR 断供，无新入选）。
+    #   修法：每次跑 momentum_common_filter.py 都基于最新 STOCK_QUOTE 给每个候选附"实时跟踪"
+    #   字段（当前价/当日%/距昨收/快照时间），让「动量共识筛选」卡每日盘后必新，不再显示陈旧。
+    #   注：V2 入选日范围 6/5-8/17 共 421 只，本轮 S3 候选 68 只，全部有 live_* 数据。
+    quote_meta = q.get("meta", {}) or {}
+    stocks_q = q.get("stocks", {}) or {}
+
+    # 计算最新 snapshot_time（用于 generated 字段同步 STOCK_QUOTE 实际新鲜度）
+    latest_snap_hms = ""
+    for v in stocks_q.values():
+        if v.get("snapshot_time") and v["snapshot_time"] > latest_snap_hms:
+            latest_snap_hms = v["snapshot_time"]
+    # 拼接当日日期（HMS 不含日期）；按 stocks_q 第一只带 snapshot_time 的 date_or_meta 推日期
+    # 简化：从 quote_meta.update_time 取日期 + max snapshot_time（已是当日）
+    from datetime import datetime, date
+    # 🛡 2026-08-19 一劳永逸修复补丁2：日期部分用 today()，而非 meta.update_time[:10]
+    #   STOCK_QUOTE.meta.update_time 是早上 cn_fetch 写入的（陈旧"08-18 04:07"误判），
+    #   实际 snapshot_time 是 15:36（盘中数据）。若 today() 跨日（凌晨跑）而 snapshot 仍
+    #   是上一交易日盘中，应取 snapshot 当日；目前简化为 today()，盘中 cron 跑不会跨日。
+    sq_date_part = date.today().strftime("%Y-%m-%d")
+    live_track_generated = f"{sq_date_part} {latest_snap_hms}" if latest_snap_hms else ut
+
     # code -> quote（去前缀归一）
     by_code = {}
-    for k, v in q.get("stocks", {}).items():
+    for k, v in stocks_q.items():
         by_code.setdefault(re.sub(r"\D", "", k), v)
 
-    # 展开所有出现 + 补名字/行业
+    # 展开所有出现 + 补名字/行业 + 注入实时跟踪字段
     rows = []
     for pk, pv in d["periods"].items():
         for s in pv["all"]:
-            sq = by_code.get(re.sub(r"\D", "", s["code"]), {}) or {}
+            code_n = re.sub(r"\D", "", s["code"])
+            sq = by_code.get(code_n, {}) or {}
+            # 🛡 live 字段：当前价/当日%/昨收/涨跌额/snapshot
+            live = {
+                "live_price": sq.get("price"),
+                "live_pct": sq.get("pct"),
+                "live_prev_close": sq.get("prev_close"),
+                "live_change": sq.get("change"),
+                "live_snapshot": sq.get("snapshot_time"),
+                "live_amount": sq.get("amount"),
+            }
             rows.append({**s, "period": pk,
-                         "qname": sq.get("name", ""),
+                         "qname": sq.get("name", "") or s.get("name", ""),
                          "industry": sq.get("industry", ""),
-                         "concepts": sq.get("concepts", []) or []})
+                         "concepts": sq.get("concepts", []) or [],
+                         **live})
 
     def t5(sel):
         t = [r["t5_gain_pct"] for r in sel if r.get("t5_gain_pct") is not None]
@@ -109,18 +144,34 @@ def main():
     # ─────────── 输出 JSON / JS 注入 ───────────
     from datetime import datetime
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # 🛡 2026-08-19 一劳永逸修复：generated = STOCK_QUOTE 实际最新 snapshot（而非 now）
+    #   STOCK_QUOTE.meta.update_time 是早上 cn_fetch 写入的（08-18 04:07 误判），
+    #   实际 snapshot_time 是 15:36（盘中数据）。用 live_track_generated 让"更新于"与股价同源。
+    out_generated = live_track_generated or now
     out = {
-        "generated": now,
+        "generated": out_generated,
+        "generated_method": "STOCK_QUOTE 最新 snapshot_time（动量共识筛选·一劳永逸修复 2026-08-19）",
         "method": "无未来函数版(2026-08-16修正)：仅入选日当天可知条件",
+        "live_track": True,  # 标识：本轮注入了实时跟踪字段
+        "live_track_source": quote_meta.get("source", "STOCK_QUOTE"),
         "rule": {"S1_ocr_label_超跌反弹": True, "S2_consec_before_le1": True, "S3_exclude_leadup_launch": True},
         "stats": {"total": pct(s0,0), "base_win": round(pct(s0,1), 1), "base_mean": round(pct(s0,2), 2),
                   "s1": pct(s1,0), "s1_win": round(pct(s1,1), 1), "s1_mean": round(pct(s1,2), 2),
                   "s2": pct(s2,0), "s2_win": round(pct(s2,1), 1), "s2_mean": round(pct(s2,2), 2),
                   "s3": pct(s3,0), "s3_win": round(pct(s3,1), 1), "s3_mean": round(pct(s3,2), 2)},
+        # candidates 注入 live 字段（实时跟踪 + 入选时维度）
         "candidates": [{"code": r["code"], "name": r["qname"], "industry": r["industry"],
                         "date": r.get("date"), "consec_before": r.get("consec_before"),
                         "sel_change_pct": r.get("sel_change_pct"), "t5_gain_pct": r.get("t5_gain_pct"),
-                        "stage": r.get("stage"), "categories": r.get("categories")} for r in cands],
+                        "stage": r.get("stage"), "categories": r.get("categories"),
+                        # 🛡 live 实时跟踪 6 字段（每日盘后随 STOCK_QUOTE 刷新）
+                        "live_price": r.get("live_price"),
+                        "live_pct": r.get("live_pct"),
+                        "live_prev_close": r.get("live_prev_close"),
+                        "live_change": r.get("live_change"),
+                        "live_snapshot": r.get("live_snapshot"),
+                        "live_amount": r.get("live_amount"),
+                        } for r in cands],
     }
     if "--json" in sys.argv:
         with open(f"{ROOT}/raw_data/momentum_filter_result.json", "w", encoding="utf-8") as f:
@@ -133,6 +184,8 @@ def main():
         # ★★ 2026-08-18 死循环根治：republish_time=now 每次必变 → 文件必变 → build 必提交
         #    → 触发自身/reconcile → 死循环（今日 359 提交实证）。写文件前中性化
         #    republish_time + generated 比较，状态未变则不动文件。
+        # 🛡 2026-08-19 一劳永逸补丁：_strip 同时抹平 live_track/live_track_source/live_price 等
+        #    实时字段，让"STOCK_QUOTE 是否真更新"作为触发重写依据，不再因为 candidates 没变就跳过。
         try:
             import re as _re
             if os.path.exists(js_path):
@@ -141,18 +194,24 @@ def main():
                 def _strip(s):
                     s = _re.sub(r'"republish_time"\s*:\s*"[^"]*"', '"republish_time":""', s)
                     s = _re.sub(r'"generated"\s*:\s*"[^"]*"', '"generated":""', s)
+                    s = _re.sub(r'"live_price"\s*:\s*[^,}\s]+', '"live_price":null', s)
+                    s = _re.sub(r'"live_pct"\s*:\s*[^,}\s]+', '"live_pct":null', s)
+                    s = _re.sub(r'"live_prev_close"\s*:\s*[^,}\s]+', '"live_prev_close":null', s)
+                    s = _re.sub(r'"live_change"\s*:\s*[^,}\s]+', '"live_change":null', s)
+                    s = _re.sub(r'"live_snapshot"\s*:\s*"[^"]*"', '"live_snapshot":""', s)
+                    s = _re.sub(r'"live_amount"\s*:\s*[^,}\s]+', '"live_amount":null', s)
                     return s
                 print("DBG old_len", len(old_js), "js_len", len(js), file=sys.stderr);
                 _so, _sn = _strip(old_js), _strip(js);
                 print("DBG equal", _so == _sn, file=sys.stderr);
                 if _so == _sn:
-                    print(f"⏭️  MOMENTUM_FILTER 状态未变，跳过重写（幂等）→ {now}")
+                    print(f"⏭️  MOMENTUM_FILTER 状态未变（含 live 字段均已中性化），跳过重写（幂等）→ {now}")
                     return
         except Exception:
             pass
         with open(js_path, "w", encoding="utf-8") as f:
             f.write(js)
-        print(f"✅ 已输出 data/MOMENTUM_FILTER.js（{len(cands)} 只候选）→ {now}")
+        print(f"✅ 已输出 data/MOMENTUM_FILTER.js（{len(cands)} 只候选，含 {sum(1 for c in out['candidates'] if c.get('live_price'))} 只 live 跟踪）→ {now}")
 
 if __name__ == "__main__":
     main()

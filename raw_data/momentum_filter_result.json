@@ -1,6 +1,9 @@
 {
- "generated": "2026-08-18 15:08:56",
+ "generated": "2026-08-19 15:36:00",
+ "generated_method": "STOCK_QUOTE 最新 snapshot_time（动量共识筛选·一劳永逸修复 2026-08-19）",
  "method": "无未来函数版(2026-08-16修正)：仅入选日当天可知条件",
+ "live_track": true,
+ "live_track_source": "akshare.stock_zh_a_spot(新浪A股)+stock_hk_spot(新浪港股)+fund_etf_spot_em(东财ETF)+algorithms/stock_industry_concepts.json",
  "rule": {
   "S1_ocr_label_超跌反弹": true,
   "S2_consec_before_le1": true,
@@ -34,7 +37,13 @@
     "反弹",
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 389.8,
+   "live_pct": -0.128,
+   "live_prev_close": 390.3,
+   "live_change": -0.5,
+   "live_snapshot": "15:34:58",
+   "live_amount": 837883653.0
   },
   {
    "code": "601881",
@@ -48,7 +57,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 12.24,
+   "live_pct": 0.246,
+   "live_prev_close": 12.21,
+   "live_change": 0.03,
+   "live_snapshot": "15:34:58",
+   "live_amount": 199138615.0
   },
   {
    "code": "601555",
@@ -62,7 +77,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 8.12,
+   "live_pct": 2.138,
+   "live_prev_close": 7.95,
+   "live_change": 0.17,
+   "live_snapshot": "15:34:58",
+   "live_amount": 352222108.0
   },
   {
    "code": "601059",
@@ -76,7 +97,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 16.57,
+   "live_pct": -0.121,
+   "live_prev_close": 16.59,
+   "live_change": -0.02,
+   "live_snapshot": "15:00:03",
+   "live_amount": 69842820.0
   },
   {
    "code": "605228",
@@ -90,7 +117,13 @@
    "categories": [
     "短线选股",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 11.19,
+   "live_pct": 0.539,
+   "live_prev_close": 11.13,
+   "live_change": 0.06,
+   "live_snapshot": "15:34:58",
+   "live_amount": 51187477.0
   },
   {
    "code": "688252",
@@ -105,7 +138,13 @@
     "反弹",
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 21.83,
+   "live_pct": 8.553,
+   "live_prev_close": 20.11,
+   "live_change": 1.72,
+   "live_snapshot": "15:34:58",
+   "live_amount": 191577154.0
   },
   {
    "code": "688798",
@@ -120,7 +159,13 @@
     "反弹",
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 56.98,
+   "live_pct": 2.889,
+   "live_prev_close": 55.38,
+   "live_change": 1.6,
+   "live_snapshot": "15:34:58",
+   "live_amount": 225419412.0
   },
   {
    "code": "002587",
@@ -134,7 +179,13 @@
    "categories": [
     "超跌反弹",
     "选股交集"
-   ]
+   ],
+   "live_price": 5.6,
+   "live_pct": 0.901,
+   "live_prev_close": 5.55,
+   "live_change": 0.05,
+   "live_snapshot": "15:35:15",
+   "live_amount": 75522926.0
   },
   {
    "code": "300998",
@@ -149,7 +200,13 @@
     "反弹01",
     "短线选股",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 26.35,
+   "live_pct": 0.842,
+   "live_prev_close": 26.13,
+   "live_change": 0.22,
+   "live_snapshot": "15:35:00",
+   "live_amount": 76546829.0
   },
   {
    "code": "603236",
@@ -164,7 +221,13 @@
     "反弹",
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 60.3,
+   "live_pct": -0.643,
+   "live_prev_close": 60.69,
+   "live_change": -0.39,
+   "live_snapshot": "15:34:58",
+   "live_amount": 1907463397.0
   },
   {
    "code": "300657",
@@ -179,7 +242,13 @@
     "反弹",
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 38.14,
+   "live_pct": 5.04,
+   "live_prev_close": 36.31,
+   "live_change": 1.83,
+   "live_snapshot": "15:35:00",
+   "live_amount": 1261359270.0
   },
   {
    "code": "002998",
@@ -193,7 +262,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 7.96,
+   "live_pct": 0.378,
+   "live_prev_close": 7.93,
+   "live_change": 0.03,
+   "live_snapshot": "15:35:30",
+   "live_amount": 78348335.0
   },
   {
    "code": "605358",
@@ -207,7 +282,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 46.59,
+   "live_pct": 3.88,
+   "live_prev_close": 44.85,
+   "live_change": 1.74,
+   "live_snapshot": "15:34:58",
+   "live_amount": 1717054713.0
   },
   {
    "code": "601066",
@@ -221,7 +302,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 25.77,
+   "live_pct": 0.901,
+   "live_prev_close": 25.54,
+   "live_change": 0.23,
+   "live_snapshot": "15:34:58",
+   "live_amount": 547248143.0
   },
   {
    "code": "000722",
@@ -235,7 +322,13 @@
    "categories": [
     "超跌反弹",
     "选股交集"
-   ]
+   ],
+   "live_price": 13.35,
+   "live_pct": 1.831,
+   "live_prev_close": 13.11,
+   "live_change": 0.24,
+   "live_snapshot": "15:35:15",
+   "live_amount": 201080630.0
   },
   {
    "code": "000921",
@@ -250,7 +343,13 @@
     "p3_other_4",
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 25.5,
+   "live_pct": -0.74,
+   "live_prev_close": 25.69,
+   "live_change": -0.19,
+   "live_snapshot": "15:35:45",
+   "live_amount": 285166702.0
   },
   {
    "code": "301617",
@@ -264,7 +363,13 @@
    "categories": [
     "超跌反弹",
     "选股交集"
-   ]
+   ],
+   "live_price": 50.74,
+   "live_pct": 6.754,
+   "live_prev_close": 47.53,
+   "live_change": 3.21,
+   "live_snapshot": "15:35:30",
+   "live_amount": 136594614.0
   },
   {
    "code": "600918",
@@ -279,7 +384,13 @@
     "反弹01",
     "短线选股",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 5.57,
+   "live_pct": 1.089,
+   "live_prev_close": 5.51,
+   "live_change": 0.06,
+   "live_snapshot": "15:34:58",
+   "live_amount": 168867973.0
   },
   {
    "code": "603903",
@@ -294,7 +405,13 @@
     "反弹",
     "超跌反弹",
     "选股交集"
-   ]
+   ],
+   "live_price": 14.61,
+   "live_pct": 3.47,
+   "live_prev_close": 14.12,
+   "live_change": 0.49,
+   "live_snapshot": "15:34:58",
+   "live_amount": 200685197.0
   },
   {
    "code": "002250",
@@ -310,7 +427,13 @@
     "反弹01",
     "短线选股",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 16.24,
+   "live_pct": -1.456,
+   "live_prev_close": 16.48,
+   "live_change": -0.24,
+   "live_snapshot": "15:35:15",
+   "live_amount": 226521232.0
   },
   {
    "code": "001287",
@@ -324,7 +447,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 24.87,
+   "live_pct": 6.373,
+   "live_prev_close": 23.38,
+   "live_change": 1.49,
+   "live_snapshot": "15:35:45",
+   "live_amount": 749049728.0
   },
   {
    "code": "002677",
@@ -338,7 +467,13 @@
    "categories": [
     "短线选股",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 7.06,
+   "live_pct": -0.843,
+   "live_prev_close": 7.12,
+   "live_change": -0.06,
+   "live_snapshot": "15:35:15",
+   "live_amount": 44549080.0
   },
   {
    "code": "002126",
@@ -352,7 +487,13 @@
    "categories": [
     "超跌反弹",
     "选股交集"
-   ]
+   ],
+   "live_price": 44.46,
+   "live_pct": 5.908,
+   "live_prev_close": 41.98,
+   "live_change": 2.48,
+   "live_snapshot": "15:35:15",
+   "live_amount": 859744454.0
   },
   {
    "code": "600605",
@@ -367,7 +508,13 @@
     "反弹",
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 25.55,
+   "live_pct": 1.59,
+   "live_prev_close": 25.15,
+   "live_change": 0.4,
+   "live_snapshot": "15:34:58",
+   "live_amount": 67605308.0
   },
   {
    "code": "002141",
@@ -381,7 +528,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 6.81,
+   "live_pct": 5.093,
+   "live_prev_close": 6.48,
+   "live_change": 0.33,
+   "live_snapshot": "15:35:00",
+   "live_amount": 1227323821.0
   },
   {
    "code": "603001",
@@ -396,7 +549,13 @@
     "反弹",
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 7.94,
+   "live_pct": 6.008,
+   "live_prev_close": 7.49,
+   "live_change": 0.45,
+   "live_snapshot": "15:34:58",
+   "live_amount": 100577305.0
   },
   {
    "code": "002156",
@@ -410,7 +569,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 69.26,
+   "live_pct": 10.006,
+   "live_prev_close": 62.96,
+   "live_change": 6.3,
+   "live_snapshot": "15:35:15",
+   "live_amount": 9941401425.0
   },
   {
    "code": "300373",
@@ -424,7 +589,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 99.78,
+   "live_pct": 3.528,
+   "live_prev_close": 96.38,
+   "live_change": 3.4,
+   "live_snapshot": "15:35:45",
+   "live_amount": 1231986792.0
   },
   {
    "code": "300475",
@@ -438,7 +609,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 171.99,
+   "live_pct": 6.806,
+   "live_prev_close": 161.03,
+   "live_change": 10.96,
+   "live_snapshot": "15:35:15",
+   "live_amount": 5977665476.0
   },
   {
    "code": "000505",
@@ -452,7 +629,13 @@
    "categories": [
     "强势股",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 6.17,
+   "live_pct": 9.982,
+   "live_prev_close": 5.61,
+   "live_change": 0.56,
+   "live_snapshot": "15:35:45",
+   "live_amount": 140149063.0
   },
   {
    "code": "600829",
@@ -467,7 +650,13 @@
     "反弹",
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 11.54,
+   "live_pct": -2.451,
+   "live_prev_close": 11.83,
+   "live_change": -0.29,
+   "live_snapshot": "15:34:58",
+   "live_amount": 721430344.0
   },
   {
    "code": "600602",
@@ -482,7 +671,13 @@
     "反弹",
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 20.15,
+   "live_pct": -1.994,
+   "live_prev_close": 20.56,
+   "live_change": -0.41,
+   "live_snapshot": "15:34:58",
+   "live_amount": 1661308092.0
   },
   {
    "code": "002115",
@@ -498,7 +693,13 @@
     "反弹01",
     "短线选股",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 12.08,
+   "live_pct": -0.658,
+   "live_prev_close": 12.16,
+   "live_change": -0.08,
+   "live_snapshot": "15:35:45",
+   "live_amount": 759111780.0
   },
   {
    "code": "000672",
@@ -512,7 +713,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 14.7,
+   "live_pct": 5.832,
+   "live_prev_close": 13.89,
+   "live_change": 0.81,
+   "live_snapshot": "15:36:00",
+   "live_amount": 333764660.0
   },
   {
    "code": "605580",
@@ -526,7 +733,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 18.98,
+   "live_pct": 4.0,
+   "live_prev_close": 18.25,
+   "live_change": 0.73,
+   "live_snapshot": "15:34:58",
+   "live_amount": 98659595.0
   },
   {
    "code": "000811",
@@ -540,7 +753,13 @@
    "categories": [
     "强势股",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 45.09,
+   "live_pct": 10.002,
+   "live_prev_close": 40.99,
+   "live_change": 4.1,
+   "live_snapshot": "15:35:45",
+   "live_amount": 1860985732.0
   },
   {
    "code": "600313",
@@ -554,7 +773,13 @@
    "categories": [
     "强势股",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 6.16,
+   "live_pct": 10.0,
+   "live_prev_close": 5.6,
+   "live_change": 0.56,
+   "live_snapshot": "15:34:58",
+   "live_amount": 354317481.0
   },
   {
    "code": "600707",
@@ -568,7 +793,13 @@
    "categories": [
     "超跌反弹",
     "选股交集"
-   ]
+   ],
+   "live_price": 9.82,
+   "live_pct": 5.478,
+   "live_prev_close": 9.31,
+   "live_change": 0.51,
+   "live_snapshot": "15:34:58",
+   "live_amount": 1567206427.0
   },
   {
    "code": "002993",
@@ -582,7 +813,13 @@
    "categories": [
     "超跌反弹",
     "选股交集"
-   ]
+   ],
+   "live_price": 40.9,
+   "live_pct": 4.872,
+   "live_prev_close": 39.0,
+   "live_change": 1.9,
+   "live_snapshot": "15:35:30",
+   "live_amount": 260916667.0
   },
   {
    "code": "000737",
@@ -596,7 +833,13 @@
    "categories": [
     "强势股",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 14.95,
+   "live_pct": 10.007,
+   "live_prev_close": 13.59,
+   "live_change": 1.36,
+   "live_snapshot": "15:36:00",
+   "live_amount": 2020297260.0
   },
   {
    "code": "002364",
@@ -610,7 +853,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 45.58,
+   "live_pct": 1.289,
+   "live_prev_close": 45.0,
+   "live_change": 0.58,
+   "live_snapshot": "15:35:30",
+   "live_amount": 3847468849.0
   },
   {
    "code": "603661",
@@ -624,7 +873,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 33.06,
+   "live_pct": 3.701,
+   "live_prev_close": 31.88,
+   "live_change": 1.18,
+   "live_snapshot": "15:34:58",
+   "live_amount": 131887637.0
   },
   {
    "code": "000521",
@@ -639,7 +894,13 @@
     "反弹",
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 4.9,
+   "live_pct": 0.41,
+   "live_prev_close": 4.88,
+   "live_change": 0.02,
+   "live_snapshot": "15:35:45",
+   "live_amount": 22952947.0
   },
   {
    "code": "600962",
@@ -654,7 +915,13 @@
     "反弹01",
     "短线选股",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 26.31,
+   "live_pct": 2.214,
+   "live_prev_close": 25.74,
+   "live_change": 0.57,
+   "live_snapshot": "15:34:58",
+   "live_amount": 207200682.0
   },
   {
    "code": "002025",
@@ -669,7 +936,13 @@
     "反弹",
     "超跌反弹",
     "选股交集"
-   ]
+   ],
+   "live_price": 65.16,
+   "live_pct": 1.464,
+   "live_prev_close": 64.22,
+   "live_change": 0.94,
+   "live_snapshot": "15:35:30",
+   "live_amount": 834248992.0
   },
   {
    "code": "600127",
@@ -683,7 +956,13 @@
    "categories": [
     "强势股",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 6.46,
+   "live_pct": 10.051,
+   "live_prev_close": 5.87,
+   "live_change": 0.59,
+   "live_snapshot": "15:34:58",
+   "live_amount": 246088299.0
   },
   {
    "code": "002292",
@@ -700,7 +979,13 @@
     "反弹01",
     "短线选股",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 8.38,
+   "live_pct": 1.576,
+   "live_prev_close": 8.25,
+   "live_change": 0.13,
+   "live_snapshot": "15:35:45",
+   "live_amount": 300473226.0
   },
   {
    "code": "002329",
@@ -714,7 +999,13 @@
    "categories": [
     "短线选股",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 4.36,
+   "live_pct": 2.108,
+   "live_prev_close": 4.27,
+   "live_change": 0.09,
+   "live_snapshot": "15:35:30",
+   "live_amount": 912973206.0
   },
   {
    "code": "301008",
@@ -728,7 +1019,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 40.92,
+   "live_pct": 4.762,
+   "live_prev_close": 39.06,
+   "live_change": 1.86,
+   "live_snapshot": "15:35:30",
+   "live_amount": 625325611.0
   },
   {
    "code": "300811",
@@ -742,7 +1039,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 80.48,
+   "live_pct": 2.955,
+   "live_prev_close": 78.17,
+   "live_change": 2.31,
+   "live_snapshot": "15:35:00",
+   "live_amount": 928463056.0
   },
   {
    "code": "688981",
@@ -756,7 +1059,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 136.76,
+   "live_pct": 2.928,
+   "live_prev_close": 132.87,
+   "live_change": 3.89,
+   "live_snapshot": "15:34:58",
+   "live_amount": 9164498726.0
   },
   {
    "code": "300189",
@@ -770,7 +1079,13 @@
    "categories": [
     "强势股",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 5.19,
+   "live_pct": 11.135,
+   "live_prev_close": 4.67,
+   "live_change": 0.52,
+   "live_snapshot": "15:35:30",
+   "live_amount": 1528816143.0
   },
   {
    "code": "300174",
@@ -784,7 +1099,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 21.15,
+   "live_pct": 2.026,
+   "live_prev_close": 20.73,
+   "live_change": 0.42,
+   "live_snapshot": "15:35:15",
+   "live_amount": 405763615.0
   },
   {
    "code": "300191",
@@ -799,7 +1120,13 @@
     "反弹",
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 33.35,
+   "live_pct": 4.154,
+   "live_prev_close": 32.02,
+   "live_change": 1.33,
+   "live_snapshot": "15:35:00",
+   "live_amount": 446254033.0
   },
   {
    "code": "688293",
@@ -814,7 +1141,13 @@
     "反弹01",
     "短线选股",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 66.5,
+   "live_pct": 0.196,
+   "live_prev_close": 66.37,
+   "live_change": 0.13,
+   "live_snapshot": "15:34:58",
+   "live_amount": 316747597.0
   },
   {
    "code": "688662",
@@ -828,7 +1161,13 @@
    "categories": [
     "超跌反弹",
     "选股交集"
-   ]
+   ],
+   "live_price": 107.91,
+   "live_pct": 9.665,
+   "live_prev_close": 98.4,
+   "live_change": 9.51,
+   "live_snapshot": "15:34:58",
+   "live_amount": 2093815303.0
   },
   {
    "code": "688388",
@@ -843,7 +1182,13 @@
     "反弹",
     "超跌反弹",
     "选股交集"
-   ]
+   ],
+   "live_price": 31.15,
+   "live_pct": 7.266,
+   "live_prev_close": 29.04,
+   "live_change": 2.11,
+   "live_snapshot": "15:34:58",
+   "live_amount": 1113911273.0
   },
   {
    "code": "688396",
@@ -857,7 +1202,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 63.13,
+   "live_pct": 3.952,
+   "live_prev_close": 60.73,
+   "live_change": 2.4,
+   "live_snapshot": "15:34:58",
+   "live_amount": 1279491411.0
   },
   {
    "code": "300679",
@@ -872,7 +1223,13 @@
     "p3_other_4",
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 51.17,
+   "live_pct": 20.005,
+   "live_prev_close": 42.64,
+   "live_change": 8.53,
+   "live_snapshot": "15:35:30",
+   "live_amount": 1774712442.0
   },
   {
    "code": "301132",
@@ -887,7 +1244,13 @@
     "反弹",
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 38.37,
+   "live_pct": 8.024,
+   "live_prev_close": 35.52,
+   "live_change": 2.85,
+   "live_snapshot": "15:35:45",
+   "live_amount": 236465929.0
   },
   {
    "code": "688046",
@@ -901,7 +1264,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 40.18,
+   "live_pct": -0.79,
+   "live_prev_close": 40.5,
+   "live_change": -0.32,
+   "live_snapshot": "15:34:58",
+   "live_amount": 683198673.0
   },
   {
    "code": "300779",
@@ -916,7 +1285,13 @@
     "反弹",
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 75.66,
+   "live_pct": -1.098,
+   "live_prev_close": 76.5,
+   "live_change": -0.84,
+   "live_snapshot": "15:35:30",
+   "live_amount": 1457555566.0
   },
   {
    "code": "688535",
@@ -930,7 +1305,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 111.72,
+   "live_pct": 5.976,
+   "live_prev_close": 105.42,
+   "live_change": 6.3,
+   "live_snapshot": "15:34:58",
+   "live_amount": 830257230.0
   },
   {
    "code": "300576",
@@ -944,7 +1325,13 @@
    "categories": [
     "超跌反弹",
     "选股交集"
-   ]
+   ],
+   "live_price": 33.13,
+   "live_pct": 3.177,
+   "live_prev_close": 32.11,
+   "live_change": 1.02,
+   "live_snapshot": "15:35:15",
+   "live_amount": 665260125.0
   },
   {
    "code": "688002",
@@ -958,7 +1345,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 168.78,
+   "live_pct": 1.669,
+   "live_prev_close": 166.01,
+   "live_change": 2.77,
+   "live_snapshot": "15:34:58",
+   "live_amount": 1962918096.0
   },
   {
    "code": "300726",
@@ -972,7 +1365,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 57.5,
+   "live_pct": 3.047,
+   "live_prev_close": 55.8,
+   "live_change": 1.7,
+   "live_snapshot": "15:35:45",
+   "live_amount": 796854983.0
   },
   {
    "code": "688711",
@@ -986,7 +1385,13 @@
    "categories": [
     "超跌反弹",
     "选股交集"
-   ]
+   ],
+   "live_price": 27.11,
+   "live_pct": 5.159,
+   "live_prev_close": 25.78,
+   "live_change": 1.33,
+   "live_snapshot": "15:34:58",
+   "live_amount": 250112506.0
   },
   {
    "code": "688603",
@@ -1000,7 +1405,13 @@
    "categories": [
     "反弹01",
     "超跌反弹"
-   ]
+   ],
+   "live_price": 118.96,
+   "live_pct": 7.413,
+   "live_prev_close": 110.75,
+   "live_change": 8.21,
+   "live_snapshot": "15:34:58",
+   "live_amount": 764092290.0
   }
  ]
 }
