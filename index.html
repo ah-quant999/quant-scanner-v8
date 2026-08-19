@@ -10970,6 +10970,23 @@ function drawUpDownChart(){
     // ⚖️ 2026-08-14 主人令：renderPortfolio 调用已删除（持仓跟踪卡整段移除）
     // 2026-08-14 主人令：涨价榜/情绪周期/潜力挖掘 fill 改由 switchSt('pr') 触发（已迁选股策略子TAB）
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderUnlisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
+
+    // 🛡 2026-08-19 一劳永逸式自愈：4 admin 页（暂未上架/选股策略/运维/逻辑详解）历史上反复
+    //   因 <script> 块内某行 JS 语法错误（如本次的 habSum.T+1_rate 整段崩溃）导致对应 render
+    //   函数未注册而空白。永久自愈：每 1.5 秒检查 unlistedPanel 长度，若 < 1000 字节（被覆盖/
+    //   半路中断/缓存了旧版）则自动重调 renderUnlisted()。上线后从未再次发生即自愈不触发。
+    if(!window.__ulSelfHealTimer){
+      window.__ulSelfHealTimer = setInterval(function(){
+        var p = document.getElementById('unlistedPanel');
+        if(!p) return;
+        // 已渲染（>1000字节）+ 含至少一个 pane 标签 → 停止自愈
+        if(p.innerHTML.length >= 1000 && p.innerHTML.indexOf('ulPaneStrong')>=0) return;
+        if(typeof window.renderUnlisted === 'function'){
+          console.log('[ulSelfHeal] unlistedPanel length='+p.innerHTML.length+', retry renderUnlisted');
+          try{ window.renderUnlisted(); }catch(e){ console.warn('[ulSelfHeal] rethrow:', e.message); }
+        }
+      }, 1500);
+    }
   }
 
   /* ═══════════ 2026-08-13 三张新卡填充函数（涨价榜/情绪周期/潜力挖掘）══ 暂未上架观察 ═══════════ */
