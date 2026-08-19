@@ -12,7 +12,7 @@
 #
 # 用法：python cloud_dispatcher.py
 # 依赖：环境变量 GITHUB_TOKEN（workflow 注入）；无需第三方库（纯 urllib）。
-import os, sys, json, urllib.request, urllib.error, datetime
+import os, sys, json, re, urllib.request, urllib.error, datetime
 
 try:
     if hasattr(sys.stdout, "reconfigure"):
@@ -67,6 +67,60 @@ def dispatch(wf_file, inputs=None):
     else:
         print(f"  ❌ 派发 {wf_file} 失败")
 
+# 3) 动量共识筛选重算（2026-08-19 一劳永逸修复）：
+#    MOMENTUM_FILTER 候选清单由 OCR 标签(超跌反弹/consec_before/stage)驱动，属【日频信号】，
+#    盘中重算内容不变(--emit-js 幂等跳过)，故不可用「盘中陈旧分钟」判定。真正的触发条件是
+#    主人喂入新盘后选股 PDF → OCR 更新 STOCK_MOMENTUM_STATE_V2.js（其最大 date > MOMENTUM_FILTER.generated
+#    日期）→ 派发 v8_algo_intraday_lite.yml 重算。OCR 可出现在任意时刻（不限于盘中），故不作窗口限制。
+REPO_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
+MOMENTUM_LITE_WF = "v8_algo_intraday_lite.yml"
+MOMENTUM_LITE_COOLDOWN_MIN = 120
+
+def _first_date(s):
+    """从字符串提取首个 YYYY-MM-DD（generated/date 通用）。"""
+    m = re.search(r"(\d{4}-\d{2}-\d{2})", s or "")
+    return m.group(1) if m else None
+
+def _momentum_filter_needs_recompute():
+    """有新 OCR 输入(OCR 源最大 date > filter 生成日期)或 filter 缺失 → 需重算。"""
+    f = os.path.join(REPO_ROOT, "data", "MOMENTUM_FILTER.js")
+    s = os.path.join(REPO_ROOT, "data", "STOCK_MOMENTUM_STATE_V2.js")
+    if not os.path.exists(f):
+        return True, "MOMENTUM_FILTER.js 缺失"
+    if not os.path.exists(s):
+        return False, "STOCK_MOMENTUM_STATE_V2.js 缺失(无 OCR 源，无法判定)"
+    try:
+        fsrc = open(f, encoding="utf-8").read()
+        ssrc = open(s, encoding="utf-8").read()
+        mg = re.search(r'["\']generated["\']\s*:\s*["\']([\d-]+)', fsrc)
+        fg = _first_date(mg.group(1)) if mg else None
+        dates = re.findall(r'["\']date["\']\s*:\s*["\'](\d{4}-\d{2}-\d{2})', ssrc)
+        sd = max(dates) if dates else None
+        if not fg:
+            return True, "MOMENTUM_FILTER 无法解析 generated"
+        if sd and sd > fg:
+            return True, "新 OCR 输入(源 %s > filter %s)" % (sd, fg)
+        return False, "无新 OCR 输入(源 %s 未超过 filter %s)" % (sd, fg)
+    except Exception as e:
+        return True, "解析异常: " + str(e)
+
+def dispatch_momentum_intraday(now):
+    need, why = _momentum_filter_needs_recompute()
+    if not need:
+        print("  动量轻量: " + why + "，跳过")
+        return
+    # 冷却：最近冷却窗口内已成功跑过则跳过（防 30 分轮询频派发）
+    lr = latest_run(MOMENTUM_LITE_WF)
+    if lr:
+        created, concl = lr
+        ct = datetime.datetime.fromisoformat(created.replace("Z", "+00:00")).astimezone(CST)
+        ago = (now - ct).total_seconds() / 60.0
+        if concl == "success" and ago <= MOMENTUM_LITE_COOLDOWN_MIN:
+            print("  动量轻量: %s 成功于 %s(%.0f分钟前)，冷却跳过" % (MOMENTUM_LITE_WF, ct.strftime("%H:%M"), ago))
+            return
+    print("  动量轻量: " + why + "，派发 " + MOMENTUM_LITE_WF)
+    dispatch(MOMENTUM_LITE_WF)
+
 def main():
     now = datetime.datetime.now(CST)
     print(f"🛰️ 云端兜底调度器 @ {now.strftime('%Y-%m-%d %H:%M CST')}")
@@ -101,6 +155,9 @@ def main():
             dispatch("v8_algo_cloud.yml")
     else:
         print(f"  算法链: 当前 {now.hour}:xx 未到 18:00，跳过（等盘后 LHB 发布）")
+
+    # 3) 动量共识筛选重算（新 OCR 输入触发 + 冷却）
+    dispatch_momentum_intraday(now)
 
     print("🛰️ 兜底调度完成")
 

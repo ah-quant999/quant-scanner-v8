@@ -7,6 +7,7 @@ v8 自愈监控闭环（self_heal_monitor.py）
 
   P0-1: candidate.json 丢失「观澜台」源 → 自动拉取观澜台数据并入 + push
   P0-2: STOCK_MOMENTUM_STATE.js 陈旧 >1 个交易日 → 已知遗留（WARN 留痕，免告警；需主人提供 PDF 做 OCR，见 MOMENTUM_MANUAL_DEPENDENCY）
+  P0-3: MOMENTUM_FILTER.js（动量共识筛选卡源，OCR 驱动日频信号）新鲜度确认：缺失/解析失败=FAIL（真异常）；OCR 源比 filter 新=有新 PDF 待重算 WARN 留痕（dispatcher 应已派发）；其余=OK（日频信号陈旧非异常）。本机不 push（云端 cloud_dispatcher/算法链为修复方）
   P1-1: zsxq_token 缺失/失效 → 告警（需用户补 token）
 
 退出码：
@@ -46,6 +47,7 @@ ZSXQ_TOKEN_FILE = ROOT / "data" / "zsxq_token.json"
 # 关键数据文件
 CANDIDATE_FILE = RAW_DIR / "candidate.json"
 MOMENTUM_FILE = DATA_DIR / "STOCK_MOMENTUM_STATE.js"
+MOMENTUM_FILTER_FILE = DATA_DIR / "MOMENTUM_FILTER.js"
 GUANLAN_WATCHLIST = OUT_DIR / "guanlan_watchlist.json"
 
 # STOCK_MOMENTUM_STATE 最大允许陈旧天数
@@ -295,6 +297,36 @@ def check_momentum_state():
         return False, None, 999, "解析错误: " + str(e)
 
 
+# ── P0-3: MOMENTUM_FILTER.js（动量共识筛选卡源）新鲜度 ──
+# 2026-08-19 一劳永逸修复：该卡原被主人投诉「好几天没动静」。根因并非盘中刷新问题，而是：
+#   ① 候选清单完全由 OCR 标签(超跌反弹/consec_before/stage)驱动，属【日频信号】，intraday 重算内容不变；
+#   ② momentum_common_filter.py 此前不在任何自动链，OCR 输入更新后卡永不重算。
+# 现修复：cloud_dispatcher.py 检测「新 OCR 输入」派发 v8_algo_intraday_lite.yml 即时重算 +
+#   algorithms/emit_momentum_filter.py 随盘后算法链每晚 18:30 兜底重算（两路互补）。
+# 本检查负责「跟踪确认」：缺失/解析失败=真异常(FAIL)；OCR 源比 filter 新=有新 PDF 待重算(WARN 留痕，
+#   dispatcher 应已派发)；其余=OK（日频信号，陈旧本身非异常）。本机不直接 push（云端为修复方）。
+def check_momentum_filter():
+    if not MOMENTUM_FILTER_FILE.exists():
+        return "fail", None, 99999, "FILE_MISSING"
+    try:
+        fsrc = open(MOMENTUM_FILTER_FILE, encoding="utf-8").read()
+        mg = re.search(r'["\']generated["\']\s*:\s*["\'](\d{4}-\d{2}-\d{2})', fsrc)
+        fg = mg.group(1) if mg else None
+        if not fg:
+            return "fail", None, 99999, "无法解析 generated"
+        # OCR 源(STOCK_MOMENTUM_STATE_V2)最大 date 比 filter 生成日期新 → 有新 PDF 输入尚未重算
+        s = MOMENTUM_FILTER_FILE.parent / "STOCK_MOMENTUM_STATE_V2.js"
+        if s.exists():
+            ssrc = open(s, encoding="utf-8").read()
+            dates = re.findall(r'["\']date["\']\s*:\s*["\'](\d{4}-\d{2}-\d{2})', ssrc)
+            sd = max(dates) if dates else None
+            if sd and sd > fg:
+                return "warn", fg, 0, "有新 OCR 输入(源%s>filter%s)待重算(dispatcher应已派发v8_algo_intraday_lite)"
+        return "ok", fg, 0, "generated=%s (OCR驱动日频信号, 新PDF输入后自动重算)" % fg
+    except Exception as e:
+        return "fail", None, 99999, "解析错误: " + str(e)
+
+
 # ── P1-1: zsxq_token 检查 ───────────────────────────────
 
 def check_zsxq_token():
@@ -334,8 +366,20 @@ def run_check_only():
     icon = "OK" if tok_ok else "FAIL"
     log("[" + icon + "] zsxq_token: " + tok_det)
 
-    # momentum 陈旧属已知人工依赖，不计入整体 FAIL 判定
-    all_ok = all(v["ok"] for k, v in results.items() if k != "momentum_state")
+    # P0-3: 动量共识筛选卡源新鲜度（盘中窗口陈旧→WARN 留痕；缺失/解析失败→FAIL）
+    mf_status, mf_gen, mf_age, mf_det = check_momentum_filter()
+    results["momentum_filter"] = {"ok": mf_status != "fail", "status": mf_status,
+                                   "detail": mf_det, "generated": mf_gen, "age_min": mf_age}
+    if mf_status == "fail":
+        log("[FAIL] MOMENTUM_FILTER.js: " + mf_det, "FAIL")
+    elif mf_status == "warn":
+        log("[WARN] MOMENTUM_FILTER.js: " + mf_det, "WARN")
+    else:
+        log("[OK] MOMENTUM_FILTER.js: " + mf_det, "OK")
+
+    # momentum 陈旧属已知人工依赖、动量共识盘中陈旧属 WARN 留痕，均不计入整体 FAIL 判定
+    all_ok = all(v["ok"] for k, v in results.items()
+                 if k not in ("momentum_state", "momentum_filter"))
     if all_ok:
         log("=== 全部正常（含已知遗留 WARN）===", "PASS")
         return 0
@@ -387,6 +431,21 @@ def run_heal(json_output=False):
     else:
         log("[OK] P0-2: STOCK_MOMENTUM_STATE.js 新鲜 (" + det2 + ")", "OK")
         heal_results["momentum_state"] = {"ok": True, "message": det2}
+
+    # P0-3: 动量共识筛选卡源新鲜度（云端盘中刷新为修复方，本机仅检测+留痕，不直接 push）
+    mf_status, mf_gen, mf_age, mf_det = check_momentum_filter()
+    if mf_status == "fail":
+        log("[FAIL] P0-3: MOMENTUM_FILTER.js 真异常! " + mf_det, "FAIL")
+        heal_results["momentum_filter"] = {"ok": False, "message": mf_det}
+        actions_taken.append("MOMENTUM_FILTER 异常: " + mf_det)
+        exit_code = max(exit_code, 2)
+    elif mf_status == "warn":
+        log("[WARN] P0-3: MOMENTUM_FILTER.js 有新 OCR 待重算(留痕): " + mf_det, "WARN")
+        heal_results["momentum_filter"] = {"ok": True, "known_cloud_dependency": True, "message": mf_det}
+        actions_taken.append("MOMENTUM_FILTER 新OCR待重算: " + mf_det)
+    else:
+        log("[OK] P0-3: MOMENTUM_FILTER.js 新鲜 (" + mf_det + ")", "OK")
+        heal_results["momentum_filter"] = {"ok": True, "message": mf_det}
 
     # P1-1
     tok_ok, tok_det = check_zsxq_token()
