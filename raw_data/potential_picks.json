@@ -1,19 +1,19 @@
 {
-  "update_time": "2026-08-19 13:43:38",
+  "update_time": "2026-08-19 13:58:13",
   "data_date": "2026-08-19",
   "source": "CONCEPT_RANKING × STOCK_PROFILE × STOCK_QUOTE",
   "hot_concepts_count": 33,
   "hot_concepts": [
     "煤化工概念",
-    "红利股",
-    "红利破净股",
     "租售同权",
     "净水概念",
+    "红利股",
     "宠物经济",
-    "页岩气",
+    "红利破净股",
+    "啤酒概念",
     "代糖概念",
-    "价值股",
-    "啤酒概念"
+    "B股",
+    "环氧丙烷"
   ],
   "picks": [
     {
@@ -25,7 +25,41 @@
         "煤化工概念"
       ],
       "hot_count": 1,
-      "total_score": 6.2
+      "total_score": 6.14
+    },
+    {
+      "code": "600309",
+      "name": "万华化学",
+      "pct": 0.12,
+      "amount_yi": 21.01,
+      "hot_concepts": [
+        "煤化工概念",
+        "环氧丙烷"
+      ],
+      "hot_count": 2,
+      "total_score": 5.04
+    },
+    {
+      "code": "603538",
+      "name": "美诺华",
+      "pct": 3.08,
+      "amount_yi": 22.59,
+      "hot_concepts": [
+        "宠物经济"
+      ],
+      "hot_count": 1,
+      "total_score": 4.85
+    },
+    {
+      "code": "605589",
+      "name": "圣泉集团",
+      "pct": 3.58,
+      "amount_yi": 23.39,
+      "hot_concepts": [
+        "代糖概念"
+      ],
+      "hot_count": 1,
+      "total_score": 4.72
     },
     {
       "code": "600123",
@@ -38,7 +72,18 @@
         "红利股"
       ],
       "hot_count": 3,
-      "total_score": 5.95
+      "total_score": 4.69
+    },
+    {
+      "code": "000933",
+      "name": "神火股份",
+      "pct": 2.83,
+      "amount_yi": 11.11,
+      "hot_concepts": [
+        "煤化工概念"
+      ],
+      "hot_count": 1,
+      "total_score": 4.65
     },
     {
       "code": "600997",
@@ -51,7 +96,19 @@
         "红利股"
       ],
       "hot_count": 3,
-      "total_score": 5.82
+      "total_score": 4.57
+    },
+    {
+      "code": "601088",
+      "name": "中国神华",
+      "pct": 0.16,
+      "amount_yi": 9.52,
+      "hot_concepts": [
+        "煤化工概念",
+        "红利股"
+      ],
+      "hot_count": 2,
+      "total_score": 4.51
     },
     {
       "code": "600985",
@@ -65,91 +122,7 @@
         "红利股"
       ],
       "hot_count": 4,
-      "total_score": 5.81
-    },
-    {
-      "code": "601166",
-      "name": "兴业银行",
-      "pct": -1.11,
-      "amount_yi": 16.93,
-      "hot_concepts": [
-        "红利破净股",
-        "红利股"
-      ],
-      "hot_count": 2,
-      "total_score": 5.28
-    },
-    {
-      "code": "601088",
-      "name": "中国神华",
-      "pct": 0.16,
-      "amount_yi": 9.52,
-      "hot_concepts": [
-        "煤化工概念",
-        "红利股"
-      ],
-      "hot_count": 2,
-      "total_score": 5.21
-    },
-    {
-      "code": "601288",
-      "name": "农业银行",
-      "pct": -0.15,
-      "amount_yi": 15.7,
-      "hot_concepts": [
-        "红利破净股",
-        "红利股"
-      ],
-      "hot_count": 2,
-      "total_score": 5.16
-    },
-    {
-      "code": "600309",
-      "name": "万华化学",
-      "pct": 0.12,
-      "amount_yi": 21.01,
-      "hot_concepts": [
-        "煤化工概念",
-        "环氧丙烷"
-      ],
-      "hot_count": 2,
-      "total_score": 5.08
-    },
-    {
-      "code": "600188",
-      "name": "兖矿能源",
-      "pct": -0.45,
-      "amount_yi": 8.57,
-      "hot_concepts": [
-        "煤化工概念",
-        "红利股"
-      ],
-      "hot_count": 2,
-      "total_score": 5.04
-    },
-    {
-      "code": "601939",
-      "name": "建设银行",
-      "pct": 0.59,
-      "amount_yi": 10.86,
-      "hot_concepts": [
-        "红利破净股",
-        "红利股"
-      ],
-      "hot_count": 2,
-      "total_score": 4.97
-    },
-    {
-      "code": "000830",
-      "name": "鲁西化工",
-      "pct": 0.84,
-      "amount_yi": 2.7,
-      "hot_concepts": [
-        "煤化工概念",
-        "红利股"
-      ],
-      "hot_count": 2,
-      "total_score": 4.87
+      "total_score": 4.37
     },
     {
       "code": "002556",
@@ -162,46 +135,71 @@
         "煤化工概念"
       ],
       "hot_count": 3,
-      "total_score": 4.81
+      "total_score": 4.35
     },
     {
-      "code": "603538",
-      "name": "美诺华",
-      "pct": 3.08,
-      "amount_yi": 22.59,
+      "code": "600188",
+      "name": "兖矿能源",
+      "pct": -0.45,
+      "amount_yi": 8.57,
       "hot_concepts": [
-        "宠物经济"
+        "煤化工概念",
+        "红利股"
+      ],
+      "hot_count": 2,
+      "total_score": 4.33
+    },
+    {
+      "code": "001696",
+      "name": "宗申动力",
+      "pct": 4.72,
+      "amount_yi": 15.48,
+      "hot_concepts": [
+        "交运设备"
       ],
       "hot_count": 1,
-      "total_score": 4.73
+      "total_score": 4.19
     },
     {
-      "code": "605589",
-      "name": "圣泉集团",
-      "pct": 3.58,
-      "amount_yi": 23.39,
+      "code": "000830",
+      "name": "鲁西化工",
+      "pct": 0.84,
+      "amount_yi": 2.7,
       "hot_concepts": [
-        "代糖概念"
+        "煤化工概念",
+        "红利股"
       ],
-      "hot_count": 1,
-      "total_score": 4.71
+      "hot_count": 2,
+      "total_score": 4.17
     },
     {
-      "code": "000933",
-      "name": "神火股份",
-      "pct": 2.83,
-      "amount_yi": 11.11,
+      "code": "600227",
+      "name": "赤天化",
+      "pct": 3.02,
+      "amount_yi": 4.72,
       "hot_concepts": [
         "煤化工概念"
       ],
       "hot_count": 1,
-      "total_score": 4.71
+      "total_score": 4.11
+    },
+    {
+      "code": "601166",
+      "name": "兴业银行",
+      "pct": -1.11,
+      "amount_yi": 16.93,
+      "hot_concepts": [
+        "红利破净股",
+        "红利股"
+      ],
+      "hot_count": 2,
+      "total_score": 4.09
     }
   ],
   "rejected_summary": {
-    "no_hot_concept": 4155,
-    "too_hot": 37,
-    "too_cold": 9,
+    "no_hot_concept": 4181,
+    "too_hot": 34,
+    "too_cold": 6,
     "small_mv": 0,
     "big_mv": 0,
     "no_quote": 0
