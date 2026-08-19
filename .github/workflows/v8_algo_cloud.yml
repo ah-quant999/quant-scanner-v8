@@ -78,6 +78,12 @@ jobs:
       # 观澜台(知识星球) token：与小九本地 data/zsxq_token.json 同值。
       # 设置路径：GitHub 仓库 → Settings → Secrets → Actions → ZSXQ_TOKEN
       ZSXQ_TOKEN: ${{ secrets.ZSXQ_TOKEN }}
+      # 🛡 2026-08-19 一劳永逸根因修复：cn runner 默认 GBK 终端，algorithms/* 270 处 print 含 emoji
+      # （📅✅❌⚠️🔗💹🌐…）全部会 UnicodeEncodeError crash，整条 18:30 盘后算法链 0 执行，
+      # 17 张盘后/选股卡停在 08:27 红卡。PYTHONIOENCODING=utf-8 是 Python 官方做法，
+      # 对所有 print/file-open/f-string 一刀切彻底免疫，不需逐脚本 reconfigure。
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
     defaults:
       run:
         shell: bash

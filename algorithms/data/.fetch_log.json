@@ -17,7 +17,7 @@
   },
   "fetch_lhb": {
     "consecutive_failures": 0,
-    "last_success": "2026-08-19 15:41:38",
+    "last_success": "2026-08-19 16:04:48",
     "last_error": null
   },
   "fetch_maharo_signals": {
