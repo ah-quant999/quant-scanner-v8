@@ -106,15 +106,21 @@ def main():
     ladder_dist = {int(k): int(v) for k, v in ladder.items()}
     ladder_dist = dict(sorted(ladder_dist.items()))
 
-    # 昨日涨停家数：sectors[0] 是当日，[1] 是昨日（如果 sectors 是日期排序）
-    # 但 LIMIT_UP_HEATMAP.sectors 是 [{name, data:[10日]}, ...]，data 是最近 10 日
-    # 用 sectors[0].data[-1] 当昨日，[0] 当 2 日前。最新一日是今日
+    # 昨日全市场涨停总数 = 所有板块昨日涨停数之和
+    # 注意：sectors 是板块列表（非按日期排），每个 s.data 是该板块近 10 日涨停家数序列
+    # 取所有板块 data[-2]（昨日）求和 = 全市场昨日总数（口径：LIMIT_UP_HEATMAP 注 "近10日板块涨停家数"）
     prev_total = None
-    if sectors and len(sectors) > 0:
-        first = sectors[0]
-        data = first.get("data", []) if isinstance(first, dict) else []
-        if len(data) >= 2:
-            prev_total = data[-2]  # 昨日
+    if sectors:
+        yesterday_vals = []
+        for s in sectors:
+            d = s.get("data", []) if isinstance(s, dict) else []
+            if len(d) >= 2:
+                try:
+                    yesterday_vals.append(int(d[-2]))
+                except (TypeError, ValueError):
+                    pass
+        if yesterday_vals:
+            prev_total = sum(yesterday_vals)
 
     phase, score, color, advice, delta_pct = calc_phase(total, max_ladder, ladder_dist, prev_total)
 
