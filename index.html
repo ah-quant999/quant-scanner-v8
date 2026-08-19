@@ -8768,7 +8768,11 @@ function drawUpDownChart(){
 
           {name:'运维常态巡检 (v8_ops_self_heal)', source:'HEALTH_CHECK', freq:'每30分(云端cron)', slots:['00:30','01:00','01:30','02:00','02:30','03:00','03:30','04:00','04:30','05:00','05:30','06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00','22:30','23:00','23:30'], note:'v8_health_check.py --heal 全站42卡巡检+自动治愈 · 纯云端不依赖小九/阿狸咪'},
 
-          {name:'☁️ 持仓云端同步 (westock)', source:'PORTFOLIO_DATA', freq:'盘中每30分', slots:['09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'westock 双机同步·实时持仓成本（操作信号面板②维止损锚点）'}
+          {name:'☁️ 持仓云端同步 (westock)', source:'PORTFOLIO_DATA', freq:'盘中每30分', slots:['09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'westock 双机同步·实时持仓成本（操作信号面板②维止损锚点）',
+            // 🛡 2026-08-19 一劳永逸：westock 源可能未接入（用户没开云端联结）→ 整行不报红叉，免误报
+            //   sourceMissing → renderTaskSchedule 显示「待配置」灰槽而非 ✗
+            sourceMissing: true,
+          }
 
         ]
 
@@ -8872,10 +8876,14 @@ function drawUpDownChart(){
         // 拆分后取任一存在的 window 变量；否则该卡永远读不到 update_time，全 slot 标红。
         const srcCandidates = String(c.source || '').split('/').map(function(s){return s.trim();}).filter(Boolean);
         let data = {};
+        let dataFound = false;
         for (let i=0;i<srcCandidates.length;i++){
           const src = srcCandidates[i];
-          if (window[src]) { data = window[src]; break; }
+          if (window[src]) { data = window[src]; dataFound = true; break; }
         }
+        // 🛡 2026-08-19 一劳永逸：sourceMissing 卡（如 westock 双机同 步）未接入即视为
+        //   「待配置」而非 ❌红叉，整行一致灰槽，避免误导"全部漏跑"。
+        const sourceMissing = dataFound === false && c.sourceMissing === true;
 
         // 字段兼容：RUNNER_STATUS_HEALTH 用 checked_at_bj（非 update_time），
         // 其余卡用 update_time/last_update/run_time/updated（2026-08-06 红叉审计修复）
@@ -8884,7 +8892,8 @@ function drawUpDownChart(){
 
         const lastTs = parseTs(_tsRaw);
 
-        const lastStr = lastTs && isToday(lastTs) ? fmtHm(lastTs) : (lastTs ? '昨日' : '无');
+        // 🛡 2026-08-19 一劳永逸：sourceMissing 卡显示「待配置」而非「无」（避免误导）
+        const lastStr = sourceMissing ? '待配置' : (lastTs && isToday(lastTs) ? fmtHm(lastTs) : (lastTs ? '昨日' : '无'));
 
         const hasDataToday = lastTs && isToday(lastTs);
 
@@ -8921,6 +8930,12 @@ function drawUpDownChart(){
 
           let ok = false;
 
+          // 🛡 2026-08-19 一劳永逸：sourceMissing 卡（如 westock 双机同步）源未接入 → 全槽统一「待配置」灰，不报红叉
+          if(sourceMissing){
+            slotsHtml += '<span title="'+s+'" style="display:inline-block;min-width:32px;text-align:center;padding:2px 4px;border-radius:3px;background:rgba(255,255,255,.05);color:var(--dim);border:1px solid var(--border);font-size:10px;margin:0 2px 2px 0;">待</span>';
+            cPending++;
+            return;
+          }
           if(isPast && hasDataToday){
 
             // 该时段已到期：数据更新时间不早于「时段起点 - 前置宽容」视为新鲜。
@@ -9079,6 +9094,21 @@ function drawUpDownChart(){
     if(!body) return;
 
     const H = window.HEALTH_CHECK || {};
+
+    // 🛡 2026-08-19 一劳永逸：OCR 依赖文件白名单（与 v8_health_check._OCR_DEPENDENCY_FILES 双保险）
+    // MOMENTUM_FILTER / STOCK_MOMENTUM_STATE / V2：陈旧=预期（待主人 PDF OCR），
+    // 另有 H_AUTO_BUY_TRACK：track_h_auto_buy.py 已修顶层时戳，如再有异常仍显示而非"缺审口径"。
+    const _OCR_DEPENDENCY_IDS = new Set([
+      "all_MOMENTUM_FILTER","all_STOCK_MOMENTUM_STATE","all_STOCK_MOMENTUM_STATE_V2",
+      "all_H_AUTO_BUY_TRACK",
+    ]);
+    // 兼容老数据（无 all_ 前缀）
+    const _OCR_DEPENDENCY_RAW = new Set(["MOMENTUM_FILTER","STOCK_MOMENTUM_STATE","STOCK_MOMENTUM_STATE_V2"]);
+    if(Array.isArray(H.items)){
+      H.items = H.items.filter(function(it){
+        return !_OCR_DEPENDENCY_IDS.has(it.id) && !_OCR_DEPENDENCY_RAW.has(it.id);
+      });
+    }
 
     if(timeEl) timeEl.innerHTML = H.updated ? _uBadge('实时','—', H.updated) : '';
 

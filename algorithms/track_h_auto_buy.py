@@ -133,12 +133,22 @@ def track_one_pick(code, pick_date_str, today_str):
 
 def load_history():
     if not HISTORY_FILE.exists():
+        # 🛡 2026-08-19 一劳永逸：顶层带 generated/update_time（v8_health_check 找时戳用，缺时戳永远判"无法判龄"）
         return {"first_run": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "generated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "by_date": {}, "summary": {"days": 0, "tracked_picks": 0, "T+1_hit": 0, "T+3_hit": 0, "T+5_hit": 0, "T+10_hit": 0}}
     try:
-        return json.load(open(HISTORY_FILE, encoding="utf-8"))
+        h = json.load(open(HISTORY_FILE, encoding="utf-8"))
+        # 老文件无顶层时戳 → 当作历史补打一次
+        if "update_time" not in h or "generated" not in h:
+            ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            h["generated"] = ts
+            h["update_time"] = ts
+        return h
     except Exception:
-        return {"by_date": {}}
+        return {"by_date": {}, "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "generated": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 
 
 def run(target_date=None, emit_js=True, top_n=50):

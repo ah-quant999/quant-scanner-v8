@@ -1091,6 +1091,14 @@ _WINDOW_VAR_ALIASES = {
 #   RUNNER_STATUS_HEALTH runner 心跳（1 分钟级自愈，另有专门检查）
 # 🛡 2026-08-18 一劳永逸补入：
 #   WEEKEND_RUN 周度运行汇总（周末/月初自动跑，工作日基本无变化）→ 加入白名单避免误报 warn
+_OCR_DEPENDENCY_FILES = {
+    # 🛡 2026-08-19 一劳永逸：这些文件由「主人提供 PDF → OCR 抽取」驱动，无 PDF 输入自动巡检
+    # 永远无法刷新。陈旧=预期，非异常。一并从 health-check items[] **完全排除**，彻底不渲染告警卡。
+    # 与 self_heal_monitor.py P0-2 (免邮件方针) 对齐。
+    "MOMENTUM_FILTER",
+    "STOCK_MOMENTUM_STATE",
+    "STOCK_MOMENTUM_STATE_V2",
+}
 _LOW_FREQ_FILES = {
     "STOCK_PROFILE", "WEEKEND_META_REPORT", "PORTFOLIO", "PORTFOLIO_COST",
     "CONCEPT_ETF_MAP", "OPTIMIZED_STRATEGY", "BACKTEST_TDX", "BLOAT_CHECK",
@@ -1114,6 +1122,9 @@ def check_all_data_files():
     for p in sorted(DATA_DIR.glob("*.js")):
         vid = p.name[:-3]
         if vid in known_ids or vid in derived:
+            continue
+        # 🛡 2026-08-19 一劳永逸：OCR 依赖文件彻底跳过（不输出 items[] → 不渲染告警卡）
+        if vid in _OCR_DEPENDENCY_FILES:
             continue
         data = load_window_var(p, vid)
         # 2026-08-17 兼容 window 变量名 ≠ 文件名（STOCK_MOMENTUM_STATE_V2.js → window.STOCK_MOMENTUM_ENHANCED）
