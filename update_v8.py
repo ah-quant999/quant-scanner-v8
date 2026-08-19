@@ -102,6 +102,10 @@ DATA_SOURCES = {
     # 2026-08-19 主人令：路径概率预测卡（艾略特波浪+江恩+缠论+形态匹配），需 5 年长 K 线
     "index_history.json":          "INDEX_HISTORY",
     "market_path_probability.json": "MARKET_PATH_PROBABILITY",
+    # 2026-08-19 主人令：利率上行期板块推荐框架（宏观+板块RS+资金流+周期融合）
+    "macro.json":                   "MACRO",
+    "market_regime.json":           "MARKET_REGIME",
+    "sector_recommendation.json":   "SECTOR_RECOMMENDATION",
 }
 
 # 变量名 → 更新时段
@@ -184,6 +188,10 @@ CATEGORY_MAP = {
     # 2026-08-19：路径概率预测卡数据源（盘后跑，与算法链节奏一致）
     "INDEX_HISTORY": "post_close",
     "MARKET_PATH_PROBABILITY": "post_close",
+    # 2026-08-19：板块推荐框架数据源（盘后跑宏观+板块融合）
+    "MACRO": "post_close",
+    "MARKET_REGIME": "post_close",
+    "SECTOR_RECOMMENDATION": "post_close",
 }
 
 CATEGORY_LABEL = {
