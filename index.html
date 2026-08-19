@@ -7765,22 +7765,23 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var el=document.getElementById('etfDailyBlock');
     if(!el) return;
     // 2026-08-19 主人令修复：文案对齐卡标题"T+0·盘后定基（盘前空·盘中累积·15:10/15:30 定基）"
+    // 🛡 2026-08-19 主人令再修：删除盘前早退，盘中+盘前+盘后都展示数据
+    //   KEEP_VARS 已保证盘前持有昨日(T+1)收盘值，无需再用占位符隐藏——主人原话「数据都没了」
     var _now=new Date();
     var _hr=_now.getHours()+_now.getMinutes()/60;
     var _slotNow=_hr<9.5?'盘前':_hr<15.5?'盘中':'盘后';
-    if(_hr<9.5){
-      el.innerHTML='<div class="ipo-empty">⏳ T+0·盘后定基（盘前空·盘中累积·15:10/15:30 定基）<br><span style="color:var(--dim);font-size:11px">当前 '+_slotNow+' · 09:40 起每 30 分盘中累积</span></div>';
-      if(daily&&daily.update_time) setBadge('phEtfTime','盘后','短线',daily.update_time);
-      return;
-    }
     if(!daily||daily.no_data||!daily.top_inflow){
       var dmsg=(daily&&daily.note)?daily.note:'日监控数据尚未生成，盘中累积中';
       el.innerHTML='<div class="ipo-empty">⏳ '+dmsg+'</div>';
-      if(daily&&daily.update_time) setBadge('phEtfTime','盘中','短线',daily.update_time);
+      if(daily&&daily.update_time) setBadge('phEtfTime',_slotNow,'短线',daily.update_time);
       return;
     }
+    var _dataDate=(daily.update_time||'').slice(0,10);
+    var _dataHint=_hr<9.5
+      ? '盘前 · 数据为上一交易日('+_dataDate+')收盘值；09:40 起每 30 分盘中累积'
+      : (_hr<15.5?'盘中 · 每 30 分累积中（基线 15:10/15:30）':'盘后 · 当日('+_dataDate+')定基');
     var h='<div style="padding:8px 4px;">';
-    h+='<div style="font-size:11px;color:var(--sub);margin-bottom:8px;">全市场净流入：<span style="color:'+(daily.total_net>=0?'var(--up)':'var(--down)')+';font-weight:700;">'+(daily.total_net>=0?'+':'')+(daily.total_net/1e8).toFixed(2)+'亿</span> · 覆盖 '+(daily.total_etf||0)+' 只</div>';
+    h+='<div style="font-size:11px;color:var(--sub);margin-bottom:8px;">全市场净流入：<span style="color:'+(daily.total_net>=0?'var(--up)':'var(--down)')+';font-weight:700;">'+(daily.total_net>=0?'+':'')+(daily.total_net/1e8).toFixed(2)+'亿</span> · 覆盖 '+(daily.total_etf||0)+' 只 <span style="color:var(--dim);font-size:10.5px;margin-left:6px;">'+_dataHint+'</span></div>';
     h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">';
     /* Card 1: TOP10 主力净流入 */
     h+='<div style="background:linear-gradient(135deg,rgba(244,79,93,0.08),rgba(244,79,93,0.02));border:1px solid rgba(244,79,93,0.2);border-radius:12px;padding:14px;">';
@@ -7811,7 +7812,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     h+='</div>';
     h+='</div>';
     el.innerHTML=h;
-    if(daily.update_time) setBadge('phEtfTime','盘中','短线',daily.update_time);
+    if(daily.update_time) setBadge('phEtfTime',_slotNow,'短线',daily.update_time);
   }
 
   /* ---- ETF 三合一·三段式分析说明（对标涨停热力矩阵） ---- */
