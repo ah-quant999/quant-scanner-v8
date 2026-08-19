@@ -6,7 +6,7 @@ v8 自愈监控闭环（self_heal_monitor.py）
 每 10-20 分钟自动运行，检测以下异常并自动修复：
 
   P0-1: candidate.json 丢失「观澜台」源 → 自动拉取观澜台数据并入 + push
-  P0-2: STOCK_MOMENTUM_STATE.js 陈旧 >1 个交易日 → 告警（需 PDF OCR）
+  P0-2: STOCK_MOMENTUM_STATE.js 陈旧 >1 个交易日 → 已知遗留（WARN 留痕，免告警；需主人提供 PDF 做 OCR，见 MOMENTUM_MANUAL_DEPENDENCY）
   P1-1: zsxq_token 缺失/失效 → 告警（需用户补 token）
 
 退出码：
@@ -51,6 +51,15 @@ GUANLAN_WATCHLIST = OUT_DIR / "guanlan_watchlist.json"
 # STOCK_MOMENTUM_STATE 最大允许陈旧天数
 MOMENTUM_MAX_STALE_DAYS = 1
 
+# 2026-08-19 主人令一劳永逸（对齐 v8_health_check.py:1934 OCR 免邮件方针）：
+# momentum 数据源 = 主人提供的盘后选股 PDF → OCR 抽取（人工流程），自动巡检永远无法修复。
+# 「陈旧」→ WARN 留痕、看板可见，但不计入 exit=2，避免每 10 分钟告警/邮件轰炸；
+# 仅文件缺失/解析失败等「真异常」仍判 FAIL 需人工。
+MOMENTUM_MANUAL_DEPENDENCY = True
+
+# momentum 检查中属于「已知人工依赖」的明细前缀（陈旧不算真异常）
+_MOMENTUM_KNOWN_QUIET_PREFIXES = ("last_day=",)
+
 
 def now_cst():
     return datetime.now(CST)
@@ -58,7 +67,12 @@ def now_cst():
 
 def log(msg, level="INFO"):
     ts = now_cst().strftime("%H:%M:%S")
-    print("[" + ts + "] [" + level + "] " + msg)
+    line = "[" + ts + "] [" + level + "] " + msg
+    # --json 模式下 stdout 只留纯净 JSON，日志走 stderr（2026-08-19 修复）
+    if getattr(log, "to_stderr", False):
+        print(line, file=sys.stderr)
+    else:
+        print(line)
 
 
 # ── P0-1: candidate.json 观澜台源检查 ─────────────────
@@ -307,19 +321,25 @@ def run_check_only():
 
     fresh, last_day, age, det2 = check_momentum_state()
     results["momentum_state"] = {"ok": fresh, "detail": det2, "last_day": last_day, "age_days": age}
-    icon = "OK" if fresh else "FAIL"
-    log("[" + icon + "] STOCK_MOMENTUM_STATE.js: " + det2)
+    if not fresh:
+        if MOMENTUM_MANUAL_DEPENDENCY and det2.startswith(_MOMENTUM_KNOWN_QUIET_PREFIXES):
+            log("[WARN] STOCK_MOMENTUM_STATE.js 陈旧(已知遗留/需PDF OCR, 免告警): " + det2, "WARN")
+        else:
+            log("[FAIL] STOCK_MOMENTUM_STATE.js: " + det2)
+    else:
+        log("[OK] STOCK_MOMENTUM_STATE.js: " + det2)
 
     tok_ok, tok_det = check_zsxq_token()
     results["zsxq_token"] = {"ok": tok_ok, "detail": tok_det}
     icon = "OK" if tok_ok else "FAIL"
     log("[" + icon + "] zsxq_token: " + tok_det)
 
-    all_ok = all(r["ok"] for r in results.values())
+    # momentum 陈旧属已知人工依赖，不计入整体 FAIL 判定
+    all_ok = all(v["ok"] for k, v in results.items() if k != "momentum_state")
     if all_ok:
-        log("=== 全部正常 ===", "PASS")
+        log("=== 全部正常（含已知遗留 WARN）===", "PASS")
         return 0
-    issues = [k for k, v in results.items() if not v["ok"]]
+    issues = [k for k, v in results.items() if not v["ok"] and k != "momentum_state"]
     log("=== 发现问题: " + ", ".join(issues) + " ===", "FAIL")
     return 2
 
@@ -328,6 +348,8 @@ def run_heal(json_output=False):
     actions_taken = []
     heal_results = {}
     exit_code = 0
+    if json_output:
+        log.to_stderr = True  # stdout 仅输出 JSON（供自动化机器解析），日志走 stderr
 
     # P0-1
     has, sd, total, det = check_candidate_guanlan()
@@ -346,16 +368,22 @@ def run_heal(json_output=False):
         log("[OK] P0-1: candidate.json 含观澜台(" + str(guanlan_count) + "只)", "OK")
         heal_results["candidate_guanlan"] = {"ok": True, "message": det}
 
-    # P0-2
+    # P0-2: momentum 陈旧 = 已知人工依赖（2026-08-19 主人令免告警，对齐 v8_health_check OCR 豁免）
     fresh, last_day, age, det2 = check_momentum_state()
     if not fresh:
-        log("[FAIL] P0-2: STOCK_MOMENTUM_STATE.js 陈旧! " + det2, "FAIL")
-        heal_results["momentum_state"] = {
-            "ok": False,
-            "message": "最后交易日=" + str(last_day) + ", 陈旧" + str(age) + "天, 需要当日盘后选股 PDF 做 OCR 抽取",
-        }
-        actions_taken.append("MOMENTUM_STATE 陈旧(" + str(last_day) + ", " + str(age) + "天): 需 PDF OCR")
-        exit_code = max(exit_code, 2)
+        if MOMENTUM_MANUAL_DEPENDENCY and det2.startswith(_MOMENTUM_KNOWN_QUIET_PREFIXES):
+            log("[WARN] P0-2: STOCK_MOMENTUM_STATE.js 陈旧(已知遗留/需PDF OCR, 免告警)! " + det2, "WARN")
+            heal_results["momentum_state"] = {
+                "ok": False,
+                "known_manual_dependency": True,
+                "message": "最后交易日=" + str(last_day) + ", 陈旧" + str(age) + "天, 需主人提供盘后选股 PDF 做 OCR 抽取（自动巡检无法修复，已免告警）",
+            }
+            actions_taken.append("MOMENTUM_STATE 陈旧(" + str(last_day) + ", " + str(age) + "天): 已知遗留免告警，等主人提供 PDF")
+        else:
+            log("[FAIL] P0-2: STOCK_MOMENTUM_STATE.js 异常! " + det2, "FAIL")
+            heal_results["momentum_state"] = {"ok": False, "message": det2}
+            actions_taken.append("MOMENTUM_STATE 异常: " + det2)
+            exit_code = max(exit_code, 2)
     else:
         log("[OK] P0-2: STOCK_MOMENTUM_STATE.js 新鲜 (" + det2 + ")", "OK")
         heal_results["momentum_state"] = {"ok": True, "message": det2}
