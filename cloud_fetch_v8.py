@@ -215,20 +215,50 @@ _EM_HEADERS = {
     "Accept": "*/*",
 }
 
+def _em_get_with_retry(url, *, params, headers, timeout, max_attempts=3, label=""):
+    """2026-08-19 主人令一劳永逸式根治云端 push2 抓取抖动（B 方案）：
+       指数退避重试，遇 ConnectionError/Timeout/JSON 异常/rc!=0 时按 0.5s/1.5s/3.0s 退避。
+       三次都失败抛 RuntimeError 给上层 fn_xxx 决定是否降级返回（保留空列表语义，不破坏现有 caller）。"""
+    import random as _rnd
+    delays = [0.5, 1.5, 3.0]
+    last_err = None
+    for attempt in range(max_attempts):
+        try:
+            r = _requests.get(url, params=params, headers=headers, timeout=timeout)
+            d = r.json()
+            if d.get("rc") == 0:
+                return d
+            last_err = RuntimeError(f"rc={d.get('rc')}")
+        except Exception as e:
+            last_err = e
+        if attempt < max_attempts - 1:
+            dly = delays[attempt] + _rnd.uniform(0, 0.4)
+            print(f"  ⚠️ push2 抖动({label or url}) 尝试{attempt+1}/{max_attempts}: {last_err} → {dly:.1f}s 后重试")
+            import time as _t; _t.sleep(dly)
+    raise RuntimeError(f"push2 重试{max_attempts}次仍失败: {last_err}")
+
+
 def em_clist(fs, fields, fid="f62", stat="1", pz=5000, po="1", pn=1, timeout=15):
     """东方财富 clist 接口（push2delay 镜像）。返回 data.diff 列表（每项为字段字典）。
     po="1" 降序(取净流入最高)，po="0" 升序(取净流出最高)。
-    pn 页码（默认 1），pz 单页大小（默认 5000，但 push2delay 实际硬截 100，分页需自循环）。"""
+    pn 页码（默认 1），pz 单页大小（默认 5000，但 push2delay 实际硬截 100，分页需自循环）。
+    2026-08-19 主人令：em_clist/em_ulist_np 加 _em_get_with_retry 指数退避，根治云端 WAF 抖动。
+    """
     params = {
         "pn": str(pn), "pz": str(pz), "po": po, "np": "1", "fltt": "2", "invt": "2",
         "ut": "b2884a393a59ad64002292a3e90d46a5",
         "fid": fid, "fs": fs, "stat": stat,
         "fields": fields, "_": int(time.time() * 1000),
     }
-    r = _requests.get(f"{_EM_DELAY}/api/qt/clist/get", params=params,
-                      headers=_EM_HEADERS, timeout=timeout)
-    d = r.json()
-    if d.get("rc") != 0 or not d.get("data"):
+    try:
+        d = _em_get_with_retry(
+            f"{_EM_DELAY}/api/qt/clist/get", params=params,
+            headers=_EM_HEADERS, timeout=timeout,
+            label=f"clist {fs.split(' ')[0]} pz={pz} po={po}",
+        )
+    except RuntimeError:
+        return []
+    if not d.get("data"):
         return []
     return d["data"].get("diff", []) or []
 

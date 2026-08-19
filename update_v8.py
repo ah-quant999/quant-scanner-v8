@@ -28,6 +28,11 @@ DATA_SOURCES = {
     "sector_phase_history.json":   "SECTOR_PHASE_HISTORY",  # 2026-08-17 主人令：盘后每日阶段快照（自动累积+前端"今日 vs 上次"对比）
     "sector_fund_flow.json":       "SECTOR_FUND_FLOW",
     "sector_fund_flow_trend.json": "SECTOR_FUND_FLOW_TREND",
+    # 🛡 2026-08-19 主人令一劳永逸式修复：原 DATA_SOURCES 缺 sector_fund_flow_intraday.json 映射，
+    #   cloud_fetch_v8.py f_sector_fund_flow() 已在抓取时按 intraday 追加快照（line 1168），
+    #   但 update_v8 转换层漏挂 → data/SECTOR_FUND_FLOW_INTRADAY.js 永远停在 09:56 的 2 快照版。
+    #   根因：与 8/18 OVERSEAS_MARKETS 同类疏漏（fetch 注册了 raw 写，build 没映射）。
+    "sector_fund_flow_intraday.json": "SECTOR_FUND_FLOW_INTRADAY",
     "gold_pool.json":              "GOLD_POOL",
     "stock_names.json":            "STOCK_LIST",
     "stock_profile.json":          "STOCK_PROFILE",
@@ -126,6 +131,7 @@ CATEGORY_MAP = {
     "ETF_SUBSCRIPTION": "premarket",
     "ETF_DAILY_MONITOR": "intraday",
     "SECTOR_FUND_FLOW": "intraday",
+    "SECTOR_FUND_FLOW_INTRADAY": "intraday",  # 2026-08-19 主人令：分时快照盘中每30分随 SECTOR_FUND_FLOW 同步发布
     "CAPITAL_FLOW_DATA": "intraday",
     "CONCEPT_RANKING": "intraday",
     "LIMIT_UP_HEATMAP": "intraday",

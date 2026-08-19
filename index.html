@@ -420,7 +420,7 @@ window.__domReadyFns=[];
     <script src="data/ETF_INTRADAY_HEAT.js?v=2200b3985d" defer></script>
     <script src="data/SECTOR_FUND_FLOW.js?v=01bfa26769" defer></script>
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=31ab548e23" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=23f0d8e559" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=3df176afdb" defer></script>
     <script src="data/ANALYST_RATINGS.js?v=82d8b3b4c5" defer></script>
     <script src="data/SUSPENSION_ALERT.js?v=b966474051" defer></script>
     <script src="data/GOLD_POOL.js?v=d67911f8c2" defer></script>
@@ -12624,6 +12624,11 @@ window.__renderV8CalToday();
   tryRun('renderCycleLadderCard', window.__renderCycleLadderCard, 'cycle-ladder init');
   // 2026-08-16 修复：商品涨价弹性榜也在实时数据区，需在此处触发渲染（之前仅在盘后数据/选股策略>潜力参考触发）
   tryRun('fillCommodityElasticity', window._fillCommodityElasticity, 'commodity elasticity init');
+  // 🛡 2026-08-19 主人令一劳永逸式修复：商品涨价弹性榜的 defer 脚本（line 1249 data/COMMODITY_ELASTICITY.js）
+  //   在 IIFE 末尾的 tryRun 调用时尚未注入（defer 在 DOMContentLoaded 后才执行），导致 ce=undefined → 卡片显示"数据不可用"或保持"加载中…"。
+  //   解决：把重试也纳入 setTimeout 兜底链（400/1200ms 后再跑一次，此时 defer 已就位）。
+  setTimeout(function(){ tryRun('fillCommodityElasticity-late', window._fillCommodityElasticity, 'commodity elasticity late retry'); }, 400);
+  setTimeout(function(){ tryRun('fillCommodityElasticity-late2', window._fillCommodityElasticity, 'commodity elasticity late2 retry'); }, 1200);
   // ⛓ 任何后续切到 fv/crds tab 也只是再跑一次幂等
 })();
 </script>
