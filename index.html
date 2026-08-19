@@ -420,7 +420,7 @@ window.__domReadyFns=[];
     <script src="data/ETF_INTRADAY_HEAT.js?v=e1f49462b7" defer></script>
     <script src="data/SECTOR_FUND_FLOW.js?v=77d7ce10fc" defer></script>
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=31ab548e23" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=fe7d1c5a35" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=464b8ea6a1" defer></script>
     <script src="data/ANALYST_RATINGS.js?v=82d8b3b4c5" defer></script>
     <script src="data/SUSPENSION_ALERT.js?v=b966474051" defer></script>
     <script src="data/GOLD_POOL.js?v=d67911f8c2" defer></script>
@@ -435,7 +435,7 @@ window.__domReadyFns=[];
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
 <script src="data/CONCEPT_RANKING.js?v=92d5810cce" defer></script>
 <script src="data/INDEX_QUOTES.js?v=fa044705dd" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=1d387f8e81" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=8296c71bf2" defer></script>
 <script src="data/MARGIN_DATA.js?v=49adea8248" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=e89d0ffb7b" defer></script>
 <script src="data/IPO_DATA.js?v=a797439bb3" defer></script>
@@ -1214,7 +1214,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_FIB.js?v=19243735f3" defer></script>
 <script src="data/SZ_FIB.js?v=241b9be075" defer></script>
 <script src="data/SECTOR_RS.js?v=236fe2a09b" defer></script>
-<script src="data/SECTOR_PHASE_HISTORY.js?v=90e53ed90f" defer></script>
+<script src="data/SECTOR_PHASE_HISTORY.js?v=6c3d24d6e9" defer></script>
 <script src="data/INST_TRADE.js?v=d727a0d04b" defer></script>
 <script src="data/NORTH_FUND.js?v=40aca41964" defer></script>
 <script src="data/MARKET_ALERTS.js?v=c3e14a9cfa" defer></script>
@@ -1245,10 +1245,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/W52_HIGH.js?v=5feac36f7b" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=786bb1b130" defer></script>
 <script src="data/RUNNER_STATUS.js?v=c98995c5eb" defer></script>
-<script src="data/HEALTH_CHECK.js?v=6ceed941c2" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=0064fa9213" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=bf0bdbbb4a" defer></script>
-    <script src="data/POTENTIAL_PICKS.js?v=be485aa1ad" defer></script>
+<script src="data/HEALTH_CHECK.js?v=35e115b820" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=92bd852569" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=39d658b28a" defer></script>
+    <script src="data/POTENTIAL_PICKS.js?v=7dc0d86a64" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE.js?v=f135754004" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=0dcbab52a2" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=9c5aef89a0" defer></script>
@@ -1403,23 +1403,23 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         opBody.innerHTML = window._buildJudgmentEnvHTML(jd);
       }catch(e){ console.error('renderJudgmentBody error',e); }
     };
-    // 🛡️ 2026-08-19 主人令「补回来，别一直被覆盖掉」一劳永逸：
-    //   放弃 setTimeout 一次性猜测 / 30 次重试的旧方案，改为**永久自愈轮询**——
-    //   每 1 秒检查 head 是否被其他 logic 清空（含缓存戳老版本/v8CardHeader 截断/CDN 缓存）。
-    //   head 缺失/空/不含「今日判定」字样时立即重新渲染，确保永不被覆盖。
-    window.__selfHealJudgmentHeader = function(){
-      var _self = arguments.callee;
-      var head = document.getElementById('judgmentCardHeader');
-      var ok = head && head.innerHTML && head.innerHTML.indexOf('今日判定') >= 0;
-      if(!ok && typeof window.v8CardHeader === 'function' && typeof window.__renderJudgmentHeader === 'function'){
-        try{ window.__renderJudgmentHeader(); }catch(e){}
-      }
-      setTimeout(_self, 1000);
+    // 🛡️ 2026-08-14 一劳永逸：数据未就绪时重试保底（500ms × 5 次）
+    window.__retryJudgmentRender = function(maxTries){
+      var tries = 0;
+      var tick = function(){
+        var jd = window.JUDGMENT_DATA || {};
+        var mb = window.MACRO_BRIEF || {};
+        if ((jd.update_time || mb.update_time) && typeof window._buildJudgmentEnvHTML === 'function') {
+          window.__renderJudgmentHeader();
+          window.__renderJudgmentBody();
+          return;
+        }
+        if(typeof window.__renderJudgmentBody === 'function') window.__renderJudgmentBody();
+        if (++tries < (maxTries || 30)) setTimeout(tick, 500);
+        else console.warn('[judgment retry] 超过最大重试次数，数据仍未就绪');
+      };
+      tick();
     };
-    if(typeof window !== 'undefined' && !window.__jdHeaderHealStarted){
-      window.__jdHeaderHealStarted = true;
-      setTimeout(window.__selfHealJudgmentHeader, 800);
-    }
     </script>
 
 
@@ -12630,22 +12630,6 @@ window.__renderV8CalToday();
   //   解决：把重试也纳入 setTimeout 兜底链（400/1200ms 后再跑一次，此时 defer 已就位）。
   setTimeout(function(){ tryRun('fillCommodityElasticity-late', window._fillCommodityElasticity, 'commodity elasticity late retry'); }, 400);
   setTimeout(function(){ tryRun('fillCommodityElasticity-late2', window._fillCommodityElasticity, 'commodity elasticity late2 retry'); }, 1200);
-  // 🛡 2026-08-19 主人令「还是没修复好」一劳永逸：放弃 setTimeout 一次性猜测，改为**永久自愈轮询**——
-  //   每 1 秒检查 ceBody 是否仍是「加载中…」（老版本/CDN 缓存/被覆盖），空则重渲染，永远不会被覆盖。
-  if(typeof window !== 'undefined' && !window.__ceBodyHealStarted){
-    window.__ceBodyHealStarted = true;
-    (function selfHealCeBody(){
-      var dst = document.getElementById('ceBody');
-      if(dst){
-        var html = dst.innerHTML || '';
-        var isLoading = !html || html.indexOf('加载中') >= 0 || html.length < 200;
-        if(isLoading && typeof window._fillCommodityElasticity === 'function' && window.COMMODITY_ELASTICITY){
-          try{ window._fillCommodityElasticity(); }catch(e){}
-        }
-      }
-      setTimeout(selfHealCeBody, 1000);
-    })();
-  }
   // ⛓ 任何后续切到 fv/crds tab 也只是再跑一次幂等
 })();
 </script>
@@ -13110,7 +13094,7 @@ window.__renderV8CalToday();
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=fb5190121b'},
     {name:'STOCK_PROFILE', url:'data/STOCK_PROFILE.js?v=f23feb0264'},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=da58360c63'},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=20baf6b0fd'},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=9f64b8dc73'}
   ];
   function loadOne(item, done){
