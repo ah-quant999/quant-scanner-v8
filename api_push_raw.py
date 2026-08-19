@@ -159,6 +159,10 @@ def walk_extra():
         # ── 2026-08-17 补入：商品涨价弹性榜（calc_commodity_elasticity.py 产出）──
         # 之前未注册，导致国内期货 LC/SA 数据永远不显示；现加入云端自动跑 + 推送
         "data/COMMODITY_ELASTICITY.js",
+        # ── 2026-08-19 补入：H 反推短线买点 + 跟踪（auto_run_dn_algorithm / track_h_auto_buy） ──
+        # 之前仅手动 commit，未注册到 api_push 队列 → 每天盘后算法链跑完也不上传。
+        "data/H_AUTO_BUY.js",           # 反推算法当日候选（脱离 PDF OCR）
+        "data/H_AUTO_BUY_TRACK.js",     # 反推算法累计胜率（每日跟踪 T+1/T+3/T+5/T+10）
         # optimized_strategy.json 在 raw_data/，由 walk_raw() 按算法产物前缀自动排除（不推送，免覆盖）
     ]
     for rel in extra:
@@ -182,6 +186,9 @@ _EXTRA_FILES = (
     "data/FINAL_RECOMMEND_DATA.js",
     "data/STOCK_RPS.js",
     "data/FOUR_VOLUME_60M.js",
+    # 🛡 2026-08-19：H 反推算法相关文件注册到 ?v 重写集，确保 api_push 推送后 index.html 同步对齐缓存戳
+    "data/H_AUTO_BUY.js",
+    "data/H_AUTO_BUY_TRACK.js",
 )
 _RE_V = re.compile(r'([\'"])(data/[A-Z0-9_]+\.js)(?:\?[^"\'>\s]+)?([\'"])')
 
@@ -251,7 +258,9 @@ def main():
         if (e["path"].startswith("raw_data/")
             or e["path"] in ("data/FOUR_VOLUME.js", "data/STOCK_STOP_DATA.js",
                               "data/FINAL_RECOMMEND_DATA.js", "data/STOCK_RPS.js",
-                              "data/FOUR_VOLUME_60M.js")
+                              "data/FOUR_VOLUME_60M.js",
+                              # 🛡 2026-08-19：H 反推注册到防倒退守卫远端基线
+                              "data/H_AUTO_BUY.js", "data/H_AUTO_BUY_TRACK.js")
             ) and e["type"] == "blob":
             existing[e["path"]] = e["sha"]
 

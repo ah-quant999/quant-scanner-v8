@@ -100,6 +100,12 @@ ORDER = [
     #   - fetch_weekend_run.py → raw_data/weekend_run.json（周度运行汇总）
     "refresh_stock_metadata.py",
     "fetch_weekend_run.py",
+    # 🛡 2026-08-19 一劳永逸式修复：H 反推算法从PDF OCR 脱离，反推代码 + 每日盘后自跑 + 跟踪回测。
+    #   auto_run_dn_algorithm.py 默认 emit-js（写 data/H_AUTO_BUY.js）；
+    #   track_h_auto_buy.py 默认 emit-js（写 data/H_AUTO_BUY_TRACK.js，写 raw_data/h_auto_buy_history.json）。
+    #   这两个之前一直在算法链外，导致反推算法即使跑出结果也没人调度、没人推送、没人可见。
+    "auto_run_dn_algorithm.py",
+    "track_h_auto_buy.py",
 ]
 
 

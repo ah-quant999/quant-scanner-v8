@@ -221,7 +221,10 @@ def verify_against_baseline():
 def main():
     parser = argparse.ArgumentParser(description="H 反推 PDF 短线买点算法（自动跑，脱离 PDF OCR）")
     parser.add_argument("--date", help="目标日期（YYYY-MM-DD，默认今日）")
-    parser.add_argument("--emit-js", action="store_true", help="输出 data/H_AUTO_BUY.js")
+    # 🛡 2026-08-19 默认 --emit-js ON：run_algorithms.py daily 调用无需每次加 flag，部署口径统一
+    parser.add_argument("--no-emit-js", dest="emit_js", action="store_false", help="不写 data/H_AUTO_BUY.js（默认写）")
+    parser.add_argument("--emit-js", dest="emit_js", action="store_true", help="显式开关（与默认相同，保留兼容）")
+    parser.set_defaults(emit_js=True)
     parser.add_argument("--verify", action="store_true", help="验证 vs PDF 8.17 baseline 命中率")
     args = parser.parse_args()
 
