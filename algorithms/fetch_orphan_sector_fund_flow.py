@@ -891,17 +891,18 @@ def fetch_sector_flow():
         if net_5d_val != 0 and len(real_5) >= 5:
             item["net_5d"] = net_5d_val
             item["net_5d_days"] = len(real_5)
-        if net_10d_val != 0 and len(real_10) >= 10:
+        # 🛡 2026-08-19 主人令一劳永逸修复：阈值从 10/60 降到 3（早期 history 不足 10/60 天时也出数）。
+        #   原阈值让 10日/60日 永远"暂无数据"——本机补算发现 history 只有 8 天，按需降级。
+        #   数据带 _days 字段注明实际窗口，渲染层可显示「数据窗口 X 天」提示。
+        if net_10d_val != 0 and len(real_10) >= 3:
             item["net_10d"] = net_10d_val
             item["net_10d_days"] = len(real_10)
         if net_20d_val != 0 and len(real_20) >= 20:  # 2026-08-12 修：原写>=10，20日趋势需至少20天真实数据
             item["net_20d"] = net_20d_val
             item["net_20d_days"] = len(real_20)
-        if len(real_60) >= 60:
+        if net_60d_val != 0 and len(real_60) >= 3:
             item["net_60d"] = net_60d_val
             item["net_60d_days"] = len(real_60)
-        else:
-            item["net_60d"] = None
 
     trend_5d = sorted([x for x in candidate_list if x.get("net_5d") is not None and x["net_5d"] != 0],
                       key=lambda x: x.get("net_5d", 0), reverse=True)
