@@ -70,6 +70,10 @@ ORDER = [
     "cockpit_backtest_now.py",         # 读 raw_data/history/top10_daily_YYYYMMDD.json（必须在 generate_top10 之后）
     "export_optimized_strategy.py",    # → raw_data/optimized_strategy.json（读 backtest_tdx.json 汇总优化策略效果）
     "strategy_four_volume_60m.py",     # → data/FOUR_VOLUME_60M.js（四量终极60min版，baostock独立数据源）
+    "strategy_four_volume.py",         # 🛡 2026-08-19 阿狸咪根治孤儿：日线版 FOUR_VOLUME.js 一直在 ORDER 漏挂 → 四星终极卡 4 格 0。render 端已合并读 60m 兜底，这里补齐日线数据链。
+    "market_path_probability.py",      # 🛡 2026-08-19 阿狸咪补对齐：路径概率预测卡 → data/INDEX_HISTORY.js + data/MARKET_PATH_PROBABILITY.js（5年上证K线+江恩+缠论+形态匹配+路径ABC）
+    "market_regime.py",                # 🛡 2026-08-19 阿狸咪补对齐：宏观环境卡 → data/MACRO.js + data/MARKET_REGIME.js（国债+LPR+银行间利率+利率上行期板块推荐框架）
+    "sector_recommendation.py",        # 🛡 2026-08-19 阿狸咪补对齐：板块推荐卡 → data/SECTOR_RECOMMENDATION.js（13板块按优先级+异动跟随/已涨过标）
     "gen_cockpit_tier_recommend.py",   # 读 scan_result 输入
     "gen_cockpit_tier_recommend.py",   # 读 scan_result 输入
     "gen_cockpit_advice.py",           # 读 backtest_tdx
