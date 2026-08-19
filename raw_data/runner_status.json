@@ -1,11 +1,14 @@
 {
-  "update_time": "2026-08-19 08:13:48",
-  "status": "warn",
+  "update_time": "2026-08-19 08:16:13",
+  "status": "fail",
   "process": {
-    "ok": false,
-    "listener": false,
-    "worker": false,
-    "details": []
+    "ok": true,
+    "listener": true,
+    "worker": true,
+    "details": [
+      "runner.listener",
+      "runner.worker"
+    ]
   },
   "service": {
     "ok": false,
@@ -36,9 +39,7 @@
     "message": "阈值=100000（一劳永逸目标 2000）"
   },
   "actions_taken": [
-    "进程缺失拉起 run.cmd: 成功 (已发起进程拉起)",
-    "checkout 失败为网络型（github.com:443 超时），无需清空 _work，等待网络恢复",
-    "dispatch cn_fetch 云端 fallback: 成功 (HTTP 204)"
+    "checkout 失败为网络型（github.com:443 超时），无需清空 _work，等待网络恢复"
   ],
-  "message": "runner进程=异常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 1 次，checkout 失败 1 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) 失败"
+  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 1 次，checkout 失败 1 次，最新 🇨🇳 v8 中国数据抓取(云端·小九应急) 失败"
 }
