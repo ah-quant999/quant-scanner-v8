@@ -7207,9 +7207,16 @@ window.__renderV8CalFull();
       h+='<div style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.7">⚠️ 高分预警：'+
         worst.map(x=>x.name+'('+Math.round(x.score)+')').join('、')+'</div>';
     }
-    $('phCrisisBody').innerHTML=h;
+    var _crisisEl=document.getElementById('phCrisisBody');
+    if(_crisisEl) _crisisEl.innerHTML=h;
     setBadge('phCrisisTime','盘中','短线',cr.update_time);
   }
+
+  /* 🛡 2026-08-19 主人令「赶紧修复」:
+     renderCrisis 之前用 jQuery('$id')，在脚本加载顺序不稳时返 null，
+     给 null 设 innerHTML 会抛 TypeError 「Cannot set properties of null」，
+     进而中断后续 render 调用（HTML legend 跟着不出来，图就堆底成一团根本看不清）。
+     改用 document.getElementById + 显式 null check。*/
 
   /* ~~ 已下架：资金流时间轴 MARKET_FUND_FLOW_DATA（2026-08-16 主人令） ~~ */
 
@@ -7626,7 +7633,7 @@ window.__renderV8CalFull();
         });
         return sb-sa;
       });
-    var lines=ranked.slice(0,20).map(function(r){return r.name;});
+    var lines=ranked.slice(0,10).map(function(r){return r.name;});
 
     var xData=snaps.map(function(s){return s.time;});
     // 🛡 2026-08-19 主人令一劳永逸修复：每条板块线不同颜色（不再流入=全红/流出=全绿统一色）。
@@ -7673,9 +7680,9 @@ window.__renderV8CalFull();
       var color=_sfPickColor(name);
       return {
         name:name, type:'line', smooth:true, data:data, showSymbol:false,
-        lineStyle:{width:1.6, color:color},
+        lineStyle:{width:2.0, color:color, opacity:0.85},
         itemStyle:{color:color},
-        emphasis:{focus:'series', lineStyle:{width:2.8}},
+        emphasis:{focus:'series', lineStyle:{width:3.2}},
         connectNulls:true
       };
     });
@@ -7815,7 +7822,7 @@ const catNames=['宽基','行业','主题','跨境','商品'];
       h+='</div>';
     });
     if(el1) el1.innerHTML=h;
-    setBadge('etfHeatTime','盘中','短线',etfHeat.update_time);
+    if(document.getElementById('etfHeatTime')) setBadge('etfHeatTime','盘中','短线',etfHeat.update_time);
   }
 
   /* ---- 5.5 ETF 量能脉冲(盘中异动) / 日监控 渲染 ---- */
