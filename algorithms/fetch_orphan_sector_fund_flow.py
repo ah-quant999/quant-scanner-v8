@@ -876,10 +876,16 @@ def fetch_sector_flow():
         candidate_map[name]["trend"] = trend
     candidate_list = list(candidate_map.values())
 
-    # 60/20/10/5 日累计（从历史数据累加，按可用数据动态）
+    # 🛡 2026-08-19 主人令一劳永逸修复：对 candidate_list 做 net_5d/10d/20d/60d 累加
+    #   原代码先累加 sectors_in/out（那时 sectors_in/out 还没 append 仍空 list → 循环无效）。
+    #   同时也修阈值：10/20/60 日一律 >=3（history.max=9 天，原 >=20 永不可能满足）。层级最稳。
+    seen_names = set()
     for item in candidate_list:
-        name = item["name"]
-        hist = history.get(name, [])
+        nm = item.get("name", "")
+        if not nm or nm in seen_names:
+            continue
+        seen_names.add(nm)
+        hist = history.get(nm, [])
 
         def _real_n(hist, n):
             arr = [h for h in hist[-n:] if not h.get("carried")]
@@ -888,24 +894,19 @@ def fetch_sector_flow():
         real_10, net_10d_val = _real_n(hist, 10)
         real_20, net_20d_val = _real_n(hist, 20)
         real_60, net_60d_val = _real_n(hist, 60)
-        if net_5d_val != 0 and len(real_5) >= 5:
+        if net_5d_val != 0 and len(real_5) >= 3:
             item["net_5d"] = net_5d_val
             item["net_5d_days"] = len(real_5)
-        # 🛡 2026-08-19 主人令一劳永逸修复：阈值从 10/60 降到 3（早期 history 不足 10/60 天时也出数）。
-        #   原阈值让 10日/60日 永远"暂无数据"——本机补算发现 history 只有 8 天，按需降级。
-        #   数据带 _days 字段注明实际窗口，渲染层可显示「数据窗口 X 天」提示。
         if net_10d_val != 0 and len(real_10) >= 3:
             item["net_10d"] = net_10d_val
             item["net_10d_days"] = len(real_10)
-        # 🛡 2026-08-19 主人令一劳永逸修复：20 日阈值从 `>=20` 降到 `>=3`（同 10/60 日一致）。
-        #   根因 history.max=9 天，`>=20` 永不可能满足 → 20日永远"暂无"。
-        #   数据带 _days 字段注明实际窗口（多数 4-9 天），渲染层无须改。
         if net_20d_val != 0 and len(real_20) >= 3:
             item["net_20d"] = net_20d_val
             item["net_20d_days"] = len(real_20)
         if net_60d_val != 0 and len(real_60) >= 3:
             item["net_60d"] = net_60d_val
             item["net_60d_days"] = len(real_60)
+
 
     trend_5d = sorted([x for x in candidate_list if x.get("net_5d") is not None and x["net_5d"] != 0],
                       key=lambda x: x.get("net_5d", 0), reverse=True)
@@ -934,6 +935,8 @@ def fetch_sector_flow():
     # 保存历史
     save_history(history)
 
+    # 🛡 2026-08-19 主人令一劳永逸修复：先构造 sectors_in/out，再做 net_5/10/20/60d 累加。
+    #   原代码累加发生在 sectors_in/out 构造之前，循环遍历空 list → 累加完全失效 → 全部"暂无"。
     # 生成汇总
     THRESHOLD = 1.0
     for item in result["top_list"]:
@@ -941,6 +944,19 @@ def fetch_sector_flow():
             result["sectors_in"].append(item)
         elif item["net"] <= -THRESHOLD:
             result["sectors_out"].append(item)
+
+    # 🛡 2026-08-19 主人令一劳永逸修复：从 candidate_list 按 name 同步 net_5d/10d/20d/60d
+    #   到 sectors_in/out（top_list 引用，但 candidate_list 是 dict 浅拷贝，identity 不同，
+    #   不能直接引用；只能按 name 显式复制）。
+    cand_map_sync = {c["name"]: c for c in candidate_list}
+    for item in result["sectors_in"] + result["sectors_out"]:
+        nm = item.get("name", "")
+        c = cand_map_sync.get(nm)
+        if not c:
+            continue
+        for k in ("net_5d", "net_10d", "net_20d", "net_60d"):
+            if item.get(k) in (None, 0) and c.get(k) not in (None, 0):
+                item[k] = c[k]
 
     in_names = [f"{s['name']}({s['net']:.1f}亿)" for s in result["sectors_in"]]
     out_names = [f"{s['name']}({s['net']:.1f}亿)" for s in result["sectors_out"]]
