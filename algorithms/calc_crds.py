@@ -186,6 +186,53 @@ def _query_kline(code, secid_prefix, days):
     return _query_kline_em(code, secid_prefix, days)
 
 
+def _load_index_quotes():
+    """读取 v8 raw_data/index_quotes.json 的多指数行情，作为 CRDS 大盘判断依据。"""
+    base = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(base, "..", "raw_data", "index_quotes.json")
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        items = data.get("items", [])
+        out = {}
+        up_total = 0
+        down_total = 0
+        for it in items:
+            code = it.get("code", "")
+            chg = float(it.get("chg", 0) or 0)
+            out[code] = chg
+            up_total += int(it.get("up", 0) or 0)
+            down_total += int(it.get("down", 0) or 0)
+        total_adv_decl = up_total + down_total
+        out["breadth"] = up_total / total_adv_decl if total_adv_decl > 0 else 0.5
+        out["up_total"] = up_total
+        out["down_total"] = down_total
+        return out
+    except Exception as e:
+        print(f"  [市场] 读取 index_quotes 失败: {e}")
+        return None
+
+
+def _composite_market_score(quotes):
+    """综合市场强度得分。避免上证被权重股扭曲，纳入深证/创业板/科创50 + 涨跌家数比。"""
+    if not quotes:
+        return None
+    sh = quotes.get("000001", 0)
+    sz = quotes.get("399001", 0)
+    cy = quotes.get("399006", 0)
+    kc = quotes.get("000688", 0)
+    breadth = quotes.get("breadth", 0.5)
+    breadth_score = (breadth - 0.5) * 4.0
+    composite = (
+        sh * 0.25 +
+        sz * 0.20 +
+        cy * 0.25 +
+        kc * 0.15 +
+        breadth_score * 0.15
+    )
+    return round(composite, 2)
+
+
 def get_market_index():
     """获取大盘指数(上证)近期数据(含每日涨跌幅)"""
     df = _query_kline("000001", "1", LOOKBACK_DAYS + 5)
@@ -198,8 +245,10 @@ def get_market_index():
 
 def get_market_context(mkt_df):
     """
-    根据大盘(上证)今日及近期走势，判断 CRDS 逆势龙头数据的有效性。
+    根据大盘综合强度判断 CRDS 逆势龙头数据的有效性。
     逻辑：逆势龙头只在大跌/震荡市有效；若今日大涨，则信号参考意义极低。
+    2026-08-19 主人令一劳永逸修复：不再只看上证指数（权重股易扭曲），
+    改为读取 raw_data/index_quotes.json，综合上证/深证/创业板/科创50涨跌幅 + 全市场涨跌家数比。
     """
     if mkt_df is None or len(mkt_df) < 2:
         return {
@@ -211,34 +260,48 @@ def get_market_context(mkt_df):
             "trend5_pct": None,
             "color": "#999999",
         }
-    today_pct = float(mkt_df["pct_chg"].iloc[-1])
+
+    quotes = _load_index_quotes()
+    if quotes:
+        today_pct = _composite_market_score(quotes)
+        sh_pct = quotes.get("000001", 0)
+        up_total = quotes.get("up_total", 0)
+        down_total = quotes.get("down_total", 0)
+        breadth = quotes.get("breadth", 0.5)
+        data_source = "index_quotes"
+    else:
+        today_pct = float(mkt_df["pct_chg"].iloc[-1])
+        sh_pct = today_pct
+        up_total = down_total = 0
+        breadth = 0.5
+        data_source = "mootdx"
+
     prev_pct = float(mkt_df["pct_chg"].iloc[-2])
     trend5_pct = float(mkt_df["pct_chg"].iloc[-5:].sum()) if len(mkt_df) >= 5 else 0.0
 
-    # 判断结论：以今日上证涨跌幅为主
     if today_pct >= 2.0:
         validity = "失效"
-        summary = f"上证今日大涨 +{today_pct:.2f}%，逆势龙头信号参考意义极低，无需关注"
+        summary = f"市场综合强度 +{today_pct:.2f}%（上证{sh_pct:+.2f}%，上涨占比{breadth:.1%}），逆势龙头信号参考意义极低，无需关注"
         color = "#999999"
         valid = False
     elif today_pct >= 1.0:
         validity = "低效"
-        summary = f"上证今日涨 +{today_pct:.2f}%，市场偏强，CRDS 有效性降低"
+        summary = f"市场综合强度 +{today_pct:.2f}%（上证{sh_pct:+.2f}%，涨跌 {up_total}:{down_total}），偏强环境下 CRDS 有效性降低"
         color = "#BA7517"
         valid = True
     elif today_pct >= -0.5:
         validity = "有效"
-        summary = f"上证今日 {today_pct:+.2f}%，市场震荡，CRDS 可正常参考"
+        summary = f"市场综合强度 {today_pct:+.2f}%（上证{sh_pct:+.2f}%，涨跌 {up_total}:{down_total}），震荡市，CRDS 可正常参考"
         color = "#1D9E75"
         valid = True
     elif today_pct >= -2.0:
         validity = "较有效"
-        summary = f"上证今日 {today_pct:+.2f}%，市场偏弱，CRDS 较有效"
+        summary = f"市场综合强度 {today_pct:+.2f}%（上证{sh_pct:+.2f}%，涨跌 {up_total}:{down_total}），偏弱环境，CRDS 较有效"
         color = "#1D9E75"
         valid = True
     else:
         validity = "高有效"
-        summary = f"上证今日大跌 {today_pct:.2f}%，恐慌市 CRDS 信号最强，但需防系统性风险"
+        summary = f"市场综合强度 {today_pct:.2f}%（上证{sh_pct:+.2f}%，涨跌 {up_total}:{down_total}），恐慌市 CRDS 信号最强，但需防系统性风险"
         color = "#185FA5"
         valid = True
 
@@ -250,6 +313,11 @@ def get_market_context(mkt_df):
         "prev_pct": round(prev_pct, 2),
         "trend5_pct": round(trend5_pct, 2),
         "color": color,
+        "data_source": data_source,
+        "sh_pct": round(sh_pct, 2),
+        "breadth": round(breadth, 4),
+        "up_total": up_total,
+        "down_total": down_total,
     }
 
 

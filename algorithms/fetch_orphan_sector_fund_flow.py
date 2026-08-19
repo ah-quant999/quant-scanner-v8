@@ -405,7 +405,7 @@ def fetch_akshare_ths_5d20d_backup(sector_names):
             try:
                 df = ak_mod.stock_board_industry_index_ths(
                     symbol=name,
-                    start_date=(datetime.now() - timedelta(days=30)).strftime("%Y%m%d"),
+                    start_date=(datetime.now() - timedelta(days=70)).strftime("%Y%m%d"),
                     end_date=datetime.now().strftime("%Y%m%d")
                 )
                 if len(df) >= 5:
@@ -421,7 +421,7 @@ def fetch_akshare_ths_5d20d_backup(sector_names):
             try:
                 df = ak_mod.stock_board_concept_index_ths(
                     symbol=name,
-                    start_date=(datetime.now() - timedelta(days=30)).strftime("%Y%m%d"),
+                    start_date=(datetime.now() - timedelta(days=70)).strftime("%Y%m%d"),
                     end_date=datetime.now().strftime("%Y%m%d")
                 )
                 if len(df) >= 5:
@@ -441,6 +441,13 @@ def fetch_akshare_ths_5d20d_backup(sector_names):
                 net_5d_est = round(vol_5_yi * pct_5 / 100, 2)
             else:
                 net_5d_est = 0
+            if len(df) >= 10:
+                recent_10 = df.tail(10)
+                vol_10_yi = recent_10["成交额"].sum() / 1e8
+                pct_10 = (recent_10.iloc[-1]["收盘价"] / recent_10.iloc[0]["开盘价"] - 1) * 100
+                net_10d_est = round(vol_10_yi * pct_10 / 100, 2)
+            else:
+                net_10d_est = 0
             if len(df) >= 20:
                 recent_20 = df.tail(20)
                 vol_20_yi = recent_20["成交额"].sum() / 1e8
@@ -448,22 +455,30 @@ def fetch_akshare_ths_5d20d_backup(sector_names):
                 net_20d_est = round(vol_20_yi * pct_20 / 100, 2)
             else:
                 net_20d_est = 0
-            if len(df) >= 60:
-                recent_60 = df.tail(60)
-                vol_60_yi = recent_60["成交额"].sum() / 1e8
-                pct_60 = (recent_60.iloc[-1]["收盘价"] / recent_60.iloc[0]["开盘价"] - 1) * 100
-                net_60d_est = round(vol_60_yi * pct_60 / 100, 2)
-            else:
-                net_60d_est = None
+            # 🛡 2026-08-19 主人令一劳永逸修复：net_60d 用尽同花顺历史窗口（最多约 50 交易日），
+            #   不足 60 也出数并标注实N天，避免 60日 列永远「暂无数据」。
+            recent_60 = df.tail(60) if len(df) >= 60 else df
+            vol_60_yi = recent_60["成交额"].sum() / 1e8
+            pct_60 = (recent_60.iloc[-1]["收盘价"] / recent_60.iloc[0]["开盘价"] - 1) * 100
+            net_60d_est = round(vol_60_yi * pct_60 / 100, 2) if len(df) >= 10 else None
+            net_10d_days = len(recent_10) if len(df) >= 10 else len(df)
+            net_60d_days = len(recent_60)
             MAX_REASONABLE = 5000.0
             if net_5d_est and abs(net_5d_est) > MAX_REASONABLE:
                 net_5d_est = 0
+            if net_10d_est and abs(net_10d_est) > MAX_REASONABLE:
+                net_10d_est = 0
             if net_20d_est and abs(net_20d_est) > MAX_REASONABLE:
                 net_20d_est = 0
+            if net_60d_est is not None and abs(net_60d_est) > MAX_REASONABLE:
+                net_60d_est = 0
             result[name] = {
                 "net_5d": net_5d_est,
+                "net_10d": net_10d_est,
                 "net_20d": net_20d_est,
                 "net_60d": net_60d_est,
+                "net_10d_days": net_10d_days if net_10d_est != 0 else None,
+                "net_60d_days": net_60d_days if net_60d_est is not None else None,
                 "source": "同花顺估算"
             }
         matched = sum(1 for n in sector_names if n in result)
@@ -477,7 +492,7 @@ def _fetch_akshare_real_5d20d(top_list):
     """用akshare真实历史资金流接口获取5日/20日精确累计（快速失败模式）"""
     import akshare as ak_mod
     result = {}
-    start_20d = (datetime.now() - timedelta(days=30)).strftime("%Y%m%d")
+    start_20d = (datetime.now() - timedelta(days=70)).strftime("%Y%m%d")
     end_d = datetime.now().strftime("%Y%m%d")
     sorted_items = sorted(top_list, key=lambda x: abs(x.get("net", 0)), reverse=True)[:10]
     total_ok = 0
@@ -501,10 +516,13 @@ def _fetch_akshare_real_5d20d(top_list):
                     nets = [float(x) / 1e8 for x in df[net_col].astype(float).tolist()]
                     if len(nets) >= 5:
                         net_5d = round(sum(nets[-5:]), 2)
-                        net_20d = round(sum(nets[-20:]), 2)
-                        result[name] = {"net_5d": net_5d, "net_20d": net_20d}
+                        net_10d = round(sum(nets[-10:]), 2) if len(nets) >= 10 else None
+                        net_20d = round(sum(nets[-20:]), 2) if len(nets) >= 20 else None
+                        net_60d = round(sum(nets[-60:]), 2) if len(nets) >= 60 else None
+                        result[name] = {"net_5d": net_5d, "net_10d": net_10d,
+                                        "net_20d": net_20d, "net_60d": net_60d}
                         total_ok += 1
-                        print(f"    ✓ [{idx+1}/{len(sorted_items)}] {name}: 5d={net_5d}亿 20d={net_20d}亿")
+                        print(f"    ✓ [{idx+1}/{len(sorted_items)}] {name}: 5d={net_5d}亿 10d={net_10d}亿 20d={net_20d}亿 60d={net_60d}亿")
         except Exception as e:
             err_name = type(e).__name__
             if "Connection" in err_name or "Timeout" in err_name or "Remote" in str(e):
@@ -719,16 +737,25 @@ def fetch_sector_flow():
             if name in supplement:
                 s = supplement[name]
                 net_5d = s.get("net_5d", 0)
+                net_10d = s.get("net_10d")
                 net_20d = s.get("net_20d", 0)
                 net_60d = s.get("net_60d")
+                net_10d_days = s.get("net_10d_days")
+                net_60d_days = s.get("net_60d_days")
                 if net_5d != 0 and net_20d != 0 and abs(net_5d - net_20d) < 0.1:
                     continue
                 if net_5d != 0:
                     item["net_5d"] = net_5d
+                if net_10d is not None and net_10d != 0:
+                    item["net_10d"] = net_10d
+                    if net_10d_days:
+                        item["net_10d_days"] = net_10d_days
                 if net_20d != 0:
                     item["net_20d"] = net_20d
                 if net_60d is not None and net_60d != 0 and net_60d != net_20d:
                     item["net_60d"] = net_60d
+                    if net_60d_days:
+                        item["net_60d_days"] = net_60d_days
 
         # === P0: 从本地history累加（最可靠，每天累积） ===
         hist_5d_count = 0
@@ -898,16 +925,18 @@ def fetch_sector_flow():
         real_10, net_10d_val = _real_n(hist, 10)
         real_20, net_20d_val = _real_n(hist, 20)
         real_60, net_60d_val = _real_n(hist, 60)
-        if net_5d_val != 0 and len(real_5) >= 5:
+        if item.get("net_5d") in (None, 0) and net_5d_val != 0 and len(real_5) >= 5:
             item["net_5d"] = net_5d_val
             item["net_5d_days"] = len(real_5)
-        if net_10d_val != 0 and len(real_10) >= 10:
+        # 🛡 2026-08-19 主人令一劳永逸修复：本地history最多9天，10日窗放宽到≥8天即出数(实N天标注)；
+        #   60日窗需真实≥45天历史才填充，避免与10日同值（本地9天累加必同值）触发体感bug。
+        if item.get("net_10d") in (None, 0) and net_10d_val != 0 and len(real_10) >= 8:
             item["net_10d"] = net_10d_val
             item["net_10d_days"] = len(real_10)
-        if net_20d_val != 0 and len(real_20) >= 20:
+        if item.get("net_20d") in (None, 0) and net_20d_val != 0 and len(real_20) >= 20:
             item["net_20d"] = net_20d_val
             item["net_20d_days"] = len(real_20)
-        if net_60d_val != 0 and len(real_60) >= 60:
+        if item.get("net_60d") in (None, 0) and net_60d_val != 0 and len(real_60) >= 45:
             item["net_60d"] = net_60d_val
             item["net_60d_days"] = len(real_60)
         # 一劳永逸兜底：写实 *_days 字段，sectors_in/out 同步时不再乱 fallback

@@ -1705,6 +1705,9 @@ def check_a_share_coverage():
         if d is None:
             continue
         stocks_raw = d.get("stocks", d.get("all_candidates", d.get("watch", d.get("tier_a", []))))
+        # 🛡 2026-08-19 主人令一劳永逸修复：MAHORO.js 结构不同，A 股命中在 gold_pool_matches，不是 stocks
+        if var == "MAHORO":
+            stocks_raw = d.get("gold_pool_matches", [])
         if isinstance(stocks_raw, dict):
             stocks = list(stocks_raw.values())
         else:
