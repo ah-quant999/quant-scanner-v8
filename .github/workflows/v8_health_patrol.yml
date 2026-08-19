@@ -114,13 +114,12 @@ jobs:
           if [ "$REMAIN_FAIL" -gt 0 ]; then
             echo "🚨 自愈后仍有 $REMAIN_FAIL 项 fail，可能结构性断点（algo_run→bridge_raw_data 未生效等），已发邮件升级"
             echo "::error::自愈闭环未达成 — $REMAIN_FAIL 项 10 分钟后仍 fail（详见 verify_output.txt）"
-            # 标记升级：写入 urgent 标记文件供下次日审计读取
-            python -c "import json,os,datetime;d={};ts=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S');
-p='.workbuddy/self_heal_escalations.json';
-try:d=json.load(open(p,encoding='utf-8'))
-except:d=[]
-d.append({'ts':ts,'remaining_fail':int(os.environ.get('REMAIN_FAIL',0)),'detail':'自愈闭环未达成'});
-open(p,'w',encoding='utf-8').write(json.dumps(d[-30:],ensure_ascii=False,indent=1))"
+            # 🛡 2026-08-19 阿狸咪根治（health_patrol 死 37h 根因）：
+            # 原版这段用多行 python -c（含换行 + 单引号字符串），YAML 解析时把换行当成
+            # 字符串内的 \n，但 Python 看到的是多行字符串需要三引号包裹 → SyntaxError →
+            # 整个 workflow 文件无效 → 每次 push 都产生 event=push failure run + 巡检/自愈停摆。
+            # 修复：抽到独立脚本 scripts/write_self_heal_escalation.py，单行调用。
+            REMAIN_FAIL="$REMAIN_FAIL" python scripts/write_self_heal_escalation.py
           else
             echo "✅ 自愈闭环达成：$NEW_OK 项全 OK"
           fi
