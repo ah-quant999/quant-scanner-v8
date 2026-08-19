@@ -1,5 +1,5 @@
 window.FOUR_VOLUME_60M={
- "update_time": "2026-08-19 07:19:29",
+ "update_time": "2026-08-19 15:56:43",
  "total": 1,
  "period": "60m",
  "description": "四量终极 60分钟共振信号（加分因子，独立于日线版）",
@@ -11,7 +11,7 @@ window.FOUR_VOLUME_60M={
    "board_label": "创业板",
    "close": 97.0,
    "pct_chg": 20.0,
-   "turnover_rate": 24.55,
+   "turnover_rate": 0,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
