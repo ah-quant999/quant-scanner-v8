@@ -31,44 +31,99 @@ def _safe_float(v):
     try:
         if v in (None, '', '-'):
             return None
-        return float(v)
+        f = float(v)
+        if f != f:  # NaN → None（2026-08-19 一劳永逸：东财 NaN 不抛异常会直通，前端显示 NaN）
+            return None
+        return f
     except Exception:
         return None
 
 
-def fetch_all_spot():
-    """全市场 A 股实时行情（约 5537 只，14 列，27s）。"""
-    df = ak.stock_zh_a_spot()
-    # 字段中文化映射
+def _fetch_all_spot_em():
+    """东财全市场 A 股实时行情（akshare.stock_zh_a_spot_em）—— 新浪接口风控/抖动时的自动 fallback。
+    2026-08-19 一劳永逸：新浪 stock_zh_a_spot 当日两次抖动（ConnectionError / JSONDecodeError 返回 HTML），
+    双源互备后任一路通都能出全量数据，杜绝「个股查询整表陈旧/错值」复发。"""
+    try:
+        df = ak.stock_zh_a_spot_em()
+    except Exception as e:
+        print(f"⚠️ 东财A股行情也失败: {type(e).__name__} {str(e)[:60]}")
+        return {}
     df = df.rename(columns={
         '代码': 'code', '名称': 'name', '最新价': 'price', '涨跌额': 'change',
-        '涨跌幅': 'pct', '买入': 'bid', '卖出': 'ask', '昨收': 'prev_close',
-        '今开': 'open', '最高': 'high', '最低': 'low',
-        '成交量': 'volume', '成交额': 'amount', '时间戳': 'snapshot_time',
+        '涨跌幅': 'pct', '昨收': 'prev_close', '今开': 'open', '最高': 'high',
+        '最低': 'low', '成交量': 'volume', '成交额': 'amount',
     })
+    now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8))).strftime('%H:%M:%S')
     out = {}
     for _, r in df.iterrows():
-        code = str(r['code']).strip()
-        if not code:
+        code = str(r.get('code', '')).strip().zfill(6)
+        if not code or code == '0':
             continue
-        # code 已带 sh/sz/bj 前缀（新浪格式：sh603259 / sz000001 / bj920000）
+        if code.startswith(('6', '9', '5')):
+            key = 'sh' + code
+        elif code.startswith(('0', '1', '2', '3')):
+            key = 'sz' + code
+        else:
+            key = 'bj' + code
         try:
-            out[code] = {
-                'name': r['name'],
-                'price': _safe_float(r['price']),
-                'change': _safe_float(r['change']),
-                'pct': _safe_float(r['pct']),
-                'prev_close': _safe_float(r['prev_close']),
-                'open': _safe_float(r['open']),
-                'high': _safe_float(r['high']),
-                'low': _safe_float(r['low']),
-                'volume': _safe_float(r['volume']),
-                'amount': _safe_float(r['amount']),
-                'snapshot_time': r['snapshot_time'],
+            out[key] = {
+                'name': r.get('name'),
+                'price': _safe_float(r.get('price')),
+                'change': _safe_float(r.get('change')),
+                'pct': _safe_float(r.get('pct')),
+                'prev_close': _safe_float(r.get('prev_close')),
+                'open': _safe_float(r.get('open')),
+                'high': _safe_float(r.get('high')),
+                'low': _safe_float(r.get('low')),
+                'volume': _safe_float(r.get('volume')),
+                'amount': _safe_float(r.get('amount')),
+                'snapshot_time': now,
             }
         except Exception:
             continue
+    print(f"✅ 东财A股行情：{len(out)} 只（新浪不可用时 fallback）")
     return out
+
+
+def fetch_all_spot():
+    """全市场 A 股实时行情（约 5537 只，14 列，27s）。
+    2026-08-19 一劳永逸：主源新浪 stock_zh_a_spot，失败自动 fallback 东财 stock_zh_a_spot_em，
+    双源互备杜绝「整表陈旧/错值」复发。"""
+    try:
+        df = ak.stock_zh_a_spot()
+        # 字段中文化映射
+        df = df.rename(columns={
+            '代码': 'code', '名称': 'name', '最新价': 'price', '涨跌额': 'change',
+            '涨跌幅': 'pct', '买入': 'bid', '卖出': 'ask', '昨收': 'prev_close',
+            '今开': 'open', '最高': 'high', '最低': 'low',
+            '成交量': 'volume', '成交额': 'amount', '时间戳': 'snapshot_time',
+        })
+        out = {}
+        for _, r in df.iterrows():
+            code = str(r['code']).strip()
+            if not code:
+                continue
+            # code 已带 sh/sz/bj 前缀（新浪格式：sh603259 / sz000001 / bj920000）
+            try:
+                out[code] = {
+                    'name': r['name'],
+                    'price': _safe_float(r['price']),
+                    'change': _safe_float(r['change']),
+                    'pct': _safe_float(r['pct']),
+                    'prev_close': _safe_float(r['prev_close']),
+                    'open': _safe_float(r['open']),
+                    'high': _safe_float(r['high']),
+                    'low': _safe_float(r['low']),
+                    'volume': _safe_float(r['volume']),
+                    'amount': _safe_float(r['amount']),
+                    'snapshot_time': r['snapshot_time'],
+                }
+            except Exception:
+                continue
+        return out
+    except Exception as e:
+        print(f"⚠️ 新浪A股行情失败: {type(e).__name__} {str(e)[:80]} → fallback 东财")
+        return _fetch_all_spot_em()
 
 
 def fetch_hk_spot():
@@ -364,7 +419,13 @@ def main():
     t0 = time.time()
     print("开始抓取全市场实时行情...")
     data = fetch_all_spot()
-    print(f"A股：{len(data)} 只，{time.time()-t0:.1f}s")
+    a_count = sum(1 for k in data if k.startswith(('sh', 'sz', 'bj')))
+    print(f"A股：{a_count} 只，{time.time()-t0:.1f}s")
+    # 🛡 2026-08-19 一劳永逸：A 股数量守卫——双源均不可用（新浪/东财同时风控）时
+    #   拒绝写输出，保留旧文件，杜绝「个股查询整表被残缺数据覆盖成未收录」。
+    if a_count < 3000:
+        print(f"❌ A股行情异常稀少（{a_count} 只 < 3000），新浪+东财均不可用 → 拒绝写输出，保留旧数据")
+        return 1
     hk_data = fetch_hk_spot()
     etf_data = fetch_etf_spot()
     # 合并：A 股为基础，港股/ETF 补充（不覆盖 A 股）

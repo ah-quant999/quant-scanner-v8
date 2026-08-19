@@ -7712,11 +7712,13 @@ window.__renderV8CalFull();
         connectNulls:true
       };
     });
-    // 副轴：上证指数涨跌幅（虚线）
+    // 副轴：上证指数涨跌幅（虚线）—— 2026-08-19 主人令：无真实数据（快照无 index_chg 或全 0）时
+    //   整条线 + 图例都不画，避免「上证没画线却写着上证涨跌幅(%)」的占位假象。
     var idxData=snaps.map(function(s){return s.index_chg||0;});
-    var idxSeries={name:'上证涨跌幅(%)',type:'line',yAxisIndex:1,data:idxData,smooth:true,
+    var idxHasReal=idxData.some(function(v){return v!==0;});
+    var idxSeries=idxHasReal?{name:'上证涨跌幅(%)',type:'line',yAxisIndex:1,data:idxData,smooth:true,
       showSymbol:false,lineStyle:{width:1,type:'dashed',color:'#94a3b8'},
-      tooltip:{valueFormatter:function(v){return (v>=0?'+':'')+v.toFixed(2)+'%';}}};
+      tooltip:{valueFormatter:function(v){return (v>=0?'+':'')+v.toFixed(2)+'%';}}}:null;
 
     if(_SF_INTRADAY_CHART) _SF_INTRADAY_CHART.dispose();
     _SF_INTRADAY_CHART=echarts.init(dom, null, {renderer:'canvas'});
@@ -7762,7 +7764,7 @@ window.__renderV8CalFull();
       dataZoom:[{type:'inside', start:0, end:100}, {type:'slider', height:18, bottom:8,
                  fillerColor:'rgba(56,189,248,.15)', borderColor:'#334155',
                  textStyle:{color:'#94a3b8'}}],
-      series:series.concat([idxSeries])
+      series: idxHasReal ? series.concat([idxSeries]) : series
     }, true);  // 🛡 2026-08-19 一劳永逸：notMerge=true 强制重画，避免 tab 切回后 grid/dataZoom 残留旧布局
     // 立即 resize 一次：解决"父容器已可见但 chart 仍画在 0 宽"导致的左半挤压
     try{ _SF_INTRADAY_CHART.resize(); }catch(e){}
@@ -7780,7 +7782,7 @@ window.__renderV8CalFull();
     if(legendDom){
       var idxColor='#94a3b8';
       function _sfEsc(s){return String(s).replace(/[<>&"]/g,function(c){return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];});}
-      var lh='<span style="font-size:10px;color:#94a3b8;margin-right:4px;align-self:center">共 '+(lines.length+1)+' 条线 · '+snaps.length+' 快照（'+snaps[0].time+' → '+snaps[snaps.length-1].time+'）：</span>';
+      var lh='<span style="font-size:10px;color:#94a3b8;margin-right:4px;align-self:center">共 '+(lines.length+(idxHasReal?1:0))+' 条线 · '+snaps.length+' 快照（'+snaps[0].time+' → '+snaps[snaps.length-1].time+'）：</span>';
       lines.forEach(function(name){
         var color=_sfPickColor(name);
         lh+='<span class="sf-leg-item" data-sf-name="'+_sfEsc(name)+'" '
@@ -7788,11 +7790,13 @@ window.__renderV8CalFull();
            +'<i style="display:inline-block;width:14px;height:3px;background:'+color+';border-radius:2px"></i>'
            +'<span>'+_sfEsc(name)+'</span></span>';
       });
-      // 上证指数副轴（虚线灰色）也加入，最后展示
-      lh+='<span class="sf-leg-item" data-sf-name="__idx__" '
-         +'style="display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:4px;cursor:pointer;background:rgba(148,163,184,.08)">'
-         +'<i style="display:inline-block;width:14px;height:0;border-top:1px dashed '+idxColor+'"></i>'
-         +'<span style="color:'+idxColor+'">上证涨跌幅(%)</span></span>';
+      // 上证指数副轴（虚线灰色）—— 仅在有真实数据时加入图例（2026-08-19 主人令）
+      if(idxHasReal){
+        lh+='<span class="sf-leg-item" data-sf-name="__idx__" '
+           +'style="display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:4px;cursor:pointer;background:rgba(148,163,184,.08)">'
+           +'<i style="display:inline-block;width:14px;height:0;border-top:1px dashed '+idxColor+'"></i>'
+           +'<span style="color:'+idxColor+'">上证涨跌幅(%)</span></span>';
+      }
       legendDom.innerHTML=lh;
       // 联动高亮
       Array.prototype.forEach.call(legendDom.querySelectorAll('.sf-leg-item'),function(el){
@@ -13329,7 +13333,7 @@ window.__renderV8CalToday();
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=3bb06ec3e6'},
     {name:'STOCK_PROFILE', url:'data/STOCK_PROFILE.js?v=f23feb0264'},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=db6980e27c'},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=9a06c6da98'},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=ac1e588334'}
   ];
   function loadOne(item, done){
