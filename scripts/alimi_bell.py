@@ -20,8 +20,8 @@
         18:30-23:00 晚间   -> 上次成功 < 3h 则跳过
         23:00-08:00 夜间   -> 不按铃
         周末 08:00-11:00   -> 上次成功 < 3h 则跳过；其余时间不按铃
-    algo_cloud（ubuntu-latest，120min timeout，18:30 主档 + dispatch 兜底）：
-        工作日 18:00-23:30 -> 上次成功 < 4h 则跳过；最近 run 失败/取消则 30min 重试
+    algo_cloud（ubuntu-latest，120min timeout，19:15 主档 + dispatch 兜底）：
+        工作日 19:15-23:30 -> 上次成功 < 4h 则跳过；最近 run 失败/取消则 30min 重试
         盘后若 TOP5_TRACK/BACKTEST_TDX/BACKTEST_COMPREHENSIVE/COCKPIT_BACKTEST 仍为旧日期 -> 直接按铃
         周末不按铃（workflow 内部有交易日历 gate，非交易日自动跳过）
 
@@ -109,7 +109,7 @@ def _algo_need_bell(now):
     hhmm = now.hour * 60 + now.minute
     if wd >= 5:
         return None, None, "weekend-off"
-    if 18 * 60 <= hhmm < 23 * 60 + 30:
+    if 19 * 60 + 15 <= hhmm < 23 * 60 + 30:
         return 240, 30, "algo-main"
     return None, None, "algo-off-hours"
 
@@ -143,13 +143,13 @@ def _read_update_time(var_name):
 
 
 def _algo_data_need_bell(now):
-    """盘后 18:30-23:30 直接检查回测卡数据是否已更新到今天。
+    """盘后 19:15-23:30 直接检查回测卡数据是否已更新到今天。
 
-    根因：只看 workflow 上次成功不够——workflow 成功也可能因为 18:00 前跑过，
-    而选股策略被我们永久门控在 18:00 后，回测数据必须今天才新鲜。
+    根因：只看 workflow 上次成功不够——workflow 成功也可能因为 19:15 前跑过，
+    而选股策略被我们永久门控在 18:00 后、主档调为 19:15，回测数据必须今天才新鲜。
     """
     hhmm = now.hour * 60 + now.minute
-    if not (18 * 60 + 30 <= hhmm < 23 * 60 + 30):
+    if not (19 * 60 + 15 <= hhmm < 23 * 60 + 30):
         return None
     if now.weekday() >= 5:
         return None

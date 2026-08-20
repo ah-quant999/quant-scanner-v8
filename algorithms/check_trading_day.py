@@ -12,7 +12,7 @@ import sys
 ALGO = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ALGO)
 
-# 🛡 2026-08-19 一劳永逸根因：v8_algo_cloud.yml 18:30 cron 连续多天 0 算法执行，
+# 🛡 2026-08-19 一劳永逸根因：v8_algo_cloud.yml 19:15 cron 连续多天 0 算法执行，
 # 17 张盘后/选股卡停在 08:27 红卡——皆因本脚本 print("📅 ...") 在 cn runner
 # （中文 Windows 默认 GBK 终端）触发 UnicodeEncodeError → exit 1 → workflow 失败。
 # cloud_fetch_v8.py 早就有同款兜底（line 33-37），本脚本漏抄。补齐：

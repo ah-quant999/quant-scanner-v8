@@ -167,6 +167,26 @@ jobs:
         run: |
           python algorithms/calc_etf_intraday.py
 
+      # 2026-08-20 主人令：观澜台 / mahoro 研报数据源并入定时任务，根治候选股池“公开资讯源/研报来源”为 0
+      # 仅 post_close 跑：需要当日收盘行情 + 研报，输出 out/candidate_pool.json → stage_to_raw → raw_data/candidate.json
+      - name: "📚 观澜台 + mahoro 研报抓取并重建候选股池"
+        if: steps.cat.outputs.category == 'post_close'
+        continue-on-error: true
+        shell: bash
+        env:
+          ZSXQ_TOKEN: ${{ secrets.ZSXQ_TOKEN }}
+          MAHORO_COOKIE: ${{ secrets.MAHORO_COOKIE }}
+          V8_OUT_DIR: out
+        run: |
+          mkdir -p out
+          # build_candidate_pool / guanlan_extractor 读 out/ 下的 stock_names.json + gold_pool.json 做名字索引
+          cp raw_data/stock_names.json out/stock_names.json 2>/dev/null || true
+          cp raw_data/gold_pool.json out/gold_pool.json 2>/dev/null || true
+          python algorithms/guanlan_extractor.py
+          python algorithms/fetch_maharo_signals.py --non-interactive
+          python algorithms/build_candidate_pool.py
+          python -c "import sys; sys.path.insert(0,'algorithms'); import stage_to_raw; stage_to_raw.main()"
+
       - name: "📤 推送 raw_data/ 到 main（Contents API）"
         # 🔴 2026-08-18 主人根治令：消费层软失败。推送失败（网络抖动/并发冲突）不阻断
         #   后续 bridge/update_v8/health_check——raw_data 数据源已抓取成功，只是推送瞬态失败
