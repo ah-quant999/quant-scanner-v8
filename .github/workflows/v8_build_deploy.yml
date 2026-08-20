@@ -14,8 +14,8 @@
 #     用 workflow_run 原生机制绕过该限制，实现"抓取完成即自动部署"，无需小九手动 dispatch。
 #   - workflow_dispatch → 全量构建（人工兜底）
 #
-# ⚠️ 已移除原 17:00 schedule：它会与 18:30 前尚未完成的算法链竞态，用旧 raw_data
-#   先构建部署一版陈旧数据；而算法链 18:30 推送 raw_data 时会经 push 触发本工作流
+# ⚠️ 已移除原 17:00 schedule：它会与 19:15 前尚未完成的算法链竞态，用旧 raw_data
+#   先构建部署一版陈旧数据；而算法链 19:15 推送 raw_data 时会经 push 触发本工作流
 #   自动重新构建，schedule 纯属冗余且有害，故删除。
 
 name: "☁️ v8 构建部署(云端ubuntu)"

@@ -1,7 +1,7 @@
 # 九宝量化 v8.0 — 盘中算法追踪轻量重算（云端 ubuntu-latest）
 #
 # 2026-08-20 主人令「一劳永逸」：动量共识筛选属于盘后选股策略，
-#   已迁到 18:30 CST 盘后算法链（v8_algo_cloud.yml → v8_build_deploy.yml），
+#   已迁到 19:15 CST 盘后算法链（v8_algo_cloud.yml → v8_build_deploy.yml），
 #   避免盘中 09:28 等时间点用未完整数据提前计算。
 # 本 workflow 仅保留：
 #   ① 盘中每 2h 真跑 gen_algo_track.py（三算法追踪入池：四量终极/板块龙头/大牛股猎手）
@@ -49,7 +49,7 @@ jobs:
         with:
           python-version: "3.13"
 
-      # 2026-08-20 主人令：动量共识筛选已迁到盘后 18:30 算法链（v8_algo_cloud.yml），
+      # 2026-08-20 主人令：动量共识筛选已迁到盘后 19:15 算法链（v8_algo_cloud.yml），
       #   盘中不再重复跑，避免 09:28 等时间点基于未完整数据刷新。
       #   脚本入口已加 check_stock_picking_ready() 双保险，任何手动触发在 18:00 前都会直接退出。
 
@@ -66,7 +66,7 @@ jobs:
         # ALGO_TRACK.js 由 update_v8.py 的 _make_js 从原始 raw_data 重生，
         # 流水线单一写者原则防止双写竞态击穿 ?v 防覆盖铁律（2026-08-15 根因修复）。
         # 不传 --category：默认 build() 内部读 raw_data/*.json 全量重生，盘中每 2h 漂移可控（<5min）。
-        # 注：MOMENTUM_FILTER.js 已迁到盘后 18:30 算法链，本 workflow 不再碰。
+        # 注：MOMENTUM_FILTER.js 已迁到盘后 19:15 算法链，本 workflow 不再碰。
         run: |
           python update_v8.py || echo "update_v8 warned, continue"
 

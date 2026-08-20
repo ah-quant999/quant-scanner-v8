@@ -1,7 +1,7 @@
 # 九宝量化 v8.0 — STOCK_QUOTE 轻量 refresh
 #
 # 🆕 2026-08-18 阿狸咪新建：解决"STOCK_QUOTE.js 0 字节 → 全站个股查询无报价"问题。
-#   背景：fetch_stock_quote_v8.py 仅在 v8_algo_cloud 整套算法链（cron 18:30 每天）里跑一次，
+#   背景：fetch_stock_quote_v8.py 仅在 v8_algo_cloud 整套算法链（cron 19:15 每天）里跑一次，
 #   8/15 周五 18:30 最后一次成功后，8/16-17 调度丢触发或写入失败 → data/STOCK_QUOTE.js 0 字节。
 #   表现：TOP5_TRACK 前 3 只（06862/301583/002552）9 天 last_pct=null + 全站个股查询无报价。
 #   解决：本 workflow 单独跑 fetch_stock_quote_v8.py（5-10 分钟），cron 兜底 17:00 盘后
