@@ -110,6 +110,10 @@ def main():
     print(f"  三重共识选股  —  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 60)
 
+    # 🛡 2026-08-20 主人令·一劳永逸：三重共识属于盘后选股策略，必须 18:00 后跑。
+    from utils.time_gate import check_stock_picking_ready
+    check_stock_picking_ready(by='gen_triple_consensus')
+
     top10 = load_json(os.path.join(DATA_DIR, "top10_daily.json"), {})
     # 🔴 2026-08-06 改 v8 命名：stage_to_raw 把 out/cockpit_tier_recommend_alimi.json 提升为 raw_data/cockpit_tier_recommend.json
     tier = load_json(os.path.join(DATA_DIR, "cockpit_tier_recommend.json"), {})

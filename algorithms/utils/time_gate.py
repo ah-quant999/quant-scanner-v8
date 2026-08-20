@@ -53,6 +53,37 @@ def markets_required(markets):
     return list(markets)
 
 
+# 🔴 2026-08-20 主人令·一劳永逸：所有选股策略统一守门
+STOCK_PICKING_READY = (18, 0)  # CST 18:00
+
+
+def check_stock_picking_ready(by='unknown'):
+    """盘后选股策略统一门控：必须 ≥ 18:00 CST。
+
+    所有选股策略（CRDS / TOP10 / 三重共识 / 四量 / 最终推荐等）必须在
+    A股收盘、港股收盘、龙虎榜、北向、板块资金等全部盘后数据稳定就绪后才跑。
+    早于 18:00 直接 sys.exit(1)。
+    """
+    if os.environ.get('TIME_GATE_BYPASS') == '1':
+        logging.warning(f'[time_gate] BYPASS 已设置，跳过选股策略守门')
+        return
+    now = _now_cst()
+    wd = now.weekday()
+    if wd >= 5:
+        # 周末不交易，选股策略无意义；这里不拦截，让上游决定是否跑
+        logging.info('[time_gate] 周末，跳过选股策略守门')
+        return
+    hh, mm = STOCK_PICKING_READY
+    ready = now.hour * 60 + now.minute >= hh * 60 + mm
+    if not ready:
+        print(f'\n🚫 [time_gate] 盘后选股策略禁止执行（需 ≥ {hh:02d}:{mm:02d} CST，当前 {now:%H:%M}）', file=sys.stderr)
+        print(f'   触发方: {by}', file=sys.stderr)
+        print(f'   原因: 所有盘后数据（龙虎榜/北向/板块资金/个股行情等）18:00 后才稳定就绪', file=sys.stderr)
+        print(f'   绕开（应急）: TIME_GATE_BYPASS=1 环境变量', file=sys.stderr)
+        sys.exit(1)
+    logging.info(f'[time_gate] 选股策略守门通过（{now:%H:%M}）')
+
+
 def check(markets, by='unknown'):
     """检查所有 markets 是否都过了数据就绪时间
     markets: list of 'a'/'hk'/'lhb'/'us'

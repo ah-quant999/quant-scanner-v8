@@ -345,6 +345,10 @@ def backtest_four_volume(years=3, top_cy=60, top_kc=60, top_zb=60, top_hk=30):
 
 
 def main():
+    # 🛡 2026-08-20 主人令·一劳永逸：四量终极属于盘后选股策略，必须 18:00 后跑。
+    from utils.time_gate import check_stock_picking_ready
+    check_stock_picking_ready(by='strategy_four_volume')
+
     ap = argparse.ArgumentParser(description="四量终极 选股策略")
     ap.add_argument("--backtest", type=int, default=0,
                     help="同时跑近 N 年回测(0=不跑)")

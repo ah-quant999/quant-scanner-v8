@@ -72,6 +72,10 @@ def main():
     print(f"  多维共振评分 · 每日TOP20精选  —  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 60)
 
+    # 🛡 2026-08-20 主人令·一劳永逸：TOP10 精选属于盘后选股策略，必须 18:00 后跑。
+    from utils.time_gate import check_stock_picking_ready
+    check_stock_picking_ready(by='generate_top10')
+
     # ── 1. 加载金股池 ──
     # 🔴 2026-08-11 修复顺序缺陷：本轮 fresh gold_pool 由 scanner.py 直产到 out/，
     #    raw_data/gold_pool.json 要等 stage_to_raw（run_algorithms step2）才刷新；

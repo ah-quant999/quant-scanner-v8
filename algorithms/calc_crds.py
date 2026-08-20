@@ -679,6 +679,9 @@ def _parse_js_stock_file(js_path):
 def calc_crds():
     """主流程：读取v8金股池/候选池 → 逐只计算CRDS → 输出
 
+    🛡 2026-08-20 主人令·一劳永逸：CRDS 属于盘后选股策略，必须在 18:00 所有数据就绪后跑。
+    加统一选股策略守门：早于 18:00 直接 sys.exit(1)；应急可设 TIME_GATE_BYPASS=1。
+
     数据源优先级(2026-08-05 修复，不再依赖已退役v6的watch_result.json):
       1. out/gold_pool_stocks.json (算法链build_candidate_pool.py产出)
       2. raw_data/gold_pool.json (update_v8.py注入前)
@@ -687,6 +690,13 @@ def calc_crds():
     print(f"\n{'='*60}")
     print(f"CRDS逆势龙头评分计算 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"{'='*60}")
+
+    # 🛡 2026-08-20 统一选股策略门控：18:00 前禁止出结果
+    try:
+        from utils.time_gate import check_stock_picking_ready
+        check_stock_picking_ready(by='calc_crds')
+    except SystemExit:
+        raise
 
     # 1. 读取股票列表（v8自有数据源，不再依赖v6 watch_result.json）
     all_stocks = _load_scan_targets()

@@ -194,34 +194,52 @@ def step_seed_inputs():
         print(f"  ⚠️ 保存金股池快照失败: {e}")
 
 
-# 🔴 2026-08-20 一劳永逸修复：算法时序逻辑 bug。
-#   症状：16:10 就出最终推荐，但龙虎榜 16:30 才发布 → final_recommend 用的是不完整/旧 LHB 数据。
-#   根因：run_algorithms.py 无时间 gate，任何时刻触发都会跑整条链包括 LHB 依赖脚本。
-#   修复：以下脚本的输入依赖「当日龙虎榜」（16:30 后才稳定可用），在 16:30 前跳过。
-LHB_DEPENDENT_SCRIPTS = {
-    "final_recommend.py",         # 注释明确：输入含 lhb → Top5 共振
-    "gen_triple_consensus.py",    # 读 top10/cockpit/fundamental + 隐式依赖 LHB 完整性
-    "gen_triple_track.py",        # 读 triple_history + LHB 追踪
-    "gen_lhb_7d.py",              # 直接读 lhb_data.json 当日明细（由 step_gen_lhb_7d 调用）
-    "gen_top5_track.py",          # finalRec Top5 追踪，依赖 final_recommend
+# 🔴 2026-08-20 主人令·一劳永逸修复：所有选股策略必须在 18:00 盘后数据全就绪后才跑。
+#   症状1：16:10 就出最终推荐，但龙虎榜 16:30 才发布 → final_recommend 用不完整/旧 LHB 数据。
+#   症状2：CRDS 17:13 就跑出结果（前端显示"更新于今日 17:13"），但大量盘后数据 17:30-18:00 才齐。
+#   根因：run_algorithms.py 只有 16:30 龙虎榜门控，且未覆盖 calc_crds / generate_top10 / 四量等选股脚本。
+#   修复：统一设"盘后选股策略门控" ≥ 18:00 (CST)。以下脚本在 18:00 前一律跳过；
+#         上游纯数据采集（fetch_*）不受影响，仍可提前跑。
+STOCK_PICKING_SCRIPTS = {
+    # 核心选股策略
+    "calc_crds.py",                  # CRDS 逆势龙头（前端 17:13 更新元凶）
+    "build_candidate_pool.py",       # 候选池/金股池聚合
+    "calc_stock_rps.py",             # 个股 RPS（依赖候选池结果）
+    "generate_top10.py",             # 多维共振 TOP10 精选
+    "strategy_four_volume.py",       # 四量终极 日线选股
+    "strategy_four_volume_60m.py",   # 四量终极 60min 选股
+    "gen_cockpit_tier_recommend.py", # 驾驶舱分级推荐
+    "gen_cockpit_advice.py",         # 驾驶舱建议
+    "update_triple_resonance_history.py",  # 三重历史累积
+    "gen_triple_consensus.py",       # 三重共识选股
+    "gen_triple_track.py",           # 三重跟踪
+    "final_recommend.py",            # 跨策略共振 Top5（管线最终产物）
+    "gen_top5_track.py",             # Top5 追踪
+    "gen_algo_track.py",             # 算法追踪
+    "calc_sentiment_cycle.py",       # 情绪周期（读 LIMIT_UP_HEATMAP）
+    "auto_run_dn_algorithm.py",      # H 反推算法
+    "track_h_auto_buy.py",           # H 反推跟踪
+    "calc_volatility_watch.py",      # 波动率观察选股
+    "gen_stock_stop.py",             # ATR 止损止盈（读候选宇宙日K）
+    "gen_lhb_7d.py",                 # 龙虎榜 7 日累计（选股向汇总）
 }
-# 16:30 = 龙虎榜官方发布时间（收盘后 1.5 小时），留 2min 余量
-_LHB_READY_HOUR, _LHB_READY_MIN = 16, 30
+# 18:00 = 所有盘后数据（龙虎榜/北向/板块资金/个股行情/机构调研等）稳定就绪时间
+_STOCK_PICKING_READY_HOUR, _STOCK_PICKING_READY_MIN = 18, 0
 
 
-def _is_post_lhb_ready():
-    """判断当前是否已过龙虎榜发布时间（CST 16:30）。"""
+def _is_post_close_picking_ready():
+    """判断当前是否已过盘后选股策略统一执行时间（CST 18:00）。"""
     now = datetime.now()
     # 云端 runner 用 TZ=Asia/Shanghai 时朴素 now() 即北京时间；本机系统本身 CST
-    return (now.hour > _LHB_READY_HOUR or
-            (now.hour == _LHB_READY_HOUR and now.minute >= _LHB_READY_MIN))
+    return (now.hour > _STOCK_PICKING_READY_HOUR or
+            (now.hour == _STOCK_PICKING_READY_HOUR and now.minute >= _STOCK_PICKING_READY_MIN))
 
 
 def step_run():
     print(f"\n[1] 运行算法链（{len(ORDER)} 个）")
-    # 🔴 数据就绪门控：打印一次当前时间和 LHB 就绪状态
-    lhb_ready = _is_post_lhb_ready()
-    print(f"  🕐 当前时间 {datetime.now():H:%M} | 龙虎榜就绪 {'✅ 已过 16:30' if lhb_ready else '⏳ 未到 16:30（LHB 依赖脚本将跳过）'}")
+    # 🔴 盘后选股策略统一门控：18:00 前跳过所有选股脚本
+    picking_ready = _is_post_close_picking_ready()
+    print(f"  🕐 当前时间 {datetime.now():%H:%M} | 盘后选股策略就绪 {'✅ 已过 18:00' if picking_ready else '⏳ 未到 18:00（选股策略将跳过）'}")
     ok, fail = 0, 0
     for script in ORDER:
         path = os.path.join(ALGO, script)
@@ -229,9 +247,9 @@ def step_run():
             print(f"  ❌ 缺失脚本: {script}")
             fail += 1
             continue
-        # 🔴 LHB 门控：未到 16:30 且脚本依赖当日龙虎榜 → 跳过
-        if not lhb_ready and script in LHB_DEPENDENT_SCRIPTS:
-            print(f"  ⏭️  {script}  ← 跳过（龙虎榜 16:30 未就绪，避免用不完整数据生成推荐）")
+        # 🔴 盘后选股策略门控：未到 18:00 且脚本属于选股策略 → 跳过
+        if not picking_ready and script in STOCK_PICKING_SCRIPTS:
+            print(f"  ⏭️  {script}  ← 跳过（盘后数据未全就绪，18:00 前禁止生成选股结果）")
             continue
         print(f"  ▶ {script}  ({datetime.now():%H:%M:%S})")
         try:
@@ -308,12 +326,12 @@ def main():
     step_seed_inputs()          # 默认 no-op, V6_SEED=1 才重灌
     step_run()
     n = step_stage()
-    # 🔴 LHB 后处理门控：未到 16:30 不处理当日龙虎榜数据（避免用不完整/旧数据）
-    if _is_post_lhb_ready():
+    # 🔴 盘后选股策略门控：LHB 7日累计属于选股向汇总，未到 18:00 不处理当日龙虎榜数据
+    if _is_post_close_picking_ready():
         step_append_lhb_history()
         step_gen_lhb_7d()
     else:
-        print("\n[2.5-2.6] ⏭️ 跳过 LHB 历史累积 + LHB 7日累计（未到 16:30）")
+        print("\n[2.5-2.6] ⏭️ 跳过 LHB 历史累积 + LHB 7日累计（盘后选股策略未到 18:00）")
     step_push()
     print(f"\n=== 完成。staged {n} 个文件 ===")
 
