@@ -41,6 +41,16 @@ ROOT = Path(__file__).resolve().parent
 RAW_DIR = ROOT / "raw_data"
 RAW_DIR.mkdir(exist_ok=True)
 
+# 东财概念列表里的"索引/通道/成分/境外指数"类条目，不应作为真实概念热点展示
+# 2026-08-20 一劳永逸修复：标准普尔/富时罗素等被东财当作概念板块返回，会污染
+# 板块资金流与分时累计曲线，必须从 sectors_in/out 与历史数据中剔除。
+_NOISE_CONCEPTS = {
+    "融资融券", "深股通", "沪股通", "昨日高振幅", "富时罗素", "MSCI中国",
+    "深成500", "标准普尔", "HS300_", "中证500", "上证50", "上证180",
+    "深证100R", "创业板综", "创业成份", "中盘股", "大盘股", "小盘股",
+    "基金重仓", "百元股", "东方财富热股", "科技风格", "大盘成长", "高市净率",
+}
+
 # 变量名 → raw_data 文件名（与 update_v8.py 的 DATA_SOURCES 对应）
 VAR_TO_RAW = {
     "ETF_INTRADAY_HEAT": "etf_intraday_heat.json",
@@ -1162,6 +1172,11 @@ def f_sector_fund_flow():
         items.extend(by_key.values())
     if not items:
         return None
+
+    # 2026-08-20 一劳永逸过滤噪声概念：标准普尔/富时罗素等是境外指数或成分标签，
+    # 不是真实 A 股概念板块，进入分时累计曲线会导致图例出现"标准普尔是 A 股的"这种误导。
+    items = [x for x in items if x.get("name") not in _NOISE_CONCEPTS]
+
     items.sort(key=lambda x: x["net"], reverse=True)
     sectors_in = [x for x in items if x["net"] > 0]
     sectors_out = [x for x in items if x["net"] < 0]
@@ -1179,6 +1194,10 @@ def f_sector_fund_flow():
                 _history = json.loads(_hist_path.read_text(encoding="utf-8"))
             except Exception:
                 _history = {}
+        # 2026-08-20 清理历史中的噪声概念（标准普尔/富时罗素等）残留
+        for _noise_name in list(_NOISE_CONCEPTS):
+            if _noise_name in _history:
+                del _history[_noise_name]
         _appended = 0
         for _sec in sectors_in + sectors_out:
             _name = _sec["name"]

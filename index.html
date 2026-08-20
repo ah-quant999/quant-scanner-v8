@@ -11144,19 +11144,28 @@ function drawUpDownChart(){
 
     // ── pane2: 🔮 潜力挖掘 ──
     h+='<div class="ul-pane" id="ulPanePP">';
+
+    // 子卡 A：潜力个股表格（POTENTIAL_PICKS）
+    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a78bfa;">';
+    h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
+    h+='<span style="font-size:15px;font-weight:700;color:#a78bfa;">🔮 潜力挖掘</span>';
+    h+='<span class="fresh" id="prPPFresh">—</span>';
+    h+='<span style="font-size:12px;color:var(--dim);">热点概念 → 潜力个股 · 不构成投资建议</span>';
+    h+='</div>';
+    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">⚠️ 基于当前热门概念与个股资金面/量价信号筛选，<b style="color:#fbbf24">不构成任何投资建议</b>，仅作研究观察。</div>';
+    h+='<div id="ppBody"><div class="note">加载中…</div></div>';
+    h+='</div>';
+
+    // 子卡 B：ETF·龙头参考（从调试专区 dbgEtfMapBody 克隆内容）
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';
     h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
     h+='<span style="font-size:15px;font-weight:700;color:#38bdf8;">📌 概念/行业 → ETF·龙头 参考</span>';
     h+='<span class="fresh" id="prPPEtfFresh">—</span>';
     h+='<span style="font-size:12px;color:var(--dim);">潜力挖掘·参考 · 不构成投资建议</span>';
     h+='</div>';
-    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">⚠️ 仅根据当前热点板块列出代表性 ETF 与龙头股，<b style="color:#fbbf24">不构成任何投资建议</b>。本卡与「调试专区」数据源一致（共享内容）。</div>';
     h+='<div id="ppEtfMapBody"><div class="note">加载中…</div></div>';
-    h+='<hr style="border:none;border-top:1px dashed rgba(56,189,248,.25);margin:12px 0;">';
-    h+='<div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.3);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.7;color:var(--sub);">';
-    h+='📌 潜力挖掘：本卡为热点板块→ETF/龙头映射参考，属研究信号，未纳入任何推荐链路。';
     h+='</div>';
-    h+='</div>';
+
     h+='</div>';  // /ulPanePP
 
     el.innerHTML=h;

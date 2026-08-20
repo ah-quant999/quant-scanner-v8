@@ -219,6 +219,28 @@ def load_window_var(path, var_name):
     return None
 
 
+def load_window_var_from_site(source_id, var_name):
+    """一劳永逸修复（2026-08-20）：优先读取线上站点 data/<id>.js（云端真实部署态），
+    避免本机 checkout 未 git pull 时旧 data/*.js 误报「陈旧」，导致主人与看门狗反复盯盘。
+    站点不可达/解析失败返回 None，由调用方回退到本地文件（云端 runner 本地即最新 checkout）。"""
+    try:
+        url = SITE_URL + f"data/{source_id}.js"
+        req = urllib.request.Request(url, headers={"User-Agent": "v8-health-check"})
+        raw, err = _urlopen_retry(req, timeout=20)
+        if raw is None:
+            return None
+        text = raw.decode("utf-8", "ignore").lstrip("\ufeff")
+        m = re.search(rf"window\.{re.escape(var_name)}\s*=\s*(\{{[\s\S]*?\}})\s*;", text)
+        if m:
+            try:
+                return json.loads(m.group(1))
+            except Exception:
+                return None
+    except Exception:
+        return None
+    return None
+
+
 def _load_token():
     # GHA/云端：secrets.GITHUB_TOKEN (默认 workflow token, 有 actions:read 权限可查 runners)
     for env_name in ("V8_GITHUB_TOKEN", "GITHUB_TOKEN", "GH_TOKEN"):
@@ -972,9 +994,12 @@ def check_data_cards():
 
     for d in CARD_DEFS:
         source_id = d.get("_source_file") or d["id"]
-        path = DATA_DIR / f"{source_id}.js"
         var_name = d.get("_window_var") or d["id"]
-        data = load_window_var(path, var_name)
+        path = DATA_DIR / f"{source_id}.js"  # 本地兜底路径（云端 runner 本地即最新 checkout）
+        # 2026-08-20 一劳永逸修复：优先读线上站点（云端真实部署态），本机未 pull 也不会误报陈旧
+        data = load_window_var_from_site(source_id, var_name)
+        if data is None:
+            data = load_window_var(path, var_name)
         if data is None:
             _emit(d, {
                 "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
