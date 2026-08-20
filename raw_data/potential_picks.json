@@ -1,200 +1,277 @@
 {
-  "update_time": "2026-08-19 16:38:59",
-  "data_date": "2026-08-19",
+  "update_time": "2026-08-20 11:45:00",
+  "data_date": "2026-08-20",
   "source": "CONCEPT_RANKING × STOCK_PROFILE × STOCK_QUOTE",
   "hot_concepts_count": 33,
   "hot_concepts": [
-    "煤化工概念",
-    "净水概念",
-    "宠物经济",
-    "租售同权",
-    "红利股",
-    "啤酒概念",
-    "B股",
-    "红利破净股",
-    "代糖概念",
-    "微盘精选"
+    "融资融券",
+    "创新药",
+    "CAR-T细胞疗法",
+    "医药医疗风格",
+    "CRO",
+    "病原体防治",
+    "黄金概念",
+    "沪股通",
+    "创新医疗服务",
+    "基因测序"
   ],
   "picks": [
     {
-      "code": "600722",
-      "name": "金牛化工",
+      "code": "300639",
+      "name": "凯普生物",
+      "pct": 5.0,
+      "amount_yi": 0.03,
+      "hot_concepts": [
+        "AI制药（医疗）",
+        "体外诊断概念",
+        "创业板综",
+        "创新药",
+        "医疗器械概念",
+        "基因测序",
+        "病原体防治",
+        "病毒防治"
+      ],
+      "hot_count": 8,
+      "total_score": 13.89
+    },
+    {
+      "code": "300436",
+      "name": "广生堂",
       "pct": 4.96,
-      "amount_yi": 15.29,
+      "amount_yi": 0.09,
       "hot_concepts": [
-        "煤化工概念"
+        "创业板综",
+        "创新药",
+        "基因测序",
+        "病原体防治",
+        "病毒防治",
+        "肝炎概念",
+        "融资融券"
       ],
-      "hot_count": 1,
-      "total_score": 6.13
+      "hot_count": 7,
+      "total_score": 13.81
     },
     {
-      "code": "603538",
-      "name": "美诺华",
-      "pct": 3.08,
-      "amount_yi": 22.59,
+      "code": "002007",
+      "name": "华兰生物",
+      "pct": 4.06,
+      "amount_yi": 0.08,
       "hot_concepts": [
-        "宠物经济"
+        "创新药",
+        "单抗概念",
+        "流感",
+        "生物疫苗",
+        "病原体防治",
+        "病毒防治",
+        "融资融券"
       ],
-      "hot_count": 1,
-      "total_score": 4.85
+      "hot_count": 7,
+      "total_score": 13.4
     },
     {
-      "code": "000933",
-      "name": "神火股份",
-      "pct": 2.83,
-      "amount_yi": 11.11,
+      "code": "600645",
+      "name": "中源协和",
+      "pct": 4.11,
+      "amount_yi": 0.1,
       "hot_concepts": [
-        "煤化工概念"
+        "CAR-T细胞疗法",
+        "体外诊断概念",
+        "免疫治疗",
+        "单抗概念",
+        "基因测序",
+        "精准医疗",
+        "融资融券"
       ],
-      "hot_count": 1,
-      "total_score": 4.64
+      "hot_count": 7,
+      "total_score": 13.05
     },
     {
-      "code": "605589",
-      "name": "圣泉集团",
-      "pct": 3.58,
-      "amount_yi": 23.39,
+      "code": "300723",
+      "name": "一品红",
+      "pct": 3.16,
+      "amount_yi": 0.07,
       "hot_concepts": [
-        "代糖概念"
+        "创业板综",
+        "创新药",
+        "流感",
+        "生物疫苗",
+        "病原体防治",
+        "肝炎概念",
+        "融资融券"
       ],
-      "hot_count": 1,
-      "total_score": 4.46
+      "hot_count": 7,
+      "total_score": 12.64
     },
     {
-      "code": "600309",
-      "name": "万华化学",
-      "pct": 0.12,
-      "amount_yi": 21.01,
+      "code": "603222",
+      "name": "济民健康",
+      "pct": 2.97,
+      "amount_yi": 0.01,
       "hot_concepts": [
-        "煤化工概念",
-        "环氧丙烷"
+        "体外诊断概念",
+        "免疫治疗",
+        "创新药",
+        "医疗器械概念",
+        "病原体防治",
+        "精准诊断",
+        "融资融券"
       ],
-      "hot_count": 2,
-      "total_score": 4.41
+      "hot_count": 7,
+      "total_score": 12.63
     },
     {
-      "code": "600227",
-      "name": "赤天化",
-      "pct": 3.02,
-      "amount_yi": 4.72,
+      "code": "603259",
+      "name": "药明康德",
+      "pct": 4.27,
+      "amount_yi": 2.37,
       "hot_concepts": [
-        "煤化工概念"
+        "CAR-T细胞疗法",
+        "CRO",
+        "创新医疗服务",
+        "创新药",
+        "融资融券"
       ],
-      "hot_count": 1,
-      "total_score": 4.1
+      "hot_count": 5,
+      "total_score": 12.46
     },
     {
-      "code": "601088",
-      "name": "中国神华",
-      "pct": 0.16,
-      "amount_yi": 9.52,
+      "code": "300485",
+      "name": "赛升药业",
+      "pct": 3.95,
+      "amount_yi": 0.01,
       "hot_concepts": [
-        "煤化工概念",
-        "红利股"
+        "免疫治疗",
+        "创业板综",
+        "创新药",
+        "医疗器械概念",
+        "单抗概念",
+        "生物疫苗",
+        "病原体防治"
       ],
-      "hot_count": 2,
-      "total_score": 4.09
+      "hot_count": 7,
+      "total_score": 12.34
     },
     {
-      "code": "001696",
-      "name": "宗申动力",
-      "pct": 4.72,
-      "amount_yi": 15.48,
+      "code": "300147",
+      "name": "*ST香雪",
+      "pct": 3.03,
+      "amount_yi": 0.01,
       "hot_concepts": [
-        "交运设备"
+        "CAR-T细胞疗法",
+        "免疫治疗",
+        "创新药",
+        "医疗器械概念",
+        "流感",
+        "病原体防治",
+        "病毒防治"
       ],
-      "hot_count": 1,
-      "total_score": 3.95
+      "hot_count": 7,
+      "total_score": 12.27
     },
     {
-      "code": "600123",
-      "name": "兰花科创",
-      "pct": 0,
-      "amount_yi": 1.69,
+      "code": "603456",
+      "name": "九洲药业",
+      "pct": 3.79,
+      "amount_yi": 0.07,
       "hot_concepts": [
-        "煤化工概念",
-        "红利破净股",
-        "红利股"
+        "CRO",
+        "创新医疗服务",
+        "创新药",
+        "单抗概念",
+        "合成生物",
+        "融资融券"
       ],
-      "hot_count": 3,
-      "total_score": 3.94
+      "hot_count": 6,
+      "total_score": 12.24
     },
     {
-      "code": "600188",
-      "name": "兖矿能源",
-      "pct": -0.45,
-      "amount_yi": 8.57,
+      "code": "600521",
+      "name": "华海药业",
+      "pct": 2.04,
+      "amount_yi": 0.07,
       "hot_concepts": [
-        "煤化工概念",
-        "红利股"
+        "AI制药（医疗）",
+        "免疫治疗",
+        "创新药",
+        "单抗概念",
+        "流感",
+        "病原体防治",
+        "融资融券"
       ],
-      "hot_count": 2,
-      "total_score": 3.92
+      "hot_count": 7,
+      "total_score": 12.15
     },
     {
-      "code": "600096",
-      "name": "云天化",
-      "pct": 2.25,
-      "amount_yi": 6.59,
+      "code": "688076",
+      "name": "ST诺泰",
+      "pct": 2.64,
+      "amount_yi": 0.05,
       "hot_concepts": [
-        "煤化工概念"
+        "AI制药（医疗）",
+        "CRO",
+        "减肥药",
+        "创新药",
+        "流感",
+        "病原体防治",
+        "肝炎概念"
       ],
-      "hot_count": 1,
-      "total_score": 3.9
+      "hot_count": 7,
+      "total_score": 12.02
     },
     {
-      "code": "600997",
-      "name": "开滦股份",
-      "pct": -0.36,
-      "amount_yi": 0.45,
+      "code": "603127",
+      "name": "昭衍新药",
+      "pct": 4.42,
+      "amount_yi": 0.23,
       "hot_concepts": [
-        "煤化工概念",
-        "红利破净股",
-        "红利股"
+        "CRO",
+        "创新医疗服务",
+        "创新药",
+        "生物疫苗",
+        "融资融券"
       ],
-      "hot_count": 3,
-      "total_score": 3.82
+      "hot_count": 5,
+      "total_score": 11.88
     },
     {
-      "code": "002597",
-      "name": "金禾实业",
-      "pct": 1.83,
-      "amount_yi": 1.14,
+      "code": "600222",
+      "name": "太龙药业",
+      "pct": 2.47,
+      "amount_yi": 0.02,
       "hot_concepts": [
-        "代糖概念",
-        "煤化工概念"
+        "CRO",
+        "创新医疗服务",
+        "创新药",
+        "流感",
+        "病原体防治",
+        "融资融券"
       ],
-      "hot_count": 2,
-      "total_score": 3.82
+      "hot_count": 6,
+      "total_score": 11.87
     },
     {
-      "code": "000830",
-      "name": "鲁西化工",
-      "pct": 0.84,
-      "amount_yi": 2.7,
+      "code": "002022",
+      "name": "科华生物",
+      "pct": 2.0,
+      "amount_yi": 0.01,
       "hot_concepts": [
-        "煤化工概念",
-        "红利股"
+        "体外诊断概念",
+        "医疗器械概念",
+        "单抗概念",
+        "流感",
+        "病原体防治",
+        "病毒防治",
+        "精准医疗",
+        "精准诊断"
       ],
-      "hot_count": 2,
-      "total_score": 3.75
-    },
-    {
-      "code": "002109",
-      "name": "ST兴化",
-      "pct": 3.05,
-      "amount_yi": 0.17,
-      "hot_concepts": [
-        "煤化工概念"
-      ],
-      "hot_count": 1,
-      "total_score": 3.66
+      "hot_count": 8,
+      "total_score": 11.75
     }
   ],
   "rejected_summary": {
-    "no_hot_concept": 4217,
-    "too_hot": 33,
-    "too_cold": 7,
+    "no_hot_concept": 1745,
+    "too_hot": 71,
+    "too_cold": 50,
     "small_mv": 0,
     "big_mv": 0,
     "no_quote": 0

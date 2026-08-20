@@ -1,40 +1,40 @@
 {
-  "update_time": "2026-08-20 10:11:58",
+  "update_time": "2026-08-20 11:45:00",
   "data_date": "2026-08-20",
   "source": "LIMIT_UP_HEATMAP",
   "phase": "退潮",
   "color": "#f97316",
-  "score": 51.0,
-  "delta_pct": -73.33,
+  "score": 80.0,
+  "delta_pct": -41.48,
   "advice": "⚠️ 情绪退潮中：高位股注意回撤，关注高低切换",
   "metrics": {
-    "total_up": 36,
-    "max_ladder": 3,
-    "high_ladder_count": 3,
+    "total_up": 79,
+    "max_ladder": 4,
+    "high_ladder_count": 1,
     "sectors_count": 14
   },
   "ladder_dist": {
-    "1": 29,
-    "2": 4,
-    "3": 3
+    "1": 75,
+    "2": 3,
+    "4": 1
   },
   "leaders": [
     {
       "code": "600127",
       "name": "金健米业",
-      "lbc": 3,
-      "chg": 9.99
+      "lbc": 4,
+      "chg": 9.97
     },
     {
-      "code": "603395",
-      "name": "红四方",
-      "lbc": 3,
-      "chg": 10.02
+      "code": "002412",
+      "name": "汉森制药",
+      "lbc": 2,
+      "chg": 9.98
     },
     {
-      "code": "000505",
-      "name": "京粮控股",
-      "lbc": 3,
+      "code": "001277",
+      "name": "速达股份",
+      "lbc": 2,
       "chg": 10.01
     }
   ],
