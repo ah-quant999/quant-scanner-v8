@@ -291,12 +291,22 @@ def in_schedule_window(kind, now_cst=None):
     #     真故障最迟 09:14 必被抓到，不会漏。
     PREMARKET_GUARD = 8 * 60 + 45    # 08:45
 
+    # 2026-08-20 第293棒根治【cn_fetch 盘后空档结构性误报】：
+    #   核实 .github/workflows/v8_cn_fetch_cloud.yml 只有 5 条 cron（平台隐性上限），
+    #   工作日最后一档是 17:20 CST（'20 9 * * 1-5'）——旧注释所称「17:00 与 21:00 两个
+    #   全量兜底 cron」早已不存在。⇒ 17:20 之后直到次日 08:25 之间没有任何排程，
+    #   cn_fetch 的 age 只会线性增长，必然越过 max_age_min=120 阈值。
+    #   实测坐实：08-18 20:24 FAIL(2.5h)、08-18 21:24 FAIL(3.5h)、08-20 20:25 FAIL(2.2h)，
+    #   每个交易日傍晚固定刷 1~3 封"陈旧"告警邮件，且每轮 heal 都多派一次云端 fetch
+    #   （违背主人「小九不烧 TOKEN」铁律，且盘后 A股无新数据，派了也无意义）。
+    #   ⇒ 严查窗口下沉到 19:30 收口（17:20 最后一档 + 120min 阈值 + 10min 余量）。
+    #     17:20 那档真失败仍会在 19:2x 那一轮被抓到，不漏报真故障。
+    POSTCLOSE_GUARD = 19 * 60 + 30   # 19:30
+
     if kind == "cn_fetch":
         if weekend:
             return 9 <= h <= 11          # 周末只有 09:00 一轮
-        # 2026-08-06 修正：云端 v8_cn_fetch_cloud 除盘中槽外新增 16:30 港股补抓、
-        # 17:00 与 21:00 两个全量兜底 cron，旧窗口 8-16 会把 17:00/21:00 故障静默掉。
-        return PREMARKET_GUARD <= mins and h <= 22   # 云端 08:25~21:00 + 容错
+        return PREMARKET_GUARD <= mins <= POSTCLOSE_GUARD
     if kind == "build_deploy":
         # 🛡️ 2026-08-16 根治「周末刷邮件」：build_deploy 仅由上游 push 触发，周末无盘后
         #   算法链、通常无人 push，最近成功停留 >120min 属设计预期。旧逻辑周末 9-22 严查
@@ -849,7 +859,7 @@ def main():
 
     ok, msg, is_failure = check_workflow(CN_WORKFLOW_NAME, "cn_fetch", max_age_min=120, workflow_id=CN_WORKFLOW_ID)
     if not ok and not is_failure and not in_schedule_window("cn_fetch", now_cst):
-        ok, msg = True, msg + " —— 非调度时段，豁免（cn_fetch 工作日 08:25-21:00 有 cron，周末仅 09:00）"
+        ok, msg = True, msg + " —— 非调度时段，豁免（cn_fetch 工作日 cron 08:25~17:20，19:30 后无排程；周末仅 09:00）"
     results.append(("cn_fetch", ok, msg))
 
     ok, msg, is_failure = check_workflow(BD_WORKFLOW_NAME, "build_deploy", max_age_min=120, workflow_id=BD_WORKFLOW_ID)
