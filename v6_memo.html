@@ -1,7 +1,7 @@
 <!--
 ⚠️ 逻辑详解独立页 (standalone/guide.html) — 用户明确要求保留，禁止删除！
    内容：九宝量化V6.0 算法逻辑详解（按前端 Tab 顺序与卡片排列组织）
-   最后更新：2026-08-18 10:50（按新分工时刻表重排+去脚本名/数据源+修正3处责任归属；2026-08-18 强制刷新缓存戳，修复 iframe 偶发空白）
+   最后更新：2026-08-20 09:48（新增前端预测方法论总纲+KVI验证指标矩阵+数据时序铁律；2026-08-18 10:50 按新分工时刻表重排+去脚本名/数据源+修正3处责任归属；2026-08-18 强制刷新缓存戳，修复 iframe 偶发空白）
 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -136,6 +136,83 @@ table td, table th, table tr { color: #333 !important; }
 
       <div style="font-size:11.5px;line-height:1.8;background:#fff8e1;padding:10px 14px;border-radius:8px;">
         <b>关于收盘后两个时间点的说明</b>：15:05 是收盘前最后一次盘中快照；15:30 是收盘后 T+1 数据（大盘资金流/EXPERIMENT）。A股 15:00 收盘后数据在 15:30 已稳定，<b>无需 15:15 单独部署</b>。v8 目前没有港股收盘专属数据模块，<b>也无需 16:15 为港股单独部署</b>；港股休市信息已纳入日历。
+      </div>
+    </div>
+
+
+    <!-- ═══ 前端预测方法论总纲（2026-08-20 主人拍板写入） ═══ -->
+    <div style="background:linear-gradient(135deg,#1a237e,#283593);border-radius:10px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.15);margin-bottom:18px;color:#fff;">
+      <h3 style="margin-bottom:14px;font-size:16px;color:#fff;">🔬 关于"前端预测"的方法论总纲</h3>
+      <div style="background:rgba(255,255,255,0.95);border-radius:8px;padding:16px;color:#333;font-size:12.5px;line-height:1.9;">
+        <b style="color:#1a237e;font-size:14px;">核心原则：关键验证指标 > 拍脑袋打分</b><br>
+        每个预测维度都附有<b>关键验证指标（KVI）</b>——不是给个综合分数就完事，而是明确告诉你：<br>
+        <span style="background:#e8f5e9;padding:2px 8px;border-radius:4px;font-weight:700;color:#2e7d32;">「什么数据出现 = 趋势确认 / 什么信号缺失 = 观望等待」</span><br><br>
+
+        <table style="width:100%;border-collapse:collapse;font-size:11.5px;margin:8px 0;">
+          <tr style="background:#e8eaf6;color:#1a237e;">
+            <th style="padding:6px 8px;text-align:left;border:1px solid #c5cae9;width:18%;">预测维度</th>
+            <th style="padding:6px 8px;text-align:left;border:1px solid #c5cae9;width:32%;">关键验证指标（KVI）</th>
+            <th style="padding:6px 8px;text-align:left;border:1px solid #c5cae9;width:25%;">✅ 确认信号（可跟进）</th>
+            <th style="padding:6px 8px;text-align:left;border:1px solid #c5cae9;">⏳ 观望信号（等一等）</th>
+          </tr>
+          <tr style="background:#f5f5f5;">
+            <td style="padding:5px 8px;border:1px solid #ddd;font-weight:700;">📐 路径概率</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;">江恩 F21/F34 窗口 + 缠论分型 + MACD 金死叉 + 形态匹配一致率</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;color:#2e7d32;">F34 窗口 ±3 天内 + 底分型 + MACD 金叉 = 窗口共振买点</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;color:#e65100;">窗口已过 ≥5 天未触发 / 一致率 &lt;50%</td>
+          </tr>
+          <tr>
+            <td style="padding:5px 8px;border:1px solid #ddd;font-weight:700;">🌍 宏观环境</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;">中/美 10Y 国债收益率 + LPR + 20 日 bp 变动</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;color:#2e7d32;">中美利差收窄 + LPR 稳定 + 中债 &lt;2% = 利率平稳期</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;color:#e65100;">美 10Y 快速上行 + LPR 连降 = 宽松预期未兑现</td>
+          </tr>
+          <tr style="background:#f5f5f5;">
+            <td style="padding:5px 8px;border:1px solid #ddd;font-weight:700;">🌐 板块推荐</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;">板块 5d/20d 涨幅 + 主力净流入(亿) + 已涨过标记</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;color:#2e7d32;">低位(5d&lt;0) + 资金正流入 + 未涨过 = 优先关注</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;color:#e65100;">已涨过 5d+7% + 资金流出 = ⏸️ 观望（追高风险）</td>
+          </tr>
+          <tr>
+            <td style="padding:5px 8px;border:1px solid #ddd;font-weight:700;">🧬 三重共识</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;">缠论买字 + 金钻信号 + 机构变红 + EMA 趋势</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;color:#2e7d32;">缠论买+金钻起撞=+10 分共振 / 四信号全满 ≈158 满分区</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;color:#e65100;">仅 1 项命中 / 基本面 D 级(-10) 拖分</td>
+          </tr>
+          <tr style="background:#f5f5f5;">
+            <td style="padding:5px 8px;border:1px solid #ddd;font-weight:700;">📊 CRDS 逆势龙头</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;">AF(逆势强度) × VR(量价比) × 逆势板占比</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;color:#2e7d32;">CRDS≥80 + 大跌日涨停 + 量比&gt;2 = 精选级</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;color:#e65100;">VR&lt;1（无量）或 逆势板占比 &lt;10%</td>
+          </tr>
+          <tr>
+            <td style="padding:5px 8px;border:1px solid #ddd;font-weight:700;">🛰️ 六维危机雷达</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;">SHIBOR/VIX/DXY/PMI/社融/出口 等 7 项历史分位</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;color:#2e7d32;">综合指数 &lt;30 = 平稳（4 项绿色 ✅）</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;color:#e65100;">任一维度 ≥70 或 综合指数 ≥50 = 警惕</td>
+          </tr>
+          <tr style="background:#f5f5f5;">
+            <td style="padding:5px 8px;border:1px solid #ddd;font-weight:700;">📉 斐波那契窗口</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;">上证从 peak 回撤 % → 38.2/50/61.8/78.6 支撑位</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;color:#2e7d32;">价格进入 ±1% 支撑区 + 底分型 = 窗口有效</td>
+            <td style="padding:5px 8px;border:1px solid #ddd;color:#e65100;">跌破 78.6%（深度回调）或 窗口过期无反弹</td>
+          </tr>
+        </table>
+
+        <div style="margin-top:12px;padding:12px;background:#fff8e1;border-radius:6px;border-left:4px solid #f0a020;font-size:11.5px;line-height:1.8;">
+          <b style="color:#e65100;">🔗 数据时序铁律（2026-08-20 修复）</b><br>
+          · <b>龙虎榜数据 16:30 后才稳定可用</b>——算法链在 16:30 前不会运行 final_recommend / gen_triple_consensus 等 LHB 依赖脚本，避免用不完整数据生成推荐。<br>
+          · <b>盘后算法链 cron = 18:30 CST</b>（云端 ubuntu-latest），确保所有当日数据（含龙虎榜）就绪后才跑。<br>
+          · <b>数据新鲜度</b>：每张卡标注 update_time，看门狗监控超 360min 自动标红；实验区卡片（路径概率/宏观/板块推荐）遵循同一规则。<br>
+          · <b>算法→前端 链路</b>：run_algorithms.py → raw_data/ → api_push_raw.py → GitHub Contents API → data/*.js → window.X 注入 → render 函数消费。全链路可追踪。
+        </div>
+
+        <div style="margin-top:10px;font-size:11px;color:#666;line-height:1.7;">
+          <b>设计哲学</b>：以上框架借鉴了周期股研究方法论——如猪周期看「能繁母猪月度存栏」而非单纯猪价、
+          军工看「合同负债变动」而非仅订单公告、光伏看「组件价格企稳+单季扭亏」而非只盯装机量。
+          九宝量化将此思想量化为每张卡的 KVI 表，让每个结论都可追溯到具体数据触发条件，
+          而非黑箱评分。<span style="color:#888;">（回测胜率因维度而异，区间 55-70%，不构成投资建议。）</span>
+        </div>
       </div>
     </div>
 

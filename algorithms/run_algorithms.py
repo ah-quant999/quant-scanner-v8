@@ -194,14 +194,44 @@ def step_seed_inputs():
         print(f"  ⚠️ 保存金股池快照失败: {e}")
 
 
+# 🔴 2026-08-20 一劳永逸修复：算法时序逻辑 bug。
+#   症状：16:10 就出最终推荐，但龙虎榜 16:30 才发布 → final_recommend 用的是不完整/旧 LHB 数据。
+#   根因：run_algorithms.py 无时间 gate，任何时刻触发都会跑整条链包括 LHB 依赖脚本。
+#   修复：以下脚本的输入依赖「当日龙虎榜」（16:30 后才稳定可用），在 16:30 前跳过。
+LHB_DEPENDENT_SCRIPTS = {
+    "final_recommend.py",         # 注释明确：输入含 lhb → Top5 共振
+    "gen_triple_consensus.py",    # 读 top10/cockpit/fundamental + 隐式依赖 LHB 完整性
+    "gen_triple_track.py",        # 读 triple_history + LHB 追踪
+    "gen_lhb_7d.py",              # 直接读 lhb_data.json 当日明细（由 step_gen_lhb_7d 调用）
+    "gen_top5_track.py",          # finalRec Top5 追踪，依赖 final_recommend
+}
+# 16:30 = 龙虎榜官方发布时间（收盘后 1.5 小时），留 2min 余量
+_LHB_READY_HOUR, _LHB_READY_MIN = 16, 30
+
+
+def _is_post_lhb_ready():
+    """判断当前是否已过龙虎榜发布时间（CST 16:30）。"""
+    now = datetime.now()
+    # 云端 runner 用 TZ=Asia/Shanghai 时朴素 now() 即北京时间；本机系统本身 CST
+    return (now.hour > _LHB_READY_HOUR or
+            (now.hour == _LHB_READY_HOUR and now.minute >= _LHB_READY_MIN))
+
+
 def step_run():
     print(f"\n[1] 运行算法链（{len(ORDER)} 个）")
+    # 🔴 数据就绪门控：打印一次当前时间和 LHB 就绪状态
+    lhb_ready = _is_post_lhb_ready()
+    print(f"  🕐 当前时间 {datetime.now():H:%M} | 龙虎榜就绪 {'✅ 已过 16:30' if lhb_ready else '⏳ 未到 16:30（LHB 依赖脚本将跳过）'}")
     ok, fail = 0, 0
     for script in ORDER:
         path = os.path.join(ALGO, script)
         if not os.path.exists(path):
             print(f"  ❌ 缺失脚本: {script}")
             fail += 1
+            continue
+        # 🔴 LHB 门控：未到 16:30 且脚本依赖当日龙虎榜 → 跳过
+        if not lhb_ready and script in LHB_DEPENDENT_SCRIPTS:
+            print(f"  ⏭️  {script}  ← 跳过（龙虎榜 16:30 未就绪，避免用不完整数据生成推荐）")
             continue
         print(f"  ▶ {script}  ({datetime.now():%H:%M:%S})")
         try:
@@ -278,8 +308,12 @@ def main():
     step_seed_inputs()          # 默认 no-op, V6_SEED=1 才重灌
     step_run()
     n = step_stage()
-    step_append_lhb_history()
-    step_gen_lhb_7d()
+    # 🔴 LHB 后处理门控：未到 16:30 不处理当日龙虎榜数据（避免用不完整/旧数据）
+    if _is_post_lhb_ready():
+        step_append_lhb_history()
+        step_gen_lhb_7d()
+    else:
+        print("\n[2.5-2.6] ⏭️ 跳过 LHB 历史累积 + LHB 7日累计（未到 16:30）")
     step_push()
     print(f"\n=== 完成。staged {n} 个文件 ===")
 
