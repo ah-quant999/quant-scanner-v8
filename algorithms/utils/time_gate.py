@@ -90,6 +90,31 @@ def check_stock_picking_ready(by='unknown'):
     logging.info(f'[time_gate] 选股策略守门通过（{now:%H:%M}）')
 
 
+def check_cloud_only(script_name='unknown'):
+    """云端/CI 算法链专属护栏（主人 2026-08-20 一劳永逸令）。
+
+    根因：阿狸咪曾在本地手动跑 gen_lhb_7d / gen_top5_track 等算法产数据并推仓，
+    与云端算法链产物分叉，造成「本地 file:/// 版 ≠ 主站」的数据不一致。
+    铁律：算法（含数据生产脚本）一律由云端算法链定时任务（v8_algo_cloud 19:15 /
+    v8_cn_fetch_cloud / build_deploy 等）执行，本地只改代码+推仓+镜像拉取。
+
+    判定：GITHUB_ACTIONS=true（GitHub Actions，含云端与自托管 runner）或
+    CI=true（通用 CI 标记）放行；本地手动执行默认拦截并退出，
+    仅显式 ALLOW_LOCAL_ALGO=1（应急调试）可放行。
+    """
+    if os.environ.get('GITHUB_ACTIONS', '').lower() == 'true':
+        return True
+    if os.environ.get('CI', '').lower() == 'true':
+        return True
+    if os.environ.get('ALLOW_LOCAL_ALGO', '0') == '1':
+        logging.warning(f'[time_gate] ALLOW_LOCAL_ALGO=1 显式放行本地执行（{script_name}）')
+        return True
+    print(f'\n🚫 [time_gate] {script_name} 仅允许云端算法链定时任务执行', file=sys.stderr)
+    print(f'   铁律（主人 2026-08-20）：算法一律由云端定时任务跑，本地禁止手动跑算法产数据', file=sys.stderr)
+    print(f'   否则会造成本地 file:/// 版与主站分叉。如需本地调试请设 ALLOW_LOCAL_ALGO=1', file=sys.stderr)
+    return False
+
+
 def check(markets, by='unknown'):
     """检查所有 markets 是否都过了数据就绪时间
     markets: list of 'a'/'hk'/'lhb'/'us'

@@ -421,7 +421,7 @@ window.__domReadyFns=[];
     <script src="data/SECTOR_FUND_FLOW.js?v=80e793dc3d" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=4d046ef4ca" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=47333a29c1" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=ff6102495a" defer></script>
     <script src="data/ANALYST_RATINGS.js?v=210237691e" defer></script>
     <script src="data/SUSPENSION_ALERT.js?v=6f46309da8" defer></script>
     <script src="data/GOLD_POOL.js?v=736d410857" defer></script>
@@ -436,7 +436,7 @@ window.__domReadyFns=[];
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
 <script src="data/CONCEPT_RANKING.js?v=b7b451097d" defer></script>
 <script src="data/INDEX_QUOTES.js?v=d8f00ffeba" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=f586db569f" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=b5d70cf8f4" defer></script>
 <script src="data/MARGIN_DATA.js?v=72c5be5c25" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=c12285379f" defer></script>
 <script src="data/IPO_DATA.js?v=7dc3b7c63c" defer></script>
@@ -1215,7 +1215,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_FIB.js?v=18b7ac91c2" defer></script>
 <script src="data/SZ_FIB.js?v=4d9f108d25" defer></script>
 <script src="data/SECTOR_RS.js?v=e0fd025bd3" defer></script>
-<script src="data/SECTOR_PHASE_HISTORY.js?v=60ba35f12d" defer></script>
+<script src="data/SECTOR_PHASE_HISTORY.js?v=e15a21d80d" defer></script>
 <script src="data/INST_TRADE.js?v=b8da64911c" defer></script>
 <script src="data/NORTH_FUND.js?v=14e7084732" defer></script>
 <script src="data/MARKET_ALERTS.js?v=b494d54ca7" defer></script>
@@ -1246,10 +1246,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/W52_HIGH.js?v=ce4e87a3fe" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=cfaae456c5" defer></script>
 <script src="data/RUNNER_STATUS.js?v=e19e85efcb" defer></script>
-<script src="data/HEALTH_CHECK.js?v=b79c7d1f5a" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=ed765df162" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=9086c066a9" defer></script>
-    <script src="data/POTENTIAL_PICKS.js?v=c9a8d45065" defer></script>
+<script src="data/HEALTH_CHECK.js?v=b1b67058cf" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=6a7d5d335b" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=6e95fef37b" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=5d23ebe369" defer></script>
+    <script src="data/INDEX_HISTORY.js?v=5d23ebe369" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE.js?v=f135754004" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=0dcbab52a2" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=8f5ae7d309" defer></script>
@@ -4560,7 +4561,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <tr><td>v8_cn_fetch_cloud</td><td>工作日 cron</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>中国数据抓取主链 · push raw_data → 自动触发 build_deploy</td></tr>
         <tr><td>v8_intraday_healer</td><td>工作日09:03-15:33每30分</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>盘中自愈：检测 cn_fetch 过期(>45min)自动 dispatch 补跑 · 纯云端，小九关机不受影响</td></tr>
         <tr><td>v8_safety_net</td><td>每30分</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>raw_data stale 时兜底 dispatch</td></tr>
-        <tr><td>v8_algo_cloud</td><td>18:30/20:00+兜底</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>收盘后算法数据生产（选股四模块+回测）</td></tr>
+        <tr><td>v8_algo_cloud</td><td>19:15/20:00+兜底</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>收盘后算法数据生产（选股四模块+回测）</td></tr>
         <tr><td>v8_backup</td><td>每日23:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>备份 raw_data / data / 交接文档（含 v6 备份保留策略：v8 稳定一周前不删）</td></tr>
         <tr><td>runner_health_alert</td><td>非交易时段每2h</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>lemoncat-cn runner 离线告警 + 自动恢复关闭 Issue</td></tr>
         <tr><td>小九-v8云端管线看门狗</td><td>08-22每小时</td><td><span class="status-dot s-ok"></span>ACTIVE</td><td>只监督、不部署、不抢跑</td></tr>
@@ -5291,14 +5292,14 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>15:30</td><td>v8_cn_fetch_cloud</td><td>盘后</td><td>EXPERIMENT、大盘资金流累积序列、ETF日监控再补抓(T+1收盘定稿)、龙虎榜历史回填</td></tr>
           <tr><td>16:30</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓</td><td>港股16:00收盘后补抓恒指/港股候选/盘中模块收盘值（A股已收盘，不重复抓A股）</td></tr>
           <tr><td>盘中每30分</td><td>v8_risk_gauge</td><td>危机雷达</td><td>危机雷达/风险温度计实时刷新（美股开盘情绪覆盖 19:00-22:00 北京时间）</td></tr>
-          <tr><td>18:30 / 20:00（主+冗余）</td><td>v8_algo_cloud</td><td>盘后算法（云端主链）</td><td>龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测/板块资金流趋势/停牌预警/市场预警/NT数据（已迁 GitHub 云端 ubuntu，20:30/20:50 兜底）</td></tr>
+          <tr><td>19:15 / 20:00（主+冗余）</td><td>v8_algo_cloud</td><td>盘后算法（云端主链）</td><td>龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测/板块资金流趋势/停牌预警/市场预警/NT数据（已迁 GitHub 云端 ubuntu，20:30/20:50 兜底）</td></tr>
           <tr><td>23:00</td><td>v8_backup</td><td>每日备份</td><td>备份 raw_data/*.json 防意外丢失（push 至 main）</td></tr>
           <tr><td>09:00 / 17:00</td><td>v8_algo</td><td>体检</td><td>46 模块新鲜度体检（云端）</td></tr>
           <tr><td>非交易时段每2h</td><td>runner_health_alert</td><td>健康监控</td><td>lemoncat-cn runner 离线 → 开 Issue 告警（云端，工作日13-21点/周末0-20点）</td></tr>
           <tr><td>周六/周日 09:00</td><td>v8_cn_fetch_cloud</td><td>T+1 周度</td><td>日历/今日判定/IPO/两融/中金所/宏观/危机/北向/分析师/52周高/羊群效应统一刷新</td></tr>
         </table>
         <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>成交金额 / 涨跌家数</b> = 模块 <code>SH_SZ_HISTORY</code>，归属 <b>盘中 09:40–15:10 每 30 分钟</b> 自动抓取（v8_cn_fetch_cloud · 云端）。此前因上游 push2his 接口被 WAF 拦截导致序列冻结，已于今日改用 akshare 指数日线 + 全市场快照修复，恢复实时刷新。</div>
-        <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>盘后数据里「仍在盘中实时更新」的模块（易遗漏，特此单列）</b>：<code>ETF_DAILY_MONITOR</code>（ETF 日监控）在 <b>盘中 09:40–15:10 每 30 分钟</b> 实时刷新，且 <b>15:30 盘后再补抓一次</b> 做 T+1 日监控收盘定稿——它既出现在「实时数据区」实时卡，也会出现在「盘后数据」区，两端都不遗漏。<br>📌 <b>日频序列防漏跑 safety_net</b>：<code>MARKET_FUND_FLOW_DATA</code>（资金流时间轴·中长线）主档为 <b>盘后 15:30</b>，但因其是日频收盘累积序列、一旦 15:30 漏跑就会滞后一天，故额外在 <b>次日盘前 08:25</b> 补抓一次。其余纯盘后模块（EXPERIMENT / 龙虎榜历史回填）仅在 15:30 或 18:30 产出，盘中不刷新。所有前端模块均已落在上方「前端模块→时段」表与「工作日」逐档表中，无遗漏。</div>
+        <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>盘后数据里「仍在盘中实时更新」的模块（易遗漏，特此单列）</b>：<code>ETF_DAILY_MONITOR</code>（ETF 日监控）在 <b>盘中 09:40–15:10 每 30 分钟</b> 实时刷新，且 <b>15:30 盘后再补抓一次</b> 做 T+1 日监控收盘定稿——它既出现在「实时数据区」实时卡，也会出现在「盘后数据」区，两端都不遗漏。<br>📌 <b>日频序列防漏跑 safety_net</b>：<code>MARKET_FUND_FLOW_DATA</code>（资金流时间轴·中长线）主档为 <b>盘后 15:30</b>，但因其是日频收盘累积序列、一旦 15:30 漏跑就会滞后一天，故额外在 <b>次日盘前 08:25</b> 补抓一次。其余纯盘后模块（EXPERIMENT / 龙虎榜历史回填）仅在 15:30 或 19:15 产出，盘中不刷新。所有前端模块均已落在上方「前端模块→时段」表与「工作日」逐档表中，无遗漏。</div>
 
         <div class="logic-h">工作日</div>
         <table class="lg-table">
@@ -5321,7 +5322,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>工作日13/15/17/19/21点 · 周末0-20点每2h</td><td>runner_health_alert</td><td>Runner 健康监控（离线开 Issue；workflow 当前 active，无需手动 unpause）</td><td>云端</td></tr>
           <tr><td>09:00</td><td>v8_algo</td><td>盘前预检（46模块新鲜度体检）</td><td>云端</td></tr>
           <tr><td>17:00</td><td>v8_algo</td><td>收盘后总检（46模块新鲜度体检）</td><td>云端</td></tr>
-          <tr><td>18:30 / 20:00</td><td>v8_algo_cloud</td><td>盘后算法链（龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测）</td><td>GitHub 云端 ubuntu（主链；20:30/20:50 兜底）</td></tr>
+          <tr><td>19:15 / 20:00</td><td>v8_algo_cloud</td><td>盘后算法链（龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测）</td><td>GitHub 云端 ubuntu（主链；20:30/20:50 兜底）</td></tr>
           <tr><td>23:00</td><td>v8_backup</td><td>每日自动备份 raw_data</td><td>云端</td></tr>
           <tr style="background:rgba(56,189,248,.06);"><td colspan="4" style="text-align:center;font-size:12px;color:var(--dim);">↓ push raw_data → 自动触发 v8_build_deploy → GitHub Pages 部署</td></tr>
         </table>
@@ -5357,7 +5358,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         </table>
 
         <div class="logic-h">关键设计原则</div>
-        <div class="logic-p"><b>龙虎榜必须等 17 点交易所发布后才能取完整数据</b>，因此盘后算法链固定在 18:30。盘中只刷新 T+0 快照，不跑盘后算法，避免用陈旧数据算出错误共识。<b>Safety Net</b>是保险机制——中国数据抓取已迁云端 24/7 在线，Safety Net 是「断线时自动补跑」而非「日常调度」。</div>
+        <div class="logic-p"><b>龙虎榜必须等 17 点交易所发布后才能取完整数据</b>，因此盘后算法链固定在 19:15（2026-08-20 主人令，确保龙虎榜/北向等全部盘后数据就绪）。盘中只刷新 T+0 快照，不跑盘后算法，避免用陈旧数据算出错误共识。<b>Safety Net</b>是保险机制——中国数据抓取已迁云端 24/7 在线，Safety Net 是「断线时自动补跑」而非「日常调度」。</div>
         <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>盘后算法链顺序铁律（2026-08-08 修复）</b>：<code style="background:var(--bg2);padding:1px 4px;border-radius:3px">generate_top10.py</code> 必须在 <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">backtest_comprehensive.py</code> / <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">cockpit_backtest_now.py</code> <b>之前</b>执行——综合回测依赖 top10 当日快照（<code style="background:var(--bg2);padding:1px 4px;border-radius:3px">raw_data/history/top10_daily_YYYYMMDD.json</code>），顺序倒置会导致「综合回测」卡长期为空。当前固定顺序：build_candidate_pool → generate_top10 → backtest_tdx → backtest_comprehensive → cockpit_backtest_now。</div>
       </div>
 
@@ -5367,7 +5368,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><th>时段</th><th>职责</th><th>失败影响</th><th>兜底</th></tr>
           <tr><td>盘前 08:25</td><td>把当日已知事件、预警、宏观状态准备好</td><td>事件/日历显示旧数据</td><td>Safety Net 2h 后补跑</td></tr>
           <tr><td>盘中 09:40~15:10</td><td>刷新实时行情、资金、ETF、涨停热力</td><td>实时区时间戳停滞</td><td>盘中自愈器每30分检测补跑 + 下一档自动覆盖</td></tr>
-          <tr><td>盘后 18:30</td><td>基于完整收盘数据生成选股结果</td><td>三重共识/驾驶舱用隔夜数据</td><td>周六 self_heal 补跑</td></tr>
+          <tr><td>盘后 19:15</td><td>基于完整收盘数据生成选股结果</td><td>三重共识/驾驶舱用隔夜数据</td><td>周六 self_heal 补跑</td></tr>
           <tr><td>构建部署</td><td>raw_data push 触发 selective build → Pages</td><td>线上数据不更新</td><td>manual dispatch</td></tr>
         </table>
       </div>
@@ -5482,6 +5483,31 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         </div>
 
         <!-- ============= 2026-08-11 今日改动汇总（最高优先级） ============= -->
+        <div class="logic-h" style="background:linear-gradient(135deg,#14532d,#166534);color:#bbf7d0;padding:8px 12px;border-radius:6px;margin:12px 0;">📋 2026-08-20 今晚改动汇总（AI 预测子TAB / 本地禁跑算法护栏 / 算法链补链 / 镜像同步）· 阿狸咪</div>
+        <div class="logic-p"><b>主人令</b>：潜力挖掘删除 → 重写「AI 预测」子TAB（小九 market_path_probability 算法）；算法必须有定时任务跟踪、跟着算法链 19:15 计算部署；本地禁止手动跑算法；审计后推仓入库；与运维/逻辑详解页对齐。以下为 8/20 全部实质改动，均已在 main 生效。</div>
+
+        <div class="logic-h">① 「潜力挖掘」子TAB 已删除 → 重写「🤖 AI 预测」子TAB</div>
+        <div class="logic-p">
+        <ul>
+          <li>删除：<code>data/POTENTIAL_PICKS.js</code> 引用、<code>ulPanePP</code> pane、<code>_fillPotentialPicks</code> 渲染函数、<code>_ppFilterConcept</code> 筛选、ETF 克隆逻辑、调试专区 <code>ulMppPanel</code> 宿主。</li>
+          <li>新增：<code>data/MARKET_PATH_PROBABILITY.js</code> + <code>data/INDEX_HISTORY.js</code> 加载（原缺失 → 卡永久空）、<code>ulPaneAI</code> pane、<b>重写</b> <code>_fillAiPrediction()</code>（非复制）：路径概率 ABC（红涨绿跌）+ 当前状态（收盘/60日位置/MA5·20·60/MACD/量能）+ 江恩窗口（is_near 高亮）+ 黄金分割位（贴近收盘 ⚡）+ 缠论分型（顶红/底绿）+ 免责声明；defer 时序自愈轮询杜绝空卡。</li>
+          <li>算法链更新：<code>run_algorithms.py ORDER</code> 补入 <code>scripts/fetch_index_history.py</code>（此前无任何调度方）；<code>fetch_index_history.py</code> / <code>market_path_probability.py</code> 双 bridge 到 <code>raw_data/</code>（此前只写 out/ → update_v8 永远读旧）。19:15 盘后算法链自动产出 → build 部署。</li>
+        </ul>
+        </div>
+
+        <div class="logic-h">② 本地禁止手动跑算法（一劳永逸护栏）</div>
+        <div class="logic-p"><code>algorithms/utils/time_gate.py</code> 新增 <code>check_cloud_only()</code>：非 <code>GITHUB_ACTIONS</code>/<code>CI</code> 且未显式 <code>ALLOW_LOCAL_ALGO=1</code> 时直接退出。已接入 <code>run_algorithms.py</code> / <code>fetch_index_history.py</code> / <code>market_path_probability.py</code> / <code>gen_lhb_7d.py</code> / <code>gen_top5_track.py</code> / <code>cockpit_backtest_now.py</code> / <code>build_candidate_pool.py</code> / <code>gen_algo_track.py</code> / <code>momentum_common_filter.py</code>。根治「本地手动跑算法产数据 → 本地 file:/// 版与主站分叉」。</div>
+
+        <div class="logic-h">③ 本地 ↔ 主站镜像同步（每 15 分钟）</div>
+        <div class="logic-p">WorkBuddy 自动化「九宝量化-本地↔主站镜像同步(每15分)」跑 <code>scripts/sync_local_mirror.py</code>：仅当工作区干净才 <code>reset --hard origin/main</code>（脏则跳过防误吞），确保本地 <code>file:///</code> 打开 = 线上 GitHub Pages。云端 build 推了新数据，本地 15 分钟内自动对齐。</div>
+
+        <div class="logic-h">④ 盘后算法链 18:30 → 19:15（8/20 晚间指令）</div>
+        <div class="logic-p"><code>v8_algo_cloud.yml</code> cron <code>30 10</code> → <code>15 11</code>（UTC，即 CST 19:15），确保龙虎榜/北向/板块资金等全部盘后数据就绪后再跑选股算法；<code>alimi_bell.py</code> 按铃/陈旧检查窗口同步 19:15。候选股池 post_close 档接入观澜台 + mahoro 数据源。</div>
+
+        <div class="logic-h">⑤ 算法产物推送范围修复（8/20 晚间指令）</div>
+        <div class="logic-p"><code>time_gate._now_cst()</code> 改 UTC+8 显式计算（runner 时区漂移根因）；<code>api_push_raw.py</code> <code>PUSH_ALGO_RAW=1</code> 允许推送算法 raw 产物；<code>guard_v8_freshness.py</code> 加入 LHB_7D 监控自愈；<code>data/LHB_7D.js</code> / <code>TOP5_TRACK.js</code> 已即时刷新推仓。</div>
+
+        <!-- ============= 2026-08-11 今日改动汇总（最高优先级） ============= -->
         <div class="logic-h" style="background:linear-gradient(135deg,#14532d,#166534);color:#bbf7d0;padding:8px 12px;border-radius:6px;margin:12px 0;">📋 2026-08-19 今晚改动汇总（双机运维/算法对齐/防覆盖）· 阿狸咪</div>
         <div class="logic-p"><b>主人令</b>：今晚全部修复完成 + 审计对齐 + 写进逻辑详解页 + 退仓入库防覆盖 + 与小九交接明明白白。以下为 8/19 全部实质改动（13 项），均已在 main 生效。</div>
 
@@ -5493,7 +5519,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <ul>
           <li><code>scripts/fetch_index_history.py</code>：akshare 拉上证 5 年日 K → <code>raw_data/index_history.json</code> → <code>data/INDEX_HISTORY.js</code>（92KB）</li>
           <li><code>algorithms/market_path_probability.py</code>：均线+MACD+江恩时间窗(F21/34/55/89)+缠论分型+涨跌方向形态匹配(≥65%一致率)+路径概率 ABC → <code>data/MARKET_PATH_PROBABILITY.js</code></li>
-          <li>⏳ 已加入 <code>run_algorithms.py ORDER</code>（云端 18:30 盘后自动跑）</li>
+          <li>✅ 已加入 <code>run_algorithms.py ORDER</code>（云端 19:15 盘后算法链自动跑；2026-08-20 补入上游 <code>fetch_index_history.py</code> + 双 bridge 到 <code>raw_data/</code>，根治 K 线/概率卡永不更新的链路断点）</li>
         </ul>
         <b>诚实标注</b>：⚠️ 历史回测仅供参考；预测市场不存在稳定高准确率方法。实盘验证 ≥3 个月。当前（8/19 收 3894.42）：A=37.9% / B=18.3% / C=43.7%，江恩 F34=8/23 临近。</div>
 
@@ -8943,23 +8969,23 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'候选池（盘中/盘后）', source:'CANDIDATE', freq:'盘中+收盘后1次', slots:['15:30','18:30'], note:'算法初筛名单'},
+          {name:'候选池（盘中/盘后）', source:'CANDIDATE', freq:'盘中+收盘后1次', slots:['15:30','19:15'], note:'算法初筛名单'},
 
-          {name:'黄金池', source:'GOLD_POOL', freq:'收盘后1次', slots:['18:30'], note:'精选标的'},
+          {name:'黄金池', source:'GOLD_POOL', freq:'收盘后1次', slots:['19:15'], note:'精选标的'},
 
-          {name:'三重共识', source:'TRIPLE_CONSENSUS', freq:'收盘后1次', slots:['18:30'], note:'多策略共振'},
+          {name:'三重共识', source:'TRIPLE_CONSENSUS', freq:'收盘后1次', slots:['19:15'], note:'多策略共振'},
 
-          {name:'四量终极', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['18:30'], note:'目标池：主板/创业板/科创板成交额前80~100 + 港股前40~50；频率：盘后日线；回测：近3年 T+1/3/5/10/20 持有收益'},
+          {name:'四量终极', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['19:15'], note:'目标池：主板/创业板/科创板成交额前80~100 + 港股前40~50；频率：盘后日线；回测：近3年 T+1/3/5/10/20 持有收益'},
 
-          {name:'驾驶舱', source:'COCKPIT_ADVICE', freq:'收盘后1次', slots:['18:30'], note:'驾驶舱A/B档建议'},
+          {name:'驾驶舱', source:'COCKPIT_ADVICE', freq:'收盘后1次', slots:['19:15'], note:'驾驶舱A/B档建议'},
 
-          {name:'大牛股猎手', source:'LHB_DATA', freq:'收盘后1次', slots:['18:30'], note:'机游共振中线策略（派生自龙虎榜+机构买卖）'},
+          {name:'大牛股猎手', source:'LHB_DATA', freq:'收盘后1次', slots:['19:15'], note:'机游共振中线策略（派生自龙虎榜+机构买卖）'},
 
-          {name:'全站精选', source:'TOP10_DAILY', freq:'收盘后1次', slots:['18:30'], note:'主站TOP10精选池'},
+          {name:'全站精选', source:'TOP10_DAILY', freq:'收盘后1次', slots:['19:15'], note:'主站TOP10精选池'},
 
-          {name:'相对强度', source:'STOCK_RPS_DATA', freq:'收盘后1次', slots:['18:30'], note:'个股相对强度评分'},
+          {name:'相对强度', source:'STOCK_RPS_DATA', freq:'收盘后1次', slots:['19:15'], note:'个股相对强度评分'},
 
-          {name:'逆势龙头', source:'CRDS_CARD_DATA', freq:'收盘后1次', slots:['18:30'], note:'CRDS逆势龙头精英池'}
+          {name:'逆势龙头', source:'CRDS_CARD_DATA', freq:'收盘后1次', slots:['19:15'], note:'CRDS逆势龙头精英池'}
 
         ]
 
@@ -8973,7 +8999,7 @@ function drawUpDownChart(){
 
           {name:'中国数据抓取 (v8_cn_fetch_cloud)', source:'RUNNER_STATUS', freq:'工作日 cron · 云端', slots:['08:25','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:20'], note:'核心数据管线 · GitHub Actions 云端 ubuntu-latest 主链（含 17:20 龙虎榜收盘后刷新）'},
 
-          {name:'盘后算法链 (v8_algo_cloud)', source:'TRIPLE_CONSENSUS', freq:'工作日18:30主档', slots:['18:30'], note:'候选池/黄金池/三重共识/回测 · 已迁 GitHub Actions 云端 ubuntu-latest · 冗余由本机每30分检查dispatch兜底'},
+          {name:'盘后算法链 (v8_algo_cloud)', source:'TRIPLE_CONSENSUS', freq:'工作日19:15主档', slots:['19:15'], note:'候选池/黄金池/三重共识/回测 · 已迁 GitHub Actions 云端 ubuntu-latest · 冗余由本机每30分检查dispatch兜底'},
 
           {name:'每日数据体检', source:'HEALTH_CHECK', freq:'每日2次', slots:['09:00','17:00'], note:'数据完整性检查 · 覆盖构建/部署/备份健康'},
 
@@ -9120,7 +9146,7 @@ function drawUpDownChart(){
         const isWeekendSkipped = c.weekendUpdate === false;
 
         // 多 slot 卡（盘中+盘后 等）一劳永逸：只要 lastTs 落在任一槽位 ±60min 区间，整卡全部槽位都标 ✓
-        //   否则盘中槽位无数据时被错误判 ✗（如候选池 lastTs=17:36 落在 18:30 区间但 15:30 槽 ✗ → 红边）
+        //   否则盘中槽位无数据时被错误判 ✗（如候选池 lastTs=17:36 落在 19:15 区间但 15:30 槽 ✗ → 红边）
         let multiSlotAnyOk = false;
         if(hasDataToday && c.slots.length > 1){
           for(const s2 of c.slots){
@@ -9164,7 +9190,7 @@ function drawUpDownChart(){
 
             // 🛡 2026-08-18 主人令：槽位宽容 ±60min（一劳永逸防误判红叉）
             //   原逻辑只做「前置宽容 45min」：数据必须 >= 槽位-45min，导致「数据提前更新」误判红叉
-            //   （例：候选池算法 17:36 出数，18:30 槽位 → 17:36 < 17:45 → 红叉，但数据明明已出）
+            //   （例：候选池算法 17:36 出数，19:15 槽位 → 17:36 < 18:15 → 红叉，但数据明明已出）
             //   新逻辑：数据在「槽位 ±60min」窗口内都算 ✓——前置漂移（提前跑）与排程漂移（晚跑）都不误判
             //   真漏跑仍正确标红：数据停 08:12，9:40/10:00 槽位 → 08:12 < 08:40（9:40-60min）→ ✗
             const SLOT_GRACE_MIN = 60;
@@ -9778,11 +9804,12 @@ function drawUpDownChart(){
       var _allSel = a.concat(b);
       var _aShareCnt = _allSel.filter(function(s){ return s.market && !/港股|hk/i.test(s.market); }).length;
       if(_aShareCnt===0){
-        // 2026-08-11 主人令：18:30 是盘后跑批，不应该写死——盘中应该"下一轮盘中抓取"，盘后才说"18:30 自动重刷"
+        // 2026-08-11 主人令：盘后跑批时间不应写死——盘中应该"下一轮盘中抓取"，盘后才说"盘后重刷"
+        //   2026-08-20：盘后算法链已改 19:15，文案同步
         var _ph2 = window._cstParts ? window._cstParts(new Date()) : null;
         var _ph2IsPost = _ph2 && _ph2.hh >= 15;
         var _next = _ph2IsPost
-          ? '今日盘后跑批已完成，下一次盘后重刷约 18:30'
+          ? '今日盘后跑批已完成，下一次盘后重刷约 19:15'
           : '下一轮盘中抓取（一般 30 分钟内自动到位），也可手动触发 <code>v8_algo_cloud</code>';
         h+='<div style="background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.35);border-radius:8px;padding:10px 14px;margin-bottom:14px;color:#ef5350;font-size:12px;line-height:1.6;font-family:\"PingFang SC\",\"Microsoft YaHei\",\"Hiragino Sans GB\",sans-serif;">'
           +'<b>⚠️ A股数据缺失</b>：当前全站精选仅含港股，原因是盘后扫描时 A股活跃股池抓取失败。'+_next+'。'
@@ -10645,11 +10672,11 @@ function drawUpDownChart(){
     if(typeof window.__renderJudgmentBody==='function') window.__renderJudgmentBody();
     var h='';
 
-    // ═══ 2026-08-16/18 主人令：暂未上架改子Tab导航（强势突破/潜力挖掘/调试专区）═══
+    // ═══ 2026-08-16/18 主人令：暂未上架改子Tab导航（强势突破/AI预测/调试专区）；2026-08-20 潜力挖掘已删除→AI预测 ═══
     h+='<style>.ul-pane{display:none}.ul-pane.active{display:block}.ul-tab{font-size:12.5px;font-weight:600;color:var(--sub);background:transparent;border:1px solid var(--border);border-radius:8px;padding:6px 13px;cursor:pointer;transition:all .15s}.ul-tab:hover{color:var(--txt);background:var(--bg2)}.ul-tab.active{color:var(--txt);background:var(--card2);border-color:var(--border2);box-shadow:0 1px 4px rgba(0,0,0,.12)}</style>';
     h+='<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px;">';
     h+='<div class="ul-tab active" data-ultab="strong" onclick="window.__ulSwitch(this,\'strong\')">🚀 强势突破</div>';
-    h+='<div class="ul-tab" data-ultab="pp" onclick="window.__ulSwitch(this,\'pp\')">🔮 潜力挖掘</div>';
+    h+='<div class="ul-tab" data-ultab="ai" onclick="window.__ulSwitch(this,\'ai\')">🤖 AI 预测</div>';
     h+='<div class="ul-tab" data-ultab="dbg" onclick="window.__ulSwitch(this,\'dbg\')">🧪 调试专区</div>';
     h+='</div>';
 
@@ -10709,7 +10736,7 @@ function drawUpDownChart(){
     // 🛡 2026-08-19 主人令：「反推出了代码就可以每天自己搜强势股，去跟踪和回测」
     //   数据源：data/H_AUTO_BUY.js（auto_run_dn_algorithm.py 每日盘后跑，行情 + 4 日均量）
     //         data/H_AUTO_BUY_TRACK.js（track_h_auto_buy.py 每日跟踪 T+1/T+3/T+5/T+10 胜率）
-    //   完全独立于 PDF / OCR，每交易日 18:30 由 run_algorithms.py 自动化产出。
+    //   完全独立于 PDF / OCR，每交易日 19:15 由 run_algorithms.py 自动化产出。
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #ce93d8;">';
     h+=v8CardHeader('🧬','H 反推短线买点','反推代码每日盘后自跑 + 跟踪回测，admin 可见','update_time',window.H_AUTO_BUY);
     // 🛡 2026-08-19 一劳永逸修复：H 卡 4 时段更新标识（commit 23a5eb5e5 实际只改 fetcher/data，没动 index.html——本补完整 4 时段渲染）
@@ -10767,7 +10794,7 @@ function drawUpDownChart(){
       }
       h+='</table>';
     } else {
-      h+='<div class="note" style="text-align:center;">⏳ 当日候选未产出（盘后 18:30 算法链自动跑）</div>';
+      h+='<div class="note" style="text-align:center;">⏳ 当日候选未产出（盘后 19:15 算法链自动跑）</div>';
     }
     if(habDayKeys.length){
       h+='<details style="margin-top:12px;"><summary style="cursor:pointer;color:var(--sub);font-size:12px;">📊 近 '+habDayKeys.length+' 日跟踪明细（每只候选 T+1/T+5 命中）</summary>';
@@ -10798,10 +10825,10 @@ function drawUpDownChart(){
     h+='</div>';
     h+='</div>';
 
-    // ── 🛡 2026-08-19 主人令：3 张新卡（路径概率+宏观+板块推荐）暂未上架实验区 · 调试专区底部 ──
+    // ── 🛡 2026-08-19 主人令：2 张新卡（宏观+板块推荐）暂未上架实验区 · 调试专区底部 ──
+    //    2026-08-20 主人令：路径概率预测卡已迁出调试专区 → 独立「AI 预测」子TAB（潜力挖掘删除，算法链 19:15 自动更新）
     h+='<hr style="border:none;border-top:1px dashed rgba(56,189,248,.4);margin:18px 0 12px 0;">';
-    h+='<div style="background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(167,139,250,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#38bdf8;border-radius:8px;margin:0 0 10px 0;">🧪 实验区 · 8/19 新增（v8 路径概率预测卡 + 宏观 + 板块推荐框架）</div>';
-    h+='<div id="ulMppPanel"></div>';
+    h+='<div style="background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(167,139,250,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#38bdf8;border-radius:8px;margin:0 0 10px 0;">🧪 实验区 · 8/19 新增（宏观 + 板块推荐框架；路径概率已迁「AI 预测」子TAB）</div>';
     h+='<div id="ulMacroPanel"></div>';
     h+='<div id="ulSecPanel"></div>';
 
@@ -11135,35 +11162,25 @@ function drawUpDownChart(){
 
     h+='</div>';  // /ulPaneStrong
 
-    // ── pane2: 🔮 潜力挖掘 ──
-    h+='<div class="ul-pane" id="ulPanePP">';
+    // ── pane2: 🤖 AI 预测（2026-08-20 主人令：重写自 market_path_probability 算法，潜力挖掘已删除）──
+    h+='<div class="ul-pane" id="ulPaneAI">';
 
-    // 子卡 A：潜力个股表格（POTENTIAL_PICKS）
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a78bfa;">';
-    h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
-    h+='<span style="font-size:15px;font-weight:700;color:#a78bfa;">🔮 潜力挖掘</span>';
-    h+='<span class="fresh" id="prPPFresh">—</span>';
-    h+='<span style="font-size:12px;color:var(--dim);">热点概念 → 潜力个股 · 不构成投资建议</span>';
-    h+='</div>';
-    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">⚠️ 基于当前热门概念与个股资金面/量价信号筛选，<b style="color:#fbbf24">不构成任何投资建议</b>，仅作研究观察。</div>';
-    h+='<div id="ppBody"><div class="note">加载中…</div></div>';
-    h+='</div>';
-
-    // 子卡 B：ETF·龙头参考（从调试专区 dbgEtfMapBody 克隆内容）
+    // AI 预测主卡：路径ABC概率 + 当前状态 + 江恩窗口 + 黄金分割 + 缠论分型（渲染函数见 _fillAiPrediction）
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';
     h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
-    h+='<span style="font-size:15px;font-weight:700;color:#38bdf8;">📌 概念/行业 → ETF·龙头 参考</span>';
-    h+='<span class="fresh" id="prPPEtfFresh">—</span>';
-    h+='<span style="font-size:12px;color:var(--dim);">潜力挖掘·参考 · 不构成投资建议</span>';
+    h+='<span style="font-size:15px;font-weight:700;color:#38bdf8;">🤖 AI 预测 · 市场路径概率</span>';
+    h+='<span class="fresh" id="aiPredFresh">—</span>';
+    h+='<span style="font-size:12px;color:var(--dim);">艾略特 + 江恩 + 缠论 + 形态匹配 · 上证指数</span>';
     h+='</div>';
-    h+='<div id="ppEtfMapBody"><div class="note">加载中…</div></div>';
+    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">基于 5 年上证日 K 线：涨跌方向形态匹配（≥65% 一致率）统计后续路径分布，<b style="color:#fbbf24">历史回测仅供参考，不构成投资建议</b>，实盘验证 ≥3 个月。</div>';
+    h+='<div id="aiPredBody"><div class="note">加载中…</div></div>';
     h+='</div>';
 
-    h+='</div>';  // /ulPanePP
+    h+='</div>';  // /ulPaneAI
 
     el.innerHTML=h;
-    // 2026-08-16/18 主人令：潜力挖掘 从选股策略·潜力参考(st-pr) 迁至暂未上架；ETF·龙头参考 迁入调试专区
-    try{ if(typeof window._fillPotentialPicks==='function') window._fillPotentialPicks(); }catch(e){ console.warn('潜力挖掘渲染失败',e); }
+    // 2026-08-20 主人令：潜力挖掘已删除，替换为 AI 预测（market_path_probability 算法，重写非复制）
+    try{ if(typeof window._fillAiPrediction==='function') window._fillAiPrediction(); }catch(e){ console.warn('AI预测渲染失败',e); }
     try{
       // 🛡 2026-08-18 主人令：ETF·龙头参考 直接渲染（不依赖已删的 etfMapBody 克隆）
       //   数据源：CONCEPT_RANKING.items（概念 top 8）+ SECTOR_FUND_FLOW.sectors_in（行业 top 6）
@@ -11227,22 +11244,16 @@ function drawUpDownChart(){
           cEl.innerHTML = h;
         }
       }
-      // 同步克隆到潜力挖掘 pane
-      var etfSrc=document.getElementById('dbgEtfMapBody');
-      var etfDstPP=document.getElementById('ppEtfMapBody');
-      if(etfSrc && etfDstPP) etfDstPP.innerHTML = etfSrc.innerHTML;
       var em = window.CONCEPT_ETF_MAP || {};
       var tm=document.getElementById('prEtfFresh');
-      var tmPP=document.getElementById('prPPEtfFresh');
       var _etfBadge = _uBadge('盘后','短线',em.update_time||null);
       if(tm) tm.innerHTML = _etfBadge;
-      if(tmPP) tmPP.innerHTML = _etfBadge;
     }catch(e){ console.warn('ETF龙头渲染失败',e); }
     // 2026-08-16 子Tab 切换函数
     window.__ulSwitch = function(btn, tab){
       var panes = document.querySelectorAll('#sec-ul .ul-pane');
       for(var i=0;i<panes.length;i++) panes[i].classList.remove('active');
-      var idMap = {strong:'ulPaneStrong', pp:'ulPanePP', dbg:'ulPaneDbg'};
+      var idMap = {strong:'ulPaneStrong', ai:'ulPaneAI', dbg:'ulPaneDbg'};
       var target = document.getElementById(idMap[tab] || ('ulPane'+tab));
       if(target) target.classList.add('active');
       var tabs = document.querySelectorAll('#sec-ul .ul-tab');
@@ -11269,60 +11280,12 @@ function drawUpDownChart(){
         }
       }, 1500);
     }
-    // 🛡 2026-08-19 主人令：3 张新卡 render 调用（路径概率+宏观+板块推荐）
-    try{ if(typeof window.renderMarketPathProbability==='function') window.renderMarketPathProbability(); }catch(e){console.warn("路径概率卡渲染失败",e);}
+    // 🛡 2026-08-19 主人令：render 调用（宏观+板块推荐；路径概率已迁 AI 预测子TAB 由 _fillAiPrediction 渲染）
     try{ if(typeof window.renderMarketRegimeCard==='function') window.renderMarketRegimeCard(); }catch(e){console.warn("宏观卡渲染失败",e);}
     try{ if(typeof window.renderSectorRecommendationCard==='function') window.renderSectorRecommendationCard(); }catch(e){console.warn("板块推荐卡渲染失败",e);}
   }
 
-  /* ═══════════ 2026-08-19 主人令：3 张新卡 render 函数（路径概率+板块推荐+宏观）══ 暂未上架·调试专区 ═══════════ */
-  /* ---- 📐 路径概率 + 关键窗口 ---- */
-  function renderMarketPathProbability(){
-    var host = document.getElementById('ulMppPanel');
-    if(!host) return;
-    var d = window.MARKET_PATH_PROBABILITY || {};
-    if(!d.current){
-      host.innerHTML = '<div class="note" style="padding:14px;text-align:center;">路径概率数据暂不可用</div>';
-      return;
-    }
-    var c = d.current, prob = d.path_probability||{}, gann = d.gann_windows||[];
-    var A=prob.A_up||0, B=prob.B_down||0, C=prob.C_flat||0, sample=prob.sample||0;
-    var h = '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';
-    h += '<h3 style="font-size:14px;color:var(--txt);font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">';
-    h += '📐 路径概率 + 关键窗口 <span style="font-size:11px;color:var(--dim);font-weight:400;">艾略特 + 江恩 + 缠论 + 形态匹配</span>';
-    h += '</h3>';
-    h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;padding:10px;background:rgba(56,189,248,.06);border-radius:8px;">';
-    h += '<div style="text-align:center;"><div style="font-size:10px;color:var(--dim);">今日收</div><div style="font-size:18px;font-weight:800;color:var(--txt);">'+(c.close||'-')+'</div></div>';
-    h += '<div style="text-align:center;"><div style="font-size:10px;color:var(--dim);">60日位置</div><div style="font-size:18px;font-weight:800;color:'+(c.pos_in_60d<0.4?'var(--down)':c.pos_in_60d>0.6?'var(--up)':'#f59e0b')+';">'+(c.pos_in_60d*100).toFixed(0)+'%</div></div>';
-    h += '<div style="text-align:center;"><div style="font-size:10px;color:var(--dim);">MA 趋势</div><div style="font-size:14px;font-weight:700;color:'+(c.ma_trend==='多头'?'var(--up)':c.ma_trend==='空头'?'var(--down)':'#f59e0b')+';">'+c.ma_trend+'</div></div>';
-    h += '<div style="text-align:center;"><div style="font-size:10px;color:var(--dim);">MACD</div><div style="font-size:14px;font-weight:700;color:'+(c.macd==='金叉'?'var(--up)':c.macd==='死叉'?'var(--down)':'#f59e0b')+';">'+c.macd+'</div></div>';
-    h += '</div>';
-    h += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">';
-    h += '<div style="background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.4);border-radius:8px;padding:12px;text-align:center;"><div style="font-size:11px;color:#ef5350;font-weight:700;">A 上行</div><div style="font-size:32px;font-weight:800;color:#ef5350;line-height:1;">'+A.toFixed(1)+'%</div><div style="font-size:10px;color:var(--dim);margin-top:2px;">5日涨>1%</div></div>';
-    h += '<div style="background:rgba(31,209,123,.12);border:1px solid rgba(31,209,123,.4);border-radius:8px;padding:12px;text-align:center;"><div style="font-size:11px;color:var(--down);font-weight:700;">B 下行</div><div style="font-size:32px;font-weight:800;color:var(--down);line-height:1;">'+B.toFixed(1)+'%</div><div style="font-size:10px;color:var(--dim);margin-top:2px;">5日跌<-1%</div></div>';
-    h += '<div style="background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.4);border-radius:8px;padding:12px;text-align:center;"><div style="font-size:11px;color:var(--sub);font-weight:700;">C 震荡</div><div style="font-size:32px;font-weight:800;color:var(--sub);line-height:1;">'+C.toFixed(1)+'%</div><div style="font-size:10px;color:var(--dim);margin-top:2px;">±1% 内</div></div>';
-    h += '</div>';
-    if(gann.length){
-      h += '<div style="background:var(--bg2);border-radius:8px;padding:10px 12px;margin-bottom:8px;">';
-      h += '<div style="font-size:11px;color:var(--sub);font-weight:700;margin-bottom:8px;">🔯 江恩时间窗口（锚点：'+(gann[0].anchor_date||'-')+'，近89日低点 '+(gann[0].anchor_price||'-')+'）</div>';
-      h += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">';
-      for(var i=0;i<gann.length;i++){
-        var w=gann[i];
-        var c2=w.is_near?'#fbbf24':'var(--dim)';
-        var bg=w.is_near?'rgba(251,191,36,.12)':'transparent';
-        h += '<div style="text-align:center;padding:6px;background:'+bg+';border:1px solid '+(w.is_near?'rgba(251,191,36,.4)':'var(--border)')+';border-radius:6px;">';
-        h += '<div style="font-size:11px;font-weight:700;color:'+c2+';">F'+w.F+'</div>';
-        h += '<div style="font-size:11px;color:var(--txt);">'+(w.target_date||'').slice(5)+'</div>';
-        h += '<div style="font-size:10px;color:'+c2+';">'+(w.days_to_today>0?'+':'')+w.days_to_today+'天</div>';
-        h += '</div>';
-      }
-      h += '</div></div>';
-    }
-    h += '<div style="font-size:10px;color:var(--dim);line-height:1.6;">形态匹配样本 '+sample+' 段（涨跌方向序列≥65%一致率）· 数据 '+(d.meta.data_range||'')+' · ⚠️ 历史回测仅供参考</div>';
-    h += '</div>';
-    host.innerHTML = h;
-  }
-
+  /* ═══════════ 2026-08-19 主人令：2 张新卡 render 函数（宏观+板块推荐）══ 暂未上架·调试专区 ═══════════ */
   /* ---- 🌍 宏观环境（MACRO + MARKET_REGIME 融合）---- */
   function renderMarketRegimeCard(){
     var host = document.getElementById('ulMacroPanel');
@@ -11605,140 +11568,105 @@ function drawUpDownChart(){
     dst.innerHTML = html;
   };
 
-  // 🔮 潜力挖掘 2.0（2026-08-16 升级：成交额列 + 大涨幅警示 + 概念可筛选 + 综合分可视化 + 情绪周期联动）
-  window._ppFilterConcept = null;
-  window._fillPotentialPicks = function(){
-    var dst = document.getElementById('ppBody');
+  // 🤖 AI 预测 · 市场路径概率（2026-08-20 主人令：重写自 market_path_probability 算法，潜力挖掘已删除）
+  //   展示：路径概率 ABC + 当前状态（收盘/60日位置/MA/MACD/量能）+ 江恩窗口 + 黄金分割 + 缠论分型
+  window._fillAiPrediction = function(){
+    var dst = document.getElementById('aiPredBody');
     if(!dst) return;
-    var pp = window.POTENTIAL_PICKS;
-    // 🛡 2026-08-20 主人令一劳永逸：首渲时 POTENTIAL_PICKS 可能因脚本加载时序/缓存尚未就绪，
-    //   此时若直接写"数据不可用"并 return 会永久空卡。改为注册轮询重试，数据到位立即填充。
-    if(!pp || !pp.picks || !pp.picks.length){
-      if(!window.__ppRetryTimer){
-        window.__ppRetryN = 0;
-        window.__ppRetryTimer = setInterval(function(){
-          window.__ppRetryN++;
-          if(window.POTENTIAL_PICKS && window.POTENTIAL_PICKS.picks && window.POTENTIAL_PICKS.picks.length){
-            clearInterval(window.__ppRetryTimer); window.__ppRetryTimer=null; window.__ppRetryN=0;
-            try{ window._fillPotentialPicks(); }catch(e){}
-          } else if(window.__ppRetryN > 30){ // 15s 仍无数据才判不可用
-            clearInterval(window.__ppRetryTimer); window.__ppRetryTimer=null; window.__ppRetryN=0;
-            var d = document.getElementById('ppBody');
-            if(d) d.innerHTML = '<div class="note">POTENTIAL_PICKS 数据不可用</div>';
+    var d = window.MARKET_PATH_PROBABILITY || {};
+    if(!d.current){
+      // 🛡 defer 时序自愈：数据未注入时轮询重试（0.5s×30=15s），到位立即渲染，杜绝永久空卡
+      if(!window.__aiRetryTimer){
+        window.__aiRetryN = 0;
+        window.__aiRetryTimer = setInterval(function(){
+          window.__aiRetryN++;
+          if(window.MARKET_PATH_PROBABILITY && window.MARKET_PATH_PROBABILITY.current){
+            clearInterval(window.__aiRetryTimer); window.__aiRetryTimer=null; window.__aiRetryN=0;
+            try{ window._fillAiPrediction(); }catch(e){}
+          } else if(window.__aiRetryN > 30){
+            clearInterval(window.__aiRetryTimer); window.__aiRetryTimer=null; window.__aiRetryN=0;
+            var dd = document.getElementById('aiPredBody');
+            if(dd) dd.innerHTML = '<div class="note">AI 预测数据暂不可用（等待盘后算法链 19:15 生成）</div>';
           }
         }, 500);
       }
       return;
     }
-    if(window.__ppRetryTimer){ clearInterval(window.__ppRetryTimer); window.__ppRetryTimer=null; window.__ppRetryN=0; }
-    // ⚖️ 2026-08-14 主人令：加"更新于"统一胶囊（潜力挖掘卡）
-    try{ var tm=document.getElementById('prPPFresh'); if(tm) tm.innerHTML = _uBadge('盘后','短线',(pp&&pp.update_time)||null); }catch(e){}
+    if(window.__aiRetryTimer){ clearInterval(window.__aiRetryTimer); window.__aiRetryTimer=null; window.__aiRetryN=0; }
+    var c = d.current, prob = d.path_probability||{}, gann = d.gann_windows||[];
+    var fibs = d.fib_retracements||[], fr = d.chan_fractals||[];
+    var A=prob.A_up||0, B=prob.B_down||0, C=prob.C_flat||0, sample=prob.sample||0;
+    // ⚖️ 更新胶囊（盘后 · 中长线观察）
+    try{ var tm=document.getElementById('aiPredFresh'); if(tm) tm.innerHTML = _uBadge('盘后','中长线',(d.meta&&d.meta.update_time)||d.update_time||null); }catch(e){}
     var html = '';
 
-    // ── 顶部：情绪周期联动适配条（读 CRISIS_DATA 危机雷达）──
-    var phase='', advice='', pColor='var(--sub)';
-    var cr = window.CRISIS_DATA || {};
-    var crisisScore = (cr.currency||0)*0.4 + (cr.economy||0)*0.35 + (cr.global||0)*0.25;
-    var crisisPct = Math.round(crisisScore*100);
-    if(crisisPct>=70){ phase='冰点'; pColor='var(--down)'; advice='情绪冰点，潜力信号可靠性下降，建议降仓观望'; }
-    else if(crisisPct>=50){ phase='降温'; pColor='#f59e0b'; advice='风险累积，潜力挖掘仅作观察，仓位≤30%'; }
-    else if(crisisPct<=30){ phase='温和'; pColor='var(--up)'; advice='情绪温和偏暖，潜力挖掘可正常使用'; }
-    else { phase='修复'; pColor='#38bdf8'; advice='低位筑底期，潜力挖掘可小仓试错'; }
-    html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:7px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.15);font-size:12px;margin-bottom:10px;">';
-    html += '<span style="font-weight:700;color:'+pColor+';">情绪·'+phase+'</span>';
-    html += '<span style="color:var(--dim);">危机雷达 '+crisisPct+'/100</span>';
-    html += '<span style="color:var(--sub);flex:1;min-width:0;">'+advice+'</span></div>';
+    // ① 当前状态条（收盘 / 60日位置 / MA趋势 / MACD / 量能）
+    html += '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px;padding:10px;background:rgba(56,189,248,.06);border-radius:8px;">';
+    html += '<div style="text-align:center;"><div style="font-size:10px;color:var(--dim);">今日收 · '+(c.date||'').slice(5)+'</div><div style="font-size:17px;font-weight:800;color:var(--txt);">'+(c.close||'-')+'</div></div>';
+    html += '<div style="text-align:center;"><div style="font-size:10px;color:var(--dim);">60日位置</div><div style="font-size:17px;font-weight:800;color:'+(c.pos_in_60d<0.4?'var(--down)':c.pos_in_60d>0.6?'var(--up)':'#f59e0b')+';">'+Math.round((c.pos_in_60d||0)*100)+'%</div></div>';
+    html += '<div style="text-align:center;"><div style="font-size:10px;color:var(--dim);">MA5/20/60</div><div style="font-size:13px;font-weight:700;color:'+(c.ma_trend==='多头'?'var(--up)':c.ma_trend==='空头'?'var(--down)':'#f59e0b')+';">'+c.ma_trend+'</div><div style="font-size:9.5px;color:var(--dim);">'+(c.ma5||'-')+' / '+(c.ma20||'-')+' / '+(c.ma60||'-')+'</div></div>';
+    html += '<div style="text-align:center;"><div style="font-size:10px;color:var(--dim);">MACD</div><div style="font-size:13px;font-weight:700;color:'+(c.macd==='金叉'?'var(--up)':c.macd==='死叉'?'var(--down)':'#f59e0b')+';">'+c.macd+'</div><div style="font-size:9.5px;color:var(--dim);">DIF-DEA '+(c.macd_dif!=null?c.macd_dif:'-')+'</div></div>';
+    html += '<div style="text-align:center;"><div style="font-size:10px;color:var(--dim);">量能</div><div style="font-size:13px;font-weight:700;color:var(--txt);">'+c.volume+'</div></div>';
+    html += '</div>';
 
-    // ── 头部：热门概念标签（可点击筛选）──
-    if (pp.hot_concepts && pp.hot_concepts.length){
-      html += '<div style="font-size:11.5px;color:var(--sub);margin-bottom:6px;">🔥 当前热门概念（共 '+pp.hot_concepts_count+' 个，点击筛选）：</div>';
-      html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">';
-      pp.hot_concepts.slice(0,10).forEach(function(cn){
-        var active = (_ppFilterConcept===cn);
-        var bg = active ? 'rgba(167,139,250,.35)' : 'rgba(167,139,250,.12)';
-        var bd = active ? 'rgba(167,139,250,.7)' : 'rgba(167,139,250,.35)';
-        html += '<span onclick="window._ppFilterConcept=\''+cn+'\';window._fillPotentialPicks();" style="cursor:pointer;display:inline-block;padding:3px 8px;background:'+bg+';border:1px solid '+bd+';border-radius:6px;font-size:11.5px;color:#c4b5fd;font-weight:600;">'+cn+'</span>';
-      });
-      html += '</div>';
-      if(_ppFilterConcept){
-        html += '<div style="font-size:11.5px;color:#c4b5fd;margin-bottom:8px;">已筛选概念：<b>'+_ppFilterConcept+'</b> <span onclick="window._ppFilterConcept=null;window._fillPotentialPicks();" style="cursor:pointer;color:var(--dim);text-decoration:underline;">清除</span></div>';
+    // ② 路径概率 ABC（红涨绿跌铁律：A 上行红 / B 下行绿）
+    html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">';
+    html += '<div style="background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.4);border-radius:8px;padding:12px;text-align:center;"><div style="font-size:11px;color:#ef5350;font-weight:700;">A 上行延续</div><div style="font-size:32px;font-weight:800;color:#ef5350;line-height:1;">'+A.toFixed(1)+'%</div><div style="font-size:10px;color:var(--dim);margin-top:2px;">5日涨&gt;1%</div></div>';
+    html += '<div style="background:rgba(38,166,154,.12);border:1px solid rgba(38,166,154,.4);border-radius:8px;padding:12px;text-align:center;"><div style="font-size:11px;color:#26a69a;font-weight:700;">B 下行调整</div><div style="font-size:32px;font-weight:800;color:#26a69a;line-height:1;">'+B.toFixed(1)+'%</div><div style="font-size:10px;color:var(--dim);margin-top:2px;">5日跌&lt;-1%</div></div>';
+    html += '<div style="background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.4);border-radius:8px;padding:12px;text-align:center;"><div style="font-size:11px;color:var(--sub);font-weight:700;">C 宽幅震荡</div><div style="font-size:32px;font-weight:800;color:var(--sub);line-height:1;">'+C.toFixed(1)+'%</div><div style="font-size:10px;color:var(--dim);margin-top:2px;">|5日|≤1%</div></div>';
+    html += '</div>';
+
+    // ③ 江恩时间窗口（is_near 高亮）
+    if(gann.length){
+      html += '<div style="background:var(--bg2);border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
+      html += '<div style="font-size:11px;color:var(--sub);font-weight:700;margin-bottom:8px;">🔯 江恩时间窗口（锚点：'+(gann[0].anchor_date||'-')+' 近89日低点 '+(gann[0].anchor_price||'-')+'）</div>';
+      html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">';
+      for(var i=0;i<gann.length;i++){
+        var w=gann[i];
+        var c2=w.is_near?'#fbbf24':'var(--dim)';
+        var bg=w.is_near?'rgba(251,191,36,.12)':'transparent';
+        html += '<div style="text-align:center;padding:6px;background:'+bg+';border:1px solid '+(w.is_near?'rgba(251,191,36,.4)':'var(--border)')+';border-radius:6px;">';
+        html += '<div style="font-size:11px;font-weight:700;color:'+c2+';">F'+w.F+'</div>';
+        html += '<div style="font-size:11px;color:var(--txt);">'+(w.target_date||'').slice(5)+'</div>';
+        html += '<div style="font-size:10px;color:'+c2+';">'+(w.days_to_today>0?'+':'')+w.days_to_today+'天</div>';
+        html += '</div>';
       }
+      html += '</div></div>';
     }
 
-    // ── 表格 ──
-    var rows = pp.picks.slice();
-    if(_ppFilterConcept){
-      rows = rows.filter(function(p){ return (p.hot_concepts||[]).indexOf(_ppFilterConcept)>=0; });
-    }
-    if(!rows.length){
-      html += '<div class="note">该概念下暂无潜力股</div>';
-      dst.innerHTML = html;
-      return;
-    }
-    html += '<div style="overflow-x:auto;">';
-    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
-    html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-    html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">#</th>';
-    html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">名称</th>';
-    html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">代码</th>';
-    html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">当日%</th>';
-    html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">成交额亿</th>';
-    html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">分红方案</th>';
-    html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">热门数</th>';
-    html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">综合分</th>';
-    html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">热门概念(点选)</th>';
-    html += '</tr></thead><tbody>';
-    rows.forEach(function(p, i){
-      var pctColor = p.pct > 0 ? 'var(--up)' : (p.pct < 0 ? 'var(--down)' : 'var(--sub)');
-      var hot = p.pct > 7;
-      var pctTxt = (p.pct>0?'+':'')+p.pct+'%' + (hot ? ' ⚠️' : '');
-      var scoreColor = p.total_score >= 9 ? '#c4b5fd' : (p.total_score >= 7 ? '#a78bfa' : '#7c3aed');
-      var amtColor = (p.amount_yi||0) >= 100 ? '#f87171' : ((p.amount_yi||0) >= 50 ? '#fbbf24' : 'var(--sub)');
-      var scoreW = Math.min(100, Math.round((p.total_score/16)*100));
-      html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+(hot?'background:rgba(248,113,113,.06);':'')+'">';
-      html += '<td style="padding:7px 6px;color:var(--dim);">'+(i+1)+'</td>';
-      html += '<td style="padding:7px 6px;font-weight:700;color:var(--txt);">'+p.name+'</td>';
-      html += '<td style="padding:7px 6px;color:var(--sub);font-family:ui-monospace,Menlo,monospace;">'+p.code+'</td>';
-      html += '<td style="padding:7px 6px;text-align:right;color:'+pctColor+';font-weight:600;">'+pctTxt+'</td>';
-      html += '<td style="padding:7px 6px;text-align:right;color:'+amtColor+';font-weight:600;">'+(p.amount_yi!=null?p.amount_yi:'-')+'</td>';
-      // 分红方案（沿用 2026-08-14 主人令逻辑）
-      var sq = (window.STOCK_QUOTE && window.STOCK_QUOTE.stocks) ? window.STOCK_QUOTE.stocks[p.code] : null;
-      var dv = sq ? sq.dividend : null;
-      var dyCell = '<span style="color:var(--dim);font-size:10px;">-</span>';
-      if (dv && dv.cash_ratio != null){
-        var dyColor = dv.cash_ratio >= 30 ? '#fbbf24' : (dv.cash_ratio >= 10 ? '#22c55e' : '#94a3b8');
-        var prog = dv.progress && /实施|已/.test(dv.progress) ? '已实施' : (dv.progress || '预案');
-        dyCell = '<span style="font-size:11px;color:'+dyColor+';font-weight:700;">'+dv.cash_ratio.toFixed(1)+'%</span>'
-              + '<br><span style="font-size:9.5px;color:var(--dim);">'+prog+'</span>'
-              + (dv.ex_date ? '<br><span style="font-size:9.5px;color:var(--sub);">除'+dv.ex_date.slice(5)+'</span>' : '');
+    // ④ 黄金分割位（近60日高低回撤位，价格贴近当前收盘高亮）
+    if(fibs.length){
+      html += '<div style="background:var(--bg2);border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
+      html += '<div style="font-size:11px;color:var(--sub);font-weight:700;margin-bottom:8px;">📐 黄金分割位（近60日高 '+(c.recent_60d_high||'-')+' / 低 '+(c.recent_60d_low||'-')+'）</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+      for(var j=0;j<fibs.length;j++){
+        var f=fibs[j];
+        var near = c.close!=null && Math.abs(c.close-f.price)/f.price < 0.015;
+        var fc = near ? '#fbbf24' : 'var(--txt)';
+        var fb = near ? 'rgba(251,191,36,.15)' : 'rgba(148,163,184,.08)';
+        var fbd = near ? 'rgba(251,191,36,.4)' : 'var(--border)';
+        html += '<div style="padding:6px 10px;background:'+fb+';border:1px solid '+fbd+';border-radius:6px;font-size:11px;color:'+fc+';'+(near?'font-weight:700;':'')+'">'+(f.ratio*100).toFixed(1)+'%位 '+(f.price||'-')+(near?' ⚡':'')+'</div>';
       }
-      html += '<td style="padding:7px 6px;text-align:right;font-size:10.5px;">'+dyCell+'</td>';
-      html += '<td style="padding:7px 6px;text-align:right;color:#c4b5fd;font-weight:600;">'+p.hot_count+'</td>';
-      html += '<td style="padding:7px 6px;text-align:right;">'
-            + '<div style="font-weight:700;color:'+scoreColor+';font-size:13px;">'+p.total_score+'</div>'
-            + '<div style="background:rgba(148,163,184,.15);border-radius:3px;height:4px;margin-top:2px;width:48px;margin-left:auto;">'
-            + '<div style="background:'+scoreColor+';height:100%;border-radius:3px;width:'+scoreW+'%;min-width:2px;"></div></div></td>';
-      var consHtml = (p.hot_concepts||[]).map(function(cn){
-        var act = _ppFilterConcept===cn ? 'font-weight:700;text-decoration:underline;' : '';
-        return '<span onclick="window._ppFilterConcept=\''+cn+'\';window._fillPotentialPicks();" style="cursor:pointer;color:#a78bfa;'+act+'">'+cn+'</span>';
-      }).join(' · ');
-      html += '<td style="padding:7px 6px;color:var(--sub);font-size:11px;">'+consHtml+'</td>';
-      html += '</tr>';
-    });
-    html += '</tbody></table></div>';
+      html += '</div></div>';
+    }
 
-    // ── 底部升级备注：先跑1-2周再决策 ──
-    try { var _due = new Date(Date.now() + 14*24*3600*1000).toLocaleDateString('zh-CN'); } catch(e) { var _due = '2周后'; }
-    html += '<hr style="border:none;border-top:1px dashed rgba(167,139,250,.25);margin:12px 0;">';
-    html += '<div style="background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.3);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.7;">';
-    html += '<div style="font-size:13px;font-weight:700;color:#a78bfa;margin-bottom:6px;">📌 升级说明（2026-08-16）：先跑 1-2 周再决策</div>';
-    html += '<div style="color:var(--dim);margin-bottom:4px;">本卡已升级 2.0：新增成交额列、大涨幅⚠️警示、概念可点击筛选、综合分可视化、顶部情绪周期联动。当前仅作「热度观察」，尚无历史胜率验证。</div>';
-    html += '<div>满足以下观察结论，再决定是否加做「历史回测」（持有3/5/10天胜率）：</div>';
-    html += '<div>① 1-2 周内概念主线（光通信/CPO/5G）持续，非一日游；</div>';
-    html += '<div>② 综合分≥12 个股次日延续性较好（非高开低走）；</div>';
-    html += '<div>③ 成交额≥50亿的票确实走出超额收益；</div>';
-    html += '<div>④ 情绪联动提示与实际涨跌方向大致吻合。</div>';
-    html += '<div style="margin-top:4px;color:var(--sub);">复核起点：'+_due+'（每周日可跑对比报告）。未达则继续维持观察，不盲目升级为买卖信号。</div>';
+    // ⑤ 缠论分型（近60日自动识别顶底分型序列）
+    if(fr.length){
+      html += '<div style="background:var(--bg2);border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
+      html += '<div style="font-size:11px;color:var(--sub);font-weight:700;margin-bottom:8px;">🀄 缠论分型（近60日自动识别，顶红/底绿）</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:5px;">';
+      for(var k=0;k<fr.length;k++){
+        var fp=fr[k];
+        var fc2 = fp.type==='顶' ? '#ef5350' : '#26a69a';
+        html += '<span style="padding:3px 8px;background:rgba(148,163,184,.08);border:1px solid var(--border);border-radius:6px;font-size:10.5px;color:var(--sub);">'+fp.type+' '+(fp.date||'').slice(5)+' <b style="color:'+fc2+';">'+fp.price+'</b></span>';
+      }
+      html += '</div></div>';
+    }
+
+    // ⑥ 免责 + 数据说明
+    html += '<hr style="border:none;border-top:1px dashed rgba(56,189,248,.25);margin:12px 0;">';
+    html += '<div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.3);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--dim);">';
+    html += '形态匹配样本 '+sample+' 段（涨跌方向序列≥65%一致率）· 数据 '+(d.meta.data_range||'')+'（'+(d.meta.kline_count||'-')+' 根日K）· <b style="color:#fbbf24">⚠️ 历史回测仅供参考；预测市场不存在稳定高准确率方法，实盘验证 ≥3 个月。</b>';
     html += '</div>';
 
     dst.innerHTML = html;
@@ -12976,10 +12904,9 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
   window.renderFourVolume = renderFourVolume;
   window.renderUnlisted=renderUnlisted;
   window.renderDelisted=renderDelisted;
-  // 🛡 2026-08-19 阿狸咪根治3卡空白bug：整个 JS 在 IIFE 内，render 函数必须显式挂 window
-  //   否则 line 11130 try/catch 中 `typeof window.renderMarketPathProbability` 恒为 undefined
-  //   → try/catch 不抛错也不调用 → ulMppPanel/ulMacroPanel/ulSecPanel 容器永远空 → 「啥都没有」
-  window.renderMarketPathProbability = renderMarketPathProbability;
+  // 🛡 2026-08-19 阿狸咪根治空白bug：整个 JS 在 IIFE 内，render 函数必须显式挂 window
+  //   否则 try/catch 中 `typeof window.renderXxx` 恒为 undefined → 容器永远空 → 「啥都没有」
+  //   2026-08-20：renderMarketPathProbability 已删除（路径概率迁至「AI 预测」子TAB 由 _fillAiPrediction 渲染）
   window.renderMarketRegimeCard = renderMarketRegimeCard;
   window.renderSectorRecommendationCard = renderSectorRecommendationCard;
 
@@ -13669,7 +13596,7 @@ window.__renderV8CalToday();
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=2fb3290cd9'},
     {name:'STOCK_PROFILE', url:'data/STOCK_PROFILE.js?v=f23feb0264'},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=6840261db8'},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=b93228f878'},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=6025187010'}
   ];
   function loadOne(item, done){

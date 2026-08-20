@@ -423,4 +423,9 @@ def main():
 
 
 if __name__ == "__main__":
+    # 🛡 2026-08-20 主人令：算法一律云端算法链执行，本地禁止手动跑（护栏）
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from utils.time_gate import check_cloud_only
+    if not check_cloud_only("algorithms/gen_algo_track.py"):
+        sys.exit(2)
     main()

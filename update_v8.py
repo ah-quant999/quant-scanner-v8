@@ -673,7 +673,9 @@ def _ensure_momentum_loader():
     if "data/STOCK_MOMENTUM_STATE.js" in html:
         return  # 已存在（含 ?v 或刚注入），交给缓存戳逻辑处理
     tag = '<script src="data/STOCK_MOMENTUM_STATE.js" defer></script>'
-    marker = '<script src="data/POTENTIAL_PICKS.js'
+    # 2026-08-20：原 marker 用 POTENTIAL_PICKS.js（已随「潜力挖掘→AI 预测」删除），
+    # 改用同区块的 SENTIMENT_CYCLE.js 作为插入锚点，防止引用失效后行为漂移。
+    marker = '<script src="data/SENTIMENT_CYCLE.js'
     if marker in html:
         html = html.replace(marker, marker + "\n    " + tag, 1)
     else:
@@ -794,11 +796,12 @@ def run_experiment_cards():
     三脚本读 data/*.js（build 刚生成的），写 data/COMMODITY_ELASTICITY.js 等。
     2026-08-16 主人令：新增动量共识筛选器（momentum_common_filter.py --emit-js →
     data/MOMENTUM_FILTER.js），与动量卡一起跟踪。
+    2026-08-20 主人令：潜力挖掘页已删除 → calc_potential_picks.py 从实验链路移除。
     任何模块失败不阻断主流程（仅告警），避免拖垮云端抓取。
     """
     import subprocess
     algo_dir = Path(__file__).resolve().parent / "algorithms"
-    for script in ("calc_commodity_elasticity.py", "calc_sentiment_cycle.py", "calc_potential_picks.py"):
+    for script in ("calc_commodity_elasticity.py", "calc_sentiment_cycle.py"):
         path = algo_dir / script
         if not path.exists():
             print(f"[experiment] ⚠️ 缺失 {script}，跳过")

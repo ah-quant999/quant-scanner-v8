@@ -14,6 +14,7 @@ import sys
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(BASE, "out", "index_history.json")
+RAW = os.path.join(BASE, "raw_data", "index_history.json")
 YEARS = 5  # 默认 5 年，按主人拍板
 
 def log(msg):
@@ -48,20 +49,33 @@ def main(years=YEARS):
     rows.sort(key=lambda x: x["d"])
     log(f"拿到 {len(rows)} 条记录，时间跨度 {rows[0]['d']} ~ {rows[-1]['d']}")
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
+    payload = {
+        "meta": {
+            "symbol": "sh000001",
+            "name": "上证指数",
+            "years": years,
+            "update_time": datetime.datetime.now().isoformat(timespec="seconds"),
+            "count": len(rows),
+        },
+        "klines": rows,
+    }
     with open(OUT, "w", encoding="utf-8") as f:
-        json.dump({
-            "meta": {
-                "symbol": "sh000001",
-                "name": "上证指数",
-                "years": years,
-                "update_time": datetime.datetime.now().isoformat(timespec="seconds"),
-                "count": len(rows),
-            },
-            "klines": rows,
-        }, f, ensure_ascii=False, separators=(",", ":"))
+        json.dump(payload, f, ensure_ascii=False, separators=(",", ":"))
     log(f"已写入 {OUT}")
+    # 🛡 2026-08-20 一劳永逸：bridge 到 raw_data/（update_v8 只读 raw_data/ 生成
+    #   data/INDEX_HISTORY.js；之前无调度方 + 无 bridge → 主站永远用旧 K 线）。
+    #   与 docstring 声明保持一致（原注释声称有 bridge，实际缺失，补上）。
+    os.makedirs(os.path.dirname(RAW), exist_ok=True)
+    with open(RAW, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, separators=(",", ":"))
+    log(f"已 bridge → raw_data/index_history.json")
     return 0
 
 if __name__ == "__main__":
+    # 🛡 2026-08-20 主人令：算法一律云端算法链执行，本地禁止手动跑（护栏）
+    sys.path.insert(0, os.path.join(BASE, "algorithms"))
+    from utils.time_gate import check_cloud_only
+    if not check_cloud_only("scripts/fetch_index_history.py"):
+        sys.exit(2)
     years = int(sys.argv[1]) if len(sys.argv) > 1 else YEARS
     sys.exit(main(years))

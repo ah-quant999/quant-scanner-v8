@@ -223,4 +223,9 @@ def main():
         print(f"✅ 已输出 data/MOMENTUM_FILTER.js（{len(cands)} 只候选，含 {sum(1 for c in out['candidates'] if c.get('live_price'))} 只 live 跟踪）→ {now}")
 
 if __name__ == "__main__":
+    # 🛡 2026-08-20 主人令：算法一律云端算法链执行，本地禁止手动跑（护栏）
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "algorithms"))
+    from utils.time_gate import check_cloud_only
+    if not check_cloud_only("scripts/momentum_common_filter.py"):
+        sys.exit(2)
     main()

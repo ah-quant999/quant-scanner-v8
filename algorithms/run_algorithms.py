@@ -61,6 +61,10 @@ ORDER = [
     "fetch_inst_trade.py",
     "fetch_sector_rs.py",
     "fetch_lhb.py",
+    # 🛡 2026-08-20 一劳永逸：5 年长 K 线 fetcher 补入算法链（此前无任何调度方，
+    #   且只写 out/ 不 bridge raw_data/ → INDEX_HISTORY/MARKET_PATH_PROBABILITY 永不更新）。
+    #   必须在 market_path_probability.py 之前执行（它是概率卡的输入源）。
+    "scripts/fetch_index_history.py",
     "calc_crds.py",
     "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
     "calc_stock_rps.py",               # → data/STOCK_RPS.js（个股RPS+RS，读 candidate.json 做 universe）
@@ -247,7 +251,8 @@ def step_run():
     print(f"  🕐 当前时间 {datetime.now():%H:%M} | 盘后选股策略就绪 {'✅ 已过 18:00' if picking_ready else '⏳ 未到 18:00（选股策略将跳过）'}")
     ok, fail = 0, 0
     for script in ORDER:
-        path = os.path.join(ALGO, script)
+        # 支持 scripts/ 前缀（如 scripts/fetch_index_history.py 在仓库根 scripts/ 下）
+        path = os.path.join(V8_ROOT, script) if script.startswith("scripts/") else os.path.join(ALGO, script)
         if not os.path.exists(path):
             print(f"  ❌ 缺失脚本: {script}")
             fail += 1
@@ -342,4 +347,9 @@ def main():
 
 
 if __name__ == "__main__":
+    # 🛡 2026-08-20 主人令·一劳永逸：算法编排器仅允许云端算法链定时任务执行
+    #   （v8_algo_cloud 19:15 等）；本地禁止手动跑算法产数据，避免与主站分叉。
+    from utils.time_gate import check_cloud_only
+    if not check_cloud_only("algorithms/run_algorithms.py"):
+        sys.exit(2)
     main()

@@ -53,6 +53,9 @@
 
 **注意**: `data/` 下所有 `.js` 文件都是前端运行时依赖，**禁止批量删除**。`data/freshness_status.json` 由体检 workflow 自动生成。
 
+> 🟢 **豁免（2026-08-20 主人令：潜力挖掘页已删除 → AI 预测子TAB 重写）**：
+> `data/POTENTIAL_PICKS.js`（+ `raw_data/potential_picks.json`）为已删除页面的孤儿产物，index.html 已无任何引用，`update_v8.py` 实验链路已移除 `calc_potential_picks.py`，**允许删除**。前端已改加载 `data/MARKET_PATH_PROBABILITY.js` + `data/INDEX_HISTORY.js`（AI 预测卡）。
+
 ---
 
 ## 🔴 核心原始数据 (raw_data/)

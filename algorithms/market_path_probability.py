@@ -22,6 +22,9 @@ from collections import deque
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IN = os.path.join(BASE, "out", "index_history.json")
 OUT = os.path.join(BASE, "out", "market_path_probability.json")
+# 🛡 2026-08-20 一劳永逸：update_v8.py 只读 raw_data/market_path_probability.json
+#   生成 data/MARKET_PATH_PROBABILITY.js；脚本必须 bridge 到 raw_data/，否则主站永远旧数据。
+RAW_OUT = os.path.join(BASE, "raw_data", "market_path_probability.json")
 
 WIN = 60        # 分析窗口（近 60 日）
 MATCH_WIN = 60  # 形态匹配窗口
@@ -297,8 +300,18 @@ def main():
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
     log(f"已写入 {OUT}")
+    # 🛡 2026-08-20 一劳永逸：bridge 到 raw_data/（update_v8 只读 raw_data/ 生成
+    #   data/MARKET_PATH_PROBABILITY.js；之前缺 bridge → 主站用旧版概率卡）。
+    os.makedirs(os.path.dirname(RAW_OUT), exist_ok=True)
+    with open(RAW_OUT, "w", encoding="utf-8") as f:
+        json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
+    log(f"已 bridge → raw_data/market_path_probability.json")
     return 0
 
 
 if __name__ == "__main__":
+    # 🛡 2026-08-20 主人令：算法一律云端算法链执行，本地禁止手动跑（护栏）
+    from utils.time_gate import check_cloud_only
+    if not check_cloud_only("algorithms/market_path_probability.py"):
+        sys.exit(2)
     sys.exit(main())
