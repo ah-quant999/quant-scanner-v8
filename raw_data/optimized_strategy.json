@@ -1,6 +1,6 @@
 {
-  "calc_time": "2026-08-19",
-  "update_time": "2026-08-19",
+  "calc_time": "2026-08-20",
+  "update_time": "2026-08-20",
   "method": "①持仓周期≤10d + ②≥3信号共振 + ③市场regime门控(grind/panic)",
   "backtest_sample": {
     "stocks_analyzed": 296,
@@ -64,5 +64,9 @@
     ],
     "note": "数据驱动：仅在市场状态为 grind/panic 时开仓"
   },
-  "current_regime_error": "No module named 'pandas'"
+  "current_regime": {
+    "date": "2026-08-20",
+    "regime": "grind",
+    "open_position": true
+  }
 }

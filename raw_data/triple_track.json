@@ -1,11 +1,92 @@
 {
-  "update_time": "2026-08-20 18:11:04",
+  "update_time": "2026-08-20 22:27:00",
   "data_date": "2026-08-20",
   "track_start": "2026-08-20",
   "history_days": 4,
   "strict_count": 0,
-  "near_count": 3,
+  "near_count": 4,
   "tracked": [
+    {
+      "code": "300765",
+      "name": "石药创新",
+      "market": "sz",
+      "board": "创业板",
+      "status": "near",
+      "total_score": 39.6,
+      "quality_grade": "A",
+      "industry": "食品制造业",
+      "sectors": [
+        "食品制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-19",
+      "hold_days": 1,
+      "consecutive_days": 2,
+      "first_close": 43.15,
+      "current_close": 51.78,
+      "pnl_pct": 20.0,
+      "catalysts": [
+        {
+          "tag": "中报扭亏",
+          "score": 15,
+          "reaction": "已兑现(价涨)"
+        }
+      ]
+    },
+    {
+      "code": "600988",
+      "name": "赤峰黄金",
+      "market": "sh",
+      "board": "主板",
+      "status": "near",
+      "total_score": 38.4,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-20",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 46.1,
+      "current_close": 46.1,
+      "pnl_pct": 0.0,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
+      "code": "000703",
+      "name": "恒逸石化",
+      "market": "sz",
+      "board": "主板",
+      "status": "near",
+      "total_score": 38.4,
+      "quality_grade": "A",
+      "industry": "化学纤维制造业",
+      "sectors": [
+        "化学纤维制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-20",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 20.1,
+      "current_close": 20.1,
+      "pnl_pct": 0.0,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
     {
       "code": "300017",
       "name": "网宿科技",
@@ -22,63 +103,9 @@
       "enter_date": "2026-08-20",
       "hold_days": 1,
       "consecutive_days": 1,
-      "first_close": 15.65,
-      "current_close": 15.65,
+      "first_close": 15.86,
+      "current_close": 15.86,
       "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "回购",
-          "score": 8,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "000725",
-      "name": "000725",
-      "market": "sz",
-      "board": "主板",
-      "status": "near",
-      "total_score": 28.4,
-      "quality_grade": "D",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-20",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 6.01,
-      "current_close": 6.01,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "000651",
-      "name": "格力电器",
-      "market": "深市",
-      "board": "主板",
-      "status": "near",
-      "total_score": 15,
-      "quality_grade": "A",
-      "industry": "电气机械和器材制造业",
-      "sectors": [
-        "电气机械和器材制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-20",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 0,
-      "current_close": null,
-      "pnl_pct": null,
       "catalysts": []
     }
   ],
@@ -171,64 +198,73 @@
   "sector_cluster": {
     "by_industry": [
       {
+        "industry": "食品制造业",
+        "count": 1,
+        "names": [
+          "石药创新"
+        ]
+      },
+      {
+        "industry": "有色金属矿采选业",
+        "count": 1,
+        "names": [
+          "赤峰黄金"
+        ]
+      },
+      {
+        "industry": "化学纤维制造业",
+        "count": 1,
+        "names": [
+          "恒逸石化"
+        ]
+      },
+      {
         "industry": "软件和信息技术服务业",
         "count": 1,
         "names": [
           "网宿科技"
         ]
-      },
-      {
-        "industry": "计算机、通信和其他电子设备制造业",
-        "count": 1,
-        "names": [
-          "000725"
-        ]
-      },
-      {
-        "industry": "电气机械和器材制造业",
-        "count": 1,
-        "names": [
-          "格力电器"
-        ]
       }
     ],
     "by_sector": [
       {
+        "sector": "食品制造业",
+        "count": 1
+      },
+      {
+        "sector": "有色金属矿采选业",
+        "count": 1
+      },
+      {
+        "sector": "化学纤维制造业",
+        "count": 1
+      },
+      {
         "sector": "软件和信息技术服务业",
-        "count": 1
-      },
-      {
-        "sector": "计算机、通信和其他电子设备制造业",
-        "count": 1
-      },
-      {
-        "sector": "电气机械和器材制造业",
         "count": 1
       }
     ],
-    "concentration": 33.33
+    "concentration": 25.0
   },
   "overlap": {
-    "total_tracked": 3,
+    "total_tracked": 4,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
       "names": []
     },
     "cockpit_a": {
-      "count": 3,
-      "overlap": 1,
+      "count": 4,
+      "overlap": 2,
       "names": [
+        "赤峰黄金",
         "网宿科技"
       ]
     },
     "cockpit_b": {
-      "count": 15,
-      "overlap": 2,
-      "names": [
-        "000725",
-        "格力电器"
-      ]
+      "count": 5,
+      "overlap": 0,
+      "names": []
     }
   },
   "backtest_signal": {
@@ -353,8 +389,8 @@
     "summary": {
       "1d": {
         "count": 5,
-        "win_rate": 40.0,
-        "avg_return": 1.54
+        "win_rate": 60.0,
+        "avg_return": 5.54
       },
       "3d": {
         "count": 2,
@@ -417,7 +453,7 @@
         "name": "石药创新",
         "enter_date": "2026-08-19",
         "offsets": {
-          "1d": 0.0
+          "1d": 20.0
         }
       }
     ]
