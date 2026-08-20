@@ -92,6 +92,11 @@ def walk_raw():
     #    2026-08-14 升级：由写死集合改为「词根前缀」自动匹配，新增算法脚本产物
     #    （如 backtest_xxx / top3_track_xxx / cockpit_backtest_xxx / optimized_strategy_xxx）
     #    自动纳入排除，根除「漏把新算法产物加进排除表导致再被覆盖」的根因。
+    # 🔴 2026-08-20 根因修复：v8_algo_cloud 自己就是 run_algorithms 的 runner，必须
+    #    把算法产物推上去；否则 backtest_*/cockpit_backtest*/top5_track.json 等
+    #    永远停在本地旧版，策略回测/驾驶舱/TOP5_TRACK 卡片长期 stale。通过环境变量
+    #    PUSH_ALGO_RAW=1 显式开启（仅 v8_algo_cloud.yml 设置），cloud_fetch 不设置
+    #    保持原有防覆盖行为。
     _ALGO_RAW_PREFIXES = (
         "backtest",          # backtest_tdx.py / backtest_comprehensive.py 等
         "cockpit_backtest",  # cockpit_backtest_now.py
@@ -100,9 +105,10 @@ def walk_raw():
         "algo_track",         # gen_algo_track.py（2026-08-15 三算法追踪）
         "commodity_prices_cache",  # calc_commodity_elasticity.py westock 价格缓存（MCP 预抓取）
     )
+    push_algo_raw = os.environ.get("PUSH_ALGO_RAW") == "1"
     for root, _dirs, files in os.walk("raw_data"):
         for f in files:
-            if f.startswith(_ALGO_RAW_PREFIXES):
+            if f.startswith(_ALGO_RAW_PREFIXES) and not push_algo_raw:
                 continue
             full = os.path.join(root, f)
             rel = os.path.relpath(full, ".").replace("\\", "/")
@@ -163,6 +169,9 @@ def walk_extra():
         # 之前仅手动 commit，未注册到 api_push 队列 → 每天盘后算法链跑完也不上传。
         "data/H_AUTO_BUY.js",           # 反推算法当日候选（脱离 PDF OCR）
         "data/H_AUTO_BUY_TRACK.js",     # 反推算法累计胜率（每日跟踪 T+1/T+3/T+5/T+10）
+        # 🔴 2026-08-20 根因修复：LHB_7D.js 由 gen_lhb_7d.py 直写 data/，之前未注册
+        #    到 extra → 算法链跑完也不上传，页面 7 日龙虎榜/机游共振长期 stale。
+        "data/LHB_7D.js",
         # optimized_strategy.json 在 raw_data/，由 walk_raw() 按算法产物前缀自动排除（不推送，免覆盖）
     ]
     for rel in extra:
@@ -189,6 +198,8 @@ _EXTRA_FILES = (
     # 🛡 2026-08-19：H 反推算法相关文件注册到 ?v 重写集，确保 api_push 推送后 index.html 同步对齐缓存戳
     "data/H_AUTO_BUY.js",
     "data/H_AUTO_BUY_TRACK.js",
+    # 🔴 2026-08-20：LHB_7D.js 同步对齐缓存戳
+    "data/LHB_7D.js",
     # 2026-08-19：路径概率预测卡（艾略特+江恩+缠论+形态匹配）注册到 ?v 重写集
     "data/INDEX_HISTORY.js",
     "data/MARKET_PATH_PROBABILITY.js",

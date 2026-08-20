@@ -27,6 +27,12 @@ import sys
 import datetime
 import logging
 
+
+# 2026-08-20 根因修复：Ubuntu/GitHub Actions 默认 UTC，朴素 datetime.now() 会把
+# 18:30 CST 当成 10:30 UTC → 选股策略门控永远通不过（盘中被跳过、盘后也不跑）。
+# 以下函数显式按 UTC+8 计算中国标准时间，不依赖系统时区或 TZ 环境变量。
+_CST_OFFSET = datetime.timedelta(hours=8)
+
 # 各市场数据就绪时间（CST, 24h 格式）
 MARKET_READY = {
     'a': (15, 30),   # A股 15:30
@@ -45,7 +51,7 @@ MARKET_LABEL = {
 
 
 def _now_cst():
-    return datetime.datetime.now()
+    return datetime.datetime.now(datetime.timezone.utc) + _CST_OFFSET
 
 
 def markets_required(markets):

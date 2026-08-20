@@ -134,6 +134,9 @@ CORE_SOURCES_ALGO = {
     "BACKTEST_TDX": 24,
     "TOP5_TRACK": 24,      # 策略回测统一卡片时间戳来源
     "CRDS_CARD_DATA": 24,
+    # 🔴 2026-08-20 根因修复：LHB_7D.js 由算法链生成，之前不在监控/自愈范围，
+    #    文件停更 24h+ 无告警，页面 7 日龙虎榜/机游共振长期 stale。
+    "LHB_7D": 24,
 }
 
 # ── 分类三：无云端生产者的冻结快照 ────────────────────────────────────
@@ -169,6 +172,7 @@ ALGO_VARS = {
     "CRDS_CARD_DATA", "TRIPLE_CONSENSUS", "TRIPLE_TRACK", "TRIPLE_HISTORY",
     "FINAL_RECOMMEND_DATA", "ALGO_TRACK", "COCKPIT_TIER_RECOMMEND",
     "COCKPIT_ADVICE", "SENTIMENT_CYCLE", "H_AUTO_BUY", "H_AUTO_BUY_TRACK",
+    "LHB_7D",
 }
 
 
@@ -447,7 +451,9 @@ def main():
                     help="仅检查不派发自愈（诊断模式）")
     args = ap.parse_args()
 
-    now = datetime.now()
+    # 2026-08-20 根因修复：统一 UTC+8 北京时间，避免 runner/本机时区漂移导致
+    # 交易日判定、收盘时间、自愈窗口全部错位。
+    now = (datetime.now(timezone.utc) + timedelta(hours=8)).replace(tzinfo=None)
     is_trading = _is_trading_day(now.date())
     close = last_trade_day_close(now)
 

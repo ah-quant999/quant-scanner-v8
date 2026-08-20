@@ -229,8 +229,13 @@ _STOCK_PICKING_READY_HOUR, _STOCK_PICKING_READY_MIN = 18, 0
 
 def _is_post_close_picking_ready():
     """判断当前是否已过盘后选股策略统一执行时间（CST 18:00）。"""
-    now = datetime.now()
-    # 云端 runner 用 TZ=Asia/Shanghai 时朴素 now() 即北京时间；本机系统本身 CST
+    # 2026-08-20 根因修复：统一使用 time_gate 的 UTC+8 计算，避免 runner 时区漂移。
+    sys.path.insert(0, ALGO)
+    try:
+        from utils.time_gate import _now_cst
+    finally:
+        sys.path.pop(0)
+    now = _now_cst()
     return (now.hour > _STOCK_PICKING_READY_HOUR or
             (now.hour == _STOCK_PICKING_READY_HOUR and now.minute >= _STOCK_PICKING_READY_MIN))
 
