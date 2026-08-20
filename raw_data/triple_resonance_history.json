@@ -153,6 +153,15 @@
     },
     "688019": {
       "2026-08-19": 0
+    },
+    "300017": {
+      "2026-08-20": 15.65
+    },
+    "000725": {
+      "2026-08-20": 6.01
+    },
+    "000651": {
+      "2026-08-20": 0
     }
   },
   "_tracking_latest": {
@@ -315,12 +324,36 @@
       "last_close": 0,
       "status": "dropped",
       "streak": 1
+    },
+    "300017": {
+      "enter_date": "2026-08-20",
+      "enter_close": 15.65,
+      "last_date": "2026-08-20",
+      "last_close": 15.65,
+      "status": "near",
+      "streak": 1
+    },
+    "000725": {
+      "enter_date": "2026-08-20",
+      "enter_close": 6.01,
+      "last_date": "2026-08-20",
+      "last_close": 6.01,
+      "status": "near",
+      "streak": 1
+    },
+    "000651": {
+      "enter_date": "2026-08-20",
+      "enter_close": 0,
+      "last_date": "2026-08-20",
+      "last_close": 0,
+      "status": "near",
+      "streak": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-08-20 10:02:14"
+    "last_update": "2026-08-20 16:54:38"
   },
   "2026-08-18": [
     {
@@ -504,65 +537,49 @@
   ],
   "2026-08-20": [
     {
-      "code": "601899",
-      "name": "紫金矿业",
-      "market": "sh",
-      "board": "主板",
-      "close": 35.45,
-      "pct_chg": 0.85,
-      "total_score": 40.0,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "300765",
-      "name": "石药创新",
+      "code": "300017",
+      "name": "网宿科技",
       "market": "sz",
       "board": "创业板",
-      "close": 43.15,
-      "pct_chg": -2.82,
-      "total_score": 40.0,
-      "quality_grade": "A",
-      "industry": "食品制造业",
+      "close": 15.65,
+      "pct_chg": -7.12,
+      "total_score": 28.8,
+      "quality_grade": "C",
+      "industry": "软件和信息技术服务业",
       "sectors": [
-        "食品制造业"
+        "软件和信息技术服务业"
       ],
       "signal_count": 0,
       "status": "near"
     },
     {
-      "code": "603993",
-      "name": "洛阳钼业",
-      "market": "sh",
+      "code": "000725",
+      "name": "000725",
+      "market": "sz",
       "board": "主板",
-      "close": 20.75,
-      "pct_chg": -0.38,
-      "total_score": 40.0,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
+      "close": 6.01,
+      "pct_chg": -7.11,
+      "total_score": 28.4,
+      "quality_grade": "D",
+      "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "有色金属矿采选业"
+        "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 0,
       "status": "near"
     },
     {
-      "code": "688331",
-      "name": "荣昌生物",
-      "market": "sh",
-      "board": "科创板",
-      "close": 128.31,
-      "pct_chg": -3.9,
-      "total_score": 28.4,
+      "code": "000651",
+      "name": "格力电器",
+      "market": "深市",
+      "board": "主板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 15,
       "quality_grade": "A",
-      "industry": "医药制造业",
+      "industry": "电气机械和器材制造业",
       "sectors": [
-        "医药制造业"
+        "电气机械和器材制造业"
       ],
       "signal_count": 0,
       "status": "near"

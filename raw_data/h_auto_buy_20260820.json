@@ -5,8 +5,8 @@
   "method": "涨幅≥3.0% + 量比≥1.2（4日均量，H 反推最小可行版）",
   "total_scanned": 9926,
   "skipped_no_quote": 459,
-  "hit_chg_only": 127,
-  "final_count": 127,
+  "hit_chg_only": 128,
+  "final_count": 128,
   "candidates": [
     {
       "code": "600127",
@@ -542,6 +542,19 @@
       "board": "创业板"
     },
     {
+      "code": "159657",
+      "symbol": "sz159657",
+      "name": "疫苗ETF鹏华",
+      "pct": 10.05,
+      "price": 0.668,
+      "prev_close": 0.607,
+      "volume": 22488.0,
+      "avg_vol_4d": 11328.0,
+      "vol_ratio": 1.985,
+      "industry": "",
+      "board": "ETF"
+    },
+    {
       "code": "000710",
       "symbol": "sz000710",
       "name": "贝瑞基因",
@@ -646,15 +659,15 @@
       "board": "主板"
     },
     {
-      "code": "159657",
-      "symbol": "sz159657",
-      "name": "疫苗ETF鹏华",
-      "pct": 10.05,
-      "price": 0.668,
-      "prev_close": 0.607,
-      "volume": 22488.0,
-      "avg_vol_4d": 15669.25,
-      "vol_ratio": 1.435,
+      "code": "159645",
+      "symbol": "sz159645",
+      "name": "疫苗ETF富国",
+      "pct": 9.9,
+      "price": 0.688,
+      "prev_close": 0.626,
+      "volume": 6045.0,
+      "avg_vol_4d": 4056.5,
+      "vol_ratio": 1.49,
       "industry": "",
       "board": "ETF"
     },
@@ -1660,6 +1673,6 @@
       "board": "创业板"
     }
   ],
-  "generated_at": "2026-08-20 10:59:51",
+  "generated_at": "2026-08-20 17:21:43",
   "source": "raw_data/h_auto_buy 反推算法，无 PDF OCR 依赖"
 }
