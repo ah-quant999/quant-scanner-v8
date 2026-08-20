@@ -1760,13 +1760,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         const el=$('conceptTreemap');
         if(!el) return;
         if(!d || !d.items || !d.items.length){
-          el.innerHTML='<div class="ipo-empty">暂无概念数据</div>'; return;
+          el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">📭 暂无概念数据（盘前自动清空，开盘后更新）</div>'; return;
         }
         // 过滤掉资金为0的无效项，避免全部等高
         const items=d.items.filter(it=>Math.abs(it.net)>0.001||Math.abs(it.chg)>0.001)
                            .sort((a,b)=>Math.abs(b.net)-Math.abs(a.net)).slice(0,30);
         if(!items.length){
-          el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">概念板块资金数据待更新</div>';
+          el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">📭 概念板块资金数据待更新（盘前自动清空，开盘后刷新）</div>';
           return;
         }
         const maxArea=Math.sqrt(Math.abs(items[0].net)||1);
@@ -2288,8 +2288,19 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           source='SECTOR_RS';
         }
         if(!sectors.length){
-          el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">暂无行业板块数据</div>';
-          if(timeEl) timeEl.innerHTML = '';
+          el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">📭 暂无行业板块数据（盘前自动清空，开盘后更新）</div>';
+          if(timeEl) timeEl.innerHTML = '<span style="font-size:11px;color:var(--dim)">盘前</span>';
+          return;
+        }
+        // 盘前清空检测：数据日期非今日时显示占位，不渲染昨日旧数据
+        var _today=new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+        var _dataDate='';
+        if(updateTime){
+          _dataDate=String(updateTime).slice(0,10);
+        }
+        if(_dataDate && _dataDate!==_today){
+          el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">📭 行业板块数据（盘前自动清空，开盘后更新）</div>';
+          if(timeEl) timeEl.innerHTML = '<span style="font-size:11px;color:var(--dim)">盘前 · 数据待刷新</span>';
           return;
         }
         sectors=sectors.slice().sort(function(a,b){
@@ -7046,6 +7057,12 @@ window.__renderV8CalFull();
       $('phFibNext').textContent=daysLeft+'天';
       $('phFibNext').style.fontSize='20px';
       $('phFibNextLbl').textContent=(nw.date||'')+' · '+(nw.name||'')+(nw.desc?' · '+nw.desc:'');
+    }else{
+      // 无 future 窗口：全部已 passed 或数据中无下一周期
+      $('phFibNext').textContent='—';
+      $('phFibNext').style.color='var(--dim)';
+      $('phFibNextLbl').textContent='当前无在观测窗口';
+      $('phFibNextLbl').style.color='var(--dim)';
     }
     const badge=$('phFibBadge');
     if(badge){
