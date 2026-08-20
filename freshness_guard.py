@@ -103,6 +103,43 @@ def get_update_time(filepath):
         return None
 
 
+def is_trading_day(d):
+    """简化交易日判断：周一至周五（不含周末，忽略法定节假日）。"""
+    return d.weekday() < 5
+
+
+def last_published_lhb_date(now):
+    """
+    LHB（龙虎榜）于交易日 D 约 17:00 后由交易所发布。
+    返回「最新已发布 LHB 对应的交易日」(date 对象)：
+    - 若 today 是交易日且 now>=17:00 → today 已发布
+    - 否则 → 向前回溯到最近的已收盘交易日
+    用于根治 17:00 边界缝隙：mtime 新鲜 ≠ 内容已为当日龙虎榜。
+    """
+    d = now.date()
+    if is_trading_day(d) and now.hour >= 17:
+        return d
+    cand = d - timedelta(days=1)
+    while not is_trading_day(cand):
+        cand -= timedelta(days=1)
+    return cand
+
+
+def get_lhb_content_date(filepath):
+    """读取 lhb_data.json 的 date 字段（YYYYMMDD，int）。缺失/异常返回 None。"""
+    p = RAW_DIR / filepath
+    if not p.exists():
+        return None
+    try:
+        d = json.load(open(p, encoding="utf-8"))
+        cd = d.get("date")
+        if cd is None:
+            return None
+        return int(str(cd))
+    except Exception:
+        return None
+
+
 def in_trading_hours(hhmm=None):
     """判断当前是否在交易连续竞价时段。"""
     if hhmm is None:
@@ -189,6 +226,16 @@ def check_freshness(category=None, threshold_override=None):
         age = get_file_age(filename)
         ut = get_update_time(filename)
 
+        # ── LHB 语义门控（根治 17:00 边界缝隙）──
+        # mtime 新鲜 ≠ 内容已为当日龙虎榜；按 content date 与「最新已发布交易日」比对
+        semantic_stale = False
+        if filename == "lhb_data.json":
+            cd = get_lhb_content_date(filename)
+            if cd is not None:
+                expected = int(last_published_lhb_date(now).strftime("%Y%m%d"))
+                if cd < expected:
+                    semantic_stale = True
+
         if age is None:
             # 文件不存在 = 无限旧
             stale_files.append({
@@ -197,6 +244,17 @@ def check_freshness(category=None, threshold_override=None):
                 "age": -1,
                 "threshold": threshold,
                 "reason": "FILE_MISSING",
+                "update_time": ut,
+            })
+            stale_count += 1
+        elif semantic_stale:
+            # 内容 date 早于最新已发布交易日（典型：17:00 边界 mtime 新鲜但仍是昨日龙虎榜）
+            stale_files.append({
+                "file": filename,
+                "label": rule["label"],
+                "age": round(age, 1) if age is not None else -1,
+                "threshold": threshold,
+                "reason": "LHB_CONTENT_STALE",
                 "update_time": ut,
             })
             stale_count += 1
@@ -221,7 +279,8 @@ def check_freshness(category=None, threshold_override=None):
         lines.append("⚠️ 陈旧文件:")
         for sf in stale_files:
             age_str = f"{sf['age']:.0f}分钟" if sf['age'] >= 0 else "缺失"
-            reason_str = {"FILE_MISSING": "❌文件不存在", "STALE": "⏰超阈值"}[sf["reason"]]
+            reason_str = {"FILE_MISSING": "❌文件不存在", "STALE": "⏰超阈值",
+                          "LHB_CONTENT_STALE": "📅内容非最新交易日"}[sf["reason"]]
             lines.append(
                 f"  - [{sf['label']}] {sf['file']} ({age_str}, "
                 f"阈值{sf['threshold']}min, {reason_str})"
