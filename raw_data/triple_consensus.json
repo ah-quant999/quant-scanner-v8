@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-20 22:45:42",
-  "data_time": "2026-08-20 22:33:41",
+  "update_time": "2026-08-20 22:46:35",
+  "data_time": "2026-08-20 22:32:15",
   "count": 1,
   "near_miss_count": 6,
   "criteria": "主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)）· 驾驶舱A档 · 基本面A档",

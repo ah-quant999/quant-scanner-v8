@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-20 23:04:11",
-  "generated": "2026-08-20 23:04:11",
+  "update_time": "2026-08-20 23:07:39",
+  "generated": "2026-08-20 23:07:39",
   "period_start": "2026-08-10",
   "period_end": "2026-08-16",
   "stats": {
@@ -30,7 +30,7 @@
       "file": "top10_daily.json",
       "label": "全站精选",
       "status": "ok",
-      "update_time": "2026-08-20 22:33:41",
+      "update_time": "2026-08-20 22:32:15",
       "size_kb": 20.8
     },
     {
@@ -51,7 +51,7 @@
       "file": "final_recommend.json",
       "label": "最终推荐池",
       "status": "ok",
-      "update_time": "2026-08-20 22:54:58",
+      "update_time": "2026-08-20 22:57:49",
       "size_kb": 39.7
     },
     {
