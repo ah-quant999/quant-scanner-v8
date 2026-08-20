@@ -10279,6 +10279,19 @@
       "board": "科创板"
     },
     {
+      "code": "159839",
+      "symbol": "sz159839",
+      "name": "生物医药ETF汇添富",
+      "pct": 6.84,
+      "price": 0.406,
+      "prev_close": 0.38,
+      "volume": 3238732.0,
+      "avg_vol_4d": 1476296.0,
+      "vol_ratio": 2.194,
+      "industry": "",
+      "board": "ETF"
+    },
+    {
       "code": "688319",
       "symbol": "sh688319",
       "name": "欧林生物",
@@ -10290,19 +10303,6 @@
       "vol_ratio": 1.572,
       "industry": "医药制造业",
       "board": "科创板"
-    },
-    {
-      "code": "159839",
-      "symbol": "sz159839",
-      "name": "生物医药ETF汇添富",
-      "pct": 6.84,
-      "price": 0.406,
-      "prev_close": 0.38,
-      "volume": 3238732.0,
-      "avg_vol_4d": 1554887.5,
-      "vol_ratio": 2.083,
-      "industry": "",
-      "board": "ETF"
     },
     {
       "code": "159102",
@@ -10903,6 +10903,19 @@
       "board": "ETF"
     },
     {
+      "code": "159828",
+      "symbol": "sz159828",
+      "name": "医疗ETF国泰",
+      "pct": 4.44,
+      "price": 0.447,
+      "prev_close": 0.428,
+      "volume": 3103829.0,
+      "avg_vol_4d": 1315452.75,
+      "vol_ratio": 2.36,
+      "industry": "",
+      "board": "ETF"
+    },
+    {
       "code": "159883",
       "symbol": "sz159883",
       "name": "医疗器械ETF永赢",
@@ -11042,19 +11055,6 @@
       "volume": 2293952.0,
       "avg_vol_4d": 1058529.5,
       "vol_ratio": 2.167,
-      "industry": "",
-      "board": "ETF"
-    },
-    {
-      "code": "159828",
-      "symbol": "sz159828",
-      "name": "医疗ETF国泰",
-      "pct": 4.44,
-      "price": 0.447,
-      "prev_close": 0.428,
-      "volume": 3103829.0,
-      "avg_vol_4d": 1451014.5,
-      "vol_ratio": 2.139,
       "industry": "",
       "board": "ETF"
     },
@@ -11631,6 +11631,19 @@
       "board": "科创板"
     },
     {
+      "code": "159105",
+      "symbol": "sz159105",
+      "name": "恒生生物科技ETF易方达",
+      "pct": 4.71,
+      "price": 0.978,
+      "prev_close": 0.934,
+      "volume": 1891114.0,
+      "avg_vol_4d": 1384097.75,
+      "vol_ratio": 1.366,
+      "industry": "",
+      "board": "ETF"
+    },
+    {
       "code": "516060",
       "symbol": "sh516060",
       "name": "创新药ETF工银",
@@ -11731,19 +11744,6 @@
       "volume": 534887.0,
       "avg_vol_4d": 310706.0,
       "vol_ratio": 1.722,
-      "industry": "",
-      "board": "ETF"
-    },
-    {
-      "code": "159105",
-      "symbol": "sz159105",
-      "name": "恒生生物科技ETF易方达",
-      "pct": 4.71,
-      "price": 0.978,
-      "prev_close": 0.934,
-      "volume": 1891114.0,
-      "avg_vol_4d": 1443080.0,
-      "vol_ratio": 1.31,
       "industry": "",
       "board": "ETF"
     },
@@ -12385,6 +12385,6 @@
       "board": "科创板"
     }
   ],
-  "generated_at": "2026-08-20 17:27:28",
+  "generated_at": "2026-08-20 18:28:38",
   "source": "raw_data/h_auto_buy 反推算法，无 PDF OCR 依赖"
 }

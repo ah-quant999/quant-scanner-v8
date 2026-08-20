@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-20 17:40:43",
+  "update_time": "2026-08-20 17:44:46",
   "data_date": "2026-08-20",
   "track_start": "2026-08-20",
   "history_days": 4,
@@ -234,22 +234,22 @@
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测",
     "latest_date": "2026-08-20",
-    "total": 225,
+    "total": 231,
     "best_hold_days": 1,
     "periods": {
       "1d": {
         "win_rate": 59.0,
-        "avg_return": 0.5,
+        "avg_return": 0.49,
         "sharpe": 0.09,
-        "count": 213,
+        "count": 219,
         "best": 14.99,
         "worst": -10.01
       },
       "3d": {
         "win_rate": 40.8,
-        "avg_return": -0.73,
+        "avg_return": -0.71,
         "sharpe": -0.1,
-        "count": 213,
+        "count": 219,
         "best": 15.06,
         "worst": -10.04
       },
@@ -257,23 +257,23 @@
         "win_rate": 48.0,
         "avg_return": 0.0,
         "sharpe": 0.0,
-        "count": 213,
+        "count": 219,
         "best": 15.06,
         "worst": -10.04
       },
       "10d": {
         "win_rate": 49.4,
-        "avg_return": 0.88,
+        "avg_return": 0.86,
         "sharpe": 0.09,
-        "count": 213,
+        "count": 219,
         "best": 15.07,
         "worst": -10.04
       },
       "20d": {
         "win_rate": 20.0,
-        "avg_return": -1.03,
+        "avg_return": -1.01,
         "sharpe": -0.21,
-        "count": 213,
+        "count": 219,
         "best": 15.0,
         "worst": -10.04
       }
@@ -282,17 +282,17 @@
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 84,
+      "count": 87,
       "win_rate_5d": 66.7,
-      "avg_ret_5d": 2.45,
+      "avg_ret_5d": 2.35,
       "best_win_rate": 66.7,
       "best_hold_days": 5
     },
     {
       "band": "70~80",
-      "count": 141,
+      "count": 144,
       "win_rate_5d": 39.8,
-      "avg_ret_5d": -1.25,
+      "avg_ret_5d": -1.23,
       "best_win_rate": 55.7,
       "best_hold_days": 1
     }
@@ -302,8 +302,8 @@
       {
         "period": "1d",
         "strict_win": 59.0,
-        "strict_ret": 0.5,
-        "strict_count": 213,
+        "strict_ret": 0.49,
+        "strict_count": 219,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -311,8 +311,8 @@
       {
         "period": "3d",
         "strict_win": 40.8,
-        "strict_ret": -0.73,
-        "strict_count": 213,
+        "strict_ret": -0.71,
+        "strict_count": 219,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -321,7 +321,7 @@
         "period": "5d",
         "strict_win": 48.0,
         "strict_ret": 0.0,
-        "strict_count": 213,
+        "strict_count": 219,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -329,8 +329,8 @@
       {
         "period": "10d",
         "strict_win": 49.4,
-        "strict_ret": 0.88,
-        "strict_count": 213,
+        "strict_ret": 0.86,
+        "strict_count": 219,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -338,8 +338,8 @@
       {
         "period": "20d",
         "strict_win": 20.0,
-        "strict_ret": -1.03,
-        "strict_count": 213,
+        "strict_ret": -1.01,
+        "strict_count": 219,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
