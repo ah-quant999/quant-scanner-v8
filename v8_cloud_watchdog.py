@@ -106,13 +106,32 @@ def fmt_age(minutes):
     return f"{minutes/60:.1f}h"
 
 
-def api_get(url):
-    req = urllib.request.Request(url, headers=HEADERS)
-    try:
-        with urllib.request.urlopen(req, timeout=30) as r:
-            return json.loads(r.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        return {"__error__": e.code, "__msg__": e.read().decode("utf-8", "replace")}
+def api_get(url, max_retries=2, retry_sleep=2.0):
+    """GET GitHub API；网络层错误(URLError/超时/连接重置)重试一次后降级为错误字典，
+    绝不向外抛出 —— 调用方统一以 `if "__error__" in <result>` 兜底，避免网络抖动整进程
+    崩溃（2026-08-20 第289轮根因：api_get 未捕获 URLError(WinError 10060) 致看门狗中断）。"""
+    import time as _time
+    last_err = None
+    for attempt in range(max_retries + 1):
+        req = urllib.request.Request(url, headers=HEADERS)
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return json.loads(r.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            # HTTP 层错误(4xx/5xx) 不重试，直接返回错误字典
+            return {"__error__": e.code, "__msg__": e.read().decode("utf-8", "replace")}
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
+            # 网络层错误(连接超时/DNS/重置)：瞬时抖动重试，仍失败返回错误字典
+            last_err = e
+            if attempt < max_retries:
+                try:
+                    _time.sleep(retry_sleep)
+                except Exception:
+                    pass
+                continue
+            return {"__error__": "URLError",
+                    "__msg__": str(getattr(e, "reason", e))}
+    return {"__error__": "URLError", "__msg__": str(getattr(last_err, "reason", last_err))}
 
 
 def is_runner_process_alive():
@@ -567,6 +586,9 @@ def auto_dispatch(cat):
             return True, f"已派发 cn_fetch category={cat} (HTTP {r.status})"
     except urllib.error.HTTPError as e:
         return False, f"派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
+    except (urllib.error.URLError, TimeoutError, OSError) as e:
+        # 网络层失败(超时/连接重置)降级为派发失败，不向上抛（2026-08-20 一劳永逸兜底）
+        return False, f"派发失败 network: {getattr(e, 'reason', e)}"
 
 
 def _load_selfhosted_log():
@@ -661,6 +683,10 @@ def dispatch_selfhosted_fallback(cat):
     except urllib.error.HTTPError as e:
         _record_selfhosted_dispatch(False)
         return False, f"小九应急兜底派发失败 HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:150]}"
+    except (urllib.error.URLError, TimeoutError, OSError) as e:
+        # 网络层失败(超时/连接重置)降级为派发失败，不向上抛（2026-08-20 一劳永逸兜底）
+        _record_selfhosted_dispatch(False)
+        return False, f"小九应急兜底派发失败 network: {getattr(e, 'reason', e)}"
 
 
 def auto_dispatch_with_fallback(cat):
