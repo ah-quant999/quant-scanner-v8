@@ -1,15 +1,43 @@
 window.FOUR_VOLUME={
- "update_time": "2026-08-20 11:19:38",
- "total": 1,
+ "update_time": "2026-08-20 11:36:06",
+ "total": 2,
  "stocks": [
   {
    "code": "002821",
    "name": "凯莱英",
    "market": "sz",
    "board_label": "主板",
-   "close": 186.76,
-   "pct_chg": 9.48,
-   "turnover_rate": 5.29,
+   "close": 187.65,
+   "pct_chg": 10.0,
+   "turnover_rate": 5.75,
+   "mv_yi": 0,
+   "fund_type": "混合",
+   "components": {
+    "游资点火": true,
+    "机构托底": true,
+    "广度翻多": true,
+    "主力动量翻多": true,
+    "机构金叉": false,
+    "散户金叉": true,
+    "主力金叉": false
+   },
+   "yzc": true,
+   "jg": true,
+   "xc": true,
+   "four": true,
+   "qd": true,
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+   "signal_date": "2026-08-20",
+   "enter_date": "2026-08-20"
+  },
+  {
+   "code": "300418",
+   "name": "昆仑万维",
+   "market": "sz",
+   "board_label": "创业板",
+   "close": 46.18,
+   "pct_chg": 8.61,
+   "turnover_rate": 7.87,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
