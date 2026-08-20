@@ -110,10 +110,6 @@ WARN_SOURCES = {
     "TRIPLE_HISTORY": 48,
     "COCKPIT_ADVICE": 48,
     "COCKPIT_TIER_RECOMMEND": 48,
-    "COCKPIT_BACKTEST": 48,
-    "BACKTEST_COMPREHENSIVE": 48,
-    "BACKTEST_TDX": 48,
-    "CRDS_CARD_DATA": 48,
     "LHB_DATA": 48,
     "SH_FIB": 48,
     "SZ_FIB": 48,
@@ -126,6 +122,18 @@ WARN_SOURCES = {
     "SUSPENSION_ALERT": 48,
     "MARKET_ALERTS": 48,
     "STOCK_LIST": 24 * 30,
+}
+
+# 🛡 2026-08-20 主人令·一劳永逸：策略回测（统一）卡片依赖选股算法产出，
+# 必须纳入 CORE 并由 v8_algo_cloud 自动补跑。旧版在 WARN 仅告警不自愈，
+# 导致 08-19 18:30 算法链 failure 后卡片停更 24h+ 无人问津。
+# 阈值用 24h：跨一个交易日未更新即 stale（周五→周一按交易日算会正确触发）。
+CORE_SOURCES_ALGO = {
+    "COCKPIT_BACKTEST": 24,
+    "BACKTEST_COMPREHENSIVE": 24,
+    "BACKTEST_TDX": 24,
+    "TOP5_TRACK": 24,      # 策略回测统一卡片时间戳来源
+    "CRDS_CARD_DATA": 24,
 }
 
 # ── 分类三：无云端生产者的冻结快照 ────────────────────────────────────
@@ -150,8 +158,18 @@ from collections import defaultdict
 
 REPO = "ah-quant999/quant-scanner-v8"
 CN_WORKFLOW_ID = 327687211   # 🇨🇳 v8 中国数据抓取(云端)（v8_cn_fetch_cloud.yml）
+ALGO_WORKFLOW_ID = 324119592  # ☁️ v8 盘后算法链（v8_algo_cloud.yml）
 SELFHEAL_PATH = DATA_DIR / "freshness_selfheal.json"
 SELFHEAL_COOLDOWN_MIN = 30   # 同 category 自愈派发冷却，避免每小时重复派发刷爆 runner
+
+# 由 v8_algo_cloud.yml 产出的选股/回测类 data/*.js 变量（在 update_v8 CATEGORY_MAP 中多为 post_close，
+# 但 cloud_fetch 无法生产它们；需要单独 dispatch algo_cloud 来自愈）。
+ALGO_VARS = {
+    "COCKPIT_BACKTEST", "BACKTEST_COMPREHENSIVE", "BACKTEST_TDX", "TOP5_TRACK",
+    "CRDS_CARD_DATA", "TRIPLE_CONSENSUS", "TRIPLE_TRACK", "TRIPLE_HISTORY",
+    "FINAL_RECOMMEND_DATA", "ALGO_TRACK", "COCKPIT_TIER_RECOMMEND",
+    "COCKPIT_ADVICE", "SENTIMENT_CYCLE", "H_AUTO_BUY", "H_AUTO_BUY_TRACK",
+}
 
 
 def _load_token():
@@ -177,6 +195,25 @@ def _dispatch_cn(category, token):
         "X-GitHub-Api-Version": "2022-11-28",
     }
     data = json.dumps({"ref": "main", "inputs": {"category": category}}).encode()
+    req = urllib.request.Request(url, data=data, headers=hdr, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return True, r.status
+    except urllib.error.HTTPError as e:
+        return False, f"HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:120]}"
+    except Exception as e:
+        return False, str(e)[:120]
+
+
+def _dispatch_algo(token):
+    """派发 v8_algo_cloud（盘后算法链）重跑，用于选股/回测类数据 stale 自愈。"""
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{ALGO_WORKFLOW_ID}/dispatches"
+    hdr = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    data = json.dumps({"ref": "main"}).encode()
     req = urllib.request.Request(url, data=data, headers=hdr, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
@@ -306,15 +343,8 @@ def last_trade_day_close(now: datetime) -> datetime:
     return close
 
 
-def extract_update_time(path: Path):
-    """从 data/X.js 中 window.X = {...}; 提取 update_time 字段。"""
-    text = path.read_text(encoding="utf-8", errors="ignore")
-    m = re.search(r'"update_time"\s*:\s*"([^"]+)"', text)
-    if not m:
-        m = re.search(r'"calc_time"\s*:\s*"([^"]+)"', text)
-    if not m:
-        return None
-    ts = m.group(1)
+def _parse_ts(ts: str):
+    """把字符串时间戳解析为 naive datetime（北京时间）。"""
     for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d",
                 "%Y-%m-%dT%H:%M:%S"):
         try:
@@ -324,7 +354,42 @@ def extract_update_time(path: Path):
     return None
 
 
-def check_group(group, close, label, is_trading=True):
+def extract_update_time(path: Path):
+    """从本地 data/X.js 中提取 update_time 字段。"""
+    text = path.read_text(encoding="utf-8", errors="ignore")
+    m = re.search(r'"update_time"\s*:\s*"([^"]+)"', text)
+    if not m:
+        m = re.search(r'"calc_time"\s*:\s*"([^"]+)"', text)
+    if not m:
+        return None
+    return _parse_ts(m.group(1))
+
+
+def extract_update_time_cloud(var: str, token: str):
+    """从 GitHub Contents API 读取 data/X.js 的 update_time（避免本地滞后）。"""
+    import base64
+    hdr = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    url = f"https://api.github.com/repos/{REPO}/contents/data/{var}.js"
+    req = urllib.request.Request(url, headers=hdr)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            data = json.loads(r.read().decode("utf-8"))
+        content = base64.b64decode(data.get("content", "")).decode("utf-8", errors="ignore")
+        m = re.search(r'"update_time"\s*:\s*"([^"]+)"', content)
+        if not m:
+            m = re.search(r'"calc_time"\s*:\s*"([^"]+)"', content)
+        if not m:
+            return None
+        return _parse_ts(m.group(1))
+    except Exception:
+        return None
+
+
+def check_group(group, close, label, is_trading=True, token=None, use_cloud=False):
     """返回 (stale_list, notime_list)
 
     陈旧判定（2026-08-02 修订）：
@@ -342,11 +407,15 @@ def check_group(group, close, label, is_trading=True):
         # 🛡️ 周末豁免：非交易日 + 盘中高频（<24h 阈值）不判陈旧
         if (not is_trading) and max_hours < 24:
             continue
-        path = DATA_DIR / f"{var}.js"
-        if not path.exists():
-            stale.append((var, "文件缺失"))
-            continue
-        ts = extract_update_time(path)
+        ts = None
+        if use_cloud and token:
+            ts = extract_update_time_cloud(var, token)
+        if ts is None:
+            path = DATA_DIR / f"{var}.js"
+            if not path.exists():
+                stale.append((var, "文件缺失"))
+                continue
+            ts = extract_update_time(path)
         if ts is None:
             notime.append(var)
             continue
@@ -382,12 +451,22 @@ def main():
     is_trading = _is_trading_day(now.date())
     close = last_trade_day_close(now)
 
+    # token 提前加载：CORE_SOURCES_ALGO 需读云端 update_time 避免本地滞后
+    token = None if args.no_self_heal else _load_token()
+
     core_stale, core_notime = check_group(CORE_SOURCES, close, "CORE", is_trading)
+    algo_stale, algo_notime = check_group(CORE_SOURCES_ALGO, close, "CORE_ALGO", is_trading, token=token, use_cloud=True)
+    core_stale += algo_stale
+    core_notime += algo_notime
     warn_stale, warn_notime = check_group(WARN_SOURCES, close, "WARN", is_trading)
     frozen_stale, frozen_notime = check_group(FROZEN_SOURCES, close, "FROZEN", is_trading)
 
     def _with_cat(items):
-        return [{"var": v, "reason": r, "category": CATEGORY_MAP.get(v, "post_close")} for v, r in items]
+        def _cat(var):
+            if var in ALGO_VARS:
+                return "algo"
+            return CATEGORY_MAP.get(var, "post_close")
+        return [{"var": v, "reason": r, "category": _cat(v)} for v, r in items]
 
     status = {
         "check_time": now.strftime("%Y-%m-%d %H:%M:%S"),
@@ -398,7 +477,7 @@ def main():
         "frozen_stale": _with_cat(frozen_stale),
         "no_update_time": sorted(core_notime + warn_notime + frozen_notime),
         "summary": {
-            "total_checked": len(CORE_SOURCES) + len(WARN_SOURCES) + len(FROZEN_SOURCES),
+            "total_checked": len(CORE_SOURCES) + len(CORE_SOURCES_ALGO) + len(WARN_SOURCES) + len(FROZEN_SOURCES),
             "core_stale": len(core_stale),
             "warn_stale": len(warn_stale),
             "frozen_stale": len(frozen_stale),
@@ -453,7 +532,6 @@ def main():
     # ── 自愈派发（修而不只查，根治刷屏）──
     # 发现 CORE stale → 自动 dispatch 对应 category 的 cn_fetch 在在线 runner 上重抓；
     # 30min 冷却去重；自愈成功/冷却中 → 该项从 core_stale 剔除 → 最终 exit 0（不刷屏）。
-    token = None if args.no_self_heal else _load_token()
     healed_cats = set()
     sh = load_selfheal()   # 始终加载，确保数据自愈与管线自愈都能读写冷却状态
     if core_stale and token:
@@ -472,13 +550,18 @@ def main():
                         continue
                 except Exception:
                     pass
-            ok, msg = _dispatch_cn(cat, token)
+            if cat == "algo":
+                ok, msg = _dispatch_algo(token)
+                dispatch_name = "algo_cloud"
+            else:
+                ok, msg = _dispatch_cn(cat, token)
+                dispatch_name = f"cn_fetch({cat})"
             if ok:
                 sh[cat] = {"ts": now.strftime("%Y-%m-%d %H:%M:%S"), "vars": vars_}
                 healed_cats.add(cat)
-                print(f"  [自愈✓] 派发 cn_fetch({cat}) 刷新 {', '.join(vars_)}（HTTP {msg}）")
+                print(f"  [自愈✓] 派发 {dispatch_name} 刷新 {', '.join(vars_)}（HTTP {msg}）")
             else:
-                print(f"  [自愈✗] cn_fetch({cat}) 派发失败: {msg}（{', '.join(vars_)}）")
+                print(f"  [自愈✗] {dispatch_name} 派发失败: {msg}（{', '.join(vars_)}）")
         save_selfheal(sh)
     elif core_stale and not token:
         print("  [自愈跳过] 未找到 GitHub token，无法派发刷新（请配置 V8_GITHUB_TOKEN）")

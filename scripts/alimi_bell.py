@@ -20,14 +20,16 @@
         18:30-23:00 晚间   -> 上次成功 < 3h 则跳过
         23:00-08:00 夜间   -> 不按铃
         周末 08:00-11:00   -> 上次成功 < 3h 则跳过；其余时间不按铃
-    algo_cloud（[self-hosted, cn]，120min timeout，18:30 主档 + dispatch 兜底）：
-        工作日 18:00-23:30 -> 上次成功 < 4h 则跳过；其余不按铃
+    algo_cloud（ubuntu-latest，120min timeout，18:30 主档 + dispatch 兜底）：
+        工作日 18:00-23:30 -> 上次成功 < 4h 则跳过；最近 run 失败/取消则 30min 重试
+        盘后若 TOP5_TRACK/BACKTEST_TDX/BACKTEST_COMPREHENSIVE/COCKPIT_BACKTEST 仍为旧日期 -> 直接按铃
         周末不按铃（workflow 内部有交易日历 gate，非交易日自动跳过）
 
 权限：读 E:/workspace/stock-scanner/.gh_pat（已被 .gitignore 保护）。
 """
 import json
 import os
+import re
 import sys
 import datetime
 import urllib.request
@@ -106,10 +108,61 @@ def _algo_need_bell(now):
     wd = now.weekday()
     hhmm = now.hour * 60 + now.minute
     if wd >= 5:
-        return None, "weekend-off"
+        return None, None, "weekend-off"
     if 18 * 60 <= hhmm < 23 * 60 + 30:
-        return 240, "algo-main"
-    return None, "algo-off-hours"
+        return 240, 30, "algo-main"
+    return None, None, "algo-off-hours"
+
+
+def _read_cloud_update_time(var_name):
+    """从 GitHub Contents API 读取 data/X.js 内层 update_time / calc_time（避免本地滞后）。"""
+    import base64
+    st, data = _api(f"/repos/{_REPO}/contents/data/{var_name}.js")
+    if st != 200:
+        return None
+    try:
+        text = base64.b64decode(data.get("content", "")).decode("utf-8", errors="ignore")
+    except Exception:
+        return None
+    m = re.search(r'"update_time"\s*:\s*"([^"]+)"', text)
+    if not m:
+        m = re.search(r'"calc_time"\s*:\s*"([^"]+)"', text)
+    return m.group(1) if m else None
+
+
+def _read_update_time(var_name):
+    """读取本地 data/X.js 内层 update_time / calc_time（云端失败时 fallback）。"""
+    p = os.path.join(os.path.dirname(_PAT_FILE), "data", f"{var_name}.js")
+    if not os.path.exists(p):
+        return None
+    text = open(p, encoding="utf-8", errors="ignore").read()
+    m = re.search(r'"update_time"\s*:\s*"([^"]+)"', text)
+    if not m:
+        m = re.search(r'"calc_time"\s*:\s*"([^"]+)"', text)
+    return m.group(1) if m else None
+
+
+def _algo_data_need_bell(now):
+    """盘后 18:30-23:30 直接检查回测卡数据是否已更新到今天。
+
+    根因：只看 workflow 上次成功不够——workflow 成功也可能因为 18:00 前跑过，
+    而选股策略被我们永久门控在 18:00 后，回测数据必须今天才新鲜。
+    """
+    hhmm = now.hour * 60 + now.minute
+    if not (18 * 60 + 30 <= hhmm < 23 * 60 + 30):
+        return None
+    if now.weekday() >= 5:
+        return None
+    today = now.date().isoformat()
+    vars_ = ["TOP5_TRACK", "BACKTEST_TDX", "BACKTEST_COMPREHENSIVE", "COCKPIT_BACKTEST"]
+    stale = []
+    for v in vars_:
+        ts = _read_cloud_update_time(v)
+        if ts is None:
+            ts = _read_update_time(v)  # fallback 本地
+        if not ts or not ts.startswith(today):
+            stale.append((v, ts))
+    return stale
 
 
 def _dispatch(workflow_id, payload=None):
@@ -124,7 +177,7 @@ def _dispatch(workflow_id, payload=None):
     return f"DISPATCH FAIL({st}): {data.get('error', '')[:150]}"
 
 
-def _bell(workflow_id, rule, now):
+def _bell(workflow_id, rule_success, rule_failure, now):
     run, err = _last_run(workflow_id)
     if err:
         print(f"[{now:%H:%M}] {workflow_id} 查运行失败 -> 跳过本次按铃（{err}）")
@@ -138,8 +191,12 @@ def _bell(workflow_id, rule, now):
     if status in ("in_progress", "queued", "waiting", "pending", "requested"):
         print(f"[{now:%H:%M}] {workflow_id} 正在运行({status}) -> 跳过按铃")
         return
+    rule = rule_success if conclusion == "success" else rule_failure
+    if rule is None:
+        print(f"[{now:%H:%M}] {workflow_id} 当前规则不适用(last={conclusion}) -> 跳过按铃")
+        return
     if ago is not None and ago < rule:
-        print(f"[{now:%H:%M}] {workflow_id} 最近成功 {ago:.0f}min 前(<{rule}min) -> 跳过按铃")
+        print(f"[{now:%H:%M}] {workflow_id} 最近 {conclusion} {ago:.0f}min 前(<{rule}min) -> 跳过按铃")
         return
     print(f"[{now:%H:%M}] {workflow_id} 需要按铃(rule={rule}min, last={conclusion}/{ago:.0f}min前) -> {_dispatch(workflow_id)}")
 
@@ -153,13 +210,24 @@ def main():
     if rule is None:
         print(f"[{now:%H:%M}] cn_fetch 非按铃时段({label}) -> 跳过")
     else:
-        _bell(_WF_CN_FETCH, rule, now)
+        _bell(_WF_CN_FETCH, rule, 30, now)
 
-    rule, label = _algo_need_bell(now)
-    if rule is None:
+    rule_s, rule_f, label = _algo_need_bell(now)
+    if rule_s is None:
         print(f"[{now:%H:%M}] algo_cloud 非按铃时段({label}) -> 跳过")
     else:
-        _bell(_WF_ALGO, rule, now)
+        # 先直接检查回测数据文件新鲜度：比看 workflow 状态更准
+        stale = _algo_data_need_bell(now)
+        if stale:
+            run, err = _last_run(_WF_ALGO)
+            if err:
+                print(f"[{now:%H:%M}] algo_cloud 数据陈旧但查运行失败({err}) -> 仍尝试dispatch: {_dispatch(_WF_ALGO)}")
+            elif run.get("status") in ("in_progress", "queued", "waiting", "pending", "requested"):
+                print(f"[{now:%H:%M}] algo_cloud 数据陈旧但已有 run 在跑({run['status']}) -> 跳过按铃，等本轮完成")
+            else:
+                print(f"[{now:%H:%M}] algo_cloud 数据陈旧需补跑: {stale} -> {_dispatch(_WF_ALGO)}")
+        else:
+            _bell(_WF_ALGO, rule_s, rule_f, now)
 
     print("=== done ===")
 
