@@ -5525,7 +5525,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p">主人「算法链一定要安排在数据全部出来后跑」：小九 16:18 本地手动跑 final_recommend，但港股 16:30 才完整 → 新增 <code>algorithms/utils/time_gate.py</code>，final_recommend 入口加 <code>check(['hk','lhb'])</code>（港股≥16:30 / 龙虎榜≥17:30，早于则 sys.exit(1)；应急 TIME_GATE_BYPASS=1）。数据就绪时间口径：A股15:30 / 港股16:30 / LHB17:30 / 美股06:00。</div>
 
         <div class="logic-h">⑩ 资金验证卡 fetcher 字段不全（render 兜底 + 体检 disclaimer）</div>
-        <div class="logic-p"><code>SECTOR_FUND_FLOW_TREND.js</code> 54 条板块只有 7 条有 net_10d 字段（fetcher bug）→ 10/20/60日「流出」列空。render 兜底：放弃过过滤，全部板块参与 + 卡底显示「⚠️ fetcher 字段不完整：net_5d:7/54 ...」黄色警告。<b>fetcher 补全字段 = 小九明早待办</b>（改生成脚本或写新 fetcher 跑一次）。</div>
+        <div class="logic-p"><code>SECTOR_FUND_FLOW_TREND.js</code> 板块 5/10/20/60 日累计由 fetcher 本地 history 累加 + 东财历史接口补全。<b>2026-08-20 已修复</b>：放宽 20/60 日累计门槛、扩大东财接口覆盖，20 日「流出」列已能正常展示（如 AI应用/人工智能/DeepSeek概念/证金持股等）。卡片底部无黄字警告。</div>
 
         <div class="logic-h">⑪ SfIntradayChart Y 轴 999999 修复</div>
         <div class="logic-p">Y 轴 max 回调无 isFinite 兜底：series 全 null 时 v.max=undefined → Math.max(0, NaN)=NaN → ECharts 默认 max=1e9 → label 999999999。修复：isFinite 检查，无效回退 ±50 亿。</div>
@@ -7724,11 +7724,6 @@ window.__renderV8CalFull();
     h3+=sfTrendCard('20日',t20d,'net_20d','sf-trend-head-20');
     h3+=sfTrendCard('60日',t60d,'net_60d','sf-trend-head-60');
     h3+='</div>';
-    // 🛡 字段不全时显示明确状态（主人能一眼判断是 fetcher bug 还是数据真没有）
-    var missing = Object.keys(_sfIntegrity).filter(function(k){ return _sfIntegrity[k].split('/')[0] != _sfIntegrity[k].split('/')[1]; });
-    if(missing.length){
-      h3+='<div style="font-size:11px;color:var(--gold);margin-top:6px;line-height:1.4;background:rgba(251,191,36,.06);padding:6px 10px;border-radius:6px;border-left:3px solid var(--gold)">⚠️ fetcher 字段不完整：' + missing.map(function(k){return k+':'+_sfIntegrity[k];}).join(' / ') + '（板块有但该窗口净流入未产出 → 流出列「暂无」是 fetcher 漏算，非 render bug；等明早云端 algo_cloud 重跑）</div>';
-    }
     h3+='<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.4;">📌 上半：板块按 20 日涨幅周期定位；下半：按主力资金净流入滚动累计验证。</div>';
     $('sfBlock3').innerHTML=h3;
 
@@ -7751,12 +7746,9 @@ window.__renderV8CalFull();
       return;
     }
     var snaps=d.snapshots;
-    // 🛡 2026-08-19 主人令「一劳永逸+赶紧修复」: 跳过盘前 08:31 全市场累计快照
-    //   (08:31 是盘前「全市场累计」口径，与盘中分时不可同日而语，会把 Y 轴拉到 36+ 拉胯所有盘中曲线堆底角)
-    //   仅在「08:31 + 后续 snapshots>=2」时跳过，避免误伤纯盘中场景
-    if(snaps.length >= 3 && snaps[0] && /^\s*08:3[01]\s*$/.test(snaps[0].time||'')){
-      snaps = snaps.slice(1);
-    }
+    // 🛡 2026-08-20 主人令一劳永逸：只保留 09:30 开盘后的盘中快照，
+    //   过滤盘前 08:xx 全市场累计快照（与盘中分时口径不同，会把 Y 轴拉胯到 36+ 且堆底角）
+    snaps = snaps.filter(function(s){ return (s.time||'') >= '09:30'; });
     // 🛡 2026-08-19: 改板块选法 = 「跨 snap 出现频次 ≥ 半数 AND 该 snap 内 net 不小」
     //   (旧选法「全局累计绝对值 Top」会把盘前 1-2 个快照独有的大额板块选上，后续 snaps 全 null → 曲线贴底)
     //   频次优先保证每条线都有连续数据点，曲线有意义
@@ -11615,15 +11607,31 @@ function drawUpDownChart(){
   // 🔮 潜力挖掘 2.0（2026-08-16 升级：成交额列 + 大涨幅警示 + 概念可筛选 + 综合分可视化 + 情绪周期联动）
   window._ppFilterConcept = null;
   window._fillPotentialPicks = function(){
-    var pp = window.POTENTIAL_PICKS;
-    // ⚖️ 2026-08-14 主人令：加"更新于"统一胶囊（潜力挖掘卡）
-    try{ var tm=document.getElementById('prPPFresh'); if(tm) tm.innerHTML = _uBadge('盘后','短线',(pp&&pp.update_time)||null); }catch(e){}
     var dst = document.getElementById('ppBody');
     if(!dst) return;
+    var pp = window.POTENTIAL_PICKS;
+    // 🛡 2026-08-20 主人令一劳永逸：首渲时 POTENTIAL_PICKS 可能因脚本加载时序/缓存尚未就绪，
+    //   此时若直接写"数据不可用"并 return 会永久空卡。改为注册轮询重试，数据到位立即填充。
     if(!pp || !pp.picks || !pp.picks.length){
-      dst.innerHTML = '<div class="note">POTENTIAL_PICKS 数据不可用</div>';
+      if(!window.__ppRetryTimer){
+        window.__ppRetryN = 0;
+        window.__ppRetryTimer = setInterval(function(){
+          window.__ppRetryN++;
+          if(window.POTENTIAL_PICKS && window.POTENTIAL_PICKS.picks && window.POTENTIAL_PICKS.picks.length){
+            clearInterval(window.__ppRetryTimer); window.__ppRetryTimer=null; window.__ppRetryN=0;
+            try{ window._fillPotentialPicks(); }catch(e){}
+          } else if(window.__ppRetryN > 30){ // 15s 仍无数据才判不可用
+            clearInterval(window.__ppRetryTimer); window.__ppRetryTimer=null; window.__ppRetryN=0;
+            var d = document.getElementById('ppBody');
+            if(d) d.innerHTML = '<div class="note">POTENTIAL_PICKS 数据不可用</div>';
+          }
+        }, 500);
+      }
       return;
     }
+    if(window.__ppRetryTimer){ clearInterval(window.__ppRetryTimer); window.__ppRetryTimer=null; window.__ppRetryN=0; }
+    // ⚖️ 2026-08-14 主人令：加"更新于"统一胶囊（潜力挖掘卡）
+    try{ var tm=document.getElementById('prPPFresh'); if(tm) tm.innerHTML = _uBadge('盘后','短线',(pp&&pp.update_time)||null); }catch(e){}
     var html = '';
 
     // ── 顶部：情绪周期联动适配条（读 CRISIS_DATA 危机雷达）──
