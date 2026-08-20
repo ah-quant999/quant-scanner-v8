@@ -489,12 +489,13 @@ def fetch_akshare_ths_5d20d_backup(sector_names):
 
 
 def _fetch_akshare_real_5d20d(top_list):
-    """用akshare真实历史资金流接口获取5日/20日精确累计（快速失败模式）"""
+    """用akshare真实历史资金流接口获取5日/10日/20日/60日精确累计（快速失败模式）"""
     import akshare as ak_mod
     result = {}
-    start_20d = (datetime.now() - timedelta(days=70)).strftime("%Y%m%d")
+    start_20d = (datetime.now() - timedelta(days=90)).strftime("%Y%m%d")
     end_d = datetime.now().strftime("%Y%m%d")
-    sorted_items = sorted(top_list, key=lambda x: abs(x.get("net", 0)), reverse=True)[:10]
+    # 2026-08-20 扩容: 从 top10 扩到 top30，提高真实数据源覆盖率
+    sorted_items = sorted(top_list, key=lambda x: abs(x.get("net", 0)), reverse=True)[:30]
     total_ok = 0
     server_down = False
     for idx, item in enumerate(sorted_items):
@@ -758,7 +759,9 @@ def fetch_sector_flow():
                         item["net_60d_days"] = net_60d_days
 
         # === P0: 从本地history累加（最可靠，每天累积） ===
-        hist_5d_count = 0
+        # 2026-08-20 主人令「一劳永逸」: 20日/60日本地历史不足时，用真实可用天数出数并标注，
+        # 避免外部源覆盖有限导致大片「暂无」。source 只在本地确实补到数据时才追加，不覆盖外部精确源标签。
+        hist_5d_count = hist_20d_count = hist_60d_count = 0
         try:
             with open(HISTORY_FILE, "r", encoding="utf-8") as hf:
                 hist_data = json.load(hf)
@@ -769,14 +772,25 @@ def fetch_sector_flow():
                     nets = [x.get("net", 0) for x in real_entries]
                     if len(nets) >= 5:
                         item["net_5d"] = round(sum(nets[-5:]), 2)
-                        item["source"] = "本地累加"
+                        item["net_5d_days"] = 5
+                        if item.get("source") not in ("东财历史", "同花顺估算", "neodata"):
+                            item["source"] = "本地累加"
                         hist_5d_count += 1
+                    # 20日: 真实历史 >=8 天即可出数（本地约 9 天，避免空窗）
+                    if len(nets) >= 8:
+                        n20 = round(sum(nets[-20:]) if len(nets) >= 20 else sum(nets), 2)
+                        if item.get("net_20d") in (None, 0) and n20 != 0:
+                            item["net_20d"] = n20
+                            item["net_20d_days"] = min(len(nets), 20)
+                            hist_20d_count += 1
+                    # 60日: 真实历史 >=20 天即可出数
                     if len(nets) >= 20:
-                        item["net_20d"] = round(sum(nets[-20:]), 2)
-                    if len(nets) >= 60:
-                        item["net_60d"] = round(sum(nets[-60:]), 2)
-            if hist_5d_count > 0:
-                print(f"  📊 [P0本地累加] {hist_5d_count} 个板块有真实5日累计(来自{len(hist_data)}个板块history)")
+                        n60 = round(sum(nets[-60:]) if len(nets) >= 60 else sum(nets), 2)
+                        if item.get("net_60d") in (None, 0) and n60 != 0:
+                            item["net_60d"] = n60
+                            item["net_60d_days"] = min(len(nets), 60)
+                            hist_60d_count += 1
+            print(f"  📊 [P0本地累加] 5日={hist_5d_count} 20日={hist_20d_count} 60日={hist_60d_count} (来自{len(hist_data)}个板块history)")
         except Exception as e:
             print(f"  📊 [P0本地累加] 失败: {e}")
 
@@ -903,13 +917,8 @@ def fetch_sector_flow():
         candidate_map[name]["trend"] = trend
     candidate_list = list(candidate_map.values())
 
-    # 🛡 2026-08-19 主人令一劳永逸修复：对 candidate_list 做 net_5d/10d/20d/60d 累加
-    #   原代码先累加 sectors_in/out（那时 sectors_in/out 还没 append 仍空 list → 循环无效）。
-    #   同时也修阈值：10/20/60 日一律 >=3（history.max=9 天，原 >=20 永不可能满足）。层级最稳。
-    # 🛡 2026-08-19 主人令一劳永逸修复：阈值改回严格 5/10/20/60。
-    #   旧阈值 >=3 会让 history 只有 9 天时，10/20/60 三个窗口都凑「全部 history 求和」
-    #   → 同值 = 卡片「10日/20日/60日 完全相同」体感 bug（用户截图）。
-    #   现 history < N 天时字段保留 None，UI 资金验证列会显「(实X天) + 暂无数据」。
+    # 🛡 2026-08-20 主人令「一劳永逸」: candidate_list 同样放宽 20日/60日 阈值，
+    # 用真实可用天数出数并标注，避免大片板块因历史不足而显示「暂无」。
     seen_names = set()
     for item in candidate_list:
         nm = item.get("name", "")
@@ -928,18 +937,19 @@ def fetch_sector_flow():
         if item.get("net_5d") in (None, 0) and net_5d_val != 0 and len(real_5) >= 5:
             item["net_5d"] = net_5d_val
             item["net_5d_days"] = len(real_5)
-        # 🛡 2026-08-19 主人令一劳永逸修复：本地history最多9天，10日窗放宽到≥8天即出数(实N天标注)；
-        #   60日窗需真实≥45天历史才填充，避免与10日同值（本地9天累加必同值）触发体感bug。
+        # 10日: >=8 天出数（与主流程一致）
         if item.get("net_10d") in (None, 0) and net_10d_val != 0 and len(real_10) >= 8:
             item["net_10d"] = net_10d_val
             item["net_10d_days"] = len(real_10)
-        if item.get("net_20d") in (None, 0) and net_20d_val != 0 and len(real_20) >= 20:
+        # 20日: >=8 天出数，避免空窗（本地约 9 天可用）
+        if item.get("net_20d") in (None, 0) and net_20d_val != 0 and len(real_20) >= 8:
             item["net_20d"] = net_20d_val
             item["net_20d_days"] = len(real_20)
-        if item.get("net_60d") in (None, 0) and net_60d_val != 0 and len(real_60) >= 45:
+        # 60日: >=20 天出数
+        if item.get("net_60d") in (None, 0) and net_60d_val != 0 and len(real_60) >= 20:
             item["net_60d"] = net_60d_val
             item["net_60d_days"] = len(real_60)
-        # 一劳永逸兜底：写实 *_days 字段，sectors_in/out 同步时不再乱 fallback
+        # 兜底：写实 *_days 字段，sectors_in/out 同步时不再乱 fallback
         real_all = [h for h in hist if not h.get("carried")]
         for k in ("net_5d", "net_10d", "net_20d", "net_60d"):
             days_field = k + "_days"
