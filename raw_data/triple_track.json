@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-20 22:27:00",
+  "update_time": "2026-08-20 22:45:42",
   "data_date": "2026-08-20",
   "track_start": "2026-08-20",
   "history_days": 4,
@@ -106,7 +106,13 @@
       "first_close": 15.86,
       "current_close": 15.86,
       "pnl_pct": 0.0,
-      "catalysts": []
+      "catalysts": [
+        {
+          "tag": "回购",
+          "score": 8,
+          "reaction": "观察中"
+        }
+      ]
     }
   ],
   "alerts": [

@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-20 22:16:52",
+  "update_time": "2026-08-20 22:33:41",
   "total_scored": 26,
   "count_80plus": 0,
   "max_score": 39.6,
@@ -170,7 +170,7 @@
       "fund_detail": "",
       "sector_detail": "",
       "inst_detail": "",
-      "quality_detail": "ROE良好(19.6%) | 营收高增(37.9%) | 消息:中报预增"
+      "quality_detail": "ROE良好(19.6%) | 营收高增(37.9%) | 消息:中报预增,收购"
     },
     {
       "rank": 5,
@@ -258,6 +258,48 @@
     },
     {
       "rank": 7,
+      "code": "300017",
+      "name": "网宿科技",
+      "market": "sz",
+      "board": "创业板",
+      "sig_count": 2,
+      "close": 15.86,
+      "pct_chg": 1.34,
+      "pct_chg_20d": 0,
+      "total_score": 28.8,
+      "sectors": [],
+      "stop_loss": 14.27,
+      "target_price": 19.03,
+      "stop_loss_method": "fixed",
+      "target_price_method": "rr2",
+      "risk_reward": 2.0,
+      "stop_precise": false,
+      "score_base": 50,
+      "score_enhance": 0,
+      "score_form": 6,
+      "score_fund": 0,
+      "score_sector": 0,
+      "score_inst": 0,
+      "score_quality": 8,
+      "score_backtest": 8,
+      "win_rate": 65.9,
+      "quality_grade": "C",
+      "signals": {
+        "chan": false,
+        "jinzuan": false,
+        "jigou": true,
+        "trend": true,
+        "form_A": false
+      },
+      "consecutive_days": 0,
+      "form_detail": "非涨停",
+      "fund_detail": "",
+      "sector_detail": "",
+      "inst_detail": "",
+      "quality_detail": "ROE偏低(7.9%) | 营收高增(38.8%) | 消息:回购"
+    },
+    {
+      "rank": 8,
       "code": "603127",
       "name": "昭衍新药",
       "market": "sh",
@@ -299,7 +341,7 @@
       "quality_detail": "ROE差(3.6%) | 营收增长(17.4%) | 消息:中报预增"
     },
     {
-      "rank": 8,
+      "rank": 9,
       "code": "300759",
       "name": "康龙化成",
       "market": "sz",
@@ -341,7 +383,7 @@
       "quality_detail": "ROE一般(11.6%) | 营收高增(55.3%) | 消息:中报略增"
     },
     {
-      "rank": 9,
+      "rank": 10,
       "code": "600667",
       "name": "太极实业",
       "market": "sh",
@@ -383,7 +425,7 @@
       "quality_detail": "ROE偏低(5.2%) | 营收高增(91.0%)"
     },
     {
-      "rank": 10,
+      "rank": 11,
       "code": "600547",
       "name": "山东黄金",
       "market": "sh",
@@ -425,7 +467,7 @@
       "quality_detail": "ROE一般(11.5%) | 营收高增(63.0%)"
     },
     {
-      "rank": 11,
+      "rank": 12,
       "code": "002821",
       "name": "凯莱英",
       "market": "sz",
@@ -467,7 +509,7 @@
       "quality_detail": "ROE偏低(6.6%) | 营收高增(33.7%)"
     },
     {
-      "rank": 12,
+      "rank": 13,
       "code": "603259",
       "name": "药明康德",
       "market": "sh",
@@ -507,48 +549,6 @@
       "sector_detail": "",
       "inst_detail": "",
       "quality_detail": "ROE一般(13.6%) | 营收高增(26.3%)"
-    },
-    {
-      "rank": 13,
-      "code": "300017",
-      "name": "网宿科技",
-      "market": "sz",
-      "board": "创业板",
-      "sig_count": 2,
-      "close": 15.86,
-      "pct_chg": 1.34,
-      "pct_chg_20d": 0,
-      "total_score": 25.6,
-      "sectors": [],
-      "stop_loss": 14.27,
-      "target_price": 19.03,
-      "stop_loss_method": "fixed",
-      "target_price_method": "rr2",
-      "risk_reward": 2.0,
-      "stop_precise": false,
-      "score_base": 50,
-      "score_enhance": 0,
-      "score_form": 6,
-      "score_fund": 0,
-      "score_sector": 0,
-      "score_inst": 0,
-      "score_quality": 0,
-      "score_backtest": 8,
-      "win_rate": 65.9,
-      "quality_grade": "C",
-      "signals": {
-        "chan": false,
-        "jinzuan": false,
-        "jigou": true,
-        "trend": true,
-        "form_A": false
-      },
-      "consecutive_days": 0,
-      "form_detail": "非涨停",
-      "fund_detail": "",
-      "sector_detail": "",
-      "inst_detail": "",
-      "quality_detail": "ROE偏低(7.9%) | 营收高增(38.8%)"
     },
     {
       "rank": 14,
