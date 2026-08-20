@@ -421,7 +421,7 @@ window.__domReadyFns=[];
     <script src="data/SECTOR_FUND_FLOW.js?v=f625475575" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=49e25b3431" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=85defdd31d" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=f16dd62c96" defer></script>
     <script src="data/ANALYST_RATINGS.js?v=80d60bf1d6" defer></script>
     <script src="data/SUSPENSION_ALERT.js?v=127106adde" defer></script>
     <script src="data/GOLD_POOL.js?v=233a3372b9" defer></script>
@@ -436,7 +436,7 @@ window.__domReadyFns=[];
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
 <script src="data/CONCEPT_RANKING.js?v=b40fc922e2" defer></script>
 <script src="data/INDEX_QUOTES.js?v=9daf8a4c8b" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=493c860a54" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=1700d5970d" defer></script>
 <script src="data/MARGIN_DATA.js?v=f2ee733c81" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=91aacbacf4" defer></script>
 <script src="data/IPO_DATA.js?v=c42f34ea33" defer></script>
@@ -1215,7 +1215,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_FIB.js?v=7a5591c7d0" defer></script>
 <script src="data/SZ_FIB.js?v=f41220e487" defer></script>
 <script src="data/SECTOR_RS.js?v=96c3aef9a2" defer></script>
-<script src="data/SECTOR_PHASE_HISTORY.js?v=44dc0957e5" defer></script>
+<script src="data/SECTOR_PHASE_HISTORY.js?v=47b89f60ca" defer></script>
 <script src="data/INST_TRADE.js?v=6f8255054f" defer></script>
 <script src="data/NORTH_FUND.js?v=1f2ef6c7c0" defer></script>
 <script src="data/MARKET_ALERTS.js?v=839435ff23" defer></script>
@@ -1245,12 +1245,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/WEEKEND_RUN.js?v=6d383f23f6" defer></script>
 <script src="data/W52_HIGH.js?v=3dd8aa233b" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=1d9e39aab7" defer></script>
-<script src="data/RUNNER_STATUS.js?v=d3d2b98986" defer></script>
-<script src="data/HEALTH_CHECK.js?v=ea798c2356" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=ce34f736a1" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=4191c1efad" defer></script>
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=c8c46db0fc" defer></script>
-    <script src="data/INDEX_HISTORY.js?v=f5d699636e" defer></script>
+<script src="data/RUNNER_STATUS.js?v=f8175ce116" defer></script>
+<script src="data/HEALTH_CHECK.js?v=2f4ebc0c0b" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=aae960e035" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=5c2568f30c" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=f1ddb2df23" defer></script>
+    <script src="data/INDEX_HISTORY.js?v=131a49d437" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE.js?v=f135754004" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=0dcbab52a2" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=8f5ae7d309" defer></script>
@@ -13053,16 +13053,6 @@ window.__v6MemoLoaded = function(){
   window.__v6MemoReady = true;
   var err=document.getElementById('v6MemoError');
   var st=document.getElementById('v6MemoStatus');
-  // 🛡 2026-08-21 增强（主人「v6 备忘录空白」）：onload 后必须确认 iframe 内容真实渲染，
-  //   防「onload 触发了但 body 为空/被拦截」——内容 <500 字节判定为空白，显示直接打开按钮。
-  try{
-    var d=document.getElementById('v6MemoFrame');
-    if(d && d.contentDocument && d.contentDocument.body && d.contentDocument.body.innerHTML.length<500){
-      if(err) err.style.display='flex';
-      if(st) st.style.display='none';
-      return;
-    }
-  }catch(e){}
   if(err) err.style.display='none';
   if(st){ st.style.display='inline-flex'; st.innerHTML='✅ v6 备忘录已加载'; }
   clearTimeout(window.__v6MemoCheckT);
@@ -13077,30 +13067,6 @@ window.addEventListener('message', function(e){
 // v8 数据注入（不动 HTML，只填已有元素）
 try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
 try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
-</script>
-
-<!-- 🛡 2026-08-21 版本自愈：根治「开了旧标签页/浏览器缓存旧 index.html → 永远看到旧版空白」
-     每 2 分钟探测远端 data/HEALTH_CHECK.js 的 update_time（每次云端构建部署必然更新），
-     若与本地不同 → 自动 location.reload() 拉取新版。主人无需手动 Ctrl+F5。 -->
-<script>
-(function(){
-  if(window.__v8AutoReloadStarted) return;
-  window.__v8AutoReloadStarted=true;
-  function _localTs(){ try{ var h=window.HEALTH_CHECK||{}; return h.update_time||h.updated_at||''; }catch(e){ return ''; } }
-  var localTs=_localTs();
-  if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
-  console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
-  setInterval(function(){
-    fetch('data/HEALTH_CHECK.js?v=ea798c2356'+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
-      var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"/);
-      var remoteTs=m?(m[1]||m[2]):'';
-      if(remoteTs && remoteTs!==localTs){
-        console.log('[v8AutoReload] 检测到新版本 '+remoteTs+' ≠ 本地 '+localTs+'，自动刷新');
-        try{ location.reload(); }catch(e){}
-      }
-    }).catch(function(){});
-  },120000);
-})();
 </script>
 
 <!-- ===== 独立脚本：V8_CAL 日历 + 今日事件（确保执行） ===== -->
@@ -13691,7 +13657,7 @@ window.__renderV8CalToday();
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=2d4d85326d'},
     {name:'STOCK_PROFILE', url:'data/STOCK_PROFILE.js?v=f23feb0264'},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=f0d3981149'},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=d5705ffcea'},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=6025187010'}
   ];
   function loadOne(item, done){
