@@ -1,5 +1,5 @@
 window.FOUR_VOLUME={
- "update_time": "2026-08-20 11:50:13",
+ "update_time": "2026-08-20 13:01:58",
  "total": 2,
  "stocks": [
   {
@@ -9,7 +9,7 @@ window.FOUR_VOLUME={
    "board_label": "主板",
    "close": 187.65,
    "pct_chg": 10.0,
-   "turnover_rate": 5.75,
+   "turnover_rate": 5.78,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -35,9 +35,9 @@ window.FOUR_VOLUME={
    "name": "昆仑万维",
    "market": "sz",
    "board_label": "创业板",
-   "close": 46.18,
-   "pct_chg": 8.61,
-   "turnover_rate": 7.87,
+   "close": 45.95,
+   "pct_chg": 8.07,
+   "turnover_rate": 7.89,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
