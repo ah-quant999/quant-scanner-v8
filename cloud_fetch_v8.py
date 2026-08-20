@@ -1239,9 +1239,15 @@ def f_sector_fund_flow():
         except Exception:
             pass
 
-        # 快照：Top15流入 + Top5流出（控制数据量）
-        _top_in = [{"name": s["name"], "net": round(s["net"], 2)} for s in sectors_in[:15]]
-        _top_out = [{"name": s["name"], "net": round(s["net"], 2)} for s in sectors_out[:5]]
+        # 2026-08-20 清理旧快照中的噪声概念残留（如标准普尔/富时罗素等），
+        # 避免历史曲线图例继续出现误导性条目。
+        for _snap in _intraday_data.get("snapshots", []):
+            _snap["sectors_in"] = [s for s in _snap.get("sectors_in", []) if s.get("name") not in _NOISE_CONCEPTS]
+            _snap["sectors_out"] = [s for s in _snap.get("sectors_out", []) if s.get("name") not in _NOISE_CONCEPTS]
+
+        # 快照：Top15流入 + Top5流出（控制数据量），再次过滤噪声概念
+        _top_in = [{"name": s["name"], "net": round(s["net"], 2)} for s in sectors_in[:15] if s.get("name") not in _NOISE_CONCEPTS]
+        _top_out = [{"name": s["name"], "net": round(s["net"], 2)} for s in sectors_out[:5] if s.get("name") not in _NOISE_CONCEPTS]
 
         _snapshot = {
             "time": _now_ts,
