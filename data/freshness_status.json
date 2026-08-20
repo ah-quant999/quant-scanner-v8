@@ -1,30 +1,14 @@
 {
-  "check_time": "2026-08-20 22:03:32",
+  "check_time": "2026-08-20 23:16:37",
   "last_trade_close": "2026-08-20 15:30:00",
   "is_trading_day": true,
-  "core_stale": [
-    {
-      "var": "COCKPIT_BACKTEST",
-      "reason": "更新于 08-19 15:54，落后 2 个交易日（阈值 1）",
-      "category": "algo"
-    },
-    {
-      "var": "BACKTEST_COMPREHENSIVE",
-      "reason": "更新于 08-19 15:50，落后 2 个交易日（阈值 1）",
-      "category": "algo"
-    },
-    {
-      "var": "BACKTEST_TDX",
-      "reason": "更新于 08-19 00:00，落后 2 个交易日（阈值 1）",
-      "category": "algo"
-    }
-  ],
+  "core_stale": [],
   "warn_stale": [],
   "frozen_stale": [],
   "no_update_time": [],
   "summary": {
-    "total_checked": 48,
-    "core_stale": 3,
+    "total_checked": 50,
+    "core_stale": 0,
     "warn_stale": 0,
     "frozen_stale": 0,
     "no_timestamp": 0
