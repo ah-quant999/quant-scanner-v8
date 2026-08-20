@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-20 18:58:32",
+  "update_time": "2026-08-20 21:42:48",
   "range": [
     "2026-08-12",
     "2026-08-20"
@@ -56,11 +56,11 @@
     },
     {
       "date": "2026-08-20",
-      "total": 67,
+      "total": 68,
       "resonance": 0,
       "inst_only": 1,
       "yz_only": 15,
-      "north_present": 28
+      "north_present": 29
     }
   ],
   "top_inst_buy": [
