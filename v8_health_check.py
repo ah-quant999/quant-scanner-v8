@@ -366,6 +366,48 @@ _PENDING_STATES = ("queued", "pending", "waiting", "requested")
 # 自愈链路对该 workflow 直接死锁（GitHub 保留僵尸 run 可达 ~24h）。
 _PENDING_MAX_AGE_MIN = 15
 
+# 2026-08-20 第290轮一劳永逸修复：盘后算法链「并发堆积」闸门。
+# 根因：_has_pending_run 只拦 queued/pending，**放行 in_progress**（对 2~5 分钟就跑完的
+# cn_fetch / build_deploy 是正确设计）。但云端算法链单轮实测 68~120 分钟（step 06
+# 「运行盘后算法链」独占绝大部分耗时，部分轮次撞 120min job timeout 被 cancelled），
+# 远大于 HEAL_DEBOUNCE_MIN=25 的去抖窗口 → 每 25 分钟无条件再派一轮。
+# 实证（2026-08-20 下午）：08:46:50Z~09:32:49Z 累积 **7 个 in_progress 算法链并发**，
+# 既白烧 Actions 额度（7×~100min），又让多轮 run 对 raw_data/ 抢推产生 push race。
+# 修复：algo_run 专用闸门——若已有 in_progress 且年龄 <= 该上限，则跳过派发；
+# 超过上限视为僵尸（挂死/即将被 timeout 收割）不阻断，避免自愈链死锁。
+_ALGO_RUNNING_MAX_AGE_MIN = 130
+
+
+def _has_running_algo_run(headers):
+    """算法链是否已有「正在跑」的运行；有则本轮不应再派发（防并发堆积）。
+
+    返回 (running: bool, created_at: str|None)。查询异常保守返回 False（放行），
+    与 _has_pending_run 的失败策略保持一致。
+    """
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{ALGO_RUN_WORKFLOW_ID}/runs?per_page=10"
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=20) as r:
+            data = json.loads(r.read().decode("utf-8"))
+        now_utc = datetime.now(timezone.utc)
+        for run in data.get("workflow_runs") or []:
+            if (run.get("status") or "").lower() != "in_progress":
+                continue
+            created = run.get("created_at")
+            try:
+                dt = datetime.strptime(created, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+                age_min = (now_utc - dt).total_seconds() / 60
+            except Exception:
+                age_min = None
+            if age_min is not None and age_min > _ALGO_RUNNING_MAX_AGE_MIN:
+                print(f"[WARN] algo_run 存在僵尸 in_progress run(created {created}, "
+                      f"已跑 {age_min:.0f}min > {_ALGO_RUNNING_MAX_AGE_MIN}min)，不阻断派发")
+                continue
+            return True, created
+        return False, None
+    except Exception:
+        return False, None
+
 
 def _has_pending_run(workflow_id, headers):
     """检查 workflow 是否已有「排队中(未开始)」运行；有则不应再派发。
@@ -487,6 +529,11 @@ def _dispatch_algo_run():
     pending, since = _has_pending_run(ALGO_RUN_WORKFLOW_ID, headers)
     if pending:
         return True, f"已有排队中的 algo_run 运行(created {since})，跳过派发（避免顶掉该 pending run）", False
+    # 2026-08-20 第290轮：算法链单轮 68~120min >> 25min 去抖窗口，若不拦 in_progress
+    # 会每 25 分钟叠加一轮（实测堆到 7 个并发）。已在跑就等它出数，不重复派发。
+    running, r_since = _has_running_algo_run(headers)
+    if running:
+        return True, f"已有正在运行的 algo_run(created {r_since})，跳过派发（防并发堆积，等其出数）", False
     url = f"https://api.github.com/repos/{REPO}/actions/workflows/{ALGO_RUN_WORKFLOW_ID}/dispatches"
     data = json.dumps({"ref": "main"}).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
