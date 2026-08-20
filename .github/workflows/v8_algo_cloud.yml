@@ -48,7 +48,15 @@ permissions:
 
 jobs:
   algo:
-    runs-on: [self-hosted, cn]
+    # 🔴 2026-08-20 一劳永逸根因修复（小九令「即使 cn runner 离线也能独立运作」）：
+    #   本 workflow 名为「☁️ 云端版」，头部注释也写明「迁到 GitHub 云端 ubuntu-latest」，
+    #   但 runs-on 一直是 [self-hosted, cn] —— 实际绑死在中国 IP 自托管 runner 上。
+    #   用户出差/单位机离线时 cn runner 接不到任务 → workflow 永远 queued/failure →
+    #   盘后算法链 0 执行 → H_AUTO_BUY/TRIPLE_HISTORY 等盘后数据停更 → health_patrol 持续 failure。
+    #   改为 ubuntu-latest（GitHub 云端，不依赖任何自托管 runner），与文件名/注释意图一致，
+    #   step 2「GitHub API 同步源码」在云端 IP 反而更快（连 api.github.com 无墙），数据源已
+    #   由 CLOUD_RUNNER=true + 腾讯 GTimg 适配境外环境（probe 实测 10/11 通）。
+    runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
       # 🔴 2026-08-06 00:10 必须保留：云端 runner 默认 UTC，脚本里凡是用朴素 datetime.now()
