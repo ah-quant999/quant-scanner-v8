@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-20 08:16:39",
+  "update_time": "2026-08-20 09:23:32",
   "total": 458,
   "grade_summary": {
     "A": 37,
@@ -9,6 +9,13 @@
     "no_data": 81
   },
   "stocks": {
+    "hk_00001": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
     "hk_00003": {
       "score": 0,
       "grade": "",
@@ -255,13 +262,6 @@
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
     "hk_01548": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "港股暂无基本面数据源(中性不扣分)"
-    },
-    "hk_01787": {
       "score": 0,
       "grade": "",
       "roe": null,
