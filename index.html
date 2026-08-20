@@ -1759,6 +1759,21 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         const d=window.CONCEPT_RANKING;
         const el=$('conceptTreemap');
         if(!el) return;
+        // 🛡 2026-08-20 主人令一劳永逸：盘中卡盘前必须清空
+        //   检测逻辑：当前时间 < 09:25 且数据时间戳不是今日开盘后的 → 显示占位
+        var _conceptNow=new Date();
+        var _conceptHr=_conceptNow.getHours()+_conceptNow.getMinutes()/60;
+        var _isPreMarketConcept=_conceptHr<9.416; // 09:25 前
+        var _conceptDataDate=(d&&d.update_time)?String(d.update_time).slice(0,10):'';
+        var _conceptToday=new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+        var _conceptShouldClear=_isPreMarketConcept && (!_conceptDataDate||_conceptDataDate!==_conceptToday
+          || (_conceptDataDate===_conceptToday && d.update_time && parseInt(String(d.update_time).slice(11,2))<9));
+        if(_conceptShouldClear){
+          el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">📭 概念资金热力图（盘前自动清空，开盘后更新）</div>';
+          const _mt=$('conceptMapTime');
+          if(_mt) _mt.innerHTML = '<span style="font-size:11px;color:var(--dim)">盘前 · 数据待刷新</span>';
+          return;
+        }
         if(!d || !d.items || !d.items.length){
           el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">📭 暂无概念数据（盘前自动清空，开盘后更新）</div>'; return;
         }
@@ -2292,13 +2307,19 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           if(timeEl) timeEl.innerHTML = '<span style="font-size:11px;color:var(--dim)">盘前</span>';
           return;
         }
-        // 盘前清空检测：数据日期非今日时显示占位，不渲染昨日旧数据
+        // 🛡 2026-08-20 主人令加强：盘前清空检测必须同时满足
+        //   ① 当前时间 < 09:25（盘前） ② 数据日期非今日 或 数据虽是今日但时间 < 09:00（盘前fetch刷新了戳但数据仍是昨日）
         var _today=new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
         var _dataDate='';
+        var _dataHour=0;
         if(updateTime){
           _dataDate=String(updateTime).slice(0,10);
+          _dataHour=parseInt(String(updateTime).slice(11,3))||0;
         }
-        if(_dataDate && _dataDate!==_today){
+        var _nowHr=new Date().getHours()+new Date().getMinutes()/60;
+        var _isPreMarketTree=_nowHr<9.416; // 09:25 前
+        var _isStaleData=_dataDate!==_today || (_dataDate===_today && _dataHour<9);
+        if(_isPreMarketTree && _isStaleData){
           el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">📭 行业板块数据（盘前自动清空，开盘后更新）</div>';
           if(timeEl) timeEl.innerHTML = '<span style="font-size:11px;color:var(--dim)">盘前 · 数据待刷新</span>';
           return;
@@ -6560,6 +6581,21 @@ function renderLimitUpHeatmap(){
   const data=window.LIMIT_UP_HEATMAP || null;
   if(!data || !data.dates || !data.sectors){ card.style.display='none'; return; }
 
+  // 🛡 2026-08-20 主人令一劳永逸：盘前时段（<09:25）自动截掉最后一列（今日），
+  //   因为数据生成器会把昨日值复制到今日列（premarket_cleared 未设置时）。
+  //   盘前不可能有涨停数据，显示昨日复制值会误导用户以为今天已有涨停。
+  var _nowLuh=new Date();
+  var _hrLuh=_nowLuh.getHours()+_nowLuh.getMinutes()/60;
+  var _isPreMarketLuh=_hrLuh<9.416; // 09:25 前
+  var _displayDates=data.dates.slice();
+  var _displaySectors=data.sectors.map(function(s){ return {name:s.name, data:s.data.slice()}; });
+  if(_isPreMarketLuh && _displayDates.length>0){
+    var _todayCol=_displayDates[_displayDates.length-1];
+    _displayDates.pop(); // 去掉今日列
+    _displaySectors.forEach(function(s){ s.data.pop(); });
+    data.premarket_cleared=true; // 标记占位分析文案
+  }
+
   if(timeEl && data.update_time){
     timeEl.innerHTML = _uBadge(data.premarket_cleared?'盘前':'盘中','短线',data.update_time);
   }
@@ -6569,13 +6605,13 @@ function renderLimitUpHeatmap(){
     return sectorData[idx]>=2 && sectorData[idx-1]===0;
   }
 
-  const sorted=data.sectors.slice().sort(function(a,b){
+  const sorted=_displaySectors.slice().sort(function(a,b){
     return b.data.reduce(function(s,n){return s+n;},0) - a.data.reduce(function(s,n){return s+n;},0);
   });
 
   let h='<table><thead><tr><th>板块</th>';
-  for(let di=0;di<data.dates.length;di++){
-    h+='<th>'+data.dates[di].split('/').pop()+'</th>';
+  for(let di=0;di<_displayDates.length;di++){
+    h+='<th>'+_displayDates[di].split('/').pop()+'</th>';
   }
   h+='<th>合</th><th>势</th></tr></thead><tbody>';
 
@@ -6637,7 +6673,7 @@ function renderLimitUpHeatmap(){
   }
   if(cl.length) analysis.push('❄️ <b>热度消退：</b>'+cl.join('、')+' — 前期热闹近期熄火');
 
-  const ti=data.dates.length-1;
+  const ti=_displayDates.length-1;
   const tt=sorted.slice().sort(function(a,b){return b.data[ti]-a.data[ti];}).slice(0,3);
   if(tt[0].data[ti]>0) analysis.push('📊 <b>今日最强：</b>'+tt.map(function(x){return x.name+' '+x.data[ti]+'只涨停';}).join('、'));
 
@@ -7788,7 +7824,11 @@ window.__renderV8CalFull();
     series=lines.map(function(name){
       var data=snaps.map(function(s){
         var hit=s.sectors_in.concat(s.sectors_out).find(function(x){return x.name===name;});
-        return hit?(hit.net||0):null;
+        var v=hit?(hit.net||0):null;
+        // 🛡 2026-08-20 主人令一劳永逸：截断异常值（数据源偶尔写入 99999999 占位）
+        //   >10亿 或非 finite 值一律置 null，ECharts connectNulls 会桥接不断线
+        if(v!==null && (!isFinite(v) || Math.abs(v)>1e9)) v=null;
+        return v;
       });
       var color=_sfPickColor(name);
       return {
@@ -7844,8 +7884,9 @@ window.__renderV8CalFull();
               //   旧版当 series 数据全 null 时，v.max/v.min 是 undefined，Math.max(0, undefined+0.15*undefined) = NaN，
               //   ECharts 默认 max = 1e9，Y 轴 label 变成 999999999（主人截图被遮的「999999」就是这个）。
               //   加 isFinite 检查：无效时回退到 ±50 亿合理范围。
-              min:function(v){var lo=(typeof v.min==='number'&&isFinite(v.min))?(v.min - Math.abs(v.min)*0.1):-50; return Math.min(0, lo);},
-              max:function(v){var hi=(typeof v.max==='number'&&isFinite(v.max))?(v.max + Math.abs(v.max)*0.15):50; return Math.max(0, hi);},
+              // 🛡 2026-08-20 主人令加强：硬 clamp 到 ±100 亿，杜绝 99999999 显示
+              min:function(v){var lo=(typeof v.min==='number'&&isFinite(v.min) && v.min>-1e8)?(v.min - Math.abs(v.min)*0.1):-50; return Math.max(-100, Math.min(0, lo));},
+              max:function(v){var hi=(typeof v.max==='number'&&isFinite(v.max) && v.max<1e8)?(v.max + Math.abs(v.max)*0.15):50; return Math.min(100, Math.max(0, hi));},
               axisLine:{lineStyle:{color:'#475569'}}, splitLine:{lineStyle:{color:'#1e293b'}},
               axisLabel:{color:'#94a3b8', formatter:function(v){return v>=0?'+'+v:v;}}},
              {type:'value', name:'指数 %', position:'right',
@@ -8015,9 +8056,19 @@ const catNames=['宽基','行业','主题','跨境','商品'];
     var _now=new Date();
     var _hr=_now.getHours()+_now.getMinutes()/60;
     var _slotNow=_hr<9.5?'盘前':_hr<15.5?'盘中':'盘后';
-    if(!daily||daily.no_data||!daily.top_inflow){
-      var dmsg=(daily&&daily.note)?daily.note:'日监控数据尚未生成，盘中累积中';
-      el.innerHTML='<div class="ipo-empty">⏳ '+dmsg+'</div>';
+    // 🛡 2026-08-20 主人令：T+0 盘后定基卡不应盘前清空！
+    //   旧逻辑：no_data=true → 显示占位返回。但此卡是 T+0（昨日收盘即有值），盘前应展示最近一期有效数据。
+    //   改为：no_data 时仍尝试渲染（top_inflow 为空时才显示占位），且文案修正为 T+0 语义。
+    var _hasData=daily && !daily.no_data && daily.top_inflow && daily.top_inflow.length>0;
+    if(!_hasData){
+      // 尝试从 stale 数据恢复：若 top_inflow 缺失但 total_net 有值，说明是部分数据缺失而非完全无数据
+      var _hasPartial=daily && (typeof daily.total_net==='number') && (daily.top_inflow || []).length===0;
+      var _dmsg=_hasPartial
+        ? '⏳ 盘前暂无完整排名，最近定基 '+((daily.update_time||'').slice(0,10))+' 全市场净流入 '+(daily.total_net>=0?'+':'')+(daily.total_net/1e8).toFixed(2)+' 亿（T+0 盘后 15:10/15:30 刷新完整排名）'
+        : ((daily&&daily.note)||'日监控数据尚未生成，盘中累积中');
+      // 修正：T+0 不是 T+1！
+      _dmsg=_dmsg.replace(/T\+1/g,'T+0');
+      el.innerHTML='<div class="ipo-empty" style="padding:14px;text-align:center;color:var(--dim)">⏳ '+_dmsg+'</div>';
       if(daily&&daily.update_time) setBadge('phEtfTime',_slotNow,'短线',daily.update_time);
       return;
     }
