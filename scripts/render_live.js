@@ -21,8 +21,12 @@ const OUT = __dirname + '/../.workbuddy/';
   page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text().slice(0, 200)); });
   page.on('pageerror', e => consoleErrors.push('PAGEERROR: ' + String(e).slice(0, 200)));
 
-  await page.goto(SITE, { waitUntil: 'networkidle', timeout: 60000 });
-  await page.waitForTimeout(3000);
+  try {
+    await page.goto(SITE, { waitUntil: 'domcontentloaded', timeout: 30000 });
+  } catch (e) {
+    console.log('导航超时，继续用已有 DOM');
+  }
+  await page.waitForTimeout(5000);
 
   // 各主 tab 截图
   const tabs = await page.$$eval('.tab[data-sec]', els => els.map(e => e.dataset.sec));
