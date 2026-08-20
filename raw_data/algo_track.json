@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-20 23:52",
+  "update_time": "2026-08-21 00:02",
   "window_days": 90,
   "total_stats": {
     "four_volume": {
@@ -13,14 +13,14 @@
       "today_signals": 4
     },
     "sector_lead": {
-      "tracking": 18,
+      "tracking": 16,
       "history_samples": 0,
       "win_rate": 0,
       "avg_return": 0,
       "exit_target": 0,
       "exit_stop": 0,
       "exit_timeout": 0,
-      "today_signals": 3
+      "today_signals": 1
     },
     "big_bull": {
       "tracking": 30,
@@ -630,7 +630,7 @@
           "peak_pct": 0.0,
           "days_in": 3,
           "appear_count": 1,
-          "last_seen": "20260820",
+          "last_seen": "20260821",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
@@ -668,7 +668,7 @@
           "peak_pct": 0.0,
           "days_in": 3,
           "appear_count": 1,
-          "last_seen": "20260820",
+          "last_seen": "20260821",
           "signal_detail": {
             "period": "60m",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
@@ -687,7 +687,7 @@
           "peak_pct": 0.0,
           "days_in": 3,
           "appear_count": 1,
-          "last_seen": "20260820",
+          "last_seen": "20260821",
           "signal_detail": {
             "period": "60m",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 主力金叉",
@@ -706,7 +706,7 @@
           "peak_pct": 0.0,
           "days_in": 3,
           "appear_count": 1,
-          "last_seen": "20260820",
+          "last_seen": "20260821",
           "signal_detail": {
             "period": "60m",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
@@ -720,14 +720,14 @@
       "algo": "sector_lead",
       "display_name": "板块龙头",
       "stats": {
-        "tracking": 18,
+        "tracking": 16,
         "history_samples": 0,
         "win_rate": 0,
         "avg_return": 0,
         "exit_target": 0,
         "exit_stop": 0,
         "exit_timeout": 0,
-        "today_signals": 3
+        "today_signals": 1
       },
       "tracking": [
         {
@@ -856,7 +856,7 @@
           "peak_pct": 13.86,
           "days_in": 11,
           "appear_count": 1,
-          "last_seen": "20260816",
+          "last_seen": "20260821",
           "signal_detail": {
             "period": "daily",
             "reason": "",
@@ -1032,44 +1032,6 @@
             "period": "daily",
             "reason": "",
             "pct_chg": 0.0
-          }
-        },
-        {
-          "code": "600988",
-          "name": "赤峰黄金",
-          "algo": "sector_lead",
-          "list_date": "20260820",
-          "list_date_dashed": "2026-08-20",
-          "entry_price": 46.1,
-          "last_close": 46.1,
-          "last_pct": 0.0,
-          "peak_pct": 0.0,
-          "days_in": 0,
-          "appear_count": 1,
-          "last_seen": "20260820",
-          "signal_detail": {
-            "period": "daily",
-            "reason": "",
-            "pct_chg": 7.91
-          }
-        },
-        {
-          "code": "000426",
-          "name": "兴业银锡",
-          "algo": "sector_lead",
-          "list_date": "20260820",
-          "list_date_dashed": "2026-08-20",
-          "entry_price": 38.56,
-          "last_close": 38.56,
-          "last_pct": 0.0,
-          "peak_pct": 0.0,
-          "days_in": 0,
-          "appear_count": 1,
-          "last_seen": "20260820",
-          "signal_detail": {
-            "period": "daily",
-            "reason": "",
-            "pct_chg": 7.23
           }
         }
       ],
@@ -1511,15 +1473,15 @@
           "code": "002437",
           "name": "誉衡药业",
           "algo": "big_bull",
-          "list_date": "20260820",
-          "list_date_dashed": "2026-08-20",
+          "list_date": "20260821",
+          "list_date_dashed": "2026-08-21",
           "entry_price": 4.73,
           "last_close": 4.73,
           "last_pct": 0.0,
           "peak_pct": 0.0,
           "days_in": 0,
           "appear_count": 1,
-          "last_seen": "20260820",
+          "last_seen": "20260821",
           "signal_detail": {
             "period": "daily",
             "reason": "机构0.1亿+游资4.2亿",
@@ -1530,15 +1492,15 @@
           "code": "300009",
           "name": "安科生物",
           "algo": "big_bull",
-          "list_date": "20260820",
-          "list_date_dashed": "2026-08-20",
+          "list_date": "20260821",
+          "list_date_dashed": "2026-08-21",
           "entry_price": 10.15,
           "last_close": 10.15,
           "last_pct": 0.0,
           "peak_pct": 0.0,
           "days_in": 0,
           "appear_count": 1,
-          "last_seen": "20260820",
+          "last_seen": "20260821",
           "signal_detail": {
             "period": "daily",
             "reason": "机构0.4亿+游资2.4亿",
@@ -1549,15 +1511,15 @@
           "code": "300601",
           "name": "康泰生物",
           "algo": "big_bull",
-          "list_date": "20260820",
-          "list_date_dashed": "2026-08-20",
+          "list_date": "20260821",
+          "list_date_dashed": "2026-08-21",
           "entry_price": 14.47,
           "last_close": 14.47,
           "last_pct": 0.0,
           "peak_pct": 0.0,
           "days_in": 0,
           "appear_count": 1,
-          "last_seen": "20260820",
+          "last_seen": "20260821",
           "signal_detail": {
             "period": "daily",
             "reason": "机构0.1亿+游资1.0亿",
@@ -1568,15 +1530,15 @@
           "code": "002172",
           "name": "澳洋健康",
           "algo": "big_bull",
-          "list_date": "20260820",
-          "list_date_dashed": "2026-08-20",
+          "list_date": "20260821",
+          "list_date_dashed": "2026-08-21",
           "entry_price": 4.44,
           "last_close": 4.44,
           "last_pct": 0.0,
           "peak_pct": 0.0,
           "days_in": 0,
           "appear_count": 1,
-          "last_seen": "20260820",
+          "last_seen": "20260821",
           "signal_detail": {
             "period": "daily",
             "reason": "机构0.2亿+游资1.1亿",
@@ -1587,15 +1549,15 @@
           "code": "000523",
           "name": "红棉股份",
           "algo": "big_bull",
-          "list_date": "20260820",
-          "list_date_dashed": "2026-08-20",
+          "list_date": "20260821",
+          "list_date_dashed": "2026-08-21",
           "entry_price": 3.53,
           "last_close": 3.53,
           "last_pct": 0.0,
           "peak_pct": 0.0,
           "days_in": 0,
           "appear_count": 1,
-          "last_seen": "20260820",
+          "last_seen": "20260821",
           "signal_detail": {
             "period": "daily",
             "reason": "机构0.1亿+游资1.6亿",
@@ -1606,15 +1568,15 @@
           "code": "300363",
           "name": "博腾股份",
           "algo": "big_bull",
-          "list_date": "20260820",
-          "list_date_dashed": "2026-08-20",
+          "list_date": "20260821",
+          "list_date_dashed": "2026-08-21",
           "entry_price": 24.48,
           "last_close": 24.48,
           "last_pct": 0.0,
           "peak_pct": 0.0,
           "days_in": 0,
           "appear_count": 1,
-          "last_seen": "20260820",
+          "last_seen": "20260821",
           "signal_detail": {
             "period": "daily",
             "reason": "机构0.0亿+游资0.8亿",
@@ -1625,15 +1587,15 @@
           "code": "301655",
           "name": "绿控传动",
           "algo": "big_bull",
-          "list_date": "20260820",
-          "list_date_dashed": "2026-08-20",
+          "list_date": "20260821",
+          "list_date_dashed": "2026-08-21",
           "entry_price": 32.49,
           "last_close": 32.49,
           "last_pct": 0.0,
           "peak_pct": 0.0,
           "days_in": 0,
           "appear_count": 1,
-          "last_seen": "20260820",
+          "last_seen": "20260821",
           "signal_detail": {
             "period": "daily",
             "reason": "机构0.3亿+游资0.6亿",
@@ -1644,15 +1606,15 @@
           "code": "600649",
           "name": "城投控股",
           "algo": "big_bull",
-          "list_date": "20260820",
-          "list_date_dashed": "2026-08-20",
+          "list_date": "20260821",
+          "list_date_dashed": "2026-08-21",
           "entry_price": 4.16,
           "last_close": 4.16,
           "last_pct": 0.0,
           "peak_pct": 0.0,
           "days_in": 0,
           "appear_count": 1,
-          "last_seen": "20260820",
+          "last_seen": "20260821",
           "signal_detail": {
             "period": "daily",
             "reason": "机构0.6亿+游资0.1亿",
@@ -1665,7 +1627,7 @@
   ],
   "_meta": {
     "version": "v1",
-    "schema_date": "2026-08-20",
+    "schema_date": "2026-08-21",
     "note": "三算法独立追踪；entry=信号日收盘，exit=timeout≥90天（stop/target待接止损数据）"
   }
 }
