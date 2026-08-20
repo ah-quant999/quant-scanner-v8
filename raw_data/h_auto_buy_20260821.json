@@ -1,6 +1,6 @@
 {
-  "date": "2026-08-20",
-  "snapshot_date": "2026-08-20",
+  "date": "2026-08-21",
+  "snapshot_date": "2026-08-21",
   "snapshot_time": "",
   "method": "涨幅≥3.0% + 量比≥1.2（4日均量，H 反推最小可行版）",
   "total_scanned": 9926,
@@ -12385,6 +12385,6 @@
       "board": "科创板"
     }
   ],
-  "generated_at": "2026-08-20 18:58:31",
+  "generated_at": "2026-08-21 00:27:57",
   "source": "raw_data/h_auto_buy 反推算法，无 PDF OCR 依赖"
 }
