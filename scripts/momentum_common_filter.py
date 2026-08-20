@@ -41,6 +41,15 @@ def load_js_var(path, var_name):
     return json.loads(m.group(1))
 
 def main():
+    # 🛡 2026-08-20 主人令·一劳永逸：动量共识筛选属于盘后选股策略，
+    #   必须在 A股/港股/龙虎榜/板块资金等全部盘后数据就绪后（≥18:00 CST）才执行。
+    #   盘中（09:28 等）提前跑出的结果基于未完整数据，会误导决策。
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "algorithms"))
+    from utils.time_gate import check_stock_picking_ready
+    check_stock_picking_ready(by="momentum_common_filter")
+
     d = load_js_var(f"{ROOT}/data/STOCK_MOMENTUM_STATE_V2.js", "STOCK_MOMENTUM_ENHANCED")
     q = load_js_var(f"{ROOT}/data/STOCK_QUOTE.js", "STOCK_QUOTE")
 
