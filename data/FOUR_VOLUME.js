@@ -1,5 +1,5 @@
 window.FOUR_VOLUME={
- "update_time": "2026-08-20 13:29:31",
+ "update_time": "2026-08-20 15:20:07",
  "total": 1,
  "stocks": [
   {
@@ -7,9 +7,9 @@ window.FOUR_VOLUME={
    "name": "凯莱英",
    "market": "sz",
    "board_label": "主板",
-   "close": 187.65,
-   "pct_chg": 10.0,
-   "turnover_rate": 5.95,
+   "close": 182.4,
+   "pct_chg": 6.92,
+   "turnover_rate": 7.87,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
