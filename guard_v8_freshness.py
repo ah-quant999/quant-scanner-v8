@@ -137,6 +137,11 @@ CORE_SOURCES_ALGO = {
     # 🔴 2026-08-20 根因修复：LHB_7D.js 由算法链生成，之前不在监控/自愈范围，
     #    文件停更 24h+ 无告警，页面 7 日龙虎榜/机游共振长期 stale。
     "LHB_7D": 24,
+    # 🔴 2026-08-20 主人令审计补全：AI 预测子TAB（INDEX_HISTORY 5年K线 +
+    #    MARKET_PATH_PROBABILITY 路径概率）由 19:15 算法链产出，纳入 CORE 监控/自愈，
+    #    防算法链失败时卡静默陈旧（48h 阈值，交易日每日更新）。
+    "INDEX_HISTORY": 48,
+    "MARKET_PATH_PROBABILITY": 48,
 }
 
 # ── 分类三：无云端生产者的冻结快照 ────────────────────────────────────
@@ -173,6 +178,7 @@ ALGO_VARS = {
     "FINAL_RECOMMEND_DATA", "ALGO_TRACK", "COCKPIT_TIER_RECOMMEND",
     "COCKPIT_ADVICE", "SENTIMENT_CYCLE", "H_AUTO_BUY", "H_AUTO_BUY_TRACK",
     "LHB_7D",
+    "INDEX_HISTORY", "MARKET_PATH_PROBABILITY",
 }
 
 

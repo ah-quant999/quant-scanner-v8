@@ -154,7 +154,10 @@ def _algo_data_need_bell(now):
     if now.weekday() >= 5:
         return None
     today = now.date().isoformat()
-    vars_ = ["TOP5_TRACK", "BACKTEST_TDX", "BACKTEST_COMPREHENSIVE", "COCKPIT_BACKTEST"]
+    # 2026-08-20 主人令审计补全：加入 AI 预测卡（INDEX_HISTORY/MARKET_PATH_PROBABILITY），
+    # 防 19:15 算法链失败时 AI 预测子TAB 静默陈旧。
+    vars_ = ["TOP5_TRACK", "BACKTEST_TDX", "BACKTEST_COMPREHENSIVE", "COCKPIT_BACKTEST",
+             "MARKET_PATH_PROBABILITY", "INDEX_HISTORY"]
     stale = []
     for v in vars_:
         ts = _read_cloud_update_time(v)
