@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-20 11:45:00",
+  "update_time": "2026-08-20 13:28:24",
   "data_date": "2026-08-20",
   "source": "CONCEPT_RANKING × STOCK_PROFILE × STOCK_QUOTE",
   "hot_concepts_count": 33,
@@ -7,13 +7,13 @@
     "融资融券",
     "创新药",
     "CAR-T细胞疗法",
-    "医药医疗风格",
     "CRO",
     "病原体防治",
-    "黄金概念",
-    "沪股通",
+    "医药医疗风格",
+    "重组蛋白",
     "创新医疗服务",
-    "基因测序"
+    "基因测序",
+    "单抗概念"
   ],
   "picks": [
     {
@@ -32,7 +32,7 @@
         "病毒防治"
       ],
       "hot_count": 8,
-      "total_score": 13.89
+      "total_score": 14.33
     },
     {
       "code": "300436",
@@ -49,7 +49,7 @@
         "融资融券"
       ],
       "hot_count": 7,
-      "total_score": 13.81
+      "total_score": 14.17
     },
     {
       "code": "002007",
@@ -66,7 +66,25 @@
         "融资融券"
       ],
       "hot_count": 7,
-      "total_score": 13.4
+      "total_score": 13.69
+    },
+    {
+      "code": "603222",
+      "name": "济民健康",
+      "pct": 2.97,
+      "amount_yi": 0.01,
+      "hot_concepts": [
+        "体外诊断概念",
+        "免疫治疗",
+        "创新药",
+        "医疗器械概念",
+        "医美概念",
+        "病原体防治",
+        "精准诊断",
+        "融资融券"
+      ],
+      "hot_count": 8,
+      "total_score": 13.63
     },
     {
       "code": "600645",
@@ -83,7 +101,7 @@
         "融资融券"
       ],
       "hot_count": 7,
-      "total_score": 13.05
+      "total_score": 13.54
     },
     {
       "code": "300723",
@@ -100,24 +118,7 @@
         "融资融券"
       ],
       "hot_count": 7,
-      "total_score": 12.64
-    },
-    {
-      "code": "603222",
-      "name": "济民健康",
-      "pct": 2.97,
-      "amount_yi": 0.01,
-      "hot_concepts": [
-        "体外诊断概念",
-        "免疫治疗",
-        "创新药",
-        "医疗器械概念",
-        "病原体防治",
-        "精准诊断",
-        "融资融券"
-      ],
-      "hot_count": 7,
-      "total_score": 12.63
+      "total_score": 12.95
     },
     {
       "code": "603259",
@@ -132,24 +133,25 @@
         "融资融券"
       ],
       "hot_count": 5,
-      "total_score": 12.46
+      "total_score": 12.78
     },
     {
-      "code": "300485",
-      "name": "赛升药业",
-      "pct": 3.95,
-      "amount_yi": 0.01,
+      "code": "600267",
+      "name": "海正药业",
+      "pct": 3.34,
+      "amount_yi": 0.17,
       "hot_concepts": [
-        "免疫治疗",
-        "创业板综",
+        "AI制药（医疗）",
+        "减肥药",
         "创新药",
-        "医疗器械概念",
+        "医美概念",
         "单抗概念",
-        "生物疫苗",
-        "病原体防治"
+        "合成生物",
+        "流感",
+        "生物疫苗"
       ],
-      "hot_count": 7,
-      "total_score": 12.34
+      "hot_count": 8,
+      "total_score": 12.72
     },
     {
       "code": "300147",
@@ -166,7 +168,24 @@
         "病毒防治"
       ],
       "hot_count": 7,
-      "total_score": 12.27
+      "total_score": 12.7
+    },
+    {
+      "code": "300485",
+      "name": "赛升药业",
+      "pct": 3.95,
+      "amount_yi": 0.01,
+      "hot_concepts": [
+        "免疫治疗",
+        "创业板综",
+        "创新药",
+        "医疗器械概念",
+        "单抗概念",
+        "生物疫苗",
+        "病原体防治"
+      ],
+      "hot_count": 7,
+      "total_score": 12.68
     },
     {
       "code": "603456",
@@ -182,7 +201,7 @@
         "融资融券"
       ],
       "hot_count": 6,
-      "total_score": 12.24
+      "total_score": 12.58
     },
     {
       "code": "600521",
@@ -199,7 +218,7 @@
         "融资融券"
       ],
       "hot_count": 7,
-      "total_score": 12.15
+      "total_score": 12.57
     },
     {
       "code": "688076",
@@ -216,22 +235,7 @@
         "肝炎概念"
       ],
       "hot_count": 7,
-      "total_score": 12.02
-    },
-    {
-      "code": "603127",
-      "name": "昭衍新药",
-      "pct": 4.42,
-      "amount_yi": 0.23,
-      "hot_concepts": [
-        "CRO",
-        "创新医疗服务",
-        "创新药",
-        "生物疫苗",
-        "融资融券"
-      ],
-      "hot_count": 5,
-      "total_score": 11.88
+      "total_score": 12.55
     },
     {
       "code": "600222",
@@ -247,7 +251,7 @@
         "融资融券"
       ],
       "hot_count": 6,
-      "total_score": 11.87
+      "total_score": 12.2
     },
     {
       "code": "002022",
@@ -265,11 +269,11 @@
         "精准诊断"
       ],
       "hot_count": 8,
-      "total_score": 11.75
+      "total_score": 12.2
     }
   ],
   "rejected_summary": {
-    "no_hot_concept": 1745,
+    "no_hot_concept": 1736,
     "too_hot": 71,
     "too_cold": 50,
     "small_mv": 0,
