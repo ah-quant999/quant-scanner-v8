@@ -1,9 +1,10 @@
 {
-"update_time": "2026-08-19 07:40:47",
-"total": 6787,
-"new_listings_count": 2797,
-"delisted_count": 0,
-"new_listings": [
+"update_time": "2026-08-19 17:51:53",
+"total": 6788,
+"new_listings_count": 0,
+"delisted_count": 2797,
+"new_listings": [],
+"delisted": [
 "00001 长和",
 "00002 中电控股",
 "00003 香港中华煤气",
@@ -55,6 +56,5 @@
 "00059 天誉置业",
 "00060 香港食品投资"
 ],
-"delisted": [],
-"meta_enriched": 116
+"meta_enriched": 0
 }
