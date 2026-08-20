@@ -80,25 +80,20 @@ def now_cst():
     return datetime.now(CST)
 
 
-def get_file_age(filepath):
-    """返回文件年龄（分钟），文件不存在返回 None（视为无限旧）。"""
-    p = RAW_DIR / filepath
-    if not p.exists():
-        return None
-    mtime = os.path.getmtime(p)
-    mt_dt = datetime.fromtimestamp(mtime, tz=CST)
-    age_min = (now_cst() - mt_dt).total_seconds() / 60
-    return age_min
-
-
 def get_update_time(filepath):
-    """从 JSON 文件内读取 update_time 字段。"""
+    """从 JSON 文件内读取 update_time 字段（含嵌套 meta）。"""
     p = RAW_DIR / filepath
     if not p.exists():
         return None
     try:
         d = json.load(open(p, encoding="utf-8"))
-        return d.get("update_time") or d.get("timestamp") or d.get("updated_at")
+        if not isinstance(d, dict):
+            return None
+        ts = d.get("update_time") or d.get("timestamp") or d.get("updated_at") or d.get("generated")
+        if not ts:
+            meta = d.get("meta") if isinstance(d.get("meta"), dict) else {}
+            ts = meta.get("update_time") or meta.get("timestamp") or meta.get("updated_at") or meta.get("generated")
+        return ts
     except Exception:
         return None
 
@@ -138,6 +133,35 @@ def get_lhb_content_date(filepath):
         return int(str(cd))
     except Exception:
         return None
+
+
+def get_file_age(filepath):
+    """返回文件年龄（分钟），文件不存在返回 None（视为无限旧）。
+
+    🛡 2026-08-20 一劳永逸修复：优先按文件内层 update_time 判龄，fallback 到 mtime。
+    根因：仅看 mtime 会出现「文件刚被 git checkout / sync 更新，但内层数据时间戳仍陈旧」
+    的假绿；实盘应以数据本身声明的 update_time 为准。
+    """
+    p = RAW_DIR / filepath
+    if not p.exists():
+        return None
+    ts = get_update_time(filepath)
+    if ts:
+        try:
+            dt = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S").replace(tzinfo=CST)
+            age_min = (now_cst() - dt).total_seconds() / 60
+            return age_min
+        except Exception:
+            try:
+                dt = datetime.strptime(ts, "%Y-%m-%d %H:%M").replace(tzinfo=CST)
+                age_min = (now_cst() - dt).total_seconds() / 60
+                return age_min
+            except Exception:
+                pass
+    mtime = os.path.getmtime(p)
+    mt_dt = datetime.fromtimestamp(mtime, tz=CST)
+    age_min = (now_cst() - mt_dt).total_seconds() / 60
+    return age_min
 
 
 def in_trading_hours(hhmm=None):
