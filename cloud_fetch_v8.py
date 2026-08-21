@@ -1811,16 +1811,19 @@ def f_crisis_data():
                     # BOC 汇率单位为"每100外币"，需除以 100
                     usd_cny_latest = round(usd_cny_latest / 100.0, 4)
                     # 归一化：7.0=健康(0.2), 7.3=警戒(0.5), 7.5+=危险(0.8+)
-                    if usd_cny_latest < 6.9:
-                        currency_score = 0.15  # 强势人民币
-                    elif usd_cny_latest < 7.1:
-                        currency_score = 0.25  # 正常偏强
-                    elif usd_cny_latest < 7.25:
-                        currency_score = 0.40  # 正常区间
-                    elif usd_cny_latest < 7.35:
-                        currency_score = 0.55  # 有贬值压力
+                    # 🔴 2026-08-22 主人令连续化：原档位跳变使 score 多天恒定（31.4），
+                    #   每日真实汇率微变被档位吞掉。改线性插值，让变化反映到分数。
+                    if usd_cny_latest < 6.85:
+                        currency_score = 0.12  # 强势人民币
+                    elif usd_cny_latest <= 7.50:
+                        if usd_cny_latest < 7.00:
+                            currency_score = round(0.12 + (usd_cny_latest - 6.85) / 0.15 * 0.13, 4)
+                        elif usd_cny_latest < 7.30:
+                            currency_score = round(0.25 + (usd_cny_latest - 7.00) / 0.30 * 0.30, 4)
+                        else:
+                            currency_score = round(0.55 + (usd_cny_latest - 7.30) / 0.20 * 0.30, 4)
                     else:
-                        currency_score = min(0.85, 0.55 + (usd_cny_latest - 7.35) * 0.3)
+                        currency_score = min(0.95, 0.85 + (usd_cny_latest - 7.50) * 0.1)
     except Exception as e:
         print(f"    ⚠️ 汇率数据获取失败: {e}")
 
@@ -1842,18 +1845,16 @@ def f_crisis_data():
             us10y_v = float((monetary.get("us_bond_10y") or {}).get("value") or 0)
             # VIX 风险分（<15 极低 / 15-20 正常 / 20-25 警戒 / 25-30 警惕 / ≥30 危机）
             if vix_v > 0:
-                if vix_v < 15: vix_score = 0.10
-                elif vix_v < 20: vix_score = 0.20
-                elif vix_v < 25: vix_score = 0.35
-                elif vix_v < 30: vix_score = 0.50
-                else: vix_score = min(0.80, 0.55 + (vix_v - 30) * 0.02)
+                # 2026-08-22 连续化（10→0.10, 20→0.30, 30→0.55, 40→0.80 线性插值）
+                if vix_v <= 10: vix_score = 0.10
+                elif vix_v <= 40: vix_score = round(0.10 + (vix_v - 10) / 30 * 0.70, 4)
+                else: vix_score = min(0.90, 0.80 + (vix_v - 40) * 0.01)
             # 美债 10Y 风险分（<3.5 宽松 / 3.5-4.0 正常 / 4.0-4.5 偏紧 / 4.5-4.8 警惕 / ≥4.8 高压）
             if us10y_v > 0:
-                if us10y_v < 3.5: bond_score = 0.10
-                elif us10y_v < 4.0: bond_score = 0.20
-                elif us10y_v < 4.5: bond_score = 0.30
-                elif us10y_v < 4.8: bond_score = 0.45
-                else: bond_score = min(0.80, 0.50 + (us10y_v - 4.8) * 0.15)
+                # 2026-08-22 连续化（3.0→0.08, 4.0→0.25, 5.0→0.60 线性插值）
+                if us10y_v <= 3.0: bond_score = 0.08
+                elif us10y_v <= 5.0: bond_score = round(0.08 + (us10y_v - 3.0) / 2.0 * 0.52, 4)
+                else: bond_score = min(0.90, 0.60 + (us10y_v - 5.0) * 0.1)
             # 综合：取均值（任一缺失则退化为另一维度）
             parts = [x for x in [vix_score, bond_score] if x is not None]
             if parts:
@@ -2645,9 +2646,10 @@ def f_v8_cal(today=None):
     #   Jackson Hole 央行年会（每年 8 月底，2026/8/28-29，**美联储主席**就货币政策发言）
     # 🔴 2026-08-12 主人令修正：之前写「鲍威尔讲话」是事实错误——Powell 2026/5/15 任期结束已退休
     #   8 月讲话是候任/新任主席（避免写具体人名又错），所以只用「美联储主席」
+    # 🔴 2026-08-22 主人令：去掉「Jackson Hole」英文（外观像人名），统一写「美联储主席」
     if m == 8:
-        add(28, "🏛️ Jackson Hole 央行年会（美联储主席讲话核心）", "cb")
-        add(29, "🏛️ Jackson Hole 美联储主席讲话", "cb")
+        add(28, "🏛️ 央行年会（美联储主席讲话核心）", "cb")
+        add(29, "🏛️ 美联储主席讲话", "cb")
     # A股中报披露截止（8月31日）
     if m == 8:
         add(31, "🇨🇳 中报披露截止", "ipo")

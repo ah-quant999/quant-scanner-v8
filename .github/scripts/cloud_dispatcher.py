@@ -30,6 +30,27 @@ if not TOKEN:
 
 CST = datetime.timezone(datetime.timedelta(hours=8))
 
+# 2026 A股交易日历（与 v8_health_check.py 一致）：节假日 + 补班日
+_HOLIDAYS_2026 = {
+    "01-01", "01-02", "01-03",
+    "01-28", "01-29", "01-30", "01-31", "02-01", "02-02", "02-03", "02-04",
+    "04-04", "04-05", "04-06",
+    "05-01", "05-02", "05-03", "05-04", "05-05",
+    "05-31", "06-01", "06-02",
+    "09-30", "10-01", "10-02", "10-03", "10-04", "10-05", "10-06", "10-07", "10-08",
+}
+_MAKEUP_DAYS_2026 = {
+    "2026-01-04", "2026-02-14", "2026-02-28",
+    "2026-05-09", "2026-09-20", "2026-10-10",
+}
+
+def _is_trading_day(dt):
+    """判断给定 CST 时间是否为 A 股交易日（周末 + 节假日剔除，补班日算交易日）。"""
+    d = dt.date()
+    if d.weekday() >= 5 and d.isoformat() not in _MAKEUP_DAYS_2026:
+        return False
+    return d.strftime("%m-%d") not in _HOLIDAYS_2026
+
 def api(method, path, data=None):
     url = API + path
     headers = {"Authorization": f"Bearer {TOKEN}",
@@ -225,8 +246,10 @@ def main():
         else:
             print("  风险温度计: %s" % why)
 
-    # 2) 算法链：仅 >=18:00 且今日未成功跑过才派发
-    if now.hour >= 18:
+    # 2) 算法链：仅交易日且 >=18:00 且今日未成功跑过才派发
+    #    2026-08-22 根因⑫：非交易日（周末/节假日）不派发——v8_algo_cloud 的交易日历
+    #    gate 会跳过 step7（实证 08-22 03:2x 一批 run 全 skipped 秒退），派了也白跑。
+    if now.hour >= 18 and _is_trading_day(now):
         al = latest_run("v8_algo_cloud.yml")
         ran_today = False
         if al:
@@ -246,7 +269,10 @@ def main():
             else:
                 print("  算法链: %s" % why)
     else:
-        print(f"  算法链: 当前 {now.hour}:xx 未到 18:00，跳过（等盘后 LHB 发布）")
+        if not _is_trading_day(now):
+            print(f"  算法链: 非交易日（{now.strftime('%Y-%m-%d %H:%M')}），跳过算法链派发")
+        else:
+            print(f"  算法链: 当前 {now.hour}:xx 未到 18:00，跳过（等盘后 LHB 发布）")
 
     # 3) 动量共识筛选重算（新 OCR 输入触发 + 冷却）
     dispatch_momentum_intraday(now)

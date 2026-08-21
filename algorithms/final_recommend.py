@@ -46,6 +46,38 @@ HK_PENALTY = 0          # 港股不再降权（之前 1.5）——2026-08-11 主
 MIN_A_SHARES_IN_TOP = 0  # A 股硬保底关闭（之前 max(1, TOP_N-1)=2）——公平竞争
 
 
+_STOCK_NAME_MAP = None
+def _stock_name_map():
+    """延迟加载 raw_data/stock_names.json → {code: name}，用于候选池 code-only 补名。
+    2026-08-22 主人令：最终推荐候选池出现多个「只有代码没股票名」条目
+    （601899/600206/000725），fix_name 在 name==code 时直接返回 code，需在此兜底补全。"""
+    global _STOCK_NAME_MAP
+    if _STOCK_NAME_MAP is None:
+        _m = {}
+        try:
+            sp = os.path.join(ROOT, "raw_data", "stock_names.json")
+            if os.path.exists(sp):
+                d = json.load(open(sp, encoding="utf-8"))
+                for it in (d.get("data") or []):
+                    if isinstance(it, dict) and it.get("code") and it.get("name"):
+                        _m[str(it["code"])] = str(it["name"])
+        except Exception as e:
+            print(f"[warn] stock_names 加载失败: {e}")
+        _STOCK_NAME_MAP = _m
+    return _STOCK_NAME_MAP
+
+
+def _resolve_name(code, name):
+    """fix_name 兜底后仍为纯代码（name==code/缺失）时，用 stock_names 映射补全真实股票名。"""
+    n = fix_name(code, name)
+    c = norm_code(code)
+    if not n or n == c:
+        m = _stock_name_map().get(code) or _stock_name_map().get(c)
+        if m:
+            return m
+    return n
+
+
 
 
 
@@ -890,7 +922,7 @@ def main():
         "all_candidates": [
             {
                 "code": x["key"],
-                "name": fix_name(x["key"], x["name"]),
+                "name": _resolve_name(x["key"], x["name"]),
                 "market": {"sh": "沪市", "sz": "深市", "bj": "北交所", "hk": "港股"}.get((x["market"] or market_prefix(x["key"])).lower(), x["market"] or market_prefix(x["key"])),
                 "board": x["board"] or board_from_code(x["key"], x["market"]),
                 "horizon": horizon_for(x["sources"], x.get("resonance",0)),

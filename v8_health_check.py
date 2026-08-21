@@ -88,18 +88,18 @@ CARD_DEFS = [
     {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["items"], "heal_cat": "post_close"},  # 同上：交易所日更数据，1440（24h）
     {"id": "CRISIS_DATA", "name": "危机雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["currency", "global"], "heal_cat": "premarket"},  # 危机雷达每日 08:25 跑一次
     {"id": "MARKET_FUND_FLOW_DATA", "name": "盘后资金流向", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["daily"], "heal_cat": "premarket"},  # 资金流日频时间轴——08:25 必跑一次（防漏跑）
-    {"id": "CANDIDATE", "name": "候选池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
-    {"id": "GOLD_POOL", "name": "黄金池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
+    {"id": "CANDIDATE", "name": "候选池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
+    {"id": "GOLD_POOL", "name": "黄金池", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
     {"id": "LHB_DATA", "name": "龙虎榜", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
     {"id": "INST_TRADE", "name": "机构买卖", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top_buy", "top_sell"], "heal_cat": "algo_run"},
-    {"id": "TRIPLE_CONSENSUS", "name": "三重共识", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
+    {"id": "TRIPLE_CONSENSUS", "name": "三重共识", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
     # 选股策略
-    {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
-    {"id": "COCKPIT_ADVICE", "name": "驾驶舱", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["verdict", "watch"], "heal_cat": "algo_run"},
-    {"id": "BIG_BULL_HUNTER", "name": "大牛股猎手", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "_source_file": "LHB_DATA", "_window_var": "LHB_DATA", "heal_cat": "algo_run"},  # 前端 renderHunter 直接读 LHB_DATA 派生的机游共振信号，无独立 BIG_BULL_HUNTER.js 文件
-    {"id": "TOP10_DAILY", "name": "全站精选", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top10"], "heal_cat": "algo_run"},
-    {"id": "STOCK_RPS", "name": "相对强度", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["records"], "_window_var": "STOCK_RPS_DATA", "heal_cat": "algo_run"},  # 文件名 STOCK_RPS.js，但 window 变量名是 STOCK_RPS_DATA（历史遗留）
-    {"id": "CRDS_CARD_DATA", "name": "逆势龙头", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["elite", "watch"], "heal_cat": "algo_run"},
+    {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
+    {"id": "COCKPIT_ADVICE", "name": "驾驶舱", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["verdict", "watch"], "heal_cat": "algo_run", "picking": True},
+    {"id": "BIG_BULL_HUNTER", "name": "大牛股猎手", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "_source_file": "LHB_DATA", "_window_var": "LHB_DATA", "heal_cat": "algo_run", "picking": True},  # 前端 renderHunter 直接读 LHB_DATA 派生的机游共振信号，无独立 BIG_BULL_HUNTER.js 文件
+    {"id": "TOP10_DAILY", "name": "全站精选", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top10"], "heal_cat": "algo_run", "picking": True},
+    {"id": "STOCK_RPS", "name": "相对强度", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["records"], "_window_var": "STOCK_RPS_DATA", "heal_cat": "algo_run", "picking": True},  # 文件名 STOCK_RPS.js，但 window 变量名是 STOCK_RPS_DATA（历史遗留）
+    {"id": "CRDS_CARD_DATA", "name": "逆势龙头", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["elite", "watch"], "heal_cat": "algo_run", "picking": True},
 ]
 
 
@@ -509,14 +509,25 @@ def _dispatch_cn_fetch(cat):
         return False, f"派发异常: {e}", False
 
 
-def _dispatch_algo_run():
+def _dispatch_algo_run(picking_only=False):
     """经 GitHub API 派发 v8 盘后算法链(云端)，重新产出 FINAL_RECOMMEND_DATA 等选股结果。
 
     返回三元组 (ok, msg, dispatched)，语义同 _dispatch_cn_fetch。
+    picking_only=True：本次派发仅因选股类卡片（候选池/三重共识/最终推荐等）触发。
     """
     token = _load_token()
     if not token:
         return False, "无 GitHub token，无法派发", False
+    # 🔴 2026-08-22 根因⑫（主人令）：非交易日不派发 algo_run——
+    #   v8_algo_cloud 的交易日历 gate 会跳过算法链 step7（实证 08-22 03:2x 一批 run 全 skipped 秒退）
+    if not _is_trading_day(date.today()):
+        return True, "非交易日（周末/节假日），跳过 algo_run 派发", False
+    # 🔴 2026-08-22 根因⑨（主人令）：选股类卡片在 18:00 前派发 = 空转——
+    #   run_algorithms 的 18:00 时间闸会把 20+ 选股脚本全跳过（实证 15:34/15:46/15:50
+    #   三轮 success 却零产出）。仅当触发原因全为选股类且未到 18:00 才拦；
+    #   非选股类（SH_FIB/INST_TRADE/NT_DATA 等）收盘后即可算，不拦。
+    if picking_only and now_cst().hour < 18:
+        return True, "未到 18:00 盘后选股窗口，跳过 algo_run 派发（避免选股脚本全被时间闸跳过空转45min）", False
     # 2026-08-17 防风暴：algo_run 也用 self-hosted cn runner
     avail, online = _cn_runner_available()
     if not avail:
@@ -701,7 +712,7 @@ def self_heal(report):
                     healed.append(f"[algo] {it['name']}: 近 {HEAL_DEBOUNCE_MIN} 分钟内已派发，跳过重复")
                     it["heal"] = "已自愈(跳过重复): 近窗口内已派发盘后算法链"
                     continue
-            ok, dmsg, dispatched = _dispatch_algo_run()
+            ok, dmsg, dispatched = _dispatch_algo_run(picking_only=True)
             if ok:
                 # 第173轮：跳过（已有 pending）不得记账，否则去抖窗口被空派发消耗；
                 # 文案也据实区分「已派发」与「跳过」，避免邮件谎报已自愈。
@@ -743,7 +754,7 @@ def self_heal(report):
                     healed.append(f"[algo/A股自愈] A股全港股: 达单次派发上限({MAX_DISPATCHES_PER_RUN})，跳过")
                 else:
                     _dispatch_count += 1
-                    ok, dmsg, dispatched = _dispatch_algo_run()
+                    ok, dmsg, dispatched = _dispatch_algo_run(picking_only=True)
                     if ok and dispatched:
                         healed.append(f"[algo/A股自愈] {', '.join(it.get('name','') for it in urgnet_items)}: 🚨 URGENT 自动派发 algo_run 重跑（{dmsg}）→ 修复路径在 commit 045ac1c84")
                         for it in urgnet_items:
@@ -789,7 +800,10 @@ def self_heal(report):
             continue
         _dispatch_count += 1
         if cat == "algo_run":
-            ok, dmsg, dispatched = _dispatch_algo_run()
+            # 2026-08-22 根因⑨：仅当待治愈卡片全为选股类(picking) 且 <18:00 才跳过派发，
+            # 避免 18:00 前空转 45min（选股脚本全被时间闸跳过）。
+            _picking = bool(items) and all(it.get("picking") for it in items)
+            ok, dmsg, dispatched = _dispatch_algo_run(picking_only=_picking)
         else:
             ok, dmsg, dispatched = _dispatch_cn_fetch(cat)
         if ok:

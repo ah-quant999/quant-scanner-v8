@@ -1,5 +1,5 @@
 window.FINAL_RECOMMEND_DATA = {
-  "update_time": "2026-08-22 06:42:31",
+  "update_time": "2026-08-22 07:26:48",
   "crisis_score": 31.4,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
@@ -55,29 +55,29 @@ window.FINAL_RECOMMEND_DATA = {
       "sector_score": 2.0,
       "sector_hits": [
         {
-          "name": "小金属",
-          "pct_5d": -1.68,
-          "relative_5d": -1.68,
-          "strong": true
-        },
-        {
           "name": "贵金属",
           "pct_5d": 13.37,
           "relative_5d": 13.37,
+          "strong": true
+        },
+        {
+          "name": "小金属",
+          "pct_5d": -1.68,
+          "relative_5d": -1.68,
           "strong": true
         }
       ],
       "sector_fund": [
         {
-          "name": "小金属",
-          "pct_5d": -1.68,
-          "relative_5d": -1.68,
-          "strong": true
-        },
-        {
           "name": "贵金属",
           "pct_5d": 13.37,
           "relative_5d": 13.37,
+          "strong": true
+        },
+        {
+          "name": "小金属",
+          "pct_5d": -1.68,
+          "relative_5d": -1.68,
           "strong": true
         }
       ],
@@ -92,14 +92,14 @@ window.FINAL_RECOMMEND_DATA = {
         "板块强势"
       ],
       "_60m_resonance": false,
-      "reason": "四量终极 信号2项；大牛股猎手 机构1.7亿+游资0.7亿；板块龙头 小金属,贵金属",
+      "reason": "四量终极 信号2项；大牛股猎手 机构1.7亿+游资0.7亿；板块龙头 贵金属,小金属",
       "industry": "",
       "concepts": [
-        "小金属概念",
-        "融资融券",
-        "深成500",
         "黄金概念",
-        "央国企改革"
+        "融资融券",
+        "央国企改革",
+        "小金属概念",
+        "深成500"
       ],
       "backtest": {
         "signals": 225,
@@ -178,11 +178,11 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "四量终极 信号2项；大牛股猎手 机构4.4亿+游资3.1亿；板块龙头 贵金属",
       "industry": "有色金属矿采选业",
       "concepts": [
-        "融资融券",
         "贬值受益",
         "黄金概念",
-        "央国企改革",
-        "稀缺资源"
+        "稀缺资源",
+        "融资融券",
+        "央国企改革"
       ],
       "backtest": {
         "signals": 225,
@@ -236,15 +236,15 @@ window.FINAL_RECOMMEND_DATA = {
       "sector_score": 2.0,
       "sector_hits": [
         {
-          "name": "小金属",
-          "pct_5d": -1.68,
-          "relative_5d": -1.68,
-          "strong": true
-        },
-        {
           "name": "贵金属",
           "pct_5d": 13.37,
           "relative_5d": 13.37,
+          "strong": true
+        },
+        {
+          "name": "小金属",
+          "pct_5d": -1.68,
+          "relative_5d": -1.68,
           "strong": true
         }
       ],
@@ -257,14 +257,14 @@ window.FINAL_RECOMMEND_DATA = {
         "板块强势"
       ],
       "_60m_resonance": false,
-      "reason": "四量终极 信号2项；大牛股猎手 机构1.7亿+游资0.7亿；板块龙头 小金属,贵金属",
+      "reason": "四量终极 信号2项；大牛股猎手 机构1.7亿+游资0.7亿；板块龙头 贵金属,小金属",
       "industry": "",
       "concepts": [
-        "小金属概念",
-        "融资融券",
-        "深成500",
         "黄金概念",
-        "央国企改革"
+        "融资融券",
+        "央国企改革",
+        "小金属概念",
+        "深成500"
       ],
       "backtest": {},
       "tracking": {
@@ -328,11 +328,11 @@ window.FINAL_RECOMMEND_DATA = {
       "reason": "四量终极 信号2项；大牛股猎手 机构4.4亿+游资3.1亿；板块龙头 贵金属",
       "industry": "有色金属矿采选业",
       "concepts": [
-        "融资融券",
         "贬值受益",
         "黄金概念",
-        "央国企改革",
-        "稀缺资源"
+        "稀缺资源",
+        "融资融券",
+        "央国企改革"
       ],
       "backtest": {},
       "tracking": {
@@ -373,11 +373,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "小金属概念",
-        "融资融券",
-        "深成500",
         "黄金概念",
-        "央国企改革"
+        "融资融券",
+        "央国企改革",
+        "小金属概念",
+        "深成500"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 9.69,
@@ -410,11 +410,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "有色金属矿采选业",
       "concepts": [
-        "融资融券",
         "贬值受益",
         "黄金概念",
-        "央国企改革",
-        "稀缺资源"
+        "稀缺资源",
+        "融资融券",
+        "央国企改革"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 34.46,
@@ -446,12 +446,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "有色金属矿采选业",
       "concepts": [
-        "中证500",
-        "中盘股",
-        "富时罗素",
         "黄金概念",
-        "稀缺资源",
-        "贬值受益"
+        "最近多板",
+        "题材股",
+        "上证380",
+        "昨日高振幅",
+        "稀土永磁"
       ],
       "enter_date": "2026-08-20",
       "stop_loss": 45.97,
@@ -462,7 +462,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "601899",
-      "name": "601899",
+      "name": "XD紫金矿",
       "market": "沪市",
       "board": "主板",
       "horizon": "中长线",
@@ -483,12 +483,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "有色金属矿采选业",
       "concepts": [
-        "小金属概念",
-        "融资融券",
+        "反转股",
         "贬值受益",
+        "权重股",
         "稀缺资源",
-        "央国企改革",
-        "锂矿概念"
+        "融资融券",
+        "央国企改革"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 32.31,
@@ -518,12 +518,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "有色金属矿采选业",
       "concepts": [
-        "融资融券",
         "贬值受益",
+        "中字头",
         "中特估",
-        "央国企改革",
-        "黄金概念",
-        "中字头"
+        "稀缺资源",
+        "融资融券",
+        "黄金概念"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 25.28,
@@ -553,11 +553,11 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "西部大开发",
-        "小金属概念",
         "融资融券",
-        "深成500",
-        "东方财富热股"
+        "西部大开发",
+        "东方财富热股",
+        "小金属概念",
+        "深成500"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 38.02,
@@ -587,12 +587,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
-        "氢能源",
-        "小金属概念",
         "独角兽",
-        "机器人概念",
+        "氢能源",
+        "新材料",
         "MLCC",
-        "可控核聚变"
+        "央国企改革",
+        "动力电池回收"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 51.69,
@@ -603,7 +603,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "600206",
-      "name": "600206",
+      "name": "XD有研新",
       "market": "沪市",
       "board": "主板",
       "horizon": "中长线",
@@ -622,12 +622,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "有色金属冶炼和压延加工业",
       "concepts": [
+        "华为概念",
+        "3D打印",
+        "央国企改革",
         "半导体概念",
         "5G概念",
-        "医疗器械概念",
-        "中芯概念",
-        "3D打印",
-        "国产芯片"
+        "医疗器械概念"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 50.44,
@@ -655,9 +655,9 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "有色金属矿采选业",
       "concepts": [
-        "东方财富热股",
-        "黄金概念",
         "融资融券",
+        "黄金概念",
+        "东方财富热股",
         "题材股"
       ],
       "enter_date": "20260821",
@@ -712,12 +712,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "创新药",
-        "医疗器械概念",
-        "专精特新",
         "人脑工程",
-        "创业板综",
-        "免疫治疗"
+        "精准医疗",
+        "创新药",
+        "破增发价股",
+        "中药概念",
+        "创业板综"
       ],
       "enter_date": "20260821",
       "stop_loss": null,
@@ -745,12 +745,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "化学原料和化学制品制造业",
       "concepts": [
-        "创业板综",
-        "液冷概念",
+        "东数西算",
+        "新材料",
         "算力概念",
         "数据中心",
-        "东数西算",
-        "新材料"
+        "创业板综",
+        "液冷概念"
       ],
       "enter_date": "20260821",
       "stop_loss": null,
@@ -778,12 +778,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "融资融券",
-        "专精特新",
-        "创业板综",
-        "新能源车",
         "PEEK材料概念",
-        "海洋经济"
+        "新材料",
+        "新能源车",
+        "融资融券",
+        "海洋经济",
+        "创业板综"
       ],
       "enter_date": "20260821",
       "stop_loss": null,
@@ -837,12 +837,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "",
       "concepts": [
-        "长期破净",
-        "ST股",
         "HJT电池",
-        "钙钛矿电池",
-        "储能概念",
-        "降解塑料"
+        "新材料",
+        "长期破净",
+        "降解塑料",
+        "节能环保",
+        "储能概念"
       ],
       "enter_date": "20260821",
       "stop_loss": null,
@@ -870,12 +870,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "创业成份",
-        "CPO概念",
-        "5G概念",
+        "权重股",
         "创业板综",
+        "创业成份",
         "光通信模块",
-        "算力概念"
+        "算力概念",
+        "百元股"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 397.8,
@@ -903,12 +903,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "5G概念",
-        "融资融券",
-        "百元股",
-        "PCB",
         "存储芯片",
-        "通信技术"
+        "华为概念",
+        "通信技术",
+        "融资融券",
+        "PCB",
+        "百元股"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 123.5,
@@ -937,11 +937,11 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
         "AI手机",
+        "AIPC",
+        "存储芯片",
         "信创",
-        "半导体概念",
-        "专精特新",
-        "国产芯片",
-        "AIPC"
+        "AI眼镜",
+        "东方财富热股"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 215.06,
@@ -969,12 +969,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "电气机械和器材制造业",
       "concepts": [
-        "CPO概念",
-        "5G概念",
-        "专精特新",
+        "华为概念",
+        "国产芯片",
         "光通信模块",
         "可控核聚变",
-        "国产芯片"
+        "专精特新",
+        "CPO概念"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 36.94,
@@ -1002,12 +1002,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "半导体概念",
-        "无线耳机",
-        "人工智能",
         "人形机器人",
         "存储芯片",
-        "央视50_"
+        "AI眼镜",
+        "无线耳机",
+        "央视50_",
+        "东方财富热股"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 380.43,
@@ -1035,12 +1035,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "金属制品业",
       "concepts": [
-        "军工",
-        "人工智能",
         "毫米波概念",
+        "云计算",
         "算力概念",
-        "国产芯片",
-        "百元股"
+        "百元股",
+        "东方财富热股",
+        "英伟达概念"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 117.15,
@@ -1069,9 +1069,9 @@ window.FINAL_RECOMMEND_DATA = {
       "industry": "水上运输业",
       "concepts": [
         "融资融券",
-        "天然气",
         "央国企改革",
         "海洋经济",
+        "天然气",
         "一带一路",
         "油气资源"
       ],
@@ -1101,12 +1101,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "研究和试验发展",
       "concepts": [
-        "茅指数",
-        "创新药",
-        "独角兽",
         "创新医疗服务",
-        "融资融券",
-        "CRO"
+        "独角兽",
+        "权重股",
+        "创新药",
+        "CAR-T细胞疗法",
+        "融资融券"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 151.46,
@@ -1134,12 +1134,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "英伟达概念",
-        "CPO概念",
-        "5G概念",
+        "华为概念",
         "特斯拉概念",
         "PCB",
-        "无人驾驶"
+        "商业航天",
+        "无人驾驶",
+        "深圳特区"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 88.2,
@@ -1167,12 +1167,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "土木工程建筑业",
       "concepts": [
-        "半导体概念",
+        "存储芯片",
+        "绿色电力",
         "光伏概念",
-        "国产芯片",
-        "先进封装",
+        "工程建设",
         "央国企改革",
-        "数据中心"
+        "东方财富热股"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 19.94,
@@ -1200,12 +1200,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "医药制造业",
       "concepts": [
-        "西部大开发",
-        "流感",
-        "融资融券",
-        "创业板综",
+        "病毒防治",
+        "单抗概念",
         "病原体防治",
-        "单抗概念"
+        "融资融券",
+        "生物疫苗",
+        "西部大开发"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 14.49,
@@ -1233,12 +1233,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "电气机械和器材制造业",
       "concepts": [
-        "玻璃基板",
-        "充电桩",
-        "储能概念",
-        "国产芯片",
         "新能源车",
-        "柔性屏(折叠屏)"
+        "玻璃基板",
+        "柔性屏(折叠屏)",
+        "智能家居",
+        "百元股",
+        "充电桩"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": 119.1,
@@ -1265,12 +1265,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "互联网和相关服务",
       "concepts": [
-        "DeepSeek概念",
-        "AI应用",
+        "互联网服务",
+        "AI智能体",
         "人工智能",
-        "AI芯片",
+        "Web3.0",
         "AI语料",
-        "ChatGPT概念"
+        "AI应用"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": null,
@@ -1297,12 +1297,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "MicroLED",
         "工业互联",
-        "国产芯片",
         "元宇宙概念",
-        "小米概念",
-        "传感器"
+        "MicroLED",
+        "华为概念",
+        "AI眼镜",
+        "增强现实"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": null,
@@ -1313,7 +1313,7 @@ window.FINAL_RECOMMEND_DATA = {
     },
     {
       "code": "000725",
-      "name": "000725",
+      "name": "京东方Ａ",
       "market": "深市",
       "board": "主板",
       "horizon": "中长线",
@@ -1329,12 +1329,12 @@ window.FINAL_RECOMMEND_DATA = {
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
+        "MicroLED",
+        "AB股",
+        "LED概念",
+        "东方财富热股",
         "UWB概念",
-        "人工智能",
-        "光纤概念",
-        "MiniLED",
-        "先进封装",
-        "LED概念"
+        "光纤概念"
       ],
       "enter_date": "2026-08-21",
       "stop_loss": null,
