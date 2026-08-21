@@ -104,6 +104,38 @@ jobs:
         with:
           fetch-depth: 1
 
+      # 🛡 2026-08-21 一劳永逸：幂等退出（主人报告「下午分时曲线断链」根因之一）
+      #   现象：8/21 下午 13:00-16:30 每分钟一个 dispatch（触发者均为 ah-quant999 =
+      #   本机 WorkBuddy 自动化/看门狗），concurrency 组排队堆积 → 大量 run cancelled，
+      #   加上 api_push_raw tree 超时（已另修）→ 盘中快照抓了却推不上 main → 前端下午无数据。
+      #   修复：本 run 启动时若同 workflow 已有 run 在执行/排队 → 幂等退出，杜绝堆积与重复抓取。
+      - name: "🔒 幂等退出（同 workflow 已有 run 执行/排队则跳过）"
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          COUNT=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=100" \
+            | python3 -c "
+import json,sys,os
+rid=os.environ.get('RUN_ID','')
+d=json.load(sys.stdin)
+act=0
+for r in d.get('workflow_runs',[]):
+    if str(r.get('id',''))==rid: continue
+    if r.get('status') in ('in_progress','queued','waiting','pending','requested'):
+        act+=1
+print(act)
+")
+          echo "同 workflow 并发 run 数(排除自己): $COUNT"
+          if [ -n "$COUNT" ] && [ "$COUNT" -gt 0 ]; then
+            echo "✅ 已有 $COUNT 个同 workflow run 执行/排队，本 run 幂等退出（避免堆积/重复抓取/互相覆盖）"
+            exit 0
+          fi
+          echo "无并发 run，继续抓取"
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"

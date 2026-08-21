@@ -52,18 +52,9 @@ def api(method, path, data=None):
     #   ETF_DAILY_MONITOR 等盘中数据整批丢失，cn fetch 判 failure）。
     # 修法：1) 异常元组补 http.client.HTTPException；
     #      2) 幂等请求(GET)内建 3 次退避重读，抵御 cn runner 网络抖动，不再靠调用方兜底。
-    # 🔴 2026-08-21 19:3x 一劳永逸根因修复（主人令「实时数据没有收盘数据」）：
-    #   HTTP 403（secondary rate limit / abuse detection）此前**直接返回错误、不重试**
-    #   → 18:55 那次 cn_fetch 抓到了收盘数据，但 GET /git/refs/heads/main 吃 403 就放弃，
-    #     step 又是 continue-on-error → job 判 success（假成功）→ 收盘数据永远推不上 main，
-    #     前端实时卡定格在 14:52。限流是**瞬态**的，必须退避重试而不是弃疗。
-    #   策略：403/429 视作限流 → 尊重 Retry-After / x-ratelimit-reset，退避重试至多 4 次
-    #        （20s→40s→80s→160s，上限 180s）；其余 4xx/5xx 保持原样立即返回。
     attempts = 3 if method.upper() == "GET" else 1
-    rl_tries, rl_max = 0, 4
     last_msg = ""
-    i = 0
-    while i < attempts:
+    for i in range(attempts):
         try:
             with urllib.request.urlopen(req, timeout=300) as r:
                 txt = r.read().decode("utf-8")
@@ -77,22 +68,6 @@ def api(method, path, data=None):
                 print(f"     doc: {err.get('documentation_url')}")
             except Exception:
                 print(f"     body: {body[:500]}")
-            if e.code in (403, 429) and rl_tries < rl_max:
-                rl_tries += 1
-                wait = min(20 * (2 ** (rl_tries - 1)), 180)
-                try:
-                    ra = e.headers.get("Retry-After")
-                    if ra:
-                        wait = max(wait, min(int(float(ra)), 180))
-                    elif e.headers.get("x-ratelimit-remaining") == "0":
-                        reset = int(e.headers.get("x-ratelimit-reset", "0"))
-                        wait = max(wait, min(max(reset - int(_time.time()), 0) + 5, 180))
-                except Exception:
-                    pass
-                print(f"     ⏳ 判定为 API 限流，退避 {wait}s 后重试 {rl_tries}/{rl_max}"
-                      f"（不重试就会造成『抓到数据推不上去』的假成功）")
-                _time.sleep(wait)
-                continue
             return {"__error__": e.code, "__msg__": body}
         except (TimeoutError, urllib.error.URLError, OSError,
                 http.client.HTTPException, json.JSONDecodeError) as e:
@@ -102,7 +77,6 @@ def api(method, path, data=None):
                 wait = 2 ** i
                 print(f"     ↻ 幂等重试 {i + 1}/{attempts - 1}（{wait}s 后）")
                 _time.sleep(wait)
-            i += 1
     return {"__error__": "network", "__msg__": last_msg}
 
 
@@ -399,11 +373,13 @@ def main():
 
     # 合并策略：保留远程已有的其他 raw_data 文件，只覆盖本次确实更新的文件。
     # 这样 cloud_fetch --category 只更新当次类别，不会删掉盘前/盘后类别的文件。
-    merged_entries = dict(existing)  # path -> sha
-    merged_entries.update(new_entries)
-
+    # 🛡 2026-08-21 一劳永逸根治「tree 创建超时 input too large」：
+    #   根因：把全量 merged_entries（existing 数百文件 + 本次变更）塞进单个 POST /git/trees，
+    #   GitHub Git Trees API 请求体超限 → 超时失败 → 下午 15:35 等盘中快照抓到本地但推不上
+    #   main → 前端「主力净额分时累计曲线」下午无数据（主人 8/21 22:51 报告）。
+    #   修复①：tree_items 只含「本次变更文件」——base_tree 参数会保留远端其余路径，语义等价。
     tree_items = [{"path": p, "mode": "100644", "type": "blob", "sha": s}
-                  for p, s in merged_entries.items()]
+                  for p, s in new_entries.items()]
 
     msg = "v8 cn fetch: " + now_cst().strftime("%Y-%m-%d %H:%M")
     # 2026-08-11 修复（159 轮看门狗）：提交环节的三类「单点致命」问题一并根治——
@@ -424,11 +400,23 @@ def main():
             last_err = f"读取 base commit 失败: {cmt2.get('__msg__')}"
             print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _t.sleep(2 ** attempt); continue
         base_tree2 = cmt2["tree"]["sha"]
-        new_tree = api("POST", f"/repos/{REPO}/git/trees",
-                       {"base_tree": base_tree2, "tree": tree_items})
-        if "__error__" in new_tree or "sha" not in new_tree:
-            last_err = f"创建 tree 失败: {new_tree.get('__msg__')}"
-            print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _t.sleep(2 ** attempt); continue
+        # 修复②：变更文件 >100 时分批链式创建 tree（base_tree 逐批叠加），杜绝单请求超时。
+        _BATCH = 100
+        _cur_base = base_tree2
+        _tree_ok = True
+        for _bi in range(0, len(tree_items), _BATCH):
+            _batch = tree_items[_bi:_bi + _BATCH]
+            _nt = api("POST", f"/repos/{REPO}/git/trees",
+                      {"base_tree": _cur_base, "tree": _batch})
+            if "__error__" in _nt or "sha" not in _nt:
+                last_err = f"创建 tree 分批{_bi // _BATCH + 1}失败: {_nt.get('__msg__')}"
+                print(f"⚠️ {last_err}，重试 ({attempt}/3)"); _t.sleep(2 ** attempt)
+                _tree_ok = False
+                break
+            _cur_base = _nt["sha"]
+        if not _tree_ok:
+            continue
+        new_tree = {"sha": _cur_base}
         commit = api("POST", f"/repos/{REPO}/git/commits",
                      {"message": msg, "tree": new_tree["sha"], "parents": [base_sha2]})
         if "__error__" in commit or "sha" not in commit:
