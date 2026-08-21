@@ -312,8 +312,12 @@ jobs:
           python algorithms/run_algorithms.py
           echo "algo exit: $?"
           # run_algorithms 内部每个脚本 continue-on-error，整体退出码不代表全失败；
-          # 推送交由下一步兜底执行，这里不因非零退出码而 fail。
-          exit 0
+          # 但推送是否落地是唯一可靠判据（2026-08-22 实证：final_recommend 23:34 已生成，
+          # 建 tree 422 推送失败被 exit 0 吞掉 → job 假 success → 线上 FINAL_RECOMMEND 停 08-20）。
+          # 显式再跑一次 api_push_raw（分块增量模式、幂等），严格退出码：
+          # 推送失败即让 job 失败，dispatch_guard 才能感知并重试，杜绝假 success。
+          python api_push_raw.py
+          echo "push exit: $?"
 
       # 🛡 2026-08-18 主人紧急令根治：算法链收尾前先做 4 件事，确保 data/*.js 与 HEALTH_CHECK.js
       #   必刷新——bridge_raw_data 防 raw_data 内部改名断点（如 triple_resonance_history → triple_history），
@@ -333,7 +337,9 @@ jobs:
       - name: "📤 兜底推送（若上一步未推）"
         if: steps.trading.outputs.is_trading_day == 'true'
         run: |
-          python api_push_raw.py || true
+          # 2026-08-22 根因⑪收口：去掉 || true —— 推送失败必须让 job 失败，
+          # 否则「算法链算完但推送 422 失败」永远被假 success 掩盖。
+          python api_push_raw.py
 
       # 🔴 2026-08-15 防覆盖铁律修复：run_algorithms 刚重写 data/ALGO_TRACK.js（带新时间戳），
       #   但 index.html 的 ?v 不会自动跟着变 → CDN 吐旧 ALGO_TRACK 副本。
