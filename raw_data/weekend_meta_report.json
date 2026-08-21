@@ -1,9 +1,11 @@
 {
-"update_time": "2026-08-21 08:04:26",
-"total": 9591,
+"update_time": "2026-08-21 08:47:14",
+"total": 9590,
 "new_listings_count": 0,
-"delisted_count": 0,
+"delisted_count": 1,
 "new_listings": [],
-"delisted": [],
+"delisted": [
+"02904 CMON RTS"
+],
 "meta_enriched": 0
 }
