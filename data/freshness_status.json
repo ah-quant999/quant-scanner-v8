@@ -1,7 +1,7 @@
 {
-  "check_time": "2026-08-21 16:43:34",
+  "check_time": "2026-08-22 00:05:56",
   "last_trade_close": "2026-08-21 15:30:00",
-  "is_trading_day": true,
+  "is_trading_day": false,
   "core_stale": [
     {
       "var": "VOLATILITY",
