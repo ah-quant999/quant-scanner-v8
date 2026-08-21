@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-21 15:13",
+  "update_time": "2026-08-21 15:48",
   "data_type": "real",
   "summary": {
     "in_count": 40,
@@ -1645,18 +1645,18 @@
       "net_60d_days": 10
     },
     {
-      "name": "先进封装",
-      "net": -123.88,
-      "net_5d": 31.1,
-      "net_20d": 159.11,
-      "net_60d": null,
-      "type": "行业",
-      "consecutive_days": 2,
-      "trend": "out",
+      "name": "一带一路",
+      "net": 49.96,
+      "net_5d": -38.53,
+      "net_20d": 128.36,
+      "type": "概念",
       "net_5d_days": 5,
-      "net_10d": 159.11,
-      "net_10d_days": 10,
+      "source": "本地累加",
       "net_20d_days": 10,
+      "consecutive_days": 2,
+      "trend": "in",
+      "net_10d": 141.32,
+      "net_10d_days": 10,
       "net_60d_days": 10
     }
   ],

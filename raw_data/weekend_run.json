@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-21 15:35:04",
-  "generated": "2026-08-21 15:35:04",
+  "update_time": "2026-08-21 15:51:42",
+  "generated": "2026-08-21 15:51:42",
   "period_start": "2026-08-10",
   "period_end": "2026-08-16",
   "stats": {
@@ -9,7 +9,13 @@
     "tracked_files": 10,
     "ok_files": 9,
     "missing_files": 1,
-    "latest_health": null
+    "latest_health": {
+      "ok": 95,
+      "warn": 0,
+      "fail": 9,
+      "total": 105,
+      "updated": "2026-08-21 15:29:00"
+    }
   },
   "freshness": [
     {
@@ -31,7 +37,7 @@
       "label": "全站精选",
       "status": "ok",
       "update_time": "2026-08-20 23:40:42",
-      "size_kb": 20.8
+      "size_kb": 21.6
     },
     {
       "file": "cockpit_tier_recommend.json",
@@ -52,7 +58,7 @@
       "label": "最终推荐池",
       "status": "ok",
       "update_time": "2026-08-20 23:52:35",
-      "size_kb": 39.8
+      "size_kb": 41.4
     },
     {
       "file": "gold_pool.json",
