@@ -422,7 +422,7 @@ window.__domReadyFns=[];
     <script src="data/SECTOR_FUND_FLOW.js?v=e195967a56" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=4b32448feb" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=a8bf0bdd96" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=bcb549a486" defer></script>
     <script src="data/ANALYST_RATINGS.js?v=ac79a8f80f" defer></script>
     <script src="data/SUSPENSION_ALERT.js?v=4fdfd50ad7" defer></script>
     <script src="data/GOLD_POOL.js?v=1dde51d136" defer></script>
@@ -437,7 +437,7 @@ window.__domReadyFns=[];
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
 <script src="data/CONCEPT_RANKING.js?v=be49b57a1c" defer></script>
 <script src="data/INDEX_QUOTES.js?v=95e9fb3045" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=a457871ef7" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=29507d92e6" defer></script>
 <script src="data/MARGIN_DATA.js?v=f2633af85b" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=ccad64a5a3" defer></script>
 <script src="data/IPO_DATA.js?v=81b3d79fdb" defer></script>
@@ -452,7 +452,7 @@ window.__domReadyFns=[];
     <script src="data/AVG_PRICE_DATA.js?v=72fd6d3910" defer></script>
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
     <script src="data/PORTFOLIO_COST.js?v=6c6515f693" defer></script>
-    <script src="data/PORTFOLIO.js?v=edd90c1e83" defer></script>
+    <script src="data/PORTFOLIO.js?v=09fce9da74" defer></script>
     <script>
 window.V8_CAL = {weeks:[],legend:[]};
 /* ===== 2026 A股交易日历（每年需更新） ===== */
@@ -1216,7 +1216,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_FIB.js?v=16f4c29615" defer></script>
 <script src="data/SZ_FIB.js?v=b028614bea" defer></script>
 <script src="data/SECTOR_RS.js?v=9c98c0d1f4" defer></script>
-<script src="data/SECTOR_PHASE_HISTORY.js?v=46e8e10c23" defer></script>
+<script src="data/SECTOR_PHASE_HISTORY.js?v=0f91429727" defer></script>
 <script src="data/INST_TRADE.js?v=73dd6fe5fb" defer></script>
 <script src="data/NORTH_FUND.js?v=a63b529a9a" defer></script>
 <script src="data/MARKET_ALERTS.js?v=c5a1275d03" defer></script>
@@ -1246,12 +1246,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/WEEKEND_RUN.js?v=8106defdc7" defer></script>
 <script src="data/W52_HIGH.js?v=67892c15d7" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=f613f920ff" defer></script>
-<script src="data/RUNNER_STATUS.js?v=2b5721dda1" defer></script>
-<script src="data/HEALTH_CHECK.js?v=e587d2608a" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=2bf8df8acf" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=d6ca081a22" defer></script>
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=9fd998234f" defer></script>
-    <script src="data/INDEX_HISTORY.js?v=7ac7a39ad8" defer></script>
+<script src="data/RUNNER_STATUS.js?v=107a314682" defer></script>
+<script src="data/HEALTH_CHECK.js?v=c1be15791b" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=cd6a135357" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=c434236a49" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=0eefe571e8" defer></script>
+    <script src="data/INDEX_HISTORY.js?v=52b382cb9b" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE.js?v=f135754004" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=0dcbab52a2" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=8f5ae7d309" defer></script>
@@ -13099,7 +13099,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch('data/HEALTH_CHECK.js?v=e587d2608a'+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch('data/HEALTH_CHECK.js?v=c1be15791b'+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]):'';
       if(remoteTs && remoteTs!==localTs){
@@ -13699,7 +13699,7 @@ window.__renderV8CalToday();
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=6094d411a7'},
     {name:'STOCK_PROFILE', url:'data/STOCK_PROFILE.js?v=f23feb0264'},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=7ed1831198'},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=6693190631'},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=6025187010'}
   ];
   function loadOne(item, done){
