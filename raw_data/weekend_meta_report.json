@@ -1,12 +1,9 @@
 {
-"update_time": "2026-08-21 07:20:31",
+"update_time": "2026-08-21 08:04:26",
 "total": 9591,
-"new_listings_count": 2,
+"new_listings_count": 0,
 "delisted_count": 0,
-"new_listings": [
-"589460 科创200ETF华宝",
-"159082 化工ETF华夏"
-],
+"new_listings": [],
 "delisted": [],
-"meta_enriched": 2
+"meta_enriched": 0
 }
