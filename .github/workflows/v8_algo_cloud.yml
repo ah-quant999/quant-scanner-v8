@@ -314,9 +314,17 @@ jobs:
           # run_algorithms 内部每个脚本 continue-on-error，整体退出码不代表全失败；
           # 但推送是否落地是唯一可靠判据（2026-08-22 实证：final_recommend 23:34 已生成，
           # 建 tree 422 推送失败被 exit 0 吞掉 → job 假 success → 线上 FINAL_RECOMMEND 停 08-20）。
-          # 显式再跑一次 api_push_raw（分块增量模式、幂等），严格退出码：
+          # 显式再跑一次 api_push_raw（来源驱动增量、幂等），严格退出码：
           # 推送失败即让 job 失败，dispatch_guard 才能感知并重试，杜绝假 success。
-          python api_push_raw.py
+          # 2026-08-22 来源驱动：git status 收集本次 changed 作清单，避免与 run_algorithms
+          # 内部 step_push 重复全量 848 扫描（与 api_push_raw PUSH_FILES 配合，422 根治闭环）。
+          MANIFEST=$(git status --porcelain raw_data/ data/ | awk '{print $2}' | tr '\n' ',')
+          if [ -n "$MANIFEST" ]; then
+            echo "📋 本次变更清单: ${MANIFEST%,}"
+            PUSH_FILES="$MANIFEST" python api_push_raw.py
+          else
+            echo "ℹ️ 无 raw_data/data 变更，跳过推送"
+          fi
           echo "push exit: $?"
 
       # 🛡 2026-08-18 主人紧急令根治：算法链收尾前先做 4 件事，确保 data/*.js 与 HEALTH_CHECK.js
@@ -339,7 +347,13 @@ jobs:
         run: |
           # 2026-08-22 根因⑪收口：去掉 || true —— 推送失败必须让 job 失败，
           # 否则「算法链算完但推送 422 失败」永远被假 success 掩盖。
-          python api_push_raw.py
+          # 2026-08-22 来源驱动增量：只推本次 changed，避免全量 848 扫描。
+          MANIFEST=$(git status --porcelain raw_data/ data/ | awk '{print $2}' | tr '\n' ',')
+          if [ -n "$MANIFEST" ]; then
+            PUSH_FILES="$MANIFEST" python api_push_raw.py
+          else
+            echo "ℹ️ 无 raw_data/data 变更，跳过推送"
+          fi
 
       # 🔴 2026-08-15 防覆盖铁律修复：run_algorithms 刚重写 data/ALGO_TRACK.js（带新时间戳），
       #   但 index.html 的 ?v 不会自动跟着变 → CDN 吐旧 ALGO_TRACK 副本。
