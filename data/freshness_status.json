@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-08-21 15:50:03",
+  "check_time": "2026-08-21 16:43:34",
   "last_trade_close": "2026-08-21 15:30:00",
   "is_trading_day": true,
   "core_stale": [
@@ -19,19 +19,13 @@
       "category": "algo"
     }
   ],
-  "warn_stale": [
-    {
-      "var": "COCKPIT_ADVICE",
-      "reason": "更新于 08-19 18:21，落后 3 个交易日（阈值 2）",
-      "category": "algo"
-    }
-  ],
+  "warn_stale": [],
   "frozen_stale": [],
   "no_update_time": [],
   "summary": {
     "total_checked": 50,
     "core_stale": 3,
-    "warn_stale": 1,
+    "warn_stale": 0,
     "frozen_stale": 0,
     "no_timestamp": 0
   },
