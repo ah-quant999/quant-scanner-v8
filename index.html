@@ -422,7 +422,7 @@ window.__domReadyFns=[];
     <script src="data/SECTOR_FUND_FLOW.js?v=5ffd021185" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=8f4841c6a1" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=5e49db568a" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=b41347945a" defer></script>
     <script src="data/ANALYST_RATINGS.js?v=022e009bc7" defer></script>
     <script src="data/SUSPENSION_ALERT.js?v=f5ba0274c4" defer></script>
     <script src="data/GOLD_POOL.js?v=ae55fec5ab" defer></script>
@@ -437,7 +437,7 @@ window.__domReadyFns=[];
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
 <script src="data/CONCEPT_RANKING.js?v=4424969926" defer></script>
 <script src="data/INDEX_QUOTES.js?v=45b42130a8" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=f48d894c19" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=669f925680" defer></script>
 <script src="data/MARGIN_DATA.js?v=fd8f67c3b2" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=5141048b06" defer></script>
 <script src="data/IPO_DATA.js?v=759f93f048" defer></script>
@@ -1216,7 +1216,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_FIB.js?v=fe71c7c4a2" defer></script>
 <script src="data/SZ_FIB.js?v=2fffa2c582" defer></script>
 <script src="data/SECTOR_RS.js?v=376d7f50d7" defer></script>
-<script src="data/SECTOR_PHASE_HISTORY.js?v=0f1fed1950" defer></script>
+<script src="data/SECTOR_PHASE_HISTORY.js?v=3e78a65c51" defer></script>
 <script src="data/INST_TRADE.js?v=0b43bbc903" defer></script>
 <script src="data/NORTH_FUND.js?v=fe1caa4c40" defer></script>
 <script src="data/MARKET_ALERTS.js?v=b0cfa2428e" defer></script>
@@ -1246,12 +1246,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/WEEKEND_RUN.js?v=348c32949e" defer></script>
 <script src="data/W52_HIGH.js?v=6a6d89d164" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=b759a1963e" defer></script>
-<script src="data/RUNNER_STATUS.js?v=0648856e92" defer></script>
-<script src="data/HEALTH_CHECK.js?v=80de7b103b" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=c5e3583dfa" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=a66d3c455f" defer></script>
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=4a761155ea" defer></script>
-    <script src="data/INDEX_HISTORY.js?v=f2e8190251" defer></script>
+<script src="data/RUNNER_STATUS.js?v=9d413ce080" defer></script>
+<script src="data/HEALTH_CHECK.js?v=da4df908aa" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=0222f863ac" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=1f525b97fb" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=5ddb099030" defer></script>
+    <script src="data/INDEX_HISTORY.js?v=deff0fcffc" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE.js?v=f135754004" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=0dcbab52a2" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=8f5ae7d309" defer></script>
@@ -13099,7 +13099,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch('data/HEALTH_CHECK.js?v=80de7b103b'+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch('data/HEALTH_CHECK.js?v=da4df908aa'+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]):'';
       if(remoteTs && remoteTs!==localTs){
@@ -13699,7 +13699,7 @@ window.__renderV8CalToday();
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=fa7499d366'},
     {name:'STOCK_PROFILE', url:'data/STOCK_PROFILE.js?v=f23feb0264'},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=f7587aa7f6'},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=5a45ee5063'},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=6025187010'}
   ];
   function loadOne(item, done){
