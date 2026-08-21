@@ -62,7 +62,19 @@ concurrency:
   #     - 但若 3 个并发 push 同一份 freshness，至少 2 个会失败 → 雪崩；
   #     - cancel 让最新一次覆盖，确保只有 1 个在跑，1 次 push 必成功。
   group: v8-health-patrol
-  cancel-in-progress: true
+  # 🛡️ 2026-08-21 20:45 一劳永逸根因修复（主人令「核查，一劳永逸式修复」）：
+  #   实测今日 patrol 100 run 中 98 个 cancelled、仅 1 failure —— 自愈器实际全年失能。
+  #   死锁链路：本 workflow 的「🔁 自愈验证」step 内含 sleep 600（10 分钟），而
+  #   workflow_run 触发源（cn_fetch 每 6-30 分钟 + 盘后算法链 + 自身兜底派发）间隔
+  #   远小于 10 分钟 → 每个 patrol 都在 sleep 中被后来者 cancel → 永远走不到
+  #   「写 freshness_status.json」与锁文件写回（实证：data/.heal_dispatch.json 停在
+  #   13:56:37）→ 自愈判定永远读到陈旧锁 → 盘后算法链坏了 5 小时无人救。
+  #   改 false 的语义正确性：GitHub 对同 group 只保留「1 running + 1 最新 pending」，
+  #   多余 pending 自动 cancel —— 即 running 绝不被打断，排队的自然合并。
+  #   （其余 6 个 workflow 早已全是 false，patrol 是唯一漏网的 true。）
+  #   配套：新增下方「⏱️ 去抖 gate」，近 15 分钟已完整巡检过则本轮秒退 no-op，
+  #   防止 false 后排队 run 接力连跑把 group 与 API 配额占满。
+  cancel-in-progress: false
 
 jobs:
   health-patrol:
@@ -81,8 +93,23 @@ jobs:
         with:
           python-version: '3.13'
 
+      # 🛡️ 2026-08-21 20:45 一劳永逸根因修复（主人令）：配合 cancel-in-progress: false。
+      #   false 后同 group 的排队 run 会接力连跑（每轮含 sleep 600 = 12min+），若不去抖
+      #   会把 group 与 GitHub API 配额吃满 —— 那正是今日 secondary rate limit 403 风暴的燃料。
+      #   本 gate：近 15 分钟内已有「完整跑完」的 patrol 则本轮秒退 no-op（不派发、不推文件）。
+      #   只认 success/failure，cancelled 不算（被打断 ≠ 已巡检），判定纯走 Runs API 无状态。
+      - name: "⏱️ 去抖 gate（近 15 分钟已完整巡检则本轮 no-op）"
+        id: gate
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          FORCE: ${{ github.event.inputs.force }}
+          DEBOUNCE_WINDOW_MIN: "15"
+        run: python .github/scripts/patrol_debounce.py
+
       - name: "🩺 巡检 + 自动治愈（一站式）"
         id: heal
+        if: steps.gate.outputs.skip != 'true'
         continue-on-error: true
         run: |
           echo "=== 运维自愈巡检 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') ==="
@@ -99,7 +126,7 @@ jobs:
       #   →再派发→空转」循环；这是「4 天没跑没发现」的根因之一——algo_run 派发无数次，bridge
       #   断点未修，永远回到同一陈旧数据。仅当本次有 healed 项且派发了非 skip 类才进入验证。
       - name: "🔁 自愈验证：10 分钟后回查仍 fail → 升级告警"
-        if: steps.heal.outputs.healed != '0' && steps.heal.outputs.healed != ''
+        if: steps.gate.outputs.skip != 'true' && steps.heal.outputs.healed != '0' && steps.heal.outputs.healed != ''
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -132,7 +159,9 @@ jobs:
         #   与 v8_health_check.py --heal 的「按卡片 stale 阈值派发」互补：
         #     - heal 按数据卡 age（>120min 才派发）—— 太慢；
         #     - 本 step 按「管线心跳」（>6min 无 raw_data 推）—— 及时。
-        if: always()
+        # 🛡️ 2026-08-21：加 gate 条件 —— 去抖跳过时绝不派发，否则「排队 run 接力各派一发」
+        #   会把 cn_fetch 推成 6 分钟一轮的风暴（今日 cn_fetch 150 run 的成因之一）。
+        if: always() && steps.gate.outputs.skip != 'true'
         env:
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -170,7 +199,7 @@ jobs:
           echo "  → HTTP $HTTP"
 
       - name: "📊 写 freshness_status.json（供面板读取）"
-        if: always()
+        if: always() && steps.gate.outputs.skip != 'true'
         env:
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -234,6 +263,11 @@ jobs:
       - name: "📊 巡检摘要"
         if: always()
         run: |
+          if [ "${{ steps.gate.outputs.skip }}" = "true" ]; then
+            echo "## v8 云端健康巡检 — 去抖跳过 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')" >> $GITHUB_STEP_SUMMARY
+            echo "- ⏭️ ${{ steps.gate.outputs.reason }}" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
           echo "## v8 云端健康巡检 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')" >> $GITHUB_STEP_SUMMARY
           echo "- 自动治愈: ${{ steps.heal.outputs.healed }} 项" >> $GITHUB_STEP_SUMMARY
           echo "- 自愈失败: ${{ steps.heal.outputs.failed }} 项" >> $GITHUB_STEP_SUMMARY

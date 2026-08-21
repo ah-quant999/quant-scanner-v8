@@ -56,8 +56,22 @@ jobs:
       run:
         shell: bash
     steps:
-      # 复用 v8_algo_cloud 的源码同步代码（绕开 cn runner git 墙）
-      - name: "📥 经 GitHub API 同步源码（绕开 cn git 墙）"
+      # 🛡️ 2026-08-21 20:45 一劳永逸根因修复（主人令「核查，一劳永逸式修复」）：
+      #   本 job runs-on 已是 ubuntu-latest（美国 IP，git 直连无墙），但源码同步仍沿用
+      #   给 [self-hosted, cn] 写的「逐 blob 走 Contents API 拉全仓上千文件」方案。
+      #   后果与 v8_algo_cloud 同源：并发场景下上千次 API 打爆 secondary rate limit
+      #   → blob 全 403 Forbidden → 同步步骤超时 → job 失败。
+      #   修复：checkout 优先（秒级、0 次 blob API），仅当 checkout 失败才回退 API 同步。
+      - name: "📥 Checkout 源码（云端 git 直连，秒级）"
+        id: co
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: "📥 回退·经 GitHub API 同步源码（仅 checkout 失败时）"
+        if: steps.co.outcome == 'failure'
+        timeout-minutes: 10
         run: |
           set -e
           cat > "$RUNNER_TEMP/sync_src_v8cloud.py" <<'PYEOF'
