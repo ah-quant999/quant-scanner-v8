@@ -89,7 +89,22 @@ def dispatch_guard(wf_file, now, cooldown_min=30, max_fail_today=3):
     if ago <= cooldown_min:
         return False, "最近一次 run 于 %s（%.0f 分钟前），%d 分钟冷却内不重复派发" % (
             ct.strftime("%H:%M") if ct else "?", ago, cooldown_min)
+    # 🔴 2026-08-21 21:5x 二次根因修复（主人令「一劳永逸」）：
+    #   初版熔断只按「今日失败次数」计，实测今日 algo_cloud 因 403 限流失败 84 次 →
+    #   熔断永久生效到次日 0 点。后果：403 根因修好（checkout 替代逐 blob API 同步）后，
+    #   自动派发仍被旧账熔断挡住，18:00 后的盘后选股链永远等不到自动恢复，只能人工派 ——
+    #   这与「一劳永逸」正好相反：把一次故障变成一整晚的失能。
+    #   正确语义：熔断是防「对同一个 bug 反复无效补派」，所以只该统计
+    #   「与当前 main HEAD 同一份代码」的失败。代码一变（bug 已修）即自动解封。
+    #   另留「探针」出口：同版本失败超阈值，但距最近一次失败 ≥ probe_after_min 时
+    #   允许放 1 次探针 —— 覆盖「代码没错、是外部瞬时故障（GitHub 限流/数据源抖动）」的情形。
+    head = None
+    ref = api("GET", f"/repos/{REPO}/git/refs/heads/main")
+    if isinstance(ref, dict):
+        head = (ref.get("object") or {}).get("sha")
     fails_today = 0
+    fails_same_code = 0
+    last_fail_ago = 9999.0
     for r in runs:
         if r.get("conclusion") != "failure":
             continue
@@ -98,13 +113,29 @@ def dispatch_guard(wf_file, now, cooldown_min=30, max_fail_today=3):
                 r.get("created_at", "").replace("Z", "+00:00")).astimezone(CST)
         except Exception:
             continue
-        if rt.date() == now.date():
-            fails_today += 1
-    if fails_today >= max_fail_today:
-        return False, ("🚨 熔断：%s 今日已失败 %d 次（阈值 %d）→ 停止自动补派，"
-                       "属真故障需人工介入（继续派发只会烧额度并触发 API 限流）"
-                       % (wf_file, fails_today, max_fail_today))
-    return True, "允许派发（今日失败 %d 次 < 阈值 %d）" % (fails_today, max_fail_today)
+        if rt.date() != now.date():
+            continue
+        fails_today += 1
+        if head and r.get("head_sha") == head:
+            fails_same_code += 1
+            last_fail_ago = min(last_fail_ago, (now - rt).total_seconds() / 60.0)
+    if head is None:
+        # 取不到 HEAD 时退回旧口径（保守，宁可熔断也不风暴）
+        if fails_today >= max_fail_today:
+            return False, ("🚨 熔断（保守口径，未取到 main HEAD）：%s 今日失败 %d 次 ≥ %d"
+                           % (wf_file, fails_today, max_fail_today))
+        return True, "允许派发（未取到 HEAD，按今日失败 %d < %d 放行）" % (fails_today, max_fail_today)
+    if fails_same_code >= max_fail_today:
+        probe_after_min = 60
+        if last_fail_ago >= probe_after_min:
+            return True, ("🔍 探针放行：%s 同版本(%s)今日失败 %d 次已熔断，但距最近失败 %.0f 分钟"
+                          "（≥%d），放 1 次探针试探外部故障是否恢复"
+                          % (wf_file, head[:7], fails_same_code, last_fail_ago, probe_after_min))
+        return False, ("🚨 熔断：%s 在当前代码版本(%s)上今日已失败 %d 次（阈值 %d，今日总失败 %d），"
+                       "距最近失败仅 %.0f 分钟 → 停止补派，属真故障需人工介入"
+                       % (wf_file, head[:7], fails_same_code, max_fail_today, fails_today, last_fail_ago))
+    return True, ("允许派发（当前代码版本 %s 今日失败 %d 次 < 阈值 %d；今日总失败 %d 次为旧版本旧账，不计）"
+                  % (head[:7], fails_same_code, max_fail_today, fails_today))
 
 
 def dispatch(wf_file, inputs=None):

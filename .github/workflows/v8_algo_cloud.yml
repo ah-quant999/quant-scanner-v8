@@ -74,7 +74,16 @@ jobs:
     #   step 2「GitHub API 同步源码」在云端 IP 反而更快（连 api.github.com 无墙），数据源已
     #   由 CLOUD_RUNNER=true + 腾讯 GTimg 适配境外环境（probe 实测 10/11 通）。
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    # 🔴 2026-08-21 22:00 根因修复（主人令「一劳永逸」）：120 分钟不够。
+    #   实测对比：15:30 派发那轮因未到 18:00，run_algorithms 把 20+ 个选股脚本全跳过，
+    #   step「运行盘后算法链」只用 45-49 分钟；而 18:00 后那轮选股脚本全放行
+    #   （calc_crds / build_candidate_pool / calc_stock_rps / generate_top10 /
+    #     strategy_four_volume(_60m) / gen_triple_consensus / final_recommend /
+    #     auto_run_dn_algorithm / track_h_auto_buy ... 单脚本 subprocess timeout 1800s），
+    #   耗时显著更长（今晚 20:26 那轮 step 7 单步已跑 90+ 分钟）。
+    #   120 分钟会在收尾推送前被强杀 → 整轮 90 分钟计算成果全丢、最终推荐依旧缺失。
+    #   放宽到 200 分钟，留足「计算 + 桥接 + 候选池行情 + 推送」全链余量。
+    timeout-minutes: 200
     env:
       # 🔴 2026-08-06 00:10 必须保留：云端 runner 默认 UTC，脚本里凡是用朴素 datetime.now()
       #   写的 update_time 会比北京时间慢 8 小时（run#31021842600 实测：lhb_data/candidate/
