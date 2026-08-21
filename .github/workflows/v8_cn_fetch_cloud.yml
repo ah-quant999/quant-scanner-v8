@@ -209,14 +209,23 @@ jobs:
           python algorithms/build_candidate_pool.py
           python -c "import sys; sys.path.insert(0,'algorithms'); import stage_to_raw; stage_to_raw.main()"
 
-      - name: "📤 推送 raw_data/ 到 main（Contents API）"
+      - name: "📤 推送 raw_data/ 到 main（来源驱动增量，Contents API）"
         # 🔴 2026-08-18 主人根治令：消费层软失败。推送失败（网络抖动/并发冲突）不阻断
         #   后续 bridge/update_v8/health_check——raw_data 数据源已抓取成功，只是推送瞬态失败
         #   （历史证据：16:33 run 32116993591 因步骤12推送失败拖垮整个 workflow → 今日 9+ 连败）。
         continue-on-error: true
         shell: bash
         run: |
-          python api_push_raw.py
+          # 2026-08-22 来源驱动增量推送（主人令升级）：git status 收集"本次 changed"作清单，
+          #   聚焦推送本次产物（cloud_fetch save + 外部脚本全部写入），不再全量 848 文件扫描，
+          #   配合 api_push_raw 的 PUSH_FILES，单次 tree 请求大小与仓库规模解耦（422 根治）。
+          MANIFEST=$(git status --porcelain raw_data/ data/ | awk '{print $2}' | tr '\n' ',')
+          if [ -z "$MANIFEST" ]; then
+            echo "ℹ️ 本次无 raw_data/data 变更，跳过推送"
+          else
+            echo "📋 本次变更清单: ${MANIFEST%,}"
+            PUSH_FILES="$MANIFEST" python api_push_raw.py
+          fi
 
       # 🛡 2026-08-18 主人紧急令根治：抓完 raw_data 之后立即桥接（bridge_raw_data.py）
       #   + 重生成 data/*.js（update_v8.py）+ 刷新 HEALTH_CHECK.js（v8_health_check.py），

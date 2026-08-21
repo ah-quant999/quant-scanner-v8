@@ -2320,9 +2320,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           _dataHour=parseInt(String(updateTime).slice(11,3))||0;
         }
         var _nowHr=new Date().getHours()+new Date().getMinutes()/60;
+        // 🛡 2026-08-22 主人令：周末/节假日（非交易日）保留最后一个交易日数据，不做盘前清空。
+        //   只有「今天确实是 A 股交易日」才执行盘前清空，与实时数据页其他卡片保持一致。
+        var _c=window._cstParts?window._cstParts(new Date()):{y:new Date().getFullYear(),m:new Date().getMonth()+1,d:new Date().getDate()};
+        var _todayCSTObj=new Date(_c.y,_c.m-1,_c.d);
+        var _isTradingToday=window._isAshareTradingDay?window._isAshareTradingDay(_todayCSTObj):true;
         var _isPreMarketTree=_nowHr<9.416; // 09:25 前
         var _isStaleData=_dataDate!==_today || (_dataDate===_today && _dataHour<9);
-        if(_isPreMarketTree && _isStaleData){
+        if(_isPreMarketTree && _isStaleData && _isTradingToday){
           el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">📭 行业板块数据（盘前自动清空，开盘后更新）</div>';
           if(timeEl) timeEl.innerHTML = '<span style="font-size:11px;color:var(--dim)">盘前 · 数据待刷新</span>';
           return;

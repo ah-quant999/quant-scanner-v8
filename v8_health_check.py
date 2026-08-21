@@ -1316,6 +1316,25 @@ def check_raw_data():
             status = "warn"
             msg = f"文件过小 ({p.stat().st_size} bytes)"
         results.append({"id": f"raw_{fn}", "name": f"raw_data/{fn}", "page": "管线", "status": status, "message": msg})
+    # 🛡 2026-08-22 规模巡检（主人令）：raw_data 文件总数上限——防止无声膨胀到
+    #   Git Trees API "input too large"（今天 848 文件 × 全量 tree 已触发 422）。
+    #   ok <850 / warn 850-1100 / fail >1100（850 为当前规模基线，留余量）
+    try:
+        n_files = sum(1 for _ in RAW_DIR.rglob("*") if _.is_file())
+        if n_files > 1100:
+            results.append({"id": "raw_volume", "name": "raw_data 文件数", "page": "管线",
+                            "status": "fail",
+                            "message": f"raw_data 共 {n_files} 个文件（>1100），仓库膨胀，需分流/归档"})
+        elif n_files > 850:
+            results.append({"id": "raw_volume", "name": "raw_data 文件数", "page": "管线",
+                            "status": "warn",
+                            "message": f"raw_data 共 {n_files} 个文件（>850），接近规模上限"})
+        else:
+            results.append({"id": "raw_volume", "name": "raw_data 文件数", "page": "管线",
+                            "status": "ok", "message": f"raw_data 共 {n_files} 个文件"})
+    except Exception as e:
+        results.append({"id": "raw_volume", "name": "raw_data 文件数", "page": "管线",
+                        "status": "warn", "message": f"统计失败: {e}"})
     return results
 
 

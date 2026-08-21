@@ -294,8 +294,25 @@ def step_push():
     if not PUSH:
         print("\n[3] 跳过推送（V8_PUSH != 1）")
         return
-    print("\n[3] 推送 raw_data → main（api_push_raw）")
-    r = subprocess.run([PY, "api_push_raw.py"], cwd=V8_ROOT)
+    print("\n[3] 推送 raw_data → main（api_push_raw，来源驱动增量）")
+    # 2026-08-22 来源驱动增量推送（主人令升级）：git status 收集"本次 changed"作清单，
+    #   聚焦推送本次算法链产物，不再全量 848 文件扫描；配合 api_push_raw 的 PUSH_FILES，
+    #   单次 tree 请求大小与仓库规模解耦（422 根治）。
+    manifest = ""
+    try:
+        out = subprocess.run(["git", "status", "--porcelain", "raw_data/", "data/"],
+                             cwd=V8_ROOT, capture_output=True, text=True, encoding="utf-8", timeout=60)
+        manifest = ",".join(ln.split(None, 1)[1] for ln in out.stdout.splitlines() if ln.strip())
+    except Exception as e:
+        print(f"  ⚠️ 收集变更清单失败，回退全量推送: {e}")
+    if manifest:
+        print(f"  📋 本次变更清单: {manifest[:200]}{'...' if len(manifest) > 200 else ''}")
+        env = dict(os.environ)
+        env["PUSH_FILES"] = manifest
+        r = subprocess.run([PY, "api_push_raw.py"], cwd=V8_ROOT, env=env)
+    else:
+        print("  ℹ️ 本次无 raw_data/data 变更，跳过推送")
+        return
     if r.returncode == 0:
         print("  ✅ 已推送")
     else:

@@ -240,11 +240,32 @@ def _stamp_index_v(index_text: str, changed: dict) -> tuple:
 
 
 def main():
-    files = walk_raw()
-    files.update(walk_extra())
+    # 2026-08-22 来源驱动增量推送（主人令升级）：支持 PUSH_FILES 环境变量（逗号分隔相对路径）。
+    #   - 有 PUSH_FILES：只处理清单内文件（workflow 用 git status 收集"本次 changed"，聚焦且不漏）；
+    #   - 无 PUSH_FILES：回退全量 walk_raw + walk_extra（兼容旧调用/本地手动跑）。
+    # 两种模式都只把「变更集」提交进 tree（base_tree 增量），单次请求大小与仓库规模解耦，
+    # 彻底绕开 Git Trees API 的 "input too large" 422。
+    # 🛡 累计数据守卫（主人令）：history/ 与 *_history.json 等时间序列为「只增不改」数据——
+    #   ① 任何模式都不从 tree 中删除（base_tree 继承未列出路径，天然保留）；
+    #   ② 防倒退时间戳守卫（下方 existing 比对）保证绝不覆盖远端更新版本。
+    push_files_env = os.environ.get("PUSH_FILES", "").strip()
+    if push_files_env:
+        files = {}
+        _missing = []
+        for _rel in [p.strip() for p in push_files_env.split(",") if p.strip()]:
+            if os.path.isfile(_rel):
+                with open(_rel, "rb") as _fh:
+                    files[_rel] = _fh.read()
+            else:
+                _missing.append(_rel)
+        if _missing:
+            print(f"⚠️ 清单中 {len(_missing)} 个文件不存在（跳过）: {_missing[:10]}")
+    else:
+        files = walk_raw()
+        files.update(walk_extra())
     if not files:
-        print("ℹ️ raw_data 为空，跳过"); sys.exit(0)
-    print(f"待推送文件: {len(files)} 个 -> {sorted(files)[:5]} ...")
+        print("ℹ️ 无文件可推送，跳过"); sys.exit(0)
+    print(f"待推送文件: 收集 {len(files)} 个 -> {sorted(files)[:5]} ...")
 
     # 现有 main 树里的 raw_data 子树（及额外文件）的 blob sha，用于变更检测
     ref = api("GET", f"/repos/{REPO}/git/refs/heads/main")
@@ -358,6 +379,10 @@ def main():
             print("  ⚠️ 拉取 index.html 失败，?v 将交由 reconcile 自愈")
 
     print(f"📊 未变化 {unchanged} / 防倒退跳过 {len(regressed)} / 待更新 {len(new_entries)}")
+    # 🛡 2026-08-22 规模巡检（主人令）：单次提交过大 = 全量重建/仓库膨胀信号，告警便于及时发现
+    if len(new_entries) > 300:
+        print(f"⚠️ 单次提交 {len(new_entries)} 个文件（>300）——推送规模偏大，"
+              f"疑似全量重建或仓库膨胀，请核查来源驱动清单是否生效")
     if regressed:
         for p, lts, rts in regressed:
             print(f"  🛡️ 防倒退跳过 {p}: 本地({lts}) < 远端({rts})")
