@@ -437,5 +437,135 @@
     "message": "未找到元素"
    }
   ]
+ },
+ {
+  "date": "2026-08-21",
+  "time": "15:00:31",
+  "overall": "fail",
+  "summary": {
+   "ok": 90,
+   "warn": 8,
+   "fail": 15,
+   "total": 113
+  },
+  "warn_items": [
+   {
+    "id": "dom_taskScheduleBody",
+    "name": "DOM #taskScheduleBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttBackBody",
+    "name": "DOM #ttBackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttThrBody",
+    "name": "DOM #ttThrBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttSvlBody",
+    "name": "DOM #ttSvlBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttTrackBody",
+    "name": "DOM #ttTrackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsAdvBody",
+    "name": "DOM #stcrdsAdvBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsEliteBody",
+    "name": "DOM #stcrdsEliteBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_healthCheckBody",
+    "name": "DOM #healthCheckBody",
+    "message": "静态占位符(JS渲染)"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "SH_FIB",
+    "name": "市场温度计",
+    "message": "更新于 今日 15:39；超过阈值 360 分钟"
+   },
+   {
+    "id": "SIX_DIM_RADAR",
+    "name": "六维共振雷达",
+    "message": "更新于 今日 15:39；超过阈值 360 分钟"
+   },
+   {
+    "id": "CANDIDATE",
+    "name": "候选池",
+    "message": "更新于 昨日 23:26；超过阈值 360 分钟"
+   },
+   {
+    "id": "GOLD_POOL",
+    "name": "黄金池",
+    "message": "更新于 今日 15:51；超过阈值 360 分钟"
+   },
+   {
+    "id": "INST_TRADE",
+    "name": "机构买卖",
+    "message": "更新于 今日 15:39；超过阈值 360 分钟"
+   },
+   {
+    "id": "TRIPLE_CONSENSUS",
+    "name": "三重共识",
+    "message": "更新于 昨日 23:52；超过阈值 360 分钟"
+   },
+   {
+    "id": "COCKPIT_ADVICE",
+    "name": "驾驶舱",
+    "message": "更新于 今日 15:51；超过阈值 360 分钟"
+   },
+   {
+    "id": "TOP10_DAILY",
+    "name": "全站精选",
+    "message": "更新于 昨日 23:40；超过阈值 360 分钟"
+   },
+   {
+    "id": "STOCK_RPS",
+    "name": "相对强度",
+    "message": "更新于 昨日 23:40；超过阈值 360 分钟"
+   },
+   {
+    "id": "CRDS_CARD_DATA",
+    "name": "逆势龙头",
+    "message": "更新于 昨日 23:10；超过阈值 360 分钟"
+   },
+   {
+    "id": "dom_phMacroBody",
+    "name": "DOM #phMacroBody",
+    "message": "未找到元素"
+   },
+   {
+    "id": "all_FINAL_RECOMMEND_DATA",
+    "name": "FINAL_RECOMMEND_DATA",
+    "message": "FINAL_RECOMMEND_DATA.js 更新于 昨日 18:21；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_FOUR_VOLUME_60M",
+    "name": "FOUR_VOLUME_60M",
+    "message": "FOUR_VOLUME_60M.js 更新于 昨日 10:00；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_H_AUTO_BUY_TRACK",
+    "name": "H_AUTO_BUY_TRACK",
+    "message": "H_AUTO_BUY_TRACK.js 更新于 昨日 10:59；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_LHB_7D",
+    "name": "LHB_7D",
+    "message": "LHB_7D.js 更新于 昨日 21:42；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   }
+  ]
  }
 ]
