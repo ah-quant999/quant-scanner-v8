@@ -118,17 +118,7 @@ jobs:
           COUNT=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/${{ github.repository }}/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=100" \
-            | python3 -c "
-import json,sys,os
-rid=os.environ.get('RUN_ID','')
-d=json.load(sys.stdin)
-act=0
-for r in d.get('workflow_runs',[]):
-    if str(r.get('id',''))==rid: continue
-    if r.get('status') in ('in_progress','queued','waiting','pending','requested'):
-        act+=1
-print(act)
-")
+            | python3 -c "import json,sys,os;rid=os.environ.get('RUN_ID','');d=json.load(sys.stdin);print(sum(1 for r in d.get('workflow_runs',[]) if str(r.get('id',''))!=rid and r.get('status') in ('in_progress','queued','waiting','pending','requested')))")
           echo "同 workflow 并发 run 数(排除自己): $COUNT"
           if [ -n "$COUNT" ] && [ "$COUNT" -gt 0 ]; then
             echo "✅ 已有 $COUNT 个同 workflow run 执行/排队，本 run 幂等退出（避免堆积/重复抓取/互相覆盖）"
