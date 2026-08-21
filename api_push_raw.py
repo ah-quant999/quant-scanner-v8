@@ -52,9 +52,18 @@ def api(method, path, data=None):
     #   ETF_DAILY_MONITOR 等盘中数据整批丢失，cn fetch 判 failure）。
     # 修法：1) 异常元组补 http.client.HTTPException；
     #      2) 幂等请求(GET)内建 3 次退避重读，抵御 cn runner 网络抖动，不再靠调用方兜底。
+    # 🔴 2026-08-21 19:3x 一劳永逸根因修复（主人令「实时数据没有收盘数据」）：
+    #   HTTP 403（secondary rate limit / abuse detection）此前**直接返回错误、不重试**
+    #   → 18:55 那次 cn_fetch 抓到了收盘数据，但 GET /git/refs/heads/main 吃 403 就放弃，
+    #     step 又是 continue-on-error → job 判 success（假成功）→ 收盘数据永远推不上 main，
+    #     前端实时卡定格在 14:52。限流是**瞬态**的，必须退避重试而不是弃疗。
+    #   策略：403/429 视作限流 → 尊重 Retry-After / x-ratelimit-reset，退避重试至多 4 次
+    #        （20s→40s→80s→160s，上限 180s）；其余 4xx/5xx 保持原样立即返回。
     attempts = 3 if method.upper() == "GET" else 1
+    rl_tries, rl_max = 0, 4
     last_msg = ""
-    for i in range(attempts):
+    i = 0
+    while i < attempts:
         try:
             with urllib.request.urlopen(req, timeout=300) as r:
                 txt = r.read().decode("utf-8")
@@ -68,6 +77,22 @@ def api(method, path, data=None):
                 print(f"     doc: {err.get('documentation_url')}")
             except Exception:
                 print(f"     body: {body[:500]}")
+            if e.code in (403, 429) and rl_tries < rl_max:
+                rl_tries += 1
+                wait = min(20 * (2 ** (rl_tries - 1)), 180)
+                try:
+                    ra = e.headers.get("Retry-After")
+                    if ra:
+                        wait = max(wait, min(int(float(ra)), 180))
+                    elif e.headers.get("x-ratelimit-remaining") == "0":
+                        reset = int(e.headers.get("x-ratelimit-reset", "0"))
+                        wait = max(wait, min(max(reset - int(_time.time()), 0) + 5, 180))
+                except Exception:
+                    pass
+                print(f"     ⏳ 判定为 API 限流，退避 {wait}s 后重试 {rl_tries}/{rl_max}"
+                      f"（不重试就会造成『抓到数据推不上去』的假成功）")
+                _time.sleep(wait)
+                continue
             return {"__error__": e.code, "__msg__": body}
         except (TimeoutError, urllib.error.URLError, OSError,
                 http.client.HTTPException, json.JSONDecodeError) as e:
@@ -77,6 +102,7 @@ def api(method, path, data=None):
                 wait = 2 ** i
                 print(f"     ↻ 幂等重试 {i + 1}/{attempts - 1}（{wait}s 后）")
                 _time.sleep(wait)
+            i += 1
     return {"__error__": "network", "__msg__": last_msg}
 
 

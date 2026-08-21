@@ -57,6 +57,56 @@ def latest_run(wf_file):
     r = runs[0]
     return r.get("created_at"), r.get("conclusion")
 
+def runs_of(wf_file, per_page=30):
+    d = api("GET", f"/repos/{REPO}/actions/workflows/{wf_file}/runs?per_page={per_page}")
+    return d.get("workflow_runs", [])
+
+
+# 🔴 2026-08-21 19:3x 一劳永逸根因修复（主人令「核查，一劳永逸式修复」）：
+#   原逻辑「最近一条 run 不是今日 success → 派发」既不看有没有 run 正在跑，也没有冷却，
+#   更没有失败熔断。算法链一失败就每 1-2 分钟被补派一次，实测今日堆到 150 个 run、
+#   11-20 个并发 → 打爆 GitHub secondary rate limit(403) → 算法链 100% 超时失败，
+#   连带 cn_fetch 的 api_push_raw 也 403（收盘数据推不上 main，实时卡停在 14:52）。
+#   本守卫纯 API 判定、无状态：不依赖 repo 内锁文件（patrol 用 cancel-in-progress: true，
+#   锁文件 push 常被 cancel → 锁永远写不回，data/.heal_dispatch.json 停在 13:56 即实证）。
+def dispatch_guard(wf_file, now, cooldown_min=30, max_fail_today=3):
+    """返回 (allow, reason)。三道闸：在跑/排队 → 冷却窗口 → 当日失败熔断。"""
+    runs = runs_of(wf_file)
+    if not runs:
+        return True, "无历史 run，允许派发"
+    live = [r for r in runs
+            if r.get("status") in ("queued", "pending", "waiting", "requested", "in_progress")]
+    if live:
+        return False, "已有 %d 个 run 在跑/排队，再派发只会加剧并发限流 → 跳过" % len(live)
+    last = runs[0]
+    ct, ago = None, 9999.0
+    try:
+        ct = datetime.datetime.fromisoformat(
+            last.get("created_at", "").replace("Z", "+00:00")).astimezone(CST)
+        ago = (now - ct).total_seconds() / 60.0
+    except Exception:
+        pass
+    if ago <= cooldown_min:
+        return False, "最近一次 run 于 %s（%.0f 分钟前），%d 分钟冷却内不重复派发" % (
+            ct.strftime("%H:%M") if ct else "?", ago, cooldown_min)
+    fails_today = 0
+    for r in runs:
+        if r.get("conclusion") != "failure":
+            continue
+        try:
+            rt = datetime.datetime.fromisoformat(
+                r.get("created_at", "").replace("Z", "+00:00")).astimezone(CST)
+        except Exception:
+            continue
+        if rt.date() == now.date():
+            fails_today += 1
+    if fails_today >= max_fail_today:
+        return False, ("🚨 熔断：%s 今日已失败 %d 次（阈值 %d）→ 停止自动补派，"
+                       "属真故障需人工介入（继续派发只会烧额度并触发 API 限流）"
+                       % (wf_file, fails_today, max_fail_today))
+    return True, "允许派发（今日失败 %d 次 < 阈值 %d）" % (fails_today, max_fail_today)
+
+
 def dispatch(wf_file, inputs=None):
     payload = {"ref": "main"}
     if inputs:
@@ -137,8 +187,12 @@ def main():
             need_rg = False
             print(f"  风险温度计: 最近成功于 {ct.strftime('%H:%M')}（{ago:.0f}分钟前），无需补发")
     if need_rg:
-        print("  风险温度计: 超时未更新，派发")
-        dispatch("v8_risk_gauge.yml")
+        allow, why = dispatch_guard("v8_risk_gauge.yml", now, cooldown_min=30, max_fail_today=5)
+        if allow:
+            print("  风险温度计: 超时未更新，派发（%s）" % why)
+            dispatch("v8_risk_gauge.yml")
+        else:
+            print("  风险温度计: %s" % why)
 
     # 2) 算法链：仅 >=18:00 且今日未成功跑过才派发
     if now.hour >= 18:
@@ -151,8 +205,15 @@ def main():
                 ran_today = True
                 print(f"  算法链: 今日已成功于 {ct.strftime('%H:%M')}，无需补发")
         if not ran_today:
-            print("  算法链: 今日尚未成功运行（或已过时），派发")
-            dispatch("v8_algo_cloud.yml")
+            # 算法链单轮 20-40 分钟：冷却 45 分钟（>单轮耗时，避免"上一轮刚跑完就再派"）；
+            # 今日失败 >=3 次即熔断，交人工（历史教训：不熔断会滚到 150 个 run / 403 限流）。
+            allow, why = dispatch_guard("v8_algo_cloud.yml", now,
+                                        cooldown_min=45, max_fail_today=3)
+            if allow:
+                print("  算法链: 今日尚未成功运行，派发（%s）" % why)
+                dispatch("v8_algo_cloud.yml")
+            else:
+                print("  算法链: %s" % why)
     else:
         print(f"  算法链: 当前 {now.hour}:xx 未到 18:00，跳过（等盘后 LHB 发布）")
 

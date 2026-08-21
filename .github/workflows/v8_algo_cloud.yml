@@ -48,6 +48,21 @@ on:
 permissions:
   contents: write
 
+# 🔴 2026-08-21 19:2x 一劳永逸根因修复（主人令「核查，一劳永逸式修复」）：
+#   本 workflow 此前**没有 concurrency 段** → 算法链失败后自愈派发器
+#   （.github/scripts/cloud_dispatcher.py + patrol self_heal）每 1-2 分钟补派一次，
+#   实测同时有 11-20 个 run 并发；每个 run 的「经 GitHub API 同步源码」要逐 blob 拉全仓
+#   上千文件 → 并发洪流触发 GitHub **secondary rate limit（HTTP 403）**，造成双杀：
+#     ① 算法链本身 100% 卡在同步源码步骤 10 分钟超时（今日 134 次 failure，
+#        候选池/三重共识/全站精选/最终推荐全部停在昨晚 23:xx）；
+#     ② 姊妹 workflow cn_fetch 的 api_push_raw.py 取 main ref 同样吃 403 →
+#        收盘数据抓到却推不上 main → 实时数据卡永久停在 14:52（「没有收盘数据」）。
+#   加 concurrency：同一时刻最多 1 跑 + 1 排队，API 压力从根上消失。
+#   cancel-in-progress: false —— 算法链单轮 20-40 分钟，绝不能被新派发打断（会丢产物）。
+concurrency:
+  group: v8-algo-cloud
+  cancel-in-progress: false
+
 jobs:
   algo:
     # 🔴 2026-08-20 一劳永逸根因修复（小九令「即使 cn runner 离线也能独立运作」）：
@@ -102,11 +117,27 @@ jobs:
       run:
         shell: bash
     steps:
-      # 🔴 2026-08-16 根治 Checkout 失败：alimi-cn runner 的 git 协议连不上 github.com:443
-      #   （Failed to connect to github.com port 443），actions/checkout@v4 走 git fetch 必挂。
-      #   改走 GitHub REST API（api.github.com 畅通）同步源码，与 v8_algo_run.yml 的
-      #   cn 应急回退同思路。blob 下载带 sha 校验防截断，大文件未变则跳过。
-      - name: "📥 经 GitHub API 同步源码（绕开 cn git 墙）"
+      # 🔴 2026-08-21 19:2x 一劳永逸根因修复（主人令）：
+      #   本 job 的 runs-on 已于 08-20 从 [self-hosted, cn] 改成 ubuntu-latest，
+      #   而「经 GitHub API 同步源码（绕开 cn git 墙）」是给被墙的 cn runner 写的遗留方案。
+      #   在 GitHub 云端 runner 上 git 直连本来毫无障碍，却仍逐 blob 拉全仓上千文件
+      #   （空目录起步 → 本地 sha 全不命中 → 每个文件一次 blob API）：
+      #     - 正常时慢（数分钟），逼近 10 分钟 timeout；
+      #     - 一旦有并发（今日 11-20 个 run）立刻打爆 secondary rate limit → 全量 403 →
+      #       每文件 6 次重试 + 20s 惩罚 → 必然 10 分钟超时 → 算法链 100% 失败。
+      #   改为标准 actions/checkout@v4（秒级、0 次 blob API），API 同步只在 checkout
+      #   失败时作回退（保留给将来切回 cn 自托管 runner 被墙的场景）。
+      - name: "📥 Checkout 源码（云端 git 直连，秒级）"
+        id: co
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      # 回退：仅当上一步 checkout 失败才走 REST API 同步（cn runner 被墙场景）。
+      #   2026-08-16 首次引入；blob 下载带 sha 校验防截断，大文件未变则跳过。
+      - name: "📥 回退·经 GitHub API 同步源码（仅 checkout 失败时）"
+        if: steps.co.outcome == 'failure'
         timeout-minutes: 10
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
