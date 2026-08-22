@@ -2079,11 +2079,8 @@ def send_report_email(report, healed=None, failed=None):
             continue
         if it.get("heal", "").startswith("已自动"):
             continue  # 已自愈，无需人工
-        # 🛡 2026-08-18 主人令一劳永逸：OCR 抽取数据（STOCK_MOMENTUM_STATE/V2）需要人工提供盘后选股 PDF
-        # 才能刷新（OCR 管线等输入，自动巡检永远无法修复）→ 免邮件（看板红叉保留提示主人给 PDF），
-        # 避免每晚 22:30 定时邮件轰炸主人。
-        if "MOMENTUM" in it.get("id", ""):
-            continue
+        # 2026-08-22 起：STOCK_MOMENTUM_STATE/V2 已脱离 PDF，由 gen_strong_breakout 每日盘后自选强势突破自合成，
+        # 不再走 OCR 人工依赖豁免。此类失败按普通卡处理（纳入邮件/告警）。
         remaining.append(it)
 
     quiet = in_quiet_hours()

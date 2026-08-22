@@ -169,11 +169,9 @@ def dispatch(wf_file, inputs=None):
     else:
         print(f"  ❌ 派发 {wf_file} 失败")
 
-# 3) 动量共识筛选重算（2026-08-19 一劳永逸修复）：
-#    MOMENTUM_FILTER 候选清单由 OCR 标签(超跌反弹/consec_before/stage)驱动，属【日频信号】，
-#    盘中重算内容不变(--emit-js 幂等跳过)，故不可用「盘中陈旧分钟」判定。真正的触发条件是
-#    主人喂入新盘后选股 PDF → OCR 更新 STOCK_MOMENTUM_STATE_V2.js（其最大 date > MOMENTUM_FILTER.generated
-#    日期）→ 派发 v8_algo_intraday_lite.yml 重算。OCR 可出现在任意时刻（不限于盘中），故不作窗口限制。
+# 3) 动量共识筛选重算（2026-08-22 起脱离 PDF，由 gen_momentum_self 每日盘后自合成）：
+#    V2 与 MOMENTUM_FILTER 现已随盘后构建(update_v8.run_experiment_cards)每日自动重算。
+#    本 dispatcher 仅作兜底：当 V2 生成日 < 今日（盘后构建漏跑/被冲掉）时，派发轻量链补算。
 REPO_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 MOMENTUM_LITE_WF = "v8_algo_intraday_lite.yml"
 MOMENTUM_LITE_COOLDOWN_MIN = 120
@@ -184,25 +182,23 @@ def _first_date(s):
     return m.group(1) if m else None
 
 def _momentum_filter_needs_recompute():
-    """有新 OCR 输入(OCR 源最大 date > filter 生成日期)或 filter 缺失 → 需重算。"""
+    """V2 生成日 < 今日(交易日漏跑)或 filter 缺失 → 需重算（兜底，非 OCR 触发）。"""
     f = os.path.join(REPO_ROOT, "data", "MOMENTUM_FILTER.js")
     s = os.path.join(REPO_ROOT, "data", "STOCK_MOMENTUM_STATE_V2.js")
     if not os.path.exists(f):
         return True, "MOMENTUM_FILTER.js 缺失"
     if not os.path.exists(s):
-        return False, "STOCK_MOMENTUM_STATE_V2.js 缺失(无 OCR 源，无法判定)"
+        return True, "STOCK_MOMENTUM_STATE_V2.js 缺失(需补算)"
     try:
-        fsrc = open(f, encoding="utf-8").read()
         ssrc = open(s, encoding="utf-8").read()
-        mg = re.search(r'["\']generated["\']\s*:\s*["\']([\d-]+)', fsrc)
-        fg = _first_date(mg.group(1)) if mg else None
-        dates = re.findall(r'["\']date["\']\s*:\s*["\'](\d{4}-\d{2}-\d{2})', ssrc)
-        sd = max(dates) if dates else None
-        if not fg:
-            return True, "MOMENTUM_FILTER 无法解析 generated"
-        if sd and sd > fg:
-            return True, "新 OCR 输入(源 %s > filter %s)" % (sd, fg)
-        return False, "无新 OCR 输入(源 %s 未超过 filter %s)" % (sd, fg)
+        mg = re.search(r'["\']generated["\']\s*:\s*["\']([\d-]+)', ssrc)
+        vg = _first_date(mg.group(1)) if mg else None
+        today = datetime.datetime.now(CST).strftime("%Y-%m-%d")
+        if not vg:
+            return True, "V2 无法解析 generated"
+        if vg < today:
+            return True, "V2 陈旧(生成 %s < 今日 %s)，需补算" % (vg, today)
+        return False, "V2 已为今日(%s)，无需重算" % vg
     except Exception as e:
         return True, "解析异常: " + str(e)
 

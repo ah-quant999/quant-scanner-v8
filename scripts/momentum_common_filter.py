@@ -110,9 +110,11 @@ def main():
         return (len(t), 100 * sum(1 for v in t if v > 0) / len(t), statistics.mean(t))
 
     # ─────────── 无泄漏筛选链（全部入选日当天可知）───────────
-    # S1 含「超跌反弹」OCR 标签（实测 60.3% 胜率，最强单信号）
-    S1 = [r for r in rows if "超跌反弹" in (r.get("categories") or [])]
-    # S2 入选前连涨 ≤ 1（追高过滤，实测 66.7% 胜率）
+    # 2026-08-22 升级：数据源由 OCR 共识改为「H反推升级算法」自选强势突破，
+    #   原「超跌反弹」OCR 标签已不存在，改为强势信号集（突破/超跌反弹/加速/强势股/短线选股）。
+    STRONG_LABELS = {"突破", "超跌反弹", "加速", "强势股", "短线选股"}
+    S1 = [r for r in rows if set(r.get("categories") or []) & STRONG_LABELS]
+    # S2 入选前连涨 ≤ 1（追高过滤，实测 66.7% 胜率，保留）
     S2 = [r for r in S1 if (r.get("consec_before") is not None and r["consec_before"] <= 1)]
     # S3 剔除主升/启动板块（方向成立；无K线不剔除——R6 实测剔除后反而变差）
     S3 = [r for r in S2 if r.get("stage") not in ("主升", "启动")]
@@ -171,7 +173,9 @@ def main():
         # candidates 注入 live 字段（实时跟踪 + 入选时维度）
         "candidates": [{"code": r["code"], "name": r["qname"], "industry": r["industry"],
                         "date": r.get("date"), "consec_before": r.get("consec_before"),
-                        "sel_change_pct": r.get("sel_change_pct"), "t5_gain_pct": r.get("t5_gain_pct"),
+                        "sel_change_pct": r.get("sel_change_pct"),
+                        "t1_gain_pct": r.get("t1_gain_pct"), "t3_gain_pct": r.get("t3_gain_pct"),
+                        "t5_gain_pct": r.get("t5_gain_pct"), "t10_gain_pct": r.get("t10_gain_pct"),
                         "stage": r.get("stage"), "categories": r.get("categories"),
                         # 🛡 live 实时跟踪 6 字段（每日盘后随 STOCK_QUOTE 刷新）
                         "live_price": r.get("live_price"),

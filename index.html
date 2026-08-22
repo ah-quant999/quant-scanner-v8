@@ -1255,6 +1255,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/STOCK_MOMENTUM_STATE.js?v=57b2500500" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=9c5a135fba" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=dffd47c355" defer></script>
+    <script src="data/ALGO_BACKTEST_COMPARE.js?v=algo010" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -10945,6 +10946,44 @@ function drawUpDownChart(){
     h+='<b style="color:#38bdf8;">② 观察池</b>：本卡「🚀 个股动量状态」共识股（当日 ≥2 分类同时看好）仅观察，① 清单 ∩ ② 共识 = 加分项。<br>';
     h+='<b style="color:#a78bfa;">③ 纪律</b>：止损 入场×0.90（-10% 封顶）｜止盈 前60日高点。避开「主升/启动」板块（追高回撤大，回测反向）。';
     h+='</div></div></div>';
+
+    // ── 📊 两套算法回测横向对比（2026-08-23 主人令：同一口径比胜率+收益率）──
+    var _cmp = window.ALGO_BACKTEST_COMPARE;
+    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">';
+    h+='<h3 style="font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">📊</span>两套算法回测对比 <span style="font-size:10px;color:#94a3b8;font-weight:400">H反推 vs 强势突破 · 同一口径</span>';
+    h+=_uBadge('盘后','对比',_cmp?_cmp.generated:null)+'</h3>';
+    if(!_cmp || !_cmp.algorithms){
+      h+='<div class="note">对比数据未生成（由 algo_backtest_compare.py 在构建末尾产出）</div>';
+    } else {
+      var _ha=_cmp.algorithms.h_reverse, _sb=_cmp.algorithms.strong_breakout;
+      var _hz=[['t1','T+1'],['t3','T+3'],['t5','T+5'],['t10','T+10']];
+      h+='<div style="font-size:11px;color:var(--dim);margin-bottom:6px;">胜率=该周期收益&gt;0占比；平均收益=样本均值%；命中率(≥5%)为原H反推定义。绿高优。</div>';
+      h+='<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;">';
+      h+='<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+      h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">算法</th>';
+      _hz.forEach(function(x){ h+='<th style="padding:6px 5px;text-align:center;color:var(--sub);">'+x[1]+'胜率</th><th style="padding:6px 5px;text-align:center;color:var(--sub);">'+x[1]+'均收益</th>'; });
+      h+='</tr></thead><tbody>';
+      [['h_reverse',_ha,'#38bdf8'],['strong_breakout',_sb,'#f59e0b']].forEach(function(rw){
+        var a=rw[1], col=rw[2];
+        var _sn=(a&&a.summary&&a.summary.n_samples)?a.summary.n_samples:0;
+        var _hzs=(a&&a.summary)?a.summary.horizons:null;
+        h+='<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+        h+='<td style="padding:5px 5px;font-weight:700;color:'+col+';white-space:nowrap;">'+(a?a.name:'?')+' <span style="color:var(--dim);font-weight:400;font-size:11px;">(n='+_sn+')</span></td>';
+        _hz.forEach(function(x){
+          var m=(_hzs)?_hzs[x[0]]:null;
+          var win=(m)?m.win:null, avg=(m)?m.avg:null;
+          h+='<td style="padding:5px 5px;text-align:center;color:'+(win!=null?(win>=50?'var(--up)':'var(--down)'):'var(--sub)')+';font-weight:600;">'+(win!=null?win+'%':'--')+'</td>';
+          h+='<td style="padding:5px 5px;text-align:center;color:'+(avg!=null?(avg>=0?'var(--up)':'var(--down)'):'var(--sub)')+';font-weight:600;">'+(avg!=null?(avg>0?'+':'')+avg+'%':'--')+'</td>';
+        });
+        h+='</tr>';
+      });
+      h+='</tbody></table></div>';
+      if(_cmp.verdict){
+        h+='<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:7px;padding:8px 10px;font-size:13px;line-height:1.7;color:var(--sub);margin-top:8px;">📌 结论：'+_cmp.verdict+'</div>';
+      }
+    }
+    h+='</div>';
+
     // ── 🎯 动量共识筛选（2026-08-16 无未来函数版，移入强势突破 pane1）──
     var _mf = window.MOMENTUM_FILTER;
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a855f7;">';
@@ -10967,11 +11006,16 @@ function drawUpDownChart(){
       h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">入选日</th>';
       h+='<th style="padding:6px 5px;text-align:right;color:var(--sub);">前连涨</th>';
       h+='<th style="padding:6px 5px;text-align:right;color:var(--sub);">入选日%</th>';
+      h+='<th style="padding:6px 5px;text-align:right;color:var(--sub);">T+1%</th>';
+      h+='<th style="padding:6px 5px;text-align:right;color:var(--sub);">T+3%</th>';
       h+='<th style="padding:6px 5px;text-align:right;color:var(--sub);">T+5%</th>';
+      h+='<th style="padding:6px 5px;text-align:right;color:var(--sub);">T+10%</th>';
       h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">阶段</th>';
       h+='</tr></thead><tbody>';
       _mf.candidates.slice(0,20).forEach(function(r,i){
         var t5=r.t5_gain_pct, t5Color = t5>0?'var(--up)':(t5<0?'var(--down)':'var(--sub)');
+        var tg=function(v){ return v>0?'var(--up)':(v<0?'var(--down)':'var(--sub)'); };
+        var f1=function(v){ return v!=null?(v>0?'+':'')+Number(v).toFixed(1):'--'; };
         var stage=r.stage||'无K线';
         var stageColor = stage==='震荡'?'#38bdf8':(stage==='退潮'?'#f59e0b':(stage==='底部'?'#22c55e':(stage==='主升'||stage==='启动')?'#ef4444':'#94a3b8'));
         h+='<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
@@ -10981,7 +11025,10 @@ function drawUpDownChart(){
         h+='<td style="padding:5px 5px;color:var(--dim);font-size:10.5px;">'+((r.date||'').slice(5))+'</td>';
         h+='<td style="padding:5px 5px;text-align:right;color:#c4b5fd;font-weight:700;">'+(r.consec_before!=null?r.consec_before:'--')+'天</td>';
         h+='<td style="padding:5px 5px;text-align:right;color:var(--sub);">'+(r.sel_change_pct!=null?Number(r.sel_change_pct).toFixed(1):'--')+'%</td>';
-        h+='<td style="padding:5px 5px;text-align:right;color:'+t5Color+';font-weight:600;">'+(t5!=null?(t5>0?'+':'')+t5.toFixed(1):'--')+'%</td>';
+        h+='<td style="padding:5px 5px;text-align:right;color:'+tg(r.t1_gain_pct)+';font-weight:600;">'+f1(r.t1_gain_pct)+'%</td>';
+        h+='<td style="padding:5px 5px;text-align:right;color:'+tg(r.t3_gain_pct)+';font-weight:600;">'+f1(r.t3_gain_pct)+'%</td>';
+        h+='<td style="padding:5px 5px;text-align:right;color:'+t5Color+';font-weight:600;">'+f1(r.t5_gain_pct)+'%</td>';
+        h+='<td style="padding:5px 5px;text-align:right;color:'+tg(r.t10_gain_pct)+';font-weight:600;">'+f1(r.t10_gain_pct)+'%</td>';
         h+='<td style="padding:5px 5px;color:'+stageColor+';font-size:11px;">'+stage+'</td>';
         h+='</tr>';
       });

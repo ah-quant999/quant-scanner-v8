@@ -884,6 +884,26 @@ def run_experiment_cards():
         except Exception as e:
             print(f"[experiment]   ⚠️ {script} 异常: {e}")
 
+    # 2026-08-22 主人令·脱离PDF：先由「H反推升级算法」(涨幅≥3%+量比≥1.2+突破+RS) 自选强势突破
+    # + 重算 V2 动量（写 data/STOCK_MOMENTUM_STATE.js / STOCK_MOMENTUM_STATE_V2.js），
+    # 再跑 momentum_common_filter 消费 V2。顺序不可颠倒。
+    momentum_self_py = Path(__file__).resolve().parent / "scripts" / "gen_strong_breakout.py"
+    if momentum_self_py.exists():
+        print(f"[experiment] ▶ gen_strong_breakout.py ({datetime.now():%H:%M:%S})")
+        try:
+            r = subprocess.run([sys.executable, str(momentum_self_py)],
+                               capture_output=True, text=True, timeout=1800)
+            if r.returncode == 0:
+                last = [l for l in r.stdout.strip().splitlines() if l.strip()][-1:] or [""]
+                print(f"[experiment]   ✅ {last[0][:80]}")
+            else:
+                print(f"[experiment]   ⚠️ gen_strong_breakout 退出码 {r.returncode}")
+                print("     " + "\n     ".join(r.stdout.strip().splitlines()[-2:] + r.stderr.strip().splitlines()[-2:])[:300])
+        except Exception as e:
+            print(f"[experiment]   ⚠️ gen_strong_breakout 异常: {e}")
+    else:
+        print("[experiment] ⚠️ 缺失 scripts/gen_strong_breakout.py，跳过")
+
     # 2026-08-16 主人令：动量共识筛选器（读 data/STOCK_MOMENTUM_STATE_V2.js + STOCK_QUOTE + SECTOR_RS）
     filter_py = Path(__file__).resolve().parent / "scripts" / "momentum_common_filter.py"
     if filter_py.exists():
@@ -901,6 +921,24 @@ def run_experiment_cards():
             print(f"[experiment]   ⚠️ momentum_common_filter 异常: {e}")
     else:
         print("[experiment] ⚠️ 缺失 scripts/momentum_common_filter.py，跳过")
+
+    # 2026-08-23 主人令：两套算法（H反推 vs 强势突破）回测横向对比，统一口径产出
+    # data/ALGO_BACKTEST_COMPARE.js（无网络依赖，纯聚合既有产物；失败不影响主流程）
+    compare_py = Path(__file__).resolve().parent / "scripts" / "algo_backtest_compare.py"
+    if compare_py.exists():
+        print(f"[experiment] ▶ algo_backtest_compare.py ({datetime.now():%H:%M:%S})")
+        try:
+            r = subprocess.run([sys.executable, str(compare_py)],
+                               capture_output=True, text=True, timeout=120)
+            if r.returncode == 0:
+                last = [l for l in r.stdout.strip().splitlines() if l.strip()][-1:] or [""]
+                print(f"[experiment]   ✅ {last[0][:120]}")
+            else:
+                print(f"[experiment]   ⚠️ algo_backtest_compare 退出码 {r.returncode}")
+        except Exception as e:
+            print(f"[experiment]   ⚠️ algo_backtest_compare 异常: {e}")
+    else:
+        print("[experiment] ⚠️ 缺失 scripts/algo_backtest_compare.py，跳过")
 
 
 def main():
