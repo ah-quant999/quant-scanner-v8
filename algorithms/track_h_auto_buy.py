@@ -203,6 +203,9 @@ def run(target_date=None, emit_js=True, top_n=50):
     s["T+5_rate"] = round(s["T+5_hit"] / s["n"] * 100, 1) if s["n"] else 0
     history["by_date"][target_date] = s
     history["last_updated"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # 🔴 2026-08-22 主人令修复：顶层 update_time 必须随每次生成刷新，
+    #   否则 v8_health_check/前端判龄一直读到旧时戳（08-20）误判陈旧
+    history["update_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # 重算 cumulative summary
     summary = {"days": 0, "tracked_picks": 0,
