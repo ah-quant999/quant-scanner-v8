@@ -177,14 +177,54 @@ def _query_kline_em(code, secid_prefix, days):
     return None
 
 
+# ---- 2026-08-22 主人令一劳永逸：baostock 第三兜底（mootdx/东财均不可达时，A股）----
+_BS_LOGGED_IN = False
+def _query_kline_bs(code, days):
+    """baostock 日K兜底（仅 A股，6 位数字代码）。返回 DataFrame 或 None。"""
+    global _BS_LOGGED_IN
+    if not (isinstance(code, str) and code.isdigit() and len(code) == 6):
+        return None
+    try:
+        import baostock as bs
+        if not _BS_LOGGED_IN:
+            lg = bs.login()
+            if lg.error_code != '0':
+                return None
+            _BS_LOGGED_IN = True
+        prefix = 'sh' if code.startswith(('6', '9')) else 'sz'
+        start = (datetime.now() - timedelta(days=days * 2 + 20)).strftime('%Y-%m-%d')
+        end = datetime.now().strftime('%Y-%m-%d')
+        rs = bs.query_history_k_data_plus(
+            f"{prefix}.{code}", "date,code,open,high,low,close,volume,amount",
+            start_date=start, end_date=end, frequency='d', adjustflag='2')
+        rows = []
+        while rs.error_code == '0' and rs.next():
+            rows.append(rs.get_row_data())
+        if len(rows) < 20:
+            return None
+        df = pd.DataFrame(rows, columns=rs.fields)
+        for c in ['open', 'high', 'low', 'close', 'volume', 'amount']:
+            df[c] = pd.to_numeric(df[c], errors='coerce')
+        df = df.sort_values("date").reset_index(drop=True)
+        df["pctChg"] = ((df["close"] / df["close"].shift(1) - 1) * 100).round(2)
+        df["pctChg"] = df["pctChg"].fillna(0.0)
+        return df
+    except Exception:
+        return None
+
+
 def _query_kline(code, market, days):
-    """取数调度: mootdx 优先, 东方财富兜底。"""
+    """取数调度: mootdx 优先 → 东财兜底 → baostock 兜底（2026-08-22 主人令防数据源全不可达）。"""
     df = _query_kline_mootdx(code, days)
     if df is not None and len(df) >= 60:
         return df
     # 东财
     prefix = "1" if market == "sh" else "0"
-    return _query_kline_em(code, prefix, days)
+    df = _query_kline_em(code, prefix, days)
+    if df is not None and len(df) >= 60:
+        return df
+    # baostock 第三兜底（A股）
+    return _query_kline_bs(code, days)
 
 
 # ---- 缓存 ----
