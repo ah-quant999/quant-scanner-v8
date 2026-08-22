@@ -1,45 +1,18 @@
 {
-  "update_time": "2026-08-21 23:17:24",
-  "data_date": "2026-08-21",
-  "track_start": "2026-08-21",
+  "update_time": "2026-08-22 15:31:26",
+  "data_date": "2026-08-22",
+  "track_start": "2026-08-22",
   "history_days": 5,
   "strict_count": 1,
   "near_count": 6,
   "tracked": [
-    {
-      "code": "300765",
-      "name": "石药创新",
-      "market": "sz",
-      "board": "创业板",
-      "status": "near",
-      "total_score": 39.6,
-      "quality_grade": "A",
-      "industry": "食品制造业",
-      "sectors": [
-        "食品制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-19",
-      "hold_days": 2,
-      "consecutive_days": 3,
-      "first_close": 43.15,
-      "current_close": 51.78,
-      "pnl_pct": 20.0,
-      "catalysts": [
-        {
-          "tag": "中报扭亏",
-          "score": 15,
-          "reaction": "已兑现(价涨)"
-        }
-      ]
-    },
     {
       "code": "600988",
       "name": "赤峰黄金",
       "market": "sh",
       "board": "主板",
       "status": "strict",
-      "total_score": 38.4,
+      "total_score": 36.0,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
@@ -50,61 +23,88 @@
       "hold_days": 1,
       "consecutive_days": 2,
       "first_close": 46.1,
-      "current_close": 46.1,
-      "pnl_pct": 0.0,
+      "current_close": 49.43,
+      "pnl_pct": 7.22,
       "catalysts": [
         {
           "tag": "中报预增",
           "score": 15,
-          "reaction": "观察中"
+          "reaction": "已兑现(价涨)"
         }
       ]
     },
     {
-      "code": "000703",
-      "name": "恒逸石化",
-      "market": "sz",
+      "code": "601899",
+      "name": "601899",
+      "market": "sh",
       "board": "主板",
       "status": "near",
-      "total_score": 38.4,
+      "total_score": 37.2,
       "quality_grade": "A",
-      "industry": "化学纤维制造业",
-      "sectors": [
-        "化学纤维制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-20",
-      "hold_days": 1,
-      "consecutive_days": 2,
-      "first_close": 20.1,
-      "current_close": 20.1,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "000426",
-      "name": "兴业银锡",
-      "market": "sz",
-      "board": "主板",
-      "status": "near",
-      "total_score": 34.4,
-      "quality_grade": "B",
       "industry": "有色金属矿采选业",
       "sectors": [
         "有色金属矿采选业"
       ],
       "signal_count": 0,
-      "enter_date": "2026-08-21",
+      "enter_date": "2026-08-17",
+      "hold_days": 5,
+      "consecutive_days": 1,
+      "first_close": 33.36,
+      "current_close": 34.74,
+      "pnl_pct": 4.14,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "已兑现(价涨)"
+        }
+      ]
+    },
+    {
+      "code": "688525",
+      "name": "佰维存储",
+      "market": "sh",
+      "board": "科创板",
+      "status": "near",
+      "total_score": 34.8,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-22",
       "hold_days": 1,
       "consecutive_days": 1,
-      "first_close": 38.56,
-      "current_close": 38.56,
+      "first_close": 238.96,
+      "current_close": 238.96,
+      "pnl_pct": 0.0,
+      "catalysts": [
+        {
+          "tag": "中报扭亏",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
+      "code": "600183",
+      "name": "生益科技",
+      "market": "sh",
+      "board": "主板",
+      "status": "near",
+      "total_score": 34.8,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-22",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 132.8,
+      "current_close": 132.8,
       "pnl_pct": 0.0,
       "catalysts": [
         {
@@ -120,18 +120,18 @@
       "market": "sh",
       "board": "主板",
       "status": "near",
-      "total_score": 33.6,
+      "total_score": 31.2,
       "quality_grade": "B",
       "industry": "有色金属矿采选业",
       "sectors": [
         "有色金属矿采选业"
       ],
       "signal_count": 0,
-      "enter_date": "2026-08-21",
+      "enter_date": "2026-08-22",
       "hold_days": 1,
       "consecutive_days": 1,
-      "first_close": 26.37,
-      "current_close": 26.37,
+      "first_close": 27.18,
+      "current_close": 27.18,
       "pnl_pct": 0.0,
       "catalysts": [
         {
@@ -142,50 +142,56 @@
       ]
     },
     {
-      "code": "300017",
-      "name": "网宿科技",
+      "code": "000426",
+      "name": "兴业银锡",
       "market": "sz",
-      "board": "创业板",
-      "status": "near",
-      "total_score": 28.8,
-      "quality_grade": "C",
-      "industry": "软件和信息技术服务业",
-      "sectors": [
-        "软件和信息技术服务业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-20",
-      "hold_days": 1,
-      "consecutive_days": 2,
-      "first_close": 15.86,
-      "current_close": 15.86,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "601899",
-      "name": "紫金矿业",
-      "market": "沪市",
       "board": "主板",
       "status": "near",
-      "total_score": 15,
-      "quality_grade": "A",
+      "total_score": 30.0,
+      "quality_grade": "B",
       "industry": "有色金属矿采选业",
       "sectors": [
         "有色金属矿采选业"
       ],
       "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 5,
+      "enter_date": "2026-08-22",
+      "hold_days": 1,
       "consecutive_days": 1,
-      "first_close": 33.36,
-      "current_close": null,
-      "pnl_pct": null,
+      "first_close": 40.88,
+      "current_close": 40.88,
+      "pnl_pct": 0.0,
       "catalysts": [
         {
           "tag": "中报预增",
           "score": 15,
-          "reaction": "—"
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
+      "code": "300502",
+      "name": "新易盛",
+      "market": "sz",
+      "board": "创业板",
+      "status": "near",
+      "total_score": 37.2,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 2,
+      "consecutive_days": 1,
+      "first_close": 448.08,
+      "current_close": 442.0,
+      "pnl_pct": -1.36,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
         }
       ]
     }
@@ -220,12 +226,6 @@
       "code": "688213",
       "name": "",
       "text": "(688213) 于 2026-08-17 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "warn",
-      "code": "300502",
-      "name": "新易盛",
-      "text": "新易盛(300502) 于 2026-08-19 跌出共识（曾连续 1 日）"
     },
     {
       "level": "warn",
@@ -283,9 +283,21 @@
     },
     {
       "level": "warn",
+      "code": "300765",
+      "name": "石药创新",
+      "text": "石药创新(300765) 于 2026-08-20 跌出共识（曾连续 2 日）"
+    },
+    {
+      "level": "warn",
       "code": "688019",
       "name": "",
       "text": "(688019) 于 2026-08-19 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300017",
+      "name": "网宿科技",
+      "text": "网宿科技(300017) 于 2026-08-20 跌出共识（曾连续 1 日）"
     },
     {
       "level": "warn",
@@ -298,6 +310,12 @@
       "code": "000651",
       "name": "",
       "text": "(000651) 于 2026-08-20 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "000703",
+      "name": "恒逸石化",
+      "text": "恒逸石化(000703) 于 2026-08-20 跌出共识（曾连续 1 日）"
     }
   ],
   "sector_cluster": {
@@ -307,30 +325,18 @@
         "count": 4,
         "names": [
           "赤峰黄金",
-          "兴业银锡",
+          "601899",
           "中金黄金",
-          "紫金矿业"
+          "兴业银锡"
         ]
       },
       {
-        "industry": "食品制造业",
-        "count": 1,
+        "industry": "计算机、通信和其他电子设备制造业",
+        "count": 3,
         "names": [
-          "石药创新"
-        ]
-      },
-      {
-        "industry": "化学纤维制造业",
-        "count": 1,
-        "names": [
-          "恒逸石化"
-        ]
-      },
-      {
-        "industry": "软件和信息技术服务业",
-        "count": 1,
-        "names": [
-          "网宿科技"
+          "佰维存储",
+          "生益科技",
+          "新易盛"
         ]
       }
     ],
@@ -340,16 +346,8 @@
         "count": 4
       },
       {
-        "sector": "食品制造业",
-        "count": 1
-      },
-      {
-        "sector": "化学纤维制造业",
-        "count": 1
-      },
-      {
-        "sector": "软件和信息技术服务业",
-        "count": 1
+        "sector": "计算机、通信和其他电子设备制造业",
+        "count": 3
       }
     ],
     "concentration": 57.14
@@ -362,21 +360,16 @@
       "names": []
     },
     "cockpit_a": {
-      "count": 4,
-      "overlap": 3,
+      "count": 1,
+      "overlap": 1,
       "names": [
-        "赤峰黄金",
-        "中金黄金",
-        "网宿科技"
+        "601899"
       ]
     },
     "cockpit_b": {
-      "count": 5,
-      "overlap": 2,
-      "names": [
-        "兴业银锡",
-        "紫金矿业"
-      ]
+      "count": 4,
+      "overlap": 0,
+      "names": []
     }
   },
   "backtest_signal": {
@@ -496,13 +489,13 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-08-21",
+    "track_start": "2026-08-22",
     "history_days": 5,
     "summary": {
       "1d": {
-        "count": 8,
-        "win_rate": 37.5,
-        "avg_return": 3.46
+        "count": 6,
+        "win_rate": 66.67,
+        "avg_return": 5.82
       },
       "3d": {
         "count": 2,
@@ -528,7 +521,7 @@
     "per_stock": [
       {
         "code": "601899",
-        "name": "紫金矿业",
+        "name": "601899",
         "enter_date": "2026-08-17",
         "offsets": {
           "1d": 6.26,
@@ -569,27 +562,11 @@
         }
       },
       {
-        "code": "300017",
-        "name": "网宿科技",
-        "enter_date": "2026-08-20",
-        "offsets": {
-          "1d": 0.0
-        }
-      },
-      {
         "code": "600988",
         "name": "赤峰黄金",
         "enter_date": "2026-08-20",
         "offsets": {
-          "1d": 0.0
-        }
-      },
-      {
-        "code": "000703",
-        "name": "恒逸石化",
-        "enter_date": "2026-08-20",
-        "offsets": {
-          "1d": 0.0
+          "1d": 7.22
         }
       }
     ]
