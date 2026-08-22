@@ -113,31 +113,83 @@ def is_trading_day(date_str):
         return d.strftime("%Y-%m-%d") in cal
     return True  # 查不到日历时保守：视为交易日（不写占位）
 
-def fetch_lhb_list(date_str):
+def _parse_lhb_list_em(df):
+    """东财龙虎榜列表 → 统一 stocks 结构"""
+    stocks = []
+    seen = set()
+    for _, row in df.iterrows():
+        code = str(row.get('代码', '')).zfill(6)
+        if code and code not in seen:
+            seen.add(code)
+            stocks.append({
+                'code': code,
+                'name': str(row.get('名称', '')),
+                'price': float(row.get('最新价', 0) or 0),
+                'pct': float(row.get('涨跌幅', 0) or 0),
+                'amount': float(row.get('龙虎榜净买额', 0) or 0),
+                'reason': str(row.get('上榜原因', '')),
+            })
+    return stocks
+
+def _fetch_lhb_list_em_with_retry(date_str, max_retry=3):
+    """东财列表主源（指数退避重试），全部失败返回 None。
+    2026-08-22 加：东财接口抖动常返回空/抛错，必须重试+兜底，否则整页空白。"""
+    import time
+    for attempt in range(max_retry):
+        try:
+            df = ak.stock_lhb_detail_em(start_date=date_str, end_date=date_str)
+            if df is not None and len(df) > 0:
+                return _parse_lhb_list_em(df)
+            log(f"东财列表返回空(第{attempt+1}/{max_retry}次)，重试...")
+        except Exception as e:
+            log(f"东财列表失败(第{attempt+1}/{max_retry}次): {e}")
+        if attempt < max_retry - 1:
+            time.sleep(3 * (attempt + 1))
+    return None
+
+def fetch_lhb_list_sina(date_str):
+    """非东财第三兜底：新浪每日龙虎榜列表（akshare stock_lhb_detail_daily_sina）。
+    仅含上榜股列表/原因，无逐笔席位与净买额，作为东财主源全失败时的降级来源，
+    保证页面不空白。对应值≈涨跌幅(偏离值)，净买额不可得置 0。"""
     try:
-        df = ak.stock_lhb_detail_em(start_date=date_str, end_date=date_str)
+        df = ak.stock_lhb_detail_daily_sina(date=date_str)
         if df is None or len(df) == 0:
-            log(f"龙虎榜：暂无{date_str}数据")
+            log("新浪龙虎榜列表：无数据")
             return []
         stocks = []
         seen = set()
         for _, row in df.iterrows():
-            code = str(row.get('代码', '')).zfill(6)
-            if code and code not in seen:
-                seen.add(code)
-                stocks.append({
-                    'code': code,
-                    'name': str(row.get('名称', '')),
-                    'price': float(row.get('最新价', 0) or 0),
-                    'pct': float(row.get('涨跌幅', 0) or 0),
-                    'amount': float(row.get('龙虎榜净买额', 0) or 0),
-                    'reason': str(row.get('上榜原因', '')),
-                })
-        log(f"龙虎榜：{len(stocks)} 只")
+            code = str(row.get('股票代码', '')).zfill(6)
+            if not code or code in seen:
+                continue
+            seen.add(code)
+            stocks.append({
+                'code': code,
+                'name': str(row.get('股票名称', '')),
+                'price': float(row.get('收盘价', 0) or 0),
+                'pct': float(row.get('对应值', 0) or 0),
+                'amount': 0.0,
+                'reason': str(row.get('指标', '')),
+            })
+        log(f"新浪龙虎榜列表：{len(stocks)} 只（降级：无席位明细）")
         return stocks
     except Exception as e:
-        log(f"获取龙虎榜失败: {e}")
+        log(f"新浪龙虎榜列表失败: {e}")
         return []
+
+def fetch_lhb_list(date_str):
+    # ★ 2026-08-22 修复：东财主源重试 → 新浪列表兜底，杜绝"整页空白"
+    stocks = _fetch_lhb_list_em_with_retry(date_str)
+    src = 'em'
+    if stocks is None:
+        log("东财列表主源全失败，切换新浪列表兜底...")
+        stocks = fetch_lhb_list_sina(date_str)
+        src = 'sina'
+    if not stocks:
+        log(f"龙虎榜：暂无{date_str}数据（来源：{src}）")
+        return []
+    log(f"龙虎榜列表来源：{src}，{len(stocks)} 只")
+    return stocks
 
 def fetch_seat_detail(stocks, date_str):
     """逐笔席位明细：合并买入/卖出页并去重，避免同一席位重复计算。
@@ -153,10 +205,20 @@ def fetch_seat_detail(stocks, date_str):
         detail_map[code] = {}
         seen = set()
         for flag in ['买入', '卖出']:
+            # ★ 2026-08-22 加：游资逐笔席位东财独家，瞬时抖动需重试，否则该股席位缺失
+            df = None
+            for attempt in range(3):
+                try:
+                    df = ak.stock_lhb_stock_detail_em(symbol=code, date=date_str, flag=flag)
+                    if df is not None and not df.empty:
+                        break
+                except Exception:
+                    pass
+                if attempt < 2:
+                    time.sleep(1)
+            if df is None or df.empty:
+                continue
             try:
-                df = ak.stock_lhb_stock_detail_em(symbol=code, date=date_str, flag=flag)
-                if df is None or df.empty:
-                    continue
                 for _, drow in df.iterrows():
                     seat = str(drow.get('交易营业部名称', ''))
                     if not seat:

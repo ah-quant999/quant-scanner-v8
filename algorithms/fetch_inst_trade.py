@@ -53,6 +53,51 @@ def _fetch_lhb_detail_with_retry(today, max_retry=4):
                 time.sleep(wait)
     return None
 
+def _fetch_lhb_jgmx_sina_with_retry(today, max_retry=3):
+    """非东财第三兜底：新浪机构明细（akshare stock_lhb_jgmx_sina）。
+    返回含 股票代码/股票名称/交易日期/机构席位买入额/机构席位卖出额/类型 的 DataFrame。
+    按交易日过滤；东财 jgmmtj/detail 全失败时启用，保证机构净买卖统计不空白。"""
+    import akshare as ak
+    import time
+    for attempt in range(max_retry):
+        try:
+            df = ak.stock_lhb_jgmx_sina()
+            if df is None or len(df) == 0:
+                return None
+            if len(today) == 8:
+                target = f"{today[:4]}-{today[4:6]}-{today[6:]}"
+                df = df[df['交易日期'].astype(str) == target]
+            if df is None or len(df) == 0:
+                return None
+            return df
+        except Exception as e:
+            log(f"新浪jgmx失败(第{attempt+1}/{max_retry}次): {e}")
+            if attempt < max_retry - 1:
+                time.sleep(3 * (attempt + 1))
+    return None
+
+def _normalize_sina_jgmx(df):
+    """把新浪机构明细列名归一化为 detail_em 同款列，复用下方 dedup 逻辑。
+    新浪仅给 机构席位买入额/卖出额，机构数/总成交额/占比等不可得置空。"""
+    import pandas as pd
+    out = pd.DataFrame()
+    out['代码'] = df['股票代码'].astype(str).str.zfill(6)
+    out['名称'] = df['股票名称'].astype(str)
+    out['机构买入净额'] = (df['机构席位买入额'].astype(float) - df['机构席位卖出额'].astype(float))
+    out['机构净买额'] = out['机构买入净额']
+    out['买方机构数'] = 0
+    out['卖方机构数'] = 0
+    out['机构买入总额'] = df['机构席位买入额'].astype(float)
+    out['机构卖出总额'] = df['机构席位卖出额'].astype(float)
+    out['市场总成交额'] = float('nan')
+    out['机构净买额占总成交额比'] = float('nan')
+    out['换手率'] = float('nan')
+    out['上榜原因'] = ''
+    out['收盘价'] = float('nan')
+    out['最新价'] = float('nan')
+    out['涨跌幅'] = float('nan')
+    return out
+
 def _num(row, *names, default=0.0):
     """容错读数值：多候选列名，None/NaN/缺失返回 default"""
     for n in names:
@@ -101,8 +146,15 @@ def main():
         df = _fetch_lhb_detail_with_retry(today)
         src = "detail_em"
     if df is None or len(df) == 0:
+        log("东财接口全失败，切换新浪机构明细兜底(jgmx_sina)...")
+        df = _fetch_lhb_jgmx_sina_with_retry(today)
+        src = "sina_jgmx"
+    if df is None or len(df) == 0:
         log("全部接口重试仍失败，保留旧数据（如有）")
         sys.exit(1)
+    # 新浪机构明细列名与东财不同，归一化为东财同款列再走 dedup
+    if src == "sina_jgmx":
+        df = _normalize_sina_jgmx(df)
     log(f"数据源: {src}，命中 {len(df)} 行")
 
     # Deduplicate by code (keep max net buy)；容错读列（两套接口列名不同）
