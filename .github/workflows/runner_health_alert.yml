@@ -142,8 +142,8 @@ jobs:
             "https://api.github.com/repos/$REPO/contents/data/RUNNER_STATUS_HEALTH.js" \
             | jq -r '.sha // ""')
           mkdir -p data
-          printf 'window.RUNNER_STATUS_HEALTH = {"runner":"lemoncat-cn","state":"%s","checked_at_utc":"%s","checked_at_bj":"%s","source":"runner_health_alert.yml"};\n' \
-            "$STATE" "$UTC_NOW" "$BJ_NOW" > data/RUNNER_STATUS_HEALTH.js
+          printf 'window.RUNNER_STATUS_HEALTH = {"runner":"lemoncat-cn","state":"%s","checked_at_utc":"%s","checked_at_bj":"%s","update_time":"%s","source":"runner_health_alert.yml"};\n' \
+            "$STATE" "$UTC_NOW" "$BJ_NOW" "$BJ_NOW" > data/RUNNER_STATUS_HEALTH.js
           B64=$(base64 -w0 data/RUNNER_STATUS_HEALTH.js)
           jq -n --arg m "runner health: $STATE @ $BJ_NOW" --arg c "$B64" --arg s "$SHA" \
             'if $s=="" then {message:$m, content:$c} else {message:$m, content:$c, sha:$s} end' > put.json

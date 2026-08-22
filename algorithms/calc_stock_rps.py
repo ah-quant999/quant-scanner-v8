@@ -214,7 +214,9 @@ def _query_kline_bs(code, days):
 
 
 def _query_kline(code, market, days):
-    """取数调度: mootdx 优先 → 东财兜底 → baostock 兜底（2026-08-22 主人令防数据源全不可达）。"""
+    """取数调度: 港股走 akshare 专线; A股 mootdx 优先 → 东财 → baostock 兜底。"""
+    if market == "hk":
+        return _query_kline_hk(code, days)
     df = _query_kline_mootdx(code, days)
     if df is not None and len(df) >= 60:
         return df
@@ -225,6 +227,55 @@ def _query_kline(code, market, days):
         return df
     # baostock 第三兜底（A股）
     return _query_kline_bs(code, days)
+
+
+# ---- 港股 K 线 + 恒指（2026-08-22 主人令：补齐港股 RPS，按市场分组算百分位）----
+def _query_kline_hk(code, days):
+    """港股日K (akshare stock_hk_hist)。code: 5位港股代码。失败返回 None，不影响 A股。"""
+    sym = str(code).zfill(5)
+    try:
+        import akshare as ak
+        df = ak.stock_hk_hist(symbol=sym, period="daily", adjust="qfq")
+        if df is None or len(df) < 20:
+            return None
+        rename = {"日期": "date", "开盘": "open", "收盘": "close", "最高": "high",
+                  "最低": "low", "成交量": "volume", "成交额": "amount"}
+        df = df.rename(columns={k: v for k, v in rename.items() if k in df.columns})
+        keep = [c for c in ["date", "open", "high", "low", "close", "volume", "amount"] if c in df.columns]
+        df = df[keep].copy()
+        df["date"] = df["date"].astype(str).str[:10]
+        for c in ["open", "high", "low", "close", "volume", "amount"]:
+            if c in df:
+                df[c] = pd.to_numeric(df[c], errors="coerce")
+        df = df.dropna(subset=["close"]).sort_values("date").reset_index(drop=True)
+        if len(df) < 20:
+            return None
+        df["pctChg"] = ((df["close"] / df["close"].shift(1) - 1) * 100).round(2)
+        df["pctChg"] = df["pctChg"].fillna(0.0)
+        return df
+    except Exception as e:
+        print(f"  [hk] {code} error: {e}")
+        return None
+
+
+def _query_index_hk(days):
+    """恒生指数日K (akshare stock_hk_index_daily_em)。失败返回 None。"""
+    try:
+        import akshare as ak
+        df = ak.stock_hk_index_daily_em(symbol="HSI")
+        if df is None or len(df) < 20:
+            return None
+        df = df.rename(columns={k: k for k in df.columns})  # 保留原列名
+        if "date" in df.columns:
+            df["date"] = df["date"].astype(str).str[:10]
+        for c in ["open", "high", "low", "close", "volume", "amount"]:
+            if c in df:
+                df[c] = pd.to_numeric(df[c], errors="coerce")
+        df = df.dropna(subset=["close"]).sort_values("date").reset_index(drop=True)
+        return df if len(df) >= RS_WINDOW + 1 else None
+    except Exception as e:
+        print(f"  [hk-index] HSI error: {e}")
+        return None
 
 
 # ---- 缓存 ----
@@ -320,8 +371,11 @@ def fetch_stock_df(code, market, days=DAYS_NEED):
     return df
 
 
-def fetch_index_df(days=DAYS_NEED):
-    """获取沪深300 K 线; 若取不到则用上证指数兜底。返回 (df, code)。"""
+def fetch_index_df(market="cn", days=DAYS_NEED):
+    """获取指数 K 线。market='cn'→沪深300(兜底上证); market='hk'→恒生指数。返回 (df, code)。"""
+    if market == "hk":
+        df = _query_index_hk(days)
+        return (df, "HSI") if df is not None else (None, "HSI")
     for code in (INDEX_CODE, INDEX_FALLBACK):
         df = _load_cache(code)
         if df is not None and len(df) >= days * 0.8:
@@ -386,27 +440,29 @@ def compute_metrics(stock_df, index_df):
     }
 
 
-def compute_rps_percentiles(metrics_list):
-    """在 universe 内对每个窗口做百分位, 得到 rps50/120/250。"""
+def compute_rps_percentiles(metrics_map, code_market):
+    """按市场分组, 在各自 universe 内对每个窗口做百分位, 得到 rps50/120/250。
+    港股与 A股分别排百分位, 避免混算失真。"""
     windows = RPS_WINDOWS
-    for w in windows:
-        vals = [m.get(f"ret{w}") for m in metrics_list if m.get(f"ret{w}") is not None]
-        if not vals:
+    for mk in set(code_market.values()):
+        grp = [m for c, m in metrics_map.items() if code_market.get(c) == mk]
+        if not grp:
             continue
-        arr = np.array(vals)
-        for m in metrics_list:
-            key = f"ret{w}"
-            v = m.get(key)
-            if v is None:
-                m[f"rps{w}"] = None
+        for w in windows:
+            vals = [m.get(f"ret{w}") for m in grp if m.get(f"ret{w}") is not None]
+            if not vals:
                 continue
-            # 百分位: 比 v 小的比例; scipy 不在时手写
-            pct = np.mean(arr <= v) * 100
-            m[f"rps{w}"] = round(pct, 1)
-    return metrics_list
+            arr = np.array(vals)
+            for m in grp:
+                v = m.get(f"ret{w}")
+                if v is None:
+                    m[f"rps{w}"] = None
+                    continue
+                m[f"rps{w}"] = round(np.mean(arr <= v) * 100, 1)
+    return metrics_map
 
 
-def build_output(stocks, metrics_map):
+def build_output(stocks, metrics_map, code_market):
     records = []
     for s in stocks:
         code = s["code"]
@@ -419,6 +475,7 @@ def build_output(stocks, metrics_map):
             "code": code,
             "name": s["name"],
             "market": s["market"],
+            "index_code": "HSI" if code_market.get(code) == "hk" else "000300",
             "board": s["board"],
             "close": m["close"],
             "ret50": m["ret50"],
@@ -458,6 +515,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--universe", default=os.path.join(RAW, "candidate.json"),
                         help="universe JSON 路径")
+    parser.add_argument("--hk-universe", default=os.path.join(RAW, "hk_universe.json"),
+                        help="港股 universe JSON 路径(可选, 不存在则跳过港股)")
     parser.add_argument("--max-age", type=int, default=1,
                         help="缓存最大天数")
     parser.add_argument("--limit", type=int, default=0,
@@ -471,26 +530,46 @@ def main():
         sys.exit(1)
 
     stocks = load_universe(args.universe)
+    # 港股 universe(可选)
+    hk_count = 0
+    if os.path.exists(args.hk_universe):
+        hk = load_universe(args.hk_universe)
+        for s in hk:
+            s["market"] = "hk"
+            if s["board"] in (None, "", "港股"):
+                s["board"] = "港股"
+        stocks += hk
+        hk_count = len(hk)
     if args.limit > 0:
         stocks = stocks[:args.limit]
-    print(f"universe 共 {len(stocks)} 只")
+    print(f"universe 共 {len(stocks)} 只 (A股 {len(stocks)-hk_count} + 港股 {hk_count})")
 
     print("先拉取沪深300指数( fallback 上证指数)...")
-    index_df, actual_index_code = fetch_index_df()
-    if index_df is None or len(index_df) < RS_WINDOW + 1:
-        print("[warn] 指数数据不足, RS 将为空")
-        index_df = None
+    cn_index_df, actual_index_code = fetch_index_df("cn")
+    if cn_index_df is None or len(cn_index_df) < RS_WINDOW + 1:
+        print("[warn] 沪深指数数据不足, RS 将为空")
+        cn_index_df = None
     else:
-        print(f"  使用指数: {actual_index_code} ({'沪深300' if actual_index_code == INDEX_CODE else '上证指数'}), {len(index_df)} 条")
+        print(f"  使用指数: {actual_index_code} ({'沪深300' if actual_index_code == INDEX_CODE else '上证指数'}), {len(cn_index_df)} 条")
+
+    hk_index_df = None
+    if hk_count > 0:
+        print("拉取恒生指数(HSI)用于港股 RS...")
+        hk_index_df, _ = fetch_index_df("hk")
+        if hk_index_df is None:
+            print("[warn] 恒指数据不足, 港股 RS 将为空(其余指标正常)")
 
     metrics_map = {}
+    code_market = {}
     ok = fail = 0
     for i, s in enumerate(stocks, 1):
         code = s["code"]
         name = s["name"]
+        code_market[code] = s["market"]
         print(f"[{i}/{len(stocks)}] {code} {name} ", end="", flush=True)
+        idx = hk_index_df if s["market"] == "hk" else cn_index_df
         df = fetch_stock_df(code, s["market"])
-        m = compute_metrics(df, index_df)
+        m = compute_metrics(df, idx)
         if m:
             metrics_map[code] = m
             ok += 1
@@ -504,11 +583,10 @@ def main():
         print("[error] 无任何有效个股数据, 退出")
         sys.exit(1)
 
-    # 计算 RPS 百分位
-    metrics_list = list(metrics_map.values())
-    compute_rps_percentiles(metrics_list)
+    # 计算 RPS 百分位(按市场分组)
+    compute_rps_percentiles(metrics_map, code_market)
 
-    records = build_output(stocks, metrics_map)
+    records = build_output(stocks, metrics_map, code_market)
 
     # 加 tier
     for r in records:
@@ -520,6 +598,7 @@ def main():
         "valid_count": len(records),
         "index_code": actual_index_code,
         "index_name": "沪深300" if actual_index_code == INDEX_CODE else "上证指数(兜底)",
+        "has_hk": hk_count > 0,
         "records": records,
     }
 
