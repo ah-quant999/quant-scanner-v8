@@ -53,7 +53,7 @@ permissions:
 
 concurrency:
   group: v8-cn-fetch-cloud
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   fetch:
@@ -104,27 +104,63 @@ jobs:
         with:
           fetch-depth: 1
 
-      # 🛡 2026-08-21 一劳永逸：幂等退出（主人报告「下午分时曲线断链」根因之一）
-      #   现象：8/21 下午 13:00-16:30 每分钟一个 dispatch（触发者均为 ah-quant999 =
-      #   本机 WorkBuddy 自动化/看门狗），concurrency 组排队堆积 → 大量 run cancelled，
-      #   加上 api_push_raw tree 超时（已另修）→ 盘中快照抓了却推不上 main → 前端下午无数据。
-      #   修复：本 run 启动时若同 workflow 已有 run 在执行/排队 → 幂等退出，杜绝堆积与重复抓取。
-      - name: "🔒 幂等退出（同 workflow 已有 run 执行/排队则跳过）"
+      # 🛡 2026-08-22 一劳永逸（主人令根治）：幂等闸门升级
+      #   旧版 exit 0 在 run: 块里只是退出当前 shell、后续步骤仍照跑 → 实际从未拦住抓取，
+      #   且「只要有并发就跳过」过激：一个僵尸/过期 run 会永久冻住本卡刷新。
+      #   新版：
+      #     1) 仅当存在「正在执行且未超时(<35min)」的同 workflow run 才真正跳过（写 skip 输出，
+      #        由下方 fetch 步骤 if 拦截），避免重复抓取/推送冲突；
+      #     2) 排队中/已过期(>35min)的 run 视为僵尸，不阻断本 run → 根治「冻在 13:45」；
+      #     3) concurrency 已改 cancel-in-progress: true，风暴来时只保留最新一次 dispatch。
+      - name: "🔒 幂等闸门（仅新鲜 run 执行时跳过；僵尸/过期 run 不阻断）"
+        id: gate
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RUN_ID: ${{ github.run_id }}
+          REPO: ${{ github.repository }}
         run: |
-          COUNT=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
-            -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/${{ github.repository }}/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=100" \
-            | python3 -c "import json,sys,os;rid=os.environ.get('RUN_ID','');d=json.load(sys.stdin);print(sum(1 for r in d.get('workflow_runs',[]) if str(r.get('id',''))!=rid and r.get('status') in ('in_progress','queued','waiting','pending','requested')))")
-          echo "同 workflow 并发 run 数(排除自己): $COUNT"
-          if [ -n "$COUNT" ] && [ "$COUNT" -gt 0 ]; then
-            echo "✅ 已有 $COUNT 个同 workflow run 执行/排队，本 run 幂等退出（避免堆积/重复抓取/互相覆盖）"
-            exit 0
-          fi
-          echo "无并发 run，继续抓取"
+          python3 - <<'PY'
+          import json, os, sys, urllib.request, datetime
+          token = os.environ.get('GITHUB_TOKEN', '')
+          run_id = os.environ.get('RUN_ID', '')
+          repo = os.environ.get('REPO', '')
+          out = os.environ.get('GITHUB_OUTPUT', '/dev/null')
+          url = f"https://api.github.com/repos/{repo}/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=100"
+          req = urllib.request.Request(url, headers={"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"})
+          try:
+              d = json.load(urllib.request.urlopen(req, timeout=20))
+          except Exception as e:
+              print("幂等检查 API 失败，保守放行:", e)
+              print("skip=false", file=open(out, 'a'))
+              sys.exit(0)
+          now = datetime.datetime.now(datetime.timezone.utc)
+          fresh = False
+          for r in d.get('workflow_runs', []):
+              if str(r.get('id', '')) == run_id:
+                  continue
+              st = r.get('status')
+              if st not in ('in_progress', 'queued', 'pending', 'waiting', 'requested'):
+                  continue
+              started = r.get('run_started_at') or r.get('created_at')
+              age = 999.0
+              if started:
+                  try:
+                      ts = datetime.datetime.fromisoformat(started.replace('Z', '+00:00'))
+                      age = (now - ts).total_seconds() / 60
+                  except Exception:
+                      age = 999.0
+              # 仅『正在执行且未超时(>35min)』视为有效并发；过期僵尸不阻断
+              if st == 'in_progress' and age < 35:
+                  fresh = True
+                  break
+          if fresh:
+              print("✅ 已有新鲜同 workflow run 在执行，本 run 幂等跳过抓取")
+              print("skip=true", file=open(out, 'a'))
+          else:
+              print("无有效并发 run（或仅有僵尸/过期 run），继续抓取")
+              print("skip=false", file=open(out, 'a'))
+          PY
 
       - uses: actions/setup-python@v5
         with:
@@ -140,6 +176,8 @@ jobs:
           python -c "import akshare, pandas; print('akshare', akshare.__version__, '/ pandas', pandas.__version__)"
 
       - name: "📡 抓中国数据 → raw_data/（selective）"
+        # 🛡 2026-08-22 幂等闸门：skip=true 时本 run 不重复抓取（另一新鲜 run 已在做）
+        if: steps.gate.outputs.skip != 'true'
         # 🛡️ 2026-08-12 移除 continue-on-error：抓取失败必须让 job 失败，
         #    阻止 api_push_raw 把只刷了 update_time 的空壳数据推送到 main。
         shell: bash

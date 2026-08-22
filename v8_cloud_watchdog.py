@@ -699,6 +699,39 @@ def dispatch_selfhosted_fallback(cat):
         return False, f"小九应急兜底派发失败 network: {getattr(e, 'reason', e)}"
 
 
+# 🔴 2026-08-22 主人令根治：本机看门狗被外部调度每分钟调用一次，
+#   曾造成 13:00-16:30「每分钟一个 dispatch」风暴 → concurrency 堆积 → 盘中数据断链。
+#   加全局派发冷却锁：无论被调多频繁，每 30 分钟内最多真正派发一次（与 enqueue 同 chokepoint）。
+_DISPATCH_LOCK = Path(".workbuddy/v8_dispatch_lock.json")
+_GLOBAL_DISPATCH_MIN = 30
+
+
+def _global_dispatch_allowed():
+    now = datetime.now(timezone(timedelta(hours=8)))
+    if _DISPATCH_LOCK.exists():
+        try:
+            st = json.loads(_DISPATCH_LOCK.read_text(encoding="utf-8"))
+            last = st.get("last")
+            if last:
+                age = (now - datetime.fromisoformat(last)).total_seconds() / 60
+                if age < _GLOBAL_DISPATCH_MIN:
+                    return False, f"全局派发冷却中({age:.0f}min < {_GLOBAL_DISPATCH_MIN}min)"
+        except Exception:
+            pass
+    return True, ""
+
+
+def _record_global_dispatch():
+    try:
+        _DISPATCH_LOCK.parent.mkdir(parents=True, exist_ok=True)
+        _DISPATCH_LOCK.write_text(
+            json.dumps({"last": datetime.now(timezone(timedelta(hours=8))).isoformat()},
+                       ensure_ascii=False),
+            encoding="utf-8")
+    except Exception:
+        pass
+
+
 def auto_dispatch_with_fallback(cat):
     """2026-08-18 主人令：优先派发云端 ubuntu-latest（v8_cn_fetch_cloud.yml）；
     若其最近 failure 或派发失败，自动切到小九 self-hosted cn 应急兜底。
@@ -707,19 +740,29 @@ def auto_dispatch_with_fallback(cat):
     🔴 2026-08-18 主人根治令：云端是【唯一】主力。self-hosted 兜底受 4 重门控
     （连续失败降级 / 30min 静默期 / 云端 in_progress 不抢 / 真超阈才派），
     历史 9+ 连败 → 不再每小时烧 token 重试。
+
+    🔴 2026-08-22 主人令：进入即查全局派发冷却锁，杜绝每分钟风暴。
     """
+    allowed, reason = _global_dispatch_allowed()
+    if not allowed:
+        return False, reason
     # 先检查主 workflow 最近状态
     ok, msg, is_failure = check_workflow(CN_WORKFLOW_NAME, "cn_fetch", max_age_min=120, workflow_id=CN_WORKFLOW_ID)
     if is_failure:
-        # 云端主力最近已 failure，直接派 self-hosted 兜底（受 3 重门控约束）
+        # 云端主力最近已 failure，直接派 self-host 兜底（受 3 重门控约束）
         fh_ok, fh_msg = dispatch_selfhosted_fallback(cat)
+        if fh_ok:
+            _record_global_dispatch()
         return fh_ok, f"云端主力最近 failure → {fh_msg}"
     # 正常路径：尝试派发云端主力 workflow
     d_ok, d_msg = auto_dispatch(cat)
     if d_ok:
+        _record_global_dispatch()
         return True, d_msg
     # 派发失败：触发 self-hosted 兜底（受 3 重门控约束）
     fh_ok, fh_msg = dispatch_selfhosted_fallback(cat)
+    if fh_ok:
+        _record_global_dispatch()
     return fh_ok, f"云端派发失败({d_msg}) → {fh_msg}"
 
 
