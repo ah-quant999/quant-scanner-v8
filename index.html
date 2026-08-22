@@ -1250,12 +1250,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/HEALTH_CHECK.js?v=5f802e8505" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=3a5a9a3f3e" defer></script>
     <script src="data/SENTIMENT_CYCLE.js?v=8902eac7be" defer></script>
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=34b9e499f2" defer></script>
-    <script src="data/INDEX_HISTORY.js?v=6b3579a9ca" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=260823a1" defer></script>
+    <script src="data/INDEX_HISTORY.js?v=260823a1" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE.js?v=57b2500500" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=9c5a135fba" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=dffd47c355" defer></script>
-    <script src="data/ALGO_BACKTEST_COMPARE.js?v=algo010" defer></script>
+    <script src="data/ALGO_BACKTEST_COMPARE.js?v=260823b1" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -11696,7 +11696,18 @@ function drawUpDownChart(){
     if(!dst) return;
     var d = window.MARKET_PATH_PROBABILITY || {};
     if(!d.current){
-      // 🛡 defer 时序自愈：数据未注入时轮询重试（0.5s×30=15s），到位立即渲染，杜绝永久空卡
+      // 🛡 自愈（2026-08-23 主人令「还是空白」根因修复）：
+      //   原 head defer 引入的 ?v 写死为 8/20 旧哈希 → CDN/浏览器缓存旧空壳 → 数据永远缺失。
+      //   除 15s 轮询外，主动用「时间戳 ?v」重新注入脚本强制绕过缓存拉取最新文件；
+      //   若算法链尚未产出（真缺数据）则保留「暂不可用」提示，绝不永久空白。
+      if(!window.__aiInjected){
+        window.__aiInjected = true;
+        var _s = document.createElement('script');
+        _s.src = 'data/MARKET_PATH_PROBABILITY.js?v=' + Date.now();
+        _s.onload = function(){ try{ window._fillAiPrediction(); }catch(e){} };
+        _s.onerror = function(){};
+        document.head.appendChild(_s);
+      }
       if(!window.__aiRetryTimer){
         window.__aiRetryN = 0;
         window.__aiRetryTimer = setInterval(function(){
@@ -11707,7 +11718,7 @@ function drawUpDownChart(){
           } else if(window.__aiRetryN > 30){
             clearInterval(window.__aiRetryTimer); window.__aiRetryTimer=null; window.__aiRetryN=0;
             var dd = document.getElementById('aiPredBody');
-            if(dd) dd.innerHTML = '<div class="note">AI 预测数据暂不可用（等待盘后算法链 19:15 生成）</div>';
+            if(dd) dd.innerHTML = '<div class="note">AI 预测数据暂不可用（等待盘后算法链 19:15 生成，或本地未构建 MarketPathProbability）</div>';
           }
         }, 500);
       }

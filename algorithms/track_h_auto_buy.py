@@ -151,6 +151,43 @@ def load_history():
                 "generated": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 
 
+def _load_candidates(target_date):
+    """读 target_date 的候选股。
+
+    主源：raw_data/h_auto_buy_<date>.json（auto_run_dn_algorithm.py 产出）。
+    🛡 兜底（2026-08-23 修复）：云端流水线若时序错位（track 早于 auto_run 跑），
+       raw json 缺失/为空 → 静默 0 样本，导致「H反推」永远比不出胜率。
+       此时退回已部署且每日刷新的 data/H_AUTO_BUY.js（含 date + candidates），
+       用快照里的真实候选日做 key，保证每日跟踪不落空。
+    返回 (candidates_list, real_date_str)。主源可用时 real_date=target_date。
+    """
+    pick_file = RAW_DIR / f"h_auto_buy_{target_date.replace('-', '')}.json"
+    if pick_file.exists():
+        try:
+            pick = json.load(open(pick_file, encoding="utf-8"))
+            cands = pick.get("candidates", []) or []
+            if cands:
+                return cands, target_date
+        except Exception:
+            pass
+    # 兜底：data/H_AUTO_BUY.js
+    hjs = DATA_DIR / "H_AUTO_BUY.js"
+    if hjs.exists():
+        try:
+            src = open(hjs, encoding="utf-8").read()
+            m = re.search(r"window\.H_AUTO_BUY\s*=\s*(\{.*?\});\s*$", src, re.S)
+            if m:
+                d = json.loads(m.group(1))
+                cands = d.get("candidates", []) or []
+                if cands:
+                    real = d.get("date") or target_date
+                    print(f"  🛡 主源缺失/空，兜底读 data/H_AUTO_BUY.js（候选日 {real}，{len(cands)} 只）")
+                    return cands, real
+        except Exception:
+            pass
+    return None, target_date
+
+
 def run(target_date=None, emit_js=True, top_n=50):
     """
     把 target_date（默认昨日）的 h_auto_buy 候选股全部跟踪一遍，
@@ -159,25 +196,23 @@ def run(target_date=None, emit_js=True, top_n=50):
     """
     if target_date is None:
         target_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-    pick_file = RAW_DIR / f"h_auto_buy_{target_date.replace('-', '')}.json"
-    if not pick_file.exists():
-        print(f"❌ 候选文件不存在: {pick_file.name}")
+    candidates, real_date = _load_candidates(target_date)
+    if candidates is None:
+        print(f"❌ 候选文件不存在且 data/H_AUTO_BUY.js 无候选: target={target_date}")
         return None
 
-    pick = json.load(open(pick_file, encoding="utf-8"))
-    candidates = pick.get("candidates", [])[:top_n]
     history = load_history()
-    day_rec = history["by_date"].get(target_date, {"picks": []})
+    day_rec = history["by_date"].get(real_date, {"picks": []})
 
     today_str = datetime.now().strftime("%Y-%m-%d")
-    print(f"📊 跟踪 {target_date} 的 {len(candidates)} 只候选（top {top_n}）")
+    print(f"📊 跟踪 {real_date} 的 {len(candidates)} 只候选（top {top_n}）")
     tracked = []
     ok = 0
     for i, c in enumerate(candidates):
         code = c.get("code") or _norm_code(c.get("symbol", ""))
         if not code:
             continue
-        rec = track_one_pick(code, target_date, today_str)
+        rec = track_one_pick(code, real_date, today_str)
         if rec is None:
             continue
         rec["name"] = c.get("name", "")
@@ -201,7 +236,7 @@ def run(target_date=None, emit_js=True, top_n=50):
     }
     s["T+1_rate"] = round(s["T+1_hit"] / s["n"] * 100, 1) if s["n"] else 0
     s["T+5_rate"] = round(s["T+5_hit"] / s["n"] * 100, 1) if s["n"] else 0
-    history["by_date"][target_date] = s
+    history["by_date"][real_date] = s
     history["last_updated"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     # 🔴 2026-08-22 主人令修复：顶层 update_time 必须随每次生成刷新，
     #   否则 v8_health_check/前端判龄一直读到旧时戳（08-20）误判陈旧
