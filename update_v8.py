@@ -296,6 +296,19 @@ def _make_lite(name, obj):
         lite = {k: v for k, v in obj.items() if k != 'stocks'}
         lite['_lite_note'] = 'stocks 完整列表已裁剪，仅保留 top_gainers 与 total'
         return lite
+    if name == 'SECTOR_PHASE_HISTORY':
+        # 2026-08-22 主人令：顶层 update_time 取最新一期快照时间（raw 文件 mtime 因
+        # git checkout 重置会失真，但 snaps 内每期自带 update_time，以数据为准）。
+        snaps = obj.get('snaps') or []
+        latest = ""
+        for s in snaps:
+            t = s.get('update_time') or s.get('date') or ""
+            if t > latest:
+                latest = t
+        out = dict(obj)
+        out['update_time'] = latest or obj.get('update_time', '')
+        out['snap_count'] = len(snaps)
+        return out
     return obj
 
 
@@ -718,6 +731,58 @@ def _list_changed_raw_files():
         return []
 
 
+def _load_js_var_file(path):
+    """解析 data/*.js 形如 window.X = {...}; 返回 (var_name, obj) 或 (None, None)。
+
+    仅支持顶层为普通对象字面量（json 可解析）的文件；IIFE 壳/数组壳解析失败则跳过，
+    避免误伤。允许文件前置注释（// 或 /* */），用 re.search 找首个 window.X =。"""
+    try:
+        txt = path.read_text(encoding='utf-8')
+    except Exception:
+        return None, None
+    m = re.search(r'window\.([A-Z0-9_]+)\s*=\s*', txt)
+    if not m:
+        return None, None
+    var = m.group(1)
+    body = txt[m.end():].rstrip()
+    if body.endswith(';'):
+        body = body[:-1]
+    try:
+        obj = json.loads(body)
+    except Exception:
+        return var, None
+    return var, obj
+
+
+def stamp_missing_update_time():
+    """2026-08-22 主人令：为缺失 update_time 的 data/*.js 补入生成时间戳。
+
+    目的：审计发现 9 个文件（HEALTH_CHECK / H_AUTO_BUY / MOMENTUM_FILTER / PORTFOLIO /
+    PORTFOLIO_COST / BLOAT_CHECK / RUNNER_STATUS_HEALTH / STOCK_MOMENTUM_STATE /
+    STOCK_MOMENTUM_STATE_V2）无 update_time 字段，无法纳入新鲜度监控。
+
+    规则（不造假）：注入的是「文件真实生成时间」= mtime，非数据造假；无法解析为 dict
+    的文件（数组壳/IIFE 壳）跳过；已有 update_time 的不动。幂等：补一次后下次构建即跳过。
+    """
+    stamp_count = 0
+    for p in DATA_DIR.glob("*.js"):
+        var, obj = _load_js_var_file(p)
+        if not isinstance(obj, dict):
+            continue
+        if "update_time" in obj:
+            continue
+        mtime = datetime.fromtimestamp(p.stat().st_mtime, tz=CST).strftime("%Y-%m-%d %H:%M:%S")
+        obj["update_time"] = mtime
+        with open(p, "w", encoding='utf-8') as f:
+            f.write(f"window.{var} = ")
+            json.dump(obj, f, ensure_ascii=False, separators=(',', ':'))
+            f.write(";\n")
+        stamp_count += 1
+        print(f"  🕒 补 update_time → {var} ({mtime})")
+    if stamp_count:
+        print(f"✅ 已为 {stamp_count} 个 data/*.js 补 update_time")
+
+
 def build(category=None, detect_changes=False):
     if not RAW_DIR.exists():
         print(f"⚠️  raw_data/ 目录不存在（{RAW_DIR}）。保持既有 data/*.js 不变。")
@@ -850,6 +915,8 @@ def main():
     if rc == 0:
         run_health_check()
         run_experiment_cards()
+        # 2026-08-22 主人令：为缺 update_time 的 data/*.js 补时间戳（须在全部生成之后）
+        stamp_missing_update_time()
         # 2026-08-15 缓存戳铁律修复：必须在全部数据生成（含 run_experiment_cards
         # 重写的 COMMODITY_ELASTICITY.js 等）之后才算 ?v，否则 ?v 与最终文件内容
         # 不符 → CDN 吐旧副本。

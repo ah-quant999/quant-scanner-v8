@@ -3375,6 +3375,17 @@ def main(category=None, only=None):
         except Exception as e:
             print(f"  ⚠️ 四量终极策略失败: {e}")
 
+    # 2026-08-22 主人令：STOCK_PROFILE 自愈（从已维护的 stock_names 派生）
+    #   原仅 legacy_v6/sync_v6_to_v8.py 生成、不在 v8 云端链路 → 永久陈旧。
+    #   现 post_close 每次运行前由 stock_names（同节奏刷新）派生 stock_profile.json，
+    #   再由 update_v8 转 data/STOCK_PROFILE.js，周一自动自愈。
+    if category in ("post_close", "all"):
+        try:
+            subprocess.run([sys.executable, str(ROOT / "algorithms" / "gen_stock_profile.py")],
+                           cwd=str(ROOT), check=False)
+        except Exception as e:
+            print(f"  ⚠️ gen_stock_profile 调用失败: {e}")
+
 
     # 生成 runner 状态文件，供前端「定时任务跟踪」看板展示
     try:
