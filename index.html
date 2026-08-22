@@ -422,7 +422,7 @@ window.__domReadyFns=[];
     <script src="data/SECTOR_FUND_FLOW.js?v=a9e9f34173" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=5ab6ee1eef" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=f5c44a92ca" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=ba3b562b83" defer></script>
     <script src="data/ANALYST_RATINGS.js?v=99f15c91e0" defer></script>
     <script src="data/SUSPENSION_ALERT.js?v=e95dd44be3" defer></script>
     <script src="data/GOLD_POOL.js?v=f41556b409" defer></script>
@@ -437,7 +437,7 @@ window.__domReadyFns=[];
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
 <script src="data/CONCEPT_RANKING.js?v=ad328b4e49" defer></script>
 <script src="data/INDEX_QUOTES.js?v=860d522d2a" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=f304b5df87" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=f4135bd6f9" defer></script>
 <script src="data/MARGIN_DATA.js?v=45176a28d3" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=8284221495" defer></script>
 <script src="data/IPO_DATA.js?v=6eb4f59dcb" defer></script>
@@ -447,12 +447,12 @@ window.__domReadyFns=[];
     <script src="data/STOCK_RPS.js?v=0e036c2d48" defer></script>
     <!-- 🛡 2026-08-19：H 反推短线买点（data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js）反推代码 + 跟踪回测，独立于 PDF OCR
          v= 占位由 api_push_raw._stamp_index_v 在每日推送后自动重写为新 sha，确保 CDN 不缓存旧版 -->
-    <script src="data/H_AUTO_BUY.js?v=0e1ad4e54c" defer></script>
+    <script src="data/H_AUTO_BUY.js?v=884b93cc1f" defer></script>
     <script src="data/H_AUTO_BUY_TRACK.js?v=de02fa6225" defer></script>
     <script src="data/AVG_PRICE_DATA.js?v=27eb9f4671" defer></script>
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
-    <script src="data/PORTFOLIO_COST.js?v=6c6515f693" defer></script>
-    <script src="data/PORTFOLIO.js?v=30da394f6f" defer></script>
+    <script src="data/PORTFOLIO_COST.js?v=befe07aa7c" defer></script>
+    <script src="data/PORTFOLIO.js?v=cb9de9133d" defer></script>
     <script>
 window.V8_CAL = {weeks:[],legend:[]};
 /* ===== 2026 A股交易日历（每年需更新） ===== */
@@ -1216,7 +1216,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SH_FIB.js?v=a4c337fcbf" defer></script>
 <script src="data/SZ_FIB.js?v=100109fcaf" defer></script>
 <script src="data/SECTOR_RS.js?v=51eed83e65" defer></script>
-<script src="data/SECTOR_PHASE_HISTORY.js?v=c7e7db72c3" defer></script>
+<script src="data/SECTOR_PHASE_HISTORY.js?v=090689a326" defer></script>
 <script src="data/INST_TRADE.js?v=4c9403b3fa" defer></script>
 <script src="data/NORTH_FUND.js?v=5fe207476a" defer></script>
 <script src="data/MARKET_ALERTS.js?v=ea64a4bd25" defer></script>
@@ -1246,15 +1246,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/WEEKEND_RUN.js?v=bfd67c5cd1" defer></script>
 <script src="data/W52_HIGH.js?v=4cd3b9de2b" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=ef9efada49" defer></script>
-<script src="data/RUNNER_STATUS.js?v=3b86cc9864" defer></script>
-<script src="data/HEALTH_CHECK.js?v=03db595867" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=123e1530bd" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=2d22b40fb9" defer></script>
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=062ddea849" defer></script>
-    <script src="data/INDEX_HISTORY.js?v=31679c754f" defer></script>
+<script src="data/RUNNER_STATUS.js?v=9265405d43" defer></script>
+<script src="data/HEALTH_CHECK.js?v=c9cb6042db" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=e7fab689ff" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=d764822ddd" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=154379c2b9" defer></script>
+    <script src="data/INDEX_HISTORY.js?v=35eb4f6e06" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE.js?v=f135754004" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=0dcbab52a2" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=d5e26eb77a" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=9c5a135fba" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=50cc85ab76" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -10744,7 +10744,7 @@ function drawUpDownChart(){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=0dcbab52a2';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=9c5a135fba';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -13104,7 +13104,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch('data/HEALTH_CHECK.js?v=03db595867'+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch('data/HEALTH_CHECK.js?v=c9cb6042db'+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]):'';
       if(remoteTs && remoteTs!==localTs){
@@ -13703,8 +13703,8 @@ window.__renderV8CalToday();
 (function(){
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=0806be2451'},
-    {name:'STOCK_PROFILE', url:'data/STOCK_PROFILE.js?v=f23feb0264'},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=30dba9ecb5'},
+    {name:'STOCK_PROFILE', url:'data/STOCK_PROFILE.js?v=c92e63f8de'},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=e9df64cdd8'},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=8ab9822d35'}
   ];
   function loadOne(item, done){
