@@ -11405,6 +11405,9 @@ function drawUpDownChart(){
       var tabs = document.querySelectorAll('#sec-ul .ul-tab');
       for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
       if(btn) btn.classList.add('active');
+      // 🛡 2026-08-23 强化：切到 AI 预测 子 tab 时强制渲染一次，
+      //   彻底免疫「renderUnlisted 内 IIFE 触发时机错位 / 中途重渲染清掉 aiPredBody 未回填」导致的空白。
+      if(tab==='ai'){ try{ if(window._fillAiPrediction) window._fillAiPrediction(); }catch(e){ console.warn('AI预测 子tab渲染失败',e); } }
     };
     // ⚖️ 2026-08-14 主人令：renderPortfolio 调用已删除（持仓跟踪卡整段移除）
     // 2026-08-14 主人令：涨价榜/情绪周期/潜力挖掘 fill 改由 switchSt('pr') 触发（已迁选股策略子TAB）
