@@ -11001,6 +11001,7 @@ function drawUpDownChart(){
       }
     }
     h+='</div>';
+    h+='</div>';  // /两套算法回测对比卡
 
     // ── 🎯 动量共识筛选（2026-08-16 无未来函数版，移入强势突破 pane1）──
     var _mf = window.MOMENTUM_FILTER;
@@ -13841,6 +13842,33 @@ window.__renderV8CalToday();
   }
   if(document.readyState==='complete') start();
   else window.addEventListener('load', start);
+})();
+</script>
+
+<!-- 🛡 2026-08-23 子 tab 直达链接：/?sec=ul&sub=ai 或 /?sec=lg&sub=v6 可直接定位到对应子 tab -->
+<script>
+(function(){
+  try{
+    var p = new URLSearchParams(location.search);
+    var sec = p.get('sec'), sub = p.get('sub');
+    if(!sec || !sub) return;
+    function go(){
+      if(sec==='ul' && sub==='ai'){
+        if(typeof switchSec==='function') switchSec('ul');
+        setTimeout(function(){
+          if(typeof window.__ulSwitch==='function') window.__ulSwitch(null,'ai');
+        }, 250);
+      }
+      if(sec==='lg' && sub==='v6'){
+        if(typeof switchSec==='function') switchSec('lg');
+        setTimeout(function(){
+          if(typeof switchLg==='function') switchLg('v6', document.querySelector('[data-lg="v6"]'));
+        }, 250);
+      }
+    }
+    if(document.readyState !== 'loading') go();
+    else document.addEventListener('DOMContentLoaded', go);
+  }catch(e){}
 })();
 </script>
 </body>
