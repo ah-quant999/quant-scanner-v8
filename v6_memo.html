@@ -8,6 +8,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 🛡 2026-08-23 一劳永逸修复：v6_memo.html 永远只是主站(index.html)的 iframe 子页。
+     若被直接/误加载到顶层(window.self===window.top)，立即跳回主站，
+     绝不让"无导航的 v6 全屏内容"停留（否则刷新=卡在 v6、只能关掉）。 -->
+<script>
+if (window.self === window.top) {
+  try {
+    var _idx = location.pathname.replace(/[^/]*$/, '') + 'index.html';
+    location.replace(_idx + (location.search || '') + (location.hash || ''));
+  } catch (e) {
+    location.href = 'index.html';
+  }
+}
+</script>
 <title>九宝量化 V6.0 - 逻辑详解</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
