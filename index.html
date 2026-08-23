@@ -5772,18 +5772,20 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
     <div class="lg-pane" id="lg-v6" style="position:relative;">
       <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:12px;margin-bottom:10px;flex-wrap:wrap;">
         <span style="font-size:13px;font-weight:700;color:#38bdf8;">📦 v6 备忘录</span>
-        <a href="v6_memo.html?v=3785c4e601" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:#38bdf8;color:#0a0e17;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">🚀 直接打开（推荐，绕过 iframe）</a>
+        <a class="v6MemoOpenLink" href="v6_memo.html?standalone=1" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:#38bdf8;color:#0a0e17;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">🚀 直接打开（推荐，绕过 iframe）</a>
         <span style="font-size:10px;color:var(--dim);margin-left:auto;">如 iframe 长期空白，请点「直接打开」按钮，规避浏览器/网络拦截</span>
       </div>
       <!-- 🛡 2026-08-23 修复：iframe 初始 src 留空，由 JS 一次性设为 v6_memo.html?时间戳。
            避免页面加载后二次改 src，消除 iOS Safari / 微信浏览器 iframe 重复加载/空白问题。 -->
       <iframe src="" style="width:100%;height:calc(100vh - 280px);border:none;border-radius:14px;background:#f5f7fa;" id="v6MemoFrame" onload="window.__v6MemoLoaded && window.__v6MemoLoaded()"></iframe>
       <script>(function(){ var _f=document.getElementById('v6MemoFrame'); if(_f) _f.src='v6_memo.html?' + Date.now(); })();</script>
+      <!-- 直接打开按钮加时间戳，避免缓存旧版 v6_memo.html -->
+      <script>(function(){ var t=Date.now(); document.querySelectorAll('a.v6MemoOpenLink').forEach(function(a){ if(a.href.indexOf('standalone=1')>=0){ a.href=a.href.split('&_cb=')[0]+'&_cb='+t; } }); })();</script>
       <div id="v6MemoStatus" style="position:absolute;top:60px;right:16px;padding:5px 10px;border-radius:8px;font-size:12px;font-weight:600;background:rgba(13,20,35,.75);color:#38bdf8;border:1px solid rgba(56,189,248,.3);z-index:10;pointer-events:none;display:none;">加载中…</div>
       <div id="v6MemoError" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:var(--bg);border-radius:14px;z-index:20;text-align:center;padding:24px;">
         <div style="font-size:18px;font-weight:700;color:#f87171;">⚠️ v6 备忘录加载失败</div>
         <div style="font-size:13px;color:var(--sub);max-width:420px;line-height:1.8;">iframe 嵌入可能因浏览器隐私策略或缓存未刷新导致空白。<br>可点击下方按钮在新标签页直接打开。</div>
-        <a href="v6_memo.html?v=3785c4e601" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:10px;background:#38bdf8;color:#0a0e17;font-size:14px;font-weight:700;text-decoration:none;">📦 直接打开 v6 备忘录</a>
+        <a class="v6MemoOpenLink" href="v6_memo.html?standalone=1" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:10px;background:#38bdf8;color:#0a0e17;font-size:14px;font-weight:700;text-decoration:none;">📦 直接打开 v6 备忘录</a>
       </div>
     </div>
   </section>

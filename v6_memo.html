@@ -8,14 +8,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- 🛡 2026-08-23 一劳永逸修复：v6_memo.html 永远只是主站(index.html)的 iframe 子页。
-     若被直接/误加载到顶层(window.self===window.top)，立即跳回主站，
-     绝不让"无导航的 v6 全屏内容"停留（否则刷新=卡在 v6、只能关掉）。 -->
+<!-- 🛡 2026-08-23 修复：v6_memo.html 默认只应作为主站 iframe 子页存在。
+     若被误加载到顶层(window.self===window.top) 且不是主动「直接打开」(?standalone=1)，
+     立即跳回主站，绝不让"无导航的 v6 全屏内容"停留。
+     带 ?standalone=1 时允许顶层打开，用于 iframe 加载失败后的「直接打开」兜底。 -->
 <script>
 if (window.self === window.top) {
   try {
-    var _idx = location.pathname.replace(/[^/]*$/, '') + 'index.html';
-    location.replace(_idx + (location.search || '') + (location.hash || ''));
+    var _params = new URLSearchParams(location.search || '');
+    if (_params.get('standalone') !== '1') {
+      var _idx = location.pathname.replace(/[^/]*$/, '') + 'index.html';
+      location.replace(_idx + (location.search || '') + (location.hash || ''));
+    }
   } catch (e) {
     location.href = 'index.html';
   }
