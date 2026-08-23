@@ -86,6 +86,12 @@ def main():
     has_iframe = 'src="v6_memo.html' in h
     has_fetch = ('__v6MemoLoad' in h) and ('v6MemoBody' in h)
     has_inline = ('id="lg-v6"' in h) and ('九宝量化 V6.0' in h)
+    # 2026-08-23 修复假阳性：iframe 初始 src 留空、改由 JS 动态赋 src='v6_memo.html?<ts>'
+    # 以击穿 CDN 缓存后，字面量 src="v6_memo.html 消失 → 前三模式全部落空 → 误判"入口缺失"
+    # 并阻断 build_deploy（run #3682/#3683 连续失败）。此处补认「JS 动态注入」与「直链兜底」两种
+    # 合法入口。保护强度不变：仍强制 data-lg="v6" 子tab + id="lg-v6" 面板存在，且必须真实引用 v6_memo.html。
+    has_jssrc = ('v6MemoFrame' in h) and (re.search(r"""\.src\s*=\s*['"]v6_memo\.html""", h) is not None)
+    has_directlink = re.search(r"""href=['"]v6_memo\.html""", h) is not None
 
     checks = {
         "子tab data-lg=\"v6\"": 'data-lg="v6"',
@@ -96,8 +102,8 @@ def main():
     for k, v in list(checks.items())[:-1]:  # 跳过最后一项
         if v not in h:
             missing.append(k)
-    if not has_iframe and not has_fetch and not has_inline:
-        missing.append("v6 渲染入口(iframe / fetch / 内联内容)")
+    if not (has_iframe or has_fetch or has_inline or has_jssrc or has_directlink):
+        missing.append("v6 渲染入口(iframe / fetch / 内联 / JS动态src / 直链)")
     if missing:
         print("❌ index.html 缺失 v6备忘录 入口：%s —— 阻断部署" % "、".join(missing))
         ok = False
@@ -106,8 +112,12 @@ def main():
             mode = "内联(最终方案)"
         elif has_fetch:
             mode = "fetch()注入"
-        else:
+        elif has_iframe:
             mode = "iframe"
+        elif has_jssrc:
+            mode = "iframe(JS动态src·缓存击穿)"
+        else:
+            mode = "直链兜底(a href)"
         print("✅ index.html 保留 v6备忘录 子tab/面板/%s" % mode)
 
     # ── 3) 内联一致性校验（仅内联模式需要） ────────────────────────
