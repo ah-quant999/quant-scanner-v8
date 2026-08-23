@@ -6,13 +6,15 @@ html>
 // 🛡 2026-08-23 修复：手机 Safari / 微信浏览器会长期缓存旧 index.html，导致新修复不生效、双卡空白。
 // 首次本会话访问时，若 URL 没有 nocache 标记，强制带时间戳刷新一次，绕过磁盘缓存拿到最新版本。
 (function(){
-  if(location.href.indexOf('nocache=1')>=0 || sessionStorage.getItem('v8_nocache')) return;
-  sessionStorage.setItem('v8_nocache','1');
-  var h = location.href.split('#');
-  var base = h[0];
-  var hash = h[1] ? '#' + h[1] : '';
-  var sep = base.indexOf('?')>=0 ? '&' : '?';
-  location.replace(base + sep + 'nocache=1' + hash);
+  try{
+    if(location.href.indexOf('nocache=1')>=0 || sessionStorage.getItem('v8_nocache')) return;
+    sessionStorage.setItem('v8_nocache','1');
+    var h = location.href.split('#');
+    var base = h[0];
+    var hash = h[1] ? '#' + h[1] : '';
+    var sep = base.indexOf('?')>=0 ? '&' : '?';
+    location.replace(base + sep + 'nocache=1' + hash);
+  }catch(e){}
 })();
 </script>
 <script>
