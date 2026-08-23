@@ -11317,12 +11317,16 @@ function drawUpDownChart(){
     el.innerHTML=h;
     // 2026-08-20 主人令：潜力挖掘已删除，替换为 AI 预测（market_path_probability 算法，重写非复制）
     // 🛡 2026-08-23 根因修复：_fillAiPrediction 定义在 11694 行（本行之后），
-    // 原同步调用时函数尚不存在 → typeof 判定 undefined 被跳过 → AI预测 卡永不渲染。
-    // 改为：函数已定义立即渲染；否则 setTimeout(0) 推迟到本脚本块解析完成（函数已定义）后渲染。
-    try{
-      if(typeof window._fillAiPrediction==='function'){ window._fillAiPrediction(); }
-      else { setTimeout(function(){ try{ window._fillAiPrediction && window._fillAiPrediction(); }catch(e){} }, 0); }
-    }catch(e){ console.warn('AI预测渲染失败',e); }
+    // 🛡 2026-08-23 根因修复（强化版）：_fillAiPrediction 定义在 11694 行（本行之后）。
+    // 原同步调用时函数尚不存在 → typeof 判定 undefined 被跳过 → AI预测 卡永不渲染；
+    // 后改 setTimeout(0) 仍偶发受时序/缓存影响。现统一用 DOMContentLoaded 触发：
+    // 此时 HTML 解析已完成（函数已定义）、head 的 defer 数据脚本已执行（window.MARKET_PATH_PROBABILITY 已就绪）、
+    // DOM 元素已存在，彻底免疫时序问题；若脚本晚到（readyState 非 loading）则立即渲染。
+    (function(){
+      function _renderAiPred(){ try{ window._fillAiPrediction && window._fillAiPrediction(); }catch(e){ console.warn('AI预测渲染失败',e); } }
+      if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', _renderAiPred); }
+      else { _renderAiPred(); }
+    })();
     try{
       // 🛡 2026-08-18 主人令：ETF·龙头参考 直接渲染（不依赖已删的 etfMapBody 克隆）
       //   数据源：CONCEPT_RANKING.items（概念 top 8）+ SECTOR_FUND_FLOW.sectors_in（行业 top 6）
@@ -11712,9 +11716,11 @@ function drawUpDownChart(){
       if(!window.__aiInjected){
         window.__aiInjected = true;
         var _s = document.createElement('script');
-        // 🛡 2026-08-23 修复：原把时间戳拼进 ?v 值（?v=xxx123456）污染缓存键 → 重注入必失败。
-        // 改裸 URL + 独立 ?cb 时间戳参数，绕过浏览器/CDN 缓存强制拉取最新数据文件。
-        _s.src = 'data/MARKET_PATH_PROBABILITY.js?cb=' + Date.now();
+        // 🛡 2026-08-23 修复：原把时间戳拼进 ?v 值（?v=xxx123456）污染缓存键 → 重注入必失败；
+        //  又试过 ?cb= 时间戳，但被 reconcile_cache_busters 正则整体归一成 ?v=<内容哈希> 而丢弃自定义参数。
+        //  现改裸路径：构建时自动补 ?v=<内容哈希>（每次内容变化哈希必变 → 天然跨构建缓存失效），
+        //  运行时即加载当前数据文件，杜绝畸形 URL 与陈旧缓存。
+        _s.src = 'data/MARKET_PATH_PROBABILITY.js';
         _s.onload = function(){ try{ window._fillAiPrediction(); }catch(e){} };
         _s.onerror = function(){};
         document.head.appendChild(_s);
