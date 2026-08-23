@@ -14039,6 +14039,12 @@ window.__renderV8CalToday();
           if(typeof window.__ulSwitch==='function') window.__ulSwitch(null,'ai');
         }, 250);
       }
+      if(sec==='ul' && sub==='pp'){
+        if(typeof switchSec==='function') switchSec('ul');
+        setTimeout(function(){
+          if(typeof window.__ulSwitch==='function') window.__ulSwitch(null,'pp');
+        }, 250);
+      }
       if(sec==='lg' && sub==='v6'){
         if(typeof switchSec==='function') switchSec('lg');
         setTimeout(function(){
