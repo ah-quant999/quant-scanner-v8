@@ -11937,21 +11937,21 @@ function drawUpDownChart(){
       html += '<div style="font-size:11.5px;color:var(--sub);margin-bottom:6px;">🔥 当前热门概念（共 '+pp.hot_concepts_count+' 个，点击筛选）：</div>';
       html += '<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;">';
       pp.hot_concepts.slice(0,10).forEach(function(cn){
-        var active = (_ppFilterConcept===cn);
+        var active = (window._ppFilterConcept===cn);
         var bg = active ? 'rgba(167,139,250,.35)' : 'rgba(167,139,250,.12)';
         var bd = active ? 'rgba(167,139,250,.7)' : 'rgba(167,139,250,.35)';
         html += '<span onclick="window._ppFilterConcept=\''+cn+'\';window._fillPotentialPicks();" style="cursor:pointer;display:inline-block;padding:3px 8px;background:'+bg+';border:1px solid '+bd+';border-radius:6px;font-size:11.5px;color:#c4b5fd;font-weight:600;">'+cn+'</span>';
       });
       html += '</div>';
-      if(_ppFilterConcept){
-        html += '<div style="font-size:11.5px;color:#c4b5fd;margin-bottom:8px;">已筛选概念：<b>'+_ppFilterConcept+'</b> <span onclick="window._ppFilterConcept=null;window._fillPotentialPicks();" style="cursor:pointer;color:var(--dim);text-decoration:underline;">清除</span></div>';
+      if(window._ppFilterConcept){
+        html += '<div style="font-size:11.5px;color:#c4b5fd;margin-bottom:8px;">已筛选概念：<b>'+window._ppFilterConcept+'</b> <span onclick="window._ppFilterConcept=null;window._fillPotentialPicks();" style="cursor:pointer;color:var(--dim);text-decoration:underline;">清除</span></div>';
       }
     }
 
     // ── 表格 ──
     var rows = pp.picks.slice();
-    if(_ppFilterConcept){
-      rows = rows.filter(function(p){ return (p.hot_concepts||[]).indexOf(_ppFilterConcept)>=0; });
+    if(window._ppFilterConcept){
+      rows = rows.filter(function(p){ return (p.hot_concepts||[]).indexOf(window._ppFilterConcept)>=0; });
     }
     if(!rows.length){
       html += '<div class="note">该概念下暂无潜力股</div>';
@@ -12002,7 +12002,7 @@ function drawUpDownChart(){
             + '<div style="background:rgba(148,163,184,.15);border-radius:3px;height:4px;margin-top:2px;width:48px;margin-left:auto;">'
             + '<div style="background:'+scoreColor+';height:100%;border-radius:3px;width:'+scoreW+'%;min-width:2px;"></div></div></td>';
       var consHtml = (p.hot_concepts||[]).map(function(cn){
-        var act = _ppFilterConcept===cn ? 'font-weight:700;text-decoration:underline;' : '';
+        var act = window._ppFilterConcept===cn ? 'font-weight:700;text-decoration:underline;' : '';
         return '<span onclick="window._ppFilterConcept=\''+cn+'\';window._fillPotentialPicks();" style="cursor:pointer;color:#a78bfa;'+act+'">'+cn+'</span>';
       }).join(' · ');
       html += '<td style="padding:7px 6px;color:var(--sub);font-size:11px;">'+consHtml+'</td>';
