@@ -3,6 +3,19 @@ html>
 <html lang="zh-CN">
 <head>
 <script>
+// 🛡 2026-08-23 修复：手机 Safari / 微信浏览器会长期缓存旧 index.html，导致新修复不生效、双卡空白。
+// 首次本会话访问时，若 URL 没有 nocache 标记，强制带时间戳刷新一次，绕过磁盘缓存拿到最新版本。
+(function(){
+  if(location.href.indexOf('nocache=1')>=0 || sessionStorage.getItem('v8_nocache')) return;
+  sessionStorage.setItem('v8_nocache','1');
+  var h = location.href.split('#');
+  var base = h[0];
+  var hash = h[1] ? '#' + h[1] : '';
+  var sep = base.indexOf('?')>=0 ? '&' : '?';
+  location.replace(base + sep + 'nocache=1' + hash);
+})();
+</script>
+<script>
 /* 2026-08-15 A2 懒加载：捕获首次 DOMContentLoaded 所有渲染回调，供大文件到位后重放 */
 window.__domReadyFns=[];
 (function(){
@@ -5759,10 +5772,10 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <a href="v6_memo.html?v=3785c4e601" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:#38bdf8;color:#0a0e17;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">🚀 直接打开（推荐，绕过 iframe）</a>
         <span style="font-size:10px;color:var(--dim);margin-left:auto;">如 iframe 长期空白，请点「直接打开」按钮，规避浏览器/网络拦截</span>
       </div>
-      <iframe src="v6_memo.html?v=3785c4e601" style="width:100%;height:calc(100vh - 280px);border:none;border-radius:14px;background:#f5f7fa;" id="v6MemoFrame" onload="window.__v6MemoLoaded && window.__v6MemoLoaded()"></iframe>
-      <!-- 🛡 2026-08-23 修复：v6_memo.html 内容已更新但 index.html 引用 ?v=3785c4e601 写死不变，
-           浏览器/CDN 按 URL 缓存旧空白版 → 用户长期看到空白。动态重设 src 带 _cb 时间戳强制拉最新。 -->
-      <script>try{var _f=document.getElementById('v6MemoFrame');if(_f)_f.src='v6_memo.html?_cb='+Date.now();}catch(e){}</script>
+      <!-- 🛡 2026-08-23 修复：iframe 初始 src 留空，由 JS 一次性设为 v6_memo.html?时间戳。
+           避免页面加载后二次改 src，消除 iOS Safari / 微信浏览器 iframe 重复加载/空白问题。 -->
+      <iframe src="" style="width:100%;height:calc(100vh - 280px);border:none;border-radius:14px;background:#f5f7fa;" id="v6MemoFrame" onload="window.__v6MemoLoaded && window.__v6MemoLoaded()"></iframe>
+      <script>(function(){ var _f=document.getElementById('v6MemoFrame'); if(_f) _f.src='v6_memo.html?' + Date.now(); })();</script>
       <div id="v6MemoStatus" style="position:absolute;top:60px;right:16px;padding:5px 10px;border-radius:8px;font-size:12px;font-weight:600;background:rgba(13,20,35,.75);color:#38bdf8;border:1px solid rgba(56,189,248,.3);z-index:10;pointer-events:none;display:none;">加载中…</div>
       <div id="v6MemoError" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:var(--bg);border-radius:14px;z-index:20;text-align:center;padding:24px;">
         <div style="font-size:18px;font-weight:700;color:#f87171;">⚠️ v6 备忘录加载失败</div>
@@ -11723,7 +11736,9 @@ function drawUpDownChart(){
         //  又试过 ?cb= 时间戳，但被 reconcile_cache_busters 正则整体归一成 ?v=<内容哈希> 而丢弃自定义参数。
         //  现改裸路径：构建时自动补 ?v=<内容哈希>（每次内容变化哈希必变 → 天然跨构建缓存失效），
         //  运行时即加载当前数据文件，杜绝畸形 URL 与陈旧缓存。
-        _s.src = 'data/MARKET_PATH_PROBABILITY.js?v=45f0b41074';
+        // 运行时动态拼接 ?时间戳，拆分字符串避免 reconcile_cache_busters 把静态 ?v 和时间戳粘成畸形 URL
+        var _base = 'data/MARKET_PATH_PROBABILITY' + '.js';
+        _s.src = _base + '?' + Date.now();
         _s.onload = function(){ try{ window._fillAiPrediction(); }catch(e){} };
         _s.onerror = function(){};
         document.head.appendChild(_s);
@@ -13108,19 +13123,17 @@ function switchLg(id,el){
   var pane=document.getElementById('lg-'+id);
   if(pane) pane.classList.add('active');
   if(el) el.classList.add('active');
-  if(id==='v6'){
+    if(id==='v6'){
     var d=document.getElementById('v6MemoFrame');
     var err=document.getElementById('v6MemoError');
     var st=document.getElementById('v6MemoStatus');
     if(d&&err){
       err.style.display='none';
-      // 2026-08-18 修复：iframe 父元素默认 display:none，某些浏览器不会及时初始化；
-      // 切到 v6 tab 时若 src 未变或缓存异常，强制重载一次保证内容真正加载。
+      // 2026-08-23 修复：只在检测到 iframe 内容为空/异常时才重载，避免 iOS Safari 重复加载。
       try{
-        var src = d.getAttribute('src') || '';
-        if(src.indexOf('?')>-1 && !d.__v6Reloaded){
-          d.__v6Reloaded = true;
-          d.src = src;
+        var isEmpty = !d.contentDocument || !d.contentDocument.body || d.contentDocument.body.innerHTML.length<500;
+        if(isEmpty && d.src && d.src.indexOf('v6_memo')>=0){
+          d.src = d.src.split('?')[0] + '?' + Date.now();
         }
       }catch(e){}
     }
@@ -13144,11 +13157,13 @@ window.__v6MemoLoaded = function(){
   window.__v6MemoReady = true;
   var err=document.getElementById('v6MemoError');
   var st=document.getElementById('v6MemoStatus');
+  var d=document.getElementById('v6MemoFrame');
+  // 初始空 src 也会触发 onload，此时无需处理，等真实 v6_memo.html 加载完再判。
+  if(!d || !d.src || d.src.indexOf('v6_memo')<0) return;
   // 🛡 2026-08-21 增强（主人「v6 备忘录空白」）：onload 后必须确认 iframe 内容真实渲染，
   //   防「onload 触发了但 body 为空/被拦截」——内容 <500 字节判定为空白，显示直接打开按钮。
   try{
-    var d=document.getElementById('v6MemoFrame');
-    if(d && d.contentDocument && d.contentDocument.body && d.contentDocument.body.innerHTML.length<500){
+    if(d.contentDocument && d.contentDocument.body && d.contentDocument.body.innerHTML.length<500){
       if(err) err.style.display='flex';
       if(st) st.style.display='none';
       return;
