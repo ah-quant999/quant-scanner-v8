@@ -1,1 +1,1 @@
-window.RUNNER_STATUS = {"run_time":"2026-08-24 11:50:17","category":"all","hostname":"","modules":{"CANDIDATE_QUOTES":{"status":"ok","msg":"成功"}},"summary":{"total":1,"ok":1,"empty":0,"fail":0},"update_time":"2026-08-24 11:52:51","republish_time":"2026-08-24 11:52:55"};
+window.RUNNER_STATUS = {"run_time":"2026-08-24 11:50:17","category":"all","hostname":"","modules":{"CANDIDATE_QUOTES":{"status":"ok","msg":"成功"}},"summary":{"total":1,"ok":1,"empty":0,"fail":0},"update_time":"2026-08-24 12:03:32","republish_time":"2026-08-24 12:03:53"};
