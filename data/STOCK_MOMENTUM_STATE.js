@@ -1,15 +1,21 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-08-23 19:48",
- "generated": "2026-08-23 19:48",
+ "update_time": "2026-08-24 18:03",
+ "generated": "2026-08-24 18:03",
  "meta": {
-  "generated": "2026-08-23 19:48",
+  "generated": "2026-08-24 18:03",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
-  "total_days": 0,
+  "total_days": 1,
   "days_with_consensus": 0,
   "total_consensus_stocks": 0
  },
- "days": []
+ "days": [
+  {
+   "date": "2026-08-24",
+   "categories": {},
+   "consensus": []
+  }
+ ]
 };
   return {
     getDays: function() { return data.days; },
