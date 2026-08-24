@@ -1,248 +1,35 @@
 {
-  "update_time": "2026-08-24 20:38:32",
+  "update_time": "2026-08-24 21:47:36",
   "data_date": "2026-08-24",
   "track_start": "2026-08-24",
   "history_days": 7,
   "strict_count": 0,
-  "near_count": 10,
+  "near_count": 1,
   "tracked": [
     {
-      "code": "000506",
-      "name": "中国食品",
-      "market": "sz",
-      "board": "主板",
-      "status": "near",
-      "total_score": 36.4,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 3,
-      "consecutive_days": 2,
-      "first_close": 17.55,
-      "current_close": 20.77,
-      "pnl_pct": 18.35,
-      "catalysts": []
-    },
-    {
-      "code": "300765",
-      "name": "石药创新",
-      "market": "sz",
-      "board": "创业板",
-      "status": "near",
-      "total_score": 37.6,
-      "quality_grade": "A",
-      "industry": "食品制造业",
-      "sectors": [
-        "食品制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-19",
-      "hold_days": 3,
-      "consecutive_days": 2,
-      "first_close": 43.15,
-      "current_close": 49.0,
-      "pnl_pct": 13.56,
-      "catalysts": []
-    },
-    {
-      "code": "601899",
-      "name": "紫金矿业",
+      "code": "600988",
+      "name": "赤峰黄金",
       "market": "sh",
       "board": "主板",
       "status": "near",
-      "total_score": 37.6,
+      "total_score": 34.8,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
         "有色金属矿采选业"
       ],
       "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 7,
-      "consecutive_days": 3,
-      "first_close": 33.36,
-      "current_close": 35.45,
-      "pnl_pct": 6.26,
+      "enter_date": "2026-08-20",
+      "hold_days": 1,
+      "consecutive_days": 2,
+      "first_close": 46.1,
+      "current_close": 48.77,
+      "pnl_pct": 5.79,
       "catalysts": [
         {
           "tag": "中报预增",
           "score": 15,
           "reaction": "已兑现(价涨)"
-        }
-      ]
-    },
-    {
-      "code": "000703",
-      "name": "FUTURE BRIGHT",
-      "market": "sz",
-      "board": "主板",
-      "status": "near",
-      "total_score": 36.4,
-      "quality_grade": "A",
-      "industry": "化学纤维制造业",
-      "sectors": [
-        "化学纤维制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-20",
-      "hold_days": 2,
-      "consecutive_days": 2,
-      "first_close": 20.1,
-      "current_close": 20.8,
-      "pnl_pct": 3.48,
-      "catalysts": []
-    },
-    {
-      "code": "603993",
-      "name": "洛阳钼业",
-      "market": "sh",
-      "board": "主板",
-      "status": "near",
-      "total_score": 37.6,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 5,
-      "consecutive_days": 2,
-      "first_close": 20.75,
-      "current_close": 20.75,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "601168",
-      "name": "西部矿业",
-      "market": "sh",
-      "board": "主板",
-      "status": "near",
-      "total_score": 36.4,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 3,
-      "consecutive_days": 2,
-      "first_close": 42.45,
-      "current_close": 42.45,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "688525",
-      "name": "佰维存储",
-      "market": "sh",
-      "board": "科创板",
-      "status": "near",
-      "total_score": 36.0,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-22",
-      "hold_days": 3,
-      "consecutive_days": 3,
-      "first_close": 238.96,
-      "current_close": 238.96,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报扭亏",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "000792",
-      "name": "盐湖股份",
-      "market": "sz",
-      "board": "主板",
-      "status": "near",
-      "total_score": 36.0,
-      "quality_grade": "A",
-      "industry": "化学原料和化学制品制造业",
-      "sectors": [
-        "化学原料和化学制品制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-23",
-      "hold_days": 2,
-      "consecutive_days": 2,
-      "first_close": 28.81,
-      "current_close": 28.81,
-      "pnl_pct": 0.0,
-      "catalysts": []
-    },
-    {
-      "code": "600183",
-      "name": "生益科技",
-      "market": "sh",
-      "board": "主板",
-      "status": "near",
-      "total_score": 36.0,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-22",
-      "hold_days": 3,
-      "consecutive_days": 3,
-      "first_close": 132.8,
-      "current_close": 132.8,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "300502",
-      "name": "新易盛",
-      "market": "sz",
-      "board": "创业板",
-      "status": "near",
-      "total_score": 38.4,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 4,
-      "consecutive_days": 3,
-      "first_close": 448.08,
-      "current_close": 442.0,
-      "pnl_pct": -1.36,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
         }
       ]
     }
@@ -340,12 +127,6 @@
     },
     {
       "level": "warn",
-      "code": "600988",
-      "name": "赤峰黄金",
-      "text": "赤峰黄金(600988) 于 2026-08-22 跌出共识（曾连续 2 日）"
-    },
-    {
-      "level": "warn",
       "code": "600489",
       "name": "中金黄金",
       "text": "中金黄金(600489) 于 2026-08-22 跌出共识（曾连续 1 日）"
@@ -361,83 +142,34 @@
     "by_industry": [
       {
         "industry": "有色金属矿采选业",
-        "count": 4,
-        "names": [
-          "中国食品",
-          "紫金矿业",
-          "洛阳钼业",
-          "西部矿业"
-        ]
-      },
-      {
-        "industry": "计算机、通信和其他电子设备制造业",
-        "count": 3,
-        "names": [
-          "佰维存储",
-          "生益科技",
-          "新易盛"
-        ]
-      },
-      {
-        "industry": "食品制造业",
         "count": 1,
         "names": [
-          "石药创新"
-        ]
-      },
-      {
-        "industry": "化学纤维制造业",
-        "count": 1,
-        "names": [
-          "FUTURE BRIGHT"
-        ]
-      },
-      {
-        "industry": "化学原料和化学制品制造业",
-        "count": 1,
-        "names": [
-          "盐湖股份"
+          "赤峰黄金"
         ]
       }
     ],
     "by_sector": [
       {
         "sector": "有色金属矿采选业",
-        "count": 4
-      },
-      {
-        "sector": "计算机、通信和其他电子设备制造业",
-        "count": 3
-      },
-      {
-        "sector": "食品制造业",
-        "count": 1
-      },
-      {
-        "sector": "化学纤维制造业",
-        "count": 1
-      },
-      {
-        "sector": "化学原料和化学制品制造业",
         "count": 1
       }
     ],
-    "concentration": 40.0
+    "concentration": 100.0
   },
   "overlap": {
-    "total_tracked": 10,
+    "total_tracked": 1,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
       "names": []
     },
     "cockpit_a": {
-      "count": 7,
+      "count": 2,
       "overlap": 0,
       "names": []
     },
     "cockpit_b": {
-      "count": 15,
+      "count": 9,
       "overlap": 0,
       "names": []
     }
@@ -568,9 +300,9 @@
         "avg_return": 3.88
       },
       "3d": {
-        "count": 4,
-        "win_rate": 75.0,
-        "avg_return": 5.83
+        "count": 5,
+        "win_rate": 80.0,
+        "avg_return": 5.82
       },
       "5d": {
         "count": 5,
@@ -663,12 +395,13 @@
         "name": "赤峰黄金",
         "enter_date": "2026-08-20",
         "offsets": {
-          "1d": 7.22
+          "1d": 7.22,
+          "3d": 5.79
         }
       },
       {
         "code": "000703",
-        "name": "FUTURE BRIGHT",
+        "name": "恒逸石化",
         "enter_date": "2026-08-20",
         "offsets": {
           "3d": 3.48

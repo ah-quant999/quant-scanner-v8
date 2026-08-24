@@ -179,7 +179,8 @@
     },
     "600988": {
       "2026-08-20": 46.1,
-      "2026-08-22": 49.43
+      "2026-08-22": 49.43,
+      "2026-08-24": 48.77
     },
     "000703": {
       "2026-08-20": 20.1,
@@ -395,9 +396,9 @@
     "600988": {
       "enter_date": "2026-08-20",
       "enter_close": 46.1,
-      "last_date": "2026-08-22",
-      "last_close": 49.43,
-      "status": "dropped",
+      "last_date": "2026-08-24",
+      "last_close": 48.77,
+      "status": "near",
       "streak": 2,
       "total_days": 1
     },
@@ -459,7 +460,7 @@
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-08-24 20:38:32"
+    "last_update": "2026-08-24 21:47:36"
   },
   "2026-08-18": [
     {
@@ -985,161 +986,17 @@
   ],
   "2026-08-24": [
     {
-      "code": "300502",
-      "name": "新易盛",
-      "market": "sz",
-      "board": "创业板",
-      "close": 442.0,
-      "pct_chg": 6.76,
-      "total_score": 38.4,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "601899",
-      "name": "紫金矿业",
+      "code": "600988",
+      "name": "赤峰黄金",
       "market": "sh",
       "board": "主板",
-      "close": 35.45,
-      "pct_chg": 0.85,
-      "total_score": 37.6,
+      "close": 48.77,
+      "pct_chg": -1.34,
+      "total_score": 34.8,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
         "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "603993",
-      "name": "洛阳钼业",
-      "market": "sh",
-      "board": "主板",
-      "close": 20.75,
-      "pct_chg": -0.38,
-      "total_score": 37.6,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "300765",
-      "name": "石药创新",
-      "market": "sz",
-      "board": "创业板",
-      "close": 49.0,
-      "pct_chg": -5.37,
-      "total_score": 37.6,
-      "quality_grade": "A",
-      "industry": "食品制造业",
-      "sectors": [
-        "食品制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "000703",
-      "name": "FUTURE BRIGHT",
-      "market": "sz",
-      "board": "主板",
-      "close": 20.8,
-      "pct_chg": 3.48,
-      "total_score": 36.4,
-      "quality_grade": "A",
-      "industry": "化学纤维制造业",
-      "sectors": [
-        "化学纤维制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "000506",
-      "name": "中国食品",
-      "market": "sz",
-      "board": "主板",
-      "close": 20.77,
-      "pct_chg": 6.79,
-      "total_score": 36.4,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "601168",
-      "name": "西部矿业",
-      "market": "sh",
-      "board": "主板",
-      "close": 42.45,
-      "pct_chg": -1.44,
-      "total_score": 36.4,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "688525",
-      "name": "佰维存储",
-      "market": "sh",
-      "board": "科创板",
-      "close": 238.96,
-      "pct_chg": 1.83,
-      "total_score": 36.0,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "000792",
-      "name": "盐湖股份",
-      "market": "sz",
-      "board": "主板",
-      "close": 28.81,
-      "pct_chg": 3.15,
-      "total_score": 36.0,
-      "quality_grade": "A",
-      "industry": "化学原料和化学制品制造业",
-      "sectors": [
-        "化学原料和化学制品制造业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "600183",
-      "name": "生益科技",
-      "market": "sh",
-      "board": "主板",
-      "close": 132.8,
-      "pct_chg": 5.16,
-      "total_score": 36.0,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 0,
       "status": "near"
