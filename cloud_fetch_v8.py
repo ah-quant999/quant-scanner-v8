@@ -1228,7 +1228,17 @@ def f_sector_fund_flow():
                 if _existing.get("date") == _today_str:
                     _intraday_data = _existing
             except Exception:
-                pass
+                # 🛡 2026-08-24 读取损坏 → 尝试 .bak 恢复，而非静默重置为空
+                #   （曾导致早盘12快照午后丢失 → 曲线断档）。根因=取消风暴中途杀写留下半截JSON。
+                _bak = _intraday_path.with_suffix(".json.bak")
+                if _bak.exists():
+                    try:
+                        _existing = json.loads(_bak.read_text(encoding="utf-8"))
+                        if _existing.get("date") == _today_str:
+                            _intraday_data = _existing
+                            print("  ↩️ intraday 快照从 .bak 恢复（主文件读取损坏）")
+                    except Exception:
+                        pass
 
         # 取上证指数当前涨跌幅%（用于双轴对照）
         _idx_chg = 0.0
@@ -1255,16 +1265,37 @@ def f_sector_fund_flow():
             "sectors_out": _top_out,
             "index_chg": _idx_chg,
         }
-        _intraday_data["snapshots"].append(_snapshot)
+        # 🛡 2026-08-24 一劳永逸：按 time 幂等写入（同时间快照覆盖而非重复追加），
+        #   杜绝双机/重试导致的重复快照，并配合 .bak 恢复保留完整盘中序列
+        _snap_times = {s.get("time") for s in _intraday_data.get("snapshots", [])}
+        if _now_ts in _snap_times:
+            for _i, _s in enumerate(_intraday_data["snapshots"]):
+                if _s.get("time") == _now_ts:
+                    _intraday_data["snapshots"][_i] = _snapshot
+                    break
+        else:
+            _intraday_data["snapshots"].append(_snapshot)
 
         # 保留最近 80 个快照（约 13 小时 × 10min，足够覆盖延时长交易）
         if len(_intraday_data["snapshots"]) > 80:
             _intraday_data["snapshots"] = _intraday_data["snapshots"][-80:]
 
-        _intraday_path.write_text(
+        # 🛡 2026-08-24 一劳永逸：先写临时文件再原子 rename，避免被 cancel-in-progress
+        #   中途杀掉时留下半截 JSON（下次读取即损坏→重置→丢失全天快照→曲线断档）
+        _tmp_path = _intraday_path.with_suffix(".json.tmp")
+        _tmp_path.write_text(
             json.dumps(_intraday_data, ensure_ascii=False, separators=(",", ":")),
             encoding="utf-8",
         )
+        _tmp_path.replace(_intraday_path)
+        # 🛡 2026-08-24 一劳永逸：写成功后留存 .bak（完整最新态），供下次读取损坏时恢复，
+        #   确保盘中快照序列最多丢失「正在写的那一个」，而非被重置清空全天
+        try:
+            _intraday_path.with_suffix(".json.bak").write_text(
+                json.dumps(_intraday_data, ensure_ascii=False, separators=(",", ":")),
+                encoding="utf-8")
+        except Exception:
+            pass
         print(f"  📈 sector_fund_flow_intraday 快照 {_now_ts} ({len(_top_in)}进{len(_top_out)}出)")
     except Exception as _ie:
         print(f"  ⚠️ sector_fund_flow_intraday 快照失败: {_ie}")
