@@ -1,52 +1,52 @@
 {
-  "update_time": "2026-08-21 23:20:26",
+  "update_time": "2026-08-24 08:34:47",
   "suspended": [
     {
       "code": "200706",
       "name": "瓦轴B",
-      "days": 172,
+      "days": 175,
       "reason": "刊登重要公告"
     },
     {
       "code": "600984",
       "name": "建设机械",
-      "days": 10,
+      "days": 13,
       "reason": "拟筹划重大资产重组"
-    },
-    {
-      "code": "300176",
-      "name": "鸿特科技",
-      "days": 8,
-      "reason": "刊登重要公告"
     },
     {
       "code": "002445",
       "name": "中南文化",
-      "days": 4,
+      "days": 7,
       "reason": "刊登重要公告"
     },
     {
       "code": "002084",
       "name": "海鸥住工",
-      "days": 4,
+      "days": 7,
       "reason": "刊登重要公告"
     },
     {
       "code": "002906",
       "name": "华阳集团",
-      "days": 3,
+      "days": 6,
       "reason": "刊登重要公告"
     },
     {
       "code": "300862",
       "name": "蓝盾光电",
-      "days": 2,
+      "days": 5,
       "reason": "交易异常波动"
     },
     {
       "code": "002155",
       "name": "湖南黄金",
-      "days": 1,
+      "days": 4,
+      "reason": "刊登重要公告"
+    },
+    {
+      "code": "200016",
+      "name": "*ST康佳B",
+      "days": 0,
       "reason": "刊登重要公告"
     }
   ],
