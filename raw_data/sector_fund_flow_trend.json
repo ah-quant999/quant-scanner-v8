@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-25 00:04",
+  "update_time": "2026-08-25 01:11",
   "data_type": "real",
   "summary": {
     "in_count": 30,
@@ -12,7 +12,7 @@
     {
       "name": "高股息精选",
       "net": 80.06,
-      "net_5d": 182.98,
+      "net_5d": 240.74,
       "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
@@ -26,12 +26,12 @@
     {
       "name": "银行",
       "net": 45.23,
-      "net_5d": 45.16,
-      "net_20d": 159.45,
+      "net_5d": 67.1,
+      "net_20d": 204.68,
       "type": "行业",
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_20d_days": 14,
+      "net_20d_days": 15,
       "consecutive_days": 2,
       "trend": "in",
       "net_10d": 135.25,
@@ -54,7 +54,7 @@
     {
       "name": "超级品牌",
       "net": 20.18,
-      "net_5d": -0.47,
+      "net_5d": 15.43,
       "net_20d": 118.31,
       "type": "概念",
       "net_10d": -117.2,
@@ -73,9 +73,10 @@
       "net_5d": 77.76,
       "net_20d": 0,
       "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
       "consecutive_days": 5,
       "trend": "in",
-      "net_5d_days": 5,
       "net_10d_days": 5,
       "net_20d_days": 5,
       "net_60d_days": 5
@@ -83,12 +84,12 @@
     {
       "name": "证金持股",
       "net": 17.37,
-      "net_5d": 67.33,
-      "net_20d": -137.91,
+      "net_5d": 55.38,
+      "net_20d": -120.54,
       "type": "概念",
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_20d_days": 13,
+      "net_20d_days": 14,
       "consecutive_days": 4,
       "trend": "in",
       "net_10d": -49.25,
@@ -113,7 +114,7 @@
     {
       "name": "白酒",
       "net": 12.44,
-      "net_5d": -13.85,
+      "net_5d": 1.17,
       "net_20d": 96.59,
       "type": "行业",
       "net_10d": -60.61,
@@ -160,9 +161,10 @@
       "net_5d": 14.5,
       "net_20d": 0,
       "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
       "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 5,
       "net_10d_days": 5,
       "net_20d_days": 5,
       "net_60d_days": 5
@@ -196,7 +198,7 @@
     {
       "name": "钢铁",
       "net": 4.55,
-      "net_5d": 10.06,
+      "net_5d": 11.98,
       "net_20d": 58.55,
       "type": "行业",
       "net_10d": -14.21,
@@ -212,7 +214,7 @@
     {
       "name": "参股券商",
       "net": 4.07,
-      "net_5d": 40.35,
+      "net_5d": 36.63,
       "net_20d": 297.34,
       "type": "概念",
       "net_10d": -66.49,
@@ -267,7 +269,7 @@
     {
       "name": "乳业",
       "net": 3.17,
-      "net_5d": 6.63,
+      "net_5d": 7.91,
       "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
@@ -296,7 +298,7 @@
     {
       "name": "贵金属",
       "net": 2.73,
-      "net_5d": 151.08,
+      "net_5d": 124.13,
       "net_20d": 2706.5,
       "type": "行业",
       "net_10d": 224.26,
@@ -351,7 +353,7 @@
     {
       "name": "净水概念",
       "net": 1.56,
-      "net_5d": 2.71,
+      "net_5d": 3.32,
       "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
@@ -378,7 +380,7 @@
     {
       "name": "转基因",
       "net": 1.32,
-      "net_5d": 9.31,
+      "net_5d": 9.09,
       "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
@@ -395,9 +397,10 @@
       "net_5d": 7.89,
       "net_20d": 0,
       "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
       "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 5,
       "net_10d_days": 5,
       "net_20d_days": 5,
       "net_60d_days": 5
@@ -434,7 +437,7 @@
     {
       "name": "高股息精选",
       "net": 80.06,
-      "net_5d": 182.98,
+      "net_5d": 240.74,
       "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
@@ -448,12 +451,12 @@
     {
       "name": "银行",
       "net": 45.23,
-      "net_5d": 45.16,
-      "net_20d": 159.45,
+      "net_5d": 67.1,
+      "net_20d": 204.68,
       "type": "行业",
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_20d_days": 14,
+      "net_20d_days": 15,
       "consecutive_days": 2,
       "trend": "in",
       "net_10d": 135.25,
@@ -476,7 +479,7 @@
     {
       "name": "超级品牌",
       "net": 20.18,
-      "net_5d": -0.47,
+      "net_5d": 15.43,
       "net_20d": 118.31,
       "type": "概念",
       "net_10d": -117.2,
@@ -495,9 +498,10 @@
       "net_5d": 77.76,
       "net_20d": 0,
       "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
       "consecutive_days": 5,
       "trend": "in",
-      "net_5d_days": 5,
       "net_10d_days": 5,
       "net_20d_days": 5,
       "net_60d_days": 5
@@ -505,12 +509,12 @@
     {
       "name": "证金持股",
       "net": 17.37,
-      "net_5d": 67.33,
-      "net_20d": -137.91,
+      "net_5d": 55.38,
+      "net_20d": -120.54,
       "type": "概念",
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_20d_days": 13,
+      "net_20d_days": 14,
       "consecutive_days": 4,
       "trend": "in",
       "net_10d": -49.25,
@@ -535,7 +539,7 @@
     {
       "name": "白酒",
       "net": 12.44,
-      "net_5d": -13.85,
+      "net_5d": 1.17,
       "net_20d": 96.59,
       "type": "行业",
       "net_10d": -60.61,
@@ -582,9 +586,10 @@
       "net_5d": 14.5,
       "net_20d": 0,
       "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
       "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 5,
       "net_10d_days": 5,
       "net_20d_days": 5,
       "net_60d_days": 5
@@ -618,7 +623,7 @@
     {
       "name": "钢铁",
       "net": 4.55,
-      "net_5d": 10.06,
+      "net_5d": 11.98,
       "net_20d": 58.55,
       "type": "行业",
       "net_10d": -14.21,
@@ -634,7 +639,7 @@
     {
       "name": "参股券商",
       "net": 4.07,
-      "net_5d": 40.35,
+      "net_5d": 36.63,
       "net_20d": 297.34,
       "type": "概念",
       "net_10d": -66.49,
@@ -689,7 +694,7 @@
     {
       "name": "乳业",
       "net": 3.17,
-      "net_5d": 6.63,
+      "net_5d": 7.91,
       "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
@@ -718,7 +723,7 @@
     {
       "name": "贵金属",
       "net": 2.73,
-      "net_5d": 151.08,
+      "net_5d": 124.13,
       "net_20d": 2706.5,
       "type": "行业",
       "net_10d": 224.26,
@@ -773,7 +778,7 @@
     {
       "name": "净水概念",
       "net": 1.56,
-      "net_5d": 2.71,
+      "net_5d": 3.32,
       "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
@@ -800,7 +805,7 @@
     {
       "name": "转基因",
       "net": 1.32,
-      "net_5d": 9.31,
+      "net_5d": 9.09,
       "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
@@ -817,9 +822,10 @@
       "net_5d": 7.89,
       "net_20d": 0,
       "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
       "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 5,
       "net_10d_days": 5,
       "net_20d_days": 5,
       "net_60d_days": 5
@@ -853,11 +859,12 @@
     {
       "name": "物流",
       "net": 0.94,
-      "net_5d": 0.03,
-      "net_20d": 0,
+      "net_5d": 0.16,
+      "net_20d": 2.59,
       "type": "行业",
       "net_5d_days": 5,
       "source": "本地累加",
+      "net_20d_days": 8,
       "consecutive_days": 3,
       "trend": "in"
     },
@@ -900,7 +907,7 @@
     {
       "name": "多元金融",
       "net": 0.28,
-      "net_5d": 14.11,
+      "net_5d": 9.76,
       "net_20d": 45.83,
       "type": "行业",
       "net_10d": -11.05,
@@ -924,13 +931,15 @@
     {
       "name": "白色家电",
       "net": 0.2,
-      "net_5d": -23.68,
+      "net_5d": 3.96,
       "net_20d": 171.22,
       "type": "行业",
       "net_10d": -25.66,
       "net_10d_days": 10,
       "net_60d": -452.09,
       "net_60d_days": 49,
+      "net_5d_days": 5,
+      "source": "本地累加",
       "consecutive_days": 5,
       "trend": "in"
     },
@@ -1458,7 +1467,7 @@
     {
       "name": "贵金属",
       "net": 2.73,
-      "net_5d": 151.08,
+      "net_5d": 124.13,
       "net_20d": 2706.5,
       "type": "行业",
       "net_10d": 224.26,
@@ -1476,7 +1485,7 @@
     {
       "name": "贵金属",
       "net": 2.73,
-      "net_5d": 151.08,
+      "net_5d": 124.13,
       "net_20d": 2706.5,
       "type": "行业",
       "net_10d": 224.26,
@@ -1659,7 +1668,7 @@
     {
       "name": "贵金属",
       "net": 2.73,
-      "net_5d": 151.08,
+      "net_5d": 124.13,
       "net_20d": 2706.5,
       "type": "行业",
       "net_10d": 224.26,
@@ -1705,7 +1714,7 @@
     {
       "name": "白酒",
       "net": 12.44,
-      "net_5d": -13.85,
+      "net_5d": 1.17,
       "net_20d": 96.59,
       "type": "行业",
       "net_10d": -60.61,
@@ -1721,7 +1730,7 @@
     {
       "name": "超级品牌",
       "net": 20.18,
-      "net_5d": -0.47,
+      "net_5d": 15.43,
       "net_20d": 118.31,
       "type": "概念",
       "net_10d": -117.2,
@@ -1737,7 +1746,7 @@
     {
       "name": "多元金融",
       "net": 0.28,
-      "net_5d": 14.11,
+      "net_5d": 9.76,
       "net_20d": 45.83,
       "type": "行业",
       "net_10d": -11.05,
@@ -1768,7 +1777,7 @@
     {
       "name": "钢铁",
       "net": 4.55,
-      "net_5d": 10.06,
+      "net_5d": 11.98,
       "net_20d": 58.55,
       "type": "行业",
       "net_10d": -14.21,
@@ -1784,7 +1793,7 @@
     {
       "name": "参股券商",
       "net": 4.07,
-      "net_5d": 40.35,
+      "net_5d": 36.63,
       "net_20d": 297.34,
       "type": "概念",
       "net_10d": -66.49,
@@ -1800,16 +1809,17 @@
     {
       "name": "白色家电",
       "net": 0.2,
-      "net_5d": -23.68,
+      "net_5d": 3.96,
       "net_20d": 171.22,
       "type": "行业",
       "net_10d": -25.66,
       "net_10d_days": 10,
       "net_60d": -452.09,
       "net_60d_days": 49,
+      "net_5d_days": 5,
+      "source": "本地累加",
       "consecutive_days": 5,
       "trend": "in",
-      "net_5d_days": 5,
       "net_20d_days": 5
     }
   ]
