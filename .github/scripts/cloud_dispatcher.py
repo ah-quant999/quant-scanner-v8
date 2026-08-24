@@ -169,6 +169,63 @@ def dispatch(wf_file, inputs=None):
     else:
         print(f"  ❌ 派发 {wf_file} 失败")
 
+# 🔴 2026-08-24 一劳永逸根因修复（主人令「修复 2-3 号问题」之 #3）：
+#   盘后算法链 step（🧮 运行盘后算法链）偶发挂死（数据源/网络调用无超时等），
+#   会以 in_progress 状态长期占用 v8-algo-cloud 单并发槽（concurrency cancel-in-progress:false），
+#   把当晚 19:15 的盘后生成堵在队列里 → CANDIDATE/all_* 等卡片停更（#3 慢性陈旧根因）。
+#   僵尸看门狗：仅对「北京时间 < 18:00 创建、却仍 in_progress」的 algo run 出手取消——
+#   这类 run 按设计会跳过全部选股脚本（run_algorithms 内部 18:00 时间窗 gate），
+#   不产生任何卡片数据，且正常 5-15 分钟即结束；若 in_progress 超 60 分钟必为挂死，
+#   取消它零数据损失、并立即释放并发槽给当晚 19:15 生成。
+#   绝不碰「>=18:00 创建」的盘后生成 run（那才是真正产出卡片的轮次），避免误杀真生成。
+ZOMBIE_WF = "v8_algo_cloud.yml"
+ZOMBIE_PRE18_MAX_MIN = 60  # 盘前 run 正常 5-15 分钟结束，超 60 分钟必挂
+
+def api_delete(path):
+    """DELETE 并返回 HTTP 状态码（204=成功；看门狗取消 run 用）。"""
+    url = API + path
+    headers = {"Authorization": f"Bearer {TOKEN}",
+               "Accept": "application/vnd.github+json",
+               "X-GitHub-Api-Version": "2022-11-28"}
+    req = urllib.request.Request(url, headers=headers, method="DELETE")
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return r.status
+    except urllib.error.HTTPError as e:
+        print(f"  ⚠️ DELETE {path} -> HTTP {e.code}")
+        return e.code
+    except Exception as e:
+        print(f"  ⚠️ DELETE {path} -> {e}")
+        return -1
+
+def kill_zombie_pre18_algo(now):
+    """取消「盘前创建却仍 in_progress 超阈值」的 algo run，释放并发槽。"""
+    d = api("GET", f"/repos/{REPO}/actions/workflows/{ZOMBIE_WF}/runs?per_page=30&status=in_progress")
+    runs = d.get("workflow_runs", []) if isinstance(d, dict) else []
+    killed = 0
+    for r in runs:
+        try:
+            ct = datetime.datetime.fromisoformat(
+                r.get("created_at", "").replace("Z", "+00:00")).astimezone(CST)
+        except Exception:
+            continue
+        if ct.hour >= 18:
+            continue  # 盘后生成轮，受保护，绝不误杀
+        age_min = (now - ct).total_seconds() / 60.0
+        if age_min <= ZOMBIE_PRE18_MAX_MIN:
+            continue
+        rid = r.get("id")
+        print(f"  🧟 盘前僵尸 algo run {rid}（创建 {ct.strftime('%H:%M')}CST，已挂 {age_min:.0f} 分钟），"
+              f"取消以释放并发槽")
+        st = api_delete(f"/repos/{REPO}/actions/runs/{rid}")
+        if st in (200, 202, 204):
+            killed += 1
+            print(f"     ✅ 已取消 {rid} (HTTP {st})")
+        else:
+            print(f"     ⚠️ 取消 {rid} 返回 HTTP {st}")
+    if killed == 0:
+        print("  🧟 当前无盘前僵尸 algo run（并发槽干净）")
+
 # 3) 动量共识筛选重算（2026-08-22 起脱离 PDF，由 gen_momentum_self 每日盘后自合成）：
 #    V2 与 MOMENTUM_FILTER 现已随盘后构建(update_v8.run_experiment_cards)每日自动重算。
 #    本 dispatcher 仅作兜底：当 V2 生成日 < 今日（盘后构建漏跑/被冲掉）时，派发轻量链补算。
@@ -222,6 +279,11 @@ def dispatch_momentum_intraday(now):
 def main():
     now = datetime.datetime.now(CST)
     print(f"🛰️ 云端兜底调度器 @ {now.strftime('%Y-%m-%d %H:%M CST')}")
+
+    # 0) 僵尸看门狗：先清掉盘前挂死的 algo run，避免它占用 v8-algo-cloud 单并发槽
+    #    把当晚 19:15 盘后生成堵死（#3 慢性陈旧根因）。每 30 分随 cn_fetch 触发一次。
+    print("🧟 僵尸看门狗（盘前挂死 algo run）：")
+    kill_zombie_pre18_algo(now)
 
     # 1) 风险温度计：最近 90 分钟内无成功运行则补发
     rg = latest_run("v8_risk_gauge.yml")
