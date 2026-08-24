@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-08-24 12:30:59",
+  "update_time": "2026-08-24 13:02:31",
   "data_date": "2026-08-24",
   "source": "CONCEPT_RANKING × STOCK_PROFILE × STOCK_QUOTE",
   "hot_concepts_count": 33,
   "hot_concepts": [
     "破净股",
-    "稀缺资源",
     "红利股",
+    "稀缺资源",
     "红利破净股",
     "黄金概念",
     "小金属概念",
@@ -29,7 +29,7 @@
         "红利股"
       ],
       "hot_count": 5,
-      "total_score": 12.01
+      "total_score": 12.02
     },
     {
       "code": "601318",
@@ -44,7 +44,7 @@
         "金融地产风格"
       ],
       "hot_count": 5,
-      "total_score": 11.62
+      "total_score": 11.64
     },
     {
       "code": "601398",
@@ -59,7 +59,7 @@
         "长期破净"
       ],
       "hot_count": 5,
-      "total_score": 10.77
+      "total_score": 10.78
     },
     {
       "code": "000983",
@@ -74,7 +74,7 @@
         "红利股"
       ],
       "hot_count": 5,
-      "total_score": 10.53
+      "total_score": 10.54
     },
     {
       "code": "600997",
@@ -90,7 +90,7 @@
         "长期破净"
       ],
       "hot_count": 6,
-      "total_score": 10.13
+      "total_score": 10.14
     },
     {
       "code": "601666",
@@ -120,7 +120,7 @@
         "红利股"
       ],
       "hot_count": 5,
-      "total_score": 10.03
+      "total_score": 10.04
     },
     {
       "code": "601077",
@@ -135,7 +135,7 @@
         "长期破净"
       ],
       "hot_count": 5,
-      "total_score": 10.0
+      "total_score": 10.02
     },
     {
       "code": "600919",
@@ -150,7 +150,7 @@
         "长期破净"
       ],
       "hot_count": 5,
-      "total_score": 9.98
+      "total_score": 10.0
     },
     {
       "code": "601166",
@@ -165,7 +165,7 @@
         "长期破净"
       ],
       "hot_count": 5,
-      "total_score": 9.95
+      "total_score": 9.97
     },
     {
       "code": "601288",
@@ -179,7 +179,7 @@
         "金融地产风格"
       ],
       "hot_count": 4,
-      "total_score": 9.78
+      "total_score": 9.8
     },
     {
       "code": "600123",
@@ -195,7 +195,7 @@
         "长期破净"
       ],
       "hot_count": 6,
-      "total_score": 9.73
+      "total_score": 9.74
     },
     {
       "code": "601818",
@@ -210,7 +210,7 @@
         "长期破净"
       ],
       "hot_count": 5,
-      "total_score": 9.64
+      "total_score": 9.65
     },
     {
       "code": "600019",
@@ -226,7 +226,7 @@
         "长期破净"
       ],
       "hot_count": 6,
-      "total_score": 9.61
+      "total_score": 9.62
     },
     {
       "code": "601939",
@@ -241,7 +241,7 @@
         "长期破净"
       ],
       "hot_count": 5,
-      "total_score": 9.55
+      "total_score": 9.57
     }
   ],
   "rejected_summary": {
