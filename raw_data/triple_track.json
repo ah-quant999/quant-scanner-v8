@@ -1,10 +1,10 @@
 {
-  "update_time": "2026-08-23 15:32:35",
-  "data_date": "2026-08-23",
-  "track_start": "2026-08-23",
-  "history_days": 6,
-  "strict_count": 1,
-  "near_count": 9,
+  "update_time": "2026-08-24 19:32:38",
+  "data_date": "2026-08-24",
+  "track_start": "2026-08-24",
+  "history_days": 7,
+  "strict_count": 0,
+  "near_count": 10,
   "tracked": [
     {
       "code": "000506",
@@ -20,18 +20,12 @@
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
-      "hold_days": 2,
-      "consecutive_days": 1,
+      "hold_days": 3,
+      "consecutive_days": 2,
       "first_close": 17.55,
       "current_close": 20.77,
       "pnl_pct": 18.35,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "已兑现(价涨)"
-        }
-      ]
+      "catalysts": []
     },
     {
       "code": "300765",
@@ -47,25 +41,19 @@
       ],
       "signal_count": 0,
       "enter_date": "2026-08-19",
-      "hold_days": 2,
-      "consecutive_days": 1,
+      "hold_days": 3,
+      "consecutive_days": 2,
       "first_close": 43.15,
       "current_close": 49.0,
       "pnl_pct": 13.56,
-      "catalysts": [
-        {
-          "tag": "中报扭亏",
-          "score": 15,
-          "reaction": "已兑现(价涨)"
-        }
-      ]
+      "catalysts": []
     },
     {
       "code": "601899",
       "name": "紫金矿业",
       "market": "sh",
       "board": "主板",
-      "status": "strict",
+      "status": "near",
       "total_score": 37.6,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
@@ -74,8 +62,8 @@
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
-      "hold_days": 6,
-      "consecutive_days": 2,
+      "hold_days": 7,
+      "consecutive_days": 3,
       "first_close": 33.36,
       "current_close": 35.45,
       "pnl_pct": 6.26,
@@ -101,18 +89,12 @@
       ],
       "signal_count": 0,
       "enter_date": "2026-08-20",
-      "hold_days": 1,
-      "consecutive_days": 1,
+      "hold_days": 2,
+      "consecutive_days": 2,
       "first_close": 20.1,
       "current_close": 20.8,
       "pnl_pct": 3.48,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "已兑现(价涨)"
-        }
-      ]
+      "catalysts": []
     },
     {
       "code": "603993",
@@ -128,8 +110,8 @@
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
-      "hold_days": 4,
-      "consecutive_days": 1,
+      "hold_days": 5,
+      "consecutive_days": 2,
       "first_close": 20.75,
       "current_close": 20.75,
       "pnl_pct": 0.0,
@@ -155,24 +137,18 @@
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
-      "hold_days": 2,
-      "consecutive_days": 1,
+      "hold_days": 3,
+      "consecutive_days": 2,
       "first_close": 42.45,
       "current_close": 42.45,
       "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
+      "catalysts": []
     },
     {
-      "code": "600183",
-      "name": "生益科技",
+      "code": "688525",
+      "name": "佰维存储",
       "market": "sh",
-      "board": "主板",
+      "board": "科创板",
       "status": "near",
       "total_score": 36.0,
       "quality_grade": "A",
@@ -182,14 +158,14 @@
       ],
       "signal_count": 0,
       "enter_date": "2026-08-22",
-      "hold_days": 2,
-      "consecutive_days": 2,
-      "first_close": 132.8,
-      "current_close": 132.8,
+      "hold_days": 3,
+      "consecutive_days": 3,
+      "first_close": 238.96,
+      "current_close": 238.96,
       "pnl_pct": 0.0,
       "catalysts": [
         {
-          "tag": "中报预增",
+          "tag": "中报扭亏",
           "score": 15,
           "reaction": "观察中"
         }
@@ -209,24 +185,18 @@
       ],
       "signal_count": 0,
       "enter_date": "2026-08-23",
-      "hold_days": 1,
-      "consecutive_days": 1,
+      "hold_days": 2,
+      "consecutive_days": 2,
       "first_close": 28.81,
       "current_close": 28.81,
       "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
+      "catalysts": []
     },
     {
-      "code": "688525",
-      "name": "佰维存储",
+      "code": "600183",
+      "name": "生益科技",
       "market": "sh",
-      "board": "科创板",
+      "board": "主板",
       "status": "near",
       "total_score": 36.0,
       "quality_grade": "A",
@@ -236,14 +206,14 @@
       ],
       "signal_count": 0,
       "enter_date": "2026-08-22",
-      "hold_days": 2,
-      "consecutive_days": 2,
-      "first_close": 238.96,
-      "current_close": 238.96,
+      "hold_days": 3,
+      "consecutive_days": 3,
+      "first_close": 132.8,
+      "current_close": 132.8,
       "pnl_pct": 0.0,
       "catalysts": [
         {
-          "tag": "中报扭亏",
+          "tag": "中报预增",
           "score": 15,
           "reaction": "观察中"
         }
@@ -263,8 +233,8 @@
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
-      "hold_days": 3,
-      "consecutive_days": 2,
+      "hold_days": 4,
+      "consecutive_days": 3,
       "first_close": 448.08,
       "current_close": 442.0,
       "pnl_pct": -1.36,
@@ -403,8 +373,8 @@
         "industry": "计算机、通信和其他电子设备制造业",
         "count": 3,
         "names": [
-          "生益科技",
           "佰维存储",
+          "生益科技",
           "新易盛"
         ]
       },
@@ -474,48 +444,48 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测",
-    "latest_date": "2026-08-21",
-    "total": 237,
+    "latest_date": "2026-08-24",
+    "total": 255,
     "best_hold_days": 1,
     "periods": {
       "1d": {
-        "win_rate": 59.2,
-        "avg_return": 0.49,
-        "sharpe": 0.09,
-        "count": 225,
+        "win_rate": 56.8,
+        "avg_return": 0.31,
+        "sharpe": 0.06,
+        "count": 243,
         "best": 14.99,
         "worst": -10.02
       },
       "3d": {
-        "win_rate": 40.1,
-        "avg_return": -0.8,
-        "sharpe": -0.11,
-        "count": 225,
+        "win_rate": 40.4,
+        "avg_return": -0.73,
+        "sharpe": -0.1,
+        "count": 243,
         "best": 15.06,
         "worst": -10.04
       },
       "5d": {
-        "win_rate": 50.3,
-        "avg_return": 0.26,
-        "sharpe": 0.03,
-        "count": 225,
+        "win_rate": 49.3,
+        "avg_return": 0.07,
+        "sharpe": 0.01,
+        "count": 243,
         "best": 15.06,
         "worst": -10.04
       },
       "10d": {
         "win_rate": 49.1,
-        "avg_return": 1.02,
-        "sharpe": 0.11,
-        "count": 225,
+        "avg_return": 0.94,
+        "sharpe": 0.1,
+        "count": 243,
         "best": 15.07,
         "worst": -10.04
       },
       "20d": {
-        "win_rate": 21.9,
-        "avg_return": -1.56,
-        "sharpe": -0.26,
-        "count": 225,
-        "best": 15.01,
+        "win_rate": 22.2,
+        "avg_return": -1.59,
+        "sharpe": -0.27,
+        "count": 243,
+        "best": 15.07,
         "worst": -10.04
       }
     }
@@ -523,18 +493,18 @@
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 90,
-      "win_rate_5d": 68.3,
-      "avg_ret_5d": 2.92,
-      "best_win_rate": 68.3,
+      "count": 99,
+      "win_rate_5d": 66.7,
+      "avg_ret_5d": 2.47,
+      "best_win_rate": 66.7,
       "best_hold_days": 5
     },
     {
       "band": "70~80",
-      "count": 147,
-      "win_rate_5d": 41.7,
-      "avg_ret_5d": -1.15,
-      "best_win_rate": 55.9,
+      "count": 156,
+      "win_rate_5d": 40.7,
+      "avg_ret_5d": -1.27,
+      "best_win_rate": 54.6,
       "best_hold_days": 1
     }
   ],
@@ -542,27 +512,27 @@
     "periods": [
       {
         "period": "1d",
-        "strict_win": 59.2,
-        "strict_ret": 0.49,
-        "strict_count": 225,
+        "strict_win": 56.8,
+        "strict_ret": 0.31,
+        "strict_count": 243,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "3d",
-        "strict_win": 40.1,
-        "strict_ret": -0.8,
-        "strict_count": 225,
+        "strict_win": 40.4,
+        "strict_ret": -0.73,
+        "strict_count": 243,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "5d",
-        "strict_win": 50.3,
-        "strict_ret": 0.26,
-        "strict_count": 225,
+        "strict_win": 49.3,
+        "strict_ret": 0.07,
+        "strict_count": 243,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -570,17 +540,17 @@
       {
         "period": "10d",
         "strict_win": 49.1,
-        "strict_ret": 1.02,
-        "strict_count": 225,
+        "strict_ret": 0.94,
+        "strict_count": 243,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "20d",
-        "strict_win": 21.9,
-        "strict_ret": -1.56,
-        "strict_count": 225,
+        "strict_win": 22.2,
+        "strict_ret": -1.59,
+        "strict_count": 243,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -589,18 +559,18 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-08-23",
-    "history_days": 6,
+    "track_start": "2026-08-24",
+    "history_days": 7,
     "summary": {
       "1d": {
-        "count": 8,
-        "win_rate": 50.0,
-        "avg_return": 4.37
+        "count": 9,
+        "win_rate": 44.44,
+        "avg_return": 3.88
       },
       "3d": {
-        "count": 3,
-        "win_rate": 66.67,
-        "avg_return": 6.61
+        "count": 4,
+        "win_rate": 75.0,
+        "avg_return": 5.83
       },
       "5d": {
         "count": 5,
@@ -697,6 +667,14 @@
         }
       },
       {
+        "code": "000703",
+        "name": "FUTURE BRIGHT",
+        "enter_date": "2026-08-20",
+        "offsets": {
+          "3d": 3.48
+        }
+      },
+      {
         "code": "688525",
         "name": "佰维存储",
         "enter_date": "2026-08-22",
@@ -708,6 +686,14 @@
         "code": "600183",
         "name": "生益科技",
         "enter_date": "2026-08-22",
+        "offsets": {
+          "1d": 0.0
+        }
+      },
+      {
+        "code": "000792",
+        "name": "盐湖股份",
+        "enter_date": "2026-08-23",
         "offsets": {
           "1d": 0.0
         }

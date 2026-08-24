@@ -1,19 +1,11 @@
 {
-  "update_time": "2026-08-24 18:35:30",
+  "update_time": "2026-08-24 20:01:14",
   "range": [
-    "2026-08-13",
-    "2026-08-21"
+    "2026-08-14",
+    "2026-08-24"
   ],
   "days_count": 7,
   "daily_summary": [
-    {
-      "date": "2026-08-13",
-      "total": 71,
-      "resonance": 1,
-      "inst_only": 2,
-      "yz_only": 8,
-      "north_present": 28
-    },
     {
       "date": "2026-08-14",
       "total": 67,
@@ -61,6 +53,14 @@
       "inst_only": 5,
       "yz_only": 10,
       "north_present": 23
+    },
+    {
+      "date": "2026-08-24",
+      "total": 60,
+      "resonance": 0,
+      "inst_only": 0,
+      "yz_only": 11,
+      "north_present": 30
     }
   ],
   "top_inst_buy": [
@@ -85,16 +85,6 @@
       "resonance_days": 1
     },
     {
-      "code": "603990",
-      "name": "麦迪科技",
-      "inst_net": 29547.1,
-      "yz_net": -14502.5,
-      "north_net": 0.0,
-      "combined_net": 15044.6,
-      "days": 1,
-      "resonance_days": 0
-    },
-    {
       "code": "688617",
       "name": "惠泰医疗",
       "inst_net": 26137.7,
@@ -111,6 +101,16 @@
       "yz_net": 0.0,
       "north_net": 8410.2,
       "combined_net": 26086.7,
+      "days": 1,
+      "resonance_days": 0
+    },
+    {
+      "code": "000831",
+      "name": "中国稀土",
+      "inst_net": 25309.7,
+      "yz_net": 3274.3,
+      "north_net": 23581.9,
+      "combined_net": 28584.0,
       "days": 1,
       "resonance_days": 0
     }
@@ -169,23 +169,23 @@
   ],
   "top_yz_buy": [
     {
-      "code": "000887",
-      "name": "中鼎股份",
-      "inst_net": 243.3,
-      "yz_net": 77642.3,
-      "north_net": 6031.1,
-      "combined_net": 77885.6,
-      "days": 1,
-      "resonance_days": 0
-    },
-    {
       "code": "300862",
       "name": "蓝盾光电",
       "inst_net": 976.2,
-      "yz_net": 76194.2,
+      "yz_net": 74924.0,
       "north_net": 0.0,
-      "combined_net": 77170.4,
-      "days": 3,
+      "combined_net": 75900.2,
+      "days": 2,
+      "resonance_days": 0
+    },
+    {
+      "code": "000620",
+      "name": "盈新发展",
+      "inst_net": -3083.3,
+      "yz_net": 64982.2,
+      "north_net": 27447.3,
+      "combined_net": 61898.9,
+      "days": 4,
       "resonance_days": 0
     },
     {
@@ -209,13 +209,13 @@
       "resonance_days": 0
     },
     {
-      "code": "002396",
-      "name": "星网锐捷",
-      "inst_net": -9412.3,
-      "yz_net": 40828.1,
-      "north_net": 15202.5,
-      "combined_net": 31415.8,
-      "days": 2,
+      "code": "603330",
+      "name": "天洋新材",
+      "inst_net": 0.0,
+      "yz_net": 39242.1,
+      "north_net": 0.0,
+      "combined_net": 39242.1,
+      "days": 4,
       "resonance_days": 0
     }
   ],
@@ -234,62 +234,52 @@
       "code": "000802",
       "name": "北京文化",
       "inst_net": -2615.7,
-      "yz_net": -34106.2,
+      "yz_net": -28167.5,
       "north_net": 0.0,
-      "combined_net": -36721.9,
-      "days": 5,
+      "combined_net": -30783.2,
+      "days": 4,
       "resonance_days": 0
     },
     {
-      "code": "600667",
-      "name": "太极实业",
+      "code": "603341",
+      "name": "龙旗科技",
       "inst_net": 0.0,
-      "yz_net": -33194.9,
-      "north_net": -6152.5,
-      "combined_net": -33194.9,
+      "yz_net": -18284.1,
+      "north_net": -15974.3,
+      "combined_net": -18284.1,
       "days": 1,
       "resonance_days": 0
     },
     {
-      "code": "600721",
-      "name": "百花医药",
-      "inst_net": 0.0,
-      "yz_net": -25921.9,
-      "north_net": 0.0,
-      "combined_net": -25921.9,
-      "days": 7,
+      "code": "300142",
+      "name": "沃森生物",
+      "inst_net": 17482.5,
+      "yz_net": -17551.2,
+      "north_net": 50680.0,
+      "combined_net": -68.7,
+      "days": 1,
       "resonance_days": 0
     },
     {
-      "code": "002248",
-      "name": "华东数控",
-      "inst_net": 2514.7,
-      "yz_net": -22951.9,
-      "north_net": 0.0,
-      "combined_net": -20437.2,
-      "days": 5,
+      "code": "002437",
+      "name": "誉衡药业",
+      "inst_net": 10025.9,
+      "yz_net": -17008.3,
+      "north_net": 1323.2,
+      "combined_net": -6982.4,
+      "days": 7,
       "resonance_days": 0
     }
   ],
   "top_resonance": [
     {
-      "code": "000887",
-      "name": "中鼎股份",
-      "inst_net": 243.3,
-      "yz_net": 77642.3,
-      "north_net": 6031.1,
-      "combined_net": 77885.6,
-      "days": 1,
-      "resonance_days": 0
-    },
-    {
       "code": "300862",
       "name": "蓝盾光电",
       "inst_net": 976.2,
-      "yz_net": 76194.2,
+      "yz_net": 74924.0,
       "north_net": 0.0,
-      "combined_net": 77170.4,
-      "days": 3,
+      "combined_net": 75900.2,
+      "days": 2,
       "resonance_days": 0
     },
     {
@@ -321,6 +311,16 @@
       "combined_net": 47130.0,
       "days": 1,
       "resonance_days": 1
+    },
+    {
+      "code": "002491",
+      "name": "通鼎互联",
+      "inst_net": 15854.5,
+      "yz_net": 16272.5,
+      "north_net": 13181.4,
+      "combined_net": 32127.0,
+      "days": 2,
+      "resonance_days": 0
     }
   ],
   "top_north_buy": [
@@ -365,13 +365,13 @@
       "resonance_days": 1
     },
     {
-      "code": "000620",
-      "name": "盈新发展",
-      "inst_net": -1202.6,
-      "yz_net": 25584.5,
-      "north_net": 27693.4,
-      "combined_net": 24381.9,
-      "days": 3,
+      "code": "002716",
+      "name": "湖南白银",
+      "inst_net": -15507.5,
+      "yz_net": 23394.0,
+      "north_net": 28495.4,
+      "combined_net": 7886.5,
+      "days": 2,
       "resonance_days": 0
     }
   ],

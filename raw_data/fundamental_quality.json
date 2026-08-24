@@ -1,11 +1,11 @@
 {
-  "update_time": "2026-08-24 17:28:22",
-  "total": 169,
+  "update_time": "2026-08-24 18:40:38",
+  "total": 170,
   "grade_summary": {
     "A": 15,
     "B": 17,
     "C": 42,
-    "D": 30,
+    "D": 31,
     "no_data": 65
   },
   "stocks": {
@@ -463,6 +463,13 @@
       "roe": null,
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "sh_600028": {
+      "score": 30,
+      "grade": "D",
+      "roe": 3.0616,
+      "revenue_growth": 65.97319999999999,
+      "reason": "ROE差(3.1%) | 营收高增(66.0%)"
     },
     "sh_600105": {
       "score": 45,
