@@ -345,7 +345,11 @@ def main():
     is_weekend = now.weekday() >= 5
 
     quote, qdate = load_quote()
-    quote_fresh = bool(qdate) and qdate == today
+    yesterday = (now - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+    # 🛡 2026-08-25 主人令：放宽「行情新鲜」判定。行情文件 update_time 常为盘后抓取壁钟，
+    #   可能跨午夜（如 08-25 04:27 抓的是 08-24 收盘），若严格 qdate==today 会让 select_breakouts
+    #   被静默跳过 → 强势突破页长期空。改为接受「今天或昨天(交易日)」的行情；周末本就不追加。
+    quote_fresh = bool(qdate) and (qdate == today or qdate == yesterday)
 
     history = load_history()
 
