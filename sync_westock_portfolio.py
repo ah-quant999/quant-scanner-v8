@@ -122,8 +122,17 @@ def git_push_portfolio(commit_msg):
         r = run(["git", "push", "origin", f"{commit}:main"])
         if r.returncode == 0:
             print("OK pushed", commit[:12], "to origin/main")
-            # 收尾：软重置本地 HEAD，删除临时 index
-            run(["git", "reset", "--soft", "origin/main"])
+            # 收尾：只删除临时 index，**不再移动本地 HEAD**。
+            # 【2026-08-24 修复·数据回滚地雷】原实现为 git reset --soft origin/main：
+            #   ① --soft 只移动 HEAD、不重排主 index（且此处 env 带 GIT_INDEX_FILE，
+            #      即便改 --mixed 也只会写临时 index，主 index 依旧停留在旧树）；
+            #   ② HEAD 被推到最新 origin/main 后，主 index 仍是旧树 →
+            #      git status 出现 100+ 个「已暂存」的**旧版本**文件（含 index.html 与
+            #      raw_data 删除项）；
+            #   ③ 任何脚本执行不带 pathspec 的 git commit -m 都会把这批旧版本一并提交，
+            #      造成整站数据回滚 + 文件被删。
+            # 现改为不动 HEAD：主 index 与 HEAD 始终一致，暂存区恒为空，地雷不再生成。
+            # 本地 HEAD 落后 origin/main 属预期（各管线自身会 fetch + rebase 对齐）。
             try:
                 os.remove(tmp_index)
             except FileNotFoundError:
