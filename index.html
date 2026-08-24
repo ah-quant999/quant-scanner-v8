@@ -437,7 +437,7 @@ window.__domReadyFns=[];
     <script src="data/SECTOR_FUND_FLOW.js?v=ece1eb5b44" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=6e017c7178" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=233c19c8df" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=b849e393a1" defer></script>
     <script src="data/ANALYST_RATINGS.js?v=09cc10e7c4" defer></script>
     <script src="data/SUSPENSION_ALERT.js?v=16010946ff" defer></script>
     <script src="data/GOLD_POOL.js?v=94285060e2" defer></script>
@@ -454,7 +454,7 @@ window.__domReadyFns=[];
 <!-- 2026-08-23 恢复：潜力挖掘板块+股票预测推荐数据（calc_potential_picks.py 输出，跟盘后算法链自动更新） -->
 <script src="data/POTENTIAL_PICKS.js?v=4ef87d7e1c" defer></script>
 <script src="data/INDEX_QUOTES.js?v=1c57f78546" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=90ac2bc0d7" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=34bda1be03" defer></script>
 <script src="data/MARGIN_DATA.js?v=c20e5df78f" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=964db92ae3" defer></script>
 <script src="data/IPO_DATA.js?v=1c0a7ef36a" defer></script>
@@ -1263,16 +1263,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/WEEKEND_RUN.js?v=42fb56ac7a" defer></script>
 <script src="data/W52_HIGH.js?v=5b47fa400d" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=82114f2b9c" defer></script>
-<script src="data/RUNNER_STATUS.js?v=1bfd86173a" defer></script>
-<script src="data/HEALTH_CHECK.js?v=19f7e2c2d9" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=db9e4e122e" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=1894c14770" defer></script>
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=308cd86522" defer></script>
-    <script src="data/INDEX_HISTORY.js?v=5257f28c90" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=3a6290f2d4" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=158f499bf8" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=30d8eadafb" defer></script>
-    <script src="data/ALGO_BACKTEST_COMPARE.js?v=e5df5a1bc4" defer></script>
+<script src="data/RUNNER_STATUS.js?v=e3fd611a30" defer></script>
+<script src="data/HEALTH_CHECK.js?v=941ae1a1f5" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=bba92b9573" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=a1eeb6c43e" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=ee873287f2" defer></script>
+    <script src="data/INDEX_HISTORY.js?v=3aa1f04534" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=ca3ae1c6f4" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=e6648b511f" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=f5ea5fdc38" defer></script>
+    <script src="data/ALGO_BACKTEST_COMPARE.js?v=605d8487bc" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -10759,7 +10759,7 @@ function drawUpDownChart(){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=3a6290f2d4';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=ca3ae1c6f4';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -10768,7 +10768,7 @@ function drawUpDownChart(){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=158f499bf8';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=e6648b511f';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -13385,7 +13385,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch('data/HEALTH_CHECK.js?v=19f7e2c2d9'+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch('data/HEALTH_CHECK.js?v=941ae1a1f5'+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]):'';
       if(remoteTs && remoteTs!==localTs){
@@ -13985,7 +13985,7 @@ window.__renderV8CalToday();
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=ace6a7c4af'},
     {name:'STOCK_PROFILE', url:'data/STOCK_PROFILE.js?v=902cdbf956'},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=bc8f5f8ed6'},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=4bde53847f'},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=e4c0fa9fc3'}
   ];
   function loadOne(item, done){
