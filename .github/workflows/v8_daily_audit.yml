@@ -38,7 +38,7 @@ concurrency:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25  # 2026-08-24 拉大：15→25。根因 v8_health_check --alert --site 跑完 + 18min（health_patrol step 5 sleep 600 + 验证 8min）原 15min 不够，daily_audit 22:30 那轮被切 → rc=3 误报。25min 含 5min buffer 安全。
     env:
       REPO: ah-quant999/quant-scanner-v8
       # 🔴 2026-08-12 修复：用 PAT（含 repo+actions 权限），默认 GITHUB_TOKEN 权限不足

@@ -289,7 +289,7 @@ def api_get(url, max_retries=None):
     last = {"__error__": 0, "__msg__": "unknown"}
     for attempt in range(retries + 1):
         try:
-            with urllib.request.urlopen(req, timeout=30) as r:
+            with urllib.request.urlopen(req, timeout=API_GET_TIMEOUT) as r:  # 2026-08-24 收紧：30→10
                 return json.loads(r.read().decode("utf-8"))
         except urllib.error.HTTPError as e:
             last = {"__error__": e.code, "__msg__": e.read().decode("utf-8", "replace")}
@@ -312,15 +312,19 @@ def api_get(url, max_retries=None):
 # 2026-08-11 由 2 提到 4：GitHub Pages / api.github.com 在云端 build 高频推送时段
 # （如 09:07-09:09 连续 6 次 build）会出现成片的 503 / SSL 握手超时，2 次重试不足以吸收，
 # 导致「Pages 部署同步」误报。5 次尝试 × 3s 间隔 ≈ 12s，代价可接受。
-SITE_MAX_RETRIES = 4       # 首次 + 最多重试 4 次
-_SITE_RETRY_DELAY_SEC = 3   # 重试间隔（秒）
+# 2026-08-24 收紧（根因修复 22:24【rc=3】邮件）：
+#   原 4=5 次 × 30s × 4wf = 50min 卡死进程，超 480s 看门狗超时被杀。改 2=3 次 × 10s + 2×1s 间隔 = 32s/次 × 4wf = 128s 上限，安全。
+#   build 高峰连续 3 次超时的概率近 0（实测），仍能吸收瞬时抖动。
+SITE_MAX_RETRIES = 2       # 2026-08-24 收紧：首次 + 最多重试 2 次（3 次尝试）
+_SITE_RETRY_DELAY_SEC = 1   # 2026-08-24 收紧：3s→1s
+API_GET_TIMEOUT = 10         # 2026-08-24 新增：单次 GitHub API GET timeout 上限（30→10）。仅在网络真卡死时省时间。
 
 
 def _urlopen_retry(req_or_url, timeout=15, max_retries=None):
     """带重试的 urlopen，返回 (response_bytes, None) 或 (None, error_str)。
     用于 site 检测等对外请求，吸收瞬时抖动。"""
     import time as _time
-    retries = max_retries or SITE_MAX_RETRIES
+    retries = max_retries or SITE_MAX_RETRIES  # 2026-08-24：与 api_get 共用收紧后的 SITE_MAX_RETRIES=2
     last_err = None
     for attempt in range(retries + 1):
         try:
@@ -586,13 +590,18 @@ def _dispatch_build_deploy():
         return False, f"派发异常: {e}", False
 
 
-def _heal_local_sync():
-    """尝试让本地 HEAD 与 origin/main 对齐（fetch + ff-only，必要时 stash）。"""
+def _heal_local_sync(pull_raw_data_only=False):
+    """尝试让本地 HEAD 与 origin/main 对齐（fetch + ff-only，必要时 stash）。
+
+    2026-08-24 新增 pull_raw_data_only 模式：仅拉取 raw_data/ 子树，不动代码 HEAD。
+    用途：local_sync 检测到 raw_data 落后（数据卡陈旧二级根因），但本地代码未提交需要 ff。
+    此时用 `git checkout origin/main -- raw_data/` 单独把 raw_data/ 同步过来，不污染本地工作区。
+    """
     try:
         subprocess.run(["git", "fetch", "origin"], check=True, capture_output=True, text=True, timeout=60)
         local = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, timeout=10).strip()
         remote = subprocess.check_output(["git", "rev-parse", "origin/main"], text=True, timeout=10).strip()
-        if local == remote:
+        if local == remote and not pull_raw_data_only:
             return True, f"本地已与 origin/main 同步 ({local[:7]})"
         try:
             behind = int(subprocess.check_output(
@@ -601,6 +610,25 @@ def _heal_local_sync():
             ).strip())
         except Exception:
             return False, "无法判断本地与 origin/main 的祖先关系"
+
+        # 2026-08-24 raw_data_only 分支：只拉子树，不 ff HEAD
+        if pull_raw_data_only:
+            # 校验工作树 raw_data/ 区段是否脏；脏则跳过避免覆盖未提交改动
+            dirty = subprocess.run(
+                ["git", "status", "--porcelain", "--", "raw_data/"],
+                capture_output=True, text=True, timeout=10
+            ).stdout.strip()
+            if dirty:
+                return True, f"raw_data/ 工作区有未提交改动（{len(dirty.splitlines())} 项），跳过自动拉取"
+            try:
+                subprocess.run(
+                    ["git", "checkout", "origin/main", "--", "raw_data/"],
+                    check=True, capture_output=True, text=True, timeout=60
+                )
+                return True, f"已从 origin/main {remote[:7]} 拉取 raw_data/ 子树（{behind} 个 commit 落后）"
+            except subprocess.CalledProcessError as e:
+                return False, f"raw_data/ 拉取失败: {e.stderr.strip()[:200]}"
+
         if behind == 0:
             return False, f"本地 ({local[:7]}) 领先/分歧于 origin/main ({remote[:7]})，需人工处理"
         # 工作树若脏：跳过自动对齐（禁止 stash/pop）。
@@ -829,7 +857,9 @@ def self_heal(report):
     for it in fail_items:
         iid = it.get("id")
         if iid == "local_sync":
-            ok, dmsg = _heal_local_sync()
+            # 2026-08-24 二级根因修复：local_sync fail 时若 message 含"raw_data"，优先拉 raw_data 子树（不污染代码 HEAD）
+            is_raw_data_behind = "raw_data" in (it.get("message") or "")
+            ok, dmsg = _heal_local_sync(pull_raw_data_only=is_raw_data_behind)
             if ok:
                 healed.append(f"[管线] {it['name']}: {dmsg}")
                 it["heal"] = f"已自动对齐: {dmsg}"
@@ -1610,23 +1640,46 @@ def check_runner():
 
 
 def check_local_head_sync():
-    """检查本地 HEAD 是否与 origin/main 一致。
+    """检查本地 HEAD 是否与 origin/main 一致 + 关键路径是否落后。
 
     2026-08-18 主人建议：一劳永逸把「本地落后于 origin/main」降为 info。
     根因：云端 Pages 每次构建会重写 index.html（cn-extra data 文件 ?v= 刷新），
     致 origin/main 永远比本地「前进 1~3 个 commit」，本地若未做新提交则每次必报 fail。
     视作「云端 build 副作用 → 本地落后属预期」，降级 info 不再触发自愈/告警。
     派发链 (self_heal) 仍按原 iid=local_sync 调用 _heal_local_sync() 做软对齐，不影响修复能力。
+
+    2026-08-24 二级根因修复：原策略把"本地落后"全归为 info，掩盖了 raw_data 子树落后这一真问题
+    （11 项 all_* 数据卡陈旧的二级根因：raw_data 没从 origin 拉，本地端一直看陈旧快照）。
+    修复：拆为两态——
+      - 仅 code（index.html / cache ?v= 类）落后：status=info（云端 build 副作用，非真落后）
+      - raw_data/ 落后：status=fail（数据陈旧二级根因，必须上报警+自愈拉取）
     """
     try:
         subprocess.run(["git", "fetch", "origin"], check=True, timeout=30)
         local = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, timeout=10).strip()
         remote = subprocess.check_output(["git", "rev-parse", "origin/main"], text=True, timeout=10).strip()
         synced = local == remote
-        # 2026-08-18 降级：fail → info（云端 build 重写 index.html 属预期，非真实落后）
-        status = "ok" if synced else "info"
-        msg = f"本地 {local[:7]} / origin/main {remote[:7]} {'同步' if synced else '本地落后（Pages build 重写 index.html 属预期，已降级 info 不报警）'}"
-        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线", "status": status, "message": msg}]
+        if synced:
+            return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线", "status": "ok", "message": f"本地 {local[:7]} / origin/main {remote[:7]} 同步"}]
+
+        # 2026-08-24 拆态：检查 raw_data/ 子树是否落后（这是数据卡陈旧的二级根因）
+        try:
+            raw_data_diff = subprocess.check_output(
+                ["git", "diff", "--name-only", f"{local}..origin/main", "--", "raw_data/"],
+                text=True, timeout=10
+            ).strip()
+        except Exception:
+            raw_data_diff = ""
+
+        if raw_data_diff:
+            # raw_data 真的落后 → 数据卡陈旧的二级根因 → fail + 自愈拉取
+            n_raw = len([x for x in raw_data_diff.splitlines() if x.strip()])
+            msg = f"本地 {local[:7]} / origin/main {remote[:7]} 落后；其中 raw_data/ 子树有 {n_raw} 个文件待同步（数据卡陈旧二级根因）"
+            return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线", "status": "fail", "message": msg}]
+
+        # 仅代码层落后（index.html / ?v= cache）→ 仍属云端 build 副作用 → info
+        msg = f"本地 {local[:7]} / origin/main {remote[:7]} 落后（仅代码层，Pages build 重写 index.html 属预期，已降级 info 不报警）"
+        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线", "status": "info", "message": msg}]
     except Exception as e:
         return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线", "status": "warn", "message": f"检查失败: {e}"}]
 
@@ -2184,15 +2237,26 @@ def main():
             print(f"  [{item['status'].upper()}] {item['page']}/{item['name']}: {item['message']}")
 
     # ── 自愈（默认开）：发现可修复陈腐即尝试派发刷新，而非只发邮件 ──
+    # 2026-08-24 一劳永逸（根因 22:24【rc=3】邮件）：self_heal 内部 subprocess.run + api_get 链路
+    # 理论最坏 50min，超过看门狗 v8_cloud_watchdog.py::run_health_check timeout=480 → 主进程被 SIGTERM
+    # 杀 → report 没写完 → 看门狗兜底发【rc=3】误报。修复：用 ThreadPoolExecutor 把 self_heal
+    # 隔离到工作线程，future.result(timeout=420) 7 分钟强制收线，超时即 mark "自愈超时跳过本轮"，
+    # 主流程照常写盘 + 发邮件 + sys.exit(2)。代价：极端情况下 self_heal 派发不完整 → 下轮再去抖重试。
+    _SELF_HEAL_GLOBAL_TIMEOUT = 420  # 7 分钟
     healed, failed = [], []
     if args.heal:
-        # 2026-08-10 修复：移除对 overall 的依赖——只要 heal 开就跑 self_heal，
-        # 内部自行判断 fail 卡片 / 内容审计陈旧项，确保「任何可自愈问题都自动派发」。
-        # 2026-08-12 加固：自愈内部异常不得连坐吞掉「报告落盘 + 邮件告警」两个下游动作
-        # （3d2a53b2 的 UnboundLocalError 就是这样让整个检查以 rc=1 崩退的）。
-        # 不静默 pass：异常写进 failed 列表并打印 traceback，保证在邮件/日志里可见。
         try:
-            healed, failed = self_heal(report)
+            from concurrent.futures import ThreadPoolExecutor, TimeoutError as _FutTimeout
+            with ThreadPoolExecutor(max_workers=1) as _ex:
+                _fut = _ex.submit(self_heal, report)
+                try:
+                    healed, failed = _fut.result(timeout=_SELF_HEAL_GLOBAL_TIMEOUT)
+                except _FutTimeout:
+                    _fut.cancel()
+                    msg = f"self_heal 超时(>{_SELF_HEAL_GLOBAL_TIMEOUT}s)，本轮跳过，依赖下轮再去抖重试"
+                    print(f"[WARN] {msg}")
+                    failed = [f"[自愈超时] {msg}"]
+                    report["heal_error"] = msg
         except Exception as e:
             import traceback as _tb
             _tb.print_exc()
