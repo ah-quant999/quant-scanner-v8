@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-24 19:48",
+  "update_time": "2026-08-24 20:54",
   "window_days": 90,
   "total_stats": {
     "four_volume": {
@@ -924,7 +924,7 @@
         },
         {
           "code": "002460",
-          "name": "赣锋锂业",
+          "name": "华润饮料",
           "algo": "four_volume",
           "list_date": "20260824",
           "list_date_dashed": "2026-08-24",
@@ -1377,6 +1377,25 @@
           }
         },
         {
+          "code": "600988",
+          "name": "赤峰黄金",
+          "algo": "sector_lead",
+          "list_date": "20260824",
+          "list_date_dashed": "2026-08-24",
+          "entry_price": 48.77,
+          "last_close": 48.77,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260824",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "",
+            "pct_chg": -1.34
+          }
+        },
+        {
           "code": "002460",
           "name": "赣锋锂业",
           "algo": "sector_lead",
@@ -1393,25 +1412,6 @@
             "period": "daily",
             "reason": "",
             "pct_chg": 2.79
-          }
-        },
-        {
-          "code": "002466",
-          "name": "天齐锂业",
-          "algo": "sector_lead",
-          "list_date": "20260824",
-          "list_date_dashed": "2026-08-24",
-          "entry_price": 49.1,
-          "last_close": 49.1,
-          "last_pct": 0.0,
-          "peak_pct": 0.0,
-          "days_in": 0,
-          "appear_count": 1,
-          "last_seen": "20260824",
-          "signal_detail": {
-            "period": "daily",
-            "reason": "",
-            "pct_chg": 1.49
           }
         }
       ],

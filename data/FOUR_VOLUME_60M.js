@@ -1,5 +1,5 @@
 window.FOUR_VOLUME_60M={
- "update_time": "2026-08-24 19:31:15",
+ "update_time": "2026-08-24 20:37:12",
  "total": 6,
  "period": "60m",
  "description": "四量终极 60分钟共振信号（加分因子，独立于日线版）",
@@ -64,7 +64,7 @@ window.FOUR_VOLUME_60M={
   },
   {
    "code": "002460",
-   "name": "赣锋锂业",
+   "name": "华润饮料",
    "market": "sz",
    "board_label": "主板",
    "close": 56.31,

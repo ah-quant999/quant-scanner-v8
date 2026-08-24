@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-24 19:32:38",
-  "data_time": "2026-08-24 19:19:27",
+  "update_time": "2026-08-24 20:38:32",
+  "data_time": "2026-08-24 20:26:02",
   "count": 0,
   "near_miss_count": 1,
   "criteria": "主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)）· 驾驶舱A档 · 基本面A档",
@@ -12,7 +12,7 @@
       "name": "赤峰黄金",
       "market": "sh",
       "board": "主板",
-      "total_score": 35.2,
+      "total_score": 34.8,
       "top10_rank": 2,
       "a_score": 0,
       "quality_grade": "A",
