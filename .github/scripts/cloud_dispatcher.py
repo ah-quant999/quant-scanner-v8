@@ -179,7 +179,7 @@ def dispatch(wf_file, inputs=None):
 #   取消它零数据损失、并立即释放并发槽给当晚 19:15 生成。
 #   绝不碰「>=18:00 创建」的盘后生成 run（那才是真正产出卡片的轮次），避免误杀真生成。
 ZOMBIE_WF = "v8_algo_cloud.yml"
-ZOMBIE_PRE18_MAX_MIN = 60  # 盘前 run 正常 5-15 分钟结束，超 60 分钟必挂
+ZOMBIE_STALE_MAX_MIN = 60  # run 最后更新(updated_at)超 60 分钟无进展即判定卡死僵尸（不论盘前盘后）
 
 def api_delete(path):
     """DELETE 并返回 HTTP 状态码（204=成功；看门狗取消 run 用）。"""
@@ -198,12 +198,12 @@ def api_delete(path):
         print(f"  ⚠️ DELETE {path} -> {e}")
         return -1
 
-def kill_zombie_pre18_algo(now, wf=ZOMBIE_WF):
-    """取消「盘前创建却仍 in_progress/pending 超阈值」的 run，释放并发槽。
-    wf 指定目标 workflow；默认 v8_algo_cloud，#1 改 cancel-in-progress:false 后
-    亦用于清理 v8_cn_fetch_cloud 可能堆积的盘前僵尸（含 pending 排队 run）。
-    仅清「盘前(<18:00)创建且超 60 分钟」的 run——此类按设计跳过选股脚本、零数据损失，
-    且占着单并发槽会堵死当晚 19:15 生成轮；盘后生成轮(ct.hour>=18)受保护绝不误杀。"""
+def kill_zombie_stale(now, wf=ZOMBIE_WF):
+    """取消「仍 in_progress/pending/queued 但最后更新超阈值静止」的 run，释放并发槽。
+    判定用 updated_at 陈旧度（而非创建时间）：正常 run 的 updated_at 会随步骤推进持续刷新，
+    卡死僵尸则静止不动——这样不论盘前盘后创建，只要静止超 ZOMBIE_STALE_MAX_MIN 分钟就清，
+    避免旧逻辑把 18:xx 创建的挂死 run 误当「盘后生成轮」保护而漏杀（曾导致占槽堵死当晚盘后链）。
+    真正在跑的盘后生成轮 updated_at 持续刷新，不会被误杀。"""
     d = api("GET", f"/repos/{REPO}/actions/workflows/{wf}/runs?per_page=30")
     runs = d.get("workflow_runs", []) if isinstance(d, dict) else []
     killed = 0
@@ -212,18 +212,16 @@ def kill_zombie_pre18_algo(now, wf=ZOMBIE_WF):
         if stt not in ("in_progress", "pending", "queued"):
             continue
         try:
-            ct = datetime.datetime.fromisoformat(
-                r.get("created_at", "").replace("Z", "+00:00")).astimezone(CST)
+            ut = datetime.datetime.fromisoformat(
+                r.get("updated_at", "").replace("Z", "+00:00")).astimezone(CST)
         except Exception:
             continue
-        if ct.hour >= 18:
-            continue  # 盘后生成轮，受保护，绝不误杀
-        age_min = (now - ct).total_seconds() / 60.0
-        if age_min <= ZOMBIE_PRE18_MAX_MIN:
-            continue
+        stale_min = (now - ut).total_seconds() / 60.0
+        if stale_min <= ZOMBIE_STALE_MAX_MIN:
+            continue  # 仍在活跃推进，正常跑
         rid = r.get("id")
-        print(f"  🧟 盘前僵尸 {wf} run {rid}（{stt} 创建 {ct.strftime('%H:%M')}CST，已挂 {age_min:.0f} 分钟），"
-              f"取消以释放并发槽")
+        print(f"  🧟 卡死僵尸 {wf} run {rid}（{stt} 最后更新 {ut.strftime('%H:%M')}CST，"
+              f"已静止 {stale_min:.0f} 分钟），取消以释放并发槽")
         st = api_delete(f"/repos/{REPO}/actions/runs/{rid}")
         if st in (200, 202, 204):
             killed += 1
@@ -231,7 +229,7 @@ def kill_zombie_pre18_algo(now, wf=ZOMBIE_WF):
         else:
             print(f"     ⚠️ 取消 {rid} 返回 HTTP {st}")
     if killed == 0:
-        print("  🧟 当前无盘前僵尸 algo run（并发槽干净）")
+        print("  🧟 当前无卡死僵尸 run（并发槽干净）")
 
 # 3) 动量共识筛选重算（2026-08-22 起脱离 PDF，由 gen_momentum_self 每日盘后自合成）：
 #    V2 与 MOMENTUM_FILTER 现已随盘后构建(update_v8.run_experiment_cards)每日自动重算。
@@ -287,13 +285,15 @@ def main():
     now = datetime.datetime.now(CST)
     print(f"🛰️ 云端兜底调度器 @ {now.strftime('%Y-%m-%d %H:%M CST')}")
 
-    # 0) 僵尸看门狗：先清掉盘前挂死的 run，避免它占用单并发槽把当晚 19:15 盘后生成堵死
-    #    （#3 慢性陈旧根因）。每 30 分随 cn_fetch 触发一次。
+    # 0) 僵尸看门狗：先清掉卡死（updated_at 静止超阈值）的 run，避免它占用单并发槽
+    #    把当晚盘后生成轮堵死（#3 慢性陈旧根因）。每 30 分随 cn_fetch 触发一次。
     #    #1 改 cancel-in-progress:false 后，v8_cn_fetch_cloud 自身也不再自取消，
-    #    故一并清理其可能堆积的盘前僵尸，防止队列雪崩。
-    print("🧟 僵尸看门狗（盘前挂死 run）：")
-    kill_zombie_pre18_algo(now, "v8_algo_cloud.yml")
-    kill_zombie_pre18_algo(now, "v8_cn_fetch_cloud.yml")
+    #    故一并清理其可能堆积的卡死 run，防止队列雪崩。
+    #    ⚠️ 2026-08-24 修正：旧逻辑按 created_at 的 hour>=18 误判 18:xx 僵尸为「盘后生成轮」而漏杀，
+    #    改用 updated_at 静止度判定后，不论盘前盘后，卡死即清、在跑不误杀。
+    print("🧟 僵尸看门狗（按 updated_at 静止度判定卡死 run）：")
+    kill_zombie_stale(now, "v8_algo_cloud.yml")
+    kill_zombie_stale(now, "v8_cn_fetch_cloud.yml")
 
     # 1) 风险温度计：最近 90 分钟内无成功运行则补发
     rg = latest_run("v8_risk_gauge.yml")
