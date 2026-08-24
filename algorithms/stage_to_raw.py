@@ -72,10 +72,21 @@ V6_TO_V8 = {
 
 
 def _load_json(path):
+    _p = Path(path)
     try:
-        with open(path, encoding="utf-8") as f:
+        with open(_p, encoding="utf-8") as f:
             return json.load(f)
     except Exception as e:
+        # 2026-08-24 抗丢失：主文件损坏时从 .bak 恢复，防止 lhb_history 等
+        # 累积型文件被并发取消风暴清空后彻底丢失（共振日历「数据又没了」根因）。
+        _bak = _p.with_suffix(_p.suffix + ".bak")
+        if _bak.exists():
+            try:
+                with open(_bak, encoding="utf-8") as f:
+                    print(f"  ↩️ {path} 读取损坏，从 .bak 恢复: {e}")
+                    return json.load(f)
+            except Exception:
+                pass
         print(f"  ❌ 读取失败 {path}: {e}")
         return None
 
@@ -83,8 +94,18 @@ def _load_json(path):
 def _save_json(path, obj):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
+    _bak = path.with_suffix(path.suffix + ".bak")
+    _tmp = path.with_suffix(path.suffix + ".tmp")
+    # 2026-08-24 抗丢失：原子写（临时文件 replace）+ 写成功后存 .bak。
+    # 避免被并发取消风暴杀掉时留下半截 JSON 清空数据。
+    with open(_tmp, "w", encoding="utf-8") as f:
         json.dump(obj, f, ensure_ascii=False, separators=(",", ":"), default=str)
+    _tmp.replace(path)
+    try:
+        with open(_bak, "w", encoding="utf-8") as f:
+            json.dump(obj, f, ensure_ascii=False, separators=(",", ":"), default=str)
+    except Exception:
+        pass
 
 
 def _add_timestamp(obj):

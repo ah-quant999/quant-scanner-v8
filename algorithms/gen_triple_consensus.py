@@ -254,8 +254,17 @@ def main():
     }
 
     os.makedirs(DATA_DIR, exist_ok=True)
-    with open(OUTPUT, "w", encoding="utf-8") as f:
+    # 2026-08-24 抗丢失：原子写 + .bak，避免被并发取消风暴杀掉时留下半截 JSON 清空数据。
+    _bak = OUTPUT + ".bak"
+    _tmp = OUTPUT + ".tmp"
+    with open(_tmp, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
+    os.replace(_tmp, OUTPUT)
+    try:
+        with open(_bak, "w", encoding="utf-8") as f:
+            json.dump(result, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
 
     print(f"  ✅ 三重共识: {len(consensus)} 只")
     for s in consensus:

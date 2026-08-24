@@ -190,14 +190,30 @@ def main():
     os.makedirs(RAW_DIR, exist_ok=True)
     os.makedirs(DATA_DIR, exist_ok=True)
 
-    with open(OUT_JSON_PATH, "w", encoding="utf-8") as f:
+    # 2026-08-24 抗丢失：原子写 + .bak，避免被并发取消风暴杀掉时留下半截 JSON 清空数据。
+    with open(OUT_JSON_PATH + ".tmp", "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
+    os.replace(OUT_JSON_PATH + ".tmp", OUT_JSON_PATH)
+    try:
+        with open(OUT_JSON_PATH + ".bak", "w", encoding="utf-8") as f:
+            json.dump(result, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
     log(f"已写 {OUT_JSON_PATH}")
 
-    with open(OUT_JS_PATH, "w", encoding="utf-8") as f:
+    _js_tmp = OUT_JS_PATH + ".tmp"
+    with open(_js_tmp, "w", encoding="utf-8") as f:
         f.write("window.LHB_7D = ")
         json.dump(result, f, ensure_ascii=False, separators=(",", ":"))
         f.write(";")
+    os.replace(_js_tmp, OUT_JS_PATH)
+    try:
+        with open(OUT_JS_PATH + ".bak", "w", encoding="utf-8") as f:
+            f.write("window.LHB_7D = ")
+            json.dump(result, f, ensure_ascii=False, separators=(",", ":"))
+            f.write(";")
+    except Exception:
+        pass
     log(f"已写 {OUT_JS_PATH}")
 
 

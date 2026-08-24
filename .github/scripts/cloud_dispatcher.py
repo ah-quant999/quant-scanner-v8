@@ -198,9 +198,11 @@ def api_delete(path):
         print(f"  ⚠️ DELETE {path} -> {e}")
         return -1
 
-def kill_zombie_pre18_algo(now):
-    """取消「盘前创建却仍 in_progress 超阈值」的 algo run，释放并发槽。"""
-    d = api("GET", f"/repos/{REPO}/actions/workflows/{ZOMBIE_WF}/runs?per_page=30&status=in_progress")
+def kill_zombie_pre18_algo(now, wf=ZOMBIE_WF):
+    """取消「盘前创建却仍 in_progress 超阈值」的 run，释放并发槽。
+    wf 指定目标 workflow；默认 v8_algo_cloud，#1 改 cancel-in-progress:false 后
+    亦用于清理 v8_cn_fetch_cloud 可能堆积的盘前僵尸。"""
+    d = api("GET", f"/repos/{REPO}/actions/workflows/{wf}/runs?per_page=30&status=in_progress")
     runs = d.get("workflow_runs", []) if isinstance(d, dict) else []
     killed = 0
     for r in runs:
@@ -215,7 +217,7 @@ def kill_zombie_pre18_algo(now):
         if age_min <= ZOMBIE_PRE18_MAX_MIN:
             continue
         rid = r.get("id")
-        print(f"  🧟 盘前僵尸 algo run {rid}（创建 {ct.strftime('%H:%M')}CST，已挂 {age_min:.0f} 分钟），"
+        print(f"  🧟 盘前僵尸 {wf} run {rid}（创建 {ct.strftime('%H:%M')}CST，已挂 {age_min:.0f} 分钟），"
               f"取消以释放并发槽")
         st = api_delete(f"/repos/{REPO}/actions/runs/{rid}")
         if st in (200, 202, 204):
@@ -280,10 +282,13 @@ def main():
     now = datetime.datetime.now(CST)
     print(f"🛰️ 云端兜底调度器 @ {now.strftime('%Y-%m-%d %H:%M CST')}")
 
-    # 0) 僵尸看门狗：先清掉盘前挂死的 algo run，避免它占用 v8-algo-cloud 单并发槽
-    #    把当晚 19:15 盘后生成堵死（#3 慢性陈旧根因）。每 30 分随 cn_fetch 触发一次。
-    print("🧟 僵尸看门狗（盘前挂死 algo run）：")
-    kill_zombie_pre18_algo(now)
+    # 0) 僵尸看门狗：先清掉盘前挂死的 run，避免它占用单并发槽把当晚 19:15 盘后生成堵死
+    #    （#3 慢性陈旧根因）。每 30 分随 cn_fetch 触发一次。
+    #    #1 改 cancel-in-progress:false 后，v8_cn_fetch_cloud 自身也不再自取消，
+    #    故一并清理其可能堆积的盘前僵尸，防止队列雪崩。
+    print("🧟 僵尸看门狗（盘前挂死 run）：")
+    kill_zombie_pre18_algo(now, "v8_algo_cloud.yml")
+    kill_zombie_pre18_algo(now, "v8_cn_fetch_cloud.yml")
 
     # 1) 风险温度计：最近 90 分钟内无成功运行则补发
     rg = latest_run("v8_risk_gauge.yml")

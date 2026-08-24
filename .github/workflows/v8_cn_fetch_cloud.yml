@@ -53,7 +53,12 @@ permissions:
 
 concurrency:
   group: v8-cn-fetch-cloud
-  cancel-in-progress: true
+  # 2026-08-24 修复(#1 取消风暴根治)：改为 false，新派发不再杀掉正在写
+  # 共振/快照文件的 run，从根上杜绝「自伤顶掉」——此前 cancel-in-progress:true
+  # 频繁把正在写 triple_consensus.json / lhb_history.json / sector_fund_flow 的 run 杀掉，
+  # 留下半截 JSON → 数据清空（共振日历反复「数据又没了」、主力净额曲线断档均源于此）。
+  # 配合 token 修复 + 僵尸看门狗形成双保险。
+  cancel-in-progress: false
 
 jobs:
   fetch:
@@ -111,7 +116,9 @@ jobs:
       #     1) 仅当存在「正在执行且未超时(<35min)」的同 workflow run 才真正跳过（写 skip 输出，
       #        由下方 fetch 步骤 if 拦截），避免重复抓取/推送冲突；
       #     2) 排队中/已过期(>35min)的 run 视为僵尸，不阻断本 run → 根治「冻在 13:45」；
-      #     3) concurrency 已改 cancel-in-progress: true，风暴来时只保留最新一次 dispatch。
+      #     3) concurrency 现改为 cancel-in-progress: false（2026-08-24 #1 根治），
+      #        风暴来时新 dispatch 排队而非杀掉在跑的 run → 不再有「半截写入→数据清空」；
+      #        盘前僵尸由 cloud_dispatcher 看门狗清理（见 v8_cn_fetch_cloud_selfhosted 同款逻辑）。
       - name: "🔒 幂等闸门（仅新鲜 run 执行时跳过；僵尸/过期 run 不阻断）"
         id: gate
         shell: bash
