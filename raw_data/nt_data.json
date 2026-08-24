@@ -1,35 +1,35 @@
 {
-  "update_time": "2026-08-24 16:59",
+  "update_time": "2026-08-24 18:15",
   "alerts": [
     {
       "type": "summary",
       "severity": "medium",
       "message": "ETF监测中，1涨11跌",
-      "time": "16:59"
+      "time": "18:15"
     },
     {
       "type": "etf",
       "severity": "medium",
       "message": "华夏科创50ETF 大跌 3.09%",
-      "time": "17:00"
+      "time": "18:15"
     },
     {
       "type": "etf",
       "severity": "medium",
       "message": "5G通信ETF 大跌 4.48%",
-      "time": "17:00"
+      "time": "18:15"
     },
     {
       "type": "etf",
       "severity": "medium",
       "message": "芯片ETF 大跌 3.62%",
-      "time": "17:00"
+      "time": "18:15"
     },
     {
       "type": "etf",
       "severity": "medium",
       "message": "医药ETF 大跌 3.09%",
-      "time": "17:00"
+      "time": "18:15"
     }
   ],
   "etfFlow": {
