@@ -557,5 +557,80 @@
     "message": "未找到元素"
    }
   ]
+ },
+ {
+  "date": "2026-08-24",
+  "time": "15:07:56",
+  "overall": "fail",
+  "summary": {
+   "ok": 105,
+   "warn": 9,
+   "fail": 3,
+   "total": 117
+  },
+  "warn_items": [
+   {
+    "id": "raw_volume",
+    "name": "raw_data 文件数",
+    "message": "raw_data 共 855 个文件（>850），接近规模上限"
+   },
+   {
+    "id": "dom_taskScheduleBody",
+    "name": "DOM #taskScheduleBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttBackBody",
+    "name": "DOM #ttBackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttThrBody",
+    "name": "DOM #ttThrBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttSvlBody",
+    "name": "DOM #ttSvlBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttTrackBody",
+    "name": "DOM #ttTrackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsAdvBody",
+    "name": "DOM #stcrdsAdvBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsEliteBody",
+    "name": "DOM #stcrdsEliteBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_healthCheckBody",
+    "name": "DOM #healthCheckBody",
+    "message": "静态占位符(JS渲染)"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "COCKPIT_ADVICE",
+    "name": "驾驶舱",
+    "message": "更新于 昨日 15:32；超过阈值 360 分钟"
+   },
+   {
+    "id": "dom_phMacroBody",
+    "name": "DOM #phMacroBody",
+    "message": "未找到元素"
+   },
+   {
+    "id": "all_SECTOR_RECOMMENDATION",
+    "name": "SECTOR_RECOMMENDATION",
+    "message": "SECTOR_RECOMMENDATION.js 更新于 2天前 07:59；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   }
+  ]
  }
 ]
