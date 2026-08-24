@@ -1,1 +1,1 @@
-window.WEEKEND_META_REPORT = {"update_time":"2026-08-21 23:58:45","total":9591,"new_listings_count":0,"delisted_count":0,"new_listings":[],"delisted":[],"meta_enriched":0,"republish_time":"2026-08-22 00:15:17"};
+window.WEEKEND_META_REPORT = {"update_time":"2026-08-24 08:56:42","total":9590,"new_listings_count":3,"delisted_count":4,"new_listings":["561410 N光伏ETF工银","159043 食品ETF华安","158005 工程机械ETF博时"],"delisted":["00195 绿科科技国际","02990 鼎立资本（旧）","02995 雅天妮集团（旧）","560650 核心50ETF民生加银"],"meta_enriched":3,"republish_time":"2026-08-24 08:58:18"};
