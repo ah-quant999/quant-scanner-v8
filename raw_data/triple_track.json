@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-08-24 22:56:15",
-  "data_date": "2026-08-24",
-  "track_start": "2026-08-24",
-  "history_days": 7,
+  "update_time": "2026-08-25 00:01:28",
+  "data_date": "2026-08-25",
+  "track_start": "2026-08-25",
+  "history_days": 8,
   "strict_count": 0,
   "near_count": 2,
   "tracked": [
@@ -20,8 +20,8 @@
       ],
       "signal_count": 0,
       "enter_date": "2026-08-20",
-      "hold_days": 1,
-      "consecutive_days": 2,
+      "hold_days": 2,
+      "consecutive_days": 3,
       "first_close": 46.1,
       "current_close": 48.77,
       "pnl_pct": 5.79,
@@ -47,8 +47,8 @@
       ],
       "signal_count": 0,
       "enter_date": "2026-08-17",
-      "hold_days": 7,
-      "consecutive_days": 3,
+      "hold_days": 8,
+      "consecutive_days": 4,
       "first_close": 33.36,
       "current_close": null,
       "pnl_pct": null,
@@ -64,15 +64,39 @@
   "alerts": [
     {
       "level": "warn",
+      "code": "603993",
+      "name": "洛阳钼业",
+      "text": "洛阳钼业(603993) 于 2026-08-24 跌出共识（曾连续 2 日）"
+    },
+    {
+      "level": "warn",
       "code": "000975",
       "name": "",
       "text": "(000975) 于 2026-08-17 跌出共识（曾连续 1 日）"
     },
     {
       "level": "warn",
+      "code": "601168",
+      "name": "西部矿业",
+      "text": "西部矿业(601168) 于 2026-08-24 跌出共识（曾连续 2 日）"
+    },
+    {
+      "level": "warn",
+      "code": "000506",
+      "name": "中国食品",
+      "text": "中国食品(000506) 于 2026-08-24 跌出共识（曾连续 2 日）"
+    },
+    {
+      "level": "warn",
       "code": "688213",
       "name": "",
       "text": "(688213) 于 2026-08-17 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300502",
+      "name": "新易盛",
+      "text": "新易盛(300502) 于 2026-08-24 跌出共识（曾连续 3 日）"
     },
     {
       "level": "warn",
@@ -130,6 +154,12 @@
     },
     {
       "level": "warn",
+      "code": "300765",
+      "name": "石药创新",
+      "text": "石药创新(300765) 于 2026-08-24 跌出共识（曾连续 2 日）"
+    },
+    {
+      "level": "warn",
       "code": "688019",
       "name": "",
       "text": "(688019) 于 2026-08-19 跌出共识（曾连续 1 日）"
@@ -154,6 +184,24 @@
     },
     {
       "level": "warn",
+      "code": "000703",
+      "name": "恒逸石化",
+      "text": "恒逸石化(000703) 于 2026-08-24 跌出共识（曾连续 2 日）"
+    },
+    {
+      "level": "warn",
+      "code": "688525",
+      "name": "佰维存储",
+      "text": "佰维存储(688525) 于 2026-08-24 跌出共识（曾连续 3 日）"
+    },
+    {
+      "level": "warn",
+      "code": "600183",
+      "name": "生益科技",
+      "text": "生益科技(600183) 于 2026-08-24 跌出共识（曾连续 3 日）"
+    },
+    {
+      "level": "warn",
       "code": "600489",
       "name": "中金黄金",
       "text": "中金黄金(600489) 于 2026-08-22 跌出共识（曾连续 1 日）"
@@ -163,6 +211,12 @@
       "code": "000426",
       "name": "兴业银锡",
       "text": "兴业银锡(000426) 于 2026-08-22 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "000792",
+      "name": "盐湖股份",
+      "text": "盐湖股份(000792) 于 2026-08-24 跌出共识（曾连续 2 日）"
     }
   ],
   "sector_cluster": {
@@ -321,8 +375,8 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-08-24",
-    "history_days": 7,
+    "track_start": "2026-08-25",
+    "history_days": 8,
     "summary": {
       "1d": {
         "count": 9,

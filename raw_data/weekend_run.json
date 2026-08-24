@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-24 23:20:15",
-  "generated": "2026-08-24 23:20:15",
+  "update_time": "2026-08-25 00:30:21",
+  "generated": "2026-08-25 00:30:21",
   "period_start": "2026-08-17",
   "period_end": "2026-08-23",
   "stats": {
@@ -16,35 +16,35 @@
       "file": "lhb_data.json",
       "label": "龙虎榜",
       "status": "ok",
-      "update_time": "2026-08-24 21:26:55",
+      "update_time": "2026-08-24 22:36:46",
       "size_kb": 23.7
     },
     {
       "file": "triple_history.json",
       "label": "三重共振历史",
       "status": "ok",
-      "update_time": "2026-08-24 22:22:47",
-      "size_kb": 15.3
+      "update_time": "2026-08-24 23:27:13",
+      "size_kb": 15.5
     },
     {
       "file": "top10_daily.json",
       "label": "全站精选",
       "status": "ok",
-      "update_time": "2026-08-24 22:41:54",
+      "update_time": "2026-08-24 23:51:03",
       "size_kb": 20.8
     },
     {
       "file": "cockpit_tier_recommend.json",
       "label": "驾驶舱分档",
       "status": "ok",
-      "update_time": "2026-08-24 22:21:59",
+      "update_time": "2026-08-24 23:26:22",
       "size_kb": 3.3
     },
     {
       "file": "sector_rs.json",
       "label": "板块相对强度",
       "status": "ok",
-      "update_time": "2026-08-24 21:21",
+      "update_time": "2026-08-24 22:32",
       "size_kb": 71.8
     },
     {
@@ -58,14 +58,14 @@
       "file": "gold_pool.json",
       "label": "黄金池",
       "status": "ok",
-      "update_time": "2026-08-24 22:21:59",
-      "size_kb": 84.3
+      "update_time": "2026-08-24 23:26:22",
+      "size_kb": 83.5
     },
     {
       "file": "candidate.json",
       "label": "候选池",
       "status": "ok",
-      "update_time": "2026-08-24 21:32:42",
+      "update_time": "2026-08-24 22:39:31",
       "size_kb": 66.7
     },
     {
@@ -78,8 +78,8 @@
       "file": "crds_card_data.json",
       "label": "逆势龙头",
       "status": "ok",
-      "update_time": "2026-08-24 21:31:26",
-      "size_kb": 0.5
+      "update_time": "2026-08-24 22:38:05",
+      "size_kb": 10.4
     }
   ],
   "source_note": "v8 周度运行汇总（轻量，离线可跑；由 algorithms/run_algorithms.py 周末链路调用）"
