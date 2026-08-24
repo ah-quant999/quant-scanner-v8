@@ -1,200 +1,71 @@
 {
-  "update_time": "2026-08-24 11:46:52",
+  "update_time": "2026-08-24 12:30:59",
   "data_date": "2026-08-24",
   "source": "CONCEPT_RANKING × STOCK_PROFILE × STOCK_QUOTE",
   "hot_concepts_count": 33,
   "hot_concepts": [
-    "小金属概念",
-    "稀缺资源",
-    "黄金概念",
     "破净股",
+    "稀缺资源",
     "红利股",
-    "锂矿概念",
     "红利破净股",
-    "金融地产风格",
+    "黄金概念",
+    "小金属概念",
+    "低市净率",
     "反内卷概念",
-    "低市净率"
+    "金融地产风格",
+    "锂矿概念"
   ],
   "picks": [
     {
       "code": "600028",
       "name": "中国石化",
       "pct": 4.71,
-      "amount_yi": 23.23,
+      "amount_yi": 24.14,
       "hot_concepts": [
-        "中特估",
         "天然气",
         "破净股",
         "碳交易",
         "红利破净股",
-        "红利股",
-        "证金持股"
+        "红利股"
       ],
-      "hot_count": 7,
-      "total_score": 11.87
+      "hot_count": 5,
+      "total_score": 12.01
     },
     {
       "code": "601318",
       "name": "中国平安",
-      "pct": 3.06,
-      "amount_yi": 47.04,
+      "pct": 3.41,
+      "amount_yi": 50.77,
       "hot_concepts": [
         "IPO受益",
-        "参股银行",
         "破净股",
         "红利破净股",
         "红利股",
-        "证金持股",
         "金融地产风格"
       ],
-      "hot_count": 7,
-      "total_score": 11.11
+      "hot_count": 5,
+      "total_score": 11.62
     },
     {
       "code": "601398",
       "name": "工商银行",
-      "pct": 1.54,
-      "amount_yi": 17.19,
+      "pct": 1.67,
+      "amount_yi": 18.53,
       "hot_concepts": [
-        "中特估",
-        "参股银行",
         "破净股",
         "红利破净股",
         "红利股",
-        "证金持股",
         "金融地产风格",
         "长期破净"
       ],
-      "hot_count": 8,
-      "total_score": 10.74
-    },
-    {
-      "code": "601020",
-      "name": "华钰矿业",
-      "pct": 4.97,
-      "amount_yi": 8.79,
-      "hot_concepts": [
-        "小金属概念",
-        "稀缺资源",
-        "黄金概念"
-      ],
-      "hot_count": 3,
-      "total_score": 10.13
-    },
-    {
-      "code": "601899",
-      "name": "紫金矿业",
-      "pct": -0.06,
-      "amount_yi": 79.16,
-      "hot_concepts": [
-        "小金属概念",
-        "稀缺资源",
-        "证金持股",
-        "锂矿概念",
-        "黄金概念"
-      ],
       "hot_count": 5,
-      "total_score": 10.11
-    },
-    {
-      "code": "600019",
-      "name": "宝钢股份",
-      "pct": 2.06,
-      "amount_yi": 4.52,
-      "hot_concepts": [
-        "中特估",
-        "价值股",
-        "低碳冶金",
-        "参股银行",
-        "反内卷概念",
-        "破净股",
-        "红利破净股",
-        "红利股",
-        "证金持股",
-        "长期破净"
-      ],
-      "hot_count": 10,
-      "total_score": 10.08
-    },
-    {
-      "code": "603993",
-      "name": "洛阳钼业",
-      "pct": 1.93,
-      "amount_yi": 41.44,
-      "hot_concepts": [
-        "小金属概念",
-        "磷化工",
-        "稀缺资源",
-        "黄金概念"
-      ],
-      "hot_count": 4,
-      "total_score": 9.91
-    },
-    {
-      "code": "601666",
-      "name": "平煤股份",
-      "pct": 2.39,
-      "amount_yi": 2.77,
-      "hot_concepts": [
-        "反内卷概念",
-        "破净股",
-        "稀缺资源",
-        "红利破净股",
-        "红利股",
-        "证金持股"
-      ],
-      "hot_count": 6,
-      "total_score": 9.77
-    },
-    {
-      "code": "002460",
-      "name": "赣锋锂业",
-      "pct": 3.44,
-      "amount_yi": 25.37,
-      "hot_concepts": [
-        "反内卷概念",
-        "小金属概念",
-        "锂矿概念"
-      ],
-      "hot_count": 3,
-      "total_score": 9.63
-    },
-    {
-      "code": "600188",
-      "name": "兖矿能源",
-      "pct": 2.01,
-      "amount_yi": 8.13,
-      "hot_concepts": [
-        "参股期货",
-        "参股银行",
-        "反内卷概念",
-        "小金属概念",
-        "稀缺资源",
-        "红利股"
-      ],
-      "hot_count": 6,
-      "total_score": 9.62
-    },
-    {
-      "code": "600362",
-      "name": "江西铜业",
-      "pct": -0.24,
-      "amount_yi": 20.09,
-      "hot_concepts": [
-        "参股银行",
-        "小金属概念",
-        "稀缺资源",
-        "证金持股",
-        "黄金概念"
-      ],
-      "hot_count": 5,
-      "total_score": 9.62
+      "total_score": 10.77
     },
     {
       "code": "000983",
       "name": "山西焦煤",
-      "pct": 2.32,
-      "amount_yi": 6.13,
+      "pct": 2.05,
+      "amount_yi": 6.54,
       "hot_concepts": [
         "反内卷概念",
         "破净股",
@@ -203,60 +74,180 @@
         "红利股"
       ],
       "hot_count": 5,
-      "total_score": 9.56
+      "total_score": 10.53
+    },
+    {
+      "code": "600997",
+      "name": "开滦股份",
+      "pct": 1.63,
+      "amount_yi": 0.5,
+      "hot_concepts": [
+        "反内卷概念",
+        "破净股",
+        "稀缺资源",
+        "红利破净股",
+        "红利股",
+        "长期破净"
+      ],
+      "hot_count": 6,
+      "total_score": 10.13
+    },
+    {
+      "code": "601666",
+      "name": "平煤股份",
+      "pct": 1.87,
+      "amount_yi": 2.94,
+      "hot_concepts": [
+        "反内卷概念",
+        "破净股",
+        "稀缺资源",
+        "红利破净股",
+        "红利股"
+      ],
+      "hot_count": 5,
+      "total_score": 10.09
+    },
+    {
+      "code": "000937",
+      "name": "冀中能源",
+      "pct": 2.13,
+      "amount_yi": 1.15,
+      "hot_concepts": [
+        "反内卷概念",
+        "破净股",
+        "稀缺资源",
+        "红利破净股",
+        "红利股"
+      ],
+      "hot_count": 5,
+      "total_score": 10.03
+    },
+    {
+      "code": "601077",
+      "name": "渝农商行",
+      "pct": 3.08,
+      "amount_yi": 3.81,
+      "hot_concepts": [
+        "破净股",
+        "红利破净股",
+        "红利股",
+        "金融地产风格",
+        "长期破净"
+      ],
+      "hot_count": 5,
+      "total_score": 10.0
+    },
+    {
+      "code": "600919",
+      "name": "江苏银行",
+      "pct": 2.01,
+      "amount_yi": 8.97,
+      "hot_concepts": [
+        "破净股",
+        "红利破净股",
+        "红利股",
+        "金融地产风格",
+        "长期破净"
+      ],
+      "hot_count": 5,
+      "total_score": 9.98
+    },
+    {
+      "code": "601166",
+      "name": "兴业银行",
+      "pct": 0.99,
+      "amount_yi": 13.78,
+      "hot_concepts": [
+        "破净股",
+        "红利破净股",
+        "红利股",
+        "金融地产风格",
+        "长期破净"
+      ],
+      "hot_count": 5,
+      "total_score": 9.95
     },
     {
       "code": "601288",
       "name": "农业银行",
-      "pct": 0.89,
-      "amount_yi": 15.06,
+      "pct": 1.03,
+      "amount_yi": 15.96,
       "hot_concepts": [
-        "中特估",
         "破净股",
         "红利破净股",
         "红利股",
-        "证金持股",
         "金融地产风格"
       ],
-      "hot_count": 6,
-      "total_score": 9.5
+      "hot_count": 4,
+      "total_score": 9.78
     },
     {
-      "code": "601998",
-      "name": "中信银行",
-      "pct": 2.15,
-      "amount_yi": 4.85,
+      "code": "600123",
+      "name": "兰花科创",
+      "pct": 0.69,
+      "amount_yi": 1.23,
       "hot_concepts": [
-        "中特估",
+        "反内卷概念",
+        "破净股",
+        "稀缺资源",
+        "红利破净股",
+        "红利股",
+        "长期破净"
+      ],
+      "hot_count": 6,
+      "total_score": 9.73
+    },
+    {
+      "code": "601818",
+      "name": "光大银行",
+      "pct": 1.99,
+      "amount_yi": 5.67,
+      "hot_concepts": [
         "破净股",
         "红利破净股",
         "红利股",
-        "证金持股",
         "金融地产风格",
         "长期破净"
       ],
-      "hot_count": 7,
-      "total_score": 9.46
+      "hot_count": 5,
+      "total_score": 9.64
     },
     {
-      "code": "601168",
-      "name": "西部矿业",
-      "pct": -2.96,
-      "amount_yi": 18.38,
+      "code": "600019",
+      "name": "宝钢股份",
+      "pct": 1.72,
+      "amount_yi": 4.77,
       "hot_concepts": [
-        "小金属概念",
-        "稀缺资源",
-        "锂矿概念",
-        "黄金概念"
+        "低碳冶金",
+        "反内卷概念",
+        "破净股",
+        "红利破净股",
+        "红利股",
+        "长期破净"
       ],
-      "hot_count": 4,
-      "total_score": 9.44
+      "hot_count": 6,
+      "total_score": 9.61
+    },
+    {
+      "code": "601939",
+      "name": "建设银行",
+      "pct": 1.43,
+      "amount_yi": 7.62,
+      "hot_concepts": [
+        "破净股",
+        "红利破净股",
+        "红利股",
+        "金融地产风格",
+        "长期破净"
+      ],
+      "hot_count": 5,
+      "total_score": 9.55
     }
   ],
   "rejected_summary": {
-    "no_hot_concept": 7995,
-    "too_hot": 46,
-    "too_cold": 168,
+    "no_hot_concept": 8097,
+    "too_hot": 49,
+    "too_cold": 153,
     "small_mv": 0,
     "big_mv": 0,
     "no_quote": 0
