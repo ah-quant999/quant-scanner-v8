@@ -4119,13 +4119,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   var rendered = false;
   function _esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
   function _colorNum(v, mid){
-    // 数值染色：>= mid+5 绿，<= mid-5 红，中间黄
+    // 数值染色（红涨绿跌·中国习惯）：>= mid+5 红，<= mid-5 绿，中间黄
     if(v == null || v === '--' || v === '') return 'var(--sub)';
     if(typeof v === 'string') v = parseFloat(v);
     if(isNaN(v)) return 'var(--sub)';
     if(mid == null) mid = 50;
-    if(v >= mid+5) return '#22c55e';
-    if(v <= mid-5) return '#f87171';
+    if(v >= mid+5) return '#f4495d';
+    if(v <= mid-5) return '#1fd17b';
     return '#fbbf24';
   }
 
