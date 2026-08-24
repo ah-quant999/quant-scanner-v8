@@ -36,6 +36,36 @@ OUT_JS = DATA_DIR / "BLOAT_CHECK.js"
 QUIET_HOURS_START = 22
 QUIET_HOURS_END = 7
 
+# 2026-08-24 根因修复：加 30 分钟邮件去重。原 send_bloat_email 完全无去重，
+# 一旦被高频跑批(如周末 15:30 任务 coupled 其他调度)每轮都发，即成邮件轰炸。
+_BLOAT_ALERT_STATE = REPO_ROOT / ".workbuddy" / "v8_bloat_alert_state.json"
+_BLOAT_DEDUPE_MIN = 30
+
+
+def _bloat_alert_deduped(now_cst):
+    """同组风险 30 分钟内只发一封。返回 (should_send, reason)。"""
+    try:
+        if _BLOAT_ALERT_STATE.exists():
+            st = json.loads(_BLOAT_ALERT_STATE.read_text(encoding="utf-8"))
+            last, last_key = st.get("last_ts"), st.get("last_key")
+            if last and last_key == "bloat":
+                ago = (now_cst.timestamp() - last) / 60
+                if ago < _BLOAT_DEDUPE_MIN:
+                    return False, f"距上次体检邮件仅 {ago:.0f}min < {_BLOAT_DEDUPE_MIN}min"
+    except Exception:
+        pass
+    return True, ""
+
+
+def _save_bloat_alert_state(now_cst):
+    try:
+        _BLOAT_ALERT_STATE.parent.mkdir(parents=True, exist_ok=True)
+        _BLOAT_ALERT_STATE.write_text(
+            json.dumps({"last_ts": now_cst.timestamp(), "last_key": "bloat"}, ensure_ascii=False),
+            encoding="utf-8")
+    except Exception:
+        pass
+
 
 def in_quiet_hours(now_cst=None):
     """判断当前是否处于夜间静音时段（北京时间 22:00-07:00）。"""
@@ -326,6 +356,12 @@ def send_bloat_email(report):
         print("[INFO] 当前处于夜间静音时段（22:00-07:00），跳过邮件，仅记录日志")
         return False
 
+    now_cst = datetime.now(timezone(timedelta(hours=8)))
+    send, why = _bloat_alert_deduped(now_cst)
+    if not send:
+        print(f"[INFO] 体检邮件去抖：{why}，跳过（仅记录日志）")
+        return False
+
     subject = f"【v8周末体检】{report['summary']['fail']} 项风险 / {report['updated']}"
     lines = [
         f"v8 臃肿度/崩溃风险检查时间：{report['updated']}",
@@ -340,6 +376,7 @@ def send_bloat_email(report):
             lines.append(f"{flag} {item['name']}: {item['message']}")
     lines.append("")
     lines.append("建议：非交易时段可抽时间清理死代码、拆分大文件、修复重复 id/函数。")
+    _save_bloat_alert_state(now_cst)
     return send_alert(subject, "\n".join(lines))
 
 

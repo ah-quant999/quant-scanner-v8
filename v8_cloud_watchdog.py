@@ -678,11 +678,16 @@ def dispatch_selfhosted_fallback(cat):
     # 门控 1+2：连续失败降级 + 静默期
     allowed, reason = _check_selfhosted_throttle(now_cst)
     if not allowed:
-        return False, f"self-hosted 派发被门控拦截: {reason}"
+        # 2026-08-24 根因修复：连续失败≥3 是真问题(需人工)保留 False 告警；
+        # 静默期/距上次派发过近属「安全跳过」降级为 True，避免误报 auto_dispatch 失败邮件。
+        if "连续失败" in reason:
+            return False, f"self-hosted 派发被门控拦截: {reason}"
+        return True, f"self-hosted 派发安全跳过(门控): {reason}"
     # 门控 3：云端在跑就不抢
     cloud_busy, cmsg = _check_cloud_in_progress()
     if cloud_busy:
-        return False, f"self-hosted 派发被门控拦截: {cmsg}"
+        # 2026-08-24 根因修复：云端正在刷新,无需抢派,属安全跳过而非失败。
+        return True, f"self-hosted 派发安全跳过(云端在跑): {cmsg}"
     url = f"https://api.github.com/repos/{REPO}/actions/workflows/{CN_SELFHOSTED_FALLBACK_FILE}/dispatches"
     data = json.dumps({"ref": "main", "inputs": {"category": cat}}).encode("utf-8")
     req = urllib.request.Request(url, data=data, headers=HEADERS, method="POST")
@@ -745,7 +750,10 @@ def auto_dispatch_with_fallback(cat):
     """
     allowed, reason = _global_dispatch_allowed()
     if not allowed:
-        return False, reason
+        # 2026-08-24 根因修复：30 分钟全局派发冷却中 = 近期已成功派发，无需再派，
+        # 属「安全跳过」而非失败。原 return False 被看门狗当成管线故障，
+        # 造成每小时一封 auto_dispatch 失败邮件轰炸（数据其实在正常刷新）。
+        return True, f"派发冷却中(近期已派发,安全跳过): {reason}"
     # 先检查主 workflow 最近状态
     ok, msg, is_failure = check_workflow(CN_WORKFLOW_NAME, "cn_fetch", max_age_min=120, workflow_id=CN_WORKFLOW_ID)
     if is_failure:
