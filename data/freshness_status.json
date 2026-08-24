@@ -1,17 +1,19 @@
 {
-  "check_time": "2026-08-24 21:18:51",
+  "check_time": "2026-08-25 00:22:19",
   "last_trade_close": "2026-08-24 15:30:00",
   "is_trading_day": true,
   "core_stale": [],
   "warn_stale": [],
   "frozen_stale": [],
-  "no_update_time": [],
+  "no_update_time": [
+    "COCKPIT_ADVICE"
+  ],
   "summary": {
     "total_checked": 50,
     "core_stale": 0,
     "warn_stale": 0,
     "frozen_stale": 0,
-    "no_timestamp": 0
+    "no_timestamp": 1
   },
   "category_map": {
     "V8_CAL": "premarket",
