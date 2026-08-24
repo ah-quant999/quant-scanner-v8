@@ -7853,7 +7853,15 @@ window.__renderV8CalFull();
     var snaps=d.snapshots;
     // 🛡 2026-08-20 主人令一劳永逸：只保留 09:30 开盘后的盘中快照，
     //   过滤盘前 08:xx 全市场累计快照（与盘中分时口径不同，会把 Y 轴拉胯到 36+ 且堆底角）
-    snaps = snaps.filter(function(s){ return (s.time||'') >= '09:30'; });
+    // 🛡 2026-08-24 主人令：只显示交易时段 09:25–16:05 的盘中快照，
+    //   盘前冷启(08:xx)/盘后(16:05后)快照一律不画，避免曲线出现离群水平段
+    snaps = snaps.filter(function(s){ var t=(s.time||''); return t >= '09:25' && t <= '16:05'; });
+    // 🛡 过滤后若不足 2 个点，直接空提示（避免 line 8001 取末点时报 undefined）
+    if(snaps.length < 2){
+      dom.innerHTML='<div class="ipo-empty">📭 当前交易时段暂无足够盘中分时数据（盘中每30分快照，盘前自动清空）</div>';
+      var tEl0=$('sfIntradayTime'); if(tEl0) tEl0.innerHTML='—';
+      return;
+    }
     // 🛡 2026-08-19: 改板块选法 = 「跨 snap 出现频次 ≥ 半数 AND 该 snap 内 net 不小」
     //   (旧选法「全局累计绝对值 Top」会把盘前 1-2 个快照独有的大额板块选上，后续 snaps 全 null → 曲线贴底)
     //   频次优先保证每条线都有连续数据点，曲线有意义

@@ -1220,6 +1220,11 @@ def f_sector_fund_flow():
     try:
         _now_ts = now_cst().strftime("%H:%M")
         _today_str = now_cst().strftime("%Y-%m-%d")
+        # 🛡 2026-08-24 主人令：只在交易时段 09:25–16:05 抓取快照，
+        #   盘前冷启(08:xx)/盘后 run 不写 intraday，杜绝开盘前/收盘后的离群点污染曲线
+        if not ("09:25" <= _now_ts <= "16:05"):
+            print(f"  ⏭️ 非交易时段 {_now_ts}，跳过 sector_fund_flow_intraday 快照写入")
+            return
         _intraday_data = {"date": _today_str, "snapshots": []}
         if _intraday_path.exists():
             try:
