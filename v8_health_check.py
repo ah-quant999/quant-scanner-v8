@@ -2131,8 +2131,16 @@ def send_report_email(report, healed=None, failed=None):
             continue
         if it.get("page") == "管线":
             continue
-        if it.get("heal", "").startswith("已自动"):
-            continue  # 已自愈，无需人工
+        # 2026-08-24 主人令：自愈已接手的项不再用【需人工】吓人。
+        # 凡 self_heal 对该项写过 heal 标记（无论"已自动派发"/"跳过重复"/"达上限"），
+        # 即代表自愈链已接管刷新，数据陈旧只是派发后尚未刷新的快照瞬间态，
+        # 下一轮自愈/云端产出即恢复——摘除出 remaining，不发【需人工】。
+        # 仅「自愈失败:...」(派发明确失败) 与「无 heal 标记」(根本没派发) 保留告警。
+        _heal = it.get("heal", "") or ""
+        if _heal and not _heal.startswith("自愈失败"):
+            continue  # 自愈已接手，无需人工介入告警
+        if _heal.startswith("已自动"):
+            continue  # 冗余保险：已自愈
         # 2026-08-22 起：STOCK_MOMENTUM_STATE/V2 已脱离 PDF，由 gen_strong_breakout 每日盘后自选强势突破自合成，
         # 不再走 OCR 人工依赖豁免。此类失败按普通卡处理（纳入邮件/告警）。
         remaining.append(it)
