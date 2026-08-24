@@ -45,7 +45,12 @@ def load_cost():
                 if depth == 0:
                     end = i + 1
                     break
-        return json.loads(txt[start:end])
+        raw = json.loads(txt[start:end])
+        # 铁律：PORTFOLIO_COST.js 顶层混有 update_time 等字符串键，
+        # 只保留 dict 值（真正的持仓成本条目），否则下游 c.get() 会 AttributeError。
+        if isinstance(raw, dict):
+            return {k: v for k, v in raw.items() if isinstance(v, dict)}
+        return {}
     except Exception as e:
         print("WARN load_cost:", e, file=sys.stderr)
     return {}
