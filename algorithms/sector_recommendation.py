@@ -155,6 +155,15 @@ def main():
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
     log(f"已写入 {OUT}")
+
+    # 🔴 2026-08-25 一劳永逸：直接导出 data/SECTOR_RECOMMENDATION.js（脱离云端未知导出步）
+    #   见 gen_cockpit_advice.py 同款说明。脚本自带 data 导出 → 云端跑到即写新鲜 data/X.js，不被旧 out 覆盖。
+    DATA_JS = os.path.join(BASE, "data", "SECTOR_RECOMMENDATION.js")
+    with open(DATA_JS, "w", encoding="utf-8") as f:
+        f.write("window.SECTOR_RECOMMENDATION = ")
+        json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
+        f.write(";")
+    log(f"已导出 {DATA_JS}")
     log(f"推荐板块数: {len(results)}")
     for r in results[:10]:
         flags_s = " ".join(r["flags"]) if r["flags"] else "—"

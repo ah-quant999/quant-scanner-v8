@@ -291,6 +291,29 @@ def step_stage():
     return stage_to_raw.main()
 
 
+def step_ensure_cockpit_sector():
+    """🔴 2026-08-25 一劳永逸：链尾保底，强制重跑驾驶舱建议 + 板块推荐并直接导出 data/X.js。
+
+    这两张卡此前落入链路后方，常因整链超时截断 / continue-on-error 静默失败而漏产，
+    且 data/X.js 依赖云端未知导出步（用陈旧 out 重导出覆盖本地推送）。现两个生成器脚本
+    已自带 data 导出逻辑，此处再保底重跑一次（幂等），确保无论如何这两张卡 data 必新鲜。
+    """
+    print("\n[2.7] 保底重跑 驾驶舱建议 + 板块推荐（确保 data/X.js 新鲜）")
+    for s in ["gen_cockpit_advice.py", "sector_recommendation.py"]:
+        path = os.path.join(ALGO, s)
+        if not os.path.exists(path):
+            print(f"  ❌ 缺失脚本: {s}")
+            continue
+        try:
+            r = subprocess.run([PY, path], cwd=ALGO, capture_output=True, text=True, timeout=600)
+            if r.returncode == 0:
+                print(f"  ✅ {s} 完成")
+            else:
+                print(f"  ⚠️ {s} 退出码 {r.returncode}")
+        except Exception as e:
+            print(f"  ❌ {s} 异常: {e}")
+
+
 def step_push():
     if not PUSH:
         print("\n[3] 跳过推送（V8_PUSH != 1）")
@@ -354,6 +377,8 @@ def main():
     step_seed_inputs()          # 默认 no-op, V6_SEED=1 才重灌
     step_run()
     n = step_stage()
+    # 🔴 2026-08-25 一劳永逸：链尾保底，确保驾驶舱建议 + 板块推荐 data/X.js 必新鲜
+    step_ensure_cockpit_sector()
     # 🔴 盘后选股策略门控：LHB 7日累计属于选股向汇总，未到 18:00 不处理当日龙虎榜数据
     if _is_post_close_picking_ready():
         step_append_lhb_history()

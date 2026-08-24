@@ -155,6 +155,17 @@ def main():
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(advice, f, ensure_ascii=False, indent=2)
 
+    # 🔴 2026-08-25 一劳永逸：直接导出 data/COCKPIT_ADVICE.js（脱离云端未知导出步）
+    #   此前该脚本只写 out/cockpit_advice.json，data/X.js 由云端 build 特有导出步生成；
+    #   云端整链超时截断后方脚本 → out 陈旧 → 每次 build 用旧 out 重导出覆盖本地推送的新鲜 data。
+    #   脚本自带 data 导出后，云端 run_algorithms 跑到本脚本即直接写出新鲜 data/X.js，不再被覆盖。
+    DATA_JS = os.path.join(BASE, "..", "data", "COCKPIT_ADVICE.js")
+    with open(DATA_JS, "w", encoding="utf-8") as f:
+        f.write("window.COCKPIT_ADVICE = ")
+        json.dump(advice, f, ensure_ascii=False, separators=(",", ":"))
+        f.write(";")
+    print(f"✅ 导出 {DATA_JS}")
+
     print(f"✅ 生成 {OUT}")
     print(f"   主推信号: 5日突破 | 最佳T+{best_pd}胜率 {wr_best}% / 收益 {ar_best:+.2f}% | 样本 {smp}")
     print(f"   关注池(近期突破且守住): {len(watch)} 只 | 回避名单(已破位): {len(avoid)} 只")
