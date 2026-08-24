@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-08-24 08:18:30",
-  "total": 175,
+  "update_time": "2026-08-24 09:01:56",
+  "total": 169,
   "grade_summary": {
     "A": 15,
-    "B": 18,
-    "C": 43,
+    "B": 17,
+    "C": 42,
     "D": 30,
-    "no_data": 69
+    "no_data": 65
   },
   "stocks": {
     "hk_00005": {
@@ -59,13 +59,6 @@
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
     "hk_00388": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "港股暂无基本面数据源(中性不扣分)"
-    },
-    "hk_00688": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -136,13 +129,6 @@
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
     "hk_01109": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "港股暂无基本面数据源(中性不扣分)"
-    },
-    "hk_01177": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -247,13 +233,6 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
-    "hk_01908": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "港股暂无基本面数据源(中性不扣分)"
-    },
     "hk_01919": {
       "score": 0,
       "grade": "",
@@ -346,13 +325,6 @@
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
     "hk_02382": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "港股暂无基本面数据源(中性不扣分)"
-    },
-    "hk_02423": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -645,10 +617,9 @@
       "revenue_growth": 55.0175,
       "reason": "ROE一般(12.3%) | 营收高增(55.0%)",
       "news": {
-        "score": 20,
+        "score": 15,
         "tags": [
-          "中报预增",
-          "收购"
+          "中报预增"
         ]
       }
     },
@@ -1229,9 +1200,10 @@
       "revenue_growth": 50.0494,
       "reason": "ROE差(2.6%) | 营收高增(50.0%)",
       "news": {
-        "score": 15,
+        "score": 20,
         "tags": [
-          "中报预增"
+          "中报预增",
+          "回购"
         ]
       }
     },
@@ -1319,13 +1291,6 @@
           "中报预增"
         ]
       }
-    },
-    "sz_002594": {
-      "score": 65,
-      "grade": "B",
-      "roe": 15.118,
-      "revenue_growth": 96.4515,
-      "reason": "ROE良好(15.1%) | 营收高增(96.5%)"
     },
     "sz_002716": {
       "score": 30,
@@ -1594,13 +1559,6 @@
           "中报预增"
         ]
       }
-    },
-    "sz_301358": {
-      "score": 55,
-      "grade": "C",
-      "roe": 10.4307,
-      "revenue_growth": 99.734,
-      "reason": "ROE一般(10.4%) | 营收高增(99.7%)"
     },
     "sz_301526": {
       "score": 30,
