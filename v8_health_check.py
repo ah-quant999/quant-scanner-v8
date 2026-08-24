@@ -253,6 +253,7 @@ def _load_token():
     _this_dir = Path(__file__).resolve().parent
     candidates = [
         _this_dir / "data" / ".github_pat.txt",          # 仓库根/data/.github_pat.txt（推荐）
+        _this_dir / ".workbuddy" / "v8_gh_token.txt",    # 2026-08-24 修复：仓库本地 token（与看门狗同源，本机实际存放处）
         Path.home() / ".workbuddy" / "v8_gh_token.txt",  # 用户级 workbuddy token
     ]
     for p in candidates:
@@ -2083,13 +2084,34 @@ def send_report_email(report, healed=None, failed=None):
         # 不再走 OCR 人工依赖豁免。此类失败按普通卡处理（纳入邮件/告警）。
         remaining.append(it)
 
+    # 2026-08-24 去重：同一组不可自愈项 30 分钟内只发一封邮件，避免每轮巡检轰炸；
+    # 但始终写 URGENT 留痕（与静音时段一致），不影响自愈闭环与人工可追溯。
+    _state_path = Path(__file__).resolve().parent / ".workbuddy" / "v8_health_alert_state.json"
+    _now = datetime.now()
+    _key = "|".join(sorted(it.get("id", it.get("name", "")) for it in remaining) + sorted(failed))
+    if failed or remaining:
+        _ulines = [f"[{it.get('page', '')}] {it.get('name', '')}: {it.get('message', '')}" for it in remaining]
+        _ulines += failed
+        write_urgent(_ulines)
+    _suppressed = False
+    try:
+        _prev = json.loads(_state_path.read_text(encoding="utf-8")) if _state_path.exists() else {}
+    except Exception:
+        _prev = {}
+    if _prev.get("key") == _key:
+        try:
+            _elapsed = (_now - datetime.fromisoformat(_prev["last_ts"])).total_seconds() / 60
+        except Exception:
+            _elapsed = 999
+        if _elapsed < 30:
+            _suppressed = True
+    if _suppressed:
+        print(f"[DEDUP] 健康邮件 {_elapsed:.0f}min 内同组已发，跳过（URGENT 已留痕）")
+        return False
+
     quiet = in_quiet_hours()
     if quiet:
-        if failed or remaining:
-            lines = [f"[{it.get('page', '')}] {it.get('name', '')}: {it.get('message', '')}" for it in remaining]
-            lines += failed
-            write_urgent(lines)
-        # 夜间静音：自愈已执行，仅不邮件
+        # 夜间静音：自愈已执行，仅不邮件（URGENT 已写）
         return False
 
     if failed or remaining:
@@ -2103,15 +2125,20 @@ def send_report_email(report, healed=None, failed=None):
         if healed:
             lines += ["", "以下项已自动派发刷新（无需人工）："]
             lines += [f"✓ {h}" for h in healed]
+        lines += ["", f"站点：{SITE_URL}"]
+        send_alert(subject, "\n".join(lines))
+        try:
+            _state_path.parent.mkdir(parents=True, exist_ok=True)
+            _state_path.write_text(json.dumps({"key": _key, "last_ts": _now.isoformat()}, ensure_ascii=False), encoding="utf-8")
+        except Exception:
+            pass
+        return True
     elif healed:
         # 🔴 2026-08-12 主人令：全部自愈成功不发邮件(避免噪音),「只看有问题的」
         #   如果有 fail 项需要人工,会进上面 if 分支(healed 也会列在最后)所以不影响
         return False
     else:
         return False
-
-    lines += ["", f"站点：{SITE_URL}"]
-    return send_alert(subject, "\n".join(lines))
 
 
 def main():
