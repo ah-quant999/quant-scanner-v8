@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-25 05:45:09",
-  "generated": "2026-08-25 05:45:09",
+  "update_time": "2026-08-25 06:26:46",
+  "generated": "2026-08-25 06:26:46",
   "period_start": "2026-08-17",
   "period_end": "2026-08-23",
   "stats": {
@@ -16,7 +16,7 @@
       "file": "lhb_data.json",
       "label": "龙虎榜",
       "status": "ok",
-      "update_time": "2026-08-25 04:32:49",
+      "update_time": "2026-08-25 05:15:10",
       "size_kb": 23.7
     },
     {
@@ -44,7 +44,7 @@
       "file": "sector_rs.json",
       "label": "板块相对强度",
       "status": "ok",
-      "update_time": "2026-08-25 04:28",
+      "update_time": "2026-08-25 05:10",
       "size_kb": 71.8
     },
     {
@@ -58,7 +58,7 @@
       "file": "gold_pool.json",
       "label": "黄金池",
       "status": "ok",
-      "update_time": "2026-08-25 05:00:59",
+      "update_time": "2026-08-25 05:45:10",
       "size_kb": 83.7
     },
     {
