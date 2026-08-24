@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-24 15:45:55",
-  "generated": "2026-08-24 15:45:55",
+  "update_time": "2026-08-24 16:33:20",
+  "generated": "2026-08-24 16:33:20",
   "period_start": "2026-08-17",
   "period_end": "2026-08-23",
   "stats": {
@@ -9,13 +9,7 @@
     "tracked_files": 10,
     "ok_files": 9,
     "missing_files": 1,
-    "latest_health": {
-      "ok": 90,
-      "warn": 5,
-      "fail": 12,
-      "total": 107,
-      "updated": "2026-08-24 15:27:34"
-    }
+    "latest_health": null
   },
   "freshness": [
     {
