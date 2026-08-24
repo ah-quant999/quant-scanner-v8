@@ -199,13 +199,18 @@ def api_delete(path):
         return -1
 
 def kill_zombie_pre18_algo(now, wf=ZOMBIE_WF):
-    """取消「盘前创建却仍 in_progress 超阈值」的 run，释放并发槽。
+    """取消「盘前创建却仍 in_progress/pending 超阈值」的 run，释放并发槽。
     wf 指定目标 workflow；默认 v8_algo_cloud，#1 改 cancel-in-progress:false 后
-    亦用于清理 v8_cn_fetch_cloud 可能堆积的盘前僵尸。"""
-    d = api("GET", f"/repos/{REPO}/actions/workflows/{wf}/runs?per_page=30&status=in_progress")
+    亦用于清理 v8_cn_fetch_cloud 可能堆积的盘前僵尸（含 pending 排队 run）。
+    仅清「盘前(<18:00)创建且超 60 分钟」的 run——此类按设计跳过选股脚本、零数据损失，
+    且占着单并发槽会堵死当晚 19:15 生成轮；盘后生成轮(ct.hour>=18)受保护绝不误杀。"""
+    d = api("GET", f"/repos/{REPO}/actions/workflows/{wf}/runs?per_page=30")
     runs = d.get("workflow_runs", []) if isinstance(d, dict) else []
     killed = 0
     for r in runs:
+        stt = r.get("status")
+        if stt not in ("in_progress", "pending", "queued"):
+            continue
         try:
             ct = datetime.datetime.fromisoformat(
                 r.get("created_at", "").replace("Z", "+00:00")).astimezone(CST)
@@ -217,7 +222,7 @@ def kill_zombie_pre18_algo(now, wf=ZOMBIE_WF):
         if age_min <= ZOMBIE_PRE18_MAX_MIN:
             continue
         rid = r.get("id")
-        print(f"  🧟 盘前僵尸 {wf} run {rid}（创建 {ct.strftime('%H:%M')}CST，已挂 {age_min:.0f} 分钟），"
+        print(f"  🧟 盘前僵尸 {wf} run {rid}（{stt} 创建 {ct.strftime('%H:%M')}CST，已挂 {age_min:.0f} 分钟），"
               f"取消以释放并发槽")
         st = api_delete(f"/repos/{REPO}/actions/runs/{rid}")
         if st in (200, 202, 204):
