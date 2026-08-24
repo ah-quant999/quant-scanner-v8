@@ -12,13 +12,13 @@
   },
   "maharo_signals": {
     "exists": true,
-    "raw_signals": 23,
+    "raw_signals": 29,
     "gold_pool_matches": 21
   },
   "source_dist": {
     "主板成交前100": 62,
     "观澜台": 7,
-    "maharo研报": 25,
+    "maharo研报": 26,
     "创业板成交前100": 23,
     "科创板成交前100": 15,
     "港股成交前50": 50

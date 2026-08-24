@@ -1,10 +1,10 @@
 {
-  "update_time": "2026-08-24 21:47:36",
+  "update_time": "2026-08-24 22:56:15",
   "data_date": "2026-08-24",
   "track_start": "2026-08-24",
   "history_days": 7,
   "strict_count": 0,
-  "near_count": 1,
+  "near_count": 2,
   "tracked": [
     {
       "code": "600988",
@@ -30,6 +30,33 @@
           "tag": "中报预增",
           "score": 15,
           "reaction": "已兑现(价涨)"
+        }
+      ]
+    },
+    {
+      "code": "601899",
+      "name": "紫金矿业",
+      "market": "沪市",
+      "board": "主板",
+      "status": "near",
+      "total_score": 20,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 7,
+      "consecutive_days": 3,
+      "first_close": 33.36,
+      "current_close": null,
+      "pnl_pct": null,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "—"
         }
       ]
     }
@@ -142,22 +169,23 @@
     "by_industry": [
       {
         "industry": "有色金属矿采选业",
-        "count": 1,
+        "count": 2,
         "names": [
-          "赤峰黄金"
+          "赤峰黄金",
+          "紫金矿业"
         ]
       }
     ],
     "by_sector": [
       {
         "sector": "有色金属矿采选业",
-        "count": 1
+        "count": 2
       }
     ],
     "concentration": 100.0
   },
   "overlap": {
-    "total_tracked": 1,
+    "total_tracked": 2,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
@@ -170,8 +198,10 @@
     },
     "cockpit_b": {
       "count": 9,
-      "overlap": 0,
-      "names": []
+      "overlap": 1,
+      "names": [
+        "紫金矿业"
+      ]
     }
   },
   "backtest_signal": {
