@@ -1,71 +1,15 @@
 window.FOUR_VOLUME={
- "update_time": "2026-08-23 16:47:38",
- "total": 3,
+ "update_time": "2026-08-24 18:25:13",
+ "total": 2,
  "stocks": [
   {
-   "code": "300390",
-   "name": "天华新能",
-   "market": "sz",
-   "board_label": "创业板",
-   "close": 65.47,
-   "pct_chg": 7.68,
-   "turnover_rate": 8.67,
-   "mv_yi": 0,
-   "fund_type": "混合",
-   "components": {
-    "游资点火": true,
-    "机构托底": true,
-    "广度翻多": true,
-    "主力动量翻多": true,
-    "机构金叉": false,
-    "散户金叉": true,
-    "主力金叉": false
-   },
-   "yzc": true,
-   "jg": true,
-   "xc": true,
-   "four": true,
-   "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
-   "signal_date": "2026-08-21",
-   "enter_date": "2026-08-21"
-  },
-  {
-   "code": "300308",
-   "name": "中际旭创",
-   "market": "sz",
-   "board_label": "创业板",
-   "close": 943.0,
-   "pct_chg": 4.29,
-   "turnover_rate": 2.59,
-   "mv_yi": 0,
-   "fund_type": "混合",
-   "components": {
-    "游资点火": true,
-    "机构托底": true,
-    "广度翻多": true,
-    "主力动量翻多": true,
-    "机构金叉": false,
-    "散户金叉": true,
-    "主力金叉": false
-   },
-   "yzc": true,
-   "jg": true,
-   "xc": true,
-   "four": true,
-   "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
-   "signal_date": "2026-08-21",
-   "enter_date": "2026-08-21"
-  },
-  {
-   "code": "601318",
-   "name": "中国平安",
+   "code": "600028",
+   "name": "中国石化",
    "market": "sh",
    "board_label": "主板",
-   "close": 53.35,
-   "pct_chg": 2.32,
-   "turnover_rate": 1.05,
+   "close": 5.33,
+   "pct_chg": 4.51,
+   "turnover_rate": 0.63,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -74,7 +18,35 @@ window.FOUR_VOLUME={
     "广度翻多": true,
     "主力动量翻多": true,
     "机构金叉": false,
-    "散户金叉": true,
+    "散户金叉": false,
+    "主力金叉": false
+   },
+   "yzc": true,
+   "jg": true,
+   "xc": true,
+   "four": true,
+   "qd": true,
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+   "signal_date": "2026-08-24",
+   "enter_date": "2026-08-24"
+  },
+  {
+   "code": "600110",
+   "name": "诺德股份",
+   "market": "sh",
+   "board_label": "主板",
+   "close": 11.07,
+   "pct_chg": 3.07,
+   "turnover_rate": 17.06,
+   "mv_yi": 0,
+   "fund_type": "混合",
+   "components": {
+    "游资点火": true,
+    "机构托底": true,
+    "广度翻多": true,
+    "主力动量翻多": true,
+    "机构金叉": true,
+    "散户金叉": false,
     "主力金叉": true
    },
    "yzc": true,
@@ -82,9 +54,9 @@ window.FOUR_VOLUME={
    "xc": true,
    "four": true,
    "qd": true,
-   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉 + 主力金叉",
-   "signal_date": "2026-08-21",
-   "enter_date": "2026-08-21"
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+   "signal_date": "2026-08-24",
+   "enter_date": "2026-08-24"
   }
  ]
 };
