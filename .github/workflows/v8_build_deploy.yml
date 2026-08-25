@@ -180,7 +180,7 @@ jobs:
             s=re.sub(r'var BUILD = "(?:BUILD_SHA_PLACEHOLDER|[0-9a-f]{7,40})"', 'var BUILD = "'+sha+'"', s)
             open(p,'w',encoding='utf-8').write(s)
             print('✅ 已注入构建版本戳', sha)
-            PYS
+          PYS
             # 🛡 2026-08-25 一劳永逸(任务①)：关键 data 文件须为今日新鲜，否则阻断部署防陈旧上线。
             #   update_v8.py 写回的是 raw_data 内嵌时间戳（「不得造假」铁律），故能真实反映数据新鲜度；
             #   仅当内嵌时间戳确凿陈旧(>36h)才拦截；格式缺失/无时间戳仅告警不拦截，避免误伤正常部署。
@@ -205,7 +205,7 @@ jobs:
                 print('❌ 关键数据陈旧，阻断部署（避免上线过期数据）：')
                 [print('  -',x) for x in stale]; sys.exit(1)
             print('✅ 关键数据均为今日新鲜')
-            PYF
+          PYF
             git add -f data/ index.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py
             if git diff --cached --quiet; then
               echo "ℹ️ 无数据变化，跳过部署（远端已是最新构建）"
