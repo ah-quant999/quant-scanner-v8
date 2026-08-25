@@ -1,35 +1,17 @@
 {
-  "update_time": "2026-08-25 08:37",
+  "update_time": "2026-08-25 09:16",
   "alerts": [
     {
       "type": "summary",
       "severity": "medium",
       "message": "ETF监测中，1涨11跌",
-      "time": "08:37"
+      "time": "09:16"
     },
     {
       "type": "etf",
       "severity": "medium",
-      "message": "华夏科创50ETF 大跌 3.09%",
-      "time": "08:38"
-    },
-    {
-      "type": "etf",
-      "severity": "medium",
-      "message": "5G通信ETF 大跌 4.48%",
-      "time": "08:38"
-    },
-    {
-      "type": "etf",
-      "severity": "medium",
-      "message": "芯片ETF 大跌 3.62%",
-      "time": "08:38"
-    },
-    {
-      "type": "etf",
-      "severity": "medium",
-      "message": "医药ETF 大跌 3.09%",
-      "time": "08:38"
+      "message": "华夏中证1000ETF 大跌 3.50%",
+      "time": "09:17"
     }
   ],
   "etfFlow": {
@@ -39,120 +21,120 @@
         "name": "华泰柏瑞沪深300ETF",
         "type": "宽基",
         "price": 4.627,
-        "change_pct": -1.13,
-        "volume": 9229738.0,
-        "amount": 4272980684.0,
-        "amplitude": 2.12
+        "change_pct": 0.0,
+        "volume": 0.0,
+        "amount": 0.0,
+        "amplitude": 0.0
       },
       {
         "code": "510310",
         "name": "易方达沪深300ETF",
         "type": "宽基",
-        "price": 4.493,
-        "change_pct": -1.25,
-        "volume": 1656352.0,
-        "amount": 744550152.0,
-        "amplitude": 1.93
+        "price": 4.463,
+        "change_pct": -0.67,
+        "volume": 0.0,
+        "amount": 0.0,
+        "amplitude": 0.0
       },
       {
         "code": "159919",
         "name": "嘉实沪深300ETF",
         "type": "宽基",
-        "price": 4.83,
-        "change_pct": -1.19,
-        "volume": 2306461.0,
-        "amount": 1115094890.2,
-        "amplitude": 1.98
+        "price": 4.831,
+        "change_pct": 0.02,
+        "volume": 0.0,
+        "amount": 0.0,
+        "amplitude": 0.0
       },
       {
         "code": "510330",
         "name": "华夏沪深300ETF",
         "type": "宽基",
         "price": 4.824,
-        "change_pct": -1.17,
-        "volume": 1171201.0,
-        "amount": 565476893.0,
-        "amplitude": 2.03
+        "change_pct": 0.0,
+        "volume": 0.0,
+        "amount": 0.0,
+        "amplitude": 0.0
       },
       {
         "code": "510050",
         "name": "华夏上证50ETF",
         "type": "宽基",
-        "price": 2.979,
-        "change_pct": -0.47,
-        "volume": 6945110.0,
-        "amount": 2070626243.0,
-        "amplitude": 1.04
+        "price": 2.966,
+        "change_pct": -0.44,
+        "volume": 0.0,
+        "amount": 0.0,
+        "amplitude": 0.0
       },
       {
         "code": "510500",
         "name": "南方中证500ETF",
         "type": "宽基",
-        "price": 7.74,
-        "change_pct": -1.6,
-        "volume": 3524545.0,
-        "amount": 2732054483.0,
-        "amplitude": 3.11
+        "price": 7.735,
+        "change_pct": -0.06,
+        "volume": 0.0,
+        "amount": 0.0,
+        "amplitude": 0.0
       },
       {
         "code": "159845",
         "name": "华夏中证1000ETF",
         "type": "宽基",
-        "price": 3.118,
-        "change_pct": -1.55,
-        "volume": 7033096.0,
-        "amount": 2189948477.067,
-        "amplitude": 3.32
+        "price": 3.009,
+        "change_pct": -3.5,
+        "volume": 0.0,
+        "amount": 0.0,
+        "amplitude": 0.0
       },
       {
         "code": "588000",
         "name": "华夏科创50ETF",
         "type": "宽基",
-        "price": 1.691,
-        "change_pct": -3.09,
-        "volume": 41050774.0,
-        "amount": 6962746430.0,
-        "amplitude": 4.64
+        "price": 1.666,
+        "change_pct": -1.48,
+        "volume": 0.0,
+        "amount": 0.0,
+        "amplitude": 0.0
       },
       {
         "code": "512690",
         "name": "酒ETF",
         "type": "行业",
         "price": 0.421,
-        "change_pct": 0.48,
-        "volume": 8717230.0,
-        "amount": 368192885.0,
-        "amplitude": 1.67
+        "change_pct": 0.0,
+        "volume": 0.0,
+        "amount": 0.0,
+        "amplitude": 0.0
       },
       {
         "code": "515050",
         "name": "5G通信ETF",
         "type": "行业",
-        "price": 1.003,
-        "change_pct": -4.48,
-        "volume": 11384633.0,
-        "amount": 1145417045.0,
-        "amplitude": 7.24
+        "price": 0.98,
+        "change_pct": -2.29,
+        "volume": 0.0,
+        "amount": 0.0,
+        "amplitude": 0.0
       },
       {
         "code": "159995",
         "name": "芯片ETF",
         "type": "行业",
-        "price": 1.117,
-        "change_pct": -3.62,
-        "volume": 7675750.0,
-        "amount": 861738757.111,
-        "amplitude": 5.44
+        "price": 1.099,
+        "change_pct": -1.61,
+        "volume": 0.0,
+        "amount": 0.0,
+        "amplitude": 0.0
       },
       {
         "code": "512010",
         "name": "医药ETF",
         "type": "行业",
         "price": 0.376,
-        "change_pct": -3.09,
-        "volume": 14279440.0,
-        "amount": 541904015.0,
-        "amplitude": 3.09
+        "change_pct": 0.0,
+        "volume": 0.0,
+        "amount": 0.0,
+        "amplitude": 0.0
       }
     ],
     "summary": {
@@ -160,7 +142,7 @@
       "valid": 12,
       "up": 1,
       "down": 11,
-      "alerts_count": 4
+      "alerts_count": 1
     }
   },
   "calendar": []
