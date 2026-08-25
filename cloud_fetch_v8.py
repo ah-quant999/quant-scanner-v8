@@ -2942,7 +2942,10 @@ def _clear_intraday_for_premarket(category, only=None):
     # ETF_DAILY_MONITOR：T+1 主力净流入为盘后（15:30）定稿值，盘前清成空会让「日监控·主力净流入」
     #   卡片在开盘前一片空白（阿狸咪 2026-08-11 反馈「这是盘后的啊，清空了干嘛」）。保留昨日值，
     #   开盘后盘中 fetch 自然覆盖为当日数据。注意它在 CATEGORY_MAP 里仍是 intraday（保证盘中被抓）。
-    KEEP_VARS = {"SH_SZ_HISTORY", "CAPITAL_FLOW_DATA", "LIMIT_UP_HEATMAP", "ETF_DAILY_MONITOR"}
+    # 🛡 2026-08-26 一劳永逸根因修复：CONCEPT_RANKING 原不在 KEEP_VARS，盘前(08:25)即被抹成空 stub，
+    #   导致"概念资金热图过早清空"。现与 SH_SZ_HISTORY 同等对待——盘前保留前一交易日真实数据，
+    #   等 09:00 盘中 fetch 自然刷新（即"开盘前一起刷新"，而非 08:25 就空白）。
+    KEEP_VARS = {"SH_SZ_HISTORY", "CAPITAL_FLOW_DATA", "LIMIT_UP_HEATMAP", "ETF_DAILY_MONITOR", "CONCEPT_RANKING"}
 
     for var, cat in CATEGORY_MAP.items():
         if "intraday" not in [x.strip() for x in cat.split(",")]:
@@ -3208,7 +3211,17 @@ def main(category=None, only=None):
 
         # ---- 涨跌家数：沪市 + 深市（与 AI市场速览 口径一致）----
         # index_quotes.json 已含 000001/399001 的 f104/f105/f106，直接读取求和，避免再调 ulist。
-        ds_hist = baseline.get("daily_stats") or []
+        # 🛡 2026-08-26 一劳永逸根因修复：daily_stats 无历史回填源，纯靠基线累积。
+        #   原 `ds_hist = baseline.get("daily_stats")` 在基线被覆盖/回退时直接塌缩到 1-2 天。
+        #   现对【远端基线 + 本地基线】按 date 取并集去重，确保任何已累积的历史天数都不丢失、不被截断。
+        _remote_ds = (remote.get("daily_stats") if isinstance(remote, dict) else None) or []
+        _local_ds = (baseline.get("daily_stats") if isinstance(baseline, dict) else None) or []
+        _seen = set(); ds_hist = []
+        for _r in sorted(_remote_ds + _local_ds, key=lambda x: (x.get("date") or "")):
+            _d = _r.get("date")
+            if not _d or _d in _seen:
+                continue
+            _seen.add(_d); ds_hist.append(_r)
         if is_today_trade:
             try:
                 idx_path = RAW_DIR / "index_quotes.json"

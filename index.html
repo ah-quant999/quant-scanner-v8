@@ -2,6 +2,9 @@
 html>
 <html lang="zh-CN">
 <head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <script>
 // 🛡 2026-08-25 一劳永逸：版本戳强缓存破坏。
 // 旧版只用 sessionStorage，仅本会话首次刷新一次；若用户缓存的是「还没带此脚本」的旧 index.html，
@@ -1799,23 +1802,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         const d=window.CONCEPT_RANKING;
         const el=$('conceptTreemap');
         if(!el) return;
-        // 🛡 2026-08-20 主人令一劳永逸：盘中卡盘前必须清空
-        //   检测逻辑：当前时间 < 09:25 且数据时间戳不是今日开盘后的 → 显示占位
-        var _conceptNow=new Date();
-        var _conceptHr=_conceptNow.getHours()+_conceptNow.getMinutes()/60;
-        var _isPreMarketConcept=_conceptHr<9.416; // 09:25 前
-        var _conceptDataDate=(d&&d.update_time)?String(d.update_time).slice(0,10):'';
-        var _conceptToday=new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
-        var _conceptShouldClear=_isPreMarketConcept && (!_conceptDataDate||_conceptDataDate!==_conceptToday
-          || (_conceptDataDate===_conceptToday && d.update_time && parseInt(String(d.update_time).slice(11,2))<9));
-        if(_conceptShouldClear){
-          el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">📭 概念资金热力图（盘前自动清空，开盘后更新）</div>';
+        // 🛡 2026-08-26 一劳永逸根因修复：原逻辑按"访客本地时钟<09:25"就清空显示，
+        //   等于从午夜起每个访客各自清空 → 与"开盘前和大家一起清空"彻底脱钩。
+        //   现改为【事件驱动】：只在后端真正做了盘前清空(premarket_cleared/no_data)或数据为空时才显示占位；
+        //   清空时机完全由后端在开盘前集合竞价窗口(09:15–09:30)统一触发一次，全站访客看到的状态完全一致。
+        var _cleared = !!(d && (d.premarket_cleared===true || d.no_data===true));
+        if(_cleared || !d || !d.items || !d.items.length){
+          el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">📭 概念资金热力图（'+( _cleared ? '盘前清空，开盘后更新' : '暂无数据' )+'）</div>';
           const _mt=$('conceptMapTime');
-          if(_mt) _mt.innerHTML = '<span style="font-size:11px;color:var(--dim)">盘前 · 数据待刷新</span>';
+          if(_mt) _mt.innerHTML = '<span style="font-size:11px;color:var(--dim)">'+( _cleared ? '盘前 · 数据待刷新' : '—' )+'</span>';
           return;
-        }
-        if(!d || !d.items || !d.items.length){
-          el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">📭 暂无概念数据（盘前自动清空，开盘后更新）</div>'; return;
         }
         // 过滤掉资金为0的无效项，避免全部等高
         const items=d.items.filter(it=>Math.abs(it.net)>0.001||Math.abs(it.chg)>0.001)
@@ -4226,8 +4222,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       else if(r.score >= 0) r.stars = '⭐';
       else r.stars = '—';
     });
-    // 按综合分降序
-    rows.sort(function(a,b){ return b.score - a.score; });
+    // 🛡 2026-08-26 一劳永逸根因修复：原按"综合分"排序，avg_return 权重过大，
+    //   把驾驶舱A档(胜率仅50.6%、avg_return 2.2 偏高)顶到最上并标"👑最强"，与真实强度背离。
+    //   现改为【胜率降序、平局看平均收益降序】——胜率最高的策略才是"最强"，排序有唯一主依据。
+    rows.sort(function(a,b){ return (b.win_rate - a.win_rate) || (b.avg_return - a.avg_return); });
     return rows;
   }
 
@@ -4271,10 +4269,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       // ② TOP5 追踪状态
       var ts = tt.stats || {};
       if(ts.tracking != null){
+        // 🛡 2026-08-26：samples=已平仓样本数(生命周期早期恒为1)，tracking=在池追踪总数(35)；口径不同，明确标注消除"1样本 vs 35"误导
         var tHtml = 'TOP5 <b>'+ts.tracking+'只</b>追踪中';
-        if(ts.samples > 0) tHtml += ' · <b style="color:#22c55e;">'+ts.win_rate+'%</b>胜率';
-        else tHtml += ' · <span style="color:var(--dim);">待平仓</span>';
-        pills.push('<span style="padding:2px 8px;border-radius:6px;font-weight:700;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);">'+tHtml+'</span>');
+        if(ts.samples != null) tHtml += ' · 已平仓 <b>'+ts.samples+'只</b>';
+        if(ts.samples > 0 && ts.win_rate != null) tHtml += ' · <b style="color:#22c55e;">'+ts.win_rate+'%</b>胜率';
+        pills.push('<span style="padding:2px 8px;border-radius:6px;font-weight:700;background:rgba(56,189,248,.12);color:var(--cyan);border:1px solid rgba(56,189,248,.3);">'+tHtml+'</span>');
       }
 
       // ③ TDX信号最强策略（从BACKTEST_TDX取T+5胜率最高的）
@@ -4298,13 +4297,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     /* ── 0️⃣ 策略星级对比表（2026-08-13 主人令：全部策略一表看尽，按星级排序）── */
     var starRows = _buildStrategyRating();
     if(starRows.length){
-      html += '<div style="margin:14px 0;border-left:4px solid #f59e0b;" class="card">';
+      html += '<div style="margin:14px 0;border-left:4px solid var(--border2);" class="card">';
       html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
-      html += '<span style="font-size:15px;font-weight:700;color:#fbbf24;">⭐ 策略星级对比</span>';
-      html += '<span style="font-size:11px;color:var(--dim);">全部已回测策略一表看尽 · 按综合分降序 · 最高在最上</span>';
+      html += '<span style="font-size:15px;font-weight:700;color:var(--txt);">⭐ 策略星级对比</span>';
+      html += '<span style="font-size:11px;color:var(--dim);">全部已回测策略一表看尽 · 按胜率降序 · 最高在最上</span>';
       html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);">✅ 全部真实跟踪</span>';
       html += '</div>';
-      html += '<div style="font-size:10.5px;color:var(--dim);margin-bottom:8px;line-height:1.5;">综合分 = (胜率−50) + 平均收益×8 + 样本可信度（log10样本×2，上限8）。星级：≥30=⭐⭐⭐⭐⭐ / ≥20=⭐⭐⭐⭐ / ≥12=⭐⭐⭐ / ≥6=⭐⭐。<b style="color:#fbbf24;">仅列真实算法跟踪回测</b>：驾驶舱回测 + 综合回测 + K线信号60日；合成基线（样本伪造/胜率≈随机）已剔除。<br><b style="color:var(--cyan);">口径说明</b>：<b>驾驶舱/综合回测</b> = 滚动回测所有历史入场信号的平均（"n=样本"是历史入场信号数，非天数）；<b>K线信号</b> = 最近 60 日 9 个通达信公式的回测均值（每日 1 条快照）。</div>';
+      html += '<div style="font-size:10.5px;color:var(--dim);margin-bottom:8px;line-height:1.5;">综合分 = (胜率−50) + 平均收益×8 + 样本可信度（log10样本×2，上限8）。星级：≥30=⭐⭐⭐⭐⭐ / ≥20=⭐⭐⭐⭐ / ≥12=⭐⭐⭐ / ≥6=⭐⭐。<b style="color:var(--sub);">仅列真实算法跟踪回测</b>：驾驶舱回测 + 综合回测 + K线信号60日；合成基线（样本伪造/胜率≈随机）已剔除。<br><b style="color:var(--cyan);">口径说明</b>：<b>驾驶舱/综合回测</b> = 滚动回测所有历史入场信号的平均（"n=样本"是历史入场信号数，非天数）；<b>K线信号</b> = 最近 60 日 9 个通达信公式的回测均值（每日 1 条快照）。</div>';
       html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
       html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
       html += '<th style="padding:7px 6px;text-align:left;color:var(--sub);">星级</th>';
@@ -4317,15 +4316,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '</tr></thead><tbody>';
       starRows.forEach(function(r, i){
         var isOpt = r.isOpt;
-        var bg = isOpt ? 'background:linear-gradient(90deg,rgba(245,158,11,.16),rgba(245,158,11,.06));border-left:3px solid #f59e0b;' : ((i===0 && !isOpt) ? 'background:rgba(245,158,11,.08);' : '');
-        var badge = isOpt ? '<span style="color:#f59e0b;font-weight:800;"> 🏆最优策略</span>' : ((i===0) ? '<span style="color:#fbbf24;font-weight:700;"> 👑最强</span>' : '');
+        var bg = isOpt ? 'background:linear-gradient(90deg,rgba(34,197,94,.16),rgba(34,197,94,.06));border-left:3px solid #22c55e;' : ((i===0 && !isOpt) ? 'background:rgba(244,73,93,.08);border-left:3px solid var(--up);' : '');
+        var badge = isOpt ? '<span style="color:#22c55e;font-weight:800;"> 🏆最优策略</span>' : ((i===0) ? '<span style="color:var(--up);font-weight:700;"> 👑最强</span>' : '');
         html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+bg+'">';
-        html += '<td class="no-shrink"  style="padding:7px 6px;color:'+(isOpt?'#f59e0b':'#fbbf24')+';font-weight:800;white-space:nowrap">'+r.stars+'</td>';
-        html += '<td style="padding:7px 6px;font-weight:800;color:'+(isOpt?'#f59e0b':'var(--txt)')+';white-space:nowrap;">'+r.name+badge+'</td>';
+        html += '<td class="no-shrink"  style="padding:7px 6px;color:var(--sub);font-weight:800;white-space:nowrap">'+r.stars+'</td>';
+        html += '<td style="padding:7px 6px;font-weight:800;color:var(--txt);white-space:nowrap;">'+r.name+badge+'</td>';
         html += '<td style="padding:7px 6px;text-align:right;font-weight:700;color:'+_colorNum(r.win_rate, 50)+';">'+ (typeof r.win_rate==='number' ? r.win_rate.toFixed(1) : r.win_rate)+'%</td>';
         html += '<td style="padding:7px 6px;text-align:right;font-weight:600;color:'+_colorPL(r.avg_return)+';">'+(r.avg_return>0?'+':'')+ (typeof r.avg_return==='number' ? r.avg_return.toFixed(2) : r.avg_return)+'%</td>';
         html += '<td style="padding:7px 6px;text-align:right;color:var(--sub);">'+r.sample+'</td>';
-        html += '<td style="padding:7px 6px;text-align:right;font-weight:700;color:#fbbf24;">'+r.score.toFixed(1)+'</td>';
+        html += '<td style="padding:7px 6px;text-align:right;font-weight:700;color:var(--sub);">'+r.score.toFixed(1)+'</td>';
         html += '<td style="padding:7px 6px;color:var(--dim);font-size:10.5px;white-space:nowrap;">'+r.extra+'</td>';
         html += '</tr>';
       });
@@ -4334,9 +4333,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     }
 
     /* ── ① TOP5 滚动跟踪（多窗口累积执行效果）── */
-    html += '<div style="margin:14px 0;border-left:4px solid #fbbf24;" class="card">';
+    html += '<div style="margin:14px 0;border-left:4px solid var(--cyan);" class="card">';
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
-    html += '<span style="font-size:15px;font-weight:700;color:#fbbf24;">🏆 ① TOP5 滚动跟踪</span>';
+    html += '<span style="font-size:15px;font-weight:700;color:var(--cyan);">🏆 ① TOP5 滚动跟踪</span>';
     html += '<span style="font-size:11px;color:var(--dim);">执行效果：刚推的票后来涨没涨？</span>';
     html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);">正在跟踪 '+(tt.stats && tt.stats.tracking || 0)+' 只</span>';
     html += '</div>';
@@ -4348,7 +4347,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     html += '<div style="overflow-x:auto;margin-bottom:12px;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
     html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
     html += '<th style="padding:6px 4px;text-align:left;color:var(--sub);font-weight:600;">窗口</th>';
-    html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">样本</th>';
+    html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">已平仓样本</th>';
     html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">达成胜率</th>';
     html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">平均收益</th>';
     html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">最高</th>';
@@ -4364,7 +4363,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var mn = wst.max_loss != null ? wst.max_loss : (key === '90d' ? stats.max_loss : 0);
       var faded = samples === 0;
       html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
-      html += '<td style="padding:6px 4px;font-weight:600;color:'+(faded?'var(--dim)':'#fbbf24')+';">'+label+'</td>';
+      html += '<td style="padding:6px 4px;font-weight:600;color:'+(faded?'var(--dim)':'var(--txt)')+';">'+label+'</td>';
       html += '<td style="padding:6px 4px;text-align:right;color:'+(faded?'var(--dim)':'var(--txt)')+';">'+(samples||'—')+'</td>';
       html += '<td style="padding:6px 4px;text-align:right;font-weight:700;color:'+(faded?'var(--dim)':_colorNum(wr,50))+';">'+(samples?(wr+'%'):'待积累')+'</td>';
       html += '<td style="padding:6px 4px;text-align:right;font-weight:700;color:'+(faded?'var(--dim)':_colorPL(avg))+';">'+(samples?((avg>0?'+':'')+avg+'%'):'—')+'</td>';
@@ -6708,17 +6707,25 @@ function renderLimitUpHeatmap(){
   var _nowLuh=new Date();
   var _hrLuh=_nowLuh.getHours()+_nowLuh.getMinutes()/60;
   var _isPreMarketLuh=_hrLuh<9.416; // 09:25 前
+  var _todayMd=_nowLuh.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',month:'2-digit',day:'2-digit'}).replace(/\//g,'/');
   var _displayDates=data.dates.slice();
   var _displaySectors=data.sectors.map(function(s){ return {name:s.name, data:s.data.slice()}; });
+  // 🛡 2026-08-26 一劳永逸根因修复：原逻辑在盘前无条件 pop 最后一列，
+  //   误把"昨日(08/25)真实完整交易日数据"当今日占位弹掉 → 25日全面丢失。
+  //   现仅当末列确实是"今日(MM/DD)"占位列时才截掉，否则保留昨日真实数据。
+  //   同时不再污染共享对象 data（改为局部 _premkt），避免分析文案误判。
+  var _premkt=false;
   if(_isPreMarketLuh && _displayDates.length>0){
-    var _todayCol=_displayDates[_displayDates.length-1];
-    _displayDates.pop(); // 去掉今日列
-    _displaySectors.forEach(function(s){ s.data.pop(); });
-    data.premarket_cleared=true; // 标记占位分析文案
+    var _lastDate=_displayDates[_displayDates.length-1];
+    if(_lastDate===_todayMd){
+      _displayDates.pop(); // 去掉今日占位列
+      _displaySectors.forEach(function(s){ s.data.pop(); });
+      _premkt=true;
+    }
   }
 
   if(timeEl && data.update_time){
-    timeEl.innerHTML = _uBadge(data.premarket_cleared?'盘前':'盘中','短线',data.update_time);
+    timeEl.innerHTML = _uBadge(_premkt?'盘前':'盘中','短线',data.update_time);
   }
 
   function isIgnite(sectorData,idx){

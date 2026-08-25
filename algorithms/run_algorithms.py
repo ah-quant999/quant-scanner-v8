@@ -92,12 +92,12 @@ ORDER = [
     "fetch_orphan_market_alerts.py",    # → raw_data/market_alerts.json
     "fetch_orphan_nt_data.py",          # → raw_data/nt_data.json
     "fetch_orphan_sector_fund_flow.py", # → raw_data/sector_fund_flow_trend.json (+ history 累加)
-    # ── 最终推荐（2026-08-10 补入：之前缺失导致 FINAL_RECOMMEND_DATA 等永远不刷新）──
-    # final_recommend.py 是整条管线的最终汇聚点，必须排在所有上游之后：
-    #   输入 = triple_consensus + cockpit_tier + top10_daily + crds + lhb + sector_rs +
-    #          crisis_data + cockpit_backtest + triple_track + four_volume_60m + stock_profile
-    #   输出 = raw_data/final_recommend.json + data/FINAL_RECOMMEND_DATA.js（Top5 + 全量推荐池）
-    "final_recommend.py",              # → FINAL_RECOMMEND_DATA.js（跨策略共振 Top5，管线最终产物）
+    # ── 最终推荐（final_recommend.py）──
+    # 整条管线的最终汇聚点，输入 = triple_consensus + cockpit_tier + top10_daily + crds + lhb +
+    #   sector_rs + crisis_data + cockpit_backtest + triple_track + four_volume_60m + stock_profile
+    #   → raw_data/final_recommend.json + data/FINAL_RECOMMEND_DATA.js（Top5 + 全量推荐池）
+    # 🛡 2026-08-26 一劳永逸：原排在 ORDER 前部，可能先于部分选股脚本完成就产出推荐。
+    #   现整体移至 ORDER 末尾（见下方 track_h_auto_buy.py 之后），确保所有选股策略数据跑完后再汇总。
     "gen_top5_track.py",               # → TOP5_TRACK.js（finalRec Top5 90 天滚动追踪盘，2026-08-13 落地/2026-08-15 改自 TOP3）
     "gen_algo_track.py",                # → ALGO_TRACK.js（四量终极/板块龙头/大牛股猎手 独立追踪，2026-08-15 落地）
     # ── 2026-08-17 主人怒令「每个前端的算法都全面审计」补入：之前完全不调度，前端卡永远陈旧 ──
@@ -115,6 +115,11 @@ ORDER = [
     #   这两个之前一直在算法链外，导致反推算法即使跑出结果也没人调度、没人推送、没人可见。
     "auto_run_dn_algorithm.py",
     "track_h_auto_buy.py",
+    # 🛡 2026-08-26 一劳永逸（bug7/bug8）：最终推荐必须置于【所有选股策略之后】。
+    #   上游 triple_consensus / cockpit_tier / top10_daily / crds / lhb / sector_rs / crisis_data /
+    #   cockpit_backtest / triple_track / four_volume_60m / stock_profile 等全部跑完，本步才汇总，
+    #   杜绝「某选股还没跑完，推荐却已生成」的抢跑问题。
+    "final_recommend.py",              # → FINAL_RECOMMEND_DATA.js（跨策略共振 Top5，管线最终产物，置于末尾）
 ]
 
 
@@ -245,8 +250,96 @@ def _is_post_close_picking_ready():
             (now.hour == _STOCK_PICKING_READY_HOUR and now.minute >= _STOCK_PICKING_READY_MIN))
 
 
+# 🛡 2026-08-26 一劳永逸（bug7/bug8）：final_recommend 读取 raw_data/，但 4 个输入
+#   (crds_card_data / lhb_data / sector_rs / cockpit_tier_recommend) 由生成器写 out/，
+#   step_stage 原在整链跑完后才搬运 → final_recommend 一直读到上一轮的陈旧版本。
+#   本门控在 final_recommend 之前：(1) 先做一轮 stage(out→raw_data)；(2) 校验全部选股
+#   输入是否本轮回合新鲜产出（mtime≥本轮启动时间）；(3) 任一缺失/陈旧则重跑其生成器并
+#   再次 stage；仍失败则拒绝产出最终推荐（绝不拿陈旧数据冒充今日推荐，遵守铁律「不得造假」）。
+#   映射： 输入文件 → (生成器脚本, 是否写 out/ 需二次 stage)
+_FINAL_RECOMMEND_INPUTS = {
+    "triple_consensus.json":       ("gen_triple_consensus.py", False),
+    "cockpit_tier_recommend.json": ("gen_cockpit_tier_recommend.py", True),
+    "top10_daily.json":            ("generate_top10.py", False),
+    "crds_card_data.json":         ("calc_crds.py", True),
+    "lhb_data.json":               ("fetch_lhb.py", True),
+    "sector_rs.json":              ("fetch_sector_rs.py", True),
+    "stock_profile.json":          ("gen_stock_profile.py", False),
+    "cockpit_backtest.json":       ("cockpit_backtest_now.py", False),
+    "triple_track.json":           ("gen_triple_track.py", False),
+    # crisis_data.json 由云端 cloud_fetch_v8.py 产出，本地链不重跑；仅做新鲜度告警（见 final_recommend 内部兜底）
+}
+
+
+def _stage_out_to_raw(quiet=False):
+    """把 algorithms/out/ 下的产物按 V6_TO_V8 搬运到 raw_data/（幂等，可重复调用）。"""
+    try:
+        sys.path.insert(0, ALGO)
+        import stage_to_raw as _str
+        n = _str.main()
+        if not quiet:
+            print(f"  🔄 stage(out→raw_data)：提升 {n} 个产物")
+        return n
+    except Exception as e:
+        print(f"  ⚠️ stage 异常: {e}")
+        return 0
+
+
+def _final_recommend_gate(run_start):
+    """final_recommend 前的就绪门控。返回 True=可继续；False=应跳过本轮最终推荐。"""
+    print(f"\n  🚦 final_recommend 就绪门控（确保全部选股数据已新鲜产出）")
+    # (1) 先把本轮 out/ 产物搬运到 raw_data/，使 4 个 out-依赖输入新鲜
+    _stage_out_to_raw()
+    # (2) 校验每个本地输入是否本轮新鲜产出
+    missing, stale = [], []
+    for fname in _FINAL_RECOMMEND_INPUTS:
+        fpath = os.path.join(V8_ROOT, "raw_data", fname)
+        if not os.path.exists(fpath):
+            missing.append(fname)
+            continue
+        mtime = datetime.fromtimestamp(os.path.getmtime(fpath))
+        if mtime < run_start:
+            stale.append(fname)
+    if not missing and not stale:
+        print(f"  ✅ 全部 {len(_FINAL_RECOMMEND_INPUTS)} 个选股输入均为本轮新鲜产出，放行 final_recommend")
+        return True
+    # (3) 缺失/陈旧 → 重跑对应生成器（让最终推荐确实基于本轮数据，而非抢跑陈旧）
+    if missing:
+        print(f"  ⚠️ 缺失输入: {', '.join(missing)} → 重跑生成器")
+    if stale:
+        print(f"  ⚠️ 陈旧输入(非本轮产出): {', '.join(stale)} → 重跑生成器")
+    for fname in list(missing) + list(stale):
+        prod, _is_out = _FINAL_RECOMMEND_INPUTS[fname]
+        p = os.path.join(ALGO, prod)
+        if not os.path.exists(p):
+            print(f"     ❌ 生成器缺失: {prod}")
+            continue
+        try:
+            r = subprocess.run([PY, p], cwd=ALGO, capture_output=True, text=True, timeout=1800)
+            print(f"     {'✅' if r.returncode == 0 else '⚠️ 退出码 ' + str(r.returncode)} 重跑 {prod}")
+        except Exception as e:
+            print(f"     ❌ 重跑 {prod} 异常: {e}")
+        if _is_out:
+            _stage_out_to_raw(quiet=True)
+    # (4) 复检：仍缺失/陈旧则拒绝产出（宁可本轮无推荐，也绝不造假）
+    still_bad = []
+    for fname in list(missing) + list(stale):
+        fpath = os.path.join(V8_ROOT, "raw_data", fname)
+        if not os.path.exists(fpath):
+            still_bad.append(f"{fname}(缺失)")
+        elif datetime.fromtimestamp(os.path.getmtime(fpath)) < run_start:
+            still_bad.append(f"{fname}(仍陈旧)")
+    if still_bad:
+        print(f"  🛑 门控未通过，拒绝产出最终推荐（避免陈旧/造假数据）: {', '.join(still_bad)}")
+        return False
+    print(f"  ✅ 重跑后全部输入新鲜，放行 final_recommend")
+    return True
+
+
 def step_run():
     print(f"\n[1] 运行算法链（{len(ORDER)} 个）")
+    # 记录本轮启动时间，供 final_recommend 门控判断「输入是否本轮新鲜产出」
+    run_start = datetime.now()
     # 🔴 盘后选股策略统一门控：18:00 前跳过所有选股脚本
     picking_ready = _is_post_close_picking_ready()
     print(f"  🕐 当前时间 {datetime.now():%H:%M} | 盘后选股策略就绪 {'✅ 已过 18:00' if picking_ready else '⏳ 未到 18:00（选股策略将跳过）'}")
@@ -261,6 +354,11 @@ def step_run():
         # 🔴 盘后选股策略门控：未到 18:00 且脚本属于选股策略 → 跳过
         if not picking_ready and script in STOCK_PICKING_SCRIPTS:
             print(f"  ⏭️  {script}  ← 跳过（盘后数据未全就绪，18:00 前禁止生成选股结果）")
+            continue
+        # 🛡 2026-08-26 一劳永逸（bug7/bug8）：final_recommend 必须先过就绪门控，
+        #   确保所有选股输入均本轮新鲜产出后才汇总，杜绝「某选股还没跑完就推荐完成」。
+        if script == "final_recommend.py" and not _final_recommend_gate(run_start):
+            print(f"  ⏭️  跳过 final_recommend（就绪门控未通过，本轮不产出最终推荐）")
             continue
         print(f"  ▶ {script}  ({datetime.now():%H:%M:%S})")
         try:

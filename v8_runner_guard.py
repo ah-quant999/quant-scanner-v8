@@ -39,6 +39,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone, timedelta
@@ -410,21 +411,51 @@ def restart_runner_service():
     return rc == 0, stderr[:200] if rc != 0 else "服务已重启"
 
 
+STARTUP_WAIT_SEC = 45          # 拉起后最多等多久确认 Listener 真起来
+STARTUP_POLL_SEC = 3
+
+
 def start_runner_process():
-    """进程方式拉起 runner（无服务时的兜底启动，run.cmd 后台运行）。"""
-    log_path = RUNNER_DIR / "_diag" / "guard_start.log"
-    log_path.parent.mkdir(parents=True, exist_ok=True)
+    """进程方式拉起 runner（无服务时的兜底启动，run.cmd 后台运行）。
+
+    ⚠️ 2026-08-25 根治两个致命假阳性（首次真实掉线事故暴露）：
+      1. -RedirectStandardOutput 与 -RedirectStandardError 原先指向【同一文件】，
+         PowerShell 直接拒绝启动 → 必须分离成两个日志文件。
+      2. 原实现只要 Popen 发起成功就 return True，run.cmd 从未真跑起来也报「成功」
+         → 改为轮询 Runner.Listener 真实存在作为唯一成功判据。
+      3. launcher 用 fire-and-forget + poll()，禁用 communicate(timeout)：
+         重定向句柄被 runner 长期持有会导致 launcher 不退出，把真成功误报成超时失败。
+    """
+    diag = RUNNER_DIR / "_diag"
+    diag.mkdir(parents=True, exist_ok=True)
+    out_log = diag / "guard_start.out.log"
+    err_log = diag / "guard_start.err.log"
     cmd = (
         f'Set-Location "{RUNNER_DIR}"; '
         f'Start-Process -FilePath "{RUNNER_DIR}\\{RUNNER_CMD}" -WorkingDirectory "{RUNNER_DIR}" '
-        f'-RedirectStandardOutput "{log_path}" -RedirectStandardError "{log_path}"'
+        f'-RedirectStandardOutput "{out_log}" -RedirectStandardError "{err_log}"'
     )
     try:
-        subprocess.Popen(['powershell', '-NoProfile', '-Command', cmd],
-                         creationflags=subprocess.CREATE_NO_WINDOW)
-        return True, "已发起进程拉起"
+        proc = subprocess.Popen(['powershell', '-NoProfile', '-Command', cmd],
+                                creationflags=subprocess.CREATE_NO_WINDOW)
     except Exception as e:
-        return False, f"拉起失败: {e}"
+        return False, f"拉起失败(launcher 未能发起): {e}"
+
+    # 以 Listener 真实存在为唯一成功判据
+    waited = 0
+    while waited < STARTUP_WAIT_SEC:
+        time.sleep(STARTUP_POLL_SEC)
+        waited += STARTUP_POLL_SEC
+        if check_processes().get("listener"):
+            return True, f"进程拉起成功(Listener 已就绪, {waited}s)"
+    rc = proc.poll()
+    tail = ""
+    try:
+        if err_log.exists():
+            tail = err_log.read_text(encoding="utf-8", errors="ignore")[-200:].replace("\n", " ")
+    except Exception:
+        pass
+    return False, f"拉起后 {STARTUP_WAIT_SEC}s 内 Listener 未出现(launcher rc={rc}) {tail}"
 
 
 def clear_work_dir():

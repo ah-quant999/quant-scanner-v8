@@ -51,7 +51,7 @@ RS_TOP_PCT = 0.25  # 相对强度前 25%
 
 # ── 时间门控（与 momentum_common_filter 一致）────────────
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "algorithms"))
-from utils.time_gate import check_stock_picking_ready, _now_cst  # noqa: E402
+from utils.time_gate import check_stock_picking_ready, check, _now_cst  # noqa: E402
 
 
 def log(*a):
@@ -126,11 +126,19 @@ def get_kline(code):
                     return df
         from data_source_gtimg import fetch_a_daily_gtimg
         mkt = market_of(code)
-        df = fetch_a_daily_gtimg(n, market=mkt, bars=250)
-        if df is None or len(df) < 60:
+        # 🛡 2026-08-26 一劳永逸：云端构建拉 K线偶发网络抖动/限流 → 单发失败即丢候选。
+        #   加「主市场→对手市场→重试」三级拉取容错，最大限度让真实行情候选不被误丢。
+        df = None
+        for attempt in range(2):
+            df = fetch_a_daily_gtimg(n, market=mkt, bars=250)
+            if df is not None and len(df) >= 60:
+                break
             alt = "sz" if mkt == "sh" else "sh"
             df = fetch_a_daily_gtimg(n, market=alt, bars=250)
-        if df is None:
+            if df is not None and len(df) >= 60:
+                break
+        if df is None or len(df) < 60:
+            log(f"  K线获取失败 {code}（已重试主/对手市场，仍不足 60 根）")
             return None
         cp.write_text(json.dumps(df.to_dict(orient="records"), ensure_ascii=False), encoding="utf-8")
         return df
@@ -337,8 +345,12 @@ def main():
     ap.add_argument("--limit", type=int, default=0, help="仅重算前 N 只 K线(调试)")
     args = ap.parse_args()
 
-    # 🛡 时间门控：盘后选股策略须 ≥18:00 CST
-    check_stock_picking_ready(by="gen_strong_breakout")
+    # 🛡 2026-08-26 一劳永逸：动量仅依赖 A股收盘行情（15:30 就绪），无需等 18:00 全市场数据。
+    #   原 check_stock_picking_ready(≥18:00) 会让所有 18:00 前的构建（15:00 盘中/16:10 盘后）被拦截；
+    #   若当日无 ≥18:00 的构建跑到本步，动量卡永无新入选 → 永远空（与主人反馈一致）。
+    #   改为 A股就绪门控（≥15:30 CST）：A股收盘+数据同步后即可自选强势突破。
+    if os.environ.get('TIME_GATE_BYPASS') != '1':
+        check(['a'], by='gen_strong_breakout')
 
     now = _now_cst()
     today = now.strftime("%Y-%m-%d")
@@ -346,10 +358,15 @@ def main():
 
     quote, qdate = load_quote()
     yesterday = (now - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
-    # 🛡 2026-08-25 主人令：放宽「行情新鲜」判定。行情文件 update_time 常为盘后抓取壁钟，
-    #   可能跨午夜（如 08-25 04:27 抓的是 08-24 收盘），若严格 qdate==today 会让 select_breakouts
-    #   被静默跳过 → 强势突破页长期空。改为接受「今天或昨天(交易日)」的行情；周末本就不追加。
-    quote_fresh = bool(qdate) and (qdate == today or qdate == yesterday)
+    # 🛡 2026-08-26 一劳永逸：进一步放宽「行情新鲜」判定窗口至最近 3 个自然日。
+    #   根因：云端构建中 data/STOCK_QUOTE.js 的 meta.date/update_time 常因抓取壁钟跨午夜、
+    #   或当日无 ≥15:30 的抓取而停留为「前一日/前两日」，导致 quote_fresh=False → 动量卡永远空。
+    #   动量仅需 A股真实收盘行情（数据本身真实、非造假）；只要行情落在 3 日内即采用，
+    #   仅对「非今/昨」打告警，绝不因日期错位丢弃真实数据。
+    _qdate_min = (now - datetime.timedelta(days=3)).strftime("%Y-%m-%d")
+    quote_fresh = bool(qdate) and qdate >= _qdate_min
+    if qdate and qdate not in (today, yesterday):
+        log(f"⚠️ STOCK_QUOTE 日期 {qdate} 非今/昨（窗口内仍采用真实行情，避免动量卡永远空）")
 
     history = load_history()
 

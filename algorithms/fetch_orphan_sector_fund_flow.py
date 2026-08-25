@@ -753,7 +753,10 @@ def fetch_sector_flow():
                         item["net_10d_days"] = net_10d_days
                 if net_20d != 0:
                     item["net_20d"] = net_20d
-                if net_60d is not None and net_60d != 0 and net_60d != net_20d:
+                # 🛡 2026-08-26 一劳永逸根因修复：原守卫 `net_60d != net_20d` 在板块历史不足60交易日时
+                #   nets[-60:]==nets[-20:] → net_60d==net_20d → 整条 60日值被丢弃，导致"资金验证60日"恒空。
+                #   去掉 !=net_20d：60日与20日同值属正常（历史不足），应保留。
+                if net_60d is not None and net_60d != 0:
                     item["net_60d"] = net_60d
                     if net_60d_days:
                         item["net_60d_days"] = net_60d_days

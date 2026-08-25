@@ -50,7 +50,10 @@ DATA_SOURCES = {
     "crds_card_data.json":         "CRDS_CARD_DATA",
     "triple_consensus.json":       "TRIPLE_CONSENSUS",
     "triple_track.json":           "TRIPLE_TRACK",
-    "triple_history.json":         "TRIPLE_HISTORY",
+    # 🛡 2026-08-26 一劳永逸根因修复：生成器 update_triple_resonance_history.py 写的是
+    #   raw_data/triple_resonance_history.json，而此处原读旧名 triple_history.json（同源不同名），
+    #   桥接顺序一错位就吃陈旧基线 → 共振日历缺 08-24 等。改为直接读生成器真输出，消除重命名歧义。
+    "triple_resonance_history.json": "TRIPLE_HISTORY",
     "cockpit_tier_recommend.json": "COCKPIT_TIER_RECOMMEND",
     "top10_daily.json":            "TOP10_DAILY",
     "cockpit_advice.json":         "COCKPIT_ADVICE",
