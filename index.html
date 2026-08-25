@@ -10,7 +10,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "a84057c21";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
+    var BUILD = "51bef9c47";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
     var KEY = "v8_build_sha";
     var cached = localStorage.getItem(KEY);
     if(cached && cached !== BUILD){
@@ -456,7 +456,7 @@ window.__domReadyFns=[];
     <script src="data/SECTOR_FUND_FLOW.js?v=aa3a2233d2" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=85ba68ed8d" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=6876e28de7" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=b052c31b8a" defer></script>
     <script src="data/ANALYST_RATINGS.js?v=67099fa2f2" defer></script>
     <script src="data/SUSPENSION_ALERT.js?v=c65dd58b86" defer></script>
     <script src="data/GOLD_POOL.js?v=48b337cc91" defer></script>
@@ -473,7 +473,7 @@ window.__domReadyFns=[];
 <!-- 2026-08-23 恢复：潜力挖掘板块+股票预测推荐数据（calc_potential_picks.py 输出，跟盘后算法链自动更新） -->
 <script src="data/POTENTIAL_PICKS.js?v=1535a71dd6" defer></script>
 <script src="data/INDEX_QUOTES.js?v=a4eb605d58" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=ec1ed0ee35" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=29176cc810" defer></script>
 <script src="data/MARGIN_DATA.js?v=c6cf91de44" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=81c0efb9b6" defer></script>
 <script src="data/IPO_DATA.js?v=308c9f2be7" defer></script>
@@ -1282,16 +1282,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/WEEKEND_RUN.js?v=c8b5110e77" defer></script>
 <script src="data/W52_HIGH.js?v=7ac353db01" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=69713986e9" defer></script>
-<script src="data/RUNNER_STATUS.js?v=0e344a65d1" defer></script>
-<script src="data/HEALTH_CHECK.js?v=5839372666" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=6851082ae7" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=6d0b37d4a0" defer></script>
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=986ec7664f" defer></script>
-    <script src="data/INDEX_HISTORY.js?v=3a5a3a64cc" defer></script>
+<script src="data/RUNNER_STATUS.js?v=de47d1478d" defer></script>
+<script src="data/HEALTH_CHECK.js?v=9b3c9d8d99" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=af897e02e6" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=e676ff4d74" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=1bcd17c696" defer></script>
+    <script src="data/INDEX_HISTORY.js?v=b88b199f6f" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE.js?v=c6a9adf1ea" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=b787134fdd" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=11dd759cf9" defer></script>
-    <script src="data/ALGO_BACKTEST_COMPARE.js?v=cde1166b5c" defer></script>
+    <script src="data/ALGO_BACKTEST_COMPARE.js?v=04b9879e7a" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -13434,7 +13434,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch('data/HEALTH_CHECK.js?v=5839372666'+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch('data/HEALTH_CHECK.js?v=9b3c9d8d99'+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]):'';
       if(remoteTs && remoteTs!==localTs){
@@ -14034,7 +14034,7 @@ window.__renderV8CalToday();
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=59bfe1bfac'},
     {name:'STOCK_PROFILE', url:'data/STOCK_PROFILE.js?v=2a563a3528'},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=7a8dbd1880'},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=bf4d2e763e'},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=324135e5bc'}
   ];
   function loadOne(item, done){
