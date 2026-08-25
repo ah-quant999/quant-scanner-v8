@@ -1,14 +1,20 @@
 {
-  "check_time": "2026-08-25 20:15:57",
+  "check_time": "2026-08-25 21:16:52",
   "last_trade_close": "2026-08-25 15:30:00",
   "is_trading_day": true,
-  "core_stale": [],
+  "core_stale": [
+    {
+      "var": "LHB_7D",
+      "reason": "更新于 08-22 07:56，落后 2 个交易日（阈值 1）",
+      "category": "algo"
+    }
+  ],
   "warn_stale": [],
   "frozen_stale": [],
   "no_update_time": [],
   "summary": {
     "total_checked": 50,
-    "core_stale": 0,
+    "core_stale": 1,
     "warn_stale": 0,
     "frozen_stale": 0,
     "no_timestamp": 0
