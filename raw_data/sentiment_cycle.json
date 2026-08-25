@@ -1,20 +1,20 @@
 {
-  "update_time": "2026-08-25 12:11:15",
+  "update_time": "2026-08-25 13:30:07",
   "data_date": "2026-08-25",
   "source": "LIMIT_UP_HEATMAP",
   "phase": "退潮",
   "color": "#f97316",
-  "score": 72.0,
-  "delta_pct": -59.13,
+  "score": 79.0,
+  "delta_pct": -53.04,
   "advice": "⚠️ 情绪退潮中：高位股注意回撤，关注高低切换",
   "metrics": {
-    "total_up": 47,
+    "total_up": 54,
     "max_ladder": 5,
     "high_ladder_count": 3,
     "sectors_count": 14
   },
   "ladder_dist": {
-    "1": 39,
+    "1": 46,
     "2": 5,
     "3": 1,
     "4": 1,
