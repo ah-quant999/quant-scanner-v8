@@ -1,3 +1,6 @@
+<<<<<<< Updated upstream
+{"run_time":"2026-08-25 08:57:51","category":"all","hostname":"","modules":{"CANDIDATE_QUOTES":{"status":"empty","msg":"返回空"}},"summary":{"total":1,"ok":0,"empty":1,"fail":0}}
+=======
 {
   "update_time": "2026-08-25 09:13:47",
   "status": "ok",
@@ -40,3 +43,4 @@
   "actions_taken": [],
   "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(cn·应急) completed（兜底角色 6h 未触发，云端主线接管中）"
 }
+>>>>>>> Stashed changes
