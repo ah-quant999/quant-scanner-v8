@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-08-24 23:30",
- "generated": "2026-08-24 23:30",
+ "update_time": "2026-08-25 18:43",
+ "generated": "2026-08-25 18:43",
  "meta": {
-  "generated": "2026-08-24 23:30",
+  "generated": "2026-08-25 18:43",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 1,
   "days_with_consensus": 0,
@@ -11,7 +11,7 @@ window.STOCK_MOMENTUM_STATE = (function() {
  },
  "days": [
   {
-   "date": "2026-08-24",
+   "date": "2026-08-25",
    "categories": {},
    "consensus": []
   }
