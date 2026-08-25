@@ -2310,44 +2310,31 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         var el=$('industryTreemap');
         if(!el) return;
         var timeEl=$('htUpdateTime');
-        // 优先用盘中实时资金流 SECTOR_FUND_FLOW（每30分刷新），无数据时回落到盘后 SECTOR_RS
+        // 与其他实时数据（板块资金三合一等）一致：优先用盘中实时资金流 SECTOR_FUND_FLOW（每30分刷新）。
+        // 盘前由 cloud_fetch 数据层统一写入 premarket_cleared 占位清空，本卡同一时间清掉上一交易日数据，不特立独行。
+        // 仅当 SECTOR_FUND_FLOW 盘中真缺失（非盘前清空）才回落盘后 SECTOR_RS，避免把昨日收盘数据挂到开盘前。
         var SF=window.SECTOR_FUND_FLOW;
         var SR=window.SECTOR_RS;
         var sectors=[], updateTime=null, source='SECTOR_FUND_FLOW';
-        if(SF && (SF.sectors_in||SF.sectors_out)){
+        var sfCleared = !!(SF && SF.premarket_cleared === true);
+        if(SF && !sfCleared && (SF.sectors_in||SF.sectors_out)){
           var all=(SF.sectors_in||[]).concat(SF.sectors_out||[]);
           sectors=all.map(function(s){ return {name:s.name, pct_day:s.chg}; }).filter(function(s){ return s.pct_day!=null; });
           updateTime=SF.update_time;
-        }else if(SR && SR.sectors && SR.sectors.length){
+        }else if(!sfCleared && SR && SR.sectors && SR.sectors.length){
           sectors=SR.sectors.map(function(s){ return {name:s.name||s.sector_name, pct_day:s.pct_day}; });
           updateTime=SR.update_time;
           source='SECTOR_RS';
         }
-        if(!sectors.length){
-          el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">📭 暂无行业板块数据（盘前自动清空，开盘后更新）</div>';
-          if(timeEl) timeEl.innerHTML = '<span style="font-size:11px;color:var(--dim)">盘前</span>';
-          return;
-        }
-        // 🛡 2026-08-20 主人令加强：盘前清空检测必须同时满足
-        //   ① 当前时间 < 09:25（盘前） ② 数据日期非今日 或 数据虽是今日但时间 < 09:00（盘前fetch刷新了戳但数据仍是昨日）
-        var _today=new Date().toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
-        var _dataDate='';
-        var _dataHour=0;
-        if(updateTime){
-          _dataDate=String(updateTime).slice(0,10);
-          _dataHour=parseInt(String(updateTime).slice(11,3))||0;
-        }
-        var _nowHr=new Date().getHours()+new Date().getMinutes()/60;
-        // 🛡 2026-08-22 主人令：周末/节假日（非交易日）保留最后一个交易日数据，不做盘前清空。
-        //   只有「今天确实是 A 股交易日」才执行盘前清空，与实时数据页其他卡片保持一致。
-        var _c=window._cstParts?window._cstParts(new Date()):{y:new Date().getFullYear(),m:new Date().getMonth()+1,d:new Date().getDate()};
-        var _todayCSTObj=new Date(_c.y,_c.m-1,_c.d);
-        var _isTradingToday=window._isAshareTradingDay?window._isAshareTradingDay(_todayCSTObj):true;
-        var _isPreMarketTree=_nowHr<9.416; // 09:25 前
-        var _isStaleData=_dataDate!==_today || (_dataDate===_today && _dataHour<9);
-        if(_isPreMarketTree && _isStaleData && _isTradingToday){
+        // 盘前同一时间随其他实时数据清空（数据层 premarket_cleared 占位）
+        if(sfCleared){
           el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">📭 行业板块数据（盘前自动清空，开盘后更新）</div>';
           if(timeEl) timeEl.innerHTML = '<span style="font-size:11px;color:var(--dim)">盘前 · 数据待刷新</span>';
+          return;
+        }
+        if(!sectors.length){
+          el.innerHTML='<div class="ipo-empty" style="padding:30px;text-align:center;color:var(--dim)">📭 暂无行业板块数据（开盘后更新）</div>';
+          if(timeEl) timeEl.innerHTML = '<span style="font-size:11px;color:var(--dim)">—</span>';
           return;
         }
         sectors=sectors.slice().sort(function(a,b){
