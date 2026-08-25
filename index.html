@@ -7842,7 +7842,7 @@ window.__renderV8CalFull();
     var dom=$('sfIntradayChart');
     if(!dom) return;
     var d=window.SECTOR_FUND_FLOW_INTRADAY;
-    if(!d || !d.snapshots || d.snapshots.length<2){
+    if(!d || !d.snapshots || d.snapshots.length<1){
       dom.innerHTML='<div class="ipo-empty">📭 暂无盘中分时数据（盘中每30分快照，盘前自动清空）</div>';
       var tEl=$('sfIntradayTime'); if(tEl) tEl.innerHTML='—';
       return;
@@ -7853,8 +7853,8 @@ window.__renderV8CalFull();
     // 🛡 2026-08-24 主人令：只显示交易时段 09:25–16:05 的盘中快照，
     //   盘前冷启(08:xx)/盘后(16:05后)快照一律不画，避免曲线出现离群水平段
     snaps = snaps.filter(function(s){ var t=(s.time||''); return t >= '09:25' && t <= '16:05'; });
-    // 🛡 过滤后若不足 2 个点，直接空提示（避免 line 8001 取末点时报 undefined）
-    if(snaps.length < 2){
+    // 🛡 过滤后若 0 个点，直接空提示（避免 line 8006 取末点时报 undefined）；≥1 即出图（不再干等第2个快照）
+    if(snaps.length < 1){
       dom.innerHTML='<div class="ipo-empty">📭 当前交易时段暂无足够盘中分时数据（盘中每30分快照，盘前自动清空）</div>';
       var tEl0=$('sfIntradayTime'); if(tEl0) tEl0.innerHTML='—';
       return;
@@ -7870,7 +7870,9 @@ window.__renderV8CalFull();
         if(v > (maxAbsByName[n]||0)) maxAbsByName[n]=v;
       });
     });
-    var minFreq=Math.max(2, Math.ceil(snaps.length*0.6));  // 至少出现 2 次 OR 60% snap
+    // 🛡 2026-08-25 一劳永逸：minFreq 自适应——快照少时不再强制"出现于全部快照"（否则 1~2 个快照会筛成 0 条线→空白）。
+    //   规则：取「快照数」与「max(1, 60%快照数)」的较小值，保证只要有 ≥1 个快照就能选出板块画线。
+    var minFreq=Math.min(snaps.length, Math.max(1, Math.ceil(snaps.length*0.6)));
     var ranked=Object.keys(freq).filter(function(n){return freq[n]>=minFreq;})
       .map(function(n){return {name:n, freq:freq[n], abs:maxAbsByName[n]};})
       .sort(function(a,b){

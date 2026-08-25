@@ -1244,6 +1244,15 @@ def f_sector_fund_flow():
                             print("  ↩️ intraday 快照从 .bak 恢复（主文件读取损坏）")
                     except Exception:
                         pass
+        # 🛡 2026-08-25 一劳永逸：确保 snapshots 始终是列表、date 字段存在，
+        #   避免 premarket 占位(缺 snapshots/date)→误判旧日→重置清空，或 .append 崩→整段丢失。
+        if not isinstance(_intraday_data.get("snapshots"), list):
+            _intraday_data["snapshots"] = []
+        if not _intraday_data.get("date"):
+            _intraday_data["date"] = _today_str
+        # 一旦进入交易时段并写入真实快照，去除盘前占位标记（防止数据文件带 premarket_cleared 误导）
+        _intraday_data.pop("premarket_cleared", None)
+        _intraday_data.pop("no_data", None)
 
         # 取上证指数当前涨跌幅%（用于双轴对照）
         _idx_chg = 0.0
