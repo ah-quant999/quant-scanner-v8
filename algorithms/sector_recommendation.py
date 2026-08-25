@@ -13,6 +13,7 @@
 """
 import json
 import os
+import subprocess
 import sys
 import datetime
 import re
@@ -34,10 +35,31 @@ def load_window_var(path):
     return json.loads(m.group(1))
 
 
+def _bootstrap_regime(macro_path):
+    """🔴 2026-08-25 治本：out/ 被 .gitignore 忽略，云端全新 checkout 永远没有
+    out/market_regime.json，旧逻辑只打印「先跑 market_regime.py」就 return 1（光说不做）→
+    本卡自 2026-08-22 07:59 起永久冻结，链尾保底重跑(step_ensure_cockpit_sector)也救不回来
+    （因为重跑的是同一个必失败脚本）。现改为真的去跑 market_regime.py 自举依赖。
+    严格附加：自举失败则维持原 return 1 行为，不会比现状更差。"""
+    regime = os.path.join(BASE, "algorithms", "market_regime.py")
+    if not os.path.exists(regime):
+        log(f"缺 {macro_path} 且找不到 {regime}，无法自举")
+        return False
+    log(f"缺 {macro_path}，自动先跑 market_regime.py 自举依赖…")
+    try:
+        r = subprocess.run([sys.executable, regime], cwd=BASE,
+                           capture_output=True, text=True, timeout=900)
+        if r.returncode != 0:
+            log(f"market_regime.py 退出码 {r.returncode}: {(r.stderr or '')[-300:]}")
+    except Exception as e:
+        log(f"market_regime.py 异常: {e}")
+    return os.path.exists(macro_path)
+
+
 def main():
     macro_path = os.path.join(BASE, "out", "market_regime.json")
-    if not os.path.exists(macro_path):
-        log(f"缺 {macro_path}，先跑 market_regime.py")
+    if not os.path.exists(macro_path) and not _bootstrap_regime(macro_path):
+        log(f"缺 {macro_path}，自举 market_regime.py 后仍不存在，放弃")
         return 1
     with open(macro_path, encoding="utf-8") as f:
         macro = json.load(f)

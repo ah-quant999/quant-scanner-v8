@@ -10,6 +10,7 @@
 """
 import json
 import os
+import subprocess
 import sys
 import datetime
 
@@ -45,9 +46,29 @@ def classify_trend(bp_change, threshold=8.0):
     return "平稳", 0
 
 
+def _bootstrap_macro():
+    """🔴 2026-08-25 治本：out/ 是 .gitignore 目录，云端全新 checkout 永远没有 out/macro.json，
+    旧逻辑只打印「先跑 fetch_macro.py」就 return 1（光说不做）→ market_regime 每轮必失败 →
+    下游 sector_recommendation 连锁失败 → data/SECTOR_RECOMMENDATION.js 自 08-22 起永久冻结。
+    现改为真的去跑 scripts/fetch_macro.py 自举依赖。严格附加：自举失败则维持原 return 1 行为。"""
+    fetcher = os.path.join(BASE, "scripts", "fetch_macro.py")
+    if not os.path.exists(fetcher):
+        log(f"缺 {IN} 且找不到 {fetcher}，无法自举")
+        return False
+    log(f"缺 {IN}，自动先跑 fetch_macro.py 自举依赖…")
+    try:
+        r = subprocess.run([sys.executable, fetcher], cwd=BASE,
+                           capture_output=True, text=True, timeout=600)
+        if r.returncode != 0:
+            log(f"fetch_macro.py 退出码 {r.returncode}: {(r.stderr or '')[-300:]}")
+    except Exception as e:
+        log(f"fetch_macro.py 异常: {e}")
+    return os.path.exists(IN)
+
+
 def main():
-    if not os.path.exists(IN):
-        log(f"缺 {IN}，先跑 fetch_macro.py")
+    if not os.path.exists(IN) and not _bootstrap_macro():
+        log(f"缺 {IN}，自举 fetch_macro.py 后仍不存在，放弃")
         return 1
     with open(IN, encoding="utf-8") as f:
         data = json.load(f)
