@@ -489,10 +489,13 @@ def _dispatch_cn_fetch(cat):
     token = _load_token()
     if not token:
         return False, "无 GitHub token，无法派发", False
-    # 2026-08-17 防风暴：cn runner 全 offline 时派发必失败 → 跳过本轮
-    avail, online = _cn_runner_available()
-    if not avail:
-        return True, f"cn runner 全 offline（在线={online}），跳过派发防风暴（待 runner 恢复）", False
+    # 🛡 2026-08-25 一劳永逸根因修复（主人令「先修自愈器」）：
+    #   原 _cn_runner_available() 闸门在本函数内拦截——但 CN_WORKFLOW_ID 指向的
+    #   v8_cn_fetch_cloud 早已迁到云端 ubuntu-latest（见 .github/workflows/v8_cn_fetch_cloud.yml
+    #   runs-on: ubuntu-latest），根本不依赖 cn 自托管 runner。原闸门是「cn runner 离线即
+    #   永久跳过派发」的静默死锁根因：个人机 LEMONCAT 频繁离线 → 自愈全年失能 → 数据陈旧红灯堆积。
+    #   云端 ubuntu 永远可用，移除该闸门；去抖仍由 HEAL_DEBOUNCE_MIN / MAX_DISPATCHES_PER_RUN 保证，
+    #   派发失败会如实记为 failed 并升级告警（而非静默吞掉）。
     headers = {
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
@@ -533,10 +536,12 @@ def _dispatch_algo_run(picking_only=False):
     #   非选股类（SH_FIB/INST_TRADE/NT_DATA 等）收盘后即可算，不拦。
     if picking_only and now_cst().hour < 18:
         return True, "未到 18:00 盘后选股窗口，跳过 algo_run 派发（避免选股脚本全被时间闸跳过空转45min）", False
-    # 2026-08-17 防风暴：algo_run 也用 self-hosted cn runner
-    avail, online = _cn_runner_available()
-    if not avail:
-        return True, f"cn runner 全 offline（在线={online}），跳过 algo_run 派发防风暴", False
+    # 🛡 2026-08-25 一劳永逸根因修复（主人令「先修自愈器」）：
+    #   原 _cn_runner_available() 闸门在此拦截——但 ALGO_RUN_WORKFLOW_ID 指向的
+    #   v8_algo_cloud（盘后算法链·云端 ubuntu-latest，见该 workflow runs-on: ubuntu-latest）
+    #   根本不依赖 cn 自托管 runner。该闸门即「cn runner 离线 → 永久跳过 algo_run 派发」的
+    #   静默死锁根因（自愈全年失能、数据陈旧红灯堆积）。云端 ubuntu 永远可用，移除闸门；
+    #   去抖仍由 HEAL_DEBOUNCE_MIN / MAX_DISPATCHES_PER_RUN 保证，派发失败如实记 failed 并升级。
     headers = {
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
