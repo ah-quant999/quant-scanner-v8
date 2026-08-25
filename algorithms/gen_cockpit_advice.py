@@ -4,7 +4,7 @@
 gen_cockpit_advice.py — 生成驾驶舱顶部「回测驱动的买卖建议」横幅数据
 ==================================================================
 逻辑：
-1. 读 data/backtest_tdx.json（K线60日全量回测，已含每只票逐日信号 + 回测汇总）
+1. 读 raw_data/backtest_tdx.json（K线60日全量回测，由 backtest_tdx.py 产出并经 stage_to_raw 落地，每日盘后算法链刷新；已含每只票逐日信号 + 回测汇总）
 2. 回测结论：从 summary 取 5日突破(breakout_5d) 的 T+3/T+5 胜率与收益作为主推信号
 3. 当前候选：对每只票取「最近一次触发 breakout_5d 的日期」作为新近突破，
    按信号日期降序取前 N 只（最新突破优先），并标注该信号日的入场价与历史T+3/T+5收益
@@ -26,7 +26,12 @@ from datetime import datetime, timedelta
 from fundamental_helper import fq_key_of, load_fundamental, quality_points
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-SRC = os.path.join(BASE, "..", "out", "backtest_tdx.json")
+# 🛡 2026-08-25 一劳永逸·根治 COCKPIT 红灯根因：读取源从 out/backtest_tdx.json 改为 raw_data/backtest_tdx.json。
+#   原 out/backtest_tdx.json 是 2026-08-07 的死文件——backtest_tdx.py 只写 data/backtest_tdx.json，
+#   再经 run_algorithms.stage_to_raw 落到 raw_data/backtest_tdx.json（每日盘后算法链刷新，今日 20:17 新鲜）。
+#   旧代码读 out/（永不更新）→ 驾驶舱永远从 08-07 死回测派生，gen_time 卡在 08-23、watch/avoid 恒空。
+#   改读 raw_data/backtest_tdx.json（规范活源）后，COCKPIT 才从每日新鲜回测派生，红灯根除。
+SRC = os.path.join(BASE, "..", "raw_data", "backtest_tdx.json")
 OUT = os.path.join(BASE, "..", "out", "cockpit_advice.json")
 FQ = load_fundamental()  # 基本面质量分（含消息面加减分）
 TODAY = datetime.now().strftime("%Y-%m-%d")
@@ -131,6 +136,7 @@ def main():
 
     advice = {
         "gen_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "verdict": {
             "best_signal": "5日突破",
             "win_rate_3d": bk.get("win_rate_3d", 0),
@@ -154,6 +160,16 @@ def main():
 
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(advice, f, ensure_ascii=False, indent=2)
+
+    # 🛡 2026-08-25 一劳永逸·根治 build-clobber：同步写 raw_data/cockpit_advice.json（规范活源）。
+    #   此前只写 out/cockpit_advice.json + data/COCKPIT_ADVICE.js，但云端 v8_build_deploy 的
+    #   update_v8.py 每次 build 都用 raw_data/cockpit_advice.json 重导出 data/COCKPIT_ADVICE.js；
+    #   旧链路该 raw 从不刷新 → 永远用陈旧 raw 覆盖新鲜 data（COCKPIT 红灯"永远治不好"的真凶）。
+    #   现本脚本直写 raw，update_v8 重导出与本写 data 内容一致，根除 clobber 闭环。
+    RAW_JS = os.path.join(BASE, "..", "raw_data", "cockpit_advice.json")
+    with open(RAW_JS, "w", encoding="utf-8") as f:
+        json.dump(advice, f, ensure_ascii=False, indent=2)
+    print(f"✅ 导出 {RAW_JS}")
 
     # 🔴 2026-08-25 一劳永逸：直接导出 data/COCKPIT_ADVICE.js（脱离云端未知导出步）
     #   此前该脚本只写 out/cockpit_advice.json，data/X.js 由云端 build 特有导出步生成；
