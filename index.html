@@ -3,17 +3,36 @@ html>
 <html lang="zh-CN">
 <head>
 <script>
-// 🛡 2026-08-23 修复：手机 Safari / 微信浏览器会长期缓存旧 index.html，导致新修复不生效、双卡空白。
-// 首次本会话访问时，若 URL 没有 nocache 标记，强制带时间戳刷新一次，绕过磁盘缓存拿到最新版本。
+// 🛡 2026-08-25 一劳永逸：版本戳强缓存破坏。
+// 旧版只用 sessionStorage，仅本会话首次刷新一次；若用户缓存的是「还没带此脚本」的旧 index.html，
+// 该脚本根本不存在 → 永不刷新 → 长期卡在旧版（如动量共识卡曾多页重复、修复不生效）。
+// 现改为：读取构建时注入的 V8_BUILD_SHA，与 localStorage 中上次成功加载的版本比对；
+// 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    if(location.href.indexOf('nocache=1')>=0 || sessionStorage.getItem('v8_nocache')) return;
-    sessionStorage.setItem('v8_nocache','1');
-    var h = location.href.split('#');
-    var base = h[0];
-    var hash = h[1] ? '#' + h[1] : '';
-    var sep = base.indexOf('?')>=0 ? '&' : '?';
-    location.replace(base + sep + 'nocache=1' + hash);
+    var BUILD = "BUILD_SHA_PLACEHOLDER";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
+    var KEY = "v8_build_sha";
+    var cached = localStorage.getItem(KEY);
+    if(cached && cached !== BUILD){
+      localStorage.setItem(KEY, BUILD);
+      if(location.href.indexOf('nocache=1')>=0) return;
+      var h = location.href.split('#');
+      var base = h[0];
+      var hash = h[1] ? '#' + h[1] : '';
+      var sep = base.indexOf('?')>=0 ? '&' : '?';
+      location.replace(base + sep + 'nocache=1' + hash);
+      return;
+    }
+    localStorage.setItem(KEY, BUILD);
+    // 首次访问（或缓存被清）：仍兜底强制刷新一次，绕过磁盘缓存拿到最新版
+    if(location.href.indexOf('nocache=1')<0 && !sessionStorage.getItem('v8_nocache')){
+      sessionStorage.setItem('v8_nocache','1');
+      var h2 = location.href.split('#');
+      var b2 = h2[0];
+      var hs2 = h2[1] ? '#'+h2[1] : '';
+      var s2 = b2.indexOf('?')>=0 ? '&' : '?';
+      location.replace(b2 + s2 + 'nocache=1' + hs2);
+    }
   }catch(e){}
 })();
 </script>
@@ -8467,6 +8486,27 @@ function drawUpDownChart(){
     lastUdLabelIdx = i;
   });
 
+  // ── 累计净宽度折线（右轴）：running sum of (up - down)，与「资金流时间轴」双轴风格一致 ──
+  // 修复「涨跌家数累计没了」：原图只有当日柱状、无累计，现在补累计净宽度折线，逐日累积后自动成形。
+  var cumNet = [];
+  var _run = 0;
+  filtered.forEach(function(d){ _run += (d.up - d.down); cumNet.push(_run); });
+  var cumMax = cumNet.length ? Math.max.apply(null, cumNet) : 0;
+  var cumMin = cumNet.length ? Math.min.apply(null, cumNet) : 0;
+  if(cumMax === cumMin) cumMax = cumMin + 1;
+  var cumRange = cumMax - cumMin;
+  function _cumY(v){ return PAD.top + gh * (1 - (v - cumMin)/cumRange); }
+  // 右轴分隔线 + 刻度标签
+  html += '<line x1="'+(W-PAD.right)+'" y1="'+PAD.top+'" x2="'+(W-PAD.right)+'" y2="'+(PAD.top+gh)+'" stroke="rgba(251,191,36,0.25)" stroke-width="1"/>';
+  html += '<text x="'+(W-PAD.right+5)+'" y="'+(PAD.top+4)+'" text-anchor="start" font-size="9" fill="#fbbf24">'+ (Math.round(cumMax/100)/10) +'k</text>';
+  html += '<text x="'+(W-PAD.right+5)+'" y="'+(PAD.top+gh)+'" text-anchor="start" font-size="9" fill="#fbbf24">'+ (Math.round(cumMin/100)/10) +'k</text>';
+  if(cumNet.length > 1){
+    var _pts = filtered.map(function(d,i){ var _x = PAD.left + gap*i + gap*0.5; return _x+','+_cumY(cumNet[i]); }).join(' ');
+    html += '<polyline points="'+_pts+'" fill="none" stroke="#fbbf24" stroke-width="2" opacity="0.9"/>';
+    var _lx = PAD.left + gap*(filtered.length-1) + gap*0.5;
+    html += '<circle cx="'+_lx+'" cy="'+_cumY(cumNet[cumNet.length-1])+'" r="3" fill="#fbbf24"/>';
+  }
+
   const udLast = filtered[filtered.length-1];
   if(udLast){
     html += '<text x="'+(W-PAD.right)+'" y="'+(PAD.top-18)+'" text-anchor="end" font-size="10" fill="#ff5252" font-weight="bold">'+udLast.up+'</text>';
@@ -8474,6 +8514,7 @@ function drawUpDownChart(){
   }
   html += '<text x="'+(PAD.left+5)+'" y="'+(PAD.top-6)+'" font-size="11" fill="#ff5252">● 上涨家数</text>';
   html += '<text x="'+(PAD.left+90)+'" y="'+(PAD.top-6)+'" font-size="11" fill="#69f0ae">● 下跌家数</text>';
+  html += '<text x="'+(PAD.left+180)+'" y="'+(PAD.top-6)+'" font-size="11" fill="#fbbf24">— 累计净宽度</text>';
 
   svg.innerHTML = html;
 
@@ -8483,7 +8524,8 @@ function drawUpDownChart(){
     if(udPremarket){
       note.textContent = '⏳ 盘前数据待刷新，开盘后自动更新。';
     }else if(udLast){
-      note.textContent = '红=上涨家数，绿=下跌家数。今日涨 '+udLast.up+' / 跌 '+udLast.down+' / 平 '+(udLast.flat||0)+'。涨跌比 '+(udLast.down?(udLast.up/udLast.down).toFixed(2):'—')+'。';
+      var _cum = cumNet.length ? cumNet[cumNet.length-1] : 0;
+      note.textContent = '红=上涨家数，绿=下跌家数。今日涨 '+udLast.up+' / 跌 '+udLast.down+' / 平 '+(udLast.flat||0)+'。涨跌比 '+(udLast.down?(udLast.up/udLast.down).toFixed(2):'—')+'。累计净宽度 '+( _cum>=0?'+':'')+_cum+'（近'+filtered.length+'日 running sum，黄线）。';
     }
   }
 }

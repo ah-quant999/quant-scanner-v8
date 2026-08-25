@@ -170,6 +170,42 @@ jobs:
             #    故此戳无任何自愈网 —— 必须在 reset 之后重跑 guard 才能对齐。）
             #   修复：reset 之后重新执行 guard，使 v6 戳与实际落库内容严格一致。
             python guard_v6_memo.py
+            # 🛡 2026-08-25 一劳永逸(任务②)：注入构建版本戳，配合 index.html 版本戳缓存破坏，
+            #   部署新版本后用户自动刷新，彻底免疫「看到重构前旧 HTML（动量共识卡多页重复等）」。
+            python - <<'PYS'
+            import re, subprocess
+            p='index.html'
+            s=open(p,encoding='utf-8').read()
+            sha=subprocess.check_output(['git','rev-parse','--short','HEAD']).decode().strip()
+            s=re.sub(r'var BUILD = "(?:BUILD_SHA_PLACEHOLDER|[0-9a-f]{7,40})"', 'var BUILD = "'+sha+'"', s)
+            open(p,'w',encoding='utf-8').write(s)
+            print('✅ 已注入构建版本戳', sha)
+            PYS
+            # 🛡 2026-08-25 一劳永逸(任务①)：关键 data 文件须为今日新鲜，否则阻断部署防陈旧上线。
+            #   update_v8.py 写回的是 raw_data 内嵌时间戳（「不得造假」铁律），故能真实反映数据新鲜度；
+            #   仅当内嵌时间戳确凿陈旧(>36h)才拦截；格式缺失/无时间戳仅告警不拦截，避免误伤正常部署。
+            python - <<'PYF'
+            import re, datetime, sys
+            crit={'data/COCKPIT_ADVICE.js':['gen_time','update_time','calc_time'],
+                  'data/SECTOR_RECOMMENDATION.js':['gen_time','update_time','calc_time']}
+            tz=datetime.timezone(datetime.timedelta(hours=8)); now=datetime.datetime.now(tz)
+            stale=[]
+            for f,keys in crit.items():
+                try: s=open(f,encoding='utf-8').read()
+                except Exception: print('  ⚠️',f,'(缺失,仅告警)'); continue
+                found=None
+                for k in keys:
+                    m=re.search(k+r'\s*[:=]\s*["\']?(\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2})', s)
+                    if m: found=m.group(1).replace('T',' '); break
+                if not found: print('  ⚠️',f,'(无时间戳,仅告警)'); continue
+                dt=datetime.datetime.strptime(found[:16],'%Y-%m-%d %H:%M').replace(tzinfo=tz)
+                age=(now-dt).total_seconds()/3600
+                if age>36: stale.append(f+'(陈旧%.1fh,%s)'%(age,found))
+            if stale:
+                print('❌ 关键数据陈旧，阻断部署（避免上线过期数据）：')
+                [print('  -',x) for x in stale]; sys.exit(1)
+            print('✅ 关键数据均为今日新鲜')
+            PYF
             git add -f data/ index.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py
             if git diff --cached --quiet; then
               echo "ℹ️ 无数据变化，跳过部署（远端已是最新构建）"
