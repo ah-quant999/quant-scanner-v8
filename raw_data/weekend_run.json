@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-25 18:41:41",
-  "generated": "2026-08-25 18:41:41",
+  "update_time": "2026-08-25 19:42:16",
+  "generated": "2026-08-25 19:42:16",
   "period_start": "2026-08-17",
   "period_end": "2026-08-23",
   "stats": {
@@ -16,8 +16,8 @@
       "file": "lhb_data.json",
       "label": "龙虎榜",
       "status": "ok",
-      "update_time": "2026-08-25 16:32:24",
-      "size_kb": 23.6
+      "update_time": "2026-08-25 17:58:01",
+      "size_kb": 23.9
     },
     {
       "file": "triple_history.json",
@@ -30,8 +30,8 @@
       "file": "top10_daily.json",
       "label": "全站精选",
       "status": "ok",
-      "update_time": "2026-08-24 23:51:03",
-      "size_kb": 20.8
+      "update_time": "2026-08-25 19:02:37",
+      "size_kb": 20.9
     },
     {
       "file": "cockpit_tier_recommend.json",
@@ -44,29 +44,29 @@
       "file": "sector_rs.json",
       "label": "板块相对强度",
       "status": "ok",
-      "update_time": "2026-08-25 16:27",
+      "update_time": "2026-08-25 17:59",
       "size_kb": 71.8
     },
     {
       "file": "final_recommend.json",
       "label": "最终推荐池",
       "status": "ok",
-      "update_time": "2026-08-24 23:12:45",
-      "size_kb": 42.5
+      "update_time": "2026-08-25 19:35:28",
+      "size_kb": 42.6
     },
     {
       "file": "gold_pool.json",
       "label": "黄金池",
       "status": "ok",
-      "update_time": "2026-08-25 17:06:31",
+      "update_time": "2026-08-25 17:55:23",
       "size_kb": 85.3
     },
     {
       "file": "candidate.json",
       "label": "候选池",
       "status": "ok",
-      "update_time": "2026-08-24 23:49:26",
-      "size_kb": 66.7
+      "update_time": "2026-08-25 18:04:24",
+      "size_kb": 60.3
     },
     {
       "file": "four_volume.json",
