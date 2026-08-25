@@ -1,20 +1,14 @@
 {
-  "check_time": "2026-08-25 19:36:23",
+  "check_time": "2026-08-25 20:15:57",
   "last_trade_close": "2026-08-25 15:30:00",
   "is_trading_day": true,
-  "core_stale": [
-    {
-      "var": "CRDS_CARD_DATA",
-      "reason": "更新于 08-24 23:47，落后 2 个交易日（阈值 1）",
-      "category": "algo"
-    }
-  ],
+  "core_stale": [],
   "warn_stale": [],
   "frozen_stale": [],
   "no_update_time": [],
   "summary": {
     "total_checked": 50,
-    "core_stale": 1,
+    "core_stale": 0,
     "warn_stale": 0,
     "frozen_stale": 0,
     "no_timestamp": 0
