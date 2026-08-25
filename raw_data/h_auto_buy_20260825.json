@@ -3,7 +3,7 @@
   "snapshot_date": "2026-08-25",
   "snapshot_time": "",
   "method": "涨幅≥3.0% + 量比≥1.2（4日均量，H 反推最小可行版）",
-  "total_scanned": 9932,
+  "total_scanned": 7135,
   "skipped_no_quote": 0,
   "hit_chg_only": 1042,
   "final_count": 1042,
@@ -13555,6 +13555,6 @@
       "board": "科创板"
     }
   ],
-  "generated_at": "2026-08-25 21:31:12",
+  "generated_at": "2026-08-25 23:06:15",
   "source": "raw_data/h_auto_buy 反推算法，无 PDF OCR 依赖"
 }
