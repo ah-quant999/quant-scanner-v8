@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-25 17:33",
+  "update_time": "2026-08-25 18:22",
   "data_type": "real",
   "summary": {
     "in_count": 40,
@@ -1641,15 +1641,15 @@
     },
     {
       "name": "锂电池概念",
-      "net": -23.07,
-      "net_5d": 377.89,
-      "net_20d": 370.67,
+      "net": -21.15,
+      "net_5d": 379.81,
+      "net_20d": 372.59,
       "net_60d": null,
       "type": "概念",
       "consecutive_days": 1,
       "trend": "out",
       "net_5d_days": 5,
-      "net_10d": 410.76,
+      "net_10d": 412.68,
       "net_10d_days": 10,
       "net_20d_days": 14,
       "net_60d_days": 14
