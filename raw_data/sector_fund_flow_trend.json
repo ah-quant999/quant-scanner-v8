@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-25 19:20",
+  "update_time": "2026-08-25 20:45",
   "data_type": "real",
   "summary": {
     "in_count": 40,
@@ -214,10 +214,10 @@
     {
       "name": "阿里巴巴概念",
       "net": 80.24,
-      "net_5d": -205.96,
-      "net_20d": 3441.68,
+      "net_5d": -666.83,
+      "net_20d": 3078.96,
       "type": "概念",
-      "net_10d": -867.58,
+      "net_10d": -1295.07,
       "net_10d_days": 10,
       "consecutive_days": 2,
       "trend": "in",
@@ -800,10 +800,10 @@
     {
       "name": "阿里巴巴概念",
       "net": 80.24,
-      "net_5d": -205.96,
-      "net_20d": 3441.68,
+      "net_5d": -666.83,
+      "net_20d": 3078.96,
       "type": "概念",
-      "net_10d": -867.58,
+      "net_10d": -1295.07,
       "net_10d_days": 10,
       "consecutive_days": 2,
       "trend": "in",
@@ -1704,10 +1704,10 @@
     {
       "name": "阿里巴巴概念",
       "net": 80.24,
-      "net_5d": -205.96,
-      "net_20d": 3441.68,
+      "net_5d": -666.83,
+      "net_20d": 3078.96,
       "type": "概念",
-      "net_10d": -867.58,
+      "net_10d": -1295.07,
       "net_10d_days": 10,
       "consecutive_days": 2,
       "trend": "in",
