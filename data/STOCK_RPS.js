@@ -1,6 +1,6 @@
 window.STOCK_RPS_DATA = {
-  "update_time": "2026-08-26 20:38:44",
-  "universe_count": 197,
+  "update_time": "2026-08-26 22:38:15",
+  "universe_count": 196,
   "valid_count": 115,
   "index_code": "000300",
   "index_name": "沪深300",
@@ -1570,7 +1570,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "000725",
-      "name": "000725",
+      "name": "京东方A",
       "market": "sz",
       "index_code": "000300",
       "board": "主板",
@@ -1680,7 +1680,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "002081",
-      "name": "002081",
+      "name": "金 螳 螂",
       "market": "sz",
       "index_code": "000300",
       "board": "主板",
@@ -2252,7 +2252,7 @@ window.STOCK_RPS_DATA = {
     },
     {
       "code": "300001",
-      "name": "青岛特锐德",
+      "name": "特锐德",
       "market": "sz",
       "index_code": "000300",
       "board": "创业板",

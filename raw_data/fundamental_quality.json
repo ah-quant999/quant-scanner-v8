@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-08-26 20:22:32",
-  "total": 168,
+  "update_time": "2026-08-26 22:22:45",
+  "total": 164,
   "grade_summary": {
     "A": 16,
     "B": 11,
-    "C": 46,
+    "C": 45,
     "D": 34,
-    "no_data": 61
+    "no_data": 58
   },
   "stocks": {
     "hk_00005": {
@@ -38,13 +38,6 @@
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
     "hk_00358": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "港股暂无基本面数据源(中性不扣分)"
-    },
-    "hk_00386": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -352,13 +345,6 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
-    "hk_06163": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "港股暂无基本面数据源(中性不扣分)"
-    },
     "hk_06166": {
       "score": 0,
       "grade": "",
@@ -374,13 +360,6 @@
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
     "hk_06185": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "港股暂无基本面数据源(中性不扣分)"
-    },
-    "hk_06680": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -807,9 +786,10 @@
       "revenue_growth": 54.076800000000006,
       "reason": "ROE良好(16.2%) | 营收高增(54.1%)",
       "news": {
-        "score": 15,
+        "score": 5,
         "tags": [
-          "中报预增"
+          "中报预增",
+          "处罚"
         ]
       }
     },
@@ -1342,13 +1322,6 @@
       "revenue_growth": 38.5828,
       "reason": "ROE偏低(6.6%) | 营收高增(38.6%)"
     },
-    "sz_002906": {
-      "score": 45,
-      "grade": "C",
-      "roe": 5.6805,
-      "revenue_growth": 46.6024,
-      "reason": "ROE偏低(5.7%) | 营收高增(46.6%)"
-    },
     "sz_300001": {
       "score": 30,
       "grade": "D",
@@ -1462,7 +1435,13 @@
       "grade": "D",
       "roe": -5.3155,
       "revenue_growth": 49.0745,
-      "reason": "ROE差(-5.3%) | 营收高增(49.1%)"
+      "reason": "ROE差(-5.3%) | 营收高增(49.1%)",
+      "news": {
+        "score": 10,
+        "tags": [
+          "收购"
+        ]
+      }
     },
     "sz_300502": {
       "score": 70,

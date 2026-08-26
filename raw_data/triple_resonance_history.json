@@ -114,7 +114,7 @@
       "2026-08-22": 34.74,
       "2026-08-23": 35.45,
       "2026-08-25": 33.68,
-      "2026-08-26": 33.68
+      "2026-08-26": 34.47
     },
     "300476": {
       "2026-08-17": 0,
@@ -177,7 +177,7 @@
       "2026-08-20": 46.1,
       "2026-08-22": 49.43,
       "2026-08-25": 47.66,
-      "2026-08-26": 47.66
+      "2026-08-26": 46.85
     },
     "000703": {
       "2026-08-20": 20.1,
@@ -189,7 +189,7 @@
     },
     "000426": {
       "2026-08-22": 40.88,
-      "2026-08-26": 39.5
+      "2026-08-26": 40.24
     },
     "600183": {
       "2026-08-22": 132.8,
@@ -205,6 +205,9 @@
     "300394": {
       "2026-08-25": 257.1,
       "2026-08-26": 257.1
+    },
+    "002475": {
+      "2026-08-26": 57.11
     }
   },
   "_tracking_latest": {
@@ -212,7 +215,7 @@
       "enter_date": "2026-08-17",
       "enter_close": 35.45,
       "last_date": "2026-08-26",
-      "last_close": 33.68,
+      "last_close": 34.47,
       "status": "strict",
       "streak": 4,
       "total_days": 8
@@ -396,7 +399,7 @@
       "enter_date": "2026-08-20",
       "enter_close": 46.1,
       "last_date": "2026-08-26",
-      "last_close": 47.66,
+      "last_close": 46.85,
       "status": "strict",
       "streak": 2,
       "total_days": 3
@@ -441,7 +444,7 @@
       "enter_date": "2026-08-22",
       "enter_close": 40.88,
       "last_date": "2026-08-26",
-      "last_close": 39.5,
+      "last_close": 40.24,
       "status": "near",
       "streak": 1,
       "total_days": 2
@@ -463,12 +466,20 @@
       "status": "near",
       "streak": 2,
       "total_days": 2
+    },
+    "002475": {
+      "enter_date": "2026-08-26",
+      "enter_close": 57.11,
+      "last_date": "2026-08-26",
+      "last_close": 57.11,
+      "status": "near",
+      "streak": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-08-26 21:30:36"
+    "last_update": "2026-08-26 22:55:28"
   },
   "2026-08-18": [
     {
@@ -1198,9 +1209,9 @@
       "name": "紫金矿业",
       "market": "sh",
       "board": "主板",
-      "close": 33.68,
-      "pct_chg": -2.49,
-      "total_score": 33.6,
+      "close": 34.47,
+      "pct_chg": 2.35,
+      "total_score": 36.4,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
@@ -1214,9 +1225,9 @@
       "name": "赤峰黄金",
       "market": "sh",
       "board": "主板",
-      "close": 47.66,
-      "pct_chg": -2.28,
-      "total_score": 32.4,
+      "close": 46.85,
+      "pct_chg": -1.7,
+      "total_score": 35.2,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
@@ -1226,13 +1237,13 @@
       "status": "strict"
     },
     {
-      "code": "300394",
-      "name": "天孚通信",
+      "code": "002475",
+      "name": "立讯精密",
       "market": "sz",
-      "board": "创业板",
-      "close": 257.1,
-      "pct_chg": 3.05,
-      "total_score": 32.0,
+      "board": "主板",
+      "close": 57.11,
+      "pct_chg": 4.1,
+      "total_score": 31.2,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
@@ -1246,25 +1257,9 @@
       "name": "兴业银锡",
       "market": "sz",
       "board": "主板",
-      "close": 39.5,
-      "pct_chg": -6.6,
-      "total_score": 27.6,
-      "quality_grade": "B",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": 0,
-      "status": "near"
-    },
-    {
-      "code": "600489",
-      "name": "中金黄金",
-      "market": "sh",
-      "board": "主板",
-      "close": 26.24,
-      "pct_chg": -3.74,
-      "total_score": 27.6,
+      "close": 40.24,
+      "pct_chg": 1.87,
+      "total_score": 30.4,
       "quality_grade": "B",
       "industry": "有色金属矿采选业",
       "sectors": [
