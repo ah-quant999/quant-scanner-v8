@@ -10784,6 +10784,16 @@ function drawUpDownChart(){
     //      → 页面永远空白无人救。提前后每 1.5s 检查，即使首调失败也能自愈重试直至渲染成功。
     var el=(typeof $==='function')?$('unlistedPanel'):document.getElementById('unlistedPanel');
     if(!el) return;
+    // 🛡 2026-08-26 一劳永逸：提前暴露 __ulSwitch，子 tab 按钮在 renderUnlisted 任何位置抛错后仍可切换
+    window.__ulSwitch = function(btn, tab){
+      window.__ulActivePane = tab;  // guard: 记住当前子 tab，重渲染不再 snap-back
+      var idMap={strong:'ulPaneStrong',ai:'ulPaneAI',pp:'ulPanePP',dbg:'ulPaneDbg'};
+      var all=['ulPaneStrong','ulPaneAI','ulPanePP','ulPaneDbg'];
+      for(var k=0;k<all.length;k++){var p=document.getElementById(all[k]); if(p) p.style.display=(all[k]===idMap[tab])?'block':'none';}
+      var tabs=document.querySelectorAll('#sec-ul .ul-tab');
+      for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
+      if(btn) btn.classList.add('active');
+    };
     if(!window.__ulSelfHealTimer){
       window.__ulSelfHealTimer=setInterval(function(){
         var p=document.getElementById('unlistedPanel');
@@ -10837,18 +10847,19 @@ function drawUpDownChart(){
     // 填充「今日判定 · 环境态势」卡（2026-08-07 已迁回今日事件；函数注册在今日事件卡脚本块）
     if(typeof window.__renderJudgmentBody==='function') window.__renderJudgmentBody();
     var h='';
+    var _ulAct = window.__ulActivePane || 'strong';  // 🛡 记住激活的子 tab（重渲染跟随）
 
     // ═══ 2026-08-16/18 主人令：暂未上架改子Tab导航（强势突破/AI预测/调试专区）；2026-08-20 潜力挖掘已删除→AI预测 ═══
     h+='<style>.ul-pane{display:none}.ul-pane.active{display:block}.ul-tab{font-size:12.5px;font-weight:600;color:var(--sub);background:transparent;border:1px solid var(--border);border-radius:8px;padding:6px 13px;cursor:pointer;transition:all .15s}.ul-tab:hover{color:var(--txt);background:var(--bg2)}.ul-tab.active{color:var(--txt);background:var(--card2);border-color:var(--border2);box-shadow:0 1px 4px rgba(0,0,0,.12)}</style>';
     h+='<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px;">';
-    h+='<div class="ul-tab active" data-ultab="strong" onclick="window.__ulSwitch(this,\'strong\')">🚀 强势突破</div>';
-    h+='<div class="ul-tab" data-ultab="ai" onclick="window.__ulSwitch(this,\'ai\')">🤖 AI 预测</div>';
-    h+='<div class="ul-tab" data-ultab="pp" onclick="window.__ulSwitch(this,\'pp\')">🔮 潜力挖掘</div>';
-    h+='<div class="ul-tab" data-ultab="dbg" onclick="window.__ulSwitch(this,\'dbg\')">🧪 调试专区</div>';
+    h+='<div class="ul-tab' + (_ulAct==='strong'?' active':'') + '" data-ultab="strong" onclick="window.__ulSwitch(this,\'strong\')">🚀 强势突破</div>';
+    h+='<div class="ul-tab' + (_ulAct==='ai'?' active':'') + '" data-ultab="ai" onclick="window.__ulSwitch(this,\'ai\')">🤖 AI 预测</div>';
+    h+='<div class="ul-tab' + (_ulAct==='pp'?' active':'') + '" data-ultab="pp" onclick="window.__ulSwitch(this,\'pp\')">🔮 潜力挖掘</div>';
+    h+='<div class="ul-tab' + (_ulAct==='dbg'?' active':'') + '" data-ultab="dbg" onclick="window.__ulSwitch(this,\'dbg\')">🧪 调试专区</div>';
     h+='</div>';
 
     // ── pane4: 🧪 调试专区 ──
-    h+='<div class="ul-pane" id="ulPaneDbg">';
+    h+='<div class="ul-pane" id="ulPaneDbg" style="display:'+(_ulAct==='dbg'?'block':'none')+'">';
 
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #7b1fa2;">';
     h+=v8CardHeader('🧪','实验选股调试专区','管理员可见：三重起涨 / CRDS逆势 / 候选池，验证中请勿依赖','update_time',window.SH_FIB);
@@ -11016,7 +11027,7 @@ function drawUpDownChart(){
     // ── 🎭 情绪周期 · 连板天梯（合并紧凑版）已迁到实时数据区，见 window.__renderCycleLadderCard ──
 
     // ── pane1: 🚀 强势突破（本页速读 + 动量共识筛选 + 个股动量状态）──
-    h+='<div class="ul-pane active" id="ulPaneStrong">';
+    h+='<div class="ul-pane" id="ulPaneStrong" style="display:'+(_ulAct==='strong'?'block':'none')+'">';
     // ── 2026-08-17 主人令：本页速读卡（一句话看懂"该看什么买卖"）──
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #22c55e;">';
     h+='<div style="padding:10px 14px;">';
@@ -11377,7 +11388,7 @@ function drawUpDownChart(){
     h+='</div>';  // /ulPaneStrong
 
     // ── pane2: 🤖 AI 预测（2026-08-20 主人令：重写自 market_path_probability 算法，潜力挖掘已删除）──
-    h+='<div class="ul-pane" id="ulPaneAI">';
+    h+='<div class="ul-pane" id="ulPaneAI" style="display:'+(_ulAct==='ai'?'block':'none')+'">';
 
     // AI 预测主卡：路径ABC概率 + 当前状态 + 江恩窗口 + 黄金分割 + 缠论分型（渲染函数见 _fillAiPrediction）
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';
@@ -11393,7 +11404,7 @@ function drawUpDownChart(){
     h+='</div>';  // /ulPaneAI
 
     // ── pane3: 🔮 潜力挖掘（2026-08-23 恢复：板块+股票预测推荐，读 POTENTIAL_PICKS）──
-    h+='<div class="ul-pane" id="ulPanePP">';
+    h+='<div class="ul-pane" id="ulPanePP" style="display:'+(_ulAct==='pp'?'block':'none')+'">';
 
     // 子卡 A：潜力个股表格（POTENTIAL_PICKS）
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a78bfa;">';
@@ -11512,11 +11523,10 @@ function drawUpDownChart(){
     }catch(e){ console.warn('ETF龙头渲染失败',e); }
     // 2026-08-16 子Tab 切换函数
     window.__ulSwitch = function(btn, tab){
-      var panes = document.querySelectorAll('#sec-ul .ul-pane');
-      for(var i=0;i<panes.length;i++) panes[i].classList.remove('active');
+      window.__ulActivePane = tab;  // 🛡 guard: 记住当前子 tab，重渲染不再 snap-back
       var idMap = {strong:'ulPaneStrong', ai:'ulPaneAI', pp:'ulPanePP', dbg:'ulPaneDbg'};
-      var target = document.getElementById(idMap[tab] || ('ulPane'+tab));
-      if(target) target.classList.add('active');
+      var all = ['ulPaneStrong','ulPaneAI','ulPanePP','ulPaneDbg'];
+      for(var k=0;k<all.length;k++){ var p=document.getElementById(all[k]); if(p) p.style.display = (all[k]===idMap[tab]) ? 'block' : 'none'; }
       var tabs = document.querySelectorAll('#sec-ul .ul-tab');
       for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
       if(btn) btn.classList.add('active');
