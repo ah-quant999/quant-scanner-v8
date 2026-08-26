@@ -464,6 +464,16 @@ def fetch_akshare_ths_5d20d_backup(sector_names):
             net_10d_days = len(recent_10) if len(df) >= 10 else len(df)
             net_60d_days = len(recent_60)
             MAX_REASONABLE = 5000.0
+            # 🛡 2026-08-27 主人令（资金验证60日夸张根因）：估算公式 vol×pct/100 对
+            #   大成交额板块（如电力）严重失真——60日成交额巨大，即使小涨跌也得出上千亿。
+            #   增加「方向一致性 + 量级」双重闸门：与 20 日方向相反或量级超 5 倍 → 判定失真置 0（宁缺毋滥）。
+            _dir_ok = (net_60d_est is None or net_60d_est == 0 or net_20d_est == 0
+                       or (net_60d_est * net_20d_est > 0))
+            _mag_ok = (net_60d_est is None or net_60d_est == 0 or net_20d_est == 0
+                       or abs(net_60d_est) <= abs(net_20d_est) * 5)
+            if net_60d_est is not None and (not _dir_ok or not _mag_ok):
+                print(f"    ⚠️ {name}: 60日估算失真({net_60d_est}亿 vs 20日{net_20d_est}亿) → 置0")
+                net_60d_est = 0
             if net_5d_est and abs(net_5d_est) > MAX_REASONABLE:
                 net_5d_est = 0
             if net_10d_est and abs(net_10d_est) > MAX_REASONABLE:

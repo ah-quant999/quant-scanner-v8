@@ -23,6 +23,12 @@ data/.github_pat.txt
 data/.wc_jwt_cache.json
 data/.neodata_token
 data/zszxq_token.json
+# 🛡 2026-08-27 主人令：算法运行时行情缓存（RPS/K线/TDX），纯本地加速用，严禁入库/推仓
+#   历史已入库文件由隔离索引 git rm --cached 移除（不删本地文件）
+raw_data/_rps_cache/
+raw_data/kline_cache/
+raw_data/_tdx_cache/
+
 # 算法 staging / 生成数据（脚本和工作流会重建）
 algorithms/data/
 algorithms/out/

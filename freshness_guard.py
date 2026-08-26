@@ -58,6 +58,9 @@ FRESHNESS_RULES = {
     "macro_data.json":            {"threshold": 360, "category": "premarket", "label": "宏观数据"},
     # ──盘后数据（15:30后）──
     "lhb_data.json":              {"threshold": 480, "category": "post_close", "label": "龙虎榜"},
+    "sector_fund_flow_trend.json": {"threshold": 1440, "category": "post_close", "label": "板块资金趋势(5/10/20/60日)"},
+    # 🛡 2026-08-27 主人令：SECTOR_FUND_FLOW_TREND 数据源（资金验证卡 5/10/20/60 日累计），
+    #   由 fetch_orphan_sector_fund_flow.py 盘后产出，纳入审计杜绝"每天审计个毛线"漏检。
 }
 
 # 交易时段定义（CST HHMM）

@@ -1234,6 +1234,8 @@ _LOW_FREQ_FILES = {
     "CONCEPT_ETF_MAP", "OPTIMIZED_STRATEGY", "BACKTEST_TDX", "BLOAT_CHECK",
     "HEALTH_CHECK", "RUNNER_STATUS_HEALTH",
     "WEEKEND_RUN",
+    "FOUR_VOLUME_60M",  # 🛡 2026-08-27 主人令：baostock 60min 源本身滞后（曾到 8/22），
+    # 且 final_recommend 已回退读日线 FOUR_VOLUME.js（Layer B），60M 不再作为最终推荐必需输入 → 降级低频白名单，消除误报红灯
 }
 def check_all_data_files():
     """全量审计 data/*.js：已登记 CARD_DEFS 的跳过（check_data_cards 管），其余全部按通用规则查。
@@ -1370,7 +1372,11 @@ def check_raw_data():
     #   Git Trees API "input too large"（今天 848 文件 × 全量 tree 已触发 422）。
     #   ok <850 / warn 850-1100 / fail >1100（850 为当前规模基线，留余量）
     try:
-        n_files = sum(1 for _ in RAW_DIR.rglob("*") if _.is_file())
+        # 🛡 2026-08-27 主人令：排除运行时缓存目录（_rps_cache 550 + kline_cache 401 + _tdx_cache 170）
+        #   这些是算法运行产生的行情缓存，本不应入库/计入仓库规模；否则一直触发 raw_volume fail 红灯。
+        _CACHE_SUBDIRS = {"_rps_cache", "kline_cache", "_tdx_cache"}
+        n_files = sum(1 for _ in RAW_DIR.rglob("*")
+                      if _.is_file() and not any(part in _CACHE_SUBDIRS for part in _.parts))
         if n_files > 1100:
             results.append({"id": "raw_volume", "name": "raw_data 文件数", "page": "管线",
                             "status": "fail",

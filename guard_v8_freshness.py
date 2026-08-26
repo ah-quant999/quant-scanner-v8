@@ -122,6 +122,9 @@ WARN_SOURCES = {
     "SUSPENSION_ALERT": 48,
     "MARKET_ALERTS": 48,
     "STOCK_LIST": 24 * 30,
+    # 🛡 2026-08-27 主人令：SECTOR_FUND_FLOW_TREND 资金验证数据源（fetch_orphan 盘后产出），
+    #   此前完全不在审计清单 → "资金验证60日夸张/陈旧"无人发现。纳入 WARN 48h。
+    "SECTOR_FUND_FLOW_TREND": 48,
 }
 
 # 🛡 2026-08-20 主人令·一劳永逸：策略回测（统一）卡片依赖选股算法产出，

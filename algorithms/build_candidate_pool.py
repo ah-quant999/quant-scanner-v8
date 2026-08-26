@@ -796,6 +796,42 @@ def build():
         "source_dist": dict(dist),
         "stocks": pool,
     }
+    # 🛡 2026-08-27 主人令（运维股池黄色根因）：A股行情源（新浪排行等）当天若只返回部分，
+    #   主板/创业板/科创板来源数量会显著缩水（如 63/20/17 < 期望100）→ 运维面板三个来源黄色。
+    #   一劳永逸：当任一 A股来源数量 < TOP_PER_BOARD*0.6 时，从上一份 candidate_pool.json 合并
+    #   该来源的旧股票补齐（保留旧数据兜底，杜绝"缩水覆盖"）。
+    try:
+        _prev = {}
+        if os.path.exists(OUT):
+            _prev = json.load(open(OUT, encoding="utf-8")).get("stocks", {})
+        _merged = 0
+        for _b in ("主板", "创业板", "科创板"):
+            _src = f"{_b}成交前{TOP_PER_BOARD}"
+            _cnt = dist.get(_src, 0)
+            if _cnt < TOP_PER_BOARD * 0.6 and _prev:
+                for _k, _v in _prev.items():
+                    if not isinstance(_v, dict) or _src not in (_v.get("sources") or []):
+                        continue
+                    if _k in pool:
+                        continue
+                    pool[_k] = {kk: _v.get(kk) for kk in ("code", "name", "market", "board_label")}
+                    pool[_k]["sources"] = [s for s in (_v.get("sources") or []) if s != _src] + [_src]
+                    _merged += 1
+        if _merged:
+            dist = Counter()
+            for v in pool.values():
+                for s in v["sources"]:
+                    dist[s] += 1
+            out = {
+                "update_time": time.strftime("%Y-%m-%d %H:%M:%S"),
+                "total": len(pool),
+                "source_dist": dict(dist),
+                "stocks": pool,
+                "merge_note": f"来源数量不足，从上一份候选池合并补入 {_merged} 只（防缩水覆盖）",
+            }
+            print(f"  🛡 候选池数量不足保护：合并上一份 {_merged} 只 → total={len(pool)}")
+    except Exception as e:
+        print(f"  ⚠️ 候选池数量保护异常（继续写当前数据）: {e}")
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
     print(f"\n✅ 候选股池构建完成：{len(pool)} 只")
