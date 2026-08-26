@@ -108,6 +108,12 @@ DATA_SOURCES = {
     # 2026-08-19 主人令：利率上行期板块推荐框架（宏观+板块RS+资金流+周期融合；macro.json 删除孤儿后由 market_regime.json 单源触发）
     "market_regime.json":           "MARKET_REGIME",
     "sector_recommendation.json":   "SECTOR_RECOMMENDATION",
+    # 🛡 2026-08-26 一劳永逸根因修复：原 DATA_SOURCES 漏挂 final_recommend.json / stock_rps.json 映射，
+    #   这两个 .js 仅由算法脚本（final_recommend.py / calc_stock_rps.py）写入，而云端 build 的 update_v8 步骤
+    #   不覆盖它们 → data/FINAL_RECOMMEND_DATA.js、data/STOCK_RPS.js 站点读的 window.* 永远停在 08-22（源 raw_data 已是 08-25 新鲜）。
+    #   补映射后，云端 build 自动按 raw_data 重建，杜绝复发。
+    "final_recommend.json":        "FINAL_RECOMMEND_DATA",
+    "stock_rps.json":              "STOCK_RPS_DATA",
 }
 
 # 变量名 → 更新时段
@@ -193,6 +199,10 @@ CATEGORY_MAP = {
     # 2026-08-19：板块推荐框架数据源（盘后跑宏观+板块融合；MACRO.js 已删孤儿→不注册）
     "MARKET_REGIME": "post_close",
     "SECTOR_RECOMMENDATION": "post_close",
+    # 🛡 2026-08-26 一劳永逸根因修复：final_recommend / stock_rps 与 FINAL_RECOMMEND_DATA / STOCK_RPS_DATA
+    #   归属盘后（与 finalRec 同节奏），补类别映射使 --category post_close / --detect-changes 能正确重建。
+    "FINAL_RECOMMEND_DATA": "post_close",
+    "STOCK_RPS_DATA": "post_close",
 }
 
 CATEGORY_LABEL = {
