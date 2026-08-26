@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-26 19:51",
+  "update_time": "2026-08-26 21:43",
   "window_days": 90,
   "total_stats": {
     "four_volume": {
@@ -1019,7 +1019,7 @@
         },
         {
           "code": "000630",
-          "name": "铜陵有色",
+          "name": "隽泰控股",
           "algo": "four_volume",
           "list_date": "20260826",
           "list_date_dashed": "2026-08-26",

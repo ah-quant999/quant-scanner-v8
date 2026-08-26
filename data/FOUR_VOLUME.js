@@ -1,10 +1,10 @@
 window.FOUR_VOLUME={
- "update_time": "2026-08-26 20:42:16",
+ "update_time": "2026-08-26 21:30:04",
  "total": 1,
  "stocks": [
   {
    "code": "000630",
-   "name": "铜陵有色",
+   "name": "隽泰控股",
    "market": "sz",
    "board_label": "主板",
    "close": 6.75,

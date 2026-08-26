@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-26 19:58:20",
-  "generated": "2026-08-26 19:58:20",
+  "update_time": "2026-08-26 21:51:54",
+  "generated": "2026-08-26 21:51:54",
   "period_start": "2026-08-17",
   "period_end": "2026-08-23",
   "stats": {
@@ -30,7 +30,7 @@
       "file": "top10_daily.json",
       "label": "全站精选",
       "status": "ok",
-      "update_time": "2026-08-26 19:05:12",
+      "update_time": "2026-08-26 20:38:44",
       "size_kb": 21.0
     },
     {
@@ -58,7 +58,7 @@
       "file": "gold_pool.json",
       "label": "黄金池",
       "status": "ok",
-      "update_time": "2026-08-26 17:56:19",
+      "update_time": "2026-08-26 18:48:15",
       "size_kb": 80.3
     },
     {

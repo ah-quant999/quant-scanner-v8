@@ -1,5 +1,5 @@
 window.STOCK_RPS_DATA = {
-  "update_time": "2026-08-26 19:05:12",
+  "update_time": "2026-08-26 20:38:44",
   "universe_count": 197,
   "valid_count": 115,
   "index_code": "000300",
