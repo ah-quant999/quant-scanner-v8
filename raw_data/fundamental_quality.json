@@ -1,15 +1,22 @@
 {
-  "update_time": "2026-08-26 22:22:45",
-  "total": 164,
+  "update_time": "2026-08-27 00:02:49",
+  "total": 177,
   "grade_summary": {
     "A": 16,
     "B": 11,
-    "C": 45,
-    "D": 34,
-    "no_data": 58
+    "C": 43,
+    "D": 37,
+    "no_data": 70
   },
   "stocks": {
     "hk_00005": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_00038": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -121,6 +128,13 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
+    "hk_01112": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
     "hk_01177": {
       "score": 0,
       "grade": "",
@@ -129,13 +143,6 @@
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
     "hk_01211": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "港股暂无基本面数据源(中性不扣分)"
-    },
-    "hk_01276": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -205,6 +212,13 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
+    "hk_01951": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
     "hk_01952": {
       "score": 0,
       "grade": "",
@@ -213,6 +227,20 @@
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
     "hk_02020": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_02039": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_02208": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -247,6 +275,13 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
+    "hk_02331": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
     "hk_02359": {
       "score": 0,
       "grade": "",
@@ -268,14 +303,14 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
-    "hk_02579": {
+    "hk_02628": {
       "score": 0,
       "grade": "",
       "roe": null,
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
-    "hk_02628": {
+    "hk_02696": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -310,6 +345,13 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
+    "hk_03899": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
     "hk_03908": {
       "score": 0,
       "grade": "",
@@ -332,6 +374,13 @@
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
     "hk_06030": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_06060": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -366,7 +415,35 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
+    "hk_06680": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_06821": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
     "hk_06869": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_07666": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_09633": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -402,6 +479,13 @@
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
     "hk_09988": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_09995": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -772,13 +856,6 @@
       "revenue_growth": 26.344299999999997,
       "reason": "ROE一般(13.6%) | 营收高增(26.3%)"
     },
-    "sh_603486": {
-      "score": 55,
-      "grade": "C",
-      "roe": 12.9801,
-      "revenue_growth": 55.863099999999996,
-      "reason": "ROE一般(13.0%) | 营收高增(55.9%)"
-    },
     "sh_603629": {
       "score": 65,
       "grade": "B",
@@ -878,13 +955,6 @@
       "roe": 1.1065,
       "revenue_growth": 10.911999999999999,
       "reason": "ROE差(1.1%) | 营收增长(10.9%)"
-    },
-    "sh_688169": {
-      "score": 45,
-      "grade": "C",
-      "roe": 6.916,
-      "revenue_growth": 48.228500000000004,
-      "reason": "ROE偏低(6.9%) | 营收高增(48.2%)"
     },
     "sh_688256": {
       "score": 65,
@@ -992,6 +1062,19 @@
       "roe": 3.3716000000000004,
       "revenue_growth": 18.671499999999998,
       "reason": "ROE差(3.4%) | 营收增长(18.7%)"
+    },
+    "sz_000039": {
+      "score": 30,
+      "grade": "D",
+      "roe": 0.43290000000000006,
+      "revenue_growth": 91.7069,
+      "reason": "ROE差(0.4%) | 营收高增(91.7%)",
+      "news": {
+        "score": -15,
+        "tags": [
+          "一季报预减"
+        ]
+      }
     },
     "sz_000426": {
       "score": 65,
@@ -1443,6 +1526,19 @@
         ]
       }
     },
+    "sz_300496": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.3482,
+      "revenue_growth": 30.279,
+      "reason": "ROE差(2.3%) | 营收高增(30.3%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "中报预增"
+        ]
+      }
+    },
     "sz_300502": {
       "score": 70,
       "grade": "A",
@@ -1502,6 +1598,13 @@
       "roe": 0.3929,
       "revenue_growth": 16.1581,
       "reason": "ROE差(0.4%) | 营收增长(16.2%)"
+    },
+    "sz_301039": {
+      "score": 30,
+      "grade": "D",
+      "roe": 2.3174,
+      "revenue_growth": 46.1093,
+      "reason": "ROE差(2.3%) | 营收高增(46.1%)"
     },
     "sz_301205": {
       "score": 45,
