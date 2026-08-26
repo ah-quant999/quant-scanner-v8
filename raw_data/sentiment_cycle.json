@@ -1,43 +1,43 @@
 {
-  "update_time": "2026-08-26 08:34:52",
+  "update_time": "2026-08-26 10:23:54",
   "data_date": "2026-08-26",
   "source": "LIMIT_UP_HEATMAP",
   "phase": "退潮",
   "color": "#f97316",
-  "score": 85.0,
-  "delta_pct": -42.48,
+  "score": 63.0,
+  "delta_pct": -66.37,
   "advice": "⚠️ 情绪退潮中：高位股注意回撤，关注高低切换",
   "metrics": {
-    "total_up": 65,
-    "max_ladder": 5,
-    "high_ladder_count": 4,
-    "sectors_count": 14
+    "total_up": 38,
+    "max_ladder": 6,
+    "high_ladder_count": 3,
+    "sectors_count": 15
   },
   "ladder_dist": {
-    "1": 56,
-    "2": 5,
-    "3": 2,
-    "4": 1,
-    "5": 1
+    "1": 25,
+    "2": 10,
+    "3": 1,
+    "5": 1,
+    "6": 1
   },
   "leaders": [
     {
       "code": "002412",
       "name": "汉森制药",
-      "lbc": 5,
-      "chg": 9.99
+      "lbc": 6,
+      "chg": 9.98
     },
     {
       "code": "000017",
       "name": "深中华A",
-      "lbc": 4,
-      "chg": 9.97
+      "lbc": 5,
+      "chg": 10.0
     },
     {
-      "code": "003040",
-      "name": "楚天龙",
+      "code": "002084",
+      "name": "海鸥住工",
       "lbc": 3,
-      "chg": 10.02
+      "chg": 10.11
     }
   ],
   "prev_total": 113,
