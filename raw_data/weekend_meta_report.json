@@ -1,9 +1,14 @@
 {
-"update_time": "2026-08-27 06:51:28",
-"total": 9594,
-"new_listings_count": 0,
+"update_time": "2026-08-27 07:31:07",
+"total": 9598,
+"new_listings_count": 4,
 "delisted_count": 0,
-"new_listings": [],
+"new_listings": [
+"158019 电池ETF永赢",
+"158017 化工ETF易方达",
+"158010 医疗ETF嘉实",
+"158001 价值ETF嘉实"
+],
 "delisted": [],
-"meta_enriched": 0
+"meta_enriched": 4
 }
