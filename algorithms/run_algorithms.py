@@ -56,6 +56,11 @@ INPUTS_FROM_V6 = [
 ORDER = [
     "fetch_fundamental_quality.py",   # → fundamental_quality（输入给 top10/triple*）
     "fetch_stock_names.py",
+    # 🛡 2026-08-26 一劳永逸（对齐）：原 gen_stock_profile.py 仅被 cloud_fetch_v8 在 post_close
+    #   副作用式调用，run_algorithms 算法链从不调度 → 本地跑/该步跳过时 stock_profile.json 陈旧，
+    #   致 calc_potential_picks(潜力挖掘) 与 final_recommend 读脏数据。现正式挂链（仅依赖 stock_names），
+    #   使算法链自洽、不依赖上游副作用。门控仍保留作安全网。
+    "gen_stock_profile.py",            # → raw_data/stock_profile.json（个股行业/概念，潜力挖掘&最终推荐共用）
     "fetch_stock_quote_v8.py",         # → raw_data/stock_quote.json + data/STOCK_QUOTE.js（全市场实时报价快照，查股功能用）
     "fetch_sh_index_fib.py",
     "fetch_inst_trade.py",
