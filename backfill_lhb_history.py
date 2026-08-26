@@ -234,7 +234,15 @@ def main():
             hist[iso] = rec
         except Exception as e:
             print(f"  {iso}: 失败 {e}")
-            hist[iso] = {'trading': False, 'error': str(e)[:80]}
+            # 🛡 2026-08-26 一劳永逸：已有真实数据的日期绝不被失败重抓覆盖，
+            #   否则解析异常日(如 08-24 的 'NoneType' object is not subscriptable')会反复把
+            #   手动/历史找回的真实龙虎榜冲成 error 占位（"又没了"根因）。
+            _existing = hist.get(iso)
+            _real = bool(_existing and _existing.get('trading') is True and len(_existing.get('stocks', [])) > 0)
+            if _real:
+                print(f"  {iso}: 保留既有真实数据({len(_existing.get('stocks', []))}只)，跳过错误覆盖")
+            else:
+                hist[iso] = {'trading': False, 'error': str(e)[:80]}
         time.sleep(0.3)
 
     hist['update_time'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
