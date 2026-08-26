@@ -275,6 +275,14 @@ _FINAL_RECOMMEND_INPUTS = {
     # crisis_data.json 由云端 cloud_fetch_v8.py 产出，本地链不重跑；仅做新鲜度告警（见 final_recommend 内部兜底）
 }
 
+# 🛡 2026-08-26 补全（昨天门控漏挂四量）：final_recommend 实际读 data/FOUR_VOLUME_60M.js
+#   （60min 四量终极共振），四量终极卡还读 data/FOUR_VOLUME.js；二者必须本轮回合新鲜产出，
+#   否则最终推荐用陈旧四量汇总（"逻辑不对"根因）。这两脚本直接写 data/*.js（不经 out/，无需 stage）。
+_FINAL_RECOMMEND_DATA_INPUTS = {
+    "FOUR_VOLUME_60M.js": ("strategy_four_volume_60m.py", False),
+    "FOUR_VOLUME.js":      ("strategy_four_volume.py", False),
+}
+
 
 def _stage_out_to_raw(quiet=False):
     """把 algorithms/out/ 下的产物按 V6_TO_V8 搬运到 raw_data/（幂等，可重复调用）。"""
@@ -290,55 +298,56 @@ def _stage_out_to_raw(quiet=False):
         return 0
 
 
-def _final_recommend_gate(run_start):
-    """final_recommend 前的就绪门控。返回 True=可继续；False=应跳过本轮最终推荐。"""
-    print(f"\n  🚦 final_recommend 就绪门控（确保全部选股数据已新鲜产出）")
-    # (1) 先把本轮 out/ 产物搬运到 raw_data/，使 4 个 out-依赖输入新鲜
-    _stage_out_to_raw()
-    # (2) 校验每个本地输入是否本轮新鲜产出
+def _gate_ensure_inputs(inputs_map, base_dir, run_start):
+    """检查一组输入是否本轮回合新鲜产出（mtime ≥ run_start）。缺失/陈旧则重跑生成器并复检。
+    返回 (ok, bad_list)。ok=False=有输入重跑后仍缺失/陈旧，应拒绝产出最终推荐。"""
     missing, stale = [], []
-    for fname in _FINAL_RECOMMEND_INPUTS:
-        fpath = os.path.join(V8_ROOT, "raw_data", fname)
+    for fname, (prod, is_out) in inputs_map.items():
+        fpath = os.path.join(base_dir, fname)
         if not os.path.exists(fpath):
-            missing.append(fname)
-            continue
+            missing.append(fname); continue
         mtime = datetime.fromtimestamp(os.path.getmtime(fpath))
         if mtime < run_start:
             stale.append(fname)
     if not missing and not stale:
-        print(f"  ✅ 全部 {len(_FINAL_RECOMMEND_INPUTS)} 个选股输入均为本轮新鲜产出，放行 final_recommend")
-        return True
-    # (3) 缺失/陈旧 → 重跑对应生成器（让最终推荐确实基于本轮数据，而非抢跑陈旧）
-    if missing:
-        print(f"  ⚠️ 缺失输入: {', '.join(missing)} → 重跑生成器")
-    if stale:
-        print(f"  ⚠️ 陈旧输入(非本轮产出): {', '.join(stale)} → 重跑生成器")
+        return (True, [])
+    print(f"  ⚠️ 四量/输入 缺失={missing} 陈旧={stale} → 重跑生成器")
     for fname in list(missing) + list(stale):
-        prod, _is_out = _FINAL_RECOMMEND_INPUTS[fname]
+        prod, is_out = inputs_map[fname]
         p = os.path.join(ALGO, prod)
         if not os.path.exists(p):
-            print(f"     ❌ 生成器缺失: {prod}")
-            continue
+            print(f"     ❌ 生成器缺失: {prod}"); continue
         try:
             r = subprocess.run([PY, p], cwd=ALGO, capture_output=True, text=True, timeout=1800)
             print(f"     {'✅' if r.returncode == 0 else '⚠️ 退出码 ' + str(r.returncode)} 重跑 {prod}")
         except Exception as e:
             print(f"     ❌ 重跑 {prod} 异常: {e}")
-        if _is_out:
+        if is_out:
             _stage_out_to_raw(quiet=True)
-    # (4) 复检：仍缺失/陈旧则拒绝产出（宁可本轮无推荐，也绝不造假）
-    still_bad = []
+    bad = []
     for fname in list(missing) + list(stale):
-        fpath = os.path.join(V8_ROOT, "raw_data", fname)
+        fpath = os.path.join(base_dir, fname)
         if not os.path.exists(fpath):
-            still_bad.append(f"{fname}(缺失)")
+            bad.append(f"{fname}(缺失)")
         elif datetime.fromtimestamp(os.path.getmtime(fpath)) < run_start:
-            still_bad.append(f"{fname}(仍陈旧)")
-    if still_bad:
-        print(f"  🛑 门控未通过，拒绝产出最终推荐（避免陈旧/造假数据）: {', '.join(still_bad)}")
-        return False
-    print(f"  ✅ 重跑后全部输入新鲜，放行 final_recommend")
-    return True
+            bad.append(f"{fname}(仍陈旧)")
+    return (len(bad) == 0, bad)
+
+def _final_recommend_gate(run_start):
+    """final_recommend 前的就绪门控。返回 True=可继续；False=应跳过本轮最终推荐。
+    🛡 2026-08-26 补全：同时校验 raw_data/*.json 选股输入 与 data/*.js 四量输入（FOUR_VOLUME_60M/FOUR_VOLUME），
+       确保最终推荐必须等四量本轮回合新鲜产出后才汇总。"""
+    print(f"\n  🚦 final_recommend 就绪门控（确保全部选股数据+四量已新鲜产出）")
+    # (1) 先把本轮 out/ 产物搬运到 raw_data/，使 out-依赖输入新鲜
+    _stage_out_to_raw()
+    ok_raw, bad_raw = _gate_ensure_inputs(_FINAL_RECOMMEND_INPUTS, os.path.join(V8_ROOT, "raw_data"), run_start)
+    ok_data, bad_data = _gate_ensure_inputs(_FINAL_RECOMMEND_DATA_INPUTS, os.path.join(V8_ROOT, "data"), run_start)
+    if ok_raw and ok_data:
+        print(f"  ✅ 全部选股输入（含四量终极）均为本轮新鲜产出，放行 final_recommend")
+        return True
+    bad = bad_raw + bad_data
+    print(f"  🛑 门控未通过，拒绝产出最终推荐（避免陈旧/造假数据）: {', '.join(bad)}")
+    return False
 
 
 def step_run():

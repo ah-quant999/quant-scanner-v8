@@ -3389,7 +3389,22 @@ def main(category=None, only=None):
     ]
 
     def f_four_volume():
-        """四量终极 选股：子进程跑 strategy_four_volume.py（盘后日线，直接写 data/FOUR_VOLUME.js）。"""
+        """四量终极 选股：子进程跑 strategy_four_volume.py（盘后日线，直接写 data/FOUR_VOLUME.js）。
+        [2026-08-26 一劳永逸-理顺cn fetch时序] 若 data/FOUR_VOLUME.js 已是「今日」产出，
+           说明算法链(run_algorithms, 19:15 CST，先于 final_recommend) 本轮已生成四量 -> 跳过，
+           避免 30 分 patrol 在 final_recommend 之后又重发四量 -> 四量卡时间戳晚于最终推荐(逻辑倒置)。"""
+        # 当日新鲜度闸门：仅当四量尚未是今日产出时才重算(同时自愈陈旧/缺失)。
+        import re as _re
+        _fv = ROOT / "data" / "FOUR_VOLUME.js"
+        try:
+            if _fv.exists():
+                _txt = _fv.read_text(encoding="utf-8", errors="replace")
+                _m = _re.search(r"[\'\"]update_time[\'\"]\s*:\s*[\'\"]([\d-]+)", _txt)
+                if _m and _m.group(1)[:10] == now_cst().strftime("%Y-%m-%d"):
+                    print("  [skip] 四量终极已为今日(%s)产出，跳过重算(防覆盖算法链先于 final_recommend 的四量)" % _m.group(1)[:10])
+                    return
+        except Exception as _e:
+            print("  [warn] 四量新鲜度检查异常，继续重算: %s" % _e)
         import subprocess as _sp
         try:
             script = ROOT / "algorithms" / "strategy_four_volume.py"

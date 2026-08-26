@@ -285,14 +285,27 @@ def main():
     stop_data = load_js("STOCK_STOP_DATA.js", "STOCK_STOP_DATA")
     stop_stocks = stop_data.get("stocks") or {}
 
-    # ── 读取 60min 四量终极共振数据（多周期确认）──
-    _60m_raw = load_js("FOUR_VOLUME_60M.js", "FOUR_VOLUME_60M")
+    # ── 读取四量终极共振数据（多周期确认）──
+    # 🛡 2026-08-26 一劳永逸：优先 60min 版(FOUR_VOLUME_60M)；但其 update_time 非今日
+    #   （baostock 60min 源常滞后，曾陈旧到 8/22）→ 回退读日线版 FOUR_VOLUME.js（新鲜），
+    #   避免最终推荐用几天前的陈旧四量汇总（"逻辑不对"根因）。两份 schema 兼容(stocks[])。
+    _four_vol_raw = load_js("FOUR_VOLUME_60M.js", "FOUR_VOLUME_60M")
+    _four_vol_src = "60m"
+    try:
+        _ut = _four_vol_raw.get("update_time", "")
+        _ut_date = datetime.strptime(_ut, "%Y-%m-%d %H:%M:%S").date()
+        if _ut_date < datetime.now().date():
+            _four_vol_raw = load_js("FOUR_VOLUME.js", "FOUR_VOLUME")
+            _four_vol_src = "day(60m陈旧回退)"
+            print(f"[warn] 60m 四量 update_time={_ut} 非今日，回退读日线四量终极")
+    except Exception as e:
+        print(f"[warn] 四量新鲜度校验失败，沿用 60m: {e}")
     _60m_hits = {}  # norm_code → {reason, signals[], qd, pct_chg, ...}
-    for item in (_60m_raw.get("hits") or _60m_raw.get("stocks") or []):
+    for item in (_four_vol_raw.get("hits") or _four_vol_raw.get("stocks") or []):
         c = norm_code(item.get("code") or item.get("code"))
         if c:
             _60m_hits[c] = item
-    print(f"[info] 60m 四量数据: 加载 {len(_60m_hits)} 只命中")
+    print(f"[info] 四量数据({_four_vol_src}): 加载 {len(_60m_hits)} 只命中")
 
     # 读取回测/跟踪数据（用于 Top3 卡片展示）
     cb = load_json("cockpit_backtest.json")
