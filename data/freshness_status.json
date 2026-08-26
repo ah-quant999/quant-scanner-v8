@@ -1,30 +1,14 @@
 {
-  "check_time": "2026-08-26 19:19:08",
+  "check_time": "2026-08-26 20:57:55",
   "last_trade_close": "2026-08-26 15:30:00",
   "is_trading_day": true,
-  "core_stale": [
-    {
-      "var": "VOLATILITY",
-      "reason": "更新于 08-25 22:19，落后 2 个交易日（阈值 1.08333）",
-      "category": "post_close"
-    },
-    {
-      "var": "TOP5_TRACK",
-      "reason": "更新于 08-25 22:37，落后 2 个交易日（阈值 1）",
-      "category": "algo"
-    },
-    {
-      "var": "CRDS_CARD_DATA",
-      "reason": "更新于 08-25 21:58，落后 2 个交易日（阈值 1）",
-      "category": "algo"
-    }
-  ],
+  "core_stale": [],
   "warn_stale": [],
   "frozen_stale": [],
   "no_update_time": [],
   "summary": {
     "total_checked": 50,
-    "core_stale": 3,
+    "core_stale": 0,
     "warn_stale": 0,
     "frozen_stale": 0,
     "no_timestamp": 0
