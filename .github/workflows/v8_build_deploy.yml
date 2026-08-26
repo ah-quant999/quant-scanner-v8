@@ -206,7 +206,20 @@ jobs:
               [print('  -',x) for x in stale]; sys.exit(1)
           print('✅ 关键数据均为今日新鲜')
           PYF
-            git add -f data/ index.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py
+            # 🛡 2026-08-26 一劳永逸根因修复（涨跌家/资金60日/共振日历长期「只1天/空」）：
+            #   累加型 raw_data 此前只靠 cn_fetch/algo_cloud 的 api_push_raw（Contents API + git status 变更清单），
+            #   遇大 tree 会 HTTP 422 失败且 continue-on-error 吞掉 → 这些文件永不持久化 → 每轮构建从陈旧基线重来（死亡螺旋）。
+            #   现由本部署步用【可靠 git】一并提交累加型小文件（非缓存），确保下一轮 checkout 拿到真实累积基线。
+            #   仅列历史累加型文件，避免把 kline/_rps 等缓存（共 51M）塞进仓库。
+            git add -f data/ index.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py \
+              raw_data/sh_sz_history.json \
+              raw_data/sector_fund_flow_history.json \
+              raw_data/triple_resonance_history.json \
+              raw_data/triple_history.json \
+              raw_data/triple_track.json \
+              raw_data/h_auto_buy_history.json \
+              raw_data/lhb_history.json \
+              raw_data/stock_profile.json
             if git diff --cached --quiet; then
               echo "ℹ️ 无数据变化，跳过部署（远端已是最新构建）"
               exit 0
