@@ -113,7 +113,8 @@
       "2026-08-20": 35.45,
       "2026-08-22": 34.74,
       "2026-08-23": 35.45,
-      "2026-08-25": 33.68
+      "2026-08-25": 33.68,
+      "2026-08-26": 33.68
     },
     "300476": {
       "2026-08-17": 0,
@@ -175,7 +176,8 @@
     "600988": {
       "2026-08-20": 46.1,
       "2026-08-22": 49.43,
-      "2026-08-25": 47.66
+      "2026-08-25": 47.66,
+      "2026-08-26": 47.66
     },
     "000703": {
       "2026-08-20": 20.1,
@@ -186,31 +188,34 @@
       "2026-08-23": 238.96
     },
     "000426": {
-      "2026-08-22": 40.88
+      "2026-08-22": 40.88,
+      "2026-08-26": 39.5
     },
     "600183": {
       "2026-08-22": 132.8,
       "2026-08-23": 132.8
     },
     "600489": {
-      "2026-08-22": 27.18
+      "2026-08-22": 27.18,
+      "2026-08-26": 26.24
     },
     "000792": {
       "2026-08-23": 28.81
     },
     "300394": {
-      "2026-08-25": 257.1
+      "2026-08-25": 257.1,
+      "2026-08-26": 257.1
     }
   },
   "_tracking_latest": {
     "601899": {
       "enter_date": "2026-08-17",
       "enter_close": 35.45,
-      "last_date": "2026-08-25",
+      "last_date": "2026-08-26",
       "last_close": 33.68,
-      "status": "near",
-      "streak": 3,
-      "total_days": 7
+      "status": "strict",
+      "streak": 4,
+      "total_days": 8
     },
     "603993": {
       "enter_date": "2026-08-17",
@@ -390,11 +395,11 @@
     "600988": {
       "enter_date": "2026-08-20",
       "enter_close": 46.1,
-      "last_date": "2026-08-25",
+      "last_date": "2026-08-26",
       "last_close": 47.66,
-      "status": "near",
-      "streak": 1,
-      "total_days": 2
+      "status": "strict",
+      "streak": 2,
+      "total_days": 3
     },
     "000703": {
       "enter_date": "2026-08-20",
@@ -426,20 +431,20 @@
     "600489": {
       "enter_date": "2026-08-22",
       "enter_close": 27.18,
-      "last_date": "2026-08-22",
-      "last_close": 27.18,
-      "status": "dropped",
+      "last_date": "2026-08-26",
+      "last_close": 26.24,
+      "status": "near",
       "streak": 1,
-      "total_days": 1
+      "total_days": 2
     },
     "000426": {
       "enter_date": "2026-08-22",
       "enter_close": 40.88,
-      "last_date": "2026-08-22",
-      "last_close": 40.88,
-      "status": "dropped",
+      "last_date": "2026-08-26",
+      "last_close": 39.5,
+      "status": "near",
       "streak": 1,
-      "total_days": 1
+      "total_days": 2
     },
     "000792": {
       "enter_date": "2026-08-23",
@@ -453,17 +458,17 @@
     "300394": {
       "enter_date": "2026-08-25",
       "enter_close": 257.1,
-      "last_date": "2026-08-25",
+      "last_date": "2026-08-26",
       "last_close": 257.1,
       "status": "near",
-      "streak": 1,
-      "total_days": 1
+      "streak": 2,
+      "total_days": 2
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-08-25 22:18:54"
+    "last_update": "2026-08-26 19:45:47"
   },
   "2026-08-18": [
     {
@@ -1179,6 +1184,88 @@
       "pct_chg": 0,
       "total_score": 15,
       "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    }
+  ],
+  "2026-08-26": [
+    {
+      "code": "601899",
+      "name": "紫金矿业",
+      "market": "sh",
+      "board": "主板",
+      "close": 33.68,
+      "pct_chg": -2.49,
+      "total_score": 33.6,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "status": "strict"
+    },
+    {
+      "code": "600988",
+      "name": "赤峰黄金",
+      "market": "sh",
+      "board": "主板",
+      "close": 47.66,
+      "pct_chg": -2.28,
+      "total_score": 32.4,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "status": "strict"
+    },
+    {
+      "code": "300394",
+      "name": "天孚通信",
+      "market": "sz",
+      "board": "创业板",
+      "close": 257.1,
+      "pct_chg": 3.05,
+      "total_score": 32.0,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "000426",
+      "name": "兴业银锡",
+      "market": "sz",
+      "board": "主板",
+      "close": 39.5,
+      "pct_chg": -6.6,
+      "total_score": 27.6,
+      "quality_grade": "B",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "600489",
+      "name": "中金黄金",
+      "market": "sh",
+      "board": "主板",
+      "close": 26.24,
+      "pct_chg": -3.74,
+      "total_score": 27.6,
+      "quality_grade": "B",
       "industry": "有色金属矿采选业",
       "sectors": [
         "有色金属矿采选业"
