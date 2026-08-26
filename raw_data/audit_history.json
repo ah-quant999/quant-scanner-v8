@@ -557,5 +557,85 @@
     "message": "未找到元素"
    }
   ]
+ },
+ {
+  "date": "2026-08-26",
+  "time": "15:57:50",
+  "overall": "fail",
+  "summary": {
+   "ok": 103,
+   "warn": 10,
+   "fail": 3,
+   "total": 116
+  },
+  "warn_items": [
+   {
+    "id": "site_sync",
+    "name": "Pages 部署同步",
+    "message": "本地 HEAD 8d71229 / 线上 b9fddbb：线上 commit 在本地对象库中不存在，无法比较（fetch 后自动恢复）"
+   },
+   {
+    "id": "dom_taskScheduleBody",
+    "name": "DOM #taskScheduleBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttBackBody",
+    "name": "DOM #ttBackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttThrBody",
+    "name": "DOM #ttThrBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttSvlBody",
+    "name": "DOM #ttSvlBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttTrackBody",
+    "name": "DOM #ttTrackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsAdvBody",
+    "name": "DOM #stcrdsAdvBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsEliteBody",
+    "name": "DOM #stcrdsEliteBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_healthCheckBody",
+    "name": "DOM #healthCheckBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "all_SECTOR_RECOMMENDATION",
+    "name": "SECTOR_RECOMMENDATION",
+    "message": "SECTOR_RECOMMENDATION.js 无 update_time/date/generated 时间戳，无法判龄（缺审计登记）"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "raw_volume",
+    "name": "raw_data 文件数",
+    "message": "raw_data 共 1172 个文件（>1100），仓库膨胀，需分流/归档"
+   },
+   {
+    "id": "dom_phMacroBody",
+    "name": "DOM #phMacroBody",
+    "message": "未找到元素"
+   },
+   {
+    "id": "all_FOUR_VOLUME_60M",
+    "name": "FOUR_VOLUME_60M",
+    "message": "FOUR_VOLUME_60M.js 更新于 4天前 08:54；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   }
+  ]
  }
 ]
