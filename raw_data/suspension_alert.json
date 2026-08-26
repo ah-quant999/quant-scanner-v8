@@ -1,51 +1,45 @@
 {
-  "update_time": "2026-08-25 22:19:30",
+  "update_time": "2026-08-26 08:38:23",
   "suspended": [
     {
       "code": "200706",
       "name": "瓦轴B",
-      "days": 176,
+      "days": 177,
       "reason": "刊登重要公告"
-    },
-    {
-      "code": "600984",
-      "name": "建设机械",
-      "days": 14,
-      "reason": "拟筹划重大资产重组"
     },
     {
       "code": "002155",
       "name": "湖南黄金",
-      "days": 5,
+      "days": 6,
       "reason": "刊登重要公告"
     },
     {
       "code": "200016",
       "name": "*ST康佳B",
-      "days": 1,
+      "days": 2,
       "reason": "刊登重要公告"
     },
     {
       "code": "000016",
       "name": "*ST康佳A",
-      "days": 1,
-      "reason": "刊登重要公告"
-    },
-    {
-      "code": "301117",
-      "name": "ST佳缘",
-      "days": 1,
+      "days": 2,
       "reason": "刊登重要公告"
     },
     {
       "code": "600525",
-      "name": "ST长园",
-      "days": 0,
+      "name": "长园集团",
+      "days": 1,
       "reason": "刊登重要公告"
     },
     {
       "code": "600165",
-      "name": "ST宁科",
+      "name": "宁科生物",
+      "days": 1,
+      "reason": "刊登重要公告"
+    },
+    {
+      "code": "002274",
+      "name": "华昌化工",
       "days": 0,
       "reason": "刊登重要公告"
     }

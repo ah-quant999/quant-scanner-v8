@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-08-25 21:40:24",
+  "update_time": "2026-08-26 08:17:05",
   "total": 159,
   "grade_summary": {
     "A": 14,
     "B": 14,
-    "C": 46,
+    "C": 47,
     "D": 29,
-    "no_data": 56
+    "no_data": 55
   },
   "stocks": {
     "hk_00005": {
@@ -886,11 +886,11 @@
       }
     },
     "sh_688835": {
-      "score": 0,
-      "grade": "",
-      "roe": null,
-      "revenue_growth": null,
-      "reason": "无基本面数据",
+      "score": 55,
+      "grade": "C",
+      "roe": 13.431199999999999,
+      "revenue_growth": 32.0689,
+      "reason": "ROE一般(13.4%) | 营收高增(32.1%)",
       "news": {
         "score": 15,
         "tags": [
@@ -925,10 +925,9 @@
       "revenue_growth": 37.8972,
       "reason": "ROE良好(19.6%) | 营收高增(37.9%)",
       "news": {
-        "score": 20,
+        "score": 15,
         "tags": [
-          "中报预增",
-          "收购"
+          "中报预增"
         ]
       }
     },
