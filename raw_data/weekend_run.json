@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-26 15:45:29",
-  "generated": "2026-08-26 15:45:29",
+  "update_time": "2026-08-26 16:19:28",
+  "generated": "2026-08-26 16:19:28",
   "period_start": "2026-08-17",
   "period_end": "2026-08-23",
   "stats": {
@@ -9,13 +9,7 @@
     "tracked_files": 10,
     "ok_files": 9,
     "missing_files": 1,
-    "latest_health": {
-      "ok": 106,
-      "warn": 1,
-      "fail": 0,
-      "total": 107,
-      "updated": "2026-08-26 15:29:06"
-    }
+    "latest_health": null
   },
   "freshness": [
     {
@@ -30,14 +24,14 @@
       "label": "三重共振历史",
       "status": "ok",
       "update_time": "2026-08-25 23:10:29",
-      "size_kb": 25.2
+      "size_kb": 24.1
     },
     {
       "file": "top10_daily.json",
       "label": "全站精选",
       "status": "ok",
       "update_time": "2026-08-25 22:05:38",
-      "size_kb": 21.7
+      "size_kb": 20.9
     },
     {
       "file": "cockpit_tier_recommend.json",
@@ -58,7 +52,7 @@
       "label": "最终推荐池",
       "status": "ok",
       "update_time": "2026-08-25 22:37:19",
-      "size_kb": 45.0
+      "size_kb": 43.2
     },
     {
       "file": "gold_pool.json",

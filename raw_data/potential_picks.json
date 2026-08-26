@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-26 15:44:22",
+  "update_time": "2026-08-26 16:16:07",
   "data_date": "2026-08-26",
   "source": "CONCEPT_RANKING × STOCK_PROFILE × STOCK_QUOTE",
   "hot_concepts_count": 33,
@@ -19,8 +19,8 @@
     {
       "code": "600030",
       "name": "中信证券",
-      "pct": 2.39,
-      "amount_yi": 46.2,
+      "pct": 2.28,
+      "amount_yi": 47.69,
       "hot_concepts": [
         "2026中报预增",
         "AH股",
@@ -41,13 +41,13 @@
         "金融地产风格"
       ],
       "hot_count": 17,
-      "total_score": 22.95
+      "total_score": 22.89
     },
     {
       "code": "601688",
       "name": "华泰证券",
       "pct": 2.96,
-      "amount_yi": 16.86,
+      "amount_yi": 17.43,
       "hot_concepts": [
         "2026中报预增",
         "AH股",
@@ -65,13 +65,13 @@
         "金融地产风格"
       ],
       "hot_count": 14,
-      "total_score": 20.82
+      "total_score": 20.88
     },
     {
       "code": "601211",
       "name": "国泰海通",
-      "pct": 3.18,
-      "amount_yi": 18.66,
+      "pct": 3.12,
+      "amount_yi": 19.5,
       "hot_concepts": [
         "AH股",
         "MSCI中国",
@@ -88,13 +88,13 @@
         "金融地产风格"
       ],
       "hot_count": 13,
-      "total_score": 20.38
+      "total_score": 20.44
     },
     {
       "code": "601318",
       "name": "中国平安",
-      "pct": 2.09,
-      "amount_yi": 56.93,
+      "pct": 2.04,
+      "amount_yi": 58.86,
       "hot_concepts": [
         "AH股",
         "MSCI中国",
@@ -113,13 +113,13 @@
         "金融地产风格"
       ],
       "hot_count": 15,
-      "total_score": 20.29
+      "total_score": 20.26
     },
     {
       "code": "601899",
       "name": "紫金矿业",
-      "pct": 2.44,
-      "amount_yi": 106.05,
+      "pct": 2.35,
+      "amount_yi": 109.24,
       "hot_concepts": [
         "2026中报预增",
         "AH股",
@@ -136,13 +136,13 @@
         "黄金概念"
       ],
       "hot_count": 13,
-      "total_score": 20.13
+      "total_score": 20.08
     },
     {
       "code": "601628",
       "name": "中国人寿",
-      "pct": 2.58,
-      "amount_yi": 15.07,
+      "pct": 2.61,
+      "amount_yi": 15.58,
       "hot_concepts": [
         "2026中报预增",
         "AH股",
@@ -159,13 +159,13 @@
         "金融地产风格"
       ],
       "hot_count": 13,
-      "total_score": 19.44
+      "total_score": 19.51
     },
     {
       "code": "000776",
       "name": "广发证券",
-      "pct": 3.52,
-      "amount_yi": 19.45,
+      "pct": 3.67,
+      "amount_yi": 19.9,
       "hot_concepts": [
         "2026中报预增",
         "AH股",
@@ -181,13 +181,13 @@
         "金融地产风格"
       ],
       "hot_count": 12,
-      "total_score": 19.29
+      "total_score": 19.41
     },
     {
       "code": "601066",
       "name": "中信建投",
-      "pct": 2.68,
-      "amount_yi": 7.19,
+      "pct": 2.56,
+      "amount_yi": 7.45,
       "hot_concepts": [
         "2026中报预增",
         "AH股",
@@ -204,13 +204,34 @@
         "金融地产风格"
       ],
       "hot_count": 13,
-      "total_score": 19.18
+      "total_score": 19.14
+    },
+    {
+      "code": "601995",
+      "name": "中金公司",
+      "pct": 2.58,
+      "amount_yi": 8.44,
+      "hot_concepts": [
+        "2026中报预增",
+        "AH股",
+        "MSCI中国",
+        "互联网金融",
+        "券商概念",
+        "周期股",
+        "大盘股",
+        "富时罗素",
+        "沪股通",
+        "融资融券",
+        "金融地产风格"
+      ],
+      "hot_count": 11,
+      "total_score": 17.93
     },
     {
       "code": "002475",
       "name": "立讯精密",
-      "pct": 4.61,
-      "amount_yi": 80.57,
+      "pct": 4.1,
+      "amount_yi": 86.49,
       "hot_concepts": [
         "AH股",
         "MSCI中国",
@@ -226,57 +247,13 @@
         "融资融券"
       ],
       "hot_count": 12,
-      "total_score": 18.19
-    },
-    {
-      "code": "300059",
-      "name": "东方财富",
-      "pct": 2.38,
-      "amount_yi": 62.1,
-      "hot_concepts": [
-        "MSCI中国",
-        "互联网金融",
-        "券商概念",
-        "区块链",
-        "参股期货",
-        "周期股",
-        "大盘股",
-        "富时罗素",
-        "权重股",
-        "深股通",
-        "茅指数",
-        "融资融券",
-        "金融地产风格"
-      ],
-      "hot_count": 13,
-      "total_score": 17.92
-    },
-    {
-      "code": "601995",
-      "name": "中金公司",
-      "pct": 2.58,
-      "amount_yi": 7.98,
-      "hot_concepts": [
-        "2026中报预增",
-        "AH股",
-        "MSCI中国",
-        "互联网金融",
-        "券商概念",
-        "周期股",
-        "大盘股",
-        "富时罗素",
-        "沪股通",
-        "融资融券",
-        "金融地产风格"
-      ],
-      "hot_count": 11,
-      "total_score": 17.89
+      "total_score": 17.93
     },
     {
       "code": "601108",
       "name": "财通证券",
-      "pct": 3.46,
-      "amount_yi": 7.29,
+      "pct": 3.58,
+      "amount_yi": 7.53,
       "hot_concepts": [
         "2026中报预增",
         "MSCI中国",
@@ -294,35 +271,36 @@
         "金融地产风格"
       ],
       "hot_count": 14,
-      "total_score": 17.79
+      "total_score": 17.87
     },
     {
-      "code": "600036",
-      "name": "招商银行",
-      "pct": 1.06,
-      "amount_yi": 24.52,
+      "code": "300059",
+      "name": "东方财富",
+      "pct": 2.27,
+      "amount_yi": 63.98,
       "hot_concepts": [
-        "AH股",
         "MSCI中国",
         "互联网金融",
+        "券商概念",
+        "区块链",
+        "参股期货",
+        "周期股",
         "大盘股",
         "富时罗素",
         "权重股",
-        "标准普尔",
-        "沪股通",
-        "深圳特区",
+        "深股通",
         "茅指数",
         "融资融券",
         "金融地产风格"
       ],
-      "hot_count": 12,
-      "total_score": 17.64
+      "hot_count": 13,
+      "total_score": 17.87
     },
     {
       "code": "601600",
       "name": "中国铝业",
-      "pct": 2.46,
-      "amount_yi": 19.79,
+      "pct": 2.35,
+      "amount_yi": 20.56,
       "hot_concepts": [
         "2026中报预增",
         "AH股",
@@ -336,13 +314,13 @@
         "融资融券"
       ],
       "hot_count": 10,
-      "total_score": 17.59
+      "total_score": 17.56
     },
     {
       "code": "600958",
       "name": "东方证券",
       "pct": 1.9,
-      "amount_yi": 6.43,
+      "amount_yi": 6.7,
       "hot_concepts": [
         "AH股",
         "MSCI中国",
@@ -358,13 +336,35 @@
         "金融地产风格"
       ],
       "hot_count": 12,
-      "total_score": 17.52
+      "total_score": 17.55
+    },
+    {
+      "code": "600036",
+      "name": "招商银行",
+      "pct": 0.76,
+      "amount_yi": 25.74,
+      "hot_concepts": [
+        "AH股",
+        "MSCI中国",
+        "互联网金融",
+        "大盘股",
+        "富时罗素",
+        "权重股",
+        "标准普尔",
+        "沪股通",
+        "深圳特区",
+        "茅指数",
+        "融资融券",
+        "金融地产风格"
+      ],
+      "hot_count": 12,
+      "total_score": 17.49
     }
   ],
   "rejected_summary": {
     "no_hot_concept": 5511,
-    "too_hot": 123,
-    "too_cold": 182,
+    "too_hot": 125,
+    "too_cold": 177,
     "small_mv": 0,
     "big_mv": 0,
     "no_quote": 0
