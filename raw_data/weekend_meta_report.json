@@ -1,11 +1,9 @@
 {
-"update_time": "2026-08-26 09:05:42",
+"update_time": "2026-08-26 15:45:29",
 "total": 6798,
-"new_listings_count": 1,
-"delisted_count": 2797,
-"new_listings": [
-"158000 港股通金融ETF鹏华"
-],
+"new_listings_count": 0,
+"delisted_count": 2796,
+"new_listings": [],
 "delisted": [
 "00001 长和",
 "00002 中电控股",
@@ -58,5 +56,5 @@
 "00059 天誉置业",
 "00060 香港食品投资"
 ],
-"meta_enriched": 1
+"meta_enriched": 0
 }
