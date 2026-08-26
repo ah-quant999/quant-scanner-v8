@@ -13,7 +13,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "53bbac8ed";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
+    var BUILD = "fd3cb5606";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
     var KEY = "v8_build_sha";
     var cached = localStorage.getItem(KEY);
     if(cached && cached !== BUILD){
@@ -455,40 +455,40 @@ window.__domReadyFns=[];
   .tp-hist-cell .tp-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
   .tp-empty{color:var(--dim);text-align:center;padding:24px 10px;font-size:13px}
 </style>
-    <script src="data/ETF_INTRADAY_HEAT.js?v=02e9588aba" defer></script>
-    <script src="data/SECTOR_FUND_FLOW.js?v=008a8b1a46" defer></script>
+    <script src="data/ETF_INTRADAY_HEAT.js?v=9a9d1c3fae" defer></script>
+    <script src="data/SECTOR_FUND_FLOW.js?v=1c3dd98617" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=d1e6973d75" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=5ee39c4c55" defer></script>
-    <script src="data/ANALYST_RATINGS.js?v=ade25fad15" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=5141efebd1" defer></script>
+    <script src="data/ANALYST_RATINGS.js?v=d9244376c4" defer></script>
     <script src="data/SUSPENSION_ALERT.js?v=b6955fa1fd" defer></script>
     <script src="data/GOLD_POOL.js?v=865317448e" defer></script>
     <!-- A2 懒加载：STOCK_LIST 移至文末 loader 按需注入 -->
     <!-- A2 懒加载：STOCK_PROFILE 移至文末 loader 按需注入 -->
     <!-- A2 懒加载：STOCK_QUOTE 移至文末 loader 按需注入 -->
-    <script src="data/MACRO_DATA.js?v=8f53c8ade2" defer></script>
-    <script src="data/MACRO_BRIEF.js?v=9ef35a102b" defer></script>
+    <script src="data/MACRO_DATA.js?v=7496f943b4" defer></script>
+    <script src="data/MACRO_BRIEF.js?v=00d021d323" defer></script>
 <script src="data/NT_DATA.js?v=95e45d54d0" defer></script>
 <script src="data/LHB_DATA.js?v=05866176b3" defer></script>
 <script src="data/LHB_7D.js?v=9fa4d86d9c" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
-<script src="data/CONCEPT_RANKING.js?v=32d54c188c" defer></script>
+<script src="data/CONCEPT_RANKING.js?v=d09b1430d0" defer></script>
 <!-- 2026-08-23 恢复：潜力挖掘板块+股票预测推荐数据（calc_potential_picks.py 输出，跟盘后算法链自动更新） -->
 <script src="data/POTENTIAL_PICKS.js?v=52c0f6bd9e" defer></script>
-<script src="data/INDEX_QUOTES.js?v=664f9578ba" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=b29dda7d87" defer></script>
-<script src="data/MARGIN_DATA.js?v=ef7738278b" defer></script>
-<script src="data/CFFEX_HOLDINGS.js?v=a00f0a3145" defer></script>
-<script src="data/IPO_DATA.js?v=a899b016df" defer></script>
-    <script src="data/CRISIS_DATA.js?v=df00dcb14c" defer></script>
-    <script src="data/JUDGMENT_DATA.js?v=c6b375d052" defer></script>
-    <script src="data/OVERSEAS_MARKETS.js?v=7d203634e2" defer></script>
+<script src="data/INDEX_QUOTES.js?v=f583e3bd8a" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=1ad5c958ee" defer></script>
+<script src="data/MARGIN_DATA.js?v=34d2834c4b" defer></script>
+<script src="data/CFFEX_HOLDINGS.js?v=32ce40e6c9" defer></script>
+<script src="data/IPO_DATA.js?v=954d9cc5cd" defer></script>
+    <script src="data/CRISIS_DATA.js?v=16c67f2d19" defer></script>
+    <script src="data/JUDGMENT_DATA.js?v=0f9f329470" defer></script>
+    <script src="data/OVERSEAS_MARKETS.js?v=ea712d059e" defer></script>
     <script src="data/STOCK_RPS.js?v=d2394ae473" defer></script>
     <!-- 🛡 2026-08-19：H 反推短线买点（data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js）反推代码 + 跟踪回测，独立于 PDF OCR
          v= 占位由 api_push_raw._stamp_index_v 在每日推送后自动重写为新 sha，确保 CDN 不缓存旧版 -->
     <script src="data/H_AUTO_BUY.js?v=afd1ae8e39" defer></script>
     <script src="data/H_AUTO_BUY_TRACK.js?v=d81af248b0" defer></script>
-    <script src="data/AVG_PRICE_DATA.js?v=3328d3ffc4" defer></script>
+    <script src="data/AVG_PRICE_DATA.js?v=94237fff4c" defer></script>
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
     <script src="data/PORTFOLIO_COST.js?v=befe07aa7c" defer></script>
     <script src="data/PORTFOLIO.js?v=0a35398ae7" defer></script>
@@ -1251,21 +1251,21 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/TRIPLE_HISTORY.js?v=813be62aff" defer></script>
 <script src="data/COCKPIT_TIER_RECOMMEND.js?v=df2d649145" defer></script>
 <script src="data/COCKPIT_ADVICE.js?v=40756ec74e" defer></script>
-<script src="data/V8_CAL.js?v=9df73e7177"></script>
+<script src="data/V8_CAL.js?v=4f42af8774"></script>
 <script src="data/SH_FIB.js?v=62c775f525" defer></script>
 <script src="data/SZ_FIB.js?v=b43f0c82f1" defer></script>
 <script src="data/SECTOR_RS.js?v=bd3dea93e7" defer></script>
 <script src="data/SECTOR_PHASE_HISTORY.js?v=dc040e022b" defer></script>
 <script src="data/INST_TRADE.js?v=810612f7dd" defer></script>
-<script src="data/NORTH_FUND.js?v=9b2e4c3d86" defer></script>
-<script src="data/MARKET_ALERTS.js?v=423ee546c9" defer></script>
-<script src="data/MARKET_FUND_FLOW_DATA.js?v=42fed85834" defer></script>
-<script src="data/ETF_SUBSCRIPTION.js?v=4f7f76704a" defer></script>
-<script src="data/LIMIT_UP_HEATMAP.js?v=6cd4304ea3" defer></script>
-<script src="data/HERDING_DATA.js?v=b5f54f768e" defer></script>
+<script src="data/NORTH_FUND.js?v=3fd7b95768" defer></script>
+<script src="data/MARKET_ALERTS.js?v=66fdd1464d" defer></script>
+<script src="data/MARKET_FUND_FLOW_DATA.js?v=85df1b197c" defer></script>
+<script src="data/ETF_SUBSCRIPTION.js?v=4aaee84cc6" defer></script>
+<script src="data/LIMIT_UP_HEATMAP.js?v=fe5102ecec" defer></script>
+<script src="data/HERDING_DATA.js?v=328ee1b9fe" defer></script>
 <script src="data/VOLATILITY.js?v=64299e143b" defer></script>
-<script src="data/CAPITAL_FLOW_DATA.js?v=7b5a3805bb" defer></script>
-<script src="data/SH_SZ_HISTORY.js?v=63219be435" defer></script>
+<script src="data/CAPITAL_FLOW_DATA.js?v=8ba1da6085" defer></script>
+<script src="data/SH_SZ_HISTORY.js?v=af1e25a26a" defer></script>
 <script src="data/MAHORO.js?v=328c5748cf" defer></script>
 <script src="data/CANDIDATE.js?v=44123ea469" defer></script>
     <script src="data/FOUR_VOLUME.js?v=7361b8b8fb" defer></script>
@@ -1275,26 +1275,26 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/COCKPIT_BACKTEST.js?v=174460c620" defer></script>
 <script src="data/BACKTEST_TDX.js?v=36b07cdc5a" defer></script>
 <script src="data/OPTIMIZED_STRATEGY.js?v=08528a3167" defer></script>
-<script src="data/EXPERIMENT.js?v=04bdeeda89" defer></script>
+<script src="data/EXPERIMENT.js?v=7b8bbfe534" defer></script>
 <script src="data/FINAL_RECOMMEND_DATA.js?v=da9766880e" defer></script>
 <script src="data/TOP5_TRACK.js?v=27384cc2ff" defer></script>
 <script src="data/ALGO_TRACK.js?v=99399b8a9e" defer></script>
-<script src="data/ETF_PULSE.js?v=a39ceb47f9" defer></script>
-<script src="data/ETF_DAILY_MONITOR.js?v=5cb30e1453" defer></script>
+<script src="data/ETF_PULSE.js?v=0557d5aaa6" defer></script>
+<script src="data/ETF_DAILY_MONITOR.js?v=be65a3b67a" defer></script>
 <script src="data/TOP10_DAILY.js?v=c27ba190d8" defer></script>
 <script src="data/WEEKEND_RUN.js?v=69786f6301" defer></script>
-<script src="data/W52_HIGH.js?v=aa74fe684b" defer></script>
-<script src="data/CANDIDATE_QUOTES.js?v=c09def94d0" defer></script>
-<script src="data/RUNNER_STATUS.js?v=8f7ee09964" defer></script>
-<script src="data/HEALTH_CHECK.js?v=e3549f6f9f" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=c5f7b5dfee" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=da8e75a749" defer></script>
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=35b2b0fbe6" defer></script>
-    <script src="data/INDEX_HISTORY.js?v=26dfe68338" defer></script>
+<script src="data/W52_HIGH.js?v=97c4a2cab0" defer></script>
+<script src="data/CANDIDATE_QUOTES.js?v=0073318995" defer></script>
+<script src="data/RUNNER_STATUS.js?v=9392eb10e2" defer></script>
+<script src="data/HEALTH_CHECK.js?v=f5076d0180" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=64e4d8dd51" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=829bb3dd65" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=82e0f6e41a" defer></script>
+    <script src="data/INDEX_HISTORY.js?v=6f0a97130f" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE.js?v=c6a9adf1ea" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=b787134fdd" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=11dd759cf9" defer></script>
-    <script src="data/ALGO_BACKTEST_COMPARE.js?v=83ae9dccf2" defer></script>
+    <script src="data/ALGO_BACKTEST_COMPARE.js?v=b612b87292" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -7175,7 +7175,7 @@ window.__renderV8CalFull();
       applyData(window.IPO_DATA);
     }else{
       // 优先 fetch data/IPO_DATA.js?v=bf5d738bc6（真实数据文件），其次 data/ipo_score.json（兼容旧路径）
-      fetch('data/IPO_DATA.js?v=a899b016df')
+      fetch('data/IPO_DATA.js?v=954d9cc5cd')
         .then(r=>{ if(!r.ok) throw new Error('data/IPO_DATA.js?v=bf5d738bc6 http '+r.status); return r.text(); })
         .then(txt=>{ const m=txt.match(/window\.IPO_DATA\s*=\s*({[\s\S]+?});?\s*$/); if(!m) throw new Error('no IPO_DATA found'); return JSON.parse(m[1]); })
         .then(applyData)
@@ -13441,7 +13441,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch('data/HEALTH_CHECK.js?v=e3549f6f9f'+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch('data/HEALTH_CHECK.js?v=f5076d0180'+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]):'';
       if(remoteTs && remoteTs!==localTs){
@@ -14040,8 +14040,8 @@ window.__renderV8CalToday();
 (function(){
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=52aaf0a0f6'},
-    {name:'STOCK_PROFILE', url:'data/STOCK_PROFILE.js?v=9d118fcdf2'},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=f080ee9dd3'},
+    {name:'STOCK_PROFILE', url:'data/STOCK_PROFILE.js?v=1bf641e487'},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=3b6253bc87'},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=43689c7c3c'}
   ];
   function loadOne(item, done){
