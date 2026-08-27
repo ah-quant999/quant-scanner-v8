@@ -297,6 +297,21 @@ jobs:
         run: |
           python v8_health_check.py
 
+      # 🛡 2026-08-27 主人令（盘中更新全断根因修复）：update_v8 重建的 data/*.js 之前从不推送，
+      #   依赖外部 build（workflow_run）推送；而 build 并发组被僵尸 run 占死 → data 永不更新。
+      #   自闭环：重建后立即推送 data 变更（PUSH_FILES 来源驱动增量），不依赖外部 build。
+      - name: "📤 推送重建的 data/*.js（自闭环，防 build 触发失效）"
+        continue-on-error: true
+        shell: bash
+        run: |
+          DATA_MANIFEST=
+          if [ -z "" ]; then
+            echo "ℹ️ 本次无 data 变更，跳过推送"
+          else
+            echo "📋 推送重建 data: "
+            PUSH_FILES="" python api_push_raw.py
+          fi
+
       - name: "🛰️ 云端兜底调度（算法链/温度计，幂等）"
         if: success()
         continue-on-error: true

@@ -53,7 +53,10 @@ permissions:
 
 concurrency:
   group: v8-build-deploy
-  cancel-in-progress: false
+  # 🛡 2026-08-27 主人令（11:00/11:30 盘中更新全断根因）：8-09 幽灵 in_progress build run
+  #   一直占着本并发组，后续 workflow_run 触发的 build 全部排队 → data/*.js 永不重建。
+  #   改 cancel-in-progress: true：新触发的 build 取消旧排队/僵尸，永远跑最新 raw_data。
+  cancel-in-progress: true
 
 jobs:
   build:
