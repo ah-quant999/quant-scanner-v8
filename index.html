@@ -8006,7 +8006,9 @@ window.__renderV8CalFull();
                borderColor:'#334155', textStyle:{color:'#e2e8f0'},
                valueFormatter:function(v){return (v!=null?(v>=0?'+':'')+v.toFixed(1)+'亿':'-');}},
       legend:{show:false},
-      grid:{top:20, left:65, right:65, bottom:50},
+      // 🛡 2026-08-27 主人令：grid.top 从 20 提到 55——上方 HTML legend 占 ~45px，
+      //   原 top=20 导致绘图区被 legend 遮盖，Y 轴顶部数据看不到。
+      grid:{top:55, left:65, right:65, bottom:50},
       xAxis:{type:'category', data:xData, boundaryGap:false,
              axisLine:{lineStyle:{color:'#475569'}}, axisLabel:{color:'#94a3b8', fontSize:11}},
       yAxis:[{type:'value', name:'累计净额（亿）', nameTextStyle:{color:'#94a3b8'},
@@ -8020,7 +8022,11 @@ window.__renderV8CalFull();
               axisLine:{lineStyle:{color:'#475569'}}, splitLine:{lineStyle:{color:'#1e293b'}},
               axisLabel:{color:'#94a3b8', formatter:function(v){return v>=0?'+'+v:v;}}},
              {type:'value', name:'指数 %', position:'right',
-              min:-5, max:5,
+              // 🛡 2026-08-27 主人令：副轴从硬编码 ±5 改为「数据自适应 + 安全边界」。
+              //   旧版 min:-5/max:5 导致昨日大涨（>5%）板块线画到图外不可见。
+              //   新逻辑：取数据极值 + 20%余量，clamp 到 [-20, 20] 防异常值拉胯；无数据时回退 ±5。
+              min:function(v){ if(!v.min || !isFinite(v.min)) return -5; var lo=v.min-Math.abs(v.min)*0.2; return Math.max(-20, lo); },
+              max:function(v){ if(!v.max || !isFinite(v.max)) return 5; var hi=v.max+Math.abs(v.max)*0.2; return Math.min(20, hi); },
               axisLine:{lineStyle:{color:'#475569'}}, splitLine:{show:false},
               axisLabel:{color:'#94a3b8', formatter:function(v){return (v>=0?'+':'')+v+'%';}}}],
       dataZoom:[{type:'inside', start:0, end:100}, {type:'slider', height:18, bottom:8,
