@@ -1,1 +1,1 @@
-window.AVG_PRICE_DATA = {"no_data":true,"premarket_cleared":true,"note":"盘前数据已清空，开盘后自动刷新","update_time":"2026-08-27 09:12:41","republish_time":"2026-08-27 09:17:59"};
+window.AVG_PRICE_DATA = {"date":"2026-08-27","avg_price":28.1475,"avg_change_pct":0.0474,"prev_avg_price":null,"count":5280,"ma20":28.1475,"ma60":28.1475,"position_vs_ma20":0.0001,"position_vs_ma60":0.0001,"history":[{"date":"2026-08-27","avg_price":28.1475,"avg_change_pct":0.0474,"count":5280}],"update_time":"2026-08-27 09:47:40","republish_time":"2026-08-27 09:49:55"};
