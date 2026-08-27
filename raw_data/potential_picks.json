@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-28 05:19:38",
+  "update_time": "2026-08-28 05:58:16",
   "data_date": "2026-08-27",
   "source": "CONCEPT_RANKING × STOCK_PROFILE × STOCK_QUOTE",
   "hot_concepts_count": 33,
@@ -405,7 +405,7 @@
     }
   ],
   "rejected_summary": {
-    "no_hot_concept": 2780,
+    "no_hot_concept": 5576,
     "too_hot": 378,
     "too_cold": 70,
     "small_mv": 0,
