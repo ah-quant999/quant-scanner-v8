@@ -1,1 +1,1 @@
-window.WEEKEND_META_REPORT = {"update_time":"2026-08-27 08:10:03","total":9598,"new_listings_count":0,"delisted_count":0,"new_listings":[],"delisted":[],"meta_enriched":0,"republish_time":"2026-08-27 08:12:05"};
+window.WEEKEND_META_REPORT = {"update_time":"2026-08-27 09:59:16","total":9598,"new_listings_count":1,"delisted_count":1,"new_listings":["02912 永义国际"],"delisted":["01218 永义国际"],"meta_enriched":0,"republish_time":"2026-08-27 10:01:45"};
