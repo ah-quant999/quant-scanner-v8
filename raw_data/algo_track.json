@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-27 19:06",
+  "update_time": "2026-08-27 20:30",
   "window_days": 90,
   "total_stats": {
     "four_volume": {
@@ -23,14 +23,14 @@
       "today_signals": 5
     },
     "big_bull": {
-      "tracking": 56,
+      "tracking": 68,
       "history_samples": 0,
       "win_rate": 0,
       "avg_return": 0,
       "exit_target": 0,
       "exit_stop": 0,
       "exit_timeout": 0,
-      "today_signals": 3
+      "today_signals": 15
     }
   },
   "algos": [
@@ -1554,14 +1554,14 @@
       "algo": "big_bull",
       "display_name": "大牛股猎手",
       "stats": {
-        "tracking": 56,
+        "tracking": 68,
         "history_samples": 0,
         "win_rate": 0,
         "avg_return": 0,
         "exit_target": 0,
         "exit_stop": 0,
         "exit_timeout": 0,
-        "today_signals": 3
+        "today_signals": 15
       },
       "tracking": [
         {
@@ -1823,7 +1823,7 @@
           "peak_pct": 27.75,
           "days_in": 44,
           "appear_count": 1,
-          "last_seen": "20260819",
+          "last_seen": "20260827",
           "signal_detail": {
             "period": "daily",
             "reason": "机构0.5亿+游资0.1亿",
@@ -1994,7 +1994,7 @@
           "peak_pct": 0.0,
           "days_in": 34,
           "appear_count": 1,
-          "last_seen": "20260821",
+          "last_seen": "20260827",
           "signal_detail": {
             "period": "daily",
             "reason": "机构0.1亿+游资4.2亿",
@@ -2108,7 +2108,7 @@
           "peak_pct": 0.0,
           "days_in": 34,
           "appear_count": 1,
-          "last_seen": "20260821",
+          "last_seen": "20260827",
           "signal_detail": {
             "period": "daily",
             "reason": "机构0.3亿+游资0.6亿",
@@ -2626,6 +2626,234 @@
             "period": "daily",
             "reason": "机构0.0亿+游资0.1亿",
             "pct_chg": 20.0084
+          }
+        },
+        {
+          "code": "688300",
+          "name": "联瑞新材",
+          "algo": "big_bull",
+          "list_date": "20260827",
+          "list_date_dashed": "2026-08-27",
+          "entry_price": 186.24,
+          "last_close": 186.24,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260827",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "机构1.2亿+游资0.8亿",
+            "pct_chg": 20.0
+          }
+        },
+        {
+          "code": "002636",
+          "name": "金安国纪",
+          "algo": "big_bull",
+          "list_date": "20260827",
+          "list_date_dashed": "2026-08-27",
+          "entry_price": 69.41,
+          "last_close": 69.41,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260827",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "机构0.2亿+游资2.8亿",
+            "pct_chg": 10.0
+          }
+        },
+        {
+          "code": "002396",
+          "name": "星网锐捷",
+          "algo": "big_bull",
+          "list_date": "20260827",
+          "list_date_dashed": "2026-08-27",
+          "entry_price": 33.35,
+          "last_close": 33.35,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260827",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "机构0.7亿+游资1.7亿",
+            "pct_chg": 9.9934
+          }
+        },
+        {
+          "code": "301666",
+          "name": "大普微",
+          "algo": "big_bull",
+          "list_date": "20260827",
+          "list_date_dashed": "2026-08-27",
+          "entry_price": 469.2,
+          "last_close": 469.2,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260827",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "机构0.4亿+游资1.6亿",
+            "pct_chg": 20.0
+          }
+        },
+        {
+          "code": "002536",
+          "name": "飞龙股份",
+          "algo": "big_bull",
+          "list_date": "20260827",
+          "list_date_dashed": "2026-08-27",
+          "entry_price": 54.23,
+          "last_close": 54.23,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260827",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "机构0.0亿+游资0.8亿",
+            "pct_chg": 10.0
+          }
+        },
+        {
+          "code": "000962",
+          "name": "东方钽业",
+          "algo": "big_bull",
+          "list_date": "20260827",
+          "list_date_dashed": "2026-08-27",
+          "entry_price": 57.55,
+          "last_close": 57.55,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260827",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "机构0.6亿+游资0.5亿",
+            "pct_chg": 9.9962
+          }
+        },
+        {
+          "code": "002947",
+          "name": "恒铭达",
+          "algo": "big_bull",
+          "list_date": "20260827",
+          "list_date_dashed": "2026-08-27",
+          "entry_price": 66.5,
+          "last_close": 66.5,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260827",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "机构0.7亿+游资0.4亿",
+            "pct_chg": 4.7409
+          }
+        },
+        {
+          "code": "301399",
+          "name": "英特科技",
+          "algo": "big_bull",
+          "list_date": "20260827",
+          "list_date_dashed": "2026-08-27",
+          "entry_price": 21.24,
+          "last_close": 21.24,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260827",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "机构0.1亿+游资0.4亿",
+            "pct_chg": 20.0
+          }
+        },
+        {
+          "code": "000890",
+          "name": "法尔胜",
+          "algo": "big_bull",
+          "list_date": "20260827",
+          "list_date_dashed": "2026-08-27",
+          "entry_price": 8.78,
+          "last_close": 8.78,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260827",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "机构0.0亿+游资0.4亿",
+            "pct_chg": 10.0251
+          }
+        },
+        {
+          "code": "920176",
+          "name": "维琪科技",
+          "algo": "big_bull",
+          "list_date": "20260827",
+          "list_date_dashed": "2026-08-27",
+          "entry_price": 63.08,
+          "last_close": 63.08,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260827",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "机构0.1亿+游资0.3亿",
+            "pct_chg": -1.5144
+          }
+        },
+        {
+          "code": "001268",
+          "name": "联合精密",
+          "algo": "big_bull",
+          "list_date": "20260827",
+          "list_date_dashed": "2026-08-27",
+          "entry_price": 25.95,
+          "last_close": 25.95,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260827",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "机构0.2亿+游资0.0亿",
+            "pct_chg": 5.7026
+          }
+        },
+        {
+          "code": "920093",
+          "name": "信胜科技",
+          "algo": "big_bull",
+          "list_date": "20260827",
+          "list_date_dashed": "2026-08-27",
+          "entry_price": 20.48,
+          "last_close": 20.48,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260827",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "机构0.0亿+游资0.1亿",
+            "pct_chg": 2.0429
           }
         }
       ],
