@@ -12025,7 +12025,7 @@ function drawUpDownChart(){
     html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
     html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
     html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">#</th>';
-    html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">名称</th>';
+    html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;white-space:nowrap;">名称</th>';
     html += '<th style="padding:8px 6px;text-align:left;color:var(--sub);font-weight:600;">代码</th>';
     html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">当日%</th>';
     html += '<th style="padding:8px 6px;text-align:right;color:var(--sub);font-weight:600;">成交额亿</th>';
@@ -12043,7 +12043,7 @@ function drawUpDownChart(){
       var scoreW = Math.min(100, Math.round((p.total_score/16)*100));
       html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+(hot?'background:rgba(248,113,113,.06);':'')+'">';
       html += '<td style="padding:7px 6px;color:var(--dim);">'+(i+1)+'</td>';
-      html += '<td style="padding:7px 6px;font-weight:700;color:var(--txt);">'+p.name+'</td>';
+      html += '<td style="padding:7px 6px;font-weight:700;color:var(--txt);white-space:nowrap;">'+p.name+'</td>';
       html += '<td style="padding:7px 6px;color:var(--sub);font-family:ui-monospace,Menlo,monospace;">'+p.code+'</td>';
       html += '<td style="padding:7px 6px;text-align:right;color:'+pctColor+';font-weight:600;">'+pctTxt+'</td>';
       html += '<td style="padding:7px 6px;text-align:right;color:'+amtColor+';font-weight:600;">'+(p.amount_yi!=null?p.amount_yi:'-')+'</td>';
