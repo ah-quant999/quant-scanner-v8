@@ -8017,8 +8017,12 @@ window.__renderV8CalFull();
               //   ECharts 默认 max = 1e9，Y 轴 label 变成 999999999（主人截图被遮的「999999」就是这个）。
               //   加 isFinite 检查：无效时回退到 ±50 亿合理范围。
               // 🛡 2026-08-20 主人令加强：硬 clamp 到 ±100 亿，杜绝 99999999 显示
-              min:function(v){var lo=(typeof v.min==='number'&&isFinite(v.min) && v.min>-1e8)?(v.min - Math.abs(v.min)*0.1):-50; return Math.max(-100, Math.min(0, lo));},
-              max:function(v){var hi=(typeof v.max==='number'&&isFinite(v.max) && v.max<1e8)?(v.max + Math.abs(v.max)*0.15):50; return Math.min(100, Math.max(0, hi));},
+              // 🛡 2026-08-27 主人令一劳永逸（主力日净额曲线顶出图根因）：clamp ±100 太紧——
+              //   线上电子板块当日累计净额达 304 亿，曲线 204 亿被砍在图外完全看不到。
+              //   改「数据自适应 + 宽松 clamp ±500」：极值+15%余量，正常量级完整显示；
+              //   仅当异常值(>1e8 占位/NaN)才回退 ±50 兜底，杜绝 99999999。
+              min:function(v){ if(typeof v.min!=='number'||!isFinite(v.min)||v.min<-1e8) return -50; var lo=v.min-Math.abs(v.min)*0.12; return Math.max(-500, Math.min(0, lo));},
+              max:function(v){ if(typeof v.max!=='number'||!isFinite(v.max)||v.max>1e8) return 50; var hi=v.max+Math.abs(v.max)*0.15; return Math.min(500, Math.max(0, hi));},
               axisLine:{lineStyle:{color:'#475569'}}, splitLine:{lineStyle:{color:'#1e293b'}},
               axisLabel:{color:'#94a3b8', formatter:function(v){return v>=0?'+'+v:v;}}},
              {type:'value', name:'指数 %', position:'right',
