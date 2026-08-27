@@ -84,7 +84,8 @@
   "_stock_price_history": {
     "000506": {
       "2026-08-17": 17.55,
-      "2026-08-23": 20.77
+      "2026-08-23": 20.77,
+      "2026-08-27": 22.08
     },
     "300274": {
       "2026-08-17": 0,
@@ -117,7 +118,7 @@
       "2026-08-23": 35.45,
       "2026-08-25": 33.68,
       "2026-08-26": 34.47,
-      "2026-08-27": 34.47
+      "2026-08-27": 34.57
     },
     "300476": {
       "2026-08-17": 0,
@@ -140,7 +141,8 @@
       "2026-08-17": 0
     },
     "300857": {
-      "2026-08-17": 0
+      "2026-08-17": 0,
+      "2026-08-27": 259.2
     },
     "002371": {
       "2026-08-17": 765.97,
@@ -150,7 +152,8 @@
     "300604": {
       "2026-08-17": 0,
       "2026-08-18": 301.03,
-      "2026-08-19": 0
+      "2026-08-19": 0,
+      "2026-08-27": 284.8
     },
     "002396": {
       "2026-08-17": 33.91,
@@ -181,7 +184,7 @@
       "2026-08-22": 49.43,
       "2026-08-25": 47.66,
       "2026-08-26": 46.85,
-      "2026-08-27": 46.85
+      "2026-08-27": 48.22
     },
     "000703": {
       "2026-08-20": 20.1,
@@ -189,7 +192,8 @@
     },
     "688525": {
       "2026-08-22": 238.96,
-      "2026-08-23": 238.96
+      "2026-08-23": 238.96,
+      "2026-08-27": 238.44
     },
     "000426": {
       "2026-08-22": 40.88,
@@ -198,7 +202,8 @@
     },
     "600183": {
       "2026-08-22": 132.8,
-      "2026-08-23": 132.8
+      "2026-08-23": 132.8,
+      "2026-08-27": 140.97
     },
     "600489": {
       "2026-08-22": 27.18,
@@ -209,11 +214,12 @@
     },
     "300394": {
       "2026-08-25": 257.1,
-      "2026-08-26": 257.1
+      "2026-08-26": 257.1,
+      "2026-08-27": 267.16
     },
     "002475": {
       "2026-08-26": 57.11,
-      "2026-08-27": 57.11
+      "2026-08-27": 57.18
     },
     "000630": {
       "2026-08-27": 6.75
@@ -224,7 +230,7 @@
       "enter_date": "2026-08-17",
       "enter_close": 35.45,
       "last_date": "2026-08-27",
-      "last_close": 34.47,
+      "last_close": 34.57,
       "status": "strict",
       "streak": 5,
       "total_days": 9
@@ -259,9 +265,9 @@
     "000506": {
       "enter_date": "2026-08-17",
       "enter_close": 17.55,
-      "last_date": "2026-08-23",
-      "last_close": 20.77,
-      "status": "dropped",
+      "last_date": "2026-08-27",
+      "last_close": 22.08,
+      "status": "near",
       "streak": 1,
       "total_days": 2
     },
@@ -286,9 +292,9 @@
     "300857": {
       "enter_date": "2026-08-17",
       "enter_close": 0,
-      "last_date": "2026-08-17",
-      "last_close": 0,
-      "status": "dropped",
+      "last_date": "2026-08-27",
+      "last_close": 259.2,
+      "status": "near",
       "streak": 1,
       "total_days": 1
     },
@@ -349,9 +355,9 @@
     "300604": {
       "enter_date": "2026-08-17",
       "enter_close": 0,
-      "last_date": "2026-08-19",
-      "last_close": 0,
-      "status": "dropped",
+      "last_date": "2026-08-27",
+      "last_close": 284.8,
+      "status": "near",
       "streak": 3,
       "total_days": 2
     },
@@ -408,7 +414,7 @@
       "enter_date": "2026-08-20",
       "enter_close": 46.1,
       "last_date": "2026-08-27",
-      "last_close": 46.85,
+      "last_close": 48.22,
       "status": "strict",
       "streak": 3,
       "total_days": 4
@@ -425,18 +431,18 @@
     "688525": {
       "enter_date": "2026-08-22",
       "enter_close": 238.96,
-      "last_date": "2026-08-23",
-      "last_close": 238.96,
-      "status": "dropped",
+      "last_date": "2026-08-27",
+      "last_close": 238.44,
+      "status": "near",
       "streak": 2,
       "total_days": 2
     },
     "600183": {
       "enter_date": "2026-08-22",
       "enter_close": 132.8,
-      "last_date": "2026-08-23",
-      "last_close": 132.8,
-      "status": "dropped",
+      "last_date": "2026-08-27",
+      "last_close": 140.97,
+      "status": "near",
       "streak": 2,
       "total_days": 2
     },
@@ -470,9 +476,9 @@
     "300394": {
       "enter_date": "2026-08-25",
       "enter_close": 257.1,
-      "last_date": "2026-08-26",
-      "last_close": 257.1,
-      "status": "dropped",
+      "last_date": "2026-08-27",
+      "last_close": 267.16,
+      "status": "near",
       "streak": 2,
       "total_days": 2
     },
@@ -480,7 +486,7 @@
       "enter_date": "2026-08-26",
       "enter_close": 57.11,
       "last_date": "2026-08-27",
-      "last_close": 57.11,
+      "last_close": 57.18,
       "status": "near",
       "streak": 2,
       "total_days": 1
@@ -498,7 +504,7 @@
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-08-27 20:20:48"
+    "last_update": "2026-08-27 22:03:22"
   },
   "2026-08-18": [
     {
@@ -1294,9 +1300,9 @@
       "name": "紫金矿业",
       "market": "sh",
       "board": "主板",
-      "close": 34.47,
-      "pct_chg": 2.35,
-      "total_score": 36.4,
+      "close": 34.57,
+      "pct_chg": 0.29,
+      "total_score": 36.8,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
@@ -1310,9 +1316,9 @@
       "name": "赤峰黄金",
       "market": "sh",
       "board": "主板",
-      "close": 46.85,
-      "pct_chg": -1.7,
-      "total_score": 35.2,
+      "close": 48.22,
+      "pct_chg": 2.92,
+      "total_score": 35.6,
       "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
@@ -1322,13 +1328,13 @@
       "status": "strict"
     },
     {
-      "code": "002475",
-      "name": "立讯精密",
+      "code": "300857",
+      "name": "协创数据",
       "market": "sz",
-      "board": "主板",
-      "close": 57.11,
-      "pct_chg": 4.1,
-      "total_score": 31.2,
+      "board": "创业板",
+      "close": 259.2,
+      "pct_chg": 9.72,
+      "total_score": 38.4,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
@@ -1338,14 +1344,62 @@
       "status": "near"
     },
     {
-      "code": "000426",
-      "name": "兴业银锡",
+      "code": "300604",
+      "name": "长川科技",
+      "market": "sz",
+      "board": "创业板",
+      "close": 284.8,
+      "pct_chg": 3.11,
+      "total_score": 38.4,
+      "quality_grade": "A",
+      "industry": "专用设备制造业",
+      "sectors": [
+        "专用设备制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "688525",
+      "name": "佰维存储",
+      "market": "sh",
+      "board": "科创板",
+      "close": 238.44,
+      "pct_chg": 6.76,
+      "total_score": 37.2,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "600183",
+      "name": "生益科技",
+      "market": "sh",
+      "board": "主板",
+      "close": 140.97,
+      "pct_chg": 8.43,
+      "total_score": 37.2,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "000506",
+      "name": "招金黄金",
       "market": "sz",
       "board": "主板",
-      "close": 40.24,
-      "pct_chg": 1.87,
-      "total_score": 30.4,
-      "quality_grade": "B",
+      "close": 22.08,
+      "pct_chg": 9.25,
+      "total_score": 35.6,
+      "quality_grade": "A",
       "industry": "有色金属矿采选业",
       "sectors": [
         "有色金属矿采选业"
@@ -1354,17 +1408,33 @@
       "status": "near"
     },
     {
-      "code": "000630",
-      "name": "铜陵有色",
+      "code": "002475",
+      "name": "立讯精密",
       "market": "sz",
       "board": "主板",
-      "close": 6.75,
-      "pct_chg": 4.98,
-      "total_score": 28.4,
-      "quality_grade": "C",
-      "industry": "有色金属冶炼和压延加工业",
+      "close": 57.18,
+      "pct_chg": 0.12,
+      "total_score": 34.4,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "有色金属冶炼和压延加工业"
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 0,
+      "status": "near"
+    },
+    {
+      "code": "300394",
+      "name": "天孚通信",
+      "market": "sz",
+      "board": "创业板",
+      "close": 267.16,
+      "pct_chg": 5.36,
+      "total_score": 34.4,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
       ],
       "signal_count": 0,
       "status": "near"

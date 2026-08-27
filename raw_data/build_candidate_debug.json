@@ -3,12 +3,12 @@
   "V8_OUT_DIR": "",
   "guanlan_watchlist": {
     "exists": true,
-    "stocks": 20
+    "stocks": 6
   },
   "guanlan_reports": {
     "exists": true,
     "reports": 20,
-    "stocks_in_reports": 20
+    "stocks_in_reports": 7
   },
   "maharo_signals": {
     "exists": false,
@@ -19,6 +19,6 @@
     "创业板成交前100": 24,
     "科创板成交前100": 19,
     "港股成交前50": 50,
-    "观澜台": 18
+    "观澜台": 6
   }
 }
