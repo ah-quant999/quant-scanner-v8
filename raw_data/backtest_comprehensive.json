@@ -1,5 +1,5 @@
 {
-  "calc_time": "2026-08-28 06:49:51",
+  "calc_time": "2026-08-28 07:29:05",
   "method": "baostock 真实收盘价全面回测",
   "hold_periods_tested": [
     1,
@@ -24995,5 +24995,5 @@
       ]
     }
   },
-  "update_stamp": 1787870991
+  "update_stamp": 1787873345
 }
