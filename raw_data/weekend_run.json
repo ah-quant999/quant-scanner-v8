@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-27 18:08:20",
-  "generated": "2026-08-27 18:08:20",
+  "update_time": "2026-08-27 19:17:23",
+  "generated": "2026-08-27 19:17:23",
   "period_start": "2026-08-17",
   "period_end": "2026-08-23",
   "stats": {
@@ -30,8 +30,8 @@
       "file": "top10_daily.json",
       "label": "全站精选",
       "status": "ok",
-      "update_time": "2026-08-26 22:38:15",
-      "size_kb": 21.0
+      "update_time": "2026-08-27 18:25:42",
+      "size_kb": 21.2
     },
     {
       "file": "cockpit_tier_recommend.json",

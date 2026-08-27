@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-27 00:36:08",
+  "update_time": "2026-08-27 18:50:37",
   "data_date": "update_time",
   "track_start": "2026-08-17",
   "history_days": 13,
@@ -189,47 +189,47 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测",
-    "latest_date": "2026-08-26",
-    "total": 267,
+    "latest_date": "2026-08-27",
+    "total": 273,
     "best_hold_days": 1,
     "periods": {
       "1d": {
-        "win_rate": 55.2,
-        "avg_return": 0.17,
-        "sharpe": 0.03,
-        "count": 255,
+        "win_rate": 56.3,
+        "avg_return": 0.21,
+        "sharpe": 0.04,
+        "count": 261,
         "best": 14.99,
         "worst": -10.02
       },
       "3d": {
-        "win_rate": 38.8,
-        "avg_return": -0.98,
-        "sharpe": -0.14,
-        "count": 255,
+        "win_rate": 37.9,
+        "avg_return": -1.02,
+        "sharpe": -0.15,
+        "count": 261,
         "best": 15.06,
         "worst": -10.04
       },
       "5d": {
         "win_rate": 48.4,
-        "avg_return": -0.05,
+        "avg_return": -0.1,
         "sharpe": -0.01,
-        "count": 255,
+        "count": 261,
         "best": 15.06,
         "worst": -10.08
       },
       "10d": {
-        "win_rate": 49.1,
-        "avg_return": 0.9,
-        "sharpe": 0.1,
-        "count": 255,
+        "win_rate": 50.3,
+        "avg_return": 1.03,
+        "sharpe": 0.11,
+        "count": 261,
         "best": 15.07,
         "worst": -10.04
       },
       "20d": {
-        "win_rate": 39.7,
-        "avg_return": -0.51,
-        "sharpe": -0.07,
-        "count": 255,
+        "win_rate": 48.2,
+        "avg_return": 0.46,
+        "sharpe": 0.05,
+        "count": 261,
         "best": 15.07,
         "worst": -10.04
       }
@@ -238,18 +238,18 @@
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 105,
-      "win_rate_5d": 66.7,
-      "avg_ret_5d": 2.52,
-      "best_win_rate": 66.7,
+      "count": 108,
+      "win_rate_5d": 65.3,
+      "avg_ret_5d": 2.34,
+      "best_win_rate": 65.3,
       "best_hold_days": 5
     },
     {
       "band": "70~80",
-      "count": 162,
-      "win_rate_5d": 39.0,
+      "count": 165,
+      "win_rate_5d": 39.6,
       "avg_ret_5d": -1.53,
-      "best_win_rate": 53.8,
+      "best_win_rate": 54.7,
       "best_hold_days": 1
     }
   ],
@@ -257,18 +257,18 @@
     "periods": [
       {
         "period": "1d",
-        "strict_win": 55.2,
-        "strict_ret": 0.17,
-        "strict_count": 255,
+        "strict_win": 56.3,
+        "strict_ret": 0.21,
+        "strict_count": 261,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "3d",
-        "strict_win": 38.8,
-        "strict_ret": -0.98,
-        "strict_count": 255,
+        "strict_win": 37.9,
+        "strict_ret": -1.02,
+        "strict_count": 261,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -276,26 +276,26 @@
       {
         "period": "5d",
         "strict_win": 48.4,
-        "strict_ret": -0.05,
-        "strict_count": 255,
+        "strict_ret": -0.1,
+        "strict_count": 261,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "10d",
-        "strict_win": 49.1,
-        "strict_ret": 0.9,
-        "strict_count": 255,
+        "strict_win": 50.3,
+        "strict_ret": 1.03,
+        "strict_count": 261,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "20d",
-        "strict_win": 39.7,
-        "strict_ret": -0.51,
-        "strict_count": 255,
+        "strict_win": 48.2,
+        "strict_ret": 0.46,
+        "strict_count": 261,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
