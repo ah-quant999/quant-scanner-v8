@@ -10929,83 +10929,9 @@ function drawUpDownChart(){
     }
     h+='</div></div>';  // /调试卡
 
-    // ── pane4-1: 🧬 H 反推短线买点（反推代码 + 跟踪回测，admin-only） ──
-    // 🛡 2026-08-19 主人令：「反推出了代码就可以每天自己搜强势股，去跟踪和回测」
-    //   数据源：data/H_AUTO_BUY.js（auto_run_dn_algorithm.py 每日盘后跑，行情 + 4 日均量）
-    //         data/H_AUTO_BUY_TRACK.js（track_h_auto_buy.py 每日跟踪 T+1/T+3/T+5/T+10 胜率）
-    //   完全独立于 PDF / OCR，每交易日 19:15 由 run_algorithms.py 自动化产出。
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #ce93d8;">';
-    h+=v8CardHeader('🧬','H 反推短线买点','反推代码每日盘后自跑 + 跟踪回测，admin 可见','update_time',window.H_AUTO_BUY);
-    // 🛡 2026-08-19 一劳永逸修复：H 卡 4 时段更新标识（commit 23a5eb5e5 实际只改 fetcher/data，没动 index.html——本补完整 4 时段渲染）
-    //   · 盘前 = snapshot_date + snapshot_time（行情快照）
-    //   · 盘后 = generated_at（auto_run_dn_algorithm 跑批时间）
-    //   · 短信 = first_run（track_h_auto_buy 首次跟踪）
-    //   · 长线 = by_date 最末日期
-    try{
-      var hab2 = window.H_AUTO_BUY || {};
-      var habt2 = window.H_AUTO_BUY_TRACK || {};
-      var _slotPre = (hab2.snapshot_date && hab2.snapshot_time) ? hab2.snapshot_date + ' ' + String(hab2.snapshot_time).slice(0,8) : (hab2.snapshot_date || '—');
-      var _slotPost = hab2.generated_at || '—';
-      var _slotSms = habt2.first_run || habt2.update_time || '—';
-      var _byDates = Object.keys(habt2.by_date || {}).sort();
-      var _slotLn = _byDates.length ? _byDates[_byDates.length-1] : '—';
-      h += '<div style="display:flex;flex-wrap:wrap;gap:8px 14px;padding:6px 14px 0;font-size:11px;color:var(--sub);">';
-      h += '<span><span style="color:#f59e0b">●</span> 盘前 <b style="color:var(--txt)">'+_slotPre+'</b></span>';
-      h += '<span><span style="color:#10b981">●</span> 盘后 <b style="color:var(--txt)">'+_slotPost+'</b></span>';
-      h += '<span><span style="color:#8b5cf6">●</span> 长线 <b style="color:var(--txt)">'+_slotLn+'</b></span>';
-      h += '</div>';
-    }catch(_hSlotErr){ try{console.warn('h_slot_render',_hSlotErr);}catch(_){} }
-    h+='<div style="padding:12px 14px;">';
-    var hab=window.H_AUTO_BUY||{};
-    var habt=window.H_AUTO_BUY_TRACK||{};
-    var habCand=(hab.candidates||[]).slice(0,30);
-    var habSum=habt.summary||{};
-    var habDays=(habt.by_date||{});
-    var habDayKeys=Object.keys(habDays).sort().slice(-7).reverse();
-    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">';
-    h+='<div style="background:rgba(206,147,216,.08);border:1px solid rgba(206,147,216,.25);border-radius:8px;padding:10px 12px;">';
-    h+='<div style="font-size:11px;color:var(--sub);">📅 当日候选 <span style="color:var(--dim)">('+(hab.date||'--')+')</span></div>';
-    h+='<div style="font-size:14px;margin-top:4px;">扫描 <b>'+(hab.total_scanned||0)+'</b> 只 · 涨幅≥3%+量比≥1.2 入选 <b style="color:var(--up)">'+(hab.final_count||0)+'</b> 只</div>';
-    h+='<div style="font-size:11px;color:var(--sub);margin-top:4px;line-height:1.5;">公式：涨幅≥3% + 量比≥1.2 + 4 日均量基准（反推 PDF 8.10/8.17 「短线买点」35 样本分布）</div>';
-    h+='</div>';
-    h+='<div style="background:rgba(206,147,216,.08);border:1px solid rgba(206,147,216,.25);border-radius:8px;padding:10px 12px;">';
-    h+='<div style="font-size:11px;color:var(--sub);">📈 累计胜率 <span style="color:var(--dim)">('+(habSum.tracked_picks||0)+' picks · '+(habSum.days||0)+' 日)</span></div>';
-    h+='<div style="font-size:14px;margin-top:4px;">T+1: <b>'+(habSum.tracked_picks? (100*habSum['T+1_hit']/habSum.tracked_picks).toFixed(1):0)+'%</b> · T+5: <b>'+(habSum.tracked_picks? (100*habSum['T+5_hit']/habSum.tracked_picks).toFixed(1):0)+'%</b> · T+10: <b>'+(habSum.tracked_picks? (100*habSum['T+10_hit']/habSum.tracked_picks).toFixed(1):0)+'%</b></div>';
-    h+='<div style="font-size:11px;color:var(--sub);margin-top:4px;">命中阈值 T+N 收盘涨幅 ≥ 5%</div>';
-    h+='</div>';
-    h+='</div>';
-    if(habCand.length){
-      h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">⚡ Top 30 候选（按 0.6×量比 + 0.4×涨幅 综合分排序）</div>';
-      h+='<table style="width:100%;font-size:12px;border-collapse:collapse;">';
-      h+='<tr style="color:var(--sub);font-size:11px;border-bottom:1px solid var(--bd);"><th style="text-align:left;padding:4px 6px;">代码</th><th style="text-align:left;padding:4px 6px;">名称</th><th style="text-align:right;padding:4px 6px;">涨幅%</th><th style="text-align:right;padding:4px 6px;">量比</th><th style="text-align:left;padding:4px 6px;">行业</th></tr>';
-      for(var j=0;j<habCand.length;j++){
-        var hc=habCand[j];
-        var habPctColor=(hc.pct>=10?'var(--up)':(hc.pct>=5?'var(--up)':'var(--txt)'));
-        h+='<tr style="border-bottom:1px dashed var(--bd);">';
-        h+='<td style="padding:4px 6px;font-family:monospace;">'+hc.code+'</td>';
-        h+='<td style="padding:4px 6px;">'+hc.name+'</td>';
-        h+='<td style="padding:4px 6px;text-align:right;color:'+habPctColor+';">'+hc.pct+'</td>';
-        h+='<td style="padding:4px 6px;text-align:right;color:var(--cyan);">'+hc.vol_ratio+'</td>';
-        h+='<td style="padding:4px 6px;color:var(--sub);font-size:11px;">'+(hc.industry||'')+'</td>';
-        h+='</tr>';
-      }
-      h+='</table>';
-    } else {
-      h+='<div class="note" style="text-align:center;">⏳ 当日候选未产出（盘后 19:15 算法链自动跑）</div>';
-    }
-    if(habDayKeys.length){
-      h+='<details style="margin-top:12px;"><summary style="cursor:pointer;color:var(--sub);font-size:12px;">📊 近 '+habDayKeys.length+' 日跟踪明细（每只候选 T+1/T+5 命中）</summary>';
-      h+='<div style="padding:8px 0;">';
-      for(var hk=0;hk<habDayKeys.length;hk++){
-        var hdk=habDayKeys[hk];
-        var hdr=habDays[hdk];
-        h+='<div style="margin-bottom:8px;font-size:12px;border-left:3px solid #ce93d8;padding-left:8px;">';
-        h+='<div style="color:var(--sub);font-size:11px;">'+hdk+' · n='+(hdr.n||0)+' · T+1 命中 <b>'+(hdr['T+1_hit']||0)+'/'+(hdr.n||0)+' = '+(hdr['T+1_rate']||0)+'%</b> · T+5 '+(hdr['T+5_rate']||0)+'%</div>';
-        h+='</div>';
-      }
-      h+='</div></details>';
-    }
-    h+='</div></div>';  // /H反推卡
+    // [2026-08-27 主人令已执行] H反推卡整段删除（调试专区只保留 F窗口 + ETF·龙头 参考）
+
+    // ── pane4-2: 📌 概念/行业 → ETF·龙头 参考
 
     // ── pane4-2: 📌 概念/行业 → ETF·龙头 参考（已迁入调试专区，原ETF·龙头TAB删除）──
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';
@@ -11020,16 +10946,12 @@ function drawUpDownChart(){
     h+='<div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.3);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.7;color:var(--sub);">';
     h+='📌 调试区：本卡为热点板块→ETF/龙头映射参考，属研究信号，未纳入任何推荐链路。';
     h+='</div>';
+    h+='</div>';  // /ETF·龙头参考卡
+    h+='</div>';  // /ulPaneDbg
     h+='</div>';
 
     // ── 🛡 2026-08-19 主人令：2 张新卡（宏观+板块推荐）暂未上架实验区 · 调试专区底部 ──
     //    2026-08-20 主人令：路径概率预测卡已迁出调试专区 → 独立「AI 预测」子TAB（潜力挖掘删除，算法链 19:15 自动更新）
-    h+='<hr style="border:none;border-top:1px dashed rgba(56,189,248,.4);margin:18px 0 12px 0;">';
-    h+='<div style="background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(167,139,250,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#38bdf8;border-radius:8px;margin:0 0 10px 0;">🧪 实验区 · 8/19 新增（宏观 + 板块推荐框架；路径概率已迁「AI 预测」子TAB）</div>';
-    h+='<div id="ulMacroPanel"></div>';
-    h+='<div id="ulSecPanel"></div>';
-
-    h+='</div>';  // /ulPaneDbg
 
     // ⚖️ 2026-08-14 主人令："这个没用，删了吧"：TOP3 持仓跟踪卡片 HTML 已删除
     h+='';
