@@ -1,1 +1,1 @@
-window.WEEKEND_META_REPORT = {"update_time":"2026-08-28 07:14:53","total":9601,"new_listings_count":3,"delisted_count":0,"new_listings":["561730 A股ETF华夏","159096 价值ETF华夏","158008 新能源电池ETF华夏"],"delisted":[],"meta_enriched":3,"republish_time":"2026-08-28 07:16:43"};
+window.WEEKEND_META_REPORT = {"update_time":"2026-08-28 07:49:38","total":9601,"new_listings_count":0,"delisted_count":0,"new_listings":[],"delisted":[],"meta_enriched":0,"republish_time":"2026-08-28 07:51:47"};
