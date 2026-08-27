@@ -319,3 +319,47 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python .github/scripts/cloud_dispatcher.py
+
+  # 🛡 2026-08-27 主人令一劳永逸式修复（盘中快照随重抓取被 cancel / 漏触发而断档的根因）：
+  #   板块资金日内快照原写在 f_sector_fund_flow() 内（重抓取整轮 ~23 分钟、易 cancel），
+  #   重抓取一挂快照随之丢失 → 曲线断档（主人实锤：13:22 后主站曲线停更）。
+  #   现解耦为独立轻量 job：只读已提交的 raw_data/sector_fund_flow.json 追加快照并直接
+  #   生成 data/SECTOR_FUND_FLOW_INTRADAY.js 推送。独立并发组 + 取消不杀 + 重试，
+  #   秒级完成，绝不被重抓取的取消风暴波及；重抓取挂了也只是用上次提交值 → 曲线连续不断。
+  intraday-snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: v8-intraday-snapshot
+      cancel-in-progress: false
+    env:
+      TZ: Asia/Shanghai
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: "📈 追加板块资金日内快照（轻量/解耦/重试 3 次）"
+        shell: bash
+        run: |
+          for i in 1 2 3; do
+            echo "尝试 $i/3 追加板块资金日内快照"
+            if python intraday_snapshot.py; then
+              echo "✅ 快照追加成功"
+              break
+            fi
+            echo "⚠️ 第 $i 次失败，10s 后重试"
+            sleep 10
+          done
+      - name: "📤 推送 raw + data（自闭环，不依赖外部 build）"
+        continue-on-error: true
+        shell: bash
+        run: |
+          PUSH_FILES="raw_data/sector_fund_flow_intraday.json,data/SECTOR_FUND_FLOW_INTRADAY.js" python api_push_raw.py
