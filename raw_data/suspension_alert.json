@@ -1,39 +1,51 @@
 {
-  "update_time": "2026-08-27 23:53:09",
+  "update_time": "2026-08-28 01:00:21",
   "suspended": [
     {
       "code": "200706",
       "name": "瓦轴B",
-      "days": 178,
-      "reason": "刊登重要公告"
-    },
-    {
-      "code": "002155",
-      "name": "湖南黄金",
-      "days": 7,
+      "days": 179,
       "reason": "刊登重要公告"
     },
     {
       "code": "200016",
       "name": "*ST康佳B",
-      "days": 3,
+      "days": 4,
       "reason": "刊登重要公告"
     },
     {
       "code": "000016",
       "name": "*ST康佳A",
-      "days": 3,
+      "days": 4,
       "reason": "刊登重要公告"
     },
     {
       "code": "002274",
       "name": "华昌化工",
-      "days": 1,
+      "days": 2,
       "reason": "刊登重要公告"
     },
     {
       "code": "600491",
       "name": "ST龙元",
+      "days": 1,
+      "reason": "刊登重要公告"
+    },
+    {
+      "code": "000711",
+      "name": "ST京蓝",
+      "days": 0,
+      "reason": "刊登重要公告"
+    },
+    {
+      "code": "002586",
+      "name": "ST围海",
+      "days": 0,
+      "reason": "刊登重要公告"
+    },
+    {
+      "code": "000635",
+      "name": "英力特",
       "days": 0,
       "reason": "刊登重要公告"
     }
