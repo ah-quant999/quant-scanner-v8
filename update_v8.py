@@ -555,15 +555,24 @@ def _write_js(var_name, obj):
         except Exception:
             pass
 
-    def _pick_ts(existing):
-        """真实优先：源数据自带时间戳 > 源文件 mtime > 当前时间。
+    def _pick_ts(existing, obj=None):
+        """真实优先：源数据自带时间戳 > _meta.last_update（子级更新） > 源文件 mtime > 当前时间。
 
         2026-08-07 修（主人铁律「不得造假」）：原实现取 max(existing, mtime, now)，
         now_ts 永远最大 → 每次构建都把所有卡片的「更新于」刷成构建时刻，
         导致 ①「更新于」全是假时间 ②「今日已跑完」胶囊在开盘前判错（数据日期被
         改成今天，而交易日归上一日 → 胶囊隐藏）。禁止再改回 max。
+
+        2026-08-27 一劳永逸修复：TRIPLE_HISTORY 等带 _meta 的数据，
+        算法跟踪只更新 _meta.last_update 而忘同步顶层 update_time → HEALTH_CHECK 读到陈旧值报 fail。
+        此处增加 _meta.last_update 作为第二优先源，取较新者。
         """
         if existing:
+            # 有 _meta.last_update 且比 existing 更新？→ 用它（消除顶层/子级时间不同步）
+            if obj and isinstance(obj, dict):
+                meta_last = (obj.get("_meta") or {}).get("last_update") or ""
+                if meta_last and meta_last > existing:
+                    return meta_last
             return existing
         if mtime_ts:
             return mtime_ts
@@ -574,7 +583,7 @@ def _write_js(var_name, obj):
         lite_obj = {"data": lite_obj, "update_time": _pick_ts(None), "republish_time": now_ts}
     elif isinstance(lite_obj, dict):
         existing = lite_obj.get("update_time") or lite_obj.get("calc_time") or ""
-        lite_obj["update_time"] = _pick_ts(existing)
+        lite_obj["update_time"] = _pick_ts(existing, lite_obj)
         # republish_time = 本次构建/重部署时间，仅用于排障与缓存戳，前端不得当作「数据时间」展示
         lite_obj["republish_time"] = now_ts
 
