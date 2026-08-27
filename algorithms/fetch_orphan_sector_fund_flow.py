@@ -466,12 +466,11 @@ def fetch_akshare_ths_5d20d_backup(sector_names):
             MAX_REASONABLE = 5000.0
             # 🛡 2026-08-27 主人令（资金验证60日夸张根因）：估算公式 vol×pct/100 对
             #   大成交额板块（如电力）严重失真——60日成交额巨大，即使小涨跌也得出上千亿。
-            #   增加「方向一致性 + 量级」双重闸门：与 20 日方向相反或量级超 5 倍 → 判定失真置 0（宁缺毋滥）。
-            _dir_ok = (net_60d_est is None or net_60d_est == 0 or net_20d_est == 0
-                       or (net_60d_est * net_20d_est > 0))
+            #   增加「量级」单重闸门（放宽版）：只杀 >20 倍的极端异常值；
+            #   方向不再限制（60日与20日反向属正常市场行为，不应置0导致全空）。
             _mag_ok = (net_60d_est is None or net_60d_est == 0 or net_20d_est == 0
-                       or abs(net_60d_est) <= abs(net_20d_est) * 5)
-            if net_60d_est is not None and (not _dir_ok or not _mag_ok):
+                       or abs(net_60d_est) <= abs(net_20d_est) * 20)
+            if net_60d_est is not None and not _mag_ok:
                 print(f"    ⚠️ {name}: 60日估算失真({net_60d_est}亿 vs 20日{net_20d_est}亿) → 置0")
                 net_60d_est = 0
             if net_5d_est and abs(net_5d_est) > MAX_REASONABLE:
@@ -796,8 +795,9 @@ def fetch_sector_flow():
                             item["net_20d"] = n20
                             item["net_20d_days"] = min(len(nets), 20)
                             hist_20d_count += 1
-                    # 60日: 真实历史 >=20 天即可出数
-                    if len(nets) >= 20:
+                    # 60日: 真实历史 >=5 天即可出数（2026-08-27 修复：原阈值20天导致
+                    #   history最多19天→零个板块达标→60日恒空。改为与5d一致，有几天出几天）
+                    if len(nets) >= 5:
                         n60 = round(sum(nets[-60:]) if len(nets) >= 60 else sum(nets), 2)
                         if item.get("net_60d") in (None, 0) and n60 != 0:
                             item["net_60d"] = n60
@@ -958,8 +958,8 @@ def fetch_sector_flow():
         if item.get("net_20d") in (None, 0) and net_20d_val != 0 and len(real_20) >= 8:
             item["net_20d"] = net_20d_val
             item["net_20d_days"] = len(real_20)
-        # 60日: >=20 天出数
-        if item.get("net_60d") in (None, 0) and net_60d_val != 0 and len(real_60) >= 20:
+        # 60日: >=5 天出数（2026-08-27 修复：原20天导致history不足时恒空）
+        if item.get("net_60d") in (None, 0) and net_60d_val != 0 and len(real_60) >= 5:
             item["net_60d"] = net_60d_val
             item["net_60d_days"] = len(real_60)
         # 兜底：写实 *_days 字段，sectors_in/out 同步时不再乱 fallback
