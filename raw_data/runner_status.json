@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-27 21:11:30",
+  "update_time": "2026-08-27 22:11:16",
   "status": "ok",
   "process": {
     "ok": true,
@@ -30,7 +30,7 @@
     "stuck_min": 0,
     "is_fail": false,
     "is_warn": false,
-    "message": "self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(cn·应急) completed"
+    "message": "self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(cn·应急) completed（兜底角色 6h 未触发，云端主线接管中）"
   },
   "runner_env": {
     "ok": true,
@@ -38,5 +38,5 @@
     "message": "阈值=100000（一劳永逸目标 2000）"
   },
   "actions_taken": [],
-  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(cn·应急) completed"
+  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 中国数据抓取(cn·应急) completed（兜底角色 6h 未触发，云端主线接管中）"
 }
