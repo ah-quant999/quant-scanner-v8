@@ -89,7 +89,7 @@ def _gtimg_kl(code, bars=30):
 def track_one_pick(code, pick_date_str, today_str):
     """对一只候选：拿到候选日及之后 ~10 个交易日的收盘价。
     返回 dict: {T+1/T+3/T+5/T+10 涨幅、命中标志、最佳涨幅}"""
-    kl = _gtimg_kl(code, bars=40)
+    kl = _gtimg_kl(code, bars=70)  # 🔴 2026-08-27 修复：fetch_a_daily_gtimg 要求 ≥60 条，之前 bars=40 永远 None
     if not kl:
         return None
     # 把 kl 索引化（list of dict）
