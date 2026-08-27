@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-27 16:47:07",
-  "generated": "2026-08-27 16:47:07",
+  "update_time": "2026-08-27 17:24:00",
+  "generated": "2026-08-27 17:24:00",
   "period_start": "2026-08-17",
   "period_end": "2026-08-23",
   "stats": {
@@ -16,7 +16,7 @@
       "file": "lhb_data.json",
       "label": "龙虎榜",
       "status": "ok",
-      "update_time": "2026-08-27 11:37:03",
+      "update_time": "2026-08-27 15:40:30",
       "size_kb": 22.8
     },
     {
