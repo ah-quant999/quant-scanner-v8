@@ -4141,6 +4141,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     return v >= 0 ? '#f4495d' : '#1fd17b';   // 涨红 / 跌绿
   }
 
+  // 2026-08-27 主人令：胜率专用——红涨绿跌，高胜率(≥50%)=红优，低胜率(<50%)=绿差，无金色中性带。
+  function _colorWR(v){
+    if(v == null || v === '--' || v === '') return 'var(--sub)';
+    if(typeof v === 'string') v = parseFloat(v);
+    if(isNaN(v)) return 'var(--sub)';
+    return v >= 50 ? '#f4495d' : '#1fd17b';   // 高胜率红 / 低胜率绿
+  }
+
   // ═══ 2026-08-13 主人令：策略星级对比表（聚合已有4类回测数据） ═══
   // 数据来源（详见逻辑详解）：BACKTEST_COMPREHENSIVE(共振3档) + COCKPIT_BACKTEST(驾驶舱2档) +
   //         BACKTEST_TDX(K线信号9个) + OPTIMIZED_STRATEGY(三信号优化)
@@ -4321,7 +4329,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+bg+'">';
         html += '<td class="no-shrink"  style="padding:7px 6px;color:var(--sub);font-weight:800;white-space:nowrap">'+r.stars+'</td>';
         html += '<td style="padding:7px 6px;font-weight:800;color:var(--txt);white-space:nowrap;">'+r.name+badge+'</td>';
-        html += '<td style="padding:7px 6px;text-align:right;font-weight:700;color:'+_colorNum(r.win_rate, 50)+';">'+ (typeof r.win_rate==='number' ? r.win_rate.toFixed(1) : r.win_rate)+'%</td>';
+        html += '<td style="padding:7px 6px;text-align:right;font-weight:700;color:'+_colorWR(r.win_rate)+';">'+ (typeof r.win_rate==='number' ? r.win_rate.toFixed(1) : r.win_rate)+'%</td>';
         html += '<td style="padding:7px 6px;text-align:right;font-weight:600;color:'+_colorPL(r.avg_return)+';">'+(r.avg_return>0?'+':'')+ (typeof r.avg_return==='number' ? r.avg_return.toFixed(2) : r.avg_return)+'%</td>';
         html += '<td style="padding:7px 6px;text-align:right;color:var(--sub);">'+r.sample+'</td>';
         html += '<td style="padding:7px 6px;text-align:right;font-weight:700;color:var(--sub);">'+r.score.toFixed(1)+'</td>';
@@ -4365,7 +4373,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
       html += '<td style="padding:6px 4px;font-weight:600;color:'+(faded?'var(--dim)':'var(--txt)')+';">'+label+'</td>';
       html += '<td style="padding:6px 4px;text-align:right;color:'+(faded?'var(--dim)':'var(--txt)')+';">'+(samples||'—')+'</td>';
-      html += '<td style="padding:6px 4px;text-align:right;font-weight:700;color:'+(faded?'var(--dim)':_colorNum(wr,50))+';">'+(samples?(wr+'%'):'待积累')+'</td>';
+      html += '<td style="padding:6px 4px;text-align:right;font-weight:700;color:'+(faded?'var(--dim)':_colorWR(wr))+';">'+(samples?(wr+'%'):'待积累')+'</td>';
       html += '<td style="padding:6px 4px;text-align:right;font-weight:700;color:'+(faded?'var(--dim)':_colorPL(avg))+';">'+(samples?((avg>0?'+':'')+avg+'%'):'—')+'</td>';
       html += '<td style="padding:6px 4px;text-align:right;color:'+(faded?'var(--dim)':_colorPL(mx))+';">'+(samples?((mx>0?'+':'')+mx+'%'):'—')+'</td>';
       html += '<td style="padding:6px 4px;text-align:right;color:'+(faded?'var(--dim)':_colorPL(mn))+';">'+(samples?((mn>0?'+':'')+mn+'%'):'—')+'</td>';
@@ -4451,8 +4459,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var wr = d.win_rate == null ? '—' : d.win_rate;
           var ar = d.avg_return == null ? '—' : d.avg_return;
           var first = (stratList.indexOf(s) === 0);
-          html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorNum(wr, 50)+';">'+(typeof wr === 'number' ? wr.toFixed(1) : wr)+'%</td>';
-          html += '<td style="padding:6px;text-align:center;color:'+_colorPL(ar)+';'+(first?'':'border-left:1px solid var(--border2);')+'">'+(typeof ar === 'number' ? (ar>0?'+':'')+ar.toFixed(2) : ar)+'%</td>';
+          html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(wr)+';">'+(typeof wr === 'number' ? wr.toFixed(1) : wr)+'%</td>';
+          html += '<td style="padding:6px;text-align:center;color:'+_colorPL(ar)+';'+(first?'':'border-left:1px solid var(--border2);')+'">'
         });
         html += '</tr>';
       });
@@ -4497,7 +4505,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         periods.forEach(function(p){
           var wr = sig['win_rate_'+p+'d'];
           var ar = sig['avg_return_'+p+'d'];
-          html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorNum(wr, 50)+';">'+ (wr==null?'—':wr.toFixed(1))+'%</td>';
+          html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(wr)+';">'+ (wr==null?'—':wr.toFixed(1))+'%</td>';
           html += '<td style="padding:6px;text-align:center;color:'+_colorPL(ar)+';border-left:1px solid var(--border2);">'+(ar==null?'—':(ar>0?'+':'')+ar.toFixed(2))+'%</td>';
         });
         html += '</tr>';
