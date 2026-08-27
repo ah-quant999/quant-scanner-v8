@@ -9110,7 +9110,7 @@ function drawUpDownChart(){
 
           {name:'盘后资金流向', source:'MARKET_FUND_FLOW_DATA', freq:'收盘后1次', slots:['17:30'], note:'全天资金总结'},
 
-          {name:'候选池', source:'CANDIDATE', freq:'收盘后1次', slots:['17:30'], note:'算法初筛名单'},
+          {name:'候选池', source:'CANDIDATE', freq:'收盘后1次', slots:['20:00'], note:'算法初筛名单（v8_algo_cloud 19:15 跑批，约20:00产出）'},
 
           {name:'黄金池', source:'GOLD_POOL', freq:'收盘后1次', slots:['17:30'], note:'精选标的'},
 
@@ -9130,7 +9130,7 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'候选池（盘中/盘后）', source:'CANDIDATE', freq:'盘中+收盘后1次', slots:['15:30','19:15'], note:'算法初筛名单'},
+          {name:'候选池（盘中/盘后）', source:'CANDIDATE', freq:'收盘后1次', slots:['20:00'], note:'算法初筛名单（v8_algo_cloud 19:15 跑批产出，无独立盘中更新）'},
 
           {name:'黄金池', source:'GOLD_POOL', freq:'收盘后1次', slots:['19:15'], note:'精选标的'},
 
@@ -9413,7 +9413,15 @@ function drawUpDownChart(){
 
         totalCards++;
 
-        if(cMiss>0){ missCards++; issueList.push('<b>'+pg.name+' / '+c.name+'</b>：'+c.note+'（最近 '+lastStr+'）'); }
+        // 🛡 2026-08-27 一劳永逸：上游依赖根因追踪——防止候选池陈旧时下游卡连锁误报
+        var _upstreamStale = '';
+        if(cMiss>0 && !hasDataToday && lastTs){
+          // 检查是否为已知上游数据源陈旧（非本卡独立漏跑）
+          var _staleSources = {'CANDIDATE':'候选池(v8_algo_cloud)','TRIPLE_CONSENSUS':'三重共识/黄金池','GOLD_POOL':'黄金池','H_AUTO_BUY':'H反推短线买点'};
+          for(var _si in _staleSources){ if(c.source.indexOf(_si)>=0){ _upstreamStale = ' ⚠️ 上游 '+_staleSources[_si]+' 未更新（根因）'; break; } }
+        }
+
+        if(cMiss>0){ missCards++; issueList.push('<b>'+pg.name+' / '+c.name+'</b>：'+c.note+'（最近 '+lastStr+'）'+_upstreamStale); }
 
         else if(cOk>0) okCards++;
 
@@ -9429,7 +9437,7 @@ function drawUpDownChart(){
 
           '<td style="padding:5px 8px;border:1px solid var(--border);">'+slotsHtml+'</td>'+
 
-          '<td style="padding:5px 8px;border:1px solid var(--border);white-space:nowrap;'+rowColor+'">'+lastStr+'</td>'+
+          '<td style="padding:5px 8px;border:1px solid var(--border);white-space:nowrap;'+rowColor+'">'+lastStr+(_upstreamStale ? '<br><span style="font-size:9.5px;color:#f59e0b">'+_upstreamStale+'</span>'':'')+'</td>'+
 
           '<td style="padding:5px 8px;border:1px solid var(--border);color:var(--sub);font-size:10px;">'+c.note+'</td>'+
 
