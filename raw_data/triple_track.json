@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-08-27 23:52:11",
+  "update_time": "2026-08-28 19:14:01",
   "data_date": "update_time",
   "track_start": "2026-08-17",
-  "history_days": 13,
+  "history_days": 14,
   "strict_count": 0,
   "near_count": 0,
   "tracked": [],
@@ -11,13 +11,19 @@
       "level": "good",
       "code": "601899",
       "name": "紫金矿业",
-      "text": "紫金矿业(601899) 连续 5 日稳居严格共识（高质量）"
+      "text": "紫金矿业(601899) 连续 6 日稳居严格共识（高质量）"
     },
     {
       "level": "warn",
       "code": "000975",
       "name": "",
       "text": "(000975) 于 2026-08-17 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "601168",
+      "name": "西部矿业",
+      "text": "西部矿业(601168) 于 2026-08-27 跌出共识（曾连续 1 日）"
     },
     {
       "level": "warn",
@@ -107,7 +113,7 @@
       "level": "good",
       "code": "600988",
       "name": "赤峰黄金",
-      "text": "赤峰黄金(600988) 连续 3 日稳居严格共识（高质量）"
+      "text": "赤峰黄金(600988) 连续 4 日稳居严格共识（高质量）"
     },
     {
       "level": "warn",
@@ -123,9 +129,21 @@
     },
     {
       "level": "warn",
+      "code": "000426",
+      "name": "兴业银锡",
+      "text": "兴业银锡(000426) 于 2026-08-27 跌出共识（曾连续 2 日）"
+    },
+    {
+      "level": "warn",
       "code": "000792",
       "name": "盐湖股份",
       "text": "盐湖股份(000792) 于 2026-08-23 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "000630",
+      "name": "",
+      "text": "(000630) 于 2026-08-27 跌出共识（曾连续 1 日）"
     }
   ],
   "sector_cluster": {
@@ -153,47 +171,47 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测",
-    "latest_date": "2026-08-27",
-    "total": 273,
+    "latest_date": "2026-08-28",
+    "total": 279,
     "best_hold_days": 1,
     "periods": {
       "1d": {
-        "win_rate": 56.3,
-        "avg_return": 0.21,
-        "sharpe": 0.04,
-        "count": 261,
+        "win_rate": 55.8,
+        "avg_return": 0.18,
+        "sharpe": 0.03,
+        "count": 267,
         "best": 14.99,
         "worst": -10.02
       },
       "3d": {
-        "win_rate": 37.9,
-        "avg_return": -1.02,
-        "sharpe": -0.15,
-        "count": 261,
+        "win_rate": 39.4,
+        "avg_return": -0.89,
+        "sharpe": -0.13,
+        "count": 267,
         "best": 15.06,
         "worst": -10.04
       },
       "5d": {
-        "win_rate": 48.4,
-        "avg_return": -0.1,
-        "sharpe": -0.01,
-        "count": 261,
+        "win_rate": 47.7,
+        "avg_return": -0.18,
+        "sharpe": -0.02,
+        "count": 267,
         "best": 15.06,
         "worst": -10.08
       },
       "10d": {
-        "win_rate": 50.3,
-        "avg_return": 1.03,
-        "sharpe": 0.11,
-        "count": 261,
+        "win_rate": 52.8,
+        "avg_return": 1.24,
+        "sharpe": 0.13,
+        "count": 267,
         "best": 15.07,
         "worst": -10.04
       },
       "20d": {
-        "win_rate": 48.2,
-        "avg_return": 0.46,
-        "sharpe": 0.05,
-        "count": 261,
+        "win_rate": 47.6,
+        "avg_return": 0.51,
+        "sharpe": 0.06,
+        "count": 267,
         "best": 15.07,
         "worst": -10.04
       }
@@ -202,18 +220,18 @@
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 108,
-      "win_rate_5d": 65.3,
-      "avg_ret_5d": 2.34,
-      "best_win_rate": 65.3,
-      "best_hold_days": 5
+      "count": 111,
+      "win_rate_5d": 60.7,
+      "avg_ret_5d": 2.06,
+      "best_win_rate": 65.1,
+      "best_hold_days": 10
     },
     {
       "band": "70~80",
-      "count": 165,
-      "win_rate_5d": 39.6,
-      "avg_ret_5d": -1.52,
-      "best_win_rate": 54.7,
+      "count": 168,
+      "win_rate_5d": 40.5,
+      "avg_ret_5d": -1.5,
+      "best_win_rate": 54.3,
       "best_hold_days": 1
     }
   ],
@@ -221,45 +239,45 @@
     "periods": [
       {
         "period": "1d",
-        "strict_win": 56.3,
-        "strict_ret": 0.21,
-        "strict_count": 261,
+        "strict_win": 55.8,
+        "strict_ret": 0.18,
+        "strict_count": 267,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "3d",
-        "strict_win": 37.9,
-        "strict_ret": -1.02,
-        "strict_count": 261,
+        "strict_win": 39.4,
+        "strict_ret": -0.89,
+        "strict_count": 267,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "5d",
-        "strict_win": 48.4,
-        "strict_ret": -0.1,
-        "strict_count": 261,
+        "strict_win": 47.7,
+        "strict_ret": -0.18,
+        "strict_count": 267,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "10d",
-        "strict_win": 50.3,
-        "strict_ret": 1.03,
-        "strict_count": 261,
+        "strict_win": 52.8,
+        "strict_ret": 1.24,
+        "strict_count": 267,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "20d",
-        "strict_win": 48.2,
-        "strict_ret": 0.46,
-        "strict_count": 261,
+        "strict_win": 47.6,
+        "strict_ret": 0.51,
+        "strict_count": 267,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -269,17 +287,17 @@
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
     "track_start": "2026-08-17",
-    "history_days": 13,
+    "history_days": 14,
     "summary": {
       "1d": {
-        "count": 9,
-        "win_rate": 44.44,
-        "avg_return": 3.09
+        "count": 10,
+        "win_rate": 40.0,
+        "avg_return": 2.78
       },
       "3d": {
-        "count": 3,
-        "win_rate": 66.67,
-        "avg_return": 3.25
+        "count": 4,
+        "win_rate": 75.0,
+        "avg_return": 3.42
       },
       "5d": {
         "count": 6,
@@ -405,7 +423,8 @@
         "name": "天孚通信",
         "enter_date": "2026-08-25",
         "offsets": {
-          "1d": 0.0
+          "1d": 0.0,
+          "3d": 3.91
         }
       },
       {
@@ -414,6 +433,14 @@
         "enter_date": "2026-08-26",
         "offsets": {
           "1d": 0.12
+        }
+      },
+      {
+        "code": "600362",
+        "name": "江西铜业",
+        "enter_date": "2026-08-27",
+        "offsets": {
+          "1d": 0.0
         }
       }
     ]
