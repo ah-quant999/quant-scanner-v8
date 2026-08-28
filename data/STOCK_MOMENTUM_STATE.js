@@ -416,4 +416,3 @@ window.STOCK_MOMENTUM_STATE = (function() {
     getAll: function() { return data; }
   };
 })();
-// fix

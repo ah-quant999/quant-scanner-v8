@@ -84,4 +84,3 @@ window.CONCEPT_ETF_MAP = {
   "宁组合":      { etf: { code: "159761", name: "新材料ETF" }, leaders: [{ code: "300750", name: "宁德时代" }, { code: "300760", name: "迈瑞医疗" }] },
   "茅指数":      { etf: { code: "510310", name: "沪深300ETF" }, leaders: [{ code: "600519", name: "贵州茅台" }, { code: "300750", name: "宁德时代" }] }
 };
-// fix

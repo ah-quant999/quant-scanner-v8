@@ -99,7 +99,11 @@ def _strip_js_comments(s):
     保留 http:// https://（负向后查 : 前的 // 不剥），避免误伤 URL。
     """
     s = re.sub(r"/\*.*?\*/", "", s, flags=re.S)
-    s = re.sub(r"(?<!:)//[^\n\r]*", "", s)
+    # 行注释：仅当 // 位于行首(可含前导空白)或紧跟空白字符时剥离，
+    # 避免误伤 JSON 字符串内的 //（如 http:// 或 "x//y"）。
+    # 2026-08-28 根因补丁：旧正则 (?<!:)// 会误删字符串值中的 //，
+    # 且本函数必须在 rstrip(";") 之前调用，否则 // fix 在 ; 之后致 json 解析失败。
+    s = re.sub(r"(?m)(?:(?<=^)|(?<=\s))//[^\n\r]*", "", s)
     return s
 
 
@@ -121,11 +125,15 @@ def _is_valid_js_data(text):
     m = re.search(r"window\.[A-Z_0-9]+\s*=\s*(.*)", text, re.S)
     if not m:
         return False
-    body = m.group(1).strip().rstrip(";").strip()
+    # 2026-08-28 根因补丁：必须先剥 JS 注释再 rstrip(";")。
+    # 旧顺序下 body 形如 `{...};\n// fix`，rstrip(";") 因尾部是 \n 剥不到 ;，
+    # 注释剥离后残留 `;` 致 json.loads 抛错、合法数据被误判成 shell 阻断全部构建。
+    body = _strip_js_comments(m.group(1))
+    body = body.strip().rstrip(";").strip()
     if not body:
         return False
     try:
-        json.loads(_strip_js_comments(body))
+        json.loads(body)
         return True
     except Exception:
         return False

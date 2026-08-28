@@ -35,4 +35,3 @@ window.FOUR_VOLUME_60M={
   }
  ]
 };
-// fix

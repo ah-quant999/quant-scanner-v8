@@ -3,4 +3,3 @@ window.FOUR_VOLUME={
  "total": 0,
  "stocks": []
 };
-// fix
