@@ -1,6 +1,6 @@
 {
-  "calc_time": "2026-08-28",
-  "update_time": "2026-08-28",
+  "calc_time": "2026-08-29",
+  "update_time": "2026-08-29",
   "method": "①持仓周期≤10d + ②≥3信号共振 + ③市场regime门控(grind/panic)",
   "backtest_sample": {
     "stocks_analyzed": 296,
