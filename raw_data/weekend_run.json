@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-08-28 08:29:12",
-  "generated": "2026-08-28 08:29:12",
+  "update_time": "2026-08-28 10:00:55",
+  "generated": "2026-08-28 10:00:55",
   "period_start": "2026-08-17",
   "period_end": "2026-08-23",
   "stats": {
@@ -44,7 +44,7 @@
       "file": "sector_rs.json",
       "label": "板块相对强度",
       "status": "ok",
-      "update_time": "2026-08-28 07:23",
+      "update_time": "2026-08-28 07:58",
       "size_kb": 70.9
     },
     {
