@@ -1,2 +1,1 @@
-window.OVERSEAS_MARKETS = {"no_data":true,"premarket_cleared":true,"note":"盘前数据已清空，开盘后自动刷新","update_time":"2026-08-28 09:12:42","republish_time":"2026-08-28 09:17:40"};
-// fix
+window.OVERSEAS_MARKETS = {"date":"2026-08-28","indices":[{"name":"恒生指数","code":"100.HSI","value":25671.11,"chg_pct":0.41,"currency":"HKD"},{"name":"日经225","code":"100.N225","value":66682.88,"chg_pct":0.83,"currency":"JPY"},{"name":"韩国KOSPI","code":"100.KS11","value":6843.61,"chg_pct":-0.99,"currency":"KRW"},{"name":"台湾加权","code":"100.TWII","value":46459.3,"chg_pct":1.05,"currency":"TWD"}],"bias":"亚太偏强","note":"恒生指数/日经225/韩国KOSPI/台湾加权为前一交易日收盘（北京时间08:25抓取时亚太尚未开盘），反映隔夜亚太风险偏好，对A股开盘有传导。","update_time":"2026-08-28 11:07:39","auto":true,"republish_time":"2026-08-28 11:22:06"};
