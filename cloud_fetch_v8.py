@@ -2088,10 +2088,12 @@ def f_market_fund_flow_data():
                 except Exception: return None
             entry = {"date": ds, "net_yi": _f(1)}
             if len(parts) >= 8:
-                entry["super_large_yi"] = _f(2)
-                entry["large_yi"]       = _f(3)
-                entry["medium_yi"]      = _f(4)
-                entry["small_yi"]       = _f(5)
+                # 🛡 2026-08-28 根因修复：东财 daykline 字段顺序为 f52=主力净流入, f53=小单, f54=中单, f55=大单, f56=超大单
+                # 原代码把 2/3/4/5 直接当成 特大/大/中/小，导致 super_large+large 与 net_yi 符号相反、散户/主力颠倒。
+                entry["small_yi"]       = _f(2)
+                entry["medium_yi"]      = _f(3)
+                entry["large_yi"]       = _f(4)
+                entry["super_large_yi"] = _f(5)
                 entry["main_pct"]       = _pct(6)
                 entry["small_pct"]      = _pct(7)
             daily.append(entry)
