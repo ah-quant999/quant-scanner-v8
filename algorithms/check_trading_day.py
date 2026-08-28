@@ -34,6 +34,20 @@ def print(*args, **kwargs):
 
 
 def main():
+    # 2026-08-29 主人令：周末/假期审计验证时，可通过 V8_FORCE_RUN=1 强制视为交易日运行
+    # （用于「代码审计/验证」场景刷新上一交易日数据，不依赖交易日历）。仅 manual dispatch 传入，
+    # 日常 cron 不受影响（仍按交易日历 gate，避免周末无意义覆盖）。
+    if os.environ.get("V8_FORCE_RUN", "") == "1":
+        today = datetime.datetime.now().strftime("%Y-%m-%d")
+        print(f"📅 {today} V8_FORCE_RUN=1 → 强制 is_trading_day=true（周末/假期审计验证）")
+        github_output = os.environ.get("GITHUB_OUTPUT")
+        if github_output:
+            try:
+                with open(github_output, "a", encoding="utf-8") as f:
+                    f.write("is_trading_day=true\n")
+            except Exception as e:
+                print(f"⚠️ 写入 GITHUB_OUTPUT 失败: {e}")
+        sys.exit(0)
     today = datetime.datetime.now().strftime("%Y-%m-%d")
     try:
         from fetch_lhb import is_trading_day

@@ -34,6 +34,13 @@ on:
     - cron: '15 11 * * *'  # 19:15 CST 每天触发，内部交易日历 gate
   workflow_dispatch:
     # 2026-08-28 主人令：mahoro 数据源不再跟踪，已移除相关输入
+    # 2026-08-29 新增 force_run：周末/假期审计验证时强制视为交易日运行（产出上一交易日数据）
+    inputs:
+      force_run:
+        description: '周末/假期审计验证：强制视为交易日运行（默认 false）'
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -99,6 +106,8 @@ jobs:
       # 观澜台(知识星球) token：与小九本地 data/zsxq_token.json 同值。
       # 设置路径：GitHub 仓库 → Settings → Secrets → Actions → ZSXQ_TOKEN
       ZSXQ_TOKEN: ${{ secrets.ZSXQ_TOKEN }}
+      # 2026-08-29 主人令：周末/假期审计验证强制运行开关（workflow_dispatch force_run=true 时置 1）
+      V8_FORCE_RUN: ${{ github.event.inputs.force_run == 'true' && '1' || '' }}
       # 🛡 2026-08-19 一劳永逸根因修复：cn runner 默认 GBK 终端，algorithms/* 270 处 print 含 emoji
       # （📅✅❌⚠️🔗💹🌐…）全部会 UnicodeEncodeError crash，整条 19:15 盘后算法链 0 执行，
       # 17 张盘后/选股卡停在 08:27 红卡。PYTHONIOENCODING=utf-8 是 Python 官方做法，

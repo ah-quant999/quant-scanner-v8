@@ -277,6 +277,10 @@ def _is_post_close_picking_ready():
         sys.path.pop(0)
     now = _now_cst()
     h, m = now.hour, now.minute
+    # 2026-08-29 主人令「周末有 T+1 数据」：周末/节假日上一交易日盘后数据已齐，
+    # 允许跑选股策略（产物归属由 base_trade_date 回退到上一交易日，不会错标成周末）。
+    if now.weekday() >= 5:                          # 5=周六 6=周日
+        return True
     if h > _STOCK_PICKING_READY_HOUR:              # 19:00 ~ 23:59
         return True
     if h == _STOCK_PICKING_READY_HOUR:             # 18:00 ~ 18:59
