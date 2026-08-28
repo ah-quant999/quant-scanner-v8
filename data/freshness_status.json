@@ -1,7 +1,7 @@
 {
-  "check_time": "2026-08-28 20:29:53",
+  "check_time": "2026-08-29 00:09:02",
   "last_trade_close": "2026-08-28 15:30:00",
-  "is_trading_day": true,
+  "is_trading_day": false,
   "core_stale": [
     {
       "var": "CRDS_CARD_DATA",
