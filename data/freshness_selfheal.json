@@ -3,5 +3,18 @@
     "ts": "2026-08-18 15:40:45",
     "run_id": 32110989468,
     "category": "post_close"
+  },
+  "post_close": {
+    "ts": "2026-08-28 16:09:53",
+    "vars": [
+      "VOLATILITY"
+    ]
+  },
+  "algo": {
+    "ts": "2026-08-28 16:09:53",
+    "vars": [
+      "CRDS_CARD_DATA",
+      "LHB_7D"
+    ]
   }
 }
