@@ -197,26 +197,65 @@ def parse_time(s):
 
 
 def load_window_var(path, var_name):
-    """从 data/*.js 读取 window.X = {...}; 并解析为 dict（兼容 IIFE 壳）。"""
+    """从 data/*.js 读取 window.X = {...}; 并解析为 dict（兼容 IIFE 壳）。
+
+    改无正则括号配对版：定位目标变量后做括号配对，正确处理嵌套对象
+    （旧正则 `\\{{[\\s\\S]*?\\}}` 非贪婪会在首个内层 `}` 截断）。
+    """
     if not path.exists():
         return None
-    text = path.read_text(encoding="utf-8")
-    # 去掉 BOM
-    text = text.lstrip("\ufeff")
-    # 直接对象形式 window.X = {...};
-    m = re.search(rf"window\.{re.escape(var_name)}\s*=\s*(\{{[\s\S]*?\}})\s*;", text)
-    if m:
-        try:
-            return json.loads(m.group(1))
-        except Exception:
-            pass  # 落到 IIFE 分支
-    # IIFE 壳：window.X = (function(){ var data = {...}; ... })()
-    m2 = re.search(rf"window\.{re.escape(var_name)}\s*=\s*\(function[\s\S]*?var\s+data\s*=\s*(\{{[\s\S]*?\}})\s*;", text)
-    if m2:
-        try:
-            return json.loads(m2.group(1))
-        except Exception:
-            return None
+    try:
+        text = path.read_text(encoding="utf-8").lstrip("\ufeff")
+        val = _match_braced(text, var_name)
+        if val is not None:
+            return val
+        # IIFE 壳：window.X = (function(){ var data = {...}; ... })()
+        m2 = re.search(
+            rf"window\.{re.escape(var_name)}\s*=\s*\(function[\s\S]*?var\s+data\s*=\s*(\{{[\s\S]*?\}})\s*;",
+            text,
+        )
+        if m2:
+            try:
+                return json.loads(m2.group(1))
+            except Exception:
+                return None
+    except Exception as e:
+        print(f"⚠️ 解析 {path} 失败: {e}")
+    return None
+
+
+def _match_braced(text, var_name):
+    """括号配对提取 window.VAR = {...} 的对象体（无正则，支持嵌套）。"""
+    idx = text.find(f"window.{var_name}")
+    if idx == -1:
+        return None
+    eq = text.find("=", idx)
+    start = text.find("{", eq) if eq != -1 else -1
+    if start == -1:
+        return None
+    depth = 0
+    in_str = esc = False
+    for i in range(start, len(text)):
+        ch = text[i]
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == '"':
+                in_str = False
+        else:
+            if ch == '"':
+                in_str = True
+            elif ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    try:
+                        return json.loads(text[start : i + 1])
+                    except Exception:
+                        return None
     return None
 
 
