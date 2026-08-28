@@ -214,7 +214,12 @@ jobs:
             #   遇大 tree 会 HTTP 422 失败且 continue-on-error 吞掉 → 这些文件永不持久化 → 每轮构建从陈旧基线重来（死亡螺旋）。
             #   现由本部署步用【可靠 git】一并提交累加型小文件（非缓存），确保下一轮 checkout 拿到真实累积基线。
             #   仅列历史累加型文件，避免把 kline/_rps 等缓存（共 51M）塞进仓库。
-            git add -f data/ index.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py \
+            # 🛡 安全：先把任何落入 data/ 的密钥/令牌文件从索引移除，避免一并由 git add 提交到
+            #   公开仓库（git add 不会自动 unstage 已跟踪的敏感文件；此前 -f 曾把 .mahoro_cookies.txt 等强制入库）。
+            git rm --cached --ignore-unmatch \
+              data/.mahoro_cookies.txt data/.github_pat.txt data/zsxq_token.json \
+              data/.wc_jwt_cache.json data/.neodata_token data/zszxq_token.json 2>/dev/null || true
+            git add data/ index.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py \
               raw_data/sh_sz_history.json \
               raw_data/sector_fund_flow_history.json \
               raw_data/triple_resonance_history.json \

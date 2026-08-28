@@ -82,6 +82,10 @@ jobs:
           set -e
           git config user.name "v8-intraday-bot"
           git config user.email "v8-intraday-bot@users.noreply.github.com"
+          # 🛡 安全：先从索引移除敏感文件，防止 git add -A 重新提交已跟踪的密钥
+          git rm --cached --ignore-unmatch \
+            data/.mahoro_cookies.txt data/.github_pat.txt data/zsxq_token.json \
+            data/.wc_jwt_cache.json data/.neodata_token data/zszxq_token.json 2>/dev/null || true
           git add -A
           # 仅有变更时提交（无变更 = noop）
           if git diff --cached --quiet; then
