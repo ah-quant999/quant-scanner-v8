@@ -509,11 +509,16 @@ def auto_dispatch_smart(now_cst, health_rc, health_out):
         b = f"{cn_stale_min/60:.1f}h" if cn_stale_min is not None else "N/A"
         return f"raw_data={a}, cn_fetch={b}"
 
-    if effective_stale is not None and effective_stale > 150:
-        cat = choose_category(now_cst)
-        d_ok, d_msg = auto_dispatch_with_fallback(cat)
-        return d_ok, f"{d_msg} (commit 兜底 [{_age_detail()}])"
-    return True, f"数据新鲜/无 actionable 项（{_age_detail()}），无需派发"
+    # 🛡 2026-08-28 主人令 Option A：30 分钟心跳兜底派发，与 staleness 彻底解耦。
+    # GitHub schedule cron 可能整日静默；仅靠 health fail / commit 陈旧才派发，
+    # 会出现「guard 部分补抓把数据刷得很新 → 全量 cn_fetch 不派发」的断档窗口。
+    # 活跃时段内，只要全局 30min 冷却已过，就强制派发一次，保底刷新。
+    cat = choose_category(now_cst)
+    d_ok, d_msg = auto_dispatch_with_fallback(cat)
+    if d_ok:
+        ctx = "commit 兜底" if (effective_stale is not None and effective_stale > 150) else "30min 心跳兜底"
+        return True, f"{d_msg} ({ctx} [{_age_detail()}])"
+    return False, f"心跳/兜底派发失败: {d_msg} [{_age_detail()}]"
 
 
 _PENDING_STATES = ("queued", "pending", "waiting", "requested")
