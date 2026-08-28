@@ -91,6 +91,18 @@ MIN_SIZE = {
 }
 MIN_TOTAL = 1000000
 
+def _strip_js_comments(s):
+    """剥离 JS 注释，使含 // 行注释或 /* */ 块注释的合法 JSON 数据能被 json.loads 解析。
+    2026-08-28 根因修复：data/*.js 末尾常残留人工/管线留下的 `// fix` 等注释，
+    旧逻辑直接 json.loads 遇 // 注释即抛错，把合法空占位符/真实数据误判成 shell，
+    触发部署前校验失败阻断全部构建。剥离注释后，有 window.X= 且主体为合法 JSON 一律放行。
+    保留 http:// https://（负向后查 : 前的 // 不剥），避免误伤 URL。
+    """
+    s = re.sub(r"/\*.*?\*/", "", s, flags=re.S)
+    s = re.sub(r"(?<!:)//[^\n\r]*", "", s)
+    return s
+
+
 def _is_valid_js_data(text):
     """判定 data/*.js 是否为合法 JSON 数据（非 shell/错误页）。
 
@@ -113,7 +125,7 @@ def _is_valid_js_data(text):
     if not body:
         return False
     try:
-        json.loads(body)
+        json.loads(_strip_js_comments(body))
         return True
     except Exception:
         return False
