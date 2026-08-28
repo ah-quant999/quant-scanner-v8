@@ -14,7 +14,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "beb70e39d";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
+    var BUILD = "13a3608aa";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
     var KEY = "v8_build_sha";
     var cached = localStorage.getItem(KEY);
     if(cached && cached !== BUILD){
@@ -460,7 +460,7 @@ window.__domReadyFns=[];
     <script src="data/SECTOR_FUND_FLOW.js?v=f3481fec30" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=254a8483ef" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=912990e424" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=1a52c85250" defer></script>
     <script src="data/ANALYST_RATINGS.js?v=20876de163" defer></script>
     <script src="data/SUSPENSION_ALERT.js?v=95faf04dbf" defer></script>
     <script src="data/GOLD_POOL.js?v=765e748eb6" defer></script>
@@ -477,7 +477,7 @@ window.__domReadyFns=[];
 <!-- 2026-08-23 恢复：潜力挖掘板块+股票预测推荐数据（calc_potential_picks.py 输出，跟盘后算法链自动更新） -->
 <script src="data/POTENTIAL_PICKS.js?v=d2022db617" defer></script>
 <script src="data/INDEX_QUOTES.js?v=396f2383f5" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=b72ec36bfa" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=4d8cf920e2" defer></script>
 <script src="data/MARGIN_DATA.js?v=401a1da85b" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=6c0e0cf7f9" defer></script>
 <script src="data/IPO_DATA.js?v=94aba12264" defer></script>
@@ -1287,15 +1287,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/W52_HIGH.js?v=a3dd7ce343" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=5a17f6461c" defer></script>
 <script src="data/RUNNER_STATUS.js?v=86e11e2303" defer></script>
-<script src="data/HEALTH_CHECK.js?v=d8f7c51a90" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=e0b35fd16c" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=cf4ee1f4c7" defer></script>
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=67d76a0062" defer></script>
-    <script src="data/INDEX_HISTORY.js?v=4aef2a7390" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=1870e0ff8f" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=9cae58f5ef" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=22254d14da" defer></script>
-    <script src="data/ALGO_BACKTEST_COMPARE.js?v=d124d2474a" defer></script>
+<script src="data/HEALTH_CHECK.js?v=17404d78f5" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=7bf8edaf62" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=d1480b7a16" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=1879adfa37" defer></script>
+    <script src="data/INDEX_HISTORY.js?v=c40079496c" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=489829e7d0" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=09b86d3959" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=dd4f4c8116" defer></script>
+    <script src="data/ALGO_BACKTEST_COMPARE.js?v=b473886c7f" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -5125,7 +5125,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-h">分组展示</div>
         <div class="logic-p">· <b class="up">严格共识（3/3）</b>：无条件优先看<br>· <b style="color:var(--gold)">优先观察（2/3，total_score≥75）</b>：差1步<br>· <b style="color:var(--dim)">扩展观察（2/3，total_score&lt;75）</b>：差2步</div>
         <div class="logic-h">评分·完整公式</div>
-        <div class="logic-p">原始加分 = 基础(~110) + 增强(±16) + 形态(~16) + 资金(~10) + 板块(~5) + 机构投行(~10) + 基本面(-10~+40) + 回测反哺(±10)，理论满分约 250。<br><b>最终 total_score 已归一化到 0~100</b>，因此 ≥80 分才是「精选」、≥70 分是「观察」。</div>
+        <div class="logic-p">原始加分 = 基础(~110) + 增强(±16) + 形态(~16) + 资金(~10) + 板块(~5) + 机构/事件(~7) + 基本面(-10~+40) + 回测反哺(±10)。<br><b>最终 total_score 已归一化到 0~100</b>，≥80 分为「精选」、≥70 分为「观察」。<br><b class="up">2026-08-28 口径校准</b>：分母由理论上限 250 改为按实测分布校准的 <b>130</b>。此前 46 天 756 个信号的原始分实际分布在 69~106 之间，除以 250 后最高只有 42 分，<b>≥80 分在数学上不可达</b>（近 15 日实测 0 个）。校准后 80 分重新代表头部约 5% 的信号。</div>
         <table class="lg-table">
           <tr><th>维度</th><th>原始满分</th><th>细则</th></tr>
           <tr><td>缠论买</td><td>25</td><td>日K底分型+MACD金叉/底背离</td></tr>
@@ -5133,16 +5133,20 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><td>机构变红</td><td>25</td><td>四量图机构资金介入</td></tr>
           <tr><td>上涨趋势</td><td>25</td><td>EMA多头+量能+价格确认</td></tr>
           <tr><td>信号组合优待</td><td>+10/+5</td><td>缠论买+金钻起涨=+10；+黄柱=+5</td></tr>
-          <tr><td>增强因子</td><td>±16</td><td>20日动量(±5)+RSI风控(±5)+连续共振(+2/天上限8)</td></tr>
+          <tr><td>增强因子</td><td>-6~+16</td><td>20日动量(<b>2026-08-28 起反向计分</b>：≥50% −6 / 35~50% −3 / 20~35% −1 / 0~10% +2)+RSI风控(±5)+连续共振(+2/天上限8)</td></tr>
           <tr><td>形态分</td><td>~16</td><td>EMA结构+非涨停+20日涨幅控制+RSI控制+形态A奖励</td></tr>
-          <tr><td>资金动力</td><td>~10</td><td>主力净买(+5/+2)+龙虎榜机构/机游共振(+5/+3)</td></tr>
+          <tr><td>资金动力</td><td>-2~+10</td><td>主力净流入≥1亿 +5 / &gt;0 +2 / <b>净流出≤−1亿 −2</b>+龙虎榜机构/机游共振(+5/+3)</td></tr>
           <tr><td>板块共振</td><td>~5</td><td>所属板块净流入&gt;5亿+5/&gt;1亿+2/&lt;-5亿-3</td></tr>
-          <tr><td>机构投行</td><td>~10</td><td>投行bullish+3/52周新高+4/分析师转向+3</td></tr>
+          <tr><td>机构/事件</td><td>~7</td><td>52周新高+4/分析师关注+3（2026-08-28 起不再跟踪 mahoro）</td></tr>
           <tr><td>基本面质量分</td><td>-10~+40</td><td>A级+40/B级+5/C级0/D级-10</td></tr>
           <tr><td>回测反哺</td><td>±10</td><td>按信号组合的历史 T+3 胜率偏离 50% 的程度加减分</td></tr>
         </table>
         <div class="logic-h">归一化口径</div>
-        <div class="logic-p">total_score = min(100, 原始总分 / 250 × 100)。历史快照会同步回刷，保证「≥80 精选 / ≥70 观察」的阈值在所有日期口径一致。</div>
+        <div class="logic-p">total_score = min(100, 原始总分 / 130 × 100)。历史快照已同步回刷，保证「≥80 精选 / ≥70 观察」的阈值在所有日期口径一致。<br><span style="color:var(--dim)">注：2026-06 那批早期快照缺少评分明细、无法还原原始分，按要求保持原样未改（不编造数据）。</span></div>
+        <div class="logic-h">建议持有期（2026-08-28 新增）</div>
+        <div class="logic-p">按可信口径回测（入场价 = 信号日次一交易日<b>开盘价</b>，扣除往返 0.20% 成本，基准 = 上证指数），持有期与超额收益强相关：<br>· <b class="down">T+1 / T+3 / T+5：超额 −0.58% / −1.96% / −1.87%</b> —— 短期反而跑输大盘<br>· <b class="up">T+10：超额 +6.05%，胜率 64.5%</b><br>· <b class="up">T+20：超额 +5.92%，胜率 75.1%</b><br>因此全站默认<b>建议持有 10 个交易日</b>，不宜按 1~5 日的短线思路操作。</div>
+        <div class="logic-h">评分有效性验证</div>
+        <div class="logic-p">按当日评分分三组回测（T+10）：<b class="up">前 1/3 超额胜率 81.5%</b>，后 1/3 为 58.0%；分月看 T+10 超额收益 6 月 +18.7% / 7 月 +3.8% / 8 月 +4.8%，三个月全为正。<br>结论：评分的主要价值是提升<b>胜率与稳定性</b>，而非拉高单笔收益。</div>
         <div class="logic-h">历史追踪</div>
         <div class="logic-p">持仓表、催化剂兑现、回测N日胜率、严格vs宽松、阈值敏感性、板块聚类、重叠度、每日入选历史。</div>
       </div>
@@ -7219,17 +7223,17 @@ window.__renderV8CalFull();
       applyData(window.IPO_DATA);
     }else{
       /* 🛡 2026-08-28 一劳永逸（主站审计 P1-8）：缓存戳 ?v= 从页面已注入的
-         <script src="data/IPO_DATA.js?v=94aba12264"> 实时读取，不再手写 hash。
+         <script src="data/IPO_DATA.js?v=xxx"> 实时读取，不再手写 hash。
          历史债务：本处注释写死一个旧 hash、实际引用是另一个、报错信息又写一遍，
          三处漂移；且手写 hash 不随构建更新 → CDN 吐旧副本 → 打新数据陈旧。
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
       var _ipoUrl=(function(){
         try{
-          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=94aba12264"]');
+          var el=document.querySelector('script[src*="data/IPO_DATA.js"]');
           var s=el?el.getAttribute('src'):'';
           if(s) return s;
         }catch(e){}
-        return 'data/IPO_DATA.js?v=94aba12264';
+        return 'data/IPO_DATA.js';
       })();
       // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
       fetch(_ipoUrl)
@@ -10905,7 +10909,7 @@ function drawUpDownChart(){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=1870e0ff8f';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=489829e7d0';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -10914,7 +10918,7 @@ function drawUpDownChart(){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=9cae58f5ef';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=09b86d3959';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -13550,7 +13554,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=d8f7c51a90')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
@@ -14150,7 +14154,7 @@ window.__renderV8CalToday();
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=bf40940569'},
     {name:'STOCK_PROFILE', url:'data/STOCK_PROFILE.js?v=fed118da8a'},
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=376c772467'},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=63967ef5cd'},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=eec2a58464'}
   ];
   function loadOne(item, done){

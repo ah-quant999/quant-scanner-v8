@@ -134,9 +134,12 @@ ORDER = [
 
 
 def step_v8_self_sufficiency():
-    """2026-08-02 原生化：v8 自产 4 类上游输入（gold_pool / scan_result / watch_result /
-    guanlan_* / mahoro_signals），替代 v6 供给。通过 V8_OUT_DIR 环境变量让被迁移脚本
-    把数据写到仓库根 out/（而非 algorithms/data）。"""
+    """2026-08-02 原生化：v8 自产 3 类上游输入（gold_pool / scan_result / watch_result /
+    guanlan_*），替代 v6 供给。通过 V8_OUT_DIR 环境变量让被迁移脚本把数据写到仓库根
+    out/（而非 algorithms/data）。
+
+    2026-08-28 主人令：mahoro 数据源不再跟踪，已从 jobs 中移除。
+    """
     print(f"\n[0-pre] v8 原生化自产上游输入 → out/  (V8_OUT_DIR={OUT})")
     os.makedirs(OUT, exist_ok=True)
     env = dict(os.environ)
@@ -144,7 +147,6 @@ def step_v8_self_sufficiency():
     jobs = [
         ("scanner.py", 3600),             # 产出 gold_pool / scan_result / watch_result
         ("guanlan_extractor.py", 600),    # 产出 guanlan_reports / guanlan_watchlist
-        ("fetch_maharo_signals.py", 300), # 产出 mahoro_signals（cookie 在 v8 data/）
     ]
     for script, timeout in jobs:
         path = os.path.join(ALGO, script)

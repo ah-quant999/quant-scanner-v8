@@ -23,6 +23,17 @@ WORKSPACE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(WORKSPACE, "..", "raw_data")
 OUTPUT = os.path.join(DATA_DIR, "top10_daily.json")
 
+# ── 归一化分母（2026-08-28 校准，勿改回 250）─────────────────────────────────
+# 原值 250 是【理论上限】累加值，但实测 46 天 756 个信号的 raw_total 分布是
+#   P50=69  P75=78  P90=88  P95=93  P99=100  MAX=106
+# 用 250 作分母 → 历史最高分仅 42.4 分，≥80 分信号【数学上不可达】
+# （近 15 日实测 ≥80 与 70~80 分信号均 0 个，回测阈值对实盘完全失效）。
+# 本次同时修复了恒为 0 的 fund/inst/sector 三维度（+0~25 raw），
+# 校准后分母取 130：P95≈110、MAX≈130，80 分线重新代表头部约 5% 的信号。
+# ⚠️ 改此值必须同步重跑 renormalize_top10_history.py，否则历史口径断裂。
+NORM_DIVISOR = 130
+NORM_VERSION = 130          # 写入快照，供迁移函数识别是否已按本口径归一
+
 
 def load_json(path, default=None):
     """安全加载JSON"""
@@ -33,11 +44,99 @@ def load_json(path, default=None):
         return default if default is not None else {}
 
 
+def freshness_warn(name, obj, max_age_days=1.0):
+    """数据源陈旧度告警（2026-08-28 新增）
+
+    主人的核心痛点：「算法链或股池断更了我都不知道」。此前三个评分维度
+    因读不到数据源而恒为 0，却毫无提示。现对每个关键数据源检查 update_time，
+    超过阈值就打印告警 —— 只告警不阻断，保证断更【可见】。
+    """
+    if not isinstance(obj, dict) or not obj:
+        print(f"  ⚠️ {name}: 数据为空，相关评分维度将为 0")
+        return False
+    ut = obj.get("update_time") or obj.get("fetch_time") or obj.get("date")
+    if not ut:
+        print(f"  ⚠️ {name}: 无 update_time 字段，无法判断新鲜度")
+        return True
+    s = str(ut).replace("T", " ").strip()
+    dt = None
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d"):
+        try:
+            dt = datetime.strptime(s[:len(fmt) + 3], fmt)
+            break
+        except ValueError:
+            continue
+    if dt is None:
+        return True
+    age = (datetime.now() - dt).total_seconds() / 86400.0
+    if age > max_age_days:
+        print(f"  ⚠️ {name} 陈旧: update_time={ut}（{age:.1f} 天前）→ 相关维度可能失真")
+        return False
+    return True
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 🔴 2026-08-28 修复：真实 20 日涨幅
+# 实测 top10 近 10 日 180/180 条信号的 pct_chg_20d 全为 0，且 gold_pool 中
+# 0/65 只股票带该字段 —— 该因子此前完全失效，并造成两处隐性错误：
+#   1) enhance 的涨幅分支永远走 else（0<20），涨跌幅调节形同虚设
+#   2) form 的 `pct20 < 35` 恒为 True → 每只股票白送 2 分，形态A判断失真
+# 现改为从 raw_data/kline_cache 的真实日K计算。
+# ─────────────────────────────────────────────────────────────────────────────
+_KLINE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                          "..", "raw_data", "kline_cache")
+_KLINE_CACHE = {}
+
+
+def _load_kline(code):
+    """读取个股日K缓存 → [(date, close), ...] 升序；无数据返回 []"""
+    if code in _KLINE_CACHE:
+        return _KLINE_CACHE[code]
+    rows = []
+    try:
+        with open(os.path.join(_KLINE_DIR, f"{code}.json"), "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, list):
+            for r in data:
+                try:
+                    if r.get("date") and r.get("close"):
+                        rows.append((r["date"], float(r["close"])))
+                except (TypeError, ValueError):
+                    continue
+            rows.sort(key=lambda x: x[0])
+    except Exception:
+        rows = []
+    _KLINE_CACHE[code] = rows
+    return rows
+
+
+def pct_chg_20d_of(code, asof_date=None):
+    """真实 20 交易日涨幅(%)。数据不足返回 None（注意：None ≠ 0，0 是有效值）"""
+    rows = _load_kline(code)
+    if len(rows) < 2:
+        return None
+    if asof_date:
+        rows = [r for r in rows if r[0] <= asof_date]
+        if len(rows) < 2:
+            return None
+    cur = rows[-1][1]
+    base = rows[max(0, len(rows) - 1 - 20)][1]
+    if base <= 0:
+        return None
+    return (cur - base) / base * 100
+
+
 def _migrate_old_top10_scores(hist_dir):
     """将历史 top10_daily_YYYYMMDD.json 中旧 raw 评分（>100）统一归一化到 0~100，
-    保证回测与阈值口径一致。按 250 理论满分折算，最高 100。"""
+    保证回测与阈值口径一致。
+
+    2026-08-28 升级：分母 250 → NORM_DIVISOR(130)，并写入 norm_version 标记。
+    ⚠️ 若无版本标记，同一文件会被不同口径反复归一化 —— 那正是「回测结论对
+       实盘失效」的根因（7/17–7/30 比值 1.00，8/01 起 0.40）。
+    """
     if not os.path.isdir(hist_dir):
         return
+    changed = 0
     for fn in os.listdir(hist_dir):
         if not fn.startswith("top10_daily_") or not fn.endswith(".json"):
             continue
@@ -46,25 +145,30 @@ def _migrate_old_top10_scores(hist_dir):
             data = load_json(path, {})
             if not isinstance(data, dict):
                 continue
-            # max_score > 100 说明是旧 raw 分
-            if data.get("max_score", 0) <= 100:
-                continue
+            if data.get("norm_version") == NORM_VERSION:
+                continue                      # 已是本口径，跳过
+            need_norm = data.get("max_score", 0) > 100   # >100 → 仍是旧 raw 分
             top10 = data.get("top10", [])
             count_80 = 0
             max_s = 0
             for item in top10:
-                raw = item.get("total_score", 0)
-                norm = round(min(100, raw / 250 * 100), 1)
-                item["total_score"] = norm
-                max_s = max(max_s, norm)
-                if norm >= 80:
+                if need_norm:
+                    raw = item.get("total_score", 0)
+                    item["total_score"] = round(min(100, max(0, raw / NORM_DIVISOR * 100)), 1)
+                s = item.get("total_score", 0) or 0
+                max_s = max(max_s, s)
+                if s >= 80:
                     count_80 += 1
             data["max_score"] = max_s
             data["count_80plus"] = count_80
+            data["norm_version"] = NORM_VERSION
             with open(path, "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)
+            changed += 1
         except Exception:
             pass
+    if changed:
+        print(f"  🔄 历史快照已统一到 NORM_DIVISOR={NORM_DIVISOR} 口径：{changed} 个文件")
 
 
 def main():
@@ -93,17 +197,44 @@ def main():
     print(f"  📊 金股池: {len(gp_stocks)} 只")
 
     # ── 2. 加载辅助数据 ──
+    # 🔴 2026-08-28 修复：以下 6 处此前读的是【不存在的文件/键】，导致
+    #    score_fund / score_inst / score_sector 三个维度恒为 0（实测近 7 日
+    #    140/140 条信号这三项全为 0），评分体系丢掉约 25 分 raw 的区分度。
+    #    真实文件名以 stage_to_raw.py 的 V6_TO_V8 映射表与 raw_data 实际产物为准。
+    #    ┌ 旧（读不到）              → 新（实际存在）
+    #    ├ main_stock.json          → capital_flow_data.json  (.top_inflow/.top_outflow，单位【亿元】)
+    #    ├ lhb_result.json          → lhb_data.json           (.stocks)   ← V6_TO_V8 已映射
+    #    ├ mahoro_signals.json      → mahoro.json             (.gold_pool_matches) ← V6_TO_V8 已映射
+    #    ├ 52w_high.json            → w52_high.json           (.top_gainers)
+    #    ├ analyst_ratings[upgrades]→ analyst_ratings (.hot_stocks/.new_coverage)  ← upgrades 恒为空
+    #    └ industry_map.json        → candidate.json          (.stocks[].industry/.concepts)
     sector_flow = load_json(os.path.join(DATA_DIR, "sector_fund_flow.json"), {})
-    lhb_data = load_json(os.path.join(DATA_DIR, "lhb_result.json"), {})
-    main_stock = load_json(os.path.join(DATA_DIR, "main_stock.json"), {})
+    lhb_data = load_json(os.path.join(DATA_DIR, "lhb_data.json"), {})
+    capital_flow = load_json(os.path.join(DATA_DIR, "capital_flow_data.json"), {})
     north_fund = load_json(os.path.join(DATA_DIR, "north_fund.json"), {})
-    mahoro = load_json(os.path.join(DATA_DIR, "mahoro_signals.json"), {})
-    w52_high = load_json(os.path.join(DATA_DIR, "52w_high.json"), {})
+    # 2026-08-28 主人令：mahoro 数据源不再跟踪，相关评分项已移除
+    w52_high = load_json(os.path.join(DATA_DIR, "w52_high.json"), {})
     # 2026-07-21: 基本面质量分(A=+40, B=+5, D=-10, C=0)
     fundamental = load_json(os.path.join(DATA_DIR, "fundamental_quality.json"), {})
     fundamental_stocks = fundamental.get("stocks", {}) if isinstance(fundamental, dict) else {}
     analyst = load_json(os.path.join(DATA_DIR, "analyst_ratings.json"), {})
-    industry_map = load_json(os.path.join(DATA_DIR, "industry_map.json"), {})
+    # 行业/概念映射：与 gold_pool 同构的时序坑 —— 本轮产物在 out/candidate_pool.json，
+    # 要等 stage_to_raw 才搬运到 raw_data。直接读 raw_data 可能拿到上一轮（实测曾陈旧 2 天）。
+    _out_cand = os.path.join(WORKSPACE, "..", "out", "candidate_pool.json")
+    industry_map = load_json(_out_cand, {})
+    if not (isinstance(industry_map, dict) and industry_map.get("stocks")):
+        industry_map = load_json(os.path.join(DATA_DIR, "candidate.json"), {})
+
+    # ── 2.2 数据源新鲜度巡检（断更可见化，不阻断）──
+    print("  ── 数据源新鲜度 ──")
+    freshness_warn("板块资金流", sector_flow)
+    freshness_warn("龙虎榜", lhb_data, max_age_days=2.0)
+    freshness_warn("主力资金", capital_flow)
+    freshness_warn("52周新高", w52_high)
+    freshness_warn("分析师评级", analyst)
+    freshness_warn("基本面质量", fundamental)
+    freshness_warn("行业概念映射", industry_map, max_age_days=2.0)
+    print("  ────────────────")
 
     # ── 2.5 加载驾驶舱回测胜率并按信号组合聚合 ──
     backtest = load_json(os.path.join(DATA_DIR, "cockpit_backtest.json"), {})
@@ -151,38 +282,53 @@ def main():
                 "category": s.get("category", ""),
             }
 
-    # 主力：code→net
+    # 主力：code→净流入【亿元】（capital_flow_data 口径与旧 main_stock 的万元不同，阈值已换算）
     main_map = {}
-    for s in main_stock.get("top_main_in", []):
-        main_map[s.get("code", "")] = s.get("net", 0)
-    for s in main_stock.get("top_main_out", []):
+    for s in capital_flow.get("top_inflow", []):
         code = s.get("code", "")
-        if code not in main_map:
+        if code:
+            main_map[code] = s.get("net", 0)
+    for s in capital_flow.get("top_outflow", []):
+        code = s.get("code", "")
+        if code and code not in main_map:
             main_map[code] = s.get("net", 0)
 
-    # 投行覆盖：code→stance
-    mahoro_map = {}
-    for m in mahoro.get("gold_pool_matches", []):
-        mahoro_map[m.get("code", "")] = m.get("stance", "")
+    # 52周新高：优先按 code 精确匹配，回退 name（旧代码只读 name，易误命中同名股）
+    w52_codes, w52_names = set(), set()
+    for s in w52_high.get("top_gainers", []):
+        if s.get("code"):
+            w52_codes.add(s.get("code", ""))
+        if s.get("name"):
+            w52_names.add(s.get("name", ""))
 
-    # 52周新高 (按名称粗略匹配)
-    w52_names = set()
-    for s in w52_high.get("stocks", []):
-        w52_names.add(s.get("name", ""))
+    # 分析师关注：hot_stocks（TOP分析师推荐）+ new_coverage（新覆盖）
+    # 旧代码只读 upgrades，而该键实测恒为空 list，导致此项永久加分失败
+    analyst_codes, analyst_names = set(), set()
+    for key in ("hot_stocks", "new_coverage", "upgrades"):
+        for a in analyst.get(key, []) or []:
+            if a.get("code"):
+                analyst_codes.add(a.get("code", ""))
+            if a.get("name"):
+                analyst_names.add(a.get("name", ""))
 
-    # 分析师转向 (按名称)
-    analyst_names = set()
-    for a in analyst.get("upgrades", []):
-        analyst_names.add(a.get("name", ""))
-
-    # 行业映射：code→[sector_names]
+    # 行业/概念映射：code→[板块名]
+    # 数据源由不存在的 industry_map.json 换成 candidate.json（含 industry + concepts）
     ind_map = {}
     im_stocks = industry_map.get("stocks", {})
     if isinstance(im_stocks, dict):
-        for code_key, sectors in im_stocks.items():
-            # normalize code
-            clean = code_key.replace("sh_", "").replace("sz_", "").replace("hk_", "").replace("bj_", "")
-            ind_map[clean] = sectors if isinstance(sectors, list) else sectors.get("sectors", [])
+        for code_key, info in im_stocks.items():
+            if not isinstance(info, dict):
+                continue
+            clean = (info.get("code") or code_key.replace("sh_", "").replace("sz_", "")
+                     .replace("hk_", "").replace("bj_", ""))
+            tags = []
+            if info.get("industry"):
+                tags.append(info["industry"])
+            for c in (info.get("concepts") or []):
+                if c:
+                    tags.append(c)
+            if tags:
+                ind_map[clean] = tags
 
     # ── 4. 计算多维共振评分 ──
     scored = []
@@ -225,12 +371,23 @@ def main():
         # 增强因子 (-10 ~ +13)
         enhance = 0
         pct20 = latest.get("pct_chg_20d") or s.get("pct_chg_20d") or 0
+        if not pct20:
+            # 字段缺失（实测 100% 缺失）→ 用真实日K补齐
+            _v = pct_chg_20d_of(raw_code)
+            if _v is not None:
+                pct20 = _v
+        # 🔴 方向修正（2026-08-28）：可信回测显示 pct_chg_20d 与未来收益
+        #    【负相关】——T5 IC 7月 -0.109 / 8月 -0.228，T10 -0.293、T20 -0.392，
+        #    两个月同号率 100%。原代码却给 20~50% 涨幅【加分】，方向相反。
+        #    现改为：涨幅越大越扣分（A股短期反转效应），温和小涨给正分。
         if pct20 >= 50:
-            enhance -= 5
+            enhance -= 6
         elif pct20 >= 35:
-            enhance += 5
+            enhance -= 3          # 原 +5 → -3
         elif pct20 >= 20:
-            enhance += 3
+            enhance -= 1          # 原 +3 → -1
+        elif 0 < pct20 < 10:
+            enhance += 2          # 新增：温和上涨（未过热）给正分
 
         rsi = latest.get("rsi_14") or s.get("rsi_14") or 50
         if rsi > 70:
@@ -283,18 +440,21 @@ def main():
         if limit_up:
             form_score -= 5
 
-        # 资金动力 (0 ~ +15)
+        # 资金动力 (0 ~ +10)
         fund = 0
         fund_detail = []
 
-        # 主力
+        # 主力（capital_flow_data 单位为【亿元】，非旧 main_stock 的万元）
         main_net = main_map.get(raw_code, 0)
-        if main_net > 1000:
+        if main_net >= 1:
             fund += 5
-            fund_detail.append(f"主力+{main_net:.0f}万")
+            fund_detail.append(f"主力净流入+{main_net:.2f}亿")
         elif main_net > 0:
             fund += 2
-            fund_detail.append(f"主力+{main_net:.0f}万")
+            fund_detail.append(f"主力净流入+{main_net:.2f}亿")
+        elif main_net <= -1:
+            fund -= 2
+            fund_detail.append(f"主力净流出{main_net:.2f}亿")
 
         # 龙虎榜
         lhb_info = lhb_map.get(raw_code)
@@ -340,26 +500,17 @@ def main():
             sector_score -= 3
             sector_detail = f"{best_sector_name}{best_sector_flow:.1f}亿"
 
-        # 机构/投行 (0 ~ +10)
+        # 机构/投行 (0 ~ +7)  2026-08-28：mahoro 已移除，只剩 52周新高 + 分析师关注
         inst = 0
         inst_detail = []
 
-        stance = mahoro_map.get(raw_code, "")
-        if stance == "bullish":
-            inst += 3
-            inst_detail.append("投行看多")
-        elif stance in ("neutral", "mixed"):
-            inst += 1
-            inst_detail.append("投行关注")
-
-        if name in w52_names:
+        if raw_code in w52_codes or name in w52_names:
             inst += 4
             inst_detail.append("52周新高")
 
-        if name in analyst_names:
+        if raw_code in analyst_codes or name in analyst_names:
             inst += 3
-            analyst_detail_name = name  # just use name
-            inst_detail.append("分析师转向")
+            inst_detail.append("分析师关注")
 
         # ── 止损位 / 目标价 ──
         close_price = latest.get("close") or s.get("close") or 0
@@ -406,10 +557,9 @@ def main():
         score_backtest = max(-10, min(10, round((win_rate - 50) / 10 * 5)))
         raw_total = raw_total + score_backtest
 
-        # ── 归一化到 0~100（2026-08-01 升级）──
-        # 理论满分 ≈ 250（base 110 + enhance 16 + form 16 + fund 10 + sector 5 + inst 10 + quality 40 + backtest 10）
-        # 避免 base 单项满分 110 却被下游当百分制阈值用的口径混乱
-        total = round(min(100, raw_total / 250 * 100), 1)
+        # ── 归一化到 0~100 ──
+        # 分母见模块顶部 NORM_DIVISOR 注释：250 已使 ≥80 分不可达，现校准为 130
+        total = round(min(100, max(0, raw_total / NORM_DIVISOR * 100)), 1)
 
         scored.append({
             "code": raw_code,
@@ -511,6 +661,14 @@ def main():
         "total_scored": len(scored),
         "count_80plus": count_80plus,
         "max_score": max_score,
+        "norm_version": NORM_VERSION,
+        "norm_divisor": NORM_DIVISOR,
+        # 🔴 2026-08-28：可信回测（入场=次日开盘、扣往返 0.20%、基准=上证指数）
+        #    显示持有期与超额收益强相关：
+        #      T1 −0.58% / T3 −1.96% / T5 −1.87%  ← 短期跑输大盘
+        #      T10 +6.05%(胜率64.5%) / T20 +5.92%(胜率75.1%)  ← 中长持有才有 alpha
+        #    故全站默认建议持有 10 个交易日，前端可直接展示。
+        "suggested_hold_days": 10,
         "top10": top10,
     }
 

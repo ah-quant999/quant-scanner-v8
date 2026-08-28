@@ -2,7 +2,7 @@
   "update_time": "2026-08-01 13:22:01",
   "total_scored": 213,
   "count_80plus": 0,
-  "max_score": 34.4,
+  "max_score": 66.2,
   "top10": [
     {
       "rank": 1,
@@ -14,7 +14,7 @@
       "close": 37.91,
       "pct_chg": 9.88,
       "pct_chg_20d": 0,
-      "total_score": 34.4,
+      "total_score": 66.2,
       "sectors": [
         "电气机械和器材制造业",
         "MSCI中国",
@@ -61,7 +61,7 @@
       "close": 40.8,
       "pct_chg": 1.02,
       "pct_chg_20d": 0,
-      "total_score": 33.2,
+      "total_score": 63.8,
       "sectors": [
         "电气机械和器材制造业",
         "HS300_",
@@ -108,7 +108,7 @@
       "close": 41.48,
       "pct_chg": 0.02,
       "pct_chg_20d": 0,
-      "total_score": 32.4,
+      "total_score": 62.3,
       "sectors": [
         "计算机、通信和其他电子设备制造业",
         "2026中报预增",
@@ -155,7 +155,7 @@
       "close": 39.31,
       "pct_chg": -4.52,
       "pct_chg_20d": 0,
-      "total_score": 32.4,
+      "total_score": 62.3,
       "sectors": [
         "计算机、通信和其他电子设备制造业",
         "2025三季报预增",
@@ -202,7 +202,7 @@
       "close": 40.51,
       "pct_chg": -2.92,
       "pct_chg_20d": 15.61,
-      "total_score": 32.4,
+      "total_score": 62.3,
       "sectors": [
         "保险业",
         "2025三季报预增",
@@ -249,7 +249,7 @@
       "close": 75.98,
       "pct_chg": -2.79,
       "pct_chg_20d": -62.39,
-      "total_score": 31.6,
+      "total_score": 60.8,
       "sectors": [
         "金属制品业",
         "2026一季报预增",
@@ -296,7 +296,7 @@
       "close": 57.32,
       "pct_chg": -10.0,
       "pct_chg_20d": 0,
-      "total_score": 30.4,
+      "total_score": 58.5,
       "sectors": [
         "计算机、通信和其他电子设备制造业",
         "2026中报预增",
@@ -343,7 +343,7 @@
       "close": 150.54,
       "pct_chg": 1.33,
       "pct_chg_20d": 0,
-      "total_score": 30.4,
+      "total_score": 58.5,
       "sectors": [
         "专用设备制造业",
         "HS300_",
@@ -390,7 +390,7 @@
       "close": 21.68,
       "pct_chg": -4.95,
       "pct_chg_20d": 25.25,
-      "total_score": 28.4,
+      "total_score": 54.6,
       "sectors": [
         "有色金属矿采选业",
         "2026一季报预增",
@@ -437,7 +437,7 @@
       "close": 65.6,
       "pct_chg": 3.67,
       "pct_chg_20d": 0,
-      "total_score": 28.4,
+      "total_score": 54.6,
       "sectors": [
         "计算机、通信和其他电子设备制造业",
         "AIPC",
@@ -484,7 +484,7 @@
       "close": 85.37,
       "pct_chg": 1.47,
       "pct_chg_20d": 0,
-      "total_score": 28.4,
+      "total_score": 54.6,
       "sectors": [
         "电气机械和器材制造业",
         "AH股",
@@ -531,7 +531,7 @@
       "close": 44.17,
       "pct_chg": -4.76,
       "pct_chg_20d": -25.03,
-      "total_score": 28.0,
+      "total_score": 53.8,
       "sectors": [
         "有色金属冶炼和压延加工业",
         "2026一季报预增",
@@ -578,7 +578,7 @@
       "close": 14.55,
       "pct_chg": -3.39,
       "pct_chg_20d": -21.65,
-      "total_score": 27.6,
+      "total_score": 53.1,
       "sectors": [
         "计算机、通信和其他电子设备制造业",
         "2026中报预增",
@@ -625,7 +625,7 @@
       "close": 30.41,
       "pct_chg": 1.6,
       "pct_chg_20d": -20.52,
-      "total_score": 27.6,
+      "total_score": 53.1,
       "sectors": [
         "房地产业",
         "2026中报预增",
@@ -672,7 +672,7 @@
       "close": 58.26,
       "pct_chg": -4.6,
       "pct_chg_20d": -25.09,
-      "total_score": 27.6,
+      "total_score": 53.1,
       "sectors": [
         "计算机、通信和其他电子设备制造业",
         "2026中报扭亏",
@@ -719,7 +719,7 @@
       "close": 28.48,
       "pct_chg": -6.38,
       "pct_chg_20d": -32.75,
-      "total_score": 27.6,
+      "total_score": 53.1,
       "sectors": [
         "有色金属冶炼和压延加工业",
         "2026中报扭亏",
@@ -766,7 +766,7 @@
       "close": 26.93,
       "pct_chg": -2.36,
       "pct_chg_20d": -6.85,
-      "total_score": 27.2,
+      "total_score": 52.3,
       "sectors": [
         "化学原料和化学制品制造业",
         "2026中报预增",
@@ -813,7 +813,7 @@
       "close": 36.14,
       "pct_chg": -2.3,
       "pct_chg_20d": 0,
-      "total_score": 26.4,
+      "total_score": 50.8,
       "sectors": [
         "计算机、通信和其他电子设备制造业",
         "AI应用",
@@ -860,7 +860,7 @@
       "close": 14.25,
       "pct_chg": 6.18,
       "pct_chg_20d": 0,
-      "total_score": 26.4,
+      "total_score": 50.8,
       "sectors": [
         "医药制造业",
         "中药概念",
@@ -907,7 +907,7 @@
       "close": 35.58,
       "pct_chg": -1.25,
       "pct_chg_20d": 0,
-      "total_score": 26.4,
+      "total_score": 50.8,
       "sectors": [
         "通用设备制造业",
         "AH股",
@@ -944,5 +944,7 @@
       "inst_detail": "",
       "quality_detail": "ROE良好(15.9%) | 营收高增(72.3%)"
     }
-  ]
+  ],
+  "norm_version": 130,
+  "norm_divisor": 130
 }

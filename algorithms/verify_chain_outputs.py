@@ -65,7 +65,7 @@ CRITICAL = [
     ("最终推荐",     "raw_data/final_recommend.json",  True),
     ("最终推荐(前端)", "data/FINAL_RECOMMEND_DATA.js", True),
     ("金股池",       "raw_data/gold_pool.json",        False),
-    ("MAHORO",       "raw_data/mahoro.json",           False),
+    # 2026-08-28 主人令：mahoro 数据源不再跟踪，已从闸门清单移除
 ]
 
 # 时间戳字段名按优先级尝试（各生成器写法不统一，这里做兼容层）

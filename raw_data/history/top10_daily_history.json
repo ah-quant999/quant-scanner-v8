@@ -240,9 +240,12 @@
     "update_time": "2026-08-27 23:38:34"
   },
   "2026-08-28": {
-    "count_80plus": 0,
+    "count_80plus": 1,
     "total_scored": 65,
-    "max_score": 40.4,
-    "update_time": "2026-08-28 18:47:39"
-  }
+    "max_score": 80.0,
+    "update_time": "2026-08-28 23:08:23"
+  },
+  "max_score": 0,
+  "count_80plus": 0,
+  "norm_version": 130
 }

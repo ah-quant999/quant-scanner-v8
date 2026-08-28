@@ -63,7 +63,7 @@ V6_TO_V8 = {
     "cockpit_backtest.json":             "cockpit_backtest.json",
     "backtest_tdx.json":                 "backtest_tdx.json",
     "backtest_comprehensive.json":       "backtest_comprehensive.json",
-    "mahoro_signals.json":               "mahoro.json",
+    # 2026-08-28 主人令：mahoro 不再跟踪，移除映射
     "market_fund_flow.json":             "market_fund_flow.json",
     "volatility_watch.json":             "volatility.json",
     # 已原生化（2026-08-02）：nt_data / suspension_alert / market_alerts /

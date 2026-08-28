@@ -1,0 +1,106 @@
+{
+  "update_time": "2026-08-28 22:49:08",
+  "benchmark": "上证指数 sh000001",
+  "n_fixed": 245,
+  "periods": {
+    "T1": {
+      "stock": {
+        "n": 245,
+        "win": 50.2,
+        "avg": -0.337
+      },
+      "excess": {
+        "n": 245,
+        "win": 47.3,
+        "avg": -0.582
+      },
+      "bench_avg": 0.245
+    },
+    "T3": {
+      "stock": {
+        "n": 245,
+        "win": 35.1,
+        "avg": -1.672
+      },
+      "excess": {
+        "n": 245,
+        "win": 35.5,
+        "avg": -1.956
+      },
+      "bench_avg": 0.284
+    },
+    "T5": {
+      "stock": {
+        "n": 245,
+        "win": 40.4,
+        "avg": -1.471
+      },
+      "excess": {
+        "n": 245,
+        "win": 41.2,
+        "avg": -1.868
+      },
+      "bench_avg": 0.397
+    },
+    "T10": {
+      "stock": {
+        "n": 245,
+        "win": 64.5,
+        "avg": 7.768
+      },
+      "excess": {
+        "n": 245,
+        "win": 64.1,
+        "avg": 6.052
+      },
+      "bench_avg": 1.716
+    },
+    "T20": {
+      "stock": {
+        "n": 189,
+        "win": 75.1,
+        "avg": 7.894
+      },
+      "excess": {
+        "n": 189,
+        "win": 70.4,
+        "avg": 5.923
+      },
+      "bench_avg": 1.971
+    }
+  },
+  "monthly_T10": {
+    "2026-06": {
+      "n": 34,
+      "stock_avg": 22.148,
+      "excess_avg": 18.651,
+      "verdict": "有超额"
+    },
+    "2026-07": {
+      "n": 156,
+      "stock_avg": 5.786,
+      "excess_avg": 3.762,
+      "verdict": "有超额"
+    },
+    "2026-08": {
+      "n": 55,
+      "stock_avg": 4.5,
+      "excess_avg": 4.76,
+      "verdict": "有超额"
+    }
+  },
+  "tiers_T10": {
+    "TOP1/3": {
+      "n": 81,
+      "stock_avg": 11.4,
+      "excess_avg": 8.662,
+      "win": 81.5
+    },
+    "BOTTOM1/3": {
+      "n": 81,
+      "stock_avg": 9.943,
+      "excess_avg": 8.654,
+      "win": 58.0
+    }
+  }
+}
