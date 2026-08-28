@@ -7,6 +7,7 @@ generate_top10.py — 多维共振评分 + 每日TOP10精选
 """
 import json
 import os
+import re
 
 try:
     _ = BASE
@@ -42,6 +43,30 @@ def load_json(path, default=None):
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return default if default is not None else {}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 板块资金噪音过滤（2026-08-29 新增）
+# sector_fund_flow 的板块表里混有大量【非赛道标签】：业绩类（2026中报预增）、
+# 指数/属性类（AH股/权重股/行业龙头/MSCI中国）、交易类（融资融券/沪股通）。
+# 它们不是赛道，其资金流不代表赛道景气度；且数值巨大（实测「2026中报预增」
+# 达 -104 亿），会淹没真实的赛道信号（全市场最大净流入仅 32.94 亿）。
+# ─────────────────────────────────────────────────────────────────────────────
+_NOISE_SECTOR_RE = re.compile(
+    # 业绩 / 指数 / 交易属性类
+    r"预增|预减|扭亏|预盈|业绩|MSCI|标普|标准普尔|富时|融资|融券|沪股通|深股通|转融|"
+    r"破净|破发|破增发|高价股|低价股|次新股|送转|增持|回购|减持|AH股|权重股|"
+    r"行业龙头|央国企|国企改革|成分股|指数|ST股|创业成份|深成|上证|中证|QFII|社保|"
+    r"基金重仓|机构重仓|昨日|近期|连续|多板|专精特新|"
+    # 风格 / 属性类（2026-08-29 实测 16 个，其中「题材股 -129.21 亿」为全市场第二大流出，
+    # 不过滤会把市场系统性风格切换误当成个股赛道资金动向）
+    r"题材股|趋势股|反转股|周期股|成长股|价值股|蓝筹|白马|小盘|中盘|大盘|微盘|"
+    r"创投|并购重组|股权转让|壳资源|重组|摘帽|独角兽|涨价")
+
+
+def is_noise_sector(name):
+    """业绩/指数/交易属性类标签不是赛道，其资金流不代表赛道动向"""
+    return bool(_NOISE_SECTOR_RE.search(name or ""))
 
 
 def freshness_warn(name, obj, max_age_days=1.0):
@@ -268,9 +293,21 @@ def main():
 
     # ── 3. 构建辅助查询映射 ──
     # 板块资金：板块名→净流入(亿)
+    # 🔴 2026-08-29 修复三处（主人问「板块的资金验证是否有错」后实测确认）：
+    #   ① 原只读 sectors_in（净流入榜，200 个全为正数）→ sectors_out（净流出榜，
+    #      178 个全为负）从未被读取，导致下方 `best_sector_flow < -5` 的【扣分分支
+    #      永远不可能触发】——板块失血从来不扣分。
+    #   ② 改用 top_list（378 个 = 流入 200 + 流出 178，正负齐全）；实测覆盖率
+    #      从 28.8% 提升到 56.5%。
+    #   ③ 过滤非赛道噪音标签（业绩/指数/属性类），详见 is_noise_sector()。
+    _src = sector_flow.get("top_list")
+    if not _src:
+        _src = (sector_flow.get("sectors_in") or []) + (sector_flow.get("sectors_out") or [])
     sector_flow_in = {}
-    for s in sector_flow.get("sectors_in", []):
-        sector_flow_in[s.get("name", "")] = s.get("net", 0)
+    for s in _src:
+        nm = s.get("name", "")
+        if nm and not is_noise_sector(nm):
+            sector_flow_in[nm] = s.get("net", 0)
 
     # 龙虎榜：code→inst_net_万
     lhb_map = {}
@@ -482,23 +519,35 @@ def main():
         if sector and sector not in stock_sectors:
             stock_sectors = [sector] + stock_sectors
 
-        best_sector_flow = 0
+        # 取【最强流入】的单个赛道板块，而非求和 —— 概念板块高度重叠，求和会
+        # 重复计数：实测亨通光电 19 个概念求和达 -1338.91 亿，而全市场最大净流入
+        # 板块仅 32.94 亿，数量级完全失真（同一笔资金被重复计了 N 次）。
+        # 🔴 初值用 None 而非 0：原写法下若所有板块均为负（弱势市况），
+        #    `flow > 0` 恒不成立 → best 保持 0 → 既不加也不扣，
+        #    板块失血被当成「无数据」放过。
+        best_sector_flow = None
         best_sector_name = ""
         for sec_name in stock_sectors:
-            flow = sector_flow_in.get(sec_name, 0)
-            if flow > best_sector_flow:
+            flow = sector_flow_in.get(sec_name)
+            if flow is None:
+                continue
+            if best_sector_flow is None or flow > best_sector_flow:
                 best_sector_flow = flow
                 best_sector_name = sec_name
 
-        if best_sector_flow > 5:
+        if best_sector_flow is None:
+            sector_detail = ""                      # 无板块资金数据，不编造
+        elif best_sector_flow > 5:
             sector_score += 5
             sector_detail = f"{best_sector_name}+{best_sector_flow:.1f}亿"
         elif best_sector_flow > 1:
             sector_score += 2
             sector_detail = f"{best_sector_name}+{best_sector_flow:.1f}亿"
         elif best_sector_flow < -5:
-            sector_score -= 3
+            sector_score -= 3                       # 修复后此处才真正可能触发
             sector_detail = f"{best_sector_name}{best_sector_flow:.1f}亿"
+        else:
+            sector_detail = f"{best_sector_name}{best_sector_flow:+.1f}亿"
 
         # 机构/投行 (0 ~ +7)  2026-08-28：mahoro 已移除，只剩 52周新高 + 分析师关注
         inst = 0
