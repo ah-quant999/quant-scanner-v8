@@ -1,10 +1,10 @@
 {
-  "update_time": "2026-08-28 16:21:08",
-  "total": 189,
+  "update_time": "2026-08-28 17:21:27",
+  "total": 187,
   "grade_summary": {
     "A": 17,
-    "B": 13,
-    "C": 49,
+    "B": 12,
+    "C": 48,
     "D": 40,
     "no_data": 70
   },
@@ -1477,19 +1477,6 @@
       "revenue_growth": 38.5828,
       "reason": "ROE偏低(6.6%) | 营收高增(38.6%)"
     },
-    "sz_002916": {
-      "score": 55,
-      "grade": "C",
-      "roe": 12.7998,
-      "revenue_growth": 42.8922,
-      "reason": "ROE一般(12.8%) | 营收高增(42.9%)",
-      "news": {
-        "score": 15,
-        "tags": [
-          "中报预增"
-        ]
-      }
-    },
     "sz_300001": {
       "score": 30,
       "grade": "D",
@@ -1657,19 +1644,6 @@
       "roe": 72.6213,
       "revenue_growth": 130.2407,
       "reason": "ROE优质(72.6%) | 营收高增(130.2%)",
-      "news": {
-        "score": 15,
-        "tags": [
-          "中报预增"
-        ]
-      }
-    },
-    "sz_300548": {
-      "score": 65,
-      "grade": "B",
-      "roe": 15.856700000000002,
-      "revenue_growth": 40.6541,
-      "reason": "ROE良好(15.9%) | 营收高增(40.7%)",
       "news": {
         "score": 15,
         "tags": [

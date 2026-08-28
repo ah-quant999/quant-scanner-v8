@@ -1,19 +1,11 @@
 {
-  "update_time": "2026-08-27 22:49:27",
+  "update_time": "2026-08-28 18:01:11",
   "range": [
-    "2026-08-19",
-    "2026-08-27"
+    "2026-08-20",
+    "2026-08-28"
   ],
   "days_count": 7,
   "daily_summary": [
-    {
-      "date": "2026-08-19",
-      "total": 74,
-      "resonance": 0,
-      "inst_only": 2,
-      "yz_only": 9,
-      "north_present": 36
-    },
     {
       "date": "2026-08-20",
       "total": 67,
@@ -61,6 +53,14 @@
       "inst_only": 2,
       "yz_only": 12,
       "north_present": 25
+    },
+    {
+      "date": "2026-08-28",
+      "total": 51,
+      "resonance": 1,
+      "inst_only": 0,
+      "yz_only": 7,
+      "north_present": 23
     }
   ],
   "top_inst_buy": [
@@ -88,10 +88,10 @@
       "code": "688828",
       "name": "国仪公司",
       "inst_net": 53263.7,
-      "yz_net": -27529.0,
+      "yz_net": -20295.9,
       "north_net": 0.0,
-      "combined_net": 25734.7,
-      "days": 5,
+      "combined_net": 32967.8,
+      "days": 4,
       "resonance_days": 0
     },
     {
@@ -117,12 +117,12 @@
   ],
   "top_inst_sell": [
     {
-      "code": "603186",
-      "name": "华正新材",
-      "inst_net": -132202.1,
-      "yz_net": 34646.7,
-      "north_net": 13225.0,
-      "combined_net": -97555.4,
+      "code": "600378",
+      "name": "昊华科技",
+      "inst_net": -51852.6,
+      "yz_net": 25056.6,
+      "north_net": -5167.8,
+      "combined_net": -26796.0,
       "days": 1,
       "resonance_days": 0
     },
@@ -171,11 +171,11 @@
     {
       "code": "002396",
       "name": "星网锐捷",
-      "inst_net": 3803.6,
-      "yz_net": 49290.9,
-      "north_net": 9736.1,
-      "combined_net": 53094.5,
-      "days": 2,
+      "inst_net": 1309.9,
+      "yz_net": 76117.1,
+      "north_net": 15532.7,
+      "combined_net": 77427.0,
+      "days": 3,
       "resonance_days": 0
     },
     {
@@ -199,37 +199,27 @@
       "resonance_days": 0
     },
     {
-      "code": "603330",
-      "name": "天洋新材",
-      "inst_net": 0.0,
-      "yz_net": 36756.2,
+      "code": "001232",
+      "name": "嘉立创",
+      "inst_net": 25316.2,
+      "yz_net": 39927.5,
       "north_net": 0.0,
-      "combined_net": 36756.2,
-      "days": 4,
-      "resonance_days": 0
+      "combined_net": 65243.7,
+      "days": 1,
+      "resonance_days": 1
     },
     {
-      "code": "603186",
-      "name": "华正新材",
-      "inst_net": -132202.1,
-      "yz_net": 34646.7,
-      "north_net": 13225.0,
-      "combined_net": -97555.4,
+      "code": "000620",
+      "name": "盈新发展",
+      "inst_net": -1880.7,
+      "yz_net": 39397.7,
+      "north_net": -246.1,
+      "combined_net": 37517.0,
       "days": 1,
       "resonance_days": 0
     }
   ],
   "top_yz_sell": [
-    {
-      "code": "688828",
-      "name": "国仪公司",
-      "inst_net": 53263.7,
-      "yz_net": -27529.0,
-      "north_net": 0.0,
-      "combined_net": 25734.7,
-      "days": 5,
-      "resonance_days": 0
-    },
     {
       "code": "603156",
       "name": "养元饮品",
@@ -241,23 +231,13 @@
       "resonance_days": 0
     },
     {
-      "code": "002172",
-      "name": "澳洋健康",
-      "inst_net": 279.0,
-      "yz_net": -18421.0,
+      "code": "688828",
+      "name": "国仪公司",
+      "inst_net": 53263.7,
+      "yz_net": -20295.9,
       "north_net": 0.0,
-      "combined_net": -18142.0,
-      "days": 5,
-      "resonance_days": 0
-    },
-    {
-      "code": "002412",
-      "name": "汉森制药",
-      "inst_net": 15307.2,
-      "yz_net": -18291.5,
-      "north_net": 0.0,
-      "combined_net": -2984.3,
-      "days": 5,
+      "combined_net": 32967.8,
+      "days": 4,
       "resonance_days": 0
     },
     {
@@ -268,6 +248,26 @@
       "north_net": 50680.0,
       "combined_net": -68.7,
       "days": 1,
+      "resonance_days": 0
+    },
+    {
+      "code": "002412",
+      "name": "汉森制药",
+      "inst_net": 11908.0,
+      "yz_net": -16761.4,
+      "north_net": 0.0,
+      "combined_net": -4853.4,
+      "days": 6,
+      "resonance_days": 0
+    },
+    {
+      "code": "600721",
+      "name": "百花医药",
+      "inst_net": 0.0,
+      "yz_net": -16020.0,
+      "north_net": 0.0,
+      "combined_net": -16020.0,
+      "days": 7,
       "resonance_days": 0
     }
   ],
@@ -283,6 +283,16 @@
       "resonance_days": 1
     },
     {
+      "code": "002396",
+      "name": "星网锐捷",
+      "inst_net": 1309.9,
+      "yz_net": 76117.1,
+      "north_net": 15532.7,
+      "combined_net": 77427.0,
+      "days": 3,
+      "resonance_days": 0
+    },
+    {
       "code": "600547",
       "name": "山东黄金",
       "inst_net": 43939.4,
@@ -293,14 +303,14 @@
       "resonance_days": 1
     },
     {
-      "code": "002396",
-      "name": "星网锐捷",
-      "inst_net": 3803.6,
-      "yz_net": 49290.9,
-      "north_net": 9736.1,
-      "combined_net": 53094.5,
-      "days": 2,
-      "resonance_days": 0
+      "code": "001232",
+      "name": "嘉立创",
+      "inst_net": 25316.2,
+      "yz_net": 39927.5,
+      "north_net": 0.0,
+      "combined_net": 65243.7,
+      "days": 1,
+      "resonance_days": 1
     },
     {
       "code": "002837",
@@ -311,16 +321,6 @@
       "combined_net": 47678.4,
       "days": 1,
       "resonance_days": 1
-    },
-    {
-      "code": "300009",
-      "name": "安科生物",
-      "inst_net": 3572.0,
-      "yz_net": 24043.8,
-      "north_net": 4178.9,
-      "combined_net": 27615.8,
-      "days": 1,
-      "resonance_days": 0
     }
   ],
   "top_north_buy": [
@@ -377,46 +377,6 @@
   ],
   "top_north_sell": [
     {
-      "code": "688017",
-      "name": "绿的谐波",
-      "inst_net": 8307.0,
-      "yz_net": -9182.2,
-      "north_net": -18742.7,
-      "combined_net": -875.2,
-      "days": 1,
-      "resonance_days": 0
-    },
-    {
-      "code": "688585",
-      "name": "上纬新材",
-      "inst_net": 3517.4,
-      "yz_net": -1701.9,
-      "north_net": -16821.7,
-      "combined_net": 1815.5,
-      "days": 1,
-      "resonance_days": 0
-    },
-    {
-      "code": "002361",
-      "name": "神剑股份",
-      "inst_net": -17154.1,
-      "yz_net": 5494.7,
-      "north_net": -14823.9,
-      "combined_net": -11659.4,
-      "days": 1,
-      "resonance_days": 0
-    },
-    {
-      "code": "688141",
-      "name": "杰华特",
-      "inst_net": -12090.7,
-      "yz_net": 10207.5,
-      "north_net": -14460.7,
-      "combined_net": -1883.2,
-      "days": 1,
-      "resonance_days": 0
-    },
-    {
       "code": "002491",
       "name": "通鼎互联",
       "inst_net": -29306.7,
@@ -424,6 +384,46 @@
       "north_net": -14166.3,
       "combined_net": -7652.9,
       "days": 5,
+      "resonance_days": 0
+    },
+    {
+      "code": "603156",
+      "name": "养元饮品",
+      "inst_net": 0.0,
+      "yz_net": -26991.2,
+      "north_net": -13044.8,
+      "combined_net": -26991.2,
+      "days": 3,
+      "resonance_days": 0
+    },
+    {
+      "code": "600367",
+      "name": "红星发展",
+      "inst_net": 0.0,
+      "yz_net": -4708.1,
+      "north_net": -12302.7,
+      "combined_net": -4708.1,
+      "days": 2,
+      "resonance_days": 0
+    },
+    {
+      "code": "002837",
+      "name": "英维克",
+      "inst_net": 13650.2,
+      "yz_net": 34028.2,
+      "north_net": -10812.0,
+      "combined_net": 47678.4,
+      "days": 1,
+      "resonance_days": 1
+    },
+    {
+      "code": "002536",
+      "name": "飞龙股份",
+      "inst_net": -16763.7,
+      "yz_net": 22825.4,
+      "north_net": -9162.9,
+      "combined_net": 6061.7,
+      "days": 2,
       "resonance_days": 0
     }
   ]
