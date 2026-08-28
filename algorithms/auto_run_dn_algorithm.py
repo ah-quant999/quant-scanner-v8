@@ -57,16 +57,50 @@ VR_WINDOW = 4   # 量比窗口：当日量 / 4日均量
 
 
 def load_window_var(path, var_name):
-    """读 data/*.js 的 window.XXX = {...}; 形式"""
-    src = open(path, encoding="utf-8").read()
-    m = re.search(r"window\.%s\s*=\s*(\{.*?\})\s*;?\s*$" % var_name, src, re.S)
-    if not m:
+    """读 data/*.js 的 `window.XXX = {...};` 形式（无正则，括号配对版）。
+
+    旧正则 `\\{.*?\\}` 非贪婪会在首个内层 `}` 截断（如 {"sentiment":{"label":...}} 嵌套对象），
+    得到非法 JSON。改用括号配对：定位目标变量 -> 从其 `=` 后做配对，遇字符串内 `{}` 跳过，
+    配对到 0 才切，嵌套/多变量都正确。
+    """
+    try:
+        with open(path, encoding="utf-8") as f:
+            src = f.read()
+    except Exception as e:
+        print(f"⚠️ 读取 {path} 失败: {e}")
         return None
     try:
-        return json.loads(m.group(1))
-    except Exception:
-        # 退化：尝试宽松 JSON
-        return json.loads(m.group(1).replace("'", '"'))
+        idx = src.find(f"window.{var_name}")
+        if idx == -1:
+            return None
+        eq = src.find("=", idx)
+        start = src.find("{", eq) if eq != -1 else -1
+        if start == -1:
+            return None
+        depth = 0
+        in_str = esc = False
+        for i in range(start, len(src)):
+            ch = src[i]
+            if in_str:
+                if esc:
+                    esc = False
+                elif ch == "\\":
+                    esc = True
+                elif ch == '"':
+                    in_str = False
+            else:
+                if ch == '"':
+                    in_str = True
+                elif ch == "{":
+                    depth += 1
+                elif ch == "}":
+                    depth -= 1
+                    if depth == 0:
+                        return json.loads(src[start : i + 1])
+        return None
+    except Exception as e:
+        print(f"⚠️ 解析 {path} 失败: {e}")
+        return None
 
 
 def _norm_code(code):

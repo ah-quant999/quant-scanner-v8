@@ -46,17 +46,46 @@ def _norm_code(code):
 
 
 def load_window_var(path, var_name):
-    """读 data/*.js 的 window.XXX = {...}; 形式"""
+    """读 data/*.js 的 `window.XXX = {...};` 形式（无正则，括号配对版）。"""
     if not path.exists():
         return None
-    src = open(path, encoding="utf-8").read()
-    m = re.search(r"window\.%s\s*=\s*(\{.*?\})\s*;?\s*$" % var_name, src, re.S)
-    if not m:
+    try:
+        src = path.read_text(encoding="utf-8")
+    except Exception as e:
+        print(f"⚠️ 读取 {path} 失败: {e}")
         return None
     try:
-        return json.loads(m.group(1))
-    except Exception:
-        return json.loads(m.group(1).replace("'", '"'))
+        idx = src.find(f"window.{var_name}")
+        if idx == -1:
+            return None
+        eq = src.find("=", idx)
+        start = src.find("{", eq) if eq != -1 else -1
+        if start == -1:
+            return None
+        depth = 0
+        in_str = esc = False
+        for i in range(start, len(src)):
+            ch = src[i]
+            if in_str:
+                if esc:
+                    esc = False
+                elif ch == "\\":
+                    esc = True
+                elif ch == '"':
+                    in_str = False
+            else:
+                if ch == '"':
+                    in_str = True
+                elif ch == "{":
+                    depth += 1
+                elif ch == "}":
+                    depth -= 1
+                    if depth == 0:
+                        return json.loads(src[start : i + 1])
+        return None
+    except Exception as e:
+        print(f"⚠️ 解析 {path} 失败: {e}")
+        return None
 
 
 def _gtimg_kl(code, bars=30):

@@ -1,13 +1,31 @@
 import time
 def try_call(name, fn, *a, **k):
+    """调用 fn 并打印类型/行数/耗时；仅对瞬时网络错误退避重试（1/3/5s）。"""
     try:
-        t = time.time()
-        r = fn(*a, **k)
-        print(f"[{name}] OK type={type(r).__name__} rows={getattr(r,'shape',None)} sec={time.time()-t:.1f}")
-        return r
-    except Exception as e:
-        print(f"[{name}] FAIL: {type(e).__name__}: {str(e)[:140]}")
-        return None
+        import requests
+    except ImportError:
+        requests = None
+    last = None
+    for i in range(3):
+        try:
+            t = time.time()
+            r = fn(*a, **k)
+            print(f"[{name}] OK type={type(r).__name__} rows={getattr(r,'shape',None)} sec={time.time()-t:.1f}")
+            return r
+        except Exception as e:
+            transient = requests and isinstance(
+                e, (requests.exceptions.ConnectionError, requests.exceptions.Timeout,
+                    requests.exceptions.ChunkedEncodingError)
+            )
+            if transient and i < 2:
+                last = e
+                print(f"[{name}] 网络抖动重试({i+1}/3): {type(e).__name__}")
+                time.sleep(1 + i * 2)
+                continue
+            print(f"[{name}] FAIL: {type(e).__name__}: {str(e)[:140]}")
+            return None
+    print(f"[{name}] 重试后仍失败: {type(last).__name__}")
+    return None
 
 # 同花顺概念 (fallback 1)
 try:

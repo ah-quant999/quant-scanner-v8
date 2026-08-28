@@ -19,6 +19,7 @@ import json
 import os
 import time
 import urllib.request
+import urllib.error
 
 import pandas as pd
 
@@ -42,7 +43,13 @@ _CAND_FALLBACK_PATHS = (
 
 
 def _http(url, timeout=20, retries=3, referer="https://finance.sina.com.cn/"):
-    """GET 并返回文本（带重试）。"""
+    """GET 并返回文本（带智能重试与异常处理）。
+
+    修复点（2026-08-28）：
+      - sina/腾讯接口多为 GBK 编码，原 utf-8+replace 会把中文名/板块名解码成乱码；
+        改为按 Content-Type 探测，失败回退 GBK。
+      - 仅对瞬时错误（连接重置/超时/5xx）重试；4xx 客户端错误立即失败，不浪费重试。
+    """
     last = None
     for i in range(retries):
         try:
@@ -50,11 +57,22 @@ def _http(url, timeout=20, retries=3, referer="https://finance.sina.com.cn/"):
             if referer:
                 headers["Referer"] = referer
             req = urllib.request.Request(url, headers=headers)
-            return urllib.request.urlopen(req, timeout=timeout).read().decode("utf-8", "replace")
-        except Exception as e:  # noqa: BLE001
+            resp = urllib.request.urlopen(req, timeout=timeout)
+            raw = resp.read()
+            charset = resp.headers.get_content_charset()
+            try:
+                return raw.decode(charset or "utf-8")
+            except (UnicodeDecodeError, TypeError):
+                return raw.decode("gbk", "replace")  # sina/腾讯兜底
+        except urllib.error.HTTPError as e:
+            if 400 <= e.code < 500:
+                raise  # 4xx 客户端错误：不重试，立即失败
             last = e
-            time.sleep(1 + i)
-    raise last
+            time.sleep(1 + i * 2)
+        except Exception as e:  # 连接重置/超时/5xx 等瞬时错误才重试
+            last = e
+            time.sleep(1 + i * 2)
+    raise last or RuntimeError("no attempts")
 
 
 def fetch_a_daily_gtimg(code, market="sh", bars=250):
