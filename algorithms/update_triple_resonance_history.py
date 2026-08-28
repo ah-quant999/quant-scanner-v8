@@ -41,6 +41,31 @@ def normalize_code(c):
     return str(c or "").replace("sh_", "").replace("sz_", "").replace("hk_", "").replace("bj_", "").replace("sh.", "").replace("sz.", "").replace("hk.", "").replace("bj.", "").strip()
 
 
+def _gp_latest(gp_stock):
+    """🛡 2026-08-28 修复：gold_pool.json 的 stock 没有 'latest.close'，
+    真实最新价/涨幅/信号数在 history[-1] 里。本函数统一读取，兜底旧的 latest 结构。"""
+    if not isinstance(gp_stock, dict):
+        return {}
+    hist = gp_stock.get("history") or []
+    if isinstance(hist, list) and hist:
+        last = hist[-1]
+        if isinstance(last, dict):
+            return {
+                "close": last.get("close"),
+                "pct_chg": last.get("pct_chg"),
+                "signal_count": last.get("signal_count"),
+                "date": last.get("date"),
+            }
+    # 兜底旧结构（如有）
+    latest = gp_stock.get("latest") or {}
+    return {
+        "close": latest.get("close"),
+        "pct_chg": latest.get("pct_chg"),
+        "signal_count": latest.get("signal_count"),
+        "date": None,
+    }
+
+
 def build_gp_map(gold_pool):
     gp = gold_pool.get("stocks", {}) if isinstance(gold_pool, dict) else {}
     m = {}
@@ -84,19 +109,20 @@ def main():
                 continue
             seen_codes.add(code)
             gp = gp_map.get(code, {})
-            close = s.get("close") or gp.get("latest", {}).get("close") or 0
+            gp_latest = _gp_latest(gp)
+            close = s.get("close") or gp_latest.get("close") or 0
             rec = {
                 "code": code,
                 "name": s.get("name", gp.get("name", "")),
                 "market": s.get("market", gp.get("market", "")),
                 "board": s.get("board", gp.get("board", "")),
                 "close": close,
-                "pct_chg": s.get("pct_chg", gp.get("latest", {}).get("pct_chg", 0)),
+                "pct_chg": s.get("pct_chg", gp_latest.get("pct_chg", 0)),
                 "total_score": s.get("total_score", 0),
                 "quality_grade": s.get("quality_grade", gp.get("quality_grade", "")),
                 "industry": s.get("industry", gp.get("industry", "")),
                 "sectors": s.get("sectors", []) or gp.get("sectors", []),
-                "signal_count": s.get("signal_count", gp.get("latest", {}).get("signal_count", 0)),
+                "signal_count": s.get("signal_count", gp_latest.get("signal_count", 0)),
                 "status": status,
             }
             today_records.append(rec)
@@ -110,7 +136,8 @@ def main():
     all_ever = set(price_hist.keys()) | seen_codes
     for code in all_ever:
         gp = gp_map.get(code, {})
-        close = gp.get("latest", {}).get("close")
+        gp_latest = _gp_latest(gp)
+        close = gp_latest.get("close")
         if close is None and code in seen_codes:
             # 当日入榜股优先用今日快照价
             for r in today_records:

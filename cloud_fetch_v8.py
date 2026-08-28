@@ -2397,6 +2397,88 @@ def f_market_alerts():
     return None
 
 
+# ══════════════════════════════════════════════════════════════════════
+# 🗄 日历月度归档（2026-08-28 主人令「旧的也别丢」）
+#
+# 背景（真 bug，不是假想）：
+#   f_v8_cal() 只生成【当前月】，产物单文件 raw_data/v8_cal.json 是覆盖式写入。
+#   每月 1 号切月时，上月整月数据被直接覆盖，永久丢失，且无法回溯。
+#   更致命的是：上月最后几天（如 8/31）会落在本月首周的灰色(dim)格子里，
+#   原逻辑 dim 格子 events 恒为空 → 8/31 的「官方制造业PMI/中报披露截止」
+#   在 9 月视图里凭空消失（用户肉眼可见的事件丢失）。
+#
+# 修复（双保险）：
+#   1) 归档：每次生成月份时，把该月完整数据写入 v8_cal_archive/YYYY-MM.json，
+#      永不覆盖历史月份（同月重复生成才覆盖，属正常刷新）。
+#   2) 继承：生成新月时，从归档（优先）或单文件缓存（回退）读取紧邻上月的
+#      事件，填进本月首周的灰色格子。
+# ══════════════════════════════════════════════════════════════════════
+def _cal_archive_dir():
+    # 🛡 动态取 RAW_DIR（模块级常量在测试改 RAW_DIR 后不会跟着变，会写错目录）
+    return Path(RAW_DIR) / "v8_cal_archive"
+
+
+def _cal_archive_path(y, m):
+    return _cal_archive_dir() / f"{y:04d}-{m:02d}.json"
+
+
+def _cal_archive_month(year, month, payload):
+    """把某个月的日历产物归档（只写不删，历史月份永不被覆盖丢失）。"""
+    try:
+        _cal_archive_dir().mkdir(parents=True, exist_ok=True)
+        _cal_archive_path(year, month).write_text(
+            json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8"
+        )
+    except Exception as e:
+        print(f"  ⚠️ 日历归档失败 {year}-{month:02d}（不影响本月生成）: {type(e).__name__}: {e}")
+
+
+def _cal_load_month_events(year, month):
+    """读取指定月份『按日期索引的事件表』→ {(y,m,day): [events...]}
+
+    优先读归档（不会被切月覆盖，最可靠），归档不存在时回退到单文件缓存
+    （v8_cal.json，仅当它正好是所求月份时有效）。任何异常都返回空表并打印
+    可见告警——绝不静默吞异常（2026-08-28 教训：静默 except 掩盖了 NameError，
+    导致修复代码形同虚设，排查浪费大量时间）。
+    """
+    out = {}
+    src = None
+    payload = None
+    ap = _cal_archive_path(year, month)
+    if ap.exists():
+        try:
+            payload = json.loads(ap.read_text(encoding="utf-8"))
+            src = f"归档 {ap.name}"
+        except Exception as e:
+            print(f"  ⚠️ 日历归档读取失败 {ap.name}: {type(e).__name__}: {e}")
+    if payload is None:
+        cf = RAW_DIR / "v8_cal.json"
+        if cf.exists():
+            try:
+                cand = json.loads(cf.read_text(encoding="utf-8"))
+                # 单文件缓存只在"正好是所求月份"时才可信
+                if str(cand.get("month", "") or "").find(f"{year}年{month}月") >= 0:
+                    payload = cand
+                    src = "缓存 v8_cal.json"
+            except Exception as e:
+                print(f"  ⚠️ 日历缓存读取失败: {type(e).__name__}: {e}")
+    if not payload:
+        return out
+    try:
+        for _w in payload.get("weeks", []):
+            for _d in _w.get("days", []):
+                if _d.get("events"):
+                    out[(year, month, _d["num"])] = _d["events"]
+    except Exception as e:
+        print(f"  ⚠️ 日历事件表解析失败（{src}）: {type(e).__name__}: {e}")
+    return out
+
+
+def _cal_prev_month(y, m):
+    """返回 (y, m) 的紧邻上一月，正确处理跨年。"""
+    return (y - 1, 12) if m == 1 else (y, m - 1)
+
+
 def f_v8_cal(today=None):
     """重要事件日历：自动生成【当前月】日历。
     - 频率控制：仅在每月 1~3 号执行完整生成；其余日期直接返回已有缓存（v8_cal.json），
@@ -2501,6 +2583,22 @@ def f_v8_cal(today=None):
         return d
 
     ev = {}
+
+    # 🛡 2026-08-28 主人令「旧的也别丢」：跨月时上月最后几天事件不丢。
+    #   f_v8_cal 按月生成，上月最后几天（如 8/31）会落在本月首周的灰色(dim)格子里。
+    #   原逻辑 dim 格子 events 为空，导致 8/31 的中报披露截止、官方制造业PMI 等事件
+    #   在 9 月视图里直接消失。修复：读取上月缓存，把上月最后 7 天（即可能落入
+    #   本月灰色格子的日期）的事件保留，用于本月显示。
+    # 取紧邻上月（自动处理跨年：1月→去年12月）
+    _py, _pm = _cal_prev_month(y, m)
+    prev_month_events = _cal_load_month_events(_py, _pm)
+    if prev_month_events:
+        print(f"  🔗 日历跨月继承：{_py}年{_pm}月 → {y}年{m}月，"
+              f"保留上月事件 {sum(len(v) for v in prev_month_events.values())} 条"
+              f"（{len(prev_month_events)} 天）")
+    else:
+        print(f"  ℹ️ 日历跨月继承：{_py}年{_pm}月无可用事件（归档/缓存均无），本月首周灰色格子将为空")
+
     def add(day, text, cls, released=None):
         if 1 <= day <= last_day:
             rel = (day < today.day) if released is None else bool(released)
@@ -2775,7 +2873,9 @@ def f_v8_cal(today=None):
                 "num": d.day,
                 "dim": dim,
                 "today": (d == today),
-                "events": ev.get(d.day, []) if not dim else [],
+                # 🛡 2026-08-28 主人令「旧的也别丢」：dim 日期优先显示上月缓存事件，
+                #   无上月事件时才置空，确保跨月首周不会丢失上月末事件。
+                "events": ev.get(d.day, []) if not dim else prev_month_events.get((d.year, d.month, d.day), []),
             })
         wk_end = cur + timedelta(days=6)
         weeks.append({
@@ -2808,12 +2908,15 @@ def f_v8_cal(today=None):
     ]
 
     print(f"    日历: {y}年{m}月, {len(weeks)}周, 事件日 {len(ev)} 天")
-    return {
+    _payload = {
         "month": f"{y}年{m}月",
         "update_time": now_cst().strftime("%Y-%m-%d %H:%M"),
         "legend": legend,
         "weeks": weeks,
     }
+    # 🗄 归档本月（历史月份永不丢失，下月生成时可回读继承）
+    _cal_archive_month(y, m, _payload)
+    return _payload
 
 
 def _clear_intraday_for_premarket(category, only=None):

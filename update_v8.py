@@ -754,10 +754,12 @@ def _list_changed_raw_files():
 
 
 def _load_js_var_file(path):
-    """解析 data/*.js 形如 window.X = {...}; 返回 (var_name, obj) 或 (None, None)。
+    """解析 data/*.js 形如 window.X = {...}; 或 IIFE 壳，返回 (var_name, obj) 或 (None, None)。
 
-    仅支持顶层为普通对象字面量（json 可解析）的文件；IIFE 壳/数组壳解析失败则跳过，
-    避免误伤。允许文件前置注释（// 或 /* */），用 re.search 找首个 window.X =。"""
+    2026-08-28 扩展：支持 IIFE 壳 window.X = (function(){ var data = {...}; ... })()
+    （STOCK_MOMENTUM_STATE 等 OCR 产物用此格式），使 stamp_missing_update_time
+    不再漏判这些文件。数组壳仍返回 (var, list)。
+    """
     try:
         txt = path.read_text(encoding='utf-8')
     except Exception:
@@ -771,9 +773,17 @@ def _load_js_var_file(path):
         body = body[:-1]
     try:
         obj = json.loads(body)
+        return var, obj
     except Exception:
-        return var, None
-    return var, obj
+        pass
+    # IIFE 壳：window.X = (function(){ var data = {...}; ... })();
+    m2 = re.search(r'var\s+data\s*=\s*(\{[\s\S]*?\})\s*;', txt)
+    if m2:
+        try:
+            return var, json.loads(m2.group(1))
+        except Exception:
+            return var, None
+    return var, None
 
 
 def stamp_missing_update_time():

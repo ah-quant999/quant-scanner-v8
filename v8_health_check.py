@@ -19,6 +19,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone, timedelta, date
@@ -219,26 +220,106 @@ def load_window_var(path, var_name):
     return None
 
 
+def _extract_window_data(text, var_name):
+    """从 JS 文本中解析 window.X = {...}; 或 IIFE 壳，返回 dict/None。"""
+    if not text:
+        return None
+    text = text.lstrip("\ufeff")
+    m = re.search(rf"window\.{re.escape(var_name)}\s*=\s*(\{{[\s\S]*?\}})\s*;", text)
+    if m:
+        try:
+            return json.loads(m.group(1))
+        except Exception:
+            pass
+    m2 = re.search(rf"window\.{re.escape(var_name)}\s*=\s*\(function[\s\S]*?var\s+data\s*=\s*(\{{[\s\S]*?\}})\s*;", text)
+    if m2:
+        try:
+            return json.loads(m2.group(1))
+        except Exception:
+            return None
+    return None
+
+
 def load_window_var_from_site(source_id, var_name):
-    """一劳永逸修复（2026-08-20）：优先读取线上站点 data/<id>.js（云端真实部署态），
-    避免本机 checkout 未 git pull 时旧 data/*.js 误报「陈旧」，导致主人与看门狗反复盯盘。
-    站点不可达/解析失败返回 None，由调用方回退到本地文件（云端 runner 本地即最新 checkout）。"""
+    """一劳永逸修复（2026-08-28）：线上站点读取强制加 cache-buster，绕开 GitHub Pages CDN 缓存。
+
+    历史：2026-08-20 改为优先读线上部署态，解决本地 checkout 未 pull 导致的陈旧误报。
+    新增竞态：算法链刚把新数据 push 到 Pages，CDN 边缘节点可能仍缓存旧版，HEALTH_CHECK
+    读到旧时间戳 → 误报 fail（尤其 20:01 左右算法链跑完立刻巡检时）。
+    修复：URL 强制追加 ?nocache=1&t={timestamp} 直接回源；失败返回 None 由调用方兜底。
+    """
     try:
-        url = SITE_URL + f"data/{source_id}.js"
+        # 站点 URL 末尾已带 /，但防御性处理
+        base = SITE_URL if SITE_URL.endswith("/") else SITE_URL + "/"
+        url = f"{base}data/{source_id}.js?nocache=1&t={int(time.time())}"
         req = urllib.request.Request(url, headers={"User-Agent": "v8-health-check"})
         raw, err = _urlopen_retry(req, timeout=20)
         if raw is None:
             return None
-        text = raw.decode("utf-8", "ignore").lstrip("\ufeff")
-        m = re.search(rf"window\.{re.escape(var_name)}\s*=\s*(\{{[\s\S]*?\}})\s*;", text)
-        if m:
-            try:
-                return json.loads(m.group(1))
-            except Exception:
-                return None
+        return _extract_window_data(raw.decode("utf-8", "ignore"), var_name)
     except Exception:
         return None
     return None
+
+
+def _update_time_to_dt(ts):
+    """把 data 里的时间戳字段统一转成 datetime，失败返回 None。"""
+    if isinstance(ts, (int, float)):
+        try:
+            return datetime.fromtimestamp(ts, tz=timezone(timedelta(hours=8)))
+        except Exception:
+            return None
+    if isinstance(ts, str):
+        return parse_time(ts)
+    return None
+
+
+def load_window_var_newest(source_id, var_name, local_path):
+    """取「线上站点」与「本地文件」两者中时间戳较新的一个。
+
+    这是 2026-08-28 一劳永逸修复 HEALTH_CHECK 竞态误报的核心：
+      · 云端 runner 刚生成本地新文件，但 Pages CDN 缓存未刷新 → 本地更新
+      · 本地 runner 未 pull，本地旧但线上已部署 → 线上更新
+      · 任一方失败 → 回退到另一方
+      · 两边都无时间戳/不可比 → 优先本地（离线/开发环境更可信）
+    """
+    local_data = load_window_var(local_path, var_name) if local_path and local_path.exists() else None
+    site_data = load_window_var_from_site(source_id, var_name)
+
+    if local_data is None:
+        return site_data
+    if site_data is None:
+        return local_data
+
+    # 比较 update_time/date/lastUpdated 等常见时间戳
+    ts_keys = ("update_time", "date", "generated", "generated_time", "generated_at",
+               "lastUpdated", "updated", "updated_at", "last_update")
+    local_ts = None
+    site_ts = None
+    for k in ts_keys:
+        if local_ts is None:
+            local_ts = local_data.get(k)
+        if site_ts is None:
+            site_ts = site_data.get(k)
+        if local_ts is not None and site_ts is not None:
+            break
+
+    local_dt = _update_time_to_dt(local_ts)
+    site_dt = _update_time_to_dt(site_ts)
+
+    if local_dt is None and site_dt is None:
+        # 无法比较，优先本地（离线开发环境）
+        return local_data
+    if local_dt is None:
+        return site_data
+    if site_dt is None:
+        return local_data
+
+    chosen = local_data if local_dt >= site_dt else site_data
+    if local_dt != site_dt:
+        side = "本地" if chosen is local_data else "线上"
+        print(f"[HEALTH] {source_id}.js 取较新：本地 {local_ts} vs 线上 {site_ts} → 用 {side}")
+    return chosen
 
 
 def _load_token():
@@ -1101,10 +1182,9 @@ def check_data_cards():
         source_id = d.get("_source_file") or d["id"]
         var_name = d.get("_window_var") or d["id"]
         path = DATA_DIR / f"{source_id}.js"  # 本地兜底路径（云端 runner 本地即最新 checkout）
-        # 2026-08-20 一劳永逸修复：优先读线上站点（云端真实部署态），本机未 pull 也不会误报陈旧
-        data = load_window_var_from_site(source_id, var_name)
-        if data is None:
-            data = load_window_var(path, var_name)
+        # 2026-08-28 一劳永逸修复：取线上站点与本地文件中时间戳较新的一个，彻底消除
+        # 算法链刚部署新数据但 CDN 缓存未刷新 → HEALTH_CHECK 读到旧值 → 误报 fail 的竞态。
+        data = load_window_var_newest(source_id, var_name, path)
         if data is None:
             _emit(d, {
                 "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
@@ -1258,16 +1338,13 @@ def check_all_data_files():
         # 🛡 2026-08-19 一劳永逸：OCR 依赖文件彻底跳过（不输出 items[] → 不渲染告警卡）
         if vid in _OCR_DEPENDENCY_FILES:
             continue
-        # 🛡 2026-08-28 一劳永逸：全量审计改读线上部署态（与 check_data_cards 对齐），
-        # 避免 self-hosted runner 本地 checkout 落后时把「线上正常的文件」误报 fail
-        # （local_sync / all_LHB_7D 等红灯的根因：健康检查读本地陈旧副本而非 Pages 真实态）
-        data = load_window_var_from_site(vid, vid)
-        if data is None:
-            data = load_window_var(p, vid)
+        # 🛡 2026-08-28 一劳永逸：取线上站点与本地文件中时间戳较新的一个，
+        # 避免算法链刚部署但 CDN 缓存未刷新导致的旧值误报，同时兼容本地未 pull 的场景。
+        data = load_window_var_newest(vid, vid, p)
         # 2026-08-17 兼容 window 变量名 ≠ 文件名（STOCK_MOMENTUM_STATE_V2.js → window.STOCK_MOMENTUM_ENHANCED）
         if data is None:
             for alias in _WINDOW_VAR_ALIASES.get(vid, []):
-                data = load_window_var(p, alias)
+                data = load_window_var_newest(vid, alias, p)
                 if data is not None:
                     break
         if data is None:

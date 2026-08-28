@@ -58,6 +58,20 @@ def r2(x):
         return 0.0
 
 
+def _gp_latest_close(gp_stock):
+    """🛡 2026-08-28 修复：gold_pool.json 的 stock 没有 'latest.close'，
+    真实最新价在 history[-1].close。统一读取，兜底旧的 latest 结构。"""
+    if not isinstance(gp_stock, dict):
+        return None
+    hist = gp_stock.get("history") or []
+    if isinstance(hist, list) and hist:
+        last = hist[-1]
+        if isinstance(last, dict):
+            return last.get("close")
+    latest = gp_stock.get("latest") or {}
+    return latest.get("close")
+
+
 def load_meta_map(path=META_FILE):
     try:
         with open(path, "r", encoding="utf-8") as f:
@@ -121,7 +135,7 @@ def main():
         tr = tracking.get(code, {})
         enter_date = tr.get("enter_date", today)
         first_close = price_hist.get(code, {}).get(enter_date)
-        current_close = price_hist.get(code, {}).get(today) or gp_stocks.get(code, {}).get("latest", {}).get("close")
+        current_close = price_hist.get(code, {}).get(today) or _gp_latest_close(gp_stocks.get(code, {}))
         pnl = None
         if first_close and current_close and first_close > 0:
             pnl = r2((current_close / first_close - 1) * 100)

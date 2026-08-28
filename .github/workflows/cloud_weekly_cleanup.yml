@@ -101,7 +101,7 @@ jobs:
               "WEEKEND_META_REPORT",
           }
           # 保留目录：历史快照、回测产物等整体保护
-          PROTECTED_DIRS = {"history", "backtest", "optimize"}
+          PROTECTED_DIRS = {"history", "backtest", "optimize", "v8_cal_archive"}
 
           removed_raw = []
           if RAW_DIR.exists():

@@ -20,6 +20,11 @@ import subprocess
 import sys
 from datetime import datetime
 
+# 本轮失败/超时脚本清单（供链尾闸门与运维面板消费）
+# 🛡 2026-08-28 一劳永逸：过去只在 stdout 打一行「⚠️ 退出码 N」，无人看、无汇总、无告警，
+#   导致候选池停更 1.9 天仍无人知晓。现统一收集并落盘 raw_data/algo_run_report.json。
+FAILED_SCRIPTS = []
+
 ALGO = os.path.dirname(os.path.abspath(__file__))
 V8_ROOT = os.path.dirname(ALGO)
 # ⚠️ out 目录必须与被迁移脚本的 os.path.join(BASE, "..", "out") 口径一致：
@@ -350,6 +355,27 @@ def _final_recommend_gate(run_start):
     return False
 
 
+def _write_run_report(ok, fail, skipped, run_start):
+    """🛡 2026-08-28：把本轮算法链执行结果落盘 raw_data/algo_run_report.json，
+    供链尾 verify_chain_outputs 闸门与运维面板消费，杜绝「静默吞失败」。"""
+    try:
+        rp = os.path.join(V8_ROOT, "raw_data", "algo_run_report.json")
+        os.makedirs(os.path.dirname(rp), exist_ok=True)
+        report = {
+            "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "run_start": run_start.strftime("%Y-%m-%d %H:%M:%S"),
+            "ok": ok,
+            "fail": fail,
+            "failed_scripts": [{"script": s, "reason": w} for s, w in FAILED_SCRIPTS],
+            "skipped_by_time_gate": skipped,
+        }
+        with open(rp, "w", encoding="utf-8") as f:
+            json.dump(report, f, ensure_ascii=False, indent=2)
+        print(f"  📄 执行报告已写入 raw_data/algo_run_report.json")
+    except Exception as e:
+        print(f"  ⚠️ 写执行报告失败: {e}")
+
+
 def step_run():
     print(f"\n[1] 运行算法链（{len(ORDER)} 个）")
     # 记录本轮启动时间，供 final_recommend 门控判断「输入是否本轮新鲜产出」
@@ -358,21 +384,25 @@ def step_run():
     picking_ready = _is_post_close_picking_ready()
     print(f"  🕐 当前时间 {datetime.now():%H:%M} | 盘后选股策略就绪 {'✅ 已过 18:00' if picking_ready else '⏳ 未到 18:00（选股策略将跳过）'}")
     ok, fail = 0, 0
+    skipped = []
     for script in ORDER:
         # 支持 scripts/ 前缀（如 scripts/fetch_index_history.py 在仓库根 scripts/ 下）
         path = os.path.join(V8_ROOT, script) if script.startswith("scripts/") else os.path.join(ALGO, script)
         if not os.path.exists(path):
             print(f"  ❌ 缺失脚本: {script}")
             fail += 1
+            FAILED_SCRIPTS.append((script, "脚本文件缺失"))
             continue
         # 🔴 盘后选股策略门控：未到 18:00 且脚本属于选股策略 → 跳过
         if not picking_ready and script in STOCK_PICKING_SCRIPTS:
             print(f"  ⏭️  {script}  ← 跳过（盘后数据未全就绪，18:00 前禁止生成选股结果）")
+            skipped.append(script)
             continue
         # 🛡 2026-08-26 一劳永逸（bug7/bug8）：final_recommend 必须先过就绪门控，
         #   确保所有选股输入均本轮新鲜产出后才汇总，杜绝「某选股还没跑完就推荐完成」。
         if script == "final_recommend.py" and not _final_recommend_gate(run_start):
             print(f"  ⏭️  跳过 final_recommend（就绪门控未通过，本轮不产出最终推荐）")
+            FAILED_SCRIPTS.append((script, "就绪门控未通过（上游选股输入陈旧/缺失）"))
             continue
         print(f"  ▶ {script}  ({datetime.now():%H:%M:%S})")
         try:
@@ -387,13 +417,28 @@ def step_run():
                 print(f"     ⚠️ 退出码 {r.returncode}")
                 tail = "\n".join(r.stdout.strip().splitlines()[-3:] + r.stderr.strip().splitlines()[-3:])
                 print("     " + tail.replace("\n", "\n     ")[:400])
+                # 🛡 2026-08-28：抓取末行 stderr 作为失败原因，供链尾闸门/运维面板定位
+                reason = ((r.stderr or "").strip().splitlines() or
+                          (r.stdout or "").strip().splitlines() or [""])
+                FAILED_SCRIPTS.append((script, f"退出码 {r.returncode} | {reason[-1][:160]}"))
         except subprocess.TimeoutExpired:
             fail += 1
             print(f"     ⏱️ 超时(>30min)，跳过")
+            FAILED_SCRIPTS.append((script, "超时 >30min"))
         except Exception as e:
             fail += 1
             print(f"     ❌ 异常: {e}")
+            FAILED_SCRIPTS.append((script, f"异常 {e}"))
     print(f"  算法运行: 成功 {ok} / 失败 {fail}")
+    # 🛡 2026-08-28 一劳永逸：失败清单汇总 —— 过去被 continue-on-error 静默吞掉，
+    #   导致 08-28 候选池停更 1.9 天仍无人知晓。现在必须显式列出。
+    if FAILED_SCRIPTS:
+        print(f"\n  🛑 本轮失败/未产出脚本 {len(FAILED_SCRIPTS)} 个（对应前端卡将保持陈旧）:")
+        for _s, _why in FAILED_SCRIPTS:
+            print(f"     • {_s}  ← {_why}")
+    if skipped:
+        print(f"\n  ⏭️ 因未到 18:00 跳过的选股脚本 {len(skipped)} 个: {', '.join(skipped)}")
+    _write_run_report(ok, fail, skipped, run_start)
 
 
 def step_stage():

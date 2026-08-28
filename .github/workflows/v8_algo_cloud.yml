@@ -306,11 +306,19 @@ jobs:
           python algorithms/check_trading_day.py
 
       - name: "🧮 运行盘后算法链 → raw_data/ → 推送"
+        id: algo
         if: steps.trading.outputs.is_trading_day == 'true'
         run: |
           set +e
           python algorithms/run_algorithms.py
-          echo "algo exit: $?"
+          ALGO_EXIT=$?
+          echo "algo exit: ${ALGO_EXIT}"
+          # 🛡 2026-08-28 一劳永逸：原写法只 echo 不留存，退出码随风消散。
+          #   现写入 GITHUB_ENV 供链尾闸门 step 展示。
+          #   注意：退出码**不能**作为成败判据——run_algorithms 内部对每个脚本
+          #   continue-on-error，脚本失败时退出码往往仍是 0。真正的成败判定
+          #   交由链尾「产物完整性闸门」按数据(update_time)说了算。
+          echo "ALGO_EXIT=${ALGO_EXIT}" >> "$GITHUB_ENV"
           # run_algorithms 内部每个脚本 continue-on-error，整体退出码不代表全失败；
           # 但推送是否落地是唯一可靠判据（2026-08-22 实证：final_recommend 23:34 已生成，
           # 建 tree 422 推送失败被 exit 0 吞掉 → job 假 success → 线上 FINAL_RECOMMEND 停 08-20）。
@@ -397,3 +405,42 @@ jobs:
               req = urllib.request.Request(API + "/contents/index.html", data=body, headers=H, method="PUT")
               print("push index.html ALGO_TRACK ?v:", urllib.request.urlopen(req).getcode(), "v=", t)
           PY
+
+      # 🛡 2026-08-28 一劳永逸（主站审计 P0-1 根治）：链尾「产物完整性闸门」
+      #
+      #  背景——2026-08-28 实测「跑一半没人知道」：
+      #    本 workflow 全部 step 绿、job success，但核心选股产物实际停在昨晚/前天：
+      #      CANDIDATE(候选池)   停 08-26 22:36 → 1.9 天（选股链上游）
+      #      CRDS(逆势龙头)      停 08-27 19:53
+      #      STOCK_RPS(相对强度)  停 08-27 19:58
+      #      FINAL_RECOMMEND     停 08-27 21:02
+      #    而 TOP10 / 三重共识 / 四量 却已刷新 → 典型「上游不动、下游全停」。
+      #
+      #  三重叠加根因：
+      #    ① run_algorithms.py 对每个脚本 continue-on-error，单脚本失败只打一行
+      #       「⚠️ 退出码 N」，无人看、无汇总、无告警；
+      #    ② 本 workflow 用 `set +e` + `echo "algo exit: $?"` 显式丢弃退出码；
+      #    ③ 整条链没有任何「产物是否真产出了」的校验环节。
+      #
+      #  修复：链尾按**文件内容里的 update_time** 校验核心产物是否本交易日产出。
+      #  ⚠️ 刻意不用文件 mtime —— actions/checkout 会把所有文件 mtime 重置为
+      #     checkout 时刻，未更新的文件 mtime 同样「新」，用 mtime 会 100% 误判新鲜。
+      #
+      #  缺失/陈旧 → exit 1 → job 显式失败 → 既有告警链路（runner_health_alert /
+      #    v8_ops_watch）可见；同时写 $GITHUB_STEP_SUMMARY + raw_data/algo_chain_report.json，
+      #    让主人一眼看到断在哪一环，而不是对着全绿的 job 发呆。
+      - name: "🛡 产物完整性闸门（核心产物必须本交易日产出）"
+        if: steps.trading.outputs.is_trading_day == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "本轮 run_algorithms 退出码 = ${ALGO_EXIT:-未知}（仅供参考：continue-on-error 下常为 0）"
+          # 闸门报告 + 算法执行报告一并推送，供前端运维面板 / 后续排查消费
+          PUSH_FILES="raw_data/algo_chain_report.json,raw_data/algo_run_report.json" \
+            python api_push_raw.py || echo "⚠️ 报告推送失败（不影响闸门判定）"
+          python algorithms/verify_chain_outputs.py
+          GATE_EXIT=$?
+          if [ "$GATE_EXIT" != "0" ]; then
+            echo "::error::盘后算法链产物不完整——核心产物未在本交易日产出，详见上方闸门报告"
+          fi
+          exit $GATE_EXIT
