@@ -1258,7 +1258,12 @@ def check_all_data_files():
         # 🛡 2026-08-19 一劳永逸：OCR 依赖文件彻底跳过（不输出 items[] → 不渲染告警卡）
         if vid in _OCR_DEPENDENCY_FILES:
             continue
-        data = load_window_var(p, vid)
+        # 🛡 2026-08-28 一劳永逸：全量审计改读线上部署态（与 check_data_cards 对齐），
+        # 避免 self-hosted runner 本地 checkout 落后时把「线上正常的文件」误报 fail
+        # （local_sync / all_LHB_7D 等红灯的根因：健康检查读本地陈旧副本而非 Pages 真实态）
+        data = load_window_var_from_site(vid, vid)
+        if data is None:
+            data = load_window_var(p, vid)
         # 2026-08-17 兼容 window 变量名 ≠ 文件名（STOCK_MOMENTUM_STATE_V2.js → window.STOCK_MOMENTUM_ENHANCED）
         if data is None:
             for alias in _WINDOW_VAR_ALIASES.get(vid, []):
