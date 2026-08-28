@@ -109,13 +109,35 @@ def parse_date(ts):
     return m.group(0) if m else None
 
 
+def base_trade_date(now):
+    """产物应归属的交易日（2026-08-29 新增）
+
+    原实现直接用 `datetime.now()` 当天作基准日，在两类场景下必然误判：
+      ① 周末跑：产物属于上周五，基准日却是周六/周日 → 全表报「陈旧」
+      ② 次日凌晨补跑（00:00~06:00）：数据属于上一交易日 → 同样全表误判
+    实测 run #1204 于 08-29(周六) 00:43 跑，基准日取 08-29，14 项产物
+    被判「陈旧」13 项，其中多项其实只差 1 天（TOP10/三重共识/四量均为 08-28）。
+
+    规则：
+      · 凌晨（<06:00）→ 归上一自然日
+      · 周六/周日 → 逐日回退到周五
+    注：不处理法定节假日（需交易日历数据），节假日请用 --date 显式指定。
+    """
+    d = now.date()
+    if now.hour < 6:
+        d = d - timedelta(days=1)
+    while d.weekday() >= 5:          # 5=周六, 6=周日
+        d = d - timedelta(days=1)
+    return d.strftime("%Y-%m-%d")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--warn-only", action="store_true", help="只报告，不因陈旧而 exit 1")
-    ap.add_argument("--date", default=None, help="基准交易日 YYYY-MM-DD（默认今天 CST）")
+    ap.add_argument("--date", default=None, help="基准交易日 YYYY-MM-DD（默认按 base_trade_date 推导）")
     args = ap.parse_args()
 
-    today = args.date or datetime.now(CST).strftime("%Y-%m-%d")
+    today = args.date or base_trade_date(datetime.now(CST))
     print("=" * 72)
     print(f"🛡 盘后算法链产物完整性闸门 | 基准交易日 {today}"
           f"{'（warn-only 模式）' if args.warn_only else ''}")

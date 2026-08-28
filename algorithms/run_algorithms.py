@@ -18,6 +18,7 @@ import os
 import re
 import subprocess
 import sys
+import json
 from datetime import datetime
 
 # 本轮失败/超时脚本清单（供链尾闸门与运维面板消费）
@@ -247,10 +248,27 @@ STOCK_PICKING_SCRIPTS = {
 }
 # 18:00 = 所有盘后数据（龙虎榜/北向/板块资金/个股行情/机构调研等）稳定就绪时间
 _STOCK_PICKING_READY_HOUR, _STOCK_PICKING_READY_MIN = 18, 0
+# 次日凌晨补跑的截止时刻（CST）：过了这个点就属于新交易日的盘前，不再放行
+_NEXT_DAY_CUTOFF_HOUR = 6
 
 
 def _is_post_close_picking_ready():
-    """判断当前是否已过盘后选股策略统一执行时间（CST 18:00）。"""
+    """判断当前可否跑盘后选股策略（CST）。
+
+    🛡 2026-08-29 一劳永逸根因修复（候选池停更 3 天的真凶）：
+    原写法只判断「hour > 18」，把**次日凌晨补跑**（00:00~05:59）也误判成
+    「未到 18:00」→ 实测 run #1204 在北京时间 08-29 00:43 跑算法链，
+    20 个选股脚本（calc_crds / build_candidate_pool / calc_stock_rps /
+    generate_top10 / strategy_four_volume* ...）被整批跳过 → 候选池不产出 →
+    CRDS / RPS / 最终推荐整条选股链停更，链尾闸门随之 failure。
+
+    本门控真正要挡的是「盘中/盘前数据不全时抢跑选股」，不是挡凌晨补跑 ——
+    凌晨时上一交易日的盘后数据早已齐全。
+
+      放行 18:00~23:59  当日盘后，数据已齐
+      放行 00:00~05:59  次日凌晨补跑，上一交易日盘后数据已齐
+      拦截 06:00~17:59  盘前/盘中，当日尚未收盘，禁止生成选股结果
+    """
     # 2026-08-20 根因修复：统一使用 time_gate 的 UTC+8 计算，避免 runner 时区漂移。
     sys.path.insert(0, ALGO)
     try:
@@ -258,8 +276,14 @@ def _is_post_close_picking_ready():
     finally:
         sys.path.pop(0)
     now = _now_cst()
-    return (now.hour > _STOCK_PICKING_READY_HOUR or
-            (now.hour == _STOCK_PICKING_READY_HOUR and now.minute >= _STOCK_PICKING_READY_MIN))
+    h, m = now.hour, now.minute
+    if h > _STOCK_PICKING_READY_HOUR:              # 19:00 ~ 23:59
+        return True
+    if h == _STOCK_PICKING_READY_HOUR:             # 18:00 ~ 18:59
+        return m >= _STOCK_PICKING_READY_MIN
+    if h < _NEXT_DAY_CUTOFF_HOUR:                  # 00:00 ~ 05:59 凌晨补跑
+        return True
+    return False                                   # 06:00 ~ 17:59 盘前/盘中
 
 
 # 🛡 2026-08-26 一劳永逸（bug7/bug8）：final_recommend 读取 raw_data/，但 4 个输入
