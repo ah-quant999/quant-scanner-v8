@@ -4660,6 +4660,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <svg class="radar" style="display:block;margin:0 auto" width="220" height="200" viewBox="-110 -110 220 220" id="radar"></svg>
       </div>
     </div>
+    </div><!-- /delistedPanel -->
+    </div><!-- /opTab4 -->
   </section>
 
   <!-- ============ 暂未上架（管理员 · 实验区 · 2026-08-07 提升为一级 Tab） ============ -->
@@ -5515,7 +5517,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p">· 删除暂未上架里重复的「平均股价」独立卡片 + <code>renderAvgPrice</code> IIFE（AI 速览已有紧凑版，93 行净删）<br>· 个股全站综合诊断「各维度明细」从 6 行竖排 → 2 列 grid（<code>repeat(auto-fit,minmax(280px,1fr))</code>）</div>
 
         <div class="logic-h">⑧ 观测候选股池 0 只 根因修复（commit 23aa9f116）</div>
-        <div class="logic-p">主人全面审核发现「公开资讯源/研报来源」恒 0。根因：<code>stage_to_raw.py</code> 丢源守卫 <code>lost = d_src - s_src</code> 只查 dst>src 单方向，out 端丢源（src<dst）反向覆盖 raw 时守卫不触发。已改双向检查 <code>src_missing = d_src - s_src</code>；手动搬运 <code>out/candidate_pool.json</code>（6 源：观澜台 61/maharo 3）→ <code>raw_data/candidate.json</code> + <code>data/CANDIDATE.js</code>，主人刷新立即恢复 6 源。</div>
+        <div class="logic-p">主人全面审核发现「公开资讯源/研报来源」恒 0。根因：<code>stage_to_raw.py</code> 丢源守卫 <code>lost = d_src - s_src</code> 只查 dst&gt;src 单方向，out 端丢源（src&lt;dst）反向覆盖 raw 时守卫不触发。已改双向检查 <code>src_missing = d_src - s_src</code>；手动搬运 <code>out/candidate_pool.json</code>（6 源：观澜台 61/maharo 3）→ <code>raw_data/candidate.json</code> + <code>data/CANDIDATE.js</code>，主人刷新立即恢复 6 源。</div>
 
         <div class="logic-h">⑨ 提交清单</div>
         <div class="logic-p">
@@ -5716,7 +5718,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         </div>
 
         <div class="logic-h">⑥ 共振日历空壳阻塞 bug（已根治）</div>
-        <div class="logic-p>
+        <div class="logic-p">
         <code>algorithms/stage_to_raw.py:append_lhb_to_history()</code> 检测到空壳占位符（trading=False/stocks=0）时改为<b>覆盖更新</b>而非永久 <code>return False</code> 跳过。回填后 8 月 LHB_HISTORY 全部 trading=True，再不会出现"占位符阻塞真实数据"。
         </div>
 
@@ -5776,6 +5778,34 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         </table>
         </div>
       </div>
+
+      <div class="card">
+        <h3><span class="ic">🛠️</span>2026-08-28 全站审计修复（阿狸咪夜间档）</h3>
+        <div class="logic-p">
+        本轮针对「9 月切月数据丢失」「巡检误报陈旧」「历史追踪价格滞后」三类问题做根因治理，共 11 项。执行矩阵如下（时间均为北京时间）：
+        <table class="lg-table">
+          <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端影响</th></tr>
+          <tr><td>每日构建</td><td>重要事件日历按月归档，上月月末事件不再随切月消失</td><td>云端</td><td>重要日历卡片</td></tr>
+          <tr><td>每日构建</td><td>日历跨月时继承上月事件填入首周灰格</td><td>云端</td><td>重要日历卡片</td></tr>
+          <tr><td>每次巡检</td><td>健康面板读取数据时绕开缓存，并取线上与本地较新的一份</td><td>云端</td><td>运维页健康巡检</td></tr>
+          <tr><td>盘后算法链</td><td>历史追踪改用真实最新价，修复入选价与当前价滞后一日</td><td>云端</td><td>历史追踪页</td></tr>
+          <tr><td>盘后算法链</td><td>三重共识历史快照同步修正收盘价与涨幅</td><td>云端</td><td>三重共识历史</td></tr>
+          <tr><td>每日构建</td><td>补齐数据文件时间戳的解析兼容，消除误判陈旧</td><td>云端</td><td>全站数据卡</td></tr>
+          <tr><td>盘后算法链</td><td>链尾增设产物完整性闸门，核心产物未产出则整条链显式失败</td><td>云端</td><td>运维页任务看板</td></tr>
+          <tr><td>盘后算法链</td><td>失败脚本清单不再被静默吞掉，写明失败原因</td><td>云端</td><td>运维页任务看板</td></tr>
+          <tr><td>页面加载</td><td>版本自愈逻辑兼容全部时间戳字段名，自愈定时器真正启动</td><td>前端</td><td>全站页面</td></tr>
+          <tr><td>页面加载</td><td>新股缓存戳改为实时读取，消除三处手写值漂移</td><td>前端</td><td>打新卡片</td></tr>
+          <tr><td>每周清理</td><td>日历归档目录纳入保护名单，不再被清理逻辑误删</td><td>云端</td><td>无（后台）</td></tr>
+        </table>
+        </div>
+        <div class="logic-h">顺带根治的页面结构问题</div>
+        <div class="logic-p">
+        · 运维页「已下架」子面板缺 2 个闭合标签，导致后续板块被嵌套吞掉 —— 已补齐，<b>暂未上架页面不再受运维页标签切换影响</b>。<br>
+        · 逻辑详解页一处段落缺闭合引号、一处尖括号未转义 —— 已修正，相关段落样式与文本恢复正常。<br>
+        · 早年为防止子页面不可见而加的临时闭合补丁，其成因已根治，<b>予以移除</b>；经结构校验两个子页面为平级兄弟节点，显示不受影响。
+        </div>
+      </div>
+
       <div class="card">
         <div class="logic-p">· <b>v6精选</b>：选股驾驶舱+全站精选（15个JSON映射到DATA.*）<br>· <b>暂未上架</b>：V6卡片真实渲染（F窗口/金股池停牌/波动率/精选预判/四路资金/大盘资金流/期指/两融/ETF申赎）<br>· <b>已下架</b>：2026-07-30 起已<b>全面接入真实数据（11张卡）</b>，观测候选股池(CANDIDATE) 置顶，其余分别来自 F窗口实时监测(SH_FIB) / 金股池停牌监测(GOLD_POOL) / 波动率结构观测(VOLATILITY) / 精选预判信号(W52_HIGH·LIMIT_UP_HEATMAP·HERDING_DATA) / 四路资金流向对比(CAPITAL_FLOW_DATA) / 上交所大盘资金流时间轴(MARKET_FUND_FLOW_DATA) / 股指期货升贴水(CFFEX_HOLDINGS) / 两融余额走势(MARGIN_DATA) / 宽基ETF净申赎(ETF_SUBSCRIPTION) / 国家队ETF资金流向(ETF_INTRADAY_HEAT)；数据缺失时显示友好提示而非空白。</div>
       </div>
@@ -5798,7 +5828,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
     <!-- === v6备忘录（逻辑详解页最右侧子tab，2026-08-18 主人令：v6 回忆 tab 改名 v6 备忘录 + iframe 重新引用铁律文件 v6_memo.html?v=063d312703） === -->
     <!-- 🛡 2026-08-21 兜底（主人 04:55 报告 v6 空白）：iframe 在某些浏览器/网络下可能不渲染，
          顶部始终显示「直接打开」按钮，让用户即使 iframe 空白也能看 v6 备忘录完整内容。 -->
-    </div><!-- /lg-op 2026-08-23 修复：补缺失闭合，否则 lg-op 吞掉 lg-v6 子tab 致其 display:none 不可见 -->
+    <!-- /lg-op：2026-08-23 的补闭合补丁已于 2026-08-28 移除 —— 其成因(运维页 opTab4 缺 2 个 </div>)已根治；
+           经结构校验 lg-op 在上方正常闭合，lg-v6 为兄弟节点不再被吞，v6 备忘录 tab 可见性不受影响 -->
     <div class="lg-pane" id="lg-v6" style="position:relative;">
       <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:12px;margin-bottom:10px;flex-wrap:wrap;">
         <span style="font-size:13px;font-weight:700;color:#38bdf8;">📦 v6 备忘录</span>
@@ -7187,12 +7218,25 @@ window.__renderV8CalFull();
     if(window.IPO_DATA && Array.isArray(window.IPO_DATA.stocks) && window.IPO_DATA.stocks.length){
       applyData(window.IPO_DATA);
     }else{
-      // 优先 fetch data/IPO_DATA.js?v=bf5d738bc6（真实数据文件），其次 data/ipo_score.json（兼容旧路径）
-      fetch('data/IPO_DATA.js?v=94aba12264')
-        .then(r=>{ if(!r.ok) throw new Error('data/IPO_DATA.js?v=bf5d738bc6 http '+r.status); return r.text(); })
+      /* 🛡 2026-08-28 一劳永逸（主站审计 P1-8）：缓存戳 ?v= 从页面已注入的
+         <script src="data/IPO_DATA.js?v=xxx"> 实时读取，不再手写 hash。
+         历史债务：本处注释写死一个旧 hash、实际引用是另一个、报错信息又写一遍，
+         三处漂移；且手写 hash 不随构建更新 → CDN 吐旧副本 → 打新数据陈旧。
+         现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
+      var _ipoUrl=(function(){
+        try{
+          var el=document.querySelector('script[src*="data/IPO_DATA.js"]');
+          var s=el?el.getAttribute('src'):'';
+          if(s) return s;
+        }catch(e){}
+        return 'data/IPO_DATA.js';
+      })();
+      // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
+      fetch(_ipoUrl)
+        .then(r=>{ if(!r.ok) throw new Error(_ipoUrl+' http '+r.status); return r.text(); })
         .then(txt=>{ const m=txt.match(/window\.IPO_DATA\s*=\s*({[\s\S]+?});?\s*$/); if(!m) throw new Error('no IPO_DATA found'); return JSON.parse(m[1]); })
         .then(applyData)
-        .catch(err=>{ console.warn('IPO: 尝试 data/IPO_DATA.js?v=bf5d738bc6 失败', err);
+        .catch(err=>{ console.warn('IPO: 尝试 '+_ipoUrl+' 失败', err);
           fetch('data/ipo_score.json')
             .then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
             .then(applyData)
@@ -13480,14 +13524,35 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
 (function(){
   if(window.__v8AutoReloadStarted) return;
   window.__v8AutoReloadStarted=true;
-  function _localTs(){ try{ var h=window.HEALTH_CHECK||{}; return h.update_time||h.updated_at||''; }catch(e){ return ''; } }
+
+  /* 🛡 2026-08-28 一劳永逸（主站审计 P0-3）：
+     缓存戳 ?v= 一律从页面已注入的 <script src> 实时读取，不再手写 hash。
+     历史债务：IPO 卡注释写 ?v=bf5d738bc6、实际引用却是另一个 hash、报错信息又写一遍，
+     三处漂移导致排障时被误导，且手写 hash 不随构建更新 → CDN 吐旧副本。
+     现统一：script 标签是唯一真源，fetch 永远跟随它。 */
+  function _scriptUrl(file){
+    try{
+      var el=document.querySelector('script[src*="'+file+'"]');
+      var src=el?el.getAttribute('src'):'';
+      if(src){ return (src.indexOf('?')>=0 ? src+'&t=' : src+'?t='); }
+    }catch(e){}
+    return file+'?t=';
+  }
+
+  /* 🛡 2026-08-28 一劳永逸（主站审计 P0-3，比审计结论更严重）：
+     HEALTH_CHECK.js 的实际字段名是 {"updated":"...", "items":[{..."last_update":"..."}]}，
+     原代码只读 update_time / updated_at → 恒为 '' → 下方 `if(!localTs) return`
+     直接短路返回，setInterval 从未注册 —— 版本自愈功能自上线起从未启动过。
+     现按优先级兼容全部四种字段名（与下方正则严格对齐）。 */
+  function _pickTs(o){ try{ return o.update_time||o.updated_at||o.updated||o.last_update||''; }catch(e){ return ''; } }
+  function _localTs(){ try{ return _pickTs(window.HEALTH_CHECK||{}); }catch(e){ return ''; } }
   var localTs=_localTs();
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch('data/HEALTH_CHECK.js?v=17404d78f5'+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
-      var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"/);
-      var remoteTs=m?(m[1]||m[2]):'';
+    fetch(_scriptUrl('data/HEALTH_CHECK.js')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+      var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
+      var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
         console.log('[v8AutoReload] 检测到新版本 '+remoteTs+' ≠ 本地 '+localTs+'，自动刷新');
         try{ location.reload(); }catch(e){}
