@@ -12569,6 +12569,24 @@ h+='        <svg id="upDownChart" width="100%" height="260" style="overflow:visi
 h+='      </div>';
 h+='      <div class="note" id="upDownNote">红=上涨家数，绿=下跌家数，灰=平盘。今日涨 -- / 跌 -- / 平 --。</div>';
 h+='    </div>';
+
+    /* ===== 🌐 下架雷达组（2026-08-29 主人令「盘中三卡放到涨跌家数统计下方」+ 一劳永逸修复"闪现"问题）
+       三张宏观雷达卡：市场温度计·分项 / 六维共振雷达·战术层 / 危机雷达 */
+    h+='<div class="grid g-2" style="margin-bottom:16px">';
+    h+='  <div class="card">';
+    h+='    <h3><span class="ic">🌡️</span>市场温度计 · 分项 <span class="fresh" id="phThermoTime">—</span></h3>';
+    h+='    <div id="phThermoBody"><div class="ipo-empty">温度计数据加载中…</div></div>';
+    h+='  </div>';
+    h+='  <div class="card">';
+    h+='    <h3><span class="ic">🕸️</span>六维共振雷达 · 战术层 <span class="fresh" id="phRadarTime">—</span></h3>';
+    h+='    <svg class="radar" style="display:block;margin:0 auto" width="220" height="200" viewBox="-110 -110 220 220" id="radar"></svg>';
+    h+='  </div>';
+    h+='</div>';
+    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #f43f5e;">';
+    h+='  <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">📊</span>危机雷达 <span class="fresh" id="phCrisisTime">—</span></h3>';
+    h+='  <div id="phCrisisBody"><div class="ipo-empty">危机数据加载中…</div></div>';
+    h+='</div>';
+
     /* ===== 🌙 盘后 ===== */
 h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167,139,250,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#a78bfa;border-radius:8px;margin:16px 0 10px 0;">🌙 盘后（收盘后复盘）</div>';
     /* 2. 精选预判信号 */
@@ -12706,24 +12724,6 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     }
     h+='</div></div>';
 
-    /* ===== 🌐 下架雷达组（2026-08-29 主人令「雷达卡是下架卡，放已下架吧」+ 一劳永逸修复"闪现"问题）
-       三张宏观雷达卡：市场温度计·分项 / 六维共振雷达·战术层 / 危机雷达
-       原写为 opTab4 静态 HTML 会被 renderDelisted 整体 innerHTML 替换（"闪现"），
-       现彻底接管到 h 字符串里、容器+调用与数据插入同步走 */
-    h+='<div class="grid g-2" style="margin-bottom:16px">';
-    h+='  <div class="card">';
-    h+='    <h3><span class="ic">🌡️</span>市场温度计 · 分项 <span class="fresh" id="phThermoTime">—</span></h3>';
-    h+='    <div id="phThermoBody"><div class="ipo-empty">温度计数据加载中…</div></div>';
-    h+='  </div>';
-    h+='  <div class="card">';
-    h+='    <h3><span class="ic">🕸️</span>六维共振雷达 · 战术层 <span class="fresh" id="phRadarTime">—</span></h3>';
-    h+='    <svg class="radar" style="display:block;margin:0 auto" width="220" height="200" viewBox="-110 -110 220 220" id="radar"></svg>';
-    h+='  </div>';
-    h+='</div>';
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #f43f5e;">';
-    h+='  <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">📊</span>危机雷达 <span class="fresh" id="phCrisisTime">—</span></h3>';
-    h+='  <div id="phCrisisBody"><div class="ipo-empty">危机数据加载中…</div></div>';
-    h+='</div>';
 
     el.innerHTML=h;
     drawV8MarginChart();
