@@ -288,6 +288,15 @@ def main():
             print(f"  ⚠️ 跳过（解析失败）: {v6_name}")
             continue
         obj = _add_timestamp(obj)
+        # 2026-08-29 验证模式：非交易日（周末/假期）调试运行，源数据为上一交易日缓存，
+        # 强制沿用 dst 已有时间戳，避免把陈旧内容冒充「今日新鲜数据」推上线。
+        if os.environ.get("V8_VALIDATION_RUN") == "1" and os.path.exists(dst_path):
+            d = _load_json(dst_path)
+            if isinstance(d, dict) and isinstance(obj, dict):
+                for _k in ("update_time", "calc_time", "gen_time", "run_time", "date", "data_date"):
+                    if d.get(_k) is not None:
+                        obj[_k] = d[_k]
+                print(f"  🔒 验证模式沿用 dst 时间戳 {d.get('update_time')}（非交易日不推进日期）")
         # 2026-08-18 补：sector_rs.json 兜底注入 data_date（板块周期卡比对锚点）
         if v8_name == "sector_rs.json" and isinstance(obj, dict):
             if not obj.get("data_date"):
