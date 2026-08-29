@@ -71,8 +71,7 @@ if _requests is not None:
 
     _requests.Session.request = _session_request_with_timeout
 
-# 2026-08-09 修复：优先用 V8_OUT_DIR（run_algorithms 注入 = 与 guanlan_extractor /
-# fetch_maharo_signals 写入同目录），消除任何「脚本写 out/A、本脚本读 out/B」的口径偏差。
+# 2026-08-09 修复：优先用 V8_OUT_DIR（run_algorithms 注入 = 与 guanlan_extractor 写入同目录），消除任何「脚本写 out/A、本脚本读 out/B」的口径偏差。
 # 兜底才用 algorithms/../out（与 guanlan 的 BASE/../out 等价）。
 _DATA_FALLBACK = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "out")
 DATA = os.environ.get("V8_OUT_DIR") or _DATA_FALLBACK
@@ -616,10 +615,6 @@ def _norm(code, name, market_raw, full_code):
     return code, name, market, board
 
 
-def _mahoro_ticker(ticker):
-    """'2359.HK' → ('02359','hk','港股'); '601872.SS' → ('601872','sh','主板')"""
-    if not ticker:
-        return None
     t = str(ticker).strip().upper()
     if ".HK" in t:
         code = t.split(".HK")[0].zfill(5)
@@ -749,37 +744,6 @@ def build():
     except Exception as e:
         print(f"  [观澜台] 研报读取失败: {e}")
 
-    # 5) mahoro 研报
-    try:
-        mh = json.load(open(os.path.join(DATA, "mahoro_signals.json"), encoding="utf-8"))
-        n = 0
-        seen = set()
-        for sig in mh.get("raw_signals", []):
-            for co in sig.get("companies", []):
-                t = _mahoro_ticker(co.get("ticker", ""))
-                if not t:
-                    continue
-                code, mkt, board = t
-                key = f"{mkt}_{code}"
-                if key in seen:
-                    continue
-                seen.add(key)
-                add(key, code, co.get("name", ""), mkt, board, "maharo研报")
-                n += 1
-        for gm in mh.get("gold_pool_matches", []):
-            t = _mahoro_ticker(gm.get("code", ""))
-            if not t:
-                continue
-            code, mkt, board = t
-            key = f"{mkt}_{code}"
-            if key in seen:
-                continue
-            seen.add(key)
-            add(key, code, gm.get("name", ""), mkt, board, "maharo研报")
-            n += 1
-        print(f"  [maharo] 研报个股 {n} 只已并入")
-    except Exception as e:
-        print(f"  [maharo] 读取失败: {e}")
 
     # 补充行业 / 概念 / 板块元数据（用于个股查询展示）
     _enrich_industry_concepts(pool)
@@ -864,7 +828,6 @@ def build():
         dbg = {"DATA": DATA, "V8_OUT_DIR": _os.environ.get("V8_OUT_DIR", ""),
                "guanlan_watchlist": _cnt(wl, "stocks"),
                "guanlan_reports": _cnt(rp, "reports"),
-               "maharo_signals": _cnt(mh, "raw"),
                "source_dist": dict(dist)}
         # 同时写 raw_data/（api_push 会推送），便于云端 run 后经 API 取回核验
         _rd = _os.path.join(_os.path.dirname(DATA), "raw_data")
