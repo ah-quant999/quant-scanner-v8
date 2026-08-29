@@ -19,7 +19,11 @@ import datetime
 import re
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(BASE, "out", "sector_recommendation.json")
+# 🛡 2026-08-29 一劳永逸：输出到 raw_data，与 update_v8 DATA_SOURCES 对齐。
+#   原 out/sector_recommendation.json 在 .gitignore 目录，云端 checkout 不存在，
+#   update_v8 只扫描 raw_data/；本脚本此前只能自救式直接写 data/*.js，
+#   造成 raw/data 两层来源不一致、跨层校验失效。
+OUT = os.path.join(BASE, "raw_data", "sector_recommendation.json")
 
 
 def log(msg):
@@ -36,10 +40,8 @@ def load_window_var(path):
 
 
 def _bootstrap_regime(macro_path):
-    """🔴 2026-08-25 治本：out/ 被 .gitignore 忽略，云端全新 checkout 永远没有
-    out/market_regime.json，旧逻辑只打印「先跑 market_regime.py」就 return 1（光说不做）→
-    本卡自 2026-08-22 07:59 起永久冻结，链尾保底重跑(step_ensure_cockpit_sector)也救不回来
-    （因为重跑的是同一个必失败脚本）。现改为真的去跑 market_regime.py 自举依赖。
+    """🔴 2026-08-25 治本：raw_data/market_regime.json 缺失时，真的去跑 market_regime.py 生成。
+    2026-08-29 修正：macro_path 已指向 raw_data/，自举目标同步修正。
     严格附加：自举失败则维持原 return 1 行为，不会比现状更差。"""
     regime = os.path.join(BASE, "algorithms", "market_regime.py")
     if not os.path.exists(regime):
@@ -57,7 +59,7 @@ def _bootstrap_regime(macro_path):
 
 
 def main():
-    macro_path = os.path.join(BASE, "out", "market_regime.json")
+    macro_path = os.path.join(BASE, "raw_data", "market_regime.json")
     if not os.path.exists(macro_path) and not _bootstrap_regime(macro_path):
         log(f"缺 {macro_path}，自举 market_regime.py 后仍不存在，放弃")
         return 1
@@ -160,9 +162,11 @@ def main():
     # 按优先级 + 异动排序
     results.sort(key=lambda x: (x["priority"], 0 if any("🔥" in f for f in x["flags"]) else 1))
 
+    now_str = datetime.datetime.now().isoformat(timespec="seconds")
     out = {
+        "update_time": now_str,  # 🛡 顶层 update_time，供 update_v8 / 跨层校验读取
         "meta": {
-            "update_time": datetime.datetime.now().isoformat(timespec="seconds"),
+            "update_time": now_str,
             "regime_label": macro.get("regime", {}).get("label"),
             "framework_match": macro.get("framework_match"),
             "disclaimer": "⚠️ 框架+实时数据融合，板块轮动回测胜率 55-65% 上限。实盘验证 ≥3 个月。",
@@ -177,15 +181,8 @@ def main():
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
     log(f"已写入 {OUT}")
-
-    # 🔴 2026-08-25 一劳永逸：直接导出 data/SECTOR_RECOMMENDATION.js（脱离云端未知导出步）
-    #   见 gen_cockpit_advice.py 同款说明。脚本自带 data 导出 → 云端跑到即写新鲜 data/X.js，不被旧 out 覆盖。
-    DATA_JS = os.path.join(BASE, "data", "SECTOR_RECOMMENDATION.js")
-    with open(DATA_JS, "w", encoding="utf-8") as f:
-        f.write("window.SECTOR_RECOMMENDATION = ")
-        json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
-        f.write(";")
-    log(f"已导出 {DATA_JS}")
+    # 🛡 2026-08-29 一劳永逸：不再自救式直接写 data/*.js，统一由 update_v8 从 raw_data 桥接。
+    #   避免 raw/data 两层来源不一致、跨层校验失效的问题复发。
     log(f"推荐板块数: {len(results)}")
     for r in results[:10]:
         flags_s = " ".join(r["flags"]) if r["flags"] else "—"

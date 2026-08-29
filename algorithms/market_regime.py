@@ -16,7 +16,10 @@ import datetime
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 IN = os.path.join(BASE, "out", "macro.json")
-OUT = os.path.join(BASE, "out", "market_regime.json")
+# 🛡 2026-08-29 一劳永逸：输出到 raw_data，与 update_v8 DATA_SOURCES 对齐。
+#   原 out/market_regime.json 在 .gitignore 目录，云端 checkout 不存在，
+#   且 update_v8 只扫描 raw_data/ → 该卡自 8/19 起事实上冻结。
+OUT = os.path.join(BASE, "raw_data", "market_regime.json")
 
 
 def log(msg):
@@ -138,9 +141,11 @@ def main():
         {"priority": 2, "name": "消费", "sectors": ["白酒", "食品饮料", "家用电器"], "logic": "利率下行提振消费"},
     ]
 
+    now_str = datetime.datetime.now().isoformat(timespec="seconds")
     out = {
+        "update_time": now_str,  # 🛡 顶层 update_time，供 update_v8 / 跨层校验读取
         "meta": {
-            "update_time": datetime.datetime.now().isoformat(timespec="seconds"),
+            "update_time": now_str,
             "disclaimer": "⚠️ 利率与板块映射是经验关系，非因果；回测胜率 55-65% 上限。实盘验证 ≥3 个月。",
             "framework_source": "主人 2026-08-19 拍板（利率上行期板块推荐框架）",
         },
