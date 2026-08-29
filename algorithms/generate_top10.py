@@ -115,10 +115,112 @@ def freshness_warn(name, obj, max_age_days=1.0):
 #   1) enhance 的涨幅分支永远走 else（0<20），涨跌幅调节形同虚设
 #   2) form 的 `pct20 < 35` 恒为 True → 每只股票白送 2 分，形态A判断失真
 # 现改为从 raw_data/kline_cache 的真实日K计算。
+# 2026-08-29 再修复：kline_cache 只是 gen_strong_breakout 的副产物（只覆盖当日涨幅≥3%的
+# 强势突破候选），而金股池 65 只股票常常不在其中 → pct_chg_20d 再次 100% 缺失。
+# 现增加「缓存miss则实时拉取」兜底，让 generate_top10 对金股池自洽。
 # ─────────────────────────────────────────────────────────────────────────────
 _KLINE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                           "..", "raw_data", "kline_cache")
 _KLINE_CACHE = {}
+
+
+def _num_code(code):
+    return re.sub(r"\D", "", str(code or ""))
+
+
+def _market_of(code):
+    """从 sh_600362 / sz_300319 等格式推断市场"""
+    n = _num_code(code)
+    if len(n) != 6:
+        return None
+    if n.startswith("6") or n.startswith("9") or n.startswith("11") or n.startswith("13"):
+        return "sh"
+    if n.startswith("0") or n.startswith("3") or n.startswith("20"):
+        return "sz"
+    if n.startswith("8") or n.startswith("4") or n.startswith("43") or n.startswith("92"):
+        return "bj"
+    return "sh"
+
+
+def _df_to_records(df):
+    """把 DataFrame 转成 kline_cache 统一 records 列表，并清理 NaN"""
+    if df is None or len(df) < 2:
+        return []
+    records = []
+    for _, r in df.iterrows():
+        try:
+            close = float(r["close"])
+            if not (close > 0):
+                continue
+            records.append({
+                "date": str(r["date"])[:10],
+                "open": float(r["open"]),
+                "close": close,
+                "high": float(r["high"]),
+                "low": float(r["low"]),
+                "volume": float(r["volume"]),
+            })
+        except (TypeError, ValueError):
+            continue
+    return records
+
+
+def _fetch_kline_fallback(code):
+    """缓存 miss 时尝试从腾讯 GTimg / akshare 拉取日K并写入缓存。失败返回 []"""
+    n = _num_code(code)
+    mkt = _market_of(code)
+    if len(n) != 6 or not mkt:
+        return []
+    os.makedirs(_KLINE_DIR, exist_ok=True)
+    cp = os.path.join(_KLINE_DIR, f"{n}.json")
+    try:
+        from data_source_gtimg import fetch_a_daily_gtimg
+        df = None
+        for attempt in range(2):
+            df = fetch_a_daily_gtimg(n, market=mkt, bars=250)
+            if df is not None and len(df) >= 60:
+                break
+            alt = "sz" if mkt == "sh" else "sh"
+            df = fetch_a_daily_gtimg(n, market=alt, bars=250)
+            if df is not None and len(df) >= 60:
+                break
+        if df is None or len(df) < 60:
+            try:
+                import akshare as ak
+                end = datetime.now()
+                start = end - datetime.timedelta(days=600)
+                symbol = f"sh{n}" if mkt == "sh" else f"sz{n}"
+                df = ak.stock_zh_a_daily(
+                    symbol=symbol,
+                    start_date=start.strftime("%Y%m%d"),
+                    end_date=end.strftime("%Y%m%d"),
+                )
+                if df is None or len(df) < 60:
+                    return []
+                records = []
+                for _, r in df.iterrows():
+                    records.append({
+                        "date": str(r["date"])[:10],
+                        "open": float(r["open"]),
+                        "close": float(r["close"]),
+                        "high": float(r["high"]),
+                        "low": float(r["low"]),
+                        "volume": float(r["volume"]),
+                    })
+                if len(records) < 60:
+                    return []
+                with open(cp, "w", encoding="utf-8") as f:
+                    json.dump(records, f, ensure_ascii=False)
+                return records
+            except Exception:
+                return []
+        records = _df_to_records(df)
+        if len(records) >= 60:
+            with open(cp, "w", encoding="utf-8") as f:
+                json.dump(records, f, ensure_ascii=False)
+        return records
+    except Exception:
+        return []
 
 
 def _load_kline(code):
@@ -126,19 +228,26 @@ def _load_kline(code):
     if code in _KLINE_CACHE:
         return _KLINE_CACHE[code]
     rows = []
+    n = _num_code(code)
     try:
-        with open(os.path.join(_KLINE_DIR, f"{code}.json"), "r", encoding="utf-8") as f:
+        with open(os.path.join(_KLINE_DIR, f"{n}.json"), "r", encoding="utf-8") as f:
             data = json.load(f)
         if isinstance(data, list):
             for r in data:
                 try:
-                    if r.get("date") and r.get("close"):
-                        rows.append((r["date"], float(r["close"])))
+                    close = r.get("close")
+                    if r.get("date") and close is not None and close == close and close > 0:
+                        rows.append((r["date"], float(close)))
                 except (TypeError, ValueError):
                     continue
             rows.sort(key=lambda x: x[0])
     except Exception:
         rows = []
+    # 缓存 miss 或数据不足：实时拉取
+    if len(rows) < 21:
+        records = _fetch_kline_fallback(code)
+        rows = [(r["date"], r["close"]) for r in records if r.get("date") and r.get("close") > 0]
+        rows.sort(key=lambda x: x[0])
     _KLINE_CACHE[code] = rows
     return rows
 
