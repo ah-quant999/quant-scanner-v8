@@ -7,7 +7,7 @@
     "创业板成交前100": 101,
     "科创板成交前100": 102,
     "港股成交前50": 50,
-    "观澜台": 21
+    "外资研投": 21
   },
   "stocks": {
     "sh_600487": {
@@ -10455,7 +10455,7 @@
       "board_label": "科创板",
       "sources": [
         "科创板成交前100",
-        "观澜台"
+        "外资研投"
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "科创板",
@@ -10468,7 +10468,7 @@
       "market": "hk",
       "board_label": "港股",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "first_seen": "2026-08-29",
       "last_seen": "2026-08-29"
@@ -10479,7 +10479,7 @@
       "market": "sh",
       "board_label": "主板",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "industry": "批发业",
       "concepts": [
@@ -10505,7 +10505,7 @@
       "market": "sh",
       "board_label": "主板",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "industry": "软件和信息技术服务业",
       "concepts": [
@@ -10555,7 +10555,7 @@
       "market": "sh",
       "board_label": "主板",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "industry": "电气机械和器材制造业",
       "concepts": [
@@ -10584,7 +10584,7 @@
       "market": "sz",
       "board_label": "主板",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "industry": "电气机械和器材制造业",
       "concepts": [
@@ -10629,7 +10629,7 @@
       "market": "hk",
       "board_label": "港股",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "first_seen": "2026-08-29",
       "last_seen": "2026-08-29"
@@ -10640,7 +10640,7 @@
       "market": "sh",
       "board_label": "主板",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "industry": "资本市场服务",
       "concepts": [
@@ -10667,7 +10667,7 @@
       "market": "hk",
       "board_label": "港股",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "first_seen": "2026-08-29",
       "last_seen": "2026-08-29"
@@ -10678,7 +10678,7 @@
       "market": "hk",
       "board_label": "港股",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "first_seen": "2026-08-29",
       "last_seen": "2026-08-29"
@@ -10689,7 +10689,7 @@
       "market": "sh",
       "board_label": "主板",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "industry": "医药制造业",
       "concepts": [
@@ -10724,7 +10724,7 @@
       "market": "sh",
       "board_label": "科创板",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "科创板",
@@ -10737,7 +10737,7 @@
       "market": "hk",
       "board_label": "港股",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "first_seen": "2026-08-29",
       "last_seen": "2026-08-29"
@@ -10748,7 +10748,7 @@
       "market": "hk",
       "board_label": "港股",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "first_seen": "2026-08-29",
       "last_seen": "2026-08-29"
@@ -10759,7 +10759,7 @@
       "market": "sh",
       "board_label": "主板",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "industry": "电气机械和器材制造业",
       "concepts": [
@@ -10801,7 +10801,7 @@
       "market": "sz",
       "board_label": "主板",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "industry": "电气机械和器材制造业",
       "concepts": [
@@ -10825,7 +10825,7 @@
       "market": "hk",
       "board_label": "港股",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "first_seen": "2026-08-29",
       "last_seen": "2026-08-29"
@@ -10836,7 +10836,7 @@
       "market": "sz",
       "board_label": "主板",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "industry": "电力、热力生产和供应业",
       "concepts": [
@@ -10875,7 +10875,7 @@
       "market": "sh",
       "board_label": "主板",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "industry": "通用设备制造业",
       "concepts": [
@@ -10903,7 +10903,7 @@
       "market": "sz",
       "board_label": "主板",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "industry": "汽车制造业",
       "concepts": [
@@ -10933,7 +10933,7 @@
       "market": "sz",
       "board_label": "创业板",
       "sources": [
-        "观澜台"
+        "外资研投"
       ],
       "industry": "通用设备制造业",
       "concepts": [
