@@ -115,8 +115,40 @@ def calc_vol_ratio(vol_today, vol_prev_4d):
     return round(vol_today / vol_prev_4d, 3)
 
 
+def _market_prefix(code):
+    """返回 sh/sz/bj 前缀。"""
+    if str(code).startswith(("60","68","90","11","13","5","1")):
+        return "sh"
+    if str(code).startswith(("00","30","20")):
+        return "sz"
+    if str(code).startswith(("8","43","92")):
+        return "bj"
+    return "sh"
+
+
+def _fetch_kline_akshare(code, bars=250):
+    """akshare 东财前复权日线兜底（gtimg 境外抖动/限流时用）。返回 DataFrame 或 None。"""
+    try:
+        import akshare as ak
+        n = _norm_code(code)
+        prefix = _market_prefix(n)
+        symbol = f"{prefix}{n}"
+        end = datetime.now()
+        start = end - datetime.timedelta(days=bars * 2)
+        df = ak.stock_zh_a_daily(
+            symbol=symbol,
+            start_date=start.strftime("%Y%m%d"),
+            end_date=end.strftime("%Y%m%d"),
+        )
+        if df is None or len(df) < 60:
+            return None
+        return df
+    except Exception:
+        return None
+
+
 def get_avg_volume_4d(code, target_date):
-    """从腾讯 gtimg 拉近 60 日 K 线，算前 4 日均量（接口要求 ≥60 根）"""
+    """从腾讯 gtimg 拉近 60 日 K 线，算前 4 日均量（接口要求 ≥60 根）。gtimg 失败时用 akshare 兜底。"""
     try:
         sys.path.insert(0, str(ALGO_DIR))
         from data_source_gtimg import fetch_a_daily_gtimg
@@ -124,16 +156,11 @@ def get_avg_volume_4d(code, target_date):
         print(f"  ⚠️ 导入 data_source_gtimg 失败: {e}")
         return None
     try:
-        # sh/sz/bj 前缀
-        if str(code).startswith(("60","68","90","11","13","5","1")):
-            market = "sh"
-        elif str(code).startswith(("00","30","20")):
-            market = "sz"
-        elif str(code).startswith(("8","43","92")):
-            market = "bj"
-        else:
-            market = "sh"
+        market = _market_prefix(code)
         kl = fetch_a_daily_gtimg(code, market=market, bars=250)
+        if kl is None or len(kl) < 5:
+            # 🛡 2026-08-29 兜底：GTimg 偶发抖动/限流，换 akshare 东财日线。
+            kl = _fetch_kline_akshare(code, bars=250)
         if kl is None or len(kl) < 5:
             return None
         # kl 是 DataFrame（date/open/close/high/low/volume/pct_chg）
@@ -204,6 +231,21 @@ def run_for_today(emit_js=False, target_date=None):
     # 排序：量比 + 涨幅 综合分
     candidates.sort(key=lambda c: (c["vol_ratio"] * 0.6 + (c["pct"] or 0) * 0.4), reverse=True)
 
+    # 🛡 2026-08-29 高手画像版 H反推对照组：低价(<15元) + 主板 + 医药/化工/贵金属/农业
+    EXPERT_MAX_PRICE = 15.0
+    EXPERT_BOARDS = {"主板"}
+    EXPERT_INDUSTRY_KEYWORDS = {"医药", "化工", "贵金属", "农业"}
+    expert_candidates = []
+    for c in candidates:
+        if (c.get("price") or 999) >= EXPERT_MAX_PRICE:
+            continue
+        if c.get("board") not in EXPERT_BOARDS:
+            continue
+        ind = c.get("industry", "")
+        if not any(kw in ind for kw in EXPERT_INDUSTRY_KEYWORDS):
+            continue
+        expert_candidates.append(c)
+
     out = {
         "date": target_date,
         "snapshot_date": snapshot_date,
@@ -214,6 +256,9 @@ def run_for_today(emit_js=False, target_date=None):
         "hit_chg_only": len([c for c in candidates if c["pct"] >= CHG_MIN]),
         "final_count": len(candidates),
         "candidates": candidates,
+        "expert_method": f"{EXPERT_MAX_PRICE}元以下 + 主板 + 医药/化工/贵金属/农业（高手画像版）",
+        "expert_count": len(expert_candidates),
+        "expert_candidates": expert_candidates,
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "source": "raw_data/h_auto_buy 反推算法，无 PDF OCR 依赖",
     }

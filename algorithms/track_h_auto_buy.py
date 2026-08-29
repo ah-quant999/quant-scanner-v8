@@ -188,7 +188,7 @@ def _load_candidates(target_date):
        raw json 缺失/为空 → 静默 0 样本，导致「H反推」永远比不出胜率。
        此时退回已部署且每日刷新的 data/H_AUTO_BUY.js（含 date + candidates），
        用快照里的真实候选日做 key，保证每日跟踪不落空。
-    返回 (candidates_list, real_date_str)。主源可用时 real_date=target_date。
+    返回 (candidates_list, real_date_str, expert_candidates_list)。主源可用时 real_date=target_date。
     """
     pick_file = RAW_DIR / f"h_auto_buy_{target_date.replace('-', '')}.json"
     if pick_file.exists():
@@ -196,7 +196,8 @@ def _load_candidates(target_date):
             pick = json.load(open(pick_file, encoding="utf-8"))
             cands = pick.get("candidates", []) or []
             if cands:
-                return cands, target_date
+                expert = pick.get("expert_candidates", []) or None
+                return cands, target_date, expert
         except Exception:
             pass
     # 兜底：data/H_AUTO_BUY.js
@@ -210,34 +211,23 @@ def _load_candidates(target_date):
                 cands = d.get("candidates", []) or []
                 if cands:
                     real = d.get("date") or target_date
+                    expert = d.get("expert_candidates", []) or None
                     print(f"  🛡 主源缺失/空，兜底读 data/H_AUTO_BUY.js（候选日 {real}，{len(cands)} 只）")
-                    return cands, real
+                    return cands, real, expert
         except Exception:
             pass
-    return None, target_date
+    return None, target_date, None
 
 
-def run(target_date=None, emit_js=True, top_n=50):
-    """
-    把 target_date（默认昨日）的 h_auto_buy 候选股全部跟踪一遍，
-    写进 history + 重新计 summary + 输出 H_AUTO_BUY_TRACK.js。
-    每日盘后调度：拿到昨日候选 → 等到今天才能算 T+1。
-    """
-    if target_date is None:
-        target_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
-    candidates, real_date = _load_candidates(target_date)
-    if candidates is None:
-        print(f"❌ 候选文件不存在且 data/H_AUTO_BUY.js 无候选: target={target_date}")
-        return None
-
-    history = load_history()
-    day_rec = history["by_date"].get(real_date, {"picks": []})
-
-    today_str = datetime.now().strftime("%Y-%m-%d")
-    print(f"📊 跟踪 {real_date} 的 {len(candidates)} 只候选（top {top_n}）")
+def _track_subset(candidates, real_date, today_str, label=""):
+    """跟踪 candidates 子集，返回当日 rec（picks/summary）。"""
+    if not candidates:
+        return {"picks": [], "n": 0, "T+1_hit": 0, "T+3_hit": 0,
+                "T+5_hit": 0, "T+10_hit": 0, "tracked_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+    print(f"📊 跟踪 {real_date} {label}的 {len(candidates)} 只候选")
     tracked = []
     ok = 0
-    for i, c in enumerate(candidates):
+    for c in candidates:
         code = c.get("code") or _norm_code(c.get("symbol", ""))
         if not code:
             continue
@@ -248,12 +238,12 @@ def run(target_date=None, emit_js=True, top_n=50):
         rec["industry"] = c.get("industry", "")
         rec["pct_at_pick"] = c.get("pct")
         rec["vol_ratio_at_pick"] = c.get("vol_ratio")
+        rec["board_at_pick"] = c.get("board", "")
+        rec["price_at_pick"] = c.get("price")
         tracked.append(rec)
         ok += 1
         if ok % 10 == 0:
-            print(f"   ... {ok}/{len(candidates)}")
-
-    # 累计当日 summary
+            print(f"   {label}... {ok}/{len(candidates)}")
     s = {
         "picks": tracked,
         "n": len(tracked),
@@ -265,16 +255,14 @@ def run(target_date=None, emit_js=True, top_n=50):
     }
     s["T+1_rate"] = round(s["T+1_hit"] / s["n"] * 100, 1) if s["n"] else 0
     s["T+5_rate"] = round(s["T+5_hit"] / s["n"] * 100, 1) if s["n"] else 0
-    history["by_date"][real_date] = s
-    history["last_updated"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    # 🔴 2026-08-22 主人令修复：顶层 update_time 必须随每次生成刷新，
-    #   否则 v8_health_check/前端判龄一直读到旧时戳（08-20）误判陈旧
-    history["update_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return s
 
-    # 重算 cumulative summary
+
+def _summarize_by_date(by_date):
+    """按 by_date 重算 cumulative summary。"""
     summary = {"days": 0, "tracked_picks": 0,
                "T+1_hit": 0, "T+3_hit": 0, "T+5_hit": 0, "T+10_hit": 0}
-    for d, rec in history["by_date"].items():
+    for d, rec in by_date.items():
         if "n" in rec and rec["n"]:
             summary["days"] += 1
             summary["tracked_picks"] += rec["n"]
@@ -286,13 +274,57 @@ def run(target_date=None, emit_js=True, top_n=50):
         summary["T+1_rate"] = round(summary["T+1_hit"] / summary["tracked_picks"] * 100, 1)
         summary["T+5_rate"] = round(summary["T+5_hit"] / summary["tracked_picks"] * 100, 1)
         summary["T+10_rate"] = round(summary["T+10_hit"] / summary["tracked_picks"] * 100, 1)
-    history["summary"] = summary
+    return summary
+
+
+def run(target_date=None, emit_js=True, top_n=50):
+    """
+    把 target_date（默认昨日）的 h_auto_buy 候选股全部跟踪一遍，
+    写进 history + 重新计 summary + 输出 H_AUTO_BUY_TRACK.js。
+    每日盘后调度：拿到昨日候选 → 等到今天才能算 T+1。
+    """
+    if target_date is None:
+        target_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    base_candidates, real_date, expert_candidates = _load_candidates(target_date)
+    if base_candidates is None:
+        print(f"❌ 候选文件不存在且 data/H_AUTO_BUY.js 无候选: target={target_date}")
+        return None
+
+    history = load_history()
+    today_str = datetime.now().strftime("%Y-%m-%d")
+
+    # 基础 H反推
+    base_rec = _track_subset(base_candidates[:top_n], real_date, today_str, label="基础H反推 ")
+    history["by_date"][real_date] = base_rec
+
+    # 高手画像版 H反推（若候选文件含 expert_candidates）
+    if expert_candidates:
+        expert_rec = _track_subset(expert_candidates[:top_n], real_date, today_str, label="高手画像版 ")
+        if "expert_by_date" not in history:
+            history["expert_by_date"] = {}
+        history["expert_by_date"][real_date] = expert_rec
+    else:
+        print(f"ℹ️ {real_date} 候选文件无 expert_candidates，跳过高手画像版跟踪")
+
+    history["last_updated"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # 🔴 2026-08-22 主人令修复：顶层 update_time 必须随每次生成刷新，
+    #   否则 v8_health_check/前端判龄一直读到旧时戳（08-20）误判陈旧
+    history["update_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    # 重算 cumulative summary
+    history["summary"] = _summarize_by_date(history["by_date"])
+    if "expert_by_date" in history:
+        history["expert_summary"] = _summarize_by_date(history["expert_by_date"])
 
     with open(HISTORY_FILE, "w", encoding="utf-8") as f:
         json.dump(history, f, ensure_ascii=False, indent=2)
-    print(f"✅ {HISTORY_FILE.name}: 累计 {summary['tracked_picks']} picks · "
-          f"T+1 winrate {summary.get('T+1_rate', 0)}% · "
-          f"T+5 winrate {summary.get('T+5_rate', 0)}%")
+    print(f"✅ {HISTORY_FILE.name}: 累计 {history['summary']['tracked_picks']} picks · "
+          f"T+1 winrate {history['summary'].get('T+1_rate', 0)}% · "
+          f"T+5 winrate {history['summary'].get('T+5_rate', 0)}%")
+    if "expert_summary" in history:
+        es = history["expert_summary"]
+        print(f"✅ 高手画像版: 累计 {es['tracked_picks']} picks · "
+              f"T+1 winrate {es.get('T+1_rate', 0)}% · T+5 winrate {es.get('T+5_rate', 0)}%")
 
     if emit_js:
         payload = "/* H 反推算法跟踪 / 累积胜率（脱离 PDF OCR） */\n" \

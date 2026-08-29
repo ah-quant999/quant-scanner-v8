@@ -56,13 +56,14 @@ def _agg(values):
     return {"n": n, "win": win, "avg": avg, "hit": hit}
 
 
-def collect_h_reverse():
+def collect_h_reverse(expert=False):
     """读 H_AUTO_BUY_TRACK 历史，返回每只 pick 的 T+1~T+10 实测涨幅。"""
     d = load_js_var(DATA_DIR / "H_AUTO_BUY_TRACK.js", "H_AUTO_BUY_TRACK")
     if not d:
         return []
     out = []
-    by_date = d.get("by_date", {}) or {}
+    key = "expert_by_date" if expert else "by_date"
+    by_date = d.get(key, {}) or {}
     for date, rec in by_date.items():
         for p in rec.get("picks", []) or []:
             row = {
@@ -106,31 +107,42 @@ def summarize(rows):
     return {"n_samples": len(rows), "horizons": metrics}
 
 
-def verdict(ha, sb):
-    if not ha and not sb:
-        return "两套算法暂无可比历史，等待盘后累积（每日自动累加）。"
-    if not ha:
-        return "H 反推暂无历史样本；强势突破已就绪，等待 H 反推累积后对比。"
-    if not sb:
-        return "强势突破暂无历史样本（首次云运行后开始累积）；H 反推已就绪。"
-    ha_t5 = ha["horizons"].get("t5")
-    sb_t5 = sb["horizons"].get("t5")
-    if not ha_t5 or not sb_t5:
-        return "T+5 样本不足，待累积后给出结论。"
-    lines = []
-    if sb_t5["win"] > ha_t5["win"]:
-        lines.append(f"强势突破 T+5 胜率更高（{sb_t5['win']}% vs {ha_t5['win']}%）")
-    else:
-        lines.append(f"H 反推 T+5 胜率更高（{ha_t5['win']}% vs {sb_t5['win']}%）")
-    if sb_t5["avg"] > ha_t5["avg"]:
-        lines.append(f"强势突破 T+5 平均收益更好（+{sb_t5['avg']}% vs +{ha_t5['avg']}%）")
-    else:
-        lines.append(f"H 反推 T+5 平均收益更好（+{ha_t5['avg']}% vs +{sb_t5['avg']}%）")
-    return "；".join(lines)
+def _t5_win_avg(s):
+    t5 = (s or {}).get("horizons", {}).get("t5")
+    if not t5:
+        return None, None
+    return t5.get("win"), t5.get("avg")
+
+
+def verdict(ha, ha_expert, sb):
+    parts = []
+    names = {
+        "h_reverse": "H 反推",
+        "h_reverse_expert": "高手画像版H反推",
+        "strong_breakout": "强势突破",
+    }
+    metrics = [(names["h_reverse"], ha), (names["h_reverse_expert"], ha_expert), (names["strong_breakout"], sb)]
+    # 只参与有 T+5 样本的
+    valid = [(n, _t5_win_avg(s)) for n, s in metrics if _t5_win_avg(s)[0] is not None]
+    if not valid:
+        return "三套算法均暂无足够 T+5 可比历史，等待盘后累积。"
+    if len(valid) == 1:
+        return f"仅 {valid[0][0]} 有 T+5 样本，待其他算法累积后对比。"
+    # 胜率排名 + 平均收益排名
+    by_win = sorted(valid, key=lambda x: x[1][0], reverse=True)
+    by_avg = sorted(valid, key=lambda x: x[1][1], reverse=True)
+    parts.append(f"T+5 胜率：{by_win[0][0]}（{by_win[0][1][0]}%）> {by_win[1][0]}（{by_win[1][1][0]}%）")
+    if len(by_win) > 2:
+        parts[-1] += f" > {by_win[2][0]}（{by_win[2][1][0]}%）"
+    parts.append(f"T+5 平均收益：{by_avg[0][0]}（+{by_avg[0][1][1]}%）> {by_avg[1][0]}（+{by_avg[1][1][1]}%）")
+    if len(by_avg) > 2:
+        parts[-1] += f" > {by_avg[2][0]}（+{by_avg[2][1][1]}%）"
+    return "；".join(parts)
 
 
 def main():
     ha = summarize(collect_h_reverse())
+    ha_expert = summarize(collect_h_reverse(expert=True))
     sb = summarize(collect_strong_breakout())
     payload = {
         "generated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -139,8 +151,14 @@ def main():
             "h_reverse": {
                 "name": "H 反推短线买点",
                 "rule": "涨幅≥3% + 量比≥1.2（PDF 提取算法）",
-                "source": "H_AUTO_BUY_TRACK",
+                "source": "H_AUTO_BUY_TRACK.by_date",
                 "summary": ha,
+            },
+            "h_reverse_expert": {
+                "name": "高手画像版H反推",
+                "rule": "涨幅≥3% + 量比≥1.2 + 价格<15 + 主板 + 医药/化工/贵金属/农业",
+                "source": "H_AUTO_BUY_TRACK.expert_by_date",
+                "summary": ha_expert,
             },
             "strong_breakout": {
                 "name": "强势突破（H反推升级）",
@@ -149,7 +167,7 @@ def main():
                 "summary": sb,
             },
         },
-        "verdict": verdict(ha, sb),
+        "verdict": verdict(ha, ha_expert, sb),
     }
     out = DATA_DIR / "ALGO_BACKTEST_COMPARE.js"
     out.write_text(
@@ -157,8 +175,9 @@ def main():
         encoding="utf-8",
     )
     n_ha = ha["n_samples"] if ha else 0
+    n_ha_ex = ha_expert["n_samples"] if ha_expert else 0
     n_sb = sb["n_samples"] if sb else 0
-    print(f"[algo_backtest_compare] H反推 n={n_ha} | 强势突破 n={n_sb}")
+    print(f"[algo_backtest_compare] H反推 n={n_ha} | 高手画像版 n={n_ha_ex} | 强势突破 n={n_sb}")
     print(f"[algo_backtest_compare] 结论: {payload['verdict']}")
 
 

@@ -40,6 +40,9 @@ RAW_DIR = Path(ROOT) / "raw_data"
 CACHE_DIR = RAW_DIR / "kline_cache"
 HISTORY_FILE = RAW_DIR / "strong_breakout_history.json"
 WINDOW_DAYS = 45
+# 🛡 2026-08-29 硬化：K线可用率低于阈值时直接失败，禁止发布「data_available=false」的虚假回测。
+# 默认 50%：既避免偶发单股失败阻塞构建，又确保大多数样本真实可算。
+MIN_KLINE_RATIO = float(os.environ.get("GEN_SB_MIN_KLINE_RATIO", "0.5"))
 
 # ── H 反推阈值（与 auto_run_dn_algorithm.py 同源，PDF 8.10/8.17 样本）──
 CHG_MIN = 3.0      # 涨幅下限
@@ -109,8 +112,71 @@ def load_quote():
 
 
 # ── K线缓存 ────────────────────────────────────────────
+def _df_from_records(rows):
+    """把 dict list 转成统一 DataFrame，补 pct_chg。"""
+    import pandas as pd
+    if not rows:
+        return None
+    df = pd.DataFrame(rows)
+    if len(df) < 60:
+        return None
+    for col in ("open", "close", "high", "low", "volume"):
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+    df = df.dropna(subset=["close"])
+    df["pct_chg"] = 0.0
+    if len(df) > 1:
+        df["pct_chg"] = ((df["close"] / df["close"].shift(1) - 1) * 100).round(2)
+    return df.reset_index(drop=True)
+
+
+def fetch_a_daily_akshare(code, bars=250):
+    """akshare 日K兜底：东财前复权日线。返回 DataFrame 或 None。"""
+    try:
+        import akshare as ak
+        n = num_code(code)
+        if len(n) != 6:
+            return None
+        # akshare 代码格式: sh600028 / sz000001
+        if n.startswith(("60", "68", "90", "11", "13")):
+            symbol = f"sh{n}"
+        elif n.startswith(("00", "30", "20")):
+            symbol = f"sz{n}"
+        elif n.startswith(("8", "43", "92")):
+            symbol = f"bj{n}"
+        else:
+            symbol = f"sh{n}"
+        end = datetime.datetime.now()
+        start = end - datetime.timedelta(days=bars * 2)
+        df = ak.stock_zh_a_daily(
+            symbol=symbol,
+            start_date=start.strftime("%Y%m%d"),
+            end_date=end.strftime("%Y%m%d"),
+        )
+        if df is None or len(df) < 60:
+            return None
+        # 列映射到统一schema
+        rows = []
+        for _, r in df.iterrows():
+            rows.append({
+                "date": str(r["date"])[:10],
+                "open": float(r["open"]),
+                "close": float(r["close"]),
+                "high": float(r["high"]),
+                "low": float(r["low"]),
+                "volume": float(r["volume"]),
+            })
+        return _df_from_records(rows)
+    except Exception as e:
+        log(f"  akshare K线失败 {code}: {e}")
+        return None
+
+
 def get_kline(code):
-    """返回 腾讯前复权日K DataFrame(date/open/close/high/low/volume/pct_chg)，带本地缓存。"""
+    """返回 前复权日K DataFrame(date/open/close/high/low/volume/pct_chg)，带本地缓存。
+
+    数据源优先级：本地缓存 → 腾讯 GTimg（主/对手市场+重试） → akshare 东财日线兜底。
+    """
     n = num_code(code)
     if len(n) != 6:
         return None
@@ -120,9 +186,8 @@ def get_kline(code):
         if cp.exists():
             raw = json.loads(cp.read_text(encoding="utf-8"))
             if raw:
-                import pandas as pd
-                df = pd.DataFrame(raw)
-                if len(df) >= 60:
+                df = _df_from_records(raw)
+                if df is not None and len(df) >= 60:
                     return df
         from data_source_gtimg import fetch_a_daily_gtimg
         mkt = market_of(code)
@@ -137,8 +202,12 @@ def get_kline(code):
             df = fetch_a_daily_gtimg(n, market=alt, bars=250)
             if df is not None and len(df) >= 60:
                 break
+        # 🛡 2026-08-29 兜底：GTimg 在境外 runner 偶发抖动/限流，用 akshare 东财日线兜底。
         if df is None or len(df) < 60:
-            log(f"  K线获取失败 {code}（已重试主/对手市场，仍不足 60 根）")
+            log(f"  GTimg 失败 {code}，尝试 akshare 兜底")
+            df = fetch_a_daily_akshare(n, bars=250)
+        if df is None or len(df) < 60:
+            log(f"  K线获取失败 {code}（GTimg+akshare 均不足 60 根）")
             return None
         cp.write_text(json.dumps(df.to_dict(orient="records"), ensure_ascii=False), encoding="utf-8")
         return df
@@ -480,13 +549,14 @@ def main():
         "meta": {
             "generated": today + " " + now.strftime("%H:%M:%S"),
             "description": "个股动量状态增强分析 V2：基于「H反推升级算法」(涨幅≥3%+量比≥1.2+突破前高+RS前25%) 每日自选强势突破 + 真实日K线(前复权)计算 T+1~T+10 回测",
-            "data_source": "腾讯ifzq K线(日,前复权) + STOCK_QUOTE(涨幅/量比)",
+            "data_source": "腾讯ifzq K线(日,前复权) + akshare东财日线兜底 + STOCK_QUOTE(涨幅/量比)",
             "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
             "method": f"涨幅≥{CHG_MIN}% + 量比≥{VR_MIN}({VR_WINDOW}日均量) + 突破{BREAKOUT_RATIO*100:.0f}%20日高 + RS前{RS_TOP_PCT*100:.0f}%",
             "total_unique_stocks": total_uni,
             "total_appearances": sum(p["count"] for p in periods.values()),
             "kline_available": kline_ok,
             "kline_unavailable": total_uni - kline_ok,
+            "kline_ratio": round(kline_ok / total_uni, 4) if total_uni else 0.0,
         },
         "periods": periods,
     }
@@ -555,6 +625,16 @@ def main():
 
     log(f"✅ 写出 STOCK_MOMENTUM_STATE_V2.js（{total_uni} 只唯一，K线可用 {kline_ok}，月份 {len(periods)}）")
     log(f"✅ 写出 STOCK_MOMENTUM_STATE.js（窗口 {len(days)} 天，今日追加={appended}）")
+
+    # 🛡 2026-08-29 硬化：K线真实率不达标 → 构建失败，禁止把「回测全 0」的虚假数据发上线。
+    # --limit 模式下跳过此检查（本地调试只算少量）。
+    if args.limit == 0 and total_uni > 0:
+        ratio = kline_ok / total_uni
+        if ratio < MIN_KLINE_RATIO:
+            log(f"❌ K线真实率 {ratio:.2%}（{kline_ok}/{total_uni}）低于阈值 {MIN_KLINE_RATIO:.0%}，拒绝发布虚假回测")
+            sys.exit(1)
+        if kline_ok < total_uni:
+            log(f"⚠️ K线真实率 {ratio:.2%}（{kline_ok}/{total_uni}），未达标个股已标记 data_available=false，不进入 leaders")
 
 
 if __name__ == "__main__":

@@ -928,9 +928,14 @@ def run_experiment_cards():
                 last = [l for l in r.stdout.strip().splitlines() if l.strip()][-1:] or [""]
                 print(f"[experiment]   ✅ {last[0][:80]}")
             else:
-                print(f"[experiment]   ⚠️ gen_strong_breakout 退出码 {r.returncode}")
-                print("     " + "\n     ".join(r.stdout.strip().splitlines()[-2:] + r.stderr.strip().splitlines()[-2:])[:300])
+                print(f"[experiment]   ❌ gen_strong_breakout 退出码 {r.returncode}")
+                print("     " + "\n     ".join(r.stdout.strip().splitlines()[-4:] + r.stderr.strip().splitlines()[-4:])[:500])
+                # 🛡 2026-08-29 硬化：动量 V2 回测数据必须真实，禁止「data_available=false 全 0」继续发布。
+                #   直接抛异常让 update_v8 / build 失败，触发重试或人工介入。
+                raise RuntimeError(f"gen_strong_breakout 失败（退出码 {r.returncode}），拒绝发布虚假回测")
         except Exception as e:
+            if isinstance(e, RuntimeError):
+                raise
             print(f"[experiment]   ⚠️ gen_strong_breakout 异常: {e}")
     else:
         print("[experiment] ⚠️ 缺失 scripts/gen_strong_breakout.py，跳过")
