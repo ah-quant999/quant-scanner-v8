@@ -399,6 +399,7 @@ def main():
             "results": [],
             "summary": {"overall": None, "gte80": None, "gte70_lt80": None, "stock_summary": []},
         }
+        out["update_time"] = out["calc_time"]  # 顶层 update_time 供 freshness SLA（持久化，不被 cron 覆盖）
         with open(OUT, "w", encoding="utf-8") as f:
             json.dump(out, f, ensure_ascii=False, indent=2)
         return
@@ -450,6 +451,7 @@ def main():
         "results": results,
     }
 
+    out["update_time"] = out["calc_time"]  # 顶层 update_time 供 freshness SLA（持久化，不被 cron 覆盖）
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
 

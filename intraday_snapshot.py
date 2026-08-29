@@ -123,6 +123,10 @@ def main():
     if len(data["snapshots"]) > 80:
         data["snapshots"] = data["snapshots"][-80:]
 
+
+
+    data["update_time"] = now_cst().strftime("%Y-%m-%d %H:%M:%S")  # 🛡 每次快照刷新，根治盘中超 4h 假陈旧
+
     blob = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
     # 先写临时文件再原子 rename，避免被取消中途杀掉留下半截 JSON
     tmp = INTRADAY_PATH + ".tmp"

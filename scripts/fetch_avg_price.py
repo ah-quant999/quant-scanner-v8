@@ -54,7 +54,16 @@ def main():
     }
     data = http_get(URL, params=params)
     if not data or not data.get("data"):
-        print("[warn] avg_price fetch failed, exit 1 (云端可重试)", file=sys.stderr)
+        placeholder = {
+            "current_date": today,
+            "current": None, "yesterday": None, "change_pct": 0, "history_5d": [],
+            "meta": {"指标": "沪深两市A股平均股价", "secid": SEC_ID,
+                     "source": "东方财富push2his", "placeholder": True},
+            "update_time": datetime.now(CST).strftime("%Y-%m-%d %H:%M:%S")}
+        out_raw = os.path.join(RAW_DIR, "avg_price.json")
+        os.makedirs(RAW_DIR, exist_ok=True)
+        open(out_raw, "w", encoding="utf-8").write(json.dumps(placeholder, ensure_ascii=False, indent=2))
+        print("[warn] avg_price fetch failed, placeholder written, exit 1 (云端可重试)", file=sys.stderr)
         return 1
 
     # parse klines: "date,open,close,high,low,vol,amount,..."
