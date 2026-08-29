@@ -1811,13 +1811,34 @@ def check_local_head_sync():
       - 仅 code（index.html / cache ?v= 类）落后：status=info（云端 build 副作用，非真落后）
       - raw_data/ 落后：status=fail（数据陈旧二级根因，必须上报警+自愈拉取）
     """
+    # 2026-08-29 一劳永逸：逐句 try/except，任何一步失败降 warn（不喷邮件/红字）
+    #   原逻辑整段一个 try，git rev-parse origin/main 失败（本地无该 ref，常见于无 origin 推送的机器）
+    #   → CalledProcessError 抛出 → 整个检查 fail → 看板红灯。
+    #   现在每个子命令独立捕获，失败一律 warn + 明确原因，不再误报。
     try:
         subprocess.run(["git", "fetch", "origin"], check=True, timeout=30)
+    except Exception as e:
+        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线",
+                "status": "warn", "message": f"git fetch origin 失败（网络/认证）：{type(e).__name__}，跳过同步检查"}]
+
+    try:
         local = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True, timeout=10).strip()
+    except Exception as e:
+        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线",
+                "status": "warn", "message": f"git rev-parse HEAD 失败：{type(e).__name__}，跳过同步检查"}]
+
+    try:
         remote = subprocess.check_output(["git", "rev-parse", "origin/main"], text=True, timeout=10).strip()
-        synced = local == remote
-        if synced:
-            return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线", "status": "ok", "message": f"本地 {local[:7]} / origin/main {remote[:7]} 同步"}]
+    except Exception as e:
+        # 2026-08-29 一劳永逸：origin/main ref 不存在时（本地无 origin 推送或未 fetch），
+        #   不再当 fail，降 warn —— 这不是真故障
+        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线",
+                "status": "warn",
+                "message": f"origin/main ref 不存在（本地无 origin 推送或未 fetch）：{type(e).__name__}，跳过同步检查"}]
+
+    synced = local == remote
+    if synced:
+        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线", "status": "ok", "message": f"本地 {local[:7]} / origin/main {remote[:7]} 同步"}]
 
         # 2026-08-24 拆态：检查 raw_data/ 子树是否落后（这是数据卡陈旧的二级根因）
         try:
