@@ -1267,6 +1267,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/MARKET_FUND_FLOW_DATA.js?v=73f36cbcc9" defer></script>
 <script src="data/ETF_SUBSCRIPTION.js?v=c9bf9e50aa" defer></script>
 <script src="data/LIMIT_UP_HEATMAP.js?v=c99efedb1f" defer></script>
+<script src="data/LIMIT_UP_BROKEN.js" defer></script>
 <script src="data/HERDING_DATA.js?v=8ee1de39bc" defer></script>
 <script src="data/VOLATILITY.js?v=03bd903796" defer></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=2f15b1db24" defer></script>
@@ -12317,6 +12318,51 @@ function drawUpDownChart(){
       });
       html += '</div>';
     }
+
+    /* ===== 💥 当日炸板汇总（2026-08-29 主人令：连板天梯首板下方，风格与天梯一致） ===== */
+    var zb = window.LIMIT_UP_BROKEN || {};
+    var zbList = window._safeArr ? window._safeArr(zb.stocks) : (zb.stocks || []);
+    var zbTotal = zb.total != null ? zb.total : zbList.length;
+    var sealed = (lh && lh.total) || 0;
+    var touched = sealed + zbTotal;
+    var zbRate = touched > 0 ? (zbTotal / touched * 100) : 0;
+    var zbLvl = zbRate >= 30 ? {c:'#ff6b81', bg:'rgba(255,107,129,.12)', bd:'rgba(255,107,129,.35)', txt:'退潮·承接弱'}
+              : zbRate >= 15 ? {c:'#ffb74d', bg:'rgba(255,183,77,.12)', bd:'rgba(255,183,77,.35)', txt:'偏弱·分歧大'}
+              : {c:'#5ee0a0', bg:'rgba(94,224,160,.12)', bd:'rgba(94,224,160,.35)', txt:'健康·承接足'};
+    html += '<div style="border-top:1px dashed var(--border2);margin-top:12px;padding-top:12px;">';
+    html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
+    html += '<span style="font-size:13px;font-weight:700;color:var(--text);">💥 当日炸板</span>';
+    html += '<span style="font-size:10px;font-weight:700;color:'+zbLvl.c+';background:'+zbLvl.bg+';border:1px solid '+zbLvl.bd+';padding:1px 7px;border-radius:6px;">炸板率 '+zbRate.toFixed(1)+'% · '+zbLvl.txt+'</span>';
+    html += '<span style="font-size:11px;color:var(--dim);">炸板 <b style="color:'+zbLvl.c+'">'+zbTotal+'</b> 只 / 触及涨停 '+touched+' 只（封板 '+sealed+'）</span>';
+    if(zb.date) html += '<span style="font-size:10px;color:var(--dim);">'+zb.date+'</span>';
+    html += '</div>';
+    if(zbTotal > 0 && zbList.length){
+      html += '<div style="display:grid;grid-template-columns:repeat(10, minmax(0,1fr));gap:5px 6px;">';
+      zbList.forEach(function(s){
+        var chg = (s.chg != null) ? s.chg : 0;
+        var chgColor = chg > 0 ? 'var(--up)' : (chg < 0 ? 'var(--down)' : 'var(--dim)');
+        var bt = s.broken_times || 0;
+        var tip = (s.name||'') + ' ' + (s.code||'') + ' | 炸板' + bt + '次 | 首封' + (s.first_seal||'-') +
+                  ' | 振幅' + (s.amplitude != null ? s.amplitude : '-') + '% | ' + (s.industry||'');
+        html += '<span style="font-size:11px;background:var(--card2);padding:3px 5px;border-radius:4px;'
+             +  'border:1px solid var(--border2);border-left:3px solid '+zbLvl.c+';'
+             +  'white-space:nowrap;overflow:visible;text-align:center;cursor:default;" title="'+tip+'">'
+             +  '<span style="color:var(--text);">'+(s.name||'')+'</span> '
+             +  '<span style="color:var(--dim);font-size:10px;letter-spacing:-0.2px;">'+(s.code||'')+'</span> '
+             +  '<span style="color:'+chgColor+';font-size:10px;">'+(chg>0?'+':'')+chg.toFixed(1)+'%</span>'
+             +  (bt>1 ? '<span style="color:'+zbLvl.c+';font-size:9px;font-weight:700;margin-left:2px;">×'+bt+'</span>' : '')
+             +  '</span>';
+      });
+      html += '</div>';
+      html += '<div style="font-size:10.5px;color:var(--dim);margin-top:7px;line-height:1.6;">'
+           +  '💡 炸板＝盘中触及涨停但收盘未封住。<b>炸板率越高，当日情绪承接越弱</b>，'
+           +  '次日高标接力风险越大；<b>×N</b> 表示当日被砸开 N 次（越多越弱）。'
+           +  '</div>';
+    } else {
+      html += '<div style="font-size:11.5px;color:var(--dim);padding:6px 0;">当日无炸板（触及涨停全部封住），情绪承接健康。</div>';
+    }
+    html += '</div>';
+
     html += '</div></div>';
     el.innerHTML = html;
   }
