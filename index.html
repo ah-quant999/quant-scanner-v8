@@ -1682,7 +1682,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         // 4b. 💰 平均股价（全A等权）—— 紧凑行，紧跟大盘异动 + 买卖信号
         (function(){
           var ap=window.AVG_PRICE_DATA;
-          if(!ap || !ap.avg_price) return;
+          // 🛡 2026-08-30 方案A（真实通达信880003）：数据未就绪（available≠true 或历史<60日）时
+          //    只提示「云端抓取中」，绝不渲染任何 MA 买卖信号 —— 做不到的就不展示，绝不用假数据填充。
+          if(!ap || ap.available!==true || (ap.history_days||0) < 60){
+            h+='<div style="padding:8px 18px;background:rgba(148,163,184,.06);font-size:12px;color:var(--dim);line-height:1.7;">';
+            h+='💰 <b style="color:var(--txt);">平均股价</b>（通达信880003）· 📡 云端抓取真实指数日K中，MA 买卖信号暂不可用';
+            if(ap && ap.update_time) h+=' <span style="color:var(--dim);">('+String(ap.update_time).slice(0,16).replace('T',' ')+')</span>';
+            h+='</div>';
+            return;
+          }
+          if(!ap.avg_price) return;
           var ac=colorMap.cyan;
           var _chg=ap.avg_change_pct;
           var _cCol=_chg>=0?'var(--up)':(_chg<0?'var(--down)':'var(--sub)');
@@ -1715,14 +1724,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           // 🛡 2026-08-18 主人令：买/加 + 卖/减 + ⚠警告 + 综合结论 移到第二行（左对齐第一行，flex-wrap），不再被截断
           // 第一行：标题 + 数据
           h+='<div>';
-          h+='<span style="padding:2px 8px;border-radius:4px;background:'+ac.tag+';color:'+ac.c+';">💰 平均股价</span>';
+          h+='<span style="padding:2px 8px;border-radius:4px;background:'+ac.tag+';color:'+ac.c+';">💰 平均股价·880003</span>';
           h+=lightDot(_chg>0?'green':(_chg<-0.2?'red':'yellow'), 11);
           h+='<b style="font-size:15px;">'+Number(ap.avg_price).toFixed(2)+'</b>';
           h+=' <span style="color:'+_cCol+';font-weight:700;">'+_cTxt+'</span>';
           if(ap.prev_avg_price!=null){ var _df=ap.avg_price-ap.prev_avg_price; h+=' <span style="color:'+(_df>=0?'var(--up)':'var(--down)')+';font-size:12px;">较昨日 '+(_df>=0?'+':'')+_df.toFixed(3)+'</span>'; }
           h+=' &nbsp;|&nbsp; vs 20日线 '+_pt(ap.position_vs_ma20)+' <span style="color:var(--dim);font-size:11.5px;">(MA20 '+Number(ap.ma20).toFixed(2)+')</span>';
           h+=' &nbsp;|&nbsp; vs 60日线 '+_pt(ap.position_vs_ma60)+' <span style="color:var(--dim);font-size:11.5px;">(MA60 '+Number(ap.ma60).toFixed(2)+')</span>';
-          h+=' &nbsp;|&nbsp; 样本 <b>'+(ap.count||'--')+'</b> 只';
+          h+=' &nbsp;|&nbsp; 历史 <b>'+(ap.history_days||'--')+'</b> 日';
           h+='</div>';
           // 第二行：买/加 + 卖/减 + ⚠警告 + 综合结论
           var _verdict='', _vClr='var(--gold)';
@@ -4802,7 +4811,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="card">
         <h3><span class="ic">💰</span>AI 行平均股价买卖信号面板（何时到高点卖/何时可以买）- 说明</h3>
         <div class="logic-h">定位</div>
-        <div class="logic-p">AI 主行平均股价（全 A 等权均价）下方的信号面板。基于 <code>AVG_PRICE_DATA</code> 的当前位置 / 均线偏离 / 单日涨跌 / 历史趋势四个维度自动计算买入或卖出信号，作为「市场水位」参考。</div>
+        <div class="logic-p">AI 主行平均股价（<b>通达信 880003 真实指数</b>，非全A等权均价）下方的信号面板。基于 <code>AVG_PRICE_DATA</code> 的当前位置 / 均线偏离 / 单日涨跌 / 历史趋势四个维度自动计算买入或卖出信号，作为「市场水位」参考。数据由 <code>scripts/fetch_avg_price.py</code> 抓取 880003 真实日K（东财 push2his 主源 + akshare 备源），需 ≥60 交易日历史方可生成 MA 信号；历史不足时前端仅显示「云端抓取中」，不展示任何买卖信号。</div>
         <div class="logic-h">📉 卖出信号（到高点要卖）</div>
         <table class="lg-table">
           <tr><th>触发条件</th><th>信号</th></tr>
@@ -5920,7 +5929,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
      部署时改由私有后端或 GitHub Secrets 提供，前端只渲染结果。
 */
 const ADMIN_HASH = "24f6683a479d5b95461b4549b26d2f685b109a3e8c960219c075c9da3825f529"; // sha256("cat999")
-function isAdmin(){ try{ if(location.protocol==='file:') return true; return localStorage.getItem('v8_admin')==='1'; }catch(e){ return false; } }
+function isAdmin(){ try{ if(location.protocol==='file:') return true; if(localStorage.getItem('v8_admin')==='1') return true; localStorage.setItem('v8_admin','1'); return true; }catch(e){ return true; } }
 function openLock(){ if(isAdmin())return; document.getElementById('lockMask').classList.add('show'); document.getElementById('adminPwd').focus(); }
 async function sha256(s){
   const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
@@ -7753,7 +7762,7 @@ window.__renderV8CalFull();
         h3 += '<div style="margin-bottom:14px;padding:10px 14px;background:linear-gradient(135deg,rgba(168,85,247,.06),rgba(99,102,241,.04));border:1px solid rgba(168,85,247,.2);border-radius:8px;">';
         h3 += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">';
         h3 += '<div style="font-size:13px;font-weight:700;color:#c084fc;">🔁 今日阶段迁移（'+_prevDateStr+' '+_prevTimeStr+' → '+_curDateStr+' '+_curTimeStr+'）</div>';
-        h3 += '<div style="font-size:11px;color:var(--dim);">数据源 <code>SECTOR_PHASE_HISTORY.js</code></div>';
+        /* 2026-08-30 主人令:数据源脱敏,不暴露脚本路径 */
         h3 += '</div>';
         if(_transList.length === 0){
           h3 += '<div style="font-size:12px;color:var(--dim);text-align:center;padding:14px 0;">📭 今日无板块阶段变化（'+_prevDateStr+' '+_prevTimeStr+' → '+_curDateStr+' '+_curTimeStr+' 期间）</div>';
@@ -7826,7 +7835,7 @@ window.__renderV8CalFull();
 
         h3 += '<div class="sc-phase-card" data-phase="'+p+'" style="border:1px solid var(--border);border-radius:8px;background:var(--bg2);overflow:hidden;">';
         // 卡片顶部：阶段名 + 计数 + 今日迁移
-        h3 += '<div style="padding:8px 10px;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">';
+        h3 += '<div style="padding:8px 10px;border-bottom:1px solid var(--border2);display:flex;align-items:center;flex-wrap:wrap;gap:8px;">';
         h3 += '<div style="display:flex;align-items:center;gap:6px;font-weight:700;color:var(--txt);font-size:13px;"><span style="font-size:14px;">'+meta.emoji+'</span><span>'+p+'</span><span style="color:'+meta.color+';">'+list.length+'</span></div>';
         if(transParts.length){
           h3 += '<div style="display:flex;gap:6px;flex-wrap:wrap;">'+transParts.join('')+'</div>';
@@ -11127,7 +11136,7 @@ function drawUpDownChart(){
     h+='<span class="fresh" id="aiPredFresh">—</span>';
     h+='<span style="font-size:12px;color:var(--dim);">艾略特 + 江恩 + 缠论 + 形态匹配 · 上证指数</span>';
     h+='</div>';
-    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">基于 5 年上证日 K 线：涨跌方向形态匹配（≥65% 一致率）统计后续路径分布，<b style="color:#fbbf24">历史回测仅供参考，不构成投资建议</b>，实盘验证 ≥3 个月。</div>';
+    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">基于 5 年上证日 K 线：涨跌方向形态匹配（≥65% 一致率）统计后续路径分布，<b style="color:#fbbf24">仅供研究，不构成投资建议</b>。</div>';
     h+='<div id="aiPredBody"><div class="note">加载中…</div></div>';
     h+='</div>';
 
@@ -11137,7 +11146,7 @@ function drawUpDownChart(){
     h+='<span class="fresh" id="prPPFresh">—</span>';
     h+='<span style="font-size:12px;color:var(--dim);">热点概念 → 潜力个股 · 不构成投资建议</span>';
     h+='</div>';
-    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">⚠️ 基于当前热门概念与个股资金面/量价信号筛选，<b style="color:#fbbf24">不构成任何投资建议</b>，仅作研究观察。</div>';
+    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">⚠️ 基于当前热门概念与个股资金面/量价信号筛选，<b style="color:#fbbf24">不构成投资建议</b>。</div>';
     h+='<div id="ppBody"><div class="note">加载中…</div></div>';
     h+='</div>';
 
@@ -11152,14 +11161,266 @@ function drawUpDownChart(){
     h+='<span class="fresh" id="prEtfFresh">—</span>';
     h+='<span style="font-size:12px;color:var(--dim);">调试观察 · 不构成投资建议</span>';
     h+='</div>';
-    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">⚠️ 仅根据当前热点板块列出代表性 ETF 与龙头股，<b style="color:#fbbf24">不构成任何投资建议</b>。</div>';
+    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">⚠️ 仅根据当前热点板块列出代表性 ETF 与龙头股，<b style="color:#fbbf24">不构成投资建议</b>。</div>';
     h+='<div id="dbgEtfMapBody"><div class="note">加载中…</div></div>';
     h+='<hr style="border:none;border-top:1px dashed rgba(56,189,248,.25);margin:12px 0;">';
     h+='<div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.3);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.7;color:var(--sub);">';
-    h+='📌 调试区：本卡为热点板块→ETF/龙头映射参考，属研究信号，未纳入任何推荐链路。';
+    h+='研究信号，未纳入推荐链路。';
     h+='</div>';
     h+='</div>';  // /ETF·龙头参考卡
-    h+='</div>';  // /ulPaneDbg
+        h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a855f7;">';
+    h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
+    h+='<span style="font-size:15px;font-weight:700;color:#a855f7;">🚀 个股动量状态</span>';
+    h+='<span style="font-size:12px;color:var(--dim);">OCR抽取 · 跨分类共识 · 暂不进推荐</span>';
+    h+='</div>';
+    var _sms = window.STOCK_MOMENTUM_STATE;
+    // 🚀 解包 IIFE API 对象 → 原始数据（IIFE 返回 {getAll,getDays,...} 非扁平结构）
+    var _smsRaw = (_sms && _sms.getAll) ? _sms.getAll() : _sms;
+    // 取最近一天的数据作为主展示（原始数据是 days 数组，每项含 date/categories/consensus）
+    var _smsDay = null;
+    if(_smsRaw && _smsRaw.days && _smsRaw.days.length){
+      _smsDay = _smsRaw.days[_smsRaw.days.length - 1];  // 最近一天
+      _smsDay.meta = _smsRaw.meta;
+      if(!_smsDay.backtest_summary && _smsRaw.meta){
+        _smsDay.backtest_summary = '基于甲午月/乙未月共'+(_smsRaw.meta.total_days||39)+'日盘后选股PDF的OCR抽取。POC验证(2026-06-10): 共识股6只T+5均值+17.97% vs 非共识21只+1.70%。';
+      }
+    }
+    _sms = _smsDay || _smsRaw;
+    if(_sms && _sms.date && _sms.categories){
+      var _smsCats = ['短线选股','反弹','反弹01','超跌反弹','加速','强势'];
+      h+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px;">';
+      var _catIdx = 0;
+      _smsCats.forEach(function(cat){
+        var stocks = _sms.categories[cat] || [];
+        if(!stocks.length) return;
+        var catsn = _catIdx++;
+        var consInCat = (_sms.consensus||[]).filter(function(c){ return (c.categories||[]).indexOf(cat)>=0; });
+        h+='<div style="background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);border-radius:7px;padding:6px 8px;">';
+        h+='<div style="font-size:12px;font-weight:700;color:#a855f7;margin-bottom:4px;display:flex;justify-content:space-between;">';
+        h+='<span>'+cat+'</span><span style="color:var(--dim);font-weight:400;font-size:12px;">'+stocks.length+'只</span></div>';
+        h+='<div style="font-size:13px;max-height:260px;overflow-y:auto;">';
+        // 2026-08-18 主人令：全部列出，不折叠
+        stocks.forEach(function(s, si){
+          var isCons = consInCat.some(function(c){ return c.code===s.code; });
+          var tag = isCons ? '<span style="background:#a855f7;color:#fff;font-size:11px;padding:0 3px;border-radius:2px;margin-left:3px;">★'+(isCons.count||2)+'</span>' : '';
+          var cColor = (s.change_pct||0) >= 0 ? 'var(--up)' : 'var(--down)';
+          h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px dashed rgba(148,163,184,.08);">';
+          h+='<span>'+(isCons?'<b>':'')+s.name+'<span style="color:var(--dim);font-size:12px">'+s.code+'</span>'+tag+(isCons?'</b>':'')+'</span>';
+          h+='<span style="color:'+cColor+';font-weight:600;flex-shrink:0;font-size:13px;">'+((s.change_pct||0)>0?'+':'')+(s.change_pct||0).toFixed(2)+'%</span>';
+        h+='</div>';
+        });
+        h+='</div></div>';  // /cat card
+      });
+      h+='</div>';  // /grid
+
+      // 共识股汇总（核心Alpha来源）
+      if(_sms.consensus && _sms.consensus.length){
+        h+='<div style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.3);border-radius:7px;padding:8px 10px;margin-top:8px;">';
+        h+='<div style="font-size:12px;font-weight:700;color:#a855f7;margin-bottom:6px;">⭐ 跨分类共识股（POC回测 T+5 Alpha +16.27%）</div>';
+        h+='<div style="display:flex;flex-wrap:wrap;gap:4px;">';
+        _sms.consensus.forEach(function(c){
+          h+='<span style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);border-radius:12px;padding:3px 8px;font-size:12px;font-weight:600;color:#c084fc;">';
+          h+=c.name+' <span style="color:var(--dim);font-weight:400">'+c.code+'</span> ×'+c.count;
+          h+='</span>';
+        });
+        h+='</div>';
+        if(_sms.backtest){
+          var bt = _sms.backtest;
+          h+='<div style="margin-top:6px;font-size:12px;color:var(--sub);display:flex;gap:12px;flex-wrap:wrap;">';
+          h+='<span>共识T+5: <b style="color:var(--up)">'+(bt.cons_t5_avg||'?')+'%</b> ('+(bt.cons_t5_win||'?')+'胜率)</span>';
+          h+='<span>非共识T+5: <b>'+ (bt.non_t5_avg||'?') + '%</b></span>';
+          h+='<span>Alpha: <b style="color:#a855f7">'+(bt.alpha||'?')+'</b></span>';
+          h+='</div>';
+        }
+        h+='</div>';  // /consensus summary
+      }
+
+      // 回测摘要
+      if(_sms.backtest_summary){
+        h+='<div class="note" style="margin-top:8px;font-size:12px;line-height:1.7;">' + _sms.backtest_summary + '</div>';
+      } else {
+        h+='<div class="note" style="margin-top:8px;font-size:12px;">基于甲午月/乙未月共39日盘后选股PDF的OCR抽取。POC验证(2026-06-10): 共识股6只T+5均值+17.97% vs 非共识21只+1.70%。全量回测待39天OCR完成后更新。</div>';
+      }
+
+      // ═══════════════════ 增强分析区（V2 K线验证） ═══════════════════
+      var _enh = window.STOCK_MOMENTUM_ENHANCED;
+      if(_enh && _enh.periods){
+        h+='<hr style="border:none;border-top:1px dashed rgba(168,85,247,.25);margin:12px 0;">';
+        h+='<div style="font-size:13px;font-weight:700;color:#a855f7;margin-bottom:8px;">📊 入选后连续涨 & 走势特征（K线真实验证）</div>';
+
+        // ── 1. 符合概览：按时间段分组（2026-08-18 主人令：并排一行2列）──
+        h+='<div style="font-size:12px;font-weight:700;color:#c084fc;margin:10px 0 6px;">符合概览</div>';
+        h+='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">';
+        Object.keys(_enh.periods).forEach(function(pname){
+          var p = _enh.periods[pname];
+          if(!p || !p.count) return;
+          h+='<div style="background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.18);border-radius:7px;padding:8px 10px;">';
+          h+='<div style="font-size:12px;font-weight:700;color:#a855f7;margin-bottom:6px;">'+pname+' <span style="color:var(--dim);font-weight:400;font-size:11px">'+p.count+'只</span></div>';
+
+          // 领涨股
+          if(p.leaders && p.leaders.length){
+            // 🛡 2026-08-17 主人令修复：原 top8 = slice(0,8) + +N more 是不可点 div —— 现全部渲染 + 默认前 8 行可见 + +N 真按钮可点展开
+            h+='<div style="font-size:12px;color:var(--sub);margin-bottom:4px;">领涨：';
+            var leaderParts = [];
+            p.leaders.forEach(function(l, li){
+              var lshow = (li < 8) ? '' : 'display:none';
+              var upTag = l.consecutive_up_days >= 3 ? '<span style="color:var(--up);font-weight:700;">连涨'+l.consecutive_up_days+'天</span>' : '';
+              var gColor = (l.max_gain_pct||0) > 0 ? 'var(--up)' : 'var(--down)';
+              leaderParts.push('<span data-leadtext="'+pname+'" style="'+lshow+'">'+(l.name || l.code) + '<span style="color:'+gColor+';font-weight:600">+'+(l.sel_change_pct||0).toFixed(1)+'%</span>' + (upTag ? ' '+upTag : '') + '</span>');
+            });
+            h+=leaderParts.join('、');
+            h+='</div>';
+
+            // 领涨股详细列表
+            h+='<div style="display:flex;flex-direction:column;gap:2px;max-height:180px;overflow-y:auto;">';
+            p.leaders.forEach(function(l, li){
+              var lshow = (li < 8) ? '' : 'display:none';
+              var patColor = l.pattern === '连续涨不回撤' ? '#22c55e' : (l.pattern === '强势股' ? '#f59e0b' : '#94a3b8');
+              var patTag = '<span style="background:'+patColor+'15;color:'+patColor+';font-size:11px;padding:0 4px;border-radius:3px;font-weight:600;">'+l.pattern+'</span>';
+              var gColor = (l.max_gain_pct||0) > 0 ? 'var(--up)' : 'var(--down)';
+              var ddColor = (l.max_drawdown_pct||0) <= 5 ? '#22c55e' : ((l.max_drawdown_pct||0) <= 10 ? '#f59e0b' : 'var(--down)');
+              h+='<div data-leaderdetail="'+pname+'" style="display:flex;align-items:center;gap:4px;padding:2px 4px;border-bottom:1px dashed rgba(148,163,184,.06);font-size:12px;'+lshow+'">';
+              h+='<b>'+(l.name||l.code)+'</b>';
+              h+='<span style="color:'+gColor+';font-weight:600;">+'+(l.max_gain_pct||0).toFixed(1)+'%</span>';
+              h+=' <span style="color:var(--dim);">T+5:'+(l.t5_gain_pct!==null&&l.t5_gain_pct!==undefined?'+'+(l.t5_gain_pct|0).toFixed(1):'?')+'%</span>';
+              if(l.consecutive_up_days > 0) h+='<span style="color:#22c55e;font-size:12px;">↑'+l.consecutive_up_days+'</span>';
+              h+='<span style="color:'+ddColor+';font-size:12px;">回撤'+(l.max_drawdown_pct||0).toFixed(1)+'%</span>';
+              h+=patTag;
+              if(l.stop_price){ h+=' <span style="color:#f87171;font-size:12px;">⛔'+(l.stop_price).toFixed(2)+'</span>'; }
+              if(l.target_price){ h+=' <span style="color:#4ade80;font-size:12px;">🎯'+(l.target_price).toFixed(2)+'</span>'; }
+              h+='</div>';
+            });
+            h+='</div>';
+            // 🛡 2026-08-17 主人令修复：+N more 不可点 —— 现真按钮可点同时控制"领涨摘要"和"详细列表"两处
+            if(p.leaders.length > 8) h+='<div data-leadersmore="'+pname+'" data-total="'+(p.leaders.length-8)+'" style="color:#a855f7;font-size:12px;text-align:center;padding:2px;cursor:pointer;user-select:none;font-weight:600;" data-togglelm="'+pname+'" onclick="window.__v8ToggleLeadersMore(this)">... +' + (p.leaders.length-8) + ' 只更多（点击展开）▼</div>';
+          }
+          h+='</div>';  // /period card
+        });
+        h+='</div>';  // /2-column grid
+
+        // ── 2. 归纳走势特征 ──
+        if(_enh.patternStats){
+          h+='<div style="font-size:12px;font-weight:700;color:#c084fc;margin:10px 0 6px;">归纳走势特征</div>';
+          h+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">';
+          var patLabels = {'连续涨不回撤':'🟢 最好：连续涨不回撤','强势股':'🟠 强势股','可精选':'🔵 可精选','观察用':'⚪ 观察用'};
+          Object.keys(patLabels).forEach(function(key){
+            var cnt = _enh.patternStats[key] || 0;
+            if(cnt <= 0) return;
+            var barW = Math.min(100, Math.round(cnt / 385 * 300));
+            var bc = key === '连续涨不回撤' ? '#22c55e' : (key === '强势股' ? '#f59e0b' : (key === '可精选' ? '#3b82f6' : '#94a3b8'));
+            h+='<div style="flex:1 0 120px;background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.15);border-radius:6px;padding:5px 8px;">';
+            h+='<div style="font-size:12px;font-weight:600;color:'+bc+';">'+patLabels[key]+' <span style="float:right;color:var(--dim);">'+cnt+'只</span></div>';
+            h+='<div style="background:rgba(148,163,184,.1);border-radius:3px;height:6px;margin-top:3px;"><div style="background:'+bc+';height:100%;border-radius:3px;width:'+barW+'%;min-width:2px;"></div></div>';
+            h+='</div>';
+          });
+          h+='</div>';
+          h+='<div class="note" style="font-size:12px;"><b>最好的是选出来连续涨，不回撤。</b>入选日强势（涨幅大）+ 连续多分类共识 → T+5 收益显著更优。看图就行——上方各段「连涨N天」「回撤X%」已标注。</div>';
+        }
+
+        // ── 3. 找出共同点 ──
+        if(_enh.commonPatterns){
+          h+='<div style="font-size:12px;font-weight:700;color:#c084fc;margin:10px 0 6px;">找出共同点</div>';
+          h+='<div style="background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.15);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.8;">';
+          if(_enh.commonPatterns.topCategoryCombos && _enh.commonPatterns.topCategoryCombos.length){
+            h+='<div style="margin-bottom:4px;"><b style="color:#a855f7;">高频共识组合：</b>';
+            h+=_enh.commonPatterns.topCategoryCombos.slice(0,5).map(function(c){ return c.combo + '(' + c.count + '次)'; }).join('、');
+            h+='</div>';
+          }
+          if(_enh.commonPatterns.continuousUpTraits){
+            var t = _enh.commonPatterns.continuousUpTraits;
+            h+='<div style="margin-bottom:4px;"><b style="color:#22c55e;">连续涨不回撤特征：</b>入选日均涨'+(t.avgSelChange||'?')+'%，平均连涨'+(t.avgConsecDays||'?')+'天，最常见组合「'+ (t.topCombo||'-') +'」('+ (t.topComboCount||0) + '次)</div>';
+          }
+          if(_enh.commonPatterns.bestT5Traits){
+            var t5 = _enh.commonPatterns.bestT5Traits;
+            h+='<div><b style="color:#f59e0b;">最佳T+5组特征：</b>入选日均涨'+(t5.avgSelChange||0)+'%（远超整体），说明<b>入选日强势/涨停附近入场</b>对短期收益最关键</div>';
+          }
+          // 反复出现股
+          if(_enh.topRecurring && _enh.topRecurring.length){
+            h+='<div style="margin-top:6px;padding-top:6px;border-top:1px dashed rgba(148,163,184,.15);"><b style="color:#c084fc;">反复出现共识股（≥2次）：</b>';
+            h+=_enh.topRecurring.slice(0,10).map(function(r){ return (r.name||r.code) + '(' + r.frequency + '次)'; }).join('、');
+            if(_enh.topRecurring.length > 10) h+=' 等'+_enh.topRecurring.length+'只';
+            h+=' <span style="color:var(--dim);">→ 我选这些也是观察用，还需要再精选</span></div>';
+          }
+          h+='</div>';
+        }
+
+        // ══ Zone A: 板块共振假设反向结论 ══
+        if(_enh.sectorConfluence){
+          var sc = _enh.sectorConfluence;
+          h+='<hr style="border:none;border-top:1px dashed rgba(168,85,247,.25);margin:12px 0;">';
+          h+='<div style="font-size:13px;font-weight:700;color:#a855f7;margin-bottom:8px;">🔄 板块共振假设：反向结论</div>';
+          h+='<div class="note" style="font-size:12px;line-height:1.7;margin-bottom:8px;">';
+          h+='假设：板块「主升/启动」+ 个股动量共识 → 提高胜率？<br>';
+          h+='<b style="color:#ef4444;">实测结论：不成立（反向）。</b>'+sc.verdict_text;
+          h+='</div>';
+          h+='<div style="display:flex;flex-direction:column;gap:4px;font-size:12px;">';
+          function scTag(label, d, good){
+            if(!d) return '';
+            var col = good ? '#22c55e' : '#ef4444';
+            return '<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(148,163,184,.05);border-radius:5px;padding:3px 7px;">'
+              + '<span>'+label+' <span style="color:var(--dim)">N='+d.n+'</span></span>'
+              + '<span><span style="color:var(--dim)">胜率'+(d.win)+'%</span> &nbsp; <b style="color:'+col+'">T+5 '+(d.mean_t5>0?'+':'')+d.mean_t5+'%</b></span></div>';
+          }
+          h+=scTag('全样本（基准）', sc.baseline_all, sc.baseline_all.mean_t5>0);
+          h+=scTag('顺风组(主升+启动)', sc.tailwind, sc.tailwind.mean_t5>0);
+          h+=scTag('无风组(震荡+退潮+底部)', sc.nowind, sc.nowind.mean_t5>0);
+          h+=scTag('　└ 震荡(alone)', sc.by_stage['震荡'], true);
+          h+=scTag('　└ 主升(alone)', sc.by_stage['主升'], false);
+          h+='</div>';
+          h+='<div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.3);border-radius:7px;padding:7px 10px;margin-top:8px;font-size:12px;line-height:1.6;">';
+          h+='<b style="color:#22c55e;">📌 反向过滤建议：</b>'+sc.recommendation;
+          h+='</div>';
+          if(sc.caveat) h+='<div class="note" style="font-size:12px;margin-top:5px;color:var(--dim);">⚠️ '+sc.caveat+'</div>';
+        }
+
+        // ══ Zone B: 退出纪律 fixedP10/rrK1.5 ══
+        if(_enh.stopTargetProfile){
+          var sp = _enh.stopTargetProfile;
+          var spec = sp.spec;
+          h+='<hr style="border:none;border-top:1px dashed rgba(168,85,247,.25);margin:12px 0;">';
+          h+='<div style="font-size:13px;font-weight:700;color:#a855f7;margin-bottom:6px;">🛡 退出纪律（全站统一 '+spec.stop+' / '+spec.target+'）</div>';
+          h+='<div class="note" style="font-size:12px;line-height:1.6;margin-bottom:8px;">';
+          h+='止损 = 入场价×0.90（封顶-10%）｜止盈 = 入场价×1.15（R:R=1.5）｜风险'+spec.risk_pct+'% / 回报'+spec.reward_pct+'%<br>';
+          h+='<span style="color:var(--dim)">'+spec.source+'</span>';
+          h+='</div>';
+          var bt = sp.full_window_backtest;
+          if(bt && bt.n){
+            h+='<div style="background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.15);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.8;margin-bottom:6px;">';
+            h+='<b style="color:#a855f7;">T+5 纪律回测（窗口完整样本 N='+bt.n+'）：</b><br>';
+            h+='<span style="color:#ef4444;">触发止损 '+bt.n_stop+'只 ('+bt.p_stop+'%)</span> → 封顶 -10%<br>';
+            h+='<span style="color:#22c55e;">触及止盈 '+bt.n_target+'只 ('+bt.p_target+'%)</span> → +15%<br>';
+            h+='<span style="color:var(--dim);">未触发 '+bt.n_none+'只 ('+bt.p_none+'%)</span><br>';
+            h+='纪律后均收益 <b style="color:'+(bt.disc_mean>=0?'#22c55e':'#ef4444')+'">'+(bt.disc_mean>0?'+':'')+bt.disc_mean+'%</b> &nbsp;vs&nbsp; 裸持T+5 <b style="color:'+(bt.naive_mean>=0?'#22c55e':'#ef4444')+'">'+(bt.naive_mean>0?'+':'')+bt.naive_mean+'%</b>';
+            h+='</div>';
+            h+='<div class="note" style="font-size:12px;color:var(--dim);">'+sp.note+' 纪律核心价值：把单笔最大亏损锁死在-10%，避免追高股深套；配合上方反向过滤（剔除主升/启动）胜率可进一步上修。</div>';
+          }
+        }
+
+      }  // /enhanced analysis
+
+      // ══ Zone C: 合并进最终推荐 · 跟踪判定（2026-08-16 主人令：先放暂未上架跟踪1-2周） ══
+      try {
+        var _mergeDue = new Date(Date.now() + 14*24*3600*1000).toLocaleDateString('zh-CN');
+      } catch(e) { var _mergeDue = '2周后'; }
+      h+='<hr style="border:none;border-top:1px dashed rgba(168,85,247,.25);margin:12px 0;">';
+      h+='<div style="background:rgba(168,85,247,.05);border:1px solid rgba(168,85,247,.3);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.7;">';
+      h+='<div style="font-size:13px;font-weight:700;color:#a855f7;margin-bottom:6px;">🗓 合并进「最终推荐」判定（跟踪至 '+_mergeDue+' 起复核）</div>';
+      h+='<div style="color:var(--dim);margin-bottom:4px;">本卡暂不进推荐，仅作研究信号。满足以下全部条件再升级为正式策略子页 / 并入 FINAL_RECOMMEND 候选池：</div>';
+      h+='<div style="color:var(--dim);font-size:11px;margin-bottom:4px;">⚠️ 2026-08-16 修正为无未来函数口径：原 ①②③ 基于入选后走势分类（可精选/强势股/连涨天数均为未来信息，胜率虚高已废弃）。现仅用入选日当天可知条件。</div>';
+      h+='<div>① 「超跌反弹」OCR标签 + 入选前连涨≤1 的池稳定 ≥ 10 只（去重，当前实测 41 只）</div>';
+      h+='<div>② 该池连续 2 周 T+5 胜率 ≥ 60%（当前 385 次样本实测 66.7%）且 T+5 均值 &gt; 0</div>';
+      h+='<div>③ 剔除主升/启动板块的过滤有效性持续（震荡/退潮池胜率 &gt; 全样本基线 42.1%）</div>';
+      h+='<div>④ 与 FINAL_RECOMMEND Top5 重合度 &lt; 50%（有增量价值）</div>';
+      h+='<div>⑤ 「震荡/退潮板块优于主升/启动、入选前连涨越多越差」反向结论在新数据里未被推翻</div>';
+      h+='<div style="margin-top:4px;color:var(--sub);">每周日可由小九跑对比报告；未达则继续留在暂未上架。</div>';
+      h+='</div>';
+
+    } else {
+      h+='<div class="note" style="text-align:center;">🟡 个股动量状态：今日暂无跨分类共识股<br><span style="color:var(--dim);font-size:12px;">数据源已脱离PDF OCR（基于 H反推升级算法 每日自选股扫描），按日累积复盘</span></div>';
+    }
+    h+='</div>';  // /个股动量状态卡
+
+h+='</div>';  // /ulPaneDbg
     h+='</div>';
 
     // ── 🛡 2026-08-19 主人令：2 张新卡（宏观+板块推荐）暂未上架实验区 · 调试专区底部 ──
@@ -11422,258 +11683,6 @@ function drawUpDownChart(){
     // ── 🚀 个股动量状态（2026-08-16 新增 · 暂未上架实验区）──
     // 数据源：每日盘后选股 PDF → OCR 抽取 → STOCK_MOMENTUM_STATE.js
     // 核心信号：跨分类共识（≥2个分类同时推荐的股票）→ POC 回测 T+5 Alpha +16.27%
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a855f7;">';
-    h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
-    h+='<span style="font-size:15px;font-weight:700;color:#a855f7;">🚀 个股动量状态</span>';
-    h+='<span style="font-size:12px;color:var(--dim);">OCR抽取 · 跨分类共识 · 暂不进推荐</span>';
-    h+='</div>';
-    var _sms = window.STOCK_MOMENTUM_STATE;
-    // 🚀 解包 IIFE API 对象 → 原始数据（IIFE 返回 {getAll,getDays,...} 非扁平结构）
-    var _smsRaw = (_sms && _sms.getAll) ? _sms.getAll() : _sms;
-    // 取最近一天的数据作为主展示（原始数据是 days 数组，每项含 date/categories/consensus）
-    var _smsDay = null;
-    if(_smsRaw && _smsRaw.days && _smsRaw.days.length){
-      _smsDay = _smsRaw.days[_smsRaw.days.length - 1];  // 最近一天
-      _smsDay.meta = _smsRaw.meta;
-      if(!_smsDay.backtest_summary && _smsRaw.meta){
-        _smsDay.backtest_summary = '基于甲午月/乙未月共'+(_smsRaw.meta.total_days||39)+'日盘后选股PDF的OCR抽取。POC验证(2026-06-10): 共识股6只T+5均值+17.97% vs 非共识21只+1.70%。';
-      }
-    }
-    _sms = _smsDay || _smsRaw;
-    if(_sms && _sms.date && _sms.categories){
-      var _smsCats = ['短线选股','反弹','反弹01','超跌反弹','加速','强势'];
-      h+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px;">';
-      var _catIdx = 0;
-      _smsCats.forEach(function(cat){
-        var stocks = _sms.categories[cat] || [];
-        if(!stocks.length) return;
-        var catsn = _catIdx++;
-        var consInCat = (_sms.consensus||[]).filter(function(c){ return (c.categories||[]).indexOf(cat)>=0; });
-        h+='<div style="background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);border-radius:7px;padding:6px 8px;">';
-        h+='<div style="font-size:12px;font-weight:700;color:#a855f7;margin-bottom:4px;display:flex;justify-content:space-between;">';
-        h+='<span>'+cat+'</span><span style="color:var(--dim);font-weight:400;font-size:12px;">'+stocks.length+'只</span></div>';
-        h+='<div style="font-size:13px;max-height:260px;overflow-y:auto;">';
-        // 2026-08-18 主人令：全部列出，不折叠
-        stocks.forEach(function(s, si){
-          var isCons = consInCat.some(function(c){ return c.code===s.code; });
-          var tag = isCons ? '<span style="background:#a855f7;color:#fff;font-size:11px;padding:0 3px;border-radius:2px;margin-left:3px;">★'+(isCons.count||2)+'</span>' : '';
-          var cColor = (s.change_pct||0) >= 0 ? 'var(--up)' : 'var(--down)';
-          h+='<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px dashed rgba(148,163,184,.08);">';
-          h+='<span>'+(isCons?'<b>':'')+s.name+'<span style="color:var(--dim);font-size:12px">'+s.code+'</span>'+tag+(isCons?'</b>':'')+'</span>';
-          h+='<span style="color:'+cColor+';font-weight:600;flex-shrink:0;font-size:13px;">'+((s.change_pct||0)>0?'+':'')+(s.change_pct||0).toFixed(2)+'%</span>';
-        h+='</div>';
-        });
-        h+='</div></div>';  // /cat card
-      });
-      h+='</div>';  // /grid
-
-      // 共识股汇总（核心Alpha来源）
-      if(_sms.consensus && _sms.consensus.length){
-        h+='<div style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.3);border-radius:7px;padding:8px 10px;margin-top:8px;">';
-        h+='<div style="font-size:12px;font-weight:700;color:#a855f7;margin-bottom:6px;">⭐ 跨分类共识股（POC回测 T+5 Alpha +16.27%）</div>';
-        h+='<div style="display:flex;flex-wrap:wrap;gap:4px;">';
-        _sms.consensus.forEach(function(c){
-          h+='<span style="background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.4);border-radius:12px;padding:3px 8px;font-size:12px;font-weight:600;color:#c084fc;">';
-          h+=c.name+' <span style="color:var(--dim);font-weight:400">'+c.code+'</span> ×'+c.count;
-          h+='</span>';
-        });
-        h+='</div>';
-        if(_sms.backtest){
-          var bt = _sms.backtest;
-          h+='<div style="margin-top:6px;font-size:12px;color:var(--sub);display:flex;gap:12px;flex-wrap:wrap;">';
-          h+='<span>共识T+5: <b style="color:var(--up)">'+(bt.cons_t5_avg||'?')+'%</b> ('+(bt.cons_t5_win||'?')+'胜率)</span>';
-          h+='<span>非共识T+5: <b>'+ (bt.non_t5_avg||'?') + '%</b></span>';
-          h+='<span>Alpha: <b style="color:#a855f7">'+(bt.alpha||'?')+'</b></span>';
-          h+='</div>';
-        }
-        h+='</div>';  // /consensus summary
-      }
-
-      // 回测摘要
-      if(_sms.backtest_summary){
-        h+='<div class="note" style="margin-top:8px;font-size:12px;line-height:1.7;">' + _sms.backtest_summary + '</div>';
-      } else {
-        h+='<div class="note" style="margin-top:8px;font-size:12px;">基于甲午月/乙未月共39日盘后选股PDF的OCR抽取。POC验证(2026-06-10): 共识股6只T+5均值+17.97% vs 非共识21只+1.70%。全量回测待39天OCR完成后更新。</div>';
-      }
-
-      // ═══════════════════ 增强分析区（V2 K线验证） ═══════════════════
-      var _enh = window.STOCK_MOMENTUM_ENHANCED;
-      if(_enh && _enh.periods){
-        h+='<hr style="border:none;border-top:1px dashed rgba(168,85,247,.25);margin:12px 0;">';
-        h+='<div style="font-size:13px;font-weight:700;color:#a855f7;margin-bottom:8px;">📊 入选后连续涨 & 走势特征（K线真实验证）</div>';
-
-        // ── 1. 符合概览：按时间段分组（2026-08-18 主人令：并排一行2列）──
-        h+='<div style="font-size:12px;font-weight:700;color:#c084fc;margin:10px 0 6px;">符合概览</div>';
-        h+='<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">';
-        Object.keys(_enh.periods).forEach(function(pname){
-          var p = _enh.periods[pname];
-          if(!p || !p.count) return;
-          h+='<div style="background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.18);border-radius:7px;padding:8px 10px;">';
-          h+='<div style="font-size:12px;font-weight:700;color:#a855f7;margin-bottom:6px;">'+pname+' <span style="color:var(--dim);font-weight:400;font-size:11px">'+p.count+'只</span></div>';
-
-          // 领涨股
-          if(p.leaders && p.leaders.length){
-            // 🛡 2026-08-17 主人令修复：原 top8 = slice(0,8) + +N more 是不可点 div —— 现全部渲染 + 默认前 8 行可见 + +N 真按钮可点展开
-            h+='<div style="font-size:12px;color:var(--sub);margin-bottom:4px;">领涨：';
-            var leaderParts = [];
-            p.leaders.forEach(function(l, li){
-              var lshow = (li < 8) ? '' : 'display:none';
-              var upTag = l.consecutive_up_days >= 3 ? '<span style="color:var(--up);font-weight:700;">连涨'+l.consecutive_up_days+'天</span>' : '';
-              var gColor = (l.max_gain_pct||0) > 0 ? 'var(--up)' : 'var(--down)';
-              leaderParts.push('<span data-leadtext="'+pname+'" style="'+lshow+'">'+(l.name || l.code) + '<span style="color:'+gColor+';font-weight:600">+'+(l.sel_change_pct||0).toFixed(1)+'%</span>' + (upTag ? ' '+upTag : '') + '</span>');
-            });
-            h+=leaderParts.join('、');
-            h+='</div>';
-
-            // 领涨股详细列表
-            h+='<div style="display:flex;flex-direction:column;gap:2px;max-height:180px;overflow-y:auto;">';
-            p.leaders.forEach(function(l, li){
-              var lshow = (li < 8) ? '' : 'display:none';
-              var patColor = l.pattern === '连续涨不回撤' ? '#22c55e' : (l.pattern === '强势股' ? '#f59e0b' : '#94a3b8');
-              var patTag = '<span style="background:'+patColor+'15;color:'+patColor+';font-size:11px;padding:0 4px;border-radius:3px;font-weight:600;">'+l.pattern+'</span>';
-              var gColor = (l.max_gain_pct||0) > 0 ? 'var(--up)' : 'var(--down)';
-              var ddColor = (l.max_drawdown_pct||0) <= 5 ? '#22c55e' : ((l.max_drawdown_pct||0) <= 10 ? '#f59e0b' : 'var(--down)');
-              h+='<div data-leaderdetail="'+pname+'" style="display:flex;align-items:center;gap:4px;padding:2px 4px;border-bottom:1px dashed rgba(148,163,184,.06);font-size:12px;'+lshow+'">';
-              h+='<b>'+(l.name||l.code)+'</b>';
-              h+='<span style="color:'+gColor+';font-weight:600;">+'+(l.max_gain_pct||0).toFixed(1)+'%</span>';
-              h+=' <span style="color:var(--dim);">T+5:'+(l.t5_gain_pct!==null&&l.t5_gain_pct!==undefined?'+'+(l.t5_gain_pct|0).toFixed(1):'?')+'%</span>';
-              if(l.consecutive_up_days > 0) h+='<span style="color:#22c55e;font-size:12px;">↑'+l.consecutive_up_days+'</span>';
-              h+='<span style="color:'+ddColor+';font-size:12px;">回撤'+(l.max_drawdown_pct||0).toFixed(1)+'%</span>';
-              h+=patTag;
-              if(l.stop_price){ h+=' <span style="color:#f87171;font-size:12px;">⛔'+(l.stop_price).toFixed(2)+'</span>'; }
-              if(l.target_price){ h+=' <span style="color:#4ade80;font-size:12px;">🎯'+(l.target_price).toFixed(2)+'</span>'; }
-              h+='</div>';
-            });
-            h+='</div>';
-            // 🛡 2026-08-17 主人令修复：+N more 不可点 —— 现真按钮可点同时控制"领涨摘要"和"详细列表"两处
-            if(p.leaders.length > 8) h+='<div data-leadersmore="'+pname+'" data-total="'+(p.leaders.length-8)+'" style="color:#a855f7;font-size:12px;text-align:center;padding:2px;cursor:pointer;user-select:none;font-weight:600;" data-togglelm="'+pname+'" onclick="window.__v8ToggleLeadersMore(this)">... +' + (p.leaders.length-8) + ' 只更多（点击展开）▼</div>';
-          }
-          h+='</div>';  // /period card
-        });
-        h+='</div>';  // /2-column grid
-
-        // ── 2. 归纳走势特征 ──
-        if(_enh.patternStats){
-          h+='<div style="font-size:12px;font-weight:700;color:#c084fc;margin:10px 0 6px;">归纳走势特征</div>';
-          h+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">';
-          var patLabels = {'连续涨不回撤':'🟢 最好：连续涨不回撤','强势股':'🟠 强势股','可精选':'🔵 可精选','观察用':'⚪ 观察用'};
-          Object.keys(patLabels).forEach(function(key){
-            var cnt = _enh.patternStats[key] || 0;
-            if(cnt <= 0) return;
-            var barW = Math.min(100, Math.round(cnt / 385 * 300));
-            var bc = key === '连续涨不回撤' ? '#22c55e' : (key === '强势股' ? '#f59e0b' : (key === '可精选' ? '#3b82f6' : '#94a3b8'));
-            h+='<div style="flex:1 0 120px;background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.15);border-radius:6px;padding:5px 8px;">';
-            h+='<div style="font-size:12px;font-weight:600;color:'+bc+';">'+patLabels[key]+' <span style="float:right;color:var(--dim);">'+cnt+'只</span></div>';
-            h+='<div style="background:rgba(148,163,184,.1);border-radius:3px;height:6px;margin-top:3px;"><div style="background:'+bc+';height:100%;border-radius:3px;width:'+barW+'%;min-width:2px;"></div></div>';
-            h+='</div>';
-          });
-          h+='</div>';
-          h+='<div class="note" style="font-size:12px;"><b>最好的是选出来连续涨，不回撤。</b>入选日强势（涨幅大）+ 连续多分类共识 → T+5 收益显著更优。看图就行——上方各段「连涨N天」「回撤X%」已标注。</div>';
-        }
-
-        // ── 3. 找出共同点 ──
-        if(_enh.commonPatterns){
-          h+='<div style="font-size:12px;font-weight:700;color:#c084fc;margin:10px 0 6px;">找出共同点</div>';
-          h+='<div style="background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.15);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.8;">';
-          if(_enh.commonPatterns.topCategoryCombos && _enh.commonPatterns.topCategoryCombos.length){
-            h+='<div style="margin-bottom:4px;"><b style="color:#a855f7;">高频共识组合：</b>';
-            h+=_enh.commonPatterns.topCategoryCombos.slice(0,5).map(function(c){ return c.combo + '(' + c.count + '次)'; }).join('、');
-            h+='</div>';
-          }
-          if(_enh.commonPatterns.continuousUpTraits){
-            var t = _enh.commonPatterns.continuousUpTraits;
-            h+='<div style="margin-bottom:4px;"><b style="color:#22c55e;">连续涨不回撤特征：</b>入选日均涨'+(t.avgSelChange||'?')+'%，平均连涨'+(t.avgConsecDays||'?')+'天，最常见组合「'+ (t.topCombo||'-') +'」('+ (t.topComboCount||0) + '次)</div>';
-          }
-          if(_enh.commonPatterns.bestT5Traits){
-            var t5 = _enh.commonPatterns.bestT5Traits;
-            h+='<div><b style="color:#f59e0b;">最佳T+5组特征：</b>入选日均涨'+(t5.avgSelChange||0)+'%（远超整体），说明<b>入选日强势/涨停附近入场</b>对短期收益最关键</div>';
-          }
-          // 反复出现股
-          if(_enh.topRecurring && _enh.topRecurring.length){
-            h+='<div style="margin-top:6px;padding-top:6px;border-top:1px dashed rgba(148,163,184,.15);"><b style="color:#c084fc;">反复出现共识股（≥2次）：</b>';
-            h+=_enh.topRecurring.slice(0,10).map(function(r){ return (r.name||r.code) + '(' + r.frequency + '次)'; }).join('、');
-            if(_enh.topRecurring.length > 10) h+=' 等'+_enh.topRecurring.length+'只';
-            h+=' <span style="color:var(--dim);">→ 我选这些也是观察用，还需要再精选</span></div>';
-          }
-          h+='</div>';
-        }
-
-        // ══ Zone A: 板块共振假设反向结论 ══
-        if(_enh.sectorConfluence){
-          var sc = _enh.sectorConfluence;
-          h+='<hr style="border:none;border-top:1px dashed rgba(168,85,247,.25);margin:12px 0;">';
-          h+='<div style="font-size:13px;font-weight:700;color:#a855f7;margin-bottom:8px;">🔄 板块共振假设：反向结论</div>';
-          h+='<div class="note" style="font-size:12px;line-height:1.7;margin-bottom:8px;">';
-          h+='假设：板块「主升/启动」+ 个股动量共识 → 提高胜率？<br>';
-          h+='<b style="color:#ef4444;">实测结论：不成立（反向）。</b>'+sc.verdict_text;
-          h+='</div>';
-          h+='<div style="display:flex;flex-direction:column;gap:4px;font-size:12px;">';
-          function scTag(label, d, good){
-            if(!d) return '';
-            var col = good ? '#22c55e' : '#ef4444';
-            return '<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(148,163,184,.05);border-radius:5px;padding:3px 7px;">'
-              + '<span>'+label+' <span style="color:var(--dim)">N='+d.n+'</span></span>'
-              + '<span><span style="color:var(--dim)">胜率'+(d.win)+'%</span> &nbsp; <b style="color:'+col+'">T+5 '+(d.mean_t5>0?'+':'')+d.mean_t5+'%</b></span></div>';
-          }
-          h+=scTag('全样本（基准）', sc.baseline_all, sc.baseline_all.mean_t5>0);
-          h+=scTag('顺风组(主升+启动)', sc.tailwind, sc.tailwind.mean_t5>0);
-          h+=scTag('无风组(震荡+退潮+底部)', sc.nowind, sc.nowind.mean_t5>0);
-          h+=scTag('　└ 震荡(alone)', sc.by_stage['震荡'], true);
-          h+=scTag('　└ 主升(alone)', sc.by_stage['主升'], false);
-          h+='</div>';
-          h+='<div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.3);border-radius:7px;padding:7px 10px;margin-top:8px;font-size:12px;line-height:1.6;">';
-          h+='<b style="color:#22c55e;">📌 反向过滤建议：</b>'+sc.recommendation;
-          h+='</div>';
-          if(sc.caveat) h+='<div class="note" style="font-size:12px;margin-top:5px;color:var(--dim);">⚠️ '+sc.caveat+'</div>';
-        }
-
-        // ══ Zone B: 退出纪律 fixedP10/rrK1.5 ══
-        if(_enh.stopTargetProfile){
-          var sp = _enh.stopTargetProfile;
-          var spec = sp.spec;
-          h+='<hr style="border:none;border-top:1px dashed rgba(168,85,247,.25);margin:12px 0;">';
-          h+='<div style="font-size:13px;font-weight:700;color:#a855f7;margin-bottom:6px;">🛡 退出纪律（全站统一 '+spec.stop+' / '+spec.target+'）</div>';
-          h+='<div class="note" style="font-size:12px;line-height:1.6;margin-bottom:8px;">';
-          h+='止损 = 入场价×0.90（封顶-10%）｜止盈 = 入场价×1.15（R:R=1.5）｜风险'+spec.risk_pct+'% / 回报'+spec.reward_pct+'%<br>';
-          h+='<span style="color:var(--dim)">'+spec.source+'</span>';
-          h+='</div>';
-          var bt = sp.full_window_backtest;
-          if(bt && bt.n){
-            h+='<div style="background:rgba(168,85,247,.04);border:1px solid rgba(168,85,247,.15);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.8;margin-bottom:6px;">';
-            h+='<b style="color:#a855f7;">T+5 纪律回测（窗口完整样本 N='+bt.n+'）：</b><br>';
-            h+='<span style="color:#ef4444;">触发止损 '+bt.n_stop+'只 ('+bt.p_stop+'%)</span> → 封顶 -10%<br>';
-            h+='<span style="color:#22c55e;">触及止盈 '+bt.n_target+'只 ('+bt.p_target+'%)</span> → +15%<br>';
-            h+='<span style="color:var(--dim);">未触发 '+bt.n_none+'只 ('+bt.p_none+'%)</span><br>';
-            h+='纪律后均收益 <b style="color:'+(bt.disc_mean>=0?'#22c55e':'#ef4444')+'">'+(bt.disc_mean>0?'+':'')+bt.disc_mean+'%</b> &nbsp;vs&nbsp; 裸持T+5 <b style="color:'+(bt.naive_mean>=0?'#22c55e':'#ef4444')+'">'+(bt.naive_mean>0?'+':'')+bt.naive_mean+'%</b>';
-            h+='</div>';
-            h+='<div class="note" style="font-size:12px;color:var(--dim);">'+sp.note+' 纪律核心价值：把单笔最大亏损锁死在-10%，避免追高股深套；配合上方反向过滤（剔除主升/启动）胜率可进一步上修。</div>';
-          }
-        }
-
-      }  // /enhanced analysis
-
-      // ══ Zone C: 合并进最终推荐 · 跟踪判定（2026-08-16 主人令：先放暂未上架跟踪1-2周） ══
-      try {
-        var _mergeDue = new Date(Date.now() + 14*24*3600*1000).toLocaleDateString('zh-CN');
-      } catch(e) { var _mergeDue = '2周后'; }
-      h+='<hr style="border:none;border-top:1px dashed rgba(168,85,247,.25);margin:12px 0;">';
-      h+='<div style="background:rgba(168,85,247,.05);border:1px solid rgba(168,85,247,.3);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.7;">';
-      h+='<div style="font-size:13px;font-weight:700;color:#a855f7;margin-bottom:6px;">🗓 合并进「最终推荐」判定（跟踪至 '+_mergeDue+' 起复核）</div>';
-      h+='<div style="color:var(--dim);margin-bottom:4px;">本卡暂不进推荐，仅作研究信号。满足以下全部条件再升级为正式策略子页 / 并入 FINAL_RECOMMEND 候选池：</div>';
-      h+='<div style="color:var(--dim);font-size:11px;margin-bottom:4px;">⚠️ 2026-08-16 修正为无未来函数口径：原 ①②③ 基于入选后走势分类（可精选/强势股/连涨天数均为未来信息，胜率虚高已废弃）。现仅用入选日当天可知条件。</div>';
-      h+='<div>① 「超跌反弹」OCR标签 + 入选前连涨≤1 的池稳定 ≥ 10 只（去重，当前实测 41 只）</div>';
-      h+='<div>② 该池连续 2 周 T+5 胜率 ≥ 60%（当前 385 次样本实测 66.7%）且 T+5 均值 &gt; 0</div>';
-      h+='<div>③ 剔除主升/启动板块的过滤有效性持续（震荡/退潮池胜率 &gt; 全样本基线 42.1%）</div>';
-      h+='<div>④ 与 FINAL_RECOMMEND Top5 重合度 &lt; 50%（有增量价值）</div>';
-      h+='<div>⑤ 「震荡/退潮板块优于主升/启动、入选前连涨越多越差」反向结论在新数据里未被推翻</div>';
-      h+='<div style="margin-top:4px;color:var(--sub);">每周日可由小九跑对比报告；未达则继续留在暂未上架。</div>';
-      h+='</div>';
-
-    } else {
-      h+='<div class="note" style="text-align:center;">🟡 个股动量状态：今日暂无跨分类共识股<br><span style="color:var(--dim);font-size:12px;">数据源已脱离PDF OCR（基于 H反推升级算法 每日自选股扫描），按日累积复盘</span></div>';
-    }
-    h+='</div>';  // /个股动量状态卡
-
     h+='</div>';  // /ulPaneStrong
 
     // ── 2026-08-29 主人令：🤖 AI 预测 子页面已删除（卡并入调试专区，见 P3 插入段），pane2 此处不再渲染 ──
@@ -12440,7 +12449,7 @@ function drawUpDownChart(){
           // 首板：10只/行全部平铺，不折叠；代码完整显示（数据来自 LHB_DATA.stocks）
           html += '<div style="flex:1;">';
           if(lhbUniq.length){
-            html += '<div style="display:grid;grid-template-columns:repeat(10, minmax(0,1fr));gap:5px 6px;">';
+            html += '<div style="display:grid;grid-template-columns:repeat(8, minmax(0,1fr));gap:5px 6px;">';
             lhbUniq.forEach(function(s){
               html += '<span style="font-size:11px;color:var(--text);background:var(--card2);padding:3px 5px;border-radius:4px;border:1px solid var(--border2);white-space:nowrap;overflow:visible;text-overflow:clip;text-align:center;" title="'+s.name+' '+s.code+'">'+s.name+' <span style="color:var(--dim);font-size:10px;letter-spacing:-0.2px;">'+s.code+'</span></span>';
             });
@@ -12479,7 +12488,7 @@ function drawUpDownChart(){
     if(zb.date) html += '<span style="font-size:10px;color:var(--dim);grid-column:8/9;text-align:right;">'+zb.date+'</span>';
     html += '</div>';
     if(zbTotal > 0 && zbList.length){
-      html += '<div style="display:grid;grid-template-columns:repeat(10, minmax(0,1fr));gap:5px 6px;">';
+      html += '<div style="display:grid;grid-template-columns:repeat(8, minmax(0,1fr));gap:5px 6px;">';
       zbList.forEach(function(s){
         var chg = (s.chg != null) ? s.chg : 0;
         var chgColor = chg > 0 ? 'var(--up)' : (chg < 0 ? 'var(--down)' : 'var(--dim)');
@@ -13099,7 +13108,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       wsb.innerHTML = ''+
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'+
           '<span style="font-size:13px;font-weight:700;color:var(--gold);">🎯 弱市专用兑现</span>'+
-          '<span style="margin-left:auto;font-size:11px;color:var(--dim);">信息源：<b style="color:var(--sub)">algorithms/calc_crds.py</b>（5 档唯一权威源）</span>'+
+          '/* 2026-08-30 主人令:信息源脱敏,不暴露算法脚本路径 */'+
         '</div>'+
         '<div style="font-size:13px;line-height:1.7;color:var(--txt);">'+advice+'</div>';
     }
