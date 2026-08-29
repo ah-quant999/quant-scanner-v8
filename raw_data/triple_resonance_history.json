@@ -104,7 +104,8 @@
       "2026-08-20": 20.75,
       "2026-08-23": 20.75,
       "2026-08-27": 0,
-      "2026-08-28": 0
+      "2026-08-28": 0,
+      "2026-08-29": 0
     },
     "601168": {
       "2026-08-17": 42.45,
@@ -121,7 +122,8 @@
       "2026-08-25": 33.68,
       "2026-08-26": 34.47,
       "2026-08-27": 34.57,
-      "2026-08-28": 34.57
+      "2026-08-28": 34.57,
+      "2026-08-29": 0
     },
     "300476": {
       "2026-08-17": 0,
@@ -162,7 +164,8 @@
     },
     "002396": {
       "2026-08-17": 33.91,
-      "2026-08-18": 33.91
+      "2026-08-18": 33.91,
+      "2026-08-29": 36.69
     },
     "688012": {
       "2026-08-19": 398.33
@@ -182,7 +185,8 @@
       "2026-08-20": 15.86
     },
     "000725": {
-      "2026-08-20": 6.01
+      "2026-08-20": 6.01,
+      "2026-08-29": 5.92
     },
     "600988": {
       "2026-08-20": 46.1,
@@ -190,7 +194,8 @@
       "2026-08-25": 47.66,
       "2026-08-26": 46.85,
       "2026-08-27": 48.22,
-      "2026-08-28": 48.22
+      "2026-08-28": 48.22,
+      "2026-08-29": 0
     },
     "000703": {
       "2026-08-20": 20.1,
@@ -211,7 +216,8 @@
       "2026-08-22": 132.8,
       "2026-08-23": 132.8,
       "2026-08-27": 140.97,
-      "2026-08-28": 140.97
+      "2026-08-28": 140.97,
+      "2026-08-29": 145.65
     },
     "600489": {
       "2026-08-22": 27.18,
@@ -229,38 +235,44 @@
     "002475": {
       "2026-08-26": 57.11,
       "2026-08-27": 57.18,
-      "2026-08-28": 57.18
+      "2026-08-28": 57.18,
+      "2026-08-29": 56.6
     },
     "000630": {
       "2026-08-27": 6.75
     },
     "002463": {
       "2026-08-27": 0,
-      "2026-08-28": 0
+      "2026-08-28": 0,
+      "2026-08-29": 0
     },
     "600362": {
       "2026-08-27": 49.2,
-      "2026-08-28": 49.2
+      "2026-08-28": 49.2,
+      "2026-08-29": 49.01
+    },
+    "300475": {
+      "2026-08-29": 172.1
     }
   },
   "_tracking_latest": {
     "601899": {
       "enter_date": "2026-08-17",
       "enter_close": 35.45,
-      "last_date": "2026-08-28",
-      "last_close": 34.57,
-      "status": "strict",
-      "streak": 6,
-      "total_days": 10
+      "last_date": "2026-08-29",
+      "last_close": 0,
+      "status": "near",
+      "streak": 7,
+      "total_days": 11
     },
     "603993": {
       "enter_date": "2026-08-17",
       "enter_close": 20.75,
-      "last_date": "2026-08-28",
+      "last_date": "2026-08-29",
       "last_close": 0,
       "status": "near",
-      "streak": 2,
-      "total_days": 6
+      "streak": 3,
+      "total_days": 7
     },
     "000975": {
       "enter_date": "2026-08-17",
@@ -285,7 +297,7 @@
       "enter_close": 17.55,
       "last_date": "2026-08-28",
       "last_close": 22.08,
-      "status": "near",
+      "status": "dropped",
       "streak": 2,
       "total_days": 3
     },
@@ -312,7 +324,7 @@
       "enter_close": 0,
       "last_date": "2026-08-28",
       "last_close": 259.2,
-      "status": "near",
+      "status": "dropped",
       "streak": 2,
       "total_days": 2
     },
@@ -375,7 +387,7 @@
       "enter_close": 0,
       "last_date": "2026-08-28",
       "last_close": 284.8,
-      "status": "near",
+      "status": "dropped",
       "streak": 4,
       "total_days": 3
     },
@@ -431,11 +443,11 @@
     "600988": {
       "enter_date": "2026-08-20",
       "enter_close": 46.1,
-      "last_date": "2026-08-28",
-      "last_close": 48.22,
-      "status": "strict",
-      "streak": 4,
-      "total_days": 5
+      "last_date": "2026-08-29",
+      "last_close": 0,
+      "status": "near",
+      "streak": 5,
+      "total_days": 6
     },
     "000703": {
       "enter_date": "2026-08-20",
@@ -451,18 +463,18 @@
       "enter_close": 238.96,
       "last_date": "2026-08-28",
       "last_close": 238.44,
-      "status": "near",
+      "status": "dropped",
       "streak": 3,
       "total_days": 3
     },
     "600183": {
       "enter_date": "2026-08-22",
       "enter_close": 132.8,
-      "last_date": "2026-08-28",
-      "last_close": 140.97,
+      "last_date": "2026-08-29",
+      "last_close": 145.65,
       "status": "near",
-      "streak": 3,
-      "total_days": 3
+      "streak": 4,
+      "total_days": 4
     },
     "600489": {
       "enter_date": "2026-08-22",
@@ -496,18 +508,18 @@
       "enter_close": 257.1,
       "last_date": "2026-08-28",
       "last_close": 267.16,
-      "status": "near",
+      "status": "dropped",
       "streak": 3,
       "total_days": 3
     },
     "002475": {
       "enter_date": "2026-08-26",
       "enter_close": 57.11,
-      "last_date": "2026-08-28",
-      "last_close": 57.18,
+      "last_date": "2026-08-29",
+      "last_close": 56.6,
       "status": "near",
-      "streak": 3,
-      "total_days": 2
+      "streak": 4,
+      "total_days": 3
     },
     "000630": {
       "enter_date": "2026-08-27",
@@ -521,26 +533,35 @@
     "600362": {
       "enter_date": "2026-08-27",
       "enter_close": 49.2,
-      "last_date": "2026-08-28",
-      "last_close": 49.2,
+      "last_date": "2026-08-29",
+      "last_close": 49.01,
       "status": "near",
-      "streak": 2,
-      "total_days": 1
+      "streak": 3,
+      "total_days": 2
     },
     "002463": {
       "enter_date": "2026-08-27",
       "enter_close": 0,
-      "last_date": "2026-08-28",
+      "last_date": "2026-08-29",
       "last_close": 0,
       "status": "near",
-      "streak": 2,
+      "streak": 3,
+      "total_days": 2
+    },
+    "300475": {
+      "enter_date": "2026-08-29",
+      "enter_close": 172.1,
+      "last_date": "2026-08-29",
+      "last_close": 172.1,
+      "status": "near",
+      "streak": 1,
       "total_days": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-08-28 19:14:01"
+    "last_update": "2026-08-29 07:38:35"
   },
   "2026-08-18": [
     {
@@ -1715,6 +1736,136 @@
         "有色金属矿采选业"
       ],
       "signal_count": 0,
+      "status": "near"
+    }
+  ],
+  "2026-08-29": [
+    {
+      "code": "600988",
+      "name": "赤峰黄金",
+      "market": "沪市",
+      "board": "主板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 60,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": null,
+      "status": "near"
+    },
+    {
+      "code": "601899",
+      "name": "紫金矿业",
+      "market": "沪市",
+      "board": "主板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 60,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": null,
+      "status": "near"
+    },
+    {
+      "code": "300475",
+      "name": "香农芯创",
+      "market": "sz",
+      "board": "创业板",
+      "close": 172.1,
+      "pct_chg": 4.09,
+      "total_score": 40.4,
+      "quality_grade": "A",
+      "industry": "批发业",
+      "sectors": [
+        "批发业"
+      ],
+      "signal_count": 2,
+      "status": "near"
+    },
+    {
+      "code": "600183",
+      "name": "生益科技",
+      "market": "sh",
+      "board": "主板",
+      "close": 145.65,
+      "pct_chg": 3.32,
+      "total_score": 37.2,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 2,
+      "status": "near"
+    },
+    {
+      "code": "600362",
+      "name": "江西铜业",
+      "market": "sh",
+      "board": "主板",
+      "close": 49.01,
+      "pct_chg": -0.39,
+      "total_score": 35.2,
+      "quality_grade": "C",
+      "industry": "有色金属冶炼和压延加工业",
+      "sectors": [
+        "有色金属冶炼和压延加工业"
+      ],
+      "signal_count": 3,
+      "status": "near"
+    },
+    {
+      "code": "002475",
+      "name": "立讯精密",
+      "market": "sz",
+      "board": "主板",
+      "close": 56.6,
+      "pct_chg": -1.01,
+      "total_score": 34.4,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": 2,
+      "status": "near"
+    },
+    {
+      "code": "002463",
+      "name": "沪电股份",
+      "market": "深市",
+      "board": "主板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 22,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": null,
+      "status": "near"
+    },
+    {
+      "code": "603993",
+      "name": "洛阳钼业",
+      "market": "沪市",
+      "board": "主板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 15,
+      "quality_grade": "A",
+      "industry": "有色金属矿采选业",
+      "sectors": [
+        "有色金属矿采选业"
+      ],
+      "signal_count": null,
       "status": "near"
     }
   ]

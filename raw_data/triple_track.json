@@ -1,18 +1,12 @@
 {
-  "update_time": "2026-08-28 19:14:01",
+  "update_time": "2026-08-29 07:38:35",
   "data_date": "update_time",
   "track_start": "2026-08-17",
-  "history_days": 14,
+  "history_days": 15,
   "strict_count": 0,
   "near_count": 0,
   "tracked": [],
   "alerts": [
-    {
-      "level": "good",
-      "code": "601899",
-      "name": "紫金矿业",
-      "text": "紫金矿业(601899) 连续 6 日稳居严格共识（高质量）"
-    },
     {
       "level": "warn",
       "code": "000975",
@@ -27,6 +21,12 @@
     },
     {
       "level": "warn",
+      "code": "000506",
+      "name": "中国食品",
+      "text": "中国食品(000506) 于 2026-08-28 跌出共识（曾连续 2 日）"
+    },
+    {
+      "level": "warn",
       "code": "688213",
       "name": "",
       "text": "(688213) 于 2026-08-17 跌出共识（曾连续 1 日）"
@@ -36,6 +36,12 @@
       "code": "300502",
       "name": "新易盛",
       "text": "新易盛(300502) 于 2026-08-23 跌出共识（曾连续 2 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300857",
+      "name": "协创数据",
+      "text": "协创数据(300857) 于 2026-08-28 跌出共识（曾连续 2 日）"
     },
     {
       "level": "warn",
@@ -75,6 +81,12 @@
     },
     {
       "level": "warn",
+      "code": "300604",
+      "name": "长川科技",
+      "text": "长川科技(300604) 于 2026-08-28 跌出共识（曾连续 4 日）"
+    },
+    {
+      "level": "warn",
       "code": "688012",
       "name": "",
       "text": "(688012) 于 2026-08-19 跌出共识（曾连续 1 日）"
@@ -110,16 +122,16 @@
       "text": "(000651) 于 2026-08-20 跌出共识（曾连续 1 日）"
     },
     {
-      "level": "good",
-      "code": "600988",
-      "name": "赤峰黄金",
-      "text": "赤峰黄金(600988) 连续 4 日稳居严格共识（高质量）"
-    },
-    {
       "level": "warn",
       "code": "000703",
       "name": "恒逸石化",
       "text": "恒逸石化(000703) 于 2026-08-23 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "688525",
+      "name": "佰维存储",
+      "text": "佰维存储(688525) 于 2026-08-28 跌出共识（曾连续 3 日）"
     },
     {
       "level": "warn",
@@ -141,6 +153,12 @@
     },
     {
       "level": "warn",
+      "code": "300394",
+      "name": "天孚通信",
+      "text": "天孚通信(300394) 于 2026-08-28 跌出共识（曾连续 3 日）"
+    },
+    {
+      "level": "warn",
       "code": "000630",
       "name": "",
       "text": "(000630) 于 2026-08-27 跌出共识（曾连续 1 日）"
@@ -154,17 +172,17 @@
   "overlap": {
     "total_tracked": 0,
     "top10_ge70": {
-      "count": 0,
+      "count": 1,
       "overlap": 0,
       "names": []
     },
     "cockpit_a": {
-      "count": 4,
+      "count": 1,
       "overlap": 0,
       "names": []
     },
     "cockpit_b": {
-      "count": 10,
+      "count": 15,
       "overlap": 0,
       "names": []
     }
@@ -172,47 +190,47 @@
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测",
     "latest_date": "2026-08-28",
-    "total": 279,
+    "total": 176,
     "best_hold_days": 1,
     "periods": {
       "1d": {
-        "win_rate": 55.8,
-        "avg_return": 0.18,
-        "sharpe": 0.03,
-        "count": 267,
+        "win_rate": 54.3,
+        "avg_return": 0.05,
+        "sharpe": 0.01,
+        "count": 164,
         "best": 14.99,
-        "worst": -10.02
+        "worst": -9.99
       },
       "3d": {
-        "win_rate": 39.4,
-        "avg_return": -0.89,
-        "sharpe": -0.13,
-        "count": 267,
-        "best": 15.06,
-        "worst": -10.04
+        "win_rate": 40.4,
+        "avg_return": -1.15,
+        "sharpe": -0.16,
+        "count": 164,
+        "best": 15.01,
+        "worst": -10.02
       },
       "5d": {
-        "win_rate": 47.7,
-        "avg_return": -0.18,
-        "sharpe": -0.02,
-        "count": 267,
-        "best": 15.06,
-        "worst": -10.08
+        "win_rate": 42.3,
+        "avg_return": -1.55,
+        "sharpe": -0.19,
+        "count": 164,
+        "best": 15.02,
+        "worst": -10.04
       },
       "10d": {
-        "win_rate": 52.8,
-        "avg_return": 1.24,
-        "sharpe": 0.13,
-        "count": 267,
-        "best": 15.07,
+        "win_rate": 37.4,
+        "avg_return": -1.32,
+        "sharpe": -0.15,
+        "count": 164,
+        "best": 15.02,
         "worst": -10.04
       },
       "20d": {
-        "win_rate": 47.6,
-        "avg_return": 0.51,
-        "sharpe": 0.06,
-        "count": 267,
-        "best": 15.07,
+        "win_rate": 25.3,
+        "avg_return": -1.92,
+        "sharpe": -0.26,
+        "count": 164,
+        "best": 15.01,
         "worst": -10.04
       }
     }
@@ -220,18 +238,18 @@
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 111,
-      "win_rate_5d": 60.7,
-      "avg_ret_5d": 2.06,
-      "best_win_rate": 65.1,
-      "best_hold_days": 10
+      "count": 66,
+      "win_rate_5d": 44.0,
+      "avg_ret_5d": -1.29,
+      "best_win_rate": 56.6,
+      "best_hold_days": 1
     },
     {
       "band": "70~80",
-      "count": 168,
-      "win_rate_5d": 40.5,
-      "avg_ret_5d": -1.5,
-      "best_win_rate": 54.3,
+      "count": 110,
+      "win_rate_5d": 41.4,
+      "avg_ret_5d": -1.68,
+      "best_win_rate": 53.2,
       "best_hold_days": 1
     }
   ],
@@ -239,45 +257,45 @@
     "periods": [
       {
         "period": "1d",
-        "strict_win": 55.8,
-        "strict_ret": 0.18,
-        "strict_count": 267,
+        "strict_win": 54.3,
+        "strict_ret": 0.05,
+        "strict_count": 164,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "3d",
-        "strict_win": 39.4,
-        "strict_ret": -0.89,
-        "strict_count": 267,
+        "strict_win": 40.4,
+        "strict_ret": -1.15,
+        "strict_count": 164,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "5d",
-        "strict_win": 47.7,
-        "strict_ret": -0.18,
-        "strict_count": 267,
+        "strict_win": 42.3,
+        "strict_ret": -1.55,
+        "strict_count": 164,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "10d",
-        "strict_win": 52.8,
-        "strict_ret": 1.24,
-        "strict_count": 267,
+        "strict_win": 37.4,
+        "strict_ret": -1.32,
+        "strict_count": 164,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "20d",
-        "strict_win": 47.6,
-        "strict_ret": 0.51,
-        "strict_count": 267,
+        "strict_win": 25.3,
+        "strict_ret": -1.92,
+        "strict_count": 164,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -287,7 +305,7 @@
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
     "track_start": "2026-08-17",
-    "history_days": 14,
+    "history_days": 15,
     "summary": {
       "1d": {
         "count": 10,
@@ -295,9 +313,9 @@
         "avg_return": 2.78
       },
       "3d": {
-        "count": 4,
-        "win_rate": 75.0,
-        "avg_return": 3.42
+        "count": 5,
+        "win_rate": 60.0,
+        "avg_return": 2.55
       },
       "5d": {
         "count": 6,
@@ -432,7 +450,8 @@
         "name": "立讯精密",
         "enter_date": "2026-08-26",
         "offsets": {
-          "1d": 0.12
+          "1d": 0.12,
+          "3d": -0.89
         }
       },
       {

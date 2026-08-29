@@ -1,5 +1,5 @@
 {
-  "calc_time": "2026-08-29 00:17:30",
+  "calc_time": "2026-08-29 07:25:09",
   "method": "baostock 真实收盘价全面回测",
   "hold_periods_tested": [
     1,
@@ -15,149 +15,149 @@
   ],
   "overview": {
     "resonance_all": {
-      "total": 175,
-      "valid": 163,
+      "total": 176,
+      "valid": 164,
       "best_hold_days": 1,
       "best_win_rate": 54.3,
       "best_avg_return": 0.05,
       "periods": {
         "hold_1d": {
-          "count": 163,
+          "count": 164,
           "win": 88,
           "loss": 74,
-          "draw": 1,
+          "draw": 2,
           "win_rate": 54.3,
           "avg_return": 0.05,
           "median_return": 0.51,
           "best_return": 14.99,
           "worst_return": -9.99,
-          "std_return": 5.42,
+          "std_return": 5.41,
           "sharpe_ratio": 0.01
         },
         "hold_3d": {
-          "count": 163,
+          "count": 164,
           "win": 63,
           "loss": 93,
-          "draw": 7,
+          "draw": 8,
           "win_rate": 40.4,
           "avg_return": -1.15,
-          "median_return": -1.36,
+          "median_return": -1.06,
           "best_return": 15.01,
           "worst_return": -10.02,
-          "std_return": 7.27,
+          "std_return": 7.25,
           "sharpe_ratio": -0.16
         },
         "hold_5d": {
-          "count": 163,
+          "count": 164,
           "win": 63,
           "loss": 86,
-          "draw": 14,
+          "draw": 15,
           "win_rate": 42.3,
-          "avg_return": -1.56,
-          "median_return": -0.76,
+          "avg_return": -1.55,
+          "median_return": -0.26,
           "best_return": 15.02,
           "worst_return": -10.04,
-          "std_return": 8.37,
+          "std_return": 8.35,
           "sharpe_ratio": -0.19
         },
         "hold_10d": {
-          "count": 163,
+          "count": 164,
           "win": 46,
           "loss": 77,
-          "draw": 40,
+          "draw": 41,
           "win_rate": 37.4,
-          "avg_return": -1.33,
+          "avg_return": -1.32,
           "median_return": 0,
           "best_return": 15.02,
           "worst_return": -10.04,
-          "std_return": 8.93,
+          "std_return": 8.91,
           "sharpe_ratio": -0.15
         },
         "hold_20d": {
-          "count": 163,
+          "count": 164,
           "win": 21,
           "loss": 62,
-          "draw": 80,
+          "draw": 81,
           "win_rate": 25.3,
-          "avg_return": -1.93,
+          "avg_return": -1.92,
           "median_return": 0,
           "best_return": 15.01,
           "worst_return": -10.04,
-          "std_return": 7.53,
+          "std_return": 7.51,
           "sharpe_ratio": -0.26
         }
       }
     },
     "resonance_gte70_lt80": {
-      "total": 109,
-      "valid": 109,
+      "total": 110,
+      "valid": 110,
       "best_hold_days": 1,
       "best_win_rate": 53.2,
       "best_avg_return": -0.19,
       "periods": {
         "hold_1d": {
-          "count": 109,
+          "count": 110,
           "win": 58,
           "loss": 51,
-          "draw": 0,
+          "draw": 1,
           "win_rate": 53.2,
           "avg_return": -0.19,
           "median_return": 0.29,
           "best_return": 14.99,
           "worst_return": -9.99,
-          "std_return": 5.32,
+          "std_return": 5.29,
           "sharpe_ratio": -0.04
         },
         "hold_3d": {
-          "count": 109,
+          "count": 110,
           "win": 38,
           "loss": 65,
-          "draw": 6,
+          "draw": 7,
           "win_rate": 36.9,
-          "avg_return": -1.31,
-          "median_return": -1.46,
+          "avg_return": -1.3,
+          "median_return": -1.06,
           "best_return": 15.0,
           "worst_return": -10.02,
-          "std_return": 6.75,
+          "std_return": 6.72,
           "sharpe_ratio": -0.19
         },
         "hold_5d": {
-          "count": 109,
+          "count": 110,
           "win": 41,
           "loss": 58,
-          "draw": 10,
+          "draw": 11,
           "win_rate": 41.4,
-          "avg_return": -1.69,
+          "avg_return": -1.68,
           "median_return": -0.26,
           "best_return": 15.0,
           "worst_return": -10.02,
-          "std_return": 7.95,
+          "std_return": 7.91,
           "sharpe_ratio": -0.21
         },
         "hold_10d": {
-          "count": 109,
+          "count": 110,
           "win": 25,
           "loss": 48,
-          "draw": 36,
+          "draw": 37,
           "win_rate": 34.2,
-          "avg_return": -1.83,
+          "avg_return": -1.82,
           "median_return": 0,
           "best_return": 15.01,
           "worst_return": -10.02,
-          "std_return": 8.01,
+          "std_return": 7.98,
           "sharpe_ratio": -0.23
         },
         "hold_20d": {
-          "count": 109,
+          "count": 110,
           "win": 12,
           "loss": 37,
-          "draw": 60,
+          "draw": 61,
           "win_rate": 24.5,
-          "avg_return": -1.7,
+          "avg_return": -1.69,
           "median_return": 0,
           "best_return": 15.0,
           "worst_return": -10.02,
-          "std_return": 7.3,
+          "std_return": 7.27,
           "sharpe_ratio": -0.23
         }
       }
@@ -243,13 +243,13 @@
         "win_rate": 54.3,
         "avg_return": 0.05,
         "sharpe": 0.01,
-        "count": 163
+        "count": 164
       },
       "resonance_gte70_lt80": {
         "win_rate": 53.2,
         "avg_return": -0.19,
         "sharpe": -0.04,
-        "count": 109
+        "count": 110
       },
       "resonance_gte80": {
         "win_rate": 56.6,
@@ -263,13 +263,13 @@
         "win_rate": 40.4,
         "avg_return": -1.15,
         "sharpe": -0.16,
-        "count": 163
+        "count": 164
       },
       "resonance_gte70_lt80": {
         "win_rate": 36.9,
-        "avg_return": -1.31,
+        "avg_return": -1.3,
         "sharpe": -0.19,
-        "count": 109
+        "count": 110
       },
       "resonance_gte80": {
         "win_rate": 47.2,
@@ -281,15 +281,15 @@
     "hold_5d": {
       "resonance_all": {
         "win_rate": 42.3,
-        "avg_return": -1.56,
+        "avg_return": -1.55,
         "sharpe": -0.19,
-        "count": 163
+        "count": 164
       },
       "resonance_gte70_lt80": {
         "win_rate": 41.4,
-        "avg_return": -1.69,
+        "avg_return": -1.68,
         "sharpe": -0.21,
-        "count": 109
+        "count": 110
       },
       "resonance_gte80": {
         "win_rate": 44.0,
@@ -301,15 +301,15 @@
     "hold_10d": {
       "resonance_all": {
         "win_rate": 37.4,
-        "avg_return": -1.33,
+        "avg_return": -1.32,
         "sharpe": -0.15,
-        "count": 163
+        "count": 164
       },
       "resonance_gte70_lt80": {
         "win_rate": 34.2,
-        "avg_return": -1.83,
+        "avg_return": -1.82,
         "sharpe": -0.23,
-        "count": 109
+        "count": 110
       },
       "resonance_gte80": {
         "win_rate": 42.0,
@@ -321,15 +321,15 @@
     "hold_20d": {
       "resonance_all": {
         "win_rate": 25.3,
-        "avg_return": -1.93,
+        "avg_return": -1.92,
         "sharpe": -0.26,
-        "count": 163
+        "count": 164
       },
       "resonance_gte70_lt80": {
         "win_rate": 24.5,
-        "avg_return": -1.7,
+        "avg_return": -1.69,
         "sharpe": -0.23,
-        "count": 109
+        "count": 110
       },
       "resonance_gte80": {
         "win_rate": 26.5,
@@ -341,75 +341,75 @@
   },
   "details": {
     "resonance_all": {
-      "total_signals": 175,
-      "valid_signals": 163,
+      "total_signals": 176,
+      "valid_signals": 164,
       "best_hold_days": 1,
       "best_hold_win_rate": 54.3,
       "best_hold_avg_return": 0.05,
       "periods": {
         "hold_1d": {
-          "count": 163,
+          "count": 164,
           "win": 88,
           "loss": 74,
-          "draw": 1,
+          "draw": 2,
           "win_rate": 54.3,
           "avg_return": 0.05,
           "median_return": 0.51,
           "best_return": 14.99,
           "worst_return": -9.99,
-          "std_return": 5.42,
+          "std_return": 5.41,
           "sharpe_ratio": 0.01
         },
         "hold_3d": {
-          "count": 163,
+          "count": 164,
           "win": 63,
           "loss": 93,
-          "draw": 7,
+          "draw": 8,
           "win_rate": 40.4,
           "avg_return": -1.15,
-          "median_return": -1.36,
+          "median_return": -1.06,
           "best_return": 15.01,
           "worst_return": -10.02,
-          "std_return": 7.27,
+          "std_return": 7.25,
           "sharpe_ratio": -0.16
         },
         "hold_5d": {
-          "count": 163,
+          "count": 164,
           "win": 63,
           "loss": 86,
-          "draw": 14,
+          "draw": 15,
           "win_rate": 42.3,
-          "avg_return": -1.56,
-          "median_return": -0.76,
+          "avg_return": -1.55,
+          "median_return": -0.26,
           "best_return": 15.02,
           "worst_return": -10.04,
-          "std_return": 8.37,
+          "std_return": 8.35,
           "sharpe_ratio": -0.19
         },
         "hold_10d": {
-          "count": 163,
+          "count": 164,
           "win": 46,
           "loss": 77,
-          "draw": 40,
+          "draw": 41,
           "win_rate": 37.4,
-          "avg_return": -1.33,
+          "avg_return": -1.32,
           "median_return": 0,
           "best_return": 15.02,
           "worst_return": -10.04,
-          "std_return": 8.93,
+          "std_return": 8.91,
           "sharpe_ratio": -0.15
         },
         "hold_20d": {
-          "count": 163,
+          "count": 164,
           "win": 21,
           "loss": 62,
-          "draw": 80,
+          "draw": 81,
           "win_rate": 25.3,
-          "avg_return": -1.93,
+          "avg_return": -1.92,
           "median_return": 0,
           "best_return": 15.01,
           "worst_return": -10.04,
-          "std_return": 7.53,
+          "std_return": 7.51,
           "sharpe_ratio": -0.26
         }
       },
@@ -8200,79 +8200,102 @@
           "exit_date": "2026-08-28",
           "exit_price": 172.1,
           "exit_type": null
+        },
+        {
+          "entry_date": "2026-08-28",
+          "code": "300475",
+          "name": "香农芯创",
+          "market": "sz",
+          "board": "创业板",
+          "total_score": 75.4,
+          "entry_price": 172.1,
+          "bsc": "sz.300475",
+          "source": "top10_daily",
+          "strategy": "resonance_all",
+          "latest_date": "2026-08-28",
+          "latest_price": 172.1,
+          "hold_days": 0,
+          "max_drawdown": 0.0,
+          "latest_return": 0.0,
+          "stop_loss": 154.89,
+          "target_price": 197.92,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-28",
+          "exit_price": 172.1,
+          "exit_type": null
         }
       ]
     },
     "resonance_gte70_lt80": {
-      "total_signals": 109,
-      "valid_signals": 109,
+      "total_signals": 110,
+      "valid_signals": 110,
       "best_hold_days": 1,
       "best_hold_win_rate": 53.2,
       "best_hold_avg_return": -0.19,
       "periods": {
         "hold_1d": {
-          "count": 109,
+          "count": 110,
           "win": 58,
           "loss": 51,
-          "draw": 0,
+          "draw": 1,
           "win_rate": 53.2,
           "avg_return": -0.19,
           "median_return": 0.29,
           "best_return": 14.99,
           "worst_return": -9.99,
-          "std_return": 5.32,
+          "std_return": 5.29,
           "sharpe_ratio": -0.04
         },
         "hold_3d": {
-          "count": 109,
+          "count": 110,
           "win": 38,
           "loss": 65,
-          "draw": 6,
+          "draw": 7,
           "win_rate": 36.9,
-          "avg_return": -1.31,
-          "median_return": -1.46,
+          "avg_return": -1.3,
+          "median_return": -1.06,
           "best_return": 15.0,
           "worst_return": -10.02,
-          "std_return": 6.75,
+          "std_return": 6.72,
           "sharpe_ratio": -0.19
         },
         "hold_5d": {
-          "count": 109,
+          "count": 110,
           "win": 41,
           "loss": 58,
-          "draw": 10,
+          "draw": 11,
           "win_rate": 41.4,
-          "avg_return": -1.69,
+          "avg_return": -1.68,
           "median_return": -0.26,
           "best_return": 15.0,
           "worst_return": -10.02,
-          "std_return": 7.95,
+          "std_return": 7.91,
           "sharpe_ratio": -0.21
         },
         "hold_10d": {
-          "count": 109,
+          "count": 110,
           "win": 25,
           "loss": 48,
-          "draw": 36,
+          "draw": 37,
           "win_rate": 34.2,
-          "avg_return": -1.83,
+          "avg_return": -1.82,
           "median_return": 0,
           "best_return": 15.01,
           "worst_return": -10.02,
-          "std_return": 8.01,
+          "std_return": 7.98,
           "sharpe_ratio": -0.23
         },
         "hold_20d": {
-          "count": 109,
+          "count": 110,
           "win": 12,
           "loss": 37,
-          "draw": 60,
+          "draw": 61,
           "win_rate": 24.5,
-          "avg_return": -1.7,
+          "avg_return": -1.69,
           "median_return": 0,
           "best_return": 15.0,
           "worst_return": -10.02,
-          "std_return": 7.3,
+          "std_return": 7.27,
           "sharpe_ratio": -0.23
         }
       },
@@ -13381,6 +13404,29 @@
             "target_price": 34.65,
             "exit_type": null
           }
+        },
+        {
+          "entry_date": "2026-08-28",
+          "code": "300475",
+          "name": "香农芯创",
+          "market": "sz",
+          "board": "创业板",
+          "total_score": 75.4,
+          "entry_price": 172.1,
+          "bsc": "sz.300475",
+          "source": "top10_daily",
+          "strategy": "resonance_gte70_lt80",
+          "latest_date": "2026-08-28",
+          "latest_price": 172.1,
+          "hold_days": 0,
+          "max_drawdown": 0.0,
+          "latest_return": 0.0,
+          "stop_loss": 154.89,
+          "target_price": 197.92,
+          "risk_reward": 1.5,
+          "exit_date": "2026-08-28",
+          "exit_price": 172.1,
+          "exit_type": null
         }
       ]
     },
@@ -16143,5 +16189,5 @@
       ]
     }
   },
-  "update_stamp": 1787933850
+  "update_stamp": 1787959509
 }
