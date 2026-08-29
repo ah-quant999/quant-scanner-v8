@@ -289,6 +289,24 @@ def main():
     bt_total_n = bt_total_wins + bt_total_losses
     bt_base_rate = bt_total_wins / bt_total_n * 100 if bt_total_n > 0 else 50.0
 
+    # ── 2.6 P0-1 消费端接入（2026-08-29）：门禁信号 → 分数乘子 ──
+    # 读 raw_data/ic_gate.json 的 ic_weight（因子 IC 胜率门禁）和
+    # raw_data/strategy_regime_gate.json 的 ge3 weight（市场 regime 门控）。
+    # 缺文件/缺键时默认 1.0（不改变现有行为，仅在有信号时介入）。
+    _ic_gate = load_json(os.path.join(DATA_DIR, "ic_gate.json"), {})
+    _regime_gate = load_json(os.path.join(DATA_DIR, "strategy_regime_gate.json"), {})
+    ic_weight = float((_ic_gate.get("factors") or {}).get("ge3", {}).get("ic_weight") or 1.0)
+    ic_action = (_ic_gate.get("overall_action") or "ok")
+    _strat = (_regime_gate.get("strategies") or {}).get("ge3", {})
+    regime_weight = float(_strat.get("weight") or 1.0)
+    regime_action = (_regime_gate.get("overall_action") or "ok")
+    # 组合乘子：ic × regime，夹紧 [0.3, 1.05] 防止双重打折过狠或加杠杆
+    gate_multiplier = max(0.3, min(1.05, ic_weight * regime_weight))
+    if abs(gate_multiplier - 1.0) > 0.01 or ic_action != "ok" or regime_action != "ok":
+        print(f"  🚦 门禁: ic={ic_weight:.2f}({ic_action}) × regime={regime_weight:.2f}({regime_action}) → 乘子={gate_multiplier:.3f}")
+    else:
+        print(f"  🚦 门禁: 全 ok，乘子=1.000（不介入）")
+
     def bt_win_rate_for(sigs):
         """给定四信号布尔元组，返回带拉普拉斯平滑的历史 T+3 胜率(%)"""
         key = (bool(sigs[0]), bool(sigs[1]), bool(sigs[2]), bool(sigs[3]))
@@ -614,6 +632,9 @@ def main():
         score_backtest = max(-10, min(10, round((win_rate - 50) / 10 * 5)))
         raw_total = raw_total + score_backtest
 
+        # 🚦 P0-1 门禁乘子：IC × Regime 联合微调（早于归一化，确保 max_score 口径一致）
+        raw_total = raw_total * gate_multiplier
+
         # ── 归一化到 0~100 ──
         # 分母见模块顶部 NORM_DIVISOR 注释：250 已使 ≥80 分不可达，现校准为 130
         total = round(min(100, max(0, raw_total / NORM_DIVISOR * 100)), 1)
@@ -742,6 +763,15 @@ def main():
         #    故全站默认建议持有 10 个交易日，前端可直接展示。
         "suggested_hold_days": 10,
         "regime_summary": regime_summary,
+        # 🚦 P0-1 门禁信号透出（前端可直接展示 ic/regime/乘子，便于主人审核）
+        "gate_info": {
+            "ic_weight": ic_weight,
+            "ic_action": ic_action,
+            "regime_weight": regime_weight,
+            "regime_action": regime_action,
+            "gate_multiplier": round(gate_multiplier, 4),
+            "applied_to": "ge3 (generate_top10)",
+        },
         "top10": top10,
     }
 
@@ -777,7 +807,10 @@ def main():
     except Exception as e:
         print(f"  [warn] 保存历史记录失败: {e}")
 
-    print(f"  ✅ TOP10 已生成: {len(top10)} 只")
+    gate_note = ""
+    if abs(gate_multiplier - 1.0) > 0.01:
+        gate_note = f" [门禁×{gate_multiplier:.2f} ic={ic_weight:.2f}({ic_action}) regime={regime_weight:.2f}({regime_action})]"
+    print(f"  ✅ TOP10 已生成: {len(top10)} 只{gate_note}")
     for t in top10:
         print(f"     #{t['rank']} {t['name']}({t['code']}) 评分{t['total_score']} "
               f"基础{t['score_base']}+形态{t.get('score_form',0)}+增强{t['score_enhance']}+资金{t['score_fund']}+"
