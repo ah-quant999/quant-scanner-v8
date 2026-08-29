@@ -297,7 +297,7 @@ jobs:
 
       - name: "🧮 运行盘后算法链 → raw_data/ → 推送"
         id: algo
-        if: steps.trading.outputs.is_trading_day == 'true'
+        if: steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true'
         timeout-minutes: 90
         run: |
           set +e
@@ -330,19 +330,19 @@ jobs:
       #   必刷新——bridge_raw_data 防 raw_data 内部改名断点（如 triple_resonance_history → triple_history），
       #   update_v8 重生成 data/*.js，v8_health_check 刷新 HEALTH_CHECK.js。
       - name: "🔗 桥接 raw_data 内部改名（bridge_raw_data.py）"
-        if: steps.trading.outputs.is_trading_day == 'true'
+        if: steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true'
         run: |
           python algorithms/bridge_raw_data.py || true
 
       # 2026-08-08 修复：算法链产出 candidate.json 后，立即刷新候选池行情，
       # 避免 runner 状态卡 CANDIDATE_QUOTES 长期显示「空」。
       - name: "📈 刷新候选池行情（CANDIDATE_QUOTES）"
-        if: steps.trading.outputs.is_trading_day == 'true'
+        if: steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true'
         run: |
           python cloud_fetch_v8.py --only CANDIDATE_QUOTES || true
 
       - name: "📤 兜底推送（若上一步未推）"
-        if: steps.trading.outputs.is_trading_day == 'true'
+        if: steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true'
         run: |
           # 2026-08-22 根因⑪收口：去掉 || true —— 推送失败必须让 job 失败，
           # 否则「算法链算完但推送 422 失败」永远被假 success 掩盖。
@@ -359,7 +359,7 @@ jobs:
       #   此步只在算法链收尾重算 ALGO_TRACK.js 的 ?v 并推送 index.html（Contents API，避开 cn git 墙）。
       #   只改 ALGO_TRACK 一项，不碰 COMMODITY 等（避免用陈旧本地文件覆盖 build/deploy 已对齐的 ?v）。
       - name: "🔄 同步 ALGO_TRACK 缓存戳 ?v 并推送 index.html"
-        if: steps.trading.outputs.is_trading_day == 'true'
+        if: steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
