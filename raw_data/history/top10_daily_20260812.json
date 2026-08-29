@@ -2,7 +2,7 @@
   "update_time": "2026-08-12 21:22:14",
   "total_scored": 8,
   "count_80plus": 0,
-  "max_score": 38.5,
+  "max_score": 20.0,
   "top10": [
     {
       "rank": 1,
@@ -14,7 +14,7 @@
       "close": 11.66,
       "pct_chg": -0.51,
       "pct_chg_20d": 0,
-      "total_score": 38.5,
+      "total_score": 20.0,
       "sectors": [],
       "stop_loss": 10.49,
       "target_price": 13.41,
@@ -56,7 +56,7 @@
       "close": 91.65,
       "pct_chg": -1.5,
       "pct_chg_20d": 0,
-      "total_score": 38.5,
+      "total_score": 20.0,
       "sectors": [],
       "stop_loss": 82.49,
       "target_price": 105.4,
@@ -98,7 +98,7 @@
       "close": 198.9,
       "pct_chg": -0.1,
       "pct_chg_20d": 0,
-      "total_score": 34.6,
+      "total_score": 18.0,
       "sectors": [],
       "stop_loss": 179.01,
       "target_price": 228.73,
@@ -140,7 +140,7 @@
       "close": 45.7,
       "pct_chg": -0.61,
       "pct_chg_20d": 0,
-      "total_score": 34.6,
+      "total_score": 18.0,
       "sectors": [],
       "stop_loss": 41.13,
       "target_price": 52.56,
@@ -182,7 +182,7 @@
       "close": 216.6,
       "pct_chg": -1.01,
       "pct_chg_20d": 0,
-      "total_score": 34.6,
+      "total_score": 18.0,
       "sectors": [],
       "stop_loss": 194.94,
       "target_price": 249.09,
@@ -224,7 +224,7 @@
       "close": 0,
       "pct_chg": 0,
       "pct_chg_20d": 0,
-      "total_score": 15.4,
+      "total_score": 8.0,
       "sectors": [],
       "stop_loss": 0,
       "target_price": 0,
@@ -341,6 +341,5 @@
       "quality_detail": "港股暂无基本面数据源(中性不扣分)"
     }
   ],
-  "norm_version": 130,
-  "norm_divisor": 130
+  "norm_version": 130
 }

@@ -2,7 +2,7 @@
   "update_time": "2026-07-21 22:51:07",
   "total_scored": 40,
   "count_80plus": 0,
-  "max_score": 50.0,
+  "max_score": 65,
   "top10": [
     {
       "rank": 1,
@@ -14,7 +14,7 @@
       "close": 551.77,
       "pct_chg": 8.19,
       "pct_chg_20d": -0.04,
-      "total_score": 50.0,
+      "total_score": 65,
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
@@ -49,7 +49,7 @@
       "close": 38.82,
       "pct_chg": 1.46,
       "pct_chg_20d": 24.66,
-      "total_score": 33.1,
+      "total_score": 43,
       "sectors": [],
       "stop_loss": 36.1,
       "target_price": 43.48,
@@ -82,7 +82,7 @@
       "close": 158.4,
       "pct_chg": 0.76,
       "pct_chg_20d": 21.1,
-      "total_score": 33.1,
+      "total_score": 43,
       "sectors": [],
       "stop_loss": 147.31,
       "target_price": 177.41,
@@ -115,7 +115,7 @@
       "close": 231.0,
       "pct_chg": 8.18,
       "pct_chg_20d": -25.74,
-      "total_score": 30.8,
+      "total_score": 40,
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
@@ -150,7 +150,7 @@
       "close": 24.4,
       "pct_chg": 4.01,
       "pct_chg_20d": 0.83,
-      "total_score": 30.8,
+      "total_score": 40,
       "sectors": [],
       "stop_loss": 22.69,
       "target_price": 27.33,
@@ -183,7 +183,7 @@
       "close": 193.0,
       "pct_chg": 0.78,
       "pct_chg_20d": 19.95,
-      "total_score": 26.9,
+      "total_score": 35,
       "sectors": [],
       "stop_loss": 179.49,
       "target_price": 216.16,
@@ -216,7 +216,7 @@
       "close": 18.35,
       "pct_chg": -0.27,
       "pct_chg_20d": 14.26,
-      "total_score": 26.9,
+      "total_score": 35,
       "sectors": [],
       "stop_loss": 17.07,
       "target_price": 20.55,
@@ -249,7 +249,7 @@
       "close": 156.5,
       "pct_chg": -0.82,
       "pct_chg_20d": 5.25,
-      "total_score": 26.9,
+      "total_score": 35,
       "sectors": [],
       "stop_loss": 145.55,
       "target_price": 175.28,
@@ -282,7 +282,7 @@
       "close": 61.16,
       "pct_chg": 4.71,
       "pct_chg_20d": -3.01,
-      "total_score": 19.2,
+      "total_score": 25,
       "sectors": [
         "软件和信息技术服务业"
       ],
@@ -317,7 +317,7 @@
       "close": 142.0,
       "pct_chg": 0.71,
       "pct_chg_20d": -46.33,
-      "total_score": 13.8,
+      "total_score": 18,
       "sectors": [],
       "stop_loss": 132.06,
       "target_price": 159.04,
@@ -350,7 +350,7 @@
       "close": 208.4,
       "pct_chg": -1.23,
       "pct_chg_20d": 12.1,
-      "total_score": 11.5,
+      "total_score": 15,
       "sectors": [],
       "stop_loss": 193.81,
       "target_price": 233.41,
@@ -383,7 +383,7 @@
       "close": 582.5,
       "pct_chg": 12.13,
       "pct_chg_20d": -20.8,
-      "total_score": 11.5,
+      "total_score": 15,
       "sectors": [],
       "stop_loss": 541.73,
       "target_price": 652.4,
@@ -416,7 +416,7 @@
       "close": 5.56,
       "pct_chg": 0.36,
       "pct_chg_20d": 4.71,
-      "total_score": 7.7,
+      "total_score": 10,
       "sectors": [],
       "stop_loss": 5.17,
       "target_price": 6.23,
@@ -681,6 +681,5 @@
       "quality_detail": ""
     }
   ],
-  "norm_version": 130,
-  "norm_divisor": 130
+  "norm_version": 130
 }

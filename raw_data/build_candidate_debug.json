@@ -1,18 +1,18 @@
 {
-  "DATA": "/home/runner/work/quant-scanner-v8/quant-scanner-v8/algorithms/../out",
+  "DATA": "D:\\actions-runner-v8\\_work\\quant-scanner-v8\\quant-scanner-v8\\algorithms\\..\\out",
   "V8_OUT_DIR": "",
   "guanlan_watchlist": {
     "exists": true,
-    "stocks": 15
+    "stocks": 37
   },
   "guanlan_reports": {
     "exists": true,
     "reports": 20,
-    "stocks_in_reports": 15
+    "stocks_in_reports": 37
   },
   "source_dist": {
     "主板成交前100": 57,
-    "观澜台": 15,
+    "观澜台": 34,
     "创业板成交前100": 27,
     "科创板成交前100": 16,
     "港股成交前50": 50

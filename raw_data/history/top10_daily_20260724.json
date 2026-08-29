@@ -2,7 +2,7 @@
   "update_time": "2026-07-24 19:25:42",
   "total_scored": 295,
   "count_80plus": 0,
-  "max_score": 53.8,
+  "max_score": 70,
   "top10": [
     {
       "rank": 1,
@@ -14,7 +14,7 @@
       "close": 398.99,
       "pct_chg": 1.52,
       "pct_chg_20d": 21.83,
-      "total_score": 53.8,
+      "total_score": 70,
       "sectors": [
         "软件和信息技术服务业"
       ],
@@ -49,7 +49,7 @@
       "close": 128.05,
       "pct_chg": 3.27,
       "pct_chg_20d": -32.41,
-      "total_score": 52.3,
+      "total_score": 68,
       "sectors": [
         "计算机、通信和其他电子设备制造业",
         "AIPC",
@@ -91,7 +91,7 @@
       "close": 42.12,
       "pct_chg": -3.04,
       "pct_chg_20d": -38.8,
-      "total_score": 48.5,
+      "total_score": 63,
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
@@ -126,7 +126,7 @@
       "close": 83.88,
       "pct_chg": -1.56,
       "pct_chg_20d": -45.23,
-      "total_score": 48.5,
+      "total_score": 63,
       "sectors": [
         "AI眼镜",
         "专精特新",
@@ -168,7 +168,7 @@
       "close": 160.66,
       "pct_chg": -1.45,
       "pct_chg_20d": -46.62,
-      "total_score": 48.5,
+      "total_score": 63,
       "sectors": [
         "批发业"
       ],
@@ -203,7 +203,7 @@
       "close": 123.55,
       "pct_chg": -3.01,
       "pct_chg_20d": -53.48,
-      "total_score": 48.5,
+      "total_score": 63,
       "sectors": [
         "计算机、通信和其他电子设备制造业",
         "5G概念",
@@ -245,7 +245,7 @@
       "close": 238.59,
       "pct_chg": -4.72,
       "pct_chg_20d": -52.38,
-      "total_score": 48.5,
+      "total_score": 63,
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
@@ -280,7 +280,7 @@
       "close": 38.33,
       "pct_chg": -2.22,
       "pct_chg_20d": -38.67,
-      "total_score": 48.5,
+      "total_score": 63,
       "sectors": [
         "计算机、通信和其他电子设备制造业",
         "2026中报预增",
@@ -322,7 +322,7 @@
       "close": 65.28,
       "pct_chg": -3.67,
       "pct_chg_20d": -16.06,
-      "total_score": 48.5,
+      "total_score": 63,
       "sectors": [],
       "stop_loss": 60.71,
       "target_price": 73.11,
@@ -355,7 +355,7 @@
       "close": 162.28,
       "pct_chg": -4.02,
       "pct_chg_20d": -38.21,
-      "total_score": 46.2,
+      "total_score": 60,
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
@@ -390,7 +390,7 @@
       "close": 788.75,
       "pct_chg": 6.16,
       "pct_chg_20d": -5.2,
-      "total_score": 46.2,
+      "total_score": 60,
       "sectors": [
         "专用设备制造业",
         "HS300_",
@@ -432,7 +432,7 @@
       "close": 63.46,
       "pct_chg": -4.46,
       "pct_chg_20d": -41.78,
-      "total_score": 45.4,
+      "total_score": 59,
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
@@ -467,7 +467,7 @@
       "close": 16.26,
       "pct_chg": 0.18,
       "pct_chg_20d": -39.51,
-      "total_score": 44.6,
+      "total_score": 58,
       "sectors": [
         "土木工程建筑业"
       ],
@@ -502,7 +502,7 @@
       "close": 108.87,
       "pct_chg": -2.72,
       "pct_chg_20d": -32.35,
-      "total_score": 44.6,
+      "total_score": 58,
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
@@ -537,7 +537,7 @@
       "close": 222.39,
       "pct_chg": -3.06,
       "pct_chg_20d": -45.77,
-      "total_score": 44.6,
+      "total_score": 58,
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
@@ -572,7 +572,7 @@
       "close": 47.38,
       "pct_chg": -5.43,
       "pct_chg_20d": -51.49,
-      "total_score": 44.6,
+      "total_score": 58,
       "sectors": [
         "非金属矿物制品业"
       ],
@@ -607,7 +607,7 @@
       "close": 57.71,
       "pct_chg": -8.54,
       "pct_chg_20d": -48.53,
-      "total_score": 44.6,
+      "total_score": 58,
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
@@ -642,7 +642,7 @@
       "close": 74.93,
       "pct_chg": 0.24,
       "pct_chg_20d": -36.66,
-      "total_score": 44.6,
+      "total_score": 58,
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
@@ -677,7 +677,7 @@
       "close": 48.45,
       "pct_chg": -3.62,
       "pct_chg_20d": -42.66,
-      "total_score": 44.6,
+      "total_score": 58,
       "sectors": [
         "有色金属冶炼和压延加工业"
       ],
@@ -712,7 +712,7 @@
       "close": 8.78,
       "pct_chg": -3.62,
       "pct_chg_20d": -43.75,
-      "total_score": 44.6,
+      "total_score": 58,
       "sectors": [
         "通用设备制造业"
       ],
@@ -738,6 +738,5 @@
       "quality_detail": "ROE偏低(5.2%) | 营收高增(43.2%)"
     }
   ],
-  "norm_version": 130,
-  "norm_divisor": 130
+  "norm_version": 130
 }

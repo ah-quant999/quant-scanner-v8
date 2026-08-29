@@ -1,8 +1,8 @@
 {
   "update_time": "2026-07-25 13:09:55",
   "total_scored": 295,
-  "count_80plus": 0,
-  "max_score": 69.2,
+  "count_80plus": 1,
+  "max_score": 90,
   "top10": [
     {
       "rank": 1,
@@ -14,7 +14,7 @@
       "close": 238.59,
       "pct_chg": -4.72,
       "pct_chg_20d": -52.38,
-      "total_score": 69.2,
+      "total_score": 90,
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
@@ -49,7 +49,7 @@
       "close": 83.88,
       "pct_chg": -1.56,
       "pct_chg_20d": -45.23,
-      "total_score": 60.0,
+      "total_score": 78,
       "sectors": [
         "AI眼镜",
         "专精特新",
@@ -91,7 +91,7 @@
       "close": 160.66,
       "pct_chg": -1.45,
       "pct_chg_20d": -46.62,
-      "total_score": 60.0,
+      "total_score": 78,
       "sectors": [
         "批发业"
       ],
@@ -126,7 +126,7 @@
       "close": 38.33,
       "pct_chg": -2.22,
       "pct_chg_20d": -38.67,
-      "total_score": 60.0,
+      "total_score": 78,
       "sectors": [
         "计算机、通信和其他电子设备制造业",
         "2026中报预增",
@@ -168,7 +168,7 @@
       "close": 162.28,
       "pct_chg": -4.02,
       "pct_chg_20d": -38.21,
-      "total_score": 57.7,
+      "total_score": 75,
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
@@ -203,7 +203,7 @@
       "close": 222.39,
       "pct_chg": -3.06,
       "pct_chg_20d": -45.77,
-      "total_score": 56.2,
+      "total_score": 73,
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
@@ -238,7 +238,7 @@
       "close": 57.71,
       "pct_chg": -8.54,
       "pct_chg_20d": -48.53,
-      "total_score": 56.2,
+      "total_score": 73,
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
@@ -273,7 +273,7 @@
       "close": 48.45,
       "pct_chg": -3.62,
       "pct_chg_20d": -42.66,
-      "total_score": 56.2,
+      "total_score": 73,
       "sectors": [
         "有色金属冶炼和压延加工业"
       ],
@@ -308,7 +308,7 @@
       "close": 33.5,
       "pct_chg": -5.26,
       "pct_chg_20d": -49.02,
-      "total_score": 56.2,
+      "total_score": 73,
       "sectors": [
         "电气机械和器材制造业"
       ],
@@ -343,7 +343,7 @@
       "close": 75.98,
       "pct_chg": -2.79,
       "pct_chg_20d": -62.39,
-      "total_score": 56.2,
+      "total_score": 73,
       "sectors": [
         "金属制品业",
         "2026一季报预增",
@@ -385,7 +385,7 @@
       "close": 43.79,
       "pct_chg": -1.22,
       "pct_chg_20d": -29.71,
-      "total_score": 56.2,
+      "total_score": 73,
       "sectors": [
         "化学原料和化学制品制造业"
       ],
@@ -420,7 +420,7 @@
       "close": 37.44,
       "pct_chg": -2.4,
       "pct_chg_20d": -49.49,
-      "total_score": 56.2,
+      "total_score": 73,
       "sectors": [
         "非金属矿物制品业"
       ],
@@ -455,7 +455,7 @@
       "close": 52.78,
       "pct_chg": -5.19,
       "pct_chg_20d": -52.37,
-      "total_score": 56.2,
+      "total_score": 73,
       "sectors": [
         "电气机械和器材制造业"
       ],
@@ -490,7 +490,7 @@
       "close": 37.91,
       "pct_chg": 9.88,
       "pct_chg_20d": 0,
-      "total_score": 53.8,
+      "total_score": 70,
       "sectors": [
         "电气机械和器材制造业"
       ],
@@ -525,7 +525,7 @@
       "close": 398.99,
       "pct_chg": 1.52,
       "pct_chg_20d": 21.83,
-      "total_score": 53.8,
+      "total_score": 70,
       "sectors": [
         "软件和信息技术服务业"
       ],
@@ -560,7 +560,7 @@
       "close": 86.3,
       "pct_chg": -1.89,
       "pct_chg_20d": 35.08,
-      "total_score": 53.8,
+      "total_score": 70,
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
@@ -595,7 +595,7 @@
       "close": 229.45,
       "pct_chg": 0.73,
       "pct_chg_20d": -35.33,
-      "total_score": 53.8,
+      "total_score": 70,
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
@@ -630,7 +630,7 @@
       "close": 100.39,
       "pct_chg": -4.89,
       "pct_chg_20d": -37.28,
-      "total_score": 53.8,
+      "total_score": 70,
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
@@ -665,7 +665,7 @@
       "close": 128.05,
       "pct_chg": 3.27,
       "pct_chg_20d": -32.41,
-      "total_score": 52.3,
+      "total_score": 68,
       "sectors": [
         "计算机、通信和其他电子设备制造业",
         "AIPC",
@@ -707,7 +707,7 @@
       "close": 50.82,
       "pct_chg": -2.36,
       "pct_chg_20d": -20.96,
-      "total_score": 52.3,
+      "total_score": 68,
       "sectors": [
         "计算机、通信和其他电子设备制造业",
         "2026中报预增",
@@ -740,6 +740,5 @@
       "quality_detail": "ROE差(3.9%) | 营收高增(43.7%) | 消息:中报预增"
     }
   ],
-  "norm_version": 130,
-  "norm_divisor": 130
+  "norm_version": 130
 }

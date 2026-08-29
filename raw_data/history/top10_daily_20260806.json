@@ -2,7 +2,7 @@
   "update_time": "2026-08-06 20:35:09",
   "total_scored": 8,
   "count_80plus": 0,
-  "max_score": 43.1,
+  "max_score": 22.4,
   "top10": [
     {
       "rank": 1,
@@ -14,7 +14,7 @@
       "close": 19.07,
       "pct_chg": 1.87,
       "pct_chg_20d": 0,
-      "total_score": 43.1,
+      "total_score": 22.4,
       "sectors": [],
       "stop_loss": 17.74,
       "target_price": 21.36,
@@ -52,7 +52,7 @@
       "close": 41.38,
       "pct_chg": 1.87,
       "pct_chg_20d": 0,
-      "total_score": 43.1,
+      "total_score": 22.4,
       "sectors": [],
       "stop_loss": 38.48,
       "target_price": 46.35,
@@ -90,7 +90,7 @@
       "close": 82.4,
       "pct_chg": -0.36,
       "pct_chg_20d": 0,
-      "total_score": 43.1,
+      "total_score": 22.4,
       "sectors": [],
       "stop_loss": 76.63,
       "target_price": 92.29,
@@ -128,7 +128,7 @@
       "close": 377.4,
       "pct_chg": -0.42,
       "pct_chg_20d": 0,
-      "total_score": 43.1,
+      "total_score": 22.4,
       "sectors": [],
       "stop_loss": 350.98,
       "target_price": 422.69,
@@ -166,7 +166,7 @@
       "close": 410.0,
       "pct_chg": -1.11,
       "pct_chg_20d": 0,
-      "total_score": 43.1,
+      "total_score": 22.4,
       "sectors": [],
       "stop_loss": 381.3,
       "target_price": 459.2,
@@ -204,7 +204,7 @@
       "close": 179.7,
       "pct_chg": -2.07,
       "pct_chg_20d": 0,
-      "total_score": 43.1,
+      "total_score": 22.4,
       "sectors": [],
       "stop_loss": 167.12,
       "target_price": 201.26,
@@ -242,7 +242,7 @@
       "close": 479.2,
       "pct_chg": -2.64,
       "pct_chg_20d": 0,
-      "total_score": 43.1,
+      "total_score": 22.4,
       "sectors": [],
       "stop_loss": 445.66,
       "target_price": 536.7,
@@ -280,7 +280,7 @@
       "close": 124.4,
       "pct_chg": -2.89,
       "pct_chg_20d": 0,
-      "total_score": 43.1,
+      "total_score": 22.4,
       "sectors": [],
       "stop_loss": 115.69,
       "target_price": 139.33,
@@ -309,6 +309,5 @@
       "quality_detail": "港股暂无基本面数据源(中性不扣分)"
     }
   ],
-  "norm_version": 130,
-  "norm_divisor": 130
+  "norm_version": 130
 }

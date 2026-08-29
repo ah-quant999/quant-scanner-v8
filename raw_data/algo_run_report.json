@@ -1,14 +1,9 @@
 {
-  "update_time": "2026-08-29 18:05:05",
-  "run_start": "2026-08-29 16:46:59",
-  "ok": 31,
-  "fail": 1,
-  "failed_scripts": [
-    {
-      "script": "calc_stock_rps.py",
-      "reason": "超时 >30min"
-    }
-  ],
+  "update_time": "2026-08-29 18:54:20",
+  "run_start": "2026-08-29 18:21:24",
+  "ok": 32,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": [
     "fetch_fundamental_quality.py",
     "fetch_stock_names.py",
