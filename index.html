@@ -10927,8 +10927,8 @@ function drawUpDownChart(){
     // 🛡 2026-08-26 一劳永逸：提前暴露 __ulSwitch，子 tab 按钮在 renderUnlisted 任何位置抛错后仍可切换
     window.__ulSwitch = function(btn, tab){
       window.__ulActivePane = tab;  // guard: 记住当前子 tab，重渲染不再 snap-back
-      var idMap={strong:'ulPaneStrong',ai:'ulPaneAI',pp:'ulPanePP',dbg:'ulPaneDbg'};
-      var all=['ulPaneStrong','ulPaneAI','ulPanePP','ulPaneDbg'];
+      var idMap={strong:'ulPaneStrong',dbg:'ulPaneDbg'};
+      var all=['ulPaneStrong','ulPaneDbg'];
       for(var k=0;k<all.length;k++){var p=document.getElementById(all[k]); if(p) p.style.display=(all[k]===idMap[tab])?'block':'none';}
       var tabs=document.querySelectorAll('#sec-ul .ul-tab');
       for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
@@ -10993,8 +10993,6 @@ function drawUpDownChart(){
     h+='<style>.ul-pane{display:none}.ul-pane.active{display:block}.ul-tab{font-size:12.5px;font-weight:600;color:var(--sub);background:transparent;border:1px solid var(--border);border-radius:8px;padding:6px 13px;cursor:pointer;transition:all .15s}.ul-tab:hover{color:var(--txt);background:var(--bg2)}.ul-tab.active{color:var(--txt);background:var(--card2);border-color:var(--border2);box-shadow:0 1px 4px rgba(0,0,0,.12)}</style>';
     h+='<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px;">';
     h+='<div class="ul-tab' + (_ulAct==='strong'?' active':'') + '" data-ultab="strong" onclick="window.__ulSwitch(this,\'strong\')">🚀 强势突破</div>';
-    h+='<div class="ul-tab' + (_ulAct==='ai'?' active':'') + '" data-ultab="ai" onclick="window.__ulSwitch(this,\'ai\')">🤖 AI 预测</div>';
-    h+='<div class="ul-tab' + (_ulAct==='pp'?' active':'') + '" data-ultab="pp" onclick="window.__ulSwitch(this,\'pp\')">🔮 潜力挖掘</div>';
     h+='<div class="ul-tab' + (_ulAct==='dbg'?' active':'') + '" data-ultab="dbg" onclick="window.__ulSwitch(this,\'dbg\')">🧪 调试专区</div>';
     h+='</div>';
 
@@ -11002,7 +11000,7 @@ function drawUpDownChart(){
     h+='<div class="ul-pane" id="ulPaneDbg" style="display:'+(_ulAct==='dbg'?'block':'none')+'">';
 
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #7b1fa2;">';
-    h+=v8CardHeader('🧪','实验选股调试专区','管理员可见：三重起涨 / CRDS逆势 / 候选池，验证中请勿依赖','update_time',window.SH_FIB);
+    h+=v8CardHeader('🧪','斐波那契F观测窗','','update_time',window.SH_FIB);
     var fib=window.SH_FIB||{};
     h+='<div style="padding:12px 14px;">';
     if(fib.windows&&fib.windows.length){
@@ -11049,6 +11047,27 @@ function drawUpDownChart(){
       h+='<div class="note" style="text-align:center;">调试区数据暂不可用</div>';
     }
     h+='</div></div>';  // /调试卡
+
+    // ── 2026-08-29 主人令：AI 预测 + 潜力挖掘 2 卡并入调试专区（删 AI 预测 / 潜力挖掘 子页面后补位） ──
+    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';
+    h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
+    h+='<span style="font-size:15px;font-weight:700;color:#38bdf8;">🤖 AI 预测 · 市场路径概率</span>';
+    h+='<span class="fresh" id="aiPredFresh">—</span>';
+    h+='<span style="font-size:12px;color:var(--dim);">艾略特 + 江恩 + 缠论 + 形态匹配 · 上证指数</span>';
+    h+='</div>';
+    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">基于 5 年上证日 K 线：涨跌方向形态匹配（≥65% 一致率）统计后续路径分布，<b style="color:#fbbf24">历史回测仅供参考，不构成投资建议</b>，实盘验证 ≥3 个月。</div>';
+    h+='<div id="aiPredBody"><div class="note">加载中…</div></div>';
+    h+='</div>';
+
+    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a78bfa;">';
+    h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
+    h+='<span style="font-size:15px;font-weight:700;color:#a78bfa;">🔮 潜力挖掘</span>';
+    h+='<span class="fresh" id="prPPFresh">—</span>';
+    h+='<span style="font-size:12px;color:var(--dim);">热点概念 → 潜力个股 · 不构成投资建议</span>';
+    h+='</div>';
+    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">⚠️ 基于当前热门概念与个股资金面/量价信号筛选，<b style="color:#fbbf24">不构成任何投资建议</b>，仅作研究观察。</div>';
+    h+='<div id="ppBody"><div class="note">加载中…</div></div>';
+    h+='</div>';
 
     // [2026-08-27 主人令已执行] H反推卡整段删除（调试专区只保留 F窗口 + ETF·龙头 参考）
 
@@ -11534,39 +11553,10 @@ function drawUpDownChart(){
 
     h+='</div>';  // /ulPaneStrong
 
-    // ── pane2: 🤖 AI 预测（2026-08-20 主人令：重写自 market_path_probability 算法，潜力挖掘已删除）──
-    h+='<div class="ul-pane" id="ulPaneAI" style="display:'+(_ulAct==='ai'?'block':'none')+'">';
+    // ── 2026-08-29 主人令：🤖 AI 预测 子页面已删除（卡并入调试专区，见 P3 插入段），pane2 此处不再渲染 ──
 
-    // AI 预测主卡：路径ABC概率 + 当前状态 + 江恩窗口 + 黄金分割 + 缠论分型（渲染函数见 _fillAiPrediction）
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';
-    h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
-    h+='<span style="font-size:15px;font-weight:700;color:#38bdf8;">🤖 AI 预测 · 市场路径概率</span>';
-    h+='<span class="fresh" id="aiPredFresh">—</span>';
-    h+='<span style="font-size:12px;color:var(--dim);">艾略特 + 江恩 + 缠论 + 形态匹配 · 上证指数</span>';
-    h+='</div>';
-    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">基于 5 年上证日 K 线：涨跌方向形态匹配（≥65% 一致率）统计后续路径分布，<b style="color:#fbbf24">历史回测仅供参考，不构成投资建议</b>，实盘验证 ≥3 个月。</div>';
-    h+='<div id="aiPredBody"><div class="note">加载中…</div></div>';
-    h+='</div>';
-
-    h+='</div>';  // /ulPaneAI
-
-    // ── pane3: 🔮 潜力挖掘（2026-08-23 恢复：板块+股票预测推荐，读 POTENTIAL_PICKS）──
-    h+='<div class="ul-pane" id="ulPanePP" style="display:'+(_ulAct==='pp'?'block':'none')+'">';
-
-    // 子卡 A：潜力个股表格（POTENTIAL_PICKS）
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a78bfa;">';
-    h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
-    h+='<span style="font-size:15px;font-weight:700;color:#a78bfa;">🔮 潜力挖掘</span>';
-    h+='<span class="fresh" id="prPPFresh">—</span>';
-    h+='<span style="font-size:12px;color:var(--dim);">热点概念 → 潜力个股 · 不构成投资建议</span>';
-    h+='</div>';
-    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">⚠️ 基于当前热门概念与个股资金面/量价信号筛选，<b style="color:#fbbf24">不构成任何投资建议</b>，仅作研究观察。</div>';
-    h+='<div id="ppBody"><div class="note">加载中…</div></div>';
-    h+='</div>';
-
-    // 2026-08-27 一劳永逸：删除潜力挖掘的 ETF·龙头参考 克隆卡（与调试专区 dbgEtfMapBody 重复，卡片只在一处出现）
-
-    h+='</div>';  // /ulPanePP
+    // ── 2026-08-29 主人令：🔮 潜力挖掘 子页面已删除（卡并入调试专区，见 P3 插入段），pane3 此处不再渲染 ──
+    // 2026-08-27 一劳永逸：删除潜力挖掘 ETF·龙头参考 克隆卡 一并并入调试专区 (dbgEtfMapBody 单点)
 
     el.innerHTML=h;
     // 2026-08-20 主人令：潜力挖掘已删除，替换为 AI 预测（market_path_probability 算法，重写非复制）
@@ -11576,17 +11566,8 @@ function drawUpDownChart(){
     // 后改 setTimeout(0) 仍偶发受时序/缓存影响。现统一用 DOMContentLoaded 触发：
     // 此时 HTML 解析已完成（函数已定义）、head 的 defer 数据脚本已执行（window.MARKET_PATH_PROBABILITY 已就绪）、
     // DOM 元素已存在，彻底免疫时序问题；若脚本晚到（readyState 非 loading）则立即渲染。
-    (function(){
-      function _renderAiPred(){ try{ window._fillAiPrediction && window._fillAiPrediction(); }catch(e){ console.warn('AI预测渲染失败',e); } }
-      if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', _renderAiPred); }
-      else { _renderAiPred(); }
-    })();
-    // 🔮 2026-08-23 恢复：潜力挖掘（板块+股票预测推荐）渲染，DOMContentLoaded 触发避免时序问题
-    (function(){
-      function _renderPP(){ try{ window._fillPotentialPicks && window._fillPotentialPicks(); }catch(e){ console.warn('潜力挖掘渲染失败',e); } }
-      if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', _renderPP); }
-      else { _renderPP(); }
-    })();
+    // 2026-08-29 主人令：AI 预测 / 潜力挖掘 2 子页面已删除，DOMContentLoaded 触发器一并移除；
+    // _fillAiPrediction / _fillPotentialPicks 函数体保留以备复用（v8 「数据全量注入」铁律），data 注入链路不受影响。
     try{
       // 🛡 2026-08-18 主人令：ETF·龙头参考 直接渲染（不依赖已删的 etfMapBody 克隆）
       //   数据源：CONCEPT_RANKING.items（概念 top 8）+ SECTOR_FUND_FLOW.sectors_in（行业 top 6）
@@ -11662,18 +11643,14 @@ function drawUpDownChart(){
     // 2026-08-16 子Tab 切换函数
     window.__ulSwitch = function(btn, tab){
       window.__ulActivePane = tab;  // 🛡 guard: 记住当前子 tab，重渲染不再 snap-back
-      var idMap = {strong:'ulPaneStrong', ai:'ulPaneAI', pp:'ulPanePP', dbg:'ulPaneDbg'};
-      var all = ['ulPaneStrong','ulPaneAI','ulPanePP','ulPaneDbg'];
+      var idMap = {strong:'ulPaneStrong', dbg:'ulPaneDbg'};
+      var all = ['ulPaneStrong','ulPaneDbg'];
       for(var k=0;k<all.length;k++){ var p=document.getElementById(all[k]); if(p) p.style.display = (all[k]===idMap[tab]) ? 'block' : 'none'; }
       var tabs = document.querySelectorAll('#sec-ul .ul-tab');
       for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
       if(btn) btn.classList.add('active');
-      // 🛡 2026-08-23 强化：切到 AI 预测 子 tab 时强制渲染一次，
-      //   彻底免疫「renderUnlisted 内 IIFE 触发时机错位 / 中途重渲染清掉 aiPredBody 未回填」导致的空白。
-      if(tab==='ai'){ try{ if(window._fillAiPrediction) window._fillAiPrediction(); }catch(e){ console.warn('AI预测 子tab渲染失败',e); } }
-      // 🛡 2026-08-23 恢复：切到「潜力挖掘」子 tab 时强制渲染一次，
-      //   免疫「DOMContentLoaded 时 ppBody 尚未构建导致 _fillPotentialPicks 早跑落空」的空白。
-      if(tab==='pp'){ try{ if(window._fillPotentialPicks) window._fillPotentialPicks(); }catch(e){ console.warn('潜力挖掘 子tab渲染失败',e); } }
+      // 2026-08-29 主人令：AI 预测 子 tab 已删除，其强制渲染分支一并移除（_fillAiPrediction 函数体保留以备复用）。
+      // 2026-08-29 主人令：潜力挖掘 子 tab 已删除，其强制渲染分支一并移除（_fillPotentialPicks 函数体保留以备复用）。
     };
     // ⚖️ 2026-08-14 主人令：renderPortfolio 调用已删除（持仓跟踪卡整段移除）
     // 2026-08-14 主人令：涨价榜/情绪周期/潜力挖掘 fill 改由 switchSt('pr') 触发（已迁选股策略子TAB）
