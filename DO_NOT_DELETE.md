@@ -57,7 +57,7 @@
 > 🟢 豁免 `data/POTENTIAL_PICKS.js` + `raw_data/potential_picks.json`：潜力挖掘页已删，孤儿产物，全站0引用，允许删除（2026-08-20 主人令）。
 > 🟢 豁免 `data/BLOAT_CHECK.js`：v8_bloat_check.py 已停生成（产物迁 .workbuddy/v8_bloat_report.json），全站0引用，允许删除（2026-08-29 轻量化收尾）。
 > 🟢 豁免 `data/DELISTED_STOCKS.js`：renderDelisted 已改读 raw_data/delisted_stocks.json，update_v8.py 已移除映射，全站0引用，允许删除（2026-08-29 轻量化收尾）。
-> 注：`data/MAHARO.js` 已于远端 commit 7193a5b93（maharo 全链路移除）先行删除，本地无需再处理。
+> 🟢 豁免 `data/MAHORO.js` + `algorithms/fetch_maharo_signals.py` + `.github/workflows/mahoro_refresh.yml` + `scripts/monitor_maharo_refresh.py`：mahoro 全链路引用/监控已移除（commit 7193a5b93），功能上等同删除，全站0引用，允许物理删除（2026-08-29 主人令：mahoro 孤儿清理）。
 
 ---
 

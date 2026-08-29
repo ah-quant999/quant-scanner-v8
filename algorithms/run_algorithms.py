@@ -5,8 +5,7 @@ run_algorithms.py — v8 本地/自托管 cn runner 的盘后算法编排器
 
 流程：
   0) v8 原生化自产「上游输入」到 仓库根/out/（gold_pool / scan_result / watch_result /
-     guanlan_* / mahoro_signals），由 scanner.py / guanlan_extractor.py /
-     fetch_maharo_signals.py 经 V8_OUT_DIR 钩子产出，彻底脱离 v6。
+     guanlan_*），由 scanner.py / guanlan_extractor.py 经 V8_OUT_DIR 钩子产出，彻底脱离 v6.
      （设 V6_SEED=1 可强制回退到 v6 重灌，仅用于应急。）
   1) 按依赖顺序运行 v8/algorithms/ 下的算法脚本（各自写 out/，沿用 v6 文件名）。
   2) stage_to_raw：按 V6_TO_V8 重命名为 raw_data/（v8 命名）+ 注入 update_time。

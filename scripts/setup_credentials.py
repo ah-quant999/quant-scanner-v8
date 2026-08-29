@@ -18,21 +18,6 @@ DATA_DIR = os.path.join(ROOT, "data")
 ZSXQ_PATH = os.path.join(DATA_DIR, "zsxq_token.json")
 
 
-def input_multiline(prompt):
-    """读取多行输入，以空行结束（适合粘贴 cookie 字符串）。"""
-    print(prompt)
-    lines = []
-    while True:
-        try:
-            line = input()
-        except EOFError:
-            break
-        if line.strip() == "" and lines:
-            break
-        lines.append(line)
-    return "\n".join(lines).strip()
-
-
 def main():
     os.makedirs(DATA_DIR, exist_ok=True)
 

@@ -4,12 +4,11 @@
 把本地凭据整理成「可直接粘贴到 GitHub Secrets」的形式打印出来。
 
 背景：
-  data/zsxq_token.json 和 data/.mahoro_cookies.txt 被 .gitignore 屏蔽，
-  云端 GitHub Actions checkout 后拿不到 → 观澜台 / mahoro 研报恒为 0 只。
-  解决办法是把同样的值存进 GitHub 仓库 Secrets，workflow 已配好注入：
+  data/zsxq_token.json 被 .gitignore 屏蔽，云端 GitHub Actions checkout 后拿不到
+  → 观澜台研报恒为 0 只。解决办法是把同样的值存进 GitHub 仓库 Secrets，
+  workflow 已配好注入：
       .github/workflows/v8_algo_cloud.yml
-        ZSXQ_TOKEN:    ${{ secrets.ZSXQ_TOKEN }}
-        MAHORO_COOKIE: ${{ secrets.MAHORO_COOKIE }}
+        ZSXQ_TOKEN: ${{ secrets.ZSXQ_TOKEN }}
 
 用法：
     python scripts/show_github_secrets.py
@@ -23,7 +22,6 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data")
 ZSXQ_PATH = os.path.join(DATA_DIR, "zsxq_token.json")
-MAHORO_PATH = os.path.join(DATA_DIR, ".mahoro_cookies.txt")
 
 REPO_SECRET_URL = "https://github.com/ah-quant999/quant-scanner-v8/settings/secrets/actions"
 
@@ -37,13 +35,6 @@ def read_zsxq():
     except Exception as e:
         print(f"  [ERR] 解析 {ZSXQ_PATH} 失败: {e}")
         return None
-
-
-def read_mahoro():
-    if not os.path.exists(MAHORO_PATH):
-        return None
-    with open(MAHORO_PATH, "r", encoding="utf-8") as f:
-        return f.read().strip() or None
 
 
 def emit(secret_name, value, hint):
@@ -77,12 +68,10 @@ def main():
 
     emit("ZSXQ_TOKEN", read_zsxq(),
          "先运行 python scripts/setup_credentials.py 写入观澜台 token")
-    emit("MAHORO_COOKIE", read_mahoro(),
-         "先运行 python algorithms/fetch_maharo_signals.py 用邮箱验证码登录一次")
 
     print("=" * 68)
-    print("填完后，云端算法链（v8_algo_cloud.yml）下次运行就能抓这两个源。")
-    print("cookie/token 过期后重新执行上面的步骤，再回来更新同名 Secret 即可。")
+    print("填完后，云端算法链（v8_algo_cloud.yml）下次运行就能抓观澜台源。")
+    print("token 过期后重新执行上面的步骤，再回来更新同名 Secret 即可。")
     print("=" * 68)
 
 

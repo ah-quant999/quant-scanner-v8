@@ -62,11 +62,6 @@ jobs:
       # 2026-08-13 修复：云端 runner 必须走腾讯 GTimg 数据源(mootdx/东财在境外不稳定)，
       # 与 scanner.py 的 GITHUB_ACTIONS 自动识别形成双保险，防止 A股活跃股池缺失。
       CLOUD_RUNNER: "true"
-      # 🔴 2026-08-06 22:15 新增：MAHORO 投行信号需要登录 cookie（本地 data/.mahoro_cookies.txt 被
-      #   .gitignore 屏蔽，云端 checkout 无 cookie → fetch_maharo_signals 每次都跳过 → 数据停更 7 天）。
-      #   通过 GitHub repo secret 注入，云端每天真实拉取。cookie 失效时更新该 secret 即可。
-      #   设置路径：GitHub 仓库 → Settings → Secrets and variables → Actions → MAHORO_COOKIE
-      MAHORO_COOKIE: ${{ secrets.MAHORO_COOKIE }}
       # 2026-08-10 新增：云端代发 mahoro 验证码 / 代登录用的动作开关（本机无法解析 data.maharo.cn）
       MAHORO_ACTION: ${{ github.event.inputs.maharo_action }}
       MAHORO_CODE: ${{ github.event.inputs.maharo_code }}

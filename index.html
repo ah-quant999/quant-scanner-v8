@@ -5595,7 +5595,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><th>维度</th><th>云端 ubuntu-latest</th><th>本机（Windows 家里/单位）</th><th>胜出</th></tr>
           <tr><td>时区</td><td><code>TZ=Asia/Shanghai</code> 显式（防 UTC 偏 8h）</td><td>系统默认 CST（依赖 Windows TZ）</td><td>云端</td></tr>
           <tr><td>emoji 编码</td><td><code>PYTHONIOENCODING=utf-8</code></td><td>3.13 默认 UTF-8，仍可能踩子进程 GBK</td><td>云端</td></tr>
-          <tr><td>数据源覆盖</td><td><code>MAHORO_COOKIE</code> / <code>ZSXQ_TOKEN</code> secrets 完整注入</td><td>本机 <code>data/.zsxq_token.json</code>（gitignore，主人手维护）</td><td>平（本机略即时）</td></tr>
+          <tr><td>数据源覆盖</td><td><code>ZSXQ_TOKEN</code> secret 完整注入</td><td>本机 <code>data/.zsxq_token.json</code>（gitignore，主人手维护）</td><td>平（本机略即时）</td></tr>
           <tr><td>数据源连通性</td><td>跨境 runner IP 慢，但有 probe+重试+镜像兜底（08-12 修复后实测 10/11 通）</td><td>中国 IP 直连快</td><td><b>单点本机优</b>（但已被护栏封死，且双机分叉风险抵消此优 → 总评仍云端）</td></tr>
           <tr><td>SKIP_MOOTDX</td><td><code>=1</code>（云端走 akshare，不依赖通达信）</td><td>默认走 mootdx/baostock（曾踩"黑名单用户"）</td><td>云端</td></tr>
           <tr><td>推送链路</td><td><code>V8_PUSH=1</code> + <code>api_push_raw</code> Contents API 直推 main</td><td>本机不推数据</td><td>云端远优</td></tr>
