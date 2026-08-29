@@ -4628,7 +4628,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <h3><span class="ic">🖥️</span>双机状态 <span class="fresh" style="font-size:10px;color:var(--dim)">[静态]</span></h3>
         <div class="kv"><span class="k">执行节点</span><span><span class="status-dot s-ok"></span>GitHub Actions 云端 ubuntu-latest（主链：cn_fetch + algo_cloud + build_deploy）</span></div>
         <div class="kv"><span class="k">小九（单位机）</span><span><span class="status-dot s-warn"></span>仅应急 workflow_dispatch，不再跑 cron 主链（lemoncat-cn runner · 云端管线看门狗）</span></div>
-        <div class="kv"><span class="k">阿狸咪（家中机）</span><span><span class="status-dot s-ok"></span>本地开发/预览（file:///E:/workspace/quant-scanner-v8/index.html），不接部署</span></div>
+        <div class="kv"><span class="k">阿狸咪（家中机）</span><span><span class="status-dot s-ok"></span>本地预览（file:///E:/workspace/stock-scanner/index.html），不接部署</span></div>
         <div class="kv"><span class="k">failover 守卫</span><span><span class="status-dot s-ok"></span>活跃</span></div>
       </div>
     </div>
@@ -5365,7 +5365,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
     <div class="lg-pane" id="lg-op">
       <div class="card">
         <h3><span class="ic">⏰</span>v8 定时任务矩阵（最新版，已对齐实际 workflow）</h3>
-        <div class="logic-p"><b>执行方说明（2026-08-06 更新）</b>：中国数据抓取已迁 <b>GitHub 云端 ubuntu-latest</b>（实测 push2delay 东财镜像 + akshare 从 GHA 可达，OK 10/11），<code>v8_cn_fetch_cloud</code> 自动调度跑在云端 24/7，<b>不依赖小九停电与否</b>。<b>2026-08-06 新增盘中自愈器 <code>v8_intraday_healer</code></b>：工作日 09:03-15:33 每 30 分钟检测抓取是否过期（>45 分钟）并自动 dispatch 补跑，同样纯云端执行，专门对付 GitHub schedule 漏档（实测 15:00 档会漏）。盘后算法链主链已迁 GitHub 云端 <code>v8_algo_cloud</code>（08-06 收敛 4→1 条 cron 修复静默失效），<code>v8_algo_run</code> 仅保留 workflow_dispatch 应急回退（cn runner 不再跑 cron 主链）；构建/部署/体检/清理/备份/自愈/健康监控全部云端。小九本机只运行看门狗监督 + 盘后算法链，不手动跑数据、不手动部署。</div>
+        <div class="logic-p"><b>执行方说明（2026-08-06 更新）</b>：中国数据抓取已迁 <b>GitHub 云端 ubuntu-latest</b>（实测 push2delay 东财镜像 + akshare 从 GHA 可达，OK 10/11），<code>v8_cn_fetch_cloud</code> 自动调度跑在云端 24/7，<b>不依赖小九停电与否</b>。原盘中自愈器 v8_intraday_healer / Safety Net 兜底 v8_safety_net 已于 2026-08 删除（commit 1fe4f8c71），职能并入 v8_health_patrol + v8_freshness_watch。盘后算法链主链已迁 GitHub 云端 <code>v8_algo_cloud</code>（08-06 收敛 4→1 条 cron 修复静默失效），<code>v8_algo_run</code> 仅保留 workflow_dispatch 应急回退（cn runner 不再跑 cron 主链）；构建/部署/体检/清理/备份/自愈/健康监控全部云端。小九本机只运行看门狗监督 + 盘后算法链，不手动跑数据、不手动部署。</div>
 
         <div class="logic-p">每次抓取后经 <code>api_push_raw</code> 推 <code>raw_data</code> → <code>v8_build_deploy</code> 自动 selective build + 部署 Pages，所以每个时间槽的“更新”必然触发对应前端的“部署”，不遗漏。</div>
         <table class="lg-table">
@@ -5398,7 +5398,6 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>14:00</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
           <tr><td>14:30</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
           <tr><td>15:10</td><td>v8_cn_fetch_cloud</td><td>盘中末档（收盘前最后快照）</td><td>云端</td></tr>
-          <tr style="background:rgba(56,189,248,.06);"><td>09:03-15:33 每30分</td><td>v8_intraday_healer</td><td>盘中自愈：检测抓取过期(>45min)自动补跑，防 GitHub schedule 漏档</td><td>云端</td></tr>
           <tr><td>15:45</td><td>v8_cn_fetch_cloud</td><td>盘后（T+1 龙虎榜·机游共振+北向席位数据产出·v6四色块入榜阈值≥0.8亿）</td><td>云端</td></tr>
           <tr><td>16:30</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓（恒指/港股候选/盘中模块收盘值）</td><td>云端</td></tr>
           <tr><td>盘中每30分</td><td>v8_risk_gauge</td><td>危机雷达/风险温度计实时刷新</td><td>云端</td></tr>
@@ -5415,7 +5414,6 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
           <tr><td>09:00</td><td>v8_cn_fetch_cloud</td><td>T+1 周度/月度统一刷新（日历/今日判定/IPO/两融/宏观等）</td><td>云端</td></tr>
           <tr><td>0-20点每2h</td><td>runner_health_alert</td><td>Runner 健康监控（离线开 Issue）</td><td>云端</td></tr>
-          <tr><td>14:00</td><td>v8_self_heal</td><td>云端自愈器：检测陈旧模块 → 自动 re-fetch 补跑（2026-08-06 起 dispatch 云端主链，不再依赖 cn runner 在线）</td><td>云端</td></tr>
           <tr><td>15:30</td><td>周末选股四模块T+1更新部署</td><td>选股数据更新+部署+臃肿度/崩溃风险体检（v8_bloat_check.py --alert，仅周六）</td><td>本机</td></tr>
           <tr style="background:rgba(56,189,248,.06);"><td>19:30</td><td>v8_weekend_light.py（WorkBuddy 周末轻量维护）</td><td>读交接 / 新股上市+退市股元数据巡检 / 更新 WEEKEND_RUN.js / dispatch 部署</td><td>本机（阿狸咪）</td></tr>
           <tr><td>21:00</td><td>cloud_weekly_cleanup</td><td>orphan 清理 + 新鲜度体检</td><td>云端</td></tr>
@@ -5436,7 +5434,6 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>v8_cn_fetch（应急回退）</td><td>任意时段强制补跑（原中国节点自托管版，cron 已移除；云端版 v8_cn_fetch_cloud 为主力）</td><td>workflow_dispatch</td></tr>
           <tr><td>v8_algo_run</td><td>强制重跑算法链（中国节点小九）</td><td>workflow_dispatch</td></tr>
           <tr><td>v8_build_deploy</td><td>强制全量构建部署</td><td>workflow_dispatch</td></tr>
-          <tr><td>v8_safety_net</td><td>Safety Net 兜底监控（工作日 09:00~17:00 每20min）</td><td>cron + dispatch</td></tr>
           <tr><td>runner_health_alert</td><td>Runner 离线即时告警（可手动触发立即检查）</td><td>workflow_dispatch</td></tr>
         </table>
 
@@ -5460,8 +5457,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <h3><span class="ic">🛡️</span>v8 vs v6 遗产对比</h3>
         <table class="lg-table">
           <tr><th>能力</th><th>v6 实现</th><th>v8 现状</th><th>优先级</th></tr>
-          <tr><td>Safety Net 兜底</td><td>safety-net.yml 每15min轮询</td><td><span style="color:#38bdf8;">✅ 已建 v8_safety_net.yml</span></td><td>P0 必须</td></tr>
-          <tr><td>云端自愈器</td><td>cloud_self_heal 周末T+1补全</td><td><span style="color:#38bdf8;">✅ 已建 v8_self_heal.yml</span></td><td>P1 应补</td></tr>
+          <tr style="opacity:.55"><td>Safety Net 兜底</td><td>safety-net.yml 每15min轮询</td><td><span style="color:#94a3b8;">— 已下线（v8_safety_net.yml 已删除，职能并入 v8_health_patrol）</span></td><td>P0 必须</td></tr>
+          <tr style="opacity:.55"><td>云端自愈器</td><td>cloud_self_heal 周末T+1补全</td><td><span style="color:#94a3b8;">— 已下线（v8_self_heal.yml 已删除，职能并入 v8_freshness_watch）</span></td><td>P1 应补</td></tr>
           <tr><td>每日备份</td><td>cloud_backup.yml 21:00</td><td><span style="color:#38bdf8;">✅ 已建 v8_backup.yml 23:00</span></td><td>P2 可选</td></tr>
           <tr><td>心跳监控上云</td><td>peer_health_monitor 本机</td><td>✅ Actions 日志即心跳</td><td>P2 可选</td></tr>
           <tr><td>防误删清单</td><td>DO_NOT_DELETE.md + pre-commit hook</td><td><span style="color:#38bdf8;">✅ 已建 DO_NOT_DELETE.md</span></td><td>P0 必须</td></tr>
@@ -5473,7 +5470,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p">主人在历史 HANDOVER 中规划的「建议项」，照搬待落地。本周（7/27~8/02）已完成：4 类上游原生化（89da5fc）· 每日洞察/大牛股猎手对标参考页重构（7466799）· 2 次周度锚点 bug 修复（300ec6d/589f601）· 北向席位 hasMultiDay 修复 + 月度汇总加日期注释（589f601）。</div>
         <table class="lg-table">
           <tr><th>时段</th><th>任务</th><th>建议</th><th>频次</th></tr>
-          <tr><td>14:06</td><td>v8_self_heal · 冻结模块诊断+补跑</td><td>⚠️ 建议并入 21:00 窗口，删掉这个独立 workflow</td><td>周度兜底</td></tr>
+          <tr style="opacity:.55"><td>14:06</td><td>v8_self_heal · 冻结模块诊断+补跑</td><td>✅ 已下线（v8_self_heal.yml 已删除，职能并入 v8_health_patrol）</td><td>周度兜底</td></tr>
           <tr><td>首周六</td><td>(建议)月度报告 + STOCK_LIST pinyin 重生 + 依赖体检</td><td><span class="op-tab-time" style="background:#3b82f6;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600">NEW</span> 加 if 首周六 guard 进 21:00 脚本</td><td>月度</td></tr>
           <tr><td>首周日</td><td>(建议)旧数据归档 + git gc/pack + 备份轮转</td><td><span class="op-tab-time" style="background:#3b82f6;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600">NEW</span> 加 if 首周日 guard 进 23:00 脚本</td><td>月度</td></tr>
         </table>
@@ -5495,13 +5492,13 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">部署链路</div>
         <div class="logic-p"><b>v8 独立仓库</b>：中国数据抓取（cn_fetch）→ 推送 raw_data → GitHub Actions 自动触发 build_deploy（workflow_run）→ 构建 data/*.js → 推 main → GitHub Pages 自动发布。小九本机<b>只监督、不手动部署</b>。</div>
         <div class="logic-h">双机状态</div>
-        <div class="logic-p"><b>GitHub 云端（ubuntu runner）</b>：执行<b>中国数据抓取 v8_cn_fetch_cloud</b> + 盘后算法链 <b>v8_algo_cloud</b> + 构建/部署/体检/备份/自愈/健康监控；2026-08-05 起主链已全部云端化。<b>小九（单位机 / lemoncat-cn）</b>：仅作为 GitHub self-hosted runner 应急回退（workflow_dispatch），日常不跑 cron 主链；运行云端管线看门狗监督。<b>阿狸咪（家中机）</b>：本地开发/预览用（file:///E:/workspace/quant-scanner-v8/index.html），不上主站、不接部署/救火。</div>
+        <div class="logic-p"><b>GitHub 云端（ubuntu runner）</b>：执行<b>中国数据抓取 v8_cn_fetch_cloud</b> + 盘后算法链 <b>v8_algo_cloud</b> + 构建/部署/体检/备份/自愈/健康监控；2026-08-05 起主链已全部云端化。<b>小九（单位机 / lemoncat-cn）</b>：仅作为 GitHub self-hosted runner 应急回退（workflow_dispatch），日常不跑 cron 主链；运行云端管线看门狗监督。<b>阿狸咪（家中机）</b>：本地预览用（file:///E:/workspace/stock-scanner/index.html），不上主站、不接部署/救火。</div>
       </div>
 
       <div class="card">
         <h3><span class="ic">⚙️</span>自动化任务 - 说明</h3>
         <div class="logic-h">云端调度</div>
-        <div class="logic-p">v8_cn_fetch_cloud（盘前/盘中/盘后/周末，云端主链）、v8_intraday_healer（盘中自愈：09:03-15:33 每30分检测抓取过期自动补跑）、v8_safety_net（每30分 stale 兜底）、v8_algo_cloud（收盘后算法数据生产，云端主链；本机仅 workflow_dispatch 应急）、v8_backup（每日23:00备份）、runner_health_alert（非交易时段每2h runner 健康监控）。</div>
+        <div class="logic-p">v8_cn_fetch_cloud（盘前/盘中/盘后/周末，云端主链）、v8_algo_cloud（收盘后算法数据生产，云端主链；本机仅 workflow_dispatch 应急）、v8_backup（每日23:00备份）、runner_health_alert（非交易时段每2h runner 健康监控）；原盘中自愈与 stale 兜底已下线（v8_intraday_healer / v8_safety_net），职能并入 v8_health_patrol + v8_freshness_watch。</div>
         <div class="logic-h">本机监督</div>
         <div class="logic-p">小九-v8云端管线看门狗：每天 08:00–22:00 每小时运行 v8_cloud_watchdog.py，检查 runner 在线、cn_fetch/build_deploy 状态、raw_data 陈旧度、站点存活。发现异常写 _v8_watchdog.log 并告警。</div>
         <div class="logic-h">v6 状态</div>
@@ -5511,7 +5508,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
       <div class="card">
         <h3><span class="ic">💾</span>数据新鲜度 / 看门狗 - 说明</h3>
         <div class="logic-h">云端兜底</div>
-        <div class="logic-p">v8_safety_net 每30分钟检查 raw_data 最新 commit，超过阈值自动 dispatch cn_fetch 全量兜底；阈值当前为1小时（方案B严格版待生效）。</div>
+        <div class="logic-p">v8_health_patrol 每30分钟检查 raw_data 最新 commit，超过阈值自动 dispatch cn_fetch 全量兜底；阈值当前为1小时（方案B严格版待生效）。</div>
         <div class="logic-h">本机闸门</div>
         <div class="logic-p">v8_cloud_watchdog.py 核对核心 data/*.js 的 update_time，raw_data 超过90分钟无新 commit 即 ALERT；本机只告警/汇报，不自动覆盖数据。</div>
         <div class="logic-h">候选股池来源级监控（2026-08-08 新增）</div>
@@ -5684,8 +5681,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">⑫ 动量共识卡删重复时间戳 + ⑬ 对齐审计结论</div>
         <div class="logic-p">⑫ 删动量共识说明段尾部重复「更新 08-19 18:26」（顶部胶囊已够）。⑬ 三轴审计：raw_data→data 88 个全对齐（0 缺 data）；data→render 11 个孤儿 data（MACRO 已删，10 个历史待小九）；algorithm→ORDER 20 个孤儿算法（4 个今晚已补，其余待小九）。<b>待小九</b>：历史孤儿 data 10 个 + 孤儿算法 ~16 个 + fetcher 补字段 + algo 网络瞬断根治。</div>
 
-        <div class="logic-h">📌 双机分时铁律（今晚重申）</div>
-        <div class="logic-p"><b>小九白天（7:45-17:45）独家</b>：盘中每 30 分 freshness_guard + 每小时看门狗 + 15:30 收盘刷新 + 17:00 选股四模块全量部署。<b>阿狸咪夜间/周末</b>（18:00-次日7:30 + 周末）：唯一部署者。08-19 主人令「改完直接上线不再逐项问」双方沿用。红涨绿跌铁律全站执行；动护栏文件前先说边界。rrule BYHOUR 是 CST 非 UTC；cron 语法才是 UTC。</div>
+        <div class="logic-h">📌 双机分时铁律（现行模型，2026-08-29 更新）</div>
+        <div class="logic-p"><b>云端主链 24/7</b>：GitHub Actions ubuntu-latest 跑 <code>v8_cn_fetch_cloud</code>（数据抓取）+ <code>v8_algo_cloud</code>（算法链）+ <code>v8_build_deploy</code>（部署）+ <code>v8_health_patrol</code>/<code>v8_freshness_watch</code>（兜底监控），全部 cron 自动调度，<b>不依赖本地机器</b>。<b>小九（单位机 / lemoncat-cn runner）</b>：看门狗监督 + 应急 <code>workflow_dispatch</code> 兜底，不再跑 cron 主链。<b>阿狸咪（家中机）</b>：本地预览用（<code>file:///E:/workspace/stock-scanner/index.html</code>），不接部署、不接救火。改完+审计通过即直接上线，不再逐次请示（2026-08-29 主人授权放宽）。</div>
 
         <div class="logic-h" style="background:linear-gradient(135deg,#7c2d12,#9a3412);color:#fed7aa;padding:8px 12px;border-radius:6px;margin:12px 0;">📋 2026-08-11 今日改动汇总（双机运维/逻辑详解/防覆盖）</div>
         <div class="logic-p"><b>推送入库</b>：commit <code>c232edf5a</code> 起所有本地→远端已同步（<code>git pull --rebase</code> 验证）。共 7 个功能 commit + 多份 v8 build。</div>
@@ -9276,7 +9273,6 @@ function drawUpDownChart(){
 
           {name:'每日数据体检', source:'HEALTH_CHECK', freq:'每日2次', slots:['09:00','17:00'], note:'数据完整性检查 · 覆盖构建/部署/备份健康'},
 
-          {name:'盘中云端自愈 (v8_intraday_healer)', source:'RUNNER_STATUS', freq:'工作日09:03-15:33每30分', slots:['09:03','09:33','10:03','10:33','11:03','11:33','13:03','13:33','14:03','14:33','15:03','15:33'], note:'检测抓取过期(>45min)自动补跑 · 防 GitHub schedule 漏档 · 纯云端'},
 
           {name:'运维常态巡检 (v8_ops_self_heal)', source:'HEALTH_CHECK', freq:'每30分(云端cron)', slots:['00:30','01:00','01:30','02:00','02:30','03:00','03:30','04:00','04:30','05:00','05:30','06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00','22:30','23:00','23:30'], note:'v8_health_check.py --heal 全站42卡巡检+自动治愈 · 纯云端不依赖小九/阿狸咪'},
 
