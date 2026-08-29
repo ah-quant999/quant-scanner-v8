@@ -1136,7 +1136,23 @@ function _buildJudgmentEnvHTML(d){
     + '<span style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:'+lvColor+'">'+lightDot(lvColor,14)+'今日信号 · '+({green:'积极',yellow:'观望',red:'防守'}[lv])+'</span>'
     + '<span style="font-size:11px;color:var(--sub)">'+consTxt+'</span>'
     + (warnTxt ? '<span style="display:inline-flex;align-items:center;gap:3px;background:#f59e0b18;border:1px solid #f59e0b40;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:#f59e0b;margin-left:4px">⚠️ '+warnTxt+'</span>' : '')
-    + '<span style="margin-left:auto;font-size:10px;color:var(--dim)">🟢 积极 · 🟡 观望 · 🔴 防守</span></div>';  // 2) 时事滚动（紧凑）
+    + '<span style="margin-left:auto;font-size:10px;color:var(--dim)">🟢 积极 · 🟡 观望 · 🔴 防守</span></div>';
+  /* ===== ⚖️ 择时裁决行（2026-08-29 主人令：今日信号与 AI速览 冲突，统一以此为准） =====
+     「今日信号」仅为盘前读盘参考（JUDGMENT_DATA，08:25 生成，无回测证据）；
+     真正决定「能不能开仓」的是全站唯一裁决源 v8MarketGate()。本行把它并列显示。 */
+  var _gj = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : {ok:false,name:'暂无数据',icon:'⚪',color:'#94a3b8',verdict:'等待数据',evidence:'',date:''};
+  h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 12px;background:'+_gj.color+'12;'
+     + 'border:1px solid '+_gj.color+'59;border-radius:8px;font-size:12px;flex-wrap:wrap">'
+     + '<span style="font-size:12.5px;font-weight:800;color:'+_gj.color+';">⚖️ 择时裁决（全站唯一）</span>'
+     + '<span style="font-size:11px;font-weight:700;color:'+_gj.color+';background:rgba(255,255,255,.08);'
+     + 'border:1px solid '+_gj.color+'59;padding:2px 8px;border-radius:6px;">'+_gj.icon+' '+_gj.name+' · '+_gj.verdict+'</span>'
+     + (_gj.date ? '<span style="font-size:10px;color:var(--dim)">'+_gj.date+'</span>' : '')
+     + '</div>';
+  h += '<div style="font-size:10.5px;color:var(--dim);line-height:1.6;margin:-4px 0 10px;padding:0 2px;">'
+     + '📌 <b>上方「今日信号」为盘前读盘参考（08:25 生成，无回测证据）</b>；'
+     + '是否开仓一律以上方「⚖️ 择时裁决」为准 —— 它是全站唯一有回测支撑的择时信号'
+     + '（T+10 胜率 54.6% vs 无门控基准 48.1%）。'
+     + '</div>';
   var fullMb = (typeof window !== 'undefined' && window.MACRO_BRIEF) || {};
   var mb = (fullMb.headline ? fullMb : (d.macro_brief || {})) || {};
   var news = (fullMb.news_brief && fullMb.news_brief.length ? fullMb.news_brief : (mb.news_brief || [])) || [];
