@@ -33,7 +33,7 @@ FRESHNESS_SLA = {
     "cockpit_backtest.json":        {"max_age_h": 48, "category": "post_close"},
     "lhb_data.json":                {"max_age_h": 24, "category": "post_close"},
     "top5_track.json":              {"max_age_h": 24, "category": "post_close"},
-    "h_auto_buy_track.json":        {"max_age_h": 24, "category": "post_close"},
+    "h_auto_buy_history.json":       {"max_age_h": 24, "category": "post_close"},
     "stock_quote.json":             {"max_age_h": 4,  "category": "intraday"},
     "limit_up_heatmap.json":        {"max_age_h": 4,  "category": "intraday"},
     "sector_fund_flow.json":        {"max_age_h": 24, "category": "post_close"},
@@ -45,7 +45,7 @@ FRESHNESS_SLA = {
 def parse_update_time(s):
     if not s or not isinstance(s, str):
         return None
-    for fmt in ["%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d"]:
+    for fmt in ["%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%d"]:
         try:
             return datetime.strptime(s, fmt).replace(tzinfo=CST)
         except ValueError:
