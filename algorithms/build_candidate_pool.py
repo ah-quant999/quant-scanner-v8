@@ -24,6 +24,7 @@ import sys
 import time
 import threading
 import gc
+import datetime
 
 # 名称归一化共享模块（2026-08-14 抽出，消除与 final_recommend/guanlan_extractor/scanner 的重复）
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -76,6 +77,13 @@ if _requests is not None:
 _DATA_FALLBACK = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "out")
 DATA = os.environ.get("V8_OUT_DIR") or _DATA_FALLBACK
 OUT = os.path.join(DATA, "candidate_pool.json")
+# #14 解耦：慢变成员表（独立于每日指标，hysteresis 防抖）
+#   - out/ 为工作副本；raw_data/ 为持久副本（云端工作流会 git add raw_data/ 入库，
+#     保证跨云端 runner 运行 hysteresis 不失效）。
+MEMBERS_OUT = os.path.join(DATA, "candidate_members.json")
+MEMBERS_RAW = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                           "raw_data", "candidate_members.json")
+MEMBER_HYSTERESIS_DAYS = 5   # 掉出成交额前N后仍保留的交易日数（防每日 churn）
 
 # ════════════════════════════════════════════════════════════════
 # mootdx TrafficStatSocket 泄漏长期修复：
@@ -631,11 +639,84 @@ def _norm(code, name, market_raw, full_code):
     return None
 
 
+# ---------- 候选池解耦（#14）：慢变成员表 + 快变每日指标 ----------
+def _fetch_price_amount_gtimg(codes):
+    """批量取现价/成交额（仅用确认安全的 f[3]=现价、f[6]=成交量 字段），用于补全
+    历史留存成员的当日指标。失败返回空 dict（非致命）。qt.gtimg.cn 本机+云端双环境可达。"""
+    if not codes:
+        return {}
+    import urllib.request, ssl
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    out = {}
+    for i in range(0, len(codes), 80):
+        batch = codes[i:i + 80]
+        q = "https://qt.gtimg.cn/q=" + ",".join(batch)
+        try:
+            req = urllib.request.Request(q, headers={
+                "User-Agent": "Mozilla/5.0", "Referer": "https://gu.qq.com/"})
+            b = urllib.request.urlopen(req, timeout=12, context=ctx).read().decode("gbk", "ignore")
+        except Exception as e:
+            print(f"  [指标-GTimg] 批次失败: {type(e).__name__} {str(e)[:60]}")
+            continue
+        for line in b.split(";"):
+            line = line.strip()
+            if not line.startswith("v_"):
+                continue
+            try:
+                code = line[2:line.index("=")]
+                payload = line[line.index('"') + 1:line.rindex('"')]
+                f = payload.split("~")
+                price = float(f[3]) if len(f) > 3 and f[3] else 0.0
+                vol = float(f[6]) if len(f) > 6 and f[6] else 0.0
+                out[code] = {"price": price, "amount": price * vol}
+            except Exception:
+                continue
+    print(f"  [指标-GTimg] 取到 {len(out)}/{len(codes)} 只现价/成交额")
+    return out
+
+
+def _merge_membership(today, prev, hyst_days, today_date):
+    """慢变成员表合并：今日派生集合 ∪ 历史成员(hysteresis 防抖)。
+
+    - 今日出现的成员：采用今日数据，更新 last_seen=today。
+    - 今日未出现但历史在册的成员：
+        * 来源含「观澜台」(自选/研报) → 永久保留(pinned)；
+        * 否则若在 hyst_days 内曾出现 → 保留（防单日成交额排名抖动 churn）；
+        * 否则 → 剔除（真正退出活跃区）。
+    - 首次运行(prev 为空) → 成员 = 今日集合。
+    """
+    members = {}
+    for k, v in today.items():
+        e = dict(v)
+        e["first_seen"] = (prev.get(k) or {}).get("first_seen") or today_date
+        e["last_seen"] = today_date
+        members[k] = e
+    for k, v in prev.items():
+        if k in members:
+            continue
+        last = v.get("last_seen") or ""
+        pinned = any(s == "观澜台" for s in v.get("sources", []))
+        days_gone = 999
+        if last:
+            try:
+                days_gone = (datetime.date.fromisoformat(today_date) -
+                             datetime.date.fromisoformat(last)).days
+            except Exception:
+                days_gone = 999
+        if pinned or days_gone <= hyst_days:
+            e = dict(v)
+            e.pop("_today", None)
+            members[k] = e
+    return members
+
+
 # ---------- 主构建 ----------
 def build():
     pool = {}  # key -> {code,name,market,board_label,sources:[]}
 
-    def add(key, code, name, market, board, source):
+    def add(key, code, name, market, board, source, metrics=None):
         if not key or not code:
             return
         # ★ 干净名字解析: 无论哪层(raw/研报/行情)传入的 name 都强制校正,
@@ -651,6 +732,9 @@ def build():
             pool[key] = {
                 "code": code, "name": clean, "market": market,
                 "board_label": board, "sources": [source],
+                # 快变每日指标（#14）：成交额/现价/涨跌幅/量比，由调用方随行情一并传入
+                "_metrics": metrics or {"price": 0.0, "pct_chg": 0.0,
+                                       "volume_ratio": 0.0, "amount": 0.0},
             }
 
     # 1) A股 主板/创业板/科创板 各前100（按成交额）
@@ -659,6 +743,9 @@ def build():
         code_col = "代码" if "代码" in df.columns else df.columns[0]
         name_col = "名称" if "名称" in df.columns else df.columns[1]
         amt_cols = [c for c in df.columns if "成交额" in c or "amount" in c.lower()]
+        price_col = next((c for c in df.columns if c in ("最新价", "price", "现价", "收盘")), None)
+        pct_col = next((c for c in df.columns if c in ("涨跌幅", "pct_chg", "涨跌幅(%)", "changepct")), None)
+        vr_col = next((c for c in df.columns if c in ("量比", "volume_ratio", "turnoverratio")), None)
         if amt_cols:
             amt = amt_cols[0]
             df = df.copy()
@@ -672,7 +759,13 @@ def build():
                         continue
                     c = raw.zfill(6)
                     mkt = "sh" if c.startswith("6") else "sz"
-                    add(f"{mkt}_{c}", c, r[name_col], mkt, b, f"{b}成交前{TOP_PER_BOARD}")
+                    m = {
+                        "amount": float(r[amt]) if amt in r and r[amt] is not None else 0.0,
+                        "price": float(r[price_col]) if price_col and r.get(price_col) is not None else 0.0,
+                        "pct_chg": float(r[pct_col]) if pct_col and r.get(pct_col) is not None else 0.0,
+                        "volume_ratio": float(r[vr_col]) if vr_col and r.get(vr_col) is not None else 0.0,
+                    }
+                    add(f"{mkt}_{c}", c, r[name_col], mkt, b, f"{b}成交前{TOP_PER_BOARD}", metrics=m)
             print(f"  [A股] 主板/创业板/科创板 各前{TOP_PER_BOARD} 已并入")
         else:
             print("  [A股] 未找到成交额列，跳过")
@@ -693,7 +786,9 @@ def build():
                 raw = "".join(ch for ch in raw if ch.isdigit()).zfill(5)
                 if not raw:
                     continue
-                add(f"hk_{raw}", raw, r[name_col], "hk", "港股", f"港股成交前{HK_TOP}")
+                m = {"amount": float(r[amt]) if amt in r and r[amt] is not None else 0.0,
+                     "price": 0.0, "pct_chg": 0.0, "volume_ratio": 0.0}
+                add(f"hk_{raw}", raw, r[name_col], "hk", "港股", f"港股成交前{HK_TOP}", metrics=m)
             print(f"  [港股] 前{HK_TOP} 已并入（akshare实时）")
         else:
             print("  [港股] 未找到成交额列，跳过")
@@ -748,57 +843,113 @@ def build():
     # 补充行业 / 概念 / 板块元数据（用于个股查询展示）
     _enrich_industry_concepts(pool)
 
-    # 汇总来源分布
+    # ── #14 解耦：慢变成员表（hysteresis 防抖） ──
+    # 今日派生集合(pool) 仅代表「当日成交额前N」；若直接用作候选池，个股会随每日
+    # 排名抖动而每日 churn。改为：并入历史成员表，掉出前N者仍保留
+    # MEMBER_HYSTERESIS_DAYS 个交易日（观澜台来源永久保留），成员稳定后才交给下游扫描。
+    today_date = time.strftime("%Y-%m-%d")
+    prev_members = {}
+    for _pp in (MEMBERS_RAW, MEMBERS_OUT):
+        if os.path.exists(_pp):
+            try:
+                prev_members = json.load(open(_pp, encoding="utf-8")).get("stocks", {}) or {}
+                if prev_members:
+                    break
+            except Exception:
+                continue
+    members = _merge_membership(pool, prev_members, MEMBER_HYSTERESIS_DAYS, today_date)
+
+    # 汇总来源分布（基于慢变成员表）
     from collections import Counter
     dist = Counter()
-    for v in pool.values():
+    for v in members.values():
         for s in v["sources"]:
             dist[s] += 1
     out = {
         "update_time": time.strftime("%Y-%m-%d %H:%M:%S"),
-        "total": len(pool),
+        "total": len(members),
         "source_dist": dict(dist),
-        "stocks": pool,
+        "stocks": members,
     }
-    # 🛡 2026-08-27 主人令（运维股池黄色根因）：A股行情源（新浪排行等）当天若只返回部分，
-    #   主板/创业板/科创板来源数量会显著缩水（如 63/20/17 < 期望100）→ 运维面板三个来源黄色。
-    #   一劳永逸：当任一 A股来源数量 < TOP_PER_BOARD*0.6 时，从上一份 candidate_pool.json 合并
-    #   该来源的旧股票补齐（保留旧数据兜底，杜绝"缩水覆盖"）。
+    # 🛡 2026-08-27 主人令（运维股池黄色根因）增强：
+    #   今日任一 A股来源数量 < TOP_PER_BOARD*0.6 时，行情抓取不完整；
+    #   把历史成员表中该板成员「视同今日出现」补回，杜绝缩水覆盖。
     try:
-        _prev = {}
-        if os.path.exists(OUT):
-            _prev = json.load(open(OUT, encoding="utf-8")).get("stocks", {})
         _merged = 0
         for _b in ("主板", "创业板", "科创板"):
             _src = f"{_b}成交前{TOP_PER_BOARD}"
-            _cnt = dist.get(_src, 0)
-            if _cnt < TOP_PER_BOARD * 0.6 and _prev:
-                for _k, _v in _prev.items():
-                    if not isinstance(_v, dict) or _src not in (_v.get("sources") or []):
+            if dist.get(_src, 0) < TOP_PER_BOARD * 0.6 and prev_members:
+                for _k, _v in prev_members.items():
+                    if _k in members:
                         continue
-                    if _k in pool:
+                    if _src not in (_v.get("sources") or []):
                         continue
-                    pool[_k] = {kk: _v.get(kk) for kk in ("code", "name", "market", "board_label")}
-                    pool[_k]["sources"] = [s for s in (_v.get("sources") or []) if s != _src] + [_src]
+                    members[_k] = {kk: _v.get(kk) for kk in
+                                  ("code", "name", "market", "board_label", "sources",
+                                   "first_seen", "last_seen", "metrics")}
                     _merged += 1
         if _merged:
             dist = Counter()
-            for v in pool.values():
+            for v in members.values():
                 for s in v["sources"]:
                     dist[s] += 1
-            out = {
-                "update_time": time.strftime("%Y-%m-%d %H:%M:%S"),
-                "total": len(pool),
-                "source_dist": dict(dist),
-                "stocks": pool,
-                "merge_note": f"来源数量不足，从上一份候选池合并补入 {_merged} 只（防缩水覆盖）",
-            }
-            print(f"  🛡 候选池数量不足保护：合并上一份 {_merged} 只 → total={len(pool)}")
+            print(f"  🛡 候选池数量不足保护：补回历史成员 {_merged} 只 → total={len(members)}")
     except Exception as e:
-        print(f"  ⚠️ 候选池数量保护异常（继续写当前数据）: {e}")
+        print(f"  ⚠️ 候选池数量保护异常（继续）: {e}")
+    # 6) 快变每日指标：今日成员用当日指标覆盖；历史留存成员 GTimg 补全现价/成交额（best-effort）
+    _retain_codes = []
+    for k, v in members.items():
+        if "_metrics" in v:
+            v["metrics"] = dict(v.pop("_metrics"))
+            v["metrics"]["date"] = today_date
+        else:
+            c = v["code"]
+            _retain_codes.append(("hk" + c) if v.get("market") == "hk"
+                                 else (("sh" if c.startswith("6") else "sz") + c))
+    if _retain_codes:
+        try:
+            _pa = _fetch_price_amount_gtimg(_retain_codes)
+            for k, v in members.items():
+                if "metrics" in v:
+                    continue
+                c = v["code"]
+                gkey = ("hk" + c) if v.get("market") == "hk" else (("sh" if c.startswith("6") else "sz") + c)
+                pa = _pa.get(gkey)
+                if pa:
+                    v["metrics"] = {"price": pa["price"], "pct_chg": 0.0,
+                                    "volume_ratio": 0.0, "amount": pa["amount"], "date": today_date}
+                else:
+                    v["metrics"] = {"price": 0.0, "pct_chg": 0.0,
+                                    "volume_ratio": 0.0, "amount": 0.0, "date": today_date}
+        except Exception as e:
+            print(f"  ⚠️ 留存成员指标补全失败（置零）: {e}")
+            for k, v in members.items():
+                if "metrics" not in v:
+                    v["metrics"] = {"price": 0.0, "pct_chg": 0.0,
+                                    "volume_ratio": 0.0, "amount": 0.0, "date": today_date}
+
+    # 7) 落盘：慢变成员表（纯成员基线，不含每日指标）→ out/ + 持久 raw_data/
+    _members_out = {
+        "update_time": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "total": len(members),
+        "hysteresis_days": MEMBER_HYSTERESIS_DAYS,
+        "source_dist": dict(dist),
+        "stocks": {k: {kk: vv for kk, vv in v.items() if kk not in ("metrics", "_metrics")}
+                   for k, v in members.items()},
+    }
+    with open(MEMBERS_OUT, "w", encoding="utf-8") as f:
+        json.dump(_members_out, f, ensure_ascii=False, indent=2)
+    try:
+        os.makedirs(os.path.dirname(MEMBERS_RAW), exist_ok=True)
+        with open(MEMBERS_RAW, "w", encoding="utf-8") as f:
+            json.dump(_members_out, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"  ⚠️ 慢变成员表写 raw_data 失败（out 已写）: {e}")
+    print(f"  ✅ 慢变成员表已写：{len(members)} 只 → candidate_members.json")
+
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
-    print(f"\n✅ 候选股池构建完成：{len(pool)} 只")
+    print(f"\n✅ 候选股池构建完成：{len(members)} 只")
     print("   来源分布:", dict(dist))
     # 2026-08-09 调试：把读取侧的真实状态落盘，便于云端 run 后核验
     # 「双源是否真的并入库」（step_run 吞掉了 stdout，CI 日志看不到内部打印）。
