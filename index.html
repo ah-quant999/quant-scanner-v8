@@ -1137,22 +1137,8 @@ function _buildJudgmentEnvHTML(d){
     + '<span style="font-size:11px;color:var(--sub)">'+consTxt+'</span>'
     + (warnTxt ? '<span style="display:inline-flex;align-items:center;gap:3px;background:#f59e0b18;border:1px solid #f59e0b40;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:#f59e0b;margin-left:4px">⚠️ '+warnTxt+'</span>' : '')
     + '<span style="margin-left:auto;font-size:10px;color:var(--dim)">🟢 积极 · 🟡 观望 · 🔴 防守</span></div>';
-  /* ===== ⚖️ 择时裁决行（2026-08-29 主人令：今日信号与 AI速览 冲突，统一以此为准） =====
-     「今日信号」仅为盘前读盘参考（JUDGMENT_DATA，08:25 生成，无回测证据）；
-     真正决定「能不能开仓」的是全站唯一裁决源 v8MarketGate()。本行把它并列显示。 */
-  var _gj = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : {ok:false,name:'暂无数据',icon:'⚪',color:'#94a3b8',verdict:'等待数据',evidence:'',date:''};
-  h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 12px;background:'+_gj.color+'12;'
-     + 'border:1px solid '+_gj.color+'59;border-radius:8px;font-size:12px;flex-wrap:wrap">'
-     + '<span style="font-size:12.5px;font-weight:800;color:'+_gj.color+';">⚖️ 择时裁决（全站唯一）</span>'
-     + '<span style="font-size:11px;font-weight:700;color:'+_gj.color+';background:rgba(255,255,255,.08);'
-     + 'border:1px solid '+_gj.color+'59;padding:2px 8px;border-radius:6px;">'+_gj.icon+' '+_gj.name+' · '+_gj.verdict+'</span>'
-     + (_gj.date ? '<span style="font-size:10px;color:var(--dim)">'+_gj.date+'</span>' : '')
-     + '</div>';
-  h += '<div style="font-size:10.5px;color:var(--dim);line-height:1.6;margin:-4px 0 10px;padding:0 2px;">'
-     + '📌 <b>上方「今日信号」为盘前读盘参考（08:25 生成，无回测证据）</b>；'
-     + '是否开仓一律以上方「⚖️ 择时裁决」为准 —— 它是全站唯一有回测支撑的择时信号'
-     + '（T+10 胜率 54.6% vs 无门控基准 48.1%）。'
-     + '</div>';
+  /* 2026-08-30 主人令：全站择时裁决已统一收敛到「实时数据 → AI市场速览」顶部，
+     今日判定不再重复展示择时结论，仅保留盘前读盘参考（共识/星级/时事），避免多处评判混乱。 */
   var fullMb = (typeof window !== 'undefined' && window.MACRO_BRIEF) || {};
   var mb = (fullMb.headline ? fullMb : (d.macro_brief || {})) || {};
   var news = (fullMb.news_brief && fullMb.news_brief.length ? fullMb.news_brief : (mb.news_brief || [])) || [];
@@ -10404,19 +10390,8 @@ function drawUpDownChart(){
     sumTxt+='板块与共振见下方明细；<b style="color:#8aa0c2;">开仓与否一律以「⚖️ 全站择时裁决」为准</b>';
     h+='<div style="background:#0f1a2e;border-radius:10px;padding:10px 16px;margin-bottom:14px;box-shadow:inset 4px 0 0 0 '+lightColor+';font-size:13px;line-height:1.8;color:#dbe6f7;">📌 <b>今日结论</b>：'+sumTxt+'</div>';
 
-    /* ===== ⚖️ 全站择时裁决条（2026-08-29 主人令：三处冲突信号对齐后的唯一裁决） =====
-       本条是驾驶舱/全站【唯一】的择时结论，数据来自 OPTIMIZED_STRATEGY.current_regime，
-       是全站唯一有回测证据的择时信号。下方两盏灯仅为环境观测，不得用于决策。 */
-    var _g = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : {ok:false,name:'暂无数据',icon:'⚪',color:'#94a3b8',verdict:'等待数据',evidence:'',date:''};
-    h+='<div style="background:linear-gradient(135deg,'+_g.color+'1f,'+_g.color+'0a);border:1px solid '+_g.color+'59;border-radius:10px;padding:10px 16px;margin-bottom:12px;box-shadow:inset 4px 0 0 0 '+_g.color+';">';
-    h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;line-height:1.7;">';
-    h+='<span style="font-size:14px;font-weight:800;color:'+_g.color+';">⚖️ 全站择时裁决（唯一）</span>';
-    h+='<span style="font-size:12px;font-weight:700;color:'+_g.color+';background:rgba(255,255,255,.08);border:1px solid '+_g.color+'59;padding:2px 9px;border-radius:6px;">'+_g.icon+' '+_g.name+' · '+_g.verdict+'</span>';
-    if(_g.date) h+='<span style="font-size:10.5px;color:#8aa0c2;">'+_g.date+'</span>';
-    h+='</div>';
-    if(_g.evidence) h+='<div style="font-size:11px;color:#8aa0c2;line-height:1.6;margin-top:4px;">'+_g.evidence+'</div>';
-    h+='<div style="font-size:10.5px;color:#8aa0c2;line-height:1.6;margin-top:3px;">📌 下方两盏灯 + 「今日判定·今日信号」+「AI市场速览」<b style="color:#fbbf24;">均无回测证据，仅供读盘参考</b>，不得作为开仓依据。</div>';
-    h+='</div>';
+    /* 2026-08-30 主人令：全站择时裁决已统一收敛到「实时数据 → AI市场速览」顶部，
+       驾驶舱只保留环境观测（两盏灯），不再重复展示择时结论，避免多处评判混乱。 */
 
     h+='<div style="display:flex;gap:14px;margin-bottom:14px;align-items:stretch;">';
     h+='<div style="flex:1;min-width:0;background:'+lightBg+';color:'+lightColor+';border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;border:1px solid '+(crisisScore>=70||mktAvg<=-3?'rgba(255,107,129,.4)':crisisScore>=50||(north5<0&&crisisScore>=40)||mktAvg<0?'rgba(255,183,77,.4)':'rgba(94,224,160,.4)')+';">';
