@@ -41,6 +41,16 @@ jobs:
               print("✅ 仓库内无 v6/旧备份残留，清理范围安全")
           PY
 
+      - name: "🛡 同步 DO_NOT_DELETE.js（周日固定：md → js 渲染，逻辑详解页「防删」子页注入）"
+        run: |
+          echo "── 同步 DO_NOT_DELETE.md → data/DO_NOT_DELETE.js（v8 逻辑详解页防删子页用）──"
+          python3 scripts/gen_do_not_delete_js.py
+          if [ ! -f data/DO_NOT_DELETE.js ]; then
+            echo "⚠️ DO_NOT_DELETE.js 未生成（缺少 DO_NOT_DELETE.md？），跳过"
+          else
+            echo "✅ DO_NOT_DELETE.js 已重生成，sha10=$(head -1 data/DO_NOT_DELETE.js | grep -oE '[a-f0-9]{10}' | head -1)"
+          fi
+
       - name: "🧹 清理缓存与修剪心跳日志"
         env:
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}

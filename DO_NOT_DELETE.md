@@ -52,6 +52,7 @@
 | `data/LHB_HISTORY.js` | 龙虎榜历史数据（最大文件 1.3MB） | 共振日历数据源 |
 
 **注意**: `data/` 下所有 `.js` 文件都是前端运行时依赖，**禁止批量删除**。`data/freshness_status.json` 由体检 workflow 自动生成。
+| `data/DO_NOT_DELETE.js` | 禁止删除清单的视图（window.DO_NOT_DELETE_HTML + UPDATED 注入）；由 `scripts/gen_do_not_delete_js.py` 从 `DO_NOT_DELETE.md` 解析；sha10 缓存戳已回写 index.html | 逻辑详解页「🛡️ 防删」子页 100% 依赖；删除即子页回到「加载中…」 |
 
 > 🟢 **豁免清单（DO_NOT_DELETE.md 为唯一裁判，pre-commit hook 读取本区块内含「豁免」二字的行、放行其中反引号包裹的路径删除）**：
 > 🟢 豁免 `data/POTENTIAL_PICKS.js` + `raw_data/potential_picks.json`：潜力挖掘页已删，孤儿产物，全站0引用，允许删除（2026-08-20 主人令）。
@@ -68,6 +69,13 @@
 | `raw_data/*.json` (全部 45 个) | 数据抓取原始 JSON | data/*.js 的上游源，update_v8.py 构建输入 |
 
 **注意**: `raw_data/` 由 cn runner 的 cloud_fetch_v8.py / algorithms/run_algorithms.py 产出，经 api_push_raw.py 推送。云端 weekly_cleanup 会清理 orphan，但不会删有映射的文件。
+
+**2026-08-29 Tier 1/2 升级新增 raw_data 产物**（下游消费 + freshness_sla 监控）：
+| `raw_data/ic_gate.json` | IC 门禁 MVP 每日产物（策略 gate 信号 + ic_weight） | algorithms/generate_top10.py:614 下游消费；也供 gen_triple_consensus/calc_crds 准出门禁 |
+| `raw_data/strategy_regime_gate.json` | regime 每日门禁（按主人在 2026-08-19 利率上行期框架给各策略 weight） | 下游选股脚本 compute × weight |
+| `raw_data/avg_price.json` | 平均股价（通达信 880003）每日最新值 + 5 日历史 | 由 `scripts/fetch_avg_price.py` 产出；UI 评估后再接驾驶舱/暂未上架页 |
+| `raw_data/etf_subscription_em.json` | ETF 申购赎回东方财富分类聚合（5 类 + 亿元） | 替换旧 `data/ETF_SUBSCRIPTION.js` 宽基+亿份口径；旧文件记录在豁免段 |
+| `raw_data/freshness_sla.json` | 新鲜度 SLA 体检输出（最近 13 个核心 raw_data 文件的 update_time 状态） | `scripts/freshness_sla.py` 产出；挂 `v8_algo.yml 17:00` |
 
 ---
 
@@ -89,6 +97,21 @@
 | `split_inline_data.py` | index.html 内联数据拆分工具 | 维护工具 |
 
 **注意**: 根目录下所有 `*.py` 脚本都是核心管线组件，**禁止批量删除**。
+
+---
+
+## 🟠 应用层脚本 (scripts/) — 2026-08-29 Tier 1/2 升级新增
+
+| 文件路径 | 内容描述 | 禁止删除原因 |
+|---------|---------|------------|
+| `scripts/gen_do_not_delete_js.py` | `DO_NOT_DELETE.md` → `data/DO_NOT_DELETE.js` 渲染器（轻量 md 转 HTML、disk_sha 一致性缓存戳回写 index.html） | 逻辑详解页「🛡️ 防删」子页注入源；周日 `v8_cleanup.yml` 末尾固定步骤 |
+| `scripts/apply_ic_gate.py` | **Tier 1 第 1 步**：IC 门禁 MVP。读 factor_ic_report + factor_validate + top5/h_auto_buy 累计胜率 → `raw_data/ic_gate.json` | 回测投入→选股质量变现的引擎；下游 generate_top10 / gen_triple_consensus / calc_crds 接入 |
+| `scripts/apply_regime_gate.py` | **Tier 1 第 2 步**：regime 自动门控。读 market_regime → `raw_data/strategy_regime_gate.json`（按利率上行/下行/平稳给各策略 weight） | regime 已算但未自动化→选股；按市道 gate 是 backtest_tdx 已发现差异的唯一免费 alpha |
+| `scripts/fetch_avg_price.py` | **新功能**：平均股价（通达信 880003）轻量 fetcher；东方财富 push2his | 主人 2026-08-29 周报期待；UI 评估后再接驾驶舱/暂未上架页 |
+| `scripts/fetch_etf_subscription_em.py` | **新功能**：ETF 申购赎回东方财富口径 fetcher（旧文件切到 5 类 + 亿元） | 主人 2026-08-29 新需求；旧 ETF_SUBSCRIPTION.js 宽基+亿份与东方财富分类不一致 |
+| `scripts/freshness_sla.py` | **Tier 1 第 3 步**：新鲜度 SLA 自动标红 + 告警。扫 raw_data/*.json update_time，缺数据/超时按 FRESHNESS_SLA 表拦截 | 主人 2026-08-29 反馈「图 14 卡在 8-04 没人告警」根因；挂 `v8_algo.yml 17:00` |
+
+**注意**: 上述 6 个脚本均 `py_compile` 0 错；fetcher（avg_price / etf_subscription_em）云端首次跑批时验证真实接口（本机可能因网络限制跑不通）。
 
 ---
 
@@ -180,3 +203,28 @@
 
 **最后核对**: 2026-08-08 (v6 备份保留策略已纳入 / 运营文档归档至 docs/ops/) ✅
 **下次审查**: 2026-08-15 (每周审查)
+
+---
+
+## 🔴 防覆盖指南（2026-08-29 主人紧急令 — 抵制坚果云 Nutstore 实时同步回退）
+
+> ⚠️ **痛点**：主人本机 `E:\workspace\stock-scanner\` 被**坚果云 Nutstore（NutstoreClient.exe）实时同步**（实测 2~10 秒一轮）。所有本机用 Edit 工具或 Write 工具做的改动，**会在数秒内被云端版本回退覆盖**，除非已 `git commit` 入本地 HEAD。
+>
+> 实测现象（2026-08-29 多轮确认）：
+> - Edit 写好后 `grep` 还在，下一秒再 grep = 没了；`git diff --stat` 瞬间变 clean。
+> - `git diff --cached` 显示 staged 还在，working tree 被云覆盖；`git status -s` 出现 100+ 条 `D ` 状态（云工作树被 revert 到某个老态）。
+> - 主人另一席位（`C:\Users\Administrator\qs8-tmp`，双机分时铁律的副机）能自助 commit + push origin，导致本地看似「原地提交」。
+>
+> **铁律（本机操作 v8 必读）**：
+>
+> 1. **必须 `git commit` 入本地 HEAD 才能保证改动留存**；未 commit 的改动会被云覆盖。
+> 2. **Push 要谨慎**：`git push origin main` 前 `git fetch origin main` + `git rebase origin/main`，确认无冲突再推。pre-push hook 已支持自动 rebase。
+> 3. **临时文件不要放在仓库根**（Nutstore 把 `__*`/`.tmp`/`.bak` 当 temp 清；本机已观察到此类文件数分钟内被删）。放 `C:\Users\HH20210606\.workbuddy\tmp\`（用户级 tmp，**不在同步区**）。
+> 4. **大文件 commit 后 `git status -s` 出现大批 `D ` 状态 = Nutstore 工作树污染，不是真实删除**。不要 `git checkout HEAD -- .`，会冲掉主人本地未保存工作；用 `git show origin/main:<file>` 验证文件远端仍存在。
+> 5. **优先使用 `node -e` / `python -c` 原子写入 + 立即 commit**，比 Edit/Write 工具更可靠（不会被工具回调重新读覆盖）。
+> 6. **跨机同步冲突**：`tmp_debug.py` / `stash@{0}` / `.git/index.lock` 等临时残留若另一机在跑同步脚，**主人不要 `pop`/`drop`**，需联系小九确认。
+>
+> **自动化解套路径**（已落地）：
+> - `git push` 时 pre-push hook 检测 origin 前进则自动 rebase：若工作树脏，先 `git stash push -u` 再 rebase。
+> - 本地 `init.bat`/脚本若被云回退，可用 `git reset --hard origin/main` 一键对齐（仅在用户明确放行时执行）。
+> - `stash@{0}`（最近一次工作树备份）+ `stash@{1}`（前一次 Nutstore 噪音 stash）随时可 `git stash list` 检视。
