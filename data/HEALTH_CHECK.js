@@ -1,1 +1,1091 @@
-window.HEALTH_CHECK = {"updated":"2026-08-29 13:39:29","overall":"warn","summary":{"ok":102,"warn":2,"fail":1,"total":105},"items":[{"id":"V8_CAL","name":"重要事件日历","page":"今日事件","freq":"每周日+月末","status":"ok","last_update":"2026-08-29 12:46:10","age_min":53.2,"message":"更新于 今日 12:46"},{"id":"IPO_DATA","name":"打新研判","page":"今日事件","freq":"每日盘前","status":"ok","last_update":"2026-08-29 12:38:15","age_min":61.1,"message":"休市不更新（数据为上一交易日盘前）；今日 12:38"},{"id":"JUDGMENT_DATA","name":"今日判定","page":"今日事件","freq":"每日盘前","status":"ok","last_update":"2026-08-29 12:46:14","age_min":53.1,"message":"休市不更新（数据为上一交易日盘前）；今日 12:46"},{"id":"MACRO_DATA","name":"今日宏观解读","page":"今日事件","freq":"每日盘前","status":"ok","last_update":"2026-08-29 12:39:05","age_min":60.3,"message":"休市不更新（数据为上一交易日盘前）；今日 12:39"},{"id":"NT_DATA","name":"市场提示","page":"今日事件","freq":"每日盘前","status":"ok","last_update":"2026-08-29 09:05","age_min":274.4,"message":"休市不更新（数据为上一交易日盘前）；今日 09:05","heal_cat":"algo_run"},{"id":"INDEX_QUOTES","name":"全球指数 / 股指期货","page":"实时数据","freq":"盘中每30分","status":"ok","last_update":"2026-08-29 12:34:54","age_min":64.5,"message":"更新于 今日 12:34"},{"id":"ETF_PULSE","name":"ETF 盘中异动","page":"实时数据","freq":"盘中实时","status":"ok","last_update":"2026-08-29 12:44:54","age_min":54.5,"message":"更新于 今日 12:44"},{"id":"ETF_INTRADAY_HEAT","name":"ETF 资金热度","page":"实时数据","freq":"盘中实时 T+0","status":"ok","last_update":"2026-08-29 12:34:48","age_min":64.6,"message":"更新于 今日 12:34"},{"id":"ETF_DAILY_MONITOR","name":"ETF 日监控","page":"实时数据","freq":"盘中每30分","status":"ok","last_update":"2026-08-29 12:45:31","age_min":53.8,"message":"盘前已清空，等待开盘后刷新（预期行为）；今日 12:45"},{"id":"SECTOR_FUND_FLOW","name":"板块资金流向","page":"实时数据","freq":"盘中每30分","status":"ok","last_update":"2026-08-29 12:34:53","age_min":64.5,"message":"更新于 今日 12:34"},{"id":"CONCEPT_RANKING","name":"概念排名","page":"实时数据","freq":"盘中每30分","status":"ok","last_update":"2026-08-29 12:34:55","age_min":64.4,"message":"更新于 今日 12:34"},{"id":"LIMIT_UP_HEATMAP","name":"涨停热度","page":"实时数据","freq":"盘中每30分","status":"ok","last_update":"2026-08-29 12:39:34","age_min":59.8,"message":"更新于 今日 12:39"},{"id":"MARKET_FUND_FLOW_DATA","name":"市场资金流向","page":"实时数据","freq":"盘中每30分","status":"ok","last_update":"2026-08-29 12:44:12","age_min":55.2,"message":"更新于 今日 12:44"},{"id":"MARKET_ALERTS","name":"市场预警","page":"实时数据","freq":"盘中实时","status":"ok","last_update":"2026-08-29 12:47:19","age_min":52.1,"message":"更新于 今日 12:47"},{"id":"SH_FIB","name":"市场温度计","page":"盘后数据","freq":"收盘后1次","status":"ok","last_update":"2026-08-29 08:38","age_min":301.4,"message":"休市不更新（数据为上一交易日盘后）；今日 08:38","heal_cat":"algo_run"},{"id":"SIX_DIM_RADAR","name":"六维共振雷达","page":"盘后数据","freq":"收盘后1次","status":"ok","last_update":"2026-08-29 08:38","age_min":301.4,"message":"休市不更新（数据为上一交易日盘后）；今日 08:38","heal_cat":"algo_run"},{"id":"MARGIN_DATA","name":"融资融券","page":"盘后数据","freq":"收盘后1次","status":"ok","last_update":"2026-08-29 12:38:16","age_min":61.1,"message":"休市不更新（数据为上一交易日盘后）；今日 12:38","heal_cat":"post_close"},{"id":"CFFEX_HOLDINGS","name":"股指期货持仓","page":"盘后数据","freq":"收盘后1次","status":"ok","last_update":"2026-08-29 12:38:18","age_min":61.1,"message":"休市不更新（数据为上一交易日盘后）；今日 12:38","heal_cat":"post_close"},{"id":"CRISIS_DATA","name":"危机雷达","page":"盘后数据","freq":"收盘后1次","status":"ok","last_update":"2026-08-29 12:39:31","age_min":59.9,"message":"休市不更新（数据为上一交易日盘后）；今日 12:39","heal_cat":"premarket"},{"id":"MARKET_FUND_FLOW_DATA","name":"盘后资金流向","page":"盘后数据","freq":"收盘后1次","status":"ok","last_update":"2026-08-29 12:44:12","age_min":55.2,"message":"休市不更新（数据为上一交易日盘后）；今日 12:44","heal_cat":"premarket"},{"id":"CANDIDATE","name":"候选池","page":"盘后数据","freq":"收盘后1次","status":"ok","last_update":"2026-08-29 08:45:42","age_min":293.7,"message":"休市不更新（数据为上一交易日盘后）；今日 08:45","heal_cat":"algo_run"},{"id":"GOLD_POOL","name":"黄金池","page":"盘后数据","freq":"收盘后1次","status":"ok","last_update":"2026-08-29 09:39:14","age_min":240.1,"message":"休市不更新（数据为上一交易日盘后）；今日 09:39","heal_cat":"algo_run"},{"id":"LHB_DATA","name":"龙虎榜","page":"盘后数据","freq":"收盘后1次","status":"ok","last_update":"2026-08-29 08:43:06","age_min":296.3,"message":"休市不更新（数据为上一交易日盘后）；今日 08:43","heal_cat":"algo_run"},{"id":"INST_TRADE","name":"机构买卖","page":"盘后数据","freq":"收盘后1次","status":"ok","last_update":"2026-08-29 08:38:35","age_min":300.8,"message":"休市不更新（数据为上一交易日盘后）；今日 08:38","heal_cat":"algo_run"},{"id":"TRIPLE_CONSENSUS","name":"三重共识","page":"盘后数据","freq":"收盘后1次","status":"ok","last_update":"2026-08-29 09:03:49","age_min":275.6,"message":"休市不更新（数据为上一交易日盘后）；今日 09:03","heal_cat":"algo_run"},{"id":"FOUR_VOLUME","name":"四量终极","page":"选股策略","freq":"收盘后1次","status":"ok","last_update":"2026-08-29 09:03:22","age_min":276.0,"message":"休市不更新（数据为上一交易日盘后）；今日 09:03","heal_cat":"algo_run"},{"id":"COCKPIT_ADVICE","name":"驾驶舱","page":"选股策略","freq":"收盘后1次","status":"ok","last_update":"2026-08-29 09:39:14","age_min":240.1,"message":"休市不更新（数据为上一交易日盘后）；今日 09:39","heal_cat":"algo_run"},{"id":"BIG_BULL_HUNTER","name":"大牛股猎手","page":"选股策略","freq":"收盘后1次","status":"ok","last_update":"2026-08-29 08:43:06","age_min":296.3,"message":"休市不更新（数据为上一交易日盘后）；今日 08:43","heal_cat":"algo_run"},{"id":"TOP10_DAILY","name":"全站精选","page":"选股策略","freq":"收盘后1次","status":"ok","last_update":"2026-08-29 08:53:36","age_min":285.8,"message":"休市不更新（数据为上一交易日盘后）；今日 08:53","heal_cat":"algo_run"},{"id":"STOCK_RPS","name":"相对强度","page":"选股策略","freq":"收盘后1次","status":"ok","last_update":"2026-08-29 08:53:36","age_min":285.8,"message":"休市不更新（数据为上一交易日盘后）；今日 08:53","heal_cat":"algo_run"},{"id":"CRDS_CARD_DATA","name":"逆势龙头","page":"选股策略","freq":"收盘后1次","status":"ok","last_update":"2026-08-29 08:44:29","age_min":294.9,"message":"休市不更新（数据为上一交易日盘后）；今日 08:44","heal_cat":"algo_run"},{"id":"raw_etf_pulse.json","name":"raw_data/etf_pulse.json","page":"管线","status":"ok","message":"存在"},{"id":"raw_capital_flow_data.json","name":"raw_data/capital_flow_data.json","page":"管线","status":"ok","message":"存在"},{"id":"raw_index_quotes.json","name":"raw_data/index_quotes.json","page":"管线","status":"ok","message":"存在"},{"id":"raw_crisis_data.json","name":"raw_data/crisis_data.json","page":"管线","status":"ok","message":"存在"},{"id":"raw_concept_ranking.json","name":"raw_data/concept_ranking.json","page":"管线","status":"ok","message":"存在"},{"id":"raw_volume","name":"raw_data 文件数","page":"管线","status":"ok","message":"raw_data 共 177 个文件"},{"id":"site_sync","name":"Pages 部署同步","page":"管线","status":"ok","message":"本地 HEAD 66da667 / 线上 66da667 已同步"},{"id":"runner_local","name":"runner 本地检测","page":"管线","status":"ok","message":" 最近抓取 2026-08-29 12:48:22，28 个模块全部成功"},{"id":"runner_github","name":"runner GitHub API 检测","page":"管线","status":"ok","message":"最近运行正常（本地状态:  最近抓取 2026-08-29 12:48:22，28 个模块全部成功）"},{"id":"runner","name":"self-hosted runner","page":"管线","status":"ok","message":"runner 本地检测:ok- 最近抓取 2026-08-29 12:48:22，28 个模块全部成功 | runner GitHub API 检测:ok-最近运行正常（本地状态:  最近抓取 2026-08-29 12:48:22，28 个模块全部成功）"},{"id":"local_sync","name":"本地与 origin/main 同步","page":"管线","status":"ok","message":"本地 66da667 / origin/main 66da667 同步"},{"id":"cockpit_signal_stale","name":"驾驶舱建议信号日期","page":"内容审计","status":"ok","message":"生成时间 2026-08-29 09:39:14，最新信号发生日期 --（历史回测样本，非陈旧指标）"},{"id":"final_enter_stale","name":"最终推荐入选日期","page":"内容审计","status":"ok","message":"最新 enter_date 2026-08-29 ≥ 最近交易日 2026-08-28"},{"id":"final_market_distribution","name":"最终推荐市场分布","page":"内容审计","status":"ok","message":"Top2 市场分布：A股2只 / 港股0只"},{"id":"top10_history_depth","name":"T+N 信号台账深度","page":"内容审计","status":"ok","message":"top10_daily 历史跨度 60 个交易日 (2026-06-06 ~ 2026-08-29)，满足 T+20 跟踪需求"},{"id":"a_share_triple_consensus","name":"三重共识 A股覆盖","page":"内容审计","heal_cat":"algo_run","status":"ok","message":"三重共识 今日 0 只（非交易日，算法链未运行，属正常现象）"},{"id":"all_AI_MARKET_BRIEF","name":"AI_MARKET_BRIEF","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 13:38:52","age_min":0.5,"heal_cat":"algo_run","message":"AI_MARKET_BRIEF.js 更新于 今日 13:38"},{"id":"all_ALGO_BACKTEST_COMPARE","name":"ALGO_BACKTEST_COMPARE","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 13:32:01","age_min":7.4,"heal_cat":"algo_run","message":"ALGO_BACKTEST_COMPARE.js 更新于 今日 13:32"},{"id":"all_ALGO_TRACK","name":"ALGO_TRACK","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 09:16","age_min":263.4,"heal_cat":"algo_run","message":"ALGO_TRACK.js 更新于 今日 09:16"},{"id":"all_ANALYST_RATINGS","name":"ANALYST_RATINGS","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 12:46:08","age_min":53.3,"heal_cat":"algo_run","message":"ANALYST_RATINGS.js 更新于 今日 12:46"},{"id":"all_AVG_PRICE_DATA","name":"AVG_PRICE_DATA","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 12:48:21","age_min":51.0,"heal_cat":"algo_run","message":"AVG_PRICE_DATA.js 更新于 今日 12:48"},{"id":"all_BACKTEST_COMPREHENSIVE","name":"BACKTEST_COMPREHENSIVE","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 08:55:00","age_min":284.4,"heal_cat":"algo_run","message":"BACKTEST_COMPREHENSIVE.js 更新于 今日 08:55"},{"id":"all_BACKTEST_TDX","name":"BACKTEST_TDX","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29","age_min":null,"heal_cat":"algo_run","message":"BACKTEST_TDX.js 低频/手动维护文件（白名单内，无时间戳属正常，4KB）"},{"id":"all_CANDIDATE_QUOTES","name":"CANDIDATE_QUOTES","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 12:46:13","age_min":53.2,"heal_cat":"algo_run","message":"CANDIDATE_QUOTES.js 更新于 今日 12:46"},{"id":"all_CAPITAL_FLOW_DATA","name":"CAPITAL_FLOW_DATA","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 12:39:36","age_min":59.8,"heal_cat":"algo_run","message":"CAPITAL_FLOW_DATA.js 更新于 今日 12:39"},{"id":"all_COCKPIT_BACKTEST","name":"COCKPIT_BACKTEST","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 09:00:02","age_min":279.4,"heal_cat":"algo_run","message":"COCKPIT_BACKTEST.js 更新于 今日 09:00"},{"id":"all_COCKPIT_TIER_RECOMMEND","name":"COCKPIT_TIER_RECOMMEND","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 09:39:09","age_min":240.2,"heal_cat":"algo_run","message":"COCKPIT_TIER_RECOMMEND.js 更新于 今日 09:39"},{"id":"all_COMMODITY_ELASTICITY","name":"COMMODITY_ELASTICITY","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 13:32:01","age_min":7.4,"heal_cat":"algo_run","message":"COMMODITY_ELASTICITY.js 更新于 今日 13:32"},{"id":"all_CONCEPT_ETF_MAP","name":"CONCEPT_ETF_MAP","page":"全量数据","freq":"—","status":"ok","last_update":"静态映射","age_min":null,"heal_cat":"algo_run","message":"CONCEPT_ETF_MAP.js 静态映射文件（非严格 JSON，按体积检查 OK，11KB）"},{"id":"all_DO_NOT_DELETE","name":"DO_NOT_DELETE","page":"全量数据","freq":"—","status":"fail","last_update":"--","age_min":null,"heal_cat":"algo_run","message":"DO_NOT_DELETE.js 缺失或解析失败（未被 CARD_DEFS 登记）"},{"id":"all_ETF_SUBSCRIPTION","name":"ETF_SUBSCRIPTION","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 12:44:11","age_min":55.2,"heal_cat":"algo_run","message":"ETF_SUBSCRIPTION.js 更新于 今日 12:44"},{"id":"all_EXPERIMENT","name":"EXPERIMENT","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 12:46:10","age_min":53.2,"heal_cat":"algo_run","message":"EXPERIMENT.js 更新于 今日 12:46"},{"id":"all_FINAL_RECOMMEND_DATA","name":"FINAL_RECOMMEND_DATA","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 09:39:13","age_min":240.2,"heal_cat":"algo_run","message":"FINAL_RECOMMEND_DATA.js 更新于 今日 09:39"},{"id":"all_FOUR_VOLUME_60M","name":"FOUR_VOLUME_60M","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 09:01:45","age_min":null,"heal_cat":"algo_run","message":"FOUR_VOLUME_60M.js 低频/手动维护文件（白名单内，无时间戳属正常，6KB）"},{"id":"all_HEALTH_CHECK","name":"HEALTH_CHECK","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 13:31:58","age_min":null,"heal_cat":"algo_run","message":"HEALTH_CHECK.js 低频/手动维护文件（白名单内，无时间戳属正常，23KB）"},{"id":"all_HERDING_DATA","name":"HERDING_DATA","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 12:39:32","age_min":59.9,"heal_cat":"algo_run","message":"HERDING_DATA.js 更新于 今日 12:39"},{"id":"all_H_AUTO_BUY","name":"H_AUTO_BUY","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 10:16:48","age_min":202.6,"heal_cat":"algo_run","message":"H_AUTO_BUY.js 更新于 今日 10:16"},{"id":"all_H_AUTO_BUY_TRACK","name":"H_AUTO_BUY_TRACK","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 09:39:09","age_min":240.3,"heal_cat":"algo_run","message":"H_AUTO_BUY_TRACK.js 更新于 今日 09:39"},{"id":"all_INDEX_HISTORY","name":"INDEX_HISTORY","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 13:38:52","age_min":0.5,"heal_cat":"algo_run","message":"INDEX_HISTORY.js 更新于 今日 13:38"},{"id":"all_LHB_7D","name":"LHB_7D","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 09:39:14","age_min":240.2,"heal_cat":"algo_run","message":"LHB_7D.js 更新于 今日 09:39"},{"id":"all_LHB_HISTORY","name":"LHB_HISTORY","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 04:58:40","age_min":520.8,"heal_cat":"algo_run","message":"LHB_HISTORY.js 更新于 今日 04:58"},{"id":"all_MACRO_BRIEF","name":"MACRO_BRIEF","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 12:46:14","age_min":53.2,"heal_cat":"algo_run","message":"MACRO_BRIEF.js 更新于 今日 12:46"},{"id":"all_MARKET_PATH_PROBABILITY","name":"MARKET_PATH_PROBABILITY","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 13:38:52","age_min":0.6,"heal_cat":"algo_run","message":"MARKET_PATH_PROBABILITY.js 更新于 今日 13:38"},{"id":"all_MARKET_REGIME","name":"MARKET_REGIME","page":"全量数据","freq":"—","status":"warn","last_update":"2026-08-29T11:34","age_min":null,"heal_cat":"algo_run","message":"MARKET_REGIME.js 无 update_time/date/generated 时间戳，无法判龄（缺审计登记）"},{"id":"all_NORTH_FUND","name":"NORTH_FUND","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 12:44:11","age_min":55.2,"heal_cat":"algo_run","message":"NORTH_FUND.js 更新于 今日 12:44"},{"id":"all_OPTIMIZED_STRATEGY","name":"OPTIMIZED_STRATEGY","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29","age_min":null,"heal_cat":"algo_run","message":"OPTIMIZED_STRATEGY.js 低频/手动维护文件（白名单内，无时间戳属正常，1KB）"},{"id":"all_OVERSEAS_MARKETS","name":"OVERSEAS_MARKETS","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 12:48:22","age_min":51.1,"heal_cat":"algo_run","message":"OVERSEAS_MARKETS.js 更新于 今日 12:48"},{"id":"all_PORTFOLIO","name":"PORTFOLIO","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-28 16:01:51","age_min":null,"heal_cat":"algo_run","message":"PORTFOLIO.js 低频/手动维护文件（白名单内，无时间戳属正常，0KB）"},{"id":"all_PORTFOLIO_COST","name":"PORTFOLIO_COST","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-12 09:52:20","age_min":null,"heal_cat":"algo_run","message":"PORTFOLIO_COST.js 低频/手动维护文件（白名单内，无时间戳属正常，0KB）"},{"id":"all_POTENTIAL_PICKS","name":"POTENTIAL_PICKS","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 09:19:04","age_min":260.4,"heal_cat":"algo_run","message":"POTENTIAL_PICKS.js 更新于 今日 09:19"},{"id":"all_RISK_GAUGE","name":"RISK_GAUGE","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 12:49:24","age_min":50.0,"heal_cat":"algo_run","message":"RISK_GAUGE.js 更新于 今日 12:49"},{"id":"all_RUNNER_STATUS","name":"RUNNER_STATUS","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 13:38:52","age_min":0.6,"heal_cat":"algo_run","message":"RUNNER_STATUS.js 更新于 今日 13:38"},{"id":"all_RUNNER_STATUS_HEALTH","name":"RUNNER_STATUS_HEALTH","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 08:22:08","age_min":null,"heal_cat":"algo_run","message":"RUNNER_STATUS_HEALTH.js 低频/手动维护文件（白名单内，无时间戳属正常，0KB）"},{"id":"all_SECTOR_FUND_FLOW_INTRADAY","name":"SECTOR_FUND_FLOW_INTRADAY","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 13:38:52","age_min":0.6,"heal_cat":"algo_run","message":"SECTOR_FUND_FLOW_INTRADAY.js 更新于 今日 13:38"},{"id":"all_SECTOR_FUND_FLOW_TREND","name":"SECTOR_FUND_FLOW_TREND","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 09:06","age_min":273.4,"heal_cat":"algo_run","message":"SECTOR_FUND_FLOW_TREND.js 更新于 今日 09:06"},{"id":"all_SECTOR_PHASE_HISTORY","name":"SECTOR_PHASE_HISTORY","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 08:38","age_min":301.4,"heal_cat":"algo_run","message":"SECTOR_PHASE_HISTORY.js 更新于 今日 08:38"},{"id":"all_SECTOR_RECOMMENDATION","name":"SECTOR_RECOMMENDATION","page":"全量数据","freq":"—","status":"warn","last_update":"2026-08-29T11:34","age_min":null,"heal_cat":"algo_run","message":"SECTOR_RECOMMENDATION.js 无 update_time/date/generated 时间戳，无法判龄（缺审计登记）"},{"id":"all_SECTOR_RS","name":"SECTOR_RS","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 08:38","age_min":301.4,"heal_cat":"algo_run","message":"SECTOR_RS.js 更新于 今日 08:38"},{"id":"all_SENTIMENT_CYCLE","name":"SENTIMENT_CYCLE","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 05:32:01","age_min":487.4,"heal_cat":"algo_run","message":"SENTIMENT_CYCLE.js 更新于 今日 05:32"},{"id":"all_SH_SZ_HISTORY","name":"SH_SZ_HISTORY","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 12:46:14","age_min":53.2,"heal_cat":"algo_run","message":"SH_SZ_HISTORY.js 更新于 今日 12:46"},{"id":"all_STOCK_LIST","name":"STOCK_LIST","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 09:39:14","age_min":240.2,"heal_cat":"algo_run","message":"STOCK_LIST.js 更新于 今日 09:39"},{"id":"all_STOCK_PROFILE","name":"STOCK_PROFILE","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 12:48:22","age_min":null,"heal_cat":"algo_run","message":"STOCK_PROFILE.js 低频/手动维护文件（白名单内，无时间戳属正常，1397KB）"},{"id":"all_STOCK_QUOTE","name":"STOCK_QUOTE","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 13:38:52","age_min":0.6,"heal_cat":"algo_run","message":"STOCK_QUOTE.js 更新于 今日 13:38"},{"id":"all_STOCK_RPS_DATA","name":"STOCK_RPS_DATA","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 08:53:36","age_min":285.9,"heal_cat":"algo_run","message":"STOCK_RPS_DATA.js 更新于 今日 08:53"},{"id":"all_STOCK_STOP_DATA","name":"STOCK_STOP_DATA","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 09:04:31","age_min":274.9,"heal_cat":"algo_run","message":"STOCK_STOP_DATA.js 更新于 今日 09:04"},{"id":"all_SUSPENSION_ALERT","name":"SUSPENSION_ALERT","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 09:04:34","age_min":274.9,"heal_cat":"algo_run","message":"SUSPENSION_ALERT.js 更新于 今日 09:04"},{"id":"all_SZ_FIB","name":"SZ_FIB","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 08:38","age_min":301.5,"heal_cat":"algo_run","message":"SZ_FIB.js 更新于 今日 08:38"},{"id":"all_TOP5_TRACK","name":"TOP5_TRACK","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 09:16","age_min":263.5,"heal_cat":"algo_run","message":"TOP5_TRACK.js 更新于 今日 09:16"},{"id":"all_TRIPLE_HISTORY","name":"TRIPLE_HISTORY","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 11:10:56","age_min":148.5,"heal_cat":"algo_run","message":"TRIPLE_HISTORY.js 更新于 今日 11:10"},{"id":"all_TRIPLE_TRACK","name":"TRIPLE_TRACK","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 09:03:49","age_min":275.7,"heal_cat":"algo_run","message":"TRIPLE_TRACK.js 更新于 今日 09:03"},{"id":"all_VOLATILITY","name":"VOLATILITY","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 09:03:56","age_min":275.5,"heal_cat":"algo_run","message":"VOLATILITY.js 更新于 今日 09:03"},{"id":"all_W52_HIGH","name":"W52_HIGH","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 12:44:14","age_min":55.2,"heal_cat":"algo_run","message":"W52_HIGH.js 更新于 今日 12:44"},{"id":"all_WEEKEND_META_REPORT","name":"WEEKEND_META_REPORT","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 09:21:41","age_min":null,"heal_cat":"algo_run","message":"WEEKEND_META_REPORT.js 低频/手动维护文件（白名单内，无时间戳属正常，0KB）"},{"id":"all_WEEKEND_RUN","name":"WEEKEND_RUN","page":"全量数据","freq":"—","status":"ok","last_update":"2026-08-29 09:21:41","age_min":null,"heal_cat":"algo_run","message":"WEEKEND_RUN.js 低频/手动维护文件（白名单内，无时间戳属正常，1KB）"}],"update_time":"2026-08-29 13:39:33"};
+window.HEALTH_CHECK = {
+  "updated": "2026-08-29 13:48:27",
+  "overall": "warn",
+  "summary": {
+    "ok": 99,
+    "warn": 4,
+    "fail": 2,
+    "total": 105
+  },
+  "items": [
+    {
+      "id": "V8_CAL",
+      "name": "重要事件日历",
+      "page": "今日事件",
+      "freq": "每周日+月末",
+      "status": "ok",
+      "last_update": "2026-08-29 13:45:28",
+      "age_min": 2.9,
+      "message": "更新于 今日 13:45"
+    },
+    {
+      "id": "IPO_DATA",
+      "name": "打新研判",
+      "page": "今日事件",
+      "freq": "每日盘前",
+      "status": "ok",
+      "last_update": "2026-08-29 13:37:33",
+      "age_min": 10.9,
+      "message": "休市不更新（数据为上一交易日盘前）；今日 13:37"
+    },
+    {
+      "id": "JUDGMENT_DATA",
+      "name": "今日判定",
+      "page": "今日事件",
+      "freq": "每日盘前",
+      "status": "ok",
+      "last_update": "2026-08-29 13:45:32",
+      "age_min": 2.9,
+      "message": "休市不更新（数据为上一交易日盘前）；今日 13:45"
+    },
+    {
+      "id": "MACRO_DATA",
+      "name": "今日宏观解读",
+      "page": "今日事件",
+      "freq": "每日盘前",
+      "status": "ok",
+      "last_update": "2026-08-29 13:38:31",
+      "age_min": 9.9,
+      "message": "休市不更新（数据为上一交易日盘前）；今日 13:38"
+    },
+    {
+      "id": "NT_DATA",
+      "name": "市场提示",
+      "page": "今日事件",
+      "freq": "每日盘前",
+      "status": "ok",
+      "last_update": "2026-08-29 09:05",
+      "age_min": 283.4,
+      "message": "休市不更新（数据为上一交易日盘前）；今日 09:05",
+      "heal_cat": "algo_run"
+    },
+    {
+      "id": "INDEX_QUOTES",
+      "name": "全球指数 / 股指期货",
+      "page": "实时数据",
+      "freq": "盘中每30分",
+      "status": "ok",
+      "last_update": "2026-08-29 13:34:13",
+      "age_min": 14.2,
+      "message": "更新于 今日 13:34"
+    },
+    {
+      "id": "ETF_PULSE",
+      "name": "ETF 盘中异动",
+      "page": "实时数据",
+      "freq": "盘中实时",
+      "status": "ok",
+      "last_update": "2026-08-29 13:44:27",
+      "age_min": 4.0,
+      "message": "更新于 今日 13:44"
+    },
+    {
+      "id": "ETF_INTRADAY_HEAT",
+      "name": "ETF 资金热度",
+      "page": "实时数据",
+      "freq": "盘中实时 T+0",
+      "status": "ok",
+      "last_update": "2026-08-29 13:34:07",
+      "age_min": 14.3,
+      "message": "更新于 今日 13:34"
+    },
+    {
+      "id": "ETF_DAILY_MONITOR",
+      "name": "ETF 日监控",
+      "page": "实时数据",
+      "freq": "盘中每30分",
+      "status": "ok",
+      "last_update": "2026-08-29 13:45:05",
+      "age_min": 3.3,
+      "message": "盘前已清空，等待开盘后刷新（预期行为）；今日 13:45"
+    },
+    {
+      "id": "SECTOR_FUND_FLOW",
+      "name": "板块资金流向",
+      "page": "实时数据",
+      "freq": "盘中每30分",
+      "status": "ok",
+      "last_update": "2026-08-29 13:34:12",
+      "age_min": 14.2,
+      "message": "更新于 今日 13:34"
+    },
+    {
+      "id": "CONCEPT_RANKING",
+      "name": "概念排名",
+      "page": "实时数据",
+      "freq": "盘中每30分",
+      "status": "ok",
+      "last_update": "2026-08-29 13:34:14",
+      "age_min": 14.2,
+      "message": "更新于 今日 13:34"
+    },
+    {
+      "id": "LIMIT_UP_HEATMAP",
+      "name": "涨停热度",
+      "page": "实时数据",
+      "freq": "盘中每30分",
+      "status": "ok",
+      "last_update": "2026-08-29 13:38:55",
+      "age_min": 9.5,
+      "message": "更新于 今日 13:38"
+    },
+    {
+      "id": "MARKET_FUND_FLOW_DATA",
+      "name": "市场资金流向",
+      "page": "实时数据",
+      "freq": "盘中每30分",
+      "status": "ok",
+      "last_update": "2026-08-29 13:43:47",
+      "age_min": 4.6,
+      "message": "更新于 今日 13:43"
+    },
+    {
+      "id": "MARKET_ALERTS",
+      "name": "市场预警",
+      "page": "实时数据",
+      "freq": "盘中实时",
+      "status": "ok",
+      "last_update": "2026-08-29 13:46:49",
+      "age_min": 1.6,
+      "message": "更新于 今日 13:46"
+    },
+    {
+      "id": "SH_FIB",
+      "name": "市场温度计",
+      "page": "盘后数据",
+      "freq": "收盘后1次",
+      "status": "ok",
+      "last_update": "2026-08-29 08:38",
+      "age_min": 310.4,
+      "message": "休市不更新（数据为上一交易日盘后）；今日 08:38",
+      "heal_cat": "algo_run"
+    },
+    {
+      "id": "SIX_DIM_RADAR",
+      "name": "六维共振雷达",
+      "page": "盘后数据",
+      "freq": "收盘后1次",
+      "status": "ok",
+      "last_update": "2026-08-29 08:38",
+      "age_min": 310.4,
+      "message": "休市不更新（数据为上一交易日盘后）；今日 08:38",
+      "heal_cat": "algo_run"
+    },
+    {
+      "id": "MARGIN_DATA",
+      "name": "融资融券",
+      "page": "盘后数据",
+      "freq": "收盘后1次",
+      "status": "ok",
+      "last_update": "2026-08-29 13:37:35",
+      "age_min": 10.8,
+      "message": "休市不更新（数据为上一交易日盘后）；今日 13:37",
+      "heal_cat": "post_close"
+    },
+    {
+      "id": "CFFEX_HOLDINGS",
+      "name": "股指期货持仓",
+      "page": "盘后数据",
+      "freq": "收盘后1次",
+      "status": "ok",
+      "last_update": "2026-08-29 13:37:37",
+      "age_min": 10.8,
+      "message": "休市不更新（数据为上一交易日盘后）；今日 13:37",
+      "heal_cat": "post_close"
+    },
+    {
+      "id": "CRISIS_DATA",
+      "name": "危机雷达",
+      "page": "盘后数据",
+      "freq": "收盘后1次",
+      "status": "ok",
+      "last_update": "2026-08-29 13:38:53",
+      "age_min": 9.5,
+      "message": "休市不更新（数据为上一交易日盘后）；今日 13:38",
+      "heal_cat": "premarket"
+    },
+    {
+      "id": "MARKET_FUND_FLOW_DATA",
+      "name": "盘后资金流向",
+      "page": "盘后数据",
+      "freq": "收盘后1次",
+      "status": "ok",
+      "last_update": "2026-08-29 13:43:47",
+      "age_min": 4.6,
+      "message": "休市不更新（数据为上一交易日盘后）；今日 13:43",
+      "heal_cat": "premarket"
+    },
+    {
+      "id": "CANDIDATE",
+      "name": "候选池",
+      "page": "盘后数据",
+      "freq": "收盘后1次",
+      "status": "ok",
+      "last_update": "2026-08-29 08:45:42",
+      "age_min": 302.7,
+      "message": "休市不更新（数据为上一交易日盘后）；今日 08:45",
+      "heal_cat": "algo_run"
+    },
+    {
+      "id": "GOLD_POOL",
+      "name": "黄金池",
+      "page": "盘后数据",
+      "freq": "收盘后1次",
+      "status": "ok",
+      "last_update": "2026-08-29 09:39:14",
+      "age_min": 249.2,
+      "message": "休市不更新（数据为上一交易日盘后）；今日 09:39",
+      "heal_cat": "algo_run"
+    },
+    {
+      "id": "LHB_DATA",
+      "name": "龙虎榜",
+      "page": "盘后数据",
+      "freq": "收盘后1次",
+      "status": "ok",
+      "last_update": "2026-08-29 08:43:06",
+      "age_min": 305.3,
+      "message": "休市不更新（数据为上一交易日盘后）；今日 08:43",
+      "heal_cat": "algo_run"
+    },
+    {
+      "id": "INST_TRADE",
+      "name": "机构买卖",
+      "page": "盘后数据",
+      "freq": "收盘后1次",
+      "status": "ok",
+      "last_update": "2026-08-29 08:38:35",
+      "age_min": 309.8,
+      "message": "休市不更新（数据为上一交易日盘后）；今日 08:38",
+      "heal_cat": "algo_run"
+    },
+    {
+      "id": "TRIPLE_CONSENSUS",
+      "name": "三重共识",
+      "page": "盘后数据",
+      "freq": "收盘后1次",
+      "status": "ok",
+      "last_update": "2026-08-29 09:03:49",
+      "age_min": 284.6,
+      "message": "休市不更新（数据为上一交易日盘后）；今日 09:03",
+      "heal_cat": "algo_run"
+    },
+    {
+      "id": "FOUR_VOLUME",
+      "name": "四量终极",
+      "page": "选股策略",
+      "freq": "收盘后1次",
+      "status": "ok",
+      "last_update": "2026-08-29 09:03:22",
+      "age_min": 285.0,
+      "message": "休市不更新（数据为上一交易日盘后）；今日 09:03",
+      "heal_cat": "algo_run"
+    },
+    {
+      "id": "COCKPIT_ADVICE",
+      "name": "驾驶舱",
+      "page": "选股策略",
+      "freq": "收盘后1次",
+      "status": "ok",
+      "last_update": "2026-08-29 09:39:14",
+      "age_min": 249.2,
+      "message": "休市不更新（数据为上一交易日盘后）；今日 09:39",
+      "heal_cat": "algo_run"
+    },
+    {
+      "id": "BIG_BULL_HUNTER",
+      "name": "大牛股猎手",
+      "page": "选股策略",
+      "freq": "收盘后1次",
+      "status": "ok",
+      "last_update": "2026-08-29 08:43:06",
+      "age_min": 305.3,
+      "message": "休市不更新（数据为上一交易日盘后）；今日 08:43",
+      "heal_cat": "algo_run"
+    },
+    {
+      "id": "TOP10_DAILY",
+      "name": "全站精选",
+      "page": "选股策略",
+      "freq": "收盘后1次",
+      "status": "ok",
+      "last_update": "2026-08-29 08:53:36",
+      "age_min": 294.8,
+      "message": "休市不更新（数据为上一交易日盘后）；今日 08:53",
+      "heal_cat": "algo_run"
+    },
+    {
+      "id": "STOCK_RPS",
+      "name": "相对强度",
+      "page": "选股策略",
+      "freq": "收盘后1次",
+      "status": "ok",
+      "last_update": "2026-08-29 08:53:36",
+      "age_min": 294.8,
+      "message": "休市不更新（数据为上一交易日盘后）；今日 08:53",
+      "heal_cat": "algo_run"
+    },
+    {
+      "id": "CRDS_CARD_DATA",
+      "name": "逆势龙头",
+      "page": "选股策略",
+      "freq": "收盘后1次",
+      "status": "ok",
+      "last_update": "2026-08-29 08:44:29",
+      "age_min": 303.9,
+      "message": "休市不更新（数据为上一交易日盘后）；今日 08:44",
+      "heal_cat": "algo_run"
+    },
+    {
+      "id": "raw_etf_pulse.json",
+      "name": "raw_data/etf_pulse.json",
+      "page": "管线",
+      "status": "ok",
+      "message": "存在"
+    },
+    {
+      "id": "raw_capital_flow_data.json",
+      "name": "raw_data/capital_flow_data.json",
+      "page": "管线",
+      "status": "ok",
+      "message": "存在"
+    },
+    {
+      "id": "raw_index_quotes.json",
+      "name": "raw_data/index_quotes.json",
+      "page": "管线",
+      "status": "ok",
+      "message": "存在"
+    },
+    {
+      "id": "raw_crisis_data.json",
+      "name": "raw_data/crisis_data.json",
+      "page": "管线",
+      "status": "ok",
+      "message": "存在"
+    },
+    {
+      "id": "raw_concept_ranking.json",
+      "name": "raw_data/concept_ranking.json",
+      "page": "管线",
+      "status": "ok",
+      "message": "存在"
+    },
+    {
+      "id": "raw_volume",
+      "name": "raw_data 文件数",
+      "page": "管线",
+      "status": "ok",
+      "message": "raw_data 共 175 个文件"
+    },
+    {
+      "id": "site_sync",
+      "name": "Pages 部署同步",
+      "page": "管线",
+      "status": "ok",
+      "message": "本地 HEAD 0d6456a / 线上 46d2759 已同步（线上领先本地 4 commit，云端 build 已部署，本机待 pull，非部署故障）"
+    },
+    {
+      "id": "runner_local",
+      "name": "runner 本地检测",
+      "page": "管线",
+      "status": "ok",
+      "message": " 最近抓取 2026-08-29 13:47:53，28 个模块全部成功"
+    },
+    {
+      "id": "runner_github",
+      "name": "runner GitHub API 检测",
+      "page": "管线",
+      "status": "warn",
+      "message": "cn_fetch 最新一次失败（非 checkout，连续 0 次），最新 run 卡住 14 分钟（本地状态:  最近抓取 2026-08-29 13:47:53，28 个模块全部成功）"
+    },
+    {
+      "id": "runner",
+      "name": "self-hosted runner",
+      "page": "管线",
+      "status": "warn",
+      "message": "runner 本地检测:ok- 最近抓取 2026-08-29 13:47:53，28 个模块全部成功 | runner GitHub API 检测:warn-cn_fetch 最新一次失败（非 checkout，连续 0 次），最新 run 卡住 14 分钟（本地状态:  最近抓取 2026-08-29 13:47:53，28 个模块全部成功）"
+    },
+    {
+      "id": "local_sync",
+      "name": "本地与 origin/main 同步",
+      "page": "管线",
+      "status": "fail",
+      "message": "本地 0d6456a / origin/main 41d3bfc 落后；其中 raw_data/ 子树有 35 个文件待同步（数据卡陈旧二级根因）"
+    },
+    {
+      "id": "cockpit_signal_stale",
+      "name": "驾驶舱建议信号日期",
+      "page": "内容审计",
+      "status": "ok",
+      "message": "生成时间 2026-08-29 09:39:14，最新信号发生日期 --（历史回测样本，非陈旧指标）"
+    },
+    {
+      "id": "final_enter_stale",
+      "name": "最终推荐入选日期",
+      "page": "内容审计",
+      "status": "ok",
+      "message": "最新 enter_date 2026-08-29 ≥ 最近交易日 2026-08-28"
+    },
+    {
+      "id": "final_market_distribution",
+      "name": "最终推荐市场分布",
+      "page": "内容审计",
+      "status": "ok",
+      "message": "Top2 市场分布：A股2只 / 港股0只"
+    },
+    {
+      "id": "top10_history_depth",
+      "name": "T+N 信号台账深度",
+      "page": "内容审计",
+      "status": "ok",
+      "message": "top10_daily 历史跨度 60 个交易日 (2026-06-06 ~ 2026-08-29)，满足 T+20 跟踪需求"
+    },
+    {
+      "id": "a_share_triple_consensus",
+      "name": "三重共识 A股覆盖",
+      "page": "内容审计",
+      "heal_cat": "algo_run",
+      "status": "ok",
+      "message": "三重共识 今日 0 只（非交易日，算法链未运行，属正常现象）"
+    },
+    {
+      "id": "all_AI_MARKET_BRIEF",
+      "name": "AI_MARKET_BRIEF",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:47:53",
+      "age_min": 0.5,
+      "heal_cat": "algo_run",
+      "message": "AI_MARKET_BRIEF.js 更新于 今日 13:47"
+    },
+    {
+      "id": "all_ALGO_BACKTEST_COMPARE",
+      "name": "ALGO_BACKTEST_COMPARE",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:48:23",
+      "age_min": 0.0,
+      "heal_cat": "algo_run",
+      "message": "ALGO_BACKTEST_COMPARE.js 更新于 今日 13:48"
+    },
+    {
+      "id": "all_ALGO_TRACK",
+      "name": "ALGO_TRACK",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 09:16",
+      "age_min": 272.4,
+      "heal_cat": "algo_run",
+      "message": "ALGO_TRACK.js 更新于 今日 09:16"
+    },
+    {
+      "id": "all_ANALYST_RATINGS",
+      "name": "ANALYST_RATINGS",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:45:26",
+      "age_min": 3.0,
+      "heal_cat": "algo_run",
+      "message": "ANALYST_RATINGS.js 更新于 今日 13:45"
+    },
+    {
+      "id": "all_AVG_PRICE_DATA",
+      "name": "AVG_PRICE_DATA",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:47:51",
+      "age_min": 0.6,
+      "heal_cat": "algo_run",
+      "message": "AVG_PRICE_DATA.js 更新于 今日 13:47"
+    },
+    {
+      "id": "all_BACKTEST_COMPREHENSIVE",
+      "name": "BACKTEST_COMPREHENSIVE",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 08:55:00",
+      "age_min": 293.4,
+      "heal_cat": "algo_run",
+      "message": "BACKTEST_COMPREHENSIVE.js 更新于 今日 08:55"
+    },
+    {
+      "id": "all_BACKTEST_TDX",
+      "name": "BACKTEST_TDX",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29",
+      "age_min": null,
+      "heal_cat": "algo_run",
+      "message": "BACKTEST_TDX.js 低频/手动维护文件（白名单内，无时间戳属正常，4KB）"
+    },
+    {
+      "id": "all_CANDIDATE_QUOTES",
+      "name": "CANDIDATE_QUOTES",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:45:31",
+      "age_min": 2.9,
+      "heal_cat": "algo_run",
+      "message": "CANDIDATE_QUOTES.js 更新于 今日 13:45"
+    },
+    {
+      "id": "all_CAPITAL_FLOW_DATA",
+      "name": "CAPITAL_FLOW_DATA",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:38:57",
+      "age_min": 9.5,
+      "heal_cat": "algo_run",
+      "message": "CAPITAL_FLOW_DATA.js 更新于 今日 13:38"
+    },
+    {
+      "id": "all_COCKPIT_BACKTEST",
+      "name": "COCKPIT_BACKTEST",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 09:00:02",
+      "age_min": 288.4,
+      "heal_cat": "algo_run",
+      "message": "COCKPIT_BACKTEST.js 更新于 今日 09:00"
+    },
+    {
+      "id": "all_COCKPIT_TIER_RECOMMEND",
+      "name": "COCKPIT_TIER_RECOMMEND",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 09:39:09",
+      "age_min": 249.3,
+      "heal_cat": "algo_run",
+      "message": "COCKPIT_TIER_RECOMMEND.js 更新于 今日 09:39"
+    },
+    {
+      "id": "all_COMMODITY_ELASTICITY",
+      "name": "COMMODITY_ELASTICITY",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:48:23",
+      "age_min": 0.0,
+      "heal_cat": "algo_run",
+      "message": "COMMODITY_ELASTICITY.js 更新于 今日 13:48"
+    },
+    {
+      "id": "all_CONCEPT_ETF_MAP",
+      "name": "CONCEPT_ETF_MAP",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "静态映射",
+      "age_min": null,
+      "heal_cat": "algo_run",
+      "message": "CONCEPT_ETF_MAP.js 静态映射文件（非严格 JSON，按体积检查 OK，11KB）"
+    },
+    {
+      "id": "all_DO_NOT_DELETE",
+      "name": "DO_NOT_DELETE",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "fail",
+      "last_update": "--",
+      "age_min": null,
+      "heal_cat": "algo_run",
+      "message": "DO_NOT_DELETE.js 缺失或解析失败（未被 CARD_DEFS 登记）"
+    },
+    {
+      "id": "all_ETF_SUBSCRIPTION",
+      "name": "ETF_SUBSCRIPTION",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:43:46",
+      "age_min": 4.7,
+      "heal_cat": "algo_run",
+      "message": "ETF_SUBSCRIPTION.js 更新于 今日 13:43"
+    },
+    {
+      "id": "all_EXPERIMENT",
+      "name": "EXPERIMENT",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:45:28",
+      "age_min": 3.0,
+      "heal_cat": "algo_run",
+      "message": "EXPERIMENT.js 更新于 今日 13:45"
+    },
+    {
+      "id": "all_FINAL_RECOMMEND_DATA",
+      "name": "FINAL_RECOMMEND_DATA",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 09:39:13",
+      "age_min": 249.2,
+      "heal_cat": "algo_run",
+      "message": "FINAL_RECOMMEND_DATA.js 更新于 今日 09:39"
+    },
+    {
+      "id": "all_FOUR_VOLUME_60M",
+      "name": "FOUR_VOLUME_60M",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 09:01:45",
+      "age_min": null,
+      "heal_cat": "algo_run",
+      "message": "FOUR_VOLUME_60M.js 低频/手动维护文件（白名单内，无时间戳属正常，6KB）"
+    },
+    {
+      "id": "all_HEALTH_CHECK",
+      "name": "HEALTH_CHECK",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:48:19",
+      "age_min": null,
+      "heal_cat": "algo_run",
+      "message": "HEALTH_CHECK.js 低频/手动维护文件（白名单内，无时间戳属正常，23KB）"
+    },
+    {
+      "id": "all_HERDING_DATA",
+      "name": "HERDING_DATA",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:38:54",
+      "age_min": 9.5,
+      "heal_cat": "algo_run",
+      "message": "HERDING_DATA.js 更新于 今日 13:38"
+    },
+    {
+      "id": "all_H_AUTO_BUY",
+      "name": "H_AUTO_BUY",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 10:16:48",
+      "age_min": 211.6,
+      "heal_cat": "algo_run",
+      "message": "H_AUTO_BUY.js 更新于 今日 10:16"
+    },
+    {
+      "id": "all_H_AUTO_BUY_TRACK",
+      "name": "H_AUTO_BUY_TRACK",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 09:39:09",
+      "age_min": 249.3,
+      "heal_cat": "algo_run",
+      "message": "H_AUTO_BUY_TRACK.js 更新于 今日 09:39"
+    },
+    {
+      "id": "all_INDEX_HISTORY",
+      "name": "INDEX_HISTORY",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:38:52",
+      "age_min": 9.6,
+      "heal_cat": "algo_run",
+      "message": "INDEX_HISTORY.js 更新于 今日 13:38"
+    },
+    {
+      "id": "all_LHB_7D",
+      "name": "LHB_7D",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 09:39:14",
+      "age_min": 249.2,
+      "heal_cat": "algo_run",
+      "message": "LHB_7D.js 更新于 今日 09:39"
+    },
+    {
+      "id": "all_LHB_HISTORY",
+      "name": "LHB_HISTORY",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 04:58:40",
+      "age_min": 529.8,
+      "heal_cat": "algo_run",
+      "message": "LHB_HISTORY.js 更新于 今日 04:58"
+    },
+    {
+      "id": "all_MACRO_BRIEF",
+      "name": "MACRO_BRIEF",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:45:32",
+      "age_min": 2.9,
+      "heal_cat": "algo_run",
+      "message": "MACRO_BRIEF.js 更新于 今日 13:45"
+    },
+    {
+      "id": "all_MARKET_PATH_PROBABILITY",
+      "name": "MARKET_PATH_PROBABILITY",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:38:52",
+      "age_min": 9.6,
+      "heal_cat": "algo_run",
+      "message": "MARKET_PATH_PROBABILITY.js 更新于 今日 13:38"
+    },
+    {
+      "id": "all_MARKET_REGIME",
+      "name": "MARKET_REGIME",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "warn",
+      "last_update": "2026-08-29T11:34",
+      "age_min": null,
+      "heal_cat": "algo_run",
+      "message": "MARKET_REGIME.js 无 update_time/date/generated 时间戳，无法判龄（缺审计登记）"
+    },
+    {
+      "id": "all_NORTH_FUND",
+      "name": "NORTH_FUND",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:43:46",
+      "age_min": 4.7,
+      "heal_cat": "algo_run",
+      "message": "NORTH_FUND.js 更新于 今日 13:43"
+    },
+    {
+      "id": "all_OPTIMIZED_STRATEGY",
+      "name": "OPTIMIZED_STRATEGY",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29",
+      "age_min": null,
+      "heal_cat": "algo_run",
+      "message": "OPTIMIZED_STRATEGY.js 低频/手动维护文件（白名单内，无时间戳属正常，1KB）"
+    },
+    {
+      "id": "all_OVERSEAS_MARKETS",
+      "name": "OVERSEAS_MARKETS",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:47:53",
+      "age_min": 0.5,
+      "heal_cat": "algo_run",
+      "message": "OVERSEAS_MARKETS.js 更新于 今日 13:47"
+    },
+    {
+      "id": "all_PORTFOLIO",
+      "name": "PORTFOLIO",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-28 16:01:51",
+      "age_min": null,
+      "heal_cat": "algo_run",
+      "message": "PORTFOLIO.js 低频/手动维护文件（白名单内，无时间戳属正常，0KB）"
+    },
+    {
+      "id": "all_PORTFOLIO_COST",
+      "name": "PORTFOLIO_COST",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-12 09:52:20",
+      "age_min": null,
+      "heal_cat": "algo_run",
+      "message": "PORTFOLIO_COST.js 低频/手动维护文件（白名单内，无时间戳属正常，0KB）"
+    },
+    {
+      "id": "all_POTENTIAL_PICKS",
+      "name": "POTENTIAL_PICKS",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 09:19:04",
+      "age_min": 269.4,
+      "heal_cat": "algo_run",
+      "message": "POTENTIAL_PICKS.js 更新于 今日 09:19"
+    },
+    {
+      "id": "all_RISK_GAUGE",
+      "name": "RISK_GAUGE",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 12:49:24",
+      "age_min": 59.0,
+      "heal_cat": "algo_run",
+      "message": "RISK_GAUGE.js 更新于 今日 12:49"
+    },
+    {
+      "id": "all_RUNNER_STATUS",
+      "name": "RUNNER_STATUS",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:47:53",
+      "age_min": 0.5,
+      "heal_cat": "algo_run",
+      "message": "RUNNER_STATUS.js 更新于 今日 13:47"
+    },
+    {
+      "id": "all_RUNNER_STATUS_HEALTH",
+      "name": "RUNNER_STATUS_HEALTH",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 08:22:08",
+      "age_min": null,
+      "heal_cat": "algo_run",
+      "message": "RUNNER_STATUS_HEALTH.js 低频/手动维护文件（白名单内，无时间戳属正常，0KB）"
+    },
+    {
+      "id": "all_SECTOR_FUND_FLOW_INTRADAY",
+      "name": "SECTOR_FUND_FLOW_INTRADAY",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:38:52",
+      "age_min": 9.6,
+      "heal_cat": "algo_run",
+      "message": "SECTOR_FUND_FLOW_INTRADAY.js 更新于 今日 13:38"
+    },
+    {
+      "id": "all_SECTOR_FUND_FLOW_TREND",
+      "name": "SECTOR_FUND_FLOW_TREND",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 09:06",
+      "age_min": 282.4,
+      "heal_cat": "algo_run",
+      "message": "SECTOR_FUND_FLOW_TREND.js 更新于 今日 09:06"
+    },
+    {
+      "id": "all_SECTOR_PHASE_HISTORY",
+      "name": "SECTOR_PHASE_HISTORY",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 08:38",
+      "age_min": 310.4,
+      "heal_cat": "algo_run",
+      "message": "SECTOR_PHASE_HISTORY.js 更新于 今日 08:38"
+    },
+    {
+      "id": "all_SECTOR_RECOMMENDATION",
+      "name": "SECTOR_RECOMMENDATION",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "warn",
+      "last_update": "2026-08-29T11:34",
+      "age_min": null,
+      "heal_cat": "algo_run",
+      "message": "SECTOR_RECOMMENDATION.js 无 update_time/date/generated 时间戳，无法判龄（缺审计登记）"
+    },
+    {
+      "id": "all_SECTOR_RS",
+      "name": "SECTOR_RS",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 08:38",
+      "age_min": 310.4,
+      "heal_cat": "algo_run",
+      "message": "SECTOR_RS.js 更新于 今日 08:38"
+    },
+    {
+      "id": "all_SENTIMENT_CYCLE",
+      "name": "SENTIMENT_CYCLE",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:48:23",
+      "age_min": 0.0,
+      "heal_cat": "algo_run",
+      "message": "SENTIMENT_CYCLE.js 更新于 今日 13:48"
+    },
+    {
+      "id": "all_SH_SZ_HISTORY",
+      "name": "SH_SZ_HISTORY",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:45:32",
+      "age_min": 2.9,
+      "heal_cat": "algo_run",
+      "message": "SH_SZ_HISTORY.js 更新于 今日 13:45"
+    },
+    {
+      "id": "all_STOCK_LIST",
+      "name": "STOCK_LIST",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 09:39:14",
+      "age_min": 249.2,
+      "heal_cat": "algo_run",
+      "message": "STOCK_LIST.js 更新于 今日 09:39"
+    },
+    {
+      "id": "all_STOCK_PROFILE",
+      "name": "STOCK_PROFILE",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:47:53",
+      "age_min": null,
+      "heal_cat": "algo_run",
+      "message": "STOCK_PROFILE.js 低频/手动维护文件（白名单内，无时间戳属正常，1397KB）"
+    },
+    {
+      "id": "all_STOCK_QUOTE",
+      "name": "STOCK_QUOTE",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:38:52",
+      "age_min": 9.6,
+      "heal_cat": "algo_run",
+      "message": "STOCK_QUOTE.js 更新于 今日 13:38"
+    },
+    {
+      "id": "all_STOCK_RPS_DATA",
+      "name": "STOCK_RPS_DATA",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 08:53:36",
+      "age_min": 294.8,
+      "heal_cat": "algo_run",
+      "message": "STOCK_RPS_DATA.js 更新于 今日 08:53"
+    },
+    {
+      "id": "all_STOCK_STOP_DATA",
+      "name": "STOCK_STOP_DATA",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 09:04:31",
+      "age_min": 283.9,
+      "heal_cat": "algo_run",
+      "message": "STOCK_STOP_DATA.js 更新于 今日 09:04"
+    },
+    {
+      "id": "all_SUSPENSION_ALERT",
+      "name": "SUSPENSION_ALERT",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 09:04:34",
+      "age_min": 283.9,
+      "heal_cat": "algo_run",
+      "message": "SUSPENSION_ALERT.js 更新于 今日 09:04"
+    },
+    {
+      "id": "all_SZ_FIB",
+      "name": "SZ_FIB",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 08:38",
+      "age_min": 310.4,
+      "heal_cat": "algo_run",
+      "message": "SZ_FIB.js 更新于 今日 08:38"
+    },
+    {
+      "id": "all_TOP5_TRACK",
+      "name": "TOP5_TRACK",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 09:16",
+      "age_min": 272.4,
+      "heal_cat": "algo_run",
+      "message": "TOP5_TRACK.js 更新于 今日 09:16"
+    },
+    {
+      "id": "all_TRIPLE_HISTORY",
+      "name": "TRIPLE_HISTORY",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 11:10:56",
+      "age_min": 157.5,
+      "heal_cat": "algo_run",
+      "message": "TRIPLE_HISTORY.js 更新于 今日 11:10"
+    },
+    {
+      "id": "all_TRIPLE_TRACK",
+      "name": "TRIPLE_TRACK",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 09:03:49",
+      "age_min": 284.6,
+      "heal_cat": "algo_run",
+      "message": "TRIPLE_TRACK.js 更新于 今日 09:03"
+    },
+    {
+      "id": "all_VOLATILITY",
+      "name": "VOLATILITY",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 09:03:56",
+      "age_min": 284.5,
+      "heal_cat": "algo_run",
+      "message": "VOLATILITY.js 更新于 今日 09:03"
+    },
+    {
+      "id": "all_W52_HIGH",
+      "name": "W52_HIGH",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 13:43:49",
+      "age_min": 4.6,
+      "heal_cat": "algo_run",
+      "message": "W52_HIGH.js 更新于 今日 13:43"
+    },
+    {
+      "id": "all_WEEKEND_META_REPORT",
+      "name": "WEEKEND_META_REPORT",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 09:21:41",
+      "age_min": null,
+      "heal_cat": "algo_run",
+      "message": "WEEKEND_META_REPORT.js 低频/手动维护文件（白名单内，无时间戳属正常，0KB）"
+    },
+    {
+      "id": "all_WEEKEND_RUN",
+      "name": "WEEKEND_RUN",
+      "page": "全量数据",
+      "freq": "—",
+      "status": "ok",
+      "last_update": "2026-08-29 09:21:41",
+      "age_min": null,
+      "heal_cat": "algo_run",
+      "message": "WEEKEND_RUN.js 低频/手动维护文件（白名单内，无时间戳属正常，1KB）"
+    }
+  ]
+};
