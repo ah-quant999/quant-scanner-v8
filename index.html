@@ -10386,8 +10386,9 @@ function drawUpDownChart(){
     if(_inS.length){sumTxt+=_inS.length+' 个赛道当日资金净流入，<b>'+_inS[0].name+'</b> <span style="color:#ff6b81;font-weight:700;">+'+_inS[0].net+'亿</span>领衔'+(_inS[0].consecutive_days?('（连续'+_inS[0].consecutive_days+'天）'):'')+'；';}
     else {sumTxt+='当日无板块资金净流入；';}
     sumTxt+='共振≥80分 <b style="color:#ff6b81;">'+_s80S.length+'</b> 只；';
-    // 2026-08-29 主人令：本结论行只描述环境，不再自造开仓建议（避免与全站唯一裁决源冲突）
-    sumTxt+='板块与共振见下方明细；<b style="color:#8aa0c2;">开仓与否一律以「⚖️ 全站择时裁决」为准</b>';
+    // 2026-08-29 主人令：本结论行只描述环境，不再自造开仓建议。
+    // 2026-08-30 主人令：全站择时裁决仅在「实时数据 → AI市场速览」展示，此处不再指向它，避免多处评判。
+    sumTxt+='板块与共振见下方明细；<b style="color:#8aa0c2;">本卡为环境观测，不做开仓建议</b>';
     h+='<div style="background:#0f1a2e;border-radius:10px;padding:10px 16px;margin-bottom:14px;box-shadow:inset 4px 0 0 0 '+lightColor+';font-size:13px;line-height:1.8;color:#dbe6f7;">📌 <b>今日结论</b>：'+sumTxt+'</div>';
 
     /* 2026-08-30 主人令：全站择时裁决已统一收敛到「实时数据 → AI市场速览」顶部，
