@@ -26,7 +26,7 @@ INDEX = "index.html"
 # 增减（如某卡片精简）而误报。实测：sec-st≈16774 / sec-ph≈6277 / sec-rc≈数千。
 REQUIRED_SECTIONS = {
     "sec-st": 3000,   # 🎯 选股策略
-    "sec-ph": 1500,   # 🌙 盘后数据
+    "sec-ph": 1200,   # 🌙 盘后数据（2026-08-29 轻量化后仅保留板块资金三合一）
     "sec-rc": 1500,   # 📊 共振日历
 }
 
