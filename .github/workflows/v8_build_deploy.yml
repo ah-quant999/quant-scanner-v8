@@ -163,6 +163,12 @@ jobs:
             #   跳过所有 data/*.js 重建 → 盘中数据永远停留在旧版本。注释已要求"全量重建"，
             #   实现却用了 detect_changes，这是实现与注释不一致的致命 bug。
             python update_v8.py
+
+            # 🛡 2026-08-29 跨层一致性闸门：raw_data 新但 data/*.js 没重建的错位（如 CANDIDATE 卡 3 天）
+            #   必须在此步拦截，防止陈旧消费层被推送上线。
+            #   升级阶段先软失败（告警但不阻断），待已知 2 处不一致修复后改为硬失败。
+            python v8_verify_layer_parity.py || true
+
             # ★★ 2026-08-16 根治「逻辑详解页 v6备忘录 一直打不开」★★
             #   根因：上面第 85 行的 guard_v6_memo.py 已正确把 index.html 的
             #   iframe 戳改成 sha10(v6_memo.html)，但紧接着的 `git reset --hard FETCH_HEAD`

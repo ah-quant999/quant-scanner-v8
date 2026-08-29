@@ -5,11 +5,13 @@ check_trading_day.py — 判断今天是否为 A 股交易日。
 输出到 GitHub Actions 环境文件 $GITHUB_OUTPUT（键 is_trading_day）。
 被 v8_algo_cloud.yml 用于控制非交易日跳过整个盘后算法链，避免覆盖上一交易日数据。
 """
-import datetime
 import os
 import sys
 
 ALGO = os.path.dirname(os.path.abspath(__file__))
+V8_ROOT = os.path.dirname(ALGO)
+sys.path.insert(0, V8_ROOT)
+import v8_date  # 统一交易日历
 sys.path.insert(0, ALGO)
 
 # 🛡 2026-08-19 一劳永逸根因：v8_algo_cloud.yml 19:15 cron 连续多天 0 算法执行，
@@ -37,8 +39,8 @@ def main():
     # 2026-08-29 主人令：周末/假期审计验证时，可通过 V8_FORCE_RUN=1 强制视为交易日运行
     # （用于「代码审计/验证」场景刷新上一交易日数据，不依赖交易日历）。仅 manual dispatch 传入，
     # 日常 cron 不受影响（仍按交易日历 gate，避免周末无意义覆盖）。
+    today = v8_date.now_cst().strftime("%Y-%m-%d")
     if os.environ.get("V8_FORCE_RUN", "") == "1":
-        today = datetime.datetime.now().strftime("%Y-%m-%d")
         print(f"📅 {today} V8_FORCE_RUN=1 → 强制 is_trading_day=true（周末/假期审计验证）")
         github_output = os.environ.get("GITHUB_OUTPUT")
         if github_output:
@@ -48,10 +50,8 @@ def main():
             except Exception as e:
                 print(f"⚠️ 写入 GITHUB_OUTPUT 失败: {e}")
         sys.exit(0)
-    today = datetime.datetime.now().strftime("%Y-%m-%d")
     try:
-        from fetch_lhb import is_trading_day
-        ok = is_trading_day(today)
+        ok = v8_date.is_trading_day(today)
     except Exception as e:
         # 交易日历拉取失败时保守视为交易日（不跳过），避免调休上班日漏跑
         print(f"⚠️ 交易日历判断失败: {e}，保守视为交易日继续跑")

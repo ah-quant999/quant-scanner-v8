@@ -28,6 +28,8 @@ FAILED_SCRIPTS = []
 
 ALGO = os.path.dirname(os.path.abspath(__file__))
 V8_ROOT = os.path.dirname(ALGO)
+sys.path.insert(0, V8_ROOT)
+import v8_date  # v8 统一交易日历/数据日期中枢
 # ⚠️ out 目录必须与被迁移脚本的 os.path.join(BASE, "..", "out") 口径一致：
 #   脚本 BASE = algorithms/，故 BASE/../out = 仓库根/out（不是 algorithms/out）。
 #   原来这里写 ALGO/out 与脚本对不上 → reseed 灌到 algorithms/out 而脚本读仓库根/out → 全链找不到输入。
@@ -292,35 +294,18 @@ def _is_post_close_picking_ready():
 
 # 2026-08-29 科学运行模式（主人：周末/假期放开跑，不要限死；长假仅首日有 T+1）
 def _is_trading_day_now():
-    """调用 fetch_lhb.is_trading_day 判定今日是否 A 股交易日（含调休上班日）。"""
-    sys.path.insert(0, ALGO)
+    """调用 v8_date 判定今日是否 A 股交易日（含调休上班日），全链路统一口径。"""
     try:
-        from utils.time_gate import _now_cst
-        from fetch_lhb import is_trading_day
-        return bool(is_trading_day(_now_cst().strftime("%Y-%m-%d")))
+        return v8_date.is_trading_day()
     except Exception:
         return True  # 兜底：无法判定时按交易日处理，不阻断
-    finally:
-        sys.path.pop(0)
 
 
 def _last_trading_day():
     """返回最近一个 A 股交易日（含今天；若今天非交易日则往前找）。回填模式用其作为数据日期，
-    避免周末/假期跑批把日期错标成今天（周六无交易，数据实为上周五收盘）。"""
-    sys.path.insert(0, ALGO)
-    try:
-        from utils.time_gate import _now_cst
-        from fetch_lhb import is_trading_day
-        d = _now_cst()
-        for _ in range(0, 15):
-            if is_trading_day(d.strftime("%Y-%m-%d")):
-                return d.strftime("%Y-%m-%d")
-            d -= datetime.timedelta(days=1)
-        return _now_cst().strftime("%Y-%m-%d")
-    except Exception:
-        return _now_cst().strftime("%Y-%m-%d")
-    finally:
-        sys.path.pop(0)
+    避免周末/假期跑批把日期错标成今天（周六无交易，数据实为上周五收盘）。
+    统一走 v8_date 中枢，确保全链路日期口径一致。"""
+    return v8_date.last_trading_day(max_lookback=15)
 
 
 def _run_mode():

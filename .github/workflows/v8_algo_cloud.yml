@@ -231,6 +231,17 @@ jobs:
           PYEOF
           python "$RUNNER_TEMP/sync_src_v8cloud.py"
 
+      # 🛡 2026-08-29 统一交易日历中枢：所有下游脚本通过 V8_DATA_DATE 取「数据应属日期」，
+      #   根治非交易日跑批把日期错标成「今天」的冒充今日问题。
+      - name: "🗓 解析数据日期"
+        id: data_date
+        shell: bash
+        run: |
+          DATA_DATE=$(python -c "import v8_date; print(v8_date.today_data_date())")
+          echo "data_date=$DATA_DATE" >> "$GITHUB_OUTPUT"
+          echo "V8_DATA_DATE=$DATA_DATE" >> "$GITHUB_ENV"
+          echo "📅 数据日期=$DATA_DATE"
+
       # 🔴 2026-08-16 根治：原「硬编码 Python 3.12 路径」探测在 alimi-cn runner 上找不到
       #   → 整条算法链在第一步就 exit 1（连续 5 次 failure，大牛股猎手/RPS/四量终极等全部停更）。
       #   数据抓取链 v8_cn_fetch_cloud.yml 早已改回 actions/setup-python@v5 + 3.13 且稳定成功，

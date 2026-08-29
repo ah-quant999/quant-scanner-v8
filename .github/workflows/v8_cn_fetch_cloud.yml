@@ -109,6 +109,17 @@ jobs:
         with:
           fetch-depth: 1
 
+      # 🛡 2026-08-29 统一交易日历中枢：所有下游脚本通过 V8_DATA_DATE 取「数据应属日期」，
+      #   根治非交易日跑批把日期错标成「今天」的冒充今日问题。
+      - name: "🗓 解析数据日期"
+        id: data_date
+        shell: bash
+        run: |
+          DATA_DATE=$(python -c "import v8_date; print(v8_date.today_data_date())")
+          echo "data_date=$DATA_DATE" >> "$GITHUB_OUTPUT"
+          echo "V8_DATA_DATE=$DATA_DATE" >> "$GITHUB_ENV"
+          echo "📅 数据日期=$DATA_DATE"
+
       # 🛡 2026-08-22 一劳永逸（主人令根治）：幂等闸门升级
       #   旧版 exit 0 在 run: 块里只是退出当前 shell、后续步骤仍照跑 → 实际从未拦住抓取，
       #   且「只要有并发就跳过」过激：一个僵尸/过期 run 会永久冻住本卡刷新。
@@ -287,6 +298,15 @@ jobs:
         shell: bash
         run: |
           python update_v8.py
+
+      # 🛡 2026-08-29 跨层一致性闸门：raw_data 新但 data/*.js 没重建的错位（如 CANDIDATE 卡 3 天）
+      #   必须在此步拦截，防止陈旧消费层被推送上线。
+      #   升级阶段先 continue-on-error=true（告警但不阻断），待已知 2 处不一致修复后改为硬失败。
+      - name: "🧪 校验 data/*.js 与 raw_data/*.json 时间戳一致"
+        continue-on-error: true
+        shell: bash
+        run: |
+          python v8_verify_layer_parity.py
 
       - name: "🩺 刷新 HEALTH_CHECK.js (v8_health_check)"
         # 🔴 2026-08-18 主人根治令：health_check 硬失败曾 3 次拖垮整个 workflow
