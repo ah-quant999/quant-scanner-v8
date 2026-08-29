@@ -11656,6 +11656,10 @@ function drawUpDownChart(){
     //   此处保留兜底重调（幂等：开头已设则跳过）。8/19 根因：自愈设置在尾部，函数中途
     //   return/抛错则永不自愈 → 4 admin 页空白无人救。
     try{ if(typeof window.renderUnlisted==='function' && document.getElementById('unlistedPanel') && document.getElementById('unlistedPanel').innerHTML.length<1000) window.renderUnlisted(); }catch(e){}
+    // 2026-08-29：AI 预测 / 潜力挖掘 2 卡迁入调试专区后，子 tab 触发器被移除导致空卡；
+    // 在 renderUnlisted 末尾主动触发填充，数据未到则函数内部轮询自愈。
+    try{ if(typeof window._fillAiPrediction==='function') window._fillAiPrediction(); }catch(e){ console.warn('AI预测卡渲染失败',e); }
+    try{ if(typeof window._fillPotentialPicks==='function') window._fillPotentialPicks(); }catch(e){ console.warn('潜力挖掘卡渲染失败',e); }
     // 🛡 2026-08-19 主人令：render 调用（宏观+板块推荐；路径概率已迁 AI 预测子TAB 由 _fillAiPrediction 渲染）
     try{ if(typeof window.renderMarketRegimeCard==='function') window.renderMarketRegimeCard(); }catch(e){console.warn("宏观卡渲染失败",e);}
     try{ if(typeof window.renderSectorRecommendationCard==='function') window.renderSectorRecommendationCard(); }catch(e){console.warn("板块推荐卡渲染失败",e);}
