@@ -13121,13 +13121,13 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
 
     // akshare：港股>0 说明 akshare 港股接口可用（或 gold_pool 兜底生效）
     var hkCnt = sd['港股成交前50'] || 0;
-    _setExtSrcRow('Akshare', hkCnt > 0, hkCnt > 0
+    _setExtSrcRow('Ak', hkCnt > 0, hkCnt > 0
       ? '港股 '+hkCnt+'只（akshare实时或gold_pool兜底）'
       : 'akshare港股接口不可达且gold_pool无港股数据——检查云端网络/akshare版本');
 
     // 观澜台：观澜台>0（观澜台含自选+研报两个子来源）
     var glCnt = (sd['观澜台'] || 0) + (sd['观澜台研报'] || 0);
-    _setExtSrcRow('Guanlan', glCnt > 0, glCnt > 0
+    _setExtSrcRow('Gl', glCnt > 0, glCnt > 0
       ? '自选+研报共'+glCnt+'只'
       : 'guanlan_*.json缺失或过期——检查ZSXQ_TOKEN Secret是否已配置/guanlan_extractor是否在算法链中运行');
 
