@@ -253,6 +253,12 @@
     },
     "300475": {
       "2026-08-29": 172.1
+    },
+    "601138": {
+      "2026-08-29": 64.04
+    },
+    "001309": {
+      "2026-08-29": 0
     }
   },
   "_tracking_latest": {
@@ -556,12 +562,28 @@
       "status": "near",
       "streak": 1,
       "total_days": 1
+    },
+    "601138": {
+      "enter_date": "2026-08-29",
+      "enter_close": 64.04,
+      "last_date": "2026-08-29",
+      "last_close": 64.04,
+      "status": "near",
+      "streak": 1
+    },
+    "001309": {
+      "enter_date": "2026-08-29",
+      "enter_close": 0,
+      "last_date": "2026-08-29",
+      "last_close": 0,
+      "status": "near",
+      "streak": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-08-29 07:38:35"
+    "last_update": "2026-08-29 09:03:49"
   },
   "2026-08-18": [
     {
@@ -1741,65 +1763,24 @@
   ],
   "2026-08-29": [
     {
-      "code": "600988",
-      "name": "赤峰黄金",
-      "market": "沪市",
-      "board": "主板",
-      "close": 0,
-      "pct_chg": 0,
-      "total_score": 60,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": null,
-      "status": "near"
-    },
-    {
-      "code": "601899",
-      "name": "紫金矿业",
-      "market": "沪市",
-      "board": "主板",
-      "close": 0,
-      "pct_chg": 0,
-      "total_score": 60,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
-      ],
-      "signal_count": null,
-      "status": "near"
-    },
-    {
       "code": "300475",
       "name": "香农芯创",
       "market": "sz",
       "board": "创业板",
       "close": 172.1,
       "pct_chg": 4.09,
-      "total_score": 40.4,
+      "total_score": 75.4,
       "quality_grade": "A",
       "industry": "批发业",
       "sectors": [
-        "批发业"
-      ],
-      "signal_count": 2,
-      "status": "near"
-    },
-    {
-      "code": "600183",
-      "name": "生益科技",
-      "market": "sh",
-      "board": "主板",
-      "close": 145.65,
-      "pct_chg": 3.32,
-      "total_score": 37.2,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "计算机、通信和其他电子设备制造业"
+        "深股通",
+        "半导体概念",
+        "批发业",
+        "2026中报预增",
+        "存储芯片",
+        "科技风格",
+        "MSCI中国",
+        "2026一季报预增"
       ],
       "signal_count": 2,
       "status": "near"
@@ -1811,11 +1792,18 @@
       "board": "主板",
       "close": 49.01,
       "pct_chg": -0.39,
-      "total_score": 35.2,
+      "total_score": 65.4,
       "quality_grade": "C",
       "industry": "有色金属冶炼和压延加工业",
       "sectors": [
-        "有色金属冶炼和压延加工业"
+        "有色金属冶炼和压延加工业",
+        "一带一路",
+        "新材料",
+        "2026中报预增",
+        "参股银行",
+        "MSCI中国",
+        "机构重仓",
+        "稀缺资源"
       ],
       "signal_count": 3,
       "status": "near"
@@ -1827,13 +1815,82 @@
       "board": "主板",
       "close": 56.6,
       "pct_chg": -1.01,
-      "total_score": 34.4,
+      "total_score": 62.3,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "AI眼镜",
+        "深证100R",
+        "计算机、通信和其他电子设备制造业",
+        "无线耳机",
+        "虚拟现实",
+        "铜缆高速连接",
+        "MSCI中国",
+        "机构重仓"
+      ],
+      "signal_count": 2,
+      "status": "near"
+    },
+    {
+      "code": "600183",
+      "name": "生益科技",
+      "market": "sh",
+      "board": "主板",
+      "close": 145.65,
+      "pct_chg": 3.32,
+      "total_score": 61.5,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "昨日高振幅",
+        "PCB",
+        "计算机、通信和其他电子设备制造业",
+        "2026中报预增",
+        "百元股",
+        "MSCI中国",
+        "5G概念",
+        "HS300"
+      ],
+      "signal_count": 2,
+      "status": "near"
+    },
+    {
+      "code": "601138",
+      "name": "工业富联",
+      "market": "sh",
+      "board": "主板",
+      "close": 64.04,
+      "pct_chg": 0.28,
+      "total_score": 57.7,
+      "quality_grade": "C",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "人工智能",
+        "计算机、通信和其他电子设备制造业",
+        "2026中报预增",
+        "物联网",
+        "独角兽",
+        "MSCI中国",
+        "工业互联",
+        "车联网(车路云)"
+      ],
+      "signal_count": 2,
+      "status": "near"
+    },
+    {
+      "code": "001309",
+      "name": "德明利",
+      "market": "深市",
+      "board": "主板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 25,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
         "计算机、通信和其他电子设备制造业"
       ],
-      "signal_count": 2,
+      "signal_count": null,
       "status": "near"
     },
     {
@@ -1848,22 +1905,6 @@
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
         "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": null,
-      "status": "near"
-    },
-    {
-      "code": "603993",
-      "name": "洛阳钼业",
-      "market": "沪市",
-      "board": "主板",
-      "close": 0,
-      "pct_chg": 0,
-      "total_score": 15,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "有色金属矿采选业"
       ],
       "signal_count": null,
       "status": "near"
