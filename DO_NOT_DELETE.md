@@ -53,8 +53,11 @@
 
 **注意**: `data/` 下所有 `.js` 文件都是前端运行时依赖，**禁止批量删除**。`data/freshness_status.json` 由体检 workflow 自动生成。
 
-> 🟢 **豁免（2026-08-20 主人令：潜力挖掘页已删除 → AI 预测子TAB 重写）**：
-> `data/POTENTIAL_PICKS.js`（+ `raw_data/potential_picks.json`）为已删除页面的孤儿产物，index.html 已无任何引用，`update_v8.py` 实验链路已移除 `calc_potential_picks.py`，**允许删除**。前端已改加载 `data/MARKET_PATH_PROBABILITY.js` + `data/INDEX_HISTORY.js`（AI 预测卡）。
+> 🟢 **豁免清单（DO_NOT_DELETE.md 为唯一裁判，pre-commit hook 读取本区块内含「豁免」二字的行、放行其中反引号包裹的路径删除）**：
+> 🟢 豁免 `data/POTENTIAL_PICKS.js` + `raw_data/potential_picks.json`：潜力挖掘页已删，孤儿产物，全站0引用，允许删除（2026-08-20 主人令）。
+> 🟢 豁免 `data/BLOAT_CHECK.js`：v8_bloat_check.py 已停生成（产物迁 .workbuddy/v8_bloat_report.json），全站0引用，允许删除（2026-08-29 轻量化收尾）。
+> 🟢 豁免 `data/DELISTED_STOCKS.js`：renderDelisted 已改读 raw_data/delisted_stocks.json，update_v8.py 已移除映射，全站0引用，允许删除（2026-08-29 轻量化收尾）。
+> 注：`data/MAHARO.js` 已于远端 commit 7193a5b93（maharo 全链路移除）先行删除，本地无需再处理。
 
 ---
 
