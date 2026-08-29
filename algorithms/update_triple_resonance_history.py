@@ -201,6 +201,11 @@ def main():
     meta["last_update"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     history["_meta"] = meta
 
+    # 🛡 2026-08-29 一劳永逸式修复：补写顶层 update_time，与全站 raw 文件约定一致。
+    # 此前只写 meta.last_update，导致 update_v8 / 跨层校验读到的顶层 update_time 停留在旧值，
+    # 触发「消费层时间戳不一致」误报，阻断推送。
+    history["update_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
     os.makedirs(DATA_DIR, exist_ok=True)
     with open(OUTPUT, "w", encoding="utf-8") as f:
         json.dump(history, f, ensure_ascii=False, indent=2)
