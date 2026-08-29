@@ -291,6 +291,15 @@ jobs:
         run: |
           python algorithms/bridge_raw_data.py
 
+      - name: "💰 抓取平均股价真实指数 880003 (fetch_avg_price.py)"
+        # 2026-08-30 方案A：真实通达信880003 日K → raw_data/avg_price_data.json。
+        # 早于 update_v8 运行，使其映射为 data/AVG_PRICE_DATA.js（含真实 MA20/MA60 与买卖信号）。
+        # 三源(东财push2his/akshare)失败则写 available=false 占位，前端不显示假信号。
+        continue-on-error: true
+        shell: bash
+        run: |
+          python scripts/fetch_avg_price.py
+
       - name: "🔄 重生成 data/*.js (update_v8)"
         # 🔴 2026-08-18 主人根治令：消费层软失败。update_v8 失败（个别数据源格式异常）不阻断
         #   后续 health_check；云端 bridge 已成功则 data 基础已就绪。
