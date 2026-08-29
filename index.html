@@ -1313,6 +1313,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/FOUR_VOLUME.js?v=28bba43467" defer></script>
     <script src="data/FOUR_VOLUME_60M.js?v=94404e8871" defer></script>
     <script src="data/STOCK_STOP_DATA.js?v=9f48ff044d" defer></script>
+    <!-- 2026-08-30 审计修复：STOCK_RPS_DATA 此前【从未被 script 引入】，
+         相对强度(RPS)子页 window.STOCK_RPS_DATA 恒为 {} → 表格永远空白。
+         现补引入；缓存戳由 update_v8.py 在后续 build 自动刷新。 -->
+    <script src="data/STOCK_RPS_DATA.js?v=8f2a1c3d90" defer></script>
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=e834dd3eb5" defer></script>
 <script src="data/COCKPIT_BACKTEST.js?v=28d97919ff" defer></script>
 <script src="data/BACKTEST_TDX.js?v=b3788445c6" defer></script>

@@ -100,6 +100,19 @@ jobs:
               "RUNNER_STATUS_HEALTH",
               "SECTOR_FUND_FLOW_INTRADAY",
               "WEEKEND_META_REPORT",
+              # 🛡 2026-08-30 审计误删修复（一劳永逸）：
+              #   cleanup 用 `var_name + '.json'`（如 STOCK_RPS_DATA.json）去 mapped_files 比对，
+              #   但 update_v8.py 的映射键是小写/缩写（如 stock_rps.json），命名不一致 → 误判为孤儿。
+              #   2026-08-30 实测 data/STOCK_RPS_DATA.js 因此被删（前端相对强度页 4 处引用，页面空白）。
+              #   以下 7 个为全量扫描出的「命名不一致」清单（含 4.1MB 的 STOCK_QUOTE），全部纳入保护。
+              "AI_MARKET_BRIEF",
+              "INDEX_HISTORY",
+              "MARKET_PATH_PROBABILITY",
+              "RUNNER_STATUS",
+              "SECTOR_FUND_FLOW_INTRADAY",
+              "STOCK_QUOTE",
+              "STOCK_RPS_DATA",
+              "FINAL_RECOMMEND_DATA",
           }
           # 保留目录：历史快照、回测产物等整体保护
           PROTECTED_DIRS = {"history", "backtest", "optimize", "v8_cal_archive"}
