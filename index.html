@@ -1328,6 +1328,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <div class="tab locked admin-only" data-sec="bt" data-lock="1" onclick="guardLock('bt',this)">🔒 策略回测 <span class="lk">[锁]</span></div>
   <!-- 2026-08-07 主人令：暂未上架 从运维子 Tab 提升为一级 nav（仅管理员可见，guardLock 锁定） -->
   <div class="tab locked admin-only" data-sec="ul" data-lock="1" onclick="guardLock('ul',this)">🔒 暂未上架 <span class="lk">[锁]</span></div>
+  <!-- 2026-08-29 主人令：已下架 从运维子 Tab 提升为一级 nav -->
+  <div class="tab locked admin-only" data-sec="dl" data-lock="1" onclick="guardLock('dl',this)">🔒 已下架 <span class="lk">[锁]</span></div>
   <div class="tab locked admin-only" data-sec="op" data-lock="1" onclick="guardLock('op',this)">🔒 运维 <span class="lk">[锁]</span></div>
   <div class="tab locked admin-only" data-sec="lg" data-lock="1" onclick="guardLock('lg',this)">🔒 逻辑详解 <span class="lk">[锁]</span></div>
 </nav>
@@ -2445,6 +2447,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <button class="st-tab active" data-st="tc" onclick="switchSt('tc')">🥇 三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="rps" onclick="switchSt('rps')">📈 相对强度 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用·固定</span></button>
+      <!-- 2026-08-29 主人令：选股池作为选股策略子页面 -->
+      <button class="st-tab" data-st="pool" onclick="switchSt('pool')">🧭 选股池</button>
     </div>
 
     <!-- ===== TAB 页面：大牛股猎手 / 驾驶舱 / 全站精选 / 四量终极 → 已下沉「运维→已下架·选股模块」(2026-08-29 主人令) ===== -->
@@ -2660,6 +2664,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div id="strpsBtCurve" style="width:100%;height:200px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;position:relative;overflow:hidden;"></div>
       </div>
     </div><!--/st-rps-->
+
+    <!-- ===== TAB 页面：🧭 选股池（2026-08-29 主人令：从盘后数据·已下架迁至选股策略子页） ===== -->
+    <div id="st-pool" class="st-pane">
+      <div class="card" style="border-left:4px solid #f9a8d4;">
+        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🧭</span>观测候选股池 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span> <span style="font-size:11px;color:var(--sub);font-weight:400">上游水源</span> <span style="color:var(--dim);font-weight:400">- 盘后 ·</span> <span class="fresh" id="stPoolTime">—</span></h3>
+        <div id="stPoolSourceDist" class="tp-stocklist"></div>
+        <div id="stPoolStockList" class="tp-stocklist"></div>
+        <div class="note">筛选：主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50 + 观澜台(自选+研报)。三板合计≥280视为健康。</div>
+      </div>
+    </div><!--/st-pool-->
 
   </section>
 
@@ -4632,6 +4646,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <div id="unlistedPanel"></div>
   </section>
 
+  <!-- ============ 已下架（2026-08-29 主人令：从运维子 Tab 提升为一级 nav） ============ -->
+  <section id="sec-dl">
+    <div class="sec-head"><h2>🔒 已下架</h2><span class="tag">仅管理员可见 · 下沉卡片 · 保留可查（斐波那契 / 商品涨价弹性 / 资金流时间轴 / 宏观观测 等）</span></div>
+    <div id="delistedTopPanel"></div>
+  </section>
+
   <!-- ============ 逻辑详解（管理员） ============ -->
 
   <!-- ============ 逻辑详解（管理员） ============ -->
@@ -5027,6 +5047,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <li><b>驾驶舱</b>有 A/B/C/D 多档分级，可按风险偏好选。</li>
           <li><b>全站精选</b>是综合池，机会多但单信号强度弱。</li>
           <li><b>逆势龙头 CRDS</b> 是<b>专用场景</b>（弱市找强势股），不通用——所以不挂星级，只标"弱市专用"挂在末尾。</li>
+          <li style="color:var(--gold)"><b>2026-08-29 主人令</b>：<b>🧭 选股池</b>作为选股策略子页（🧭 选股池 tab）——上游水源多源信号初筛池（主板+创业板+科创板成交前100 + 港股成交前50 + 观澜台），三板合计≥280视为健康。</li>
         </ul>
         <div class="logic-h">「今日已跑完」 vs 「已入仓」</div>
         <div class="logic-p">两个标识是<b>独立维度</b>，不可混淆：<br>
@@ -5290,7 +5311,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">定位</div>
         <div class="logic-p">仅管理员可见的实验区。放置已开发但尚未正式上架的卡片、调试工具或过渡性模块，避免在主站显示不稳定功能。</div>
         <div class="logic-h">当前内容</div>
-        <div class="logic-p">· <b>实验选股调试专区</b>：三重起涨 / CRDS逆势 / 候选池等验证中模块。<br>· <b>今日判定 · 环境态势</b>：已迁回「今日事件」页，此处不再重复。</div>
+        <div class="logic-p">· <b>实验选股调试专区</b>：三重起涨 / CRDS逆势 / 候选池等验证中模块。<br>· <b>今日判定 · 环境态势</b>：已迁回「今日事件」页，此处不再重复。<br>· <b style="color:var(--gold)">2026-08-29 主人令</b>：🧪 斐波那契F观测窗已从本专区移出 → 「<b>已下架 → 斐波那契窗口 · 当前回调状态</b>」下方（保留可查）。</div>
         <div class="logic-h">与正式区关系</div>
         <div class="logic-p">经主人确认稳定的模块会逐步提升到一级 Tab 或正式卡片；确认废弃的模块会移除。用户不应把暂未上架内容作为买卖依据。</div>
       </div>
@@ -5898,6 +5919,8 @@ function switchSec(sec,el){
   if(sec==='op' && typeof window.__renderOps==='function') setTimeout(window.__renderOps,60);
   // 暂未上架：进入时渲染实验区（renderUnlisted 内部有 rendered 防重；2026-08-07 一级 Tab）
   if(sec==='ul' && typeof window.renderUnlisted==='function') setTimeout(window.renderUnlisted,60);
+  // 2026-08-29 主人令：已下架 一级 nav，渲染到独立容器（不复用 opTab4 的 delistedPanel）
+  if(sec==='dl' && typeof window.renderDelisted==='function') setTimeout(function(){ try{ window.renderDelisted('delistedTopPanel'); }catch(e){} },60);
   // 今日事件：今日判定环境态势卡已迁回，进入时触发渲染
   if(sec==='td' && typeof window.__renderJudgmentBody==='function'){
     setTimeout(window.__renderJudgmentBody,60);
@@ -9916,9 +9939,69 @@ function drawUpDownChart(){
   }
   window.switchSt=function(n){
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
-    ['tc','cockpit','allsite','fv','crds','hunter','rps'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
+    ['tc','cockpit','allsite','fv','crds','hunter','rps','pool'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
     renderStTab(n);
+    // 2026-08-29 主人令：选股池子页渲染
+    if(n==='pool' && typeof window.renderStPool==='function') setTimeout(window.renderStPool, 30);
   };
+  // 2026-08-29 主人令：选股池子页渲染
+  function renderStPool(){
+    const $ = id => document.getElementById(id);
+    const cand = window.CANDIDATE || {};
+    const sd = cand.source_dist || {};
+    const total = cand.total || Object.keys(cand.stocks||{}).length || 0;
+    // 时间戳
+    const tEl = $('stPoolTime');
+    if(tEl) tEl.textContent = (cand.update_time||'--').slice(0,16).replace('T',' ');
+    // 来源级分布
+    const sdEl = $('stPoolSourceDist');
+    if(sdEl){
+      const order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','观澜台'];
+      const expect = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50};
+      let html = '<div style="display:flex;flex-wrap:wrap;gap:6px 10px;padding:4px 0 10px;font-size:12px;">';
+      order.forEach(function(s){
+        const cnt = sd[s]||0;
+        const exp = expect[s]||null;
+        let color, icon, tip = '';
+        if(cnt === 0){ color = (s==='港股成交前50'||s==='观澜台') ? '#f59e0b' : '#ef4444'; icon = '✗';
+          if(s === '港股成交前50') tip = ' —— akshare不可用/云端无港股API';
+          else if(s === '观澜台') tip = ' —— guanlan_*.json缺失或过期(>7天)';
+          else tip = ' —— 数据源异常';
+        } else if(exp && cnt < exp * 0.8){ color = '#f59e0b'; icon = '⚠'; }
+        else { color = '#22c55e'; icon = '✓'; }
+        const label = s.replace(/成交前\d+|研报/,'');
+        html += '<span title="'+s+'：'+cnt+'只'+(exp?'(期望≥'+exp+')':'')+tip+'" style="background:'+color+'15;color:'+color+';border:1px solid '+color+'30;border-radius:4px;padding:2px 7px;white-space:nowrap">'+icon+' '+label+' '+cnt+'</span>';
+      });
+      html += '<span style="color:var(--dim);margin-left:auto;align-self:center">共 <b style="color:var(--txt)">'+total+'</b> 只</span></div>';
+      sdEl.innerHTML = html;
+    }
+    // 个股列表
+    const listEl = $('stPoolStockList');
+    if(listEl){
+      const stocks = cand.stocks || {};
+      const keys = Object.keys(stocks);
+      if(keys.length === 0){
+        listEl.innerHTML = '<div class="note" style="text-align:center;">候选股池数据暂不可用</div>';
+      } else {
+        let html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-top:8px;">';
+        keys.slice(0, 100).forEach(function(code){
+          const s = stocks[code] || {};
+          const name = s.name || code;
+          const board = s.board_label || s.board || '';
+          const boardColor = s.up_pct >= 0 ? 'var(--up)' : 'var(--down)';
+          html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;">';
+          html += '<div style="font-weight:700;color:var(--txt);">'+name+' <span style="color:var(--dim);font-size:10px;font-family:monospace;">'+code+'</span></div>';
+          if(board) html += '<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:rgba(99,102,241,.15);color:#a5b4fc;margin-right:4px;">'+board+'</span>';
+          html += '<span style="color:'+boardColor+';font-weight:700;">'+(s.up_pct>=0?'+':'')+(s.up_pct||0)+'%</span>';
+          html += '</div>';
+        });
+        if(keys.length > 100) html += '<div class="note" style="grid-column:1/-1;text-align:center;">… 还有 '+(keys.length-100)+' 只未显示</div>';
+        html += '</div>';
+        listEl.innerHTML = html;
+      }
+    }
+  }
+  window.renderStPool = renderStPool;
   function initTriple(){
     const c=window.TRIPLE_CONSENSUS||null, t=window.TRIPLE_TRACK||null, h=window.TRIPLE_HISTORY||null;
     const safe=(fn,...a)=>{try{fn(...a);}catch(e){console.warn('三重模块渲染失败',e);}};
@@ -10945,54 +11028,7 @@ function drawUpDownChart(){
     // ── pane4: 🧪 调试专区 ──
     h+='<div class="ul-pane" id="ulPaneDbg" style="display:'+(_ulAct==='dbg'?'block':'none')+'">';
 
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #7b1fa2;">';
-    h+=v8CardHeader('🧪','斐波那契F观测窗','','update_time',window.SH_FIB);
-    var fib=window.SH_FIB||{};
-    h+='<div style="padding:12px 14px;">';
-    if(fib.windows&&fib.windows.length){
-      var triggered=fib.windows.filter(function(w){return w.status==='triggered'||w.status==='tracking';}).slice(0,3);
-      var future=fib.windows.filter(function(w){return w.status==='future';}).slice(0,3);
-      var missed=fib.windows.filter(function(w){return w.status==='missed';}).slice(0,3);
-      h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">';
-      h+='<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25);border-radius:8px;padding:12px;">';
-      h+='<div style="font-weight:700;color:#a78bfa;margin-bottom:8px;font-size:13px;">⏱️ F窗口</div>';
-      if(triggered.length){
-        h+='<div style="font-size:12px;color:#1D9E75;margin-bottom:8px;line-height:1.6;">⚡ 已触发/追踪：'+triggered.map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')+'</div>';
-      } else { h+='<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">暂无触发窗口</div>'; }
-      if(future.length){
-        var next=future[0];
-        h+='<div style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);border-radius:6px;padding:8px 10px;margin-bottom:8px;">';
-        h+='<div style="font-size:11px;color:var(--sub);margin-bottom:3px;">📍 下个转折点</div>';
-        h+='<div style="font-size:15px;font-weight:700;color:#d0bcff;line-height:1.4;">'+next.name+' '+next.date+' '+_fmtWeekday(next.date)+'</div>';
-        h+='<div style="font-size:11px;color:var(--sub);margin-top:3px;">距今 '+(next.days_left>=0?next.days_left:0)+' 天 · '+(next.desc||'')+'</div>';
-        h+='</div>';
-        h+='<div style="font-size:11px;color:var(--sub);margin-top:6px;line-height:1.8;">';
-        var fibDescMap={'F(3)':'小反弹','F(5)':'短期变盘','F(8)':'8日变盘','F(13)':'13日重要','F(21)':'中期转折','F(34)':'趋势确认','F(55)':'大周期拐点'};
-        future.forEach(function(w){
-          h+='<span style="display:inline-block;margin-right:12px;white-space:nowrap;color:var(--txt);">'+w.name+' <span style="color:#a78bfa">'+w.date.slice(5)+'</span> '+(fibDescMap[w.name]||'')+' <span style="color:var(--dim)">距'+(w.days_left>=0?w.days_left:0)+'天</span></span>';
-        });
-        h+='</div>';
-      }
-      h+='</div>';
-      h+='<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:8px;padding:12px;">';
-      h+='<div style="font-weight:700;color:var(--cyan);margin-bottom:8px;font-size:13px;">📐 缠论视角</div>';
-      if(fib.current){
-        h+='<div style="font-size:13px;color:var(--txt);line-height:1.6;">从 <b>'+(fib.current.peak_date||'--').slice(5)+'</b> 高点回调 <b>'+(fib.current.days_down||0)+'天</b></div>';
-        h+='<div style="font-size:13px;color:'+(fib.current.total_pct>=0?'var(--up)':'var(--down)')+';margin-top:6px;line-height:1.6;">累计 '+fib.current.total_pct+'%，模式：'+(fib.current.mode||'—')+'</div>';
-      } else { h+='<div style="font-size:13px;color:var(--dim);">暂无中枢数据</div>'; }
-      h+='</div>';
-      h+='<div style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:8px;padding:12px;">';
-      h+='<div style="font-weight:700;color:var(--down);margin-bottom:8px;font-size:13px;">🛡️ 窗口失效应对</div>';
-      if(missed.length){
-        h+='<div style="font-size:12px;color:var(--dim);line-height:1.6;">近3个失效：'+missed.map(function(w){return w.name+'('+(w.date||'').slice(5)+')';}).join(' ')+'</div>';
-      }
-      h+='<div style="font-size:12px;color:var(--sub);margin-top:6px;line-height:1.5;">F窗口跌破或放量未反 → 按原计划止损，不追加。</div>';
-      h+='</div>';
-      h+='</div>';
-    } else {
-      h+='<div class="note" style="text-align:center;">调试区数据暂不可用</div>';
-    }
-    h+='</div></div>';  // /调试卡
+    h+='</div>';  // /调试卡（斐波那契F观测窗已于 2026-08-29 主人令移至已下架·麦波那契窗口下方）（斐波那契F观测窗已于 2026-08-29 主人令移至已下架·麦波那契窗口下方）
 
     // ── 2026-08-29 主人令：AI 预测 + 潜力挖掘 2 卡并入调试专区（删 AI 预测 / 潜力挖掘 子页面后补位） ──
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';
@@ -12425,8 +12461,8 @@ function drawUpDownChart(){
     el.innerHTML=html;
   }
 
-  function renderDelisted(){
-    var el=$('delistedPanel');
+  function renderDelisted(elId){
+    var el=$(elId||'delistedPanel');
     if(!el) return;
     // 2026-08-13 主人令：去掉 dataset.rendered 缓存——已下架 Tab 每次切入都重渲染最新数据。
     // 原缓存导致 raw_data 更新后页面看不到（数据停在早盘 11:xx/15:xx），主人怀疑"没更新"。
@@ -12720,6 +12756,55 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       </div>
       <div class="ph-fib-badge" id="phFibBadge">--</div>
     </div>`;
+    // 2026-08-29 主人令：斐波那契F观测窗从调试专区移至已下架（麦波那契窗口下方）
+    h+=`<div class="card" style="margin-bottom:16px;border-left:4px solid #7b1fa2;">`;
+    h+=v8CardHeader('🧪','斐波那契F观测窗','','update_time',window.SH_FIB);
+    var _fib2=window.SH_FIB||{};
+    h+=`<div style="padding:12px 14px;">`;
+    if(_fib2.windows&&_fib2.windows.length){
+      var _trig2=_fib2.windows.filter(function(w){return w.status==='triggered'||w.status==='tracking';}).slice(0,3);
+      var _fut2=_fib2.windows.filter(function(w){return w.status==='future';}).slice(0,3);
+      var _miss2=_fib2.windows.filter(function(w){return w.status==='missed';}).slice(0,3);
+      var _fibDescMap={'F(3)':'小反弹','F(5)':'短期变盘','F(8)':'8日变盘','F(13)':'13日重要','F(21)':'中期转折','F(34)':'趋势确认','F(55)':'大周期拐点'};
+      h+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">`;
+      h+=`<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25);border-radius:8px;padding:12px;">`;
+      h+=`<div style="font-weight:700;color:#a78bfa;margin-bottom:8px;font-size:13px;">⏱️ F窗口</div>`;
+      if(_trig2.length){
+        h+=`<div style="font-size:12px;color:#1D9E75;margin-bottom:8px;line-height:1.6;">⚡ 已触发/追踪：`+_trig2.map(function(w){return w.name+`(`+(w.date||'').slice(5)+`)`;}).join(' ')+`</div>`;
+      } else { h+=`<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">暂无触发窗口</div>`; }
+      if(_fut2.length){
+        var _next2=_fut2[0];
+        h+=`<div style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);border-radius:6px;padding:8px 10px;margin-bottom:8px;">`;
+        h+=`<div style="font-size:11px;color:var(--sub);margin-bottom:3px;">📍 下个转折点</div>`;
+        h+=`<div style="font-size:15px;font-weight:700;color:#d0bcff;line-height:1.4;">`+_next2.name+` `+_next2.date+`</div>`;
+        h+=`<div style="font-size:11px;color:var(--sub);margin-top:3px;">距今 `+(_next2.days_left>=0?_next2.days_left:0)+` 天 · `+(_next2.desc||'')+`</div>`;
+        h+=`</div>`;
+        h+=`<div style="font-size:11px;color:var(--sub);margin-top:6px;line-height:1.8;">`;
+        _fut2.forEach(function(w){
+          h+=`<span style="display:inline-block;margin-right:12px;white-space:nowrap;color:var(--txt);">`+w.name+` <span style="color:#a78bfa">`+w.date.slice(5)+`</span> `+(_fibDescMap[w.name]||'')+` <span style="color:var(--dim)">距`+(w.days_left>=0?w.days_left:0)+`天</span></span>`;
+        });
+        h+=`</div>`;
+      }
+      h+=`</div>`;
+      h+=`<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:8px;padding:12px;">`;
+      h+=`<div style="font-weight:700;color:var(--cyan);margin-bottom:8px;font-size:13px;">📐 缠论视角</div>`;
+      if(_fib2.current){
+        h+=`<div style="font-size:13px;color:var(--txt);line-height:1.6;">从 <b>`+(_fib2.current.peak_date||'--').slice(5)+`</b> 高点回调 <b>`+(_fib2.current.days_down||0)+`天</b></div>`;
+        h+=`<div style="font-size:13px;color:`+(_fib2.current.total_pct>=0?'var(--up)':'var(--down)')+`;margin-top:6px;line-height:1.6;">累计 `+_fib2.current.total_pct+`%，模式：`+(_fib2.current.mode||'—')+`</div>`;
+      } else { h+=`<div style="font-size:13px;color:var(--dim);">暂无中枢数据</div>`; }
+      h+=`</div>`;
+      h+=`<div style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:8px;padding:12px;">`;
+      h+=`<div style="font-weight:700;color:var(--down);margin-bottom:8px;font-size:13px;">🛡️ 窗口失效应对</div>`;
+      if(_miss2.length){
+        h+=`<div style="font-size:12px;color:var(--dim);line-height:1.6;">近3个失效：`+_miss2.map(function(w){return w.name+`(`+(w.date||'').slice(5)+`)`;}).join(' ')+`</div>`;
+      }
+      h+=`<div style="font-size:12px;color:var(--sub);margin-top:6px;line-height:1.5;">F窗口跌破或放量未反 → 按原计划止损，不追加。</div>`;
+      h+=`</div>`;
+      h+=`</div>`;
+    } else {
+      h+=`<div class="note" style="text-align:center;">已下架数据暂不可用</div>`;
+    }
+    h+=`</div></div>`;
     h+=`<div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
       <h3><span class="ic">💹</span>商品涨价弹性榜 <span class="fresh" id="prCEFresh">—</span></h3>
       <div id="ceBody"><div class="note">加载中…</div></div>
