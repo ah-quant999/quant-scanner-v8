@@ -1,0 +1,23 @@
+{
+  "update_time": "2026-08-29T23:12:45",
+  "days": [
+    {
+      "light1": "黄灯·谨慎低吸",
+      "light1_code": "yellow",
+      "crisis_score": 31,
+      "mkt_avg": -1.012,
+      "north5": 0,
+      "light2": "企稳回升",
+      "light2_code": "stabilize",
+      "date": "2026-08-29",
+      "fwd": null
+    }
+  ],
+  "min_sample": 20,
+  "summary": {
+    "light1_code": {},
+    "light2_code": {}
+  },
+  "n_days": 1,
+  "n_days_with_fwd": 0
+}

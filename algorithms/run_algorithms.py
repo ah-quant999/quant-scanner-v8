@@ -120,6 +120,8 @@ ORDER = [
     "calc_sentiment_cycle.py",          # → data/SENTIMENT_CYCLE.js（情绪周期，读 LIMIT_UP_HEATMAP；之前无任何 workflow 调用 = 孤儿）
     "refresh_dividend_cninfo.py",       # → 更新 STOCK_QUOTE 分红字段（读 PORTFOLIO/CANDIDATE/GOLD_POOL；之前无任何 workflow 调用）
     "calc_potential_picks.py",          # 🔮 2026-08-23 恢复：潜力挖掘（板块+股票预测推荐） → data/POTENTIAL_PICKS.js（读 CONCEPT_RANKING+STOCK_PROFILE+STOCK_QUOTE）
+    # 🛡 2026-08-29 主人令：驾驶舱两盏预警灯前向有效性审计（每日记录灯态 + T+N 回填上证收益）
+    "scripts/audit_cockpit_lights.py",
     # 🛡 2026-08-18 一劳永逸式修复：以下两脚本原不在 run_algorithms 链中，导致前端卡长期陈旧
     #   - refresh_stock_metadata.py → raw_data/weekend_meta_report.json（周末复盘，月度个股资料）
     #   - fetch_weekend_run.py → raw_data/weekend_run.json（周度运行汇总）
