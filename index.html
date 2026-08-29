@@ -5104,7 +5104,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-h">归一化口径</div>
         <div class="logic-p">total_score = min(100, 原始总分 / 130 × 100)。历史快照已同步回刷，保证「≥80 精选 / ≥70 观察」的阈值在所有日期口径一致。<br><span style="color:var(--dim)">注：2026-06 那批早期快照缺少评分明细、无法还原原始分，按要求保持原样未改（不编造数据）。</span></div>
         <div class="logic-h">建议持有期（2026-08-28 新增）</div>
-        <div class="logic-p">按可信口径回测（入场价 = 信号日次一交易日<b>开盘价</b>，扣除往返 0.20% 成本，基准 = 上证指数），持有期与超额收益强相关：<br>· <b class="down">T+1 / T+3 / T+5：超额 −0.58% / −1.96% / −1.87%</b> —— 短期反而跑输大盘<br>· <b class="up">T+10：超额 +6.05%，胜率 64.5%</b><br>· <b class="up">T+20：超额 +5.92%，胜率 75.1%</b><br>因此全站默认<b>建议持有 10 个交易日</b>，不宜按 1~5 日的短线思路操作。</div>
+        <div class="logic-p">按可信口径回测（入场价 = 信号日次一交易日<b>开盘价</b>，扣除往返 0.20% 成本），持有期与超额收益强相关：<br>· <b class="down">T+1 / T+3 / T+5：相对上证指数超额 −0.59% / −1.90% / −1.78%</b> —— 短期反而跑输大盘<br>· <b class="up">T+10：相对上证超额 +5.72%，胜率 63.7%；相对国证A指 +4.53%，相对中证1000 +2.22%</b><br>· <b class="up">T+20：相对上证超额 +5.56%，胜率 68.2%</b><br>因此全站默认<b>建议持有 10 个交易日</b>，不宜按 1~5 日的短线思路操作。<br><span style="color:var(--dim)">注：中证1000 口径下 T+10 超额只剩 +2.22%，说明约 3.5pp 的「超额」实质是小盘风格 beta；真正的选股 alpha 约 2~4.5pp。</span></div>
         <div class="logic-h">评分有效性验证</div>
         <div class="logic-p">按当日评分分三组回测（T+10）：<b class="up">前 1/3 超额胜率 81.5%</b>，后 1/3 为 58.0%；分月看 T+10 超额收益 6 月 +18.7% / 7 月 +3.8% / 8 月 +4.8%，三个月全为正。<br>结论：评分的主要价值是提升<b>胜率与稳定性</b>，而非拉高单笔收益。</div>
         <div class="logic-h">历史追踪</div>
@@ -13067,6 +13067,21 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
 
   function _renderOpDiagnostics(){
     var diags = [];
+    // 2026-08-29 一劳永逸：非交易时段（周末/节假日 + 工作日 15:00-09:30 + 午休 11:30-13:00）
+    //   post_close 模块（MARGIN_DATA / ETF_SUBSCRIPTION 等交易所日频数据）天然返回空，
+    //   与真故障不同，不应进"失败/诊断详情"。只在交易时段 + 盘中报空模块。
+    function _isNonTradingWindow(){
+      var now = new Date();
+      var day = now.getDay();
+      if(day === 0 || day === 6) return true;  // 周末
+      var h = now.getHours(), m = now.getMinutes();
+      var t = h + m/60;
+      if(t < 9.5 || t >= 15) return true;       // 盘前 / 收盘后
+      if(t >= 11.5 && t < 13) return true;      // 午休
+      return false;
+    }
+    var isNonTrade = _isNonTradingWindow();
+
     // 1) Runner 模块失败/空
     var rs = window.RUNNER_STATUS || {};
     var modules = rs.modules || {};
@@ -13074,7 +13089,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       var m = modules[k];
       if(!m) return;
       if(m.status === 'fail') diags.push('Runner 模块 <b>'+k+'</b> 失败：'+(m.message || '未知错误'));
-      else if(m.status === 'empty') diags.push('Runner 模块 <b>'+k+'</b> 返回空数据');
+      else if(m.status === 'empty' && !isNonTrade) diags.push('Runner 模块 <b>'+k+'</b> 返回空数据');
     });
     // 2) HEALTH_CHECK 失败项
     var hc = window.HEALTH_CHECK || {};

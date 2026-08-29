@@ -77,6 +77,8 @@ ORDER = [
     #   且只写 out/ 不 bridge raw_data/ → INDEX_HISTORY/MARKET_PATH_PROBABILITY 永不更新）。
     #   必须在 market_path_probability.py 之前执行（它是概率卡的输入源）。
     "scripts/fetch_index_history.py",
+    # 🛡 2026-08-29 主人令：补跑第二基准（中证1000 / 国证A指），判断 +6% excess 是 alpha 还是风格 beta。
+    "scripts/fetch_index_history_multi.py",
     "calc_crds.py",
     "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
     "calc_stock_rps.py",               # → data/STOCK_RPS.js（个股RPS+RS，读 candidate.json 做 universe）
