@@ -28,6 +28,7 @@ data/zszxq_token.json
 raw_data/_rps_cache/
 raw_data/kline_cache/
 raw_data/_tdx_cache/
+raw_data/backtest_kline_cache/
 
 # 算法 staging / 生成数据（脚本和工作流会重建）
 algorithms/data/

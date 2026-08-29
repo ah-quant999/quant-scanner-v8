@@ -1360,6 +1360,7 @@ _LOW_FREQ_FILES = {
     "CONCEPT_ETF_MAP", "OPTIMIZED_STRATEGY", "BACKTEST_TDX",
     "HEALTH_CHECK", "RUNNER_STATUS_HEALTH",
     "WEEKEND_RUN",
+    "MACRO",  # 2026-08-29：window.MACRO 已被 window.MACRO_DATA 取代，index.html 仅用 MACRO_DATA/MACRO_BRIEF，全站 0 渲染引用 → 白名单免误报
     "FOUR_VOLUME_60M",  # 🛡 2026-08-27 主人令：baostock 60min 源本身滞后（曾到 8/22），
     # 且 final_recommend 已回退读日线 FOUR_VOLUME.js（Layer B），60M 不再作为最终推荐必需输入 → 降级低频白名单，消除误报红灯
 }
@@ -1502,17 +1503,20 @@ def check_raw_data():
     try:
         # 🛡 2026-08-27 主人令：排除运行时缓存目录（_rps_cache 550 + kline_cache 401 + _tdx_cache 170）
         #   这些是算法运行产生的行情缓存，本不应入库/计入仓库规模；否则一直触发 raw_volume fail 红灯。
-        _CACHE_SUBDIRS = {"_rps_cache", "kline_cache", "_tdx_cache"}
+        _CACHE_SUBDIRS = {"_rps_cache", "kline_cache", "_tdx_cache", "backtest_kline_cache"}
         n_files = sum(1 for _ in RAW_DIR.rglob("*")
                       if _.is_file() and not any(part in _CACHE_SUBDIRS for part in _.parts))
-        if n_files > 1100:
+        # 2026-08-29 一劳永逸：仓库膨胀属运维卫生指标，不应按「数据失鲜」触发 FAIL 邮件。
+        #   原 >1100 直接 FAIL 导致日常规模持续喷看门狗邮件（误报噪音）；
+        #   保留 Git Trees 422 防护语义：仅临近危险规模（>2500）才 FAIL，>1100 降为 WARN。
+        if n_files > 2500:
             results.append({"id": "raw_volume", "name": "raw_data 文件数", "page": "管线",
                             "status": "fail",
-                            "message": f"raw_data 共 {n_files} 个文件（>1100），仓库膨胀，需分流/归档"})
-        elif n_files > 850:
+                            "message": f"raw_data 共 {n_files} 个文件（>2500），临近 Git Trees 422 上限，需立即分流/归档"})
+        elif n_files > 1100:
             results.append({"id": "raw_volume", "name": "raw_data 文件数", "page": "管线",
                             "status": "warn",
-                            "message": f"raw_data 共 {n_files} 个文件（>850），接近规模上限"})
+                            "message": f"raw_data 共 {n_files} 个文件（>1100），仓库膨胀，需分流/归档"})
         else:
             results.append({"id": "raw_volume", "name": "raw_data 文件数", "page": "管线",
                             "status": "ok", "message": f"raw_data 共 {n_files} 个文件"})

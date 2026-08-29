@@ -1,1 +1,0 @@
-window.HERDING_DATA = {"current_clusters":[{"sector":"化学制药","direction":"强势抱团","count":3},{"sector":"汽车零部","direction":"强势抱团","count":3},{"sector":"一般零售","direction":"强势抱团","count":2}],"total_limit_up":32,"note":"由涨停行业集中度推导的抱团板块（行业涨停数降序）","update_time":"2026-08-24 09:37:51","republish_time":"2026-08-24 09:43:32"};

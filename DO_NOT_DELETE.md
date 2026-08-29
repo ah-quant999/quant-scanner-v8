@@ -59,6 +59,7 @@
 > 🟢 豁免 `data/BLOAT_CHECK.js`：v8_bloat_check.py 已停生成（产物迁 .workbuddy/v8_bloat_report.json），全站0引用，允许删除（2026-08-29 轻量化收尾）。
 > 🟢 豁免 `data/DELISTED_STOCKS.js`：renderDelisted 已改读 raw_data/delisted_stocks.json，update_v8.py 已移除映射，全站0引用，允许删除（2026-08-29 轻量化收尾）。
 > 🟢 豁免 `data/MAHORO.js` + `algorithms/fetch_maharo_signals.py` + `.github/workflows/mahoro_refresh.yml` + `scripts/monitor_maharo_refresh.py`：mahoro 全链路引用/监控已移除（commit 7193a5b93），功能上等同删除，全站0引用，允许物理删除（2026-08-29 主人令：mahoro 孤儿清理）。
+> 🟢 豁免 `raw_data/kline_cache/*` + `raw_data/backtest_kline_cache/*` + `raw_data/_rps_cache/*` + `raw_data/_tdx_cache/*`：算法运行时行情缓存（RPS / K线 / TDX / 回测K线），纯本地加速用、可随时重建，`.gitignore` 已忽略（严禁入库）。2026-08-29 仓库瘦身：`git rm --cached` 移出版本跟踪，**本地文件全部保留**，仅删除库内副本，不删本地缓存、不影响任何算法运行。本条为通配符豁免，避免 `raw_data/*.json` 保护规则（其 `*` 跨 `/`）误伤缓存子目录。
 
 ---
 
