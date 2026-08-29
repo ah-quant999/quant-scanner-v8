@@ -546,6 +546,41 @@ window.V8_CAL = {weeks:[],legend:[]};
     if(_hr < 17) return {slot:'盘后', horizon:'短线'};
     return {slot:'今日盘后', horizon:'短线'};
   };
+  /* ==========================================================================
+     ⚖️ 全站唯一择时裁决源 v8MarketGate()（2026-08-29 主人令：对齐三处冲突信号）
+     --------------------------------------------------------------------------
+     背景：此前「今日判定·今日信号 / AI市场速览 / 驾驶舱两盏灯」三处各自出结论，
+           且驾驶舱灯2（企稳回升=🟢）与「提胜率优化策略」（同 regime = ⛔不开仓）
+           直接矛盾，用户无法判断该信谁。
+     裁决：全站择时【唯一】以 OPTIMIZED_STRATEGY.current_regime 为准 —— 它是全站
+           唯一有回测证据的择时信号（T+10 胜率 54.6% vs 无门控基准 48.1%，+6.5pp）。
+           其余三处（今日信号 / AI速览 / 驾驶舱双灯）全部降级为「读盘观测」，
+           无回测证据，不得用于决策。
+     输出：{ok, regime, name, open, icon, color, verdict, evidence, date}
+     ========================================================================== */
+  window.v8MarketGate = function(){
+    var od = window.OPTIMIZED_STRATEGY || {};
+    var reg = od.current_regime || {};
+    var NAME = {'stabilize':'企稳整理','rebound_diverge':'反弹分歧','grind':'阴跌磨底','panic':'恐慌下行'};
+    var r = reg.regime || '';
+    if(!r){
+      return {ok:false, regime:'', name:'暂无数据', open:false, icon:'⚪', color:'#94a3b8',
+              verdict:'⏳ 等待数据', evidence:'盘后自动生成，生成后本条自动更新', date:''};
+    }
+    var open = !!reg.open_position;
+    return {
+      ok: true,
+      regime: r,
+      name: NAME[r] || r,
+      open: open,
+      icon: open ? '✅' : '⛔',
+      color: open ? '#5ee0a0' : '#ff6b81',
+      verdict: open ? '可开新仓' : '不开新仓',
+      // 证据链：回测口径与数字写死在前端，避免各处复述走样
+      evidence: '数据驱动：仅「阴跌磨底 / 恐慌下行」状态开仓（T+10 胜率 54.6%，无门控基准 48.1%，+6.5pp；样本 464 信号 / 296 只）',
+      date: reg.date || ''
+    };
+  };
   /* ---- 中国时间（Asia/Shanghai）统一解析与格式化 ---- */
   window._parseAsCST = function(ts){
     if(!ts) return null;
@@ -4589,9 +4624,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <tr><td>v8_cn_fetch_cloud</td><td>工作日 cron</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>中国数据抓取主链 · push raw_data → 自动触发 build_deploy</td></tr>
         <!-- ✅ 2026-08-29 一劳永逸：下列 3 个自愈器已于 commit 1fe4f8c71 删除（.github/workflows/ 下已不存在），
              原表仍标绿点 ACTIVE 属误导；改为灰色「已下线」，保留行以存历史 -->
-        <tr style="opacity:.55"><td>v8_intraday_healer</td><td>—</td><td><span class="status-dot s-off"></span>已下线</td><td>原盘中自愈器 · 2026-08 已删除，职能并入 v8_cn_fetch_cloud 自身重试</td></tr>
-        <tr style="opacity:.55"><td>v8_safety_net</td><td>—</td><td><span class="status-dot s-off"></span>已下线</td><td>原 raw_data stale 兜底 · 2026-08 已删除，职能并入 v8_health_patrol</td></tr>
-        <tr style="opacity:.55"><td>v8_self_heal</td><td>—</td><td><span class="status-dot s-off"></span>已下线</td><td>原失败源自动派发 · 2026-08 已删除，职能并入 v8_freshness_watch + v8_health_patrol</td></tr>
         <tr><td>v8_algo_cloud</td><td>19:15/20:00+兜底</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>收盘后算法数据生产（选股四模块+回测）</td></tr>
         <tr><td>v8_backup</td><td>每日23:00</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>备份 raw_data / data / 交接文档（含 v6 备份保留策略：v8 稳定一周前不删）</td></tr>
         <tr><td>runner_health_alert</td><td>非交易时段每2h</td><td><span class="status-dot s-ok"></span>GitHub Actions</td><td>lemoncat-cn runner 离线告警 + 自动恢复关闭 Issue</td></tr>
@@ -10296,8 +10328,23 @@ function drawUpDownChart(){
     if(_inS.length){sumTxt+=_inS.length+' 个赛道当日资金净流入，<b>'+_inS[0].name+'</b> <span style="color:#ff6b81;font-weight:700;">+'+_inS[0].net+'亿</span>领衔'+(_inS[0].consecutive_days?('（连续'+_inS[0].consecutive_days+'天）'):'')+'；';}
     else {sumTxt+='当日无板块资金净流入；';}
     sumTxt+='共振≥80分 <b style="color:#ff6b81;">'+_s80S.length+'</b> 只；';
-    sumTxt+=light.indexOf('🔴')>=0?'<b style="color:#ff6b81;">建议观望，不开新仓</b>':(light.indexOf('🟡')>=0?'<b style="color:#ffb74d;">建议轻仓低吸，严格止损</b>':'<b style="color:#5ee0a0;">环境平稳，可按计划执行</b>');
+    // 2026-08-29 主人令：本结论行只描述环境，不再自造开仓建议（避免与全站唯一裁决源冲突）
+    sumTxt+='板块与共振见下方明细；<b style="color:#8aa0c2;">开仓与否一律以「⚖️ 全站择时裁决」为准</b>';
     h+='<div style="background:#0f1a2e;border-radius:10px;padding:10px 16px;margin-bottom:14px;box-shadow:inset 4px 0 0 0 '+lightColor+';font-size:13px;line-height:1.8;color:#dbe6f7;">📌 <b>今日结论</b>：'+sumTxt+'</div>';
+
+    /* ===== ⚖️ 全站择时裁决条（2026-08-29 主人令：三处冲突信号对齐后的唯一裁决） =====
+       本条是驾驶舱/全站【唯一】的择时结论，数据来自 OPTIMIZED_STRATEGY.current_regime，
+       是全站唯一有回测证据的择时信号。下方两盏灯仅为环境观测，不得用于决策。 */
+    var _g = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : {ok:false,name:'暂无数据',icon:'⚪',color:'#94a3b8',verdict:'等待数据',evidence:'',date:''};
+    h+='<div style="background:linear-gradient(135deg,'+_g.color+'1f,'+_g.color+'0a);border:1px solid '+_g.color+'59;border-radius:10px;padding:10px 16px;margin-bottom:12px;box-shadow:inset 4px 0 0 0 '+_g.color+';">';
+    h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;line-height:1.7;">';
+    h+='<span style="font-size:14px;font-weight:800;color:'+_g.color+';">⚖️ 全站择时裁决（唯一）</span>';
+    h+='<span style="font-size:12px;font-weight:700;color:'+_g.color+';background:rgba(255,255,255,.08);border:1px solid '+_g.color+'59;padding:2px 9px;border-radius:6px;">'+_g.icon+' '+_g.name+' · '+_g.verdict+'</span>';
+    if(_g.date) h+='<span style="font-size:10.5px;color:#8aa0c2;">'+_g.date+'</span>';
+    h+='</div>';
+    if(_g.evidence) h+='<div style="font-size:11px;color:#8aa0c2;line-height:1.6;margin-top:4px;">'+_g.evidence+'</div>';
+    h+='<div style="font-size:10.5px;color:#8aa0c2;line-height:1.6;margin-top:3px;">📌 下方两盏灯 + 「今日判定·今日信号」+「AI市场速览」<b style="color:#fbbf24;">均无回测证据，仅供读盘参考</b>，不得作为开仓依据。</div>';
+    h+='</div>';
 
     h+='<div style="display:flex;gap:14px;margin-bottom:14px;align-items:stretch;">';
     h+='<div style="flex:1;min-width:0;background:'+lightBg+';color:'+lightColor+';border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;border:1px solid '+(crisisScore>=70||mktAvg<=-3?'rgba(255,107,129,.4)':crisisScore>=50||(north5<0&&crisisScore>=40)||mktAvg<0?'rgba(255,183,77,.4)':'rgba(94,224,160,.4)')+';">';
