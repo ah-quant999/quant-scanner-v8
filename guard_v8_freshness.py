@@ -114,7 +114,6 @@ WARN_SOURCES = {
     "SH_FIB": 48,
     "SZ_FIB": 48,
     "SECTOR_RS": 48,
-    "MAHORO": 48,
     "INST_TRADE": 48,
     "LHB_HISTORY": 48,  # 龙虎榜历史（机游共振/北向席位日历）：18:30 算法链累积，每日刷新
     "NT_DATA": 48,

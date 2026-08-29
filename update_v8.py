@@ -73,7 +73,6 @@ DATA_SOURCES = {
     "volatility.json":             "VOLATILITY",
     "index_quotes.json":           "INDEX_QUOTES",
     "capital_flow_data.json":      "CAPITAL_FLOW_DATA",
-    "mahoro.json":                 "MAHORO",
     "candidate.json":              "CANDIDATE",
     "backtest_comprehensive.json": "BACKTEST_COMPREHENSIVE",
     "cockpit_backtest.json":       "COCKPIT_BACKTEST",
@@ -98,7 +97,8 @@ DATA_SOURCES = {
     "top5_track.json":             "TOP5_TRACK",  # 2026-08-13 finalRec Top5 90 天滚动追踪（2026-08-15 改自 TOP3）
     "algo_track.json":              "ALGO_TRACK",   # 2026-08-15 三算法独立追踪（四量终极/板块龙头/大牛股猎手）
     "weekend_meta_report.json":      "WEEKEND_META_REPORT",
-    "delisted_stocks.json":        "DELISTED_STOCKS",
+    # 🛡 2026-08-29 一劳永逸式修复：DELISTED_STOCKS 已删（1MB 死数据，全站 0 渲染引用，renderDelisted 走 CANDIDATE）
+    # 映射移除后 update_v8.py 不再尝试写 data/DELISTED_STOCKS.js；data/HEALTH_CHECK.js 健康巡检条目待下次跑批自动收敛
     # 🛡 2026-08-18 一劳永逸式修复：补入 weekend_run.json → WEEKEND_RUN 映射
     #   原 update_v8 漏挂此映射 → data/WEEKEND_RUN.js 永远不被重新生成 → 健康巡检永远 warn
     "weekend_run.json":            "WEEKEND_RUN",
@@ -176,7 +176,6 @@ CATEGORY_MAP = {
     "COCKPIT_BACKTEST": "post_close",
     "BACKTEST_TDX": "post_close",
     "BACKTEST_COMPREHENSIVE": "post_close",
-    "MAHORO": "post_close",
     "EXPERIMENT": "post_close",
     "STOCK_LIST": "post_close",
     "STOCK_PROFILE": "post_close",

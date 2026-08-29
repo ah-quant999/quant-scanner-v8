@@ -94,7 +94,8 @@ jobs:
               ".github_pat.txt",
               # 🛡 2026-08-18 全仓库审计：以下 data/*.js 由生成器直写或前端以 window.XXX 注入，
               # 不在 DATA_SOURCES 映射且不被 `data/XXX.js` 正则引用， weekly cleanup 会误删，必须保护。
-              "BLOAT_CHECK",
+              # 🛡 2026-08-29 一劳永逸式修复：BLOAT_CHECK.js 已删（4K 死数据，全站 0 渲染引用）
+              # 周末巡检脚本 v8_bloat_check.py 已迁移产物到 .workbuddy/v8_bloat_report.json（不入白名单）
               "RISK_GAUGE",
               "RUNNER_STATUS_HEALTH",
               "SECTOR_FUND_FLOW_INTRADAY",

@@ -5,7 +5,8 @@ v8 臃肿度与崩溃风险巡检（周末体检）
 - 检查 index.html 体积、行数、script 标签平衡、重复 id
 - 检查 data/*.js 重复 window.X 注入、总大小
 - 用 node --check 做 JS 语法闸门
-- 输出 data/BLOAT_CHECK.js 供前端展示
+- 🛡 2026-08-29 一劳永逸：产物从 data/BLOAT_CHECK.js 迁到 .workbuddy/v8_bloat_report.json
+  （原产物 4KB 死数据，全站 0 渲染引用；新路径入 .workbuddy/ 内部隐藏目录）
 - 异常时邮件反馈（遵守 22:00-07:00 静音时段）
 
 运行方式：
@@ -31,7 +32,12 @@ except Exception:
 REPO_ROOT = Path(__file__).resolve().parent
 INDEX_HTML = REPO_ROOT / "index.html"
 DATA_DIR = REPO_ROOT / "data"
-OUT_JS = DATA_DIR / "BLOAT_CHECK.js"
+# 🛡 2026-08-29 一劳永逸式修复：产物从 data/BLOAT_CHECK.js 迁到 .workbuddy/v8_bloat_report.json
+#  旧产物为死数据（全站 0 渲染引用、纯 CDN 累赘），新路径入 .workbuddy/ 隐藏目录
+#  - 不再被 v8_health_check 白名单审计（白名单已删 BLOAT_CHECK 项）
+#  - 不再被 cloud_weekly_cleanup.yml 误删（保护列表已删 BLOAT_CHECK 项）
+#  - 保留邮件告警能力（main 流程 send_bloat_email 不变）
+OUT_JS = REPO_ROOT / ".workbuddy" / "v8_bloat_report.json"
 
 QUIET_HOURS_START = 22
 QUIET_HOURS_END = 7
@@ -339,9 +345,10 @@ def build_report(items):
 
 
 def write_bloat_js(report):
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    js = "window.BLOAT_CHECK = " + json.dumps(report, ensure_ascii=False, indent=2) + ";\n"
-    OUT_JS.write_text(js, encoding="utf-8")
+    # 🛡 2026-08-29 一劳永逸：产物落到 .workbuddy/（内部、不入白名单、不入 CDN）
+    OUT_JS.parent.mkdir(parents=True, exist_ok=True)
+    # 改写为 JSON（不再写 .js window 注入），前端不读取，仅供人工查阅 + 邮件附件
+    OUT_JS.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"[INFO] 已生成 {OUT_JS}")
 
 

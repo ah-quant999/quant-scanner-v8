@@ -148,7 +148,7 @@ def reset_alert_state():
 
 
 def dispatch_rescue():
-    """小九掉线时，向云端 dispatch v8_safety_net.yml 和 v8_self_heal.yml"""
+    """小九掉线时，向云端 dispatch 现存主链 workflow（v8_cn_fetch_cloud.yml / v8_algo_cloud.yml）补跑"""
     token = _load_token()
     if not token:
         log("  ❌ 未找到 GitHub token，无法 dispatch rescue")
@@ -160,7 +160,10 @@ def dispatch_rescue():
         "X-GitHub-Api-Version": "2022-11-28",
     }
     results = []
-    for wf in ["v8_safety_net.yml", "v8_self_heal.yml"]:
+    # ✅ 2026-08-29 一劳永逸：dispatch 现存主链。删掉的 v8_safety_net.yml / v8_self_heal.yml
+    #   已不存在（git log 1fe4f8c71 删），原派发 404/410。改为 dispatch v8_cn_fetch_cloud（盘中/盘后
+    #   中国数据抓取）+ v8_algo_cloud（收盘后算法数据生产）—— 两者都是云端主链，可独立 workflow_dispatch。
+    for wf in ["v8_cn_fetch_cloud.yml", "v8_algo_cloud.yml"]:
         url = f"https://api.github.com/repos/{REPO}/actions/workflows/{wf}/dispatches"
         data = json.dumps({"ref": "main"}).encode("utf-8")
         req = __import__("urllib.request").request.Request(url, data=data, headers=headers, method="POST")
