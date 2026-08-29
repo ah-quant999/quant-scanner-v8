@@ -2700,29 +2700,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div id="strpsEmpty" style="display:none;padding:14px;color:var(--dim);font-size:13px;text-align:center;">暂无满足条件的个股</div>
       </div>
 
-      <div class="card" id="strpsBacktestCard">
-        <h3><span class="ic">🔬</span>RPS 分层回测（历史模拟）</h3>
-        <div style="font-size:11px;color:var(--dim);margin-bottom:10px;">基于当前截面 RPS/RS/年线 做分层，用历史收益近似模拟持有 N 日的表现（样本为今日候选池，仅供内部验证）。</div>
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
-          <label style="font-size:12px;color:var(--sub);">持有天数：</label>
-          <select id="strpsBtHold" onchange="renderRpsBacktest()" style="background:var(--bg2);color:var(--txt);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;">
-            <option value="5">5日</option>
-            <option value="10" selected>10日</option>
-            <option value="20">20日</option>
-          </select>
-          <label style="font-size:12px;color:var(--sub);margin-left:8px;">分层：</label>
-          <select id="strpsBtTier" onchange="renderRpsBacktest()" style="background:var(--bg2);color:var(--txt);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;">
-            <option value="A">A档</option>
-            <option value="B">B档</option>
-            <option value="C">C档</option>
-            <option value="AB">A+B档</option>
-            <option value="all">全部</option>
-          </select>
-          <button onclick="renderRpsBacktest()" style="margin-left:auto;background:var(--cyan);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;">运行回测</button>
-        </div>
-        <div id="strpsBtSummary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:12px;"></div>
-        <div id="strpsBtCurve" style="width:100%;height:200px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;position:relative;overflow:hidden;"></div>
-      </div>
+      <!-- 2026-08-30 主人令「我只要最有效的东西」删除：RPS 分层回测卡（id=strpsBacktestCard）
+           删除理由（审计取证，非主观）：该卡并非真实回测——renderRpsBacktest() 用
+           ret=(r.ret50/50)*hold 把「50日已实现收益」线性折算成持有期收益，且用【今日截面】
+           的 RPS/RS/年线分层去回看历史收益，存在前视偏差(look-ahead bias)；
+           卡片自带文案亦写明「历史模拟 / 近似模拟 / 仅供内部验证」。
+           真实回测请以「🔒 策略回测 → ③ K线信号60日回测 / ② 综合回测」为准。 -->
     </div><!--/st-rps-->
 
     <!-- ===== TAB 页面：🧭 选股池（2026-08-29 主人令：从盘后数据·已下架迁至选股策略子页） ===== -->
@@ -13491,76 +13474,10 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
   }
   window.renderRpsScreen=renderRpsScreen;
 
-  function renderRpsBacktest(){
-    var D=window.STOCK_RPS_DATA||{};
-    var recs=D.records||[];
-    var hold=Number(_rps$('strpsBtHold').value)||10;
-    var tierF=_rps$('strpsBtTier').value||'A';
-    // 用历史已实现收益做近似：ret50 近似 50日收益，年化到持有期
-    var filtered=recs.filter(function(r){
-      if(!r || r.ret50==null) return false;
-      if(tierF==='all') return true;
-      if(tierF==='AB') return (r.tier==='A' || r.tier==='B');
-      return r.tier===tierF;
-    });
-    // 模拟：用 ret50 按 50日 线性折算到 hold 日 预期收益；同时记录 RS>0 / 年线 子集
-    var total=filtered.length;
-    if(total===0){
-      _rps$('strpsBtSummary').innerHTML='<div style="padding:12px;color:var(--dim)">无样本</div>';
-      _rps$('strpsBtCurve').innerHTML='';
-      return;
-    }
-    var rets=[], win=0, sum=0, max= -1e9, min=1e9;
-    var retsGate=[], winGate=0, sumGate=0, cntGate=0;
-    filtered.forEach(function(r){
-      var ret=(r.ret50/50)*hold; // 线性近似
-      rets.push(ret);
-      sum+=ret; max=Math.max(max,ret); min=Math.min(min,ret);
-      if(ret>0) win++;
-      if(r.above_ma250 && (r.rs||0)>0){
-        retsGate.push(ret); sumGate+=ret; cntGate++;
-        if(ret>0) winGate++;
-      }
-    });
-    var avg=sum/total, wr=win/total*100;
-    var avgGate=cntGate?sumGate/cntGate:null, wrGate=cntGate?winGate/cntGate*100:null;
-    var summary='<div style="padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">'+
-      '<div style="font-size:10px;color:var(--dim);margin-bottom:4px;">样本数</div><div style="font-size:20px;font-weight:800;color:var(--txt);">'+total+'</div></div>'+
-      '<div style="padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">'+
-      '<div style="font-size:10px;color:var(--dim);margin-bottom:4px;">胜率</div><div style="font-size:20px;font-weight:800;color:'+(wr>=50?'#22c55e':'#ef4444')+';">'+wr.toFixed(1)+'%</div></div>'+
-      '<div style="padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">'+
-      '<div style="font-size:10px;color:var(--dim);margin-bottom:4px;">平均收益</div><div style="font-size:20px;font-weight:800;color:'+(avg>=0?'#22c55e':'#ef4444')+';">'+avg.toFixed(2)+'%</div></div>'+
-      '<div style="padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">'+
-      '<div style="font-size:10px;color:var(--dim);margin-bottom:4px;">最佳/最差</div><div style="font-size:18px;font-weight:800;color:var(--txt);">'+max.toFixed(1)+'% / '+min.toFixed(1)+'%</div></div>';
-    if(cntGate>0){
-      summary+='<div style="padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">'+
-        '<div style="font-size:10px;color:var(--dim);margin-bottom:4px;">A档硬门禁(年线+RS>0)</div><div style="font-size:18px;font-weight:800;color:#22c55e;">胜'+wrGate.toFixed(1)+'% 均'+avgGate.toFixed(2)+'%</div></div>';
-    }
-    _rps$('strpsBtSummary').innerHTML=summary;
-    // 简单柱状图：按 ret 分桶
-    var bins=[-30,-15,-5,0,5,15,30], counts=bins.map(function(){return 0;});
-    rets.forEach(function(v){
-      if(v<-15) counts[0]++;
-      else if(v<-5) counts[1]++;
-      else if(v<0) counts[2]++;
-      else if(v<5) counts[3]++;
-      else if(v<15) counts[4]++;
-      else if(v<30) counts[5]++;
-      else counts[6]++;
-    });
-    var maxC=Math.max.apply(null,counts)||1;
-    var labels=['<-15','-15~-5','-5~0','0~5','5~15','15~30','>30'];
-    var bars=labels.map(function(l,i){
-      var h=(counts[i]/maxC*100).toFixed(1);
-      var color=i<3?'#ef4444':i<4?'#94a3b8':'#22c55e';
-      return '<div style="display:flex;align-items:flex-end;height:100%;flex-direction:column;justify-content:flex-end;flex:1;margin:0 3px;">'+
-        '<div style="width:100%;height:'+h+'%;background:'+color+';border-radius:4px 4px 0 0;min-height:2px;"></div>'+
-        '<div style="font-size:9px;color:var(--dim);text-align:center;margin-top:4px;white-space:nowrap;">'+l+'</div>'+
-        '<div style="font-size:9px;color:var(--sub);text-align:center;">'+counts[i]+'</div>'+
-      '</div>';
-    }).join('');
-    _rps$('strpsBtCurve').innerHTML='<div style="display:flex;align-items:flex-end;height:150px;padding:10px 20px 0 10px;">'+bars+'</div>';
-  }
+  /* 2026-08-30 主人令「我只要最有效的东西」删除：renderRpsBacktest()
+     删除理由：该函数为「模拟」而非真实回测 —— 用 ret=(r.ret50/50)*hold 把 50 日已实现收益
+     线性折算成持有期收益，并以【今日截面】RPS/RS/年线分层回看历史收益，存在前视偏差。
+     其宿主卡片 strpsBacktestCard 已同步删除。真实回测见「🔒 策略回测」页。 */
   window.renderRpsBacktest=renderRpsBacktest;
 
   /* ===== 四量终极 · tab 渲染（2026-08-06 主人令·从暂未上架移出） ===== */
