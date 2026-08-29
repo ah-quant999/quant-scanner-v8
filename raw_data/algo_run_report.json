@@ -1,16 +1,12 @@
 {
-  "update_time": "2026-08-29 16:44:37",
-  "run_start": "2026-08-29 15:28:45",
-  "ok": 30,
+  "update_time": "2026-08-29 18:05:05",
+  "run_start": "2026-08-29 16:46:59",
+  "ok": 31,
   "fail": 1,
   "failed_scripts": [
     {
       "script": "calc_stock_rps.py",
       "reason": "超时 >30min"
-    },
-    {
-      "script": "final_recommend.py",
-      "reason": "就绪门控未通过（上游选股输入陈旧/缺失）"
     }
   ],
   "skipped_by_time_gate": [
