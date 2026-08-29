@@ -464,6 +464,7 @@ window.__domReadyFns=[];
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=c391159a52" defer></script>
     <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=2db50068b5" defer></script>
+    <script src="data/DO_NOT_DELETE.js?v=f1f6d8bdba" defer></script>
     <script src="data/ANALYST_RATINGS.js?v=1fb1605232" defer></script>
     <script src="data/SUSPENSION_ALERT.js?v=f0741425d2" defer></script>
     <script src="data/GOLD_POOL.js?v=fc1f64a9c1" defer></script>
@@ -4713,6 +4714,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="lg-tab" data-lg="ul" onclick="switchLg('ul',this)">🔒 暂未上架</div>
       <div class="lg-tab" data-lg="op" onclick="switchLg('op',this)">🔒 运维</div>
       <div class="lg-tab" data-lg="v6" onclick="switchLg('v6',this)">📦 v6备忘录</div>
+      <div class="lg-tab" data-lg="dnd" onclick="switchLg('dnd',this)">🛡️ 防删</div>
     </div>
 
     <!-- === 今日事件 === -->
@@ -5876,6 +5878,16 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <a class="v6MemoOpenLink" href="v6_memo.html?standalone=1" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:10px;background:#38bdf8;color:#0a0e17;font-size:14px;font-weight:700;text-decoration:none;">📦 直接打开 v6 备忘录</a>
       </div>
     </div>
+    <div class="lg-pane" id="lg-dnd">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:13px;color:var(--sub);">本子页面数据由 <code>DO_NOT_DELETE.md</code> 解析，<strong style="color:var(--gold);">修改 <code>DO_NOT_DELETE.md</code> 后运行 <code>python scripts/gen_do_not_delete_js.py</code> 同步</strong>；周日 23:00 <code>v8_cleanup.yml</code> 自动跑。</div>
+        <div id="lg-dnd-stamp" style="font-size:12px;color:var(--sub);font-family:var(--mono);"></div>
+      </div>
+      <div id="lg-dnd-body" class="lg-dnd-body">
+        <div class="ipo-empty">防删清单加载中…</div>
+      </div>
+    </div>
+
   </section>
 
 </main>
@@ -9008,6 +9020,33 @@ function drawUpDownChart(){
   window.renderMarketFundFlow = renderMarketFundFlow;
   window.drawAmountChart = drawAmountChart;
   window.drawUpDownChart = drawUpDownChart;
+  // 2026-08-29 一劳永逸修复：renderThermo/SixDim/Crisis 三函数为 IIFE 局部，
+  //   之前 renderDelisted 用 if(window.renderThermo) 调用永远 false，导致
+  //   「已下架」Tab 恢复的"市场温度计·分项"/"六维共振雷达·战术层"/"危机雷达"
+  //   三卡永远卡在「加载中…」。此处与 renderMarketFundFlow/drawAmountChart/drawUpDownChart
+  //   同口径挂到 window，调用即生效。
+  window.renderThermo = renderThermo;
+  window.renderSixDim = renderSixDim;
+  window.renderCrisis = renderCrisis;
+  // ===== 防删子页面渲染：逻辑详解页读 window.DO_NOT_DELETE_HTML =====
+  // 注入源：data/DO_NOT_DELETE.js（由 scripts/gen_do_not_delete_js.py 从 DO_NOT_DELETE.md 解析）。
+  // 切换到 dnd 子 tab 时无需重渲，DOMContentLoaded 时已注入；此处暴露给运维页排查用。
+  function renderLgDnd(){
+    var el = document.getElementById('lg-dnd-body');
+    if(!el) return;
+    if(window.DO_NOT_DELETE_HTML){
+      el.innerHTML = window.DO_NOT_DELETE_HTML;
+      var ts = window.DO_NOT_DELETE_UPDATED;
+      if(ts){
+        var stamp = document.getElementById('lg-dnd-stamp');
+        if(stamp) stamp.textContent = '最后同步：' + ts + ' · 由 data/DO_NOT_DELETE.js 注入';
+      }
+    } else {
+      el.innerHTML = '<div class="ipo-empty">防删清单尚未加载（data/DO_NOT_DELETE.js?v=<sha> 未就绪）</div>';
+    }
+  }
+  window.renderLgDnd = renderLgDnd;
+  (window.__domReadyFns = window.__domReadyFns || []).push(renderLgDnd);
 
 
 
