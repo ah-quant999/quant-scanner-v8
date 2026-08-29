@@ -357,14 +357,15 @@ def write_outputs(data):
     }
     # raw_data/stock_quote.json（云端抓取落盘位置）
     raw_path = os.path.join(RAW_DIR, 'stock_quote.json')
+    out = {'update_time': meta['update_time'], 'meta': meta, 'stocks': data}  # 🛡 顶层 update_time 供 freshness SLA 读取（持久化，不被 cron 覆盖）
     with open(raw_path, 'w', encoding='utf-8') as f:
-        json.dump({**{'meta': meta}, **{'stocks': data}}, f, ensure_ascii=False)
+        json.dump(out, f, ensure_ascii=False)
     print(f"✅ raw_data/stock_quote.json  {len(data)} stocks | {os.path.getsize(raw_path)//1024} KB")
 
     # data/STOCK_QUOTE.js（v8 站点嵌入用）
     js_path = os.path.join(DATA_DIR, 'STOCK_QUOTE.js')
     with open(js_path, 'w', encoding='utf-8') as f:
-        f.write('window.STOCK_QUOTE = ' + json.dumps({**{'meta': meta}, **{'stocks': data}}, ensure_ascii=False, separators=(',', ':')) + ';\n')
+        f.write('window.STOCK_QUOTE = ' + json.dumps(out, ensure_ascii=False, separators=(',', ':')) + ';\n')
     print(f"✅ data/STOCK_QUOTE.js       {len(data)} stocks | {os.path.getsize(js_path)//1024} KB")
 
 
