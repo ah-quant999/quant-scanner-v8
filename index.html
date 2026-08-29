@@ -4344,6 +4344,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     html += '</div>';
     var stats = tt.stats || {};
     var dist = stats.tracking_distribution || {};
+    // 2026-08-30 主人令「不要弄虚作假」：已平仓样本 <30 时明确标注「样本不足」，
+    //   避免用 2 个样本的 0% 胜率误导为"策略不行"（2026-08-30 实测 samples=2）。
+    var _smp = (stats.samples == null) ? 0 : stats.samples;
+    if(_smp < 30){
+      html += '<div style="margin-bottom:10px;padding:8px 12px;border-radius:8px;font-size:11.5px;line-height:1.7;'
+           +  'background:rgba(251,191,36,.10);border:1px solid rgba(251,191,36,.35);color:var(--sub);">'
+           +  '⚠️ <b style="color:#fbbf24;">样本不足，暂无统计意义</b>：当前已平仓样本仅 <b>'+_smp+'</b> 只（需 ≥30 只才具参考价值）。'
+           +  '表中胜率/收益会随样本累积大幅波动，<b>请勿据此判断策略好坏</b>。'
+           +  '</div>';
+    }
     // 多窗口累积矩阵（5d→180d，样本随时间自然积累）
     var sbw = tt.stats_by_window || {};
     var winRows = [['5d','5天'],['10d','10天'],['20d','20天'],['30d','30天'],['60d','60天'],['90d','90天'],['180d','180天']];
