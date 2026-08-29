@@ -304,15 +304,34 @@ def _is_trading_day_now():
         sys.path.pop(0)
 
 
+def _last_trading_day():
+    """返回最近一个 A 股交易日（含今天；若今天非交易日则往前找）。回填模式用其作为数据日期，
+    避免周末/假期跑批把日期错标成今天（周六无交易，数据实为上周五收盘）。"""
+    sys.path.insert(0, ALGO)
+    try:
+        from utils.time_gate import _now_cst
+        from fetch_lhb import is_trading_day
+        d = _now_cst()
+        for _ in range(0, 15):
+            if is_trading_day(d.strftime("%Y-%m-%d")):
+                return d.strftime("%Y-%m-%d")
+            d -= datetime.timedelta(days=1)
+        return _now_cst().strftime("%Y-%m-%d")
+    except Exception:
+        return _now_cst().strftime("%Y-%m-%d")
+    finally:
+        sys.path.pop(0)
+
+
 def _run_mode():
     """返回本轮运行模式：
-    official   交易日 + 盘后窗口(18:00-23:59 / 00:00-05:59) → 全量采集+计算+推送（官方刷新）
-    validation 非交易日(周末/假期) → 跳过采集(无新数据)，用缓存重算+推送但沿用旧日期(不冒充今日)
+    official   交易日 + 盘后窗口(18:00-23:59 / 00:00-05:59) → 全量采集+计算+推送（官方刷新，日期=今天）
+    backfill   非交易日(周末/假期) + force_run → 跳过实时采集(无新数据)，用缓存重算+推送，
+               日期统一改写上一交易日（数据实为上周五收盘，不冒充今日）；满足主人「周末放开跑数据」
     blocked    交易日盘中(06:00-17:59) 且无 force → 禁止生成选股结果(等收盘)
-    force      V8_FORCE_RUN=1 → 等同 official，但非交易日自动按 validation 语义(跳过采集/保留日期)
     """
     if os.environ.get("V8_FORCE_RUN") == "1":
-        return "validation" if not _is_trading_day_now() else "official"
+        return "backfill" if not _is_trading_day_now() else "official"
     sys.path.insert(0, ALGO)
     try:
         from utils.time_gate import _now_cst
@@ -324,7 +343,7 @@ def _run_mode():
     if _is_trading_day_now() and post_close:
         return "official"
     if not _is_trading_day_now():
-        return "validation"
+        return "backfill"
     return "blocked"
 
 
@@ -452,11 +471,11 @@ def step_run():
     picking_ready = _is_post_close_picking_ready()
     mode = _run_mode()
     is_td = _is_trading_day_now()
-    if mode == "validation":
-        os.environ["V8_VALIDATION_RUN"] = "1"
-    skip_fetch = (mode == "validation")  # 非交易日无新数据，跳过所有采集脚本
+    if mode == "backfill":
+        os.environ["V8_REF_DATE"] = _last_trading_day()  # 回填：日期改写上一交易日
+    skip_fetch = (mode == "backfill")  # 非交易日无新实时数据，跳过 fetch_* 采集脚本（计算照常跑）
     print(f"  🕐 当前时间 {datetime.now():%H:%M} | 盘后选股就绪 {'✅' if picking_ready else '⏳'}"
-          f" | 模式={mode}{' | 验证:跳过采集+沿用旧日期' if skip_fetch else ''}")
+          f" | 模式={mode}{' | 回填:跳过实时采集+日期改写上一交易日' if skip_fetch else ''}")
     ok, fail = 0, 0
     skipped = []
     for script in ORDER:
