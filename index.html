@@ -4578,8 +4578,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <button class="op-tab-btn" data-op="2" onclick="opSwitchTab(2)">⏰ 任务运行看板 <span class="op-tab-time" id="opTab2Time"></span></button>
 
       <!-- 2026-08-07 主人令：暂未上架 已提升为一级 nav Tab（🔒 暂未上架），不再作为运维子页 -->
-
-      <button class="op-tab-btn" data-op="4" onclick="opSwitchTab(4)">已下架</button>
+      <!-- 2026-08-30 主人令：已下架 已提升为一级 nav Tab（🔒 已下架），运维内 opTab4 删除，避免重复显示 -->
 
     </div>
 
@@ -4683,16 +4682,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     </div>
 
-    <div id="opTab4" class="op-tab-pane"><div id="delistedPanel">
+    <!-- 2026-08-30 主人令：opTab4（已下架）已随「已下架」提升为一级 nav 而删除，避免重复显示 -->
 
-      <!-- ⚠️ 2026-08-29 一劳永逸式修复：
-           opTab4 内容由 renderDelisted() 整体 innerHTML 替换（line ~12671）。
-           原静态占位（温度计/六维共振）会被一帧后覆盖产生"闪现"现象，
-           缺危机雷达卡，且 renderMacro 找不到 phMacroBody 报 null →
-           全部已并入 renderDelisted 的 h 字符串尾部生成 -->
-
-    </div><!-- /delistedPanel -->
-    </div><!-- /opTab4 -->
   </section>
 
   <!-- ============ 暂未上架（管理员 · 实验区 · 2026-08-07 提升为一级 Tab） ============ -->
@@ -12662,7 +12653,8 @@ function drawUpDownChart(){
   }
 
   function renderDelisted(elId){
-    var el=$(elId||'delistedPanel');
+    // 2026-08-30 主人令：运维内 opTab4 已删除，默认容器改为一级 nav 的 delistedTopPanel
+    var el=$(elId||'delistedTopPanel');
     if(!el) return;
     // 2026-08-13 主人令：去掉 dataset.rendered 缓存——已下架 Tab 每次切入都重渲染最新数据。
     // 原缓存导致 raw_data 更新后页面看不到（数据停在早盘 11:xx/15:xx），主人怀疑"没更新"。
@@ -13762,10 +13754,9 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
 
   window.opSwitchTab=function(n){
     document.querySelectorAll('.op-tab-btn').forEach(function(b){b.classList.toggle('active', +b.dataset.op===n);});
-    [1,2,3,4].forEach(function(i){var p=document.getElementById('opTab'+i);if(p)p.classList.toggle('active', i===n);});
+    // 2026-08-30 主人令：opTab3(暂未上架)/opTab4(已下架) 均已提升为一级 nav，运维只保留 1/2
+    [1,2].forEach(function(i){var p=document.getElementById('opTab'+i);if(p)p.classList.toggle('active', i===n);});
     if(n===2){ setTimeout(renderHealthCheck,60); setTimeout(renderTaskSchedule,80); }
-    if(n===3) setTimeout(renderUnlisted,60);
-    if(n===4) setTimeout(renderDelisted,60);
   };
 })();
 
