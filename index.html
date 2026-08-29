@@ -7518,7 +7518,8 @@ window.__renderV8CalFull();
     const cats={'货币':[],'经济':[],'全球':[]};
     Object.keys(inds).forEach(k=>{const it=inds[k];if(cats[it.cat]&&it.score!=null)cats[it.cat].push(it.score);});
     const avg=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:0;
-    const mScore=avg(cats['货币']),eScore=avg(cats['经济']),gScore=avg(cats['全球']);
+    // 后端 indicators.score 为 0~1 小数，前端展示需转 0~100
+    const mScore=Math.round(avg(cats['货币'])*100),eScore=Math.round(avg(cats['经济'])*100),gScore=Math.round(avg(cats['全球'])*100);
     const idx=Math.round(mScore*0.40+eScore*0.35+gScore*0.25);
     const lv=s=>s>=70?['危险','#ef5350']:s>=50?['警惕','#ff9800']:s>=30?['关注','#ffd54f']:['安全','#4caf50'];
     const [word,color]=lv(idx);
@@ -8671,6 +8672,18 @@ function drawUpDownChart(){
       return;
     }
     card.style.display='';
+    // 2026-08-29 一劳永逸：renderDelisted 每次切换「已下架」Tab 都会重建 DOM，
+    //   旧 echarts 实例绑定的 canvas 被移除，若不复位则 setOption 更新的是游离画布 → 卡空白。
+    var chartDom = $('mffChart');
+    if(__MFF_CHART_INST){
+      try{
+        var oldDom = __MFF_CHART_INST.getDom ? __MFF_CHART_INST.getDom() : null;
+        if(!oldDom || !document.body.contains(oldDom)){
+          try{ __MFF_CHART_INST.dispose(); }catch(e){}
+          __MFF_CHART_INST = null;
+        }
+      }catch(e){ __MFF_CHART_INST = null; }
+    }
     // 更新时间：日频数据标题显示「数据最后日期」，避免用文件 update_time 误导成「今日」
     var tEl = $('mffTime');
     if(tEl) tEl.innerHTML = mffFormatUpdateTime(d.update_time, d.daily);
