@@ -10351,6 +10351,8 @@ function drawUpDownChart(){
     h+='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">';
     h+='<span style="font-size:15px;font-weight:700;">'+light+'</span>';
     h+='<span style="font-size:10px;color:'+lightColor+';background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px;font-weight:500;">宏观环境</span>';
+    // 2026-08-29 主人令：灯1 明确标注为「观测」，非择时（mktAvg 为同步指标，无前瞻性；无回测证据）
+    h+='<span style="font-size:10px;color:#8aa0c2;background:rgba(148,163,184,.14);border:1px solid rgba(148,163,184,.35);padding:1px 6px;border-radius:4px;font-weight:600;">🔭 观测 · 非择时</span>';
     h+='</div>';
     h+='<div style="font-size:12px;line-height:1.7;flex:1;">'+lightText+'</div>';
     h+='<div style="font-size:11px;opacity:.95;margin-top:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;line-height:1.5;">';
@@ -10370,12 +10372,16 @@ function drawUpDownChart(){
     var volTxtColor=volPastelTextMap[volRegimeCode]||'#dbe6f7';
     var volHasData=vol.available&&vol.indices&&vol.indices.length>0;
     var volRegimeIcon=volRegimeCode==='stabilize'?'🟢':volRegimeCode==='grind'?'🟡':volRegimeCode==='rebound_diverge'?'🔵':volRegimeCode==='panic'?'🔴':'⚪';
-    var volRegimeArrow=volRegimeCode==='stabilize'?'▲':volRegimeCode==='grind'?'━':volRegimeCode==='rebound_diverge'?'▲':volRegimeCode==='panic'?'▼':'·';
-    var volSubtitle=volRegimeCode==='stabilize'?'价稳 + 波动收敛 → 企稳回升':volRegimeCode==='grind'?'价未止跌 + 波动收敛 → 阴跌磨底':volRegimeCode==='rebound_diverge'?'价反弹 + 波动仍升 → 反弹分歧':volRegimeCode==='panic'?'价跌 + 波动升 → 恐慌下行':'波动率数据不足';
+    // 2026-08-29 主人令：stabilize 箭头 ▲ → ━ —— 「企稳」是横盘不是上涨，▲ 会误导为看多；
+    //   且本灯与「全站择时裁决」同 regime 却结论相反（裁决=⛔不开仓），故仅作观测。
+    var volRegimeArrow=volRegimeCode==='stabilize'?'━':volRegimeCode==='grind'?'━':volRegimeCode==='rebound_diverge'?'▲':volRegimeCode==='panic'?'▼':'·';
+    var volSubtitle=volRegimeCode==='stabilize'?'价稳 + 波动收敛 → 企稳整理':volRegimeCode==='grind'?'价未止跌 + 波动收敛 → 阴跌磨底':volRegimeCode==='rebound_diverge'?'价反弹 + 波动仍升 → 反弹分歧':volRegimeCode==='panic'?'价跌 + 波动升 → 恐慌下行':'波动率数据不足';
     h+='<div style="flex:1;min-width:0;background:'+volBg+';color:'+volTxtColor+';border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;border:1px solid '+(volPastelMap[volRegimeCode]||'rgba(224,224,224,.3)')+';">';
     h+='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">';
     h+='<span style="font-size:15px;font-weight:700;">'+volRegimeIcon+' '+volRegimeArrow+' '+volRegime+'</span>';
     h+='<span style="font-size:10px;color:'+volTxtColor+';background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px;font-weight:500;">短期波动结构</span>';
+    // 2026-08-29 主人令：灯2 标注「观测」—— 无回测证据，且与全站择时裁决（同 regime）结论可能相反
+    h+='<span style="font-size:10px;color:#8aa0c2;background:rgba(148,163,184,.14);border:1px solid rgba(148,163,184,.35);padding:1px 6px;border-radius:4px;font-weight:600;">🔭 观测 · 非择时</span>';
     h+='</div>';
     h+='<div style="font-size:12px;line-height:1.6;flex:1;opacity:.95;font-weight:500;">'+volSubtitle+'</div>';
     if(volHasData){
