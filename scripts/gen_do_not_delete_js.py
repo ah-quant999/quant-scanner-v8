@@ -208,6 +208,7 @@ def main():
         f"// 源：DO_NOT_DELETE.md  | 生成：{now} (Asia/Shanghai)  | 内容sha10：{hash10}\n"
         f"window.DO_NOT_DELETE_HTML = {json.dumps(html, ensure_ascii=False)};\n"
         f"window.DO_NOT_DELETE_UPDATED = {json.dumps(now)};\n"
+        f"window.DO_NOT_DELETE = {{\"update_time\": {json.dumps(now)}, \"html_sha10\": {json.dumps(hash10)}, \"html_len\": {len(html)}}};\n"
     )
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:

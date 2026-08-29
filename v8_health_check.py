@@ -101,6 +101,8 @@ CARD_DEFS = [
     {"id": "TOP10_DAILY", "name": "全站精选", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top10"], "heal_cat": "algo_run", "picking": True},
     {"id": "STOCK_RPS", "name": "相对强度", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["records"], "_window_var": "STOCK_RPS_DATA", "heal_cat": "algo_run", "picking": True},  # 文件名 STOCK_RPS.js，但 window 变量名是 STOCK_RPS_DATA（历史遗留）
     {"id": "CRDS_CARD_DATA", "name": "逆势龙头", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["elite", "watch"], "heal_cat": "algo_run", "picking": True},
+    # 运维/静态说明页（逻辑详解页「防删」子页）
+    {"id": "DO_NOT_DELETE", "name": "防误删清单", "page": "运维", "freq": "周日+手动", "max_age": 10080, "key_fields": ["update_time"], "_window_var": "DO_NOT_DELETE", "heal_cat": "algo_run", "manual_dep": True},
 ]
 
 
@@ -225,10 +227,15 @@ def load_window_var(path, var_name):
 
 
 def _match_braced(text, var_name):
-    """括号配对提取 window.VAR = {...} 的对象体（无正则，支持嵌套）。"""
-    idx = text.find(f"window.{var_name}")
-    if idx == -1:
+    """括号配对提取 window.VAR = {...} 的对象体（无正则，支持嵌套）。
+
+    2026-08-29 修：用 \b 词边界精确匹配变量名，避免 DO_NOT_DELETE 误命中
+    DO_NOT_DELETE_HTML / DO_NOT_DELETE_UPDATED 等同前缀变量。
+    """
+    m = re.search(rf"window\.{re.escape(var_name)}\b", text)
+    if not m:
         return None
+    idx = m.start()
     eq = text.find("=", idx)
     start = text.find("{", eq) if eq != -1 else -1
     if start == -1:
