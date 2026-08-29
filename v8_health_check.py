@@ -94,6 +94,13 @@ CARD_DEFS = [
     {"id": "LHB_DATA", "name": "龙虎榜", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run"},
     {"id": "INST_TRADE", "name": "机构买卖", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top_buy", "top_sell"], "heal_cat": "algo_run"},
     {"id": "TRIPLE_CONSENSUS", "name": "三重共识", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
+    # 2026-08-29 一劳永逸：MARKET_REGIME / SECTOR_RECOMMENDATION 由 market_regime.py / sector_recommendation.py
+    #   每日盘后产出，原属通用全量审计分支（被 parse_time T 格式误伤判黄灯）。正式纳入 CARD_DEFS：
+    #   · 健康检查按 24h 红线（交易所/宏观日频数据，1440min）
+    #   · 看板与运维面板正确归类到"盘后数据"
+    #   · 与 MARGIN_DATA / CFFEX_HOLDINGS 同口径
+    {"id": "MARKET_REGIME", "name": "市场利率环境", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["current_rates", "trends", "meta"], "heal_cat": "algo_run"},
+    {"id": "SECTOR_RECOMMENDATION", "name": "板块推荐", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["regime", "current_rates", "trends", "meta"], "heal_cat": "algo_run"},
     # 选股策略
     {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
     {"id": "COCKPIT_ADVICE", "name": "驾驶舱", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["verdict", "watch"], "heal_cat": "algo_run", "picking": True},
@@ -186,16 +193,16 @@ def fmt_rel_time(ts):
 def parse_time(s):
     if not s or s in ("--", "N/A"):
         return None
-    try:
-        return datetime.strptime(s, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone(timedelta(hours=8)))
-    except Exception:
-            try:
-                return datetime.strptime(s, "%Y-%m-%d %H:%M").replace(tzinfo=timezone(timedelta(hours=8)))
-            except Exception:
-                try:
-                    return datetime.strptime(s, "%Y-%m-%d").replace(tzinfo=timezone(timedelta(hours=8)))
-                except Exception:
-                    return None
+    # 2026-08-29 一劳永逸：MARKET_REGIME / SECTOR_RECOMMENDATION 等产出 ISO 8601
+    #   "2026-08-29T20:19:20" 格式，旧版只认 3 种格式 → 误报"无时间戳"判黄灯。
+    #   补 T 分隔 + 微秒容错，循环尝试直至命中。
+    for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S",
+                 "%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%d %H:%M", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(s, fmt).replace(tzinfo=timezone(timedelta(hours=8)))
+        except Exception:
+            continue
+    return None
 
 
 def load_window_var(path, var_name):
@@ -1677,12 +1684,19 @@ def check_runner():
             fail = summary.get("fail", 0)
             run_time = runner_status.get("run_time", "--")
             hostname = runner_status.get("hostname", "未知节点")
+            # 2026-08-29 一劳永逸：非交易时段 post_close 模块（如 MARGIN_DATA / ETF_SUBSCRIPTION
+            #   交易所日更数据）天然返回空，与故障不同。区分：
+            #   · 交易时段 empty > 0 → warn（可能真有问题）
+            #   · 非交易时段 empty > 0 → ok（属预期，不再喷邮件/黄灯）
             if fail > 0:
                 st = "fail"
                 msg = f"{hostname} 最近抓取 {run_time}，{total} 模块中失败 {fail} / 空 {empty} / 成功 {ok}"
-            elif empty > 0:
+            elif empty > 0 and not is_market_closed():
                 st = "warn"
                 msg = f"{hostname} 最近抓取 {run_time}，{total} 模块中空 {empty} / 成功 {ok}"
+            elif empty > 0 and is_market_closed():
+                st = "ok"
+                msg = f"{hostname} 最近抓取 {run_time}，{total} 模块中空 {empty} / 成功 {ok}（非交易时段 post_close 空属预期）"
             else:
                 st = "ok"
                 msg = f"{hostname} 最近抓取 {run_time}，{total} 个模块全部成功"
