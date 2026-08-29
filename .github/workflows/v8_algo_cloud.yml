@@ -33,13 +33,11 @@ on:
     # 内部仍用 A 股交易日历 gate，非交易日自动跳过，同时覆盖调休上班日（股市开市）。
     - cron: '15 11 * * *'  # 19:15 CST 每天触发，内部交易日历 gate
   workflow_dispatch:
-    # 2026-08-28 主人令：mahoro 数据源不再跟踪，已移除相关输入
-    # 2026-08-29 新增 force_run：周末/假期审计验证时强制视为交易日运行（产出上一交易日数据）
+    # 2026-08-29 补：maharo 数据源已移除（主人令）；新增 force_run 手动输入，供周末/假期审计强制跑。
     inputs:
       force_run:
-        description: '周末/假期审计验证：强制视为交易日运行（默认 false）'
+        description: '强制运行（忽略时间门控，周末/假期审计用）'
         type: boolean
-        required: false
         default: false
 
 permissions:
@@ -94,6 +92,8 @@ jobs:
       #   （alimi-cn 实测 966 文件，100% 被拦、所有 [self-hosted, cn] workflow 必须显式抬到 1000。
       CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 1000
       V8_PUSH: "1"
+      # 2026-08-29 周末审计：手动 dispatch 带 force_run=true 时置 1，run_algorithms 时间门控直接放行
+      V8_FORCE_RUN: ${{ github.event.inputs.force_run == 'true' && '1' || '' }}
       SKIP_MOOTDX: "1"
       # 2026-08-13 修复：云端 runner 必须走腾讯 GTimg 数据源(mootdx/东财在境外不稳定)，
       # 与 scanner.py 的 GITHUB_ACTIONS 自动识别形成双保险，防止 A股活跃股池缺失。
@@ -106,8 +106,6 @@ jobs:
       # 观澜台(知识星球) token：与小九本地 data/zsxq_token.json 同值。
       # 设置路径：GitHub 仓库 → Settings → Secrets → Actions → ZSXQ_TOKEN
       ZSXQ_TOKEN: ${{ secrets.ZSXQ_TOKEN }}
-      # 2026-08-29 主人令：周末/假期审计验证强制运行开关（workflow_dispatch force_run=true 时置 1）
-      V8_FORCE_RUN: ${{ github.event.inputs.force_run == 'true' && '1' || '' }}
       # 🛡 2026-08-19 一劳永逸根因修复：cn runner 默认 GBK 终端，algorithms/* 270 处 print 含 emoji
       # （📅✅❌⚠️🔗💹🌐…）全部会 UnicodeEncodeError crash，整条 19:15 盘后算法链 0 执行，
       # 17 张盘后/选股卡停在 08:27 红卡。PYTHONIOENCODING=utf-8 是 Python 官方做法，
