@@ -290,6 +290,44 @@ def _is_post_close_picking_ready():
     return False                                   # 06:00 ~ 17:59 盘前/盘中
 
 
+# 2026-08-29 科学运行模式（主人：周末/假期放开跑，不要限死；长假仅首日有 T+1）
+def _is_trading_day_now():
+    """调用 fetch_lhb.is_trading_day 判定今日是否 A 股交易日（含调休上班日）。"""
+    sys.path.insert(0, ALGO)
+    try:
+        from utils.time_gate import _now_cst
+        from fetch_lhb import is_trading_day
+        return bool(is_trading_day(_now_cst().strftime("%Y-%m-%d")))
+    except Exception:
+        return True  # 兜底：无法判定时按交易日处理，不阻断
+    finally:
+        sys.path.pop(0)
+
+
+def _run_mode():
+    """返回本轮运行模式：
+    official   交易日 + 盘后窗口(18:00-23:59 / 00:00-05:59) → 全量采集+计算+推送（官方刷新）
+    validation 非交易日(周末/假期) → 跳过采集(无新数据)，用缓存重算+推送但沿用旧日期(不冒充今日)
+    blocked    交易日盘中(06:00-17:59) 且无 force → 禁止生成选股结果(等收盘)
+    force      V8_FORCE_RUN=1 → 等同 official，但非交易日自动按 validation 语义(跳过采集/保留日期)
+    """
+    if os.environ.get("V8_FORCE_RUN") == "1":
+        return "validation" if not _is_trading_day_now() else "official"
+    sys.path.insert(0, ALGO)
+    try:
+        from utils.time_gate import _now_cst
+    finally:
+        sys.path.pop(0)
+    now = _now_cst()
+    h = now.hour
+    post_close = (h > 18) or (h == 18) or (h < 6)
+    if _is_trading_day_now() and post_close:
+        return "official"
+    if not _is_trading_day_now():
+        return "validation"
+    return "blocked"
+
+
 # 🛡 2026-08-26 一劳永逸（bug7/bug8）：final_recommend 读取 raw_data/，但 4 个输入
 #   (crds_card_data / lhb_data / sector_rs / cockpit_tier_recommend) 由生成器写 out/，
 #   step_stage 原在整链跑完后才搬运 → final_recommend 一直读到上一轮的陈旧版本。
@@ -412,7 +450,13 @@ def step_run():
     run_start = datetime.now()
     # 🔴 盘后选股策略统一门控：18:00 前跳过所有选股脚本
     picking_ready = _is_post_close_picking_ready()
-    print(f"  🕐 当前时间 {datetime.now():%H:%M} | 盘后选股策略就绪 {'✅ 已过 18:00' if picking_ready else '⏳ 未到 18:00（选股策略将跳过）'}")
+    mode = _run_mode()
+    is_td = _is_trading_day_now()
+    if mode == "validation":
+        os.environ["V8_VALIDATION_RUN"] = "1"
+    skip_fetch = (mode == "validation")  # 非交易日无新数据，跳过所有采集脚本
+    print(f"  🕐 当前时间 {datetime.now():%H:%M} | 盘后选股就绪 {'✅' if picking_ready else '⏳'}"
+          f" | 模式={mode}{' | 验证:跳过采集+沿用旧日期' if skip_fetch else ''}")
     ok, fail = 0, 0
     skipped = []
     for script in ORDER:
@@ -422,6 +466,11 @@ def step_run():
             print(f"  ❌ 缺失脚本: {script}")
             fail += 1
             FAILED_SCRIPTS.append((script, "脚本文件缺失"))
+            continue
+        # 🔧 2026-08-29 验证模式：非交易日跳过数据采集（无新数据，避免把陈旧数据冒充今日/浪费 API）
+        if skip_fetch and script.startswith("fetch"):
+            print(f"  ⏭️  {script}  ← 跳过采集（非交易日无新数据，validation 模式）")
+            skipped.append(script)
             continue
         # 🔴 盘后选股策略门控：未到 18:00 且脚本属于选股策略 → 跳过
         if not picking_ready and script in STOCK_PICKING_SCRIPTS:
@@ -567,11 +616,11 @@ def main():
     # 🔴 2026-08-25 一劳永逸：链尾保底，确保驾驶舱建议 + 板块推荐 data/X.js 必新鲜
     step_ensure_cockpit_sector()
     # 🔴 盘后选股策略门控：LHB 7日累计属于选股向汇总，未到 18:00 不处理当日龙虎榜数据
-    if _is_post_close_picking_ready():
+    if _is_post_close_picking_ready() and _is_trading_day_now():
         step_append_lhb_history()
         step_gen_lhb_7d()
     else:
-        print("\n[2.5-2.6] ⏭️ 跳过 LHB 历史累积 + LHB 7日累计（盘后选股策略未到 18:00）")
+        print("\n[2.5-2.6] ⏭️ 跳过 LHB 历史累积 + LHB 7日累计（非交易日或盘后策略未就绪）")
     step_push()
     print(f"\n=== 完成。staged {n} 个文件 ===")
 
