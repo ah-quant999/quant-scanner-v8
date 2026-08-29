@@ -51,12 +51,21 @@ def main():
         return 1
 
     if df is None or df.empty:
-        print("[warn] etf list empty, skip", file=sys.stderr)
+        print("[warn] etf list empty, write placeholder for freshness SLA", file=sys.stderr)
+        raw_out = os.path.join(RAW_DIR, "etf_subscription_em.json")
+        os.makedirs(RAW_DIR, exist_ok=True)
+        with open(raw_out, "w", encoding="utf-8") as f:
+            json.dump(out, f, ensure_ascii=False, indent=2)
         return 2
 
     # 聚合到 5 类
     if "基金类型" not in df.columns:
-        print("[warn] column '基金类型' not in df, skip", file=sys.stderr)
+        print(f"[warn] akshare 列名 miss (实际列: {list(df.columns)}), write placeholder for freshness SLA", file=sys.stderr)
+        raw_out = os.path.join(RAW_DIR, "etf_subscription_em.json")
+        os.makedirs(RAW_DIR, exist_ok=True)
+        with open(raw_out, "w", encoding="utf-8") as f:
+            json.dump(out, f, ensure_ascii=False, indent=2)
+        print(f"[ok] placeholder written: {raw_out}")
         return 3
 
     for cat_cn, cat_en in CATEGORY_MAP.items():
