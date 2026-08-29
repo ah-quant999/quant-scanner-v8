@@ -185,6 +185,11 @@ def main():
                         "live_snapshot": r.get("live_snapshot"),
                         "live_amount": r.get("live_amount"),
                         } for r in cands],
+        # 2026-08-30 一劳永逸：前端 render 读 _mf.stocks（硬编码），同步加 stocks 字段
+        "stocks": [{"code": r["code"], "name": r["qname"], "industry": r["industry"],
+                    "up_pct": r.get("live_pct"), "price": r.get("live_price"),
+                    "t5_gain_pct": r.get("t5_gain_pct"),
+                    "stage": r.get("stage"), "categories": r.get("categories")} for r in cands],
     }
     if "--json" in sys.argv:
         with open(f"{ROOT}/raw_data/momentum_filter_result.json", "w", encoding="utf-8") as f:
