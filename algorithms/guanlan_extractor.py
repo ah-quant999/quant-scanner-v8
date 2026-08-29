@@ -5,11 +5,11 @@ guanlan_extractor.py — 知识星球研报自动提取器（API优先 + Seleniu
 ═══════════════════════════════════════════════════════
 用途: 从知识星球(zsxq.com)抓取投行/机构研报，解析出机构名、评级、
       涉及股票、原文，输出数据文件:
-        - data/guanlan_reports.json    观澜台研报列表
+        - data/guanlan_reports.json    外资研投研报列表
         - data/guanlan_watchlist.json  合并推股池
 
 数据源:
-  - 观澜台: wx.zsxq.com/group/28882555515111 (group_id=28882555515111)
+  - 外资研投: wx.zsxq.com/group/28882555515111 (group_id=28882555515111)
   - 甲股文: wx.zsxq.com/group/51115218441414 (可选, 未启用)
 
 认证: cookie名=zsxq_access_token（非 xq_a_token！）
@@ -40,14 +40,14 @@ REPO_ROOT = os.path.dirname(BASE_DIR)
 # v8 原生化钩子（2026-08-02）：v8 仓通过 V8_OUT_DIR 环境变量重定向 DATA_DIR 到仓库根 out/
 # 2026-08-10 修复：V8_OUT_DIR 被设为空字符串时（workflow env 与 input 同名导致），
 # 原 `if _V8_OUT:` 会把它当 False，本脚本写 algorithms/data/ 而 build_candidate_pool.py
-# 读 out/，造成观澜台/maharo 来源恒为 0。空/未设置时统一回退到仓库根 out/。
+# 读 out/，造成外资研投/maharo 来源恒为 0。空/未设置时统一回退到仓库根 out/。
 _V8_OUT = os.environ.get("V8_OUT_DIR") or os.path.join(REPO_ROOT, "out")
 DATA_DIR = _V8_OUT
 
 # 🔴 2026-08-09 修复：凭据路径不能跟着 DATA_DIR 走 out/。
 #    v8 环境下 V8_OUT_DIR=仓库根/out，原写法把 token 指向 out/zsxq_token.json——
 #    但 out/ 是中间产物目录（每轮被覆盖，也不在 .gitignore 的凭据保护清单里），
-#    用户按文档写入的 data/zsxq_token.json 永远读不到 → 观澜台恒为 0 只。
+#    用户按文档写入的 data/zsxq_token.json 永远读不到 → 外资研投恒为 0 只。
 #    统一为「仓库根/data/」，.gitignore 已保护该凭据文件。
 _TOKEN_CANDIDATES = [
     os.path.join(os.path.dirname(BASE_DIR), "data", "zsxq_token.json"),  # v8 标准位置（.gitignore 已保护）
@@ -58,7 +58,7 @@ TOKEN_FILE = next((p for p in _TOKEN_CANDIDATES if os.path.exists(p)), _TOKEN_CA
 # ── 星球配置 ──
 GROUPS = {
     "guanlan": {
-        "name": "观澜台",
+        "name": "外资研投",
         "group_id": "28882555515111",
         "out_reports": os.path.join(DATA_DIR, "guanlan_reports.json"),
     },
@@ -604,7 +604,7 @@ def process_group(key, config, token):
 
 def main():
     print("=== 知识星球研报提取 (guanlan_extractor) ===")
-    print("   模式: API优先 | 星球: 观澜台\n")
+    print("   模式: API优先 | 星球: 外资研投\n")
 
     # 构建股票名索引（用于只写名字没写代码的研报反查）
     global NAME_INDEX
@@ -623,7 +623,7 @@ def main():
         try:
             reps, watches = process_group(key, config, token)
             total_reports += len(reps)
-            all_watch.update(watches)  # 观澜台股票入推股池
+            all_watch.update(watches)  # 外资研投股票入推股池
         except Exception as e:
             print(f"  [ERR] {config['name']} 处理异常: {e}")
 

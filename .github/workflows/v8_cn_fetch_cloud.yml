@@ -245,9 +245,9 @@ jobs:
         run: |
           python algorithms/calc_etf_intraday.py
 
-      # 2026-08-20 主人令：观澜台研报数据源并入定时任务，根治候选股池“公开资讯源/研报来源”为 0
+      # 2026-08-20 主人令：外资研投研报数据源并入定时任务，根治候选股池“公开资讯源/研报来源”为 0
       # 仅 post_close 跑：需要当日收盘行情 + 研报，输出 out/candidate_pool.json → stage_to_raw → raw_data/candidate.json
-      - name: "📚 观澜台研报抓取并重建候选股池"
+      - name: "📚 外资研投研报抓取并重建候选股池"
         if: steps.cat.outputs.category == 'post_close'
         continue-on-error: true
         shell: bash

@@ -65,7 +65,7 @@ jobs:
       # 2026-08-10 新增：云端代发 mahoro 验证码 / 代登录用的动作开关（本机无法解析 data.maharo.cn）
       MAHORO_ACTION: ${{ github.event.inputs.maharo_action }}
       MAHORO_CODE: ${{ github.event.inputs.maharo_code }}
-      # 观澜台(知识星球) token：与小九本地 data/zsxq_token.json 同值。
+      # 外资研投(知识星球) token：与小九本地 data/zsxq_token.json 同值。
       # 设置路径：GitHub 仓库 → Settings → Secrets → Actions → ZSXQ_TOKEN
       ZSXQ_TOKEN: ${{ secrets.ZSXQ_TOKEN }}
     steps:

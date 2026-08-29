@@ -272,9 +272,9 @@ def main():
                 continue
 # (2b) 丢源守卫：搬运会让 source_dist 少源则拒绝
 #      2026-08-11 修复：out/candidate_pool.json 曾两次用少源版本覆盖
-#      raw_data/candidate.json（观澜台/maharo 丢失 → 前端「公开资讯 0 只」）。
+#      raw_data/candidate.json（外资研投/maharo 丢失 → 前端「公开资讯 0 只」）。
 #      2026-08-12 主人全面审核：发现历史丢源是「src（out）比 dst（raw）少源」的反向场景——
-#      out 端丢了观澜台/maharo 时，反过来覆盖 raw 端原本完整的 6 源。
+#      out 端丢了外资研投/maharo 时，反过来覆盖 raw 端原本完整的 6 源。
 #      修复：双向检查 → src 缺源（dst 更全）也应拒绝搬运
             s_src, d_src = _source_names(src), _source_names(dst_path)
             if s_src is not None and d_src is not None:

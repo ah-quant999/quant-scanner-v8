@@ -3,13 +3,13 @@
 构建「候选股池」(candidate_pool.json)
 ====================================
 股池 = 主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50
-      + 观澜台(自选+研报) + mahoro研报
+      + 外资研投(自选+研报) + mahoro研报
 后续金股池 = 股池 ∩ (信号共振≥2 或 研报来源)，见 scanner.py。
 
 数据源（生产健壮）：
   A股：stock_zh_a_spot_em(东财) → stock_zh_a_spot(新浪) 回退
   港股：stock_hk_spot_em(东财) → stock_hk_spot(新浪) 回退
-  观澜台 / mahoro：直接读 data/*.json（已每日更新）
+  外资研投 / mahoro：直接读 data/*.json（已每日更新）
 任一行情源失败不致命，其余层继续构建。
 """
 import os
@@ -94,7 +94,7 @@ _TDX_LOCK = threading.Lock()
 _TDX_MAX_CALLS = 50
 
 # ════════════════════════════════════════════════════════════════
-# 干净名字解析（根治观澜台研报把新闻稿当股票名的污染）
+# 干净名字解析（根治外资研投研报把新闻稿当股票名的污染）
 # 优先级: 东财 f58(云端权威, 可纠正 stock_names/mootdx 错名)
 #        > stock_names.json(A股本地权威, 含个别校正)
 #        > 原始名(若看起来干净) > 代码兜底(绝不输出新闻稿/指数垃圾)
@@ -682,7 +682,7 @@ def _merge_membership(today, prev, hyst_days, today_date):
 
     - 今日出现的成员：采用今日数据，更新 last_seen=today。
     - 今日未出现但历史在册的成员：
-        * 来源含「观澜台」(自选/研报) → 永久保留(pinned)；
+        * 来源含「外资研投」(自选/研报) → 永久保留(pinned)；
         * 否则若在 hyst_days 内曾出现 → 保留（防单日成交额排名抖动 churn）；
         * 否则 → 剔除（真正退出活跃区）。
     - 首次运行(prev 为空) → 成员 = 今日集合。
@@ -697,7 +697,7 @@ def _merge_membership(today, prev, hyst_days, today_date):
         if k in members:
             continue
         last = v.get("last_seen") or ""
-        pinned = any(s == "观澜台" for s in v.get("sources", []))
+        pinned = any(s == "外资研投" for s in v.get("sources", []))
         days_gone = 999
         if last:
             try:
@@ -720,7 +720,7 @@ def build():
         if not key or not code:
             return
         # ★ 干净名字解析: 无论哪层(raw/研报/行情)传入的 name 都强制校正,
-        #   杜绝观澜台研报把新闻稿当股票名污染候选池(根治点)
+        #   杜绝外资研投研报把新闻稿当股票名污染候选池(根治点)
         clean = resolve_clean_name(code, market, name)
         if key in pool:
             if source not in pool[key]["sources"]:
@@ -798,7 +798,7 @@ def build():
         # 而 gold_pool 由算法链上游产出，含完整港股列表（board_label=港股）。
         _hk_from_goldpool(HK_TOP, add)
 
-    # 3) 观澜台 自选
+    # 3) 外资研投 自选
     try:
         wl_path = os.path.join(DATA, "guanlan_watchlist.json")
         wl = json.load(open(wl_path, encoding="utf-8"))
@@ -806,15 +806,15 @@ def build():
             code, name, mkt, board = _norm(st.get("code", ""), st.get("name", ""),
                                            st.get("market", ""), st.get("full_code", ""))
             if code:
-                add(f"{mkt}_{code}", code, name, mkt, board, "观澜台")
-        print(f"  [观澜台] 自选 {len(wl.get('stocks', []))} 只已并入")
+                add(f"{mkt}_{code}", code, name, mkt, board, "外资研投")
+        print(f"  [外资研投] 自选 {len(wl.get('stocks', []))} 只已并入")
     except FileNotFoundError:
-        print(f"  [观澜台] 自选文件不存在（{os.path.join(DATA, 'guanlan_watchlist.json')}）"
+        print(f"  [外资研投] 自选文件不存在（{os.path.join(DATA, 'guanlan_watchlist.json')}）"
               f"—— guanlan_extractor 可能未运行或 token 缺失")
     except Exception as e:
-        print(f"  [观澜台] 自选读取失败: {e}")
+        print(f"  [外资研投] 自选读取失败: {e}")
 
-    # 4) 观澜台 研报（合并入「观澜台」来源，不再单独计为「观澜台研报」——
+    # 4) 外资研投 研报（合并入「外资研投」来源，不再单独计为「外资研投研报」——
     #     2026-08-10 确认研报61只与自选100%重叠，去重）
     try:
         rp = json.load(open(os.path.join(DATA, "guanlan_reports.json"), encoding="utf-8"))
@@ -830,14 +830,14 @@ def build():
                 code, name, mkt, board = _norm(st.get("code", ""), st.get("name", ""),
                                                st.get("market", ""), st.get("full_code", ""))
                 if code:
-                    add(f"{mkt}_{code}", code, name, mkt, board, "观澜台")  # ← 合并入观澜台
+                    add(f"{mkt}_{code}", code, name, mkt, board, "外资研投")  # ← 合并入外资研投
                     n += 1
-        print(f"  [观澜台] 研报个股 {n} 只已并入观澜台（去重）")
+        print(f"  [外资研投] 研报个股 {n} 只已并入外资研投（去重）")
     except FileNotFoundError:
-        print(f"  [观澜台] 研报文件不存在（{os.path.join(DATA, 'guanlan_reports.json')}）"
+        print(f"  [外资研投] 研报文件不存在（{os.path.join(DATA, 'guanlan_reports.json')}）"
               f"—— guanlan_extractor 可能未运行或 token 缺失")
     except Exception as e:
-        print(f"  [观澜台] 研报读取失败: {e}")
+        print(f"  [外资研投] 研报读取失败: {e}")
 
 
     # 补充行业 / 概念 / 板块元数据（用于个股查询展示）
@@ -846,7 +846,7 @@ def build():
     # ── #14 解耦：慢变成员表（hysteresis 防抖） ──
     # 今日派生集合(pool) 仅代表「当日成交额前N」；若直接用作候选池，个股会随每日
     # 排名抖动而每日 churn。改为：并入历史成员表，掉出前N者仍保留
-    # MEMBER_HYSTERESIS_DAYS 个交易日（观澜台来源永久保留），成员稳定后才交给下游扫描。
+    # MEMBER_HYSTERESIS_DAYS 个交易日（外资研投来源永久保留），成员稳定后才交给下游扫描。
     today_date = time.strftime("%Y-%m-%d")
     prev_members = {}
     for _pp in (MEMBERS_RAW, MEMBERS_OUT):

@@ -103,7 +103,7 @@ jobs:
       #    否则策略回测/驾驶舱/TOP5_TRACK/LHB_7D 等卡片永远 stale。cloud_fetch 不设置。
       PUSH_ALGO_RAW: "1"
       # 2026-08-28 主人令：mahoro 数据源不再跟踪，MAHORO_COOKIE/MAHORO_ACTION/MAHORO_CODE 已移除
-      # 观澜台(知识星球) token：与小九本地 data/zsxq_token.json 同值。
+      # 外资研投(知识星球) token：与小九本地 data/zsxq_token.json 同值。
       # 设置路径：GitHub 仓库 → Settings → Secrets → Actions → ZSXQ_TOKEN
       ZSXQ_TOKEN: ${{ secrets.ZSXQ_TOKEN }}
       # 🛡 2026-08-19 一劳永逸根因修复：cn runner 默认 GBK 终端，algorithms/* 270 处 print 含 emoji

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 本地凭据配置助手。
-把观澜台（知识星球）token 安全写入 data/ 目录，
+把外资研投（知识星球）token 安全写入 data/ 目录，
 不会提交到 Git（.gitignore 已忽略该文件）。
 
 用法：
@@ -26,8 +26,8 @@ def main():
     print("=" * 60)
     print("说明：你的凭据只保存在本地 data/ 目录，不会进入 Git。\n")
 
-    # 观澜台 token
-    print("【观澜台 / 知识星球】")
+    # 外资研投 token
+    print("【外资研投 / 知识星球】")
     print("获取方式：浏览器打开 https://wx.zsxq.com/ → F12 → Application/Storage")
     print("→ Cookies → 找到 zsxq_access_token，或看请求头里的 authorization。")
     token = input("请粘贴 token（直接回车表示不修改）：").strip()

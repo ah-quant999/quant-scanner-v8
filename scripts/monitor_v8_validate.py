@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """监控最新 v8_algo_cloud run 完成，然后从 main 分支拉取 raw_data/candidate.json
-   校验候选池来源分布（观澜台/maharo研报 应 > 0），落盘证据。"""
+   校验候选池来源分布（外资研投/maharo研报 应 > 0），落盘证据。"""
 import os, json, time, urllib.request, urllib.error
 from datetime import datetime, timezone
 
@@ -52,8 +52,8 @@ try:
     total = data.get("total")
     log(f"candidate.json total={total}")
     log(f"source_dist={json.dumps(dist, ensure_ascii=False)}")
-    # 关键来源（2026-08-10: 观澜台研报已合并入观澜台，不再单独校验）
-    for key in ["观澜台", "maharo研报", "maharo"]:
+    # 关键来源（2026-08-10: 外资研投研报已合并入外资研投，不再单独校验）
+    for key in ["外资研投", "maharo研报", "maharo"]:
         found = {k: v for k, v in dist.items() if key in k}
         if found:
             log(f"  ✅ {key}: {found}")

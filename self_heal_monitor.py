@@ -5,7 +5,7 @@ v8 自愈监控闭环（self_heal_monitor.py）
 设计目标：不再依赖用户发现和催促。
 每 10-20 分钟自动运行，检测以下异常并自动修复：
 
-  P0-1: candidate.json 丢失「观澜台」源 → 自动拉取观澜台数据并入 + push
+  P0-1: candidate.json 丢失「外资研投」源 → 自动拉取外资研投数据并入 + push
   P0-2: STOCK_MOMENTUM_STATE.js 新鲜度 → 普通盘后日频卡（2026-08-22 起脱离 PDF，由 gen_strong_breakout 每日盘后自选强势突破重算；陈旧即 FAIL 升级）
   P0-3: MOMENTUM_FILTER.js（动量共识筛选卡源）新鲜度确认：缺失/解析失败=FAIL（真异常）；V2 源比 filter 新=待重算 WARN 留痕（dispatcher 应已派发）；其余=OK。本机不 push（云端 cloud_dispatcher/算法链为修复方）
   P1-1: zsxq_token 缺失/失效 → 告警（需用户补 token）
@@ -41,7 +41,7 @@ ALGO_DIR = ROOT / "algorithms"
 CST = timezone(timedelta(hours=8))
 PYTHON = "C:/Users/Administrator/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
 
-# 观澜台 token 文件
+# 外资研投 token 文件
 ZSXQ_TOKEN_FILE = ROOT / "data" / "zsxq_token.json"
 
 # 关键数据文件
@@ -77,7 +77,7 @@ def log(msg, level="INFO"):
         print(line)
 
 
-# ── P0-1: candidate.json 观澜台源检查 ─────────────────
+# ── P0-1: candidate.json 外资研投源检查 ─────────────────
 
 def check_candidate_guanlan():
     if not CANDIDATE_FILE.exists():
@@ -85,7 +85,7 @@ def check_candidate_guanlan():
     try:
         d = json.load(open(CANDIDATE_FILE, encoding="utf-8"))
         sd = d.get("source_dist") or {}
-        has = "观澜台" in sd
+        has = "外资研投" in sd
         total = d.get("total", 0)
         return has, sd, total, "sources=" + str(list(sd.keys())) + ", total=" + str(total)
     except Exception as e:
@@ -95,10 +95,10 @@ def check_candidate_guanlan():
 def heal_candidate_guanlan(dry_run=False):
     # 1. 检查 token
     if not ZSXQ_TOKEN_FILE.exists():
-        return False, "zsxq_token.json 不存在，无法拉取观澜台数据。需用户提供 token。"
+        return False, "zsxq_token.json 不存在，无法拉取外资研投数据。需用户提供 token。"
     # 2. 检查/生成 watchlist
     if not GUANLAN_WATCHLIST.exists():
-        log("观澜台 watchlist 不存在，先运行 guanlan_extractor.py...", "RUN")
+        log("外资研投 watchlist 不存在，先运行 guanlan_extractor.py...", "RUN")
         r = subprocess.run(
             [PYTHON, str(ALGO_DIR / "guanlan_extractor.py")],
             capture_output=True, text=True, cwd=str(ROOT), timeout=120
@@ -116,9 +116,9 @@ def heal_candidate_guanlan(dry_run=False):
     except Exception as e:
         return False, "watchlist 解析失败: " + str(e)
     if dry_run:
-        return True, "[DRY_RUN] 将并入观澜台数据并 push"
+        return True, "[DRY_RUN] 将并入外资研投数据并 push"
     # 3. 执行合并
-    log("开始增量并入观澜台到 candidate.json...", "RUN")
+    log("开始增量并入外资研投到 candidate.json...", "RUN")
     merge_result = _merge_guanlan_to_candidate()
     if not merge_result["success"]:
         return False, merge_result["message"]
@@ -160,13 +160,13 @@ def _merge_guanlan_to_candidate():
                 "name": clean_name or name,
                 "code": padded_code,
                 "market": market_raw,
-                "sources": ["观澜台"],
+                "sources": ["外资研投"],
                 "first_seen": s.get("added_date", ""),
             }
             added += 1
         else:
-            if "观澜台" not in stocks[key].get("sources", []):
-                stocks[key]["sources"].append("观澜台")
+            if "外资研投" not in stocks[key].get("sources", []):
+                stocks[key]["sources"].append("外资研投")
 
     sd = Counter()
     for v in stocks.values():
@@ -192,7 +192,7 @@ def _merge_guanlan_to_candidate():
 def _push_candidate(merge_result):
     stats = merge_result.get("stats", {})
     added_val = stats.get("added", 0)
-    msg = "fix(candidate): 自愈并入观澜台(+" + str(added_val) + ") [self_heal_monitor]"
+    msg = "fix(candidate): 自愈并入外资研投(+" + str(added_val) + ") [self_heal_monitor]"
     try:
         # 先检查是否有未解决的冲突
         check_r = subprocess.run(
@@ -230,8 +230,8 @@ def _push_candidate(merge_result):
                                    capture_output=True, timeout=10, cwd=str(ROOT))
             # 重新检查 candidate 是否被覆盖
             d = json.load(open(CANDIDATE_FILE, encoding="utf-8"))
-            if "观澜台" not in (d.get("source_dist") or {}):
-                log("rebase 冲突导致观澜台被覆盖，重新并入...", "WARN")
+            if "外资研投" not in (d.get("source_dist") or {}):
+                log("rebase 冲突导致外资研投被覆盖，重新并入...", "WARN")
                 retry2 = _merge_guanlan_to_candidate()
                 if not retry2["success"]:
                     return {"success": False, "message": "冲突后重合并失败: " + retry2["message"]}
@@ -349,7 +349,7 @@ def run_check_only():
     has, sd, total, det = check_candidate_guanlan()
     results["candidate_guanlan"] = {"ok": has, "detail": det, "source_dist": sd, "total": total}
     icon = "OK" if has else "FAIL"
-    log("[" + icon + "] candidate.json 观澜台: " + det)
+    log("[" + icon + "] candidate.json 外资研投: " + det)
 
     fresh, last_day, age, det2 = check_momentum_state()
     results["momentum_state"] = {"ok": fresh, "detail": det2, "last_day": last_day, "age_days": age}
@@ -398,18 +398,18 @@ def run_heal(json_output=False):
     # P0-1
     has, sd, total, det = check_candidate_guanlan()
     if not has:
-        log("[FAIL] P0-1: candidate.json 缺失观澜台源! " + det, "FAIL")
+        log("[FAIL] P0-1: candidate.json 缺失外资研投源! " + det, "FAIL")
         success, msg = heal_candidate_guanlan()
         heal_results["candidate_guanlan"] = {"ok": success, "message": msg}
         if success:
             log("[HEAL] P0-1 已自愈: " + msg, "HEAL")
-            actions_taken.append("并入观澜台: " + msg)
+            actions_taken.append("并入外资研投: " + msg)
         else:
             log("[FAIL] P0-1 无法自愈: " + msg, "FAIL")
             exit_code = 2
     else:
-        guanlan_count = sd.get("观澜台", 0)
-        log("[OK] P0-1: candidate.json 含观澜台(" + str(guanlan_count) + "只)", "OK")
+        guanlan_count = sd.get("外资研投", 0)
+        log("[OK] P0-1: candidate.json 含外资研投(" + str(guanlan_count) + "只)", "OK")
         heal_results["candidate_guanlan"] = {"ok": True, "message": det}
 
     # P0-2: STOCK_MOMENTUM_STATE 新鲜度（2026-08-22 起脱离 PDF，按普通盘后日频卡监控）

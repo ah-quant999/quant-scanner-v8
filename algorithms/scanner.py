@@ -1489,7 +1489,7 @@ def fetch_volume_top_stocks(top_cy=None, top_kc=None, top_zb=None, top_hk=None):
     for b, c in boards.items():
         print(f"    {b}: {c} 只")
 
-    # ── 合并观澜台关注池（30天内有出现）──
+    # ── 合并外资研投关注池（30天内有出现）──
     _wl_file = os.path.join(DATA_DIR, "guanlan_watchlist.json")
     if os.path.exists(_wl_file):
         try:
@@ -1520,14 +1520,14 @@ def fetch_volume_top_stocks(top_cy=None, top_kc=None, top_zb=None, top_hk=None):
                             _skipped += 1
                             continue
                         # (code, name, market, board_label, volume_amount, turnover_rate, mv_yi, fund_type)
-                        all_stocks.append((_code, _name, _mkt, "观澜台关注池", 0, 0, 0, "混合"))
+                        all_stocks.append((_code, _name, _mkt, "外资研投关注池", 0, 0, 0, "混合"))
                         _existing_codes.add(_code)
                         _added += 1
-            print(f"    观澜台关注池(30天): +{_added} 只")
+            print(f"    外资研投关注池(30天): +{_added} 只")
             if _skipped > 0:
                 print(f"    [跳过] {_skipped} 只代码格式不合法")
         except Exception as e:
-            print(f"  [观澜台] 读取关注池失败: {e}")
+            print(f"  [外资研投] 读取关注池失败: {e}")
 
     return all_stocks
 
@@ -2286,7 +2286,7 @@ _GUANLAN_NAME_WHITELIST = {'和林微纳', '和而泰', '和顺石油', '和晶�
                            '和辉光电', '和佳医疗', '和金科技', '和元生物'}
 
 
-# ── 干净名字解析(根治观澜台研报把新闻稿当股票名) ──
+# ── 干净名字解析(根治外资研投研报把新闻稿当股票名) ──
 # 优先级: 东财 f58(权威, 本机/云端均可达) > stock_names.json(A股本地)
 #        > 干净原值 > 代码兜底(绝不输出新闻稿/指数垃圾)
 _EM_NAME_CACHE_S = {}
@@ -2433,7 +2433,7 @@ def _repair_guanlan_name(name: str) -> str:
 
 
 def _convert_guanlan_to_pool_entry(gl_stock, today):
-    """将观澜台股票转换为金股池条目格式"""
+    """将外资研投股票转换为金股池条目格式"""
     code = str(gl_stock.get("code", ""))
     market_raw = gl_stock.get("market", "")
     full_code = gl_stock.get("full_code", "")
@@ -2479,7 +2479,7 @@ def _convert_guanlan_to_pool_entry(gl_stock, today):
         "first_signal": 0,
         "max_signal": 0,
         "history": [],
-        "sources": ["观澜台"],
+        "sources": ["外资研投"],
     }
 
 
@@ -2487,7 +2487,7 @@ def update_gold_pool_from_scan(output):
     """盘后扫描后更新金股池：金股 = 候选股池 ∩ (信号共振≥2 或 研报来源)
 
     候选股池由 build_candidate_pool.py 产出(主板/创业板/科创板成交前100 + 港股前50
-    + 观澜台 + mahoro研报)。若候选池缺失则退化为旧逻辑(不限制候选宇宙)。
+    + 外资研投 + mahoro研报)。若候选池缺失则退化为旧逻辑(不限制候选宇宙)。
     """
     pool = load_gold_pool()
     today = datetime.now().strftime("%Y-%m-%d")
@@ -2515,11 +2515,11 @@ def update_gold_pool_from_scan(output):
     cand = load_candidate_pool()
     cand_keys = set(cand.keys()) if cand else None
     # 注：
-    # - "观澜台"(watchlist) 是 "观澜台研报" 的去重聚合，两者高度重叠，
+    # - "外资研投"(watchlist) 是 "外资研投研报" 的去重聚合，两者高度重叠，
     #   故不纳入研报覆盖判定。
-    # - "投行研报" 实际也来自观澜台 watchlist，是历史遗留名称，已统一改为 "观澜台"。
+    # - "投行研报" 实际也来自外资研投 watchlist，是历史遗留名称，已统一改为 "外资研投"。
     # 研报覆盖判定只保留真正的研报来源。
-    RESEARCH_SRC = ("观澜台研报", "maharo研报")
+    RESEARCH_SRC = ("外资研投研报", "maharo研报")
 
     def _merge_sources(entry, extra):
         src = entry.setdefault("sources", [])
@@ -3025,7 +3025,7 @@ def scan_market(scan_a=True, scan_hk=True, max_stocks=None, resume=False):
     if _bs_consecutive_fails >= _BS_FAIL_SKIP_THRESHOLD:
         print(f"  注: BaoStock 连续失败 {_bs_consecutive_fails} 次后已自动跳过")
 
-    # 观澜台扫描
+    # 外资研投扫描
     guanlan_data = None
     try:
         from guanlan_extractor import get_watchlist_for_dashboard, load_watchlist
@@ -3046,7 +3046,7 @@ def scan_market(scan_a=True, scan_hk=True, max_stocks=None, resume=False):
     # 排序: 信号数降序 → 涨跌幅降序
     results.sort(key=lambda x: (-x["signal_count"], -x.get("pct_chg", 0)))
 
-    # 交叉关联观澜台股票到扫描结果
+    # 交叉关联外资研投股票到扫描结果
     if guanlan_data and guanlan_data.get("stocks"):
         gl_codes = set()
         for gl_stock in guanlan_data["stocks"]:
@@ -3065,10 +3065,10 @@ def scan_market(scan_a=True, scan_hk=True, max_stocks=None, resume=False):
                     code_variants.append(scan_code.split(".")[0])
                 if any(cv in gl_codes for cv in code_variants):
                     sources = s.get("sources", [])
-                    if "观澜台" not in sources:
-                        sources.append("观澜台")
+                    if "外资研投" not in sources:
+                        sources.append("外资研投")
                         s["sources"] = sources
-        print(f"  观澜台关联完成")
+        print(f"  外资研投关联完成")
 
     # 输出JSON
     output = {

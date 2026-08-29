@@ -63,7 +63,7 @@ def main():
     # 日志
     try:
         full = logs(rid)
-        kws = ["maharo", "EOFError", "非交互", "跳过 maharo", "ValueError", "guanlan", "观澜台",
+        kws = ["maharo", "EOFError", "非交互", "跳过 maharo", "ValueError", "guanlan", "外资研投",
                "候选", "来源", "build_candidate", "Error", "Traceback", "candidate", "0 来源", "来源分布"]
         for kw in kws:
             ls = [l.strip() for l in full.splitlines() if kw.lower() in l.lower()]

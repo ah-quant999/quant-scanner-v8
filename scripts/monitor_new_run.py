@@ -66,7 +66,7 @@ def main():
         full = ""
         for n in z.namelist():
             full += z.read(n).decode("utf-8", "replace") + "\n"
-        for kw in ["maharo", "EOFError", "非交互", "跳过 maharo", "ValueError", "guanlan", "观澜台", "候选股池构建", "来源分布"]:
+        for kw in ["maharo", "EOFError", "非交互", "跳过 maharo", "ValueError", "guanlan", "外资研投", "候选股池构建", "来源分布"]:
             ls = [l.strip() for l in full.splitlines() if kw.lower() in l.lower()]
             if ls:
                 print(f"--- {kw} ({len(ls)}) ---")

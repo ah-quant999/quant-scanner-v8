@@ -5,7 +5,7 @@
 
 背景：
   data/zsxq_token.json 被 .gitignore 屏蔽，云端 GitHub Actions checkout 后拿不到
-  → 观澜台研报恒为 0 只。解决办法是把同样的值存进 GitHub 仓库 Secrets，
+  → 外资研投研报恒为 0 只。解决办法是把同样的值存进 GitHub 仓库 Secrets，
   workflow 已配好注入：
       .github/workflows/v8_algo_cloud.yml
         ZSXQ_TOKEN: ${{ secrets.ZSXQ_TOKEN }}
@@ -67,10 +67,10 @@ def main():
     print()
 
     emit("ZSXQ_TOKEN", read_zsxq(),
-         "先运行 python scripts/setup_credentials.py 写入观澜台 token")
+         "先运行 python scripts/setup_credentials.py 写入外资研投 token")
 
     print("=" * 68)
-    print("填完后，云端算法链（v8_algo_cloud.yml）下次运行就能抓观澜台源。")
+    print("填完后，云端算法链（v8_algo_cloud.yml）下次运行就能抓外资研投源。")
     print("token 过期后重新执行上面的步骤，再回来更新同名 Secret 即可。")
     print("=" * 68)
 
