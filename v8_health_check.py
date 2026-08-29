@@ -1858,8 +1858,6 @@ def check_local_head_sync():
         # 仅代码层落后（index.html / ?v= cache）→ 仍属云端 build 副作用 → info
         msg = f"本地 {local[:7]} / origin/main {remote[:7]} 落后（仅代码层，Pages build 重写 index.html 属预期，已降级 info 不报警）"
         return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线", "status": "info", "message": msg}]
-    except Exception as e:
-        return [{"id": "local_sync", "name": "本地与 origin/main 同步", "page": "管线", "status": "warn", "message": f"检查失败: {e}"}]
 
 
 def check_site_dom(site_html=None):
