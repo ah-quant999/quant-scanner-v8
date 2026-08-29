@@ -1642,6 +1642,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         }
         var h='';
 
+        /* ===== ⚖️ 择时提示条（2026-08-29 主人令：AI速览 与 今日信号/驾驶舱灯 冲突，统一指向唯一裁决） =====
+           本卡各行为盘中观察 + 后端规则/关键词兜底亮灯，全站无回测证据，不得作为开仓依据。 */
+        var _ga = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : {ok:false,name:'暂无数据',icon:'⚪',color:'#94a3b8',verdict:'等待数据',date:''};
+        h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 12px;margin-bottom:8px;'
+         + 'background:'+_ga.color+'12;border:1px solid '+_ga.color+'59;border-radius:8px;font-size:11.5px;line-height:1.6;">'
+         + '<span style="font-weight:800;color:'+_ga.color+';">⚖️ 择时看这里</span>'
+         + '<span style="font-weight:700;color:'+_ga.color+';background:rgba(255,255,255,.08);border:1px solid '+_ga.color+'59;'
+         + 'padding:1px 8px;border-radius:6px;">'+_ga.icon+' '+_ga.name+' · '+_ga.verdict+'</span>'
+         + '<span style="color:var(--dim)">本卡各行灯点为<b style="color:#fbbf24;">盘中观察（无回测证据）</b>，仅供读盘；'
+         + '开仓与否以「今日事件 → 今日判定 → ⚖️ 择时裁决」为准。</span>'
+         + '</div>';
+
         // 1. 日内风向
         var sent=d.sentiment||{};
         var sclr=colorMap.purple;
