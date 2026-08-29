@@ -66,6 +66,7 @@ VAR_TO_RAW = {
     "JUDGMENT_DATA": "judgment_data.json",
     "HERDING_DATA": "herding_data.json",
     "LIMIT_UP_HEATMAP": "limit_up_heatmap.json",
+    "LIMIT_UP_BROKEN": "limit_up_broken.json",
     "CAPITAL_FLOW_DATA": "capital_flow_data.json",
     "ETF_SUBSCRIPTION": "etf_subscription.json",
     "NORTH_FUND": "north_fund.json",
@@ -113,6 +114,7 @@ CATEGORY_MAP = {
     "CAPITAL_FLOW_DATA": "intraday",
     "CONCEPT_RANKING": "intraday",
     "LIMIT_UP_HEATMAP": "intraday",
+    "LIMIT_UP_BROKEN": "intraday",
     "CANDIDATE_QUOTES": "intraday",  # 候选池实时行情：行业树图第二层（个股）数据源
     "SH_SZ_HISTORY": "intraday",  # 沪深成交额历史（滚动窗口，盘中最少5刷）
     "MARKET_ALERTS": "intraday",  # 市场预警（孤儿模块 fetch_orphan_market_alerts.py 接入盘中刷新）
@@ -1906,6 +1908,44 @@ def f_limit_up_heatmap():
         print(f"  ⚠️ 涨停热力图失败: {e}")
         return None
 
+def f_limit_up_broken():
+    try:
+        import akshare as ak
+        from datetime import date as _date
+        d = _date.today().strftime("%Y%m%d")
+        df = ak.stock_zt_pool_zbgc_em(date=d)
+        rows = []
+        for _, r in df.iterrows():
+            try:
+                rows.append({
+                    "code": str(r.get("代码", "")).strip(),
+                    "name": str(r.get("名称", "")).strip(),
+                    "chg": round(float(r.get("涨跌幅") or 0), 2),
+                    "price": round(float(r.get("最新价") or 0), 2),
+                    "limit_price": round(float(r.get("涨停价") or 0), 2),
+                    "amount": round(float(r.get("成交额") or 0) / 1e8, 2),
+                    "turnover": round(float(r.get("换手率") or 0), 2),
+                    "first_seal": str(r.get("首次封板时间") or "").strip(),
+                    "broken_times": int(r.get("炸板次数") or 0),
+                    "zt_stat": str(r.get("涨停统计") or "").strip(),
+                    "amplitude": round(float(r.get("振幅") or 0), 2),
+                    "industry": str(r.get("所属行业") or "").strip(),
+                })
+            except Exception:
+                continue
+        rows.sort(key=lambda x: (-x["broken_times"], -x["amount"]))
+        return {
+            "update_time": __import__("time").strftime("%Y-%m-%d %H:%M:%S"),
+            "date": f"{d[:4]}-{d[4:6]}-{d[6:]}",
+            "total": len(rows),
+            "note": "东方财富炸板股池（真实）：盘中触及涨停但收盘未封住",
+            "stocks": rows,
+        }
+    except Exception as e:
+        print(f"  ⚠️ 炸板池失败: {e}")
+        return None
+
+
 def f_capital_flow_data():
     # 个股主力净流入排行：全市场降序+升序并集（push2delay 镜像），
     # 规避实时 push2 host 的 WAF 重置，且避免 pz 截断只取头部导致净流出缺失。
@@ -3375,6 +3415,7 @@ def main(category=None, only=None):
         ("CRISIS_DATA", f_crisis_data),
         ("HERDING_DATA", f_herding_data),
         ("LIMIT_UP_HEATMAP", f_limit_up_heatmap),
+        ("LIMIT_UP_BROKEN", f_limit_up_broken),
         ("CAPITAL_FLOW_DATA", f_capital_flow_data),
         ("ETF_SUBSCRIPTION", f_etf_subscription),
         ("NORTH_FUND", f_north_fund),
