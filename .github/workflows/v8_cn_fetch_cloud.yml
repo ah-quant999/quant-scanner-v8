@@ -303,12 +303,12 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
-          DATA_MANIFEST=
-          if [ -z "" ]; then
+          DATA_MANIFEST=$(git status --porcelain data/ | awk '{print $2}' | tr '\n' ',')
+          if [ -z "$DATA_MANIFEST" ]; then
             echo "ℹ️ 本次无 data 变更，跳过推送"
           else
-            echo "📋 推送重建 data: "
-            PUSH_FILES="" python api_push_raw.py
+            echo "📋 推送重建 data: ${DATA_MANIFEST%,}"
+            PUSH_FILES="$DATA_MANIFEST" python api_push_raw.py
           fi
 
       - name: "🛰️ 云端兜底调度（算法链/温度计，幂等）"
