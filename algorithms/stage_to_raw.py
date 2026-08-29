@@ -35,6 +35,14 @@ SKIP_STAGE = {
     "triple_track.json",
 }
 
+# 2026-08-29 一劳永逸修复（根治 #1299 候选池被回退为陈旧 8/26 的根因）：
+# 已被主人主动下线、不再由任何生成器产出的数据源。搬运守卫(2b)在判定
+# 「src 比 dst 少源 → 拒绝搬运」时，必须忽略这些「主动下线源」，否则任何
+# 移除它们的刷新都会被误判为丢源而回退成陈旧 raw，导致候选池/最终推荐停更。
+REMOVED_SOURCES = {
+    "maharo研报",  # 2026-08-28 主人令：maharo 投行信号不再跟踪
+}
+
 V8_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ALGO = os.path.dirname(os.path.abspath(__file__))
 # out 目录与 run_algorithms / 被迁移脚本口径一致 = 仓库根/out
@@ -270,7 +278,8 @@ def main():
 #      修复：双向检查 → src 缺源（dst 更全）也应拒绝搬运
             s_src, d_src = _source_names(src), _source_names(dst_path)
             if s_src is not None and d_src is not None:
-                src_missing = d_src - s_src  # src 比 dst 少的源（dst 更全）
+                # 忽略「主动下线源」（REMOVED_SOURCES），避免移除它们的刷新被误回退
+                src_missing = (d_src - s_src) - REMOVED_SOURCES
                 if src_missing:
                     print(f"  [guard] src 比 dst 少源 {sorted(src_missing)}（dst 更全），保留 raw: {v6_name}")
                     continue
