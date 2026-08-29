@@ -19,6 +19,14 @@ from datetime import datetime
 from fundamental_helper import fq_key_of, quality_points
 from stop_target_logic import compute_stop_target_from_closes, board_from_code
 
+# 🛡 2026-08-29 元模型升级：regime 驱动的行业风格微调
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+try:
+    import v8_meta_model as _meta_model
+except Exception as _meta_err:
+    print(f"  ⚠️ v8_meta_model 加载失败，跳过 regime 调整: {_meta_err}")
+    _meta_model = None
+
 WORKSPACE = os.path.dirname(os.path.abspath(__file__))
 # 🔴 2026-08-06 修复：历史快照目录从 out/history（gitignore，云端丢）→ raw_data/history（git 跟踪 + api_push 推送持久化）
 DATA_DIR = os.path.join(WORKSPACE, "..", "raw_data")
@@ -610,6 +618,18 @@ def main():
         # 分母见模块顶部 NORM_DIVISOR 注释：250 已使 ≥80 分不可达，现校准为 130
         total = round(min(100, max(0, raw_total / NORM_DIVISOR * 100)), 1)
 
+        # ── Regime 驱动的行业风格微调（2026-08-29 元模型升级）──
+        #   根据 market_regime 推荐/规避板块，给个股 ±8% 的分数乘数。
+        #   当前为保守微调，后续结合 v8_factor_ic.py 滚动 IC 再进一步校准。
+        regime_adj = 1.0
+        if _meta_model is not None:
+            try:
+                regime_adj = _meta_model.sector_multiplier(stock_sectors, stock_sectors)
+                if regime_adj != 1.0:
+                    total = round(min(100, max(0, total * regime_adj)), 1)
+            except Exception as _e:
+                print(f"  ⚠️ {name}({raw_code}) regime 调整失败: {_e}")
+
         scored.append({
             "code": raw_code,
             "full_code": key,
@@ -621,6 +641,7 @@ def main():
             "pct_chg": latest.get("pct_chg") or s.get("pct_chg") or 0,
             "pct_chg_20d": pct20 or 0,
             "total_score": total,
+            "regime_adjust": regime_adj,
             "quality_grade": quality_grade,
             "quality_score": quality_score,
             "sectors": stock_sectors[:8] if isinstance(stock_sectors, list) else [],
@@ -677,6 +698,7 @@ def main():
             "pct_chg": s["pct_chg"],
             "pct_chg_20d": s["pct_chg_20d"],
             "total_score": s["total_score"],
+            "regime_adjust": s.get("regime_adjust", 1.0),
             "sectors": s["sectors"],
             "stop_loss": s["stop_loss"],
             "target_price": s["target_price"],
@@ -705,6 +727,7 @@ def main():
 
     count_80plus = sum(1 for s in scored if s.get("total_score", 0) >= 80)
     max_score = max((s.get("total_score", 0) for s in scored), default=0)
+    regime_summary = _meta_model.regime_summary() if _meta_model is not None else {}
     result = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "total_scored": len(scored),
@@ -718,6 +741,7 @@ def main():
         #      T10 +6.05%(胜率64.5%) / T20 +5.92%(胜率75.1%)  ← 中长持有才有 alpha
         #    故全站默认建议持有 10 个交易日，前端可直接展示。
         "suggested_hold_days": 10,
+        "regime_summary": regime_summary,
         "top10": top10,
     }
 
