@@ -48,14 +48,27 @@ jobs:
           DATA_DIR = ROOT / 'data'
 
           # 读取 DATA_SOURCES 映射（update_v8.py 转换层用的）
+          # 🛡 2026-08-30 一劳永逸根因修复：原逻辑只收集 json 名（如 candidate.json），
+          #    而删除判断用 var_name + '.json'（如 CANDIDATE.json）→ 大小写永不匹配，
+          #    导致 mapped_files 形同虚设，只有被 index.html script 引用的文件能幸存
+          #    （2026-08-30 实测：91 个 data/*.js 被误删 77 个，站点大面积空白）。
+          #    现同时收集 json 名(双写大小写) 与 变量名，双重保护。
           src = Path('update_v8.py').read_text(encoding='utf-8')
           m = re.search(r'DATA_SOURCES\s*=\s*\{([^}]+)\}', src, re.S)
-          mapped_files = set()
+          mapped_files = set()   # json 名（同时存原样与小写）
+          mapped_vars  = set()   # 变量名（如 CANDIDATE / STOCK_QUOTE）
           if m:
               for line in m.group(1).splitlines():
                   if ':' in line and '"' in line:
-                      fname = line.split(':')[0].strip().strip('"\'')
-                      mapped_files.add(fname)
+                      parts = line.split(':', 1)
+                      fname = parts[0].strip().strip('"\'')
+                      var = parts[1].strip().rstrip(',').strip('"\'')
+                      if fname.endswith('.json'):
+                          mapped_files.add(fname)
+                          mapped_files.add(fname.lower())
+                      if var and var.replace('_', '').isalnum():
+                          mapped_vars.add(var)
+          print(f"[映射] json名 {len(mapped_files)} / 变量名 {len(mapped_vars)}")
 
           # 读取 index.html 引用的 data/*.js
           index = Path('index.html').read_text(encoding='utf-8')
@@ -137,8 +150,13 @@ jobs:
                   json_name = var_name + '.json'
                   if var_name in PROTECTED_DATA or json_name in PROTECTED_DATA:
                       continue
-                  # 不在映射且不被 index.html 引用
-                  if json_name not in mapped_files and var_name not in referenced:
+                  # 🛡 2026-08-30 修复：原判断 `json_name not in mapped_files` 因大小写不匹配恒为 True，
+                  #    实际等价于「只保留 referenced，其余全删」。改为四重判定：
+                  #    ① json 名(原样) ② json 名(小写) ③ 变量名在映射中 ④ 被 index.html 引用
+                  if (json_name not in mapped_files
+                          and json_name.lower() not in mapped_files
+                          and var_name not in mapped_vars
+                          and var_name not in referenced):
                       p.unlink()
                       removed_data.append(p.name)
 
