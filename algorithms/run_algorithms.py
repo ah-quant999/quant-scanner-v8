@@ -269,6 +269,10 @@ def _is_post_close_picking_ready():
       放行 00:00~05:59  次日凌晨补跑，上一交易日盘后数据已齐
       拦截 06:00~17:59  盘前/盘中，当日尚未收盘，禁止生成选股结果
     """
+    # 2026-08-29 主人周末审计：V8_FORCE_RUN=1 时直接放行（周末/假期审计验证用，
+    # 此时市场已收盘、无盘中抢跑风险；等价于「手动强制跑一轮」）。仅手动 dispatch 带 force_run 时生效。
+    if os.environ.get("V8_FORCE_RUN") == "1":
+        return True
     # 2026-08-20 根因修复：统一使用 time_gate 的 UTC+8 计算，避免 runner 时区漂移。
     sys.path.insert(0, ALGO)
     try:
@@ -277,10 +281,6 @@ def _is_post_close_picking_ready():
         sys.path.pop(0)
     now = _now_cst()
     h, m = now.hour, now.minute
-    # 2026-08-29 主人令「周末有 T+1 数据」：周末/节假日上一交易日盘后数据已齐，
-    # 允许跑选股策略（产物归属由 base_trade_date 回退到上一交易日，不会错标成周末）。
-    if now.weekday() >= 5:                          # 5=周六 6=周日
-        return True
     if h > _STOCK_PICKING_READY_HOUR:              # 19:00 ~ 23:59
         return True
     if h == _STOCK_PICKING_READY_HOUR:             # 18:00 ~ 18:59
