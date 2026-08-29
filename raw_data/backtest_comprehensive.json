@@ -1,5 +1,5 @@
 {
-  "calc_time": "2026-08-29 08:55:00",
+  "calc_time": "2026-08-29 16:02:02",
   "method": "baostock 真实收盘价全面回测",
   "hold_periods_tested": [
     1,
@@ -8207,7 +8207,7 @@
           "name": "香农芯创",
           "market": "sz",
           "board": "创业板",
-          "total_score": 75.4,
+          "total_score": 74.6,
           "entry_price": 172.1,
           "bsc": "sz.300475",
           "source": "top10_daily",
@@ -13411,7 +13411,7 @@
           "name": "香农芯创",
           "market": "sz",
           "board": "创业板",
-          "total_score": 75.4,
+          "total_score": 74.6,
           "entry_price": 172.1,
           "bsc": "sz.300475",
           "source": "top10_daily",
@@ -16189,5 +16189,5 @@
       ]
     }
   },
-  "update_stamp": 1787964900
+  "update_stamp": 1787990522
 }
