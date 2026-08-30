@@ -5,6 +5,17 @@
 #   当 v8_cn_fetch_cloud.yml（云端主力）连续 failure 时，v8_cloud_watchdog.py 自动 dispatch 本文件，
 #   用小九单位机中国 IP 全量抓取。小九机器只作为应急兜底，不主动承担主链路。
 
+#
+# 🔴 2026-08-30 20:2x 根因修复（实测 run#33309752550）：
+#   本 workflow 原用 actions/checkout@v4，但它跑在 [self-hosted, cn]，
+#   而 cn runner 上 git 协议访问 github.com 必被 Connection reset
+#   （fatal: unable to access ... Recv failure: Connection was reset，
+#     checkout 重试 3 次后 5 分钟 timeout → 整个应急兼底链 0 执行）。
+#   → 已改为与 v8_algo_run.yml / v8_lhb_fetch.yml 一致的
+#     「GitHub Trees/Blobs API 同步源码」路线。
+#   ❌ 严禁在本文件重新引入：actions/checkout、git clone/fetch、
+#      rm -rf、git clean -fdx（后三者会撞 cn runner 的 safe-delete 拦截）。
+
 name: "🇨🇳 v8 中国数据抓取(云端·小九应急)"
 
 on:
@@ -65,25 +76,129 @@ jobs:
           esac
           # 注：原 if 兜底已删（重复 echo 同一 output 键会导致 GitHub Action 报 Multiple outputs）
 
-      - uses: actions/checkout@v4
-        timeout-minutes: 5
-        # self-hosted runner 必需：跳过 git clean 批量删，避免 WorkBuddy safe-delete 拦截
-        with:
-          fetch-depth: 1
-          clean: false
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-
-      - name: "📦 安装依赖"
-        # 🔴 2026-08-14 主人令永久修复：裸 `pip` 在 Windows runner 默认 PowerShell 下找不到
-        #   （pip: ObjectNotFound，导致今天下午 13:40-14:04 云端链路 5 连败）。
-        #   改用 `python -m pip`（不依赖 PATH），并显式 shell: bash 与其余 step 一致。
-        shell: bash
+      - name: "📥 经 GitHub API 同步源码（唯一可行路线：本 runner 上 git 走 github.com 会被连接重置）"
+        id: sync_api
+        shell: powershell
         run: |
-          python -m pip install akshare pandas requests --quiet
-          python -c "import akshare, pandas; print('akshare', akshare.__version__, '/ pandas', pandas.__version__)"
+          $code = @'
+          import os, base64, json, hashlib, urllib.request, time
+          token = os.environ["GITHUB_TOKEN"]
+          REPO = "ah-quant999/quant-scanner-v8"
+          H = {"Authorization": "Bearer " + token,
+               "Accept": "application/vnd.github+json",
+               "X-GitHub-Api-Version": "2022-11-28"}
+
+          def local_blob_sha(path):
+              # git blob sha1 = sha1("blob <len>\0" + content); lets us decide
+              # "already identical" WITHOUT downloading the file at all.
+              try:
+                  data = open(path, "rb").read()
+              except Exception:
+                  return None
+              h = hashlib.sha1()
+              h.update(("blob %d\0" % len(data)).encode())
+              h.update(data)
+              return h.hexdigest()
+
+          def sha_of(data):
+              h = hashlib.sha1()
+              h.update(("blob %d\0" % len(data)).encode())
+              h.update(data)
+              return h.hexdigest()
+
+          def get_json(url, tries=6):
+              last = None
+              for i in range(tries):
+                  try:
+                      return json.load(urllib.request.urlopen(
+                          urllib.request.Request(url, headers=H), timeout=120))
+                  except Exception as e:
+                      last = e
+                      print("  retry %d: %s" % (i + 1, e), flush=True)
+                      time.sleep(min(2 ** i, 20))
+              raise SystemExit("API fetch failed: %s (%s)" % (url, last))
+
+          def fetch_blob(sha, tries=6):
+              # Prefer the raw media type: no base64 inflation (~26pct smaller payload),
+              # which is what kept truncating on this runner for the 1.3MB json
+              # (run#31005326516 / #31011155328: IncompleteRead at ~1.82MB of 1.86MB).
+              # Every attempt is sha-verified so a silent truncation can never be written.
+              url = "https://api.github.com/repos/%s/git/blobs/%s" % (REPO, sha)
+              raw_h = dict(H)
+              raw_h["Accept"] = "application/vnd.github.raw"
+              last = None
+              for i in range(tries):
+                  mode = "raw" if i % 2 == 0 else "b64"
+                  try:
+                      hdr = raw_h if mode == "raw" else H
+                      resp = urllib.request.urlopen(
+                          urllib.request.Request(url, headers=hdr), timeout=180)
+                      body = resp.read()
+                      data = body if mode == "raw" else base64.b64decode(
+                          json.loads(body.decode())["content"])
+                      if sha_of(data) != sha:
+                          raise ValueError("sha mismatch (truncated?) got %d bytes" % len(data))
+                      return data
+                  except Exception as e:
+                      last = e
+                      print("  blob retry %d [%s]: %s" % (i + 1, mode, e), flush=True)
+                      time.sleep(min(2 ** i, 20))
+              raise SystemExit("blob fetch failed: %s (%s)" % (sha, last))
+
+          tree = get_json("https://api.github.com/repos/%s/git/trees/main?recursive=1" % REPO)
+          want = []
+          for e in tree.get("tree", []):
+              if e.get("type") != "blob":
+                  continue
+              p = e["path"]
+              # algorithms/ + scripts/ + .github/scripts/ + every root-level .py
+              # (needs api_push_raw.py / update_v8.py / cloud_dispatcher.py)
+              if (p.startswith("algorithms/") or p.startswith("scripts/")
+                      or p.startswith(".github/scripts/")
+                      or ("/" not in p and p.endswith(".py"))):
+                  want.append((p, e["sha"]))
+          print("files to sync: %d" % len(want), flush=True)
+
+          ok = 0
+          skipped = 0
+          for p, sha in want:
+              if local_blob_sha(p) == sha:
+                  ok += 1
+                  skipped += 1
+                  continue
+              data = fetch_blob(sha)
+              parent = os.path.dirname(p)
+              if parent:
+                  os.makedirs(parent, exist_ok=True)
+              with open(p, "wb") as f:
+                  f.write(data)
+              print("  updated %s (%d bytes)" % (p, len(data)), flush=True)
+              ok += 1
+          print("OK source sync done: %d/%d (unchanged: %d)" % (ok, len(want), skipped), flush=True)
+          if ok != len(want):
+              raise SystemExit(1)
+          '@
+          # NOTE: must write a temp file then run it; passing code via `python -c` gets
+          #       its double quotes stripped by the shell (run#30859885910).
+          # NOTE: keep every powershell step ASCII-only - Windows PowerShell 5.1 reads
+          #       the generated .ps1 as ANSI/GBK, and CJK bytes swallow quote terminators
+          #       (run#30860170070 died on a Chinese Write-Host string).
+          $tmp = Join-Path $env:RUNNER_TEMP "sync_src_v8.py"
+          Set-Content -Path $tmp -Value $code -Encoding UTF8
+          python $tmp
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: "🐍 Python / 依赖检查（缺才装·清华镜像）"
+        shell: powershell
+        # ASCII-ONLY body: Windows PowerShell 5.1 reads generated .ps1 as ANSI/GBK.
+        run: |
+          python --version
+          python -c "import akshare, pandas, requests" 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "deps missing, installing from tsinghua mirror..."
+            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple akshare pandas requests
+          } else { Write-Host "deps ready" }
+          exit 0
 
       - name: "📡 抓中国数据 → raw_data/（selective）"
         # 🛡️ 2026-08-12 移除 continue-on-error：抓取失败必须让 job 失败，
