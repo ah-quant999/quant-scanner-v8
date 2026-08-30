@@ -1,5 +1,5 @@
 {
-  "calc_time": "2026-08-30 20:00:11",
+  "calc_time": "2026-08-30 23:19:11",
   "method": "baostock 真实K线滚动回测 · 统一止损止盈（低点/ATR×2/固定% 取最严，止盈前高/0.618/R:R=2 cascade）",
   "stop_target_rule": {
     "stop": "max(近20日低点, close-2×ATR14, close×固定%)",
@@ -9770,7 +9770,7 @@
         "name": "星网锐捷",
         "market": "sz",
         "board": "主板",
-        "total_score": 33.9,
+        "total_score": 34.3,
         "rank": 1,
         "tier": "gte80",
         "score_scale": "normalized",
@@ -9815,7 +9815,7 @@
         "name": "湖南黄金",
         "market": "sz",
         "board": "主板",
-        "total_score": 33.5,
+        "total_score": 33.9,
         "rank": 2,
         "tier": "gte80",
         "score_scale": "normalized",
@@ -20806,7 +20806,7 @@
       "name": "星网锐捷",
       "market": "sz",
       "board": "主板",
-      "total_score": 33.9,
+      "total_score": 34.3,
       "rank": 1,
       "tier": "gte80",
       "score_scale": "normalized",
@@ -20851,7 +20851,7 @@
       "name": "湖南黄金",
       "market": "sz",
       "board": "主板",
-      "total_score": 33.5,
+      "total_score": 33.9,
       "rank": 2,
       "tier": "gte80",
       "score_scale": "normalized",
@@ -21071,5 +21071,5 @@
       ]
     }
   ],
-  "update_time": "2026-08-30 20:00:11"
+  "update_time": "2026-08-30 23:19:11"
 }

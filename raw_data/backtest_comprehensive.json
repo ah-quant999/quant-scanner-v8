@@ -1,5 +1,5 @@
 {
-  "calc_time": "2026-08-30 19:52:50",
+  "calc_time": "2026-08-30 23:11:31",
   "method": "baostock 真实收盘价全面回测",
   "hold_periods_tested": [
     1,
@@ -12769,7 +12769,7 @@
           "name": "星网锐捷",
           "market": "sz",
           "board": "主板",
-          "total_score": 33.9,
+          "total_score": 34.3,
           "entry_price": 36.69,
           "bsc": "sz.002396",
           "source": "top10_daily",
@@ -12792,7 +12792,7 @@
           "name": "湖南黄金",
           "market": "sz",
           "board": "主板",
-          "total_score": 33.5,
+          "total_score": 33.9,
           "entry_price": 28.92,
           "bsc": "sz.002155",
           "source": "top10_daily",
@@ -25477,7 +25477,7 @@
           "name": "星网锐捷",
           "market": "sz",
           "board": "主板",
-          "total_score": 33.9,
+          "total_score": 34.3,
           "entry_price": 36.69,
           "bsc": "sz.002396",
           "source": "top10_daily",
@@ -25500,7 +25500,7 @@
           "name": "湖南黄金",
           "market": "sz",
           "board": "主板",
-          "total_score": 33.5,
+          "total_score": 33.9,
           "entry_price": 28.92,
           "bsc": "sz.002155",
           "source": "top10_daily",
@@ -25543,5 +25543,5 @@
       ]
     }
   },
-  "update_stamp": 1788090770
+  "update_stamp": 1788102691
 }
