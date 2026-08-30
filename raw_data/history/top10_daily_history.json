@@ -229,5 +229,11 @@
   },
   "max_score": 0,
   "count_80plus": 0,
-  "norm_version": 130
+  "norm_version": 130,
+  "2026-08-30": {
+    "count_80plus": 0,
+    "total_scored": 28,
+    "max_score": 33.9,
+    "update_time": "2026-08-30 19:40:17"
+  }
 }

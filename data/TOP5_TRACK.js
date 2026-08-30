@@ -1,4 +1,4 @@
-{
+window.TOP5_TRACK = {
   "update_time": "2026-08-30 20:05",
   "window_days": 90,
   "max_window_days": 180,
@@ -922,4 +922,4 @@
     "schema_date": "2026-08-30",
     "note": "finalRec Top5 滚动追踪；多窗口 5/10/20/30/60/90/180 天累积统计；entry=上榜日收盘，exit 判定=stoploss/target/timeout"
   }
-}
+};
