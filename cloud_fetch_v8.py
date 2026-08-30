@@ -173,6 +173,20 @@ def _is_trading_day(d=None):
         pass
     return True
 
+def _last_trading_day(d=None):
+    """返回 d（默认今天）当天或之前最近的一个交易日（date 对象）。
+
+    2026-08-30 修复：f_avg_price 原来直接用 now_cst() 打日期，周末/节假日跑全量兜底时
+      （如 2026-08-30 周日）会把「上一个交易日的行情」标成一个根本不存在的交易日，
+      history 里混入周日记录，前端平均股价卡也显示周日日期。改为回落到最近交易日。
+    """
+    d = d or now_cst().date()
+    for _ in range(12):
+        if _is_trading_day(d):
+            return d
+        d = d - timedelta(days=1)
+    return d
+
 def _is_empty_payload(obj):
     """判断抓取结果是否为空/无效，避免把空壳数据写入 raw_data 并刷新 update_time。
 
@@ -3391,7 +3405,8 @@ def main(category=None, only=None):
             chgs = [r["chg"] for r in recs if r["chg"] is not None]
             avg_change = sum(chgs) / len(chgs) if chgs else 0.0
             count = len(recs)
-            today_str = now_cst().strftime("%Y-%m-%d")
+            # 2026-08-30 修复：周末/节假日不再打不存在的交易日（原用 now_cst()）
+            today_str = _last_trading_day().strftime("%Y-%m-%d")
 
             # 读取历史，用于计算均线与昨日对比
             hist = []
@@ -3424,17 +3439,27 @@ def main(category=None, only=None):
             pos20 = (avg_price - ma20) / ma20 * 100 if ma20 else 0
             pos60 = (avg_price - ma60) / ma60 * 100 if ma60 else 0
 
+            # 🔴 2026-08-30 根因修复：history 不足时 ma = mean(history[-20:]) 会退化成
+            #   「当日均价自身」（只有 1 条时 ma20 = ma60 = avg_price），
+            #   position_vs_ma20 恒 ≈ -0.0001 < 0 → 前端卡片常年虚假显示「破MA20/破MA60」。
+            #   数据层止血：样本不足就不给「位置」（前端 _pt(null) 显示 --，_warns 判 !=null 不误报）。
+            _n = len(hist)
             return {
                 "date": today_str,
+                "source": "全A等权自算(东财em_clist)",
+                "index_name": "平均股价(全A等权)",
                 "avg_price": round(avg_price, 4),
                 "avg_change_pct": round(avg_change, 4),
                 "prev_avg_price": round(prev_price, 4) if prev_price else None,
                 "count": count,
                 "ma20": round(ma20, 4),
                 "ma60": round(ma60, 4),
-                "position_vs_ma20": round(pos20, 4),
-                "position_vs_ma60": round(pos60, 4),
+                "position_vs_ma20": round(pos20, 4) if _n >= 20 else None,
+                "position_vs_ma60": round(pos60, 4) if _n >= 60 else None,
+                "ma20_ready": _n >= 20,
+                "ma60_ready": _n >= 60,
                 "history": hist,
+                "history_days": _n,
             }
         except Exception as e:
             print(f"  ⚠️ 平均股价获取失败: {e}")

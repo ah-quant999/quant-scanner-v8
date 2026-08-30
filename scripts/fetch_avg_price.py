@@ -380,19 +380,52 @@ def main():
         return 0
 
     # 全失败
+    # 🔴 2026-08-30 根因修复（主人「一劳永逸」令）：
+    #   本文件（880003 真指数口径）与 cloud_fetch_v8.py 的 f_avg_price()（全A等权自算口径）
+    #   写的是【同一个】raw_data/avg_price_data.json，且 f_avg_price 会读该文件里的 history 做累积。
+    #   旧逻辑一旦 7 源全断，就用 history:[] 的占位【整体覆盖】该文件 →
+    #     f_avg_price 下次读到空 history → 只剩当日 1 条 → ma20 = ma60 = 当日均价（假水位）
+    #     → 前端「位置 vs MA20」永远 ≈ 0，卡片无任何信息量。
+    #   实测（2026-08-30 20:0x，小九机 CN 直连亦然）：880003 在东财 push2his / akshare /
+    #     雪球 全部 RemoteDisconnected 或 400，7 源确实全断，故这条覆盖路径每天都在触发。
+    #   ✅ 修法：抓取失败 = 不许破坏别人的有效数据。若既有文件里已有可用均价/历史，
+    #      则原样保留，只追加失败留痕字段（fetch_880003_status / fetch_880003_failed_at）；
+    #      仅当既有文件本身也无有效数据时，才写 available=false 占位。
+    old = {}
+    if os.path.exists(out_path):
+        try:
+            with open(out_path, "r", encoding="utf-8") as f:
+                old = json.load(f) or {}
+        except Exception:
+            old = {}
+    ts = datetime.now(CST).strftime("%Y-%m-%d %H:%M:%S")
+    if old.get("avg_price") is not None or old.get("history"):
+        old["fetch_880003_status"] = "failed"
+        old["fetch_880003_failed_at"] = ts
+        old["fetch_880003_reason"] = ("7 源(东财push2his双secid/akshare/腾讯/新浪/雪球/cache)均未能取数；"
+                                      "已保留既有有效数据（口径见 source 字段），未覆盖")
+        with open(out_path, "w", encoding="utf-8") as f:
+            json.dump(old, f, ensure_ascii=False, indent=2)
+        print("[warn] avg_price 880003 fetch failed → 保留既有数据 "
+              f"(source={old.get('source')}, history_days={len(old.get('history') or [])})",
+              file=sys.stderr)
+        return 0
+
     placeholder = {
         "available": False,
         "source": "通达信880003",
         "index_name": "平均股价(通达信880003)",
-        "update_time": datetime.now(CST).strftime("%Y-%m-%d %H:%M:%S"),
+        "update_time": ts,
         "reason": "7 源(东财push2his双secid/akshare/腾讯/新浪/雪球/cache)均未能取数,无可用历史",
         "avg_price": None, "ma20": None, "ma60": None,
         "position_vs_ma20": None, "position_vs_ma60": None,
         "history": [], "history_days": 0,
+        "fetch_880003_status": "failed",
+        "fetch_880003_failed_at": ts,
     }
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(placeholder, f, ensure_ascii=False, indent=2)
-    print("[warn] avg_price 880003 fetch failed → available=false", file=sys.stderr)
+    print("[warn] avg_price 880003 fetch failed → available=false（既有文件也无有效数据）", file=sys.stderr)
     return 1
 
 
