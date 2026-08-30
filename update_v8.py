@@ -115,6 +115,11 @@ DATA_SOURCES = {
     #   补映射后，云端 build 自动按 raw_data 重建，杜绝复发。
     "final_recommend.json":        "FINAL_RECOMMEND_DATA",
     "stock_rps.json":              "STOCK_RPS_DATA",
+    # 🛡 2026-08-30 一劳永逸式：补 ETF 申购赎回东方财富口径（股票/债券/货币/商品/跨境 5 类 + 亿元），
+    #   替代旧宽基指数 + 亿份口径（旧 ETF_SUBSCRIPTION.js 保留作 legacy，不入 DATA_SOURCES）。
+    #   旧 data/ETF_SUBSCRIPTION.js 已写好的 "sh"/"sz"/"update_time" 老口径**保留**，前端同时读 window.ETF_SUBSCRIPTION。
+    #   新增 window.ETF_SUBSCRIPTION_EM 走东财口径（5 类聚合 + 亿元）。
+    "etf_subscription_em.json":   "ETF_SUBSCRIPTION_EM",
 }
 
 # 变量名 → 更新时段

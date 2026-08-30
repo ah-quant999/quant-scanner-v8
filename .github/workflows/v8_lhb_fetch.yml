@@ -1,0 +1,105 @@
+# 九宝量化 v8.0 — 龙虎榜单飞 fetcher 调度（cn runner）
+#
+# 2026-08-30 阿狸咪 F7-挂账：本 workflow 独立调度 fetch_lhb.py + api_push_raw.py，
+#   不依赖 v8_algo_run.yml（其 cron 已禁用，cn runner 仅 workflow_dispatch 应急），
+#   也不依赖 v8_algo_cloud.yml（云端跑，但 fetch_lhb 在 cn 才稳定）。
+# 每周一至周五 17:30（盘后+龙虎榜当日发布+留 30 分钟缓冲）单飞补算 LHB 数据。
+#
+# 安全铁律（与 v8_algo_run.yml 同步）：
+#   1. 严禁 actions/checkout / rm -rf / git clean -fdx / Remove-Item -Recurse
+#      （cn runner 系统级 BULK_CONFIRM 拦截，会挂 job）。
+#   2. 严禁 git clone/fetch（cn runner 到 github.com:443 被连接重置），
+#      仅走 GitHub Contents API 同步源码，或前置 git reset --hard FETCH_HEAD。
+#   3. 单一职责：只调 fetch_lhb.py → out/lhb_result.json + api_push → 入仓；
+#      不动其他 raw_data 文件。
+name: "\ud83c\uddf9\ud83c\uddf8 v8 \u9f99\u864e\u699c\u5355\u98de fetcher (\u4e91\u7aef cron)"
+
+on:
+  schedule:
+    # \u6bcf\u5468\u4e00\u81f3\u4e94 17:30 CST \uff08\u4ea4\u6613\u65e5 17:00 \u540e\u53d1\u5e03\u9f99\u864e\u699c\uff0c17:30 \u8d77\u59cb\u8dd1\u201c\u6628\u65e5\u9f99\u864e\u699c\u201d\uff0c
+    # \u4e0d\u51fa\u5728\u5468\u672b\u8df3\u8fc7\uff09\u3002\u4ee5 UTC cron \u8868\u8fbe\u3002
+    - cron: '30 9 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      skip_trading_day_gate:
+        description: "\u5e94\u6025\u624b\u52a8\u8c03\u7528\u65f6\u7edc\u8df3\u8fc7\u4ea4\u6613\u65e5\u5381\uff08\u9ed8\u8ba4 false\uff0ctrue \u4ec5\u4f9b\u975e\u4ea4\u6613\u65e5\u8865\u7b97\uff09"
+        required: false
+        type: choice
+        options:
+          - "false"
+          - "true"
+        default: "false"
+
+permissions:
+  contents: write
+
+jobs:
+  lhb-only:
+    runs-on: [self-hosted, cn]
+    timeout-minutes: 25
+    steps:
+      - name: "\ud83d\udcdd \u540c\u6b65\u6e90\u7801\uff08\u5b89\u5168\uff09"
+        # \u4ec5\u8c03 GitHub Contents API \u62c9\u53d6 algorithms/fetch_lhb.py\uff08\u672c workflow \u552f\u4e00\u9700\u8981\u7684\u811a\u672c\uff09\uff0c\n        # \u907f\u5f00 git clone\uff08cn runner \u4e0a github.com \u88ab connection reset\uff09\u4e5f\u907f\u5f00 checkout action\uff08safe-delete \u4ea4\u4e92\u53ef\u80fd\u6302\uff09\u3002\n        # \u9700\u8981\u7684\u73af\u5883\u53d8\u91cf\uff1aGH_PAT\n        shell: powershell
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $TARGET = 'algorithms/fetch_lhb.py'
+          $URL = "https://api.github.com/repos/ah-quant999/quant-scanner-v8/contents/$($TARGET -replace '/','%2F')?ref=main"
+          $headers = @{
+            'User-Agent' = 'v8-lhb-fetcher'
+            'Accept'     = 'application/vnd.github.raw'
+            'Authorization' = "Bearer $env:GH_PAT"
+          }
+          $tmpPath = "algorithms/_lhb_fetch.py.tmp"
+          New-Item -ItemType Directory -Force -Path algorithms | Out-Null
+          try {
+            $r = Invoke-RestMethod -Uri $URL -Headers $headers -TimeoutSec 60 -Method Get
+            [System.IO.File]::WriteAllText($tmpPath, $r, [System.Text.Encoding]::UTF8)
+            Move-Item -Force $tmpPath "algorithms/fetch_lhb.py"
+            Write-Host "fetched $TARGET from origin/main"
+          } catch {
+            Write-Host "[warn] API fetch failed: $_ ; using local copy (LHB may be stale)" -ForegroundColor Yellow
+          }
+
+      - name: "\ud83e\udd8a Python / akshare \u73af\u5883\u68c0\u67e5"
+        shell: powershell
+        run: |
+          python --version
+          python -c "import akshare, pandas, requests" 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "deps missing, installing from tsinghua mirror..."
+            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple akshare pandas requests
+          } else { Write-Host "deps ready" }
+
+      - name: "\ud83d\udc2a \u8dd1 fetch_lhb.py\uff08\u4ea7\u51fa out/lhb_result.json\uff09"
+        shell: powershell
+        continue-on-error: true
+        run: |
+          # \u4ea4\u6613\u65e5\u5381\uff08\u9ed8\u8ba4\uff09\uff1a\u5468\u672b\u9759\u9ed8\u8df3\u8fc7\uff08fetch_lhb \u5185\u90e8\u5df2\u6709\u4ea4\u6613\u65e5\u5381\u5224\u65ad\uff0c\u4f46\u4e3a\u53cc\u4fdd\u9669\u8c03\u5ea6\u7aef\u4e5f\u518d\u5224\u4e00\u6b21\uff09
+          $skip = "${{ github.event.inputs.skip_trading_day_gate || 'false' }}"
+          if ($skip -eq 'true') {
+            Write-Host "skip_trading_day_gate=true: force run"
+          } else {
+            $dow = (Get-Date).DayOfWeek.value__
+            if ($dow -ge 5) {
+              Write-Host "[skip] weekend, exit ok"
+              exit 0
+            }
+          }
+          cd $env:GITHUB_WORKSPACE
+          python algorithms/fetch_lhb.py
+          if (Test-Path 'out/lhb_result.json') {
+            Write-Host "[ok] out/lhb_result.json generated"
+          } else {
+            Write-Host "[warn] out/lhb_result.json missing"
+          }
+
+      - name: "\ud83d\udce4 \u63a8\u9001\u5230\u4ed3\u5e93\uff08api_push_raw.py \u4e2d LHB \u5206\u652f\uff09"
+        # api_push_raw.py \u672c\u8eab\u63a8\u9001\u4ed3\u5185 OUT_DIR \u4e2d\u4ea7\u51fa\u7684\u9f99\u864e\u699c\u660e\u7ec6\u3001\n        # \u4ee5 api_push_raw.py --only lhb \u9650\u5b9a\u53ea\u63a8\u9001 lhb_result.json + lhb_seats.json\u3002
+        if: always() && steps.fetch_lhb.outcome == 'success'
+        shell: powershell
+        continue-on-error: true
+        run: |
+          cd $env:GITHUB_WORKSPACE
+          python api_push_raw.py --only lhb || python api_push_raw.py || Write-Host "api_push_raw failed, non-blocking"

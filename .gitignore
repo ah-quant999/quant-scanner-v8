@@ -30,6 +30,10 @@ raw_data/kline_cache/
 raw_data/_tdx_cache/
 raw_data/backtest_kline_cache/
 
+# 🛡 2026-08-30 阿狸咪加注：raw_data/_archive/ — raw_retention.py 归档目录
+#   移走 >7 天的 .bak、>14 天的 h_auto_buy_*.json 详情，不再被 git 索引。
+raw_data/_archive/
+
 # 算法 staging / 生成数据（脚本和工作流会重建）
 algorithms/data/
 algorithms/out/

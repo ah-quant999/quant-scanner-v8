@@ -1310,6 +1310,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/MARKET_ALERTS.js?v=89478c94bc" defer></script>
 <script src="data/MARKET_FUND_FLOW_DATA.js?v=e4e2de33ba" defer></script>
 <script src="data/ETF_SUBSCRIPTION.js?v=74dbcd92a3" defer></script>
+<!-- 2026-08-30 阿狸咪加注：东方财富口径 ETF 申购赎回（股票/债券/货币/商品/跨境 5 类 + 亿元），
+     与 ETF_SUBSCRIPTION.js（宽基指数 + 亿份）并行使用，不替换。新口径在 ETF 三合一卡 / 驾驶舱
+     使用 window.ETF_SUBSCRIPTION_EM，旧口径保留向下兼容。缓存戳由 update_v8 在后续 build 自动刷新。 -->
+<script src="data/ETF_SUBSCRIPTION_EM.js?v=8a347dd649" defer></script>
 <script src="data/LIMIT_UP_HEATMAP.js?v=c17b81830e" defer></script>
 <script src="data/LIMIT_UP_BROKEN.js?v=43936e4824" defer></script>
 <script src="data/HERDING_DATA.js?v=0db73424c1" defer></script>
@@ -13034,8 +13038,7 @@ window.addEventListener('message', function(e){
   }
 }, false);
 // v8 数据注入（不动 HTML，只填已有元素）
-try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
-try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
+// (已合并到 v8TodayAll 统一渲染器，原占位 try{} 已删除)
 </script>
 
 <!-- 🛡 2026-08-21 版本自愈：根治「开了旧标签页/浏览器缓存旧 index.html → 永远看到旧版空白」
