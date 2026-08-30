@@ -4752,17 +4752,16 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-h">分组展示</div>
         <div class="logic-p">· <b class="up">严格共识（3/3）</b>：无条件优先看<br>· <b style="color:var(--gold)">优先观察（2/3，total_score≥75）</b>：差1步<br>· <b style="color:var(--dim)">扩展观察（2/3，total_score&lt;75）</b>：差2步</div>
         <div class="logic-h">评分·完整公式</div>
-        <div class="logic-p">原始加分 = 基础(~110) + 增强(±16) + 形态(~16) + 资金(~10) + 板块(~5) + 机构/事件(~7) + 基本面(-10~+40) + 回测反哺(±10)。<br><b>最终 total_score 已归一化到 0~100</b>，≥80 分为「精选」、≥70 分为「观察」。<br><b class="up">2026-08-28 口径校准</b>：分母由理论上限 250 改为按实测分布校准的 <b>130</b>。此前 46 天 756 个信号的原始分实际分布在 69~106 之间，除以 250 后最高只有 42 分，<b>≥80 分在数学上不可达</b>（近 15 日实测 0 个）。校准后 80 分重新代表头部约 5% 的信号。</div>
+        <div class="logic-p">原始加分 = 基础(~75) + 增强(~21) + 形态(~16) + 资金(~8) + 板块(~5) + 机构/事件(~7) + 基本面(-10~+40) + 回测反哺(±10)。<br><b>最终 total_score 已归一化到 0~100</b>，≥80 分为「精选」、≥70 分为「观察」。<br><b class="up">2026-08-30 P0 升级</b>：① 接入 <code>v8MarketGate()</code> 等价择时门控（仅 grind/panic 正常打分，其余状态降权）；② 5日突破（唯一 T+10 正期望信号）+5；③ 剔除缠论买点（T+10 负期望）与龙虎榜机游共振（空转/无证据）的加分；④ 默认持有期 T+10。</div>
         <table class="lg-table">
           <tr><th>维度</th><th>原始满分</th><th>细则</th></tr>
-          <tr><td>缠论买</td><td>25</td><td>日K底分型+MACD金叉/底背离</td></tr>
           <tr><td>金钻起涨/黄柱</td><td>25</td><td>金钻起涨或金钻黄柱信号</td></tr>
           <tr><td>机构变红</td><td>25</td><td>四量图机构资金介入</td></tr>
           <tr><td>上涨趋势</td><td>25</td><td>EMA多头+量能+价格确认</td></tr>
-          <tr><td>信号组合优待</td><td>+10/+5</td><td>缠论买+金钻起涨=+10；+黄柱=+5</td></tr>
+          <tr><td>5日突破</td><td>+5</td><td>收盘&gt;昨收 且 今日高价≥近5日高价最高（与 backtest_tdx 口径对齐；唯一 T+10 正期望信号）</td></tr>
           <tr><td>增强因子</td><td>-6~+16</td><td>20日动量(<b>2026-08-28 起反向计分</b>：≥50% −6 / 35~50% −3 / 20~35% −1 / 0~10% +2)+RSI风控(±5)+连续共振(+2/天上限8)</td></tr>
           <tr><td>形态分</td><td>~16</td><td>EMA结构+非涨停+20日涨幅控制+RSI控制+形态A奖励</td></tr>
-          <tr><td>资金动力</td><td>-2~+10</td><td>主力净流入≥1亿 +5 / &gt;0 +2 / <b>净流出≤−1亿 −2</b>+龙虎榜机构/机游共振(+3/+2)<br><span style="color:var(--dim);font-size:11px;">机游共振由 +5 降至 +2（2026-08-30）：近30日双净买≥0.8亿命中 0/20，加分空转；补回测前不再抬分。</span></td></tr>
+          <tr><td>资金动力</td><td>-2~+8</td><td>主力净流入≥1亿 +5 / &gt;0 +2 / <b>净流出≤−1亿 −2</b>；龙虎榜机构净买入+3<br><span style="color:var(--dim);font-size:11px;">机游共振加分已剔除（2026-08-30 P0）：近30日命中 0/20，无回测证据，不再抬分。</span></td></tr>
           <tr><td>板块共振</td><td>-3~+5</td><td>取所属<b>赛道</b>中净流入最强者：&gt;5亿 +5 / &gt;1亿 +2 / &lt;−5亿 −3。<br><b>2026-08-29 修正三处</b>：① 原只读「净流入榜」（全为正数），导致<b>扣分分支从未触发</b>——板块失血从不扣分；② 已过滤业绩/指数/风格类<b>非赛道标签</b>（「题材股 −129 亿」这类会淹没真实赛道，全市场最大净流入仅 32.94 亿）；③ 改为<b>取最强单板块</b>而非求和——概念高度重叠会重复计数，实测求和可达 −1338 亿。</td></tr>
           <tr><td>机构/事件</td><td>~7</td><td>52周新高+4/分析师关注+3（2026-08-28 起不再跟踪 mahoro）</td></tr>
           <tr><td>基本面质量分</td><td>-10~+40</td><td>A级+40/B级+5/C级0/D级-10</td></tr>
@@ -9837,6 +9836,20 @@ function drawUpDownChart(){
       }
     }
     h+='</div></div></div>';
+
+    // P0 择时门控横幅：与 v8MarketGate() 对齐
+    var _gate2 = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : null;
+    if(_gate2){
+      var _g2Color = _gate2.ok ? 'var(--down)' : 'var(--up)';
+      var _g2Icon = _gate2.ok ? '✅' : '⛔';
+      h+='<div style="background:rgba(15,23,42,.7);border:1px solid rgba(148,163,184,.18);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:#dbe6f7;">';
+      h+='<b>'+_g2Icon+' 择时裁决：</b>'+(_gate2.verdict||'')+' <span style="color:'+_g2Color+';font-weight:700;">'+(_gate2.name||'')+'</span> · 建议持有 <b>T+10</b>';
+      if(!_gate2.ok){
+        h+='<br><span style="color:var(--up);">当前非开仓状态，A/B 档仅作观察，不宜新入场。</span>';
+      }
+      h+='</div>';
+    }
+
     // 数据质量警示：若 A/B 档全部为港股（A股扫描缺失），挂红条提示，避免误导
     if(total>0){
       var _allSel = a.concat(b);
@@ -9986,6 +9999,19 @@ function drawUpDownChart(){
     }
     h+='</div><div style="font-size:11px;opacity:.85;">出手信号灯 → 大盘可操作区 → 最强赛道 → 共振候选 → 机构/龙虎榜验证 → 交易计划</div></div>';
     h+='</div>';
+
+    // P0 择时门控横幅：与全站唯一裁决 v8MarketGate() 对齐，非开仓状态明确提示
+    var _gate = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : null;
+    if(_gate){
+      var _gateColor = _gate.ok ? 'var(--down)' : 'var(--up)';
+      var _gateIcon = _gate.ok ? '✅' : '⛔';
+      h+='<div style="background:rgba(15,23,42,.7);border:1px solid rgba(148,163,184,.18);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:#dbe6f7;">';
+      h+='<b>'+_gateIcon+' 择时裁决：</b>'+(_gate.verdict||'')+' <span style="color:'+_gateColor+';font-weight:700;">'+(_gate.name||'')+'</span> · 建议持有 <b>T+10</b>';
+      if(!_gate.ok){
+        h+='<br><span style="color:var(--up);">当前处于「'+(_gate.name||'')+'」观望状态，共振候选股仅作观察，不宜新入场。</span>';
+      }
+      h+='</div>';
+    }
 
     /* 2026-08-30 主人令：驾驶舱顶部「两盏灯」（黄灯/绿灯 + 波动率 regime 卡）已删除。
        原因：两卡均为同步指标/无回测证据，且与全站唯一择时裁决 v8MarketGate() 结论可能相反，
@@ -10532,6 +10558,7 @@ function drawUpDownChart(){
         var strengthBadge='<span style="font-size:10px;background:'+(instV>0?'rgba(255,107,129,.16)':'rgba(255,255,255,.06)')+';color:'+(instV>0?'#ff6b81':'#8aa0c2')+';border-radius:4px;padding:1px 6px;">机构'+(instV>0?'+'+instV:'—')+'</span>'
           +'<span style="font-size:10px;background:'+(lhbHit?'rgba(255,107,129,.16)':'rgba(255,255,255,.06)')+';color:'+(lhbHit?'#ff6b81':'#8aa0c2')+';border-radius:4px;padding:1px 6px;margin-left:3px;">龙虎榜'+(lhbHit?'✓':'—')+'</span>'
           +'<span style="font-size:10px;background:rgba(127,180,255,.14);color:#7fb4ff;border-radius:4px;padding:1px 6px;margin-left:3px;">技术'+techV+'</span>'
+          +(s.breakout_5d?'<span style="font-size:10px;background:rgba(94,224,160,.14);color:#5ee0a0;border-radius:4px;padding:1px 6px;margin-left:3px;font-weight:700;">🚀5日突破</span>':'')
           +((tripleHit)?'<span style="font-size:10px;background:rgba(255,183,77,.16);color:#ffb74d;border:1px solid rgba(255,183,77,.4);border-radius:4px;padding:1px 6px;margin-left:3px;font-weight:700;">🔶三方共振</span>':'');
         // 优先用精确止损止盈（ATR+价格结构，统一口径），回退 top10 自带的降级值
         var _ssd=(window.STOCK_STOP_DATA&&window.STOCK_STOP_DATA.stocks)||{};
@@ -13038,7 +13065,8 @@ window.addEventListener('message', function(e){
   }
 }, false);
 // v8 数据注入（不动 HTML，只填已有元素）
-// (已合并到 v8TodayAll 统一渲染器，原占位 try{} 已删除)
+try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
+try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
 </script>
 
 <!-- 🛡 2026-08-21 版本自愈：根治「开了旧标签页/浏览器缓存旧 index.html → 永远看到旧版空白」

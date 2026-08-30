@@ -18,6 +18,7 @@ from datetime import datetime
 
 from fundamental_helper import fq_key_of, quality_points
 from stop_target_logic import compute_stop_target_from_closes, board_from_code
+import regime_filter
 
 # 🛡 2026-08-29 元模型升级：regime 驱动的行业风格微调
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -268,6 +269,40 @@ def pct_chg_20d_of(code, asof_date=None):
     return (cur - base) / base * 100
 
 
+def _load_kline_full(code):
+    """读取个股完整日K（含开高低收量），用于 5日突破 等需要 high 的因子"""
+    n = _num_code(code)
+    cp = os.path.join(_KLINE_DIR, f"{n}.json")
+    records = []
+    try:
+        with open(cp, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, list):
+            records = [r for r in data if r.get("date") and r.get("close") > 0 and r.get("high") > 0]
+    except Exception:
+        records = []
+    if len(records) < 6:
+        records = _fetch_kline_fallback(code)
+    records.sort(key=lambda r: r["date"])
+    return records
+
+
+def breakout_5d_of(code, asof_date=None):
+    """今日是否触发 5日突破：收盘>昨收 且 今日高价≥近5日高价最高。
+    与 backtest_tdx.py / gen_cockpit_advice.py 口径对齐（唯一 T+10 正期望信号）。"""
+    recs = _load_kline_full(code)
+    if len(recs) < 6:
+        return False
+    if asof_date:
+        recs = [r for r in recs if r["date"] <= asof_date]
+        if len(recs) < 6:
+            return False
+    today = recs[-1]
+    prev = recs[-2]
+    high_5d = max(r["high"] for r in recs[-5:])
+    return today["high"] >= high_5d and today["close"] > prev["close"]
+
+
 def _migrate_old_top10_scores(hist_dir):
     """将历史 top10_daily_YYYYMMDD.json 中旧 raw 评分（>100）统一归一化到 0~100，
     保证回测与阈值口径一致。
@@ -398,10 +433,11 @@ def main():
     bt_total_n = bt_total_wins + bt_total_losses
     bt_base_rate = bt_total_wins / bt_total_n * 100 if bt_total_n > 0 else 50.0
 
-    # ── 2.6 P0-1 消费端接入（2026-08-29）：门禁信号 → 分数乘子 ──
-    # 读 raw_data/ic_gate.json 的 ic_weight（因子 IC 胜率门禁）和
-    # raw_data/strategy_regime_gate.json 的 ge3 weight（市场 regime 门控）。
-    # 缺文件/缺键时默认 1.0（不改变现有行为，仅在有信号时介入）。
+    # ── 2.6 P0-1 择时门控（2026-08-30）：与前端 v8MarketGate() 对齐 ──
+    # 唯一权威 = regime_filter（grind/panic 才开仓）。非开仓状态整体降权，
+    # 避免 stabilize/rebound 阶段把负期望信号推进 TOP10。
+    # ic_gate / strategy_regime_gate 仍读取并打印，但不再让 T+3 低胜率
+    # 把默认 T+10 持有策略打到无法出信号（给 ic_weight / regime_weight 设 0.85  floor）。
     _ic_gate = load_json(os.path.join(DATA_DIR, "ic_gate.json"), {})
     _regime_gate = load_json(os.path.join(DATA_DIR, "strategy_regime_gate.json"), {})
     ic_weight = float((_ic_gate.get("factors") or {}).get("ge3", {}).get("ic_weight") or 1.0)
@@ -409,12 +445,20 @@ def main():
     _strat = (_regime_gate.get("strategies") or {}).get("ge3", {})
     regime_weight = float(_strat.get("weight") or 1.0)
     regime_action = (_regime_gate.get("overall_action") or "ok")
-    # 组合乘子：ic × regime，夹紧 [0.3, 1.05] 防止双重打折过狠或加杠杆
-    gate_multiplier = max(0.3, min(1.05, ic_weight * regime_weight))
-    if abs(gate_multiplier - 1.0) > 0.01 or ic_action != "ok" or regime_action != "ok":
-        print(f"  🚦 门禁: ic={ic_weight:.2f}({ic_action}) × regime={regime_weight:.2f}({regime_action}) → 乘子={gate_multiplier:.3f}")
-    else:
-        print(f"  🚦 门禁: 全 ok，乘子=1.000（不介入）")
+    try:
+        _regime_info = regime_filter.get_current_regime(force=False)
+        current_regime = (_regime_info or {}).get("regime", "stabilize")
+    except Exception as _e:
+        current_regime = "stabilize"
+    regime_open = regime_filter.is_open_regime(current_regime)
+    open_multiplier = 1.0 if regime_open else 0.65   # 非开仓状态显著降权
+    ic_weight_adj = max(0.85, min(1.0, ic_weight))
+    regime_weight_adj = max(0.85, min(1.0, regime_weight))
+    gate_multiplier = max(0.3, min(1.05, open_multiplier * ic_weight_adj * regime_weight_adj))
+    print(f"  🚦 择时门控: regime={current_regime}({'开仓' if regime_open else '观望'}) "
+          f"× ic={ic_weight:.2f}→{ic_weight_adj:.2f}({ic_action}) "
+          f"× regime_w={regime_weight:.2f}→{regime_weight_adj:.2f}({regime_action}) "
+          f"→ 乘子={gate_multiplier:.3f}")
 
     def bt_win_rate_for(sigs):
         """给定四信号布尔元组，返回带拉普拉斯平滑的历史 T+3 胜率(%)"""
@@ -518,27 +562,21 @@ def main():
         code = s.get("code", "")
         raw_code = code or key.replace("sz_", "").replace("sh_", "").replace("hk_", "")
 
-        # 基础信号 (0-100)
+        # 基础信号 (0-75)  —— 2026-08-30 P0：剔除缠论买点（T+10 负期望）
         has_chan = bool(latest.get("缠论买_日K"))
         has_qizhang = bool(latest.get("金钻_起涨"))
         has_huangzhu = bool(latest.get("金钻_黄柱"))
         has_jigou = bool(latest.get("四量图_机构变红"))
         has_trend = bool(latest.get("上涨趋势"))
-        sig_count = sum([has_chan, has_qizhang or has_huangzhu, has_jigou, has_trend])
+        sig_count = sum([has_qizhang or has_huangzhu, has_jigou, has_trend])
 
         base = 0
-        if has_chan:
-            base += 25
         if has_qizhang or has_huangzhu:
             base += 25
         if has_jigou:
             base += 25
         if has_trend:
             base += 25
-        if has_chan and has_qizhang:
-            base += 10
-        elif has_chan and has_huangzhu:
-            base += 5
 
         # 增强因子 (-10 ~ +13)
         enhance = 0
@@ -567,21 +605,25 @@ def main():
         elif rsi < 30:
             enhance += 3
 
-        # 连续共振天数
+        # 连续共振天数（2026-08-30 P0：剔除缠论买点）
         consecutive = 0
         sorted_hist = sorted(hist, key=lambda h: h.get("date", ""), reverse=True)
         for h in sorted_hist:
             h_sig = sum([
-                bool(h.get("缠论买_日K")),
                 bool(h.get("金钻_起涨") or h.get("金钻_黄柱")),
                 bool(h.get("四量图_机构变红")),
                 bool(h.get("上涨趋势")),
             ])
-            if h_sig >= 3:
+            if h_sig >= 2:
                 consecutive += 1
             else:
                 break
         enhance += min(consecutive * 2, 8)
+
+        # 5日突破（唯一 T+10 正期望信号，2026-08-30 P0 加权）
+        breakout_5d = breakout_5d_of(raw_code)
+        if breakout_5d:
+            enhance += 5
 
         # ── 技术形态分 (2026-07-26): 把驾驶舱 A 档条件合并进主站打分 ──
         # 条件：上涨趋势 + 机构变红 + RSI<68 + 20日涨幅<35% + EMA>=5 + 非涨停
@@ -628,14 +670,9 @@ def main():
             fund -= 2
             fund_detail.append(f"主力净流出{main_net:.2f}亿")
 
-        # 龙虎榜
+        # 龙虎榜：仅保留「机构净买入」正期望分支；机游共振已剔除（2026-08-30 P0）
         lhb_info = lhb_map.get(raw_code)
-        if lhb_info and lhb_info["category"] == "机游共振":
-            # 2026-08-30 审计：近30日双净买≥0.8亿命中 0/20，加分长期空转；
-            # 在补回测前降权到 +2，避免 TOP10 被无证据信号抬分。
-            fund += 2
-            fund_detail.append(f"龙虎榜机游共振")
-        elif lhb_info and lhb_info["inst_net"] > 0:
+        if lhb_info and lhb_info["inst_net"] > 0:
             fund += 3
             fund_detail.append(f"龙虎榜+{lhb_info['inst_net']:.0f}万")
 
@@ -772,7 +809,10 @@ def main():
             "close": latest.get("close") or s.get("close") or 0,
             "pct_chg": latest.get("pct_chg") or s.get("pct_chg") or 0,
             "pct_chg_20d": pct20 or 0,
+            "breakout_5d": breakout_5d,
             "total_score": total,
+            "current_regime": current_regime,
+            "regime_open": regime_open,
             "regime_adjust": regime_adj,
             "quality_grade": quality_grade,
             "quality_score": quality_score,
@@ -792,6 +832,7 @@ def main():
                 "inst": inst,
                 "quality": quality_score,
                 "backtest": score_backtest,
+                "breakout": 5 if breakout_5d else 0,
                 "signals": {
                     "chan": has_chan,
                     "jinzuan": has_qizhang or has_huangzhu,
@@ -829,7 +870,10 @@ def main():
             "close": s["close"],
             "pct_chg": s["pct_chg"],
             "pct_chg_20d": s["pct_chg_20d"],
+            "breakout_5d": s.get("breakout_5d", False),
             "total_score": s["total_score"],
+            "current_regime": s.get("current_regime", ""),
+            "regime_open": s.get("regime_open", False),
             "regime_adjust": s.get("regime_adjust", 1.0),
             "sectors": s["sectors"],
             "stop_loss": s["stop_loss"],
@@ -846,6 +890,7 @@ def main():
             "score_inst": bd["inst"],
             "score_quality": bd.get("quality", 0),
             "score_backtest": bd.get("backtest", 0),
+            "score_breakout": bd.get("breakout", 0),
             "win_rate": s.get("win_rate", None),
             "quality_grade": s.get("quality_grade", ""),
             "signals": bd["signals"],
@@ -876,6 +921,8 @@ def main():
         "regime_summary": regime_summary,
         # 🚦 P0-1 门禁信号透出（前端可直接展示 ic/regime/乘子，便于主人审核）
         "gate_info": {
+            "current_regime": current_regime,
+            "regime_open": regime_open,
             "ic_weight": ic_weight,
             "ic_action": ic_action,
             "regime_weight": regime_weight,
