@@ -918,7 +918,13 @@ def send_watchdog_alert(now, results, health_rc=None, health_out=None):
         lines.extend(["管线异常：", *infra_fails, ""])
     if health_alert_items:
         lines.extend(["数据陈旧（≥2h）：", *health_alert_items])
-    ok = send_alert(subject, "\n".join(lines))
+    # 🔴 2026-08-30 一劳永逸（主人令「邮件怎么还在报警，赶紧查改一劳永逸式修复」）：
+    #   分级交给 v8_send_alert.py 统一闸门判定——
+    #     含管线异常（runner 离线 / build 失败 / 站点不可达）→ infra，任何时间都发；
+    #     仅「数据陈旧」→ stale，周末与法定节假日静默（非交易日无新数据源属预期）。
+    #   主题前缀（机器溯源）由发送器统一加。
+    _level = "infra" if infra_fails else "stale"
+    ok = send_alert(subject, "\n".join(lines), level=_level)
     if not ok:
         write_urgent(infra_fails + health_alert_items)
     _save_alert_state(state_path, now_epoch, key)

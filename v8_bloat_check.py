@@ -384,7 +384,10 @@ def send_bloat_email(report):
     lines.append("")
     lines.append("建议：非交易时段可抽时间清理死代码、拆分大文件、修复重复 id/函数。")
     _save_bloat_alert_state(now_cst)
-    return send_alert(subject, "\n".join(lines))
+    # 🛡 2026-08-30 一劳永逸：仓库膨胀是**运维卫生指标**，不是数据故障也不是基础设施故障
+    #   （2026-08-29 已把 >1100 从 FAIL 降级，避免日常规模喷邮件）。
+    #   → 走 info 级：默认不打扰，需要时设 V8_ALERT_INFO=1 打开。
+    return send_alert(subject, "\n".join(lines), level="info")
 
 
 def main():

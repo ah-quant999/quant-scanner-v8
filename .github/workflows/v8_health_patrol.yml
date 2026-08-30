@@ -114,9 +114,21 @@ jobs:
         run: |
           echo "=== 运维自愈巡检 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') ==="
           python v8_health_check.py --heal 2>&1 | tee heal_output.txt; echo "PYTHON_EXIT=$?"
-          HEALED=$(grep -c "\[HEAL✓\]" heal_output.txt 2>/dev/null || echo "0")
-          FAILED=$(grep -c "\[HEAL✗\]" heal_output.txt 2>/dev/null || echo "0")
-          FAIL=$(grep -c "\[FAIL\]" heal_output.txt 2>/dev/null || echo "0")
+          # 🔴 2026-08-30 23:1x 修复（实测 run 33316381407 日志坐实）：
+          #   原写法 `VAR=$(grep -c "PAT" file || echo "0")` 在**无匹配**时会把
+          #   grep 的退出码 1 一并带进命令替换，变量里混进换行与多余输出 →
+          #     💊 自动治愈 0
+          #     0 项 / 失败 0        ← 输出被换行截断
+          #     ##[error] Unable to process file command 'output' successfully.
+          #     ##[error] Invalid format '0'
+          #   结果 healed/failed/fail 三个 step outputs 全部失效，后续汇总显示
+          #   「自愈失败: （空）项」，任何依赖它们的告警/升级逻辑都拿到空值。
+          #   ⇒ 用 `|| true` 吃掉 grep 的非 0 退出码，再用 ${VAR:-0} 兜底空串，
+          #     保证变量始终是单行纯数字。
+          HEALED=$(grep -c "\[HEAL✓\]" heal_output.txt 2>/dev/null || true)
+          FAILED=$(grep -c "\[HEAL✗\]" heal_output.txt 2>/dev/null || true)
+          FAIL=$(grep -c "\[FAIL\]" heal_output.txt 2>/dev/null || true)
+          HEALED="${HEALED:-0}"; FAILED="${FAILED:-0}"; FAIL="${FAIL:-0}"
           echo "healed=$HEALED" >> "$GITHUB_OUTPUT"
           echo "failed=$FAILED" >> "$GITHUB_OUTPUT"
           echo "fail=$FAIL" >> "$GITHUB_OUTPUT"
@@ -134,8 +146,11 @@ jobs:
           sleep 600
           echo "=== 验证回查 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') ==="
           python v8_health_check.py --no-heal 2>&1 | tee verify_output.txt || true
-          REMAIN_FAIL=$(grep -c '"status": "fail"' verify_output.txt 2>/dev/null || echo "0")
-          NEW_OK=$(grep -c '"status": "ok"' verify_output.txt 2>/dev/null || echo "0")
+          # 同上：`|| true` + ${VAR:-0} 兜底，避免 grep 无匹配时污染 step outputs
+          # 并使下面 `[ "$REMAIN_FAIL" -gt 0 ]` 因变量含换行而报 "integer expression expected"。
+          REMAIN_FAIL=$(grep -c '"status": "fail"' verify_output.txt 2>/dev/null || true)
+          NEW_OK=$(grep -c '"status": "ok"' verify_output.txt 2>/dev/null || true)
+          REMAIN_FAIL="${REMAIN_FAIL:-0}"; NEW_OK="${NEW_OK:-0}"
           echo "verify_fail=$REMAIN_FAIL" >> "$GITHUB_OUTPUT"
           echo "verify_ok=$NEW_OK" >> "$GITHUB_OUTPUT"
           if [ "$REMAIN_FAIL" -gt 0 ]; then

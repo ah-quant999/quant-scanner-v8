@@ -2378,7 +2378,13 @@ def send_report_email(report, healed=None, failed=None):
             lines += ["", "以下项已自动派发刷新（无需人工）："]
             lines += [f"✓ {h}" for h in healed]
         lines += ["", f"站点：{SITE_URL}"]
-        send_alert(subject, "\n".join(lines))
+        # 🔴 2026-08-30 一劳永逸（主人令「邮件怎么还在报警，赶紧查改一劳永逸式修复」）：
+        #   本邮件是**数据陈旧类**（卡片 fail / 自愈失败），与「进程崩溃」这类基础设施
+        #   真故障性质不同。周末与法定节假日没有新数据源，"数据陈旧"属设计预期而非故障
+        #   → 走 stale 级，由 v8_send_alert.py 统一闸门在非交易日静默；
+        #     infra 级（如本文件下面的「进程崩溃」邮件）仍会照发，不漏报真故障。
+        #   主题前缀（机器溯源）由发送器统一加，此处不重复处理。
+        send_alert(subject, "\n".join(lines), level="stale")
         try:
             _state_path.parent.mkdir(parents=True, exist_ok=True)
             _state_path.write_text(json.dumps({"key": _key, "last_ts": _now.isoformat()}, ensure_ascii=False), encoding="utf-8")
@@ -2517,6 +2523,9 @@ if __name__ == "__main__":
                     "【v8需人工】健康检查进程崩溃(兜底rc=2)",
                     f"v8_health_check.py 在主流程抛出未捕获异常，已兜底写出失败报告（overall=fail）。\n\n"
                     f"{type(e).__name__}: {e}\n\n请查 v8_health_check.py 日志与 main() 调用链。",
+                    # 🛡 2026-08-30 一劳永逸：进程崩溃是**基础设施真故障**，走 infra 级
+                    #   —— 非交易日/夜间同样发送，绝不静默（主人要求开盘前必须知道错误）。
+                    level="infra",
                 )
                 print("[GUARD] 崩溃告警邮件已发送")
             except Exception as _e3:
