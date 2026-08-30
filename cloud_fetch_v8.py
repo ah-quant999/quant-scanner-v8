@@ -3408,6 +3408,27 @@ def main(category=None, only=None):
             # 2026-08-30 修复：周末/节假日不再打不存在的交易日（原用 now_cst()）
             today_str = _last_trading_day().strftime("%Y-%m-%d")
 
+            # 🛡️ 2026-08-30 根因修复（口径隔离防覆盖）：
+            #   scripts/fetch_avg_price.py（通达信 880003 真指数，可拉 120 天真历史）与本函数
+            #   （全A等权自算，只能逐日累积 1 条）写同一 raw_data/avg_price_data.json。
+            #   cn 抓取链（intraday/all，每 30 分钟 + 盘后 + 手动 dispatch）跑得远比云端
+            #   880003 链频繁，曾把 880003 的长历史用 1 条全A等权记录反复抹掉
+            #   → ma20 = ma60 = 当日价 → 前端假「破MA20/破MA60」。
+            #   两者价格量级/口径不同，history 不可混算，故：既有数据若为 880003 口径
+            #   且历史更长，本次沿用原数据不覆盖（宁可少更新一天，不可毁掉真历史序列）。
+            _hp0 = RAW_DIR / "avg_price_data.json"
+            if _hp0.exists():
+                try:
+                    _old0 = json.loads(_hp0.read_text(encoding="utf-8"))
+                    _osrc0 = str(_old0.get("source") or "") + str(_old0.get("index_name") or "")
+                    _ohist0 = _old0.get("history") or []
+                    if "880003" in _osrc0 and len(_ohist0) > 1:
+                        print(f"  ⏸️ AVG_PRICE 口径保护：既有为 880003 真指数"
+                              f"(history={len(_ohist0)} 条)，全A等权不覆盖，沿用原数据")
+                        return _old0
+                except Exception:
+                    pass
+
             # 读取历史，用于计算均线与昨日对比
             hist = []
             prev_price = None

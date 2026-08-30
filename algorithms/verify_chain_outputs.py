@@ -161,15 +161,36 @@ def main():
         d = parse_date(ts)
         if not d:
             rows.append((name, rel, "⚠️ 时间戳异常", ts, required, "无法解析日期"))
-        elif d == today:
-            rows.append((name, rel, "✅ 本日新鲜", ts, required, ""))
         else:
+            # 🔴 2026-08-30 闸门判据方向修复（实测 run 33308094071）
+            #   原实现用 `d == today` 严格相等判新鲜，产物日期**晚于**基准交易日时
+            #   落入 else 并报「❌ 陈旧 {负数} 天」——文案与事实相反。
+            #   周末/节假日补算场景：算法在运行当日产出（update_time=2026-08-30 周日），
+            #   base_trade_date 正确回落到 2026-08-28（周五），于是 12 个必需项
+            #   全被判陈旧 → exit 1 → job failure → dispatch_guard 重试 → 又跑 88 分钟
+            #   → 再失败，形成重试风暴（2026-08-29 四次 dispatch 全 failure 即此因）。
+            #   正确判据：产物日期不早于基准交易日即为新鲜。
             try:
                 gap = (datetime.strptime(today, "%Y-%m-%d") - datetime.strptime(d, "%Y-%m-%d")).days
             except Exception:
-                gap = -1
-            rows.append((name, rel, f"❌ 陈旧 {gap} 天", ts, required,
-                         f"基准日 {today}，产物停留在 {d}"))
+                gap = None
+            if gap is None:
+                rows.append((name, rel, "⚠️ 时间戳异常", ts, required, f"无法与基准日 {today} 比较"))
+            elif gap > 0:
+                # 产物早于基准交易日 = 真陈旧（上游未动 / 链路断在中途）
+                rows.append((name, rel, f"❌ 陈旧 {gap} 天", ts, required,
+                             f"基准日 {today}，产物停留在 {d}"))
+            elif gap == 0:
+                rows.append((name, rel, "✅ 本日新鲜", ts, required, ""))
+            else:
+                # 产物晚于基准交易日：周末/节假日/次日补算，update_time 打运行当日
+                run_day = datetime.now(CST).strftime("%Y-%m-%d")
+                if d == run_day:
+                    rows.append((name, rel, "✅ 本次产出", ts, required,
+                                 f"基准日 {today}，产物 {d}（本次运行当日产出）"))
+                else:
+                    rows.append((name, rel, f"✅ 新鲜(超前{-gap}日)", ts, required,
+                                 f"基准日 {today}，产物 {d}（晚于基准日，非本次运行）"))
 
     # 控制台输出
     print(f"{'产物':16s} {'状态':14s} {'时间戳':22s} {'权重':6s} 路径")
