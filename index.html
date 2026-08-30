@@ -6869,6 +6869,9 @@ function renderLimitUpHeatmap(){
   const sorted=_displaySectors.slice().sort(function(a,b){
     return b.data.reduce(function(s,n){return s+n;},0) - a.data.reduce(function(s,n){return s+n;},0);
   });
+  // 🛡 2026-08-30：涨停热力"其他"桶为汇总口径(非单一主线)，不参与主线排序，固定沉底并标注
+  var _oi=sorted.findIndex(function(s){return s.name==='其他';});
+  if(_oi>=0){ var _o=sorted.splice(_oi,1)[0]; sorted.push(_o); }
 
   let h='<table><thead><tr><th>板块</th>';
   for(let di=0;di<_displayDates.length;di++){
@@ -6880,7 +6883,8 @@ function renderLimitUpHeatmap(){
     const sector=sorted[s];
     const total=sector.data.reduce(function(sum,n){return sum+n;},0);
     if(total===0) continue; // 全0行隐藏，减少视觉噪音
-    h+='<tr><td>'+sector.name+'</td>';
+    var _isOther=sector.name==='其他';
+    h+='<tr'+( _isOther?' style="opacity:.7"':'')+'><td>'+sector.name+(_isOther?' <span style="font-size:9px;color:var(--dim)">(汇总·非主线)</span>':'')+'</td>';
     for(let j=0;j<sector.data.length;j++){
       const val=sector.data[j];
       const ignite=isIgnite(sector.data,j)?' lu-ignite':'';
@@ -6910,6 +6914,7 @@ function renderLimitUpHeatmap(){
   const analysis=[];
   const sustained=[];
   for(let si=0;si<sorted.length;si++){
+    if(sorted[si].name==='其他') continue;
     const sd=sorted[si].data;
     let streak=0,ms=0;
     for(let di2=0;di2<sd.length;di2++){ if(sd[di2]>=3){ streak++; if(streak>ms) ms=streak; } else streak=0; }
@@ -6919,6 +6924,7 @@ function renderLimitUpHeatmap(){
 
   const ni=[];
   for(let si2=0;si2<sorted.length;si2++){
+    if(sorted[si2].name==='其他') continue;
     const sd2=sorted[si2].data;
     if(sd2.slice(0,sd2.length-3).reduce(function(s,n){return s+n;},0)<=1 && sd2.slice(-3).reduce(function(s,n){return s+n;},0)>=4)
       ni.push(sorted[si2].name);
@@ -7361,7 +7367,7 @@ window.__renderV8CalFull();
     $('phFibPoints').textContent=c.total_points!=null?num(c.total_points,1):'--';
     $('phFibPoints').classList.add(c.total_points<0?'down':'up');
     let nw=null;
-    (fib.windows||[]).forEach(w=>{if(w.status==='future'&&(!nw||w.days_left<nw.days_left))nw=w;});
+    (fib.windows||[]).forEach(w=>{if((w.status==='future'||w.status==='active'||w.status==='tracking')&&(!nw||w.days_left<nw.days_left))nw=w;});
     if(!nw&&fib.next_cycle&&fib.next_cycle.length)nw=fib.next_cycle[0];
     if(nw){
       const daysLeft=nw.days_left>=0?nw.days_left:0;
@@ -7419,7 +7425,7 @@ window.__renderV8CalFull();
     const c=fib.current||{};
     const declineDays=c.days_down||0, declinePct=c.total_pct||0;
     let nextWindow='',nextWindowDays=99;
-    (fib.windows||[]).forEach(w=>{if(w.status==='future'&&w.days_left<nextWindowDays){nextWindow=w.name+'('+w.date+')';nextWindowDays=w.days_left;}});
+    (fib.windows||[]).forEach(w=>{if((w.status==='future'||w.status==='active'||w.status==='tracking')&&w.days_left<nextWindowDays){nextWindow=w.name+'('+w.date+')';nextWindowDays=w.days_left;}});
     let techScore=5,techDetail=[];
     if(declineDays>=30){techScore-=2;techDetail.push('回调'+declineDays+'天');}
     else if(declineDays>=15){techScore-=1;techDetail.push('回调'+declineDays+'天');}
@@ -7443,11 +7449,17 @@ window.__renderV8CalFull();
 
     const cffexNet=cffex.net_total||0, cffexAbs=Math.abs(cffexNet);
     const fomcLabel=fomc.summary||'';
+    // 🛡 2026-08-30：FOMC 立场改为结构化枚举优先（fomc.stance: hawkish/dovish/neutral），关键词硬匹配仅作兜底，并补"转鸽/降息"对称分支
+    var _fomcStance = fomc.stance || (
+      fomcLabel.indexOf('转鹰')>-1 || fomcLabel.indexOf('加息')>-1 ? 'hawkish' :
+      (fomcLabel.indexOf('转鸽')>-1 || fomcLabel.indexOf('降息')>-1 ? 'dovish' : 'neutral')
+    );
     let instScore=5,instDetail=[];
     if(cffexNet<-8000){instScore-=2;instDetail.push('净空'+cffexAbs+'手');}
     else if(cffexNet<-3000){instScore-=1;instDetail.push('净空'+cffexAbs+'手');}
     else if(cffexNet>3000){instScore+=1;instDetail.push('净多'+cffexAbs+'手');}
-    if(fomcLabel.indexOf('转鹰')>-1||fomcLabel.indexOf('加息')>-1){instScore-=1;instDetail.push('FOMC转鹰');}
+    if(_fomcStance==='hawkish'){instScore-=1;instDetail.push('FOMC转鹰');}
+    else if(_fomcStance==='dovish'){instScore+=1;instDetail.push('FOMC转鸽');}
     instScore=Math.max(1,Math.min(10,instScore));
 
     const avg=Math.round((techScore+fundScore+instScore)/3);
@@ -7528,7 +7540,7 @@ window.__renderV8CalFull();
     if(netDiff>30)fundScore=85; else if(netDiff>15)fundScore=70; else if(netDiff>0)fundScore=60;
     else if(netDiff>-15)fundScore=40; else fundScore=25;
 
-    // 估值：基于回调深度反向映射（跌得多=估值低=分数高）
+    // 估值：基于回调深度反向映射（跌得多=估值低=分数高）—— ⚠️ 仅为价格回调代理，非真实 PE/PB 估值分位
     let valScore=50;
     if(declinePct<=-15)valScore=85; else if(declinePct<=-8)valScore=75; else if(declinePct<=-3)valScore=65;
     else if(declinePct>=10)valScore=35; else valScore=55;
@@ -7549,7 +7561,7 @@ window.__renderV8CalFull();
     if(cffexNet<-5000)outScore-=15; else if(cffexNet>5000)outScore+=5;
     outScore=Math.max(20,Math.min(95,outScore));
 
-    const dims=['量能','情绪','资金','估值','技术','外围'];
+    const dims=['量能','情绪','资金','估值(回调代理)','技术','外围'];
     const vals=[volScore,emoScore,fundScore,valScore,techScore,outScore];
     const cx=0,cy=0,R=85,n=dims.length;
     let grid='',axes='';
@@ -8002,7 +8014,7 @@ window.__renderV8CalFull();
     h3+=sfTrendCard('20日',t20d,'net_20d','sf-trend-head-20');
     h3+=sfTrendCard('60日',t60d,'net_60d','sf-trend-head-60');
     h3+='</div>';
-    h3+='<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.4;">📌 上半：板块按 20 日涨幅周期定位；下半：按主力资金净流入滚动累计验证。</div>';
+    h3+='<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.4;">📌 上半：板块按 20 日涨幅周期定位（SECTOR_RS 盘后定稿）；下半：按主力资金净流入滚动累计验证（SECTOR_FUND_FLOW_TREND 盘后快照，与 Block1 盘中 SECTOR_FUND_FLOW 不同源，数值可能不一致属正常）。</div>';
     $('sfBlock3').innerHTML=h3;
 
     setBadge('phSectorTime','盘后','短线',d.update_time);
@@ -8822,6 +8834,8 @@ function drawUpDownChart(){
     var dates = daily.map(function(x){ return x.date; });
     var nets = daily.map(function(x){ return x.net_yi; });
     var cums = cum.map(function(x){ return x.cum_yi; });
+    function _mffMA(arr, n){ var out=[], s=0; for(var i=0;i<arr.length;i++){ s+=arr[i]; if(i>=n) s-=arr[i-n]; out.push(i>=n-1? +(s/n).toFixed(1): null); } return out; }
+    var ma5 = _mffMA(nets, 5), ma20 = _mffMA(nets, 20);
     var upColor = getComputedStyle(document.documentElement).getPropertyValue('--up').trim() || '#ef4444';
     var downColor = getComputedStyle(document.documentElement).getPropertyValue('--down').trim() || '#22c55e';
     var txtColor = getComputedStyle(document.documentElement).getPropertyValue('--txt').trim() || '#e2e8f0';
@@ -8848,6 +8862,10 @@ function drawUpDownChart(){
           { offset: 1, color: 'rgba(236,72,153,0.02)' }
         ]}}
       });
+    }
+    if(__MFF_SHOW_DAILY){
+      legendData.push('MA5'); series.push({ name:'MA5', type:'line', yAxisIndex:0, data:ma5, smooth:true, symbol:'none', lineStyle:{color:'#fbbf24', width:1.5, type:'dashed'}, z:5 });
+      legendData.push('MA20'); series.push({ name:'MA20', type:'line', yAxisIndex:0, data:ma20, smooth:true, symbol:'none', lineStyle:{color:'#38bdf8', width:1.5, type:'dashed'}, z:5 });
     }
     var option = {
       backgroundColor: 'transparent',
@@ -11547,7 +11565,7 @@ h+='</div>';  // /ulPaneDbg
     h+='<div style="font-size:11px;color:var(--sub);margin-top:4px;line-height:1.5;">公式：涨幅≥3% + 量比≥1.2 + 4 日均量基准（反推 PDF 8.10/8.17 「短线买点」35 样本分布）</div>';
     h+='</div>';
     h+='<div style="background:rgba(206,147,216,.08);border:1px solid rgba(206,147,216,.25);border-radius:8px;padding:10px 12px;">';
-    h+='<div style="font-size:11px;color:var(--sub);">📈 累计胜率 <span style="color:var(--dim)">('+(habSum.tracked_picks||0)+' picks · '+(habSum.days||0)+' 日)</span></div>';
+    h+='<div style="font-size:11px;color:var(--sub);">📈 累计胜率 <span style="color:var(--dim)">('+(habSum.tracked_picks||0)+' picks · '+(habSum.days||0)+' 日 · 快照截至 '+(habt.update_time||habt.date||'最近跑批')+')</span></div>';
     h+='<div style="font-size:14px;margin-top:4px;">T+1: <b>'+(habSum.tracked_picks? (100*habSum['T+1_hit']/habSum.tracked_picks).toFixed(1):0)+'%</b> · T+5: <b>'+(habSum.tracked_picks? (100*habSum['T+5_hit']/habSum.tracked_picks).toFixed(1):0)+'%</b> · T+10: <b>'+(habSum.tracked_picks? (100*habSum['T+10_hit']/habSum.tracked_picks).toFixed(1):0)+'%</b></div>';
     h+='<div style="font-size:11px;color:var(--sub);margin-top:4px;">命中阈值 T+N 收盘涨幅 ≥ 5%</div>';
     h+='</div>';
@@ -12809,11 +12827,13 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
 
     /* 6. 宽基ETF净申赎 */
     var esub=window.ETF_SUBSCRIPTION||{}, esubT=esub.update_time||'';
+    var _esubDate = esubT ? esubT.slice(0,16) : '最近跑批';
     h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #00acc1;">';
     h+=v8CardHeader('📈','宽基ETF净申赎（亿份）','','update_time',{update_time:esubT},!esub||!esub.sh||!esub.sh.length);
     h+='<div style="padding:12px 14px;">';
     if(esub&&esub.sh&&esub.sh.length){
       h+='<div style="font-size:11px;color:#38bdf8;margin-bottom:8px;">沪深300/中证500/中证1000/创业板/科创50/上证50/A500 宽基指数ETF每日净申购赎回份额</div>';
+      h+='<div style="font-size:10px;color:var(--dim);margin-bottom:6px;">数据截至 '+_esubDate+'（交易所日频·盘后定基，与上方盘中 ETF 三合一窗口不同源，对照请以各自时间为准）</div>';
       h+='<div id="v8EtfChart" style="width:100%;height:240px;"></div>';
     } else {
       h+='<div class="note" style="text-align:center;">ETF申赎数据暂不可用</div>';
@@ -13465,7 +13485,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       }
     }catch(e){ console.warn('[renderFourVolume] stfvTime write failed', e); }
     var noteEl = document.getElementById('stfvNote');
-    if(noteEl) noteEl.innerHTML = '⚡ 四路信号同时共振的当日候选 · 持有期 T+1/3/5/10/20 日可观测';
+    if(noteEl) noteEl.innerHTML = '⚡ 四路信号同时共振的当日候选 · 持有期 T+1/3/5/10/20 日可观测<br><span style="font-size:10px;color:var(--dim)">（以 60 分钟版为准；日线版 FOUR_VOLUME 未入算法链 ORDER，total 常为 0 属正常、非故障）</span>';
     var stocks = d.stocks || [];
     var qd = stocks.filter(function(s){ return s.qd || (s.yzc && s.jg && s.xc && s.four); }).length;
     var yzc = stocks.filter(function(s){ return s.yzc; }).length;
