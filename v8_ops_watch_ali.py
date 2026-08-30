@@ -81,18 +81,6 @@ def git_pull():
         return False, f"rebase pull 异常: {e}"
 
 
-def run_health_check():
-    """跑 v8_health_check.py --heal，产出最新 HEALTH_CHECK.js 并自动派发重跑。"""
-    try:
-        r = subprocess.run(
-            [sys.executable, "v8_health_check.py", "--heal"],
-            cwd=BASE, capture_output=True, text=True, timeout=600,
-        )
-        return r.returncode, (r.stdout + r.stderr).strip()[-600:]
-    except Exception as e:
-        return 1, f"health check 异常: {e}"
-
-
 def load_health():
     if not HEALTH_JS.exists():
         return None
@@ -190,15 +178,39 @@ def main():
     ok, msg = git_pull()
     print(f"  git pull: {'✅' if ok else '⚠️'} {msg}")
 
-    rc, hmsg = run_health_check()
-    print(f"  v8_health_check --heal: rc={rc} {hmsg[:120]}")
-
+    # 2026-08-30 一劳永逸：阿狸咪监控机改为「只读云端报告」。
+    # 不再本地跑 v8_health_check.py --heal —— 监控机无数据访问、且 --heal 联网派发易挂死，
+    # 会再生成本地过时/误报报告；自 8/10 起多次未能跑完，留下 notify:true 陈旧文件反复推送。
+    # 云端 v8_health_patrol.yml 每小时已跑 --heal 并产出权威 HEALTH_CHECK.js / freshness_status.json。
     health = load_health()
+    if not health:
+        print("  ⚠️ 本地无 HEALTH_CHECK.js（git pull 可能失败），跳过本轮扫描")
+        return 0
+    updated = health.get("updated")
+    if updated:
+        try:
+            up = datetime.datetime.strptime(updated, "%Y-%m-%d %H:%M:%S")
+            age_h = (datetime.datetime.now() - up).total_seconds() / 3600
+            if age_h > 6:
+                print(f"  ⚠️ 云端报告陈旧（{updated}，{age_h:.1f}h 前）→ 监控/抓取链路疑似中断，写 notify=false 边障报告，不骚扰主人")
+                alert = {
+                    "check_time": _ts(), "repo": REPO,
+                    "health_summary": health.get("summary", {}),
+                    "anomaly_count": 0, "anomalies": [], "noise_count": 0, "noise": [],
+                    "signature": "monitor_stale", "notify": False, "cooled": False,
+                    "note": f"云端报告陈旧 {age_h:.1f}h，疑似监控/抓取链路中断，非站点数据故障",
+                }
+                PENDING.write_text(json.dumps(alert, ensure_ascii=False, indent=2), encoding="utf-8")
+                print(f"\n⚠️ 监控数据陈旧，已写入 notify=false 边障报告: {PENDING}")
+                return 0
+        except Exception:
+            pass
+
     fresh = load_freshness()
     anomalies = build_alert(health, fresh)
     real, noise = split_notify(anomalies)
 
-    # 冷却判定（仅基于真异常签名）
+    # 冷却判定（仅基于真异常签名）；修复 last_notify_ts 持久化缺失导致的每轮重发
     prev = {}
     if PENDING.exists():
         try:
@@ -216,12 +228,14 @@ def main():
             cooled = (now - ld).total_seconds() < NOTIFY_COOLDOWN_HOURS * 3600
         except Exception:
             cooled = False
-    notify = bool(real) and (cur_sig != prev_sig or not cooled or not last_notify)
+    # 有真异常 且（签名变化 或 冷却已过的首轮）才通知；同一异常不每轮重发
+    notify = bool(real) and (cur_sig != prev_sig or not cooled)
 
+    last_notify_ts = _ts() if notify else prev.get("last_notify_ts")
     alert = {
         "check_time": _ts(),
         "repo": REPO,
-        "health_summary": (health or {}).get("summary", {}) if health else "无 HEALTH_CHECK.js",
+        "health_summary": health.get("summary", {}),
         "anomaly_count": len(real),
         "anomalies": real,
         "noise_count": len(noise),
@@ -229,6 +243,7 @@ def main():
         "signature": cur_sig,
         "notify": notify,
         "cooled": cooled,
+        "last_notify_ts": last_notify_ts,
     }
     PENDING.write_text(json.dumps(alert, ensure_ascii=False, indent=2), encoding="utf-8")
 

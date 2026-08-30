@@ -820,6 +820,31 @@ def _save_alert_state(path, ts, key):
         pass
 
 
+def _health_rc_consecutive_bad(rc, threshold=3):
+    """记录连续非 0/2 的 health_rc；返回是否达到阈值（持续异常才升级为邮件告警）。
+
+    2026-08-30 一劳永逸修复：health_check rc=3 = 子进程超时/沙箱 urllib 挂死，
+    属已知假阳性（handover 8/29 第 N 次证伪）。偶发 rc=3 不邮件轰炸，
+    仅当连续 >= threshold 次才视为真故障升级；rc=0/2 会重置计数。
+    """
+    p = Path(".workbuddy/v8_watchdog_health_state.json")
+    try:
+        st = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+    except Exception:
+        st = {}
+    if rc in (0, 2):
+        st["count"] = 0
+    else:
+        st["count"] = (st.get("count", 0) + 1) if st.get("last_rc") == rc else 1
+    st["last_rc"] = rc
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(json.dumps(st), encoding="utf-8")
+    except Exception:
+        pass
+    return st.get("count", 0) >= threshold
+
+
 def send_watchdog_alert(now, results, health_rc=None, health_out=None):
     """发送看门狗汇总告警邮件；邮件失败时写 URGENT 文件。
 
@@ -847,10 +872,17 @@ def send_watchdog_alert(now, results, health_rc=None, health_out=None):
     # v8_health_check.py 不会自发邮件，看门狗必须兜底告警，否则 9 张盘中卡陈旧等
     # 真故障会被「无声漏报」。rc=2=有失败项(健康检查已自发邮件)，rc=0=全绿，
     # 其余(1=进程崩退/3=看门狗侧超时)均视为崩溃需兜底。
+    # 2026-08-30 一劳永逸：rc=3=子进程超时/沙箱 urllib 挂死（已知假阳性，handover 8/29 第N次证伪）。
+    # 偶发 rc=3 不邮件轰炸，仅当连续 >=3 次才升级；rc=0/2 会重置计数。
+    _health_persistent = _health_rc_consecutive_bad(health_rc) if health_rc is not None else None
     if health_rc is not None and health_rc not in (0, 2):
-        health_alert_items.append(
-            f"✗ 健康检查进程异常(rc={health_rc})：未生成报告，可能漏报数据陈旧，请查 v8_health_check.py 日志"
-        )
+        if health_rc == 3 and not _health_persistent:
+            print("[INFO] 健康检查超时(rc=3)假阳性规避：偶发超时(疑似网络/沙箱挂死)不邮件告警；连续 3 次才升级")
+        else:
+            label = "连续超时(rc=3)" if health_rc == 3 else f"进程异常(rc={health_rc})"
+            health_alert_items.append(
+                f"✗ 健康检查{label}：未生成报告，可能漏报数据陈旧，请查 v8_health_check.py 日志"
+            )
 
     total_alerts = len(infra_fails) + len(health_alert_items)
     if total_alerts == 0:
