@@ -481,7 +481,7 @@ window.__domReadyFns=[];
 <!-- 2026-08-23 恢复：潜力挖掘板块+股票预测推荐数据（calc_potential_picks.py 输出，跟盘后算法链自动更新） -->
 <script src="data/POTENTIAL_PICKS.js?v=a21dd4fd2c" defer></script>
 <script src="data/INDEX_QUOTES.js?v=f735dd1118" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=13e10fbbda" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=2d35cd039e" defer></script>
 <script src="data/MARGIN_DATA.js?v=8298f415ab" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=7420bb6a42" defer></script>
 <script src="data/IPO_DATA.js?v=01ac0d0e4b" defer></script>
@@ -1341,16 +1341,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/WEEKEND_RUN.js?v=5a7b2a64f5" defer></script>
 <script src="data/W52_HIGH.js?v=6c179b48f1" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=fc506654b4" defer></script>
-<script src="data/RUNNER_STATUS.js?v=2ef53c3147" defer></script>
-<script src="data/HEALTH_CHECK.js?v=6daf869521" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=4a44791473" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=ec1029f6ee" defer></script>
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=3de2fec4c6" defer></script>
-    <script src="data/INDEX_HISTORY.js?v=59495313b4" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=ff4d6015c9" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=a8a7018a5a" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=ca7a94e774" defer></script>
-    <script src="data/ALGO_BACKTEST_COMPARE.js?v=b288efb15d" defer></script>
+<script src="data/RUNNER_STATUS.js?v=332619a4fb" defer></script>
+<script src="data/HEALTH_CHECK.js?v=e74abb9039" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=eaf875ab73" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=88643f6848" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=6cdd680db5" defer></script>
+    <script src="data/INDEX_HISTORY.js?v=bf3104bbe1" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=278bf131f5" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=885654f1c3" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=185aba2136" defer></script>
+    <script src="data/ALGO_BACKTEST_COMPARE.js?v=bac863166c" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -10566,7 +10566,7 @@ function drawUpDownChart(){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=ff4d6015c9';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=278bf131f5';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -10575,7 +10575,7 @@ function drawUpDownChart(){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=a8a7018a5a';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=885654f1c3';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -12991,7 +12991,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=6daf869521')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=e74abb9039')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
