@@ -22,7 +22,7 @@
         周末 08:00-11:00   -> 上次成功 < 3h 则跳过；其余时间不按铃
     algo_cloud（ubuntu-latest，120min timeout，19:15 主档 + dispatch 兜底）：
         工作日 19:15-23:30 -> 上次成功 < 4h 则跳过；最近 run 失败/取消则 30min 重试
-        盘后若 TOP5_TRACK/BACKTEST_TDX/BACKTEST_COMPREHENSIVE/COCKPIT_BACKTEST 仍为旧日期 -> 直接按铃
+        盘后若 BACKTEST_TDX/BACKTEST_COMPREHENSIVE/COCKPIT_BACKTEST 仍为旧日期 -> 直接按铃
         周末不按铃（workflow 内部有交易日历 gate，非交易日自动跳过）
 
 权限：读 E:/workspace/stock-scanner/.gh_pat（已被 .gitignore 保护）。
@@ -156,7 +156,7 @@ def _algo_data_need_bell(now):
     today = now.date().isoformat()
     # 2026-08-20 主人令审计补全：加入 AI 预测卡（INDEX_HISTORY/MARKET_PATH_PROBABILITY），
     # 防 19:15 算法链失败时 AI 预测子TAB 静默陈旧。
-    vars_ = ["TOP5_TRACK", "BACKTEST_TDX", "BACKTEST_COMPREHENSIVE", "COCKPIT_BACKTEST",
+    vars_ = ["BACKTEST_TDX", "BACKTEST_COMPREHENSIVE", "COCKPIT_BACKTEST",
              "MARKET_PATH_PROBABILITY", "INDEX_HISTORY"]
     stale = []
     for v in vars_:

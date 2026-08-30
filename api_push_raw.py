@@ -93,15 +93,14 @@ def walk_raw():
     #    （如 backtest_xxx / top3_track_xxx / cockpit_backtest_xxx / optimized_strategy_xxx）
     #    自动纳入排除，根除「漏把新算法产物加进排除表导致再被覆盖」的根因。
     # 🔴 2026-08-20 根因修复：v8_algo_cloud 自己就是 run_algorithms 的 runner，必须
-    #    把算法产物推上去；否则 backtest_*/cockpit_backtest*/top5_track.json 等
-    #    永远停在本地旧版，策略回测/驾驶舱/TOP5_TRACK 卡片长期 stale。通过环境变量
+    #    把算法产物推上去；否则 backtest_*/cockpit_backtest* 等
+    #    永远停在本地旧版，策略回测/驾驶舱卡片长期 stale。通过环境变量
     #    PUSH_ALGO_RAW=1 显式开启（仅 v8_algo_cloud.yml 设置），cloud_fetch 不设置
     #    保持原有防覆盖行为。
     _ALGO_RAW_PREFIXES = (
         "backtest",          # backtest_tdx.py / backtest_comprehensive.py 等
         "cockpit_backtest",  # cockpit_backtest_now.py
         "optimized_strategy",# export_optimized_strategy.py
-        "top5_track",        # gen_top5_track.py（2026-08-15 改自 top3_track）
         "algo_track",         # gen_algo_track.py（2026-08-15 三算法追踪）
         "commodity_prices_cache",  # calc_commodity_elasticity.py westock 价格缓存（MCP 预抓取）
     )

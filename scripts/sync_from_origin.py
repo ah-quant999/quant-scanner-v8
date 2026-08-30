@@ -65,7 +65,6 @@ FILES = [
     "algorithms/calc_etf_intraday.py",
     "algorithms/calc_commodity_elasticity.py",
     "algorithms/fetch_sector_rs.py",
-    "algorithms/gen_top5_track.py",
     "algorithms/gen_stock_stop.py",
     "algorithms/stop_target_logic.py",
     "algorithms/build_candidate_pool.py",

@@ -134,7 +134,6 @@ CORE_SOURCES_ALGO = {
     "COCKPIT_BACKTEST": 24,
     "BACKTEST_COMPREHENSIVE": 24,
     "BACKTEST_TDX": 24,
-    "TOP5_TRACK": 24,      # 策略回测统一卡片时间戳来源
     "CRDS_CARD_DATA": 24,
     # 🔴 2026-08-20 根因修复：LHB_7D.js 由算法链生成，之前不在监控/自愈范围，
     #    文件停更 24h+ 无告警，页面 7 日龙虎榜/机游共振长期 stale。
@@ -175,7 +174,7 @@ SELFHEAL_COOLDOWN_MIN = 30   # 同 category 自愈派发冷却，避免每小时
 # 由 v8_algo_cloud.yml 产出的选股/回测类 data/*.js 变量（在 update_v8 CATEGORY_MAP 中多为 post_close，
 # 但 cloud_fetch 无法生产它们；需要单独 dispatch algo_cloud 来自愈）。
 ALGO_VARS = {
-    "COCKPIT_BACKTEST", "BACKTEST_COMPREHENSIVE", "BACKTEST_TDX", "TOP5_TRACK",
+    "COCKPIT_BACKTEST", "BACKTEST_COMPREHENSIVE", "BACKTEST_TDX",
     "CRDS_CARD_DATA", "TRIPLE_CONSENSUS", "TRIPLE_TRACK", "TRIPLE_HISTORY",
     "FINAL_RECOMMEND_DATA", "ALGO_TRACK", "COCKPIT_TIER_RECOMMEND",
     "COCKPIT_ADVICE", "SENTIMENT_CYCLE", "H_AUTO_BUY", "H_AUTO_BUY_TRACK",

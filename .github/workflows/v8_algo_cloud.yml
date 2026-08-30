@@ -99,8 +99,8 @@ jobs:
       # 与 scanner.py 的 GITHUB_ACTIONS 自动识别形成双保险，防止 A股活跃股池缺失。
       CLOUD_RUNNER: "true"
       # 🔴 2026-08-20 根因修复：本 workflow 就是 run_algorithms 的 runner，必须允许
-      #    api_push_raw.py 推送算法产物（backtest_*/cockpit_backtest*/top5_track.json 等），
-      #    否则策略回测/驾驶舱/TOP5_TRACK/LHB_7D 等卡片永远 stale。cloud_fetch 不设置。
+      #    api_push_raw.py 推送算法产物（backtest_*/cockpit_backtest* 等），
+      #    否则策略回测/驾驶舱/LHB_7D 等卡片永远 stale。cloud_fetch 不设置。
       PUSH_ALGO_RAW: "1"
       # 2026-08-28 主人令：mahoro 数据源不再跟踪，MAHORO_COOKIE/MAHORO_ACTION/MAHORO_CODE 已移除
       # 外资研投(知识星球) token：与小九本地 data/zsxq_token.json 同值。

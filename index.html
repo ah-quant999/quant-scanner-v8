@@ -14,7 +14,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "71dc9b94d";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
+    var BUILD = "520964446";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -481,7 +481,7 @@ window.__domReadyFns=[];
 <!-- 2026-08-23 恢复：潜力挖掘板块+股票预测推荐数据（calc_potential_picks.py 输出，跟盘后算法链自动更新） -->
 <script src="data/POTENTIAL_PICKS.js?v=a21dd4fd2c" defer></script>
 <script src="data/INDEX_QUOTES.js?v=f735dd1118" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=2d35cd039e" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=13e10fbbda" defer></script>
 <script src="data/MARGIN_DATA.js?v=8298f415ab" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=7420bb6a42" defer></script>
 <script src="data/IPO_DATA.js?v=01ac0d0e4b" defer></script>
@@ -1334,7 +1334,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/OPTIMIZED_STRATEGY.js?v=24ae245b29" defer></script>
 <script src="data/EXPERIMENT.js?v=e4cc265041" defer></script>
 <script src="data/FINAL_RECOMMEND_DATA.js?v=a15224eb36" defer></script>
-<script src="data/TOP5_TRACK.js?v=2666b66fa9" defer></script>
 <script src="data/ALGO_TRACK.js?v=e01464e2e7" defer></script>
 <script src="data/ETF_PULSE.js?v=7fb46973ef" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=0baa429c2e" defer></script>
@@ -1342,16 +1341,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/WEEKEND_RUN.js?v=5a7b2a64f5" defer></script>
 <script src="data/W52_HIGH.js?v=6c179b48f1" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=fc506654b4" defer></script>
-<script src="data/RUNNER_STATUS.js?v=332619a4fb" defer></script>
-<script src="data/HEALTH_CHECK.js?v=e74abb9039" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=eaf875ab73" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=88643f6848" defer></script>
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=6cdd680db5" defer></script>
-    <script src="data/INDEX_HISTORY.js?v=bf3104bbe1" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=278bf131f5" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=885654f1c3" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=185aba2136" defer></script>
-    <script src="data/ALGO_BACKTEST_COMPARE.js?v=bac863166c" defer></script>
+<script src="data/RUNNER_STATUS.js?v=2ef53c3147" defer></script>
+<script src="data/HEALTH_CHECK.js?v=6daf869521" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=4a44791473" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=ec1029f6ee" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=3de2fec4c6" defer></script>
+    <script src="data/INDEX_HISTORY.js?v=59495313b4" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=ff4d6015c9" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=a8a7018a5a" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=ca7a94e774" defer></script>
+    <script src="data/ALGO_BACKTEST_COMPARE.js?v=b288efb15d" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -3697,22 +3696,22 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
  <!-- ============ 运维（管理员） ============ --</script>
 
 
- <!-- ============ 🔒 策略回测（统一 · 2026-08-13 主人令） ============
-      一个 tab 装三块：① TOP5 90天跟踪 ② 综合回测多策略×多持有期 ③ K线信号60日回测
-      解决"两边跑着看"问题，仅管理员可见。 -->
+<!-- ============ 🔒 策略回测（统一 · 2026-08-13 主人令） ============
+     一个 tab 装两块：① 综合回测多策略×多持有期 ② K线信号60日回测
+     解决"两边跑着看"问题，仅管理员可见。 -->
   <section id="sec-bt">
-    <div class="sec-head"><h2>🔒 策略回测（统一）</h2><span class="tag">仅管理员可见 · TOP5跟踪 + 综合回测 + 信号60日 · 三块一站看完</span><span class="fresh" id="btFresh">—</span></div>
+    <div class="sec-head"><h2>🔒 策略回测（统一）</h2><span class="tag">仅管理员可见 · 综合回测 + 信号60日 · 两块一站看完</span><span class="fresh" id="btFresh">—</span></div>
     <div id="btSummary" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0 4px;padding:8px 12px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);border-radius:10px;font-size:11.5px;"><span style="color:var(--dim);font-weight:600;">📊 回测总览</span><span style="color:var(--sub);">加载中…</span></div>
     <div id="btBody"><div class="note">加载中…</div></div>
   </section>
 
 
 <script>
-/* ═══════════ 🔒 策略回测（统一 · 2026-08-13）═══ 三个回测块一站看完 ═══════════
-   ① 🏆 TOP5 90天跟踪  — TOP5_TRACK  →  验证"我刚推的票靠不靠谱"
-   ② 📊 综合回测 多策略×多持有期 — BACKTEST_COMPREHENSIVE → "我用的策略哪个最值钱"
-   ③ 📈 K线信号 60 日回测 — BACKTEST_TDX → "信号层有没有 alpha"
+/* ═══════════ 🔒 策略回测（统一 · 2026-08-13）═══ 两个回测块一站看完 ═══════════
+   ① 📊 综合回测 多策略×多持有期 — BACKTEST_COMPREHENSIVE → "我用的策略哪个最值钱"
+   ② 📈 K线信号 60 日回测 — BACKTEST_TDX → "信号层有没有 alpha"
    设计：简洁表格、胜率高亮（≥55% 绿 / ≤45% 红）、平均收益同色。
+   2026-08-30 主人令：TOP5 滚动跟踪样本不足（<30）且长期空表，已删除。
 */
 (function(){
   var rendered = false;
@@ -3840,14 +3839,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     if(rendered) return;
     rendered = true;
 
-    var tt = window.TOP5_TRACK || {};
     var bc = window.BACKTEST_COMPREHENSIVE || {};
     var bd = window.BACKTEST_TDX || {};
     var cb = window.COCKPIT_BACKTEST || {};
 
     // 取各回测数据源中最新的 calc_time/update_time 作为统一"更新于"时间
     var btTimes = [];
-    if(tt.update_time) btTimes.push(tt.update_time);
     if(bc.calc_time) btTimes.push(bc.calc_time);
     if(bd.calc_time) btTimes.push(bd.calc_time);
     if(cb.calc_time) btTimes.push(cb.calc_time);
@@ -3930,115 +3927,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '</div>';
     }
 
-    /* ── ① TOP5 滚动跟踪（多窗口累积执行效果）── */
-    html += '<div style="margin:14px 0;border-left:4px solid var(--cyan);" class="card">';
-    html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
-    html += '<span style="font-size:15px;font-weight:700;color:var(--cyan);">🏆 ① TOP5 滚动跟踪</span>';
-    html += '<span style="font-size:11px;color:var(--dim);">执行效果：刚推的票后来涨没涨？</span>';
-    html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);">正在跟踪 '+(tt.stats && tt.stats.tracking || 0)+' 只</span>';
-    html += '</div>';
-    var stats = tt.stats || {};
-    var dist = stats.tracking_distribution || {};
-    // 2026-08-30 主人令「不要弄虚作假」：已平仓样本 <30 时明确标注「样本不足」，
-    //   避免用 2 个样本的 0% 胜率误导为"策略不行"（2026-08-30 实测 samples=2）。
-    var _smp = (stats.samples == null) ? 0 : stats.samples;
-    if(_smp < 30){
-      html += '<div style="margin-bottom:10px;padding:8px 12px;border-radius:8px;font-size:11.5px;line-height:1.7;'
-           +  'background:rgba(251,191,36,.10);border:1px solid rgba(251,191,36,.35);color:var(--sub);">'
-           +  '⚠️ <b style="color:#fbbf24;">样本不足，暂无统计意义</b>：当前已平仓样本仅 <b>'+_smp+'</b> 只（需 ≥30 只才具参考价值）。'
-           +  '表中胜率/收益会随样本累积大幅波动，<b>请勿据此判断策略好坏</b>。'
-           +  '</div>';
-    }
-    // 多窗口累积矩阵（5d→180d，样本随时间自然积累）
-    var sbw = tt.stats_by_window || {};
-    var winRows = [['5d','5天'],['10d','10天'],['20d','20天'],['30d','30天'],['60d','60天'],['90d','90天'],['180d','180天']];
-    html += '<div style="overflow-x:auto;margin-bottom:12px;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
-    html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-    html += '<th style="padding:6px 4px;text-align:left;color:var(--sub);font-weight:600;">窗口</th>';
-    html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">已平仓样本</th>';
-    html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">达成胜率</th>';
-    html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">平均收益</th>';
-    html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">最高</th>';
-    html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">最低</th>';
-    html += '</tr></thead><tbody>';
-    // 2026-08-30：样本<30 时整矩阵数字降级，不展示任何胜率/收益（避免 2 样本的 0% 被误读为"策略不行"）
-    var insufficient = _smp < 30;
-    winRows.forEach(function(row){
-      var key=row[0], label=row[1];
-      var wst = sbw[key] || {};
-      var samples = wst.samples || 0;
-      var wr = wst.win_rate != null ? Math.round(wst.win_rate * 100) : (key === '90d' && stats.win_rate != null ? Math.round(stats.win_rate * 100) : 0);
-      var avg = wst.avg_return != null ? wst.avg_return : (key === '90d' ? stats.avg_return : 0);
-      var mx = wst.max_return != null ? wst.max_return : (key === '90d' ? stats.max_return : 0);
-      var mn = wst.max_loss != null ? wst.max_loss : (key === '90d' ? stats.max_loss : 0);
-      var faded = samples === 0 || insufficient;
-      html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
-      html += '<td style="padding:6px 4px;font-weight:600;color:'+(faded?'var(--dim)':'var(--txt)')+';">'+label+'</td>';
-      html += '<td style="padding:6px 4px;text-align:right;color:'+(faded?'var(--dim)':'var(--txt)')+';">'+(samples||'—')+'</td>';
-      if(insufficient){
-        html += '<td style="padding:6px 4px;text-align:right;font-weight:700;color:var(--dim);">—</td>';
-        html += '<td style="padding:6px 4px;text-align:right;font-weight:700;color:var(--dim);">—</td>';
-        html += '<td style="padding:6px 4px;text-align:right;color:var(--dim);">—</td>';
-        html += '<td style="padding:6px 4px;text-align:right;color:var(--dim);">—</td>';
-      } else {
-        html += '<td style="padding:6px 4px;text-align:right;font-weight:700;color:'+(faded?'var(--dim)':_colorWR(wr))+';">'+(samples?(wr+'%'):'待积累')+'</td>';
-        html += '<td style="padding:6px 4px;text-align:right;font-weight:700;color:'+(faded?'var(--dim)':_colorPL(avg))+';">'+(samples?((avg>0?'+':'')+avg+'%'):'—')+'</td>';
-        html += '<td style="padding:6px 4px;text-align:right;color:'+(faded?'var(--dim)':_colorPL(mx))+';">'+(samples?((mx>0?'+':'')+mx+'%'):'—')+'</td>';
-        html += '<td style="padding:6px 4px;text-align:right;color:'+(faded?'var(--dim)':_colorPL(mn))+';">'+(samples?((mn>0?'+':'')+mn+'%'):'—')+'</td>';
-      }
-      html += '</tr>';
-    });
-    html += '</tbody></table></div>';
-    // 排名分布
-    html += '<div style="font-size:11.5px;color:var(--sub);margin-bottom:6px;">排名分布：🥇 Rank1 <b>'+(dist.rank1||0)+'</b> / 🥈 Rank2 <b>'+(dist.rank2||0)+'</b> / 🥉 Rank3 <b>'+(dist.rank3||0)+'</b></div>';
-    // 跟踪表
-    var tracks = tt.tracking || [];
-    if(tracks.length){
-      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
-      html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      html += '<th style="padding:6px 4px;text-align:left;color:var(--sub);font-weight:600;">名次</th>';
-      html += '<th style="padding:6px 4px;text-align:left;color:var(--sub);font-weight:600;">名称/代码</th>';
-      html += '<th style="padding:6px 4px;text-align:left;color:var(--sub);font-weight:600;">入选日</th>';
-      html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">入场价</th>';
-      html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">最新价</th>';
-      html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">盈亏%</th>';
-      html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">峰值%</th>';
-      html += '<th style="padding:6px 4px;text-align:right;color:var(--sub);font-weight:600;">天数</th>';
-      html += '<th style="padding:6px 4px;text-align:left;color:var(--sub);font-weight:600;">来源</th>';
-      html += '</tr></thead><tbody>';
-      var medals = ['🥇','🥈','🥉'];
-      tracks.forEach(function(t, i){
-        var med = medals[i] || '#'+(i+1);
-        var pct = t.last_pct == null ? null : Number(t.last_pct);
-        var peak = t.peak_pct == null ? null : Number(t.peak_pct);
-        var entry = t.entry_price == null ? '<span style="color:var(--dim);">待K线</span>' : Number(t.entry_price).toFixed(2);
-        var last = t.last_close == null ? '<span style="color:var(--dim);">—</span>' : Number(t.last_close).toFixed(2);
-        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
-        html += '<td style="padding:6px 4px;font-weight:700;color:#fbbf24;">'+med+'</td>';
-        html += '<td style="padding:6px 4px;font-weight:700;color:var(--txt);">'+_esc(t.name)+' <span style="color:var(--dim);font-size:10.5px;font-family:ui-monospace,Menlo,monospace;">'+_esc(t.code)+'</span></td>';
-        html += '<td style="padding:6px 4px;color:var(--sub);">'+_esc(t.list_date_dashed||t.list_date)+'</td>';
-        html += '<td style="padding:6px 4px;text-align:right;color:var(--sub);font-family:ui-monospace,Menlo,monospace;">'+entry+'</td>';
-        html += '<td style="padding:6px 4px;text-align:right;color:var(--sub);font-family:ui-monospace,Menlo,monospace;">'+last+'</td>';
-        html += '<td style="padding:6px 4px;text-align:right;font-weight:700;color:'+_colorPL(pct)+';">'+(pct==null?'—':(pct>0?'+':'')+pct.toFixed(2)+'%')+'</td>';
-        html += '<td style="padding:6px 4px;text-align:right;color:'+_colorPL(peak)+';">'+(peak==null?'—':(peak>0?'+':'')+peak.toFixed(2)+'%')+'</td>';
-        html += '<td style="padding:6px 4px;text-align:right;color:var(--sub);">'+t.days_in+'</td>';
-        html += '<td style="padding:6px 4px;color:var(--dim);font-size:10.5px;">'+(t.list_sources||[]).join('·')+'</td>';
-        html += '</tr>';
-      });
-      html += '</tbody></table></div>';
-    } else {
-      var _onlineDays = (tt.online_days != null) ? tt.online_days : (stats.window_days ? (90 - (stats.window_days)) : '—');
-      html += '<div style="text-align:center;padding:14px 10px;background:rgba(245,158,11,.06);border:1px dashed rgba(245,158,11,.25);border-radius:8px;font-size:12px;color:var(--sub);">';
-      html += '⏳ 跟踪功能上线第 <b style="color:#f59e0b;font-weight:700">'+(tt.online_days||'1')+'</b> 天，历史成绩待积累<br>';
-      html += '<span style="font-size:11px;color:var(--dim)">待 TOP5 候选票 K 线收盘后自动统计胜率/收益（当前样本 0）</span>';
-      html += '</div>';
-    }
-    if(stats.samples === 0 && tracks.length){
-      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;">⏳ 历史成绩需待 TOP5 票 K 线收盘后再统计（当前样本 0，待积累）</div>';
-    }
-    html += '</div>';
-
-    /* ── ② 综合回测（多策略×多持有期）── */
+    /* ── ① 综合回测（多策略×多持有期）── */
     html += '<div style="margin:14px 0;border-left:4px solid #38bdf8;" class="card">';
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
     html += '<span style="font-size:15px;font-weight:700;color:#38bdf8;">📊 ② 综合回测 · 多策略 × 多持有期</span>';
@@ -4081,10 +3970,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     }
     html += '</div>';
 
-    /* ── ③ K线信号 60 日回测（驾驶舱回测页复制过来的）── */
+    /* ── ② K线信号 60 日回测（驾驶舱回测页复制过来的）── */
     html += '<div style="margin:14px 0;border-left:4px solid #c084fc;" class="card">';
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
-    html += '<span style="font-size:15px;font-weight:700;color:#c084fc;">📈 ③ K线信号 60 日回测</span>';
+    html += '<span style="font-size:15px;font-weight:700;color:#c084fc;">📈 ② K线信号 60 日回测</span>';
     html += '<span style="font-size:11px;color:var(--dim);">信号层 alpha：9 个信号 × T+1/3/5/10/20</span>';
     html += '</div>';
     if(bd.summary){
@@ -5177,7 +5066,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         </div>
 
         <div class="logic-h">② 本地禁止手动跑算法（一劳永逸护栏）</div>
-        <div class="logic-p"><code>algorithms/utils/time_gate.py</code> 新增 <code>check_cloud_only()</code>：非 <code>GITHUB_ACTIONS</code>/<code>CI</code> 且未显式 <code>ALLOW_LOCAL_ALGO=1</code> 时直接退出。已接入 <code>run_algorithms.py</code> / <code>fetch_index_history.py</code> / <code>market_path_probability.py</code> / <code>gen_lhb_7d.py</code> / <code>gen_top5_track.py</code> / <code>cockpit_backtest_now.py</code> / <code>build_candidate_pool.py</code> / <code>gen_algo_track.py</code> / <code>momentum_common_filter.py</code>。根治「本地手动跑算法产数据 → 本地 file:/// 版与主站分叉」。</div>
+        <div class="logic-p"><code>algorithms/utils/time_gate.py</code> 新增 <code>check_cloud_only()</code>：非 <code>GITHUB_ACTIONS</code>/<code>CI</code> 且未显式 <code>ALLOW_LOCAL_ALGO=1</code> 时直接退出。已接入 <code>run_algorithms.py</code> / <code>fetch_index_history.py</code> / <code>market_path_probability.py</code> / <code>gen_lhb_7d.py</code> / <code>cockpit_backtest_now.py</code> / <code>build_candidate_pool.py</code> / <code>gen_algo_track.py</code> / <code>momentum_common_filter.py</code>。根治「本地手动跑算法产数据 → 本地 file:/// 版与主站分叉」。</div>
 
         <div class="logic-h">③ 本地 ↔ 主站镜像同步（每 15 分钟）</div>
         <div class="logic-p">WorkBuddy 自动化「九宝量化-本地↔主站镜像同步(每15分)」跑 <code>scripts/sync_local_mirror.py</code>：仅当工作区干净才 <code>reset --hard origin/main</code>（脏则跳过防误吞），确保本地 <code>file:///</code> 打开 = 线上 GitHub Pages。云端 build 推了新数据，本地 15 分钟内自动对齐。</div>
@@ -5186,7 +5075,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p"><code>v8_algo_cloud.yml</code> cron <code>30 10</code> → <code>15 11</code>（UTC，即 CST 19:15），确保龙虎榜/北向/板块资金等全部盘后数据就绪后再跑选股算法；<code>alimi_bell.py</code> 按铃/陈旧检查窗口同步 19:15。候选股池 post_close 档接入外资研投 + mahoro 数据源。</div>
 
         <div class="logic-h">⑤ 算法产物推送范围修复（8/20 晚间指令）</div>
-        <div class="logic-p"><code>time_gate._now_cst()</code> 改 UTC+8 显式计算（runner 时区漂移根因）；<code>api_push_raw.py</code> <code>PUSH_ALGO_RAW=1</code> 允许推送算法 raw 产物；<code>guard_v8_freshness.py</code> 加入 LHB_7D 监控自愈；<code>data/LHB_7D.js</code> / <code>TOP5_TRACK.js</code> 已即时刷新推仓。</div>
+        <div class="logic-p"><code>time_gate._now_cst()</code> 改 UTC+8 显式计算（runner 时区漂移根因）；<code>api_push_raw.py</code> <code>PUSH_ALGO_RAW=1</code> 允许推送算法 raw 产物；<code>guard_v8_freshness.py</code> 加入 LHB_7D 监控自愈；<code>data/LHB_7D.js</code> 已即时刷新推仓。</div>
 
         <div class="logic-h">⑥ 本地算法链 vs 云端算法链 审计结论（2026-08-20 主人令一劳永逸）</div>
         <div class="logic-p">
@@ -5203,7 +5092,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>双机一致性</td><td>主站 = 唯一权威；本地镜像同步对齐</td><td>本机跑过会<b>分叉主站</b>（主人 8/20 截图根因）</td><td>云端远优</td></tr>
           <tr><td>合规/护栏</td><td>无需护栏（本来就不该跑）</td><td><code>check_cloud_only()</code> 已封死 9 脚本</td><td>云端</td></tr>
         </table>
-        <b>铁律（2026-08-20）</b>：所有数据由云端 <code>v8_algo_cloud</code>（19:15 CST）+ <code>v8_cn_fetch_cloud</code> 统一产出部署；本地只做代码开发/镜像同步（<code>sync_local_mirror.py</code> 每 15 分拉 <code>origin/main</code>），不再手动跑算法产数据。<code>time_gate.check_cloud_only()</code> 在 <code>run_algorithms.py</code> / <code>fetch_index_history.py</code> / <code>market_path_probability.py</code> / <code>gen_lhb_7d.py</code> / <code>gen_top5_track.py</code> / <code>cockpit_backtest_now.py</code> / <code>build_candidate_pool.py</code> / <code>gen_algo_track.py</code> / <code>momentum_common_filter.py</code> 共 9 入口拦截。
+        <b>铁律（2026-08-20）</b>：所有数据由云端 <code>v8_algo_cloud</code>（19:15 CST）+ <code>v8_cn_fetch_cloud</code> 统一产出部署；本地只做代码开发/镜像同步（<code>sync_local_mirror.py</code> 每 15 分拉 <code>origin/main</code>），不再手动跑算法产数据。<code>time_gate.check_cloud_only()</code> 在 <code>run_algorithms.py</code> / <code>fetch_index_history.py</code> / <code>market_path_probability.py</code> / <code>gen_lhb_7d.py</code> / <code>cockpit_backtest_now.py</code> / <code>build_candidate_pool.py</code> / <code>gen_algo_track.py</code> / <code>momentum_common_filter.py</code> 共 8 入口拦截。
         </div>
 
         <div class="logic-h">⑦ 主人追问「数据源连通性本机优，是不是该选本机？」的回答（2026-08-20）</div>
@@ -10677,7 +10566,7 @@ function drawUpDownChart(){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=278bf131f5';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=ff4d6015c9';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -10686,7 +10575,7 @@ function drawUpDownChart(){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=885654f1c3';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=a8a7018a5a';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -13102,7 +12991,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=e74abb9039')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=6daf869521')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){

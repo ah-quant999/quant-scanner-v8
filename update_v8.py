@@ -95,7 +95,6 @@ DATA_SOURCES = {
     "risk_gauge.json":             "RISK_GAUGE",
     "stock_quote.json":            "STOCK_QUOTE",
     "avg_price_data.json":         "AVG_PRICE_DATA",
-    "top5_track.json":             "TOP5_TRACK",  # 2026-08-13 finalRec Top5 90 天滚动追踪（2026-08-15 改自 TOP3）
     "algo_track.json":              "ALGO_TRACK",   # 2026-08-15 三算法独立追踪（四量终极/板块龙头/大牛股猎手）
     "weekend_meta_report.json":      "WEEKEND_META_REPORT",
     # 🛡 2026-08-29 一劳永逸式修复：DELISTED_STOCKS 已删（1MB 死数据，全站 0 渲染引用，renderDelisted 走 CANDIDATE）
@@ -195,8 +194,6 @@ CATEGORY_MAP = {
     #      → mtime 被刷新 → cache-buster 全天无意义抖动（长期记忆里那个怪现象的根源）
     # 与 fetch 侧对齐为 intraday 后，两个问题一并消除。
     "AVG_PRICE_DATA": "intraday",
-    # 2026-08-13：TOP5_TRACK 依赖 final_recommend，归属盘后（与 finalRec 同节奏）（2026-08-15 改自 TOP3）
-    "TOP5_TRACK": "post_close",
     # 2026-08-15：ALGO_TRACK 依赖 FINAL_RECOMMEND_DATA + FOUR_VOLUME，归属盘后
     "ALGO_TRACK": "post_close",
     # 2026-08-19：路径概率预测卡数据源（盘后跑，与算法链节奏一致）
