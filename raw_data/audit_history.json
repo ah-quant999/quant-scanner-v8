@@ -865,15 +865,25 @@
  },
  {
   "date": "2026-08-30",
-  "time": "11:21:22",
-  "overall": "warn",
+  "time": "18:06:40",
+  "overall": "fail",
   "summary": {
-   "ok": 108,
-   "warn": 8,
-   "fail": 1,
-   "total": 117
+   "ok": 87,
+   "warn": 10,
+   "fail": 22,
+   "total": 119
   },
   "warn_items": [
+   {
+    "id": "DELISTED",
+    "name": "已下架股票目录",
+    "message": "更新于 昨日 00:00"
+   },
+   {
+    "id": "UNLISTED_PANEL",
+    "name": "暂未上架模块索引",
+    "message": "更新于 昨日 00:00"
+   },
    {
     "id": "dom_taskScheduleBody",
     "name": "DOM #taskScheduleBody",
@@ -917,9 +927,114 @@
   ],
   "fail_items": [
    {
+    "id": "NT_DATA",
+    "name": "市场提示",
+    "message": "更新于 2天前 09:05；超过阈值 960 分钟"
+   },
+   {
+    "id": "SH_FIB",
+    "name": "市场温度计",
+    "message": "更新于 2天前 08:38；超过阈值 1440 分钟"
+   },
+   {
+    "id": "SIX_DIM_RADAR",
+    "name": "六维共振雷达",
+    "message": "更新于 2天前 08:38；超过阈值 1440 分钟"
+   },
+   {
+    "id": "CANDIDATE",
+    "name": "候选池",
+    "message": "更新于 2天前 22:06；超过阈值 1440 分钟"
+   },
+   {
+    "id": "GOLD_POOL",
+    "name": "黄金池",
+    "message": "更新于 2天前 09:39；超过阈值 1440 分钟"
+   },
+   {
+    "id": "LHB_DATA",
+    "name": "龙虎榜",
+    "message": "更新于 2天前 08:43；超过阈值 1440 分钟"
+   },
+   {
+    "id": "INST_TRADE",
+    "name": "机构买卖",
+    "message": "更新于 2天前 08:38；超过阈值 1440 分钟"
+   },
+   {
+    "id": "BIG_BULL_HUNTER",
+    "name": "大牛股猎手",
+    "message": "更新于 2天前 08:43；超过阈值 1440 分钟"
+   },
+   {
+    "id": "STOCK_RPS",
+    "name": "相对强度",
+    "message": "更新于 2天前 19:59；超过阈值 1440 分钟"
+   },
+   {
+    "id": "CRDS_CARD_DATA",
+    "name": "逆势龙头",
+    "message": "更新于 2天前 08:44；超过阈值 1440 分钟"
+   },
+   {
     "id": "dom_phMacroBody",
     "name": "DOM #phMacroBody",
     "message": "未找到元素"
+   },
+   {
+    "id": "all_COCKPIT_TIER_RECOMMEND",
+    "name": "COCKPIT_TIER_RECOMMEND",
+    "message": "COCKPIT_TIER_RECOMMEND.js 更新于 2天前 09:39；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_ETF_SUBSCRIPTION_EM",
+    "name": "ETF_SUBSCRIPTION_EM",
+    "message": "ETF_SUBSCRIPTION_EM.js 更新于 2天前 16:58；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_FINAL_RECOMMEND_DATA",
+    "name": "FINAL_RECOMMEND_DATA",
+    "message": "FINAL_RECOMMEND_DATA.js 更新于 2天前 20:34；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_LHB_7D",
+    "name": "LHB_7D",
+    "message": "LHB_7D.js 更新于 2天前 09:39；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_LHB_HISTORY",
+    "name": "LHB_HISTORY",
+    "message": "LHB_HISTORY.js 更新于 2天前 04:58；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_SECTOR_FUND_FLOW_TREND",
+    "name": "SECTOR_FUND_FLOW_TREND",
+    "message": "SECTOR_FUND_FLOW_TREND.js 更新于 2天前 09:06；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_SECTOR_RS",
+    "name": "SECTOR_RS",
+    "message": "SECTOR_RS.js 更新于 2天前 08:38；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_STOCK_LIST",
+    "name": "STOCK_LIST",
+    "message": "STOCK_LIST.js 更新于 2天前 09:39；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_STOCK_RPS_DATA",
+    "name": "STOCK_RPS_DATA",
+    "message": "STOCK_RPS_DATA.js 更新于 2天前 19:59；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_SUSPENSION_ALERT",
+    "name": "SUSPENSION_ALERT",
+    "message": "SUSPENSION_ALERT.js 更新于 2天前 09:04；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_SZ_FIB",
+    "name": "SZ_FIB",
+    "message": "SZ_FIB.js 更新于 2天前 08:38；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
    }
   ]
  }
