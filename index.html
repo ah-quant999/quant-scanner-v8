@@ -1340,7 +1340,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/W52_HIGH.js?v=d9a11612bb" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=d1570f36be" defer></script>
 <script src="data/RUNNER_STATUS.js?v=49ae7e2479" defer></script>
-<script src="data/HEALTH_CHECK.js?v=e00093d27e" defer></script>
+<script src="data/HEALTH_CHECK.js?v=495a648a81" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=210596ac68" defer></script>
     <script src="data/SENTIMENT_CYCLE.js?v=155b6e8a0c" defer></script>
     <script src="data/MARKET_PATH_PROBABILITY.js?v=0872337d1f" defer></script>
@@ -12908,7 +12908,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=e00093d27e')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=495a648a81')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
