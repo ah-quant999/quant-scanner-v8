@@ -40,7 +40,16 @@ jobs:
     # 2026-08-30：原 20 分钟，比云端孪生（v8_cn_fetch_cloud / _hosted 均 25）还短，
     #   而 category=all 要跑 fetch+LHB+回填+弹性+板块RS+ETF+推送+bridge+update_v8+health
     #   （云端同链今晚实测约 17 分钟，cn 机器更慢）→ 抬到 30，避免合法长跑被判超时红灯。
-    timeout-minutes: 30
+    # 🔴 2026-08-30 22:2x 实测再抬 30 → 75（run 33312102792 逐步耗时坐实）：
+    #   job 跑满 30.2 分钟被 GitHub 硬杀（conclusion=cancelled），杀点落在
+    #   step 11「推送 raw_data 到 main」——该步单独就跑了 21.7 分钟仍未完成，
+    #   连带 step 12-14（bridge / update_v8 / health_check）全部 skipped。
+    #   后果：中国数据抓到了(step 5 ✅ 5.6min)却推不上 main、data/*.js 不重生成 = 整轮白抓。
+    #   慢的根因不是 bug：api_push_raw.py 的防倒退守卫（2026-08-09 加，防多 workflow
+    #   竞态覆盖）需对每个变更 .json 全量下载远端 blob 比时间戳，raw_data 共 117 个
+    #   json / 26 MB（stock_quote 4.6M、backtest_tdx 3.9M），cn 出海串行传输就是 20 分钟量级。
+    #   守卫不能删（删了会重演 08-09 数据回退），只能给足墙钟时间。
+    timeout-minutes: 75
     env:
       TZ: Asia/Shanghai
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -266,6 +275,12 @@ jobs:
       - name: "📤 推送 raw_data/ 到 main（Contents API）"
         # 🔴 2026-08-18 主人根治令：消费层软失败。推送失败不阻断后续 bridge/update_v8/health_check。
         continue-on-error: true
+        # 🔴 2026-08-30 22:2x 加步级限时（run 33312102792 实测本步 21.7 分钟未完成即被
+        #   job 级 30 分钟硬杀，导致后续 bridge/update_v8/health_check 全 skipped）。
+        #   与上面的 continue-on-error: true 配合：本步超时只判「该步 failure」，job 存活，
+        #   step 12-14 照常跑完 → 即使推送慢挂，data/*.js 也能用本地 raw_data 重生成，
+        #   raw_data 则由下一轮/reconcile 补推。这才是「消费层软失败」的真正落地。
+        timeout-minutes: 40
         shell: bash
         run: |
           python api_push_raw.py
