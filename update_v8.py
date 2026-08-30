@@ -941,9 +941,26 @@ def run_experiment_cards():
             else:
                 print(f"[experiment]   ❌ gen_strong_breakout 退出码 {r.returncode}")
                 print("     " + "\n     ".join(r.stdout.strip().splitlines()[-4:] + r.stderr.strip().splitlines()[-4:])[:500])
-                # 🛡 2026-08-29 硬化：动量 V2 回测数据必须真实，禁止「data_available=false 全 0」继续发布。
-                #   直接抛异常让 update_v8 / build 失败，触发重试或人工介入。
-                raise RuntimeError(f"gen_strong_breakout 失败（退出码 {r.returncode}），拒绝发布虚假回测")
+                # 🔴 2026-08-31 07:0x 一劳永逸修复（开盘前紧急，实测 build_deploy 连续 3 次 failure 坐实）：
+                #   08-29 的「硬化」把两种性质完全不同的失败混为一谈：
+                #     (a) [time_gate] 数据未就绪（需 ≥15:30 CST）—— 凌晨/盘前跑批时的**设计内**状态，
+                #         此刻 A 股当日数据本来就不存在，属预期；
+                #     (b) 回测数据造假（data_available=false 全 0）—— 真故障，必须阻断。
+                #   原实现无差别 raise → 每次凌晨 push 触发 build_deploy 都在 step 8 中断，
+                #   导致 data/*.js 明明已更新 57 个却**不部署**（step 9/10 skipped），
+                #   夜间抓取的新数据全部卡在本地不上线，线上长期停留在上一交易日。
+                #   实测证据：run 33329876518 / 33324547960 / 33321855111 三连 failure，
+                #   报错均为 `🚫 [time_gate] A股 数据未就绪（需 ≥ 15:30 CST，当前 03:07）`。
+                #   ⇒ (a) 降级为告警并跳过该实验卡，保留其余 data/*.js 正常部署；
+                #     (b) 仍照旧 raise，不放松「拒绝发布虚假回测」的红线。
+                _sb_out = (r.stdout or "") + "\n" + (r.stderr or "")
+                if "[time_gate]" in _sb_out:
+                    print("[experiment]   ⏭️ 识别为【时间门控未就绪】——非数据造假，属设计内状态；"
+                          "跳过本卡，其余 data/*.js 照常部署（15:30 后本轮会自然产出真实数据）")
+                else:
+                    # 🛡 2026-08-29 硬化：动量 V2 回测数据必须真实，禁止「data_available=false 全 0」继续发布。
+                    #   直接抛异常让 update_v8 / build 失败，触发重试或人工介入。
+                    raise RuntimeError(f"gen_strong_breakout 失败（退出码 {r.returncode}），拒绝发布虚假回测")
         except Exception as e:
             if isinstance(e, RuntimeError):
                 raise
