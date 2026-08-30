@@ -2397,12 +2397,12 @@ def main():
 
     print(f"[INFO] v8 health check start @ {now_cst().strftime('%Y-%m-%d %H:%M:%S')}")
 
-    cards = check_data_cards()
-    all_data = check_all_data_files()  # 🔴 2026-08-17 主人怒令：全面审计（53 个未登记文件全量覆盖）
-    raw = check_raw_data()
-    site_sync = check_site_deploy_sync()
-    runner = check_runner()
-    local_sync = check_local_head_sync()
+    cards = check_data_cards() or []
+    all_data = check_all_data_files() or []  # 🔴 2026-08-17 主人怒令：全面审计（53 个未登记文件全量覆盖）
+    raw = check_raw_data() or []
+    site_sync = check_site_deploy_sync() or []
+    runner = check_runner() or []
+    local_sync = check_local_head_sync() or []
     dom = []
     if args.site:
         dom = check_site_dom()
