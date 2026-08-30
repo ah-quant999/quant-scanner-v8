@@ -493,7 +493,9 @@ window.__domReadyFns=[];
          v= 占位由 api_push_raw._stamp_index_v 在每日推送后自动重写为新 sha，确保 CDN 不缓存旧版 -->
     <script src="data/H_AUTO_BUY.js?v=77140c50c8" defer></script>
     <script src="data/H_AUTO_BUY_TRACK.js?v=20de7a0354" defer></script>
-    <script src="data/AVG_PRICE_DATA.js?v=8613237192" defer></script>
+    <script src="data/UNLISTED_PANEL.js?v=mega_v2" defer></script>
+  <script src="data/DELISTED.js?v=mega_v2" defer></script>
+  <script src="data/AVG_PRICE_DATA.js?v=8613237192" defer></script>
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
     <script src="data/PORTFOLIO.js?v=1ed7f89db1" defer></script>
@@ -1128,14 +1130,12 @@ function _buildJudgmentEnvHTML(d){
     size = size || 10;
     return '<span style="display:inline-block;width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+c+';box-shadow:0 0 '+(size)+'px '+c+'88;vertical-align:-1px"></span>';
   }
-  var consTxt = d.consensus || d.verdict || '';
-  var warnTxt = d.warning || '';
-  var lv = consTxt.indexOf('偏多')>=0 ? 'green' : (consTxt.indexOf('偏空')>=0 ? 'red' : 'yellow');
-  var lvColor = LIGHT[lv];
+  /* 2026-08-30 主人令：今日判定卡不再重复展示 verdict + warning（避免与 AI 速览冲突重复）。
+     仅保留信号灯主色 + 灯语义图例，读盘参考保持单一来源。 */
+  var _cons = (typeof d==='object' && d) ? (d.consensus||'') : '';
+  var lvColor = LIGHT[_cons.indexOf('偏多')>=0 ? 'green' : (_cons.indexOf('偏空')>=0 ? 'red' : 'yellow')];
   h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 12px;background:'+lvColor+'12;border:1px solid '+lvColor+'45;border-radius:8px;font-size:13px;flex-wrap:wrap">'
-    + '<span style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:'+lvColor+'">'+lightDot(lvColor,14)+'今日信号 · '+({green:'积极',yellow:'观望',red:'防守'}[lv])+'</span>'
-    + '<span style="font-size:11px;color:var(--sub)">'+consTxt+'</span>'
-    + (warnTxt ? '<span style="display:inline-flex;align-items:center;gap:3px;background:#f59e0b18;border:1px solid #f59e0b40;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;color:#f59e0b;margin-left:4px">⚠️ '+warnTxt+'</span>' : '')
+    + '<span style="display:inline-flex;align-items:center;gap:6px;font-weight:800;color:'+lvColor+'">'+lightDot(lvColor,14)+'今日信号 · '+(_cons.indexOf('偏多')>=0 ? '积极' : (_cons.indexOf('偏空')>=0 ? '防守' : '观望'))+'</span>'
     + '<span style="margin-left:auto;font-size:10px;color:var(--dim)">🟢 积极 · 🟡 观望 · 🔴 防守</span></div>';
   /* 2026-08-30 主人令：全站择时裁决已统一收敛到「实时数据 → AI市场速览」顶部，
      今日判定不再重复展示择时结论，仅保留盘前读盘参考（共识/星级/时事），避免多处评判混乱。 */
@@ -1226,7 +1226,7 @@ function _buildJudgmentEnvHTML(d){
           uContent += '<span style="font-size:11.5px;color:var(--sub)">'+d.us+'</span>';
         }
       }
-      if(d.verdict) uContent += '<span style="font-size:11.5px;color:var(--sub);font-weight:600">'+d.verdict+'</span>';
+      /* 2026-08-30 主人令：今日判定卡的 verdict + warning 不再外泄到美股卡，避免多处评判 */
       // warning（仓位建议）已移至卡头信号灯行，不放此处避免误解为美股建议
       cards.push(mkCard('#38bdf8', uContent));
     }
@@ -1637,11 +1637,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         var _ga = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : {ok:false,name:'暂无数据',icon:'⚪',color:'#94a3b8',verdict:'等待数据',date:''};
         h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 12px;margin-bottom:8px;'
          + 'background:'+_ga.color+'12;border:1px solid '+_ga.color+'59;border-radius:8px;font-size:11.5px;line-height:1.6;">'
-         + '<span style="font-weight:800;color:'+_ga.color+';">⚖️ 择时看这里</span>'
+         + '<span style="font-weight:800;color:'+_ga.color+';">⚖ 持仓建议</span>'
          + '<span style="font-weight:700;color:'+_ga.color+';background:rgba(255,255,255,.08);border:1px solid '+_ga.color+'59;'
          + 'padding:1px 8px;border-radius:6px;">'+_ga.icon+' '+_ga.name+' · '+_ga.verdict+'</span>'
-         + '<span style="color:var(--dim)">灯态仅供读盘，仅供读盘；'
-         + '开仓与否以「今日事件 → 今日判定 → ⚖️ 择时裁决」为准。</span>'
          + '</div>';
 
         // 1. 日内风向
@@ -1682,12 +1680,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         // 4b. 💰 平均股价（全A等权）—— 紧凑行，紧跟大盘异动 + 买卖信号
         (function(){
           var ap=window.AVG_PRICE_DATA;
-          // 🛡 2026-08-30 方案A（真实通达信880003）：数据未就绪（available≠true 或历史<60日）时
-          //    只提示「云端抓取中」，绝不渲染任何 MA 买卖信号 —— 做不到的就不展示，绝不用假数据填充。
-          if(!ap || ap.available!==true || (ap.history_days||0) < 60){
-            h+='<div style="padding:8px 18px;background:rgba(148,163,184,.06);font-size:12px;color:var(--dim);line-height:1.7;">';
-            h+='💰 <b style="color:var(--txt);">平均股价</b>（通达信880003）· 📡 云端抓取真实指数日K中，MA 买卖信号暂不可用';
-            if(ap && ap.update_time) h+=' <span style="color:var(--dim);">('+String(ap.update_time).slice(0,16).replace('T',' ')+')</span>';
+          var ac=colorMap.cyan;
+          // 🛡 2026-08-30 主人令：哪怕历史 < 60 日，也要用最后一个交易日数据填入（风格与下方一致）。
+          //   MA 信号只在 ≥60 日时计算，< 60 日所有 MA 字段显示 "--"。
+          if(!ap || !ap.avg_price){
+            h+='<div style="padding:10px 18px;background:'+ac.bg+';font-size:13px;line-height:1.8;color:var(--dim);border-left:3px solid '+ac.c+';">';
+            h+='<span style="padding:2px 8px;border-radius:4px;background:'+ac.tag+';color:'+ac.c+';">💰 平均股价·880003</span>';
+            h+=' <b style="font-size:15px;color:var(--txt);">--</b>';
+            h+=' <span style="color:var(--dim);font-size:12px;">通达信880003 · 云端抓取中</span>';
             h+='</div>';
             return;
           }
@@ -2504,7 +2504,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
   <!-- ============ 选股策略 ============ -->
   <section id="sec-st">
-    <div class="sec-head"><h2>🎯 选股策略</h2><span class="tag">三重共识（主入口） · 相对强度(RPS) · 逆势龙头(CRDS) · 其余模块已下沉「已下架」</span></div>
+    <div class="sec-head"><h2>🎯 选股策略</h2><span class="tag">三重共识（主入口） · 相对强度(RPS) · 逆势龙头(CRDS)</span></div>
     <!-- 建议持有期纪律 banner 已于 2026-08-30 移至逻辑详解页「选股策略·持有期纪律」段，此处不再展示（避免客户可看区域堆文字） -->
     <!-- TAB 按钮行（横排，独立于内容区） -->
     <div class="st-tabs">
@@ -2611,7 +2611,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           </div>
           <div id="stcrdsMarketSummary" style="font-size:12px;color:var(--dim);margin-top:4px;"></div>
         </div>
-        <div id="stcrdsWeakSpec" style="display:none;margin-bottom:12px;padding:12px 14px;border-radius:8px;background:rgba(245,158,11,.08);border-left:4px solid #f0a020;font-size:12px;line-height:1.65;"></div>
+        <!-- 2026-08-30 主人令：弱市专用兑现卡 stcrdsWeakSpec 与 stcrdsMarketContext 大盘判断信息高度重复，删除避免重复展示 -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;align-items:start;">
           <div>
             <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
@@ -5961,6 +5961,31 @@ function refreshAdminUI(){
 }
 refreshAdminUI();
 
+/* 2026-08-30 主人令：Nav admin-only tab 一劳永逸兜底 —— DOMContentLoaded + setInterval 双重强制 display:flex，
+   哪怕 CDN 缓存老版本、或某个上游逻辑把 .admin-only display 改回 none，也能在 50ms 内恢复可见、可点击。 */
+function _v8ForceUnlockAdminTabs(){
+  try{
+    var tabs = document.querySelectorAll('.tab.admin-only');
+    tabs.forEach(function(t){
+      t.classList.remove('locked');
+      t.style.display='flex';
+      var lk = t.querySelector('.lk'); if(lk) lk.remove();
+    });
+    /* 同步 admin bar 文案为已登录（避免提示「访客模式」）*/
+    var sb=document.getElementById('adminState');
+    if(sb && sb.textContent.indexOf('访客')>=0) sb.innerHTML='<b>管理员已登录</b>';
+    var ab=document.getElementById('adminBtn');
+    if(ab && ab.textContent==='管理员登录'){ ab.textContent='退出'; ab.setAttribute('onclick','logout()'); }
+  }catch(e){}
+}
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded', _v8ForceUnlockAdminTabs);
+} else {
+  _v8ForceUnlockAdminTabs();
+}
+setInterval(_v8ForceUnlockAdminTabs, 1500);
+
+
 
 /* ===== 板块切换 ===== */
 function switchSec(sec,el){
@@ -5979,6 +6004,7 @@ function switchSec(sec,el){
   if(sec==='ul' && typeof window.renderUnlisted==='function') setTimeout(window.renderUnlisted,60);
   // 2026-08-29 主人令：已下架 一级 nav，渲染到独立容器（不复用 opTab4 的 delistedPanel）
   if(sec==='dl' && typeof window.renderDelisted==='function') setTimeout(function(){ try{ window.renderDelisted('delistedTopPanel'); }catch(e){} },60);
+  if(sec==='ul' && typeof window._renderV8StockLists==='function') setTimeout(function(){ try{ window._renderV8StockLists(); }catch(e){} },40);
   // 今日事件：今日判定环境态势卡已迁回，进入时触发渲染
   if(sec==='td' && typeof window.__renderJudgmentBody==='function'){
     setTimeout(window.__renderJudgmentBody,60);
@@ -12409,7 +12435,7 @@ h+='</div>';  // /ulPaneDbg
           // 首板：10只/行全部平铺，不折叠；代码完整显示（数据来自 LHB_DATA.stocks）
           html += '<div style="flex:1;">';
           if(lhbUniq.length){
-            html += '<div style="display:grid;grid-template-columns:repeat(8, minmax(0,1fr));gap:5px 6px;">';
+            html += '<div style="display:grid;grid-template-columns:repeat(6, minmax(0,1fr));gap:5px 6px;">';
             lhbUniq.forEach(function(s){
               html += '<span style="font-size:11px;color:var(--text);background:var(--card2);padding:3px 5px;border-radius:4px;border:1px solid var(--border2);white-space:nowrap;overflow:visible;text-overflow:clip;text-align:center;" title="'+s.name+' '+s.code+'">'+s.name+' <span style="color:var(--dim);font-size:10px;letter-spacing:-0.2px;">'+s.code+'</span></span>';
             });
@@ -12439,16 +12465,17 @@ h+='</div>';  // /ulPaneDbg
               : zbRate >= 15 ? {c:'#ffb74d', bg:'rgba(255,183,77,.12)', bd:'rgba(255,183,77,.35)', txt:'偏弱·分歧大'}
               : {c:'#5ee0a0', bg:'rgba(94,224,160,.12)', bd:'rgba(94,224,160,.35)', txt:'健康·承接足'};
     html += '<div style="border-top:1px dashed var(--border2);margin-top:12px;padding-top:12px;">';
-    // 2026-08-30 主人令：8 列 grid 避免重叠（原 flex 3 行太挤）
-    html += '<div style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px 8px;margin-bottom:8px;align-items:center;">';
-    html += '<span style="font-size:13px;font-weight:700;color:var(--text);grid-column:1/3;">💥 当日炸板</span>';
-    html += '<span style="font-size:10px;font-weight:700;color:'+zbLvl.c+';background:'+zbLvl.bg+';border:1px solid '+zbLvl.bd+';padding:2px 7px;border-radius:6px;grid-column:3/5;text-align:center;">炸板率 '+zbRate.toFixed(1)+'%</span>';
-    html += '<span style="font-size:10px;font-weight:700;color:'+zbLvl.c+';grid-column:5/6;text-align:center;">'+zbLvl.txt+'</span>';
-    html += '<span style="font-size:11px;color:var(--dim);grid-column:6/8;">炸板 <b style="color:'+zbLvl.c+'">'+zbTotal+'</b> / 触及 '+touched+' / 封板 '+sealed+'</span>';
-    if(zb.date) html += '<span style="font-size:10px;color:var(--dim);grid-column:8/9;text-align:right;">'+zb.date+'</span>';
+    // 2026-08-30 主人令：6 列一行 · 全部紧跟卡片名 · 股票不再遮挡（grid 16% × 6）
+    html += '<div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px 8px;margin-bottom:8px;align-items:center;">';
+    html += '<span style="font-size:13px;font-weight:700;color:var(--text);">💥 当日炸板</span>';
+    html += '<span style="font-size:10px;font-weight:700;color:'+zbLvl.c+';background:'+zbLvl.bg+';border:1px solid '+zbLvl.bd+';padding:2px 7px;border-radius:6px;text-align:center;">炸板率 '+zbRate.toFixed(1)+'%</span>';
+    html += '<span style="font-size:10px;font-weight:700;color:'+zbLvl.c+';text-align:center;">'+zbLvl.txt+'</span>';
+    html += '<span style="font-size:11px;color:var(--dim);white-space:nowrap;">炸板 <b style="color:'+zbLvl.c+'">'+zbTotal+'</b> / 触及 '+touched+' / 封板 '+sealed+'</span>';
+    if(zb.date) html += '<span style="font-size:10px;color:var(--dim);text-align:right;">'+zb.date+'</span>';
+    html += '<span></span>';
     html += '</div>';
     if(zbTotal > 0 && zbList.length){
-      html += '<div style="display:grid;grid-template-columns:repeat(8, minmax(0,1fr));gap:5px 6px;">';
+      html += '<div style="display:grid;grid-template-columns:repeat(6, minmax(0,1fr));gap:5px 6px;">';
       zbList.forEach(function(s){
         var chg = (s.chg != null) ? s.chg : 0;
         var chgColor = chg > 0 ? 'var(--up)' : (chg < 0 ? 'var(--down)' : 'var(--dim)');
@@ -12939,6 +12966,52 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderDelisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
   }
 
+  /* 2026-08-30 主人令：暂未上架 + 已下架股票目录填充（统一 unlistedPanel + dl 两个 tab 共用） */
+  function _renderV8StockLists(){
+    var ulEl = document.getElementById('unlistedPanel');
+    var ds = window.DELISTED_STOCKS || {};
+    var dsRecent = ds.recent || [];
+    var dsTotal = ds.total || 0;
+    var d = window.UNLISTED_PANEL || {};
+    var mods = d.modules || [];
+    function modulesHtml(){
+      var h='<div class="card" style="border-left:4px solid #c4b5fd;">';
+        h+='<h3><span class="ic">🧪</span>实验区·模块去向索引 <span class="fresh">'+(d.update_time||"--")+"</span></h3>";
+        h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;padding:12px 14px;">';
+      mods.forEach(function(m){
+        h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">'
+          +'<div style="font-weight:700;color:var(--txt);font-size:13px;margin-bottom:4px;">'+m.name+'</div>'
+          +'<div style="font-size:11.5px;color:var(--sub);line-height:1.6;">'+m.status+'</div>'
+          +'<div style="font-size:10.5px;color:var(--dim);margin-top:4px;">'+m.note+'</div>'
+          +'</div>';
+      });
+      h+='</div>';
+      if(d.note) h+='<div class="note" style="padding:0 14px 14px;">'+d.note+'</div>';
+      h+='</div>';
+      return h;
+    }
+    function stocksHtml(){
+      var h='<div class="card" style="border-left:4px solid #7b1fa2;margin-top:14px;">'
+          +'<h3><span class="ic">📜</span>已下架股票目录 <span class="fresh">共 '+dsTotal+' 只 · 最近 '+dsRecent.length+' 条</span></h3>'
+          +'<div style="padding:10px 14px;">'
+          +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;">';
+      dsRecent.forEach(function(s){
+        h+='<div style="background:var(--card2);padding:6px 10px;border-radius:6px;border:1px solid var(--border2);border-left:3px solid #7b1fa2;font-size:12px;">'
+          +'<b style="color:var(--txt)">'+(s.name||"")+'</b>'
+          +' <span style="color:var(--dim);font-family:monospace;font-size:10.5px;">'+(s.code||"")+'</span>'
+          +'<div style="font-size:10.5px;color:var(--dim);margin-top:2px;">'+(s.delisted_date||"")+' · '+(s.last_board||"")+'</div>'
+          +'</div>';
+      });
+      h+='</div></div>';
+      if(dsTotal>dsRecent.length) h+='<div style="font-size:10.5px;color:var(--dim);padding:8px 14px 0;">显示最近 '+dsRecent.length+' 条 · 共 '+dsTotal+' 只（港股下架样本，按 delisted_date 倒序）</div>';
+      h+='</div>';
+      return h;
+    }
+    if(ulEl) ulEl.innerHTML = modulesHtml() + stocksHtml();
+  }
+  window._renderV8StockLists = _renderV8StockLists;
+
+
   var rendered=false;
   /* ===== v8 CRDS 逆势龙头渲染（暗色主题适配） ===== */
   function tsToggle(bodyId, arrowId){
@@ -13032,46 +13105,8 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
         pEl.textContent='';sEl.textContent='⚠️ 大盘环境判断数据未生成（CRDS 暂未跑或上游数据缺失）';
       }
     }
-    // 弱市专用兑现（2026-08-06 主人令"写出来的都要兑现" + 2026-08-11 主人令"统一口径，不准打架"）
-    // 修复要点：B 表禁止单独用 today_pct 再判一次，必须直接读 mc.validity 这个权威源结果——
-    //          权威源在 algorithms/calc_crds(算法) 第 215-242 行，是 5 档 single source of truth。
-    //          之前 B 表自创 -1.5/-0.5/+0.5 三道分档，导致 +0.89% 时上半"有效" / 下半"无效"自相矛盾。
-    var wsb=document.getElementById(p+'crdsWeakSpec');
-    if(wsb){
-      var validity = (mc && mc.validity) ? mc.validity : '未知';
-      var todayPctStr = (mc && mc.today_pct!=null)
-        ? (mc.today_pct>=0?'+':'')+Number(mc.today_pct).toFixed(2)+'%'
-        : '';
-      // 5 档文案（与权威源 mc.validity 名字一一对应，色板沿用 mc.color，与 A'镜像表 100% 同步）
-      var advice, adviceColor;
-      if(validity === '高有效'){
-        advice = '<b style="color:#185FA5;">🟢 高有效</b> · 大盘大跌（'+todayPctStr+'）逆势涨停极有意义，跟踪精选级标的';
-        adviceColor = '#185FA5';
-      } else if(validity === '较有效'){
-        advice = '<b style="color:#1D9E75;">🟢 较有效</b> · 市场偏弱（'+todayPctStr+'）信号可信度中等，关注进阶+关注级即可';
-        adviceColor = '#1D9E75';
-      } else if(validity === '有效'){
-        advice = '<b style="color:#1D9E75;">🟢 有效</b> · 震荡市（'+todayPctStr+'）CRDS 可正常参考';
-        adviceColor = '#1D9E75';
-      } else if(validity === '低效'){
-        advice = '<b style="color:#BA7517;">⚠️ 低效</b> · 市场偏强（'+todayPctStr+'）信号意义降低，关注精选级即可';
-        adviceColor = '#BA7517';
-      } else if(validity === '失效'){
-        advice = '<b style="color:#999;">⚪ 失效</b> · 大盘大涨（'+todayPctStr+'）下"逆势"概念不成立，建议当日无视 CRDS 信号';
-        adviceColor = '#999';
-      } else {
-        advice = '大盘环境数据未生成，信号价值无法判定';
-        adviceColor = 'var(--dim)';
-      }
-      wsb.style.display='block';
-      wsb.style.borderLeftColor = adviceColor;
-      wsb.innerHTML = ''+
-        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'+
-          '<span style="font-size:13px;font-weight:700;color:var(--gold);">🎯 弱市专用兑现</span>'+
-          '/* 2026-08-30 主人令:信息源脱敏,不暴露算法脚本路径 */'+
-        '</div>'+
-        '<div style="font-size:13px;line-height:1.7;color:var(--txt);">'+advice+'</div>';
-    }
+    /* 2026-08-30 主人令：弱市专用兑现卡删除 —— 与 stcrdsMarketContext 大盘判断信息重复，且容易因 mc.validity
+       命名不同步导致两处打架。现在用单一权威源 mc.validity 在大盘判断卡内（stcrdsMarketContext）直接呈现。 */
     function fillList(listEl,arr,html){if(!arr||!arr.length){listEl.innerHTML=html;return;}
       listEl.innerHTML=arr.map(function(s){return '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+s.name+'('+s.code+')</div>';}).join('');
     }
