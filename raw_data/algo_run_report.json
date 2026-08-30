@@ -1,30 +1,33 @@
 {
-  "update_time": "2026-08-30 23:53:46",
-  "run_start": "2026-08-30 22:27:05",
-  "ok": 32,
-  "fail": 1,
+  "update_time": "2026-08-31 03:03:58",
+  "run_start": "2026-08-31 01:33:59",
+  "ok": 40,
+  "fail": 5,
   "failed_scripts": [
     {
-      "script": "calc_stock_rps.py",
-      "reason": "超时 >30min"
+      "script": "calc_crds.py",
+      "reason": "退出码 1 |    绕开（应急）: TIME_GATE_BYPASS=1 环境变量"
+    },
+    {
+      "script": "generate_top10.py",
+      "reason": "退出码 1 |    绕开（应急）: TIME_GATE_BYPASS=1 环境变量"
+    },
+    {
+      "script": "strategy_four_volume_60m.py",
+      "reason": "退出码 1 |    绕开（应急）: TIME_GATE_BYPASS=1 环境变量"
+    },
+    {
+      "script": "strategy_four_volume.py",
+      "reason": "退出码 1 |    绕开（应急）: TIME_GATE_BYPASS=1 环境变量"
+    },
+    {
+      "script": "gen_triple_consensus.py",
+      "reason": "退出码 1 |    绕开（应急）: TIME_GATE_BYPASS=1 环境变量"
     },
     {
       "script": "final_recommend.py",
       "reason": "就绪门控未通过（上游选股输入陈旧/缺失）"
     }
   ],
-  "skipped_by_time_gate": [
-    "fetch_fundamental_quality.py",
-    "fetch_stock_names.py",
-    "fetch_stock_quote_v8.py",
-    "fetch_sh_index_fib.py",
-    "fetch_inst_trade.py",
-    "fetch_sector_rs.py",
-    "fetch_lhb.py",
-    "fetch_orphan_suspension.py",
-    "fetch_orphan_market_alerts.py",
-    "fetch_orphan_nt_data.py",
-    "fetch_orphan_sector_fund_flow.py",
-    "fetch_weekend_run.py"
-  ]
+  "skipped_by_time_gate": []
 }

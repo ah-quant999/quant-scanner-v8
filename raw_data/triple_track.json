@@ -1,12 +1,18 @@
 {
-  "update_time": "2026-08-30 23:24:08",
+  "update_time": "2026-08-31 02:26:21",
   "data_date": "update_time",
   "track_start": "2026-08-17",
-  "history_days": 9,
+  "history_days": 10,
   "strict_count": 0,
   "near_count": 0,
   "tracked": [],
   "alerts": [
+    {
+      "level": "warn",
+      "code": "601899",
+      "name": "紫金矿业",
+      "text": "紫金矿业(601899) 于 2026-08-30 跌出共识（曾连续 4 日）"
+    },
     {
       "level": "warn",
       "code": "603993",
@@ -162,6 +168,12 @@
       "code": "000792",
       "name": "盐湖股份",
       "text": "盐湖股份(000792) 于 2026-08-29 跌出共识（曾连续 2 日）"
+    },
+    {
+      "level": "warn",
+      "code": "601138",
+      "name": "",
+      "text": "(601138) 于 2026-08-30 跌出共识（曾连续 1 日）"
     }
   ],
   "sector_cluster": {
@@ -305,12 +317,12 @@
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
     "track_start": "2026-08-17",
-    "history_days": 9,
+    "history_days": 10,
     "summary": {
       "1d": {
-        "count": 10,
-        "win_rate": 40.0,
-        "avg_return": 3.49
+        "count": 12,
+        "win_rate": 33.33,
+        "avg_return": 2.91
       },
       "3d": {
         "count": 8,
@@ -318,9 +330,9 @@
         "avg_return": 4.4
       },
       "5d": {
-        "count": 5,
-        "win_rate": 40.0,
-        "avg_return": 4.65
+        "count": 6,
+        "win_rate": 33.33,
+        "avg_return": 3.63
       },
       "10d": {
         "count": 0,
@@ -416,7 +428,8 @@
         "name": "",
         "enter_date": "2026-08-20",
         "offsets": {
-          "3d": -1.5
+          "3d": -1.5,
+          "5d": -1.5
         }
       },
       {
@@ -465,6 +478,22 @@
         "code": "002475",
         "name": "立讯精密",
         "enter_date": "2026-08-29",
+        "offsets": {
+          "1d": 0.0
+        }
+      },
+      {
+        "code": "300475",
+        "name": "香农芯创",
+        "enter_date": "2026-08-30",
+        "offsets": {
+          "1d": 0.0
+        }
+      },
+      {
+        "code": "601138",
+        "name": "",
+        "enter_date": "2026-08-30",
         "offsets": {
           "1d": 0.0
         }
