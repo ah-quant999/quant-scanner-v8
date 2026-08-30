@@ -3416,6 +3416,24 @@ def main(category=None, only=None):
                 try:
                     old = json.loads(hist_path.read_text(encoding="utf-8"))
                     hist = old.get("history", [])
+                    # 2026-08-30 修复：清理旧 bug 混入的非交易日记录（实测存在 2026-08-30 周日）。
+                    #   旧代码用 now_cst() 打日期，周末/节假日跑兜底会写入不存在的交易日；
+                    #   这些脏记录日期更大、排序后落在 history 末尾，会持续污染 ma20/ma60
+                    #   与前端显示的「最新日期」。仅在能解析且明确判定为非交易日时剔除。
+                    _clean = []
+                    for _r in hist:
+                        _d = _r.get("date")
+                        if not _d:
+                            continue
+                        try:
+                            _keep = _is_trading_day(datetime.strptime(_d, "%Y-%m-%d").date())
+                        except Exception:
+                            _keep = True  # 解析不了就保留，宁可留噪声也不误删历史
+                        if _keep:
+                            _clean.append(_r)
+                    if len(_clean) != len(hist):
+                        print(f"  history 剔除非交易日脏记录 {len(hist) - len(_clean)} 条")
+                    hist = _clean
                     for r in sorted(hist, key=lambda x: x.get("date", "")):
                         if r.get("date") and r.get("date") != today_str:
                             prev_price = r.get("avg_price")
