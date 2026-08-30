@@ -1,15 +1,2 @@
-/* data/UNLISTED_PANEL.js — 暂未上架内容占位（2026-08-30 主人令） */
-window.UNLISTED_PANEL = {
-  "modules": [
-    {"name":"🔬 三重起涨", "status":"下沉到 已下架→选股模块","note":"与三重共识重叠"},
-    {"name":"📈 选股池", "status":"已迁到 选股策略→选股池","note":"2026-08-29"},
-    {"name":"🎯 大牛股猎手", "status":"下沉到 已下架→选股模块","note":"同源弱alpha"},
-    {"name":"📐 平均股价", "status":"保留在 实时数据→AI速览","note":"2026-08-12 移除独立卡片"},
-    {"name":"🧬 H 反推", "status":"下沉到 调试专区","note":"管理员可见"},
-    {"name":"💎 ETF 龙头", "status":"调试专区","note":"管理员可见"},
-    {"name":"🧪 AI 预测", "status":"调试专区","note":"管理员可见"},
-    {"name":"⛏ 潜力挖掘", "status":"调试专区","note":"管理员可见"}
-  ],
-  "update_time": "2026-08-30 08:30",
-  "note": "实验区已无独立卡片，全部下沉/迁移到 其他 模块位置。管理员专属 — 普通访客切此 tab 仅为「模块去向索引」。"
-};
+/* data/UNLISTED_PANEL.js — 暂未上架模块索引（2026-08-30 10:24:40 由 scripts/build_unlisted_panel.py 重建） */
+window.UNLISTED_PANEL = {"modules":[{"id":"ETF_4WAY","name":"ETF 四路资金流向","reason":"稳定但缺 ETF 全量榜单交付","status":"evaluation"},{"id":"SECTOR_PHASE_HISTORY","name":"板块周期历史曲线","reason":"vs push2 接口 5d/10d/20d/60d 趋势","status":"spec_lock"},{"id":"INDUSTRY_TREE_DRILL","name":"行业树图（下钻）","reason":"申万三级下钻与个股联动未对齐","status":"blocked"},{"id":"ETF_SUBSCRIPTION","name":"ETF 申购赎回","reason":"等东财口径切换完成（fetch_etf_subscription_em.py 已建）","status":"wip"},{"id":"STOCK_RPS_MULTI","name":"相对强度多周期","reason":"数据齐备，前端卡片未设计","status":"design"},{"id":"BIG_BULL_HUNTER_X","name":"大牛股猎手 X","reason":"与 LHB_DATA 同源，独立卡待主人确认","status":"evaluation"},{"id":"RUNNER_HEALTH","name":"Runner 健康监控卡","reason":"RUNNER_STATUS 数据已有，前端图表规格未定","status":"design"},{"id":"FY_CALENDAR","name":"财年事件日历","reason":"v8 改为每月 1 日自动更新（8/30 已上线）","status":"shipped_via_v8_cal"}],"update_time":"2026-08-30","note":"实验模块去向由主人拍板；新增模块请改 scripts/build_unlisted_panel.py","meta":{"schema_version":1,"total":8,"owner":"master","last_review":"2026-08-30","source":"scripts/build_unlisted_panel.py","generated_at":"2026-08-30 10:24:40"}};
