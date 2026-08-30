@@ -44,7 +44,9 @@ permissions:
 jobs:
   lhb-only:
     runs-on: [self-hosted, cn]
-    timeout-minutes: 25
+    # 🔴 2026-08-30 22:3x 抬高 job 墙钟（实测本 workflow run 33309687912 跑满
+    #   25 分钟被硬杀，杀点是推送步 13.8 分钟未完成 → 数据抓到却推不上 main）。
+    timeout-minutes: 50
     steps:
       # 仅调 GitHub Contents API 拉取 algorithms/fetch_lhb.py（本 workflow 唯一需要的脚本），
       # 避开 git clone（cn runner 上 github.com 被 connection reset）也避开 checkout action。
@@ -110,6 +112,13 @@ jobs:
       # api_push_raw.py 推送仓内 OUT_DIR 中产出的龙虎榜明细，
       # 以 api_push_raw.py --only lhb 限定只推送 lhb_result.json + lhb_seats.json。
       - name: "📤 推送到仓库（api_push_raw.py 中 LHB 分支）"
+        # 🔴 2026-08-30 22:3x 同类 bug 一次清干净（实测 run 33312102792 / 33309687912
+        #   均因推送步跑 13-22 分钟被 job 级 timeout 硬杀，连带后续消费步全 skipped）。
+        #   推送慢的根因是 api_push_raw.py 防倒退守卫要逐个下载远端 blob 比时间戳
+        #   （raw_data 117 个 json / 26 MB，cn 出海串行传输），守卫不能删只能限时。
+        #   步级 timeout + continue-on-error 组合：推送超时只判该步失败，job 存活，
+        #   后续 bridge/update_v8/health_check 照常跑完，raw_data 交下一轮补推。
+        timeout-minutes: 30
         if: always() && steps.fetch_lhb.outcome == 'success'
         shell: powershell
         continue-on-error: true

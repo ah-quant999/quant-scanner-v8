@@ -37,7 +37,9 @@ concurrency:
 jobs:
   fetch:
     runs-on: [self-hosted, cn]
-    timeout-minutes: 20
+    # 🔴 2026-08-30 22:3x 抬高 job 墙钟（实测本 workflow run 33309687912 跑满
+    #   20 分钟被硬杀，杀点是推送步 13.8 分钟未完成 → 数据抓到却推不上 main）。
+    timeout-minutes: 60
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # ⛔️ 2026-08-14 主人令永久修复：WorkBuddy safe-delete 批量删除守卫默认阈值 50
@@ -168,6 +170,14 @@ jobs:
           python algorithms/calc_etf_intraday.py
 
       - name: "📤 经 API 推送 raw_data/ 到 main"
+        # 🔴 2026-08-30 22:3x 同类 bug 一次清干净（实测 run 33312102792 / 33309687912
+        #   均因推送步跑 13-22 分钟被 job 级 timeout 硬杀，连带后续消费步全 skipped）。
+        #   推送慢的根因是 api_push_raw.py 防倒退守卫要逐个下载远端 blob 比时间戳
+        #   （raw_data 117 个 json / 26 MB，cn 出海串行传输），守卫不能删只能限时。
+        #   步级 timeout + continue-on-error 组合：推送超时只判该步失败，job 存活，
+        #   后续 bridge/update_v8/health_check 照常跑完，raw_data 交下一轮补推。
+        continue-on-error: true
+        timeout-minutes: 35
         shell: powershell
         run: |
           python api_push_raw.py
