@@ -16,6 +16,29 @@ run_algorithms.py — v8 本地/自托管 cn runner 的盘后算法编排器
 import os
 import re
 import subprocess
+
+# ── 单脚本超时（2026-08-31 一劳永逸修复）──────────────────────────────────
+# 背景：原代码把 1800s 硬编码在两处 subprocess.run，实测 run 33316835316 中
+#   calc_stock_rps.py 因遍历全 universe（数千只）逐只取 K 线 + 网络退避重试，
+#   30 分钟不够 → 超时被杀 → data/STOCK_RPS.js 长期陈旧（前端 RPS 卡不更新）。
+# 修法：默认阈值可配（V8_ALGO_TIMEOUT），并给重活单独放宽，不影响其他脚本。
+import os as _os
+
+DEFAULT_SCRIPT_TIMEOUT = int(_os.environ.get("V8_ALGO_TIMEOUT", "1800"))
+
+# 计算量大 / 网络重活单独放宽（秒）。新增重活在此登记即可，无需改调度代码。
+SCRIPT_TIMEOUT_OVERRIDE = {
+    "calc_stock_rps.py": 3600,   # 全 universe 逐只取 K 线，实测 30min 偶发不够
+    "calc_crds.py": 2700,        # 逆势龙头 CRDS，同样遍历较广
+    "gen_stock_profile.py": 2700,
+}
+
+
+def _script_timeout(script_name):
+    """返回该脚本的超时秒数（覆盖表优先，其次环境变量，最后默认）。"""
+    return int(SCRIPT_TIMEOUT_OVERRIDE.get(script_name, DEFAULT_SCRIPT_TIMEOUT))
+
+
 import sys
 import json
 from datetime import datetime
@@ -398,7 +421,9 @@ def _gate_ensure_inputs(inputs_map, base_dir, run_start):
         if not os.path.exists(p):
             print(f"     ❌ 生成器缺失: {prod}"); continue
         try:
-            r = subprocess.run([PY, p], cwd=ALGO, capture_output=True, text=True, timeout=1800)
+            # 2026-08-31：同主循环，按脚本取超时（重跑重活时不再卡在 1800s 硬编码）
+            _gto = _script_timeout(prod)
+            r = subprocess.run([PY, p], cwd=ALGO, capture_output=True, text=True, timeout=_gto)
             print(f"     {'✅' if r.returncode == 0 else '⚠️ 退出码 ' + str(r.returncode)} 重跑 {prod}")
         except Exception as e:
             print(f"     ❌ 重跑 {prod} 异常: {e}")
@@ -492,7 +517,9 @@ def step_run():
             continue
         print(f"  ▶ {script}  ({datetime.now():%H:%M:%S})")
         try:
-            r = subprocess.run([PY, path], cwd=ALGO, capture_output=True, text=True, timeout=1800)
+            # 2026-08-31：不再硬编码 1800s，按脚本取（重活单独放宽，见 SCRIPT_TIMEOUT_OVERRIDE）
+            _to = _script_timeout(script)
+            r = subprocess.run([PY, path], cwd=ALGO, capture_output=True, text=True, timeout=_to)
             if r.returncode == 0:
                 ok += 1
                 # 打印末行摘要
@@ -509,8 +536,8 @@ def step_run():
                 FAILED_SCRIPTS.append((script, f"退出码 {r.returncode} | {reason[-1][:160]}"))
         except subprocess.TimeoutExpired:
             fail += 1
-            print(f"     ⏱️ 超时(>30min)，跳过")
-            FAILED_SCRIPTS.append((script, "超时 >30min"))
+            print(f"     ⏱️ 超时(>{_to // 60:.0f}min)，跳过")
+            FAILED_SCRIPTS.append((script, f"超时 >{_to // 60:.0f}min"))
         except Exception as e:
             fail += 1
             print(f"     ❌ 异常: {e}")
