@@ -1545,6 +1545,25 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="note">双维度 = 套利评分（收益弹性）+ 基本面评分（安全边际）。综合分 = 套利×60% + 基本面×40%。</div>
     </div>
 
+    <!-- 宏观数据速览（2026-08-30：今日事件补位） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🌍</span>宏观数据速览 · <span class="fresh" id="macroSummaryTime">—</span></h3>
+      <div id="macroSummaryBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+      <div class="note">LPR / M2 / CPI / PMI / 中美利差 / 汇率 / 商品，集中速览。</div>
+    </div>
+
+    <!-- 今日解禁提醒（2026-08-30：今日事件补位） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🔓</span>今日解禁提醒 · <span class="fresh" id="todayRestrictedTime">—</span></h3>
+      <div id="todayRestrictedBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+    </div>
+
+    <!-- 业绩预告重点（2026-08-30：今日事件补位） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📈</span>业绩预告重点 · <span class="fresh" id="todayForecastTime">—</span></h3>
+      <div id="todayForecastBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+    </div>
+
     <!-- 重要事件日历（完整周历 · 与 calendar.html 同源） -->
     <div class="card">
       <h3><span class="ic">📅</span>重要事件日历 - 中长线 · <span class="fresh" id="v8caltime">每周日更新</span></h3>
@@ -1808,6 +1827,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     })();
     </script>
 
+    <!-- 指数快览（2026-08-30：实时数据补位） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📊</span>指数快览 · <span class="fresh" id="indexQuotesTime">—</span></h3>
+      <div id="indexQuotesBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+    </div>
+
+    <!-- 亚太市场概览（2026-08-30：实时数据补位） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🌏</span>亚太市场概览 · <span class="fresh" id="overseasTime">—</span></h3>
+      <div id="overseasBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+    </div>
 
         <!-- 情绪周期·连板天梯（2026-08-08 从暂未上架迁到实时数据） -->
     <div id="cycleLadderCard" style="margin-bottom:12px;"></div>
@@ -1931,6 +1961,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       window._renderConceptTreemap=renderConceptTreemap;
     })();
     </script>
+
+    <!-- 期指主力合约 · 情绪方向（2026-08-30：实时数据补位） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📈</span>期指主力合约 · 情绪方向 · <span class="fresh" id="futuresMainTime">—</span></h3>
+      <div id="futuresMainBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+      <div class="note">基差（升贴水）需对应现货指数，当前展示期货主力合约相对昨结涨跌与持仓量。</div>
+    </div>
 
     <!-- 2026-08-30 删除：renderMonthCal / renderHistoryBar / 大牛股猎手等旧 LHB 视图脚本；DOM 容器已不存在，sec-rc 下新日历接管。 -->
 
@@ -5532,6 +5569,14 @@ function switchSec(sec,el){
     setTimeout(window.__renderJudgmentHeader,60);
     if(typeof window.__retryJudgmentRender==='function') setTimeout(window.__retryJudgmentRender, 200);
   }
+  // 2026-08-30：今日事件补位卡（宏观/解禁/业绩）切 tab 时重绘
+  if(sec==='td'){
+    setTimeout(function(){
+      try{ window.renderMacroSummary(window.MACRO_DATA || {}); }catch(e){}
+      try{ window.renderTodayRestricted(window.RESTRICTED_RELEASE || {}); }catch(e){}
+      try{ window.renderTodayForecast(window.PERFORMANCE_FORECAST || {}); }catch(e){}
+    }, 80);
+  }
   // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
   if(sec==='ph' && typeof window._renderSecPh==='function') setTimeout(window._renderSecPh,80);
   // 选股策略页：渲染入口改为 window.switchSt('pool')（2026-08-30 主人令：选股池为默认首 tab）
@@ -5542,6 +5587,14 @@ function switchSec(sec,el){
   if(sec==='query'){ var dd=document.getElementById('v8QueryDropdown'); if(dd) dd.style.display='none'; }
   // 实时数据：情绪周期·连板天梯迁到本区，进入时渲染
   if(sec==='rt' && typeof window.__renderCycleLadderCard==='function') setTimeout(window.__renderCycleLadderCard,60);
+  // 2026-08-30：实时数据补位卡（指数/亚太/期指）切 tab 时重绘
+  if(sec==='rt'){
+    setTimeout(function(){
+      try{ window.renderIndexQuotes(window.INDEX_QUOTES || {}); }catch(e){}
+      try{ window.renderOverseasMarkets(window.OVERSEAS_MARKETS || {}); }catch(e){}
+      try{ window.renderFuturesMain(window.CFFEX_HOLDINGS || {}); }catch(e){}
+    }, 80);
+  }
   // 潜力参考（pr）已改为选股策略(st)内部子TAB，由 switchSt('pr') 触发，此处不重复处理
   // 共振日历：进入时确保默认 tab1（机游共振）渲染（rcTab1 默认 active，但 switchRcTab 仅在点 tab 时触发）
   if(sec==='rc' && typeof window.switchRcTab==='function') setTimeout(function(){ try{ window.switchRcTab('tab1', document.querySelector('.rc-tab-btn.active')); }catch(e){} }, 30);
@@ -9399,6 +9452,187 @@ function drawUpDownChart(){
   window.renderPerformanceForecast = renderPerformanceForecast;
 
 
+  /* ---- 11. 指数快览（实时数据补位） ---- */
+  function renderIndexQuotes(d){
+    const $b=$('indexQuotesBody'), $t=$('indexQuotesTime');
+    if(!$b) return;
+    if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">指数数据暂不可用</div>'; return; }
+    const fmtPct=v=>v==null||isNaN(v)?'--':(v>0?'+':'')+Number(v).toFixed(2)+'%';
+    const fmtNum=n=>n==null?'--':(n>=1e8?(n/1e8).toFixed(1)+'亿':(n>=1e4?(n/1e4).toFixed(1)+'万':n));
+    let h='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">';
+    d.items.forEach(it=>{
+      const col=it.chg>0?'var(--up)':(it.chg<0?'var(--down)':'var(--sub)');
+      const arrow=it.chg>0?'▲':(it.chg<0?'▼':'—');
+      h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:12px;position:relative;overflow:hidden;">';
+      h+='<div style="font-size:12px;color:var(--sub);margin-bottom:4px;">'+it.name+' <span style="font-size:11px;color:var(--dim);">'+it.code+'</span></div>';
+      h+='<div style="font-size:22px;font-weight:800;color:var(--txt);margin-bottom:2px;">'+Number(it.price).toFixed(2)+'</div>';
+      h+='<div style="font-size:13px;font-weight:700;color:'+col+';">'+arrow+' '+fmtPct(it.chg)+' · '+Number(it.change).toFixed(2)+'</div>';
+      h+='<div style="font-size:11px;color:var(--dim);margin-top:6px;display:flex;gap:10px;flex-wrap:wrap;">';
+      h+='<span>涨 '+it.up+' / 跌 '+it.down+'</span>';
+      h+='<span>成交 '+(it.amount>=1?it.amount.toFixed(0)+'亿':it.amount+'亿')+'</span>';
+      h+='</div></div>';
+    });
+    h+='</div>';
+    $b.innerHTML=h;
+    if($t) $t.innerHTML=_uBadge('实时','短线',d.update_time);
+  }
+  window.renderIndexQuotes = renderIndexQuotes;
+
+  /* ---- 12. 亚太市场概览（实时数据补位） ---- */
+  function renderOverseasMarkets(d){
+    const $b=$('overseasBody'), $t=$('overseasTime');
+    if(!$b) return;
+    if(!d || !d.indices || !d.indices.length){ $b.innerHTML='<div class="ipo-empty">亚太市场数据暂不可用</div>'; return; }
+    const fmtPct=v=>v==null||isNaN(v)?'--':(v>0?'+':'')+Number(v).toFixed(2)+'%';
+    let h='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">';
+    d.indices.forEach(it=>{
+      const col=it.chg_pct>0?'var(--up)':(it.chg_pct<0?'var(--down)':'var(--sub)');
+      const arrow=it.chg_pct>0?'▲':(it.chg_pct<0?'▼':'—');
+      h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:12px;">';
+      h+='<div style="font-size:12px;color:var(--sub);margin-bottom:4px;">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.currency+'</span></div>';
+      h+='<div style="font-size:18px;font-weight:800;color:var(--txt);margin-bottom:2px;">'+Number(it.value).toFixed(2)+'</div>';
+      h+='<div style="font-size:13px;font-weight:700;color:'+col+';">'+arrow+' '+fmtPct(it.chg_pct)+'</div>';
+      h+='</div>';
+    });
+    h+='</div>';
+    if(d.bias) h+='<div style="margin-top:10px;font-size:12px;color:var(--sub);">'+d.bias+'</div>';
+    $b.innerHTML=h;
+    if($t) $t.innerHTML=_uBadge('隔夜','短线',d.update_time);
+  }
+  window.renderOverseasMarkets = renderOverseasMarkets;
+
+  /* ---- 13. 期指主力合约 · 情绪方向（实时数据补位） ---- */
+  function renderFuturesMain(d){
+    const $b=$('futuresMainBody'), $t=$('futuresMainTime');
+    if(!$b) return;
+    if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">期指数据暂不可用</div>'; return; }
+    const byV={};
+    d.items.forEach(it=>{
+      if(!byV[it.variety]) byV[it.variety]=[];
+      byV[it.variety].push(it);
+    });
+    const watch=['IC','IF','IH','IM'];
+    let h='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">';
+    watch.forEach(v=>{
+      const arr=byV[v];
+      if(!arr || !arr.length) return;
+      const main=arr.slice().sort((a,b)=>b.open_interest-a.open_interest)[0];
+      const chg=main.pre_settle?(main.close-main.pre_settle)/main.pre_settle*100:null;
+      const col=chg>0?'var(--up)':(chg<0?'var(--down)':'var(--sub)');
+      const arrow=chg>0?'▲':(chg<0?'▼':'—');
+      const nameMap={IC:'中证500',IF:'沪深300',IH:'上证50',IM:'中证1000'};
+      h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:12px;">';
+      h+='<div style="font-size:12px;color:var(--sub);margin-bottom:4px;">'+nameMap[v]+' <span style="font-size:11px;color:var(--dim);">'+main.symbol+'</span></div>';
+      h+='<div style="font-size:18px;font-weight:800;color:var(--txt);margin-bottom:2px;">'+Number(main.close).toFixed(1)+'</div>';
+      h+='<div style="font-size:13px;font-weight:700;color:'+col+';">'+arrow+' '+(chg==null?'--':(chg>0?'+':'')+chg.toFixed(2)+'%')+'</div>';
+      h+='<div style="font-size:11px;color:var(--dim);margin-top:6px;">持仓 '+main.open_interest.toLocaleString()+' · 昨结 '+main.pre_settle+'</div>';
+      h+='</div>';
+    });
+    h+='</div>';
+    $b.innerHTML=h;
+    if($t) $t.innerHTML=_uBadge('收盘后','短线',d.update_time);
+  }
+  window.renderFuturesMain = renderFuturesMain;
+
+  /* ---- 14. 宏观数据速览（今日事件补位） ---- */
+  function renderMacroSummary(d){
+    const $b=$('macroSummaryBody'), $t=$('macroSummaryTime');
+    if(!$b) return;
+    if(!d || !d.monetary){ $b.innerHTML='<div class="ipo-empty">宏观数据暂不可用</div>'; return; }
+    const m=d.monetary||{}, e=d.economy||{}, g=d.global_macro||{}, c=g.commodities||{};
+    const fmt=v=>v==null||isNaN(v)?'--':Number(v).toFixed(2);
+    const delta=(v,p)=>{
+      if(v==null||p==null||isNaN(v)||isNaN(p)) return '';
+      const diff=v-p;
+      const col=diff>0?'var(--up)':(diff<0?'var(--down)':'var(--sub)');
+      return ' <span style="color:'+col+';">'+((diff>0?'+':'')+diff.toFixed(2))+'</span>';
+    };
+    const rows=[
+      {t:'LPR 1Y', v:m.lpr?m.lpr.lpr_1y+'%':'--', sub:m.lpr?('5Y '+m.lpr.lpr_5y+'%'):'', date:m.lpr&&m.lpr.date},
+      {t:'M2 同比', v:m.m2_yoy?m.m2_yoy.value+'%':'--', sub:delta(m.m2_yoy&&m.m2_yoy.value,m.m2_yoy&&m.m2_yoy.previous), date:m.m2_yoy&&m.m2_yoy.date},
+      {t:'CPI 同比', v:e.cpi?e.cpi.value+'%':'--', sub:delta(e.cpi&&e.cpi.value,e.cpi&&e.cpi.previous), date:e.cpi&&e.cpi.date},
+      {t:'制造业 PMI', v:e.pmi?e.pmi.value:'--', sub:delta(e.pmi&&e.pmi.value,e.pmi&&e.pmi.previous), date:e.pmi&&e.pmi.date},
+      {t:'中美10Y利差', v:m.cn_us_spread?m.cn_us_spread.value+'%':'--', sub:delta(m.cn_us_spread&&m.cn_us_spread.value,m.cn_us_spread&&m.cn_us_spread.previous), date:m.cn_bond_10y&&m.cn_bond_10y.date},
+      {t:'USDCNH', v:g.usdcnh?g.usdcnh.price:'--', sub:g.usdcnh&&g.usdcnh.date, date:''},
+      {t:'VIX', v:g.vix?g.vix.value:'--', sub:g.vix&&g.vix.date, date:''},
+      {t:'黄金', v:c.gold?c.gold.value:'--', sub:c.gold&&c.gold.date, date:''},
+      {t:'原油', v:c.oil?c.oil.value:'--', sub:c.oil&&c.oil.date, date:''},
+      {t:'铜', v:c.copper?c.copper.value:'--', sub:c.copper&&c.copper.date, date:''}
+    ];
+    let h='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">';
+    rows.forEach(r=>{
+      h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;">';
+      h+='<div style="font-size:11px;color:var(--sub);margin-bottom:3px;">'+r.t+'</div>';
+      h+='<div style="font-size:16px;font-weight:800;color:var(--txt);">'+r.v+'</div>';
+      if(r.sub) h+='<div style="font-size:11px;color:var(--dim);margin-top:3px;">'+r.sub+(r.date?' <span style="color:var(--dim)">'+r.date+'</span>':'')+'</div>';
+      else if(r.date) h+='<div style="font-size:11px;color:var(--dim);margin-top:3px;">'+r.date+'</div>';
+      h+='</div>';
+    });
+    h+='</div>';
+    $b.innerHTML=h;
+    if($t) $t.innerHTML=_uBadge('收盘后','中长线',d.monetary&&m.lpr&&m.lpr.date);
+  }
+  window.renderMacroSummary = renderMacroSummary;
+
+  /* ---- 15. 今日解禁提醒（今日事件补位） ---- */
+  function renderTodayRestricted(d){
+    const $b=$('todayRestrictedBody'), $t=$('todayRestrictedTime');
+    if(!$b) return;
+    if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">解禁数据暂不可用</div>'; return; }
+    const todayStr=window._cstParts?window._cstParts(new Date()).ymd:(new Date().toISOString().slice(0,10));
+    const todayItems=d.items.filter(it=>it.date===todayStr);
+    const stats=d.stats||{};
+    let h='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">';
+    h+='<span style="padding:4px 10px;border-radius:6px;background:var(--card2);border:1px solid var(--border2);font-size:12px;color:var(--txt);">未来7天 <b>'+(stats.d7||0)+'</b> 家</span>';
+    h+='<span style="padding:4px 10px;border-radius:6px;background:var(--card2);border:1px solid var(--border2);font-size:12px;color:var(--txt);">30天 <b>'+(stats.d30||0)+'</b> 家</span>';
+    h+='<span style="padding:4px 10px;border-radius:6px;background:var(--card2);border:1px solid var(--border2);font-size:12px;color:var(--txt);">90天 <b>'+(stats.d90||0)+'</b> 家</span>';
+    h+='</div>';
+    if(todayItems.length){
+      h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">今日解禁 TOP</div>';
+      h+='<div style="display:flex;flex-direction:column;gap:6px;">';
+      todayItems.slice(0,5).forEach(it=>{
+        h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;">';
+        h+='<span style="font-size:12px;color:var(--txt);">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.code+'</span></span>';
+        h+='<span style="font-size:12px;font-weight:700;color:var(--up);">'+it.amount+'</span>';
+        h+='</div>';
+      });
+      h+='</div>';
+    }else{
+      h+='<div class="ipo-empty" style="padding:14px;">今日无解禁（未来7天共 '+stats.d7+' 家）</div>';
+    }
+    $b.innerHTML=h;
+    if($t) $t.innerHTML=_uBadge('收盘后','短线',d.update_time);
+  }
+  window.renderTodayRestricted = renderTodayRestricted;
+
+  /* ---- 16. 业绩预告重点（今日事件补位） ---- */
+  function renderTodayForecast(d){
+    const $b=$('todayForecastBody'), $t=$('todayForecastTime');
+    if(!$b) return;
+    if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">业绩预告数据暂不可用</div>'; return; }
+    const s=d.summary||{};
+    let h='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">';
+    h+='<span style="padding:4px 10px;border-radius:6px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);font-size:12px;color:var(--up);font-weight:700;">预增 '+(s.increase||0)+'</span>';
+    h+='<span style="padding:4px 10px;border-radius:6px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);font-size:12px;color:var(--down);font-weight:700;">预减 '+(s.decrease||0)+'</span>';
+    h+='<span style="padding:4px 10px;border-radius:6px;background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.25);font-size:12px;color:var(--sub);font-weight:700;">预亏 '+(s.loss||0)+'</span>';
+    h+='<span style="padding:4px 10px;border-radius:6px;background:var(--card2);border:1px solid var(--border2);font-size:12px;color:var(--txt);">不确定 '+(s.uncertain||0)+'</span>';
+    h+='</div>';
+    h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">TOP 预增 / 扭亏</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:6px;">';
+    d.items.slice(0,5).forEach(it=>{
+      const col=it.change_pct>=0?'var(--up)':'var(--down)';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;">';
+      h+='<span style="font-size:12px;color:var(--txt);">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.code+'</span> <span style="font-size:10px;color:var(--sub);">'+it.type+'</span></span>';
+      h+='<span style="font-size:12px;font-weight:700;color:'+col+';">'+(it.change_pct>=0?'+':'')+Number(it.change_pct).toFixed(0)+'%</span>';
+      h+='</div>';
+    });
+    h+='</div>';
+    $b.innerHTML=h;
+    if($t) $t.innerHTML=_uBadge('收盘后','短线',d.update_time);
+  }
+  window.renderTodayForecast = renderTodayForecast;
+
+
   /* ---- 初始化 ---- */
   function initPostMarket(){
     const safe=(fn,...args)=>{try{fn(...args);}catch(e){console.warn('模块渲染失败',fn&&fn.name,e);}};
@@ -9463,6 +9697,14 @@ function drawUpDownChart(){
     safe(window.renderMarketBreadth, window.W52_HIGH || {});
     safe(window.renderRestrictedRelease, window.RESTRICTED_RELEASE || {});
     safe(window.renderPerformanceForecast, window.PERFORMANCE_FORECAST || {});
+
+    // 2026-08-30 主人令：实时数据/今日事件补位卡
+    safe(window.renderIndexQuotes, window.INDEX_QUOTES || {});
+    safe(window.renderOverseasMarkets, window.OVERSEAS_MARKETS || {});
+    safe(window.renderFuturesMain, window.CFFEX_HOLDINGS || {});
+    safe(window.renderMacroSummary, window.MACRO_DATA || {});
+    safe(window.renderTodayRestricted, window.RESTRICTED_RELEASE || {});
+    safe(window.renderTodayForecast, window.PERFORMANCE_FORECAST || {});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initPostMarket);
   else initPostMarket();
