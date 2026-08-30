@@ -14,7 +14,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "036e6f9b9";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
+    var BUILD = "416db65c2";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -479,7 +479,7 @@ window.__domReadyFns=[];
 <!-- 2026-08-23 恢复：潜力挖掘板块+股票预测推荐数据（calc_potential_picks.py 输出，跟盘后算法链自动更新） -->
 <script src="data/POTENTIAL_PICKS.js?v=4492197a47" defer></script>
 <script src="data/INDEX_QUOTES.js?v=96c461d9c9" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=834befa0b0" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=8212db72e3" defer></script>
 <script src="data/MARGIN_DATA.js?v=7a59db225b" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=a5457e9389" defer></script>
 <script src="data/IPO_DATA.js?v=9856fc3eee" defer></script>
@@ -1342,16 +1342,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=fd200b89cf" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=d3bddeb55d" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=d38c95432a" defer></script>
-<script src="data/RUNNER_STATUS.js?v=23cabe8d95" defer></script>
-<script src="data/HEALTH_CHECK.js?v=263c3f2615" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=2e2bccdfce" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=27b1ce49c4" defer></script>
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=6ac902288f" defer></script>
-    <script src="data/INDEX_HISTORY.js?v=7b3423086f" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=c75ed6a3e6" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=f01263bb35" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=8bdee81b39" defer></script>
-    <script src="data/ALGO_BACKTEST_COMPARE.js?v=4ece0c1b87" defer></script>
+<script src="data/RUNNER_STATUS.js?v=7032e41321" defer></script>
+<script src="data/HEALTH_CHECK.js?v=e85fc30a4f" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=70daf0e8b7" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=ad7b424a12" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=d059f43959" defer></script>
+    <script src="data/INDEX_HISTORY.js?v=ab47d87e8f" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=a518b348e0" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=88068f9bc7" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=6d4e63c7d2" defer></script>
+    <script src="data/ALGO_BACKTEST_COMPARE.js?v=45e6846eb9" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -1543,25 +1543,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div class="ipo-tab-body" id="ipoTabBody" style="display:none"><div class="ipo-grid" id="ipoTabsGrid"></div></div>
       </div>
       <div class="note">双维度 = 套利评分（收益弹性）+ 基本面评分（安全边际）。综合分 = 套利×60% + 基本面×40%。</div>
-    </div>
-
-    <!-- 宏观数据速览（2026-08-30：今日事件补位） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🌍</span>宏观数据速览 · <span class="fresh" id="macroSummaryTime">—</span></h3>
-      <div id="macroSummaryBody" style="font-size:13px;color:var(--txt);">加载中…</div>
-      <div class="note">LPR / M2 / CPI / PMI / 中美利差 / 汇率 / 商品，集中速览。</div>
-    </div>
-
-    <!-- 今日解禁提醒（2026-08-30：今日事件补位） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🔓</span>今日解禁提醒 · <span class="fresh" id="todayRestrictedTime">—</span></h3>
-      <div id="todayRestrictedBody" style="font-size:13px;color:var(--txt);">加载中…</div>
-    </div>
-
-    <!-- 业绩预告重点（2026-08-30：今日事件补位） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📈</span>业绩预告重点 · <span class="fresh" id="todayForecastTime">—</span></h3>
-      <div id="todayForecastBody" style="font-size:13px;color:var(--txt);">加载中…</div>
     </div>
 
     <!-- 重要事件日历（完整周历 · 与 calendar.html 同源） -->
@@ -2148,16 +2129,23 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div id="breadthBody"><div class="ipo-empty">加载中…</div></div>
     </div>
 
-    <!-- 解禁日历 -->
+    <!-- 宏观数据速览（2026-08-30：盘后数据补位） -->
     <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🔓</span>解禁日历 · <span class="fresh" id="restrictedTime">—</span></h3>
-      <div id="restrictedBody"><div class="ipo-empty">加载中…</div></div>
+      <h3><span class="ic">🌍</span>宏观数据速览 · <span class="fresh" id="macroSummaryTime">—</span></h3>
+      <div id="macroSummaryBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+      <div class="note">LPR / M2 / CPI / PMI / 中美利差 / 汇率 / 商品，集中速览。</div>
     </div>
 
-    <!-- 业绩预告 -->
+    <!-- 今日解禁提醒（2026-08-30：盘后数据补位） -->
     <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📈</span>业绩预告 · <span class="fresh" id="forecastTime">—</span></h3>
-      <div id="forecastBody"><div class="ipo-empty">加载中…</div></div>
+      <h3><span class="ic">🔓</span>今日解禁提醒 · <span class="fresh" id="todayRestrictedTime">—</span></h3>
+      <div id="todayRestrictedBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+    </div>
+
+    <!-- 业绩预告重点（2026-08-30：盘后数据补位） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📈</span>业绩预告重点 · <span class="fresh" id="todayForecastTime">—</span></h3>
+      <div id="todayForecastBody" style="font-size:13px;color:var(--txt);">加载中…</div>
     </div>
 
     
@@ -5569,8 +5557,8 @@ function switchSec(sec,el){
     setTimeout(window.__renderJudgmentHeader,60);
     if(typeof window.__retryJudgmentRender==='function') setTimeout(window.__retryJudgmentRender, 200);
   }
-  // 2026-08-30：今日事件补位卡（宏观/解禁/业绩）切 tab 时重绘
-  if(sec==='td'){
+  // 2026-08-30：盘后数据补位卡（宏观/解禁/业绩）切 tab 时重绘
+  if(sec==='ph'){
     setTimeout(function(){
       try{ window.renderMacroSummary(window.MACRO_DATA || {}); }catch(e){}
       try{ window.renderTodayRestricted(window.RESTRICTED_RELEASE || {}); }catch(e){}
@@ -9403,56 +9391,7 @@ function drawUpDownChart(){
   }
   window.renderMarketBreadth = renderMarketBreadth;
 
-  /* ---- 9. 解禁日历 ---- */
-  function renderRestrictedRelease(data){
-    const $b=$('restrictedBody'), $t=$('restrictedTime');
-    if(!$b) return;
-    data=data||{};
-    const items=(data.items||[]).slice(0,10);
-    const stats=data.stats||{};
-    $t.textContent=data.update_time?rel(data.update_time):'—';
-    if(!items.length){
-      $b.innerHTML='<div class="ipo-empty">解禁数据建设中，下次跑批后更新</div>';
-      return;
-    }
-    const statHtml='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">'
-      +'<span style="font-size:12px;">7天内 <b>'+(stats.d7||0)+'</b> 家</span>'
-      +'<span style="font-size:12px;">30天内 <b>'+(stats.d30||0)+'</b> 家</span>'
-      +'<span style="font-size:12px;">90天内 <b>'+(stats.d90||0)+'</b> 家</span>'
-      +'</div>';
-    const rows=items.map(function(it){
-      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.08);"><span style="font-size:12px;color:var(--txt);">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.code+'</span> <span style="font-size:10px;color:var(--sub);">'+it.date+'</span></span><span style="font-size:12px;font-weight:700;color:var(--txt);">'+(it.amount||'--')+'</span></div>';
-    }).join('');
-    $b.innerHTML=statHtml+'<div style="max-height:260px;overflow:auto;">'+rows+'</div>';
-  }
-  window.renderRestrictedRelease = renderRestrictedRelease;
-
-  /* ---- 10. 业绩预告 ---- */
-  function renderPerformanceForecast(data){
-    const $b=$('forecastBody'), $t=$('forecastTime');
-    if(!$b) return;
-    data=data||{};
-    const items=(data.items||[]).slice(0,10);
-    const summary=data.summary||{};
-    $t.textContent=data.update_time?rel(data.update_time):'—';
-    if(!items.length){
-      $b.innerHTML='<div class="ipo-empty">业绩预告数据建设中，下次跑批后更新</div>';
-      return;
-    }
-    const sumHtml='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">'
-      +'<span style="font-size:12px;">预增 <b style="color:var(--up);">'+(summary.increase||0)+'</b></span>'
-      +'<span style="font-size:12px;">预减 <b style="color:var(--down);">'+(summary.decrease||0)+'</b></span>'
-      +'<span style="font-size:12px;">预亏 <b>'+(summary.loss||0)+'</b></span>'
-      +'</div>';
-    const rows=items.map(function(it){
-      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.08);"><span style="font-size:12px;color:var(--txt);">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.code+'</span> <span style="font-size:10px;color:var(--sub);">'+it.type+'</span></span><span style="font-size:12px;font-weight:700;color:'+(it.change_pct>=0?'var(--up)':'var(--down)')+';">'+(it.change_pct>=0?'+':'')+(it.change_pct||'--')+'%</span></div>';
-    }).join('');
-    $b.innerHTML=sumHtml+'<div style="max-height:260px;overflow:auto;">'+rows+'</div>';
-  }
-  window.renderPerformanceForecast = renderPerformanceForecast;
-
-
-  /* ---- 11. 指数快览（实时数据补位） ---- */
+  /* ---- 12. 指数快览（实时数据补位） ---- */
   function renderIndexQuotes(d){
     const $b=$('indexQuotesBody'), $t=$('indexQuotesTime');
     if(!$b) return;
@@ -9478,7 +9417,7 @@ function drawUpDownChart(){
   }
   window.renderIndexQuotes = renderIndexQuotes;
 
-  /* ---- 12. 亚太市场概览（实时数据补位） ---- */
+  /* ---- 13. 亚太市场概览（实时数据补位） ---- */
   function renderOverseasMarkets(d){
     const $b=$('overseasBody'), $t=$('overseasTime');
     if(!$b) return;
@@ -9501,7 +9440,7 @@ function drawUpDownChart(){
   }
   window.renderOverseasMarkets = renderOverseasMarkets;
 
-  /* ---- 13. 期指主力合约 · 情绪方向（实时数据补位） ---- */
+  /* ---- 14. 期指主力合约 · 情绪方向（实时数据补位） ---- */
   function renderFuturesMain(d){
     const $b=$('futuresMainBody'), $t=$('futuresMainTime');
     if(!$b) return;
@@ -9534,7 +9473,7 @@ function drawUpDownChart(){
   }
   window.renderFuturesMain = renderFuturesMain;
 
-  /* ---- 14. 宏观数据速览（今日事件补位） ---- */
+  /* ---- 9. 宏观数据速览（盘后数据补位） ---- */
   function renderMacroSummary(d){
     const $b=$('macroSummaryBody'), $t=$('macroSummaryTime');
     if(!$b) return;
@@ -9574,7 +9513,7 @@ function drawUpDownChart(){
   }
   window.renderMacroSummary = renderMacroSummary;
 
-  /* ---- 15. 今日解禁提醒（今日事件补位） ---- */
+  /* ---- 10. 今日解禁提醒（盘后数据补位） ---- */
   function renderTodayRestricted(d){
     const $b=$('todayRestrictedBody'), $t=$('todayRestrictedTime');
     if(!$b) return;
@@ -9605,7 +9544,7 @@ function drawUpDownChart(){
   }
   window.renderTodayRestricted = renderTodayRestricted;
 
-  /* ---- 16. 业绩预告重点（今日事件补位） ---- */
+  /* ---- 11. 业绩预告重点（盘后数据补位） ---- */
   function renderTodayForecast(d){
     const $b=$('todayForecastBody'), $t=$('todayForecastTime');
     if(!$b) return;
@@ -9695,13 +9634,12 @@ function drawUpDownChart(){
     safe(window.renderSentiment, window.LIMIT_UP_HEATMAP || {}, window.LIMIT_UP_BROKEN || {});
     safe(window.renderLhbNet, window.LHB_DATA || {}, window.LHB_7D || {});
     safe(window.renderMarketBreadth, window.W52_HIGH || {});
-    safe(window.renderRestrictedRelease, window.RESTRICTED_RELEASE || {});
-    safe(window.renderPerformanceForecast, window.PERFORMANCE_FORECAST || {});
 
-    // 2026-08-30 主人令：实时数据/今日事件补位卡
+    // 2026-08-30 主人令：实时数据补位卡（指数/亚太/期指）
     safe(window.renderIndexQuotes, window.INDEX_QUOTES || {});
     safe(window.renderOverseasMarkets, window.OVERSEAS_MARKETS || {});
     safe(window.renderFuturesMain, window.CFFEX_HOLDINGS || {});
+    // 2026-08-30 主人令：盘后数据补位卡（宏观/解禁/业绩）
     safe(window.renderMacroSummary, window.MACRO_DATA || {});
     safe(window.renderTodayRestricted, window.RESTRICTED_RELEASE || {});
     safe(window.renderTodayForecast, window.PERFORMANCE_FORECAST || {});
@@ -10944,7 +10882,7 @@ function drawUpDownChart(){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=c75ed6a3e6';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=a518b348e0';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -10953,7 +10891,7 @@ function drawUpDownChart(){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=f01263bb35';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=88068f9bc7';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -13369,7 +13307,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=263c3f2615')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=e85fc30a4f')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){

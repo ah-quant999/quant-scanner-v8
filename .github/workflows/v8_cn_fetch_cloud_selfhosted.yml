@@ -213,9 +213,7 @@ jobs:
           python cloud_fetch_v8.py --category "$cat"
 
       - name: "🐉 刷新当日 LHB 数据（仅 post_close）"
-        # 🛡️ 2026-08-30 修复：category=all（全量兜底/手动 dispatch）语义上应 ⊇ post_close，
-        #   原写死 == 'post_close' 导致 all 时本步 skipped（实测 run 33312102792 五步全跳）。
-        if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
+        if: steps.cat.outputs.category == 'post_close'
         continue-on-error: true
         shell: bash
         run: |
@@ -224,9 +222,7 @@ jobs:
           python -c "import sys; sys.path.insert(0,'algorithms'); import stage_to_raw; stage_to_raw.main()"
 
       - name: "🐉 回填 LHB 历史（仅 post_close）"
-        # 🛡️ 2026-08-30 修复：category=all（全量兜底/手动 dispatch）语义上应 ⊇ post_close，
-        #   原写死 == 'post_close' 导致 all 时本步 skipped（实测 run 33312102792 五步全跳）。
-        if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
+        if: steps.cat.outputs.category == 'post_close'
         continue-on-error: true
         shell: bash
         run: |
@@ -234,9 +230,7 @@ jobs:
 
       # 2026-08-17 主人令：calc_commodity_elasticity.py 加入云端自动跑（之前从未自动跑过，导致国内期货 LC/SA 永远不显示）
       - name: "💹 商品涨价弹性榜重算（仅 post_close）"
-        # 🛡️ 2026-08-30 修复：category=all（全量兜底/手动 dispatch）语义上应 ⊇ post_close，
-        #   原写死 == 'post_close' 导致 all 时本步 skipped（实测 run 33312102792 五步全跳）。
-        if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
+        if: steps.cat.outputs.category == 'post_close'
         continue-on-error: true
         shell: bash
         run: |
@@ -244,9 +238,7 @@ jobs:
 
       # 2026-08-17 主人令：板块周期 fetch_sector_rs 之前从未自动跑过，导致 3 天前数据陈旧
       - name: "🔄 板块相对强度重算（仅 post_close）"
-        # 🛡️ 2026-08-30 修复：category=all（全量兜底/手动 dispatch）语义上应 ⊇ post_close，
-        #   原写死 == 'post_close' 导致 all 时本步 skipped（实测 run 33312102792 五步全跳）。
-        if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
+        if: steps.cat.outputs.category == 'post_close'
         continue-on-error: true
         shell: bash
         run: |
@@ -255,9 +247,7 @@ jobs:
 
       # 2026-08-17 主人令：ETF 三件套（calc_etf_intraday.py）之前无 workflow 触发
       - name: "💹 ETF 三件套数据生成（post_close 兜底）"
-        # 🛡️ 2026-08-30 修复：category=all（全量兜底/手动 dispatch）语义上应 ⊇ post_close，
-        #   原写死 == 'post_close' 导致 all 时本步 skipped（实测 run 33312102792 五步全跳）。
-        if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
+        if: steps.cat.outputs.category == 'post_close'
         continue-on-error: true
         shell: bash
         run: |
@@ -288,9 +278,6 @@ jobs:
 
       - name: "🩺 刷新 HEALTH_CHECK.js (v8_health_check)"
         # 🔴 2026-08-18 主人根治令：health_check 硬失败曾 3 次拖垮 workflow → 软失败只留痕。
-        # 🛡️ 2026-08-30 补充：cn runner 内网连线上 github.io/api 大量超时重试，
-        #   实测单次 1847s(31min) 白耗 runner。加 8 分钟上限，超时按软失败处理。
-        timeout-minutes: 8
         continue-on-error: true
         shell: bash
         run: |
