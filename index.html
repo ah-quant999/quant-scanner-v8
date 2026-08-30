@@ -1470,6 +1470,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div id="v8TodayAll" style="font-size:13px;color:var(--txt);"></div>
     </div>
 
+    <!-- 今日解禁（2026-08-30：移到今日事件，当日无解禁也展示） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🔓</span>今日解禁 · <span class="fresh" id="todayEventRestrictedTime">—</span></h3>
+      <div id="todayEventRestrictedBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+    </div>
+
+    <!-- 今日业绩预告（2026-08-30：移到今日事件，当日无预告也展示） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📈</span>今日业绩预告 · <span class="fresh" id="todayEventForecastTime">—</span></h3>
+      <div id="todayEventForecastBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+    </div>
+
     <!-- ⚖️ 今日判定 · 环境综合（2026-08-07 迁回今日事件，置于打新上方） -->
     <div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;opacity:0.95;">
       <div id="judgmentCardHeader"></div>
@@ -1943,13 +1955,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     })();
     </script>
 
-    <!-- 期指主力合约 · 情绪方向（2026-08-30：实时数据补位） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📈</span>期指主力合约 · 情绪方向 · <span class="fresh" id="futuresMainTime">—</span></h3>
-      <div id="futuresMainBody" style="font-size:13px;color:var(--txt);">加载中…</div>
-      <div class="note">基差（升贴水）需对应现货指数，当前展示期货主力合约相对昨结涨跌与持仓量。</div>
-    </div>
-
     <!-- 2026-08-30 删除：renderMonthCal / renderHistoryBar / 大牛股猎手等旧 LHB 视图脚本；DOM 容器已不存在，sec-rc 下新日历接管。 -->
 
     <!-- 2026-08-30 删除：旧 LHB 历史条/分析卡脚本；DOM 容器已不存在，由 sec-rc 新日历接管。 -->
@@ -2067,9 +2072,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         h+='</div>';
         el.innerHTML=h;
         if(timeEl && updateTime){
-          // 2026-08-15 时段标签统一走 _slotByTs（盘中边界 9:00-15:30，禁止硬编码）
-          var _slotMeta = window._slotByTs ? window._slotByTs(updateTime) : {slot:'盘中', horizon:'短线'};
-          timeEl.innerHTML = _uBadge(_slotMeta.slot, _slotMeta.horizon, updateTime);
+          // 2026-08-30 修复：行业树图位于「实时数据」tab，数据源优先 SECTOR_FUND_FLOW（盘中），
+          // 即使回退到 SECTOR_RS 也不得显示「盘后」标签，避免用户误判为盘后数据。
+          timeEl.innerHTML = _uBadge('盘中', '短线', updateTime);
         }
       }
       if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',renderIndustryTree);
@@ -2111,22 +2116,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     </div>
 
-    <!-- 情绪温度条：从涨停热力/炸板数据派生 -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🌡️</span>情绪温度条 · <span class="fresh" id="sentimentTime">—</span></h3>
-      <div id="sentimentBody"><div class="ipo-empty">加载中…</div></div>
-    </div>
-
-    <!-- 龙虎榜净买榜 -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🐉</span>龙虎榜净买榜 · <span class="fresh" id="lhbNetTime">—</span></h3>
-      <div id="lhbNetBody"><div class="ipo-empty">加载中…</div></div>
-    </div>
-
     <!-- 市场宽度：52周新高广度 -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">📊</span>市场宽度 · <span class="fresh" id="breadthTime">—</span></h3>
       <div id="breadthBody"><div class="ipo-empty">加载中…</div></div>
+    </div>
+
+    <!-- 期指主力合约 · 情绪方向（2026-08-30：盘后数据页） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📈</span>期指主力合约 · 情绪方向 · <span class="fresh" id="futuresMainTime">—</span></h3>
+      <div id="futuresMainBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+      <div class="note">基差（升贴水）需对应现货指数，当前展示期货主力合约相对昨结涨跌与持仓量。</div>
     </div>
 
     <!-- 宏观数据速览（2026-08-30：盘后数据补位） -->
@@ -2136,16 +2136,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="note">LPR / M2 / CPI / PMI / 中美利差 / 汇率 / 商品，集中速览。</div>
     </div>
 
-    <!-- 今日解禁提醒（2026-08-30：盘后数据补位） -->
+    <!-- 解禁日历（2026-08-30：盘后数据页 · 未来 N 天解禁汇总） -->
     <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">🔓</span>今日解禁提醒 · <span class="fresh" id="todayRestrictedTime">—</span></h3>
-      <div id="todayRestrictedBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+      <h3><span class="ic">🔓</span>解禁日历 · <span class="fresh" id="restrictedCalendarTime">—</span></h3>
+      <div id="restrictedCalendarBody" style="font-size:13px;color:var(--txt);">加载中…</div>
     </div>
 
-    <!-- 业绩预告重点（2026-08-30：盘后数据补位） -->
+    <!-- 业绩预告（2026-08-30：盘后数据页 · 财报季预告汇总） -->
     <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📈</span>业绩预告重点 · <span class="fresh" id="todayForecastTime">—</span></h3>
-      <div id="todayForecastBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+      <h3><span class="ic">📈</span>业绩预告 · <span class="fresh" id="forecastCalendarTime">—</span></h3>
+      <div id="forecastCalendarBody" style="font-size:13px;color:var(--txt);">加载中…</div>
     </div>
 
     
@@ -4308,6 +4308,22 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div class="logic-p"><code>index.html</code> <code>_buildJudgmentEnvHTML()</code>（约 ~989 行，LIGHT 色表 + lightDot() 发光圆点）。</div>
       </div>
 
+      <div class="card">
+        <h3><span class="ic">🔓</span>今日解禁 - 说明（2026-08-30 主人令）</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">展示「今日」限售股解禁家数与解禁市值 TOP，位于<b>今日事件</b> tab。当日无解禁时仍显示卡片（显示「今日无解禁」与未来 7 天合计），不隐藏。</div>
+        <div class="logic-h">数据口径</div>
+        <div class="logic-p"><code>RESTRICTED_RELEASE</code>（东方财富限售股解禁明细）。日频更新，盘前 08:25 抓取。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">📈</span>今日业绩预告 - 说明（2026-08-30 主人令）</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">展示「今日」发布业绩预告的公司中预增/扭亏 TOP，位于<b>今日事件</b> tab。当日无预告时仍显示卡片（显示 0 家），不隐藏。</div>
+        <div class="logic-h">数据口径</div>
+        <div class="logic-p"><code>PERFORMANCE_FORECAST</code>（东方财富业绩预告 stock_yjyg_em）。日频更新，盘前 08:25 抓取。</div>
+      </div>
+
     </div>
 
     <!-- === 实时数据 === -->
@@ -4425,17 +4441,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
 
       <div class="card">
-        <h3><span class="ic">🌙</span>盘后数据扩展卡 - 说明（2026-08-30 主人令）</h3>
-        <div class="logic-h">情绪温度条</div>
-        <div class="logic-p">由涨停热力图（LIMIT_UP_HEATMAP）的连板梯队与炸板数据（LIMIT_UP_BROKEN）派生。温度分 = 涨停家数 + 最高连板高度 − 炸板率，仅作情绪参照，不直接用于择时。</div>
-        <div class="logic-h">龙虎榜净买榜</div>
-        <div class="logic-p">汇总龙虎榜个股中机构/游资/机游共振/北向席位的净买入额，展示当日资金攻击方向。数据来自 LHB_DATA（当日）与 LHB_7D（7日聚合），非全市场资金流。</div>
-        <div class="logic-h">市场宽度</div>
-        <div class="logic-p">以东方财富「历史新高」板块成分家数（W52_HIGH）作为新高广度信号，反映市场参与上涨的宽度。</div>
-        <div class="logic-h">解禁日历</div>
-        <div class="logic-p">未来 7/30/90 天限售股解禁家数与解禁市值 TOP，数据来自东方财富限售股解禁明细（RPT_LIFT_STAGE）。</div>
-        <div class="logic-h">业绩预告</div>
-        <div class="logic-p">当前财报季 A 股业绩预告汇总与预增 TOP，数据来自东方财富业绩预告（stock_yjyg_em）。</div>
+        <h3><span class="ic">📊</span>指数快览 / 亚太市场 / 行业树图 - 说明（2026-08-30 主人令）</h3>
+        <div class="logic-h">指数快览</div>
+        <div class="logic-p">上证 / 深证 / 创业 / 科创等主要指数现价、涨跌幅、涨跌家数、成交额。数据来自东方财富 push2delay（INDEX_QUOTES），盘中每 30 分刷新，属 T+0 实时/准实时数据。</div>
+        <div class="logic-h">亚太市场概览</div>
+        <div class="logic-p">日经 225 / 恒生 / 韩国 KOSPI / 台湾加权等亚太主要指数。数据来自 akshare（OVERSEAS_MARKETS），盘中随各市场交易时段刷新，展示「隔夜」或「盘中」标签。</div>
+        <div class="logic-h">行业树图 · 细分赛道</div>
+        <div class="logic-p">以 treemap 方块展示行业板块涨跌。优先用盘中实时资金流 SECTOR_FUND_FLOW（每 30 分刷新），盘中缺失不回退到盘后 SECTOR_RS；方块颜色=涨跌，面积≈日内波动幅度。</div>
       </div>
 
       <div class="card">
@@ -4537,6 +4549,20 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><td>C</td><td>0</td><td>中性</td></tr>
           <tr><td style="color:var(--down);font-weight:700;">D</td><td>-10</td><td>扣分项</td></tr>
         </table>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🌙</span>盘后数据扩展卡 - 说明（2026-08-30 主人令）</h3>
+        <div class="logic-h">市场宽度</div>
+        <div class="logic-p">以东方财富「历史新高」板块成分家数（W52_HIGH）作为新高广度信号，反映市场参与上涨的宽度。紧凑一行多列展示：左侧核心数字 + 右侧领涨新高股 TOP8。</div>
+        <div class="logic-h">期指主力合约 · 情绪方向</div>
+        <div class="logic-p">中金所股指期货主力合约（IC/IF/IH/IM）收盘价、相对昨结涨跌、持仓量。数据来自 CFFEX_HOLDINGS（akshare get_cffex_daily），<b>2026-08-30 起由 premarket 改为 post_close 抓取</b>，放在盘后数据页。</div>
+        <div class="logic-h">宏观数据速览</div>
+        <div class="logic-p">LPR / M2 / CPI / PMI / 中美利差 / USDCNH / VIX / 黄金 / 原油 / 铜。数据来自 MACRO_DATA，日频更新，盘前 08:25 抓取。</div>
+        <div class="logic-h">解禁日历</div>
+        <div class="logic-p">未来 7/30/90 天限售股解禁家数与解禁市值 TOP。数据来自 RESTRICTED_RELEASE（东方财富 RPT_LIFT_STAGE），日频更新，盘前 08:25 抓取。与「今日事件」tab 的「今日解禁」卡不重复：本卡看未来 N 天，今日卡只看今日。</div>
+        <div class="logic-h">业绩预告</div>
+        <div class="logic-p">当前财报季 A 股业绩预告汇总（预增/预减/预亏/不确定）与预增 TOP。数据来自 PERFORMANCE_FORECAST（东方财富 stock_yjyg_em），日频更新，盘前 08:25 抓取。与「今日事件」tab 的「今日业绩预告」卡不重复：本卡看全量汇总，今日卡只看今日发布。</div>
       </div>
 
       <div class="card">
@@ -5077,6 +5103,50 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
 
       <div class="card">
         <h3><span class="ic">🛠️</span>运维面板内部模块 - 说明</h3>
+        <!-- ============= 2026-08-30 今晚改动汇总（卡片归位 + 重复清理 + 定时任务对齐） ============= -->
+        <div class="logic-h" style="background:linear-gradient(135deg,#581c87,#7e22ce);color:#e9d5ff;padding:8px 12px;border-radius:6px;margin:12px 0;">📋 2026-08-30 今晚改动汇总（盘后/实时/今日事件卡片归位 + 重复清理 + 定时任务对齐）</div>
+        <div class="logic-p"><b>主人令</b>：按截图审计结果，把盘中/盘后归属错误的卡片归位，删除与实时/共振日历重复的卡片，今日解禁/业绩预告保留在今日事件并明确区分盘后汇总卡，全部紧凑一行多列展示，并对齐定时任务与部署。以下改动已审计、推仓 main。</div>
+
+        <div class="logic-h">① 盘后数据页卡片整理</div>
+        <div class="logic-p">
+        <ul>
+          <li><b>删除「情绪温度条」</b>：与实时数据「情绪周期·连板天梯」重复，保留连板天梯。</li>
+          <li><b>删除「龙虎榜净买榜」</b>：与「共振日历」基于同一 LHB_DATA，保留共振日历完整视图。</li>
+          <li><b>期指主力合约</b>：从「实时数据」页移到「盘后数据」页；<code>CFFEX_HOLDINGS</code> 抓取时段由 premarket 改为 post_close（<code>cloud_fetch_v8.py</code> / <code>update_v8.py</code> / <code>v8_cn_fetch_cloud.yml</code> 注释同步）。</li>
+          <li><b>市场宽度</b>：保留在盘后数据页，布局改为紧凑一行多列（核心数字 + TOP 股 grid）。</li>
+          <li><b>解禁日历 / 业绩预告</b>：盘后数据页改为展示未来 N 天解禁汇总与全量预告汇总；原「今日」视角移到今日事件 tab。</li>
+          <li><b>宏观数据速览</b>：保留在盘后数据页，维持紧凑 grid。</li>
+        </ul>
+        </div>
+
+        <div class="logic-h">② 实时数据页卡片整理</div>
+        <div class="logic-p">
+        <ul>
+          <li><b>指数快览 / 亚太市场概览</b>：已在实时数据页，数据时段分别为「实时」「隔夜」，保持不变。</li>
+          <li><b>行业树图</b>：已在实时数据页，修复时段标签——即便数据回退也不显示「盘后」，强制显示「盘中」。</li>
+          <li><b>期指主力合约</b>：已从实时数据页移除。</li>
+          <li><b>情绪周期·连板天梯 / 涨停热力矩阵 / ETF三合一 / 概念资金热力图</b>：保留不变。</li>
+        </ul>
+        </div>
+
+        <div class="logic-h">③ 今日事件页卡片整理</div>
+        <div class="logic-p">
+        <ul>
+          <li><b>新增「今日解禁」</b>：从盘后数据页迁移过来，只展示今日解禁家数与 TOP；当日无解禁也显示卡片（不隐藏）。</li>
+          <li><b>新增「今日业绩预告」</b>：从盘后数据页迁移过来，只展示今日发布业绩预告的公司中预增/扭亏 TOP；当日无预告也显示卡片（不隐藏）。</li>
+          <li><b>今日事件详情 / 今日判定 / 打新速览 / 重要事件日历</b>：保留不变。</li>
+        </ul>
+        </div>
+
+        <div class="logic-h">④ 部署与验证</div>
+        <div class="logic-p">
+        <ul>
+          <li><code>index.html</code> 语法校验：110 段 inline script，0 error。</li>
+          <li>Playwright 本地验证：今日事件 / 实时数据 / 盘后数据三 tab 目标容器全部正常渲染，0 console error。</li>
+          <li>仅 <code>git add index.html</code> + 同步 <code>cloud_fetch_v8.py</code> / <code>update_v8.py</code> / <code>v8_cn_fetch_cloud.yml</code> 后推仓 main，未使用 <code>git add -A</code>。</li>
+        </ul>
+        </div>
+
         <!-- ============= 2026-08-12 今日改动汇总（最高优先级） ============= -->
         <div class="logic-h" style="background:linear-gradient(135deg,#1e3a8a,#1e40af);color:#bfdbfe;padding:8px 12px;border-radius:6px;margin:12px 0;">📋 2026-08-12 今日改动汇总（红黄绿灯四连 + 数据 bug 修复 + 布局精简）</div>
         <div class="logic-p"><b>推送入库</b>：commit <code>e2e844db8</code> 起 10 个功能 commit 已全部 push 到 <code>origin/main</code>（本地 HEAD == 远端）。</div>
@@ -5557,12 +5627,13 @@ function switchSec(sec,el){
     setTimeout(window.__renderJudgmentHeader,60);
     if(typeof window.__retryJudgmentRender==='function') setTimeout(window.__retryJudgmentRender, 200);
   }
-  // 2026-08-30：盘后数据补位卡（宏观/解禁/业绩）切 tab 时重绘
+  // 2026-08-30：盘后数据补位卡（宏观/期指/解禁/业绩）切 tab 时重绘
   if(sec==='ph'){
     setTimeout(function(){
+      try{ window.renderFuturesMain(window.CFFEX_HOLDINGS || {}); }catch(e){}
       try{ window.renderMacroSummary(window.MACRO_DATA || {}); }catch(e){}
-      try{ window.renderTodayRestricted(window.RESTRICTED_RELEASE || {}); }catch(e){}
-      try{ window.renderTodayForecast(window.PERFORMANCE_FORECAST || {}); }catch(e){}
+      try{ window.renderRestrictedCalendar(window.RESTRICTED_RELEASE || {}); }catch(e){}
+      try{ window.renderForecastCalendar(window.PERFORMANCE_FORECAST || {}); }catch(e){}
     }, 80);
   }
   // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
@@ -5575,12 +5646,18 @@ function switchSec(sec,el){
   if(sec==='query'){ var dd=document.getElementById('v8QueryDropdown'); if(dd) dd.style.display='none'; }
   // 实时数据：情绪周期·连板天梯迁到本区，进入时渲染
   if(sec==='rt' && typeof window.__renderCycleLadderCard==='function') setTimeout(window.__renderCycleLadderCard,60);
-  // 2026-08-30：实时数据补位卡（指数/亚太/期指）切 tab 时重绘
+  // 2026-08-30：实时数据补位卡（指数/亚太）切 tab 时重绘
   if(sec==='rt'){
     setTimeout(function(){
       try{ window.renderIndexQuotes(window.INDEX_QUOTES || {}); }catch(e){}
       try{ window.renderOverseasMarkets(window.OVERSEAS_MARKETS || {}); }catch(e){}
-      try{ window.renderFuturesMain(window.CFFEX_HOLDINGS || {}); }catch(e){}
+    }, 80);
+  }
+  // 2026-08-30：今日事件 tab 今日解禁/业绩预告切 tab 时重绘
+  if(sec==='td'){
+    setTimeout(function(){
+      try{ window.renderTodayEventRestricted(window.RESTRICTED_RELEASE || {}); }catch(e){}
+      try{ window.renderTodayEventForecast(window.PERFORMANCE_FORECAST || {}); }catch(e){}
     }, 80);
   }
   // 潜力参考（pr）已改为选股策略(st)内部子TAB，由 switchSt('pr') 触发，此处不重复处理
@@ -9278,89 +9355,7 @@ function drawUpDownChart(){
 
   window.renderHealthCheck = renderHealthCheck;
 
-  /* ---- 6. 情绪温度条（涨停热力 + 炸板数据派生） ---- */
-  function renderSentiment(heatmap, broken){
-    const $b=$('sentimentBody'), $t=$('sentimentTime');
-    if(!$b) return;
-    const h=heatmap||{}, b=broken||{};
-    const ladder=h.ladder||{};
-    const ztTotal=Object.values(ladder).reduce((a,v)=>a+(Number(v)||0),0);
-    const heights=Object.keys(ladder).map(Number).sort((a,b)=>b-a);
-    const maxLbc=heights[0]||0;
-    const brokenTotal=Number(b.total)||0;
-    const brokenRate=ztTotal+brokenTotal>0 ? brokenTotal/(ztTotal+brokenTotal)*100 : 0;
-    let score=50;
-    if(ztTotal>=80) score+=20;
-    else if(ztTotal>=50) score+=10;
-    else if(ztTotal>=30) score+=5;
-    else score-=10;
-    if(maxLbc>=6) score+=15;
-    else if(maxLbc>=4) score+=8;
-    else if(maxLbc>=3) score+=3;
-    if(brokenRate>=30) score-=15;
-    else if(brokenRate>=20) score-=8;
-    score=Math.max(10,Math.min(95,score));
-    let color, word;
-    if(score>=70){ color='var(--up)'; word='偏热'; }
-    else if(score>=50){ color='var(--gold)'; word='中性'; }
-    else { color='var(--down)'; word='偏冷'; }
-    let ladderHtml='';
-    heights.slice(0,6).forEach(function(l){
-      const cnt=ladder[l]||0;
-      ladderHtml+='<div style="display:flex;align-items:center;gap:6px;margin:3px 0;">';
-      ladderHtml+='<span style="min-width:40px;font-size:11px;color:var(--sub);">'+l+'板</span>';
-      ladderHtml+='<div style="flex:1;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;"><div style="width:'+Math.min(100,cnt*3)+'%;height:100%;background:'+color+';"></div></div>';
-      ladderHtml+='<span style="min-width:28px;text-align:right;font-size:11px;font-weight:700;color:var(--txt);">'+cnt+'</span>';
-      ladderHtml+='</div>';
-    });
-    const dt=h.update_time||b.update_time||'';
-    $t.textContent=dt?rel(dt):'—';
-    $b.innerHTML='<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:10px;">'
-      +'<div style="text-align:center;"><div style="font-size:32px;font-weight:800;color:'+color+';">'+score+'</div><div style="font-size:11px;color:var(--dim);">情绪温度 · '+word+'</div></div>'
-      +'<div style="flex:1;min-width:180px;">'
-      +'<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px;">'
-      +'<span style="font-size:12px;">涨停 <b style="color:var(--up);">'+ztTotal+'</b></span>'
-      +'<span style="font-size:12px;">炸板 <b style="color:'+(brokenRate>=30?'var(--up)':'var(--down)')+';">'+brokenTotal+'</b></span>'
-      +'<span style="font-size:12px;">炸板率 <b>'+brokenRate.toFixed(1)+'%</b></span>'
-      +'<span style="font-size:12px;">最高连板 <b style="color:'+color+';">'+maxLbc+'板</b></span>'
-      +'</div>'
-      +ladderHtml
-      +'</div></div>';
-  }
-  window.renderSentiment = renderSentiment;
-
-  /* ---- 7. 龙虎榜净买榜 ---- */
-  function renderLhbNet(lhb, lhb7d){
-    const $b=$('lhbNetBody'), $t=$('lhbNetTime');
-    if(!$b) return;
-    const data=lhb||{};
-    const stocks=(data.stocks||[]).slice();
-    if(!stocks.length){
-      $b.innerHTML='<div class="ipo-empty">龙虎榜数据暂不可用</div>';
-      $t.textContent='—';
-      return;
-    }
-    const instTop=stocks.slice().sort((a,b)=>(b.inst_net_万||0)-(a.inst_net_万||0)).slice(0,5);
-    const yzTop=stocks.slice().sort((a,b)=>(b.yz_net_万||0)-(a.yz_net_万||0)).slice(0,5);
-    const resonance=stocks.filter(s=>s.category==='机游共振').sort((a,b)=>((b.inst_net_万||0)+(b.yz_net_万||0))-((a.inst_net_万||0)+(a.yz_net_万||0))).slice(0,5);
-    const north=stocks.filter(function(s){ const n=(s.seats||{}).北向; return n && ((n.buy||0)-(n.sell||0))>0; })
-      .sort(function(a,b){ const na=(a.seats.北向.buy||0)-(a.seats.北向.sell||0), nb=(b.seats.北向.buy||0)-(b.seats.北向.sell||0); return nb-na; })
-      .slice(0,5);
-    function fmtYi(w){ return (Number(w)||0)>=10000 ? (Number(w)/10000).toFixed(2)+'亿' : Number(w).toFixed(0)+'万'; }
-    function row(s, keyFn){ return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.08);"><span style="font-size:12px;color:var(--txt);">'+s.name+' <span style="font-size:10px;color:var(--dim);">'+s.code+'</span></span><span style="font-size:12px;font-weight:700;color:'+((keyFn(s)||0)>=0?'var(--up)':'var(--down)')+';">'+(keyFn(s)>=0?'+':'')+fmtYi(keyFn(s))+'</span></div>'; }
-    function block(title, rows){ return rows.length?('<div style="flex:1;min-width:160px;"><div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:4px;">'+title+'</div>'+rows.join('')+'</div>'):''; }
-    const html='<div style="display:flex;gap:16px;flex-wrap:wrap;">'
-      +block('机构净买 TOP5', instTop.map(s=>row(s, x=>x.inst_net_万)))
-      +block('游资净买 TOP5', yzTop.map(s=>row(s, x=>x.yz_net_万)))
-      +block('机游共振', resonance.map(s=>row(s, x=>(x.inst_net_万||0)+(x.yz_net_万||0))))
-      +block('北向席位净买', north.map(s=>row(s, x=>(s.seats.北向.buy||0)-(s.seats.北向.sell||0))))
-      +'</div>';
-    $b.innerHTML=html || '<div class="ipo-empty">龙虎榜数据暂不可用</div>';
-    $t.textContent=data.update_time?rel(data.update_time):'—';
-  }
-  window.renderLhbNet = renderLhbNet;
-
-  /* ---- 8. 市场宽度（52周新高） ---- */
+  /* ---- 6. 市场宽度（52周新高） ---- */
   function renderMarketBreadth(w52){
     const $b=$('breadthBody'), $t=$('breadthTime');
     if(!$b) return;
@@ -9380,13 +9375,23 @@ function drawUpDownChart(){
     else if(total>=50) score=30;
     else score=20;
     let color=score>=70?'var(--up)':(score>=50?'var(--gold)':'var(--down)');
-    let rows=top.slice(0,8).map(function(s){
-      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.08);"><span style="font-size:12px;color:var(--txt);">'+s.name+' <span style="font-size:10px;color:var(--dim);">'+s.code+'</span></span><span style="font-size:12px;font-weight:700;color:var(--up);">+'+(Number(s.chg)||0).toFixed(2)+'%</span></div>';
-    }).join('');
-    $b.innerHTML='<div style="display:flex;gap:16px;flex-wrap:wrap;">'
-      +'<div style="text-align:center;min-width:100px;"><div style="font-size:32px;font-weight:800;color:'+color+';">'+total+'</div><div style="font-size:11px;color:var(--dim);">今日历史新高家数</div><div style="font-size:12px;margin-top:4px;color:'+color+';">宽度评分 '+score+'</div></div>'
-      +'<div style="flex:1;min-width:180px;"><div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:4px;">领涨新高股 TOP8</div>'+rows+'</div>'
-      +'</div>';
+    // 2026-08-30：紧凑一行多列，左边 2 个核心指标 + 右边 TOP 股 grid
+    let h='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:10px;">';
+    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--sub);">今日历史新高</div><div style="font-size:22px;font-weight:800;color:'+color+';">'+total+'</div></div>';
+    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--sub);">宽度评分</div><div style="font-size:22px;font-weight:800;color:'+color+';">'+score+'</div></div>';
+    h+='</div>';
+    if(top.length){
+      h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">领涨新高股 TOP8</div>';
+      h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px;">';
+      top.slice(0,8).forEach(function(s){
+        h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;">';
+        h+='<span style="font-size:12px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+s.name+' <span style="font-size:10px;color:var(--dim);">'+s.code+'</span></span>';
+        h+='<span style="font-size:12px;font-weight:700;color:var(--up);flex-shrink:0;">+'+(Number(s.chg)||0).toFixed(2)+'%</span>';
+        h+='</div>';
+      });
+      h+='</div>';
+    }
+    $b.innerHTML=h;
     $t.textContent=data.update_time?rel(data.update_time):'—';
   }
   window.renderMarketBreadth = renderMarketBreadth;
@@ -9451,7 +9456,7 @@ function drawUpDownChart(){
       byV[it.variety].push(it);
     });
     const watch=['IC','IF','IH','IM'];
-    let h='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">';
+    let h='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">';
     watch.forEach(v=>{
       const arr=byV[v];
       if(!arr || !arr.length) return;
@@ -9513,48 +9518,51 @@ function drawUpDownChart(){
   }
   window.renderMacroSummary = renderMacroSummary;
 
-  /* ---- 10. 今日解禁提醒（盘后数据补位） ---- */
-  function renderTodayRestricted(d){
-    const $b=$('todayRestrictedBody'), $t=$('todayRestrictedTime');
+  /* ---- 10. 今日解禁（今日事件 tab） ---- */
+  function renderTodayEventRestricted(d){
+    const $b=$('todayEventRestrictedBody'), $t=$('todayEventRestrictedTime');
     if(!$b) return;
-    if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">解禁数据暂不可用</div>'; return; }
+    if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">解禁数据暂不可用</div>'; if($t) $t.innerHTML='—'; return; }
     const todayStr=window._cstParts?window._cstParts(new Date()).ymd:(new Date().toISOString().slice(0,10));
     const todayItems=d.items.filter(it=>it.date===todayStr);
     const stats=d.stats||{};
-    let h='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">';
-    h+='<span style="padding:4px 10px;border-radius:6px;background:var(--card2);border:1px solid var(--border2);font-size:12px;color:var(--txt);">未来7天 <b>'+(stats.d7||0)+'</b> 家</span>';
-    h+='<span style="padding:4px 10px;border-radius:6px;background:var(--card2);border:1px solid var(--border2);font-size:12px;color:var(--txt);">30天 <b>'+(stats.d30||0)+'</b> 家</span>';
-    h+='<span style="padding:4px 10px;border-radius:6px;background:var(--card2);border:1px solid var(--border2);font-size:12px;color:var(--txt);">90天 <b>'+(stats.d90||0)+'</b> 家</span>';
+    let h='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:10px;">';
+    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--sub);">今日解禁</div><div style="font-size:18px;font-weight:800;color:'+(todayItems.length?'var(--up)':'var(--sub)')+';">'+(todayItems.length||0)+'</div></div>';
+    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--sub);">未来7天</div><div style="font-size:18px;font-weight:800;color:var(--txt);">'+(stats.d7||0)+'</div></div>';
+    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--sub);">30天</div><div style="font-size:18px;font-weight:800;color:var(--txt);">'+(stats.d30||0)+'</div></div>';
+    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--sub);">90天</div><div style="font-size:18px;font-weight:800;color:var(--txt);">'+(stats.d90||0)+'</div></div>';
     h+='</div>';
+    h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">'+(todayItems.length?'今日解禁 TOP':'今日无解禁')+'</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:6px;">';
     if(todayItems.length){
-      h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">今日解禁 TOP</div>';
-      h+='<div style="display:flex;flex-direction:column;gap:6px;">';
       todayItems.slice(0,5).forEach(it=>{
         h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;">';
         h+='<span style="font-size:12px;color:var(--txt);">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.code+'</span></span>';
         h+='<span style="font-size:12px;font-weight:700;color:var(--up);">'+it.amount+'</span>';
         h+='</div>';
       });
-      h+='</div>';
     }else{
-      h+='<div class="ipo-empty" style="padding:14px;">今日无解禁（未来7天共 '+stats.d7+' 家）</div>';
+      h+='<div class="ipo-empty" style="padding:14px;">未来7天共 '+(stats.d7||0)+' 家解禁</div>';
     }
+    h+='</div>';
     $b.innerHTML=h;
-    if($t) $t.innerHTML=_uBadge('收盘后','短线',d.update_time);
+    if($t) $t.innerHTML=_uBadge('盘前','短线',d.update_time);
   }
-  window.renderTodayRestricted = renderTodayRestricted;
+  window.renderTodayEventRestricted = renderTodayEventRestricted;
 
-  /* ---- 11. 业绩预告重点（盘后数据补位） ---- */
-  function renderTodayForecast(d){
-    const $b=$('todayForecastBody'), $t=$('todayForecastTime');
+  /* ---- 11. 今日业绩预告（今日事件 tab） ---- */
+  function renderTodayEventForecast(d){
+    const $b=$('todayEventForecastBody'), $t=$('todayEventForecastTime');
     if(!$b) return;
-    if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">业绩预告数据暂不可用</div>'; return; }
+    if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">业绩预告数据暂不可用</div>'; if($t) $t.innerHTML='—'; return; }
     const s=d.summary||{};
-    let h='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">';
-    h+='<span style="padding:4px 10px;border-radius:6px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);font-size:12px;color:var(--up);font-weight:700;">预增 '+(s.increase||0)+'</span>';
-    h+='<span style="padding:4px 10px;border-radius:6px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);font-size:12px;color:var(--down);font-weight:700;">预减 '+(s.decrease||0)+'</span>';
-    h+='<span style="padding:4px 10px;border-radius:6px;background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.25);font-size:12px;color:var(--sub);font-weight:700;">预亏 '+(s.loss||0)+'</span>';
-    h+='<span style="padding:4px 10px;border-radius:6px;background:var(--card2);border:1px solid var(--border2);font-size:12px;color:var(--txt);">不确定 '+(s.uncertain||0)+'</span>';
+    const total=(s.increase||0)+(s.decrease||0)+(s.loss||0)+(s.uncertain||0);
+    let h='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-bottom:10px;">';
+    h+='<div style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--up);">预增</div><div style="font-size:18px;font-weight:800;color:var(--up);">'+(s.increase||0)+'</div></div>';
+    h+='<div style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--down);">预减</div><div style="font-size:18px;font-weight:800;color:var(--down);">'+(s.decrease||0)+'</div></div>';
+    h+='<div style="background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.25);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--sub);">预亏</div><div style="font-size:18px;font-weight:800;color:var(--sub);">'+(s.loss||0)+'</div></div>';
+    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--txt);">不确定</div><div style="font-size:18px;font-weight:800;color:var(--txt);">'+(s.uncertain||0)+'</div></div>';
+    if(total) h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--sub);">合计</div><div style="font-size:18px;font-weight:800;color:var(--txt);">'+total+'</div></div>';
     h+='</div>';
     h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">TOP 预增 / 扭亏</div>';
     h+='<div style="display:flex;flex-direction:column;gap:6px;">';
@@ -9567,9 +9575,63 @@ function drawUpDownChart(){
     });
     h+='</div>';
     $b.innerHTML=h;
+    if($t) $t.innerHTML=_uBadge('盘前','短线',d.update_time);
+  }
+  window.renderTodayEventForecast = renderTodayEventForecast;
+
+  /* ---- 12. 解禁日历（盘后数据页 · 未来 N 天） ---- */
+  function renderRestrictedCalendar(d){
+    const $b=$('restrictedCalendarBody'), $t=$('restrictedCalendarTime');
+    if(!$b) return;
+    if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">解禁数据暂不可用</div>'; if($t) $t.innerHTML='—'; return; }
+    const stats=d.stats||{};
+    const sorted=d.items.slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+    let h='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:10px;">';
+    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--sub);">7天内</div><div style="font-size:18px;font-weight:800;color:var(--txt);">'+(stats.d7||0)+'</div></div>';
+    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--sub);">30天内</div><div style="font-size:18px;font-weight:800;color:var(--txt);">'+(stats.d30||0)+'</div></div>';
+    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--sub);">90天内</div><div style="font-size:18px;font-weight:800;color:var(--txt);">'+(stats.d90||0)+'</div></div>';
+    h+='</div>';
+    h+='<div style="max-height:260px;overflow-y:auto;">';
+    sorted.slice(0,15).forEach(it=>{
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;margin-bottom:6px;">';
+      h+='<span style="font-size:12px;color:var(--txt);">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.code+'</span> <span style="font-size:10px;color:var(--sub);">'+it.date+'</span></span>';
+      h+='<span style="font-size:12px;font-weight:700;color:var(--up);">'+it.amount+'</span>';
+      h+='</div>';
+    });
+    h+='</div>';
+    $b.innerHTML=h;
     if($t) $t.innerHTML=_uBadge('收盘后','短线',d.update_time);
   }
-  window.renderTodayForecast = renderTodayForecast;
+  window.renderRestrictedCalendar = renderRestrictedCalendar;
+
+  /* ---- 13. 业绩预告（盘后数据页 · 财报季汇总） ---- */
+  function renderForecastCalendar(d){
+    const $b=$('forecastCalendarBody'), $t=$('forecastCalendarTime');
+    if(!$b) return;
+    if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">业绩预告数据暂不可用</div>'; if($t) $t.innerHTML='—'; return; }
+    const s=d.summary||{};
+    const total=(s.increase||0)+(s.decrease||0)+(s.loss||0)+(s.uncertain||0);
+    let h='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-bottom:10px;">';
+    h+='<div style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--up);">预增</div><div style="font-size:18px;font-weight:800;color:var(--up);">'+(s.increase||0)+'</div></div>';
+    h+='<div style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--down);">预减</div><div style="font-size:18px;font-weight:800;color:var(--down);">'+(s.decrease||0)+'</div></div>';
+    h+='<div style="background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.25);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--sub);">预亏</div><div style="font-size:18px;font-weight:800;color:var(--sub);">'+(s.loss||0)+'</div></div>';
+    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--txt);">不确定</div><div style="font-size:18px;font-weight:800;color:var(--txt);">'+(s.uncertain||0)+'</div></div>';
+    if(total) h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--sub);">合计</div><div style="font-size:18px;font-weight:800;color:var(--txt);">'+total+'</div></div>';
+    h+='</div>';
+    h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">TOP 预增 / 扭亏</div>';
+    h+='<div style="display:flex;flex-direction:column;gap:6px;">';
+    d.items.slice(0,8).forEach(it=>{
+      const col=it.change_pct>=0?'var(--up)':'var(--down)';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;">';
+      h+='<span style="font-size:12px;color:var(--txt);">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.code+'</span> <span style="font-size:10px;color:var(--sub);">'+it.type+'</span></span>';
+      h+='<span style="font-size:12px;font-weight:700;color:'+col+';">'+(it.change_pct>=0?'+':'')+Number(it.change_pct).toFixed(0)+'%</span>';
+      h+='</div>';
+    });
+    h+='</div>';
+    $b.innerHTML=h;
+    if($t) $t.innerHTML=_uBadge('收盘后','短线',d.update_time);
+  }
+  window.renderForecastCalendar = renderForecastCalendar;
 
 
   /* ---- 初始化 ---- */
@@ -9630,19 +9692,21 @@ function drawUpDownChart(){
     // 2026-08-16: 商品涨价弹性榜已从选股策略TAB移至盘后数据section，需在此处渲染
     try{ if(typeof window._fillCommodityElasticity==='function') window._fillCommodityElasticity(); }catch(e){ console.warn('商品涨价弹性榜渲染失败',e); }
 
-    // 2026-08-30 主人令：盘后数据页扩展（情绪/龙虎榜/宽度/解禁/业绩）
-    safe(window.renderSentiment, window.LIMIT_UP_HEATMAP || {}, window.LIMIT_UP_BROKEN || {});
-    safe(window.renderLhbNet, window.LHB_DATA || {}, window.LHB_7D || {});
+    // 2026-08-30 主人令：盘后数据页扩展（宽度/期指/宏观/解禁日历/业绩预告）
+    // 情绪温度条、龙虎榜净买榜已删除（分别与实时「连板天梯」、共振日历重复）
     safe(window.renderMarketBreadth, window.W52_HIGH || {});
+    safe(window.renderFuturesMain, window.CFFEX_HOLDINGS || {});
+    safe(window.renderMacroSummary, window.MACRO_DATA || {});
+    safe(window.renderRestrictedCalendar, window.RESTRICTED_RELEASE || {});
+    safe(window.renderForecastCalendar, window.PERFORMANCE_FORECAST || {});
 
-    // 2026-08-30 主人令：实时数据补位卡（指数/亚太/期指）
+    // 2026-08-30 主人令：实时数据补位卡（指数/亚太）
     safe(window.renderIndexQuotes, window.INDEX_QUOTES || {});
     safe(window.renderOverseasMarkets, window.OVERSEAS_MARKETS || {});
-    safe(window.renderFuturesMain, window.CFFEX_HOLDINGS || {});
-    // 2026-08-30 主人令：盘后数据补位卡（宏观/解禁/业绩）
-    safe(window.renderMacroSummary, window.MACRO_DATA || {});
-    safe(window.renderTodayRestricted, window.RESTRICTED_RELEASE || {});
-    safe(window.renderTodayForecast, window.PERFORMANCE_FORECAST || {});
+
+    // 2026-08-30 主人令：今日事件 tab 补位卡（今日解禁/今日业绩预告）
+    safe(window.renderTodayEventRestricted, window.RESTRICTED_RELEASE || {});
+    safe(window.renderTodayEventForecast, window.PERFORMANCE_FORECAST || {});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initPostMarket);
   else initPostMarket();

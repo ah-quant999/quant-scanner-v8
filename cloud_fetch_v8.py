@@ -93,7 +93,8 @@ CATEGORY_MAP = {
     "V8_CAL": "premarket",
     "IPO_DATA": "premarket",
     "MARGIN_DATA": "premarket",
-    "CFFEX_HOLDINGS": "premarket",
+    # 2026-08-30：期指主力合约卡移到「盘后数据」页，改为 post_close 抓取当日收盘后数据
+    "CFFEX_HOLDINGS": "post_close",
     "MACRO_DATA": "premarket",
     "CRISIS_DATA": "premarket",
     "MACRO_BRIEF": "premarket",
