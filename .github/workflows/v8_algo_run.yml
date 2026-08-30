@@ -259,6 +259,15 @@ jobs:
           python update_v8.py
 
       - name: "🩺 刷新 HEALTH_CHECK.js (v8_health_check)"
+        # 2026-08-30：本 runner 在中国内网，v8_health_check.py 内部的线上比对
+        #   （github.io 站点 + api.github.com）会大量 TimeoutError/HTTPError 重试，
+        #   实测 8/29 该步耗时 1847s（31 分钟），且给出的红灯反映的是「内网连不上 GitHub」
+        #   而非「数据真陈旧」——假红灯，当告警源会误导。
+        #   真体检交给云端 v8_health_patrol（每小时，网络通、结论准）。
+        #   这里只保留「刷新出 data/HEALTH_CHECK.js 文件」这一个职责：
+        #     限时 8 分钟砍掉无意义重试，且不阻断（省下的 20+ 分钟同时降低 120min job timeout 风险）。
+        timeout-minutes: 8
+        continue-on-error: true
         shell: powershell
         run: |
           python v8_health_check.py
