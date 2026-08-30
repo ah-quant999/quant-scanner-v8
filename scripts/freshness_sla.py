@@ -32,7 +32,6 @@ FRESHNESS_SLA = {
     "market_regime.json":           {"max_age_h": 24, "category": "post_close"},
     "cockpit_backtest.json":        {"max_age_h": 48, "category": "post_close"},
     "lhb_data.json":                {"max_age_h": 24, "category": "post_close"},
-    "top5_track.json":              {"max_age_h": 24, "category": "post_close"},
     "h_auto_buy_history.json":       {"max_age_h": 24, "category": "post_close"},
     "stock_quote.json":             {"max_age_h": 4,  "category": "intraday"},
     "limit_up_heatmap.json":        {"max_age_h": 4,  "category": "intraday"},

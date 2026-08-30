@@ -6,7 +6,6 @@ apply_ic_gate.py — Tier 1 第 1 步「IC 门禁 MVP」
 读：
   - raw_data/factor_ic_report.json     # v8_factor_ic.py 产出（滚动 IC）
   - raw_data/factor_validate_report.json # v8_factor_validate.py 产出（固定样本 win）
-  - raw_data/top5_track.json（可选）    # TOP5 90天累计胜率
   - raw_data/h_auto_buy_track.json（可选）# H 反推累计胜率
 
 写：
@@ -122,7 +121,6 @@ def main():
 
     ic_report        = load_json(os.path.join(RAW_DIR, "factor_ic_report.json"), {})
     validate_report = load_json(os.path.join(RAW_DIR, "factor_validate_report.json"), {})
-    top5_track      = load_json(os.path.join(RAW_DIR, "top5_track.json"), {})
     h_buy_track     = load_json(os.path.join(RAW_DIR, "h_auto_buy_track.json"), {})
 
     # 合并两路 IC 报告到一个总 IC 信号（ge3 / crds 等策略的输入统一）
@@ -135,7 +133,6 @@ def main():
 
     factors = {
         "ge3":          factor_ic_to_gate("ge3", merged_ic),
-        "top5_累计":     track_to_gate("top5_累计", top5_track),
         "h_auto_buy_累计": track_to_gate("h_auto_buy_累计", h_buy_track)
     }
 

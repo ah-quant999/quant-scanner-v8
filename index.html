@@ -1376,7 +1376,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <div class="tab" data-sec="query" onclick="switchSec('query',this)">🔍 个股查询</div>
   <!-- 2026-08-08 主人令：选股策略降级为「辅助策略池」，仅管理员可见，置于暂未上架左侧 -->
   <div class="tab locked admin-only" data-sec="st" data-lock="1" onclick="guardLock('st',this)">🔒 选股策略 <span class="lk">[锁]</span></div>
-  <!-- 2026-08-13 主人令：策略回测（统一）— TOP5 跟踪 + 综合回测 + 信号 60 日回测 一个 tab 装完，仅管理员可见 -->
+  <!-- 2026-08-13 主人令：策略回测（统一）— 综合回测 + 信号 60 日回测 一个 tab 装完，仅管理员可见 -->
   <div class="tab locked admin-only" data-sec="bt" data-lock="1" onclick="guardLock('bt',this)">🔒 策略回测 <span class="lk">[锁]</span></div>
   <!-- 2026-08-07 主人令：暂未上架 从运维子 Tab 提升为一级 nav（仅管理员可见，guardLock 锁定） -->
   <div class="tab locked admin-only" data-sec="ul" data-lock="1" onclick="guardLock('ul',this)">🔒 暂未上架 <span class="lk">[锁]</span></div>
@@ -3711,7 +3711,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
    ① 📊 综合回测 多策略×多持有期 — BACKTEST_COMPREHENSIVE → "我用的策略哪个最值钱"
    ② 📈 K线信号 60 日回测 — BACKTEST_TDX → "信号层有没有 alpha"
    设计：简洁表格、胜率高亮（≥55% 绿 / ≤45% 红）、平均收益同色。
-   2026-08-30 主人令：TOP5 滚动跟踪样本不足（<30）且长期空表，已删除。
 */
 (function(){
   var rendered = false;

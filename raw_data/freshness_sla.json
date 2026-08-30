@@ -4,7 +4,6 @@
   "overall_status": "BREACH",
   "breaches": [
     "cockpit_backtest.json: 无 update_time 字段",
-    "top5_track.json: 无 update_time 字段",
     "h_auto_buy_track.json: MISSING (预期频率 post_close)",
     "stock_quote.json: 无 update_time 字段",
     "sector_fund_flow_intraday.json: 无 update_time 字段",
@@ -64,15 +63,6 @@
       "age_h": 4.31,
       "freshness_pct": 18.0,
       "status": "OK"
-    },
-    {
-      "file": "top5_track.json",
-      "exists": true,
-      "configured": true,
-      "expected_max_h": 24,
-      "category": "post_close",
-      "status": "NO_UPDATE_TIME",
-      "update_time": "2026-08-29 09:16"
     },
     {
       "file": "h_auto_buy_track.json",

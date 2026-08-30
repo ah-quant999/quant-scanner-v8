@@ -93,7 +93,7 @@ def check_stock_picking_ready(by='unknown'):
 def check_cloud_only(script_name='unknown'):
     """云端/CI 算法链专属护栏（主人 2026-08-20 一劳永逸令）。
 
-    根因：阿狸咪曾在本地手动跑 gen_lhb_7d / gen_top5_track 等算法产数据并推仓，
+    根因：阿狸咪曾在本地手动跑 gen_lhb_7d 等算法产数据并推仓，
     与云端算法链产物分叉，造成「本地 file:/// 版 ≠ 主站」的数据不一致。
     铁律：算法（含数据生产脚本）一律由云端算法链定时任务（v8_algo_cloud 19:15 /
     v8_cn_fetch_cloud / build_deploy 等）执行，本地只改代码+推仓+镜像拉取。

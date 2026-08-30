@@ -19,7 +19,7 @@
      造成 index.html ?v 与文件内容 sha 不符 → CDN 吐旧副本（缓存戳失配）。
      流水线才是 data/ALGO_TRACK.js 的唯一写者。
 
-维护逻辑（与 gen_top5_track.py 同构）：
+维护逻辑：
   - 每日盘后跑批：将今日各算法信号入追踪池
   - 每只追踪中的票：每天追加价格 → 判定 exit（stop/target/timeout≥90天）
   - exit 的标的移到 history，保留归档样本

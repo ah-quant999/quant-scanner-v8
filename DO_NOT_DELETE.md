@@ -106,7 +106,7 @@
 | 文件路径 | 内容描述 | 禁止删除原因 |
 |---------|---------|------------|
 | `scripts/gen_do_not_delete_js.py` | `DO_NOT_DELETE.md` → `data/DO_NOT_DELETE.js` 渲染器（轻量 md 转 HTML、disk_sha 一致性缓存戳回写 index.html） | 逻辑详解页「🛡️ 防删」子页注入源；周日 `v8_cleanup.yml` 末尾固定步骤 |
-| `scripts/apply_ic_gate.py` | **Tier 1 第 1 步**：IC 门禁 MVP。读 factor_ic_report + factor_validate + top5/h_auto_buy 累计胜率 → `raw_data/ic_gate.json` | 回测投入→选股质量变现的引擎；下游 generate_top10 / gen_triple_consensus / calc_crds 接入 |
+| `scripts/apply_ic_gate.py` | **Tier 1 第 1 步**：IC 门禁 MVP。读 factor_ic_report + factor_validate + h_auto_buy 累计胜率 → `raw_data/ic_gate.json` | 回测投入→选股质量变现的引擎；下游 generate_top10 / gen_triple_consensus / calc_crds 接入 |
 | `scripts/apply_regime_gate.py` | **Tier 1 第 2 步**：regime 自动门控。读 market_regime → `raw_data/strategy_regime_gate.json`（按利率上行/下行/平稳给各策略 weight） | regime 已算但未自动化→选股；按市道 gate 是 backtest_tdx 已发现差异的唯一免费 alpha |
 | `scripts/fetch_avg_price.py` | **新功能**：平均股价（通达信 880003）轻量 fetcher；东方财富 push2his | 主人 2026-08-29 周报期待；UI 评估后再接驾驶舱/暂未上架页 |
 | `scripts/fetch_etf_subscription_em.py` | **新功能**：ETF 申购赎回东方财富口径 fetcher（旧文件切到 5 类 + 亿元） | 主人 2026-08-29 新需求；旧 ETF_SUBSCRIPTION.js 宽基+亿份与东方财富分类不一致 |
@@ -229,3 +229,10 @@
 > - `git push` 时 pre-push hook 检测 origin 前进则自动 rebase：若工作树脏，先 `git stash push -u` 再 rebase。
 > - 本地 `init.bat`/脚本若被云回退，可用 `git reset --hard origin/main` 一键对齐（仅在用户明确放行时执行）。
 > - `stash@{0}`（最近一次工作树备份）+ `stash@{1}`（前一次 Nutstore 噪音 stash）随时可 `git stash list` 检视。
+
+---
+
+## 🟢 豁免白名单（主人 2026-08-30 令 · TOP5 滚动跟踪彻底下线）
+
+> 🟢 豁免 `data/TOP5_TRACK.js`：TOP5 滚动跟踪样本<30 长期空表，主人 2026-08-30 令彻底删除（A 方案），随孤儿脚本一并移除，无前端/下游依赖。
+> 🟢 豁免 `algorithms/gen_top5_track.py`：随 TOP5_TRACK 数据一并删除的孤儿算法脚本，run_algorithms.py 已移除其调度，无任何前端/下游依赖。

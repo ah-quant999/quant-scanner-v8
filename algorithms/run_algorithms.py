@@ -114,7 +114,6 @@ ORDER = [
     #   → raw_data/final_recommend.json + data/FINAL_RECOMMEND_DATA.js（Top5 + 全量推荐池）
     # 🛡 2026-08-26 一劳永逸：原排在 ORDER 前部，可能先于部分选股脚本完成就产出推荐。
     #   现整体移至 ORDER 末尾（见下方 track_h_auto_buy.py 之后），确保所有选股策略数据跑完后再汇总。
-    "gen_top5_track.py",               # → TOP5_TRACK.js（finalRec Top5 90 天滚动追踪盘，2026-08-13 落地/2026-08-15 改自 TOP3）
     "gen_algo_track.py",                # → ALGO_TRACK.js（四量终极/板块龙头/大牛股猎手 独立追踪，2026-08-15 落地）
     # ── 2026-08-17 主人怒令「每个前端的算法都全面审计」补入：之前完全不调度，前端卡永远陈旧 ──
     "calc_sentiment_cycle.py",          # → data/SENTIMENT_CYCLE.js（情绪周期，读 LIMIT_UP_HEATMAP；之前无任何 workflow 调用 = 孤儿）
@@ -244,7 +243,6 @@ STOCK_PICKING_SCRIPTS = {
     "gen_triple_consensus.py",       # 三重共识选股
     "gen_triple_track.py",           # 三重跟踪
     "final_recommend.py",            # 跨策略共振 Top5（管线最终产物）
-    "gen_top5_track.py",             # Top5 追踪
     "gen_algo_track.py",             # 算法追踪
     "calc_sentiment_cycle.py",       # 情绪周期（读 LIMIT_UP_HEATMAP）
     "auto_run_dn_algorithm.py",      # H 反推算法

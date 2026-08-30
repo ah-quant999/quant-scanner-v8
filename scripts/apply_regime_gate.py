@@ -13,7 +13,7 @@ apply_regime_gate.py — Tier 1 第 2 步「regime 自动门控」
   - 从 market_regime.regime.label 抽 4 类：
       利率上行/利率下行/利率平稳/利率剧烈波动
   - 按主人 2026-08-19 拍板的利率上行期板块推荐框架 + alt_groups_down_regime：
-      利率上行  → 红利/防御受益（ge3/crds 减弱 0.85、top5 中性 1.0）
+      利率上行  → 红利/防御受益（ge3/crds 减弱 0.85）
       利率下行  → 成长受益（ge3 增强 1.10、crds 增强 1.05）
       利率平稳  → 中性（all 1.0）
       利率剧烈 → fail（策略当日不出票，市道不稳）
@@ -29,12 +29,12 @@ RAW_DIR = os.path.join(ROOT, "raw_data")
 
 # 利率 regime → 策略乘子（主人 2026-08-19 拍板的板块框架的选股层映射）
 REGIME_MAP = {
-    "利率上行":    {"ge3": 0.85, "top5": 1.00, "h_auto_buy": 0.90, "crds": 0.85},
-    "利率下行":    {"ge3": 1.10, "top5": 1.00, "h_auto_buy": 1.10, "crds": 1.05},
-    "利率平稳":    {"ge3": 1.00, "top5": 1.00, "h_auto_buy": 1.00, "crds": 1.00},
-    "利率剧烈":    {"ge3": 0.0,  "top5": 0.0,  "h_auto_buy": 0.0,  "crds": 0.0},  # 触发 fail
+    "利率上行":    {"ge3": 0.85, "h_auto_buy": 0.90, "crds": 0.85},
+    "利率下行":    {"ge3": 1.10, "h_auto_buy": 1.10, "crds": 1.05},
+    "利率平稳":    {"ge3": 1.00, "h_auto_buy": 1.00, "crds": 1.00},
+    "利率剧烈":    {"ge3": 0.0,  "h_auto_buy": 0.0,  "crds": 0.0},  # 触发 fail
 }
-STRATEGIES = ["ge3", "top5", "h_auto_buy", "crds"]
+STRATEGIES = ["ge3", "h_auto_buy", "crds"]
 
 def load_json(p, default):
     if not os.path.exists(p):
