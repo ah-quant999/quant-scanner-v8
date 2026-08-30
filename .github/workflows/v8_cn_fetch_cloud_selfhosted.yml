@@ -10,7 +10,7 @@
 #   本 workflow 原用 actions/checkout@v4，但它跑在 [self-hosted, cn]，
 #   而 cn runner 上 git 协议访问 github.com 必被 Connection reset
 #   （fatal: unable to access ... Recv failure: Connection was reset，
-#     checkout 重试 3 次后 5 分钟 timeout → 整个应急兼底链 0 执行）。
+#     checkout 重试 3 次后 5 分钟 timeout → 整个应急兜底链 0 执行）。
 #   → 已改为与 v8_algo_run.yml / v8_lhb_fetch.yml 一致的
 #     「GitHub Trees/Blobs API 同步源码」路线。
 #   ❌ 严禁在本文件重新引入：actions/checkout、git clone/fetch、
@@ -37,7 +37,10 @@ concurrency:
 jobs:
   fetch:
     runs-on: [self-hosted, cn]
-    timeout-minutes: 20
+    # 2026-08-30：原 20 分钟，比云端孪生（v8_cn_fetch_cloud / _hosted 均 25）还短，
+    #   而 category=all 要跑 fetch+LHB+回填+弹性+板块RS+ETF+推送+bridge+update_v8+health
+    #   （云端同链今晚实测约 17 分钟，cn 机器更慢）→ 抬到 30，避免合法长跑被判超时红灯。
+    timeout-minutes: 30
     env:
       TZ: Asia/Shanghai
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
