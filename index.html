@@ -705,6 +705,14 @@ window.V8_CAL = {weeks:[],legend:[]};
     var d = window._parseAsCST(ts);
     if(!d || isNaN(d.getTime())) return String(ts);
     var now = new Date();
+    var hm = window._fmtHmCST(d);
+    // 🛡 2026-08-30 一劳永逸：时间戳在未来时，绝不可显示为「今日 HH:MM」误导用户。
+    //   原因是：STOCK_QUOTE snapshot_time 只有 HMS，后端曾用 date.today() 拼接出未来时间。
+    //   未来时间一律显示「⚠️ 未来 YYYY-MM-DD HH:MM」；仅允许 1 分钟时钟容差。
+    if(d.getTime() > now.getTime() + 60*1000){
+      var ds = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+      return '⚠️ 未来 ' + ds + ' ' + hm;
+    }
     var todayStr = now.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
     var dataStr  = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
     var tp = todayStr.split('/');
@@ -712,7 +720,6 @@ window.V8_CAL = {weeks:[],legend:[]};
     var today0 = new Date(+tp[0], +tp[1]-1, +tp[2]);
     var data0  = new Date(+dp[0], +dp[1]-1, +dp[2]);
     var diff = Math.round((today0 - data0) / 864e5);
-    var hm = window._fmtHmCST(d);
     if(diff >= 1 && !window._isAshareTradingDay(today0)){
       return '上一交易日收盘 ' + hm;
     }
@@ -10381,33 +10388,10 @@ function drawUpDownChart(){
     h+='</div><div style="font-size:11px;opacity:.85;">出手信号灯 → 大盘可操作区 → 最强赛道 → 共振候选 → 机构/龙虎榜验证 → 交易计划</div></div>';
     h+='</div>';
 
-    var crisis=DATA.crisis||{};
-    var cM=0,cE=0,cG=0;
-    var inds=crisis.indicators||{};
-    if(inds && Object.keys(inds).length){
-      var catSum={},catCnt={};
-      for(var ik in inds){var it=inds[ik];if(it&&it.cat&&it.score!=null){catSum[it.cat]=(catSum[it.cat]||0)+it.score;catCnt[it.cat]=(catCnt[it.cat]||0)+1;}}
-      cM=catCnt['货币']?catSum['货币']/catCnt['货币']:0;
-      cE=catCnt['经济']?catSum['经济']/catCnt['经济']:0;
-      cG=catCnt['全球']?catSum['全球']/catCnt['全球']:0;
-    } else {
-      // 兼容旧/扁平格式：后端输出 0-1 原始分，前端乘以 100
-      cM=crisis.currency||0; cE=crisis.economy||0; cG=crisis.global||0;
-    }
-    var crisisScore=Math.round((cM*0.4+cE*0.35+cG*0.25)*100);
-    var crisisTier=crisisScore>=70?'危机(红)':crisisScore>=50?'警惕(橙)':crisisScore>=30?'关注(黄)':'平稳(绿)';
-    var nf=DATA.north_fund||{};
-    var northStopped=!!nf.stopped;
-    var southH=(nf.south_history||[]).slice(-5);
-    var north5=southH.reduce(function(a,b){return a+(b.net_buy||0);},0);
-    var northDir=northStopped?'停更':(north5>0?'净流入':(north5<0?'净流出':'持平'));
-    var ma2=DATA.market_alerts||{};
-    var aIdx=(ma2.indices||[]).filter(function(x){return ['上证指数','深证成指','创业板指','科创50'].indexOf(x.name)>=0;});
-    var mktAvg=aIdx.length?aIdx.reduce(function(a,b){return a+(b.pct||0);},0)/aIdx.length:0;
-    var light,lightColor,lightBg,lightText;
-    if(crisisScore>=70||mktAvg<=-3){light='🔴 红灯 · 仅观望';lightColor='#ff6b81';lightBg='rgba(255,107,129,.14)';lightText='系统性风险偏高，不开新仓、控仓位、等企稳';}
-    else if(crisisScore>=50||(north5<0&&crisisScore>=40)||mktAvg<0){light='🟡 黄灯 · 谨慎低吸';lightColor='#ffb74d';lightBg='rgba(255,183,77,.14)';lightText='风险中性偏谨慎，仅轻仓低吸、严格止损';}
-    else {light='🟢 绿灯 · 可操作';lightColor='#5ee0a0';lightBg='rgba(94,224,160,.14)';lightText='环境平稳，按下方驾驶舱执行选股';}
+    /* 2026-08-30 主人令：驾驶舱顶部「两盏灯」（黄灯/绿灯 + 波动率 regime 卡）已删除。
+       原因：两卡均为同步指标/无回测证据，且与全站唯一择时裁决 v8MarketGate() 结论可能相反，
+       已被明确降级为「观测·非择时」。用户确认无用后彻底移除，避免占用首屏误导。
+       择时结论统一在「实时数据 → AI市场速览」顶部读取 v8MarketGate()。 */
 
     var _sffS=DATA.sector_fund_flow||{};
     var _inS=(_sffS.sectors_in||[]).slice().sort(function(a,b){return (b.net||0)-(a.net||0);});
@@ -10417,69 +10401,8 @@ function drawUpDownChart(){
     if(_inS.length){sumTxt+=_inS.length+' 个赛道当日资金净流入，<b>'+_inS[0].name+'</b> <span style="color:#ff6b81;font-weight:700;">+'+_inS[0].net+'亿</span>领衔'+(_inS[0].consecutive_days?('（连续'+_inS[0].consecutive_days+'天）'):'')+'；';}
     else {sumTxt+='当日无板块资金净流入；';}
     sumTxt+='共振≥80分 <b style="color:#ff6b81;">'+_s80S.length+'</b> 只；';
-    // 2026-08-29 主人令：本结论行只描述环境，不再自造开仓建议。
-    // 2026-08-30 主人令：全站择时裁决仅在「实时数据 → AI市场速览」展示，此处不再指向它，避免多处评判。
     sumTxt+='板块与共振见下方明细；<b style="color:#8aa0c2;">本卡为环境观测，不做开仓建议</b>';
-    h+='<div style="background:#0f1a2e;border-radius:10px;padding:10px 16px;margin-bottom:14px;box-shadow:inset 4px 0 0 0 '+lightColor+';font-size:13px;line-height:1.8;color:#dbe6f7;">📌 <b>今日结论</b>：'+sumTxt+'</div>';
-
-    /* 2026-08-30 主人令：全站择时裁决已统一收敛到「实时数据 → AI市场速览」顶部，
-       驾驶舱只保留环境观测（两盏灯），不再重复展示择时结论，避免多处评判混乱。 */
-
-    h+='<div style="display:flex;gap:14px;margin-bottom:14px;align-items:stretch;">';
-    h+='<div style="flex:1;min-width:0;background:'+lightBg+';color:'+lightColor+';border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;border:1px solid '+(crisisScore>=70||mktAvg<=-3?'rgba(255,107,129,.4)':crisisScore>=50||(north5<0&&crisisScore>=40)||mktAvg<0?'rgba(255,183,77,.4)':'rgba(94,224,160,.4)')+';">';
-    h+='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">';
-    h+='<span style="font-size:15px;font-weight:700;">'+light+'</span>';
-    h+='<span style="font-size:10px;color:'+lightColor+';background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px;font-weight:500;">宏观环境</span>';
-    // 2026-08-29 主人令：灯1 明确标注为「观测」，非择时（mktAvg 为同步指标，无前瞻性；无回测证据）
-    h+='<span style="font-size:10px;color:#8aa0c2;background:rgba(148,163,184,.14);border:1px solid rgba(148,163,184,.35);padding:1px 6px;border-radius:4px;font-weight:600;">🔭 观测 · 非择时</span>';
-    h+='</div>';
-    h+='<div style="font-size:12px;line-height:1.7;flex:1;">'+lightText+'</div>';
-    h+='<div style="font-size:11px;opacity:.95;margin-top:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;line-height:1.5;">';
-    h+='<div style="background:rgba(255,255,255,.10);border-radius:5px;padding:5px 7px;"><div style="opacity:.7;font-size:10px;">危机雷达</div><div style="font-weight:700;font-size:14px;">'+crisisScore+' <span style="font-size:10px;font-weight:500;opacity:.85;">· '+crisisTier+'</span></div></div>';
-    h+='<div style="background:rgba(255,255,255,.10);border-radius:5px;padding:5px 7px;"><div style="opacity:.7;font-size:10px;">南向 5日</div><div style="font-weight:700;font-size:14px;">'+northDir+' <span style="font-weight:500;opacity:.85;">'+(northStopped?'-':north5.toFixed(1)+'亿')+'</span></div></div>';
-    h+='<div style="background:rgba(255,255,255,.10);border-radius:5px;padding:5px 7px;"><div style="opacity:.7;font-size:10px;">主要指数均涨</div><div style="font-weight:700;font-size:14px;">'+mktAvg.toFixed(2)+'%</div></div>';
-    h+='</div></div>';
-
-    var vol=DATA.volatility||{};
-    var volC=vol.composite||{};
-    var volUpd=(vol.update_time||'').substring(0,16)||'-';
-    var volRegime=volC.regime||'暂无数据';
-    var volRegimeCode=volC.regime_code||'unknown';
-    var volPastelMap={'stabilize':'rgba(94,224,160,.14)','grind':'rgba(255,183,77,.14)','rebound_diverge':'rgba(127,180,255,.14)','panic':'rgba(255,107,129,.14)'};
-    var volPastelTextMap={'stabilize':'#5ee0a0','grind':'#ffb74d','rebound_diverge':'#7fb4ff','panic':'#ff6b81'};
-    var volBg=volPastelMap[volRegimeCode]||'rgba(240,240,240,.10)';
-    var volTxtColor=volPastelTextMap[volRegimeCode]||'#dbe6f7';
-    var volHasData=vol.available&&vol.indices&&vol.indices.length>0;
-    var volRegimeIcon=volRegimeCode==='stabilize'?'🟢':volRegimeCode==='grind'?'🟡':volRegimeCode==='rebound_diverge'?'🔵':volRegimeCode==='panic'?'🔴':'⚪';
-    // 2026-08-29 主人令：stabilize 箭头 ▲ → ━ —— 「企稳」是横盘不是上涨，▲ 会误导为看多；
-    //   且本灯与「全站择时裁决」同 regime 却结论相反（裁决=⛔不开仓），故仅作观测。
-    var volRegimeArrow=volRegimeCode==='stabilize'?'━':volRegimeCode==='grind'?'━':volRegimeCode==='rebound_diverge'?'▲':volRegimeCode==='panic'?'▼':'·';
-    var volSubtitle=volRegimeCode==='stabilize'?'价稳 + 波动收敛 → 企稳整理':volRegimeCode==='grind'?'价未止跌 + 波动收敛 → 阴跌磨底':volRegimeCode==='rebound_diverge'?'价反弹 + 波动仍升 → 反弹分歧':volRegimeCode==='panic'?'价跌 + 波动升 → 恐慌下行':'波动率数据不足';
-    h+='<div style="flex:1;min-width:0;background:'+volBg+';color:'+volTxtColor+';border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;border:1px solid '+(volPastelMap[volRegimeCode]||'rgba(224,224,224,.3)')+';">';
-    h+='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">';
-    h+='<span style="font-size:15px;font-weight:700;">'+volRegimeIcon+' '+volRegimeArrow+' '+volRegime+'</span>';
-    h+='<span style="font-size:10px;color:'+volTxtColor+';background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px;font-weight:500;">短期波动结构</span>';
-    // 2026-08-29 主人令：灯2 标注「观测」—— 无回测证据，且与全站择时裁决（同 regime）结论可能相反
-    h+='<span style="font-size:10px;color:#8aa0c2;background:rgba(148,163,184,.14);border:1px solid rgba(148,163,184,.35);padding:1px 6px;border-radius:4px;font-weight:600;">🔭 观测 · 非择时</span>';
-    h+='</div>';
-    h+='<div style="font-size:12px;line-height:1.6;flex:1;opacity:.95;font-weight:500;">'+volSubtitle+'</div>';
-    if(volHasData){
-      h+='<div style="font-size:11px;margin-top:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;line-height:1.5;">';
-      h+='<div style="background:rgba(255,255,255,.08);border-radius:5px;padding:5px 7px;"><div style="opacity:.7;font-size:10px;">20日波动·长端</div><div style="font-weight:700;font-size:14px;">'+(volC.avg_vol_20d!=null?volC.avg_vol_20d.toFixed(1)+'%':'—')+'</div></div>';
-      h+='<div style="background:rgba(255,255,255,.08);border-radius:5px;padding:5px 7px;"><div style="opacity:.7;font-size:10px;">5日波动·短端</div><div style="font-weight:700;font-size:14px;">'+(volC.avg_vol_5d!=null?volC.avg_vol_5d.toFixed(1)+'%':'—')+'</div></div>';
-      h+='<div style="background:rgba(255,255,255,.08);border-radius:5px;padding:5px 7px;"><div style="opacity:.7;font-size:10px;">短长差</div><div style="font-weight:700;font-size:14px;">'+(volC.vol_short_vs_long_pct!=null?(volC.vol_short_vs_long_pct>0?'+':'')+volC.vol_short_vs_long_pct.toFixed(1)+'%':'—')+'</div></div>';
-      h+='</div>';
-      h+='<div style="font-size:11px;opacity:.78;line-height:1.55;margin-top:8px;border-top:1px solid rgba(255,255,255,.1);padding-top:6px;">'+(volC.signal_summary||'短期波动已纳入观察')+'</div>';
-    } else {
-      h+='<div style="font-size:12px;opacity:.85;line-height:1.6;flex:1;padding:8px 0;">波动率数据暂不可用（指数日K未取到），不展示估算值。</div>';
-      h+='<div style="font-size:11px;margin-top:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;line-height:1.5;">';
-      h+='<div style="background:rgba(255,255,255,.08);border-radius:5px;padding:5px 7px;opacity:.55;text-align:center;">—</div>';
-      h+='<div style="background:rgba(255,255,255,.08);border-radius:5px;padding:5px 7px;opacity:.55;text-align:center;">—</div>';
-      h+='<div style="background:rgba(255,255,255,.08);border-radius:5px;padding:5px 7px;opacity:.55;text-align:center;">—</div>';
-      h+='</div>';
-    }
-    h+='</div>';
-    h+='</div>';
+    h+='<div style="background:#0f1a2e;border-radius:10px;padding:10px 16px;margin-bottom:14px;box-shadow:inset 4px 0 0 0 #fbbf24;font-size:13px;line-height:1.8;color:#dbe6f7;">📌 <b>今日结论</b>：'+sumTxt+'</div>';
 
     // ── 驾驶舱 A/B 档推荐（直接列出回测口径的 A/B 档股票，2026-08-18 主人令）──
     var _ctr = window.COCKPIT_TIER_RECOMMEND || {};
@@ -11161,8 +11084,10 @@ function drawUpDownChart(){
 
     // ── pane4: 🧪 调试专区 ──
     h+='<div class="ul-pane" id="ulPaneDbg" style="display:'+(_ulAct==='dbg'?'block':'none')+'">';
-
-    h+='</div>';  // /调试卡（斐波那契F观测窗已于 2026-08-29 主人令移至已下架·麦波那契窗口下方）
+    // 2026-08-30 根因修复：调试专区容器曾因提前闭合（line 11172 旧 bug）导致
+    //   AI预测/潜力挖掘/ETF龙头/个股动量状态 四卡溢出到两个子Tab之外，
+    //   造成「强势突破」与「调试专区」内容一模一样。现保持容器打开直到 line 11465，
+    //   把这些卡真正收进调试专区；强势突破 pane 只保留三卡。
 
     // ── 2026-08-29 主人令：AI 预测 + 潜力挖掘 2 卡并入调试专区（删 AI 预测 / 潜力挖掘 子页面后补位） ──
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';
@@ -11456,7 +11381,6 @@ function drawUpDownChart(){
     h+='</div>';  // /个股动量状态卡
 
 h+='</div>';  // /ulPaneDbg
-    h+='</div>';
 
     // ── 🛡 2026-08-19 主人令：2 张新卡（宏观+板块推荐）暂未上架实验区 · 调试专区底部 ──
     //    2026-08-20 主人令：路径概率预测卡已迁出调试专区 → 独立「AI 预测」子TAB（潜力挖掘删除，算法链 19:15 自动更新）
@@ -12657,6 +12581,72 @@ h+='</div>';  // /ulPaneDbg
 h+='<div style="background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,191,36,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#fbbf24;border-radius:8px;margin:16px 0 10px 0;">🌅 盘前（开盘前观测）</div>';
     /* 2026-08-30 主人令：观测候选股池已作为选股策略子页，删除已下架中的重复卡片 */
 
+    // 2026-08-30 主人令：斐波那契双卡 + 商品涨价弹性榜三卡置顶到「已下架」顶部，盘前条幅下方。
+    //   原在盘后分组底部，现作为首屏辅助观测卡常驻。
+    h+=`<div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📉</span>斐波那契窗口 · 当前回调状态<span class="fresh" id="phFibTime">—</span></h3>
+      <div style="font-size:11px;color:var(--dim);margin:-6px 0 10px 0;line-height:1.5;">📌 基于日K收盘数据计算，仅收盘后更新，盘前/盘中不刷新</div>
+      <div class="ph-fib-grid" id="phFibGrid">
+        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibDays">--</div><div class="ph-fib-lbl">已回调交易日</div></div>
+        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibPct">--</div><div class="ph-fib-lbl">累计跌幅</div></div>
+        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibPoints">--</div><div class="ph-fib-lbl">下跌点数</div></div>
+        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibNext">--</div><div class="ph-fib-lbl" id="phFibNextLbl">下一窗口跟踪</div></div>
+      </div>
+      <div class="ph-fib-badge" id="phFibBadge">--</div>
+    </div>`;
+    h+=`<div class="card" style="margin-bottom:16px;border-left:4px solid #7b1fa2;">`;
+    h+=v8CardHeader('🧪','斐波那契F观测窗','','update_time',window.SH_FIB);
+    var _fib2=window.SH_FIB||{};
+    h+=`<div style="padding:12px 14px;">`;
+    if(_fib2.windows&&_fib2.windows.length){
+      var _trig2=_fib2.windows.filter(function(w){return w.status==='triggered'||w.status==='tracking';}).slice(0,3);
+      var _fut2=_fib2.windows.filter(function(w){return w.status==='future';}).slice(0,3);
+      var _miss2=_fib2.windows.filter(function(w){return w.status==='missed';}).slice(0,3);
+      var _fibDescMap={'F(3)':'小反弹','F(5)':'短期变盘','F(8)':'8日变盘','F(13)':'13日重要','F(21)':'中期转折','F(34)':'趋势确认','F(55)':'大周期拐点'};
+      h+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">`;
+      h+=`<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25);border-radius:8px;padding:12px;">`;
+      h+=`<div style="font-weight:700;color:#a78bfa;margin-bottom:8px;font-size:13px;">⏱️ F窗口</div>`;
+      if(_trig2.length){
+        h+=`<div style="font-size:12px;color:#1D9E75;margin-bottom:8px;line-height:1.6;">⚡ 已触发/追踪：`+_trig2.map(function(w){return w.name+`(`+(w.date||'').slice(5)+`)`;}).join(' ')+`</div>`;
+      } else { h+=`<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">暂无触发窗口</div>`; }
+      if(_fut2.length){
+        var _next2=_fut2[0];
+        h+=`<div style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);border-radius:6px;padding:8px 10px;margin-bottom:8px;">`;
+        h+=`<div style="font-size:11px;color:var(--sub);margin-bottom:3px;">📍 下个转折点</div>`;
+        h+=`<div style="font-size:15px;font-weight:700;color:#d0bcff;line-height:1.4;">`+_next2.name+` `+_next2.date+`</div>`;
+        h+=`<div style="font-size:11px;color:var(--sub);margin-top:3px;">距今 `+(_next2.days_left>=0?_next2.days_left:0)+` 天 · `+(_next2.desc||'')+`</div>`;
+        h+=`</div>`;
+        h+=`<div style="font-size:11px;color:var(--sub);margin-top:6px;line-height:1.8;">`;
+        _fut2.forEach(function(w){
+          h+=`<span style="display:inline-block;margin-right:12px;white-space:nowrap;color:var(--txt);">`+w.name+` <span style="color:#a78bfa">`+w.date.slice(5)+`</span> `+(_fibDescMap[w.name]||'')+` <span style="color:var(--dim)">距`+(w.days_left>=0?w.days_left:0)+`天</span></span>`;
+        });
+        h+=`</div>`;
+      }
+      h+=`</div>`;
+      h+=`<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:8px;padding:12px;">`;
+      h+=`<div style="font-weight:700;color:var(--cyan);margin-bottom:8px;font-size:13px;">📐 缠论视角</div>`;
+      if(_fib2.current){
+        h+=`<div style="font-size:13px;color:var(--txt);line-height:1.6;">从 <b>`+(_fib2.current.peak_date||'--').slice(5)+`</b> 高点回调 <b>`+(_fib2.current.days_down||0)+`天</b></div>`;
+        h+=`<div style="font-size:13px;color:`+(_fib2.current.total_pct>=0?'var(--up)':'var(--down)')+`;margin-top:6px;line-height:1.6;">累计 `+_fib2.current.total_pct+`%，模式：`+(_fib2.current.mode||'—')+`</div>`;
+      } else { h+=`<div style="font-size:13px;color:var(--dim);">暂无中枢数据</div>`; }
+      h+=`</div>`;
+      h+=`<div style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:8px;padding:12px;">`;
+      h+=`<div style="font-weight:700;color:var(--down);margin-bottom:8px;font-size:13px;">🛡️ 窗口失效应对</div>`;
+      if(_miss2.length){
+        h+=`<div style="font-size:12px;color:var(--dim);line-height:1.6;">近3个失效：`+_miss2.map(function(w){return w.name+`(`+(w.date||'').slice(5)+`)`;}).join(' ')+`</div>`;
+      }
+      h+=`<div style="font-size:12px;color:var(--sub);margin-top:6px;line-height:1.5;">F窗口跌破或放量未反 → 按原计划止损，不追加。</div>`;
+      h+=`</div>`;
+      h+=`</div>`;
+    } else {
+      h+=`<div class="note" style="text-align:center;">已下架数据暂不可用</div>`;
+    }
+    h+=`</div></div>`;
+    h+=`<div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
+      <h3><span class="ic">💹</span>商品涨价弹性榜 <span class="fresh" id="prCEFresh">—</span></h3>
+      <div id="ceBody"><div class="note">加载中…</div></div>
+    </div>`;
+
     /* ===== 📊 盘中 ===== */
 h+='<div style="background:linear-gradient(135deg,rgba(56,189,248,.18),rgba(56,189,248,.08));padding:8px 14px;font-size:13px;font-weight:700;color:#38bdf8;border-radius:8px;margin:16px 0 10px 0;">📊 盘中（实时页指标）</div>';
 h+='    <!-- 📈 上证+深证 每日成交金额（实时页最下面 · 2026-08-14 主人令迁移） -->';
@@ -12876,73 +12866,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       </div>
     </div>`;
 
-    /* ===== 已下架·盘后观测（2026-08-29 主人令：斐波那契窗口 + 商品涨价弹性榜下沉，辅助参考 · 保留可查） ===== */
-    h+=`<div style="display:inline-block;margin:14px 0 8px 0;padding:4px 10px;font-size:11.5px;font-weight:700;color:#c4b5fd;background:rgba(167,139,250,.10);border:1px solid rgba(167,139,250,.28);border-radius:6px;">└ 📉 盘后 · 已下架观测（斐波那契 / 商品涨价弹性榜）</div>`;
-    h+=`<div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📉</span>斐波那契窗口 · 当前回调状态<span class="fresh" id="phFibTime">—</span></h3>
-      <div style="font-size:11px;color:var(--dim);margin:-6px 0 10px 0;line-height:1.5;">📌 基于日K收盘数据计算，仅收盘后更新，盘前/盘中不刷新</div>
-      <div class="ph-fib-grid" id="phFibGrid">
-        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibDays">--</div><div class="ph-fib-lbl">已回调交易日</div></div>
-        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibPct">--</div><div class="ph-fib-lbl">累计跌幅</div></div>
-        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibPoints">--</div><div class="ph-fib-lbl">下跌点数</div></div>
-        <div class="ph-fib-card"><div class="ph-fib-val" id="phFibNext">--</div><div class="ph-fib-lbl" id="phFibNextLbl">下一窗口跟踪</div></div>
-      </div>
-      <div class="ph-fib-badge" id="phFibBadge">--</div>
-    </div>`;
-    // 2026-08-29 主人令：斐波那契F观测窗从调试专区移至已下架（麦波那契窗口下方）
-    h+=`<div class="card" style="margin-bottom:16px;border-left:4px solid #7b1fa2;">`;
-    h+=v8CardHeader('🧪','斐波那契F观测窗','','update_time',window.SH_FIB);
-    var _fib2=window.SH_FIB||{};
-    h+=`<div style="padding:12px 14px;">`;
-    if(_fib2.windows&&_fib2.windows.length){
-      var _trig2=_fib2.windows.filter(function(w){return w.status==='triggered'||w.status==='tracking';}).slice(0,3);
-      var _fut2=_fib2.windows.filter(function(w){return w.status==='future';}).slice(0,3);
-      var _miss2=_fib2.windows.filter(function(w){return w.status==='missed';}).slice(0,3);
-      var _fibDescMap={'F(3)':'小反弹','F(5)':'短期变盘','F(8)':'8日变盘','F(13)':'13日重要','F(21)':'中期转折','F(34)':'趋势确认','F(55)':'大周期拐点'};
-      h+=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">`;
-      h+=`<div style="background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25);border-radius:8px;padding:12px;">`;
-      h+=`<div style="font-weight:700;color:#a78bfa;margin-bottom:8px;font-size:13px;">⏱️ F窗口</div>`;
-      if(_trig2.length){
-        h+=`<div style="font-size:12px;color:#1D9E75;margin-bottom:8px;line-height:1.6;">⚡ 已触发/追踪：`+_trig2.map(function(w){return w.name+`(`+(w.date||'').slice(5)+`)`;}).join(' ')+`</div>`;
-      } else { h+=`<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">暂无触发窗口</div>`; }
-      if(_fut2.length){
-        var _next2=_fut2[0];
-        h+=`<div style="background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);border-radius:6px;padding:8px 10px;margin-bottom:8px;">`;
-        h+=`<div style="font-size:11px;color:var(--sub);margin-bottom:3px;">📍 下个转折点</div>`;
-        h+=`<div style="font-size:15px;font-weight:700;color:#d0bcff;line-height:1.4;">`+_next2.name+` `+_next2.date+`</div>`;
-        h+=`<div style="font-size:11px;color:var(--sub);margin-top:3px;">距今 `+(_next2.days_left>=0?_next2.days_left:0)+` 天 · `+(_next2.desc||'')+`</div>`;
-        h+=`</div>`;
-        h+=`<div style="font-size:11px;color:var(--sub);margin-top:6px;line-height:1.8;">`;
-        _fut2.forEach(function(w){
-          h+=`<span style="display:inline-block;margin-right:12px;white-space:nowrap;color:var(--txt);">`+w.name+` <span style="color:#a78bfa">`+w.date.slice(5)+`</span> `+(_fibDescMap[w.name]||'')+` <span style="color:var(--dim)">距`+(w.days_left>=0?w.days_left:0)+`天</span></span>`;
-        });
-        h+=`</div>`;
-      }
-      h+=`</div>`;
-      h+=`<div style="background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.25);border-radius:8px;padding:12px;">`;
-      h+=`<div style="font-weight:700;color:var(--cyan);margin-bottom:8px;font-size:13px;">📐 缠论视角</div>`;
-      if(_fib2.current){
-        h+=`<div style="font-size:13px;color:var(--txt);line-height:1.6;">从 <b>`+(_fib2.current.peak_date||'--').slice(5)+`</b> 高点回调 <b>`+(_fib2.current.days_down||0)+`天</b></div>`;
-        h+=`<div style="font-size:13px;color:`+(_fib2.current.total_pct>=0?'var(--up)':'var(--down)')+`;margin-top:6px;line-height:1.6;">累计 `+_fib2.current.total_pct+`%，模式：`+(_fib2.current.mode||'—')+`</div>`;
-      } else { h+=`<div style="font-size:13px;color:var(--dim);">暂无中枢数据</div>`; }
-      h+=`</div>`;
-      h+=`<div style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.25);border-radius:8px;padding:12px;">`;
-      h+=`<div style="font-weight:700;color:var(--down);margin-bottom:8px;font-size:13px;">🛡️ 窗口失效应对</div>`;
-      if(_miss2.length){
-        h+=`<div style="font-size:12px;color:var(--dim);line-height:1.6;">近3个失效：`+_miss2.map(function(w){return w.name+`(`+(w.date||'').slice(5)+`)`;}).join(' ')+`</div>`;
-      }
-      h+=`<div style="font-size:12px;color:var(--sub);margin-top:6px;line-height:1.5;">F窗口跌破或放量未反 → 按原计划止损，不追加。</div>`;
-      h+=`</div>`;
-      h+=`</div>`;
-    } else {
-      h+=`<div class="note" style="text-align:center;">已下架数据暂不可用</div>`;
-    }
-    h+=`</div></div>`;
-    h+=`<div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">
-      <h3><span class="ic">💹</span>商品涨价弹性榜 <span class="fresh" id="prCEFresh">—</span></h3>
-      <div id="ceBody"><div class="note">加载中…</div></div>
-    </div>`;
-
+    /* 2026-08-30 主人令：斐波那契双卡 + 商品涨价弹性榜三卡已上移至「已下架」顶部盘前条幅下方 */
 
     el.innerHTML=h;
     drawV8MarginChart();

@@ -67,15 +67,6 @@ def main():
     for v in stocks_q.values():
         if v.get("snapshot_time") and v["snapshot_time"] > latest_snap_hms:
             latest_snap_hms = v["snapshot_time"]
-    # 拼接当日日期（HMS 不含日期）；按 stocks_q 第一只带 snapshot_time 的 date_or_meta 推日期
-    # 简化：从 quote_meta.update_time 取日期 + max snapshot_time（已是当日）
-    from datetime import datetime, date
-    # 🛡 2026-08-19 一劳永逸修复补丁2：日期部分用 today()，而非 meta.update_time[:10]
-    #   STOCK_QUOTE.meta.update_time 是早上 cn_fetch 写入的（陈旧"08-18 04:07"误判），
-    #   实际 snapshot_time 是 15:36（盘中数据）。若 today() 跨日（凌晨跑）而 snapshot 仍
-    #   是上一交易日盘中，应取 snapshot 当日；目前简化为 today()，盘中 cron 跑不会跨日。
-    sq_date_part = date.today().strftime("%Y-%m-%d")
-    live_track_generated = f"{sq_date_part} {latest_snap_hms}" if latest_snap_hms else ut
 
     # code -> quote（去前缀归一）
     by_code = {}
@@ -158,6 +149,14 @@ def main():
     # 🛡 2026-08-19 一劳永逸修复：generated = STOCK_QUOTE 实际最新 snapshot（而非 now）
     #   STOCK_QUOTE.meta.update_time 是早上 cn_fetch 写入的（08-18 04:07 误判），
     #   实际 snapshot_time 是 15:36（盘中数据）。用 live_track_generated 让"更新于"与股价同源。
+    # 🛡 2026-08-30 二修：sq_date_part 必须用「真实数据日期」（交易日即当天，非交易日回退上一交易日），
+    #   杜绝周日/假期把上一交易日 snapshot_time 拼接成「未来今日 16:29」的 bug。
+    import sys
+    sys.path.insert(0, ROOT)
+    from v8_date import today_data_date
+    sys.path.pop(0)
+    sq_date_part = today_data_date()
+    live_track_generated = f"{sq_date_part} {latest_snap_hms}" if latest_snap_hms else now
     out_generated = live_track_generated or now
     out = {
         "generated": out_generated,
