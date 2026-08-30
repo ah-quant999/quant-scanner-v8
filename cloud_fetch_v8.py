@@ -1020,7 +1020,7 @@ def _fetch_overseas_indices():
 
 
 def f_overseas_markets():
-    """海外/亚太股市观测（盘前生成，注册于 OVERSEAS_MARKETS→premarket）。
+    """海外/亚太股市观测（注册于 OVERSEAS_MARKETS→intraday，盘中每30分刷新）。
     恒生指数/日经225/韩国KOSPI/台湾加权：反映亚太风险偏好，对 A 股开盘与外资流向有传导。
     数据真实抓取，失败时 value=None（前端标注「数据未接入」），绝不编造点位。"""
     idx = _fetch_overseas_indices()

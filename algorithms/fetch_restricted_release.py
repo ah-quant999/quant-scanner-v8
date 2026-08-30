@@ -35,6 +35,7 @@ def fetch_restricted_release():
     ranges = {
         "d7": (today, today + timedelta(days=7)),
         "d30": (today, today + timedelta(days=30)),
+        "d60": (today, today + timedelta(days=60)),  # 2026-08-31：盘后解禁日历凑 4 列
         "d90": (today, today + timedelta(days=90)),
     }
     all_items = []
