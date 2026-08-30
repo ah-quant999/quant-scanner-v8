@@ -1305,7 +1305,12 @@ def check_data_cards():
 
         # 空值检测
         empty_fields = []
-        if not weekend_skip and not prem_cleared_expected:
+        # 🛡 2026-08-30 一劳永逸：available=False = 抓取失败/占位符状态
+        # （如 fetch_avg_price 三源取数失败写占位符，前端已优雅降级显示「云端抓取中」）。
+        # 此时关键字段为空属预期，不应报"关键字段空值"误告警；
+        # 若占位符长期未刷新（age>max_age）说明抓取持续失败，仍由下方 age 逻辑判 fail。
+        intentional_empty = data.get("available") is False
+        if not weekend_skip and not prem_cleared_expected and not intentional_empty:
             for f in d["key_fields"]:
                 v = data.get(f)
                 # 🔴 2026-08-17 一劳永逸修复：原 line 944 把 v == [] 当"空值"会误报
@@ -1327,9 +1332,14 @@ def check_data_cards():
         elif prem_cleared_expected:
             status = "ok"
             msg = f"盘前已清空，等待开盘后刷新（预期行为）；{rel}"
+        elif intentional_empty and status != "fail":
+            status = "ok"
+            msg += "；抓取占位符（available=false，前端显示抓取中，下轮自愈）"
         elif empty_fields:
             msg += f"；关键字段空值：{', '.join(empty_fields)}"
         if status == "fail":
+            if intentional_empty:
+                msg += "；占位符长期未刷新（抓取疑似持续失败）"
             msg += f"；超过阈值 {max_age} 分钟"
         _emit(d, {
             "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
