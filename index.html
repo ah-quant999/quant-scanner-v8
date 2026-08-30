@@ -4317,11 +4317,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
 
       <div class="card">
-        <h3><span class="ic">📈</span>今日业绩预告 - 说明（2026-08-30 主人令）</h3>
+        <h3><span class="ic">📈</span>今日业绩预告 - 说明（2026-08-30 主人令 / 2026-08-31 口径修正）</h3>
         <div class="logic-h">定位</div>
-        <div class="logic-p">展示「今日」发布业绩预告的公司中预增/扭亏 TOP，位于<b>今日事件</b> tab。当日无预告时仍显示卡片（显示 0 家），不隐藏。</div>
+        <div class="logic-p">只统计<b>公告日为当日</b>的业绩预告（预增/预减/预亏/不确定 + 今日预增 TOP4），位于<b>今日事件</b> tab。当日无新增时不隐藏，显示「今日（日期）无新增业绩预告」并附最近一批公告日期与家数。</div>
         <div class="logic-h">数据口径</div>
-        <div class="logic-p"><code>PERFORMANCE_FORECAST</code>（东方财富业绩预告 stock_yjyg_em）。日频更新，盘前 08:25 抓取。</div>
+        <div class="logic-p"><code>PERFORMANCE_FORECAST</code>（东方财富业绩预告 stock_yjyg_em）。日频更新，盘前 08:25 抓取。抓取时按<b>公告日期</b>筛出 <code>today_summary</code> / <code>today_items</code>；<code>summary</code> 仍是<b>全报告期累计</b>，两口径不混用。</div>
+        <div class="logic-h">与盘后「业绩预告」卡的区别</div>
+        <div class="logic-p">本卡 = <b>当日新增</b>视角；盘后「业绩预告」卡 = <b>全报告期累计</b>视角（预增 1702 / 预减 616 / 预亏 837 / 不确定 1724 一类全量数）。二者非重复。</div>
+        <div class="logic-h">降级规则</div>
+        <div class="logic-p">若数据文件尚未带今日字段（云端抓取前），卡片顶部显式标注「下方为全报告期累计，不是今日数」，<b>绝不把累计数冒充今日数</b>。</div>
       </div>
 
     </div>
@@ -8813,7 +8817,7 @@ function drawUpDownChart(){
 
           {name:'今日解禁', source:'RESTRICTED_RELEASE', freq:'每日盘前', slots:['08:25'], weekendUpdate:false, note:'今日限售股解禁家数与解禁市值 TOP；当日无解禁也显示'},
 
-          {name:'今日业绩预告', source:'PERFORMANCE_FORECAST', freq:'每日盘前', slots:['08:25'], weekendUpdate:false, note:'今日发布业绩预告的公司中预增/扭亏 TOP；当日无预告也显示'},
+          {name:'今日业绩预告', source:'PERFORMANCE_FORECAST', freq:'每日盘前', slots:['08:25'], weekendUpdate:false, note:'仅统计公告日为当日的预告（today_summary/today_items）；当日无新增也显示并附最近一批公告日期'},
 
           {name:'今日判定', source:'JUDGMENT_DATA', freq:'每日盘后', slots:['17:30'], weekendUpdate:false, note:'环境态势综合判定（仅交易日盘前更新）'},
 
@@ -8879,7 +8883,7 @@ function drawUpDownChart(){
 
           {name:'解禁日历', source:'RESTRICTED_RELEASE', freq:'每日盘前', slots:['08:25'], note:'未来 7/30/90 天限售股解禁家数与市值 TOP'},
 
-          {name:'业绩预告', source:'PERFORMANCE_FORECAST', freq:'每日盘前', slots:['08:25'], note:'财报季预增/预减/预亏/不确定汇总与预增 TOP'},
+          {name:'业绩预告', source:'PERFORMANCE_FORECAST', freq:'每日盘前', slots:['08:25'], note:'全报告期累计（预增/预减/预亏/不确定）与预增 TOP，非今日口径'},
 
           {name:'危机雷达', source:'CRISIS_DATA', freq:'收盘后1次', slots:['17:30'], note:'尾部风险监控'},
 
@@ -8942,7 +8946,7 @@ function drawUpDownChart(){
           {name:'每日数据体检', source:'HEALTH_CHECK', freq:'每日2次', slots:['09:00','17:00'], note:'数据完整性检查 · 覆盖构建/部署/备份健康'},
 
 
-          {name:'运维常态巡检 (v8_ops_self_heal)', source:'HEALTH_CHECK', freq:'每30分(云端cron)', slots:['00:30','01:00','01:30','02:00','02:30','03:00','03:30','04:00','04:30','05:00','05:30','06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00','22:30','23:00','23:30'], note:'v8_health_check.py --heal 全站42卡巡检+自动治愈 · 纯云端不依赖小九/阿狸咪'},
+          {name:'运维常态巡检 (v8_ops_self_heal)', source:'HEALTH_CHECK', freq:'每30分(云端cron)', slots:['00:30','01:00','01:30','02:00','02:30','03:00','03:30','04:00','04:30','05:00','05:30','06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00','22:30','23:00','23:30'], note:'v8_health_check.py --heal 全站109卡巡检+自动治愈 · 纯云端不依赖小九/阿狸咪 · 兜底 cron 08,38 * * * 真正全天每30分（8/31 修，废除原 22:00-09:00 静默时段，消除 09:30 开盘后 38 分钟巡检真空）'},
 
           {name:'☁️ 持仓云端同步 (westock)', source:'PORTFOLIO_DATA', freq:'盘中每30分', slots:['09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'westock 双机同步·实时持仓成本（操作信号面板②维止损锚点）',
             // 🛡 2026-08-19 一劳永逸：westock 源可能未接入（用户没开云端联结）→ 整行不报红叉，免误报
@@ -9564,30 +9568,46 @@ function drawUpDownChart(){
   }
   window.renderTodayEventRestricted = renderTodayEventRestricted;
 
-  /* ---- 11. 今日业绩预告（今日事件 tab） ---- */
+  /* ---- 11. 今日业绩预告（今日事件 tab · 仅统计「当日公告」的预告） ---- */
   function renderTodayEventForecast(d){
     const $b=$('todayEventForecastBody'), $t=$('todayEventForecastTime');
     if(!$b) return;
     if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">业绩预告数据暂不可用</div>'; if($t) $t.innerHTML='—'; return; }
-    const s=d.summary||{};
-    const total=(s.increase||0)+(s.decrease||0)+(s.loss||0)+(s.uncertain||0);
-    let h='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-bottom:10px;">';
+    // 2026-08-31：本卡必须是「今日公告」口径，与盘后「业绩预告」（全报告期累计）严格区分。
+    //   数据源 today_summary / today_items 由云端抓取时按公告日期（notice_date）筛出；
+    //   若数据文件尚未带今日字段，只给累计值并明确标注，绝不把累计数冒充今日数。
+    const hasToday = !!(d.today_summary && typeof d.today_summary.total === 'number');
+    // 无今日字段时退化为全报告期累计，但必须显式标注口径，避免把累计数误读成今日数
+    const s = hasToday ? d.today_summary : (d.summary||{});
+    let h='';
+    if(!hasToday){
+      h+='<div style="font-size:12px;color:var(--sub);padding:6px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;margin-bottom:10px;">'
+        +'今日口径需云端下次抓取后生效；下方为<b style="color:var(--txt);">全报告期累计</b>（共 '+((d.summary&&d.summary.total)||'—')+' 家），<b>不是今日数</b>。</div>';
+    }
+    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;">';
     h+='<div style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--up);">预增</div><div style="font-size:18px;font-weight:800;color:var(--up);">'+(s.increase||0)+'</div></div>';
     h+='<div style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--down);">预减</div><div style="font-size:18px;font-weight:800;color:var(--down);">'+(s.decrease||0)+'</div></div>';
     h+='<div style="background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.25);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--sub);">预亏</div><div style="font-size:18px;font-weight:800;color:var(--sub);">'+(s.loss||0)+'</div></div>';
     h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--txt);">不确定</div><div style="font-size:18px;font-weight:800;color:var(--txt);">'+(s.uncertain||0)+'</div></div>';
-    if(total) h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--sub);">合计</div><div style="font-size:18px;font-weight:800;color:var(--txt);">'+total+'</div></div>';
     h+='</div>';
-    h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">TOP 预增 / 扭亏</div>';
-    h+='<div style="display:flex;flex-direction:column;gap:6px;">';
-    d.items.slice(0,5).forEach(it=>{
-      const col=it.change_pct>=0?'var(--up)':'var(--down)';
-      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;">';
-      h+='<span style="font-size:12px;color:var(--txt);">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.code+'</span> <span style="font-size:10px;color:var(--sub);">'+it.type+'</span></span>';
-      h+='<span style="font-size:12px;font-weight:700;color:'+col+';">'+(it.change_pct>=0?'+':'')+Number(it.change_pct).toFixed(0)+'%</span>';
+    const tList = hasToday ? (d.today_items||[]) : [];
+    if(hasToday && !tList.length){
+      // 今日无新增预告：不隐藏，给出最近一批公告日期与家数（盘后/非财报季常见）
+      const ld = d.latest_notice_date ? ('最近一批公告 '+d.latest_notice_date+'（'+((d.latest_notice_count)||0)+' 家）') : '暂无近期公告批次';
+      h+='<div style="font-size:12px;color:var(--sub);padding:8px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;">今日（'+(d.today_date||'—')+'）无新增业绩预告 · '+ld+'</div>';
+    }else{
+      h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">'+(hasToday?'今日发布 · TOP 预增':'TOP 预增 / 扭亏')+'</div>';
+      h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;">';
+      const list = hasToday ? tList.slice(0,4) : d.items.slice(0,4);
+      list.forEach(it=>{
+        const col=it.change_pct>=0?'var(--up)':'var(--down)';
+        h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;">';
+        h+='<span style="font-size:12px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.code+'</span> <span style="font-size:10px;color:var(--sub);">'+it.type+'</span></span>';
+        h+='<span style="font-size:12px;font-weight:700;color:'+col+';flex-shrink:0;">'+(it.change_pct>=0?'+':'')+Number(it.change_pct).toFixed(0)+'%</span>';
+        h+='</div>';
+      });
       h+='</div>';
-    });
-    h+='</div>';
+    }
     $b.innerHTML=h;
     if($t) $t.innerHTML=_uBadge('盘前','短线',d.update_time);
   }
@@ -9624,21 +9644,19 @@ function drawUpDownChart(){
     if(!$b) return;
     if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">业绩预告数据暂不可用</div>'; if($t) $t.innerHTML='—'; return; }
     const s=d.summary||{};
-    const total=(s.increase||0)+(s.decrease||0)+(s.loss||0)+(s.uncertain||0);
-    let h='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-bottom:10px;">';
+    let h='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;">';
     h+='<div style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--up);">预增</div><div style="font-size:18px;font-weight:800;color:var(--up);">'+(s.increase||0)+'</div></div>';
     h+='<div style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--down);">预减</div><div style="font-size:18px;font-weight:800;color:var(--down);">'+(s.decrease||0)+'</div></div>';
     h+='<div style="background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.25);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--sub);">预亏</div><div style="font-size:18px;font-weight:800;color:var(--sub);">'+(s.loss||0)+'</div></div>';
     h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--txt);">不确定</div><div style="font-size:18px;font-weight:800;color:var(--txt);">'+(s.uncertain||0)+'</div></div>';
-    if(total) h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:11px;color:var(--sub);">合计</div><div style="font-size:18px;font-weight:800;color:var(--txt);">'+total+'</div></div>';
     h+='</div>';
     h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">TOP 预增 / 扭亏</div>';
-    h+='<div style="display:flex;flex-direction:column;gap:6px;">';
+    h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;">';
     d.items.slice(0,8).forEach(it=>{
       const col=it.change_pct>=0?'var(--up)':'var(--down)';
       h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;">';
-      h+='<span style="font-size:12px;color:var(--txt);">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.code+'</span> <span style="font-size:10px;color:var(--sub);">'+it.type+'</span></span>';
-      h+='<span style="font-size:12px;font-weight:700;color:'+col+';">'+(it.change_pct>=0?'+':'')+Number(it.change_pct).toFixed(0)+'%</span>';
+      h+='<span style="font-size:12px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.code+'</span> <span style="font-size:10px;color:var(--sub);">'+it.type+'</span></span>';
+      h+='<span style="font-size:12px;font-weight:700;color:'+col+';flex-shrink:0;">'+(it.change_pct>=0?'+':'')+Number(it.change_pct).toFixed(0)+'%</span>';
       h+='</div>';
     });
     h+='</div>';

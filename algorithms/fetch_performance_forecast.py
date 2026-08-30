@@ -61,31 +61,56 @@ def fetch_performance_forecast():
             "公告日期": "notice_date",
         })
         summary = {"increase": 0, "decrease": 0, "loss": 0, "uncertain": 0, "total": 0}
+        # 2026-08-30：新增「今日口径」——按公告日期（notice_date）筛当日新发布的预告，
+        #   供「今日事件」页「今日业绩预告」卡使用；summary 仍是全报告期累计，两者不混用。
+        today_str = datetime.now().strftime("%Y-%m-%d")
+        today_summary = {"increase": 0, "decrease": 0, "loss": 0, "uncertain": 0, "total": 0}
         items = []
+        today_items = []
+        date_count = {}
         for _, r in df.iterrows():
             t = str(r.get("type", ""))
             pct = _parse_change_pct(r.get("change_pct_str"))
+            nd = str(r.get("notice_date", ""))[:10]
             summary["total"] += 1
             if "预增" in t or "略增" in t:
-                summary["increase"] += 1
+                key = "increase"
             elif "预减" in t or "略减" in t:
-                summary["decrease"] += 1
+                key = "decrease"
             elif "预亏" in t or "首亏" in t or "续亏" in t:
-                summary["loss"] += 1
+                key = "loss"
             else:
-                summary["uncertain"] += 1
-            items.append({
+                key = "uncertain"
+            summary[key] += 1
+            if nd:
+                date_count[nd] = date_count.get(nd, 0) + 1
+            rec = {
                 "code": str(r.get("code", "")),
                 "name": str(r.get("name", "")),
                 "type": t,
                 "change_pct": pct,
                 "indicator": str(r.get("indicator", "")),
                 "notice_date": str(r.get("notice_date", "")),
-            })
-        # 按预增幅度排序，取前 15
+            }
+            items.append(rec)
+            if nd == today_str:
+                today_summary["total"] += 1
+                today_summary[key] += 1
+                today_items.append(rec)
+        # 按预增幅度排序，取前 15（全报告期 TOP，供盘后「业绩预告」汇总卡）
         items.sort(key=lambda x: (x.get("change_pct") if x.get("change_pct") is not None else -99999), reverse=True)
+        today_items.sort(key=lambda x: (x.get("change_pct") if x.get("change_pct") is not None else -99999), reverse=True)
         out["items"] = items[:15]
         out["summary"] = summary
+        out["today_summary"] = today_summary
+        out["today_items"] = today_items[:8]
+        out["today_date"] = today_str
+        # 最近一批公告日期（今日无新增时用于兜底展示，避免「今日」卡空而无信息）
+        if date_count:
+            latest = sorted(date_count.items(), key=lambda kv: kv[0], reverse=True)
+            out["latest_notice_date"] = latest[0][0]
+            out["latest_notice_count"] = latest[0][1]
+            out["recent_notice_dates"] = [{"date": d, "count": c} for d, c in latest[:5]]
     except Exception as e:
         print(f"  ⚠️ 业绩预告抓取失败: {e}")
         out["error"] = str(e)
