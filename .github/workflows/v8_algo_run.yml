@@ -266,7 +266,15 @@ jobs:
       - name: "📤 兜底推送（若上一步未推）"
         # was `if: always()` -> pushed stale workspace raw_data when source sync failed.
         # now only runs after a successful source sync.
-        if: steps.sync_api.outcome == 'success'
+        #
+        # 2026-08-30 死锁根治：上面这版 if 不含 always()，会被 Actions【隐式 AND success()】，
+        #   于是前面任一步判红就跳过推送。实测 8/29 两次（33251212898 / 33247269200）：
+        #   算法链跑满 50 分钟、data/*.js 也重生成成功，却因「刷新 HEALTH_CHECK.js」
+        #   exit 1（体检结论=14 项数据陈旧，文件其实已生成）导致本步 skipped，整批数据白跑；
+        #   数据推不上去 → 下次体检更陈旧 → 又 exit 1 → 又不推，形成自我强化死锁。
+        #   这里显式 always() 打破死锁，同时【保留】sync_api 成功的护栏（防推陈旧 workspace）。
+        #   注：体检 step 故意不加 continue-on-error —— 数据陈旧就该亮红灯让告警可见。
+        if: always() && steps.sync_api.outcome == 'success'
         shell: powershell
         continue-on-error: true
         run: |
