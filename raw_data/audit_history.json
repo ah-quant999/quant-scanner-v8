@@ -862,5 +862,65 @@
     "message": "未找到元素"
    }
   ]
+ },
+ {
+  "date": "2026-08-30",
+  "time": "11:21:22",
+  "overall": "warn",
+  "summary": {
+   "ok": 108,
+   "warn": 8,
+   "fail": 1,
+   "total": 117
+  },
+  "warn_items": [
+   {
+    "id": "dom_taskScheduleBody",
+    "name": "DOM #taskScheduleBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttBackBody",
+    "name": "DOM #ttBackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttThrBody",
+    "name": "DOM #ttThrBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttSvlBody",
+    "name": "DOM #ttSvlBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttTrackBody",
+    "name": "DOM #ttTrackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsAdvBody",
+    "name": "DOM #stcrdsAdvBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsEliteBody",
+    "name": "DOM #stcrdsEliteBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_healthCheckBody",
+    "name": "DOM #healthCheckBody",
+    "message": "静态占位符(JS渲染)"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "dom_phMacroBody",
+    "name": "DOM #phMacroBody",
+    "message": "未找到元素"
+   }
+  ]
  }
 ]
