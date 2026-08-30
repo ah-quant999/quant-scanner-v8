@@ -631,7 +631,9 @@ def main():
         # 龙虎榜
         lhb_info = lhb_map.get(raw_code)
         if lhb_info and lhb_info["category"] == "机游共振":
-            fund += 5
+            # 2026-08-30 审计：近30日双净买≥0.8亿命中 0/20，加分长期空转；
+            # 在补回测前降权到 +2，避免 TOP10 被无证据信号抬分。
+            fund += 2
             fund_detail.append(f"龙虎榜机游共振")
         elif lhb_info and lhb_info["inst_net"] > 0:
             fund += 3

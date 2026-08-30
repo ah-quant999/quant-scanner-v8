@@ -13448,7 +13448,11 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
   /* 2026-08-30 主人令「我只要最有效的东西」删除：renderRpsBacktest()
      删除理由：该函数为「模拟」而非真实回测 —— 用 ret=(r.ret50/50)*hold 把 50 日已实现收益
      线性折算成持有期收益，并以【今日截面】RPS/RS/年线分层回看历史收益，存在前视偏差。
-     其宿主卡片 strpsBacktestCard 已同步删除。真实回测见「🔒 策略回测」页。 */
+     其宿主卡片 strpsBacktestCard 已同步删除。真实回测见「🔒 策略回测」页。
+     🛡 2026-08-30 审计修复：函数已删，下方曾残留 `window.renderRpsBacktest=renderRpsBacktest;`
+        引用未定义变量 → 抛 ReferenceError → 同 <script> 块内后续 `window.renderFourVolume /
+        renderUnlisted / renderDelisted` 顶层注册全部中断（四量终极/暂未上架/已下架 三卡失效）。
+        现删除该悬空行，恢复三卡注册。 */
 
   /* ===== 四量终极 · tab 渲染（2026-08-06 主人令·从暂未上架移出） ===== */
   function renderFourVolume(){
