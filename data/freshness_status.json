@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-08-30 18:48:40",
+  "check_time": "2026-08-30 22:16:09",
   "last_trade_close": "2026-08-28 15:30:00",
   "is_trading_day": false,
   "core_stale": [],
@@ -74,7 +74,9 @@
     "MARKET_REGIME": "post_close",
     "SECTOR_RECOMMENDATION": "post_close",
     "FINAL_RECOMMEND_DATA": "post_close",
-    "STOCK_RPS_DATA": "post_close"
+    "STOCK_RPS_DATA": "post_close",
+    "RESTRICTED_RELEASE": "premarket",
+    "PERFORMANCE_FORECAST": "premarket"
   },
   "category_label": {
     "premarket": "盘前",
