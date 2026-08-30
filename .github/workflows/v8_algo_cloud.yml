@@ -309,7 +309,13 @@ jobs:
       - name: "🧮 运行盘后算法链 → raw_data/ → 推送"
         id: algo
         if: steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true'
-        timeout-minutes: 90
+        # 🔴 2026-08-30 23:3x 抬高步级墙钟 90 → 150（实测 run 33316835316 坐实）：
+        #   周末 force_run 全量补算时，本步跑到 70 分钟仍未完成，距 90 分钟限时仅剩
+        #   20 分钟——一旦超时被硬杀，后续 bridge / ALGO_TRACK / 兜底推送 / **产物完整性
+        #   闸门** 全部 skipped，整轮算法白跑（这正是「推送步拖死 job」的同构问题，
+        #   见批次 H 对 7 个 workflow 的统一修法）。
+        #   job 级共 200 分钟，抬到 150 后仍给后续 5 步留足 50 分钟余量，不会挤占。
+        timeout-minutes: 150
         run: |
           set +e
           python algorithms/run_algorithms.py
