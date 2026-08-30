@@ -33,7 +33,11 @@ jobs:
         run: pip install akshare
       - name: Run fill
         run: |
-          python algorithms/_fill_kcbj_concepts.py --apply --max ${{ github.event.inputs.max || '0' }}
+          # 🐛 修复：原先硬编码 --apply，导致 apply input 形同虚设（dry-run 无法生效）
+          APPLY_FLAG=""
+          if [ "${{ github.event.inputs.apply || 'true' }}" = "true" ]; then APPLY_FLAG="--apply"; fi
+          echo "apply=${{ github.event.inputs.apply || 'true' }} -> FLAG='$APPLY_FLAG'"
+          python algorithms/_fill_kcbj_concepts.py $APPLY_FLAG --max ${{ github.event.inputs.max || '0' }}
         continue-on-error: false
       - name: Commit result
         run: |
@@ -44,5 +48,10 @@ jobs:
             echo "no changes"
           else
             git commit -m "data: 补全科创板/北交所概念映射 (auto via GHA)"
-            git push
+            # 🛡 并发 push 互踩加固
+            for i in 1 2 3; do
+              if git push origin HEAD:main; then echo "✅ 已推送"; break; fi
+              echo "⚠️ push 被拒，fetch+rebase 后重试 ($i/3)"
+              git fetch origin main && git rebase FETCH_HEAD || { git rebase --abort || true; break; }
+            done
           fi

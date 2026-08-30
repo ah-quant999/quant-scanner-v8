@@ -56,8 +56,14 @@ jobs:
           git add backup/raw_data_backup_*.tar.gz 2>/dev/null || true
           if [ -n "$(git status --porcelain)" ]; then
             git commit -m "chore(v8): 每日安全网推送当天修改 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')" 2>/dev/null || true
-            git push origin main 2>&1 | tail -5
-            echo "✅ 当天修改已推送入库（防覆盖）"
+            # 🛡 并发 push 互踩加固（对齐 v8_risk_gauge 范本）
+            for i in 1 2 3; do
+              if git push origin HEAD:main; then
+                echo "✅ 当天修改已推送入库（防覆盖）"; break
+              fi
+              echo "⚠️ push 被拒，fetch+rebase 后重试 ($i/3)"
+              git fetch origin main && git rebase FETCH_HEAD || { git rebase --abort || true; break; }
+            done
           else
             echo "无待推送修改"
           fi
@@ -67,7 +73,12 @@ jobs:
         run: |
           git add backup/raw_data_backup_*.tar.gz 2>/dev/null || true
           git commit -m "backup: v8 每日自动备份 $(TZ=Asia/Shanghai date '+%Y-%m-%d')" 2>/dev/null || echo "无新备份"
-          git push origin main 2>/dev/null || echo "推送跳过（无新内容）"
+          # 🛡 并发 push 互踩加固
+          for i in 1 2 3; do
+            if git push origin HEAD:main 2>/dev/null; then echo "✅ 备份已推送"; break; fi
+            echo "⚠️ 推送被拒或无新内容，fetch+rebase 后重试 ($i/3)"
+            git fetch origin main && git rebase FETCH_HEAD || { git rebase --abort || true; break; }
+          done
 
       - name: "📦 v6 备份保留策略断言（主人令：v8 稳定一周前不删）"
         continue-on-error: true
