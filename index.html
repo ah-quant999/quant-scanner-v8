@@ -4956,16 +4956,16 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p">每次抓取后经 <code>api_push_raw</code> 推 <code>raw_data</code> → <code>v8_build_deploy</code> 自动 selective build + 部署 Pages，所以每个时间槽的“更新”必然触发对应前端的“部署”，不遗漏。</div>
         <table class="lg-table">
           <tr><th>时间槽</th><th>Workflow</th><th>类别</th><th>刷新的前端模块</th></tr>
-          <tr><td>08:25（工作日）/ 09:00（周六日）</td><td>v8_cn_fetch_cloud</td><td>盘前</td><td>今日事件(V8_CAL日历+今日判定JUDGMENT_DATA+打新)、IPO、两融、中金所持仓、宏观、危机雷达、北向、分析师评级、52周高、羊群效应、ETF申赎</td></tr>
-          <tr><td>09:40 / 10:00 / 10:30 / 11:00 / 11:30 / 13:00 / 13:30 / 14:00 / 14:30 / 15:10</td><td>v8_cn_fetch_cloud</td><td>盘中</td><td>指数行情、ETF脉搏、ETF盘中热度、ETF日监控(实时)、板块资金流、个股资金流、概念排行、涨停热力、候选池实时行情、成交金额/涨跌家数(SH_SZ_HISTORY)</td></tr>
-          <tr><td>15:30</td><td>v8_cn_fetch_cloud</td><td>盘后</td><td>EXPERIMENT、大盘资金流累积序列、ETF日监控再补抓(T+1收盘定稿)、龙虎榜历史回填</td></tr>
+          <tr><td>08:25（工作日）/ 09:00（周六日）</td><td>v8_cn_fetch_cloud</td><td>盘前</td><td>今日事件(V8_CAL日历+今日判定JUDGMENT_DATA+打新)、IPO、两融、宏观、危机雷达、北向、分析师评级、52周高、羊群效应、ETF申赎、解禁日历、业绩预告</td></tr>
+          <tr><td>09:40 / 10:00 / 10:30 / 11:00 / 11:30 / 13:00 / 13:30 / 14:00 / 14:30 / 15:10</td><td>v8_cn_fetch_cloud</td><td>盘中</td><td>指数行情、亚太市场、ETF脉搏、ETF盘中热度、ETF日监控(实时)、板块资金流、行业树图、个股资金流、概念排行、涨停热力、候选池实时行情、成交金额/涨跌家数(SH_SZ_HISTORY)</td></tr>
+          <tr><td>15:30 / 17:20</td><td>v8_cn_fetch_cloud</td><td>盘后</td><td>EXPERIMENT、期指主力合约、大盘资金流累积序列、ETF日监控再补抓(T+1收盘定稿)、龙虎榜历史回填</td></tr>
           <tr><td>16:30</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓</td><td>港股16:00收盘后补抓恒指/港股候选/盘中模块收盘值（A股已收盘，不重复抓A股）</td></tr>
           <tr><td>盘中每30分</td><td>v8_risk_gauge</td><td>危机雷达</td><td>危机雷达/风险温度计实时刷新（美股开盘情绪覆盖 19:00-22:00 北京时间）</td></tr>
           <tr><td>19:15 / 20:00（主+冗余）</td><td>v8_algo_cloud</td><td>盘后算法（云端主链）</td><td>龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测/板块资金流趋势/停牌预警/市场预警/NT数据（已迁 GitHub 云端 ubuntu，20:30/20:50 兜底）</td></tr>
           <tr><td>23:00</td><td>v8_backup</td><td>每日备份</td><td>备份 raw_data/*.json 防意外丢失（push 至 main）</td></tr>
           <tr><td>09:00 / 17:00</td><td>v8_algo</td><td>体检</td><td>46 模块新鲜度体检（云端）</td></tr>
           <tr><td>非交易时段每2h</td><td>runner_health_alert</td><td>健康监控</td><td>lemoncat-cn runner 离线 → 开 Issue 告警（云端，工作日13-21点/周末0-20点）</td></tr>
-          <tr><td>周六/周日 09:00</td><td>v8_cn_fetch_cloud</td><td>T+1 周度</td><td>日历/今日判定/IPO/两融/中金所/宏观/危机/北向/分析师/52周高/羊群效应统一刷新</td></tr>
+          <tr><td>周六/周日 09:00</td><td>v8_cn_fetch_cloud</td><td>T+1 周度</td><td>日历/今日判定/IPO/两融/宏观/危机/北向/分析师/52周高/羊群效应/解禁日历/业绩预告统一刷新</td></tr>
         </table>
         <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>成交金额 / 涨跌家数</b> = 模块 <code>SH_SZ_HISTORY</code>，归属 <b>盘中 09:40–15:10 每 30 分钟</b> 自动抓取（v8_cn_fetch_cloud · 云端）。此前因上游 push2his 接口被 WAF 拦截导致序列冻结，已于今日改用 akshare 指数日线 + 全市场快照修复，恢复实时刷新。</div>
         <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>盘后数据里「仍在盘中实时更新」的模块（易遗漏，特此单列）</b>：<code>ETF_DAILY_MONITOR</code>（ETF 日监控）在 <b>盘中 09:40–15:10 每 30 分钟</b> 实时刷新，且 <b>15:30 盘后再补抓一次</b> 做 T+1 日监控收盘定稿——它既出现在「实时数据区」实时卡，也会出现在「盘后数据」区，两端都不遗漏。<br>📌 <b>日频序列防漏跑 safety_net</b>：<code>MARKET_FUND_FLOW_DATA</code>（资金流时间轴·中长线）主档为 <b>盘后 15:30</b>，但因其是日频收盘累积序列、一旦 15:30 漏跑就会滞后一天，故额外在 <b>次日盘前 08:25</b> 补抓一次。其余纯盘后模块（EXPERIMENT / 龙虎榜历史回填）仅在 15:30 或 19:15 产出，盘中不刷新。所有前端模块均已落在上方「前端模块→时段」表与「工作日」逐档表中，无遗漏。</div>
@@ -4973,7 +4973,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">工作日</div>
         <table class="lg-table">
           <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
-          <tr><td>08:25</td><td>v8_cn_fetch_cloud</td><td>盘前（日历/今日判定/IPO/两融/中金所/宏观/危机/北向/分析师/52周高/羊群效应）</td><td>云端</td></tr>
+          <tr><td>08:25</td><td>v8_cn_fetch_cloud</td><td>盘前（日历/今日判定/IPO/两融/宏观/危机/北向/分析师/52周高/羊群效应/解禁日历/业绩预告）</td><td>云端</td></tr>
           <tr><td>09:40</td><td>v8_cn_fetch_cloud</td><td>盘中首档（开盘前首刷：指数/ETF/板块资金/概念排行/涨停热力/个股资金流）</td><td>云端</td></tr>
           <tr><td>10:00</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
           <tr><td>10:30</td><td>v8_cn_fetch_cloud</td><td>盘中（同上）</td><td>云端</td></tr>
@@ -8811,11 +8811,13 @@ function drawUpDownChart(){
 
           {name:'重要事件日历', source:'V8_CAL', freq:'每周日+月末', slots:['周日'], note:'非每日更新'},
 
-          {name:'打新研判', source:'IPO_DATA', freq:'每日盘后', slots:['17:30'], weekendUpdate:false, note:'新股评分（仅交易日盘前更新）'},
+          {name:'今日解禁', source:'RESTRICTED_RELEASE', freq:'每日盘前', slots:['08:25'], weekendUpdate:false, note:'今日限售股解禁家数与解禁市值 TOP；当日无解禁也显示'},
+
+          {name:'今日业绩预告', source:'PERFORMANCE_FORECAST', freq:'每日盘前', slots:['08:25'], weekendUpdate:false, note:'今日发布业绩预告的公司中预增/扭亏 TOP；当日无预告也显示'},
 
           {name:'今日判定', source:'JUDGMENT_DATA', freq:'每日盘后', slots:['17:30'], weekendUpdate:false, note:'环境态势综合判定（仅交易日盘前更新）'},
 
-          {name:'今日宏观解读', source:'MACRO_DATA', freq:'每日盘后', slots:['17:30'], weekendUpdate:false, note:'当前宏观总结分析（仅交易日盘前更新）'},
+          {name:'打新研判', source:'IPO_DATA', freq:'每日盘后', slots:['17:30'], weekendUpdate:false, note:'新股评分（仅交易日盘前更新）'},
 
           {name:'市场提示', source:'NT_DATA', freq:'每日盘后', slots:['17:30'], weekendUpdate:false, note:'市场动态提示（仅交易日盘前更新）'}
 
@@ -8829,7 +8831,9 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'全球指数 / 股指期货', source:'INDEX_QUOTES', freq:'盘中每30分', slots:['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'], note:'A股期指/恒指/美股期指'},
+          {name:'指数快览', source:'INDEX_QUOTES', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'], note:'上证/深证/创业/科创等核心指数'},
+
+          {name:'亚太市场概览', source:'OVERSEAS_MARKETS', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'日经/恒生/KOSPI/台湾加权等亚太指数'},
 
           {name:'ETF 盘中异动', source:'ETF_PULSE', freq:'盘中实时', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'T+0 资金流向'},
 
@@ -8839,15 +8843,17 @@ function drawUpDownChart(){
 
           {name:'板块资金流向', source:'SECTOR_FUND_FLOW', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'行业/概念资金流'},
 
+          {name:'行业树图 · 细分赛道', source:'SECTOR_FUND_FLOW', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'行业板块涨跌 treemap（强制显示「盘中」标签）'},
+
           {name:'概念排名', source:'CONCEPT_RANKING', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'涨停概念追踪'},
 
-          {name:'涨停热度', source:'LIMIT_UP_HEATMAP', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'连板/炸板热度'},
+          {name:'涨停热度', source:'LIMIT_UP_HEATMAP', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'连板/炸板热度 · 同时驱动「情绪周期·连板天梯」'},
 
           {name:'市场资金流向', source:'MARKET_FUND_FLOW_DATA', freq:'盘中每30分', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'两市净流入'},
 
           {name:'市场预警', source:'MARKET_ALERTS', freq:'盘中实时', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'量价异常预警'},
 
-          {name:'📐 平均股价', source:'AVG_PRICE_DATA', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'全A等权均价+MA20/MA60水位（操作信号面板 + AI速览共用锚点）'}
+          {name:'📐 平均股价', source:'AVG_PRICE_DATA', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'通达信 880003 真实指数 + MA20/MA60 水位（操作信号面板 + AI速览共用锚点）'}
 
         ]
 
@@ -8865,7 +8871,15 @@ function drawUpDownChart(){
 
           {name:'融资融券', source:'MARGIN_DATA', freq:'收盘后1次', slots:['17:30'], note:'两市融资余额'},
 
-          {name:'股指期货持仓', source:'CFFEX_HOLDINGS', freq:'收盘后1次', slots:['17:30'], note:'IF/IC/IM 持仓'},
+          {name:'市场宽度', source:'W52_HIGH', freq:'收盘后1次', slots:['17:30'], note:'今日历史新高家数 + 领涨新高股 TOP'},
+
+          {name:'期指主力合约', source:'CFFEX_HOLDINGS', freq:'收盘后1次', slots:['17:20'], note:'IF/IC/IM 主力合约（post_close 抓取）'},
+
+          {name:'宏观数据速览', source:'MACRO_DATA', freq:'每日盘前', slots:['08:25'], note:'LPR / M2 / CPI / PMI / 中美利差 / VIX / 商品'},
+
+          {name:'解禁日历', source:'RESTRICTED_RELEASE', freq:'每日盘前', slots:['08:25'], note:'未来 7/30/90 天限售股解禁家数与市值 TOP'},
+
+          {name:'业绩预告', source:'PERFORMANCE_FORECAST', freq:'每日盘前', slots:['08:25'], note:'财报季预增/预减/预亏/不确定汇总与预增 TOP'},
 
           {name:'危机雷达', source:'CRISIS_DATA', freq:'收盘后1次', slots:['17:30'], note:'尾部风险监控'},
 
