@@ -119,6 +119,9 @@ DATA_SOURCES = {
     #   旧 data/ETF_SUBSCRIPTION.js 已写好的 "sh"/"sz"/"update_time" 老口径**保留**，前端同时读 window.ETF_SUBSCRIPTION。
     #   新增 window.ETF_SUBSCRIPTION_EM 走东财口径（5 类聚合 + 亿元）。
     "etf_subscription_em.json":   "ETF_SUBSCRIPTION_EM",
+    # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告
+    "restricted_release.json":    "RESTRICTED_RELEASE",
+    "performance_forecast.json":  "PERFORMANCE_FORECAST",
 }
 
 # 变量名 → 更新时段
@@ -206,6 +209,9 @@ CATEGORY_MAP = {
     #   归属盘后（与 finalRec 同节奏），补类别映射使 --category post_close / --detect-changes 能正确重建。
     "FINAL_RECOMMEND_DATA": "post_close",
     "STOCK_RPS_DATA": "post_close",
+    # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告（cloud_fetch 注册为 premarket，日频）
+    "RESTRICTED_RELEASE": "premarket",
+    "PERFORMANCE_FORECAST": "premarket",
 }
 
 CATEGORY_LABEL = {

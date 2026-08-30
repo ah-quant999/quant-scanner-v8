@@ -477,7 +477,7 @@ window.__domReadyFns=[];
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
 <script src="data/CONCEPT_RANKING.js?v=424da1b5c7" defer></script>
 <!-- 2026-08-23 恢复：潜力挖掘板块+股票预测推荐数据（calc_potential_picks.py 输出，跟盘后算法链自动更新） -->
-<script src="data/POTENTIAL_PICKS.js?v=a21dd4fd2c" defer></script>
+<script src="data/POTENTIAL_PICKS.js?v=4492197a47" defer></script>
 <script src="data/INDEX_QUOTES.js?v=96c461d9c9" defer></script>
 <script src="data/AI_MARKET_BRIEF.js?v=4a5514f90f" defer></script>
 <script src="data/MARGIN_DATA.js?v=7a59db225b" defer></script>
@@ -489,7 +489,7 @@ window.__domReadyFns=[];
     <script src="data/STOCK_RPS.js?v=832f1bc9ca" defer></script>
     <!-- 🛡 2026-08-19：H 反推短线买点（data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js）反推代码 + 跟踪回测，独立于 PDF OCR
          v= 占位由 api_push_raw._stamp_index_v 在每日推送后自动重写为新 sha，确保 CDN 不缓存旧版 -->
-    <script src="data/H_AUTO_BUY.js?v=b925bf3f91" defer></script>
+    <script src="data/H_AUTO_BUY.js?v=e540462611" defer></script>
     <script src="data/H_AUTO_BUY_TRACK.js?v=b5a60442f8" defer></script>
     <script src="data/UNLISTED_PANEL.js?v=cbb45ec824" defer></script>
   <script src="data/DELISTED.js?v=9eef4eba4e" defer></script>
@@ -1297,7 +1297,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/TRIPLE_TRACK.js?v=a2990dc499" defer></script>
 <script src="data/TRIPLE_HISTORY.js?v=fe58180cc4" defer></script>
 <script src="data/COCKPIT_TIER_RECOMMEND.js?v=64b93d522c" defer></script>
-<script src="data/COCKPIT_ADVICE.js?v=2eec159ce3" defer></script>
+<script src="data/COCKPIT_ADVICE.js?v=3ccac18d23" defer></script>
 <script src="data/V8_CAL.js?v=8695f10549"></script>
 <script src="data/SH_FIB.js?v=02e280f7e9" defer></script>
 <script src="data/SZ_FIB.js?v=2bdca7559f" defer></script>
@@ -1338,17 +1338,20 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/TOP10_DAILY.js?v=9048ea549e" defer></script>
 <script src="data/WEEKEND_RUN.js?v=5a7b2a64f5" defer></script>
 <script src="data/W52_HIGH.js?v=d9a11612bb" defer></script>
+<!-- 2026-08-30：盘后数据页新增解禁日历 + 业绩预告 -->
+<script src="data/RESTRICTED_RELEASE.js?v=fd200b89cf" defer></script>
+<script src="data/PERFORMANCE_FORECAST.js?v=d3bddeb55d" defer></script>
 <script src="data/CANDIDATE_QUOTES.js?v=d1570f36be" defer></script>
-<script src="data/RUNNER_STATUS.js?v=dea55e6f04" defer></script>
-<script src="data/HEALTH_CHECK.js?v=9fc7c5378b" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=fc3d378754" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=c37495d051" defer></script>
+<script src="data/RUNNER_STATUS.js?v=cccac3ec1b" defer></script>
+<script src="data/HEALTH_CHECK.js?v=a0a6ff6b29" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=f032ae7429" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=a2a99e372d" defer></script>
     <script src="data/MARKET_PATH_PROBABILITY.js?v=137423fc2c" defer></script>
     <script src="data/INDEX_HISTORY.js?v=b02c645f3a" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=f69f4fcc75" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=65a498bd97" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=30d9d81108" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=347d768634" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=33f827b0bc" defer></script>
-    <script src="data/ALGO_BACKTEST_COMPARE.js?v=1cbf139190" defer></script>
+    <script src="data/ALGO_BACKTEST_COMPARE.js?v=c9d701b0a9" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -2084,6 +2087,36 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div id="sfBlock2"><div class="ipo-empty">加载中…</div></div>
       </div>
 
+    </div>
+
+    <!-- 情绪温度条：从涨停热力/炸板数据派生 -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🌡️</span>情绪温度条 · <span class="fresh" id="sentimentTime">—</span></h3>
+      <div id="sentimentBody"><div class="ipo-empty">加载中…</div></div>
+    </div>
+
+    <!-- 龙虎榜净买榜 -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🐉</span>龙虎榜净买榜 · <span class="fresh" id="lhbNetTime">—</span></h3>
+      <div id="lhbNetBody"><div class="ipo-empty">加载中…</div></div>
+    </div>
+
+    <!-- 市场宽度：52周新高广度 -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📊</span>市场宽度 · <span class="fresh" id="breadthTime">—</span></h3>
+      <div id="breadthBody"><div class="ipo-empty">加载中…</div></div>
+    </div>
+
+    <!-- 解禁日历 -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">🔓</span>解禁日历 · <span class="fresh" id="restrictedTime">—</span></h3>
+      <div id="restrictedBody"><div class="ipo-empty">加载中…</div></div>
+    </div>
+
+    <!-- 业绩预告 -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📈</span>业绩预告 · <span class="fresh" id="forecastTime">—</span></h3>
+      <div id="forecastBody"><div class="ipo-empty">加载中…</div></div>
     </div>
 
     
@@ -4360,6 +4393,20 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div class="logic-p">以 treemap 方块可视化概念板块主力净流入 TOP30。方块大小∝|净流入|，红色=上涨、绿色=下跌。一眼识别资金集中流向与概念热度。</div>
         <div class="logic-h">收盘复盘 · 周期定位 + 资金趋势（2026-08-30 主人令：数据源说明从卡片移到逻辑详解）</div>
         <div class="logic-p">📌 板块按 20 日涨幅周期定位；资金按主力净流入滚动累计验证（SECTOR_FUND_FLOW_TREND 盘后快照，与 Block1 盘中 SECTOR_FUND_FLOW 不同源，数值可能不一致属正常）。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🌙</span>盘后数据扩展卡 - 说明（2026-08-30 主人令）</h3>
+        <div class="logic-h">情绪温度条</div>
+        <div class="logic-p">由涨停热力图（LIMIT_UP_HEATMAP）的连板梯队与炸板数据（LIMIT_UP_BROKEN）派生。温度分 = 涨停家数 + 最高连板高度 − 炸板率，仅作情绪参照，不直接用于择时。</div>
+        <div class="logic-h">龙虎榜净买榜</div>
+        <div class="logic-p">汇总龙虎榜个股中机构/游资/机游共振/北向席位的净买入额，展示当日资金攻击方向。数据来自 LHB_DATA（当日）与 LHB_7D（7日聚合），非全市场资金流。</div>
+        <div class="logic-h">市场宽度</div>
+        <div class="logic-p">以东方财富「历史新高」板块成分家数（W52_HIGH）作为新高广度信号，反映市场参与上涨的宽度。</div>
+        <div class="logic-h">解禁日历</div>
+        <div class="logic-p">未来 7/30/90 天限售股解禁家数与解禁市值 TOP，数据来自东方财富限售股解禁明细（RPT_LIFT_STAGE）。</div>
+        <div class="logic-h">业绩预告</div>
+        <div class="logic-p">当前财报季 A 股业绩预告汇总与预增 TOP，数据来自东方财富业绩预告（stock_yjyg_em）。</div>
       </div>
 
       <div class="card">
@@ -9186,6 +9233,167 @@ function drawUpDownChart(){
 
   window.renderHealthCheck = renderHealthCheck;
 
+  /* ---- 6. 情绪温度条（涨停热力 + 炸板数据派生） ---- */
+  function renderSentiment(heatmap, broken){
+    const $b=$('sentimentBody'), $t=$('sentimentTime');
+    if(!$b) return;
+    const h=heatmap||{}, b=broken||{};
+    const ladder=h.ladder||{};
+    const ztTotal=Object.values(ladder).reduce((a,v)=>a+(Number(v)||0),0);
+    const heights=Object.keys(ladder).map(Number).sort((a,b)=>b-a);
+    const maxLbc=heights[0]||0;
+    const brokenTotal=Number(b.total)||0;
+    const brokenRate=ztTotal+brokenTotal>0 ? brokenTotal/(ztTotal+brokenTotal)*100 : 0;
+    let score=50;
+    if(ztTotal>=80) score+=20;
+    else if(ztTotal>=50) score+=10;
+    else if(ztTotal>=30) score+=5;
+    else score-=10;
+    if(maxLbc>=6) score+=15;
+    else if(maxLbc>=4) score+=8;
+    else if(maxLbc>=3) score+=3;
+    if(brokenRate>=30) score-=15;
+    else if(brokenRate>=20) score-=8;
+    score=Math.max(10,Math.min(95,score));
+    let color, word;
+    if(score>=70){ color='var(--up)'; word='偏热'; }
+    else if(score>=50){ color='var(--gold)'; word='中性'; }
+    else { color='var(--down)'; word='偏冷'; }
+    let ladderHtml='';
+    heights.slice(0,6).forEach(function(l){
+      const cnt=ladder[l]||0;
+      ladderHtml+='<div style="display:flex;align-items:center;gap:6px;margin:3px 0;">';
+      ladderHtml+='<span style="min-width:40px;font-size:11px;color:var(--sub);">'+l+'板</span>';
+      ladderHtml+='<div style="flex:1;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;"><div style="width:'+Math.min(100,cnt*3)+'%;height:100%;background:'+color+';"></div></div>';
+      ladderHtml+='<span style="min-width:28px;text-align:right;font-size:11px;font-weight:700;color:var(--txt);">'+cnt+'</span>';
+      ladderHtml+='</div>';
+    });
+    const dt=h.update_time||b.update_time||'';
+    $t.textContent=dt?rel(dt):'—';
+    $b.innerHTML='<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:10px;">'
+      +'<div style="text-align:center;"><div style="font-size:32px;font-weight:800;color:'+color+';">'+score+'</div><div style="font-size:11px;color:var(--dim);">情绪温度 · '+word+'</div></div>'
+      +'<div style="flex:1;min-width:180px;">'
+      +'<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px;">'
+      +'<span style="font-size:12px;">涨停 <b style="color:var(--up);">'+ztTotal+'</b></span>'
+      +'<span style="font-size:12px;">炸板 <b style="color:'+(brokenRate>=30?'var(--up)':'var(--down)')+';">'+brokenTotal+'</b></span>'
+      +'<span style="font-size:12px;">炸板率 <b>'+brokenRate.toFixed(1)+'%</b></span>'
+      +'<span style="font-size:12px;">最高连板 <b style="color:'+color+';">'+maxLbc+'板</b></span>'
+      +'</div>'
+      +ladderHtml
+      +'</div></div>';
+  }
+  window.renderSentiment = renderSentiment;
+
+  /* ---- 7. 龙虎榜净买榜 ---- */
+  function renderLhbNet(lhb, lhb7d){
+    const $b=$('lhbNetBody'), $t=$('lhbNetTime');
+    if(!$b) return;
+    const data=lhb||{};
+    const stocks=(data.stocks||[]).slice();
+    if(!stocks.length){
+      $b.innerHTML='<div class="ipo-empty">龙虎榜数据暂不可用</div>';
+      $t.textContent='—';
+      return;
+    }
+    const instTop=stocks.slice().sort((a,b)=>(b.inst_net_万||0)-(a.inst_net_万||0)).slice(0,5);
+    const yzTop=stocks.slice().sort((a,b)=>(b.yz_net_万||0)-(a.yz_net_万||0)).slice(0,5);
+    const resonance=stocks.filter(s=>s.category==='机游共振').sort((a,b)=>((b.inst_net_万||0)+(b.yz_net_万||0))-((a.inst_net_万||0)+(a.yz_net_万||0))).slice(0,5);
+    const north=stocks.filter(function(s){ const n=(s.seats||{}).北向; return n && ((n.buy||0)-(n.sell||0))>0; })
+      .sort(function(a,b){ const na=(a.seats.北向.buy||0)-(a.seats.北向.sell||0), nb=(b.seats.北向.buy||0)-(b.seats.北向.sell||0); return nb-na; })
+      .slice(0,5);
+    function fmtYi(w){ return (Number(w)||0)>=10000 ? (Number(w)/10000).toFixed(2)+'亿' : Number(w).toFixed(0)+'万'; }
+    function row(s, keyFn){ return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.08);"><span style="font-size:12px;color:var(--txt);">'+s.name+' <span style="font-size:10px;color:var(--dim);">'+s.code+'</span></span><span style="font-size:12px;font-weight:700;color:'+((keyFn(s)||0)>=0?'var(--up)':'var(--down)')+';">'+(keyFn(s)>=0?'+':'')+fmtYi(keyFn(s))+'</span></div>'; }
+    function block(title, rows){ return rows.length?('<div style="flex:1;min-width:160px;"><div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:4px;">'+title+'</div>'+rows.join('')+'</div>'):''; }
+    const html='<div style="display:flex;gap:16px;flex-wrap:wrap;">'
+      +block('机构净买 TOP5', instTop.map(s=>row(s, x=>x.inst_net_万)))
+      +block('游资净买 TOP5', yzTop.map(s=>row(s, x=>x.yz_net_万)))
+      +block('机游共振', resonance.map(s=>row(s, x=>(x.inst_net_万||0)+(x.yz_net_万||0))))
+      +block('北向席位净买', north.map(s=>row(s, x=>(s.seats.北向.buy||0)-(s.seats.北向.sell||0))))
+      +'</div>';
+    $b.innerHTML=html || '<div class="ipo-empty">龙虎榜数据暂不可用</div>';
+    $t.textContent=data.update_time?rel(data.update_time):'—';
+  }
+  window.renderLhbNet = renderLhbNet;
+
+  /* ---- 8. 市场宽度（52周新高） ---- */
+  function renderMarketBreadth(w52){
+    const $b=$('breadthBody'), $t=$('breadthTime');
+    if(!$b) return;
+    const data=w52||{};
+    const total=Number(data.total)||0;
+    const top=data.top_gainers||[];
+    if(!total && !top.length){
+      $b.innerHTML='<div class="ipo-empty">市场宽度数据暂不可用</div>';
+      $t.textContent='—';
+      return;
+    }
+    let score=50;
+    if(total>=300) score=90;
+    else if(total>=200) score=75;
+    else if(total>=150) score=60;
+    else if(total>=100) score=45;
+    else if(total>=50) score=30;
+    else score=20;
+    let color=score>=70?'var(--up)':(score>=50?'var(--gold)':'var(--down)');
+    let rows=top.slice(0,8).map(function(s){
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.08);"><span style="font-size:12px;color:var(--txt);">'+s.name+' <span style="font-size:10px;color:var(--dim);">'+s.code+'</span></span><span style="font-size:12px;font-weight:700;color:var(--up);">+'+(Number(s.chg)||0).toFixed(2)+'%</span></div>';
+    }).join('');
+    $b.innerHTML='<div style="display:flex;gap:16px;flex-wrap:wrap;">'
+      +'<div style="text-align:center;min-width:100px;"><div style="font-size:32px;font-weight:800;color:'+color+';">'+total+'</div><div style="font-size:11px;color:var(--dim);">今日历史新高家数</div><div style="font-size:12px;margin-top:4px;color:'+color+';">宽度评分 '+score+'</div></div>'
+      +'<div style="flex:1;min-width:180px;"><div style="font-size:11px;font-weight:700;color:var(--sub);margin-bottom:4px;">领涨新高股 TOP8</div>'+rows+'</div>'
+      +'</div>';
+    $t.textContent=data.update_time?rel(data.update_time):'—';
+  }
+  window.renderMarketBreadth = renderMarketBreadth;
+
+  /* ---- 9. 解禁日历 ---- */
+  function renderRestrictedRelease(data){
+    const $b=$('restrictedBody'), $t=$('restrictedTime');
+    if(!$b) return;
+    data=data||{};
+    const items=(data.items||[]).slice(0,10);
+    const stats=data.stats||{};
+    $t.textContent=data.update_time?rel(data.update_time):'—';
+    if(!items.length){
+      $b.innerHTML='<div class="ipo-empty">解禁数据建设中，下次跑批后更新</div>';
+      return;
+    }
+    const statHtml='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">'
+      +'<span style="font-size:12px;">7天内 <b>'+(stats.d7||0)+'</b> 家</span>'
+      +'<span style="font-size:12px;">30天内 <b>'+(stats.d30||0)+'</b> 家</span>'
+      +'<span style="font-size:12px;">90天内 <b>'+(stats.d90||0)+'</b> 家</span>'
+      +'</div>';
+    const rows=items.map(function(it){
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.08);"><span style="font-size:12px;color:var(--txt);">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.code+'</span> <span style="font-size:10px;color:var(--sub);">'+it.date+'</span></span><span style="font-size:12px;font-weight:700;color:var(--txt);">'+(it.amount||'--')+'</span></div>';
+    }).join('');
+    $b.innerHTML=statHtml+'<div style="max-height:260px;overflow:auto;">'+rows+'</div>';
+  }
+  window.renderRestrictedRelease = renderRestrictedRelease;
+
+  /* ---- 10. 业绩预告 ---- */
+  function renderPerformanceForecast(data){
+    const $b=$('forecastBody'), $t=$('forecastTime');
+    if(!$b) return;
+    data=data||{};
+    const items=(data.items||[]).slice(0,10);
+    const summary=data.summary||{};
+    $t.textContent=data.update_time?rel(data.update_time):'—';
+    if(!items.length){
+      $b.innerHTML='<div class="ipo-empty">业绩预告数据建设中，下次跑批后更新</div>';
+      return;
+    }
+    const sumHtml='<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">'
+      +'<span style="font-size:12px;">预增 <b style="color:var(--up);">'+(summary.increase||0)+'</b></span>'
+      +'<span style="font-size:12px;">预减 <b style="color:var(--down);">'+(summary.decrease||0)+'</b></span>'
+      +'<span style="font-size:12px;">预亏 <b>'+(summary.loss||0)+'</b></span>'
+      +'</div>';
+    const rows=items.map(function(it){
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.08);"><span style="font-size:12px;color:var(--txt);">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.code+'</span> <span style="font-size:10px;color:var(--sub);">'+it.type+'</span></span><span style="font-size:12px;font-weight:700;color:'+(it.change_pct>=0?'var(--up)':'var(--down)')+';">'+(it.change_pct>=0?'+':'')+(it.change_pct||'--')+'%</span></div>';
+    }).join('');
+    $b.innerHTML=sumHtml+'<div style="max-height:260px;overflow:auto;">'+rows+'</div>';
+  }
+  window.renderPerformanceForecast = renderPerformanceForecast;
+
 
   /* ---- 初始化 ---- */
   function initPostMarket(){
@@ -9244,6 +9452,13 @@ function drawUpDownChart(){
     safe(renderHealthCheck);
     // 2026-08-16: 商品涨价弹性榜已从选股策略TAB移至盘后数据section，需在此处渲染
     try{ if(typeof window._fillCommodityElasticity==='function') window._fillCommodityElasticity(); }catch(e){ console.warn('商品涨价弹性榜渲染失败',e); }
+
+    // 2026-08-30 主人令：盘后数据页扩展（情绪/龙虎榜/宽度/解禁/业绩）
+    safe(window.renderSentiment, window.LIMIT_UP_HEATMAP || {}, window.LIMIT_UP_BROKEN || {});
+    safe(window.renderLhbNet, window.LHB_DATA || {}, window.LHB_7D || {});
+    safe(window.renderMarketBreadth, window.W52_HIGH || {});
+    safe(window.renderRestrictedRelease, window.RESTRICTED_RELEASE || {});
+    safe(window.renderPerformanceForecast, window.PERFORMANCE_FORECAST || {});
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initPostMarket);
   else initPostMarket();
@@ -10483,7 +10698,7 @@ function drawUpDownChart(){
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=f69f4fcc75';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=30d9d81108';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -10492,7 +10707,7 @@ function drawUpDownChart(){
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=65a498bd97';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=347d768634';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -12908,7 +13123,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=9fc7c5378b')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=a0a6ff6b29')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){

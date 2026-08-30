@@ -83,6 +83,8 @@ VAR_TO_RAW = {
     "MARKET_ALERTS": "market_alerts.json",
     "AVG_PRICE_DATA": "avg_price_data.json",
     "OVERSEAS_MARKETS": "overseas_markets.json",
+    "RESTRICTED_RELEASE": "restricted_release.json",
+    "PERFORMANCE_FORECAST": "performance_forecast.json",
 }
 
 # 变量名 → 更新时段（与 update_v8.py 的 CATEGORY_MAP 对齐）
@@ -126,6 +128,9 @@ CATEGORY_MAP = {
     # 注：此处曾误写「盘后」注释但取值实为 intraday；2026-08-12 已把 update_v8.py CATEGORY_MAP 同步对齐为 intraday
     "AVG_PRICE_DATA": "intraday",
     "OVERSEAS_MARKETS": "intraday",  # 亚太市场(日经/恒生/KOSPI/台湾)：交易时段实时更新，盘中每轮刷新
+    # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告，日频更新即可
+    "RESTRICTED_RELEASE": "premarket",
+    "PERFORMANCE_FORECAST": "premarket",
 }
 
 _ak = None
@@ -2203,6 +2208,38 @@ def f_w52_high():
     }
 
 
+def f_restricted_release():
+    """盘后数据页：未来 A 股解禁日历（调用 algorithms/fetch_restricted_release.py）。"""
+    import subprocess as _sp
+    try:
+        script = ROOT / "algorithms" / "fetch_restricted_release.py"
+        r = _sp.run([sys.executable, str(script)], cwd=str(ROOT),
+                    capture_output=True, text=True, timeout=300)
+        if r.returncode != 0:
+            print(f"  ⚠️ 解禁日历子进程返回 {r.returncode}: {(r.stderr or '')[:200]}")
+            return None
+        return {"fetched": True}
+    except Exception as e:
+        print(f"  ⚠️ 解禁日历调用失败: {e}")
+        return None
+
+
+def f_performance_forecast():
+    """盘后数据页：A 股业绩预告（调用 algorithms/fetch_performance_forecast.py）。"""
+    import subprocess as _sp
+    try:
+        script = ROOT / "algorithms" / "fetch_performance_forecast.py"
+        r = _sp.run([sys.executable, str(script)], cwd=str(ROOT),
+                    capture_output=True, text=True, timeout=300)
+        if r.returncode != 0:
+            print(f"  ⚠️ 业绩预告子进程返回 {r.returncode}: {(r.stderr or '')[:200]}")
+            return None
+        return {"fetched": True}
+    except Exception as e:
+        print(f"  ⚠️ 业绩预告调用失败: {e}")
+        return None
+
+
 def f_etf_daily_monitor():
     # ETF 日监控：全市场 ETF 当日主力净流入排名（T+1 盘后更新）
     # 数据源：akshare fund_etf_spot_em 含「主力净流入-净额」字段
@@ -3433,6 +3470,9 @@ def main(category=None, only=None):
         ("MARKET_ALERTS", f_market_alerts),
         ("AVG_PRICE_DATA", f_avg_price),
         ("OVERSEAS_MARKETS", f_overseas_markets),
+        # 2026-08-30：盘后数据页新增
+        ("RESTRICTED_RELEASE", f_restricted_release),
+        ("PERFORMANCE_FORECAST", f_performance_forecast),
     ]
 
     def f_four_volume():
