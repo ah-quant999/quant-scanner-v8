@@ -718,8 +718,10 @@ def calc_one_commodity(key, info, current_price, price_date, source="", price_hi
                 use_zscore = True
 
     if use_zscore:
-        # z-score 模式：偏离度 = z_score × 100（放大为百分比尺度，便于展示）
-        dev_pct = round(z_score * 100, 2)
+        # 🛡 2026-08-30 审计修复：dev_pct 必须是「真实价格偏离%」而非 z×100（否则前端显示 +351.9% 误导）
+        #   标准化偏离幅度（σ单位×100）单独存 dev_z，仅用于弹性系数计算
+        dev_z = round(z_score * 100, 2)
+        dev_pct = round((current_price - ma30) / ma30 * 100, 2) if (ma30 and ma30 > 0) else 0.0
         baseline_val = ma30
         is_hot = abs(z_score) >= HOT_ZSCORE and z_score > 0  # 只看正向偏离（涨价）
         hot_basis = f"z-score={z_score}(σ={std30}, μ={ma30})"
@@ -728,12 +730,14 @@ def calc_one_commodity(key, info, current_price, price_date, source="", price_hi
         baseline = REFERENCE_BASELINE.get(key)
         baseline_val = baseline
         dev_pct = (current_price - baseline) / baseline * 100 if (baseline and baseline > 0) else 0.0
+        dev_z = round(dev_pct, 2)
         is_hot = dev_pct >= HOT_THRESHOLD_PCT
         hot_basis = f"参考基准={BASELINE_LABEL}"
 
     rows = []
     for stk in info["stocks"]:
-        elasticity = dev_pct * stk["business_pct"] * ELASTICITY_LEVERAGE
+        # 弹性系数 = 标准化偏离幅度 × 业务占比 × 杠杆（简化估算，非收益率；前端标注为「弹性指数」）
+        elasticity = dev_z * stk["business_pct"] * ELASTICITY_LEVERAGE
         rows.append({
             "code": stk["code"],
             "name": stk["name"],

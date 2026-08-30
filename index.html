@@ -1708,7 +1708,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           if(_p20!=null && _p20<-3) _sigBuy.push('🟢 低于MA20 '+_p20.toFixed(1)+'% · 短期超卖');
           if(_p20!=null && _p20<-5) _sigBuy.push('🟢 深破MA20 '+_p20.toFixed(1)+'% · 可关注');
           if(_p60!=null && _p60<-5) _sigBuy.push('🟢 低于MA60 '+_p60.toFixed(1)+'% · 中期低估·分批');
-          if(_p60!=null && _p60<-8) _sigBuy.push('🟢 深破MA60 '+_p60.toFixed(1)+'% · 建仓区间');
+          if(_p60!=null && _p60<-8) _sigBuy.push('🟢 深破MA60 '+_p60.toFixed(1)+'% · 分批观测');
           var _hist=ap.history||[];
           if(_hist.length>=3){
             var _d0=_hist[_hist.length-1], _d1=_hist[_hist.length-2], _d2=_hist[_hist.length-3];
@@ -1735,11 +1735,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           h+='</div>';
           // 第二行：买/加 + 卖/减 + ⚠警告 + 综合结论
           var _verdict='', _vClr='var(--gold)';
-          if(_sigSell.length>=2){ _verdict=' 🔴 高位警戒'; _vClr='#f87171'; }
-          else if(_sigSell.length===1){ _verdict=' 🟠 偏高'; _vClr='#fbbf24'; }
-          else if(_sigBuy.length>=2){ _verdict=' 🟢 偏低可建仓'; _vClr='#4ade80'; }
-          else if(_sigBuy.length===1){ _verdict=' 🟡 超卖轻仓'; _vClr='#fbbf24'; }
-          else { _verdict=' ⏸ 中性观望'; _vClr='var(--sub)'; }
+          if(_sigSell.length>=2){ _verdict=' 🔴 高位·观测'; _vClr='#f87171'; }
+          else if(_sigSell.length===1){ _verdict=' 🟠 偏高·观测'; _vClr='#fbbf24'; }
+          else if(_sigBuy.length>=2){ _verdict=' 🟢 偏低·观测'; _vClr='#4ade80'; }
+          else if(_sigBuy.length===1){ _verdict=' 🟡 超卖·轻仓观测'; _vClr='#fbbf24'; }
+          else { _verdict=' ⏸ 中性·观望'; _vClr='var(--sub)'; }
           var _warns=[];
           if(_chg!=null && _chg<-0.5) _warns.push('单日跌'+(_chg<0?'':'')+Number(_chg).toFixed(1)+'%');
           if(ap.position_vs_ma20!=null && ap.position_vs_ma20<0) _warns.push('破MA20');
@@ -1757,6 +1757,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
               h+='</span>';
             }
             h+='<span style="font-weight:700;color:'+_vClr+';font-size:11.5px;">'+_verdict+'</span>';
+            h+='<span style="font-size:10.5px;color:var(--dim);margin-left:6px;">🔭 仅观测位置·开仓以AI速览⚖️择时裁决为准</span>';
             if(_warns.length){
               h+='<span style="display:inline-block;padding:1px 7px;border-radius:3px;background:#b91c1c22;color:#f87171;font-size:11.5px;font-weight:700;">⚠ '+_warns.join(' / ')+'</span>';
             }
@@ -2676,7 +2677,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           <span id="strpsRunBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);vertical-align:middle">✅ 已计算</span>
         </div>
         <div style="font-size:11px;color:var(--dim);margin-bottom:12px;line-height:1.6;">
-          排名池：候选池 universe（<span id="strpsUniCount">--</span>只）；指数：<span id="strpsIndexName">--</span>；A档硬门禁：站上250日线 + RS&gt;0 + RPSmax≥90。
+          排名池：候选池 universe（<span id="strpsUniCount">--</span>只，<b style="color:#fbbf24">候选池内排名·非全市场</b>）；指数：<span id="strpsIndexName">--</span>；A档硬门禁：站上250日线 + RS&gt;0 + RPSmax≥90。
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
           <label style="font-size:12px;color:var(--sub);">分层：</label>
@@ -3448,7 +3449,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     var h = '';
     h += '<div class="cal-header-row">';
-    h += '<span class="cal-title">🌊 北向资金日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span> ' + _uBadge('盘后', '短线', NF.update_time) + '</span>';
+    h += '<span class="cal-title">🌊 北向资金日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span> ' + _uBadge('盘后', '短线', (window.LHB_DATA && window.LHB_DATA.update_time) || NF.update_time) + '</span>';
     h += '<span class="cal-meta">'
        + '<button class="cal-nav-btn" onclick="_northCalPrev()" title="上个月">◀</button>'
        + ' <span id="northCalYearMonth">' + year + '年' + (month+1) + '月</span> '
@@ -3925,7 +3926,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     h += '<div style="margin-top:16px;font-size:12px;font-weight:700;color:var(--purple);margin-bottom:8px">⚡ 机游共振（短线）· 仅龙虎榜上榜个股</div>';
     h += '<div class="insight-grid" style="grid-template-columns:1fr 1fr 1fr">';
     // 最强共振
-    var _strong = _lhb.filter(function(s){ return (s.inst_net_万||0)>0 && (s.yz_net_万||0)>0; })
+    var _strong = _lhb.filter(function(s){ return (function(a,b){return a>0 && b>0 && (a+b)>=8000;})(s.inst_net_万||0, s.yz_net_万||0); })
                      .sort(function(a,b){ return ((b.inst_net_万||0)+(b.yz_net_万||0))-((a.inst_net_万||0)+(a.yz_net_万||0)); }).slice(0,4);
     h += '<div class="insight-card" style="border-left-color:var(--purple)"><h4>🔥 最强共振 <span style="font-size:10px;color:var(--purple);font-weight:400">机构+游资</span></h4>';
     if(_strong.length){
@@ -3986,12 +3987,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     var h = '';
     // Header：标题、🐻 胶囊、🧺 计数胶囊统一放同一行（与严格三重共识/四量终极格式一致）
-    var _hunterCoreCount = lhbStocks.filter(function(s){ return (s.inst_net_万||0)>0 && (s.yz_net_万||0)>0; }).length;
+    var _hunterCoreCount = lhbStocks.filter(function(s){ return (function(a,b){return a>0 && b>0 && (a+b)>=8000;})(s.inst_net_万||0, s.yz_net_万||0); }).length;
     h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">';
     h += '<span style="font-size:18px;font-weight:800;color:var(--txt)">🐂 大牛股猎手</span>';
     h += _uBadge('盘后', '短线', updateTime);
     if(_hunterCoreCount > 0){
-      h += _holdBadge(updateTime, _hunterCoreCount, '已入仓');
+      h += _holdBadge(updateTime, _hunterCoreCount, '核心共振');
     }
     h += '</div>';
     h += '<div style="font-size:11px;color:var(--dim);margin-bottom:10px;">机游共振 · 板块资金流 · 核心共振（仅龙虎榜覆盖个股）</div>';
@@ -4049,7 +4050,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     // Col 3: 核心共振（机构 + 游资）
     h += '<div class="hunter-card"><h4>🔥 核心共振 <span style="font-size:10px;color:var(--dim);font-weight:400">机构+游资</span></h4>';
-    var core = lhbStocks.filter(function(s){ return (s.inst_net_万||0) > 0 && (s.yz_net_万||0) > 0; })
+    var core = lhbStocks.filter(function(s){ return (function(a,b){return a>0 && b>0 && (a+b)>=8000;})(s.inst_net_万||0, s.yz_net_万||0); })
                  .sort(function(a,b){ return ((b.inst_net_万||0)+(b.yz_net_万||0))-((a.inst_net_万||0)+(a.yz_net_万||0)); }).slice(0, 6);
     if(core.length > 0){
       core.forEach(function(s){
@@ -4830,7 +4831,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           <tr><td>position_vs_ma20 &lt; -3%</td><td>🟢 低于 MA20 X% · 短期超卖</td></tr>
           <tr><td>position_vs_ma20 &lt; -5%</td><td>🟢 深破 MA20 X% · 可关注</td></tr>
           <tr><td>position_vs_ma60 &lt; -5%</td><td>🟢 低于 MA60 X% · 中期低估·分批</td></tr>
-          <tr><td>position_vs_ma60 &lt; -8%</td><td>🟢 深破 MA60 X% · 建仓区间</td></tr>
+          <tr><td>position_vs_ma60 &lt; -8%</td><td>🟢 深破 MA60 X% · 分批观测</td></tr>
           <tr><td>avg_change_pct &gt; 1.5%</td><td>⚡ 单日暴涨 X% · 追高风险</td></tr>
           <tr><td>连跌 2 天后转涨</td><td>🔄 连跌后首阳 · 反弹确认</td></tr>
         </table>
@@ -5182,7 +5183,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-h">归一化口径</div>
         <div class="logic-p">total_score = min(100, 原始总分 / 130 × 100)。历史快照已同步回刷，保证「≥80 精选 / ≥70 观察」的阈值在所有日期口径一致。<br><span style="color:var(--dim)">注：2026-06 那批早期快照缺少评分明细、无法还原原始分，按要求保持原样未改（不编造数据）。</span></div>
         <div class="logic-h">建议持有期（2026-08-28 新增）</div>
-        <div class="logic-p">按可信口径回测（入场价 = 信号日次一交易日<b>开盘价</b>，扣除往返 0.20% 成本），持有期与超额收益强相关：<br>· <b class="down">T+1 / T+3 / T+5：相对上证指数超额 −0.59% / −1.90% / −1.78%</b> —— 短期反而跑输大盘<br>· <b class="up">T+10：相对上证超额 +5.72%，胜率 63.7%；相对国证A指 +4.53%，相对中证1000 +2.22%</b><br>· <b class="up">T+20：相对上证超额 +5.56%，胜率 68.2%</b><br>因此全站默认<b>建议持有 10 个交易日</b>，不宜按 1~5 日的短线思路操作。<br><span style="color:var(--dim)">注：中证1000 口径下 T+10 超额只剩 +2.22%，说明约 3.5pp 的「超额」实质是小盘风格 beta；真正的选股 alpha 约 2~4.5pp。</span></div>
+        <div class="logic-p">按可信口径回测（入场价 = 信号日次一交易日<b>开盘价</b>，扣除往返 0.20% 成本），持有期与超额收益强相关：<br><span style="color:var(--dim)">注：上述为专项「持有期」回测（已扣成本）；客户区「策略回测」信号表为<b>毛胜率、未扣成本</b>，见各表⚠️提示，二者口径不同请勿混用。</span><br>· <b class="down">T+1 / T+3 / T+5：相对上证指数超额 −0.59% / −1.90% / −1.78%</b> —— 短期反而跑输大盘<br>· <b class="up">T+10：相对上证超额 +5.72%，胜率 63.7%；相对国证A指 +4.53%，相对中证1000 +2.22%</b><br>· <b class="up">T+20：相对上证超额 +5.56%，胜率 68.2%</b><br>因此全站默认<b>建议持有 10 个交易日</b>，不宜按 1~5 日的短线思路操作。<br><span style="color:var(--dim)">注：中证1000 口径下 T+10 超额只剩 +2.22%，说明约 3.5pp 的「超额」实质是小盘风格 beta；真正的选股 alpha 约 2~4.5pp。</span></div>
         <div class="logic-h">评分有效性验证</div>
         <div class="logic-p">按当日评分分三组回测（T+10）：<b class="up">前 1/3 超额胜率 81.5%</b>，后 1/3 为 58.0%；分月看 T+10 超额收益 6 月 +18.7% / 7 月 +3.8% / 8 月 +4.8%，三个月全为正。<br>结论：评分的主要价值是提升<b>胜率与稳定性</b>，而非拉高单笔收益。</div>
         <div class="logic-h">历史追踪</div>
@@ -7265,6 +7266,7 @@ window.__renderV8CalFull();
     grouped = classify((data&&data.stocks)||[], today);
     const fresh=document.getElementById('ipoFresh');
     if(fresh && data && data.update_time) fresh.innerHTML = _uBadge('盘中','短线',data.update_time) + (fmtStaleness(data.update_time) || '');
+    else if(fresh && data && data._isFallback) fresh.innerHTML = '<span style="color:#fbbf24;font-weight:700;">⚠️ 打新数据暂不可用（兜底空态，非实时）</span>';
     renderAll();
   }
 
@@ -7295,7 +7297,7 @@ window.__renderV8CalFull();
           fetch('data/ipo_score.json')
             .then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
             .then(applyData)
-            .catch(err2=>{ console.warn('IPO: 回退内嵌兜底', err2); applyData(IPO_FALLBACK); });
+            .catch(err2=>{ console.warn('IPO: 回退内嵌兜底', err2); applyData({update_time:'', stocks:[], summary:'打新数据暂不可用，请稍后刷新', _isFallback:true}); });
         });
     }
     // ② tab 绑定独立执行，失败绝不影响数据渲染
@@ -7554,7 +7556,7 @@ window.__renderV8CalFull();
         '<b style="color:'+c2+';width:34px;text-align:right">'+Math.round(s)+'</b></div>';
     });
     h+='</div>';
-    const worst=Object.keys(inds).map(k=>inds[k]).filter(x=>x.level>=2).sort((a,b)=>b.score-a.score).slice(0,3);
+    const worst=Object.keys(inds).map(k=>inds[k]).filter(x=>(x.score!=null && x.score>=0.7)).sort((a,b)=>b.score-a.score).slice(0,3);
     if(worst.length){
       h+='<div style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.7">⚠️ 高分预警：'+
         worst.map(x=>x.name+'('+Math.round(x.score)+')').join('、')+'</div>';
@@ -10892,6 +10894,7 @@ function drawUpDownChart(){
       divergence:'⚠️量价背离', ge2_signals:'🎯双信号', ge3_signals:'🎯三信号'};
     var lowSampleCount = items.filter(function(s){return (s.total||0)<30;}).length;
     var html = optHtml + '<div style="font-size:12px;color:#8aa0c2;margin-bottom:8px;">'+d.gold_pool_size+'只金池股×60日 · '+(d.calc_time||'')+' · 按T+5胜率降序</div>';
+    html += '<div style="font-size:11px;color:#8aa0c2;margin:4px 0 8px;padding:5px 9px;background:rgba(255,183,77,.08);border:1px solid rgba(255,183,77,.25);border-radius:5px;">⚠️ 回测为<b>毛胜率</b>，未扣除交易成本（往返约 0.2%）；样本量越小参考性越低，仅供内部验证，不构成收益承诺。</div>';
     if (lowSampleCount > 0) {
       html += '<div style="font-size:12px;color:#ff6b81;background:rgba(255,107,129,.12);padding:6px 10px;border-radius:4px;margin-bottom:8px;">⚠️ <b>'+lowSampleCount+' 个信号样本<30</b>，胜率参考性低，红色行已标出。仅作排序参考，不作决策依据。</div>';
     }
@@ -11843,7 +11846,8 @@ h+='</div>';  // /ulPaneDbg
     });
 
     function _stockRow(s){
-      var eColor = s.elasticity_pct >= 3 ? '#fbbf24' : (s.elasticity_pct >= 0 ? '#22c55e' : '#f87171');
+      var _el = s.elasticity_pct || 0;
+      var eColor = _el >= 100 ? '#fbbf24' : (_el >= 50 ? '#22c55e' : '#94a3b8');
       var sq = (window.STOCK_QUOTE && window.STOCK_QUOTE.stocks) ? window.STOCK_QUOTE.stocks[s.code] : null;
       var dv = sq ? sq.dividend : null;
       var dyChip = '';
@@ -11854,14 +11858,19 @@ h+='</div>';  // /ulPaneDbg
       }
       return '<div style="display:flex;justify-content:space-between;align-items:center;font-size:10.5px;padding:1.5px 0;border-bottom:1px dashed rgba(148,163,184,.10);">'
         + '<span><b>'+s.name+'</b> <span style="color:var(--dim);font-size:9.5px;">'+s.code+' · '+(s.business_pct*100|0)+'%</span>'+dyChip+'</span>'
-        + '<span style="color:'+eColor+';font-weight:600;flex-shrink:0;margin-left:4px;">'+ (s.elasticity_pct>0?'+':'') + s.elasticity_pct+'%</span>'
+        + '<span style="color:'+eColor+';font-weight:600;flex-shrink:0;margin-left:4px;" title="理论弹性指数=商品偏离σ×业务占比×杠杆（简化估算，非收益率）">弹性 ' + _el.toFixed(0) + '</span>'
         + '</div>';
     }
 
     function _miniCard(c, opts){
-      var dev = c.dev_pct || 0;
-      var devStr = (dev > 0 ? '+' : '') + dev.toFixed(1) + '%';
-      var devColor = dev >= 3 ? '#fbbf24' : (dev <= -3 ? '#f87171' : '#94a3b8');
+      // 🛡 2026-08-30 审计修复：dev_pct 已由 fetcher 修正为真实价格偏离%；
+      //   前端再用 current_price/baseline_30d 双重校验（兼容旧数据 dev_pct=z×100），颜色按 z_score
+      var _realDev = (c.baseline_30d && c.baseline_30d > 0 && c.current_price != null)
+        ? (c.current_price - c.baseline_30d) / c.baseline_30d * 100 : (c.dev_pct || 0);
+      var dev = _realDev;
+      var _z = (c.z_score != null) ? c.z_score : 0;
+      var devStr = (dev > 0 ? '+' : '') + dev.toFixed(1) + '%' + (_z ? ' <span style="font-size:9px;color:var(--dim);">z=' + _z.toFixed(1) + '</span>' : '');
+      var devColor = _z >= 2 ? '#fbbf24' : (_z <= -2 ? '#f87171' : '#94a3b8');
       var bg = opts.bg || 'rgba(245,158,11,.08)';
       var border = opts.border || 'rgba(245,158,11,.35)';
       var icon = opts.icon || '';
@@ -11914,7 +11923,9 @@ h+='</div>';  // /ulPaneDbg
       html += '<div style="font-size:11px;font-weight:600;color:#94a3b8;margin:8px 0 4px;">❄ 未达阈值</div>';
       html += '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;">';
       coolList.forEach(function(c){
-        var dev = c.dev_pct || 0;
+        var _realDev2 = (c.baseline_30d && c.baseline_30d > 0 && c.current_price != null)
+          ? (c.current_price - c.baseline_30d) / c.baseline_30d * 100 : (c.dev_pct || 0);
+        var dev = _realDev2;
         var devStr = (dev > 0 ? '+' : '') + dev.toFixed(1) + '%';
         var isDown = dev < -0.5;
         var st = isDown ? '📉 下跌 '+devStr : '➖ 无涨价('+devStr+')';
@@ -11965,7 +11976,8 @@ h+='</div>';  // /ulPaneDbg
     var liveScore = Math.round(Math.max(0, Math.min(100, 100 - crisisPct*0.6 + Math.min(totalUp,100)*0.25)));
     var score = (sc.score > 0) ? Math.round((liveScore + sc.score) / 2) : liveScore;
     var delta_pct = sc.delta_pct || 0;
-    var advice = sc.advice || (phaseDesc+' · 建议'+posAdvice+'仓位');
+    // 🛡 2026-08-30 审计：停用 SENTIMENT_CYCLE.js 陈旧的 sc.advice，统一用实时计算，消除「退潮 vs 温和」矛盾
+    var advice = (phaseDesc+' · 建议'+posAdvice+'仓位');
 
     var html = '';
     // 顶部：phase 大色块（实时计算值）
@@ -14162,7 +14174,7 @@ window.__renderV8CalToday();
     }
 
     h+='<div style="margin-top:12px;padding:10px 13px;background:rgba(244,73,93,.07);border:1px solid rgba(244,73,93,.24);border-radius:9px;font-size:12px;color:var(--sub);line-height:1.7">';
-    h+='<b style="color:var(--up)">⚠️ 交易纪律：</b>止损价 = max(20日低点, 现价×0.9, 现价−ATR×2)；目标价按盈亏比 1.5 反推。<b>破止损无条件离场</b>，不摊平、不扛单、不追高。';
+    h+='<b style="color:var(--up)">⚠️ 交易纪律：</b>止损价 = max(20日低点, 现价×0.9, 现价−ATR×2)；目标价按盈亏比 1.5 反推。<b>破止损无条件离场</b>，不摊平、不扛单、不追高。<br>📌 <b>建议持有≈T+10</b>（回测 T+10 超额最优）；<b>短线 T+1~T+5 跑输大盘</b>，勿按短线操作。';
     h+='</div>';
 
     el.innerHTML=h;
