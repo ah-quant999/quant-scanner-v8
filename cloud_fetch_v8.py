@@ -92,8 +92,8 @@ CATEGORY_MAP = {
     "V8_CAL": "premarket",
     "IPO_DATA": "premarket",
     "MARGIN_DATA": "premarket",
-    # 2026-08-30：期指主力合约卡移到「盘后数据」页，改为 post_close 抓取当日收盘后数据
-    "CFFEX_HOLDINGS": "post_close",
+    # 2026-08-31：期指主力合约为盘中实时，放回实时数据页，改为 intraday 抓取
+    "CFFEX_HOLDINGS": "intraday",
     "MACRO_DATA": "premarket",
     "CRISIS_DATA": "premarket",
     "MACRO_BRIEF": "premarket",
@@ -3041,7 +3041,8 @@ def _clear_intraday_for_premarket(category, only=None):
     # 🛡 2026-08-26 一劳永逸根因修复：CONCEPT_RANKING 原不在 KEEP_VARS，盘前(08:25)即被抹成空 stub，
     #   导致"概念资金热图过早清空"。现与 SH_SZ_HISTORY 同等对待——盘前保留前一交易日真实数据，
     #   等 09:00 盘中 fetch 自然刷新（即"开盘前一起刷新"，而非 08:25 就空白）。
-    KEEP_VARS = {"SH_SZ_HISTORY", "CAPITAL_FLOW_DATA", "LIMIT_UP_HEATMAP", "ETF_DAILY_MONITOR", "CONCEPT_RANKING"}
+    # 2026-08-31：CFFEX_HOLDINGS 改 intraday 后盘前不清空，保留上一交易日数据等盘中覆盖
+    KEEP_VARS = {"SH_SZ_HISTORY", "CAPITAL_FLOW_DATA", "LIMIT_UP_HEATMAP", "ETF_DAILY_MONITOR", "CONCEPT_RANKING", "CFFEX_HOLDINGS"}
 
     for var, cat in CATEGORY_MAP.items():
         if "intraday" not in [x.strip() for x in cat.split(",")]:
