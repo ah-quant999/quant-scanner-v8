@@ -225,6 +225,26 @@ jobs:
         run: |
           python v8_health_check.py
 
+      # 🛡 2026-08-31 一劳永逸补齐缺口（小九令）：
+      #   本 hosted 兜底链此前只有 update_v8（重生成 data/*.js），
+      #   却**缺少「推送重建的 data/*.js」步骤** —— 主版 v8_cn_fetch_cloud.yml
+      #   在 2026-08-27「盘中更新全断根因修复」时才补上（其 step21，timeout 30）。
+      #   后果：hosted 版跑得再成功，raw_data 更新了、data/*.js 本地也重建了，
+      #   但永远推不上 main → 前端（含本次要修的共振日历）看不到任何新数据。
+      #   现原样移植主版同款自闭环推送（PUSH_FILES 来源驱动增量）。
+      - name: "📤 推送重建的 data/*.js（自闭环，防 build 触发失效）"
+        timeout-minutes: 30
+        continue-on-error: true
+        shell: bash
+        run: |
+          DATA_MANIFEST=$(git status --porcelain data/ | awk '{print $2}' | tr '\n' ',')
+          if [ -z "$DATA_MANIFEST" ]; then
+            echo "ℹ️ 本次无 data 变更，跳过推送"
+          else
+            echo "📋 推送重建 data: ${DATA_MANIFEST%,}"
+            PUSH_FILES="$DATA_MANIFEST" python api_push_raw.py
+          fi
+
       - name: "🛰️ 云端兜底调度（算法链/温度计，幂等）"
         if: success()
         continue-on-error: true
