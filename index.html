@@ -4010,8 +4010,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   window.__renderBacktestSection = function(){
     var dst = document.getElementById('btBody');
     if(!dst) return;
-    if(rendered) return;
-    rendered = true;
+    // 🔁 2026-08-31：移除一次性守卫，改为「幂等重渲染」（支持列头点击排序）
+    //   原守卫 `if(rendered)return; rendered=true;` 导致表头点击后第二次调用直接 return，
+    //   排序功能失效。本函数重写为纯渲染，无外部副作用，可重复调用。
 
     var bc = window.BACKTEST_COMPREHENSIVE || {};
     var bd = window.BACKTEST_TDX || {};
@@ -4193,6 +4194,43 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var pt = window.V8_POOL_TRACKER || null;
     if(pt && pt.items && pt.items.length){
       var sc = pt.status_counts || {};
+
+      /* ─── 列头点击排序（2026-08-31 主人截图"47/46只没全看到+没排序"一劳永逸） ─── */
+      var POOL_SORT_DEFAULT = {field:'last_pct', asc:false};
+      if(!pt._sort) pt._sort = {field:POOL_SORT_DEFAULT.field, asc:POOL_SORT_DEFAULT.asc};
+      var sortField = pt._sort.field;
+      var sortAsc   = !!pt._sort.asc;
+      var sortArrow = sortAsc ? '↑' : '↓';
+      window.__sortPoolTracker = function(field){
+        if(!window.V8_POOL_TRACKER || !field) return;
+        var cur = window.V8_POOL_TRACKER._sort || POOL_SORT_DEFAULT;
+        if(cur.field === field){
+          cur.asc = !cur.asc;
+        } else {
+          cur.field = field;
+          cur.asc = (field === 'code' || field === 'name');  // 代码/名称默认升序
+        }
+        window.V8_POOL_TRACKER._sort = cur;
+        if(typeof window.__renderBacktestSection === 'function') window.__renderBacktestSection();
+      };
+      function _sortBucket(arr, field, asc){
+        return arr.slice().sort(function(a,b){
+          var va = a[field], vb = b[field];
+          if(va==null && vb==null) return 0;
+          if(va==null) return 1;
+          if(vb==null) return -1;
+          if(typeof va === 'string') return asc ? String(va).localeCompare(String(vb)) : String(vb).localeCompare(String(va));
+          return asc ? va - vb : vb - va;
+        });
+      }
+      function _thSortable(label, field, align){
+        var isCur = (sortField === field);
+        var arrow = isCur ? ' '+sortArrow : '';
+        var activeStyle = isCur ? 'color:#22c55e;font-weight:700;' : 'color:var(--sub);cursor:pointer;user-select:none;';
+        var a = align || 'right';
+        return '<th onclick="window.__sortPoolTracker(\''+field+'\')" style="padding:6px;text-align:'+a+';'+activeStyle+'" title="点击切换排序">'+label+arrow+'</th>';
+      }
+
       html += '<div style="margin:14px 0;border-left:4px solid #22c55e;" class="card">';
       html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
       html += '<span style="font-size:15px;font-weight:700;color:#22c55e;">📈 ④ v8 选股生命周期</span>';
@@ -4214,17 +4252,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       });
       html += '</div>';
 
-      // 明细表
+      // 明细表（桶内按当前 sortField 排序，列头可点击切换，所有桶同步联动）
       html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
       html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      html += '<th style="padding:6px;text-align:left;color:var(--sub);">代码</th>';
-      html += '<th style="padding:6px;text-align:left;color:var(--sub);">名称</th>';
-      html += '<th style="padding:6px;text-align:left;color:var(--sub);">来源</th>';
-      html += '<th style="padding:6px;text-align:right;color:var(--sub);">基准价</th>';
-      html += '<th style="padding:6px;text-align:right;color:var(--sub);">现价</th>';
-      html += '<th style="padding:6px;text-align:right;color:var(--sub);">期间</th>';
-      html += '<th style="padding:6px;text-align:right;color:var(--sub);">峰值</th>';
-      html += '<th style="padding:6px;text-align:right;color:var(--sub);">回撤</th>';
+      html += '<th onclick="window.__sortPoolTracker(\'code\')" style="padding:6px;text-align:left;color:'+(sortField==='code'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">代码'+(sortField==='code'?' '+sortArrow:'')+'</th>';
+      html += '<th onclick="window.__sortPoolTracker(\'name\')" style="padding:6px;text-align:left;color:'+(sortField==='name'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">名称'+(sortField==='name'?' '+sortArrow:'')+'</th>';
+      html += '<th onclick="window.__sortPoolTracker(\'algo\')" style="padding:6px;text-align:left;color:'+(sortField==='algo'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">来源'+(sortField==='algo'?' '+sortArrow:'')+'</th>';
+      html += '<th onclick="window.__sortPoolTracker(\'entry_price\')" style="padding:6px;text-align:right;color:'+(sortField==='entry_price'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">基准价'+(sortField==='entry_price'?' '+sortArrow:'')+'</th>';
+      html += '<th onclick="window.__sortPoolTracker(\'last_close\')" style="padding:6px;text-align:right;color:'+(sortField==='last_close'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">现价'+(sortField==='last_close'?' '+sortArrow:'')+'</th>';
+      html += _thSortable('期间','last_pct','right');
+      html += _thSortable('峰值','peak_pct','right');
+      html += _thSortable('回撤','drawdown','right');
       html += '<th style="padding:6px;text-align:left;color:var(--sub);">提示</th>';
       html += '</tr></thead><tbody>';
 
@@ -4237,8 +4275,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       STATUS_ORDER.forEach(function(s){
         var arr = grouped[s]||[];
         if(!arr.length) return;
+        arr = _sortBucket(arr, sortField, sortAsc);  // 桶内按当前排序字段（与列头点击同步）
         html += '<tr style="background:rgba(148,163,184,.06);"><td colspan="9" style="padding:6px 8px;font-weight:700;color:'+statusColor[s]+';font-size:12px;">'+statusLabel[s]+' '+arr.length+' 只</td></tr>';
-        arr.slice(0, 12).forEach(function(it){  // 每桶最多 12 只，避免长表
+        arr.forEach(function(it){  // 🔁 2026-08-31：去掉 slice(0,12) 限制，全部展示（主人截图 "47/46 只没全看到" 根因）
           var hint = it.buy_hint || it.sell_hint || '';
           var periodColor = it.last_pct > 0 ? '#ef5350' : (it.last_pct < 0 ? '#26a69a' : 'var(--sub)');
           var peakColor   = it.peak_pct > 0 ? '#ef5350' : 'var(--sub)';
@@ -4258,7 +4297,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       });
       html += '</tbody></table></div>';
 
-      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">阈值：强势=回撤≤3%或连涨≥3日 / 买点=回撤6-12%且收阴 / 见顶=回撤≥10%且持仓≥3日 / 走弱=回撤≥20%或峰值≤0 · 数据 '+(pt.update_time||'').substring(0,16)+' · 仅跟 v8 三大算法真实跟踪池（不接 600+ 全池、不重做行业映射）</div>';
+      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">表头可点击切换排序方向（默认期间涨幅↓） · 阈值：强势=回撤≤3%或连涨≥3日 / 买点=回撤6-12%且收阴 / 见顶=回撤≥10%且持仓≥3日 / 走弱=回撤≥20%或峰值≤0 · 数据 '+(pt.update_time||'').substring(0,16)+' · 仅跟 v8 三大算法真实跟踪池（不接 600+ 全池、不重做行业映射）</div>';
       html += '</div>';
     }
 
