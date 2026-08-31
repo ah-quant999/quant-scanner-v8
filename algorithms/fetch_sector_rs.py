@@ -25,19 +25,33 @@ RAW_DIR = os.path.join(BASE, "..", "raw_data")
 PHASE_HISTORY_PATH = os.path.join(RAW_DIR, "sector_phase_history.json")
 PHASE_BUCKETS = ['主升', '启动', '震荡', '退潮', '底部']
 
+# 2026-08-31 一劳永逸修复：阶段判定规则 v2
+#   【v1 缺陷】退潮要求 d5<-1.5 且 d20<-5、底部要求 d5<-3 且 d20<-10（双负 AND）。
+#     实测 90 个申万二级板块 min(pct_20d) = -5.12 → 退潮/底部两桶结构性永远为 0，
+#     五桶退化成三桶；且"5日 -3.93% / 20日 +15.67%"这种教科书级【高位退潮】
+#     被错分成【震荡】，会误导择时判断。
+#   【v2 规则】短期 d5 决定"当下强弱"，中期 d20 决定"位置高低"，互斥且穷尽：
+#     主升 = 短中期共振向上；启动 = 短期转强且中期未深跌（含低位启动）；
+#     退潮 = 短期走弱（d20>0 高位退潮 / d20<0 持续退潮）；
+#     底部 = 中期深跌且短期不再急跌（筑底钝化）；其余 = 震荡。
+#   【防假迁移】规则变更会让"昨日快照(v1) vs 今日(v2)"产生大量伪迁移，
+#     故快照写入 rule_ver，前端只在 rule_ver 相同时才做迁移对比。
+#   ⚠️ 本函数必须与 index.html「板块资金趋势」卡阶段判定逐字一致，改一处必改两处。
+PHASE_RULE_VER = 2
+
 
 def _phase_of(s):
-    """前端一致的阶段判定（与 index.html line 6482-6487 完全一致）。"""
+    """阶段判定 v2（与 index.html 板块资金趋势卡完全一致）。"""
     d5 = s.get('pct_5d') or 0
     d20 = s.get('pct_20d') or 0
     if d5 > 3 and d20 > 5:
         return '主升'
-    if d5 > 1.5 and d20 > 0:
+    if d5 > 1.5 and d20 > -8:
         return '启动'
-    if d5 < -3 and d20 < -10:
-        return '底部'
-    if d5 < -1.5 and d20 < -5:
+    if d5 < -1.5:
         return '退潮'
+    if d20 < -8:
+        return '底部'
     return '震荡'
 
 
@@ -67,12 +81,14 @@ def _save_phase_snapshot(sectors, update_time_str, today_str):
     snaps.append({
         "date": today_str,
         "update_time": update_time_str,
+        "rule_ver": PHASE_RULE_VER,   # 2026-08-31：规则版本，前端只对比同版本快照防假迁移
         "phases": phases,
     })
     # 保留最近 30 天
     snaps = snaps[-30:]
 
     history["version"] = 1
+    history["rule_ver"] = PHASE_RULE_VER
     history["snaps"] = snaps
     try:
         with open(PHASE_HISTORY_PATH, 'w', encoding='utf-8') as f:
