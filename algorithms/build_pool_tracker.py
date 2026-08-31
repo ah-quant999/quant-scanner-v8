@@ -105,6 +105,8 @@ def load_stock_profile():
 
 
 def dedupe_by_code(algos):
+    """合并多 algo 的 tracking，按 code 去重（保留 peak_pct 最大者），
+    并记录命中过的所有 algo 名（_algos_hit，用于阶段 2 多算法共识度 consensus_count）。"""
     best = {}
     for alg in algos:
         algo_key = alg.get("algo", "")
@@ -115,9 +117,40 @@ def dedupe_by_code(algos):
                 continue
             peak = float(t.get("peak_pct") or 0)
             prev = best.get(code)
-            if (prev is None) or (peak > float(prev.get("peak_pct") or 0)):
-                best[code] = dict(t, _algo=display)
+            if prev is None:
+                best[code] = dict(t, _algo=display, _algos_hit=[display])
+            elif peak > float(prev.get("peak_pct") or 0):
+                # 新高者覆盖完整记录，但继承已累积的命中算法列表
+                best[code] = dict(t, _algo=display, _algos_hit=list(prev.get("_algos_hit", [display])))
+            else:
+                # 同一 code 多次命中（非新高），累加 algo 名（去重）
+                if display not in prev.get("_algos_hit", []):
+                    prev["_algos_hit"].append(display)
     return list(best.values())
+
+
+def _signal_type(it, reason, algos_hit):
+    """阶段 2：推导信号类型（短线买点/反弹/加速/强势/回调/板块联动/强势突破/多算法共识）。
+    优先多算法共识（≥2 个 algo 命中）；否则按 algo + signal_detail.reason 关键词兜底。"""
+    if len(set(algos_hit)) >= 2:
+        return "多算法共识"
+    r = reason or ""
+    if "加速" in r:
+        return "加速"
+    if "反弹" in r:
+        return "反弹"
+    if "突破" in r or "强势" in r:
+        return "强势"
+    if "回调" in r:
+        return "回调"
+    algo = it.get("_algo", "")
+    if algo == "四量终极":
+        return "短线买点"
+    if algo == "板块龙头":
+        return "板块联动"
+    if algo == "大牛股猎手":
+        return "强势突破"
+    return "其他"
 
 
 def _sector_match_item(item, sector_top_in, sector_top_out):
@@ -214,6 +247,11 @@ def build_items(merged, sentiment, sector_flow, profile_map):
         status, buy_hint, sell_hint = _status_decide(peak, last, days)
         code = it["code"]
         prof = (profile_map or {}).get(code, {}) or {}
+        # 阶段 2：多算法共识 + 信号类型
+        algos_hit = it.get("_algos_hit", [it.get("_algo", "")])
+        consensus_count = len(set(algos_hit))
+        _reason = (it.get("signal_detail") or {}).get("reason", "")
+        signal_type = _signal_type(it, _reason, algos_hit)
         # 🔧 K 批修复：必须把 status 也注入 it_for_select（否则 _selection_score 走 normal 分支）
         it_for_select = dict(it, _industry=prof.get("industry", ""),
                               _concepts=prof.get("concepts", []),
@@ -240,6 +278,10 @@ def build_items(merged, sentiment, sector_flow, profile_map):
             "buy_hint": buy_hint,
             "sell_hint": sell_hint,
             "signal_reason": (it.get("signal_detail") or {}).get("reason", ""),
+            # 阶段 2：多算法共识 + 信号类型
+            "algos_hit": algos_hit,
+            "consensus_count": consensus_count,
+            "signal_type": signal_type,
             # K 批精选维度
             "industry": prof.get("industry", ""),
             "concept_top": concept_top,
@@ -295,6 +337,7 @@ def main():
         merged = dedupe_by_code(data.get("algos", []))
         items = build_items(merged, sentiment, sector_flow, profile_map)
         status_counts, by_algo, selected_count = aggregate(items)
+        consensus_count = sum(1 for it in items if it.get("consensus_count", 0) >= 2)
         def _sort_key(it):
             if it["status"] == "strong":
                 return (0, -it["peak_pct"], -it["days_in"])
@@ -307,6 +350,7 @@ def main():
             "pool_size": len(items),
             "raw_pool_size": raw_pool_size,
             "selected_size": selected_count,
+            "consensus_count": consensus_count,
             "status_counts": status_counts,
             "by_algo": by_algo,
             "items": items,
@@ -334,7 +378,7 @@ def main():
                 "阈值源自专家 track_daily.py analyze()（强势/回调6-12%/见顶/走弱）"
             ),
         }
-        log(f"✅ 入池 {len(items)} 只（去重前 {raw_pool_size}）；精选 {selected_count} 只；状态分布 {dict(status_counts)}")
+        log(f"✅ 入池 {len(items)} 只（去重前 {raw_pool_size}）；精选 {selected_count} 只；多算法共识 {consensus_count} 只；状态分布 {dict(status_counts)}")
 
     os.makedirs(RAW_DIR, exist_ok=True)
     with open(OUT_JSON_PATH, "w", encoding="utf-8") as f:

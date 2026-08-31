@@ -1,8 +1,9 @@
 {
-  "update_time": "2026-08-31 23:12:20",
+  "update_time": "2026-08-31 23:21:40",
   "pool_size": 120,
   "raw_pool_size": 126,
   "selected_size": 29,
+  "consensus_count": 5,
   "status_counts": {
     "strong": 47,
     "weak": 51,
@@ -52,6 +53,11 @@
       "buy_hint": "连涨强势确认（11 天）",
       "sell_hint": null,
       "signal_reason": "机构0.2亿+游资0.0亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "橡胶和塑料制品业",
       "concept_top": "",
       "sector_match": "none",
@@ -78,6 +84,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构0.1亿+游资0.4亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "通用设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -104,6 +115,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构1.2亿+游资0.8亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -130,6 +146,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构0.2亿+游资0.1亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "化学原料和化学制品制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -156,6 +177,11 @@
       "buy_hint": "连涨强势确认（26 天）",
       "sell_hint": null,
       "signal_reason": "机构0.5亿+游资0.1亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "农、林、牧、渔专业及辅助性活动",
       "concept_top": "",
       "sector_match": "none",
@@ -182,6 +208,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构0.2亿+游资0.0亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "通用设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -208,6 +239,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构0.0亿+游资0.4亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "金属制品业",
       "concept_top": "",
       "sector_match": "none",
@@ -234,6 +270,12 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+      "algos_hit": [
+        "四量终极",
+        "大牛股猎手"
+      ],
+      "consensus_count": 2,
+      "signal_type": "多算法共识",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "人工智能",
       "sector_match": "top_inflow",
@@ -260,6 +302,11 @@
       "buy_hint": "连涨强势确认（27 天）",
       "sell_hint": null,
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头"
+      ],
+      "consensus_count": 1,
+      "signal_type": "板块联动",
       "industry": "有色金属矿采选业",
       "concept_top": "",
       "sector_match": "none",
@@ -286,6 +333,11 @@
       "buy_hint": "连涨强势确认（20 天）",
       "sell_hint": null,
       "signal_reason": "机构0.0亿+游资0.0亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "农业",
       "concept_top": "",
       "sector_match": "none",
@@ -312,6 +364,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构0.2亿+游资2.8亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "PCB",
       "sector_match": "top_inflow",
@@ -338,6 +395,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "建筑装饰、装修和其他建筑业",
       "concept_top": "",
       "sector_match": "none",
@@ -364,6 +426,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构1.2亿+游资0.1亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "",
       "concept_top": "",
       "sector_match": "none",
@@ -390,6 +457,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构0.7亿+游资0.4亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "虚拟现实",
       "sector_match": "top_inflow",
@@ -416,6 +488,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构0.0亿+游资0.8亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "汽车制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -442,6 +519,11 @@
       "buy_hint": "连涨强势确认（24 天）",
       "sell_hint": null,
       "signal_reason": "机构0.1亿+游资0.3亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "仪器仪表制造业",
       "concept_top": "人工智能",
       "sector_match": "top_inflow",
@@ -468,6 +550,11 @@
       "buy_hint": "连涨强势确认（27 天）",
       "sell_hint": null,
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头"
+      ],
+      "consensus_count": 1,
+      "signal_type": "板块联动",
       "industry": "有色金属冶炼和压延加工业",
       "concept_top": "",
       "sector_match": "none",
@@ -494,6 +581,11 @@
       "buy_hint": "连涨强势确认（26 天）",
       "sell_hint": null,
       "signal_reason": "机构0.6亿+游资1.1亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "物联网",
       "sector_match": "top_inflow",
@@ -520,6 +612,11 @@
       "buy_hint": "连涨强势确认（25 天）",
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "化学原料和化学制品制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -546,6 +643,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构0.4亿+游资1.6亿",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "百度概念",
       "sector_match": "top_inflow",
@@ -572,6 +674,12 @@
       "buy_hint": "连涨强势确认（11 天）",
       "sell_hint": null,
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头",
+        "大牛股猎手"
+      ],
+      "consensus_count": 2,
+      "signal_type": "多算法共识",
       "industry": "有色金属冶炼和压延加工业",
       "concept_top": "",
       "sector_match": "none",
@@ -598,6 +706,11 @@
       "buy_hint": "连涨强势确认（24 天）",
       "sell_hint": null,
       "signal_reason": "机构0.0亿+游资0.3亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "农副食品加工业",
       "concept_top": "",
       "sector_match": "none",
@@ -624,6 +737,11 @@
       "buy_hint": "连涨强势确认（26 天）",
       "sell_hint": null,
       "signal_reason": "机构0.0亿+游资1.4亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "PCB",
       "sector_match": "top_inflow",
@@ -650,6 +768,11 @@
       "buy_hint": "连涨强势确认（28 天）",
       "sell_hint": null,
       "signal_reason": "机构0.1亿+游资0.3亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -676,6 +799,11 @@
       "buy_hint": null,
       "sell_hint": "见顶：回撤 12.4%、持仓 28 日",
       "signal_reason": "机构0.7亿+游资0.9亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -702,6 +830,11 @@
       "buy_hint": null,
       "sell_hint": "见顶：回撤 14.7%、持仓 29 日",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "PCB",
       "sector_match": "top_inflow",
@@ -728,6 +861,11 @@
       "buy_hint": "连涨强势确认（27 天）",
       "sell_hint": null,
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头"
+      ],
+      "consensus_count": 1,
+      "signal_type": "板块联动",
       "industry": "有色金属矿采选业",
       "concept_top": "",
       "sector_match": "none",
@@ -754,6 +892,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：深回撤 23.7%",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "专用设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -780,6 +923,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头"
+      ],
+      "consensus_count": 1,
+      "signal_type": "板块联动",
       "industry": "有色金属冶炼和压延加工业",
       "concept_top": "",
       "sector_match": "none",
@@ -806,6 +954,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构0.6亿+游资0.5亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "有色金属冶炼和压延加工业",
       "concept_top": "",
       "sector_match": "none",
@@ -832,6 +985,11 @@
       "buy_hint": "连涨强势确认（26 天）",
       "sell_hint": null,
       "signal_reason": "机构0.6亿+游资0.3亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "水的生产和供应业",
       "concept_top": "",
       "sector_match": "none",
@@ -858,6 +1016,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构0.0亿+游资0.6亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "专用设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -884,6 +1047,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "电气机械和器材制造业",
       "concept_top": "物联网",
       "sector_match": "top_inflow",
@@ -910,6 +1078,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "软件和信息技术服务业",
       "concept_top": "",
       "sector_match": "none",
@@ -936,6 +1109,11 @@
       "buy_hint": null,
       "sell_hint": "见顶：回撤 13.2%、持仓 25 日",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -962,6 +1140,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头"
+      ],
+      "consensus_count": 1,
+      "signal_type": "板块联动",
       "industry": "专用设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -988,6 +1171,11 @@
       "buy_hint": "连涨强势确认（21 天）",
       "sell_hint": null,
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头"
+      ],
+      "consensus_count": 1,
+      "signal_type": "板块联动",
       "industry": "有色金属矿采选业",
       "concept_top": "",
       "sector_match": "none",
@@ -1014,6 +1202,11 @@
       "buy_hint": "连涨强势确认（11 天）",
       "sell_hint": null,
       "signal_reason": "机构0.3亿+游资0.0亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "有色金属矿采选业",
       "concept_top": "",
       "sector_match": "none",
@@ -1040,6 +1233,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头"
+      ],
+      "consensus_count": 1,
+      "signal_type": "板块联动",
       "industry": "软件和信息技术服务业",
       "concept_top": "人工智能",
       "sector_match": "top_inflow",
@@ -1066,6 +1264,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉 + 主力金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "保险业",
       "concept_top": "",
       "sector_match": "none",
@@ -1092,6 +1295,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：重挫破位",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -1118,6 +1326,11 @@
       "buy_hint": null,
       "sell_hint": "见顶：回撤 10.9%、持仓 25 日",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "软件和信息技术服务业",
       "concept_top": "人工智能",
       "sector_match": "top_inflow",
@@ -1144,6 +1357,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：深回撤 21.6%",
       "signal_reason": "机构0.0亿+游资0.0亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "",
       "concept_top": "",
       "sector_match": "none",
@@ -1170,6 +1388,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构0.1亿+游资0.3亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "",
       "concept_top": "",
       "sector_match": "none",
@@ -1196,6 +1419,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "算力概念",
       "sector_match": "top_inflow",
@@ -1222,6 +1450,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -1248,6 +1481,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：重挫破位",
       "signal_reason": "机构0.1亿+游资0.1亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "",
       "concept_top": "",
       "sector_match": "none",
@@ -1274,6 +1512,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：重挫破位",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -1300,6 +1543,11 @@
       "buy_hint": null,
       "sell_hint": "见顶：回撤 10.3%、持仓 25 日",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "人工智能",
       "sector_match": "top_inflow",
@@ -1326,6 +1574,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：重挫破位",
       "signal_reason": "机构0.1亿+游资3.8亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "仪器仪表制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -1352,6 +1605,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：重挫破位",
       "signal_reason": "机构0.9亿+游资1.2亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -1378,6 +1636,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构2.5亿+游资0.3亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "有色金属冶炼和压延加工业",
       "concept_top": "",
       "sector_match": "none",
@@ -1404,6 +1667,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "化学原料和化学制品制造业",
       "concept_top": "PCB",
       "sector_match": "top_inflow",
@@ -1430,6 +1698,11 @@
       "buy_hint": null,
       "sell_hint": "见顶：回撤 10.4%、持仓 16 日",
       "signal_reason": "机构0.1亿+游资4.2亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "医药制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -1456,6 +1729,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头"
+      ],
+      "consensus_count": 1,
+      "signal_type": "板块联动",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "人工智能",
       "sector_match": "top_inflow",
@@ -1482,6 +1760,12 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头",
+        "大牛股猎手"
+      ],
+      "consensus_count": 2,
+      "signal_type": "多算法共识",
       "industry": "有色金属矿采选业",
       "concept_top": "",
       "sector_match": "none",
@@ -1508,6 +1792,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "电气机械和器材制造业",
       "concept_top": "物联网",
       "sector_match": "top_inflow",
@@ -1534,6 +1823,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "虚拟现实",
       "sector_match": "top_inflow",
@@ -1560,6 +1854,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构0.0亿+游资0.1亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "橡胶和塑料制品业",
       "concept_top": "",
       "sector_match": "none",
@@ -1586,6 +1885,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "PCB",
       "sector_match": "top_inflow",
@@ -1612,6 +1916,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头"
+      ],
+      "consensus_count": 1,
+      "signal_type": "板块联动",
       "industry": "有色金属矿采选业",
       "concept_top": "",
       "sector_match": "none",
@@ -1638,6 +1947,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "有色金属冶炼和压延加工业",
       "concept_top": "",
       "sector_match": "none",
@@ -1664,6 +1978,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构0.2亿+游资1.1亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "卫生",
       "concept_top": "人工智能",
       "sector_match": "top_inflow",
@@ -1690,6 +2009,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构0.6亿+游资0.1亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "化学原料和化学制品制造业",
       "concept_top": "算力概念",
       "sector_match": "top_inflow",
@@ -1716,6 +2040,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：重挫破位",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "软件和信息技术服务业",
       "concept_top": "元宇宙概念",
       "sector_match": "top_inflow",
@@ -1742,6 +2071,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "批发业",
       "concept_top": "",
       "sector_match": "none",
@@ -1768,6 +2102,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头"
+      ],
+      "consensus_count": 1,
+      "signal_type": "板块联动",
       "industry": "有色金属冶炼和压延加工业",
       "concept_top": "",
       "sector_match": "none",
@@ -1794,6 +2133,11 @@
       "buy_hint": null,
       "sell_hint": null,
       "signal_reason": "机构0.1亿+游资1.6亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "农副食品加工业",
       "concept_top": "",
       "sector_match": "none",
@@ -1820,6 +2164,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构0.1亿+游资0.3亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "废弃资源综合利用业",
       "concept_top": "人工智能",
       "sector_match": "top_inflow",
@@ -1846,6 +2195,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构0.1亿+游资0.2亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "",
       "concept_top": "",
       "sector_match": "none",
@@ -1872,6 +2226,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "研究和试验发展",
       "concept_top": "",
       "sector_match": "none",
@@ -1898,6 +2257,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "有色金属冶炼和压延加工业",
       "concept_top": "",
       "sector_match": "none",
@@ -1924,6 +2288,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头"
+      ],
+      "consensus_count": 1,
+      "signal_type": "板块联动",
       "industry": "有色金属矿采选业",
       "concept_top": "",
       "sector_match": "none",
@@ -1950,6 +2319,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头"
+      ],
+      "consensus_count": 1,
+      "signal_type": "板块联动",
       "industry": "有色金属矿采选业",
       "concept_top": "",
       "sector_match": "none",
@@ -1976,6 +2350,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -2002,6 +2381,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头"
+      ],
+      "consensus_count": 1,
+      "signal_type": "板块联动",
       "industry": "有色金属矿采选业",
       "concept_top": "",
       "sector_match": "none",
@@ -2028,6 +2412,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构0.6亿+游资0.2亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "专用设备制造业",
       "concept_top": "人工智能",
       "sector_match": "top_inflow",
@@ -2054,6 +2443,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "虚拟现实",
       "sector_match": "top_inflow",
@@ -2080,6 +2474,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -2106,6 +2505,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "PCB",
       "sector_match": "top_inflow",
@@ -2132,6 +2536,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "电气机械和器材制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -2158,6 +2567,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头"
+      ],
+      "consensus_count": 1,
+      "signal_type": "板块联动",
       "industry": "专用设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -2184,6 +2598,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头"
+      ],
+      "consensus_count": 1,
+      "signal_type": "板块联动",
       "industry": "专用设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -2210,6 +2629,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构0.4亿+游资0.1亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "通用设备制造业",
       "concept_top": "PCB",
       "sector_match": "top_inflow",
@@ -2236,6 +2660,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "医药制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -2262,6 +2691,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "互联网和相关服务",
       "concept_top": "人工智能",
       "sector_match": "top_inflow",
@@ -2288,6 +2722,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "通用设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -2314,6 +2753,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 主力金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -2340,6 +2784,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "通用设备制造业",
       "concept_top": "人工智能",
       "sector_match": "top_inflow",
@@ -2366,6 +2815,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构0.4亿+游资2.4亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "医药制造业",
       "concept_top": "人工智能",
       "sector_match": "top_inflow",
@@ -2392,6 +2846,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构0.1亿+游资1.0亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "医药制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -2418,6 +2877,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构0.0亿+游资0.8亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "医药制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -2444,6 +2908,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构0.3亿+游资0.6亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "",
       "concept_top": "",
       "sector_match": "none",
@@ -2470,6 +2939,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构0.6亿+游资0.1亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "房地产业",
       "concept_top": "",
       "sector_match": "none",
@@ -2496,6 +2970,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "算力概念",
       "sector_match": "top_inflow",
@@ -2522,6 +3001,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "水上运输业",
       "concept_top": "",
       "sector_match": "none",
@@ -2548,6 +3032,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构0.1亿+游资1.0亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "医药制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -2574,6 +3063,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构0.1亿+游资0.1亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "",
       "concept_top": "",
       "sector_match": "none",
@@ -2600,6 +3094,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "PCB",
       "sector_match": "top_inflow",
@@ -2626,6 +3125,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -2652,6 +3156,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "电气机械和器材制造业",
       "concept_top": "英伟达概念",
       "sector_match": "top_inflow",
@@ -2678,6 +3187,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "PCB",
       "sector_match": "top_inflow",
@@ -2704,6 +3218,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构0.0亿+游资0.1亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "",
       "concept_top": "",
       "sector_match": "none",
@@ -2730,6 +3249,12 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "algos_hit": [
+        "四量终极",
+        "板块龙头"
+      ],
+      "consensus_count": 2,
+      "signal_type": "多算法共识",
       "industry": "有色金属矿采选业",
       "concept_top": "",
       "sector_match": "none",
@@ -2756,6 +3281,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构2.5亿+游资4.0亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "",
       "concept_top": "",
       "sector_match": "none",
@@ -2782,6 +3312,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "新闻和出版业",
       "concept_top": "人工智能",
       "sector_match": "top_inflow",
@@ -2808,6 +3343,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构0.6亿+游资0.9亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "资本市场服务",
       "concept_top": "",
       "sector_match": "none",
@@ -2834,6 +3374,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构0.3亿+游资0.7亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "电气机械和器材制造业",
       "concept_top": "AIGC概念",
       "sector_match": "top_inflow",
@@ -2860,6 +3405,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构0.0亿+游资0.4亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "电信、广播电视和卫星传输服务",
       "concept_top": "人工智能",
       "sector_match": "top_inflow",
@@ -2886,6 +3436,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构0.3亿+游资0.1亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "橡胶和塑料制品业",
       "concept_top": "PCB",
       "sector_match": "top_inflow",
@@ -2912,6 +3467,11 @@
       "buy_hint": null,
       "sell_hint": "走弱：峰值未跑赢基准价",
       "signal_reason": "机构0.0亿+游资0.2亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "",
       "concept_top": "",
       "sector_match": "none",
@@ -2938,6 +3498,11 @@
       "buy_hint": "回调买点（回撤 6.3%）",
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "PCB",
       "sector_match": "top_inflow",
@@ -2964,6 +3529,11 @@
       "buy_hint": "回调买点（回撤 7.0%）",
       "sell_hint": null,
       "signal_reason": "机构1.8亿+游资2.9亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "软件和信息技术服务业",
       "concept_top": "人工智能",
       "sector_match": "top_inflow",
@@ -2990,6 +3560,11 @@
       "buy_hint": "回调买点（回撤 7.5%）",
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "软件和信息技术服务业",
       "concept_top": "",
       "sector_match": "none",
@@ -3016,6 +3591,11 @@
       "buy_hint": "回调买点（回撤 7.6%）",
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "人工智能",
       "sector_match": "top_inflow",
@@ -3042,6 +3622,12 @@
       "buy_hint": "回调买点（回撤 7.6%）",
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "algos_hit": [
+        "四量终极",
+        "板块龙头"
+      ],
+      "consensus_count": 2,
+      "signal_type": "多算法共识",
       "industry": "软件和信息技术服务业",
       "concept_top": "",
       "sector_match": "none",
@@ -3068,6 +3654,11 @@
       "buy_hint": "回调买点（回撤 7.8%）",
       "sell_hint": null,
       "signal_reason": "",
+      "algos_hit": [
+        "板块龙头"
+      ],
+      "consensus_count": 1,
+      "signal_type": "板块联动",
       "industry": "专用设备制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -3094,6 +3685,11 @@
       "buy_hint": "回调买点（回撤 7.9%）",
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "电气机械和器材制造业",
       "concept_top": "",
       "sector_match": "none",
@@ -3120,6 +3716,11 @@
       "buy_hint": "回调买点（回撤 8.8%）",
       "sell_hint": null,
       "signal_reason": "机构1.7亿+游资3.1亿",
+      "algos_hit": [
+        "大牛股猎手"
+      ],
+      "consensus_count": 1,
+      "signal_type": "强势突破",
       "industry": "计算机、通信和其他电子设备制造业",
       "concept_top": "物联网",
       "sector_match": "top_inflow",
@@ -3146,6 +3747,11 @@
       "buy_hint": "回调买点（回撤 9.7%）",
       "sell_hint": null,
       "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
       "industry": "专用设备制造业",
       "concept_top": "",
       "sector_match": "none",

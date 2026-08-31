@@ -4194,6 +4194,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var pt = window.V8_POOL_TRACKER || null;
     if(pt && pt.items && pt.items.length){
       var sc = pt.status_counts || {};
+      var removedMap = _loadRemovedMap();
 
       /* ─── 列头点击排序（2026-08-31 主人截图"47/46只没全看到+没排序"一劳永逸） ─── */
       var POOL_SORT_DEFAULT = {field:'last_pct', asc:false};
@@ -4231,6 +4232,28 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         return '<th onclick="window.__sortPoolTracker(\''+field+'\')" style="padding:6px;text-align:'+a+';'+activeStyle+'" title="点击切换排序">'+label+arrow+'</th>';
       }
 
+      /* ─── 阶段 3：待确认剔除 / 历史追溯（纯前端 localStorage，仅本机同步） ─── */
+      function _loadRemovedMap(){
+        try { return JSON.parse(localStorage.getItem('v8_pool_removed') || '{}') || {}; } catch(e){ return {}; }
+      }
+      window.__removeStock = function(code){
+        try {
+          var m = _loadRemovedMap();
+          var it = (window.V8_POOL_TRACKER.items || []).find(function(x){ return x.code === code; }) || {};
+          m[code] = { name: it.name, status: it.status, last_pct: it.last_pct, drawdown: it.drawdown, removed_at: new Date().toISOString().slice(0,16) };
+          localStorage.setItem('v8_pool_removed', JSON.stringify(m));
+          if (typeof window.__renderBacktestSection === 'function') window.__renderBacktestSection();
+        } catch(e) { console.warn('removeStock fail', e); }
+      };
+      window.__restoreStock = function(code){
+        try {
+          var m = _loadRemovedMap();
+          delete m[code];
+          localStorage.setItem('v8_pool_removed', JSON.stringify(m));
+          if (typeof window.__renderBacktestSection === 'function') window.__renderBacktestSection();
+        } catch(e) { console.warn('restoreStock fail', e); }
+      };
+
       html += '<div style="margin:14px 0;border-left:4px solid #22c55e;" class="card">';
       // 【K 批】卡片头部：情绪周期 + 板块流入 top + 精选统计 三条横排
       var sm = pt.sentiment_meta || {};
@@ -4243,6 +4266,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">';
       // 精选徽章（K 批新增·主人 23:00「精选一下」核心诉求）
       html += '<span style="padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;background:rgba(251,191,36,.12);color:var(--gold);border:1px solid rgba(251,191,36,.3);">🌟 精选 '+selSize+' / '+pt.pool_size+'</span>';
+      // 【阶段 2】多算法共识徽章
+      var consSize = pt.consensus_count || 0;
+      html += '<span style="padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.3);">🤝 共识 '+consSize+' 只</span>';
       // 情绪周期徽章
       if(sm && sm.phase){
         var phColor = sm.phase==='高潮'?'#ef5350':(sm.phase==='退潮'?'#fb923c':(sm.phase==='修复'?'#22c55e':(sm.phase==='冰点'?'#38bdf8':'var(--sub)')));
@@ -4269,12 +4295,31 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       });
       html += '</div>';
 
+      /* ─── 阶段 3：待确认剔除区（走弱/见顶，未剔除者） ─── */
+      var toRemove = pt.items.filter(function(it){ return (it.status==='weak'||it.status==='topped') && !removedMap[it.code]; });
+      if(toRemove.length){
+        toRemove = _sortBucket(toRemove, 'drawdown', false);
+        html += '<div style="margin:10px 0;padding:10px;border:1px solid rgba(239,83,80,.3);border-radius:8px;background:rgba(239,83,80,.04);">';
+        html += '<div style="font-size:12px;font-weight:700;color:#ef5350;margin-bottom:6px;">⚠️ 待确认剔除（走弱/见顶，共 '+toRemove.length+' 只）· 点击「确认剔除」仅本机记录，不污染 v8 主线数据</div>';
+        toRemove.forEach(function(it){
+          html += '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.08);">';
+          html += '<span style="color:var(--txt);font-weight:600;font-size:11.5px;">'+it.code+'</span>';
+          html += '<span style="color:var(--txt);font-size:11.5px;">'+_esc(it.name)+'</span>';
+          html += '<span style="color:var(--dim);font-size:10.5px;">'+statusLabel[it.status]+' · 回撤 '+it.drawdown.toFixed(1)+'%</span>';
+          html += '<span style="margin-left:auto;color:#38bdf8;font-size:10.5px;cursor:pointer;user-select:none;" onclick="window.__removeStock(\''+it.code+'\')">确认剔除 ✕</span>';
+          html += '</div>';
+        });
+        html += '</div>';
+      }
+
       // 明细表（桶内按当前 sortField 排序，列头可点击切换，所有桶同步联动）
       html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
       html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
       html += '<th onclick="window.__sortPoolTracker(\'code\')" style="padding:6px;text-align:left;color:'+(sortField==='code'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">代码'+(sortField==='code'?' '+sortArrow:'')+'</th>';
       html += '<th onclick="window.__sortPoolTracker(\'name\')" style="padding:6px;text-align:left;color:'+(sortField==='name'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">名称'+(sortField==='name'?' '+sortArrow:'')+'</th>';
       html += '<th onclick="window.__sortPoolTracker(\'algo\')" style="padding:6px;text-align:left;color:'+(sortField==='algo'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">来源'+(sortField==='algo'?' '+sortArrow:'')+'</th>';
+      html += _thSortable('信号类型','signal_type','left');
+      html += _thSortable('共识','consensus_count','right');
       html += '<th onclick="window.__sortPoolTracker(\'entry_price\')" style="padding:6px;text-align:right;color:'+(sortField==='entry_price'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">基准价'+(sortField==='entry_price'?' '+sortArrow:'')+'</th>';
       html += '<th onclick="window.__sortPoolTracker(\'last_close\')" style="padding:6px;text-align:right;color:'+(sortField==='last_close'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">现价'+(sortField==='last_close'?' '+sortArrow:'')+'</th>';
       html += _thSortable('期间','last_pct','right');
@@ -4298,9 +4343,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         var bucketSelHtml = bucketSel > 0
           ? '<span style="padding:1px 8px;margin-left:8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(251,191,36,.15);color:var(--gold);border:1px solid rgba(251,191,36,.3);">🌟 精选 '+bucketSel+'</span>'
           : '';
-        html += '<tr style="background:rgba(148,163,184,.06);"><td colspan="11" style="padding:6px 8px;font-weight:700;color:'+statusColor[s]+';font-size:12px;">'+statusLabel[s]+' '+arr.length+' 只'+bucketSelHtml+'</td></tr>';
+        html += '<tr style="background:rgba(148,163,184,.06);"><td colspan="13" style="padding:6px 8px;font-weight:700;color:'+statusColor[s]+';font-size:12px;">'+statusLabel[s]+' '+arr.length+' 只'+bucketSelHtml+'</td></tr>';
         arr.forEach(function(it){  // 🔁 2026-08-31：去掉 slice(0,12) 限制，全部展示（主人截图 "47/46 只没全看到" 根因）
           var hint = it.buy_hint || it.sell_hint || '';
+          var isRemoved = !!removedMap[it.code];
           var periodColor = it.last_pct > 0 ? '#ef5350' : (it.last_pct < 0 ? '#26a69a' : 'var(--sub)');
           var peakColor   = it.peak_pct > 0 ? '#ef5350' : 'var(--sub)';
           var ddColor     = it.drawdown > 10 ? '#fb923c' : (it.drawdown > 5 ? '#fbbf24' : 'var(--sub)');
@@ -4312,12 +4358,19 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var conceptHtml = it.concept_top
             ? '<span style="color:'+conceptColor+';font-size:10.5px;" title="净流入 '+(it.sector_net>0?'+':'')+it.sector_net.toFixed(1)+'亿">'+(it.sector_match==='top_inflow'?'📥':(it.sector_match==='outflow'?'📤':'·'))+' '+_esc(it.concept_top)+'</span>'
             : '<span style="color:var(--dim);">—</span>';
-          // 行整体 background：精选用淡金底
-          var rowBg = it.selected ? 'background:rgba(251,191,36,.06);' : '';
-          html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+rowBg+'">';
-          html += '<td style="padding:5px 6px;color:var(--txt);font-weight:600;">'+it.code+'</td>';
+          // 行整体 background：精选用淡金底；多算法共识用淡蓝底；已剔除淡化
+          var rowBg = it.selected ? 'background:rgba(251,191,36,.06);' : (it.consensus_count>=2 ? 'background:rgba(56,189,248,.06);' : '');
+          var rowStyle = rowBg + (isRemoved ? 'opacity:.45;' : '');
+          html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+rowStyle+'">';
+          html += '<td style="padding:5px 6px;color:var(--txt);font-weight:600;'+(isRemoved?'text-decoration:line-through;':'')+'">'+it.code+'</td>';
           html += '<td style="padding:5px 6px;color:var(--txt);">'+_esc(it.name)+'</td>';
           html += '<td style="padding:5px 6px;color:var(--sub);font-size:10.5px;">'+_esc(it.algo)+'</td>';
+          // 【阶段 2】信号类型 + 共识 列
+          var sigColor = it.signal_type==='多算法共识' ? '#38bdf8' : (it.signal_type==='强势突破' ? '#ef5350' : (it.signal_type==='板块联动' ? '#22c55e' : 'var(--sub)'));
+          html += '<td style="padding:5px 6px;color:'+sigColor+';font-size:10.5px;white-space:nowrap;">'+_esc(it.signal_type)+'</td>';
+          var consTxt = it.consensus_count>=2 ? '🤝 '+it.consensus_count : (it.consensus_count>=1 ? (''+it.consensus_count) : '—');
+          var consColor = it.consensus_count>=2 ? '#38bdf8' : 'var(--dim)';
+          html += '<td style="padding:5px 6px;text-align:right;color:'+consColor+';font-weight:'+(it.consensus_count>=2?'700':'400')+';" title="命中算法：'+_esc((it.algos_hit||[]).join(' / '))+'">'+consTxt+'</td>';
           html += '<td style="padding:5px 6px;text-align:right;color:var(--sub);">'+it.entry_price.toFixed(2)+'</td>';
           html += '<td style="padding:5px 6px;text-align:right;color:var(--txt);">'+it.last_close.toFixed(2)+'</td>';
           html += '<td style="padding:5px 6px;text-align:right;font-weight:700;color:'+periodColor+';">'+(it.last_pct>0?'+':'')+it.last_pct.toFixed(2)+'%</td>';
@@ -4332,7 +4385,24 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       });
       html += '</tbody></table></div>';
 
-      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">表头可点击切换排序（默认精选分↓）· K 批二维精选（板块流入×情绪周期）：精选分 = status 基础 + 板块净流入÷10 + 情绪适配 ±N（退潮期 buy_dip+板块流入=8 分，topped/weak+板块流出=负分）· 阈值≥8 进精选池 · 数据 '+(pt.update_time||'').substring(0,16)+' · 仅跟 v8 三大算法真实跟踪池（不接 600+ 全池、不重做行业映射）</div>';
+      /* ─── 阶段 3：已剔除历史区（读 localStorage，纯前端） ─── */
+      var removedCodes = Object.keys(removedMap);
+      if(removedCodes.length){
+        html += '<div style="margin:10px 0;padding:10px;border:1px solid rgba(148,163,184,.25);border-radius:8px;background:var(--card2);">';
+        html += '<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;">🗑️ 已剔除（本机记录 '+removedCodes.length+' 只）· 仅当前浏览器可见，跨设备不同步</div>';
+        removedCodes.forEach(function(code){
+          var r = removedMap[code] || {};
+          html += '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.08);">';
+          html += '<span style="color:var(--dim);font-weight:600;font-size:11.5px;text-decoration:line-through;">'+code+'</span>';
+          html += '<span style="color:var(--dim);font-size:11.5px;text-decoration:line-through;">'+_esc(r.name||'')+'</span>';
+          html += '<span style="color:var(--dim);font-size:10.5px;">'+(r.status||'')+' · 回撤 '+(r.drawdown!=null?r.drawdown.toFixed(1):'-')+'% · '+(r.removed_at||'')+'</span>';
+          html += '<span style="margin-left:auto;color:#22c55e;font-size:10.5px;cursor:pointer;user-select:none;" onclick="window.__restoreStock(\''+code+'\')">撤销 ↺</span>';
+          html += '</div>';
+        });
+        html += '</div>';
+      }
+
+      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">表头可点击切换排序（默认精选分↓）· K 批二维精选（板块流入×情绪周期）：精选分 = status 基础 + 板块净流入÷10 + 情绪适配 ±N（退潮期 buy_dip+板块流入=8 分，topped/weak+板块流出=负分）· 阈值≥8 进精选池 · 阶段 2 信号类型/多算法共识（🤝≥2 算法命中）· 阶段 3 待确认剔除（本机 localStorage，跨设备不同步）· 数据 '+(pt.update_time||'').substring(0,16)+' · 仅跟 v8 三大算法真实跟踪池（不接 600+ 全池、不重做行业映射）</div>';
       html += '</div>';
     }
 
