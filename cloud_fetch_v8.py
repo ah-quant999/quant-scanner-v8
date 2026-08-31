@@ -125,9 +125,8 @@ CATEGORY_MAP = {
     "MARKET_FUND_FLOW_DATA": "post_close",
     # 15:30 收盘数据：EXPERIMENT 等 akshare 可抓的 T+1 数据
     "EXPERIMENT": "post_close",
-    # 盘中：全A等权平均股价的日内变化 + 中期水位（一次抓取喂两处展示：AI 速览买卖信号 + 个股查询摘要行）
-    # 注：此处曾误写「盘后」注释但取值实为 intraday；2026-08-12 已把 update_v8.py CATEGORY_MAP 同步对齐为 intraday
-    "AVG_PRICE_DATA": "intraday",
+    # 2026-08-31 移除：AVG_PRICE_DATA 改由 standalone scripts/fetch_avg_price.py 在盘后/周末(post_close||all)
+    #   生成 avg_price_data.json，update_v8.py 映射为 post_close；此处不再 intraday 抓取，避免 premarket 清空 + 双写冲突。
     "OVERSEAS_MARKETS": "intraday",  # 亚太市场(日经/恒生/KOSPI/台湾)：交易时段实时更新，盘中每轮刷新
     # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告，日频更新即可
     "RESTRICTED_RELEASE": "premarket",
@@ -3533,7 +3532,6 @@ def main(category=None, only=None):
         ("JUDGMENT_DATA", f_judgment),
         ("MACRO_BRIEF", f_macro_brief),
         ("MARKET_ALERTS", f_market_alerts),
-        ("AVG_PRICE_DATA", f_avg_price),
         ("OVERSEAS_MARKETS", f_overseas_markets),
         # 2026-08-30：盘后数据页新增
         ("RESTRICTED_RELEASE", f_restricted_release),

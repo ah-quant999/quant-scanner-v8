@@ -189,15 +189,13 @@ CATEGORY_MAP = {
     "EXPERIMENT": "post_close",
     "STOCK_LIST": "post_close",
     "STOCK_PROFILE": "post_close",
-    # 2026-08-12 根因修复：AVG_PRICE_DATA 在 cloud_fetch_v8.py 里是 intraday（盘中每周期抓），
-    # 此处却误标 post_close，造成两个问题：
-    #   ① `update_v8.py --category intraday` 静默跳过它 → 盘中 data/AVG_PRICE_DATA.js 不重建
-    #      （个股查询「平均股价/持仓摘要行」和 AI 速览买卖信号都读它，盘中会看到旧值）
-    #   ② --detect-changes 是「按类别」重建（build() line 618-624）：盘中推一个 avg_price_data.json
-    #      → 类别判成 post_close → 整个 post_close 类别（SH_FIB/SZ_FIB 等约30个文件）被重建 republish
-    #      → mtime 被刷新 → cache-buster 全天无意义抖动（长期记忆里那个怪现象的根源）
-    # 与 fetch 侧对齐为 intraday 后，两个问题一并消除。
-    "AVG_PRICE_DATA": "intraday",
+    # 2026-08-31 根因修正（覆盖 2026-08-12 的误判）：AVG_PRICE_DATA 实际由 standalone 脚本
+    #   scripts/fetch_avg_price.py 在 盘后/周末(post_close||all) 生成 avg_price_data.json，
+    #   此处映射为 post_close 即可；若误标 intraday，则 premarket 的 _clear_intraday_for_premarket
+    #   会把它清空为 {no_data:true,premarket_cleared:true}，丢失 avg_price/ma20/ma60/position_vs_ma*
+    #   （即「平均股价」卡长期空壳、买卖信号读不到）。cloud_fetch_v8.py 的 intraday 抓取已移除，
+    #   单一数据源避免双写冲突与 cache-buster 抖动。
+    "AVG_PRICE_DATA": "post_close",
     # 2026-08-15：ALGO_TRACK 依赖 FINAL_RECOMMEND_DATA + FOUR_VOLUME，归属盘后
     "ALGO_TRACK": "post_close",
     # 2026-08-19：路径概率预测卡数据源（盘后跑，与算法链节奏一致）

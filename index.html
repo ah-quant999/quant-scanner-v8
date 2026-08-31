@@ -522,6 +522,23 @@ window.V8_CAL = {weeks:[],legend:[]};
     var wd = d.getDay();
     return wd !== 0 && wd !== 6;
   };
+  // 2026-08-31 主人令：周末/假期放宽「停更」判定 —— 计数改用交易日（非自然日）
+  // 仅数「已流逝的交易日」：start 当天不计入；周末/节假日天然为 0。
+  window._tradingDaysBetween = function(start, end){
+    if(!start || !end || isNaN(start.getTime()) || isNaN(end.getTime())) return 0;
+    function _cstMidnight(d){
+      var s = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+      var p = s.split('-');
+      return new Date(+p[0], +p[1]-1, +p[2]);
+    }
+    var a = _cstMidnight(start), b = _cstMidnight(end);
+    if(b < a) return 0;
+    var cnt = 0;
+    for(var t = new Date(a.getTime()); t <= b; t.setDate(t.getDate()+1)){
+      if(window._isAshareTradingDay(t)) cnt++;
+    }
+    return Math.max(0, cnt - 1); // 减去 start 当天
+  };
   /* ---- 时段统一判断（盘前/盘中/盘后/今日盘后）----
    * 2026-08-15 主人令：盘中边界延长到 15:30（A 股 15:00 收盘，盘后数据生成通常 15:30 后），
    *   避免 15:00-15:30 之间刷出的日内实时数据被标"盘后"误读。
@@ -9624,7 +9641,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 2026-08-31：汇总胶囊改小，内部一行
     let h='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;">';
     h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">今日解禁</span><span style="font-size:18px;font-weight:800;color:'+(todayItems.length?'var(--up)':'var(--sub)')+';">'+(todayItems.length||0)+'</span></div>';
-    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">未来7天</span><span style="font-size:18px;font-weight:800;color:var(--txt);">'+(stats.d7||0)+'</span></div>';
+    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">未来7天</span><span style="font-size:18px;font-weight:800;color:var(--txt);">'+(stats.d7||0)+' 家</span></div>';
     h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">30天</span><span style="font-size:18px;font-weight:800;color:var(--txt);">'+(stats.d30||0)+'</span></div>';
     h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">90天</span><span style="font-size:18px;font-weight:800;color:var(--txt);">'+(stats.d90||0)+'</span></div>';
     h+='</div>';
@@ -9639,7 +9656,7 @@ window.showRestrictedItems = showRestrictedItems;
       });
       h+='</div>';
     }else{
-      h+='<div class="ipo-empty" style="padding:10px 12px;font-size:12px;">今日无解禁 · 未来7天共 '+(stats.d7||0)+' 家解禁</div>';
+      h+='<div class="ipo-empty" style="padding:10px 12px;font-size:12px;text-align:center;">今日无解禁 · 未来7天共 '+(stats.d7||0)+' 家解禁</div>';
     }
     $b.innerHTML=h;
     if($t) $t.innerHTML=_uBadge('盘前','短线',d.update_time);
@@ -9655,7 +9672,7 @@ window.showRestrictedItems = showRestrictedItems;
     //   无今日字段时直接提示，不再把全报告期累计冒充今日数。
     const hasToday = !!(d.today_summary && typeof d.today_summary.total === 'number');
     if(!hasToday){
-      $b.innerHTML = '<div class="ipo-empty" style="padding:10px 12px;font-size:12px;">今日口径需云端下次抓取后生效；当前暂无当日业绩预告数据。<br>全报告期累计请查看<b>盘后数据 → 业绩预告</b>卡。</div>';
+      $b.innerHTML = '<div class="ipo-empty" style="padding:10px 12px;font-size:12px;text-align:center;">今日口径需云端下次抓取后生效；当前暂无当日业绩预告数据。<br>全报告期累计请查看<b>盘后数据 → 业绩预告</b>卡。</div>';
       if($t) $t.innerHTML = _uBadge('盘前','短线',d.update_time);
       return;
     }
@@ -12740,7 +12757,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       var _staleDays = 0;
       if(_crdsTsRaw){
         var _ct = window._parseAsCST ? window._parseAsCST(_crdsTsRaw) : null;
-        if(_ct && !isNaN(_ct.getTime())) _staleDays = Math.round((Date.now() - _ct.getTime())/864e5);
+        if(_ct && !isNaN(_ct.getTime())) _staleDays = window._tradingDaysBetween ? window._tradingDaysBetween(_ct, new Date()) : Math.round((Date.now() - _ct.getTime())/864e5);
       }
       var _sb = document.getElementById(p+'crdsStaleBar');
       if(!_sb){
@@ -12751,7 +12768,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       }
       if(_staleDays >= 2){
         _sb.style.display = 'block';
-        _sb.innerHTML = '⚠️ 本卡数据已停更 <b>'+_staleDays+' 天</b>（最后产出 '+_crdsRel(_crdsTsRaw)+'），下列内容为历史快照，<b>请勿据此决策</b>；修复中。';
+        _sb.innerHTML = '⚠️ 本卡数据已停更 <b>'+_staleDays+' 个交易日</b>（最后产出 '+_crdsRel(_crdsTsRaw)+'），下列内容为历史快照，<b>请勿据此决策</b>；修复中。';
       } else {
         _sb.style.display = 'none';
       }
