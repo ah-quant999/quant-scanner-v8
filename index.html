@@ -1348,10 +1348,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/FOUR_VOLUME.js?v=aefad242c4" defer></script>
     <script src="data/FOUR_VOLUME_60M.js?v=af87ef8c3e" defer></script>
     <script src="data/STOCK_STOP_DATA.js?v=156169dbbd" defer></script>
-    <!-- 2026-08-30 审计修复：STOCK_RPS_DATA 此前【从未被 script 引入】，
-         相对强度(RPS)子页 window.STOCK_RPS_DATA 恒为 {} → 表格永远空白。
-         现补引入；缓存戳由 update_v8.py 在后续 build 自动刷新。 -->
-    <script src="data/STOCK_RPS_DATA.js?v=629c6cff63" defer></script>
+    <!-- 2026-08-31 一劳永逸：window.STOCK_RPS_DATA 已由 line 492 data/STOCK_RPS.js 注入（最新 19:16 版本），
+         此处再引入 data/STOCK_RPS_DATA.js（旧 01:56 版本）会覆盖最新数据 → 相对强度子页/状态胶囊均读到陈旧值。
+         删除重复注入，确保全局只保留一份最新 RPS 数据。 -->
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=5adea852b8" defer></script>
 <script src="data/COCKPIT_BACKTEST.js?v=f427f501ed" defer></script>
 <script src="data/BACKTEST_TDX.js?v=70ce6b55b0" defer></script>
@@ -1768,10 +1767,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           if(_chg!=null && _chg<-1.5) _sigSell.push('⚠️ 单日暴跌 '+_chg.toFixed(1)+'% · 恐慌');
           if(_chg!=null && _chg>1.5) _sigBuy.push('⚡ 单日暴涨 '+(+_chg).toFixed(1)+'% · 追高风险');
 
+          // 2026-08-31：综合结论先算好，第一行末尾展示
+          var _verdict='', _vClr='var(--gold)';
+          if(_sigSell.length>=2){ _verdict='🔴 高位·观测'; _vClr='#f87171'; }
+          else if(_sigSell.length===1){ _verdict='🟠 偏高·观测'; _vClr='#fbbf24'; }
+          else if(_sigBuy.length>=2){ _verdict='🟢 偏低·观测'; _vClr='#4ade80'; }
+          else if(_sigBuy.length===1){ _verdict='🟡 超卖·轻仓观测'; _vClr='#fbbf24'; }
+          else { _verdict='⏸ 中性·观望'; _vClr='var(--sub)'; }
+
           h+='<div style="padding:10px 18px;background:'+ac.bg+';font-size:13px;line-height:1.8;color:var(--txt);">';
-          // 🛡 2026-08-18 主人令：买/加 + 卖/减 + ⚠警告 + 综合结论 移到第二行（左对齐第一行，flex-wrap），不再被截断
-          // 第一行：标题 + 数据
-          h+='<div>';
+          // 第一行：标题 + 数据 + 综合结论
+          h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
           // 2026-08-30：标签不再硬写 880003（数据可能来自全A等权口径），按 source 字段自述
           var _srcTag=(ap.source&&String(ap.source).indexOf('880003')>=0)?'880003':'全A等权';
           h+='<span style="padding:2px 8px;border-radius:4px;background:'+ac.tag+';color:'+ac.c+';">💰 平均股价·'+_srcTag+'</span>';
@@ -1783,20 +1789,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var _hd=(ap.history_days!=null?ap.history_days:(ap.history||[]).length);
           h+=' &nbsp;|&nbsp; vs 20日线 '+_pt(ap.position_vs_ma20)+' <span style="color:var(--dim);font-size:11.5px;">('+(_hd>=20?('MA20 '+Number(ap.ma20).toFixed(2)):('历史'+_hd+'/20日'))+')</span>';
           h+=' &nbsp;|&nbsp; vs 60日线 '+_pt(ap.position_vs_ma60)+' <span style="color:var(--dim);font-size:11.5px;">('+(_hd>=60?('MA60 '+Number(ap.ma60).toFixed(2)):('历史'+_hd+'/60日'))+')</span>';
-          h+=' &nbsp;|&nbsp; 历史 <b>'+(ap.history_days||'--')+'</b> 日';
+          h+='<span style="margin-left:auto;font-weight:700;color:'+_vClr+';font-size:11.5px;padding:2px 8px;border-radius:5px;background:'+_vClr+'18;border:1.5px solid '+_vClr+'55;">'+_verdict+'</span>';
           h+='</div>';
-          // 第二行：买/加 + 卖/减 + ⚠警告 + 综合结论
-          var _verdict='', _vClr='var(--gold)';
-          if(_sigSell.length>=2){ _verdict=' 🔴 高位·观测'; _vClr='#f87171'; }
-          else if(_sigSell.length===1){ _verdict=' 🟠 偏高·观测'; _vClr='#fbbf24'; }
-          else if(_sigBuy.length>=2){ _verdict=' 🟢 偏低·观测'; _vClr='#4ade80'; }
-          else if(_sigBuy.length===1){ _verdict=' 🟡 超卖·轻仓观测'; _vClr='#fbbf24'; }
-          else { _verdict=' ⏸ 中性·观望'; _vClr='var(--sub)'; }
+          // 第二行：买/加 + 卖/减 + ⚠警告
           var _warns=[];
           if(_chg!=null && _chg<-0.5) _warns.push('单日跌'+(_chg<0?'':'')+Number(_chg).toFixed(1)+'%');
           if(ap.position_vs_ma20!=null && ap.position_vs_ma20<0) _warns.push('破MA20');
           if(ap.position_vs_ma60!=null && ap.position_vs_ma60<0) _warns.push('破MA60');
-          if(_sigBuy.length || _sigSell.length || _warns.length || _verdict){
+          if(_sigBuy.length || _sigSell.length || _warns.length){
             h+='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px;">';
             if(_sigBuy.length){
               h+='<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;background:rgba(34,197,94,.18);border:1.5px solid rgba(34,197,94,.5);font-size:11.5px;font-weight:700;color:#4ade80;box-shadow:0 0 4px rgba(34,197,94,.25);">📈 买/加: ';
@@ -1808,8 +1808,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
               _sigSell.forEach(function(s,i){ if(i>0) h+=' '; h+=s; });
               h+='</span>';
             }
-            h+='<span style="font-weight:700;color:'+_vClr+';font-size:11.5px;">'+_verdict+'</span>';
-            h+='<span style="font-size:10.5px;color:var(--dim);margin-left:6px;">🔭 仅观测位置·开仓以AI速览⚖️择时裁决为准</span>';
             if(_warns.length){
               h+='<span style="display:inline-block;padding:1px 7px;border-radius:3px;background:#b91c1c22;color:#f87171;font-size:11.5px;font-weight:700;">⚠ '+_warns.join(' / ')+'</span>';
             }
@@ -2222,7 +2220,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <h2 style="margin:0;">🎯 选股策略</h2>
       <span class="tag">三重共识（主入口） · 相对强度(RPS) · 逆势龙头(CRDS)</span>
       <!-- 2026-08-31 主人令：选股策略卡名后跟状态胶囊（最后更新 / 各算法就绪状态）。
-           数据源：window.FINAL_RECOMMEND_DATA / TRIPLE_CONSENSUS / RPS_DATA / CRDS_CARD_DATA / STOCK_RPS
+           数据源：window.FINAL_RECOMMEND_DATA / TRIPLE_CONSENSUS / STOCK_RPS_DATA / CRDS_CARD_DATA
            写入空 div#stHeaderStatus，由 initPostMarket 后单独调用 window._renderStHeaderStatus() 填充。 -->
       <span id="stHeaderStatus" style="display:inline-flex;align-items:center;gap:6px;"></span>
     </div>
@@ -2728,14 +2726,23 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var lhbDate = days.length ? days[days.length-1].iso : '';
     var updateTime = (window.LHB_DATA && window.LHB_DATA.update_time) || '';
 
-    // 注：日历标题与日历网格统一用「当前月」；若当前月无数据则回落到最近有数据的月份
-    // （补回7月：LHB_HISTORY 含7月全月，翻月或回落即可见）
+    // 注：日历标题与日历网格统一用「当前月」；
+    // 仅当目标月早于最早数据月时跳到最早数据月（补回7月初）；
+    // 目标月晚于最晚数据月（未来月份）时允许显示空月历，不再强制拉回，避免用户点「下个月」没反应。
     var year = window.__jyCalState.y, month = window.__jyCalState.m;
     var _curPrefix = String(year)+String(month+1).padStart(2,'0');
     if(!days.some(function(d){ return d.iso.indexOf(_curPrefix)===0; }) && days.length){
-      var _last = days[days.length-1].iso;
-      year = parseInt(_last.slice(0,4),10); month = parseInt(_last.slice(4,6),10)-1;
-      window.__jyCalState.y = year; window.__jyCalState.m = month;
+      var _first = days[0].iso, _last = days[days.length-1].iso;
+      var _firstYM = parseInt(_first.slice(0,6),10), _lastYM = parseInt(_last.slice(0,6),10), _curYM = parseInt(_curPrefix,10);
+      if(_curYM < _firstYM){
+        year = parseInt(_first.slice(0,4),10); month = parseInt(_first.slice(4,6),10)-1;
+        window.__jyCalState.y = year; window.__jyCalState.m = month;
+      } else if(_curYM <= _lastYM){
+        // 当前月在数据范围内但恰好无该月数据（理论上不应发生），回退到最晚数据月
+        year = parseInt(_last.slice(0,4),10); month = parseInt(_last.slice(4,6),10)-1;
+        window.__jyCalState.y = year; window.__jyCalState.m = month;
+      }
+      // else：未来月份，保留用户选择的年月，渲染空月历
     }
     var firstDay = new Date(year, month, 1).getDay();
     var monOffset = firstDay === 0 ? 6 : firstDay - 1;
@@ -3217,12 +3224,20 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       return;
     }
 
-    // 默认月份回落：当前月无数据则落到最近有数据月份（补回7月）
+    // 默认月份回落：仅当目标月早于最早数据月时跳到最早数据月（补回7月初）；
+    // 未来月份允许显示空月历，不再强制拉回，避免用户点「下个月」没反应。
     var _nbPrefix = String(year)+String(month+1).padStart(2,'0');
     if(!_nbDays.some(function(d){ return d.iso.indexOf(_nbPrefix)===0; }) && _nbDays.length){
-      var _nbLast = _nbDays[_nbDays.length-1].iso;
-      year = parseInt(_nbLast.slice(0,4),10); month = parseInt(_nbLast.slice(4,6),10)-1;
-      window.__northCalState.y = year; window.__northCalState.m = month;
+      var _nbFirst = _nbDays[0].iso, _nbLast = _nbDays[_nbDays.length-1].iso;
+      var _nbFirstYM = parseInt(_nbFirst.slice(0,6),10), _nbLastYM = parseInt(_nbLast.slice(0,6),10), _nbCurYM = parseInt(_nbPrefix,10);
+      if(_nbCurYM < _nbFirstYM){
+        year = parseInt(_nbFirst.slice(0,4),10); month = parseInt(_nbFirst.slice(4,6),10)-1;
+        window.__northCalState.y = year; window.__northCalState.m = month;
+      } else if(_nbCurYM <= _nbLastYM){
+        year = parseInt(_nbLast.slice(0,4),10); month = parseInt(_nbLast.slice(4,6),10)-1;
+        window.__northCalState.y = year; window.__northCalState.m = month;
+      }
+      // else：未来月份，保留用户选择的年月，渲染空月历
     }
 
     var now = new Date();
@@ -8990,7 +9005,7 @@ window.showRestrictedItems = showRestrictedItems;
     var modules = [
       { key:'三重共识', v: window.TRIPLE_CONSENSUS, fallback: window.FINAL_RECOMMEND_DATA, color:'#fbbf24' },
       { key:'观池候选', v: window.CANDIDATE, color:'#38bdf8' },
-      { key:'相对强度', v: window.RPS_DATA || window.STOCK_RPS, color:'#a78bfa' },
+      { key:'相对强度', v: window.STOCK_RPS_DATA, color:'#a78bfa' },
       { key:'逆势龙头', v: window.CRDS_CARD_DATA, color:'#f59e0b' }
     ];
     // 主入口"三重共识"若 FINAL_RECOMMEND_DATA 仍最旧，则用之；否则取 TRIPLE_CONSENSUS
