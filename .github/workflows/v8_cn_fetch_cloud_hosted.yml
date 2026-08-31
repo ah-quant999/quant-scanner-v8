@@ -14,6 +14,12 @@
 name: "🇨🇳 v8 中国数据抓取(云端·hosted兜底)"
 
 on:
+  # 🛡 2026-08-31 一劳永逸：新增晚间 20:30 CST 补抓档。
+  #   东财当日龙虎榜 17:30 后才陆续发布（17:05 抓必空），
+  #   而原有 post_close 档太早 → 共振日历当日空白。20:30 为稳定窗口，
+  #   同时把盘后 ETF/板块RS/商品弹性榜/研报候选池再刷一遍，补齐当日收盘口径。
+  schedule:
+    - cron: '30 12 * * 1-5'
   workflow_dispatch:
     inputs:
       category:
@@ -32,7 +38,11 @@ concurrency:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    # 🛡 2026-08-31 一劳永逸：25 分钟装不下 post_close 全链路
+    #   （LHB 刷新+回填 / 商品弹性榜 / 板块RS / ETF三件套 / 推送 raw_data）。
+    #   实测同类 job 级超时会硬杀整条链，连带后续 bridge/update_v8/health_check 全 skipped
+    #   → raw_data 新了但 data/*.js 还是旧值（主站"数据没更新"根因之一）。抬到 60。
+    timeout-minutes: 60
     env:
       TZ: Asia/Shanghai
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -71,6 +81,11 @@ jobs:
             "20 9 * * 1-5")
               echo "category=post_close" >> "$GITHUB_OUTPUT"
               echo "label=盘后" ;;
+            # 🛡 2026-08-31：晚间补抓档（CST 20:30）—— 龙虎榜发布后补当日数据。
+            #   必须显式映射，否则落 *) → category=all（全量最重→超时被杀）。
+            "30 12 * * 1-5")
+              echo "category=post_close" >> "$GITHUB_OUTPUT"
+              echo "label=晚间补抓(龙虎榜)" ;;
             # 🛡️ 2026-08-13 23:1x 根因修复（阿狸咪令）：yml cron '0 9,14'（北京 17:00/22:00）
             #   但 case 字符串写 '0 9,13'（北京 17:00/21:00），22:00 触发后 case 不匹配
             #   → step 2 '确定抓取类别' 失败 → 整个 fetch job 失败 → raw_data 盘后档不更新
@@ -138,7 +153,18 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
-          python backfill_lhb_history.py
+          # 🛡 2026-08-31 一劳永逸：改为「精准补当日」。
+          #   原实现跑全量 backfill（回溯 55 个自然日），既慢（每次几十次 akshare 调用）
+          #   又会因其 done 集合把 {'trading': False, 'error': ...} 占位也算"已完成"
+          #   → 当日抓取失败后**永不重试**，共振日历当日永久空白
+          #   （实测 8/31 17:05 龙虎榜未发布 → error 占位 → 之后任何一轮都不再重抓）。
+          #   现改为 --only 今日：直连 akshare 抓当天，抓到即写；抓不到保留既有真实数据。
+          TODAY=$(TZ=Asia/Shanghai date +%Y%m%d)
+          echo "补抓日期: $TODAY"
+          python backfill_lhb_history.py --only "$TODAY" || echo "[warn] 当日 LHB 回填未成功（非阻塞）"
+          # 若当日为空（未发布），再兜一次上一交易日，防止历史缺口
+          YESTER=$(TZ=Asia/Shanghai date -d "yesterday" +%Y%m%d)
+          python backfill_lhb_history.py --only "$YESTER" || echo "[warn] 昨日 LHB 回填未成功（非阻塞）"
 
       # 2026-08-17 主人令：calc_commodity_elasticity.py 加入云端自动跑（之前从未自动跑过，导致国内期货 LC/SA 永远不显示）
       - name: "💹 商品涨价弹性榜重算（仅 post_close）"
@@ -173,7 +199,9 @@ jobs:
         #   步级 timeout + continue-on-error 组合：推送超时只判该步失败，job 存活，
         #   后续 bridge/update_v8/health_check 照常跑完，raw_data 交下一轮补推。
         continue-on-error: true
-        timeout-minutes: 15
+        # 🛡 2026-08-31：15 → 25。raw_data 117 个 json / 26 MB，
+        #   api_push_raw.py 防倒退守卫要逐个比对远端时间戳，15 分钟常被砍。
+        timeout-minutes: 25
         shell: bash
         run: |
           python api_push_raw.py
