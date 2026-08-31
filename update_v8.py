@@ -131,8 +131,8 @@ CATEGORY_MAP = {
     "IPO_DATA": "premarket",
     "NT_DATA": "premarket",
     "MARGIN_DATA": "premarket",
-    # 2026-08-30：期指主力合约卡移到「盘后数据」页，改为 post_close 抓取
-    "CFFEX_HOLDINGS": "post_close",
+    # 2026-08-31：期指主力合约卡移回「实时数据」页，改为 intraday 盘中实时
+    "CFFEX_HOLDINGS": "intraday",
     "MACRO_DATA": "premarket",
     "CRISIS_DATA": "premarket,intraday",
     "NORTH_FUND": "premarket",
@@ -189,13 +189,9 @@ CATEGORY_MAP = {
     "EXPERIMENT": "post_close",
     "STOCK_LIST": "post_close",
     "STOCK_PROFILE": "post_close",
-    # 2026-08-31 根因修正（覆盖 2026-08-12 的误判）：AVG_PRICE_DATA 实际由 standalone 脚本
-    #   scripts/fetch_avg_price.py 在 盘后/周末(post_close||all) 生成 avg_price_data.json，
-    #   此处映射为 post_close 即可；若误标 intraday，则 premarket 的 _clear_intraday_for_premarket
-    #   会把它清空为 {no_data:true,premarket_cleared:true}，丢失 avg_price/ma20/ma60/position_vs_ma*
-    #   （即「平均股价」卡长期空壳、买卖信号读不到）。cloud_fetch_v8.py 的 intraday 抓取已移除，
-    #   单一数据源避免双写冲突与 cache-buster 抖动。
-    "AVG_PRICE_DATA": "post_close",
+    # 2026-08-31：AVG_PRICE_DATA 由 scripts/fetch_avg_price.py 在盘中/盘后/周末生成，
+    #   映射为 intraday 使 update_v8 在盘中也刷新 AVG_PRICE_DATA.js（数据源单点，无双写冲突）。
+    "AVG_PRICE_DATA": "intraday",
     # 2026-08-15：ALGO_TRACK 依赖 FINAL_RECOMMEND_DATA + FOUR_VOLUME，归属盘后
     "ALGO_TRACK": "post_close",
     # 2026-08-19：路径概率预测卡数据源（盘后跑，与算法链节奏一致）
