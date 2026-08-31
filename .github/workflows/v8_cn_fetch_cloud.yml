@@ -88,29 +88,43 @@ jobs:
         shell: bash
         run: |
           CRON="${{ github.event.schedule }}"
-          case "$CRON" in
-            "25 0 * * 1-5")
-              echo "category=premarket" >> "$GITHUB_OUTPUT"
-              echo "label=盘前" ;;
-            # 🛡 2026-08-19 主人令：盘中 cron 拆 2 段（午休 12:00/12:30 不跑）
-            "*/30 1-3 * * 1-5"|"*/30 5-7 * * 1-5")
-              echo "category=intraday" >> "$GITHUB_OUTPUT"
-              echo "label=盘中" ;;
-            "20 9 * * 1-5")
-              echo "category=post_close" >> "$GITHUB_OUTPUT"
-              echo "label=盘后" ;;
-            # 🛡️ 2026-08-13 23:1x 根因修复（阿狸咪令）：yml cron '0 9,14'（北京 17:00/22:00）
-            #   但 case 字符串写 '0 9,13'（北京 17:00/21:00），22:00 触发后 case 不匹配
-            #   → step 2 '确定抓取类别' 失败 → 整个 fetch job 失败 → raw_data 盘后档不更新
-            #   注释里的 21:30 实际 cron 是 22:00（不一致），主人出差前必须修
-            #   修复：case 同时接受 '0 9,14' 和 '0 9,13'；未匹配的 cron 走 all 兜底
-            "0 9,14 * * 1-5"|"0 9,13 * * 1-5"|"0 1 * * 0,6")
-              echo "category=all" >> "$GITHUB_OUTPUT"
-              echo "label=全量兜底" ;;
-            *)
-              echo "category=all" >> "$GITHUB_OUTPUT"
-              echo "label=兜底(未匹配cron $CRON, 走all)" ;;
-          esac
+          IN="${{ github.event.inputs.category }}"
+          # 🛡 2026-08-31 一劳永逸修复（小九令：收盘数据上线）：
+          #   原逻辑只看 github.event.schedule，而 workflow_dispatch 触发时该值为空
+          #   → case 落 *) 分支 → category=all（全量抓取，最重）。
+          #   实测 15:42 派 intraday、16:05 派 post_close，两轮都实际跑成 all，
+          #   叠加 step18 update_v8 全量重生成，25min 硬超时被杀 →
+          #   data/*.js 已重生成却来不及 step21 推送 → 线上数据停滞在 14:2x。
+          #   修复：workflow_dispatch 入参优先；入参为空才按 cron 判定。
+          if [ -n "$IN" ]; then
+            case "$IN" in
+              premarket)  echo "category=premarket" >> "$GITHUB_OUTPUT"; echo "label=手动派发(盘前)" ;;
+              intraday)   echo "category=intraday" >> "$GITHUB_OUTPUT"; echo "label=手动派发(盘中)" ;;
+              post_close) echo "category=post_close" >> "$GITHUB_OUTPUT"; echo "label=手动派发(盘后)" ;;
+              all)        echo "category=all" >> "$GITHUB_OUTPUT"; echo "label=手动派发(全量)" ;;
+              *)          echo "category=all" >> "$GITHUB_OUTPUT"; echo "label=手动派发(未知入参→all)" ;;
+            esac
+          else
+            case "$CRON" in
+              "25 0 * * 1-5")
+                echo "category=premarket" >> "$GITHUB_OUTPUT"
+                echo "label=盘前" ;;
+              # 🛡 2026-08-19 主人令：盘中 cron 拆 2 段（午休 12:00/12:30 不跑）
+              "*/30 1-3 * * 1-5"|"*/30 5-7 * * 1-5")
+                echo "category=intraday" >> "$GITHUB_OUTPUT"
+                echo "label=盘中" ;;
+              "20 9 * * 1-5")
+                echo "category=post_close" >> "$GITHUB_OUTPUT"
+                echo "label=盘后" ;;
+              # 🛡️ 2026-08-13 23:1x 根因修复（阿狸咪令）：case 同时接受 '0 9,14' 与 '0 9,13'
+              "0 9,14 * * 1-5"|"0 9,13 * * 1-5"|"0 1 * * 0,6")
+                echo "category=all" >> "$GITHUB_OUTPUT"
+                echo "label=全量兜底" ;;
+              *)
+                echo "category=all" >> "$GITHUB_OUTPUT"
+                echo "label=兜底(未匹配cron $CRON, 走all)" ;;
+            esac
+          fi
           # 注：原 if 兜底已删（重复 echo 同一 output 键会导致 GitHub Action 报 Multiple outputs）
 
       - uses: actions/checkout@v4
