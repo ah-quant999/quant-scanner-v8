@@ -9508,6 +9508,66 @@ function drawUpDownChart(){
   window.renderFuturesMain = renderFuturesMain;
 
   /* ---- 9. 宏观数据速览（盘后数据补位） ---- */
+
+// 2026-08-31：盘后业绩预告/解禁日历 点击展开下表的全局辅助函数
+window._forecastCalendarData = null;
+function showForecastItems(typeKey){
+  const d = window._forecastCalendarData;
+  if(!d || !d.items) return;
+  const $tbl = $('forecastCalendarTable');
+  if(!$tbl) return;
+  const typeMap = {increase:'预增', decrease:'预减', loss:'预亏', uncertain:'不确定'};
+  const label = typeMap[typeKey] || typeKey;
+  const exact = d.items.filter(it => (it.type||'').trim() === label).slice(0, 20);
+  let h = '<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">' + label + ' · ' + (exact.length ? '最近 ' + exact.length + ' 家' : '无匹配数据') + '</div>';
+  if(!exact.length){ $tbl.innerHTML = h + '<div class="ipo-empty" style="padding:8px 10px;font-size:12px;">该类型暂无明细</div>'; $tbl.style.display='block'; return; }
+  h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;">';
+  exact.forEach(function(it){
+    const col = (it.change_pct||0) >= 0 ? 'var(--up)' : 'var(--down)';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;">';
+    h += '<span style="font-size:12px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (it.name||'—') + ' <span style="font-size:10px;color:var(--dim);">' + (it.code||'—') + '</span></span>';
+    h += '<span style="font-size:12px;font-weight:700;color:' + col + ';flex-shrink:0;">' + ((it.change_pct||0) >= 0 ? '+' : '') + Number(it.change_pct||0).toFixed(0) + '%</span>';
+    h += '</div>';
+  });
+  h += '</div>';
+  $tbl.innerHTML = h;
+  $tbl.style.display = 'block';
+}
+window.showForecastItems = showForecastItems;
+
+window._restrictedCalendarData = null;
+function _dateDiffDays(a, b){
+  const da = new Date(a + 'T00:00:00Z'), db = new Date(b + 'T00:00:00Z');
+  return Math.round((da - db) / (1000 * 60 * 60 * 24));
+}
+function showRestrictedItems(windowKey){
+  const d = window._restrictedCalendarData;
+  if(!d || !d.items) return;
+  const $tbl = $('restrictedCalendarTable');
+  if(!$tbl) return;
+  let todayStr;
+  if(window._cstParts){ const p = window._cstParts(new Date()); todayStr = p.y + '-' + String(p.m).padStart(2,'0') + '-' + String(p.d).padStart(2,'0'); }
+  else { todayStr = new Date().toISOString().slice(0,10); }
+  const days = {d7:7, d30:30, d60:60, d90:90}[windowKey];
+  const label = {d7:'7天内', d30:'30天内', d60:'60天内', d90:'90天内'}[windowKey];
+  const future = d.items.filter(it => String(it.date) > todayStr).slice().sort((a,b) => String(a.date).localeCompare(String(b.date)));
+  const filtered = future.filter(it => _dateDiffDays(it.date, todayStr) <= days).slice(0, 20);
+  let h = '<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">' + label + ' 解禁 ' + (filtered.length ? filtered.length + ' 家' : '暂无数据') + '</div>';
+  if(!filtered.length){ $tbl.innerHTML = h + '<div class="ipo-empty" style="padding:8px 10px;font-size:12px;">该窗口暂无明细</div>'; $tbl.style.display='block'; return; }
+  h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:6px;">';
+  filtered.forEach(function(it){
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;">';
+    h += '<span style="font-size:12px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (it.name||'—') + ' <span style="font-size:10px;color:var(--dim);">' + (it.code||'—') + '</span> <span style="font-size:10px;color:var(--sub);">' + (it.date||'—') + '</span></span>';
+    h += '<span style="font-size:12px;font-weight:700;color:var(--up);flex-shrink:0;">' + (it.amount||'—') + '</span>';
+    h += '</div>';
+  });
+  h += '</div>';
+  $tbl.innerHTML = h;
+  $tbl.style.display = 'block';
+}
+window.showRestrictedItems = showRestrictedItems;
+
+
   function renderMacroSummary(d){
     const $b=$('macroSummaryBody'), $t=$('macroSummaryTime');
     if(!$b) return;
@@ -9532,12 +9592,12 @@ function drawUpDownChart(){
       {t:'原油', v:c.oil?c.oil.value:'--', sub:c.oil&&c.oil.date, date:''},
       {t:'铜', v:c.copper?c.copper.value:'--', sub:c.copper&&c.copper.date, date:''}
     ];
-    // 2026-08-31：胶囊改小，内部改成一行（标签+数值+delta 一行，日期放括号）
-    let h='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">';
+    // 2026-08-31：胶囊 4-5 列（min 190px）、内部严格一行，禁止重叠/换行
+    let h='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;">';
     rows.forEach(r=>{
-      h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;">';
-      h+='<span style="font-size:11px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+r.t+'</span>';
-      h+='<span style="font-size:14px;font-weight:800;color:var(--txt);text-align:right;white-space:nowrap;">'+r.v+(r.sub?' '+r.sub:'')+(r.date?' <span style="font-size:10px;color:var(--dim);font-weight:400;">('+r.date+')</span>':'')+'</span>';
+      h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;overflow:hidden;min-width:0;">';
+      h+='<span style="font-size:11px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;max-width:35%;">'+r.t+'</span>';
+      h+='<span style="font-size:13px;font-weight:800;color:var(--txt);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;">'+r.v+(r.sub?' '+r.sub:'')+(r.date?' <span style="font-size:10px;color:var(--dim);font-weight:400;">('+r.date+')</span>':'')+'</span>';
       h+='</div>';
     });
     h+='</div>';
@@ -9591,34 +9651,30 @@ function drawUpDownChart(){
     const $b=$('todayEventForecastBody'), $t=$('todayEventForecastTime');
     if(!$b) return;
     if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">业绩预告数据暂不可用</div>'; if($t) $t.innerHTML='—'; return; }
-    // 2026-08-31：本卡必须是「今日公告」口径，与盘后「业绩预告」（全报告期累计）严格区分。
-    //   数据源 today_summary / today_items 由云端抓取时按公告日期（notice_date）筛出；
-    //   若数据文件尚未带今日字段，只给累计值并明确标注，绝不把累计数冒充今日数。
+    // 2026-08-31：本卡必须是「今日公告」口径，与盘后「业绩预告」严格区分；
+    //   无今日字段时直接提示，不再把全报告期累计冒充今日数。
     const hasToday = !!(d.today_summary && typeof d.today_summary.total === 'number');
-    // 无今日字段时退化为全报告期累计，但必须显式标注口径，避免把累计数误读成今日数
-    const s = hasToday ? d.today_summary : (d.summary||{});
-    let h='';
     if(!hasToday){
-      h+='<div style="font-size:12px;color:var(--sub);padding:6px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;margin-bottom:10px;">'
-        +'今日口径需云端下次抓取后生效；下方为<b style="color:var(--txt);">全报告期累计</b>（共 '+((d.summary&&d.summary.total)||'—')+' 家），<b>不是今日数</b>。</div>';
+      $b.innerHTML = '<div class="ipo-empty" style="padding:10px 12px;font-size:12px;">今日口径需云端下次抓取后生效；当前暂无当日业绩预告数据。<br>全报告期累计请查看<b>盘后数据 → 业绩预告</b>卡。</div>';
+      if($t) $t.innerHTML = _uBadge('盘前','短线',d.update_time);
+      return;
     }
+    const s = d.today_summary;
     // 2026-08-31：汇总胶囊改小，内部一行
-    h+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;">';
+    let h='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;">';
     h+='<div style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--up);">预增</span><span style="font-size:18px;font-weight:800;color:var(--up);">'+(s.increase||0)+'</span></div>';
     h+='<div style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--down);">预减</span><span style="font-size:18px;font-weight:800;color:var(--down);">'+(s.decrease||0)+'</span></div>';
     h+='<div style="background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.25);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">预亏</span><span style="font-size:18px;font-weight:800;color:var(--sub);">'+(s.loss||0)+'</span></div>';
     h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--txt);">不确定</span><span style="font-size:18px;font-weight:800;color:var(--txt);">'+(s.uncertain||0)+'</span></div>';
     h+='</div>';
-    const tList = hasToday ? (d.today_items||[]) : [];
-    if(hasToday && !tList.length){
-      // 今日无新增预告：不隐藏，给出最近一批公告日期与家数（盘后/非财报季常见）
+    const tList = d.today_items || [];
+    if(!tList.length){
       const ld = d.latest_notice_date ? ('最近一批公告 '+d.latest_notice_date+'（'+((d.latest_notice_count)||0)+' 家）') : '暂无近期公告批次';
       h+='<div style="font-size:12px;color:var(--sub);padding:8px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;">今日（'+(d.today_date||'—')+'）无新增业绩预告 · '+ld+'</div>';
     }else{
-      h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">'+(hasToday?'今日发布 · TOP 预增':'TOP 预增 / 扭亏')+'</div>';
+      h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">今日发布 · TOP 预增</div>';
       h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;">';
-      const list = hasToday ? tList.slice(0,4) : d.items.slice(0,4);
-      list.forEach(it=>{
+      tList.slice(0,4).forEach(it=>{
         const col=it.change_pct>=0?'var(--up)':'var(--down)';
         h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;">';
         h+='<span style="font-size:12px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.code+'</span> <span style="font-size:10px;color:var(--sub);">'+it.type+'</span></span>';
@@ -9637,7 +9693,8 @@ function drawUpDownChart(){
     const $b=$('restrictedCalendarBody'), $t=$('restrictedCalendarTime');
     if(!$b) return;
     if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">解禁数据暂不可用</div>'; if($t) $t.innerHTML='—'; return; }
-    // 2026-08-31：盘后解禁日历 = 除今日之后的数据，加 60 天档凑成 4 列；列表按日期排序
+    // 2026-08-31：盘后解禁日历 = 一行 4 列汇总胶囊；明细列表默认隐藏，点击胶囊展开下表
+    window._restrictedCalendarData = d;
     let todayStr;
     if(window._cstParts){
       const p=window._cstParts(new Date());
@@ -9645,23 +9702,14 @@ function drawUpDownChart(){
     }else{
       todayStr=new Date().toISOString().slice(0,10);
     }
-    const future=d.items.filter(it=>String(it.date)>todayStr);
-    const sorted=future.slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
     const stats=d.stats||{};
     let h='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;">';
-    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">7天内</span><span style="font-size:18px;font-weight:800;color:var(--txt);">'+(stats.d7||0)+'</span></div>';
-    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">30天内</span><span style="font-size:18px;font-weight:800;color:var(--txt);">'+(stats.d30||0)+'</span></div>';
-    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">60天内</span><span style="font-size:18px;font-weight:800;color:var(--txt);">'+(typeof stats.d60==='number'?stats.d60:'—')+'</span></div>';
-    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">90天内</span><span style="font-size:18px;font-weight:800;color:var(--txt);">'+(stats.d90||0)+'</span></div>';
+    h+='<div onclick="showRestrictedItems('d7')" style="cursor:pointer;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">7天内</span><span style="font-size:18px;font-weight:800;color:var(--txt);">'+(stats.d7||0)+'</span></div>';
+    h+='<div onclick="showRestrictedItems('d30')" style="cursor:pointer;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">30天内</span><span style="font-size:18px;font-weight:800;color:var(--txt);">'+(stats.d30||0)+'</span></div>';
+    h+='<div onclick="showRestrictedItems('d60')" style="cursor:pointer;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">60天内</span><span style="font-size:18px;font-weight:800;color:var(--txt);">'+(typeof stats.d60==='number'?stats.d60:'—')+'</span></div>';
+    h+='<div onclick="showRestrictedItems('d90')" style="cursor:pointer;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">90天内</span><span style="font-size:18px;font-weight:800;color:var(--txt);">'+(stats.d90||0)+'</span></div>';
     h+='</div>';
-    h+='<div style="max-height:260px;overflow-y:auto;">';
-    sorted.slice(0,15).forEach(it=>{
-      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;margin-bottom:6px;">';
-      h+='<span style="font-size:12px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.code+'</span> <span style="font-size:10px;color:var(--sub);">'+it.date+'</span></span>';
-      h+='<span style="font-size:12px;font-weight:700;color:var(--up);flex-shrink:0;">'+it.amount+'</span>';
-      h+='</div>';
-    });
-    h+='</div>';
+    h+='<div id="restrictedCalendarTable" style="display:none;"></div>';
     $b.innerHTML=h;
     if($t) $t.innerHTML=_uBadge('收盘后','短线',d.update_time);
   }
@@ -9672,24 +9720,16 @@ function drawUpDownChart(){
     const $b=$('forecastCalendarBody'), $t=$('forecastCalendarTime');
     if(!$b) return;
     if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">业绩预告数据暂不可用</div>'; if($t) $t.innerHTML='—'; return; }
-    // 2026-08-31：汇总胶囊改小，内部一行；列表紧凑
+    // 2026-08-31：盘后业绩预告 = 一行 4 列汇总胶囊（全报告期累计）；明细列表默认隐藏，点击胶囊展开下表
+    window._forecastCalendarData = d;
     const s=d.summary||{};
     let h='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;">';
-    h+='<div style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--up);">预增</span><span style="font-size:18px;font-weight:800;color:var(--up);">'+(s.increase||0)+'</span></div>';
-    h+='<div style="background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--down);">预减</span><span style="font-size:18px;font-weight:800;color:var(--down);">'+(s.decrease||0)+'</span></div>';
-    h+='<div style="background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.25);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">预亏</span><span style="font-size:18px;font-weight:800;color:var(--sub);">'+(s.loss||0)+'</span></div>';
-    h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--txt);">不确定</span><span style="font-size:18px;font-weight:800;color:var(--txt);">'+(s.uncertain||0)+'</span></div>';
+    h+='<div onclick="showForecastItems('increase')" style="cursor:pointer;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--up);">预增</span><span style="font-size:18px;font-weight:800;color:var(--up);">'+(s.increase||0)+'</span></div>';
+    h+='<div onclick="showForecastItems('decrease')" style="cursor:pointer;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--down);">预减</span><span style="font-size:18px;font-weight:800;color:var(--down);">'+(s.decrease||0)+'</span></div>';
+    h+='<div onclick="showForecastItems('loss')" style="cursor:pointer;background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.25);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">预亏</span><span style="font-size:18px;font-weight:800;color:var(--sub);">'+(s.loss||0)+'</span></div>';
+    h+='<div onclick="showForecastItems('uncertain')" style="cursor:pointer;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--txt);">不确定</span><span style="font-size:18px;font-weight:800;color:var(--txt);">'+(s.uncertain||0)+'</span></div>';
     h+='</div>';
-    h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">TOP 预增 / 扭亏</div>';
-    h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;">';
-    d.items.slice(0,8).forEach(it=>{
-      const col=it.change_pct>=0?'var(--up)':'var(--down)';
-      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;">';
-      h+='<span style="font-size:12px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.code+'</span> <span style="font-size:10px;color:var(--sub);">'+it.type+'</span></span>';
-      h+='<span style="font-size:12px;font-weight:700;color:'+col+';flex-shrink:0;">'+(it.change_pct>=0?'+':'')+Number(it.change_pct).toFixed(0)+'%</span>';
-      h+='</div>';
-    });
-    h+='</div>';
+    h+='<div id="forecastCalendarTable" style="display:none;"></div>';
     $b.innerHTML=h;
     if($t) $t.innerHTML=_uBadge('收盘后','短线',d.update_time);
   }
