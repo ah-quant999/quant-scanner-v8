@@ -2,7 +2,7 @@
 html>
 <html lang="zh-CN">
 <head>
-<!-- deploy-trigger 2026-09-01T00:55 rebuild-from bt-backtest-renderhardened - bt回测整函数trycatch防空白+setBadge降级 -->
+<!-- deploy-trigger 2026-09-01T06:46 rebuild-from force-cdn-flush + click-debug - 共识段改名+grid双列卡片化+__jumpBucket容错增强+console调试入口 -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -721,6 +721,7 @@ window.V8_CAL = {weeks:[],legend:[]};
       if(!isPost) return { show:true, label:'⏳ 今日盘中预览' };
       return { show:true, label:'✅ 今日已跑完' };
     }
+    if(diff === 1) return { show:true, label:'✅ 昨日 已跑' }; // 与 _uBadge「昨日」保持一致
     if(diff <= 30) return { show:true, label:'✅ '+dataDate.slice(5)+' 已跑' }; // "08-06 已跑"
     return { show:false, label:'' };
   };
@@ -813,6 +814,44 @@ function _holdBadge(dateStr, count, label){
   // 统一轻量 pill 风格（与最终推荐 finalStatusBadges 一致）
   return '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(96,165,250,.12);color:#60a5fa;border:1px solid rgba(96,165,250,.3);white-space:nowrap">📦 '+(d||'--')+' '+lbl+' <b style="margin-left:2px">'+(count||0)+'</b></span>';
 }
+/* 分红方案合理性核查（2026-09-01 新增）
+ * 输入：d = dividend 对象，price = 当前股价
+ * 返回：{ok, badgeHTML, reason}
+ * 异常规则：
+ *   1. 解析出每股派息 / 股价 > 10%（即股息率超 10%）
+ *   2. 分红比例（cash_ratio）> 80%
+ *   3. 股息率 d.yield > 8%
+ *   4. 方案文本金额异常大但无法解析（如 >50 元/10股）
+ * 任一命中即标「待核」徽章并提示交叉核对。
+ */
+window._dividendCheck = function(d, price){
+  d = d || {};
+  var plan = d.desc || '';
+  var perShare = 0;
+  // 解析 "10派X元" / "10送Y转Z派X元" / "每股派X元"
+  var m1 = plan.match(/10(?:送\d+)?(?:转\d+)?派([0-9.]+)\s*元/);
+  var m2 = plan.match(/每股派([0-9.]+)\s*元/);
+  if(m1) perShare = parseFloat(m1[1]) / 10;
+  else if(m2) perShare = parseFloat(m2[1]);
+  else {
+    // 兜底：方案里出现超大金额数字（无单位/异常）
+    var bigNum = plan.match(/([0-9.]+)\s*元/);
+    if(bigNum && parseFloat(bigNum[1]) > 50){
+      return {ok:false, badge:'<span style="font-size:10px;background:rgba(239,68,68,.15);color:var(--down);padding:1px 6px;border-radius:4px;margin-left:4px;cursor:help" title="分红方案金额异常，无法识别常规 10派X元/每股派X元 格式，请交叉核对数据源">待核</span>', reason:'分红方案金额异常，请交叉核对'};
+    }
+  }
+  var yieldImplied = (perShare > 0 && price > 0) ? perShare / price : 0;
+  var cashRatio = (d.cash_ratio != null) ? parseFloat(d.cash_ratio) : 0;
+  var yieldVal = (d.yield != null) ? parseFloat(d.yield) : 0;
+  if(yieldImplied > 0.10 || cashRatio > 80 || yieldVal > 0.08){
+    var reasons = [];
+    if(yieldImplied > 0.10) reasons.push('估算股息率 ' + (yieldImplied*100).toFixed(2) + '%，显著偏高');
+    if(cashRatio > 80) reasons.push('分红比例 ' + cashRatio.toFixed(1) + '%，超过常规水平');
+    if(yieldVal > 0.08) reasons.push('股息率 ' + (yieldVal*100).toFixed(2) + '%，超过 8%');
+    return {ok:false, badge:'<span style="font-size:10px;background:rgba(239,68,68,.15);color:var(--down);padding:1px 6px;border-radius:4px;margin-left:4px;cursor:help" title="' + reasons.join('；') + '，请交叉核对东财/交易所公告">待核</span>', reason:reasons.join('；')};
+  }
+  return {ok:true, badge:'', reason:''};
+};
 window._uBadge = _uBadge; window.setBadge = setBadge; window._holdBadge = _holdBadge;
 
 /* ===== 🎯 今日判定 · 可入手候选 HTML 构建（2026-08-08 重构） =====
@@ -2248,7 +2287,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- ===== TAB 页面：🧭 选股池（2026-08-29 主人令：从盘后数据·已下架迁至选股策略子页；2026-08-30 移到首位并改为点击展开） ===== -->
     <div id="st-pool" class="st-pane active">
       <div class="card" style="border-left:4px solid #f9a8d4;">
-        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🧭</span>观测候选股池 <span class="fresh" id="stPoolTime">—</span> <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span> <span style="font-size:11px;color:var(--sub);font-weight:400">上游水源</span> <span style="color:var(--dim);font-weight:400">- 盘后</span></h3>
+        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🧭</span>观测候选股池 <span id="stPoolTime">—</span> <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span> <span id="stPoolSlot" style="font-size:11px;color:var(--sub);font-weight:400">上游水源 · 盘后</span></h3>
         <div id="stPoolSourceDist" class="tp-stocklist"></div>
         <div id="stPoolStockList" class="tp-stocklist" style="display:none;"></div>
         <div class="note">筛选：主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50 + 外资研投(自选+研报)。三板合计≥280视为健康。</div>
@@ -3037,30 +3076,39 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       h += '</div>';
     });
     h += '</div>';
-    /* ===== 月度汇总（当前 calendar 月·2026-08-06 按自然月） ===== */
+    /* ===== 月度汇总（当前 calendar 月·2026-09-01 修复：严格按自然月过滤 + 当月无数据占位） ===== */
     var _monthLabel = year + '年' + (month+1) + '月';
-    h += '<h3 style="margin-top:20px;font-size:15px;color:var(--txt)">📊 月度汇总 <span style="font-size:11px;color:var(--dim);font-weight:400">· ' + _monthLabel + '净买卖（仅当月·' + (lhbDate&&parseInt(lhbDate.slice(0,4))===year&&(parseInt(lhbDate.slice(4,6))-1)===month?(lhbDate.slice(0,4)+'/'+lhbDate.slice(4,6)+'/'+lhbDate.slice(6)):'--') + '）</span></h3>';
+    var _monthTradeDays = days.filter(function(d){ return +d.iso.slice(0,4) === year && (+d.iso.slice(4,6)-1) === month; });
+    var _latestMonthDay = _monthTradeDays.length ? _monthTradeDays[_monthTradeDays.length-1].iso : '';
+    var _monthStocks = [];
+    _monthTradeDays.forEach(function(d){ _monthStocks = _monthStocks.concat(d.stocks||[]); });
+    var _monthHasData = _monthStocks.length > 0;
+    h += '<h3 style="margin-top:20px;font-size:15px;color:var(--txt)">📊 月度汇总 <span style="font-size:11px;color:var(--dim);font-weight:400">· ' + _monthLabel + '净买卖（仅当月' + (_monthHasData ? '· 最新交易日 ' + (_latestMonthDay.slice(0,4)+'/'+_latestMonthDay.slice(4,6)+'/'+_latestMonthDay.slice(6)) : '· 暂无交易数据') + '）</span></h3>';
     h += '<div class="month-summary">';
 
-    // Buy TOP10
-    var mBuy = stocks.filter(function(s){ return ((s.inst_net_万||0)+(s.yz_net_万||0)) > 0; });
-    mBuy.sort(function(a,b){ return ((b.inst_net_万||0)+(b.yz_net_万||0))-((a.inst_net_万||0)+(a.yz_net_万||0)); });
-    h += '<div class="ms-col"><div class="ms-title"><span style="color:var(--up)">▲</span> 净买入TOP10</div>';
-    mBuy.slice(0, 10).forEach(function(s, idx){
-      var net = ((s.inst_net_万||0)+(s.yz_net_万||0));
-      h += '<div class="ms-item"><span>' + (idx+1) + _rcEsc(s.name) + '<span class="ms-code">'+(s.code||'')+'</span></span><span class="ms-val c-up">' + _rcFmtYi(net) + '</span></div>';
-    });
-    h += '</div>';
+    if(!_monthHasData){
+      h += '<div style="grid-column:1/-1;text-align:center;color:var(--dim);padding:28px 12px;font-size:13px;background:var(--bg2);border:1px dashed var(--border);border-radius:10px;">📭 ' + _monthLabel + ' 暂无龙虎榜交易数据<br><span style="font-size:11px;opacity:.8;">每月初/节假日后首个交易日盘后会自动更新</span></div>';
+    } else {
+      // Buy TOP10
+      var mBuy = _monthStocks.filter(function(s){ return ((s.inst_net_万||0)+(s.yz_net_万||0)) > 0; });
+      mBuy.sort(function(a,b){ return ((b.inst_net_万||0)+(b.yz_net_万||0))-((a.inst_net_万||0)+(a.yz_net_万||0)); });
+      h += '<div class="ms-col"><div class="ms-title"><span style="color:var(--up)">▲</span> 净买入TOP10</div>';
+      mBuy.slice(0, 10).forEach(function(s, idx){
+        var net = ((s.inst_net_万||0)+(s.yz_net_万||0));
+        h += '<div class="ms-item"><span>' + (idx+1) + _rcEsc(s.name) + '<span class="ms-code">'+(s.code||'')+'</span></span><span class="ms-val c-up">' + _rcFmtYi(net) + '</span></div>';
+      });
+      h += '</div>';
 
-    // Sell TOP10
-    var mSell = stocks.filter(function(s){ return ((s.inst_net_万||0)+(s.yz_net_万||0)) < 0; });
-    mSell.sort(function(a,b){ return ((a.inst_net_万||0)+(a.yz_net_万||0))-((b.inst_net_万||0)+(b.yz_net_万||0)); });
-    h += '<div class="ms-col"><div class="ms-title"><span style="color:var(--down)">▼</span> 净卖出TOP10</div>';
-    mSell.slice(0, 10).forEach(function(s, idx){
-      var net = ((s.inst_net_万||0)+(s.yz_net_万||0));
-      h += '<div class="ms-item"><span>' + (idx+1) + _rcEsc(s.name) + '<span class="ms-code">'+(s.code||'')+'</span></span><span class="ms-val c-down">' + _rcFmtYi(net) + '</span></div>';
-    });
-    h += '</div>';
+      // Sell TOP10
+      var mSell = _monthStocks.filter(function(s){ return ((s.inst_net_万||0)+(s.yz_net_万||0)) < 0; });
+      mSell.sort(function(a,b){ return ((a.inst_net_万||0)+(a.yz_net_万||0))-((b.inst_net_万||0)+(b.yz_net_万||0)); });
+      h += '<div class="ms-col"><div class="ms-title"><span style="color:var(--down)">▼</span> 净卖出TOP10</div>';
+      mSell.slice(0, 10).forEach(function(s, idx){
+        var net = ((s.inst_net_万||0)+(s.yz_net_万||0));
+        h += '<div class="ms-item"><span>' + (idx+1) + _rcEsc(s.name) + '<span class="ms-code">'+(s.code||'')+'</span></span><span class="ms-val c-down">' + _rcFmtYi(net) + '</span></div>';
+      });
+      h += '</div>';
+    }
     h += '</div>'; // month-summary
 
     // Footer note
@@ -3420,25 +3468,33 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     });
     h += '</div>';
 
-    // Monthly summary (北向席位·当月·2026-08-06 按自然月，过滤其他月)
+    // Monthly summary (北向席位·当月·2026-09-01 修复：严格按自然月过滤 + 当月无数据占位)
     var _monthNb = northStocks.filter(function(s){
       var sd = (s.date||'').replace(/-/g,'');
       if(sd.length < 8) return false;
       return +sd.slice(0,4) === year && (+sd.slice(4,6)-1) === month;
     });
-    h += '<h3 style="margin-top:20px;font-size:15px;color:var(--txt)">📊 月度汇总 <span style="font-size:11px;color:var(--dim);font-weight:400">· ' + (year) + '年' + (month+1) + '月龙虎榜北向席位净买卖（仅当月·' + _monthNb.length + '只有北向持仓）</span></h3>';
+    var _monthNbHasData = _monthNb.length > 0;
+    var _monthNbLatest = _monthNbHasData ? _monthNb.map(function(s){ return (s.date||'').replace(/-/g,''); }).sort().pop() : '';
+    h += '<h3 style="margin-top:20px;font-size:15px;color:var(--txt)">📊 月度汇总 <span style="font-size:11px;color:var(--dim);font-weight:400">· ' + (year) + '年' + (month+1) + '月龙虎榜北向席位净买卖（仅当月' + (_monthNbHasData ? '· 最新交易日 ' + (_monthNbLatest.slice(0,4)+'/'+_monthNbLatest.slice(4,6)+'/'+_monthNbLatest.slice(6)) : '· 暂无交易数据') + '）</span></h3>';
     h += '<div class="month-summary">';
-    var mNb = _monthNb.filter(function(s){ return s._nb_net_万 > 0; }).sort(function(a,b){return b._nb_net_万 - a._nb_net_万;});
-    var mNs = _monthNb.filter(function(s){ return s._nb_net_万 < 0; }).sort(function(a,b){return a._nb_net_万 - b._nb_net_万;});
-    h += '<div class="ms-col"><div class="ms-title"><span style="color:var(--up)">▲</span> 净买入TOP10</div>';
-    mNb.slice(0,10).forEach(function(s,idx){
-      h += '<div class="ms-item"><span>'+(idx+1)+_rcEsc(s.name)+'<span class="ms-code">'+(s.code||'')+'</span></span><span class="ms-val c-up">'+_rcFmtYi(s._nb_net_万)+'</span></div>';
-    });
-    h += '</div><div class="ms-col"><div class="ms-title"><span style="color:var(--down)">▼</span> 净卖出TOP10</div>';
-    mNs.slice(0,10).forEach(function(s,idx){
-      h += '<div class="ms-item"><span>'+(idx+1)+_rcEsc(s.name)+'<span class="ms-code">'+(s.code||'')+'</span></span><span class="ms-val c-down">'+_rcFmtYi(s._nb_net_万)+'</span></div>';
-    });
-    h += '</div></div>';
+
+    if(!_monthNbHasData){
+      h += '<div style="grid-column:1/-1;text-align:center;color:var(--dim);padding:28px 12px;font-size:13px;background:var(--bg2);border:1px dashed var(--border);border-radius:10px;">📭 ' + (year) + '年' + (month+1) + '月 暂无龙虎榜北向席位数据<br><span style="font-size:11px;opacity:.8;">每月初/节假日后首个交易日盘后会自动更新</span></div>';
+    } else {
+      var mNb = _monthNb.filter(function(s){ return s._nb_net_万 > 0; }).sort(function(a,b){return b._nb_net_万 - a._nb_net_万;});
+      var mNs = _monthNb.filter(function(s){ return s._nb_net_万 < 0; }).sort(function(a,b){return a._nb_net_万 - b._nb_net_万;});
+      h += '<div class="ms-col"><div class="ms-title"><span style="color:var(--up)">▲</span> 净买入TOP10</div>';
+      mNb.slice(0,10).forEach(function(s,idx){
+        h += '<div class="ms-item"><span>'+(idx+1)+_rcEsc(s.name)+'<span class="ms-code">'+(s.code||'')+'</span></span><span class="ms-val c-up">'+_rcFmtYi(s._nb_net_万)+'</span></div>';
+      });
+      h += '</div><div class="ms-col"><div class="ms-title"><span style="color:var(--down)">▼</span> 净卖出TOP10</div>';
+      mNs.slice(0,10).forEach(function(s,idx){
+        h += '<div class="ms-item"><span>'+(idx+1)+_rcEsc(s.name)+'<span class="ms-code">'+(s.code||'')+'</span></span><span class="ms-val c-down">'+_rcFmtYi(s._nb_net_万)+'</span></div>';
+      });
+      h += '</div>';
+    }
+    h += '</div>';
 
     // Footer
     h += '<div style="margin-top:12px;font-size:10px;color:var(--dim);text-align:center;line-height:1.6">';
@@ -4267,22 +4323,31 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         } catch(e) { console.warn('restoreStock fail', e); }
       };
       // 【2026-09-01 主人截图】4 桶胶囊可点击：展开 4 桶明细 details + 滚动到对应桶 header + 1.8s 闪烁高亮
+      // 容错增强：console.log 调试入口（如果主人点不到看 console）+ d.open + setAttribute('open','') 双保险 + try/catch 包内层
       window.__jumpBucket = function(btn){
         try{
+          try{ console.log('[bt jumpBucket] click', btn); }catch(_){}
           var key = btn && btn.getAttribute && btn.getAttribute('data-bucket');
-          if(!key) return;
+          if(!key){ try{ console.warn('[bt jumpBucket] no data-bucket'); }catch(_){} return; }
           var d = document.getElementById('btBucketDetail');
-          if(d && !d.open){ d.open = true; }
+          try{ console.log('[bt jumpBucket] key=', key, 'details=', !!d); }catch(_){}
+          if(d){
+            d.open = true;
+            try{ d.setAttribute('open',''); }catch(_){}
+          }
           setTimeout(function(){
             var tr = document.getElementById('btBucket-' + key);
+            try{ console.log('[bt jumpBucket] scroll target=', key, 'found=', !!tr); }catch(_){}
             if(!tr) return;
-            try{ tr.scrollIntoView({behavior: 'smooth', block: 'center'}); }catch(_){}
+            try{ tr.scrollIntoView({behavior: 'smooth', block: 'center'}); }catch(_){ tr.scrollIntoView(); }
             var origBg = tr.style.background;
             tr.style.transition = 'background .35s';
             tr.style.background = 'rgba(251,191,36,.28)';
             setTimeout(function(){ tr.style.background = origBg; }, 1800);
           }, 120);
-        }catch(e){ console.warn('[bt] jumpBucket', e); }
+        }catch(e){
+          try{ console.warn('[bt jumpBucket] outer fail', e && e.message); }catch(_){}
+        }
       };
 
       html += '<div style="margin:14px 0;border-left:4px solid #22c55e;" class="card">';
@@ -4335,17 +4400,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         try{ consensusItems = _sortBucket(consensusItems, 'consensus_count', false); }catch(e){ console.warn('[bt] consensus sort', e); }
         html += '<div style="margin:10px 0;padding:10px;border:1px solid rgba(56,189,248,.35);border-radius:8px;background:rgba(56,189,248,.04);">';
         html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
-        html += '<span style="font-size:12.5px;font-weight:700;color:#38bdf8;">🤝 多算法共识 '+consensusItems.length+' 只</span>';
-        html += '<span style="font-size:10.5px;color:var(--dim);">v8 三大 algo ≥2 命中 · 按共识数↓ · 标注具体算法 · 默认展开</span>';
+        html += '<span style="font-size:12.5px;font-weight:700;color:#38bdf8;">🤝 共识 '+consensusItems.length+' 只</span>';
+        html += '<span style="font-size:10.5px;color:var(--dim);">v8 三大 algo ≥2 命中（即「多算法共识」，与头部徽章统一简称）· 按共识数↓ · 标注具体算法 · 默认展开 · 卡片 2 列布局</span>';
         html += '</div>';
-        html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;">';
-        html += '<thead><tr style="background:rgba(56,189,248,.08);border-bottom:1.5px solid rgba(56,189,248,.3);">';
-        html += '<th style="padding:5px;text-align:left;color:#38bdf8;">代码</th>';
-        html += '<th style="padding:5px;text-align:left;color:#38bdf8;">名称</th>';
-        html += '<th style="padding:5px;text-align:right;color:#38bdf8;">共识数</th>';
-        html += '<th style="padding:5px;text-align:left;color:#38bdf8;">命中的算法（具体名）</th>';
-        html += '<th style="padding:5px;text-align:right;color:#38bdf8;">期间</th>';
-        html += '</tr></thead><tbody>';
+        // 【2026-09-01 主人截图】改为一行两列卡片展示（grid 2 列），便于一眼对比
+        html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:4px 0;">';
         var consShowLimit = 30;
         consensusItems.slice(0, consShowLimit).forEach(function(it){
           if(!it) return;
@@ -4355,17 +4414,25 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var _lastPct = (typeof it.last_pct==='number') ? it.last_pct : 0;
           var _algos = Array.isArray(it.algos_hit) ? it.algos_hit : [];
           var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
-          // 算法名 chip：蓝底白字，区分度高
           var algoChips = _algos.map(function(a){ return '<span style="display:inline-block;padding:1px 6px;margin:1px 2px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(56,189,248,.18);color:#38bdf8;border:1px solid rgba(56,189,248,.4);">'+_esc(a)+'</span>'; }).join('');
-          html += '<tr style="border-bottom:1px solid rgba(148,163,184,.08);background:rgba(56,189,248,.03);">';
-          html += '<td style="padding:4px 6px;color:var(--txt);font-weight:600;">'+_esc(_code)+'</td>';
-          html += '<td style="padding:4px 6px;color:var(--txt);">'+_esc(_name)+'</td>';
-          html += '<td style="padding:4px 6px;text-align:right;color:#38bdf8;font-weight:700;">🤝 '+_cons+' / 3</td>';
-          html += '<td style="padding:4px 6px;">'+algoChips+'</td>';
-          html += '<td style="padding:4px 6px;text-align:right;font-weight:700;color:'+periodColor+';">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</td>';
-          html += '</tr>';
+          // 单只股票卡片（grid 项）
+          html += '<div style="padding:10px;border:1px solid rgba(56,189,248,.3);border-radius:8px;background:rgba(56,189,248,.06);">';
+          // 行 1：代码 + 名称 + 共识数（右对齐）
+          html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">';
+          html += '<span style="font-weight:700;font-size:12.5px;color:var(--txt);">'+_esc(_code)+'</span>';
+          html += '<span style="font-size:11.5px;color:var(--sub);">'+_esc(_name)+'</span>';
+          html += '<span style="margin-left:auto;font-weight:700;font-size:11px;color:#38bdf8;">🤝 '+_cons+' / 3</span>';
+          html += '</div>';
+          // 行 2：命中的算法 chips（自动换行）
+          html += '<div style="margin-bottom:5px;line-height:1.6;">'+algoChips+'</div>';
+          // 行 3：期间（左标签 + 右数字，对齐）
+          html += '<div style="display:flex;align-items:center;">';
+          html += '<span style="font-size:10px;color:var(--dim);">期间</span>';
+          html += '<span style="margin-left:auto;font-weight:700;font-size:13px;color:'+periodColor+';">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
+          html += '</div>';
+          html += '</div>';
         });
-        html += '</tbody></table></div>';
+        html += '</div>';
         if(consensusItems.length > consShowLimit){
           html += '<div style="font-size:10.5px;color:var(--dim);margin-top:4px;text-align:center;">已展示前 '+consShowLimit+' / '+consensusItems.length+' 只 · 完整列表见下方「4 桶明细」</div>';
         }
@@ -5103,6 +5170,7 @@ function switchSec(sec,el){
     const progStr = d.progress || null;
     const exStr = d.ex_date || null;
     const planStr = d.desc || null;  // 具体分红方案：10派4.2元 / 10送2转3派4.2元
+    const divCheck = window._dividendCheck ? window._dividendCheck(d, q.price || 0) : {ok:true, badge:'', reason:''};
     let dyBadge = '';
     if(progStr && /实施|已/.test(progStr)) dyBadge = '<span style="font-size:10px;background:rgba(94,224,160,.15);color:var(--up);padding:1px 6px;border-radius:4px;margin-left:4px;">'+progStr+'</span>';
     else if(progStr) dyBadge = '<span style="font-size:10px;background:rgba(255,183,77,.15);color:var(--gold);padding:1px 6px;border-radius:4px;margin-left:4px;">'+progStr+'</span>';
@@ -5167,7 +5235,11 @@ function switchSec(sec,el){
         h += '<div style="margin-top:6px;font-size:11px;color:var(--sub);">💰 分红方案：'+
           (planStr ? '<b style="color:var(--gold);margin-right:4px;">'+planStr+'</b>' : '')+
           (dyBadge || '')+
+          (divCheck.badge || '')+
           '</div>';
+        if(!divCheck.ok){
+          h += '<div style="font-size:10px;color:var(--down);margin-top:4px;">⚠️ '+divCheck.reason+'，请交叉核对东财/交易所公告</div>';
+        }
       }
       h += '</div>';
     }
@@ -5179,7 +5251,8 @@ function switchSec(sec,el){
           (dyPct?'<span style="font-size:18px;font-weight:800;color:'+dyColor+';">'+dyPct+'</span>':'')+
           dyBadge+
         '</div>'+
-        (planStr?'<div style="font-size:11px;color:var(--sub);">分红方案：<b style="color:var(--gold);">'+planStr+'</b></div>':'')+
+        (planStr?'<div style="font-size:11px;color:var(--sub);">分红方案：<b style="color:var(--gold);">'+planStr+'</b>'+(divCheck.badge||'')+'</div>':'')+
+        (!divCheck.ok?'<div style="font-size:10px;color:var(--down);margin-top:4px;">⚠️ '+divCheck.reason+'，请交叉核对东财/交易所公告</div>':'')+
       '</div>';
     }
     h+='<div style="margin-top:8px;font-size:10px;color:var(--dim);">快照 '+q.snapshot_time+' · 行情源 akshare 新浪 · 分红源 东财 stock_fhps_em · 财务画像源 算法链 baostock</div>';
@@ -9464,9 +9537,20 @@ window.showRestrictedItems = showRestrictedItems;
     const sd = cand.source_dist || {};
     const total = cand.total || Object.keys(cand.stocks||{}).length || 0;
     const stocks = cand.stocks || {};
-    // 时间戳
+    // 时间戳 + 时段标签（2026-09-01 修复：统一用 _uBadge，避免显示原始时间戳）
     const tEl = $('stPoolTime');
-    if(tEl) tEl.textContent = (cand.update_time||'--').slice(0,16).replace('T',' ');
+    const slotEl = $('stPoolSlot');
+    if(tEl){
+      try{
+        tEl.innerHTML = window._uBadge ? window._uBadge('盘后','短线', cand.update_time || '') : ((cand.update_time||'--').slice(0,16).replace('T',' '));
+      }catch(e){ tEl.textContent = (cand.update_time||'--').slice(0,16).replace('T',' '); }
+    }
+    if(slotEl){
+      // 候选股池是 premarket 生成的上游水源；9:30 前显示「盘前·待开盘」更直观
+      var _nowParts = window._cstParts ? window._cstParts(new Date()) : null;
+      var _isPre = _nowParts && (_nowParts.hh < 9 || (_nowParts.hh === 9 && _nowParts.mm < 30));
+      slotEl.textContent = _isPre ? '上游水源 · 盘前' : '上游水源 · 盘后';
+    }
     // 来源级分布（紧凑行，始终可见；尾部带展开/折叠按钮）
     const sdEl = $('stPoolSourceDist');
     if(sdEl){
@@ -11164,15 +11248,18 @@ h+='</div>';  // /ulPaneDbg
       html += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
       sc.leaders.forEach(function(l){
         // ⚖️ 2026-08-14 主人令：三张新卡加分红方案跟踪（情绪龙头 chip 后追加）
+        // 2026-09-01 修复：加分红异常待核标记
         var sq = (window.STOCK_QUOTE && window.STOCK_QUOTE.stocks) ? window.STOCK_QUOTE.stocks[l.code] : null;
         var dv = sq ? sq.dividend : null;
         var dyTag = '';
+        var divCk = {ok:true, badge:''};
         if (dv && dv.cash_ratio != null){
           var dC = dv.cash_ratio >= 30 ? '#fbbf24' : (dv.cash_ratio >= 10 ? '#22c55e' : '#94a3b8');
           var prog = dv.progress && /实施|已/.test(dv.progress) ? '已实施' : (dv.progress || '预案');
           dyTag = '<span style="margin-left:4px;font-size:9.5px;padding:1px 5px;border-radius:3px;background:rgba(251,146,60,.15);color:'+dC+';font-weight:600;">💰'+dv.cash_ratio.toFixed(1)+'%·'+prog+'</span>';
+          divCk = window._dividendCheck ? window._dividendCheck(dv, sq ? sq.price : 0) : {ok:true, badge:''};
         }
-        html += '<span style="display:inline-block;padding:4px 10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:6px;font-size:12px;color:#22c55e;font-weight:600;">'+l.name+' <b style="color:var(--txt);margin-left:2px;">'+l.lbc+'板</b>'+dyTag+'</span>';
+        html += '<span style="display:inline-block;padding:4px 10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);border-radius:6px;font-size:12px;color:#22c55e;font-weight:600;">'+l.name+' <b style="color:var(--txt);margin-left:2px;">'+l.lbc+'板</b>'+dyTag+(divCk.badge||'')+'</span>';
       });
       html += '</div>';
     }
@@ -11398,15 +11485,18 @@ h+='</div>';  // /ulPaneDbg
       html += '<td style="padding:7px 6px;text-align:right;color:'+pctColor+';font-weight:600;">'+pctTxt+'</td>';
       html += '<td style="padding:7px 6px;text-align:right;color:'+amtColor+';font-weight:600;">'+(p.amount_yi!=null?p.amount_yi:'-')+'</td>';
       // 分红方案（沿用 2026-08-14 主人令逻辑）
+      // 2026-09-01 修复：加分红异常待核标记
       var sq = (window.STOCK_QUOTE && window.STOCK_QUOTE.stocks) ? window.STOCK_QUOTE.stocks[p.code] : null;
       var dv = sq ? sq.dividend : null;
       var dyCell = '<span style="color:var(--dim);font-size:10px;">-</span>';
       if (dv && dv.cash_ratio != null){
         var dyColor = dv.cash_ratio >= 30 ? '#fbbf24' : (dv.cash_ratio >= 10 ? '#22c55e' : '#94a3b8');
         var prog = dv.progress && /实施|已/.test(dv.progress) ? '已实施' : (dv.progress || '预案');
+        var divCk2 = window._dividendCheck ? window._dividendCheck(dv, sq ? sq.price : 0) : {ok:true, badge:''};
         dyCell = '<span style="font-size:11px;color:'+dyColor+';font-weight:700;">'+dv.cash_ratio.toFixed(1)+'%</span>'
               + '<br><span style="font-size:9.5px;color:var(--dim);">'+prog+'</span>'
-              + (dv.ex_date ? '<br><span style="font-size:9.5px;color:var(--sub);">除'+dv.ex_date.slice(5)+'</span>' : '');
+              + (dv.ex_date ? '<br><span style="font-size:9.5px;color:var(--sub);">除'+dv.ex_date.slice(5)+'</span>' : '')
+              + (divCk2.badge || '');
       }
       html += '<td style="padding:7px 6px;text-align:right;font-size:10.5px;">'+dyCell+'</td>';
       html += '<td style="padding:7px 6px;text-align:right;color:#c4b5fd;font-weight:600;">'+p.hot_count+'</td>';
@@ -12561,7 +12651,11 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     _rps$('strpsUniCount').textContent=uni;
     _rps$('strpsIndexName').textContent=idxName;
     if(_rps$('strpsTime')){
-      try{ _rps$('strpsTime').innerHTML=_uBadge('盘后','短线',time||'已加载'); }catch(e){ _rps$('strpsTime').textContent=time||''; }
+      // 2026-09-01 修复：不传硬编码'盘后'，让 _getSlot 根据真实时间判断（凌晨=盘前）
+      try{
+        var _rpsSlot = (window._getSlot ? window._getSlot(time) : {slot:'盘后', horizon:'短线'});
+        _rps$('strpsTime').innerHTML=_uBadge(_rpsSlot.slot, _rpsSlot.horizon, time||'已加载');
+      }catch(e){ _rps$('strpsTime').textContent=time||''; }
     }
     var filtered=recs.filter(function(r){
       if(!r) return false;
@@ -12597,22 +12691,22 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     if(empty) empty.style.display=filtered.length?'none':'block';
     var badge=_rps$('strpsRunBadge');
     if(badge){
-      // 2026-08-11：强制显示具体日期（MM-DD），不使用模糊的「今日」
+      // 2026-09-01 修复：RPS 数据常在凌晨生成，开盘前不可显示"今日已计算"。
+      // 统一调用 _runBadgeInfo（含盘前/盘中/盘后守卫），不再自行构造"✅ MM-DD 已计算"。
       var rawDate = D.calc_date || D.update_time || time || '';
-      var extracted = window._extractDateStr ? window._extractDateStr(rawDate) : '';
-      if(!extracted){ try{ extracted = String(rawDate).match(/\d{4}-\d{2}-\d{2}/)?String(rawDate).match(/\d{4}-\d{2}-\d{2}/)[0]:''; }catch(e){} }
-      var badgeText = '✅ 已计算';
-      if(extracted){
-        // 始终显示 MM-DD 具体日期，与其他卡片格式一致
-        badgeText = '✅ '+extracted.slice(5)+' 已计算';
+      var info = window._runBadgeInfo ? window._runBadgeInfo(rawDate) : null;
+      var badgeText = '';
+      if(info && info.show){
+        badgeText = info.label;
       } else {
-        var hc = window.HEALTH_CHECK || {}, hcDate = '';
-        try{ var hcIt=(hc.items||[]).find(function(x){return (x||{}).id==='STOCK_RPS'}); if(hcIt&&hcIt.last_update) hcDate=hcIt.last_update.slice(0,10); }catch(e){}
-        if(hcDate) badgeText = '✅ '+hcDate.slice(5)+' 已计算';
-        else badgeText = '✅ 已计算（日期未知）';
+        // 兜底：手动提取日期
+        var extracted = window._extractDateStr ? window._extractDateStr(rawDate) : '';
+        if(!extracted){ try{ extracted = String(rawDate).match(/\d{4}-\d{2}-\d{2}/)?String(rawDate).match(/\d{4}-\d{2}-\d{2}/)[0]:''; }catch(e){} }
+        if(extracted) badgeText = '✅ '+extracted.slice(5)+' 已计算';
+        else badgeText = '✅ 已计算';
       }
       badge.textContent = badgeText;
-      badge.style.display='inline-block';
+      badge.style.display = badgeText ? 'inline-block' : 'none';
     }
   }
   window.renderRpsScreen=renderRpsScreen;
