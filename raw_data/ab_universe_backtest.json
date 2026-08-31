@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-31T10:15:26",
+  "update_time": "2026-08-31T11:25:16",
   "days": [
     {
       "date": "2026-08-29",
@@ -49,7 +49,9 @@
               "name": "生益科技",
               "price": 132.8,
               "pct": 5.163,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "601212",
@@ -312,14 +314,18 @@
               "name": "隆扬电子",
               "price": 56.13,
               "pct": 4.331,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "600183",
               "name": "生益科技",
               "price": 132.8,
               "pct": 5.163,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "600186",
@@ -353,7 +359,9 @@
               "name": "烽火通信",
               "price": 40.7,
               "pct": 5.714,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "600549",
@@ -466,7 +474,9 @@
               "name": "海泰新光",
               "price": 91.93,
               "pct": 5.063,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "688800",
@@ -1261,7 +1271,9 @@
               "name": "金富科技",
               "price": 43.02,
               "pct": 9.997,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "003033",
@@ -1861,7 +1873,9 @@
               "name": "隆扬电子",
               "price": 56.13,
               "pct": 4.331,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "301535",
@@ -1949,7 +1963,9 @@
               "name": "生益科技",
               "price": 132.8,
               "pct": 5.163,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "600186",
@@ -2073,7 +2089,9 @@
               "name": "烽火通信",
               "price": 40.7,
               "pct": 5.714,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "600500",
@@ -2771,7 +2789,9 @@
               "name": "海泰新光",
               "price": 91.93,
               "pct": 5.063,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "688711",
@@ -2905,7 +2925,9 @@
               "name": "生益科技",
               "price": 145.65,
               "pct": 3.32,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "600869",
@@ -3107,7 +3129,9 @@
               "name": "隆扬电子",
               "price": 61.38,
               "pct": 3.246,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "301511",
@@ -3128,7 +3152,9 @@
               "name": "生益科技",
               "price": 145.65,
               "pct": 3.32,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "600367",
@@ -3489,7 +3515,9 @@
               "name": "中交发展",
               "price": 4.68,
               "pct": 3.769,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "000758",
@@ -4311,7 +4339,9 @@
               "name": "蒙娜丽莎",
               "price": 11.33,
               "pct": 10.0,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "002930",
@@ -4372,7 +4402,9 @@
               "name": "竞业达",
               "price": 15.03,
               "pct": 10.029,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "003030",
@@ -5286,7 +5318,9 @@
               "name": "隆扬电子",
               "price": 61.38,
               "pct": 3.246,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "301390",
@@ -5451,7 +5485,9 @@
               "name": "生益科技",
               "price": 145.65,
               "pct": 3.32,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "600189",
@@ -7228,7 +7264,9 @@
               "name": "生益科技",
               "price": 145.65,
               "pct": 3.32,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "600869",
@@ -7430,7 +7468,9 @@
               "name": "隆扬电子",
               "price": 61.38,
               "pct": 3.246,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "301511",
@@ -7451,7 +7491,9 @@
               "name": "生益科技",
               "price": 145.65,
               "pct": 3.32,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "600367",
@@ -7812,7 +7854,9 @@
               "name": "中交发展",
               "price": 4.68,
               "pct": 3.769,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "000758",
@@ -8634,7 +8678,9 @@
               "name": "蒙娜丽莎",
               "price": 11.33,
               "pct": 10.0,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "002930",
@@ -8695,7 +8741,9 @@
               "name": "竞业达",
               "price": 15.03,
               "pct": 10.029,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "003030",
@@ -9609,7 +9657,9 @@
               "name": "隆扬电子",
               "price": 61.38,
               "pct": 3.246,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "301390",
@@ -9774,7 +9824,9 @@
               "name": "生益科技",
               "price": 145.65,
               "pct": 3.32,
-              "returns": null
+              "returns": {
+                "1": -0.2
+              }
             },
             {
               "code": "600189",
@@ -17884,6 +17936,1967 @@
             }
           ],
           "n_hits": 169
+        }
+      }
+    },
+    {
+      "date": "2026-08-31",
+      "quote_date": "2026-08-31",
+      "universes": {
+        "gold": {
+          "universe_size": 14,
+          "hits": [],
+          "n_hits": 0
+        },
+        "candidate": {
+          "universe_size": 317,
+          "hits": [],
+          "n_hits": 0
+        },
+        "all": {
+          "universe_size": 7144,
+          "hits": [
+            {
+              "code": "002909",
+              "name": "集泰股份",
+              "price": 6.02,
+              "pct": 10.055,
+              "returns": null
+            },
+            {
+              "code": "002913",
+              "name": "奥士康",
+              "price": 61.33,
+              "pct": 3.844,
+              "returns": null
+            },
+            {
+              "code": "002921",
+              "name": "联诚精密",
+              "price": 23.22,
+              "pct": 9.995,
+              "returns": null
+            },
+            {
+              "code": "002942",
+              "name": "新农股份",
+              "price": 22.0,
+              "pct": 5.213,
+              "returns": null
+            },
+            {
+              "code": "002943",
+              "name": "宇晶股份",
+              "price": 35.32,
+              "pct": 4.466,
+              "returns": null
+            },
+            {
+              "code": "002995",
+              "name": "天地在线",
+              "price": 17.62,
+              "pct": 3.283,
+              "returns": null
+            },
+            {
+              "code": "003004",
+              "name": "声迅股份",
+              "price": 72.29,
+              "pct": 3.257,
+              "returns": null
+            },
+            {
+              "code": "003005",
+              "name": "竞业达",
+              "price": 16.53,
+              "pct": 9.98,
+              "returns": null
+            },
+            {
+              "code": "003018",
+              "name": "金富科技",
+              "price": 49.38,
+              "pct": 10.002,
+              "returns": null
+            },
+            {
+              "code": "003021",
+              "name": "兆威机电",
+              "price": 73.03,
+              "pct": 3.692,
+              "returns": null
+            },
+            {
+              "code": "003032",
+              "name": "传智教育",
+              "price": 10.8,
+              "pct": 3.448,
+              "returns": null
+            },
+            {
+              "code": "003036",
+              "name": "泰坦股份",
+              "price": 59.61,
+              "pct": 10.002,
+              "returns": null
+            },
+            {
+              "code": "159855",
+              "name": "影视ETF银华",
+              "price": 0.752,
+              "pct": 3.44,
+              "returns": null
+            },
+            {
+              "code": "300010",
+              "name": "ST豆神",
+              "price": 3.54,
+              "pct": 14.563,
+              "returns": null
+            },
+            {
+              "code": "300081",
+              "name": "ST恒信",
+              "price": 3.25,
+              "pct": 4.502,
+              "returns": null
+            },
+            {
+              "code": "300133",
+              "name": "华策影视",
+              "price": 7.34,
+              "pct": 6.223,
+              "returns": null
+            },
+            {
+              "code": "300145",
+              "name": "南方泵业",
+              "price": 4.76,
+              "pct": 3.254,
+              "returns": null
+            },
+            {
+              "code": "300164",
+              "name": "通源石油",
+              "price": 10.56,
+              "pct": 3.631,
+              "returns": null
+            },
+            {
+              "code": "300169",
+              "name": "天晟新材",
+              "price": 5.83,
+              "pct": 5.616,
+              "returns": null
+            },
+            {
+              "code": "300182",
+              "name": "捷成股份",
+              "price": 5.24,
+              "pct": 6.504,
+              "returns": null
+            },
+            {
+              "code": "300291",
+              "name": "百纳千成",
+              "price": 5.28,
+              "pct": 3.937,
+              "returns": null
+            },
+            {
+              "code": "300347",
+              "name": "泰格医药",
+              "price": 52.35,
+              "pct": 5.015,
+              "returns": null
+            },
+            {
+              "code": "300382",
+              "name": "斯莱克",
+              "price": 18.26,
+              "pct": 3.868,
+              "returns": null
+            },
+            {
+              "code": "300385",
+              "name": "ST雪浪",
+              "price": 13.15,
+              "pct": 3.056,
+              "returns": null
+            },
+            {
+              "code": "300413",
+              "name": "芒果超媒",
+              "price": 16.98,
+              "pct": 20.0,
+              "returns": null
+            },
+            {
+              "code": "300419",
+              "name": "ST浩丰",
+              "price": 9.39,
+              "pct": 4.566,
+              "returns": null
+            },
+            {
+              "code": "300426",
+              "name": "华智数媒",
+              "price": 6.61,
+              "pct": 5.255,
+              "returns": null
+            },
+            {
+              "code": "300430",
+              "name": "*ST益通",
+              "price": 4.62,
+              "pct": 3.587,
+              "returns": null
+            },
+            {
+              "code": "300440",
+              "name": "运达科技",
+              "price": 20.21,
+              "pct": 3.06,
+              "returns": null
+            },
+            {
+              "code": "300472",
+              "name": "*ST新元",
+              "price": 7.49,
+              "pct": 6.543,
+              "returns": null
+            },
+            {
+              "code": "300477",
+              "name": "ST合纵",
+              "price": 2.68,
+              "pct": 3.876,
+              "returns": null
+            },
+            {
+              "code": "300491",
+              "name": "通合科技",
+              "price": 32.95,
+              "pct": 3.943,
+              "returns": null
+            },
+            {
+              "code": "300500",
+              "name": "启迪设计",
+              "price": 9.84,
+              "pct": 3.688,
+              "returns": null
+            },
+            {
+              "code": "300508",
+              "name": "维宏股份",
+              "price": 40.59,
+              "pct": 3.02,
+              "returns": null
+            },
+            {
+              "code": "300517",
+              "name": "海波重科",
+              "price": 10.79,
+              "pct": 4.05,
+              "returns": null
+            },
+            {
+              "code": "300521",
+              "name": "爱司凯",
+              "price": 25.8,
+              "pct": 6.568,
+              "returns": null
+            },
+            {
+              "code": "300522",
+              "name": "世名科技",
+              "price": 14.35,
+              "pct": 3.015,
+              "returns": null
+            },
+            {
+              "code": "300523",
+              "name": "辰安科技",
+              "price": 20.49,
+              "pct": 3.224,
+              "returns": null
+            },
+            {
+              "code": "300528",
+              "name": "幸福蓝海",
+              "price": 13.3,
+              "pct": 3.744,
+              "returns": null
+            },
+            {
+              "code": "300550",
+              "name": "和仁科技",
+              "price": 12.69,
+              "pct": 7.725,
+              "returns": null
+            },
+            {
+              "code": "300553",
+              "name": "集智股份",
+              "price": 44.79,
+              "pct": 5.092,
+              "returns": null
+            },
+            {
+              "code": "300578",
+              "name": "会畅科技",
+              "price": 16.18,
+              "pct": 7.508,
+              "returns": null
+            },
+            {
+              "code": "300583",
+              "name": "赛托生物",
+              "price": 14.22,
+              "pct": 9.638,
+              "returns": null
+            },
+            {
+              "code": "300588",
+              "name": "熙菱信息",
+              "price": 22.5,
+              "pct": 5.14,
+              "returns": null
+            },
+            {
+              "code": "300592",
+              "name": "华凯易佰",
+              "price": 16.19,
+              "pct": 4.384,
+              "returns": null
+            },
+            {
+              "code": "300599",
+              "name": "雄塑科技",
+              "price": 11.93,
+              "pct": 5.482,
+              "returns": null
+            },
+            {
+              "code": "300647",
+              "name": "超频三",
+              "price": 7.8,
+              "pct": 4.0,
+              "returns": null
+            },
+            {
+              "code": "300650",
+              "name": "太龙股份",
+              "price": 12.0,
+              "pct": 4.348,
+              "returns": null
+            },
+            {
+              "code": "300670",
+              "name": "大烨智能",
+              "price": 6.99,
+              "pct": 3.863,
+              "returns": null
+            },
+            {
+              "code": "300687",
+              "name": "赛意信息",
+              "price": 28.3,
+              "pct": 5.44,
+              "returns": null
+            },
+            {
+              "code": "300690",
+              "name": "双一科技",
+              "price": 24.64,
+              "pct": 3.096,
+              "returns": null
+            },
+            {
+              "code": "300709",
+              "name": "精研科技",
+              "price": 46.63,
+              "pct": 12.145,
+              "returns": null
+            },
+            {
+              "code": "300729",
+              "name": "乐歌股份",
+              "price": 10.74,
+              "pct": 3.071,
+              "returns": null
+            },
+            {
+              "code": "300731",
+              "name": "科创新源",
+              "price": 47.06,
+              "pct": 10.86,
+              "returns": null
+            },
+            {
+              "code": "300740",
+              "name": "水羊股份",
+              "price": 22.51,
+              "pct": 3.162,
+              "returns": null
+            },
+            {
+              "code": "300741",
+              "name": "华宝股份",
+              "price": 14.72,
+              "pct": 4.918,
+              "returns": null
+            },
+            {
+              "code": "300761",
+              "name": "立华股份",
+              "price": 20.28,
+              "pct": 4.0,
+              "returns": null
+            },
+            {
+              "code": "300781",
+              "name": "因赛集团",
+              "price": 27.01,
+              "pct": 3.328,
+              "returns": null
+            },
+            {
+              "code": "300788",
+              "name": "中信出版",
+              "price": 24.39,
+              "pct": 3.787,
+              "returns": null
+            },
+            {
+              "code": "300793",
+              "name": "佳禾智能",
+              "price": 11.74,
+              "pct": 3.254,
+              "returns": null
+            },
+            {
+              "code": "300795",
+              "name": "米奥会展",
+              "price": 13.93,
+              "pct": 4.658,
+              "returns": null
+            },
+            {
+              "code": "300798",
+              "name": "锦鸡股份",
+              "price": 8.97,
+              "pct": 4.912,
+              "returns": null
+            },
+            {
+              "code": "300816",
+              "name": "艾可蓝",
+              "price": 67.52,
+              "pct": 6.667,
+              "returns": null
+            },
+            {
+              "code": "300820",
+              "name": "英杰电气",
+              "price": 56.5,
+              "pct": 6.044,
+              "returns": null
+            },
+            {
+              "code": "300822",
+              "name": "贝仕达克",
+              "price": 12.17,
+              "pct": 9.442,
+              "returns": null
+            },
+            {
+              "code": "300825",
+              "name": "阿尔特",
+              "price": 11.69,
+              "pct": 4.937,
+              "returns": null
+            },
+            {
+              "code": "300833",
+              "name": "浩洋股份",
+              "price": 40.84,
+              "pct": 3.21,
+              "returns": null
+            },
+            {
+              "code": "300840",
+              "name": "酷特智能",
+              "price": 20.35,
+              "pct": 10.658,
+              "returns": null
+            },
+            {
+              "code": "300845",
+              "name": "捷安高科",
+              "price": 13.29,
+              "pct": 3.666,
+              "returns": null
+            },
+            {
+              "code": "300850",
+              "name": "新强联",
+              "price": 27.29,
+              "pct": 10.845,
+              "returns": null
+            },
+            {
+              "code": "300860",
+              "name": "锋尚文化",
+              "price": 28.22,
+              "pct": 3.068,
+              "returns": null
+            },
+            {
+              "code": "300889",
+              "name": "爱克股份",
+              "price": 23.14,
+              "pct": 7.13,
+              "returns": null
+            },
+            {
+              "code": "300900",
+              "name": "广联航空",
+              "price": 23.98,
+              "pct": 3.945,
+              "returns": null
+            },
+            {
+              "code": "300901",
+              "name": "中胤时尚",
+              "price": 18.92,
+              "pct": 10.838,
+              "returns": null
+            },
+            {
+              "code": "300907",
+              "name": "康平科技",
+              "price": 52.02,
+              "pct": 3.543,
+              "returns": null
+            },
+            {
+              "code": "300911",
+              "name": "亿田智能",
+              "price": 24.42,
+              "pct": 10.05,
+              "returns": null
+            },
+            {
+              "code": "300912",
+              "name": "凯龙高科",
+              "price": 20.34,
+              "pct": 4.041,
+              "returns": null
+            },
+            {
+              "code": "300929",
+              "name": "华骐环保",
+              "price": 17.15,
+              "pct": 4.893,
+              "returns": null
+            },
+            {
+              "code": "300969",
+              "name": "恒帅股份",
+              "price": 83.14,
+              "pct": 6.385,
+              "returns": null
+            },
+            {
+              "code": "300990",
+              "name": "同飞股份",
+              "price": 101.14,
+              "pct": 12.603,
+              "returns": null
+            },
+            {
+              "code": "300998",
+              "name": "宁波方正",
+              "price": 28.12,
+              "pct": 4.652,
+              "returns": null
+            },
+            {
+              "code": "301004",
+              "name": "嘉益股份",
+              "price": 35.97,
+              "pct": 3.96,
+              "returns": null
+            },
+            {
+              "code": "301008",
+              "name": "宏昌科技",
+              "price": 39.74,
+              "pct": 4.855,
+              "returns": null
+            },
+            {
+              "code": "301016",
+              "name": "雷尔伟",
+              "price": 13.26,
+              "pct": 5.826,
+              "returns": null
+            },
+            {
+              "code": "301025",
+              "name": "读客文化",
+              "price": 9.45,
+              "pct": 4.075,
+              "returns": null
+            },
+            {
+              "code": "301040",
+              "name": "中环海陆",
+              "price": 28.5,
+              "pct": 6.822,
+              "returns": null
+            },
+            {
+              "code": "301046",
+              "name": "能辉科技",
+              "price": 24.24,
+              "pct": 3.634,
+              "returns": null
+            },
+            {
+              "code": "301052",
+              "name": "果麦文化",
+              "price": 24.42,
+              "pct": 6.128,
+              "returns": null
+            },
+            {
+              "code": "301056",
+              "name": "森赫股份",
+              "price": 13.76,
+              "pct": 4.321,
+              "returns": null
+            },
+            {
+              "code": "301061",
+              "name": "匠心家居",
+              "price": 35.8,
+              "pct": 6.738,
+              "returns": null
+            },
+            {
+              "code": "301081",
+              "name": "严牌股份",
+              "price": 15.53,
+              "pct": 9.598,
+              "returns": null
+            },
+            {
+              "code": "301086",
+              "name": "鸿富瀚",
+              "price": 130.73,
+              "pct": 5.088,
+              "returns": null
+            },
+            {
+              "code": "301088",
+              "name": "戎美股份",
+              "price": 13.49,
+              "pct": 3.292,
+              "returns": null
+            },
+            {
+              "code": "301108",
+              "name": "洁雅股份",
+              "price": 39.88,
+              "pct": 4.071,
+              "returns": null
+            },
+            {
+              "code": "301112",
+              "name": "信邦智能",
+              "price": 30.79,
+              "pct": 3.011,
+              "returns": null
+            },
+            {
+              "code": "301115",
+              "name": "联检科技",
+              "price": 30.14,
+              "pct": 4.435,
+              "returns": null
+            },
+            {
+              "code": "301121",
+              "name": "紫建电子",
+              "price": 36.43,
+              "pct": 3.76,
+              "returns": null
+            },
+            {
+              "code": "301123",
+              "name": "奕东电子",
+              "price": 78.43,
+              "pct": 3.606,
+              "returns": null
+            },
+            {
+              "code": "301125",
+              "name": "腾亚精工",
+              "price": 14.0,
+              "pct": 9.546,
+              "returns": null
+            },
+            {
+              "code": "301151",
+              "name": "冠龙节能",
+              "price": 20.74,
+              "pct": 20.023,
+              "returns": null
+            },
+            {
+              "code": "301157",
+              "name": "华塑科技",
+              "price": 61.97,
+              "pct": 4.169,
+              "returns": null
+            },
+            {
+              "code": "301176",
+              "name": "逸豪新材",
+              "price": 47.72,
+              "pct": 3.245,
+              "returns": null
+            },
+            {
+              "code": "301193",
+              "name": "家联科技",
+              "price": 19.96,
+              "pct": 7.139,
+              "returns": null
+            },
+            {
+              "code": "301198",
+              "name": "喜悦智行",
+              "price": 13.3,
+              "pct": 3.261,
+              "returns": null
+            },
+            {
+              "code": "301216",
+              "name": "万凯新材",
+              "price": 20.16,
+              "pct": 6.049,
+              "returns": null
+            },
+            {
+              "code": "301218",
+              "name": "华是科技",
+              "price": 55.2,
+              "pct": 13.932,
+              "returns": null
+            },
+            {
+              "code": "301227",
+              "name": "森鹰窗业",
+              "price": 33.74,
+              "pct": 7.624,
+              "returns": null
+            },
+            {
+              "code": "301228",
+              "name": "实朴检测",
+              "price": 68.66,
+              "pct": 3.794,
+              "returns": null
+            },
+            {
+              "code": "301231",
+              "name": "荣信文化",
+              "price": 31.28,
+              "pct": 19.985,
+              "returns": null
+            },
+            {
+              "code": "301232",
+              "name": "飞沃科技",
+              "price": 102.45,
+              "pct": 5.401,
+              "returns": null
+            },
+            {
+              "code": "301251",
+              "name": "威尔高",
+              "price": 52.93,
+              "pct": 6.735,
+              "returns": null
+            },
+            {
+              "code": "301262",
+              "name": "海看股份",
+              "price": 19.65,
+              "pct": 5.588,
+              "returns": null
+            },
+            {
+              "code": "301285",
+              "name": "鸿日达",
+              "price": 91.53,
+              "pct": 5.571,
+              "returns": null
+            },
+            {
+              "code": "301306",
+              "name": "西测测试",
+              "price": 96.4,
+              "pct": 7.987,
+              "returns": null
+            },
+            {
+              "code": "301307",
+              "name": "美利信",
+              "price": 59.18,
+              "pct": 4.448,
+              "returns": null
+            },
+            {
+              "code": "301313",
+              "name": "凡拓数创",
+              "price": 34.0,
+              "pct": 4.455,
+              "returns": null
+            },
+            {
+              "code": "301339",
+              "name": "通行宝",
+              "price": 11.52,
+              "pct": 3.318,
+              "returns": null
+            },
+            {
+              "code": "301356",
+              "name": "天振股份",
+              "price": 20.95,
+              "pct": 3.202,
+              "returns": null
+            },
+            {
+              "code": "301388",
+              "name": "欣灵电气",
+              "price": 25.51,
+              "pct": 4.378,
+              "returns": null
+            },
+            {
+              "code": "301390",
+              "name": "经纬股份",
+              "price": 33.35,
+              "pct": 3.926,
+              "returns": null
+            },
+            {
+              "code": "301392",
+              "name": "汇成真空",
+              "price": 181.1,
+              "pct": 3.244,
+              "returns": null
+            },
+            {
+              "code": "301398",
+              "name": "星源卓镁",
+              "price": 35.33,
+              "pct": 5.778,
+              "returns": null
+            },
+            {
+              "code": "301510",
+              "name": "固高科技",
+              "price": 28.7,
+              "pct": 3.349,
+              "returns": null
+            },
+            {
+              "code": "301586",
+              "name": "佳力奇",
+              "price": 30.76,
+              "pct": 3.221,
+              "returns": null
+            },
+            {
+              "code": "301596",
+              "name": "瑞迪智驱",
+              "price": 47.98,
+              "pct": 3.05,
+              "returns": null
+            },
+            {
+              "code": "301603",
+              "name": "乔锋智能",
+              "price": 134.0,
+              "pct": 5.205,
+              "returns": null
+            },
+            {
+              "code": "301628",
+              "name": "强达电路",
+              "price": 96.75,
+              "pct": 6.494,
+              "returns": null
+            },
+            {
+              "code": "301633",
+              "name": "港迪技术",
+              "price": 60.07,
+              "pct": 10.463,
+              "returns": null
+            },
+            {
+              "code": "516620",
+              "name": "影视ETF国泰",
+              "price": 0.847,
+              "pct": 3.29,
+              "returns": null
+            },
+            {
+              "code": "600031",
+              "name": "三一重工",
+              "price": 20.01,
+              "pct": 4.764,
+              "returns": null
+            },
+            {
+              "code": "600039",
+              "name": "四川路桥",
+              "price": 9.13,
+              "pct": 3.515,
+              "returns": null
+            },
+            {
+              "code": "600121",
+              "name": "郑州煤电",
+              "price": 4.91,
+              "pct": 10.09,
+              "returns": null
+            },
+            {
+              "code": "600215",
+              "name": "派斯林",
+              "price": 6.65,
+              "pct": 5.222,
+              "returns": null
+            },
+            {
+              "code": "600228",
+              "name": "返利科技",
+              "price": 8.63,
+              "pct": 3.851,
+              "returns": null
+            },
+            {
+              "code": "600250",
+              "name": "南京商旅",
+              "price": 10.4,
+              "pct": 4.313,
+              "returns": null
+            },
+            {
+              "code": "600289",
+              "name": "ST信通",
+              "price": 4.53,
+              "pct": 3.899,
+              "returns": null
+            },
+            {
+              "code": "600295",
+              "name": "鄂尔多斯",
+              "price": 14.17,
+              "pct": 3.13,
+              "returns": null
+            },
+            {
+              "code": "600354",
+              "name": "敦煌种业",
+              "price": 9.03,
+              "pct": 9.988,
+              "returns": null
+            },
+            {
+              "code": "600371",
+              "name": "万向德农",
+              "price": 12.69,
+              "pct": 9.965,
+              "returns": null
+            },
+            {
+              "code": "600376",
+              "name": "首开股份",
+              "price": 3.54,
+              "pct": 4.118,
+              "returns": null
+            },
+            {
+              "code": "600395",
+              "name": "盘江股份",
+              "price": 6.05,
+              "pct": 5.401,
+              "returns": null
+            },
+            {
+              "code": "600403",
+              "name": "大有能源",
+              "price": 7.67,
+              "pct": 7.423,
+              "returns": null
+            },
+            {
+              "code": "600405",
+              "name": "动力源",
+              "price": 4.79,
+              "pct": 3.68,
+              "returns": null
+            },
+            {
+              "code": "600520",
+              "name": "三佳科技",
+              "price": 25.63,
+              "pct": 4.57,
+              "returns": null
+            },
+            {
+              "code": "600540",
+              "name": "新赛股份",
+              "price": 5.56,
+              "pct": 10.099,
+              "returns": null
+            },
+            {
+              "code": "600562",
+              "name": "国睿科技",
+              "price": 30.14,
+              "pct": 4.039,
+              "returns": null
+            },
+            {
+              "code": "600581",
+              "name": "*ST八钢",
+              "price": 2.47,
+              "pct": 3.347,
+              "returns": null
+            },
+            {
+              "code": "600611",
+              "name": "大众交通",
+              "price": 4.79,
+              "pct": 6.208,
+              "returns": null
+            },
+            {
+              "code": "600678",
+              "name": "ST金顶",
+              "price": 5.95,
+              "pct": 4.021,
+              "returns": null
+            },
+            {
+              "code": "600683",
+              "name": "京投发展",
+              "price": 11.44,
+              "pct": 3.717,
+              "returns": null
+            },
+            {
+              "code": "600691",
+              "name": "潞化科技",
+              "price": 3.23,
+              "pct": 9.864,
+              "returns": null
+            },
+            {
+              "code": "600715",
+              "name": "文投控股",
+              "price": 1.68,
+              "pct": 3.704,
+              "returns": null
+            },
+            {
+              "code": "600758",
+              "name": "辽宁能源",
+              "price": 3.82,
+              "pct": 4.087,
+              "returns": null
+            },
+            {
+              "code": "600780",
+              "name": "通宝能源",
+              "price": 6.2,
+              "pct": 4.202,
+              "returns": null
+            },
+            {
+              "code": "600789",
+              "name": "鲁抗医药",
+              "price": 7.78,
+              "pct": 3.046,
+              "returns": null
+            },
+            {
+              "code": "600844",
+              "name": "金煤科技",
+              "price": 3.96,
+              "pct": 3.937,
+              "returns": null
+            },
+            {
+              "code": "600892",
+              "name": "大晟文化",
+              "price": 4.25,
+              "pct": 5.721,
+              "returns": null
+            },
+            {
+              "code": "600971",
+              "name": "恒源煤电",
+              "price": 9.34,
+              "pct": 3.548,
+              "returns": null
+            },
+            {
+              "code": "600985",
+              "name": "淮北矿业",
+              "price": 18.6,
+              "pct": 3.853,
+              "returns": null
+            },
+            {
+              "code": "601058",
+              "name": "赛轮轮胎",
+              "price": 15.27,
+              "pct": 6.115,
+              "returns": null
+            },
+            {
+              "code": "601086",
+              "name": "国芳集团",
+              "price": 9.17,
+              "pct": 9.952,
+              "returns": null
+            },
+            {
+              "code": "601169",
+              "name": "北京银行",
+              "price": 5.35,
+              "pct": 5.108,
+              "returns": null
+            },
+            {
+              "code": "601319",
+              "name": "中国人保",
+              "price": 7.39,
+              "pct": 3.501,
+              "returns": null
+            },
+            {
+              "code": "601330",
+              "name": "绿色动力",
+              "price": 7.81,
+              "pct": 10.0,
+              "returns": null
+            },
+            {
+              "code": "601555",
+              "name": "东吴证券",
+              "price": 8.44,
+              "pct": 3.431,
+              "returns": null
+            },
+            {
+              "code": "601595",
+              "name": "上海电影",
+              "price": 18.33,
+              "pct": 10.024,
+              "returns": null
+            },
+            {
+              "code": "601599",
+              "name": "浙文影业",
+              "price": 3.27,
+              "pct": 3.81,
+              "returns": null
+            },
+            {
+              "code": "601658",
+              "name": "邮储银行",
+              "price": 5.19,
+              "pct": 4.008,
+              "returns": null
+            },
+            {
+              "code": "601665",
+              "name": "齐鲁银行",
+              "price": 6.89,
+              "pct": 4.552,
+              "returns": null
+            },
+            {
+              "code": "601666",
+              "name": "平煤股份",
+              "price": 10.21,
+              "pct": 3.445,
+              "returns": null
+            },
+            {
+              "code": "601699",
+              "name": "潞安环能",
+              "price": 17.8,
+              "pct": 4.094,
+              "returns": null
+            },
+            {
+              "code": "601882",
+              "name": "海天精工",
+              "price": 21.91,
+              "pct": 9.99,
+              "returns": null
+            },
+            {
+              "code": "601886",
+              "name": "江河集团",
+              "price": 13.5,
+              "pct": 4.57,
+              "returns": null
+            },
+            {
+              "code": "601898",
+              "name": "中煤能源",
+              "price": 16.02,
+              "pct": 4.297,
+              "returns": null
+            },
+            {
+              "code": "601988",
+              "name": "中国银行",
+              "price": 6.43,
+              "pct": 3.877,
+              "returns": null
+            },
+            {
+              "code": "603001",
+              "name": "奥康国际",
+              "price": 8.6,
+              "pct": 4.75,
+              "returns": null
+            },
+            {
+              "code": "603012",
+              "name": "创力集团",
+              "price": 10.43,
+              "pct": 3.575,
+              "returns": null
+            },
+            {
+              "code": "603038",
+              "name": "华立股份",
+              "price": 17.82,
+              "pct": 6.325,
+              "returns": null
+            },
+            {
+              "code": "603048",
+              "name": "浙江黎明",
+              "price": 23.4,
+              "pct": 6.655,
+              "returns": null
+            },
+            {
+              "code": "603058",
+              "name": "永吉股份",
+              "price": 10.3,
+              "pct": 9.808,
+              "returns": null
+            },
+            {
+              "code": "603068",
+              "name": "博通集成",
+              "price": 37.61,
+              "pct": 5.232,
+              "returns": null
+            },
+            {
+              "code": "603090",
+              "name": "宏盛股份",
+              "price": 39.8,
+              "pct": 3.916,
+              "returns": null
+            },
+            {
+              "code": "603103",
+              "name": "横店影视",
+              "price": 15.53,
+              "pct": 3.121,
+              "returns": null
+            },
+            {
+              "code": "603113",
+              "name": "金能科技",
+              "price": 5.79,
+              "pct": 4.891,
+              "returns": null
+            },
+            {
+              "code": "603139",
+              "name": "康惠股份",
+              "price": 36.69,
+              "pct": 5.949,
+              "returns": null
+            },
+            {
+              "code": "603151",
+              "name": "邦基科技",
+              "price": 16.67,
+              "pct": 4.122,
+              "returns": null
+            },
+            {
+              "code": "603158",
+              "name": "腾龙股份",
+              "price": 11.41,
+              "pct": 5.942,
+              "returns": null
+            },
+            {
+              "code": "603178",
+              "name": "圣龙股份",
+              "price": 17.85,
+              "pct": 9.982,
+              "returns": null
+            },
+            {
+              "code": "603201",
+              "name": "常润股份",
+              "price": 15.64,
+              "pct": 5.108,
+              "returns": null
+            },
+            {
+              "code": "603216",
+              "name": "梦天家居",
+              "price": 22.65,
+              "pct": 10.005,
+              "returns": null
+            },
+            {
+              "code": "603268",
+              "name": "松发股份",
+              "price": 193.0,
+              "pct": 3.043,
+              "returns": null
+            },
+            {
+              "code": "603270",
+              "name": "金帝股份",
+              "price": 30.25,
+              "pct": 10.0,
+              "returns": null
+            },
+            {
+              "code": "603272",
+              "name": "*ST联翔",
+              "price": 16.19,
+              "pct": 7.79,
+              "returns": null
+            },
+            {
+              "code": "603315",
+              "name": "福鞍股份",
+              "price": 12.33,
+              "pct": 7.404,
+              "returns": null
+            },
+            {
+              "code": "603318",
+              "name": "水发燃气",
+              "price": 10.08,
+              "pct": 3.067,
+              "returns": null
+            },
+            {
+              "code": "603326",
+              "name": "我乐家居",
+              "price": 7.78,
+              "pct": 7.459,
+              "returns": null
+            },
+            {
+              "code": "603358",
+              "name": "华达科技",
+              "price": 49.72,
+              "pct": 10.0,
+              "returns": null
+            },
+            {
+              "code": "603366",
+              "name": "日出东方",
+              "price": 7.69,
+              "pct": 4.201,
+              "returns": null
+            },
+            {
+              "code": "603375",
+              "name": "盛景微",
+              "price": 39.3,
+              "pct": 3.968,
+              "returns": null
+            },
+            {
+              "code": "603402",
+              "name": "陕西旅游",
+              "price": 73.44,
+              "pct": 6.791,
+              "returns": null
+            },
+            {
+              "code": "603429",
+              "name": "*ST集友",
+              "price": 8.9,
+              "pct": 4.215,
+              "returns": null
+            },
+            {
+              "code": "603466",
+              "name": "风语筑",
+              "price": 11.81,
+              "pct": 5.919,
+              "returns": null
+            },
+            {
+              "code": "603499",
+              "name": "翔港科技",
+              "price": 12.62,
+              "pct": 3.189,
+              "returns": null
+            },
+            {
+              "code": "603533",
+              "name": "掌阅科技",
+              "price": 22.59,
+              "pct": 9.981,
+              "returns": null
+            },
+            {
+              "code": "603559",
+              "name": "中通国脉",
+              "price": 10.54,
+              "pct": 10.021,
+              "returns": null
+            },
+            {
+              "code": "603598",
+              "name": "引力传媒",
+              "price": 17.55,
+              "pct": 3.846,
+              "returns": null
+            },
+            {
+              "code": "603626",
+              "name": "科森科技",
+              "price": 20.33,
+              "pct": 5.391,
+              "returns": null
+            },
+            {
+              "code": "603685",
+              "name": "晨丰科技",
+              "price": 26.43,
+              "pct": 9.988,
+              "returns": null
+            },
+            {
+              "code": "603721",
+              "name": "中广天择",
+              "price": 19.1,
+              "pct": 10.023,
+              "returns": null
+            },
+            {
+              "code": "603728",
+              "name": "鸣志电器",
+              "price": 49.63,
+              "pct": 3.245,
+              "returns": null
+            },
+            {
+              "code": "603757",
+              "name": "大元泵业",
+              "price": 67.92,
+              "pct": 4.044,
+              "returns": null
+            },
+            {
+              "code": "603819",
+              "name": "神力股份",
+              "price": 14.57,
+              "pct": 3.333,
+              "returns": null
+            },
+            {
+              "code": "603822",
+              "name": "ST嘉澳",
+              "price": 63.39,
+              "pct": 3.04,
+              "returns": null
+            },
+            {
+              "code": "603893",
+              "name": "瑞芯微",
+              "price": 194.59,
+              "pct": 10.0,
+              "returns": null
+            },
+            {
+              "code": "603915",
+              "name": "国茂股份",
+              "price": 14.16,
+              "pct": 5.436,
+              "returns": null
+            },
+            {
+              "code": "603919",
+              "name": "金徽酒",
+              "price": 17.33,
+              "pct": 3.032,
+              "returns": null
+            },
+            {
+              "code": "603922",
+              "name": "ST金鸿顺",
+              "price": 14.94,
+              "pct": 7.174,
+              "returns": null
+            },
+            {
+              "code": "603926",
+              "name": "铁流股份",
+              "price": 17.01,
+              "pct": 4.613,
+              "returns": null
+            },
+            {
+              "code": "603976",
+              "name": "正川股份",
+              "price": 30.17,
+              "pct": 3.464,
+              "returns": null
+            },
+            {
+              "code": "603978",
+              "name": "深圳新星",
+              "price": 20.92,
+              "pct": 9.989,
+              "returns": null
+            },
+            {
+              "code": "603985",
+              "name": "恒润股份",
+              "price": 17.26,
+              "pct": 3.477,
+              "returns": null
+            },
+            {
+              "code": "603989",
+              "name": "艾华集团",
+              "price": 30.7,
+              "pct": 7.343,
+              "returns": null
+            },
+            {
+              "code": "603992",
+              "name": "松霖科技",
+              "price": 21.95,
+              "pct": 3.003,
+              "returns": null
+            },
+            {
+              "code": "603998",
+              "name": "方盛制药",
+              "price": 10.97,
+              "pct": 4.476,
+              "returns": null
+            },
+            {
+              "code": "605055",
+              "name": "迎丰股份",
+              "price": 10.34,
+              "pct": 6.051,
+              "returns": null
+            },
+            {
+              "code": "605118",
+              "name": "力鼎光电",
+              "price": 31.18,
+              "pct": 4.491,
+              "returns": null
+            },
+            {
+              "code": "605123",
+              "name": "派克新材",
+              "price": 79.45,
+              "pct": 3.721,
+              "returns": null
+            },
+            {
+              "code": "605162",
+              "name": "新中港",
+              "price": 10.54,
+              "pct": 3.74,
+              "returns": null
+            },
+            {
+              "code": "605188",
+              "name": "国光连锁",
+              "price": 13.8,
+              "pct": 3.216,
+              "returns": null
+            },
+            {
+              "code": "605287",
+              "name": "德才股份",
+              "price": 41.58,
+              "pct": 10.0,
+              "returns": null
+            },
+            {
+              "code": "605303",
+              "name": "园林股份",
+              "price": 24.22,
+              "pct": 3.372,
+              "returns": null
+            },
+            {
+              "code": "605577",
+              "name": "龙版传媒",
+              "price": 10.62,
+              "pct": 10.052,
+              "returns": null
+            },
+            {
+              "code": "688018",
+              "name": "乐鑫科技",
+              "price": 121.01,
+              "pct": 4.427,
+              "returns": null
+            },
+            {
+              "code": "688026",
+              "name": "洁特生物",
+              "price": 18.82,
+              "pct": 13.992,
+              "returns": null
+            },
+            {
+              "code": "688053",
+              "name": "ST思科瑞",
+              "price": 38.78,
+              "pct": 3.579,
+              "returns": null
+            },
+            {
+              "code": "688057",
+              "name": "金达莱",
+              "price": 18.52,
+              "pct": 3.754,
+              "returns": null
+            },
+            {
+              "code": "688061",
+              "name": "灿瑞科技",
+              "price": 45.1,
+              "pct": 4.981,
+              "returns": null
+            },
+            {
+              "code": "688069",
+              "name": "德林海",
+              "price": 37.02,
+              "pct": 3.264,
+              "returns": null
+            },
+            {
+              "code": "688071",
+              "name": "华依科技",
+              "price": 34.78,
+              "pct": 4.163,
+              "returns": null
+            },
+            {
+              "code": "688096",
+              "name": "京源环保",
+              "price": 9.03,
+              "pct": 4.514,
+              "returns": null
+            },
+            {
+              "code": "688099",
+              "name": "晶晨股份",
+              "price": 92.77,
+              "pct": 3.423,
+              "returns": null
+            },
+            {
+              "code": "688109",
+              "name": "品茗科技",
+              "price": 74.66,
+              "pct": 3.236,
+              "returns": null
+            },
+            {
+              "code": "688121",
+              "name": "*ST卓然",
+              "price": 1.85,
+              "pct": 5.114,
+              "returns": null
+            },
+            {
+              "code": "688127",
+              "name": "蓝特光学",
+              "price": 68.03,
+              "pct": 3.091,
+              "returns": null
+            },
+            {
+              "code": "688159",
+              "name": "有方科技",
+              "price": 35.57,
+              "pct": 7.984,
+              "returns": null
+            },
+            {
+              "code": "688178",
+              "name": "万德斯",
+              "price": 29.69,
+              "pct": 5.884,
+              "returns": null
+            },
+            {
+              "code": "688193",
+              "name": "仁度生物",
+              "price": 50.08,
+              "pct": 4.529,
+              "returns": null
+            },
+            {
+              "code": "688203",
+              "name": "海正生材",
+              "price": 13.67,
+              "pct": 3.248,
+              "returns": null
+            },
+            {
+              "code": "688210",
+              "name": "统联精密",
+              "price": 32.57,
+              "pct": 4.391,
+              "returns": null
+            },
+            {
+              "code": "688212",
+              "name": "澳华内镜",
+              "price": 30.19,
+              "pct": 6.905,
+              "returns": null
+            },
+            {
+              "code": "688239",
+              "name": "航宇科技",
+              "price": 51.29,
+              "pct": 5.535,
+              "returns": null
+            },
+            {
+              "code": "688279",
+              "name": "峰岹科技",
+              "price": 196.24,
+              "pct": 3.464,
+              "returns": null
+            },
+            {
+              "code": "688286",
+              "name": "敏芯股份",
+              "price": 50.3,
+              "pct": 5.34,
+              "returns": null
+            },
+            {
+              "code": "688309",
+              "name": "恒誉科技",
+              "price": 76.0,
+              "pct": 3.514,
+              "returns": null
+            },
+            {
+              "code": "688322",
+              "name": "奥比中光",
+              "price": 99.74,
+              "pct": 4.703,
+              "returns": null
+            },
+            {
+              "code": "688329",
+              "name": "艾隆科技",
+              "price": 22.71,
+              "pct": 3.087,
+              "returns": null
+            },
+            {
+              "code": "688330",
+              "name": "宏力达",
+              "price": 39.85,
+              "pct": 14.118,
+              "returns": null
+            },
+            {
+              "code": "688387",
+              "name": "信科移动",
+              "price": 13.56,
+              "pct": 3.828,
+              "returns": null
+            },
+            {
+              "code": "688433",
+              "name": "华曙高科",
+              "price": 111.0,
+              "pct": 14.198,
+              "returns": null
+            },
+            {
+              "code": "688458",
+              "name": "美芯晟",
+              "price": 35.87,
+              "pct": 4.669,
+              "returns": null
+            },
+            {
+              "code": "688479",
+              "name": "友车科技",
+              "price": 33.87,
+              "pct": 8.592,
+              "returns": null
+            },
+            {
+              "code": "688500",
+              "name": "慧辰股份",
+              "price": 37.82,
+              "pct": 9.306,
+              "returns": null
+            },
+            {
+              "code": "688552",
+              "name": "航天南湖",
+              "price": 29.82,
+              "pct": 3.506,
+              "returns": null
+            },
+            {
+              "code": "688558",
+              "name": "国盛智科",
+              "price": 32.81,
+              "pct": 3.209,
+              "returns": null
+            },
+            {
+              "code": "688600",
+              "name": "皖仪科技",
+              "price": 30.2,
+              "pct": 4.861,
+              "returns": null
+            },
+            {
+              "code": "688601",
+              "name": "力芯微",
+              "price": 63.93,
+              "pct": 16.874,
+              "returns": null
+            },
+            {
+              "code": "688619",
+              "name": "罗普特",
+              "price": 14.97,
+              "pct": 5.945,
+              "returns": null
+            },
+            {
+              "code": "688621",
+              "name": "阳光诺和",
+              "price": 68.74,
+              "pct": 8.938,
+              "returns": null
+            },
+            {
+              "code": "688678",
+              "name": "福立旺",
+              "price": 20.68,
+              "pct": 4.339,
+              "returns": null
+            },
+            {
+              "code": "688679",
+              "name": "通源环境",
+              "price": 41.33,
+              "pct": 6.823,
+              "returns": null
+            },
+            {
+              "code": "688686",
+              "name": "奥普特",
+              "price": 147.0,
+              "pct": 8.088,
+              "returns": null
+            },
+            {
+              "code": "688696",
+              "name": "极米科技",
+              "price": 74.5,
+              "pct": 7.488,
+              "returns": null
+            },
+            {
+              "code": "688697",
+              "name": "纽威数控",
+              "price": 15.51,
+              "pct": 4.024,
+              "returns": null
+            },
+            {
+              "code": "688722",
+              "name": "同益中",
+              "price": 14.56,
+              "pct": 4.899,
+              "returns": null
+            },
+            {
+              "code": "688768",
+              "name": "容知日新",
+              "price": 42.35,
+              "pct": 3.142,
+              "returns": null
+            },
+            {
+              "code": "688798",
+              "name": "艾为电子",
+              "price": 65.4,
+              "pct": 4.623,
+              "returns": null
+            },
+            {
+              "code": "688808",
+              "name": "联讯仪器",
+              "price": 2384.76,
+              "pct": 4.64,
+              "returns": null
+            }
+          ],
+          "n_hits": 277
         }
       }
     }
