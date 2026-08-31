@@ -1770,7 +1770,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           if(_chg!=null && _chg>1.5) _sigBuy.push('⚡ 单日暴涨 '+(+_chg).toFixed(1)+'% · 追高风险');
 
           // 2026-08-31 主人令：评价统一金色 var(--gold)（评价 = 综合判断，不是单色信号；行内灯保留红绿黄）；verdict 胶囊跟在 vs 60日线 后面不靠右
-          var _verdict='', _vClr='#fbbf24';  // 全面金色（var(--gold)=' #fbbf24'，与卡名 status 风格统一）
+          // I5 一劳永逸清理：var _vClr='#fbbf24' 死字段移除（再无引用，留着会误导下轮维护）
+          var _verdict='';  // emoji 区分具体语义（高位/偏高/偏低/超卖/中性），颜色统一 var(--gold)='#fbbf24' 见 1796
           if(_sigSell.length>=2){ _verdict='🔴 高位·观测'; }
           else if(_sigSell.length===1){ _verdict='🟠 偏高·观测'; }
           else if(_sigBuy.length>=2){ _verdict='🟢 偏低·观测'; }
