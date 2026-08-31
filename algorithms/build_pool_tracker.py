@@ -1,44 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-build_pool_tracker.py — v8 选股生命周期跟踪（阶段 1）
+build_pool_tracker.py — v8 选股生命周期跟踪（阶段 1）+ 二维精选（K 批·板块流入×情绪周期）
 
 输入：
-  raw_data/algo_track.json — v8 三大算法（四量终极 / 板块龙头 / 大牛股猎手）的真实跟踪池，
-       含 list_date/entry_price/last_close/last_pct/peak_pct/days_in/appear_count/signal_detail
+  raw_data/algo_track.json — v8 三大算法（四量终极 / 板块龙头 / 大牛股猎手）的真实跟踪池
+  raw_data/sentiment_cycle.json — 情绪周期
+  raw_data/sector_fund_flow.json — 板块资金流
+  raw_data/stock_profile.json — 股票→行业/概念映射
 
 算法：
-  1. 合并三 algo 的 tracking 列表，按 code 去重（保留 peak_pct 最大者，记录首个 algo）。
-  2. 计算 drawdown = peak_pct - last_pct。
-  3. 应用专家阈值判状态（移植 track_daily.py 的 analyze()，用 v8 已有字段近似）：
-       - 强势 strong: peak_pct > 0 且 drawdown <= 3%（仍贴近期高点/主升）
-                     或 peak_pct > 0 且 days_in >= 3 且 last_pct > 0（连涨确认）
-       - 回调买点 buy_dip: peak_pct > 0 且 drawdown ∈ [6%, 12%] 且 last_pct < 0
-       - 见顶 topped: peak_pct > 0 且 drawdown >= 10% 且 days_in >= 3 且 last_pct < 0
-                     或 peak_pct > 0 且 drawdown >= 15%
-       - 走弱 weak: peak_pct <= 0（峰值未跑赢基准）
-                   或 drawdown >= 20%（深回撤）
-                   或 last_pct <= -8%（重挫）
-       - 正常 normal: 以上皆不满足
-  4. buy_hint：
-       - buy_dip 状态 → "回调买点（回撤 {drawdown:.1f}%）"
-       - 强势状态 且 days_in >= 3 且 last_pct > 0 → "连涨强势确认（{days_in}天）"
-       - else null
-  5. sell_hint：
-       - 见顶 → "见顶：回撤 {drawdown:.1f}%"
-       - 走弱 → "走弱：跌破基准价" / "走弱：回撤过大"
-       - else null
-  6. 按状态分桶，按 peak_pct 降序、days_in 降序。
+  1. 合并三 algo 的 tracking 列表，按 code 去重（保留 peak_pct 最大者）。
+  2. 专家阈值判状态（强势/回调买点/见顶/走弱/正常）。
+  3. 【K 批新增】二维精选（板块流入 × 情绪周期）：
+       - 板块：股票命中 top_in 板块→加分；命中 top_out→减分
+       - 情绪：根据当前 phase（退潮/高潮/修复/冰点）+ status 适配
+       - 阈值：selected_score >= 8 进精选池
 
 输出：
   raw_data/v8_pool_tracker.json
-  data/V8_POOL_TRACKER.js  （window.V8_POOL_TRACKER = {...};）
+  data/V8_POOL_TRACKER.js
 
-🛡 2026-08-31 一劳永逸：
-  - 只读 algo_track.json 已有的 entry/last/peak/days_in 字段，零网络依赖（家里机/云端都能跑）。
-  - 去重 by code，防同一只股票在多 algo 中重复上榜。
-  - 空文件容错：algo_track.json 缺失或 algos 为空 → 输出空池 + 占位文案，不抛错。
-  - 状态阈值集中在 _status_decide() 一处，未来回测调参改一处即可。
+🛡 一劳永逸：
+  - 零网络依赖；空文件容错；状态阈值集中在 _status_decide()。
+  - 【K 批】情绪/板块数据缺失 → 精选维度置 0 不阻断主流程；profile 缺失 → sector_match=none。
+  - 【K 批修复】_selection_score 接收的 item 必须带 status 字段（原 bug：item 来自 merged 无 status 字段）。
 """
 import json
 import os
@@ -51,63 +37,74 @@ RAW_DIR = os.path.join(ROOT, "raw_data")
 DATA_DIR = os.path.join(ROOT, "data")
 
 ALGO_TRACK_PATH = os.path.join(RAW_DIR, "algo_track.json")
+SENTIMENT_PATH = os.path.join(RAW_DIR, "sentiment_cycle.json")
+SECTOR_FLOW_PATH = os.path.join(RAW_DIR, "sector_fund_flow.json")
+STOCK_PROFILE_PATH = os.path.join(RAW_DIR, "stock_profile.json")
 OUT_JSON_PATH = os.path.join(RAW_DIR, "v8_pool_tracker.json")
 OUT_JS_PATH = os.path.join(DATA_DIR, "V8_POOL_TRACKER.js")
+
+SELECT_THRESHOLD = 8.0
+SECTOR_TOP_N = 20
 
 
 def log(msg):
     print(f"  [pool-tracker] {msg}", flush=True)
 
 
-def _status_decide(peak_pct: float, last_pct: float, days_in: int) -> tuple:
-    """根据 v8 跟踪数据近似专家阈值，返回 (status, buy_hint, sell_hint)。
-    状态取：strong/buy_dip/topped/weak/normal。"""
+def _status_decide(peak_pct, last_pct, days_in):
     drawdown = round(peak_pct - last_pct, 2)
-
-    # 走弱（最低优先级，先判以免被后续阈值吃掉）
     if peak_pct <= 0:
         return ("weak", None, "走弱：峰值未跑赢基准价")
     if drawdown >= 20:
         return ("weak", None, f"走弱：深回撤 {drawdown:.1f}%")
     if last_pct <= -8:
         return ("weak", None, "走弱：重挫破位")
-
-    # 见顶
     if drawdown >= 10 and days_in >= 3 and last_pct < 0:
         return ("topped", None, f"见顶：回撤 {drawdown:.1f}%、持仓 {days_in} 日")
     if drawdown >= 15 and peak_pct > 0:
         return ("topped", None, f"见顶：深回撤 {drawdown:.1f}%")
-
-    # 回调买点（专家阈值的核心买点信号）
     if peak_pct > 0 and 6 <= drawdown <= 12 and last_pct < 0:
         return ("buy_dip", f"回调买点（回撤 {drawdown:.1f}%）", None)
-
-    # 强势
     if drawdown <= 3 and peak_pct > 0:
         return ("strong", None, None)
     if days_in >= 3 and last_pct > 0 and peak_pct > 0:
         hint = f"连涨强势确认（{days_in} 天）" if days_in >= 3 else None
         return ("strong", hint, None)
-
-    # 正常
     return ("normal", None, None)
 
 
-def load_algo_track():
-    """读 algo_track.json，缺/坏返回 None。"""
-    if not os.path.exists(ALGO_TRACK_PATH):
-        log(f"⚠️ 缺失：{ALGO_TRACK_PATH}")
+def _load_json(path, label):
+    if not os.path.exists(path):
+        log(f"⚠️ {label} 缺失：{path}")
         return None
     try:
-        with open(ALGO_TRACK_PATH, "r", encoding="utf-8") as f:
+        with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
     except Exception as e:
-        log(f"⚠️ 解析失败：{e}")
+        log(f"⚠️ {label} 解析失败：{e}")
         return None
+
+
+def load_algo_track():
+    return _load_json(ALGO_TRACK_PATH, "algo_track")
+
+
+def load_sentiment_cycle():
+    return _load_json(SENTIMENT_PATH, "情绪周期")
+
+
+def load_sector_fund_flow():
+    return _load_json(SECTOR_FLOW_PATH, "板块资金流")
+
+
+def load_stock_profile():
+    raw = _load_json(STOCK_PROFILE_PATH, "股票画像")
+    if raw is None:
+        return None
+    return raw.get("profiles") if isinstance(raw, dict) else None
 
 
 def dedupe_by_code(algos):
-    """合并多 algo 的 tracking，按 code 去重（保留 peak_pct 最大者，记录首个 algo）。"""
     best = {}
     for alg in algos:
         algo_key = alg.get("algo", "")
@@ -123,16 +120,112 @@ def dedupe_by_code(algos):
     return list(best.values())
 
 
-def build_items(merged):
-    """对每只跟踪股算 status / buy_hint / sell_hint / drawdown。"""
+def _sector_match_item(item, sector_top_in, sector_top_out):
+    item_concepts = set(item.get("_concepts", []) or [])
+    item_industry = item.get("_industry", "") or ""
+    best_match, best_concept, best_net = "none", "", 0.0
+    best_abs = 0.0
+    for s in sector_top_in:
+        name = s.get("name", "")
+        net = float(s.get("net") or 0)
+        if not name or net <= 0:
+            continue
+        if name in item_concepts or name == item_industry:
+            if abs(net) > best_abs:
+                best_match = "top_inflow"
+                best_concept = name
+                best_net = net
+                best_abs = abs(net)
+    for s in sector_top_out:
+        name = s.get("name", "")
+        net = float(s.get("net") or 0)
+        if not name or net >= 0:
+            continue
+        if name in item_concepts or name == item_industry:
+            if abs(net) > best_abs:
+                best_match = "outflow"
+                best_concept = name
+                best_net = net
+                best_abs = abs(net)
+    return best_match, best_concept, best_net
+
+
+def _selection_score(item, phase, sector_top_in, sector_top_out):
+    sector_bonus = 0.0
+    sentiment_match = "neutral"
+    sector_match, concept_top, sector_net = _sector_match_item(
+        item, sector_top_in, sector_top_out
+    )
+    if sector_match == "top_inflow":
+        sector_bonus = round(sector_net / 10.0, 2)
+    elif sector_match == "outflow":
+        sector_bonus = round(sector_net / 10.0, 2)
+
+    status = item.get("status", "normal")
+    if phase == "退潮":
+        if status == "buy_dip" and sector_match == "top_inflow":
+            sentiment_bonus, sentiment_match = 8, "ok"
+        elif status == "strong" and sector_match == "top_inflow":
+            sentiment_bonus, sentiment_match = 3, "caution"
+        elif status == "buy_dip":
+            sentiment_bonus, sentiment_match = 2, "neutral"
+        elif status == "topped":
+            sentiment_bonus, sentiment_match = -2, "caution"
+        elif status == "weak" and sector_match == "outflow":
+            sentiment_bonus, sentiment_match = -5, "reverse"
+        elif status == "weak":
+            sentiment_bonus, sentiment_match = -1, "caution"
+        else:
+            sentiment_bonus, sentiment_match = 0, "neutral"
+    elif phase in ("高潮", "修复"):
+        if status == "strong" and sector_match == "top_inflow":
+            sentiment_bonus, sentiment_match = 8, "ok"
+        elif status == "buy_dip" and sector_match == "top_inflow":
+            sentiment_bonus, sentiment_match = 5, "ok"
+        elif status == "strong":
+            sentiment_bonus, sentiment_match = 4, "ok"
+        else:
+            sentiment_bonus, sentiment_match = 0, "neutral"
+    else:
+        if sector_match == "top_inflow":
+            sentiment_bonus, sentiment_match = 5, "ok"
+        elif sector_match == "outflow":
+            sentiment_bonus, sentiment_match = -3, "caution"
+        else:
+            sentiment_bonus, sentiment_match = 0, "neutral"
+
+    status_base = {"strong": 3, "buy_dip": 5, "topped": 1, "weak": 0, "normal": 1}.get(status, 1)
+    selected_score = round(status_base + sector_bonus + sentiment_bonus, 2)
+    selected = selected_score >= SELECT_THRESHOLD
+    return (round(sector_bonus, 2), sentiment_bonus, sector_match, concept_top,
+            round(sector_net, 2), sentiment_match, selected_score, selected)
+
+
+def build_items(merged, sentiment, sector_flow, profile_map):
+    phase = (sentiment or {}).get("phase", "未知") if sentiment else "未知"
+    sector_top_in = ((sector_flow or {}).get("sectors_in") or [])[:SECTOR_TOP_N]
+    sector_top_out = ((sector_flow or {}).get("sectors_out") or [])[:SECTOR_TOP_N]
+
     items = []
     for it in merged:
         peak = float(it.get("peak_pct") or 0)
         last = float(it.get("last_pct") or 0)
         days = int(it.get("days_in") or 0)
         status, buy_hint, sell_hint = _status_decide(peak, last, days)
+        code = it["code"]
+        prof = (profile_map or {}).get(code, {}) or {}
+        # 🔧 K 批修复：必须把 status 也注入 it_for_select（否则 _selection_score 走 normal 分支）
+        it_for_select = dict(it, _industry=prof.get("industry", ""),
+                              _concepts=prof.get("concepts", []),
+                              status=status)
+
+        (sector_bonus, sentiment_bonus, sector_match, concept_top, sector_net,
+         sentiment_match, selected_score, selected) = _selection_score(
+            it_for_select, phase, sector_top_in, sector_top_out
+        )
+
         items.append({
-            "code": it["code"],
+            "code": code,
             "name": it.get("name", ""),
             "algo": it.get("_algo", ""),
             "list_date": it.get("list_date_dashed") or it.get("list_date", ""),
@@ -147,39 +240,61 @@ def build_items(merged):
             "buy_hint": buy_hint,
             "sell_hint": sell_hint,
             "signal_reason": (it.get("signal_detail") or {}).get("reason", ""),
+            # K 批精选维度
+            "industry": prof.get("industry", ""),
+            "concept_top": concept_top,
+            "sector_match": sector_match,
+            "sector_net": sector_net,
+            "sector_bonus": sector_bonus,
+            "sentiment_match": sentiment_match,
+            "sentiment_bonus": sentiment_bonus,
+            "selected_score": selected_score,
+            "selected": selected,
         })
     return items
 
 
 def aggregate(items):
-    """算 status_counts + by_algo。"""
     status_counts = defaultdict(int)
     by_algo = defaultdict(lambda: defaultdict(int))
+    selected_count = 0
     for it in items:
         status_counts[it["status"]] += 1
         by_algo[it["algo"]]["total"] += 1
         by_algo[it["algo"]][it["status"]] += 1
-    return dict(status_counts), {k: dict(v) for k, v in by_algo.items()}
+        if it.get("selected"):
+            selected_count += 1
+    return dict(status_counts), {k: dict(v) for k, v in by_algo.items()}, selected_count
 
 
 def main():
     print(f"[build_pool_tracker] {datetime.now():%Y-%m-%d %H:%M:%S}")
     log("读取 v8 算法跟踪池（零网络依赖）…")
     data = load_algo_track()
+    sentiment = load_sentiment_cycle()
+    sector_flow = load_sector_fund_flow()
+    profile_map = load_stock_profile()
+    if sentiment:
+        log(f"情绪周期：phase={sentiment.get('phase','?')} score={sentiment.get('score','?')} delta={sentiment.get('delta_pct','?')}%")
+    if sector_flow:
+        log(f"板块资金：top_in={len(sector_flow.get('sectors_in',[]))} top_out={len(sector_flow.get('sectors_out',[]))}")
+    if profile_map:
+        log(f"股票画像：覆盖 {len(profile_map)} 只")
+
     if not data:
         log("❌ algo_track.json 不可用，输出空占位")
         out = {
             "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "pool_size": 0, "raw_pool_size": 0,
+            "pool_size": 0, "raw_pool_size": 0, "selected_size": 0,
             "status_counts": {}, "by_algo": {}, "items": [],
+            "sentiment_meta": None, "sector_meta": None,
             "note": "algo_track.json 缺失或解析失败",
         }
     else:
         raw_pool_size = sum(len(a.get("tracking", [])) for a in data.get("algos", []))
         merged = dedupe_by_code(data.get("algos", []))
-        items = build_items(merged)
-        status_counts, by_algo = aggregate(items)
-        # 按 bucket 排序（强势：peak_pct desc；其他：drawdown asc 优先，days_in desc）
+        items = build_items(merged, sentiment, sector_flow, profile_map)
+        status_counts, by_algo, selected_count = aggregate(items)
         def _sort_key(it):
             if it["status"] == "strong":
                 return (0, -it["peak_pct"], -it["days_in"])
@@ -191,23 +306,41 @@ def main():
             "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "pool_size": len(items),
             "raw_pool_size": raw_pool_size,
+            "selected_size": selected_count,
             "status_counts": status_counts,
             "by_algo": by_algo,
             "items": items,
+            "sentiment_meta": {
+                "phase": (sentiment or {}).get("phase"),
+                "score": (sentiment or {}).get("score"),
+                "delta_pct": (sentiment or {}).get("delta_pct"),
+                "advice": (sentiment or {}).get("advice"),
+                "source": (sentiment or {}).get("source"),
+            } if sentiment else None,
+            "sector_meta": {
+                "top_in": [
+                    {"name": s.get("name"), "type": s.get("type"), "net": s.get("net")}
+                    for s in (sector_flow.get("sectors_in") or [])[:5]
+                ],
+                "top_out": [
+                    {"name": s.get("name"), "type": s.get("type"), "net": s.get("net")}
+                    for s in (sector_flow.get("sectors_out") or [])[:3]
+                ],
+            } if sector_flow else None,
+            "select_threshold": SELECT_THRESHOLD,
             "note": (
                 f"基于 v8 三大算法跟踪池 {raw_pool_size} 只去重 → {len(items)} 只；"
+                f"K 批二维精选（板块流入 × 情绪周期 {((sentiment or {}).get('phase')) or '未知'}）→ 进精选 {selected_count} 只；"
                 "阈值源自专家 track_daily.py analyze()（强势/回调6-12%/见顶/走弱）"
             ),
         }
-        log(f"✅ 入池 {len(items)} 只（去重前 {raw_pool_size}）；状态分布 {dict(status_counts)}")
+        log(f"✅ 入池 {len(items)} 只（去重前 {raw_pool_size}）；精选 {selected_count} 只；状态分布 {dict(status_counts)}")
 
-    # 写 raw_data
     os.makedirs(RAW_DIR, exist_ok=True)
     with open(OUT_JSON_PATH, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
     log(f"📝 raw_data → {OUT_JSON_PATH}")
 
-    # 写 data/*.js（window.V8_POOL_TRACKER 注入）
     os.makedirs(DATA_DIR, exist_ok=True)
     payload = json.dumps(out, ensure_ascii=False, separators=(",", ":"))
     js_body = (

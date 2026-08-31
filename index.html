@@ -4232,10 +4232,27 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       }
 
       html += '<div style="margin:14px 0;border-left:4px solid #22c55e;" class="card">';
-      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
+      // 【K 批】卡片头部：情绪周期 + 板块流入 top + 精选统计 三条横排
+      var sm = pt.sentiment_meta || {};
+      var sf = pt.sector_meta || {};
+      var selSize = pt.selected_size || 0;
+      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">';
       html += '<span style="font-size:15px;font-weight:700;color:#22c55e;">📈 ④ v8 选股生命周期</span>';
-      html += '<span style="font-size:11px;color:var(--dim);">v8 三大算法跟踪池去重 → 专家阈值判状态（强势/买点/见顶/走弱）</span>';
-      html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);">✅ 真实跟踪 '+pt.pool_size+' 只</span>';
+      html += '<span style="font-size:11px;color:var(--dim);">三 algo 跟踪池去重 → 专家阈值判状态（强势/买点/见顶/走弱）· 二维精选（板块流入×情绪周期）</span>';
+      html += '</div>';
+      html += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">';
+      // 精选徽章（K 批新增·主人 23:00「精选一下」核心诉求）
+      html += '<span style="padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;background:rgba(251,191,36,.12);color:var(--gold);border:1px solid rgba(251,191,36,.3);">🌟 精选 '+selSize+' / '+pt.pool_size+'</span>';
+      // 情绪周期徽章
+      if(sm && sm.phase){
+        var phColor = sm.phase==='高潮'?'#ef5350':(sm.phase==='退潮'?'#fb923c':(sm.phase==='修复'?'#22c55e':(sm.phase==='冰点'?'#38bdf8':'var(--sub)')));
+        html += '<span style="padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;background:rgba(148,163,184,.10);color:'+phColor+';border:1px solid '+phColor+';">⚡ 情绪：'+_esc(sm.phase)+(sm.score!=null?' (score='+sm.score+', delta='+(sm.delta_pct>0?'+':'')+sm.delta_pct+'%)':'')+'</span>';
+      }
+      // 板块流入 top 5（inline 简洁展示）
+      if(sf && sf.top_in && sf.top_in.length){
+        var tiParts = sf.top_in.map(function(s){ return _esc(s.name)+' +'+(+s.net).toFixed(0)+'亿'; });
+        html += '<span style="padding:2px 10px;border-radius:10px;font-size:10.5px;color:var(--sub);background:var(--card2);border:1px solid var(--border);">📊 流入 top：'+tiParts.join(' / ')+'</span>';
+      }
       html += '</div>';
 
       // 4 桶胶囊
@@ -4276,13 +4293,28 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         var arr = grouped[s]||[];
         if(!arr.length) return;
         arr = _sortBucket(arr, sortField, sortAsc);  // 桶内按当前排序字段（与列头点击同步）
-        html += '<tr style="background:rgba(148,163,184,.06);"><td colspan="9" style="padding:6px 8px;font-weight:700;color:'+statusColor[s]+';font-size:12px;">'+statusLabel[s]+' '+arr.length+' 只</td></tr>';
+        // 【K 批】桶 header 加精选子统计（colspan 9 → 11，板块+精选 2 新列）
+        var bucketSel = arr.filter(function(x){return x.selected;}).length;
+        var bucketSelHtml = bucketSel > 0
+          ? '<span style="padding:1px 8px;margin-left:8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(251,191,36,.15);color:var(--gold);border:1px solid rgba(251,191,36,.3);">🌟 精选 '+bucketSel+'</span>'
+          : '';
+        html += '<tr style="background:rgba(148,163,184,.06);"><td colspan="11" style="padding:6px 8px;font-weight:700;color:'+statusColor[s]+';font-size:12px;">'+statusLabel[s]+' '+arr.length+' 只'+bucketSelHtml+'</td></tr>';
         arr.forEach(function(it){  // 🔁 2026-08-31：去掉 slice(0,12) 限制，全部展示（主人截图 "47/46 只没全看到" 根因）
           var hint = it.buy_hint || it.sell_hint || '';
           var periodColor = it.last_pct > 0 ? '#ef5350' : (it.last_pct < 0 ? '#26a69a' : 'var(--sub)');
           var peakColor   = it.peak_pct > 0 ? '#ef5350' : 'var(--sub)';
           var ddColor     = it.drawdown > 10 ? '#fb923c' : (it.drawdown > 5 ? '#fbbf24' : 'var(--sub)');
-          html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+          // 【K 批】精选列 cell：icon + 分数 + 板块命中
+          var selIcon = it.selected ? '🌟' : (it.sentiment_match==='caution' ? '⚠️' : '—');
+          var selColor = it.selected ? 'var(--gold)' : (it.sentiment_match==='caution' ? '#fb923c' : 'var(--dim)');
+          var selScoreHtml = it.selected_score != null ? '<span style="font-weight:700;color:'+selColor+';">'+(it.selected_score>0?'+':'')+it.selected_score.toFixed(1)+'</span>' : '';
+          var conceptColor = it.sector_match==='top_inflow' ? '#22c55e' : (it.sector_match==='outflow' ? '#ef5350' : 'var(--dim)');
+          var conceptHtml = it.concept_top
+            ? '<span style="color:'+conceptColor+';font-size:10.5px;" title="净流入 '+(it.sector_net>0?'+':'')+it.sector_net.toFixed(1)+'亿">'+(it.sector_match==='top_inflow'?'📥':(it.sector_match==='outflow'?'📤':'·'))+' '+_esc(it.concept_top)+'</span>'
+            : '<span style="color:var(--dim);">—</span>';
+          // 行整体 background：精选用淡金底
+          var rowBg = it.selected ? 'background:rgba(251,191,36,.06);' : '';
+          html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+rowBg+'">';
           html += '<td style="padding:5px 6px;color:var(--txt);font-weight:600;">'+it.code+'</td>';
           html += '<td style="padding:5px 6px;color:var(--txt);">'+_esc(it.name)+'</td>';
           html += '<td style="padding:5px 6px;color:var(--sub);font-size:10.5px;">'+_esc(it.algo)+'</td>';
@@ -4291,13 +4323,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           html += '<td style="padding:5px 6px;text-align:right;font-weight:700;color:'+periodColor+';">'+(it.last_pct>0?'+':'')+it.last_pct.toFixed(2)+'%</td>';
           html += '<td style="padding:5px 6px;text-align:right;color:'+peakColor+';">'+(it.peak_pct>0?'+':'')+it.peak_pct.toFixed(2)+'%</td>';
           html += '<td style="padding:5px 6px;text-align:right;color:'+ddColor+';">'+it.drawdown.toFixed(1)+'%</td>';
+          // 【K 批】新增 2 列：板块 + 精选
+          html += '<td style="padding:5px 6px;">'+conceptHtml+'</td>';
+          html += '<td style="padding:5px 6px;text-align:right;" title="status_base + sector_bonus + sentiment_bonus">'+selIcon+' '+selScoreHtml+'</td>';
           html += '<td style="padding:5px 6px;color:var(--dim);font-size:10.5px;white-space:nowrap;">'+_esc(hint)+'</td>';
           html += '</tr>';
         });
       });
       html += '</tbody></table></div>';
 
-      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">表头可点击切换排序方向（默认期间涨幅↓） · 阈值：强势=回撤≤3%或连涨≥3日 / 买点=回撤6-12%且收阴 / 见顶=回撤≥10%且持仓≥3日 / 走弱=回撤≥20%或峰值≤0 · 数据 '+(pt.update_time||'').substring(0,16)+' · 仅跟 v8 三大算法真实跟踪池（不接 600+ 全池、不重做行业映射）</div>';
+      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">表头可点击切换排序（默认精选分↓）· K 批二维精选（板块流入×情绪周期）：精选分 = status 基础 + 板块净流入÷10 + 情绪适配 ±N（退潮期 buy_dip+板块流入=8 分，topped/weak+板块流出=负分）· 阈值≥8 进精选池 · 数据 '+(pt.update_time||'').substring(0,16)+' · 仅跟 v8 三大算法真实跟踪池（不接 600+ 全池、不重做行业映射）</div>';
       html += '</div>';
     }
 
