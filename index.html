@@ -4424,7 +4424,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="card">
         <h3><span class="ic">💰</span>AI 行平均股价买卖信号面板（何时到高点卖/何时可以买）- 说明</h3>
         <div class="logic-h">定位</div>
-        <div class="logic-p">AI 主行平均股价（<b>通达信 880003 真实指数</b>，非全A等权均价）下方的信号面板。基于 <code>AVG_PRICE_DATA</code> 的当前位置 / 均线偏离 / 单日涨跌 / 历史趋势四个维度自动计算买入或卖出信号，作为「市场水位」参考。数据由 <code>scripts/fetch_avg_price.py</code> 抓取 880003 真实日K（东财 push2his 主源 + akshare 备源），需 ≥60 交易日历史方可生成 MA 信号；历史不足时前端仅显示「云端抓取中」，不展示任何买卖信号。</div>
+        <div class="logic-p">AI 主行平均股价下方的信号面板。基于 <code>AVG_PRICE_DATA</code> 的当前位置 / 均线偏离 / 单日涨跌 / 历史趋势四个维度自动计算买入或卖出信号，作为「市场水位」参考。<b>2026-08-31 口径归一</b>：数据改由 <code>cloud_fetch_v8.py → f_avg_price()</code> 单点写入——用东财 <code>em_clist</code> 分页遍历全市场 5000+ 只个股取<b>算术平均股价</b>，与通达信 880003 的定义口径一致且云端稳定可达；原 <code>scripts/fetch_avg_price.py</code>（7 源拉 880003 日K）因排在推送步之后导致产物永不入库、且 7 源实测 100% 失败，已从 workflow 摘除（文件保留待官方源恢复）。<b>MA 由 history 逐交易日累积</b>：满 20 / 60 个交易日后才给出 <code>position_vs_ma20</code> / <code>position_vs_ma60</code>，不足期间显示「历史 X/20 日」且不展示任何买卖信号，绝不用当日价冒充均线。</div>
         <div class="logic-h">📉 卖出信号（到高点要卖）</div>
         <table class="lg-table">
           <tr><th>触发条件</th><th>信号</th></tr>
@@ -7492,10 +7492,15 @@ window.__renderV8CalFull();
       srSectors.forEach(function(s){
         const d5=s.pct_5d||0, d20=s.pct_20d||0;
         let phase;
+        // 2026-08-31 阶段判定规则 v2（一劳永逸）：
+        //   v1 用「双负 AND」→ 退潮/底部结构性恒为 0（实测 90 板块 min(pct_20d)=-5.12），
+        //   且「5日-3.93% / 20日+15.67%」这类高位退潮被错分成震荡。
+        //   v2：d5 定当下强弱，d20 定位置高低，互斥穷尽。
+        //   ⚠️ 必须与 algorithms/fetch_sector_rs.py _phase_of() 逐字一致，改一处必改两处。
         if(d5>3 && d20>5) phase='主升';
-        else if(d5>1.5 && d20>0) phase='启动';
-        else if(d5<-3 && d20<-10) phase='底部';
-        else if(d5<-1.5 && d20<-5) phase='退潮';
+        else if(d5>1.5 && d20>-8) phase='启动';
+        else if(d5<-1.5) phase='退潮';
+        else if(d20<-8) phase='底部';
         else phase='震荡';
         const meta=phaseMeta[phase];
         rows.push({name:s.name,phase:phase,emoji:meta.emoji,color:meta.color,order:meta.order,d5:d5,d20:d20});
@@ -7508,10 +7513,15 @@ window.__renderV8CalFull();
       var _sph = window.SECTOR_PHASE_HISTORY || {snaps: []};
       var _snaps = _sph.snaps || [];
       var _todayStr = (sr.data_date || '').slice(0,10);
-      var _prevSnap = null;
+      // 2026-08-31：阶段判定升级 v2，只与同规则版本的快照对比，避免跨规则伪迁移
+      var _PHASE_RULE_VER = 2;
+      var _prevSnap = null, _prevSkippedByRule = false;
       for (var i = _snaps.length - 1; i >= 0; i--) {
         var sd = (_snaps[i].date || '').slice(0,10);
-        if (sd && sd !== _todayStr) { _prevSnap = _snaps[i]; break; }
+        if (sd && sd !== _todayStr) {
+          if ((_snaps[i].rule_ver || 1) !== _PHASE_RULE_VER) { _prevSkippedByRule = true; continue; }
+          _prevSnap = _snaps[i]; break;
+        }
       }
       var _prevMap = (_prevSnap && _prevSnap.phases) || {};
       var _transitions = {};
@@ -7521,6 +7531,9 @@ window.__renderV8CalFull();
       });
 
       // ── 今日阶段迁移（只显示当天有变化的板块）──
+      if (!_prevSnap && _prevSkippedByRule) {
+        h3 += '<div style="margin-bottom:12px;padding:10px 14px;background:rgba(148,163,184,.06);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--sub);line-height:1.6;">🔁 今日阶段迁移：阶段判定规则已于 2026-08-31 升级为 <b>v2</b>（修复退潮/底部结构性恒空），历史快照为 v1 规则，跨规则对比会产生伪迁移，故本日暂不展示迁移。<b>次日盘后</b>产生 v2 快照后自动恢复。</div>';
+      }
       if (_prevSnap && Object.keys(_prevMap).length) {
         var _phaseEmoji = {'主升':'🚀','启动':'📈','震荡':'➡️','退潮':'📉','底部':'⛏️'};
         var _phaseColor = {'主升':'#ef4444','启动':'#f59e0b','震荡':'#94a3b8','退潮':'var(--down)','底部':'#38bdf8'};
@@ -7571,17 +7584,20 @@ window.__renderV8CalFull();
       rows.forEach(r=>byPhase[r.phase].push(r));
       phaseOrder.forEach(p=>byPhase[p].sort(function(a,b){ return b.d20-a.d20; }));
 
-      h3 += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
+      // 2026-08-31：阶段分布改一行 5 列均分，解决退潮/底部为空时挤在一起的问题
+      h3 += '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:8px;">';
       phaseOrder.forEach(function(p){
         var meta = phaseMeta[p];
         var cnt = counts[p]||0;
-        h3 += '<div class="sc-phase-pill" data-phase="'+p+'" style="flex:1;min-width:72px;padding:8px 6px;border-radius:6px;background:var(--bg1);border-left:3px solid '+meta.color+';text-align:center;cursor:pointer;transition:background .15s;" onmouseover="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseout="this.style.background=\'var(--bg1)\'">';
+        h3 += '<div class="sc-phase-pill" data-phase="'+p+'" style="padding:8px 6px;border-radius:6px;background:var(--bg1);border-left:3px solid '+meta.color+';text-align:center;cursor:pointer;transition:background .15s;" onmouseover="this.style.background=\'rgba(255,255,255,0.06)\'" onmouseout="this.style.background=\'var(--bg1)\'">';
         h3 += '<div style="font-size:12px;color:var(--dim);margin-bottom:2px;">'+meta.emoji+p+'</div>';
         h3 += '<div style="font-size:18px;font-weight:700;color:'+meta.color+';">'+cnt+'</div>';
-        h3 += '<div style="font-size:10px;color:var(--sub);margin-top:2px;">点击查看</div>';
+        h3 += '<div style="font-size:10px;color:var(--sub);margin-top:2px;">'+(cnt?'点击查看':'暂无')+'</div>';
         h3 += '</div>';
       });
       h3 += '</div>';
+      // 2026-08-31：显式给出阈值，某桶为 0 时主人一眼可判「市场真无」而非「卡片出错」
+      h3 += '<div style="font-size:11px;color:var(--dim);margin-bottom:10px;line-height:1.6;">阈值(v2)：🚀主升 5日&gt;3%且20日&gt;5% ｜ 📈启动 5日&gt;1.5%且20日&gt;-8% ｜ 📉退潮 5日&lt;-1.5%（20日为正=高位退潮）｜ ⛏️底部 20日&lt;-8%且5日不再急跌 ｜ ➡️震荡 其余。某桶为 0 表示当前无板块满足，非数据异常。</div>';
 
       // 阶段明细面板（默认隐藏，点击 pill 展开）
       h3 += '<div id="scPhaseDetailBox">';
@@ -8960,7 +8976,7 @@ function drawUpDownChart(){
 
           {name:'市场预警', source:'MARKET_ALERTS', freq:'盘中实时', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'量价异常预警'},
 
-          {name:'📐 平均股价', source:'AVG_PRICE_DATA', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'通达信 880003 真实指数 + MA20/MA60 水位（操作信号面板 + AI速览共用锚点）'}
+          {name:'📐 平均股价', source:'AVG_PRICE_DATA', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'全A算术平均股价（＝通达信880003定义口径，cloud_fetch f_avg_price 单点写入）+ MA20/MA60 水位；盘前不清空（KEEP_VARS），history 逐交易日累积，满20/60日后才给水位信号'}
 
         ]
 
@@ -9745,7 +9761,7 @@ window.showRestrictedItems = showRestrictedItems;
       });
       h+='</div>';
     }else{
-      h+='<div class="ipo-empty" style="padding:10px 12px;font-size:12px;text-align:center;">未来7天内 '+(stats.d7||0)+' 家</div>';
+      h+='<div class="ipo-empty" style="padding:10px 12px;font-size:12px;text-align:center;">今日无解禁</div>';
     }
     $b.innerHTML=h;
     if($t) $t.innerHTML=_uBadge('盘前','短线',d.update_time);
@@ -12522,19 +12538,20 @@ h+='    </div>';
 
     /* ===== 🌐 下架雷达组（2026-08-29 主人令「盘中三卡放到涨跌家数统计下方」+ 一劳永逸修复"闪现"问题）
        三张宏观雷达卡：市场温度计·分项 / 六维共振雷达·战术层 / 危机雷达 */
-    h+='<div class="grid g-2" style="margin-bottom:16px">';
-    h+='  <div class="card">';
+    // 2026-08-31：已下架三卡（温度计/六维/危机）改一行 3 列均分，避免危机雷达独占一行
+    h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;">';
+    h+='  <div class="card" style="margin-bottom:0;">';
     h+='    <h3><span class="ic">🌡️</span>市场温度计 · 分项 <span class="fresh" id="phThermoTime">—</span></h3>';
     h+='    <div id="phThermoBody"><div class="ipo-empty">温度计数据加载中…</div></div>';
     h+='  </div>';
-    h+='  <div class="card">';
+    h+='  <div class="card" style="margin-bottom:0;">';
     h+='    <h3><span class="ic">🕸️</span>六维共振雷达 · 战术层 <span class="fresh" id="phRadarTime">—</span></h3>';
     h+='    <svg class="radar" style="display:block;margin:0 auto" width="220" height="200" viewBox="-110 -110 220 220" id="radar"></svg>';
     h+='  </div>';
-    h+='</div>';
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #f43f5e;">';
-    h+='  <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">📊</span>危机雷达 <span class="fresh" id="phCrisisTime">—</span></h3>';
-    h+='  <div id="phCrisisBody"><div class="ipo-empty">危机数据加载中…</div></div>';
+    h+='  <div class="card" style="margin-bottom:0;border-left:4px solid #f43f5e;">';
+    h+='    <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">📊</span>危机雷达 <span class="fresh" id="phCrisisTime">—</span></h3>';
+    h+='    <div id="phCrisisBody"><div class="ipo-empty">危机数据加载中…</div></div>';
+    h+='  </div>';
     h+='</div>';
 
     /* ===== 🌙 盘后 ===== */
