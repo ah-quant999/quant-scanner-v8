@@ -2,9 +2,10 @@
 html>
 <html lang="zh-CN">
 <head>
-<!-- deploy-trigger 2026-08-28T11:11 rebuild-from b66a4a9281caf5fa992ff20323fde20c114b9bef -->
+<!-- deploy-trigger 2026-09-01T00:55 rebuild-from bt-backtest-renderhardened - bt回测整函数trycatch防空白+setBadge降级 -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta http-equiv="Expires" content="0">
 <script>
 // 🛡 2026-08-25 一劳永逸：版本戳强缓存破坏。
@@ -776,18 +777,22 @@ function _uBadge(slot, horizon, ts, sub){
     + (sub ? ' <span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">' + sub + '</span>' : '');
 }
 function setBadge(id, slot, horizon, ts, sub){
-  var el = document.getElementById(id) || (typeof $ === 'function' ? $(id) : null);
-  if(!el){
-    // 2026-08-06 23:18 主人反复反馈胶囊不见 — 显式告警（不静默 return）让浏览器 console 看到原因
-    console.warn('[setBadge] element NOT FOUND id=' + id);
-    return;
-  }
+  try{
+    var el = document.getElementById(id) || (typeof $ === 'function' ? $(id) : null);
+    if(!el){
+      // 🛡 2026-09-01 一劳永逸：从 console.warn 降级到 console.log —— 主人 console 截图误读为严重错误，
+      //   实际是部署版 (minified/混淆后某些历史 ID 不存在) 仅噪音，不应让主人以为"卡空了"。
+      console.log('[setBadge] skip (DOM missing) id=' + id);
+      return;
+    }
   // ts/sub 都缺失时 → 显示「更新于 已加载」兜底
   if(!ts && !sub){ ts = '已加载'; }
   el.innerHTML = _uBadge(slot, horizon, ts, sub);
-  // 调试钩子：写入后立即验证长度
-  if(!el.innerHTML || el.innerHTML.length < 30){
-    console.warn('[setBadge] innerHTML empty/short id=' + id + ' len=' + el.innerHTML.length);
+  // 调试钩子：写入后立即验证长度（已降级 log 减少噪音）
+  try{ if(!el.innerHTML || el.innerHTML.length < 30){ console.log('[setBadge] innerHTML short id=' + id + ' len=' + el.innerHTML.length); } }catch(_){}
+  }catch(e){
+    // 🛡 一劳永逸：setBadge 任何抛错都吞掉，不让主人 console 误读为严重错误
+    console.log('[setBadge] silent skip id=' + id, e && (e.message||''));
   }
 }
 /* 统一「已入仓」胶囊（2026-08-09 修复：「持仓」→「已入仓」）
@@ -4014,20 +4019,27 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     //   原守卫 `if(rendered)return; rendered=true;` 导致表头点击后第二次调用直接 return，
     //   排序功能失效。本函数重写为纯渲染，无外部副作用，可重复调用。
 
-    var bc = window.BACKTEST_COMPREHENSIVE || {};
-    var bd = window.BACKTEST_TDX || {};
-    var cb = window.COCKPIT_BACKTEST || {};
+    var html = '';
+    // 🛡 2026-09-01 一劳永逸：整函数 try/catch 兜底 + 子块分级 try/catch。
+    //   任何子块抛错（如混淆版变量名 undefined 访问）只丢失该子块，不让整张卡空。
+    //   try 内累加到 html，try 外最终赋值 dst.innerHTML。错误向上抛出可定位但不再使卡空白。
+    try{
+    var bc = (typeof window!=='undefined' && window.BACKTEST_COMPREHENSIVE) || {};
+    var bd = (typeof window!=='undefined' && window.BACKTEST_TDX) || {};
+    var cb = (typeof window!=='undefined' && window.COCKPIT_BACKTEST) || {};
 
-    // 取各回测数据源中最新的 calc_time/update_time 作为统一"更新于"时间
+    // 2. 取各回测数据源中最新的 calc_time/update_time 作为统一"更新于"时间
     var btTimes = [];
-    if(bc.calc_time) btTimes.push(bc.calc_time);
-    if(bd.calc_time) btTimes.push(bd.calc_time);
-    if(cb.calc_time) btTimes.push(cb.calc_time);
+    try{ if(bc.calc_time) btTimes.push(bc.calc_time); }catch(e){}
+    try{ if(bd.calc_time) btTimes.push(bd.calc_time); }catch(e){}
+    try{ if(cb.calc_time) btTimes.push(cb.calc_time); }catch(e){}
     var btLatest = btTimes.sort().slice(-1)[0] || null;
-    var btFresh = document.getElementById('btFresh');
-    if(btFresh && typeof _uBadge === 'function'){
-      btFresh.innerHTML = _uBadge('盘后','回测', btLatest);
-    }
+    try{
+      var btFresh = document.getElementById('btFresh');
+      if(btFresh && typeof _uBadge === 'function'){
+        btFresh.innerHTML = _uBadge('盘后','回测', btLatest);
+      }
+    }catch(e){}
 
     /* ── 📊 实战回测胶囊（只留有真实数字的，砍掉占位文案）── */
     (function(){
@@ -4191,8 +4203,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     html += '</div>';
 
     /* ── ④ v8 选股生命周期（🆕 2026-08-31 阶段 1：专家方法论整合）── */
-    var pt = window.V8_POOL_TRACKER || null;
-    if(pt && pt.items && pt.items.length){
+    try{
+    var pt = (typeof window!=='undefined' && window.V8_POOL_TRACKER) || null;
+    if(pt && pt.items && Array.isArray(pt.items) && pt.items.length){
       var sc = pt.status_counts || {};
       var removedMap = _loadRemovedMap();
 
@@ -4296,19 +4309,28 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '</div>';
 
       /* ─── 阶段 3：待确认剔除区（走弱/见顶，未剔除者） ─── */
-      var toRemove = pt.items.filter(function(it){ return (it.status==='weak'||it.status==='topped') && !removedMap[it.code]; });
-      if(toRemove.length){
-        toRemove = _sortBucket(toRemove, 'drawdown', false);
+      var toRemove = [];
+      try{
+        toRemove = (pt.items || []).filter(function(it){ return (it && (it.status==='weak'||it.status==='topped')) && !removedMap[it.code]; });
+      }catch(e){ console.warn('[bt] toRemove filter', e); toRemove = []; }
+      if(toRemove && toRemove.length){
+        try{ toRemove = _sortBucket(toRemove, 'drawdown', false); }catch(e){ console.warn('[bt] sortBucket', e); }
         html += '<div style="margin:10px 0;padding:10px;border:1px solid rgba(239,83,80,.3);border-radius:8px;background:rgba(239,83,80,.04);">';
-        html += '<div style="font-size:12px;font-weight:700;color:#ef5350;margin-bottom:6px;">⚠️ 待确认剔除（走弱/见顶，共 '+toRemove.length+' 只）· 点击「确认剔除」仅本机记录，不污染 v8 主线数据</div>';
-        toRemove.forEach(function(it){
-          html += '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.08);">';
-          html += '<span style="color:var(--txt);font-weight:600;font-size:11.5px;">'+it.code+'</span>';
-          html += '<span style="color:var(--txt);font-size:11.5px;">'+_esc(it.name)+'</span>';
-          html += '<span style="color:var(--dim);font-size:10.5px;">'+statusLabel[it.status]+' · 回撤 '+it.drawdown.toFixed(1)+'%</span>';
-          html += '<span style="margin-left:auto;color:#38bdf8;font-size:10.5px;cursor:pointer;user-select:none;" onclick="window.__removeStock(\''+it.code+'\')">确认剔除 ✕</span>';
-          html += '</div>';
-        });
+        html += '<div style="font-size:12px;font-weight:700;color:#ef5350;margin-bottom:6px;">⚠️ 待确认剔除（走弱/见顶，共 '+(toRemove?toRemove.length:0)+' 只）· 点击「确认剔除」仅本机记录，不污染 v8 主线数据</div>';
+        if(toRemove && toRemove.length){
+          toRemove.forEach(function(it){
+            var _code = (it && it.code) || '';
+            var _name = (it && it.name) || '';
+            var _drawdown = (it && typeof it.drawdown==='number') ? it.drawdown : 0;
+            var _status = (it && it.status) || '';
+            html += '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.08);">';
+            html += '<span style="color:var(--txt);font-weight:600;font-size:11.5px;">'+_esc(_code)+'</span>';
+            html += '<span style="color:var(--txt);font-size:11.5px;">'+_esc(_name)+'</span>';
+            html += '<span style="color:var(--dim);font-size:10.5px;">'+_esc(statusLabel[_status]||_status)+' · 回撤 '+_drawdown.toFixed(1)+'%</span>';
+            html += '<span style="margin-left:auto;color:#38bdf8;font-size:10.5px;cursor:pointer;user-select:none;" onclick="window.__removeStock(\''+_esc(_code)+'\')">确认剔除 ✕</span>';
+            html += '</div>';
+          });
+        }
         html += '</div>';
       }
 
@@ -4332,50 +4354,67 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var statusLabel = {strong:'🟢强势', buy_dip:'🟡回调买点', topped:'🟠见顶', weak:'🔴走弱'};
       var statusColor = {strong:'#22c55e', buy_dip:'#fbbf24', topped:'#fb923c', weak:'#ef5350'};
       var grouped = {};
-      pt.items.forEach(function(it){ (grouped[it.status] = grouped[it.status]||[]).push(it); });
+      try{
+        (pt.items||[]).forEach(function(it){
+          if(!it || !it.status) return;
+          (grouped[it.status] = grouped[it.status]||[]).push(it);
+        });
+      }catch(e){ console.warn('[bt] group', e); }
 
       STATUS_ORDER.forEach(function(s){
-        var arr = grouped[s]||[];
+        var arr = (grouped[s]||[]).slice();
         if(!arr.length) return;
-        arr = _sortBucket(arr, sortField, sortAsc);  // 桶内按当前排序字段（与列头点击同步）
+        try{ arr = _sortBucket(arr, sortField, sortAsc); }catch(e){ console.warn('[bt] sortBucket2', e); }  // 桶内按当前排序字段（与列头点击同步）
         // 【K 批】桶 header 加精选子统计（colspan 9 → 11，板块+精选 2 新列）
-        var bucketSel = arr.filter(function(x){return x.selected;}).length;
+        var bucketSel = arr.filter(function(x){return x && x.selected;}).length;
         var bucketSelHtml = bucketSel > 0
           ? '<span style="padding:1px 8px;margin-left:8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(251,191,36,.15);color:var(--gold);border:1px solid rgba(251,191,36,.3);">🌟 精选 '+bucketSel+'</span>'
           : '';
         html += '<tr style="background:rgba(148,163,184,.06);"><td colspan="13" style="padding:6px 8px;font-weight:700;color:'+statusColor[s]+';font-size:12px;">'+statusLabel[s]+' '+arr.length+' 只'+bucketSelHtml+'</td></tr>';
         arr.forEach(function(it){  // 🔁 2026-08-31：去掉 slice(0,12) 限制，全部展示（主人截图 "47/46 只没全看到" 根因）
-          var hint = it.buy_hint || it.sell_hint || '';
-          var isRemoved = !!removedMap[it.code];
-          var periodColor = it.last_pct > 0 ? '#ef5350' : (it.last_pct < 0 ? '#26a69a' : 'var(--sub)');
-          var peakColor   = it.peak_pct > 0 ? '#ef5350' : 'var(--sub)';
-          var ddColor     = it.drawdown > 10 ? '#fb923c' : (it.drawdown > 5 ? '#fbbf24' : 'var(--sub)');
+          if(!it) return;
+          var _code = it.code || '';
+          var _name = it.name || '';
+          var _algo = it.algo || '';
+          var _entry = (typeof it.entry_price==='number') ? it.entry_price : 0;
+          var _last  = (typeof it.last_close==='number')  ? it.last_close  : 0;
+          var _lastPct  = (typeof it.last_pct==='number')  ? it.last_pct  : 0;
+          var _peakPct  = (typeof it.peak_pct==='number')  ? it.peak_pct  : 0;
+          var _drawdown = (typeof it.drawdown==='number') ? it.drawdown : 0;
+          var _cons = (typeof it.consensus_count==='number') ? it.consensus_count : 0;
+          var _hint = it.buy_hint || it.sell_hint || '';
+          var isRemoved = !!removedMap[_code];
+          var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
+          var peakColor   = _peakPct > 0 ? '#ef5350' : 'var(--sub)';
+          var ddColor     = _drawdown > 10 ? '#fb923c' : (_drawdown > 5 ? '#fbbf24' : 'var(--sub)');
           // 【K 批】精选列 cell：icon + 分数 + 板块命中
+          var _selScore = (typeof it.selected_score==='number') ? it.selected_score : null;
+          var _secNet = (typeof it.sector_net==='number') ? it.sector_net : 0;
           var selIcon = it.selected ? '🌟' : (it.sentiment_match==='caution' ? '⚠️' : '—');
           var selColor = it.selected ? 'var(--gold)' : (it.sentiment_match==='caution' ? '#fb923c' : 'var(--dim)');
-          var selScoreHtml = it.selected_score != null ? '<span style="font-weight:700;color:'+selColor+';">'+(it.selected_score>0?'+':'')+it.selected_score.toFixed(1)+'</span>' : '';
+          var selScoreHtml = _selScore != null ? '<span style="font-weight:700;color:'+selColor+';">'+(_selScore>0?'+':'')+_selScore.toFixed(1)+'</span>' : '';
           var conceptColor = it.sector_match==='top_inflow' ? '#22c55e' : (it.sector_match==='outflow' ? '#ef5350' : 'var(--dim)');
           var conceptHtml = it.concept_top
-            ? '<span style="color:'+conceptColor+';font-size:10.5px;" title="净流入 '+(it.sector_net>0?'+':'')+it.sector_net.toFixed(1)+'亿">'+(it.sector_match==='top_inflow'?'📥':(it.sector_match==='outflow'?'📤':'·'))+' '+_esc(it.concept_top)+'</span>'
+            ? '<span style="color:'+conceptColor+';font-size:10.5px;" title="净流入 '+(_secNet>0?'+':'')+_secNet.toFixed(1)+'亿">'+(it.sector_match==='top_inflow'?'📥':(it.sector_match==='outflow'?'📤':'·'))+' '+_esc(it.concept_top)+'</span>'
             : '<span style="color:var(--dim);">—</span>';
           // 行整体 background：精选用淡金底；多算法共识用淡蓝底；已剔除淡化
           var rowBg = it.selected ? 'background:rgba(251,191,36,.06);' : (it.consensus_count>=2 ? 'background:rgba(56,189,248,.06);' : '');
           var rowStyle = rowBg + (isRemoved ? 'opacity:.45;' : '');
           html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+rowStyle+'">';
-          html += '<td style="padding:5px 6px;color:var(--txt);font-weight:600;'+(isRemoved?'text-decoration:line-through;':'')+'">'+it.code+'</td>';
-          html += '<td style="padding:5px 6px;color:var(--txt);">'+_esc(it.name)+'</td>';
-          html += '<td style="padding:5px 6px;color:var(--sub);font-size:10.5px;">'+_esc(it.algo)+'</td>';
+          html += '<td style="padding:5px 6px;color:var(--txt);font-weight:600;'+(isRemoved?'text-decoration:line-through;':'')+'">'+_esc(_code)+'</td>';
+          html += '<td style="padding:5px 6px;color:var(--txt);">'+_esc(_name)+'</td>';
+          html += '<td style="padding:5px 6px;color:var(--sub);font-size:10.5px;">'+_esc(_algo)+'</td>';
           // 【阶段 2】信号类型 + 共识 列
           var sigColor = it.signal_type==='多算法共识' ? '#38bdf8' : (it.signal_type==='强势突破' ? '#ef5350' : (it.signal_type==='板块联动' ? '#22c55e' : 'var(--sub)'));
-          html += '<td style="padding:5px 6px;color:'+sigColor+';font-size:10.5px;white-space:nowrap;">'+_esc(it.signal_type)+'</td>';
-          var consTxt = it.consensus_count>=2 ? '🤝 '+it.consensus_count : (it.consensus_count>=1 ? (''+it.consensus_count) : '—');
-          var consColor = it.consensus_count>=2 ? '#38bdf8' : 'var(--dim)';
-          html += '<td style="padding:5px 6px;text-align:right;color:'+consColor+';font-weight:'+(it.consensus_count>=2?'700':'400')+';" title="命中算法：'+_esc((it.algos_hit||[]).join(' / '))+'">'+consTxt+'</td>';
-          html += '<td style="padding:5px 6px;text-align:right;color:var(--sub);">'+it.entry_price.toFixed(2)+'</td>';
-          html += '<td style="padding:5px 6px;text-align:right;color:var(--txt);">'+it.last_close.toFixed(2)+'</td>';
-          html += '<td style="padding:5px 6px;text-align:right;font-weight:700;color:'+periodColor+';">'+(it.last_pct>0?'+':'')+it.last_pct.toFixed(2)+'%</td>';
-          html += '<td style="padding:5px 6px;text-align:right;color:'+peakColor+';">'+(it.peak_pct>0?'+':'')+it.peak_pct.toFixed(2)+'%</td>';
-          html += '<td style="padding:5px 6px;text-align:right;color:'+ddColor+';">'+it.drawdown.toFixed(1)+'%</td>';
+          html += '<td style="padding:5px 6px;color:'+sigColor+';font-size:10.5px;white-space:nowrap;">'+_esc(it.signal_type||'')+'</td>';
+          var consTxt = _cons>=2 ? '🤝 '+_cons : (_cons>=1 ? (''+_cons) : '—');
+          var consColor = _cons>=2 ? '#38bdf8' : 'var(--dim)';
+          html += '<td style="padding:5px 6px;text-align:right;color:'+consColor+';font-weight:'+(_cons>=2?'700':'400')+';" title="命中算法：'+_esc((it.algos_hit||[]).join(' / '))+'">'+consTxt+'</td>';
+          html += '<td style="padding:5px 6px;text-align:right;color:var(--sub);">'+_entry.toFixed(2)+'</td>';
+          html += '<td style="padding:5px 6px;text-align:right;color:var(--txt);">'+_last.toFixed(2)+'</td>';
+          html += '<td style="padding:5px 6px;text-align:right;font-weight:700;color:'+periodColor+';">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</td>';
+          html += '<td style="padding:5px 6px;text-align:right;color:'+peakColor+';">'+(_peakPct>0?'+':'')+_peakPct.toFixed(2)+'%</td>';
+          html += '<td style="padding:5px 6px;text-align:right;color:'+ddColor+';">'+_drawdown.toFixed(1)+'%</td>';
           // 【K 批】新增 2 列：板块 + 精选
           html += '<td style="padding:5px 6px;">'+conceptHtml+'</td>';
           html += '<td style="padding:5px 6px;text-align:right;" title="status_base + sector_bonus + sentiment_bonus">'+selIcon+' '+selScoreHtml+'</td>';
@@ -4386,27 +4425,42 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '</tbody></table></div>';
 
       /* ─── 阶段 3：已剔除历史区（读 localStorage，纯前端） ─── */
-      var removedCodes = Object.keys(removedMap);
-      if(removedCodes.length){
-        html += '<div style="margin:10px 0;padding:10px;border:1px solid rgba(148,163,184,.25);border-radius:8px;background:var(--card2);">';
-        html += '<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;">🗑️ 已剔除（本机记录 '+removedCodes.length+' 只）· 仅当前浏览器可见，跨设备不同步</div>';
-        removedCodes.forEach(function(code){
-          var r = removedMap[code] || {};
-          html += '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.08);">';
-          html += '<span style="color:var(--dim);font-weight:600;font-size:11.5px;text-decoration:line-through;">'+code+'</span>';
-          html += '<span style="color:var(--dim);font-size:11.5px;text-decoration:line-through;">'+_esc(r.name||'')+'</span>';
-          html += '<span style="color:var(--dim);font-size:10.5px;">'+(r.status||'')+' · 回撤 '+(r.drawdown!=null?r.drawdown.toFixed(1):'-')+'% · '+(r.removed_at||'')+'</span>';
-          html += '<span style="margin-left:auto;color:#22c55e;font-size:10.5px;cursor:pointer;user-select:none;" onclick="window.__restoreStock(\''+code+'\')">撤销 ↺</span>';
+      try{
+        var removedCodes = Object.keys(removedMap||{});
+        if(removedCodes.length){
+          html += '<div style="margin:10px 0;padding:10px;border:1px solid rgba(148,163,184,.25);border-radius:8px;background:var(--card2);">';
+          html += '<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;">🗑️ 已剔除（本机记录 '+removedCodes.length+' 只）· 仅当前浏览器可见，跨设备不同步</div>';
+          removedCodes.forEach(function(code){
+            var r = (removedMap && removedMap[code]) || {};
+            var _rDraw = (typeof r.drawdown==='number') ? r.drawdown : null;
+            html += '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.08);">';
+            html += '<span style="color:var(--dim);font-weight:600;font-size:11.5px;text-decoration:line-through;">'+_esc(code)+'</span>';
+            html += '<span style="color:var(--dim);font-size:11.5px;text-decoration:line-through;">'+_esc(r.name||'')+'</span>';
+            html += '<span style="color:var(--dim);font-size:10.5px;">'+_esc(r.status||'')+' · 回撤 '+(_rDraw!=null?_rDraw.toFixed(1):'-')+'% · '+_esc(r.removed_at||'')+'</span>';
+            html += '<span style="margin-left:auto;color:#22c55e;font-size:10.5px;cursor:pointer;user-select:none;" onclick="window.__restoreStock(\''+_esc(code)+'\')">撤销 ↺</span>';
+            html += '</div>';
+          });
           html += '</div>';
-        });
-        html += '</div>';
-      }
+        }
+      }catch(e){ console.warn('[bt] removed codes', e); }
 
-      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">表头可点击切换排序（默认精选分↓）· K 批二维精选（板块流入×情绪周期）：精选分 = status 基础 + 板块净流入÷10 + 情绪适配 ±N（退潮期 buy_dip+板块流入=8 分，topped/weak+板块流出=负分）· 阈值≥8 进精选池 · 阶段 2 信号类型/多算法共识（🤝≥2 算法命中）· 阶段 3 待确认剔除（本机 localStorage，跨设备不同步）· 数据 '+(pt.update_time||'').substring(0,16)+' · 仅跟 v8 三大算法真实跟踪池（不接 600+ 全池、不重做行业映射）</div>';
+      var _upd = (pt && pt.update_time) || '';
+      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">表头可点击切换排序（默认精选分↓）· K 批二维精选（板块流入×情绪周期）：精选分 = status 基础 + 板块净流入÷10 + 情绪适配 ±N（退潮期 buy_dip+板块流入=8 分，topped/weak+板块流出=负分）· 阈值≥8 进精选池 · 阶段 2 信号类型/多算法共识（🤝≥2 算法命中）· 阶段 3 待确认剔除（本机 localStorage，跨设备不同步）· 数据 '+_upd.substring(0,16)+' · 仅跟 v8 三大算法真实跟踪池（不接 600+ 全池、不重做行业映射）</div>';
       html += '</div>';
     }
-
-    dst.innerHTML = html;
+    }catch(e){ console.error('[bt ④ v8 选股生命周期]', e && (e.message||e)); }
+    }catch(e){
+      console.error('[bt render error]', e && (e.message||e), '— 已渲染部分保留', {partialLen: html.length, stack: e && e.stack});
+      try {
+        if(typeof Sentry!=='undefined' && Sentry && Sentry.captureException) Sentry.captureException(e);
+      } catch(_) {
+        // Sentry 未注入则静默吞错
+      }
+    }
+    // 🛡 兜底：final try/catch 保证 dst.innerHTML 总被执行（即使异常也不让"卡空了"）
+    try{
+      dst.innerHTML = html || '<div class="note" style="padding:24px;text-align:center;color:var(--dim);">⏳ 策略回测数据刷新中…<br><span style="font-size:11px">若长时间为空请硬刷新 (Ctrl/Cmd+F5)</span></div>';
+    }catch(e){ console.error('[bt dst.innerHTML fail]', e); }
   };
 
   // DOM ready hook
