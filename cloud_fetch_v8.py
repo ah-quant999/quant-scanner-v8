@@ -3104,9 +3104,19 @@ def _clear_intraday_for_premarket(category, only=None):
     dates = data.get("dates") or []
     today_md = now.strftime("%m/%d")  # e.g. "08/11"
     if dates and sectors:
-        data.pop("ladder", None)
-        data.pop("top", None)
-        data["total"] = 0
+        # 2026-08-31 一劳永逸（主人令「无数据！赶紧一劳永逸式修复」）
+        #   原实现在盘前把 ladder / top 直接 pop 掉、total 置 0。但「情绪周期·连板天梯」
+        #   卡片正是读 lh.ladder / lh.total —— 于是从盘前档(08:25)一直到当日首次成功的
+        #   盘中抓取之间，该卡必然显示「无数据」；2026-08-31 首轮盘中 run #1099(09:06)
+        #   抓取失败，空窗被拉长到 09:45，主人两次截图实锤。
+        #   这与 08-11 ETF_DAILY_MONITOR「这是盘后的啊，清空了干嘛」、08-26
+        #   CONCEPT_RANKING「概念资金过早清空」属同一类 bug 第三次复发。
+        #   修复：按本函数既有惯例（保留上一交易日真实值 + note 标注）对齐——
+        #   ladder / top / total 一律保留，另加 ladder_stale / ladder_date 供前端标「昨日」，
+        #   开盘后首次 fetch 自然覆盖为当日真实数据，卡片不再出现空窗。
+        if data.get("ladder") or data.get("top"):
+            data["ladder_stale"] = True
+            data["ladder_date"] = data.get("data_date") or dates[-1]
         if dates[-1] != today_md:
             # 日期数组里没有今日 → 追加今日占位列，每个 sector 的 data 末尾补 0
             dates.append(today_md)
@@ -3125,7 +3135,7 @@ def _clear_intraday_for_premarket(category, only=None):
                 if len(arr) == len(dates):
                     arr[-1] = 0
     data["premarket_cleared"] = True
-    data["note"] = "盘前占位今日涨停列，开盘后自动刷新"
+    data["note"] = "盘前占位今日涨停列；连板天梯/龙头榜/涨停总数为上一交易日值，开盘后自动刷新"
     save("LIMIT_UP_HEATMAP", data)
 
     # CAPITAL_FLOW_DATA：保留（用户指定不清空），仅打标记
