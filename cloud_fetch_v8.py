@@ -84,6 +84,7 @@ VAR_TO_RAW = {
     "OVERSEAS_MARKETS": "overseas_markets.json",
     "RESTRICTED_RELEASE": "restricted_release.json",
     "PERFORMANCE_FORECAST": "performance_forecast.json",
+    "AVG_PRICE_DATA": "avg_price_data.json",  # 2026-08-31 修复：f_avg_price 已加入 tasks，必须对应 raw_data/avg_price_data.json，否则 save() 因 fname=None 直接返回，数据永不被写入
 }
 
 # 变量名 → 更新时段（与 update_v8.py 的 CATEGORY_MAP 对齐）
