@@ -6115,6 +6115,7 @@ window.__renderV8CalFull();
 
   /* ---- 1. 斐波那契窗口 ---- */
   function renderFib(fib){
+    if(!$('phFibDays')) return; // 🛡 2026-08-31 守卫：元素缺失时静默返回，避免整段抛错致「卡空了」
     const c=fib.current||{};
     $('phFibDays').textContent=(c.days_down!=null?c.days_down:'--')+'天';
     $('phFibDays').classList.add('down');
@@ -6178,6 +6179,7 @@ window.__renderV8CalFull();
 
   /* ---- 2. 短线/中线市场温度计（技术/资金/机构） ---- */
   function renderThermo(fib,margin,cffex,fomc,sf){
+    if(!$('phThermoBody')) return; // 🛡 2026-08-31 守卫：元素缺失时静默返回，避免整段抛错致「卡空了」
     const c=fib.current||{};
     const declineDays=c.days_down||0, declinePct=c.total_pct||0;
     let nextWindow='',nextWindowDays=99;
@@ -9080,7 +9082,17 @@ window.showRestrictedItems = showRestrictedItems;
     const stocks=data.stocks||[];
     const near=data.near_miss||[];
     const tm=track?buildTrackMap(track.tracked):{};
-    $('tcConsensus').innerHTML = stocks.length ? stocks.map(s=>renderStock(s,false,tm)).join('') : '<div class="tp-empty">当前无严格三重共识股<br><span style="font-size:12px">下方「优先观察」展示满足 2/3 且主站评分≥75 的股票</span></div>';
+    // 🛡 2026-08-31 主人令一劳永逸：明确区分「未跑」与「跑了但 0 只」，并在命中 0 时给出「最终推荐」可信度说明。
+    //   旧版仅显示「当前无严格三重共识股」，主人无法判断是没跑还是跑了没数据。
+    var _tcTs0 = data.update_time||data.data_time||data.gen_time||'';
+    var _tcRanToday = (function(){ try{ return !!window._runBadgeInfo && window._runBadgeInfo(_tcTs0).show; }catch(e){ return false; } })();
+    var _tcEmptyHead = _tcRanToday
+      ? '✅ 今日已跑 · 命中 0 只（条件严格，非未跑）'
+      : '⚠️ 今日尚未出数（数据时间 '+_tcTs0+'）';
+    $('tcConsensus').innerHTML = stocks.length ? stocks.map(s=>renderStock(s,false,tm)).join('') :
+      '<div class="tp-empty">'+_tcEmptyHead+'<br><span style="font-size:12px">数据时间 '+_tcTs0+
+      ' · 下方「优先观察」展示满足 2/3 且主站评分≥75 的股票</span>'+
+      '<br><span style="font-size:11px;color:#f59e0b">📌 最终推荐以驾驶舱/全站精选等模块为准，三重共识为 0 时不构成否决，仍可作参考</span></div>';
     // 🛡 2026-08-19 主人令一劳永逸修复：弱市 max_score 可能很低（如 40），固定 >=75 会让 near_miss 全灭。
     //   改为动态阈值：max(near_max_score×0.6, 25)，确保弱市也有观察清单可展示。
     const nearMax=Math.max(...near.map(s=>s.total_score||0), 0);
@@ -12164,21 +12176,30 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     var items = hc.items || [];
     var map = {};
     items.forEach(function(it){ if(it && it.id) map[it.id] = it; });
-    function setRow(prefix, item){
+    // 🛡 2026-08-31 主人令一劳永逸：运维新鲜度以「真实数据时间戳」(gen_time/update_time) 为权威源，
+    //   HEALTH_CHECK 心跳仅作状态判据；旧实现只信 HEALTH_CHECK.last_update，
+    //   当其滞后（如周末聚合 WEEKEND_RUN 残留 02:26/03:03、four_volume 误报 missing）时，
+    //   运维面板会错显「凌晨2点多跑的 / 卡空了」。真实数据今日 19:53 已生成，应显示真实时间。
+    function setRow(prefix, item, realTs){
       var timeEl = document.getElementById('freshTime'+prefix);
       var statusEl = document.getElementById('freshStatus'+prefix);
       if(!timeEl || !statusEl) return;
-      if(!item || !item.last_update){
+      var dispTs = realTs || (item && item.last_update) || '';
+      if(!dispTs){
         timeEl.textContent = '--';
         statusEl.innerHTML = '<span class="status-dot s-warn"></span>待扫描';
         return;
       }
-      timeEl.textContent = item.last_update.slice(0,16).replace('T',' ');
-      var cls = item.status==='ok' ? 's-ok' : (item.status==='fail' ? 's-fail' : 's-warn');
-      var txt = item.status==='ok' ? '正常' : (item.status==='fail' ? '失败' : '待更新');
+      timeEl.textContent = String(dispTs).slice(0,16).replace('T',' ');
+      // 真实数据时间 ≠ 心跳时间时，标注「(数据)」避免误导
+      if(realTs && item && item.last_update && String(realTs).slice(0,16) !== String(item.last_update).slice(0,16)){
+        timeEl.textContent += ' (数据)';
+      }
+      var cls = item ? (item.status==='ok' ? 's-ok' : (item.status==='fail' ? 's-fail' : 's-warn')) : 's-warn';
+      var txt = item ? (item.status==='ok' ? '正常' : (item.status==='fail' ? '失败' : '待更新')) : '待扫描';
       statusEl.innerHTML = '<span class="status-dot '+cls+'"></span>'+txt;
     }
-    setRow('Candidate', map['CANDIDATE']);
+    setRow('Candidate', map['CANDIDATE'], (window.CANDIDATE && (window.CANDIDATE.update_time||window.CANDIDATE.gen_time)) || '');
     // 候选股池来源级子行（六大来源各自数量+颜色状态）
     (function(){
       var cand = window.CANDIDATE || {};
@@ -12212,9 +12233,9 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       srcEl.innerHTML = html;
       rowEl.style.display = '';
     })();
-    setRow('Gold', map['GOLD_POOL']);
+    setRow('Gold', map['GOLD_POOL'], (window.GOLD_POOL && (window.GOLD_POOL.update_time||window.GOLD_POOL.gen_time)) || '');
     // 概念映射：优先用概念排名，回退板块资金流
-    setRow('Concept', map['CONCEPT_RANKING'] || map['SECTOR_FUND_FLOW']);
+    setRow('Concept', map['CONCEPT_RANKING'] || map['SECTOR_FUND_FLOW'], (window.CONCEPT_RANKING && window.CONCEPT_RANKING.update_time) || (window.SECTOR_FUND_FLOW && window.SECTOR_FUND_FLOW.update_time) || '');
 
     // 外部数据源状态（候选股池上游依赖）
     renderExtDataSources();
