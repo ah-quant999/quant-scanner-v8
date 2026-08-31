@@ -16,6 +16,12 @@
 
 用法：python guard_v6_memo.py
 退出码 0 = 通过（含已自愈），1 = 存在不可自愈的缺失，阻断部署。
+
+⚠️ 2026-08-31 变更：v6备忘录 入口已从 index.html 迁至独立页 logic.html
+   （逻辑详解页拆为独立页，本体 153.6KB 不再进首屏）。本护栏的入口校验
+   相应改为检查 logic.html（data-lg="v6" 子tab + id="lg-v6" 面板 + 真实引用
+   v6_memo.html），并软校验 index.html 仍保留「逻辑详解」tab 指向 logic.html。
+   v6_memo.html 完整性自愈逻辑不变。
 """
 import os
 import re
@@ -26,6 +32,7 @@ import subprocess
 MEMO = "v6_memo.html"
 GOLDEN = "v6_memo.golden.html"
 INDEX = "index.html"
+LOGIC = "logic.html"  # 2026-08-31 逻辑详解拆为独立页，v6备忘录 入口迁至 logic.html
 MIN_BYTES = 60000  # 当前 ~157KB；阈值取 ~43%，足以捕捉"被删/被清空/被截断"
 
 
@@ -76,36 +83,32 @@ def main():
     else:
         print("✅ v6_memo.html 完整（%d 字节）" % os.path.getsize(MEMO))
 
-    # ── 2) index.html 必须保留 v6备忘录 入口 ─────────────────────────
-    if not os.path.exists(INDEX):
-        print("❌ index.html 不存在，阻断部署")
+    # ── 2) v6备忘录 入口现位于 logic.html（2026-08-31 逻辑详解拆为独立页） ──
+    if not os.path.exists(LOGIC):
+        print("❌ logic.html 不存在（v6备忘录 入口页），阻断部署")
         sys.exit(1)
 
-    h = open(INDEX, encoding="utf-8").read()
-    # 2026-08-17 支持三种渲染模式：iframe（旧）/ fetch()（中）/ 内联（新·最终）
+    h = open(LOGIC, encoding="utf-8").read()
+    # v6备忘录 在 logic.html 中以 iframe 模式渲染（JS 动态赋 src + 直链兜底按钮），
+    # 仍兼容旧 fetch()/内联模式检测，避免未来回退时漏检。
     has_iframe = 'src="v6_memo.html' in h
     has_fetch = ('__v6MemoLoad' in h) and ('v6MemoBody' in h)
     has_inline = ('id="lg-v6"' in h) and ('九宝量化 V6.0' in h)
-    # 2026-08-23 修复假阳性：iframe 初始 src 留空、改由 JS 动态赋 src='v6_memo.html?<ts>'
-    # 以击穿 CDN 缓存后，字面量 src="v6_memo.html 消失 → 前三模式全部落空 → 误判"入口缺失"
-    # 并阻断 build_deploy（run #3682/#3683 连续失败）。此处补认「JS 动态注入」与「直链兜底」两种
-    # 合法入口。保护强度不变：仍强制 data-lg="v6" 子tab + id="lg-v6" 面板存在，且必须真实引用 v6_memo.html。
     has_jssrc = ('v6MemoFrame' in h) and (re.search(r"""\.src\s*=\s*['"]v6_memo\.html""", h) is not None)
     has_directlink = re.search(r"""href=['"]v6_memo\.html""", h) is not None
 
     checks = {
         "子tab data-lg=\"v6\"": 'data-lg="v6"',
         "面板 id=\"lg-v6\"": 'id="lg-v6"',
-        "v6 渲染入口": None,  # 下面单独判
     }
     missing = []
-    for k, v in list(checks.items())[:-1]:  # 跳过最后一项
+    for k, v in checks.items():
         if v not in h:
             missing.append(k)
     if not (has_iframe or has_fetch or has_inline or has_jssrc or has_directlink):
         missing.append("v6 渲染入口(iframe / fetch / 内联 / JS动态src / 直链)")
     if missing:
-        print("❌ index.html 缺失 v6备忘录 入口：%s —— 阻断部署" % "、".join(missing))
+        print("❌ logic.html 缺失 v6备忘录 入口：%s —— 阻断部署" % "、".join(missing))
         ok = False
     else:
         if has_inline:
@@ -118,11 +121,20 @@ def main():
             mode = "iframe(JS动态src·缓存击穿)"
         else:
             mode = "直链兜底(a href)"
-        print("✅ index.html 保留 v6备忘录 子tab/面板/%s" % mode)
+        print("✅ logic.html 保留 v6备忘录 子tab/面板/%s" % mode)
+
+    # 软校验：主站 index.html 仍保留「逻辑详解」tab 指向 logic.html（确保 v6备忘录 从主站可达）
+    if os.path.exists(INDEX):
+        hi = open(INDEX, encoding="utf-8").read()
+        if 'logic.html' in hi:
+            print("✅ index.html 保留「逻辑详解」入口 → logic.html（v6备忘录 可达）")
+        else:
+            print("⚠️ index.html 未引用 logic.html（软告警，不阻断）：v6备忘录 可能从主站不可达")
+    else:
+        print("⚠️ index.html 不存在（软告警，不阻断）")
 
     # ── 3) 内联一致性校验（仅内联模式需要） ────────────────────────
     if has_inline:
-        # 提取 lg-v6 面板内的内容长度，确保不为空
         lg_match = re.search(r'<div class="lg-pane" id="lg-v6">(.*?)</div>\s*</div>\s*<section', h, re.DOTALL)
         if lg_match:
             inner = lg_match.group(1)
@@ -136,10 +148,10 @@ def main():
             print("⚠️ 无法解析 lg-v6 面板范围，跳过内容长度校验")
 
     if not ok:
-        print("🚫 护栏失败：v6备忘录 入口缺失，已阻断部署。请先修复 index.html 再推送。")
+        print("🚫 护栏失败：v6备忘录 入口缺失，已阻断部署。请先修复 logic.html 再推送。")
         sys.exit(1)
 
-    print("✅ 防覆盖护栏通过：v6备忘录 完整且内联内容就位，允许部署。")
+    print("✅ 防覆盖护栏通过：v6备忘录 完整且入口就位，允许部署。")
     sys.exit(0)
 
 
