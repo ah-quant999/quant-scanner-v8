@@ -6184,7 +6184,6 @@ function switchSec(sec,el){
     };
     // 兼容 dict/array 两种 schema：先提 stocks 字段
     const candList = (window.CANDIDATE && (window.CANDIDATE.stocks || window.CANDIDATE.data))
-                  || (window.CANDIDATE_DATA && (window.CANDIDATE_DATA.stocks || window.CANDIDATE_DATA.data))
                   || [];
     const goldList = (window.GOLD_POOL && (window.GOLD_POOL.stocks || window.GOLD_POOL.candidates))
                   || [];
@@ -9200,7 +9199,7 @@ function drawUpDownChart(){
       } catch (e) {}
     }
     try {
-      const fs = window.FRESHNESS_STATUS || {};
+      const fs = window.FRESHNESS_STATUS || {}; // 🛡 2026-08-31: FRESHNESS_STATUS 数据源未配置，当前永远空对象。如需新鲜度显示，需后端产数据并注入。
       if (fs.check_time) cands.push(fs.check_time);
     } catch (e) {}
     const liveUpdated = cands.length ? cands.sort().pop() : nowStr;
@@ -9474,11 +9473,7 @@ function drawUpDownChart(){
   }
 
   window.renderTaskSchedule = renderTaskSchedule;
-
-  window.V8_PAGE_SCHEDULE = V8_PAGE_SCHEDULE;
-
-
-
+    // 🛡 2026-08-31 轻量化：window.V8_PAGE_SCHEDULE 为死赋值（全仓无定义、无读取），已删除。
   /* ---- 前端健康巡检渲染 ---- */
 
   function renderHealthCheck(){
@@ -10851,7 +10846,7 @@ window.showRestrictedItems = showRestrictedItems;
         try{ renderCockpitResonance(); }catch(e){}
       }
       function renderLegacy(d){
-        window.COCKPIT_BACKTEST_DATA=d;
+        // window.COCKPIT_BACKTEST_DATA=d; // 🛡 2026-08-31 死赋值（全仓无读取），已注释。
         var wr=(typeof d.win_rate==='number'?d.win_rate:0);
         var ar=(typeof d.avg_return==='number'?d.avg_return:0);
         var winCount=(typeof d.win_count==='number'?d.win_count:0);
@@ -11197,11 +11192,7 @@ window.showRestrictedItems = showRestrictedItems;
       if(dataObj.slot) slot = dataObj.slot;
       if(dataObj.horizon) horizon = dataObj.horizon;
     }
-    if(typeof window !== 'undefined' && window.V8_CARD_META && window.V8_CARD_META[title]){
-      var m = window.V8_CARD_META[title];
-      if(m.slot) slot = m.slot;
-      if(m.horizon) horizon = m.horizon;
-    }
+    // 🛡 2026-08-31 轻量化：window.V8_CARD_META 全仓无定义，相关 slot/horizon 元信息分支不生效，已移除（下方 dataObj.slot/horizon 仍保留）。
     var badge = (t ? _uBadge(slot, horizon, dataObj ? dataObj.update_time : null) : '');
     // 2026-08-09 全站统一：「更新于」胶囊必须紧跟卡名，不得靠右；
     // subtitle 不再使用 flex:1 撑满空间挤压胶囊。
@@ -12836,6 +12827,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     drawV8EtfChart();
     // 2026-08-29 一劳永逸：删 renderMacro 调用——opTab4 无 phMacroBody 抛 null 已被主人之前在 initPostMarket 9680 注释；
     //   下面 3 个 safe 调用使用与 initPostMarket 同样的窗口数据来源（line 9658-9660 已对齐）：
+    // 🛡 2026-08-31: FOMC_DATA 数据源未配置，当前为空对象，温度计缺 FOMC 维度。
     try{ if(window.renderThermo) window.renderThermo(window.SH_FIB||{}, window.MARGIN_DATA||{}, window.CFFEX_HOLDINGS||{}, window.FOMC_DATA||{}, window.SECTOR_FUND_FLOW||{}); }catch(e){console.warn("已下架·温度计渲染失败",e);}
     try{ if(window.renderSixDim)  window.renderSixDim(window.SH_FIB||{},  window.MARGIN_DATA||{}, window.CFFEX_HOLDINGS||{}, window.CRISIS_DATA||{}, window.SECTOR_FUND_FLOW||{}, window.MARKET_FUND_FLOW_DATA||{}); }catch(e){console.warn("已下架·六维共振渲染失败",e);}
     try{ if(window.renderCrisis)  window.renderCrisis(window.CRISIS_DATA||{}); }catch(e){console.warn("已下架·危机雷达渲染失败",e);}

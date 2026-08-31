@@ -178,14 +178,10 @@ def pick_latest_plan(df):
     else:
         progress = "预案"
     return {
-        "plan_date": (impl.isoformat() if impl else (latest["rep"] or "")),
-        "announce_date": (impl.isoformat() if impl else ""),
-        "record_date": (latest["record"].isoformat() if latest["record"] else ""),
+        "yield": None,  # 由调用方根据 price 计算
+        "cash_ratio": latest["cash"],
         "ex_date": (ex.isoformat() if ex else ""),
         "progress": progress,
-        "cash_ratio": latest["cash"],
-        "report_period": (latest["rep"] or ""),
-        "type": (latest["type"] or ""),
         "desc": (latest["desc"] or ""),
     }
 
@@ -243,12 +239,9 @@ def main():
             try:
                 plan["yield"] = round((plan["cash_ratio"] / 10.0) / float(price), 10)
             except Exception:
-                plan["yield"] = div.get("yield")
+                plan["yield"] = div.get("yield") or None
         else:
-            plan["yield"] = div.get("yield")
-        for k in ("eps", "bvps", "cap_reserve", "undist_profit", "net_profit_yoy", "total_share_yi"):
-            if k in div:
-                plan[k] = div[k]
+            plan["yield"] = div.get("yield") or None
         if dry:
             print(f"[dry] {c8} -> {plan['plan_date']} 10派{plan['cash_ratio']} {plan['progress']}")
             updated += 1

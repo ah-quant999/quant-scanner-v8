@@ -261,23 +261,15 @@ def _fmt_dividend_plan(r):
 
 
 def merge_dividend(quote_data):
-    """合并 akshare stock_fhps_em() 全市场分红配送 → 每股股息率/EPS/BVPS/分红状态。
+    """合并 akshare stock_fhps_em() 全市场分红配送 → 精简字段。
 
     数据源：东方财富 stock_fhps_em（最新一期分红预案/实施情况，约 5.5 秒抓 3855 只）。
+    2026-08-31 轻量化：只保留前端/下游实际使用的 5 个字段（其余 9 字段零引用，占 ~900 KB）。
     字段映射到 STOCK_QUOTE.stocks[code].dividend = {
       yield: 0.0244 (2.44%),
       cash_ratio: 9.8974 (%),
-      eps: 3.27,
-      bvps: 18.57,
-      cap_reserve: 9.57,
-      undist_profit: 8.68,
-      net_profit_yoy: 0.0900,
-      total_share: 29.12 (亿),
-      plan_date: '2024-03-19',
-      record_date: '2024-06-25',
       ex_date: '2024-06-26',
       progress: '实施分配',
-      announce_date: '2024-06-20',
       desc: '10派4.2元' or '10送2转3派4.2元',
     }
     """
@@ -318,17 +310,8 @@ def merge_dividend(quote_data):
             quote_data[code8]['dividend'] = {
                 'yield': _f(r.get('现金分红-股息率')),     # 0.0244 = 2.44%
                 'cash_ratio': _f(r.get('现金分红-现金分红比例')),  # 9.8974%
-                'eps': _f(r.get('每股收益')),
-                'bvps': _f(r.get('每股净资产')),
-                'cap_reserve': _f(r.get('每股公积金')),
-                'undist_profit': _f(r.get('每股未分配利润')),
-                'net_profit_yoy': _f(r.get('净利润同比增长')),
-                'total_share_yi': _f(r.get('总股本')) / 1e8 if _f(r.get('总股本')) else None,  # 转为亿
-                'plan_date': _s(r.get('预案公告日')),
-                'record_date': _s(r.get('股权登记日')),
                 'ex_date': _s(r.get('除权除息日')),
                 'progress': _s(r.get('方案进度')),
-                'announce_date': _s(r.get('最新公告日期')),
                 'desc': desc,
             }
             merged += 1
