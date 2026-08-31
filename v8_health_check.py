@@ -118,7 +118,7 @@ CARD_DEFS = [
     # · AVG_PRICE_DATA  ← data/AVG_PRICE_DATA.js  注入 window.AVG_PRICE_DATA（通达信880003 平均股价）
     {"id": "DELISTED", "name": "已下架股票目录", "page": "运维", "freq": "手动+港交所公告", "max_age": 10080, "key_fields": ["total", "recent"], "_window_var": "DELISTED_STOCKS", "heal_cat": "algo_run", "manual_dep": True, "manual_note": "由 scripts/build_delisted.py 从 raw_data/delisted_stocks.json 手动生成（一周一次；港股下架名单相对静态）"},
     {"id": "UNLISTED_PANEL", "name": "暂未上架模块索引", "page": "运维", "freq": "手动策划", "max_age": 10080, "key_fields": ["modules", "meta"], "_window_var": "UNLISTED_PANEL", "heal_cat": "algo_run", "manual_dep": True, "manual_note": "由 scripts/build_unlisted_panel.py 手动生成（AI 策划实验模块去向，主人推送）"},
-    {"id": "AVG_PRICE_DATA", "name": "平均股价（880003）", "page": "实时数据", "freq": "每日盘后", "max_age": 1440, "key_fields": ["avg_price", "ma20", "ma60", "position_vs_ma20", "position_vs_ma60"], "heal_cat": "algo_run"},
+    {"id": "AVG_PRICE_DATA", "name": "平均股价（880003）", "page": "盘后数据", "freq": "每日盘后", "max_age": 1440, "key_fields": ["avg_price", "ma20", "ma60", "position_vs_ma20", "position_vs_ma60"], "heal_cat": "algo_run"},
 ]
 
 
@@ -1112,6 +1112,20 @@ def adjust_max_age(def_max, page=None):
     is_weekend = weekday >= 5
     is_trade_day = weekday < 5
 
+    # 🛡 2026-08-31 一劳永逸：运维/静态卡（防误删清单/已下架/暂未上架，manual_dep）
+    #   此前落到底部「未分类」分支，交易时段被 min(def_max,45) 夹紧到 45min →
+    #   数据明明是今晨/昨日生成（age 数小时~1天）却被误判 stale → manual_dep 降级成 WARN 满屏。
+    #   这些卡本就用自身 max_age（10080=7天），直接返回 def_max，不被盘中 45min 收紧误伤。
+    if page == "运维":
+        return def_max
+    if page == "全量数据":
+        # 全量数据多为盘后算法链产物，按盘后/选股同口径日历感知（避免交易时段被 45min 夹紧误伤）
+        close = last_trade_day_close(n)
+        hours_since_close = (n - close).total_seconds() / 3600
+        if hours_since_close < 8:
+            return min(def_max, 360)
+        return int(hours_since_close * 60) + 180
+
     # ── 通用收紧：交易时段内实时数据必须很新 ──
     if page == "实时数据":
         if is_trade_day and ((9.5 <= h <= 11.5) or (13.0 <= h <= 15.0)):
@@ -1214,6 +1228,19 @@ def _hard_cap_for_owner_rule(n=None, page=None):
             # 盘前窗口（08:00-09:00）：6h — premarket 8:25 必跑，留 6h 兜底隔夜漏抓
             if 8.0 <= h < 9.0:
                 return 360
+        # 🛡 2026-08-31 一劳永逸：盘后数据/选股策略/全量数据 由收盘后算法链(交易日~19:15)产出，
+        #   仅交易日更新一次。周一早盘距最近交易日收盘可达 60h+，但那是「最新可用」数据，
+        #   不应按 24h 红线判 fail（与 adjust_max_age 盘后/选股分支同口径）。
+        #   阈值 = 距最近收盘分钟数 + 3h 缓冲；仍不低于 24h 底线；真实多日不更新仍会超阈值告警。
+        if page in ("盘后数据", "选股策略", "全量数据"):
+            close = last_trade_day_close(n)
+            cap = int((n - close).total_seconds() / 60) + 180
+            return max(24 * 60, cap)
+        # 🛡 2026-08-31 一劳永逸：运维/静态卡（防误删清单/已下架/暂未上架）主人按周更新，
+        #   24h 红线不适用；用 7 天红线（与 CARD_DEFS max_age=10080 对齐），
+        #   避免「昨日生成的数据」被 24h 红线误判 stale → manual_dep 降级成 WARN 满屏。
+        if page == "运维":
+            return 7 * 24 * 60
         # 其他 page 或夜间：24h — 数据合理停滞（非实时数据由 adjust_max_age 自适应）
         return 24 * 60
     # 非交易日：T+1 18:30 - 上次收盘（自适应长假/连休）

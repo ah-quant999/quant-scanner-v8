@@ -81,7 +81,6 @@ VAR_TO_RAW = {
     "CANDIDATE_QUOTES": "candidate_quotes.json",
     "SH_SZ_HISTORY": "sh_sz_history.json",
     "MARKET_ALERTS": "market_alerts.json",
-    "AVG_PRICE_DATA": "avg_price_data.json",
     "OVERSEAS_MARKETS": "overseas_markets.json",
     "RESTRICTED_RELEASE": "restricted_release.json",
     "PERFORMANCE_FORECAST": "performance_forecast.json",
@@ -3374,6 +3373,12 @@ def main(category=None, only=None):
         改为复用与资金流同源的 em_clist（_IND_FS，已验证云端可用）。
         2026-08-11 修复：em_clist 用 fid=f3 排序时硬截 100 条（涨跌幅 TOP 100），
         改用 fid=f12（代码）+ pn 分页遍历全市场 5293 只，阈值 1000→3000 适配全 A 样本量。"""
+        # 🛡 2026-08-31 一劳永逸：AVG_PRICE 改由 standalone scripts/fetch_avg_price.py
+        #   （通达信 880003 真指数，可拉 120 天真实历史）独占写入 raw_data/avg_price_data.json。
+        #   本函数只能逐日累积 1 条全A等权近似，会抹掉 880003 的真实 MA 历史 →
+        #   position_vs_ma20/ma60 恒为 null、卡片假水位。自 2026-08-31 起彻底停用，
+        #   绝不写 avg_price_data.json（即便被某种路径误调用也安全返回，不覆盖）。
+        return {}
         try:
             fields = "f12,f14,f2,f3"
             by_code = {}
