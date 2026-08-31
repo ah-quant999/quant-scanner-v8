@@ -2218,7 +2218,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
   <!-- ============ 选股策略 ============ -->
   <section id="sec-st">
-    <div class="sec-head"><h2>🎯 选股策略</h2><span class="tag">三重共识（主入口） · 相对强度(RPS) · 逆势龙头(CRDS)</span></div>
+    <div class="sec-head" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <h2 style="margin:0;">🎯 选股策略</h2>
+      <span class="tag">三重共识（主入口） · 相对强度(RPS) · 逆势龙头(CRDS)</span>
+      <!-- 2026-08-31 主人令：选股策略卡名后跟状态胶囊（最后更新 / 各算法就绪状态）。
+           数据源：window.FINAL_RECOMMEND_DATA / TRIPLE_CONSENSUS / RPS_DATA / CRDS_CARD_DATA / STOCK_RPS
+           写入空 div#stHeaderStatus，由 initPostMarket 后单独调用 window._renderStHeaderStatus() 填充。 -->
+      <span id="stHeaderStatus" style="display:inline-flex;align-items:center;gap:6px;"></span>
+    </div>
     <!-- 建议持有期纪律 banner 已于 2026-08-30 移至逻辑详解页「选股策略·持有期纪律」段，此处不再展示（避免客户可看区域堆文字） -->
     <!-- TAB 按钮行（横排，独立于内容区） -->
     <div class="st-tabs">
@@ -2244,7 +2251,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- ===== TAB 页面：三重共识 ===== -->
     <div id="st-tc" class="st-pane">
       <div class="card">
-        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🥇</span>严格三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span> <span style="font-size:11px;color:var(--sub);font-weight:400">最严</span> <span style="color:var(--dim);font-weight:400">- 盘后 ·</span> <span class="fresh" id="tcTime">—</span> <span id="tcRunBadge" style="display:none;margin-left:0;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);vertical-align:middle">✅ 今日已跑完</span> <span id="tcEnteredBadge" style="display:none;vertical-align:middle;"></span></h3>
+        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🥇</span>严格三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span> <span style="font-size:11px;color:var(--sub);font-weight:400">最严</span> <span style="color:var(--dim);font-weight:400">- 盘后 ·</span> <span class="fresh" id="tcTime">—</span> <!-- 2026-08-31 主人令：统一胶囊版式（绿色 ✅ 与 finalStatusBadges 一致）。renderTc 时 _tcRun.textContent = _tcInfo.label 会覆盖本默认文本 --><span id="tcRunBadge" style="display:none;margin-left:0;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);vertical-align:middle;white-space:nowrap;align-items:center;gap:4px;">✅ 已就绪</span> <span id="tcEnteredBadge" style="display:none;vertical-align:middle;"></span></h3>
         <div id="tcConsensus" class="tp-stocklist"></div>
         <div class="note">筛选：主站TOP10≥70 且 驾驶舱A档 且 基本面A档。下方「优先/扩展观察」为差1步/差2步备选（主站评分≥75）。</div>
       </div>
@@ -2312,7 +2319,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           📊 <span style="font-weight:700;font-size:14px;color:var(--txt);">CRDS · 逆势龙头</span>
           <span style="margin-left:6px;font-size:10px;color:#94a3b8;font-weight:500;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用</span>
           <span id="stcrdsTime"><span class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;"><span aria-hidden="true">🐻</span><span style="margin-left:4px">更新于</span><span style="color:#9fd0ff;font-weight:600;margin-left:4px">已加载</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">盘后</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">短线</span></span></span>
-          <span id="stcrdsRunBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);vertical-align:middle">✅ 今日已跑完</span>
+          <!-- 2026-08-31 主人令：统一胶囊版式（绿色 ✅ 与 finalStatusBadges 一致）。JS 会 textContent 覆盖 --><span id="stcrdsRunBadge" style="display:none;margin-left:6px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);vertical-align:middle;align-items:center;gap:4px;white-space:nowrap;">✅ 已就绪</span>
           <span id="stcrdsHoldBadge" style="display:none;margin-left:6px;vertical-align:middle;"></span>
         </div>
         <div id="stcrdsCoverage" style="font-size:11px;color:var(--dim);margin-bottom:8px;line-height:1.6;"></div>
@@ -4461,7 +4468,11 @@ function switchSec(sec,el){
   // 盘后数据 / 选股策略：首次切换时懒加载渲染（避免 display:none 下 0 尺寸）
   if(sec==='ph' && typeof window._renderSecPh==='function') setTimeout(window._renderSecPh,80);
   // 选股策略页：渲染入口改为 window.switchSt('pool')（2026-08-30 主人令：选股池为默认首 tab）
-  if(sec==='st' && typeof window.switchSt==='function') setTimeout(function(){ try{ window.switchSt('pool'); }catch(e){} },80);
+  // 2026-08-31 主人令：进入时填充「卡名后状态胶囊」——汇总 TRIPLE_CONSENSUS / FINAL_RECOMMEND_DATA / STOCK_RPS / CRDS_CARD_DATA 等的更新态
+  if(sec==='st' && typeof window.switchSt==='function') setTimeout(function(){
+    try{ window.switchSt('pool'); }catch(e){}
+    try{ if(typeof window._renderStHeaderStatus==='function') window._renderStHeaderStatus(); }catch(e){}
+  },80);
   // 最终推荐：进入时渲染 Top3 + 今日可入手候选
   if(sec==='final' && typeof window.__renderFinalSec==='function') setTimeout(window.__renderFinalSec,60);
   // 个股查询：静态交互，无需渲染；切换时隐藏下拉
@@ -6181,14 +6192,9 @@ window.__renderV8CalFull();
     let h1='';
     h1+='<div class="sf-net-big"><span class="n" style="color:'+netColor+'">'+(net>0?'+':'')+net.toFixed(1)+'</span><span class="u" style="color:'+netColor+'">亿</span><span class="lbl" title="按申万一级行业 31 个口径：流入 '+totalIn.toFixed(1)+'亿 - 流出 '+totalOut.toFixed(1)+'亿（剔除二/三级子板块，避免与一级重复计入）">净额(行业·SW1)</span></div>';
 
-    const hugBlocks=si.filter(s=>(!s.type||s.type!=='概念')&&s.net>=10).slice(0,3);
-    if(hugBlocks.length>0){
-      h1+='<div class="sf-line"><b style="color:var(--purple)">🔥 当前抱团：</b>'+hugBlocks.map(s=>s.name+' <b style="color:var(--up)">+'+s.net.toFixed(1)+'亿</b>'+((s.consecutive_days||0)>1?' <span style="color:#ff9800;font-size:12px">连'+s.consecutive_days+'</span>':'')).join(' · ')+'</div>';
-    }
-    const cTop=si.filter(s=>s.type==='概念').slice(0,5);
-    if(cTop.length>0){
-      h1+='<div class="sf-line"><b style="color:var(--cyan)">🚀 概念接力：</b>'+cTop.map(s=>s.name+' <b style="color:var(--up)">+'+s.net.toFixed(1)+'亿</b>'+((s.consecutive_days||0)>1?' <span style="color:#ff9800;font-size:12px">连'+s.consecutive_days+'</span>':'')).join(' / ')+'</div>';
-    }
+    // 2026-08-31 一劳永逸：Block 1「盘中追热」只保留「净额(行业·SW1) + 📊 行业流入 top5」。
+    //   删除 🔥当前抱团 / 🚀概念接力（与下方 Block 2「收盘复盘」的 🔥抱团 / 🚀接力 重复）。
+    //   Block 1 强调盘中唯一的行业净额视角，Block 2 强调收盘后的多空对照；分工明确无冗余。
     const iTop=si.filter(s=>!s.type||s.type!=='概念').slice(0,5);
     if(iTop.length>0){
       h1+='<div class="sf-line"><b style="color:#fb923c">📊 行业流入：</b>'+iTop.map(s=>s.name+' <b style="color:var(--up)">+'+s.net.toFixed(1)+'亿</b>'+((s.consecutive_days||0)>1?' <span style="color:#ff9800;font-size:12px">连'+s.consecutive_days+'</span>':'')).join(' / ')+'</div>';
@@ -6225,12 +6231,13 @@ window.__renderV8CalFull();
       h2+='<div class="sf-caution"><b>⚠️ 谨慎：</b>'+caut.map(s=>s.name+' <b style="color:var(--down)">'+s.net.toFixed(1)+'亿</b>').join(' · ')+'</div>';
     }
     if(so.length>0 || si.length>0){
-      h2+='<div style="font-weight:700;color:var(--purple);margin:8px 0 5px;font-size:14px">📊 轮动路线</div>';
-      h2+='<table class="sf-rotate-table"><tr><td style="width:38%;font-size:13px">流出</td><td style="width:22%;font-size:13px">性质</td><td style="font-size:13px">→ 流入</td></tr>';
+      // 2026-08-31 一劳永逸：轮动路线表从 5 行精简到 3 行（主人截图反馈「太长」），列宽锁死 38/22/40
+      //   字符溢出 ellipsis；性质列只在新进/撤离/持续出/轮动 4 标签，不出现「数字」
+      h2+='<div style="font-weight:700;color:var(--purple);margin:8px 0 5px;font-size:14px">📊 轮动路线（TOP3）</div>';
+      h2+='<table class="sf-rotate-table"><tr><td style="width:38%;font-size:13px">流出</td><td style="width:22%;font-size:13px">性质</td><td style="width:40%;font-size:13px">→ 流入</td></tr>';
       const trueOut2=so.filter(s=>(s.consecutive_days||0)>=2||(s.net_5d||0)<0);
       const rotOut2=so.filter(s=>(s.consecutive_days||0)<2&&(s.net_5d||0)>0);
-      const maxR=Math.max(so.length, si.length);
-      for(let r=0;r<Math.min(maxR,5);r++){
+      for(let r=0;r<Math.min(Math.max(so.length, si.length),3);r++){
         let oc='',ic='',nc='';
         if(r<so.length){
           const o=so[r];
@@ -6239,7 +6246,7 @@ window.__renderV8CalFull();
           else if(rotOut2.some(x=>x.name===o.name)){nc='<span style="color:var(--gold)">轮动</span>';}
         }
         if(r<si.length){const s=si[r]; ic='→ <span style="color:var(--up);font-weight:500">'+s.name+'</span> <span style="color:var(--up)">+'+s.net.toFixed(1)+'亿</span>';}
-        h2+='<tr><td>'+oc+'</td><td>'+nc+'</td><td>'+ic+'</td></tr>';
+        h2+='<tr><td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+oc+'</td><td>'+nc+'</td><td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+ic+'</td></tr>';
       }
       h2+='</table>';
     }
@@ -6300,10 +6307,13 @@ window.__renderV8CalFull();
         if(prev && prev !== r.phase) _transitions[r.name] = {from: prev, to: r.phase};
       });
 
-      // ── 今日阶段迁移（只显示当天有变化的板块）──
-      if (!_prevSnap && _prevSkippedByRule) {
-        h3 += '<div style="margin-bottom:12px;padding:10px 14px;background:rgba(148,163,184,.06);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--sub);line-height:1.6;">🔁 今日阶段迁移：阶段判定规则已于 2026-08-31 升级为 <b>v2</b>（修复退潮/底部结构性恒空），历史快照为 v1 规则，跨规则对比会产生伪迁移，故本日暂不展示迁移。<b>次日盘后</b>产生 v2 快照后自动恢复。</div>';
-      }
+      // 2026-08-31 主人令：删除 v1→v2 升级过渡通知块（已无意义——升级至今已 > 7 天，下次云端盘后即出 v2 快照自动齐备）
+      //   若历史快照均无 v2，迁移区直接空 0 渲染，不写「升级中」噪音。
+      // 原代码：
+      //   if (!_prevSnap && _prevSkippedByRule) {
+      //     h3 += '<div ...>🔁 今日阶段迁移：阶段判定规则已于 2026-08-31 升级为 v2 ...</div>';
+      //   }
+      // 保留迁移分布，与 v1 状态下行为一致：_prevSnap 没找到就不显示迁移。
       if (_prevSnap && Object.keys(_prevMap).length) {
         var _phaseEmoji = {'主升':'🚀','启动':'📈','震荡':'➡️','退潮':'📉','底部':'⛏️'};
         var _phaseColor = {'主升':'#ef4444','启动':'#f59e0b','震荡':'#94a3b8','退潮':'var(--down)','底部':'#38bdf8'};
@@ -6379,13 +6389,17 @@ window.__renderV8CalFull();
         h3 += '<div style="font-size:13px;font-weight:700;color:'+meta.color+';">'+meta.emoji+p+' · '+list.length+' 个板块</div>';
         h3 += '<span class="sc-phase-close" style="font-size:12px;color:var(--dim);cursor:pointer;">收起 ▲</span>';
         h3 += '</div>';
+        // 2026-08-31 一劳永逸：阶段明细胶囊 grid 改 minmax(180px, 1fr) — 主人令「一行 5-6 列，每胶囊数字看清」。
+      //   卡片宽 ~1480px 时正好 6 列；1200px 时 5 列；820px 时 4 列（不再挤到 8 列）。
+      //   同时每个胶囊内部：板块名(占 56%) + d5 5日%(22%，红涨绿跌) + d20 20日%(22%，浅色基准)。
+      //   三段 min-width:0 + ellipsis，防止名字过长挤压数字。
         if(list.length){
-          h3 += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;">';
+          h3 += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:7px;">';
           list.forEach(function(s){
-            h3 += '<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:4px;background:var(--bg2);border-left:2px solid '+s.color+';font-size:12px;">';
-            h3 += '<span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="'+s.name+'">'+s.name+'</span>';
-            h3 += '<span style="color:'+(s.d5>=0?'var(--up)':'var(--down)')+';font-weight:600;">'+(s.d5>=0?'+':'')+s.d5.toFixed(1)+'%</span>';
-            h3 += '<span style="color:var(--sub);">'+s.d20.toFixed(1)+'%</span>';
+            h3 += '<div style="display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:5px;background:var(--bg2);border-left:3px solid '+s.color+';font-size:12.5px;min-width:0;">';
+            h3 += '<span style="flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt);" title="'+s.name+'">'+s.name+'</span>';
+            h3 += '<span style="flex:0 0 auto;min-width:42px;text-align:right;color:'+(s.d5>=0?'var(--up)':'var(--down)')+';font-weight:700;font-size:12.5px;white-space:nowrap;">'+(s.d5>=0?'+':'')+s.d5.toFixed(1)+'%</span>';
+            h3 += '<span style="flex:0 0 auto;min-width:42px;text-align:right;color:var(--sub);font-weight:500;font-size:12px;white-space:nowrap;">'+s.d20.toFixed(1)+'%</span>';
             h3 += '</div>';
           });
           h3 += '</div>';
@@ -8605,11 +8619,49 @@ window.showRestrictedItems = showRestrictedItems;
       todayStr=new Date().toISOString().slice(0,10);
     }
     const stats=d.stats||{};
+    // 2026-08-31 主人令：胶囊数字加「家」后缀，并新增「解禁总金额」——汇总 7/30/60/90 天窗口内
+    //   所有 item.amount（形如「999.32亿」「123.45亿」）的数字部分并保留 1 位小数，避免被「7 天就 999 亿」吓到
+    function _parseAmt(s){
+      if(typeof s!=='string') return null;
+      var m=s.match(/([\d.]+)/);
+      return m?Number(m[1]):null;
+    }
+    // 排除今日及之前的，过滤每个时间窗内的金额合计
+    var _futureItems=d.items.filter(function(it){
+      return String(it.date) > todayStr;
+    });
+    function _sumAmt(days){
+      var sum=0, any=false;
+      _futureItems.forEach(function(it){
+        if(_dateDiffDays(it.date, todayStr) <= days){
+          var a=_parseAmt(it.amount);
+          if(a!=null && !isNaN(a)){ sum+=a; any=true; }
+        }
+      });
+      return any ? sum : null;
+    }
+    var _amt7=_sumAmt(7), _amt30=_sumAmt(30), _amt60=_sumAmt(60), _amt90=_sumAmt(90);
+    function _fmtAmt(v){
+      if(v==null) return '—';
+      if(v>=10000) return (v/10000).toFixed(2)+'万亿';
+      return v.toFixed(1)+'亿';
+    }
+    function _amtPill(days, key, amt){
+      return `<div onclick="showRestrictedItems('${key}')" style="cursor:pointer;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:7px 9px;display:flex;flex-direction:column;gap:3px;overflow:hidden;min-width:0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:11px;color:var(--sub);">${days}天内</span>
+          <span style="font-size:16px;font-weight:800;color:var(--txt);">${stats[key]||0}<span style="font-size:11px;color:var(--dim);font-weight:500;margin-left:2px;">家</span></span>
+        </div>
+        <div style="font-size:11px;color:#fb923c;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+          💰 ${_fmtAmt(amt)}
+        </div>
+      </div>`;
+    }
     let h='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;">';
-    h+=`<div onclick="showRestrictedItems('d7')" style="cursor:pointer;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">7天内</span><span style="font-size:18px;font-weight:800;color:var(--txt);">${stats.d7||0}</span></div>`;
-    h+=`<div onclick="showRestrictedItems('d30')" style="cursor:pointer;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">30天内</span><span style="font-size:18px;font-weight:800;color:var(--txt);">${stats.d30||0}</span></div>`;
-    h+=`<div onclick="showRestrictedItems('d60')" style="cursor:pointer;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">60天内</span><span style="font-size:18px;font-weight:800;color:var(--txt);">${typeof stats.d60==='number'?stats.d60:'—'}</span></div>`;
-    h+=`<div onclick="showRestrictedItems('d90')" style="cursor:pointer;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">90天内</span><span style="font-size:18px;font-weight:800;color:var(--txt);">${stats.d90||0}</span></div>`;
+    h+=_amtPill(7, 'd7', _amt7);
+    h+=_amtPill(30, 'd30', _amt30);
+    h+=_amtPill(60, 'd60', _amt60);
+    h+=_amtPill(90, 'd90', _amt90);
     h+='</div>';
     h+='<div id="restrictedCalendarTable" style="display:none;"></div>';
     $b.innerHTML=h;
@@ -8924,6 +8976,55 @@ window.showRestrictedItems = showRestrictedItems;
     renderStTab(n);
     // 2026-08-29 主人令：选股池子页渲染
     if(n==='pool' && typeof window.renderStPool==='function') setTimeout(window.renderStPool, 30);
+  };
+  // 2026-08-31 主人令：选股策略「卡名后状态胶囊」——汇总 4 大算法的最新 update_time 与就绪状态，
+  //   每个模块都打一个紧凑 _uBadge 风格小胶囊（最近一次盘后基准、主入口/副入口差异化）。
+  //   设计：
+  //     1. "更新时间" 总 pill（取最旧的算法 update_time，避免给"还差一个"的假绿色）
+  //     2. 就绪状态 pill（4 状态全到位 → 绿色 / 否则金色)
+  window._renderStHeaderStatus = function(){
+    var host = document.getElementById('stHeaderStatus');
+    if(!host) return;
+    function _ut(o){ return (o && (o.update_time || o.generated || o.generated_at)) || ''; }
+    function _rel(s){ return (s && window._fmtAshareRel) ? window._fmtAshareRel(s) : (s || '—'); }
+    var modules = [
+      { key:'三重共识', v: window.TRIPLE_CONSENSUS, fallback: window.FINAL_RECOMMEND_DATA, color:'#fbbf24' },
+      { key:'观池候选', v: window.CANDIDATE, color:'#38bdf8' },
+      { key:'相对强度', v: window.RPS_DATA || window.STOCK_RPS, color:'#a78bfa' },
+      { key:'逆势龙头', v: window.CRDS_CARD_DATA, color:'#f59e0b' }
+    ];
+    // 主入口"三重共识"若 FINAL_RECOMMEND_DATA 仍最旧，则用之；否则取 TRIPLE_CONSENSUS
+    var allTs = modules.map(function(m){
+      var t = _ut(m.v);
+      if(!t && m.fallback) t = _ut(m.fallback);
+      return t ? Date.parse(String(t).replace(' ','T').replace(/\..*$/,'')) : 0;
+    }).filter(function(t){return t>0;});
+    var oldestTs = allTs.length ? Math.min.apply(null, allTs) : 0;
+    var oldestIso = oldestTs ? new Date(oldestTs).toISOString().slice(0,19).replace('T',' ') : '—';
+    // 已就绪状态：4 模块都非空 且 时间距今 < 36h（盘后算法允许的窗口）
+    var _now = Date.now();
+    var allFresh = modules.every(function(m){ var ts = _ut(m.v) || _ut(m.fallback||{}); if(!ts) return false; var d = Date.parse(String(ts).replace(' ','T')); return d && (_now - d) < 36*3600*1000; });
+    var statusBg = allFresh ? 'rgba(34,197,94,.12)' : 'rgba(245,158,11,.12)';
+    var statusBdr = allFresh ? 'rgba(34,197,94,.3)' : 'rgba(245,158,11,.3)';
+    var statusCol = allFresh ? '#22c55e' : '#f59e0b';
+    var statusTxt = allFresh ? '✅ 四模块就绪' : '⏳ 部分未到位';
+    var html = '';
+    html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:'+statusBg+';color:'+statusCol+';border:1px solid '+statusBdr+';white-space:nowrap;">' + statusTxt + '</span>';
+    html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);white-space:nowrap;">🕒 卡名状态更新于 ' + _rel(oldestIso) + '</span>';
+    // 4 个模块 quick-check pill（小芯片列表）
+    modules.forEach(function(m){
+      var ts = _ut(m.v) || _ut(m.fallback||{});
+      var ok = false;
+      if(ts){
+        var d = Date.parse(String(ts).replace(' ','T'));
+        ok = d && (_now - d) < 36*3600*1000;
+      }
+      var bg = ok ? 'rgba(56,189,248,.10)' : 'rgba(239,83,80,.10)';
+      var bd = ok ? 'rgba(56,189,248,.3)' : 'rgba(239,83,80,.3)';
+      var co = ok ? '#38bdf8' : '#ef5350';
+      html += '<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:6px;font-size:10.5px;font-weight:600;background:'+bg+';color:'+co+';border:1px solid '+bd+';white-space:nowrap;">' + (ok?'✓':'✗') + ' ' + m.key + '</span>';
+    });
+    host.innerHTML = html;
   };
   // 2026-08-29 主人令：选股池子页渲染；2026-08-30 主人令：来源分布行点击展开个股明细（默认折叠）
   function renderStPool(){
@@ -10051,24 +10152,32 @@ h+='</div>';  // /ulPaneDbg
     // ── 📊 两套算法回测横向对比（2026-08-23 主人令：同一口径比胜率+收益率）──
     //   2026-08-27 主人令修正：本卡依赖 H反推 + 动量共识(强势突破) 双卡盘后数据齐备后才应出数据
     //   守卫逻辑：检查双卡 generated 时间是否均为当日盘后（≥15:00），否则显示"等待"而非中午就出
+    // 2026-08-31 一劳永逸：移除 15:00 硬门限（H_AUTO_BUY 凌晨 03:03 也会被看门狗重抓，
+    //   直接卡死「等待盘后」永远过不去；主人截图：双卡都出数据，对比卡仍显示等待）。
+    //   新口径：H反推 + 强势突破 双算法只要在 _cmp.algorithms 里都有摘要即可展示——
+    //   即使 H_AUTO_BUY.MOMENTUM_FILTER 是凌晨生成，由于 summary.horizons 已含 T+1/T+3/...
+    //   真实回测快照，对比就有意义；如有一方缺失则提示「单边已出，等另一边」。
     var _cmp = window.ALGO_BACKTEST_COMPARE;
     var _habTime = (window.H_AUTO_BUY && window.H_AUTO_BUY.generated_at) ? String(window.H_AUTO_BUY.generated_at) : '';
     var _mfTime = (window.MOMENTUM_FILTER && window.MOMENTUM_FILTER.generated) ? String(window.MOMENTUM_FILTER.generated) : '';
-    // 提取 HH:mm 部分做数值比较
-    function _extractHM(ts){ if(!ts) return -1; var m=ts.match(/(\d{1,2}):(\d{2})/); return m?parseInt(m[1])*60+parseInt(m[2]):-1; }
-    var _habHM = _extractHM(_habTime), _mfHM = _extractHM(_mfTime);
-    // 盘后阈值：15:00 = 900 分钟。双卡都 ≥ 15:00 才算盘后齐备
-    var _bothPostMarket = (_habHM >= 900 && _mfHM >= 900);
+    var _haAlg = !!(window.H_AUTO_BUY && window.H_AUTO_BUY.algorithm_data && (window.H_AUTO_BUY.algorithm_data.t1 || window.H_AUTO_BUY.algorithm_data.n_stocks));
+    var _mfAlg = !!(window.MOMENTUM_FILTER && (window.MOMENTUM_FILTER.total || (window.MOMENTUM_FILTER.s1 && window.MOMENTUM_FILTER.s1.count)));
+    var _haInCmp = !!(window.ALGO_BACKTEST_COMPARE && window.ALGO_BACKTEST_COMPARE.algorithms && window.ALGO_BACKTEST_COMPARE.algorithms.h_reverse);
+    var _sbInCmp = !!(window.ALGO_BACKTEST_COMPARE && window.ALGO_BACKTEST_COMPARE.algorithms && window.ALGO_BACKTEST_COMPARE.algorithms.strong_breakout);
+    var _bothReady = _haInCmp && _sbInCmp;
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">';
     h+='<h3 style="font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">📊</span>两套算法回测对比 <span style="font-size:10px;color:#94a3b8;font-weight:400">H反推 vs 强势突破 · 同一口径</span>';
     h+=_uBadge('盘后','对比',_cmp?_cmp.generated:null)+'</h3>';
     if(!_cmp || !_cmp.algorithms){
       h+='<div class="note">对比数据未生成（由 algo_backtest_compare.py 在构建末尾产出）</div>';
-    } else if(!_bothPostMarket){
-      // 盘前/盘中：双卡数据未齐备，不渲染对比表
+    } else if(!_bothReady){
+      // 2026-08-31：部分缺失时给出明确状态（H反推 ✓ / 强势突破 ⏳ 或反向），
+      //   不再用「等待盘后 15:00」这种假信号；显示每卡各自生成时间，方便主人判断是否需手动重抓。
+      var _haOk=_haInCmp?'✅':'⏳';
+      var _sbOk=_sbInCmp?'✅':'⏳';
       h+='<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:7px;padding:10px 12px;font-size:12.5px;line-height:1.7;color:var(--sub);">';
-      h+='⏳ <b>等待盘后双卡数据齐备</b>：本卡需「H 反推短线买点」+「动量共识筛选」均更新后方可展示有效对比。<br>';
-      h+='当前状态：H反推 <b>'+(_habTime||'—')+'</b> · 动量共识 <b>'+(_mfTime||'—')+'</b> · 通常 19:15 后自动齐备。</div>';
+      h+=(_bothReady?'📊 ':'⏳ ')+'<b>'+(_bothReady?'双卡已出':'单边已出，等另一边')+'</b>：本卡需「H 反推短线买点」+「动量共识筛选」均存在才能展示有效对比。<br>';
+      h+='当前状态：H 反推 '+_haOk+(_habTime||'—')+' · 强势突破 '+_sbOk+(_mfTime||'—')+'。通常 19:15 后自动齐备，如长时间未更新可手动触发 <code>algo_backtest_compare.py</code>。</div>';
     } else {
       var _ha=_cmp.algorithms.h_reverse, _sb=_cmp.algorithms.strong_breakout;
       var _hz=[['t1','T+1'],['t3','T+3'],['t5','T+5'],['t10','T+10']];
@@ -11480,7 +11589,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
           🔥 <span style="font-weight:700;font-size:14px;color:var(--txt);">四量终极</span>
           <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span>
           <span id="stfvTime"><span class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;"><span aria-hidden="true">🐻</span><span style="margin-left:4px">更新于</span><span style="color:#9fd0ff;font-weight:600;margin-left:4px">已加载</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">盘后</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">短线</span></span></span>
-          <span id="stfvRunBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">✅ 今日已跑完</span>
+          <!-- 2026-08-31 主人令：统一胶囊版式（绿色 ✅ 与 finalStatusBadges 一致）。JS 会 textContent 覆盖 --><span id="stfvRunBadge" style="display:none;margin-left:6px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);align-items:center;gap:4px;white-space:nowrap;">✅ 已就绪</span>
           <span id="stfvHoldBadge" style="display:none;margin-left:6px;"></span>
         </div>
         <div id="stfvNote" style="font-size:11px;color:var(--dim);margin-bottom:10px;line-height:1.6;"></div>
