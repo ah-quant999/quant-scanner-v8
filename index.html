@@ -4230,6 +4230,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <!-- ✅ 2026-08-29 一劳永逸：v8_self_heal / v8_intraday_healer 已于 commit 1fe4f8c71 删除，改为现存主链 -->
         <!-- ✅ 2026-08-30 主人令：运维面板·自动化任务区 3 个已下线行（v8_intraday_healer / v8_safety_net / v8_self_heal）移除展示（HEAD 已清，触发 CI 重建对齐远端） -->
         <div class="kv"><span class="k">触发方式</span><b>v8_cn_fetch_cloud / v8_algo_cloud / v8_health_patrol / v8_freshness_watch 等 push raw_data 后 workflow_run 自动触发 v8_build_deploy</b></div>
+        <div class="kv"><span class="k">历史归档</span><span><span class="status-dot s-ok"></span>data/archive 已对齐构建部署与周末清理，历史月份持久不丢（2026-08-31 对齐）</span></div>
         <div class="kv"><span class="k">心跳</span><span><span class="status-dot s-ok"></span>正常（每小时巡查）</span></div>
       </div>
       <div class="card">
@@ -4385,6 +4386,22 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div class="logic-p">本卡 = <b>当日新增</b>视角；盘后「业绩预告」卡 = <b>全报告期累计</b>视角（预增 1702 / 预减 616 / 预亏 837 / 不确定 1724 一类全量数）。二者非重复。</div>
         <div class="logic-h">降级规则</div>
         <div class="logic-p">若数据文件尚未带今日字段（云端抓取前），卡片顶部显式标注「下方为全报告期累计，不是今日数」，<b>绝不把累计数冒充今日数</b>。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🗓️</span>重要事件日历 · 月度归档与回看（2026-08-31 对齐）</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">日历默认展示「当月」重要事件；同时保留历史月份归档，支持 ◀▶ 切换回看，避免月初旧月直接消失。</div>
+        <div class="logic-h">执行矩阵（时间 / 任务 / 执行机 / 前端）</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端表现</th></tr>
+          <tr><td>每月首日 08:25（工作日/周末）</td><td>生成新月日历，并归档上月</td><td>云端盘前任务</td><td>默认显示本月；◀ 可切回上月</td></tr>
+          <tr><td>用户点击 ◀</td><td>加载上月归档</td><td>浏览器本地</td><td>显示上月整月日历</td></tr>
+          <tr><td>用户点击 ▶</td><td>回到当前月</td><td>浏览器本地</td><td>显示本月日历</td></tr>
+          <tr><td>每周清理</td><td>历史归档持久保留</td><td>云端清理任务</td><td>归档不丢失</td></tr>
+        </table>
+        <div class="logic-h">一致性说明</div>
+        <div class="logic-p">归档文件随 data 目录一并构建/部署；云端抓取任务生成后自动推仓，周末清理任务只扫顶层 data 文件、不递归子目录，因此归档不会被误删。</div>
       </div>
 
     </div>
@@ -4677,6 +4694,24 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">8/4/5/7/10 四天 stocks 列表回填成功但 <code>seats</code> 全空：① <code>fetch_lhb.py</code> <code>DETAIL_LIMIT=40</code> 覆盖率不足；② <code>stage_to_raw.append_lhb_to_history()</code> 旧逻辑只要 <code>trading=True + stocks&gt;0</code> 就跳过（骨架数据永不重试）。</div>
         <div class="logic-h">修复</div>
         <div class="logic-p">· <code>fetch_lhb.py</code>：<code>DETAIL_LIMIT 40→90</code>（覆盖全天上榜股）。<br>· <code>stage_to_raw.py</code>：新增骨架检测（trading=True + stocks&gt;0 + 全部 seats={}）→ 允许覆盖更新。<br>· <code>index.html</code> <code>renderNorthCalendar()</code>：新增 <code>_isSkeleton</code> 分支渲染「🟡 席位待补」。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🔄</span>共振日历 · 历史数据懒加载对齐（2026-08-31 一劳永逸）</h3>
+        <div class="logic-h">现象</div>
+        <div class="logic-p">页面首次打开时，共振日历只显示 1 天（当日），看似「空了」；等待几秒或切换 tab 后数据才出现。</div>
+        <div class="logic-h">根因</div>
+        <div class="logic-p">历史龙虎榜数据量较大，走 body 末尾延迟注入；页面初始渲染时历史数据尚未就绪。此前重绘只刷新当前 tab，切换后另一 tab 仍是旧状态。</div>
+        <div class="logic-h">执行矩阵（时间 / 任务 / 执行机 / 前端）</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端表现</th></tr>
+          <tr><td>页面 DOM 就绪</td><td>检测到历史数据尚未加载</td><td>浏览器本地</td><td>显示「数据加载中」占位，启动轮询</td></tr>
+          <tr><td>历史数据注入完成</td><td>自动重绘机游共振 + 北向席位双卡</td><td>浏览器本地</td><td>多日日历完整填满</td></tr>
+          <tr><td>用户切换 tab</td><td>双卡状态同步刷新</td><td>浏览器本地</td><td>当前 tab 立即显示完整数据</td></tr>
+          <tr><td>每日盘后 / 周末</td><td>历史数据回填与累积</td><td>云端盘后任务</td><td>次日及以后可查看更完整历史</td></tr>
+        </table>
+        <div class="logic-h">一致性说明</div>
+        <div class="logic-p">该修复不改动数据源生成节奏，只调整前端「数据未到」时的等待/重绘策略；因此云端抓取、构建部署、双机同步均无需新增任务。</div>
       </div>
     </div>
 
@@ -5142,6 +5177,23 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p"><b>v8 独立仓库</b>：中国数据抓取（cn_fetch）→ 推送 raw_data → GitHub Actions 自动触发 build_deploy（workflow_run）→ 构建 data/*.js → 推 main → GitHub Pages 自动发布。小九本机<b>只监督、不手动部署</b>。</div>
         <div class="logic-h">双机状态</div>
         <div class="logic-p"><b>GitHub 云端（ubuntu runner）</b>：执行<b>中国数据抓取 v8_cn_fetch_cloud</b> + 盘后算法链 <b>v8_algo_cloud</b> + 构建/部署/体检/备份/自愈/健康监控；2026-08-05 起主链已全部云端化。<b>小九（单位机 / lemoncat-cn）</b>：仅作为 GitHub self-hosted runner 应急回退（workflow_dispatch），日常不跑 cron 主链；运行云端管线看门狗监督。<b>阿狸咪（家中机）</b>：本地预览用（file:///E:/workspace/stock-scanner/index.html），不上主站、不接部署/救火。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">📦</span>历史归档与双机同步 - 说明（2026-08-31 对齐）</h3>
+        <div class="logic-h">覆盖范围</div>
+        <div class="logic-p">本批新增两类持久化归档：① 重要事件日历历史月份回看；② 共振日历历史数据懒加载回填。二者均不影响原有云端/本机调度。</div>
+        <div class="logic-h">执行矩阵（时间 / 任务 / 执行机 / 前端）</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端/持久化</th></tr>
+          <tr><td>每月首日 08:25</td><td>生成下月日历，归档上月</td><td>云端盘前任务</td><td>data 子目录持久化，随全站构建部署</td></tr>
+          <tr><td>每日盘后 / 周末全量</td><td>龙虎榜历史回填与累积</td><td>云端盘后任务</td><td>历史日历可查看更早日</td></tr>
+          <tr><td>每次构建部署</td><td>data 子目录随 data 目录一并提交</td><td>云端构建部署</td><td>归档文件上线</td></tr>
+          <tr><td>每小时本地同步</td><td>本机从 main 拉取最新 data 子目录</td><td>小九本地同步任务</td><td>本地预览与线上一致</td></tr>
+          <tr><td>每周清理</td><td>只扫描顶层 data 文件，不递归子目录</td><td>云端周末清理</td><td>历史归档不被误删</td></tr>
+        </table>
+        <div class="logic-h">一致性结论</div>
+        <div class="logic-p">无需新建 workflow 或 automation：现有云端抓取、构建部署、本地同步、周末清理已天然覆盖归档文件的生成、推送、拉取与保护。</div>
       </div>
 
       <div class="card">
