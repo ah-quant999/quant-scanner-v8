@@ -62,8 +62,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    # workflow_run 触发时，仅在上游 cn_fetch 成功后才构建；push / workflow_dispatch 始终构建
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    # 🛡 2026-08-31 一劳永逸根治「构建部署自触发取消死循环」：
+    #   旧逻辑 push 事件无条件构建 → 本 workflow 部署时 push data/**+index.html（GITHUB_TOKEN 即
+    #   github-actions[bot]）→ 再次命中 push.paths → 触发新一轮 → cancel-in-progress 取消在跑的自己
+    #   → 每次都 cancelled，data 内容永不重生（症状：TRIPLE_CONSENSUS 卡 08-30）。
+    #   修复：push 事件下仅当推送者非 bot（即人类/本地推送）才构建；bot 推送（含本 workflow 自身
+    #   部署 push、缓存戳对齐 push）一律跳过，斩断自触发环。workflow_run（算法链/抓取完成）与
+    #   workflow_dispatch（手动兜底）不受影响，照常构建。
+    if: (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || (github.event_name == 'workflow_dispatch') || (github.event_name == 'push' && github.actor != 'github-actions[bot]')
     steps:
       - uses: actions/checkout@v4
         with:
