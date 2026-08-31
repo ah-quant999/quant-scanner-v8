@@ -134,7 +134,7 @@ CATEGORY_MAP = {
     "V8_CAL": "premarket",
     "IPO_DATA": "premarket",
     "NT_DATA": "premarket",
-    "MARGIN_DATA": "premarket",
+    "MARGIN_DATA": "premarket,post_close",
     # 2026-08-31：期指主力合约卡移回「实时数据」页，改为 intraday 盘中实时
     "CFFEX_HOLDINGS": "intraday",
     "MACRO_DATA": "premarket",

@@ -92,7 +92,7 @@ CATEGORY_MAP = {
     # 盘前
     "V8_CAL": "premarket",
     "IPO_DATA": "premarket",
-    "MARGIN_DATA": "premarket",
+    "MARGIN_DATA": "premarket,post_close",
     # 2026-08-31：期指主力合约为盘中实时，放回实时数据页，改为 intraday 抓取
     "CFFEX_HOLDINGS": "intraday",
     "MACRO_DATA": "premarket",
