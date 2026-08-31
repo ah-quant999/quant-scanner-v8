@@ -1,9 +1,14 @@
 {
-  "update_time": "2026-08-31 14:00:24",
-  "run_start": "2026-08-31 12:48:48",
-  "ok": 27,
-  "fail": 0,
-  "failed_scripts": [],
+  "update_time": "2026-08-31 17:12:07",
+  "run_start": "2026-08-31 15:55:28",
+  "ok": 26,
+  "fail": 1,
+  "failed_scripts": [
+    {
+      "script": "scripts/ab_universe_backtest.py",
+      "reason": "超时 >30min"
+    }
+  ],
   "skipped_by_time_gate": [
     "calc_crds.py",
     "build_candidate_pool.py",
