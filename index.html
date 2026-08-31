@@ -4308,6 +4308,50 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       });
       html += '</div>';
 
+      /* ─── 【2026-09-01 主人截图】多算法共识默认展开（v8 三大 algo ≥2 命中 + 标注具体 algo 名），置于精选池上方 ─── */
+      var consensusItems = [];
+      try{ consensusItems = (pt.items||[]).filter(function(x){ return x && (typeof x.consensus_count==='number') && x.consensus_count>=2 && (x.algos_hit||[]).length; }); }catch(e){ console.warn('[bt] consensus filter', e); }
+      if(consensusItems && consensusItems.length){
+        try{ consensusItems = _sortBucket(consensusItems, 'consensus_count', false); }catch(e){ console.warn('[bt] consensus sort', e); }
+        html += '<div style="margin:10px 0;padding:10px;border:1px solid rgba(56,189,248,.35);border-radius:8px;background:rgba(56,189,248,.04);">';
+        html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
+        html += '<span style="font-size:12.5px;font-weight:700;color:#38bdf8;">🤝 多算法共识 '+consensusItems.length+' 只</span>';
+        html += '<span style="font-size:10.5px;color:var(--dim);">v8 三大 algo ≥2 命中 · 按共识数↓ · 标注具体算法 · 默认展开</span>';
+        html += '</div>';
+        html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;">';
+        html += '<thead><tr style="background:rgba(56,189,248,.08);border-bottom:1.5px solid rgba(56,189,248,.3);">';
+        html += '<th style="padding:5px;text-align:left;color:#38bdf8;">代码</th>';
+        html += '<th style="padding:5px;text-align:left;color:#38bdf8;">名称</th>';
+        html += '<th style="padding:5px;text-align:right;color:#38bdf8;">共识数</th>';
+        html += '<th style="padding:5px;text-align:left;color:#38bdf8;">命中的算法（具体名）</th>';
+        html += '<th style="padding:5px;text-align:right;color:#38bdf8;">期间</th>';
+        html += '</tr></thead><tbody>';
+        var consShowLimit = 30;
+        consensusItems.slice(0, consShowLimit).forEach(function(it){
+          if(!it) return;
+          var _code = it.code || '';
+          var _name = it.name || '';
+          var _cons = (typeof it.consensus_count==='number') ? it.consensus_count : 0;
+          var _lastPct = (typeof it.last_pct==='number') ? it.last_pct : 0;
+          var _algos = Array.isArray(it.algos_hit) ? it.algos_hit : [];
+          var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
+          // 算法名 chip：蓝底白字，区分度高
+          var algoChips = _algos.map(function(a){ return '<span style="display:inline-block;padding:1px 6px;margin:1px 2px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(56,189,248,.18);color:#38bdf8;border:1px solid rgba(56,189,248,.4);">'+_esc(a)+'</span>'; }).join('');
+          html += '<tr style="border-bottom:1px solid rgba(148,163,184,.08);background:rgba(56,189,248,.03);">';
+          html += '<td style="padding:4px 6px;color:var(--txt);font-weight:600;">'+_esc(_code)+'</td>';
+          html += '<td style="padding:4px 6px;color:var(--txt);">'+_esc(_name)+'</td>';
+          html += '<td style="padding:4px 6px;text-align:right;color:#38bdf8;font-weight:700;">🤝 '+_cons+' / 3</td>';
+          html += '<td style="padding:4px 6px;">'+algoChips+'</td>';
+          html += '<td style="padding:4px 6px;text-align:right;font-weight:700;color:'+periodColor+';">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</td>';
+          html += '</tr>';
+        });
+        html += '</tbody></table></div>';
+        if(consensusItems.length > consShowLimit){
+          html += '<div style="font-size:10.5px;color:var(--dim);margin-top:4px;text-align:center;">已展示前 '+consShowLimit+' / '+consensusItems.length+' 只 · 完整列表见下方「4 桶明细」</div>';
+        }
+        html += '</div>';
+      }
+
       /* ─── 【2026-09-01 主人截图】精选池默认展开（板块流入×情绪周期双优），其他子块折叠 ─── */
       var selectedItems = [];
       try{ selectedItems = (pt.items||[]).filter(function(x){ return x && x.selected; }); }catch(e){ console.warn('[bt] selected filter', e); }
