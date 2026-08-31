@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-08-31 03:15:36",
+  "check_time": "2026-08-31 10:53:54",
   "last_trade_close": "2026-08-28 15:30:00",
   "is_trading_day": true,
   "core_stale": [],
@@ -67,7 +67,7 @@
     "EXPERIMENT": "post_close",
     "STOCK_LIST": "post_close",
     "STOCK_PROFILE": "post_close",
-    "AVG_PRICE_DATA": "intraday",
+    "AVG_PRICE_DATA": "post_close",
     "ALGO_TRACK": "post_close",
     "INDEX_HISTORY": "post_close",
     "MARKET_PATH_PROBABILITY": "post_close",
