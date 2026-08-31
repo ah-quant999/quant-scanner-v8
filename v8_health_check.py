@@ -125,7 +125,7 @@ CARD_DEFS = [
     #   改为只校验真正必须存在的 avg_price / ma20 / ma60 / history_days；
     #   累积进度由前端「历史 X/20 日」自述，不再当成健康异常。
     #   page 同步改「实时数据」：CATEGORY_MAP 已复位 intraday（盘中每 30 分刷新 + KEEP 盘前不清空）。
-    {"id": "AVG_PRICE_DATA", "name": "平均股价（全A算术平均·880003口径）", "page": "实时数据", "freq": "盘中每30分", "max_age": 1440, "key_fields": ["avg_price", "ma20", "ma60", "history_days"], "heal_cat": "algo_run"},
+    {"id": "AVG_PRICE_DATA", "name": "平均股价（全A算术平均·880003口径）", "page": "实时数据", "freq": "盘中每30分", "max_age": 1440, "key_fields": ["avg_price", "ma20", "ma60", "history_days"], "heal_cat": "intraday"}  # 2026-08-31 修复：写入端在 cloud_fetch_v8.py（cn_fetch 盘中链），自愈应派发给 intraday 而非 algo_run；algo_run 只会在非交易时段空转且无法写入,
 ]
 
 
