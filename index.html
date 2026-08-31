@@ -14,7 +14,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "fcb72f8dd";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
+    var BUILD = "a4276040e";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -457,37 +457,37 @@ window.__domReadyFns=[];
   .tp-hist-cell .tp-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
   .tp-empty{color:var(--dim);text-align:center;padding:24px 10px;font-size:13px}
 </style>
-    <script src="data/ETF_INTRADAY_HEAT.js?v=61d5a606d5" defer></script>
-    <script src="data/SECTOR_FUND_FLOW.js?v=c0fc082fbe" defer></script>
+    <script src="data/ETF_INTRADAY_HEAT.js?v=34a4efe555" defer></script>
+    <script src="data/SECTOR_FUND_FLOW.js?v=827b6e69e2" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=664326ded9" defer></script>
     <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=aa09e486f4" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=85e486d722" defer></script>
-    <script src="data/ANALYST_RATINGS.js?v=90387384fd" defer></script>
+    <script src="data/ANALYST_RATINGS.js?v=29fad27cf0" defer></script>
     <script src="data/SUSPENSION_ALERT.js?v=549615d482" defer></script>
     <script src="data/GOLD_POOL.js?v=f4240292a3" defer></script>
     <!-- A2 懒加载：STOCK_LIST 移至文末 loader 按需注入 -->
     <!-- A2 懒加载：STOCK_PROFILE 移至文末 loader 按需注入 -->
     <!-- A2 懒加载：STOCK_QUOTE 移至文末 loader 按需注入 -->
-    <script src="data/MACRO_DATA.js?v=3543347b7c" defer></script>
-    <script src="data/MACRO_BRIEF.js?v=c099dc6eef" defer></script>
+    <script src="data/MACRO_DATA.js?v=1b03eee46e" defer></script>
+    <script src="data/MACRO_BRIEF.js?v=d0ef351919" defer></script>
 <script src="data/NT_DATA.js?v=f3138b8fcf" defer></script>
-<script src="data/LHB_DATA.js?v=5e75fc98ca" defer></script>
+<script src="data/LHB_DATA.js?v=ad74bc516b" defer></script>
 <script src="data/LHB_7D.js?v=3069d19b73" defer></script>
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
-<script src="data/CONCEPT_RANKING.js?v=1b06f809fa" defer></script>
+<script src="data/CONCEPT_RANKING.js?v=f2f1b26d5b" defer></script>
 <!-- 2026-08-23 恢复：潜力挖掘板块+股票预测推荐数据（calc_potential_picks.py 输出，跟盘后算法链自动更新） -->
 <script src="data/POTENTIAL_PICKS.js?v=a34c22ae37" defer></script>
-<script src="data/INDEX_QUOTES.js?v=7b83517c9d" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=733366e73a" defer></script>
-<script src="data/MARGIN_DATA.js?v=8a0c496ad3" defer></script>
-<script src="data/CFFEX_HOLDINGS.js?v=79d9922663" defer></script>
-<script src="data/IPO_DATA.js?v=9ab06ae1cf" defer></script>
-    <script src="data/CRISIS_DATA.js?v=65485e667f" defer></script>
-    <script src="data/JUDGMENT_DATA.js?v=8defa9ef72" defer></script>
-    <script src="data/OVERSEAS_MARKETS.js?v=dfc7163f73" defer></script>
+<script src="data/INDEX_QUOTES.js?v=1d75c560fb" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=fc353e0393" defer></script>
+<script src="data/MARGIN_DATA.js?v=e1ad57e191" defer></script>
+<script src="data/CFFEX_HOLDINGS.js?v=c4dee731f2" defer></script>
+<script src="data/IPO_DATA.js?v=79a495d544" defer></script>
+    <script src="data/CRISIS_DATA.js?v=b558b9a6a9" defer></script>
+    <script src="data/JUDGMENT_DATA.js?v=0f84183cb3" defer></script>
+    <script src="data/OVERSEAS_MARKETS.js?v=c4a0ec4175" defer></script>
     <script src="data/STOCK_RPS.js?v=d327fbae0e" defer></script>
     <!-- 🛡 2026-08-19：H 反推短线买点（data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js）反推代码 + 跟踪回测，独立于 PDF OCR
          v= 占位由 api_push_raw._stamp_index_v 在每日推送后自动重写为新 sha，确保 CDN 不缓存旧版 -->
@@ -1317,26 +1317,26 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/TRIPLE_HISTORY.js?v=8413c43a29" defer></script>
 <script src="data/COCKPIT_TIER_RECOMMEND.js?v=1b5e261fd3" defer></script>
 <script src="data/COCKPIT_ADVICE.js?v=0bcf1a308c" defer></script>
-<script src="data/V8_CAL.js?v=4d17c4f459"></script>
+<script src="data/V8_CAL.js?v=fb19d6bdc0"></script>
 <script src="data/SH_FIB.js?v=e26fdde497" defer></script>
 <script src="data/SZ_FIB.js?v=5fd7570866" defer></script>
 <script src="data/SECTOR_RS.js?v=651d5e0977" defer></script>
 <script src="data/SECTOR_PHASE_HISTORY.js?v=1ee65f39c0" defer></script>
 <script src="data/INST_TRADE.js?v=9a174a1506" defer></script>
-<script src="data/NORTH_FUND.js?v=6992135489" defer></script>
-<script src="data/MARKET_ALERTS.js?v=e21bc41619" defer></script>
-<script src="data/MARKET_FUND_FLOW_DATA.js?v=ff78ce5173" defer></script>
-<script src="data/ETF_SUBSCRIPTION.js?v=0f427ba248" defer></script>
+<script src="data/NORTH_FUND.js?v=4158c8589f" defer></script>
+<script src="data/MARKET_ALERTS.js?v=aee51eb083" defer></script>
+<script src="data/MARKET_FUND_FLOW_DATA.js?v=a396e75d72" defer></script>
+<script src="data/ETF_SUBSCRIPTION.js?v=cf07dba42c" defer></script>
 <!-- 2026-08-30 阿狸咪加注：东方财富口径 ETF 申购赎回（股票/债券/货币/商品/跨境 5 类 + 亿元），
      与 ETF_SUBSCRIPTION.js（宽基指数 + 亿份）并行使用，不替换。新口径在 ETF 三合一卡 / 驾驶舱
      使用 window.ETF_SUBSCRIPTION_EM，旧口径保留向下兼容。缓存戳由 update_v8 在后续 build 自动刷新。 -->
-<script src="data/ETF_SUBSCRIPTION_EM.js?v=e6248f9be0" defer></script>
-<script src="data/LIMIT_UP_HEATMAP.js?v=23cf2042a7" defer></script>
-<script src="data/LIMIT_UP_BROKEN.js?v=e7704cb568" defer></script>
-<script src="data/HERDING_DATA.js?v=45e66696d4" defer></script>
+<script src="data/ETF_SUBSCRIPTION_EM.js?v=7c2d8be9c7" defer></script>
+<script src="data/LIMIT_UP_HEATMAP.js?v=71d8f3daa4" defer></script>
+<script src="data/LIMIT_UP_BROKEN.js?v=90637a431f" defer></script>
+<script src="data/HERDING_DATA.js?v=a77bcd6264" defer></script>
 <script src="data/VOLATILITY.js?v=e4b8e90815" defer></script>
-<script src="data/CAPITAL_FLOW_DATA.js?v=5bb4b941cf" defer></script>
-<script src="data/SH_SZ_HISTORY.js?v=1fd0edcead" defer></script>
+<script src="data/CAPITAL_FLOW_DATA.js?v=67d6cc351f" defer></script>
+<script src="data/SH_SZ_HISTORY.js?v=40bb1a71e5" defer></script>
 <script src="data/CANDIDATE.js?v=3615832bd4" defer></script>
     <script src="data/FOUR_VOLUME.js?v=68fd643fea" defer></script>
     <script src="data/FOUR_VOLUME_60M.js?v=af87ef8c3e" defer></script>
@@ -1349,28 +1349,28 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/COCKPIT_BACKTEST.js?v=bc1d11c258" defer></script>
 <script src="data/BACKTEST_TDX.js?v=70ce6b55b0" defer></script>
 <script src="data/OPTIMIZED_STRATEGY.js?v=f7cf1946ec" defer></script>
-<script src="data/EXPERIMENT.js?v=c0a1976688" defer></script>
+<script src="data/EXPERIMENT.js?v=edab82a3d7" defer></script>
 <script src="data/FINAL_RECOMMEND_DATA.js?v=a15224eb36" defer></script>
-<script src="data/ALGO_TRACK.js?v=3bd8b21cc5" defer></script>
-<script src="data/ETF_PULSE.js?v=6433b2ab7a" defer></script>
-<script src="data/ETF_DAILY_MONITOR.js?v=3c215560de" defer></script>
+<script src="data/ALGO_TRACK.js?v=df2ca881da" defer></script>
+<script src="data/ETF_PULSE.js?v=73c02579b1" defer></script>
+<script src="data/ETF_DAILY_MONITOR.js?v=de8eb71298" defer></script>
 <script src="data/TOP10_DAILY.js?v=7c29671d9c" defer></script>
 <script src="data/WEEKEND_RUN.js?v=0334c1439f" defer></script>
-<script src="data/W52_HIGH.js?v=e03c2aa42d" defer></script>
+<script src="data/W52_HIGH.js?v=8fe97b864f" defer></script>
 <!-- 2026-08-30：盘后数据页新增解禁日历 + 业绩预告 -->
-<script src="data/RESTRICTED_RELEASE.js?v=d4f0e1288c" defer></script>
-<script src="data/PERFORMANCE_FORECAST.js?v=af443bdf14" defer></script>
-<script src="data/CANDIDATE_QUOTES.js?v=dd8f5aa572" defer></script>
-<script src="data/RUNNER_STATUS.js?v=0f9f788806" defer></script>
-<script src="data/HEALTH_CHECK.js?v=365e236fcd" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=3fddc5263d" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=8ebd9355bf" defer></script>
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=5ad85a6509" defer></script>
-    <script src="data/INDEX_HISTORY.js?v=f4185a67f3" defer></script>
+<script src="data/RESTRICTED_RELEASE.js?v=8c5194c22d" defer></script>
+<script src="data/PERFORMANCE_FORECAST.js?v=719e381505" defer></script>
+<script src="data/CANDIDATE_QUOTES.js?v=a0c88f4605" defer></script>
+<script src="data/RUNNER_STATUS.js?v=3b52fae704" defer></script>
+<script src="data/HEALTH_CHECK.js?v=16c9ea5f62" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=b75d28f663" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=d0aeebbe5e" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=1bd73dd1df" defer></script>
+    <script src="data/INDEX_HISTORY.js?v=64ed4089b2" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE.js?v=710b5905eb" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=c229665f7a" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=6cf016ccb6" defer></script>
-    <script src="data/ALGO_BACKTEST_COMPARE.js?v=00c0be98ba" defer></script>
+    <script src="data/ALGO_BACKTEST_COMPARE.js?v=bae4629332" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -1858,6 +1858,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div id="overseasBody" style="font-size:13px;color:var(--txt);">加载中…</div>
     </div>
 
+    <!-- 期指主力合约 · 情绪方向（2026-08-31：移回实时数据页，盘中每30分刷新） -->
+    <div class="card" style="margin-bottom:16px">
+      <h3><span class="ic">📈</span>期指主力合约 · 情绪方向 · <span class="fresh" id="futuresMainTime">—</span></h3>
+      <div id="futuresMainBody" style="font-size:13px;color:var(--txt);">加载中…</div>
+      <div class="note">基差（升贴水）需对应现货指数，当前展示期货主力合约相对昨结涨跌与持仓量。</div>
+    </div>
+
         <!-- 情绪周期·连板天梯（2026-08-08 从暂未上架迁到实时数据） -->
     <div id="cycleLadderCard" style="margin-bottom:12px;"></div>
 
@@ -2031,7 +2038,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 行业树图 · 细分赛道（盘中实时数据源 SECTOR_FUND_FLOW，置于实时数据页最下方） -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">🏭</span>行业树图 · 细分赛道 · <span class="fresh" id="htUpdateTime">—</span></h3>
-      <div id="industryTreemap" style="min-height:260px;overflow:visible;"></div>
+      <div id="industryTreemap" style="min-height:420px;overflow:visible;"></div>
       <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:6px;flex-wrap:wrap;align-items:center;">
         <span>大块=行业 &nbsp; 小块=个股</span>
         <span>颜色=涨跌 &nbsp; 面积≈市值</span>
@@ -2078,21 +2085,24 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           return Math.abs(b.pct_day||0)-Math.abs(a.pct_day||0);
         }).slice(0,50);
         var maxVal=Math.abs(sectors[0].pct_day||0)||1;
-        var h='<div style="display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start;padding:4px">';
+        // 2026-08-31 主人令：胶囊加大、撑满卡片，避免下半截空荡
+        var h='<div style="display:flex;flex-wrap:wrap;gap:5px;align-content:flex-start;padding:4px">';
         sectors.forEach(function(s){
           var pct=s.pct_day||0;
           var up=pct>0, down=pct<0;
           var bg=up?'var(--up)':down?'var(--down)':'var(--dim)';
           var txt=(up||down)?'#fff':'var(--txt)';
           var area=Math.sqrt(Math.abs(pct))/Math.sqrt(maxVal);
-          var px=Math.max(40, Math.round(area*100));
+          var px=Math.max(64, Math.round(area*170)); // 最小64，最大约170
           var name=s.name||'未知';
+          var titleFz=px>=110?15:(px>=75?13:12);
+          var pctFz=px>=110?13:(px>=75?11:10);
           h+='<div style="width:'+px+'px;height:'+px+'px;background:'+bg+';color:'+txt;
-          h+=';border-radius:8px;padding:6px;display:flex;flex-direction:column';
+          h+=';border-radius:10px;padding:8px;display:flex;flex-direction:column';
           h+=';justify-content:center;align-items:center;text-align:center';
-          h+=';font-size:11px;line-height:1.2;box-shadow:0 1px 4px rgba(0,0,0,.3);overflow:hidden;cursor:default">';
-          h+='<div style="font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">'+esc(name)+'</div>';
-          h+='<div style="font-size:10px;opacity:.85">'+(pct>0?'+':'')+fmt(pct)+'%</div>';
+          h+=';font-size:12px;line-height:1.25;box-shadow:0 1px 5px rgba(0,0,0,.35);overflow:hidden;cursor:default">';
+          h+='<div style="font-weight:700;font-size:'+titleFz+'px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%">'+esc(name)+'</div>';
+          h+='<div style="font-size:'+pctFz+'px;opacity:.9;font-weight:600">'+(pct>0?'+':'')+fmt(pct)+'%</div>';
           h+='</div>';
         });
         h+='</div>';
@@ -2146,13 +2156,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">📊</span>市场宽度 · 新高家数与宽度评分 · <span class="fresh" id="breadthTime">—</span></h3>
       <div id="breadthBody"><div class="ipo-empty">加载中…</div></div>
-    </div>
-
-    <!-- 期指主力合约 · 情绪方向（2026-08-30：盘后数据页） -->
-    <div class="card" style="margin-bottom:16px">
-      <h3><span class="ic">📈</span>期指主力合约 · 情绪方向 · <span class="fresh" id="futuresMainTime">—</span></h3>
-      <div id="futuresMainBody" style="font-size:13px;color:var(--txt);">加载中…</div>
-      <div class="note">基差（升贴水）需对应现货指数，当前展示期货主力合约相对昨结涨跌与持仓量。</div>
     </div>
 
     <!-- 宏观数据速览（2026-08-30：盘后数据补位） -->
@@ -4441,7 +4444,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="card">
         <h3><span class="ic">💰</span>AI 行平均股价买卖信号面板（何时到高点卖/何时可以买）- 说明</h3>
         <div class="logic-h">定位</div>
-        <div class="logic-p">AI 主行平均股价下方的信号面板。基于 <code>AVG_PRICE_DATA</code> 的当前位置 / 均线偏离 / 单日涨跌 / 历史趋势四个维度自动计算买入或卖出信号，作为「市场水位」参考。<b>2026-08-31 口径归一</b>：数据改由 <code>cloud_fetch_v8.py → f_avg_price()</code> 单点写入——用东财 <code>em_clist</code> 分页遍历全市场 5000+ 只个股取<b>算术平均股价</b>，与通达信 880003 的定义口径一致且云端稳定可达；原 <code>scripts/fetch_avg_price.py</code>（7 源拉 880003 日K）因排在推送步之后导致产物永不入库、且 7 源实测 100% 失败，已从 workflow 摘除（文件保留待官方源恢复）。<b>MA 由 history 逐交易日累积</b>：满 20 / 60 个交易日后才给出 <code>position_vs_ma20</code> / <code>position_vs_ma60</code>，不足期间显示「历史 X/20 日」且不展示任何买卖信号，绝不用当日价冒充均线。</div>
+        <div class="logic-p">AI 主行平均股价下方的信号面板。基于 <code>AVG_PRICE_DATA</code> 的当前位置 / 均线偏离 / 单日涨跌 / 历史趋势四个维度自动计算买入或卖出信号，作为「市场水位」参考。<b>2026-08-31 口径归一 + tasks 补齐</b>：数据改由 <code>cloud_fetch_v8.py → f_avg_price()</code> 单点写入——用东财 <code>em_clist</code> 分页遍历全市场 5000+ 只个股取<b>算术平均股价</b>，与通达信 880003 的定义口径一致且云端稳定可达；原 <code>scripts/fetch_avg_price.py</code>（7 源拉 880003 日K）因排在推送步之后导致产物永不入库、且 7 源实测 100% 失败，已从 workflow 摘除（文件保留待官方源恢复）。<b>2026-08-31 修复</b>：因 <code>("AVG_PRICE_DATA", f_avg_price)</code> 被从 cloud_fetch tasks 列表遗漏，导致 health_check 报「超过阈值 120 分钟」黄灯，已补齐至 intraday 任务链。<b>MA 由 history 逐交易日累积</b>：满 20 / 60 个交易日后才给出 <code>position_vs_ma20</code> / <code>position_vs_ma60</code>，不足期间显示「历史 X/20 日」且不展示任何买卖信号，绝不用当日价冒充均线。</div>
         <div class="logic-h">📉 卖出信号（到高点要卖）</div>
         <table class="lg-table">
           <tr><th>触发条件</th><th>信号</th></tr>
@@ -4521,13 +4524,31 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
 
       <div class="card">
+        <h3><span class="ic">📋</span>实时数据页 · 卡片归属与刷新对齐矩阵（2026-08-31）</h3>
+        <div class="logic-p">以下矩阵明确「实时数据页」各卡的时间/任务/执行机/前端位置，防止后续被 CI 或回滚覆盖后再次出现卡片位置/刷新标签错误。</div>
+        <table class="lg-table">
+          <tr><th>卡片</th><th>数据任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
+          <tr><td>AI 市场速览</td><td>AI_MARKET_BRIEF</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
+          <tr><td>指数快览</td><td>INDEX_QUOTES</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
+          <tr><td>亚太市场概览</td><td>OVERSEAS_MARKETS</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 实时</td></tr>
+          <tr><td><b>期指主力合约 · 情绪方向</b></td><td><b>CFFEX_HOLDINGS</b></td><td><b>云端 v8_cn_fetch_cloud</b></td><td><b>实时数据 / 盘中 · 短线（2026-08-31 迁回，防回滚）</b></td></tr>
+          <tr><td>情绪周期 · 连板天梯</td><td>LIMIT_UP_HEATMAP</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
+          <tr><td>涨停热力矩阵</td><td>LIMIT_UP_HEATMAP</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
+          <tr><td>ETF 三合一</td><td>ETF_PULSE / ETF_INTRADAY_HEAT / ETF_DAILY_MONITOR</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中 + 盘后定稿</td></tr>
+          <tr><td>板块资金三合一</td><td>SECTOR_FUND_FLOW / SECTOR_FUND_FLOW_TREND</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
+          <tr><td>概念资金热力图</td><td>CONCEPT_RANKING</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
+          <tr><td>行业树图 · 细分赛道</td><td>SECTOR_FUND_FLOW</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中 · 短线</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
         <h3><span class="ic">📊</span>指数快览 / 亚太市场 / 行业树图 - 说明（2026-08-30 主人令）</h3>
         <div class="logic-h">指数快览</div>
         <div class="logic-p">上证 / 深证 / 创业 / 科创等主要指数现价、涨跌幅、涨跌家数、成交额。数据来自东方财富 push2delay（INDEX_QUOTES），盘中每 30 分刷新，属 T+0 实时/准实时数据。2026-08-31 起每个指数胶囊改小，名称/价格/涨跌幅/成交压缩为紧凑两行。</div>
         <div class="logic-h">亚太市场概览</div>
         <div class="logic-p">日经 225 / 恒生 / 韩国 KOSPI / 台湾加权等亚太主要指数。数据来自 akshare（OVERSEAS_MARKETS），<b>注册为 intraday</b>，随各市场交易时段每 30 分刷新，徽章统一显示「实时」。2026-08-31 起每个指数胶囊改小，名称/点位/涨跌幅压缩为紧凑两行。</div>
         <div class="logic-h">行业树图 · 细分赛道</div>
-        <div class="logic-p">以 treemap 方块展示行业板块涨跌。优先用盘中实时资金流 SECTOR_FUND_FLOW（每 30 分刷新），盘中缺失不回退到盘后 SECTOR_RS；方块颜色=涨跌，面积≈日内波动幅度。</div>
+        <div class="logic-p">以 treemap 方块展示行业板块涨跌。优先用盘中实时资金流 SECTOR_FUND_FLOW（每 30 分刷新），盘中缺失不回退到盘后 SECTOR_RS；方块颜色=涨跌，面积≈日内波动幅度。<b>2026-08-31 主人令</b>：胶囊尺寸加大（最小 64px、系数 170、圆角/间距同步放大），撑满卡片高度，避免下方半截空荡。</div>
       </div>
 
       <div class="card">
@@ -4636,7 +4657,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-h">市场宽度 · 新高家数与宽度评分</div>
         <div class="logic-p">以东方财富「创历史新高」成分家数（W52_HIGH）作为新高广度信号，反映市场参与上涨的宽度。2026-08-31 起标题改为「新高家数与宽度评分」，避免「市场宽度」一词过于抽象。展示：今日历史新高家数、宽度评分（按家数映射 20/30/45/60/75/90）、领涨新高股 TOP8。所有胶囊改小、内部一行。</div>
         <div class="logic-h">期指主力合约 · 情绪方向</div>
-        <div class="logic-p">中金所股指期货主力合约（IC/IF/IH/IM）收盘价、相对昨结涨跌、持仓量。数据来自 CFFEX_HOLDINGS（akshare get_cffex_daily），<b>2026-08-30 起由 premarket 改为 post_close 抓取</b>，放在盘后数据页。胶囊改小、内部一行。</div>
+        <div class="logic-p">中金所股指期货主力合约（IC/IF/IH/IM）收盘价、相对昨结涨跌、持仓量。数据来自 CFFEX_HOLDINGS（akshare get_cffex_daily），<b>2026-08-31 起由盘后数据页迁回实时数据页</b>，跟随盘中每 30 分刷新，标签显示「盘中 · 短线」。胶囊改小、内部一行。</div>
         <div class="logic-h">宏观数据速览</div>
         <div class="logic-p">LPR / M2 / CPI / PMI / 中美利差 / USDCNH / VIX / 黄金 / 原油 / 铜。数据来自 MACRO_DATA，日频更新，盘前 08:25 抓取。2026-08-31 起每个指标胶囊改小，标签、数值、变动、日期压缩为一行。</div>
         <div class="logic-h">解禁日历</div>
@@ -5194,6 +5215,21 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         </table>
         <div class="logic-h">一致性结论</div>
         <div class="logic-p">无需新建 workflow 或 automation：现有云端抓取、构建部署、本地同步、周末清理已天然覆盖归档文件的生成、推送、拉取与保护。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🔄</span>实时数据页卡片归属 + 平均股价任务链对齐（2026-08-31）</h3>
+        <div class="logic-h">覆盖范围</div>
+        <div class="logic-p">本批修复两类「被回滚/遗漏」问题：① 期指主力合约卡由盘后数据页迁回实时数据页；② AVG_PRICE_DATA 因 cloud_fetch tasks 列表遗漏导致 health_check 报「超过阈值 120 分钟」黄灯。</div>
+        <div class="logic-h">执行矩阵（时间 / 任务 / 执行机 / 前端）</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端/持久化</th></tr>
+          <tr><td>盘中每 30 分</td><td>CFFEX_HOLDINGS 抓取 + 渲染</td><td>云端 v8_cn_fetch_cloud</td><td>期指主力合约卡位于「实时数据」页，标签显示「盘中 · 短线」</td></tr>
+          <tr><td>盘中每 30 分</td><td>AVG_PRICE_DATA 抓取</td><td>云端 v8_cn_fetch_cloud</td><td>f_avg_price 已加入 tasks 列表，avg_price_data.json 被推回仓库并生成 data/AVG_PRICE_DATA.js</td></tr>
+          <tr><td>每小时</td><td>v8_health_check 新鲜度体检</td><td>云端 / 本机看门狗</td><td>平均股价卡 update_time 在 120 分钟内 → 不再报黄灯</td></tr>
+        </table>
+        <div class="logic-h">一致性结论</div>
+        <div class="logic-p">无需新建 workflow：v8_cn_fetch_cloud 已覆盖 CFFEX_HOLDINGS 与 AVG_PRICE_DATA 的盘中刷新；health_check 的 max_age=1440 阈值保持不变，数据正常刷新后即可通过。</div>
       </div>
 
       <div class="card">
@@ -7106,17 +7142,17 @@ window.__renderV8CalFull();
       applyData(window.IPO_DATA);
     }else{
       /* 🛡 2026-08-28 一劳永逸（主站审计 P1-8）：缓存戳 ?v= 从页面已注入的
-         <script src="data/IPO_DATA.js?v=9ab06ae1cf"> 实时读取，不再手写 hash。
+         <script src="data/IPO_DATA.js?v=79a495d544"> 实时读取，不再手写 hash。
          历史债务：本处注释写死一个旧 hash、实际引用是另一个、报错信息又写一遍，
          三处漂移；且手写 hash 不随构建更新 → CDN 吐旧副本 → 打新数据陈旧。
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
       var _ipoUrl=(function(){
         try{
-          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=9ab06ae1cf"]');
+          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=79a495d544"]');
           var s=el?el.getAttribute('src'):'';
           if(s) return s;
         }catch(e){}
-        return 'data/IPO_DATA.js?v=9ab06ae1cf';
+        return 'data/IPO_DATA.js?v=79a495d544';
       })();
       // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
       fetch(_ipoUrl)
@@ -9028,7 +9064,7 @@ function drawUpDownChart(){
 
           {name:'市场预警', source:'MARKET_ALERTS', freq:'盘中实时', slots:['09:40','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:10','15:30'], note:'量价异常预警'},
 
-          {name:'📐 平均股价', source:'AVG_PRICE_DATA', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'全A算术平均股价（＝通达信880003定义口径，cloud_fetch f_avg_price 单点写入）+ MA20/MA60 水位；盘前不清空（KEEP_VARS），history 逐交易日累积，满20/60日后才给水位信号'}
+          {name:'📐 平均股价', source:'AVG_PRICE_DATA', freq:'盘中每30分', slots:['09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30'], note:'全A算术平均股价（＝通达信880003定义口径，cloud_fetch f_avg_price 单点写入；2026-08-31 修复：tasks 列表遗漏导致不刷新，已补齐）+ MA20/MA60 水位；盘前不清空（KEEP_VARS），history 逐交易日累积，满20/60日后才给水位信号'}
 
         ]
 
@@ -9048,7 +9084,7 @@ function drawUpDownChart(){
 
           {name:'市场宽度 · 新高家数与宽度评分', source:'W52_HIGH', freq:'收盘后1次', slots:['17:30'], note:'今日历史新高家数 + 宽度评分 + 领涨新高股 TOP8；胶囊改小内部一行'},
 
-          {name:'期指主力合约', source:'CFFEX_HOLDINGS', freq:'收盘后1次', slots:['17:20'], note:'IF/IC/IM 主力合约（post_close 抓取）；胶囊改小内部一行'},
+          {name:'期指主力合约', source:'CFFEX_HOLDINGS', freq:'盘中每30分', slots:['09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00'], note:'IF/IC/IM 主力合约（intraday 刷新，2026-08-31 迁回实时数据页）；胶囊改小内部一行'},
 
           {name:'宏观数据速览', source:'MACRO_DATA', freq:'每日盘前', slots:['08:25'], note:'LPR / M2 / CPI / PMI / 中美利差 / VIX / 商品；胶囊改小内部一行'},
 
@@ -9674,7 +9710,7 @@ function drawUpDownChart(){
     });
     h+='</div>';
     $b.innerHTML=h;
-    if($t) $t.innerHTML=_uBadge('收盘后','短线',d.update_time);
+    if($t) $t.innerHTML=_uBadge('盘中','短线',d.update_time);
   }
   window.renderFuturesMain = renderFuturesMain;
 
@@ -13650,7 +13686,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=365e236fcd')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=16c9ea5f62')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
@@ -14249,9 +14285,9 @@ window.__renderV8CalToday();
 (function(){
   var BIG=[
     {name:'STOCK_LIST',    url:'data/STOCK_LIST.js?v=86f0807d62'},
-    {name:'STOCK_PROFILE', url:'data/STOCK_PROFILE.js?v=4c5c1bc893'},
+    {name:'STOCK_PROFILE', url:'data/STOCK_PROFILE.js?v=964ce22872'},
     {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=1341dd0941'},
-    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=c50c5816c2'}
+    {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=887291964e'}
   ];
   function loadOne(item, done){
     var s=document.createElement('script');

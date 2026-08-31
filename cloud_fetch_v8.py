@@ -3594,6 +3594,9 @@ def main(category=None, only=None):
         ("MACRO_BRIEF", f_macro_brief),
         ("MARKET_ALERTS", f_market_alerts),
         ("OVERSEAS_MARKETS", f_overseas_markets),
+        # 2026-08-31 一劳永逸复位：AVG_PRICE_DATA 回归 intraday tasks 链
+        #   曾因被从 tasks 列表遗漏导致 health_check 永久报「超过阈值120分钟」黄灯。
+        ("AVG_PRICE_DATA", f_avg_price),
         # 2026-08-30：盘后数据页新增
         ("RESTRICTED_RELEASE", f_restricted_release),
         ("PERFORMANCE_FORECAST", f_performance_forecast),
