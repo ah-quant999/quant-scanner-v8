@@ -4266,6 +4266,24 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           if (typeof window.__renderBacktestSection === 'function') window.__renderBacktestSection();
         } catch(e) { console.warn('restoreStock fail', e); }
       };
+      // 【2026-09-01 主人截图】4 桶胶囊可点击：展开 4 桶明细 details + 滚动到对应桶 header + 1.8s 闪烁高亮
+      window.__jumpBucket = function(btn){
+        try{
+          var key = btn && btn.getAttribute && btn.getAttribute('data-bucket');
+          if(!key) return;
+          var d = document.getElementById('btBucketDetail');
+          if(d && !d.open){ d.open = true; }
+          setTimeout(function(){
+            var tr = document.getElementById('btBucket-' + key);
+            if(!tr) return;
+            try{ tr.scrollIntoView({behavior: 'smooth', block: 'center'}); }catch(_){}
+            var origBg = tr.style.background;
+            tr.style.transition = 'background .35s';
+            tr.style.background = 'rgba(251,191,36,.28)';
+            setTimeout(function(){ tr.style.background = origBg; }, 1800);
+          }, 120);
+        }catch(e){ console.warn('[bt] jumpBucket', e); }
+      };
 
       html += '<div style="margin:14px 0;border-left:4px solid #22c55e;" class="card">';
       // 【K 批】卡片头部：情绪周期 + 板块流入 top + 精选统计 三条横排
@@ -4282,19 +4300,21 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       // 【阶段 2】多算法共识徽章
       var consSize = pt.consensus_count || 0;
       html += '<span style="padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.3);">🤝 共识 '+consSize+' 只</span>';
-      // 情绪周期徽章
+      // 情绪周期徽章 — 【2026-09-01 主人截图】降权：去背景去边框仅文字 + 10.5px 小字 + 灰，给流入让位
       if(sm && sm.phase){
         var phColor = sm.phase==='高潮'?'#ef5350':(sm.phase==='退潮'?'#fb923c':(sm.phase==='修复'?'#22c55e':(sm.phase==='冰点'?'#38bdf8':'var(--sub)')));
-        html += '<span style="padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;background:rgba(148,163,184,.10);color:'+phColor+';border:1px solid '+phColor+';">⚡ 情绪：'+_esc(sm.phase)+(sm.score!=null?' (score='+sm.score+', delta='+(sm.delta_pct>0?'+':'')+sm.delta_pct+'%)':'')+'</span>';
+        html += '<span style="font-size:10.5px;color:var(--dim);white-space:nowrap;" title="情绪周期相位（降权显示，给📥流入让视觉焦点）">⚡情绪：<span style="color:'+phColor+';font-weight:600;">'+_esc(sm.phase)+'</span>'+(sm.score!=null?' score='+sm.score+' Δ'+(sm.delta_pct>0?'+':'')+sm.delta_pct+'%':'')+'</span>';
       }
-      // 板块流入 top 5（inline 简洁展示）
+      // 板块流入 top 5 — 【2026-09-01 主人截图】加权：蓝色 total chip + 每板块独立蓝色 chip + 加粗，从 dim 灰提为视觉焦点
       if(sf && sf.top_in && sf.top_in.length){
-        var tiParts = sf.top_in.map(function(s){ return _esc(s.name)+' +'+(+s.net).toFixed(0)+'亿'; });
-        html += '<span style="padding:2px 10px;border-radius:10px;font-size:10.5px;color:var(--sub);background:var(--card2);border:1px solid var(--border);">📊 流入 top：'+tiParts.join(' / ')+'</span>';
+        html += '<span style="padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;background:rgba(56,189,248,.16);color:#0ea5e9;border:1px solid rgba(56,189,248,.4);white-space:nowrap;">📥 流入 top5</span>';
+        sf.top_in.forEach(function(s){
+          html += '<span style="padding:2px 8px;border-radius:8px;font-size:10.5px;font-weight:700;background:rgba(56,189,248,.08);color:#0284c7;border:1px solid rgba(56,189,248,.3);white-space:nowrap;" title="主力净流入（亿元）">'+_esc(s.name)+' +'+(+s.net).toFixed(0)+'亿</span>';
+        });
       }
       html += '</div>';
 
-      // 4 桶胶囊
+      // 4 桶胶囊 — 【2026-09-01 主人截图】改为可点击 button，click → 展开下方明细 details + 跳到该桶 + 1.8s 高亮闪烁
       var buckets = [
         {key:'strong',  label:'🟢强势',   color:'#22c55e', bg:'rgba(34,197,94,.10)',   border:'rgba(34,197,94,.3)'},
         {key:'buy_dip', label:'🟡回调买点', color:'#fbbf24', bg:'rgba(251,191,36,.10)',  border:'rgba(251,191,36,.3)'},
@@ -4304,7 +4324,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">';
       buckets.forEach(function(b){
         var n = sc[b.key]||0;
-        html += '<span style="padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;color:'+b.color+';background:'+b.bg+';border:1px solid '+b.border+';">'+b.label+' '+n+'</span>';
+        html += '<button type="button" data-bucket="'+b.key+'" title="点击跳转到下方 '+b.label+' 明细（共 '+n+' 只）" onclick="window.__jumpBucket(this)" style="cursor:pointer;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;color:'+b.color+';background:'+b.bg+';border:1px solid '+b.border+';font-family:inherit;">'+b.label+' '+n+'</button>';
       });
       html += '</div>';
 
@@ -4427,8 +4447,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
       // 明细表（桶内按当前 sortField 排序，列头可点击切换，所有桶同步联动，默认折叠）
       var _poolTotal = 0; try{ _poolTotal = (pt.items||[]).length; }catch(e){}
-      html += '<details style="margin:10px 0;border:1px solid var(--border);border-radius:8px;background:var(--card2);">';
-      html += '<summary style="cursor:pointer;user-select:none;padding:8px 12px;font-size:12.5px;font-weight:700;color:var(--txt);list-style:none;">📊 4 桶明细（共 '+_poolTotal+' 只）· 当前排序：'+(sortField||'last_pct')+(sortAsc?'↑':'↓')+' · 点击展开</summary>';
+      html += '<details id="btBucketDetail" style="margin:10px 0;border:1px solid var(--border);border-radius:8px;background:var(--card2);">';
+      html += '<summary style="cursor:pointer;user-select:none;padding:8px 12px;font-size:12.5px;font-weight:700;color:var(--txt);list-style:none;">📊 4 桶明细（共 '+_poolTotal+' 只）· 当前排序：'+(sortField||'last_pct')+(sortAsc?'↑':'↓')+' · 点击展开（也可点击上方 4 个桶胶囊跳转）</summary>';
       html += '<div style="padding:6px 10px;">';
       html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
       html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
@@ -4465,7 +4485,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         var bucketSelHtml = bucketSel > 0
           ? '<span style="padding:1px 8px;margin-left:8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(251,191,36,.15);color:var(--gold);border:1px solid rgba(251,191,36,.3);">🌟 精选 '+bucketSel+'</span>'
           : '';
-        html += '<tr style="background:rgba(148,163,184,.06);"><td colspan="13" style="padding:6px 8px;font-weight:700;color:'+statusColor[s]+';font-size:12px;">'+statusLabel[s]+' '+arr.length+' 只'+bucketSelHtml+'</td></tr>';
+        html += '<tr id="btBucket-'+s+'" style="background:rgba(148,163,184,.06);"><td colspan="13" style="padding:6px 8px;font-weight:700;color:'+statusColor[s]+';font-size:12px;">'+statusLabel[s]+' '+arr.length+' 只'+bucketSelHtml+'</td></tr>';
         arr.forEach(function(it){  // 🔁 2026-08-31：去掉 slice(0,12) 限制，全部展示（主人截图 "47/46 只没全看到" 根因）
           if(!it) return;
           var _code = it.code || '';
