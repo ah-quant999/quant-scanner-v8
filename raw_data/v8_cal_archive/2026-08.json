@@ -1,6 +1,6 @@
 {
  "month": "2026年8月",
- "update_time": "2026-08-30 19:56",
+ "update_time": "2026-08-31 08:16",
  "legend": [
   {
    "title": "重要政策",
@@ -473,7 +473,7 @@
     {
      "num": 30,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": []
     }
    ]
@@ -485,7 +485,7 @@
     {
      "num": 31,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": [
       {
        "text": "🇨🇳 官方制造业PMI",
