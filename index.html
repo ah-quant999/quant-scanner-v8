@@ -3812,6 +3812,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var _hunterCoreCount = lhbStocks.filter(function(s){ return (function(a,b){return a>0 && b>0 && (a+b)>=8000;})(s.inst_net_万||0, s.yz_net_万||0); }).length;
     h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">';
     h += '<span style="font-size:18px;font-weight:800;color:var(--txt)">🐂 大牛股猎手</span>';
+    h += '<span style="color:#fbbf24;font-size:12px;letter-spacing:1px;margin-left:6px;">'+ (window.__moduleStarsHTML?window.__moduleStarsHTML('hunter'):'⭐⭐⭐') +'</span>';
     h += _uBadge('盘后', '短线', updateTime);
     if(_hunterCoreCount > 0){
       h += _holdBadge(updateTime, _hunterCoreCount, '核心共振');
@@ -9701,7 +9702,7 @@ window.showRestrictedItems = showRestrictedItems;
     var h='';
     h+='<div style="background:linear-gradient(135deg,#13243f,#0e2747);color:#cfe3ff;border:1px solid #244066;border-radius:10px;padding:14px 18px;margin-bottom:14px;">';
     h+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><span style="font-size:22px;">🌐</span>';
-    h+='<div style="font-size:16px;font-weight:700;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">全站精选 <span style="color:#fbbf24;font-size:13px;letter-spacing:1px">⭐⭐⭐</span>';
+    h+='<div style="font-size:16px;font-weight:700;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">全站精选 <span style="color:#fbbf24;font-size:13px;letter-spacing:1px">'+ (window.__moduleStarsHTML?window.__moduleStarsHTML('allsite'):'⭐⭐⭐') +'</span>';
     if(genTime) h+=_uBadge('盘后', '中线', genTime);
     // 「已跑完」胶囊：_runBadgeInfo.label 已含 ✅，不再额外加
     var _fvInfo = window._runBadgeInfo(genTime);
@@ -9876,7 +9877,7 @@ window.showRestrictedItems = showRestrictedItems;
     var _cockpitGenTs = _cockpitData.gen_time || _cockpitData.data_time || _cockpitData.update_time || cockpitTs;
 
     h+='<div style="background:linear-gradient(135deg,#13243f,#0e2747);color:#cfe3ff;border:1px solid #244066;border-radius:10px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">';
-    h+='<span style="font-size:22px;">🎯</span><div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:700;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">选股驾驶舱 <span style="color:#fbbf24;font-size:13px;letter-spacing:1px">⭐⭐⭐⭐</span>';
+    h+='<span style="font-size:22px;">🎯</span><div style="flex:1;min-width:0;"><div style="font-size:16px;font-weight:700;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">选股驾驶舱 <span style="color:#fbbf24;font-size:13px;letter-spacing:1px">'+ (window.__moduleStarsHTML?window.__moduleStarsHTML('cockpit'):'⭐⭐⭐⭐') +'</span>';
     if(_cockpitGenTs) h+=_uBadge('盘后','短线',_cockpitGenTs);
     // 「已跑完」胶囊：统一调用 _runBadgeInfo（2026-08-07 修复）
     var _cockpitInfo = window._runBadgeInfo(_cockpitGenTs);
@@ -12100,15 +12101,18 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     h+='</div></div>';
 
     /* ===== 🎯 已下架选股模块（2026-08-29 主人令：同源弱alpha选股tab下沉，保留可查） ===== */
+    /* 2026-09-01 主人令：已下架选股模块统一星级（唯一裁决源），卡片显示 + 排序共用 */
+    window.__MODULE_STARS = { hunter:3, cockpit:4, allsite:3, fourvolume:4 };
+    window.__moduleStarsHTML = function(k){ var n=(window.__MODULE_STARS&&window.__MODULE_STARS[k])||0; var x=''; for(var i=0;i<n;i++) x+='⭐'; return x || '—'; };
     h+=`<div style="display:inline-block;margin:14px 0 8px 0;padding:4px 10px;font-size:11.5px;font-weight:700;color:#c4b5fd;background:rgba(167,139,250,.10);border:1px solid rgba(167,139,250,.28);border-radius:6px;">└ 🎯 盘后 · 已下架选股模块（同源弱alpha · 保留可查）</div>`;
-    h+=`<div id="st-hunter" style="margin-bottom:16px"><div id="hunterContainer"></div></div>`;
-    h+=`<div id="st-cockpit" style="margin-bottom:16px"><div id="stCockpit"></div></div>`;
-    h+=`<div id="st-allsite" style="margin-bottom:16px"><div id="stAllsite"></div></div>`;
-    h+=`<div id="st-fv" style="margin-bottom:16px">
+    h+=`<div id="st-hunter" data-star="3" style="margin-bottom:16px"><div id="hunterContainer"></div></div>`;
+    h+=`<div id="st-cockpit" data-star="4" style="margin-bottom:16px"><div id="stCockpit"></div></div>`;
+    h+=`<div id="st-allsite" data-star="3" style="margin-bottom:16px"><div id="stAllsite"></div></div>`;
+    h+=`<div id="st-fv" data-star="4" style="margin-bottom:16px">
       <div class="card" id="stfvCard">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
           🔥 <span style="font-weight:700;font-size:14px;color:var(--txt);">四量终极</span>
-          <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span>
+          <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">'+window.__moduleStarsHTML('fourvolume')+'</span>
           <span id="stfvTime"><span class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;"><span aria-hidden="true">🐻</span><span style="margin-left:4px">更新于</span><span style="color:#9fd0ff;font-weight:600;margin-left:4px">已加载</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">盘后</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">短线</span></span></span>
           <!-- 2026-08-31 主人令：统一胶囊版式（绿色 ✅ 与 finalStatusBadges 一致）。JS 会 textContent 覆盖 --><span id="stfvRunBadge" style="display:none;margin-left:6px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);align-items:center;gap:4px;white-space:nowrap;">✅ 已就绪</span>
           <span id="stfvHoldBadge" style="display:none;margin-left:6px;"></span>
@@ -12164,6 +12168,13 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     try{ if(window.renderCockpit) window.renderCockpit('stCockpit'); }catch(e){console.warn("已下架·驾驶舱渲染失败",e);}
     try{ if(window.renderAllsite) window.renderAllsite('stAllsite'); }catch(e){console.warn("已下架·全站精选渲染失败",e);}
     try{ if(window.renderFourVolume) window.renderFourVolume(); }catch(e){console.warn("已下架·四量终极渲染失败",e);}
+    /* 2026-09-01 主人令：已下架选股模块按星级降序排列（⭐多排前） */
+    try{
+      var _selIds=['st-hunter','st-cockpit','st-allsite','st-fv'];
+      var _selCards=_selIds.map(function(id){return document.getElementById(id);}).filter(Boolean);
+      _selCards.sort(function(a,b){ return (+b.getAttribute('data-star')||0) - (+a.getAttribute('data-star')||0); });
+      _selCards.forEach(function(c){ if(c.parentNode) c.parentNode.appendChild(c); });
+    }catch(e){ console.warn('已下架选股模块星级排序失败', e); }
     /* 2026-08-29 主人令：下沉盘后观测卡渲染（斐波那契窗口 + 商品涨价弹性榜） */
     try{ if(window.renderFib) window.renderFib(window.SH_FIB||{}); }catch(e){console.warn("已下架·斐波那契渲染失败",e);}
     try{ if(typeof window._fillCommodityElasticity==='function') window._fillCommodityElasticity(); }catch(e){console.warn("已下架·商品涨价弹性榜渲染失败",e);}
