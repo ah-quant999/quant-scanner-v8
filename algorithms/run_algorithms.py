@@ -401,9 +401,11 @@ def _stage_out_to_raw(quiet=False):
         return 0
 
 
-def _gate_ensure_inputs(inputs_map, base_dir, run_start):
+def _gate_ensure_inputs(inputs_map, base_dir, run_start, soft=False):
     """检查一组输入是否本轮回合新鲜产出（mtime ≥ run_start）。缺失/陈旧则重跑生成器并复检。
-    返回 (ok, bad_list)。ok=False=有输入重跑后仍缺失/陈旧，应拒绝产出最终推荐。"""
+    返回 (ok, bad_list)。
+      ok=False(硬模式)=有输入重跑后仍缺失/陈旧，应拒绝产出最终推荐；
+      soft=True=仅尝试重跑刷新，但无论如何返回 ok=True（bad 仅作告警记录，不阻断下游）。"""
     missing, stale = [], []
     for fname, (prod, is_out) in inputs_map.items():
         fpath = os.path.join(base_dir, fname)
@@ -414,7 +416,7 @@ def _gate_ensure_inputs(inputs_map, base_dir, run_start):
             stale.append(fname)
     if not missing and not stale:
         return (True, [])
-    print(f"  ⚠️ 四量/输入 缺失={missing} 陈旧={stale} → 重跑生成器")
+    print(f"  ⚠️ 输入 缺失={missing} 陈旧={stale} → 重跑生成器" + ("（软模式：仅告警不阻断）" if soft else ""))
     for fname in list(missing) + list(stale):
         prod, is_out = inputs_map[fname]
         p = os.path.join(ALGO, prod)
@@ -436,22 +438,31 @@ def _gate_ensure_inputs(inputs_map, base_dir, run_start):
             bad.append(f"{fname}(缺失)")
         elif datetime.fromtimestamp(os.path.getmtime(fpath)) < run_start:
             bad.append(f"{fname}(仍陈旧)")
-    return (len(bad) == 0, bad)
+    # 🛡 2026-08-31 一劳永逸：软模式下不阻断——四量终极等「加分因子」陈旧时，
+    #   final_recommend.py 自身会回退日线版，无需整轮跳过。
+    return (True, bad) if soft else (len(bad) == 0, bad)
 
 def _final_recommend_gate(run_start):
     """final_recommend 前的就绪门控。返回 True=可继续；False=应跳过本轮最终推荐。
-    🛡 2026-08-26 补全：同时校验 raw_data/*.json 选股输入 与 data/*.js 四量输入（FOUR_VOLUME_60M/FOUR_VOLUME），
-       确保最终推荐必须等四量本轮回合新鲜产出后才汇总。"""
-    print(f"\n  🚦 final_recommend 就绪门控（确保全部选股数据+四量已新鲜产出）")
+    🛡 2026-08-26 补全：校验 raw_data/*.json 核心选股输入（硬，缺失/陈旧则拒绝产出，遵守「不得造假」）。
+    🛡 2026-08-31 一劳永逸：四量终极（FOUR_VOLUME_60M/FOUR_VOLUME）降级为软告警——
+        其本身为「加分因子，独立于日线版」，final_recommend.py 已做「60m 非今日→回退日线版」
+        降级（见 final_recommend.py L289-302）。baostock 60min 源常滞后（曾陈旧到 8/22），
+        列硬门控会反复阻断整轮最终推荐，反而让站点长期展示更旧的 FINAL_RECOMMEND（违背「不得造假」本意）。
+        故：核心选股输入硬门控，四量软告警；四量陈旧的告警仍打印，但 final_recommend 照常产出。"""
+    print(f"\n  🚦 final_recommend 就绪门控（核心选股输入硬门控 + 四量终极为加分因子软告警）")
     # (1) 先把本轮 out/ 产物搬运到 raw_data/，使 out-依赖输入新鲜
     _stage_out_to_raw()
+    # 核心选股输入：硬门控（缺失/陈旧且重跑仍失败 → 拒绝产出）
     ok_raw, bad_raw = _gate_ensure_inputs(_FINAL_RECOMMEND_INPUTS, os.path.join(V8_ROOT, "raw_data"), run_start)
-    ok_data, bad_data = _gate_ensure_inputs(_FINAL_RECOMMEND_DATA_INPUTS, os.path.join(V8_ROOT, "data"), run_start)
-    if ok_raw and ok_data:
-        print(f"  ✅ 全部选股输入（含四量终极）均为本轮新鲜产出，放行 final_recommend")
+    # 四量终极：软告警（脚本自带回退，陈旧不阻断整轮）
+    _, bad_data = _gate_ensure_inputs(_FINAL_RECOMMEND_DATA_INPUTS, os.path.join(V8_ROOT, "data"), run_start, soft=True)
+    if ok_raw:
+        if bad_data:
+            print(f"  ⚠️ 四量输入陈旧(软告警，final_recommend 将回退日线版，不阻断): {', '.join(bad_data)}")
+        print(f"  ✅ 核心选股输入均为本轮新鲜产出，放行 final_recommend（四量终极为加分因子，陈旧仅告警）")
         return True
-    bad = bad_raw + bad_data
-    print(f"  🛑 门控未通过，拒绝产出最终推荐（避免陈旧/造假数据）: {', '.join(bad)}")
+    print(f"  🛑 核心门控未通过，拒绝产出最终推荐（避免陈旧/造假数据）: {', '.join(bad_raw)}")
     return False
 
 
