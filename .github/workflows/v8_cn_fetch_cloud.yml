@@ -204,8 +204,18 @@ jobs:
           echo "本次类别: $cat"
           python cloud_fetch_v8.py --category "$cat"
 
-      - name: "🐉 刷新当日 LHB 数据（仅 post_close）"
-        if: steps.cat.outputs.category == 'post_close'
+      # 2026-08-31 主人令：ETF_SUBSCRIPTION_EM 硬缺口修复（原产出脚本无任何 workflow 引用）
+      # 每个交易日盘前/盘后各抓一次即可（T+1 数据，akshare fund_etf_fund_info_em）。
+      # 仅生成 raw_data/etf_subscription_em.json，后续 update_v8 会映射为 data/ETF_SUBSCRIPTION_EM.js。
+      - name: "💰 ETF 申购赎回（东财口径，盘前/盘后/全量）"
+        if: steps.cat.outputs.category == 'premarket' || steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
+        continue-on-error: true
+        shell: bash
+        run: |
+          python scripts/fetch_etf_subscription_em.py
+
+      - name: "🐉 刷新当日 LHB 数据（post_close + 周末全量）"
+        if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
         continue-on-error: true
         shell: bash
         run: |
@@ -213,8 +223,8 @@ jobs:
           python algorithms/fetch_lhb.py
           python -c "import sys; sys.path.insert(0,'algorithms'); import stage_to_raw; stage_to_raw.main()"
 
-      - name: "🐉 回填 LHB 历史（仅 post_close）"
-        if: steps.cat.outputs.category == 'post_close'
+      - name: "🐉 回填 LHB 历史（post_close + 周末全量）"
+        if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
         continue-on-error: true
         shell: bash
         run: |
