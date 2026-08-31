@@ -124,8 +124,13 @@ CATEGORY_MAP = {
     "MARKET_FUND_FLOW_DATA": "post_close",
     # 15:30 收盘数据：EXPERIMENT 等 akshare 可抓的 T+1 数据
     "EXPERIMENT": "post_close",
-    # 2026-08-31 移除：AVG_PRICE_DATA 改由 standalone scripts/fetch_avg_price.py 在盘后/周末(post_close||all)
-    #   生成 avg_price_data.json，update_v8.py 映射为 post_close；此处不再 intraday 抓取，避免 premarket 清空 + 双写冲突。
+    # 2026-08-31 一劳永逸复位：AVG_PRICE_DATA 回归 intraday（与 update_v8.py 的 intraday 映射一致，
+    #   主人令「实时的放回实时数据页」），并【必须】同时列入下方 KEEP_VARS——
+    #   历史根因：它曾是 intraday 但不在 KEEP_VARS，于是每个盘前轮都被 _clear_intraday_for_premarket
+    #   清成 {no_data:true} stub，history 每日归零 → history_days 恒为 1 → ma20=ma60=当日价、
+    #   position_vs_ma20/ma60 恒 null → v8_health_check 常年判「关键字段空值」黄灯。
+    #   本函数是该文件唯一写入者（standalone fetch_avg_price.py 步骤已从 workflow 摘除）。
+    "AVG_PRICE_DATA": "intraday",
     "OVERSEAS_MARKETS": "intraday",  # 亚太市场(日经/恒生/KOSPI/台湾)：交易时段实时更新，盘中每轮刷新
     # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告，日频更新即可
     "RESTRICTED_RELEASE": "premarket",
@@ -3068,7 +3073,9 @@ def _clear_intraday_for_premarket(category, only=None):
     #   导致"概念资金热图过早清空"。现与 SH_SZ_HISTORY 同等对待——盘前保留前一交易日真实数据，
     #   等 09:00 盘中 fetch 自然刷新（即"开盘前一起刷新"，而非 08:25 就空白）。
     # 2026-08-31：CFFEX_HOLDINGS 改 intraday 后盘前不清空，保留上一交易日数据等盘中覆盖
-    KEEP_VARS = {"SH_SZ_HISTORY", "CAPITAL_FLOW_DATA", "LIMIT_UP_HEATMAP", "ETF_DAILY_MONITOR", "CONCEPT_RANKING", "CFFEX_HOLDINGS"}
+    # 2026-08-31 加入 AVG_PRICE_DATA：该卡靠 history[] 逐交易日累积算 MA20/MA60，
+    #   盘前一旦被清成 stub，累积史即全毁（实测 history_days 恒为 1 的直接原因）。
+    KEEP_VARS = {"SH_SZ_HISTORY", "CAPITAL_FLOW_DATA", "LIMIT_UP_HEATMAP", "ETF_DAILY_MONITOR", "CONCEPT_RANKING", "CFFEX_HOLDINGS", "AVG_PRICE_DATA"}
 
     for var, cat in CATEGORY_MAP.items():
         if "intraday" not in [x.strip() for x in cat.split(",")]:
@@ -3400,12 +3407,24 @@ def main(category=None, only=None):
         改为复用与资金流同源的 em_clist（_IND_FS，已验证云端可用）。
         2026-08-11 修复：em_clist 用 fid=f3 排序时硬截 100 条（涨跌幅 TOP 100），
         改用 fid=f12（代码）+ pn 分页遍历全市场 5293 只，阈值 1000→3000 适配全 A 样本量。"""
-        # 🛡 2026-08-31 一劳永逸：AVG_PRICE 改由 standalone scripts/fetch_avg_price.py
-        #   （通达信 880003 真指数，可拉 120 天真实历史）独占写入 raw_data/avg_price_data.json。
-        #   本函数只能逐日累积 1 条全A等权近似，会抹掉 880003 的真实 MA 历史 →
-        #   position_vs_ma20/ma60 恒为 null、卡片假水位。自 2026-08-31 起彻底停用，
-        #   绝不写 avg_price_data.json（即便被某种路径误调用也安全返回，不覆盖）。
-        return {}
+        # 🛡 2026-08-31 一劳永逸根治（主人「运维还有失败亮黄灯」令）：
+        #   【根因三层】
+        #   ① 结构性不可持久化：scripts/fetch_avg_price.py 在 workflow 里排在
+        #      「📤 推送 raw_data/data」步之后，其写出的 raw_data/avg_price_data.json 与
+        #      raw_data/_avg_price_cache.json 从未被推回仓库；云端 runner 又是一次性的，
+        #      下轮 checkout 拿到的永远是旧文件 → 缓存永远为空。
+        #   ② 缓存死锁：单点源（腾讯/新浪）拿到当日价后要求 len(series)>=5 才落盘，
+        #      而 series 长度依赖缓存 → 缓存空 → 永远 <5 → 永远走「7 源全失败」分支。
+        #   ③ 于是每天必然只剩 1 条 history → ma20=ma60=当日价、position_vs_ma20/ma60=null
+        #      → v8_health_check 判「关键字段空值」→ 运维页常年黄灯。
+        #   【修法】通达信 880003 的定义本身就是「全A算术平均股价」，本函数用 em_clist
+        #   遍历全市场 5000+ 只算术平均，与 880003 口径一致且云端稳定可达。
+        #   故恢复本函数为 avg_price_data.json 的【唯一写入者】（fetch_avg_price.py 步骤
+        #   已从 v8_cn_fetch_cloud.yml 摘除），history 由本函数逐交易日累积：
+        #   本函数在「抓取」步内执行，产物随后被同一 workflow 的推送步推回仓库 →
+        #   累积可跨轮生效，约 20 / 60 个交易日后 MA20 / MA60 自然可用，无需人工干预。
+        #   过渡期 position_vs_ma20/ma60 保持 None（前端显示「历史 X/20 日」，不给假信号），
+        #   v8_health_check 的 key_fields 已同步去掉这两个字段，只校验 avg_price/ma20/ma60。
         try:
             fields = "f12,f14,f2,f3"
             by_code = {}
