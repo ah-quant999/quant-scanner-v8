@@ -14,7 +14,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "4a80923af";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
+    var BUILD = "4c73215f2";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -482,7 +482,7 @@ window.__domReadyFns=[];
 <!-- 2026-08-23 恢复：潜力挖掘板块+股票预测推荐数据（calc_potential_picks.py 输出，跟盘后算法链自动更新） -->
 <script src="data/POTENTIAL_PICKS.js?v=18b1cffaca" defer></script>
 <script src="data/INDEX_QUOTES.js?v=a0a6836004" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=2ecdefe103" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=7d6ee5065b" defer></script>
 <script src="data/MARGIN_DATA.js?v=9a36d79d76" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=ab4e8b8da5" defer></script>
 <script src="data/IPO_DATA.js?v=3526e3b86b" defer></script>
@@ -498,7 +498,7 @@ window.__domReadyFns=[];
     <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
     <script src="data/MARKET_REGIME.js?v=266665c874" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
-    <script src="data/RISK_GAUGE.js?v=346226b982" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
+    <script src="data/RISK_GAUGE.js?v=9d00ea54d7" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
     <script src="data/SECTOR_RECOMMENDATION.js?v=3504c70d18" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
     <script src="data/WEEKEND_META_REPORT.js?v=809aac5940" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
   <script src="data/DELISTED.js?v=9eef4eba4e" defer></script>
@@ -1369,16 +1369,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=96491d17a4" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=28301a08f3" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=54a0a7608a" defer></script>
-<script src="data/HEALTH_CHECK.js?v=6f60beed56" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=e49691cc76" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=83714f952c" defer></script>
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=704eb0c7b7" defer></script>
+<script src="data/RUNNER_STATUS.js?v=b55c65931c" defer></script>
+<script src="data/HEALTH_CHECK.js?v=14ae7bab63" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=20b5784a78" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=70a0a12bfc" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=c19017dc57" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=b85a9da176" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=2a7ed92426" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=ea9c132218" defer></script>
-    <script src="data/ALGO_BACKTEST_COMPARE.js?v=e69b6a0fda" defer></script>
+    <script src="data/ALGO_BACKTEST_COMPARE.js?v=412cf7da10" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -12756,7 +12756,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=6f60beed56')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=14ae7bab63')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
