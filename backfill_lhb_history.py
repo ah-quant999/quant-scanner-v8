@@ -29,6 +29,9 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "raw_data", "lhb_history.json")
 THRESHOLD = 8000  # 万，强买阈值
 N_CALENDAR_DAYS = 55  # 回溯的日历天数（约 40 个交易日，覆盖 ~6 周）
+# 🛡 2026-08-31：最近 N 个自然日强制重抓。东财当日龙虎榜「先出列表、后补席位」，
+#   首轮抓到常是骨架（seats 全空），必须隔一段时间重抓补全。
+FORCE_REFRESH_DAYS = 4
 
 
 def _load_lhb_seats():
@@ -77,10 +80,8 @@ def _safe_float(v):
         return 0.0
 
 
-def fetch_lhb_list(date_str):
-    df = ak.stock_lhb_detail_em(start_date=date_str, end_date=date_str)
-    if df is None or len(df) == 0:
-        return []
+def _parse_lhb_list_em(df):
+    """东财龙虎榜列表 → 统一 stocks 结构（与 fetch_lhb.py 同口径）"""
     stocks = []
     seen = set()
     for _, row in df.iterrows():
@@ -92,9 +93,53 @@ def fetch_lhb_list(date_str):
                 'name': str(row.get('名称', '')),
                 'price': _safe_float(row.get('最新价', 0)),
                 'pct': _safe_float(row.get('涨跌幅', 0)),
+                'amount': _safe_float(row.get('龙虎榜净买额', 0)),
                 'reason': str(row.get('上榜原因', '')),
             })
     return stocks
+
+
+def fetch_lhb_list(date_str, max_retry=4):
+    """🛡 2026-08-31 一劳永逸：东财列表重试 + 新浪兜底。
+
+    原实现单次裸调 ak.stock_lhb_detail_em：当日龙虎榜未发布 / 接口抖动时抛
+    'NoneType' object is not subscriptable，直接被 main() 的 except 捕获并写成
+    error 占位，再因 done 集合永不重试 → 共振日历当日永久空白。
+    现改为：4 次指数退避重试 → 新浪列表兜底 → 仍空才返回 []。
+    """
+    for attempt in range(max_retry):
+        try:
+            df = ak.stock_lhb_detail_em(start_date=date_str, end_date=date_str)
+            if df is not None and len(df) > 0:
+                return _parse_lhb_list_em(df)
+            print(f"    东财列表返回空(第{attempt+1}/{max_retry}次)，重试...")
+        except Exception as e:
+            print(f"    东财列表异常(第{attempt+1}/{max_retry}次): {type(e).__name__}: {e}")
+        if attempt < max_retry - 1:
+            time.sleep(3 * (attempt + 1))
+    # 兜底：新浪每日龙虎榜列表（无席位明细，保证不空白）
+    try:
+        df = ak.stock_lhb_detail_daily_sina(date=date_str)
+        if df is not None and len(df) > 0:
+            stocks, seen = [], set()
+            for _, row in df.iterrows():
+                code = str(row.get('股票代码', '')).zfill(6)
+                if not code or code in seen:
+                    continue
+                seen.add(code)
+                stocks.append({
+                    'code': code,
+                    'name': str(row.get('股票名称', '')),
+                    'price': _safe_float(row.get('收盘价', 0)),
+                    'pct': _safe_float(row.get('对应值', 0)),
+                    'amount': 0.0,
+                    'reason': str(row.get('指标', '')),
+                })
+            print(f"    新浪兜底列表：{len(stocks)} 只")
+            return stocks
+    except Exception as e:
+        print(f"    新浪兜底失败: {type(e).__name__}: {e}")
+    return []
 
 
 def fetch_seat_detail(stocks, date_str, seats_db=None):
@@ -207,8 +252,25 @@ def main():
                 hist = json.load(f)
         except Exception:
             hist = {}
-    # 去掉元信息键，仅保留日期键集合
-    done = {k for k in hist if isinstance(k, str) and len(k) == 10 and k[4] == '-'}
+    # 🛡 2026-08-31 一劳永逸：done 只认"真实完整数据"。
+    #   原实现 done = 所有日期键 → {'trading': False, 'error': ...} 占位也被视为已完成，
+    #   导致解析失败/未发布的那一天**永远不会被重抓**（共振日历当日永久空白）。
+    #   现改为：只有 trading=True 且 stocks 非空且 seats 非全空 才算完成。
+    def _is_real(rec):
+        if not isinstance(rec, dict):
+            return False
+        if rec.get('trading') is not True:
+            return False
+        st = rec.get('stocks') or []
+        if not st:
+            return False
+        # 骨架检测：stocks>0 但所有股票 seats 全空 → 视为不完整，允许重抓补全
+        if all(not (x or {}).get('seats') for x in st):
+            return False
+        return True
+
+    done = {k for k, v in hist.items()
+            if isinstance(k, str) and len(k) == 10 and k[4] == '-' and _is_real(v)}
 
     dates = []
     d = start
@@ -217,21 +279,42 @@ def main():
             dates.append(d)
         d += datetime.timedelta(days=1)
 
-    print(f"回填区间 {start} ~ {end}，共 {len(dates)} 个交易日，已存在 {len(done & {x.isoformat() for x in dates})}")
+    # 🛡 强制刷新窗口：最近 FORCE_REFRESH_DAYS 个自然日一律重抓（补全席位 / 覆盖 error 占位）
+    force_from = (end - datetime.timedelta(days=FORCE_REFRESH_DAYS - 1)).isoformat()
+    force_set = {x.isoformat() for x in dates if x.isoformat() >= force_from}
+
+    print(f"回填区间 {start} ~ {end}，共 {len(dates)} 个交易日，已存在真实数据 {len(done & {x.isoformat() for x in dates})}")
+    if force_set:
+        print(f"强制重抓窗口（最近 {FORCE_REFRESH_DAYS} 天）：{sorted(force_set)}")
     newly = 0
     for dt in dates:
         ds = dt.strftime("%Y%m%d")
         iso = dt.isoformat()
-        if iso in done:
+        if iso in done and iso not in force_set:
             continue
+        if iso in force_set and iso in done:
+            # 已有真实数据但在强制窗口内：仅当新数据更完整时才覆盖（只增不减）
+            _prev_n = len((hist.get(iso) or {}).get('stocks') or [])
+        else:
+            _prev_n = -1
         try:
             rec = process_day(ds)
             if rec.get('trading'):
+                # 强制窗口内已有真实数据 → 只增不减，防止把好数据冲成骨架
+                if _prev_n >= 0 and len(rec['stocks']) < _prev_n:
+                    print(f"  {iso}: 保留既有 {_prev_n} 只（新抓 {len(rec['stocks'])} 只更少，不覆盖）")
+                    continue
                 newly += 1
-                print(f"  {iso}: {len(rec['stocks'])} 只  共振{rec['summary']['机游共振']} 机构独买{rec['summary']['机构独买']} 游资独买{rec['summary']['游资独买']}")
+                tag = f"[覆盖{_prev_n}→{len(rec['stocks'])}只]" if _prev_n >= 0 else ""
+                print(f"  {iso}: {len(rec['stocks'])} 只  共振{rec['summary']['机游共振']} 机构独买{rec['summary']['机构独买']} 游资独买{rec['summary']['游资独买']} {tag}")
+                hist[iso] = rec
             else:
+                # 非交易日/无数据：绝不覆盖已有真实数据
+                if _prev_n >= 0:
+                    print(f"  {iso}: 接口空数据，保留既有真实数据（{_prev_n} 只）")
+                    continue
                 print(f"  {iso}: 非交易日/无数据")
-            hist[iso] = rec
+                hist[iso] = rec
         except Exception as e:
             print(f"  {iso}: 失败 {e}")
             # 🛡 2026-08-26 一劳永逸：已有真实数据的日期绝不被失败重抓覆盖，
@@ -253,5 +336,58 @@ def main():
     print(f"完成。新增 {newly} 个交易日，文件 {OUT}")
 
 
+def _only_one(date_str):
+    """单日补抓入口（应急 / 守卫调用）：忽略 done 集合与强制窗口，抓到即写。"""
+    hist = {}
+    if os.path.exists(OUT):
+        try:
+            with open(OUT, encoding="utf-8") as f:
+                hist = json.load(f)
+        except Exception:
+            hist = {}
+    iso = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:]}"
+    prev = hist.get(iso) or {}
+    prev_n = len(prev.get("stocks") or [])
+    print(f"[--only] 单日补抓 {iso}（既有 {prev_n} 只）")
+    try:
+        rec = process_day(date_str)
+    except Exception as e:
+        print(f"[--only] {iso} 抓取失败: {type(e).__name__}: {e}")
+        if prev_n > 0:
+            print(f"[--only] 保留既有 {prev_n} 只真实数据，不写 error 占位")
+            return 1
+        hist[iso] = {"trading": False, "error": str(e)[:80]}
+        hist["update_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open(OUT, "w", encoding="utf-8") as f:
+            json.dump(hist, f, ensure_ascii=False, indent=1)
+        return 2
+    if rec.get("trading"):
+        if prev_n > 0 and len(rec["stocks"]) < prev_n:
+            print(f"[--only] 保留既有 {prev_n} 只（新抓 {len(rec['stocks'])} 只更少）")
+            return 0
+        hist[iso] = rec
+        print(f"[--only] {iso}: {len(rec['stocks'])} 只  共振{rec['summary']['机游共振']} "
+              f"机构独买{rec['summary']['机构独买']} 游资独买{rec['summary']['游资独买']} "
+              f"[覆盖 {prev_n}→{len(rec['stocks'])}]")
+    else:
+        if prev_n > 0:
+            print(f"[--only] 接口空数据，保留既有 {prev_n} 只，不写占位")
+            return 0
+        hist[iso] = rec
+        print(f"[--only] {iso}: 非交易日/无数据")
+    hist["update_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(OUT, "w", encoding="utf-8") as f:
+        json.dump(hist, f, ensure_ascii=False, indent=1)
+    return 0
+
+
 if __name__ == "__main__":
+    _only = None
+    for _i, _a in enumerate(sys.argv[1:]):
+        if _a == "--only" and _i + 1 < len(sys.argv[1:]):
+            _only = sys.argv[1:][_i + 1]
+        elif _a.startswith("--only="):
+            _only = _a.split("=", 1)[1]
+    if _only:
+        raise SystemExit(_only_one(_only.strip()))
     main()
