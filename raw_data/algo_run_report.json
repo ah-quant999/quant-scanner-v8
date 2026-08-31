@@ -1,28 +1,33 @@
 {
-  "update_time": "2026-08-31 09:27:45",
-  "run_start": "2026-08-31 08:20:46",
-  "ok": 27,
-  "fail": 0,
-  "failed_scripts": [],
-  "skipped_by_time_gate": [
-    "calc_crds.py",
-    "build_candidate_pool.py",
-    "calc_stock_rps.py",
-    "generate_top10.py",
-    "strategy_four_volume_60m.py",
-    "strategy_four_volume.py",
-    "gen_cockpit_tier_recommend.py",
-    "gen_cockpit_tier_recommend.py",
-    "gen_cockpit_advice.py",
-    "update_triple_resonance_history.py",
-    "gen_triple_consensus.py",
-    "gen_triple_track.py",
-    "calc_volatility_watch.py",
-    "gen_stock_stop.py",
-    "gen_algo_track.py",
-    "calc_sentiment_cycle.py",
-    "auto_run_dn_algorithm.py",
-    "track_h_auto_buy.py",
-    "final_recommend.py"
-  ]
+  "update_time": "2026-08-31 03:03:58",
+  "run_start": "2026-08-31 01:33:59",
+  "ok": 40,
+  "fail": 5,
+  "failed_scripts": [
+    {
+      "script": "calc_crds.py",
+      "reason": "退出码 1 |    绕开（应急）: TIME_GATE_BYPASS=1 环境变量"
+    },
+    {
+      "script": "generate_top10.py",
+      "reason": "退出码 1 |    绕开（应急）: TIME_GATE_BYPASS=1 环境变量"
+    },
+    {
+      "script": "strategy_four_volume_60m.py",
+      "reason": "退出码 1 |    绕开（应急）: TIME_GATE_BYPASS=1 环境变量"
+    },
+    {
+      "script": "strategy_four_volume.py",
+      "reason": "退出码 1 |    绕开（应急）: TIME_GATE_BYPASS=1 环境变量"
+    },
+    {
+      "script": "gen_triple_consensus.py",
+      "reason": "退出码 1 |    绕开（应急）: TIME_GATE_BYPASS=1 环境变量"
+    },
+    {
+      "script": "final_recommend.py",
+      "reason": "就绪门控未通过（上游选股输入陈旧/缺失）"
+    }
+  ],
+  "skipped_by_time_gate": []
 }
