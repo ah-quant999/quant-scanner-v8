@@ -2,7 +2,7 @@
 html>
 <html lang="zh-CN">
 <head>
-<!-- deploy-trigger 2026-09-01T07:15 rebuild-from mc-tab-new + final-chip-add - 共识段方案A行布局+st-mc新子页+最终推荐🤝chip加权 -->
+<!-- deploy-trigger 2026-09-01T07:30 rebuild-from buckets-to-details + grid2col - 4桶胶囊改为<details>默认展开+前8只股票预览;共识段grid 2列+卡内3行(代码名🤝/chips/入场以来%);删__jumpBucket+document代理 -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -4344,75 +4344,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           if (typeof window.__renderBacktestSection === 'function') window.__renderBacktestSection();
         } catch(e) { console.warn('restoreStock fail', e); }
       };
-      // 【2026-09-01 主人截图】4 桶胶囊可点击：展开 4 桶明细 details + 滚动到对应桶 header + 1.8s 闪烁高亮
-      // 三道保险：① inline onclick 直接调 ② document 级 click 代理兜底（防 inline 失效/CSP 拦截）③ 接受 string 入参
-      window.__jumpBucket = function(input){
-        try{
-          try{ console.log('[bt jumpBucket] input=', input); }catch(_){}
-          // 支持 string 入参或 element 入参
-          var key = '';
-          if(typeof input === 'string'){
-            key = input;
-          } else if(input && input.getAttribute){
-            key = input.getAttribute('data-bucket') || '';
-          }
-          if(!key){ try{ console.warn('[bt jumpBucket] no data-bucket'); }catch(_){} return; }
-          // 1. 展开 details
-          var d = document.getElementById('btBucketDetail');
-          try{ console.log('[bt jumpBucket] key=', key, 'details=', !!d); }catch(_){}
-          if(d){
-            d.open = true;
-            try{ d.setAttribute('open',''); }catch(_){}
-          }
-          // 2. 120ms 后跳转（让浏览器先把 details 展开的 reflow 完成）
-          setTimeout(function(){
-            var tr = document.getElementById('btBucket-' + key);
-            try{ console.log('[bt jumpBucket] target=', 'btBucket-' + key, 'found=', !!tr); }catch(_){}
-            if(tr){
-              try{ tr.scrollIntoView({behavior:'smooth', block:'center'}); }catch(_){ try{ tr.scrollIntoView(); }catch(_){} }
-              // 三段式闪烁：金（命中）→ 透明 → 金（命中）→ 透明，比单次更醒目
-              var origBg = tr.style.background;
-              tr.style.transition = 'background .35s';
-              tr.style.background = 'rgba(251,191,36,.35)';
-              setTimeout(function(){ tr.style.background = ''; }, 600);
-              setTimeout(function(){ tr.style.background = 'rgba(251,191,36,.35)'; }, 1200);
-              setTimeout(function(){
-                try{ tr.style.background = origBg; tr.style.transition=''; }catch(_){}
-              }, 2400);
-            } else {
-              // 找不到 tr（如某桶 0 只），回退到 details summary
-              try{
-                if(d){
-                  var sum = d.querySelector('summary');
-                  if(sum){ try{ sum.scrollIntoView({behavior:'smooth', block:'center'}); }catch(_){ try{ sum.scrollIntoView(); }catch(_){} } }
-                }
-                console.warn('[bt jumpBucket] 行 ' + key + ' 不存在（可能桶为 0），已滚到 📊 4 桶明细 summary');
-              }catch(_){}
-            }
-          }, 120);
-        }catch(e){
-          try{ console.warn('[bt jumpBucket] outer fail', e && e.message); }catch(_){}
-        }
-      };
-      // 保险 ②：document 级 click 代理，兜底 inline onclick 被覆盖/CSP 拦截的场景
-      (function(){
-        try{
-          document.addEventListener('click', function(ev){
-            try{
-              var t = ev && ev.target;
-              while(t && t !== document){
-                if(t.matches && t.matches('[data-bucket]')){
-                  if(ev.preventDefault){ ev.preventDefault(); }
-                  if(ev.stopPropagation){ ev.stopPropagation(); }
-                  window.__jumpBucket(t.getAttribute('data-bucket') || t);
-                  return;
-                }
-                t = t.parentNode;
-              }
-            }catch(_){}
-          }, false);
-        }catch(e){ try{ console.warn('[bt jumpBucket] delegated listener fail', e && e.message); }catch(_){} }
-      })();
+      // 【2026-09-01 v3 主人截图】4 桶胶囊已改为 4 个 <details> 默认展开，每桶前 8 只股票直接可见。无需跳转函数。
+      // 删除旧 __jumpBucket + document 代理代码（点击摘要切换更稳定，避免 inline onclick 被 CDN/CSP 拦截的潜在风险）。
 
       html += '<div style="margin:14px 0;border-left:4px solid #22c55e;" class="card">';
       // 【K 批】卡片头部：情绪周期 + 板块流入 top + 精选统计 三条横排
@@ -4443,37 +4376,74 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       }
       html += '</div>';
 
-      // 4 桶胶囊 — 【2026-09-01 主人截图】改为可点击 button，click → 展开下方明细 details + 跳到该桶 + 1.8s 高亮闪烁
+      // 4 桶胶囊 — 【2026-09-01 v3 主人截图】改成 4 个 <details> 横向并排，summary 显示原 chip 风格（点击切换开/关），body 显该桶前 8 只。
+      // 这彻底解决了「点了看不到具体股票」的痛点：主人点 summary 即可展开对应桶股票列表。
       var buckets = [
-        {key:'strong',  label:'🟢强势',   color:'#22c55e', bg:'rgba(34,197,94,.10)',   border:'rgba(34,197,94,.3)'},
-        {key:'buy_dip', label:'🟡回调买点', color:'#fbbf24', bg:'rgba(251,191,36,.10)',  border:'rgba(251,191,36,.3)'},
-        {key:'topped',  label:'🟠见顶',   color:'#fb923c', bg:'rgba(251,146,60,.10)',  border:'rgba(251,146,60,.3)'},
-        {key:'weak',    label:'🔴走弱',   color:'#ef5350', bg:'rgba(239,83,80,.10)',   border:'rgba(239,83,80,.3)'},
+        {key:'strong',  label:'🟢强势',   color:'#22c55e', bg:'rgba(34,197,94,.10)',   border:'rgba(34,197,94,.35)'},
+        {key:'buy_dip', label:'🟡回调买点', color:'#fbbf24', bg:'rgba(251,191,36,.10)',  border:'rgba(251,191,36,.35)'},
+        {key:'topped',  label:'🟠见顶',   color:'#fb923c', bg:'rgba(251,146,60,.10)',  border:'rgba(251,146,60,.35)'},
+        {key:'weak',    label:'🔴走弱',   color:'#ef5350', bg:'rgba(239,83,80,.10)',   border:'rgba(239,83,80,.35)'},
       ];
-      html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">';
+      var statusFilter = {strong:'strong', buy_dip:'buy_dip', topped:'topped', weak:'weak'};
+      html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">';
       buckets.forEach(function(b){
         var n = sc[b.key]||0;
-        html += '<button type="button" data-bucket="'+b.key+'" title="点击跳转到下方 '+b.label+' 明细（共 '+n+' 只）" onclick="window.__jumpBucket(this)" style="cursor:pointer;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;color:'+b.color+';background:'+b.bg+';border:1px solid '+b.border+';font-family:inherit;">'+b.label+' '+n+'</button>';
+        var bucketItems = [];
+        try{
+          bucketItems = (pt.items||[]).filter(function(x){ return x && x.status === statusFilter[b.key]; });
+          bucketItems = _sortBucket(bucketItems, 'last_pct', false);
+        }catch(e){ console.warn('[bt] bucket filter', e); }
+        var sampleLimit = 8;
+        var sample = (bucketItems||[]).slice(0, sampleLimit);
+        html += '<details open style="grid-column:1 / -1;border:1px solid '+b.border+';border-radius:8px;background:'+b.bg+';">';
+        // summary 部分 = 原 chip 风格 + 后缀「点击收起」
+        html +=   '<summary style="cursor:pointer;user-select:none;padding:6px 12px;font-size:12px;font-weight:700;color:'+b.color+';list-style:none;display:flex;align-items:center;gap:8px;">';
+        html +=     '<span style="display:inline-block;padding:2px 10px;border-radius:6px;background:rgba(0,0,0,0);">'+b.label+' '+n+'</span>';
+        html +=     '<span style="font-size:10.5px;color:var(--dim);font-weight:500;">点击收起（已展示前 '+sample.length+' / '+(bucketItems?bucketItems.length:0)+' 只）</span>';
+        html +=   '</summary>';
+        // body = 该桶前 8 只股票，每只 1 行：代码+名称+入场以来%（精简）
+        if(sample && sample.length){
+          html += '<div style="padding:6px 10px 8px;">';
+          sample.forEach(function(it){
+            if(!it) return;
+            var _code = it.code || '';
+            var _name = it.name || '';
+            var _lastPct = (typeof it.last_pct==='number') ? it.last_pct : 0;
+            var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
+            var _cons = (typeof it.consensus_count==='number') ? it.consensus_count : 0;
+            var _isSel = !!it.selected;
+            html += '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid rgba(148,163,184,.07);">';
+            html +=   '<span style="color:var(--txt);font-weight:600;font-size:11.5px;font-family:ui-monospace,monospace;min-width:64px;">'+_esc(_code)+'</span>';
+            html +=   '<span style="color:var(--txt);font-size:11.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+_esc(_name)+'</span>';
+            if(_isSel){ html += '<span style="font-size:10px;font-weight:700;color:var(--gold);" title="同时入选精选池">🌟</span>'; }
+            if(_cons>=2){ html += '<span style="font-size:10px;font-weight:700;color:#38bdf8;padding:1px 5px;border-radius:5px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);">🤝'+_cons+'</span>'; }
+            html +=   '<span style="font-weight:700;font-size:11.5px;color:'+periodColor+';min-width:58px;text-align:right;">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
+            html += '</div>';
+          });
+          if((bucketItems||[]).length > sampleLimit){
+            html += '<div style="font-size:10px;color:var(--dim);margin-top:4px;text-align:center;">已展示前 '+sampleLimit+' 只 · 全部 '+((bucketItems||[]).length)+' 只见下方「📊 4 桶明细」</div>';
+          }
+          html += '</div>';
+        } else {
+          html += '<div style="padding:6px 12px 10px;font-size:11px;color:var(--dim);">该桶 0 只</div>';
+        }
+        html += '</details>';
       });
       html += '</div>';
 
-      /* ─── 【2026-09-01 主人截图】多算法共识默认展开（v8 三大 algo ≥2 命中 + 标注具体 algo 名），置于精选池上方 ─── */
+      /* ─── 【2026-09-01 主人截图 v3】多算法共识默认展开，grid 2 列布局，卡内保持行布局（与之前方案A完全一致：左=代码名+🤝N/3，右=chips+入场以来%） ─── */
       var consensusItems = [];
       try{ consensusItems = (pt.items||[]).filter(function(x){ return x && (typeof x.consensus_count==='number') && x.consensus_count>=2 && (x.algos_hit||[]).length; }); }catch(e){ console.warn('[bt] consensus filter', e); }
       if(consensusItems && consensusItems.length){
         try{ consensusItems = _sortBucket(consensusItems, 'consensus_count', false); }catch(e){ console.warn('[bt] consensus sort', e); }
         html += '<div style="margin:10px 0;padding:10px;border:1px solid rgba(56,189,248,.35);border-radius:8px;background:rgba(56,189,248,.04);">';
-        html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
+        html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">';
         html += '<span style="font-size:12.5px;font-weight:700;color:#38bdf8;">🤝 共识 '+consensusItems.length+' 只</span>';
-        html += '<span style="font-size:10.5px;color:var(--dim);">v8 三大 algo ≥2 命中（即「多算法共识」，与头部徽章统一简称）· 按共识数↓ · 标注具体算法 · 默认展开 · 卡片 2 列布局</span>';
-        html += '</div>';
-        // ────────────── 【2026-09-01 v2】🤝 共识段：方案 A 布局（每胶囊=1 行 flex，内部左右 2 列）──────────────
-        html += '<div style="margin:10px 0;padding:10px;border:1px solid rgba(56,189,248,.35);border-radius:8px;background:rgba(56,189,248,.04);">';
-        html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">';
-        html += '<span style="font-size:12.5px;font-weight:700;color:#38bdf8;">🤝 共识 '+consensusItems.length+' 只</span>';
-        html += '<span style="font-size:10.5px;color:var(--dim);">v8 三大 algo ≥2 命中（即「多算法共识」，与头部徽章统一简称）· 按共识数↓ · 默认展开 · 一行一只（左右双列：左=代码名+共识数，右=algo chips+入场以来）</span>';
+        html += '<span style="font-size:10.5px;color:var(--dim);">v8 三大 algo ≥2 命中 · 按共识数↓ · 默认展开 · 一行两列（卡内保持左右双列：代码名+🤝N/3 · chips · 入场以来%）</span>';
         html += '</div>';
         var consShowLimit = 30;
+        // 外层 grid 一行两列；每卡内 = 方案A 行布局（flex 双列：左 基本信息，右 chips+期间）
+        html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">';
         consensusItems.slice(0, consShowLimit).forEach(function(it){
           if(!it) return;
           var _code = it.code || '';
@@ -4484,27 +4454,27 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var _daysIn = (typeof it.days_in==='number') ? it.days_in : null;
           var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
           var algoChips = _algos.map(function(a){ return '<span style="display:inline-block;padding:1px 6px;margin:1px 2px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(56,189,248,.18);color:#38bdf8;border:1px solid rgba(56,189,248,.4);">'+_esc(a)+'</span>'; }).join('');
-          // 方案 A：每只胶囊独占 1 行（flex justify-between），左 = 基本信息 + 共识数，右 = algo chips + 入场以来
-          html += '<div style="display:flex;align-items:center;gap:12px;padding:8px 10px;margin:3px 0;border:1px solid rgba(56,189,248,.28);border-radius:8px;background:rgba(56,189,248,.06);flex-wrap:wrap;">';
-          // 左列：代码 + 名称 + 🤝 N/3
-          html += '<div style="display:flex;align-items:center;gap:8px;min-width:160px;">';
-          html +=   '<span style="font-weight:700;font-size:12.5px;color:var(--txt);font-family:ui-monospace,monospace;">'+_esc(_code)+'</span>';
-          html +=   '<span style="font-size:11.5px;color:var(--txt);">'+_esc(_name)+'</span>';
-          html +=   '<span style="font-weight:700;font-size:11px;color:#38bdf8;padding:2px 8px;border-radius:6px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);white-space:nowrap;">🤝 '+_cons+' / 3</span>';
-          html += '</div>';
-          // 右列：algo chips（多行包）+ 入场以来%（右对齐数字）
-          html += '<div style="flex:1;min-width:220px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
-          html +=   '<span style="font-size:10px;color:var(--dim);white-space:nowrap;">命中的算法：</span>';
-          html +=   '<span style="flex:1;min-width:140px;line-height:1.7;">'+(algoChips||'<span style="font-size:10px;color:var(--dim);">—</span>')+'</span>';
-          html +=   '<span style="font-size:10px;color:var(--dim);white-space:nowrap;" title="从 algo 入选那天起到当前的累计涨幅（基准 entry_price）">入场以来'+( _daysIn!=null ? ' · '+_daysIn+' 天' : '')+'</span>';
-          html +=   '<span style="font-weight:700;font-size:14px;color:'+periodColor+';min-width:62px;text-align:right;">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
-          html += '</div>';
+          // 单卡（grid 项）· 内部分行：行1=代码名🤝、行2=algo chips、 行3=入场以来%
+          html += '<div style="padding:9px 10px;border:1px solid rgba(56,189,248,.28);border-radius:8px;background:rgba(56,189,248,.06);">';
+          html +=   '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
+          html +=     '<span style="font-weight:700;font-size:12.5px;color:var(--txt);font-family:ui-monospace,monospace;">'+_esc(_code)+'</span>';
+          html +=     '<span style="font-size:11.5px;color:var(--txt);">'+_esc(_name)+'</span>';
+          html +=     '<span style="margin-left:auto;font-weight:700;font-size:11px;color:#38bdf8;padding:2px 8px;border-radius:6px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);white-space:nowrap;">🤝 '+_cons+' / 3</span>';
+          html +=   '</div>';
+          html +=   '<div style="margin-bottom:6px;line-height:1.6;font-size:10.5px;">';
+          html +=     '<span style="color:var(--dim);font-size:10px;margin-right:4px;">命中的算法：</span>'+(algoChips||'<span style="font-size:10px;color:var(--dim);">—</span>');
+          html +=   '</div>';
+          html +=   '<div style="display:flex;align-items:center;">';
+          html +=     '<span style="font-size:10px;color:var(--dim);white-space:nowrap;" title="从 algo 入选那天起到当前的累计涨幅（基准 entry_price）">入场以来'+( _daysIn!=null ? ' · '+_daysIn+' 天' : '')+'</span>';
+          html +=     '<span style="margin-left:auto;font-weight:700;font-size:14px;color:'+periodColor+';min-width:62px;text-align:right;">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
+          html +=   '</div>';
           html += '</div>';
         });
+        html += '</div>'; // /grid
         if(consensusItems.length > consShowLimit){
-          html += '<div style="font-size:10.5px;color:var(--dim);margin-top:4px;text-align:center;">已展示前 '+consShowLimit+' / '+consensusItems.length+' 只 · 完整列表见下方「4 桶明细」或切换到「🆕 多 algo 共识」独立子页</div>';
+          html += '<div style="font-size:10.5px;color:var(--dim);margin-top:6px;text-align:center;">已展示前 '+consShowLimit+' / '+consensusItems.length+' 只 · 完整列表见下方「4 桶明细」或切换到「🆕 多 algo 共识」独立子页</div>';
         }
-        html += '</div>';
+        html += '</div>'; // /外层 wrapper
       }
 
       /* ─── 【2026-09-01 主人截图】精选池默认展开（板块流入×情绪周期双优），其他子块折叠 ─── */
