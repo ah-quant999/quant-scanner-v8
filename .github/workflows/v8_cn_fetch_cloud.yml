@@ -304,7 +304,7 @@ jobs:
         #   （raw_data 117 个 json / 26 MB，cn 出海串行传输），守卫不能删只能限时。
         #   步级 timeout + continue-on-error 组合：推送超时只判该步失败，job 存活，
         #   后续 bridge/update_v8/health_check 照常跑完，raw_data 交下一轮补推。
-        timeout-minutes: 15
+        timeout-minutes: 25  # 2026-08-31 一劳永逸：15->25（35 个文件逐个 Contents API 推送，原值不足致推送被取消）
         # 🔴 2026-08-18 主人根治令：消费层软失败。推送失败（网络抖动/并发冲突）不阻断
         #   后续 bridge/update_v8/health_check——raw_data 数据源已抓取成功，只是推送瞬态失败
         #   （历史证据：16:33 run 32116993591 因步骤12推送失败拖垮整个 workflow → 今日 9+ 连败）。
@@ -380,7 +380,7 @@ jobs:
         #   （raw_data 117 个 json / 26 MB，cn 出海串行传输），守卫不能删只能限时。
         #   步级 timeout + continue-on-error 组合：推送超时只判该步失败，job 存活，
         #   后续 bridge/update_v8/health_check 照常跑完，raw_data 交下一轮补推。
-        timeout-minutes: 12
+        timeout-minutes: 30  # 2026-08-31 一劳永逸：12->30（108 个文件逐个 Contents API 推送，原值不足致推送被取消）
         continue-on-error: true
         shell: bash
         run: |
