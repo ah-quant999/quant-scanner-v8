@@ -353,6 +353,20 @@ def load_window_var_newest(source_id, var_name, local_path):
       · 两边都无时间戳/不可比 → 优先本地（离线/开发环境更可信）
     """
     local_data = load_window_var(local_path, var_name) if local_path and local_path.exists() else None
+
+    # 🛡 2026-08-31 一劳永逸性能优化（小九令：收盘数据上线）
+    #   CI(GitHub Actions) 内：本地 data/*.js 是本轮 update_v8 刚由最新 raw_data 生成，
+    #   必然最新；而「取线上站点」要对每个 js 发一次 HTTP（timeout 20s × 最多 4 次重试），
+    #   实测 108 个文件把 HEALTH_CHECK 拖到 15~20min，叠加前序抓取与 update_v8 后
+    #   整条 post_close 链路在超时窗口内跑不完 → data/*.js 已重生成却来不及 step21 推送
+    #   → 主站数据停滞（2026-08-31 停在 14:2x，15:42/16:05/16:18 三轮连杀）。
+    #   CI 内本地可用即直接返回（省掉 108 次网络往返）；仅本地缺失才回退线上。
+    #   非 CI（本机/开发环境）仍保留双源比对，防「本机未 pull 导致误报陈旧」。
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        if local_data is not None:
+            return local_data
+        return load_window_var_from_site(source_id, var_name)
+
     site_data = load_window_var_from_site(source_id, var_name)
 
     if local_data is None:
