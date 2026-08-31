@@ -1,1 +1,1 @@
-{"run_time":"2026-08-31 16:59:50","category":"post_close","hostname":"","modules":{"MARKET_FUND_FLOW_DATA":{"status":"ok","msg":"成功"},"ETF_DAILY_MONITOR":{"status":"ok","msg":"成功"},"EXPERIMENT":{"status":"ok","msg":"成功"}},"summary":{"total":3,"ok":3,"empty":0,"fail":0}}
+{"run_time":"2026-08-31 17:12:58","category":"all","hostname":"","modules":{"CANDIDATE_QUOTES":{"status":"ok","msg":"成功"}},"summary":{"total":1,"ok":1,"empty":0,"fail":0}}
