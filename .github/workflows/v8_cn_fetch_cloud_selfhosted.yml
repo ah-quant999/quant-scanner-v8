@@ -63,6 +63,22 @@ jobs:
         id: cat
         shell: bash
         run: |
+          # 🛡 2026-08-31 一劳永逸修复（小九令）：workflow_dispatch 入参优先。
+          #   原逻辑只看 github.event.schedule，dispatch 时该值为空 → 落 *) → all
+          #   （全量最重→超时被杀→数据推不上去）。同缺陷在主链路 v8_cn_fetch_cloud.yml
+          #   已造成 15:42/16:05/16:18 三轮连杀、主站数据停在 14:2x 的生产事故。
+          IN="${{ github.event.inputs.category }}"
+          if [ -n "$IN" ]; then
+            case "$IN" in
+              premarket|intraday|post_close|all)
+                echo "category=$IN" >> "$GITHUB_OUTPUT"
+                echo "label=手动派发($IN)" ;;
+              *)
+                echo "category=all" >> "$GITHUB_OUTPUT"
+                echo "label=手动派发(未知入参→all)" ;;
+            esac
+            exit 0
+          fi
           CRON="${{ github.event.schedule }}"
           case "$CRON" in
             "25 0 * * 1-5")
