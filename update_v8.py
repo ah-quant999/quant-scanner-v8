@@ -48,6 +48,10 @@ DATA_SOURCES = {
     "crisis_data.json":            "CRISIS_DATA",
     "judgment_data.json":          "JUDGMENT_DATA",
     "crds_card_data.json":         "CRDS_CARD_DATA",
+    # 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合）。
+    #   从 algo_track.json 读三 algo 跟踪池，去重 → 状态机判 status → 输出
+    #   raw_data/v8_pool_tracker.json + data/V8_POOL_TRACKER.js，注入 window.V8_POOL_TRACKER。
+    "v8_pool_tracker.json":        "V8_POOL_TRACKER",
     "triple_consensus.json":       "TRIPLE_CONSENSUS",
     "triple_track.json":           "TRIPLE_TRACK",
     # 🛡 2026-08-26 一劳永逸根因修复：生成器 update_triple_resonance_history.py 写的是
@@ -189,6 +193,8 @@ CATEGORY_MAP = {
     "EXPERIMENT": "post_close",
     "STOCK_LIST": "post_close",
     "STOCK_PROFILE": "post_close",
+    # 🆕 2026-08-31：v8 选股生命周期跟踪归属盘后（依赖算法跟踪池，每日盘后产出）。
+    "V8_POOL_TRACKER": "post_close",
     # 2026-08-31：AVG_PRICE_DATA 由 scripts/fetch_avg_price.py 在盘中/盘后/周末生成，
     #   映射为 intraday 使 update_v8 在盘中也刷新 AVG_PRICE_DATA.js（数据源单点，无双写冲突）。
     "AVG_PRICE_DATA": "intraday",

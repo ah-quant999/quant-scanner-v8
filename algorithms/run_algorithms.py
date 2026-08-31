@@ -652,6 +652,23 @@ def step_gen_lhb_7d():
         print(f"  ⚠️ LHB 7 日累计失败: {e}")
 
 
+def step_build_pool_tracker():
+    """🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪。
+    读取 raw_data/algo_track.json（三 algo 跟踪池：四量终极/板块龙头/大牛股猎手），
+    去重 → 应用专家阈值判状态（强势/回调买点/见顶/走弱/正常）→ 输出
+    raw_data/v8_pool_tracker.json + data/V8_POOL_TRACKER.js（注入 window.V8_POOL_TRACKER）。
+    零网络依赖；algo_track 缺失时输出空占位不抛错。"""
+    print("\n[2.7] v8 选股生命周期跟踪 → data/V8_POOL_TRACKER.js")
+    try:
+        r = subprocess.run([PY, "build_pool_tracker.py"], cwd=ALGO)
+        if r.returncode == 0:
+            print("  ✅ v8 选股生命周期跟踪完成")
+        else:
+            print("  ⚠️ build_pool_tracker 返回非零（继续，不阻断后续）")
+    except Exception as e:
+        print(f"  ⚠️ v8 选股生命周期跟踪失败: {e}")
+
+
 def main():
     print(f"=== v8 算法编排  {datetime.now():%Y-%m-%d %H:%M:%S} ===")
     step_v8_self_sufficiency()  # 2026-08-02 原生化: 先自产 4 类上游输入
@@ -664,8 +681,11 @@ def main():
     if _is_post_close_picking_ready() and _is_trading_day_now():
         step_append_lhb_history()
         step_gen_lhb_7d()
+        # 🆕 2026-08-31：v8 选股生命周期跟踪（阶段 1 整合）。
+        # 依赖 LHB 历史/算法跟踪（algo_track.json），放 2.6 后保 LHB 不阻塞它。
+        step_build_pool_tracker()
     else:
-        print("\n[2.5-2.6] ⏭️ 跳过 LHB 历史累积 + LHB 7日累计（非交易日或盘后策略未就绪）")
+        print("\n[2.5-2.7] ⏭️ 跳过 LHB 历史累积 + LHB 7日累计 + v8 选股生命周期（非交易日或盘后策略未就绪）")
     step_push()
     print(f"\n=== 完成。staged {n} 个文件 ===")
 

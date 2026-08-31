@@ -1357,6 +1357,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/OPTIMIZED_STRATEGY.js?v=f7cf1946ec" defer></script>
 <script src="data/EXPERIMENT.js?v=ad9cd3e7a0" defer></script>
 <script src="data/FINAL_RECOMMEND_DATA.js?v=a15224eb36" defer></script>
+<!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
+<script src="data/V8_POOL_TRACKER.js?v=4834182948" defer></script>
 <!-- 2026-08-31 轻量化：data/ALGO_TRACK.js（42.4 KB）前端零引用，停止注入（省 42.4 KB） -->
 <script src="data/ETF_PULSE.js?v=8bbf696f7d" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=c97401b78b" defer></script>
@@ -4184,6 +4186,79 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '<div class="note">BACKTEST_TDX 数据不可用</div>';
     }
     html += '</div>';
+
+    /* ── ④ v8 选股生命周期（🆕 2026-08-31 阶段 1：专家方法论整合）── */
+    var pt = window.V8_POOL_TRACKER || null;
+    if(pt && pt.items && pt.items.length){
+      var sc = pt.status_counts || {};
+      html += '<div style="margin:14px 0;border-left:4px solid #22c55e;" class="card">';
+      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
+      html += '<span style="font-size:15px;font-weight:700;color:#22c55e;">📈 ④ v8 选股生命周期</span>';
+      html += '<span style="font-size:11px;color:var(--dim);">v8 三大算法跟踪池去重 → 专家阈值判状态（强势/买点/见顶/走弱）</span>';
+      html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);">✅ 真实跟踪 '+pt.pool_size+' 只</span>';
+      html += '</div>';
+
+      // 4 桶胶囊
+      var buckets = [
+        {key:'strong',  label:'🟢强势',   color:'#22c55e', bg:'rgba(34,197,94,.10)',   border:'rgba(34,197,94,.3)'},
+        {key:'buy_dip', label:'🟡回调买点', color:'#fbbf24', bg:'rgba(251,191,36,.10)',  border:'rgba(251,191,36,.3)'},
+        {key:'topped',  label:'🟠见顶',   color:'#fb923c', bg:'rgba(251,146,60,.10)',  border:'rgba(251,146,60,.3)'},
+        {key:'weak',    label:'🔴走弱',   color:'#ef5350', bg:'rgba(239,83,80,.10)',   border:'rgba(239,83,80,.3)'},
+      ];
+      html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">';
+      buckets.forEach(function(b){
+        var n = sc[b.key]||0;
+        html += '<span style="padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;color:'+b.color+';background:'+b.bg+';border:1px solid '+b.border+';">'+b.label+' '+n+'</span>';
+      });
+      html += '</div>';
+
+      // 明细表
+      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+      html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+      html += '<th style="padding:6px;text-align:left;color:var(--sub);">代码</th>';
+      html += '<th style="padding:6px;text-align:left;color:var(--sub);">名称</th>';
+      html += '<th style="padding:6px;text-align:left;color:var(--sub);">来源</th>';
+      html += '<th style="padding:6px;text-align:right;color:var(--sub);">基准价</th>';
+      html += '<th style="padding:6px;text-align:right;color:var(--sub);">现价</th>';
+      html += '<th style="padding:6px;text-align:right;color:var(--sub);">期间</th>';
+      html += '<th style="padding:6px;text-align:right;color:var(--sub);">峰值</th>';
+      html += '<th style="padding:6px;text-align:right;color:var(--sub);">回撤</th>';
+      html += '<th style="padding:6px;text-align:left;color:var(--sub);">提示</th>';
+      html += '</tr></thead><tbody>';
+
+      var STATUS_ORDER = ['strong','buy_dip','topped','weak'];
+      var statusLabel = {strong:'🟢强势', buy_dip:'🟡回调买点', topped:'🟠见顶', weak:'🔴走弱'};
+      var statusColor = {strong:'#22c55e', buy_dip:'#fbbf24', topped:'#fb923c', weak:'#ef5350'};
+      var grouped = {};
+      pt.items.forEach(function(it){ (grouped[it.status] = grouped[it.status]||[]).push(it); });
+
+      STATUS_ORDER.forEach(function(s){
+        var arr = grouped[s]||[];
+        if(!arr.length) return;
+        html += '<tr style="background:rgba(148,163,184,.06);"><td colspan="9" style="padding:6px 8px;font-weight:700;color:'+statusColor[s]+';font-size:12px;">'+statusLabel[s]+' '+arr.length+' 只</td></tr>';
+        arr.slice(0, 12).forEach(function(it){  // 每桶最多 12 只，避免长表
+          var hint = it.buy_hint || it.sell_hint || '';
+          var periodColor = it.last_pct > 0 ? '#ef5350' : (it.last_pct < 0 ? '#26a69a' : 'var(--sub)');
+          var peakColor   = it.peak_pct > 0 ? '#ef5350' : 'var(--sub)';
+          var ddColor     = it.drawdown > 10 ? '#fb923c' : (it.drawdown > 5 ? '#fbbf24' : 'var(--sub)');
+          html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+          html += '<td style="padding:5px 6px;color:var(--txt);font-weight:600;">'+it.code+'</td>';
+          html += '<td style="padding:5px 6px;color:var(--txt);">'+_esc(it.name)+'</td>';
+          html += '<td style="padding:5px 6px;color:var(--sub);font-size:10.5px;">'+_esc(it.algo)+'</td>';
+          html += '<td style="padding:5px 6px;text-align:right;color:var(--sub);">'+it.entry_price.toFixed(2)+'</td>';
+          html += '<td style="padding:5px 6px;text-align:right;color:var(--txt);">'+it.last_close.toFixed(2)+'</td>';
+          html += '<td style="padding:5px 6px;text-align:right;font-weight:700;color:'+periodColor+';">'+(it.last_pct>0?'+':'')+it.last_pct.toFixed(2)+'%</td>';
+          html += '<td style="padding:5px 6px;text-align:right;color:'+peakColor+';">'+(it.peak_pct>0?'+':'')+it.peak_pct.toFixed(2)+'%</td>';
+          html += '<td style="padding:5px 6px;text-align:right;color:'+ddColor+';">'+it.drawdown.toFixed(1)+'%</td>';
+          html += '<td style="padding:5px 6px;color:var(--dim);font-size:10.5px;white-space:nowrap;">'+_esc(hint)+'</td>';
+          html += '</tr>';
+        });
+      });
+      html += '</tbody></table></div>';
+
+      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">阈值：强势=回撤≤3%或连涨≥3日 / 买点=回撤6-12%且收阴 / 见顶=回撤≥10%且持仓≥3日 / 走弱=回撤≥20%或峰值≤0 · 数据 '+(pt.update_time||'').substring(0,16)+' · 仅跟 v8 三大算法真实跟踪池（不接 600+ 全池、不重做行业映射）</div>';
+      html += '</div>';
+    }
 
     dst.innerHTML = html;
   };
@@ -11898,6 +11973,8 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     DATA.backtest_comprehensive = window.BACKTEST_COMPREHENSIVE||null;
     DATA.cockpit_backtest = window.COCKPIT_BACKTEST||null;
     DATA.backtest_tdx = window.BACKTEST_TDX||null;
+    // 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合）
+    DATA.pool_tracker = window.V8_POOL_TRACKER||null;
     DATA.cockpit_advice = window.COCKPIT_ADVICE||null;
     DATA.experiment = window.EXPERIMENT||{};
     DATA.etf_pulse = window.ETF_PULSE||null;
