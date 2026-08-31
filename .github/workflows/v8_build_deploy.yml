@@ -69,7 +69,15 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # 🛡 2026-08-31 第二处根治：超时线曾为 15 分钟，但「📤 部署到 main」步会
+    #   `git reset --hard FETCH_HEAD` 后必跑一次【全量】update_v8.py（约 14 分钟），
+    #   叠加 checkout/依赖/护栏/构建步，整 job 常态 >15 分钟 → 被 GitHub 以
+    #   timeout 判 `cancelled`（与并发取消同为 cancelled，极易误诊）。原 6h「零成功」
+    #   实为「并发取消(前 60-600s)」+「超时取消(满 15min)」双重夹击。并发按事件分桶修
+    #   复后构建能跑满 15min 才暴露此超时 bug。提至 60 分钟：全量构建(~14min)+
+    #   部署步二次全量(~14min，仅 workflow_dispatch 触发)仍留足余量，正常流水线
+    #   (selective+全量≈16min) 更宽松。GitHub 免费 runner 单 job 上限 6h，60 安全。
+    timeout-minutes: 60
     # 🛡 构建条件：workflow_run 上游成功 / 手动 dispatch / 任意 push 均构建。
     #   注：曾误以为「bot 自触发」靠 github.actor=='github-actions[bot]' 排除，但实测云端
     #   workflow 用 PAT 推送，actor 实为 ah-quant999（≠ github-actions[bot]），故 actor 过滤无效。
