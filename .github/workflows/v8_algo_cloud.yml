@@ -446,7 +446,25 @@ jobs:
           # 闸门报告 + 算法执行报告一并推送，供前端运维面板 / 后续排查消费
           PUSH_FILES="raw_data/algo_chain_report.json,raw_data/algo_run_report.json" \
             python api_push_raw.py || echo "⚠️ 报告推送失败（不影响闸门判定）"
-          python algorithms/verify_chain_outputs.py
+          # 2026-08-31 一劳永逸（主人令「一劳永逸式修复」·闸门假阳性根治）
+          #   本闸门要求 CRDS / 最终推荐「本交易日产出」，但：
+          #     - calc_crds.py       挂在 run_algorithms._POST_LHB_SCRIPTS（16:30 龙虎榜门控后才放行）
+          #     - final_recommend.py 另有 _final_recommend_gate() 就绪门控
+          #   于是看门狗在盘中派发本链时（实测 #1312 08:19 / #1313 09:33），这两个脚本
+          #   按设计正确跳过、并未产出今日产物，闸门却仍严格判定 -> exit 1 -> 整轮假阳性报红，
+          #   连带 HEALTH_CHECK 长期挂 CRDS_CARD_DATA / FINAL_RECOMMEND_DATA 两个 fail。
+          #   修复：16:30 前（CRDS/最终推荐尚未放行）以 --warn-only 运行（只报告、不判失败）；
+          #        16:30 之后（含真正的盘后主档 19:15）保持严格判定，不放水。
+          #   用 date -u -d '+8 hours' 而非 TZ=，避免依赖 runner 的 tzdata；
+          #   10#$HH 强制十进制，防 "0933" 被当八进制。
+          HH=$(date -u -d '+8 hours' +%H%M)
+          if [ "$((10#$HH))" -lt 1630 ]; then
+            echo "当前 CST ${HH} < 16:30 —— CRDS/最终推荐按设计尚未放行，闸门以 warn-only 模式运行（不判失败）"
+            python algorithms/verify_chain_outputs.py --warn-only
+          else
+            echo "当前 CST ${HH} >= 16:30 —— 盘后窗口，闸门严格判定"
+            python algorithms/verify_chain_outputs.py
+          fi
           GATE_EXIT=$?
           if [ "$GATE_EXIT" != "0" ]; then
             echo "::error::盘后算法链产物不完整——核心产物未在本交易日产出，详见上方闸门报告"
