@@ -310,14 +310,19 @@ jobs:
         run: |
           python algorithms/bridge_raw_data.py
 
-      - name: "💰 抓取平均股价真实指数 880003 (fetch_avg_price.py)"
-        # 2026-08-30 方案A：真实通达信880003 日K → raw_data/avg_price_data.json。
-        # 早于 update_v8 运行，使其映射为 data/AVG_PRICE_DATA.js（含真实 MA20/MA60 与买卖信号）。
-        # 三源(东财push2his/akshare)失败则写 available=false 占位，前端不显示假信号。
-        continue-on-error: true
-        shell: bash
-        run: |
-          python scripts/fetch_avg_price.py
+      # 🛡 2026-08-31 一劳永逸摘除（主人「运维还有失败亮黄灯」令）：
+      #   原步骤「💰 抓取平均股价真实指数 880003 (fetch_avg_price.py)」已删除，理由三条：
+      #   ① 位置错误 = 结构性不可持久化：本步排在上方「📤 推送 raw_data/data」之后，
+      #      它写出的 raw_data/avg_price_data.json 与 raw_data/_avg_price_cache.json
+      #      从未被推回仓库；云端 runner 一次性，下轮 checkout 永远拿旧文件。
+      #   ② 缓存死锁：单点源（腾讯/新浪）要求 len(series)>=5 才落盘，而 series 长度依赖
+      #      缓存本身 → 缓存永远空 → 永远 <5 → 每天必然走「7 源全失败」分支。
+      #   ③ 实测 7 源（东财 push2his 双 secid / akshare / 腾讯 / 新浪 / 雪球 / cache）
+      #      在 CN 直连与云端均 100% 失败，每轮纯浪费 runner 时间。
+      #   现改由 cloud_fetch_v8.py 的 f_avg_price() 单点写入（全A算术平均 = 通达信 880003
+      #   的定义口径，em_clist 遍历全市场 5000+ 只，云端稳定可达）；它在「抓取」步内执行，
+      #   产物随后被同一 workflow 的推送步推回仓库，history 得以逐交易日累积。
+      #   scripts/fetch_avg_price.py 文件保留但已停用，待 880003 官方源恢复时可再启用。
 
       - name: "🔄 重生成 data/*.js (update_v8)"
         # 🔴 2026-08-18 主人根治令：消费层软失败。update_v8 失败（个别数据源格式异常）不阻断
