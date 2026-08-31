@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-08-31 23:24:17",
+  "check_time": "2026-09-01 00:02:55",
   "last_trade_close": "2026-08-31 15:30:00",
   "is_trading_day": true,
   "core_stale": [],
@@ -17,7 +17,7 @@
     "V8_CAL": "premarket",
     "IPO_DATA": "premarket",
     "NT_DATA": "premarket",
-    "MARGIN_DATA": "premarket",
+    "MARGIN_DATA": "premarket,post_close",
     "CFFEX_HOLDINGS": "intraday",
     "MACRO_DATA": "premarket",
     "CRISIS_DATA": "premarket,intraday",
