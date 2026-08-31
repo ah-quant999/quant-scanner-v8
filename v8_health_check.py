@@ -118,7 +118,14 @@ CARD_DEFS = [
     # · AVG_PRICE_DATA  ← data/AVG_PRICE_DATA.js  注入 window.AVG_PRICE_DATA（通达信880003 平均股价）
     {"id": "DELISTED", "name": "已下架股票目录", "page": "运维", "freq": "手动+港交所公告", "max_age": 10080, "key_fields": ["total", "recent"], "_window_var": "DELISTED_STOCKS", "heal_cat": "algo_run", "manual_dep": True, "manual_note": "由 scripts/build_delisted.py 从 raw_data/delisted_stocks.json 手动生成（一周一次；港股下架名单相对静态）"},
     {"id": "UNLISTED_PANEL", "name": "暂未上架模块索引", "page": "运维", "freq": "手动策划", "max_age": 10080, "key_fields": ["modules", "meta"], "_window_var": "UNLISTED_PANEL", "heal_cat": "algo_run", "manual_dep": True, "manual_note": "由 scripts/build_unlisted_panel.py 手动生成（AI 策划实验模块去向，主人推送）"},
-    {"id": "AVG_PRICE_DATA", "name": "平均股价（880003）", "page": "盘后数据", "freq": "每日盘后", "max_age": 1440, "key_fields": ["avg_price", "ma20", "ma60", "position_vs_ma20", "position_vs_ma60"], "heal_cat": "algo_run"},
+    # 🛡 2026-08-31 一劳永逸（主人「运维还有失败亮黄灯」令）：
+    #   position_vs_ma20 / position_vs_ma60 在 history 累积满 20 / 60 个交易日之前
+    #   【按设计】就是 None（数据层刻意不给假水位，见 cloud_fetch_v8.f_avg_price 注释），
+    #   把它们放进 key_fields 等于每天必报「关键字段空值」→ 运维页常年黄灯（伪告警）。
+    #   改为只校验真正必须存在的 avg_price / ma20 / ma60 / history_days；
+    #   累积进度由前端「历史 X/20 日」自述，不再当成健康异常。
+    #   page 同步改「实时数据」：CATEGORY_MAP 已复位 intraday（盘中每 30 分刷新 + KEEP 盘前不清空）。
+    {"id": "AVG_PRICE_DATA", "name": "平均股价（全A算术平均·880003口径）", "page": "实时数据", "freq": "盘中每30分", "max_age": 1440, "key_fields": ["avg_price", "ma20", "ma60", "history_days"], "heal_cat": "algo_run"},
 ]
 
 
