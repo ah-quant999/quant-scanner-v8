@@ -2,7 +2,7 @@
 html>
 <html lang="zh-CN">
 <head>
-<!-- deploy-trigger 2026-09-01T06:46 rebuild-from force-cdn-flush + click-debug - 共识段改名+grid双列卡片化+__jumpBucket容错增强+console调试入口 -->
+<!-- deploy-trigger 2026-09-01T07:00 rebuild-from bt-bucket-clickhardened - __jumpBucket加固:document代理兜底+tr不存在回退summary+三段闪烁;期间→入场以来 -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -4324,32 +4324,74 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         } catch(e) { console.warn('restoreStock fail', e); }
       };
       // 【2026-09-01 主人截图】4 桶胶囊可点击：展开 4 桶明细 details + 滚动到对应桶 header + 1.8s 闪烁高亮
-      // 容错增强：console.log 调试入口（如果主人点不到看 console）+ d.open + setAttribute('open','') 双保险 + try/catch 包内层
-      window.__jumpBucket = function(btn){
+      // 三道保险：① inline onclick 直接调 ② document 级 click 代理兜底（防 inline 失效/CSP 拦截）③ 接受 string 入参
+      window.__jumpBucket = function(input){
         try{
-          try{ console.log('[bt jumpBucket] click', btn); }catch(_){}
-          var key = btn && btn.getAttribute && btn.getAttribute('data-bucket');
+          try{ console.log('[bt jumpBucket] input=', input); }catch(_){}
+          // 支持 string 入参或 element 入参
+          var key = '';
+          if(typeof input === 'string'){
+            key = input;
+          } else if(input && input.getAttribute){
+            key = input.getAttribute('data-bucket') || '';
+          }
           if(!key){ try{ console.warn('[bt jumpBucket] no data-bucket'); }catch(_){} return; }
+          // 1. 展开 details
           var d = document.getElementById('btBucketDetail');
           try{ console.log('[bt jumpBucket] key=', key, 'details=', !!d); }catch(_){}
           if(d){
             d.open = true;
             try{ d.setAttribute('open',''); }catch(_){}
           }
+          // 2. 120ms 后跳转（让浏览器先把 details 展开的 reflow 完成）
           setTimeout(function(){
             var tr = document.getElementById('btBucket-' + key);
-            try{ console.log('[bt jumpBucket] scroll target=', key, 'found=', !!tr); }catch(_){}
-            if(!tr) return;
-            try{ tr.scrollIntoView({behavior: 'smooth', block: 'center'}); }catch(_){ tr.scrollIntoView(); }
-            var origBg = tr.style.background;
-            tr.style.transition = 'background .35s';
-            tr.style.background = 'rgba(251,191,36,.28)';
-            setTimeout(function(){ tr.style.background = origBg; }, 1800);
+            try{ console.log('[bt jumpBucket] target=', 'btBucket-' + key, 'found=', !!tr); }catch(_){}
+            if(tr){
+              try{ tr.scrollIntoView({behavior:'smooth', block:'center'}); }catch(_){ try{ tr.scrollIntoView(); }catch(_){} }
+              // 三段式闪烁：金（命中）→ 透明 → 金（命中）→ 透明，比单次更醒目
+              var origBg = tr.style.background;
+              tr.style.transition = 'background .35s';
+              tr.style.background = 'rgba(251,191,36,.35)';
+              setTimeout(function(){ tr.style.background = ''; }, 600);
+              setTimeout(function(){ tr.style.background = 'rgba(251,191,36,.35)'; }, 1200);
+              setTimeout(function(){
+                try{ tr.style.background = origBg; tr.style.transition=''; }catch(_){}
+              }, 2400);
+            } else {
+              // 找不到 tr（如某桶 0 只），回退到 details summary
+              try{
+                if(d){
+                  var sum = d.querySelector('summary');
+                  if(sum){ try{ sum.scrollIntoView({behavior:'smooth', block:'center'}); }catch(_){ try{ sum.scrollIntoView(); }catch(_){} } }
+                }
+                console.warn('[bt jumpBucket] 行 ' + key + ' 不存在（可能桶为 0），已滚到 📊 4 桶明细 summary');
+              }catch(_){}
+            }
           }, 120);
         }catch(e){
           try{ console.warn('[bt jumpBucket] outer fail', e && e.message); }catch(_){}
         }
       };
+      // 保险 ②：document 级 click 代理，兜底 inline onclick 被覆盖/CSP 拦截的场景
+      (function(){
+        try{
+          document.addEventListener('click', function(ev){
+            try{
+              var t = ev && ev.target;
+              while(t && t !== document){
+                if(t.matches && t.matches('[data-bucket]')){
+                  if(ev.preventDefault){ ev.preventDefault(); }
+                  if(ev.stopPropagation){ ev.stopPropagation(); }
+                  window.__jumpBucket(t.getAttribute('data-bucket') || t);
+                  return;
+                }
+                t = t.parentNode;
+              }
+            }catch(_){}
+          }, false);
+        }catch(e){ try{ console.warn('[bt jumpBucket] delegated listener fail', e && e.message); }catch(_){} }
+      })();
 
       html += '<div style="margin:14px 0;border-left:4px solid #22c55e;" class="card">';
       // 【K 批】卡片头部：情绪周期 + 板块流入 top + 精选统计 三条横排
@@ -4426,9 +4468,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           html += '</div>';
           // 行 2：命中的算法 chips（自动换行）
           html += '<div style="margin-bottom:5px;line-height:1.6;">'+algoChips+'</div>';
-          // 行 3：期间（左标签 + 右数字，对齐）
+          // 行 3：入场以来（左标签 + 右数字，对齐）
           html += '<div style="display:flex;align-items:center;">';
-          html += '<span style="font-size:10px;color:var(--dim);">期间</span>';
+          var _daysIn = (typeof it.days_in==='number') ? it.days_in : null;
+          html += '<span style="font-size:10px;color:var(--dim);" title="从 algo 入选那天起到当前的累计涨幅（基准 entry_price）">入场以来'+( _daysIn!=null ? ' · '+_daysIn+' 天' : '')+'</span>';
           html += '<span style="margin-left:auto;font-weight:700;font-size:13px;color:'+periodColor+';">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
           html += '</div>';
           html += '</div>';
@@ -4457,7 +4500,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         html += '<th style="padding:5px;text-align:left;color:var(--gold);">信号</th>';
         html += '<th style="padding:5px;text-align:right;color:var(--gold);">精选分</th>';
         html += '<th style="padding:5px;text-align:left;color:var(--gold);">板块</th>';
-        html += '<th style="padding:5px;text-align:right;color:var(--gold);">期间</th>';
+        html += '<th style="padding:5px;text-align:right;color:var(--gold);" title="从 algo 入选那天起到当前的累计涨幅（基准 entry_price）">入场以来</th>';
         html += '</tr></thead><tbody>';
         var selShowLimit = 30;
         selectedItems.slice(0, selShowLimit).forEach(function(it){
@@ -4527,7 +4570,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += _thSortable('共识','consensus_count','right');
       html += '<th onclick="window.__sortPoolTracker(\'entry_price\')" style="padding:6px;text-align:right;color:'+(sortField==='entry_price'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">基准价'+(sortField==='entry_price'?' '+sortArrow:'')+'</th>';
       html += '<th onclick="window.__sortPoolTracker(\'last_close\')" style="padding:6px;text-align:right;color:'+(sortField==='last_close'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">现价'+(sortField==='last_close'?' '+sortArrow:'')+'</th>';
-      html += _thSortable('期间','last_pct','right');
+      html += _thSortable('入场以来','last_pct','right');
       html += _thSortable('峰值','peak_pct','right');
       html += _thSortable('回撤','drawdown','right');
       html += '<th style="padding:6px;text-align:left;color:var(--sub);">提示</th>';
