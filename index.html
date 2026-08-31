@@ -1769,13 +1769,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           if(_chg!=null && _chg<-1.5) _sigSell.push('⚠️ 单日暴跌 '+_chg.toFixed(1)+'% · 恐慌');
           if(_chg!=null && _chg>1.5) _sigBuy.push('⚡ 单日暴涨 '+(+_chg).toFixed(1)+'% · 追高风险');
 
-          // 2026-08-31：综合结论先算好，第一行末尾展示
-          var _verdict='', _vClr='var(--gold)';
-          if(_sigSell.length>=2){ _verdict='🔴 高位·观测'; _vClr='#f87171'; }
-          else if(_sigSell.length===1){ _verdict='🟠 偏高·观测'; _vClr='#fbbf24'; }
-          else if(_sigBuy.length>=2){ _verdict='🟢 偏低·观测'; _vClr='#4ade80'; }
-          else if(_sigBuy.length===1){ _verdict='🟡 超卖·轻仓观测'; _vClr='#fbbf24'; }
-          else { _verdict='⏸ 中性·观望'; _vClr='var(--sub)'; }
+          // 2026-08-31 主人令：评价统一金色 var(--gold)（评价 = 综合判断，不是单色信号；行内灯保留红绿黄）；verdict 胶囊跟在 vs 60日线 后面不靠右
+          var _verdict='', _vClr='#fbbf24';  // 全面金色（var(--gold)=' #fbbf24'，与卡名 status 风格统一）
+          if(_sigSell.length>=2){ _verdict='🔴 高位·观测'; }
+          else if(_sigSell.length===1){ _verdict='🟠 偏高·观测'; }
+          else if(_sigBuy.length>=2){ _verdict='🟢 偏低·观测'; }
+          else if(_sigBuy.length===1){ _verdict='🟡 超卖·轻仓观测'; }
+          else { _verdict='⏸ 中性·观望'; }
 
           h+='<div style="padding:10px 18px;background:'+ac.bg+';font-size:13px;line-height:1.8;color:var(--txt);">';
           // 第一行：标题 + 数据 + 综合结论
@@ -1791,7 +1791,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var _hd=(ap.history_days!=null?ap.history_days:(ap.history||[]).length);
           h+=' &nbsp;|&nbsp; vs 20日线 '+_pt(ap.position_vs_ma20)+' <span style="color:var(--dim);font-size:11.5px;">('+(_hd>=20?('MA20 '+Number(ap.ma20).toFixed(2)):('历史'+_hd+'/20日'))+')</span>';
           h+=' &nbsp;|&nbsp; vs 60日线 '+_pt(ap.position_vs_ma60)+' <span style="color:var(--dim);font-size:11.5px;">('+(_hd>=60?('MA60 '+Number(ap.ma60).toFixed(2)):('历史'+_hd+'/60日'))+')</span>';
-          h+='<span style="margin-left:auto;font-weight:700;color:'+_vClr+';font-size:11.5px;padding:2px 8px;border-radius:5px;background:'+_vClr+'18;border:1.5px solid '+_vClr+'55;">'+_verdict+'</span>';
+          // 2026-08-31 主人令：评价换金色 + 跟在后面不靠右 → 去掉 margin-left:auto，并改胶囊颜色为 var(--gold)（评价统一，不随信号变）
+          h+=' <span style="font-weight:700;color:#fbbf24;font-size:11.5px;padding:2px 8px;border-radius:5px;background:rgba(251,191,36,.15);border:1.5px solid rgba(251,191,36,.55);white-space:nowrap;">'+_verdict+'</span>';
           h+='</div>';
           // 第二行：买/加 + 卖/减 + ⚠警告
           var _warns=[];
@@ -8765,14 +8766,27 @@ window.showRestrictedItems = showRestrictedItems;
     const $b=$('forecastCalendarBody'), $t=$('forecastCalendarTime');
     if(!$b) return;
     if(!d || !d.items || !d.items.length){ $b.innerHTML='<div class="ipo-empty">业绩预告数据暂不可用</div>'; if($t) $t.innerHTML='—'; return; }
-    // 2026-08-31：盘后业绩预告 = 一行 4 列汇总胶囊（全报告期累计）；明细列表默认隐藏，点击胶囊展开下表
+    // 2026-08-31 主人令：盘后业绩预告汇总胶囊从 4 列扩到 6 列（4 类型 + 总数 + 净增=预增−预减，金色汇总+红绿涨跌）。明细列表仍默认隐藏，点击胶囊展开下表
     window._forecastCalendarData = d;
     const s=d.summary||{};
-    let h='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px;">';
+    // 2026-08-31 主人令：业绩预告 4 列 → 6 列（4 类型 + 总数 + 净增=预增-预减，金色汇总+红绿涨跌）
+    // 使用 repeat(auto-fit, minmax(110px,1fr)) 兼容窄屏，4 列版本固定 repeat(4,1fr) 在 600px 屏会挤出
+    const _fcTotal = (s.total != null) ? s.total : ((s.increase||0)+(s.decrease||0)+(s.loss||0)+(s.uncertain||0));
+    const _fcNet = (s.increase||0) - (s.decrease||0);  // 净增 = 预增 - 预减，>0 表示市场改善方向
+    let h='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:10px;">';
     h+=`<div onclick="showForecastItems('increase')" style="cursor:pointer;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--up);">预增</span><span style="font-size:18px;font-weight:800;color:var(--up);">${s.increase||0}</span></div>`;
     h+=`<div onclick="showForecastItems('decrease')" style="cursor:pointer;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--down);">预减</span><span style="font-size:18px;font-weight:800;color:var(--down);">${s.decrease||0}</span></div>`;
     h+=`<div onclick="showForecastItems('loss')" style="cursor:pointer;background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.25);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--sub);">预亏</span><span style="font-size:18px;font-weight:800;color:var(--sub);">${s.loss||0}</span></div>`;
     h+=`<div onclick="showForecastItems('uncertain')" style="cursor:pointer;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--txt);">不确定</span><span style="font-size:18px;font-weight:800;color:var(--txt);">${s.uncertain||0}</span></div>`;
+    // 第 5 列：总数（金色汇总，等于 s.total 或四大类合计）
+    h+=`<div title="全报告期累计（预增+预减+预亏+不确定）" style="background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.30);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:var(--gold);">总数</span><span style="font-size:18px;font-weight:800;color:var(--gold);">${_fcTotal}</span></div>`;
+    // 第 6 列：净增=预增-预减，>0 红色涨 / <0 绿色跌
+    const _fcNetUp = _fcNet > 0, _fcNetDown = _fcNet < 0;
+    const _fcNetCol = _fcNetUp ? 'var(--up)' : (_fcNetDown ? 'var(--down)' : 'var(--sub)');
+    const _fcNetBg = _fcNetUp ? 'rgba(239,68,68,.12)' : (_fcNetDown ? 'rgba(34,197,94,.12)' : 'rgba(148,163,184,.12)');
+    const _fcNetBd = _fcNetUp ? 'rgba(239,68,68,.30)' : (_fcNetDown ? 'rgba(34,197,94,.30)' : 'rgba(148,163,184,.30)');
+    const _fcNetSign = _fcNet > 0 ? '+' : '';
+    h+=`<div title="净增 = 预增 − 预减（市场改善方向）" style="cursor:default;background:${_fcNetBg};border:1px solid ${_fcNetBd};border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;"><span style="font-size:11px;color:${_fcNetCol};">净增</span><span style="font-size:18px;font-weight:800;color:${_fcNetCol};">${_fcNetSign}${_fcNet}</span></div>`;
     h+='</div>';
     h+='<div id="forecastCalendarTable" style="display:none;"></div>';
     $b.innerHTML=h;

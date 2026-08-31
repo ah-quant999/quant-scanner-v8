@@ -12,6 +12,10 @@
 #   08:25  盘前：V8_CAL / IPO_DATA / MARGIN_DATA / MACRO_DATA / CRISIS_DATA /
 #                 NORTH_FUND / ANALYST_RATINGS / W52_HIGH / VOLATILITY / HERDING_DATA /
 #                 RESTRICTED_RELEASE / PERFORMANCE_FORECAST
+  #   注意：PERFORMANCE_FORECAST 数据格式 = {summary: {increase, decrease, loss, uncertain, total}, items: [...]}
+  #   summary.total 由云端 f_perf_forecast 算出 = 4 类型合计（schema 已稳定，不要写 sum(increase+...)现算避免与 stats 双源漂移）。
+  #   前端 2026-08-31 起展示为 6 列汇总：预增/预减/预亏/不确定 + 总数 + 净增(=预增−预减)，其中「净增」前端现算不写盘。
+  #   INDEX 同步：logic.html 「今日业绩预告·说明」段已同步改为"6 列"口径。
 #   盘中每30分钟刷新（09:00-15:30）：INDEX_QUOTES / ETF_PULSE / ETF_INTRADAY_HEAT / ETF_SUBSCRIPTION /
 #                     ETF_DAILY_MONITOR / SECTOR_FUND_FLOW / CAPITAL_FLOW_DATA /
 #                     CONCEPT_RANKING / LIMIT_UP_HEATMAP / AI_MARKET_BRIEF
