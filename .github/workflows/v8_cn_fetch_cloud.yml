@@ -65,7 +65,14 @@ concurrency:
 jobs:
   fetch:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    # 2026-08-31 16:25 一劳永逸修复（小九令：收盘数据上线）：25 -> 60
+    #   根因：post_close 要跑 LHB 刷新 + LHB 历史回填 + 研报抓取重建候选池 +
+    #   涨价弹性榜重算 + 板块RS重算 + update_v8 全量重生成 + HEALTH_CHECK 108 项比对，
+    #   实测 15:42 那轮 step18(update_v8) 就已跑到 16:00（17min），16:07:56 被
+    #   25min 硬超时杀死 -> data/*.js 已重生成却来不及 step21 推送 -> 线上数据停滞
+    #   （13:46/15:42 两轮同因 cancelled，数据卡在 14:2x 唯一跑完的一轮）。
+    #   60min 覆盖完整 post_close 链路，intraday 实际仍只需 ~20min，无副作用。
+    timeout-minutes: 60
     env:
       # 🔴 2026-08-06 00:10 必须保留：云端 runner 默认 UTC，朴素 datetime.now() 写出的
       #   update_time 会比北京时间慢 8 小时，前端「更新于」与新鲜度判定全线错位。
