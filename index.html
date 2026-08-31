@@ -2,7 +2,7 @@
 html>
 <html lang="zh-CN">
 <head>
-<!-- deploy-trigger 2026-09-01T07:00 rebuild-from bt-bucket-clickhardened - __jumpBucket加固:document代理兜底+tr不存在回退summary+三段闪烁;期间→入场以来 -->
+<!-- deploy-trigger 2026-09-01T07:15 rebuild-from mc-tab-new + final-chip-add - 共识段方案A行布局+st-mc新子页+最终推荐🤝chip加权 -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -2278,6 +2278,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <!-- 2026-08-29 主人令：选股池作为选股策略子页面；2026-08-30 主人令：选股池移到三重共识前面 -->
       <button class="st-tab active" data-st="pool" onclick="switchSt('pool')">🧭 选股池</button>
       <button class="st-tab" data-st="tc" onclick="switchSt('tc')">🥇 三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span></button>
+      <!-- 2026-09-01 主人令：新增「多 algo 共识」子页面 = 三重共识旁路（看所有 ≥2 algo 命中的票，附 4 桶分布 + 加权进最终推荐） -->
+      <button class="st-tab" data-st="mc" onclick="switchSt('mc')">🆕 多 algo 共识 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#38bdf8;background:rgba(56,189,248,.12);padding:1px 6px;border-radius:4px">v3·试验</span></button>
       <button class="st-tab" data-st="rps" onclick="switchSt('rps')">📈 相对强度 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用·固定</span></button>
     </div>
@@ -2354,6 +2356,25 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div id="ttHistory"></div>
       </div>
     </div><!--/st-tc-->
+
+    <!-- ===== TAB 页面：🆕 多 algo 共识（2026-09-01 主人令：在三重共识后新增独立子页面） ===== -->
+    <!-- 数据契约：window.V8_POOL_TRACKER.pt.items 每只含 consensus_count/algos_hit/selected/selected_score/entry_price/last_pct/days_in -->
+    <div id="st-mc" class="st-pane">
+      <div class="card">
+        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🆕</span>多 algo 共识 · 独立子页 <span style="color:#38bdf8;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span> <span style="font-size:11px;color:var(--sub);font-weight:400">v3·试验</span> <span style="color:var(--dim);font-weight:400">- 盘后 ·</span> <span class="fresh" id="mcTime">—</span></h3>
+        <div class="note" style="margin-bottom:8px;">同源数据：<code>window.V8_POOL_TRACKER.pt.items</code> · 过滤 <code>consensus_count ≥ 2</code> 且 <code>algos_hit.length ≥ 1</code> · 与卡片内「🤝 共识」段共用渲染。下方分两段：① 全共识池（每只独立行，方案 A flex 布局）；② 4 桶分布（强/回/顶/弱拆解）。</div>
+        <div id="mcBody">
+          <div class="note" style="padding:20px;text-align:center;color:var(--dim);">加载中…</div>
+        </div>
+        <div class="note" style="margin-top:10px;font-size:11px;color:var(--dim);line-height:1.6;">
+          <b style="color:#38bdf8">💡 这个新选股方式与「最终推荐」如何结合（方案 B）：</b><br>
+          • <b>3/3 三 algo 全中</b> → 加权 <b style="color:#22c55e">+5 分</b>（高确信）<br>
+          • <b>2/3</b> → 加权 <b style="color:#38bdf8">+3 分</b>（中等）<br>
+          • <b>1/3</b> → 加权 <b style="color:#94a3b8">+1 分</b>（基础）<br>
+          → 见「🏆 最终推荐」表格中每只股右侧 <span style="display:inline-block;padding:1px 6px;font-size:10px;font-weight:700;background:rgba(56,189,248,.18);color:#38bdf8;border:1px solid rgba(56,189,248,.4);border-radius:6px;">🤝 N/3</span> 蓝色徽章
+        </div>
+      </div>
+    </div><!--/st-mc-->
 
     <!-- ===== 驾驶舱 / 全站精选 已下沉「运维→已下架·选股模块」(2026-08-29 主人令) ===== -->
 
@@ -4446,8 +4467,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         html += '<span style="font-size:12.5px;font-weight:700;color:#38bdf8;">🤝 共识 '+consensusItems.length+' 只</span>';
         html += '<span style="font-size:10.5px;color:var(--dim);">v8 三大 algo ≥2 命中（即「多算法共识」，与头部徽章统一简称）· 按共识数↓ · 标注具体算法 · 默认展开 · 卡片 2 列布局</span>';
         html += '</div>';
-        // 【2026-09-01 主人截图】改为一行两列卡片展示（grid 2 列），便于一眼对比
-        html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:4px 0;">';
+        // ────────────── 【2026-09-01 v2】🤝 共识段：方案 A 布局（每胶囊=1 行 flex，内部左右 2 列）──────────────
+        html += '<div style="margin:10px 0;padding:10px;border:1px solid rgba(56,189,248,.35);border-radius:8px;background:rgba(56,189,248,.04);">';
+        html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap;">';
+        html += '<span style="font-size:12.5px;font-weight:700;color:#38bdf8;">🤝 共识 '+consensusItems.length+' 只</span>';
+        html += '<span style="font-size:10.5px;color:var(--dim);">v8 三大 algo ≥2 命中（即「多算法共识」，与头部徽章统一简称）· 按共识数↓ · 默认展开 · 一行一只（左右双列：左=代码名+共识数，右=algo chips+入场以来）</span>';
+        html += '</div>';
         var consShowLimit = 30;
         consensusItems.slice(0, consShowLimit).forEach(function(it){
           if(!it) return;
@@ -4456,29 +4481,28 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var _cons = (typeof it.consensus_count==='number') ? it.consensus_count : 0;
           var _lastPct = (typeof it.last_pct==='number') ? it.last_pct : 0;
           var _algos = Array.isArray(it.algos_hit) ? it.algos_hit : [];
+          var _daysIn = (typeof it.days_in==='number') ? it.days_in : null;
           var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
           var algoChips = _algos.map(function(a){ return '<span style="display:inline-block;padding:1px 6px;margin:1px 2px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(56,189,248,.18);color:#38bdf8;border:1px solid rgba(56,189,248,.4);">'+_esc(a)+'</span>'; }).join('');
-          // 单只股票卡片（grid 项）
-          html += '<div style="padding:10px;border:1px solid rgba(56,189,248,.3);border-radius:8px;background:rgba(56,189,248,.06);">';
-          // 行 1：代码 + 名称 + 共识数（右对齐）
-          html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">';
-          html += '<span style="font-weight:700;font-size:12.5px;color:var(--txt);">'+_esc(_code)+'</span>';
-          html += '<span style="font-size:11.5px;color:var(--sub);">'+_esc(_name)+'</span>';
-          html += '<span style="margin-left:auto;font-weight:700;font-size:11px;color:#38bdf8;">🤝 '+_cons+' / 3</span>';
+          // 方案 A：每只胶囊独占 1 行（flex justify-between），左 = 基本信息 + 共识数，右 = algo chips + 入场以来
+          html += '<div style="display:flex;align-items:center;gap:12px;padding:8px 10px;margin:3px 0;border:1px solid rgba(56,189,248,.28);border-radius:8px;background:rgba(56,189,248,.06);flex-wrap:wrap;">';
+          // 左列：代码 + 名称 + 🤝 N/3
+          html += '<div style="display:flex;align-items:center;gap:8px;min-width:160px;">';
+          html +=   '<span style="font-weight:700;font-size:12.5px;color:var(--txt);font-family:ui-monospace,monospace;">'+_esc(_code)+'</span>';
+          html +=   '<span style="font-size:11.5px;color:var(--txt);">'+_esc(_name)+'</span>';
+          html +=   '<span style="font-weight:700;font-size:11px;color:#38bdf8;padding:2px 8px;border-radius:6px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);white-space:nowrap;">🤝 '+_cons+' / 3</span>';
           html += '</div>';
-          // 行 2：命中的算法 chips（自动换行）
-          html += '<div style="margin-bottom:5px;line-height:1.6;">'+algoChips+'</div>';
-          // 行 3：入场以来（左标签 + 右数字，对齐）
-          html += '<div style="display:flex;align-items:center;">';
-          var _daysIn = (typeof it.days_in==='number') ? it.days_in : null;
-          html += '<span style="font-size:10px;color:var(--dim);" title="从 algo 入选那天起到当前的累计涨幅（基准 entry_price）">入场以来'+( _daysIn!=null ? ' · '+_daysIn+' 天' : '')+'</span>';
-          html += '<span style="margin-left:auto;font-weight:700;font-size:13px;color:'+periodColor+';">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
+          // 右列：algo chips（多行包）+ 入场以来%（右对齐数字）
+          html += '<div style="flex:1;min-width:220px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
+          html +=   '<span style="font-size:10px;color:var(--dim);white-space:nowrap;">命中的算法：</span>';
+          html +=   '<span style="flex:1;min-width:140px;line-height:1.7;">'+(algoChips||'<span style="font-size:10px;color:var(--dim);">—</span>')+'</span>';
+          html +=   '<span style="font-size:10px;color:var(--dim);white-space:nowrap;" title="从 algo 入选那天起到当前的累计涨幅（基准 entry_price）">入场以来'+( _daysIn!=null ? ' · '+_daysIn+' 天' : '')+'</span>';
+          html +=   '<span style="font-weight:700;font-size:14px;color:'+periodColor+';min-width:62px;text-align:right;">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
           html += '</div>';
           html += '</div>';
         });
-        html += '</div>';
         if(consensusItems.length > consShowLimit){
-          html += '<div style="font-size:10.5px;color:var(--dim);margin-top:4px;text-align:center;">已展示前 '+consShowLimit+' / '+consensusItems.length+' 只 · 完整列表见下方「4 桶明细」</div>';
+          html += '<div style="font-size:10.5px;color:var(--dim);margin-top:4px;text-align:center;">已展示前 '+consShowLimit+' / '+consensusItems.length+' 只 · 完整列表见下方「4 桶明细」或切换到「🆕 多 algo 共识」独立子页</div>';
         }
         html += '</div>';
       }
@@ -9501,6 +9525,121 @@ window.showRestrictedItems = showRestrictedItems;
     $('ttHistory').innerHTML=h;
   }
 
+  // ════════════════════════════════════════════════════════════════════
+  // 2026-09-01 主人令：🆕 多 algo 共识 · 独立子页渲染
+  //   复用 window.V8_POOL_TRACKER.pt.items 数据源，与卡片内「🤝 共识」段共用筛选逻辑
+  //   布局方案 A：每只胶囊 = 1 行 flex，内部左右 2 列（左=代码名+🤝 N/3，右=algo chips+入场以来%）
+  //   第二段：4 桶分布（强/回/顶/弱），帮主人看共识票的池子归属
+  // ════════════════════════════════════════════════════════════════════
+  window.renderStMc = function(){
+    try{
+      var host = document.getElementById('mcBody');
+      if(!host) return;
+      var pt = (window.V8_POOL_TRACKER && window.V8_POOL_TRACKER.pt) || {};
+      var items = [];
+      try{ items = Array.isArray(pt.items) ? pt.items.slice() : []; }catch(e){ console.warn('[st-mc] items', e); }
+      // 时间胶囊
+      try{
+        var tEl = document.getElementById('mcTime');
+        if(tEl){
+          var ut = pt.update_time || '';
+          if(ut){
+            tEl.innerHTML = '<span style="color:#22c55e;font-size:11px;font-weight:700;">✓ </span>' + (window._fmtAshareRel ? window._fmtAshareRel(ut) : ut.replace('T',' ').slice(0,16)) + ' <span style="color:#38bdf8;font-size:10px;">盘后</span>';
+          }else{
+            tEl.textContent = '—';
+          }
+        }
+      }catch(_){}
+      // 过滤共识票（与卡片内共用：consensus_count >= 2 && algos_hit.length）
+      var consensusItems = [];
+      try{
+        consensusItems = items.filter(function(x){
+          return x && (typeof x.consensus_count==='number') && x.consensus_count>=2 && (x.algos_hit||[]).length;
+        });
+      }catch(e){ console.warn('[st-mc] consensus filter', e); }
+      // 按 consensus_count 倒序
+      try{
+        consensusItems.sort(function(a,b){ return (b.consensus_count||0) - (a.consensus_count||0); });
+      }catch(e){}
+
+      var html = '';
+      if(!consensusItems.length){
+        html += '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">暂无 ≥2 algo 共识股（盘后跑完会显示）</div>';
+        host.innerHTML = html;
+        return;
+      }
+
+      // ─── 段 1：全共识池（方案 A 行布局）───
+      var consShowLimit = 60;
+      html += '<div style="margin:8px 0;padding:8px;border:1px solid rgba(56,189,248,.35);border-radius:8px;background:rgba(56,189,248,.04);">';
+      html +=   '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">';
+      html +=     '<span style="font-size:12.5px;font-weight:700;color:#38bdf8;">🤝 全共识池 '+consensusItems.length+' 只</span>';
+      html +=     '<span style="font-size:10.5px;color:var(--dim);">每胶囊一行 · 内部左右双列 · 按共识数↓ · 前 '+consShowLimit+' 只</span>';
+      html +=   '</div>';
+
+      consensusItems.slice(0, consShowLimit).forEach(function(it){
+        if(!it) return;
+        var _code = it.code || '';
+        var _name = it.name || '';
+        var _cons = (typeof it.consensus_count==='number') ? it.consensus_count : 0;
+        var _lastPct = (typeof it.last_pct==='number') ? it.last_pct : 0;
+        var _algos = Array.isArray(it.algos_hit) ? it.algos_hit : [];
+        var _daysIn = (typeof it.days_in==='number') ? it.days_in : null;
+        var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
+        var algoChips = _algos.map(function(a){
+          return '<span style="display:inline-block;padding:1px 6px;margin:1px 2px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(56,189,248,.18);color:#38bdf8;border:1px solid rgba(56,189,248,.4);">'+window._escapeHtml(a)+'</span>';
+        }).join('');
+        // flex 容器：左 160px min，右 flex:1（按方案 A）
+        html += '<div style="display:flex;align-items:center;gap:12px;padding:7px 10px;margin:3px 0;border:1px solid rgba(56,189,248,.22);border-radius:8px;background:rgba(56,189,248,.04);flex-wrap:wrap;">';
+        // 左列：代码 + 名称 + 🤝 N/3
+        html +=   '<div style="display:flex;align-items:center;gap:6px;min-width:170px;">';
+        html +=     '<span style="font-weight:700;font-size:12.5px;color:var(--txt);font-family:ui-monospace,monospace;">'+window._escapeHtml(_code)+'</span>';
+        html +=     '<span style="font-size:11.5px;color:var(--txt);">'+window._escapeHtml(_name)+'</span>';
+        html +=     '<span style="font-weight:700;font-size:11px;color:#38bdf8;padding:2px 8px;border-radius:6px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);white-space:nowrap;">🤝 '+_cons+' / 3</span>';
+        html +=   '</div>';
+        // 右列：algo chips + 入场以来%
+        html +=   '<div style="flex:1;min-width:240px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
+        html +=     '<span style="font-size:10px;color:var(--dim);white-space:nowrap;">命中的算法：</span>';
+        html +=     '<span style="flex:1;min-width:160px;line-height:1.7;">'+(algoChips||'<span style="font-size:10px;color:var(--dim);">—</span>')+'</span>';
+        html +=     '<span style="font-size:10px;color:var(--dim);white-space:nowrap;" title="从 algo 入选那天起到当前的累计涨幅（基准 entry_price）">入场以来'+( _daysIn!=null ? ' · '+_daysIn+' 天' : '')+'</span>';
+        html +=     '<span style="font-weight:700;font-size:14px;color:'+periodColor+';min-width:62px;text-align:right;">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
+        html +=   '</div>';
+        html += '</div>';
+      });
+
+      if(consensusItems.length > consShowLimit){
+        html += '<div style="font-size:10.5px;color:var(--dim);margin-top:4px;text-align:center;">已展示前 '+consShowLimit+' / '+consensusItems.length+' 只</div>';
+      }
+      html += '</div>';
+
+      // ─── 段 2：4 桶分布（在共识池内的 status=strong/buy_dip/topped/weak 拆解）───
+      var bucketLabels = {'strong':'🟢 强势','buy_dip':'🟡 回调买点','topped':'🟠 见顶','weak':'🔴 走弱'};
+      var buckets = ['strong','buy_dip','topped','weak'];
+      html += '<div style="margin:8px 0;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--card2);">';
+      html +=   '<div style="font-size:12.5px;font-weight:700;color:var(--txt);margin-bottom:6px;">📊 共识池 → 4 桶分布</div>';
+      buckets.forEach(function(b){
+        var arr = [];
+        try{ arr = consensusItems.filter(function(x){ return x.status===b; }); }catch(e){}
+        if(!arr.length) return;
+        var pct = ((arr.length / consensusItems.length) * 100).toFixed(0);
+        var colorMap = {'strong':'#22c55e','buy_dip':'#fbbf24','topped':'#fb923c','weak':'#ef5350'};
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11.5px;">';
+        html +=   '<span style="font-weight:700;color:'+colorMap[b]+';min-width:90px;">'+bucketLabels[b]+'</span>';
+        html +=   '<span style="font-weight:700;font-size:13px;color:var(--txt);min-width:36px;">'+arr.length+'</span>';
+        html +=   '<span style="font-size:10.5px;color:var(--dim);min-width:40px;">('+pct+'%)</span>';
+        html +=   '<span style="flex:1;color:var(--sub);">'+arr.slice(0,8).map(function(s){ return '<code style="font-size:10.5px;color:var(--sub);margin:0 4px;">'+(s.code||'').replace(/[^0-9]/g,'').slice(-6)+'</code>'; }).join('')+'</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+
+      host.innerHTML = html;
+    }catch(e){
+      try{ console.error('[st-mc] 渲染错误', e); }catch(_){}
+      var host2 = document.getElementById('mcBody');
+      if(host2) host2.innerHTML = '<div class="note" style="padding:14px;background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.35);border-radius:8px;color:#ef5350;font-size:12px;">⚠️ 多 algo 共识 子页渲染错误: '+(e && e.message ? e.message : String(e))+'</div>';
+    }
+  };
+
   let stRendered={};
   function renderStTab(tab){
     // 确保 op 标签的 DATA.*（驾驶舱/全站精选/逆势龙头读取的共享数据源）已从 window.X 填充
@@ -9520,10 +9659,12 @@ window.showRestrictedItems = showRestrictedItems;
   }
   window.switchSt=function(n){
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
-    ['tc','cockpit','allsite','fv','crds','hunter','rps','pool'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
+    ['tc','cockpit','allsite','fv','crds','hunter','rps','pool','mc'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
     renderStTab(n);
     // 2026-08-29 主人令：选股池子页渲染
     if(n==='pool' && typeof window.renderStPool==='function') setTimeout(window.renderStPool, 30);
+    // 2026-09-01 主人令：多 algo 共识独立子页渲染
+    if(n==='mc' && typeof window.renderStMc==='function') setTimeout(window.renderStMc, 30);
   };
   // 2026-08-31 主人令：选股策略「卡名后状态胶囊」——汇总 4 大算法的最新 update_time 与就绪状态，
   //   每个模块都打一个紧凑 _uBadge 风格小胶囊（最近一次盘后基准、主入口/副入口差异化）。
@@ -13451,7 +13592,16 @@ window.__renderV8CalToday();
     }
     var n=document.getElementById('finalTopN'); if(n) n.textContent=(D.stocks.length||3);
     var tag=document.getElementById('finalHeaderTag');
-    if(tag) tag.textContent='双轨排名 · Top'+D.stocks.length+'（分数最强 + 共振最强）· 候选池 '+(D.total_candidates||0)+' 只';
+    if(tag) tag.textContent='双轨排名 · Top'+D.stocks.length+'（分数最强 + 共振最强 · 多algo共识加权）· 候选池 '+(D.total_candidates||0)+' 只';
+    // 2026-09-01 主人令：构建 code → {consensus_count, algos_hit} 索引，给股票卡片加 🤝 N/3 蓝色 chip
+    var _algoIndex = {};
+    try{
+      var _pt = (window.V8_POOL_TRACKER && window.V8_POOL_TRACKER.pt) || {};
+      var _items = Array.isArray(_pt.items) ? _pt.items : [];
+      _items.forEach(function(it){
+        if(it && it.code){ _algoIndex[String(it.code)] = { cons: it.consensus_count||0, algos: Array.isArray(it.algos_hit) ? it.algos_hit : [] }; }
+      });
+    }catch(e){ console.warn('[renderFinalRec] algoIndex', e); }
     // 状态徽标行（与全站精选统一 pill 风格）
     (function(){
       var sb=document.getElementById('finalStatusBadges'); if(!sb) return;
@@ -13590,6 +13740,13 @@ window.__renderV8CalToday();
       if(isHK) tags+='<span class="no-shrink"  style="display:inline-block;padding:2px 7px;border-radius:999px;background:#64748b22;color:#94a3b8;border:1px solid #64748b40;font-size:10px;font-weight:600;white-space:nowrap">数据待补</span>';
       if(s.industry) tags+=_mkTag(s.industry, '#64748b');
       (s.concepts||[]).slice(0,4).forEach(function(c){ tags+=_mkTag(c, '#38bdf8'); });
+      // 2026-09-01 主人令：🆕 多 algo 共识加权（3/3→+5、2/3→+3、1/3→+1）→ 蓝色 chip 显示在 tags 行
+      try{
+        var _ai = _algoIndex[String(s.code)||''];
+        if(_ai && _ai.cons>=2){
+          tags += '<span class="no-shrink" style="font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;background:rgba(56,189,248,.18);color:#38bdf8;border:1px solid rgba(56,189,248,.4);white-space:nowrap;" title="多 algo 共识：'+_fe((_ai.algos||[]).join(' / '))+' （方案B加权 +3 分）">🤝 '+_ai.cons+' / 3</span>';
+        }
+      }catch(_){}
       var srcColor={'三重共识':'var(--purple)','驾驶舱A档':'#ffd54f','驾驶舱B档':'#f59e0b','四量终极':'#ff7043','板块龙头':'#22c55e','大牛股猎手':'#ef4444','逆势龙头·精锐':'#06b6d4'};
       var _srcs = (s.sources||[]);
       var _isMulti = (_srcs.length >= 2);
