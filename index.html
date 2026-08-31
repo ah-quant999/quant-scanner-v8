@@ -12857,15 +12857,40 @@ window.__renderV8CalToday();
         if(typeof window.__retryJudgmentRender==='function') window.__retryJudgmentRender();
       }catch(e){ console.warn('[judgment DOMContentLoaded retry]', e); }
     }
+    // 🛡 2026-09-01 一劳永逸：策略回顾卡(strpsCard·个股相对强度 RPS+RS+年线) 因 data/STOCK_RPS.js 是
+    //   defer 脚本，init 末尾的普通 <script> 在解析阶段执行 renderRpsScreen 时 window.STOCK_RPS_DATA 尚未注入
+    //   → 卡片写入空表（显示「暂无满足条件的个股」）。defer 脚本在 DOMContentLoaded 前执行完毕，故在此兜底重试 +
+    //   自愈轮询，彻底消除空白。范式同 2026-08-19 商品弹性榜(COMMODITY_ELASTICITY)的 setTimeout+自愈。
+    function doRpsRetry(){
+      if(typeof window.renderRpsScreen === 'function' && window.STOCK_RPS_DATA && (window.STOCK_RPS_DATA.records||[]).length){
+        try{ window.renderRpsScreen(); }catch(e){ console.warn('[rps DOMContentLoaded retry]', e); }
+      }
+    }
+    // 自愈轮询：每 1s 检查策略回顾卡是否仍空白且数据已就绪，自动补渲染（应对 CDN 慢/缓存覆盖/defer 延迟）
+    if(typeof window !== 'undefined' && !window.__rpsHealStarted){
+      window.__rpsHealStarted = true;
+      (function selfHealRps(){
+        var body = document.getElementById('strpsBody');
+        if(body){
+          var hasData = window.STOCK_RPS_DATA && (window.STOCK_RPS_DATA.records||[]).length;
+          var isEmpty = !body.innerHTML || body.innerHTML.trim().length < 20;
+          if(hasData && isEmpty){
+            try{ window.renderRpsScreen(); }catch(e){}
+          }
+        }
+        setTimeout(selfHealRps, 1000);
+      })();
+    }
     if(document.readyState === 'loading'){
-      document.addEventListener('DOMContentLoaded', function(){ doV8CalRetry(); doJdRetry(); });
+      document.addEventListener('DOMContentLoaded', function(){ doV8CalRetry(); doJdRetry(); doRpsRetry(); });
     } else {
       doV8CalRetry();
       doJdRetry();
+      doRpsRetry();
     }
     // 额外再拍一次：defer 脚本可能在 DOMContentLoaded 之后才全部跑完
-    setTimeout(function(){ doV8CalRetry(); doJdRetry(); }, 400);
-    setTimeout(function(){ doV8CalRetry(); doJdRetry(); }, 1200);
+    setTimeout(function(){ doV8CalRetry(); doJdRetry(); doRpsRetry(); }, 400);
+    setTimeout(function(){ doV8CalRetry(); doJdRetry(); doRpsRetry(); }, 1200);
   }
   // 实时数据区：情绪周期·连板天梯（迁到涨停热力矩阵上方）
   tryRun('renderCycleLadderCard', window.__renderCycleLadderCard, 'cycle-ladder init');
