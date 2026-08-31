@@ -489,11 +489,11 @@ window.__domReadyFns=[];
     <script src="data/CRISIS_DATA.js?v=0dbf64960e" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=8c58cd3382" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=1a66d55cff" defer></script>
-    <script src="data/STOCK_RPS.js?v=d327fbae0e" defer></script>
+    <script src="data/STOCK_RPS.js?v=af1365ec5f" defer></script>
     <!-- 🛡 2026-08-19：H 反推短线买点（data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js）反推代码 + 跟踪回测，独立于 PDF OCR
          v= 占位由 api_push_raw._stamp_index_v 在每日推送后自动重写为新 sha，确保 CDN 不缓存旧版 -->
-    <script src="data/H_AUTO_BUY.js?v=b0a61c3c8c" defer></script>
-    <script src="data/H_AUTO_BUY_TRACK.js?v=fd4d6f4e78" defer></script>
+    <script src="data/H_AUTO_BUY.js?v=9e598841dd" defer></script>
+    <script src="data/H_AUTO_BUY_TRACK.js?v=f8db38c88f" defer></script>
     <script src="data/UNLISTED_PANEL.js?v=cbb45ec824" defer></script>
     <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
@@ -1345,9 +1345,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CAPITAL_FLOW_DATA.js?v=796b01170c" defer></script>
 <script src="data/SH_SZ_HISTORY.js?v=a9633ec6dc" defer></script>
 <script src="data/CANDIDATE.js?v=3615832bd4" defer></script>
-    <script src="data/FOUR_VOLUME.js?v=f53818eed7" defer></script>
+    <script src="data/FOUR_VOLUME.js?v=aefad242c4" defer></script>
     <script src="data/FOUR_VOLUME_60M.js?v=af87ef8c3e" defer></script>
-    <script src="data/STOCK_STOP_DATA.js?v=59cc26460d" defer></script>
+    <script src="data/STOCK_STOP_DATA.js?v=156169dbbd" defer></script>
     <!-- 2026-08-30 审计修复：STOCK_RPS_DATA 此前【从未被 script 引入】，
          相对强度(RPS)子页 window.STOCK_RPS_DATA 恒为 {} → 表格永远空白。
          现补引入；缓存戳由 update_v8.py 在后续 build 自动刷新。 -->

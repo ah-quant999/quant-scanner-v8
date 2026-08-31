@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-31 02:26:21",
+  "update_time": "2026-08-31 19:53:55",
   "data_date": "update_time",
   "track_start": "2026-08-17",
   "history_days": 10,
@@ -201,47 +201,47 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测",
-    "latest_date": "2026-08-28",
-    "total": 275,
+    "latest_date": "2026-08-31",
+    "total": 281,
     "best_hold_days": 1,
     "periods": {
       "1d": {
-        "win_rate": 56.2,
-        "avg_return": 0.24,
-        "sharpe": 0.05,
-        "count": 263,
+        "win_rate": 57.3,
+        "avg_return": 0.34,
+        "sharpe": 0.07,
+        "count": 269,
         "best": 14.99,
         "worst": -10.02
       },
       "3d": {
-        "win_rate": 40.2,
-        "avg_return": -0.86,
+        "win_rate": 40.0,
+        "avg_return": -0.85,
         "sharpe": -0.12,
-        "count": 263,
+        "count": 269,
         "best": 15.06,
         "worst": -10.04
       },
       "5d": {
-        "win_rate": 47.7,
-        "avg_return": -0.19,
+        "win_rate": 47.5,
+        "avg_return": -0.2,
         "sharpe": -0.02,
-        "count": 263,
+        "count": 269,
         "best": 15.06,
         "worst": -10.08
       },
       "10d": {
-        "win_rate": 52.8,
-        "avg_return": 1.26,
-        "sharpe": 0.13,
-        "count": 263,
+        "win_rate": 52.2,
+        "avg_return": 1.1,
+        "sharpe": 0.12,
+        "count": 269,
         "best": 15.07,
         "worst": -10.04
       },
       "20d": {
-        "win_rate": 47.6,
-        "avg_return": 0.52,
-        "sharpe": 0.06,
-        "count": 263,
+        "win_rate": 48.7,
+        "avg_return": 0.77,
+        "sharpe": 0.09,
+        "count": 269,
         "best": 15.07,
         "worst": -10.04
       }
@@ -250,18 +250,18 @@
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 106,
+      "count": 109,
       "win_rate_5d": 60.7,
-      "avg_ret_5d": 2.17,
-      "best_win_rate": 65.1,
-      "best_hold_days": 10
+      "avg_ret_5d": 2.1,
+      "best_win_rate": 64.3,
+      "best_hold_days": 20
     },
     {
       "band": "70~80",
-      "count": 169,
-      "win_rate_5d": 40.5,
-      "avg_ret_5d": -1.49,
-      "best_win_rate": 54.3,
+      "count": 172,
+      "win_rate_5d": 40.3,
+      "avg_ret_5d": -1.5,
+      "best_win_rate": 55.4,
       "best_hold_days": 1
     }
   ],
@@ -269,45 +269,45 @@
     "periods": [
       {
         "period": "1d",
-        "strict_win": 56.2,
-        "strict_ret": 0.24,
-        "strict_count": 263,
+        "strict_win": 57.3,
+        "strict_ret": 0.34,
+        "strict_count": 269,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "3d",
-        "strict_win": 40.2,
-        "strict_ret": -0.86,
-        "strict_count": 263,
+        "strict_win": 40.0,
+        "strict_ret": -0.85,
+        "strict_count": 269,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "5d",
-        "strict_win": 47.7,
-        "strict_ret": -0.19,
-        "strict_count": 263,
+        "strict_win": 47.5,
+        "strict_ret": -0.2,
+        "strict_count": 269,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "10d",
-        "strict_win": 52.8,
-        "strict_ret": 1.26,
-        "strict_count": 263,
+        "strict_win": 52.2,
+        "strict_ret": 1.1,
+        "strict_count": 269,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "20d",
-        "strict_win": 47.6,
-        "strict_ret": 0.52,
-        "strict_count": 263,
+        "strict_win": 48.7,
+        "strict_ret": 0.77,
+        "strict_count": 269,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -330,9 +330,9 @@
         "avg_return": 4.4
       },
       "5d": {
-        "count": 6,
-        "win_rate": 33.33,
-        "avg_return": 3.63
+        "count": 7,
+        "win_rate": 42.86,
+        "avg_return": 3.56
       },
       "10d": {
         "count": 0,
@@ -420,7 +420,8 @@
         "name": "网宿科技",
         "enter_date": "2026-08-20",
         "offsets": {
-          "3d": -3.47
+          "3d": -3.47,
+          "5d": 3.15
         }
       },
       {
