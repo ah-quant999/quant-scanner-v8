@@ -4308,15 +4308,62 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       });
       html += '</div>';
 
-      /* ─── 阶段 3：待确认剔除区（走弱/见顶，未剔除者） ─── */
+      /* ─── 【2026-09-01 主人截图】精选池默认展开（板块流入×情绪周期双优），其他子块折叠 ─── */
+      var selectedItems = [];
+      try{ selectedItems = (pt.items||[]).filter(function(x){ return x && x.selected; }); }catch(e){ console.warn('[bt] selected filter', e); }
+      if(selectedItems && selectedItems.length){
+        try{ selectedItems = _sortBucket(selectedItems, 'selected_score', false); }catch(e){ console.warn('[bt] selected sort', e); }
+        html += '<div style="margin:10px 0;padding:10px;border:1px solid rgba(251,191,36,.35);border-radius:8px;background:rgba(251,191,36,.04);">';
+        html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
+        html += '<span style="font-size:12.5px;font-weight:700;color:var(--gold);">🌟 精选池 '+selectedItems.length+' 只</span>';
+        html += '<span style="font-size:10.5px;color:var(--dim);">板块流入×情绪周期双优 · 按精选分↓ · 默认展开</span>';
+        html += '</div>';
+        html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;">';
+        html += '<thead><tr style="background:rgba(251,191,36,.08);border-bottom:1.5px solid rgba(251,191,36,.3);">';
+        html += '<th style="padding:5px;text-align:left;color:var(--gold);">代码</th>';
+        html += '<th style="padding:5px;text-align:left;color:var(--gold);">名称</th>';
+        html += '<th style="padding:5px;text-align:left;color:var(--gold);">信号</th>';
+        html += '<th style="padding:5px;text-align:right;color:var(--gold);">精选分</th>';
+        html += '<th style="padding:5px;text-align:left;color:var(--gold);">板块</th>';
+        html += '<th style="padding:5px;text-align:right;color:var(--gold);">期间</th>';
+        html += '</tr></thead><tbody>';
+        var selShowLimit = 30;
+        selectedItems.slice(0, selShowLimit).forEach(function(it){
+          if(!it) return;
+          var _code = it.code || '';
+          var _name = it.name || '';
+          var _selScore = (typeof it.selected_score==='number') ? it.selected_score : 0;
+          var _lastPct = (typeof it.last_pct==='number') ? it.last_pct : 0;
+          var _secNet = (typeof it.sector_net==='number') ? it.sector_net : 0;
+          var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
+          var conceptColor = it.sector_match==='top_inflow' ? '#22c55e' : (it.sector_match==='outflow' ? '#ef5350' : 'var(--dim)');
+          var sigColor = it.signal_type==='多算法共识' ? '#38bdf8' : (it.signal_type==='强势突破' ? '#ef5350' : (it.signal_type==='板块联动' ? '#22c55e' : 'var(--sub)'));
+          html += '<tr style="border-bottom:1px solid rgba(148,163,184,.08);background:rgba(251,191,36,.03);">';
+          html += '<td style="padding:4px 6px;color:var(--txt);font-weight:600;">'+_esc(_code)+'</td>';
+          html += '<td style="padding:4px 6px;color:var(--txt);">'+_esc(_name)+'</td>';
+          html += '<td style="padding:4px 6px;color:'+sigColor+';font-size:10.5px;">'+_esc(it.signal_type||'')+'</td>';
+          html += '<td style="padding:4px 6px;text-align:right;color:var(--gold);font-weight:700;">'+(_selScore>0?'+':'')+_selScore.toFixed(1)+'</td>';
+          html += '<td style="padding:4px 6px;color:'+conceptColor+';font-size:10.5px;" title="净流入 '+(_secNet>0?'+':'')+_secNet.toFixed(1)+'亿">'+(it.concept_top?_esc(it.concept_top):'—')+'</td>';
+          html += '<td style="padding:4px 6px;text-align:right;font-weight:700;color:'+periodColor+';">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</td>';
+          html += '</tr>';
+        });
+        html += '</tbody></table></div>';
+        if(selectedItems.length > selShowLimit){
+          html += '<div style="font-size:10.5px;color:var(--dim);margin-top:4px;text-align:center;">已展示前 '+selShowLimit+' / '+selectedItems.length+' 只 · 完整池见下方「4 桶明细」</div>';
+        }
+        html += '</div>';
+      }
+
+      /* ─── 阶段 3：待确认剔除区（走弱/见顶，未剔除者，默认折叠） ─── */
       var toRemove = [];
       try{
         toRemove = (pt.items || []).filter(function(it){ return (it && (it.status==='weak'||it.status==='topped')) && !removedMap[it.code]; });
       }catch(e){ console.warn('[bt] toRemove filter', e); toRemove = []; }
       if(toRemove && toRemove.length){
         try{ toRemove = _sortBucket(toRemove, 'drawdown', false); }catch(e){ console.warn('[bt] sortBucket', e); }
-        html += '<div style="margin:10px 0;padding:10px;border:1px solid rgba(239,83,80,.3);border-radius:8px;background:rgba(239,83,80,.04);">';
-        html += '<div style="font-size:12px;font-weight:700;color:#ef5350;margin-bottom:6px;">⚠️ 待确认剔除（走弱/见顶，共 '+(toRemove?toRemove.length:0)+' 只）· 点击「确认剔除」仅本机记录，不污染 v8 主线数据</div>';
+        html += '<details style="margin:10px 0;border:1px solid rgba(239,83,80,.3);border-radius:8px;background:rgba(239,83,80,.04);">';
+        html += '<summary style="cursor:pointer;user-select:none;padding:8px 12px;font-size:12.5px;font-weight:700;color:#ef5350;list-style:none;">⚠️ 待确认剔除（走弱/见顶，共 '+(toRemove?toRemove.length:0)+' 只）· 点击展开 · 本机记录不污染主站</summary>';
+        html += '<div style="padding:6px 10px;">';
         if(toRemove && toRemove.length){
           toRemove.forEach(function(it){
             var _code = (it && it.code) || '';
@@ -4331,10 +4378,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
             html += '</div>';
           });
         }
-        html += '</div>';
+        html += '</div></details>';
       }
 
-      // 明细表（桶内按当前 sortField 排序，列头可点击切换，所有桶同步联动）
+      // 明细表（桶内按当前 sortField 排序，列头可点击切换，所有桶同步联动，默认折叠）
+      var _poolTotal = 0; try{ _poolTotal = (pt.items||[]).length; }catch(e){}
+      html += '<details style="margin:10px 0;border:1px solid var(--border);border-radius:8px;background:var(--card2);">';
+      html += '<summary style="cursor:pointer;user-select:none;padding:8px 12px;font-size:12.5px;font-weight:700;color:var(--txt);list-style:none;">📊 4 桶明细（共 '+_poolTotal+' 只）· 当前排序：'+(sortField||'last_pct')+(sortAsc?'↑':'↓')+' · 点击展开</summary>';
+      html += '<div style="padding:6px 10px;">';
       html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
       html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
       html += '<th onclick="window.__sortPoolTracker(\'code\')" style="padding:6px;text-align:left;color:'+(sortField==='code'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">代码'+(sortField==='code'?' '+sortArrow:'')+'</th>';
@@ -4422,14 +4473,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           html += '</tr>';
         });
       });
-      html += '</tbody></table></div>';
+      html += '</tbody></table></div></div></details>';
 
-      /* ─── 阶段 3：已剔除历史区（读 localStorage，纯前端） ─── */
+      /* ─── 阶段 3：已剔除历史区（读 localStorage，纯前端，默认折叠） ─── */
       try{
         var removedCodes = Object.keys(removedMap||{});
         if(removedCodes.length){
-          html += '<div style="margin:10px 0;padding:10px;border:1px solid rgba(148,163,184,.25);border-radius:8px;background:var(--card2);">';
-          html += '<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;">🗑️ 已剔除（本机记录 '+removedCodes.length+' 只）· 仅当前浏览器可见，跨设备不同步</div>';
+          html += '<details style="margin:10px 0;border:1px solid rgba(148,163,184,.25);border-radius:8px;background:var(--card2);">';
+          html += '<summary style="cursor:pointer;user-select:none;padding:8px 12px;font-size:12.5px;font-weight:700;color:var(--sub);list-style:none;">🗑️ 已剔除本机记录 '+removedCodes.length+' 只 · 仅当前浏览器可见 · 点击展开</summary>';
+          html += '<div style="padding:6px 10px;">';
           removedCodes.forEach(function(code){
             var r = (removedMap && removedMap[code]) || {};
             var _rDraw = (typeof r.drawdown==='number') ? r.drawdown : null;
@@ -4440,7 +4492,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
             html += '<span style="margin-left:auto;color:#22c55e;font-size:10.5px;cursor:pointer;user-select:none;" onclick="window.__restoreStock(\''+_esc(code)+'\')">撤销 ↺</span>';
             html += '</div>';
           });
-          html += '</div>';
+          html += '</div></details>';
         }
       }catch(e){ console.warn('[bt] removed codes', e); }
 
