@@ -29,9 +29,14 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "raw_data", "lhb_history.json")
 THRESHOLD = 8000  # 万，强买阈值
 N_CALENDAR_DAYS = 55  # 回溯的日历天数（约 40 个交易日，覆盖 ~6 周）
-# 🛡 2026-08-31：最近 N 个自然日强制重抓。东财当日龙虎榜「先出列表、后补席位」，
-#   首轮抓到常是骨架（seats 全空），必须隔一段时间重抓补全。
-FORCE_REFRESH_DAYS = 4
+# 🛡 2026-08-31：强制重抓窗口（自然日）。仅保留"当日"：
+#   · 骨架数据（stocks>0 但 seats 全空）/ error 占位 / 空壳 已被 _is_real()
+#     判为不完整 → 每轮自动重抓，无需靠本窗口兜底；
+#   · 本窗口唯一不可替代的场景是"当日"——可能在龙虎榜发布前被抓过一次，
+#     stocks 有值但席位不全，需要隔一段时间补全。
+#   · 曾设 4 天，实测每轮 post_close 多花 4-12 分钟重复抓前 3 个交易日，
+#     与 job 60 分钟预算（update_v8 单步已占 ~19 分钟）冲突 → 收窄为 1。
+FORCE_REFRESH_DAYS = 1
 
 
 def _load_lhb_seats():
