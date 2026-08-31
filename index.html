@@ -2209,7 +2209,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- ===== TAB 页面：🧭 选股池（2026-08-29 主人令：从盘后数据·已下架迁至选股策略子页；2026-08-30 移到首位并改为点击展开） ===== -->
     <div id="st-pool" class="st-pane active">
       <div class="card" style="border-left:4px solid #f9a8d4;">
-        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🧭</span>观测候选股池 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span> <span style="font-size:11px;color:var(--sub);font-weight:400">上游水源</span> <span style="color:var(--dim);font-weight:400">- 盘后 ·</span> <span class="fresh" id="stPoolTime">—</span></h3>
+        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🧭</span>观测候选股池 <span class="fresh" id="stPoolTime">—</span> <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span> <span style="font-size:11px;color:var(--sub);font-weight:400">上游水源</span> <span style="color:var(--dim);font-weight:400">- 盘后</span></h3>
         <div id="stPoolSourceDist" class="tp-stocklist"></div>
         <div id="stPoolStockList" class="tp-stocklist" style="display:none;"></div>
         <div class="note">筛选：主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50 + 外资研投(自选+研报)。三板合计≥280视为健康。</div>
@@ -6756,6 +6756,18 @@ window.__v8calAll = function(){
   var arc = (window.V8_CAL_ARCHIVE||[]).slice();
   var live = window.__v8calLiveKey();
   if(live && arc.indexOf(live)<0) arc.push(live);
+  // 2026-08-31 一劳永逸：自动加入 live 月前后各一个月，防止 archive 只有本月时「下个月」按钮被 disabled。
+  // 这样 8 月 31 日也能看 9 月空日历，跨月时无需等周日归档。
+  var m = live ? live.match(/^(\d{4})-(\d{2})$/):null;
+  if(m){
+    var y=+m[1], mo=+m[2];
+    var add=function(yy,mm){
+      if(mm===0){yy--;mm=12;}else if(mm===13){yy++;mm=1;}
+      var k=yy+'-'+String(mm).padStart(2,'0');
+      if(arc.indexOf(k)<0) arc.push(k);
+    };
+    add(y,mo-1); add(y,mo+1);
+  }
   return arc.sort();
 };
 window.__v8calGoto = function(key){
@@ -9715,6 +9727,12 @@ function drawUpDownChart(){
 
 // 2026-08-31：盘后业绩预告/解禁日历 点击展开下表的全局辅助函数
 window._forecastCalendarData = null;
+// 2026-08-31 主人令：业绩预告百分比格式化。change_pct>1000% 时显示为 "X 倍"（如 265430% → 2654.3倍），避免夸张 6 位数百分比；同时按 code 去重，同一股票只保留 change_pct 最大的一条。
+function _fmtForecastPct(pct){
+  if(pct==null || isNaN(pct)) return '—';
+  if(Math.abs(pct)>=1000) return (pct>=0?'+':'') + (pct/100).toFixed(1) + '倍';
+  return (pct>=0?'+':'') + Number(pct).toFixed(0) + '%';
+}
 function showForecastItems(typeKey){
   const d = window._forecastCalendarData;
   if(!d || !d.items) return;
@@ -9722,7 +9740,13 @@ function showForecastItems(typeKey){
   if(!$tbl) return;
   const typeMap = {increase:'预增', decrease:'预减', loss:'预亏', uncertain:'不确定'};
   const label = typeMap[typeKey] || typeKey;
-  const exact = d.items.filter(it => (it.type||'').trim() === label).slice(0, 20);
+  // 按 code 去重：同一股票取 change_pct 最大的一条（避免江波龙因归母/扣非两条指标重复出现）
+  const uniq = d.items.filter(it => (it.type||'').trim() === label).reduce(function(map, it){
+    var cur = map[it.code];
+    if(!cur || (it.change_pct||-Infinity) > (cur.change_pct||-Infinity)) map[it.code] = it;
+    return map;
+  }, {});
+  const exact = Object.values(uniq).sort((a,b)=>(b.change_pct||-99999)-(a.change_pct||-99999)).slice(0, 20);
   let h = '<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">' + label + ' · ' + (exact.length ? '最近 ' + exact.length + ' 家' : '无匹配数据') + '</div>';
   if(!exact.length){ $tbl.innerHTML = h + '<div class="ipo-empty" style="padding:8px 10px;font-size:12px;">该类型暂无明细</div>'; $tbl.style.display='block'; return; }
   h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;">';
@@ -9730,7 +9754,7 @@ function showForecastItems(typeKey){
     const col = (it.change_pct||0) >= 0 ? 'var(--up)' : 'var(--down)';
     h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;">';
     h += '<span style="font-size:12px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (it.name||'—') + ' <span style="font-size:10px;color:var(--dim);">' + (it.code||'—') + '</span></span>';
-    h += '<span style="font-size:12px;font-weight:700;color:' + col + ';flex-shrink:0;">' + ((it.change_pct||0) >= 0 ? '+' : '') + Number(it.change_pct||0).toFixed(0) + '%</span>';
+    h += '<span style="font-size:12px;font-weight:700;color:' + col + ';flex-shrink:0;">' + _fmtForecastPct(it.change_pct) + '</span>';
     h += '</div>';
   });
   h += '</div>';
@@ -9785,23 +9809,24 @@ window.showRestrictedItems = showRestrictedItems;
       return ' <span style="color:'+col+';">'+((diff>0?'+':'')+diff.toFixed(2))+'</span>';
     };
     const rows=[
-      {t:'LPR 1Y', v:m.lpr?m.lpr.lpr_1y+'%':'--', sub:m.lpr?('5Y '+m.lpr.lpr_5y+'%'):'', date:m.lpr&&m.lpr.date},
-      {t:'M2 同比', v:m.m2_yoy?m.m2_yoy.value+'%':'--', sub:delta(m.m2_yoy&&m.m2_yoy.value,m.m2_yoy&&m.m2_yoy.previous), date:m.m2_yoy&&m.m2_yoy.date},
-      {t:'CPI 同比', v:e.cpi?e.cpi.value+'%':'--', sub:delta(e.cpi&&e.cpi.value,e.cpi&&e.cpi.previous), date:e.cpi&&e.cpi.date},
-      {t:'制造业 PMI', v:e.pmi?e.pmi.value:'--', sub:delta(e.pmi&&e.pmi.value,e.pmi&&e.pmi.previous), date:e.pmi&&e.pmi.date},
-      {t:'中美10Y利差', v:m.cn_us_spread?m.cn_us_spread.value+'%':'--', sub:delta(m.cn_us_spread&&m.cn_us_spread.value,m.cn_us_spread&&m.cn_us_spread.previous), date:m.cn_bond_10y&&m.cn_bond_10y.date},
-      {t:'USDCNH', v:g.usdcnh?g.usdcnh.price:'--', sub:g.usdcnh&&g.usdcnh.date, date:''},
-      {t:'VIX', v:g.vix?g.vix.value:'--', sub:g.vix&&g.vix.date, date:''},
-      {t:'黄金', v:c.gold?c.gold.value:'--', sub:c.gold&&c.gold.date, date:''},
-      {t:'原油', v:c.oil?c.oil.value:'--', sub:c.oil&&c.oil.date, date:''},
-      {t:'铜', v:c.copper?c.copper.value:'--', sub:c.copper&&c.copper.date, date:''}
+      // 2026-08-31 主人令：每个胶囊只显示标签+数值（及环比变动），不再逐胶囊写日期，日期统一在卡片顶部时间 pill。
+      {t:'LPR 1Y', v:m.lpr?m.lpr.lpr_1y+'%':'--', sub:m.lpr?('5Y '+m.lpr.lpr_5y+'%'):''},
+      {t:'M2 同比', v:m.m2_yoy?m.m2_yoy.value+'%':'--', sub:delta(m.m2_yoy&&m.m2_yoy.value,m.m2_yoy&&m.m2_yoy.previous)},
+      {t:'CPI 同比', v:e.cpi?e.cpi.value+'%':'--', sub:delta(e.cpi&&e.cpi.value,e.cpi&&e.cpi.previous)},
+      {t:'制造业 PMI', v:e.pmi?e.pmi.value:'--', sub:delta(e.pmi&&e.pmi.value,e.pmi&&e.pmi.previous)},
+      {t:'中美10Y利差', v:m.cn_us_spread?m.cn_us_spread.value+'%':'--', sub:delta(m.cn_us_spread&&m.cn_us_spread.value,m.cn_us_spread&&m.cn_us_spread.previous)},
+      {t:'USDCNH', v:g.usdcnh?g.usdcnh.price:'--', sub:''},
+      {t:'VIX', v:g.vix?g.vix.value:'--', sub:''},
+      {t:'黄金', v:c.gold?c.gold.value:'--', sub:''},
+      {t:'原油', v:c.oil?c.oil.value:'--', sub:''},
+      {t:'铜', v:c.copper?c.copper.value:'--', sub:''}
     ];
     // 2026-08-31：胶囊 4-5 列（min 190px）、内部严格一行，禁止重叠/换行
     let h='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;">';
     rows.forEach(r=>{
       h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:7px 9px;display:flex;justify-content:space-between;align-items:center;overflow:hidden;min-width:0;">';
       h+='<span style="font-size:11px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;max-width:35%;">'+r.t+'</span>';
-      h+='<span style="font-size:13px;font-weight:800;color:var(--txt);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;">'+r.v+(r.sub?' '+r.sub:'')+(r.date?' <span style="font-size:10px;color:var(--dim);font-weight:400;">('+r.date+')</span>':'')+'</span>';
+      h+='<span style="font-size:13px;font-weight:800;color:var(--txt);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;">'+r.v+(r.sub?' '+r.sub:'')+'</span>';
       h+='</div>';
     });
     h+='</div>';
@@ -9881,11 +9906,12 @@ window.showRestrictedItems = showRestrictedItems;
     }else{
       h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">今日发布 · TOP 预增</div>';
       h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;">';
+      // 2026-08-31 今日口径同样使用 _fmtForecastPct 格式化，避免 +265430% 类夸张显示
       tList.slice(0,4).forEach(it=>{
         const col=it.change_pct>=0?'var(--up)':'var(--down)';
         h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 10px;background:var(--card2);border:1px solid var(--border2);border-radius:8px;">';
         h+='<span style="font-size:12px;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.code+'</span> <span style="font-size:10px;color:var(--sub);">'+it.type+'</span></span>';
-        h+='<span style="font-size:12px;font-weight:700;color:'+col+';flex-shrink:0;">'+(it.change_pct>=0?'+':'')+Number(it.change_pct).toFixed(0)+'%</span>';
+        h+='<span style="font-size:12px;font-weight:700;color:'+col+';flex-shrink:0;">'+_fmtForecastPct(it.change_pct)+'</span>';
         h+='</div>';
       });
       h+='</div>';
