@@ -2037,6 +2037,31 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         });
         return arr;
       };
+
+      // 🛡 2026-08-31 一劳永逸：共振日历必须显式标注「数据是哪一天」。
+      //   历史教训：LHB_DATA.update_time 每轮跑批都刷新（显示"更新于 X 分钟前"），
+      //   但 date 可能仍停在上一个交易日（当日龙虎榜 17:30 后才发布）→
+      //   主人看到"刚更新"却找不到当日数据，误判为"日历又空了"。
+      //   另：LHB_HISTORY 里当日若为 {'trading': false, 'error': ...} 占位，
+      //   _rcDays() 会将其过滤 → 今天那格空白且无任何原因说明。
+      //   现统一在标题上打「数据日期」badge，非当日时追加橙色「今日未发布」提示。
+      window._rcDataDateBadge = function(lhbDate){
+        if(!lhbDate || String(lhbDate).length !== 8){ return ''; }
+        var iso = String(lhbDate);
+        var txt = '数据日期 ' + iso.slice(4,6) + '-' + iso.slice(6,8);
+        var n = new Date();
+        var today = String(n.getFullYear())
+                  + String(n.getMonth()+1).padStart(2,'0')
+                  + String(n.getDate()).padStart(2,'0');
+        var isToday = (iso === today);
+        var color = isToday ? '#26a69a' : '#f59e0b';
+        var tip   = isToday ? '' : ' · 今日未发布';
+        return '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;'
+             + 'border-radius:8px;font-size:11.5px;font-weight:600;'
+             + 'background:rgba(255,255,255,.05);color:' + color + ';'
+             + 'border:1px solid ' + color + '55;white-space:nowrap;margin-left:6px">'
+             + '📌 ' + txt + tip + '</span>';
+      };
     })();
     </script>
 
@@ -2725,7 +2750,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     var h = '';
     h += '<div class="cal-header-row">';
-    h += '<span class="cal-title">📅 机游共振日历 ' + _uBadge('盘后', '短线', updateTime) + '</span>';
+    h += '<span class="cal-title">📅 机游共振日历 ' + (window._rcDataDateBadge ? _rcDataDateBadge(lhbDate) : '') + _uBadge('盘后', '短线', updateTime) + '</span>';
     h += '<span class="cal-meta">'
        + '<button class="cal-nav-btn" onclick="_jyCalPrev()" title="上个月">◀</button>'
        + ' <span id="jyCalYearMonth">' + year + '年' + (month+1) + '月</span> '
@@ -3142,12 +3167,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     if(!c) return;
     try{
     var NF = window.NORTH_FUND || {};
+    // 🛡 2026-08-31：标题要显示「数据日期」，但原 lhbDate 定义在标题之后，
+    //   这里先算一次最新数据日期（_rcDays() 是纯内存聚合，开销可忽略）。
+    var _nbEarly = (window._rcDays() || []);
+    var _lhbDateTop = _nbEarly.length
+      ? String(_nbEarly[_nbEarly.length-1].iso).replace(/-/g,'') : '';
 
     var year = window.__northCalState.y, month = window.__northCalState.m;
 
     var h = '';
     h += '<div class="cal-header-row">';
-    h += '<span class="cal-title">🌊 北向资金日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span> ' + _uBadge('盘后', '短线', (window.LHB_DATA && window.LHB_DATA.update_time) || NF.update_time) + '</span>';
+    h += '<span class="cal-title">🌊 北向资金日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span> ' + (window._rcDataDateBadge ? _rcDataDateBadge(_lhbDateTop) : '') + _uBadge('盘后', '短线', (window.LHB_DATA && window.LHB_DATA.update_time) || NF.update_time) + '</span>';
     h += '<span class="cal-meta">'
        + '<button class="cal-nav-btn" onclick="_northCalPrev()" title="上个月">◀</button>'
        + ' <span id="northCalYearMonth">' + year + '年' + (month+1) + '月</span> '
