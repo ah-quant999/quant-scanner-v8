@@ -1,13 +1,13 @@
 {
-  "update_time": "2026-08-31 17:10:58",
-  "total": 399,
+  "update_time": "2026-08-31 19:13:48",
+  "total": 414,
   "hysteresis_days": 5,
   "source_dist": {
     "主板成交前100": 102,
-    "外资研投": 36,
+    "外资研投": 35,
     "创业板成交前100": 101,
     "科创板成交前100": 101,
-    "港股成交前50": 66
+    "港股成交前50": 81
   },
   "stocks": {
     "sh_600183": {
@@ -4004,20 +4004,9 @@
       "first_seen": "2026-08-29",
       "last_seen": "2026-08-31"
     },
-    "hk_02513": {
-      "code": "02513",
-      "name": "02513",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
     "hk_09988": {
       "code": "09988",
-      "name": "09988",
+      "name": "阿里巴巴-W",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4028,18 +4017,7 @@
     },
     "hk_00700": {
       "code": "00700",
-      "name": "00700",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
-    "hk_00100": {
-      "code": "00100",
-      "name": "00100",
+      "name": "腾讯控股",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4050,7 +4028,7 @@
     },
     "hk_03690": {
       "code": "03690",
-      "name": "03690",
+      "name": "美团-W",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4061,41 +4039,18 @@
     },
     "hk_00939": {
       "code": "00939",
-      "name": "00939",
+      "name": "建设银行",
       "market": "hk",
       "board_label": "港股",
       "sources": [
         "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
-    "hk_01888": {
-      "code": "01888",
-      "name": "建滔积层板",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50",
-        "外资研投"
       ],
       "first_seen": "2026-08-29",
       "last_seen": "2026-08-31"
     },
     "hk_02318": {
       "code": "02318",
-      "name": "02318",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
-    "hk_00148": {
-      "code": "00148",
-      "name": "00148",
+      "name": "中国平安",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4106,29 +4061,7 @@
     },
     "hk_03988": {
       "code": "03988",
-      "name": "03988",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
-    "hk_01211": {
-      "code": "01211",
-      "name": "01211",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
-    "hk_00992": {
-      "code": "00992",
-      "name": "00992",
+      "name": "中国银行",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4139,29 +4072,7 @@
     },
     "hk_01347": {
       "code": "01347",
-      "name": "01347",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
-    "hk_00268": {
-      "code": "00268",
-      "name": "00268",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
-    "hk_06869": {
-      "code": "06869",
-      "name": "06869",
+      "name": "华虹宏力",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4172,7 +4083,18 @@
     },
     "hk_00981": {
       "code": "00981",
-      "name": "00981",
+      "name": "中芯国际",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_00268": {
+      "code": "00268",
+      "name": "金蝶国际",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4183,7 +4105,7 @@
     },
     "hk_01109": {
       "code": "01109",
-      "name": "01109",
+      "name": "华润置地",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4194,7 +4116,7 @@
     },
     "hk_01398": {
       "code": "01398",
-      "name": "01398",
+      "name": "工商银行",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4205,7 +4127,7 @@
     },
     "hk_02899": {
       "code": "02899",
-      "name": "02899",
+      "name": "紫金矿业",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4216,7 +4138,7 @@
     },
     "hk_01299": {
       "code": "01299",
-      "name": "01299",
+      "name": "友邦保险",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4227,7 +4149,7 @@
     },
     "hk_01810": {
       "code": "01810",
-      "name": "01810",
+      "name": "小米集团-W",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4250,7 +4172,7 @@
     },
     "hk_02628": {
       "code": "02628",
-      "name": "02628",
+      "name": "中国人寿",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4261,7 +4183,7 @@
     },
     "hk_01787": {
       "code": "01787",
-      "name": "01787",
+      "name": "山东黄金",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4270,20 +4192,9 @@
       "first_seen": "2026-08-31",
       "last_seen": "2026-08-31"
     },
-    "hk_02259": {
-      "code": "02259",
-      "name": "02259",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
     "hk_02359": {
       "code": "02359",
-      "name": "02359",
+      "name": "药明康德",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4294,18 +4205,7 @@
     },
     "hk_02382": {
       "code": "02382",
-      "name": "02382",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
-    "hk_03800": {
-      "code": "03800",
-      "name": "03800",
+      "name": "舜宇光学科技",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4316,18 +4216,7 @@
     },
     "hk_09888": {
       "code": "09888",
-      "name": "09888",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
-    "hk_03308": {
-      "code": "03308",
-      "name": "03308",
+      "name": "百度集团-W",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4338,40 +4227,7 @@
     },
     "hk_01801": {
       "code": "01801",
-      "name": "01801",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
-    "hk_00688": {
-      "code": "00688",
-      "name": "00688",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-31",
-      "last_seen": "2026-08-31"
-    },
-    "hk_01548": {
-      "code": "01548",
-      "name": "01548",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
-    "hk_00388": {
-      "code": "00388",
-      "name": "00388",
+      "name": "信达生物",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4382,7 +4238,18 @@
     },
     "hk_00285": {
       "code": "00285",
-      "name": "00285",
+      "name": "比亚迪电子",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_00688": {
+      "code": "00688",
+      "name": "中国海外发展",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4393,18 +4260,7 @@
     },
     "hk_02388": {
       "code": "02388",
-      "name": "02388",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-31",
-      "last_seen": "2026-08-31"
-    },
-    "hk_00300": {
-      "code": "00300",
-      "name": "00300",
+      "name": "中银香港",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4415,7 +4271,7 @@
     },
     "hk_01024": {
       "code": "01024",
-      "name": "01024",
+      "name": "快手-W",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4426,29 +4282,7 @@
     },
     "hk_09999": {
       "code": "09999",
-      "name": "09999",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
-    "hk_06082": {
-      "code": "06082",
-      "name": "06082",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-31",
-      "last_seen": "2026-08-31"
-    },
-    "hk_03750": {
-      "code": "03750",
-      "name": "03750",
+      "name": "网易",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4459,29 +4293,7 @@
     },
     "hk_03968": {
       "code": "03968",
-      "name": "03968",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-31",
-      "last_seen": "2026-08-31"
-    },
-    "hk_09660": {
-      "code": "09660",
-      "name": "09660",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-31",
-      "last_seen": "2026-08-31"
-    },
-    "hk_06809": {
-      "code": "06809",
-      "name": "06809",
+      "name": "招商银行",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4492,7 +4304,7 @@
     },
     "hk_01658": {
       "code": "01658",
-      "name": "01658",
+      "name": "邮储银行",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4512,9 +4324,53 @@
       "first_seen": "2026-08-31",
       "last_seen": "2026-08-31"
     },
-    "hk_09926": {
-      "code": "09926",
-      "name": "09926",
+    "hk_01093": {
+      "code": "01093",
+      "name": "石药集团",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_00857": {
+      "code": "00857",
+      "name": "中国石油股份",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_06160": {
+      "code": "06160",
+      "name": "百济神州",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_03993": {
+      "code": "03993",
+      "name": "洛阳钼业",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-30",
+      "last_seen": "2026-08-31"
+    },
+    "hk_00883": {
+      "code": "00883",
+      "name": "中国海洋石油",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4523,9 +4379,20 @@
       "first_seen": "2026-08-29",
       "last_seen": "2026-08-31"
     },
-    "hk_00136": {
-      "code": "00136",
-      "name": "00136",
+    "hk_00005": {
+      "code": "00005",
+      "name": "汇丰控股",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_09961": {
+      "code": "09961",
+      "name": "携程集团-S",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4534,9 +4401,9 @@
       "first_seen": "2026-08-31",
       "last_seen": "2026-08-31"
     },
-    "hk_01093": {
-      "code": "01093",
-      "name": "01093",
+    "hk_00016": {
+      "code": "00016",
+      "name": "新鸿基地产",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4545,9 +4412,141 @@
       "first_seen": "2026-08-31",
       "last_seen": "2026-08-31"
     },
-    "hk_03330": {
-      "code": "03330",
-      "name": "03330",
+    "hk_01288": {
+      "code": "01288",
+      "name": "农业银行",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_02380": {
+      "code": "02380",
+      "name": "中国电力",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_02015": {
+      "code": "02015",
+      "name": "理想汽车-W",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_00941": {
+      "code": "00941",
+      "name": "中国移动",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_00012": {
+      "code": "00012",
+      "name": "恒基地产",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_01171": {
+      "code": "01171",
+      "name": "兖矿能源",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_09987": {
+      "code": "09987",
+      "name": "百胜中国",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_02018": {
+      "code": "02018",
+      "name": "瑞声科技",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_01918": {
+      "code": "01918",
+      "name": "融创中国",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_00386": {
+      "code": "00386",
+      "name": "中国石油化工股份",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_09868": {
+      "code": "09868",
+      "name": "小鹏集团-W",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_01336": {
+      "code": "01336",
+      "name": "新华保险",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_01088": {
+      "code": "01088",
+      "name": "中国神华",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -4633,6 +4632,226 @@
       "board_label": "港股",
       "sources": [
         "外资研投"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_01888": {
+      "code": "01888",
+      "name": "建滔积层板",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "外资研投"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_02513": {
+      "code": "02513",
+      "name": "02513",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_00100": {
+      "code": "00100",
+      "name": "00100",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_00148": {
+      "code": "00148",
+      "name": "00148",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_01211": {
+      "code": "01211",
+      "name": "01211",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_00992": {
+      "code": "00992",
+      "name": "00992",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_06869": {
+      "code": "06869",
+      "name": "06869",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_02259": {
+      "code": "02259",
+      "name": "02259",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_03800": {
+      "code": "03800",
+      "name": "03800",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_03308": {
+      "code": "03308",
+      "name": "03308",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_01548": {
+      "code": "01548",
+      "name": "01548",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_00388": {
+      "code": "00388",
+      "name": "00388",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_00300": {
+      "code": "00300",
+      "name": "00300",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_06082": {
+      "code": "06082",
+      "name": "06082",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_03750": {
+      "code": "03750",
+      "name": "03750",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_09660": {
+      "code": "09660",
+      "name": "09660",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_06809": {
+      "code": "06809",
+      "name": "06809",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_09926": {
+      "code": "09926",
+      "name": "09926",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-29",
+      "last_seen": "2026-08-31"
+    },
+    "hk_00136": {
+      "code": "00136",
+      "name": "00136",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
+      ],
+      "first_seen": "2026-08-31",
+      "last_seen": "2026-08-31"
+    },
+    "hk_03330": {
+      "code": "03330",
+      "name": "03330",
+      "market": "hk",
+      "board_label": "港股",
+      "sources": [
+        "港股成交前50"
       ],
       "first_seen": "2026-08-31",
       "last_seen": "2026-08-31"
@@ -5345,28 +5564,6 @@
       "first_seen": "2026-08-29",
       "last_seen": "2026-08-31"
     },
-    "hk_00883": {
-      "code": "00883",
-      "name": "00883",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
-    "hk_00005": {
-      "code": "00005",
-      "name": "00005",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
     "hk_03986": {
       "code": "03986",
       "name": "03986",
@@ -5411,17 +5608,6 @@
       "first_seen": "2026-08-29",
       "last_seen": "2026-08-31"
     },
-    "hk_00941": {
-      "code": "00941",
-      "name": "00941",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
     "hk_06166": {
       "code": "06166",
       "name": "06166",
@@ -5436,17 +5622,6 @@
     "hk_01357": {
       "code": "01357",
       "name": "01357",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "港股成交前50"
-      ],
-      "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
-    "hk_00386": {
-      "code": "00386",
-      "name": "00386",
       "market": "hk",
       "board_label": "港股",
       "sources": [
@@ -5486,17 +5661,6 @@
         "港股成交前50"
       ],
       "first_seen": "2026-08-29",
-      "last_seen": "2026-08-31"
-    },
-    "hk_03993": {
-      "code": "03993",
-      "name": "洛阳钼业",
-      "market": "hk",
-      "board_label": "港股",
-      "sources": [
-        "外资研投"
-      ],
-      "first_seen": "2026-08-30",
       "last_seen": "2026-08-31"
     },
     "hk_02600": {
