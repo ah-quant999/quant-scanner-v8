@@ -43,6 +43,7 @@ on:
       - "🇨🇳 v8 中国数据抓取(云端)"
       - "☁️ v8 盘后算法链(云端)"
       - "🌍 v8 实时风险温度计"
+      - "☁️ v8 盘中算法追踪(轻量)"
     types: [completed]
     branches: [main]
   workflow_dispatch:
@@ -52,24 +53,29 @@ permissions:
   actions: read   # v8_health_check.py 查 /actions/runners 需要此权限；不加则 401
 
 concurrency:
-  group: v8-build-deploy
-  # 🛡 2026-08-27 主人令（11:00/11:30 盘中更新全断根因）：8-09 幽灵 in_progress build run
-  #   一直占着本并发组，后续 workflow_run 触发的 build 全部排队 → data/*.js 永不重建。
-  #   改 cancel-in-progress: true：新触发的 build 取消旧排队/僵尸，永远跑最新 raw_data。
+  # 🛡 2026-08-31 一劳永逸根治「构建部署永不成功 / 持续 cancelled」：
+  #   根因：云端多个 workflow（盘中算法追踪 / 风险温度计 / cn抓取 / 盘后算法链 / 龙虎榜…）
+  #   用 PAT（actor=ah-quant999，≠ github-actions[bot]）push raw_data/data，每次都命中
+  #   on.push → 触发一场 build。cancel-in-progress 让新 build 取消在跑的旧 build →
+  #   只要触发频率高于单次构建时长(~14min)，build 永远被取消、data 永不重生（今日6h零成功）。
+  #   修复：并发组按事件类型隔离——push / workflow_run / workflow_dispatch 各占独立组。
+  #   · push 组：机器人 raw_data 推送互相取消（无害，本就由下方 workflow_run 兜底）。
+  #   · workflow_run 组：云端 workflow 成功完成才触发，与 push 组互不干扰 → 必定跑完并部署。
+  #   · workflow_dispatch 组：手动兜底，必定跑完。
+  #   效果：无论 push 风暴多密，workflow_run/dispatch 的构建都能独立跑完，data 必重生。
+  group: v8-build-deploy-${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    # 🛡 2026-08-31 一劳永逸根治「构建部署自触发取消死循环」：
-    #   旧逻辑 push 事件无条件构建 → 本 workflow 部署时 push data/**+index.html（GITHUB_TOKEN 即
-    #   github-actions[bot]）→ 再次命中 push.paths → 触发新一轮 → cancel-in-progress 取消在跑的自己
-    #   → 每次都 cancelled，data 内容永不重生（症状：TRIPLE_CONSENSUS 卡 08-30）。
-    #   修复：push 事件下仅当推送者非 bot（即人类/本地推送）才构建；bot 推送（含本 workflow 自身
-    #   部署 push、缓存戳对齐 push）一律跳过，斩断自触发环。workflow_run（算法链/抓取完成）与
-    #   workflow_dispatch（手动兜底）不受影响，照常构建。
-    if: (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || (github.event_name == 'workflow_dispatch') || (github.event_name == 'push' && github.actor != 'github-actions[bot]')
+    # 🛡 构建条件：workflow_run 上游成功 / 手动 dispatch / 任意 push 均构建。
+    #   注：曾误以为「bot 自触发」靠 github.actor=='github-actions[bot]' 排除，但实测云端
+    #   workflow 用 PAT 推送，actor 实为 ah-quant999（≠ github-actions[bot]），故 actor 过滤无效。
+    #   真正的根治在上方 concurrency：按事件类型分桶，workflow_run/dispatch 组不被 push 风暴取消，
+    #   必定跑完并部署；push 组的机器人互相取消无害（数据由 workflow_run 兜底重建）。
+    if: (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || (github.event_name == 'workflow_dispatch') || (github.event_name == 'push')
     steps:
       - uses: actions/checkout@v4
         with:
