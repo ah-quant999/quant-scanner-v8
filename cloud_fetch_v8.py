@@ -3006,6 +3006,32 @@ def f_v8_cal(today=None):
     }
     # 🗄 归档本月（历史月份永不丢失，下月生成时可回读继承）
     _cal_archive_month(y, m, _payload)
+    # 🛡 2026-08-31 一劳永逸：同步发布前端可回看的归档（data/archive/V8_CAL_YYYY-MM.js + 索引）。
+    #   这样每月切月时旧月自动留在 data/archive/，前端「重要事件日历」◀ 即可回看，无需手动干预。
+    try:
+        import json as _json, re as _re
+        _k = f"{y:04d}-{m:02d}"
+        _arc_dir = Path(__file__).resolve().parent / "data" / "archive"
+        _arc_dir.mkdir(parents=True, exist_ok=True)
+        (_arc_dir / f"V8_CAL_{_k}.js").write_text(
+            "window.V8_CAL_ARC = " + _json.dumps(_payload, ensure_ascii=False) + ";\n",
+            encoding="utf-8")
+        _idx = _arc_dir / "V8_CAL_INDEX.js"
+        _keys = []
+        if _idx.exists():
+            try:
+                _m = _re.search(r"\[([^\]]*)\]", _idx.read_text(encoding="utf-8"))
+                if _m:
+                    _keys = [s.strip().strip('"').strip("'") for s in _m.group(1).split(",") if s.strip()]
+            except Exception:
+                _keys = []
+        if _k not in _keys:
+            _keys.append(_k)
+        _keys = sorted(set(_keys))
+        _idx.write_text("window.V8_CAL_ARCHIVE = " + _json.dumps(_keys, ensure_ascii=False) + ";\n", encoding="utf-8")
+        print(f"    🗄 前端归档已发布 data/archive/V8_CAL_{_k}.js（索引 {len(_keys)} 个月）")
+    except Exception as e:
+        print(f"    ⚠️ 前端归档发布失败（不影响主数据）: {e}")
     return _payload
 
 
