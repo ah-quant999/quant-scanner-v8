@@ -144,7 +144,8 @@
       "2026-08-17": 0
     },
     "300857": {
-      "2026-08-17": 0
+      "2026-08-17": 0,
+      "2026-09-01": 0
     },
     "002371": {
       "2026-08-17": 765.97,
@@ -163,7 +164,8 @@
       "2026-08-18": 33.91,
       "2026-08-29": 36.69,
       "2026-08-30": 36.69,
-      "2026-08-31": 40.36
+      "2026-08-31": 40.36,
+      "2026-09-01": 40.36
     },
     "688012": {
       "2026-08-19": 398.33,
@@ -184,7 +186,8 @@
     "300017": {
       "2026-08-20": 15.86,
       "2026-08-29": 15.31,
-      "2026-08-31": 16.36
+      "2026-08-31": 16.36,
+      "2026-09-01": 16.36
     },
     "000725": {
       "2026-08-20": 6.01,
@@ -229,15 +232,18 @@
     "002475": {
       "2026-08-29": 56.6,
       "2026-08-30": 56.6,
-      "2026-08-31": 0
+      "2026-08-31": 0,
+      "2026-09-01": 0
     },
     "002463": {
       "2026-08-30": 0,
-      "2026-08-31": 0
+      "2026-08-31": 0,
+      "2026-09-01": 0
     },
     "300475": {
       "2026-08-30": 172.1,
-      "2026-08-31": 172.1
+      "2026-08-31": 172.1,
+      "2026-09-01": 0
     },
     "601138": {
       "2026-08-30": 64.04,
@@ -245,7 +251,8 @@
     },
     "001309": {
       "2026-08-30": 0,
-      "2026-08-31": 0
+      "2026-08-31": 0,
+      "2026-09-01": 0
     }
   },
   "_tracking_latest": {
@@ -315,11 +322,11 @@
     "300857": {
       "enter_date": "2026-08-17",
       "enter_close": 0,
-      "last_date": "2026-08-17",
+      "last_date": "2026-09-01",
       "last_close": 0,
-      "status": "dropped",
+      "status": "near",
       "streak": 1,
-      "total_days": 1
+      "total_days": 2
     },
     "300274": {
       "enter_date": "2026-08-17",
@@ -465,7 +472,7 @@
       "enter_close": 132.8,
       "last_date": "2026-08-31",
       "last_close": 145.65,
-      "status": "near",
+      "status": "dropped",
       "streak": 5,
       "total_days": 5
     },
@@ -499,20 +506,20 @@
     "002475": {
       "enter_date": "2026-08-29",
       "enter_close": 56.6,
-      "last_date": "2026-08-31",
+      "last_date": "2026-09-01",
       "last_close": 0,
       "status": "near",
-      "streak": 3,
-      "total_days": 2
+      "streak": 4,
+      "total_days": 3
     },
     "300475": {
       "enter_date": "2026-08-30",
       "enter_close": 172.1,
-      "last_date": "2026-08-31",
-      "last_close": 172.1,
+      "last_date": "2026-09-01",
+      "last_close": 0,
       "status": "near",
-      "streak": 2,
-      "total_days": 2
+      "streak": 3,
+      "total_days": 3
     },
     "601138": {
       "enter_date": "2026-08-30",
@@ -526,26 +533,26 @@
     "001309": {
       "enter_date": "2026-08-30",
       "enter_close": 0,
-      "last_date": "2026-08-31",
+      "last_date": "2026-09-01",
       "last_close": 0,
       "status": "near",
-      "streak": 2,
-      "total_days": 2
+      "streak": 3,
+      "total_days": 3
     },
     "002463": {
       "enter_date": "2026-08-30",
       "enter_close": 0,
-      "last_date": "2026-08-31",
+      "last_date": "2026-09-01",
       "last_close": 0,
       "status": "near",
-      "streak": 2,
-      "total_days": 2
+      "streak": 3,
+      "total_days": 3
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-08-31 19:53:54"
+    "last_update": "2026-09-01 03:01:27"
   },
   "2026-08-18": [
     {
@@ -1140,7 +1147,7 @@
       "status": "near"
     }
   ],
-  "update_time": "2026-08-31 19:53:54",
+  "update_time": "2026-09-01 03:01:27",
   "2026-08-30": [
     {
       "code": "300475",
@@ -1308,6 +1315,88 @@
       "close": 0,
       "pct_chg": 0,
       "total_score": 25,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": null,
+      "status": "near"
+    },
+    {
+      "code": "002463",
+      "name": "沪电股份",
+      "market": "深市",
+      "board": "主板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 22,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": null,
+      "status": "near"
+    }
+  ],
+  "2026-09-01": [
+    {
+      "code": "300475",
+      "name": "香农芯创",
+      "market": "创业板",
+      "board": "创业板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 40,
+      "quality_grade": "A",
+      "industry": "批发业",
+      "sectors": [
+        "批发业"
+      ],
+      "signal_count": null,
+      "status": "near"
+    },
+    {
+      "code": "002475",
+      "name": "立讯精密",
+      "market": "深市",
+      "board": "主板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 32,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": null,
+      "status": "near"
+    },
+    {
+      "code": "001309",
+      "name": "德明利",
+      "market": "深市",
+      "board": "主板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 25,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": null,
+      "status": "near"
+    },
+    {
+      "code": "300857",
+      "name": "协创数据",
+      "market": "创业板",
+      "board": "创业板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 22,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [

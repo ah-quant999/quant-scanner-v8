@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-08-31 20:01",
+  "update_time": "2026-09-01 03:03",
   "data_type": "real",
   "summary": {
     "in_count": 40,
     "out_count": 0,
     "in_text": "人工智能(204.8亿)、东数西算(算力)(177.8亿)、华为概念(169.8亿)、芯片概念(158.1亿)、虚拟现实(146.2亿)",
     "out_text": "无",
-    "alert": "🔥 40个板块大幅流入；🚀 人工智能+204.8亿、东数西算(算力)+177.8亿(连5天)、华为概念+169.8亿"
+    "alert": "🔥 40个板块大幅流入；🚀 人工智能+204.8亿(连2天)、东数西算(算力)+177.8亿(连6天)、华为概念+169.8亿(连2天)"
   },
   "sectors_in": [
     {
@@ -20,9 +20,9 @@
       "net_20d_days": 19,
       "net_60d": 379.19,
       "net_60d_days": 19,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 226.04,
+      "net_10d": 453.38,
       "net_10d_days": 10
     },
     {
@@ -35,10 +35,10 @@
       "source": "本地累加",
       "net_60d": 471.37,
       "net_60d_days": 5,
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in",
-      "net_10d_days": 5,
-      "net_20d_days": 5
+      "net_10d_days": 6,
+      "net_20d_days": 6
     },
     {
       "name": "华为概念",
@@ -51,9 +51,9 @@
       "net_20d_days": 20,
       "net_60d": 379.93,
       "net_60d_days": 20,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 569.59,
+      "net_10d": 672.72,
       "net_10d_days": 10
     },
     {
@@ -67,10 +67,10 @@
       "net_20d_days": 8,
       "net_60d": 1887.91,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1887.91,
-      "net_10d_days": 8
+      "net_10d": 2046.04,
+      "net_10d_days": 9
     },
     {
       "name": "虚拟现实",
@@ -83,9 +83,9 @@
       "net_20d_days": 16,
       "net_60d": 21.35,
       "net_60d_days": 16,
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "in",
-      "net_10d": 35.41,
+      "net_10d": 143.47,
       "net_10d_days": 10
     },
     {
@@ -104,16 +104,17 @@
     {
       "name": "阿里巴巴概念",
       "net": 130.67,
-      "net_5d": 158.3,
-      "net_20d": 1896.63,
+      "net_5d": 668.45,
+      "net_20d": 2281.04,
       "type": "概念",
-      "net_10d": -472.32,
+      "net_10d": -145.5,
       "net_10d_days": 10,
-      "consecutive_days": 2,
+      "net_60d": -4343.0,
+      "net_60d_days": 50,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_5d_days": 2,
-      "net_20d_days": 2,
-      "net_60d_days": 2
+      "net_5d_days": 3,
+      "net_20d_days": 3
     },
     {
       "name": "融资融券",
@@ -139,9 +140,9 @@
       "net_20d_days": 17,
       "net_60d": -62.05,
       "net_60d_days": 17,
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in",
-      "net_10d": 160.25,
+      "net_10d": 335.73,
       "net_10d_days": 10
     },
     {
@@ -155,9 +156,9 @@
       "net_20d_days": 16,
       "net_60d": 165.56,
       "net_60d_days": 16,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -110.03,
+      "net_10d": 395.67,
       "net_10d_days": 10
     },
     {
@@ -171,9 +172,9 @@
       "net_20d_days": 13,
       "net_60d": 92.0,
       "net_60d_days": 13,
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "in",
-      "net_10d": 147.92,
+      "net_10d": 286.35,
       "net_10d_days": 10
     },
     {
@@ -187,9 +188,9 @@
       "net_20d_days": 20,
       "net_60d": 57.13,
       "net_60d_days": 20,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 128.54,
+      "net_10d": 234.78,
       "net_10d_days": 10
     },
     {
@@ -203,9 +204,9 @@
       "net_20d_days": 19,
       "net_60d": 177.38,
       "net_60d_days": 19,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -31.92,
+      "net_10d": 284.21,
       "net_10d_days": 10
     },
     {
@@ -219,10 +220,10 @@
       "net_20d_days": 8,
       "net_60d": 1074.76,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1074.76,
-      "net_10d_days": 8
+      "net_10d": 1182.73,
+      "net_10d_days": 9
     },
     {
       "name": "AI眼镜",
@@ -235,9 +236,9 @@
       "net_20d_days": 16,
       "net_60d": -63.04,
       "net_60d_days": 16,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 88.33,
+      "net_10d": 169.65,
       "net_10d_days": 10
     },
     {
@@ -251,9 +252,9 @@
       "net_20d_days": 16,
       "net_60d": 22.06,
       "net_60d_days": 16,
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in",
-      "net_10d": 126.93,
+      "net_10d": 283.11,
       "net_10d_days": 10
     },
     {
@@ -262,12 +263,12 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 1,
-      "net_10d_days": 1,
-      "net_20d_days": 1,
-      "net_60d_days": 1
+      "net_5d_days": 2,
+      "net_10d_days": 2,
+      "net_20d_days": 2,
+      "net_60d_days": 2
     },
     {
       "name": "消费电子概念",
@@ -280,9 +281,9 @@
       "net_20d_days": 20,
       "net_60d": 406.26,
       "net_60d_days": 20,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 245.9,
+      "net_10d": 301.02,
       "net_10d_days": 10
     },
     {
@@ -296,9 +297,9 @@
       "net_20d_days": 16,
       "net_60d": 539.44,
       "net_60d_days": 16,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 21.02,
+      "net_10d": 365.28,
       "net_10d_days": 10
     },
     {
@@ -312,27 +313,14 @@
       "net_20d_days": 15,
       "net_60d": 92.83,
       "net_60d_days": 15,
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in",
-      "net_10d": 71.33,
+      "net_10d": 172.6,
       "net_10d_days": 10
     },
     {
       "name": "元宇宙",
       "net": 94.13,
-      "net_5d": 0,
-      "net_20d": 0,
-      "type": "概念",
-      "consecutive_days": 3,
-      "trend": "in",
-      "net_5d_days": 3,
-      "net_10d_days": 3,
-      "net_20d_days": 3,
-      "net_60d_days": 3
-    },
-    {
-      "name": "算力租赁",
-      "net": 93.14,
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
@@ -342,6 +330,20 @@
       "net_10d_days": 4,
       "net_20d_days": 4,
       "net_60d_days": 4
+    },
+    {
+      "name": "算力租赁",
+      "net": 93.14,
+      "net_5d": 331.81,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 5,
+      "trend": "in",
+      "net_60d": 331.81,
+      "net_5d_days": 5,
+      "net_10d_days": 5,
+      "net_20d_days": 5,
+      "net_60d_days": 5
     },
     {
       "name": "汽车芯片",
@@ -354,9 +356,9 @@
       "net_20d_days": 13,
       "net_60d": 213.17,
       "net_60d_days": 13,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 142.04,
+      "net_10d": 69.16,
       "net_10d_days": 10
     },
     {
@@ -370,26 +372,26 @@
       "net_20d_days": 13,
       "net_60d": 299.83,
       "net_60d_days": 13,
-      "consecutive_days": 7,
+      "consecutive_days": 8,
       "trend": "in",
-      "net_10d": 34.62,
+      "net_10d": 107.93,
       "net_10d_days": 10
     },
     {
       "name": "百度概念",
       "net": 82.81,
       "net_5d": 146.83,
-      "net_20d": 819.37,
+      "net_20d": 1031.1,
       "type": "概念",
-      "net_10d": -174.06,
+      "net_10d": -31.57,
       "net_10d_days": 10,
-      "net_60d": -3504.08,
+      "net_60d": -2554.97,
       "net_60d_days": 50,
       "net_5d_days": 5,
       "source": "本地累加",
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in",
-      "net_20d_days": 16
+      "net_20d_days": 17
     },
     {
       "name": "专精特新",
@@ -402,9 +404,9 @@
       "net_20d_days": 18,
       "net_60d": 217.39,
       "net_60d_days": 18,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -177.64,
+      "net_10d": 281.81,
       "net_10d_days": 10
     },
     {
@@ -418,9 +420,9 @@
       "net_20d_days": 20,
       "net_60d": 215.46,
       "net_60d_days": 20,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 146.22,
+      "net_10d": 207.98,
       "net_10d_days": 10
     },
     {
@@ -434,9 +436,9 @@
       "net_20d_days": 15,
       "net_60d": -1.07,
       "net_60d_days": 15,
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_10d": -87.23,
+      "net_10d": -40.39,
       "net_10d_days": 10
     },
     {
@@ -450,9 +452,9 @@
       "net_20d_days": 13,
       "net_60d": 25.56,
       "net_60d_days": 13,
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "in",
-      "net_10d": 59.41,
+      "net_10d": 150.11,
       "net_10d_days": 10
     },
     {
@@ -466,10 +468,10 @@
       "net_20d_days": 8,
       "net_60d": 1350.21,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1350.21,
-      "net_10d_days": 8
+      "net_10d": 1426.34,
+      "net_10d_days": 9
     },
     {
       "name": "半导体",
@@ -477,14 +479,14 @@
       "net_5d": -16.78,
       "net_20d": 170.5,
       "type": "行业",
-      "net_10d": -424.41,
+      "net_10d": -986.99,
       "net_10d_days": 10,
       "net_5d_days": 5,
       "source": "本地累加",
       "net_20d_days": 20,
       "net_60d": 170.5,
       "net_60d_days": 20,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -498,9 +500,9 @@
       "net_20d_days": 13,
       "net_60d": 102.74,
       "net_60d_days": 13,
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "in",
-      "net_10d": 86.09,
+      "net_10d": 149.9,
       "net_10d_days": 10
     },
     {
@@ -514,9 +516,9 @@
       "net_20d_days": 18,
       "net_60d": 73.81,
       "net_60d_days": 18,
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in",
-      "net_10d": 136.83,
+      "net_10d": 194.22,
       "net_10d_days": 10
     },
     {
@@ -530,10 +532,10 @@
       "net_20d_days": 8,
       "net_60d": 1308.69,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1308.69,
-      "net_10d_days": 8
+      "net_10d": 1380.81,
+      "net_10d_days": 9
     },
     {
       "name": "智能座舱",
@@ -541,12 +543,12 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_5d_days": 2,
-      "net_10d_days": 2,
-      "net_20d_days": 2,
-      "net_60d_days": 2
+      "net_5d_days": 3,
+      "net_10d_days": 3,
+      "net_20d_days": 3,
+      "net_60d_days": 3
     },
     {
       "name": "传感器",
@@ -559,9 +561,9 @@
       "net_20d_days": 16,
       "net_60d": -2.18,
       "net_60d_days": 16,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -136.38,
+      "net_10d": 51.4,
       "net_10d_days": 10
     },
     {
@@ -575,9 +577,9 @@
       "net_20d_days": 20,
       "net_60d": 139.95,
       "net_60d_days": 20,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 2.37,
+      "net_10d": 76.69,
       "net_10d_days": 10
     },
     {
@@ -591,10 +593,10 @@
       "net_20d_days": 9,
       "net_60d": 67.05,
       "net_60d_days": 9,
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "in",
-      "net_10d": 67.05,
-      "net_10d_days": 9
+      "net_10d": 134.89,
+      "net_10d_days": 10
     },
     {
       "name": "人形机器人",
@@ -607,9 +609,9 @@
       "net_20d_days": 16,
       "net_60d": 141.34,
       "net_60d_days": 16,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -109.69,
+      "net_10d": -174.71,
       "net_10d_days": 10
     },
     {
@@ -623,9 +625,9 @@
       "net_20d_days": 12,
       "net_60d": -111.52,
       "net_60d_days": 12,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -86.29,
+      "net_10d": 25.72,
       "net_10d_days": 10
     }
   ],
@@ -642,9 +644,9 @@
       "net_20d_days": 19,
       "net_60d": 379.19,
       "net_60d_days": 19,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 226.04,
+      "net_10d": 453.38,
       "net_10d_days": 10
     },
     {
@@ -657,10 +659,10 @@
       "source": "本地累加",
       "net_60d": 471.37,
       "net_60d_days": 5,
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in",
-      "net_10d_days": 5,
-      "net_20d_days": 5
+      "net_10d_days": 6,
+      "net_20d_days": 6
     },
     {
       "name": "华为概念",
@@ -673,9 +675,9 @@
       "net_20d_days": 20,
       "net_60d": 379.93,
       "net_60d_days": 20,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 569.59,
+      "net_10d": 672.72,
       "net_10d_days": 10
     },
     {
@@ -689,10 +691,10 @@
       "net_20d_days": 8,
       "net_60d": 1887.91,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1887.91,
-      "net_10d_days": 8
+      "net_10d": 2046.04,
+      "net_10d_days": 9
     },
     {
       "name": "虚拟现实",
@@ -705,9 +707,9 @@
       "net_20d_days": 16,
       "net_60d": 21.35,
       "net_60d_days": 16,
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "in",
-      "net_10d": 35.41,
+      "net_10d": 143.47,
       "net_10d_days": 10
     },
     {
@@ -726,16 +728,17 @@
     {
       "name": "阿里巴巴概念",
       "net": 130.67,
-      "net_5d": 158.3,
-      "net_20d": 1896.63,
+      "net_5d": 668.45,
+      "net_20d": 2281.04,
       "type": "概念",
-      "net_10d": -472.32,
+      "net_10d": -145.5,
       "net_10d_days": 10,
-      "consecutive_days": 2,
+      "net_60d": -4343.0,
+      "net_60d_days": 50,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_5d_days": 2,
-      "net_20d_days": 2,
-      "net_60d_days": 2
+      "net_5d_days": 3,
+      "net_20d_days": 3
     },
     {
       "name": "融资融券",
@@ -761,9 +764,9 @@
       "net_20d_days": 17,
       "net_60d": -62.05,
       "net_60d_days": 17,
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in",
-      "net_10d": 160.25,
+      "net_10d": 335.73,
       "net_10d_days": 10
     },
     {
@@ -777,9 +780,9 @@
       "net_20d_days": 16,
       "net_60d": 165.56,
       "net_60d_days": 16,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -110.03,
+      "net_10d": 395.67,
       "net_10d_days": 10
     },
     {
@@ -793,9 +796,9 @@
       "net_20d_days": 13,
       "net_60d": 92.0,
       "net_60d_days": 13,
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "in",
-      "net_10d": 147.92,
+      "net_10d": 286.35,
       "net_10d_days": 10
     },
     {
@@ -809,9 +812,9 @@
       "net_20d_days": 20,
       "net_60d": 57.13,
       "net_60d_days": 20,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 128.54,
+      "net_10d": 234.78,
       "net_10d_days": 10
     },
     {
@@ -825,9 +828,9 @@
       "net_20d_days": 19,
       "net_60d": 177.38,
       "net_60d_days": 19,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -31.92,
+      "net_10d": 284.21,
       "net_10d_days": 10
     },
     {
@@ -841,10 +844,10 @@
       "net_20d_days": 8,
       "net_60d": 1074.76,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1074.76,
-      "net_10d_days": 8
+      "net_10d": 1182.73,
+      "net_10d_days": 9
     },
     {
       "name": "AI眼镜",
@@ -857,9 +860,9 @@
       "net_20d_days": 16,
       "net_60d": -63.04,
       "net_60d_days": 16,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 88.33,
+      "net_10d": 169.65,
       "net_10d_days": 10
     },
     {
@@ -873,9 +876,9 @@
       "net_20d_days": 16,
       "net_60d": 22.06,
       "net_60d_days": 16,
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in",
-      "net_10d": 126.93,
+      "net_10d": 283.11,
       "net_10d_days": 10
     },
     {
@@ -884,12 +887,12 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 1,
-      "net_10d_days": 1,
-      "net_20d_days": 1,
-      "net_60d_days": 1
+      "net_5d_days": 2,
+      "net_10d_days": 2,
+      "net_20d_days": 2,
+      "net_60d_days": 2
     },
     {
       "name": "消费电子概念",
@@ -902,9 +905,9 @@
       "net_20d_days": 20,
       "net_60d": 406.26,
       "net_60d_days": 20,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 245.9,
+      "net_10d": 301.02,
       "net_10d_days": 10
     },
     {
@@ -918,9 +921,9 @@
       "net_20d_days": 16,
       "net_60d": 539.44,
       "net_60d_days": 16,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 21.02,
+      "net_10d": 365.28,
       "net_10d_days": 10
     },
     {
@@ -934,27 +937,14 @@
       "net_20d_days": 15,
       "net_60d": 92.83,
       "net_60d_days": 15,
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in",
-      "net_10d": 71.33,
+      "net_10d": 172.6,
       "net_10d_days": 10
     },
     {
       "name": "元宇宙",
       "net": 94.13,
-      "net_5d": 0,
-      "net_20d": 0,
-      "type": "概念",
-      "consecutive_days": 3,
-      "trend": "in",
-      "net_5d_days": 3,
-      "net_10d_days": 3,
-      "net_20d_days": 3,
-      "net_60d_days": 3
-    },
-    {
-      "name": "算力租赁",
-      "net": 93.14,
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
@@ -964,6 +954,20 @@
       "net_10d_days": 4,
       "net_20d_days": 4,
       "net_60d_days": 4
+    },
+    {
+      "name": "算力租赁",
+      "net": 93.14,
+      "net_5d": 331.81,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 5,
+      "trend": "in",
+      "net_60d": 331.81,
+      "net_5d_days": 5,
+      "net_10d_days": 5,
+      "net_20d_days": 5,
+      "net_60d_days": 5
     },
     {
       "name": "汽车芯片",
@@ -976,9 +980,9 @@
       "net_20d_days": 13,
       "net_60d": 213.17,
       "net_60d_days": 13,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 142.04,
+      "net_10d": 69.16,
       "net_10d_days": 10
     },
     {
@@ -992,26 +996,26 @@
       "net_20d_days": 13,
       "net_60d": 299.83,
       "net_60d_days": 13,
-      "consecutive_days": 7,
+      "consecutive_days": 8,
       "trend": "in",
-      "net_10d": 34.62,
+      "net_10d": 107.93,
       "net_10d_days": 10
     },
     {
       "name": "百度概念",
       "net": 82.81,
       "net_5d": 146.83,
-      "net_20d": 819.37,
+      "net_20d": 1031.1,
       "type": "概念",
-      "net_10d": -174.06,
+      "net_10d": -31.57,
       "net_10d_days": 10,
-      "net_60d": -3504.08,
+      "net_60d": -2554.97,
       "net_60d_days": 50,
       "net_5d_days": 5,
       "source": "本地累加",
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in",
-      "net_20d_days": 16
+      "net_20d_days": 17
     },
     {
       "name": "专精特新",
@@ -1024,9 +1028,9 @@
       "net_20d_days": 18,
       "net_60d": 217.39,
       "net_60d_days": 18,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -177.64,
+      "net_10d": 281.81,
       "net_10d_days": 10
     },
     {
@@ -1040,9 +1044,9 @@
       "net_20d_days": 20,
       "net_60d": 215.46,
       "net_60d_days": 20,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 146.22,
+      "net_10d": 207.98,
       "net_10d_days": 10
     },
     {
@@ -1056,9 +1060,9 @@
       "net_20d_days": 15,
       "net_60d": -1.07,
       "net_60d_days": 15,
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_10d": -87.23,
+      "net_10d": -40.39,
       "net_10d_days": 10
     },
     {
@@ -1072,9 +1076,9 @@
       "net_20d_days": 13,
       "net_60d": 25.56,
       "net_60d_days": 13,
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "in",
-      "net_10d": 59.41,
+      "net_10d": 150.11,
       "net_10d_days": 10
     },
     {
@@ -1088,10 +1092,10 @@
       "net_20d_days": 8,
       "net_60d": 1350.21,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1350.21,
-      "net_10d_days": 8
+      "net_10d": 1426.34,
+      "net_10d_days": 9
     },
     {
       "name": "半导体",
@@ -1099,14 +1103,14 @@
       "net_5d": -16.78,
       "net_20d": 170.5,
       "type": "行业",
-      "net_10d": -424.41,
+      "net_10d": -986.99,
       "net_10d_days": 10,
       "net_5d_days": 5,
       "source": "本地累加",
       "net_20d_days": 20,
       "net_60d": 170.5,
       "net_60d_days": 20,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -1120,9 +1124,9 @@
       "net_20d_days": 13,
       "net_60d": 102.74,
       "net_60d_days": 13,
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "in",
-      "net_10d": 86.09,
+      "net_10d": 149.9,
       "net_10d_days": 10
     },
     {
@@ -1136,9 +1140,9 @@
       "net_20d_days": 18,
       "net_60d": 73.81,
       "net_60d_days": 18,
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in",
-      "net_10d": 136.83,
+      "net_10d": 194.22,
       "net_10d_days": 10
     },
     {
@@ -1152,10 +1156,10 @@
       "net_20d_days": 8,
       "net_60d": 1308.69,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1308.69,
-      "net_10d_days": 8
+      "net_10d": 1380.81,
+      "net_10d_days": 9
     },
     {
       "name": "智能座舱",
@@ -1163,12 +1167,12 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_5d_days": 2,
-      "net_10d_days": 2,
-      "net_20d_days": 2,
-      "net_60d_days": 2
+      "net_5d_days": 3,
+      "net_10d_days": 3,
+      "net_20d_days": 3,
+      "net_60d_days": 3
     },
     {
       "name": "传感器",
@@ -1181,9 +1185,9 @@
       "net_20d_days": 16,
       "net_60d": -2.18,
       "net_60d_days": 16,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -136.38,
+      "net_10d": 51.4,
       "net_10d_days": 10
     },
     {
@@ -1197,9 +1201,9 @@
       "net_20d_days": 20,
       "net_60d": 139.95,
       "net_60d_days": 20,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 2.37,
+      "net_10d": 76.69,
       "net_10d_days": 10
     },
     {
@@ -1213,10 +1217,10 @@
       "net_20d_days": 9,
       "net_60d": 67.05,
       "net_60d_days": 9,
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "in",
-      "net_10d": 67.05,
-      "net_10d_days": 9
+      "net_10d": 134.89,
+      "net_10d_days": 10
     },
     {
       "name": "人形机器人",
@@ -1229,9 +1233,9 @@
       "net_20d_days": 16,
       "net_60d": 141.34,
       "net_60d_days": 16,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -109.69,
+      "net_10d": -174.71,
       "net_10d_days": 10
     },
     {
@@ -1245,31 +1249,31 @@
       "net_20d_days": 12,
       "net_60d": -111.52,
       "net_60d_days": 12,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -86.29,
+      "net_10d": 25.72,
       "net_10d_days": 10
     }
   ],
   "consecutive": {
     "人工智能": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "东数西算(算力)": {
-      "days": 5,
+      "days": 6,
       "trend": "in"
     },
     "华为概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "芯片概念": {
-      "days": 8,
+      "days": 9,
       "trend": "in"
     },
     "虚拟现实": {
-      "days": 3,
+      "days": 4,
       "trend": "in"
     },
     "深股通": {
@@ -1277,7 +1281,7 @@
       "trend": "in"
     },
     "阿里巴巴概念": {
-      "days": 2,
+      "days": 3,
       "trend": "in"
     },
     "融资融券": {
@@ -1285,131 +1289,131 @@
       "trend": "in"
     },
     "AI应用": {
-      "days": 5,
+      "days": 6,
       "trend": "in"
     },
     "机器人概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "AI智能体": {
-      "days": 3,
+      "days": 4,
       "trend": "in"
     },
     "物联网": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "小米概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "汽车电子": {
-      "days": 8,
+      "days": 9,
       "trend": "in"
     },
     "AI眼镜": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "AIGC概念": {
-      "days": 5,
+      "days": 6,
       "trend": "in"
     },
     "腾讯概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "消费电子概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "液冷服务器": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "抖音概念(字节概念)": {
-      "days": 4,
+      "days": 5,
       "trend": "in"
     },
     "元宇宙": {
-      "days": 3,
-      "trend": "in"
-    },
-    "算力租赁": {
       "days": 4,
       "trend": "in"
     },
+    "算力租赁": {
+      "days": 5,
+      "trend": "in"
+    },
     "汽车芯片": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "苹果概念": {
-      "days": 7,
+      "days": 8,
       "trend": "in"
     },
     "百度概念": {
-      "days": 5,
+      "days": 6,
       "trend": "in"
     },
     "专精特新": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "智能穿戴": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "云计算": {
-      "days": 2,
+      "days": 3,
       "trend": "in"
     },
     "多模态AI": {
-      "days": 3,
+      "days": 4,
       "trend": "in"
     },
     "数据中心(AIDC)": {
-      "days": 8,
+      "days": 9,
       "trend": "in"
     },
     "半导体": {
-      "days": 1,
-      "trend": "in"
-    },
-    "虚拟数字人": {
-      "days": 3,
-      "trend": "in"
-    },
-    "DeepSeek概念": {
-      "days": 5,
-      "trend": "in"
-    },
-    "5G": {
-      "days": 8,
-      "trend": "in"
-    },
-    "智能座舱": {
       "days": 2,
       "trend": "in"
     },
-    "传感器": {
-      "days": 1,
+    "虚拟数字人": {
+      "days": 4,
       "trend": "in"
     },
-    "银行": {
-      "days": 1,
+    "DeepSeek概念": {
+      "days": 6,
       "trend": "in"
     },
-    "ChatGPT概念": {
+    "5G": {
+      "days": 9,
+      "trend": "in"
+    },
+    "智能座舱": {
       "days": 3,
       "trend": "in"
     },
+    "传感器": {
+      "days": 2,
+      "trend": "in"
+    },
+    "银行": {
+      "days": 2,
+      "trend": "in"
+    },
+    "ChatGPT概念": {
+      "days": 4,
+      "trend": "in"
+    },
     "人形机器人": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "工业互联网": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     }
   },
@@ -1425,10 +1429,10 @@
       "net_20d_days": 8,
       "net_60d": 1887.91,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1887.91,
-      "net_10d_days": 8
+      "net_10d": 2046.04,
+      "net_10d_days": 9
     },
     {
       "name": "新能源汽车",
@@ -1470,10 +1474,10 @@
       "net_20d_days": 8,
       "net_60d": 1350.21,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1350.21,
-      "net_10d_days": 8
+      "net_10d": 1426.34,
+      "net_10d_days": 9
     },
     {
       "name": "汽车电子",
@@ -1486,10 +1490,10 @@
       "net_20d_days": 8,
       "net_60d": 1074.76,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1074.76,
-      "net_10d_days": 8
+      "net_10d": 1182.73,
+      "net_10d_days": 9
     },
     {
       "name": "5G",
@@ -1502,10 +1506,25 @@
       "net_20d_days": 8,
       "net_60d": 1308.69,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1308.69,
-      "net_10d_days": 8
+      "net_10d": 1380.81,
+      "net_10d_days": 9
+    },
+    {
+      "name": "阿里巴巴概念",
+      "net": 130.67,
+      "net_5d": 668.45,
+      "net_20d": 2281.04,
+      "type": "概念",
+      "net_10d": -145.5,
+      "net_10d_days": 10,
+      "net_60d": -4343.0,
+      "net_60d_days": 50,
+      "consecutive_days": 3,
+      "trend": "in",
+      "net_5d_days": 3,
+      "net_20d_days": 3
     },
     {
       "name": "比亚迪概念",
@@ -1531,10 +1550,10 @@
       "source": "本地累加",
       "net_60d": 471.37,
       "net_60d_days": 5,
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in",
-      "net_10d_days": 5,
-      "net_20d_days": 5
+      "net_10d_days": 6,
+      "net_20d_days": 6
     },
     {
       "name": "PCB概念",
@@ -1579,20 +1598,6 @@
       "net_10d_days": 9,
       "net_20d_days": 9,
       "net_60d_days": 9
-    },
-    {
-      "name": "液冷概念",
-      "net": 83.58,
-      "net_5d": 305.46,
-      "net_20d": 0,
-      "net_60d": 305.46,
-      "type": "概念",
-      "consecutive_days": 5,
-      "trend": "in",
-      "net_5d_days": 5,
-      "net_60d_days": 5,
-      "net_10d_days": 5,
-      "net_20d_days": 5
     }
   ],
   "trend_10d": [
@@ -1607,10 +1612,10 @@
       "net_20d_days": 8,
       "net_60d": 1887.91,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1887.91,
-      "net_10d_days": 8
+      "net_10d": 2046.04,
+      "net_10d_days": 9
     },
     {
       "name": "数据中心(AIDC)",
@@ -1623,10 +1628,10 @@
       "net_20d_days": 8,
       "net_60d": 1350.21,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1350.21,
-      "net_10d_days": 8
+      "net_10d": 1426.34,
+      "net_10d_days": 9
     },
     {
       "name": "5G",
@@ -1639,10 +1644,10 @@
       "net_20d_days": 8,
       "net_60d": 1308.69,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1308.69,
-      "net_10d_days": 8
+      "net_10d": 1380.81,
+      "net_10d_days": 9
     },
     {
       "name": "共封装光学(CPO)",
@@ -1685,10 +1690,10 @@
       "net_20d_days": 8,
       "net_60d": 1074.76,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1074.76,
-      "net_10d_days": 8
+      "net_10d": 1182.73,
+      "net_10d_days": 9
     },
     {
       "name": "2026中报预增",
@@ -1731,71 +1736,75 @@
       "net_20d_days": 20,
       "net_60d": 379.93,
       "net_60d_days": 20,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 569.59,
+      "net_10d": 672.72,
       "net_10d_days": 10
     },
     {
-      "name": "黄金概念",
-      "net": 15.55,
-      "net_5d": 101.2,
-      "net_20d": 167.01,
-      "net_60d": 167.01,
+      "name": "人工智能",
+      "net": 204.78,
+      "net_5d": 251.8,
+      "net_20d": 379.19,
       "type": "概念",
-      "consecutive_days": 1,
-      "trend": "in",
       "net_5d_days": 5,
-      "net_10d": 357.43,
-      "net_10d_days": 10,
-      "net_20d_days": 13,
-      "net_60d_days": 13
-    },
-    {
-      "name": "无人驾驶",
-      "net": 19.86,
-      "net_5d": 152.54,
-      "net_20d": 335.03,
-      "net_60d": 335.03,
-      "type": "行业",
-      "consecutive_days": 5,
-      "trend": "in",
-      "net_5d_days": 5,
-      "net_10d": 335.03,
-      "net_10d_days": 8,
-      "net_20d_days": 8,
-      "net_60d_days": 8
-    },
-    {
-      "name": "元件",
-      "net": 11.76,
-      "net_5d": 98.89,
-      "net_20d": 180.09,
-      "net_60d": 180.09,
-      "type": "行业",
-      "consecutive_days": 1,
-      "trend": "in",
-      "net_5d_days": 5,
-      "net_10d": 328.84,
-      "net_10d_days": 10,
+      "source": "本地累加",
       "net_20d_days": 19,
-      "net_60d_days": 19
+      "net_60d": 379.19,
+      "net_60d_days": 19,
+      "consecutive_days": 2,
+      "trend": "in",
+      "net_10d": 453.38,
+      "net_10d_days": 10
+    },
+    {
+      "name": "机器人概念",
+      "net": 125.96,
+      "net_5d": 101.31,
+      "net_20d": 165.56,
+      "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "net_20d_days": 16,
+      "net_60d": 165.56,
+      "net_60d_days": 16,
+      "consecutive_days": 2,
+      "trend": "in",
+      "net_10d": 395.67,
+      "net_10d_days": 10
+    },
+    {
+      "name": "液冷服务器",
+      "net": 96.44,
+      "net_5d": 125.92,
+      "net_20d": 539.44,
+      "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "net_20d_days": 16,
+      "net_60d": 539.44,
+      "net_60d_days": 16,
+      "consecutive_days": 2,
+      "trend": "in",
+      "net_10d": 365.28,
+      "net_10d_days": 10
     }
   ],
   "trend_20d": [
     {
       "name": "阿里巴巴概念",
       "net": 130.67,
-      "net_5d": 158.3,
-      "net_20d": 1896.63,
+      "net_5d": 668.45,
+      "net_20d": 2281.04,
       "type": "概念",
-      "net_10d": -472.32,
+      "net_10d": -145.5,
       "net_10d_days": 10,
-      "consecutive_days": 2,
+      "net_60d": -4343.0,
+      "net_60d_days": 50,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_5d_days": 2,
-      "net_20d_days": 2,
-      "net_60d_days": 2
+      "net_5d_days": 3,
+      "net_20d_days": 3
     },
     {
       "name": "芯片概念",
@@ -1808,10 +1817,10 @@
       "net_20d_days": 8,
       "net_60d": 1887.91,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1887.91,
-      "net_10d_days": 8
+      "net_10d": 2046.04,
+      "net_10d_days": 9
     },
     {
       "name": "数据中心(AIDC)",
@@ -1824,10 +1833,10 @@
       "net_20d_days": 8,
       "net_60d": 1350.21,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1350.21,
-      "net_10d_days": 8
+      "net_10d": 1426.34,
+      "net_10d_days": 9
     },
     {
       "name": "5G",
@@ -1840,10 +1849,10 @@
       "net_20d_days": 8,
       "net_60d": 1308.69,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1308.69,
-      "net_10d_days": 8
+      "net_10d": 1380.81,
+      "net_10d_days": 9
     },
     {
       "name": "共封装光学(CPO)",
@@ -1886,10 +1895,26 @@
       "net_20d_days": 8,
       "net_60d": 1074.76,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1074.76,
-      "net_10d_days": 8
+      "net_10d": 1182.73,
+      "net_10d_days": 9
+    },
+    {
+      "name": "百度概念",
+      "net": 82.81,
+      "net_5d": 146.83,
+      "net_20d": 1031.1,
+      "type": "概念",
+      "net_10d": -31.57,
+      "net_10d_days": 10,
+      "net_60d": -2554.97,
+      "net_60d_days": 50,
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "consecutive_days": 6,
+      "trend": "in",
+      "net_20d_days": 17
     },
     {
       "name": "通信设备",
@@ -1905,22 +1930,6 @@
       "net_10d_days": 10,
       "net_20d_days": 20,
       "net_60d_days": 20
-    },
-    {
-      "name": "百度概念",
-      "net": 82.81,
-      "net_5d": 146.83,
-      "net_20d": 819.37,
-      "type": "概念",
-      "net_10d": -174.06,
-      "net_10d_days": 10,
-      "net_60d": -3504.08,
-      "net_60d_days": 50,
-      "net_5d_days": 5,
-      "source": "本地累加",
-      "consecutive_days": 5,
-      "trend": "in",
-      "net_20d_days": 16
     },
     {
       "name": "PCB概念",
@@ -1963,9 +1972,9 @@
       "net_20d_days": 16,
       "net_60d": 539.44,
       "net_60d_days": 16,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 21.02,
+      "net_10d": 365.28,
       "net_10d_days": 10
     }
   ],
@@ -1981,10 +1990,10 @@
       "net_20d_days": 8,
       "net_60d": 1887.91,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1887.91,
-      "net_10d_days": 8
+      "net_10d": 2046.04,
+      "net_10d_days": 9
     },
     {
       "name": "数据中心(AIDC)",
@@ -1997,10 +2006,10 @@
       "net_20d_days": 8,
       "net_60d": 1350.21,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1350.21,
-      "net_10d_days": 8
+      "net_10d": 1426.34,
+      "net_10d_days": 9
     },
     {
       "name": "5G",
@@ -2013,10 +2022,10 @@
       "net_20d_days": 8,
       "net_60d": 1308.69,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1308.69,
-      "net_10d_days": 8
+      "net_10d": 1380.81,
+      "net_10d_days": 9
     },
     {
       "name": "共封装光学(CPO)",
@@ -2059,10 +2068,10 @@
       "net_20d_days": 8,
       "net_60d": 1074.76,
       "net_60d_days": 8,
-      "consecutive_days": 8,
+      "consecutive_days": 9,
       "trend": "in",
-      "net_10d": 1074.76,
-      "net_10d_days": 8
+      "net_10d": 1182.73,
+      "net_10d_days": 9
     },
     {
       "name": "新能源汽车",
@@ -2148,9 +2157,9 @@
       "net_20d_days": 16,
       "net_60d": 539.44,
       "net_60d_days": 16,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 21.02,
+      "net_10d": 365.28,
       "net_10d_days": 10
     }
   ]
