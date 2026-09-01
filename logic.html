@@ -695,7 +695,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/SECTOR_FUND_FLOW.js?v=2840729b66" defer></script>
   <script src="data/SECTOR_FUND_FLOW_TREND.js?v=29cecefca9" defer></script>
   <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=4fa7b66fbd" defer></script>
-  <script src="data/DO_NOT_DELETE.js?v=85e486d722" defer></script>
+  <script src="data/DO_NOT_DELETE.js?v=c211e783e2" defer></script>
   <script src="data/SUSPENSION_ALERT.js?v=a66547b33d" defer></script>
   <script src="data/GOLD_POOL.js?v=6999f5b4ff" defer></script>
   <script src="data/MACRO_DATA.js?v=a706459de8" defer></script>
@@ -851,6 +851,23 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div class="logic-p">技术面 / 情绪面 / 宏观面各亮一灯：推荐度 ≥4★ = 🟢，=3★ = 🟡，≤2★ = 🔴（星级颜色与灯语义同步）。卡片顶部「今日信号 · 积极/观望/防守」总览灯 + 右侧 🟢积极·🟡观望·🔴防守 图例。</div>
         <div class="logic-h">代码位置</div>
         <div class="logic-p"><code>index.html</code> <code>_buildJudgmentEnvHTML()</code>（约 ~989 行，LIGHT 色表 + lightDot() 发光圆点）。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🚨</span>风险温度计 - 说明（2026-09-01 迁入今日判定）</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">展示海外/宏观情绪风险（美债收益率、日元、VIX、人民币汇率等），作为<b>今日判定 · 环境综合</b>的辅助读盘信号，帮助判断A股开盘外部压力。整体为<b>偏冷/中性</b>时不构成系统性风险；偏热且与A股共振时才提升警惕。</div>
+        <div class="logic-h">数据来源</div>
+        <div class="logic-p"><code>RISK_GAUGE</code>（盘中每30分刷新，覆盖美股开盘时段 19:00-22:00 北京时间；周末运行则标记为周末轻量维护）。由 <code>cloud_fetch_v8.py f_risk_gauge()</code> 聚合美债、日元、VIX、离岸人民币。</div>
+        <div class="logic-h">颜色语义（与市场常规一致）</div>
+        <table class="lg-table">
+          <tr><th>灯</th><th>含义</th><th>常规标注</th></tr>
+          <tr><td style="color:var(--up);font-weight:700;">🔴 偏热</td><td>海外风险升温，可能对A股造成外部冲击</td><td>建议在标准流程上加一层过滤</td></tr>
+          <tr><td style="color:var(--gold);font-weight:700;">🟡 中性</td><td>各指标暂未共振，不构成系统性风险</td><td>按原有流程执行</td></tr>
+          <tr><td style="color:var(--down);font-weight:700;">🟢 偏冷</td><td>海外环境相对温和</td><td>不构成拖累</td></tr>
+        </table>
+        <div class="logic-h">代码位置</div>
+        <div class="logic-p"><code>index.html</code> <code>_buildJudgmentEnvHTML()</code> 危险信号之后、return 之前；原运维页「数据健康总览」中的风险温度计展示已移除，避免同一数据两处重复。</div>
       </div>
 
       <div class="card">
@@ -9590,28 +9607,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
 })();
 </script>
 
-<!-- ============ 2026-09-01 兜底修复：白屏根治 ============ -->
-<script>
-(function(){
-  function _forceShow(){
-    try{
-      var sec=document.getElementById("sec-lg");
-      if(sec){ sec.style.display="block"; sec.classList.add("active"); }
-      // 显示所有子面板与卡片
-      document.querySelectorAll(".lg-pane").forEach(function(p){ p.style.display="block"; p.classList.add("active"); });
-      document.querySelectorAll(".card").forEach(function(c){ c.style.display="block"; });
-      document.querySelectorAll("section").forEach(function(s){ s.style.display="block"; });
-      // 管理员锁默认放行(访客也能看说明)
-      var st=document.getElementById("adminState");
-      if(st){ st.textContent="说明模式(已解锁)"; st.style.color="var(--cyan)"; }
-    }catch(e){ /* ignore */ }
-  }
-  if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",_forceShow); }
-  else { _forceShow(); }
-  // 延迟再执行一次, 抵抗后续脚本隐藏
-  window.addEventListener("load",function(){ setTimeout(_forceShow,300); setTimeout(_forceShow,1200); });
-})();
-</script>
+<!-- 2026-09-01 修复：删除错误的「显示所有子面板」兜底脚本。导航依赖 .lg-pane.active 控制，强制全部显示会让导航失效。 -->
 
 </body>
 </html>
