@@ -1601,10 +1601,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       if(!opBody) return;
       try{
         var jd = window.JUDGMENT_DATA || {};
-        if(!jd.update_time || typeof window._buildJudgmentEnvHTML !== 'function'){
-          opBody.innerHTML = '<div style="color:var(--dim);padding:14px;text-align:center;line-height:1.7">'
-            + '<div style="font-size:13px;color:#fbbf24;margin-bottom:4px">⏳ 环境态势数据加载中…</div>'
-            + '<div style="font-size:12px;color:var(--dim)">数据依赖每日盘前 08:25 自动生成</div></div>';
+        // 🛡 2026-09-01 主人令：环境综合"环境态势 数据加载中"→ 改为"等盘后算法链产出"+ 显示运维状态
+        var _jdOk = jd.update_time && typeof window._buildJudgmentEnvHTML === 'function';
+        if(!_jdOk){
+          var _hc = (window.HEALTH_CHECK && window.HEALTH_CHECK.items || []).find(function(x){ return x.id==='MARKET_REGIME'; });
+          var _hcMsg = _hc ? ('最近更新 '+_hc.last_update+( _hc.status!=='ok' ? '·'+_hc.message : '')) : '等待 19:15 算法链写入';
+          opBody.innerHTML = '<div style="color:var(--dim);padding:18px 14px;text-align:center;line-height:1.8">'
+            + '<div style="font-size:13px;color:#fbbf24;margin-bottom:6px">⏳ 环境态势 等盘后算法链产出</div>'
+            + '<div style="font-size:11.5px;color:var(--dim)">MARKET_REGIME 由 <code>run_algorithms.py</code> 19:15 跑批后写入 data/<code>MARKET_REGIME.js</code></div>'
+            + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px">运维状态：<b>'+_hcMsg+'</b></div>'
+            + '<div style="font-size:10px;color:var(--dim);margin-top:4px">链跑完后本卡自动呈现；刷本页无效可 Ctrl+F5 强刷</div>'
+            + '</div>';
           return;
         }
         opBody.innerHTML = window._buildJudgmentEnvHTML(jd);
@@ -1945,7 +1952,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     <!-- 涨停热力矩阵（整行宽度） -->
     <div class="card" id="limitUpHeatCard" style="margin-bottom:16px">
-      <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近15日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">—</span></h3>
+      <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近30日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">—</span></h3>
       <div id="limitUpHeatAnalysis" class="limit-up-analysis" style="display:none"></div>
       <div id="limitUpHeatContent" class="limit-up-content">加载中…</div>
     </div>
@@ -4053,62 +4060,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     out += '</div>';
     return out;
   };
-  /* ── 📊 两套算法回测对比（2026-09-01 主人令：从暂未上架抽离 + 下沉到已下架·大牛股猎手回测下方）── */
-  window.__renderAlgoBacktestCompare = function(){
-    var h = '';
-        var _cmp = window.ALGO_BACKTEST_COMPARE;
-        var _habTime = (window.H_AUTO_BUY && window.H_AUTO_BUY.generated_at) ? String(window.H_AUTO_BUY.generated_at) : '';
-        var _mfTime = (window.MOMENTUM_FILTER && window.MOMENTUM_FILTER.generated) ? String(window.MOMENTUM_FILTER.generated) : '';
-        var _haAlg = !!(window.H_AUTO_BUY && window.H_AUTO_BUY.algorithm_data && (window.H_AUTO_BUY.algorithm_data.t1 || window.H_AUTO_BUY.algorithm_data.n_stocks));
-        var _mfAlg = !!(window.MOMENTUM_FILTER && (window.MOMENTUM_FILTER.total || (window.MOMENTUM_FILTER.s1 && window.MOMENTUM_FILTER.s1.count)));
-        var _haInCmp = !!(window.ALGO_BACKTEST_COMPARE && window.ALGO_BACKTEST_COMPARE.algorithms && window.ALGO_BACKTEST_COMPARE.algorithms.h_reverse);
-        var _sbInCmp = !!(window.ALGO_BACKTEST_COMPARE && window.ALGO_BACKTEST_COMPARE.algorithms && window.ALGO_BACKTEST_COMPARE.algorithms.strong_breakout);
-        var _bothReady = _haInCmp && _sbInCmp;
-        h +='<div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">';
-        h +='<h3 style="font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">📊</span>两套算法回测对比 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px;">'+window.__moduleStarsHTML('algo_compare')+'</span> <span style="font-size:10px;color:#94a3b8;font-weight:400">H反推 vs 强势突破 · 同一口径</span>';
-        h +=_uBadge('盘后','对比',_cmp?_cmp.generated:null)+'</h3>';
-        if(!_cmp || !_cmp.algorithms){
-          h +='<div class="note">对比数据未生成（由 algo_backtest_compare.py 在构建末尾产出）</div>';
-        } else if(!_bothReady){
-          // 2026-08-31：部分缺失时给出明确状态（H反推 ✓ / 强势突破 ⏳ 或反向），
-          //   不再用「等待盘后 15:00」这种假信号；显示每卡各自生成时间，方便主人判断是否需手动重抓。
-          var _haOk=_haInCmp?'✅':'⏳';
-          var _sbOk=_sbInCmp?'✅':'⏳';
-          h +='<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:7px;padding:10px 12px;font-size:12.5px;line-height:1.7;color:var(--sub);">';
-          h +=(_bothReady?'📊 ':'⏳ ')+'<b>'+(_bothReady?'双卡已出':'单边已出，等另一边')+'</b>：本卡需「H 反推短线买点」+「动量共识筛选」均存在才能展示有效对比。<br>';
-          h +='当前状态：H 反推 '+_haOk+(_habTime||'—')+' · 强势突破 '+_sbOk+(_mfTime||'—')+'。通常 19:15 后自动齐备，如长时间未更新可手动触发 <code>algo_backtest_compare.py</code>。</div>';
-        } else {
-          var _ha=_cmp.algorithms.h_reverse, _sb=_cmp.algorithms.strong_breakout;
-          var _hz=[['t1','T+1'],['t3','T+3'],['t5','T+5'],['t10','T+10']];
-          h +='<div style="font-size:11px;color:var(--dim);margin-bottom:6px;">胜率=该周期收益&gt;0占比；平均收益=样本均值%；命中率(≥5%)为原H反推定义。绿高优。</div>';
-          h +='<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;">';
-          h +='<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-          h +='<th style="padding:6px 5px;text-align:left;color:var(--sub);">算法</th>';
-          _hz.forEach(function(x){ h+='<th style="padding:6px 5px;text-align:center;color:var(--sub);">'+x[1]+'胜率</th><th style="padding:6px 5px;text-align:center;color:var(--sub);">'+x[1]+'均收益</th>'; });
-          h +='</tr></thead><tbody>';
-          [['h_reverse',_ha,'#38bdf8'],['strong_breakout',_sb,'#f59e0b']].forEach(function(rw){
-            var a=rw[1], col=rw[2];
-            var _sn=(a&&a.summary&&a.summary.n_samples)?a.summary.n_samples:0;
-            var _hzs=(a&&a.summary)?a.summary.horizons:null;
-            h +='<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
-            h +='<td style="padding:5px 5px;font-weight:700;color:'+col+';white-space:nowrap;">'+(a?a.name:'?')+' <span style="color:var(--dim);font-weight:400;font-size:11px;">(n='+_sn+')</span></td>';
-            _hz.forEach(function(x){
-              var m=(_hzs)?_hzs[x[0]]:null;
-              var win=(m)?m.win:null, avg=(m)?m.avg:null;
-              h +='<td style="padding:5px 5px;text-align:center;color:'+(win!=null?(win>=50?'var(--up)':'var(--down)'):'var(--sub)')+';font-weight:600;">'+(win!=null?win+'%':'--')+'</td>';
-              h +='<td style="padding:5px 5px;text-align:center;color:'+(avg!=null?(avg>=0?'var(--up)':'var(--down)'):'var(--sub)')+';font-weight:600;">'+(avg!=null?(avg>0?'+':'')+avg+'%':'--')+'</td>';
-            });
-            h +='</tr>';
-          });
-          h +='</tbody></table></div>';
-          if(_cmp.verdict){
-            h +='<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:7px;padding:8px 10px;font-size:13px;line-height:1.7;color:var(--sub);margin-top:8px;">📌 结论：'+_cmp.verdict+'</div>';
-          }
-        }
-        h +='</div>';
-        h +='</div>';  // /两套算法回测对比卡
-    return h;
-  };
+  /* ── 📊 两套算法回测对比卡 已删除（2026-09-01 23:40 主人令："这卡怎么还在！删除干净"）── */
 
 
   // ═══ 2026-08-13 主人令：策略星级对比表（聚合已有4类回测数据） ═══
@@ -5832,7 +5784,9 @@ function renderLimitUpHeatmap(){
   if(_oi>=0){ var _o=sorted.splice(_oi,1)[0]; sorted.push(_o); }
 
   let h='<table><thead><tr><th>板块</th>';
-  for(let di=0;di<_displayDates.length;di++){
+  // 2026-09-01 主人令：窗口 15日 → 30日（取最近 30 列；后端数据若>30会自动截前端）
+  var _colStart = Math.max(0, _displayDates.length - 30);
+  for(let di=_colStart;di<_displayDates.length;di++){
     h+='<th>'+_displayDates[di].split('/').pop()+'</th>';
   }
   h+='<th>合</th><th>势</th></tr></thead><tbody>';
@@ -5843,7 +5797,7 @@ function renderLimitUpHeatmap(){
     if(total===0) continue; // 全0行隐藏，减少视觉噪音
     var _isOther=sector.name==='其他';
     h+='<tr'+( _isOther?' style="opacity:.7"':'')+'><td>'+sector.name+(_isOther?' <span style="font-size:9px;color:var(--dim)">(汇总·非主线)</span>':'')+'</td>';
-    for(let j=0;j<sector.data.length;j++){
+    for(let j=_colStart;j<sector.data.length;j++){
       const val=sector.data[j];
       const ignite=isIgnite(sector.data,j)?' lu-ignite':'';
       const cls=val>=8?'lu-h5':val>=5?'lu-h4':val>=3?'lu-h3':val>=2?'lu-h2':val>=1?'lu-h1':'lu-h0';
@@ -10714,12 +10668,14 @@ window.showRestrictedItems = showRestrictedItems;
       window.__ulSelfHealTimer=setInterval(function(){
         var p=document.getElementById('unlistedPanel');
         if(!p) return;
-        if(p.innerHTML.length>=1000 && p.innerHTML.indexOf('ulPaneStrong')>=0) return; // 已渲染成功停止
+        if(!p.innerHTML || p.innerHTML.length<600 || p.innerHTML.indexOf('ulSectorFundTrackPanel')<0){
         if(typeof window.renderUnlisted==='function'){
-          console.log('[ulSelfHeal] retry renderUnlisted len='+p.innerHTML.length);
+          console.log('[ulSelfHeal] retry renderUnlisted len='+(p.innerHTML||'').length);
           try{ window.renderUnlisted(); }catch(e){ console.warn('[ulSelfHeal] rethrow:',e.message); }
         }
-      },1500);
+      } else { /* 已渲染成功，停止轮询 */
+        clearInterval(window.__ulSelfHealTimer); window.__ulSelfHealTimer=null;
+      }
     }
     // 🚀 自愈：构建/reconcile 偶发把静态 head 标签冲掉 → 动态注入兜底，避免卡片显示「数据不可用」
     if(!window.STOCK_MOMENTUM_STATE && !el.dataset.smsFailed){
@@ -10799,7 +10755,7 @@ window.showRestrictedItems = showRestrictedItems;
 
     el.innerHTML=h;
     // 2026-08-30 主人令:渲染兜底
-    if(!h || h.length<200){ el.innerHTML='<div style=\"text-align:center;padding:40px;color:var(--dim);\"><div style=\"font-size:32px;margin-bottom:12px;\">📭</div><div style=\"font-size:14px;\">已下架卡片暂无可用数据</div><div style=\"font-size:12px;margin-top:8px;\">稍后再试或检查数据源</div></div>'; }
+    if(!h || h.length<100){ el.innerHTML='<div style=\"text-align:center;padding:40px;color:var(--dim);\"><div style=\"font-size:32px;margin-bottom:12px;\">📭</div><div style=\"font-size:14px;\">暂未上架暂无可用数据</div><div style=\"font-size:12px;margin-top:8px;\">稍后再试或检查数据源</div></div>'; }
 
     // ⚖️ 2026-08-14 主人令：renderPortfolio 调用已删除（持仓跟踪卡整段移除）
     // 2026-08-14 主人令：涨价榜/情绪周期/潜力挖掘 fill 改由 switchSt('pr') 触发（已迁选股策略子TAB）
@@ -11618,8 +11574,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     h+=`<div style="display:inline-block;margin:14px 0 8px 0;padding:4px 10px;font-size:11.5px;font-weight:700;color:#c4b5fd;background:rgba(167,139,250,.10);border:1px solid rgba(167,139,250,.28);border-radius:6px;">└ 🎯 盘后 · 已下架选股模块（同源弱alpha · 保留可查）</div>`;
     h+=`<div id="st-hunter" data-star="3" style="margin-bottom:16px"><div id="hunterContainer"></div></div>`;
     h+=`<div id="st-hunter-bt" data-star="3" style="margin-bottom:16px">`+(typeof window.__renderHunterBacktest==='function'?window.__renderHunterBacktest():'')+`</div>`;
-    // 2026-09-01 主人令：从暂未上架下沉到已下架·大牛股回测卡下方
-    h+=`<div id="st-cmp" data-star="2" style="margin-bottom:16px">`+(typeof window.__renderAlgoBacktestCompare==='function'?window.__renderAlgoBacktestCompare():'')+`</div>`;
+    // 2026-09-01 主人令：从暂未上架抽出 + 下沉到已下架·大牛股回测下方；23:40 主人令"删除干净"——已删 `__renderAlgoBacktestCompare` + `st-cmp` 卡
     h+=`<div id="st-cockpit" data-star="4" style="margin-bottom:16px"><div id="stCockpit"></div></div>`;
     h+=`<div id="st-allsite" data-star="3" style="margin-bottom:16px"><div id="stAllsite"></div></div>`;
     h+=`<div id="st-fv" data-star="4" style="margin-bottom:16px">
@@ -11684,7 +11639,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     try{ if(window.renderFourVolume) window.renderFourVolume(); }catch(e){console.warn("已下架·四量终极渲染失败",e);}
     /* 2026-09-01 主人令：已下架选股模块按星级降序排列（⭐多排前） */
     try{
-      var _selIds=['st-hunter','st-hunter-bt','st-cmp','st-cockpit','st-allsite','st-fv'];
+      var _selIds=['st-hunter','st-hunter-bt','st-cockpit','st-allsite','st-fv'];  /* 2026-09-01 23:40 主人令：'st-cmp' 两套算法回测对比卡已删除 */
       var _selCards=_selIds.map(function(id){return document.getElementById(id);}).filter(Boolean);
       _selCards.sort(function(a,b){ return (+b.getAttribute('data-star')||0) - (+a.getAttribute('data-star')||0); });
       _selCards.forEach(function(c){ if(c.parentNode) c.parentNode.appendChild(c); });
