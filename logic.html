@@ -816,66 +816,14 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div class="logic-p">主站新增/删除/重命名卡片时，必须同步更新本页对应子 tab；历史改动归档折叠在「🗄️ 历史改动归档」内，只供追溯，不得替代卡片说明书。</div>
       </div>
 
-      <div class="card">
-        <h3><span class="ic">📅</span>重要事件日历 - 说明</h3>
-        <div class="logic-h">定位</div>
-        <div class="logic-p">月度日历视图，标注当日各类市场事件，用于预判宏观/政策/资金面窗口。中长线视角，每周日更新、月底补全下月。</div>
-        <div class="logic-h">标签体系</div>
-        <div class="logic-p">今天 / 重要政策 / 央行·LPR / 中国数据 / FOMC / 期权交割 / 期货交割 / A50交割 / 休市（港股/美股）/ SG公假 / 财报（美股绿/韩股灰/台股靛）/ 苹果·华为发布。</div>
-        <div class="logic-h">去重规则</div>
-        <div class="logic-p">同一天多个事件时自动去重，保留最详细版本，避免「港股休市」与「港股休市（xxx）」重复显示。</div>
-      </div>
+      <!-- 顺序严格对齐主站「今日事件」tab：今日事件详情 → 今日解禁 → 今日业绩预告 → 今日判定(含风险温度计) → 打新速览 → 重要事件日历 -->
 
       <div class="card">
-        <h3><span class="ic">🚀</span>打新研判 - 说明</h3>
-        <div class="logic-h">评分模型</div>
-        <div class="logic-p">满分100 = PE折价(0-40分) + 行业热度(0-25分) + 发行价合理性(0-20分) + 板块溢价(0-15分)。</div>
-        <div class="logic-h">推荐等级</div>
-        <div class="logic-p">≥80 强烈推荐 / 65-79 建议申购 / 50-64 谨慎参与 / ＜50 不建议。无可申购新股时显示「近期无新股上市」。</div>
-        <div class="logic-h">当前展示</div>
-        <div class="logic-p">v8 保留「今日上市」「今日申购」「上市日追踪5日」直接显示，其余通过按钮 tab 进入查看。</div>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">⚡</span>今日关键事件 - 说明</h3>
+        <h3><span class="ic">⚡</span>今日事件详情 - 说明</h3>
         <div class="logic-h">数据来源</div>
-        <div class="logic-p">整合宏观数据、政策、FOMC、重要财报、休市等当日高优先级事件，按盘中实时口径聚合。</div>
+        <div class="logic-p">整合宏观数据、政策、FOMC、重要财报、休市等当日高优先级事件，按盘中实时口径聚合（主站 <code>v8TodayAll</code>）。</div>
         <div class="logic-h">展示原则</div>
         <div class="logic-p">事件必须带「相对时间」标签（今日/明日/X天后），不写裸日期。全天性事件置顶，盘中动态事件按触发时间倒序。</div>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">⚖️</span>今日判定 · 环境综合 红黄绿灯 - 说明（2026-08-12 新增）</h3>
-        <div class="logic-h">数据来源</div>
-        <div class="logic-p"><code>JUDGMENT_DATA</code>（盘前 08:25 自动生成，由 <code>cloud_fetch_v8.py f_judgment()</code> 规则引擎驱动，动态时事不写固定文字）。</div>
-        <div class="logic-h">红黄绿灯总览（交通灯语义）</div>
-        <table class="lg-table">
-          <tr><th>灯</th><th>共识方向</th><th>含义</th></tr>
-          <tr><td style="color:#1fd17b;font-weight:700;">🟢 绿</td><td>偏多共识（平均推荐 ≥3.5★）</td><td>积极，可参与</td></tr>
-          <tr><td style="color:#fbbf24;font-weight:700;">🟡 黄</td><td>分歧观望（2.5~3.5★）</td><td>观望，轻仓试错</td></tr>
-          <tr><td style="color:#f4495d;font-weight:700;">🔴 红</td><td>偏空共识（平均推荐 ≤2.5★）</td><td>防守，控制仓位</td></tr>
-        </table>
-        <div class="logic-h">三大分析师灯点</div>
-        <div class="logic-p">技术面 / 情绪面 / 宏观面各亮一灯：推荐度 ≥4★ = 🟢，=3★ = 🟡，≤2★ = 🔴（星级颜色与灯语义同步）。卡片顶部「今日信号 · 积极/观望/防守」总览灯 + 右侧 🟢积极·🟡观望·🔴防守 图例。</div>
-        <div class="logic-h">代码位置</div>
-        <div class="logic-p"><code>index.html</code> <code>_buildJudgmentEnvHTML()</code>（约 ~989 行，LIGHT 色表 + lightDot() 发光圆点）。</div>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">🚨</span>风险温度计 - 说明（2026-09-01 迁入今日判定）</h3>
-        <div class="logic-h">定位</div>
-        <div class="logic-p">展示海外/宏观情绪风险（美债收益率、日元、VIX、人民币汇率等），作为<b>今日判定 · 环境综合</b>的辅助读盘信号，帮助判断A股开盘外部压力。整体为<b>偏冷/中性</b>时不构成系统性风险；偏热且与A股共振时才提升警惕。</div>
-        <div class="logic-h">数据来源</div>
-        <div class="logic-p"><code>RISK_GAUGE</code>（盘中每30分刷新，覆盖美股开盘时段 19:00-22:00 北京时间；周末运行则标记为周末轻量维护）。由 <code>cloud_fetch_v8.py f_risk_gauge()</code> 聚合美债、日元、VIX、离岸人民币。</div>
-        <div class="logic-h">颜色语义（与市场常规一致）</div>
-        <table class="lg-table">
-          <tr><th>灯</th><th>含义</th><th>常规标注</th></tr>
-          <tr><td style="color:var(--up);font-weight:700;">🔴 偏热</td><td>海外风险升温，可能对A股造成外部冲击</td><td>建议在标准流程上加一层过滤</td></tr>
-          <tr><td style="color:var(--gold);font-weight:700;">🟡 中性</td><td>各指标暂未共振，不构成系统性风险</td><td>按原有流程执行</td></tr>
-          <tr><td style="color:var(--down);font-weight:700;">🟢 偏冷</td><td>海外环境相对温和</td><td>不构成拖累</td></tr>
-        </table>
-        <div class="logic-h">代码位置</div>
-        <div class="logic-p"><code>index.html</code> <code>_buildJudgmentEnvHTML()</code> 危险信号之后、return 之前；原运维页「数据健康总览」中的风险温度计展示已移除，避免同一数据两处重复。</div>
       </div>
 
       <div class="card">
@@ -899,6 +847,60 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       </div>
 
       <div class="card">
+        <h3><span class="ic">⚖️</span>今日判定 · 环境综合 红黄绿灯 - 说明（2026-08-12 新增）</h3>
+        <div class="logic-h">数据来源</div>
+        <div class="logic-p"><code>JUDGMENT_DATA</code>（盘前 08:25 自动生成，由 <code>cloud_fetch_v8.py f_judgment()</code> 规则引擎驱动，动态时事不写固定文字）。</div>
+        <div class="logic-h">红黄绿灯总览（交通灯语义）</div>
+        <table class="lg-table">
+          <tr><th>灯</th><th>共识方向</th><th>含义</th></tr>
+          <tr><td style="color:#1fd17b;font-weight:700;">🟢 绿</td><td>偏多共识（平均推荐 ≥3.5★）</td><td>积极，可参与</td></tr>
+          <tr><td style="color:#fbbf24;font-weight:700;">🟡 黄</td><td>分歧观望（2.5~3.5★）</td><td>观望，轻仓试错</td></tr>
+          <tr><td style="color:#f4495d;font-weight:700;">🔴 红</td><td>偏空共识（平均推荐 ≤2.5★）</td><td>防守，控制仓位</td></tr>
+        </table>
+        <div class="logic-h">三大分析师灯点</div>
+        <div class="logic-p">技术面 / 情绪面 / 宏观面各亮一灯：推荐度 ≥4★ = 🟢，=3★ = 🟡，≤2★ = 🔴（星级颜色与灯语义同步）。卡片顶部「今日信号 · 积极/观望/防守」总览灯 + 右侧 🟢积极·🟡观望·🔴防守 图例。</div>
+        <div class="logic-h">代码位置</div>
+        <div class="logic-p"><code>index.html</code> <code>_buildJudgmentEnvHTML()</code>（约 ~989 行，LIGHT 色表 + lightDot() 发光圆点）。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🚨</span>风险温度计 - 说明（今日判定卡内嵌 · 2026-09-01 迁入）</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">展示海外/宏观情绪风险（美债收益率、日元、VIX、人民币汇率等），<b>内嵌于「今日判定 · 环境综合」卡内</b>（<code>_buildJudgmentEnvHTML()</code> 危险信号之后、return 之前），作为辅助读盘信号，帮助判断A股开盘外部压力。整体为<b>偏冷/中性</b>时不构成系统性风险；偏热且与A股共振时才提升警惕。</div>
+        <div class="logic-h">数据来源</div>
+        <div class="logic-p"><code>RISK_GAUGE</code>（盘中每30分刷新，覆盖美股开盘时段 19:00-22:00 北京时间；周末运行则标记为周末轻量维护）。由 <code>cloud_fetch_v8.py f_risk_gauge()</code> 聚合美债、日元、VIX、离岸人民币。</div>
+        <div class="logic-h">颜色语义（与市场常规一致）</div>
+        <table class="lg-table">
+          <tr><th>灯</th><th>含义</th><th>常规标注</th></tr>
+          <tr><td style="color:var(--up);font-weight:700;">🔴 偏热</td><td>海外风险升温，可能对A股造成外部冲击</td><td>建议在标准流程上加一层过滤</td></tr>
+          <tr><td style="color:var(--gold);font-weight:700;">🟡 中性</td><td>各指标暂未共振，不构成系统性风险</td><td>按原有流程执行</td></tr>
+          <tr><td style="color:var(--down);font-weight:700;">🟢 偏冷</td><td>海外环境相对温和</td><td>不构成拖累</td></tr>
+        </table>
+        <div class="logic-h">代码位置</div>
+        <div class="logic-p"><code>index.html</code> <code>_buildJudgmentEnvHTML()</code> 危险信号之后、return 之前；原运维页「数据健康总览」中的风险温度计展示已移除，避免同一数据两处重复。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">🚀</span>打新速览 - 说明</h3>
+        <div class="logic-h">评分模型</div>
+        <div class="logic-p">满分100 = PE折价(0-40分) + 行业热度(0-25分) + 发行价合理性(0-20分) + 板块溢价(0-15分)。</div>
+        <div class="logic-h">推荐等级</div>
+        <div class="logic-p">≥80 强烈推荐 / 65-79 建议申购 / 50-64 谨慎参与 / ＜50 不建议。无可申购新股时显示「近期无新股上市」。</div>
+        <div class="logic-h">当前展示</div>
+        <div class="logic-p">v8 保留「今日上市」「今日申购」「上市日追踪5日」直接显示，其余通过按钮 tab 进入查看。</div>
+      </div>
+
+      <div class="card">
+        <h3><span class="ic">📅</span>重要事件日历 - 说明</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">月度日历视图，标注当日各类市场事件，用于预判宏观/政策/资金面窗口。中长线视角，每周日更新、月底补全下月。</div>
+        <div class="logic-h">标签体系</div>
+        <div class="logic-p">今天 / 重要政策 / 央行·LPR / 中国数据 / FOMC / 期权交割 / 期货交割 / A50交割 / 休市（港股/美股）/ SG公假 / 财报（美股绿/韩股灰/台股靛）/ 苹果·华为发布。</div>
+        <div class="logic-h">去重规则</div>
+        <div class="logic-p">同一天多个事件时自动去重，保留最详细版本，避免「港股休市」与「港股休市（xxx）」重复显示。</div>
+      </div>
+
+      <div class="card">
         <h3><span class="ic">🗓️</span>重要事件日历 · 月度归档与回看（2026-08-31 对齐）</h3>
         <div class="logic-h">定位</div>
         <div class="logic-p">日历默认展示「当月」重要事件；同时保留历史月份归档，支持 ◀▶ 切换回看，避免月初旧月直接消失。</div>
@@ -913,8 +915,6 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div class="logic-h">一致性说明</div>
         <div class="logic-p">归档文件随 data 目录一并构建/部署；云端抓取任务生成后自动推仓，周末清理任务只扫顶层 data 文件、不递归子目录，因此归档不会被误删。</div>
       </div>
-
-        </details>
     </div>
 
     <!-- === 实时数据 === -->
@@ -2097,6 +2097,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         </table>
         </div>
       </div>
+      </details>
 
       <div class="card">
         <h3><span class="ic">🛠️</span>2026-08-28 全站审计修复（阿狸咪夜间档）</h3>
