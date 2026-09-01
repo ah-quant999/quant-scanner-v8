@@ -16,6 +16,10 @@ DATA = r"E:/workspace/quant-scanner-v8/data"
 INDEX = r"E:/workspace/quant-scanner-v8/index.html"
 REPO = r"C:/Users/Administrator/qs8-tmp"
 
+# 超时阶梯（与 sync_local_mirror.py 同口径，2026-09-01 统一）：
+# 链路偶发「stalled 但活着」——固定 60s 会让 3 次重试全部超时、等于无效重试。
+TIMEOUTS = (60, 120, 180)
+
 
 def git(args):
     return subprocess.run(["git"] + args, cwd=REPO, capture_output=True, text=True).stdout.strip()
@@ -48,8 +52,9 @@ def main():
         dest = os.path.join(DATA, n)
         tmp = dest + ".tmp"
         got = False
-        for attempt in range(3):
-            r = subprocess.run(["curl", "-sS", "--max-time", "60", f"{BASE}/data/{n}"],
+        for attempt in range(len(TIMEOUTS)):
+            r = subprocess.run(["curl", "-sS", "--max-time", str(TIMEOUTS[attempt]),
+                                f"{BASE}/data/{n}"],
                                capture_output=True)
             body = r.stdout
             if r.returncode == 0 and body:
