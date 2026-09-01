@@ -2282,7 +2282,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <!-- 2026-09-01 主人令：选股生命周期作为选股策略子页面，置于三重共识之后 -->
       <button class="st-tab" data-st="life" onclick="switchSt('life')">选股生命周期 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#22c55e;background:rgba(34,197,94,.12);padding:1px 6px;border-radius:4px">v8·追踪</span></button>
       <!-- 2026-09-01 主人令：新增「多 algo 共识」子页面 = 三重共识旁路（看所有 ≥2 algo 命中的票，附 4 桶分布 + 加权进最终推荐） -->
-      <button class="st-tab" data-st="mc" onclick="switchSt('mc')">🆕 多 algo 共识 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#38bdf8;background:rgba(56,189,248,.12);padding:1px 6px;border-radius:4px">v3·试验</span></button>
+      <button class="st-tab" data-st="mc" onclick="switchSt('mc')">🆕 多 algo 共识</button>
       <button class="st-tab" data-st="rps" onclick="switchSt('rps')">📈 相对强度 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用·固定</span></button>
     </div>
@@ -2369,7 +2369,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 数据契约：window.V8_POOL_TRACKER.pt.items 每只含 consensus_count/algos_hit/selected/selected_score/entry_price/last_pct/days_in -->
     <div id="st-mc" class="st-pane">
       <div class="card">
-        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🆕</span>多 algo 共识 · 独立子页 <span style="color:#38bdf8;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span> <span style="font-size:11px;color:var(--sub);font-weight:400">v3·试验</span> <span style="color:var(--dim);font-weight:400">- 盘后 ·</span> <span class="fresh" id="mcTime">—</span></h3>
+        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🆕</span>多 algo 共识 · 独立子页 <span style="color:#38bdf8;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span> <span style="color:var(--dim);font-weight:400">- 盘后 ·</span> <span class="fresh" id="mcTime">—</span></h3>
         <div class="note" style="margin-bottom:8px;">同源数据：<code>window.V8_POOL_TRACKER.pt.items</code> · 过滤 <code>consensus_count ≥ 2</code> 且 <code>algos_hit.length ≥ 1</code> · 与卡片内「🤝 共识」段共用渲染。下方分两段：① 全共识池（每只独立行，方案 A flex 布局）；② 4 桶分布（强/回/顶/弱拆解）。</div>
         <div id="mcBody">
           <div class="note" style="padding:20px;text-align:center;color:var(--dim);">加载中…</div>
@@ -10601,8 +10601,8 @@ window.showRestrictedItems = showRestrictedItems;
     // 🛡 2026-08-26 一劳永逸：提前暴露 __ulSwitch，子 tab 按钮在 renderUnlisted 任何位置抛错后仍可切换
     window.__ulSwitch = function(btn, tab){
       window.__ulActivePane = tab;  // guard: 记住当前子 tab，重渲染不再 snap-back
-      var idMap={strong:'ulPaneStrong',dbg:'ulPaneDbg'};
-      var all=['ulPaneStrong','ulPaneDbg'];
+      var idMap={dbg:'ulPaneDbg'};
+      var all=['ulPaneDbg'];
       for(var k=0;k<all.length;k++){var p=document.getElementById(all[k]); if(p) p.style.display=(all[k]===idMap[tab])?'block':'none';}
       var tabs=document.querySelectorAll('#sec-ul .ul-tab');
       for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
@@ -10612,7 +10612,7 @@ window.showRestrictedItems = showRestrictedItems;
       window.__ulSelfHealTimer=setInterval(function(){
         var p=document.getElementById('unlistedPanel');
         if(!p) return;
-        if(p.innerHTML.length>=1000 && p.innerHTML.indexOf('ulPaneStrong')>=0) return; // 已渲染成功停止
+        if(p.innerHTML.length>=1000 && p.innerHTML.indexOf('ulPaneDbg')>=0) return; // 已渲染成功停止
         if(typeof window.renderUnlisted==='function'){
           console.log('[ulSelfHeal] retry renderUnlisted len='+p.innerHTML.length);
           try{ window.renderUnlisted(); }catch(e){ console.warn('[ulSelfHeal] rethrow:',e.message); }
@@ -10624,7 +10624,7 @@ window.showRestrictedItems = showRestrictedItems;
       if(el.dataset.smsLoading){
         // 🛡 2026-08-20 超时兜底：STOCK_MOMENTUM_STATE.js(616KB) 加载慢会让页面永久空白。
         //   首次进本分支即启动 8s 超时：超时后强制渲染（动量卡降级为"数据不可用"），
-        //   其余 pane（强势突破/AI预测/调试专区）正常显示，绝不整页空白。
+        //   其余 pane（调试专区）正常显示，绝不整页空白。
         if(!el.dataset.smsTimeoutSet){
           el.dataset.smsTimeoutSet='1';
           setTimeout(function(){
@@ -10655,27 +10655,24 @@ window.showRestrictedItems = showRestrictedItems;
     }
     // 2026-08-18 主人令「空的！修复」根因：原 `el.dataset.rendered='1'` 在首次调用即设置，
     // 但若 STOCK_MOMENTUM_STATE.js 加载失败，onerror 重调 renderUnlisted 会被该标志阻断
-    // → ulPaneStrong 永远空白。修复：彻底移除 rendered 缓存（renderUnlisted 内部重 DOM
+    // → 子Tab 面板永远空白。修复：彻底移除 rendered 缓存（renderUnlisted 内部重 DOM
     // 操作轻量，每次重新渲染即可彻底避免加载失败路径下的空白陷阱）。
     try{
     // 填充「今日判定 · 环境态势」卡（2026-08-07 已迁回今日事件；函数注册在今日事件卡脚本块）
     if(typeof window.__renderJudgmentBody==='function') window.__renderJudgmentBody();
     var h='';
-    var _ulAct = window.__ulActivePane || 'strong';  // 🛡 记住激活的子 tab（重渲染跟随）
+    var _ulAct = 'dbg';  // 🛡 2026-09-01 删除「强势突破」子页，仅剩「调试专区」唯一子Tab（忽略陈旧 __ulActivePane）
 
-    // ═══ 2026-08-16/18 主人令：暂未上架改子Tab导航（强势突破/AI预测/调试专区）；2026-08-20 潜力挖掘已删除→AI预测 ═══
+    // ═══ 2026-08-16/18 主人令：暂未上架改子Tab导航；2026-09-01 主人令：删除「强势突破」子页，仅保留「调试专区」唯一子Tab ═══
     h+='<style>.ul-pane{display:none}.ul-pane.active{display:block}.ul-tab{font-size:12.5px;font-weight:600;color:var(--sub);background:transparent;border:1px solid var(--border);border-radius:8px;padding:6px 13px;cursor:pointer;transition:all .15s}.ul-tab:hover{color:var(--txt);background:var(--bg2)}.ul-tab.active{color:var(--txt);background:var(--card2);border-color:var(--border2);box-shadow:0 1px 4px rgba(0,0,0,.12)}</style>';
     h+='<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px;">';
-    h+='<div class="ul-tab' + (_ulAct==='strong'?' active':'') + '" data-ultab="strong" onclick="window.__ulSwitch(this,\'strong\')">🚀 强势突破</div>';
-    h+='<div class="ul-tab' + (_ulAct==='dbg'?' active':'') + '" data-ultab="dbg" onclick="window.__ulSwitch(this,\'dbg\')">🧪 调试专区</div>';
+    h+='<div class="ul-tab active" data-ultab="dbg" onclick="window.__ulSwitch(this,\'dbg\')">🧪 调试专区</div>';
     h+='</div>';
 
     // ── pane4: 🧪 调试专区 ──
     h+='<div class="ul-pane" id="ulPaneDbg" style="display:'+(_ulAct==='dbg'?'block':'none')+'">';
-    // 2026-08-30 根因修复：调试专区容器曾因提前闭合（line 11172 旧 bug）导致
-    //   AI预测/潜力挖掘/ETF龙头/个股动量状态 四卡溢出到两个子Tab之外，
-    //   造成「强势突破」与「调试专区」内容一模一样。现保持容器打开直到 line 11465，
-    //   把这些卡真正收进调试专区；强势突破 pane 只保留三卡。
+    // 2026-08-30 根因修复：调试专区容器曾因提前闭合（旧 bug）导致卡片溢出到子Tab之外；
+    //   现保持容器打开直到本函数末尾，把这些卡真正收进调试专区。2026-09-01 删除「强势突破」子页，调试专区现为唯一子Tab。
 
     // ── 2026-08-29 主人令：AI 预测 + 潜力挖掘 2 卡并入调试专区（删 AI 预测 / 潜力挖掘 子页面后补位） ──
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';
@@ -10735,204 +10732,6 @@ h+='</div>';  // /ulPaneDbg
     // 2026-08-18 主人令：ETF·龙头参考 已迁入「暂未上架 > 调试专区」，此处不再重复渲染
 
     // ── 🎭 情绪周期 · 连板天梯（合并紧凑版）已迁到实时数据区，见 window.__renderCycleLadderCard ──
-
-    // ── pane1: 🚀 强势突破（3 卡：回测对比 + 动量共识 + H反推）──
-    h+='<div class="ul-pane" id="ulPaneStrong" style="display:'+(_ulAct==='strong'?'block':'none')+'">';
-    // ── 2026-08-30 主人令：强势突破 = H反推 + 动量共识 + 回测对比 三卡并列；本页速读删（属调试/展示性内容，移至逻辑详解） ──
-    // ── 📊 两套算法回测横向对比（2026-08-23 主人令：同一口径比胜率+收益率）──
-    //   2026-08-27 主人令修正：本卡依赖 H反推 + 动量共识(强势突破) 双卡盘后数据齐备后才应出数据
-    //   守卫逻辑：检查双卡 generated 时间是否均为当日盘后（≥15:00），否则显示"等待"而非中午就出
-    // 2026-08-31 一劳永逸：移除 15:00 硬门限（H_AUTO_BUY 凌晨 03:03 也会被看门狗重抓，
-    //   直接卡死「等待盘后」永远过不去；主人截图：双卡都出数据，对比卡仍显示等待）。
-    //   新口径：H反推 + 强势突破 双算法只要在 _cmp.algorithms 里都有摘要即可展示——
-    //   即使 H_AUTO_BUY.MOMENTUM_FILTER 是凌晨生成，由于 summary.horizons 已含 T+1/T+3/...
-    //   真实回测快照，对比就有意义；如有一方缺失则提示「单边已出，等另一边」。
-    var _cmp = window.ALGO_BACKTEST_COMPARE;
-    var _habTime = (window.H_AUTO_BUY && window.H_AUTO_BUY.generated_at) ? String(window.H_AUTO_BUY.generated_at) : '';
-    var _mfTime = (window.MOMENTUM_FILTER && window.MOMENTUM_FILTER.generated) ? String(window.MOMENTUM_FILTER.generated) : '';
-    var _haAlg = !!(window.H_AUTO_BUY && window.H_AUTO_BUY.algorithm_data && (window.H_AUTO_BUY.algorithm_data.t1 || window.H_AUTO_BUY.algorithm_data.n_stocks));
-    var _mfAlg = !!(window.MOMENTUM_FILTER && (window.MOMENTUM_FILTER.total || (window.MOMENTUM_FILTER.s1 && window.MOMENTUM_FILTER.s1.count)));
-    var _haInCmp = !!(window.ALGO_BACKTEST_COMPARE && window.ALGO_BACKTEST_COMPARE.algorithms && window.ALGO_BACKTEST_COMPARE.algorithms.h_reverse);
-    var _sbInCmp = !!(window.ALGO_BACKTEST_COMPARE && window.ALGO_BACKTEST_COMPARE.algorithms && window.ALGO_BACKTEST_COMPARE.algorithms.strong_breakout);
-    var _bothReady = _haInCmp && _sbInCmp;
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #f59e0b;">';
-    h+='<h3 style="font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">📊</span>两套算法回测对比 <span style="font-size:10px;color:#94a3b8;font-weight:400">H反推 vs 强势突破 · 同一口径</span>';
-    h+=_uBadge('盘后','对比',_cmp?_cmp.generated:null)+'</h3>';
-    if(!_cmp || !_cmp.algorithms){
-      h+='<div class="note">对比数据未生成（由 algo_backtest_compare.py 在构建末尾产出）</div>';
-    } else if(!_bothReady){
-      // 2026-08-31：部分缺失时给出明确状态（H反推 ✓ / 强势突破 ⏳ 或反向），
-      //   不再用「等待盘后 15:00」这种假信号；显示每卡各自生成时间，方便主人判断是否需手动重抓。
-      var _haOk=_haInCmp?'✅':'⏳';
-      var _sbOk=_sbInCmp?'✅':'⏳';
-      h+='<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:7px;padding:10px 12px;font-size:12.5px;line-height:1.7;color:var(--sub);">';
-      h+=(_bothReady?'📊 ':'⏳ ')+'<b>'+(_bothReady?'双卡已出':'单边已出，等另一边')+'</b>：本卡需「H 反推短线买点」+「动量共识筛选」均存在才能展示有效对比。<br>';
-      h+='当前状态：H 反推 '+_haOk+(_habTime||'—')+' · 强势突破 '+_sbOk+(_mfTime||'—')+'。通常 19:15 后自动齐备，如长时间未更新可手动触发 <code>algo_backtest_compare.py</code>。</div>';
-    } else {
-      var _ha=_cmp.algorithms.h_reverse, _sb=_cmp.algorithms.strong_breakout;
-      var _hz=[['t1','T+1'],['t3','T+3'],['t5','T+5'],['t10','T+10']];
-      h+='<div style="font-size:11px;color:var(--dim);margin-bottom:6px;">胜率=该周期收益&gt;0占比；平均收益=样本均值%；命中率(≥5%)为原H反推定义。绿高优。</div>';
-      h+='<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:13px;">';
-      h+='<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      h+='<th style="padding:6px 5px;text-align:left;color:var(--sub);">算法</th>';
-      _hz.forEach(function(x){ h+='<th style="padding:6px 5px;text-align:center;color:var(--sub);">'+x[1]+'胜率</th><th style="padding:6px 5px;text-align:center;color:var(--sub);">'+x[1]+'均收益</th>'; });
-      h+='</tr></thead><tbody>';
-      [['h_reverse',_ha,'#38bdf8'],['strong_breakout',_sb,'#f59e0b']].forEach(function(rw){
-        var a=rw[1], col=rw[2];
-        var _sn=(a&&a.summary&&a.summary.n_samples)?a.summary.n_samples:0;
-        var _hzs=(a&&a.summary)?a.summary.horizons:null;
-        h+='<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
-        h+='<td style="padding:5px 5px;font-weight:700;color:'+col+';white-space:nowrap;">'+(a?a.name:'?')+' <span style="color:var(--dim);font-weight:400;font-size:11px;">(n='+_sn+')</span></td>';
-        _hz.forEach(function(x){
-          var m=(_hzs)?_hzs[x[0]]:null;
-          var win=(m)?m.win:null, avg=(m)?m.avg:null;
-          h+='<td style="padding:5px 5px;text-align:center;color:'+(win!=null?(win>=50?'var(--up)':'var(--down)'):'var(--sub)')+';font-weight:600;">'+(win!=null?win+'%':'--')+'</td>';
-          h+='<td style="padding:5px 5px;text-align:center;color:'+(avg!=null?(avg>=0?'var(--up)':'var(--down)'):'var(--sub)')+';font-weight:600;">'+(avg!=null?(avg>0?'+':'')+avg+'%':'--')+'</td>';
-        });
-        h+='</tr>';
-      });
-      h+='</tbody></table></div>';
-      if(_cmp.verdict){
-        h+='<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3);border-radius:7px;padding:8px 10px;font-size:13px;line-height:1.7;color:var(--sub);margin-top:8px;">📌 结论：'+_cmp.verdict+'</div>';
-      }
-    }
-    h+='</div>';
-    h+='</div>';  // /两套算法回测对比卡
-
-    // ── 🎯 动量共识筛选（2026-08-30 主人令：强势突破 3 卡之一）──
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';
-    h+='<h3 style="font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">🎯</span>动量共识筛选 <span style="font-size:10px;color:#94a3b8;font-weight:400">多信号融合 · 盘后选股</span>';
-    var _mf=window.MOMENTUM_FILTER;
-    if(_mf && _mf.generated) h+=_uBadge('盘后','筛选',_mf.generated);
-    h+='</h3>';
-    if(!_mf || (!_mf.stocks && !_mf.s1 && !_mf.total)){
-      h+='<div class="note">动量共识筛选数据未生成（由 momentum_common_filter.py 产出，盘后 19:15 后通常可用）</div>';
-    } else {
-      // 1) 统计概览
-      var _mfTot=_mf.total||((_mf.s1&&_mf.s1.count)||0)+((_mf.s2&&_mf.s2.count)||0)+((_mf.s3&&_mf.s3.count)||0);
-      var _mfBaseWin=_mf.base_win||0, _mfBaseMean=_mf.base_mean||0;
-      h+='<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px;font-size:12px;">';
-      h+='<div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);border-radius:6px;padding:8px 10px;text-align:center;">';
-      h+='<div style="font-size:10px;color:var(--dim);margin-bottom:2px;">总入选</div>';
-      h+='<div style="font-size:18px;font-weight:800;color:#38bdf8;">'+_mfTot+'</div></div>';
-      h+='<div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:6px;padding:8px 10px;text-align:center;">';
-      h+='<div style="font-size:10px;color:var(--dim);margin-bottom:2px;">基准胜率</div>';
-      h+='<div style="font-size:18px;font-weight:800;color:var(--up);">'+_mfBaseWin.toFixed(1)+'%</div></div>';
-      h+='<div style="background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.2);border-radius:6px;padding:8px 10px;text-align:center;">';
-      h+='<div style="font-size:10px;color:var(--dim);margin-bottom:2px;">基准均收益</div>';
-      h+='<div style="font-size:18px;font-weight:800;color:#a78bfa;">'+(_mfBaseMean>0?'+':'')+_mfBaseMean.toFixed(2)+'%</div></div>';
-      h+='<div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:6px;padding:8px 10px;text-align:center;">';
-      h+='<div style="font-size:10px;color:var(--dim);margin-bottom:2px;">规则数</div>';
-      h+='<div style="font-size:18px;font-weight:800;color:#fbbf24;">'+((_mf.rule?Object.keys(_mf.rule).filter(function(k){return _mf.rule[k]&&k!=="S1_ocr_label_超跌反弹"&&k!=="S2_consec_before_le1"&&k!=="S3_exclude_leadup_launch";}).length:0))+'</div></div>';
-      h+='</div>';
-      // 2) S1/S2/S3 分类命中数
-      h+='<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:8px;font-size:12px;">';
-      [['s1','#38bdf8','S1 超跌反弹'],['s2','#f59e0b','S2 连板前'],['s3','#a78bfa','S3 排除主升']].forEach(function(sig){
-        var sd=_mf[sig[0]]; if(!sd) return;
-        var c=sd.count||0, w=sd.win||0, m=sd.mean||0;
-        h+='<div style="background:rgba(0,0,0,.15);border:1px solid var(--border);border-radius:6px;padding:6px 8px;">';
-        h+='<div style="font-weight:700;color:'+sig[1]+';font-size:11px;">'+sig[2]+'</div>';
-        h+='<div style="display:flex;justify-content:space-between;margin-top:3px;font-size:11px;color:var(--sub);">';
-        h+='<span>命中 <b style="color:var(--txt);">'+c+'</b></span>';
-        h+='<span>胜率 <b style="color:'+(w>=50?'var(--up)':'var(--down)')+';">'+w.toFixed(1)+'%</b></span>';
-        h+='<span>均收 <b style="color:'+(m>=0?'var(--up)':'var(--down)')+';">'+(m>0?'+':'')+m.toFixed(2)+'%</b></span>';
-        h+='</div></div>';
-      });
-      h+='</div>';
-      // 3) 个股列表
-      var _mflist=(_mf.stocks && _mf.stocks.length)?_mf.stocks:[];
-      if(_mflist.length){
-        h+='<div style="font-size:11px;color:var(--dim);margin-bottom:4px;">🎯 候选清单（'+_mflist.length+' 只，按基准胜率排序）：</div>';
-        h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:4px;max-height:200px;overflow-y:auto;">';
-        _mflist.slice(0,40).forEach(function(s){
-          var nm=(s.name||s.code||'').toString().slice(0,8);
-          h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:3px 6px;font-size:11px;display:flex;justify-content:space-between;">';
-          h+='<span style="color:var(--txt);">'+nm+'</span>';
-          if(s.up_pct!=null) h+='<span style="color:'+(s.up_pct>=0?'var(--up)':'var(--down)')+';font-weight:600;">'+(s.up_pct>0?'+':'')+s.up_pct.toFixed(1)+'%</span>';
-          h+='</div>';
-        });
-        if(_mflist.length>40) h+='<div style="grid-column:1/-1;font-size:10px;color:var(--dim);text-align:center;">… 还有 '+(_mflist.length-40)+' 只</div>';
-        h+='</div>';
-      } else {
-        h+='<div class="note" style="text-align:center;">今日动量共识筛选无候选（数据正常但无符合全部规则的个股）</div>';
-      }
-    }
-    h+='</div>';
-
-    // ── 🧬 H 反推短线买点（2026-08-27 主人令：从调试专区迁入强势突破，放动量共识上方）──
-    //   数据源：data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js
-    //   动量共识是 H 反推的升级版，故本卡放在其上方供对照
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #ce93d8;">';
-    h+=v8CardHeader('🧬','H 反推短线买点','反推代码每日盘后自跑 + 跟踪回测 · admin 可见','update_time',window.H_AUTO_BUY);
-    try{
-      var hab2 = window.H_AUTO_BUY || {};
-      var habt2 = window.H_AUTO_BUY_TRACK || {};
-      var _slotPre = (hab2.snapshot_date && hab2.snapshot_time) ? hab2.snapshot_date + ' ' + String(hab2.snapshot_time).slice(0,8) : (hab2.snapshot_date || '—');
-      var _slotPost = hab2.generated_at || '—';
-      var _slotSms = habt2.first_run || habt2.update_time || '—';
-      var _byDates = Object.keys(habt2.by_date || {}).sort();
-      var _slotLn = _byDates.length ? _byDates[_byDates.length-1] : '—';
-      h += '<div style="display:flex;flex-wrap:wrap;gap:8px 14px;padding:6px 14px 0;font-size:11px;color:var(--sub);">';
-      h += '<span><span style="color:#f59e0b">●</span> 盘前 <b style="color:var(--txt)">'+_slotPre+'</b></span>';
-      h += '<span><span style="color:#10b981">●</span> 盘后 <b style="color:var(--txt)">'+_slotPost+'</b></span>';
-      h += '<span><span style="color:#8b5cf6">●</span> 长线 <b style="color:var(--txt)">'+_slotLn+'</b></span>';
-      h += '</div>';
-    }catch(_hSlotErr){ try{console.warn('h_slot_render',_hSlotErr);}catch(_){} }
-    h+='<div style="padding:12px 14px;">';
-    var hab=window.H_AUTO_BUY||{};
-    var habt=window.H_AUTO_BUY_TRACK||{};
-    var habCand=(hab.candidates||[]).slice(0,30);
-    var habSum=habt.summary||{};
-    var habDays=(habt.by_date||{});
-    var habDayKeys=Object.keys(habDays).sort().slice(-7).reverse();
-    h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">';
-    h+='<div style="background:rgba(206,147,216,.08);border:1px solid rgba(206,147,216,.25);border-radius:8px;padding:10px 12px;">';
-    h+='<div style="font-size:11px;color:var(--sub);">📅 当日候选 <span style="color:var(--dim)">('+(hab.date||'--')+')</span></div>';
-    h+='<div style="font-size:14px;margin-top:4px;">扫描 <b>'+(hab.total_scanned||0)+'</b> 只 · 涨幅≥3%+量比≥1.2 入选 <b style="color:var(--up)">'+(hab.final_count||0)+'</b> 只</div>';
-    h+='<div style="font-size:11px;color:var(--sub);margin-top:4px;line-height:1.5;">公式：涨幅≥3% + 量比≥1.2 + 4 日均量基准（反推 PDF 8.10/8.17 「短线买点」35 样本分布）</div>';
-    h+='</div>';
-    h+='<div style="background:rgba(206,147,216,.08);border:1px solid rgba(206,147,216,.25);border-radius:8px;padding:10px 12px;">';
-    h+='<div style="font-size:11px;color:var(--sub);">📈 累计胜率 <span style="color:var(--dim)">('+(habSum.tracked_picks||0)+' picks · '+(habSum.days||0)+' 日 · 快照截至 '+(habt.update_time||habt.date||'最近跑批')+')</span></div>';
-    h+='<div style="font-size:14px;margin-top:4px;">T+1: <b>'+(habSum.tracked_picks? (100*habSum['T+1_hit']/habSum.tracked_picks).toFixed(1):0)+'%</b> · T+5: <b>'+(habSum.tracked_picks? (100*habSum['T+5_hit']/habSum.tracked_picks).toFixed(1):0)+'%</b> · T+10: <b>'+(habSum.tracked_picks? (100*habSum['T+10_hit']/habSum.tracked_picks).toFixed(1):0)+'%</b></div>';
-    h+='<div style="font-size:11px;color:var(--sub);margin-top:4px;">命中阈值 T+N 收盘涨幅 ≥ 5%</div>';
-    h+='</div>';
-    h+='</div>';
-    if(habCand.length){
-      h+='<div style="font-size:12px;color:var(--sub);margin-bottom:6px;">⚡ Top 30 候选（按 0.6×量比 + 0.4×涨幅 综合分排序）</div>';
-      h+='<table style="width:100%;font-size:12px;border-collapse:collapse;">';
-      h+='<tr style="color:var(--sub);font-size:11px;border-bottom:1px solid var(--bd);"><th style="text-align:left;padding:4px 6px;">代码</th><th style="text-align:left;padding:4px 6px;">名称</th><th style="text-align:right;padding:4px 6px;">涨幅%</th><th style="text-align:right;padding:4px 6px;">量比</th><th style="text-align:left;padding:4px 6px;">行业</th></tr>';
-      for(var j=0;j<habCand.length;j++){
-        var hc=habCand[j];
-        var habPctColor=(hc.pct>=10?'var(--up)':(hc.pct>=5?'var(--up)':'var(--txt)'));
-        h+='<tr style="border-bottom:1px dashed var(--bd);">';
-        h+='<td style="padding:4px 6px;font-family:monospace;">'+hc.code+'</td>';
-        h+='<td style="padding:4px 6px;">'+hc.name+'</td>';
-        h+='<td style="padding:4px 6px;text-align:right;color:'+habPctColor+';">'+hc.pct+'</td>';
-        h+='<td style="padding:4px 6px;text-align:right;color:var(--cyan);">'+hc.vol_ratio+'</td>';
-        h+='<td style="padding:4px 6px;color:var(--sub);font-size:11px;">'+(hc.industry||'')+'</td>';
-        h+='</tr>';
-      }
-      h+='</table>';
-    } else {
-      h+='<div class="note" style="text-align:center;">⏳ 当日候选未产出（盘后 19:15 算法链自动跑）</div>';
-    }
-    if(habDayKeys.length){
-      h+='<details style="margin-top:12px;"><summary style="cursor:pointer;color:var(--sub);font-size:12px;">📊 近 '+habDayKeys.length+' 日跟踪明细（每只候选 T+1/T+5 命中）</summary>';
-      h+='<div style="padding:8px 0;">';
-      for(var hk=0;hk<habDayKeys.length;hk++){
-        var hdk=habDayKeys[hk];
-        var hdr=habDays[hdk];
-        h+='<div style="margin-bottom:8px;font-size:12px;border-left:3px solid #ce93d8;padding-left:8px;">';
-        h+='<div style="color:var(--sub);font-size:11px;">'+hdk+' · n='+(hdr.n||0)+' · T+1 命中 <b>'+(hdr['T+1_hit']||0)+'/'+(hdr.n||0)+' = '+(hdr['T+1_rate']||0)+'%</b> · T+5 '+(hdr['T+5_rate']||0)+'%</div>';
-        h+='</div>';
-      }
-      h+='</div></details>';
-    }
-    h+='</div></div>';  // /H反推卡
-    // ── 2026-08-29 主人令：🤖 AI 预测 子页面已删除（卡并入调试专区，见 P3 插入段），pane2 此处不再渲染 ──
-
-    // ── 2026-08-29 主人令：🔮 潜力挖掘 子页面已删除（卡并入调试专区，见 P3 插入段），pane3 此处不再渲染 ──
-    // 2026-08-27 一劳永逸：删除潜力挖掘 ETF·龙头参考 克隆卡 一并并入调试专区 (dbgEtfMapBody 单点)
 
     el.innerHTML=h;
     // 2026-08-30 主人令:渲染兜底
@@ -11021,8 +10820,8 @@ h+='</div>';  // /ulPaneDbg
     // 2026-08-16 子Tab 切换函数
     window.__ulSwitch = function(btn, tab){
       window.__ulActivePane = tab;  // 🛡 guard: 记住当前子 tab，重渲染不再 snap-back
-      var idMap = {strong:'ulPaneStrong', dbg:'ulPaneDbg'};
-      var all = ['ulPaneStrong','ulPaneDbg'];
+      var idMap = {dbg:'ulPaneDbg'};
+      var all = ['ulPaneDbg'];
       for(var k=0;k<all.length;k++){ var p=document.getElementById(all[k]); if(p) p.style.display = (all[k]===idMap[tab]) ? 'block' : 'none'; }
       var tabs = document.querySelectorAll('#sec-ul .ul-tab');
       for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
@@ -13815,18 +13614,7 @@ window.__renderV8CalToday();
     var sec = p.get('sec'), sub = p.get('sub');
     if(!sec || !sub) return;
     function go(){
-      if(sec==='ul' && sub==='ai'){
-        if(typeof switchSec==='function') switchSec('ul');
-        setTimeout(function(){
-          if(typeof window.__ulSwitch==='function') window.__ulSwitch(null,'ai');
-        }, 250);
-      }
-      if(sec==='ul' && sub==='pp'){
-        if(typeof switchSec==='function') switchSec('ul');
-        setTimeout(function(){
-          if(typeof window.__ulSwitch==='function') window.__ulSwitch(null,'pp');
-        }, 250);
-      }
+      // 2026-09-01 删除：?sec=ul&sub=ai / sub=pp 深链（对应 AI预测/潜力挖掘 子页早已删除，且会误隐藏仅剩的调试专区）
       if(sec==='lg'){
         // 2026-08-31 轻量化：逻辑详解已拆为独立页 logic.html，主站不再含 sec-lg 容器。
         // 旧的 ?sec=lg&sub=xx 深链改为自动打开独立页（保持 deep link 可用）。
