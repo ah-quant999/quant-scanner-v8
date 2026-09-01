@@ -140,11 +140,19 @@ def main() -> int:
         for f in regressions:
             rc3, _, e3 = git(["checkout", "origin/main", "--", f])
             print("  [apply] %s -> %s" % (f, "已恢复为远端版本" if rc3 == 0 else ("失败:" + e3[:120])))
-        # 收尾归位：checkout 会把文件【暂存】，而 origin/main 可能已被并发 build 推进，
-        # 残留的 staged 旧条目正是「陈旧暂存区地雷」（下次任何 commit 都会回滚）。
-        # 必须 reset --mixed 让索引回到最新 origin/main（只动索引，工作树一个字节不碰）。
-        git(["fetch", "origin", "main"])
-        git(["reset", "-q", "--mixed", "origin/main"])
+        # 收尾归位：checkout 会把文件【暂存】，残留的 staged 条目正是「陈旧暂存区地雷」。
+        # 【2026-09-01 根治·数据回滚地雷复发】原实现为
+        #     git fetch origin main && git reset -q --mixed origin/main
+        #   ✗ 致命：`reset --mixed <commit>` 会**连同 HEAD 一起移动**到 origin/main，
+        #     而工作树一个字节不动（注释误以为"只动索引"）→
+        #     HEAD/索引跑到最新、工作树停在旧状态，git status 暴出 200+ 个
+        #     「已修改」的**旧版本**文件（2026-09-01 11:31 实测 218 个 / -114,584 行），
+        #     此时任何 `git add -A && commit` 都会造成整站数据回滚 + 文件被删。
+        #   ✓ 正确做法：**只取消本次 checkout 产生的暂存，绝不移动 HEAD**。
+        #     索引回到 HEAD → staged 恒为 0；工作树保留刚拉回的远端新版本，
+        #     后续 `git add raw_data/` 暂存的是**新**内容，天然免回滚。
+        # 同源先例：sync_westock_portfolio.py 已于 2026-08-24 用同样思路修过同一地雷。
+        git(["reset", "-q", "HEAD", "--"] + regressions)
         _, staged, _ = git(["diff", "--cached", "--name-only"])
         n_staged = len([x for x in staged.splitlines() if x.strip()])
         print("  [apply] 索引已归位，残留 staged 条目 = %d" % n_staged)
