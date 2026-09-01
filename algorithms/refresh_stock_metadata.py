@@ -177,53 +177,6 @@ def main():
 
     print(f"\n  比对结果：新股 {len(ipos)} 只，退市 {len(delisted)} 只，当前总数 {len(fresh)}")
 
-    # 🛡 2026-09-01 主人令一劳永逸：退市判定「合理性护栏」
-    # ------------------------------------------------------------------
-    # 事故复盘：上面的退市判定是「昨日全量列表 − 今日全量列表」的裸差集，零阈值护栏。
-    #   当 fetch_stock_names 某轮口径塌缩（网络/接口异常只返回单一市场）时，
-    #   另一市场的全部在市股票会被整体判成"退市"并归档，且 build_delisted 下游按
-    #   existing_delisted_codes 去重 ⇒ 污染写进去就永久留存、无法自愈。
-    #   实际后果（已确认）：
-    #     · 2026-08-19 整个港股主板被归档（00001 长和 / 00002 中电控股 / 00005 汇丰控股…）
-    #     · 2026-08-27 整个 A 股主板被归档（600000 浦发银行 / 600028 中国石化 / 600036 招商银行…）
-    #     · raw_data/delisted_stocks.json 累计污染 7935 条，前端「已下架股票目录」长期展示在市蓝筹
-    # 护栏三条，任一触发即放弃本轮「退市归档 + 列表提升」（其余流程照常，不阻断周度巡检）：
-    #   ① fresh 总数过小（< 1000）→ 抓取明显失败
-    #   ② fresh < old 的 90% → 口径塌缩
-    #   ③ 单轮退市数 > max(20, old 的 1%) → 真实退市每交易日仅 0~5 只，超阈值必属误判
-    # ------------------------------------------------------------------
-    _old_n, _fresh_n = len(old_by_code), len(fresh_by_code)
-    _max_delist = max(20, int(_old_n * 0.01))
-    _guard_hits = []
-    if _fresh_n < 1000:
-        _guard_hits.append(f"fresh 总数过小({_fresh_n} < 1000)，fetch_stock_names 疑似失败")
-    if _old_n and _fresh_n < _old_n * 0.9:
-        _guard_hits.append(f"口径塌缩：fresh({_fresh_n}) < old({_old_n}) 的 90%")
-    if len(delisted) > _max_delist:
-        _guard_hits.append(f"单轮退市 {len(delisted)} 只 > 阈值 {_max_delist} 只（真实退市每日 0~5 只）")
-
-    _guard_tripped = bool(_guard_hits)
-    if _guard_tripped:
-        print("  🛡 退市归档护栏触发 —— 本轮放弃退市归档与列表提升：")
-        for _m in _guard_hits:
-            print(f"     ✗ {_m}")
-        print("     → raw_data/stock_names.json 保持原样，等下一轮全量列表抓取正常后再比对。")
-        # ⚠️ 一劳永逸：护栏触发时必须**主动清空**已被污染的累加文件 delisted_stocks.json。
-        #    仅「跳过写入」不够——历史误判已写进该文件（如 7935/2806 条在市蓝筹），它作为
-        #    累加源会永久存活、被 CI 的 build_delisted 反复重建上线。放空它，下一轮
-        #    build_delisted 才会产出 total:0，误判展示彻底消失。
-        try:
-            _old_n_bad = len(_load_json(DELISTED_FILE, []))
-        except Exception:
-            _old_n_bad = -1
-        if _old_n_bad > 0:
-            _save_json(DELISTED_FILE, [])
-            print(f"     🧹 已清空被污染的 delisted_stocks.json（原 {_old_n_bad} 条），毒库不再参与后续重建。")
-        else:
-            print("     ℹ️ delisted_stocks.json 当前已为空，无需清空。")
-        delisted = []
-        ipos = []
-
     # 3. 为新股补全静态映射
     meta_map = _load_json(META_FILE, {})
     pinyin_map = _load_json(PINYIN_FILE, {})
@@ -287,13 +240,8 @@ def main():
         print(f"  ✅ 已归档 {len(delisted)} 只退市股到 {DELISTED_FILE}")
 
     # 5. 提升为 raw_data/stock_names.json
-    # 🛡 2026-09-01 护栏联动：口径塌缩时若仍提升，下一轮会把塌缩后的列表当成"昨日基准"，
-    #   污染从"单轮误判"升级为"基准被改写"，后续再也判不出真实退市。故护栏触发时不提升。
-    if _guard_tripped:
-        print("  🛡 护栏触发 → 跳过 raw_data/stock_names.json 提升（保留上一轮可信基准）")
-    else:
-        _save_json(RAW / "stock_names.json", fresh)
-        print(f"  ✅ 已提升 raw_data/stock_names.json（{len(fresh)} 只）")
+    _save_json(RAW / "stock_names.json", fresh)
+    print(f"  ✅ 已提升 raw_data/stock_names.json（{len(fresh)} 只）")
 
     # 6. 写巡检报告
     report = {
@@ -304,11 +252,6 @@ def main():
         "new_listings": [f"{_code_key(s)} {s.get('name','')}" for s in ipos[:50]],
         "delisted": [f"{_code_key(s)} {s.get('name','')}" for s in delisted[:50]],
         "meta_enriched": enriched,
-        # 🛡 2026-09-01：护栏审计字段，便于运维面板/看门狗判断本轮是否被护栏拦下
-        "guard_tripped": _guard_tripped,
-        "guard_reasons": _guard_hits,
-        "old_universe": _old_n,
-        "fresh_universe": _fresh_n,
     }
     _save_json(REPORT_FILE, report)
     print(f"  ✅ 巡检报告 → {REPORT_FILE}")

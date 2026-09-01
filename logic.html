@@ -583,213 +583,18 @@
     .fr-allrow:last-child{border-bottom:none}
 
 </style>
-<script>
-/* ===== 逻辑详解页独立所需全局工具函数（从 index.html 同步，防拆页后缺失） ===== */
-(function(){
-  window._AS_HOLIDAY_RANGES_2026 = [
-    ["01-01","01-03"], ["02-15","02-23"], ["04-04","04-06"],
-    ["05-01","05-05"], ["06-19","06-21"], ["09-25","09-27"], ["10-01","10-07"]
-  ];
-  window._AS_MAKEUP_DAYS_2026 = new Set([
-    "2026-01-04","2026-02-14","2026-02-28","2026-05-09","2026-09-20","2026-10-10"
-  ]);
-  window._isAshareTradingDay = function(d){
-    var cstDateStr = d.toLocaleDateString ? d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}) : String(d).slice(0,10);
-    var iso = cstDateStr.replace(/\//g,'-');
-    if (window._AS_MAKEUP_DAYS_2026.has(iso)) return true;
-    var parts = iso.split('-');
-    var md = parts[1] + '-' + parts[2];
-    for (var i=0;i<window._AS_HOLIDAY_RANGES_2026.length;i++){
-      var r = window._AS_HOLIDAY_RANGES_2026[i];
-      if (md >= r[0] && md <= r[1]) return false;
-    }
-    var wd = d.getDay();
-    return wd !== 0 && wd !== 6;
-  };
-  window._parseAsCST = function(ts){
-    if(!ts) return null;
-    var s = String(ts).trim();
-    var m = s.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(Z|[+-]\d{2}:?\d{2})?$/);
-    if(m){
-      var tz = (m[7] || '').replace(':', '');
-      if(tz === 'Z' || tz === '+0000' || tz === '-0000'){
-        var d = new Date(Date.UTC(+m[1], +m[2]-1, +m[3], +m[4], +m[5], +m[6]));
-        d.setTime(d.getTime() + 8*3600*1000);
-        return d;
-      }
-    }
-    var d2 = new Date(s.replace('T',' ').replace(/-/g,'/'));
-    return isNaN(d2.getTime()) ? null : d2;
-  };
-  window._fmtHmCST = function(d){
-    if(!d || isNaN(d.getTime())) return '--';
-    return d.toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour:'2-digit',minute:'2-digit',hour12:false});
-  };
-  window._cstParts = function(d){
-    d = d || new Date();
-    var p = {year:'1970',month:'01',day:'01',hour:'00',minute:'00'};
-    try{
-      var fmt = new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});
-      (fmt.formatToParts(d)||[]).forEach(function(part){ if(part && part.type) p[part.type]=part.value; });
-    }catch(e){}
-    return { y: +(p.year || d.getFullYear()), m: +(p.month || d.getMonth()+1), d: +(p.day || d.getDate()), hh: +(p.hour || d.getHours()), mm: +(p.minute || d.getMinutes()) };
-  };
-  window._extractDateStr = function(genTimeStr){
-    if(!genTimeStr) return '';
-    var d = window._parseAsCST ? window._parseAsCST(genTimeStr) : null;
-    if(d && !isNaN(d.getTime())){
-      var parts = window._cstParts ? window._cstParts(d) : null;
-      if(parts) return String(parts.y)+'-'+String(parts.m).padStart(2,'0')+'-'+String(parts.d).padStart(2,'0');
-      return d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
-    }
-    var s = String(genTimeStr).slice(0,10);
-    if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-    return '';
-  };
-  window._fmtAshareRel = function(ts){
-    if(!ts) return '--';
-    var d = window._parseAsCST(ts);
-    if(!d || isNaN(d.getTime())) return String(ts);
-    var now = new Date();
-    var hm = window._fmtHmCST(d);
-    if(d.getTime() > now.getTime() + 60*1000){
-      var ds = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
-      return '⚠️ 未来 ' + ds + ' ' + hm;
-    }
-    var todayStr = now.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
-    var dataStr  = d.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'});
-    var tp = todayStr.split('/');
-    var dp = dataStr.split('/');
-    var today0 = new Date(+tp[0], +tp[1]-1, +tp[2]);
-    var data0  = new Date(+dp[0], +dp[1]-1, +dp[2]);
-    var diff = Math.round((today0 - data0) / 864e5);
-    if(diff >= 1 && !window._isAshareTradingDay(today0)) return '上一交易日收盘 ' + hm;
-    if(diff <= 0) return '今日 ' + hm;
-    if(diff === 1) return '昨日 ' + hm;
-    return diff + '天前 ' + hm;
-  };
-})();
-function _uBadge(slot, horizon, ts, sub){
-  var t = '—';
-  if(ts){
-    try{ var rel = window._fmtAshareRel ? window._fmtAshareRel(ts) : null; t = rel || String(ts); } catch(e){ t = String(ts); }
-  }
-  var sHTML = slot ? ' '+slot : '';
-  var hHTML = horizon ? ' '+horizon : '';
-  return '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 '+t+sHTML+hHTML+'</span>'
-    + (sub ? ' <span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">' + sub + '</span>' : '');
-}
-function setBadge(id, slot, horizon, ts, sub){
-  try{
-    var el = document.getElementById(id) || (typeof $ === 'function' ? $(id) : null);
-    if(!el){ console.log('[setBadge] skip (DOM missing) id=' + id); return; }
-    if(!ts && !sub){ ts = '已加载'; }
-    el.innerHTML = _uBadge(slot, horizon, ts, sub);
-  }catch(e){ console.log('[setBadge] silent skip id=' + id, e && (e.message||'')); }
-}
-window._uBadge = _uBadge; window.setBadge = setBadge;
-</script>
-  <!-- 2026-09-01 逻辑详解页数据注入：镜像 index.html 的 data/*.js 注入，
-       使 window.X 在 DOMContentLoaded 前就绪，根治拆页后卡片空白。DATA_INJECT_LOGIC_FIX -->
-  <script src="data/ETF_INTRADAY_HEAT.js?v=fee5469d7d" defer></script>
-  <script src="data/SECTOR_FUND_FLOW.js?v=2840729b66" defer></script>
-  <script src="data/SECTOR_FUND_FLOW_TREND.js?v=29cecefca9" defer></script>
-  <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=4fa7b66fbd" defer></script>
-  <script src="data/DO_NOT_DELETE.js?v=85e486d722" defer></script>
-  <script src="data/SUSPENSION_ALERT.js?v=a66547b33d" defer></script>
-  <script src="data/GOLD_POOL.js?v=6999f5b4ff" defer></script>
-  <script src="data/MACRO_DATA.js?v=a706459de8" defer></script>
-  <script src="data/MACRO_BRIEF.js?v=7f09bbe0ea" defer></script>
-  <script src="data/NT_DATA.js?v=757ca8ac52" defer></script>
-  <script src="data/LHB_DATA.js?v=cb34981eb2" defer></script>
-  <script src="data/archive/V8_CAL_INDEX.js" defer></script>
-  <script src="data/CONCEPT_RANKING.js?v=7f0ca39d29" defer></script>
-  <script src="data/POTENTIAL_PICKS.js?v=4acbf12f64" defer></script>
-  <script src="data/INDEX_QUOTES.js?v=9e1ea72480" defer></script>
-  <script src="data/AI_MARKET_BRIEF.js?v=65ec8567d7" defer></script>
-  <script src="data/MARGIN_DATA.js?v=9a36d79d76" defer></script>
-  <script src="data/CFFEX_HOLDINGS.js?v=ab4e8b8da5" defer></script>
-  <script src="data/IPO_DATA.js?v=d8ab82ee25" defer></script>
-  <script src="data/CRISIS_DATA.js?v=d5eff40132" defer></script>
-  <script src="data/JUDGMENT_DATA.js?v=2f9f5ef94a" defer></script>
-  <script src="data/OVERSEAS_MARKETS.js?v=3476e4e890" defer></script>
-  <script src="data/STOCK_RPS.js?v=01c70ca90f" defer></script>
-  <script src="data/H_AUTO_BUY.js?v=66d7974bc3" defer></script>
-  <script src="data/H_AUTO_BUY_TRACK.js?v=45339f2662" defer></script>
-  <script src="data/UNLISTED_PANEL.js?v=cbb45ec824" defer></script>
-  <script src="data/MARKET_REGIME.js?v=c7d358bf56" defer></script>
-  <script src="data/RISK_GAUGE.js?v=f90a48fe41" defer></script>
-  <script src="data/SECTOR_RECOMMENDATION.js?v=3f3856577e" defer></script>
-  <script src="data/WEEKEND_META_REPORT.js?v=14594c5a2a" defer></script>
-  <script src="data/DELISTED.js?v=9eef4eba4e" defer></script>
-  <script src="data/AVG_PRICE_DATA.js?v=2816fdd5d7" defer></script>
-  <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
-  <script src="data/PORTFOLIO.js?v=1d8d158a7d" defer></script>
-  <script src="data/CRDS_CARD_DATA.js?v=b2d259d362" defer></script>
-  <script src="data/TRIPLE_CONSENSUS.js?v=567e9fb230" defer></script>
-  <script src="data/TRIPLE_TRACK.js?v=35b9ff2a0a" defer></script>
-  <script src="data/TRIPLE_HISTORY.js?v=64972c29af" defer></script>
-  <script src="data/COCKPIT_TIER_RECOMMEND.js?v=36da3d81bb" defer></script>
-  <script src="data/COCKPIT_ADVICE.js?v=9a55168e0e" defer></script>
-  <script src="data/V8_CAL.js?v=ee623e0834"></script>
-  <script src="data/SH_FIB.js?v=4bbea72b7b" defer></script>
-  <script src="data/SZ_FIB.js?v=a28b0a37f0" defer></script>
-  <script src="data/SECTOR_RS.js?v=003cb876f6" defer></script>
-  <script src="data/SECTOR_PHASE_HISTORY.js?v=18ec616638" defer></script>
-  <script src="data/INST_TRADE.js?v=d9ad536792" defer></script>
-  <script src="data/NORTH_FUND.js?v=fefb1266e3" defer></script>
-  <script src="data/MARKET_ALERTS.js?v=f280879de6" defer></script>
-  <script src="data/MARKET_FUND_FLOW_DATA.js?v=fe827a5db7" defer></script>
-  <script src="data/ETF_SUBSCRIPTION.js?v=2cc7309e1f" defer></script>
-  <script src="data/ETF_SUBSCRIPTION_EM.js?v=edbb4a9085" defer></script>
-  <script src="data/LIMIT_UP_HEATMAP.js?v=290e9631f6" defer></script>
-  <script src="data/LIMIT_UP_BROKEN.js?v=cee690d979" defer></script>
-  <script src="data/HERDING_DATA.js?v=b96f321639" defer></script>
-  <script src="data/VOLATILITY.js?v=9f717d98d6" defer></script>
-  <script src="data/CAPITAL_FLOW_DATA.js?v=f796e25fac" defer></script>
-  <script src="data/SH_SZ_HISTORY.js?v=c667054319" defer></script>
-  <script src="data/CANDIDATE.js?v=98a4072b2b" defer></script>
-  <script src="data/FOUR_VOLUME.js?v=aefad242c4" defer></script>
-  <script src="data/FOUR_VOLUME_60M.js?v=af87ef8c3e" defer></script>
-  <script src="data/STOCK_STOP_DATA.js?v=bed314b262" defer></script>
-  <script src="data/BACKTEST_COMPREHENSIVE.js?v=6b82b50363" defer></script>
-  <script src="data/COCKPIT_BACKTEST.js?v=3a5b9d5747" defer></script>
-  <script src="data/BACKTEST_TDX.js?v=44eeb2ea13" defer></script>
-  <script src="data/HUNTER_BACKTEST.js?v=103c8a4c6a" defer></script>
-  <script src="data/OPTIMIZED_STRATEGY.js?v=c8b62a8ad4" defer></script>
-  <script src="data/EXPERIMENT.js?v=0eb4075617" defer></script>
-  <script src="data/FINAL_RECOMMEND_DATA.js?v=bb2d45b606" defer></script>
-  <script src="data/V8_POOL_TRACKER.js?v=c3a084a1cd" defer></script>
-  <script src="data/ETF_PULSE.js?v=2ec8dec0d7" defer></script>
-  <script src="data/ETF_DAILY_MONITOR.js?v=0e8be2476b" defer></script>
-  <script src="data/TOP10_DAILY.js?v=7b1026beec" defer></script>
-  <script src="data/WEEKEND_RUN.js?v=d55b092978" defer></script>
-  <script src="data/W52_HIGH.js?v=1bd34291a8" defer></script>
-  <script src="data/RESTRICTED_RELEASE.js?v=c9c3ec0180" defer></script>
-  <script src="data/PERFORMANCE_FORECAST.js?v=c127116867" defer></script>
-  <script src="data/RUNNER_STATUS.js?v=f6bddc2c3f" defer></script>
-  <script src="data/HEALTH_CHECK.js?v=d88e359ac0" defer></script>
-  <script src="data/COMMODITY_ELASTICITY.js?v=b07e27a704" defer></script>
-  <script src="data/SENTIMENT_CYCLE.js?v=45cbe14a15" defer></script>
-  <script src="data/MARKET_PATH_PROBABILITY.js?v=92f73782b3" defer></script>
-  <script src="data/STOCK_MOMENTUM_STATE.js?v=b85a9da176" defer></script>
-  <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=2a7ed92426" defer></script>
-  <script src="data/MOMENTUM_FILTER.js?v=ea9c132218" defer></script>
-  <script src="data/ALGO_BACKTEST_COMPARE.js?v=14437c0d12" defer></script>
 </head>
 <body>
 <nav class="v8nav" style="padding:8px 12px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--line,#333)">
   <a href="./index.html" style="color:var(--txt);text-decoration:none;font-weight:700">← 返回主站（实时看盘）</a>
-  <span style="color:var(--dim);font-size:12px;flex:1">📖 逻辑详解 · 指标/策略/安全口径 · 仅管理员可见 · <b style="color:var(--gold)">本页已从主站 index.html 拆为独立页（2026-08-31 轻量化）</b></span>
-  <span class="admin-badge" id="adminState">访客模式</span>
-  <button class="btn" id="adminBtn" onclick="openLock()">管理员登录</button>
+  <span style="color:var(--dim);font-size:12px">📖 逻辑详解 · 指标/策略/安全口径 · 仅管理员可见 · <b style="color:var(--gold)">本页已从主站 index.html 拆为独立页（2026-08-31 轻量化）</b></span>
 </nav>
 <main style="max-width:1400px;margin:0 auto;padding:12px">
 
   <!-- ============ 逻辑详解（管理员） ============ -->
 
   <!-- ============ 逻辑详解（管理员） ============ -->
-  <section id="sec-lg" class="active">
+  <section id="sec-lg">
     <div class="sec-head"><h2>📖 逻辑详解</h2><span class="tag">仅管理员可见 · 指标/策略/安全口径</span></div>
 
     <div class="lg-subtabs" id="lgSubtabs">
@@ -2184,13 +1989,7 @@ async function tryUnlock(){
 function logout(){ try{ localStorage.removeItem('v8_admin'); }catch(e){} location.reload(); }
 function guardLock(sec,el){ if(isAdmin()){switchSec(sec,el);}else{openLock();} }
 function refreshAdminUI(){
-  if(!isAdmin()) return;
-  var adminState=document.getElementById('adminState');
-  var adminBtn=document.getElementById('adminBtn');
-  if(adminState) adminState.innerHTML='<b>管理员已登录</b>';
-  if(adminBtn){ adminBtn.textContent='退出'; adminBtn.setAttribute('onclick','logout()'); }
-  document.querySelectorAll('.tab.locked').forEach(t=>{t.classList.remove('locked');const s=t.querySelector('.lk');if(s)s.remove();});
-  document.querySelectorAll('.tab.admin-only').forEach(t=>t.style.display='flex');
+  if(isAdmin()){document.getElementById('adminState').innerHTML='<b>管理员已登录</b>';document.getElementById('adminBtn').textContent='退出';document.getElementById('adminBtn').setAttribute('onclick','logout()');document.querySelectorAll('.tab.locked').forEach(t=>{t.classList.remove('locked');const s=t.querySelector('.lk');if(s)s.remove();});document.querySelectorAll('.tab.admin-only').forEach(t=>t.style.display='flex');}
 }
 refreshAdminUI();
 

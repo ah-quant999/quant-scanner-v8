@@ -231,6 +231,15 @@ jobs:
           echo "本次类别: $cat"
           python cloud_fetch_v8.py --category "$cat"
 
+      # 2026-09-01 主人令：热门赛道资金追踪原生卡数据生成（暂未上架最底部）。
+      # 读取 raw_data/sector_fund_flow_history.json，产出近 20 日累计净流入 top10 赛道折线数据。
+      - name: "🔥 热门赛道资金追踪数据生成"
+        if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
+        continue-on-error: true
+        shell: bash
+        run: |
+          python algorithms/build_sector_fund_track.py
+
       # 2026-09-01 主人令：#7 分红刷新上云（小九机降级为监督/应急兜底）。
       # 直接跑 refresh_dividend_cninfo（cninfo 源），写回 raw_data/stock_quote.json 并重建
       # data/STOCK_QUOTE.js；随后本 workflow 的「📤 推送 raw_data/」与「📤 推送重建 data/*.js」

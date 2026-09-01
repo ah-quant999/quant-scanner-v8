@@ -28,6 +28,7 @@ DATA_SOURCES = {
     "sector_phase_history.json":   "SECTOR_PHASE_HISTORY",  # 2026-08-17 主人令：盘后每日阶段快照（自动累积+前端"今日 vs 上次"对比）
     "sector_fund_flow.json":       "SECTOR_FUND_FLOW",
     "sector_fund_flow_trend.json": "SECTOR_FUND_FLOW_TREND",
+    "sector_fund_track.json": "SECTOR_FUND_TRACK",
     # 🛡 2026-08-19 主人令一劳永逸式修复：原 DATA_SOURCES 缺 sector_fund_flow_intraday.json 映射，
     #   cloud_fetch_v8.py f_sector_fund_flow() 已在抓取时按 intraday 追加快照（line 1168），
     #   但 update_v8 转换层漏挂 → data/SECTOR_FUND_FLOW_INTRADAY.js 永远停在 09:56 的 2 快照版。
@@ -172,6 +173,7 @@ CATEGORY_MAP = {
 
     # 盘后（17:00，主要由 v6 算法推送；cloud_fetch 暂无生产者）
     "SECTOR_FUND_FLOW_TREND": "post_close",
+    "SECTOR_FUND_TRACK": "post_close",
     "GOLD_POOL": "post_close",
     "CANDIDATE": "post_close",
     "TRIPLE_CONSENSUS": "post_close",

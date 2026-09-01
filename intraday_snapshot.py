@@ -111,18 +111,6 @@ def main():
 
     # 幂等：同时间快照覆盖而非重复追加（杜绝双机/重试导致的重复快照）
     times = {s.get("time") for s in data["snapshots"]}
-    # 🛡 2026-09-01 主人令根因修复（"主力净额曲线才1根线"）：
-    #   intraday-snapshot 并发组与主抓取并行跑，若本档触发时主抓取尚未提交刷新后的
-    #   sector_fund_flow.json，会读到最后一轮提交的老文件 → 写出字节级完全相同的快照
-    #   （实测 09:41≡10:09、10:21≡10:27）。重复对会让前端 freq 选线把两个板块簇都卡在
-    #   freq=2<阈值 → 全部落选、曲线坍缩成单一板块簇（该簇内 net 值相近 → 视觉叠成1根线）。
-    #   内容去重：最新一笔快照板块内容与此刻完全一致则跳过追加，只保留真实变化的快照点。
-    def _same_content(a, b):
-        return (a.get("sectors_in") == b.get("sectors_in")
-                and a.get("sectors_out") == b.get("sectors_out"))
-    if data["snapshots"] and _same_content(data["snapshots"][-1], snap):
-        print(f"⏭️ 快照 {hhmm} 板块内容与上一笔({data['snapshots'][-1].get('time')}) 完全一致，跳过重复追加（防曲线坍缩）")
-        return 0
     if hhmm in times:
         for i, s in enumerate(data["snapshots"]):
             if s.get("time") == hhmm:

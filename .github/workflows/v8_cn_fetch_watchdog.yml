@@ -1,19 +1,22 @@
 # 九宝量化 v8.0 — 数据抓取云端看门狗（自愈·兜底）
 #
 # 🔴 2026-09-01 根因修复（一劳永逸）：
-#   GitHub Actions 的 schedule 在高负载下会整段漏触发。本看门狗不依赖"准点"，
-#   而是基于**线上数据是否陈旧**做自愈派发：任何对 main 的 push 都会唤醒本 workflow，
-#   它拉取线上关键 data/*.js，发现哪类数据陈旧就派发对应 workflow。
-#   与原始 cron 互为冗余，只要 push/workflow_dispatch/schedule 任一触发，数据就不会空窗。
+#   主 workflow v8_cn_fetch_cloud.yml 的 5 条 cron 长期被 GitHub schedule 高负载整段漏触发
+#   （实测 2026-09-01 全天 0 次 schedule 触发，而 08-31 正常）。单靠 workflow 内置 cron 不可靠。
+#   本看门狗不依赖"准点"，而是**基于状态（线上数据是否陈旧）**自愈：
+#     - 每 30 分（交易日 08:00-17:30 CST）跑一次轻量检查；
+#     - 拉取线上 data/HEALTH_CHECK.js，取最新 last_update 与当前 CST 比较；
+#     - 若处于交易时段且对应类别数据陈旧（盘中>35min / 盘前盘后>60min），
+#       直接在云端用 gh workflow run 派发 v8_cn_fetch_cloud.yml（category 自适应）。
+#   全云端（ubuntu-latest），小九机仅在云端连续失败时才作人工后备，不依赖其定时。
+#   与主 workflow 的 cron 互为冗余：只要任意一条触发，数据就不会长时间空窗。
 
 name: "🐕 v8 数据抓取看门狗(云端自愈)"
 
 on:
   schedule:
-    # 交易日 08:00-17:30 CST 每 30 分（UTC 00:00-09:30）
+    # 交易日 08:00-17:30 CST 每 30 分（UTC 00:00-09:30）。覆盖盘前/盘中/盘后全窗口。
     - cron: '*/30 0-9 * * 1-5'
-  push:
-    branches: [main]
   workflow_dispatch:
     inputs:
       force_category:
@@ -24,7 +27,7 @@ on:
 
 permissions:
   contents: read
-  actions: write   # 用于 gh workflow run 派发
+  actions: write   # 用于 gh workflow run 派发主抓取
 
 concurrency:
   group: v8-cn-fetch-watchdog
@@ -42,8 +45,6 @@ jobs:
           python3 - <<'PY'
           import urllib.request, json, re, subprocess, datetime, sys
 
-          BASE_URL = "https://ah-quant999.github.io/quant-scanner-v8/data"
-
           # 当前 CST 时间
           cst = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
           dow = cst.weekday()            # 0=周一
@@ -52,6 +53,10 @@ jobs:
 
           force = "${{ github.event.inputs.force_category }}".strip()
 
+          # 仅交易日（周一至周五）
+          if dow >= 5 and not force:
+              print("[watchdog] 非交易日，跳过"); sys.exit(0)
+
           def in_window(a, b):
               return a <= hhmm <= b
 
@@ -59,12 +64,6 @@ jobs:
           cat = None
           if force:
               cat = force
-          elif dow >= 5:
-              # 周末：仅 09:00-10:00 CST 做一次周度全量兜底
-              if in_window(9*60, 10*60):
-                  cat = "all"
-              else:
-                  print("[watchdog] 周末非兜底窗口，跳过"); sys.exit(0)
           elif in_window(8*60+25, 9*60):        # 08:25-09:00 盘前
               cat = "premarket"
           elif in_window(9*60, 11*60+30):       # 09:00-11:30 上午盘中
@@ -74,89 +73,44 @@ jobs:
           elif in_window(17*60, 17*60+40):      # 17:00-17:40 盘后
               cat = "post_close"
           else:
-              print("[watchdog] 非交易时段，跳过主抓取检查"); cat = None
+              print("[watchdog] 非交易时段，跳过"); sys.exit(0)
 
-          def fetch_js(path):
-              url = f"{BASE_URL}/{path}"
-              try:
-                  req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-                  t = urllib.request.urlopen(req, timeout=30).read().decode("utf-8")
-                  m = re.search(r"window\.\w+\s*=\s*(\{.*\});?\s*$", t, re.S)
-                  if m:
-                      return json.loads(m.group(1))
-              except Exception as e:
-                  print(f"[watchdog] 无法读取 {path}: {e}")
-              return None
+          url = "https://ah-quant999.github.io/quant-scanner-v8/data/HEALTH_CHECK.js"
+          latest = None
+          try:
+              req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+              t = urllib.request.urlopen(req, timeout=30).read().decode("utf-8")
+              m = re.search(r"window\.HEALTH_CHECK\s*=\s*(\{.*\});?\s*$", t, re.S)
+              d = json.loads(m.group(1))
+              for c in (d.get("checks") or []):
+                  lu = c.get("last_update")
+                  if lu:
+                      try:
+                          dt = datetime.datetime.strptime(lu, "%Y-%m-%d %H:%M:%S")
+                          if latest is None or dt > latest:
+                              latest = dt
+                      except Exception:
+                          pass
+          except Exception as e:
+              print(f"[watchdog] 无法读取 HEALTH({e})，保守派发 {cat}")
+              subprocess.run(["gh", "workflow", "run", "v8_cn_fetch_cloud.yml",
+                              "-f", f"category={cat}"], check=False)
+              sys.exit(0)
 
-          def parse_dt(s):
-              if not s:
-                  return None
-              for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M"):
-                  try:
-                      return datetime.datetime.strptime(s, fmt)
-                  except Exception:
-                      pass
-              return None
+          if latest is None:
+              print(f"[watchdog] 无 last_update，派发 {cat}")
+              subprocess.run(["gh", "workflow", "run", "v8_cn_fetch_cloud.yml",
+                              "-f", f"category={cat}"], check=False)
+              sys.exit(0)
 
-          dispatched = []
-
-          # ---------- 1) 主数据链路 HEALTH_CHECK ----------
-          if cat:
-              hc = fetch_js("HEALTH_CHECK.js")
-              latest = None
-              if hc:
-                  # 兼容 checks/items 两种字段名
-                  for c in (hc.get("checks") or []) + (hc.get("items") or []):
-                      lu = c.get("last_update") or c.get("update_time")
-                      dt = parse_dt(lu)
-                      if dt and (latest is None or dt > latest):
-                          latest = dt
-
-              if latest is None:
-                  print(f"[watchdog] 无 HEALTH_CHECK 时间，保守派发 {cat}")
-                  subprocess.run(["gh", "workflow", "run", "v8_cn_fetch_cloud.yml",
-                                  "-f", f"category={cat}"], check=False)
-                  dispatched.append("v8_cn_fetch_cloud.yml (no HEALTH time)")
-              else:
-                  age_min = (cst.replace(tzinfo=None) - latest).total_seconds() / 60
-                  thr = 35 if cat == "intraday" else 60
-                  print(f"[watchdog] HEALTH 最新={latest} 距今={age_min:.1f}min 类别={cat} 阈值={thr}min")
-                  if age_min > thr:
-                      print(f"[watchdog] HEALTH 陈旧({age_min:.0f}>{thr}min)，派发 v8_cn_fetch_cloud.yml {cat}")
-                      r = subprocess.run(["gh", "workflow", "run", "v8_cn_fetch_cloud.yml",
-                                          "-f", f"category={cat}"], capture_output=True, text=True, check=False)
-                      print(r.stdout.strip(), r.stderr.strip())
-                      dispatched.append(f"v8_cn_fetch_cloud.yml {cat}")
-                  else:
-                      print(f"[watchdog] HEALTH 新鲜({age_min:.0f}<={thr}min)，无需派发主抓取")
-
-          # ---------- 2) 风险温度计 RISK_GAUGE ----------
-          # 交易日 08:00-16:30 CST 每 30 分应刷新；兜底阈值 90 分钟
-          rg_trade_window = (dow < 5) and (in_window(8*60, 16*60+30))
-          if rg_trade_window or force:
-              rg = fetch_js("RISK_GAUGE.js")
-              if rg is None:
-                  print("[watchdog] 无法读取 RISK_GAUGE，派发 v8_risk_gauge.yml")
-                  subprocess.run(["gh", "workflow", "run", "v8_risk_gauge.yml"], check=False)
-                  dispatched.append("v8_risk_gauge.yml (no data)")
-              else:
-                  rg_ts = parse_dt(rg.get("update_time"))
-                  if rg_ts is None:
-                      print("[watchdog] RISK_GAUGE 无 update_time，派发 v8_risk_gauge.yml")
-                      subprocess.run(["gh", "workflow", "run", "v8_risk_gauge.yml"], check=False)
-                      dispatched.append("v8_risk_gauge.yml (no timestamp)")
-                  else:
-                      age_min = (cst.replace(tzinfo=None) - rg_ts).total_seconds() / 60
-                      rg_thr = 90
-                      print(f"[watchdog] RISK_GAUGE 最新={rg_ts} 距今={age_min:.1f}min 阈值={rg_thr}min")
-                      if age_min > rg_thr:
-                          print(f"[watchdog] RISK_GAUGE 陈旧({age_min:.0f}>{rg_thr}min)，派发 v8_risk_gauge.yml")
-                          r = subprocess.run(["gh", "workflow", "run", "v8_risk_gauge.yml"],
-                                             capture_output=True, text=True, check=False)
-                          print(r.stdout.strip(), r.stderr.strip())
-                          dispatched.append("v8_risk_gauge.yml")
-                      else:
-                          print(f"[watchdog] RISK_GAUGE 新鲜({age_min:.0f}<={rg_thr}min)，无需派发")
-
-          print(f"[watchdog] 本次共派发: {dispatched if dispatched else '无'}")
+          age_min = (cst.replace(tzinfo=None) - latest).total_seconds() / 60
+          thr = 35 if cat == "intraday" else 60
+          print(f"[watchdog] 最新数据={latest} 距今={age_min:.1f}min 类别={cat} 阈值={thr}min")
+          if age_min > thr:
+              print(f"[watchdog] 数据陈旧({age_min:.0f}>{thr}min)，云端派发 {cat}")
+              r = subprocess.run(["gh", "workflow", "run", "v8_cn_fetch_cloud.yml",
+                                  "-f", f"category={cat}"], capture_output=True, text=True, check=False)
+              print(r.stdout.strip(), r.stderr.strip())
+          else:
+              print(f"[watchdog] 数据新鲜({age_min:.0f}<={thr}min)，无需派发")
           PY
