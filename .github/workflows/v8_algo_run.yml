@@ -185,8 +185,9 @@ jobs:
               if e.get("type") != "blob":
                   continue
               p = e["path"]
-              # all of algorithms/ + every root-level .py (incl. api_push_raw.py)
-              if p.startswith("algorithms/") or ("/" not in p and p.endswith(".py")):
+              # all of algorithms/ + scripts/build_delisted.py(下游护栏,_SANE_MAX>300 拒重建) + every root-level .py
+              # 2026-09-01 主人令：把下游护栏脚本也纳入每轮同步，确保两层护栏都 100% 新鲜、7935 误判绝不二次出现
+              if p.startswith("algorithms/") or p == "scripts/build_delisted.py" or ("/" not in p and p.endswith(".py")):
                   want.append((p, e["sha"]))
           print("files to sync: %d" % len(want), flush=True)
 
