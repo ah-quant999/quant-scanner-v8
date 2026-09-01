@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-09-02 04:54:17",
-  "generated": "2026-09-02 04:54:17",
+  "update_time": "2026-09-02 06:21:13",
+  "generated": "2026-09-02 06:21:13",
   "period_start": "2026-08-24",
   "period_end": "2026-08-30",
   "stats": {
@@ -9,13 +9,7 @@
     "tracked_files": 10,
     "ok_files": 9,
     "missing_files": 1,
-    "latest_health": {
-      "ok": 106,
-      "warn": 2,
-      "fail": 4,
-      "total": 112,
-      "updated": "2026-09-02 04:11:57"
-    }
+    "latest_health": null
   },
   "freshness": [
     {
@@ -36,8 +30,8 @@
       "file": "top10_daily.json",
       "label": "全站精选",
       "status": "ok",
-      "update_time": "2026-09-02 04:22:13",
-      "size_kb": 28.2
+      "update_time": "2026-08-31 19:16:19",
+      "size_kb": 17.0
     },
     {
       "file": "cockpit_tier_recommend.json",

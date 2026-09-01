@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-02 04:48",
+  "update_time": "2026-09-02 06:01",
   "data_type": "real",
   "summary": {
     "in_count": 40,
@@ -90,15 +90,15 @@
       "net_5d": 91.06,
       "net_20d": 280.47,
       "type": "概念",
+      "net_10d": 124.15,
+      "net_10d_days": 10,
+      "net_60d": 681.8,
+      "net_60d_days": 50,
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_20d_days": 8,
-      "net_60d": 114.43,
-      "net_60d_days": 8,
       "consecutive_days": 8,
       "trend": "in",
-      "net_10d": 114.43,
-      "net_10d_days": 8
+      "net_20d_days": 8
     },
     {
       "name": "互联网金融",
@@ -119,15 +119,17 @@
     {
       "name": "保险",
       "net": 25.93,
-      "net_5d": 0,
-      "net_20d": 0,
+      "net_5d": 28.51,
+      "net_20d": 87.23,
       "type": "行业",
+      "net_10d": 87.68,
+      "net_10d_days": 10,
+      "net_60d": 503.81,
+      "net_60d_days": 50,
       "consecutive_days": 2,
       "trend": "in",
       "net_5d_days": 2,
-      "net_10d_days": 2,
-      "net_20d_days": 2,
-      "net_60d_days": 2
+      "net_20d_days": 2
     },
     {
       "name": "互联网保险",
@@ -190,15 +192,15 @@
       "net_5d": 12.68,
       "net_20d": -145.21,
       "type": "行业",
+      "net_10d": 28.01,
+      "net_10d_days": 10,
+      "net_60d": -805.68,
+      "net_60d_days": 50,
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_20d_days": 20,
-      "net_60d": -112.57,
-      "net_60d_days": 22,
       "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 0.01,
-      "net_10d_days": 10
+      "net_20d_days": 22
     },
     {
       "name": "医药电商",
@@ -360,15 +362,17 @@
     {
       "name": "白酒概念",
       "net": 11.12,
-      "net_5d": 0,
-      "net_20d": 0,
+      "net_5d": 19.37,
+      "net_20d": 81.33,
       "type": "概念",
+      "net_10d": 24.49,
+      "net_10d_days": 10,
+      "net_60d": 350.41,
+      "net_60d_days": 50,
       "consecutive_days": 2,
       "trend": "in",
       "net_5d_days": 2,
-      "net_10d_days": 2,
-      "net_20d_days": 2,
-      "net_60d_days": 2
+      "net_20d_days": 2
     },
     {
       "name": "移动支付",
@@ -482,15 +486,15 @@
       "net_5d": 25.58,
       "net_20d": 38.55,
       "type": "行业",
+      "net_10d": 25.77,
+      "net_10d_days": 10,
+      "net_60d": 107.09,
+      "net_60d_days": 50,
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_20d_days": 16,
-      "net_60d": 21.53,
-      "net_60d_days": 16,
       "consecutive_days": 5,
       "trend": "in",
-      "net_10d": 19.21,
-      "net_10d_days": 10
+      "net_20d_days": 16
     },
     {
       "name": "物业管理",
@@ -566,14 +570,15 @@
       "net_5d": 12.82,
       "net_20d": -7.63,
       "type": "行业",
+      "net_10d": 7.47,
+      "net_10d_days": 10,
       "net_5d_days": 5,
       "source": "本地累加",
       "net_60d": -29.39,
       "net_60d_days": 13,
       "consecutive_days": 3,
       "trend": "in",
-      "net_10d": -31.77,
-      "net_10d_days": 10
+      "net_20d_days": 13
     },
     {
       "name": "宠物经济",
@@ -675,15 +680,15 @@
       "net_5d": 91.06,
       "net_20d": 280.47,
       "type": "概念",
+      "net_10d": 124.15,
+      "net_10d_days": 10,
+      "net_60d": 681.8,
+      "net_60d_days": 50,
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_20d_days": 8,
-      "net_60d": 114.43,
-      "net_60d_days": 8,
       "consecutive_days": 8,
       "trend": "in",
-      "net_10d": 114.43,
-      "net_10d_days": 8
+      "net_20d_days": 8
     },
     {
       "name": "互联网金融",
@@ -704,15 +709,17 @@
     {
       "name": "保险",
       "net": 25.93,
-      "net_5d": 0,
-      "net_20d": 0,
+      "net_5d": 28.51,
+      "net_20d": 87.23,
       "type": "行业",
+      "net_10d": 87.68,
+      "net_10d_days": 10,
+      "net_60d": 503.81,
+      "net_60d_days": 50,
       "consecutive_days": 2,
       "trend": "in",
       "net_5d_days": 2,
-      "net_10d_days": 2,
-      "net_20d_days": 2,
-      "net_60d_days": 2
+      "net_20d_days": 2
     },
     {
       "name": "互联网保险",
@@ -775,15 +782,15 @@
       "net_5d": 12.68,
       "net_20d": -145.21,
       "type": "行业",
+      "net_10d": 28.01,
+      "net_10d_days": 10,
+      "net_60d": -805.68,
+      "net_60d_days": 50,
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_20d_days": 20,
-      "net_60d": -112.57,
-      "net_60d_days": 22,
       "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 0.01,
-      "net_10d_days": 10
+      "net_20d_days": 22
     },
     {
       "name": "医药电商",
@@ -945,15 +952,17 @@
     {
       "name": "白酒概念",
       "net": 11.12,
-      "net_5d": 0,
-      "net_20d": 0,
+      "net_5d": 19.37,
+      "net_20d": 81.33,
       "type": "概念",
+      "net_10d": 24.49,
+      "net_10d_days": 10,
+      "net_60d": 350.41,
+      "net_60d_days": 50,
       "consecutive_days": 2,
       "trend": "in",
       "net_5d_days": 2,
-      "net_10d_days": 2,
-      "net_20d_days": 2,
-      "net_60d_days": 2
+      "net_20d_days": 2
     },
     {
       "name": "移动支付",
@@ -1067,15 +1076,15 @@
       "net_5d": 25.58,
       "net_20d": 38.55,
       "type": "行业",
+      "net_10d": 25.77,
+      "net_10d_days": 10,
+      "net_60d": 107.09,
+      "net_60d_days": 50,
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_20d_days": 16,
-      "net_60d": 21.53,
-      "net_60d_days": 16,
       "consecutive_days": 5,
       "trend": "in",
-      "net_10d": 19.21,
-      "net_10d_days": 10
+      "net_20d_days": 16
     },
     {
       "name": "物业管理",
@@ -1151,14 +1160,15 @@
       "net_5d": 12.82,
       "net_20d": -7.63,
       "type": "行业",
+      "net_10d": 7.47,
+      "net_10d_days": 10,
       "net_5d_days": 5,
       "source": "本地累加",
       "net_60d": -29.39,
       "net_60d_days": 13,
       "consecutive_days": 3,
       "trend": "in",
-      "net_10d": -31.77,
-      "net_10d_days": 10
+      "net_20d_days": 13
     },
     {
       "name": "宠物经济",
@@ -2060,20 +2070,6 @@
       "net_10d_days": 10,
       "net_20d_days": 17,
       "net_60d_days": 17
-    },
-    {
-      "name": "比亚迪概念",
-      "net": 67.23,
-      "net_5d": 605.13,
-      "net_20d": 0,
-      "net_60d": 605.13,
-      "type": "概念",
-      "consecutive_days": 5,
-      "trend": "in",
-      "net_5d_days": 5,
-      "net_60d_days": 5,
-      "net_10d_days": 5,
-      "net_20d_days": 5
     }
   ]
 }
