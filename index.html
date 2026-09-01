@@ -4118,7 +4118,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var sc = pt.status_counts || {};
       var removedMap = _loadRemovedMap();
 
-      /* ─── 状态枚举（提前定义，供 ⑥ 待确认剔除 / ⑦ 4 桶明细 共用，避免 hoist 后 undefined 访问） ─── */
+      /* ─── 状态枚举（提前定义，供 4 桶状态标签与待确认剔除 共用，避免 hoist 后 undefined 访问） ─── */
       var STATUS_ORDER = ['strong','buy_dip','topped','weak'];
       var statusLabel = {strong:'🟢强势', buy_dip:'🟡回调买点', topped:'🟠见顶', weak:'🔴走弱'};
       var statusColor = {strong:'#22c55e', buy_dip:'#fbbf24', topped:'#fb923c', weak:'#ef5350'};
@@ -4168,16 +4168,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           if(typeof window.__renderBacktestSection === 'function') window.__renderBacktestSection();
         } catch(e) { console.warn('removeStock fail', e); }
       };
-      window.__restoreStock = function(code){
-        try {
-          var m = _loadRemovedMap();
-          delete m[code];
-          localStorage.setItem('v8_pool_removed', JSON.stringify(m));
-          window.__renderLifecycleSection();
-          if(typeof window.__renderBacktestSection === 'function') window.__renderBacktestSection();
-        } catch(e) { console.warn('restoreStock fail', e); }
-      };
-
       /* ─── 头部 ─── */
       var _upd = (pt && pt.update_time) || '';
       html += '<div style="margin:14px 0;" class="card">';

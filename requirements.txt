@@ -1,7 +1,0 @@
-# v8 云端构建依赖（ubuntu-latest）
-# 注意：本地中国数据抓取 runner 还需要 akshare 完整生态（已含 pandas/numpy/requests）、
-#       baostock、pypinyin、PyMuPDF 等，由该 runner 自行安装。
-pandas>=2.0
-akshare>=1.15
-requests>=2.28
-PyYAML>=6.0
