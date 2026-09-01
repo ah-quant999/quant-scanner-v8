@@ -816,9 +816,20 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div class="logic-p">主站新增/删除/重命名卡片时，必须同步更新本页对应子 tab；历史改动归档折叠在「🗄️ 历史改动归档」内，只供追溯，不得替代卡片说明书。</div>
       </div>
 
-      <!-- 顺序严格对齐主站「今日事件」tab：今日事件详情 → 今日解禁 → 今日业绩预告 → 今日判定(含风险温度计) → 打新速览 → 重要事件日历 -->
+                                                                                      
 
+      
       <div class="card">
+        <h3><span class="ic">📋</span>📋 今日事件页 · 卡片归属与刷新对齐矩阵（2026-09-02 自动对齐）</h3>
+        <div class="logic-p">本矩阵按主站实际卡片顺序，明确每张卡片的时间/任务/执行机/前端位置，防止后续 CI 或回滚覆盖后再出现卡片位置/刷新标签错误。</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
+          <tr><td>实时</td><td>今日事件详情/解禁/业绩预告/打新/日历</td><td>云端 v8_cn_fetch_cloud + 本地脚本</td><td>今日事件页</td></tr>
+          <tr><td>盘中每30分</td><td>风险温度计 JUDGMENT_DATA</td><td>云端 v8_cn_fetch_cloud</td><td>今日事件页·风险温度计</td></tr>
+        </table>
+      </div>
+
+<div class="card">
         <h3><span class="ic">⚡</span>今日事件详情 - 说明</h3>
         <div class="logic-h">数据来源</div>
         <div class="logic-p">整合宏观数据、政策、FOMC、重要财报、休市等当日高优先级事件，按盘中实时口径聚合（主站 <code>v8TodayAll</code>）。</div>
@@ -826,7 +837,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div class="logic-p">事件必须带「相对时间」标签（今日/明日/X天后），不写裸日期。全天性事件置顶，盘中动态事件按触发时间倒序。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">🔓</span>今日解禁 - 说明（2026-08-30 主人令 / 2026-08-31 布局修正）</h3>
         <div class="logic-h">定位</div>
         <div class="logic-p">展示「今日」限售股解禁家数与解禁市值 TOP，位于<b>今日事件</b> tab。当日无解禁时仍显示卡片（显示「今日无解禁」与未来 7 天合计），不隐藏。2026-08-31 起汇总胶囊一行 4 列、内部改为一行；有解禁时列表项也改紧凑一行。</div>
@@ -834,7 +846,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div class="logic-p"><code>RESTRICTED_RELEASE</code>（东方财富限售股解禁明细）。日频更新，盘前 08:25 抓取。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">📈</span>今日业绩预告 - 说明（2026-08-30 主人令 / 2026-08-31 口径+布局修正）</h3>
         <div class="logic-h">定位</div>
         <div class="logic-p">只统计<b>公告日为当日</b>的业绩预告（预增/预减/预亏/不确定 + 今日预增 TOP4），位于<b>今日事件</b> tab。当日无新增时不隐藏，显示「今日（日期）无新增业绩预告」并附最近一批公告日期与家数。2026-08-31 起汇总胶囊一行 6 列（4 类型 + 总数 + 净增=预增−预减），窄屏自适应；汇总列均提供 `<div title>` 鼠标悬浮解释；内部仍保持单行布局。</div>
@@ -846,7 +859,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div class="logic-p">若数据文件尚未带今日字段（云端抓取前），卡片顶部显式标注「下方为全报告期累计，不是今日数」，<b>绝不把累计数冒充今日数</b>。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">⚖️</span>今日判定 · 环境综合 红黄绿灯 - 说明（2026-08-12 新增）</h3>
         <div class="logic-h">数据来源</div>
         <div class="logic-p"><code>JUDGMENT_DATA</code>（盘前 08:25 自动生成，由 <code>cloud_fetch_v8.py f_judgment()</code> 规则引擎驱动，动态时事不写固定文字）。</div>
@@ -863,7 +877,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div class="logic-p"><code>index.html</code> <code>_buildJudgmentEnvHTML()</code>（约 ~989 行，LIGHT 色表 + lightDot() 发光圆点）。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">🚨</span>风险温度计 - 说明（今日判定卡内嵌 · 2026-09-01 迁入）</h3>
         <div class="logic-h">定位</div>
         <div class="logic-p">展示海外/宏观情绪风险（美债收益率、日元、VIX、人民币汇率等），<b>内嵌于「今日判定 · 环境综合」卡内</b>（<code>_buildJudgmentEnvHTML()</code> 危险信号之后、return 之前），作为辅助读盘信号，帮助判断A股开盘外部压力。整体为<b>偏冷/中性</b>时不构成系统性风险；偏热且与A股共振时才提升警惕。</div>
@@ -880,7 +895,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div class="logic-p"><code>index.html</code> <code>_buildJudgmentEnvHTML()</code> 危险信号之后、return 之前；原运维页「数据健康总览」中的风险温度计展示已移除，避免同一数据两处重复。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">🚀</span>打新速览 - 说明</h3>
         <div class="logic-h">评分模型</div>
         <div class="logic-p">满分100 = PE折价(0-40分) + 行业热度(0-25分) + 发行价合理性(0-20分) + 板块溢价(0-15分)。</div>
@@ -890,7 +906,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div class="logic-p">v8 保留「今日上市」「今日申购」「上市日追踪5日」直接显示，其余通过按钮 tab 进入查看。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">📅</span>重要事件日历 - 说明</h3>
         <div class="logic-h">定位</div>
         <div class="logic-p">月度日历视图，标注当日各类市场事件，用于预判宏观/政策/资金面窗口。中长线视角，每周日更新、月底补全下月。</div>
@@ -900,7 +917,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div class="logic-p">同一天多个事件时自动去重，保留最详细版本，避免「港股休市」与「港股休市（xxx）」重复显示。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">🗓️</span>重要事件日历 · 月度归档与回看（2026-08-31 对齐）</h3>
         <div class="logic-h">定位</div>
         <div class="logic-p">日历默认展示「当月」重要事件；同时保留历史月份归档，支持 ◀▶ 切换回看，避免月初旧月直接消失。</div>
@@ -917,8 +935,9 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
       </div>
     </div>
 
-    <!-- === 实时数据 === -->
-    <div class="lg-pane" id="lg-rt">
+                         
+    
+<div class="lg-pane" id="lg-rt">
       <div class="card">
         <h3><span class="ic">🌟</span>AI市场速览 - 说明</h3>
         <div class="logic-h">定位</div>
@@ -949,7 +968,99 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         </table>
       </div>
 
-      <div class="card">
+      
+<div class="card">
+        <h3><span class="ic">📋</span>实时数据页 · 卡片归属与刷新对齐矩阵（2026-08-31）</h3>
+        <div class="logic-p">以下矩阵明确「实时数据页」各卡的时间/任务/执行机/前端位置，防止后续被 CI 或回滚覆盖后再次出现卡片位置/刷新标签错误。</div>
+        <table class="lg-table">
+          <tr><th>卡片</th><th>数据任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
+          <tr><td>AI 市场速览</td><td>AI_MARKET_BRIEF</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
+          <tr><td>指数快览</td><td>INDEX_QUOTES</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
+          <tr><td>亚太市场概览</td><td>OVERSEAS_MARKETS</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 实时</td></tr>
+          <tr><td><b>期指主力合约 · 情绪方向</b></td><td><b>CFFEX_HOLDINGS</b></td><td><b>云端 v8_cn_fetch_cloud</b></td><td><b>实时数据 / 盘中 · 短线（2026-08-31 迁回，防回滚）</b></td></tr>
+          <tr><td>情绪周期 · 连板天梯</td><td>LIMIT_UP_HEATMAP</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
+          <tr><td>涨停热力矩阵</td><td>LIMIT_UP_HEATMAP</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
+          <tr><td>ETF 三合一</td><td>ETF_PULSE / ETF_INTRADAY_HEAT / ETF_DAILY_MONITOR</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中 + 盘后定稿</td></tr>
+          <tr><td>板块资金三合一</td><td>SECTOR_FUND_FLOW / SECTOR_FUND_FLOW_TREND</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
+          <tr><td>概念资金热力图</td><td>CONCEPT_RANKING</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
+          <tr><td>行业树图 · 细分赛道</td><td>SECTOR_FUND_FLOW</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中 · 短线</td></tr>
+        </table>
+      </div>
+
+      
+<div class="card">
+        <h3><span class="ic">📊</span>指数快览 / 亚太市场 / 行业树图 - 说明（2026-08-30 主人令）</h3>
+        <div class="logic-h">指数快览</div>
+        <div class="logic-p">上证 / 深证 / 创业 / 科创等主要指数现价、涨跌幅、涨跌家数、成交额。数据来自东方财富 push2delay（INDEX_QUOTES），盘中每 30 分刷新，属 T+0 实时/准实时数据。2026-08-31 起每个指数胶囊改小，名称/价格/涨跌幅/成交压缩为紧凑两行。</div>
+        <div class="logic-h">亚太市场概览</div>
+        <div class="logic-p">日经 225 / 恒生 / 韩国 KOSPI / 台湾加权等亚太主要指数。数据来自 akshare（OVERSEAS_MARKETS），<b>注册为 intraday</b>，随各市场交易时段每 30 分刷新，徽章统一显示「实时」。2026-08-31 起每个指数胶囊改小，名称/点位/涨跌幅压缩为紧凑两行。</div>
+        <div class="logic-h">行业树图 · 细分赛道</div>
+        <div class="logic-p">以 treemap 方块展示行业板块涨跌。优先用盘中实时资金流 SECTOR_FUND_FLOW（每 30 分刷新），盘中缺失不回退到盘后 SECTOR_RS；方块颜色=涨跌，面积≈日内波动幅度。<b>2026-08-31 主人令</b>：胶囊尺寸加大（最小 64px、系数 170、圆角/间距同步放大），撑满卡片高度，避免下方半截空荡。</div>
+      </div>
+
+      
+<div class="card">
+        <h3><span class="ic">🔥</span>涨停热力矩阵 / 个股实时查询 / ETF资金热度 - 说明</h3>
+        <div class="logic-h">涨停热力矩阵</div>
+        <div class="logic-p">10日滚动热力矩阵，按概念板块统计涨停家数。持续热点(≥7日有涨停且近3日连续) / 新启动(今日≥2家但前2日=0) / 消退(前5日活跃但近3日&lt;2)。</div>
+        <div class="logic-h">个股实时查询</div>
+        <div class="logic-p">输入代码或名称，聚合三重共识评分、金股池状态、主力资金、近10日走势等。</div>
+        <div class="logic-h">ETF资金热度</div>
+        <div class="logic-p">宽基指数ETF每日净申购赎回份额折线图，T+0实时估算国家队动向。数据源：etf_intraday_heat.json（akshare fund_etf_hist_em）。展示沪深300/中证500/创业板/科创50/上证50等主要宽基ETF。</div>
+        <div class="logic-h">主力净额分时累计曲线（2026-08-18 主人令：数据源说明从卡片移到逻辑详解）</div>
+        <div class="logic-p">📌 <b>实时数据源</b> SECTOR_FUND_FLOW_INTRADAY（cn_fetch 每30分钟快照 Top15流入+Top5流出）。盘前清空、盘中累积、盘后自然定基——一段连续 time-series 即完整曲线。<b style="color:#f59e0b">不依赖高频 tick</b>，调度与你"不要太频繁"偏好一致。</div>
+      </div>
+
+    </div>
+
+                         
+    
+<div class="card">
+        <h3><span class="ic">📈</span>板块资金三合一 / 概念资金热力图 - 说明</h3>
+        <div class="logic-h">板块资金三合一</div>
+        <div class="logic-p">行业板块主力净流入/流出排名，|净流入|≥5亿为「大幅流入/流出」。红色=流入，绿色=流出。主数据源失败时自动切换备用数据源（流入TOP10+流出TOP10合并去重）。</div>
+        <div class="logic-h">概念资金热力图</div>
+        <div class="logic-p">以 treemap 方块可视化概念板块主力净流入 TOP30。方块大小∝|净流入|，红色=上涨、绿色=下跌。一眼识别资金集中流向与概念热度。</div>
+        <div class="logic-h">收盘复盘 · 周期定位 + 资金趋势（2026-08-30 主人令：数据源说明从卡片移到逻辑详解）</div>
+        <div class="logic-p">📌 板块按 20 日涨幅周期定位；资金按主力净流入滚动累计验证（SECTOR_FUND_FLOW_TREND 盘后快照，与 Block1 盘中 SECTOR_FUND_FLOW 不同源，数值可能不一致属正常）。</div>
+      </div>
+
+      
+<div class="card">
+        <h3><span class="ic">🚦</span>市场健康度三灯 - 说明</h3>
+        <div class="logic-h">三维判断</div>
+        <table class="lg-table">
+          <tr><th>灯</th><th>亮灯条件</th><th>灭灯条件</th></tr>
+          <tr><td>🟢 结构灯</td><td>上证连跌＜10天 且 累计跌幅＞-8%</td><td>创新低且无窗口覆盖</td></tr>
+          <tr><td>🟢 资金灯</td><td>主力净流入+流出＞-5亿 或 流入＞|流出|</td><td>主力净出且流入不抵流出</td></tr>
+          <tr><td>🟢 情绪灯</td><td>涨家＞跌家 且 涨停≥30只</td><td>跌多涨少或涨停冻结</td></tr>
+        </table>
+        <div class="logic-h">综合判定</div>
+        <div class="logic-p">3灯=积极 / 2灯=中性偏暖 / 1灯=谨慎 / 0灯=观望。与五维行互补：五维看中长期，三灯看短期。</div>
+      </div>
+
+      
+<div class="card">
+        <h3><span class="ic">⚠️</span>异动提醒监控算法 - 说明</h3>
+        <div class="logic-h">触发阈值与依据</div>
+        <table class="lg-table">
+          <tr><th>维度</th><th>触发阈值</th><th>市场依据</th></tr>
+          <tr><td>融券余额异动</td><td>日环比 ≥ ±5% 且 绝对值变动 ≥ 3亿</td><td>融券市值约150亿，5%约7.5亿属显著异动</td></tr>
+          <tr><td>融资余额异动</td><td>日环比 ≥ ±1%</td><td>融资约1.5万亿，1%≈150亿</td></tr>
+          <tr><td>连续下跌</td><td>连续下跌 ≥ 20天</td><td>约1个自然月连续走低</td></tr>
+          <tr><td>累计跌幅</td><td>累计跌幅 ≤ -8%</td><td>8%为技术性回调与中级调整分界线</td></tr>
+          <tr><td>成交额异动</td><td>两市成交额日环比 ≥ ±20%</td><td>20%以上属异常放量或缩量</td></tr>
+          <tr><td>普涨/普跌</td><td>上涨/下跌家数＞4000</td><td>A股约5000只，4000以上为极端行情</td></tr>
+          <tr><td>情绪偏强/偏弱</td><td>一方＞另一方×2 且 基数＞2000</td><td>多空力量超过2倍且有统计意义</td></tr>
+          <tr><td>ETF大幅申赎</td><td>净申赎绝对值 ≥ 100亿份</td><td>百亿级为机构大额调仓信号</td></tr>
+          <tr><td>跌停潮</td><td>跌停 ≥ 30家</td><td>恐慌性抛售</td></tr>
+          <tr><td>涨停冰点</td><td>涨停 ≤ 15家</td><td>投机情绪进入冰点</td></tr>
+          <tr><td>VIX恐慌</td><td>VIX ≥ 30</td><td>阈值已从单日涨幅改为绝对水平</td></tr>
+        </table>
+      </div>
+
+      
+<div class="card">
         <h3><span class="ic">💰</span>AI 行平均股价买卖信号面板（何时到高点卖/何时可以买）- 说明</h3>
         <div class="logic-h">定位</div>
         <div class="logic-p">AI 主行平均股价下方的信号面板。基于 <code>AVG_PRICE_DATA</code> 的当前位置 / 均线偏离 / 单日涨跌 / 历史趋势四个维度自动计算买入或卖出信号，作为「市场水位」参考。<b>2026-08-31 口径归一 + tasks 补齐</b>：数据改由 <code>cloud_fetch_v8.py → f_avg_price()</code> 单点写入——用东财 <code>em_clist</code> 分页遍历全市场 5000+ 只个股取<b>算术平均股价</b>，与通达信 880003 的定义口径一致且云端稳定可达；原 <code>scripts/fetch_avg_price.py</code>（7 源拉 880003 日K）因排在推送步之后导致产物永不入库、且 7 源实测 100% 失败，已从 workflow 摘除（文件保留待官方源恢复）。<b>2026-08-31 修复</b>：因 <code>("AVG_PRICE_DATA", f_avg_price)</code> 被从 cloud_fetch tasks 列表遗漏，导致 health_check 报「超过阈值 120 分钟」黄灯，已补齐至 intraday 任务链。<b>MA 由 history 逐交易日累积</b>：满 20 / 60 个交易日后才给出 <code>position_vs_ma20</code> / <code>position_vs_ma60</code>，不足期间显示「历史 X/20 日」且不展示任何买卖信号，绝不用当日价冒充均线。</div>
@@ -989,92 +1100,8 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div class="logic-p"><code>index.html</code> 渲染在 <code>renderAiSummary()</code> IIFE 内「4b. 💰 平均股价」约 ~1512-1563 行（紧凑版 + 买卖信号面板，2026-08-12 起不再有独立卡片容器）。</div>
       </div>
 
-      <div class="card">
-        <h3><span class="ic">🚦</span>市场健康度三灯 - 说明</h3>
-        <div class="logic-h">三维判断</div>
-        <table class="lg-table">
-          <tr><th>灯</th><th>亮灯条件</th><th>灭灯条件</th></tr>
-          <tr><td>🟢 结构灯</td><td>上证连跌＜10天 且 累计跌幅＞-8%</td><td>创新低且无窗口覆盖</td></tr>
-          <tr><td>🟢 资金灯</td><td>主力净流入+流出＞-5亿 或 流入＞|流出|</td><td>主力净出且流入不抵流出</td></tr>
-          <tr><td>🟢 情绪灯</td><td>涨家＞跌家 且 涨停≥30只</td><td>跌多涨少或涨停冻结</td></tr>
-        </table>
-        <div class="logic-h">综合判定</div>
-        <div class="logic-p">3灯=积极 / 2灯=中性偏暖 / 1灯=谨慎 / 0灯=观望。与五维行互补：五维看中长期，三灯看短期。</div>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">⚠️</span>异动提醒监控算法 - 说明</h3>
-        <div class="logic-h">触发阈值与依据</div>
-        <table class="lg-table">
-          <tr><th>维度</th><th>触发阈值</th><th>市场依据</th></tr>
-          <tr><td>融券余额异动</td><td>日环比 ≥ ±5% 且 绝对值变动 ≥ 3亿</td><td>融券市值约150亿，5%约7.5亿属显著异动</td></tr>
-          <tr><td>融资余额异动</td><td>日环比 ≥ ±1%</td><td>融资约1.5万亿，1%≈150亿</td></tr>
-          <tr><td>连续下跌</td><td>连续下跌 ≥ 20天</td><td>约1个自然月连续走低</td></tr>
-          <tr><td>累计跌幅</td><td>累计跌幅 ≤ -8%</td><td>8%为技术性回调与中级调整分界线</td></tr>
-          <tr><td>成交额异动</td><td>两市成交额日环比 ≥ ±20%</td><td>20%以上属异常放量或缩量</td></tr>
-          <tr><td>普涨/普跌</td><td>上涨/下跌家数＞4000</td><td>A股约5000只，4000以上为极端行情</td></tr>
-          <tr><td>情绪偏强/偏弱</td><td>一方＞另一方×2 且 基数＞2000</td><td>多空力量超过2倍且有统计意义</td></tr>
-          <tr><td>ETF大幅申赎</td><td>净申赎绝对值 ≥ 100亿份</td><td>百亿级为机构大额调仓信号</td></tr>
-          <tr><td>跌停潮</td><td>跌停 ≥ 30家</td><td>恐慌性抛售</td></tr>
-          <tr><td>涨停冰点</td><td>涨停 ≤ 15家</td><td>投机情绪进入冰点</td></tr>
-          <tr><td>VIX恐慌</td><td>VIX ≥ 30</td><td>阈值已从单日涨幅改为绝对水平</td></tr>
-        </table>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">📈</span>板块资金三合一 / 概念资金热力图 - 说明</h3>
-        <div class="logic-h">板块资金三合一</div>
-        <div class="logic-p">行业板块主力净流入/流出排名，|净流入|≥5亿为「大幅流入/流出」。红色=流入，绿色=流出。主数据源失败时自动切换备用数据源（流入TOP10+流出TOP10合并去重）。</div>
-        <div class="logic-h">概念资金热力图</div>
-        <div class="logic-p">以 treemap 方块可视化概念板块主力净流入 TOP30。方块大小∝|净流入|，红色=上涨、绿色=下跌。一眼识别资金集中流向与概念热度。</div>
-        <div class="logic-h">收盘复盘 · 周期定位 + 资金趋势（2026-08-30 主人令：数据源说明从卡片移到逻辑详解）</div>
-        <div class="logic-p">📌 板块按 20 日涨幅周期定位；资金按主力净流入滚动累计验证（SECTOR_FUND_FLOW_TREND 盘后快照，与 Block1 盘中 SECTOR_FUND_FLOW 不同源，数值可能不一致属正常）。</div>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">📋</span>实时数据页 · 卡片归属与刷新对齐矩阵（2026-08-31）</h3>
-        <div class="logic-p">以下矩阵明确「实时数据页」各卡的时间/任务/执行机/前端位置，防止后续被 CI 或回滚覆盖后再次出现卡片位置/刷新标签错误。</div>
-        <table class="lg-table">
-          <tr><th>卡片</th><th>数据任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
-          <tr><td>AI 市场速览</td><td>AI_MARKET_BRIEF</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
-          <tr><td>指数快览</td><td>INDEX_QUOTES</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
-          <tr><td>亚太市场概览</td><td>OVERSEAS_MARKETS</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 实时</td></tr>
-          <tr><td><b>期指主力合约 · 情绪方向</b></td><td><b>CFFEX_HOLDINGS</b></td><td><b>云端 v8_cn_fetch_cloud</b></td><td><b>实时数据 / 盘中 · 短线（2026-08-31 迁回，防回滚）</b></td></tr>
-          <tr><td>情绪周期 · 连板天梯</td><td>LIMIT_UP_HEATMAP</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
-          <tr><td>涨停热力矩阵</td><td>LIMIT_UP_HEATMAP</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
-          <tr><td>ETF 三合一</td><td>ETF_PULSE / ETF_INTRADAY_HEAT / ETF_DAILY_MONITOR</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中 + 盘后定稿</td></tr>
-          <tr><td>板块资金三合一</td><td>SECTOR_FUND_FLOW / SECTOR_FUND_FLOW_TREND</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
-          <tr><td>概念资金热力图</td><td>CONCEPT_RANKING</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中每 30 分</td></tr>
-          <tr><td>行业树图 · 细分赛道</td><td>SECTOR_FUND_FLOW</td><td>云端 v8_cn_fetch_cloud</td><td>实时数据 / 盘中 · 短线</td></tr>
-        </table>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">📊</span>指数快览 / 亚太市场 / 行业树图 - 说明（2026-08-30 主人令）</h3>
-        <div class="logic-h">指数快览</div>
-        <div class="logic-p">上证 / 深证 / 创业 / 科创等主要指数现价、涨跌幅、涨跌家数、成交额。数据来自东方财富 push2delay（INDEX_QUOTES），盘中每 30 分刷新，属 T+0 实时/准实时数据。2026-08-31 起每个指数胶囊改小，名称/价格/涨跌幅/成交压缩为紧凑两行。</div>
-        <div class="logic-h">亚太市场概览</div>
-        <div class="logic-p">日经 225 / 恒生 / 韩国 KOSPI / 台湾加权等亚太主要指数。数据来自 akshare（OVERSEAS_MARKETS），<b>注册为 intraday</b>，随各市场交易时段每 30 分刷新，徽章统一显示「实时」。2026-08-31 起每个指数胶囊改小，名称/点位/涨跌幅压缩为紧凑两行。</div>
-        <div class="logic-h">行业树图 · 细分赛道</div>
-        <div class="logic-p">以 treemap 方块展示行业板块涨跌。优先用盘中实时资金流 SECTOR_FUND_FLOW（每 30 分刷新），盘中缺失不回退到盘后 SECTOR_RS；方块颜色=涨跌，面积≈日内波动幅度。<b>2026-08-31 主人令</b>：胶囊尺寸加大（最小 64px、系数 170、圆角/间距同步放大），撑满卡片高度，避免下方半截空荡。</div>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">🔥</span>涨停热力矩阵 / 个股实时查询 / ETF资金热度 - 说明</h3>
-        <div class="logic-h">涨停热力矩阵</div>
-        <div class="logic-p">10日滚动热力矩阵，按概念板块统计涨停家数。持续热点(≥7日有涨停且近3日连续) / 新启动(今日≥2家但前2日=0) / 消退(前5日活跃但近3日&lt;2)。</div>
-        <div class="logic-h">个股实时查询</div>
-        <div class="logic-p">输入代码或名称，聚合三重共识评分、金股池状态、主力资金、近10日走势等。</div>
-        <div class="logic-h">ETF资金热度</div>
-        <div class="logic-p">宽基指数ETF每日净申购赎回份额折线图，T+0实时估算国家队动向。数据源：etf_intraday_heat.json（akshare fund_etf_hist_em）。展示沪深300/中证500/创业板/科创50/上证50等主要宽基ETF。</div>
-        <div class="logic-h">主力净额分时累计曲线（2026-08-18 主人令：数据源说明从卡片移到逻辑详解）</div>
-        <div class="logic-p">📌 <b>实时数据源</b> SECTOR_FUND_FLOW_INTRADAY（cn_fetch 每30分钟快照 Top15流入+Top5流出）。盘前清空、盘中累积、盘后自然定基——一段连续 time-series 即完整曲线。<b style="color:#f59e0b">不依赖高频 tick</b>，调度与你"不要太频繁"偏好一致。</div>
-      </div>
-
-    </div>
-
-    <!-- === 盘后数据 === -->
-    <div class="lg-pane" id="lg-ph">
+      
+<div class="lg-pane" id="lg-ph">
       <div class="card">
         <h3><span class="ic">🌡️</span>市场温度计 - 说明</h3>
         <div class="logic-h">综合打分</div>
@@ -1084,7 +1111,20 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div class="logic-p">≥70 偏热 / ≤30 偏冷 / 30-70 中性。北向停更后北向分权重仍保留，但数据源标注停更。</div>
       </div>
 
+      
       <div class="card">
+        <h3><span class="ic">📋</span>📋 盘后数据页 · 卡片归属与刷新对齐矩阵（2026-09-02 自动对齐）</h3>
+        <div class="logic-p">本矩阵按主站实际卡片顺序，明确每张卡片的时间/任务/执行机/前端位置，防止后续 CI 或回滚覆盖后再出现卡片位置/刷新标签错误。</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
+          <tr><td>15:30 收盘后</td><td>板块资金三合一 + 趋势</td><td>云端 v8_cn_fetch_cloud</td><td>盘后数据页首卡</td></tr>
+          <tr><td>15:30 收盘后</td><td>市场宽度（新高家数）</td><td>云端 v8_cn_fetch_cloud</td><td>盘后数据页</td></tr>
+          <tr><td>08:25 盘前</td><td>宏观数据速览 MACRO_DATA</td><td>云端 v8_cn_fetch_cloud</td><td>盘后数据页</td></tr>
+          <tr><td>08:25 盘前</td><td>解禁日历 / 业绩预告</td><td>云端 v8_cn_fetch_cloud</td><td>盘后数据页</td></tr>
+        </table>
+      </div>
+
+<div class="card">
         <h3><span class="ic">🕸️</span>六维共振雷达 - 说明</h3>
         <div class="logic-h">六个维度</div>
         <div class="logic-p">量能 / 情绪 / 资金 / 估值 / 技术 / 外围。各维归一化到 0~100 后绘制多边形。</div>
@@ -1108,7 +1148,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">基于近1年历史分位。越高越危险指标（SHIBOR/VIX/DXY/两融/离岸汇率）危险分=分位；越低越危险指标（期限利差/中美利差/PMI/出口/CPI/房价/铜金比/BDI/美债倒挂）危险分=100−分位。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">📏</span>全站判定区间 / 分档一览（备忘）</h3>
         <div class="logic-p">各算法/模块核心区间值与档位阈值汇总，方便对比记忆。完整算法见各对应章节。</div>
 
@@ -1160,7 +1201,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         </table>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">🌙</span>盘后数据扩展卡 - 说明（2026-08-30 主人令）</h3>
         <div class="logic-h">市场宽度 · 新高家数与宽度评分</div>
         <div class="logic-p">以东方财富「创历史新高」成分家数（W52_HIGH）作为新高广度信号，反映市场参与上涨的宽度。2026-08-31 起标题改为「新高家数与宽度评分」，避免「市场宽度」一词过于抽象。展示：今日历史新高家数、宽度评分（按家数映射 20/30/45/60/75/90）、领涨新高股 TOP8。所有胶囊改小、内部一行。</div>
@@ -1174,7 +1216,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">当前财报季 A 股业绩预告<b>全报告期累计</b>（预增/预减/预亏/不确定）与预增 TOP。数据来自 PERFORMANCE_FORECAST（东方财富 stock_yjyg_em），日频更新，盘前 08:25 抓取。与「今日事件」tab 的「今日业绩预告」卡不重复：本卡看全量汇总，今日卡只看<b>公告日为当日</b>的新增。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">🌀</span>斐波窗口 - 说明</h3>
         <div class="logic-h">时间窗口</div>
         <div class="logic-p">以显著高低点为基准日，叠加 5/8/13/21/34/55 交易日序列，标注变盘窗口。F21窗口（21个交易日）最重要，±1天容差。</div>
@@ -1184,7 +1227,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">与FOMC、LPR、重要经济数据发布日重合时权重提升。窗口失效后依次观察34日/55日更高级别窗口。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">💰</span>资金流口径 - 说明</h3>
         <div class="logic-h">板块/概念资金流</div>
         <div class="logic-p">成分股主力净流入合计，单位统一为亿元。红色=净流入/绿色=净流出。</div>
@@ -1194,7 +1238,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">5日/20日/60日累计净流入排名：⚡短线5日反映近期热点，📊中线20日反映中期建仓趋势，🏛️长线60日反映机构级别大资金动向。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">🌍</span>宏观观测 / 危机监测 - 说明</h3>
         <div class="logic-h">宏观观测</div>
         <div class="logic-p">追踪四大类：货币（国债/LPR/OMO/M2）/ 全球（VIX/DXY/CNH/利差）/ 情绪（新增投资者）/ 经济（PMI/CPI/PPI/社融/出口）。月度⭐已更新 / ☆待更新；每日高频实时显示。</div>
@@ -1203,8 +1248,9 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
       </div>
     </div>
 
-    <!-- === 共振日历 === -->
-    <div class="lg-pane" id="lg-rc">
+                         
+    
+<div class="lg-pane" id="lg-rc">
       <div class="card">
         <h3><span class="ic">🧲</span>共振日历 - 说明</h3>
         <div class="logic-h">三段结构</div>
@@ -1215,17 +1261,18 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">大牛股猎手（选股策略 tab）是共振日历「机游共振」信号的<b>选股化落地</b>——把当日上榜的机游共振标的做成中线观察池；共振日历仍是完整的每日机游/北向/洞察总览。</div>
       </div>
 
+      
       <div class="card">
-        <h3><span class="ic">🌊</span>北向席位日历 - 席位补回机制（2026-08-12 修复）</h3>
-        <div class="logic-h">「🟡 席位待补」标识</div>
-        <div class="logic-p">当日 <code>trading=True</code> 且 <code>stocks&gt;0</code>，但所有股票 <code>seats={}</code>（骨架数据）时，日历格显示 <b>🟡 席位待补</b> + 上榜股数量，hover 提示「等待云端重跑 fetch_lhb 补回」——区别于真空白（—）与休市。</div>
-        <div class="logic-h">根因（2026-08-12 定位）</div>
-        <div class="logic-p">8/4/5/7/10 四天 stocks 列表回填成功但 <code>seats</code> 全空：① <code>fetch_lhb.py</code> <code>DETAIL_LIMIT=40</code> 覆盖率不足；② <code>stage_to_raw.append_lhb_to_history()</code> 旧逻辑只要 <code>trading=True + stocks&gt;0</code> 就跳过（骨架数据永不重试）。</div>
-        <div class="logic-h">修复</div>
-        <div class="logic-p">· <code>fetch_lhb.py</code>：<code>DETAIL_LIMIT 40→90</code>（覆盖全天上榜股）。<br>· <code>stage_to_raw.py</code>：新增骨架检测（trading=True + stocks&gt;0 + 全部 seats={}）→ 允许覆盖更新。<br>· <code>index.html</code> <code>renderNorthCalendar()</code>：新增 <code>_isSkeleton</code> 分支渲染「🟡 席位待补」。</div>
+        <h3><span class="ic">📋</span>📋 共振日历页 · 卡片归属与刷新对齐矩阵（2026-09-02 自动对齐）</h3>
+        <div class="logic-p">本矩阵按主站实际卡片顺序，明确每张卡片的时间/任务/执行机/前端位置，防止后续 CI 或回滚覆盖后再出现卡片位置/刷新标签错误。</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
+          <tr><td>17:00 收盘后</td><td>龙虎榜日数据 fetch_lhb</td><td>cn runner v8_algo_cloud</td><td>共振日历龙虎榜</td></tr>
+          <tr><td>17:00 收盘后</td><td>机游共振 / 北向席位汇总</td><td>cn runner v8_algo_cloud</td><td>共振日历汇总卡</td></tr>
+        </table>
       </div>
 
-      <div class="card">
+<div class="card">
         <h3><span class="ic">🔄</span>共振日历 · 历史数据懒加载对齐（2026-08-31 一劳永逸）</h3>
         <div class="logic-h">现象</div>
         <div class="logic-p">页面首次打开时，共振日历只显示 1 天（当日），看似「空了」；等待几秒或切换 tab 后数据才出现。</div>
@@ -1244,8 +1291,20 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
       </div>
     </div>
 
-    <!-- === 最终推荐 === -->
-    <div class="lg-pane" id="lg-final">
+                         
+    
+<div class="card">
+        <h3><span class="ic">🌊</span>北向席位日历 - 席位补回机制（2026-08-12 修复）</h3>
+        <div class="logic-h">「🟡 席位待补」标识</div>
+        <div class="logic-p">当日 <code>trading=True</code> 且 <code>stocks&gt;0</code>，但所有股票 <code>seats={}</code>（骨架数据）时，日历格显示 <b>🟡 席位待补</b> + 上榜股数量，hover 提示「等待云端重跑 fetch_lhb 补回」——区别于真空白（—）与休市。</div>
+        <div class="logic-h">根因（2026-08-12 定位）</div>
+        <div class="logic-p">8/4/5/7/10 四天 stocks 列表回填成功但 <code>seats</code> 全空：① <code>fetch_lhb.py</code> <code>DETAIL_LIMIT=40</code> 覆盖率不足；② <code>stage_to_raw.append_lhb_to_history()</code> 旧逻辑只要 <code>trading=True + stocks&gt;0</code> 就跳过（骨架数据永不重试）。</div>
+        <div class="logic-h">修复</div>
+        <div class="logic-p">· <code>fetch_lhb.py</code>：<code>DETAIL_LIMIT 40→90</code>（覆盖全天上榜股）。<br>· <code>stage_to_raw.py</code>：新增骨架检测（trading=True + stocks&gt;0 + 全部 seats={}）→ 允许覆盖更新。<br>· <code>index.html</code> <code>renderNorthCalendar()</code>：新增 <code>_isSkeleton</code> 分支渲染「🟡 席位待补」。</div>
+      </div>
+
+      
+<div class="lg-pane" id="lg-final">
       <div class="card">
         <h3><span class="ic">🏆</span>最终推荐 - 说明</h3>
         <div class="logic-h">定位</div>
@@ -1259,8 +1318,19 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
       </div>
     </div>
 
-    <!-- === 个股查询 === -->
-    <div class="lg-pane" id="lg-query">
+                         
+    
+      <div class="card">
+        <h3><span class="ic">📋</span>📋 最终推荐页 · 卡片归属与刷新对齐矩阵（2026-09-02 自动对齐）</h3>
+        <div class="logic-p">本矩阵按主站实际卡片顺序，明确每张卡片的时间/任务/执行机/前端位置，防止后续 CI 或回滚覆盖后再出现卡片位置/刷新标签错误。</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
+          <tr><td>15:30 收盘后</td><td>最终推荐 Top5</td><td>cn runner v8_algo_cloud</td><td>最终推荐页首卡</td></tr>
+          <tr><td>15:30 收盘后</td><td>今日推荐候选池聚合</td><td>cn runner v8_algo_cloud</td><td>最终推荐页次卡</td></tr>
+        </table>
+      </div>
+
+<div class="lg-pane" id="lg-query">
       <div class="card">
         <h3><span class="ic">🔍</span>个股查询 - 说明</h3>
         <div class="logic-h">定位</div>
@@ -1283,8 +1353,18 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
       </div>
     </div>
 
-    <!-- === 选股策略 === -->
-    <div class="lg-pane" id="lg-st">
+                         
+    
+      <div class="card">
+        <h3><span class="ic">📋</span>📋 个股查询页 · 卡片归属与刷新对齐矩阵（2026-09-02 自动对齐）</h3>
+        <div class="logic-p">本矩阵按主站实际卡片顺序，明确每张卡片的时间/任务/执行机/前端位置，防止后续 CI 或回滚覆盖后再出现卡片位置/刷新标签错误。</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
+          <tr><td>任意时间</td><td>个股查询轻量版</td><td>浏览器本地 + window 注入数据</td><td>个股查询页</td></tr>
+        </table>
+      </div>
+
+<div class="lg-pane" id="lg-st">
       <div class="card">
         <h3><span class="ic">🗂️</span>算法对比与可信度排序</h3>
         <table class="lg-table">
@@ -1315,49 +1395,19 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <b style="color:#ef5350">铁律</b>：所有数据必须及时真实准确，<b>不得造假</b>。数据过期或 0 入选时，绝不显示"已入仓"骗用户。</div>
       </div>
 
+      
       <div class="card">
-        <h3><span class="ic">🔍</span>个股查询 - 说明</h3>
-        <div class="logic-h">定位</div>
-        <div class="logic-p">全市场 A 股（5500+ 只）个股画像工具，不是选股算法，因此排在 tab 最左、不参与可信度排序。查任何股票都保证有数据（离线全市场行情缓存 + 行业概念 + 股息分红 + 止盈止损）。</div>
-        <div class="logic-h">数据覆盖（2026-08-06 升级）</div>
-        <div class="logic-p">· <b>实时行情</b>：全市场 5537 只（价格/涨跌/今开/昨收/最高/最低/量额）<br>· <b>概念行业</b>：5198 只 board/industry/concepts<br>· <b>股息分红</b>：3637 只（股息率/EPS/BVPS/分红比例/除权除息日/方案进度）</div>
-        <div class="logic-h">股息判断口径</div>
-        <div class="logic-p">· 股息率 ≥2.5% → 高股息，适合长期持有收息<br>· 1.5%-2.5% → 中等股息，股息+成长兼顾<br>· &lt;1.5% → 低股息，偏成长型<br>· 无分红记录 → 显示"暂无分红记录"（不造假）</div>
-        <div class="logic-h">分析类卡片说明（综合财务画像）</div>
-        <div class="logic-p">仅在 <b>候选池入选股</b> 显示（fundamentals 来自 v8 算法链 baostock 计算），覆盖 200+ 只候选股。<br>
-        · <b>评分来源</b>：ROE（净资产收益率）+ 营收增速（近一期）+ 净利润同比增长 + 消息面加减分 → 综合质量分 0~100<br>
-        · <b>评级口径</b>：🟢 <b>绩优 A</b> ≥70（极致优质，ROE+营收双高） / 🟢 <b>良好 B</b> 40-69（基本面良好） / 🟡 <b>一般 C</b> 20-39 / 🔴 <b>差 D</b> &lt;20<br>
-        · <b>字段说明</b>：ROE ≥15% 绿 / 10-15% 金 / &lt;10% 红；营收 ≥15% 绿 / ≥0% 金 / &lt;0% 红；分红比例来自东财 stock_fhps_em<br>
-        · <b>不显示规则</b>：股票不在候选池 → 整张卡不渲染（不显示「无数据」占位，避免「每只都空着」）<br>
-        · <b>v6 旧口径</b>（已停用）：「BUY 评分 ≥50」是 v6 当年个股查询评分模型，v8 升级为「综合财务画像多指标评级」，更客观（含 ROE/营收/分红多维度）。</div>
-        <div class="logic-h">综合财务画像 · 评分方法（如何评分）</div>
-        <div class="logic-p"><b>2026-08-06 主人令：把"综合财务画像"的评分方法写到此处</b>。<br>
-        评分来源：<b>raw_data/fundamental_quality.json</b>（v8 算法链 <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">algorithms/fetch_fundamental_quality.py</code> 用 baostock 抓取）。<br>
-        <b>5 个独立评分维度</b>（每维 0~100 → 加权汇总成最终 quality_score 0~100）：<br>
-        <table class="lg-table" style="margin-top:6px">
-          <tr><th>维度</th><th>计算口径</th><th>权重</th><th>优/中/差阈值</th></tr>
-          <tr><td><b>ROE 净资产收益率</b></td><td>最近一期年报 / 滚动 12 月 ROE%</td><td>30%</td><td>≥15% 优 / 10-15% 中 / &lt;10% 差</td></tr>
-          <tr><td><b>营收增速</b></td><td>最近一期同比营收%</td><td>25%</td><td>≥15% 优 / ≥0% 中 / &lt;0% 差</td></tr>
-          <tr><td><b>净利润同比增长</b></td><td>最近一期同比净利%</td><td>20%</td><td>≥20% 优 / ≥0% 中 / &lt;0% 差</td></tr>
-          <tr><td><b>每股净资产 BVPS</b></td><td>最近一期 BVPS 元</td><td>15%</td><td>≥10 优 / 5-10 中 / &lt;5 差</td></tr>
-          <tr><td><b>消息面加减分</b></td><td>业绩预告/重大公告/重组等信号</td><td>10%</td><td>+15 至 +25 利好 / -15 至 -25 利空</td></tr>
+        <h3><span class="ic">📋</span>📋 选股策略页 · 卡片归属与刷新对齐矩阵（2026-09-02 自动对齐）</h3>
+        <div class="logic-p">本矩阵按主站实际卡片顺序，明确每张卡片的时间/任务/执行机/前端位置，防止后续 CI 或回滚覆盖后再出现卡片位置/刷新标签错误。</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
+          <tr><td>15:30 收盘后</td><td>观测候选股池</td><td>cn runner v8_algo_cloud</td><td>选股策略·选股池</td></tr>
+          <tr><td>15:30 收盘后</td><td>三重共识 / 相对强度 / CRDS</td><td>cn runner v8_algo_cloud</td><td>选股策略各子 tab</td></tr>
+          <tr><td>15:30 收盘后</td><td>回测胜率 N 日</td><td>cn runner backtest_tdx</td><td>选股策略·回测区</td></tr>
         </table>
-        <br><b>最终评级（按 final_score）</b>：<br>
-        · 🟢 <b>A 绩优</b> ≥70 · 极致优质（ROE+营收双高，是赛道头部）<br>
-        · 🟢 <b>B 良好</b> 40-69 · 基本面良好（单一维度突出即可）<br>
-        · 🟡 <b>C 一般</b> 20-39 · 基本面一般（等待业绩拐点）<br>
-        · 🔴 <b>D 差</b> &lt;20 · 基本面差（避免介入）<br>
-        <b>字段显示规则</b>：每个字段独立 &lt; if 数据非空 &gt; 包裹，没数据整行不渲染（如某只股票没 BVPS，BVPS 行根本不显示，不留 "-"）。<br>
-        <b>不显示规则</b>：股票不在候选池 → 综合财务画像段不渲染（不显示「无财务数据」占位）；v8 全市场 5537 候选池内股票才有。</div>
-        <div class="logic-h">止盈止损口径（v8 升级版，三档目标）</div>
-        <div class="logic-p">· <b>止损</b> = max(当前价×0.93, 当日最低价×0.99)，至少留 1% 缓冲<br>· <b>短线目标</b> = 当前价×1.07（+7%）· <b>中线目标</b> = 当前价×1.12（+12%）· <b>强势目标</b> = 当前价×1.15（+15%）<br>· <b>盈亏比</b> = 短线收益 / 止损亏损，≥2 优秀 / 1.5-2 一般 / &lt;1.5 较差<br>· 波动率 = max(当日振幅, 当前价×1.5%)，&gt;4% 高波动 / &gt;2% 中波动 / 其余低波动<br>· 操作提示按当日涨跌：涨 ≥5% 追高谨慎 / 跌 ≥5% 警惕破位 / 其余中性可分批建仓</div>
-        <div class="logic-h">个股查询网格卡片清单（2026-08-06 清理后）</div>
-        <div class="logic-p">页面只保留「有数据才显示」的卡，<b>没有数据整张卡不渲染</b>，网格自动重排避免「每只都空着不好看」：<br>
-        · 📊 <b>实时行情</b>（全市场 5537 只必有 · 含分时概要 + 股息分红 + 综合财务画像）<br>· 🎯 <b>止盈止损</b>（基于实时行情 · 全市场 5537 只一定有）<br>· 🏷️ <b>概念行业</b>（4801 只候选池 + fallback 全市场 · 高覆盖）<br>· 🎖️ <b>选股策略命中</b>（候选池 350 只命中才显示，0 不渲染）<br>· 💧 <b>关联板块资金流向</b>（板块+概念有数据才显示，无不渲染）<br>· 🐉 <b>龙虎榜</b>（当日上榜 40 只才显示，非上榜日不渲染）<br>· 🚫 <b>停牌识别</b>（仅停牌股显示，未在停牌清单不渲染）<br>
-        · <b>已删除的永远空卡</b>：三重共识/全站精选/主力资金/近10日走势/EMA趋势/投行研报（事件型或需日 K 库——前者永远只对特定股票，后者需建库，工作量大；后续如需可单独立项做「日 K 行情库 v8.5」）</div>
       </div>
 
-      <div class="card">
+<div class="card">
         <h3><span class="ic">🥇</span>三重共识 - 说明</h3>
         <div class="logic-h">判定公式</div>
         <div class="logic-p">主站 TOP10（total_score ≥70） ∩ 驾驶舱 A档 ∩ 基本面质量 A档，三者同时满足即严格共识。可信度最高（⭐⭐⭐⭐⭐）——3 个独立维度一致才入选，命中即高质量。</div>
@@ -1389,7 +1439,37 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">持仓表、催化剂兑现、回测N日胜率、严格vs宽松、阈值敏感性、板块聚类、重叠度、每日入选历史。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
+        <h3><span class="ic">🥇</span>核心原则：买卖只看三重共识</h3>
+        <div class="lg-box red">
+          <b>该看「三重共识」买卖，其他都是辅助/背景。</b><br>
+          · 🥇 三重共识：可直接作为买卖候选池<br>
+          · 🌐 全站精选（原驾驶舱A/B档）：扩大观察范围，不是最终买点<br>
+          · 🚀 驾驶舱：看市场环境和技术面背景<br>
+          · 📦 股池构成：只是背景信息，不用于买卖
+        </div>
+      </div>
+    </div>
+
+                         
+    
+<div class="card">
+        <h3><span class="ic">📈</span>相对强度 (RPS + RS + 年线) - 说明</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">个股相对强度排名（RPS）+ 曼斯菲尔德 RS + 年线状态，作为选股「<b>排名 / 筛选层</b>」，与板块 RPS（SECTOR_RS）形成「板块 → 个股」双层互验。2026-08-08 全量实施（算法 <code>calc_stock_rps.py</code> + 前端 📈 相对强度 tab + RPS 分层回测卡）。</div>
+        <div class="logic-h">计算口径</div>
+        <div class="logic-p">· <b>RPS</b> = 个股 N 日收益率在 universe 中的百分位排名 → rps50 / rps120 / rps250，取最大为 <b>rps_max</b>（0~100，≥90 为极强）。<br>· <b>RS</b> = 曼斯菲尔德相对强度（个股价格/基准指数价格的 ROC 比值），&gt;0 表示跑赢基准。<br>· <b>年线</b>：above_ma250（站上 250 日线）作为趋势门禁。<br>· 排名池：候选池 universe（当前约 310 只，可扩全市场 5537）。</div>
+        <div class="logic-h">A 档硬门禁（2026-08-08 实施）</div>
+        <div class="logic-p">站上 250 日线 <b>且</b> RS&gt;0 <b>且</b> RPSmax≥90 → 三重过滤才入 A 档；B/C 档为逐级放宽。A 档硬门禁结果同时叠加进「最终推荐」共振来源徽标，与板块 RPS 自上而下互验。</div>
+        <div class="logic-h">前端展示</div>
+        <div class="logic-p">· <b>📈 相对强度</b> tab：A/B/C 分层筛选 + 最小 RPS 阈值；表格列 RPS50/120/250/RPSmax/RS/年线状态/收盘价。<br>· <b>RPS 分层回测</b> 卡：基于当前截面用历史收益近似模拟持有 N 日表现（胜率 / 平均收益 / 最佳最差 + 收益分布柱状图 + A 档硬门禁子集对比）。</div>
+        <div class="logic-h">诚实标注</div>
+        <div class="logic-p">RS 分母实际用<b>上证指数(000001)兜底</b>（沪深300 本地取数返回 0 条），不影响 RPS 百分位计算；回测为截面历史模拟近似、非未来函数，仅供内部验证，不构成收益承诺。</div>
+      </div>
+
+      
+<div class="card">
         <h3><span class="ic">🔥</span>四量终极 - 说明</h3>
         <div class="logic-h">定位</div>
         <div class="logic-p">游资点火 + 机构托底 + 当天金叉 + 四路翻多四条件<b>同时共振</b>才入选，命中即四路信号齐发。4 重共振 + 3 年回测验证，信号明确 → 可信度 ⭐⭐⭐⭐，排在驾驶舱前。</div>
@@ -1420,7 +1500,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         · <b>信号日</b>：该票最近一次触发 QD 共振的日期。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">🎯</span>驾驶舱 - 说明</h3>
         <div class="logic-h">定位</div>
         <div class="logic-p">出手信号灯→宏观环境→最强赛道TOP5→共振候选→机构/龙虎榜验证→三重选股。用于确认市场环境和技术面背景。A/B/C/D 多档分级，可按风险偏好选 → 可信度 ⭐⭐⭐⭐。</div>
@@ -1434,7 +1515,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">龙虎榜明细按净买额排序，优先分析资金最活跃的前 N 只。「机构」「游资」「量化」「北向」「未识别」五类席位分账统计；其中「未识别」席位<b>不并入游资</b>，避免把无名营业部误判为游资共振。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">🌐</span>全站精选 - 说明</h3>
         <div class="logic-h">定位</div>
         <div class="logic-p">技术面形态+基本面质量分筛选后的观察池（A/B档）。A档进入三重共识候选，B档扩大观察范围。综合池机会多但单信号强度弱 → 可信度 ⭐⭐⭐。</div>
@@ -1452,7 +1534,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">候选股池是下游金股池/评分/CRDS/四量终极等全部算法的<b>唯一输入宇宙</b>，其健康度直接影响全站结论可靠性。监控分两层：<br>· <b>night_watchdog.py --health</b>：每次巡检读取 candidate.json，拆分六大来源数量。成交额TOP三板任一&lt;80只→WARNING、=0→CRITICAL；港股/外资研投=0降级为WARNING（云端可能天然缺失）。同时检测垃圾名污染。<br>· <b>运维面板数据新鲜度</b>：CANDIDATE 行下方展示六来源彩色标签（✓绿/⚠黄/✗红），一目了然哪个来源异常。HEALTH_CHECK.js 整体条目仅反映 update_time，不拆分来源——来源级状态以上述两处为准。<br>        · <b>正常基线</b>：主板≈97-100 / 创业板=100 / 科创板=100；港股0-50（依赖akshare可用性）；外资研投0-N（依赖外部JSON更新）。三板合计≥280视为健康。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">🐂</span>大牛股猎手 - 说明</h3>
         <div class="logic-h">定位</div>
         <div class="logic-p">基于<b>龙虎榜上榜个股</b>（机构 + 游资净买卖）的「机游共振」中线策略，核心区分「一日游」与「真启动」。2026-08-08 从「共振日历」迁入「选股策略」独立 tab（原标题残留的「大牛股猎手」字样已清除，功能卡仅保留此处）。</div>
@@ -1466,42 +1549,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">样本小、偏短线情绪，<b>不单独作为买点</b>；需结合三重共识等做买卖决策。完整机游/北向/每日洞察分析见顶部 🧲 共振日历。</div>
       </div>
 
-      <div class="card">
-        <h3><span class="ic">📈</span>相对强度 (RPS + RS + 年线) - 说明</h3>
-        <div class="logic-h">定位</div>
-        <div class="logic-p">个股相对强度排名（RPS）+ 曼斯菲尔德 RS + 年线状态，作为选股「<b>排名 / 筛选层</b>」，与板块 RPS（SECTOR_RS）形成「板块 → 个股」双层互验。2026-08-08 全量实施（算法 <code>calc_stock_rps.py</code> + 前端 📈 相对强度 tab + RPS 分层回测卡）。</div>
-        <div class="logic-h">计算口径</div>
-        <div class="logic-p">· <b>RPS</b> = 个股 N 日收益率在 universe 中的百分位排名 → rps50 / rps120 / rps250，取最大为 <b>rps_max</b>（0~100，≥90 为极强）。<br>· <b>RS</b> = 曼斯菲尔德相对强度（个股价格/基准指数价格的 ROC 比值），&gt;0 表示跑赢基准。<br>· <b>年线</b>：above_ma250（站上 250 日线）作为趋势门禁。<br>· 排名池：候选池 universe（当前约 310 只，可扩全市场 5537）。</div>
-        <div class="logic-h">A 档硬门禁（2026-08-08 实施）</div>
-        <div class="logic-p">站上 250 日线 <b>且</b> RS&gt;0 <b>且</b> RPSmax≥90 → 三重过滤才入 A 档；B/C 档为逐级放宽。A 档硬门禁结果同时叠加进「最终推荐」共振来源徽标，与板块 RPS 自上而下互验。</div>
-        <div class="logic-h">前端展示</div>
-        <div class="logic-p">· <b>📈 相对强度</b> tab：A/B/C 分层筛选 + 最小 RPS 阈值；表格列 RPS50/120/250/RPSmax/RS/年线状态/收盘价。<br>· <b>RPS 分层回测</b> 卡：基于当前截面用历史收益近似模拟持有 N 日表现（胜率 / 平均收益 / 最佳最差 + 收益分布柱状图 + A 档硬门禁子集对比）。</div>
-        <div class="logic-h">诚实标注</div>
-        <div class="logic-p">RS 分母实际用<b>上证指数(000001)兜底</b>（沪深300 本地取数返回 0 条），不影响 RPS 百分位计算；回测为截面历史模拟近似、非未来函数，仅供内部验证，不构成收益承诺。</div>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">🔤</span>四个基础信号 - 说明</h3>
-        <table class="lg-table">
-          <tr><th>信号</th><th>含义</th><th>技术定义</th></tr>
-          <tr><td><b class="up">C</b> 缠论买</td><td>技术拐点信号</td><td>日K底分型+MACD金叉/底背离</td></tr>
-          <tr><td><b style="color:var(--gold)">J</b> 金钻起涨/黄柱</td><td>金钻量化买点</td><td>DDX资金流入+阳线+涨幅&gt;2%触发起涨；金钻趋势&gt;最高价触发黄柱</td></tr>
-          <tr><td><b style="color:var(--cyan)">I</b> 机构变红</td><td>机构资金介入</td><td>收盘价高于牛线1；牛线1=WMA20(加权中间价MID9)</td></tr>
-          <tr><td><b class="down">T</b> 上涨趋势</td><td>趋势确认</td><td>EMA多头+量能+价格确认</td></tr>
-        </table>
-      </div>
-
-      <div class="card">
-        <h3><span class="ic">📈</span>回测胜率与买卖建议 - 口径说明</h3>
-        <div class="logic-h">胜率计算口径</div>
-        <div class="logic-p">所有回测引擎统一采用 <b>win / (win + loss)</b>，平盘（收益=0）不计入胜率分母。避免一处平盘算输、另一处平盘剔除导致的口径打架。</div>
-        <div class="logic-h">幸存者偏差控制</div>
-        <div class="logic-p">通达信 60 日回测会累积每日金股池快照，用「最近 90 天内所有快照的并集」作为回测宇宙。这样可以纳入那些曾经入选、后来跌出池的股票，降低「只测现存强势股」导致胜率高估的问题。快照累积不足时，面板会标注「仍含幸存者偏差」。</div>
-        <div class="logic-h">买卖建议原则</div>
-        <div class="logic-p">驾驶舱给出的「最佳持有期」优先看胜率，但同时要求样本量足够。小样本信号不会直接推荐，避免偶然性。</div>
-      </div>
-
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">📊</span>CRDS 逆势龙头 - 算法说明</h3>
         <div class="logic-h">定位</div>
         <div class="logic-p">在大盘大跌/震荡市中，捕捉「逆势涨停」的强势龙头股。<b>盘后看</b>(基于日K) · <b>短线</b>捕捉逆势龙头 · <b>日频</b>(每日盘后跑)。逆势龙头只在大跌/震荡市有效，若今日大涨则信号参考意义极低。</div>
@@ -1549,20 +1598,74 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p">calc_crds(算法) → <b>data/crds_result.json</b> → update_v8.py 注入 <b>window.CRDS_CARD_DATA</b> → 前端「逆势龙头」tab 渲染（含历史扫描累积追踪）。</div>
       </div>
 
-      <div class="card">
-        <h3><span class="ic">🥇</span>核心原则：买卖只看三重共识</h3>
-        <div class="lg-box red">
-          <b>该看「三重共识」买卖，其他都是辅助/背景。</b><br>
-          · 🥇 三重共识：可直接作为买卖候选池<br>
-          · 🌐 全站精选（原驾驶舱A/B档）：扩大观察范围，不是最终买点<br>
-          · 🚀 驾驶舱：看市场环境和技术面背景<br>
-          · 📦 股池构成：只是背景信息，不用于买卖
-        </div>
+      
+<div class="card">
+        <h3><span class="ic">🔤</span>四个基础信号 - 说明</h3>
+        <table class="lg-table">
+          <tr><th>信号</th><th>含义</th><th>技术定义</th></tr>
+          <tr><td><b class="up">C</b> 缠论买</td><td>技术拐点信号</td><td>日K底分型+MACD金叉/底背离</td></tr>
+          <tr><td><b style="color:var(--gold)">J</b> 金钻起涨/黄柱</td><td>金钻量化买点</td><td>DDX资金流入+阳线+涨幅&gt;2%触发起涨；金钻趋势&gt;最高价触发黄柱</td></tr>
+          <tr><td><b style="color:var(--cyan)">I</b> 机构变红</td><td>机构资金介入</td><td>收盘价高于牛线1；牛线1=WMA20(加权中间价MID9)</td></tr>
+          <tr><td><b class="down">T</b> 上涨趋势</td><td>趋势确认</td><td>EMA多头+量能+价格确认</td></tr>
+        </table>
       </div>
-    </div>
 
-    <!-- === 暂未上架 === -->
-    <div class="lg-pane" id="lg-ul">
+      
+<div class="card">
+        <h3><span class="ic">📈</span>回测胜率与买卖建议 - 口径说明</h3>
+        <div class="logic-h">胜率计算口径</div>
+        <div class="logic-p">所有回测引擎统一采用 <b>win / (win + loss)</b>，平盘（收益=0）不计入胜率分母。避免一处平盘算输、另一处平盘剔除导致的口径打架。</div>
+        <div class="logic-h">幸存者偏差控制</div>
+        <div class="logic-p">通达信 60 日回测会累积每日金股池快照，用「最近 90 天内所有快照的并集」作为回测宇宙。这样可以纳入那些曾经入选、后来跌出池的股票，降低「只测现存强势股」导致胜率高估的问题。快照累积不足时，面板会标注「仍含幸存者偏差」。</div>
+        <div class="logic-h">买卖建议原则</div>
+        <div class="logic-p">驾驶舱给出的「最佳持有期」优先看胜率，但同时要求样本量足够。小样本信号不会直接推荐，避免偶然性。</div>
+      </div>
+
+      
+<div class="card">
+        <h3><span class="ic">🔍</span>个股查询 - 说明</h3>
+        <div class="logic-h">定位</div>
+        <div class="logic-p">全市场 A 股（5500+ 只）个股画像工具，不是选股算法，因此排在 tab 最左、不参与可信度排序。查任何股票都保证有数据（离线全市场行情缓存 + 行业概念 + 股息分红 + 止盈止损）。</div>
+        <div class="logic-h">数据覆盖（2026-08-06 升级）</div>
+        <div class="logic-p">· <b>实时行情</b>：全市场 5537 只（价格/涨跌/今开/昨收/最高/最低/量额）<br>· <b>概念行业</b>：5198 只 board/industry/concepts<br>· <b>股息分红</b>：3637 只（股息率/EPS/BVPS/分红比例/除权除息日/方案进度）</div>
+        <div class="logic-h">股息判断口径</div>
+        <div class="logic-p">· 股息率 ≥2.5% → 高股息，适合长期持有收息<br>· 1.5%-2.5% → 中等股息，股息+成长兼顾<br>· &lt;1.5% → 低股息，偏成长型<br>· 无分红记录 → 显示"暂无分红记录"（不造假）</div>
+        <div class="logic-h">分析类卡片说明（综合财务画像）</div>
+        <div class="logic-p">仅在 <b>候选池入选股</b> 显示（fundamentals 来自 v8 算法链 baostock 计算），覆盖 200+ 只候选股。<br>
+        · <b>评分来源</b>：ROE（净资产收益率）+ 营收增速（近一期）+ 净利润同比增长 + 消息面加减分 → 综合质量分 0~100<br>
+        · <b>评级口径</b>：🟢 <b>绩优 A</b> ≥70（极致优质，ROE+营收双高） / 🟢 <b>良好 B</b> 40-69（基本面良好） / 🟡 <b>一般 C</b> 20-39 / 🔴 <b>差 D</b> &lt;20<br>
+        · <b>字段说明</b>：ROE ≥15% 绿 / 10-15% 金 / &lt;10% 红；营收 ≥15% 绿 / ≥0% 金 / &lt;0% 红；分红比例来自东财 stock_fhps_em<br>
+        · <b>不显示规则</b>：股票不在候选池 → 整张卡不渲染（不显示「无数据」占位，避免「每只都空着」）<br>
+        · <b>v6 旧口径</b>（已停用）：「BUY 评分 ≥50」是 v6 当年个股查询评分模型，v8 升级为「综合财务画像多指标评级」，更客观（含 ROE/营收/分红多维度）。</div>
+        <div class="logic-h">综合财务画像 · 评分方法（如何评分）</div>
+        <div class="logic-p"><b>2026-08-06 主人令：把"综合财务画像"的评分方法写到此处</b>。<br>
+        评分来源：<b>raw_data/fundamental_quality.json</b>（v8 算法链 <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">algorithms/fetch_fundamental_quality.py</code> 用 baostock 抓取）。<br>
+        <b>5 个独立评分维度</b>（每维 0~100 → 加权汇总成最终 quality_score 0~100）：<br>
+        <table class="lg-table" style="margin-top:6px">
+          <tr><th>维度</th><th>计算口径</th><th>权重</th><th>优/中/差阈值</th></tr>
+          <tr><td><b>ROE 净资产收益率</b></td><td>最近一期年报 / 滚动 12 月 ROE%</td><td>30%</td><td>≥15% 优 / 10-15% 中 / &lt;10% 差</td></tr>
+          <tr><td><b>营收增速</b></td><td>最近一期同比营收%</td><td>25%</td><td>≥15% 优 / ≥0% 中 / &lt;0% 差</td></tr>
+          <tr><td><b>净利润同比增长</b></td><td>最近一期同比净利%</td><td>20%</td><td>≥20% 优 / ≥0% 中 / &lt;0% 差</td></tr>
+          <tr><td><b>每股净资产 BVPS</b></td><td>最近一期 BVPS 元</td><td>15%</td><td>≥10 优 / 5-10 中 / &lt;5 差</td></tr>
+          <tr><td><b>消息面加减分</b></td><td>业绩预告/重大公告/重组等信号</td><td>10%</td><td>+15 至 +25 利好 / -15 至 -25 利空</td></tr>
+        </table>
+        <br><b>最终评级（按 final_score）</b>：<br>
+        · 🟢 <b>A 绩优</b> ≥70 · 极致优质（ROE+营收双高，是赛道头部）<br>
+        · 🟢 <b>B 良好</b> 40-69 · 基本面良好（单一维度突出即可）<br>
+        · 🟡 <b>C 一般</b> 20-39 · 基本面一般（等待业绩拐点）<br>
+        · 🔴 <b>D 差</b> &lt;20 · 基本面差（避免介入）<br>
+        <b>字段显示规则</b>：每个字段独立 &lt; if 数据非空 &gt; 包裹，没数据整行不渲染（如某只股票没 BVPS，BVPS 行根本不显示，不留 "-"）。<br>
+        <b>不显示规则</b>：股票不在候选池 → 综合财务画像段不渲染（不显示「无财务数据」占位）；v8 全市场 5537 候选池内股票才有。</div>
+        <div class="logic-h">止盈止损口径（v8 升级版，三档目标）</div>
+        <div class="logic-p">· <b>止损</b> = max(当前价×0.93, 当日最低价×0.99)，至少留 1% 缓冲<br>· <b>短线目标</b> = 当前价×1.07（+7%）· <b>中线目标</b> = 当前价×1.12（+12%）· <b>强势目标</b> = 当前价×1.15（+15%）<br>· <b>盈亏比</b> = 短线收益 / 止损亏损，≥2 优秀 / 1.5-2 一般 / &lt;1.5 较差<br>· 波动率 = max(当日振幅, 当前价×1.5%)，&gt;4% 高波动 / &gt;2% 中波动 / 其余低波动<br>· 操作提示按当日涨跌：涨 ≥5% 追高谨慎 / 跌 ≥5% 警惕破位 / 其余中性可分批建仓</div>
+        <div class="logic-h">个股查询网格卡片清单（2026-08-06 清理后）</div>
+        <div class="logic-p">页面只保留「有数据才显示」的卡，<b>没有数据整张卡不渲染</b>，网格自动重排避免「每只都空着不好看」：<br>
+        · 📊 <b>实时行情</b>（全市场 5537 只必有 · 含分时概要 + 股息分红 + 综合财务画像）<br>· 🎯 <b>止盈止损</b>（基于实时行情 · 全市场 5537 只一定有）<br>· 🏷️ <b>概念行业</b>（4801 只候选池 + fallback 全市场 · 高覆盖）<br>· 🎖️ <b>选股策略命中</b>（候选池 350 只命中才显示，0 不渲染）<br>· 💧 <b>关联板块资金流向</b>（板块+概念有数据才显示，无不渲染）<br>· 🐉 <b>龙虎榜</b>（当日上榜 40 只才显示，非上榜日不渲染）<br>· 🚫 <b>停牌识别</b>（仅停牌股显示，未在停牌清单不渲染）<br>
+        · <b>已删除的永远空卡</b>：三重共识/全站精选/主力资金/近10日走势/EMA趋势/投行研报（事件型或需日 K 库——前者永远只对特定股票，后者需建库，工作量大；后续如需可单独立项做「日 K 行情库 v8.5」）</div>
+      </div>
+
+      
+<div class="lg-pane" id="lg-ul">
       <div class="card">
         <h3><span class="ic">🧪</span>暂未上架 - 说明</h3>
         <div class="logic-h">定位</div>
@@ -1574,8 +1677,18 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
       </div>
     </div>
 
-    <!-- === 运维 === -->
-    <div class="lg-pane" id="lg-op">
+                       
+    
+      <div class="card">
+        <h3><span class="ic">📋</span>📋 暂未上架页 · 卡片归属与刷新对齐矩阵（2026-09-02 自动对齐）</h3>
+        <div class="logic-p">本矩阵按主站实际卡片顺序，明确每张卡片的时间/任务/执行机/前端位置，防止后续 CI 或回滚覆盖后再出现卡片位置/刷新标签错误。</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
+          <tr><td>按需</td><td>已下架/观测候选股池/模块去向索引</td><td>cn runner + 浏览器本地</td><td>暂未上架页</td></tr>
+        </table>
+      </div>
+
+<div class="lg-pane" id="lg-op">
       <div class="card">
         <h3><span class="ic">⏰</span>v8 定时任务矩阵（最新版，已对齐实际 workflow）</h3>
         <div class="logic-p"><b>执行方说明（2026-08-06 更新）</b>：中国数据抓取已迁 <b>GitHub 云端 ubuntu-latest</b>（实测 push2delay 东财镜像 + akshare 从 GHA 可达，OK 10/11），<code>v8_cn_fetch_cloud</code> 自动调度跑在云端 24/7，<b>不依赖小九停电与否</b>。原盘中自愈器 v8_intraday_healer / Safety Net 兜底 v8_safety_net 已于 2026-08 删除（commit 1fe4f8c71），职能并入 v8_health_patrol + v8_freshness_watch。盘后算法链主链已迁 GitHub 云端 <code>v8_algo_cloud</code>（08-06 收敛 4→1 条 cron 修复静默失效），<code>v8_algo_run</code> 仅保留 workflow_dispatch 应急回退（cn runner 不再跑 cron 主链）；构建/部署/体检/清理/备份/自愈/健康监控全部云端。小九本机只运行看门狗监督 + 盘后算法链，不手动跑数据、不手动部署。</div>
@@ -1655,7 +1768,24 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>盘后算法链顺序铁律（2026-08-08 修复）</b>：<code style="background:var(--bg2);padding:1px 4px;border-radius:3px">generate_top10.py</code> 必须在 <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">backtest_comprehensive.py</code> / <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">cockpit_backtest_now.py</code> <b>之前</b>执行——综合回测依赖 top10 当日快照（<code style="background:var(--bg2);padding:1px 4px;border-radius:3px">raw_data/history/top10_daily_YYYYMMDD.json</code>），顺序倒置会导致「综合回测」卡长期为空。当前固定顺序：build_candidate_pool → generate_top10 → backtest_tdx → backtest_comprehensive → cockpit_backtest_now。</div>
       </div>
 
+      
       <div class="card">
+        <h3><span class="ic">📋</span>📋 运维页 · 卡片归属与刷新对齐矩阵（2026-09-02 自动对齐）</h3>
+        <div class="logic-p">本矩阵按主站实际卡片顺序，明确每张卡片的时间/任务/执行机/前端位置，防止后续 CI 或回滚覆盖后再出现卡片位置/刷新标签错误。</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
+          <tr><td>每小时 :00/:30</td><td>数据健康总览 / 双机状态</td><td>云端/双机 watchdog</td><td>运维面板</td></tr>
+          <tr><td>raw_data push 后</td><td>自动部署 v8_build_deploy</td><td>云端 ubuntu-latest</td><td>全站刷新</td></tr>
+          <tr><td>每日 08:30/16:30</td><td>自动化审计</td><td>双机 audit_automations</td><td>运维面板·审计摘要</td></tr>
+        </table>
+      </div>
+
+<div class="card">
+        <div class="logic-p">· <b>v6精选</b>：选股驾驶舱+全站精选（15个JSON映射到DATA.*）<br>· <b>暂未上架</b>：V6卡片真实渲染（F窗口/金股池停牌/波动率/精选预判/四路资金/大盘资金流/期指/两融/ETF申赎）<br>· <b>已下架</b>：2026-07-30 起已<b>全面接入真实数据（11张卡）</b>，观测候选股池(CANDIDATE) 置顶，其余分别来自 F窗口实时监测(SH_FIB) / 金股池停牌监测(GOLD_POOL) / 波动率结构观测(VOLATILITY) / 精选预判信号(W52_HIGH·LIMIT_UP_HEATMAP·HERDING_DATA) / 四路资金流向对比(CAPITAL_FLOW_DATA) / 上交所大盘资金流时间轴(MARKET_FUND_FLOW_DATA) / 股指期货升贴水(CFFEX_HOLDINGS) / 两融余额走势(MARGIN_DATA) / 宽基ETF净申赎(ETF_SUBSCRIPTION) / 国家队ETF资金流向(ETF_INTRADAY_HEAT)；数据缺失时显示友好提示而非空白。</div>
+      </div>
+
+      
+<div class="card">
         <h3><span class="ic">🔄</span>盘中 vs 盘后分工</h3>
         <table class="lg-table">
           <tr><th>时段</th><th>职责</th><th>失败影响</th><th>兜底</th></tr>
@@ -1666,7 +1796,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         </table>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">🛡️</span>v8 vs v6 遗产对比</h3>
         <table class="lg-table">
           <tr><th>能力</th><th>v6 实现</th><th>v8 现状</th><th>优先级</th></tr>
@@ -1678,18 +1809,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         </table>
       </div>
 
-      <div class="card">
-        <h3><span class="ic">📝</span>本周待办/建议表</h3>
-        <div class="logic-p">主人在历史 HANDOVER 中规划的「建议项」，照搬待落地。本周（7/27~8/02）已完成：4 类上游原生化（89da5fc）· 每日洞察/大牛股猎手对标参考页重构（7466799）· 2 次周度锚点 bug 修复（300ec6d/589f601）· 北向席位 hasMultiDay 修复 + 月度汇总加日期注释（589f601）。</div>
-        <table class="lg-table">
-          <tr><th>时段</th><th>任务</th><th>建议</th><th>频次</th></tr>
-          <tr style="opacity:.55"><td>14:06</td><td>v8_self_heal · 冻结模块诊断+补跑</td><td>✅ 已下线（v8_self_heal.yml 已删除，职能并入 v8_health_patrol）</td><td>周度兜底</td></tr>
-          <tr><td>首周六</td><td>(建议)月度报告 + STOCK_LIST pinyin 重生 + 依赖体检</td><td><span class="op-tab-time" style="background:#3b82f6;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600">NEW</span> 加 if 首周六 guard 进 21:00 脚本</td><td>月度</td></tr>
-          <tr><td>首周日</td><td>(建议)旧数据归档 + git gc/pack + 备份轮转</td><td><span class="op-tab-time" style="background:#3b82f6;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600">NEW</span> 加 if 首周日 guard 进 23:00 脚本</td><td>月度</td></tr>
-        </table>
-      </div>
-
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">🔒</span>数据安全口径 - 说明</h3>
         <div class="lg-box red">
           <b>铁律</b>：前端面板一律不得暴露具体数据源、脚本路径、本地文件名、机器节点或跑批时间等核心信息。所有口径仅写 HANDOVER/代码注释，不进入用户可见文本。
@@ -1700,7 +1821,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="note">所有数据仅供参考，不构成投资建议。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">☁️</span>部署与双机状态 - 说明</h3>
         <div class="logic-h">部署链路</div>
         <div class="logic-p"><b>v8 独立仓库</b>：中国数据抓取（cn_fetch）→ 推送 raw_data → GitHub Actions 自动触发 build_deploy（workflow_run）→ 构建 data/*.js → 推 main → GitHub Pages 自动发布。小九本机<b>只监督、不手动部署</b>。</div>
@@ -1708,7 +1830,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p"><b>GitHub 云端（ubuntu runner）</b>：执行<b>中国数据抓取 v8_cn_fetch_cloud</b> + 盘后算法链 <b>v8_algo_cloud</b> + 构建/部署/体检/备份/自愈/健康监控；2026-08-05 起主链已全部云端化。<b>小九（单位机 / lemoncat-cn）</b>：仅作为 GitHub self-hosted runner 应急回退（workflow_dispatch），日常不跑 cron 主链；运行云端管线看门狗监督。<b>阿狸咪（家中机）</b>：本地预览用（file:///E:/workspace/stock-scanner/index.html），不上主站、不接部署/救火。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">📦</span>历史归档与双机同步 - 说明（2026-08-31 对齐）</h3>
         <div class="logic-h">覆盖范围</div>
         <div class="logic-p">本批新增两类持久化归档：① 重要事件日历历史月份回看；② 共振日历历史数据懒加载回填。二者均不影响原有云端/本机调度。</div>
@@ -1725,22 +1848,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p">无需新建 workflow 或 automation：现有云端抓取、构建部署、本地同步、周末清理已天然覆盖归档文件的生成、推送、拉取与保护。</div>
       </div>
 
-      <div class="card">
-        <h3><span class="ic">🔄</span>实时数据页卡片归属 + 平均股价任务链对齐（2026-08-31）</h3>
-        <div class="logic-h">覆盖范围</div>
-        <div class="logic-p">本批修复两类「被回滚/遗漏」问题：① 期指主力合约卡由盘后数据页迁回实时数据页；② AVG_PRICE_DATA 因 cloud_fetch tasks 列表遗漏导致 health_check 报「超过阈值 120 分钟」黄灯。</div>
-        <div class="logic-h">执行矩阵（时间 / 任务 / 执行机 / 前端）</div>
-        <table class="lg-table">
-          <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端/持久化</th></tr>
-          <tr><td>盘中每 30 分</td><td>CFFEX_HOLDINGS 抓取 + 渲染</td><td>云端 v8_cn_fetch_cloud</td><td>期指主力合约卡位于「实时数据」页，标签显示「盘中 · 短线」</td></tr>
-          <tr><td>盘中每 30 分</td><td>AVG_PRICE_DATA 抓取</td><td>云端 v8_cn_fetch_cloud</td><td>f_avg_price 已加入 tasks 列表，avg_price_data.json 被推回仓库并生成 data/AVG_PRICE_DATA.js</td></tr>
-          <tr><td>每小时</td><td>v8_health_check 新鲜度体检</td><td>云端 / 本机看门狗</td><td>平均股价卡 update_time 在 120 分钟内 → 不再报黄灯</td></tr>
-        </table>
-        <div class="logic-h">一致性结论</div>
-        <div class="logic-p">无需新建 workflow：v8_cn_fetch_cloud 已覆盖 CFFEX_HOLDINGS 与 AVG_PRICE_DATA 的盘中刷新；health_check 的 max_age=1440 阈值保持不变，数据正常刷新后即可通过。</div>
-      </div>
-
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">⚙️</span>自动化任务 - 说明</h3>
         <div class="logic-h">云端调度</div>
         <div class="logic-p">v8_cn_fetch_cloud（盘前/盘中/盘后/周末，云端主链）、v8_algo_cloud（收盘后算法数据生产，云端主链；本机仅 workflow_dispatch 应急）、v8_backup（每日23:00备份）、runner_health_alert（非交易时段每2h runner 健康监控）；原盘中自愈与 stale 兜底已下线（v8_intraday_healer / v8_safety_net），职能并入 v8_health_patrol + v8_freshness_watch。</div>
@@ -1750,7 +1859,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p">2026-08-03 起，所有 v6 相关定时任务已全部停止；v6 仅在主人明确指令下由小九手动操作。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">💾</span>数据新鲜度 / 看门狗 - 说明</h3>
         <div class="logic-h">云端兜底</div>
         <div class="logic-p">v8_health_patrol 每30分钟检查 raw_data 最新 commit，超过阈值自动 dispatch cn_fetch 全量兜底；阈值当前为1小时（方案B严格版待生效）。</div>
@@ -1760,9 +1870,10 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p">候选股池是全站算法链的<b>上游水源</b>（金股/CRDS/四量/评分全部从它取股）。除整体 update_time 外，运维面板「数据健康总览」已合并来源级监控：<br>· <b>night_watchdog.py</b> 每次巡检拆分六大来源数量，成交额TOP三板归零→🔴CRITICAL、&lt;80%→⚠️WARNING；港股/外资研投归零→⚠️降级（云端可能天然缺失）。<br>· <b>数据健康总览</b> CANDIDATE 行下方展示六来源彩色标签行，实时反映各源健康状态。<br>· <b>正常基线</b>：主板成交前100 + 创业板成交前100 + 科创板成交前100（三板合计≥300只）。低于此基线需排查 mootdx/akshare 是否挂了。</div>
       </div>
 
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">🛠️</span>运维面板内部模块 - 说明</h3>
-        <!-- ============= 2026-08-30 今晚改动汇总（卡片归位 + 重复清理 + 定时任务对齐） ============= -->
+                                                                                    
         <div class="logic-h" style="background:linear-gradient(135deg,#581c87,#7e22ce);color:#e9d5ff;padding:8px 12px;border-radius:6px;margin:12px 0;">📋 2026-08-30 今晚改动汇总（盘后/实时/今日事件卡片归位 + 重复清理 + 定时任务对齐）</div>
         <div class="logic-p"><b>主人令</b>：按截图审计结果，把盘中/盘后归属错误的卡片归位，删除与实时/共振日历重复的卡片，今日解禁/业绩预告保留在今日事件并明确区分盘后汇总卡，全部紧凑一行多列展示，并对齐定时任务与部署。以下改动已审计、推仓 main。</div>
 
@@ -1806,7 +1917,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         </ul>
         </div>
 
-        <!-- ============= 2026-08-12 今日改动汇总（最高优先级） ============= -->
+                                                                     
         <div class="logic-h" style="background:linear-gradient(135deg,#1e3a8a,#1e40af);color:#bfdbfe;padding:8px 12px;border-radius:6px;margin:12px 0;">📋 2026-08-12 今日改动汇总（红黄绿灯四连 + 数据 bug 修复 + 布局精简）</div>
         <div class="logic-p"><b>推送入库</b>：commit <code>e2e844db8</code> 起 10 个功能 commit 已全部 push 到 <code>origin/main</code>（本地 HEAD == 远端）。</div>
 
@@ -1851,11 +1962,11 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         </table>
         </div>
 
-        <!-- 2026-09-01 主人令：以下大块为「每日改动汇总」历史归档，不是主站卡片说明书。折叠起来，避免一打开全是旧改动。 -->
+                                                                            
         <details class="lg-archive" style="margin-top:14px;">
           <summary style="cursor:pointer;font-size:13px;font-weight:700;color:var(--gold);padding:8px 12px;background:linear-gradient(135deg,#14532d,#166534);border-radius:8px;">🗄️ 历史改动归档（2026-08 及以前 · 非主站卡片说明书）</summary>
 
-        <!-- ============= 2026-08-11 今日改动汇总（最高优先级） ============= -->
+                                                                     
         <div class="logic-h" style="background:transparent;color:#bbf7d0;padding:8px 0;border-radius:0;margin:12px 0;">📋 2026-08-20 今晚改动汇总（AI 预测子TAB / 本地禁跑算法护栏 / 算法链补链 / 镜像同步）· 阿狸咪</div>
         <div class="logic-p"><b>主人令</b>：潜力挖掘删除 → 重写「AI 预测」子TAB（小九 market_path_probability 算法）；算法必须有定时任务跟踪、跟着算法链 19:15 计算部署；本地禁止手动跑算法；审计后推仓入库；与运维/逻辑详解页对齐。以下为 8/20 全部实质改动，均已在 main 生效。</div>
 
@@ -1921,7 +2032,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <b>当前现状（8/20）</b>：云端采集 <code>probe_v8_cn_cloud.yml</code> 实测 10/11 通；新加入 <code>SKIP_MOOTDX=1</code> + Tencent GTimg 适配 + akshare 双镜像兜底，采集失败率历史 <3%。无需切换 B。
         </div>
 
-        <!-- ============= 2026-08-11 今日改动汇总（最高优先级） ============= -->
+                                                                     
         <div class="logic-h" style="background:linear-gradient(135deg,#14532d,#166534);color:#bbf7d0;padding:8px 12px;border-radius:6px;margin:12px 0;">📋 2026-08-19 今晚改动汇总（双机运维/算法对齐/防覆盖）· 阿狸咪</div>
         <div class="logic-p"><b>主人令</b>：今晚全部修复完成 + 审计对齐 + 写进逻辑详解页 + 退仓入库防覆盖 + 与小九交接明明白白。以下为 8/19 全部实质改动（13 项），均已在 main 生效。</div>
 
@@ -2099,7 +2210,36 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
       </div>
       </details>
 
-      <div class="card">
+      
+<div class="card">
+        <h3><span class="ic">📝</span>本周待办/建议表</h3>
+        <div class="logic-p">主人在历史 HANDOVER 中规划的「建议项」，照搬待落地。本周（7/27~8/02）已完成：4 类上游原生化（89da5fc）· 每日洞察/大牛股猎手对标参考页重构（7466799）· 2 次周度锚点 bug 修复（300ec6d/589f601）· 北向席位 hasMultiDay 修复 + 月度汇总加日期注释（589f601）。</div>
+        <table class="lg-table">
+          <tr><th>时段</th><th>任务</th><th>建议</th><th>频次</th></tr>
+          <tr style="opacity:.55"><td>14:06</td><td>v8_self_heal · 冻结模块诊断+补跑</td><td>✅ 已下线（v8_self_heal.yml 已删除，职能并入 v8_health_patrol）</td><td>周度兜底</td></tr>
+          <tr><td>首周六</td><td>(建议)月度报告 + STOCK_LIST pinyin 重生 + 依赖体检</td><td><span class="op-tab-time" style="background:#3b82f6;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600">NEW</span> 加 if 首周六 guard 进 21:00 脚本</td><td>月度</td></tr>
+          <tr><td>首周日</td><td>(建议)旧数据归档 + git gc/pack + 备份轮转</td><td><span class="op-tab-time" style="background:#3b82f6;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600">NEW</span> 加 if 首周日 guard 进 23:00 脚本</td><td>月度</td></tr>
+        </table>
+      </div>
+
+      
+<div class="card">
+        <h3><span class="ic">🔄</span>实时数据页卡片归属 + 平均股价任务链对齐（2026-08-31）</h3>
+        <div class="logic-h">覆盖范围</div>
+        <div class="logic-p">本批修复两类「被回滚/遗漏」问题：① 期指主力合约卡由盘后数据页迁回实时数据页；② AVG_PRICE_DATA 因 cloud_fetch tasks 列表遗漏导致 health_check 报「超过阈值 120 分钟」黄灯。</div>
+        <div class="logic-h">执行矩阵（时间 / 任务 / 执行机 / 前端）</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端/持久化</th></tr>
+          <tr><td>盘中每 30 分</td><td>CFFEX_HOLDINGS 抓取 + 渲染</td><td>云端 v8_cn_fetch_cloud</td><td>期指主力合约卡位于「实时数据」页，标签显示「盘中 · 短线」</td></tr>
+          <tr><td>盘中每 30 分</td><td>AVG_PRICE_DATA 抓取</td><td>云端 v8_cn_fetch_cloud</td><td>f_avg_price 已加入 tasks 列表，avg_price_data.json 被推回仓库并生成 data/AVG_PRICE_DATA.js</td></tr>
+          <tr><td>每小时</td><td>v8_health_check 新鲜度体检</td><td>云端 / 本机看门狗</td><td>平均股价卡 update_time 在 120 分钟内 → 不再报黄灯</td></tr>
+        </table>
+        <div class="logic-h">一致性结论</div>
+        <div class="logic-p">无需新建 workflow：v8_cn_fetch_cloud 已覆盖 CFFEX_HOLDINGS 与 AVG_PRICE_DATA 的盘中刷新；health_check 的 max_age=1440 阈值保持不变，数据正常刷新后即可通过。</div>
+      </div>
+
+      
+<div class="card">
         <h3><span class="ic">🛠️</span>2026-08-28 全站审计修复（阿狸咪夜间档）</h3>
         <div class="logic-p">
         本轮针对「9 月切月数据丢失」「巡检误报陈旧」「历史追踪价格滞后」三类问题做根因治理，共 11 项。执行矩阵如下（时间均为北京时间）：
@@ -2126,11 +2266,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         </div>
       </div>
 
-      <div class="card">
-        <div class="logic-p">· <b>v6精选</b>：选股驾驶舱+全站精选（15个JSON映射到DATA.*）<br>· <b>暂未上架</b>：V6卡片真实渲染（F窗口/金股池停牌/波动率/精选预判/四路资金/大盘资金流/期指/两融/ETF申赎）<br>· <b>已下架</b>：2026-07-30 起已<b>全面接入真实数据（11张卡）</b>，观测候选股池(CANDIDATE) 置顶，其余分别来自 F窗口实时监测(SH_FIB) / 金股池停牌监测(GOLD_POOL) / 波动率结构观测(VOLATILITY) / 精选预判信号(W52_HIGH·LIMIT_UP_HEATMAP·HERDING_DATA) / 四路资金流向对比(CAPITAL_FLOW_DATA) / 上交所大盘资金流时间轴(MARKET_FUND_FLOW_DATA) / 股指期货升贴水(CFFEX_HOLDINGS) / 两融余额走势(MARGIN_DATA) / 宽基ETF净申赎(ETF_SUBSCRIPTION) / 国家队ETF资金流向(ETF_INTRADAY_HEAT)；数据缺失时显示友好提示而非空白。</div>
-      </div>
-
-      <div class="card">
+      
+<div class="card">
         <h3><span class="ic">⏱️</span>数据时间口径与内容级审计（2026-08-09 主人铁律落地）</h3>
         <div class="logic-h">字段语义</div>
         <div class="logic-p">· <b>update_time / calc_time / data_time</b> = 数据真实产生时间，前端「更新于」胶囊只读这些字段。<br>· <b>republish_time</b> = 本次构建/重部署时间（由 <code>update_v8.py</code> 注入），仅用于排障与 <code>?v=</code> 缓存戳，<b>不得当作数据时间展示</b>。原名 <code>build_time</code> 易产生歧义，已重命名。</div>
@@ -2145,23 +2282,20 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
       </div>
     </div>
 
-    <!-- === v6备忘录（逻辑详解页最右侧子tab，2026-08-18 主人令：v6 回忆 tab 改名 v6 备忘录 + iframe 重新引用铁律文件 v6_memo.html?v=063d312703） === -->
-    <!-- 🛡 2026-08-21 兜底（主人 04:55 报告 v6 空白）：iframe 在某些浏览器/网络下可能不渲染，
-         顶部始终显示「直接打开」按钮，让用户即使 iframe 空白也能看 v6 备忘录完整内容。 -->
-    <!-- /lg-op：2026-08-23 的补闭合补丁已于 2026-08-28 移除 —— 其成因(运维页 opTab4 缺 2 个 </div>)已根治；
-           经结构校验 lg-op 在上方正常闭合，lg-v6 为兄弟节点不再被吞，v6 备忘录 tab 可见性不受影响 -->
+                                                                                                                       
+                                                                                                                              
+                                                                                                                                                           
     <div class="lg-pane" id="lg-v6" style="position:relative;">
       <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.3);border-radius:12px;margin-bottom:10px;flex-wrap:wrap;">
         <span style="font-size:13px;font-weight:700;color:#38bdf8;">📦 v6 备忘录</span>
         <a class="v6MemoOpenLink" href="v6_memo.html?standalone=1" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:#38bdf8;color:#0a0e17;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none;">🚀 直接打开（推荐，绕过 iframe）</a>
         <span style="font-size:10px;color:var(--dim);margin-left:auto;">如 iframe 长期空白，请点「直接打开」按钮，规避浏览器/网络拦截</span>
       </div>
-      <!-- 🛡 2026-08-23 修复：iframe 初始 src 留空，由 JS 一次性设为 v6_memo.html?时间戳。
-           避免页面加载后二次改 src，消除 iOS Safari / 微信浏览器 iframe 重复加载/空白问题。 -->
+                                                                                                                                              
       <iframe src="" style="width:100%;height:calc(100vh - 280px);border:none;border-radius:14px;background:#f5f7fa;" id="v6MemoFrame" onload="window.__v6MemoLoaded && window.__v6MemoLoaded()"></iframe>
-      <script>(function(){ var _f=document.getElementById('v6MemoFrame'); if(_f) _f.src='v6_memo.html?' + Date.now(); })();</script>
-      <!-- 直接打开按钮加时间戳，避免缓存旧版 v6_memo.html -->
-      <script>(function(){ var t=Date.now(); document.querySelectorAll('a.v6MemoOpenLink').forEach(function(a){ if(a.href.indexOf('standalone=1')>=0){ a.href=a.href.split('&_cb=')[0]+'&_cb='+t; } }); })();</script>
+                                                                                                                                    
+                                             
+                                                                                                                                                                                                                      
       <div id="v6MemoStatus" style="position:absolute;top:60px;right:16px;padding:5px 10px;border-radius:8px;font-size:12px;font-weight:600;background:rgba(13,20,35,.75);color:#38bdf8;border:1px solid rgba(56,189,248,.3);z-index:10;pointer-events:none;display:none;">加载中…</div>
       <div id="v6MemoError" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:var(--bg);border-radius:14px;z-index:20;text-align:center;padding:24px;">
         <div style="font-size:18px;font-weight:700;color:#f87171;">⚠️ v6 备忘录加载失败</div>
@@ -2169,7 +2303,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <a class="v6MemoOpenLink" href="v6_memo.html?standalone=1" target="_blank" style="display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:10px;background:#38bdf8;color:#0a0e17;font-size:14px;font-weight:700;text-decoration:none;">📦 直接打开 v6 备忘录</a>
       </div>
     </div>
-    <div class="lg-pane" id="lg-dnd">
+    
+<div class="lg-pane" id="lg-dnd">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
         <div style="font-size:13px;color:var(--sub);">本子页面数据由 <code>DO_NOT_DELETE.md</code> 解析，<strong style="color:var(--gold);">修改 <code>DO_NOT_DELETE.md</code> 后运行 <code>python scripts/gen_do_not_delete_js.py</code> 同步</strong>；周日 23:00 <code>v8_cleanup.yml</code> 自动跑。</div>
         <div id="lg-dnd-stamp" style="font-size:12px;color:var(--sub);font-family:var(--mono);"></div>
