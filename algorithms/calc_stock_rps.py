@@ -180,26 +180,35 @@ def _query_kline_em(code, secid_prefix, days):
 # ---- 2026-08-22 主人令一劳永逸：baostock 第三兜底（mootdx/东财均不可达时，A股）----
 _BS_LOGGED_IN = False
 def _query_kline_bs(code, days):
-    """baostock 日K兜底（仅 A股，6 位数字代码）。返回 DataFrame 或 None。"""
+    """baostock 日K兜底（仅 A股，6 位数字代码）。返回 DataFrame 或 None。
+
+    2026-09-01 监督跑算法更先进：baostock 底层 socket 无超时，网络抖动会永久挂起。
+    现加 socket_timeout(25) 安全锁 + 熔断器：挂起即抛错走 mootdx/东财兜底；
+    连续失败则冷却期内跳过 baostock，加速兜底（绝不出假数据）。
+    """
     global _BS_LOGGED_IN
     if not (isinstance(code, str) and code.isdigit() and len(code) == 6):
         return None
+    from fetch_source import socket_timeout, SOURCE_BREAKER
+    if SOURCE_BREAKER.is_open("baostock"):
+        return None
     try:
         import baostock as bs
-        if not _BS_LOGGED_IN:
-            lg = bs.login()
-            if lg.error_code != '0':
-                return None
-            _BS_LOGGED_IN = True
-        prefix = 'sh' if code.startswith(('6', '9')) else 'sz'
-        start = (datetime.now() - timedelta(days=days * 2 + 20)).strftime('%Y-%m-%d')
-        end = datetime.now().strftime('%Y-%m-%d')
-        rs = bs.query_history_k_data_plus(
-            f"{prefix}.{code}", "date,code,open,high,low,close,volume,amount",
-            start_date=start, end_date=end, frequency='d', adjustflag='2')
-        rows = []
-        while rs.error_code == '0' and rs.next():
-            rows.append(rs.get_row_data())
+        with socket_timeout(25):
+            if not _BS_LOGGED_IN:
+                lg = bs.login()
+                if lg.error_code != '0':
+                    return None
+                _BS_LOGGED_IN = True
+            prefix = 'sh' if code.startswith(('6', '9')) else 'sz'
+            start = (datetime.now() - timedelta(days=days * 2 + 20)).strftime('%Y-%m-%d')
+            end = datetime.now().strftime('%Y-%m-%d')
+            rs = bs.query_history_k_data_plus(
+                f"{prefix}.{code}", "date,code,open,high,low,close,volume,amount",
+                start_date=start, end_date=end, frequency='d', adjustflag='2')
+            rows = []
+            while rs.error_code == '0' and rs.next():
+                rows.append(rs.get_row_data())
         if len(rows) < 20:
             return None
         df = pd.DataFrame(rows, columns=rs.fields)
@@ -208,8 +217,10 @@ def _query_kline_bs(code, days):
         df = df.sort_values("date").reset_index(drop=True)
         df["pctChg"] = ((df["close"] / df["close"].shift(1) - 1) * 100).round(2)
         df["pctChg"] = df["pctChg"].fillna(0.0)
+        SOURCE_BREAKER.mark_success("baostock")
         return df
     except Exception:
+        SOURCE_BREAKER.mark_failure("baostock")
         return None
 
 
@@ -231,11 +242,18 @@ def _query_kline(code, market, days):
 
 # ---- 港股 K 线 + 恒指（2026-08-22 主人令：补齐港股 RPS，按市场分组算百分位）----
 def _query_kline_hk(code, days):
-    """港股日K (akshare stock_hk_hist)。code: 5位港股代码。失败返回 None，不影响 A股。"""
+    """港股日K (akshare stock_hk_hist)。code: 5位港股代码。失败返回 None，不影响 A股。
+
+    2026-09-01 监督跑算法更先进：akshare 底层请求加 socket_timeout 安全锁，挂起即走异常兜底。
+    """
     sym = str(code).zfill(5)
+    from fetch_source import socket_timeout, SOURCE_BREAKER
+    if SOURCE_BREAKER.is_open("akshare_hk"):
+        return None
     try:
         import akshare as ak
-        df = ak.stock_hk_hist(symbol=sym, period="daily", adjust="qfq")
+        with socket_timeout(25):
+            df = ak.stock_hk_hist(symbol=sym, period="daily", adjust="qfq")
         if df is None or len(df) < 20:
             return None
         rename = {"日期": "date", "开盘": "open", "收盘": "close", "最高": "high",
@@ -252,8 +270,10 @@ def _query_kline_hk(code, days):
             return None
         df["pctChg"] = ((df["close"] / df["close"].shift(1) - 1) * 100).round(2)
         df["pctChg"] = df["pctChg"].fillna(0.0)
+        SOURCE_BREAKER.mark_success("akshare_hk")
         return df
     except Exception as e:
+        SOURCE_BREAKER.mark_failure("akshare_hk")
         print(f"  [hk] {code} error: {e}")
         return None
 

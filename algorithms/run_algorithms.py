@@ -16,6 +16,8 @@ run_algorithms.py — v8 本地/自托管 cn runner 的盘后算法编排器
 import os
 import re
 import subprocess
+import time
+import threading
 
 # ── 单脚本超时（2026-08-31 一劳永逸修复）──────────────────────────────────
 # 背景：原代码把 1800s 硬编码在两处 subprocess.run，实测 run 33316835316 中
@@ -487,6 +489,144 @@ def _write_run_report(ok, fail, skipped, run_start):
         print(f"  ⚠️ 写执行报告失败: {e}")
 
 
+# ════════════════════════════════════════════════════════════════════════════
+# 🔴 2026-09-01 主人令「监督跑算法更先进」：监督式脚本执行器
+#   旧实现：subprocess.run(timeout=_to) 阻塞等待，单脚本卡死要等满 30~60min 才超时
+#           （"死盯死等"）；无实时进度、无主动杀进程续跑。
+#   新实现：Popen + 独立读线程实时抽 stdout/stderr 写心跳文件；若某脚本连续
+#           SILENCE_KILL_SEC 秒无新输出（网络挂起/死循环/进程冻结）→ 判定卡死、
+#           kill 进程并 continue 到下一脚本（绝不编造缺失产物的假数据，交由下游
+#           continue-on-error / 就绪门控 / 产物完整性闸门按真实数据口径处理）。
+#   铁律：被 kill 的脚本其产物视为「未产出」，下游门控会拒绝用陈旧数据冒充今日。
+# ════════════════════════════════════════════════════════════════════════════
+# 单脚本静默卡死判定秒数（默认 15min）。V8_ALGO_SILENCE 可调大以防极重活误杀。
+SILENCE_KILL_SEC = int(_os.environ.get("V8_ALGO_SILENCE", "900"))
+# 算法链心跳文件：实时进度 + 卡死信号，供 v8_cloud_watchdog 跨 run 监督 + 运维面板消费
+HEARTBEAT_PATH = os.path.join(V8_ROOT, "raw_data", "algo_heartbeat.json")
+
+
+def _write_heartbeat(state):
+    """增量写心跳文件（失败静默，不阻断算法链）。"""
+    try:
+        os.makedirs(os.path.dirname(HEARTBEAT_PATH), exist_ok=True)
+        with open(HEARTBEAT_PATH, "w", encoding="utf-8") as f:
+            json.dump(state, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
+
+def _supervised_run(script, path, timeout):
+    """监督式执行单个算法脚本；返回 (returncode, last_lines, killed_reason)。
+    killed_reason ∈ {None, 'silence', 'timeout'}。"""
+    start_ts = time.time()
+    ctx = {"last_output_ts": start_ts, "last_lines": [], "start_ts": start_ts}
+    lock = threading.Lock()
+
+    _write_heartbeat({
+        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "script": script, "step": "run_algorithms",
+        "last_output_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "silent_sec": 0,
+        "started": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "status": "starting",
+    })
+
+    proc = subprocess.Popen(
+        [PY, path], cwd=ALGO, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        text=True, bufsize=1, encoding="utf-8", errors="replace",
+    )
+
+    def reader():
+        try:
+            for line in proc.stdout:
+                s = line.rstrip("\n")
+                with lock:
+                    ctx["last_output_ts"] = time.time()
+                    if s.strip():
+                        ctx["last_lines"].append(s)
+                        if len(ctx["last_lines"]) > 6:
+                            ctx["last_lines"] = ctx["last_lines"][-6:]
+        except Exception:
+            pass
+
+    reader_thread = threading.Thread(target=reader, daemon=True)
+    reader_thread.start()
+
+    killed_reason = None
+    while True:
+        rc = proc.poll()
+        if rc is not None:
+            break
+        now = time.time()
+        with lock:
+            silent = int(now - ctx["last_output_ts"])
+            ls = ctx["last_lines"][-1] if ctx["last_lines"] else ""
+        _write_heartbeat({
+            "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "script": script, "step": "run_algorithms", "pid": proc.pid,
+            "last_line": ls[:160],
+            "last_output_time": datetime.fromtimestamp(ctx["last_output_ts"]).strftime("%Y-%m-%d %H:%M:%S"),
+            "silent_sec": silent,
+            "started": datetime.fromtimestamp(ctx["start_ts"]).strftime("%Y-%m-%d %H:%M:%S"),
+            "status": "running",
+        })
+        elapsed = now - ctx["start_ts"]
+        if elapsed >= timeout:
+            killed_reason = "timeout"
+            break
+        # 静默杀：已起跑超过启动宽限期(30s) 且 连续无输出 ≥ SILENCE_KILL_SEC
+        if elapsed > 30 and silent >= SILENCE_KILL_SEC:
+            killed_reason = "silence"
+            break
+        time.sleep(5)
+
+    if killed_reason:
+        try:
+            proc.kill()
+        except Exception:
+            pass
+        try:
+            proc.wait(timeout=10)
+        except Exception:
+            pass
+        with lock:
+            silent_now = int(time.time() - ctx["last_output_ts"])
+            ls = ctx["last_lines"][-1] if ctx["last_lines"] else ""
+        _write_heartbeat({
+            "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "script": script, "step": "run_algorithms",
+            "last_line": ls[:160], "silent_sec": silent_now,
+            "status": "killed", "reason": killed_reason,
+            "note": "卡死被监督器终止，续跑下一脚本（产物视为未产出，遵守不得造假铁律）",
+        })
+    else:
+        # 正常结束：标记 done，避免心跳文件停留在 running 误导跨 run 监督
+        with lock:
+            ls = ctx["last_lines"][-1] if ctx["last_lines"] else ""
+        _write_heartbeat({
+            "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "script": script, "step": "run_algorithms",
+            "status": "done", "returncode": rc, "last_line": ls[:160],
+            "note": "脚本本轮执行结束",
+        })
+    # 等读线程把剩余 stdout 抽完，避免末几行丢失（先 join 再关 pipe）
+    try:
+        reader_thread.join(timeout=15)
+    except Exception:
+        pass
+    try:
+        proc.stdout.close()
+    except Exception:
+        pass
+
+    with lock:
+        last_lines = list(ctx["last_lines"])
+    rc = proc.returncode
+    if rc is None:
+        rc = -9
+    return rc, last_lines, killed_reason
+
+
 def step_run():
     print(f"\n[1] 运行算法链（{len(ORDER)} 个）")
     # 记录本轮启动时间，供 final_recommend 门控判断「输入是否本轮新鲜产出」
@@ -526,33 +666,39 @@ def step_run():
             print(f"  ⏭️  跳过 final_recommend（就绪门控未通过，本轮不产出最终推荐）")
             FAILED_SCRIPTS.append((script, "就绪门控未通过（上游选股输入陈旧/缺失）"))
             continue
-        print(f"  ▶ {script}  ({datetime.now():%H:%M:%S})")
+        print(f"  ▶ {script}  ({datetime.now():%H:%M:%S})  [监督执行·静默杀≥{SILENCE_KILL_SEC//60}min]")
+        # 2026-09-01 主人令「监督跑算法更先进」：用监督式执行器替代朴素 subprocess.run
+        #   —— 实时写心跳 + 静默超时即杀进程续跑（永不再 30~60min 死等单脚本卡死）。
+        _to = _script_timeout(script)
         try:
-            # 2026-08-31：不再硬编码 1800s，按脚本取（重活单独放宽，见 SCRIPT_TIMEOUT_OVERRIDE）
-            _to = _script_timeout(script)
-            r = subprocess.run([PY, path], cwd=ALGO, capture_output=True, text=True, timeout=_to)
-            if r.returncode == 0:
-                ok += 1
-                # 打印末行摘要
-                last = [l for l in r.stdout.strip().splitlines() if l.strip()][-1:] or [""]
-                print(f"     ✅ ok | {last[0][:80]}")
-            else:
-                fail += 1
-                print(f"     ⚠️ 退出码 {r.returncode}")
-                tail = "\n".join(r.stdout.strip().splitlines()[-3:] + r.stderr.strip().splitlines()[-3:])
-                print("     " + tail.replace("\n", "\n     ")[:400])
-                # 🛡 2026-08-28：抓取末行 stderr 作为失败原因，供链尾闸门/运维面板定位
-                reason = ((r.stderr or "").strip().splitlines() or
-                          (r.stdout or "").strip().splitlines() or [""])
-                FAILED_SCRIPTS.append((script, f"退出码 {r.returncode} | {reason[-1][:160]}"))
-        except subprocess.TimeoutExpired:
-            fail += 1
-            print(f"     ⏱️ 超时(>{_to // 60:.0f}min)，跳过")
-            FAILED_SCRIPTS.append((script, f"超时 >{_to // 60:.0f}min"))
+            rc, last_lines, killed_reason = _supervised_run(script, path, _to)
         except Exception as e:
             fail += 1
-            print(f"     ❌ 异常: {e}")
-            FAILED_SCRIPTS.append((script, f"异常 {e}"))
+            print(f"     ❌ 监督执行异常: {e}")
+            FAILED_SCRIPTS.append((script, f"监督执行异常 {e}"))
+            continue
+        if killed_reason == "silence":
+            fail += 1
+            print(f"     💀 静默卡死(>{SILENCE_KILL_SEC//60}min 无输出)，监督器已终止并续跑下一脚本")
+            FAILED_SCRIPTS.append((script, f"监督器静默杀(>{SILENCE_KILL_SEC//60}min 无输出)"))
+            continue
+        if killed_reason == "timeout":
+            fail += 1
+            print(f"     ⏱️ 硬超时(>{_to // 60:.0f}min)，监督器终止并续跑")
+            FAILED_SCRIPTS.append((script, f"超时 >{_to // 60:.0f}min"))
+            continue
+        if rc == 0:
+            ok += 1
+            last = last_lines[-1] if last_lines else ""
+            print(f"     ✅ ok | {last[:80]}")
+        else:
+            fail += 1
+            print(f"     ⚠️ 退出码 {rc}")
+            tail = "\n".join(last_lines[-3:])
+            print("     " + tail.replace("\n", "\n     ")[:400])
+            # 🛡 2026-08-28：抓取末行作为失败原因，供链尾闸门/运维面板定位
+            reason = last_lines[-1] if last_lines else f"退出码 {rc}"
+            FAILED_SCRIPTS.append((script, f"退出码 {rc} | {reason[:160]}"))
     print(f"  算法运行: 成功 {ok} / 失败 {fail}")
     # 🛡 2026-08-28 一劳永逸：失败清单汇总 —— 过去被 continue-on-error 静默吞掉，
     #   导致 08-28 候选池停更 1.9 天仍无人知晓。现在必须显式列出。
@@ -562,6 +708,15 @@ def step_run():
             print(f"     • {_s}  ← {_why}")
     if skipped:
         print(f"\n  ⏭️ 因未到 18:00 跳过的选股脚本 {len(skipped)} 个: {', '.join(skipped)}")
+    # 2026-09-01 主人令：算法链本轮执行完毕，心跳置 completed（供跨 run 监督判定"已脱离卡死"）
+    _write_heartbeat({
+        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "script": "(chain-end)",
+        "step": "run_algorithms",
+        "status": "completed",
+        "ok": ok, "fail": fail,
+        "note": "算法链本轮执行完毕",
+    })
     _write_run_report(ok, fail, skipped, run_start)
 
 

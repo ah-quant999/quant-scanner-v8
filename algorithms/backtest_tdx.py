@@ -74,24 +74,36 @@ OPTIMIZED = {
 
 def _fetch_index_ohlc(code, prefix, days=150):
     """从 baostock 拉取指数日K，返回 [(date, close)]"""
+    from fetch_source import socket_timeout, SOURCE_BREAKER
+    if SOURCE_BREAKER.is_open("baostock"):
+        log(f"  [_fetch_index_ohlc] {code}: baostock 熔断冷却中，跳过")
+        return []
     import baostock as bs
     end = datetime.now().strftime("%Y-%m-%d")
     start = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
-    bs.login()
-    rs = bs.query_history_k_data_plus(
-        f"{prefix}.{code}", "date,close", start_date=start, end_date=end,
-        frequency="d", adjustflag="3"
-    )
-    rows = []
-    while (rs.error_code == "0") & rs.next():
-        r = rs.get_row_data()
-        try:
-            rows.append((r[0], float(r[1])))
-        except Exception:
-            pass
-    bs.logout()
-    rows.sort(key=lambda x: x[0])
-    return rows
+    try:
+        with socket_timeout(25):
+            bs.login()
+            rs = bs.query_history_k_data_plus(
+                f"{prefix}.{code}", "date,close", start_date=start, end_date=end,
+                frequency="d", adjustflag="3"
+            )
+            bs.logout()
+        rows = []
+        if rs is not None:
+            while (rs.error_code == "0") & rs.next():
+                r = rs.get_row_data()
+                try:
+                    rows.append((r[0], float(r[1])))
+                except Exception:
+                    pass
+        SOURCE_BREAKER.mark_success("baostock")
+        rows.sort(key=lambda x: x[0])
+        return rows
+    except Exception as e:
+        SOURCE_BREAKER.mark_failure("baostock")
+        log(f"  [_fetch_index_ohlc] {code}: {e}")
+        return []
 
 
 def _compute_regime_series(rows):
@@ -181,30 +193,35 @@ def tdx_kline(code, setcode, period="4", count=60):
     
     # 用 baostock 作主数据源（云端/本地都能跑，比MCP可靠）
     # 通达信MCP在自动化环境可能不可用，baostock是Pypi包，已安装
+    from fetch_source import socket_timeout, SOURCE_BREAKER
+    if SOURCE_BREAKER.is_open("baostock"):
+        log(f"  [baostock] {code}: 近期连续失败，熔断冷却中，跳过（走缓存/兜底）")
+        return None
     import baostock as bs
     try:
-        lg = bs.login()
-        if lg.error_code != "0":
-            log(f"  baostock登录失败: {lg.error_msg}")
-            return None
-        # code needs to be like "sz.002141" or "sh.601318"
-        market_map = {"0": "sz", "1": "sh", "2": "bj", "31": "hk"}
-        prefix = market_map.get(str(setcode), "sz")
-        bs_code = f"{prefix}.{code}"
-        
-        end_date = TODAY  # 保持 YYYY-MM-DD
-        start_dt = (datetime.now() - timedelta(days=90)).strftime("%Y-%m-%d")
-        start_date = start_dt
-        
-        # baostock 不支持港股，跳过
-        if prefix == "hk":
-            return None
-        
-        rs = bs.query_history_k_data_plus(bs_code,
-            "date,close,high,low,open,volume,amount",
-            start_date=start_date, end_date=end_date,
-            frequency="d", adjustflag="2")  # 后复权
-        bs.logout()
+        with socket_timeout(25):
+            lg = bs.login()
+            if lg.error_code != "0":
+                log(f"  baostock登录失败: {lg.error_msg}")
+                return None
+            # code needs to be like "sz.002141" or "sh.601318"
+            market_map = {"0": "sz", "1": "sh", "2": "bj", "31": "hk"}
+            prefix = market_map.get(str(setcode), "sz")
+            bs_code = f"{prefix}.{code}"
+
+            end_date = TODAY  # 保持 YYYY-MM-DD
+            start_dt = (datetime.now() - timedelta(days=90)).strftime("%Y-%m-%d")
+            start_date = start_dt
+
+            # baostock 不支持港股，跳过
+            if prefix == "hk":
+                return None
+
+            rs = bs.query_history_k_data_plus(bs_code,
+                "date,close,high,low,open,volume,amount",
+                start_date=start_date, end_date=end_date,
+                frequency="d", adjustflag="2")  # 后复权
+            bs.logout()
         
         # rs 可能为 None（查询失败）
         if rs is None or rs.error_code != "0":
@@ -230,11 +247,13 @@ def tdx_kline(code, setcode, period="4", count=60):
             log(f"  [baostock] {code} ({bs_code}) → {len(rows)} 根K ({rows[0]['date']} ~ {rows[-1]['date']})")
             # 缓存
             json.dump({"rows": rows, "ts": TODAY}, open(cache_file, "w", encoding="utf-8"))
+            SOURCE_BREAKER.mark_success("baostock")
             return rows
         else:
             log(f"  [baostock] {code}: 空数据")
             return None
     except Exception as e:
+        SOURCE_BREAKER.mark_failure("baostock")
         log(f"  [baostock] {code}: {e}")
         return None
 

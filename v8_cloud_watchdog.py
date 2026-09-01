@@ -322,11 +322,27 @@ def in_schedule_window(kind, now_cst=None):
         if weekend:
             return 9 <= h <= 11
         return PREMARKET_GUARD <= mins and h <= 22
+    if kind == "algo":
+        # 🔴 2026-09-01 主人令：盘后算法链 19:15 / 20:00 两档（每天触发，内部交易日历 gate），
+        #   失败后自愈重派可能延续到 21-23 点；凌晨 00:00-02:00 为次轮补跑窗口。
+        #   周末/节假日无盘后选股（gate 跳过），整段豁免以防结构性误报。
+        if weekend:
+            return False
+        return (19 <= h <= 23) or (0 <= h <= 2)
     return True
 
 
 # 运行中的 workflow 允许的最长时长；超过视为卡死（v8 各 workflow 正常 2-15 分钟完成）
 RUNNING_GRACE_MIN = 45
+
+# ═══ 2026-09-01 主人令「监督跑算法更先进」：盘后算法链独立监督阈值 ═══
+# 算法链与轻量 workflow 不同：单轮合法运行时长可达 60~150min（step 超时 150min / job 200min）。
+# 故不能用 RUNNING_GRACE_MIN=45 一刀切（会误报）。这里用专属阈值：
+ALGO_WORKFLOW_FILE = "v8_algo_cloud.yml"
+ALGO_STUCK_MIN = 165        # 算法链 step 150min/job 200min：>165min 仍 in_progress 必为整条卡死
+ALGO_STALE_MIN = 1500       # 距上次成功 >25h 且处于盘后窗口 → 疑似漏跑（交易日每天 19:15/20:00 两档）
+ALGO_SILENCE_KILL_MIN = 15  # 与 run_algorithms.SILENCE_KILL_SEC 对齐：本地心跳静默超 15min+余量 → 卡死
+
 
 
 def check_workflow(name, label, max_age_min=None, workflow_id=None):
@@ -380,6 +396,122 @@ def check_raw_data_stale(threshold_min=90):
     ok = age_min <= threshold_min
     detail = f"raw_data last commit {dt.strftime('%m-%d %H:%M')} (age {fmt_age(age_min)}, threshold {fmt_age(threshold_min)})"
     return ok, detail
+
+
+def find_workflow_id_by_filename(filename):
+    """按 workflow 文件路径（稳定，不像显示名会漂移为文件名）解析 workflow id。"""
+    wfs = api_get(f"https://api.github.com/repos/{REPO}/actions/workflows")
+    if "__error__" in wfs:
+        return None
+    for w in wfs.get("workflows", []):
+        if w.get("path") == f".github/workflows/{filename}":
+            return w["id"]
+    return None
+
+
+def _read_local_heartbeat():
+    """读本地 raw_data/algo_heartbeat.json（cn-runner 同机场景可见最近一轮进度）。"""
+    p = Path("raw_data/algo_heartbeat.json")
+    if not p.exists():
+        return None
+    try:
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def _algo_recover(run_id, run_number):
+    """算法链卡死兜底：cancel 当前 run + repository_dispatch trigger_algo 重派。
+    受全局派发冷却节流，避免重复派发风暴。"""
+    try:
+        if not _global_dispatch_allowed()[0]:
+            print(f"[HEAL] algo 链 run #{run_number} 卡死，但处于全局派发冷却中，跳过重派")
+            return
+        # ① cancel 卡死 run
+        cancel_url = f"https://api.github.com/repos/{REPO}/actions/runs/{run_id}/cancel"
+        try:
+            req = urllib.request.Request(cancel_url, headers=HEADERS, method="POST")
+            urllib.request.urlopen(req, timeout=30).read()
+        except Exception as e:
+            print(f"[WARN] cancel algo run #{run_number} 失败: {e}")
+        # ② repository_dispatch 重派 trigger_algo（v8_algo_cloud.yml 已注册该 types）
+        disp_url = f"https://api.github.com/repos/{REPO}/dispatches"
+        data = json.dumps({
+            "event_type": "trigger_algo",
+            "client_payload": {"reason": "watchdog_algo_stuck_recover", "stuck_run": run_number},
+        }).encode("utf-8")
+        req2 = urllib.request.Request(disp_url, data=data, headers=HEADERS, method="POST")
+        try:
+            with urllib.request.urlopen(req2, timeout=30) as r:
+                print(f"[HEAL] algo 链 run #{run_number} 卡死 → 已 cancel + 重派 trigger_algo (HTTP {r.status})")
+        except Exception as e:
+            print(f"[WARN] 重派 trigger_algo 失败: {e}")
+        _record_global_dispatch()
+    except Exception as e:
+        print(f"[WARN] algo 链自愈异常: {e}")
+
+
+def check_algo_chain():
+    """监督盘后算法链 run_algorithms 的运行状态（2026-09-01 主人令·监督跑算法更先进）。
+
+      - 无运行中实例：按最近已完成 run 判成败 + 新鲜度（与现有其他 workflow 同口径）。
+      - 有运行中实例：
+          * 进程内监督器（run_algorithms._supervised_run）已对「单脚本静默卡死」实时杀进程续跑，
+            此处只兜底「整条 run 卡死（runner 失联 / 进程冻结 / concurrency 卡死）」。
+          * elapsed > ALGO_STUCK_MIN → 判卡死，cancel + 重派 trigger_algo。
+          * 本地心跳 status=running 但更新时间已超静默阈值 → 判卡死（同机场景）。
+    返回 (ok, detail, is_explicit_failure)。卡死自愈合路径返回 ok=False 但不带 is_failure，
+    以免与「显式 failure」混淆；卡死总是硬告警（不受调度窗口豁免）。"""
+    wf_id = find_workflow_id_by_filename(ALGO_WORKFLOW_FILE)
+    if wf_id is None:
+        return False, "找不到 v8_algo_cloud workflow（API 错误或文件名变更）", False
+    run, err, running = latest_workflow_run(ALGO_WORKFLOW_NAME, workflow_id=wf_id)
+    if err:
+        return False, err, False
+    now_cst = datetime.now(timezone(timedelta(hours=8)))
+
+    if running is not None:
+        r_created = utc_to_cst(running["created_at"])
+        r_age = (now_cst - r_created).total_seconds() / 60
+        r_num = running.get("run_number")
+        # 整条 run 卡死兜底：超过 ALGO_STUCK_MIN 仍 in_progress → 必为异常
+        if r_age > ALGO_STUCK_MIN:
+            detail = (f"algo 链 run #{r_num} {running['status']} @ {r_created.strftime('%m-%d %H:%M')} "
+                      f"已 {fmt_age(r_age)} 未结束（step 超时150min/job 200min），疑似整条卡死")
+            _algo_recover(running["id"], r_num)
+            return False, detail, False
+        # 同机心跳兜底：status=running 但最后心跳已超静默阈值 → 进程冻结
+        hb = _read_local_heartbeat()
+        if hb and hb.get("status") == "running":
+            try:
+                hb_ts = datetime.strptime(hb["update_time"], "%Y-%m-%d %H:%M:%S")
+                hb_age = (now_cst - hb_ts).total_seconds() / 60
+                if hb_age > (ALGO_SILENCE_KILL_MIN + 5):
+                    detail = (f"algo 链 run #{r_num} 心跳静默 {fmt_age(hb_age)}"
+                              f"（最后脚本 {hb.get('script')}），疑似进程冻结，已触发 cancel+重派")
+                    _algo_recover(running["id"], r_num)
+                    return False, detail, False
+            except Exception:
+                pass
+        return True, (f"algo 链 run #{r_num} {running['status']} @ {r_created.strftime('%m-%d %H:%M')} "
+                      f"(已 {fmt_age(r_age)})"), False
+
+    if run is None:
+        return False, "algo 链 无可判定运行记录", False
+
+    status = run["status"]
+    con = run.get("conclusion")
+    created = utc_to_cst(run["created_at"])
+    age_min = (now_cst - created).total_seconds() / 60
+    ok = status == "completed" and con == "success"
+    is_failure = status == "completed" and con == "failure"
+    detail = f"algo 链 {status}/{con} @ {created.strftime('%m-%d %H:%M')} (age {fmt_age(age_min)})"
+    # 盘后窗口内距上次成功过久 → 漏跑
+    if ok and age_min > ALGO_STALE_MIN and in_schedule_window("algo", now_cst):
+        ok = False
+        detail += (f" | 距上次成功 {fmt_age(age_min)} > {fmt_age(ALGO_STALE_MIN)}"
+                   f"（盘后窗口内缺跑，疑似漏跑）")
+    return ok, detail, is_failure
 
 
 def check_site():
@@ -960,6 +1092,13 @@ def main():
     if not ok and not is_failure and not in_schedule_window("build_deploy", now_cst):
         ok, msg = True, msg + " —— 非调度时段，豁免（夜间无上游推送属预期）"
     results.append(("build_deploy", ok, msg))
+
+    # 🔴 2026-09-01 主人令：把盘后算法链纳入看门狗监督（此前完全未监督）。
+    #   卡死自愈（cancel+重派 trigger_algo）在 check_algo_chain 内完成；此处只采集结果。
+    ok, msg, is_failure = check_algo_chain()
+    if not ok and not is_failure and not in_schedule_window("algo", now_cst):
+        ok, msg = True, msg + " —— 非调度时段豁免（周末/盘中无盘后选股属预期）"
+    results.append(("algo_chain", ok, msg))
 
     raw_ok, raw_msg = check_raw_data_stale(threshold_min=90)
     if not raw_ok and not in_schedule_window("raw_data", now_cst):
