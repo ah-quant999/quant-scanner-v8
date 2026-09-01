@@ -1,15 +1,42 @@
 {
-  "check_time": "2026-09-01 00:02:55",
-  "last_trade_close": "2026-08-31 15:30:00",
+  "check_time": "2026-09-01 20:15:13",
+  "last_trade_close": "2026-09-01 15:30:00",
   "is_trading_day": true,
-  "core_stale": [],
-  "warn_stale": [],
+  "core_stale": [
+    {
+      "var": "CRISIS_DATA",
+      "reason": "更新于 09-01 06:27，落后 9.0 小时",
+      "category": "premarket,intraday"
+    },
+    {
+      "var": "MARGIN_DATA",
+      "reason": "更新于 08-31 16:38，落后 2 个交易日（阈值 1.08333）",
+      "category": "premarket,post_close"
+    },
+    {
+      "var": "V8_CAL",
+      "reason": "更新于 09-01 06:30，落后 9.0 小时",
+      "category": "premarket"
+    },
+    {
+      "var": "CRDS_CARD_DATA",
+      "reason": "更新于 08-31 19:12，落后 2 个交易日（阈值 1）",
+      "category": "algo"
+    }
+  ],
+  "warn_stale": [
+    {
+      "var": "CONCEPT_RANKING",
+      "reason": "更新于 08-31 19:31，落后 2 个交易日（阈值 1.08333）",
+      "category": "intraday"
+    }
+  ],
   "frozen_stale": [],
   "no_update_time": [],
   "summary": {
     "total_checked": 49,
-    "core_stale": 0,
-    "warn_stale": 0,
+    "core_stale": 4,
+    "warn_stale": 1,
     "frozen_stale": 0,
     "no_timestamp": 0
   },
@@ -46,6 +73,7 @@
     "AI_MARKET_BRIEF": "intraday",
     "MARKET_FUND_FLOW_DATA": "post_close",
     "SECTOR_FUND_FLOW_TREND": "post_close",
+    "SECTOR_FUND_TRACK": "post_close",
     "GOLD_POOL": "post_close",
     "CANDIDATE": "post_close",
     "TRIPLE_CONSENSUS": "post_close",
