@@ -465,6 +465,7 @@ window.__domReadyFns=[];
 </style>
     <script src="data/ETF_INTRADAY_HEAT.js?v=9add7c1151" defer></script>
     <script src="data/SECTOR_FUND_FLOW.js?v=39ebcdf976" defer></script>
+    <script src="data/SECTOR_FUND_TRACK.js?v=SECTOR_FUND_TRACK" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=f3e45f1ad0" defer></script>
     <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=1d8eb3b524" defer></script>
@@ -9593,14 +9594,12 @@ window.showRestrictedItems = showRestrictedItems;
       var _isPre = _nowParts && (_nowParts.hh < 9 || (_nowParts.hh === 9 && _nowParts.mm < 30));
       slotEl.textContent = _isPre ? '上游水源 · 盘前' : '上游水源 · 盘后';
     }
-    // 来源级分布（紧凑行，始终可见；点击来源标签可直接筛选该来源，尾部带展开/折叠按钮）
+    // 来源级分布（紧凑行，始终可见；尾部带展开/折叠按钮）
     const sdEl = $('stPoolSourceDist');
-    const listEl = $('stPoolStockList');
-    const activeFilter = window._stPoolFilterSource || null;
-    const isExpanded = sdEl && sdEl.dataset.expanded === '1';
     if(sdEl){
       const order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投'];
       const expect = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50};
+      const isExpanded = sdEl.dataset.expanded === '1';
       let html = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:4px 0 10px;font-size:12px;">';
       order.forEach(function(s){
         const cnt = sd[s]||0;
@@ -9613,33 +9612,23 @@ window.showRestrictedItems = showRestrictedItems;
         } else if(exp && cnt < exp * 0.8){ color = '#f59e0b'; icon = '⚠'; }
         else { color = '#22c55e'; icon = '✓'; }
         const label = s.replace(/成交前\d+|研报/,'');
-        const isActive = activeFilter === s;
-        const bg = isActive ? color : (color+'15');
-        const fg = isActive ? '#fff' : color;
-        const ring = isActive ? ('2px solid '+color) : ('1px solid '+color+'30');
-        html += '<span onclick="window.filterStPoolBySource(\''+s+'\')" title="点击只看 '+s+'" style="cursor:pointer;background:'+bg+';color:'+fg+';border:'+ring+';border-radius:4px;padding:2px 7px;white-space:nowrap;transition:.15s;">'+icon+' '+label+' '+cnt+'</span>';
+        html += '<span title="'+s+'：'+cnt+'只'+(exp?'(期望≥'+exp+')':'')+tip+'" style="background:'+color+'15;color:'+color+';border:1px solid '+color+'30;border-radius:4px;padding:2px 7px;white-space:nowrap">'+icon+' '+label+' '+cnt+'</span>';
       });
       html += '<span style="color:var(--dim);margin-left:auto;align-self:center;margin-right:8px;">共 <b style="color:var(--txt)">'+total+'</b> 只</span>';
       html += '<button id="stPoolToggleBtn" onclick="window.toggleStPoolDetail()" style="background:var(--cyan);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;">'+(isExpanded?'▴ 收起明细':'▾ 展开明细')+'</button>';
       html += '</div>';
       sdEl.innerHTML = html;
     }
-    // 个股明细（默认隐藏；点击来源标签后仅展示该来源股票）
+    // 个股明细（默认隐藏，点击展开）—— 按来源分组展示
+    const listEl = $('stPoolStockList');
     if(listEl){
       const keys = Object.keys(stocks);
       if(keys.length === 0){
         listEl.innerHTML = '<div class="note" style="text-align:center;">候选股池数据暂不可用</div>';
       } else {
         const order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投'];
-        const sourcesToShow = activeFilter ? [activeFilter] : order;
         let html = '<div style="margin-top:8px;">';
-        if(activeFilter){
-          html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;">';
-          html += '<span style="color:var(--sub);">当前筛选：<b style="color:var(--txt);">'+activeFilter.replace(/成交前\d+|研报/,'')+'</b></span>';
-          html += '<button onclick="window.filterStPoolBySource(null)" style="background:transparent;color:var(--cyan);border:1px solid var(--cyan);border-radius:4px;padding:1px 7px;font-size:11px;cursor:pointer;">清除筛选</button>';
-          html += '</div>';
-        }
-        sourcesToShow.forEach(function(src){
+        order.forEach(function(src){
           const srcStocks = Object.values(stocks).filter(function(s){ return s && s.sources && s.sources.indexOf(src) >= 0; });
           if(!srcStocks.length) return;
           html += '<div style="margin-bottom:12px;">';
@@ -9664,44 +9653,15 @@ window.showRestrictedItems = showRestrictedItems;
     }
   }
   window.renderStPool = renderStPool;
-  window.filterStPoolBySource = function(src){
-    const sdEl = document.getElementById('stPoolSourceDist');
-    const listEl = document.getElementById('stPoolStockList');
-    if(!sdEl || !listEl) return;
-    const prev = window._stPoolFilterSource || null;
-    // 点击已激活的筛选 = 清除
-    window._stPoolFilterSource = (src && src !== prev) ? src : null;
-    const expandedNow = listEl.style.display !== 'none';
-    if(window._stPoolFilterSource){
-      // 筛选某来源：强制展开
-      listEl.style.display = 'block';
-      sdEl.dataset.expanded = '1';
-    } else if(prev){
-      // 从筛选态清除：保持展开（方便看全部），若用户想收可点按钮
-      listEl.style.display = 'block';
-      sdEl.dataset.expanded = '1';
-    } else {
-      // 无筛选时按原按钮行为切换
-      listEl.style.display = expandedNow ? 'none' : 'block';
-      sdEl.dataset.expanded = expandedNow ? '0' : '1';
-    }
-    window.renderStPool();
-  };
   window.toggleStPoolDetail = function(){
     const sdEl = document.getElementById('stPoolSourceDist');
     const listEl = document.getElementById('stPoolStockList');
     if(!sdEl || !listEl) return;
     const expanded = listEl.style.display !== 'none';
-    if(window._stPoolFilterSource){
-      // 展开/折叠按钮在筛选态下 = 清除筛选并折叠
-      window._stPoolFilterSource = null;
-      listEl.style.display = 'none';
-      sdEl.dataset.expanded = '0';
-    } else {
-      listEl.style.display = expanded ? 'none' : 'block';
-      sdEl.dataset.expanded = expanded ? '0' : '1';
-    }
-    window.renderStPool();
+    listEl.style.display = expanded ? 'none' : 'block';
+    sdEl.dataset.expanded = expanded ? '0' : '1';
+    const btn = document.getElementById('stPoolToggleBtn');
+    if(btn) btn.textContent = expanded ? '▾ 展开明细' : '▴ 收起明细';
   };
   function initTriple(){
     const c=window.TRIPLE_CONSENSUS||null, t=window.TRIPLE_TRACK||null, h=window.TRIPLE_HISTORY||null;
@@ -10599,6 +10559,84 @@ window.showRestrictedItems = showRestrictedItems;
     html+='</div>';
     return html;
   }
+
+  /* ═══════════ 2026-09-01 主人令：🔥 热门赛道资金追踪（暂未上架·强势突破 pane 最底部原生卡）══ */
+  function renderSectorFundTrackCard(host){
+    if(!host) return;
+    var D = window.SECTOR_FUND_TRACK;
+    var head = '<div class="card" style="margin-bottom:16px;border-left:4px solid #f43f5e;">'
+      + v8CardHeader('🔥','热门赛道资金追踪','近20日累计净流入 Top 10 赛道 · 折线+紧凑矩阵','update_time', D||{})
+      + '<div style="padding:12px 14px;">';
+    if(!D || !D.top_10 || !D.top_10.length){
+      host.innerHTML = head + '<div class="note" style="text-align:center;padding:18px;">暂无赛道资金追踪数据（等待盘后算法链生成）</div></div>';
+      return;
+    }
+    var dates = D.dates || [];
+    var top = D.top_10;
+    var n = dates.length;
+    // ── 折线图（自包含 SVG，零依赖，暗色主题）──
+    var W=720, Hgt=236, pl=40, pr=14, pt=14, pb=26;
+    var iw=W-pl-pr, ih=Hgt-pt-pb;
+    var vmin=0, vmax=0;
+    top.forEach(function(s){ s.series_cum.forEach(function(v){ if(v<vmin)vmin=v; if(v>vmax)vmax=v; }); });
+    if(vmax===vmin){ vmax=vmin+1; }
+    var y0 = (vmin>=0)? vmin : vmin;  // 0 基线
+    var xOf = function(i){ return pl + (n<=1?0:(iw*i/(n-1))); };
+    var yOf = function(v){ return pt + ih*(1-(v-y0)/(vmax-y0)); };
+    var grid='';
+    var yticks=[vmin,(vmin+vmax)/2,vmax];
+    yticks.forEach(function(v){
+      var yy=yOf(v);
+      grid+='<line x1="'+pl+'" y1="'+yy.toFixed(1)+'" x2="'+(W-pr)+'" y2="'+yy.toFixed(1)+'" stroke="#243150" stroke-width="1"/>';
+      grid+='<text x="'+(pl-6)+'" y="'+(yy+4).toFixed(1)+'" fill="#5f7099" font-size="10" text-anchor="end">'+Math.round(v)+'</text>';
+    });
+    var xlab=['',''];
+    if(n>1){ xlab=['<text x="'+pl+'" y="'+(Hgt-8)+'" fill="#5f7099" font-size="10" text-anchor="start">'+dates[0].slice(5)+'</text>','<text x="'+(W-pr)+'" y="'+(Hgt-8)+'" fill="#5f7099" font-size="10" text-anchor="end">'+dates[n-1].slice(5)+'</text>']; }
+    var lines='';
+    top.forEach(function(s){
+      var pts=[];
+      s.series_cum.forEach(function(v,idx){ pts.push(xOf(idx).toFixed(1)+','+yOf(v).toFixed(1)); });
+      var op = (s.rank<=3)? 0.95 : 0.5;
+      var w = (s.rank<=3)? 2 : 1.2;
+      lines+='<polyline points="'+pts.join(' ')+'" fill="none" stroke="'+s.color+'" stroke-width="'+w+'" stroke-opacity="'+op+'"/>';
+    });
+    var chart='<svg viewBox="0 0 '+W+' '+Hgt+'" width="100%" preserveAspectRatio="xMidYMid meet" style="display:block;background:#0e1422;border-radius:8px;">'
+      + grid + lines + xlab[0] + xlab[1]
+      + '<line x1="'+pl+'" y1="'+yOf(0).toFixed(1)+'" x2="'+(W-pr)+'" y2="'+yOf(0).toFixed(1)+'" stroke="#5f7099" stroke-width="1" stroke-dasharray="3 3"/>'
+      + '</svg>';
+
+    // ── 紧凑矩阵：排名·赛道·20日累计·覆盖·近5日迷你柱 ──
+    var rows='';
+    top.forEach(function(s){
+      var color = (s.total>=0)? 'var(--up)' : 'var(--down)';
+      var last5 = s.series_net.slice(-5);
+      var mx = 1; last5.forEach(function(v){ if(Math.abs(v)>mx)mx=Math.abs(v); });
+      var bars = last5.map(function(v){
+        var hh = Math.max(2, Math.round(ih*0.22*Math.abs(v)/mx));
+        var bc = (v>0)? 'var(--up)' : (v<0? 'var(--down)' : '#5f7099');
+        return '<div style="width:7px;height:'+hh+'px;background:'+bc+';border-radius:1px;"></div>';
+      }).join('');
+      var cov = s.days;
+      var covTag = (cov<10)? ' <span style="color:var(--dim);font-size:10px;">('+cov+'d)</span>' : '';
+      rows+='<tr style="border-bottom:1px dashed #243150;">'
+        + '<td style="padding:5px 6px;color:var(--sub);text-align:center;width:26px;">'+s.rank+'</td>'
+        + '<td style="padding:5px 6px;"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:'+s.color+';margin-right:6px;"></span><span style="color:var(--txt);">'+s.name+'</span>'+covTag+'</td>'
+        + '<td style="padding:5px 6px;text-align:right;color:'+color+';font-weight:700;white-space:nowrap;">'+(s.total>=0?'+':'')+s.total.toFixed(1)+'</td>'
+        + '<td style="padding:5px 6px;"><div style="display:flex;align-items:flex-end;gap:2px;height:'+Math.round(ih*0.22)+'px;">'+bars+'</div></td>'
+        + '</tr>';
+    });
+    var tbl='<table style="width:100%;border-collapse:collapse;font-size:12.5px;margin-top:12px;">'
+      + '<thead><tr style="color:var(--sub);font-size:11px;border-bottom:1px solid #243150;">'
+      + '<th style="padding:4px 6px;text-align:center;">#</th><th style="padding:4px 6px;text-align:left;">赛道</th>'
+      + '<th style="padding:4px 6px;text-align:right;">20日累计(亿)</th><th style="padding:4px 6px;text-align:left;">近5日净流入</th></tr></thead>'
+      + '<tbody>'+rows+'</tbody></table>';
+
+    host.innerHTML = head + chart + tbl
+      + '<div style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.5;">近20交易日板块/概念每日主力净流入累计 · 折线按20日累计排序取 Top 10 · 覆盖天数(d)&lt;10 表示窗口内数据不全 · 近5日柱：红涨绿跌</div>'
+      + '</div>';
+  }
+  window.renderSectorFundTrackCard = renderSectorFundTrackCard;
+
   function renderUnlisted(){
     // 🛡 2026-08-20 一劳永逸加固（主人「新建 AI 预测空白 + v6 备忘录空白」）：
     //   1) $ 兜底：$ 是 IIFE 闭包变量，若因加载时序未就绪会 TypeError → 整页空白。
@@ -10699,6 +10737,8 @@ window.showRestrictedItems = showRestrictedItems;
 
     // ── pane1: 🚀 强势突破（3 卡：回测对比 + 动量共识 + H反推）──
     h+='<div class="ul-pane" id="ulPaneStrong" style="display:'+(_ulAct==='strong'?'block':'none')+'">';
+    // ── 2026-09-01 主人令：🔥 热门赛道资金追踪 容器（pane1 最底部原生卡）──
+    h+='<div id="ulSectorFundTrackPanel">加载中…</div>';
     // ── 2026-08-30 主人令：强势突破 = H反推 + 动量共识 + 回测对比 三卡并列；本页速读删（属调试/展示性内容，移至逻辑详解） ──
     // ── 📊 两套算法回测横向对比（2026-08-23 主人令：同一口径比胜率+收益率）──
     //   2026-08-27 主人令修正：本卡依赖 H反推 + 动量共识(强势突破) 双卡盘后数据齐备后才应出数据
@@ -10920,6 +10960,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 🛡 2026-08-19 主人令：render 调用（宏观+板块推荐）
     try{ if(typeof window.renderMarketRegimeCard==='function') window.renderMarketRegimeCard(); }catch(e){console.warn("宏观卡渲染失败",e);}
     try{ if(typeof window.renderSectorRecommendationCard==='function') window.renderSectorRecommendationCard(); }catch(e){console.warn("板块推荐卡渲染失败",e);}
+    try{ if(typeof window.renderSectorFundTrackCard==='function'){ var p=document.getElementById('ulSectorFundTrackPanel'); if(p) window.renderSectorFundTrackCard(p); } }catch(e){console.warn("热门赛道资金追踪卡渲染失败",e);}
   }
 
   /* ═══════════ 2026-08-19 主人令：2 张新卡 render 函数（宏观+板块推荐）══ 暂未上架·调试专区 ═══════════ */
