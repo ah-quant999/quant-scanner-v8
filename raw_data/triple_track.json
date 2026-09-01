@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-02 03:15:36",
+  "update_time": "2026-09-02 04:39:30",
   "data_date": "update_time",
   "track_start": "2026-08-17",
   "history_days": 12,
@@ -189,7 +189,7 @@
       "names": []
     },
     "cockpit_a": {
-      "count": 5,
+      "count": 3,
       "overlap": 0,
       "names": []
     },
@@ -335,9 +335,9 @@
         "avg_return": 3.56
       },
       "10d": {
-        "count": 1,
+        "count": 2,
         "win_rate": 100.0,
-        "avg_return": 19.02
+        "avg_return": 9.17
       },
       "20d": {
         "count": 0,
@@ -353,7 +353,8 @@
         "offsets": {
           "1d": 6.26,
           "3d": 6.26,
-          "5d": 6.26
+          "5d": 6.26,
+          "10d": 1.11
         }
       },
       {
@@ -404,7 +405,7 @@
         "enter_date": "2026-08-17",
         "offsets": {
           "1d": 0.0,
-          "10d": 19.02
+          "10d": 17.22
         }
       },
       {

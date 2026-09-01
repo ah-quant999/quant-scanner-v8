@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-09-02 03:53:53",
-  "run_start": "2026-09-02 02:32:10",
-  "ok": 38,
-  "fail": 7,
+  "update_time": "2026-09-02 05:16:23",
+  "run_start": "2026-09-02 03:57:04",
+  "ok": 37,
+  "fail": 8,
   "failed_scripts": [
     {
       "script": "calc_crds.py",
@@ -31,6 +31,10 @@
     {
       "script": "refresh_dividend_cninfo.py",
       "reason": "退出码 1 | KeyError: 'plan_date'"
+    },
+    {
+      "script": "auto_run_dn_algorithm.py",
+      "reason": "监督器静默杀(>15min 无输出)"
     },
     {
       "script": "final_recommend.py",
