@@ -207,8 +207,20 @@ def main():
         print("  🛡 退市归档护栏触发 —— 本轮放弃退市归档与列表提升：")
         for _m in _guard_hits:
             print(f"     ✗ {_m}")
-        print("     → raw_data/delisted_stocks.json 与 raw_data/stock_names.json 保持原样，")
-        print("       等下一轮全量列表抓取正常后再比对（避免把在市股票误判为退市）。")
+        print("     → raw_data/stock_names.json 保持原样，等下一轮全量列表抓取正常后再比对。")
+        # ⚠️ 一劳永逸：护栏触发时必须**主动清空**已被污染的累加文件 delisted_stocks.json。
+        #    仅「跳过写入」不够——历史误判已写进该文件（如 7935/2806 条在市蓝筹），它作为
+        #    累加源会永久存活、被 CI 的 build_delisted 反复重建上线。放空它，下一轮
+        #    build_delisted 才会产出 total:0，误判展示彻底消失。
+        try:
+            _old_n_bad = len(_load_json(DELISTED_FILE, []))
+        except Exception:
+            _old_n_bad = -1
+        if _old_n_bad > 0:
+            _save_json(DELISTED_FILE, [])
+            print(f"     🧹 已清空被污染的 delisted_stocks.json（原 {_old_n_bad} 条），毒库不再参与后续重建。")
+        else:
+            print("     ℹ️ delisted_stocks.json 当前已为空，无需清空。")
         delisted = []
         ipos = []
 

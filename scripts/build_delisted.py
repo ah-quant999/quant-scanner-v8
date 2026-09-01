@@ -59,6 +59,32 @@ def main():
 
     items.sort(key=lambda x: x.get("delisted_date", ""), reverse=True)
 
+    # 🛡 2026-09-01 下游合理性护栏（最后一道防线）：A股+港股历史累计退市真实量级 ≤ 300 只，
+    #    若源文件条目远超此值，必为 refresh_stock_metadata 全量差集误判的污染累加
+    #    （如 7935 / 2806 条在市蓝筹被错判退市）。此时**拒绝盲重建**，直接产出 total:0，
+    #    避免把毒库反复上线、前端「已下架」长期展示在市股票。根因清除请修 refresh_stock_metadata 护栏。
+    _SANE_MAX = 300
+    if len(items) > _SANE_MAX:
+        print(f"[WARN] delisted_stocks.json 共 {len(items)} 条 >> 合理上限 {_SANE_MAX}，"
+              f"判定为误判污染，本次不重建 DELISTED.js，改为输出 total:0 占位。", file=sys.stderr)
+        payload = {
+            "total": 0,
+            "recent": [],
+            "update_time": now_cst().strftime("%Y-%m-%d"),
+            "data_update": now_cst().strftime("%Y-%m-%d"),
+            "source": "raw_data/delisted_stocks.json",
+            "generated_at": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
+            "guard_note": f"build_delisted 合理性护栏触发：源 {len(items)} 条 > 上限 {_SANE_MAX}，疑似误判污染，已拒绝重建",
+        }
+        OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with OUT_PATH.open("w", encoding="utf-8") as f:
+            f.write(f"/* data/DELISTED.js — 已下架股票目录（{payload['generated_at']} 由 scripts/build_delisted.py 重建，护栏拦截） */\n")
+            f.write("window.DELISTED_STOCKS = ")
+            json.dump(payload, f, ensure_ascii=False, separators=(",", ":"))
+            f.write(";\n")
+        print(f"[OK] {OUT_PATH} | total=0（护栏拦截，未重建污染数据）")
+        sys.exit(0)
+
     today = now_cst().strftime("%Y-%m-%d")
     now_hms = now_cst().strftime("%Y-%m-%d %H:%M:%S")
     data_update = items[0].get("delisted_date", today) if items else today
