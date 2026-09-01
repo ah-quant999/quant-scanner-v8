@@ -1,5 +1,5 @@
 {
-  "calc_time": "2026-09-01 09:23:10",
+  "calc_time": "2026-09-01 10:32:34",
   "method": "baostock 真实K线滚动回测 · 统一止损止盈（低点/ATR×2/固定% 取最严，止盈前高/0.618/R:R=2 cascade）",
   "stop_target_rule": {
     "stop": "max(近20日低点, close-2×ATR14, close×固定%)",
@@ -21635,5 +21635,5 @@
       ]
     }
   ],
-  "update_time": "2026-09-01 09:23:10"
+  "update_time": "2026-09-01 10:32:34"
 }
