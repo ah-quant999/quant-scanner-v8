@@ -993,13 +993,12 @@ def _fetch_overseas_indices():
     ]
     by_code = {}
     try:
-        r = _requests.get(
+        j = _em_get_with_retry(
             f"{_EM_DELAY}/api/qt/ulist.np/get",
             params={"fltt": "2", "invt": "2", "ut": "b2884a393a59ad64002292a3e90d46a5",
                     "fields": "f12,f14,f2,f3",
                     "secids": ",".join(s for s, _, _ in sec_map)},
-            headers=_EM_HEADERS, timeout=15)
-        j = r.json()
+            headers=_EM_HEADERS, timeout=15, label="海外指数")
         rows = (j.get("data", {}) or {}).get("diff") or []
         by_code = {x.get("f12"): x for x in rows if x.get("f12")}
     except Exception as e:
@@ -1893,7 +1892,7 @@ def f_herding_data():
     }
 
 def f_limit_up_heatmap():
-    # 涨停热力图：近10个交易日板块涨停家数日历时序（v6风格）。
+    # 涨停热力图：近15个交易日板块涨停家数日历时序（v6风格）。
     # 复用 fetch_limit_up_heatmap_v8.generate() 做重建/增量。
     try:
         import fetch_limit_up_heatmap_v8 as hm
@@ -1926,7 +1925,7 @@ def f_limit_up_heatmap():
             result["total"] = int(len(df))
         except Exception:
             pass
-        result["note"] = "东方财富涨停池（真实），近10日板块涨停家数"
+        result["note"] = "东方财富涨停池（真实），近15日板块涨停家数"
         return result
     except Exception as e:
         print(f"  ⚠️ 涨停热力图失败: {e}")
@@ -3149,7 +3148,7 @@ def _clear_intraday_for_premarket(category, only=None):
         "baseline_source": "remote_main" if remote_baseline else "local",
     })
 
-    # LIMIT_UP_HEATMAP：保留近10日历史列，再追加今日占位列（开盘后首次 fetch 会替换为真实数据）
+    # LIMIT_UP_HEATMAP：保留近15日历史列，再追加今日占位列（开盘后首次 fetch 会替换为真实数据）
     data = _load_judgment_raw("LIMIT_UP_HEATMAP", VAR_TO_RAW.get("LIMIT_UP_HEATMAP")) or {}
     sectors = data.get("sectors") or []
     dates = data.get("dates") or []
