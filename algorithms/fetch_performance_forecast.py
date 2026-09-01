@@ -44,6 +44,51 @@ def _parse_change_pct(s):
     return float(m.group(1))
 
 
+def _type_to_key(t):
+    """预告类型 -> 汇总计数键。"""
+    t = str(t)
+    if "预增" in t or "略增" in t:
+        return "increase"
+    elif "预减" in t or "略减" in t:
+        return "decrease"
+    elif "预亏" in t or "首亏" in t or "续亏" in t:
+        return "loss"
+    else:
+        return "uncertain"
+
+
+def _dedup_by_code(items):
+    """同一股票可能因多个预测指标（归母净利润/扣非/营收）出现多条预告，
+    去重保留 change_pct 绝对值最大的一条，避免前端重复展示。
+    保持原列表首次出现顺序。
+    """
+    best = {}
+    for it in items:
+        code = it.get("code")
+        if not code:
+            continue
+        old = best.get(code)
+        if old is None:
+            best[code] = it
+        else:
+            old_v = old.get("change_pct")
+            new_v = it.get("change_pct")
+            old_abs = abs(old_v) if old_v is not None else -1
+            new_abs = abs(new_v) if new_v is not None else -1
+            if new_abs > old_abs:
+                best[code] = it
+    seen = set()
+    out = []
+    for it in items:
+        code = it.get("code")
+        if not code or code in seen:
+            continue
+        if best.get(code) is it:
+            out.append(it)
+            seen.add(code)
+    return out
+
+
 def fetch_performance_forecast():
     date = _current_report_date()
     out = {"update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "report_date": date, "items": [], "summary": {}}
@@ -60,11 +105,9 @@ def fetch_performance_forecast():
             "预告类型": "type",
             "公告日期": "notice_date",
         })
-        summary = {"increase": 0, "decrease": 0, "loss": 0, "uncertain": 0, "total": 0}
         # 2026-08-30：新增「今日口径」——按公告日期（notice_date）筛当日新发布的预告，
         #   供「今日事件」页「今日业绩预告」卡使用；summary 仍是全报告期累计，两者不混用。
         today_str = datetime.now().strftime("%Y-%m-%d")
-        today_summary = {"increase": 0, "decrease": 0, "loss": 0, "uncertain": 0, "total": 0}
         items = []
         today_items = []
         date_count = {}
@@ -72,18 +115,6 @@ def fetch_performance_forecast():
             t = str(r.get("type", ""))
             pct = _parse_change_pct(r.get("change_pct_str"))
             nd = str(r.get("notice_date", ""))[:10]
-            summary["total"] += 1
-            if "预增" in t or "略增" in t:
-                key = "increase"
-            elif "预减" in t or "略减" in t:
-                key = "decrease"
-            elif "预亏" in t or "首亏" in t or "续亏" in t:
-                key = "loss"
-            else:
-                key = "uncertain"
-            summary[key] += 1
-            if nd:
-                date_count[nd] = date_count.get(nd, 0) + 1
             rec = {
                 "code": str(r.get("code", "")),
                 "name": str(r.get("name", "")),
@@ -93,10 +124,20 @@ def fetch_performance_forecast():
                 "notice_date": str(r.get("notice_date", "")),
             }
             items.append(rec)
+            if nd:
+                date_count[nd] = date_count.get(nd, 0) + 1
             if nd == today_str:
-                today_summary["total"] += 1
-                today_summary[key] += 1
                 today_items.append(rec)
+        # 2026-09-01 主人令：同一股票因多个预测指标会出现多条预告，去重保留 change_pct 绝对值最大的一条，
+        #   并基于去重后结果重新计算 summary / today_summary，避免前端重复展示。
+        items = _dedup_by_code(items)
+        today_items = _dedup_by_code(today_items)
+        summary = {"increase": 0, "decrease": 0, "loss": 0, "uncertain": 0, "total": len(items)}
+        today_summary = {"increase": 0, "decrease": 0, "loss": 0, "uncertain": 0, "total": len(today_items)}
+        for rec in items:
+            summary[_type_to_key(rec["type"])] += 1
+        for rec in today_items:
+            today_summary[_type_to_key(rec["type"])] += 1
         # 按预增幅度排序，取前 15（全报告期 TOP，供盘后「业绩预告」汇总卡）
         items.sort(key=lambda x: (x.get("change_pct") if x.get("change_pct") is not None else -99999), reverse=True)
         today_items.sort(key=lambda x: (x.get("change_pct") if x.get("change_pct") is not None else -99999), reverse=True)
