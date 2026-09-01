@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
 fetch_limit_up_heatmap.py — 涨停热力矩阵数据采集
-- 每日获取涨停股票 → 按概念板块归类统计 → 构建10日热力矩阵
+- 每日获取涨停股票 → 按概念板块归类统计 → 构建30日热力矩阵
 - 输出 data/limit_up_heatmap.json
 - 数据源：akshare stock_zt_pool_strong_em（强势涨停池）
-- 支持全量重建（检测到脏数据时自动拉取近10日重建）
+- 支持全量重建（检测到脏数据时自动拉取近30日重建）
 """
 import json
 import os
@@ -235,12 +235,12 @@ def build_heatmap(days_data):
 
 
 def _check_dates_integrity(existing_dates):
-    """检查已有日期序列是否完整覆盖最近10个交易日，防止丢列/错列。"""
-    if not existing_dates or len(existing_dates) < 10:
-        return False, f"日期不足10列 ({len(existing_dates)})"
+    """检查已有日期序列是否完整覆盖最近30个交易日，防止丢列/错列。"""
+    if not existing_dates or len(existing_dates) < 30:
+        return False, f"日期不足30列 ({len(existing_dates)})"
     if len(existing_dates) != len(set(existing_dates)):
         return False, "存在重复日期"
-    expected = get_trade_dates(10)
+    expected = get_trade_dates(30)
     expected_labels = {datetime.strptime(d, "%Y%m%d").strftime("%m/%d") for d in expected}
     actual_set = set(existing_dates)
     missing = expected_labels - actual_set
@@ -248,7 +248,7 @@ def _check_dates_integrity(existing_dates):
     if missing:
         return False, f"缺失交易日 {sorted(missing)}"
     if extra:
-        return False, f"包含非最近10日日期 {sorted(extra)}"
+        return False, f"包含非最近30日日期 {sorted(extra)}"
     return True, "OK"
 
 
@@ -265,7 +265,7 @@ def needs_rebuild(existing):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--rebuild", action="store_true", help="强制全量重建近10个交易日")
+    parser.add_argument("--rebuild", action="store_true", help="强制全量重建近30个交易日")
     args = parser.parse_args()
 
     print("=" * 60)
@@ -293,8 +293,8 @@ def main():
             need_rebuild = True
 
     if need_rebuild:
-        # ── 全量重建：拉取近10个交易日 ──
-        trade_dates = get_trade_dates(10)
+        # ── 全量重建：拉取近30个交易日 ──
+        trade_dates = get_trade_dates(30)
         print(f"  📅 拉取 {len(trade_dates)} 个交易日数据...")
 
         days_data = []
@@ -371,8 +371,8 @@ def main():
             idx = len(ed) - 1 - ed[::-1].index(today_str)
             new_dates = ed[:idx] + [today_str] + ed[idx + 1:]
         else:
-            new_dates = (ed[-9:] + [today_str]) if len(ed) >= 9 else (ed + [today_str])
-        new_dates = new_dates[-10:]
+            new_dates = (ed[-29:] + [today_str]) if len(ed) >= 29 else (ed + [today_str])
+        new_dates = new_dates[-30:]
 
         # 用「日期→板块→数值」映射做精确对齐，避免丢列/错位
         old_by_date = {}
@@ -430,7 +430,7 @@ def generate():
             need_rebuild = True
 
     if need_rebuild:
-        trade_dates = get_trade_dates(10)
+        trade_dates = get_trade_dates(30)
         days_data = []
         for td in trade_dates:
             dt_obj = datetime.strptime(td, "%Y%m%d")
@@ -486,8 +486,8 @@ def generate():
             idx = len(ed) - 1 - ed[::-1].index(today_str)
             new_dates = ed[:idx] + [today_str] + ed[idx + 1:]
         else:
-            new_dates = (ed[-9:] + [today_str]) if len(ed) >= 9 else (ed + [today_str])
-        new_dates = new_dates[-10:]
+            new_dates = (ed[-29:] + [today_str]) if len(ed) >= 29 else (ed + [today_str])
+        new_dates = new_dates[-30:]
         old_by_date = {}
         for i, dd in enumerate(existing_dates):
             old_by_date[dd] = {
