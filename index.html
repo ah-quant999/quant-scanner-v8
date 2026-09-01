@@ -4168,6 +4168,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           if(typeof window.__renderBacktestSection === 'function') window.__renderBacktestSection();
         } catch(e) { console.warn('removeStock fail', e); }
       };
+      window.__restoreStock = function(code){
+        try {
+          var m = _loadRemovedMap();
+          delete m[code];
+          localStorage.setItem('v8_pool_removed', JSON.stringify(m));
+          window.__renderLifecycleSection();
+          if(typeof window.__renderBacktestSection === 'function') window.__renderBacktestSection();
+        } catch(e) { console.warn('restoreStock fail', e); }
+      };
+
       /* ─── 头部 ─── */
       var _upd = (pt && pt.update_time) || '';
       html += '<div style="margin:14px 0;" class="card">';
