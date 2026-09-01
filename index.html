@@ -9593,12 +9593,14 @@ window.showRestrictedItems = showRestrictedItems;
       var _isPre = _nowParts && (_nowParts.hh < 9 || (_nowParts.hh === 9 && _nowParts.mm < 30));
       slotEl.textContent = _isPre ? '上游水源 · 盘前' : '上游水源 · 盘后';
     }
-    // 来源级分布（紧凑行，始终可见；尾部带展开/折叠按钮）
+    // 来源级分布（紧凑行，始终可见；点击来源标签可直接筛选该来源，尾部带展开/折叠按钮）
     const sdEl = $('stPoolSourceDist');
+    const listEl = $('stPoolStockList');
+    const activeFilter = window._stPoolFilterSource || null;
+    const isExpanded = sdEl && sdEl.dataset.expanded === '1';
     if(sdEl){
       const order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投'];
       const expect = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50};
-      const isExpanded = sdEl.dataset.expanded === '1';
       let html = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:4px 0 10px;font-size:12px;">';
       order.forEach(function(s){
         const cnt = sd[s]||0;
@@ -9611,23 +9613,33 @@ window.showRestrictedItems = showRestrictedItems;
         } else if(exp && cnt < exp * 0.8){ color = '#f59e0b'; icon = '⚠'; }
         else { color = '#22c55e'; icon = '✓'; }
         const label = s.replace(/成交前\d+|研报/,'');
-        html += '<span title="'+s+'：'+cnt+'只'+(exp?'(期望≥'+exp+')':'')+tip+'" style="background:'+color+'15;color:'+color+';border:1px solid '+color+'30;border-radius:4px;padding:2px 7px;white-space:nowrap">'+icon+' '+label+' '+cnt+'</span>';
+        const isActive = activeFilter === s;
+        const bg = isActive ? color : (color+'15');
+        const fg = isActive ? '#fff' : color;
+        const ring = isActive ? ('2px solid '+color) : ('1px solid '+color+'30');
+        html += '<span onclick="window.filterStPoolBySource(\''+s+'\')" title="点击只看 '+s+'" style="cursor:pointer;background:'+bg+';color:'+fg+';border:'+ring+';border-radius:4px;padding:2px 7px;white-space:nowrap;transition:.15s;">'+icon+' '+label+' '+cnt+'</span>';
       });
       html += '<span style="color:var(--dim);margin-left:auto;align-self:center;margin-right:8px;">共 <b style="color:var(--txt)">'+total+'</b> 只</span>';
       html += '<button id="stPoolToggleBtn" onclick="window.toggleStPoolDetail()" style="background:var(--cyan);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;">'+(isExpanded?'▴ 收起明细':'▾ 展开明细')+'</button>';
       html += '</div>';
       sdEl.innerHTML = html;
     }
-    // 个股明细（默认隐藏，点击展开）—— 按来源分组展示
-    const listEl = $('stPoolStockList');
+    // 个股明细（默认隐藏；点击来源标签后仅展示该来源股票）
     if(listEl){
       const keys = Object.keys(stocks);
       if(keys.length === 0){
         listEl.innerHTML = '<div class="note" style="text-align:center;">候选股池数据暂不可用</div>';
       } else {
         const order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投'];
+        const sourcesToShow = activeFilter ? [activeFilter] : order;
         let html = '<div style="margin-top:8px;">';
-        order.forEach(function(src){
+        if(activeFilter){
+          html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;">';
+          html += '<span style="color:var(--sub);">当前筛选：<b style="color:var(--txt);">'+activeFilter.replace(/成交前\d+|研报/,'')+'</b></span>';
+          html += '<button onclick="window.filterStPoolBySource(null)" style="background:transparent;color:var(--cyan);border:1px solid var(--cyan);border-radius:4px;padding:1px 7px;font-size:11px;cursor:pointer;">清除筛选</button>';
+          html += '</div>';
+        }
+        sourcesToShow.forEach(function(src){
           const srcStocks = Object.values(stocks).filter(function(s){ return s && s.sources && s.sources.indexOf(src) >= 0; });
           if(!srcStocks.length) return;
           html += '<div style="margin-bottom:12px;">';
@@ -9652,15 +9664,44 @@ window.showRestrictedItems = showRestrictedItems;
     }
   }
   window.renderStPool = renderStPool;
+  window.filterStPoolBySource = function(src){
+    const sdEl = document.getElementById('stPoolSourceDist');
+    const listEl = document.getElementById('stPoolStockList');
+    if(!sdEl || !listEl) return;
+    const prev = window._stPoolFilterSource || null;
+    // 点击已激活的筛选 = 清除
+    window._stPoolFilterSource = (src && src !== prev) ? src : null;
+    const expandedNow = listEl.style.display !== 'none';
+    if(window._stPoolFilterSource){
+      // 筛选某来源：强制展开
+      listEl.style.display = 'block';
+      sdEl.dataset.expanded = '1';
+    } else if(prev){
+      // 从筛选态清除：保持展开（方便看全部），若用户想收可点按钮
+      listEl.style.display = 'block';
+      sdEl.dataset.expanded = '1';
+    } else {
+      // 无筛选时按原按钮行为切换
+      listEl.style.display = expandedNow ? 'none' : 'block';
+      sdEl.dataset.expanded = expandedNow ? '0' : '1';
+    }
+    window.renderStPool();
+  };
   window.toggleStPoolDetail = function(){
     const sdEl = document.getElementById('stPoolSourceDist');
     const listEl = document.getElementById('stPoolStockList');
     if(!sdEl || !listEl) return;
     const expanded = listEl.style.display !== 'none';
-    listEl.style.display = expanded ? 'none' : 'block';
-    sdEl.dataset.expanded = expanded ? '0' : '1';
-    const btn = document.getElementById('stPoolToggleBtn');
-    if(btn) btn.textContent = expanded ? '▾ 展开明细' : '▴ 收起明细';
+    if(window._stPoolFilterSource){
+      // 展开/折叠按钮在筛选态下 = 清除筛选并折叠
+      window._stPoolFilterSource = null;
+      listEl.style.display = 'none';
+      sdEl.dataset.expanded = '0';
+    } else {
+      listEl.style.display = expanded ? 'none' : 'block';
+      sdEl.dataset.expanded = expanded ? '0' : '1';
+    }
+    window.renderStPool();
   };
   function initTriple(){
     const c=window.TRIPLE_CONSENSUS||null, t=window.TRIPLE_TRACK||null, h=window.TRIPLE_HISTORY||null;
