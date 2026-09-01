@@ -10656,6 +10656,79 @@ window.showRestrictedItems = showRestrictedItems;
   }
   window.renderSectorFundTrackCard = renderSectorFundTrackCard;
 
+  /* ═══════════ 2026-09-02 主人令加回：调试专区 2 张新卡 render 函数（宏观+板块推荐）══ 暂未上架 ═══════════ */
+  /* ---- 🌍 宏观环境（MACRO + MARKET_REGIME 融合）---- */
+  function renderMarketRegimeCard(){
+    var host = document.getElementById('ulMacroPanel');
+    if(!host) return;
+    var reg = window.MARKET_REGIME || {};
+    var cur = reg.current_rates || {}, tr = reg.trends || {}, regime = reg.regime || {};
+    var fm = reg.framework_match || '';
+    if(!cur.cn_10y && !cur.us_10y){
+      host.innerHTML = '<div class="note" style="padding:14px;text-align:center;">宏观数据暂不可用</div>';
+      return;
+    }
+    var h = '<div class="card" style="margin-bottom:16px;border-left:4px solid #fbbf24;">';
+    h += '<h3 style="font-size:14px;color:var(--txt);font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">';
+    h += '🌍 宏观环境 <span style="font-size:11px;color:var(--dim);font-weight:400;">国债 + LPR + 银行间 · 利率上行期板块推荐框架配套</span>';
+    h += '</h3>';
+    h += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px;">';
+    var cnT = tr.cn_20d && tr.cn_20d.bp; var usT = tr.us_20d && tr.us_20d.bp;
+    var cnCol = cnT>5?'var(--up)':cnT<-5?'var(--down)':'#f59e0b';
+    var usCol = usT>5?'var(--up)':usT<-5?'var(--down)':'#f59e0b';
+    h += '<div style="background:var(--bg2);border-radius:8px;padding:12px;"><div style="font-size:11px;color:var(--sub);">🇨🇳 中国10Y</div><div style="font-size:24px;font-weight:800;color:var(--txt);margin:4px 0;">'+(cur.cn_10y||'-')+'%</div><div style="font-size:11px;color:'+cnCol+';">20日 '+(tr.cn_20d&&tr.cn_20d.label||'-')+' ('+(cnT!==undefined?(cnT>0?'+':'')+cnT.toFixed(1):'-')+'bp)</div></div>';
+    h += '<div style="background:var(--bg2);border-radius:8px;padding:12px;"><div style="font-size:11px;color:var(--sub);">🇺🇸 美国10Y</div><div style="font-size:24px;font-weight:800;color:var(--txt);margin:4px 0;">'+(cur.us_10y||'-')+'%</div><div style="font-size:11px;color:'+usCol+';">20日 '+(tr.us_20d&&tr.us_20d.label||'-')+' ('+(usT!==undefined?(usT>0?'+':'')+usT.toFixed(1):'-')+'bp)</div></div>';
+    h += '</div>';
+    h += '<div style="display:flex;gap:8px;margin-bottom:10px;font-size:11px;color:var(--sub);">';
+    h += '<span>🇨🇳 LPR 1Y <b style="color:var(--txt);">'+(cur.lpr_1y||'-')+'%</b></span>';
+    h += '<span>LPR 5Y <b style="color:var(--txt);">'+(cur.lpr_5y||'-')+'%</b></span>';
+    h += '<span>LPR立场 <b style="color:var(--txt);">'+(tr.lpr_stance||'-')+'</b></span>';
+    h += '</div>';
+    h += '<div style="background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);border-radius:8px;padding:10px 12px;margin-bottom:8px;">';
+    h += '<div style="font-size:11px;color:#fbbf24;font-weight:700;margin-bottom:4px;">综合判定</div>';
+    h += '<div style="font-size:18px;font-weight:800;color:var(--txt);">'+(regime.label||'-')+' <span style="font-size:12px;font-weight:400;color:var(--sub);">（置信：'+(regime.confidence||'-')+'）</span></div>';
+    h += '<div style="font-size:11px;color:var(--sub);margin-top:4px;">'+fm+'</div>';
+    h += '</div>';
+    h += '<div style="font-size:10px;color:var(--dim);">⚠️ 利率与板块映射是经验关系，非因果；回测胜率 55-65% 上限</div>';
+    h += '</div>';
+    host.innerHTML = h;
+  }
+
+  /* ---- 🌐 板块推荐（利率上行期框架）---- */
+  function renderSectorRecommendationCard(){
+    var host = document.getElementById('ulSecPanel');
+    if(!host) return;
+    var d = window.SECTOR_RECOMMENDATION || {};
+    var recs = d.recommendations || [];
+    if(!recs.length){
+      host.innerHTML = '<div class="note" style="padding:14px;text-align:center;">板块推荐数据暂不可用</div>';
+      return;
+    }
+    var h = '<div class="card" style="margin-bottom:16px;border-left:4px solid #a78bfa;">';
+    h += '<h3 style="font-size:14px;color:var(--txt);font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">';
+    h += '🌐 板块推荐 <span style="font-size:11px;color:var(--dim);font-weight:400;">利率上行期框架（主人 8/19 拍板）</span>';
+    h += '<span style="font-size:10px;color:var(--dim);margin-left:auto;">'+(d.meta&&d.meta.regime_label||'')+'</span>';
+    h += '</h3>';
+    h += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+    h += '<thead><tr style="border-bottom:1px solid var(--border);color:var(--dim);"><th style="text-align:left;padding:6px 4px;">优先级</th><th style="text-align:left;">板块</th><th style="text-align:left;">分组</th><th style="text-align:right;">5d</th><th style="text-align:right;">资金(亿)</th><th style="text-align:left;padding-left:8px;">信号</th></tr></thead><tbody>';
+    for(var i=0;i<recs.length;i++){
+      var r = recs[i];
+      var bg = r.priority<0 ? 'rgba(239,83,80,.06)' : (r.action==='🔥 跟随' ? 'rgba(239,83,80,.12)' : (r.action==='⏸️ 观望(已涨过)' ? 'rgba(148,163,184,.06)' : 'transparent'));
+      h += '<tr style="background:'+bg+';border-bottom:1px solid var(--border);">';
+      h += '<td style="padding:6px 4px;color:'+(r.priority<0?'#ef5350':'var(--txt)')+';font-weight:600;">'+(r.priority<0?'⚠️ P-1':'P'+r.priority)+'</td>';
+      h += '<td style="font-weight:600;color:var(--txt);">'+r.sector+'</td>';
+      h += '<td style="color:var(--sub);font-size:11px;">'+r.group+'</td>';
+      h += '<td style="text-align:right;color:'+(r.pct_5d>0?'var(--up)':r.pct_5d<0?'var(--down)':'var(--sub)')+';">'+(r.pct_5d!==null?(r.pct_5d>0?'+':'')+r.pct_5d.toFixed(1)+'%':'-')+'</td>';
+      h += '<td style="text-align:right;color:'+(r.net_inflow_yi>0?'var(--up)':r.net_inflow_yi<0?'var(--down)':'var(--sub)')+';">'+(r.net_inflow_yi!==null?(r.net_inflow_yi>0?'+':'')+r.net_inflow_yi.toFixed(1):'-')+'</td>';
+      h += '<td style="padding-left:8px;font-size:11px;color:var(--sub);">'+r.action+(r.flags.length?' · '+r.flags.join(' · '):'')+'</td>';
+      h += '</tr>';
+    }
+    h += '</tbody></table>';
+    h += '<div style="font-size:10px;color:var(--dim);margin-top:8px;">⚠️ 板块轮动回测胜率 55-65% 上限。框架推荐独立于当前 regime，主人自行判断是否采纳</div>';
+    h += '</div>';
+    host.innerHTML = h;
+  }
+
   function renderUnlisted(){
     // 🛡 2026-08-20 一劳永逸加固（主人「新建 AI 预测空白 + v6 备忘录空白」）：
     //   1) $ 兜底：$ 是 IIFE 闭包变量，若因加载时序未就绪会 TypeError → 整页空白。
@@ -10669,13 +10742,14 @@ window.showRestrictedItems = showRestrictedItems;
         var p=document.getElementById('unlistedPanel');
         if(!p) return;
         if(!p.innerHTML || p.innerHTML.length<600 || p.innerHTML.indexOf('ulSectorFundTrackPanel')<0){
-        if(typeof window.renderUnlisted==='function'){
-          console.log('[ulSelfHeal] retry renderUnlisted len='+(p.innerHTML||'').length);
-          try{ window.renderUnlisted(); }catch(e){ console.warn('[ulSelfHeal] rethrow:',e.message); }
+          if(typeof window.renderUnlisted==='function'){
+            console.log('[ulSelfHeal] retry renderUnlisted len='+(p.innerHTML||'').length);
+            try{ window.renderUnlisted(); }catch(e){ console.warn('[ulSelfHeal] rethrow:',e.message); }
+          }
+        } else { /* 已渲染成功，停止轮询 */
+          clearInterval(window.__ulSelfHealTimer); window.__ulSelfHealTimer=null;
         }
-      } else { /* 已渲染成功，停止轮询 */
-        clearInterval(window.__ulSelfHealTimer); window.__ulSelfHealTimer=null;
-      }
+      },1500);
     }
     // 🚀 自愈：构建/reconcile 偶发把静态 head 标签冲掉 → 动态注入兜底，避免卡片显示「数据不可用」
     if(!window.STOCK_MOMENTUM_STATE && !el.dataset.smsFailed){
@@ -10743,11 +10817,14 @@ window.showRestrictedItems = showRestrictedItems;
     // 2026-08-18 主人令：ETF·龙头参考 已迁入「暂未上架 > 调试专区」，此处不再重复渲染
 
     // ═══ 2026-09-01 主人令：暂未上架瘦身为「只保留热门赛道资金追踪（新卡）」
-    //   强势突破 3 卡（两套算法回测对比 / 动量共识 / H反推短线买点）
-    //   + 上轮误加的 ulMacroPanel / ulSecPanel 全部清出。
+    //   强势突破 3 卡（两套算法回测对比 / 动量共识 / H反推短线买点）→ 已下沉至「已下架」。
+    //   2026-09-02 主人令恢复：调试专区 3 卡（宏观+板块推荐）加回——见 ulMacroPanel / ulSecPanel。
     //   「两套算法回测对比」已抽 window.__renderAlgoBacktestCompare，下沉至「已下架·大牛股猎手回测卡下方」。
     //   「动量共识 / H反推」属调试展示性，移至逻辑详解（不在前台卡片列表）。
     h += '<div id="ulSectorFundTrackPanel">加载中…</div>';
+    // 🛡 2026-09-02 主人令"加回！"：调试专区 3 卡容器（宏观+板块推荐）
+    h+='<div id="ulMacroPanel"></div>';
+    h+='<div id="ulSecPanel"></div>';
     // ── 2026-08-29 主人令：🤖 AI 预测 子页面已删除（卡并入调试专区，见 P3 插入段），pane2 此处不再渲染 ──
 
     // ── 2026-08-29 主人令：🔮 潜力挖掘 子页面已删除（卡并入调试专区，见 P3 插入段），pane3 此处不再渲染 ──
@@ -10766,8 +10843,9 @@ window.showRestrictedItems = showRestrictedItems;
     //   return/抛错则永不自愈 → 4 admin 页空白无人救。
     try{ if(typeof window.renderUnlisted==='function' && document.getElementById('unlistedPanel') && document.getElementById('unlistedPanel').innerHTML.length<1000) window.renderUnlisted(); }catch(e){}
     // 2026-09-01 主人令：AI预测/潜力挖掘/ETF·龙头参考三卡已删除，相关 fill 调用移除。
-    // 🛡 2026-08-19 主人令：render 调用（宏观+板块推荐）
-    // 2026-09-01 主人令：宏观 + 板块推荐卡已退出暂未上架（详见上方注释）
+    // 🛡 2026-09-02 主人令"加回！"：调试专区 3 卡（宏观+板块推荐）渲染调用（22:55 误删恢复）
+    try{ if(typeof window.renderMarketRegimeCard==='function') window.renderMarketRegimeCard(); }catch(e){console.warn("宏观卡渲染失败",e);}
+    try{ if(typeof window.renderSectorRecommendationCard==='function') window.renderSectorRecommendationCard(); }catch(e){console.warn("板块推荐卡渲染失败",e);}
     try{ if(typeof window.renderSectorFundTrackCard==='function'){ var p=document.getElementById('ulSectorFundTrackPanel'); if(p) window.renderSectorFundTrackCard(p); } }catch(e){console.warn("热门赛道资金追踪卡渲染失败",e);}
   }
 
@@ -12414,6 +12492,9 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
   // 🛡 2026-08-19 阿狸咪根治空白bug：整个 JS 在 IIFE 内，render 函数必须显式挂 window
   //   否则 try/catch 中 `typeof window.renderXxx` 恒为 undefined → 容器永远空 → 「啥都没有」
   //   2026-09-01：市场路径概率 / AI 预测相关渲染函数已随三卡删除，不再挂载。
+  //   2026-09-02 主人令加回：调试专区 3 卡（宏观+板块推荐）挂载（22:55 误删恢复，主人今日明示加回）
+  window.renderMarketRegimeCard = renderMarketRegimeCard;
+  window.renderSectorRecommendationCard = renderSectorRecommendationCard;
 
   // 🛡 2026-08-18 07:02 主人令修复：+N more 真按钮 onclick 全局函数（避开 HTML 属性嵌套引号问题）
   window.__v8ToggleCatMore = function(btn){
