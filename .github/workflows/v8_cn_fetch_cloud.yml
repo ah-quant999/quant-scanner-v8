@@ -231,6 +231,19 @@ jobs:
           echo "本次类别: $cat"
           python cloud_fetch_v8.py --category "$cat"
 
+      # 2026-09-01 主人令：#7 分红刷新上云（小九机降级为监督/应急兜底）。
+      # 直接跑 refresh_dividend_cninfo（cninfo 源），写回 raw_data/stock_quote.json 并重建
+      # data/STOCK_QUOTE.js；随后本 workflow 的「📤 推送 raw_data/」与「📤 推送重建 data/*.js」
+      # 两步经 api_push_raw(Contents API) 自动上线——不再走 run_dividend_refresh.py 的本地 SSH 自推
+      # （云端 runner 无 SSH 凭据，自推会失败）。cninfo 为境内源，云端偶发超时则 continue-on-error 跳过，
+      # 由小九机「分红刷新」监督 automation 检测后作为应急兜底本地补跑。
+      - name: "💰 分红方案刷新（cninfo·云端主跑）"
+        if: steps.cat.outputs.category == 'premarket' || steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
+        continue-on-error: true
+        shell: bash
+        run: |
+          python algorithms/refresh_dividend_cninfo.py
+
       # 2026-08-31 主人令：ETF_SUBSCRIPTION_EM 硬缺口修复（原产出脚本无任何 workflow 引用）
       # 每个交易日盘前/盘后各抓一次即可（T+1 数据，akshare fund_etf_fund_info_em）。
       # 仅生成 raw_data/etf_subscription_em.json，后续 update_v8 会映射为 data/ETF_SUBSCRIPTION_EM.js。
