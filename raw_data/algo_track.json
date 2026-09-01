@@ -1,16 +1,16 @@
 {
-  "update_time": "2026-09-02 04:51",
+  "update_time": "2026-09-02 04:49",
   "window_days": 90,
   "total_stats": {
     "four_volume": {
-      "tracking": 50,
+      "tracking": 52,
       "history_samples": 0,
       "win_rate": 0,
       "avg_return": 0,
       "exit_target": 0,
       "exit_stop": 0,
       "exit_timeout": 0,
-      "today_signals": 11
+      "today_signals": 3
     },
     "sector_lead": {
       "tracking": 20,
@@ -38,14 +38,14 @@
       "algo": "four_volume",
       "display_name": "四量终极",
       "stats": {
-        "tracking": 50,
+        "tracking": 52,
         "history_samples": 0,
         "win_rate": 0,
         "avg_return": 0,
         "exit_target": 0,
         "exit_stop": 0,
         "exit_timeout": 0,
-        "today_signals": 11
+        "today_signals": 3
       },
       "tracking": [
         {
@@ -996,6 +996,44 @@
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
             "pct_chg": 7.37
+          }
+        },
+        {
+          "code": "688297",
+          "name": "中无人机",
+          "algo": "four_volume",
+          "list_date": "20260902",
+          "list_date_dashed": "2026-09-02",
+          "entry_price": 42.41,
+          "last_close": 42.41,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260902",
+          "signal_detail": {
+            "period": "60m",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 散户金叉 + 主力金叉",
+            "pct_chg": 10.1
+          }
+        },
+        {
+          "code": "000425",
+          "name": "敏实集团",
+          "algo": "four_volume",
+          "list_date": "20260902",
+          "list_date_dashed": "2026-09-02",
+          "entry_price": 8.27,
+          "last_close": 8.27,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260902",
+          "signal_detail": {
+            "period": "60m",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+            "pct_chg": 5.48
           }
         }
       ],

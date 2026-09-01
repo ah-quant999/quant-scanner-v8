@@ -1,21 +1,21 @@
 {
-  "update_time": "2026-09-02 05:16:24",
-  "pool_size": 128,
-  "raw_pool_size": 134,
-  "selected_size": 14,
+  "update_time": "2026-09-02 05:18:04",
+  "pool_size": 130,
+  "raw_pool_size": 136,
+  "selected_size": 21,
   "consensus_count": 5,
   "status_counts": {
     "normal": 9,
-    "weak": 56,
+    "weak": 58,
     "buy_dip": 12,
     "strong": 45,
     "topped": 6
   },
   "by_algo": {
     "四量终极": {
-      "total": 49,
+      "total": 51,
       "normal": 4,
-      "weak": 30,
+      "weak": 32,
       "buy_dip": 5,
       "strong": 8,
       "topped": 2
@@ -95,9 +95,9 @@
       "sector_match": "top_inflow",
       "sector_net": 25.95,
       "sector_bonus": 2.59,
-      "sentiment_match": "caution",
-      "sentiment_bonus": 3,
-      "selected_score": 8.59,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 10.59,
       "selected": true
     },
     {
@@ -188,10 +188,10 @@
       "sector_match": "top_inflow",
       "sector_net": 18.23,
       "sector_bonus": 1.82,
-      "sentiment_match": "caution",
-      "sentiment_bonus": 3,
-      "selected_score": 7.82,
-      "selected": false
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 9.82,
+      "selected": true
     },
     {
       "code": "001268",
@@ -282,9 +282,9 @@
       "sector_match": "top_inflow",
       "sector_net": 21.56,
       "sector_bonus": 2.16,
-      "sentiment_match": "caution",
-      "sentiment_bonus": 3,
-      "selected_score": 8.16,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 10.16,
       "selected": true
     },
     {
@@ -344,9 +344,9 @@
       "sector_match": "top_inflow",
       "sector_net": 24.52,
       "sector_bonus": 2.45,
-      "sentiment_match": "caution",
-      "sentiment_bonus": 3,
-      "selected_score": 8.45,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 10.45,
       "selected": true
     },
     {
@@ -499,10 +499,10 @@
       "sector_match": "top_inflow",
       "sector_net": 17.54,
       "sector_bonus": 1.75,
-      "sentiment_match": "caution",
-      "sentiment_bonus": 3,
-      "selected_score": 7.75,
-      "selected": false
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 9.75,
+      "selected": true
     },
     {
       "code": "688828",
@@ -623,9 +623,9 @@
       "sector_match": "top_inflow",
       "sector_net": 20.43,
       "sector_bonus": 2.04,
-      "sentiment_match": "caution",
-      "sentiment_bonus": 3,
-      "selected_score": 8.04,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 10.04,
       "selected": true
     },
     {
@@ -654,9 +654,9 @@
       "sector_match": "top_inflow",
       "sector_net": 31.59,
       "sector_bonus": 3.16,
-      "sentiment_match": "caution",
-      "sentiment_bonus": 3,
-      "selected_score": 9.16,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 11.16,
       "selected": true
     },
     {
@@ -685,9 +685,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -2,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 1.0,
       "selected": false
     },
     {
@@ -872,9 +872,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -2,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 1.0,
       "selected": false
     },
     {
@@ -903,9 +903,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -2,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 1.0,
       "selected": false
     },
     {
@@ -934,9 +934,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -996,9 +996,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -1027,10 +1027,10 @@
       "sector_match": "top_inflow",
       "sector_net": 18.23,
       "sector_bonus": 1.82,
-      "sentiment_match": "caution",
-      "sentiment_bonus": 3,
-      "selected_score": 7.82,
-      "selected": false
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 9.82,
+      "selected": true
     },
     {
       "code": "600362",
@@ -1058,9 +1058,9 @@
       "sector_match": "top_inflow",
       "sector_net": 21.56,
       "sector_bonus": 2.16,
-      "sentiment_match": "caution",
-      "sentiment_bonus": 3,
-      "selected_score": 8.16,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 10.16,
       "selected": true
     },
     {
@@ -1089,10 +1089,10 @@
       "sector_match": "top_inflow",
       "sector_net": 18.23,
       "sector_bonus": 1.82,
-      "sentiment_match": "caution",
-      "sentiment_bonus": 3,
-      "selected_score": 7.82,
-      "selected": false
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 9.82,
+      "selected": true
     },
     {
       "code": "300911",
@@ -1151,9 +1151,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -2,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 1.0,
       "selected": false
     },
     {
@@ -1275,9 +1275,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -1306,9 +1306,9 @@
       "sector_match": "top_inflow",
       "sector_net": 31.59,
       "sector_bonus": 3.16,
-      "sentiment_match": "caution",
-      "sentiment_bonus": 3,
-      "selected_score": 9.16,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 11.16,
       "selected": true
     },
     {
@@ -1337,10 +1337,10 @@
       "sector_match": "top_inflow",
       "sector_net": 16.77,
       "sector_bonus": 1.68,
-      "sentiment_match": "caution",
-      "sentiment_bonus": 3,
-      "selected_score": 7.68,
-      "selected": false
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 9.68,
+      "selected": true
     },
     {
       "code": "002436",
@@ -1368,10 +1368,10 @@
       "sector_match": "top_inflow",
       "sector_net": 31.59,
       "sector_bonus": 3.16,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -2,
-      "selected_score": 2.16,
-      "selected": false
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 9.16,
+      "selected": true
     },
     {
       "code": "920021",
@@ -1492,9 +1492,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -1523,9 +1523,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -1554,9 +1554,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -1585,9 +1585,9 @@
       "sector_match": "top_inflow",
       "sector_net": 31.59,
       "sector_bonus": 3.16,
-      "sentiment_match": "caution",
-      "sentiment_bonus": 3,
-      "selected_score": 9.16,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 11.16,
       "selected": true
     },
     {
@@ -1647,9 +1647,9 @@
       "sector_match": "top_inflow",
       "sector_net": 31.59,
       "sector_bonus": 3.16,
-      "sentiment_match": "caution",
-      "sentiment_bonus": 3,
-      "selected_score": 9.16,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 11.16,
       "selected": true
     },
     {
@@ -1740,9 +1740,9 @@
       "sector_match": "top_inflow",
       "sector_net": 22.19,
       "sector_bonus": 2.22,
-      "sentiment_match": "caution",
-      "sentiment_bonus": 3,
-      "selected_score": 8.22,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 10.22,
       "selected": true
     },
     {
@@ -1771,9 +1771,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -1802,9 +1802,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -1833,9 +1833,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -2,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 1.0,
       "selected": false
     },
     {
@@ -1864,9 +1864,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -1895,9 +1895,9 @@
       "sector_match": "top_inflow",
       "sector_net": 18.23,
       "sector_bonus": 1.82,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": 0.82,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 6.82,
       "selected": false
     },
     {
@@ -1957,9 +1957,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -1988,9 +1988,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2020,9 +2020,9 @@
       "sector_match": "top_inflow",
       "sector_net": 21.56,
       "sector_bonus": 2.16,
-      "sentiment_match": "caution",
-      "sentiment_bonus": 3,
-      "selected_score": 8.16,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 10.16,
       "selected": true
     },
     {
@@ -2051,10 +2051,10 @@
       "sector_match": "top_inflow",
       "sector_net": 21.56,
       "sector_bonus": 2.16,
-      "sentiment_match": "neutral",
-      "sentiment_bonus": 0,
-      "selected_score": 3.16,
-      "selected": false
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 8.16,
+      "selected": true
     },
     {
       "code": "002156",
@@ -2082,9 +2082,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2237,9 +2237,9 @@
       "sector_match": "top_inflow",
       "sector_net": 21.56,
       "sector_bonus": 2.16,
-      "sentiment_match": "caution",
-      "sentiment_bonus": 3,
-      "selected_score": 8.16,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 10.16,
       "selected": true
     },
     {
@@ -2269,9 +2269,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2300,9 +2300,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2393,9 +2393,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2424,9 +2424,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2455,9 +2455,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2486,9 +2486,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2517,9 +2517,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2548,9 +2548,9 @@
       "sector_match": "top_inflow",
       "sector_net": 21.56,
       "sector_bonus": 2.16,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": 1.16,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 7.16,
       "selected": false
     },
     {
@@ -2579,9 +2579,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2610,9 +2610,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2641,9 +2641,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2672,9 +2672,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2703,9 +2703,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2734,9 +2734,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2765,9 +2765,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2796,9 +2796,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2827,9 +2827,9 @@
       "sector_match": "top_inflow",
       "sector_net": 22.19,
       "sector_bonus": 2.22,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": 1.22,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 7.22,
       "selected": false
     },
     {
@@ -2858,9 +2858,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2889,9 +2889,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2920,9 +2920,9 @@
       "sector_match": "top_inflow",
       "sector_net": 22.19,
       "sector_bonus": 2.22,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": 1.22,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 7.22,
       "selected": false
     },
     {
@@ -2951,9 +2951,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -2982,9 +2982,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -3013,9 +3013,9 @@
       "sector_match": "top_inflow",
       "sector_net": 16.77,
       "sector_bonus": 1.68,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": 0.68,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 6.68,
       "selected": false
     },
     {
@@ -3044,9 +3044,9 @@
       "sector_match": "top_inflow",
       "sector_net": 16.41,
       "sector_bonus": 1.64,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": 0.64,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 6.64,
       "selected": false
     },
     {
@@ -3075,9 +3075,9 @@
       "sector_match": "top_inflow",
       "sector_net": 18.23,
       "sector_bonus": 1.82,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": 0.82,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 6.82,
       "selected": false
     },
     {
@@ -3106,9 +3106,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -3137,9 +3137,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -3168,9 +3168,9 @@
       "sector_match": "top_inflow",
       "sector_net": 18.23,
       "sector_bonus": 1.82,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": 0.82,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 6.82,
       "selected": false
     },
     {
@@ -3199,9 +3199,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -3230,9 +3230,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -3261,9 +3261,9 @@
       "sector_match": "top_inflow",
       "sector_net": 18.23,
       "sector_bonus": 1.82,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": 0.82,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 6.82,
       "selected": false
     },
     {
@@ -3292,9 +3292,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -3323,9 +3323,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -3354,9 +3354,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -3385,9 +3385,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -3416,9 +3416,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -3447,9 +3447,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -3479,9 +3479,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -3510,9 +3510,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -3541,9 +3541,9 @@
       "sector_match": "top_inflow",
       "sector_net": 17.54,
       "sector_bonus": 1.75,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": 0.75,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 6.75,
       "selected": false
     },
     {
@@ -3572,9 +3572,9 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
       "selected": false
     },
     {
@@ -3603,9 +3603,9 @@
       "sector_match": "top_inflow",
       "sector_net": 22.19,
       "sector_bonus": 2.22,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": 1.22,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 7.22,
       "selected": false
     },
     {
@@ -3634,9 +3634,71 @@
       "sector_match": "none",
       "sector_net": 0.0,
       "sector_bonus": 0.0,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": -1.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
+      "selected": false
+    },
+    {
+      "code": "688297",
+      "name": "中无人机",
+      "algo": "四量终极",
+      "list_date": "2026-09-02",
+      "entry_price": 42.41,
+      "last_close": 42.41,
+      "last_pct": 0.0,
+      "peak_pct": 0.0,
+      "drawdown": 0.0,
+      "days_in": 0,
+      "appear_count": 1,
+      "status": "weak",
+      "buy_hint": null,
+      "sell_hint": "走弱：峰值未跑赢基准价",
+      "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 散户金叉 + 主力金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
+      "industry": "铁路、船舶、航空航天和其他运输设备制造业",
+      "concept_top": "",
+      "sector_match": "none",
+      "sector_net": 0.0,
+      "sector_bonus": 0.0,
+      "sentiment_match": "neutral",
+      "sentiment_bonus": 0,
+      "selected_score": 0.0,
+      "selected": false
+    },
+    {
+      "code": "000425",
+      "name": "敏实集团",
+      "algo": "四量终极",
+      "list_date": "2026-09-02",
+      "entry_price": 8.27,
+      "last_close": 8.27,
+      "last_pct": 0.0,
+      "peak_pct": 0.0,
+      "drawdown": 0.0,
+      "days_in": 0,
+      "appear_count": 1,
+      "status": "weak",
+      "buy_hint": null,
+      "sell_hint": "走弱：峰值未跑赢基准价",
+      "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
+      "industry": "专用设备制造业",
+      "concept_top": "乡村振兴",
+      "sector_match": "top_inflow",
+      "sector_net": 26.94,
+      "sector_bonus": 2.69,
+      "sentiment_match": "ok",
+      "sentiment_bonus": 5,
+      "selected_score": 7.69,
       "selected": false
     },
     {
@@ -3666,8 +3728,8 @@
       "sector_net": 0.0,
       "sector_bonus": 0.0,
       "sentiment_match": "neutral",
-      "sentiment_bonus": 2,
-      "selected_score": 7.0,
+      "sentiment_bonus": 0,
+      "selected_score": 5.0,
       "selected": false
     },
     {
@@ -3697,8 +3759,8 @@
       "sector_net": 0.0,
       "sector_bonus": 0.0,
       "sentiment_match": "neutral",
-      "sentiment_bonus": 2,
-      "selected_score": 7.0,
+      "sentiment_bonus": 0,
+      "selected_score": 5.0,
       "selected": false
     },
     {
@@ -3728,8 +3790,8 @@
       "sector_net": 17.54,
       "sector_bonus": 1.75,
       "sentiment_match": "ok",
-      "sentiment_bonus": 8,
-      "selected_score": 14.75,
+      "sentiment_bonus": 5,
+      "selected_score": 11.75,
       "selected": true
     },
     {
@@ -3759,8 +3821,8 @@
       "sector_net": 0.0,
       "sector_bonus": 0.0,
       "sentiment_match": "neutral",
-      "sentiment_bonus": 2,
-      "selected_score": 7.0,
+      "sentiment_bonus": 0,
+      "selected_score": 5.0,
       "selected": false
     },
     {
@@ -3790,8 +3852,8 @@
       "sector_net": 0.0,
       "sector_bonus": 0.0,
       "sentiment_match": "neutral",
-      "sentiment_bonus": 2,
-      "selected_score": 7.0,
+      "sentiment_bonus": 0,
+      "selected_score": 5.0,
       "selected": false
     },
     {
@@ -3821,8 +3883,8 @@
       "sector_net": 0.0,
       "sector_bonus": 0.0,
       "sentiment_match": "neutral",
-      "sentiment_bonus": 2,
-      "selected_score": 7.0,
+      "sentiment_bonus": 0,
+      "selected_score": 5.0,
       "selected": false
     },
     {
@@ -3852,8 +3914,8 @@
       "sector_net": 0.0,
       "sector_bonus": 0.0,
       "sentiment_match": "neutral",
-      "sentiment_bonus": 2,
-      "selected_score": 7.0,
+      "sentiment_bonus": 0,
+      "selected_score": 5.0,
       "selected": false
     },
     {
@@ -3883,8 +3945,8 @@
       "sector_net": 0.0,
       "sector_bonus": 0.0,
       "sentiment_match": "neutral",
-      "sentiment_bonus": 2,
-      "selected_score": 7.0,
+      "sentiment_bonus": 0,
+      "selected_score": 5.0,
       "selected": false
     },
     {
@@ -3914,8 +3976,8 @@
       "sector_net": 18.23,
       "sector_bonus": 1.82,
       "sentiment_match": "ok",
-      "sentiment_bonus": 8,
-      "selected_score": 14.82,
+      "sentiment_bonus": 5,
+      "selected_score": 11.82,
       "selected": true
     },
     {
@@ -3945,8 +4007,8 @@
       "sector_net": 0.0,
       "sector_bonus": 0.0,
       "sentiment_match": "neutral",
-      "sentiment_bonus": 2,
-      "selected_score": 7.0,
+      "sentiment_bonus": 0,
+      "selected_score": 5.0,
       "selected": false
     },
     {
@@ -3976,8 +4038,8 @@
       "sector_net": 0.0,
       "sector_bonus": 0.0,
       "sentiment_match": "neutral",
-      "sentiment_bonus": 2,
-      "selected_score": 7.0,
+      "sentiment_bonus": 0,
+      "selected_score": 5.0,
       "selected": false
     },
     {
@@ -4007,16 +4069,16 @@
       "sector_net": 0.0,
       "sector_bonus": 0.0,
       "sentiment_match": "neutral",
-      "sentiment_bonus": 2,
-      "selected_score": 7.0,
+      "sentiment_bonus": 0,
+      "selected_score": 5.0,
       "selected": false
     }
   ],
   "sentiment_meta": {
-    "phase": "退潮",
-    "score": 85.0,
-    "delta_pct": -82.64,
-    "advice": "⚠️ 情绪退潮中：高位股注意回撤，关注高低切换",
+    "phase": "冰点",
+    "score": 0.0,
+    "delta_pct": -100.0,
+    "advice": "💡 报复性连板窗口临近：冰点后情绪修复，关注低位/首板",
     "source": "LIMIT_UP_HEATMAP"
   },
   "sector_meta": {
@@ -4066,5 +4128,5 @@
     ]
   },
   "select_threshold": 8.0,
-  "note": "基于 v8 三大算法跟踪池 134 只去重 → 128 只；K 批二维精选（板块流入 × 情绪周期 退潮）→ 进精选 14 只；阈值源自专家 track_daily.py analyze()（强势/回调6-12%/见顶/走弱）"
+  "note": "基于 v8 三大算法跟踪池 136 只去重 → 130 只；K 批二维精选（板块流入 × 情绪周期 冰点）→ 进精选 21 只；阈值源自专家 track_daily.py analyze()（强势/回调6-12%/见顶/走弱）"
 }

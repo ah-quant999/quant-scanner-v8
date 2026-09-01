@@ -1,142 +1,140 @@
 {
-  "update_time": "2026-08-31 21:19:55",
-  "crisis_score": 31.5,
+  "update_time": "2026-09-02 05:17:58",
+  "crisis_score": 31.8,
   "crisis_high": false,
   "crisis_note": "危机雷达未达高位，逆势龙头暂不并入",
-  "total_candidates": 31,
+  "total_candidates": 33,
   "top_n": 2,
   "market_regime": {
-    "date": null,
-    "regime": null,
+    "date": "2026-09-01",
+    "regime": "stabilize",
     "open": false,
     "note": "grind/panic=可开仓(正常推)；stabilize/rebound=历史回测≥3共振负期望，应观察/少推"
   },
   "strong_sectors": [
+    "IT服务",
     "农产品加工",
     "农化制品",
     "化学原料",
     "小金属",
+    "影视院线",
     "教育",
-    "旅游及酒店",
-    "煤炭开采加工",
+    "文化传媒",
     "种植业与林业",
     "证券",
     "贵金属",
-    "贸易",
-    "零售"
+    "黑色家电"
   ],
   "stocks": [
     {
       "rank": 1,
-      "code": "002155",
-      "name": "湖南黄金",
-      "market": "sz",
+      "code": "600362",
+      "name": "江西铜业",
+      "market": "sh",
       "board": "主板",
-      "horizon": "短线/中线共振",
-      "close": 27.23,
-      "pct_chg": -5.84,
-      "stop_loss": 25.32,
-      "target_price": 31.04,
+      "horizon": "短线",
+      "close": 49.01,
+      "pct_chg": -0.39,
+      "stop_loss": 45.58,
+      "target_price": 55.87,
       "risk_reward": 2.0,
-      "support": 22.0,
-      "resistance": 29.54,
-      "atr": 1.47,
+      "support": null,
+      "resistance": null,
+      "atr": null,
       "sources": [
         "四量终极",
-        "板块龙头",
-        "驾驶舱A档"
+        "板块龙头"
       ],
       "source_scores": {
-        "驾驶舱A档": 1.8,
         "四量终极": 1.2,
         "板块龙头": 2.5
       },
-      "resonance": 3,
-      "strength": 5.5,
+      "resonance": 2,
+      "strength": 3.7,
       "sector_score": 2.0,
       "sector_hits": [
         {
-          "name": "贵金属",
-          "pct_5d": 1.97,
-          "relative_5d": 1.97,
+          "name": "小金属",
+          "pct_5d": 0.59,
+          "relative_5d": 0.59,
           "strong": true
         },
         {
-          "name": "小金属",
-          "pct_5d": 1.38,
-          "relative_5d": 1.38,
+          "name": "贵金属",
+          "pct_5d": -0.76,
+          "relative_5d": -0.76,
           "strong": true
         }
       ],
       "sector_fund": [
         {
-          "name": "贵金属",
-          "pct_5d": 1.97,
-          "relative_5d": 1.97,
+          "name": "小金属",
+          "pct_5d": 0.59,
+          "relative_5d": 0.59,
           "strong": true
         },
         {
-          "name": "小金属",
-          "pct_5d": 1.38,
-          "relative_5d": 1.38,
+          "name": "贵金属",
+          "pct_5d": -0.76,
+          "relative_5d": -0.76,
           "strong": true
         }
       ],
-      "final_score": 10.0,
-      "buy_score": 10.0,
-      "enter_date": "2026-08-31",
+      "final_score": 6.7,
+      "buy_score": 6.7,
+      "enter_date": "2026-09-02",
       "signals": [
         "上涨趋势",
-        "双真+不超买+EMA完好",
         "机构变红",
-        "板块强势"
+        "板块强势",
+        "缠论买点"
       ],
       "_60m_resonance": false,
-      "reason": "驾驶舱A档 技术60 质量0；四量终极 信号2项；板块龙头 贵金属,小金属",
-      "industry": "有色金属矿采选业",
+      "reason": "四量终极 信号2项；板块龙头 小金属,贵金属",
+      "industry": "有色金属冶炼和压延加工业",
       "concepts": [
-        "贬值受益",
-        "央国企改革",
-        "黄金概念",
+        "融资融券",
+        "2026中报预增",
         "小金属概念",
-        "有色金属矿采选业",
-        "稀缺资源"
+        "电池技术",
+        "AH股",
+        "机构重仓"
       ],
       "backtest": {
-        "signals": 2,
+        "signals": 3,
         "win_count": 0,
-        "loss_count": 1,
+        "loss_count": 2,
         "win_rate": 0.0,
-        "avg_return": -2.92,
+        "avg_return": -1.27,
         "best_return": 0.0,
-        "worst_return": -5.84,
-        "note": "该股历史共触发 2 次驾驶舱/共振信号"
+        "worst_return": -1.9,
+        "note": "该股历史共触发 3 次驾驶舱/共振信号"
       },
       "tracking": {
-        "entry_date": "2026-08-31",
-        "entry_price": 27.23,
-        "latest_price": 27.23,
+        "entry_date": "2026-09-01",
+        "entry_price": 48.08,
+        "latest_price": 48.08,
         "return_pct": 0.0,
         "hold_days": 1,
         "exit_type": "hold",
-        "stop_loss": 24.51,
-        "target_price": 31.31,
+        "stop_loss": 43.27,
+        "target_price": 55.29,
         "note": "已入场跟踪中"
       },
       "action": "观察（市场企稳/反弹，历史回测负期望）",
-      "market_regime": null
+      "market_regime": "stabilize"
     },
     {
       "rank": 2,
-      "code": "600309",
-      "name": "万华化学",
-      "market": "sh",
-      "board": "主板",
+      "code": "02020",
+      "name": "安踏体育",
+      "market": "hk",
+      "board": "港股",
       "horizon": "短线/中线共振",
-      "close": 76.32,
-      "pct_chg": -2.2,
-      "stop_loss": 70.98,
-      "target_price": 87.0,
+      "close": 78.35,
+      "pct_chg": 0.84,
+      "stop_loss": 72.87,
+      "target_price": 89.32,
       "risk_reward": 2.0,
       "support": null,
       "resistance": null,
@@ -156,7 +154,7 @@
       "sector_fund": [],
       "final_score": 6.0,
       "buy_score": 6.0,
-      "enter_date": "2026-08-31",
+      "enter_date": "2026-09-02",
       "signals": [
         "上涨趋势",
         "双真+不超买+EMA完好",
@@ -164,126 +162,112 @@
       ],
       "_60m_resonance": false,
       "reason": "驾驶舱A档 技术60 质量0；四量终极 信号2项",
-      "industry": "化学原料和化学制品制造业",
-      "concepts": [
-        "大盘股",
-        "央国企改革",
-        "化工原料",
-        "上证180",
-        "创投",
-        "化学原料和化学制品制造业"
-      ],
+      "industry": "",
+      "concepts": [],
       "backtest": {
-        "signals": 1,
-        "win_count": 0,
-        "loss_count": 0,
-        "win_rate": 0.0,
-        "avg_return": 0.0,
-        "best_return": 0.0,
-        "worst_return": 0.0,
-        "note": "该股历史共触发 1 次驾驶舱/共振信号"
+        "signals": 275,
+        "win_rate": 43.5,
+        "avg_return": 0.47,
+        "best_hold_days": 3,
+        "note": "个股暂无历史信号，展示策略级统计（最佳持有 3 天）"
       },
       "tracking": {
-        "entry_date": "2026-08-31",
-        "entry_price": 76.32,
-        "latest_price": 76.32,
-        "return_pct": 0.0,
-        "hold_days": 1,
-        "exit_type": "hold",
-        "stop_loss": 68.69,
-        "target_price": 87.77,
-        "note": "已入场跟踪中"
-      },
-      "action": "观察（市场企稳/反弹，历史回测负期望）",
-      "market_regime": null
-    }
-  ],
-  "consensus_stocks": [
-    {
-      "rank": 1,
-      "code": "002155",
-      "name": "湖南黄金",
-      "market": "深市",
-      "board": "主板",
-      "horizon": "短线/中线共振",
-      "close": 27.23,
-      "pct_chg": -5.84,
-      "stop_loss": 25.32,
-      "target_price": 31.04,
-      "risk_reward": 2.0,
-      "support": 22.0,
-      "resistance": 29.54,
-      "atr": 1.47,
-      "sources": [
-        "四量终极",
-        "板块龙头",
-        "驾驶舱A档"
-      ],
-      "source_scores": {
-        "驾驶舱A档": 1.8,
-        "四量终极": 1.2,
-        "板块龙头": 2.5
-      },
-      "resonance": 3,
-      "strength": 5.5,
-      "final_score": 10.0,
-      "sector_score": 2.0,
-      "sector_hits": [
-        {
-          "name": "贵金属",
-          "pct_5d": 1.97,
-          "relative_5d": 1.97,
-          "strong": true
-        },
-        {
-          "name": "小金属",
-          "pct_5d": 1.38,
-          "relative_5d": 1.38,
-          "strong": true
-        }
-      ],
-      "enter_date": "2026-08-31",
-      "signals": [
-        "双真+不超买+EMA完好",
-        "机构变红",
-        "上涨趋势",
-        "板块强势"
-      ],
-      "_60m_resonance": false,
-      "reason": "驾驶舱A档 技术60 质量0；四量终极 信号2项；板块龙头 贵金属,小金属",
-      "industry": "有色金属矿采选业",
-      "concepts": [
-        "贬值受益",
-        "央国企改革",
-        "黄金概念",
-        "小金属概念",
-        "有色金属矿采选业",
-        "稀缺资源"
-      ],
-      "backtest": {},
-      "tracking": {
-        "entry_date": "2026-08-31",
-        "entry_price": 27.23,
-        "latest_price": 27.23,
+        "entry_date": "2026-09-02",
+        "entry_price": 78.35,
+        "latest_price": 78.35,
         "return_pct": 0.0,
         "hold_days": 1,
         "exit_type": "hold",
         "note": "今日新入选，自动开始跟踪"
       },
       "action": "观察（市场企稳/反弹，历史回测负期望）",
-      "market_regime": null
+      "market_regime": "stabilize"
+    }
+  ],
+  "consensus_stocks": [
+    {
+      "rank": 1,
+      "code": "600362",
+      "name": "江西铜业",
+      "market": "沪市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": 49.01,
+      "pct_chg": -0.39,
+      "stop_loss": 45.58,
+      "target_price": 55.87,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null,
+      "atr": null,
+      "sources": [
+        "四量终极",
+        "板块龙头"
+      ],
+      "source_scores": {
+        "四量终极": 1.2,
+        "板块龙头": 2.5
+      },
+      "resonance": 2,
+      "strength": 3.7,
+      "final_score": 6.7,
+      "sector_score": 2.0,
+      "sector_hits": [
+        {
+          "name": "小金属",
+          "pct_5d": 0.59,
+          "relative_5d": 0.59,
+          "strong": true
+        },
+        {
+          "name": "贵金属",
+          "pct_5d": -0.76,
+          "relative_5d": -0.76,
+          "strong": true
+        }
+      ],
+      "enter_date": "2026-09-02",
+      "signals": [
+        "缠论买点",
+        "机构变红",
+        "上涨趋势",
+        "板块强势"
+      ],
+      "_60m_resonance": false,
+      "reason": "四量终极 信号2项；板块龙头 小金属,贵金属",
+      "industry": "有色金属冶炼和压延加工业",
+      "concepts": [
+        "融资融券",
+        "2026中报预增",
+        "小金属概念",
+        "电池技术",
+        "AH股",
+        "机构重仓"
+      ],
+      "backtest": {},
+      "tracking": {
+        "entry_date": "2026-09-02",
+        "entry_price": 49.01,
+        "latest_price": 49.01,
+        "return_pct": 0.0,
+        "hold_days": 1,
+        "exit_type": "hold",
+        "note": "今日新入选，自动开始跟踪"
+      },
+      "action": "观察（市场企稳/反弹，历史回测负期望）",
+      "market_regime": "stabilize"
     },
     {
       "rank": 2,
-      "code": "600309",
-      "name": "万华化学",
-      "market": "沪市",
-      "board": "主板",
+      "code": "02020",
+      "name": "安踏体育",
+      "market": "港股",
+      "board": "港股",
       "horizon": "短线/中线共振",
-      "close": 76.32,
-      "pct_chg": -2.2,
-      "stop_loss": 70.98,
-      "target_price": 87.0,
+      "close": 78.35,
+      "pct_chg": 0.84,
+      "stop_loss": 72.87,
+      "target_price": 89.32,
       "risk_reward": 2.0,
       "support": null,
       "resistance": null,
@@ -301,7 +285,7 @@
       "final_score": 6.0,
       "sector_score": 0.0,
       "sector_hits": [],
-      "enter_date": "2026-08-31",
+      "enter_date": "2026-09-02",
       "signals": [
         "双真+不超买+EMA完好",
         "机构变红",
@@ -309,216 +293,32 @@
       ],
       "_60m_resonance": false,
       "reason": "驾驶舱A档 技术60 质量0；四量终极 信号2项",
-      "industry": "化学原料和化学制品制造业",
-      "concepts": [
-        "大盘股",
-        "央国企改革",
-        "化工原料",
-        "上证180",
-        "创投",
-        "化学原料和化学制品制造业"
-      ],
+      "industry": "",
+      "concepts": [],
       "backtest": {},
       "tracking": {
-        "entry_date": "2026-08-31",
-        "entry_price": 76.32,
-        "latest_price": 76.32,
+        "entry_date": "2026-09-02",
+        "entry_price": 78.35,
+        "latest_price": 78.35,
         "return_pct": 0.0,
         "hold_days": 1,
         "exit_type": "hold",
         "note": "今日新入选，自动开始跟踪"
       },
       "action": "观察（市场企稳/反弹，历史回测负期望）",
-      "market_regime": null
+      "market_regime": "stabilize"
     }
   ],
   "all_candidates": [
     {
-      "code": "002155",
-      "name": "湖南黄金",
-      "market": "深市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": 27.23,
-      "pct_chg": -5.84,
-      "final_score": 10.0,
-      "resonance": 3,
-      "sources": [
-        "四量终极",
-        "板块龙头",
-        "驾驶舱A档"
-      ],
-      "signals": [
-        "上涨趋势",
-        "双真+不超买+EMA完好",
-        "机构变红",
-        "板块强势"
-      ],
-      "industry": "有色金属矿采选业",
-      "concepts": [
-        "贬值受益",
-        "央国企改革",
-        "黄金概念",
-        "小金属概念",
-        "有色金属矿采选业",
-        "稀缺资源"
-      ],
-      "enter_date": "2026-08-31",
-      "stop_loss": 25.32,
-      "target_price": 31.04,
-      "risk_reward": 2.0,
-      "support": 22.0,
-      "resistance": 29.54
-    },
-    {
-      "code": "600309",
-      "name": "万华化学",
+      "code": "600362",
+      "name": "江西铜业",
       "market": "沪市",
       "board": "主板",
       "horizon": "中长线",
-      "close": 76.32,
-      "pct_chg": -2.2,
-      "final_score": 6.0,
-      "resonance": 2,
-      "sources": [
-        "四量终极",
-        "驾驶舱A档"
-      ],
-      "signals": [
-        "上涨趋势",
-        "双真+不超买+EMA完好",
-        "机构变红"
-      ],
-      "industry": "化学原料和化学制品制造业",
-      "concepts": [
-        "大盘股",
-        "央国企改革",
-        "化工原料",
-        "上证180",
-        "创投",
-        "化学原料和化学制品制造业"
-      ],
-      "enter_date": "2026-08-31",
-      "stop_loss": 70.98,
-      "target_price": 87.0,
-      "risk_reward": 2.0,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "600036",
-      "name": "招商银行",
-      "market": "沪市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": 40.12,
-      "pct_chg": 1.96,
-      "final_score": 6.0,
-      "resonance": 2,
-      "sources": [
-        "四量终极",
-        "驾驶舱A档"
-      ],
-      "signals": [
-        "上涨趋势",
-        "双真+不超买+EMA完好",
-        "机构变红"
-      ],
-      "industry": "货币金融服务",
-      "concepts": [
-        "大盘股",
-        "AH股",
-        "上证180",
-        "金融地产风格",
-        "跨境支付",
-        "融资融券"
-      ],
-      "enter_date": "2026-08-31",
-      "stop_loss": 37.31,
-      "target_price": 45.74,
-      "risk_reward": 2.0,
-      "support": 38.03,
-      "resistance": 40.28
-    },
-    {
-      "code": "000977",
-      "name": "浪潮信息",
-      "market": "深市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": 85.18,
-      "pct_chg": 9.99,
-      "final_score": 6.0,
-      "resonance": 2,
-      "sources": [
-        "四量终极",
-        "驾驶舱A档"
-      ],
-      "signals": [
-        "上涨趋势",
-        "双真+不超买+EMA完好",
-        "机构变红"
-      ],
-      "industry": "计算机、通信和其他电子设备制造业",
-      "concepts": [
-        "大盘股",
-        "央国企改革",
-        "东方财富热股",
-        "数据中心",
-        "东数西算",
-        "算力概念"
-      ],
-      "enter_date": "2026-08-31",
-      "stop_loss": 79.22,
-      "target_price": 97.11,
-      "risk_reward": 2.0,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "688002",
-      "name": "睿创微纳",
-      "market": "科创板",
-      "board": "科创板",
-      "horizon": "中长线",
-      "close": 185.0,
-      "pct_chg": 14.41,
-      "final_score": 6.0,
-      "resonance": 2,
-      "sources": [
-        "四量终极",
-        "驾驶舱A档"
-      ],
-      "signals": [
-        "上涨趋势",
-        "双真+不超买+EMA完好",
-        "机构变红"
-      ],
-      "industry": "计算机、通信和其他电子设备制造业",
-      "concepts": [
-        "毫米波概念",
-        "百元股",
-        "转债标的",
-        "无人机",
-        "2026中报预增",
-        "融资融券"
-      ],
-      "enter_date": "2026-08-31",
-      "stop_loss": 166.5,
-      "target_price": 222.0,
-      "risk_reward": 2.0,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "600547",
-      "name": "山东黄金",
-      "market": "沪市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": 37.85,
-      "pct_chg": 6.65,
-      "final_score": 5.7,
+      "close": 49.01,
+      "pct_chg": -0.39,
+      "final_score": 6.7,
       "resonance": 2,
       "sources": [
         "四量终极",
@@ -527,68 +327,155 @@
       "signals": [
         "上涨趋势",
         "机构变红",
-        "板块强势"
+        "板块强势",
+        "缠论买点"
       ],
-      "industry": "有色金属矿采选业",
+      "industry": "有色金属冶炼和压延加工业",
       "concepts": [
-        "大盘股",
-        "AH股",
-        "央国企改革",
-        "上证180",
         "融资融券",
-        "行业龙头"
+        "2026中报预增",
+        "小金属概念",
+        "电池技术",
+        "AH股",
+        "机构重仓"
       ],
-      "enter_date": "2026-08-31",
-      "stop_loss": 35.2,
-      "target_price": 43.15,
+      "enter_date": "2026-09-02",
+      "stop_loss": 45.58,
+      "target_price": 55.87,
       "risk_reward": 2.0,
       "support": null,
       "resistance": null
     },
     {
-      "code": "300364",
-      "name": "中文在线",
-      "market": "创业板",
-      "board": "创业板",
+      "code": "02020",
+      "name": "安踏体育",
+      "market": "港股",
+      "board": "港股",
       "horizon": "中长线",
-      "close": 27.28,
-      "pct_chg": 20.02,
-      "final_score": 5.4,
+      "close": 78.35,
+      "pct_chg": 0.84,
+      "final_score": 6.0,
       "resonance": 2,
       "sources": [
         "四量终极",
-        "驾驶舱B档"
+        "驾驶舱A档"
       ],
       "signals": [
-        "60min多周期共振",
-        "早期:机构变红+缠论买",
-        "机构变红",
-        "缠论买点"
+        "上涨趋势",
+        "双真+不超买+EMA完好",
+        "机构变红"
       ],
-      "industry": "新闻和出版业",
-      "concepts": [
-        "区块链",
-        "创业板综",
-        "谷子经济",
-        "融资融券",
-        "影视概念",
-        "快手概念"
-      ],
-      "enter_date": "2026-08-31",
-      "stop_loss": 24.55,
-      "target_price": 32.74,
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-09-02",
+      "stop_loss": 72.87,
+      "target_price": 89.32,
       "risk_reward": 2.0,
-      "support": 21.81,
-      "resistance": 27.3
+      "support": null,
+      "resistance": null
     },
     {
-      "code": "300017",
-      "name": "网宿科技",
+      "code": "02318",
+      "name": "中国平安",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "中长线",
+      "close": 56.75,
+      "pct_chg": 0.35,
+      "final_score": 5.82,
+      "resonance": 2,
+      "sources": [
+        "四量终极",
+        "驾驶舱A档"
+      ],
+      "signals": [
+        "上涨趋势",
+        "双真+不超买+EMA完好",
+        "机构变红"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-09-02",
+      "stop_loss": 52.78,
+      "target_price": 64.69,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "002155",
+      "name": "湖南黄金",
+      "market": "深市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": 28.92,
+      "pct_chg": 7.03,
+      "final_score": 4.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "有色金属矿采选业",
+      "concepts": [
+        "融资融券",
+        "MSCI中国",
+        "2026中报预增",
+        "小金属概念",
+        "贬值受益",
+        "富时罗素"
+      ],
+      "enter_date": "2026-09-02",
+      "stop_loss": 26.9,
+      "target_price": 32.97,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "601212",
+      "name": "白银有色",
+      "market": "沪市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": 7.63,
+      "pct_chg": 5.97,
+      "final_score": 4.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "有色金属冶炼和压延加工业",
+      "concepts": [
+        "融资融券",
+        "破增发价股",
+        "2026中报扭亏",
+        "MSCI中国",
+        "可控核聚变",
+        "PCB"
+      ],
+      "enter_date": "2026-09-02",
+      "stop_loss": 7.1,
+      "target_price": 8.7,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "300475",
+      "name": "香农芯创",
       "market": "创业板",
       "board": "创业板",
       "horizon": "中长线",
-      "close": 16.36,
-      "pct_chg": 6.86,
+      "close": 169.65,
+      "pct_chg": -4.69,
       "final_score": 4.6,
       "resonance": 2,
       "sources": [
@@ -596,119 +483,83 @@
         "驾驶舱B档"
       ],
       "signals": [
-        "早期:机构变红+缠论买",
-        "机构变红",
-        "缠论买点"
+        "早期:机构变红",
+        "机构变红"
       ],
-      "industry": "软件和信息技术服务业",
+      "industry": "批发业",
       "concepts": [
-        "创业板综",
-        "数据中心",
-        "算力概念",
         "融资融券",
-        "网红经济",
-        "云计算"
+        "2026中报预增",
+        "深股通",
+        "2026一季报预增",
+        "基金重仓",
+        "中证500"
       ],
-      "enter_date": "2026-08-31",
-      "stop_loss": 14.72,
-      "target_price": 19.63,
+      "enter_date": "2026-09-02",
+      "stop_loss": 152.69,
+      "target_price": 203.58,
       "risk_reward": 2.0,
-      "support": 14.12,
-      "resistance": 17.5
+      "support": null,
+      "resistance": null
     },
     {
-      "code": "000712",
-      "name": "锦龙股份",
-      "market": "深市",
+      "code": "601899",
+      "name": "紫金矿业",
+      "market": "沪市",
       "board": "主板",
       "horizon": "短线",
       "close": null,
-      "pct_chg": 10.0,
-      "final_score": 3.69,
+      "pct_chg": 0.0,
+      "final_score": 4.0,
+      "resonance": 1,
+      "sources": [
+        "板块龙头"
+      ],
+      "signals": [
+        "板块强势"
+      ],
+      "industry": "有色金属矿采选业",
+      "concepts": [
+        "融资融券",
+        "2026中报预增",
+        "小金属概念",
+        "AH股",
+        "权重股",
+        "机构重仓"
+      ],
+      "enter_date": "2026-09-02",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "300927",
+      "name": "江天化学",
+      "market": "深市",
+      "board": "创业板",
+      "horizon": "短线",
+      "close": null,
+      "pct_chg": 20.0,
+      "final_score": 3.72,
       "resonance": 1,
       "sources": [
         "大牛股猎手"
       ],
       "signals": [
-        "日涨幅偏离值达到7%的前5只证券",
+        "日涨幅达到15%的前5只证券",
         "游资独买"
       ],
-      "industry": "资本市场服务",
+      "industry": "化学原料和化学制品制造业",
       "concepts": [
-        "参股保险",
-        "互联网金融",
-        "IPO受益",
-        "参股银行",
-        "富时罗素",
-        "深股通"
-      ],
-      "enter_date": "20260831",
-      "stop_loss": 11.68,
-      "target_price": 15.58,
-      "risk_reward": 2.0,
-      "support": 8.4,
-      "resistance": 12.98
-    },
-    {
-      "code": "300911",
-      "name": "亿田智能",
-      "market": "深市",
-      "board": "创业板",
-      "horizon": "短线",
-      "close": null,
-      "pct_chg": 20.009,
-      "final_score": 3.63,
-      "resonance": 1,
-      "sources": [
-        "大牛股猎手"
-      ],
-      "signals": [
-        "不达标",
-        "日涨幅达到15%的前5只证券"
-      ],
-      "industry": "电气机械和器材制造业",
-      "concepts": [
+        "融资融券",
+        "专精特新",
         "创业板综",
-        "转债标的",
-        "东数西算",
-        "深股通",
-        "算力概念",
-        "融资融券"
-      ],
-      "enter_date": "20260831",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "301262",
-      "name": "海看股份",
-      "market": "深市",
-      "board": "创业板",
-      "horizon": "短线",
-      "close": null,
-      "pct_chg": 19.9893,
-      "final_score": 3.55,
-      "resonance": 1,
-      "sources": [
-        "大牛股猎手"
-      ],
-      "signals": [
-        "不达标",
-        "日涨幅达到15%的前5只证券"
-      ],
-      "industry": "电信、广播电视和卫星传输服务",
-      "concepts": [
-        "在线教育",
         "央国企改革",
-        "创业板综",
-        "旅游概念",
-        "数字经济",
-        "人工智能"
+        "机构重仓"
       ],
-      "enter_date": "20260831",
+      "enter_date": "20260901",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -716,32 +567,25 @@
       "resistance": null
     },
     {
-      "code": "002886",
-      "name": "沃特股份",
+      "code": "301697",
+      "name": "贝特利",
       "market": "深市",
-      "board": "主板",
+      "board": "创业板",
       "horizon": "短线",
       "close": null,
-      "pct_chg": 10.0,
-      "final_score": 3.54,
+      "pct_chg": 196.6942,
+      "final_score": 3.65,
       "resonance": 1,
       "sources": [
         "大牛股猎手"
       ],
       "signals": [
         "不达标",
-        "日涨幅偏离值达到7%的前5只证券"
+        "无价格涨跌幅限制的证券"
       ],
-      "industry": "橡胶和塑料制品业",
-      "concepts": [
-        "碳基材料",
-        "铜缆高速连接",
-        "无人机",
-        "3D打印",
-        "合成生物",
-        "小米汽车"
-      ],
-      "enter_date": "20260831",
+      "industry": "",
+      "concepts": [],
+      "enter_date": "20260901",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -749,14 +593,14 @@
       "resistance": null
     },
     {
-      "code": "000890",
-      "name": "法尔胜",
+      "code": "002354",
+      "name": "天娱数科",
       "market": "深市",
       "board": "主板",
       "horizon": "短线",
       "close": null,
-      "pct_chg": 5.0,
-      "final_score": 3.54,
+      "pct_chg": 4.1096,
+      "final_score": 3.59,
       "resonance": 1,
       "sources": [
         "大牛股猎手"
@@ -765,15 +609,16 @@
         "不达标",
         "日换手率达到20%的前5只证券"
       ],
-      "industry": "金属制品业",
+      "industry": "互联网和相关服务",
       "concepts": [
-        "参股保险",
-        "长江三角",
-        "节能环保",
-        "机构重仓",
-        "光纤概念"
+        "小盘价值",
+        "融资融券",
+        "2026中报预增",
+        "元宇宙概念",
+        "小红书概念",
+        "AI应用"
       ],
-      "enter_date": "20260831",
+      "enter_date": "20260901",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -781,31 +626,32 @@
       "resistance": null
     },
     {
-      "code": "301399",
-      "name": "英特科技",
+      "code": "300642",
+      "name": "透景生命",
       "market": "深市",
       "board": "创业板",
       "horizon": "短线",
       "close": null,
-      "pct_chg": 5.6382,
-      "final_score": 3.53,
+      "pct_chg": 19.9882,
+      "final_score": 3.59,
       "resonance": 1,
       "sources": [
         "大牛股猎手"
       ],
       "signals": [
         "不达标",
-        "连续三个交易日内，涨幅偏离值累计达到30%的证券"
+        "日涨幅达到15%的前5只证券"
       ],
-      "industry": "通用设备制造业",
+      "industry": "医药制造业",
       "concepts": [
+        "医疗器械概念",
         "专精特新",
-        "创业板综",
-        "融资融券",
-        "液冷概念",
-        "破发股"
+        "病毒防治",
+        "微盘股",
+        "基因测序",
+        "体外诊断概念"
       ],
-      "enter_date": "20260831",
+      "enter_date": "20260901",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -813,25 +659,116 @@
       "resistance": null
     },
     {
-      "code": "920223",
-      "name": "荣亿精密",
-      "market": "北交所",
-      "board": "北交所",
+      "code": "000892",
+      "name": "欢瑞世纪",
+      "market": "深市",
+      "board": "主板",
       "horizon": "短线",
       "close": null,
-      "pct_chg": 29.9672,
-      "final_score": 3.53,
+      "pct_chg": 10.0,
+      "final_score": 3.55,
       "resonance": 1,
       "sources": [
         "大牛股猎手"
       ],
       "signals": [
         "不达标",
-        "北交所股票连续3个交易日内日收盘价涨跌幅偏离值累计达到+40%(-40%)"
+        "连续三个交易日内，涨幅偏离值累计达到20%的证券"
+      ],
+      "industry": "广播、电视、电影和录音制作业",
+      "concepts": [
+        "破增发价股",
+        "人工智能",
+        "影视概念",
+        "机构重仓",
+        "谷子经济",
+        "成渝特区"
+      ],
+      "enter_date": "20260901",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "920087",
+      "name": "秋乐种业",
+      "market": "北交所",
+      "board": "北交所",
+      "horizon": "短线",
+      "close": null,
+      "pct_chg": 19.6319,
+      "final_score": 3.52,
+      "resonance": 1,
+      "sources": [
+        "大牛股猎手"
+      ],
+      "signals": [
+        "不达标",
+        "当日价格振幅达到30%的前5只股票"
       ],
       "industry": "",
       "concepts": [],
-      "enter_date": "20260831",
+      "enter_date": "20260901",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "920021",
+      "name": "流金科技",
+      "market": "北交所",
+      "board": "北交所",
+      "horizon": "短线",
+      "close": null,
+      "pct_chg": 5.6497,
+      "final_score": 3.51,
+      "resonance": 1,
+      "sources": [
+        "大牛股猎手"
+      ],
+      "signals": [
+        "不达标",
+        "当日换手率达到20%的前5只股票"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "20260901",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "600547",
+      "name": "山东黄金",
+      "market": "沪市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": null,
+      "pct_chg": 0.0,
+      "final_score": 3.0,
+      "resonance": 1,
+      "sources": [
+        "板块龙头"
+      ],
+      "signals": [
+        "板块强势"
+      ],
+      "industry": "有色金属矿采选业",
+      "concepts": [
+        "周期股",
+        "融资融券",
+        "MSCI中国",
+        "沪股通",
+        "证金持股",
+        "富时罗素"
+      ],
+      "enter_date": "2026-09-02",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -844,8 +781,8 @@
       "market": "深市",
       "board": "主板",
       "horizon": "短线",
-      "close": 40.36,
-      "pct_chg": 10.0,
+      "close": 36.69,
+      "pct_chg": 10.01,
       "final_score": 2.7,
       "resonance": 1,
       "sources": [
@@ -857,28 +794,28 @@
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "CPO概念",
-        "央国企改革",
-        "F5G概念",
-        "东方财富热股",
-        "数据中心",
-        "融资融券"
+        "融资融券",
+        "2026中报预增",
+        "元宇宙概念",
+        "移动支付",
+        "车联网(车路云)",
+        "昨日炸板"
       ],
-      "enter_date": "2026-08-31",
-      "stop_loss": 37.53,
-      "target_price": 46.01,
+      "enter_date": "2026-09-02",
+      "stop_loss": 34.12,
+      "target_price": 41.83,
       "risk_reward": 2.0,
-      "support": 24.6,
-      "resistance": 40.36
+      "support": null,
+      "resistance": null
     },
     {
-      "code": "600127",
-      "name": "金健米业",
-      "market": "沪市",
-      "board": "主板",
+      "code": "00939",
+      "name": "建设银行",
+      "market": "港股",
+      "board": "港股",
       "horizon": "短线",
-      "close": 12.04,
-      "pct_chg": 2.29,
+      "close": 9.6,
+      "pct_chg": 1.05,
       "final_score": 2.7,
       "resonance": 1,
       "sources": [
@@ -888,27 +825,229 @@
         "上涨趋势",
         "机构变红"
       ],
-      "industry": "农副食品加工业",
-      "concepts": [
-        "农副食品加工业",
-        "新零售",
-        "央国企改革",
-        "预制菜概念",
-        "融资融券",
-        "2026中报首亏"
-      ],
-      "enter_date": "2026-08-31",
-      "stop_loss": 11.2,
-      "target_price": 13.73,
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-09-02",
+      "stop_loss": 8.93,
+      "target_price": 10.94,
       "risk_reward": 2.0,
-      "support": 5.52,
-      "resistance": 12.58
+      "support": null,
+      "resistance": null
     },
     {
-      "code": "002354",
-      "name": "天娱数科",
-      "market": "深市",
-      "board": "主板",
+      "code": "02601",
+      "name": "中国太保",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "短线",
+      "close": 30.92,
+      "pct_chg": 2.32,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-09-02",
+      "stop_loss": 28.76,
+      "target_price": 35.25,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "01398",
+      "name": "工商银行",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "短线",
+      "close": 7.68,
+      "pct_chg": 1.52,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-09-02",
+      "stop_loss": 7.14,
+      "target_price": 8.76,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "03988",
+      "name": "中国银行",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "短线",
+      "close": 5.97,
+      "pct_chg": 1.27,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-09-02",
+      "stop_loss": 5.55,
+      "target_price": 6.81,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "03328",
+      "name": "交通银行",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "短线",
+      "close": 7.88,
+      "pct_chg": 1.03,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-09-02",
+      "stop_loss": 7.33,
+      "target_price": 8.98,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "03968",
+      "name": "招商银行",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "短线",
+      "close": 51.45,
+      "pct_chg": 0.98,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-09-02",
+      "stop_loss": 47.85,
+      "target_price": 58.65,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "00857",
+      "name": "中国石油股份",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "短线",
+      "close": 10.2,
+      "pct_chg": 0.29,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-09-02",
+      "stop_loss": 9.49,
+      "target_price": 11.63,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "00386",
+      "name": "中国石油化工股份",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "短线",
+      "close": 4.76,
+      "pct_chg": -0.42,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-09-02",
+      "stop_loss": 4.43,
+      "target_price": 5.43,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "01288",
+      "name": "农业银行",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "短线",
+      "close": 6.51,
+      "pct_chg": 2.6,
+      "final_score": 2.7,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "上涨趋势",
+        "机构变红",
+        "缠论买点"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-09-02",
+      "stop_loss": 6.05,
+      "target_price": 7.42,
+      "risk_reward": 2.0,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "02269",
+      "name": "药明生物",
+      "market": "港股",
+      "board": "港股",
       "horizon": "中长线",
       "close": null,
       "pct_chg": 0.0,
@@ -918,18 +1057,11 @@
         "驾驶舱B档"
       ],
       "signals": [
-        "早期:机构变红"
+        "早期:机构变红+缠论买"
       ],
-      "industry": "互联网和相关服务",
-      "concepts": [
-        "谷子经济",
-        "东数西算",
-        "融资融券",
-        "百度概念",
-        "AI智能体",
-        "破增发价股"
-      ],
-      "enter_date": "2026-08-31",
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-09-02",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -937,10 +1069,10 @@
       "resistance": null
     },
     {
-      "code": "300285",
-      "name": "国瓷材料",
-      "market": "创业板",
-      "board": "创业板",
+      "code": "01093",
+      "name": "石药集团",
+      "market": "港股",
+      "board": "港股",
       "horizon": "中长线",
       "close": null,
       "pct_chg": 0.0,
@@ -950,338 +1082,11 @@
         "驾驶舱B档"
       ],
       "signals": [
-        "早期:机构变红"
+        "早期:机构变红+缠论买"
       ],
-      "industry": "化学原料和化学制品制造业",
-      "concepts": [
-        "创业板综",
-        "融资融券",
-        "3D打印",
-        "商业航天",
-        "QFII重仓",
-        "电池技术"
-      ],
-      "enter_date": "2026-08-31",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "002407",
-      "name": "多氟多",
-      "market": "深市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "化学原料和化学制品制造业",
-      "concepts": [
-        "化工原料",
-        "创投",
-        "融资融券",
-        "氟化工概念",
-        "钠离子电池",
-        "PVDF概念"
-      ],
-      "enter_date": "2026-08-31",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "301171",
-      "name": "易点天下",
-      "market": "创业板",
-      "board": "创业板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "互联网和相关服务",
-      "concepts": [
-        "西部大开发",
-        "创业板综",
-        "跨境支付",
-        "融资融券",
-        "快手概念",
-        "QFII重仓"
-      ],
-      "enter_date": "2026-08-31",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "000938",
-      "name": "紫光股份",
-      "market": "深市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "计算机、通信和其他电子设备制造业",
-      "concepts": [
-        "CPO概念",
-        "大盘股",
-        "区块链",
-        "创投",
-        "东数西算",
-        "东方财富热股"
-      ],
-      "enter_date": "2026-08-31",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "300454",
-      "name": "深信服",
-      "market": "创业板",
-      "board": "创业板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "软件和信息技术服务业",
-      "concepts": [
-        "百元股",
-        "创业板综",
-        "数据中心",
-        "算力概念",
-        "融资融券",
-        "云计算"
-      ],
-      "enter_date": "2026-08-31",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "600522",
-      "name": "中天科技",
-      "market": "沪市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "电气机械和器材制造业",
-      "concepts": [
-        "CPO概念",
-        "大盘股",
-        "参股银行",
-        "上证180",
-        "创投",
-        "数据中心"
-      ],
-      "enter_date": "2026-08-31",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "600498",
-      "name": "烽火通信",
-      "market": "沪市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "计算机、通信和其他电子设备制造业",
-      "concepts": [
-        "CPO概念",
-        "央国企改革",
-        "F5G概念",
-        "湖北自贸",
-        "数据中心",
-        "上证380"
-      ],
-      "enter_date": "2026-08-31",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "002156",
-      "name": "通富微电",
-      "market": "深市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "计算机、通信和其他电子设备制造业",
-      "concepts": [
-        "毫米波概念",
-        "CPO概念",
-        "大盘股",
-        "东方财富热股",
-        "融资融券",
-        "碳化硅"
-      ],
-      "enter_date": "2026-08-31",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "600105",
-      "name": "永鼎股份",
-      "market": "沪市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "电气机械和器材制造业",
-      "concepts": [
-        "CPO概念",
-        "数据中心",
-        "2026中报预增",
-        "融资融券",
-        "磁悬浮概念",
-        "QFII重仓"
-      ],
-      "enter_date": "2026-08-31",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "001309",
-      "name": "德明利",
-      "market": "深市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "计算机、通信和其他电子设备制造业",
-      "concepts": [
-        "大盘股",
-        "百元股",
-        "东方财富热股",
-        "融资融券",
-        "存储芯片",
-        "深成500"
-      ],
-      "enter_date": "2026-08-31",
-      "stop_loss": null,
-      "target_price": null,
-      "risk_reward": null,
-      "support": null,
-      "resistance": null
-    },
-    {
-      "code": "600176",
-      "name": "中国巨石",
-      "market": "沪市",
-      "board": "主板",
-      "horizon": "中长线",
-      "close": null,
-      "pct_chg": 0.0,
-      "final_score": 2.5,
-      "resonance": 1,
-      "sources": [
-        "驾驶舱B档"
-      ],
-      "signals": [
-        "早期:机构变红"
-      ],
-      "industry": "非金属矿物制品业",
-      "concepts": [
-        "大盘股",
-        "央国企改革",
-        "上证180",
-        "东方财富热股",
-        "2026中报预增",
-        "融资融券"
-      ],
-      "enter_date": "2026-08-31",
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-09-02",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
@@ -1306,17 +1111,75 @@
       ],
       "industry": "计算机、通信和其他电子设备制造业",
       "concepts": [
-        "CPO概念",
-        "大盘股",
-        "百元股",
-        "创业板综",
-        "算力概念",
-        "融资融券"
+        "融资融券",
+        "深圳特区",
+        "2026中报预增",
+        "小米概念",
+        "车联网(车路云)",
+        "云计算"
       ],
-      "enter_date": "2026-08-31",
+      "enter_date": "2026-09-02",
       "stop_loss": null,
       "target_price": null,
       "risk_reward": null,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "01299",
+      "name": "友邦保险",
+      "market": "港股",
+      "board": "港股",
+      "horizon": "中长线",
+      "close": null,
+      "pct_chg": 0.0,
+      "final_score": 2.5,
+      "resonance": 1,
+      "sources": [
+        "驾驶舱B档"
+      ],
+      "signals": [
+        "早期:机构变红"
+      ],
+      "industry": "",
+      "concepts": [],
+      "enter_date": "2026-09-02",
+      "stop_loss": null,
+      "target_price": null,
+      "risk_reward": null,
+      "support": null,
+      "resistance": null
+    },
+    {
+      "code": "002475",
+      "name": "立讯精密",
+      "market": "深市",
+      "board": "主板",
+      "horizon": "短线",
+      "close": 56.6,
+      "pct_chg": -1.01,
+      "final_score": 2.1,
+      "resonance": 1,
+      "sources": [
+        "四量终极"
+      ],
+      "signals": [
+        "机构变红",
+        "缠论买点"
+      ],
+      "industry": "计算机、通信和其他电子设备制造业",
+      "concepts": [
+        "新能源车",
+        "融资融券",
+        "深圳特区",
+        "铜缆高速连接",
+        "AH股",
+        "液冷概念"
+      ],
+      "enter_date": "2026-09-02",
+      "stop_loss": 52.64,
+      "target_price": 64.52,
+      "risk_reward": 2.0,
       "support": null,
       "resistance": null
     }
