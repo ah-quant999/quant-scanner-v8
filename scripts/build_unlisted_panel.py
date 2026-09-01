@@ -31,7 +31,7 @@ _MODULES = [
     {"id": "INDUSTRY_TREE_DRILL", "name": "行业树图（下钻）",  "reason": "申万三级下钻与个股联动未对齐",            "status": "blocked"},
     {"id": "ETF_SUBSCRIPTION",  "name": "ETF 申购赎回",        "reason": "等东财口径切换完成（fetch_etf_subscription_em.py 已建）", "status": "wip"},
     {"id": "STOCK_RPS_MULTI",   "name": "相对强度多周期",      "reason": "数据齐备，前端卡片未设计",                "status": "design"},
-    {"id": "BIG_BULL_HUNTER_X", "name": "大牛股猎手 X",        "reason": "与 LHB_DATA 同源，独立卡待主人确认",     "status": "evaluation"},
+    # 🛡 2026-09-02 主人令：3⭐ 大牛股猎手已决定删除，其独立实验卡（大牛股猎手 X）从模块去向索引移除。
     {"id": "RUNNER_HEALTH",     "name": "Runner 健康监控卡",   "reason": "RUNNER_STATUS 数据已有，前端图表规格未定", "status": "design"},
     {"id": "FY_CALENDAR",       "name": "财年事件日历",        "reason": "v8 改为每月 1 日自动更新（8/30 已上线）", "status": "shipped_via_v8_cal"},
 ]

@@ -71,7 +71,9 @@ CARD_DEFS = [
     {"id": "ETF_DAILY_MONITOR", "name": "ETF 日监控", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["top_inflow", "top_outflow"], "premarket_keep": True},
     {"id": "SECTOR_FUND_FLOW", "name": "板块资金流向", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["top_list"]},
     {"id": "CONCEPT_RANKING", "name": "概念排名", "page": "实时数据", "freq": "盘中每30分", "max_age": 90, "key_fields": ["items"]},
-    {"id": "LIMIT_UP_HEATMAP", "name": "涨停热度", "page": "实时数据", "freq": "盘中每30分", "max_age": 90, "key_fields": ["top", "dates"]},
+    # 🛡 2026-09-02 一劳永逸：LIMIT_UP_HEATMAP.js 实际字段为 update_time/dates/sectors/republish_time，
+    #   不存在 "top" 字段；原 key_fields 含 "top" 导致健康检查每天误报"关键字段空值：top"黄灯。
+    {"id": "LIMIT_UP_HEATMAP", "name": "涨停热度", "page": "实时数据", "freq": "盘中每30分", "max_age": 90, "key_fields": ["dates", "sectors"]},
     {"id": "MARKET_FUND_FLOW_DATA", "name": "市场资金流向", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["daily"]},
     {"id": "MARKET_ALERTS", "name": "市场预警", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["indices"]},
     # 盘后数据
