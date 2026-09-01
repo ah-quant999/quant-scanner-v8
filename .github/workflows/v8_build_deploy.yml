@@ -87,11 +87,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # ★ 2026-08-15 根治 build clobber：必须全量克隆（fetch-depth: 0），否则浅克隆
-          #   reset --hard FETCH_HEAD 拉不到 cn 单独推送的 5 个 extra 文件（STOCK_RPS 等）
-          #   最新 blob，本地副本落后 → ?v 算成陈旧值 → CDN 吐旧副本。全量克隆保证
-          #   reset 后本地 data/*.js 与线上严格一致，?v 一律取本地文件即权威。
-          fetch-depth: 0
+          # ★ 2026-09-01 根治 checkout 超时：改用浅克隆（fetch-depth: 1）。
+          #   原 fetch-depth: 0 全量克隆在大仓库 + runner 配额/网络波动下，
+          #   09:51 UTC 起连续 21 轮死在 actions/checkout@v4 → 部署整段未跑、Pages 整站停更 1.5h+。
+          #   部署只需最新树：浅克隆即含完整最新快照（含 cn 推送的 5 个 extra 文件最新 blob），
+          #   reset --hard FETCH_HEAD 后工作树 == 最新 commit 完整树，?v 取本地文件即权威；
+          #   累加型小文件已由「可靠 git 提交」落在 HEAD，不依赖历史深度，故无需全量克隆。
+          fetch-depth: 1
 
       - uses: actions/setup-python@v5
         with:
