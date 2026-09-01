@@ -10644,17 +10644,7 @@ window.showRestrictedItems = showRestrictedItems;
     //      → 页面永远空白无人救。提前后每 1.5s 检查，即使首调失败也能自愈重试直至渲染成功。
     var el=(typeof $==='function')?$('unlistedPanel'):document.getElementById('unlistedPanel');
     if(!el) return;
-    // 🛡 2026-08-26 一劳永逸：提前暴露 __ulSwitch，子 tab 按钮在 renderUnlisted 任何位置抛错后仍可切换
-    window.__ulSwitch = function(btn, tab){
-      window.__ulActivePane = tab;  // guard: 记住当前子 tab，重渲染不再 snap-back
-      // 2026-09-01 主人令：AI预测 / 潜力挖掘 / ETF·龙头参考 三卡已彻底删除，调试专区 tab 一并取消，
-      //   子 tab 现只剩「强势突破」一个 pane，故此处只切 ulPaneStrong。
-      var pStrong=document.getElementById('ulPaneStrong');
-      if(pStrong) pStrong.style.display=(tab==='strong')?'block':'none';
-      var tabs=document.querySelectorAll('#sec-ul .ul-tab');
-      for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
-      if(btn) btn.classList.add('active');
-    };
+
     if(!window.__ulSelfHealTimer){
       window.__ulSelfHealTimer=setInterval(function(){
         var p=document.getElementById('unlistedPanel');
@@ -10712,9 +10702,7 @@ window.showRestrictedItems = showRestrictedItems;
 
     // ═══ 2026-08-16/18 主人令：暂未上架改子Tab导航（强势突破/AI预测/调试专区）；2026-08-20 潜力挖掘已删除→AI预测 ═══
     h+='<style>.ul-pane{display:none}.ul-pane.active{display:block}.ul-tab{font-size:12.5px;font-weight:600;color:var(--sub);background:transparent;border:1px solid var(--border);border-radius:8px;padding:6px 13px;cursor:pointer;transition:all .15s}.ul-tab:hover{color:var(--txt);background:var(--bg2)}.ul-tab.active{color:var(--txt);background:var(--card2);border-color:var(--border2);box-shadow:0 1px 4px rgba(0,0,0,.12)}</style>';
-    h+='<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px;">';
-    h+='<div class="ul-tab' + (_ulAct==='strong'?' active':'') + '" data-ultab="strong" onclick="window.__ulSwitch(this,\'strong\')">🚀 强势突破</div>';
-    h+='</div>';
+
 
     // 2026-09-01 主人令：调试专区（AI预测/潜力挖掘/ETF·龙头参考）三卡确认无用，已彻底删除。
 
@@ -10736,7 +10724,7 @@ window.showRestrictedItems = showRestrictedItems;
     // ── 🎭 情绪周期 · 连板天梯（合并紧凑版）已迁到实时数据区，见 window.__renderCycleLadderCard ──
 
     // ── pane1: 🚀 强势突破（3 卡：回测对比 + 动量共识 + H反推）──
-    h+='<div class="ul-pane" id="ulPaneStrong" style="display:'+(_ulAct==='strong'?'block':'none')+'">';
+    h+='<div class="ul-pane" id="ulPaneStrong" style="display:block">';
     // ── 2026-09-01 主人令：🔥 热门赛道资金追踪 容器（pane1 最底部原生卡）──
     h+='<div id="ulSectorFundTrackPanel">加载中…</div>';
     // ── 2026-08-30 主人令：强势突破 = H反推 + 动量共识 + 回测对比 三卡并列；本页速读删（属调试/展示性内容，移至逻辑详解） ──
@@ -10938,16 +10926,7 @@ window.showRestrictedItems = showRestrictedItems;
     el.innerHTML=h;
     // 2026-08-30 主人令:渲染兜底
     if(!h || h.length<200){ el.innerHTML='<div style=\"text-align:center;padding:40px;color:var(--dim);\"><div style=\"font-size:32px;margin-bottom:12px;\">📭</div><div style=\"font-size:14px;\">已下架卡片暂无可用数据</div><div style=\"font-size:12px;margin-top:8px;\">稍后再试或检查数据源</div></div>'; }
-    // 2026-09-01 主人令（轻量化）：AI预测 / 潜力挖掘 / ETF·龙头参考 三卡及其填充函数、data 注入、
-    //   调试专区 tab 全部彻底删除（不保留"以备复用"的死代码）。子 tab 只剩「强势突破」，__ulSwitch 已简化。
-    window.__ulSwitch = function(btn, tab){
-      window.__ulActivePane = tab;
-      var pStrong = document.getElementById('ulPaneStrong');
-      if(pStrong) pStrong.style.display = (tab === 'strong') ? 'block' : 'none';
-      var tabs = document.querySelectorAll('#sec-ul .ul-tab');
-      for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
-      if(btn) btn.classList.add('active');
-    };
+
     // ⚖️ 2026-08-14 主人令：renderPortfolio 调用已删除（持仓跟踪卡整段移除）
     // 2026-08-14 主人令：涨价榜/情绪周期/潜力挖掘 fill 改由 switchSt('pr') 触发（已迁选股策略子TAB）
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderUnlisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
