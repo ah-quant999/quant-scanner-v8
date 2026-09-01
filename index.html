@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "51f569ec7";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
+    var BUILD = "b569ff014";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -170,10 +170,10 @@ window.__domReadyFns=[];
   /* ===== 涨停热力矩阵（暗色主题） ===== */
   .limit-up-content{overflow-x:auto;font-size:11px;line-height:1.5}
   .limit-up-content table{width:100%;min-width:460px;border-collapse:separate;border-spacing:0}
-  .limit-up-content th{padding:4px 2px;text-align:center;font-weight:500;color:var(--dim);font-size:10px;border-bottom:1px solid var(--border2);white-space:nowrap}
-  .limit-up-content th:first-child{text-align:left;padding-left:2px}
-  .limit-up-content td{padding:3px 2px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap}
-  .limit-up-content td:first-child{text-align:left;padding-left:2px;color:var(--txt);font-weight:600}
+  .limit-up-content th{padding:5px 3px;text-align:center;font-weight:500;color:var(--dim);font-size:10px;border-bottom:1px solid var(--border2);white-space:nowrap}
+  .limit-up-content th:first-child{text-align:left;padding-left:6px}
+  .limit-up-content td{padding:4px 3px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap}
+  .limit-up-content td:first-child{text-align:left;padding-left:6px;color:var(--txt);font-weight:600}
   .limit-up-content .lu-total{color:var(--gold);font-weight:700}
   .limit-up-content .lu-trend{font-size:12px;font-weight:700}
   .limit-up-content .lu-ignite{box-shadow:inset 0 0 0 2px var(--gold);border-radius:4px}
@@ -483,7 +483,7 @@ window.__domReadyFns=[];
 <!-- 2026-08-23 恢复：潜力挖掘板块+股票预测推荐数据（calc_potential_picks.py 输出，跟盘后算法链自动更新） -->
 <script src="data/POTENTIAL_PICKS.js?v=6b9651ad7c" defer></script>
 <script src="data/INDEX_QUOTES.js?v=4231ec83ee" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=1772dc44b4" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=f06b5615e1" defer></script>
 <script src="data/MARGIN_DATA.js?v=9a36d79d76" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=62196b4d4a" defer></script>
 <script src="data/IPO_DATA.js?v=55e8bede0f" defer></script>
@@ -1414,16 +1414,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=cff1b773ab" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=a6dc499609" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=7963f31ed4" defer></script>
-<script src="data/HEALTH_CHECK.js?v=d530272520" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=98ff5d1df7" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=f1f39bba37" defer></script>
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=92a44e9c55" defer></script>
+<script src="data/RUNNER_STATUS.js?v=cd4897cc88" defer></script>
+<script src="data/HEALTH_CHECK.js?v=813e1fa657" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=28694b55fa" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=33b6f68243" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=30e49bc7f7" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=b85a9da176" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=2a7ed92426" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=ea9c132218" defer></script>
-    <script src="data/ALGO_BACKTEST_COMPARE.js?v=82e645cbdb" defer></script>
+    <script src="data/ALGO_BACKTEST_COMPARE.js?v=10b39b009d" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -1924,7 +1924,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     <!-- 涨停热力矩阵（整行宽度） -->
     <div class="card" id="limitUpHeatCard" style="margin-bottom:16px">
-      <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近15日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">—</span></h3>
+      <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近10日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">—</span></h3>
       <div id="limitUpHeatAnalysis" class="limit-up-analysis" style="display:none"></div>
       <div id="limitUpHeatContent" class="limit-up-content">加载中…</div>
     </div>
@@ -2274,15 +2274,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <span id="stHeaderStatus" style="display:inline-flex;align-items:center;gap:6px;"></span>
     </div>
     <!-- 建议持有期纪律 banner 已于 2026-08-30 移至逻辑详解页「选股策略·持有期纪律」段，此处不再展示（避免客户可看区域堆文字） -->
-    <!-- ===== ④ v8 选股生命周期（2026-09-01 主人令：从🔒策略回测迁至选股策略页顶部） ===== -->
-    <!-- 由 window.__renderLifecycleSection() 渲染（数据源 window.V8_POOL_TRACKER） -->
-    <div id="lifeBody"></div>
-
     <!-- TAB 按钮行（横排，独立于内容区） -->
     <div class="st-tabs">
       <!-- 2026-08-29 主人令：选股池作为选股策略子页面；2026-08-30 主人令：选股池移到三重共识前面 -->
       <button class="st-tab active" data-st="pool" onclick="switchSt('pool')">🧭 选股池</button>
       <button class="st-tab" data-st="tc" onclick="switchSt('tc')">🥇 三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span></button>
+      <!-- 2026-09-01 主人令：选股生命周期作为选股策略子页面，置于三重共识之后 -->
+      <button class="st-tab" data-st="life" onclick="switchSt('life')">选股生命周期 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#22c55e;background:rgba(34,197,94,.12);padding:1px 6px;border-radius:4px">v8·追踪</span></button>
       <!-- 2026-09-01 主人令：新增「多 algo 共识」子页面 = 三重共识旁路（看所有 ≥2 algo 命中的票，附 4 桶分布 + 加权进最终推荐） -->
       <button class="st-tab" data-st="mc" onclick="switchSt('mc')">🆕 多 algo 共识 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#38bdf8;background:rgba(56,189,248,.12);padding:1px 6px;border-radius:4px">v3·试验</span></button>
       <button class="st-tab" data-st="rps" onclick="switchSt('rps')">📈 相对强度 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
@@ -2361,6 +2359,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div id="ttHistory"></div>
       </div>
     </div><!--/st-tc-->
+
+    <!-- ===== TAB 页面：选股生命周期（2026-09-01 主人令：作为选股策略子页面，置于三重共识之后） ===== -->
+    <div id="st-life" class="st-pane">
+      <div id="lifeBody"></div>
+    </div><!--/st-life-->
 
     <!-- ===== TAB 页面：🆕 多 algo 共识（2026-09-01 主人令：在三重共识后新增独立子页面） ===== -->
     <!-- 数据契约：window.V8_POOL_TRACKER.pt.items 每只含 consensus_count/algos_hit/selected/selected_score/entry_price/last_pct/days_in -->
@@ -4096,12 +4099,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   }
 
   /* ════════════════════════════════════════════════════════════════════
-     📈 ④ v8 选股生命周期（2026-09-01 主人令：从🔒策略回测迁至「选股策略」页顶部）
-     渲染进 #lifeBody（选股策略区顶部容器）。
-     布局：① 头部 → ② 置顶两卡（🤝共识N只 / 🌟精选池N只）→ ③ 胶囊包「多 algo 共识」
-          → ④ 4 桶 <details open> 全展开 → ⑤ 精选池（默认展开）→ ⑥ 待确认剔除（默认展开）
-          → ⑦ 4 桶明细（默认 open）→ ⑧ 已剔除本机记录（默认展开）
-     全部默认展开，满足「点开后要全部展示」诉求。
+     v8 选股生命周期（2026-09-01 主人令：作为「选股策略」子页面，置于三重共识之后）
+     渲染进 #lifeBody（#st-life 子页面容器）。
+     布局：① 多 algo 共识（全部展示） → ② 精选池（全部展示，跟在共识下方）
+          → ③ 4 桶（全部展示，跟在精选下方） → ④ 待确认剔除（放在最下面）
+     删除：置顶两卡、情绪/板块横排、4 桶明细表、已剔除本机记录、冗余 footer。
      ════════════════════════════════════════════════════════════════════ */
   window.__renderLifecycleSection = function(){
     var dst = document.getElementById('lifeBody');
@@ -4177,56 +4179,25 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       };
 
       /* ─── 头部 ─── */
-      var sm = pt.sentiment_meta || {};
-      var sf = pt.sector_meta || {};
-      var selSize = pt.selected_size || 0;
-      var consSize = pt.consensus_count || 0;
-      html += '<div style="margin:14px 0;border-left:4px solid #22c55e;" class="card">';
+      var _upd = (pt && pt.update_time) || '';
+      html += '<div style="margin:14px 0;" class="card">';
       html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
-      html += '<span style="font-size:15px;font-weight:700;color:#22c55e;">📈 ④ v8 选股生命周期</span>';
+      html += '<span style="font-size:15px;font-weight:700;color:var(--txt);">v8 选股生命周期</span>';
       html += '<span style="font-size:11px;color:var(--dim);">三 algo 跟踪池去重 → 专家阈值判状态（强势/买点/见顶/走弱）· 二维精选（板块流入×情绪周期）</span>';
       html += '</div>';
 
-      /* ─── ② 置顶两卡：🤝 共识 / 🌟 精选池（截图4：两卡置顶） ─── */
-      html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px;">';
-      html += '<div style="padding:10px 12px;border:1px solid rgba(56,189,248,.35);border-radius:10px;background:rgba(56,189,248,.06);">';
-      html +=   '<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:22px;font-weight:800;color:#38bdf8;">'+consSize+'</span><span style="font-size:12px;font-weight:700;color:#38bdf8;">🤝 共识 · 只</span></div>';
-      html +=   '<div style="font-size:10.5px;color:var(--dim);margin-top:2px;">v8 三大 algo ≥2 命中</div>';
-      html += '</div>';
-      html += '<div style="padding:10px 12px;border:1px solid rgba(251,191,36,.35);border-radius:10px;background:rgba(251,191,36,.06);">';
-      html +=   '<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:22px;font-weight:800;color:var(--gold);">'+selSize+'</span><span style="font-size:12px;font-weight:700;color:var(--gold);">🌟 精选池 · 只</span></div>';
-      html +=   '<div style="font-size:10.5px;color:var(--dim);margin-top:2px;">板块流入×情绪周期双优 · 共 '+pt.pool_size+' 只跟踪</div>';
-      html += '</div>';
-      html += '</div>';
-
-      /* ─── 情绪 / 板块流入 横排（降权展示） ─── */
-      html += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px;">';
-      if(sm && sm.phase){
-        var phColor = sm.phase==='高潮'?'#ef5350':(sm.phase==='退潮'?'#fb923c':(sm.phase==='修复'?'#22c55e':(sm.phase==='冰点'?'#38bdf8':'var(--sub)')));
-        html += '<span style="font-size:10.5px;color:var(--dim);white-space:nowrap;">⚡情绪：<span style="color:'+phColor+';font-weight:600;">'+_esc(sm.phase)+'</span>'+(sm.score!=null?' score='+sm.score+' Δ'+(sm.delta_pct>0?'+':'')+sm.delta_pct+'%':'')+'</span>';
-      }
-      if(sf && sf.top_in && sf.top_in.length){
-        html += '<span style="padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700;background:rgba(56,189,248,.16);color:#0ea5e9;border:1px solid rgba(56,189,248,.4);white-space:nowrap;">📥 流入 top5</span>';
-        sf.top_in.forEach(function(s){
-          html += '<span style="padding:2px 8px;border-radius:8px;font-size:10.5px;font-weight:700;background:rgba(56,189,248,.08);color:#0284c7;border:1px solid rgba(56,189,248,.3);white-space:nowrap;" title="主力净流入（亿元）">'+_esc(s.name)+' +'+(+s.net).toFixed(0)+'亿</span>';
-        });
-      }
-      html += '</div>';
-
-      /* ─── ③ 胶囊包「多 algo 共识」（截图3：用一个胶囊包起来，默认展开） ─── */
+      /* ─── ① 多 algo 共识（全部展示） ─── */
       var consensusItems = [];
       try{ consensusItems = (pt.items||[]).filter(function(x){ return x && (typeof x.consensus_count==='number') && x.consensus_count>=2 && (x.algos_hit||[]).length; }); }catch(e){ console.warn('[life] consensus filter', e); }
       if(consensusItems && consensusItems.length){
         try{ consensusItems = _sortBucket(consensusItems, 'consensus_count', false); }catch(e){ console.warn('[life] consensus sort', e); }
-        // 胶囊外框（圆角 + 蓝色边）
         html += '<div style="margin:10px 0;padding:12px;border:1.5px solid rgba(56,189,248,.45);border-radius:14px;background:rgba(56,189,248,.04);">';
         html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">';
         html += '<span style="font-size:13px;font-weight:700;color:#38bdf8;">🤝 多 algo 共识 · '+consensusItems.length+' 只</span>';
-        html += '<span style="font-size:10.5px;color:var(--dim);">v8 三大 algo ≥2 命中 · 按共识数↓ · 一行两列</span>';
+        html += '<span style="font-size:10.5px;color:var(--dim);">v8 三大 algo ≥2 命中 · 按共识数↓</span>';
         html += '</div>';
-        var consShowLimit = 30;
         html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">';
-        consensusItems.slice(0, consShowLimit).forEach(function(it){
+        consensusItems.forEach(function(it){
           if(!it) return;
           var _code = it.code || '';
           var _name = it.name || '';
@@ -4252,71 +4223,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           html += '</div>';
         });
         html += '</div>';
-        if(consensusItems.length > consShowLimit){
-          html += '<div style="font-size:10.5px;color:var(--dim);margin-top:6px;text-align:center;">已展示前 '+consShowLimit+' / '+consensusItems.length+' 只 · 完整见下方「4 桶明细」或「🆕 多 algo 共识」子页</div>';
-        }
-        html += '</div>'; // /胶囊
+        html += '</div>'; // /共识
       }
 
-      /* ─── ④ 4 桶 <details open> 全展开（截图5：全部展示） ─── */
-      var buckets = [
-        {key:'strong',  label:'🟢强势',   color:'#22c55e', bg:'rgba(34,197,94,.10)',   border:'rgba(34,197,94,.35)'},
-        {key:'buy_dip', label:'🟡回调买点', color:'#fbbf24', bg:'rgba(251,191,36,.10)',  border:'rgba(251,191,36,.35)'},
-        {key:'topped',  label:'🟠见顶',   color:'#fb923c', bg:'rgba(251,146,60,.10)',  border:'rgba(251,146,60,.35)'},
-        {key:'weak',    label:'🔴走弱',   color:'#ef5350', bg:'rgba(239,83,80,.10)',   border:'rgba(239,83,80,.35)'},
-      ];
-      var statusFilter = {strong:'strong', buy_dip:'buy_dip', topped:'topped', weak:'weak'};
-      html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">';
-      buckets.forEach(function(b){
-        var n = sc[b.key]||0;
-        var bucketItems = [];
-        try{
-          bucketItems = (pt.items||[]).filter(function(x){ return x && x.status === statusFilter[b.key]; });
-          bucketItems = _sortBucket(bucketItems, 'last_pct', false);
-        }catch(e){ console.warn('[life] bucket filter', e); }
-        var sampleLimit = 8;
-        var sample = (bucketItems||[]).slice(0, sampleLimit);
-        html += '<details open style="grid-column:1 / -1;border:1px solid '+b.border+';border-radius:8px;background:'+b.bg+';">';
-        html +=   '<summary style="cursor:pointer;user-select:none;padding:6px 12px;font-size:12px;font-weight:700;color:'+b.color+';list-style:none;display:flex;align-items:center;gap:8px;">';
-        html +=     '<span style="display:inline-block;padding:2px 10px;border-radius:6px;">'+b.label+' '+n+'</span>';
-        html +=     '<span style="font-size:10.5px;color:var(--dim);font-weight:500;">已展示前 '+sample.length+' / '+(bucketItems?bucketItems.length:0)+' 只</span>';
-        html +=   '</summary>';
-        if(sample && sample.length){
-          html += '<div style="padding:6px 10px 8px;">';
-          sample.forEach(function(it){
-            if(!it) return;
-            var _code = it.code || '';
-            var _name = it.name || '';
-            var _lastPct = (typeof it.last_pct==='number') ? it.last_pct : 0;
-            var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
-            var _cons = (typeof it.consensus_count==='number') ? it.consensus_count : 0;
-            var _isSel = !!it.selected;
-            html += '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid rgba(148,163,184,.07);">';
-            html +=   '<span style="color:var(--txt);font-weight:600;font-size:11.5px;font-family:ui-monospace,monospace;min-width:64px;">'+_esc(_code)+'</span>';
-            html +=   '<span style="color:var(--txt);font-size:11.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+_esc(_name)+'</span>';
-            if(_isSel){ html += '<span style="font-size:10px;font-weight:700;color:var(--gold);">🌟</span>'; }
-            if(_cons>=2){ html += '<span style="font-size:10px;font-weight:700;color:#38bdf8;padding:1px 5px;border-radius:5px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);">🤝'+_cons+'</span>'; }
-            html +=   '<span style="font-weight:700;font-size:11.5px;color:'+periodColor+';min-width:58px;text-align:right;">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
-            html += '</div>';
-          });
-          if((bucketItems||[]).length > sampleLimit){
-            html += '<div style="font-size:10px;color:var(--dim);margin-top:4px;text-align:center;">全部 '+((bucketItems||[]).length)+' 只见下方「📊 4 桶明细」</div>';
-          }
-          html += '</div>';
-        } else {
-          html += '<div style="padding:6px 12px 10px;font-size:11px;color:var(--dim);">该桶 0 只</div>';
-        }
-        html += '</details>';
-      });
-      html += '</div>';
-
-      /* ─── ⑤ 精选池（默认展开） ─── */
+      /* ─── ② 精选池（全部展示，跟在共识下方） ─── */
       var selectedItems = [];
       try{ selectedItems = (pt.items||[]).filter(function(x){ return x && x.selected; }); }catch(e){ console.warn('[life] selected filter', e); }
       if(selectedItems && selectedItems.length){
         try{ selectedItems = _sortBucket(selectedItems, 'selected_score', false); }catch(e){ console.warn('[life] selected sort', e); }
-        html += '<details open style="margin:10px 0;padding:0;border:1px solid rgba(251,191,36,.35);border-radius:10px;background:rgba(251,191,36,.04);">';
-        html += '<summary style="cursor:pointer;user-select:none;padding:10px 12px;font-size:13px;font-weight:700;color:var(--gold);list-style:none;">🌟 精选池 '+selectedItems.length+' 只 · 板块流入×情绪周期双优 · 按精选分↓ · 点击可收起</summary>';
+        html += '<div style="margin:10px 0;padding:0;border:1px solid rgba(251,191,36,.35);border-radius:10px;background:rgba(251,191,36,.04);">';
+        html += '<div style="padding:10px 12px;font-size:13px;font-weight:700;color:var(--gold);">🌟 精选池 '+selectedItems.length+' 只 · 板块流入×情绪周期双优 · 按精选分↓</div>';
         html += '<div style="padding:8px 10px;">';
         html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;">';
         html += '<thead><tr style="background:rgba(251,191,36,.08);border-bottom:1.5px solid rgba(251,191,36,.3);">';
@@ -4327,8 +4243,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         html += '<th style="padding:5px;text-align:left;color:var(--gold);">板块</th>';
         html += '<th style="padding:5px;text-align:right;color:var(--gold);" title="从 algo 入选那天起到当前的累计涨幅（基准 entry_price）">入场以来</th>';
         html += '</tr></thead><tbody>';
-        var selShowLimit = 30;
-        selectedItems.slice(0, selShowLimit).forEach(function(it){
+        selectedItems.forEach(function(it){
           if(!it) return;
           var _code = it.code || '';
           var _name = it.name || '';
@@ -4348,13 +4263,57 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           html += '</tr>';
         });
         html += '</tbody></table></div>';
-        if(selectedItems.length > selShowLimit){
-          html += '<div style="font-size:10.5px;color:var(--dim);margin-top:4px;text-align:center;">已展示前 '+selShowLimit+' / '+selectedItems.length+' 只 · 完整池见下方「4 桶明细」</div>';
-        }
-        html += '</div></details>';
+        html += '</div></div>';
       }
 
-      /* ─── ⑥ 待确认剔除（默认展开，满足「全部展示」） ─── */
+      /* ─── ③ 4 桶（全部展示，跟在精选下方） ─── */
+      var buckets = [
+        {key:'strong',  label:'🟢强势',   color:'#22c55e', bg:'rgba(34,197,94,.10)',   border:'rgba(34,197,94,.35)'},
+        {key:'buy_dip', label:'🟡回调买点', color:'#fbbf24', bg:'rgba(251,191,36,.10)',  border:'rgba(251,191,36,.35)'},
+        {key:'topped',  label:'🟠见顶',   color:'#fb923c', bg:'rgba(251,146,60,.10)',  border:'rgba(251,146,60,.35)'},
+        {key:'weak',    label:'🔴走弱',   color:'#ef5350', bg:'rgba(239,83,80,.10)',   border:'rgba(239,83,80,.35)'},
+      ];
+      var statusFilter = {strong:'strong', buy_dip:'buy_dip', topped:'topped', weak:'weak'};
+      html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0;">';
+      buckets.forEach(function(b){
+        var n = sc[b.key]||0;
+        var bucketItems = [];
+        try{
+          bucketItems = (pt.items||[]).filter(function(x){ return x && x.status === statusFilter[b.key]; });
+          bucketItems = _sortBucket(bucketItems, 'last_pct', false);
+        }catch(e){ console.warn('[life] bucket filter', e); }
+        html += '<details open style="grid-column:1 / -1;border:1px solid '+b.border+';border-radius:8px;background:'+b.bg+';">';
+        html +=   '<summary style="cursor:pointer;user-select:none;padding:6px 12px;font-size:12px;font-weight:700;color:'+b.color+';list-style:none;display:flex;align-items:center;gap:8px;">';
+        html +=     '<span style="display:inline-block;padding:2px 10px;border-radius:6px;">'+b.label+' '+n+'</span>';
+        html +=     '<span style="font-size:10.5px;color:var(--dim);font-weight:500;">共 '+(bucketItems?bucketItems.length:0)+' 只</span>';
+        html +=   '</summary>';
+        if(bucketItems && bucketItems.length){
+          html += '<div style="padding:6px 10px 8px;">';
+          bucketItems.forEach(function(it){
+            if(!it) return;
+            var _code = it.code || '';
+            var _name = it.name || '';
+            var _lastPct = (typeof it.last_pct==='number') ? it.last_pct : 0;
+            var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
+            var _cons = (typeof it.consensus_count==='number') ? it.consensus_count : 0;
+            var _isSel = !!it.selected;
+            html += '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid rgba(148,163,184,.07);">';
+            html +=   '<span style="color:var(--txt);font-weight:600;font-size:11.5px;font-family:ui-monospace,monospace;min-width:64px;">'+_esc(_code)+'</span>';
+            html +=   '<span style="color:var(--txt);font-size:11.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+_esc(_name)+'</span>';
+            if(_isSel){ html += '<span style="font-size:10px;font-weight:700;color:var(--gold);">🌟</span>'; }
+            if(_cons>=2){ html += '<span style="font-size:10px;font-weight:700;color:#38bdf8;padding:1px 5px;border-radius:5px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);">🤝'+_cons+'</span>'; }
+            html +=   '<span style="font-weight:700;font-size:11.5px;color:'+periodColor+';min-width:58px;text-align:right;">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
+            html += '</div>';
+          });
+          html += '</div>';
+        } else {
+          html += '<div style="padding:6px 12px 10px;font-size:11px;color:var(--dim);">该桶 0 只</div>';
+        }
+        html += '</details>';
+      });
+      html += '</div>';
+
+      /* ─── ④ 待确认剔除（放在最下面） ─── */
       var toRemove = [];
       try{
         toRemove = (pt.items || []).filter(function(it){ return (it && (it.status==='weak'||it.status==='topped')) && !removedMap[it.code]; });
@@ -4379,116 +4338,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         html += '</div></details>';
       }
 
-      /* ─── ⑦ 4 桶明细（默认 open） ─── */
-      var _poolTotal = 0; try{ _poolTotal = (pt.items||[]).length; }catch(e){}
-      html += '<details open id="btBucketDetail" style="margin:10px 0;border:1px solid var(--border);border-radius:8px;background:var(--card2);">';
-      html += '<summary style="cursor:pointer;user-select:none;padding:8px 12px;font-size:12.5px;font-weight:700;color:var(--txt);list-style:none;">📊 4 桶明细（共 '+_poolTotal+' 只）· 当前排序：'+(sortField||'last_pct')+(sortAsc?'↑':'↓')+' · 点击可收起（也可点击上方 4 个桶胶囊跳转）</summary>';
-      html += '<div style="padding:6px 10px;">';
-      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
-      html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      html += '<th onclick="window.__sortPoolTracker(\'code\')" style="padding:6px;text-align:left;color:'+(sortField==='code'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">代码'+(sortField==='code'?' '+sortArrow:'')+'</th>';
-      html += '<th onclick="window.__sortPoolTracker(\'name\')" style="padding:6px;text-align:left;color:'+(sortField==='name'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">名称'+(sortField==='name'?' '+sortArrow:'')+'</th>';
-      html += '<th onclick="window.__sortPoolTracker(\'algo\')" style="padding:6px;text-align:left;color:'+(sortField==='algo'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">来源'+(sortField==='algo'?' '+sortArrow:'')+'</th>';
-      html += _thSortable('信号类型','signal_type','left');
-      html += _thSortable('共识','consensus_count','right');
-      html += '<th onclick="window.__sortPoolTracker(\'entry_price\')" style="padding:6px;text-align:right;color:'+(sortField==='entry_price'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">基准价'+(sortField==='entry_price'?' '+sortArrow:'')+'</th>';
-      html += '<th onclick="window.__sortPoolTracker(\'last_close\')" style="padding:6px;text-align:right;color:'+(sortField==='last_close'?'#22c55e;font-weight:700;':'var(--sub);cursor:pointer;user-select:none;')+'" title="点击切换排序">现价'+(sortField==='last_close'?' '+sortArrow:'')+'</th>';
-      html += _thSortable('入场以来','last_pct','right');
-      html += _thSortable('峰值','peak_pct','right');
-      html += _thSortable('回撤','drawdown','right');
-      html += '<th style="padding:6px;text-align:left;color:var(--sub);">提示</th>';
-      html += '</tr></thead><tbody>';
-      var grouped = {};
-      try{
-        (pt.items||[]).forEach(function(it){
-          if(!it || !it.status) return;
-          (grouped[it.status] = grouped[it.status]||[]).push(it);
-        });
-      }catch(e){ console.warn('[life] group', e); }
-      STATUS_ORDER.forEach(function(s){
-        var arr = (grouped[s]||[]).slice();
-        if(!arr.length) return;
-        try{ arr = _sortBucket(arr, sortField, sortAsc); }catch(e){ console.warn('[life] sortBucket2', e); }
-        var bucketSel = arr.filter(function(x){return x && x.selected;}).length;
-        var bucketSelHtml = bucketSel > 0
-          ? '<span style="padding:1px 8px;margin-left:8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(251,191,36,.15);color:var(--gold);border:1px solid rgba(251,191,36,.3);">🌟 精选 '+bucketSel+'</span>'
-          : '';
-        html += '<tr id="btBucket-'+s+'" style="background:rgba(148,163,184,.06);"><td colspan="13" style="padding:6px 8px;font-weight:700;color:'+statusColor[s]+';font-size:12px;">'+statusLabel[s]+' '+arr.length+' 只'+bucketSelHtml+'</td></tr>';
-        arr.forEach(function(it){
-          if(!it) return;
-          var _code = it.code || '';
-          var _name = it.name || '';
-          var _algo = it.algo || '';
-          var _entry = (typeof it.entry_price==='number') ? it.entry_price : 0;
-          var _last  = (typeof it.last_close==='number')  ? it.last_close  : 0;
-          var _lastPct  = (typeof it.last_pct==='number')  ? it.last_pct  : 0;
-          var _peakPct  = (typeof it.peak_pct==='number')  ? it.peak_pct  : 0;
-          var _drawdown = (typeof it.drawdown==='number') ? it.drawdown : 0;
-          var _cons = (typeof it.consensus_count==='number') ? it.consensus_count : 0;
-          var _hint = it.buy_hint || it.sell_hint || '';
-          var isRemoved = !!removedMap[_code];
-          var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
-          var peakColor   = _peakPct > 0 ? '#ef5350' : 'var(--sub)';
-          var ddColor     = _drawdown > 10 ? '#fb923c' : (_drawdown > 5 ? '#fbbf24' : 'var(--sub)');
-          var _selScore = (typeof it.selected_score==='number') ? it.selected_score : null;
-          var _secNet = (typeof it.sector_net==='number') ? it.sector_net : 0;
-          var selIcon = it.selected ? '🌟' : (it.sentiment_match==='caution' ? '⚠️' : '—');
-          var selColor = it.selected ? 'var(--gold)' : (it.sentiment_match==='caution' ? '#fb923c' : 'var(--dim)');
-          var selScoreHtml = _selScore != null ? '<span style="font-weight:700;color:'+selColor+';">'+(_selScore>0?'+':'')+_selScore.toFixed(1)+'</span>' : '';
-          var conceptColor = it.sector_match==='top_inflow' ? '#22c55e' : (it.sector_match==='outflow' ? '#ef5350' : 'var(--dim)');
-          var conceptHtml = it.concept_top
-            ? '<span style="color:'+conceptColor+';font-size:10.5px;" title="净流入 '+(_secNet>0?'+':'')+_secNet.toFixed(1)+'亿">'+(it.sector_match==='top_inflow'?'📥':(it.sector_match==='outflow'?'📤':'·'))+' '+_esc(it.concept_top)+'</span>'
-            : '<span style="color:var(--dim);">—</span>';
-          var rowBg = it.selected ? 'background:rgba(251,191,36,.06);' : (it.consensus_count>=2 ? 'background:rgba(56,189,248,.06);' : '');
-          var rowStyle = rowBg + (isRemoved ? 'opacity:.45;' : '');
-          html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+rowStyle+'">';
-          html += '<td style="padding:5px 6px;color:var(--txt);font-weight:600;'+(isRemoved?'text-decoration:line-through;':'')+'">'+_esc(_code)+'</td>';
-          html += '<td style="padding:5px 6px;color:var(--txt);">'+_esc(_name)+'</td>';
-          html += '<td style="padding:5px 6px;color:var(--sub);font-size:10.5px;">'+_esc(_algo)+'</td>';
-          var sigColor = it.signal_type==='多算法共识' ? '#38bdf8' : (it.signal_type==='强势突破' ? '#ef5350' : (it.signal_type==='板块联动' ? '#22c55e' : 'var(--sub)'));
-          html += '<td style="padding:5px 6px;color:'+sigColor+';font-size:10.5px;white-space:nowrap;">'+_esc(it.signal_type||'')+'</td>';
-          var consTxt = _cons>=2 ? '🤝 '+_cons : (_cons>=1 ? (''+_cons) : '—');
-          var consColor = _cons>=2 ? '#38bdf8' : 'var(--dim)';
-          html += '<td style="padding:5px 6px;text-align:right;color:'+consColor+';font-weight:'+(_cons>=2?'700':'400')+';" title="命中算法：'+_esc((it.algos_hit||[]).join(' / '))+'">'+consTxt+'</td>';
-          html += '<td style="padding:5px 6px;text-align:right;color:var(--sub);">'+_entry.toFixed(2)+'</td>';
-          html += '<td style="padding:5px 6px;text-align:right;color:var(--txt);">'+_last.toFixed(2)+'</td>';
-          html += '<td style="padding:5px 6px;text-align:right;font-weight:700;color:'+periodColor+';">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</td>';
-          html += '<td style="padding:5px 6px;text-align:right;color:'+peakColor+';">'+(_peakPct>0?'+':'')+_peakPct.toFixed(2)+'%</td>';
-          html += '<td style="padding:5px 6px;text-align:right;color:'+ddColor+';">'+_drawdown.toFixed(1)+'%</td>';
-          html += '<td style="padding:5px 6px;">'+conceptHtml+'</td>';
-          html += '<td style="padding:5px 6px;text-align:right;" title="status_base + sector_bonus + sentiment_bonus">'+selIcon+' '+selScoreHtml+'</td>';
-          html += '<td style="padding:5px 6px;color:var(--dim);font-size:10.5px;white-space:nowrap;">'+_esc(_hint)+'</td>';
-          html += '</tr>';
-        });
-      });
-      html += '</tbody></table></div></div></details>';
-
-      /* ─── ⑧ 已剔除本机记录（默认展开） ─── */
-      try{
-        var removedCodes = Object.keys(removedMap||{});
-        if(removedCodes.length){
-          html += '<details open style="margin:10px 0;border:1px solid rgba(148,163,184,.25);border-radius:8px;background:var(--card2);">';
-          html += '<summary style="cursor:pointer;user-select:none;padding:8px 12px;font-size:12.5px;font-weight:700;color:var(--sub);list-style:none;">🗑️ 已剔除本机记录 '+removedCodes.length+' 只 · 仅当前浏览器可见 · 点击可收起</summary>';
-          html += '<div style="padding:6px 10px;">';
-          removedCodes.forEach(function(code){
-            var r = (removedMap && removedMap[code]) || {};
-            var _rDraw = (typeof r.drawdown==='number') ? r.drawdown : null;
-            html += '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.08);">';
-            html += '<span style="color:var(--dim);font-weight:600;font-size:11.5px;text-decoration:line-through;">'+_esc(code)+'</span>';
-            html += '<span style="color:var(--dim);font-size:11.5px;text-decoration:line-through;">'+_esc(r.name||'')+'</span>';
-            html += '<span style="color:var(--dim);font-size:10.5px;">'+_esc(r.status||'')+' · 回撤 '+(_rDraw!=null?_rDraw.toFixed(1):'-')+'% · '+_esc(r.removed_at||'')+'</span>';
-            html += '<span style="margin-left:auto;color:#22c55e;font-size:10.5px;cursor:pointer;user-select:none;" onclick="window.__restoreStock(\''+_esc(code)+'\')">撤销 ↺</span>';
-            html += '</div>';
-          });
-          html += '</div></details>';
-        }
-      }catch(e){ console.warn('[life] removed codes', e); }
-
-      var _upd = (pt && pt.update_time) || '';
-      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">表头可点击切换排序（默认精选分↓）· 二维精选（板块流入×情绪周期）：精选分 = status 基础 + 板块净流入÷10 + 情绪适配 ±N · 阈值≥8 进精选池 · 多算法共识（🤝≥2 算法命中）· 待确认剔除（本机 localStorage，跨设备不同步）· 数据 '+_upd.substring(0,16)+' · 仅跟 v8 三大算法真实跟踪池</div>';
+      html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">数据 '+_upd.substring(0,16)+' · 仅跟 v8 三大算法真实跟踪池</div>';
       html += '</div>'; // /card
     }catch(e){
-      console.error('[life ④ v8 选股生命周期]', e && (e.message||e), e && e.stack);
+      console.error('[life v8 选股生命周期]', e && (e.message||e), e && e.stack);
       try{ if(typeof Sentry!=='undefined' && Sentry && Sentry.captureException) Sentry.captureException(e); }catch(_){}
     }
     try{
@@ -4728,12 +4581,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     }
     html += '</div>';
 
-    /* ── ④ v8 选股生命周期 已迁至「选股策略」页顶部（2026-09-01 主人令：
-          把这张卡从🔒策略回测移到选股策略区，由 window.__renderLifecycleSection() 渲染进 #lifeBody）── */
+    /* ── v8 选股生命周期 已迁至「选股策略」子页面（2026-09-01 主人令：
+          置于三重共识之后，由 window.__renderLifecycleSection() 渲染进 #lifeBody）── */
     try{ if(typeof window.__renderLifecycleSection === 'function') window.__renderLifecycleSection(); }catch(e){ console.warn('[bt→lifecycle]', e); }
 
-    /* ── ④ v8 选股生命周期（渲染函数定义见下方 window.__renderLifecycleSection，2026-09-01 迁出）── */
-    /* ④ v8 选股生命周期 旧体已迁至 window.__renderLifecycleSection()（2026-09-01），本段为死代码，已整体删除 */
+    /* ── v8 选股生命周期（渲染函数定义见下方 window.__renderLifecycleSection，2026-09-01 迁出）── */
+    /* v8 选股生命周期 旧体已迁至 window.__renderLifecycleSection()（2026-09-01），本段为死代码，已整体删除 */
     }catch(e){
       console.error('[bt render error]', e && (e.message||e), '— 已渲染部分保留', {partialLen: html.length, stack: e && e.stack});
       try {
@@ -7111,12 +6964,7 @@ window.__renderV8CalFull();
     });
     // 🛡 2026-08-25 一劳永逸：minFreq 自适应——快照少时不再强制"出现于全部快照"（否则 1~2 个快照会筛成 0 条线→空白）。
     //   规则：取「快照数」与「max(1, 60%快照数)」的较小值，保证只要有 ≥1 个快照就能选出板块画线。
-    // 🛡 2026-09-01 主人令根因修复（"才1根线"）：旧阈值 ceil(n*0.6) 在快照存在重复对
-    //   （09:41≡10:09 / 10:21≡10:27）时，会把两个板块簇都卡在 freq=2<3 → 全部落选、
-    //   曲线坍缩成单一板块簇（簇内 net 值相近 → 视觉叠成1根线）。改 freq>=1（盘中至少出现一次即入选），
-    //   再按跨快照累计绝对值取 Top10，保证早盘科技 / 盘中农业等不同时段领涨板块都能同时画出，不再被阈值误杀。
-    //   （重复对源头已在 intraday_snapshot.py 内容去重根治，此处阈值放宽作双保险。）
-    var minFreq=1;
+    var minFreq=Math.min(snaps.length, Math.max(1, Math.ceil(snaps.length*0.6)));
     var ranked=Object.keys(freq).filter(function(n){return freq[n]>=minFreq;})
       .map(function(n){return {name:n, freq:freq[n], abs:maxAbsByName[n]};})
       .sort(function(a,b){
@@ -8945,7 +8793,7 @@ function drawUpDownChart(){
       h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;">';
       h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">';
       h+='<span style="font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+it.name+' <span style="font-size:10px;color:var(--dim);">'+it.currency+'</span></span>';
-      h+='<span style="font-size:16px;font-weight:800;color:var(--txt);flex-shrink:0;">'+(it.value==null?'--':Number(it.value).toFixed(2))+'</span>';
+      h+='<span style="font-size:16px;font-weight:800;color:var(--txt);flex-shrink:0;">'+Number(it.value).toFixed(2)+'</span>';
       h+='</div>';
       h+='<div style="font-size:12px;font-weight:700;color:'+col+';">'+arrow+' '+fmtPct(it.chg_pct)+'</div>';
       h+='</div>';
@@ -9699,10 +9547,12 @@ window.showRestrictedItems = showRestrictedItems;
   }
   window.switchSt=function(n){
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
-    ['tc','cockpit','allsite','fv','crds','hunter','rps','pool','mc'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
+    ['tc','cockpit','allsite','fv','crds','hunter','rps','pool','mc','life'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
     renderStTab(n);
     // 2026-08-29 主人令：选股池子页渲染
     if(n==='pool' && typeof window.renderStPool==='function') setTimeout(window.renderStPool, 30);
+    // 2026-09-01 主人令：选股生命周期子页面渲染
+    if(n==='life' && typeof window.__renderLifecycleSection==='function') setTimeout(window.__renderLifecycleSection, 30);
     // 2026-09-01 主人令：多 algo 共识独立子页渲染
     if(n==='mc' && typeof window.renderStMc==='function') setTimeout(window.renderStMc, 30);
   };
@@ -13255,7 +13105,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=d530272520')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=813e1fa657')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
