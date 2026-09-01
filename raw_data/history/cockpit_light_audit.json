@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-01T10:46:26",
+  "update_time": "2026-09-01T18:33:07",
   "days": [
     {
       "light1": "黄灯·谨慎低吸",
@@ -42,7 +42,7 @@
       "light1": "黄灯·谨慎低吸",
       "light1_code": "yellow",
       "crisis_score": 31,
-      "mkt_avg": -1.31,
+      "mkt_avg": -1.173,
       "north5": 0,
       "light2": "企稳回升",
       "light2_code": "stabilize",
