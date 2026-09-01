@@ -2113,11 +2113,16 @@ def check_a_share_coverage():
         d = load_window_var(path, var)
         if d is None:
             continue
-        stocks_raw = d.get("stocks", d.get("all_candidates", d.get("watch", d.get("tier_a", []))))
-        if isinstance(stocks_raw, dict):
-            stocks = list(stocks_raw.values())
+        # 🔴 2026-09-02 一劳永逸：驾驶舱分档同时含 tier_a（严格）+ tier_b（埋伏），
+        #   健康检查只看 tier_a 会误报"全港股"（tier_b 实际含 A股 创业板/沪市/深市）
+        if var == "COCKPIT_TIER_RECOMMEND":
+            stocks = list(d.get("tier_a", []) or []) + list(d.get("tier_b", []) or [])
         else:
-            stocks = stocks_raw or []
+            stocks_raw = d.get("stocks", d.get("all_candidates", d.get("watch", d.get("tier_a", []))))
+            if isinstance(stocks_raw, dict):
+                stocks = list(stocks_raw.values())
+            else:
+                stocks = stocks_raw or []
         total = len(stocks)
         a_cnt = sum(1 for s in stocks if _is_a_share(s)) if total > 0 else 0
         hk_cnt = total - a_cnt
