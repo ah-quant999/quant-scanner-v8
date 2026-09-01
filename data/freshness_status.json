@@ -1,13 +1,8 @@
 {
-  "check_time": "2026-09-01 20:15:13",
+  "check_time": "2026-09-01 21:01:01",
   "last_trade_close": "2026-09-01 15:30:00",
   "is_trading_day": true,
   "core_stale": [
-    {
-      "var": "CRISIS_DATA",
-      "reason": "更新于 09-01 06:27，落后 9.0 小时",
-      "category": "premarket,intraday"
-    },
     {
       "var": "MARGIN_DATA",
       "reason": "更新于 08-31 16:38，落后 2 个交易日（阈值 1.08333）",
@@ -24,19 +19,13 @@
       "category": "algo"
     }
   ],
-  "warn_stale": [
-    {
-      "var": "CONCEPT_RANKING",
-      "reason": "更新于 08-31 19:31，落后 2 个交易日（阈值 1.08333）",
-      "category": "intraday"
-    }
-  ],
+  "warn_stale": [],
   "frozen_stale": [],
   "no_update_time": [],
   "summary": {
     "total_checked": 49,
-    "core_stale": 4,
-    "warn_stale": 1,
+    "core_stale": 3,
+    "warn_stale": 0,
     "frozen_stale": 0,
     "no_timestamp": 0
   },
