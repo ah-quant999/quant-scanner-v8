@@ -46,6 +46,7 @@ jobs:
   reconcile:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    if: false   # 🚨 2026-09-01 紧急禁用：本 workflow 正在用 fetch-depth:1 浅克隆把 main  force 成孤立 root，先停掉再根治
     steps:
       - uses: actions/checkout@v4
         with:
