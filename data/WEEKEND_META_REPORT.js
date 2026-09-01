@@ -1,1 +1,1 @@
-window.WEEKEND_META_REPORT = {"update_time":"2026-09-01 03:24:27","total":9602,"new_listings_count":0,"delisted_count":0,"new_listings":[],"delisted":[],"meta_enriched":0,"republish_time":"2026-09-01 03:47:53"};
+window.WEEKEND_META_REPORT = {"update_time":"2026-09-01 09:35:34","total":9607,"new_listings_count":5,"delisted_count":0,"new_listings":["601123 N马矿","301697 N贝特利","00625 希音－Ｗ","09615 梅卡曼德机器人","562180 NA500红利低波ETF招商"],"delisted":[],"meta_enriched":3,"republish_time":"2026-09-01 09:38:15"};
