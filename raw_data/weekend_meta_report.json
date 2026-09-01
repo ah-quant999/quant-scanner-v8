@@ -1,9 +1,21 @@
 {
-"update_time": "2026-09-01 03:24:27",
-"total": 9602,
-"new_listings_count": 0,
-"delisted_count": 0,
-"new_listings": [],
-"delisted": [],
-"meta_enriched": 0
+"update_time": "2026-09-02 03:39:12",
+"total": 9606,
+"new_listings_count": 5,
+"delisted_count": 1,
+"new_listings": [
+"601123 N马矿",
+"301697 N贝特利",
+"00625 希音－Ｗ",
+"09615 梅卡曼德机器人",
+"562180 NA500红利低波ETF招商"
+],
+"delisted": [
+"01712 龙资源"
+],
+"meta_enriched": 3,
+"guard_tripped": false,
+"guard_reasons": [],
+"old_universe": 9602,
+"fresh_universe": 9606
 }

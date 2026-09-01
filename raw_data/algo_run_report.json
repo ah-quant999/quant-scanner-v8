@@ -1,20 +1,20 @@
 {
-  "update_time": "2026-09-01 03:44:52",
-  "run_start": "2026-09-01 02:02:45",
+  "update_time": "2026-09-02 03:53:53",
+  "run_start": "2026-09-02 02:32:10",
   "ok": 38,
   "fail": 7,
   "failed_scripts": [
     {
       "script": "calc_crds.py",
-      "reason": "退出码 1 |    绕开（应急）: TIME_GATE_BYPASS=1 环境变量"
+      "reason": "退出码 1 | ============================================================"
     },
     {
       "script": "generate_top10.py",
-      "reason": "退出码 1 |    绕开（应急）: TIME_GATE_BYPASS=1 环境变量"
+      "reason": "退出码 1 | ============================================================"
     },
     {
       "script": "scripts/ab_universe_backtest.py",
-      "reason": "超时 >30min"
+      "reason": "监督器静默杀(>15min 无输出)"
     },
     {
       "script": "strategy_four_volume_60m.py",
@@ -26,7 +26,7 @@
     },
     {
       "script": "gen_triple_consensus.py",
-      "reason": "退出码 1 |    绕开（应急）: TIME_GATE_BYPASS=1 环境变量"
+      "reason": "退出码 1 | ============================================================"
     },
     {
       "script": "refresh_dividend_cninfo.py",

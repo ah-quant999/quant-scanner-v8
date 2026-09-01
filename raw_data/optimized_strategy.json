@@ -1,6 +1,6 @@
 {
-  "calc_time": "2026-09-01",
-  "update_time": "2026-09-01",
+  "calc_time": "2026-09-02",
+  "update_time": "2026-09-02",
   "method": "①持仓周期≤10d + ②≥3信号共振 + ③市场regime门控(grind/panic)",
   "backtest_sample": {
     "stocks_analyzed": 296,
@@ -65,7 +65,7 @@
     "note": "数据驱动：仅在市场状态为 grind/panic 时开仓"
   },
   "current_regime": {
-    "date": "2026-08-31",
+    "date": "2026-09-01",
     "regime": "stabilize",
     "open_position": false
   }

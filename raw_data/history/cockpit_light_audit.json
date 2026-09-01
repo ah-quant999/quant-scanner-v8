@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-01T03:21:20",
+  "update_time": "2026-09-02T03:33:21",
   "days": [
     {
       "light1": "黄灯·谨慎低吸",
@@ -36,7 +36,9 @@
       "light2": "企稳回升",
       "light2_code": "stabilize",
       "date": "2026-08-31",
-      "fwd": null
+      "fwd": {
+        "1": -0.161
+      }
     },
     {
       "light1": "绿灯·可操作",
@@ -47,6 +49,17 @@
       "light2": "企稳回升",
       "light2_code": "stabilize",
       "date": "2026-09-01",
+      "fwd": null
+    },
+    {
+      "light1": "黄灯·谨慎低吸",
+      "light1_code": "yellow",
+      "crisis_score": 32,
+      "mkt_avg": -1.173,
+      "north5": 0,
+      "light2": "企稳回升",
+      "light2_code": "stabilize",
+      "date": "2026-09-02",
       "fwd": null
     }
   ],
@@ -63,22 +76,33 @@
           }
         },
         "ready": false
+      },
+      "green": {
+        "n": 1,
+        "periods": {
+          "T1": {
+            "n": 1,
+            "avg": -0.161,
+            "win": 0.0
+          }
+        },
+        "ready": false
       }
     },
     "light2_code": {
       "stabilize": {
-        "n": 2,
+        "n": 3,
         "periods": {
           "T1": {
-            "n": 2,
-            "avg": 0.863,
-            "win": 100.0
+            "n": 3,
+            "avg": 0.522,
+            "win": 66.7
           }
         },
         "ready": false
       }
     }
   },
-  "n_days": 4,
-  "n_days_with_fwd": 2
+  "n_days": 5,
+  "n_days_with_fwd": 3
 }
