@@ -46,6 +46,10 @@ on:
         description: '强制运行（忽略时间门控，周末/假期审计用）'
         type: boolean
         default: false
+      bypass_time_gate:
+        description: '绕过选股时间守门(应急:凌晨/盘前补跑用，默认关，勾选即放行)'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -101,6 +105,8 @@ jobs:
       V8_PUSH: "1"
       # 2026-08-29 周末审计：手动 dispatch 带 force_run=true 时置 1，run_algorithms 时间门控直接放行
       V8_FORCE_RUN: ${{ github.event.inputs.force_run == 'true' && '1' || '' }}
+      # 2026-09-02 紧急补：手动 dispatch 带 bypass_time_gate=true 时置 1，绕过「选股须≥18:00 CST」守门(凌晨/盘前应急补跑)
+      TIME_GATE_BYPASS: ${{ github.event.inputs.bypass_time_gate == 'true' && '1' || '' }}
       SKIP_MOOTDX: "1"
       # 2026-08-13 修复：云端 runner 必须走腾讯 GTimg 数据源(mootdx/东财在境外不稳定)，
       # 与 scanner.py 的 GITHUB_ACTIONS 自动识别形成双保险，防止 A股活跃股池缺失。
