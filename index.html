@@ -169,11 +169,11 @@ window.__domReadyFns=[];
 
   /* ===== 涨停热力矩阵（暗色主题） ===== */
   .limit-up-content{overflow-x:auto;font-size:11px;line-height:1.5}
-  .limit-up-content table{width:100%;min-width:460px;border-collapse:separate;border-spacing:0}
-  .limit-up-content th{padding:5px 3px;text-align:center;font-weight:500;color:var(--dim);font-size:10px;border-bottom:1px solid var(--border2);white-space:nowrap}
-  .limit-up-content th:first-child{text-align:left;padding-left:6px}
-  .limit-up-content td{padding:4px 3px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap}
-  .limit-up-content td:first-child{text-align:left;padding-left:6px;color:var(--txt);font-weight:600}
+  .limit-up-content table{width:100%;min-width:460px;border-collapse:separate;border-spacing:0;table-layout:fixed}
+  .limit-up-content th{padding:5px 2px;text-align:center;font-weight:500;color:var(--dim);font-size:10px;border-bottom:1px solid var(--border2);white-space:nowrap}
+  .limit-up-content th:first-child{width:110px;text-align:left;padding-left:6px}
+  .limit-up-content td{padding:4px 2px;text-align:center;border-bottom:1px solid rgba(255,255,255,.04);white-space:nowrap}
+  .limit-up-content td:first-child{width:110px;text-align:left;padding-left:6px;color:var(--txt);font-weight:600}
   .limit-up-content .lu-total{color:var(--gold);font-weight:700}
   .limit-up-content .lu-trend{font-size:12px;font-weight:700}
   .limit-up-content .lu-ignite{box-shadow:inset 0 0 0 2px var(--gold);border-radius:4px}
@@ -1924,7 +1924,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     <!-- 涨停热力矩阵（整行宽度） -->
     <div class="card" id="limitUpHeatCard" style="margin-bottom:16px">
-      <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近10日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">—</span></h3>
+      <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近15日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">—</span></h3>
       <div id="limitUpHeatAnalysis" class="limit-up-analysis" style="display:none"></div>
       <div id="limitUpHeatContent" class="limit-up-content">加载中…</div>
     </div>
@@ -10598,21 +10598,13 @@ window.showRestrictedItems = showRestrictedItems;
     //      → 页面永远空白无人救。提前后每 1.5s 检查，即使首调失败也能自愈重试直至渲染成功。
     var el=(typeof $==='function')?$('unlistedPanel'):document.getElementById('unlistedPanel');
     if(!el) return;
-    // 🛡 2026-08-26 一劳永逸：提前暴露 __ulSwitch，子 tab 按钮在 renderUnlisted 任何位置抛错后仍可切换
-    window.__ulSwitch = function(btn, tab){
-      window.__ulActivePane = tab;  // guard: 记住当前子 tab，重渲染不再 snap-back
-      var idMap={dbg:'ulPaneDbg'};
-      var all=['ulPaneDbg'];
-      for(var k=0;k<all.length;k++){var p=document.getElementById(all[k]); if(p) p.style.display=(all[k]===idMap[tab])?'block':'none';}
-      var tabs=document.querySelectorAll('#sec-ul .ul-tab');
-      for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
-      if(btn) btn.classList.add('active');
-    };
+    // 🛡 2026-09-01 主人令：「暂未上架」取消子Tab，直接平铺三个卡。保留 __ulSwitch 空壳防止旧深链调用报错。
+    window.__ulSwitch = function(btn, tab){};
     if(!window.__ulSelfHealTimer){
       window.__ulSelfHealTimer=setInterval(function(){
         var p=document.getElementById('unlistedPanel');
         if(!p) return;
-        if(p.innerHTML.length>=1000 && p.innerHTML.indexOf('ulPaneDbg')>=0) return; // 已渲染成功停止
+        if(p.innerHTML.length>=1000 && p.innerHTML.indexOf('aiPredBody')>=0) return; // 已渲染成功停止（AI预测卡 body 存在即可）
         if(typeof window.renderUnlisted==='function'){
           console.log('[ulSelfHeal] retry renderUnlisted len='+p.innerHTML.length);
           try{ window.renderUnlisted(); }catch(e){ console.warn('[ulSelfHeal] rethrow:',e.message); }
@@ -10624,7 +10616,7 @@ window.showRestrictedItems = showRestrictedItems;
       if(el.dataset.smsLoading){
         // 🛡 2026-08-20 超时兜底：STOCK_MOMENTUM_STATE.js(616KB) 加载慢会让页面永久空白。
         //   首次进本分支即启动 8s 超时：超时后强制渲染（动量卡降级为"数据不可用"），
-        //   其余 pane（调试专区）正常显示，绝不整页空白。
+        //   其余三个调试卡正常显示，绝不整页空白。
         if(!el.dataset.smsTimeoutSet){
           el.dataset.smsTimeoutSet='1';
           setTimeout(function(){
@@ -10661,18 +10653,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 填充「今日判定 · 环境态势」卡（2026-08-07 已迁回今日事件；函数注册在今日事件卡脚本块）
     if(typeof window.__renderJudgmentBody==='function') window.__renderJudgmentBody();
     var h='';
-    var _ulAct = 'dbg';  // 🛡 2026-09-01 删除「强势突破」子页，仅剩「调试专区」唯一子Tab（忽略陈旧 __ulActivePane）
-
-    // ═══ 2026-08-16/18 主人令：暂未上架改子Tab导航；2026-09-01 主人令：删除「强势突破」子页，仅保留「调试专区」唯一子Tab ═══
-    h+='<style>.ul-pane{display:none}.ul-pane.active{display:block}.ul-tab{font-size:12.5px;font-weight:600;color:var(--sub);background:transparent;border:1px solid var(--border);border-radius:8px;padding:6px 13px;cursor:pointer;transition:all .15s}.ul-tab:hover{color:var(--txt);background:var(--bg2)}.ul-tab.active{color:var(--txt);background:var(--card2);border-color:var(--border2);box-shadow:0 1px 4px rgba(0,0,0,.12)}</style>';
-    h+='<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px;">';
-    h+='<div class="ul-tab active" data-ultab="dbg" onclick="window.__ulSwitch(this,\'dbg\')">🧪 调试专区</div>';
-    h+='</div>';
-
-    // ── pane4: 🧪 调试专区 ──
-    h+='<div class="ul-pane" id="ulPaneDbg" style="display:'+(_ulAct==='dbg'?'block':'none')+'">';
-    // 2026-08-30 根因修复：调试专区容器曾因提前闭合（旧 bug）导致卡片溢出到子Tab之外；
-    //   现保持容器打开直到本函数末尾，把这些卡真正收进调试专区。2026-09-01 删除「强势突破」子页，调试专区现为唯一子Tab。
+    // 🛡 2026-09-01 主人令：「暂未上架」取消子Tab与子页面，直接平铺三个调试卡。
 
     // ── 2026-08-29 主人令：AI 预测 + 潜力挖掘 2 卡并入调试专区（删 AI 预测 / 潜力挖掘 子页面后补位） ──
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';
@@ -10713,8 +10694,6 @@ window.showRestrictedItems = showRestrictedItems;
     h+='研究信号，未纳入推荐链路。';
     h+='</div>';
     h+='</div>';  // /ETF·龙头参考卡
-
-h+='</div>';  // /ulPaneDbg
 
     // ── 🛡 2026-08-19 主人令：2 张新卡（宏观+板块推荐）暂未上架实验区 · 调试专区底部 ──
     //    2026-08-20 主人令：路径概率预测卡已迁出调试专区 → 独立「AI 预测」子TAB（潜力挖掘删除，算法链 19:15 自动更新）
@@ -10817,18 +10796,6 @@ h+='</div>';  // /ulPaneDbg
       if(tm) tm.innerHTML = _etfBadge;
       // 2026-08-27 一劳永逸：删除克隆到潜力挖掘的逻辑（卡片只存在于调试专区，杜绝重复）
     }catch(e){ console.warn('ETF龙头渲染失败',e); }
-    // 2026-08-16 子Tab 切换函数
-    window.__ulSwitch = function(btn, tab){
-      window.__ulActivePane = tab;  // 🛡 guard: 记住当前子 tab，重渲染不再 snap-back
-      var idMap = {dbg:'ulPaneDbg'};
-      var all = ['ulPaneDbg'];
-      for(var k=0;k<all.length;k++){ var p=document.getElementById(all[k]); if(p) p.style.display = (all[k]===idMap[tab]) ? 'block' : 'none'; }
-      var tabs = document.querySelectorAll('#sec-ul .ul-tab');
-      for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
-      if(btn) btn.classList.add('active');
-      // 2026-08-29 主人令：AI 预测 子 tab 已删除，其强制渲染分支一并移除（_fillAiPrediction 函数体保留以备复用）。
-      // 2026-08-29 主人令：潜力挖掘 子 tab 已删除，其强制渲染分支一并移除（_fillPotentialPicks 函数体保留以备复用）。
-    };
     // ⚖️ 2026-08-14 主人令：renderPortfolio 调用已删除（持仓跟踪卡整段移除）
     // 2026-08-14 主人令：涨价榜/情绪周期/潜力挖掘 fill 改由 switchSt('pr') 触发（已迁选股策略子TAB）
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderUnlisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
