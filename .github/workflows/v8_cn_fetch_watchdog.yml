@@ -17,6 +17,12 @@ on:
   schedule:
     # 交易日 08:00-17:30 CST 每 30 分（UTC 00:00-09:30）。覆盖盘前/盘中/盘后全窗口。
     - cron: '*/30 0-9 * * 1-5'
+  # 🛡 2026-09-01 一劳永逸加固：GitHub schedule 高负载会整段漏触发（实测今早 0 次 schedule 触发），
+  #   看门狗自身 schedule 也不可靠。改为同时监听 push(main)：任何对 main 的推送（抓取落地/
+  #   构建部署/主人提交）都会唤醒看门狗做新鲜度自检+兜底派发，形成「推送即巡检」常驻自愈，
+  #   彻底摆脱对 GitHub 脆弱 schedule 的单点依赖。全云端(ubuntu-latest)，双机只监督。
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       force_category:
@@ -53,10 +59,6 @@ jobs:
 
           force = "${{ github.event.inputs.force_category }}".strip()
 
-          # 仅交易日（周一至周五）
-          if dow >= 5 and not force:
-              print("[watchdog] 非交易日，跳过"); sys.exit(0)
-
           def in_window(a, b):
               return a <= hhmm <= b
 
@@ -64,6 +66,11 @@ jobs:
           cat = None
           if force:
               cat = force
+          elif dow >= 5:                         # 周末：仅 09:00-10:00 CST 周度全量刷新兜底
+              if in_window(9*60, 10*60):
+                  cat = "all"
+              else:
+                  print("[watchdog] 周末非刷新时段，跳过"); sys.exit(0)
           elif in_window(8*60+25, 9*60):        # 08:25-09:00 盘前
               cat = "premarket"
           elif in_window(9*60, 11*60+30):       # 09:00-11:30 上午盘中
