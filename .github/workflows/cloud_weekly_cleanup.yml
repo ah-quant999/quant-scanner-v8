@@ -1,0 +1,193 @@
+# 九宝量化 v8.0 — 每周清理（周六 21:00，并入周六 T+1 统一维护窗口）
+#
+# 目标：删除无映射的 orphan raw_data/data 文件，更新 freshness_status.json，
+#       防止 v6 时代遗留的废弃数据像雪球一样越滚越大。
+#
+# ⚠️ 安全机制：只删 "不在 DATA_SOURCES 且不被 index.html 引用" 的文件，
+#    不会删除有用模块。误删风险由 guard + git diff 兜底。
+
+name: "🧹 v8 每周清理(云端ubuntu)"
+
+on:
+  schedule:
+    - cron: '0 13 * * 6'   # 周六 21:00 CST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-weekly-cleanup
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: "🩺 运行全量新鲜度体检"
+        continue-on-error: true
+        run: python guard_v8_freshness.py | tee guard_output.txt
+
+      - name: "🧹 清理 orphan 文件"
+        run: |
+          python - <<'PY'
+          import json, re
+          from pathlib import Path
+
+          ROOT = Path('.')
+          RAW_DIR = ROOT / 'raw_data'
+          DATA_DIR = ROOT / 'data'
+
+          # 读取 DATA_SOURCES 映射（update_v8.py 转换层用的）
+          # 🛡 2026-08-30 一劳永逸根因修复：原逻辑只收集 json 名（如 candidate.json），
+          #    而删除判断用 var_name + '.json'（如 CANDIDATE.json）→ 大小写永不匹配，
+          #    导致 mapped_files 形同虚设，只有被 index.html script 引用的文件能幸存
+          #    （2026-08-30 实测：91 个 data/*.js 被误删 77 个，站点大面积空白）。
+          #    现同时收集 json 名(双写大小写) 与 变量名，双重保护。
+          src = Path('update_v8.py').read_text(encoding='utf-8')
+          m = re.search(r'DATA_SOURCES\s*=\s*\{([^}]+)\}', src, re.S)
+          mapped_files = set()   # json 名（同时存原样与小写）
+          mapped_vars  = set()   # 变量名（如 CANDIDATE / STOCK_QUOTE）
+          if m:
+              for line in m.group(1).splitlines():
+                  if ':' in line and '"' in line:
+                      parts = line.split(':', 1)
+                      fname = parts[0].strip().strip('"\'')
+                      var = parts[1].strip().rstrip(',').strip('"\'')
+                      if fname.endswith('.json'):
+                          mapped_files.add(fname)
+                          mapped_files.add(fname.lower())
+                      if var and var.replace('_', '').isalnum():
+                          mapped_vars.add(var)
+          print(f"[映射] json名 {len(mapped_files)} / 变量名 {len(mapped_vars)}")
+
+          # 读取 index.html 引用的 data/*.js
+          index = Path('index.html').read_text(encoding='utf-8')
+          referenced = set(re.findall(r'data/([A-Z_0-9]+)\.js', index))
+
+          # 🛡 2026-08-18 一劳永逸修复：原逻辑把「不在 DATA_SOURCES 映射」等同于 orphan，
+          # 但 v8 大量生成器直写的 raw_data（尤其是历史累积账本）并不在 update_v8 映射里，
+          # 导致 sector_fund_flow_history / triple_resonance_history / commodity_price_history 等
+          # 每周被误删，数据越清越少。现改为：必须同时满足「不在映射/引用」且「不在保护名单」才删除。
+          PROTECTED_RAW = {
+              # 历史累积账本（删除后趋势窗口会永久变空）
+              "audit_history.json",
+              "commodity_price_history.json",
+              "commodity_prices_cache.json",
+              "lhb_history.json",
+              "sector_fund_flow_history.json",
+              "sector_fund_flow_intraday.json",
+              "triple_history.json",
+              "triple_resonance_history.json",
+              # 生成器直写、update_v8 不映射但算法链/前端真实依赖的中间产物
+              "build_candidate_debug.json",
+              "commodity_elasticity.json",
+              "final_recommend.json",
+              "fundamental_quality.json",
+              "lhb_7d.json",
+              "potential_picks.json",
+              "sentiment_cycle.json",
+              "stock_rps.json",
+              "stop_target_optimization.json",
+          }
+          PROTECTED_DATA = {
+              # 守护/中间文件，不被 index.html 直接引用但生产流程需要
+              "freshness_selfheal.json",
+              ".heal_dispatch.json",
+              "freshness_status.json",
+              ".github_pat.txt",
+              # 🛡 2026-08-18 全仓库审计：以下 data/*.js 由生成器直写或前端以 window.XXX 注入，
+              # 不在 DATA_SOURCES 映射且不被 `data/XXX.js` 正则引用， weekly cleanup 会误删，必须保护。
+              # 🛡 2026-08-29 一劳永逸式修复：BLOAT_CHECK.js 已删（4K 死数据，全站 0 渲染引用）
+              # 周末巡检脚本 v8_bloat_check.py 已迁移产物到 .workbuddy/v8_bloat_report.json（不入白名单）
+              "RISK_GAUGE",
+              "RUNNER_STATUS_HEALTH",
+              "SECTOR_FUND_FLOW_INTRADAY",
+              "WEEKEND_META_REPORT",
+              # 🛡 2026-08-30 审计误删修复（一劳永逸）：
+              #   cleanup 用 `var_name + '.json'`（如 STOCK_RPS_DATA.json）去 mapped_files 比对，
+              #   但 update_v8.py 的映射键是小写/缩写（如 stock_rps.json），命名不一致 → 误判为孤儿。
+              #   2026-08-30 实测 data/STOCK_RPS_DATA.js 因此被删（前端相对强度页 4 处引用，页面空白）。
+              #   以下 7 个为全量扫描出的「命名不一致」清单（含 4.1MB 的 STOCK_QUOTE），全部纳入保护。
+              "AI_MARKET_BRIEF",
+              "INDEX_HISTORY",
+              "MARKET_PATH_PROBABILITY",
+              "RUNNER_STATUS",
+              "SECTOR_FUND_FLOW_INTRADAY",
+              "STOCK_QUOTE",
+              "STOCK_RPS_DATA",
+              "FINAL_RECOMMEND_DATA",
+          }
+          # 保留目录：历史快照、回测产物等整体保护
+          PROTECTED_DIRS = {"history", "backtest", "optimize", "v8_cal_archive"}
+
+          removed_raw = []
+          if RAW_DIR.exists():
+              for p in RAW_DIR.glob('*.json'):
+                  if p.name in PROTECTED_RAW:
+                      continue
+                  if p.name not in mapped_files:
+                      p.unlink()
+                      removed_raw.append(p.name)
+              # 保护子目录不被整体删除，仅清理其内部 orphan（暂不删子目录文件）
+              for d in RAW_DIR.iterdir():
+                  if d.is_dir() and d.name in PROTECTED_DIRS:
+                      print(f"[保护] 目录 {d.name}/ 保留")
+
+          removed_data = []
+          if DATA_DIR.exists():
+              for p in DATA_DIR.glob('*.js'):
+                  var_name = p.stem
+                  json_name = var_name + '.json'
+                  if var_name in PROTECTED_DATA or json_name in PROTECTED_DATA:
+                      continue
+                  # 🛡 2026-08-30 修复：原判断 `json_name not in mapped_files` 因大小写不匹配恒为 True，
+                  #    实际等价于「只保留 referenced，其余全删」。改为四重判定：
+                  #    ① json 名(原样) ② json 名(小写) ③ 变量名在映射中 ④ 被 index.html 引用
+                  if (json_name not in mapped_files
+                          and json_name.lower() not in mapped_files
+                          and var_name not in mapped_vars
+                          and var_name not in referenced):
+                      p.unlink()
+                      removed_data.append(p.name)
+
+          print(f"删除 orphan raw_data: {removed_raw or '无'}")
+          print(f"删除 orphan data/*.js: {removed_data or '无'}")
+          PY
+
+      - name: "📤 提交清理结果"
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "v8-cloud-bot"
+          git config user.email "v8-bot@users.noreply.github.com"
+          # 🛡 安全：先从索引移除敏感文件（防止 -f 或整目录 add 泄露密钥），
+          #   再显式添加需要持久化的文件（避免把 kline/_rps 等 51M 缓存塞进仓库）。
+          git rm --cached --ignore-unmatch \
+            data/.mahoro_cookies.txt data/.github_pat.txt data/zsxq_token.json \
+            data/.wc_jwt_cache.json data/.neodata_token data/zszxq_token.json 2>/dev/null || true
+          git add data/freshness_status.json raw_data/ data/*.js data/*.html 2>/dev/null || true
+          # 兜底：仅添加已被 git 跟踪的 data/ 文件（不含被 .gitignore 的密钥）
+          git ls-files --cached -- data/ | xargs -r git add 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "ℹ️ 无清理内容"
+            exit 0
+          fi
+          git commit -m "v8 weekly cleanup: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
+          REPO="https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
+          for i in 1 2 3; do
+            if git push "$REPO" HEAD:main; then
+              echo "✅ 清理已提交（第 $i 次）"; exit 0
+            fi
+            git fetch "$REPO" main && git rebase FETCH_HEAD || { git rebase --abort; exit 1; }
+          done
+          echo "❌ 3 次重试后仍失败"; exit 1

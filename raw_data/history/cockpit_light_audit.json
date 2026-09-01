@@ -1,0 +1,84 @@
+{
+  "update_time": "2026-09-01T10:46:26",
+  "days": [
+    {
+      "light1": "黄灯·谨慎低吸",
+      "light1_code": "yellow",
+      "crisis_score": 31,
+      "mkt_avg": -1.012,
+      "north5": 0,
+      "light2": "企稳回升",
+      "light2_code": "stabilize",
+      "date": "2026-08-29",
+      "fwd": {
+        "1": 0.863
+      }
+    },
+    {
+      "light1": "黄灯·谨慎低吸",
+      "light1_code": "yellow",
+      "crisis_score": 31,
+      "mkt_avg": -1.012,
+      "north5": 0,
+      "light2": "企稳回升",
+      "light2_code": "stabilize",
+      "date": "2026-08-30",
+      "fwd": {
+        "1": 0.863
+      }
+    },
+    {
+      "light1": "绿灯·可操作",
+      "light1_code": "green",
+      "crisis_score": 31,
+      "mkt_avg": 0.765,
+      "north5": 0,
+      "light2": "企稳回升",
+      "light2_code": "stabilize",
+      "date": "2026-08-31",
+      "fwd": null
+    },
+    {
+      "light1": "黄灯·谨慎低吸",
+      "light1_code": "yellow",
+      "crisis_score": 31,
+      "mkt_avg": -1.31,
+      "north5": 0,
+      "light2": "企稳回升",
+      "light2_code": "stabilize",
+      "date": "2026-09-01",
+      "fwd": null
+    }
+  ],
+  "min_sample": 20,
+  "summary": {
+    "light1_code": {
+      "yellow": {
+        "n": 2,
+        "periods": {
+          "T1": {
+            "n": 2,
+            "avg": 0.863,
+            "win": 100.0
+          }
+        },
+        "ready": false
+      }
+    },
+    "light2_code": {
+      "stabilize": {
+        "n": 2,
+        "periods": {
+          "T1": {
+            "n": 2,
+            "avg": 0.863,
+            "win": 100.0
+          }
+        },
+        "ready": false
+      }
+    }
+  },
+  "n_days": 4,
+  "n_days_with_fwd": 2
+}

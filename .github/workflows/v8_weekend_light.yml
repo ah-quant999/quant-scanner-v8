@@ -1,0 +1,45 @@
+# 🧹 v8 周末轻量维护（SA/SU 19:30）— 2026-08-16 从本机 WorkBuddy 自动化迁移至云端
+# 原「周末轻量维护(阿狸咪·SA/SU 19:30)」(automation-1783744306764)：
+# v8_weekend_light.py 读交接摘要、检测新股/退市股更新行业/概念/拼音映射、生成 WEEKEND_RUN.js、
+# dispatch v8_build_deploy.yml 重新部署。不抓行情、不改数据时间戳。
+name: "🧹 v8 周末轻量维护(SA/SU 19:30)"
+
+on:
+  schedule:
+    - cron: '30 11 * * 0,6'   # 周六/周日 19:30 CST = 11:30 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: v8-weekend-light
+  cancel-in-progress: false
+
+jobs:
+  light:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      V8_GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: "🧹 周末轻量维护（新股/退市映射 + WEEKEND_RUN.js + dispatch build）"
+        continue-on-error: true
+        run: |
+          python v8_weekend_light.py 2>&1 | tee weekend_out.txt
+
+      - name: "📊 摘要"
+        if: always()
+        run: |
+          echo "## 🧹 v8 周末轻量维护 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')" >> $GITHUB_STEP_SUMMARY
+          tail -25 weekend_out.txt >> $GITHUB_STEP_SUMMARY || true

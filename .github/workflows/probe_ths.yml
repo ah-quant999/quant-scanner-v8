@@ -1,0 +1,57 @@
+name: Probe THS Concept Constituents (GHA)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install akshare
+        run: pip install akshare
+      - name: List THS funcs + test constituent candidates
+        run: |
+          python - <<'PY'
+          import akshare as ak, time, traceback
+          # 1) 列出所有含 ths 的函数名
+          ths=[n for n in dir(ak) if 'ths' in n.lower()]
+          print("=== THS 相关函数 ===")
+          for n in sorted(ths): print(" ", n)
+          # 2) 取一个概念名/code
+          try:
+              df=ak.stock_board_concept_name_ths()
+              row=df.iloc[0]
+              cname=row['name']; ccode=str(row['code'])
+              print("sample concept: name=",cname," code=",ccode)
+          except Exception as e:
+              print("name_ths FAIL", e); raise SystemExit
+          # 3) 测试 summary 完整列
+          try:
+              s=ak.stock_board_concept_summary_ths()
+              print("summary_ths cols:", list(s.columns))
+              print(s.head(2).to_string())
+          except Exception as e:
+              print("summary_ths FAIL", type(e).__name__, str(e)[:120])
+          # 4) 测试 cons_ths（概念名 / 概念code）
+          for arg in [cname, ccode]:
+              for fn in ['stock_board_concept_cons_ths','stock_board_concept_spot_ths']:
+                  if hasattr(ak,fn):
+                      try:
+                          t=time.time(); r=getattr(ak,fn)(symbol=arg)
+                          dt=time.time()-t
+                          if hasattr(r,'shape'):
+                              print(f"{fn}({arg!r}) OK rows={r.shape} cols={list(r.columns)[:12]} sec={dt:.1f}")
+                              print(r.head(3).to_string())
+                          else:
+                              print(f"{fn}({arg!r}) OK type={type(r).__name__} sec={dt:.1f}")
+                      except Exception as e:
+                          print(f"{fn}({arg!r}) FAIL {type(e).__name__}: {str(e)[:120]}")
+          PY

@@ -1,0 +1,57 @@
+name: Fill KCBJ Concepts
+
+on:
+  workflow_dispatch:
+    inputs:
+      max:
+        description: "最多处理 N 只 (0=全部)"
+        required: false
+        default: "0"
+      apply:
+        description: "是否写回主文件 (true/false)"
+        required: false
+        default: "true"
+  # 注意：东财源在 unit 机与 GHA 均不可达(502/RemoteDisconnected)，同花顺无成分股函数，
+  # 故 P1 概念补全当前被数据源封死。保留手动 dispatch 以便东财恢复后手动触发，
+  # 不挂自动 schedule（避免每日产生必失败的 cancelled run）。
+
+permissions:
+  contents: write
+
+jobs:
+  fill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install akshare
+        run: pip install akshare
+      - name: Run fill
+        run: |
+          # 🐛 修复：原先硬编码 --apply，导致 apply input 形同虚设（dry-run 无法生效）
+          APPLY_FLAG=""
+          if [ "${{ github.event.inputs.apply || 'true' }}" = "true" ]; then APPLY_FLAG="--apply"; fi
+          echo "apply=${{ github.event.inputs.apply || 'true' }} -> FLAG='$APPLY_FLAG'"
+          python algorithms/_fill_kcbj_concepts.py $APPLY_FLAG --max ${{ github.event.inputs.max || '0' }}
+        continue-on-error: false
+      - name: Commit result
+        run: |
+          git config user.email "bot@github.com"
+          git config user.name "kcbj-fill-bot"
+          git add -f algorithms/stock_industry_concepts.json
+          if git diff --cached --quiet; then
+            echo "no changes"
+          else
+            git commit -m "data: 补全科创板/北交所概念映射 (auto via GHA)"
+            # 🛡 并发 push 互踩加固
+            for i in 1 2 3; do
+              if git push origin HEAD:main; then echo "✅ 已推送"; break; fi
+              echo "⚠️ push 被拒，fetch+rebase 后重试 ($i/3)"
+              git fetch origin main && git rebase FETCH_HEAD || { git rebase --abort || true; break; }
+            done
+          fi

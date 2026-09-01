@@ -1,0 +1,297 @@
+# 九宝量化 v8.0 — 盘后算法链（自托管 cn runner）
+#
+# 2026-08-01 周末改造：把 v6 的算法产出脚本选择性复制到 v8/algorithms/，
+# 由本工作流在本地 cn 自托管 runner 上按依赖顺序运行，直接产出 v8 raw_data/，
+# 不再依赖 v6 每日批处理。GitHub 美区云端 runner 无法访问 EastMoney/akshare/
+# Tongdaxin，故算法必须在 cn runner（本地机器）执行。
+#
+# 2026-08-03 修复：该 workflow 自 07-31 创建、08-01/08-02 多次提交后，GitHub 调度器从未派发其
+#   schedule（API 实测 total runs = 0，而同仓库同 cn runner 的 v8_cn_fetch 正常 30 次）。
+#   根因 = schedule 未被调度器注册/触发（非 runner 问题）。修复 = re-touch 文件 + 加 20:00 冗余 cron。
+#   若日后再次发现盘后页陈旧，先查本 workflow 的 schedule 是否又失效，手动 workflow_dispatch 即可补算。
+#
+# 2026-08-03 21:23 实测：schedule 修复后本 workflow 终于被调度触发，但首步 actions/checkout 在
+#   自托管 cn runner（Windows 持久化工作目录）上因脏树/dubious ownership 直接失败（0 算法执行）。
+#   加固：checkout 前加「git reset --hard + git clean -fdx（保留 out 产物）+ safe.directory '*」清理步，
+#   checkout 本身加 clean:true。若仍失败，查 Actions 日志确认具体 checkout 报错。
+#
+# 2026-08-03 22:50 再修复：actions/checkout@v4 在 Windows 自托管 runner 上使用 Node24 的 safe-delete 库，
+#   当 .git 目录文件数超过 50 阈值时要求 BULK_CONFIRM，但 Action 无法交互确认，直接抛错：
+#   [safe-delete][SAFE_DELETE_BULK_CONFIRM_REQUIRED] {"count":217,"threshold":50,...}
+#   根因不是 git 命令，而是 checkout action 自己删不掉旧 .git。修复 = 前置清理步直接删除整个 workspace，
+#   让 checkout 重新 clone 到空目录。经实测 run#30820713215 因此失败。
+#
+# 2026-08-03 22:58 三修复：上一轮（run#30824863189）改前置删 workspace + checkout clean:false 仍失败——
+#   日志显示 checkout action 内部又会"Deleting the contents of"再删一次，仍撞 safe-delete 阈值。
+#   当时误判为 checkout action 自身问题，改成手动 git clone —— run#30825718613 仍失败。
+#
+# 🔴 2026-08-04 06:45 真根因（连挂 4 次后定位，务必牢记）：
+#   `[safe-delete][SAFE_DELETE_BULK_CONFIRM_REQUIRED]` **不是 actions/checkout 的机制**，
+#   而是 cn runner 宿主机（LEMONCAT）上的**系统级删除拦截钩子**：任何单次删除 >50 个文件的操作
+#   （Node 的 fs.rm、bash 的 rm -rf 全部命中）都会被拦截并要求人工 BULK_CONFIRM，CI 无法确认 → abort。
+#   证据：run#30825718613 日志里报错行紧跟在**我们自己写的 bash `rm -rf`** 之后，count 从 217 涨到 397。
+#
+#   ❌ 严禁在本 workflow 里出现：actions/checkout、rm -rf、git clean -fdx、Remove-Item -Recurse。
+#
+# 🔴 2026-08-04 07:05 第二真根因（run#30859885910 实测）：
+#   本 cn runner 上 **git 协议访问 github.com 会被连接重置**：
+#     fatal: unable to access 'https://github.com/...': Recv failure: Connection was reset
+#   而 api.github.com 畅通 —— 这才是常年健康的 v8_cn_fetch 完全不用 git、只走 Contents API 的原因。
+#   ✅ 唯一可行源码同步路线 = **GitHub Trees/Blobs API 下载**（algorithms/** + 根目录 *.py），
+#      既不走 git 网络，也不删任何文件，同时规避 safe-delete 钩子。严禁改回 git clone/fetch。
+#
+# ⚠️ PowerShell 坑（同 run 实测）：`python -c @'...'@` 传参时 PowerShell 会剥离双引号，
+#   导致 SyntaxError: '{' was never closed。必须 Set-Content 写临时 .py 文件再 `python $tmp` 执行。
+#
+# 🔴 2026-08-05 23:58 第三真根因（run#31005326516 20:29 + run#31011155328 21:46 连挂两次）：
+#   源码同步步骤稳定卡死在**单个大 blob** algorithms/stock_industry_concepts.json（1.35MB，
+#   base64 后约 1.86MB）：本 runner 到 api.github.com 的长连接在 ~1.82MB 处被截断，
+#   4 次重试全部 IncompleteRead（1820829/1824422/1693416/1846048 bytes read）→ 整步 exit 1，
+#   算法链 0 执行 → 全部盘后数据停在前一天。**不是 token/权限/磁盘问题，是大响应体传输截断。**
+#   ✅ 修法（三层，已落地）：
+#     1) 下载前先算**本地 git blob sha1**（sha1("blob <len>\0"+content)）与 tree 里的 sha 比对，
+#        相同直接跳过——大 json 极少变动，正常情况下**根本不再下载它**，从源头绕开截断；
+#     2) 真要下载时优先用 Accept: application/vnd.github.raw（省掉 base64 的 33% 膨胀），
+#        与 base64 JSON 两种模式交替重试 6 次；
+#     3) 每次下载都做 sha 校验，截断内容绝不落盘（旧代码 json.load 截断会直接抛异常，
+#        但 raw 模式下截断是"静默半个文件"，必须校验）。
+#
+
+# 2026-08-02 原生化：4 类上游输入（gold_pool / scan_result / guanlan_* / mahoro_signals）
+# 也已由 v8 自产（scanner.py / guanlan_extractor.py / fetch_maharo_signals.py + V8_OUT_DIR 钩子
+# → 写 v8 仓根 out/）。run_algorithms.py 的 step_v8_self_sufficiency() 负责调度这 3 脚本；
+# 原 step_seed_inputs() 默认 no-op（V6_SEED=1 可强制回退 v6 重灌）。彻底脱离 v6。
+#
+# 4 类原 v6 → v8 映射:
+#   v6 data/scan_result.json          → v8 out/scan_result.json          (scanner.py)
+#   v6 data/guanlan_watchlist.json     → v8 out/guanlan_watchlist.json     (guanlan_extractor.py)
+#   v6 data/guanlan_reports.json       → v8 out/guanlan_reports.json       (guanlan_extractor.py)
+#   v6 data/mahoro_signals.json (拼写 mahoro) ← fetch_maharo_signals.py 写 (拼写 maharo, v8 钩子自动改写)
+#
+# 注意: v6 build_candidate_pool.py 读「mahoro_signals.json」, v6 fetch_maharo_signals.py 写「maharo_signals.json」,
+# 两个文件在 v6 data/ 一直并存. v8 fetch_maharo_signals.py 在 v8 环境下 OUTPUT_JSON 改写为 mahoro_signals.json, 兼容下游.
+
+name: "🇨🇳 v8 盘后算法链(cn)"
+
+# ⏰ 时点铁律（2026-08-01 审计修正 + 2026-08-02 锁定）：
+#   龙虎榜由交易所「17点后」才发布（fetch_lhb 在 17:00 整点跑会查到空、静默保留昨日数据），
+#   v6 成熟系统据此把 close_p2（龙虎榜+scanner全量+各类生成）固定在 18:30。
+#   原 v8 定在 17:00 是时序倒退 → 三重共识/机构游资共振/top10 龙虎榜维度全用隔夜数据。
+#   现对齐 v6，改为 18:30（LHB 已出 + 留缓冲），单次跑全链即数据齐全。
+#
+# ⏰ 时序依赖（2026-08-02 固化，2026-08-02 升级）：
+#   本 workflow (18:30) 是 v8 盘后数据的唯一权威生产者。自 2026-08-02 起，
+#   NT_DATA / SUSPENSION_ALERT / MARKET_ALERTS / SECTOR_FUND_FLOW_TREND 这 4 个孤儿模块
+#   也已由本链原生产出（fetch_orphan_*.py → raw_data/ → api_push），彻底脱离 v6。
+#   原 v8_sync_legacy.yml（19:30 从 v6 补 4 孤儿）已退役为 no-op，不再参与时序。
+#   详见 TIME_ORDER.md。
+# 2026-08-05 23:45 四修复：cron 已移除，本 workflow 仅作 workflow_dispatch 应急回退。
+#   算法链主力已迁「☁️ v8 盘后算法链(云端)」v8_algo_cloud.yml（ubuntu-latest）。
+#   双路同时跑会向 main 推同一批 raw_data 互相覆盖，故 cn 版必须禁 cron。
+#   应急用法：云端版挂时手动 dispatch 本 workflow（cn runner 在线时仍能补算）。
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  algo:
+    runs-on: [self-hosted, cn]
+    timeout-minutes: 120
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # ⛔️ 2026-08-14 主人令永久修复：WorkBuddy safe-delete 批量删除守卫默认阈值 50
+      #   （alimi-cn 实测 966 文件，100% 被拦、所有 [self-hosted, cn] workflow 必须显式抬到 1000。
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 1000
+      V8_PUSH: "1"
+      V6_DATA_DIR: "E:\\workspace\\quant-scanner-v8\\data"
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    steps:
+      - name: "📥 经 GitHub API 同步源码（唯一可行路线：本 runner 上 git 走 github.com 会被连接重置）"
+        id: sync_api
+        shell: powershell
+        run: |
+          $code = @'
+          import os, base64, json, hashlib, urllib.request, time
+          token = os.environ["GITHUB_TOKEN"]
+          REPO = "ah-quant999/quant-scanner-v8"
+          H = {"Authorization": "Bearer " + token,
+               "Accept": "application/vnd.github+json",
+               "X-GitHub-Api-Version": "2022-11-28"}
+
+          def local_blob_sha(path):
+              # git blob sha1 = sha1("blob <len>\0" + content); lets us decide
+              # "already identical" WITHOUT downloading the file at all.
+              try:
+                  data = open(path, "rb").read()
+              except Exception:
+                  return None
+              h = hashlib.sha1()
+              h.update(("blob %d\0" % len(data)).encode())
+              h.update(data)
+              return h.hexdigest()
+
+          def sha_of(data):
+              h = hashlib.sha1()
+              h.update(("blob %d\0" % len(data)).encode())
+              h.update(data)
+              return h.hexdigest()
+
+          def get_json(url, tries=6):
+              last = None
+              for i in range(tries):
+                  try:
+                      return json.load(urllib.request.urlopen(
+                          urllib.request.Request(url, headers=H), timeout=120))
+                  except Exception as e:
+                      last = e
+                      print("  retry %d: %s" % (i + 1, e), flush=True)
+                      time.sleep(min(2 ** i, 20))
+              raise SystemExit("API fetch failed: %s (%s)" % (url, last))
+
+          def fetch_blob(sha, tries=6):
+              # Prefer the raw media type: no base64 inflation (~26pct smaller payload),
+              # which is what kept truncating on this runner for the 1.3MB json
+              # (run#31005326516 / #31011155328: IncompleteRead at ~1.82MB of 1.86MB).
+              # Every attempt is sha-verified so a silent truncation can never be written.
+              url = "https://api.github.com/repos/%s/git/blobs/%s" % (REPO, sha)
+              raw_h = dict(H)
+              raw_h["Accept"] = "application/vnd.github.raw"
+              last = None
+              for i in range(tries):
+                  mode = "raw" if i % 2 == 0 else "b64"
+                  try:
+                      hdr = raw_h if mode == "raw" else H
+                      resp = urllib.request.urlopen(
+                          urllib.request.Request(url, headers=hdr), timeout=180)
+                      body = resp.read()
+                      data = body if mode == "raw" else base64.b64decode(
+                          json.loads(body.decode())["content"])
+                      if sha_of(data) != sha:
+                          raise ValueError("sha mismatch (truncated?) got %d bytes" % len(data))
+                      return data
+                  except Exception as e:
+                      last = e
+                      print("  blob retry %d [%s]: %s" % (i + 1, mode, e), flush=True)
+                      time.sleep(min(2 ** i, 20))
+              raise SystemExit("blob fetch failed: %s (%s)" % (sha, last))
+
+          tree = get_json("https://api.github.com/repos/%s/git/trees/main?recursive=1" % REPO)
+          want = []
+          for e in tree.get("tree", []):
+              if e.get("type") != "blob":
+                  continue
+              p = e["path"]
+              # all of algorithms/ + every root-level .py (incl. api_push_raw.py)
+              if p.startswith("algorithms/") or ("/" not in p and p.endswith(".py")):
+                  want.append((p, e["sha"]))
+          print("files to sync: %d" % len(want), flush=True)
+
+          ok = 0
+          skipped = 0
+          for p, sha in want:
+              if local_blob_sha(p) == sha:
+                  ok += 1
+                  skipped += 1
+                  continue
+              data = fetch_blob(sha)
+              parent = os.path.dirname(p)
+              if parent:
+                  os.makedirs(parent, exist_ok=True)
+              with open(p, "wb") as f:
+                  f.write(data)
+              print("  updated %s (%d bytes)" % (p, len(data)), flush=True)
+              ok += 1
+          print("OK source sync done: %d/%d (unchanged: %d)" % (ok, len(want), skipped), flush=True)
+          if ok != len(want):
+              raise SystemExit(1)
+          '@
+          # NOTE: must write a temp file then run it; passing code via `python -c` gets
+          #       its double quotes stripped by the shell (run#30859885910).
+          # NOTE: keep every powershell step ASCII-only - Windows PowerShell 5.1 reads
+          #       the generated .ps1 as ANSI/GBK, and CJK bytes swallow quote terminators
+          #       (run#30860170070 died on a Chinese Write-Host string).
+          $tmp = Join-Path $env:RUNNER_TEMP "sync_src_v8.py"
+          Set-Content -Path $tmp -Value $code -Encoding UTF8
+          python $tmp
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: "🐍 校验 Python / 安装 A股依赖"
+        shell: powershell
+        # ASCII-ONLY step: Windows PowerShell 5.1 reads the generated .ps1 as ANSI/GBK,
+        # CJK characters corrupt string terminators (run#30860170070 died exactly here).
+        run: |
+          python --version
+          python -c "import akshare, pandas, numpy, requests" 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "base deps missing, installing from tsinghua mirror..."
+            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple akshare pandas numpy requests
+          } else { Write-Host "base deps ready" }
+          python -c "import mootdx" 2>$null; if ($LASTEXITCODE -ne 0) {
+            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple mootdx 2>$null; Write-Host "mootdx install exit: $LASTEXITCODE"
+          }
+          python -c "import baostock" 2>$null; if ($LASTEXITCODE -ne 0) {
+            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple baostock 2>$null; Write-Host "baostock install exit: $LASTEXITCODE"
+          }
+          exit 0
+
+      - name: "🧮 运行盘后算法链 → raw_data/ → 推送"
+        shell: powershell
+        continue-on-error: true
+        run: |
+          python algorithms/run_algorithms.py
+
+      # 🛡 2026-08-18 主人紧急令根治：算法链收尾前先做 4 件事，确保 data/*.js 与 HEALTH_CHECK.js
+      #   必刷新——bridge_raw_data 防 raw_data 内部改名断点（如 triple_resonance_history → triple_history），
+      #   update_v8 重生成 data/*.js，v8_health_check 刷新 HEALTH_CHECK.js。
+      - name: "🔗 桥接 raw_data 内部改名（bridge_raw_data.py）"
+        shell: powershell
+        continue-on-error: true
+        run: |
+          python algorithms/bridge_raw_data.py
+
+      - name: "🔄 重生成 data/*.js (update_v8)"
+        shell: powershell
+        run: |
+          python update_v8.py
+
+      - name: "🩺 刷新 HEALTH_CHECK.js (v8_health_check)"
+        # 2026-08-30：本 runner 在中国内网，v8_health_check.py 内部的线上比对
+        #   （github.io 站点 + api.github.com）会大量 TimeoutError/HTTPError 重试，
+        #   实测 8/29 该步耗时 1847s（31 分钟），且给出的红灯反映的是「内网连不上 GitHub」
+        #   而非「数据真陈旧」——假红灯，当告警源会误导。
+        #   真体检交给云端 v8_health_patrol（每小时，网络通、结论准）。
+        #   这里只保留「刷新出 data/HEALTH_CHECK.js 文件」这一个职责：
+        #     限时 8 分钟砍掉无意义重试，且不阻断（省下的 20+ 分钟同时降低 120min job timeout 风险）。
+        timeout-minutes: 8
+        continue-on-error: true
+        shell: powershell
+        run: |
+          python v8_health_check.py
+
+      - name: "📤 兜底推送（若上一步未推）"
+        # 🔴 2026-08-30 22:3x 同类 bug 一次清干净（实测 run 33312102792 / 33309687912
+        #   均因推送步跑 13-22 分钟被 job 级 timeout 硬杀，连带后续消费步全 skipped）。
+        #   推送慢的根因是 api_push_raw.py 防倒退守卫要逐个下载远端 blob 比时间戳
+        #   （raw_data 117 个 json / 26 MB，cn 出海串行传输），守卫不能删只能限时。
+        #   步级 timeout + continue-on-error 组合：推送超时只判该步失败，job 存活，
+        #   后续 bridge/update_v8/health_check 照常跑完，raw_data 交下一轮补推。
+        timeout-minutes: 40
+        # was `if: always()` -> pushed stale workspace raw_data when source sync failed.
+        # now only runs after a successful source sync.
+        #
+        # 2026-08-30 死锁根治：上面这版 if 不含 always()，会被 Actions【隐式 AND success()】，
+        #   于是前面任一步判红就跳过推送。实测 8/29 两次（33251212898 / 33247269200）：
+        #   算法链跑满 50 分钟、data/*.js 也重生成成功，却因「刷新 HEALTH_CHECK.js」
+        #   exit 1（体检结论=14 项数据陈旧，文件其实已生成）导致本步 skipped，整批数据白跑；
+        #   数据推不上去 → 下次体检更陈旧 → 又 exit 1 → 又不推，形成自我强化死锁。
+        #   这里显式 always() 打破死锁，同时【保留】sync_api 成功的护栏（防推陈旧 workspace）。
+        #   注：体检 step 故意不加 continue-on-error —— 数据陈旧就该亮红灯让告警可见。
+        if: always() && steps.sync_api.outcome == 'success'
+        shell: powershell
+        continue-on-error: true
+        run: |
+          python api_push_raw.py

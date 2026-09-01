@@ -1,0 +1,75 @@
+# 九宝量化 v8.0 — 周日清理（GitHub 云端 ubuntu-latest）
+#
+# 周日 23:00 CST（15:00 UTC）。轻量维护：清缓存/修剪心跳日志，保持仓库整洁。纯云端执行。
+#
+# 📦 v6 备份保留策略（2026-08-07 主人令）：本清理任务严禁触碰 v6 历史备份
+#   （九宝量化v6.0_*.tar.gz / shared/九宝量化v6.0_*）。v6 备份位于本地，本任务仅作用于
+#   仓库内 __pycache__ 与心跳日志，绝不涉及 v6 备份；下方守卫步骤做显式断言，防误改。
+
+name: "🧹 v8 周日清理(云端ubuntu)"
+
+on:
+  schedule:
+    - cron: '0 15 * * 0'   # 周日 23:00 CST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: "📦 v6 备份保留守卫（主人令：v8 稳定一周前不删）"
+        continue-on-error: true
+        run: |
+          echo "── v6 备份保留守卫（2026-08-07 主人令）──"
+          echo "本清理任务只动 __pycache__ 与心跳日志，绝不触碰 v6 历史备份。"
+          echo "v6 备份（九宝量化v6.0_*.tar.gz / shared/九宝量化v6.0_*）保留至 v8 稳定一周 + 主人确认。"
+          python3 - <<'PY'
+          import os
+          # 防御性断言：绝不允许本任务清理范围内出现 v6/旧备份文件
+          suspicious = [f for f in os.listdir('.') if f.startswith('九宝量化v6') or f.startswith('backup_2026')]
+          if suspicious:
+              print("⚠️ 仓库内出现疑似 v6/旧备份残留：", suspicious, "— 本任务无权删除，已跳过")
+          else:
+              print("✅ 仓库内无 v6/旧备份残留，清理范围安全")
+          PY
+
+      - name: "🛡 同步 DO_NOT_DELETE.js（周日固定：md → js 渲染，逻辑详解页「防删」子页注入）"
+        run: |
+          echo "── 同步 DO_NOT_DELETE.md → data/DO_NOT_DELETE.js（v8 逻辑详解页防删子页用）──"
+          python3 scripts/gen_do_not_delete_js.py
+          if [ ! -f data/DO_NOT_DELETE.js ]; then
+            echo "⚠️ DO_NOT_DELETE.js 未生成（缺少 DO_NOT_DELETE.md？），跳过"
+          else
+            echo "✅ DO_NOT_DELETE.js 已重生成，sha10=$(head -1 data/DO_NOT_DELETE.js | grep -oE '[a-f0-9]{10}' | head -1)"
+          fi
+
+      - name: "🧹 清理缓存与修剪心跳日志"
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "v8-cloud-bot"
+          git config user.email "v8-bot@users.noreply.github.com"
+          rm -rf __pycache__
+          if [ -f data/_heartbeat.log ]; then
+            tail -n 200 data/_heartbeat.log > data/_heartbeat.log.tmp && mv data/_heartbeat.log.tmp data/_heartbeat.log
+          fi
+          git fetch origin main && git rebase origin/main || true
+          # 🛡 安全：先从索引移除敏感文件，防止 git add -A 重新提交已跟踪的密钥
+          git rm --cached --ignore-unmatch \
+            data/.mahoro_cookies.txt data/.github_pat.txt data/zsxq_token.json \
+            data/.wc_jwt_cache.json data/.neodata_token data/zszxq_token.json 2>/dev/null || true
+          git add -A
+          if git diff --cached --quiet; then
+            echo "ℹ️ 无变化，跳过提交"
+          else
+            git commit -m "v8 cleanup: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
+            git push "https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git" HEAD:main
+          fi

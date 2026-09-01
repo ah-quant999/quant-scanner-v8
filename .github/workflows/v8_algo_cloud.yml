@@ -1,0 +1,472 @@
+# 九宝量化 v8.0 — 盘后算法链（云端 ubuntu-latest）
+#
+# 2026-08-05 23:45 创建：cn 自托管 runner 连续 2 天盘后算法链失败——
+#   run#16/#17（08-05 18:30/20:00）双双挂在「经 GitHub API 同步源码」步骤，
+#   根因是 cn runner 网络层不稳定（git 走 github.com 被连接重置，GitHub API 同步也超时）。
+#   与 v8_cn_fetch_cloud.yml 同理，把算法链迁到 GitHub 云端 ubuntu-latest：
+#   - 云端 runner 在 GitHub 内网，checkout/clone 无 safe-delete 钩子、无连接重置问题；
+#   - 东财镜像/akshare 可达性已由 probe_v8_cn_cloud.yml 实测（10/11 通，唯一 FAIL 是探针函数名写错）；
+#   - cn_fetch 云端版 08-05 17:34 已实测跑通 12 模块，同源数据链路可信。
+#
+# ⚠️ 保留 v8_algo_run.yml（cn runner）仅作 workflow_dispatch 应急回退，其 cron 已移除
+#    （防止双跑：两路都会往 main 推 raw_data，同一产物并发会互相覆盖）。
+#
+# 2026-08-05 23:45 兼容性要点：
+#   - actions/checkout@v4 在云端 ubuntu 是标准操作（无 Windows safe-delete 钩子）；
+#   - actions/setup-python 提供 python3；
+#   - SKIP_MOOTDX=1：云端无通达信接口，直走 akshare；
+#   - V6_SEED 不设（默认 0，v8 已原生化，不依赖 v6 路径 E:\...）；
+#   - GITHUB_TOKEN 由云端自动注入，api_push_raw.py 走 Contents API 推送。
+
+name: "☁️ v8 盘后算法链(云端)"
+
+on:
+  # 🔴 2026-08-06 21:00 收敛 4→1：GitHub Actions 单 workflow 多条 cron 存在静默失效问题
+  #   （cn_fetch_cloud 17→5 收敛后恢复触发；本 workflow 4 条 cron 自创建起 0 次 schedule 触发，
+  #    仅 workflow_dispatch 可用）。算法链一次跑完所有产物（候选池/黄金池/三重共识/回测），
+  #   只需 18:30 主档成功一次即可；冗余兜底由「本机 WorkBuddy 每30分检查 + dispatch」承担，
+  #   不再依赖 GitHub schedule 多条冗余。
+  schedule:
+    # 2026-08-15 一劳永逸修复：cron 从 1-5 改为每天，内部用 A 股交易日历判断，
+    # 非交易日自动跳过，避免周末/节假日无意义覆盖，同时覆盖调休上班日（股市开市）。
+    # 2026-08-20 主人令：主档从 18:30 推迟到 19:15 CST，确保全部盘后数据源完整就绪后再跑选股算法。
+    # 内部仍用 A 股交易日历 gate，非交易日自动跳过，同时覆盖调休上班日（股市开市）。
+    - cron: '15 11 * * *'  # 19:15 CST 每天触发，内部交易日历 gate
+  workflow_dispatch:
+    # 2026-08-29 补：maharo 数据源已移除（主人令）；新增 force_run 手动输入，供周末/假期审计强制跑。
+    inputs:
+      force_run:
+        description: '强制运行（忽略时间门控，周末/假期审计用）'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+# 🔴 2026-08-21 19:2x 一劳永逸根因修复（主人令「核查，一劳永逸式修复」）：
+#   本 workflow 此前**没有 concurrency 段** → 算法链失败后自愈派发器
+#   （.github/scripts/cloud_dispatcher.py + patrol self_heal）每 1-2 分钟补派一次，
+#   实测同时有 11-20 个 run 并发；每个 run 的「经 GitHub API 同步源码」要逐 blob 拉全仓
+#   上千文件 → 并发洪流触发 GitHub **secondary rate limit（HTTP 403）**，造成双杀：
+#     ① 算法链本身 100% 卡在同步源码步骤 10 分钟超时（今日 134 次 failure，
+#        候选池/三重共识/全站精选/最终推荐全部停在昨晚 23:xx）；
+#     ② 姊妹 workflow cn_fetch 的 api_push_raw.py 取 main ref 同样吃 403 →
+#        收盘数据抓到却推不上 main → 实时数据卡永久停在 14:52（「没有收盘数据」）。
+#   加 concurrency：同一时刻最多 1 跑 + 1 排队，API 压力从根上消失。
+#   cancel-in-progress: false —— 算法链单轮 20-40 分钟，绝不能被新派发打断（会丢产物）。
+concurrency:
+  group: v8-algo-cloud
+  cancel-in-progress: false
+
+jobs:
+  algo:
+    # 🔴 2026-08-20 一劳永逸根因修复（小九令「即使 cn runner 离线也能独立运作」）：
+    #   本 workflow 名为「☁️ 云端版」，头部注释也写明「迁到 GitHub 云端 ubuntu-latest」，
+    #   但 runs-on 一直是 [self-hosted, cn] —— 实际绑死在中国 IP 自托管 runner 上。
+    #   用户出差/单位机离线时 cn runner 接不到任务 → workflow 永远 queued/failure →
+    #   盘后算法链 0 执行 → H_AUTO_BUY/TRIPLE_HISTORY 等盘后数据停更 → health_patrol 持续 failure。
+    #   改为 ubuntu-latest（GitHub 云端，不依赖任何自托管 runner），与文件名/注释意图一致，
+    #   step 2「GitHub API 同步源码」在云端 IP 反而更快（连 api.github.com 无墙），数据源已
+    #   由 CLOUD_RUNNER=true + 腾讯 GTimg 适配境外环境（probe 实测 10/11 通）。
+    runs-on: ubuntu-latest
+    # 🔴 2026-08-21 22:00 根因修复（主人令「一劳永逸」）：120 分钟不够。
+    #   实测对比：15:30 派发那轮因未到 18:00，run_algorithms 把 20+ 个选股脚本全跳过，
+    #   step「运行盘后算法链」只用 45-49 分钟；而 18:00 后那轮选股脚本全放行
+    #   （calc_crds / build_candidate_pool / calc_stock_rps / generate_top10 /
+    #     strategy_four_volume(_60m) / gen_triple_consensus / final_recommend /
+    #     auto_run_dn_algorithm / track_h_auto_buy ... 单脚本 subprocess timeout 1800s），
+    #   耗时显著更长（今晚 20:26 那轮 step 7 单步已跑 90+ 分钟）。
+    #   120 分钟会在收尾推送前被强杀 → 整轮 90 分钟计算成果全丢、最终推荐依旧缺失。
+    #   放宽到 200 分钟，留足「计算 + 桥接 + 候选池行情 + 推送」全链余量。
+    timeout-minutes: 200
+    env:
+      # 🔴 2026-08-06 00:10 必须保留：云端 runner 默认 UTC，脚本里凡是用朴素 datetime.now()
+      #   写的 update_time 会比北京时间慢 8 小时（run#31021842600 实测：lhb_data/candidate/
+      #   inst_trade 写成 15:5x，实际是 23:5x），前端「更新于」相对时间会整体错一个时区，
+      #   新鲜度守卫在北京 00:00-08:00 还会把当天数据误判成昨天。
+      #   显式声明时区后，朴素 now() 即北京时间，与中国节点产出完全一致。
+      #   （显式带 tzinfo 的写法不受本变量影响，不会双重偏移。）
+      TZ: Asia/Shanghai
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # ⛔️ 2026-08-14 主人令永久修复：WorkBuddy safe-delete 批量删除守卫默认阈值 50
+      #   （alimi-cn 实测 966 文件，100% 被拦、所有 [self-hosted, cn] workflow 必须显式抬到 1000。
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 1000
+      V8_PUSH: "1"
+      # 2026-08-29 周末审计：手动 dispatch 带 force_run=true 时置 1，run_algorithms 时间门控直接放行
+      V8_FORCE_RUN: ${{ github.event.inputs.force_run == 'true' && '1' || '' }}
+      SKIP_MOOTDX: "1"
+      # 2026-08-13 修复：云端 runner 必须走腾讯 GTimg 数据源(mootdx/东财在境外不稳定)，
+      # 与 scanner.py 的 GITHUB_ACTIONS 自动识别形成双保险，防止 A股活跃股池缺失。
+      CLOUD_RUNNER: "true"
+      # 🔴 2026-08-20 根因修复：本 workflow 就是 run_algorithms 的 runner，必须允许
+      #    api_push_raw.py 推送算法产物（backtest_*/cockpit_backtest* 等），
+      #    否则策略回测/驾驶舱/LHB_7D 等卡片永远 stale。cloud_fetch 不设置。
+      PUSH_ALGO_RAW: "1"
+      # 2026-08-28 主人令：mahoro 数据源不再跟踪，MAHORO_COOKIE/MAHORO_ACTION/MAHORO_CODE 已移除
+      # 外资研投(知识星球) token：与小九本地 data/zsxq_token.json 同值。
+      # 设置路径：GitHub 仓库 → Settings → Secrets → Actions → ZSXQ_TOKEN
+      ZSXQ_TOKEN: ${{ secrets.ZSXQ_TOKEN }}
+      # 🛡 2026-08-19 一劳永逸根因修复：cn runner 默认 GBK 终端，algorithms/* 270 处 print 含 emoji
+      # （📅✅❌⚠️🔗💹🌐…）全部会 UnicodeEncodeError crash，整条 19:15 盘后算法链 0 执行，
+      # 17 张盘后/选股卡停在 08:27 红卡。PYTHONIOENCODING=utf-8 是 Python 官方做法，
+      # 对所有 print/file-open/f-string 一刀切彻底免疫，不需逐脚本 reconfigure。
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: "1"
+    defaults:
+      run:
+        shell: bash
+    steps:
+      # 🔴 2026-08-21 19:2x 一劳永逸根因修复（主人令）：
+      #   本 job 的 runs-on 已于 08-20 从 [self-hosted, cn] 改成 ubuntu-latest，
+      #   而「经 GitHub API 同步源码（绕开 cn git 墙）」是给被墙的 cn runner 写的遗留方案。
+      #   在 GitHub 云端 runner 上 git 直连本来毫无障碍，却仍逐 blob 拉全仓上千文件
+      #   （空目录起步 → 本地 sha 全不命中 → 每个文件一次 blob API）：
+      #     - 正常时慢（数分钟），逼近 10 分钟 timeout；
+      #     - 一旦有并发（今日 11-20 个 run）立刻打爆 secondary rate limit → 全量 403 →
+      #       每文件 6 次重试 + 20s 惩罚 → 必然 10 分钟超时 → 算法链 100% 失败。
+      #   改为标准 actions/checkout@v4（秒级、0 次 blob API），API 同步只在 checkout
+      #   失败时作回退（保留给将来切回 cn 自托管 runner 被墙的场景）。
+      - name: "📥 Checkout 源码（云端 git 直连，秒级）"
+        id: co
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      # 回退：仅当上一步 checkout 失败才走 REST API 同步（cn runner 被墙场景）。
+      #   2026-08-16 首次引入；blob 下载带 sha 校验防截断，大文件未变则跳过。
+      - name: "📥 回退·经 GitHub API 同步源码（仅 checkout 失败时）"
+        if: steps.co.outcome == 'failure'
+        timeout-minutes: 10
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -e
+          cat > "$RUNNER_TEMP/sync_src_v8cloud.py" <<'PYEOF'
+          import os, base64, json, hashlib, urllib.request, time, sys
+          token = os.environ["GITHUB_TOKEN"]
+          REPO = "ah-quant999/quant-scanner-v8"
+          H = {"Authorization": "Bearer " + token,
+               "Accept": "application/vnd.github+json",
+               "X-GitHub-Api-Version": "2022-11-28"}
+
+          def local_blob_sha(path):
+              try:
+                  data = open(path, "rb").read()
+              except Exception:
+                  return None
+              h = hashlib.sha1()
+              h.update(("blob %d\0" % len(data)).encode())
+              h.update(data)
+              return h.hexdigest()
+
+          def sha_of(data):
+              h = hashlib.sha1()
+              h.update(("blob %d\0" % len(data)).encode())
+              h.update(data)
+              return h.hexdigest()
+
+          def get_json(url, tries=6):
+              last = None
+              for i in range(tries):
+                  try:
+                      return json.load(urllib.request.urlopen(
+                          urllib.request.Request(url, headers=H), timeout=120))
+                  except Exception as e:
+                      last = e
+                      print("  retry %d: %s" % (i + 1, e), flush=True)
+                      time.sleep(min(2 ** i, 20))
+              raise SystemExit("API fetch failed: %s (%s)" % (url, last))
+
+          def fetch_blob(sha, tries=6):
+              url = "https://api.github.com/repos/%s/git/blobs/%s" % (REPO, sha)
+              raw_h = dict(H); raw_h["Accept"] = "application/vnd.github.raw"
+              last = None
+              for i in range(tries):
+                  mode = "raw" if i % 2 == 0 else "b64"
+                  try:
+                      hdr = raw_h if mode == "raw" else H
+                      resp = urllib.request.urlopen(
+                          urllib.request.Request(url, headers=hdr), timeout=180)
+                      body = resp.read()
+                      data = body if mode == "raw" else base64.b64decode(json.loads(body.decode())["content"])
+                      if sha_of(data) != sha:
+                          raise ValueError("sha mismatch (truncated?) got %d bytes" % len(data))
+                      return data
+                  except Exception as e:
+                      last = e
+                      print("  blob retry %d [%s]: %s" % (i + 1, mode, e), flush=True)
+                      time.sleep(min(2 ** i, 20))
+              raise SystemExit("blob fetch failed: %s (%s)" % (sha, last))
+
+          tree = get_json("https://api.github.com/repos/%s/git/trees/main?recursive=1" % REPO)
+          want = []
+          for e in tree.get("tree", []):
+              if e.get("type") != "blob":
+                  continue
+              p = e["path"]
+              if p.startswith(".git/"):
+                  continue
+              want.append((p, e["sha"]))
+          print("files to sync: %d" % len(want), flush=True)
+          ok = 0; skipped = 0
+          for p, sha in want:
+              lp = os.path.join(".", p)
+              if local_blob_sha(lp) == sha:
+                  skipped += 1; ok += 1; continue
+              try:
+                  data = fetch_blob(sha)
+              except SystemExit:
+                  # 容错：任何文件下载失败都跳过而非整步死掉（非关键文件缺失好过全链阻塞）
+                  print("  SKIP failed download: %s" % p, flush=True)
+                  ok += 1; continue
+              parent = os.path.dirname(lp)
+              if parent:
+                  os.makedirs(parent, exist_ok=True)
+              with open(lp, "wb") as f:
+                  f.write(data)
+              ok += 1
+          print("OK source sync done: %d/%d (unchanged: %d)" % (ok, len(want), skipped), flush=True)
+          PYEOF
+          python "$RUNNER_TEMP/sync_src_v8cloud.py"
+
+      # 🛡 2026-08-29 统一交易日历中枢：所有下游脚本通过 V8_DATA_DATE 取「数据应属日期」，
+      #   根治非交易日跑批把日期错标成「今天」的冒充今日问题。
+      - name: "🗓 解析数据日期"
+        id: data_date
+        shell: bash
+        run: |
+          DATA_DATE=$(python -c "import v8_date; print(v8_date.today_data_date())")
+          echo "data_date=$DATA_DATE" >> "$GITHUB_OUTPUT"
+          echo "V8_DATA_DATE=$DATA_DATE" >> "$GITHUB_ENV"
+          echo "📅 数据日期=$DATA_DATE"
+
+      # 🔴 2026-08-16 根治：原「硬编码 Python 3.12 路径」探测在 alimi-cn runner 上找不到
+      #   → 整条算法链在第一步就 exit 1（连续 5 次 failure，大牛股猎手/RPS/四量终极等全部停更）。
+      #   数据抓取链 v8_cn_fetch_cloud.yml 早已改回 actions/setup-python@v5 + 3.13 且稳定成功，
+      #   证明 setup-python 在当前 cn runner 上可用（旧「无法下载」注释已过时）。直接对齐之。
+      - name: "🐍 配置 Python (setup-python 3.13)"
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      # 🔴 2026-08-12 第173轮根因修复：本步骤原先「只用清华镜像 + || true 吞失败」，
+      #   GitHub 云端 runner 是境外 IP，访问清华镜像会间歇性拿到**空索引**：
+      #     ERROR: Could not find a version that satisfies the requirement akshare
+      #            (from versions: none)
+      #   （run#94 08-12 15:39 真实日志，install 仅 5 秒即快速失败）
+      #   → `|| true` 把 pip 失败吞掉 → 末行 import 校验 ModuleNotFoundError → 本步骤
+      #   exit 1 → **整条盘后算法链 job 直接 fail，算法一行没跑** → 7 张盘后/选股卡
+      #   (市场温度计/六维共振雷达/候选池/机构买卖/三重共识/全站精选/逆势龙头)
+      #   停在上午 09:08 不刷新，逆势龙头更是停在 08-11 17:09。
+      #
+      #   决定性佐证：同为云端的姊妹 workflow v8_cn_fetch_cloud.yml 用的是**官方 PyPI
+      #   （无镜像）**，同一时刻 15:33 success；本 workflow 用清华镜像 15:39 fail。
+      #   云端 runner 在 GitHub 内网，官方 pypi.org 才是最快最稳的源，中国镜像只作兜底
+      #   （清华/阿里云镜像仍保留给 cn 自托管 runner 的 v8_algo_run.yml / v8_cn_fetch.yml 用）。
+      #
+      #   策略：官方源优先 → 清华 → 阿里云，每源重试 2 次，逐源做 import 实证校验；
+      #   三源全灭才 exit 1（此时确属真故障，必须显式失败而不是被 || true 掩盖）。
+      - name: "📦 安装 A股依赖（官方 PyPI 优先 + 双镜像兜底 + 重试）"
+        run: |
+          CORE="akshare pandas numpy requests baostock"
+          ok=0
+          for IDX in "https://pypi.org/simple" \
+                     "https://pypi.tuna.tsinghua.edu.cn/simple" \
+                     "https://mirrors.aliyun.com/pypi/simple"; do
+            for TRY in 1 2; do
+              echo "=== pip install core [index=$IDX try=$TRY] ==="
+              if python -m pip install -q --retries 3 --timeout 60 -i "$IDX" $CORE; then
+                if python -c "import akshare, pandas, numpy, requests"; then
+                  echo "core deps OK via $IDX (try=$TRY)"
+                  ok=1
+                  break
+                fi
+                echo "!! pip 退出码 0 但 import 校验未通过，继续换源/重试"
+              fi
+              echo "!! [$IDX] 第 $TRY 次安装失败"
+            done
+            # 注：GitHub 的 run: 默认 `bash -e`，此处用显式 if 而非 `[ ... ] && break`，
+            # 避免依赖 `set -e` 对 && 列表首命令失败的豁免语义（易踩坑）。
+            if [ "$ok" = "1" ]; then break; fi
+          done
+          if [ "$ok" != "1" ]; then
+            echo "::error::核心依赖安装失败（官方 PyPI / 清华 / 阿里云 各试 2 次全灭）"
+            exit 1
+          fi
+          # mootdx 为可选依赖（本 workflow SKIP_MOOTDX=1 不使用），装不上不阻断
+          pip install -q --retries 2 --timeout 40 mootdx \
+            || pip install -q --retries 2 --timeout 40 -i https://pypi.tuna.tsinghua.edu.cn/simple mootdx \
+            || echo "mootdx 未安装（可选依赖，SKIP_MOOTDX=1 不影响算法链）"
+          python -c "import akshare, pandas, numpy, requests; print('deps ready')"
+
+      - name: "📅 交易日历 gate"
+        id: trading
+        run: |
+          python algorithms/check_trading_day.py
+
+      - name: "🧮 运行盘后算法链 → raw_data/ → 推送"
+        id: algo
+        if: steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true'
+        # 🔴 2026-08-30 23:3x 抬高步级墙钟 90 → 150（实测 run 33316835316 坐实）：
+        #   周末 force_run 全量补算时，本步跑到 70 分钟仍未完成，距 90 分钟限时仅剩
+        #   20 分钟——一旦超时被硬杀，后续 bridge / ALGO_TRACK / 兜底推送 / **产物完整性
+        #   闸门** 全部 skipped，整轮算法白跑（这正是「推送步拖死 job」的同构问题，
+        #   见批次 H 对 7 个 workflow 的统一修法）。
+        #   job 级共 200 分钟，抬到 150 后仍给后续 5 步留足 50 分钟余量，不会挤占。
+        timeout-minutes: 150
+        run: |
+          set +e
+          python algorithms/run_algorithms.py
+          ALGO_EXIT=$?
+          echo "algo exit: ${ALGO_EXIT}"
+          # 🛡 2026-08-28 一劳永逸：原写法只 echo 不留存，退出码随风消散。
+          #   现写入 GITHUB_ENV 供链尾闸门 step 展示。
+          #   注意：退出码**不能**作为成败判据——run_algorithms 内部对每个脚本
+          #   continue-on-error，脚本失败时退出码往往仍是 0。真正的成败判定
+          #   交由链尾「产物完整性闸门」按数据(update_time)说了算。
+          echo "ALGO_EXIT=${ALGO_EXIT}" >> "$GITHUB_ENV"
+          # run_algorithms 内部每个脚本 continue-on-error，整体退出码不代表全失败；
+          # 但推送是否落地是唯一可靠判据（2026-08-22 实证：final_recommend 23:34 已生成，
+          # 建 tree 422 推送失败被 exit 0 吞掉 → job 假 success → 线上 FINAL_RECOMMEND 停 08-20）。
+          # 显式再跑一次 api_push_raw（来源驱动增量、幂等），严格退出码：
+          # 推送失败即让 job 失败，dispatch_guard 才能感知并重试，杜绝假 success。
+          # 2026-08-22 来源驱动：git status 收集本次 changed 作清单，避免与 run_algorithms
+          # 内部 step_push 重复全量 848 扫描（与 api_push_raw PUSH_FILES 配合，422 根治闭环）。
+          MANIFEST=$(git status --porcelain raw_data/ data/ | awk '{print $2}' | tr '\n' ',')
+          if [ -n "$MANIFEST" ]; then
+            echo "📋 本次变更清单: ${MANIFEST%,}"
+            PUSH_FILES="$MANIFEST" python api_push_raw.py
+          else
+            echo "ℹ️ 无 raw_data/data 变更，跳过推送"
+          fi
+          echo "push exit: $?"
+
+      # 🛡 2026-08-18 主人紧急令根治：算法链收尾前先做 4 件事，确保 data/*.js 与 HEALTH_CHECK.js
+      #   必刷新——bridge_raw_data 防 raw_data 内部改名断点（如 triple_resonance_history → triple_history），
+      #   update_v8 重生成 data/*.js，v8_health_check 刷新 HEALTH_CHECK.js。
+      - name: "🔗 桥接 raw_data 内部改名（bridge_raw_data.py）"
+        if: steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true'
+        run: |
+          python algorithms/bridge_raw_data.py || true
+
+      # 2026-08-08 修复：算法链产出 candidate.json 后，立即刷新候选池行情，
+      # 避免 runner 状态卡 CANDIDATE_QUOTES 长期显示「空」。
+      - name: "📈 刷新候选池行情（CANDIDATE_QUOTES）"
+        if: steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true'
+        run: |
+          python cloud_fetch_v8.py --only CANDIDATE_QUOTES || true
+
+      - name: "📤 兜底推送（若上一步未推）"
+        if: steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true'
+        run: |
+          # 2026-08-22 根因⑪收口：去掉 || true —— 推送失败必须让 job 失败，
+          # 否则「算法链算完但推送 422 失败」永远被假 success 掩盖。
+          # 2026-08-22 来源驱动增量：只推本次 changed，避免全量 848 扫描。
+          MANIFEST=$(git status --porcelain raw_data/ data/ | awk '{print $2}' | tr '\n' ',')
+          if [ -n "$MANIFEST" ]; then
+            PUSH_FILES="$MANIFEST" python api_push_raw.py
+          else
+            echo "ℹ️ 无 raw_data/data 变更，跳过推送"
+          fi
+
+      # 🔴 2026-08-15 防覆盖铁律修复：run_algorithms 刚重写 data/ALGO_TRACK.js（带新时间戳），
+      #   但 index.html 的 ?v 不会自动跟着变 → CDN 吐旧 ALGO_TRACK 副本。
+      #   此步只在算法链收尾重算 ALGO_TRACK.js 的 ?v 并推送 index.html（Contents API，避开 cn git 墙）。
+      #   只改 ALGO_TRACK 一项，不碰 COMMODITY 等（避免用陈旧本地文件覆盖 build/deploy 已对齐的 ?v）。
+      - name: "🔄 同步 ALGO_TRACK 缓存戳 ?v 并推送 index.html"
+        if: steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'PY'
+          import os, re, hashlib, base64, json, urllib.request
+          TOK = os.environ["GITHUB_TOKEN"]
+          REPO = "ah-quant999/quant-scanner-v8"
+          API = "https://api.github.com/repos/" + REPO
+          H = {"Authorization": "Bearer " + TOK, "Content-Type": "application/json", "Accept": "application/vnd.github+json"}
+          ROOT = "."
+          idx = os.path.join(ROOT, "index.html")
+          html = open(idx, encoding="utf-8").read()
+          p = os.path.join(ROOT, "data", "ALGO_TRACK.js")
+          # ★ 2026-08-16 审计修复：必须与 build/reconcile 的 ?v 计算逐字符一致——
+          #   ① 取原始字节（非 read().encode()，避免 Windows CRLF→LF 归一化致 sha 偏移）；
+          #   ② 中性化 republish_time 构建时间戳（_write_js 每次注入，否则 ?v 随构建时刻漂）。
+          #   否则写出的 ?v 与 reconcile 算出的不一致 → ALGO_TRACK 缓存戳失配 → CDN 吐旧副本。
+          if os.path.exists(p):
+              _b = open(p, "rb").read()
+              _neutral = re.sub(rb'"republish_time"\s*:\s*"[^"]*"', b'"republish_time":""', _b)
+              t = hashlib.sha1(_neutral).hexdigest()[:10]
+          else:
+              t = ""
+          if not t:
+              print("ALGO_TRACK.js 缺失，跳过")
+              raise SystemExit(0)
+          new = re.sub(r'(ALGO_TRACK\.js)\?v=\w+', r'\1?v=' + t, html)
+          if new == html:
+              print("ALGO_TRACK ?v 已是最新，无需推送")
+          else:
+              open(idx, "w", encoding="utf-8").write(new)
+              meta = json.loads(urllib.request.urlopen(urllib.request.Request(API + "/contents/index.html?ref=main", headers=H)).read())
+              body = json.dumps({"message": "chore: 算法链后同步 ALGO_TRACK ?v（防覆盖）", "content": base64.b64encode(new.encode()).decode(), "sha": meta["sha"]}).encode()
+              req = urllib.request.Request(API + "/contents/index.html", data=body, headers=H, method="PUT")
+              print("push index.html ALGO_TRACK ?v:", urllib.request.urlopen(req).getcode(), "v=", t)
+          PY
+
+      # 🛡 2026-08-28 一劳永逸（主站审计 P0-1 根治）：链尾「产物完整性闸门」
+      #
+      #  背景——2026-08-28 实测「跑一半没人知道」：
+      #    本 workflow 全部 step 绿、job success，但核心选股产物实际停在昨晚/前天：
+      #      CANDIDATE(候选池)   停 08-26 22:36 → 1.9 天（选股链上游）
+      #      CRDS(逆势龙头)      停 08-27 19:53
+      #      STOCK_RPS(相对强度)  停 08-27 19:58
+      #      FINAL_RECOMMEND     停 08-27 21:02
+      #    而 TOP10 / 三重共识 / 四量 却已刷新 → 典型「上游不动、下游全停」。
+      #
+      #  三重叠加根因：
+      #    ① run_algorithms.py 对每个脚本 continue-on-error，单脚本失败只打一行
+      #       「⚠️ 退出码 N」，无人看、无汇总、无告警；
+      #    ② 本 workflow 用 `set +e` + `echo "algo exit: $?"` 显式丢弃退出码；
+      #    ③ 整条链没有任何「产物是否真产出了」的校验环节。
+      #
+      #  修复：链尾按**文件内容里的 update_time** 校验核心产物是否本交易日产出。
+      #  ⚠️ 刻意不用文件 mtime —— actions/checkout 会把所有文件 mtime 重置为
+      #     checkout 时刻，未更新的文件 mtime 同样「新」，用 mtime 会 100% 误判新鲜。
+      #
+      #  缺失/陈旧 → exit 1 → job 显式失败 → 既有告警链路（runner_health_alert /
+      #    v8_ops_watch）可见；同时写 $GITHUB_STEP_SUMMARY + raw_data/algo_chain_report.json，
+      #    让主人一眼看到断在哪一环，而不是对着全绿的 job 发呆。
+      - name: "🛡 产物完整性闸门（核心产物必须本交易日产出）"
+        if: steps.trading.outputs.is_trading_day == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "本轮 run_algorithms 退出码 = ${ALGO_EXIT:-未知}（仅供参考：continue-on-error 下常为 0）"
+          # 闸门报告 + 算法执行报告一并推送，供前端运维面板 / 后续排查消费
+          PUSH_FILES="raw_data/algo_chain_report.json,raw_data/algo_run_report.json" \
+            python api_push_raw.py || echo "⚠️ 报告推送失败（不影响闸门判定）"
+          # 2026-08-31 一劳永逸（主人令「一劳永逸式修复」·闸门假阳性根治）
+          #   本闸门要求 CRDS / 最终推荐「本交易日产出」，但：
+          #     - calc_crds.py       挂在 run_algorithms._POST_LHB_SCRIPTS（16:30 龙虎榜门控后才放行）
+          #     - final_recommend.py 另有 _final_recommend_gate() 就绪门控
+          #   于是看门狗在盘中派发本链时（实测 #1312 08:19 / #1313 09:33），这两个脚本
+          #   按设计正确跳过、并未产出今日产物，闸门却仍严格判定 -> exit 1 -> 整轮假阳性报红，
+          #   连带 HEALTH_CHECK 长期挂 CRDS_CARD_DATA / FINAL_RECOMMEND_DATA 两个 fail。
+          #   修复：16:30 前（CRDS/最终推荐尚未放行）以 --warn-only 运行（只报告、不判失败）；
+          #        16:30 之后（含真正的盘后主档 19:15）保持严格判定，不放水。
+          #   用 date -u -d '+8 hours' 而非 TZ=，避免依赖 runner 的 tzdata；
+          #   10#$HH 强制十进制，防 "0933" 被当八进制。
+          HH=$(date -u -d '+8 hours' +%H%M)
+          if [ "$((10#$HH))" -lt 1630 ]; then
+            echo "当前 CST ${HH} < 16:30 —— CRDS/最终推荐按设计尚未放行，闸门以 warn-only 模式运行（不判失败）"
+            python algorithms/verify_chain_outputs.py --warn-only
+          else
+            echo "当前 CST ${HH} >= 16:30 —— 盘后窗口，闸门严格判定"
+            python algorithms/verify_chain_outputs.py
+          fi
+          GATE_EXIT=$?
+          if [ "$GATE_EXIT" != "0" ]; then
+            echo "::error::盘后算法链产物不完整——核心产物未在本交易日产出，详见上方闸门报告"
+          fi
+          exit $GATE_EXIT

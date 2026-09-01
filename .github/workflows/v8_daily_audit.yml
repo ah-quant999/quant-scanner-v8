@@ -1,0 +1,184 @@
+# 九宝量化 v8.0 — 🧾 每日全站审核（22:30 CST，每晚 23:00 备份前）
+#
+# 主人令（2026-08-12 20:52）：「每晚23点备份前，在云端运行，做一个全站审核的任务建议吗？
+#   你总是出错，很担心！」
+# 背景：8 天三重共识全港股 bug 因健康检查漏洞长期未发现（空 stocks 豁免 + 只盯 Top3）。
+#   本 workflow 作为每日「全站体检」：比 v8_backup（23:00 CST）早 30 分钟跑，
+#   用 v8_health_check.py 全量检查 + 自愈派发 + 邮件告警 + 审核历史落盘。
+#
+# 审核范围（v8_health_check.py 全部检查项）：
+#   1. check_data_cards        所有 data/*.js 更新新鲜度 + 关键字段空值
+#   2. check_a_share_coverage  8 大池 A 股覆盖（全港股/0 只 → URGENT 告警）  ← 主人紧急令
+#   3. check_raw_data          raw_data 关键文件完整性
+#   4. check_site_deploy_sync  GitHub Pages 部署同步（token 修复后不再误报）
+#   5. check_runner / check_local_head_sync  runner 与仓库同步
+#   6. check_signal_date_freshness / check_top10_history_depth  内容级陈旧
+#   7. _check_workflow_durations  管线耗时趋势
+#   8. --site: 线上 DOM 空值
+#
+# 动作：发现问题 → 自愈派发（--heal 默认开）→ 邮件告警（--alert）→
+#       审核历史写入 raw_data/audit_history.json → push 触发 build → 前端可看历史。
+
+name: "🧾 v8 每日全站审核(22:30 备份前)"
+
+on:
+  schedule:
+    # UTC 14:30 = CST 22:30（比 v8_backup 的 23:00 早 30 分钟）
+    - cron: '30 14 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: v8-daily-audit
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25  # 2026-08-24 拉大：15→25。根因 v8_health_check --alert --site 跑完 + 18min（health_patrol step 5 sleep 600 + 验证 8min）原 15min 不够，daily_audit 22:30 那轮被切 → rc=3 误报。25min 含 5min buffer 安全。
+    env:
+      REPO: ah-quant999/quant-scanner-v8
+      # 🔴 2026-08-12 修复：用 PAT（含 repo+actions 权限），默认 GITHUB_TOKEN 权限不足
+      V8_GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: "🩺 全站审核（数据卡/覆盖/部署/内容）"
+        id: audit
+        continue-on-error: true
+        run: |
+          echo "=== 🧾 每日全站审核 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') ==="
+          python v8_health_check.py --alert --site 2>&1 | tee audit_output.txt
+          echo "AUDIT_EXIT=$?"
+          echo "PYTHON_EXIT=$?"
+
+      - name: "🔒 ?v 真失配 + 受保护文件核验（audit_weekly --cloud）"
+        continue-on-error: true
+        run: |
+          python scripts/audit_weekly.py --cloud 2>&1 | tail -40 || true
+
+      - name: "🔧 ?v 失配自动自愈（CDN 权威 fix + Contents API 直推，省主人手动）"
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'EOF'
+          import subprocess, os, re, base64, json, urllib.request, datetime
+          # 1) 再跑一次 audit 判断是否真有 ?v 失配
+          out = subprocess.run(["python", "scripts/audit_weekly.py", "--cloud"],
+                                capture_output=True, text=True).stdout
+          if "?v失配" not in out:
+              print("✅ 无 ?v 失配，无需自愈")
+              raise SystemExit(0)
+          # 2) 以 CDN 真实内容重算 ?v（fix_cachebusters_cdn 直接下载 github.io，云端可达）
+          subprocess.run(["python", "scripts/fix_cachebusters_cdn.py"], check=True)
+          # 3) Contents API 直推 index.html（默认 GITHUB_TOKEN 可写 contents，无 PAT secret 问题）
+          tok = os.environ["GH_TOKEN"]; REPO = "ah-quant999/quant-scanner-v8"
+          H = {"Authorization": "Bearer " + tok, "Accept": "application/vnd.github+json",
+               "Content-Type": "application/json", "User-Agent": "audit-heal"}
+          path = "index.html"; data = open(path, "rb").read()
+          sha = None
+          try:
+              r = json.load(urllib.request.urlopen(urllib.request.Request(
+                  f"https://api.github.com/repos/{REPO}/contents/{path}", headers=H), timeout=60))
+              sha = r["sha"]
+          except Exception:
+              pass
+          body = {"message": "audit-heal: ?v 对齐 CDN 真实内容 " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                  "content": base64.b64encode(data).decode(), "branch": "main"}
+          if sha:
+              body["sha"] = sha
+          req = urllib.request.Request(f"https://api.github.com/repos/{REPO}/contents/{path}",
+                                       data=json.dumps(body).encode(), headers=H, method="PUT")
+          urllib.request.urlopen(req, timeout=120)
+          # 4) 触发 Pages 构建
+          try:
+              req = urllib.request.Request(f"https://api.github.com/repos/{REPO}/pages/builds",
+                                           data=b"{}", headers=H, method="POST")
+              urllib.request.urlopen(req, timeout=60)
+          except Exception as e:
+              print("⚠️ pages build 触发警告:", e)
+          print("✅ 已自愈：?v 对齐 CDN 真实内容并直推 index.html")
+          EOF
+
+      - name: "📦 追加审核历史（raw_data/audit_history.json）"
+        run: |
+          python - <<'EOF'
+          import json, os, datetime
+          # 读 health report（v8_health_check 已生成 .workbuddy/v8_health_report.json）
+          rep = {}
+          try:
+              rep = json.load(open('.workbuddy/v8_health_report.json', encoding='utf-8'))
+          except Exception as e:
+              print('health report 读取失败:', e)
+          rec = {
+              "date": datetime.datetime.now().strftime('%Y-%m-%d'),
+              "time": datetime.datetime.now().strftime('%H:%M:%S'),
+              "overall": rep.get("overall", "unknown"),
+              "summary": rep.get("summary", {}),
+              "warn_items": [{"id": x.get("id"), "name": x.get("name"), "message": (x.get("message") or "")[:120]}
+                             for x in rep.get("items", []) if x.get("status") == "warn"],
+              "fail_items": [{"id": x.get("id"), "name": x.get("name"), "message": (x.get("message") or "")[:120]}
+                             for x in rep.get("items", []) if x.get("status") == "fail"],
+          }
+          hist = []
+          try:
+              hist = json.load(open('raw_data/audit_history.json', encoding='utf-8'))
+          except Exception:
+              hist = []
+          # 同一天只保留最新一条（覆盖当天）
+          hist = [h for h in hist if h.get("date") != rec["date"]]
+          hist.append(rec)
+          hist = hist[-90:]  # 保留 90 天
+          with open('raw_data/audit_history.json', 'w', encoding='utf-8') as f:
+              json.dump(hist, f, ensure_ascii=False, indent=1)
+          print('✅ 审核记录:', rec["date"], rec["overall"], rec["summary"])
+          print('   warn:', len(rec["warn_items"]), 'fail:', len(rec["fail_items"]))
+          EOF
+
+      - name: "🚀 推送审核记录（Contents API 直推，避免与 build 抢锁丢失；用默认 GITHUB_TOKEN 省 PAT）"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - <<'EOF'
+          import os, base64, json, urllib.request, datetime
+          tok = os.environ["GH_TOKEN"]
+          REPO = "ah-quant999/quant-scanner-v8"
+          path = "raw_data/audit_history.json"
+          H = {"Authorization": "Bearer " + tok, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
+          data = open(path, "rb").read()
+          sha = None
+          try:
+              r = json.load(urllib.request.urlopen(urllib.request.Request(
+                  f"https://api.github.com/repos/{REPO}/contents/{path}", headers=H), timeout=60))
+              sha = r["sha"]
+          except Exception:
+              pass  # 首次推送无 sha
+          body = {"message": "audit: 每日全站审核 " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                  "content": base64.b64encode(data).decode(), "branch": "main"}
+          if sha:
+              body["sha"] = sha
+          req = urllib.request.Request(
+              f"https://api.github.com/repos/{REPO}/contents/{path}",
+              data=json.dumps(body).encode(),
+              headers={**H, "Content-Type": "application/json"}, method="PUT")
+          urllib.request.urlopen(req, timeout=60)
+          print("✅ 审核记录已直推 origin（Contents API，默认 token，不耗 PAT）")
+          EOF
+
+      - name: "📊 审核摘要"
+        if: always()
+        run: |
+          echo "## 🧾 v8 每日全站审核 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')" >> $GITHUB_STEP_SUMMARY
+          tail -30 audit_output.txt >> $GITHUB_STEP_SUMMARY || true
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**主人提醒**：发现问题已邮件告警（--alert）+ 自愈派发（--heal 默认开）。备份在 23:00 自动执行。" >> $GITHUB_STEP_SUMMARY

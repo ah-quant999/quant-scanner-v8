@@ -1,0 +1,14 @@
+{"_说明": "手工维护的一次性日历事件（重大政策/活动日等非周期性事件）。程序每月自动渲染「当前月」时，会合并本文件里落在当月的事件。", "_财报说明": "公司财报（七姐妹/NVDA/半导体链/三星/台积电/ASML/华为）已内嵌在 cloud_fetch_v8.py 的 f_v8_cal() 函数中（从 v6 移植），无需在此重复填写。本文件仅用于补充无法自动计算的偶发事件。", "_template": {"date": "2026-08-15", "text": "示例：某临时政策发布", "cls": "imp", "released": false}, "_可用cls": "imp(重要政策)/cb(央行LPR)/data(中国数据)/caixin(财新PMI)/us(美股休市)/hk(港股)/fomc/appl(苹果华为)/ipo/option(期权交割)/future(期货交割)/a50/kr(韩股)/tw(台股)/eu(欧股)/jp(日股)/us_earnings(美股财报)", "events": [
+  {"date":"2026-09-09","text":"🍎 苹果秋季发布会（预计·待官宣）","cls":"appl","released":false},
+  {"date":"2026-09-17","text":"🇺🇸 FOMC利率决议（北京时间 9/17 02:00）","cls":"fomc","released":false},
+  {"date":"2026-09-26","text":"🌕 中秋假期（连休）","cls":"imp","released":false},
+  {"date":"2026-09-27","text":"🌕 中秋假期（连休）","cls":"imp","released":false},
+  {"date":"2026-09-30","text":"🇨🇳 国庆前最后交易日（10/1-7 休市）","cls":"imp","released":false},
+  {"date":"2026-10-01","text":"🇨🇳 国庆休市（10/1-7）","cls":"imp","released":false},
+  {"date":"2026-10-02","text":"🇨🇳 国庆休市（10/1-7）","cls":"imp","released":false},
+  {"date":"2026-10-03","text":"🇨🇳 国庆休市（10/1-7）","cls":"imp","released":false},
+  {"date":"2026-10-04","text":"🇨🇳 国庆休市（10/1-7）","cls":"imp","released":false},
+  {"date":"2026-10-05","text":"🇨🇳 国庆休市（10/1-7）","cls":"imp","released":false},
+  {"date":"2026-10-06","text":"🇨🇳 国庆休市（10/1-7）","cls":"imp","released":false},
+  {"date":"2026-10-07","text":"🇨🇳 国庆休市（10/1-7）","cls":"imp","released":false}
+]}

@@ -1,0 +1,116 @@
+# 九宝量化 v8.0 — 数据抓取云端看门狗（自愈·兜底）
+#
+# 🔴 2026-09-01 根因修复（一劳永逸）：
+#   主 workflow v8_cn_fetch_cloud.yml 的 5 条 cron 长期被 GitHub schedule 高负载整段漏触发
+#   （实测 2026-09-01 全天 0 次 schedule 触发，而 08-31 正常）。单靠 workflow 内置 cron 不可靠。
+#   本看门狗不依赖"准点"，而是**基于状态（线上数据是否陈旧）**自愈：
+#     - 每 30 分（交易日 08:00-17:30 CST）跑一次轻量检查；
+#     - 拉取线上 data/HEALTH_CHECK.js，取最新 last_update 与当前 CST 比较；
+#     - 若处于交易时段且对应类别数据陈旧（盘中>35min / 盘前盘后>60min），
+#       直接在云端用 gh workflow run 派发 v8_cn_fetch_cloud.yml（category 自适应）。
+#   全云端（ubuntu-latest），小九机仅在云端连续失败时才作人工后备，不依赖其定时。
+#   与主 workflow 的 cron 互为冗余：只要任意一条触发，数据就不会长时间空窗。
+
+name: "🐕 v8 数据抓取看门狗(云端自愈)"
+
+on:
+  schedule:
+    # 交易日 08:00-17:30 CST 每 30 分（UTC 00:00-09:30）。覆盖盘前/盘中/盘后全窗口。
+    - cron: '*/30 0-9 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      force_category:
+        description: '强制派发类别（留空=按陈旧度自适应）'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+  actions: write   # 用于 gh workflow run 派发主抓取
+
+concurrency:
+  group: v8-cn-fetch-watchdog
+  cancel-in-progress: false
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: 自检数据新鲜度并兜底派发
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import urllib.request, json, re, subprocess, datetime, sys
+
+          # 当前 CST 时间
+          cst = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
+          dow = cst.weekday()            # 0=周一
+          hhmm = cst.hour * 60 + cst.minute
+          print(f"[watchdog] CST={cst.strftime('%Y-%m-%d %H:%M')} dow={dow} hhmm={hhmm}")
+
+          force = "${{ github.event.inputs.force_category }}".strip()
+
+          # 仅交易日（周一至周五）
+          if dow >= 5 and not force:
+              print("[watchdog] 非交易日，跳过"); sys.exit(0)
+
+          def in_window(a, b):
+              return a <= hhmm <= b
+
+          # 交易时段 → 自适应类别
+          cat = None
+          if force:
+              cat = force
+          elif in_window(8*60+25, 9*60):        # 08:25-09:00 盘前
+              cat = "premarket"
+          elif in_window(9*60, 11*60+30):       # 09:00-11:30 上午盘中
+              cat = "intraday"
+          elif in_window(13*60, 15*60+30):      # 13:00-15:30 下午盘中
+              cat = "intraday"
+          elif in_window(17*60, 17*60+40):      # 17:00-17:40 盘后
+              cat = "post_close"
+          else:
+              print("[watchdog] 非交易时段，跳过"); sys.exit(0)
+
+          url = "https://ah-quant999.github.io/quant-scanner-v8/data/HEALTH_CHECK.js"
+          latest = None
+          try:
+              req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+              t = urllib.request.urlopen(req, timeout=30).read().decode("utf-8")
+              m = re.search(r"window\.HEALTH_CHECK\s*=\s*(\{.*\});?\s*$", t, re.S)
+              d = json.loads(m.group(1))
+              for c in (d.get("checks") or []):
+                  lu = c.get("last_update")
+                  if lu:
+                      try:
+                          dt = datetime.datetime.strptime(lu, "%Y-%m-%d %H:%M:%S")
+                          if latest is None or dt > latest:
+                              latest = dt
+                      except Exception:
+                          pass
+          except Exception as e:
+              print(f"[watchdog] 无法读取 HEALTH({e})，保守派发 {cat}")
+              subprocess.run(["gh", "workflow", "run", "v8_cn_fetch_cloud.yml",
+                              "-f", f"category={cat}"], check=False)
+              sys.exit(0)
+
+          if latest is None:
+              print(f"[watchdog] 无 last_update，派发 {cat}")
+              subprocess.run(["gh", "workflow", "run", "v8_cn_fetch_cloud.yml",
+                              "-f", f"category={cat}"], check=False)
+              sys.exit(0)
+
+          age_min = (cst.replace(tzinfo=None) - latest).total_seconds() / 60
+          thr = 35 if cat == "intraday" else 60
+          print(f"[watchdog] 最新数据={latest} 距今={age_min:.1f}min 类别={cat} 阈值={thr}min")
+          if age_min > thr:
+              print(f"[watchdog] 数据陈旧({age_min:.0f}>{thr}min)，云端派发 {cat}")
+              r = subprocess.run(["gh", "workflow", "run", "v8_cn_fetch_cloud.yml",
+                                  "-f", f"category={cat}"], capture_output=True, text=True, check=False)
+              print(r.stdout.strip(), r.stderr.strip())
+          else:
+              print(f"[watchdog] 数据新鲜({age_min:.0f}<={thr}min)，无需派发")
+          PY

@@ -1,0 +1,336 @@
+# 九宝量化 v8.0 — 中国数据抓取（小九 self-hosted cn 应急兜底版）
+#
+# 🔴 2026-08-18 主人令：云端 ubuntu-latest 才是主力，小九机器只兜底。
+#   本 workflow 固定 runs-on: [self-hosted, cn]，【不配置 schedule】，仅由 workflow_dispatch 触发。
+#   当 v8_cn_fetch_cloud.yml（云端主力）连续 failure 时，v8_cloud_watchdog.py 自动 dispatch 本文件，
+#   用小九单位机中国 IP 全量抓取。小九机器只作为应急兜底，不主动承担主链路。
+
+#
+# 🔴 2026-08-30 20:2x 根因修复（实测 run#33309752550）：
+#   本 workflow 原用 actions/checkout@v4，但它跑在 [self-hosted, cn]，
+#   而 cn runner 上 git 协议访问 github.com 必被 Connection reset
+#   （fatal: unable to access ... Recv failure: Connection was reset，
+#     checkout 重试 3 次后 5 分钟 timeout → 整个应急兜底链 0 执行）。
+#   → 已改为与 v8_algo_run.yml / v8_lhb_fetch.yml 一致的
+#     「GitHub Trees/Blobs API 同步源码」路线。
+#   ❌ 严禁在本文件重新引入：actions/checkout、git clone/fetch、
+#      rm -rf、git clean -fdx（后三者会撞 cn runner 的 safe-delete 拦截）。
+
+name: "🇨🇳 v8 中国数据抓取(云端·小九应急)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      category:
+        description: '抓取类别：premarket / intraday / post_close / all'
+        required: false
+        default: 'intraday'
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-cn-fetch-cloud-selfhosted
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: [self-hosted, cn]
+    # 2026-08-30：原 20 分钟，比云端孪生（v8_cn_fetch_cloud / _hosted 均 25）还短，
+    #   而 category=all 要跑 fetch+LHB+回填+弹性+板块RS+ETF+推送+bridge+update_v8+health
+    #   （云端同链今晚实测约 17 分钟，cn 机器更慢）→ 抬到 30，避免合法长跑被判超时红灯。
+    # 🔴 2026-08-30 22:2x 实测再抬 30 → 75（run 33312102792 逐步耗时坐实）：
+    #   job 跑满 30.2 分钟被 GitHub 硬杀（conclusion=cancelled），杀点落在
+    #   step 11「推送 raw_data 到 main」——该步单独就跑了 21.7 分钟仍未完成，
+    #   连带 step 12-14（bridge / update_v8 / health_check）全部 skipped。
+    #   后果：中国数据抓到了(step 5 ✅ 5.6min)却推不上 main、data/*.js 不重生成 = 整轮白抓。
+    #   慢的根因不是 bug：api_push_raw.py 的防倒退守卫（2026-08-09 加，防多 workflow
+    #   竞态覆盖）需对每个变更 .json 全量下载远端 blob 比时间戳，raw_data 共 117 个
+    #   json / 26 MB（stock_quote 4.6M、backtest_tdx 3.9M），cn 出海串行传输就是 20 分钟量级。
+    #   守卫不能删（删了会重演 08-09 数据回退），只能给足墙钟时间。
+    timeout-minutes: 75
+    env:
+      TZ: Asia/Shanghai
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # self-hosted runner 上 WorkBuddy safe-delete 批量删除守卫阈值
+      CODEBUDDY_SAFE_DELETE_BULK_THRESHOLD: 1000
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    steps:
+      - name: "🕐 确定抓取类别"
+        id: cat
+        shell: bash
+        run: |
+          # 🛡 2026-08-31 一劳永逸修复（小九令）：workflow_dispatch 入参优先。
+          #   原逻辑只看 github.event.schedule，dispatch 时该值为空 → 落 *) → all
+          #   （全量最重→超时被杀→数据推不上去）。同缺陷在主链路 v8_cn_fetch_cloud.yml
+          #   已造成 15:42/16:05/16:18 三轮连杀、主站数据停在 14:2x 的生产事故。
+          IN="${{ github.event.inputs.category }}"
+          if [ -n "$IN" ]; then
+            case "$IN" in
+              premarket|intraday|post_close|all)
+                echo "category=$IN" >> "$GITHUB_OUTPUT"
+                echo "label=手动派发($IN)" ;;
+              *)
+                echo "category=all" >> "$GITHUB_OUTPUT"
+                echo "label=手动派发(未知入参→all)" ;;
+            esac
+            exit 0
+          fi
+          CRON="${{ github.event.schedule }}"
+          case "$CRON" in
+            "25 0 * * 1-5")
+              echo "category=premarket" >> "$GITHUB_OUTPUT"
+              echo "label=盘前" ;;
+            "*/30 1-8 * * 1-5")
+              echo "category=intraday" >> "$GITHUB_OUTPUT"
+              echo "label=盘中" ;;
+            "20 9 * * 1-5")
+              echo "category=post_close" >> "$GITHUB_OUTPUT"
+              echo "label=盘后" ;;
+            # 🛡️ 2026-08-13 23:1x 根因修复（阿狸咪令）：yml cron '0 9,14'（北京 17:00/22:00）
+            #   但 case 字符串写 '0 9,13'（北京 17:00/21:00），22:00 触发后 case 不匹配
+            #   → step 2 '确定抓取类别' 失败 → 整个 fetch job 失败 → raw_data 盘后档不更新
+            #   注释里的 21:30 实际 cron 是 22:00（不一致），主人出差前必须修
+            #   修复：case 同时接受 '0 9,14' 和 '0 9,13'；未匹配的 cron 走 all 兜底
+            "0 9,14 * * 1-5"|"0 9,13 * * 1-5"|"0 1 * * 0,6")
+              echo "category=all" >> "$GITHUB_OUTPUT"
+              echo "label=全量兜底" ;;
+            *)
+              echo "category=all" >> "$GITHUB_OUTPUT"
+              echo "label=兜底(未匹配cron $CRON, 走all)" ;;
+          esac
+          # 注：原 if 兜底已删（重复 echo 同一 output 键会导致 GitHub Action 报 Multiple outputs）
+
+      - name: "📥 经 GitHub API 同步源码（唯一可行路线：本 runner 上 git 走 github.com 会被连接重置）"
+        id: sync_api
+        shell: powershell
+        run: |
+          $code = @'
+          import os, base64, json, hashlib, urllib.request, time
+          token = os.environ["GITHUB_TOKEN"]
+          REPO = "ah-quant999/quant-scanner-v8"
+          H = {"Authorization": "Bearer " + token,
+               "Accept": "application/vnd.github+json",
+               "X-GitHub-Api-Version": "2022-11-28"}
+
+          def local_blob_sha(path):
+              # git blob sha1 = sha1("blob <len>\0" + content); lets us decide
+              # "already identical" WITHOUT downloading the file at all.
+              try:
+                  data = open(path, "rb").read()
+              except Exception:
+                  return None
+              h = hashlib.sha1()
+              h.update(("blob %d\0" % len(data)).encode())
+              h.update(data)
+              return h.hexdigest()
+
+          def sha_of(data):
+              h = hashlib.sha1()
+              h.update(("blob %d\0" % len(data)).encode())
+              h.update(data)
+              return h.hexdigest()
+
+          def get_json(url, tries=6):
+              last = None
+              for i in range(tries):
+                  try:
+                      return json.load(urllib.request.urlopen(
+                          urllib.request.Request(url, headers=H), timeout=120))
+                  except Exception as e:
+                      last = e
+                      print("  retry %d: %s" % (i + 1, e), flush=True)
+                      time.sleep(min(2 ** i, 20))
+              raise SystemExit("API fetch failed: %s (%s)" % (url, last))
+
+          def fetch_blob(sha, tries=6):
+              # Prefer the raw media type: no base64 inflation (~26pct smaller payload),
+              # which is what kept truncating on this runner for the 1.3MB json
+              # (run#31005326516 / #31011155328: IncompleteRead at ~1.82MB of 1.86MB).
+              # Every attempt is sha-verified so a silent truncation can never be written.
+              url = "https://api.github.com/repos/%s/git/blobs/%s" % (REPO, sha)
+              raw_h = dict(H)
+              raw_h["Accept"] = "application/vnd.github.raw"
+              last = None
+              for i in range(tries):
+                  mode = "raw" if i % 2 == 0 else "b64"
+                  try:
+                      hdr = raw_h if mode == "raw" else H
+                      resp = urllib.request.urlopen(
+                          urllib.request.Request(url, headers=hdr), timeout=180)
+                      body = resp.read()
+                      data = body if mode == "raw" else base64.b64decode(
+                          json.loads(body.decode())["content"])
+                      if sha_of(data) != sha:
+                          raise ValueError("sha mismatch (truncated?) got %d bytes" % len(data))
+                      return data
+                  except Exception as e:
+                      last = e
+                      print("  blob retry %d [%s]: %s" % (i + 1, mode, e), flush=True)
+                      time.sleep(min(2 ** i, 20))
+              raise SystemExit("blob fetch failed: %s (%s)" % (sha, last))
+
+          tree = get_json("https://api.github.com/repos/%s/git/trees/main?recursive=1" % REPO)
+          want = []
+          for e in tree.get("tree", []):
+              if e.get("type") != "blob":
+                  continue
+              p = e["path"]
+              # algorithms/ + scripts/ + .github/scripts/ + every root-level .py
+              # (needs api_push_raw.py / update_v8.py / cloud_dispatcher.py)
+              if (p.startswith("algorithms/") or p.startswith("scripts/")
+                      or p.startswith(".github/scripts/")
+                      or ("/" not in p and p.endswith(".py"))):
+                  want.append((p, e["sha"]))
+          print("files to sync: %d" % len(want), flush=True)
+
+          ok = 0
+          skipped = 0
+          for p, sha in want:
+              if local_blob_sha(p) == sha:
+                  ok += 1
+                  skipped += 1
+                  continue
+              data = fetch_blob(sha)
+              parent = os.path.dirname(p)
+              if parent:
+                  os.makedirs(parent, exist_ok=True)
+              with open(p, "wb") as f:
+                  f.write(data)
+              print("  updated %s (%d bytes)" % (p, len(data)), flush=True)
+              ok += 1
+          print("OK source sync done: %d/%d (unchanged: %d)" % (ok, len(want), skipped), flush=True)
+          if ok != len(want):
+              raise SystemExit(1)
+          '@
+          # NOTE: must write a temp file then run it; passing code via `python -c` gets
+          #       its double quotes stripped by the shell (run#30859885910).
+          # NOTE: keep every powershell step ASCII-only - Windows PowerShell 5.1 reads
+          #       the generated .ps1 as ANSI/GBK, and CJK bytes swallow quote terminators
+          #       (run#30860170070 died on a Chinese Write-Host string).
+          $tmp = Join-Path $env:RUNNER_TEMP "sync_src_v8.py"
+          Set-Content -Path $tmp -Value $code -Encoding UTF8
+          python $tmp
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+
+      - name: "🐍 Python / 依赖检查（缺才装·清华镜像）"
+        shell: powershell
+        # ASCII-ONLY body: Windows PowerShell 5.1 reads generated .ps1 as ANSI/GBK.
+        run: |
+          python --version
+          python -c "import akshare, pandas, requests" 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "deps missing, installing from tsinghua mirror..."
+            python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple akshare pandas requests
+          } else { Write-Host "deps ready" }
+          exit 0
+
+      - name: "📡 抓中国数据 → raw_data/（selective）"
+        # 🛡️ 2026-08-12 移除 continue-on-error：抓取失败必须让 job 失败，
+        #    阻止 api_push_raw 把只刷了 update_time 的空壳数据推送到 main。
+        shell: bash
+        run: |
+          cat="${{ steps.cat.outputs.category }}"
+          echo "本次类别: $cat"
+          python cloud_fetch_v8.py --category "$cat"
+
+      - name: "🐉 刷新当日 LHB 数据（仅 post_close）"
+        # 🛡️ 2026-08-30 修复：category=all（全量兜底/手动 dispatch）语义上应 ⊇ post_close，
+        #   原写死 == 'post_close' 导致 all 时本步 skipped（实测 run 33312102792 五步全跳）。
+        if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
+        continue-on-error: true
+        shell: bash
+        run: |
+          # fetch_lhb.py 产出 out/lhb_result.json；stage_to_raw 将其提升为 raw_data/lhb_data.json
+          python algorithms/fetch_lhb.py
+          python -c "import sys; sys.path.insert(0,'algorithms'); import stage_to_raw; stage_to_raw.main()"
+
+      - name: "🐉 回填 LHB 历史（仅 post_close）"
+        # 🛡️ 2026-08-30 修复：category=all（全量兜底/手动 dispatch）语义上应 ⊇ post_close，
+        #   原写死 == 'post_close' 导致 all 时本步 skipped（实测 run 33312102792 五步全跳）。
+        if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
+        continue-on-error: true
+        shell: bash
+        run: |
+          python backfill_lhb_history.py
+
+      # 2026-08-17 主人令：calc_commodity_elasticity.py 加入云端自动跑（之前从未自动跑过，导致国内期货 LC/SA 永远不显示）
+      - name: "💹 商品涨价弹性榜重算（仅 post_close）"
+        # 🛡️ 2026-08-30 修复：category=all（全量兜底/手动 dispatch）语义上应 ⊇ post_close，
+        #   原写死 == 'post_close' 导致 all 时本步 skipped（实测 run 33312102792 五步全跳）。
+        if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
+        continue-on-error: true
+        shell: bash
+        run: |
+          python algorithms/calc_commodity_elasticity.py
+
+      # 2026-08-17 主人令：板块周期 fetch_sector_rs 之前从未自动跑过，导致 3 天前数据陈旧
+      - name: "🔄 板块相对强度重算（仅 post_close）"
+        # 🛡️ 2026-08-30 修复：category=all（全量兜底/手动 dispatch）语义上应 ⊇ post_close，
+        #   原写死 == 'post_close' 导致 all 时本步 skipped（实测 run 33312102792 五步全跳）。
+        if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
+        continue-on-error: true
+        shell: bash
+        run: |
+          python algorithms/fetch_sector_rs.py
+          python -c "import sys; sys.path.insert(0,'algorithms'); import stage_to_raw; stage_to_raw.main()"
+
+      # 2026-08-17 主人令：ETF 三件套（calc_etf_intraday.py）之前无 workflow 触发
+      - name: "💹 ETF 三件套数据生成（post_close 兜底）"
+        # 🛡️ 2026-08-30 修复：category=all（全量兜底/手动 dispatch）语义上应 ⊇ post_close，
+        #   原写死 == 'post_close' 导致 all 时本步 skipped（实测 run 33312102792 五步全跳）。
+        if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
+        continue-on-error: true
+        shell: bash
+        run: |
+          python algorithms/calc_etf_intraday.py
+
+      - name: "📤 推送 raw_data/ 到 main（Contents API）"
+        # 🔴 2026-08-18 主人根治令：消费层软失败。推送失败不阻断后续 bridge/update_v8/health_check。
+        continue-on-error: true
+        # 🔴 2026-08-30 22:2x 加步级限时（run 33312102792 实测本步 21.7 分钟未完成即被
+        #   job 级 30 分钟硬杀，导致后续 bridge/update_v8/health_check 全 skipped）。
+        #   与上面的 continue-on-error: true 配合：本步超时只判「该步 failure」，job 存活，
+        #   step 12-14 照常跑完 → 即使推送慢挂，data/*.js 也能用本地 raw_data 重生成，
+        #   raw_data 则由下一轮/reconcile 补推。这才是「消费层软失败」的真正落地。
+        timeout-minutes: 40
+        shell: bash
+        run: |
+          python api_push_raw.py
+
+      # 🛡 2026-08-18 主人紧急令根治：抓完 raw_data 之后立即桥接（bridge_raw_data.py）
+      #   + 重生成 data/*.js（update_v8.py）+ 刷新 HEALTH_CHECK.js（v8_health_check.py），
+      #   闭环 4 步：fetch → bridge → update_v8 → health_check。否则 raw_data 新了但
+      #   data/*.js 还是昨日旧值（如 TRIPLE_HISTORY 4 天前的根因就是缺 bridge 这步）。
+      - name: "🔗 桥接 raw_data 内部改名（bridge_raw_data.py）"
+        shell: bash
+        run: |
+          python algorithms/bridge_raw_data.py
+
+      - name: "🔄 重生成 data/*.js (update_v8)"
+        # 🔴 2026-08-18 主人根治令：消费层软失败。
+        continue-on-error: true
+        shell: bash
+        run: |
+          python update_v8.py
+
+      - name: "🩺 刷新 HEALTH_CHECK.js (v8_health_check)"
+        # 🔴 2026-08-18 主人根治令：health_check 硬失败曾 3 次拖垮 workflow → 软失败只留痕。
+        # 🛡️ 2026-08-30 补充：cn runner 内网连线上 github.io/api 大量超时重试，
+        #   实测单次 1847s(31min) 白耗 runner。加 8 分钟上限，超时按软失败处理。
+        timeout-minutes: 8
+        continue-on-error: true
+        shell: bash
+        run: |
+          python v8_health_check.py
+
+      - name: "🛰️ 云端兜底调度（算法链/温度计，幂等）"
+        if: success()
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python .github/scripts/cloud_dispatcher.py

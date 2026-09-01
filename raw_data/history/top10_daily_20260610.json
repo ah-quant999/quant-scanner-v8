@@ -1,0 +1,9 @@
+{
+  "update_time": "2026-06-10 15:00:00",
+  "source_note": "从 v6 recommend.json 轻量转换，仅用于 T+N 历史深度回填",
+  "total_scored": 0,
+  "count_80plus": 0,
+  "max_score": 0,
+  "top10": [],
+  "norm_version": 130
+}

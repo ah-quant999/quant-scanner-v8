@@ -1,0 +1,299 @@
+# 九宝量化 v8.0 — 云端健康巡检（合并版·随定时任务自愈 + 每日体检）
+#
+# 2026-08-13 合并自以下 5 个冗余自愈器（消除"每 30/15/6 分钟轮询"的碎片化）：
+#   - v8_intraday_healer.yml   （盘中云端自愈器）
+#   - v8_safety_net.yml        （cn_fetch safety_net）
+#   - v8_self_heal.yml         （周六冻结模块补跑）
+#   - v8_ops_self_heal.yml     （运维看板常态自愈巡检）
+#   - v8_algo.yml              （每日数据体检）
+#
+# 合并原则（用户令 2026-08-13：云端全权 + 合并 + 不每分钟轮询 + 跟定时任务走）：
+#   1. 主触发 = workflow_run：cn_fetch(云端) / 盘后算法链(云端) / 构建部署 一完成 → 立即巡检+自愈。
+#      数据刚抓完/算完就查，比固定 30 分钟轮询更及时、更省资源。
+#   2. 兜底 = schedule：每 60 分钟一次（仅 09:08-21:08 用户在线时段），防 workflow_run 漏触发。
+#      夜间 21:08-09:08 完全静音（不跑不自愈不告警，睡眠免打扰）。
+#   3. 本 workflow 只做「诊断 + 一键派发治愈」，不自己抓数据（抓数据走 v8_cn_fetch_cloud，
+#      跑在 [self-hosted, cn] 中国 IP；自愈派发同理指向该 workflow）。
+#
+# 自愈能力（来自 v8_health_check.py --heal，已含防雪崩守卫 MAX_DISPATCHES_PER_RUN）：
+#   - 检测全部前端数据卡片新鲜度 + 空值 + 管线同步；
+#   - 发现 fail 卡片即按 page→category 逐源自动派发对应 cn_fetch / algo_run 刷新；
+#   - 本地/部署不同步自动对齐 + 派发 build_deploy。
+# 另跑 guard_v8_freshness.py 写 data/freshness_status.json 供运维面板读取（原 v8_algo.yml 职责）。
+#
+# 纯云端执行（ubuntu-latest），不依赖 cn runner 在线——派发动作经 API 触达 cn runner。
+
+name: "🩺 v8 云端健康巡检(合并·自愈+体检)"
+
+on:
+  # 主触发：上游一完成立即巡检（最及时）
+  workflow_run:
+    workflows:
+      - "🇨🇳 v8 中国数据抓取(云端)"
+      - "☁️ v8 盘后算法链(云端)"
+      # 注：build_deploy 自身已跑 health_check + 自愈，patrol 不再对其重复巡检，省 PAT（避免双跑 health_check）
+    types: [completed]
+    branches: [main]
+  # 2026-08-31 fix: 原仅工作日 09:08-21:08 + 每 60 分钟，与卡片 48 槽位声称不符
+  # 改为全天每 30 分钟（盘前/盘中/盘后/夜间全覆盖），08,38 偏移避整点洪峰
+  # 预算 1440/月 + workflow_run 200/月 = 1640/月（<GHA 2000 免费档）
+  schedule:
+    - cron: '8,38 * * * 1-5'
+    - cron: '8,38 * * * 0,6'
+
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "强制运行（忽略去抖锁）"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write
+  actions: write            # 必须：dispatch 其他 workflow 做派发治愈
+
+concurrency:
+  # 🛡️ 2026-08-13 14:57 根因修复（小九令）：同分钟内 v8_cn_fetch_cloud / v8_build_deploy
+  #   / pages build 完成事件会在 1-3 秒内接连触发多次 health-patrol，3 个并发跑
+  #   step 5 推 freshness_status.json 时 git push 因 race condition 全部 422 失败。
+  #   加 concurrency group：同 group 同时只跑一个，cancel 老 run（防 stale 派发链），
+  #   解决「1 分钟 #22/#23/#24 三连发 → #24 失败传播给 build_deploy → 卡死」链路。
+  #   用 cancel-in-progress: true（不是 false），新触发把老的 cancel 掉：
+  #     - heal 逻辑本身幂等（去抖锁 + MAX_DISPATCHES_PER_RUN），cancel 不破坏数据；
+  #     - 但若 3 个并发 push 同一份 freshness，至少 2 个会失败 → 雪崩；
+  #     - cancel 让最新一次覆盖，确保只有 1 个在跑，1 次 push 必成功。
+  group: v8-health-patrol
+  # 🛡️ 2026-08-21 20:45 一劳永逸根因修复（主人令「核查，一劳永逸式修复」）：
+  #   实测今日 patrol 100 run 中 98 个 cancelled、仅 1 failure —— 自愈器实际全年失能。
+  #   死锁链路：本 workflow 的「🔁 自愈验证」step 内含 sleep 600（10 分钟），而
+  #   workflow_run 触发源（cn_fetch 每 6-30 分钟 + 盘后算法链 + 自身兜底派发）间隔
+  #   远小于 10 分钟 → 每个 patrol 都在 sleep 中被后来者 cancel → 永远走不到
+  #   「写 freshness_status.json」与锁文件写回（实证：data/.heal_dispatch.json 停在
+  #   13:56:37）→ 自愈判定永远读到陈旧锁 → 盘后算法链坏了 5 小时无人救。
+  #   改 false 的语义正确性：GitHub 对同 group 只保留「1 running + 1 最新 pending」，
+  #   多余 pending 自动 cancel —— 即 running 绝不被打断，排队的自然合并。
+  #   （其余 6 个 workflow 早已全是 false，patrol 是唯一漏网的 true。）
+  #   配套：新增下方「⏱️ 去抖 gate」，近 15 分钟已完整巡检过则本轮秒退 no-op，
+  #   防止 false 后排队 run 接力连跑把 group 与 API 配额占满。
+  cancel-in-progress: false
+
+jobs:
+  health-patrol:
+    runs-on: ubuntu-latest   # 巡检器只诊断+派发 API，美国 IP 即可
+    timeout-minutes: 15
+    env:
+      REPO: ah-quant999/quant-scanner-v8
+      # 派发治愈用 PAT（含 repo+actions 权限），与 v8_build_deploy.yml 一致
+      V8_GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      # 🛡️ 2026-08-21 20:45 一劳永逸根因修复（主人令）：配合 cancel-in-progress: false。
+      #   false 后同 group 的排队 run 会接力连跑（每轮含 sleep 600 = 12min+），若不去抖
+      #   会把 group 与 GitHub API 配额吃满 —— 那正是今日 secondary rate limit 403 风暴的燃料。
+      #   本 gate：近 15 分钟内已有「完整跑完」的 patrol 则本轮秒退 no-op（不派发、不推文件）。
+      #   只认 success/failure，cancelled 不算（被打断 ≠ 已巡检），判定纯走 Runs API 无状态。
+      - name: "⏱️ 去抖 gate（近 15 分钟已完整巡检则本轮 no-op）"
+        id: gate
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          FORCE: ${{ github.event.inputs.force }}
+          DEBOUNCE_WINDOW_MIN: "15"
+        run: python .github/scripts/patrol_debounce.py
+
+      - name: "🩺 巡检 + 自动治愈（一站式）"
+        id: heal
+        if: steps.gate.outputs.skip != 'true'
+        continue-on-error: true
+        run: |
+          echo "=== 运维自愈巡检 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') ==="
+          python v8_health_check.py --heal 2>&1 | tee heal_output.txt; echo "PYTHON_EXIT=$?"
+          # 🔴 2026-08-30 23:1x 修复（实测 run 33316381407 日志坐实）：
+          #   原写法 `VAR=$(grep -c "PAT" file || echo "0")` 在**无匹配**时会把
+          #   grep 的退出码 1 一并带进命令替换，变量里混进换行与多余输出 →
+          #     💊 自动治愈 0
+          #     0 项 / 失败 0        ← 输出被换行截断
+          #     ##[error] Unable to process file command 'output' successfully.
+          #     ##[error] Invalid format '0'
+          #   结果 healed/failed/fail 三个 step outputs 全部失效，后续汇总显示
+          #   「自愈失败: （空）项」，任何依赖它们的告警/升级逻辑都拿到空值。
+          #   ⇒ 用 `|| true` 吃掉 grep 的非 0 退出码，再用 ${VAR:-0} 兜底空串，
+          #     保证变量始终是单行纯数字。
+          HEALED=$(grep -c "\[HEAL✓\]" heal_output.txt 2>/dev/null || true)
+          FAILED=$(grep -c "\[HEAL✗\]" heal_output.txt 2>/dev/null || true)
+          FAIL=$(grep -c "\[FAIL\]" heal_output.txt 2>/dev/null || true)
+          HEALED="${HEALED:-0}"; FAILED="${FAILED:-0}"; FAIL="${FAIL:-0}"
+          echo "healed=$HEALED" >> "$GITHUB_OUTPUT"
+          echo "failed=$FAILED" >> "$GITHUB_OUTPUT"
+          echo "fail=$FAIL" >> "$GITHUB_OUTPUT"
+          echo "💊 自动治愈 $HEALED 项 / 失败 $FAILED 项 / 仍 fail $FAIL 项"
+
+      # 🛡 2026-08-18 主人紧急令根治：派发自愈后等 10 分钟再验一次，避免「派发→同一数据未变
+      #   →再派发→空转」循环；这是「4 天没跑没发现」的根因之一——algo_run 派发无数次，bridge
+      #   断点未修，永远回到同一陈旧数据。仅当本次有 healed 项且派发了非 skip 类才进入验证。
+      - name: "🔁 自愈验证：10 分钟后回查仍 fail → 升级告警"
+        if: steps.gate.outputs.skip != 'true' && steps.heal.outputs.healed != '0' && steps.heal.outputs.healed != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🛌 等 10 分钟让 cn_fetch/algo_run 完成数据更新..."
+          sleep 600
+          echo "=== 验证回查 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') ==="
+          python v8_health_check.py --no-heal 2>&1 | tee verify_output.txt || true
+          # 同上：`|| true` + ${VAR:-0} 兜底，避免 grep 无匹配时污染 step outputs
+          # 并使下面 `[ "$REMAIN_FAIL" -gt 0 ]` 因变量含换行而报 "integer expression expected"。
+          REMAIN_FAIL=$(grep -c '"status": "fail"' verify_output.txt 2>/dev/null || true)
+          NEW_OK=$(grep -c '"status": "ok"' verify_output.txt 2>/dev/null || true)
+          REMAIN_FAIL="${REMAIN_FAIL:-0}"; NEW_OK="${NEW_OK:-0}"
+          echo "verify_fail=$REMAIN_FAIL" >> "$GITHUB_OUTPUT"
+          echo "verify_ok=$NEW_OK" >> "$GITHUB_OUTPUT"
+          if [ "$REMAIN_FAIL" -gt 0 ]; then
+            echo "🚨 自愈后仍有 $REMAIN_FAIL 项 fail，可能结构性断点（algo_run→bridge_raw_data 未生效等），已发邮件升级"
+            echo "::error::自愈闭环未达成 — $REMAIN_FAIL 项 10 分钟后仍 fail（详见 verify_output.txt）"
+            # 🛡 2026-08-19 阿狸咪根治（health_patrol 死 37h 根因）：
+            # 原版这段用多行 python -c（含换行 + 单引号字符串），YAML 解析时把换行当成
+            # 字符串内的 \n，但 Python 看到的是多行字符串需要三引号包裹 → SyntaxError →
+            # 整个 workflow 文件无效 → 每次 push 都产生 event=push failure run + 巡检/自愈停摆。
+            # 修复：抽到独立脚本 scripts/write_self_heal_escalation.py，单行调用。
+            REMAIN_FAIL="$REMAIN_FAIL" python scripts/write_self_heal_escalation.py
+          else
+            echo "✅ 自愈闭环达成：$NEW_OK 项全 OK"
+          fi
+
+      - name: "🚨 缺口兜底：近 6 分钟无 cn_fetch / algo_run 完成就派发"
+        # 🛡️ 2026-08-13 14:57 根因修复（小九令）：health-patrol #24 失败 + build #1425 skipped
+        #   后，cn_fetch 下一次 schedule 要等 30 分钟（盘中每 30 分），期间 14:57-15:30
+        #   缺口 33 分钟无人补。本 step 主动检测「近 6 分钟无上游完成事件」并
+        #   兜底 dispatch 一条 intraday cn_fetch，把"卡住 30 分钟无数据"压到 ≤6 分钟。
+        #   与 v8_health_check.py --heal 的「按卡片 stale 阈值派发」互补：
+        #     - heal 按数据卡 age（>120min 才派发）—— 太慢；
+        #     - 本 step 按「管线心跳」（>6min 无 raw_data 推）—— 及时。
+        # 🛡️ 2026-08-21：加 gate 条件 —— 去抖跳过时绝不派发，否则「排队 run 接力各派一发」
+        #   会把 cn_fetch 推成 6 分钟一轮的风暴（今日 cn_fetch 150 run 的成因之一）。
+        if: always() && steps.gate.outputs.skip != 'true'
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CN_WORKFLOW_ID=327687211   # 🇨🇳 v8 中国数据抓取(云端)
+          STALE_MIN=6
+          # 盘中时间才派发 intraday（盘前/盘后/周末 dispatch 也没用）
+          CST_HH=$(TZ=Asia/Shanghai date +%H)
+          CST_MM=$(TZ=Asia/Shanghai date +%M)
+          CST_DOW=$(TZ=Asia/Shanghai date +%u)
+          CST_TOTAL=$((CST_HH * 60 + CST_MM))
+          INTRADAY=$([ $CST_DOW -le 5 ] && [ $CST_TOTAL -ge 540 ] && [ $CST_TOTAL -le 900 ] && echo "1" || echo "0")  # 09:00-15:00
+          POSTCLOSE=$([ $CST_DOW -le 5 ] && [ $CST_TOTAL -ge 900 ] && [ $CST_TOTAL -le 1020 ] && echo "1" || echo "0")  # 15:00-17:00
+          echo "🕐 CST ${CST_HH}:${CST_MM} 周${CST_DOW} | intraday=$INTRADAY post_close=$POSTCLOSE"
+          # 取最近 cn_fetch 完成时间
+          LAST_CN=$(curl -sS -H "Authorization: token ${GIT_TOKEN}" \
+            "https://api.github.com/repos/${REPO}/actions/workflows/${CN_WORKFLOW_ID}/runs?per_page=1" \
+            | python -c "import json,sys; d=json.load(sys.stdin); r=d.get('workflow_runs',[{}])[0]; print(r.get('updated_at') or r.get('created_at',''))")
+          NOW_EPOCH=$(date +%s)
+          GAP_CN=$([ -n "$LAST_CN" ] && echo $(( (NOW_EPOCH - $(date -d "$LAST_CN" +%s)) / 60 )) || echo "9999")
+          echo "📊 距上次 cn_fetch ${GAP_CN} 分钟（阈值 ${STALE_MIN}）"
+          if [ "$INTRADAY" = "1" ] && [ $GAP_CN -ge $STALE_MIN ]; then
+            CATEGORY="intraday"
+          elif [ "$POSTCLOSE" = "1" ] && [ $GAP_CN -ge $STALE_MIN ]; then
+            CATEGORY="post_close"
+          else
+            echo "✅ 管线心跳正常，无需兜底派发"
+            exit 0
+          fi
+          echo "🚨 兜底派发 cn_fetch (category=${CATEGORY}) — 距上次 ${GAP_CN} 分钟超阈值"
+          HTTP=$(curl -sS -o /dev/null -w "%{http_code}" -X POST \
+            -H "Authorization: token ${GIT_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -d "{\"ref\":\"main\",\"inputs\":{\"category\":\"${CATEGORY}\"}}" \
+            "https://api.github.com/repos/${REPO}/actions/workflows/${CN_WORKFLOW_ID}/dispatches")
+          echo "  → HTTP $HTTP"
+
+      - name: "📊 写 freshness_status.json（供面板读取）"
+        if: always() && steps.gate.outputs.skip != 'true'
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python guard_v8_freshness.py | tee guard_output.txt || true
+          # 🛡️ 2026-08-13 14:57 根因修复（小九令）：原 git push + rebase 循环
+          #   在「1 分钟内 #22/#23/#24 并发同跑 step 5」时 race condition
+          #   全部失败，导致 health-patrol 整体 failure → build_deploy skipped。
+          #   改用 Contents API（PUT /repos/{owner}/{repo}/contents/...）：
+          #     1. sha-based 原子更新：拿 main HEAD 上的 sha，PUT 时 GitHub 自动
+          #        校验；并发请求中只有一个能成功（其他拿旧 sha 被 409 拒绝），
+          #        不会像 git push 那样让 rebase 循环跑 3 次还全失败。
+          #     2. 幂等：若文件未变（content 相同）PUT 不会创建新 commit，
+          #        GitHub 返回 200/422 都视为「已记录」，不污染 history。
+          #     3. 无需 rebase/fetch：完全绕开 step 4 heal 派发出去的工作流
+          #        推 raw_data 时与本 step push freshness 的 race。
+          if git diff --quiet HEAD -- data/freshness_status.json; then
+            echo "ℹ️ freshness_status.json 与 HEAD 一致，无需推送"
+          else
+            FILE_PATH="data/freshness_status.json"
+            SHA=$(curl -sS -H "Authorization: token ${GIT_TOKEN}" \
+              "https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main" \
+              | python -c "import json,sys; d=json.load(sys.stdin); print(d.get('sha',''))")
+            if [ -z "$SHA" ]; then
+              echo "❌ 取 freshness_status.json 远端 sha 失败（首次写入？）；改用 POST 创建"
+              METHOD="POST"; SHA_ARG=""
+            else
+              echo "远端 sha: $SHA"
+              METHOD="PUT"; SHA_ARG="\"sha\":\"${SHA}\","
+            fi
+            CONTENT_B64=$(base64 -w0 data/freshness_status.json)
+            MSG="v8 healthcheck: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
+            PAYLOAD="{\"message\":\"${MSG}\",\"content\":\"${CONTENT_B64}\",${SHA_ARG}\"branch\":\"main\"}"
+            for i in 1 2 3; do
+              HTTP_CODE=$(curl -sS -o /tmp/api_resp.json -w "%{http_code}" -X $METHOD \
+                -H "Authorization: token ${GIT_TOKEN}" \
+                -H "Accept: application/vnd.github+json" \
+                -d "$PAYLOAD" \
+                "https://api.github.com/repos/${REPO}/contents/${FILE_PATH}")
+              echo "第 $i 次：HTTP $HTTP_CODE"
+              if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
+                echo "✅ freshness_status.json 已通过 Contents API 提交"
+                break
+              elif [ "$HTTP_CODE" = "409" ] || [ "$HTTP_CODE" = "422" ]; then
+                # 409=sha 冲突（并发 PUT 抢赢）；422=content 未变；都重拿 sha 再试
+                echo "⚠️ $HTTP_CODE 重试：重取 sha 后再 PUT"
+                SHA=$(curl -sS -H "Authorization: token ${GIT_TOKEN}" \
+                  "https://api.github.com/repos/${REPO}/contents/${FILE_PATH}?ref=main" \
+                  | python -c "import json,sys; d=json.load(sys.stdin); print(d.get('sha',''))")
+                PAYLOAD="{\"message\":\"${MSG}\",\"content\":\"${CONTENT_B64}\",\"sha\":\"${SHA}\",\"branch\":\"main\"}"
+                continue
+              else
+                echo "❌ 第 $i 次失败 HTTP=$HTTP_CODE；响应：$(head -c 200 /tmp/api_resp.json)"
+                if [ $i -eq 3 ]; then
+                  echo "::error::freshness_status.json 推送 3 次均失败（HTTP=$HTTP_CODE），已切换静默：日志写入 guard_output.txt 与 URGENT 兜底"
+                  echo "FRESHNESS_PUSH_FAIL HTTP=$HTTP_CODE" >> guard_output.txt
+                fi
+              fi
+            done
+          fi
+
+      - name: "📊 巡检摘要"
+        if: always()
+        run: |
+          if [ "${{ steps.gate.outputs.skip }}" = "true" ]; then
+            echo "## v8 云端健康巡检 — 去抖跳过 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')" >> $GITHUB_STEP_SUMMARY
+            echo "- ⏭️ ${{ steps.gate.outputs.reason }}" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+          echo "## v8 云端健康巡检 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')" >> $GITHUB_STEP_SUMMARY
+          echo "- 自动治愈: ${{ steps.heal.outputs.healed }} 项" >> $GITHUB_STEP_SUMMARY
+          echo "- 自愈失败: ${{ steps.heal.outputs.failed }} 项" >> $GITHUB_STEP_SUMMARY
+          echo "- 仍 fail: ${{ steps.heal.outputs.fail }} 项" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -n 40 heal_output.txt 2>/dev/null >> $GITHUB_STEP_SUMMARY || echo "无输出" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: "🚨 自愈失败升级"
+        if: steps.heal.outputs.failed != '0' && steps.heal.outputs.failed != ''
+        run: |
+          echo "::warning::运维自愈有 ${{ steps.heal.outputs.failed }} 项失败，需人工介入（见邮件/URGENT 文件）"

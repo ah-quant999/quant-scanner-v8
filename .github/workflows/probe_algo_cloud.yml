@@ -1,0 +1,91 @@
+# v8_algo_run 迁移 GHA 可行性探针（baostock + scanner 核心依赖）
+# 2026-08-05 18:15：审计发现 v8_algo_run（盘后算法链 18:30/20:00）是唯一还依赖小九的环节。
+# 验证 baostock（回测）从 GHA 是否可达、scanner 依赖是否可装。
+
+name: "🧪 v8 algo_run GHA 迁移探针"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: "📦 安装依赖"
+        run: |
+          pip install akshare pandas numpy requests baostock --quiet
+          python -c "import akshare, pandas, numpy, baostock; print('deps ok')"
+      - name: "🧪 baostock + 关键数据源实测"
+        run: |
+          python - <<'PY'
+          import time, traceback
+
+          def probe(name, fn):
+              t = time.time()
+              try:
+                  r = fn()
+                  dt = time.time() - t
+                  print(f"[OK]   {name}  {dt:.1f}s  {str(r)[:120]}")
+                  return True
+              except Exception as e:
+                  dt = time.time() - t
+                  print(f"[FAIL] {name}  {dt:.1f}s  {type(e).__name__}: {str(e)[:160]}")
+                  return False
+
+          results = {}
+          # ── baostock（回测核心）──
+          def bs_login():
+              import baostock as bs
+              lg = bs.login()
+              code = lg.error_code if hasattr(lg, 'error_code') else getattr(lg, 'code', '')
+              if str(code) not in ('0', '10000'):
+                  raise RuntimeError(f"login fail: {lg}")
+              try:
+                  rs = bs.query_history_k_data_plus("sh.000001", "date,close",
+                      start_date="2026-08-01", end_date="2026-08-05", frequency="d")
+                  rows = []
+                  while rs.error_code == '0' and rs.next():
+                      rows.append(rs.get_row_data())
+                  bs.logout()
+                  return f"login+query OK rows={len(rows)}"
+              except Exception as e:
+                  bs.logout()
+                  raise e
+          results["baostock"] = probe("baostock 登录+日K查询", bs_login)
+
+          # ── scanner 关键数据源（腾讯 GTimg，四量终极已验证）──
+          def gtimg():
+              import requests
+              r = requests.get("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get",
+                  params={"param": "sh600519,day,,,10,qfq"}, timeout=15)
+              d = r.json()
+              return f"code={d.get('code')} keys={list(d.get('data',{}).keys())[:3]}"
+          results["gtimg"] = probe("腾讯GTimg 前复权日K", gtimg)
+
+          # ── akshare 龙虎榜（LHB 是关键盘后数据）──
+          def lhb():
+              import akshare as ak
+              df = ak.stock_lhb_detail_em(start_date="20260803", end_date="20260805")
+              return f"LHB rows={len(df)}"
+          results["lhb"] = probe("akshare 东财龙虎榜 stock_lhb_detail_em", lhb)
+
+          # ── 同花顺龙虎榜（备用源）──
+          def lhb_ths():
+              import akshare as ak
+              df = ak.stock_lhb_detail_daily_sina(date="20260804")
+              return f"LHB(sina) rows={len(df)}"
+          results["lhb_sina"] = probe("akshare 新浪龙虎榜 stock_lhb_detail_daily_sina", lhb_ths)
+
+          ok = sum(1 for v in results.values() if v)
+          fail = sum(1 for v in results.values() if not v)
+          print(f"\n════════ 探针结果: OK {ok} / FAIL {fail} ════════")
+          print("结论:", "v8_algo_run 可迁 GHA（缺 mahoro cookie 会跳过，不阻塞）" if ok >= 3 else "迁移受限，需双轨")
+          PY

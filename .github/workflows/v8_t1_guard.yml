@@ -1,0 +1,45 @@
+# 📅 v8 周六T+1守门（8:30 兜底 + 9:30 巡检）— 2026-08-16 从本机 WorkBuddy 自动化迁移至云端
+# 原「周六T+1兜底」(automation-1783744306577) +「周六T+1新鲜度巡检」(1784465134207)：
+# v8_t1_guard.py 检查上一交易日数据，陈旧则自动 dispatch 云端补跑。
+name: "📅 v8 周六T+1守门(8:30兜底+9:30巡检)"
+
+on:
+  schedule:
+    - cron: '30 0 * * 6'     # 周六 08:30 CST = 00:30 UTC
+    - cron: '30 1 * * 6'     # 周六 09:30 CST = 01:30 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: v8-t1-guard
+  cancel-in-progress: false
+
+jobs:
+  t1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      V8_GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: "🛡️ T+1 检查（脚本自动 dispatch 云端补跑）"
+        continue-on-error: true
+        run: |
+          python v8_t1_guard.py 2>&1 | tee t1_out.txt
+
+      - name: "📊 摘要"
+        if: always()
+        run: |
+          echo "## 📅 v8 周六T+1 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')" >> $GITHUB_STEP_SUMMARY
+          tail -25 t1_out.txt >> $GITHUB_STEP_SUMMARY || true

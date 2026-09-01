@@ -1,0 +1,160 @@
+# 九宝量化 v8.0 — Runner 健康监控（离线告警）
+#
+# 2026-08-05 新增：主人「怕小九停电」要求发现 runner 离线立刻告警。
+# 方案：由 GitHub 云端 ubuntu-latest 自检 lemoncat-cn runner 状态，
+# 离线即开 GitHub Issue（带 runner-offline 标签+@主人），恢复时自动关闭。
+# 同步把状态写入 data/RUNNER_STATUS_HEALTH.js 让运维面板可见。
+# 云端跑、不依赖小九在线；GHA cron 永不漏跑、无 safe-delete 拦截。
+#
+# 🔴 2026-08-05 23:58 修复（本工作流自创建起从未成功运行过一次，务必牢记）：
+#   症状 = Actions 列表里每次 push 都多一条本工作流的 failure（0 job、无日志、
+#          调 logs API 直接 404）。这是 GitHub 对「workflow 文件本身解析失败」的固定表现。
+#   三处致命写法：
+#     1) cron 只有 4 段 —— "13,15,17,19,21 * * 1-5" 缺「分钟」位，非法 cron；
+#        且把小时当北京时间写，GHA cron 一律 UTC，须 -8 换算。
+#     2) 内嵌 python 顶格写在 `run: |` 块标量里（第 84 行起 import json 在第 0 列）——
+#        块标量被提前终止，YAML 解析器把 `import json` 当成新的映射键 → 整文件报废。
+#     3) 另一处内嵌 python 缩进了 10 空格却直接喂给 `python3 -c` —— 即便 YAML 过了，
+#        python 也会 IndentationError。
+#   ✅ 修法：**彻底不用多行内嵌 python**，全部改 jq（ubuntu-latest 自带）+ 单行命令，
+#      从根上杜绝「YAML 缩进」与「python 缩进」互相打架。改动后不要再往 run: 块里塞多行脚本。
+
+name: "🚨 Runner 健康监控"
+
+on:
+  # 2026-08-05 用户反馈：交易时段小九 100% 在线无意义；22 点后用户睡觉提醒也无效。
+  # 改为"非交易时段 + 周末每 2 小时，且 21:00 之后完全静音（睡眠免打扰）"。
+  # 下面 cron 全部是 UTC，对应北京时间：
+  #   工作日 UTC 5,7,9,11,13        → 北京 13,15,17,19,21
+  #   周末   UTC 五/六 16,18,20,22  → 北京 六/日 00,02,04,06
+  #   周末   UTC 六/日 0~12 每 2h    → 北京 六/日 08,10,12,14,16,18,20
+  schedule:
+    - cron: "0 5,7,9,11,13 * * 1-5"
+    - cron: "0 16,18,20,22 * * 5,6"
+    - cron: "0 0,2,4,6,8,10,12 * * 6,0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      REPO: ah-quant999/quant-scanner-v8
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: "🩺 探测 lemoncat-cn runner 状态"
+        id: probe
+        # 🔴 2026-08-06 00:05 修复误报：runner 列表 API 需要 administration 权限，
+        #   而 GITHUB_TOKEN 永远拿不到该权限（Actions 令牌的 permissions 清单里根本没有这一项）。
+        #   旧写法把 403 错误体喂给 jq → `.runners[]?` 空 → 判成 "missing" → 节点明明在线却开告警 Issue。
+        #   现改用仓库 secret 里的长效凭据，并把「API 非 200」单独降级为 unknown（只记 warning，不告警）。
+        env:
+          PROBE_TOKEN: ${{ secrets.V8_GH_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          set -eo pipefail
+          CODE=$(curl -sS -o runners.json -w "%{http_code}" \
+            -H "Authorization: token $PROBE_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/actions/runners")
+          if [ "$CODE" != "200" ]; then
+            echo "::warning::runner 列表 API HTTP=$CODE（凭据缺 administration 权限？）→ 本次判定 unknown，不告警"
+            head -c 300 runners.json || true
+            echo "state=unknown" >> "$GITHUB_OUTPUT"
+            echo "busy=-" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          STATE=$(jq -r '[.runners[]? | select(.name=="lemoncat-cn")] | if length==0 then "missing" else (.[0].status) end' runners.json)
+          BUSY=$(jq -r '[.runners[]? | select(.name=="lemoncat-cn")] | if length==0 then "-" else (.[0].busy|tostring) end' runners.json)
+          echo "lemoncat-cn: state=$STATE busy=$BUSY"
+          echo "state=$STATE" >> "$GITHUB_OUTPUT"
+          echo "busy=$BUSY" >> "$GITHUB_OUTPUT"
+
+      - name: "🚨 离线告警：开 GitHub Issue"
+        # 只在「确认离线」或「确认不存在」时告警；unknown（API 取不到）绝不告警，避免凭据问题刷假 Issue
+        if: steps.probe.outputs.state == 'offline' || steps.probe.outputs.state == 'missing'
+        run: |
+          set -eo pipefail
+          BJ_NOW=$(TZ='Asia/Shanghai' date '+%m-%d %H:%M')
+          EXISTING=$(curl -sS -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO/issues?state=open&labels=runner-offline&per_page=1" \
+            | jq -r 'if length>0 then .[0].number else "" end')
+          if [ -n "$EXISTING" ]; then
+            echo "  issue #$EXISTING 已开，跳过"
+            exit 0
+          fi
+          echo "::warning::lemoncat-cn runner 离线（state=${{ steps.probe.outputs.state }}），开 GitHub Issue 告警"
+          BODY=$(printf '%s\n' \
+            "@ah-quant999 ⚠️ **lemoncat-cn runner 离线**" \
+            "" \
+            "- 检测时间: $BJ_NOW 北京" \
+            "- 探测结果: ${{ steps.probe.outputs.state }}" \
+            "" \
+            "**后果**: 中国节点全部 cron 漏跑 → 实时数据停更" \
+            "**可能原因**: 机器停电 / 网络断 / runner 服务未启动 / 安全软件拦截" \
+            "" \
+            "**自愈路径**:" \
+            "- 数据陈旧 → 邮件报警 + 盘后守护自愈" \
+            "- 恢复后本工作流会自动关闭此 issue" \
+            "" \
+            "---" \
+            "*本 issue 由 runner_health_alert.yml 自动创建*")
+          jq -n --arg t "🚨 lemoncat-cn runner 离线 ($BJ_NOW)" --arg b "$BODY" \
+            '{title:$t, body:$b, labels:["runner-offline"], assignees:["ah-quant999"]}' > payload.json
+          curl -sS -X POST -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/issues" -d @payload.json > /dev/null
+          echo "  created issue"
+
+      - name: "✅ 恢复在线：关闭告警 Issue"
+        if: steps.probe.outputs.state == 'online'
+        run: |
+          set -eo pipefail
+          BJ_NOW=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
+          ISSUES=$(curl -sS -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO/issues?state=open&labels=runner-offline&per_page=10" \
+            | jq -r '.[].number')
+          if [ -z "$ISSUES" ]; then
+            echo "  无 open 告警 issue，runner 健康"
+            exit 0
+          fi
+          for n in $ISSUES; do
+            echo "  closing issue #$n"
+            jq -n --arg b "✅ lemoncat-cn runner 已恢复在线（$BJ_NOW 北京）" '{body:$b}' > cmt.json
+            curl -sS -X POST -H "Authorization: token $GH_TOKEN" \
+              "https://api.github.com/repos/$REPO/issues/$n/comments" -d @cmt.json > /dev/null
+            curl -sS -X PATCH -H "Authorization: token $GH_TOKEN" \
+              "https://api.github.com/repos/$REPO/issues/$n" -d '{"state":"closed"}' > /dev/null
+          done
+
+      - name: "📝 写状态文件 data/RUNNER_STATUS_HEALTH.js"
+        if: always()
+        run: |
+          set -eo pipefail
+          STATE="${{ steps.probe.outputs.state }}"
+          if [ -z "$STATE" ]; then STATE="unknown"; fi
+          BJ_NOW=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
+          UTC_NOW=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+          SHA=$(curl -sS -H "Authorization: token $GH_TOKEN" \
+            "https://api.github.com/repos/$REPO/contents/data/RUNNER_STATUS_HEALTH.js" \
+            | jq -r '.sha // ""')
+          mkdir -p data
+          printf 'window.RUNNER_STATUS_HEALTH = {"runner":"lemoncat-cn","state":"%s","checked_at_utc":"%s","checked_at_bj":"%s","update_time":"%s","source":"runner_health_alert.yml"};\n' \
+            "$STATE" "$UTC_NOW" "$BJ_NOW" "$BJ_NOW" > data/RUNNER_STATUS_HEALTH.js
+          B64=$(base64 -w0 data/RUNNER_STATUS_HEALTH.js)
+          jq -n --arg m "runner health: $STATE @ $BJ_NOW" --arg c "$B64" --arg s "$SHA" \
+            'if $s=="" then {message:$m, content:$c} else {message:$m, content:$c, sha:$s} end' > put.json
+          HTTP_CODE=$(curl -sS -o resp.json -w "%{http_code}" -X PUT \
+            -H "Authorization: token $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/contents/data/RUNNER_STATUS_HEALTH.js" \
+            -d @put.json)
+          if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
+            echo "  ✅ 状态文件已更新 state=$STATE"
+          else
+            echo "  ::warning::状态文件推送失败 HTTP=$HTTP_CODE"
+            cat resp.json
+          fi

@@ -1,0 +1,65 @@
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+.workbuddy/
+# 临时文件（_ 开头 / 脚本检查切片 / 日志 / 缓存）
+_*/
+_tmp_*/
+*.log
+*.err
+*.tmp
+*.bak
+nul
+# Token / 密钥（防泄露）
+.neodata_token
+.gh_pat
+*token*.json
+*.jwt_cache
+data/.mahoro_cookies.txt
+data/.maharo_cookies.txt
+data/zsxq_token.json
+data/.github_pat.txt
+data/.wc_jwt_cache.json
+data/.neodata_token
+data/zszxq_token.json
+# 🛡 2026-08-27 主人令：算法运行时行情缓存（RPS/K线/TDX），纯本地加速用，严禁入库/推仓
+#   历史已入库文件由隔离索引 git rm --cached 移除（不删本地文件）
+raw_data/_rps_cache/
+raw_data/kline_cache/
+raw_data/_tdx_cache/
+raw_data/backtest_kline_cache/
+
+# 🛡 2026-08-30 阿狸咪加注：raw_data/_archive/ — raw_retention.py 归档目录
+#   移走 >7 天的 .bak、>14 天的 h_auto_buy_*.json 详情，不再被 git 索引。
+raw_data/_archive/
+
+# 算法 staging / 生成数据（脚本和工作流会重建）
+algorithms/data/
+algorithms/out/
+out/
+# 运行时锁文件（PID，脚本并发互斥用，勿提交）
+algorithms/.scanner.lock
+# 冲突文件（双机同步残留）
+*-冲突-*
+*-conflict-*
+
+# 临时脚本残留
+_*.py
+
+# 自愈派发防抖锁（运行时本地文件，不入库）
+data/.heal_dispatch.json
+data/FOUR_VOLUME_BACKTEST.json
+
+# 紧急交接/看门狗留痕（云端每小时重建并曾由 v8_cleanup.yml `git add -A` 回推仓库；
+# 根因修复：根目录 URGENT_*.md 永不入库，避免 git status 反复被污染。
+# 正式交接通道在 docs/ops/urgent/，不被此规则影响。以下 3 份含根因/交接信息，显式保留。）
+/URGENT_*.md
+!/URGENT_阿狸咪_2026-08-08_添加ZSXQ_TOKEN_Secret.md
+!/URGENT_小九_2026-08-11_19-43_根治项+模型全切.md
+!/URGENT_小九_2026-08-10_0117_v8健康自检告警.md
+
+# 本地 npm 安装产物（非仓库依赖，勿提交；防止 19M node_modules 污染仓库）
+node_modules/
+package-lock.json
+package.json

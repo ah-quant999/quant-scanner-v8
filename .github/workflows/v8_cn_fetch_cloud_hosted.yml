@@ -1,0 +1,254 @@
+# 九宝量化 v8.0 — 中国数据抓取（GitHub 官方 hosted runner 兜底版）
+#
+# 🔴 2026-08-18 根因新增：self-hosted cn runner（小九单位机 LEMONCAT）网络到 GitHub 中断，
+#   v8_cn_fetch_cloud.yml 连续 failure 在 checkout 阶段，导致盘中实时数据断流。
+#   本 workflow 作为看门狗兜底：当 self-hosted 失败/离线时由 v8_cloud_watchdog.py 自动 dispatch，
+#   使用 GitHub 官方 ubuntu-latest runner 抓取东方财富 push2delay 等「境外可访问」的源。
+#   部分 akshare/纯内网源可能超时失败，但东方财富模块（INDEX_QUOTES / SECTOR_FUND_FLOW /
+#   CONCEPT_RANKING / LIMIT_UP_HEATMAP / ETF_PULSE / CAPITAL_FLOW_DATA / AI_MARKET_BRIEF 等）
+#   在美国 runner 上仍可工作，避免实时数据区完全空窗。
+#
+# 注意：本文件【不配置 schedule】，仅由 workflow_dispatch 触发，避免与 v8_cn_fetch_cloud.yml
+#   并发推同一分支产生冲突。看门狗在检测到 self-hosted cn 抓取失败后自动派发。
+
+name: "🇨🇳 v8 中国数据抓取(云端·hosted兜底)"
+
+on:
+  # 🛡 2026-08-31 一劳永逸：新增晚间 20:30 CST 补抓档。
+  #   东财当日龙虎榜 17:30 后才陆续发布（17:05 抓必空），
+  #   而原有 post_close 档太早 → 共振日历当日空白。20:30 为稳定窗口，
+  #   同时把盘后 ETF/板块RS/商品弹性榜/研报候选池再刷一遍，补齐当日收盘口径。
+  schedule:
+    - cron: '30 12 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      category:
+        description: '抓取类别：premarket / intraday / post_close / all'
+        required: false
+        default: 'intraday'
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-cn-fetch-cloud-hosted
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    # 🛡 2026-08-31 一劳永逸：25 分钟装不下 post_close 全链路
+    #   （LHB 刷新+回填 / 商品弹性榜 / 板块RS / ETF三件套 / 推送 raw_data）。
+    #   实测同类 job 级超时会硬杀整条链，连带后续 bridge/update_v8/health_check 全 skipped
+    #   → raw_data 新了但 data/*.js 还是旧值（主站"数据没更新"根因之一）。抬到 60。
+    timeout-minutes: 60
+    env:
+      TZ: Asia/Shanghai
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    steps:
+      - name: "🕐 确定抓取类别"
+        id: cat
+        shell: bash
+        run: |
+          # 🛡 2026-08-31 一劳永逸修复（小九令）：workflow_dispatch 入参优先。
+          #   原逻辑只看 github.event.schedule，dispatch 时该值为空 → 落 *) → all
+          #   （全量最重→超时被杀→数据推不上去）。同缺陷在主链路 v8_cn_fetch_cloud.yml
+          #   已造成 15:42/16:05/16:18 三轮连杀、主站数据停在 14:2x 的生产事故。
+          IN="${{ github.event.inputs.category }}"
+          if [ -n "$IN" ]; then
+            case "$IN" in
+              premarket|intraday|post_close|all)
+                echo "category=$IN" >> "$GITHUB_OUTPUT"
+                echo "label=手动派发($IN)" ;;
+              *)
+                echo "category=all" >> "$GITHUB_OUTPUT"
+                echo "label=手动派发(未知入参→all)" ;;
+            esac
+            exit 0
+          fi
+          CRON="${{ github.event.schedule }}"
+          case "$CRON" in
+            "25 0 * * 1-5")
+              echo "category=premarket" >> "$GITHUB_OUTPUT"
+              echo "label=盘前" ;;
+            "*/30 1-8 * * 1-5")
+              echo "category=intraday" >> "$GITHUB_OUTPUT"
+              echo "label=盘中" ;;
+            "20 9 * * 1-5")
+              echo "category=post_close" >> "$GITHUB_OUTPUT"
+              echo "label=盘后" ;;
+            # 🛡 2026-08-31：晚间补抓档（CST 20:30）—— 龙虎榜发布后补当日数据。
+            #   必须显式映射，否则落 *) → category=all（全量最重→超时被杀）。
+            "30 12 * * 1-5")
+              echo "category=post_close" >> "$GITHUB_OUTPUT"
+              echo "label=晚间补抓(龙虎榜)" ;;
+            # 🛡️ 2026-08-13 23:1x 根因修复（阿狸咪令）：yml cron '0 9,14'（北京 17:00/22:00）
+            #   但 case 字符串写 '0 9,13'（北京 17:00/21:00），22:00 触发后 case 不匹配
+            #   → step 2 '确定抓取类别' 失败 → 整个 fetch job 失败 → raw_data 盘后档不更新
+            #   注释里的 21:30 实际 cron 是 22:00（不一致），主人出差前必须修
+            #   修复：case 同时接受 '0 9,14' 和 '0 9,13'；未匹配的 cron 走 all 兜底
+            "0 9,14 * * 1-5"|"0 9,13 * * 1-5"|"0 1 * * 0,6")
+              echo "category=all" >> "$GITHUB_OUTPUT"
+              echo "label=全量兜底" ;;
+            *)
+              echo "category=all" >> "$GITHUB_OUTPUT"
+              echo "label=兜底(未匹配cron $CRON, 走all)" ;;
+          esac
+          # 注：原 if 兜底已删（重复 echo 同一 output 键会导致 GitHub Action 报 Multiple outputs）
+
+      - uses: actions/checkout@v4
+        timeout-minutes: 5
+        # 🛡️ 2026-08-13 14:54 根因修复（小九令）：原 checkout 默认 1 分钟超时，
+        #   self-hosted cn runner 在中国 IP 拉 GitHub 偶发 60s 超时（#194 step 3 failure
+        #   根因），导致整个 fetch job 失败、main 上 raw_data 缺口无人补。
+        #   改 timeout=5min（容忍网络抖动）+ fetch-depth=1（默认，已省带宽）。
+        #   ⚠️ timeout-minutes 必须放在 step 级（与 uses 同级），不能放在 actions/checkout 的 with 里，
+        #   否则 actions/checkout@v4 会报 "Unexpected input(s) 'timeout-minutes'" 并忽略整个 with 块，
+        #   导致 clean:false 失效，safe-delete 继续拦截（2026-08-14 16:37 实测）。
+        # 🔴 2026-08-14 根因修复（小九令）：actions/checkout@v4 默认会先执行 git clean -ffdx，
+        #   本机 self-hosted runner 的 worktree 被 WorkBuddy safe-delete 守卫按 50 文件阈值拦截
+        #   （.git 需清理 430 个文件），导致 checkout step 100% 失败（77/77 runs）。
+        #   加 clean: false 跳过 git clean 批量删，直接复用/覆盖现有 worktree，彻底绕开阈值。
+        with:
+          fetch-depth: 1
+          clean: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: "📦 安装依赖"
+        # 🔴 2026-08-14 主人令永久修复：裸 `pip` 在 Windows runner 默认 PowerShell 下找不到
+        #   （pip: ObjectNotFound，导致今天下午 13:40-14:04 云端链路 5 连败）。
+        #   改用 `python -m pip`（不依赖 PATH），并显式 shell: bash 与其余 step 一致。
+        shell: bash
+        run: |
+          python -m pip install akshare pandas requests --quiet
+          python -c "import akshare, pandas; print('akshare', akshare.__version__, '/ pandas', pandas.__version__)"
+
+      - name: "📡 抓中国数据 → raw_data/（selective）"
+        # 🛡️ 2026-08-12 移除 continue-on-error：抓取失败必须让 job 失败，
+        #    阻止 api_push_raw 把只刷了 update_time 的空壳数据推送到 main。
+        shell: bash
+        run: |
+          cat="${{ steps.cat.outputs.category }}"
+          echo "本次类别: $cat"
+          python cloud_fetch_v8.py --category "$cat"
+
+      - name: "🐉 刷新当日 LHB 数据（仅 post_close）"
+        if: steps.cat.outputs.category == 'post_close'
+        continue-on-error: true
+        shell: bash
+        run: |
+          # fetch_lhb.py 产出 out/lhb_result.json；stage_to_raw 将其提升为 raw_data/lhb_data.json
+          python algorithms/fetch_lhb.py
+          python -c "import sys; sys.path.insert(0,'algorithms'); import stage_to_raw; stage_to_raw.main()"
+
+      - name: "🐉 回填 LHB 历史（仅 post_close）"
+        if: steps.cat.outputs.category == 'post_close'
+        continue-on-error: true
+        shell: bash
+        run: |
+          # 🛡 2026-08-31 一劳永逸：改为「精准补当日」。
+          #   原实现跑全量 backfill（回溯 55 个自然日），既慢（每次几十次 akshare 调用）
+          #   又会因其 done 集合把 {'trading': False, 'error': ...} 占位也算"已完成"
+          #   → 当日抓取失败后**永不重试**，共振日历当日永久空白
+          #   （实测 8/31 17:05 龙虎榜未发布 → error 占位 → 之后任何一轮都不再重抓）。
+          #   现改为 --only 今日：直连 akshare 抓当天，抓到即写；抓不到保留既有真实数据。
+          TODAY=$(TZ=Asia/Shanghai date +%Y%m%d)
+          echo "补抓日期: $TODAY"
+          python backfill_lhb_history.py --only "$TODAY" || echo "[warn] 当日 LHB 回填未成功（非阻塞）"
+          # 若当日为空（未发布），再兜一次上一交易日，防止历史缺口
+          YESTER=$(TZ=Asia/Shanghai date -d "yesterday" +%Y%m%d)
+          python backfill_lhb_history.py --only "$YESTER" || echo "[warn] 昨日 LHB 回填未成功（非阻塞）"
+
+      # 2026-08-17 主人令：calc_commodity_elasticity.py 加入云端自动跑（之前从未自动跑过，导致国内期货 LC/SA 永远不显示）
+      - name: "💹 商品涨价弹性榜重算（仅 post_close）"
+        if: steps.cat.outputs.category == 'post_close'
+        continue-on-error: true
+        shell: bash
+        run: |
+          python algorithms/calc_commodity_elasticity.py
+
+      # 2026-08-17 主人令：板块周期 fetch_sector_rs 之前从未自动跑过，导致 3 天前数据陈旧
+      - name: "🔄 板块相对强度重算（仅 post_close）"
+        if: steps.cat.outputs.category == 'post_close'
+        continue-on-error: true
+        shell: bash
+        run: |
+          python algorithms/fetch_sector_rs.py
+          python -c "import sys; sys.path.insert(0,'algorithms'); import stage_to_raw; stage_to_raw.main()"
+
+      # 2026-08-17 主人令：ETF 三件套（calc_etf_intraday.py）之前无 workflow 触发
+      - name: "💹 ETF 三件套数据生成（post_close 兜底）"
+        if: steps.cat.outputs.category == 'post_close'
+        continue-on-error: true
+        shell: bash
+        run: |
+          python algorithms/calc_etf_intraday.py
+
+      - name: "📤 推送 raw_data/ 到 main（Contents API）"
+        # 🔴 2026-08-30 22:3x 同类 bug 一次清干净（实测 run 33312102792 / 33309687912
+        #   均因推送步跑 13-22 分钟被 job 级 timeout 硬杀，连带后续消费步全 skipped）。
+        #   推送慢的根因是 api_push_raw.py 防倒退守卫要逐个下载远端 blob 比时间戳
+        #   （raw_data 117 个 json / 26 MB，cn 出海串行传输），守卫不能删只能限时。
+        #   步级 timeout + continue-on-error 组合：推送超时只判该步失败，job 存活，
+        #   后续 bridge/update_v8/health_check 照常跑完，raw_data 交下一轮补推。
+        continue-on-error: true
+        # 🛡 2026-08-31：15 → 25。raw_data 117 个 json / 26 MB，
+        #   api_push_raw.py 防倒退守卫要逐个比对远端时间戳，15 分钟常被砍。
+        timeout-minutes: 25
+        shell: bash
+        run: |
+          python api_push_raw.py
+
+      # 🛡 2026-08-18 主人紧急令根治：抓完 raw_data 之后立即桥接（bridge_raw_data.py）
+      #   + 重生成 data/*.js（update_v8.py）+ 刷新 HEALTH_CHECK.js（v8_health_check.py），
+      #   闭环 4 步：fetch → bridge → update_v8 → health_check。否则 raw_data 新了但
+      #   data/*.js 还是昨日旧值（如 TRIPLE_HISTORY 4 天前的根因就是缺 bridge 这步）。
+      - name: "🔗 桥接 raw_data 内部改名（bridge_raw_data.py）"
+        shell: bash
+        run: |
+          python algorithms/bridge_raw_data.py
+
+      - name: "🔄 重生成 data/*.js (update_v8)"
+        shell: bash
+        run: |
+          python update_v8.py
+
+      - name: "🩺 刷新 HEALTH_CHECK.js (v8_health_check)"
+        shell: bash
+        run: |
+          python v8_health_check.py
+
+      # 🛡 2026-08-31 一劳永逸补齐缺口（小九令）：
+      #   本 hosted 兜底链此前只有 update_v8（重生成 data/*.js），
+      #   却**缺少「推送重建的 data/*.js」步骤** —— 主版 v8_cn_fetch_cloud.yml
+      #   在 2026-08-27「盘中更新全断根因修复」时才补上（其 step21，timeout 30）。
+      #   后果：hosted 版跑得再成功，raw_data 更新了、data/*.js 本地也重建了，
+      #   但永远推不上 main → 前端（含本次要修的共振日历）看不到任何新数据。
+      #   现原样移植主版同款自闭环推送（PUSH_FILES 来源驱动增量）。
+      - name: "📤 推送重建的 data/*.js（自闭环，防 build 触发失效）"
+        timeout-minutes: 30
+        continue-on-error: true
+        shell: bash
+        run: |
+          DATA_MANIFEST=$(git status --porcelain data/ | awk '{print $2}' | tr '\n' ',')
+          if [ -z "$DATA_MANIFEST" ]; then
+            echo "ℹ️ 本次无 data 变更，跳过推送"
+          else
+            echo "📋 推送重建 data: ${DATA_MANIFEST%,}"
+            PUSH_FILES="$DATA_MANIFEST" python api_push_raw.py
+          fi
+
+      - name: "🛰️ 云端兜底调度（算法链/温度计，幂等）"
+        if: success()
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python .github/scripts/cloud_dispatcher.py
