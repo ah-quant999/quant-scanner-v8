@@ -488,7 +488,7 @@ window.__domReadyFns=[];
 <script src="data/CONCEPT_RANKING.js?v=8b7a40b6ed" defer></script>
 <!-- 2026-09-01 删除：潜力挖掘 / AI预测 / ETF·龙头参考 三卡删除，对应数据注入移除 -->
 <script src="data/INDEX_QUOTES.js?v=cdf300c031" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=f612ad506b" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=284c356e8c" defer></script>
 <script src="data/MARGIN_DATA.js?v=d7ee8d39c3" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=cde17cb022" defer></script>
 <script src="data/IPO_DATA.js?v=6f2f27f529" defer></script>
@@ -1403,7 +1403,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      与 ETF_SUBSCRIPTION.js（宽基指数 + 亿份）并行使用，不替换。新口径在 ETF 三合一卡 / 驾驶舱
      使用 window.ETF_SUBSCRIPTION_EM，旧口径保留向下兼容。缓存戳由 update_v8 在后续 build 自动刷新。 -->
 <script src="data/ETF_SUBSCRIPTION_EM.js?v=d0a644cff2" defer></script>
-<script src="data/LIMIT_UP_HEATMAP.js?v=9533b3792e" defer></script>
+<script src="data/LIMIT_UP_HEATMAP.js?v=89d9e4b800" defer></script>
 <script src="data/LIMIT_UP_BROKEN.js?v=0b22a8894a" defer></script>
 <script src="data/HERDING_DATA.js?v=a34b8996b0" defer></script>
 <script src="data/VOLATILITY.js?v=5c77738ddc" defer></script>
@@ -1435,16 +1435,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=1eecae3be0" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=d24700b7ab" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=c1632314ef" defer></script>
-<script src="data/HEALTH_CHECK.js?v=88ecedb686" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=7f0696bdbd" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=d351539c2b" defer></script>
+<script src="data/RUNNER_STATUS.js?v=0109eaf287" defer></script>
+<script src="data/HEALTH_CHECK.js?v=eccc85adab" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=9ef108df91" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=847aa81136" defer></script>
     <!-- 2026-09-01 删除：AI预测卡已删除，MARKET_PATH_PROBABILITY 数据注入移除 -->
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=b3f630070e" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=2a436a5f24" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=379c217b84" defer></script>
-    <script src="data/ALGO_BACKTEST_COMPARE.js?v=0f55fb5921" defer></script>
+    <script src="data/ALGO_BACKTEST_COMPARE.js?v=761dfb87cf" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -12636,7 +12636,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=88ecedb686')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=eccc85adab')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
