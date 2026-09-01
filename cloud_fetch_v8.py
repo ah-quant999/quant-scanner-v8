@@ -2246,6 +2246,7 @@ def f_restricted_release():
 def f_performance_forecast():
     """盘后数据页：A 股业绩预告（调用 algorithms/fetch_performance_forecast.py）。"""
     import subprocess as _sp
+    import json as _json
     try:
         script = ROOT / "algorithms" / "fetch_performance_forecast.py"
         r = _sp.run([sys.executable, str(script)], cwd=str(ROOT),
@@ -2253,6 +2254,11 @@ def f_performance_forecast():
         if r.returncode != 0:
             print(f"  ⚠️ 业绩预告子进程返回 {r.returncode}: {(r.stderr or '')[:200]}")
             return None
+        # 2026-09-01 一劳永逸：返回子进程实际落盘的 JSON，否则 save() 会把 {"fetched":True}
+        #   判为空/无效数据而跳过写入，导致线上永远保留旧重复数据。
+        path = RAW_DIR / "performance_forecast.json"
+        if path.exists():
+            return _json.loads(path.read_text(encoding="utf-8"))
         return {"fetched": True}
     except Exception as e:
         print(f"  ⚠️ 业绩预告调用失败: {e}")
