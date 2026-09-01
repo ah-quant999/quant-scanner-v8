@@ -3093,7 +3093,9 @@ def _clear_intraday_for_premarket(category, only=None):
     # 2026-08-31：CFFEX_HOLDINGS 改 intraday 后盘前不清空，保留上一交易日数据等盘中覆盖
     # 2026-08-31 加入 AVG_PRICE_DATA：该卡靠 history[] 逐交易日累积算 MA20/MA60，
     #   盘前一旦被清成 stub，累积史即全毁（实测 history_days 恒为 1 的直接原因）。
-    KEEP_VARS = {"SH_SZ_HISTORY", "CAPITAL_FLOW_DATA", "LIMIT_UP_HEATMAP", "ETF_DAILY_MONITOR", "CONCEPT_RANKING", "CFFEX_HOLDINGS", "AVG_PRICE_DATA"}
+    # 2026-09-01：SECTOR_FUND_FLOW_INTRADAY 盘前不清空；次日 09:25 前保留上一交易日全天快照，
+    #   开盘后由 intraday_snapshot.py 自然覆盖为当日数据（符合「第二天开盘前才清空」）。
+    KEEP_VARS = {"SH_SZ_HISTORY", "CAPITAL_FLOW_DATA", "LIMIT_UP_HEATMAP", "ETF_DAILY_MONITOR", "CONCEPT_RANKING", "CFFEX_HOLDINGS", "AVG_PRICE_DATA", "SECTOR_FUND_FLOW_INTRADAY"}
 
     for var, cat in CATEGORY_MAP.items():
         if "intraday" not in [x.strip() for x in cat.split(",")]:
