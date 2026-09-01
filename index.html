@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "d4670da70";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
+    var BUILD = "eef78c49e";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -459,11 +459,11 @@ window.__domReadyFns=[];
   .tp-hist-cell .tp-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
   .tp-empty{color:var(--dim);text-align:center;padding:24px 10px;font-size:13px}
 </style>
-    <script src="data/ETF_INTRADAY_HEAT.js?v=3e2422c5c9" defer></script>
-    <script src="data/SECTOR_FUND_FLOW.js?v=2263a7a22b" defer></script>
+    <script src="data/ETF_INTRADAY_HEAT.js?v=bc4f94b729" defer></script>
+    <script src="data/SECTOR_FUND_FLOW.js?v=cafad7386b" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=f3e45f1ad0" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=5e75663843" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=fd33babb5f" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=85e486d722" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=82f2975f12" defer></script>
@@ -479,17 +479,17 @@ window.__domReadyFns=[];
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
-<script src="data/CONCEPT_RANKING.js?v=f3e0a2adc9" defer></script>
+<script src="data/CONCEPT_RANKING.js?v=3b3442bcc2" defer></script>
 <!-- 2026-08-23 恢复：潜力挖掘板块+股票预测推荐数据（calc_potential_picks.py 输出，跟盘后算法链自动更新） -->
 <script src="data/POTENTIAL_PICKS.js?v=6b9651ad7c" defer></script>
-<script src="data/INDEX_QUOTES.js?v=c4b36e3be1" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=584dd6ecca" defer></script>
+<script src="data/INDEX_QUOTES.js?v=1d860f3393" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=a93e1ed603" defer></script>
 <script src="data/MARGIN_DATA.js?v=9a36d79d76" defer></script>
-<script src="data/CFFEX_HOLDINGS.js?v=bdd6f1a7cb" defer></script>
+<script src="data/CFFEX_HOLDINGS.js?v=01d388119c" defer></script>
 <script src="data/IPO_DATA.js?v=4e219098fe" defer></script>
-    <script src="data/CRISIS_DATA.js?v=c28fff6556" defer></script>
+    <script src="data/CRISIS_DATA.js?v=f318ae4198" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=f0716cb161" defer></script>
-    <script src="data/OVERSEAS_MARKETS.js?v=acbad74925" defer></script>
+    <script src="data/OVERSEAS_MARKETS.js?v=c97719453c" defer></script>
     <script src="data/STOCK_RPS.js?v=01c70ca90f" defer></script>
     <!-- 🛡 2026-08-19：H 反推短线买点（data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js）反推代码 + 跟踪回测，独立于 PDF OCR
          v= 占位由 api_push_raw._stamp_index_v 在每日推送后自动重写为新 sha，确保 CDN 不缓存旧版 -->
@@ -499,11 +499,11 @@ window.__domReadyFns=[];
     <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
     <script src="data/MARKET_REGIME.js?v=f81432eff9" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
-    <script src="data/RISK_GAUGE.js?v=30b1ca7e03" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
+    <script src="data/RISK_GAUGE.js?v=b5c1957b4f" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
     <script src="data/SECTOR_RECOMMENDATION.js?v=cb35dbf3b5" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
     <script src="data/WEEKEND_META_REPORT.js?v=e331cacb37" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
   <script src="data/DELISTED.js?v=9eef4eba4e" defer></script>
-  <script src="data/AVG_PRICE_DATA.js?v=7c987e0604" defer></script>
+  <script src="data/AVG_PRICE_DATA.js?v=dc9f2e0b24" defer></script>
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
     <script src="data/PORTFOLIO.js?v=1d8d158a7d" defer></script>
@@ -1375,19 +1375,19 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SECTOR_PHASE_HISTORY.js?v=6d0838169e" defer></script>
 <script src="data/INST_TRADE.js?v=729517ffd7" defer></script>
 <script src="data/NORTH_FUND.js?v=16c71f9eca" defer></script>
-<script src="data/MARKET_ALERTS.js?v=758f3e7d39" defer></script>
-<script src="data/MARKET_FUND_FLOW_DATA.js?v=2cf66de5b5" defer></script>
+<script src="data/MARKET_ALERTS.js?v=a0f72e07fa" defer></script>
+<script src="data/MARKET_FUND_FLOW_DATA.js?v=6a41262104" defer></script>
 <script src="data/ETF_SUBSCRIPTION.js?v=68abf886b1" defer></script>
 <!-- 2026-08-30 阿狸咪加注：东方财富口径 ETF 申购赎回（股票/债券/货币/商品/跨境 5 类 + 亿元），
      与 ETF_SUBSCRIPTION.js（宽基指数 + 亿份）并行使用，不替换。新口径在 ETF 三合一卡 / 驾驶舱
      使用 window.ETF_SUBSCRIPTION_EM，旧口径保留向下兼容。缓存戳由 update_v8 在后续 build 自动刷新。 -->
 <script src="data/ETF_SUBSCRIPTION_EM.js?v=8e3164d793" defer></script>
-<script src="data/LIMIT_UP_HEATMAP.js?v=5b99f06b9b" defer></script>
-<script src="data/LIMIT_UP_BROKEN.js?v=42e735a4fd" defer></script>
+<script src="data/LIMIT_UP_HEATMAP.js?v=d28842d937" defer></script>
+<script src="data/LIMIT_UP_BROKEN.js?v=2b34b02edd" defer></script>
 <script src="data/HERDING_DATA.js?v=1cf93cfb1f" defer></script>
 <script src="data/VOLATILITY.js?v=9f717d98d6" defer></script>
-<script src="data/CAPITAL_FLOW_DATA.js?v=eb0350dd66" defer></script>
-<script src="data/SH_SZ_HISTORY.js?v=b5482878b2" defer></script>
+<script src="data/CAPITAL_FLOW_DATA.js?v=9609cc6c53" defer></script>
+<script src="data/SH_SZ_HISTORY.js?v=7b2e3f4df6" defer></script>
 <script src="data/CANDIDATE.js?v=98a4072b2b" defer></script>
     <script src="data/FOUR_VOLUME.js?v=aefad242c4" defer></script>
     <script src="data/FOUR_VOLUME_60M.js?v=af87ef8c3e" defer></script>
@@ -1405,8 +1405,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=c3a084a1cd" defer></script>
 <!-- 2026-08-31 轻量化：data/ALGO_TRACK.js（42.4 KB）前端零引用，停止注入（省 42.4 KB） -->
-<script src="data/ETF_PULSE.js?v=0026d9631e" defer></script>
-<script src="data/ETF_DAILY_MONITOR.js?v=2fcf0517c2" defer></script>
+<script src="data/ETF_PULSE.js?v=a55c02d956" defer></script>
+<script src="data/ETF_DAILY_MONITOR.js?v=a7755cd5a2" defer></script>
 <script src="data/TOP10_DAILY.js?v=7b1026beec" defer></script>
 <script src="data/WEEKEND_RUN.js?v=180731ef35" defer></script>
 <script src="data/W52_HIGH.js?v=a42170f3cf" defer></script>
@@ -1414,16 +1414,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=cff1b773ab" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=62b867f394" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=4d95071cd2" defer></script>
-<script src="data/HEALTH_CHECK.js?v=2587558d27" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=bd5b6ed295" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=a8d555fa17" defer></script>
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=cda00a046e" defer></script>
+<script src="data/RUNNER_STATUS.js?v=7c64ab97b1" defer></script>
+<script src="data/HEALTH_CHECK.js?v=aaafa02840" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=1f2f8344f9" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=fb84e797ab" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=6522f11754" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=b85a9da176" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=2a7ed92426" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=ea9c132218" defer></script>
-    <script src="data/ALGO_BACKTEST_COMPARE.js?v=260a353958" defer></script>
+    <script src="data/ALGO_BACKTEST_COMPARE.js?v=da6d277da2" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -4264,7 +4264,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         {key:'weak',    label:'🔴走弱',   color:'#ef5350', bg:'rgba(239,83,80,.10)',   border:'rgba(239,83,80,.35)'},
       ];
       var statusFilter = {strong:'strong', buy_dip:'buy_dip', topped:'topped', weak:'weak'};
-      html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0;">';
+      html += '<div style="margin:10px 0;">';
       buckets.forEach(function(b){
         var n = sc[b.key]||0;
         var bucketItems = [];
@@ -4272,13 +4272,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           bucketItems = (pt.items||[]).filter(function(x){ return x && x.status === statusFilter[b.key]; });
           bucketItems = _sortBucket(bucketItems, 'last_pct', false);
         }catch(e){ console.warn('[life] bucket filter', e); }
-        html += '<details open style="grid-column:1 / -1;border:1px solid '+b.border+';border-radius:8px;background:'+b.bg+';">';
+        html += '<details open style="border:1px solid '+b.border+';border-radius:8px;background:'+b.bg+';margin-bottom:8px;">';
         html +=   '<summary style="cursor:pointer;user-select:none;padding:6px 12px;font-size:12px;font-weight:700;color:'+b.color+';list-style:none;display:flex;align-items:center;gap:8px;">';
         html +=     '<span style="display:inline-block;padding:2px 10px;border-radius:6px;">'+b.label+' '+n+'</span>';
         html +=     '<span style="font-size:10.5px;color:var(--dim);font-weight:500;">共 '+(bucketItems?bucketItems.length:0)+' 只</span>';
         html +=   '</summary>';
         if(bucketItems && bucketItems.length){
-          html += '<div style="padding:6px 10px 8px;">';
+          html += '<div style="padding:6px 10px 8px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;">';
           bucketItems.forEach(function(it){
             if(!it) return;
             var _code = it.code || '';
@@ -4287,12 +4287,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
             var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
             var _cons = (typeof it.consensus_count==='number') ? it.consensus_count : 0;
             var _isSel = !!it.selected;
-            html += '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid rgba(148,163,184,.07);">';
-            html +=   '<span style="color:var(--txt);font-weight:600;font-size:11.5px;font-family:ui-monospace,monospace;min-width:64px;">'+_esc(_code)+'</span>';
-            html +=   '<span style="color:var(--txt);font-size:11.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+_esc(_name)+'</span>';
-            if(_isSel){ html += '<span style="font-size:10px;font-weight:700;color:var(--gold);">🌟</span>'; }
-            if(_cons>=2){ html += '<span style="font-size:10px;font-weight:700;color:#38bdf8;padding:1px 5px;border-radius:5px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);">🤝'+_cons+'</span>'; }
-            html +=   '<span style="font-weight:700;font-size:11.5px;color:'+periodColor+';min-width:58px;text-align:right;">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
+            html += '<div style="padding:6px 8px;border:1px solid '+b.border+';border-radius:6px;background:rgba(15,23,42,.45);display:flex;flex-direction:column;gap:4px;min-width:0;">';
+            html +=   '<div style="display:flex;align-items:center;gap:6px;min-width:0;">';
+            html +=     '<span style="color:var(--txt);font-weight:700;font-size:11px;font-family:ui-monospace,monospace;white-space:nowrap;">'+_esc(_code)+'</span>';
+            html +=     '<span style="color:var(--txt);font-size:10.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+_esc(_name)+'</span>';
+            html +=   '</div>';
+            html +=   '<div style="display:flex;align-items:center;gap:4px;margin-top:auto;min-width:0;">';
+            if(_isSel){ html += '<span style="font-size:9px;font-weight:700;color:var(--gold);">🌟</span>'; }
+            if(_cons>=2){ html += '<span style="font-size:9px;font-weight:700;color:#38bdf8;padding:1px 4px;border-radius:4px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);">🤝'+_cons+'</span>'; }
+            html +=     '<span style="margin-left:auto;font-weight:700;font-size:11.5px;color:'+periodColor+';white-space:nowrap;">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
+            html +=   '</div>';
             html += '</div>';
           });
           html += '</div>';
@@ -4311,21 +4315,28 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       if(toRemove && toRemove.length){
         try{ toRemove = _sortBucket(toRemove, 'drawdown', false); }catch(e){ console.warn('[life] sortBucket', e); }
         html += '<details open style="margin:10px 0;border:1px solid rgba(239,83,80,.3);border-radius:8px;background:rgba(239,83,80,.04);">';
-        html += '<summary style="cursor:pointer;user-select:none;padding:8px 12px;font-size:12.5px;font-weight:700;color:#ef5350;list-style:none;">⚠️ 待确认剔除（走弱/见顶，共 '+(toRemove?toRemove.length:0)+' 只）· 点击可收起 · 本机记录不污染主站</summary>';
-        html += '<div style="padding:6px 10px;">';
-        toRemove.forEach(function(it){
-          var _code = (it && it.code) || '';
-          var _name = (it && it.name) || '';
-          var _drawdown = (it && typeof it.drawdown==='number') ? it.drawdown : 0;
-          var _status = (it && it.status) || '';
-          html += '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(148,163,184,.08);">';
-          html += '<span style="color:var(--txt);font-weight:600;font-size:11.5px;">'+_esc(_code)+'</span>';
-          html += '<span style="color:var(--txt);font-size:11.5px;">'+_esc(_name)+'</span>';
-          html += '<span style="color:var(--dim);font-size:10.5px;">'+_esc(statusLabel[_status]||_status)+' · 回撤 '+_drawdown.toFixed(1)+'%</span>';
-          html += '<span style="margin-left:auto;color:#38bdf8;font-size:10.5px;cursor:pointer;user-select:none;" onclick="window.__removeStock(\''+_esc(_code)+'\')">确认剔除 ✕</span>';
-          html += '</div>';
-        });
-        html += '</div></details>';
+      html += '<details open style="margin:10px 0;border:1px solid rgba(239,83,80,.3);border-radius:8px;background:rgba(239,83,80,.04);">';
+      html += '<summary style="cursor:pointer;user-select:none;padding:8px 12px;font-size:12.5px;font-weight:700;color:#ef5350;list-style:none;">⚠️ 待确认剔除（走弱/见顶，共 '+(toRemove?toRemove.length:0)+' 只）· 点击可收起 · 本机记录不污染主站</summary>';
+      html += '<div style="padding:6px 10px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;">';
+      toRemove.forEach(function(it){
+        var _code = (it && it.code) || '';
+        var _name = (it && it.name) || '';
+        var _drawdown = (it && typeof it.drawdown==='number') ? it.drawdown : 0;
+        var _status = (it && it.status) || '';
+        var statusCol = statusColor[_status] || 'var(--dim)';
+        html += '<div style="padding:6px 8px;border:1px solid rgba(239,83,80,.3);border-radius:6px;background:rgba(15,23,42,.45);display:flex;flex-direction:column;gap:4px;min-width:0;">';
+        html += '<div style="display:flex;align-items:center;gap:6px;min-width:0;">';
+        html += '<span style="color:var(--txt);font-weight:700;font-size:11px;font-family:ui-monospace,monospace;white-space:nowrap;">'+_esc(_code)+'</span>';
+        html += '<span style="color:var(--txt);font-size:10.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+_esc(_name)+'</span>';
+        html += '</div>';
+        html += '<div style="display:flex;align-items:center;gap:4px;margin-top:auto;min-width:0;">';
+        html += '<span style="font-size:9px;color:'+statusCol+';padding:1px 4px;border-radius:4px;background:'+statusColor[_status]+'22;white-space:nowrap;">'+_esc(statusLabel[_status]||_status)+'</span>';
+        html += '<span style="font-size:9px;color:var(--dim);white-space:nowrap;">回撤 '+_drawdown.toFixed(1)+'%</span>';
+        html += '<span style="margin-left:auto;color:#38bdf8;font-size:10px;cursor:pointer;user-select:none;white-space:nowrap;" onclick="window.__removeStock(\''+_esc(_code)+'\')">确认剔除 ✕</span>';
+        html += '</div>';
+        html += '</div>';
+      });
+      html += '</div></details>';
       }
 
       html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">数据 '+_upd.substring(0,16)+' · 仅跟 v8 三大算法真实跟踪池</div>';
@@ -13095,7 +13106,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=2587558d27')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=aaafa02840')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
