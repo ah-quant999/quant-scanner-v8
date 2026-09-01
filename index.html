@@ -2,7 +2,7 @@
 html>
 <html lang="zh-CN">
 <head>
-<!-- deploy-trigger 2026-09-01T07:30 rebuild-from buckets-to-details + grid2col - 4桶胶囊改为<details>默认展开+前8只股票预览;共识段grid 2列+卡内3行(代码名🤝/chips/入场以来%);删__jumpBucket+document代理 -->
+<!-- deploy-trigger 2026-09-01T21:55 lifeflow-pool-guardian-pool-2026-09-01 - 主力净额分时fallback扩到全天;选股策略4⭐tab放5⭐后;选股池外资研投默认展开+其他details折叠;v8选股生命周期卡加更新于胶囊;暂未上架补宏观/板块推荐容器;toggleStPoolDetail+isExpanded死代码清除 -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -2279,9 +2279,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <!-- 2026-08-29 主人令：选股池作为选股策略子页面；2026-08-30 主人令：选股池移到三重共识前面 -->
       <button class="st-tab active" data-st="pool" onclick="switchSt('pool')">🧭 选股池</button>
       <button class="st-tab" data-st="tc" onclick="switchSt('tc')">🥇 三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span></button>
+      <button class="st-tab" data-st="life" onclick="switchSt('life')">🧬 选股生命周期 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="rps" onclick="switchSt('rps')">📈 相对强度 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用·固定</span></button>
-      <button class="st-tab" data-st="life" onclick="switchSt('life')">🧬 选股生命周期 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
     </div>
 
     <!-- ===== TAB 页面：大牛股猎手 / 驾驶舱 / 全站精选 / 四量终极 → 已下沉「运维→已下架·选股模块」(2026-08-29 主人令) ===== -->
@@ -2291,7 +2291,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="card" style="border-left:4px solid #f9a8d4;">
         <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🧭</span>观测候选股池 <span id="stPoolTime">—</span> <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span> <span id="stPoolSlot" style="font-size:11px;color:var(--sub);font-weight:400">上游水源 · 盘后</span></h3>
         <div id="stPoolSourceDist" class="tp-stocklist"></div>
-        <div id="stPoolStockList" class="tp-stocklist" style="display:none;"></div>
+        <div id="stPoolStockList" class="tp-stocklist"></div>
         <div class="note">筛选：主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50 + 外资研投(自选+研报)。三板合计≥280视为健康。</div>
       </div>
     </div><!--/st-pool-->
@@ -4200,6 +4200,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '<div style="margin:14px 0;" class="card">';
       html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
       html += '<span style="font-size:15px;font-weight:700;color:var(--txt);">v8 选股生命周期</span>';
+      html += (window._uBadge ? window._uBadge('盘后','短线', _upd) : '');
       html += '<span style="font-size:11px;color:var(--dim);">三 algo 跟踪池去重 → 专家阈值判状态（强势/买点/见顶/走弱）· 二维精选（板块流入×情绪周期）</span>';
       html += '</div>';
 
@@ -6917,16 +6918,17 @@ window.__renderV8CalFull();
     var dom=$('sfIntradayChart');
     if(!dom) return;
     var d=window.SECTOR_FUND_FLOW_INTRADAY || {};
-    // 🛡 2026-09-01 主人令：9:30-15:00 曲线保留到次日开盘前，和大家一起盘前才清空。
-    //   盘前时段（<09:30）优先用 d.prev_snapshots / d.history 里的上一交易日完整快照；
-    //   若没有历史字段且今日 snapshots 为空，则提示等待开盘（不再说"盘前自动清空"）。
+    // 🛡 2026-09-01 主人令：盘中数据保留到次日盘前才清空，白天/盘后任何时段只要 d.snapshots 为空
+    //   都要回退到 prev_snapshots / history 显示上一交易日完整曲线，绝不显示"暂无盘中分时数据"。
+    //   盘前时段（<09:30）优先用 d.prev_snapshots / d.history 里的上一交易日完整快照。
     //   数据端 fetcher 需配合：收盘后不要覆盖/清空本文件，保留完整全天 snapshots。
     var _nowParts = window._cstParts ? window._cstParts(new Date()) : null;
     var _isPreMarket = _nowParts && (_nowParts.hh < 9 || (_nowParts.hh === 9 && _nowParts.mm < 30));
     var _todayStr = window._fmtDateCST ? window._fmtDateCST(new Date()) : (new Date().toISOString().slice(0,10));
     var _dataDate = d.date || _todayStr;
     var snaps = d.snapshots || [];
-    if(_isPreMarket && (!snaps || snaps.length < 1)){
+    // 🛡 2026-09-01：fallback 条件去掉 _isPreMarket 限制——任何时段 snaps 为空都回退到上一交易日
+    if(!snaps || snaps.length < 1){
       if(d.prev_snapshots && d.prev_snapshots.length > 0){
         snaps = d.prev_snapshots; _dataDate = d.prev_date || '上一交易日';
       } else if(d.history && d.history.length > 0){
@@ -6935,7 +6937,7 @@ window.__renderV8CalFull();
       }
     }
     if(!snaps || snaps.length<1){
-      dom.innerHTML='<div class="ipo-empty">📭 ' + (_isPreMarket ? '盘前等待开盘 · 上一交易日 9:30-15:00 曲线由数据端保留' : '暂无盘中分时数据（盘中每30分快照）') + '</div>';
+      dom.innerHTML='<div class="ipo-empty">📭 ' + (_isPreMarket ? '盘前等待开盘 · 上一交易日 9:30-15:00 曲线由数据端保留' : '暂无盘中分时数据（盘中每30分快照，等待 fetcher 跑批）') + '</div>';
       var tEl=$('sfIntradayTime'); if(tEl) tEl.innerHTML='—';
       return;
     }
@@ -9599,7 +9601,6 @@ window.showRestrictedItems = showRestrictedItems;
     if(sdEl){
       const order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投'];
       const expect = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50};
-      const isExpanded = sdEl.dataset.expanded === '1';
       let html = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:4px 0 10px;font-size:12px;">';
       order.forEach(function(s){
         const cnt = sd[s]||0;
@@ -9614,55 +9615,51 @@ window.showRestrictedItems = showRestrictedItems;
         const label = s.replace(/成交前\d+|研报/,'');
         html += '<span title="'+s+'：'+cnt+'只'+(exp?'(期望≥'+exp+')':'')+tip+'" style="background:'+color+'15;color:'+color+';border:1px solid '+color+'30;border-radius:4px;padding:2px 7px;white-space:nowrap">'+icon+' '+label+' '+cnt+'</span>';
       });
-      html += '<span style="color:var(--dim);margin-left:auto;align-self:center;margin-right:8px;">共 <b style="color:var(--txt)">'+total+'</b> 只</span>';
-      html += '<button id="stPoolToggleBtn" onclick="window.toggleStPoolDetail()" style="background:var(--cyan);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;">'+(isExpanded?'▴ 收起明细':'▾ 展开明细')+'</button>';
-      html += '</div>';
-      sdEl.innerHTML = html;
-    }
-    // 个股明细（默认隐藏，点击展开）—— 按来源分组展示
-    const listEl = $('stPoolStockList');
-    if(listEl){
-      const keys = Object.keys(stocks);
-      if(keys.length === 0){
-        listEl.innerHTML = '<div class="note" style="text-align:center;">候选股池数据暂不可用</div>';
-      } else {
-        const order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投'];
-        let html = '<div style="margin-top:8px;">';
-        order.forEach(function(src){
-          const srcStocks = Object.values(stocks).filter(function(s){ return s && s.sources && s.sources.indexOf(src) >= 0; });
-          if(!srcStocks.length) return;
-          html += '<div style="margin-bottom:12px;">';
-          html += '<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--cyan);"></span>'+src.replace(/成交前\d+|研报/,'')+' <span style="color:var(--dim);font-weight:500;">'+srcStocks.length+'只</span></div>';
-          html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;">';
-          srcStocks.slice(0, 100).forEach(function(s){
-            const name = s.name || s.code || '';
-            const board = s.board_label || s.board || '';
-            const boardColor = (s.up_pct||0) >= 0 ? 'var(--up)' : 'var(--down)';
-            html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;">';
-            html += '<div style="font-weight:700;color:var(--txt);">'+name+' <span style="color:var(--dim);font-size:10px;font-family:monospace;">'+(s.code||'')+'</span></div>';
-            if(board) html += '<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:rgba(99,102,241,.15);color:#a5b4fc;margin-right:4px;">'+board+'</span>';
-            html += '<span style="color:'+boardColor+';font-weight:700;">'+(s.up_pct>=0?'+':'')+(s.up_pct||0)+'%</span>';
+        html += '<span style="color:var(--dim);margin-left:auto;align-self:center;margin-right:8px;">共 <b style="color:var(--txt)">'+total+'</b> 只</span>';
+        html += '</div>';
+        sdEl.innerHTML = html;
+      }
+      // 2026-09-01 主人令：选股池明细改为「外资研投」默认展开，其他来源折叠（details 原生折叠）
+      const listEl = $('stPoolStockList');
+      if(listEl){
+        const keys = Object.keys(stocks);
+        if(keys.length === 0){
+          listEl.innerHTML = '<div class="note" style="text-align:center;">候选股池数据暂不可用</div>';
+        } else {
+          const order = ['外资研投','主板成交前100','创业板成交前100','科创板成交前100','港股成交前50'];
+          let html = '<div style="margin-top:8px;">';
+          order.forEach(function(src){
+            const srcStocks = Object.values(stocks).filter(function(s){ return s && s.sources && s.sources.indexOf(src) >= 0; });
+            if(!srcStocks.length) return;
+            const isOpen = src === '外资研投';
+            const label = src.replace(/成交前\d+|研报/,'');
+            html += '<details'+(isOpen?' open':'')+' style="margin-bottom:8px;border:1px solid var(--border);border-radius:8px;padding:6px 10px;background:var(--card);">';
+            html += '<summary style="cursor:pointer;font-size:12px;font-weight:700;color:var(--sub);display:flex;align-items:center;gap:6px;list-style:none;user-select:none;">';
+            html += '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+(isOpen?'var(--cyan)':'var(--dim)')+';"></span>';
+            html += label+' <span style="color:var(--dim);font-weight:500;">'+srcStocks.length+'只</span>';
+            html += '<span style="margin-left:auto;font-size:10px;color:var(--dim);">'+(isOpen?'▾ 点击收起':'▸ 点击展开')+'</span>';
+            html += '</summary>';
+            html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin-top:8px;">';
+            srcStocks.slice(0, 100).forEach(function(s){
+              const name = s.name || s.code || '';
+              const board = s.board_label || s.board || '';
+              const boardColor = (s.up_pct||0) >= 0 ? 'var(--up)' : 'var(--down)';
+              html += '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;">';
+              html += '<div style="font-weight:700;color:var(--txt);">'+name+' <span style="color:var(--dim);font-size:10px;font-family:monospace;">'+(s.code||'')+'</span></div>';
+              if(board) html += '<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:rgba(99,102,241,.15);color:#a5b4fc;margin-right:4px;">'+board+'</span>';
+              html += '<span style="color:'+boardColor+';font-weight:700;">'+(s.up_pct>=0?'+':'')+(s.up_pct||0)+'%</span>';
+              html += '</div>';
+            });
             html += '</div>';
+            html += '</details>';
           });
           html += '</div>';
-          html += '</div>';
-        });
-        html += '</div>';
-        listEl.innerHTML = html;
+          listEl.innerHTML = html;
+        }
       }
     }
-  }
   window.renderStPool = renderStPool;
-  window.toggleStPoolDetail = function(){
-    const sdEl = document.getElementById('stPoolSourceDist');
-    const listEl = document.getElementById('stPoolStockList');
-    if(!sdEl || !listEl) return;
-    const expanded = listEl.style.display !== 'none';
-    listEl.style.display = expanded ? 'none' : 'block';
-    sdEl.dataset.expanded = expanded ? '0' : '1';
-    const btn = document.getElementById('stPoolToggleBtn');
-    if(btn) btn.textContent = expanded ? '▾ 展开明细' : '▴ 收起明细';
-  };
+  // 2026-09-01 主人令：移除 toggleStPoolDetail（已改为 details 原生折叠，不再需要 JS 切换）
   function initTriple(){
     const c=window.TRIPLE_CONSENSUS||null, t=window.TRIPLE_TRACK||null, h=window.TRIPLE_HISTORY||null;
     const safe=(fn,...a)=>{try{fn(...a);}catch(e){console.warn('三重模块渲染失败',e);}};
@@ -10727,6 +10724,9 @@ window.showRestrictedItems = showRestrictedItems;
     h+='<div class="ul-pane" id="ulPaneStrong" style="display:block">';
     // ── 2026-09-01 主人令：🔥 热门赛道资金追踪 容器（pane1 最底部原生卡）──
     h+='<div id="ulSectorFundTrackPanel">加载中…</div>';
+    // ── 2026-09-01 主人令：调试专区 3 卡（宏观+板块推荐+ETF龙头参考）直接放进暂未上架，不分子页面 ──
+    h+='<div id="ulMacroPanel"></div>';
+    h+='<div id="ulSecPanel"></div>';
     // ── 2026-08-30 主人令：强势突破 = H反推 + 动量共识 + 回测对比 三卡并列；本页速读删（属调试/展示性内容，移至逻辑详解） ──
     // ── 📊 两套算法回测横向对比（2026-08-23 主人令：同一口径比胜率+收益率）──
     //   2026-08-27 主人令修正：本卡依赖 H反推 + 动量共识(强势突破) 双卡盘后数据齐备后才应出数据
