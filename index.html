@@ -10564,7 +10564,8 @@ window.showRestrictedItems = showRestrictedItems;
     // 🛡 2026-08-26 一劳永逸：提前暴露 __ulSwitch，子 tab 按钮在 renderUnlisted 任何位置抛错后仍可切换
     window.__ulSwitch = function(btn, tab){
       window.__ulActivePane = tab;  // guard: 记住当前子 tab，重渲染不再 snap-back
-      // 2026-09-01 主人令：取消调试专区 tab，其 3 卡（AI预测/潜力挖掘/ETF·龙头）改为恒为平铺可见（ulPaneDbg 不再参与切换）
+      // 2026-09-01 主人令：AI预测 / 潜力挖掘 / ETF·龙头参考 三卡已彻底删除，调试专区 tab 一并取消，
+      //   子 tab 现只剩「强势突破」一个 pane，故此处只切 ulPaneStrong。
       var pStrong=document.getElementById('ulPaneStrong');
       if(pStrong) pStrong.style.display=(tab==='strong')?'block':'none';
       var tabs=document.querySelectorAll('#sec-ul .ul-tab');
@@ -10587,7 +10588,7 @@ window.showRestrictedItems = showRestrictedItems;
       if(el.dataset.smsLoading){
         // 🛡 2026-08-20 超时兜底：STOCK_MOMENTUM_STATE.js(616KB) 加载慢会让页面永久空白。
         //   首次进本分支即启动 8s 超时：超时后强制渲染（动量卡降级为"数据不可用"），
-        //   其余 pane（强势突破/AI预测/调试专区）正常显示，绝不整页空白。
+        //   强势突破 pane 正常显示，绝不整页空白。
         if(!el.dataset.smsTimeoutSet){
           el.dataset.smsTimeoutSet='1';
           setTimeout(function(){
@@ -10852,17 +10853,8 @@ window.showRestrictedItems = showRestrictedItems;
     el.innerHTML=h;
     // 2026-08-30 主人令:渲染兜底
     if(!h || h.length<200){ el.innerHTML='<div style=\"text-align:center;padding:40px;color:var(--dim);\"><div style=\"font-size:32px;margin-bottom:12px;\">📭</div><div style=\"font-size:14px;\">已下架卡片暂无可用数据</div><div style=\"font-size:12px;margin-top:8px;\">稍后再试或检查数据源</div></div>'; }
-    // 2026-08-20 主人令：潜力挖掘已删除，替换为 AI 预测（market_path_probability 算法，重写非复制）
-    // 🛡 2026-08-23 根因修复：_fillAiPrediction 定义在 11694 行（本行之后），
-    // 🛡 2026-08-23 根因修复（强化版）：_fillAiPrediction 定义在 11694 行（本行之后）。
-    // 原同步调用时函数尚不存在 → typeof 判定 undefined 被跳过 → AI预测 卡永不渲染；
-    // 后改 setTimeout(0) 仍偶发受时序/缓存影响。现统一用 DOMContentLoaded 触发：
-    // 此时 HTML 解析已完成（函数已定义）、head 的 defer 数据脚本已执行（window.MARKET_PATH_PROBABILITY 已就绪）、
-    // DOM 元素已存在，彻底免疫时序问题；若脚本晚到（readyState 非 loading）则立即渲染。
-    // 2026-08-29 主人令：AI 预测 / 潜力挖掘 2 子页面已删除，DOMContentLoaded 触发器一并移除；
-    // _fillAiPrediction / _fillPotentialPicks 函数体保留以备复用（v8 「数据全量注入」铁律），data 注入链路不受影响。
-    // 2026-09-01 主人令：ETF·龙头参考卡已删除，原填充逻辑移除。
-    // 2026-09-01 主人令：子Tab 只剩强势突破，调试专区三卡已删除，__ulSwitch 简化。
+    // 2026-09-01 主人令（轻量化）：AI预测 / 潜力挖掘 / ETF·龙头参考 三卡及其填充函数、data 注入、
+    //   调试专区 tab 全部彻底删除（不保留"以备复用"的死代码）。子 tab 只剩「强势突破」，__ulSwitch 已简化。
     window.__ulSwitch = function(btn, tab){
       window.__ulActivePane = tab;
       var pStrong = document.getElementById('ulPaneStrong');
@@ -12595,7 +12587,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
   window.renderDelisted=renderDelisted;
   // 🛡 2026-08-19 阿狸咪根治空白bug：整个 JS 在 IIFE 内，render 函数必须显式挂 window
   //   否则 try/catch 中 `typeof window.renderXxx` 恒为 undefined → 容器永远空 → 「啥都没有」
-  //   2026-08-20：renderMarketPathProbability 已删除（路径概率迁至「AI 预测」子TAB 由 _fillAiPrediction 渲染）
+  //   2026-09-01：市场路径概率 / AI 预测相关渲染函数已随三卡删除，不再挂载。
   window.renderMarketRegimeCard = renderMarketRegimeCard;
   window.renderSectorRecommendationCard = renderSectorRecommendationCard;
 
