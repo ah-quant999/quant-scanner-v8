@@ -1337,6 +1337,22 @@ def check_data_cards():
         age_min = (now_cst() - dt).total_seconds() / 60
         status = "ok" if age_min <= max_age else "fail"
 
+        # 🛡 2026-09-02 一劳永逸：选股类(picking)卡片按「交易日(data_date)」判定新鲜度，根治运维面板整日误标红 ✗
+        #   根因：picking 卡由 overnight 算法链 ~04:xx 生成「当日」选股、再由盘后链 ~19:15 重写；
+        #   04:xx→19:15 重写前年龄可达 15h+，原固定 360min 阈值（adjust_max_age 收盘后8h严格窗口）整日误判 stale。
+        #   修正：只要 update_time 属「当前交易日」即视为当日新鲜（盘后链会按时重写），
+        #   仅当属更早交易日（overnight+盘后链都未产出）才维持 fail。杜绝同类误报再犯。
+        if d.get("picking"):
+            try:
+                from v8_date import today_data_date as _tdd
+                _dd = _tdd()
+                _cd = dt.strftime("%Y-%m-%d")
+                if _cd == _dd:
+                    status = "ok"
+                    msg = f"更新于 {rel}（当日选股·盘后链将刷新）"
+            except Exception:
+                pass
+
         # 🛡 2026-08-19 修：人工维护卡（今日宏观解读=主人撰写宏观解读，管线只补cpi/pmi）
         #   陈旧属预期，降 warn 不误报 fail（看板保留提示主人更新）。
         if d.get("manual_dep") and age_min > max_age:
