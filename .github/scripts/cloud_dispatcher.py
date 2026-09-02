@@ -314,18 +314,20 @@ def main():
         else:
             print("  风险温度计: %s" % why)
 
-    # 2) 算法链：仅交易日且 >=18:00 且今日未成功跑过才派发
+    # 2) 算法链：仅交易日且 >=18:00 且今日 18:00 后未成功跑过才派发
     #    2026-08-22 根因⑫：非交易日（周末/节假日）不派发——v8_algo_cloud 的交易日历
     #    gate 会跳过 step7（实证 08-22 03:2x 一批 run 全 skipped 秒退），派了也白跑。
+    #    2026-09-02 根因：16:xx 创建的 algo run 会被 run_algorithms 的 18:00 时间门跳过，
+    #    仍判 success 但无候选池/三重共识/最终推荐；必须要求成功 run 创建于 18:00 后。
     if now.hour >= 18 and _is_trading_day(now):
         al = latest_run("v8_algo_cloud.yml")
         ran_today = False
         if al:
             created, concl = al
             ct = datetime.datetime.fromisoformat(created.replace("Z", "+00:00")).astimezone(CST)
-            if concl == "success" and ct.date() == now.date():
+            if concl == "success" and ct.date() == now.date() and ct.hour >= 18:
                 ran_today = True
-                print(f"  算法链: 今日已成功于 {ct.strftime('%H:%M')}，无需补发")
+                print(f"  算法链: 今日 18:00 后已成功于 {ct.strftime('%H:%M')}，无需补发")
         if not ran_today:
             # 算法链单轮 20-40 分钟：冷却 45 分钟（>单轮耗时，避免"上一轮刚跑完就再派"）；
             # 今日失败 >=3 次即熔断，交人工（历史教训：不熔断会滚到 150 个 run / 403 限流）。
