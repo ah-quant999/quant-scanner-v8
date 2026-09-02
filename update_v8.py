@@ -1014,7 +1014,21 @@ def main():
                         help="只构建某一时段类别")
     parser.add_argument("--detect-changes", action="store_true",
                         help="只构建最近 git diff 发生变化的 raw_data 所属类别")
+    parser.add_argument("--only-cache-busters", action="store_true",
+                        help="仅重写 index.html 的 data/*.js ?v 缓存戳（基于本地文件内容哈希），不重建任何数据。"
+                             "供 v8_cache_buster_reconcile（兜底自愈）/ v8_build_deploy（提交前守卫）/"
+                             "生成器 workflow（原子提交 ?v）三处复用同一套权威 ?v 逻辑，彻底消除各 workflow 各算各的导致的失配。")
     args = parser.parse_args()
+    # 🛡 2026-09-02 一劳永逸根治「?v 缓存戳失配」：新增 --only-cache-busters 独立开关。
+    #   只重写 index.html 的 data/*.js ?v（基于本地文件内容哈希），不重建任何数据。
+    #   供 v8_cache_buster_reconcile（兜底自愈）/ v8_build_deploy（提交前守卫）/
+    #   生成器 workflow（原子提交 ?v）三处复用同一套权威 ?v 逻辑，彻底消除"各 workflow
+    #   各算各的"导致的失配。
+    if args.only_cache_busters:
+        _ensure_momentum_loader()
+        _rewrite_index_html_cache_busters()
+        print("✅ 仅重写 ?v 完成（未重建数据）")
+        return 0
     rc = build(category=args.category, detect_changes=args.detect_changes)
     if rc == 0:
         run_health_check()

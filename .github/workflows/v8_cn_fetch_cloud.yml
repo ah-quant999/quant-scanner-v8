@@ -418,6 +418,36 @@ jobs:
             PUSH_FILES="$DATA_MANIFEST" python api_push_raw.py
           fi
 
+      - name: "🛡️ 原子提交 index.html ?v（与本次 data 同轮上线，根治 ?v 失配）"
+        # 2026-09-02 一劳永逸根治「?v 缓存戳失配」：生成器跑完 update_v8.py 已本地重写
+        # index.html ?v，但此前从不推送 index.html → ?v 改动随 runner 销毁丢失；且 build_deploy
+        # 的 push 组高频互相 cancel 时 ?v 永不提交。现本步用 git 把 ?v 与本次 data 同轮推上线。
+        # 先 sync 远端再重写 ?v，确保 ?v 基于「当前线上最新 data」而非构建机滞后副本；
+        # 与 v8_cache_buster_reconcile / v8_build_deploy 三处共用 update_v8.py --only-cache-busters，
+        # 形成「生成器原子提交 + build 提交前守卫 + reconcile 15分钟兜底」三保险。
+        continue-on-error: true
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          git config user.name "v8-cloud-bot"
+          git config user.email "v8-bot@users.noreply.github.com"
+          REPO="https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
+          for i in 1 2 3; do
+            git fetch "$REPO" main
+            git reset --hard FETCH_HEAD
+            python update_v8.py --only-cache-busters
+            git add -f index.html
+            if git diff --cached --quiet; then
+              echo "ℹ️ ?v 已最新，无需推送"; break
+            fi
+            git commit -m "chore: 生成器原子提交 ?v → 防覆盖 ($(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M'))"
+            if git push "$REPO" HEAD:main; then
+              echo "✅ 已原子提交 ?v (第 $i 次)"; break
+            fi
+            echo "⚠️ push 被拒，同步远端后重试 ($i/3)"
+          done
+
       - name: "🛰️ 云端兜底调度（算法链/温度计，幂等）"
         if: success()
         continue-on-error: true

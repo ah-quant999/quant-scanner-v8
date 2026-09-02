@@ -8,18 +8,22 @@
 # 本 workflow 是「缓存戳自愈器」：
 #   1) 监听 data/** / raw_data/** 的每一次 push（即任何 data 变更的瞬间）→ 立即重算 ?v；
 #   2) 每 15 分钟兜底巡检一次（防 schedule 偶发静默失效 + 兜底短时漂移）；
-#   3) 重算时**优先用 GitHub Contents API 拉取线上真实服务版本**（raw.githubusercontent 实际
-#      吐给浏览器/CDN 的内容）来算 ?v，而非依赖 actions/checkout 检出的文件——实测 checkout
-#      对部分 data/*.js 会检出「旧 blob」，导致按磁盘算 ?v 误判「已一致」、缓存戳长期失配。
-#      API 取到的内容即用户真实拿到的内容，?v 与之严格一致，CDN 不再吐旧副本。
+#   3) 重算用「本地已 checkout 的 data/*.js 内容」算 ?v（与 build_deploy 同源，
+#      update_v8.py 的 _rewrite_index_html_cache_busters 即权威实现），不再依赖
+#      github.io CDN 下载（CDN 传播延迟会导致读到旧版本、算旧 ?v）。
 #   4) 仅在 ?v 真变化时才 commit+push。
 #
 # 与 build_deploy 的关系：
 #   - 本 workflow 推送 index.html 会触发 build_deploy（其 paths 含 index.html），
-#     但 build_deploy 在「无数据变化」时 git diff --cached --quiet 直接跳过，不会形成死循环；
-#   - 本 workflow 自身的 paths 不含 index.html，故它推送 index.html 不会再次触发自己。
+#     但 build_deploy 在「无数据变化」时仍会因 BUILD 戳变化而提交；本 workflow
+#     自身 paths 不含 index.html，故它推送 index.html 不会再次触发自己。
 #   - 两道机制互为冗余：即便 schedule 偶发失效，data push 也会立刻对齐；即便某次
-#     build_deploy 因竞态漏算，本巡检 15 分钟内必纠。
+#     build_deploy 因 cancel-in-progress 未跑完，本巡检 15 分钟内必纠。
+#
+# 2026-09-02 根治（此前被紧急 if:false 禁用）：原版因 fetch-depth:1 浅克隆 + 依赖
+#   CDN 下载算 ?v，存在把 main 历史截断/孤立 root 的隐患。现改为
+#   fetch-depth:0 + 本地文件哈希（复用 update_v8.py --only-cache-busters），
+#   彻底消除该隐患并重新启用，作为 ?v 失配的兜底自愈网。
 
 name: "🛡️ v8 缓存戳实时对齐(防覆盖)"
 
@@ -28,8 +32,7 @@ on:
     branches: [main]
     paths:
       - 'data/**'
-      - '!data/freshness_status.json'   # 🔴 2026-08-18 幽灵提交源排除：health_patrol 每分钟写它，
-                                        #   每次触发本 workflow → 与 build 死循环（今日 42 次 cache-bot 提交实证）
+      - '!data/freshness_status.json'   # 健康巡检每分钟写它，排除避免死循环
       - 'raw_data/**'
   schedule:
     - cron: '*/15 * * * *'   # 每 15 分钟兜底巡检
@@ -45,25 +48,26 @@ concurrency:
 jobs:
   reconcile:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    if: false   # 🚨 2026-09-01 紧急禁用：本 workflow 正在用 fetch-depth:1 浅克隆把 main  force 成孤立 root，先停掉再根治
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
+          fetch-depth: 0   # 🛡 2026-09-02 根治：全量克隆，避免浅克隆把历史截断致孤立 root
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
 
-      - name: "🔄 重算 index.html 全部 ?v 对齐 CDN 真实内容（中性化 republish_time）"
+      - name: "📦 安装 Python 依赖"
+        run: python -m pip install --upgrade pip
+
+      - name: "🔄 重算 index.html 全部 ?v（基于本地 data/*.js 内容哈希，与 build_deploy 同源）"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # 🔴 2026-08-18 根因修复：弃用 reconcile_cache_busters.py（git blobs API 取 origin/main
-        #   快照算 ?v，cn 墙/竞态下拿旧 blob → 算旧 ?v → 与 build 互踩 → 死循环，今日 42+77 提交实证）。
-        #   改 fix_cachebusters_cdn.py：直接下载 github.io 实际服务内容算 sha，
-        #   ?v 严格等于 CDN 真实文件 sha（memory 铁律：CDN 权威）。
-        run: python scripts/fix_cachebusters_cdn.py
+        # 🛡 2026-09-02 根治：弃用 fix_cachebusters_cdn.py（github.io 下载，CDN 传播延迟
+        #   会算到旧 ?v）；改用 update_v8.py --only-cache-busters 读本地已 checkout 的
+        #   真实 data/*.js 内容算 sha，?v 严格等于落库文件内容哈希，与 build_deploy 完全一致。
+        run: python update_v8.py --only-cache-busters
 
       - name: "📤 推送（仅当 ?v 真变化）"
         env:
@@ -84,7 +88,7 @@ jobs:
             echo "⚠️ push 被拒，同步远端后重试 ($i/3)"
             git fetch "$REPO" main
             git reset --hard FETCH_HEAD
-            python scripts/fix_cachebusters_cdn.py
+            python update_v8.py --only-cache-busters
             git add -f index.html
             if git diff --cached --quiet; then echo "ℹ️ 重试时已一致"; exit 0; fi
             git commit -m "chore: 缓存戳实时对齐 ?v → 防覆盖 (retry $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M'))"
