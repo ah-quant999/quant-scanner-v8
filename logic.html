@@ -1403,7 +1403,21 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><td>18:10 B批选股</td><td>三重共识/相对强度/CRDS/四量终极/选股生命周期</td><td>云端 v8_algo_cloud (--stage B)</td><td>选股策略各子 tab</td></tr>
           <tr><td>19:15 C批回测</td><td>backtest_tdx/comprehensive/cockpit/hunter/crds/allsite/rps</td><td>云端 v8_algo_cloud (--stage C)</td><td>策略回顾·回测区</td></tr>
           <tr><td>20:00 D批汇总</td><td>final_recommend + LHB历史/7d/生命周期</td><td>云端 v8_algo_cloud (--stage D)</td><td>今日推荐候选池·Top3</td></tr>
+          <tr><td>本地因子(盘后/周末)</td><td>异常换手率(重点池) + ROE(TTM)全市场主板 · 因子实验室卡</td><td>小九本机 baostock 生成 → push main</td><td>选股策略·🧬生命周期 tab</td></tr>
         </table>
+      </div>
+
+<div class="card">
+        <h3><span class="ic">🧪</span>因子实验室（🧬 选股生命周期 tab · 2026-09 新增）</h3>
+        <div class="logic-p">把 v2 回测验证显著的两个单因子做成「可观测截面排名 + 择时闸门」，作为选股策略的<b>因子观察层</b>。当前<b>尚未并入最终推荐加权</b>（属研究/预警信号，不参与 final_recommend 名单生成）。</div>
+        <div class="logic-h">① 异常换手率（重点池 351 只口径）</div>
+        <div class="logic-p">· 因子 = −(当月换手率 ÷ 过去12月均值)。缩量 → 因子高 → 低关注度强势股。<br>· v2 回测：Spearman IC t=<b>4.26</b>（全样本显著，样本内外一致）；多空组合 ls_nw_t=1.78（边界显著）→ 仅作排序/门控，不作独立策略。<br>· 展示：Top30 缩量最强 + Bottom10 放量最严重（反向警示）。</div>
+        <div class="logic-h">② ROE(TTM) 全市场主板（3193 只口径）</div>
+        <div class="logic-p">· 因子 = 最近4季度 roeAvg 求和(TTM)；仅取大市值档（成交额代理 Top1/3）排序 Top30。<br>· 重点池 60% 为双创，ROE大市值档在重点池是噪声 → 已按主人令改为<b>全市场主板</b>口径（sh.60/sz.00，实测 3193 只）。<br>· v2 回测：ROE_TTM 全样本不显著(t=1.26)；<b>仅大市值档显著</b>(t=3.25) → 必须限大市值档。</div>
+        <div class="logic-h">③ 择时闸门 v8FactorGate()</div>
+        <div class="logic-p">每行个股打 🟢可关注 需同时满足：① 全站唯一择时权威 <code>v8MarketGate()</code> 开仓（仅「阴跌磨底/恐慌下行」开放）；② 该因子值进入全样本前 20% 分位。否则显示原因徽章（择时封闭 / 因子未达分位）。与三重共识等共用同一择时闸门，口径一致。</div>
+        <div class="logic-h">数据来源与刷新</div>
+        <div class="logic-p">· 数据源：baostock 历史换手率/ROE/成交额（本地系统 Python 抓取；云端 runner 无中国行情权限，故为<b>本机生成</b>）。<br>· 刷新：小九本机定时任务（双机之一）周期重算 → 提交 data/FACTOR_LAB.js + raw_data/factor_lab.json → 推送 main → 云端构建自动部署。<br>· 口径铁律：不得造假；数据过期时卡片显「加载中/数据陈旧」而非编造信号。</div>
       </div>
 
 <div class="card">
