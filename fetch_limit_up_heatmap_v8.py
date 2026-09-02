@@ -291,6 +291,24 @@ def main():
         if not ok:
             print(f"  🧹 日期序列异常：{reason}，触发全量重建")
             need_rebuild = True
+        # 🛡 2026-09-02 主人令根治：dates 字段齐了但前段数据全 0（历史回填遗漏）→ 触发全量重建
+        elif existing.get("sectors"):
+            n_cols = len(existing_dates)
+            col_sums = [0] * n_cols
+            for s in existing.get("sectors", []):
+                data = s.get("data", [])
+                for i, v in enumerate(data):
+                    if i < n_cols:
+                        col_sums[i] += (v if isinstance(v, (int, float)) else 0)
+            head_zero = 0
+            for c in col_sums:
+                if c == 0:
+                    head_zero += 1
+                else:
+                    break
+            if head_zero >= 5:
+                print(f"  🧹 历史前段连续 {head_zero} 列全 0（dates 齐但 data 缺），触发全量重建")
+                need_rebuild = True
 
     if need_rebuild:
         # ── 全量重建：拉取近30个交易日 ──
@@ -449,6 +467,24 @@ def generate():
         if not ok:
             print(f"  🧹 日期序列异常：{reason}，触发全量重建")
             need_rebuild = True
+        # 🛡 2026-09-02 主人令根治：dates 字段齐了但前段数据全 0（历史回填遗漏）→ 触发全量重建
+        elif existing.get("sectors"):
+            n_cols = len(existing_dates)
+            col_sums = [0] * n_cols
+            for s in existing.get("sectors", []):
+                data = s.get("data", [])
+                for i, v in enumerate(data):
+                    if i < n_cols:
+                        col_sums[i] += (v if isinstance(v, (int, float)) else 0)
+            head_zero = 0
+            for c in col_sums:
+                if c == 0:
+                    head_zero += 1
+                else:
+                    break
+            if head_zero >= 5:
+                print(f"  🧹 历史前段连续 {head_zero} 列全 0（dates 齐但 data 缺），触发全量重建")
+                need_rebuild = True
 
     if need_rebuild:
         trade_dates = get_trade_dates(30)
