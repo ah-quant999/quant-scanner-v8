@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "b79ab1716";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "28cd1b8c1";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -538,7 +538,7 @@ window.__domReadyFns=[];
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/POTENTIAL_PICKS.js?v=2ce3c7bbdc" defer></script>
 <script src="data/INDEX_QUOTES.js?v=e31ff29551" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=4f2fada110" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=9900a2f6e6" defer></script>
 <script src="data/MARGIN_DATA.js?v=878ae75123" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=149695cabd" defer></script>
 <script src="data/IPO_DATA.js?v=29a5efed36" defer></script>
@@ -1476,7 +1476,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          此处再引入 data/STOCK_RPS_DATA.js（旧 01:56 版本）会覆盖最新数据 → 相对强度子页/状态胶囊均读到陈旧值。
          删除重复注入，确保全局只保留一份最新 RPS 数据。 -->
 <!-- 2026-09-03 主人令：COCKPIT_BACKTEST.js / HUNTER_BACKTEST.js 脚本标签删除（脚本文件早已全方位下线，留着只会在浏览器控制台制造 404 噪音、影响运维健康检查"失败/诊断详情"，一并清干净） -->
-<script src="data/BACKTEST_COMPREHENSIVE.js?v=b6991845a5" defer></script>
+<script src="data/BACKTEST_COMPREHENSIVE.js?v=cd12cfa6ce" defer></script>
 <script src="data/BACKTEST_TDX.js?v=b1589ec11f" defer></script>
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=f4fabe4f73" defer></script>
@@ -1496,21 +1496,21 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=909e4353cc" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=3e00228da7" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=f48c8304a9" defer></script>
-<script src="data/HEALTH_CHECK.js?v=22b00e406a" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=461a87acb3" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=4b3521618a" defer></script>
+<script src="data/RUNNER_STATUS.js?v=2ccd20806d" defer></script>
+<script src="data/HEALTH_CHECK.js?v=603ecede6d" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=e5e63c4f6f" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=db5d2146ca" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 MARKET_PATH_PROBABILITY 注入（AI预测卡用） -->
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=6c65eedbf0" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=771c447c18" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=ac04776279" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=258e585586" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=f4bc653137" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
-    <script src="data/FOUR_VOLUME_BACKTEST.js?v=7b774c251c" defer></script>
+    <script src="data/FOUR_VOLUME_BACKTEST.js?v=e1655f6cbb" defer></script>
     <script src="data/ALLSITE_BACKTEST.js?v=5c20fb44d8" defer></script>
-    <script src="data/CRDS_BACKTEST.js?v=318fde1812" defer></script>
-    <script src="data/RPS_BACKTEST.js?v=73b38c0682" defer></script>
+    <script src="data/CRDS_BACKTEST.js?v=92bb0d80d0" defer></script>
+    <script src="data/RPS_BACKTEST.js?v=8258714cbe" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -12460,7 +12460,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=22b00e406a')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=603ecede6d')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
