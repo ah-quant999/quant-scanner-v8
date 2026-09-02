@@ -1,27 +1,27 @@
 {
-  "update_time": "2026-09-02 08:23:42",
+  "update_time": "2026-09-02 08:36:38",
   "source": "akshare etf_em (东财/同花顺)",
-  "metric": "规模AUM(回退)",
+  "metric": "净流入(亿元,优先) / 规模AUM(亿元,回退)",
   "categories": {
     "stock": {
       "name": "股票型",
       "net_amount_yi": 0.0,
       "scale_yi": 0.0,
-      "n_funds": 1613,
+      "n_funds": 0,
       "top5": []
     },
     "bond": {
       "name": "债券型",
       "net_amount_yi": 0.0,
       "scale_yi": 0.0,
-      "n_funds": 53,
+      "n_funds": 0,
       "top5": []
     },
     "money": {
       "name": "货币型",
       "net_amount_yi": 0.0,
       "scale_yi": 0.0,
-      "n_funds": 25,
+      "n_funds": 0,
       "top5": []
     },
     "commodity": {
