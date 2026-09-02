@@ -31,10 +31,12 @@ on:
     # 非交易日自动跳过，避免周末/节假日无意义覆盖，同时覆盖调休上班日（股市开市）。
     # 2026-08-20 主人令：主档从 18:30 推迟到 19:15 CST，确保全部盘后数据源完整就绪后再跑选股算法。
     # 内部仍用 A 股交易日历 gate，非交易日自动跳过，同时覆盖调休上班日（股市开市）。
-    - cron: '15 11 * * *'  # 19:15 CST 每天触发，内部交易日历 gate
-    # 2026-09-01 加固：冗余第二触发点(20:00 CST)，降低 GitHub 单 cron 静默失效导致盘后链整夜不跑的风险。
-    #   两条 cron 都走同一内部交易日历 gate，非交易日均跳过，不会重复覆盖。
-    - cron: '0 12 * * *'   # 20:00 CST 冗余兜底，主档 19:15 未跑时补跑
+    # 🔴 2026-09-02 主人令「分批跑」：4 个 cron 各对应一个 stage（job 内按 CST 小时分派）：
+    #   A 采集批(16:40) / B 选股批(18:10) / C 回测批(19:15) / D 汇总批(20:00, final_recommend)
+    - cron: '40 8 * * *'   # 16:40 CST 数据采集批(A)
+    - cron: '10 10 * * *'  # 18:10 CST 选股批(B)
+    - cron: '15 11 * * *'  # 19:15 CST 回测批(C)
+    - cron: '0 12 * * *'   # 20:00 CST 汇总批(D, final_recommend)
   repository_dispatch:
     # 2026-09-01 加固：允许本机 WorkBuddy 自动化 / 手动经 API 主动唤醒盘后链，
     #   不再单纯依赖 GitHub schedule（已知静默失效）。types 见下。
@@ -338,7 +340,24 @@ jobs:
         timeout-minutes: 320
         run: |
           set +e
-          python algorithms/run_algorithms.py
+          # 🔴 2026-09-02 主人令「分批跑」：schedule 触发按 CST 小时分派 stage；手动/dispatch 跑全链
+          STAGE=""
+          if [ "${GITHUB_EVENT_NAME}" = "schedule" ]; then
+            HH=$(TZ=Asia/Shanghai date +%H)
+            case "$HH" in
+              16|17) STAGE=A ;;   # 16:40 采集批
+              18)    STAGE=B ;;   # 18:10 选股批
+              19)    STAGE=C ;;   # 19:15 回测批
+              20)    STAGE=D ;;   # 20:00 汇总批(final_recommend)
+              *)     STAGE="" ;;   # 小时漂移兜底：跑全链
+            esac
+          fi
+          echo "🎯 event=${GITHUB_EVENT_NAME} CST=${HH:-?} → stage=${STAGE:-ALL}"
+          if [ -n "$STAGE" ]; then
+            python algorithms/run_algorithms.py --stage "$STAGE"
+          else
+            python algorithms/run_algorithms.py
+          fi
           ALGO_EXIT=$?
           echo "algo exit: ${ALGO_EXIT}"
           # 🛡 2026-08-28 一劳永逸：原写法只 echo 不留存，退出码随风消散。

@@ -182,6 +182,51 @@ ORDER = [
 ]
 
 
+
+# 🔴 2026-09-02 主人令「分批跑」：把单轮串行 ORDER 拆成 4 个按时触发的 stage，
+#   每 stage 独立触发、独立 timeout，final_recommend 独占 D 批（不再被单窗口掐断）。
+#   跨 stage 产物经 main 分支传递：每 stage 跑完即 stage(out→raw_data)+push，
+#   下游 stage 的云端 run checkout main 即含上游当日产物。
+#   同 stage 内严格沿用 ORDER 相对次序（build_candidate_pool 在 calc_stock_rps 前等依赖不变）。
+STAGES = {
+    "A": [  # 数据采集批（~16:40 CST，龙虎榜16:30后）：纯 fetch + 上游自产前置
+        "fetch_fundamental_quality.py", "fetch_stock_names.py", "gen_stock_profile.py",
+        "fetch_stock_quote_v8.py", "fetch_sh_index_fib.py", "fetch_inst_trade.py",
+        "fetch_sector_rs.py", "fetch_lhb.py",
+        "scripts/fetch_index_history.py", "scripts/fetch_index_history_multi.py",
+        "fetch_orphan_suspension.py", "fetch_orphan_market_alerts.py",
+        "fetch_orphan_nt_data.py", "fetch_orphan_sector_fund_flow.py",
+    ],
+    "B": [  # 选股批（~18:10 CST，盘后数据齐）：核心选股策略
+        "calc_crds.py", "build_candidate_pool.py", "calc_stock_rps.py", "generate_top10.py",
+        "strategy_four_volume_60m.py", "strategy_four_volume.py",
+        "market_path_probability.py", "market_regime.py", "sector_recommendation.py",
+        "gen_cockpit_tier_recommend.py", "gen_cockpit_tier_recommend.py",
+        "gen_cockpit_advice.py", "update_triple_resonance_history.py",
+        "gen_triple_consensus.py", "gen_triple_track.py", "calc_volatility_watch.py",
+        "gen_stock_stop.py", "gen_algo_track.py", "calc_sentiment_cycle.py",
+        "refresh_dividend_cninfo.py", "calc_potential_picks.py",
+        "scripts/audit_cockpit_lights.py", "refresh_stock_metadata.py", "fetch_weekend_run.py",
+        "auto_run_dn_algorithm.py", "track_h_auto_buy.py",
+    ],
+    "C": [  # 回测批（~19:00 CST，依赖 top10/crds history）：backtest 全家
+        "scripts/ab_universe_backtest.py", "backtest_tdx.py", "backtest_comprehensive.py",
+        "cockpit_backtest_now.py", "export_optimized_strategy.py",
+        "v8/backtest_hunter.py", "v8/backtest_crds.py", "v8/backtest_allsite.py", "v8/backtest_rps.py",
+    ],
+    "D": [  # 汇总批（~20:00 CST，依赖全部）：final_recommend + LHB历史/7d/生命周期
+        "final_recommend.py",
+    ],
+}
+# 自校验：STAGES 并集必须精确覆盖 ORDER（无遗漏/多余，保证分批模式不丢脚本）
+_STAGE_UNION = set()
+for _s in STAGES.values():
+    _STAGE_UNION.update(_s)
+assert _STAGE_UNION == set(ORDER), (
+    "STAGES 与 ORDER 不一致: 仅ORDER有=%s, 仅STAGES有=%s"
+    % (set(ORDER) - _STAGE_UNION, _STAGE_UNION - set(ORDER))
+)
+
 def step_v8_self_sufficiency():
     """2026-08-02 原生化：v8 自产 3 类上游输入（gold_pool / scan_result / watch_result /
     guanlan_*），替代 v6 供给。通过 V8_OUT_DIR 环境变量让被迁移脚本把数据写到仓库根
@@ -644,8 +689,10 @@ def _supervised_run(script, path, timeout):
     return rc, last_lines, killed_reason
 
 
-def step_run():
-    print(f"\n[1] 运行算法链（{len(ORDER)} 个）")
+def step_run(order=None):
+    if order is None:
+        order = ORDER
+    print(f"\n[1] 运行算法链（{len(order)} 个）")
     # 记录本轮启动时间，供 final_recommend 门控判断「输入是否本轮新鲜产出」
     run_start = datetime.now()
     # 🔴 盘后选股策略统一门控：18:00 前跳过所有选股脚本
@@ -659,7 +706,7 @@ def step_run():
           f" | 模式={mode}{' | 回填:跳过实时采集+日期改写上一交易日' if skip_fetch else ''}")
     ok, fail = 0, 0
     skipped = []
-    for script in ORDER:
+    for script in order:
         # 支持 scripts/ 前缀（仓库根 scripts/）与 v8/ 前缀（仓库根 v8/）
         if script.startswith("scripts/") or script.startswith("v8/"):
             path = os.path.join(V8_ROOT, script)
@@ -845,22 +892,39 @@ def step_build_pool_tracker():
 
 
 def main():
-    print(f"=== v8 算法编排  {datetime.now():%Y-%m-%d %H:%M:%S} ===")
-    step_v8_self_sufficiency()  # 2026-08-02 原生化: 先自产 4 类上游输入
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--stage", choices=list(STAGES.keys()), default=None)
+    ns, _ = ap.parse_known_args()
+    stage = ns.stage
+    print(f"=== v8 算法编排  {datetime.now():%Y-%m-%d %H:%M:%S}  stage={stage or 'ALL'} ===")
+    # 🔴 2026-09-02 主人令「分批跑」：上游自产仅 A 批或全链跑；B/C/D 批依赖 A 已推送的 gold_pool 等
+    if stage in (None, "A"):
+        step_v8_self_sufficiency()  # 2026-08-02 原生化: 先自产 4 类上游输入
+    else:
+        print(f"\n[0] 跳过 v8 原生化自产上游输入（stage={stage}，gold_pool 由 A 批产出并已推送）")
+        os.makedirs(OUT, exist_ok=True)
     step_seed_inputs()          # 默认 no-op, V6_SEED=1 才重灌
-    step_run()
+    if stage is None:
+        order = ORDER
+    else:
+        order = STAGES[stage]
+        print(f"  🎯 stage={stage} 仅跑 {len(order)} 个脚本（其余由对应批次产出）")
+    step_run(order=order)
     n = step_stage()
     # 🔴 2026-08-25 一劳永逸：链尾保底，确保驾驶舱建议 + 板块推荐 data/X.js 必新鲜
-    step_ensure_cockpit_sector()
-    # 🔴 盘后选股策略门控：LHB 7日累计属于选股向汇总，未到 18:00 不处理当日龙虎榜数据
-    if _is_post_close_picking_ready() and _is_trading_day_now():
-        step_append_lhb_history()
-        step_gen_lhb_7d()
-        # 🆕 2026-08-31：v8 选股生命周期跟踪（阶段 1 整合）。
-        # 依赖 LHB 历史/算法跟踪（algo_track.json），放 2.6 后保 LHB 不阻塞它。
-        step_build_pool_tracker()
+    #   仅全链(无--stage)或 D 汇总批执行；A/B/C 批跳过（D 批会补）
+    if stage in (None, "D"):
+        step_ensure_cockpit_sector()
+        # 🔴 盘后选股策略门控：LHB 7日累计属于选股向汇总，未到 18:00 不处理当日龙虎榜数据
+        if _is_post_close_picking_ready() and _is_trading_day_now():
+            step_append_lhb_history()
+            step_gen_lhb_7d()
+            step_build_pool_tracker()
+        else:
+            print("\n[2.5-2.7] ⏭️ 跳过 LHB 历史累积 + LHB 7日累计 + v8 选股生命周期（非交易日或盘后策略未就绪）")
     else:
-        print("\n[2.5-2.7] ⏭️ 跳过 LHB 历史累积 + LHB 7日累计 + v8 选股生命周期（非交易日或盘后策略未就绪）")
+        print(f"\n[2.5-2.7] ⏭️ 跳过 LHB 历史累积 + 驾驶舱保底（stage={stage}，交由 D 汇总批执行）")
     step_push()
     print(f"\n=== 完成。staged {n} 个文件 ===")
 
