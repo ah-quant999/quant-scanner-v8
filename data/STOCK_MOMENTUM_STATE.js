@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-02 17:02",
- "generated": "2026-09-02 17:02",
+ "update_time": "2026-09-02 18:35",
+ "generated": "2026-09-02 18:35",
  "meta": {
-  "generated": "2026-09-02 17:02",
+  "generated": "2026-09-02 18:35",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 2,
   "days_with_consensus": 0,
@@ -22,22 +22,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603221",
       "name": "爱丽家居",
-      "change_pct": 8.969,
-      "price": 33.29,
+      "change_pct": 9.231,
+      "price": 33.37,
       "category": "突破"
      },
      {
       "code": "603269",
       "name": "海鸥股份",
-      "change_pct": 6.827,
-      "price": 27.07,
+      "change_pct": 8.169,
+      "price": 27.41,
       "category": "突破"
      },
      {
       "code": "003040",
       "name": "楚天龙",
-      "change_pct": 9.091,
-      "price": 21.36,
+      "change_pct": 7.865,
+      "price": 21.12,
       "category": "突破"
      },
      {
@@ -57,22 +57,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002811",
       "name": "郑中设计",
-      "change_pct": 5.431,
-      "price": 14.56,
+      "change_pct": 5.286,
+      "price": 14.54,
       "category": "突破"
      },
      {
       "code": "688448",
       "name": "磁谷科技",
-      "change_pct": 5.336,
-      "price": 68.89,
+      "change_pct": 5.505,
+      "price": 69.0,
       "category": "突破"
      },
      {
       "code": "301151",
       "name": "冠龙节能",
-      "change_pct": 3.019,
-      "price": 22.18,
+      "change_pct": 3.576,
+      "price": 22.3,
       "category": "突破"
      },
      {
@@ -85,15 +85,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300192",
       "name": "科德教育",
-      "change_pct": 8.619,
-      "price": 18.4,
+      "change_pct": 8.737,
+      "price": 18.42,
       "category": "突破"
      },
      {
       "code": "300911",
       "name": "亿田智能",
-      "change_pct": 5.038,
-      "price": 30.44,
+      "change_pct": 4.348,
+      "price": 30.24,
       "category": "突破"
      },
      {
@@ -113,8 +113,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301287",
       "name": "康力源",
-      "change_pct": 3.271,
-      "price": 44.2,
+      "change_pct": 3.411,
+      "price": 44.26,
       "category": "突破"
      },
      {
@@ -141,8 +141,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300025",
       "name": "华星创业",
-      "change_pct": 3.912,
-      "price": 6.11,
+      "change_pct": 3.741,
+      "price": 6.1,
       "category": "突破"
      },
      {
@@ -185,22 +185,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603221",
       "name": "爱丽家居",
-      "change_pct": 8.969,
-      "price": 33.29,
+      "change_pct": 9.231,
+      "price": 33.37,
       "category": "加速"
      },
      {
       "code": "603269",
       "name": "海鸥股份",
-      "change_pct": 6.827,
-      "price": 27.07,
+      "change_pct": 8.169,
+      "price": 27.41,
       "category": "加速"
      },
      {
       "code": "003040",
       "name": "楚天龙",
-      "change_pct": 9.091,
-      "price": 21.36,
+      "change_pct": 7.865,
+      "price": 21.12,
       "category": "加速"
      },
      {
@@ -220,22 +220,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002811",
       "name": "郑中设计",
-      "change_pct": 5.431,
-      "price": 14.56,
+      "change_pct": 5.286,
+      "price": 14.54,
       "category": "加速"
      },
      {
       "code": "688448",
       "name": "磁谷科技",
-      "change_pct": 5.336,
-      "price": 68.89,
+      "change_pct": 5.505,
+      "price": 69.0,
       "category": "加速"
      },
      {
       "code": "301151",
       "name": "冠龙节能",
-      "change_pct": 3.019,
-      "price": 22.18,
+      "change_pct": 3.576,
+      "price": 22.3,
       "category": "加速"
      },
      {
@@ -248,15 +248,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300192",
       "name": "科德教育",
-      "change_pct": 8.619,
-      "price": 18.4,
+      "change_pct": 8.737,
+      "price": 18.42,
       "category": "加速"
      },
      {
       "code": "300911",
       "name": "亿田智能",
-      "change_pct": 5.038,
-      "price": 30.44,
+      "change_pct": 4.348,
+      "price": 30.24,
       "category": "加速"
      },
      {
@@ -276,8 +276,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301287",
       "name": "康力源",
-      "change_pct": 3.271,
-      "price": 44.2,
+      "change_pct": 3.411,
+      "price": 44.26,
       "category": "加速"
      },
      {
@@ -304,8 +304,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300025",
       "name": "华星创业",
-      "change_pct": 3.912,
-      "price": 6.11,
+      "change_pct": 3.741,
+      "price": 6.1,
       "category": "加速"
      },
      {
@@ -348,22 +348,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603221",
       "name": "爱丽家居",
-      "change_pct": 8.969,
-      "price": 33.29,
+      "change_pct": 9.231,
+      "price": 33.37,
       "category": "短线选股"
      },
      {
       "code": "603269",
       "name": "海鸥股份",
-      "change_pct": 6.827,
-      "price": 27.07,
+      "change_pct": 8.169,
+      "price": 27.41,
       "category": "短线选股"
      },
      {
       "code": "003040",
       "name": "楚天龙",
-      "change_pct": 9.091,
-      "price": 21.36,
+      "change_pct": 7.865,
+      "price": 21.12,
       "category": "短线选股"
      },
      {
@@ -383,22 +383,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002811",
       "name": "郑中设计",
-      "change_pct": 5.431,
-      "price": 14.56,
+      "change_pct": 5.286,
+      "price": 14.54,
       "category": "短线选股"
      },
      {
       "code": "688448",
       "name": "磁谷科技",
-      "change_pct": 5.336,
-      "price": 68.89,
+      "change_pct": 5.505,
+      "price": 69.0,
       "category": "短线选股"
      },
      {
       "code": "301151",
       "name": "冠龙节能",
-      "change_pct": 3.019,
-      "price": 22.18,
+      "change_pct": 3.576,
+      "price": 22.3,
       "category": "短线选股"
      },
      {
@@ -411,15 +411,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300192",
       "name": "科德教育",
-      "change_pct": 8.619,
-      "price": 18.4,
+      "change_pct": 8.737,
+      "price": 18.42,
       "category": "短线选股"
      },
      {
       "code": "300911",
       "name": "亿田智能",
-      "change_pct": 5.038,
-      "price": 30.44,
+      "change_pct": 4.348,
+      "price": 30.24,
       "category": "短线选股"
      },
      {
@@ -439,8 +439,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301287",
       "name": "康力源",
-      "change_pct": 3.271,
-      "price": 44.2,
+      "change_pct": 3.411,
+      "price": 44.26,
       "category": "短线选股"
      },
      {
@@ -467,8 +467,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300025",
       "name": "华星创业",
-      "change_pct": 3.912,
-      "price": 6.11,
+      "change_pct": 3.741,
+      "price": 6.1,
       "category": "短线选股"
      },
      {
