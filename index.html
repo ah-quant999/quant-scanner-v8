@@ -8523,11 +8523,8 @@ function drawUpDownChart(){
 
           {name:'四量终极', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['19:15'], note:'目标池：主板/创业板/科创板成交额前80~100 + 港股前40~50；频率：盘后日线；回测：近3年 T+1/3/5/10/20 持有收益'},
 
-          {name:'驾驶舱', source:'COCKPIT_ADVICE', freq:'收盘后1次', slots:['19:15'], note:'驾驶舱A/B档建议'},
 
-          {name:'大牛股猎手', source:'LHB_DATA', freq:'收盘后1次', slots:['19:15'], note:'机游共振中线策略（派生自龙虎榜+机构买卖）'},
 
-          {name:'全站精选', source:'TOP10_DAILY', freq:'收盘后1次', slots:['19:15'], note:'主站TOP10精选池'},
 
           {name:'相对强度', source:'STOCK_RPS_DATA', freq:'收盘后1次', slots:['19:15'], note:'个股相对强度评分'},
 
@@ -8547,7 +8544,7 @@ function drawUpDownChart(){
 
           {name:'中国数据抓取 (v8_cn_fetch_cloud)', source:'RUNNER_STATUS', freq:'工作日 cron · 云端', slots:['08:25','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:20'], note:'核心数据管线 · GitHub Actions 云端 ubuntu-latest 主链（含 17:20 龙虎榜收盘后刷新）'},
 
-          {name:'盘后算法链 (v8_algo_cloud)', source:'TRIPLE_CONSENSUS', freq:'工作日19:15主档', slots:['19:15'], note:'候选池/黄金池/三重共识/回测 · 已迁 GitHub Actions 云端 ubuntu-latest · 冗余由本机每30分检查dispatch兜底'},
+          {name:'盘后算法链 (v8_algo_cloud)', source:'TRIPLE_CONSENSUS', freq:'工作日16:40/18:10/19:15/20:00 四批', slots:['19:15'], note:'候选池/黄金池/三重共识/回测 · 已迁 GitHub Actions 云端 ubuntu-latest · 冗余由本机每30分检查dispatch兜底'},
 
           {name:'每日数据体检', source:'HEALTH_CHECK', freq:'每日2次', slots:['09:00','17:00'], note:'数据完整性检查 · 覆盖构建/部署/备份健康'},
 

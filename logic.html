@@ -1308,7 +1308,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
       <div class="card">
         <h3><span class="ic">🏆</span>最终推荐 - 说明</h3>
         <div class="logic-h">定位</div>
-        <div class="logic-p">2026-08-08 主人令：最终推荐 = 全站唯一买卖决策入口。聚合三重共识、四量终极、驾驶舱 A 档、全站精选、相对强度 A 档、大牛股猎手核心共振、CRDS 逆势龙头等多策略信号，按跨策略共振 + 板块强度加权排序，输出 Top3。</div>
+        <div class="logic-p">2026-08-08 主人令：最终推荐 = 全站唯一买卖决策入口。聚合三重共识、四量终极、相对强度 A 档、大牛股猎手核心共振、CRDS 逆势龙头等多策略信号，按跨策略共振 + 板块强度加权排序，输出 Top3。</div>
         <div class="logic-h">三子页</div>
         <div class="logic-p">· <b>🏆 最终推荐 · Top3</b>：跨策略共振得分最高的 3 只，作为当日核心买卖观察。<br>· <b>🎯 今日推荐候选池</b>：Top3 之外仍满足至少两条独立策略共振的候选，供扩展观察。<br>· <b>🔍 个股查询</b>：输入任意股票代码/名称，查看其是否命中各策略层及基本面画像。</div>
         <div class="logic-h">评分逻辑</div>
@@ -1371,11 +1371,9 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><th>序</th><th>算法</th><th>一句话定义</th><th>可信度</th></tr>
           <tr><td>2</td><td>🥇 三重共识</td><td>主站TOP10精选 + 驾驶舱A档 + 基本面A档（3 重过滤）</td><td><b style="color:#fbbf24">⭐⭐⭐⭐⭐</b> 最严</td></tr>
           <tr><td>3</td><td>🔥 四量终极</td><td>游资点火+机构托底+当天金叉+四路翻多（4 重共振 + 3 年回测）</td><td><b style="color:#fbbf24">⭐⭐⭐⭐</b></td></tr>
-          <tr><td>4</td><td>🎯 驾驶舱</td><td>A/B/C/D 成熟分级筛选</td><td><b style="color:#fbbf24">⭐⭐⭐⭐</b></td></tr>
-          <tr><td>5</td><td>🌐 全站精选</td><td>主板+创业+科创前100 + 港股前50 + 观澜（多信号融合）</td><td><b style="color:#fbbf24">⭐⭐⭐</b></td></tr>
+          <tr><td>4</td><td>🧬 选股生命周期</td><td>逐日累积快照跟踪（入池→持仓→走弱→剔除），与选股策略子页一致口径</td><td><b style="color:#fbbf24">⭐⭐⭐</b></td></tr>
+          <tr><td>5</td><td>📈 相对强度</td><td>个股 RPS 百分位(50/120/250日) + 曼斯菲尔德 RS + 250日年线门禁（排名/筛选层）</td><td><b style="color:#fbbf24">⭐⭐⭐</b></td></tr>
           <tr><td>6</td><td>📊 逆势龙头</td><td>CRDS（弱市专用）</td><td><span style="font-size:10px;color:#94a3b8;font-weight:500;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用</span></td></tr>
-          <tr><td>7</td><td>🐂 大牛股猎手</td><td>龙虎榜机游共振（机构+游资净买）+ 板块资金流 + 核心共振（中线）</td><td><b style="color:#fbbf24">⭐⭐⭐⭐</b></td></tr>
-          <tr><td>8</td><td>📈 相对强度</td><td>个股 RPS 百分位(50/120/250日) + 曼斯菲尔德 RS + 250日年线门禁（排名/筛选层）</td><td><b style="color:#fbbf24">⭐⭐⭐</b></td></tr>
         </table>
 
         <div class="logic-h">排序逻辑</div>
@@ -1401,9 +1399,10 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">本矩阵按主站实际卡片顺序，明确每张卡片的时间/任务/执行机/前端位置，防止后续 CI 或回滚覆盖后再出现卡片位置/刷新标签错误。</div>
         <table class="lg-table">
           <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
-          <tr><td>15:30 收盘后</td><td>观测候选股池</td><td>cn runner v8_algo_cloud</td><td>选股策略·选股池</td></tr>
-          <tr><td>15:30 收盘后</td><td>三重共识 / 相对强度 / CRDS</td><td>cn runner v8_algo_cloud</td><td>选股策略各子 tab</td></tr>
-          <tr><td>15:30 收盘后</td><td>回测胜率 N 日</td><td>cn runner backtest_tdx</td><td>选股策略·回测区</td></tr>
+          <tr><td>16:40 A批采集</td><td>龙虎榜/行情/板块RS/指数历史/港股</td><td>云端 v8_algo_cloud (--stage A)</td><td>选股策略·选股池/板块资金流</td></tr>
+          <tr><td>18:10 B批选股</td><td>三重共识/相对强度/CRDS/四量终极/选股生命周期</td><td>云端 v8_algo_cloud (--stage B)</td><td>选股策略各子 tab</td></tr>
+          <tr><td>19:15 C批回测</td><td>backtest_tdx/comprehensive/cockpit/hunter/crds/allsite/rps</td><td>云端 v8_algo_cloud (--stage C)</td><td>策略回顾·回测区</td></tr>
+          <tr><td>20:00 D批汇总</td><td>final_recommend + LHB历史/7d/生命周期</td><td>云端 v8_algo_cloud (--stage D)</td><td>今日推荐候选池·Top3</td></tr>
         </table>
       </div>
 
@@ -1502,41 +1501,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
 
       
 <div class="card">
-        <h3><span class="ic">🎯</span>驾驶舱 - 说明</h3>
-        <div class="logic-h">定位</div>
-        <div class="logic-p">出手信号灯→宏观环境→最强赛道TOP5→共振候选→机构/龙虎榜验证→三重选股。用于确认市场环境和技术面背景。A/B/C/D 多档分级，可按风险偏好选 → 可信度 ⭐⭐⭐⭐。</div>
-        <div class="logic-h">分级规则</div>
-        <div class="logic-p">· <b class="up">A档</b>：技术+质量+信号俱佳（最多 10 只），进入三重共识候选<br>· <b style="color:var(--gold)">B档</b>：扩大观察范围（最多 15 只）<br>· <b style="color:var(--dim)">C/D档</b>：低质量/弱信号，不展示</div>
-        <div class="logic-h">B档准入条件</div>
-        <div class="logic-p">必须满足「机构变红」或「三重信号共振」二者之一；仅「缠论买」一个信号不足以进入B档。</div>
-        <div class="logic-h">排序口径</div>
-        <div class="logic-p">A/B 档均按 total_score 降序 → quality_score → ema → signal_count → rsi 升序（RSI 过高靠后，防追高）。</div>
-        <div class="logic-h">龙虎榜席位口径</div>
-        <div class="logic-p">龙虎榜明细按净买额排序，优先分析资金最活跃的前 N 只。「机构」「游资」「量化」「北向」「未识别」五类席位分账统计；其中「未识别」席位<b>不并入游资</b>，避免把无名营业部误判为游资共振。</div>
-      </div>
-
-      
-<div class="card">
-        <h3><span class="ic">🌐</span>全站精选 - 说明</h3>
-        <div class="logic-h">定位</div>
-        <div class="logic-p">技术面形态+基本面质量分筛选后的观察池（A/B档）。A档进入三重共识候选，B档扩大观察范围。综合池机会多但单信号强度弱 → 可信度 ⭐⭐⭐。</div>
-        <div class="logic-h">股池构成</div>
-        <div class="logic-p">主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50 + 外资研投(自选+研报) + mahoro研报 → 多信号融合。</div>
-        <div class="logic-h">B档准入条件</div>
-        <div class="logic-p">必须满足「机构变红」或「三重信号共振」二者之一；仅「缠论买」一个信号不足以进入B档。</div>
-        <div class="logic-h">基本面质量分</div>
-        <div class="logic-p">A=+40 / B=+5 / C=0 / D=-10。A档阈值已对齐真实上限 70 分。</div>
-        <div class="logic-h">名字清洗（防研报/新闻稿污染名）</div>
-        <div class="logic-p">候选池名字优先东财权威名 &gt; 通达信名字 &gt; raw 干净名 &gt; 代码兜底；容忍港股 -W/-S/-R 双重上市后缀。</div>
-        <div class="logic-h">🔔 60m 共振标签</div>
-        <div class="logic-p">候选池每只票的来源标签旁，若命中 <code>FOUR_VOLUME_60M</code> 多周期共振，会显示 🔔 60m 紫色标签，与主站/驾驶舱/四量等来源标签并列，便于一眼识别「多周期共振」标的。</div>
-        <div class="logic-h">来源级监控（2026-08-08 新增）</div>
-        <div class="logic-p">候选股池是下游金股池/评分/CRDS/四量终极等全部算法的<b>唯一输入宇宙</b>，其健康度直接影响全站结论可靠性。监控分两层：<br>· <b>night_watchdog.py --health</b>：每次巡检读取 candidate.json，拆分六大来源数量。成交额TOP三板任一&lt;80只→WARNING、=0→CRITICAL；港股/外资研投=0降级为WARNING（云端可能天然缺失）。同时检测垃圾名污染。<br>· <b>运维面板数据新鲜度</b>：CANDIDATE 行下方展示六来源彩色标签（✓绿/⚠黄/✗红），一目了然哪个来源异常。HEALTH_CHECK.js 整体条目仅反映 update_time，不拆分来源——来源级状态以上述两处为准。<br>        · <b>正常基线</b>：主板≈97-100 / 创业板=100 / 科创板=100；港股0-50（依赖akshare可用性）；外资研投0-N（依赖外部JSON更新）。三板合计≥280视为健康。</div>
-      </div>
-
-      
-<div class="card">
-        <h3><span class="ic">🐂</span>大牛股猎手 - 说明</h3>
+        <h3><span class="ic">🐂</span>大牛股猎手 - 说明 <span style="font-size:10px;color:#f59e0b;background:rgba(245,158,11,.12);padding:1px 6px;border-radius:4px">🗑️ 已下架（2026-09-02 迁至「已下架」一级 nav）</span></h3>
         <div class="logic-h">定位</div>
         <div class="logic-p">基于<b>龙虎榜上榜个股</b>（机构 + 游资净买卖）的「机游共振」中线策略，核心区分「一日游」与「真启动」。2026-08-08 从「共振日历」迁入「选股策略」独立 tab（原标题残留的「大牛股猎手」字样已清除，功能卡仅保留此处）。</div>
         <div class="logic-h">三栏结构</div>
@@ -1701,7 +1666,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>15:30 / 17:20</td><td>v8_cn_fetch_cloud</td><td>盘后</td><td>EXPERIMENT、期指主力合约、大盘资金流累积序列、ETF日监控再补抓(T+1收盘定稿)、龙虎榜历史回填</td></tr>
           <tr><td>16:30</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓</td><td>港股16:00收盘后补抓恒指/港股候选/盘中模块收盘值（A股已收盘，不重复抓A股）</td></tr>
           <tr><td>盘中每30分</td><td>v8_risk_gauge</td><td>危机雷达</td><td>危机雷达/风险温度计实时刷新（美股开盘情绪覆盖 19:00-22:00 北京时间）</td></tr>
-          <tr><td>19:15 / 20:00（主+冗余）</td><td>v8_algo_cloud</td><td>盘后算法（云端主链）</td><td>龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测/板块资金流趋势/停牌预警/市场预警/NT数据（已迁 GitHub 云端 ubuntu，20:30/20:50 兜底）</td></tr>
+          <tr><td>16:40 / 18:10 / 19:15 / 20:00（A/B/C/D 四批）</td><td>v8_algo_cloud</td><td>盘后算法（云端主链·分批跑）</td><td>A采集/B选股/C回测/D汇总(final_recommend)；龙虎榜/三重共识/逆势龙头/top10/回测/板块资金流趋势/停牌预警/市场预警/NT数据（已迁 GitHub 云端 ubuntu）</td></tr>
           <tr><td>23:00</td><td>v8_backup</td><td>每日备份</td><td>备份 raw_data/*.json 防意外丢失（push 至 main）</td></tr>
           <tr><td>09:00 / 17:00</td><td>v8_algo</td><td>体检</td><td>46 模块新鲜度体检（云端）</td></tr>
           <tr><td>非交易时段每2h</td><td>runner_health_alert</td><td>健康监控</td><td>lemoncat-cn runner 离线 → 开 Issue 告警（云端，工作日13-21点/周末0-20点）</td></tr>
@@ -1730,7 +1695,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>工作日13/15/17/19/21点 · 周末0-20点每2h</td><td>runner_health_alert</td><td>Runner 健康监控（离线开 Issue；workflow 当前 active，无需手动 unpause）</td><td>云端</td></tr>
           <tr><td>09:00</td><td>v8_algo</td><td>盘前预检（46模块新鲜度体检）</td><td>云端</td></tr>
           <tr><td>17:00</td><td>v8_algo</td><td>收盘后总检（46模块新鲜度体检）</td><td>云端</td></tr>
-          <tr><td>19:15 / 20:00</td><td>v8_algo_cloud</td><td>盘后算法链（龙虎榜/三重共识/驾驶舱/逆势龙头/top10/回测）</td><td>GitHub 云端 ubuntu（主链；20:30/20:50 兜底）</td></tr>
+          <tr><td>16:40 / 18:10 / 19:15 / 20:00</td><td>v8_algo_cloud</td><td>盘后算法链分批（A采集/B选股/C回测/D汇总 final_recommend；龙虎榜/三重共识/逆势龙头/top10/回测）</td><td>GitHub 云端 ubuntu（主链·四批按时触发）</td></tr>
           <tr><td>23:00</td><td>v8_backup</td><td>每日自动备份 raw_data</td><td>云端</td></tr>
           <tr style="background:rgba(56,189,248,.06);"><td colspan="4" style="text-align:center;font-size:12px;color:var(--dim);">↓ push raw_data → 自动触发 v8_build_deploy → GitHub Pages 部署</td></tr>
         </table>
@@ -5529,11 +5494,8 @@ function drawUpDownChart(){
 
           {name:'四量终极', source:'FOUR_VOLUME', freq:'收盘后1次', slots:['19:15'], note:'目标池：主板/创业板/科创板成交额前80~100 + 港股前40~50；频率：盘后日线；回测：近3年 T+1/3/5/10/20 持有收益'},
 
-          {name:'驾驶舱', source:'COCKPIT_ADVICE', freq:'收盘后1次', slots:['19:15'], note:'驾驶舱A/B档建议'},
 
-          {name:'大牛股猎手', source:'LHB_DATA', freq:'收盘后1次', slots:['19:15'], note:'机游共振中线策略（派生自龙虎榜+机构买卖）'},
 
-          {name:'全站精选', source:'TOP10_DAILY', freq:'收盘后1次', slots:['19:15'], note:'主站TOP10精选池'},
 
           {name:'相对强度', source:'STOCK_RPS_DATA', freq:'收盘后1次', slots:['19:15'], note:'个股相对强度评分'},
 
