@@ -1,0 +1,62 @@
+name: "📡 ima 强势股自动同步"
+
+on:
+  schedule:
+    # 北京时间 15:45（收盘后）= UTC 07:45；工作日执行
+    - cron: "45 7 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: v8-ima-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "📥 Checkout（fetch-depth:0 保证基于最新 main）"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "🐍 配置 Python"
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: "📦 安装 playwright + chromium"
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install playwright
+          python -m playwright install chromium
+
+      - name: "🔄 同步远端最新 main（避免 ?v 漂移竞态）"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git reset --hard origin/main
+
+      - name: "🕸️ 抓取 ima 强势股日报"
+        run: python fetch_ima_strong_stock.py
+
+      - name: "🔁 重写 index.html 的 ?v 缓存戳（与刚生成的 data 文件对齐）"
+        run: python update_v8.py --only-cache-busters
+
+      - name: "🚀 提交并推送"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git add raw_data/ima_strong_stock.json data/IMA_STRONG_STOCK.js index.html
+          if git diff --cached --quiet; then
+            echo "无变化，跳过提交"
+          else
+            git commit -m "📡 ima 强势股自动同步 $(date +%Y-%m-%d)"
+            git push origin HEAD:refs/heads/main
+          fi
