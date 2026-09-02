@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "75cb6b30f";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "ff0340b95";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -503,7 +503,7 @@ window.__domReadyFns=[];
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/POTENTIAL_PICKS.js?v=0138123eae" defer></script>
 <script src="data/INDEX_QUOTES.js?v=3e2a15dfb0" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=2222ba732e" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=3978ae9d36" defer></script>
 <script src="data/MARGIN_DATA.js?v=cb00eeb3d7" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=ce9c4fe7f7" defer></script>
 <script src="data/IPO_DATA.js?v=3dbd1fc030" defer></script>
@@ -1487,12 +1487,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=b63c783d8b" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=bf0d0da79f" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=d1e970c24b" defer></script>
-<script src="data/HEALTH_CHECK.js?v=8a3fe570cc" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=9e9bfef596" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=c9c66160ee" defer></script>
+<script src="data/RUNNER_STATUS.js?v=bbbfa36377" defer></script>
+<script src="data/HEALTH_CHECK.js?v=1d3136b0d1" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=970ef4bda4" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=fa22982110" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 MARKET_PATH_PROBABILITY 注入（AI预测卡用） -->
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=a45d3b96e6" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=42d0197118" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=ac04776279" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=258e585586" defer></script>
@@ -3986,13 +3986,20 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   //   全部读此配置；删一个策略只改这里，三处自动同步消失，绝不再漏删/错删。
   //   active = 仍在选股策略子页的活跃回测；delisted = 已移出 UI，仅在「已下架算法回测」归档区展示。
   window.__STRATEGY_BACKTESTS = [
+    // 2026-09-02 主人令：驾驶舱/全站精选的『回测卡』不能被「已删策略」注释一起抹掉——
+    // 它们是 baostock 真实滚动回测，回测价值是该模块历史胜率的依据。
+    // 这里只列 by_period 完整可绘制的 4 个模块；自定义 hold_days 渲染的 cockpit 与
+    // 「暂无历史归档」的 allsite 在下方「特殊口径」独立渲染。
     {key:'fourvolume', name:'四量终极',     stars:4, icon:'📊', desc:'四量信号历史回测',         color:'#38bdf8', var:'FOUR_VOLUME_BACKTEST'},
-    {key:'crds',       name:'逆势龙头CRDS', stars:3, icon:'🐉', desc:'CRDS advanced 档历史回测',  color:'#ef4444', var:'CRDS_BACKTEST'},
-    {key:'rps',        name:'相对强度RPS',  stars:3, icon:'📉', desc:'RPS 相对强度信号历史回测',   color:'#14b8a6', var:'RPS_BACKTEST'}
-    // 已删策略（移出选股策略子页）：驾驶舱 / 全站精选 —— 不再进主策略区 / 生命周期 / 星级表
+    {key:'crds',       name:'逆势龙头CRDS', stars:4, icon:'🐉', desc:'CRDS advanced 档历史回测',  color:'#ef4444', var:'CRDS_BACKTEST'},
+    {key:'rps',        name:'相对强度RPS',  stars:3, icon:'📉', desc:'RPS 相对强度信号历史回测',   color:'#14b8a6', var:'RPS_BACKTEST'},
+    {key:'hunter',     name:'大牛股猎手',    stars:3, icon:'🐂', desc:'龙虎榜机游核心共振历史回测（283 信号）', color:'#f59e0b', var:'HUNTER_BACKTEST'}
   ];
   window.__STRATEGY_BACKTESTS_DELISTED = [
-    {key:'hunter', name:'大牛股猎手', stars:3, icon:'🐂', desc:'龙虎榜机构+游资核心共振回测', color:'#f59e0b', var:'HUNTER_BACKTEST'}
+    // 2026-09-02 主人令：驾驶舱与全站精选『选股信号层』在选股策略子页已精简（不展示当日推荐操作卡），
+    // 但回测不该被一起删除——保留其专属回测卡（顶部速览 + 下方特殊口径区）。
+    {key:'cockpit', name:'驾驶舱',      stars:4, icon:'🚗', desc:'top10 A/B档 baostock 滚动回测·真实止盈止损', color:'#f59e0b', var:'COCKPIT_BACKTEST', special:'by_date'},
+    {key:'allsite', name:'全站精选',    stars:3, icon:'🌐', desc:'final_recommend 历史归档（自 2026-09-02 起生效）', color:'#06b6d4', var:'ALLSITE_BACKTEST', special:'no_history'}
   ];
   window.__renderBacktestCardsFrom = function(list){
     var h = '';
@@ -4667,9 +4674,99 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var html = '';
 
 
+/* 2026-09-02 23:5x 主人令：策略回顾「全模块·T+5 一览速览表」+ 驾驶舱/全站精选回测保留 */
+
+    html += '<div style="margin:0 0 14px;border-left:4px solid #a78bfa;" class="card">';
+    html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
+    html += '<span style="font-size:15px;font-weight:700;color:#a78bfa;">📋 ① 全模块 · T+5 胜率速览</span>';
+    html += '<span style="font-size:11px;color:var(--dim);">6 个模块同框对比 · 一眼选股</span>';
+    html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(167,139,250,.10);color:#a78bfa;border:1px solid rgba(167,139,250,.3);">📐 ≥55%真值钱</span>';
+    html += '</div>';
+
+    var _ovModules = [
+      {key:'fourvolume', name:'四量终极',    icon:'📊', stars:4, color:'#38bdf8', data:window.FOUR_VOLUME_BACKTEST, group:'core'},
+      {key:'hunter',     name:'大牛股猎手',   icon:'🐂', stars:3, color:'#f59e0b', data:window.HUNTER_BACKTEST,     group:'core'},
+      {key:'cockpit',    name:'驾驶舱',       icon:'🚗', stars:4, color:'#f59e0b', data:window.COCKPIT_BACKTEST,    group:'cockpit'},
+      {key:'crds',       name:'逆势龙头CRDS', icon:'🐉', stars:4, color:'#ef4444', data:window.CRDS_BACKTEST,       group:'core'},
+      {key:'rps',        name:'相对强度RPS',  icon:'📉', stars:3, color:'#14b8a6', data:window.RPS_BACKTEST,        group:'core'},
+      {key:'allsite',    name:'全站精选',     icon:'🌐', stars:3, color:'#06b6d4', data:window.ALLSITE_BACKTEST,    group:'allsite'}
+    ];
+
+    function _ovCockpitBuckets(cb){
+      var bd = cb && cb.by_date || {};
+      var buckets = {1:{win:0,loss:0,total:0},3:{win:0,loss:0,total:0},5:{win:0,loss:0,total:0},10:{win:0,loss:0,total:0},20:{win:0,loss:0,total:0}};
+      Object.keys(bd).forEach(function(d){
+        (bd[d]||[]).forEach(function(it){
+          var hd = it && it.hold_days;
+          if(!buckets[hd]) return;
+          buckets[hd].total += 1;
+          if(it.is_win) buckets[hd].win += 1;
+          else if(it.is_loss) buckets[hd].loss += 1;
+        });
+      });
+      return buckets;
+    }
+    function _ovCell(wr, samples){
+      if(wr == null || !samples) return '<td style="padding:6px;text-align:center;color:var(--dim);">—</td>';
+      var dimStyle = samples < 30 ? 'opacity:.7;' : '';
+      return '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(wr)+';'+dimStyle+'">'+ (typeof wr === 'number' ? wr.toFixed(1) : wr) +'%<div style="font-size:9.5px;font-weight:400;color:var(--dim);">n='+samples+'</div></td>';
+    }
+
+    html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+    html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+    html += '<th style="padding:6px;text-align:left;color:var(--sub);">模块</th>';
+    html += '<th style="padding:6px;text-align:center;color:var(--sub);">星级</th>';
+    html += '<th style="padding:6px;text-align:center;color:var(--sub);">T+1</th>';
+    html += '<th style="padding:6px;text-align:center;color:var(--sub);">T+3</th>';
+    html += '<th style="padding:6px;text-align:center;color:var(--sub);">T+5</th>';
+    html += '<th style="padding:6px;text-align:center;color:var(--sub);">T+10</th>';
+    html += '<th style="padding:6px;text-align:center;color:var(--sub);">T+20</th>';
+    html += '<th style="padding:6px;text-align:right;color:var(--sub);">样本/综合</th>';
+    html += '</tr></thead><tbody>';
+
+    _ovModules.forEach(function(m){
+      var d = m.data || {};
+      html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+      html += '<td style="padding:6px;color:'+m.color+';font-weight:700;"><span style="margin-right:4px;">'+m.icon+'</span>'+_esc(m.name)+'</td>';
+      html += '<td style="padding:6px;text-align:center;">'+_btStars(m.stars)+'</td>';
+      if(m.group === 'cockpit'){
+        var cbk = _ovCockpitBuckets(d);
+        [1,3,5,10,20].forEach(function(p){
+          var b = cbk[p];
+          if(!b.total){
+            html += '<td style="padding:6px;text-align:center;color:var(--dim);">—</td>';
+          } else {
+            var wr = b.win/b.total*100;
+            html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(wr)+';">'+wr.toFixed(1)+'%<div style="font-size:9.5px;font-weight:400;color:var(--dim);">n='+b.total+'</div></td>';
+          }
+        });
+        html += '<td style="padding:6px;text-align:right;color:var(--sub);">综合 '+(d.win_rate||0).toFixed(1)+'% (n='+(d.total_count||0)+')</td>';
+      } else if(m.group === 'allsite'){
+        var ts2 = (d.summary && d.summary.total_signals) || 0;
+        for(var i=0;i<5;i++) html += '<td style="padding:6px;text-align:center;color:var(--dim);">📥</td>';
+        html += '<td style="padding:6px;text-align:right;color:var(--sub);font-size:10.5px;">'+(ts2>0?('已累 '+ts2+' 信号'):'归档自 9/2')+'</td>';
+      } else {
+        var bp = d.summary && d.summary.by_period;
+        var totalSignals = (d.summary && d.summary.total_signals) || 0;
+        [1,3,5,10,20].forEach(function(p){
+          var r = bp && bp[String(p)];
+          html += _ovCell(r && r.win_rate, r && r.samples || 0);
+        });
+        if(totalSignals === 0){
+          html += '<td style="padding:6px;text-align:right;color:var(--sub);font-size:10.5px;">📥 待归档</td>';
+        } else {
+          html += '<td style="padding:6px;text-align:right;color:var(--sub);">信号 '+totalSignals+'</td>';
+        }
+      }
+      html += '</tr>';
+    });
+    html += '</tbody></table></div>';
+    html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">📐 ≥55% 红优 · ≤45% 绿差 · 中间黄 · — 数据未齐 · 样本 &lt; 30 标灰 · 驾驶舱采用 baostock 真实止盈止损滚动回测（每个信号 hold_days 切片不同）</div>';
+    html += '</div>';
+
     /* 2026-09-02 主人令：策略回顾统一收纳全部算法回测 · 主策略区（按星级降序） */
     html += '<div style="font-size:13px;font-weight:700;color:var(--txt);margin:18px 0 8px;display:flex;align-items:center;gap:8px;"><span>🎯</span>主策略回测 <span style="font-size:11px;color:var(--dim);font-weight:500;">按星级降序</span></div>';
-    // 2026-09-02 主人令：驾驶舱已移出选股策略子页（已删策略），其回测卡不再进主策略区
+    // 2026-09-02 主人令：驾驶舱/全站精选的回测卡依然可见（仅选股信号层精简；回测价值保留）
 
     /* ── ① 综合回测（多策略×多持有期）── */
     html += '<div style="margin:14px 0;border-left:4px solid #38bdf8;" class="card">';
@@ -4762,11 +4859,68 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     }
     html += '</div>';
 
-    // 2026-09-02 主人令：全站精选 / CRDS / RPS 回测卡已上移（见 __STRATEGY_BACKTESTS 配置在四量终极位置统一渲染）；驾驶舱/全站精选为已删策略不再出现
+    // 2026-09-02 主人令：驾驶舱/全站精选回测卡依然在（仅『选股信号层操作卡』被精简）。详见下方「🗂 特殊口径」独立块。
 
-    /* 2026-09-02 主人令：已下架算法回测统一放在策略回顾最下方，按星级降序 */
-    html += '<div style="font-size:13px;font-weight:700;color:var(--txt);margin:18px 0 8px;display:flex;align-items:center;gap:8px;"><span>🗑️</span>已下架算法回测 <span style="font-size:11px;color:var(--dim);font-weight:500;">按星级降序</span></div>';
-    html += window.__renderBacktestCardsFrom(window.__STRATEGY_BACKTESTS_DELISTED);
+    /* 2026-09-02 23:5x 主人令：驾驶舱 by_date 聚合 + 全站精选 待归档占位 — 它们不在 __STRATEGY_BACKTESTS 主策略区的 by_period 通式渲染中，故 inline */
+    html += '<div style="font-size:13px;font-weight:700;color:var(--txt);margin:18px 0 8px;display:flex;align-items:center;gap:8px;"><span>🗂</span>特殊口径算法回测 <span style="font-size:11px;color:var(--dim);font-weight:500;">非 by_period 通用结构 · 自定义聚合（已被速览表覆盖）</span></div>';
+
+    (function(){
+      var cb = window.COCKPIT_BACKTEST || {};
+      html += '<div style="margin:14px 0;border-left:4px solid #f59e0b;" class="card">';
+      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
+      html += '<span style="font-size:15px;font-weight:700;color:#f59e0b;">🚗 驾驶舱 · baostock 滚动回测</span>';
+      html += '<span style="font-size:11px;color:var(--dim);">top10 A/B档 · 真实止盈止损（统一口径 stop/rr/target）</span>';
+      html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.3);">⭐⭐⭐⭐</span>';
+      html += '</div>';
+      if(cb.total_count){
+        var cbk2 = _ovCockpitBuckets(cb);
+        html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;"><thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+        html += '<th style="padding:6px;text-align:left;color:var(--sub);">持有天数</th>';
+        html += '<th style="padding:6px;text-align:right;color:var(--sub);">样本</th>';
+        html += '<th style="padding:6px;text-align:right;color:var(--sub);">胜率</th>';
+        html += '<th style="padding:6px;text-align:right;color:var(--sub);">综合均收</th>';
+        html += '<th style="padding:6px;text-align:right;color:var(--sub);">止损出场</th>';
+        html += '<th style="padding:6px;text-align:right;color:var(--sub);">止盈出场</th>';
+        html += '</tr></thead><tbody>';
+        var es = cb.exit_stat || {};
+        [1,3,5,10,20].forEach(function(p){
+          var b = cbk2[p];
+          if(!b.total){
+            html += '<tr><td style="padding:6px;color:var(--dim);">'+p+' 天</td><td colspan="5" style="padding:6px;color:var(--dim);text-align:center;">— 暂未实跳出场</td></tr>';
+            return;
+          }
+          var wr = b.win/b.total*100;
+          html += '<tr>';
+          html += '<td style="padding:6px;color:var(--txt);font-weight:700;">'+p+' 天</td>';
+          html += '<td style="padding:6px;text-align:right;color:var(--sub);">'+b.total+'</td>';
+          html += '<td style="padding:6px;text-align:right;font-weight:700;color:'+_colorWR(wr)+';">'+wr.toFixed(1)+'%</td>';
+          html += '<td style="padding:6px;text-align:right;color:'+_colorPL(cb.avg_return)+';">'+(cb.avg_return>=0?'+':'')+(cb.avg_return||0).toFixed(2)+'%</td>';
+          html += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(es.stop||0)+'</td>';
+          html += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(es.target||0)+'</td>';
+          html += '</tr>';
+        });
+        html += '</tbody></table></div>';
+        var tw = ((cb.entry_window && cb.entry_window[0])||'—') + ' → ' + ((cb.entry_window && cb.entry_window[1])||'—');
+        html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">综合胜率 <b style="color:'+_colorWR(cb.win_rate)+';">'+(cb.win_rate||0).toFixed(1)+'%</b> · 综合平均收益 <b style="color:'+_colorPL(cb.avg_return)+';">'+(cb.avg_return>=0?'+':'')+(cb.avg_return||0).toFixed(2)+'%</b> · 总样本 '+cb.total_count+' · 总出场 止损 '+es.stop+' / 止盈 '+es.target+' / 持有至最新 '+es.hold+' · 数据区间 '+tw+'</div>';
+      } else {
+        html += '<div class="note">COCKPIT_BACKTEST 数据不可用</div>';
+      }
+      html += '</div>';
+    })();
+
+    (function(){
+      var al = window.ALLSITE_BACKTEST || {};
+      var ts = (al.summary && al.summary.total_signals) || 0;
+      html += '<div style="margin:14px 0;border-left:4px solid #06b6d4;" class="card">';
+      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
+      html += '<span style="font-size:15px;font-weight:700;color:#06b6d4;">🌐 全站精选 · final_recommend 历史回测</span>';
+      html += '<span style="font-size:11px;color:var(--dim);">⭐⭐⭐ · 历史归档自 2026-09-02 起生效</span>';
+      html += '</div>';
+      html += '<div style="padding:14px;color:var(--dim);text-align:center;font-size:12px;background:rgba(6,182,212,.05);border:1px dashed rgba(6,182,212,.25);border-radius:8px;">📥 待归档 · 累计 '+ts+' 信号</div>';
+      html += '</div>';
+    })();
+
+
 
     /* 2026-09-02 主人令：回测汇总 tab 上方汇总+下方跟踪分层；下方"如何跟踪"说明（用户原话） */
     html += '<div style="margin:18px 0 8px;padding:0;border:1.5px solid rgba(56,189,248,.35);border-radius:10px;background:rgba(56,189,248,.04);">';
@@ -13243,7 +13397,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=8a3fe570cc')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=1d3136b0d1')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
