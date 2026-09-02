@@ -1,9 +1,9 @@
 window.HUNTER_BACKTEST = {
-  "update_time": "2026-09-02 09:32:55",
+  "update_time": "2026-09-02 17:18:51",
   "summary": {
-    "update_time": "2026-09-02 09:32:55",
+    "update_time": "2026-09-02 17:18:51",
     "total_signals": 283,
-    "calc_time": "2026-09-02T09:32:55.623307",
+    "calc_time": "2026-09-02T17:18:51.753245",
     "method": "大牛股猎手机游共振核心信号：机构净买>0 且 游资净买>0 且 (机构+游资)>=8000万；信号日收盘价买入，持有N个交易日收盘价卖出",
     "signal_date_range": "2026-06-10 ~ 2026-09-01",
     "by_period": {
@@ -18,39 +18,39 @@ window.HUNTER_BACKTEST = {
         "profit_loss_ratio": 1.17
       },
       "3": {
-        "samples": 273,
+        "samples": 275,
         "win_rate": 45.8,
         "avg_return": 0.19,
         "best_return": 43.91,
         "worst_return": -35.55,
-        "win_avg": 10.67,
-        "loss_avg": -8.65,
+        "win_avg": 10.62,
+        "loss_avg": -8.63,
         "profit_loss_ratio": 1.23
       },
       "5": {
-        "samples": 265,
-        "win_rate": 45.7,
-        "avg_return": -1.31,
+        "samples": 266,
+        "win_rate": 45.9,
+        "avg_return": -1.29,
         "best_return": 49.53,
         "worst_return": -38.19,
-        "win_avg": 11.0,
+        "win_avg": 10.95,
         "loss_avg": -11.66,
         "profit_loss_ratio": 0.94
       },
       "10": {
-        "samples": 249,
-        "win_rate": 37.3,
-        "avg_return": -5.58,
+        "samples": 250,
+        "win_rate": 37.2,
+        "avg_return": -5.59,
         "best_return": 49.01,
         "worst_return": -50.56,
         "win_avg": 12.82,
-        "loss_avg": -16.55,
-        "profit_loss_ratio": 0.77
+        "loss_avg": -16.49,
+        "profit_loss_ratio": 0.78
       },
       "20": {
         "samples": 212,
         "win_rate": 18.9,
-        "avg_return": -17.23,
+        "avg_return": -17.22,
         "best_return": 68.02,
         "worst_return": -57.02,
         "win_avg": 12.23,
@@ -970,7 +970,7 @@ window.HUNTER_BACKTEST = {
       "results": {
         "1": {
           "valid": true,
-          "return_pct": 9.94,
+          "return_pct": 9.93,
           "exit_date": "2026-06-12",
           "entry_price": 29.49,
           "exit_price": 32.42,
@@ -978,7 +978,7 @@ window.HUNTER_BACKTEST = {
         },
         "3": {
           "valid": true,
-          "return_pct": 15.26,
+          "return_pct": 15.25,
           "exit_date": "2026-06-16",
           "entry_price": 29.49,
           "exit_price": 33.99,
@@ -994,7 +994,7 @@ window.HUNTER_BACKTEST = {
         },
         "10": {
           "valid": true,
-          "return_pct": 17.33,
+          "return_pct": 17.32,
           "exit_date": "2026-06-26",
           "entry_price": 29.49,
           "exit_price": 34.6,
@@ -1002,7 +1002,7 @@ window.HUNTER_BACKTEST = {
         },
         "20": {
           "valid": true,
-          "return_pct": -24.11,
+          "return_pct": -24.1,
           "exit_date": "2026-07-10",
           "entry_price": 29.49,
           "exit_price": 22.38,
@@ -12927,12 +12927,12 @@ window.HUNTER_BACKTEST = {
           "note": "ok"
         },
         "10": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": -6.79,
+          "exit_date": "2026-08-31",
+          "entry_price": 69.26,
+          "exit_price": 64.56,
+          "note": "ok"
         },
         "20": {
           "valid": false,
@@ -13990,12 +13990,12 @@ window.HUNTER_BACKTEST = {
           "note": "ok"
         },
         "5": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": 4.24,
+          "exit_date": "2026-09-01",
+          "entry_price": 64.6,
+          "exit_price": 67.34,
+          "note": "ok"
         },
         "10": {
           "valid": false,
@@ -14288,12 +14288,12 @@ window.HUNTER_BACKTEST = {
           "note": "ok"
         },
         "3": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": 5.04,
+          "exit_date": "2026-09-01",
+          "entry_price": 69.41,
+          "exit_price": 72.91,
+          "note": "ok"
         },
         "5": {
           "valid": false,
@@ -14441,12 +14441,12 @@ window.HUNTER_BACKTEST = {
           "note": "ok"
         },
         "3": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": -5.41,
+          "exit_date": "2026-09-01",
+          "entry_price": 186.24,
+          "exit_price": 176.16,
+          "note": "ok"
         },
         "5": {
           "valid": false,

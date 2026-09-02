@@ -1,10 +1,10 @@
 window.ALLSITE_BACKTEST = {
- "update_time": "2026-09-02 14:44:37",
+ "update_time": "2026-09-02 17:18:58",
  "summary": {
-  "update_time": "2026-09-02 14:44:37",
+  "update_time": "2026-09-02 17:18:58",
   "total_signals": 0,
-  "calc_time": "2026-09-02 14:44:37",
-  "method": "全站精选历史回测占位（当前 final_recommend 当日信号 2 只，但无历史归档；待建立 final_recommend_YYYYMMDD.json 历史序列后升级为真实回测）",
+  "calc_time": "2026-09-02 17:18:58",
+  "method": "全站精选历史回测 · 无历史 final_recommend 信号（每日归档自 2026-09-02 起生效，待累积 dated 快照）",
   "signal_date_range": "—",
   "by_period": {
    "1": {

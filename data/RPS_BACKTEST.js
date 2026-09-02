@@ -1,10 +1,10 @@
 window.RPS_BACKTEST = {
- "update_time": "2026-09-02 14:44:37",
+ "update_time": "2026-09-02 17:19:03",
  "summary": {
-  "update_time": "2026-09-02 14:44:37",
+  "update_time": "2026-09-02 17:19:03",
   "total_signals": 0,
-  "calc_time": "2026-09-02 14:44:37",
-  "method": "RPS 相对强度历史回测占位（当前 valid=325，A档=45；待建立 stock_rps_YYYYMMDD.json 历史序列后升级为真实回测）",
+  "calc_time": "2026-09-02 17:19:03",
+  "method": "RPS 相对强度历史回测 · 无历史 stock_rps A档信号（每日归档自 2026-09-02 起生效，待累积 dated 快照）",
   "signal_date_range": "—",
   "by_period": {
    "1": {

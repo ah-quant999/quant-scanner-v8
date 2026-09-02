@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-09-02 10:22:31",
-  "run_start": "2026-09-02 09:05:34",
-  "ok": 24,
-  "fail": 3,
+  "update_time": "2026-09-02 17:19:08",
+  "run_start": "2026-09-02 16:05:56",
+  "ok": 29,
+  "fail": 2,
   "failed_scripts": [
     {
       "script": "scripts/ab_universe_backtest.py",
@@ -10,11 +10,7 @@
     },
     {
       "script": "refresh_dividend_cninfo.py",
-      "reason": "退出码 1 | KeyError: 'plan_date'"
-    },
-    {
-      "script": "refresh_stock_metadata.py",
-      "reason": "超时 >30min"
+      "reason": "监督器静默杀(>15min 无输出)"
     }
   ],
   "skipped_by_time_gate": [

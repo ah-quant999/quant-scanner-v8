@@ -1,14 +1,16 @@
 {
+  "update_time": "2026-09-02 17:18:51",
   "summary": {
-    "total_signals": 281,
-    "calc_time": "2026-09-01T07:20:22.501931",
+    "update_time": "2026-09-02 17:18:51",
+    "total_signals": 283,
+    "calc_time": "2026-09-02T17:18:51.753245",
     "method": "大牛股猎手机游共振核心信号：机构净买>0 且 游资净买>0 且 (机构+游资)>=8000万；信号日收盘价买入，持有N个交易日收盘价卖出",
-    "signal_date_range": "2026-06-10 ~ 2026-08-31",
+    "signal_date_range": "2026-06-10 ~ 2026-09-01",
     "by_period": {
       "1": {
-        "samples": 277,
-        "win_rate": 58.1,
-        "avg_return": 1.32,
+        "samples": 279,
+        "win_rate": 58.4,
+        "avg_return": 1.35,
         "best_return": 20.01,
         "worst_return": -18.13,
         "win_avg": 5.89,
@@ -16,44 +18,44 @@
         "profit_loss_ratio": 1.17
       },
       "3": {
-        "samples": 267,
-        "win_rate": 46.4,
-        "avg_return": 0.2,
+        "samples": 275,
+        "win_rate": 45.8,
+        "avg_return": 0.19,
         "best_return": 43.91,
         "worst_return": -35.55,
-        "win_avg": 10.6,
-        "loss_avg": -8.82,
-        "profit_loss_ratio": 1.2
+        "win_avg": 10.62,
+        "loss_avg": -8.63,
+        "profit_loss_ratio": 1.23
       },
       "5": {
-        "samples": 262,
-        "win_rate": 45.0,
-        "avg_return": -1.38,
+        "samples": 266,
+        "win_rate": 45.9,
+        "avg_return": -1.29,
         "best_return": 49.53,
         "worst_return": -38.19,
-        "win_avg": 11.15,
+        "win_avg": 10.95,
         "loss_avg": -11.66,
-        "profit_loss_ratio": 0.96
+        "profit_loss_ratio": 0.94
       },
       "10": {
-        "samples": 249,
-        "win_rate": 36.9,
-        "avg_return": -5.69,
+        "samples": 250,
+        "win_rate": 37.2,
+        "avg_return": -5.59,
         "best_return": 49.01,
         "worst_return": -50.56,
-        "win_avg": 12.72,
+        "win_avg": 12.82,
         "loss_avg": -16.49,
-        "profit_loss_ratio": 0.77
+        "profit_loss_ratio": 0.78
       },
       "20": {
-        "samples": 203,
-        "win_rate": 18.2,
-        "avg_return": -17.89,
+        "samples": 212,
+        "win_rate": 18.9,
+        "avg_return": -17.22,
         "best_return": 68.02,
         "worst_return": -57.02,
-        "win_avg": 12.94,
-        "loss_avg": -24.76,
-        "profit_loss_ratio": 0.52
+        "win_avg": 12.23,
+        "loss_avg": -24.07,
+        "profit_loss_ratio": 0.51
       }
     },
     "by_date": {
@@ -333,6 +335,11 @@
         "avg_T+1": -5.57
       },
       "2026-08-31": {
+        "count": 2,
+        "valid_T+1": 2,
+        "avg_T+1": 6.42
+      },
+      "2026-09-01": {
         "count": 2,
         "valid_T+1": 0,
         "avg_T+1": null
@@ -10837,12 +10844,12 @@
           "note": "ok"
         },
         "20": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": -4.53,
+          "exit_date": "2026-09-01",
+          "entry_price": 54.33,
+          "exit_price": 51.87,
+          "note": "ok"
         }
       }
     },
@@ -10888,12 +10895,12 @@
           "note": "ok"
         },
         "20": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": -19.46,
+          "exit_date": "2026-09-01",
+          "entry_price": 208.01,
+          "exit_price": 167.53,
+          "note": "ok"
         }
       }
     },
@@ -10939,12 +10946,12 @@
           "note": "ok"
         },
         "20": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": 4.87,
+          "exit_date": "2026-09-01",
+          "entry_price": 172.32,
+          "exit_price": 180.72,
+          "note": "ok"
         }
       }
     },
@@ -10990,12 +10997,12 @@
           "note": "ok"
         },
         "20": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": -4.32,
+          "exit_date": "2026-09-01",
+          "entry_price": 11.1,
+          "exit_price": 10.62,
+          "note": "ok"
         }
       }
     },
@@ -11041,12 +11048,12 @@
           "note": "ok"
         },
         "20": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": 0.57,
+          "exit_date": "2026-09-01",
+          "entry_price": 3.48,
+          "exit_price": 3.5,
+          "note": "ok"
         }
       }
     },
@@ -11092,12 +11099,12 @@
           "note": "ok"
         },
         "20": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": 4.94,
+          "exit_date": "2026-09-01",
+          "entry_price": 28.75,
+          "exit_price": 30.17,
+          "note": "ok"
         }
       }
     },
@@ -11143,12 +11150,12 @@
           "note": "ok"
         },
         "20": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": -0.21,
+          "exit_date": "2026-09-01",
+          "entry_price": 33.64,
+          "exit_price": 33.57,
+          "note": "ok"
         }
       }
     },
@@ -11194,12 +11201,12 @@
           "note": "ok"
         },
         "20": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": -0.78,
+          "exit_date": "2026-09-01",
+          "entry_price": 176.65,
+          "exit_price": 175.28,
+          "note": "ok"
         }
       }
     },
@@ -11245,12 +11252,12 @@
           "note": "ok"
         },
         "20": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": -1.84,
+          "exit_date": "2026-09-01",
+          "entry_price": 32.15,
+          "exit_price": 31.56,
+          "note": "ok"
         }
       }
     },
@@ -13175,12 +13182,12 @@
           "note": "ok"
         },
         "10": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": 21.19,
+          "exit_date": "2026-09-01",
+          "entry_price": 6.23,
+          "exit_price": 7.55,
+          "note": "ok"
         },
         "20": {
           "valid": false,
@@ -13830,12 +13837,12 @@
           "note": "ok"
         },
         "5": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": 0.36,
+          "exit_date": "2026-09-01",
+          "entry_price": 36.27,
+          "exit_price": 36.4,
+          "note": "ok"
         },
         "10": {
           "valid": false,
@@ -13881,12 +13888,12 @@
           "note": "ok"
         },
         "5": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": 5.98,
+          "exit_date": "2026-09-01",
+          "entry_price": 11.21,
+          "exit_price": 11.88,
+          "note": "ok"
         },
         "10": {
           "valid": false,
@@ -13932,12 +13939,12 @@
           "note": "ok"
         },
         "5": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": 9.41,
+          "exit_date": "2026-09-01",
+          "entry_price": 60.23,
+          "exit_price": 65.9,
+          "note": "ok"
         },
         "10": {
           "valid": false,
@@ -13983,12 +13990,12 @@
           "note": "ok"
         },
         "5": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": 4.24,
+          "exit_date": "2026-09-01",
+          "entry_price": 64.6,
+          "exit_price": 67.34,
+          "note": "ok"
         },
         "10": {
           "valid": false,
@@ -14077,12 +14084,12 @@
           "note": "ok"
         },
         "3": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": -5.21,
+          "exit_date": "2026-09-01",
+          "entry_price": 57.55,
+          "exit_price": 54.55,
+          "note": "ok"
         },
         "5": {
           "valid": false,
@@ -14128,12 +14135,12 @@
           "note": "ok"
         },
         "3": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": 19.19,
+          "exit_date": "2026-09-01",
+          "entry_price": 33.35,
+          "exit_price": 39.75,
+          "note": "ok"
         },
         "5": {
           "valid": false,
@@ -14179,12 +14186,12 @@
           "note": "ok"
         },
         "3": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": -1.58,
+          "exit_date": "2026-09-01",
+          "entry_price": 4.42,
+          "exit_price": 4.35,
+          "note": "ok"
         },
         "5": {
           "valid": false,
@@ -14230,12 +14237,12 @@
           "note": "ok"
         },
         "3": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": -2.66,
+          "exit_date": "2026-09-01",
+          "entry_price": 54.23,
+          "exit_price": 52.79,
+          "note": "ok"
         },
         "5": {
           "valid": false,
@@ -14281,12 +14288,12 @@
           "note": "ok"
         },
         "3": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": 5.04,
+          "exit_date": "2026-09-01",
+          "entry_price": 69.41,
+          "exit_price": 72.91,
+          "note": "ok"
         },
         "5": {
           "valid": false,
@@ -14332,12 +14339,12 @@
           "note": "ok"
         },
         "3": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": -3.35,
+          "exit_date": "2026-09-01",
+          "entry_price": 66.5,
+          "exit_price": 64.27,
+          "note": "ok"
         },
         "5": {
           "valid": false,
@@ -14383,12 +14390,12 @@
           "note": "ok"
         },
         "3": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": -6.45,
+          "exit_date": "2026-09-01",
+          "entry_price": 469.2,
+          "exit_price": 438.95,
+          "note": "ok"
         },
         "5": {
           "valid": false,
@@ -14434,12 +14441,12 @@
           "note": "ok"
         },
         "3": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": -5.41,
+          "exit_date": "2026-09-01",
+          "entry_price": 186.24,
+          "exit_price": 176.16,
+          "note": "ok"
         },
         "5": {
           "valid": false,
@@ -14579,12 +14586,12 @@
       "reason": "日涨幅偏离值达到7%的前5只证券",
       "results": {
         "1": {
-          "valid": false,
-          "return_pct": null,
-          "exit_date": null,
-          "entry_price": null,
-          "exit_price": null,
-          "note": "持有期超出K线范围"
+          "valid": true,
+          "return_pct": 4.01,
+          "exit_date": "2026-09-01",
+          "entry_price": 12.98,
+          "exit_price": 13.5,
+          "note": "ok"
         },
         "3": {
           "valid": false,
@@ -14628,6 +14635,108 @@
       "yz_net_wan": 7100.4,
       "total_net_wan": 10234.8,
       "reason": "日涨幅达到15%的前5只证券",
+      "results": {
+        "1": {
+          "valid": true,
+          "return_pct": 8.82,
+          "exit_date": "2026-09-01",
+          "entry_price": 26.63,
+          "exit_price": 28.98,
+          "note": "ok"
+        },
+        "3": {
+          "valid": false,
+          "return_pct": null,
+          "exit_date": null,
+          "entry_price": null,
+          "exit_price": null,
+          "note": "持有期超出K线范围"
+        },
+        "5": {
+          "valid": false,
+          "return_pct": null,
+          "exit_date": null,
+          "entry_price": null,
+          "exit_price": null,
+          "note": "持有期超出K线范围"
+        },
+        "10": {
+          "valid": false,
+          "return_pct": null,
+          "exit_date": null,
+          "entry_price": null,
+          "exit_price": null,
+          "note": "持有期超出K线范围"
+        },
+        "20": {
+          "valid": false,
+          "return_pct": null,
+          "exit_date": null,
+          "entry_price": null,
+          "exit_price": null,
+          "note": "持有期超出K线范围"
+        }
+      }
+    },
+    {
+      "signal_date": "2026-09-01",
+      "code": "300927",
+      "name": "江天化学",
+      "inst_net_wan": 5157.1,
+      "yz_net_wan": 12794.2,
+      "total_net_wan": 17951.3,
+      "reason": "日涨幅达到15%的前5只证券",
+      "results": {
+        "1": {
+          "valid": false,
+          "return_pct": null,
+          "exit_date": null,
+          "entry_price": null,
+          "exit_price": null,
+          "note": "持有期超出K线范围"
+        },
+        "3": {
+          "valid": false,
+          "return_pct": null,
+          "exit_date": null,
+          "entry_price": null,
+          "exit_price": null,
+          "note": "持有期超出K线范围"
+        },
+        "5": {
+          "valid": false,
+          "return_pct": null,
+          "exit_date": null,
+          "entry_price": null,
+          "exit_price": null,
+          "note": "持有期超出K线范围"
+        },
+        "10": {
+          "valid": false,
+          "return_pct": null,
+          "exit_date": null,
+          "entry_price": null,
+          "exit_price": null,
+          "note": "持有期超出K线范围"
+        },
+        "20": {
+          "valid": false,
+          "return_pct": null,
+          "exit_date": null,
+          "entry_price": null,
+          "exit_price": null,
+          "note": "持有期超出K线范围"
+        }
+      }
+    },
+    {
+      "signal_date": "2026-09-01",
+      "code": "301697",
+      "name": "贝特利",
+      "inst_net_wan": 6904.6,
+      "yz_net_wan": 5199.4,
+      "total_net_wan": 12104.0,
+      "reason": "无价格涨跌幅限制的证券",
       "results": {
         "1": {
           "valid": false,
