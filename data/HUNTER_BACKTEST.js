@@ -1,9 +1,9 @@
 window.HUNTER_BACKTEST = {
-  "update_time": "2026-09-03 00:58:16",
+  "update_time": "2026-09-03 02:30:47",
   "summary": {
-    "update_time": "2026-09-03 00:58:16",
+    "update_time": "2026-09-03 02:30:47",
     "total_signals": 285,
-    "calc_time": "2026-09-03T00:58:16.357810",
+    "calc_time": "2026-09-03T02:30:47.262057",
     "method": "大牛股猎手机游共振核心信号：机构净买>0 且 游资净买>0 且 (机构+游资)>=8000万；信号日收盘价买入，持有N个交易日收盘价卖出",
     "signal_date_range": "2026-06-10 ~ 2026-09-02",
     "by_period": {
@@ -50,7 +50,7 @@ window.HUNTER_BACKTEST = {
       "20": {
         "samples": 214,
         "win_rate": 19.6,
-        "avg_return": -16.82,
+        "avg_return": -16.81,
         "best_return": 68.02,
         "worst_return": -57.02,
         "win_avg": 12.91,
@@ -975,7 +975,7 @@ window.HUNTER_BACKTEST = {
       "results": {
         "1": {
           "valid": true,
-          "return_pct": 9.94,
+          "return_pct": 9.93,
           "exit_date": "2026-06-12",
           "entry_price": 29.49,
           "exit_price": 32.42,
@@ -983,7 +983,7 @@ window.HUNTER_BACKTEST = {
         },
         "3": {
           "valid": true,
-          "return_pct": 15.26,
+          "return_pct": 15.25,
           "exit_date": "2026-06-16",
           "entry_price": 29.49,
           "exit_price": 33.99,
@@ -999,7 +999,7 @@ window.HUNTER_BACKTEST = {
         },
         "10": {
           "valid": true,
-          "return_pct": 17.33,
+          "return_pct": 17.32,
           "exit_date": "2026-06-26",
           "entry_price": 29.49,
           "exit_price": 34.6,
@@ -1007,7 +1007,7 @@ window.HUNTER_BACKTEST = {
         },
         "20": {
           "valid": true,
-          "return_pct": -24.11,
+          "return_pct": -24.1,
           "exit_date": "2026-07-10",
           "entry_price": 29.49,
           "exit_price": 22.38,
