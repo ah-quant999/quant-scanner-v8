@@ -339,15 +339,35 @@ def main():
         # -------------------------------------------------------------------
         payload = {"content": base64.b64encode(content).decode(), "encoding": "base64"}
         b = None
-        for attempt in range(3):
+        # 🔴 2026-09-02 根治令（涨停热力连续多轮静默丢数据事故）：
+        #    实测 09-02 盘中多轮 raw_data/limit_up_heatmap.json（仅 3.4KB，非大文件）
+        #    连续 3 次 HTTP 500 后「跳过 → 保留远程旧版本」，而 workflow 依旧报 success（假绿），
+        #    导致前端涨停热力卡在 08:45 盘前值、连续数小时无人知晓。三处加固：
+        #      1) 重试 3 → 8 次，退避封顶 30s（1/2/4/8/16/30/30，总约 91s），
+        #         足以跨过 GitHub 服务端 5xx 抖动窗口（实测抖动通常 <60s）；
+        #      2) 仅对「可重试错误」重试：5xx / 429 / 网络类异常。
+        #         4xx（400/403/404/422）属客户端错误，重试无意义 → 快速失败，不拖慢整轮；
+        #      3) 仍失败时打 ::error:: 注解（见下方 failed_paths 汇总），
+        #         Actions UI 直接标红，不再伪装成 success。
+        BLOB_MAX_TRY = 8
+        for attempt in range(BLOB_MAX_TRY):
             b = api("POST", f"/repos/{REPO}/git/blobs", payload)
             if "__error__" not in b:
                 break
-            wait = 2 ** attempt
-            print(f"  ↻ blob 重试 {attempt + 1}/3（{path}，{wait}s 后）")
-            _t.sleep(wait)
+            code = b.get("__error__")
+            retryable = (code == "network"
+                         or (isinstance(code, int) and (code >= 500 or code == 429)))
+            if not retryable:
+                print(f"  ❌ 不可重试错误（HTTP {code}），放弃该文件: {path}")
+                break
+            if attempt < BLOB_MAX_TRY - 1:
+                wait = min(2 ** attempt, 30)
+                print(f"  ↻ blob 重试 {attempt + 1}/{BLOB_MAX_TRY - 1}"
+                      f"（{path}，HTTP {code}，{wait}s 后）")
+                _t.sleep(wait)
         if b is None or "__error__" in b:
-            print(f"  ⚠️ 跳过（3 次均失败）: {path}")
+            code = (b or {}).get("__error__")
+            print(f"  ⚠️ 跳过（{BLOB_MAX_TRY} 次均失败，HTTP {code}）: {path}")
             failed_paths.append(path)
             continue
         new_entries[path] = b["sha"]
@@ -387,6 +407,25 @@ def main():
             print(f"  🛡️ 防倒退跳过 {p}: 本地({lts}) < 远端({rts})")
     if failed_paths:
         print(f"⚠️ 共 {len(failed_paths)} 个文件上传失败，将保留远程旧版本: {failed_paths}")
+        # 🔴 2026-09-02 根治令：原逻辑只 print 一行 ⚠️，workflow 依旧报 success（假绿），
+        #    数据静默丢失无人知晓（涨停热力连续多轮卡 08:45 未被发现，主人自己看出来的）。
+        #    现同时写入 ::error:: 注解 + $GITHUB_STEP_SUMMARY，
+        #    使失败在 Actions 步骤详情标红、在 Job Summary 顶部以表格呈现，一眼可见。
+        for _p in failed_paths:
+            print(f"::error title=数据未上线::{_p} 本轮上传失败，线上保留旧版本（update_time 不刷新）")
+        try:
+            import os as _os
+            _sf = _os.environ.get("GITHUB_STEP_SUMMARY")
+            if _sf:
+                with open(_sf, "a", encoding="utf-8") as _fh:
+                    _fh.write("\n## ⚠️ 本轮有数据文件未上线\n\n")
+                    _fh.write("| 文件 | 状态 |\n| --- | --- |\n")
+                    for _p in failed_paths:
+                        _fh.write(f"| `{_p}` | ❌ 上传失败，线上保留旧版本 |\n")
+                    _fh.write("\n> 这些文件的 `update_time` **不会刷新**，前端将持续显示陈旧数据。"
+                              "下轮 fetch 会重试；若连续多轮失败请排查 GitHub API 状态。\n")
+        except Exception:
+            pass
     if not new_entries:
         if failed_paths:
             # 🔴 2026-08-18 主人根治令：全部 blob 上传失败 ≠ 错误。保留远程旧版本
