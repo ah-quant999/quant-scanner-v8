@@ -1609,6 +1609,26 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       window.__jdHeaderHealStarted = true;
       setTimeout(window.__selfHealJudgmentHeader, 800);
     }
+    // 🛡 2026-09-02 一劳永逸：body 同样加永久自愈轮询。
+    //   根因：JUDGMENT_DATA 是 defer 脚本，init 末尾一次性调用 __renderJudgmentBody 时若数据/函数未就绪，
+    //   会永久停留在"环境态势数据加载中"占位。每 1s 检查，数据就绪后自动补渲染并停止空白。
+    window.__selfHealJudgmentBody = function(){
+      var _self = arguments.callee;
+      var body = document.getElementById('judgmentBodyOp');
+      var jdReady = !!(window.JUDGMENT_DATA && window.JUDGMENT_DATA.update_time);
+      var fnReady = typeof window._buildJudgmentEnvHTML==='function' && typeof window.__renderJudgmentBody==='function';
+      // 按「是否已渲染真实内容」判定，而不是匹配占位文案，避免占位文案改一次就要改一次判定
+      var hasRendered = !!(body && body.innerHTML && body.innerHTML.indexOf('今日信号')>=0);
+      if(jdReady && fnReady && !hasRendered){
+        try{ window.__renderJudgmentBody(); }catch(e){ console.warn('[jdBodyHeal] render failed', e); }
+      }
+      // 已渲染后也保持轻量轮询，防止其他逻辑再次清空 body（1s/次，开销可忽略）
+      setTimeout(_self, 1000);
+    };
+    if(typeof window !== 'undefined' && !window.__jdBodyHealStarted){
+      window.__jdBodyHealStarted = true;
+      setTimeout(window.__selfHealJudgmentBody, 900);
+    }
     </script>
 
 
