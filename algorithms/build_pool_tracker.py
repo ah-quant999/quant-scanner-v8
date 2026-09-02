@@ -4,7 +4,9 @@
 build_pool_tracker.py — v8 选股生命周期跟踪（阶段 1）+ 二维精选（K 批·板块流入×情绪周期）
 
 输入：
-  raw_data/algo_track.json — v8 三大算法（四量终极 / 板块龙头 / 大牛股猎手）的真实跟踪池
+  raw_data/algo_track.json — v8 算法（四量终极）的真实跟踪池
+    2026-09-03 主人令：已下线算法「板块龙头 / 大牛股猎手」全方位下线，其 tracking 数据在 main() 里直接过滤丢弃，
+        既不留作共识源也不进 by_algo / items。前端文案与数据源统一为「v8 三大 algo = 四量终极」。
   raw_data/sentiment_cycle.json — 情绪周期
   raw_data/sector_fund_flow.json — 板块资金流
   raw_data/stock_profile.json — 股票→行业/概念映射
@@ -131,7 +133,9 @@ def dedupe_by_code(algos):
 
 def _signal_type(it, reason, algos_hit):
     """阶段 2：推导信号类型（短线买点/反弹/加速/强势/回调/板块联动/强势突破/多算法共识）。
-    优先多算法共识（≥2 个 algo 命中）；否则按 algo + signal_detail.reason 关键词兜底。"""
+    优先多算法共识（≥2 个 algo 命中）；否则按 algo + signal_detail.reason 关键词兜底。
+    2026-09-03 主人令：板块联动 / 强势突破 两条旧分支保持死代码（不删），因为 main() 已过滤掉 sector_lead/big_bull，
+        兜底分支永远跑不到（仅留 audit 痕迹），随时可复活。"""
     if len(set(algos_hit)) >= 2:
         return "多算法共识"
     r = reason or ""
@@ -146,6 +150,7 @@ def _signal_type(it, reason, algos_hit):
     algo = it.get("_algo", "")
     if algo == "四量终极":
         return "短线买点"
+    # ↓ 以下两条分支为 2026-09-03 主人令死代码（sector_lead/big_bull 已全方位下线，不进入 merged）：
     if algo == "板块龙头":
         return "板块联动"
     if algo == "大牛股猎手":
@@ -333,8 +338,17 @@ def main():
             "note": "algo_track.json 缺失或解析失败",
         }
     else:
-        raw_pool_size = sum(len(a.get("tracking", [])) for a in data.get("algos", []))
-        merged = dedupe_by_code(data.get("algos", []))
+        # 2026-09-03 主人令：已全方位下线的「板块龙头 / 大牛股猎手」algo 在此处过滤丢弃，
+        # 既不进 dedupe_by_code 的合并池，也不进 by_algo / items。
+        _RETIRED_ALGOS = {"板块龙头", "大牛股猎手", "sector_lead", "big_bull"}
+        raw_algos = data.get("algos", []) or []
+        retained_algos = [a for a in raw_algos if (a.get("algo") not in _RETIRED_ALGOS
+                                                   and a.get("display_name") not in _RETIRED_ALGOS)]
+        dropped = len(raw_algos) - len(retained_algos)
+        if dropped:
+            log(f"🧹 已下线 algo 过滤：丢弃 {dropped} 个（板块龙头/大牛股猎手等）→ 保留 {len(retained_algos)} algo")
+        raw_pool_size = sum(len(a.get("tracking", [])) for a in retained_algos)
+        merged = dedupe_by_code(retained_algos)
         items = build_items(merged, sentiment, sector_flow, profile_map)
         status_counts, by_algo, selected_count = aggregate(items)
         consensus_count = sum(1 for it in items if it.get("consensus_count", 0) >= 2)
@@ -373,9 +387,10 @@ def main():
             } if sector_flow else None,
             "select_threshold": SELECT_THRESHOLD,
             "note": (
-                f"基于 v8 三大算法跟踪池 {raw_pool_size} 只去重 → {len(items)} 只；"
+                f"基于 v8 算法跟踪池 {raw_pool_size} 只去重 → {len(items)} 只；"
                 f"K 批二维精选（板块流入 × 情绪周期 {((sentiment or {}).get('phase')) or '未知'}）→ 进精选 {selected_count} 只；"
-                "阈值源自专家 track_daily.py analyze()（强势/回调6-12%/见顶/走弱）"
+                "阈值源自专家 track_daily.py analyze()（强势/回调6-12%/见顶/走弱）；"
+                "2026-09-03 已下线「板块龙头 / 大牛股猎手」已过滤"
             ),
         }
         log(f"✅ 入池 {len(items)} 只（去重前 {raw_pool_size}）；精选 {selected_count} 只；多算法共识 {consensus_count} 只；状态分布 {dict(status_counts)}")

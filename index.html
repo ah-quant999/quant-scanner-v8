@@ -3759,7 +3759,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     }
     try{
     var CR = window.CRISIS_DATA || {};
-    var CD = window.COCKPIT_ADVICE || {};
+    var CD = {};  /* 2026-09-03 主人令：window.COCKPIT_ADVICE 已全方位下线，留 {} 占位以防下方 var CD.XXX 报 ReferenceError */
     var CAND = window.CANDIDATE || {};
     var SR = window.SECTOR_RS || {};
     var VOL = window.VOLATILITY || {};
@@ -5630,9 +5630,9 @@ function switchSec(sec,el){
                   || [];
     const goldList = (window.GOLD_POOL && (window.GOLD_POOL.stocks || window.GOLD_POOL.candidates))
                   || [];
-    // COCKPIT 优先用 tier_a/tier_b（array 数组）合并
-    const cock = window.COCKPIT_TIER_RECOMMEND||{};
-    const cockList = [].concat(cock.tier_a||[], cock.tier_b||[]);
+    // COCKPIT 优先用 tier_a/tier_b（array 数组）合并 —— 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND 已全方位下线
+    const cock = {};  /* cockpit 已下线，留 {} 占位以防 cockList 报 TypeError */
+    const cockList = [];  /* 已下线 algorithm，列表永远为空 */
     // CRDS 用 cond1_list/cond2_list/cond3_list/cond4_list（按实际 schema）
     const crds = window.CRDS_CARD_DATA||{};
     const crdsList = [].concat(crds.cond1_list||[], crds.cond2_list||[], crds.cond3_list||[], crds.cond4_list||[]);
@@ -5691,7 +5691,7 @@ function switchSec(sec,el){
     try {
       var fr = window.FINAL_RECOMMEND_DATA || {};
       var sff = (window.SECTOR_FUND_FLOW || {});
-      var cock = window.COCKPIT_TIER_RECOMMEND || {};
+      var cock = {};  /* 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND 已全方位下线，留 {} 占位 */
 
       // --- 收集主线板块 ---
       var sectors = [];
@@ -5729,14 +5729,7 @@ function switchSec(sec,el){
           /* 2026-09-03 主人令：驾驶舱 tier_a/tier_b 候选池入口已全方位下线，删除 */
         }
       }
-      // cockpit_advice watch 补充
-      var ca=(window.COCKPIT_ADVICE||{}).watch||[];
-      for(var w=0;w<ca.length;w++){
-        var cw=ca[w]; if(!cw) continue; var cwc=cw.code||'?';
-        var dup2=false;
-        for(var k=0;k<stocks.length;k++){if(stocks[k].code===cwc){dup2=true;break;}}
-        /* 2026-09-03 主人令：驾驶舱回测 → cockpit 已全方位下线，本入口同步删除 */
-      }
+      // cockpit_advice watch 补充 —— 2026-09-03 主人令：COCKPIT_ADVICE 已全方位下线，整段删除（原本是为去重，但已无数据源可读）
 
       if(sectors.length===0 && stocks.length===0) return '';
 
@@ -5918,15 +5911,10 @@ function switchSec(sec,el){
     const cstocks = cd.stocks || {};
     const ckey = Object.keys(cstocks).find(k=>normCode(cstocks[k].code)===nc);
     if(ckey) hits.push({name:'🎯 候选池', color:'var(--cyan)', detail:(cstocks[ckey].sources||[]).join(' / ')});
-    // 驾驶舱
-    const cp = window.COCKPIT_TIER_RECOMMEND || {};
-    const cpa = (cp.tier_a||[]).find(r=>normCode(r.code)===nc);
-    const cpb = (cp.tier_b||[]).find(r=>normCode(r.code)===nc);
-    /* 2026-09-03 主人令：驾驶舱 A/B 档 hit 入口已全方位下线，删除。
-    原代码：
-      if(cpa) hits.push({name:'🚀 驾驶舱 A档', color:'#ffd54f', detail:'评分 '+cpa.total_score+' · '+ (cpa.comment||'-')});
-      else if(cpb) hits.push({name:'🚁 驾驶舱 B档', color:'var(--gold)', detail:'评分 '+cpb.total_score+' · '+(cpb.comment||'-')});
-    */
+    // 驾驶舱 —— 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND 已全方位下线，整段删除（cp/cpa/cpb 占位变量连同 if(cpa)/else if(cpb) 命中 push 一起不再保留）
+    const cp = {};       /* 已下线，留 {} 占位以防后续读 cp.XXX 抛错 */
+    const cpa = null;    /* cockpit.tier_a 已下线，永远为 null */
+    const cpb = null;    /* cockpit.tier_b 已下线，永远为 null */
     // 逆势龙头
     const crds = window.CRDS_CARD_DATA || {};
     let crdsCond='';
