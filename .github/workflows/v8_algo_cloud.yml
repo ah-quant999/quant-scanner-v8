@@ -89,7 +89,10 @@ jobs:
     #   耗时显著更长（今晚 20:26 那轮 step 7 单步已跑 90+ 分钟）。
     #   120 分钟会在收尾推送前被强杀 → 整轮 90 分钟计算成果全丢、最终推荐依旧缺失。
     #   放宽到 200 分钟，留足「计算 + 桥接 + 候选池行情 + 推送」全链余量。
-    timeout-minutes: 200
+    # 🔴 2026-09-02 主人令「必须每天晚上出数据！放宽限制」：原 200min 在 final_recommend
+    #   （run_algorithms 末步）前被强杀 -> FINAL_RECOMMEND 滞留盘前版。GitHub Actions 单 job
+    #   硬上限 360min，直接顶满 360，并配套把下方 run_algorithms 步级抬到 320 接住 final_recommend。
+    timeout-minutes: 360
     env:
       # 🔴 2026-08-06 00:10 必须保留：云端 runner 默认 UTC，脚本里凡是用朴素 datetime.now()
       #   写的 update_time 会比北京时间慢 8 小时（run#31021842600 实测：lhb_data/candidate/
@@ -328,7 +331,11 @@ jobs:
         #   闸门** 全部 skipped，整轮算法白跑（这正是「推送步拖死 job」的同构问题，
         #   见批次 H 对 7 个 workflow 的统一修法）。
         #   job 级共 200 分钟，抬到 150 后仍给后续 5 步留足 50 分钟余量，不会挤占。
-        timeout-minutes: 150
+        # 🔴 2026-09-02 主人令「放宽限制」：原 150min 步级墙在 final_recommend 前掐断
+        #   （run_algorithms 内部 final_recommend 是末步，subprocess timeout 1800s；实测前面选股
+        #   脚本占 90-120min 后余量不足 -> final_recommend 被强杀）。抬到 320min，前面 120min
+        #   + final 30min 仍富余；job 级已同步顶满 360min 接住本步 + 后续 bridge/推送/?v/闸门。
+        timeout-minutes: 320
         run: |
           set +e
           python algorithms/run_algorithms.py
