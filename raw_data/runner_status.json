@@ -1,1 +1,1 @@
-{"run_time":"2026-09-02 21:41:52","category":"post_close","hostname":"","modules":{"MARKET_FUND_FLOW_DATA":{"status":"ok","msg":"成功"},"ETF_DAILY_MONITOR":{"status":"ok","msg":"成功"},"EXPERIMENT":{"status":"ok","msg":"成功"}},"summary":{"total":3,"ok":3,"empty":0,"fail":0}}
+{"run_time":"2026-09-03 00:49:51","category":"post_close","hostname":"","modules":{"MARKET_FUND_FLOW_DATA":{"status":"ok","msg":"成功"},"ETF_DAILY_MONITOR":{"status":"ok","msg":"成功"},"EXPERIMENT":{"status":"ok","msg":"成功"}},"summary":{"total":3,"ok":3,"empty":0,"fail":0}}
