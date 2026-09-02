@@ -9690,6 +9690,20 @@ window.showRestrictedItems = showRestrictedItems;
   document.querySelectorAll('.tab[data-sec="st"]').forEach(t=>t.addEventListener('click', function(){
     if(typeof isAdmin==='function' && isAdmin()) setTimeout(initTriple, 60);
   }));
+  // 🛡 2026-09-02 主人令：选股策略页整体自愈轮询，根治切换 tab 后数据未就绪导致的空卡。
+  //   场景：data/STOCK_RPS.js / TRIPLE_CONSENSUS.js 等为 defer 脚本，initTriple 首调时可能尚未注入，
+  //   导致三重共识/持仓跟踪等卡停留在初始空状态。此处每 800ms 检查一次关键数据源，就绪即补渲染。
+  (function(){
+    var _n=0;
+    window.__stSelfHealTimer = setInterval(function(){
+      _n++;
+      if(window.TRIPLE_CONSENSUS && window.TRIPLE_TRACK){
+        clearInterval(window.__stSelfHealTimer); window.__stSelfHealTimer=null;
+        try{ initTriple(); }catch(e){ console.warn('[stSelfHeal] initTriple', e); }
+      }
+      if(_n > 60){ clearInterval(window.__stSelfHealTimer); window.__stSelfHealTimer=null; }
+    }, 800);
+  })();
   // 2026-08-06 23:44 修复：胶囊激活 init 不放在这里 — renderFourVolume/renderV8Crds
   // 在后续 <script> 块里定义（7799 之后），此处还看不到它们。
   // 真正的 init 见末尾最后一个 <script> 块 (iife initCardBadges)，
