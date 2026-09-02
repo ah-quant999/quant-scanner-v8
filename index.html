@@ -2341,7 +2341,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="card" style="border-left:4px solid #f9a8d4;">
         <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🧭</span>观测候选股池 <span id="stPoolTime">—</span> <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span> <span id="stPoolSlot" style="font-size:11px;color:var(--sub);font-weight:400">上游水源 · 盘后</span></h3>
         <div id="stPoolSourceDist" class="tp-stocklist"></div>
-        <div id="stPoolStockList" class="tp-stocklist" style="display:none;"></div>
+        <!-- 2026-09-02 主人令：外资研投默认直接展开，其余来源收起在下方弹窗式展开 -->
+        <div id="stPoolGlList" class="tp-stocklist"></div>
+        <div id="stPoolOtherToggle" style="display:none;margin:6px 0 4px;">
+          <button id="stPoolOtherBtn" onclick="window.toggleStPoolOther()" style="background:transparent;color:var(--cyan);border:1px solid var(--cyan);border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;">▾ 展开其他来源（主板/创业板/科创板/港股）</button>
+        </div>
+        <div id="stPoolOtherList" class="tp-stocklist" style="display:none;"></div>
         <div class="note">筛选：主板成交前100 + 创业板成交前100 + 科创板成交前100 + 港股成交前50 + 外资研投(自选+研报)。三板合计≥280视为健康。</div>
       </div>
     </div><!--/st-pool-->
@@ -9667,12 +9672,11 @@ window.showRestrictedItems = showRestrictedItems;
       var _isPre = _nowParts && (_nowParts.hh < 9 || (_nowParts.hh === 9 && _nowParts.mm < 30));
       slotEl.textContent = _isPre ? '上游水源 · 盘前' : '上游水源 · 盘后';
     }
-    // 来源级分布（紧凑行，始终可见；尾部带展开/折叠按钮）
+    // 来源级分布（紧凑行，始终可见）
     const sdEl = $('stPoolSourceDist');
     if(sdEl){
       const order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投'];
       const expect = {'主板成交前100':100,'创业板成交前100':100,'科创板成交前100':100,'港股成交前50':50};
-      const isExpanded = sdEl.dataset.expanded === '1';
       let html = '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:4px 0 10px;font-size:12px;">';
       order.forEach(function(s){
         const cnt = sd[s]||0;
@@ -9688,53 +9692,75 @@ window.showRestrictedItems = showRestrictedItems;
         html += '<span title="'+s+'：'+cnt+'只'+(exp?'(期望≥'+exp+')':'')+tip+'" style="background:'+color+'15;color:'+color+';border:1px solid '+color+'30;border-radius:4px;padding:2px 7px;white-space:nowrap">'+icon+' '+label+' '+cnt+'</span>';
       });
       html += '<span style="color:var(--dim);margin-left:auto;align-self:center;margin-right:8px;">共 <b style="color:var(--txt)">'+total+'</b> 只</span>';
-      html += '<button id="stPoolToggleBtn" onclick="window.toggleStPoolDetail()" style="background:var(--cyan);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;">'+(isExpanded?'▴ 收起明细':'▾ 展开明细')+'</button>';
       html += '</div>';
       sdEl.innerHTML = html;
     }
-    // 个股明细（默认隐藏，点击展开）—— 按来源分组展示
-    const listEl = $('stPoolStockList');
-    if(listEl){
-      const keys = Object.keys(stocks);
-      if(keys.length === 0){
-        listEl.innerHTML = '<div class="note" style="text-align:center;">候选股池数据暂不可用</div>';
-      } else {
-        const order = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投'];
+    // 2026-09-02 主人令：外资研投直接展开；其余来源收起，点击下方按钮弹窗式展开
+    const glEl = $('stPoolGlList');
+    const otherEl = $('stPoolOtherList');
+    const otherToggle = $('stPoolOtherToggle');
+    const keys = Object.keys(stocks);
+    if(keys.length === 0){
+      if(glEl) glEl.innerHTML = '<div class="note" style="text-align:center;">候选股池数据暂不可用</div>';
+      if(otherEl) otherEl.innerHTML = '';
+      if(otherToggle) otherToggle.style.display = 'none';
+    } else {
+      // 渲染单来源股票网格的通用函数
+      const renderSrcGrid = function(src, stockArr){
+        if(!stockArr || !stockArr.length) return '';
+        let h = '<div style="margin-bottom:12px;">';
+        h += '<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--cyan);"></span>'+src.replace(/成交前\d+|研报/,'')+' <span style="color:var(--dim);font-weight:500;">'+stockArr.length+'只</span></div>';
+        h += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;">';
+        stockArr.slice(0, 100).forEach(function(s){
+          const name = s.name || s.code || '';
+          const board = s.board_label || s.board || '';
+          const boardColor = (s.up_pct||0) >= 0 ? 'var(--up)' : 'var(--down)';
+          h += '<div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;">';
+          h += '<div style="font-weight:700;color:var(--txt);">'+name+' <span style="color:var(--dim);font-size:10px;font-family:monospace;">'+(s.code||'')+'</span></div>';
+          if(board) h += '<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:rgba(99,102,241,.15);color:#a5b4fc;margin-right:4px;">'+board+'</span>';
+          h += '<span style="color:'+boardColor+';font-weight:700;">'+(s.up_pct>=0?'+':'')+(s.up_pct||0)+'%</span>';
+          h += '</div>';
+        });
+        h += '</div></div>';
+        return h;
+      };
+      const allBySrc = {};
+      ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50','外资研投'].forEach(function(src){
+        allBySrc[src] = Object.values(stocks).filter(function(s){ return s && s.sources && s.sources.indexOf(src) >= 0; });
+      });
+      // 外资研投：直接展开
+      if(glEl){
+        const glStocks = allBySrc['外资研投'] || [];
+        if(glStocks.length){
+          glEl.innerHTML = renderSrcGrid('外资研投', glStocks);
+        } else {
+          glEl.innerHTML = '<div class="note" style="text-align:center;padding:10px;">外资研投暂无数据</div>';
+        }
+      }
+      // 其他来源：收起，提供弹窗式展开按钮
+      const otherOrder = ['主板成交前100','创业板成交前100','科创板成交前100','港股成交前50'];
+      const otherStocksTotal = otherOrder.reduce(function(acc, src){ return acc + (allBySrc[src]||[]).length; }, 0);
+      if(otherEl){
         let html = '<div style="margin-top:8px;">';
-        order.forEach(function(src){
-          const srcStocks = Object.values(stocks).filter(function(s){ return s && s.sources && s.sources.indexOf(src) >= 0; });
-          if(!srcStocks.length) return;
-          html += '<div style="margin-bottom:12px;">';
-          html += '<div style="font-size:12px;font-weight:700;color:var(--sub);margin-bottom:6px;display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--cyan);"></span>'+src.replace(/成交前\d+|研报/,'')+' <span style="color:var(--dim);font-weight:500;">'+srcStocks.length+'只</span></div>';
-          html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;">';
-          srcStocks.slice(0, 100).forEach(function(s){
-            const name = s.name || s.code || '';
-            const board = s.board_label || s.board || '';
-            const boardColor = (s.up_pct||0) >= 0 ? 'var(--up)' : 'var(--down)';
-            html += '<div style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;">';
-            html += '<div style="font-weight:700;color:var(--txt);">'+name+' <span style="color:var(--dim);font-size:10px;font-family:monospace;">'+(s.code||'')+'</span></div>';
-            if(board) html += '<span style="font-size:10px;padding:1px 5px;border-radius:3px;background:rgba(99,102,241,.15);color:#a5b4fc;margin-right:4px;">'+board+'</span>';
-            html += '<span style="color:'+boardColor+';font-weight:700;">'+(s.up_pct>=0?'+':'')+(s.up_pct||0)+'%</span>';
-            html += '</div>';
-          });
-          html += '</div>';
-          html += '</div>';
+        otherOrder.forEach(function(src){
+          html += renderSrcGrid(src, allBySrc[src] || []);
         });
         html += '</div>';
-        listEl.innerHTML = html;
+        otherEl.innerHTML = html;
+      }
+      if(otherToggle){
+        otherToggle.style.display = otherStocksTotal > 0 ? 'block' : 'none';
       }
     }
   }
   window.renderStPool = renderStPool;
-  window.toggleStPoolDetail = function(){
-    const sdEl = document.getElementById('stPoolSourceDist');
-    const listEl = document.getElementById('stPoolStockList');
-    if(!sdEl || !listEl) return;
-    const expanded = listEl.style.display !== 'none';
-    listEl.style.display = expanded ? 'none' : 'block';
-    sdEl.dataset.expanded = expanded ? '0' : '1';
-    const btn = document.getElementById('stPoolToggleBtn');
-    if(btn) btn.textContent = expanded ? '▾ 展开明细' : '▴ 收起明细';
+  window.toggleStPoolOther = function(){
+    const otherEl = document.getElementById('stPoolOtherList');
+    const btn = document.getElementById('stPoolOtherBtn');
+    if(!otherEl) return;
+    const expanded = otherEl.style.display !== 'none';
+    otherEl.style.display = expanded ? 'none' : 'block';
+    if(btn) btn.textContent = expanded ? '▾ 展开其他来源（主板/创业板/科创板/港股）' : '▴ 收起其他来源';
   };
   function initTriple(){
     const c=window.TRIPLE_CONSENSUS||null, t=window.TRIPLE_TRACK||null, h=window.TRIPLE_HISTORY||null;
