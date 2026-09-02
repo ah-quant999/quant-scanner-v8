@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-09-02 16:28:22",
+  "check_time": "2026-09-02 18:45:54",
   "last_trade_close": "2026-09-02 15:30:00",
   "is_trading_day": true,
   "core_stale": [
@@ -52,7 +52,6 @@
     "AI_MARKET_BRIEF": "intraday",
     "MARKET_FUND_FLOW_DATA": "post_close",
     "SECTOR_FUND_FLOW_TREND": "post_close",
-    "SECTOR_FUND_TRACK": "post_close",
     "GOLD_POOL": "post_close",
     "CANDIDATE": "post_close",
     "TRIPLE_CONSENSUS": "post_close",
