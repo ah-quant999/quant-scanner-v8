@@ -1497,7 +1497,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/PERFORMANCE_FORECAST.js?v=3e00228da7" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=6ddf8cc372" defer></script>
-<script src="data/HEALTH_CHECK.js?v=de35edebcc" defer></script>
+<script src="data/HEALTH_CHECK.js?v=ecaa801e41" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=e5cf2a22c9" defer></script>
     <script src="data/SENTIMENT_CYCLE.js?v=a0828c2f40" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 MARKET_PATH_PROBABILITY 注入（AI预测卡用） -->
@@ -1509,7 +1509,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=e1655f6cbb" defer></script>
     <script src="data/ALLSITE_BACKTEST.js?v=5c20fb44d8" defer></script>
-    <script src="data/CRDS_BACKTEST.js?v=283646e123" defer></script>
+    <script src="data/CRDS_BACKTEST.js?v=92bb0d80d0" defer></script>
     <script src="data/RPS_BACKTEST.js?v=8258714cbe" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -12425,7 +12425,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=de35edebcc')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=ecaa801e41')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
