@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """optimize_stop_target.py — 方案三：历史信号止损/止盈参数最优化回测
 
-目标：用全站历史信号（backtest_tdx / backtest_comprehensive / cockpit_backtest）
+目标：用全站历史信号（backtest_tdx / backtest_comprehensive / /* cockpit 已下线 2026-09-03 */_backtest）
 回测不同「止损口径 × 止盈口径」组合，自动选出对当前各策略最优的参数组合，
 并支持不同策略配置不同口径（STOP_TARGET_PROFILES）。
 
@@ -133,8 +133,8 @@ def collect_signals():
                             "board": s.get("board") or board_from_code(code),
                             "date": s.get("entry_date"), "entry": float(s["entry_price"])})
 
-    # 3) cockpit
-    p = os.path.join(RAW, "cockpit_backtest.json")
+    # 3) /* cockpit 已下线 2026-09-03 */
+    p = os.path.join(RAW, "/* cockpit 已下线 2026-09-03 */_backtest.json")
     if os.path.exists(p):
         d = json.load(open(p, encoding="utf-8"))
         for s in (d.get("results") or []):
@@ -145,7 +145,7 @@ def collect_signals():
             if not code or "港" in mkt:
                 continue
             market = "sh" if code.startswith("6") else "sz"
-            out.append({"strategy": "cockpit", "code": code, "market": market,
+            out.append({"strategy": "/* cockpit 已下线 2026-09-03 */", "code": code, "market": market,
                         "board": s.get("board") or board_from_code(code),
                         "date": s.get("entry_date"), "entry": float(s["entry_price"])})
 

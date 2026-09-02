@@ -33,9 +33,7 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     "calc_stock_rps.py": 3600,   # 全 universe 逐只取 K 线，实测 30min 偶发不够
     "calc_crds.py": 2700,        # 逆势龙头 CRDS，同样遍历较广
     "gen_stock_profile.py": 2700,
-    "v8/backtest_hunter.py": 2400,  # 大牛股猎手回测：baostock 取 281 只信号股 K 线，约 5-15min
     "v8/backtest_crds.py": 2400,    # 逆势龙头 CRDS 回测：读 crds history + baostock 取 K 线回填收益
-    "v8/backtest_allsite.py": 1800, # 全站精选回测：读 final_recommend 历史（占位，待建历史归档）
     "v8/backtest_rps.py": 1800,     # 相对强度 RPS 回测：读 stock_rps 截面（占位，RPS 为截面指标非信号引擎）
 }
 
@@ -62,8 +60,6 @@ import v8_date  # v8 统一交易日历/数据日期中枢
 #   脚本 BASE = algorithms/，故 BASE/../out = 仓库根/out（不是 algorithms/out）。
 #   原来这里写 ALGO/out 与脚本对不上 → reseed 灌到 algorithms/out 而脚本读仓库根/out → 全链找不到输入。
 OUT = os.path.join(V8_ROOT, "out")
-# 🔴 2026-08-06 修复：历史快照目录从 out/history（gitignore，云端丢）→ raw_data/history（git 跟踪 + api_push 持久化）。
-#   否则 backtest_tdx / backtest_comprehensive / cockpit_backtest_now 依赖的历史 top10/gold_pool 快照每次跑完丢失，
 #   回测永远只有当天/为空。stage_to_raw 不会处理 history 子目录，故直接落 raw_data/history 由 api_push 整体推送。
 HIST_OUT = os.path.join(V8_ROOT, "raw_data", "history")
 
@@ -116,19 +112,15 @@ ORDER = [
     "scripts/ab_universe_backtest.py",
     "backtest_tdx.py",                 # 读 gold_pool 输入
     "backtest_comprehensive.py",       # 读 raw_data/history/top10_daily_YYYYMMDD.json（必须在 generate_top10 之后）
-    "cockpit_backtest_now.py",         # 读 raw_data/history/top10_daily_YYYYMMDD.json（必须在 generate_top10 之后）
     "export_optimized_strategy.py",    # → raw_data/optimized_strategy.json（读 backtest_tdx.json 汇总优化策略效果）
     "strategy_four_volume_60m.py",     # → data/FOUR_VOLUME_60M.js（四量终极60min版，baostock独立数据源）
     "strategy_four_volume.py",         # 🛡 2026-08-19 阿狸咪根治孤儿：日线版 FOUR_VOLUME.js 一直在 ORDER 漏挂 → 四星终极卡 4 格 0。render 端已合并读 60m 兜底，这里补齐日线数据链。
     "market_path_probability.py",      # 🛡 2026-08-19 阿狸咪补对齐：路径概率预测卡 → data/INDEX_HISTORY.js + data/MARKET_PATH_PROBABILITY.js（5年上证K线+江恩+缠论+形态匹配+路径ABC）
     "market_regime.py",                # 🛡 2026-08-19 阿狸咪补对齐：宏观环境卡 → data/MACRO.js + data/MARKET_REGIME.js（国债+LPR+银行间利率+利率上行期板块推荐框架）
     "sector_recommendation.py",        # 🛡 2026-08-19 阿狸咪补对齐：板块推荐卡 → data/SECTOR_RECOMMENDATION.js（13板块按优先级+异动跟随/已涨过标）
-    "gen_cockpit_tier_recommend.py",   # 读 scan_result 输入
-    "gen_cockpit_tier_recommend.py",   # 读 scan_result 输入
-    "gen_cockpit_advice.py",           # 读 backtest_tdx
     "update_triple_resonance_history.py",  # 累积 triple_resonance_history
-    "gen_triple_consensus.py",         # 读 top10 / cockpit_tier / fundamental / gold_pool
-    "gen_triple_track.py",             # 读 triple_history / gold_pool / backtest / cockpit
+    "gen_triple_consensus.py",         # 读 top10 / fundamental / gold_pool
+    "gen_triple_track.py",             # 读 triple_history / gold_pool / backtest
     "calc_volatility_watch.py",         # → raw_data/volatility.json（v8 原生，独立无依赖）
     "gen_stock_stop.py",                # → data/STOCK_STOP_DATA.js（ATR 精确止损止盈，读候选宇宙日K）
     # ── 孤儿模块原生化（2026-08-02）：原靠 v6→v8 sync_legacy 同步，现由 v8 直接产出 ──
@@ -138,8 +130,6 @@ ORDER = [
     "fetch_orphan_nt_data.py",          # → raw_data/nt_data.json
     "fetch_orphan_sector_fund_flow.py", # → raw_data/sector_fund_flow_trend.json (+ history 累加)
     # ── 最终推荐（final_recommend.py）──
-    # 整条管线的最终汇聚点，输入 = triple_consensus + cockpit_tier + top10_daily + crds + lhb +
-    #   sector_rs + crisis_data + cockpit_backtest + triple_track + four_volume_60m + stock_profile
     #   → raw_data/final_recommend.json + data/FINAL_RECOMMEND_DATA.js（Top5 + 全量推荐池）
     # 🛡 2026-08-26 一劳永逸：原排在 ORDER 前部，可能先于部分选股脚本完成就产出推荐。
     #   现整体移至 ORDER 末尾（见下方 track_h_auto_buy.py 之后），确保所有选股策略数据跑完后再汇总。
@@ -148,8 +138,6 @@ ORDER = [
     "calc_sentiment_cycle.py",          # → data/SENTIMENT_CYCLE.js（情绪周期，读 LIMIT_UP_HEATMAP；之前无任何 workflow 调用 = 孤儿）
     "refresh_dividend_cninfo.py",       # → 更新 STOCK_QUOTE 分红字段（读 PORTFOLIO/CANDIDATE/GOLD_POOL；之前无任何 workflow 调用）
     "calc_potential_picks.py",          # 🔮 2026-08-23 恢复：潜力挖掘（板块+股票预测推荐） → data/POTENTIAL_PICKS.js（读 CONCEPT_RANKING+STOCK_PROFILE+STOCK_QUOTE）
-    # 🛡 2026-08-29 主人令：驾驶舱两盏预警灯前向有效性审计（每日记录灯态 + T+N 回填上证收益）
-    "scripts/audit_cockpit_lights.py",
     # 🛡 2026-08-18 一劳永逸式修复：以下两脚本原不在 run_algorithms 链中，导致前端卡长期陈旧
     #   - refresh_stock_metadata.py → raw_data/weekend_meta_report.json（周末复盘，月度个股资料）
     #   - fetch_weekend_run.py → raw_data/weekend_run.json（周度运行汇总）
@@ -161,23 +149,12 @@ ORDER = [
     #   这两个之前一直在算法链外，导致反推算法即使跑出结果也没人调度、没人推送、没人可见。
     "auto_run_dn_algorithm.py",
     "track_h_auto_buy.py",
-    # 🛡 2026-08-26 一劳永逸（bug7/bug8）：最终推荐必须置于【所有选股策略之后】。
-    #   上游 triple_consensus / cockpit_tier / top10_daily / crds / lhb / sector_rs / crisis_data /
-    #   cockpit_backtest / triple_track / four_volume_60m / stock_profile 等全部跑完，本步才汇总，
     #   杜绝「某选股还没跑完，推荐却已生成」的抢跑问题。
     "final_recommend.py",              # → FINAL_RECOMMEND_DATA.js（跨策略共振 Top5，管线最终产物，置于末尾）
-    # 🛡 2026-09-02 一劳永逸：大牛股猎手历史回测（v8/backtest_hunter.py）此前无调度方，
-    #   导致 data/HUNTER_BACKTEST.js 长期陈旧、被健康检查按 24h 红线误杀。现挂链尾，
-    #   依赖 lhb_history.json 已就位；失败不影响选股结果，仅自身卡片可能不刷新。
-    "v8/backtest_hunter.py",           # → data/HUNTER_BACKTEST.js（机游共振核心信号历史回测）
-    # 🛡 2026-09-02 一劳永逸：补齐三大模块回测链（此前 allsite/crds/rps 均无调度方，
     #   前端策略回顾卡长期为空/陈旧）。统一挂链尾（依赖各自历史/截面数据已就位）。
-    #   - crds：读 out/history/crds_*.json + raw_data/history/crds_*.json 真实信号 + baostock 回填 T+N 收益
-    #   - allsite：读 final_recommend 历史（当前为诚实占位，待建 final_recommend 历史归档后转真实）
     #   - rps：读 stock_rps 截面（RPS 为相对强度指标，非选股信号引擎，回测为截面有效性说明）
     #   三者失败均不影响选股结果，仅自身卡片可能不刷新。
     "v8/backtest_crds.py",            # → data/CRDS_BACKTEST.js（逆势龙头 CRDS 真实历史回测）
-    "v8/backtest_allsite.py",         # → data/ALLSITE_BACKTEST.js（全站精选回测，占位待历史归档）
     "v8/backtest_rps.py",             # → data/RPS_BACKTEST.js（相对强度 RPS 回测，截面有效性）
 ]
 
@@ -201,18 +178,13 @@ STAGES = {
         "calc_crds.py", "build_candidate_pool.py", "calc_stock_rps.py", "generate_top10.py",
         "strategy_four_volume_60m.py", "strategy_four_volume.py",
         "market_path_probability.py", "market_regime.py", "sector_recommendation.py",
-        "gen_cockpit_tier_recommend.py", "gen_cockpit_tier_recommend.py",
-        "gen_cockpit_advice.py", "update_triple_resonance_history.py",
         "gen_triple_consensus.py", "gen_triple_track.py", "calc_volatility_watch.py",
         "gen_stock_stop.py", "gen_algo_track.py", "calc_sentiment_cycle.py",
         "refresh_dividend_cninfo.py", "calc_potential_picks.py",
-        "scripts/audit_cockpit_lights.py", "refresh_stock_metadata.py", "fetch_weekend_run.py",
         "auto_run_dn_algorithm.py", "track_h_auto_buy.py",
     ],
     "C": [  # 回测批（~19:00 CST，依赖 top10/crds history）：backtest 全家
         "scripts/ab_universe_backtest.py", "backtest_tdx.py", "backtest_comprehensive.py",
-        "cockpit_backtest_now.py", "export_optimized_strategy.py",
-        "v8/backtest_hunter.py", "v8/backtest_crds.py", "v8/backtest_allsite.py", "v8/backtest_rps.py",
     ],
     "D": [  # 汇总批（~20:00 CST，依赖全部）：final_recommend + LHB历史/7d/生命周期
         "final_recommend.py",
@@ -249,8 +221,6 @@ def step_v8_self_sufficiency():
             continue
         print(f"  ▶ {script}  ({datetime.now():%H:%M:%S})")
         try:
-            # ★ 2026-08-04 修复：scanner.py 必须带 full 子命令，否则只打印用法即退出，
-            #   永远不写 gold_pool.json → 连锁导致 backtest_tdx/gen_cockpit_advice 失败。
             #   其他上游脚本不要带 full，避免 argparse 报错。
             args = [PY, path, "full"] if script == "scanner.py" else [PY, path]
             r = subprocess.run(args, cwd=ALGO, env=env,
@@ -324,8 +294,6 @@ STOCK_PICKING_SCRIPTS = {
     "generate_top10.py",             # 多维共振 TOP10 精选
     "strategy_four_volume.py",       # 四量终极 日线选股
     "strategy_four_volume_60m.py",   # 四量终极 60min 选股
-    "gen_cockpit_tier_recommend.py", # 驾驶舱分级推荐
-    "gen_cockpit_advice.py",         # 驾驶舱建议
     "update_triple_resonance_history.py",  # 三重历史累积
     "gen_triple_consensus.py",       # 三重共识选股
     "gen_triple_track.py",           # 三重跟踪
@@ -422,8 +390,6 @@ def _run_mode():
     return "blocked"
 
 
-# 🛡 2026-08-26 一劳永逸（bug7/bug8）：final_recommend 读取 raw_data/，但 4 个输入
-#   (crds_card_data / lhb_data / sector_rs / cockpit_tier_recommend) 由生成器写 out/，
 #   step_stage 原在整链跑完后才搬运 → final_recommend 一直读到上一轮的陈旧版本。
 #   本门控在 final_recommend 之前：(1) 先做一轮 stage(out→raw_data)；(2) 校验全部选股
 #   输入是否本轮回合新鲜产出（mtime≥本轮启动时间）；(3) 任一缺失/陈旧则重跑其生成器并
@@ -431,13 +397,11 @@ def _run_mode():
 #   映射： 输入文件 → (生成器脚本, 是否写 out/ 需二次 stage)
 _FINAL_RECOMMEND_INPUTS = {
     "triple_consensus.json":       ("gen_triple_consensus.py", False),
-    "cockpit_tier_recommend.json": ("gen_cockpit_tier_recommend.py", True),
     "top10_daily.json":            ("generate_top10.py", False),
     "crds_card_data.json":         ("calc_crds.py", True),
     "lhb_data.json":               ("fetch_lhb.py", True),
     "sector_rs.json":              ("fetch_sector_rs.py", True),
     "stock_profile.json":          ("gen_stock_profile.py", False),
-    "cockpit_backtest.json":       ("cockpit_backtest_now.py", False),
     "triple_track.json":           ("gen_triple_track.py", False),
     # crisis_data.json 由云端 cloud_fetch_v8.py 产出，本地链不重跑；仅做新鲜度告警（见 final_recommend 内部兜底）
 }
@@ -794,27 +758,6 @@ def step_stage():
     return stage_to_raw.main()
 
 
-def step_ensure_cockpit_sector():
-    """🔴 2026-08-25 一劳永逸：链尾保底，强制重跑驾驶舱建议 + 板块推荐并直接导出 data/X.js。
-
-    这两张卡此前落入链路后方，常因整链超时截断 / continue-on-error 静默失败而漏产，
-    且 data/X.js 依赖云端未知导出步（用陈旧 out 重导出覆盖本地推送）。现两个生成器脚本
-    已自带 data 导出逻辑，此处再保底重跑一次（幂等），确保无论如何这两张卡 data 必新鲜。
-    """
-    print("\n[2.7] 保底重跑 驾驶舱建议 + 板块推荐（确保 data/X.js 新鲜）")
-    for s in ["gen_cockpit_advice.py", "sector_recommendation.py"]:
-        path = os.path.join(ALGO, s)
-        if not os.path.exists(path):
-            print(f"  ❌ 缺失脚本: {s}")
-            continue
-        try:
-            r = subprocess.run([PY, path], cwd=ALGO, capture_output=True, text=True, timeout=600)
-            if r.returncode == 0:
-                print(f"  ✅ {s} 完成")
-            else:
-                print(f"  ⚠️ {s} 退出码 {r.returncode}")
-        except Exception as e:
-            print(f"  ❌ {s} 异常: {e}")
 
 
 def step_push():
@@ -915,7 +858,6 @@ def main():
     # 🔴 2026-08-25 一劳永逸：链尾保底，确保驾驶舱建议 + 板块推荐 data/X.js 必新鲜
     #   仅全链(无--stage)或 D 汇总批执行；A/B/C 批跳过（D 批会补）
     if stage in (None, "D"):
-        step_ensure_cockpit_sector()
         # 🔴 盘后选股策略门控：LHB 7日累计属于选股向汇总，未到 18:00 不处理当日龙虎榜数据
         if _is_post_close_picking_ready() and _is_trading_day_now():
             step_append_lhb_history()

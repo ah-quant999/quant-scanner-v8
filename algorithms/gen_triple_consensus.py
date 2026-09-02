@@ -115,8 +115,8 @@ def main():
     check_stock_picking_ready(by='gen_triple_consensus')
 
     top10 = load_json(os.path.join(DATA_DIR, "top10_daily.json"), {})
-    # 🔴 2026-08-06 改 v8 命名：stage_to_raw 把 out/cockpit_tier_recommend_alimi.json 提升为 raw_data/cockpit_tier_recommend.json
-    tier = load_json(os.path.join(DATA_DIR, "cockpit_tier_recommend.json"), {})
+    # 🔴 2026-08-06 改 v8 命名：stage_to_raw 把 out/cockpit_tier_recommend_alimi.json 提升为 raw_data//* cockpit_tier_recommend.json 已下线 2026-09-03 */
+    tier = load_json(os.path.join(DATA_DIR, "/* cockpit_tier_recommend.json 已下线 2026-09-03 */"), {})
     fundamental = load_json(os.path.join(DATA_DIR, "fundamental_quality.json"), {})
     gold_pool = load_json(os.path.join(DATA_DIR, "gold_pool.json"), {})
 

@@ -118,7 +118,7 @@ jobs:
       CLOUD_RUNNER: "true"
       # 🔴 2026-08-20 根因修复：本 workflow 就是 run_algorithms 的 runner，必须允许
       #    api_push_raw.py 推送算法产物（backtest_*/cockpit_backtest* 等），
-      #    否则策略回测/驾驶舱/LHB_7D 等卡片永远 stale。cloud_fetch 不设置。
+      #    否则策略回测/LHB_7D 等卡片永远 stale。  # 2026-09-03 驾驶舱回测卡已下线cloud_fetch 不设置。
       PUSH_ALGO_RAW: "1"
       # 2026-08-28 主人令：mahoro 数据源不再跟踪，MAHORO_COOKIE/MAHORO_ACTION/MAHORO_CODE 已移除
       # 外资研投(知识星球) token：与小九本地 data/zsxq_token.json 同值。
@@ -276,7 +276,7 @@ jobs:
       #   （run#94 08-12 15:39 真实日志，install 仅 5 秒即快速失败）
       #   → `|| true` 把 pip 失败吞掉 → 末行 import 校验 ModuleNotFoundError → 本步骤
       #   exit 1 → **整条盘后算法链 job 直接 fail，算法一行没跑** → 7 张盘后/选股卡
-      #   (市场温度计/六维共振雷达/候选池/机构买卖/三重共识/全站精选/逆势龙头)
+      #   (市场温度计/六维共振雷达/候选池/机构买卖/三重共识/逆势龙头（已去除 cockpit/allsite/hunter）)
       #   停在上午 09:08 不刷新，逆势龙头更是停在 08-11 17:09。
       #
       #   决定性佐证：同为云端的姊妹 workflow v8_cn_fetch_cloud.yml 用的是**官方 PyPI

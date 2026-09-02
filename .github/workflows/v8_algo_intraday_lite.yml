@@ -4,7 +4,7 @@
 #   已迁到 19:15 CST 盘后算法链（v8_algo_cloud.yml → v8_build_deploy.yml），
 #   避免盘中 09:28 等时间点用未完整数据提前计算。
 # 本 workflow 仅保留：
-#   ① 盘中每 2h 真跑 gen_algo_track.py（三算法追踪入池：四量终极/板块龙头/大牛股猎手）
+#   ① 盘中每 2h 真跑 gen_algo_track.py（三算法追踪入池：四量终极/RPS/CRDS）
 #   ② dispatcher 兜底：v8_dispatch_fetch.py 加 intraday_lite 子命令，时间窗 09:30-15:00 CST
 #
 # 推送：仅 workflow_dispatch 可用；内容未变（?v 已是最新）则跳过推送。
@@ -54,7 +54,7 @@ jobs:
       #   脚本入口已加 check_stock_picking_ready() 双保险，任何手动触发在 18:00 前都会直接退出。
 
       - name: "📊 三算法追踪入池（gen_algo_track）"
-        # 🔴 2026-08-19 一劳永逸补齐：盘中每 2h 重算四量终极/板块龙头/大牛股猎手追踪
+        # 🔴 2026-08-19 一劳永逸补齐：盘中每 2h 重算四量终极/RPS/CRDS追踪
         # 写入 raw_data/algo_track.json（git tracked，下一步 api_push_raw 推），保证盘中卡片不过期
         run: |
           set +e

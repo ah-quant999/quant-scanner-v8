@@ -289,7 +289,7 @@ def _load_kline_full(code):
 
 def breakout_5d_of(code, asof_date=None):
     """今日是否触发 5日突破：收盘>昨收 且 今日高价≥近5日高价最高。
-    与 backtest_tdx.py / gen_cockpit_advice.py 口径对齐（唯一 T+10 正期望信号）。"""
+    与 backtest_tdx.py 口径对齐（唯一 T+10 正期望信号）。  # 2026-09-03 gen_cockpit_advice.py 已下线"""
     recs = _load_kline_full(code)
     if len(recs) < 6:
         return False
@@ -414,7 +414,7 @@ def main():
     print("  ────────────────")
 
     # ── 2.5 加载驾驶舱回测胜率并按信号组合聚合 ──
-    backtest = load_json(os.path.join(DATA_DIR, "cockpit_backtest.json"), {})
+    backtest = {}  # 2026-09-03 主人令：cockpit_backtest.json 已下线，置空
     bt_by_signal = {}
     bt_total_wins = bt_total_losses = 0
     for date_list in backtest.get("by_date", {}).values():

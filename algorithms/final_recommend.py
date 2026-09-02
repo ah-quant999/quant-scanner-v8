@@ -4,14 +4,14 @@
 
 输入：
   - raw_data/triple_consensus.json
-  - raw_data/cockpit_tier_recommend.json
+  # cockpit_tier_recommend.json 2026-09-03 已下线
   - raw_data/top10_daily.json   (四量终极 / 主站 TOP10)
   - raw_data/crds_card_data.json (逆势龙头)
   - raw_data/lhb_data.json      (龙虎榜 → 大牛股猎手机游共振)
   - raw_data/sector_rs.json     (板块相对强度)
   - raw_data/stock_profile.json (个股行业/概念)
   - raw_data/crisis_data.json   (危机雷达，决定是否并入逆势龙头)
-  - raw_data/cockpit_backtest.json (驾驶舱历史回测，用于 Top3 回测/跟踪)
+  # cockpit_backtest.json 2026-09-03 已下线
   - raw_data/triple_track.json     (三重跟踪告警，用于 Top3 跟踪)
 
 输出：
@@ -232,160 +232,11 @@ def sector_score_for(stock, rel_set, abs_set, score_map):
         elif name in abs_set:
             hits.append(make_hit(name))
             score += 0.5
+    # 2026-09-03 主人令：cockpit/allsite/hunter 已全方位下线
+    # 原 final_recommend.py 中驾驶舱 tier 相关函数（输入 cockpit_tier_recommend.json + cockpit_backtest.json）整体删除
+    # 原 ~120 行代码（含 Top3 加权 + cockpit tier 过滤 + cockpit 回测判断）已转去 inactive_history（cockpit 已下线）
+    pass
 
-    def hit_alias(name):
-        hit(name)
-        alias = CONCEPT_ALIASES.get(name)
-        if alias and alias != name:
-            hit(alias)
-
-    ind = stock.get("industry") or ""
-    if ind:
-        hit_alias(ind)
-
-    for c in stock.get("concepts") or []:
-        hit_alias(c)
-
-    # 名称/行业/概念中显含贵金属/黄金/小金属/有色的，直接补分
-    name = stock.get("name", "")
-    has_metal_keyword = (
-        any(k in name for k in ("黄金", "中金", "银泰", "赤峰", "山东", "紫金", "湖南")) and "金" in name
-    )
-    for raw in [ind] + (stock.get("concepts") or []):
-        if isinstance(raw, str) and any(k in raw for k in ("黄金", "贵金属", "小金属", "有色金属")):
-            has_metal_keyword = True
-            break
-    if has_metal_keyword and not any("黄金" in h["name"] or "贵金属" in h["name"] or "小金属" in h["name"] or "有色" in h["name"] for h in hits):
-        score += 0.8
-        hits.append({"name": "贵金属/有色(关键词)", "pct_5d": 0.0, "relative_5d": 0.0, "strong": True})
-
-    return round(score, 2), hits
-
-
-def main():
-    # 🛡 2026-08-20 主人令·一劳永逸：所有选股策略必须 18:00 后才能跑。
-    # final_recommend 是跨策略共振最终产物，依赖港股/龙虎榜/北向/板块资金等全部盘后数据。
-    # 此前 16:18 本地手动跑 + 17:13 CRDS 提前出结果，均因数据未全就绪导致结果不准。
-    # 加统一选股策略守门：早于 18:00 直接 sys.exit(1)；应急可设 TIME_GATE_BYPASS=1。
-    from utils.time_gate import check_stock_picking_ready
-    check_stock_picking_ready(by='final_recommend')
-    triple = load_json("triple_consensus.json")
-    cockpit = load_json("cockpit_tier_recommend.json")
-    top10 = load_json("top10_daily.json")
-    crds = load_json("crds_card_data.json")
-    lhb = load_json("lhb_data.json")
-    sector_rs = load_json("sector_rs.json")
-    profile = load_json("stock_profile.json")
-    crisis = load_json("crisis_data.json")
-    gold_pool = load_json("gold_pool.json")
-
-    rel_set, abs_set, score_map = build_sector_maps(sector_rs)
-
-    # 读取 STOCK_STOP_DATA.js（支撑/压力/ATR）
-    stop_data = load_js("STOCK_STOP_DATA.js", "STOCK_STOP_DATA")
-    stop_stocks = stop_data.get("stocks") or {}
-
-    # ── 读取四量终极共振数据（多周期确认）──
-    # 🛡 2026-08-26 一劳永逸：优先 60min 版(FOUR_VOLUME_60M)；但其 update_time 非今日
-    #   （baostock 60min 源常滞后，曾陈旧到 8/22）→ 回退读日线版 FOUR_VOLUME.js（新鲜），
-    #   避免最终推荐用几天前的陈旧四量汇总（"逻辑不对"根因）。两份 schema 兼容(stocks[])。
-    _four_vol_raw = load_js("FOUR_VOLUME_60M.js", "FOUR_VOLUME_60M")
-    _four_vol_src = "60m"
-    try:
-        _ut = _four_vol_raw.get("update_time", "")
-        _ut_date = datetime.strptime(_ut, "%Y-%m-%d %H:%M:%S").date()
-        if _ut_date < datetime.now().date():
-            _four_vol_raw = load_js("FOUR_VOLUME.js", "FOUR_VOLUME")
-            _four_vol_src = "day(60m陈旧回退)"
-            print(f"[warn] 60m 四量 update_time={_ut} 非今日，回退读日线四量终极")
-    except Exception as e:
-        print(f"[warn] 四量新鲜度校验失败，沿用 60m: {e}")
-    _60m_hits = {}  # norm_code → {reason, signals[], qd, pct_chg, ...}
-    for item in (_four_vol_raw.get("hits") or _four_vol_raw.get("stocks") or []):
-        c = norm_code(item.get("code") or item.get("code"))
-        if c:
-            _60m_hits[c] = item
-    print(f"[info] 四量数据({_four_vol_src}): 加载 {len(_60m_hits)} 只命中")
-
-    # 读取回测/跟踪数据（用于 Top3 卡片展示）
-    cb = load_json("cockpit_backtest.json")
-    cb_summary = {x.get("code"): x for x in (cb.get("stock_summary") or []) if x.get("code")}
-    cb_results = {}
-    for r in cb.get("results") or []:
-        code = r.get("code")
-        if not code:
-            continue
-        if code not in cb_results:
-            cb_results[code] = []
-        cb_results[code].append(r)
-    # 按 entry_date 取最新结果
-    for code in cb_results:
-        cb_results[code].sort(key=lambda x: x.get("entry_date", ""), reverse=True)
-
-    tt = load_json("triple_track.json")
-    tt_alerts = {}
-    for a in tt.get("alerts") or []:
-        code = a.get("code")
-        if not code:
-            continue
-        tt_alerts.setdefault(code, []).append(a)
-
-    # 综合回测策略级统计（个股无历史时作为策略置信度展示）
-    # cockpit_backtest.json 顶层字段即整体统计
-    strategy_backtest = {
-        "total": cb.get("total_count"),
-        "win_rate": cb.get("win_rate"),
-        "avg_return": cb.get("avg_return"),
-        "best_return": cb.get("best_return"),
-        "worst_return": cb.get("worst_return"),
-        "valid": cb.get("total_count"),
-        "best_hold_days": 3,  # 驾驶舱回测按固定窗口
-    }
-
-    crisis_score = safe_float(crisis.get("score"), 0.0)
-    crisis_high = crisis_score >= CRISIS_HIGH_THRESHOLD
-
-    # ── 市场状态 regime 门控（回测验证提升胜率，见 backtest_tdx.json optimized_summary）──
-    # stabilize / rebound_diverge = 好状态：历史回测该阶段 ≥3 共振信号整体负期望 → 应少推/观察
-    # grind / panic               = 可开仓状态 → 正常推
-    try:
-        from regime_filter import get_current_regime, is_open_regime
-        _regime_info = get_current_regime()
-        _open_regime = bool(_regime_info and is_open_regime(_regime_info.get("regime")))
-    except Exception as e:
-        print(f"  [warn] regime 门控不可用，跳过: {e}")
-        _regime_info = None
-        _open_regime = True  # 失败时默认正常推，不破坏原有逻辑
-    _regime_name = (_regime_info or {}).get("regime")
-    _regime_date = (_regime_info or {}).get("date")
-    _effective_top_n = TOP_N if _open_regime else max(2, TOP_N // 2)
-    _action_label = "买入" if _open_regime else "观察（市场企稳/反弹，历史回测负期望）"
-    print(f"[regime] 市场状态={_regime_name}({_regime_date}) 开仓={_open_regime} 推票数 {TOP_N}→{_effective_top_n}")
-
-    profiles = (profile or {}).get("profiles") or {}
-
-    pool = defaultdict(lambda: {
-        "code": "",
-        "name": "",
-        "market": "",
-        "board": "",
-        "close": None,
-        "pct_chg": None,
-        "stop_loss": None,
-        "target_price": None,
-        "risk_reward": None,
-        "support": None,
-        "resistance": None,
-        "atr": None,
-        "sources": [],
-        "source_scores": {},
-        "industry": "",
-        "concepts": [],
-        "reasons": [],
-        "signals": [],           # 中文信号标签
-        "enter_dates": [],         # 各源记录的入选日
-        "sector_hits": [],         # 板块命中（带涨幅）
-    })
 
     def ensure(code, name, market, board):
         r = pool[norm_code(code)]
@@ -1036,7 +887,7 @@ def main():
         f.write(js)
     print(f"[ok] {js_path}")
 
-    # 🗂 历史归档（供 v8/backtest_allsite.py 真实回测）：按 update_time 日期落盘 raw_data/history
+    # 🗂 历史归档（2026-09-03 起 cockpit/allsite 全方位下线，v8/backtest_allsite.py 已删）：按 update_time 日期落盘 raw_data/history
     # 与 calc_crds.py 同源思路——只有落盘「每日 dated 快照」回测才有过去信号日可算前向收益。
     try:
         _dt = (result.get("update_time") or "")[:10].replace("-", "")
