@@ -1237,5 +1237,90 @@
     "message": "FINAL_RECOMMEND_DATA.js 更新于 2天前 21:19；超过通用红线 1440 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
    }
   ]
+ },
+ {
+  "date": "2026-09-02",
+  "time": "17:57:58",
+  "overall": "fail",
+  "summary": {
+   "ok": 113,
+   "warn": 8,
+   "fail": 6,
+   "total": 127
+  },
+  "warn_items": [
+   {
+    "id": "dom_taskScheduleBody",
+    "name": "DOM #taskScheduleBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttBackBody",
+    "name": "DOM #ttBackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttThrBody",
+    "name": "DOM #ttThrBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttSvlBody",
+    "name": "DOM #ttSvlBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttTrackBody",
+    "name": "DOM #ttTrackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsAdvBody",
+    "name": "DOM #stcrdsAdvBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsEliteBody",
+    "name": "DOM #stcrdsEliteBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_healthCheckBody",
+    "name": "DOM #healthCheckBody",
+    "message": "静态占位符(JS渲染)"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "TRIPLE_CONSENSUS",
+    "name": "三重共识",
+    "message": "更新于 昨日 04:44；超过阈值 807 分钟"
+   },
+   {
+    "id": "FOUR_VOLUME",
+    "name": "四量终极",
+    "message": "更新于 昨日 04:44；超过阈值 807 分钟"
+   },
+   {
+    "id": "TOP10_DAILY",
+    "name": "全站精选",
+    "message": "更新于 昨日 04:22；超过阈值 807 分钟"
+   },
+   {
+    "id": "STOCK_RPS",
+    "name": "相对强度",
+    "message": "更新于 昨日 05:35；超过阈值 807 分钟"
+   },
+   {
+    "id": "CRDS_CARD_DATA",
+    "name": "逆势龙头",
+    "message": "更新于 昨日 04:17；超过阈值 807 分钟"
+   },
+   {
+    "id": "dom_phMacroBody",
+    "name": "DOM #phMacroBody",
+    "message": "未找到元素"
+   }
+  ]
  }
 ]
