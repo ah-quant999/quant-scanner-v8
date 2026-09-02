@@ -4218,11 +4218,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '<span style="font-size:15px;font-weight:700;color:var(--txt);">v8 选股生命周期</span>';
       html += '<span style="font-size:11px;color:var(--dim);">三 algo 跟踪池去重 → 专家阈值判状态（强势/买点/见顶/走弱）· 二维精选（板块流入×情绪周期）</span>';
       html += '</div>';
-      // 2026-09-02 主人令：头部状态条被覆盖，加回「更新于 / 今日盘中预览 / 已入仓」
+      // 2026-09-02 主人令：头部状态条被覆盖，严格还原「更新于 / 已跑已推仓」（不自由发挥，不多加 pill）
       html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
       html += _uBadge(_isPre?'盘前':'盘后','短线',_upd);
-      html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);white-space:nowrap;">👁 今日盘中预览</span>';
-      html += _holdBadge(_upd, pt.selected_size||0, '已入仓');
+      html += _holdBadge(_upd, pt.selected_size||0, '已跑已推仓');
       html += '</div>';
 
       /* ─── ① 多 algo 共识（全部展示） ─── */
