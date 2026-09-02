@@ -231,24 +231,34 @@ def build_heatmap(days_data):
             unique_dates.append(d)
             seen.add(d)
 
+    # 🛡 2026-09-02 主人令根治：剔除「整列全 0」的日期（API 拉不到的历史日，如 07/23-08/12 东方财富只保留近 30 日）
+    #   不剔的话 dates 字段会有空洞，前端矩阵前段空白难看。
+    if sectors_output:
+        n = len(unique_dates)
+        keep_idx = [i for i in range(n) if any((s["data"][i] if i < len(s["data"]) else 0) > 0 for s in sectors_output)]
+        if keep_idx and len(keep_idx) < n:
+            print(f"  🧹 剔除 {n - len(keep_idx)} 个整列全 0 日期（API 拉不到的历史），保留 {len(keep_idx)} 个有效日")
+            unique_dates = [unique_dates[i] for i in keep_idx]
+            sectors_output = [{"name": s["name"], "data": [s["data"][i] for i in keep_idx if i < len(s["data"])]} for s in sectors_output]
+
     return unique_dates, sectors_output
 
 
 def _check_dates_integrity(existing_dates):
-    """检查已有日期序列是否完整覆盖最近30个交易日，防止丢列/错列。"""
-    if not existing_dates or len(existing_dates) < 30:
-        return False, f"日期不足30列 ({len(existing_dates)})"
+    """检查已有日期序列（剔除 API 拉不到的历史后 ≤30 列也可通过）。"""
+    if not existing_dates:
+        return False, "无日期序列"
+    if len(existing_dates) > 30:
+        return False, f"日期超过30列 ({len(existing_dates)})"
     if len(existing_dates) != len(set(existing_dates)):
         return False, "存在重复日期"
     expected = get_trade_dates(30)
     expected_labels = {datetime.strptime(d, "%Y%m%d").strftime("%m/%d") for d in expected}
     actual_set = set(existing_dates)
-    missing = expected_labels - actual_set
     extra = actual_set - expected_labels
-    if missing:
-        return False, f"缺失交易日 {sorted(missing)}"
     if extra:
         return False, f"包含非最近30日日期 {sorted(extra)}"
+    # 🛡 2026-09-02 主人令根治：允许 dates < 30 列（API 拉不到的历史被剔除后变短，例如只有 15 列）
     return True, "OK"
 
 
