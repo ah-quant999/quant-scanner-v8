@@ -75,42 +75,77 @@ jobs:
           else:
               print("[watchdog] 非交易时段，跳过"); sys.exit(0)
 
-          url = "https://ah-quant999.github.io/quant-scanner-v8/data/HEALTH_CHECK.js"
-          latest = None
-          try:
-              req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-              t = urllib.request.urlopen(req, timeout=30).read().decode("utf-8")
-              m = re.search(r"window\.HEALTH_CHECK\s*=\s*(\{.*\});?\s*$", t, re.S)
-              d = json.loads(m.group(1))
-              for c in (d.get("checks") or []):
-                  lu = c.get("last_update")
-                  if lu:
-                      try:
-                          dt = datetime.datetime.strptime(lu, "%Y-%m-%d %H:%M:%S")
-                          if latest is None or dt > latest:
-                              latest = dt
-                      except Exception:
-                          pass
-          except Exception as e:
-              print(f"[watchdog] 无法读取 HEALTH({e})，保守派发 {cat}")
-              subprocess.run(["gh", "workflow", "run", "v8_cn_fetch_cloud.yml",
-                              "-f", f"category={cat}"], check=False)
-              sys.exit(0)
-
-          if latest is None:
-              print(f"[watchdog] 无 last_update，派发 {cat}")
-              subprocess.run(["gh", "workflow", "run", "v8_cn_fetch_cloud.yml",
-                              "-f", f"category={cat}"], check=False)
-              sys.exit(0)
-
-          age_min = (cst.replace(tzinfo=None) - latest).total_seconds() / 60
+          # 🔴 2026-09-02 根治（涨停热力静默陈旧近 3 小时事故）：
+          #    原逻辑只读 HEALTH_CHECK.js 单一时间戳判断"数据是否新鲜"，存在系统性盲区——
+          #    HEALTH_CHECK 由 cn_fetch 每轮**结尾**刷新，即使该轮个别数据文件 blob 上传
+          #    HTTP 500 失败被跳过（见 api_push_raw.py 的 failed_paths 分支），
+          #    HEALTH_CHECK 依然"新鲜"，看门狗于是永远判定"无需派发"，坏文件持续陈旧无人察觉。
+          #    实测 2026-09-02：涨停热力卡 08:45 盘前值近 3 小时，而 HEALTH_CHECK 刷到 10:18。
+          #    改为：按类别并行抽查多个代表性数据文件，取【最旧】者作为判据，
+          #          任一文件陈旧即派发 —— 杜绝"整体健康、局部坏死"。
+          BASE_URL = "https://ah-quant999.github.io/quant-scanner-v8/data/"
+          PROBE = {
+              "intraday": ["LIMIT_UP_HEATMAP.js", "CONCEPT_RANKING.js", "CAPITAL_FLOW_DATA.js",
+                           "SECTOR_FUND_FLOW.js", "INDEX_QUOTES.js"],
+              "premarket": ["JUDGMENT_DATA.js", "CRISIS_DATA.js", "LIMIT_UP_HEATMAP.js"],
+              "post_close": ["LHB_DATA.js", "CANDIDATE_QUOTES.js", "CAPITAL_FLOW_DATA.js"],
+          }
+          files = PROBE.get(cat) or ["LIMIT_UP_HEATMAP.js"]
           thr = 35 if cat == "intraday" else 60
-          print(f"[watchdog] 最新数据={latest} 距今={age_min:.1f}min 类别={cat} 阈值={thr}min")
-          if age_min > thr:
-              print(f"[watchdog] 数据陈旧({age_min:.0f}>{thr}min)，云端派发 {cat}")
-              r = subprocess.run(["gh", "workflow", "run", "v8_cn_fetch_cloud.yml",
-                                  "-f", f"category={cat}"], capture_output=True, text=True, check=False)
-              print(r.stdout.strip(), r.stderr.strip())
+          PAT = re.compile(r'"?update_time"?\s*[:=]\s*"([^"]+)"')
+
+          def already_running():
+              """派发前确认没有正在跑/排队的 cn_fetch run，避免重复排队互相拖累。"""
+              try:
+                  import os as _os
+                  rq = urllib.request.Request(
+                      "https://api.github.com/repos/ah-quant999/quant-scanner-v8"
+                      "/actions/workflows/v8_cn_fetch_cloud.yml/runs?per_page=5",
+                      headers={"User-Agent": "Mozilla/5.0",
+                               "Authorization": "Bearer " + _os.environ.get("GH_TOKEN", "")})
+                  j = json.loads(urllib.request.urlopen(rq, timeout=20).read())
+                  return sum(1 for x in j.get("workflow_runs", []) if x.get("status") != "completed")
+              except Exception:
+                  return 0
+
+          stale, newest = [], None
+          for fn in files:
+              try:
+                  r2 = urllib.request.Request(BASE_URL + fn, headers={"User-Agent": "Mozilla/5.0"})
+                  t2 = urllib.request.urlopen(r2, timeout=20).read().decode("utf-8", "replace")
+                  mm = PAT.search(t2)
+                  if not mm:
+                      print(f"[watchdog]   ? {fn}: 无 update_time 字段，跳过"); continue
+                  dt = datetime.datetime.strptime(mm.group(1)[:19], "%Y-%m-%d %H:%M:%S")
+                  if newest is None or dt > newest: newest = dt
+                  age = (cst.replace(tzinfo=None) - dt).total_seconds() / 60
+                  if age > thr:
+                      stale.append((fn, age))
+                      print(f"[watchdog]   ✗ {fn}: {dt} ({age:.0f}min 陈旧)")
+                  else:
+                      print(f"[watchdog]   ✓ {fn}: {dt} ({age:.0f}min)")
+              except Exception as e:
+                  print(f"[watchdog]   ! {fn}: 读取失败 {e}")
+
+          if newest is None:
+              print(f"[watchdog] 无法解析任何数据时间戳，保守派发 {cat}")
+              if not already_running():
+                  subprocess.run(["gh", "workflow", "run", "v8_cn_fetch_cloud.yml",
+                                  "-f", f"category={cat}"], check=False)
+              sys.exit(0)
+
+          if stale:
+              print(f"[watchdog] ❌ {len(stale)}/{len(files)} 个文件陈旧（阈值 {thr}min），准备派发 {cat}")
+              n = already_running()
+              if n:
+                  print(f"[watchdog]    云端已有 {n} 个 run 在跑/排队，本轮不重复派发")
+              else:
+                  r = subprocess.run(["gh", "workflow", "run", "v8_cn_fetch_cloud.yml",
+                                      "-f", f"category={cat}"], capture_output=True, text=True, check=False)
+                  print(r.stdout.strip(), r.stderr.strip())
+              # ::error 注解：坏死文件在 Actions UI 直接标红，不再静默（原代码只 print，无人知晓）
+              print("::error title=数据陈旧::" +
+                    ", ".join(f"{fn}({a:.0f}min)" for fn, a in stale))
           else:
-              print(f"[watchdog] 数据新鲜({age_min:.0f}<={thr}min)，无需派发")
+              print(f"[watchdog] ✅ {len(files)} 个文件全部新鲜（最新 {newest}，阈值 {thr}min），无需派发")
           PY
