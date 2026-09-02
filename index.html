@@ -218,6 +218,11 @@ window.__domReadyFns=[];
   .sf-tag-rotate{background:rgba(251,191,36,.14);color:#fcd34d}
   .sf-tag-rebound{background:rgba(251,146,60,.14);color:#fdba74}
   .sf-caution{padding:9px 11px;background:rgba(251,191,36,.10);border-left:3px solid #fbbf24;border-radius:0 8px 8px 0;margin-bottom:10px;font-size:14px;line-height:1.8;color:#fde68a}
+  .sf-status-table{width:100%;font-size:13px;border-collapse:collapse;line-height:1.8}
+  .sf-status-table th{background:var(--bg2);color:var(--dim);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border)}
+  .sf-status-table td{padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.06);text-align:center}
+  .sf-status-table td:first-child{text-align:left}
+  .sf-status-badge{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:10px}
   .sf-rotate-table{width:100%;font-size:13px;border-collapse:collapse;line-height:1.7}
   .sf-rotate-table td{padding:5px 7px;border:1px solid var(--border)}
   .sf-rotate-table tr:first-child td{background:var(--bg2);color:var(--dim);font-weight:600}
@@ -2305,6 +2310,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div id="sfBlock2"><div class="ipo-empty">加载中…</div></div>
       </div>
 
+      <!-- Block 3: 周期定位 -->
+      <div class="sf-block sf-block-trend">
+        <div class="sf-block-title"><span class="sf-block-icon">🔄</span>周期定位</div>
+        <div id="sfBlock3"><div class="ipo-empty">加载中…</div></div>
+      </div>
+
     </div>
 
     <!-- 市场宽度：52周新高广度 -->
@@ -3804,47 +3815,57 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     });
     h += '</div></div>'; // left col
 
-    // Col 2: 明日关注
+    // Col 2: 明日关注（2 个共振日历：机游共振 + 北向席位，今日净买 → 对次日推荐）
     h += '<div class="insight-card" style="border-left-color:var(--gold)"><h4>⚡ 明日关注</h4>';
-    h += '<p>高胜率信号组合，明日开盘重点跟踪标的。</p>';
-    var _FR = window.FINAL_RECOMMEND_DATA || {};
-    var _frList = _rcArr(_FR.all_candidates).slice().sort(function(a,b){ return (b.final_score||0)-(a.final_score||0); }).slice(0,5);
-    if(_frList.length > 0){
+    h += '<p>共振日历（机游共振+北向席位）今日净买标的，对次日开盘推荐。</p>';
+    // 净买综合：机构买 / 游资买 / 北向席位净买 任一通道为正即入选；强度=三通道正和（万元）
+    var _focusList = _rcArr(LHB.stocks).map(function(s){
+      var inst = +(s.inst_net_万||0), yz = +(s.yz_net_万||0);
+      var nb = ((s.seats||{}).北向||{}); var nbNet = +(nb.buy||0) - +(nb.sell||0);
+      var src = []; if(inst>0) src.push('机游'); if(yz>0) src.push('游资'); if(nbNet>0) src.push('北向');
+      var strength = (inst>0?inst:0) + (yz>0?yz:0) + (nbNet>0?nbNet:0);
+      return Object.assign({}, s, {_src: src.join('+'), _strength: strength, _nbNet: nbNet});
+    }).filter(function(x){ return x._strength > 0; })
+      .sort(function(a,b){ return b._strength - a._strength; })
+      .slice(0,5);
+    if(_focusList.length > 0){
+      h += '<div style="font-size:12px;color:var(--up);font-weight:600;margin:6px 0 4px">机游+北向净买（金额排序）</div>';
       h += '<div class="insight-list">';
-      _frList.forEach(function(s){
-        var sc = +(s.final_score||0);
-        // final_score 是 0~10 量级：>=6 强、>=4 中、<4 弱
-        var col = sc>=6?'var(--up)':sc>=4?'var(--gold)':'var(--down)';
-        var mk = sc>=6?'★':sc>=4?'●':'○';
-        h += '<div class="insight-li"><span>' + mk + ' ' + _rcEsc(s.name) + ' <span style="font-size:12px;color:var(--dim)">' + _rcEsc(s.code) + '</span></span><span style="color:'+col+';font-weight:600">' + sc.toFixed(1) + '分</span></div>';
+      _focusList.forEach(function(s){
+        h += '<div class="insight-li"><span><span style="display:inline-block;padding:1px 5px;border-radius:4px;font-size:10px;background:var(--up);color:#fff;margin-right:4px">'+_rcEsc(s._src)+'</span>'+_rcEsc(s.name||'')+' <span style="font-size:12px;color:var(--dim)">'+_rcEsc(s.code||'')+'</span></span><span class="c-up" style="font-weight:600">+'+_rcFmtYi(s._strength)+'</span></div>';
       });
       h += '</div>';
     } else {
-      h += '<div style="color:var(--dim);font-size:12px">暂无候选推荐</div>';
+      h += '<div style="color:var(--dim);font-size:12px">暂无共振日历净买信号</div>';
     }
     h += '</div>';
 
     // 风险提示
     h += '<div class="insight-card" style="border-left-color:var(--down)"><h4>⚠️ 明日风险</h4>';
-    h += '<p>需警惕的异常信号与潜在风险点。</p>';
+    h += '<p>共振日历（机游共振+北向席位）今日净卖标的，对次日开盘风险。需警惕的异常信号与潜在风险点。</p>';
     var riskItems = [];
     if(score >= 70) riskItems.push('危机雷达综合分≥70，系统性风险偏高');
     if(VOL.items && VOL.items[0] && (VOL.items[0].vol_ann||0) > 80) riskItems.push('年化波动率偏高，注意仓位控制');
-    // 2026-08-11 修复：风险卡片下方竖排个股，与明日关注卡片风格一致；
-    // 机游共振卖出按金额大小倒序（最严重排前），右侧显示总流出亿
-    var lhbRisk = _rcArr(LHB.stocks).filter(function(s){ return (s.inst_net_万||0)<0 && (s.yz_net_万||0)<0; })
-                      .sort(function(a,b){ return ((a.inst_net_万||0)+(a.yz_net_万||0))-((b.inst_net_万||0)+(b.yz_net_万||0)); }).slice(0,5);
+    // 2026-09-02 主人令：合并「机游共振卖出 + 北向席位净卖」，按金额倒序前 5（最严重排前）
+    var _riskList = _rcArr(LHB.stocks).map(function(s){
+      var inst = +(s.inst_net_万||0), yz = +(s.yz_net_万||0);
+      var nb = ((s.seats||{}).北向||{}); var nbNet = +(nb.buy||0) - +(nb.sell||0);
+      var src = []; if(inst<0) src.push('机游'); if(yz<0) src.push('游资'); if(nbNet<0) src.push('北向');
+      var amount = (inst<0?inst:0) + (yz<0?yz:0) + (nbNet<0?nbNet:0); // 都为负，和越负越严重
+      return Object.assign({}, s, {_src: src.join('+'), _amount: amount});
+    }).filter(function(x){ return x._amount < 0; })
+      .sort(function(a,b){ return a._amount - b._amount; })  // 升序，最负排前
+      .slice(0,5);
     if(riskItems.length > 0){
       h += '<div class="insight-list" style="margin-bottom:8px">';
       riskItems.forEach(function(r){ h += '<div class="insight-li"><span style="color:var(--down)">●</span><span>' + r + '</span></div>'; });
       h += '</div>';
     }
-    if(lhbRisk.length > 0) {
-      h += '<div style="font-size:12px;color:var(--down);font-weight:600;margin:6px 0 4px">机游共振卖出（金额倒序）</div>';
+    if(_riskList.length > 0) {
+      h += '<div style="font-size:12px;color:var(--down);font-weight:600;margin:6px 0 4px">机游+北向净卖（金额倒序）</div>';
       h += '<div class="insight-list">';
-      lhbRisk.forEach(function(s){
-        var _out = (s.inst_net_万||0) + (s.yz_net_万||0);  // 单位万元（已含负号）
-        h += '<div class="insight-li"><span style="color:var(--down)">▼</span><span>'+_rcEsc(s.name)+' <span style="font-size:12px;color:var(--dim)">'+_rcEsc(s.code||'')+'</span></span><span class="c-down" style="font-weight:600">'+_rcFmtYi(_out)+'</span></div>';
+      _riskList.forEach(function(s){
+        h += '<div class="insight-li"><span><span style="display:inline-block;padding:1px 5px;border-radius:4px;font-size:10px;background:var(--down);color:#fff;margin-right:4px">'+_rcEsc(s._src)+'</span><span style="color:var(--down)">▼</span> '+_rcEsc(s.name||'')+' <span style="font-size:12px;color:var(--dim)">'+_rcEsc(s.code||'')+'</span></span><span class="c-down" style="font-weight:600">'+_rcFmtYi(s._amount)+'</span></div>';
       });
       h += '</div>';
     } else {
@@ -6834,360 +6855,301 @@ window.__renderV8CalFull();
 
   /* ~~ 已下架：资金流时间轴 MARKET_FUND_FLOW_DATA（2026-08-16 主人令） ~~ */
 
-  /* ---- 5. 板块资金三合一（盘中追热 + 收盘复盘 + 中期趋势） ---- */
+  /* ---- 5. 板块资金三合一（盘中追热 + 收盘复盘 + 周期定位） ---- */
   function renderSector(sf){
-    const d=sf||{};
-    const si=(d.sectors_in||[]).slice(), so=(d.sectors_out||[]).slice();
-    // 若数据源只给 sectors_in/out 的 net_5d/net_20d，从中派生中期趋势数组
-    const deriveTrend=(k)=>{
-      if(d['trend_'+k]&&d['trend_'+k].length) return d['trend_'+k];
-      const arr=[].concat(si||[], so||[]).filter(x=>x&&x['net_'+k]!=null&&!isNaN(x['net_'+k]));
-      return arr.map(x=>({name:x.name, type:x.type, ['net_'+k]:x['net_'+k]}));
-    };
+    const sff = window.SECTOR_FUND_FLOW || {};
+    const sft = window.SECTOR_FUND_FLOW_TREND || {};
+    const sr  = window.SECTOR_RS || {};
+    const fmt = v => (v >= 0 ? '+' : '') + num(v, 1);
+    const $b1 = $('sfBlock1'), $b2 = $('sfBlock2'), $b3 = $('sfBlock3');
+    if (!$b1 || !$b2 || !$b3) return;
 
-    // 降级：sects_in/out为空但top_list有数据时派生
-    if(!si.length && !so.length){
-      const tl=d.top_list||[];
-      if(!(tl.length>0 && d.update_time)){
-        const _sfNote=(d&&d.note)?d.note:'盘前板块数据待开盘刷新，开盘后自动更新';
-        const _sfPremkt=!!(d&&d.premarket_cleared);
-        const empty='<div style="text-align:center;padding:16px;color:var(--dim)">⏳ '+_sfNote+'</div>';
-        $('sfBlock1').innerHTML=empty; $('sfBlock2').innerHTML=empty;
-        setBadge('phSectorTime',_sfPremkt?'盘前':'盘后','短线',d.update_time); return;
-      }
-      tl.filter(s=>s.net>0).sort((a,b)=>b.net-a.net).slice(0,10).forEach(s=>si.push(s));
-      tl.filter(s=>s.net<0).sort((a,b)=>a.net-b.net).slice(0,10).forEach(s=>so.push(s));
-    }
-
-    const fmt=v=>(v>=0?'+':'')+num(v,1);
-
-    // ── Block 1: 盘中追热 ──
-    // 🛡 2026-08-19 一劳永逸修复「净额(行业)动不动飙到 -3000+ 亿」：
-    //   现象：raw_data 把东方财富多层板块（一级+二级+三级子板块）都打成 type='行业'，
-    //         渲染 reduce 时把子板块重复计入（如 电子-575 + 半导体-288 + 通信设备-189 + 数字芯片设计-156 + ...）
-    //         → 总额 -3856 亿（市场全天实际行业净流出 <1000 亿才合理）。
-    //   根因：fetcher 仅按 name 是否含「概念」二字打 type，把子行业也打成'行业'。
-    //   修法（渲染端兜底）：按申万 2021 一级行业 31 个 Set 做白名单过滤——
-    //         即使 fetcher 错标，渲染端只累加 SW 一级，总额回到合理量级。
-    //   不动 fetcher/raw_data/cron/workflow——本端兜底够稳；待主人说"上线"再 commit+push。
+    // 申万一级白名单（渲染端兜底，剔除二/三级子行业避免净额重复计入）
     const SW_LV1_NAMES = new Set([
       '农林牧渔','基础化工','钢铁','有色金属','电子','家用电器','食品饮料','纺织服饰',
       '轻工制造','医药生物','公用事业','交通运输','房地产','商贸零售','社会服务','综合',
       '建筑材料','建筑装饰','电力设备','机械设备','国防军工','汽车','美容护理','石油石化',
       '煤炭','环保','传媒','计算机','通信','银行','非银金融'
     ]);
-    const _isSwLv1 = (s)=> !!(s && s.name && SW_LV1_NAMES.has(s.name));
-    const indIn=si.filter(s=>s.type==='行业' && _isSwLv1(s));
-    const indOut=so.filter(s=>s.type==='行业' && _isSwLv1(s));
-    const totalIn=indIn.reduce((s,e)=>s+(e.net||0),0);
-    const totalOut=Math.abs(indOut.reduce((s,e)=>s+(e.net||0),0));
-    const net=totalIn-totalOut;
-    const netColor=net>0?'var(--up)':net<0?'var(--down)':'var(--dim)';
+    const _isSwLv1 = s => !!(s && s.name && SW_LV1_NAMES.has(s.name));
 
-    let h1='';
-    h1+='<div class="sf-net-big"><span class="n" style="color:'+netColor+'">'+(net>0?'+':'')+net.toFixed(1)+'</span><span class="u" style="color:'+netColor+'">亿</span><span class="lbl" title="按申万一级行业 31 个口径：流入 '+totalIn.toFixed(1)+'亿 - 流出 '+totalOut.toFixed(1)+'亿（剔除二/三级子板块，避免与一级重复计入）">净额(行业·SW1)</span></div>';
+    // ── Block 1: 盘中追热 ──
+    const sffIn = (sff.sectors_in || []).slice(), sffOut = (sff.sectors_out || []).slice();
+    const hasSff = sffIn.length + sffOut.length > 0;
+    if (hasSff) {
+      const indIn = sffIn.filter(s => s.type === '行业' && _isSwLv1(s));
+      const indOut = sffOut.filter(s => s.type === '行业' && _isSwLv1(s));
+      const totalIn = indIn.reduce((a, b) => a + (b.net || 0), 0);
+      const totalOut = Math.abs(indOut.reduce((a, b) => a + (b.net || 0), 0));
+      const net = totalIn - totalOut;
+      const netColor = net > 0 ? 'var(--up)' : net < 0 ? 'var(--down)' : 'var(--dim)';
+      let h1 = '';
+      h1 += '<div class="sf-net-big"><span class="n" style="color:' + netColor + '">' + (net > 0 ? '+' : '') + net.toFixed(1) + '</span><span class="u" style="color:' + netColor + '">亿</span><span class="lbl" title="按申万一级行业 31 个口径：流入 ' + totalIn.toFixed(1) + '亿 - 流出 ' + totalOut.toFixed(1) + '亿（剔除二/三级子板块，避免重复计入）">净额(行业·SW1)</span></div>';
 
-    // 2026-08-31 一劳永逸：Block 1「盘中追热」只保留「净额(行业·SW1) + 📊 行业流入 top5」。
-    //   删除 🔥当前抱团 / 🚀概念接力（与下方 Block 2「收盘复盘」的 🔥抱团 / 🚀接力 重复）。
-    //   Block 1 强调盘中唯一的行业净额视角，Block 2 强调收盘后的多空对照；分工明确无冗余。
-    const iTop=si.filter(s=>!s.type||s.type!=='概念').slice(0,5);
-    if(iTop.length>0){
-      h1+='<div class="sf-line"><b style="color:#fb923c">📊 行业流入：</b>'+iTop.map(s=>s.name+' <b style="color:var(--up)">+'+s.net.toFixed(1)+'亿</b>'+((s.consecutive_days||0)>1?' <span style="color:#ff9800;font-size:12px">连'+s.consecutive_days+'</span>':'')).join(' / ')+'</div>';
+      const iTop = sffIn.filter(s => s.type === '行业').slice(0, 5);
+      const cTop = sffIn.filter(s => s.type === '概念').slice(0, 5);
+      const oTop = sffOut.slice(0, 3);
+      h1 += '<div style="display:flex;flex-wrap:wrap;gap:14px;font-size:13px;line-height:1.8;">';
+      if (iTop.length) {
+        h1 += '<div style="flex:1 1 45%;min-width:260px;"><b style="color:#fb923c">📊 行业流入 TOP5</b><br>' + iTop.map(s => s.name + ' <b style="color:var(--up)">+' + s.net.toFixed(1) + '亿</b>').join(' / ') + '</div>';
+      }
+      if (cTop.length) {
+        h1 += '<div style="flex:1 1 45%;min-width:260px;"><b style="color:#38bdf8">🚀 概念流入 TOP5</b><br>' + cTop.map(s => s.name + ' <b style="color:var(--up)">+' + s.net.toFixed(1) + '亿</b>').join(' / ') + '</div>';
+      }
+      if (oTop.length) {
+        h1 += '<div style="flex:1 1 45%;min-width:260px;"><b style="color:var(--down)">🔻 流出 TOP3</b><br>' + oTop.map(s => s.name + ' <b style="color:var(--down)">' + s.net.toFixed(1) + '亿</b>').join(' / ') + '</div>';
+      }
+      h1 += '</div>';
+      $b1.innerHTML = h1;
+    } else {
+      const note = sff.note || '盘前板块数据待开盘刷新，开盘后自动更新';
+      $b1.innerHTML = '<div style="text-align:center;padding:16px;color:var(--dim)">⏳ ' + note + '</div>';
     }
-    $('sfBlock1').innerHTML=h1||'<div class="ipo-empty">暂无盘中数据</div>';
 
     // ── Block 2: 收盘复盘 ──
-    let h2='';
-    // 标签汇总
-    if(si.length>0 || so.length>0){
-      const trueOut=so.filter(s=>(s.consecutive_days||0)>=2||(s.net_5d||0)<0);
-      const trueIn=si.filter(s=>(s.consecutive_days||0)>=2&&(s.net_5d||0)>0);
-      const sigIn=si.filter(s=>(s.net_5d||0)>0&&(s.consecutive_days||0)<2);
-      const rbIn=si.filter(s=>(s.net_5d||0)<0);
-      const rotOut=so.filter(s=>(s.consecutive_days||0)<2&&(s.net_5d||0)>0);
-      const tags=[];
-      if(trueOut.length) tags.push('<span class="sf-tag sf-tag-out">🔚 真出 '+trueOut.map(s=>s.name).join(',')+'</span>');
-      if(trueIn.length) tags.push('<span class="sf-tag sf-tag-in">🔽 真入 '+trueIn.map(s=>s.name).join(',')+'</span>');
-      if(sigIn.length) tags.push('<span class="sf-tag sf-tag-new">✨ 新进 '+sigIn.map(s=>s.name).join(',')+'</span>');
-      if(rotOut.length) tags.push('<span class="sf-tag sf-tag-rotate">🔄 轮动 '+rotOut.map(s=>s.name).join(',')+'</span>');
-      if(rbIn.length) tags.push('<span class="sf-tag sf-tag-rebound">🔃 反弹 '+rbIn.map(s=>s.name).join(',')+'</span>');
-      if(tags.length) h2+='<div class="sf-tagline">'+tags.join(' ')+'</div>';
-    }
-    const hb2=si.filter(s=>!s.type||s.type!=='概念').slice(0,3);
-    if(hb2.length>0){
-      h2+='<div class="sf-line"><b style="color:var(--purple)">🔥 抱团：</b>'+hb2.map(s=>s.name+' <b style="color:var(--up)">+'+s.net.toFixed(1)+'亿</b>').join(' · ')+'</div>';
-    }
-    const cr=si.filter(s=>s.type==='概念').slice(0,5);
-    if(cr.length>0){
-      h2+='<div class="sf-line"><b style="color:var(--cyan)">🚀 接力：</b>'+cr.map(s=>s.name+' <b style="color:var(--up)">+'+s.net.toFixed(1)+'亿</b>').join(' · ')+'</div>';
-    }
-    const caut=so.slice(0,3);
-    if(caut.length>0){
-      h2+='<div class="sf-caution"><b>⚠️ 谨慎：</b>'+caut.map(s=>s.name+' <b style="color:var(--down)">'+s.net.toFixed(1)+'亿</b>').join(' · ')+'</div>';
-    }
-    // 轮动路线数据预计算（HTML 放到资金趋势下方，与收盘复盘拆分为独立小节）
-    var rotateTableHtml='';
-    if(so.length>0 || si.length>0){
-      const trueOut2=so.filter(s=>(s.consecutive_days||0)>=2||(s.net_5d||0)<0);
-      const rotOut2=so.filter(s=>(s.consecutive_days||0)<2&&(s.net_5d||0)>0);
-      rotateTableHtml+='<table class="sf-rotate-table"><tr><td style="width:38%;font-size:13px">流出</td><td style="width:22%;font-size:13px">性质</td><td style="width:40%;font-size:13px">→ 流入</td></tr>';
-      for(let r=0;r<Math.min(Math.max(so.length, si.length),3);r++){
-        let oc='',ic='',nc='';
-        if(r<so.length){
-          const o=so[r];
-          oc='<span style="color:var(--down);font-weight:500">'+o.name+'</span> <span style="color:var(--down)">'+o.net.toFixed(1)+'亿</span>';
-          if(trueOut2.some(x=>x.name===o.name)){nc=o.net_5d&&o.net_5d<0?'<span style="color:var(--up)">撤离</span>':'<span style="color:#fb923c">持续出</span>';}
-          else if(rotOut2.some(x=>x.name===o.name)){nc='<span style="color:var(--gold)">轮动</span>';}
-        }
-        if(r<si.length){const s=si[r]; ic='→ <span style="color:var(--up);font-weight:500">'+s.name+'</span> <span style="color:var(--up)">+'+s.net.toFixed(1)+'亿</span>';}
-        rotateTableHtml+='<tr><td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+oc+'</td><td>'+nc+'</td><td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+ic+'</td></tr>';
+    const sftIn = (sft.sectors_in || []).slice(), sftOut = (sft.sectors_out || []).slice();
+    const statusMeta = {
+      '真入': { color: '#f87171', order: 0 },
+      '新进': { color: '#38bdf8', order: 1 },
+      '反弹': { color: '#fb923c', order: 2 },
+      '轮动': { color: '#fbbf24', order: 3 },
+      '真出': { color: '#4ade80', order: 4 }
+    };
+    function classifyStatus(s) {
+      if (s.trend === 'in') {
+        if ((s.net_5d || 0) > 0) return (s.consecutive_days || 0) >= 2 ? '真入' : '新进';
+        return '反弹';
       }
-      rotateTableHtml+='</table>';
+      if ((s.net_5d || 0) > 0) return '轮动';
+      return '真出';
     }
-    // Block 2 渲染推迟到末尾，与 Block3（板块周期定位 + 资金趋势）合并为单块（方案A）
+    const seen2 = new Set();
+    const allTrend = [];
+    sftIn.forEach(s => { if (s && s.name && !seen2.has(s.name)) { seen2.add(s.name); allTrend.push(Object.assign({ trend: 'in' }, s)); } });
+    sftOut.forEach(s => { if (s && s.name && !seen2.has(s.name)) { seen2.add(s.name); allTrend.push(Object.assign({ trend: 'out' }, s)); } });
 
-    // ── Block 3: 板块资金趋势（周期定位摘要 + 5/20日资金趋势验证）──
-    let h3='';
-    const sr=window.SECTOR_RS || {};
-    const srSectors=sr.sectors || [];
-    const hasSr=sr.data_available && srSectors.length>0;
-    if(hasSr){
-      const phaseMeta={
-        '主升':{emoji:'🚀',color:'#ef4444',order:0},
-        '启动':{emoji:'📈',color:'#f59e0b',order:1},
-        '震荡':{emoji:'➡️',color:'#94a3b8',order:2},
-        '退潮':{emoji:'📉',color:'var(--down)',order:3},
-        '底部':{emoji:'⛏️',color:'#38bdf8',order:4}
-      };
-      const rows=[];
-      srSectors.forEach(function(s){
-        const d5=s.pct_5d||0, d20=s.pct_20d||0;
-        let phase;
-        // 2026-08-31 阶段判定规则 v2（一劳永逸）：
-        //   v1 用「双负 AND」→ 退潮/底部结构性恒为 0（实测 90 板块 min(pct_20d)=-5.12），
-        //   且「5日-3.93% / 20日+15.67%」这类高位退潮被错分成震荡。
-        //   v2：d5 定当下强弱，d20 定位置高低，互斥穷尽。
-        //   ⚠️ 必须与 algorithms/fetch_sector_rs.py _phase_of() 逐字一致，改一处必改两处。
-        if(d5>3 && d20>5) phase='主升';
-        else if(d5>1.5 && d20>-8) phase='启动';
-        else if(d5<-1.5) phase='退潮';
-        else if(d20<-8) phase='底部';
-        else phase='震荡';
-        const meta=phaseMeta[phase];
-        rows.push({name:s.name,phase:phase,emoji:meta.emoji,color:meta.color,order:meta.order,d5:d5,d20:d20});
+    if (allTrend.length > 0) {
+      const rows = allTrend.map(s => ({ s: s, st: classifyStatus(s), meta: statusMeta[classifyStatus(s)] }))
+        .sort((a, b) => a.meta.order - b.meta.order || b.s.net - a.s.net);
+      let h2 = '';
+      h2 += '<div style="font-size:13px;font-weight:700;color:#fdba74;margin-bottom:8px;">📝 板块状态一览</div>';
+      h2 += '<table class="sf-status-table"><thead><tr><th style="text-align:left">板块</th><th>状态</th><th>今日净额</th><th>5日净额</th></tr></thead><tbody>';
+      rows.forEach(function(r) {
+        const s = r.s;
+        h2 += '<tr><td>' + s.name + '</td>';
+        h2 += '<td><span class="sf-status-badge" style="background:rgba(255,255,255,.06);color:' + r.meta.color + ';border:1px solid ' + r.meta.color + ';">' + r.st + '</span></td>';
+        h2 += '<td style="color:' + (s.net >= 0 ? 'var(--up)' : 'var(--down)') + ';font-weight:700;">' + fmt(s.net) + '亿</td>';
+        h2 += '<td style="color:' + ((s.net_5d || 0) >= 0 ? 'var(--up)' : 'var(--down)') + ';font-weight:500;">' + fmt(s.net_5d || 0) + '亿</td></tr>';
       });
-      rows.sort(function(a,b){ if(a.order!==b.order) return a.order-b.order; return b.d20-a.d20; });
-      const counts={}; rows.forEach(function(r){ counts[r.phase]=(counts[r.phase]||0)+1; });
-      const phaseOrder=['主升','启动','震荡','退潮','底部'];
+      h2 += '</tbody></table>';
 
-      // ── 阶段迁移追踪：从 SECTOR_PHASE_HISTORY 读上次快照（云端持久化）──
-      var _sph = window.SECTOR_PHASE_HISTORY || {snaps: []};
-      var _snaps = _sph.snaps || [];
-      var _todayStr = (sr.data_date || '').slice(0,10);
-      // 2026-08-31：阶段判定升级 v2，只与同规则版本的快照对比，避免跨规则伪迁移
-      var _PHASE_RULE_VER = 2;
-      var _prevSnap = null, _prevSkippedByRule = false;
-      for (var i = _snaps.length - 1; i >= 0; i--) {
-        var sd = (_snaps[i].date || '').slice(0,10);
+      // 轮动路线 TOP3
+      const out3 = sftOut.slice().sort((a, b) => a.net - b.net).slice(0, 3);
+      const in3 = sftIn.slice().sort((a, b) => b.net - a.net).slice(0, 3);
+      if (out3.length || in3.length) {
+        h2 += '<div style="margin-top:14px;border-top:1px dashed var(--border2);padding-top:12px;">';
+        h2 += '<div style="font-size:13px;font-weight:700;color:#c4b5fd;margin-bottom:8px;">📊 轮动路线 TOP3</div>';
+        h2 += '<table class="sf-rotate-table"><tr><td style="width:38%;font-size:13px">流出</td><td style="width:22%;font-size:13px">性质</td><td style="width:40%;font-size:13px">→ 流入</td></tr>';
+        for (let r = 0; r < 3; r++) {
+          let oc = '', ic = '', nc = '';
+          if (r < out3.length) {
+            const o = out3[r];
+            const st = classifyStatus(o);
+            oc = '<span style="color:var(--down);font-weight:500">' + o.name + '</span> <span style="color:var(--down)">' + o.net.toFixed(1) + '亿</span>';
+            nc = '<span style="color:' + statusMeta[st].color + ';font-weight:700">' + st + '</span>';
+          }
+          if (r < in3.length) {
+            const s = in3[r];
+            ic = '→ <span style="color:var(--up);font-weight:500">' + s.name + '</span> <span style="color:var(--up)">+' + s.net.toFixed(1) + '亿</span>';
+          }
+          h2 += '<tr><td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + oc + '</td><td>' + nc + '</td><td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + ic + '</td></tr>';
+        }
+        h2 += '</table></div>';
+      }
+      $b2.innerHTML = h2;
+    } else {
+      $b2.innerHTML = '<div class="ipo-empty">暂无复盘数据</div>';
+    }
+
+    // ── Block 3: 周期定位 ──
+    let h3 = '';
+    const srSectors = sr.sectors || [];
+    const hasSr = sr.data_available && srSectors.length > 0;
+    if (hasSr) {
+      const phaseMeta = {
+        '主升': { emoji: '🚀', color: '#ef4444', order: 0 },
+        '启动': { emoji: '📈', color: '#f59e0b', order: 1 },
+        '震荡': { emoji: '➡️', color: '#94a3b8', order: 2 },
+        '退潮': { emoji: '📉', color: 'var(--down)', order: 3 },
+        '底部': { emoji: '⛏️', color: '#38bdf8', order: 4 }
+      };
+      const phaseOrder = ['主升', '启动', '震荡', '退潮', '底部'];
+      const rows = [];
+      srSectors.forEach(function(s) {
+        const d5 = s.pct_5d || 0, d20 = s.pct_20d || 0;
+        let phase;
+        if (d5 > 3 && d20 > 5) phase = '主升';
+        else if (d5 > 1.5 && d20 > -8) phase = '启动';
+        else if (d5 < -1.5) phase = '退潮';
+        else if (d20 < -8) phase = '底部';
+        else phase = '震荡';
+        const meta = phaseMeta[phase];
+        rows.push({ name: s.name, phase: phase, emoji: meta.emoji, color: meta.color, order: meta.order, d5: d5, d20: d20 });
+      });
+      rows.sort(function(a, b) { if (a.order !== b.order) return a.order - b.order; return b.d20 - a.d20; });
+      const counts = {};
+      rows.forEach(function(r) { counts[r.phase] = (counts[r.phase] || 0) + 1; });
+      const byPhase = {};
+      phaseOrder.forEach(function(p) { byPhase[p] = []; });
+      rows.forEach(function(r) { byPhase[r.phase].push(r); });
+      phaseOrder.forEach(function(p) { byPhase[p].sort(function(a, b) { return b.d20 - a.d20; }); });
+
+      // 阶段迁移（只读同规则版本快照）
+      const _sph = window.SECTOR_PHASE_HISTORY || { snaps: [] };
+      const _snaps = _sph.snaps || [];
+      const _todayStr = (sr.data_date || '').slice(0, 10);
+      const _PHASE_RULE_VER = 2;
+      let _prevSnap = null;
+      for (let i = _snaps.length - 1; i >= 0; i--) {
+        const sd = (_snaps[i].date || '').slice(0, 10);
         if (sd && sd !== _todayStr) {
-          if ((_snaps[i].rule_ver || 1) !== _PHASE_RULE_VER) { _prevSkippedByRule = true; continue; }
+          if ((_snaps[i].rule_ver || 1) !== _PHASE_RULE_VER) continue;
           _prevSnap = _snaps[i]; break;
         }
       }
-      var _prevMap = (_prevSnap && _prevSnap.phases) || {};
-      var _transitions = {};
-      rows.forEach(function(r){
-        var prev = _prevMap[r.name];
-        if(prev && prev !== r.phase) _transitions[r.name] = {from: prev, to: r.phase};
+      const _prevMap = (_prevSnap && _prevSnap.phases) || {};
+      const _transitions = {};
+      rows.forEach(function(r) {
+        const prev = _prevMap[r.name];
+        if (prev && prev !== r.phase) _transitions[r.name] = { from: prev, to: r.phase };
+      });
+      const transInto = {};
+      Object.keys(_transitions).forEach(function(k) {
+        const t = _transitions[k].to;
+        transInto[t] = (transInto[t] || 0) + 1;
       });
 
-      // 2026-08-31 主人令：删除 v1→v2 升级过渡通知块（已无意义——升级至今已 > 7 天，下次云端盘后即出 v2 快照自动齐备）
-      //   若历史快照均无 v2，迁移区直接空 0 渲染，不写「升级中」噪音。
-      // 原代码：
-      //   if (!_prevSnap && _prevSkippedByRule) {
-      //     h3 += '<div ...>🔁 今日阶段迁移：阶段判定规则已于 2026-08-31 升级为 v2 ...</div>';
-      //   }
-      // 保留迁移分布，与 v1 状态下行为一致：_prevSnap 没找到就不显示迁移。
-      if (_prevSnap && Object.keys(_prevMap).length) {
-        var _phaseEmoji = {'主升':'🚀','启动':'📈','震荡':'➡️','退潮':'📉','底部':'⛏️'};
-        var _phaseColor = {'主升':'#ef4444','启动':'#f59e0b','震荡':'#94a3b8','退潮':'var(--down)','底部':'#38bdf8'};
-        var _prevDateStr = (_prevSnap.date || '').slice(0,10);
-        var _prevTimeStr = (_prevSnap.update_time || '').slice(11,16);
-        var _curDateStr = (sr.data_date || '').slice(0,10);
-        var _curTimeStr = (sr.update_time || '').slice(11,16);
-        var _transList = [];
-        rows.forEach(function(r){
-          var t = _transitions[r.name];
-          if(t) _transList.push({name: r.name, from: t.from, to: t.to});
-        });
-        h3 += '<div style="margin-bottom:12px;padding:10px 14px;background:linear-gradient(135deg,rgba(168,85,247,.06),rgba(99,102,241,.04));border:1px solid rgba(168,85,247,.2);border-radius:8px;">';
-        h3 += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">';
-        h3 += '<div style="font-size:13px;font-weight:700;color:#c084fc;">🔁 今日阶段迁移（'+_prevDateStr+' '+_prevTimeStr+' → '+_curDateStr+' '+_curTimeStr+'）</div>';
-        h3 += '</div>';
-        if(_transList.length === 0){
-          h3 += '<div style="font-size:12px;color:var(--dim);text-align:center;padding:12px 0;">📭 今日无板块阶段变化</div>';
-        } else {
-          var _phaseToRank = {'主升':0,'启动':1,'震荡':2,'退潮':3,'底部':4};
-          _transList.sort(function(a,b){
-            var ra = _phaseToRank[a.to] ?? 99, rb = _phaseToRank[b.to] ?? 99;
-            if(ra !== rb) return ra - rb;
-            return (a.name||'').localeCompare(b.name, 'zh-CN');
-          });
-          h3 += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;">';
-          _transList.forEach(function(t){
-            var fromEmoji = _phaseEmoji[t.from] || '';
-            var toEmoji = _phaseEmoji[t.to] || '';
-            var fromColor = _phaseColor[t.from] || 'var(--sub)';
-            var toColor = _phaseColor[t.to] || 'var(--sub)';
-            h3 += '<div style="display:flex;align-items:center;gap:5px;padding:5px 8px;font-size:12px;background:rgba(255,255,255,.02);border-radius:4px;">';
-            h3 += '<b style="min-width:80px;max-width:100px;color:var(--txt);font-size:12px;">'+t.name+'</b>';
-            h3 += '<span style="color:'+fromColor+';font-weight:700;font-size:12px;">'+fromEmoji+t.from+'</span>';
-            h3 += '<span style="color:var(--dim);font-weight:700;">→</span>';
-            h3 += '<span style="color:'+toColor+';font-weight:700;font-size:12px;">'+toEmoji+t.to+'</span>';
-            h3 += '</div>';
-          });
-          h3 += '</div>';
-          h3 += '<div style="margin-top:6px;font-size:12px;color:var(--sub);text-align:right;">共 '+_transList.length+' 个板块今日有迁移（主升>启动>震荡>退潮）</div>';
-        }
-        h3 += '</div>';
-      }
-
-      // ── 阶段分布摘要（替代原 5 张阶段大卡片 grid）──
-      // 按阶段分桶，用于点击展开明细
-      const byPhase={}; phaseOrder.forEach(p=>byPhase[p]=[]);
-      rows.forEach(r=>byPhase[r.phase].push(r));
-      phaseOrder.forEach(p=>byPhase[p].sort(function(a,b){ return b.d20-a.d20; }));
-
-      // 2026-08-31：阶段分布改一行 5 列均分，解决退潮/底部为空时挤在一起的问题
-      // 2026-09-01 主人令：主升直接展示，不再折叠；其余阶段保持点击展开。
+      // 阶段分布 pills（迁移数直接标注在数量旁）
       h3 += '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:8px;">';
-      phaseOrder.forEach(function(p){
-        var meta = phaseMeta[p];
-        var cnt = counts[p]||0;
-        var isZhushu = (p === '主升');
-        h3 += '<div class="sc-phase-pill" data-phase="'+p+'" style="padding:8px 6px;border-radius:6px;background:var(--bg1);border-left:3px solid '+meta.color+';text-align:center;cursor:'+(isZhushu?'default':'pointer')+';transition:background .15s;" onmouseover="if(!'+isZhushu+')this.style.background=\'rgba(255,255,255,0.06)\'" onmouseout="if(!'+isZhushu+')this.style.background=\'var(--bg1)\'">';
-        h3 += '<div style="font-size:12px;color:var(--dim);margin-bottom:2px;">'+meta.emoji+p+'</div>';
-        h3 += '<div style="font-size:18px;font-weight:700;color:'+meta.color+';">'+cnt+'</div>';
-        h3 += '<div style="font-size:10px;color:var(--sub);margin-top:2px;">'+(isZhushu?'已展开':(cnt?'点击查看':'暂无'))+'</div>';
+      phaseOrder.forEach(function(p) {
+        const meta = phaseMeta[p];
+        const cnt = counts[p] || 0;
+        const delta = transInto[p] || 0;
+        const deltaHtml = delta ? ' <span style="color:var(--up);font-size:12px;font-weight:700">▲' + delta + '</span>' : '';
+        const isZhushu = (p === '主升');
+        h3 += '<div class="sc-phase-pill" data-phase="' + p + '" style="padding:8px 6px;border-radius:6px;background:var(--bg1);border-left:3px solid ' + meta.color + ';text-align:center;cursor:' + (isZhushu ? 'default' : 'pointer') + ';transition:background .15s;" onmouseover="if(!' + isZhushu + ')this.style.background='rgba(255,255,255,0.06)'" onmouseout="if(!' + isZhushu + ')this.style.background='var(--bg1)'">';
+        h3 += '<div style="font-size:12px;color:var(--dim);margin-bottom:2px;">' + meta.emoji + p + '</div>';
+        h3 += '<div style="font-size:18px;font-weight:700;color:' + meta.color + ';">' + cnt + deltaHtml + '</div>';
+        h3 += '<div style="font-size:10px;color:var(--sub);margin-top:2px;">' + (isZhushu ? '已展开' : (cnt ? '点击查看' : '暂无')) + '</div>';
         h3 += '</div>';
       });
       h3 += '</div>';
-      // 2026-08-31：显式给出阈值，某桶为 0 时主人一眼可判「市场真无」而非「卡片出错」
-      h3 += '<div style="font-size:11px;color:var(--dim);margin-bottom:10px;line-height:1.6;">阈值(v2)：🚀主升 5日&gt;3%且20日&gt;5% ｜ 📈启动 5日&gt;1.5%且20日&gt;-8% ｜ 📉退潮 5日&lt;-1.5%（20日为正=高位退潮）｜ ⛏️底部 20日&lt;-8%且5日不再急跌 ｜ ➡️震荡 其余。某桶为 0 表示当前无板块满足，非数据异常。</div>';
+      h3 += '<div style="font-size:11px;color:var(--dim);margin-bottom:10px;line-height:1.6;">阈值(v2)：🚀主升 5日&gt;3%且20日&gt;5% ｜ 📈启动 5日&gt;1.5%且20日&gt;-8% ｜ 📉退潮 5日&lt;-1.5%（20日为正=高位退潮）｜ ⛏️底部 20日&lt;-8%且5日不再急跌 ｜ ➡️震荡 其余。</div>';
 
-      // 阶段明细面板（默认隐藏，点击 pill 展开）
+      // 阶段明细面板（主升默认展开）
       h3 += '<div id="scPhaseDetailBox">';
-      phaseOrder.forEach(function(p){
-        var list = byPhase[p] || [];
-        var meta = phaseMeta[p];
-        var _detailDisplay = (p === '主升') ? 'block' : 'none';
-        h3 += '<div class="sc-phase-detail" data-phase="'+p+'" style="display:'+_detailDisplay+';margin-bottom:12px;padding:10px;border-radius:6px;background:var(--bg1);border:1px solid var(--border);">';
+      phaseOrder.forEach(function(p) {
+        const list = byPhase[p] || [];
+        const meta = phaseMeta[p];
+        const display = (p === '主升') ? 'block' : 'none';
+        h3 += '<div class="sc-phase-detail" data-phase="' + p + '" style="display:' + display + ';margin-bottom:12px;padding:10px;border-radius:6px;background:var(--bg1);border:1px solid var(--border);">';
         h3 += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">';
-        h3 += '<div style="font-size:13px;font-weight:700;color:'+meta.color+';">'+meta.emoji+p+' · '+list.length+' 个板块</div>';
+        h3 += '<div style="font-size:13px;font-weight:700;color:' + meta.color + ';">' + meta.emoji + p + ' · ' + list.length + ' 个板块</div>';
         h3 += '<span class="sc-phase-close" style="font-size:12px;color:var(--dim);cursor:pointer;">收起 ▲</span>';
         h3 += '</div>';
-        // 2026-08-31 一劳永逸：阶段明细胶囊 grid 改 minmax(180px, 1fr) — 主人令「一行 5-6 列，每胶囊数字看清」。
-      //   卡片宽 ~1480px 时正好 6 列；1200px 时 5 列；820px 时 4 列（不再挤到 8 列）。
-      //   同时每个胶囊内部：板块名(占 56%) + d5 5日%(22%，红涨绿跌) + d20 20日%(22%，浅色基准)。
-      //   三段 min-width:0 + ellipsis，防止名字过长挤压数字。
-        if(list.length){
+        if (list.length) {
           h3 += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:7px;">';
-          list.forEach(function(s){
-            h3 += '<div style="display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:5px;background:var(--bg2);border-left:3px solid '+s.color+';font-size:12.5px;min-width:0;">';
-            h3 += '<span style="flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt);" title="'+s.name+'">'+s.name+'</span>';
-            h3 += '<span style="flex:0 0 auto;min-width:42px;text-align:right;color:'+(s.d5>=0?'var(--up)':'var(--down)')+';font-weight:700;font-size:12.5px;white-space:nowrap;">'+(s.d5>=0?'+':'')+s.d5.toFixed(1)+'%</span>';
-            h3 += '<span style="flex:0 0 auto;min-width:42px;text-align:right;color:var(--sub);font-weight:500;font-size:12px;white-space:nowrap;">'+s.d20.toFixed(1)+'%</span>';
+          list.forEach(function(s) {
+            h3 += '<div style="display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:5px;background:var(--bg2);border-left:3px solid ' + s.color + ';font-size:12.5px;min-width:0;">';
+            h3 += '<span style="flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--txt);" title="' + s.name + '">' + s.name + '</span>';
+            h3 += '<span style="flex:0 0 auto;min-width:42px;text-align:right;color:' + (s.d5 >= 0 ? 'var(--up)' : 'var(--down)') + ';font-weight:700;font-size:12.5px;white-space:nowrap;">' + (s.d5 >= 0 ? '+' : '') + s.d5.toFixed(1) + '%</span>';
+            h3 += '<span style="flex:0 0 auto;min-width:42px;text-align:right;color:var(--sub);font-weight:500;font-size:12px;white-space:nowrap;">' + s.d20.toFixed(1) + '%</span>';
             h3 += '</div>';
           });
           h3 += '</div>';
         } else {
-          h3 += '<div style="font-size:12px;color:var(--dim);padding:6px 0;">暂无 '+p+' 阶段板块</div>';
+          h3 += '<div style="font-size:12px;color:var(--dim);padding:6px 0;">暂无 ' + p + ' 阶段板块</div>';
         }
         h3 += '</div>';
       });
       h3 += '</div>';
 
       // 阶段明细点击交互（只挂一次全局监听）
-      if(!window.__scPhaseDetailInited){
+      if (!window.__scPhaseDetailInited) {
         window.__scPhaseDetailInited = true;
-        document.addEventListener('click', function(e){
+        document.addEventListener('click', function(e) {
           var pill = e.target.closest('.sc-phase-pill');
           var close = e.target.closest('.sc-phase-close');
-          if(pill){
+          if (pill) {
             var p = pill.dataset.phase;
-            if(p === '主升') return; // 2026-09-01 主升直接展示，不响应折叠
+            if (p === '主升') return;
             var box = document.getElementById('scPhaseDetailBox');
-            if(!box) return;
-            box.querySelectorAll('.sc-phase-detail').forEach(function(panel){
-              if(panel.dataset.phase === p){
+            if (!box) return;
+            box.querySelectorAll('.sc-phase-detail').forEach(function(panel) {
+              if (panel.dataset.phase === p) {
                 panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
               } else {
                 panel.style.display = 'none';
               }
             });
-          } else if(close){
+          } else if (close) {
             var panel = close.closest('.sc-phase-detail');
-            if(panel) panel.style.display = 'none';
+            if (panel) panel.style.display = 'none';
           }
         });
       }
-    }else{
-      h3+='<div style="color:var(--dim);font-size:11px;padding:6px 0;margin-bottom:8px">板块 RS 数据加载中，周期定位待刷新…</div>';
+    } else {
+      h3 += '<div style="color:var(--dim);font-size:11px;padding:6px 0;margin-bottom:8px;">板块 RS 数据加载中，周期定位待刷新…</div>';
     }
-    // 资金趋势验证（精简为 5日 + 20日两列）
-    function sfTrendCard(title,dataArr,netKey,headClass){
-      const inList=(dataArr||[]).filter(s=>s&&(s[netKey]||0)>0).sort((a,b)=>b[netKey]-a[netKey]).slice(0,6);
-      const outList=(dataArr||[]).filter(s=>s&&(s[netKey]||0)<0).sort((a,b)=>a[netKey]-b[netKey]).slice(0,6);
-      const hasData=(dataArr||[]).length>0;
-      let c='<div class="sf-trend-card" style="padding:6px"><div class="sf-trend-head '+headClass+'" style="font-size:13px;padding:5px 6px;margin:-6px -6px 5px -6px">'+title+'</div><div class="sf-trend-cols">';
-      c+='<div class="sf-trend-col"><div class="col-title col-in" style="font-size:12px;padding:3px 0">流入</div>';
-      if(inList.length){inList.forEach(s=>{c+='<div class="sf-trend-row2" style="padding:3px 0;font-size:12px"><span>'+s.name+'</span><span class="no-shrink"  style="color:var(--up)">+'+(s[netKey]||0).toFixed(1)+'亿</span></div>';});}
-      else if(hasData){c+='<div style="color:var(--dim);font-size:12px;padding:3px 0">暂无</div>';}
-      else{c+='<div style="color:var(--dim);font-size:12px;padding:3px 0">暂无数据</div>';}
-      c+='</div>';
-      c+='<div class="sf-trend-col"><div class="col-title col-out" style="font-size:12px;padding:3px 0">流出</div>';
-      if(outList.length){outList.forEach(s=>{c+='<div class="sf-trend-row2" style="padding:3px 0;font-size:12px"><span>'+s.name+'</span><span class="no-shrink"  style="color:var(--down)">'+(s[netKey]||0).toFixed(1)+'亿</span></div>';});}
-      else if(hasData){c+='<div style="color:var(--dim);font-size:12px;padding:3px 0">暂无</div>';}
-      else{c+='<div style="color:var(--dim);font-size:12px;padding:3px 0">暂无数据</div>';}
-      c+='</div></div></div>';
+
+    // 趋势双卡：资金净额趋势 + 价格相对强度
+    function sfMiniTrend(title, dataArr, key) {
+      const inList = (dataArr || []).filter(s => (s[key] || 0) > 0).sort((a, b) => b[key] - a[key]).slice(0, 6);
+      const outList = (dataArr || []).filter(s => (s[key] || 0) < 0).sort((a, b) => a[key] - b[key]).slice(0, 6);
+      const isPct = key.indexOf('pct') >= 0;
+      const unit = isPct ? '%' : '亿';
+      let c = '<div class="sf-trend-card"><div style="font-size:12px;font-weight:700;text-align:center;padding:7px 0;background:#534ab7;color:#fff;">' + title + '</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px;">';
+      c += '<div><div style="font-size:12px;color:var(--up);font-weight:700;margin-bottom:4px;">' + (isPct ? '领涨' : '流入') + '</div>';
+      if (inList.length) {
+        inList.forEach(function(s) {
+          c += '<div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0;gap:6px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;">' + s.name + '</span><span style="color:var(--up);font-weight:700;flex:0 0 auto;">+' + s[key].toFixed(1) + unit + '</span></div>';
+        });
+      } else {
+        c += '<div style="font-size:12px;color:var(--dim)">暂无</div>';
+      }
+      c += '</div>';
+      c += '<div><div style="font-size:12px;color:var(--down);font-weight:700;margin-bottom:4px;">' + (isPct ? '领跌' : '流出') + '</div>';
+      if (outList.length) {
+        outList.forEach(function(s) {
+          c += '<div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0;gap:6px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;">' + s.name + '</span><span style="color:var(--down);font-weight:700;flex:0 0 auto;">' + s[key].toFixed(1) + unit + '</span></div>';
+        });
+      } else {
+        c += '<div style="font-size:12px;color:var(--dim)">暂无</div>';
+      }
+      c += '</div></div></div>';
       return c;
     }
-    const sft=window.SECTOR_FUND_FLOW_TREND || {};
-    const _sfSeen=new Set();
-    const _sfAll=[];
-    (sft.sectors_in||[]).concat(sft.sectors_out||[]).forEach(function(s){
-      if(!s||!s.name||_sfSeen.has(s.name)) return;
-      _sfSeen.add(s.name);
-      _sfAll.push(s);
-    });
-    const sfIn = _sfAll;
-    const t5d = sfIn, t20d = sfIn;
-    h3+='<div style="font-size:13px;font-weight:700;color:var(--sub);margin:0 0 5px">资金趋势</div>';
-    h3+='<div class="sf-trend-grid">';
-    h3+=sfTrendCard('5日',t5d,'net_5d','sf-trend-head-5');
-    h3+=sfTrendCard('20日',t20d,'net_20d','sf-trend-head-20');
-    h3+='</div>';
-    // 2026-09-02 主人令：轮动路线(TOP3) 从收盘复盘拆出，放到资金趋势下方作为独立小节
-    if(rotateTableHtml){
-      h3+='<div style="margin-top:14px;border-top:1px dashed var(--border2);padding-top:12px;">';
-      h3+='<div style="font-size:13px;font-weight:700;color:var(--purple);margin-bottom:8px;display:flex;align-items:center;gap:6px;"><span>📊</span>轮动路线（TOP3）</div>';
-      h3+=rotateTableHtml;
-      h3+='</div>';
-    }
-    // ── 方案A：板块资金趋势（Block3）并入收盘复盘（Block2），合并为单块 ──
-    let _sfBlk2 = h2 || '';
-    if(h3 && h3.trim()){
-      _sfBlk2 += '<div style="margin-top:14px;border-top:1px dashed var(--border2);padding-top:12px">';
-      _sfBlk2 += '<div style="font-size:13px;font-weight:700;color:#c4b5fd;margin-bottom:8px;display:flex;align-items:center;gap:6px;"><span style="font-size:14px">🔄</span>板块周期定位 + 资金趋势</div>';
-      _sfBlk2 += h3;
-      _sfBlk2 += '</div>';
-    }
-    $('sfBlock2').innerHTML=_sfBlk2||'<div class="ipo-empty">暂无复盘数据</div>';
 
-    setBadge('phSectorTime','盘后','短线',d.update_time);
+    if (allTrend.length > 0 || srSectors.length > 0) {
+      h3 += '<div style="margin-top:14px;border-top:1px dashed var(--border2);padding-top:12px;">';
+      h3 += '<div style="font-size:13px;font-weight:700;color:#c4b5fd;margin-bottom:8px;">💰 资金净额趋势</div>';
+      h3 += '<div class="sf-trend-grid">';
+      h3 += sfMiniTrend('5日', allTrend, 'net_5d');
+      h3 += sfMiniTrend('20日', allTrend, 'net_20d');
+      h3 += '</div>';
+      h3 += '<div style="font-size:13px;font-weight:700;color:#c4b5fd;margin:14px 0 8px;">📈 价格相对强度</div>';
+      h3 += '<div class="sf-trend-grid">';
+      h3 += sfMiniTrend('5日', srSectors, 'pct_5d');
+      h3 += sfMiniTrend('20日', srSectors, 'pct_20d');
+      h3 += '</div>';
+      h3 += '</div>';
+    }
+    $b3.innerHTML = h3;
+
+    setBadge('phSectorTime', '盘后', '短线', sft.update_time || sff.update_time || sr.update_time || '');
   }
 
-  /* ---- 主力净额分时累计曲线（盘中分时 + 盘后定基合并成一条线，2026-08-18 加） ---- */
+  /* ---- 主力净额分时累计曲线  /* ---- 主力净额分时累计曲线（盘中分时 + 盘后定基合并成一条线，2026-08-18 加） ---- */
   // 解析 SECTOR_FUND_FLOW_INTRADAY.snapshots 为 ECharts 多板块折线
   // 每个快照存 Top15 流入 + Top5 流出；同一板块在不同快照里的 net 累积成连续折线
   // 板块级（数据源已有）；个股级需另加源（push2detail 主力净额分时），后续单独做
@@ -9483,19 +9445,7 @@ window.showRestrictedItems = showRestrictedItems;
     safe(renderSixDim, window.SH_FIB || {}, window.MARGIN_DATA || {}, window.CFFEX_HOLDINGS || {}, window.CRISIS_DATA || {}, window.SECTOR_FUND_FLOW || {}, window.MARKET_FUND_FLOW_DATA || {});
     safe(renderCrisis, window.CRISIS_DATA || {});
     /* ~~ renderMarketFundFlow 已随卡下架移除 ~~ */
-    // 2026-08-11 修复：板块资金三合一的"收盘复盘/中期趋势"用 SECTOR_FUND_FLOW_TREND（盘后源，有昨日数据 00:15/08:30 出数）
-    // SECTOR_FUND_FLOW 是盘中源（每 30 分刷新），盘前被清空；只有当它有真实数据时才优先用，否则回退 TREND。
-    // _rs_sectors 是 SECTOR_RS 的 17:47 盘后定稿板块周期数据。
-    (function(){
-      const sft = window.SECTOR_FUND_FLOW_TREND || {};
-      const sff = window.SECTOR_FUND_FLOW || {};
-      const srs = window.SECTOR_RS || {};
-      const sffLive = (sff.no_data === true || sff.premarket_cleared === true) ? false
-        : (((sff.sectors_in&&sff.sectors_in.length)||0) + ((sff.sectors_out&&sff.sectors_out.length)||0) + ((sff.top_list&&sff.top_list.length)||0) > 0);
-      const base = sffLive ? Object.assign({}, sft, sff) : sft;
-      base._rs_sectors = (srs && srs.sectors) || [];
-      safe(renderSector, base);
-    })();
+
     // 2026-08-18 主人令：主力净额分时累计曲线（盘中分时+盘后定基合并）
     safe(renderSfIntradayChart, window.SECTOR_FUND_FLOW_INTRADAY || {});
     // 已下架：safe(renderMacro, window.MACRO_DATA || {});
