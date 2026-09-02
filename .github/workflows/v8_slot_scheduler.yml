@@ -1,0 +1,38 @@
+# v8 档期兜底调度器（云端）
+#
+# 用途：GitHub Actions schedule cron 存在静默丢触发问题，本工作流每 20 分钟主动检查
+# 盘前/盘中/盘后档期是否被成功覆盖，只补缺口、不盲轮询，避免 runner/限流风暴。
+# 本工作流本身由 GitHub cron 触发，同时由 WorkBuddy 自动化每 20 分钟派发一次作为
+# 双保险（WorkBuddy 调度更可靠，不受 GHA cron 静默失效影响）。
+#
+# 调度策略（只监督、不跑数据）：
+#   - 盘前 08:25 / 盘中 09:00-15:30 每 30 分 / 盘后 17:20
+#   - 任一档位在窗口内无成功 v8_cn_fetch_cloud run → 派发对应 category
+#   - 18:00 后若 post_close 已就绪且 v8_algo_cloud 今日尚未成功 → 派发算法链
+name: "🕒 v8 档期兜底调度器(云端)"
+
+on:
+  schedule:
+    # 每 20 分钟跑一次（UTC），覆盖 08:00-22:00 CST
+    - cron: '0,20,40 0-14 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: v8-slot-scheduler
+  cancel-in-progress: true
+
+jobs:
+  schedule:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: "🛰️ 运行档期兜底调度器"
+        shell: bash
+        run: |
+          python .github/scripts/v8_slot_scheduler.py
