@@ -1447,6 +1447,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=369597c35c" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=7f4e5a6633" defer></script>
+    <script src="data/FACTOR_LAB.js?v=0000000000" defer></script>
 <!-- 2026-08-31 轻量化：data/ALGO_TRACK.js（42.4 KB）前端零引用，停止注入（省 42.4 KB） -->
 <script src="data/ETF_PULSE.js?v=4d597fcbe1" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=b168aa5082" defer></script>
@@ -2370,6 +2371,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用·固定</span></button>
     </div>
 
+    <!-- ===== 2026-09-02 主人令：选股策略 tab 顶部插"策略级汇总"（来自原策略回测 tab 的 starRows） ===== -->
+    <div id="stStrategyRating" class="card" style="border-left:4px solid var(--border2);margin:14px 0;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="font-size:15px;font-weight:700;color:var(--txt);">🎯 策略级汇总</span>
+        <span style="font-size:11px;color:var(--dim);">全部已回测策略一表看尽 · 按胜率降序 · 最高在最上</span>
+        <span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);">✅ 全部真实跟踪</span>
+      </div>
+      <div id="stRatingBody"></div>
+    </div>
+
     <!-- ===== 2026-09-02 主人令：大牛股猎手 / 驾驶舱 / 全站精选 与选股策略高度重复，彻底删除；四量终极迁回选股策略子页 ===== -->
 
     <!-- ===== TAB 页面：🧭 选股池（2026-08-29 主人令：从盘后数据·已下架迁至选股策略子页；2026-08-30 移到首位并改为点击展开） ===== -->
@@ -2574,6 +2585,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="card" id="imaStrongBody" style="border-left:4px solid #a78bfa;margin-top:14px;">
         <div class="note" style="padding:20px;text-align:center;color:var(--dim);">📡 高手强势股跟踪（ima 自动同步）加载中…</div>
       </div>
+      <div class="card" id="factorLabBody" style="border-left:4px solid #22d3ee;margin-top:14px;">
+        <div class="note" style="padding:20px;text-align:center;color:var(--dim);">🧪 因子实验室（异常换手率 · ROE_TTM 大市值档）加载中…</div>
+      </div>
     </div><!--/st-life-->
 
     <!-- ===== TAB 页面：个股相对强度 (RPS + RS + 年线) ===== -->
@@ -2635,6 +2649,19 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 2026-08-31 一劳永逸：删除重复的「观测候选股池」TAB 旧副本（迁移时复制未删），
          原副本与新版 id 完全重复（st-pool / stPoolTime / stPoolSourceDist / stPoolStockList），
          导致 getElementById 只命中第一份、第二份时间戳永远「—」且 tab 切换错乱。 -->
+
+    <!-- 2026-09-02 主人令：选股策略 tab 底部"🗑️ 已下架策略说明"块（说明为什么下架 + 历史成绩归档） -->
+    <div id="stDelistedSection" class="card" style="margin:14px 0;border-left:4px solid rgba(245,158,11,.4);background:rgba(245,158,11,.03);">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span style="font-size:15px;font-weight:700;color:#f59e0b;">🗑️ 已下架策略</span>
+        <span style="font-size:11px;color:var(--dim);">说明为什么下架 · 历史成绩归档 · 不进主入口</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--dim);line-height:1.7;padding:0 4px 4px;">
+        <div style="margin:6px 0;"><b style="color:var(--txt);">🚗 驾驶舱（cockpit）</b> · 与主站 TOP10 高度重复（胜率/收益均无超额），2026-09-02 移出选股策略子页。历史回测见「回测汇总 tab > 已下架算法区」。</div>
+        <div style="margin:6px 0;"><b style="color:var(--txt);">🌐 全站精选（allsite）</b> · 与主站 TOP10 高度重复（胜率/收益均无超额），2026-09-02 移出选股策略子页。历史回测归档，保留单卡形式供查阅。</div>
+        <div style="margin:6px 0;"><b style="color:var(--txt);">🐂 大牛股猎手（hunter）</b> · 龙虎榜机构+游资核心共振胜率 T+5 ≈50% 收益不显著，2026-09-02 移出选股策略子页。回测见「回测汇总 tab > 已下架算法区」。</div>
+      </div>
+    </div>
 
   </section>
 
@@ -4115,7 +4142,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
      一个 tab 装两块：① 综合回测多策略×多持有期 ② K线信号60日回测
      解决"两边跑着看"问题，仅管理员可见。 -->
   <section id="sec-bt">
-    <div class="sec-head"><h2>🔒 策略回测（统一）</h2><span class="tag">仅管理员可见 · 综合回测 + 信号60日 · 两块一站看完</span><span class="fresh" id="btFresh">—</span></div>
+    <div class="sec-head"><h2>📈 回测汇总</h2><span class="tag">仅管理员可见 · 综合回测 + K线信号 + 模块回测 · 三块一站看完</span><span class="fresh" id="btFresh">—</span></div>
     <div id="btSummary" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0 4px;padding:8px 12px;background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.2);border-radius:10px;font-size:11.5px;"><span style="color:var(--dim);font-weight:600;">📊 回测总览</span><span style="color:var(--sub);">加载中…</span></div>
     <div id="btBody"><div class="note">加载中…</div></div>
   </section>
@@ -4555,32 +4582,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '</div></details>';
       }
 
-      /* ─── ⑤ 选股策略回测（按星级，置于生命周期下方 · 2026-09-02 主人令「生命周期也在该页下方弄个回测」）─── */
-      try{
-        html += '<div style="margin:10px 0;padding:0;border:1.5px solid rgba(168,85,247,.35);border-radius:10px;background:rgba(168,85,247,.04);">';
-        html += '<div style="padding:10px 12px;font-size:13px;font-weight:700;color:#a855f7;">📊 选股策略回测 <span style="font-size:11px;color:var(--dim);font-weight:500;">按星级降序 · 生命周期下方</span></div>';
-        html += '<div style="padding:8px 10px;">';
-        // 星级对比表（复用全局 _buildStrategyRating，与策略回顾一致口径）
-        var _lr = _buildStrategyRating();
-        if(_lr && _lr.length){
-          html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;">';
-          html += '<thead><tr style="background:rgba(168,85,247,.08);border-bottom:1.5px solid rgba(168,85,247,.3);">';
-          html += '<th style="padding:5px;text-align:left;color:#a855f7;">星级</th><th style="padding:5px;text-align:left;color:#a855f7;">策略</th><th style="padding:5px;text-align:right;color:#a855f7;">胜率</th><th style="padding:5px;text-align:right;color:#a855f7;">平均收益</th><th style="padding:5px;text-align:right;color:#a855f7;">样本</th></tr></thead><tbody>';
-          _lr.forEach(function(r){
-            html += '<tr style="border-bottom:1px solid rgba(148,163,184,.08);">';
-            html += '<td style="padding:4px 6px;color:var(--sub);font-weight:800;white-space:nowrap;">'+r.stars+'</td>';
-            html += '<td style="padding:4px 6px;font-weight:700;color:var(--txt);white-space:nowrap;">'+r.name+'</td>';
-            html += '<td style="padding:4px 6px;text-align:right;font-weight:700;color:'+_colorWR(r.win_rate)+';">'+(typeof r.win_rate==='number'?r.win_rate.toFixed(1):r.win_rate)+'%</td>';
-            html += '<td style="padding:4px 6px;text-align:right;font-weight:600;color:'+_colorPL(r.avg_return)+';">'+(r.avg_return>0?'+':'')+(typeof r.avg_return==='number'?r.avg_return.toFixed(2):r.avg_return)+'%</td>';
-            html += '<td style="padding:4px 6px;text-align:right;color:var(--sub);">'+r.sample+'</td>';
-            html += '</tr>';
-          });
-          html += '</tbody></table></div>';
-        }
-        // 主策略回测卡（复用 _renderPeriodBacktestCard，读 __STRATEGY_BACKTESTS 配置；已删策略自动不出现）
-        html += window.__renderBacktestCardsFrom(window.__STRATEGY_BACKTESTS);
-        html += '</div></div>';
-      }catch(e){ console.warn('[life backtest]', e); html += '<div class="note">回测渲染异常</div>'; }
+      /* ─── ⑤ 选股策略回测（按用户反问 2026-09-02 22:50：回测都归到回测汇总 tab 了，不在选股 tab 里重复写一份）
+           本页不再渲染战绩回测小条 / 模块回测卡，避免与回测汇总 tab 重复维护 ─── */
 
       html += '<div style="font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;">数据 '+_upd.substring(0,16)+' · 仅跟 v8 三大算法真实跟踪池</div>';
       html += '</div>'; // /card
@@ -4657,43 +4660,36 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     var html = '';
 
-    /* ── ① 策略星级对比表（2026-08-13 主人令：全部策略一表看尽，按星级排序）── */
+    /* 2026-09-02 主人令：策略级汇总表已上移到选股策略 tab 顶部（#stRatingBody），本 tab 只做"汇总+跟踪" */
     var starRows = _buildStrategyRating();
-    if(starRows.length){
-      html += '<div style="margin:14px 0;border-left:4px solid var(--border2);" class="card">';
-      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
-      html += '<span style="font-size:15px;font-weight:700;color:var(--txt);">① 策略星级对比</span>';
-      html += '<span style="font-size:11px;color:var(--dim);">全部已回测策略一表看尽 · 按胜率降序 · 最高在最上</span>';
-      html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);">✅ 全部真实跟踪</span>';
-      html += '</div>';
-      html += '<div style="font-size:10.5px;color:var(--dim);margin-bottom:8px;line-height:1.5;">综合分 = (胜率−50) + 平均收益×8 + 样本可信度（log10样本×2，上限8）。星级：≥30=★★★★★ / ≥20=★★★★ / ≥12=★★★ / ≥6=★★。<b style="color:var(--sub);">仅列真实算法跟踪回测</b>：模块回测(四量/CRDS/RPS) + 综合回测 + K线信号60日；合成基线（样本伪造/胜率≈随机）已剔除。<br><b style="color:var(--cyan);">口径说明</b>：<b>驾驶舱/综合回测</b> = 滚动回测所有历史入场信号的平均（"n=样本"是历史入场信号数，非天数）；<b>K线信号</b> = 最近 60 日 9 个通达信公式的回测均值（每日 1 条快照）。</div>';
-      html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
-      html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
-      html += '<th style="padding:7px 6px;text-align:left;color:var(--sub);">星级</th>';
-      html += '<th style="padding:7px 6px;text-align:left;color:var(--sub);">策略</th>';
-      html += '<th style="padding:7px 6px;text-align:right;color:var(--sub);">胜率</th>';
-      html += '<th style="padding:7px 6px;text-align:right;color:var(--sub);">平均收益</th>';
-      html += '<th style="padding:7px 6px;text-align:right;color:var(--sub);">样本</th>';
-      html += '<th style="padding:7px 6px;text-align:right;color:var(--sub);">综合分</th>';
-      html += '<th style="padding:7px 6px;text-align:left;color:var(--sub);">口径</th>';
-      html += '</tr></thead><tbody>';
+    try{ var sr = document.getElementById('stRatingBody'); if(sr && starRows && starRows.length){
+      var h = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">';
+      h += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+      h += '<th style="padding:7px 6px;text-align:left;color:var(--sub);">星级</th>';
+      h += '<th style="padding:7px 6px;text-align:left;color:var(--sub);">策略</th>';
+      h += '<th style="padding:7px 6px;text-align:right;color:var(--sub);">胜率</th>';
+      h += '<th style="padding:7px 6px;text-align:right;color:var(--sub);">平均收益</th>';
+      h += '<th style="padding:7px 6px;text-align:right;color:var(--sub);">样本</th>';
+      h += '<th style="padding:7px 6px;text-align:right;color:var(--sub);">综合分</th>';
+      h += '<th style="padding:7px 6px;text-align:left;color:var(--sub);">口径</th>';
+      h += '</tr></thead><tbody>';
       starRows.forEach(function(r, i){
         var isOpt = r.isOpt;
         var bg = isOpt ? 'background:linear-gradient(90deg,rgba(34,197,94,.16),rgba(34,197,94,.06));border-left:3px solid #22c55e;' : ((i===0 && !isOpt) ? 'background:rgba(244,73,93,.08);border-left:3px solid var(--up);' : '');
         var badge = isOpt ? '<span style="color:#22c55e;font-weight:800;"> 🏆最优策略</span>' : ((i===0) ? '<span style="color:var(--up);font-weight:700;"> 👑最强</span>' : '');
-        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+bg+'">';
-        html += '<td class="no-shrink"  style="padding:7px 6px;color:var(--sub);font-weight:800;white-space:nowrap">'+r.stars+'</td>';
-        html += '<td style="padding:7px 6px;font-weight:800;color:var(--txt);white-space:nowrap;">'+r.name+badge+'</td>';
-        html += '<td style="padding:7px 6px;text-align:right;font-weight:700;color:'+_colorWR(r.win_rate)+';">'+ (typeof r.win_rate==='number' ? r.win_rate.toFixed(1) : r.win_rate)+'%</td>';
-        html += '<td style="padding:7px 6px;text-align:right;font-weight:600;color:'+_colorPL(r.avg_return)+';">'+(r.avg_return>0?'+':'')+ (typeof r.avg_return==='number' ? r.avg_return.toFixed(2) : r.avg_return)+'%</td>';
-        html += '<td style="padding:7px 6px;text-align:right;color:var(--sub);">'+r.sample+'</td>';
-        html += '<td style="padding:7px 6px;text-align:right;font-weight:700;color:var(--sub);">'+r.score.toFixed(1)+'</td>';
-        html += '<td style="padding:7px 6px;color:var(--dim);font-size:10.5px;white-space:nowrap;">'+r.extra+'</td>';
-        html += '</tr>';
+        h += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);'+bg+'">';
+        h += '<td class="no-shrink"  style="padding:7px 6px;color:var(--sub);font-weight:800;white-space:nowrap">'+r.stars+'</td>';
+        h += '<td style="padding:7px 6px;font-weight:800;color:var(--txt);white-space:nowrap;">'+r.name+badge+'</td>';
+        h += '<td style="padding:7px 6px;text-align:right;font-weight:700;color:'+_colorWR(r.win_rate)+';">'+ (typeof r.win_rate==='number' ? r.win_rate.toFixed(1) : r.win_rate)+'%</td>';
+        h += '<td style="padding:7px 6px;text-align:right;font-weight:600;color:'+_colorPL(r.avg_return)+';">'+(r.avg_return>0?'+':'')+ (typeof r.avg_return==='number' ? r.avg_return.toFixed(2) : r.avg_return)+'%</td>';
+        h += '<td style="padding:7px 6px;text-align:right;color:var(--sub);">'+r.sample+'</td>';
+        h += '<td style="padding:7px 6px;text-align:right;font-weight:700;color:var(--sub);">'+r.score.toFixed(1)+'</td>';
+        h += '<td style="padding:7px 6px;color:var(--dim);font-size:10.5px;white-space:nowrap;">'+r.extra+'</td>';
+        h += '</tr>';
       });
-      html += '</tbody></table></div>';
-      html += '</div>';
-    }
+      h += '</tbody></table></div>';
+      sr.innerHTML = h;
+    }}catch(e){ console.warn('[stRatingBody sync]', e); }
 
     /* 2026-09-02 主人令：策略回顾统一收纳全部算法回测 · 主策略区（按星级降序） */
     html += '<div style="font-size:13px;font-weight:700;color:var(--txt);margin:18px 0 8px;display:flex;align-items:center;gap:8px;"><span>🎯</span>主策略回测 <span style="font-size:11px;color:var(--dim);font-weight:500;">按星级降序</span></div>';
@@ -4796,6 +4792,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     html += '<div style="font-size:13px;font-weight:700;color:var(--txt);margin:18px 0 8px;display:flex;align-items:center;gap:8px;"><span>🗑️</span>已下架算法回测 <span style="font-size:11px;color:var(--dim);font-weight:500;">按星级降序</span></div>';
     html += window.__renderBacktestCardsFrom(window.__STRATEGY_BACKTESTS_DELISTED);
 
+    /* 2026-09-02 主人令：回测汇总 tab 上方汇总+下方跟踪分层；下方"如何跟踪"说明（用户原话） */
+    html += '<div style="margin:18px 0 8px;padding:0;border:1.5px solid rgba(56,189,248,.35);border-radius:10px;background:rgba(56,189,248,.04);">';
+    html += '<div style="padding:10px 12px;font-size:13px;font-weight:700;color:#38bdf8;">📡 如何跟踪这些回测信号？</div>';
+    html += '<div style="padding:0 14px 12px;font-size:11.5px;color:var(--dim);line-height:1.7;">';
+    html += '<b style="color:var(--txt);">① 各算法当日/近期触发的信号</b> · 集中在主站「📅 今日事件」Tab，点信号查看个股跟踪详情<br>';
+    html += '<b style="color:var(--txt);">② K线信号 9 个通达信公式</b> · 最新触发点见「📡 实时数据」Tab；最近 60 日样本均值见本 tab 上方「📈 K线信号 9×5」块<br>';
+    html += '<b style="color:var(--txt);">③ 综合回测（策略本身价值）</b> · 历史信号入场记录全表见本 tab 上方「🔬 综合回测·策略×持有期」块；想看每日新增的入场信号 → 见候选池入口「🧭 选股池」<br>';
+    html += '<b style="color:var(--txt);">④ 算法逻辑与口径</b> · 见<a href="logic.html" style="color:#38bdf8;text-decoration:none;">「逻辑详解」</a>独立页（与本 tab 同步对齐）<br>';
+    html += '<b style="color:var(--txt);">⑤ 当日异常告警</b> · 如某算法胜率/收益异常下滑 → 邮件告警 <span style="color:var(--cyan);">2814546@qq.com</span>（每晚 03:00 跨文件对齐审计）';
+    html += '</div></div>';
+
     /* ── v8 选股生命周期 已迁至「选股策略」子页面（2026-09-01 主人令：
           置于三重共识之后，由 window.__renderLifecycleSection() 渲染进 #lifeBody）── */
     try{ if(typeof window.__renderLifecycleSection === 'function') window.__renderLifecycleSection(); }catch(e){ console.warn('[bt→lifecycle]', e); }
@@ -4894,8 +4901,56 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   };
   window.__imaSetFilter = function(f){ window.__imaFilter = f; window.__renderImaStrongStock(); };
 
+  // ===== 因子实验室（异常换手率 + ROE_TTM 大市值档）=====
+  window.__flRetry = 0;
+  window.__renderFactorLab = function(){
+    var D = window.FACTOR_LAB;
+    if(!D){
+      if(window.__flRetry < 15){ window.__flRetry++; setTimeout(window.__renderFactorLab, 700); }
+      return;
+    }
+    var dst = document.getElementById('factorLabBody');
+    if(!dst) return;
+    var _e = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
+    var m = D.meta || {};
+    var at = (D.abnormal_turnover||{});
+    var roe = (D.roe_largecap||{});
+    function row(r, kind){
+      var code = _e(r.code), name = _e(r.name), close = r.close==null?'—':r.close.toFixed(2);
+      var accent = kind==='at' ? (r.factor_at>0 ? '#22c55e' : (r.factor_at<0?'#ef5350':'#64748b'))
+                                : '#38bdf8';
+      var main = kind==='at' ? ('abn='+(r.abn==null?'—':r.abn.toFixed(2))+' 因子='+(r.factor_at==null?'—':r.factor_at.toFixed(2)))
+                              : ('ROE_TTM='+(r.roe_ttm==null?'—':r.roe_ttm.toFixed(1))+'%');
+      return '<div style="display:flex;justify-content:space-between;padding:6px 10px;border-left:3px solid '+accent+';margin:3px 0;font-size:13px;">'
+        + '<span><b>'+code+'</b> '+name+' <span style="color:var(--dim)">'+close+'</span></span>'
+        + '<span style="color:'+accent+'">'+main+'</span></div>';
+    }
+    var atTop = (at.top||[]).map(function(r){return row(r,'at');}).join('')
+      || '<div class="note" style="color:var(--dim)">无有效数据</div>';
+    var atBot = (at.bottom||[]).map(function(r){return row(r,'at');}).join('')
+      || '<div class="note" style="color:var(--dim)">—</div>';
+    var roeTop = (roe.top||[]).map(function(r){return row(r,'roe');}).join('')
+      || '<div class="note" style="color:var(--dim)">无有效数据</div>';
+    var html = ''
+      + '<div style="padding:14px 16px;">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
+      + '<b style="font-size:15px;">🧪 因子实验室</b>'
+      + '<span style="font-size:12px;color:var(--dim)">更新 '+_e(D.update_time)+'</span></div>'
+      + '<div style="font-size:12px;color:var(--dim);margin-bottom:10px;">重点池 '+_e(m.n_universe)+' 只 · 异常换手率有效 '+_e(m.n_at_valid)+' · ROE大市值档 '+_e(m.n_roe_large)+'　'
+      + '<span style="color:#22c55e">●</span>缩量强势 <span style="color:#ef5350">●</span>放量弱势</div>'
+      + '<div style="font-weight:600;margin:8px 0 4px;color:#22d3ee;">① 异常换手率（缩量=多，因子越高越强势）— Top 30</div>'
+      + atTop
+      + '<div style="font-weight:600;margin:10px 0 4px;color:#f87171;">放量最严重（弱势）— Bottom 10</div>'
+      + atBot
+      + '<div style="font-weight:600;margin:12px 0 4px;color:#38bdf8;">② ROE(TTM) 大市值档（成交额代理 Top1/3）— Top 30</div>'
+      + roeTop
+      + '<div style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5;">口径：异常换手率=当月换手率÷过去12月均值（缩量→低关注→强势）；ROE_TTM=最近4季度 roeAvg 求和。均经 v2 回测验证显著（Spearman IC t=4.3 / 3.3，样本内外一致）。仅作研究参考，非买卖建议。</div>'
+      + '</div>';
+    dst.innerHTML = html;
+  };
+
   // DOM ready hook
-  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} }
+  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} }
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', _renderPostReady);
   } else {
@@ -9814,6 +9869,7 @@ window.showRestrictedItems = showRestrictedItems;
     if(n==='pool' && typeof window.renderStPool==='function') setTimeout(window.renderStPool, 30);
     if(n==='life' && typeof window.__renderLifecycleSection==='function') setTimeout(window.__renderLifecycleSection, 30);
     if(n==='life' && typeof window.__renderImaStrongStock==='function') setTimeout(window.__renderImaStrongStock, 30);
+    if(n==='life' && typeof window.__renderFactorLab==='function') setTimeout(window.__renderFactorLab, 30);
     // 🛡 2026-09-02 主人令根治：切换后立即启动「子 tab 数据就绪重试」（见 __stRetryTab），消除 defer 未注入导致的首渲空卡
     try{ window.__stRetryTab(n); }catch(e){}
   };
