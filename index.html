@@ -3825,8 +3825,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var nb = ((s.seats||{}).北向||{}); var nbNet = +(nb.buy||0) - +(nb.sell||0);
       var src = []; if(inst>0) src.push('机游'); if(yz>0) src.push('游资'); if(nbNet>0) src.push('北向');
       var strength = (inst>0?inst:0) + (yz>0?yz:0) + (nbNet>0?nbNet:0);
-      return Object.assign({}, s, {_src: src.join('+'), _strength: strength, _nbNet: nbNet});
-    }).filter(function(x){ return x._strength > 0; })
+      var _net = inst + yz + nbNet;
+      return Object.assign({}, s, {_src: src.join('+'), _strength: strength, _net: _net, _nbNet: nbNet});
+    }).filter(function(x){ return x._net > 0; })  // 2026-09-02 净流向去重：整体净买才进关注，避免与风险卡同列
       .sort(function(a,b){ return b._strength - a._strength; })
       .slice(0,5);
     if(_focusList.length > 0){
@@ -3853,8 +3854,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var nb = ((s.seats||{}).北向||{}); var nbNet = +(nb.buy||0) - +(nb.sell||0);
       var src = []; if(inst<0) src.push('机游'); if(yz<0) src.push('游资'); if(nbNet<0) src.push('北向');
       var amount = (inst<0?inst:0) + (yz<0?yz:0) + (nbNet<0?nbNet:0); // 都为负，和越负越严重
-      return Object.assign({}, s, {_src: src.join('+'), _amount: amount});
-    }).filter(function(x){ return x._amount < 0; })
+      var _net = inst + yz + nbNet;
+      return Object.assign({}, s, {_src: src.join('+'), _amount: amount, _net: _net});
+    }).filter(function(x){ return x._net < 0; })  // 2026-09-02 净流向去重：整体净卖才进风险，避免与关注卡同列
       .sort(function(a,b){ return a._amount - b._amount; })  // 升序，最负排前
       .slice(0,5);
     if(riskItems.length > 0){
