@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "bcd184d03";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "6f02a11de";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -538,7 +538,7 @@ window.__domReadyFns=[];
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/POTENTIAL_PICKS.js?v=2ce3c7bbdc" defer></script>
 <script src="data/INDEX_QUOTES.js?v=3e2a15dfb0" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=91830768d6" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=f0f761c5d8" defer></script>
 <script src="data/MARGIN_DATA.js?v=cb00eeb3d7" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=ce9c4fe7f7" defer></script>
 <script src="data/IPO_DATA.js?v=3dbd1fc030" defer></script>
@@ -971,33 +971,8 @@ function __judgmentCandidatesHTML(){
     });
   });
 
-  // 2) 驾驶舱 A 档（中长线趋势质量）
-  (window.COCKPIT_TIER_RECOMMEND && _safeArr(window.COCKPIT_TIER_RECOMMEND.tier_a)).forEach(function(s){
-    var isHk = (s.market||'') === '港股';
-    var tech = +((s.tech_score)||0);
-    var qs = +((s.quality_score)||0);
-    var rsi = +(s.rsi || 0);
-    var ret20 = +(s.ret20 || 0);
-    var ema = +(s.ema || 0);
-    // 港股/缺失基本面时 quality_score=0，total_score 全为 tech_score 容易扎堆 60；
-    // 用 rsi/ret20/ema 做微小增量打散，保留 0~100 区间。
-    var adjustedScore = qs > 0
-      ? (tech + qs)
-      : Math.min(100, tech + Math.max(0, 68-rsi)*0.25 + Math.max(0, 35-ret20)*0.15 + ema*0.35);
-    _push({
-      code:s.code, name:s.name, market:isHk?'hk':(s.market||'sh'), board:isHk?'港股':(s.board||''),
-      /* 2026-09-03 主人令：src 列表移除 驾驶舱A档 entry（已全方位下线） */
-      score:adjustedScore,
-      buyScore:adjustedScore,
-      horizon:'中长线',
-      close:null, pct:null,
-      stopLoss:null, targetPrice:null,
-      industry:'', concepts:[],
-      reason:s.comment || (s.early || ''),
-      enterDate:s.enter_date,
-      worth: +(s.total_score||0) >= 50
-    });
-  });
+  // 2) 驾驶舱 A 档（中长线趋势质量）—— 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND.js 已全方位下线，
+  //     整段 forEach 删除（commit 1/3 漏未扫到）。驾驶舱 tier_a/港股 market 区分等业务一并归零。
 
   // 3) 四量终极（QD 共振，短线量能突破）
   _safeArr(window.FOUR_VOLUME && window.FOUR_VOLUME.stocks).forEach(function(s){
@@ -1472,8 +1447,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/TRIPLE_CONSENSUS.js?v=9ab23c898e" defer></script>
 <script src="data/TRIPLE_TRACK.js?v=9898f80589" defer></script>
 <script src="data/TRIPLE_HISTORY.js?v=732db6af0c" defer></script>
-<script src="data/COCKPIT_TIER_RECOMMEND.js?v=2d6c5f0923" defer></script>
-<script src="data/COCKPIT_ADVICE.js?v=a895d5786f" defer></script>
+<!-- 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND.js / COCKPIT_ADVICE.js 脚本标签删除（commit 1/3 漏未扫到；脚本文件早已全方位下线，留着只会在浏览器控制台制造 404 噪音、影响运维健康检查"失败/诊断详情"，一并清干净） -->
 <script src="data/V8_CAL.js?v=373e7500cc"></script>
 <script src="data/SH_FIB.js?v=75c1bd586c" defer></script>
 <script src="data/SZ_FIB.js?v=eb6905cfc8" defer></script>
@@ -1501,13 +1475,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 2026-08-31 一劳永逸：window.STOCK_RPS_DATA 已由 line 492 data/STOCK_RPS.js 注入（最新 19:16 版本），
          此处再引入 data/STOCK_RPS_DATA.js（旧 01:56 版本）会覆盖最新数据 → 相对强度子页/状态胶囊均读到陈旧值。
          删除重复注入，确保全局只保留一份最新 RPS 数据。 -->
+<!-- 2026-09-03 主人令：COCKPIT_BACKTEST.js / HUNTER_BACKTEST.js 脚本标签删除（脚本文件早已全方位下线，留着只会在浏览器控制台制造 404 噪音、影响运维健康检查"失败/诊断详情"，一并清干净） -->
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=cd12cfa6ce" defer></script>
-<script src="data/COCKPIT_BACKTEST.js?v=7927fd5783" defer></script>
-<script src="data/BACKTEST_TDX.js?v=b1589ec11f" defer></script>  <script src="data/HUNTER_BACKTEST.js?v=d453cea5d0" defer></script>
+<script src="data/BACKTEST_TDX.js?v=b1589ec11f" defer></script>
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=f4fabe4f73" defer></script>
 <script src="data/EXPERIMENT.js?v=e9b748dc96" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=ca27bec086" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=a997b9763e" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=7c9b29d7fd" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=7f4e5a6633" defer></script>
@@ -1522,12 +1496,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=b63c783d8b" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=bf0d0da79f" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=99e0cec24f" defer></script>
-<script src="data/HEALTH_CHECK.js?v=9ba72843c4" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=a9721c4abd" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=8a2797ead7" defer></script>
+<script src="data/RUNNER_STATUS.js?v=34d7319714" defer></script>
+<script src="data/HEALTH_CHECK.js?v=490069846b" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=0368395575" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=8fd0dd89fb" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 MARKET_PATH_PROBABILITY 注入（AI预测卡用） -->
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=0290be12e5" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=99d71dbdd1" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=ac04776279" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=258e585586" defer></script>
@@ -4099,9 +4073,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   // 2026-09-02 主人令：大牛股猎手回测改为由策略回顾统一渲染（已下架算法回测区），
   //   原 window.__renderHunterBacktest 已删除，避免与 _renderPeriodBacktestCard 重复。
 
-  // ═══ 2026-08-13 主人令：策略星级对比表（聚合已有4类回测数据） ═══
-  // 数据来源（详见逻辑详解）：BACKTEST_COMPREHENSIVE(共振3档) + COCKPIT_BACKTEST(驾驶舱2档) +
-  //         BACKTEST_TDX(K线信号9个) + OPTIMIZED_STRATEGY(三信号优化)
+  // ═══ 2026-08-13 主人令：策略星级对比表（聚合已有回测数据） ═══
+  // 2026-09-03 主人令：数据来源仅保留仍活跃的回测源（BACKTEST_COMPREHENSIVE + BACKTEST_TDX + OPTIMIZED_STRATEGY）。
+  //     已下线驾驶舱（COCKPIT_BACKTEST）整段删除（脚本标签、DATA 映射、星级表数据源三处都清干净）。
   // 综合分 = (胜率-50)×1 + 平均收益×8 + min(8, log10(样本)×2)
   // 星级：≥30⭐⭐⭐⭐⭐ / ≥20⭐⭐⭐⭐ / ≥12⭐⭐⭐ / ≥6⭐⭐ / ≥0⭐ / <0无星
   function _buildStrategyRating(){
@@ -4110,7 +4084,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var bd = window.BACKTEST_TDX || {};
     var op = window.OPTIMIZED_STRATEGY || {};
 
-    // ① 驾驶舱（COCKPIT_BACKTEST）—— 2026-09-02 主人令：驾驶舱已移出选股策略子页（已删策略），其回测不再进星级表
+    // ① 已下架的驾驶舱回测整段移除 —— 2026-09-03 主人令：COCKPIT_BACKTEST.js 已全方位下线，星级表只跑仍在线的回测源
 
     // ② 共振（BACKTEST_COMPREHENSIVE.comparison.hold_1d）
     if(bc && bc.comparison && bc.comparison.hold_1d){
@@ -4259,6 +4233,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         return;
       }
       var sc = pt.status_counts || {};
+      // 高手共振：IMA 跟踪池作为外部共振源之一（2026-09-03 主人令：高手的也是共振源之一）
+      var _imaMap = {};
+      try{ ((window.IMA_STRONG_STOCK && window.IMA_STRONG_STOCK.stocks) || []).forEach(function(s){ if(s && s.code) _imaMap[s.code] = s; }); }catch(_){}
+      function _resoBadge(code){
+        if(_imaMap[code]) return '<span style="font-size:9px;font-weight:700;color:#fbbf24;background:rgba(251,191,36,.16);border:1px solid rgba(251,191,36,.4);padding:1px 4px;border-radius:4px;white-space:nowrap;" title="高手强势股跟踪也命中（外部共振源）">🏆</span>';
+        return '';
+      }
       var removedMap = _loadRemovedMap();
 
       /* ─── 状态枚举（提前定义，供 4 桶状态标签与待确认剔除 共用，避免 hoist 后 undefined 访问） ─── */
@@ -4356,6 +4337,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           html +=     '<span style="font-weight:700;font-size:12.5px;color:var(--txt);font-family:ui-monospace,monospace;">'+_esc(_code)+'</span>';
           html +=     '<span style="font-size:11.5px;color:var(--txt);">'+_esc(_name)+'</span>';
           html +=     '<span style="margin-left:auto;font-weight:700;font-size:11px;color:#38bdf8;padding:2px 8px;border-radius:6px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);white-space:nowrap;">🤝 '+_cons+' / 3</span>';
+          html +=     _resoBadge(_code);
           html +=   '</div>';
           html +=   '<div style="margin-bottom:6px;line-height:1.6;font-size:10.5px;">';
           html +=     '<span style="color:var(--dim);font-size:10px;margin-right:4px;">命中的算法：</span>'+(algoChips||'<span style="font-size:10px;color:var(--dim);">—</span>');
@@ -4399,7 +4381,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var sigColor = it.signal_type==='多算法共识' ? '#38bdf8' : (it.signal_type==='强势突破' ? '#ef5350' : (it.signal_type==='板块联动' ? '#22c55e' : 'var(--sub)'));
           html += '<tr style="border-bottom:1px solid rgba(148,163,184,.08);background:rgba(251,191,36,.03);">';
           html += '<td style="padding:4px 6px;color:var(--txt);font-weight:600;">'+_esc(_code)+'</td>';
-          html += '<td style="padding:4px 6px;color:var(--txt);">'+_esc(_name)+'</td>';
+          html += '<td style="padding:4px 6px;color:var(--txt);">'+_esc(_name)+' '+_resoBadge(_code)+'</td>';
           html += '<td style="padding:4px 6px;color:'+sigColor+';font-size:10.5px;">'+_esc(it.signal_type||'')+'</td>';
           html += '<td style="padding:4px 6px;text-align:right;color:var(--gold);font-weight:700;">'+(_selScore>0?'+':'')+_selScore.toFixed(1)+'</td>';
           html += '<td style="padding:4px 6px;color:'+conceptColor+';font-size:10.5px;" title="净流入 '+(_secNet>0?'+':'')+_secNet.toFixed(1)+'亿">'+(it.concept_top?_esc(it.concept_top):'—')+'</td>';
@@ -4449,6 +4431,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
             html +=   '<div style="display:flex;align-items:center;gap:4px;margin-top:auto;min-width:0;">';
             if(_isSel){ html += '<span style="font-size:9px;font-weight:700;color:var(--gold);">🌟</span>'; }
             if(_cons>=2){ html += '<span style="font-size:9px;font-weight:700;color:#38bdf8;padding:1px 4px;border-radius:4px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);">🤝'+_cons+'</span>'; }
+            html += _resoBadge(_code);
             html +=     '<span style="margin-left:auto;font-weight:700;font-size:11.5px;color:'+periodColor+';white-space:nowrap;">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
             html +=   '</div>';
             html += '</div>';
@@ -4484,6 +4467,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         html += '</div>';
         html += '<div style="display:flex;align-items:center;gap:4px;margin-top:auto;min-width:0;">';
         html += '<span style="font-size:9px;color:'+statusCol+';padding:1px 4px;border-radius:4px;background:'+statusColor[_status]+'22;white-space:nowrap;">'+_esc(statusLabel[_status]||_status)+'</span>';
+        html += _resoBadge(_code);
         html += '<span style="font-size:9px;color:var(--dim);white-space:nowrap;">回撤 '+_drawdown.toFixed(1)+'%</span>';
         html += '<span style="margin-left:auto;color:#38bdf8;font-size:10px;cursor:pointer;user-select:none;white-space:nowrap;" onclick="window.__removeStock(\''+_esc(_code)+'\')">确认剔除 ✕</span>';
         html += '</div>';
@@ -4520,7 +4504,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     try{
     var bc = (typeof window!=='undefined' && window.BACKTEST_COMPREHENSIVE) || {};
     var bd = (typeof window!=='undefined' && window.BACKTEST_TDX) || {};
-    var cb = (typeof window!=='undefined' && window.COCKPIT_BACKTEST) || {};
+    // 2026-09-03 主人令：var cb = window.COCKPIT_BACKTEST 已删（脚本标签 + 数据源均已下线，留 fallback 反而误导）
 
     // 2. 取各回测数据源中最新的 calc_time/update_time 作为统一"更新于"时间
     var btTimes = [];
@@ -4821,11 +4805,20 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     function _p(v){ var n=parseFloat(v); return isNaN(n)?'--':((n>0?'+':'')+n.toFixed(2)+'%'); }
     function _pr(v){ var n=parseFloat(v); return isNaN(n)?'--':n.toFixed(2); }
     var html = '';
+    // 高手共振 set：IMA 股票若命中 v8 选股生命周期池 → 视为外部共振源
+    var _imaSet = {}; (D.stocks||[]).forEach(function(s){ if(s && s.code) _imaSet[s.code] = s; });
+    var _v8Items = (window.V8_POOL_TRACKER && window.V8_POOL_TRACKER.items) || [];
+    var _v8Map = {}; _v8Items.forEach(function(x){ if(x && x.code) _v8Map[x.code] = x; });
+    var _reso = 0; for(var _c1 in _imaSet){ if(_v8Map[_c1]) _reso++; }
+    // 头部胶囊：更新于 + 已跟踪 N + 高手共振 N
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">';
     html += '📡 <span style="font-weight:700;font-size:14px;color:var(--txt);">高手强势股跟踪</span>';
     html += '<span style="font-size:10px;color:#a78bfa;font-weight:600;background:rgba(167,139,250,.14);padding:1px 7px;border-radius:4px;">ima 自动同步</span>';
     if(D.note_url) html += '<a href="'+_e(D.note_url)+'" target="_blank" style="font-size:11px;color:#a78bfa;text-decoration:none;">原帖↗</a>';
-    html += '<span style="margin-left:auto;font-size:11px;color:var(--dim);">更新 '+(D.update_time||'').slice(0,16).replace('T',' ')+'</span>';
+    if(typeof _uBadge === 'function') html += _uBadge('盘后','短线',(D.update_time||'').slice(0,16).replace('T',' '));
+    // 已跟踪 N（语义真实，非已入仓）
+    html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.3);white-space:nowrap">📋 已跟踪 <b style="margin-left:2px">'+(D.stocks?D.stocks.length:0)+'</b></span>';
+    if(_reso>0) html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);white-space:nowrap">🏆 高手共振 <b style="margin-left:2px">'+_reso+'</b></span>';
     html += '</div>';
     html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;font-size:11px;">';
     [['跟踪',sum.track,'#a78bfa'],['强势',sum.strong,'#22c55e'],['买点候选',sum.buy_point,'#fbbf24'],['见顶',sum.top,'#fb923c'],['走弱',sum.weak,'#ef5350'],['已剔除',sum.removed,'#94a3b8']].forEach(function(b){ if(b[1]!=null) html += '<span style="padding:2px 8px;border-radius:10px;font-weight:600;color:'+b[2]+';background:'+b[2]+'22;border:1px solid '+b[2]+'55;">'+b[0]+' '+b[1]+'</span>'; });
@@ -4844,11 +4837,19 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '<th style="padding:5px 6px;">基准价</th><th style="padding:5px 6px;">最新价</th>'
       + '<th style="padding:5px 6px;">涨跌幅</th><th style="padding:5px 6px;">回撤</th>'
       + '<th style="padding:5px 6px;">连涨</th><th style="padding:5px 6px;text-align:left;">状态</th>'
-      + '<th style="padding:5px 6px;text-align:left;">买点提示</th></tr></thead><tbody>';
+      + '<th style="padding:5px 6px;text-align:left;">买点提示</th><th style="padding:5px 6px;text-align:left;">v8 命中</th></tr></thead><tbody>';
     rows.forEach(function(s){
       var dp=parseFloat(s.drawdown_pct);
       var dcol=isNaN(dp)?'var(--sub)':(dp>0?'#ef5350':(dp<0?'#26a69a':'var(--sub)'));
       var sc=statusMap[s.status]||'#94a3b8';
+      // v8 命中：该 IMA 股票是否同时在 v8 选股生命周期池
+      var _v8 = _v8Map[s.code] || null;
+      var _v8Html = '<span style="font-size:10px;color:var(--dim);">—</span>';
+      if(_v8){
+        var _vs = _v8.status||'';
+        var _vc = {'strong':'#22c55e','buy_dip':'#fbbf24','topped':'#fb923c','weak':'#ef5350','normal':'#38bdf8'}[_vs]||'#94a3b8';
+        _v8Html = '<span style="display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:600;color:'+_vc+';background:'+_vc+'22;">🏆 '+(window.__v8StatusLabel ? window.__v8StatusLabel[_vs]||_vs : _vs)+'</span>';
+      }
       html += '<tr style="border-top:1px solid var(--border);">'
         + '<td style="padding:5px 6px;color:var(--txt);font-weight:600;">'+(s.code||'')+'</td>'
         + '<td style="padding:5px 6px;color:var(--txt);">'+_e(s.name||'')+'</td>'
@@ -4861,6 +4862,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         + '<td style="padding:5px 6px;text-align:right;">'+(s.consecutive_up||0)+'</td>'
         + '<td style="padding:5px 6px;"><span style="display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:600;color:'+sc+';background:'+sc+'22;">'+_e(s.status||'')+'</span></td>'
         + '<td style="padding:5px 6px;color:var(--dim);max-width:200px;">'+_e(s.buy_point||'')+'</td>'
+        + '<td style="padding:5px 6px;">'+_v8Html+'</td>'
         + '</tr>';
     });
     html += '</tbody></table></div>';
@@ -11792,7 +11794,9 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     DATA.gold_pool = window.GOLD_POOL||null;
     DATA.allsite = null;  /* 2026-09-03 主人令：window.COCKPIT_TIER_RECOMMEND 已下线（原代 cockpit 整片已删） */
     DATA.cockpit_tier = null;  /* 2026-09-03 主人令：同上 */
-    DATA.cockpit_backtest = null;  /* 2026-09-03 主人令：window.COCKPIT_BACKTEST 已下线 */
+    // 2026-09-03 主人令：COCKPIT_BACKTEST / COCKPIT_TIER_RECOMMEND / COCKPIT_ADVICE 整片已全方位下线
+    //     （commit 1/3 已删 DOM/函数/CSS，commit 2/3 已删脚本与 JSON；DATA.* 死赋值仅作审计存档）
+    DATA.cockpit_backtest = null;  /* COCKPIT_BACKTEST.js 已删，运维/UI 都已无引用 */
     DATA.cockpit_advice = null;  /* 2026-09-03 主人令：window.COCKPIT_ADVICE 已下线 */
     DATA.candidate = window.CANDIDATE||null;
     DATA.backtest_comprehensive = window.BACKTEST_COMPREHENSIVE||null;
@@ -12433,7 +12437,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=9ba72843c4')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=490069846b')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
