@@ -109,9 +109,6 @@ CARD_DEFS = [
     {"id": "SECTOR_RECOMMENDATION", "name": "板块推荐", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["regime", "current_rates", "trends", "meta"], "heal_cat": "algo_run"},
     # 选股策略
     {"id": "FOUR_VOLUME", "name": "四量终极", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "heal_cat": "algo_run", "picking": True},
-    {"id": "COCKPIT_ADVICE", "name": "驾驶舱", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["verdict", "watch"], "heal_cat": "algo_run", "picking": True},
-    {"id": "BIG_BULL_HUNTER", "name": "大牛股猎手", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["stocks"], "_source_file": "LHB_DATA", "_window_var": "LHB_DATA", "heal_cat": "algo_run", "picking": True},  # 前端 renderHunter 直接读 LHB_DATA 派生的机游共振信号，无独立 BIG_BULL_HUNTER.js 文件
-    {"id": "TOP10_DAILY", "name": "全站精选", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["top10"], "heal_cat": "algo_run", "picking": True},
     {"id": "STOCK_RPS", "name": "相对强度", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["records"], "_window_var": "STOCK_RPS_DATA", "heal_cat": "algo_run", "picking": True},  # 文件名 STOCK_RPS.js，但 window 变量名是 STOCK_RPS_DATA（历史遗留）
     {"id": "CRDS_CARD_DATA", "name": "逆势龙头", "page": "选股策略", "freq": "收盘后1次", "max_age": 360, "key_fields": ["elite", "watch"], "heal_cat": "algo_run", "picking": True},
     # 运维/静态说明页（逻辑详解页「防删」子页）
@@ -135,7 +132,6 @@ CARD_DEFS = [
     # 🛡 2026-09-02 一劳永逸：HUNTER_BACKTEST.js（大牛股猎手历史回测）此前无 CARD_DEFS 登记，
     #   被通用全量审计按「全量数据/24h 红线」误杀。实际为历史回测产物，依赖 lhb_history，
     #   变化慢、baostock 取 K 线可能不稳定；改为显式登记，max_age=7 天，并纳入算法链日常调度。
-    {"id": "HUNTER_BACKTEST", "name": "大牛股猎手回测", "page": "盘后数据", "freq": "收盘后1次", "max_age": 10080, "key_fields": ["summary"], "heal_cat": "algo_run"},
 ]
 
 
@@ -2012,30 +2008,7 @@ def check_signal_date_freshness():
         return results
     last_trade_str = last_trade.strftime("%Y-%m-%d")
 
-    # ── COCKPIT_ADVICE ──
-    # 注意：COCKPIT_ADVICE 是历史回测样本库，watch[].signal_date 是信号发生日期，
-    # 不一定是最近交易日，因此不将其与最近交易日比较作为陈旧告警。
-    # 驾驶舱数据本身是否更新，由通用数据卡新鲜度检查覆盖。
-    d = load_window_var(DATA_DIR / "COCKPIT_ADVICE.js", "COCKPIT_ADVICE")
-    if d is None:
-        results.append({
-            "id": "cockpit_signal_stale",
-            "name": "驾驶舱建议信号日期",
-            "page": "内容审计",
-            "status": "warn",
-            "message": "无法加载 COCKPIT_ADVICE.js"
-        })
-    else:
-        gen_time = d.get("gen_time", "--")
-        signal_dates = [item.get("signal_date") for item in d.get("watch", []) if item.get("signal_date")]
-        newest_signal = max(signal_dates) if signal_dates else "--"
-        results.append({
-            "id": "cockpit_signal_stale",
-            "name": "驾驶舱建议信号日期",
-            "page": "内容审计",
-            "status": "ok",
-            "message": f"生成时间 {gen_time}，最新信号发生日期 {newest_signal}（历史回测样本，非陈旧指标）"
-        })
+    # 2026-09-03 主人令：COCKPIT_ADVICE 验证段已下线
 
     # ── FINAL_RECOMMEND_DATA ──
     d = load_window_var(DATA_DIR / "FINAL_RECOMMEND_DATA.js", "FINAL_RECOMMEND_DATA")
@@ -2108,7 +2081,6 @@ _A_SHARE_POOLS = [
     ("CANDIDATE.js",            "CANDIDATE",            "候选池",       "algo_run"),
     ("GOLD_POOL.js",            "GOLD_POOL",            "黄金池",       "algo_run"),
     ("TRIPLE_CONSENSUS.js",     "TRIPLE_CONSENSUS",     "三重共识",     "algo_run"),
-    ("COCKPIT_TIER_RECOMMEND.js","COCKPIT_TIER_RECOMMEND","驾驶舱分档",   "algo_run"),
     ("CRDS_CARD_DATA.js",       "CRDS_CARD_DATA",       "逆势龙头",     "algo_run"),
     ("FOUR_VOLUME.js",          "FOUR_VOLUME",          "四量终极",     "algo_run"),
     ("LHB_DATA.js",             "LHB_DATA",             "龙虎榜",       "cn_fetch"),
@@ -2141,24 +2113,7 @@ def check_a_share_coverage():
             continue
         # 🔴 2026-09-02 一劳永逸：驾驶舱分档同时含 tier_a（严格）+ tier_b（埋伏），
         #   健康检查只看 tier_a 会误报"全港股"（tier_b 实际含 A股 创业板/沪市/深市）
-        if var == "COCKPIT_TIER_RECOMMEND":
-            stocks = list(d.get("tier_a", []) or []) + list(d.get("tier_b", []) or [])
-        else:
-            stocks_raw = d.get("stocks", d.get("all_candidates", d.get("watch", d.get("tier_a", []))))
-            if isinstance(stocks_raw, dict):
-                stocks = list(stocks_raw.values())
-            else:
-                stocks = stocks_raw or []
-        total = len(stocks)
-        a_cnt = sum(1 for s in stocks if _is_a_share(s)) if total > 0 else 0
-        hk_cnt = total - a_cnt
-        # 严格池（如 TRIPLE_CONSENSUS）的 near_miss 差一步备选，弱市常 0
-        near_miss_count = len(d.get("near_miss", []) or [])
-        pool_status.append({
-            "total": total, "name": name, "var": var, "heal": heal,
-            "stocks": stocks, "a_cnt": a_cnt, "hk_cnt": hk_cnt,
-            "near_miss_count": near_miss_count,
-        })
+        # 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND 合并 tier_a/tier_b 逻辑已下线
 
     # ── 第二轮：判"全 0 vs 独立 0" ──
     n_total = len(pool_status)
@@ -2168,7 +2123,7 @@ def check_a_share_coverage():
     # 🔴 2026-08-17 增强：识别"严格共识/选股"类池（弱市天然 0，不应算"上游问题"）
     # 严格类：三重共识/驾驶舱分档/逆势龙头/四量终极/国际投行（命中条件严，弱市 0 是常态）
     # 数据类：候选池/黄金池/龙虎榜/最终推荐（结构性数据，0 = 真上游问题）
-    STRICT_POOL_NAMES = {"三重共识", "驾驶舱分档", "逆势龙头", "四量终极", "国际投行信号"}
+    STRICT_POOL_NAMES = {"三重共识", "逆势龙头", "四量终极", "国际投行信号"}  # 2026-09-03 主人令：驾驶舱分档下线
 
     for p in pool_status:
         if p["total"] == 0:
