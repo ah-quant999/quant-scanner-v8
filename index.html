@@ -1630,8 +1630,23 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     window.__selfHealJudgmentHeader = function(){
       var _self = arguments.callee;
       var head = document.getElementById('judgmentCardHeader');
-      var ok = head && head.innerHTML && head.innerHTML.indexOf('今日判定') >= 0;
-      if(!ok && typeof window.v8CardHeader === 'function' && typeof window.__renderJudgmentHeader === 'function'){
+      // 🔴 2026-09-02 14:5x 主人令「更新于呢？」根因修复：
+      //   原 ok 仅校验 head 含卡名，但：defer 时序下需排序：
+      //     1) HTML 分析到 line 1630+ 注册 ◐◦selfHealJudgmentHeader；
+      //     2) HTML 继续分析到 line 10673 注册 v8CardHeader；
+      //     3) <script src="data/JUDGMENT_DATA.js" defer> 和 <script src="data/MACRO_BRIEF.js" defer> 在 HTML 分析完成后才异步执行；
+      //     4) 首次 initCardBadges / switchSec 触发 ◐◦renderJudgmentHeader 时，JUDGMENT_DATA.js 可能还没加载完；
+      //     5) ts='' → v8CardHeader 返回的 HTML 中：卡名、副标题，但缺少「更新于」膠勢；
+      //     6) 自愈校验 ok 通过（head.innerHTML.indexOf('今日判定')>=0）→ 永不重昆明；
+      //   实锤：JUDGMENT_DATA.update_time=“2026-09-02 12:58:50” 在线是有的，单纯没进 head。
+      //   现加条件：ts 有值但 head 不含「更新于」时强制重昆明，确保数据落地后膠勢出现。
+      var jd2 = window.JUDGMENT_DATA || {};
+      var mb2 = window.MACRO_BRIEF || {};
+      var ts2 = jd2.update_time || mb2.update_time || '';
+      var hasCard = head && head.innerHTML && head.innerHTML.indexOf('今日判定') >= 0;
+      var hasTime = head && head.innerHTML && head.innerHTML.indexOf('更新于') >= 0;
+      var needRe = (!hasCard) || (ts2 && !hasTime);
+      if(needRe && typeof window.v8CardHeader === 'function' && typeof window.__renderJudgmentHeader === 'function'){
         try{ window.__renderJudgmentHeader(); }catch(e){}
       }
       setTimeout(_self, 1000);
