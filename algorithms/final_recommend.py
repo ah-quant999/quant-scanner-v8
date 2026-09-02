@@ -628,9 +628,11 @@ def main():
             if not code:
                 continue
             _pure = norm_code(code)
+            _pure6 = _pure.lstrip('.')
             _nm = _stock_name_map()
-            display_name = (_nm.get(_pure) or _nm.get(code) or s.get("name") or "")
-            r = ensure(code, _resolve_name(code, display_name), "", "")
+            display_name = (_nm.get(_pure6) or _nm.get(_pure) or _nm.get(code)
+                           or (profiles.get(_pure6) or {}).get("name") or s.get("name") or "")
+            r = ensure(code, display_name, "", "")
             sc = 2.0 if i < 5 else (1.5 if i < 15 else 1.0)
             sc *= (1.0 if _open_regime else 0.3)
             r["sources"].append("异常换手率")
@@ -645,9 +647,11 @@ def main():
             if not code:
                 continue
             _pure = norm_code(code)
+            _pure6 = _pure.lstrip('.')
             _nm = _stock_name_map()
-            display_name = (_nm.get(_pure) or _nm.get(code) or s.get("name") or "")
-            r = ensure(code, _resolve_name(code, display_name), "", "")
+            display_name = (_nm.get(_pure6) or _nm.get(_pure) or _nm.get(code)
+                           or (profiles.get(_pure6) or {}).get("name") or s.get("name") or "")
+            r = ensure(code, display_name, "", "")
             sc = 2.0 if i < 5 else (1.5 if i < 15 else 1.0)
             sc *= (1.0 if _open_regime else 0.3)
             r["sources"].append("ROE_TTM")
@@ -972,6 +976,11 @@ def main():
         })
     # ── end 双轨 ──
 
+    # 方案B：因子候选（异常换手率/ROE_TTM）因权重低常落在 top30 之后，需强制纳入候选池，否则方案B不可见
+    _top30 = scored[:30]
+    _top30_keys = {x["key"] for x in _top30}
+    _factor_extra = [x for x in scored[30:] if ("异常换手率" in x["sources"] or "ROE_TTM" in x["sources"]) and x["key"] not in _top30_keys]
+
     result = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "crisis_score": round(crisis_score, 1),
@@ -1010,7 +1019,7 @@ def main():
                 "support": round(safe_float(x.get("support")), 2) if x.get("support") is not None else None,
                 "resistance": round(safe_float(x.get("resistance")), 2) if x.get("resistance") is not None else None,
             }
-            for x in scored[:30]
+            for x in (_top30 + _factor_extra)
         ],
     }
 
