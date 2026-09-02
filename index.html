@@ -493,7 +493,7 @@ window.__domReadyFns=[];
 <script src="data/CFFEX_HOLDINGS.js?v=cde17cb022" defer></script>
 <script src="data/IPO_DATA.js?v=3d7710249b" defer></script>
     <script src="data/CRISIS_DATA.js?v=04ed639595" defer></script>
-    <script src="data/JUDGMENT_DATA.js?v=b369037bf9" defer></script>
+    <script src="data/JUDGMENT_DATA.js?v=5bc90cf659" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=cdcc1eb5b4" defer></script>
     <script src="data/STOCK_RPS.js?v=98ceffdefc" defer></script>
     <!-- 🛡 2026-08-19：H 反推短线买点（data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js）反推代码 + 跟踪回测，独立于 PDF OCR
@@ -1640,14 +1640,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     window.__selfHealJudgmentBody = function(){
       var _self = arguments.callee;
       var body = document.getElementById('judgmentBodyOp');
-      var isPlaceholder = body && body.innerHTML && (
-        body.innerHTML.indexOf('环境态势')>=0 ||
-        body.innerHTML.indexOf('等盘后算法链产出')>=0 ||
-        body.innerHTML.indexOf('等待')>=0
-      );
       var jdReady = !!(window.JUDGMENT_DATA && window.JUDGMENT_DATA.update_time);
       var fnReady = typeof window._buildJudgmentEnvHTML==='function' && typeof window.__renderJudgmentBody==='function';
-      if(isPlaceholder && jdReady && fnReady){
+      // 🛡 一劳永逸：只要数据+函数就绪且 body 尚未呈现真实内容（无「今日信号」标记）即补渲染；
+      //   旧逻辑仅在占位文案命中时才渲染，若 init 漏渲染导致 body 为空/加载中则永远空白，现为按是否已渲染判定。
+      var hasRendered = !!(body && body.innerHTML && body.innerHTML.indexOf('今日信号')>=0);
+      if(jdReady && fnReady && !hasRendered){
         try{ window.__renderJudgmentBody(); }catch(e){ console.warn('[jdBodyHeal] render failed', e); }
       }
       // 即使已渲染，仍保持轮询以便应对后续被其他逻辑清空（轻量检查，1s/次）
