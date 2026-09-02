@@ -501,7 +501,7 @@ window.__domReadyFns=[];
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
 <script src="data/CONCEPT_RANKING.js?v=00da235fd7" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
-<script src="data/POTENTIAL_PICKS.js?v=b088824b9d" defer></script>
+<script src="data/POTENTIAL_PICKS.js?v=1f2b2c5108" defer></script>
 <script src="data/INDEX_QUOTES.js?v=3e2a15dfb0" defer></script>
 <script src="data/AI_MARKET_BRIEF.js?v=24579c5e98" defer></script>
 <script src="data/MARGIN_DATA.js?v=cb00eeb3d7" defer></script>
@@ -1438,7 +1438,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/TRIPLE_TRACK.js?v=8161e836eb" defer></script>
 <script src="data/TRIPLE_HISTORY.js?v=4319eb2f16" defer></script>
 <script src="data/COCKPIT_TIER_RECOMMEND.js?v=e9b360e339" defer></script>
-<script src="data/COCKPIT_ADVICE.js?v=c62bf9f954" defer></script>
+<script src="data/COCKPIT_ADVICE.js?v=7fb71735a4" defer></script>
 <script src="data/V8_CAL.js?v=373e7500cc"></script>
 <script src="data/SH_FIB.js?v=45ba57d96d" defer></script>
 <script src="data/SZ_FIB.js?v=afa7a4a606" defer></script>
@@ -1468,13 +1468,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          删除重复注入，确保全局只保留一份最新 RPS 数据。 -->
 <script src="data/BACKTEST_COMPREHENSIVE.js?v=d849ad6841" defer></script>
 <script src="data/COCKPIT_BACKTEST.js?v=6fa5295f50" defer></script>
-<script src="data/BACKTEST_TDX.js?v=fe6ff0415a" defer></script>  <script src="data/HUNTER_BACKTEST.js?v=e3470c3f61" defer></script>
+<script src="data/BACKTEST_TDX.js?v=fe6ff0415a" defer></script>  <script src="data/HUNTER_BACKTEST.js?v=3df4dad2d9" defer></script>
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=09809275d0" defer></script>
 <script src="data/EXPERIMENT.js?v=e68563baf9" defer></script>
 <script src="data/FINAL_RECOMMEND_DATA.js?v=e5a7f077dd" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
-<script src="data/V8_POOL_TRACKER.js?v=369597c35c" defer></script>
+<script src="data/V8_POOL_TRACKER.js?v=04d5bc4357" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=7f4e5a6633" defer></script>
     <script src="data/FACTOR_LAB.js?v=9aec6d7b2f" defer></script>
 <!-- 2026-08-31 轻量化：data/ALGO_TRACK.js（42.4 KB）前端零引用，停止注入（省 42.4 KB） -->
@@ -1489,8 +1489,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=04cb063a35" defer></script>
 <script src="data/HEALTH_CHECK.js?v=d934bacca5" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=68e09a1f59" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=a6766ed48e" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=d9eabe1d12" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=f4b8147ada" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 MARKET_PATH_PROBABILITY 注入（AI预测卡用） -->
     <script src="data/MARKET_PATH_PROBABILITY.js?v=d3860bdcbd" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
@@ -1499,9 +1499,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/MOMENTUM_FILTER.js?v=f4bc653137" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=e1655f6cbb" defer></script>
-    <script src="data/ALLSITE_BACKTEST.js?v=0469225a20" defer></script>
-    <script src="data/CRDS_BACKTEST.js?v=9b680b3079" defer></script>
-    <script src="data/RPS_BACKTEST.js?v=79e1d5fc4a" defer></script>
+    <script src="data/ALLSITE_BACKTEST.js?v=41974c389b" defer></script>
+    <script src="data/CRDS_BACKTEST.js?v=cdf4c44ced" defer></script>
+    <script src="data/RPS_BACKTEST.js?v=f978797469" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -13869,7 +13869,7 @@ window.__renderV8CalToday();
     // 🛡 2026-08-31 一劳永逸：STOCK_PROFILE.js(1.4MB) 与 STOCK_LIST 的 industry/concepts
     //   实测 9602 条【零差异】、且 45.9% 为空值 → 停止单独下载，改由 STOCK_LIST 到位后就地
     //   合成 window.STOCK_PROFILE，前端引用点(819/5979 行)零改动。省 1.4 MB 下载。
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=091696533d'},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=c6bfbb4876'},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=fd4b65b5c1'}
   ];
   function loadOne(item, done){
