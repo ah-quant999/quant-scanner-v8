@@ -86,7 +86,11 @@ CARD_DEFS = [
     # 且会白占 25 分钟 debounce 锁导致真正需要的派发被跳过（与 155 轮 NT_DATA 同一类缺陷）。
     # 故统一显式覆盖 heal_cat="algo_run"。
     {"id": "SH_FIB", "name": "市场温度计", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"], "heal_cat": "algo_run"},
-    {"id": "SIX_DIM_RADAR", "name": "六维共振雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["windows", "current"], "_source_file": "SH_FIB", "_window_var": "SH_FIB", "heal_cat": "algo_run"},  # 与市场温度计同源(SH_FIB.js)，前端独立卡片展示六维评分视图
+    # 🛡 2026-09-02 一劳永逸（主人令「运维还有错」）：SIX_DIM_RADAR 是 derived 项
+    #   （前端 renderSixDim 直接读 SH_FIB 派生六维评分视图,无独立 SIX_DIM_RADAR.js 文件）。
+    #   原 CARD_DEFS 登记让它绑死 SH_FIB 检查 → SH_FIB 老化超时同步误报 red。
+    #   移除该项登记;下面"全量数据审计"循环的 derived = {..., "SIX_DIM_RADAR"}
+    #   已保护它不报"缺失或解析失败"。前端 renderSixDim 直接读 SH_FIB,无副作用。
     {"id": "MARGIN_DATA", "name": "融资融券", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["sh"], "heal_cat": "post_close"},  # 2026-08-18 主人令一劳永逸：交易所每日16:15发布1次，360min 阈值导致 22:15 必误报 → 1440（24h，符合主人 24h 铁律）
     {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "实时数据", "freq": "盘中每30分（日行情取最近交易日）", "max_age": 120, "key_fields": ["items"], "heal_cat": "intraday"},  # 2026-08-31 修复：cloud_fetch_v8.py 的 tasks 列表含 CFFEX_HOLDINGS，盘中每 30 分执行并刷新 update_time，但数据为日行情取最近交易日；HC 分类应与调度一致，避免盘后/盘中口径冲突
     {"id": "CRISIS_DATA", "name": "危机雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["currency", "global"], "heal_cat": "premarket"},  # 危机雷达每日 08:25 跑一次

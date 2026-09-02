@@ -223,6 +223,16 @@ window.__domReadyFns=[];
   .sf-status-table td{padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.06);text-align:center}
   .sf-status-table td:first-child{text-align:left}
   .sf-status-badge{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:10px}
+  /* 2026-09-02 主人令：板块状态一览改为一行 3 列 grid 卡片化（14 行竖排 → 5 行） */
+  .sf-status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}
+  .sf-status-card{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:9px 11px;display:flex;flex-direction:column;gap:5px;min-height:78px}
+  .sf-status-card-head{display:flex;justify-content:space-between;align-items:center;gap:6px}
+  .sf-status-card-name{font-size:13px;font-weight:700;color:var(--txt);line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sf-status-card-meta{display:flex;justify-content:space-between;align-items:baseline;gap:4px;font-size:12px;line-height:1.5}
+  .sf-status-card-meta .lbl{color:var(--dim);font-size:11px;flex-shrink:0}
+  .sf-status-card-meta .v{font-weight:700;font-variant-numeric:tabular-nums}
+  @media(max-width:1100px){.sf-status-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:600px){.sf-status-grid{grid-template-columns:1fr}}
   .sc-phase-pill:hover{background:rgba(255,255,255,.06) !important}
   .sf-rotate-table{width:100%;font-size:13px;border-collapse:collapse;line-height:1.7}
   .sf-rotate-table td{padding:5px 7px;border:1px solid var(--border)}
@@ -618,6 +628,25 @@ window.V8_CAL = {weeks:[],legend:[]};
       evidence: '数据驱动：仅「阴跌磨底 / 恐慌下行」状态开仓（T+10 胜率 54.6%，无门控基准 48.1%，+6.5pp；样本 464 信号 / 296 只）',
       date: reg.date || ''
     };
+  };
+  /* ---- 因子择时闸门：v8MarketGate(择时) ∩ 因子分位门槛 ----
+     因子长多组合 t<2，仅作「排序信号」而非独立策略，故必须叠加择时闸门。
+     pass 条件：① 市场闸门开放(阴跌磨底/恐慌下行) ② 因子值位于全列表前 topFrac 分位。 */
+  window.v8FactorGate = function(factorVal, allVals, topFrac){
+    topFrac = topFrac || 0.2;
+    var mkt = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : {open:false, name:'未知'};
+    if(!mkt.open){
+      return {pass:false, reason:'择时封闭·'+mkt.name, color:'#ff6b81'};
+    }
+    if(!allVals || !allVals.length || factorVal==null) {
+      return {pass:false, reason:'因子缺失', color:'#94a3b8'};
+    }
+    var sorted = allVals.slice().sort(function(a,b){return b-a;});
+    var thr = sorted[Math.floor(sorted.length*topFrac)];
+    if(factorVal >= thr){
+      return {pass:true, reason:'择时开放·因子前'+Math.round(topFrac*100)+'%', color:'#5ee0a0'};
+    }
+    return {pass:false, reason:'择时开放·因子未达分位', color:'#fbbf24'};
   };
   /* ---- 中国时间（Asia/Shanghai）统一解析与格式化 ---- */
   window._parseAsCST = function(ts){
@@ -4862,28 +4891,39 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var m = D.meta || {};
     var at = (D.abnormal_turnover||{});
     var roe = (D.roe_largecap||{});
+    var atTopArr = at.top||[], atBotArr = at.bottom||[], roeTopArr = roe.top||[];
+    var atVals = atTopArr.map(function(r){return r.factor_at;}).filter(function(v){return v!=null;});
+    var roeVals = roeTopArr.map(function(r){return r.roe_ttm;}).filter(function(v){return v!=null;});
     function row(r, kind){
       var code = _e(r.code), name = _e(r.name), close = r.close==null?'—':r.close.toFixed(2);
       var accent = kind==='at' ? (r.factor_at>0 ? '#22c55e' : (r.factor_at<0?'#ef5350':'#64748b'))
                                 : '#38bdf8';
       var main = kind==='at' ? ('abn='+(r.abn==null?'—':r.abn.toFixed(2))+' 因子='+(r.factor_at==null?'—':r.factor_at.toFixed(2)))
                               : ('ROE_TTM='+(r.roe_ttm==null?'—':r.roe_ttm.toFixed(1))+'%');
-      return '<div style="display:flex;justify-content:space-between;padding:6px 10px;border-left:3px solid '+accent+';margin:3px 0;font-size:13px;">'
+      var fv = kind==='at' ? r.factor_at : r.roe_ttm;
+      var g = (typeof window.v8FactorGate==='function') ? window.v8FactorGate(fv, kind==='at'?atVals:roeVals, 0.2) : {pass:false,reason:'',color:'#94a3b8'};
+      var badge = g.pass ? '<span style="color:#5ee0a0;font-size:11px;">🟢可关注</span>'
+                         : '<span style="color:'+g.color+';font-size:10px;">'+_e(g.reason)+'</span>';
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-left:3px solid '+accent+';margin:3px 0;font-size:13px;">'
         + '<span><b>'+code+'</b> '+name+' <span style="color:var(--dim)">'+close+'</span></span>'
-        + '<span style="color:'+accent+'">'+main+'</span></div>';
+        + '<span style="display:flex;gap:8px;align-items:center;"><span style="color:'+accent+'">'+main+'</span>'+badge+'</span></div>';
     }
-    var atTop = (at.top||[]).map(function(r){return row(r,'at');}).join('')
+    var atTop = atTopArr.map(function(r){return row(r,'at');}).join('')
       || '<div class="note" style="color:var(--dim)">无有效数据</div>';
-    var atBot = (at.bottom||[]).map(function(r){return row(r,'at');}).join('')
+    var atBot = atBotArr.map(function(r){return row(r,'at');}).join('')
       || '<div class="note" style="color:var(--dim)">—</div>';
-    var roeTop = (roe.top||[]).map(function(r){return row(r,'roe');}).join('')
+    var roeTop = roeTopArr.map(function(r){return row(r,'roe');}).join('')
       || '<div class="note" style="color:var(--dim)">无有效数据</div>';
+    var mkt = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : {open:false,name:'未知',icon:'⚪',color:'#94a3b8'};
+    var gateBanner = '<div style="font-size:12px;padding:5px 9px;border-radius:6px;margin-bottom:9px;background:'+(mkt.open?'rgba(94,224,160,.12)':'rgba(255,107,129,.10)')+';color:'+(mkt.color||'#94a3b8')+';">'
+      + (mkt.icon||'⚪')+' 择时闸门：'+(mkt.name||'未知')+' · '+(mkt.open?'可开新仓 → 因子前20%标的打「🟢可关注」':'不开新仓 → 仅作观察')+'</div>';
     var html = ''
       + '<div style="padding:14px 16px;">'
       + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
       + '<b style="font-size:15px;">🧪 因子实验室</b>'
       + '<span style="font-size:12px;color:var(--dim)">更新 '+_e(D.update_time)+'</span></div>'
-      + '<div style="font-size:12px;color:var(--dim);margin-bottom:10px;">重点池 '+_e(m.n_universe)+' 只 · 异常换手率有效 '+_e(m.n_at_valid)+' · ROE大市值档 '+_e(m.n_roe_large)+'　'
+      + gateBanner
+      + '<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">重点池 '+_e(m.n_universe)+' 只 · 异常换手率有效 '+_e(m.n_at_valid)+' · ROE大市值档 '+_e(m.n_roe_large)+'　'
       + '<span style="color:#22c55e">●</span>缩量强势 <span style="color:#ef5350">●</span>放量弱势</div>'
       + '<div style="font-weight:600;margin:8px 0 4px;color:#22d3ee;">① 异常换手率（缩量=多，因子越高越强势）— Top 30</div>'
       + atTop
@@ -4891,7 +4931,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + atBot
       + '<div style="font-weight:600;margin:12px 0 4px;color:#38bdf8;">② ROE(TTM) 大市值档（成交额代理 Top1/3）— Top 30</div>'
       + roeTop
-      + '<div style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5;">口径：异常换手率=当月换手率÷过去12月均值（缩量→低关注→强势）；ROE_TTM=最近4季度 roeAvg 求和。均经 v2 回测验证显著（Spearman IC t=4.3 / 3.3，样本内外一致）。仅作研究参考，非买卖建议。</div>'
+      + '<div style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5;">口径：异常换手率=当月换手率÷过去12月均值（缩量→低关注→强势）；ROE_TTM=最近4季度 roeAvg 求和。均经 v2 回测验证显著（Spearman IC t=4.3 / 3.3，样本内外一致）。🟢可关注=择时开放且因子进入前20%分位。注：重点池60%为双创，ROE大市值档样本偏薄，仅作观察。仅研究参考，非买卖建议。</div>'
       + '</div>';
     dst.innerHTML = html;
   };
@@ -6947,16 +6987,22 @@ window.__renderV8CalFull();
       const rows = allTrend.map(s => ({ s: s, st: classifyStatus(s), meta: statusMeta[classifyStatus(s)] }))
         .sort((a, b) => a.meta.order - b.meta.order || b.s.net - a.s.net);
       let h2 = '';
-      h2 += '<div style="font-size:13px;font-weight:700;color:#fdba74;margin-bottom:8px;">📝 板块状态一览</div>';
-      h2 += '<table class="sf-status-table"><thead><tr><th style="text-align:left">板块</th><th>状态</th><th>今日净额</th><th>5日净额</th></tr></thead><tbody>';
+      h2 += '<div style="font-size:13px;font-weight:700;color:#fdba74;margin-bottom:8px;">📝 板块状态一览 <span style="font-size:10px;color:var(--dim);font-weight:400">（每行 3 列）</span></div>';
+      h2 += '<div class="sf-status-grid">';
       rows.forEach(function(r) {
         const s = r.s;
-        h2 += '<tr><td>' + s.name + '</td>';
-        h2 += '<td><span class="sf-status-badge" style="background:rgba(255,255,255,.06);color:' + r.meta.color + ';border:1px solid ' + r.meta.color + ';">' + r.st + '</span></td>';
-        h2 += '<td style="color:' + (s.net >= 0 ? 'var(--up)' : 'var(--down)') + ';font-weight:700;">' + fmt(s.net) + '亿</td>';
-        h2 += '<td style="color:' + ((s.net_5d || 0) >= 0 ? 'var(--up)' : 'var(--down)') + ';font-weight:500;">' + fmt(s.net_5d || 0) + '亿</td></tr>';
+        const up = (s.net >= 0);
+        const up5 = ((s.net_5d || 0) >= 0);
+        h2 += '<div class="sf-status-card">';
+        h2 += '<div class="sf-status-card-head">';
+        h2 += '<span class="sf-status-card-name">' + s.name + '</span>';
+        h2 += '<span class="sf-status-badge" style="background:rgba(255,255,255,.06);color:' + r.meta.color + ';border:1px solid ' + r.meta.color + ';">' + r.st + '</span>';
+        h2 += '</div>';
+        h2 += '<div class="sf-status-card-meta"><span class="lbl">今日</span><span class="v" style="color:' + (up ? 'var(--up)' : 'var(--down)') + '">' + (up ? '+' : '') + fmt(s.net) + '亿</span></div>';
+        h2 += '<div class="sf-status-card-meta"><span class="lbl">5日</span><span class="v" style="color:' + (up5 ? 'var(--up)' : 'var(--down)') + ';font-weight:500">' + (up5 ? '+' : '') + fmt(s.net_5d || 0) + '亿</span></div>';
+        h2 += '</div>';
       });
-      h2 += '</tbody></table>';
+      h2 += '</div>';;
 
       // 轮动路线 TOP3
       const out3 = sftOut.slice().sort((a, b) => a.net - b.net).slice(0, 3);
@@ -12689,7 +12735,14 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     var hc = window.HEALTH_CHECK || {};
     (hc.items || []).forEach(function(it){
       if(!it || it.status === 'ok') return;
-      diags.push('文件 <b>'+it.id+'</b> '+(it.status==='fail'?'失败':'待更新')+'：最后更新 '+(it.last_update || '--')+(it.message ? ' · '+it.message : ''));
+      // 2026-09-02 主人令:每个 HEALTH_CHECK fail 项附运维行动提示
+      var _hint = (it.id==='SH_FIB' || it.id==='INST_TRADE') ? ' → 静候 16:40 CST STAGE A 采集批;或在 Actions 手动 Run workflow(force_run) 重跑本盘后算法链'
+                : (it.id==='MARKET_REGIME') ? ' → 静候 20:00 CST STAGE D 汇总批(final_recommend)前一并产出;或手动 Run workflow(force_run) 重跑'
+                : (it.id==='AVG_PRICE_DATA') ? ' → 盘中每 30 分自愈;非盘中时段按 24h 阈值判 fail,下一时段自愈'
+                : (it.id==='MARGIN_DATA') ? ' → 交易所日频 16:15 一次,阈值已放宽 24h,目前属正常窗口'
+                : (it.id==='LIMIT_UP_HEATMAP' || it.id==='MARKET_ALERTS' || it.id==='MARKET_FUND_FLOW_DATA') ? ' → 盘中每 30 分自愈;盘后非交易时段天然为空属正常'
+                : '';
+      diags.push('文件 <b>'+it.id+'</b> '+(it.status==='fail'?'失败':'待更新')+'：最后更新 '+(it.last_update || '--')+(it.message ? ' · '+it.message : '')+( _hint ? '<br><span style="color:#7dd3fc;font-weight:400;font-size:11px;display:inline-block;margin-top:3px">🔧 '+_hint+'</span>' : '' ));
     });
     // 3) 候选股池来源归零
     var cand = window.CANDIDATE || {};
