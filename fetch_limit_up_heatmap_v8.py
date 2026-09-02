@@ -395,9 +395,30 @@ def main():
     # ── 写入结果 ──
     result = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "dates": new_dates if need_rebuild else new_dates,
-        "sectors": new_sectors if need_rebuild else new_sectors,
+        "dates": new_dates,
+        "sectors": new_sectors,
     }
+
+    # 🔴 2026-09-02 一劳永逸：main 重建分支同样需补 top/total/ladder
+    #   （calc_sentiment_cycle.py 依赖、健康检查 key_fields=["top","dates"] 也会因缺 top 报"关键字段空值"）
+    if new_sectors and new_dates:
+        n_days = len(new_dates)
+        scored = []
+        for s in new_sectors:
+            data = s.get("data", [])
+            total = sum(data)
+            recent5 = sum(data[-5:]) if len(data) >= 5 else sum(data)
+            scored.append({"name": s["name"], "total": total, "recent5": recent5})
+        scored.sort(key=lambda x: (-x["recent5"], -x["total"]))
+        result["top"] = scored[:5]
+        daily_totals = [0] * n_days
+        for s in new_sectors:
+            for i, v in enumerate(s.get("data", [])):
+                if i < n_days:
+                    daily_totals[i] += v
+        result["total"] = daily_totals
+        result["today_total"] = daily_totals[-1] if daily_totals else 0
+        result["ladder"] = []
 
     os.makedirs(DATA_DIR, exist_ok=True)
     with open(OUTPUT, "w", encoding="utf-8") as f:
