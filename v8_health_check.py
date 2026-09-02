@@ -127,7 +127,11 @@ CARD_DEFS = [
     #   改为只校验真正必须存在的 avg_price / ma20 / ma60 / history_days；
     #   累积进度由前端「历史 X/20 日」自述，不再当成健康异常。
     #   page 同步改「实时数据」：CATEGORY_MAP 已复位 intraday（盘中每 30 分刷新 + KEEP 盘前不清空）。
-    {"id": "AVG_PRICE_DATA", "name": "平均股价（全A算术平均·880003口径）", "page": "实时数据", "freq": "盘中每30分", "max_age": 1440, "key_fields": ["avg_price", "ma20", "ma60", "history_days"], "heal_cat": "intraday"}  # 2026-08-31 修复：写入端在 cloud_fetch_v8.py（cn_fetch 盘中链），自愈应派发给 intraday 而非 algo_run；algo_run 只会在非交易时段空转且无法写入,
+    {"id": "AVG_PRICE_DATA", "name": "平均股价（全A算术平均·880003口径）", "page": "实时数据", "freq": "盘中每30分", "max_age": 1440, "key_fields": ["avg_price", "ma20", "ma60", "history_days"], "heal_cat": "intraday"},  # 2026-08-31 修复：写入端在 cloud_fetch_v8.py（cn_fetch 盘中链），自愈应派发给 intraday 而非 algo_run；algo_run 只会在非交易时段空转且无法写入
+    # 🛡 2026-09-02 一劳永逸：HUNTER_BACKTEST.js（大牛股猎手历史回测）此前无 CARD_DEFS 登记，
+    #   被通用全量审计按「全量数据/24h 红线」误杀。实际为历史回测产物，依赖 lhb_history，
+    #   变化慢、baostock 取 K 线可能不稳定；改为显式登记，max_age=7 天，并纳入算法链日常调度。
+    {"id": "HUNTER_BACKTEST", "name": "大牛股猎手回测", "page": "盘后数据", "freq": "收盘后1次", "max_age": 10080, "key_fields": ["summary"], "heal_cat": "algo_run"},
 ]
 
 

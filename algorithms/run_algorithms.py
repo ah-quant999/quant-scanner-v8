@@ -33,6 +33,7 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     "calc_stock_rps.py": 3600,   # 全 universe 逐只取 K 线，实测 30min 偶发不够
     "calc_crds.py": 2700,        # 逆势龙头 CRDS，同样遍历较广
     "gen_stock_profile.py": 2700,
+    "v8/backtest_hunter.py": 2400,  # 大牛股猎手回测：baostock 取 281 只信号股 K 线，约 5-15min
 }
 
 
@@ -162,6 +163,10 @@ ORDER = [
     #   cockpit_backtest / triple_track / four_volume_60m / stock_profile 等全部跑完，本步才汇总，
     #   杜绝「某选股还没跑完，推荐却已生成」的抢跑问题。
     "final_recommend.py",              # → FINAL_RECOMMEND_DATA.js（跨策略共振 Top5，管线最终产物，置于末尾）
+    # 🛡 2026-09-02 一劳永逸：大牛股猎手历史回测（v8/backtest_hunter.py）此前无调度方，
+    #   导致 data/HUNTER_BACKTEST.js 长期陈旧、被健康检查按 24h 红线误杀。现挂链尾，
+    #   依赖 lhb_history.json 已就位；失败不影响选股结果，仅自身卡片可能不刷新。
+    "v8/backtest_hunter.py",           # → data/HUNTER_BACKTEST.js（机游共振核心信号历史回测）
 ]
 
 
@@ -643,8 +648,11 @@ def step_run():
     ok, fail = 0, 0
     skipped = []
     for script in ORDER:
-        # 支持 scripts/ 前缀（如 scripts/fetch_index_history.py 在仓库根 scripts/ 下）
-        path = os.path.join(V8_ROOT, script) if script.startswith("scripts/") else os.path.join(ALGO, script)
+        # 支持 scripts/ 前缀（仓库根 scripts/）与 v8/ 前缀（仓库根 v8/）
+        if script.startswith("scripts/") or script.startswith("v8/"):
+            path = os.path.join(V8_ROOT, script)
+        else:
+            path = os.path.join(ALGO, script)
         if not os.path.exists(path):
             print(f"  ❌ 缺失脚本: {script}")
             fail += 1

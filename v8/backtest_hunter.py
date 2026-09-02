@@ -245,8 +245,9 @@ def backtest(signals, dry=False):
     return enriched_signals, code_klines
 
 
-def summarize(enriched_signals):
+def summarize(enriched_signals, degraded=False):
     summary = {
+        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "total_signals": len(enriched_signals),
         "calc_time": datetime.now().isoformat(),
         "method": "大牛股猎手机游共振核心信号：机构净买>0 且 游资净买>0 且 (机构+游资)>=8000万；信号日收盘价买入，持有N个交易日收盘价卖出",
@@ -254,6 +255,9 @@ def summarize(enriched_signals):
         "by_period": {},
         "by_date": {},
     }
+    if degraded:
+        summary["degraded"] = True
+        summary["degraded_note"] = "baostock 登录失败或 K 线源不可用，本次仅统计信号数/无收益计算"
     if enriched_signals:
         summary["signal_date_range"] = f"{enriched_signals[0]['signal_date']} ~ {enriched_signals[-1]['signal_date']}"
 
@@ -322,19 +326,28 @@ def main():
         print("无信号，退出")
         sys.exit(0)
 
+    degraded = False
     if args.dry:
         print("🚫 dry-run 模式，不拉K线")
+    else:
+        # 2026-09-02 一劳永逸：baostock 在云端偶发登录失败/无响应，不能因此导致整张回测卡停更。
+        #   先尝试登录；失败则降级为 dry-run（只统计信号数），仍写出文件并刷新 update_time，
+        #   避免 HEALTH_CHECK 按陈旧误杀；前端看到 degraded 标记可提示「K 线源暂不可用」。
+        if not _bs_login():
+            print("⚠️ baostock 登录失败，降级为仅统计信号数（不拉K线），仍写出文件")
+            degraded = True
+            args.dry = True
 
     enriched, _ = backtest(signals, dry=args.dry)
-    summary = summarize(enriched)
+    summary = summarize(enriched, degraded=degraded)
 
     report = {
+        "update_time": summary["update_time"],
         "summary": summary,
         "signals": enriched,
     }
 
-    if not args.dry:
-        write_outputs(report)
+    write_outputs(report)
 
     if _BS_LOGGED_IN:
         bs.logout()
