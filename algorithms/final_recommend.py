@@ -609,6 +609,60 @@ def main():
         if s.get("first_date"):
             r["enter_dates"].append(s["first_date"])
 
+    # ── 第8节 因子实验室因子（方案B：智能融合，非简单硬加权）──
+    # 维度1 异常换手率：缩量=因子高=强势（abnormal_turnover.top 前30）；放量弱势=bottom（扣0.5）
+    # 维度2 ROE_TTM：全市场主板大市值档 Top30（高 ROE=质量）
+    # 分层加权：前5名 +2.0 / 6-15名 +1.5 / 16-30名 +1.0
+    # 择时控权：非开仓期(_open_regime=False) 因子权重 ×0.3（弱加成，避免逆势放大因子噪声）
+    # 放量弱势：bottom 入池则打「放量弱势」信号，最终分 −0.5（弱势扣分）
+    # 名字兜底：ROE 票 baostock 常返回 '1' → _resolve_name + stock_names 映射补全
+    fl = load_js("FACTOR_LAB.js", "FACTOR_LAB")
+    if fl:
+        _at_top = (fl.get("abnormal_turnover") or {}).get("top") or []
+        _at_bot = (fl.get("abnormal_turnover") or {}).get("bottom") or []
+        _roe_top = (fl.get("roe_largecap") or {}).get("top") or []
+
+        _at_rank = sorted(_at_top, key=lambda x: safe_float(x.get("factor_at")), reverse=True)
+        for i, s in enumerate(_at_rank):
+            code = s.get("code")
+            if not code:
+                continue
+            _pure = norm_code(code)
+            _nm = _stock_name_map()
+            display_name = (_nm.get(_pure) or _nm.get(code) or s.get("name") or "")
+            r = ensure(code, _resolve_name(code, display_name), "", "")
+            sc = 2.0 if i < 5 else (1.5 if i < 15 else 1.0)
+            sc *= (1.0 if _open_regime else 0.3)
+            r["sources"].append("异常换手率")
+            r["source_scores"]["异常换手率"] = round(sc, 2)
+            r["signals"].append("缩量强势")
+            if s.get("first_date"):
+                r["enter_dates"].append(s["first_date"])
+
+        _roe_rank = sorted(_roe_top, key=lambda x: safe_float(x.get("roe_ttm")), reverse=True)
+        for i, s in enumerate(_roe_rank):
+            code = s.get("code")
+            if not code:
+                continue
+            _pure = norm_code(code)
+            _nm = _stock_name_map()
+            display_name = (_nm.get(_pure) or _nm.get(code) or s.get("name") or "")
+            r = ensure(code, _resolve_name(code, display_name), "", "")
+            sc = 2.0 if i < 5 else (1.5 if i < 15 else 1.0)
+            sc *= (1.0 if _open_regime else 0.3)
+            r["sources"].append("ROE_TTM")
+            r["source_scores"]["ROE_TTM"] = round(sc, 2)
+            r["signals"].append("高ROE")
+            if s.get("first_date"):
+                r["enter_dates"].append(s["first_date"])
+
+        _weak = {norm_code(x.get("code")) for x in _at_bot if x.get("code")}
+        for key, r in pool.items():
+            if key in _weak:
+                r["signals"].append("放量弱势")
+    else:
+        print("[warn] FACTOR_LAB.js 缺失，跳过因子实验室方案B融合")
+
     # 补齐个股画像（行业/概念/名称）
     for key, r in pool.items():
         prof = profiles.get(key) or profiles.get(norm_code(key))
@@ -637,7 +691,9 @@ def main():
         # 2026-08-13 公平性修复：若已是板块龙头源，板块强度已在源分体现，
         # 此处只对非板块龙头票加全局板块加分，避免板块被双重计价。
         sec_add = 0.0 if "板块龙头" in r["sources"] else sec_score
-        final_score = strength + resonance * 1.5 + sec_add
+        # 方案B 放量弱势扣分：被异常换手率 bottom 命中的票，若同时被其他源选中则 −0.5
+        weak_penalty = 0.5 if "放量弱势" in r.get("signals", []) else 0.0
+        final_score = strength + resonance * 1.5 + sec_add - weak_penalty
         # 港股惩罚：用户主做 A 股，港股不应因多源共振天然霸榜
         if r.get("board") == "港股" or market_prefix(r.get("code", "")) == "hk":
             final_score -= HK_PENALTY
