@@ -487,8 +487,8 @@ window.__domReadyFns=[];
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
 <script src="data/CONCEPT_RANKING.js?v=8b7a40b6ed" defer></script>
 <!-- 2026-09-01 删除：潜力挖掘 / AI预测 / ETF·龙头参考 三卡删除，对应数据注入移除 -->
-<script src="data/INDEX_QUOTES.js?v=e1bfb4498e" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=f2fe4fd077" defer></script>
+<script src="data/INDEX_QUOTES.js?v=cdf300c031" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=284c356e8c" defer></script>
 <script src="data/MARGIN_DATA.js?v=d7ee8d39c3" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=cde17cb022" defer></script>
 <script src="data/IPO_DATA.js?v=3d7710249b" defer></script>
@@ -1435,16 +1435,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=1469ee1ed6" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=6088dcf566" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=e8f7b484bc" defer></script>
-<script src="data/HEALTH_CHECK.js?v=9e4dbbb155" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=09d252cb65" defer></script>
+<script src="data/RUNNER_STATUS.js?v=0109eaf287" defer></script>
+<script src="data/HEALTH_CHECK.js?v=8bcb256071" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=f0a68d3b34" defer></script>
     <script src="data/SENTIMENT_CYCLE.js?v=d351539c2b" defer></script>
     <!-- 2026-09-01 删除：AI预测卡已删除，MARKET_PATH_PROBABILITY 数据注入移除 -->
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=b3f630070e" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=2a436a5f24" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=379c217b84" defer></script>
-    <script src="data/ALGO_BACKTEST_COMPARE.js?v=964f6f898f" defer></script>
+    <script src="data/ALGO_BACKTEST_COMPARE.js?v=cef57683a2" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -1975,7 +1975,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     <!-- 涨停热力矩阵（整行宽度） -->
     <div class="card" id="limitUpHeatCard" style="margin-bottom:16px">
-      <h3><span class="ic">🌡️</span>涨停热力矩阵 - 近30日板块涨停家数 · <span class="fresh" id="limitUpHeatTime">—</span></h3>
+      <h3><span class="ic">🌡️</span>涨停热力矩阵 - <span id="limitUpHeatRange">近30日板块涨停家数</span> · <span class="fresh" id="limitUpHeatTime">—</span></h3>
       <div id="limitUpHeatAnalysis" class="limit-up-analysis" style="display:none"></div>
       <div id="limitUpHeatContent" class="limit-up-content">加载中…</div>
     </div>
@@ -5807,8 +5807,22 @@ function renderLimitUpHeatmap(){
   if(_oi>=0){ var _o=sorted.splice(_oi,1)[0]; sorted.push(_o); }
 
   let h='<table><thead><tr><th>板块</th>';
-  // 2026-09-01 主人令：窗口 15日 → 30日（取最近 30 列；后端数据若>30会自动截前端）
-  var _colStart = Math.max(0, _displayDates.length - 30);
+  // 🔴 2026-09-02 自适应：只显示「有涨停数据的连续尾部列」，隐藏前面源限制导致的全0空白列
+  //   （东方财富涨停池免费接口只保留约16个交易日历史，更早返回0 → 硬撑30日会大片空白）
+  var _colStart = 0;
+  for (var _ci = 0; _ci < _displayDates.length; _ci++) {
+    var _hasData = false;
+    for (var _si = 0; _si < _displaySectors.length; _si++) {
+      var _dv = (_displaySectors[_si].data && _displaySectors[_si].data[_ci]) || 0;
+      if (_dv > 0) { _hasData = true; break; }
+    }
+    if (_hasData) { _colStart = _ci; break; }
+  }
+  // 兼顾：至少显示有数据列，最多仍不超过30列
+  _colStart = Math.max(_colStart, _displayDates.length - 30);
+  var _shownDays = _displayDates.length - _colStart;
+  var _rangeEl = document.getElementById('limitUpHeatRange');
+  if (_rangeEl) _rangeEl.textContent = '近' + _shownDays + '日板块涨停家数';
   for(let di=_colStart;di<_displayDates.length;di++){
     h+='<th>'+_displayDates[di].split('/').pop()+'</th>';
   }
@@ -12659,7 +12673,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=9e4dbbb155')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=8bcb256071')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
