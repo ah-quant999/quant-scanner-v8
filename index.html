@@ -2140,7 +2140,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 行业树图 · 细分赛道（盘中实时数据源 SECTOR_FUND_FLOW，置于实时数据页最下方） -->
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">🏭</span>行业树图 · 细分赛道 · <span class="fresh" id="htUpdateTime">—</span></h3>
-      <div id="industryTreemap" style="min-height:420px;overflow:visible;"></div>
+      <div id="industryTreemap" style="min-height:260px;overflow:visible;"></div>
       <div style="display:flex;gap:14px;font-size:11px;color:var(--dim);margin-top:6px;flex-wrap:wrap;align-items:center;">
         <span>大块=行业 &nbsp; 小块=个股</span>
         <span>颜色=涨跌 &nbsp; 面积≈市值</span>
@@ -2187,7 +2187,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           return Math.abs(b.pct_day||0)-Math.abs(a.pct_day||0);
         }).slice(0,50);
         var maxVal=Math.abs(sectors[0].pct_day||0)||1;
-        // 2026-08-31 主人令：胶囊加大、撑满卡片，避免下半截空荡
+        // 2026-09-02 主人令：与上方概念资金热力图保持同尺寸
         var h='<div style="display:flex;flex-wrap:wrap;gap:5px;align-content:flex-start;padding:4px">';
         sectors.forEach(function(s){
           var pct=s.pct_day||0;
@@ -2195,7 +2195,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var bg=up?'var(--up)':down?'var(--down)':'var(--dim)';
           var txt=(up||down)?'#fff':'var(--txt)';
           var area=Math.sqrt(Math.abs(pct))/Math.sqrt(maxVal);
-          var px=Math.max(64, Math.round(area*170)); // 最小64，最大约170
+          var px=Math.max(44, Math.round(area*130)); // 与概念资金热力图同尺寸：最小44，最大130
           var name=s.name||'未知';
           var titleFz=px>=110?15:(px>=75?13:12);
           var pctFz=px>=110?13:(px>=75?11:10);
