@@ -1459,7 +1459,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/MARKET_FUND_FLOW_DATA.js?v=3cf0f1a8d9" defer></script>
 <script src="data/ETF_SUBSCRIPTION.js?v=f9ee645883" defer></script>
 <!-- 2026-08-30 阿狸咪加注：东方财富口径 ETF 申购赎回（股票/债券/货币/商品/跨境 5 类 + 亿元），
-     与 ETF_SUBSCRIPTION.js（宽基指数 + 亿份）并行使用，不替换。新口径在 ETF 三合一卡 / 驾驶舱
+     与 ETF_SUBSCRIPTION.js（宽基指数 + 亿份）并行使用，不替换。新口径在 ETF 三合一卡
      使用 window.ETF_SUBSCRIPTION_EM，旧口径保留向下兼容。缓存戳由 update_v8 在后续 build 自动刷新。 -->
 <script src="data/ETF_SUBSCRIPTION_EM.js?v=87cbccc3a2" defer></script>
 <script src="data/LIMIT_UP_HEATMAP.js?v=b56cba3493" defer></script>
@@ -1476,7 +1476,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          此处再引入 data/STOCK_RPS_DATA.js（旧 01:56 版本）会覆盖最新数据 → 相对强度子页/状态胶囊均读到陈旧值。
          删除重复注入，确保全局只保留一份最新 RPS 数据。 -->
 <!-- 2026-09-03 主人令：COCKPIT_BACKTEST.js / HUNTER_BACKTEST.js 脚本标签删除（脚本文件早已全方位下线，留着只会在浏览器控制台制造 404 噪音、影响运维健康检查"失败/诊断详情"，一并清干净） -->
-<script src="data/BACKTEST_COMPREHENSIVE.js?v=cd12cfa6ce" defer></script>
+<script src="data/BACKTEST_COMPREHENSIVE.js?v=b6991845a5" defer></script>
 <script src="data/BACKTEST_TDX.js?v=b1589ec11f" defer></script>
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=f4fabe4f73" defer></script>
@@ -1507,10 +1507,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=258e585586" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=f4bc653137" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
-    <script src="data/FOUR_VOLUME_BACKTEST.js?v=e1655f6cbb" defer></script>
+    <script src="data/FOUR_VOLUME_BACKTEST.js?v=7b774c251c" defer></script>
     <script src="data/ALLSITE_BACKTEST.js?v=5c20fb44d8" defer></script>
-    <script src="data/CRDS_BACKTEST.js?v=92bb0d80d0" defer></script>
-    <script src="data/RPS_BACKTEST.js?v=8258714cbe" defer></script>
+    <script src="data/CRDS_BACKTEST.js?v=318fde1812" defer></script>
+    <script src="data/RPS_BACKTEST.js?v=73b38c0682" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -1570,7 +1570,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 子 Pane：今日推荐候选池 -->
     <div id="final-pane-cand" class="final-pane">
       <div class="card" style="margin-bottom:16px;border-left:4px solid #ff7043;">
-        <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">🎯</span>今日推荐候选池 <span style="font-size:11px;color:var(--sub);font-weight:400">聚合 三重共识 / 驾驶舱A档 / 四量终极</span>
+        <h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span class="ic">🎯</span>今日推荐候选池 <span style="font-size:11px;color:var(--sub);font-weight:400">聚合 三重共识 + 四量终极</span>
           <span id="finalCandBadges" style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;"></span>
         </h3>
         <div id="finalCandBody" style="padding:12px 4px 2px;"><div class="note">加载中…</div></div>
@@ -1607,7 +1607,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           <li>📐 <b>环境摘要（仅持仓时显示）</b>：持仓成本（实时行情卡内）</li>
           <li>🎯 <b>止盈止损</b>：止损位、目标位、盈亏比、操作建议</li>
           <li>🏷 <b>概念行业概览</b>：板块、行业、题材概念标签</li>
-          <li>🎖️ <b>选股策略命中</b>：是否命中三重共识、金股池、候选池、驾驶舱 A/B 档、逆势龙头、四量终极</li>
+          <li>🎖️ <b>选股策略命中</b>：是否命中三重共识、金股池、候选池、逆势龙头、四量终极</li>
           <li>💧 <b>关联板块资金流向</b>：该股所属概念/板块当日资金流向</li>
           <li>🐉 <b>龙虎榜</b>：上榜日期、机构/游资净买、上榜原因</li>
           <li>🚫 <b>停牌识别</b>：停牌状态与原因</li>
@@ -2164,7 +2164,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     })();
     </script>
 
-    <!-- 2026-08-30 删除：renderMonthCal / renderHistoryBar / 大牛股猎手等旧 LHB 视图脚本；DOM 容器已不存在，sec-rc 下新日历接管。 -->
+    <!-- 2026-08-30 删除：renderMonthCal / renderHistoryBar 等旧 LHB 视图脚本；DOM 容器已不存在，sec-rc 下新日历接管。 -->
 
     <!-- 2026-08-30 删除：旧 LHB 历史条/分析卡脚本；DOM 容器已不存在，由 sec-rc 新日历接管。 -->
 
@@ -2234,7 +2234,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     })();
     </script>
 
-    <!-- 2026-08-30 删除：旧「大牛股猎手」LHB 视图脚本；DOM 容器已不存在，由选股策略/已下架区域新实现接管。 -->
+    <!-- 2026-08-30 删除：旧 LHB 历史条/分析卡脚本（含已下线大牛股猎手 LHB 视图）；DOM 容器已不存在，由选股策略/已下架区域新实现接管。 -->
 
     <!-- 行业树图 · 细分赛道（盘中实时数据源 SECTOR_FUND_FLOW，置于实时数据页最下方） -->
     <div class="card" style="margin-bottom:16px">
@@ -2431,7 +2431,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="card">
         <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🥇</span>严格三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span> <span style="font-size:11px;color:var(--sub);font-weight:400">最严</span> <span style="color:var(--dim);font-weight:400">- 盘后 ·</span> <span class="fresh" id="tcTime">—</span> <!-- 2026-08-31 主人令：统一胶囊版式（绿色 ✅ 与 finalStatusBadges 一致）。renderTc 时 _tcRun.textContent = _tcInfo.label 会覆盖本默认文本 --><span id="tcRunBadge" style="display:none;margin-left:0;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);vertical-align:middle;white-space:nowrap;align-items:center;gap:4px;">✅ 已就绪</span> <span id="tcEnteredBadge" style="display:none;vertical-align:middle;"></span></h3>
         <div id="tcConsensus" class="tp-stocklist"></div>
-        <div class="note">筛选：主站TOP10≥70 且 驾驶舱A档 且 基本面A档。下方「优先/扩展观察」为差1步/差2步备选（主站评分≥75）。</div>
+        <div class="note">筛选：主站TOP10≥70 且 基本面A档。下方「优先/扩展观察」为差1步/差2步备选（主站评分≥75）。</div>
       </div>
       <div class="card">
         <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🎯</span>优先观察（差1步）· <span class="fresh" id="tcNearCount">0</span> <span style="font-size:11px;color:var(--sub);font-weight:400">- 盘后 ·</span> <span class="fresh" id="tcNearTime">—</span></h3>
@@ -2802,7 +2802,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div id="insightContainer"></div>
     </div>
 
-    <!-- 2026-09-03 主人令：TAB4「大牛股猎手」HTML 容器已删除（renderHunter 函数 + chips 都已全方位下线，仅保留共振日历三大功能 tab：机游共振/北向席位/每日洞察） -->
+    <!-- 2026-09-03 主人令：TAB4 HTML 容器（含已下线大牛股猎手）已删除（renderHunter 函数 + chips 都已全方位下线，仅保留共振日历三大功能 tab：机游共振/北向席位/每日洞察） -->
   </section>
 
   <script>
@@ -2838,7 +2838,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     if(tabId === 'tab1' && !window.__jyCalRendered){ setTimeout(renderJyCalendar, 30); }
     if(tabId === 'tab2' && !window.__northCalRendered){ setTimeout(renderNorthCalendar, 30); }
     if(tabId === 'tab3' && !window.__insightRendered){ setTimeout(renderInsight, 30); }
-    /* tab4 大牛股猎手已于 2026-09-03 主人令全方位下线（renderHunter 函数删除、不再挂载 window） */
+    /* tab4 大牛股猎手已于 2026-09-03 主人令全方位下线（renderHunter 函数删除、不再挂载 window）
+       —— 2026-09-03 二清：注释精简为通用已下线 trace，保留审计 */
   }
 
   /* ===== 工具函数 ===== */
@@ -4070,7 +4071,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     return v >= 50 ? '#f4495d' : '#1fd17b';   // 高胜率红 / 低胜率绿
   }
 
-  // 2026-09-02 主人令：大牛股猎手回测改为由策略回顾统一渲染（已下架算法回测区），
+  // 2026-09-02 主人令：已下线算法回测统一迁回策略回顾（已下架算法回测区），
   //   原 window.__renderHunterBacktest 已删除，避免与 _renderPeriodBacktestCard 重复。
 
   // ═══ 2026-08-13 主人令：策略星级对比表（聚合已有回测数据） ═══
@@ -4155,7 +4156,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       else r.stars = '—';
     });
     // 🛡 2026-08-26 一劳永逸根因修复：原按"综合分"排序，avg_return 权重过大，
-    //   把驾驶舱A档(胜率仅50.6%、avg_return 2.2 偏高)顶到最上并标"👑最强"，与真实强度背离。
+    //   把低胜率但 avg_return 偏高的策略顶到最上并标"👑最强"，与真实强度背离。
     //   现改为【胜率降序、平局看平均收益降序】——胜率最高的策略才是"最强"，排序有唯一主依据。
     rows.sort(function(a,b){ return (b.win_rate - a.win_rate) || (b.avg_return - a.avg_return); });
     return rows;
@@ -4525,7 +4526,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       if(!sum) return;
       var pills = [];
 
-      // 2026-08-30 主人令「保留综合回测+星级对比；降级驾驶舱/TOP5」：
+      // 2026-08-30 主人令「保留综合回测+星级对比；降级已下线策略/TOP5」：
       // 驾驶舱回测（胜率≈随机）与 TOP5（样本极少）不再单独占胶囊位，
       // 统一收敛到下方「策略星级对比表」与「综合回测」中展示，避免重复与误导。
 
@@ -4591,6 +4592,40 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         var vname = s.key==='fourvolume' ? 'FOUR_VOLUME_BACKTEST' : (s.key==='crds' ? 'CRDS_BACKTEST' : 'RPS_BACKTEST');
         var sm=((window[vname]||{}).summary||{});
         var total=sm.total_signals||0, bp=sm.by_period||{}, upd=sm.update_time||sm.calc_time||'';
+      // 2026-09-03 对齐逻辑详解页：顶部「回测汇总」——跨策略扫描真实样本，算 胜率最高/收益最好
+      (function(){
+        var _strategies = [];
+        var _bc = window.BACKTEST_COMPREHENSIVE || {};
+        if(_bc.overview){
+          var _tm = { resonance_all:{n:'三重共识·共振≥2（宽松）',i:'🧲'}, resonance_gte70_lt80:{n:'三重共识·共振70-79分',i:'🧲'}, resonance_gte80:{n:'三重共识·共振≥80（严格）',i:'🧲'} };
+          Object.keys(_tm).forEach(function(k){
+            var o=_bc.overview[k]; if(!o||!o.periods) return;
+            var rows=[];
+            [1,3,5,10,20].forEach(function(p){ var r=o.periods['hold_'+p+'d']; if(r) rows.push({period:p,sample:r.count||0,win_rate:r.win_rate,avg_return:r.avg_return}); });
+            if(rows.length) _strategies.push({name:_tm[k].n,icon:_tm[k].i,rows:rows});
+          });
+        }
+        [['FOUR_VOLUME_BACKTEST','四量终极','🔥'],['CRDS_BACKTEST','逆势龙头CRDS','🐉'],['RPS_BACKTEST','相对强度RPS','📈']].forEach(function(m){
+          var sm=((window[m[0]]||{}).summary||{}), bp=sm.by_period||{}, rows=[];
+          [1,3,5,10,20].forEach(function(p){ var r=bp[String(p)]||{}; rows.push({period:p,sample:r.samples||0,win_rate:r.win_rate,avg_return:r.avg_return}); });
+          _strategies.push({name:m[1],icon:m[2],rows:rows});
+        });
+        var MIN=20, bestWR=null,bestAR=null,bestWRraw=null,bestARraw=null;
+        _strategies.forEach(function(s){ s.rows.forEach(function(r){
+          if((r.sample||0)>0){
+            if(r.win_rate!=null){ if(!bestWRraw||r.win_rate>bestWRraw.win_rate) bestWRraw={s:s.name,p:r.period,wr:r.win_rate,n:r.sample}; if((r.sample||0)>=MIN&&(!bestWR||r.win_rate>bestWR.win_rate)) bestWR={s:s.name,p:r.period,wr:r.win_rate,n:r.sample}; }
+            if(r.avg_return!=null){ if(!bestARraw||r.avg_return>bestARraw.avg_return) bestARraw={s:s.name,p:r.period,ar:r.avg_return,n:r.sample}; if((r.sample||0)>=MIN&&(!bestAR||r.avg_return>bestAR.avg_return)) bestAR={s:s.name,p:r.period,ar:r.avg_return,n:r.sample}; }
+          }
+        }); });
+        if(!bestWR) bestWR=bestWRraw; if(!bestAR) bestAR=bestARraw;
+        html += '<div style="display:flex;flex-wrap:wrap;gap:10px;margin:10px 0;">';
+        if(bestWR){ html += '<div style="flex:1 1 260px;background:rgba(244,73,93,.08);border:1px solid rgba(244,73,93,.25);border-radius:10px;padding:10px 12px;"><div style="font-size:11px;color:var(--dim);margin-bottom:4px;">🏆 胜率最高</div><div style="font-size:15px;font-weight:800;color:var(--up);line-height:1.3;">'+_esc(bestWR.s)+'</div><div style="font-size:13px;font-weight:700;color:var(--up);margin-top:4px;">T+'+bestWR.p+' · '+bestWR.wr.toFixed(1)+'% <span style="font-size:11px;color:var(--sub);font-weight:500;">(n='+bestWR.n+')</span></div></div>'; }
+        if(bestAR){ html += '<div style="flex:1 1 260px;background:rgba(31,209,123,.08);border:1px solid rgba(31,209,123,.25);border-radius:10px;padding:10px 12px;"><div style="font-size:11px;color:var(--dim);margin-bottom:4px;">💰 收益最好</div><div style="font-size:15px;font-weight:800;color:var(--up);line-height:1.3;">'+_esc(bestAR.s)+'</div><div style="font-size:13px;font-weight:700;margin-top:4px;color:'+_colorPL(bestAR.ar)+';">T+'+bestAR.p+' · '+(bestAR.ar>0?'+':'')+bestAR.ar.toFixed(2)+'% <span style="font-size:11px;color:var(--sub);font-weight:500;">(n='+bestAR.n+')</span></div></div>'; }
+        if(!bestWR&&!bestAR){ html += '<div style="color:var(--sub);font-size:12px;">暂无有效回测样本，等待盘后算法链累积历史信号。</div>'; }
+        html += '<div style="width:100%;font-size:10.5px;color:var(--sub);margin-top:8px;line-height:1.5;">📌 排名仅纳入样本≥'+MIN+' 的稳健策略；小样本策略（如逆势龙头CRDS 当前 n=4）详见下方明细，不计入排名以免噪声误导。所有数字均由 baostock 真实收盘价前向收益回测算得。</div>';
+        html += '</div>';
+      })();
+
         var bpk=null,bw=-1;
         [1,3,5,10,20].forEach(function(p){ var r=bp[String(p)]||{}; if((r.samples||0)>0&&(r.win_rate||0)>bw){bw=r.win_rate;bpk=p;} });
         if(bpk!=null){ var r=bp[String(bpk)]; return {sample:total,hold:bpk,wr:r.win_rate,ar:r.avg_return,upd:upd,ready:true}; }
@@ -4644,7 +4679,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     })();
 
     html += '<div style="font-size:13px;font-weight:700;color:var(--txt);margin:18px 0 8px;display:flex;align-items:center;gap:8px;"><span>🎯</span>主策略回测 <span style="font-size:11px;color:var(--dim);font-weight:500;">按星级降序</span></div>';
-    // 2026-09-02 主人令：驾驶舱/全站精选的回测卡依然可见（仅选股信号层精简；回测价值保留）
+    // 2026-09-02 主人令：已下线模块的回测卡保持不可见（选股信号层全删；回测不再保留以免误用）
 
     /* ── ① 综合回测（多策略×多持有期）── */
     html += '<div style="margin:14px 0;border-left:4px solid #38bdf8;" class="card">';
@@ -4692,7 +4727,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     // 2026-09-02 主人令：模块策略回测卡统一读 __STRATEGY_BACKTESTS 配置（按星级降序；已删策略自动不出现）
     html += window.__renderBacktestCardsFrom(window.__STRATEGY_BACKTESTS);
 
-    /* ── ③ K线信号 60 日回测（驾驶舱回测页复制过来的）── */
+    /* ── ③ K线信号 60 日回测 ── */
     html += '<div style="margin:14px 0;border-left:4px solid #c084fc;" class="card">';
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
     html += '<span style="font-size:15px;font-weight:700;color:#c084fc;">📈 ③ K线信号 60 日回测</span>';
@@ -5612,7 +5647,7 @@ function switchSec(sec,el){
     if(f.grade==='A'){ signals.push({t:'绩优股',a:'回调逢低关注',c:'up'}); score+=1; }
     else if(f.grade==='D'){ signals.push({t:'基本面差',a:'规避',c:'down'}); score-=1; }
 
-    // 5. 策略共振（候选池/金股池/驾驶舱/CRDS/四量 任一命中即加分）
+    // 5. 策略共振（候选池/金股池/CRDS/四量 任一命中即加分）
     // 🔴 2026-08-12 主人紧急修复：_in 兼容 dict/array 两种 schema
     //   根因：GOLD_POOL.stocks / CANDIDATE.stocks 都是 {key: stock} dict
     //   而 .some() 只对 array 有效 → arr.some is not a function 抛错
@@ -5889,7 +5924,7 @@ function switchSec(sec,el){
     const top = window.TOP10_DAILY || {};
     const trow = (top.top10||[]).find(r=>normCode(r.code)===nc);
     if(trow) hits.push({name:'🧬 三重共识', color:'var(--purple)', detail:'排名 #'+trow.rank+' · 评分 '+trow.total_score});
-    // 相对强度（大牛股猎手 RPS 分层）
+    // 相对强度（RPS 分层）
     const rpsD = window.STOCK_RPS_DATA || {};
     const rpsRow = (rpsD.records||[]).find(r => normCode(r.code) === nc);
     if(rpsRow){
@@ -5906,7 +5941,7 @@ function switchSec(sec,el){
     const gstocks = gp.stocks || {};
     const gkey = Object.keys(gstocks).find(k=>normCode(gstocks[k].code)===nc);
     if(gkey) hits.push({name:'⭐ 金股池', color:'var(--up)', detail:'累计信号 '+(gstocks[gkey].signal_count||0)});
-    // 候选池（全站精选底层池）
+    // 候选池（算法初筛名单）
     const cd = window.CANDIDATE || {};
     const cstocks = cd.stocks || {};
     const ckey = Object.keys(cstocks).find(k=>normCode(cstocks[k].code)===nc);
@@ -9542,7 +9577,7 @@ window.showRestrictedItems = showRestrictedItems;
     h+='<span class="tp-name">'+(p.name||'')+'</span>';
     if(p.board)h+='<span class="tp-board" style="'+boardColor(p.board)+'">'+p.board+'</span>';
     if(isNear){
-      const miss=[]; if(!p.in_top10)miss.push('TOP10'); if(!p.in_tier_a&&!p.in_tier_b)miss.push('驾驶舱A/B档'); else if(!p.in_tier_a)miss.push('/* 驾驶舱A档 已下线 */'); if(!p.in_good_fund)miss.push('基本面A档');
+      const miss=[]; if(!p.in_top10)miss.push('TOP10'); if(!p.in_good_fund)miss.push('基本面A档');
       const step=((p.miss_steps||1)===2?'差两步':'差一步');
       h+='<span class="tp-badge near">'+step+' · 缺 '+miss.join(' · ')+'</span>';
     } else {
@@ -9590,7 +9625,7 @@ window.showRestrictedItems = showRestrictedItems;
     $('tcConsensus').innerHTML = stocks.length ? stocks.map(s=>renderStock(s,false,tm)).join('') :
       '<div class="tp-empty">'+_tcEmptyHead+'<br><span style="font-size:12px">数据时间 '+_tcTs0+
       ' · 下方「优先观察」展示满足 2/3 且主站评分≥75 的股票</span>'+
-      '<br><span style="font-size:11px;color:#f59e0b">📌 最终推荐以驾驶舱/全站精选等模块为准，三重共识为 0 时不构成否决，仍可作参考</span></div>';
+      '<br><span style="font-size:11px;color:#f59e0b">📌 最终推荐以三重共识等模块为准，三重共识为 0 时不构成否决，仍可作参考</span></div>';
     // 🛡 2026-08-19 主人令一劳永逸修复：弱市 max_score 可能很低（如 40），固定 >=75 会让 near_miss 全灭。
     //   改为动态阈值：max(near_max_score×0.6, 25)，确保弱市也有观察清单可展示。
     const nearMax=Math.max(...near.map(s=>s.total_score||0), 0);
@@ -9829,7 +9864,7 @@ window.showRestrictedItems = showRestrictedItems;
 
   let stRendered={};
   function renderStTab(tab){
-    // 确保 op 标签的 DATA.*（驾驶舱/全站精选/逆势龙头读取的共享数据源）已从 window.X 填充
+    // 确保 op 标签的 DATA.*（逆势龙头读取的共享数据源）已从 window.X 填充
     if(tab!=='tc'){ try{ if(window.__renderOps) window.__renderOps(); }catch(e){} }
     if(tab==='tc'){ initTriple(); }
     else if(tab==='crds'){ if(!stRendered.crds){ stRendered.crds=1; try{ window.renderV8Crds('st'); }catch(e){console.warn('逆势龙头渲染失败',e);} } }
@@ -10533,7 +10568,7 @@ window.showRestrictedItems = showRestrictedItems;
     // ═══ 2026-09-01 主人令：暂未上架瘦身为「只保留热门赛道资金追踪（新卡）」
     //   强势突破 3 卡（两套算法回测对比 / 动量共识 / H反推短线买点）→ 已下沉至「已下架」。
     //   2026-09-02 08:57 主人令重申：暂未上架 = 调试专区原 3 张卡（AI预测/潜力挖掘/ETF龙头参考）平铺，见 aiPredBody / ppBody / dbgEtfMapBody。
-    //   大牛股猎手回测已统一收归「策略回顾 > 已下架算法回测」区，不再跟随此处。
+    //   已下架策略的回测已统一收归「策略回顾 > 已下架算法回测」区（含大牛股猎手），不再跟随此处。
     //   「动量共识 / H反推」属调试展示性，移至逻辑详解（不在前台卡片列表）。
     // ═══ 2026-09-02 主人令（08:57 重申）：暂未上架 = 平铺「原来调试专区 3 张卡」——直接恢复 2026-09-01 09:00 前结构
     //   ① 🤖 AI 预测·市场路径概率（aiPredBody / _fillAiPrediction）
@@ -12499,7 +12534,7 @@ window.__renderV8CalToday();
       else { console.warn('[init '+name+'] function not defined'); }
     }catch(e){ console.warn('[init '+name+'] '+prefix, e); }
   }
-  // 选股策略 tab 上的 6 张算法卡（非 query/tc/cockpit/allsite/crds 的都有 lazy render，需要显式激活）
+  // 选股策略 tab 上的 6 张算法卡（非 query/tc/crds 的都有 lazy render，需要显式激活）
   tryRun('renderFourVolume', (typeof window.renderFourVolume==='function')?window.renderFourVolume:null, 'fv-badge init');
   tryRun('renderV8Crds-st',  (typeof window.renderV8Crds==='function')?function(){window.renderV8Crds('st');}:null, 'crds-badge init');
   tryRun('renderRpsScreen', (typeof window.renderRpsScreen==='function')?window.renderRpsScreen:null, 'rps init');
@@ -12812,7 +12847,7 @@ window.__renderV8CalToday();
         if(it && it.code){ _algoIndex[String(it.code)] = { cons: it.consensus_count||0, algos: Array.isArray(it.algos_hit) ? it.algos_hit : [] }; }
       });
     }catch(e){ console.warn('[renderFinalRec] algoIndex', e); }
-    // 状态徽标行（与全站精选统一 pill 风格）
+    // 状态徽标行（统一 pill 风格）
     (function(){
       var sb=document.getElementById('finalStatusBadges'); if(!sb) return;
       var ut=D.update_time||'';
