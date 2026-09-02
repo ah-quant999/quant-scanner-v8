@@ -223,6 +223,7 @@ window.__domReadyFns=[];
   .sf-status-table td{padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.06);text-align:center}
   .sf-status-table td:first-child{text-align:left}
   .sf-status-badge{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:10px}
+  .sc-phase-pill:hover{background:rgba(255,255,255,.06) !important}
   .sf-rotate-table{width:100%;font-size:13px;border-collapse:collapse;line-height:1.7}
   .sf-rotate-table td{padding:5px 7px;border:1px solid var(--border)}
   .sf-rotate-table tr:first-child td{background:var(--bg2);color:var(--dim);font-weight:600}
@@ -7037,7 +7038,7 @@ window.__renderV8CalFull();
         const delta = transInto[p] || 0;
         const deltaHtml = delta ? ' <span style="color:var(--up);font-size:12px;font-weight:700">▲' + delta + '</span>' : '';
         const isZhushu = (p === '主升');
-        h3 += '<div class="sc-phase-pill" data-phase="' + p + '" style="padding:8px 6px;border-radius:6px;background:var(--bg1);border-left:3px solid ' + meta.color + ';text-align:center;cursor:' + (isZhushu ? 'default' : 'pointer') + ';transition:background .15s;" onmouseover="if(!' + isZhushu + ')this.style.background='rgba(255,255,255,0.06)'" onmouseout="if(!' + isZhushu + ')this.style.background='var(--bg1)'">';
+        h3 += '<div class="sc-phase-pill" data-phase="' + p + '" style="padding:8px 6px;border-radius:6px;background:var(--bg1);border-left:3px solid ' + meta.color + ';text-align:center;cursor:' + (isZhushu ? 'default' : 'pointer') + ';transition:background .15s;">';
         h3 += '<div style="font-size:12px;color:var(--dim);margin-bottom:2px;">' + meta.emoji + p + '</div>';
         h3 += '<div style="font-size:18px;font-weight:700;color:' + meta.color + ';">' + cnt + deltaHtml + '</div>';
         h3 += '<div style="font-size:10px;color:var(--sub);margin-top:2px;">' + (isZhushu ? '已展开' : (cnt ? '点击查看' : '暂无')) + '</div>';
