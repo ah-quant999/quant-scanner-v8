@@ -752,11 +752,15 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/FOUR_VOLUME.js?v=aefad242c4" defer></script>
   <script src="data/FOUR_VOLUME_60M.js?v=af87ef8c3e" defer></script>
   <script src="data/STOCK_STOP_DATA.js?v=bed314b262" defer></script>
-  <script src="data/BACKTEST_COMPREHENSIVE.js?v=6b82b50363" defer></script>
+  <script src="data/BACKTEST_COMPREHENSIVE.js?v=b6991845a5" defer></script>
   <!-- 2026-09-03 主人令：COCKPIT_BACKTEST.js 已删（驾驶舱全方位下线） -->
   <script src="data/BACKTEST_TDX.js?v=44eeb2ea13" defer></script>
   <!-- 2026-09-03 主人令：HUNTER_BACKTEST.js 已删（大牛股猎手全方位下线） -->
   <script src="data/OPTIMIZED_STRATEGY.js?v=c8b62a8ad4" defer></script>
+  <!-- 选股策略模块回测源（供「各选股策略回测汇总」读取） -->
+  <script src="data/FOUR_VOLUME_BACKTEST.js?v=7b774c251c" defer></script>
+  <script src="data/CRDS_BACKTEST.js?v=318fde1812" defer></script>
+  <script src="data/RPS_BACKTEST.js?v=73b38c0682" defer></script>
   <script src="data/EXPERIMENT.js?v=0eb4075617" defer></script>
   <script src="data/FINAL_RECOMMEND_DATA.js?v=bb2d45b606" defer></script>
   <script src="data/V8_POOL_TRACKER.js?v=c3a084a1cd" defer></script>
@@ -1590,6 +1594,13 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
       </div>
 
       
+<!-- 2026-09-03 主人令：各选股策略回测汇总（顶部：胜率最高/收益最好；下方：各策略明细数据表） -->
+<div class="card" id="lgBacktestCard">
+  <h3><span class="ic">📊</span>各选股策略回测汇总 <span class="fresh" id="lgBacktestFresh">—</span></h3>
+  <div id="lgBacktestSummary" style="margin-bottom:12px;">加载中…</div>
+  <div id="lgBacktestDetail">加载中…</div>
+</div>
+
 <div class="card">
         <h3><span class="ic">📈</span>回测胜率与买卖建议 - 口径说明</h3>
         <div class="logic-h">胜率计算口径</div>
@@ -8938,6 +8949,151 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     btn.textContent = showMore ? '收起▲' : '... +' + total + ' 只更多（点击展开）▼';
   };
 
+  /* ════════════════════════════════════════════════════════════════════
+     2026-09-03 主人令：各选股策略回测汇总（逻辑详解页）
+     顶部：从 BACKTEST_COMPREHENSIVE + 模块回测源中实时计算「胜率最高」「收益最好」
+     下方：各策略 T+1/3/5/10/20 完整明细表（不写死，全部从 window 数据算出）
+     ════════════════════════════════════════════════════════════════════ */
+  window.__renderLgBacktest = function(){
+    var sumEl = document.getElementById('lgBacktestSummary');
+    var detEl = document.getElementById('lgBacktestDetail');
+    var freshEl = document.getElementById('lgBacktestFresh');
+    if(!sumEl || !detEl) return;
+
+    function _colorWR(v){ if(v==null || typeof v !== 'number' || isNaN(v)) return 'var(--sub)'; return v >= 50 ? 'var(--up)' : 'var(--down)'; }
+    function _colorPL(v){ if(v==null || typeof v !== 'number' || isNaN(v)) return 'var(--sub)'; return v >= 0 ? 'var(--up)' : 'var(--down)'; }
+    function _fmtPct(v, digits){ if(v==null || typeof v !== 'number' || isNaN(v)) return '—'; var d = digits == null ? 2 : digits; return (v > 0 ? '+' : '') + v.toFixed(d) + '%'; }
+    function _esc(s){ var d=document.createElement('div'); d.textContent = String(s==null ? '' : s); return d.innerHTML; }
+
+    var strategies = [];
+    var times = [];
+
+    // ① 三重共识（从 BACKTEST_COMPREHENSIVE.overview 取真实回测）
+    var bc = window.BACKTEST_COMPREHENSIVE || {};
+    if(bc.overview){
+      var tripleMap = {
+        resonance_all: {name:'三重共识·共振≥2（宽松）', icon:'🧲', color:'#38bdf8'},
+        resonance_gte70_lt80: {name:'三重共识·共振70-79分', icon:'🧲', color:'#38bdf8'},
+        resonance_gte80: {name:'三重共识·共振≥80（严格）', icon:'🧲', color:'#38bdf8'}
+      };
+      Object.keys(tripleMap).forEach(function(k){
+        var o = bc.overview[k];
+        if(!o || !o.periods) return;
+        var meta = tripleMap[k];
+        var rows = [];
+        [1,3,5,10,20].forEach(function(p){
+          var r = o.periods['hold_'+p+'d'];
+          if(!r) return;
+          rows.push({period:p, sample:(r.count!=null?r.count:0), win_rate:r.win_rate, avg_return:r.avg_return, median:r.median_return, best:r.best_return, worst:r.worst_return, sharpe:r.sharpe_ratio, pl_ratio:null});
+        });
+        if(rows.length){
+          strategies.push({key:k, name:meta.name, icon:meta.icon, color:meta.color, rows:rows, upd:bc.calc_time||''});
+          if(bc.calc_time) times.push(bc.calc_time);
+        }
+      });
+    }
+
+    // ② 模块级回测源（四量终极 / CRDS / RPS）
+    var mods = [
+      {key:'fourvolume', name:'四量终极', icon:'🔥', color:'#f97316', var:'FOUR_VOLUME_BACKTEST'},
+      {key:'crds', name:'逆势龙头CRDS', icon:'🐉', color:'#ef4444', var:'CRDS_BACKTEST'},
+      {key:'rps', name:'相对强度RPS', icon:'📈', color:'#14b8a6', var:'RPS_BACKTEST'}
+    ];
+    mods.forEach(function(m){
+      var d = window[m.var] || {};
+      var sm = d.summary || {};
+      var bp = sm.by_period || {};
+      var rows = [];
+      [1,3,5,10,20].forEach(function(p){
+        var r = bp[String(p)] || {};
+        rows.push({period:p, sample:(r.samples!=null?r.samples:0), win_rate:r.win_rate, avg_return:r.avg_return, median:null, best:r.best_return, worst:r.worst_return, sharpe:null, pl_ratio:r.profit_loss_ratio});
+      });
+      var upd = sm.update_time || sm.calc_time || '';
+      strategies.push({key:m.key, name:m.name, icon:m.icon, color:m.color, rows:rows, upd:upd});
+      if(upd) times.push(upd);
+    });
+
+    // 计算「胜率最高」「收益最好」（必须有真实样本；排名仅纳入样本≥20 的稳健策略，避免小样本噪声误导）
+    var MIN_SAMPLE = 20;
+    var bestWR = null, bestAR = null, bestWRraw = null, bestARraw = null;
+    strategies.forEach(function(s){
+      s.rows.forEach(function(r){
+        if((r.sample||0) > 0){
+          if(r.win_rate != null && !isNaN(r.win_rate)){
+            if(!bestWRraw || r.win_rate > bestWRraw.win_rate) bestWRraw = {strategy:s.name, period:r.period, win_rate:r.win_rate, sample:r.sample};
+            if((r.sample||0) >= MIN_SAMPLE && (!bestWR || r.win_rate > bestWR.win_rate)) bestWR = {strategy:s.name, period:r.period, win_rate:r.win_rate, sample:r.sample};
+          }
+          if(r.avg_return != null && !isNaN(r.avg_return)){
+            if(!bestARraw || r.avg_return > bestARraw.avg_return) bestARraw = {strategy:s.name, period:r.period, avg_return:r.avg_return, sample:r.sample};
+            if((r.sample||0) >= MIN_SAMPLE && (!bestAR || r.avg_return > bestAR.avg_return)) bestAR = {strategy:s.name, period:r.period, avg_return:r.avg_return, sample:r.sample};
+          }
+        }
+      });
+    });
+    if(!bestWR) bestWR = bestWRraw;
+    if(!bestAR) bestAR = bestARraw;
+
+    // 顶部汇总
+    var sumHtml = '<div style="display:flex;flex-wrap:wrap;gap:10px;">';
+    if(bestWR){
+      sumHtml += '<div style="flex:1 1 260px;background:rgba(244,73,93,.08);border:1px solid rgba(244,73,93,.25);border-radius:10px;padding:10px 12px;">';
+      sumHtml += '<div style="font-size:11px;color:var(--dim);margin-bottom:4px;">🏆 胜率最高</div>';
+      sumHtml += '<div style="font-size:15px;font-weight:800;color:var(--up);line-height:1.3;">'+_esc(bestWR.strategy)+'</div>';
+      sumHtml += '<div style="font-size:13px;font-weight:700;color:var(--up);margin-top:4px;">T+'+bestWR.period+' · '+bestWR.win_rate.toFixed(1)+'% <span style="font-size:11px;color:var(--sub);font-weight:500;">(n='+bestWR.sample+')</span></div>';
+      sumHtml += '</div>';
+    }
+    if(bestAR){
+      sumHtml += '<div style="flex:1 1 260px;background:rgba(31,209,123,.08);border:1px solid rgba(31,209,123,.25);border-radius:10px;padding:10px 12px;">';
+      sumHtml += '<div style="font-size:11px;color:var(--dim);margin-bottom:4px;">💰 收益最好</div>';
+      sumHtml += '<div style="font-size:15px;font-weight:800;color:var(--up);line-height:1.3;">'+_esc(bestAR.strategy)+'</div>';
+      sumHtml += '<div style="font-size:13px;font-weight:700;margin-top:4px;color:'+_colorPL(bestAR.avg_return)+';">T+'+bestAR.period+' · '+_fmtPct(bestAR.avg_return,2)+' <span style="font-size:11px;color:var(--sub);font-weight:500;">(n='+bestAR.sample+')</span></div>';
+      sumHtml += '</div>';
+    }
+    if(!bestWR && !bestAR){
+      sumHtml += '<div style="color:var(--sub);font-size:12px;">暂无有效回测样本，等待盘后算法链累积历史信号。</div>';
+    }
+    sumHtml += '<div style="width:100%;font-size:10.5px;color:var(--sub);margin-top:8px;line-height:1.5;">📌 排名仅纳入样本≥'+MIN_SAMPLE+' 的稳健策略；小样本策略（如逆势龙头CRDS 当前 n=4）详见下方明细，不计入排名以免噪声误导。所有数字均由 baostock 真实收盘价前向收益回测算得。</div>';
+    sumHtml += '</div>';
+    sumEl.innerHTML = sumHtml;
+
+    // 下方明细表
+    var detHtml = '';
+    strategies.forEach(function(s){
+      var hasData = s.rows.some(function(r){ return (r.sample||0) > 0 && (r.win_rate != null || r.avg_return != null); });
+      detHtml += '<div style="margin:14px 0;border-left:4px solid '+s.color+';" class="card">';
+      detHtml += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
+      detHtml += '<span style="font-size:15px;font-weight:700;color:'+s.color+';">'+s.icon+' '+_esc(s.name)+'</span>';
+      detHtml += '<span style="font-size:11px;color:var(--dim);">'+_esc(s.upd||'').substring(0,16)+'</span>';
+      if(!hasData) detHtml += '<span style="font-size:10px;color:#fbbf24;background:rgba(251,191,36,.12);border:1px solid rgba(251,191,36,.3);padding:1px 7px;border-radius:6px;font-weight:600;">样本累计中</span>';
+      detHtml += '</div>';
+      detHtml += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
+      detHtml += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
+      ['持有期','样本','胜率','平均收益','中位数','最佳','最差','盈亏比','Sharpe'].forEach(function(h){ detHtml += '<th style="padding:6px 4px;text-align:center;color:var(--sub);white-space:nowrap;">'+h+'</th>'; });
+      detHtml += '</tr></thead><tbody>';
+      s.rows.forEach(function(r){
+        detHtml += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
+        detHtml += '<td style="padding:6px 4px;text-align:center;color:var(--txt);font-weight:700;white-space:nowrap;">T+'+r.period+'天</td>';
+        detHtml += '<td style="padding:6px 4px;text-align:center;color:var(--sub);">'+(r.sample||0)+'</td>';
+        detHtml += '<td style="padding:6px 4px;text-align:center;font-weight:700;color:'+_colorWR(r.win_rate)+';">'+(r.win_rate!=null&&!isNaN(r.win_rate)?r.win_rate.toFixed(1)+'%':'—')+'</td>';
+        detHtml += '<td style="padding:6px 4px;text-align:center;color:'+_colorPL(r.avg_return)+';">'+(r.avg_return!=null&&!isNaN(r.avg_return)?_fmtPct(r.avg_return,2):'—')+'</td>';
+        detHtml += '<td style="padding:6px 4px;text-align:center;color:'+_colorPL(r.median)+';">'+(r.median!=null&&!isNaN(r.median)?_fmtPct(r.median,2):'—')+'</td>';
+        detHtml += '<td style="padding:6px 4px;text-align:center;color:var(--up);">'+(r.best!=null&&!isNaN(r.best)?r.best.toFixed(2)+'%':'—')+'</td>';
+        detHtml += '<td style="padding:6px 4px;text-align:center;color:var(--down);">'+(r.worst!=null&&!isNaN(r.worst)?r.worst.toFixed(2)+'%':'—')+'</td>';
+        detHtml += '<td style="padding:6px 4px;text-align:center;color:var(--sub);">'+(r.pl_ratio!=null&&!isNaN(r.pl_ratio)?r.pl_ratio.toFixed(2):'—')+'</td>';
+        detHtml += '<td style="padding:6px 4px;text-align:center;color:var(--sub);">'+(r.sharpe!=null&&!isNaN(r.sharpe)?r.sharpe.toFixed(2):'—')+'</td>';
+        detHtml += '</tr>';
+      });
+      detHtml += '</tbody></table></div>';
+      detHtml += '</div>';
+    });
+    detEl.innerHTML = detHtml;
+
+    if(freshEl){
+      var latest = times.filter(Boolean).sort().slice(-1)[0] || '';
+      freshEl.textContent = latest ? latest.substring(0,16) : '—';
+    }
+  };
+
   window.opSwitchTab=function(n){
     document.querySelectorAll('.op-tab-btn').forEach(function(b){b.classList.toggle('active', +b.dataset.op===n);});
     // 2026-08-30 主人令：opTab3(暂未上架)/opTab4(已下架) 均已提升为一级 nav，运维只保留 1/2
@@ -8954,7 +9110,8 @@ function switchLg(id,el){
   var pane=document.getElementById('lg-'+id);
   if(pane) pane.classList.add('active');
   if(el) el.classList.add('active');
-    if(id==='v6'){
+  if(id==='st' && typeof window.__renderLgBacktest === 'function'){ setTimeout(window.__renderLgBacktest, 60); }
+  if(id==='v6'){
     var d=document.getElementById('v6MemoFrame');
     var err=document.getElementById('v6MemoError');
     var st=document.getElementById('v6MemoStatus');
@@ -9022,6 +9179,8 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     var first = document.querySelector('.lg-tab');
     if (first && typeof window.switchLg === 'function') window.switchLg(first.getAttribute('data-lg') || 'td', first);
   }catch(e){ console.warn('[logic.html] 初始子页切换失败', e); }
+  // 后台预渲染选股策略回测汇总，避免首次点击 st tab 空白
+  setTimeout(function(){ try{ if(typeof window.__renderLgBacktest === 'function') window.__renderLgBacktest(); }catch(_){} }, 400);
 })();
 </script>
 

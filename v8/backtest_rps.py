@@ -139,6 +139,17 @@ def fmt_pct(v):
     return round(v, 2)
 
 
+def fetch_close_roll(code, date_str, max_fwd=8):
+    """向前滚动到最近的交易日取收盘价（信号日可能是周末，须顺延到下一交易日买入）。"""
+    d = datetime.strptime(date_str, "%Y-%m-%d").date()
+    for i in range(max_fwd + 1):
+        cand = (d + timedelta(days=i)).strftime("%Y-%m-%d")
+        px = fetch_close(code, cand)
+        if px is not None and px > 0:
+            return px, cand
+    return None, None
+
+
 def empty_backtest(reason):
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     payload = {
@@ -195,26 +206,26 @@ def main():
     for idx, sig in enumerate(signals, 1):
         code = sig["code"]
         entry_date = sig["signal_date"]
-        entry_price = fetch_close(code, entry_date)
+        entry_price, entry_td = fetch_close_roll(code, entry_date)
         if entry_price is None or entry_price <= 0:
-            print(f"[{idx}/{total}] skip {code} {entry_date}: no entry price")
+            print(f"[{idx}/{total}] skip {code} {entry_date}: no entry price (rolled)")
             continue
         sig_result = {
-            "signal_date": entry_date, "code": code, "name": sig["name"],
+            "signal_date": entry_date, "entry_trade_date": entry_td, "code": code, "name": sig["name"],
             "entry_price": entry_price, "periods": {},
         }
         for p in HOLD_PERIODS:
-            exit_date = add_trade_days(entry_date, p)
-            exit_price = fetch_close(code, exit_date)
+            exit_target = (datetime.strptime(entry_td, "%Y-%m-%d").date() + timedelta(days=p)).strftime("%Y-%m-%d")
+            exit_price, exit_td = fetch_close_roll(code, exit_target)
             if exit_price is None or exit_price <= 0:
-                sig_result["periods"][str(p)] = {"return_pct": None, "exit_price": None, "exit_date": exit_date}
+                sig_result["periods"][str(p)] = {"return_pct": None, "exit_price": None, "exit_date": exit_target}
                 continue
             ret = (exit_price - entry_price) / entry_price * 100
-            sig_result["periods"][str(p)] = {"return_pct": fmt_pct(ret), "exit_price": exit_price, "exit_date": exit_date}
+            sig_result["periods"][str(p)] = {"return_pct": fmt_pct(ret), "exit_price": exit_price, "exit_date": exit_td}
             period_returns[p].append(ret)
         detail_signals.append(sig_result)
         if idx % 10 == 0 or idx == total:
-            print(f"[{idx}/{total}] {code} {entry_date} done")
+            print(f"[{idx}/{total}] {code} {entry_date} -> entry {entry_td} done")
 
     try:
         bs.logout()
