@@ -34,6 +34,9 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     "calc_crds.py": 2700,        # 逆势龙头 CRDS，同样遍历较广
     "gen_stock_profile.py": 2700,
     "v8/backtest_hunter.py": 2400,  # 大牛股猎手回测：baostock 取 281 只信号股 K 线，约 5-15min
+    "v8/backtest_crds.py": 2400,    # 逆势龙头 CRDS 回测：读 crds history + baostock 取 K 线回填收益
+    "v8/backtest_allsite.py": 1800, # 全站精选回测：读 final_recommend 历史（占位，待建历史归档）
+    "v8/backtest_rps.py": 1800,     # 相对强度 RPS 回测：读 stock_rps 截面（占位，RPS 为截面指标非信号引擎）
 }
 
 
@@ -167,6 +170,15 @@ ORDER = [
     #   导致 data/HUNTER_BACKTEST.js 长期陈旧、被健康检查按 24h 红线误杀。现挂链尾，
     #   依赖 lhb_history.json 已就位；失败不影响选股结果，仅自身卡片可能不刷新。
     "v8/backtest_hunter.py",           # → data/HUNTER_BACKTEST.js（机游共振核心信号历史回测）
+    # 🛡 2026-09-02 一劳永逸：补齐三大模块回测链（此前 allsite/crds/rps 均无调度方，
+    #   前端策略回顾卡长期为空/陈旧）。统一挂链尾（依赖各自历史/截面数据已就位）。
+    #   - crds：读 out/history/crds_*.json + raw_data/history/crds_*.json 真实信号 + baostock 回填 T+N 收益
+    #   - allsite：读 final_recommend 历史（当前为诚实占位，待建 final_recommend 历史归档后转真实）
+    #   - rps：读 stock_rps 截面（RPS 为相对强度指标，非选股信号引擎，回测为截面有效性说明）
+    #   三者失败均不影响选股结果，仅自身卡片可能不刷新。
+    "v8/backtest_crds.py",            # → data/CRDS_BACKTEST.js（逆势龙头 CRDS 真实历史回测）
+    "v8/backtest_allsite.py",         # → data/ALLSITE_BACKTEST.js（全站精选回测，占位待历史归档）
+    "v8/backtest_rps.py",             # → data/RPS_BACKTEST.js（相对强度 RPS 回测，截面有效性）
 ]
 
 
