@@ -108,19 +108,21 @@ def _slot_covered(runs, slot_time, window_after_min=35, window_before_min=5):
 
 
 def _make_slots(now):
-    """生成今日所有预期档期（pre-market/intraday/post-close）。"""
+    """生成今日所有预期档期（pre-market/intraday/post-close）。
+    返回 (category, slot_time, window_before_min, window_after_min)。
+    窗口：盘前到 10:30，盘中 ±35 分钟，盘后到 22:00（容忍 cron 延迟）。"""
     base = datetime.datetime(now.year, now.month, now.day, tzinfo=CST)
     slots = []
     # 盘前
-    slots.append(('premarket', base.replace(hour=8, minute=25)))
+    slots.append(('premarket', base.replace(hour=8, minute=25), 5, 125))
     # 盘中：09:00-11:30 / 13:00-15:30 每 30 分
     for h, m in [
         (9, 0), (9, 30), (10, 0), (10, 30), (11, 0), (11, 30),
         (13, 0), (13, 30), (14, 0), (14, 30), (15, 0), (15, 30),
     ]:
-        slots.append(('intraday', base.replace(hour=h, minute=m)))
-    # 盘后
-    slots.append(('post_close', base.replace(hour=17, minute=20)))
+        slots.append(('intraday', base.replace(hour=h, minute=m), 5, 35))
+    # 盘后：容忍延迟到 22:00
+    slots.append(('post_close', base.replace(hour=17, minute=20), 5, 280))
     return slots
 
 
@@ -186,9 +188,11 @@ def _handle_algo(now, algo_runs, fetch_runs):
             ct = _parse_ts(r['created_at'])
         except Exception:
             continue
-        if ct.date() == now.date():
+        # 18:00 前创建的 algo run 会跳过候选池/三重共识/最终推荐等主模块，
+        # 只有 18:00 后（含 19:15 主档/20:00 兜底）的成功才算真正完成盘后选股。
+        if ct.date() == now.date() and ct.hour >= 18:
             today_success = True
-            print(f'  ✅ 算法链：今日已成功于 {ct.strftime("%H:%M")}，无需补派')
+            print(f'  ✅ 算法链：今日 18:00 后已成功于 {ct.strftime("%H:%M")}，无需补派')
             break
     if today_success:
         return
@@ -229,12 +233,12 @@ def main():
     # 1) 处理每个预期档期
     slots = _make_slots(now)
     dispatched = 0
-    for cat, slot_time in slots:
+    for cat, slot_time, win_before, win_after in slots:
         if now < slot_time:
             print(f'  ⏳ {cat} {slot_time.strftime("%H:%M")} 尚未到点，跳过')
             continue
         # 档期内是否已被覆盖？
-        covered, cov_ct = _slot_covered(fetch_runs, slot_time)
+        covered, cov_ct = _slot_covered(fetch_runs, slot_time, window_after_min=win_after, window_before_min=win_before)
         if covered:
             print(f'  ✅ {cat} {slot_time.strftime("%H:%M")} 已被覆盖（{cov_ct.strftime("%H:%M")}）')
             continue
