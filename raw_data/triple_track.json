@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-09-02 05:59:42",
+  "update_time": "2026-09-03 00:10:58",
   "data_date": "update_time",
   "track_start": "2026-08-17",
-  "history_days": 12,
+  "history_days": 13,
   "strict_count": 0,
   "near_count": 0,
   "tracked": [],
@@ -48,6 +48,12 @@
       "code": "300502",
       "name": "新易盛",
       "text": "新易盛(300502) 于 2026-08-29 跌出共识（曾连续 3 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300857",
+      "name": "协创数据",
+      "text": "协创数据(300857) 于 2026-09-02 跌出共识（曾连续 2 日）"
     },
     {
       "level": "warn",
@@ -171,9 +177,27 @@
     },
     {
       "level": "warn",
+      "code": "002475",
+      "name": "立讯精密",
+      "text": "立讯精密(002475) 于 2026-09-02 跌出共识（曾连续 5 日）"
+    },
+    {
+      "level": "warn",
       "code": "601138",
       "name": "",
       "text": "(601138) 于 2026-08-30 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "001309",
+      "name": "德明利",
+      "text": "德明利(001309) 于 2026-09-02 跌出共识（曾连续 4 日）"
+    },
+    {
+      "level": "warn",
+      "code": "002463",
+      "name": "沪电股份",
+      "text": "沪电股份(002463) 于 2026-09-02 跌出共识（曾连续 4 日）"
     }
   ],
   "sector_cluster": {
@@ -201,47 +225,47 @@
   },
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测",
-    "latest_date": "2026-09-01",
-    "total": 281,
+    "latest_date": "2026-09-02",
+    "total": 287,
     "best_hold_days": 1,
     "periods": {
       "1d": {
         "win_rate": 56.7,
         "avg_return": 0.31,
         "sharpe": 0.06,
-        "count": 269,
+        "count": 275,
         "best": 14.99,
         "worst": -10.02
       },
       "3d": {
-        "win_rate": 39.6,
-        "avg_return": -0.87,
+        "win_rate": 39.2,
+        "avg_return": -0.91,
         "sharpe": -0.13,
-        "count": 269,
+        "count": 275,
         "best": 15.06,
         "worst": -10.04
       },
       "5d": {
-        "win_rate": 47.1,
-        "avg_return": -0.19,
+        "win_rate": 46.9,
+        "avg_return": -0.2,
         "sharpe": -0.02,
-        "count": 269,
+        "count": 275,
         "best": 15.06,
         "worst": -10.08
       },
       "10d": {
-        "win_rate": 51.7,
+        "win_rate": 52.1,
         "avg_return": 0.96,
         "sharpe": 0.1,
-        "count": 269,
+        "count": 275,
         "best": 15.07,
         "worst": -10.08
       },
       "20d": {
         "win_rate": 48.7,
-        "avg_return": 0.77,
+        "avg_return": 0.75,
         "sharpe": 0.09,
-        "count": 269,
+        "count": 275,
         "best": 15.07,
         "worst": -10.04
       }
@@ -250,16 +274,16 @@
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 109,
+      "count": 112,
       "win_rate_5d": 59.8,
-      "avg_ret_5d": 2.04,
-      "best_win_rate": 64.3,
-      "best_hold_days": 20
+      "avg_ret_5d": 1.98,
+      "best_win_rate": 65.3,
+      "best_hold_days": 10
     },
     {
       "band": "70~80",
-      "count": 172,
-      "win_rate_5d": 40.1,
+      "count": 175,
+      "win_rate_5d": 39.9,
       "avg_ret_5d": -1.45,
       "best_win_rate": 54.4,
       "best_hold_days": 1
@@ -271,34 +295,34 @@
         "period": "1d",
         "strict_win": 56.7,
         "strict_ret": 0.31,
-        "strict_count": 269,
+        "strict_count": 275,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "3d",
-        "strict_win": 39.6,
-        "strict_ret": -0.87,
-        "strict_count": 269,
+        "strict_win": 39.2,
+        "strict_ret": -0.91,
+        "strict_count": 275,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "5d",
-        "strict_win": 47.1,
-        "strict_ret": -0.19,
-        "strict_count": 269,
+        "strict_win": 46.9,
+        "strict_ret": -0.2,
+        "strict_count": 275,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
       },
       {
         "period": "10d",
-        "strict_win": 51.7,
+        "strict_win": 52.1,
         "strict_ret": 0.96,
-        "strict_count": 269,
+        "strict_count": 275,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -306,8 +330,8 @@
       {
         "period": "20d",
         "strict_win": 48.7,
-        "strict_ret": 0.77,
-        "strict_count": 269,
+        "strict_ret": 0.75,
+        "strict_count": 275,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -317,7 +341,7 @@
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
     "track_start": "2026-08-17",
-    "history_days": 12,
+    "history_days": 13,
     "summary": {
       "1d": {
         "count": 12,

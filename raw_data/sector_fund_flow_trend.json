@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-02 16:55",
+  "update_time": "2026-09-03 00:13",
   "data_type": "real",
   "summary": {
     "in_count": 17,
@@ -15,42 +15,43 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "行业",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_5d_days": 2,
-      "net_10d_days": 2,
-      "net_20d_days": 2,
-      "net_60d_days": 2
+      "net_5d_days": 3,
+      "net_10d_days": 3,
+      "net_20d_days": 3,
+      "net_60d_days": 3
     },
     {
       "name": "净水概念",
       "net": 5.63,
-      "net_5d": 1.62,
-      "net_20d": 0,
+      "net_5d": 7.62,
+      "net_20d": 15.15,
       "type": "概念",
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_60d": 3.52,
+      "net_60d": 9.52,
       "net_60d_days": 7,
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "in",
-      "net_10d_days": 7,
-      "net_20d_days": 7
+      "net_10d": 15.15,
+      "net_10d_days": 8,
+      "net_20d_days": 8
     },
     {
       "name": "军民融合",
       "net": 5.29,
-      "net_5d": -4.17,
+      "net_5d": 1.07,
       "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_60d": 9.75,
+      "net_60d": 14.99,
       "net_60d_days": 6,
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_10d_days": 6,
-      "net_20d_days": 6
+      "net_10d_days": 7,
+      "net_20d_days": 7
     },
     {
       "name": "富士康概念",
@@ -58,27 +59,27 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_5d_days": 2,
-      "net_10d_days": 2,
-      "net_20d_days": 2,
-      "net_60d_days": 2
+      "net_5d_days": 3,
+      "net_10d_days": 3,
+      "net_20d_days": 3,
+      "net_60d_days": 3
     },
     {
       "name": "成飞概念",
       "net": 4.56,
-      "net_5d": 22.99,
-      "net_20d": 141.8,
+      "net_5d": 24.39,
+      "net_20d": 121.15,
       "type": "概念",
-      "net_10d": 14.45,
+      "net_10d": 64.69,
       "net_10d_days": 10,
-      "net_60d": -550.04,
+      "net_60d": -502.47,
       "net_60d_days": 50,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 1,
-      "net_20d_days": 1
+      "net_5d_days": 2,
+      "net_20d_days": 2
     },
     {
       "name": "智能音箱",
@@ -86,19 +87,6 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
-      "trend": "in",
-      "net_5d_days": 1,
-      "net_10d_days": 1,
-      "net_20d_days": 1,
-      "net_60d_days": 1
-    },
-    {
-      "name": "CRO概念",
-      "net": 4.18,
-      "net_5d": 0,
-      "net_20d": 0,
-      "type": "概念",
       "consecutive_days": 2,
       "trend": "in",
       "net_5d_days": 2,
@@ -107,63 +95,77 @@
       "net_60d_days": 2
     },
     {
+      "name": "CRO概念",
+      "net": 4.18,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 3,
+      "trend": "in",
+      "net_5d_days": 3,
+      "net_10d_days": 3,
+      "net_20d_days": 3,
+      "net_60d_days": 3
+    },
+    {
       "name": "军工电子",
       "net": 3.56,
       "net_5d": 0,
       "net_20d": 0,
       "type": "行业",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 1,
-      "net_10d_days": 1,
-      "net_20d_days": 1,
-      "net_60d_days": 1
+      "net_5d_days": 2,
+      "net_10d_days": 2,
+      "net_20d_days": 2,
+      "net_60d_days": 2
     },
     {
       "name": "医疗服务",
       "net": 3.43,
-      "net_5d": -33.71,
-      "net_20d": -103.08,
+      "net_5d": -36.18,
+      "net_20d": -105.55,
       "type": "行业",
       "net_5d_days": 5,
       "source": "本地累加",
       "net_20d_days": 20,
-      "net_60d": -122.4,
+      "net_60d": -124.87,
       "net_60d_days": 21,
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_10d": -60.14,
+      "net_10d": -25.89,
       "net_10d_days": 10
     },
     {
       "name": "EDR概念",
       "net": 2.73,
-      "net_5d": 19.52,
-      "net_20d": 0,
+      "net_5d": 22.49,
+      "net_20d": 16.62,
       "type": "概念",
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_60d": 10.92,
+      "net_60d": 13.89,
       "net_60d_days": 7,
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in",
-      "net_10d_days": 7,
-      "net_20d_days": 7
+      "net_10d": 16.62,
+      "net_10d_days": 8,
+      "net_20d_days": 8
     },
     {
       "name": "铜缆高速连接",
       "net": 2.56,
-      "net_5d": 56.91,
-      "net_20d": 232.71,
+      "net_5d": 56.48,
+      "net_20d": 232.28,
       "type": "概念",
       "net_5d_days": 5,
       "source": "本地累加",
       "net_20d_days": 12,
-      "net_60d": 232.71,
+      "net_60d": 232.28,
       "net_60d_days": 12,
-      "consecutive_days": 12,
+      "consecutive_days": 13,
       "trend": "in",
-      "net_10d": 172.0,
+      "net_10d": 144.44,
       "net_10d_days": 10
     },
     {
@@ -172,25 +174,26 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 1,
-      "net_10d_days": 1,
-      "net_20d_days": 1,
-      "net_60d_days": 1
+      "net_5d_days": 2,
+      "net_10d_days": 2,
+      "net_20d_days": 2,
+      "net_60d_days": 2
     },
     {
       "name": "大飞机",
       "net": 2.11,
-      "net_5d": 0,
+      "net_5d": 4.1,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 4,
-      "net_10d_days": 4,
-      "net_20d_days": 4,
-      "net_60d_days": 4
+      "net_60d": 4.1,
+      "net_5d_days": 5,
+      "net_10d_days": 5,
+      "net_20d_days": 5,
+      "net_60d_days": 5
     },
     {
       "name": "PM2.5",
@@ -198,55 +201,56 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 1,
-      "net_10d_days": 1,
-      "net_20d_days": 1,
-      "net_60d_days": 1
+      "net_5d_days": 2,
+      "net_10d_days": 2,
+      "net_20d_days": 2,
+      "net_60d_days": 2
     },
     {
       "name": "培育钻石",
       "net": 1.63,
-      "net_5d": 3.11,
+      "net_5d": 4.66,
       "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_60d": 6.87,
+      "net_60d": 8.42,
       "net_60d_days": 6,
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in",
-      "net_10d_days": 6,
-      "net_20d_days": 6
+      "net_10d_days": 7,
+      "net_20d_days": 7
     },
     {
       "name": "互联网电商",
       "net": 1.36,
-      "net_5d": 0,
+      "net_5d": 5.53,
       "net_20d": 0,
       "type": "行业",
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "in",
-      "net_5d_days": 4,
-      "net_10d_days": 4,
-      "net_20d_days": 4,
-      "net_60d_days": 4
+      "net_60d": 5.53,
+      "net_5d_days": 5,
+      "net_10d_days": 5,
+      "net_20d_days": 5,
+      "net_60d_days": 5
     },
     {
       "name": "建筑材料",
       "net": 1.12,
-      "net_5d": -12.23,
-      "net_20d": -96.85,
+      "net_5d": -11.09,
+      "net_20d": -95.71,
       "type": "行业",
       "net_5d_days": 5,
       "source": "本地累加",
       "net_20d_days": 20,
-      "net_60d": -102.15,
+      "net_60d": -101.01,
       "net_60d_days": 21,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -5.73,
+      "net_10d": 0.65,
       "net_10d_days": 10
     }
   ],
@@ -254,18 +258,18 @@
     {
       "name": "服装家纺",
       "net": -1.04,
-      "net_5d": 7.66,
-      "net_20d": 128.75,
+      "net_5d": 5.99,
+      "net_20d": 102.63,
       "type": "行业",
-      "net_10d": 21.81,
+      "net_10d": 42.39,
       "net_10d_days": 10,
-      "net_60d": 72.95,
+      "net_60d": 160.32,
       "net_60d_days": 50,
       "net_5d_days": 5,
       "source": "本地累加",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "out",
-      "net_20d_days": 7
+      "net_20d_days": 8
     }
   ],
   "top_list": [
@@ -275,42 +279,43 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "行业",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_5d_days": 2,
-      "net_10d_days": 2,
-      "net_20d_days": 2,
-      "net_60d_days": 2
+      "net_5d_days": 3,
+      "net_10d_days": 3,
+      "net_20d_days": 3,
+      "net_60d_days": 3
     },
     {
       "name": "净水概念",
       "net": 5.63,
-      "net_5d": 1.62,
-      "net_20d": 0,
+      "net_5d": 7.62,
+      "net_20d": 15.15,
       "type": "概念",
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_60d": 3.52,
+      "net_60d": 9.52,
       "net_60d_days": 7,
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "in",
-      "net_10d_days": 7,
-      "net_20d_days": 7
+      "net_10d": 15.15,
+      "net_10d_days": 8,
+      "net_20d_days": 8
     },
     {
       "name": "军民融合",
       "net": 5.29,
-      "net_5d": -4.17,
+      "net_5d": 1.07,
       "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_60d": 9.75,
+      "net_60d": 14.99,
       "net_60d_days": 6,
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_10d_days": 6,
-      "net_20d_days": 6
+      "net_10d_days": 7,
+      "net_20d_days": 7
     },
     {
       "name": "富士康概念",
@@ -318,27 +323,27 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_5d_days": 2,
-      "net_10d_days": 2,
-      "net_20d_days": 2,
-      "net_60d_days": 2
+      "net_5d_days": 3,
+      "net_10d_days": 3,
+      "net_20d_days": 3,
+      "net_60d_days": 3
     },
     {
       "name": "成飞概念",
       "net": 4.56,
-      "net_5d": 22.99,
-      "net_20d": 141.8,
+      "net_5d": 24.39,
+      "net_20d": 121.15,
       "type": "概念",
-      "net_10d": 14.45,
+      "net_10d": 64.69,
       "net_10d_days": 10,
-      "net_60d": -550.04,
+      "net_60d": -502.47,
       "net_60d_days": 50,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 1,
-      "net_20d_days": 1
+      "net_5d_days": 2,
+      "net_20d_days": 2
     },
     {
       "name": "智能音箱",
@@ -346,19 +351,6 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
-      "trend": "in",
-      "net_5d_days": 1,
-      "net_10d_days": 1,
-      "net_20d_days": 1,
-      "net_60d_days": 1
-    },
-    {
-      "name": "CRO概念",
-      "net": 4.18,
-      "net_5d": 0,
-      "net_20d": 0,
-      "type": "概念",
       "consecutive_days": 2,
       "trend": "in",
       "net_5d_days": 2,
@@ -367,63 +359,77 @@
       "net_60d_days": 2
     },
     {
+      "name": "CRO概念",
+      "net": 4.18,
+      "net_5d": 0,
+      "net_20d": 0,
+      "type": "概念",
+      "consecutive_days": 3,
+      "trend": "in",
+      "net_5d_days": 3,
+      "net_10d_days": 3,
+      "net_20d_days": 3,
+      "net_60d_days": 3
+    },
+    {
       "name": "军工电子",
       "net": 3.56,
       "net_5d": 0,
       "net_20d": 0,
       "type": "行业",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 1,
-      "net_10d_days": 1,
-      "net_20d_days": 1,
-      "net_60d_days": 1
+      "net_5d_days": 2,
+      "net_10d_days": 2,
+      "net_20d_days": 2,
+      "net_60d_days": 2
     },
     {
       "name": "医疗服务",
       "net": 3.43,
-      "net_5d": -33.71,
-      "net_20d": -103.08,
+      "net_5d": -36.18,
+      "net_20d": -105.55,
       "type": "行业",
       "net_5d_days": 5,
       "source": "本地累加",
       "net_20d_days": 20,
-      "net_60d": -122.4,
+      "net_60d": -124.87,
       "net_60d_days": 21,
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_10d": -60.14,
+      "net_10d": -25.89,
       "net_10d_days": 10
     },
     {
       "name": "EDR概念",
       "net": 2.73,
-      "net_5d": 19.52,
-      "net_20d": 0,
+      "net_5d": 22.49,
+      "net_20d": 16.62,
       "type": "概念",
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_60d": 10.92,
+      "net_60d": 13.89,
       "net_60d_days": 7,
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in",
-      "net_10d_days": 7,
-      "net_20d_days": 7
+      "net_10d": 16.62,
+      "net_10d_days": 8,
+      "net_20d_days": 8
     },
     {
       "name": "铜缆高速连接",
       "net": 2.56,
-      "net_5d": 56.91,
-      "net_20d": 232.71,
+      "net_5d": 56.48,
+      "net_20d": 232.28,
       "type": "概念",
       "net_5d_days": 5,
       "source": "本地累加",
       "net_20d_days": 12,
-      "net_60d": 232.71,
+      "net_60d": 232.28,
       "net_60d_days": 12,
-      "consecutive_days": 12,
+      "consecutive_days": 13,
       "trend": "in",
-      "net_10d": 172.0,
+      "net_10d": 144.44,
       "net_10d_days": 10
     },
     {
@@ -432,25 +438,26 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 1,
-      "net_10d_days": 1,
-      "net_20d_days": 1,
-      "net_60d_days": 1
+      "net_5d_days": 2,
+      "net_10d_days": 2,
+      "net_20d_days": 2,
+      "net_60d_days": 2
     },
     {
       "name": "大飞机",
       "net": 2.11,
-      "net_5d": 0,
+      "net_5d": 4.1,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 4,
-      "net_10d_days": 4,
-      "net_20d_days": 4,
-      "net_60d_days": 4
+      "net_60d": 4.1,
+      "net_5d_days": 5,
+      "net_10d_days": 5,
+      "net_20d_days": 5,
+      "net_60d_days": 5
     },
     {
       "name": "PM2.5",
@@ -458,69 +465,70 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_5d_days": 1,
-      "net_10d_days": 1,
-      "net_20d_days": 1,
-      "net_60d_days": 1
+      "net_5d_days": 2,
+      "net_10d_days": 2,
+      "net_20d_days": 2,
+      "net_60d_days": 2
     },
     {
       "name": "培育钻石",
       "net": 1.63,
-      "net_5d": 3.11,
+      "net_5d": 4.66,
       "net_20d": 0,
       "type": "概念",
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_60d": 6.87,
+      "net_60d": 8.42,
       "net_60d_days": 6,
-      "consecutive_days": 4,
+      "consecutive_days": 5,
       "trend": "in",
-      "net_10d_days": 6,
-      "net_20d_days": 6
+      "net_10d_days": 7,
+      "net_20d_days": 7
     },
     {
       "name": "互联网电商",
       "net": 1.36,
-      "net_5d": 0,
+      "net_5d": 5.53,
       "net_20d": 0,
       "type": "行业",
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "in",
-      "net_5d_days": 4,
-      "net_10d_days": 4,
-      "net_20d_days": 4,
-      "net_60d_days": 4
+      "net_60d": 5.53,
+      "net_5d_days": 5,
+      "net_10d_days": 5,
+      "net_20d_days": 5,
+      "net_60d_days": 5
     },
     {
       "name": "建筑材料",
       "net": 1.12,
-      "net_5d": -12.23,
-      "net_20d": -96.85,
+      "net_5d": -11.09,
+      "net_20d": -95.71,
       "type": "行业",
       "net_5d_days": 5,
       "source": "本地累加",
       "net_20d_days": 20,
-      "net_60d": -102.15,
+      "net_60d": -101.01,
       "net_60d_days": 21,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -5.73,
+      "net_10d": 0.65,
       "net_10d_days": 10
     },
     {
       "name": "计算机设备",
       "net": 0.79,
-      "net_5d": -51.33,
-      "net_20d": -51.13,
+      "net_5d": -38.96,
+      "net_20d": -38.76,
       "type": "行业",
       "net_5d_days": 5,
       "source": "本地累加",
       "net_20d_days": 20,
-      "net_60d": -57.64,
+      "net_60d": -45.27,
       "net_60d_days": 21,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -529,35 +537,35 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
       "name": "包装印刷",
       "net": 0.57,
-      "net_5d": 8.77,
-      "net_20d": 85.48,
+      "net_5d": 8.72,
+      "net_20d": 67.1,
       "type": "行业",
-      "net_10d": 21.02,
+      "net_10d": 35.62,
       "net_10d_days": 10,
-      "net_60d": -117.66,
+      "net_60d": -62.88,
       "net_60d_days": 50,
       "net_5d_days": 5,
       "source": "本地累加",
-      "consecutive_days": 5,
+      "consecutive_days": 6,
       "trend": "in"
     },
     {
       "name": "非金属材料",
       "net": 0.41,
-      "net_5d": 15.68,
-      "net_20d": 230.06,
+      "net_5d": 9.05,
+      "net_20d": 129.04,
       "type": "行业",
-      "net_10d": 4.32,
+      "net_10d": 18.83,
       "net_10d_days": 10,
-      "net_60d": -1024.14,
+      "net_60d": -1035.09,
       "net_60d_days": 50,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -566,50 +574,50 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
       "name": "厨卫电器",
       "net": 0.36,
-      "net_5d": 4.75,
-      "net_20d": 16.63,
+      "net_5d": 5.37,
+      "net_20d": 19.67,
       "type": "行业",
-      "net_10d": 7.9,
+      "net_10d": 3.61,
       "net_10d_days": 10,
-      "net_60d": 34.02,
+      "net_60d": 47.31,
       "net_60d_days": 50,
       "net_5d_days": 5,
       "source": "本地累加",
-      "consecutive_days": 6,
+      "consecutive_days": 7,
       "trend": "in"
     },
     {
       "name": "通用设备",
       "net": 0.28,
-      "net_5d": -31.52,
-      "net_20d": -52.87,
+      "net_5d": -23.14,
+      "net_20d": -44.49,
       "type": "行业",
       "net_5d_days": 5,
       "source": "本地累加",
       "net_20d_days": 20,
-      "net_60d": -40.43,
+      "net_60d": -32.05,
       "net_60d_days": 21,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
       "name": "通信服务",
       "net": 0.23,
-      "net_5d": -13.8,
-      "net_20d": -1.74,
+      "net_5d": -10.03,
+      "net_20d": 2.03,
       "type": "行业",
       "net_5d_days": 5,
       "source": "本地累加",
       "net_20d_days": 20,
-      "net_60d": -1.74,
+      "net_60d": 2.03,
       "net_60d_days": 20,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -618,7 +626,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "行业",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -627,7 +635,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -636,7 +644,7 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "行业",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in"
     },
     {
@@ -645,21 +653,21 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "out"
     },
     {
       "name": "石墨烯",
       "net": -0.17,
-      "net_5d": 23.98,
-      "net_20d": 148.42,
+      "net_5d": 24.34,
+      "net_20d": 148.78,
       "type": "概念",
       "net_5d_days": 5,
       "source": "本地累加",
       "net_20d_days": 9,
-      "net_60d": 148.42,
+      "net_60d": 148.78,
       "net_60d_days": 9,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "out"
     },
     {
@@ -668,21 +676,21 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "out"
     },
     {
       "name": "美容护理",
       "net": -0.46,
-      "net_5d": 1.69,
-      "net_20d": -14.72,
+      "net_5d": 0.12,
+      "net_20d": -16.29,
       "type": "行业",
       "net_5d_days": 5,
       "source": "本地累加",
       "net_20d_days": 13,
-      "net_60d": -14.72,
+      "net_60d": -16.29,
       "net_60d_days": 13,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "out"
     },
     {
@@ -691,47 +699,49 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "out"
     },
     {
       "name": "教育",
       "net": -0.56,
-      "net_5d": -1.23,
+      "net_5d": -3.56,
       "net_20d": 0,
       "type": "行业",
       "net_5d_days": 5,
       "source": "本地累加",
-      "net_60d": -1.23,
-      "net_60d_days": 5,
-      "consecutive_days": 2,
+      "net_60d": -1.79,
+      "net_60d_days": 6,
+      "consecutive_days": 3,
       "trend": "out"
     },
     {
       "name": "纺织制造",
       "net": -0.63,
-      "net_5d": 4.11,
-      "net_20d": 45.04,
+      "net_5d": -1.26,
+      "net_20d": 34.82,
       "type": "行业",
-      "net_10d": 9.48,
+      "net_10d": 12.49,
       "net_10d_days": 10,
-      "net_60d": 62.92,
+      "net_60d": 110.13,
       "net_60d_days": 50,
-      "consecutive_days": 1,
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "consecutive_days": 2,
       "trend": "out"
     },
     {
       "name": "金属新材料",
       "net": -0.65,
-      "net_5d": -15.09,
-      "net_20d": -14.14,
+      "net_5d": -12.41,
+      "net_20d": -11.46,
       "type": "行业",
       "net_5d_days": 5,
       "source": "本地累加",
       "net_20d_days": 16,
-      "net_60d": -14.14,
+      "net_60d": -11.46,
       "net_60d_days": 16,
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "out"
     },
     {
@@ -740,21 +750,21 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "out"
     },
     {
       "name": "消费电子",
       "net": -0.92,
-      "net_5d": -40.45,
-      "net_20d": 51.19,
+      "net_5d": -46.43,
+      "net_20d": 45.21,
       "type": "行业",
       "net_5d_days": 5,
       "source": "本地累加",
       "net_20d_days": 20,
-      "net_60d": 49.6,
+      "net_60d": 43.62,
       "net_60d_days": 21,
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "out"
     },
     {
@@ -763,185 +773,185 @@
       "net_5d": 0,
       "net_20d": 0,
       "type": "概念",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "out"
     },
     {
       "name": "服装家纺",
       "net": -1.04,
-      "net_5d": 7.66,
-      "net_20d": 128.75,
+      "net_5d": 5.99,
+      "net_20d": 102.63,
       "type": "行业",
-      "net_10d": 21.81,
+      "net_10d": 42.39,
       "net_10d_days": 10,
-      "net_60d": 72.95,
+      "net_60d": 160.32,
       "net_60d_days": 50,
       "net_5d_days": 5,
       "source": "本地累加",
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "out",
-      "net_20d_days": 7
+      "net_20d_days": 8
     }
   ],
   "consecutive": {
     "军工装备": {
-      "days": 2,
+      "days": 3,
       "trend": "in"
     },
     "净水概念": {
-      "days": 3,
-      "trend": "in"
-    },
-    "军民融合": {
-      "days": 2,
-      "trend": "in"
-    },
-    "富士康概念": {
-      "days": 2,
-      "trend": "in"
-    },
-    "成飞概念": {
-      "days": 1,
-      "trend": "in"
-    },
-    "智能音箱": {
-      "days": 1,
-      "trend": "in"
-    },
-    "CRO概念": {
-      "days": 2,
-      "trend": "in"
-    },
-    "军工电子": {
-      "days": 1,
-      "trend": "in"
-    },
-    "医疗服务": {
-      "days": 2,
-      "trend": "in"
-    },
-    "EDR概念": {
-      "days": 5,
-      "trend": "in"
-    },
-    "铜缆高速连接": {
-      "days": 12,
-      "trend": "in"
-    },
-    "云游戏": {
-      "days": 1,
-      "trend": "in"
-    },
-    "大飞机": {
-      "days": 1,
-      "trend": "in"
-    },
-    "PM2.5": {
-      "days": 1,
-      "trend": "in"
-    },
-    "培育钻石": {
       "days": 4,
       "trend": "in"
     },
-    "互联网电商": {
+    "军民融合": {
       "days": 3,
       "trend": "in"
     },
-    "建筑材料": {
-      "days": 1,
+    "富士康概念": {
+      "days": 3,
       "trend": "in"
     },
-    "计算机设备": {
-      "days": 1,
+    "成飞概念": {
+      "days": 2,
       "trend": "in"
     },
-    "兵装重组概念": {
-      "days": 1,
+    "智能音箱": {
+      "days": 2,
       "trend": "in"
     },
-    "包装印刷": {
-      "days": 5,
+    "CRO概念": {
+      "days": 3,
       "trend": "in"
     },
-    "非金属材料": {
-      "days": 1,
+    "军工电子": {
+      "days": 2,
       "trend": "in"
     },
-    "国产航母": {
-      "days": 1,
+    "医疗服务": {
+      "days": 3,
       "trend": "in"
     },
-    "厨卫电器": {
+    "EDR概念": {
       "days": 6,
       "trend": "in"
     },
+    "铜缆高速连接": {
+      "days": 13,
+      "trend": "in"
+    },
+    "云游戏": {
+      "days": 2,
+      "trend": "in"
+    },
+    "大飞机": {
+      "days": 2,
+      "trend": "in"
+    },
+    "PM2.5": {
+      "days": 2,
+      "trend": "in"
+    },
+    "培育钻石": {
+      "days": 5,
+      "trend": "in"
+    },
+    "互联网电商": {
+      "days": 4,
+      "trend": "in"
+    },
+    "建筑材料": {
+      "days": 2,
+      "trend": "in"
+    },
+    "计算机设备": {
+      "days": 2,
+      "trend": "in"
+    },
+    "兵装重组概念": {
+      "days": 2,
+      "trend": "in"
+    },
+    "包装印刷": {
+      "days": 6,
+      "trend": "in"
+    },
+    "非金属材料": {
+      "days": 2,
+      "trend": "in"
+    },
+    "国产航母": {
+      "days": 2,
+      "trend": "in"
+    },
+    "厨卫电器": {
+      "days": 7,
+      "trend": "in"
+    },
     "通用设备": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "通信服务": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "环保设备": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "PEEK材料": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "橡胶制品": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "无人零售": {
-      "days": 1,
+      "days": 2,
       "trend": "out"
     },
     "石墨烯": {
-      "days": 1,
+      "days": 2,
       "trend": "out"
     },
     "赛马概念": {
-      "days": 2,
-      "trend": "out"
-    },
-    "美容护理": {
-      "days": 1,
-      "trend": "out"
-    },
-    "共享单车": {
-      "days": 2,
-      "trend": "out"
-    },
-    "教育": {
-      "days": 2,
-      "trend": "out"
-    },
-    "纺织制造": {
-      "days": 1,
-      "trend": "out"
-    },
-    "金属新材料": {
       "days": 3,
       "trend": "out"
     },
-    "天津自贸区": {
-      "days": 1,
-      "trend": "out"
-    },
-    "消费电子": {
+    "美容护理": {
       "days": 2,
       "trend": "out"
     },
+    "共享单车": {
+      "days": 3,
+      "trend": "out"
+    },
+    "教育": {
+      "days": 3,
+      "trend": "out"
+    },
+    "纺织制造": {
+      "days": 2,
+      "trend": "out"
+    },
+    "金属新材料": {
+      "days": 4,
+      "trend": "out"
+    },
+    "天津自贸区": {
+      "days": 2,
+      "trend": "out"
+    },
+    "消费电子": {
+      "days": 3,
+      "trend": "out"
+    },
     "芬太尼": {
-      "days": 1,
+      "days": 2,
       "trend": "out"
     },
     "服装家纺": {
-      "days": 1,
+      "days": 2,
       "trend": "out"
     }
   },

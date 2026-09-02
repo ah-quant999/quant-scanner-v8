@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-02 17:13:38",
+  "update_time": "2026-09-03 00:42:24",
   "data_date": "2026-09-02",
   "source": "CONCEPT_RANKING × STOCK_PROFILE × STOCK_QUOTE",
   "hot_concepts_count": 33,
@@ -89,7 +89,7 @@
         "航母概念"
       ],
       "hot_count": 6,
-      "total_score": 9.64
+      "total_score": 9.65
     },
     {
       "code": "002490",
@@ -104,7 +104,7 @@
         "页岩气"
       ],
       "hot_count": 5,
-      "total_score": 9.43
+      "total_score": 9.42
     },
     {
       "code": "600378",
@@ -182,6 +182,21 @@
       "total_score": 8.96
     },
     {
+      "code": "600150",
+      "name": "中国船舶",
+      "pct": -1.45,
+      "amount_yi": 24.17,
+      "hot_concepts": [
+        "军工",
+        "军民融合",
+        "并购重组概念",
+        "海工装备",
+        "航母概念"
+      ],
+      "hot_count": 5,
+      "total_score": 8.86
+    },
+    {
       "code": "002560",
       "name": "通达股份",
       "pct": 1.61,
@@ -195,21 +210,6 @@
         "特高压"
       ],
       "hot_count": 6,
-      "total_score": 8.87
-    },
-    {
-      "code": "600150",
-      "name": "中国船舶",
-      "pct": -1.45,
-      "amount_yi": 24.17,
-      "hot_concepts": [
-        "军工",
-        "军民融合",
-        "并购重组概念",
-        "海工装备",
-        "航母概念"
-      ],
-      "hot_count": 5,
       "total_score": 8.86
     },
     {
@@ -229,21 +229,23 @@
       "total_score": 8.79
     },
     {
-      "code": "300593",
-      "name": "新雷能",
-      "pct": 3.31,
-      "amount_yi": 6.43,
+      "code": "600118",
+      "name": "中国卫星",
+      "pct": -1.26,
+      "amount_yi": 10.61,
       "hot_concepts": [
         "军工",
         "军民融合",
-        "大飞机"
+        "大飞机",
+        "无人机",
+        "航天航空"
       ],
-      "hot_count": 3,
+      "hot_count": 5,
       "total_score": 8.73
     }
   ],
   "rejected_summary": {
-    "no_hot_concept": 6424,
+    "no_hot_concept": 7842,
     "too_hot": 53,
     "too_cold": 135,
     "small_mv": 0,

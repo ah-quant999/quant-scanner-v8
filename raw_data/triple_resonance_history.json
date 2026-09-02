@@ -126,7 +126,8 @@
       "2026-08-17": 0,
       "2026-08-18": 269.4,
       "2026-08-19": 269.4,
-      "2026-08-29": 241.6
+      "2026-08-29": 241.6,
+      "2026-09-03": 225.18
     },
     "300502": {
       "2026-08-17": 448.08,
@@ -168,7 +169,8 @@
       "2026-08-30": 36.69,
       "2026-08-31": 40.36,
       "2026-09-01": 40.36,
-      "2026-09-02": 39.75
+      "2026-09-02": 39.75,
+      "2026-09-03": 39.83
     },
     "688012": {
       "2026-08-19": 398.33,
@@ -250,7 +252,8 @@
       "2026-08-30": 172.1,
       "2026-08-31": 172.1,
       "2026-09-01": 0,
-      "2026-09-02": 0
+      "2026-09-02": 0,
+      "2026-09-03": 169.65
     },
     "601138": {
       "2026-08-30": 64.04,
@@ -261,6 +264,12 @@
       "2026-08-31": 0,
       "2026-09-01": 0,
       "2026-09-02": 0
+    },
+    "600362": {
+      "2026-09-03": 49.01
+    },
+    "301536": {
+      "2026-09-03": 0
     }
   },
   "_tracking_latest": {
@@ -332,7 +341,7 @@
       "enter_close": 0,
       "last_date": "2026-09-02",
       "last_close": 0,
-      "status": "near",
+      "status": "dropped",
       "streak": 2,
       "total_days": 3
     },
@@ -516,18 +525,18 @@
       "enter_close": 56.6,
       "last_date": "2026-09-02",
       "last_close": 0,
-      "status": "near",
+      "status": "dropped",
       "streak": 5,
       "total_days": 4
     },
     "300475": {
       "enter_date": "2026-08-30",
       "enter_close": 172.1,
-      "last_date": "2026-09-02",
-      "last_close": 0,
+      "last_date": "2026-09-03",
+      "last_close": 169.65,
       "status": "near",
-      "streak": 4,
-      "total_days": 4
+      "streak": 5,
+      "total_days": 5
     },
     "601138": {
       "enter_date": "2026-08-30",
@@ -543,7 +552,7 @@
       "enter_close": 0,
       "last_date": "2026-09-02",
       "last_close": 0,
-      "status": "near",
+      "status": "dropped",
       "streak": 4,
       "total_days": 4
     },
@@ -552,15 +561,33 @@
       "enter_close": 0,
       "last_date": "2026-09-02",
       "last_close": 0,
-      "status": "near",
+      "status": "dropped",
       "streak": 4,
       "total_days": 4
+    },
+    "600362": {
+      "enter_date": "2026-09-03",
+      "enter_close": 49.01,
+      "last_date": "2026-09-03",
+      "last_close": 49.01,
+      "status": "near",
+      "streak": 1,
+      "total_days": 1
+    },
+    "301536": {
+      "enter_date": "2026-09-03",
+      "enter_close": 0,
+      "last_date": "2026-09-03",
+      "last_close": 0,
+      "status": "near",
+      "streak": 1,
+      "total_days": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-09-02 05:59:32"
+    "last_update": "2026-09-03 00:10:48"
   },
   "2026-08-18": [
     {
@@ -1155,7 +1182,7 @@
       "status": "near"
     }
   ],
-  "update_time": "2026-09-02 05:59:32",
+  "update_time": "2026-09-03 00:10:48",
   "2026-08-30": [
     {
       "code": "300475",
@@ -1503,6 +1530,70 @@
       "close": 0,
       "pct_chg": 0,
       "total_score": 22,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": null,
+      "status": "near"
+    }
+  ],
+  "2026-09-03": [
+    {
+      "code": "300475",
+      "name": "香农芯创",
+      "market": "sz",
+      "board": "创业板",
+      "close": 169.65,
+      "pct_chg": -4.69,
+      "total_score": 29.1,
+      "quality_grade": "A",
+      "industry": "批发业",
+      "sectors": [
+        "科技风格",
+        "MSCI中国",
+        "2026一季报预增",
+        "2026中报预增",
+        "深股通",
+        "半导体概念",
+        "批发业",
+        "存储芯片"
+      ],
+      "signal_count": null,
+      "status": "near"
+    },
+    {
+      "code": "600362",
+      "name": "江西铜业",
+      "market": "sh",
+      "board": "主板",
+      "close": 49.01,
+      "pct_chg": -0.39,
+      "total_score": 28.3,
+      "quality_grade": "C",
+      "industry": "有色金属冶炼和压延加工业",
+      "sectors": [
+        "参股银行",
+        "新材料",
+        "一带一路",
+        "MSCI中国",
+        "有色金属冶炼和压延加工业",
+        "2026中报预增",
+        "机构重仓",
+        "稀缺资源"
+      ],
+      "signal_count": null,
+      "status": "near"
+    },
+    {
+      "code": "301536",
+      "name": "星宸科技",
+      "market": "创业板",
+      "board": "创业板",
+      "close": 0,
+      "pct_chg": 0,
+      "total_score": 25,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [

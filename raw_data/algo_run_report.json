@@ -1,37 +1,33 @@
 {
-  "update_time": "2026-09-02 17:19:08",
-  "run_start": "2026-09-02 16:05:56",
-  "ok": 29,
-  "fail": 2,
+  "update_time": "2026-09-03 00:58:41",
+  "run_start": "2026-09-02 22:23:54",
+  "ok": 44,
+  "fail": 5,
   "failed_scripts": [
+    {
+      "script": "calc_stock_rps.py",
+      "reason": "超时 >60min"
+    },
     {
       "script": "scripts/ab_universe_backtest.py",
       "reason": "监督器静默杀(>15min 无输出)"
     },
     {
-      "script": "refresh_dividend_cninfo.py",
-      "reason": "监督器静默杀(>15min 无输出)"
+      "script": "strategy_four_volume_60m.py",
+      "reason": "退出码 1 |    绕开（应急）: TIME_GATE_BYPASS=1 环境变量"
+    },
+    {
+      "script": "strategy_four_volume.py",
+      "reason": "退出码 1 |    绕开（应急）: TIME_GATE_BYPASS=1 环境变量"
+    },
+    {
+      "script": "gen_triple_consensus.py",
+      "reason": "退出码 1 | ============================================================"
+    },
+    {
+      "script": "final_recommend.py",
+      "reason": "就绪门控未通过（上游选股输入陈旧/缺失）"
     }
   ],
-  "skipped_by_time_gate": [
-    "calc_crds.py",
-    "build_candidate_pool.py",
-    "calc_stock_rps.py",
-    "generate_top10.py",
-    "strategy_four_volume_60m.py",
-    "strategy_four_volume.py",
-    "gen_cockpit_tier_recommend.py",
-    "gen_cockpit_tier_recommend.py",
-    "gen_cockpit_advice.py",
-    "update_triple_resonance_history.py",
-    "gen_triple_consensus.py",
-    "gen_triple_track.py",
-    "calc_volatility_watch.py",
-    "gen_stock_stop.py",
-    "gen_algo_track.py",
-    "calc_sentiment_cycle.py",
-    "auto_run_dn_algorithm.py",
-    "track_h_auto_buy.py",
-    "final_recommend.py"
-  ]
+  "skipped_by_time_gate": []
 }

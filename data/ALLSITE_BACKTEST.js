@@ -1,9 +1,9 @@
 window.ALLSITE_BACKTEST = {
- "update_time": "2026-09-02 17:18:58",
+ "update_time": "2026-09-03 00:58:31",
  "summary": {
-  "update_time": "2026-09-02 17:18:58",
+  "update_time": "2026-09-03 00:58:31",
   "total_signals": 0,
-  "calc_time": "2026-09-02 17:18:58",
+  "calc_time": "2026-09-03 00:58:31",
   "method": "全站精选历史回测 · 无历史 final_recommend 信号（每日归档自 2026-09-02 起生效，待累积 dated 快照）",
   "signal_date_range": "—",
   "by_period": {
