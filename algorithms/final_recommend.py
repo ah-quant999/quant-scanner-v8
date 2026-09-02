@@ -971,6 +971,20 @@ def main():
         f.write(js)
     print(f"[ok] {js_path}")
 
+    # 🗂 历史归档（供 v8/backtest_allsite.py 真实回测）：按 update_time 日期落盘 raw_data/history
+    # 与 calc_crds.py 同源思路——只有落盘「每日 dated 快照」回测才有过去信号日可算前向收益。
+    try:
+        _dt = (result.get("update_time") or "")[:10].replace("-", "")
+        if len(_dt) == 8 and _dt.isdigit():
+            _hist_dir = os.path.join(RAW, "history")
+            os.makedirs(_hist_dir, exist_ok=True)
+            _hist_path = os.path.join(_hist_dir, f"final_recommend_{_dt}.json")
+            with open(_hist_path, "w", encoding="utf-8") as f:
+                json.dump(result, f, ensure_ascii=False, indent=2)
+            print(f"[ok] history archive {_hist_path}")
+    except Exception as e:
+        print(f"[warn] final_recommend history archive skipped: {e}")
+
     # 打印 top3
     for s in out_stocks:
         print(f"  #{s['rank']} {s['name']}({s['code']}) 综合{s['final_score']} 共振{s['resonance']} 板块+{s['sector_score']} 来源{','.join(s['sources'])}")

@@ -632,6 +632,19 @@ def main():
         f.write(js_text)
     print(f"写入 {OUT_JS}")
 
+    # 🗂 历史归档（供 v8/backtest_rps.py 真实回测）：按 update_time 日期落盘 raw_data/history
+    try:
+        _dt = (out.get("update_time") or "")[:10].replace("-", "")
+        if len(_dt) == 8 and _dt.isdigit():
+            _hist_dir = os.path.join(os.path.dirname(OUT_JSON), "history")
+            os.makedirs(_hist_dir, exist_ok=True)
+            _hist_path = os.path.join(_hist_dir, f"stock_rps_{_dt}.json")
+            with open(_hist_path, "w", encoding="utf-8") as f:
+                json.dump(out, f, ensure_ascii=False, indent=2)
+            print(f"[ok] history archive {_hist_path}")
+    except Exception as e:
+        print(f"[warn] stock_rps history archive skipped: {e}")
+
     # 打印头部样本
     print("\nTop 10 (rps_max 排序):")
     for r in records[:10]:
