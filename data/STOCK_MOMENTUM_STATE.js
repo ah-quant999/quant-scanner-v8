@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-02 16:18",
- "generated": "2026-09-02 16:18",
+ "update_time": "2026-09-02 17:02",
+ "generated": "2026-09-02 17:02",
  "meta": {
-  "generated": "2026-09-02 16:18",
+  "generated": "2026-09-02 17:02",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 2,
   "days_with_consensus": 0,
@@ -34,13 +34,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
-      "code": "920895",
-      "name": "花溪科技",
-      "change_pct": 3.267,
-      "price": 27.18,
-      "category": "突破"
-     },
-     {
       "code": "003040",
       "name": "楚天龙",
       "change_pct": 9.091,
@@ -52,6 +45,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "新赛股份",
       "change_pct": 9.967,
       "price": 6.73,
+      "category": "突破"
+     },
+     {
+      "code": "920212",
+      "name": "智新电子",
+      "change_pct": 29.954,
+      "price": 14.1,
       "category": "突破"
      },
      {
@@ -80,13 +80,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "高新发展",
       "change_pct": 9.998,
       "price": 54.79,
-      "category": "突破"
-     },
-     {
-      "code": "920855",
-      "name": "浙江大农",
-      "change_pct": 3.032,
-      "price": 17.33,
       "category": "突破"
      },
      {
@@ -129,6 +122,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "天禾股份",
       "change_pct": 10.06,
       "price": 7.33,
+      "category": "突破"
+     },
+     {
+      "code": "920006",
+      "name": "晟楠科技",
+      "change_pct": 29.959,
+      "price": 22.21,
       "category": "突破"
      },
      {
@@ -179,20 +179,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 10.007,
       "price": 31.77,
       "category": "突破"
-     },
-     {
-      "code": "300670",
-      "name": "大烨智能",
-      "change_pct": 3.357,
-      "price": 7.39,
-      "category": "突破"
-     },
-     {
-      "code": "603207",
-      "name": "小方制药",
-      "change_pct": 10.0,
-      "price": 27.94,
-      "category": "突破"
      }
     ],
     "加速": [
@@ -211,13 +197,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "加速"
      },
      {
-      "code": "920895",
-      "name": "花溪科技",
-      "change_pct": 3.267,
-      "price": 27.18,
-      "category": "加速"
-     },
-     {
       "code": "003040",
       "name": "楚天龙",
       "change_pct": 9.091,
@@ -229,6 +208,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "新赛股份",
       "change_pct": 9.967,
       "price": 6.73,
+      "category": "加速"
+     },
+     {
+      "code": "920212",
+      "name": "智新电子",
+      "change_pct": 29.954,
+      "price": 14.1,
       "category": "加速"
      },
      {
@@ -257,13 +243,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "高新发展",
       "change_pct": 9.998,
       "price": 54.79,
-      "category": "加速"
-     },
-     {
-      "code": "920855",
-      "name": "浙江大农",
-      "change_pct": 3.032,
-      "price": 17.33,
       "category": "加速"
      },
      {
@@ -306,6 +285,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "天禾股份",
       "change_pct": 10.06,
       "price": 7.33,
+      "category": "加速"
+     },
+     {
+      "code": "920006",
+      "name": "晟楠科技",
+      "change_pct": 29.959,
+      "price": 22.21,
       "category": "加速"
      },
      {
@@ -374,13 +360,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
-      "code": "920895",
-      "name": "花溪科技",
-      "change_pct": 3.267,
-      "price": 27.18,
-      "category": "短线选股"
-     },
-     {
       "code": "003040",
       "name": "楚天龙",
       "change_pct": 9.091,
@@ -392,6 +371,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "新赛股份",
       "change_pct": 9.967,
       "price": 6.73,
+      "category": "短线选股"
+     },
+     {
+      "code": "920212",
+      "name": "智新电子",
+      "change_pct": 29.954,
+      "price": 14.1,
       "category": "短线选股"
      },
      {
@@ -420,13 +406,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "高新发展",
       "change_pct": 9.998,
       "price": 54.79,
-      "category": "短线选股"
-     },
-     {
-      "code": "920855",
-      "name": "浙江大农",
-      "change_pct": 3.032,
-      "price": 17.33,
       "category": "短线选股"
      },
      {
@@ -469,6 +448,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "天禾股份",
       "change_pct": 10.06,
       "price": 7.33,
+      "category": "短线选股"
+     },
+     {
+      "code": "920006",
+      "name": "晟楠科技",
+      "change_pct": 29.959,
+      "price": 22.21,
       "category": "短线选股"
      },
      {
@@ -519,36 +505,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 10.007,
       "price": 31.77,
       "category": "短线选股"
-     },
-     {
-      "code": "300670",
-      "name": "大烨智能",
-      "change_pct": 3.357,
-      "price": 7.39,
-      "category": "短线选股"
-     },
-     {
-      "code": "603207",
-      "name": "小方制药",
-      "change_pct": 10.0,
-      "price": 27.94,
-      "category": "短线选股"
-     }
-    ],
-    "强势股": [
-     {
-      "code": "300670",
-      "name": "大烨智能",
-      "change_pct": 3.357,
-      "price": 7.39,
-      "category": "强势股"
-     },
-     {
-      "code": "603207",
-      "name": "小方制药",
-      "change_pct": 10.0,
-      "price": 27.94,
-      "category": "强势股"
      }
     ]
    },
