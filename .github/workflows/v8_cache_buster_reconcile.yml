@@ -61,7 +61,18 @@ jobs:
       - name: "📦 安装 Python 依赖"
         run: python -m pip install --upgrade pip
 
-      - name: "🔄 重算 index.html 全部 ?v（基于本地 data/*.js 内容哈希，与 build_deploy 同源）"
+      - name: "🔄 同步远端最新 main（避免 checkout 缓存拿到陈旧 data/*.js 导致 ?v 对齐到旧内容）"
+        # 🛡 2026-09-02 根因修复：actions/checkout 在高频推送的仓库里可能取到「陈旧的 main」
+        #   （缓存 ref），导致下面算出的 ?v 基于旧 data 文件、与旧 index.html 碰巧一致 →
+        #   误判「已对齐」直接退出，漂移永远修不掉。必须显式 fetch + reset 到真正最新的远端，
+        #   与 v8_build_deploy 的 sync 逻辑一致。
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git fetch origin main
+          git reset --hard origin/main
+
+      - name: "🔄 重算 index.html 全部 ?v（基于同步后的最新 data/*.js 内容哈希，与 build_deploy 同源）"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # 🛡 2026-09-02 根治：弃用 fix_cachebusters_cdn.py（github.io 下载，CDN 传播延迟
