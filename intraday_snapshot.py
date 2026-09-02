@@ -79,6 +79,25 @@ def main():
         print("⚠️ sector_fund_flow.json 无 sectors_in/out，跳过（数据暂空）")
         return 0
 
+    # 🛡 2026-09-02 主人令一劳永逸：口径守卫 —— 只接受「今日开盘后(≥09:30)抓取」的板块数据。
+    #   原逻辑无此校验：09:00/09:30 档抓取发生在开盘前，sector_fund_flow.json 存的是
+   #   「昨日收盘累计」（如互联网金融 31.59 亿），而 10:00 起才是「今日盘中累计」（线缆 8.93 亿）。
+    #   两套口径混进同一条累计曲线 → 前段点与后段点板块名/量级全不同 → 曲线前段空白
+    #   （主人 2026-09-02 截图实锤「前面数据的曲线呢」）。宁缺毋滥：非今日盘中数据一律不写快照。
+    _src_ts = str(sector.get("update_time") or "")
+    if not _src_ts.startswith(today) or _src_ts[11:16] < "09:30":
+        print(f"⏭️ 板块数据源为开盘前抓取（update_time={_src_ts or '空'}），非今日盘中口径，跳过写快照")
+        return 0
+    # 陈旧守卫：板块数据距今超 40 分钟（盘中每 30 分抓一次，留 10 分余量）→ 不写，防假点
+    try:
+        _src_dt = datetime.datetime.strptime(_src_ts, "%Y-%m-%d %H:%M:%S").replace(tzinfo=CST)
+        _age_min = (t - _src_dt).total_seconds() / 60.0
+        if _age_min > 40:
+            print(f"⏭️ 板块数据已陈旧（update_time={_src_ts}，距今 {_age_min:.0f} 分钟），跳过写快照")
+            return 0
+    except Exception:
+        pass
+
     idx_chg = get_index_chg()
     top_in = [{"name": s["name"], "net": round(float(s.get("net", 0)), 2)}
               for s in si[:15] if s.get("name") not in _NOISE]
@@ -108,6 +127,24 @@ def main():
     if not isinstance(data.get("snapshots"), list):
         data["snapshots"] = []
     data["date"] = today
+
+    # 🧹 2026-09-02 主人令一劳永逸：自愈清理 —— 剔除当日「口径断裂」的历史快照（幂等，每次运行都收敛）。
+    #   判据：某快照的 sectors_in 板块名单与「当日最新一档」零交集 → 两者不是同一口径
+    #   （典型：开盘前档写的是昨日收盘累计「互联网金融/农林牧渔」，盘中档是「线缆/铜缆/国防军工」）。
+    #   这类点与后段画不成同一条累计曲线，且会撑爆 Y 轴 → 直接剔除，让曲线只保留同一口径的连续点。
+    if len(data["snapshots"]) >= 2:
+        _latest = data["snapshots"][-1]
+        _l_names = {x.get("name") for x in (_latest.get("sectors_in") or []) if x.get("name")}
+        if _l_names:
+            _keep = []
+            for s in data["snapshots"]:
+                _s_names = {x.get("name") for x in (s.get("sectors_in") or []) if x.get("name")}
+                if _s_names and not (_s_names & _l_names):
+                    print(f"🧹 剔除口径断裂快照 {s.get('time')}（板块名单与最新档零交集，非同一口径）")
+                    continue
+                _keep.append(s)
+            if len(_keep) != len(data["snapshots"]):
+                data["snapshots"] = _keep
 
     # 幂等：同时间快照覆盖而非重复追加（杜绝双机/重试导致的重复快照）
     times = {s.get("time") for s in data["snapshots"]}
