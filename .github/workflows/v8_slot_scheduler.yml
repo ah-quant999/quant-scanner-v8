@@ -32,6 +32,9 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
       - name: "🛰️ 运行档期兜底调度器"
         shell: bash
         run: |
