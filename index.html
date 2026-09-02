@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "ef121f8b7";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "32be444c6";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -486,7 +486,7 @@ window.__domReadyFns=[];
 <script src="data/CONCEPT_RANKING.js?v=08e316d38a" defer></script>
 <!-- 2026-09-01 删除：潜力挖掘 / AI预测 / ETF·龙头参考 三卡删除，对应数据注入移除 -->
 <script src="data/INDEX_QUOTES.js?v=720fb739ae" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=f30edd8786" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=29a6f6412d" defer></script>
 <script src="data/MARGIN_DATA.js?v=d7ee8d39c3" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=44c137a3b8" defer></script>
 <script src="data/IPO_DATA.js?v=1d8a0961db" defer></script>
@@ -1417,16 +1417,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=3eaa292baa" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=1e8bae2373" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=6091b7a4b2" defer></script>
-<script src="data/HEALTH_CHECK.js?v=396bb9f25a" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=de993ef21c" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=2865a2b04f" defer></script>
+<script src="data/RUNNER_STATUS.js?v=05e0c7b812" defer></script>
+<script src="data/HEALTH_CHECK.js?v=f1eef3fe28" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=63e3ad7f30" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=c19771b009" defer></script>
     <!-- 2026-09-01 删除：AI预测卡已删除，MARKET_PATH_PROBABILITY 数据注入移除 -->
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=b3f630070e" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=2a436a5f24" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=379c217b84" defer></script>
-    <script src="data/ALGO_BACKTEST_COMPARE.js?v=b8ad5b516c" defer></script>
+    <script src="data/ALGO_BACKTEST_COMPARE.js?v=5c20664ef5" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -9582,6 +9582,34 @@ window.showRestrictedItems = showRestrictedItems;
     // 2026-08-29 主人令：选股池子页渲染
     if(n==='pool' && typeof window.renderStPool==='function') setTimeout(window.renderStPool, 30);
     if(n==='life' && typeof window.__renderLifecycleSection==='function') setTimeout(window.__renderLifecycleSection, 30);
+    // 🛡 2026-09-02 主人令根治：切换后立即启动「子 tab 数据就绪重试」（见 __stRetryTab），消除 defer 未注入导致的首渲空卡
+    try{ window.__stRetryTab(n); }catch(e){}
+  };
+  // 🛡 2026-09-02 主人令根治：选股策略「子 tab 数据就绪重试」——
+  //   根因：pool/crds/life 三子 tab 原仅首渲一次，data/*.js 为 defer 脚本，用户快速点击时尚未注入 → 卡片永久空
+  //   （tc/rps 已有同类自愈，此处补齐剩余三 tab）。方案：按各 tab 数据源就绪态轮询补渲，最多 15 次（~10s，覆盖 defer 加载窗口）。
+  window.__stRetryTab=function(n){
+    var _map={
+      pool:function(){return !!(window.CANDIDATE&&(window.CANDIDATE.stocks||window.CANDIDATE.source_dist));},
+      tc:function(){return !!(window.TRIPLE_CONSENSUS||window.TRIPLE_TRACK);},
+      rps:function(){return !!(window.STOCK_RPS_DATA&&(window.STOCK_RPS_DATA.records||[]).length);},
+      crds:function(){return !!window.CRDS_CARD_DATA;},
+      life:function(){return !!(window.V8_POOL_TRACKER&&window.V8_POOL_TRACKER.items&&window.V8_POOL_TRACKER.items.length);}
+    };
+    var _chk=_map[n]||function(){return true;};
+    if(_chk()) return; // 数据已就绪，无需重试
+    var _t=0;
+    var _id=setInterval(function(){
+      _t++;
+      if(_chk()||_t>15){
+        clearInterval(_id);
+        if(stRendered[n]) stRendered[n]=0; // 解除守卫，确保 cockpit/allsite 等(无按钮)也能重渲
+        try{ renderStTab(n); }catch(e){ console.warn('[stRetryTab]',n,e); }
+        return;
+      }
+      if(stRendered[n]) stRendered[n]=0;
+      try{ renderStTab(n); }catch(e){}
+    },700);
   };
   // 2026-08-31 主人令：选股策略「卡名后状态胶囊」——汇总 4 大算法的最新 update_time 与就绪状态，
   //   每个模块都打一个紧凑 _uBadge 风格小胶囊（最近一次盘后基准、主入口/副入口差异化）。
@@ -10854,6 +10882,78 @@ window.showRestrictedItems = showRestrictedItems;
     } catch(e){ console.warn('潜力挖掘 fill 内部抛错:', e); if(dst) dst.innerHTML='<div class="note" style="color:#fbbf24">潜力挖掘渲染异常：'+(e&&e.message||e)+'<br><span style="font-size:11px;color:var(--dim);">数据源 POTENTIAL_PICKS 正常（picks='+(pp.picks&&pp.picks.length)+'）；F12 看完整堆栈。</span></div>'; }
   };
 
+  // 🛡 2026-09-02 主人令：ETF·龙头参考 独立函数 + 自愈重试（与 _fillPotentialPicks 同款范式）
+  //   根因：原内联在 renderUnlisted，data/*.js 为 defer 脚本，首渲时未注入即永久空卡。现抽独立函数并轮询补填。
+  window._fillEtfMap = function(){
+    var cEl = document.getElementById('dbgEtfMapBody');
+    if(!cEl) return;
+    var cr = window.CONCEPT_RANKING || {};
+    var sff = window.SECTOR_FUND_FLOW || {};
+    var emap = window.CONCEPT_ETF_MAP || {};
+    var ready = ((cr.items&&cr.items.length) || (sff.sectors_in&&sff.sectors_in.length));
+    if(!ready){
+      // 🛡 自愈：数据源未就绪 → 占位 + 轮询补填（覆盖 defer 加载窗口）
+      if(!window.__etfRetryTimer){
+        window.__etfRetryN = 0;
+        window.__etfRetryTimer = setInterval(function(){
+          window.__etfRetryN++;
+          var r2 = ((window.CONCEPT_RANKING&&(window.CONCEPT_RANKING.items||[]).length) || (window.SECTOR_FUND_FLOW&&(window.SECTOR_FUND_FLOW.sectors_in||[]).length));
+          if(r2){
+            clearInterval(window.__etfRetryTimer); window.__etfRetryTimer=null; window.__etfRetryN=0;
+            try{ window._fillEtfMap(); }catch(e){}
+          } else if(window.__etfRetryN > 30){
+            clearInterval(window.__etfRetryTimer); window.__etfRetryTimer=null; window.__etfRetryN=0;
+            var dd=document.getElementById('dbgEtfMapBody'); if(dd) dd.innerHTML='<div class="ipo-empty">热点板块数据暂不可用（等待盘后算法链生成）</div>';
+          }
+        }, 600);
+      }
+      return;
+    }
+    if(window.__etfRetryTimer){ clearInterval(window.__etfRetryTimer); window.__etfRetryTimer=null; window.__etfRetryN=0; }
+    try{
+      var crItems = (cr.items||[]).slice(0,8);
+      var sffIn = (sff.sectors_in||[]).filter(function(s){return s && s.type==='行业';}).slice(0,6);
+      var rows = [];
+      var seen = {};
+      function _emapLookup(name){
+        if(!name) return null;
+        if(emap[name]) return emap[name];
+        for(var k in emap){ if(k==='update_time') continue; if(name.indexOf(k)>=0) return emap[k]; }
+        for(var k2 in emap){ if(k2==='update_time') continue; if(k2.indexOf(name)>=0) return emap[k2]; }
+        return null;
+      }
+      (crItems||[]).sort(function(a,b){return (b.net||0)-(a.net||0);}).slice(0,8).forEach(function(it){
+        if(!it || !it.name) return; seen[it.name]=1;
+        rows.push({ name:it.name, net:it.net||0, chg:it.chg||0, type:'概念', map: _emapLookup(it.name) });
+      });
+      (sffIn||[]).sort(function(a,b){return (b.net||0)-(a.net||0);}).slice(0,6).forEach(function(s){
+        if(!s || !s.name || seen[s.name]) return; seen[s.name]=1;
+        rows.push({ name:s.name, net:s.net||0, chg:s.chg||0, type:'行业', map: _emapLookup(s.name) });
+      });
+      if(!rows.length){ cEl.innerHTML='<div class="ipo-empty">暂无热点板块数据</div>'; }
+      else {
+        var hh='<div style="display:flex;flex-direction:column;gap:8px;">';
+        rows.forEach(function(r){
+          var netCol = (r.net>=0)?'var(--up)':'var(--down)';
+          hh+='<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);font-size:13px;flex-wrap:wrap;">';
+          hh+='  <span style="font-weight:700;color:var(--txt);min-width:96px;">'+r.name+'</span>';
+          hh+='  <span style="color:'+netCol+';font-weight:700;min-width:78px;">'+((r.net>=0?'+':'')+r.net.toFixed(2))+'亿</span>';
+          if(r.map && r.map.etf){ hh+='  <span style="color:var(--cyan);font-weight:600;">🎯 '+r.map.etf.code+' '+r.map.etf.name+'</span>'; }
+          else { hh+='  <span style="color:var(--dim);">🎯 ETF暂无映射</span>'; }
+          if(r.map && r.map.leaders && r.map.leaders.length){ hh+='  <span style="color:var(--sub);">龙头：'+r.map.leaders.map(function(l){return l.code+' '+l.name;}).join(' / ')+'</span>'; }
+          hh+='</div>';
+        });
+        hh+='</div>';
+        cEl.innerHTML = hh;
+      }
+      var em = window.CONCEPT_ETF_MAP || {};
+      var tm=document.getElementById('prEtfFresh');
+      var _etfSrcTs = (window.CONCEPT_RANKING||{}).update_time || (window.SECTOR_FUND_FLOW||{}).update_time || em.update_time || null;
+      var _etfBadge = _uBadge('盘后','短线',_etfSrcTs);
+      if(tm) tm.innerHTML = _etfBadge;
+    }catch(e){ console.warn('ETF龙头渲染失败',e); }
+  };
+
 
   /* 2026-09-02 主人令加回: 热门赛道资金追踪曲线卡 (暂未上架新曲线卡) */
   function renderSectorFundTrackCard(host){
@@ -11288,58 +11388,11 @@ window.showRestrictedItems = showRestrictedItems;
     //   return/抛错则永不自愈 → 4 admin 页空白无人救。
     try{ if(typeof window.renderUnlisted==='function' && document.getElementById('unlistedPanel') && document.getElementById('unlistedPanel').innerHTML.length<1000) window.renderUnlisted(); }catch(e){}
     // ═══ 2026-09-02 主人令：暂未上架 = 调试专区原 3 张卡平铺（AI预测/潜力挖掘/ETF龙头参考）══
-    try{ if(typeof window.renderSectorFundTrackCard==='function'){ var p=document.getElementById('ulSectorFundTrackPanel'); if(p) window.renderSectorFundTrackCard(p); } }catch(e){console.warn('热门赛道资金追踪卡渲染失败',e);}
+    try{ if(typeof window.renderSectorFundTrackCard==='function'){ var p=document.getElementById('ulSectorFundTrackPanel'); if(p){ if(window.SECTOR_FUND_TRACK){ window.renderSectorFundTrackCard(p); } else if(!window.__sftRetryTimer){ window.__sftRetryN=0; window.__sftRetryTimer=setInterval(function(){ window.__sftRetryN++; if(window.SECTOR_FUND_TRACK){ clearInterval(window.__sftRetryTimer); window.__sftRetryTimer=null; window.__sftRetryN=0; var pp=document.getElementById('ulSectorFundTrackPanel'); if(pp) try{ window.renderSectorFundTrackCard(pp); }catch(e){} } else if(window.__sftRetryN>25){ clearInterval(window.__sftRetryTimer); window.__sftRetryTimer=null; window.__sftRetryN=0; } }, 800); } } } }catch(e){console.warn('热门赛道资金追踪卡渲染失败',e);}
     try{ if(typeof window._fillAiPrediction==='function') window._fillAiPrediction(); }catch(e){ console.warn('AI预测卡渲染失败',e); }
     try{ if(typeof window._fillPotentialPicks==='function') window._fillPotentialPicks(); }catch(e){ console.warn('潜力挖掘卡渲染失败',e); }
-    // 📌 ETF·龙头参考 内联填充（数据源 CONCEPT_RANKING + SECTOR_FUND_FLOW + CONCEPT_ETF_MAP）
-    try{
-      var cEl = document.getElementById('dbgEtfMapBody');
-      if(cEl){
-        var cr = window.CONCEPT_RANKING || {};
-        var sff = window.SECTOR_FUND_FLOW || {};
-        var emap = window.CONCEPT_ETF_MAP || {};
-        var crItems = (cr.items||[]).slice(0,8);
-        var sffIn = (sff.sectors_in||[]).filter(function(s){return s && s.type==='行业';}).slice(0,6);
-        var rows = [];
-        var seen = {};
-        function _emapLookup(name){
-          if(!name) return null;
-          if(emap[name]) return emap[name];
-          for(var k in emap){ if(k==='update_time') continue; if(name.indexOf(k)>=0) return emap[k]; }
-          for(var k2 in emap){ if(k2==='update_time') continue; if(k2.indexOf(name)>=0) return emap[k2]; }
-          return null;
-        }
-        (crItems||[]).sort(function(a,b){return (b.net||0)-(a.net||0);}).slice(0,8).forEach(function(it){
-          if(!it || !it.name) return; seen[it.name]=1;
-          rows.push({ name:it.name, net:it.net||0, chg:it.chg||0, type:'概念', map: _emapLookup(it.name) });
-        });
-        (sffIn||[]).sort(function(a,b){return (b.net||0)-(a.net||0);}).slice(0,6).forEach(function(s){
-          if(!s || !s.name || seen[s.name]) return; seen[s.name]=1;
-          rows.push({ name:s.name, net:s.net||0, chg:s.chg||0, type:'行业', map: _emapLookup(s.name) });
-        });
-        if(!rows.length){ cEl.innerHTML='<div class="ipo-empty">暂无热点板块数据</div>'; }
-        else {
-          var hh='<div style="display:flex;flex-direction:column;gap:8px;">';
-          rows.forEach(function(r){
-            var netCol = (r.net>=0)?'var(--up)':'var(--down)';
-            hh+='<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);font-size:13px;flex-wrap:wrap;">';
-            hh+='  <span style="font-weight:700;color:var(--txt);min-width:96px;">'+r.name+'</span>';
-            hh+='  <span style="color:'+netCol+';font-weight:700;min-width:78px;">'+((r.net>=0?'+':'')+r.net.toFixed(2))+'亿</span>';
-            if(r.map && r.map.etf){ hh+='  <span style="color:var(--cyan);font-weight:600;">🎯 '+r.map.etf.code+' '+r.map.etf.name+'</span>'; }
-            else { hh+='  <span style="color:var(--dim);">🎯 ETF暂无映射</span>'; }
-            if(r.map && r.map.leaders && r.map.leaders.length){ hh+='  <span style="color:var(--sub);">龙头：'+r.map.leaders.map(function(l){return l.code+' '+l.name;}).join(' / ')+'</span>'; }
-            hh+='</div>';
-          });
-          hh+='</div>';
-          cEl.innerHTML = hh;
-        }
-      }
-      var em = window.CONCEPT_ETF_MAP || {};
-      var tm=document.getElementById('prEtfFresh');
-      var _etfSrcTs = (window.CONCEPT_RANKING||{}).update_time || (window.SECTOR_FUND_FLOW||{}).update_time || em.update_time || null;
-      var _etfBadge = _uBadge('盘后','短线',_etfSrcTs);
-      if(tm) tm.innerHTML = _etfBadge;
-    }catch(e){ console.warn('ETF龙头渲染失败',e); }
+    // 🛡 2026-09-02 主人令：ETF·龙头参考 抽为独立函数 + 自愈重试（原内联，defer 未就绪即永久空卡）
+    window._fillEtfMap();
   }
 
   /* ═══════════ 2026-08-19 主人令：2 张新卡 render 函数（宏观+板块推荐）══ 暂未上架·调试专区 ═══════════ */
@@ -12295,6 +12348,15 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     var ds = window.DELISTED_STOCKS || {};
     var dsRecent = ds.recent || [];
     var dsTotal = ds.total || 0;
+    // 🛡 2026-09-02 主人令根治：UNLISTED_PANEL 为 defer 脚本，未注入即「模块去向索引」卡永久空 → 轮询补填
+    if(!window.UNLISTED_PANEL){
+      if(!window.__ulIdxRetryTimer){
+        window.__ulIdxRetryTimer = setInterval(function(){
+          if(window.UNLISTED_PANEL){ clearInterval(window.__ulIdxRetryTimer); window.__ulIdxRetryTimer=null; try{ window._renderV8StockLists(); }catch(e){} }
+        }, 800);
+      }
+      return;
+    }
     var d = window.UNLISTED_PANEL || {};
     var mods = d.modules || [];
     function modulesHtml(){
@@ -13196,7 +13258,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=396bb9f25a')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=f1eef3fe28')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
