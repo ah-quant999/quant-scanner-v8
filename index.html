@@ -10860,6 +10860,8 @@ window.showRestrictedItems = showRestrictedItems;
     // 🛡 2026-09-02 主人令"加回！"：调试专区 3 卡容器（宏观+板块推荐）
     h+='<div id="ulMacroPanel"></div>';
     h+='<div id="ulSecPanel"></div>';
+    // 🛡 2026-09-02 修复：模块去向索引独立容器（_renderV8StockLists 只填这里，不再覆盖上面实验卡）
+    h+='<div id="ulModuleIndexPanel"></div>';
     // ── 2026-08-29 主人令：🤖 AI 预测 子页面已删除（卡并入调试专区，见 P3 插入段），pane2 此处不再渲染 ──
 
     // ── 2026-08-29 主人令：🔮 潜力挖掘 子页面已删除（卡并入调试专区，见 P3 插入段），pane3 此处不再渲染 ──
@@ -11760,19 +11762,24 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     /* 2026-08-29 主人令：下沉盘后观测卡渲染（斐波那契窗口 + 商品涨价弹性榜） */
     try{ if(window.renderFib) window.renderFib(window.SH_FIB||{}); }catch(e){console.warn("已下架·斐波那契渲染失败",e);}
     try{ if(typeof window._fillCommodityElasticity==='function') window._fillCommodityElasticity(); }catch(e){console.warn("已下架·商品涨价弹性榜渲染失败",e);}
+    // 🛡 2026-09-02 归位：已下架股票目录渲染到本容器末尾（与暂未上架实验卡彻底解耦）
+    try{ if(typeof window._renderDelistedStockDir==='function') window._renderDelistedStockDir('delistedTopPanel'); }catch(e){console.warn("已下架·股票目录渲染失败",e);}
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderDelisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
   }
 
-  /* 2026-08-30 主人令：暂未上架 + 已下架股票目录填充（统一 unlistedPanel + dl 两个 tab 共用） */
+  /* 2026-09-02 一劳永逸修复：暂未上架与已下架股票目录容器剥离
+     根因：原 _renderV8StockLists 把「模块去向索引 + 已下架股票目录」整段 innerHTML 覆盖 unlistedPanel，
+           与 renderUnlisted 渲染的 3 张实验卡（热门赛道/宏观/板块推荐）抢同一容器 → 进入暂未上架 40ms 后被股票目录整段覆盖。
+     修复：
+       · 模块去向索引 → 挂到暂未上架独立子容器 ulModuleIndexPanel（与实验卡并列，互不覆盖）
+       · 已下架股票目录 → 抽成 _renderDelistedStockDir，挂到已下架专属容器 delistedTopPanel（语义归位）
+  */
   function _renderV8StockLists(){
-    var ulEl = document.getElementById('unlistedPanel');
-    var ds = window.DELISTED_STOCKS || {};
-    var dsRecent = ds.recent || [];
-    var dsTotal = ds.total || 0;
+    var idxEl = document.getElementById('ulModuleIndexPanel');  // 🛡 独立容器，不再覆盖 unlistedPanel 实验卡
     var d = window.UNLISTED_PANEL || {};
     var mods = d.modules || [];
-    function modulesHtml(){
-      var h='<div class="card" style="border-left:4px solid #c4b5fd;">';
+    if(idxEl){
+      var h='<div class="card" style="border-left:4px solid #c4b5fd;margin-top:14px;">';
         h+='<h3><span class="ic">🧪</span>实验区·模块去向索引 <span class="fresh">'+(d.update_time||"--")+"</span></h3>";
         h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;padding:12px 14px;">';
       mods.forEach(function(m){
@@ -11785,8 +11792,16 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       h+='</div>';
       if(d.note) h+='<div class="note" style="padding:0 14px 14px;">'+d.note+'</div>';
       h+='</div>';
-      return h;
+      idxEl.innerHTML = h;
     }
+  }
+  /* 已下架股票目录：独立渲染到已下架容器（delistedTopPanel），不污染暂未上架 */
+  function _renderDelistedStockDir(hostId){
+    var host = document.getElementById(hostId);
+    if(!host) return;
+    var ds = window.DELISTED_STOCKS || {};
+    var dsRecent = ds.recent || [];
+    var dsTotal = ds.total || 0;
     /* 🛡 2026-09-01 主人令一劳永逸：已下架目录「合理性护栏」
        事故复盘：算法端 algorithms/refresh_stock_metadata.py 用「全量差集」判退市且零阈值护栏——
          delisted = old_stock_names - fresh_stock_names
@@ -11861,9 +11876,11 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       h+='</div>';
       return h;
     }
-    if(ulEl) ulEl.innerHTML = modulesHtml() + stocksHtml();
+    // 🛡 2026-09-02 归位：股票目录只由 _renderDelistedStockDir（renderDelisted 内调用）渲染到已下架容器；
+    //    本函数仅负责「暂未上架·模块去向索引」，绝不碰 delistedTopPanel，避免进暂未上架时脏写已下架。
   }
   window._renderV8StockLists = _renderV8StockLists;
+  window._renderDelistedStockDir = _renderDelistedStockDir;
 
 
   var rendered=false;
