@@ -531,10 +531,10 @@ window.__domReadyFns=[];
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/POTENTIAL_PICKS.js?v=f7d1a791f8" defer></script>
 <script src="data/INDEX_QUOTES.js?v=63cf13ffd6" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=c4c386026b" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=bc77a616a9" defer></script>
 <script src="data/MARGIN_DATA.js?v=878ae75123" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=27be0ea941" defer></script>
-<script src="data/IPO_DATA.js?v=1fd4307581" defer></script>
+<script src="data/IPO_DATA.js?v=137f68c67b" defer></script>
     <script src="data/CRISIS_DATA.js?v=5db40d7597" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=8a8ce268ec" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=f1f55dbe34" defer></script>
@@ -1489,12 +1489,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=2d24906e86" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=cf4c35af3b" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=e2f1e13a90" defer></script>
-<script src="data/HEALTH_CHECK.js?v=9d434b2f2a" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=b343ae8f47" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=8d83f8a4e9" defer></script>
+<script src="data/RUNNER_STATUS.js?v=8cbeb23020" defer></script>
+<script src="data/HEALTH_CHECK.js?v=adea4e5199" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=99e6a40d46" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=f958cafaa0" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 MARKET_PATH_PROBABILITY 注入（AI预测卡用） -->
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=6c6d637913" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=c3d2f10034" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=ac04776279" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=258e585586" defer></script>
@@ -6619,17 +6619,17 @@ window.__renderV8CalFull();
       applyData(window.IPO_DATA);
     }else{
       /* 🛡 2026-08-28 一劳永逸（主站审计 P1-8）：缓存戳 ?v= 从页面已注入的
-         <script src="data/IPO_DATA.js?v=1fd4307581"> 实时读取，不再手写 hash。
+         <script src="data/IPO_DATA.js?v=137f68c67b"> 实时读取，不再手写 hash。
          历史债务：本处注释写死一个旧 hash、实际引用是另一个、报错信息又写一遍，
          三处漂移；且手写 hash 不随构建更新 → CDN 吐旧副本 → 打新数据陈旧。
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
       var _ipoUrl=(function(){
         try{
-          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=1fd4307581"]');
+          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=137f68c67b"]');
           var s=el?el.getAttribute('src'):'';
           if(s) return s;
         }catch(e){}
-        return 'data/IPO_DATA.js?v=1fd4307581';
+        return 'data/IPO_DATA.js?v=137f68c67b';
       })();
       // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
       fetch(_ipoUrl)
@@ -12441,7 +12441,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=9d434b2f2a')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=adea4e5199')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
