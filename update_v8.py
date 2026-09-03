@@ -118,6 +118,7 @@ DATA_SOURCES = {
     #   补映射后，云端 build 自动按 raw_data 重建，杜绝复发。
     "final_recommend.json":        "FINAL_RECOMMEND_DATA",
     "stock_rps.json":              "STOCK_RPS_DATA",
+    "factor_lab_backtest.json":    "FACTOR_LAB_BACKTEST",  # 🆕 2026-09-04 因子实验室独立分层回测
     # 🛡 2026-08-30 一劳永逸式：补 ETF 申购赎回东方财富口径（股票/债券/货币/商品/跨境 5 类 + 亿元），
     #   替代旧宽基指数 + 亿份口径（旧 ETF_SUBSCRIPTION.js 保留作 legacy，不入 DATA_SOURCES）。
     #   旧 data/ETF_SUBSCRIPTION.js 已写好的 "sh"/"sz"/"update_time" 老口径**保留**，前端同时读 window.ETF_SUBSCRIPTION。
@@ -190,6 +191,7 @@ CATEGORY_MAP = {
     "COCKPIT_BACKTEST": "post_close",
     "BACKTEST_TDX": "post_close",
     "BACKTEST_COMPREHENSIVE": "post_close",
+    "FACTOR_LAB_BACKTEST": "post_close",
     "EXPERIMENT": "post_close",
     "STOCK_LIST": "post_close",
     "STOCK_PROFILE": "post_close",
