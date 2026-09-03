@@ -2663,7 +2663,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
            ret=(r.ret50/50)*hold 把「50日已实现收益」线性折算成持有期收益，且用【今日截面】
            的 RPS/RS/年线分层去回看历史收益，存在前视偏差(look-ahead bias)；
            卡片自带文案亦写明「历史模拟 / 近似模拟 / 仅供内部验证」。
-           真实回测请以「🔒 策略回测 → ③ K线信号60日回测 / ② 综合回测」为准。 -->
+           真实回测请以「🔒 策略回测 → K线信号60日回测 / 综合回测」为准。 -->
     </div><!--/st-rps-->
 
 
@@ -4017,7 +4017,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 
 <!-- ============ 🔒 策略回测（统一 · 2026-08-13 主人令） ============
-     一个 tab 装两块：① 综合回测多策略×多持有期 ② K线信号60日回测
+     一个 tab 装两块：综合回测多策略×多持有期 + K线信号60日回测
      解决"两边跑着看"问题，仅管理员可见。 -->
   <section id="sec-bt">
     <div class="sec-head"><h2>📈 回测汇总</h2><span class="tag">仅管理员可见 · 综合回测 + K线信号 + 模块回测 · 三块一站看完</span><span class="fresh" id="btFresh">—</span></div>
@@ -4028,8 +4028,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
 <script>
 /* ═══════════ 🔒 策略回测（统一 · 2026-08-13）═══ 两个回测块一站看完 ═══════════
-   ① 📊 综合回测 多策略×多持有期 — BACKTEST_COMPREHENSIVE → "我用的策略哪个最值钱"
-   ② 📈 K线信号 60 日回测 — BACKTEST_TDX → "信号层有没有 alpha"
+   📊 综合回测 多策略×多持有期 — BACKTEST_COMPREHENSIVE → "我用的策略哪个最值钱"
+   📈 K线信号 60 日回测 — BACKTEST_TDX → "信号层有没有 alpha"
    设计：简洁表格、胜率高亮（≥55% 绿 / ≤45% 红）、平均收益同色。
 */
 (function(){
@@ -4558,7 +4558,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     /* ══ 2026-09-03 主人令：📊 各选股策略回测汇总 + 📐 各策略回测如何算（用户明确要求） ══
        仅覆盖仍活跃在选股策略子页的 4 个策略：三重共识 / 四量终极 / 逆势龙头CRDS / 相对强度RPS。
        已下架的大牛股猎手 / 驾驶舱 / 全站精选 不在此列（其回测已随选股一并删除）。
-       全部读取各策略回测源实时数据，样本累积后自动刷新，不写死。 */
+       全部读取各策略回测源实时数据，样本累积后自动刷新，不写死。
+       2026-09-03 主人令②：「📐 各策略回测如何算」整块迁往 logic.html 逻辑详解页 lg-st 子页（回测汇总卡内），本页不再渲染。 */
     (function(){
       var _STRATS = [
         { key:'triple', name:'三重共识', icon:'🧲', color:'#38bdf8',
@@ -4587,7 +4588,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         var vname = s.key==='fourvolume' ? 'FOUR_VOLUME_BACKTEST' : (s.key==='crds' ? 'CRDS_BACKTEST' : 'RPS_BACKTEST');
         var sm=((window[vname]||{}).summary||{});
         var total=sm.total_signals||0, bp=sm.by_period||{}, upd=sm.update_time||sm.calc_time||'';
-      // 2026-09-03 对齐逻辑详解页：顶部「回测汇总」——跨策略扫描真实样本，算 胜率最高/收益最好
+
+        var bpk=null,bw=-1;
+        [1,3,5,10,20].forEach(function(p){ var r=bp[String(p)]||{}; if((r.samples||0)>0&&(r.win_rate||0)>bw){bw=r.win_rate;bpk=p;} });
+        if(bpk!=null){ var r=bp[String(bpk)]; return {sample:total,hold:bpk,wr:r.win_rate,ar:r.avg_return,upd:upd,ready:true}; }
+        return {sample:total,hold:null,wr:null,ar:null,upd:upd,ready:false};
+      }
+      html += '<div style="margin:16px 0 6px;font-size:13px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:8px;"><span>📊</span>各选股策略回测汇总 <span style="font-size:11px;color:var(--dim);font-weight:500;">仅活跃策略 · 样本累积后自动刷新</span></div>';
+      /* 2026-09-03 主人令：顶部「回测汇总」——跨策略扫描真实样本，算 胜率最高/收益最好（只渲染一次） */
       (function(){
         var _strategies = [];
         var _bc = window.BACKTEST_COMPREHENSIVE || {};
@@ -4620,13 +4628,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         html += '<div style="width:100%;font-size:10.5px;color:var(--sub);margin-top:8px;line-height:1.5;">📌 排名仅纳入样本≥'+MIN+' 的稳健策略；小样本策略（如逆势龙头CRDS 当前 n=4）详见下方明细，不计入排名以免噪声误导。所有数字均由 baostock 真实收盘价前向收益回测算得。</div>';
         html += '</div>';
       })();
-
-        var bpk=null,bw=-1;
-        [1,3,5,10,20].forEach(function(p){ var r=bp[String(p)]||{}; if((r.samples||0)>0&&(r.win_rate||0)>bw){bw=r.win_rate;bpk=p;} });
-        if(bpk!=null){ var r=bp[String(bpk)]; return {sample:total,hold:bpk,wr:r.win_rate,ar:r.avg_return,upd:upd,ready:true}; }
-        return {sample:total,hold:null,wr:null,ar:null,upd:upd,ready:false};
-      }
-      html += '<div style="margin:16px 0 6px;font-size:13px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:8px;"><span>📊</span>各选股策略回测汇总 <span style="font-size:11px;color:var(--dim);font-weight:500;">仅活跃策略 · 样本累积后自动刷新</span></div>';
       html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;">';
       html += '<thead><tr style="background:var(--card2);border-bottom:1.5px solid var(--border);">';
       ['策略','星级','回测口径','样本','最佳持有期','最佳胜率','最佳平均收益','更新'].forEach(function(h){ html+='<th style="padding:6px;text-align:left;color:var(--sub);white-space:nowrap;">'+h+'</th>'; });
@@ -4649,40 +4650,54 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         html += '<td style="padding:6px;color:var(--dim);font-size:10px;white-space:nowrap;">'+(m.upd?m.upd.substring(0,16):'—')+'</td>';
         html += '</tr>';
       });
-      html += '</tbody></table></div>';
-      html += '<div style="font-size:10.5px;color:var(--dim);margin-top:6px;line-height:1.5;">⚠️ 样本为 0 / 累计中：该策略历史回测信号尚未累积，最终推荐不依赖其回测胜率（依赖实时信号 + ALGO_TRACK 跟踪），样本到位后本表自动填充。</div>';
+      /* 2026-09-03 主人令：补入 选股生命周期 / 因子实验室（池内跟踪统计与因子截面观察，非信号回测，不造假） */
+      (function(){
+        var _tag='<span style="font-size:9px;font-weight:700;color:#14b8a6;background:rgba(20,184,166,.14);border:1px solid rgba(20,184,166,.35);padding:1px 5px;border-radius:4px;white-space:nowrap;">📈 选股策略</span>';
+        var _pt=window.V8_POOL_TRACKER||{}, _items=_pt.items||[];
+        var _r='<tr style="border-bottom:1px solid rgba(148,163,184,.1);">'
+          +'<td style="padding:6px;color:var(--txt);font-weight:700;">🧬 选股生命周期 '+_tag+'</td>'
+          +'<td style="padding:6px;color:#fbbf24;font-size:11px;white-space:nowrap;">⭐⭐⭐</td>'
+          +'<td style="padding:6px;color:var(--sub);font-size:10.5px;">池内跟踪·入池价→最新收盘</td>'
+          +'<td style="padding:6px;text-align:right;color:var(--sub);">'+_items.length+'</td>'
+          +'<td style="padding:6px;color:var(--txt);">实时跟踪</td>';
+        if(_items.length){
+          var _w=0,_sum=0;
+          _items.forEach(function(it){ var p=it.last_pct; if(p==null&&it.entry_price&&it.last_close)p=(it.last_close/it.entry_price-1)*100; if(p!=null){_sum+=p; if(p>0)_w++;} });
+          var _wr=_w/_items.length*100, _avg=_sum/_items.length;
+          _r+='<td style="padding:6px;text-align:right;"><span style="font-weight:700;color:'+_colorWR(_wr)+';">'+_wr.toFixed(1)+'%</span></td>'
+            +'<td style="padding:6px;text-align:right;"><span style="color:'+_colorPL(_avg)+';">'+(_avg>0?'+':'')+_avg.toFixed(2)+'%</span></td>'
+            +'<td style="padding:6px;color:var(--dim);font-size:10px;white-space:nowrap;">'+(((_pt.update_time||'')+'').substring(0,16)||'—')+'</td>';
+        } else {
+          _r+='<td style="padding:6px;text-align:right;color:var(--dim);">—</td><td style="padding:6px;text-align:right;color:var(--dim);">—</td><td style="padding:6px;color:var(--dim);font-size:10px;">—</td>';
+        }
+        html += _r+'</tr>';
+        var _fl=window.FACTOR_LAB||{};
+        html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">'
+          +'<td style="padding:6px;color:var(--txt);font-weight:700;">🧪 因子实验室 '+_tag+'</td>'
+          +'<td style="padding:6px;color:#fbbf24;font-size:11px;white-space:nowrap;">—</td>'
+          +'<td style="padding:6px;color:var(--sub);font-size:10.5px;">因子截面观察·暂无信号回测</td>'
+          +'<td style="padding:6px;text-align:right;color:var(--sub);">—</td>'
+          +'<td style="padding:6px;color:var(--dim);">信号累积中</td>'
+          +'<td style="padding:6px;text-align:right;color:var(--dim);">—</td>'
+          +'<td style="padding:6px;text-align:right;color:var(--dim);">—</td>'
+          +'<td style="padding:6px;color:var(--dim);font-size:10px;white-space:nowrap;">'+(((_fl.update_time||'')+'').substring(0,16)||'—')+'</td>'
+          +'</tr>';
+      })();
+      html += '<div style="font-size:10.5px;color:var(--dim);margin-top:6px;line-height:1.5;">⚠️ 样本为 0 / 累计中：该策略历史回测信号尚未累积，最终推荐不依赖其回测胜率（依赖实时信号 + ALGO_TRACK 跟踪），样本到位后本表自动填充。🧬 选股生命周期为池内跟踪统计（胜率列=池内盈利占比：最新收盘高于入池价的股票占比；收益列=平均浮盈），非历史信号回测；🧪 因子实验室为因子截面观察（异常换手率·ROE_TTM 大市值档），前向收益回测待因子信号历史累积后上线，不造假。</div>';
 
-      html += '<div style="margin:18px 0 8px;font-size:13px;font-weight:700;color:var(--txt);display:flex;align-items:center;gap:8px;"><span>📐</span>各策略回测如何算 <span style="font-size:11px;color:var(--dim);font-weight:500;">口径 · 入场出场 · 持有期 · 指标定义</span></div>';
-      _STRATS.forEach(function(s){
-        var m=_metric(s);
-        var trackCount = (function(){
-          var at=window.ALGO_TRACK; if(!at||!at.total_stats) return null;
-          var k = s.key==='fourvolume' ? 'four_volume' : (s.key==='triple' ? 'resonance' : s.key);
-          var t = at.total_stats[k] || at.total_stats[s.key];
-          return t ? (t.tracking+' 只跟踪 / '+t.today_signals+' 今日信号') : null;
-        })();
-        html += '<div style="margin:10px 0;padding:10px 12px;border-left:4px solid '+s.color+';border-radius:8px;background:rgba(148,163,184,.04);">';
-        html += '<div style="font-weight:700;color:'+s.color+';font-size:12.5px;margin-bottom:6px;">'+s.icon+' '+s.name+(m.ready?'':' <span style="font-size:10px;color:var(--dim);font-weight:500;">· 历史回测样本累计中</span>')+'</div>';
-        html += '<div style="font-size:11px;color:var(--dim);line-height:1.7;">';
-        html += '<b style="color:var(--txt);">口径</b>：'+_esc(s.method)+'<br>';
-        html += '<b style="color:var(--txt);">持有期窗口</b>：1 / 3 / 5 / 10 / 20 个交易日<br>';
-        html += '<b style="color:var(--txt);">指标定义</b>：'+_esc(s.def)+'<br>';
-        if(trackCount) html += '<b style="color:var(--txt);">实时跟踪</b>：'+_esc(trackCount)+'<br>';
-        html += '<b style="color:var(--txt);">当前状态</b>：'+(m.ready?('已回测 '+m.sample+' 样本，最佳 T+'+m.hold+' 胜率 '+m.wr.toFixed(1)+'%、收益 '+(m.ar>0?'+':'')+m.ar.toFixed(2)+'%') : ('历史信号累计中（累计 '+(m.sample||0)+' 个）；最终推荐以实时信号 + ALGO_TRACK 跟踪为准'));
-        html += '</div></div>';
-      });
     })();
 
     html += '<div style="font-size:13px;font-weight:700;color:var(--txt);margin:18px 0 8px;display:flex;align-items:center;gap:8px;"><span>🎯</span>主策略回测 <span style="font-size:11px;color:var(--dim);font-weight:500;">按星级降序</span></div>';
     // 2026-09-02 主人令：已下线模块的回测卡保持不可见（选股信号层全删；回测不再保留以免误用）
 
-    /* ── ① 综合回测（多策略×多持有期）── */
+    /* ── 综合回测（多策略×多持有期）── */
     html += '<div style="margin:14px 0;border-left:4px solid #38bdf8;" class="card">';
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
-    html += '<span style="font-size:15px;font-weight:700;color:#38bdf8;">📊 ② 综合回测 · 多策略 × 多持有期</span>';
+    html += '<span style="font-size:15px;font-weight:700;color:#38bdf8;">📊 综合回测 · 多策略 × 多持有期</span>';
     html += '<span style="font-size:11px;color:var(--dim);">策略本身价值：哪条策略最值钱？</span>';
     html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(34,197,94,.12);color:#22c55e;border:1px solid rgba(34,197,94,.3);">✅ 真实baostock全回测</span>';
     html += '</div>';
+    html += '<div style="font-size:11px;color:var(--sub);line-height:1.7;margin-bottom:6px;"><b style="color:var(--txt);">包含</b>：三重共识 3 档共振（≥2 宽松 / 70-79 分 / ≥80 严格）× 5 个持有期（T+1/3/5/10/20 个交易日）= 15 组回测，每格给<b>胜率</b>与<b>平均收益</b>；样本=历史全部入选信号，按 baostock 真实收盘价前向收益计算。<b style="color:var(--txt);">更新时机</b>：每日盘后算法链（与最终推荐同链产出后）统一重算，盘中不重算——太早算无效、浪费。</div>';
     if(bc.overview && bc.comparison){
       var labelMap = {resonance_all:'共振≥2（宽松）', resonance_gte70_lt80:'共振70-79分', resonance_gte80:'共振≥80（严格）'};
       var stratList = bc.strategies_tested || ['resonance_all','resonance_gte70_lt80','resonance_gte80'];
@@ -4722,10 +4737,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     // 2026-09-02 主人令：模块策略回测卡统一读 __STRATEGY_BACKTESTS 配置（按星级降序；已删策略自动不出现）
     html += window.__renderBacktestCardsFrom(window.__STRATEGY_BACKTESTS);
 
-    /* ── ③ K线信号 60 日回测 ── */
+    /* ── K线信号 60 日回测 ── */
     html += '<div style="margin:14px 0;border-left:4px solid #c084fc;" class="card">';
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
-    html += '<span style="font-size:15px;font-weight:700;color:#c084fc;">📈 ③ K线信号 60 日回测</span>';
+    html += '<span style="font-size:15px;font-weight:700;color:#c084fc;">📈 K线信号 60 日回测</span>';
     html += '<span style="font-size:11px;color:var(--dim);">信号层 alpha：9 个信号 × T+1/3/5/10/20</span>';
     html += '</div>';
     if(bd.summary){
