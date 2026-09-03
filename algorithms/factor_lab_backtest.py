@@ -7,7 +7,7 @@ factor_lab_backtest.py — 因子实验室独立分层回测（2026-09-04 主人
   对「异常量比(缩量=强势)」因子做 5 层(quintile)分层回测：各层净收益/胜率/分层净值最大回撤/
   分季稳定性/样本内外(OOS)一致性；对「ROE_TTM 大市值」因子做 Top30 组合 vs 全池等权基准对比。
   升 3⭐ 判据：Top−Bottom 利差>0 且 Top 层胜率≥55% 且 OOS 同号。
-  升 4⭐ 另需「异常换手扩全市场扫描」（v8/factor_lab_gen.py --abn-universe full，数据侧另行开启）。
+  升 4⭐ 另需「异常换手扩全市场扫描」（数据侧另行开启后复验）。
 
 数据源：
   raw_data/_rps_cache/*.json — universe 名单（重点池 A股 6 位码；calc_stock_rps 当日产出）
