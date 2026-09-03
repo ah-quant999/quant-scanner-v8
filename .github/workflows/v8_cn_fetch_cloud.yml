@@ -129,20 +129,6 @@ jobs:
                 echo "label=兜底(未匹配cron $CRON, 走all)" ;;
             esac
           fi
-          # 🛡 2026-09-03 交易时段优先级闸门（盘中风暴一劳永逸根治）：
-          #   盘中(09:25-11:30 / 13:00-14:59 CST)只做 intraday 数据，重活(post_close/all)排队至盘后。
-          #   原因：盘中风暴 = 全量 build / 算法重算 / 巡检自愈 与 intraday 抓取抢 CI，导致盘中数据卡壳。
-          #   交易时段内任何「非 intraday」类别（多为手动 dispatch 的 post_close/all）一律强制降为
-          #   intraday，重活不占 CI，盘后 17:20 自然跑全量；premarket 仅盘前触发不受影响。
-          CAT=$(grep '^category=' "$GITHUB_OUTPUT" | tail -1 | cut -d= -f2)
-          TH=$(TZ=Asia/Shanghai date +%-H); TM=$(TZ=Asia/Shanghai date +%-M)
-          TRADING=0
-          if { [ "$TH" -eq 9 ] && [ "$TM" -ge 25 ]; } || [ "$TH" -eq 10 ] || { [ "$TH" -eq 11 ] && [ "$TM" -le 30 ]; } || [ "$TH" -eq 13 ] || [ "$TH" -eq 14 ]; then TRADING=1; fi
-          echo "is_trading_hours=$TRADING" >> "$GITHUB_OUTPUT"
-          if [ "$TRADING" -eq 1 ] && [ "$CAT" != "intraday" ] && [ "$CAT" != "premarket" ]; then
-            echo "⚠️ 交易时段(${TH}:${TM})：强制 category=intraday，重活排队至盘后"
-            echo "category=intraday" >> "$GITHUB_OUTPUT"
-          fi
           # 注：原 if 兜底已删（重复 echo 同一 output 键会导致 GitHub Action 报 Multiple outputs）
 
       - uses: actions/checkout@v4
@@ -272,10 +258,6 @@ jobs:
       # 仅生成 raw_data/etf_subscription_em.json，后续 update_v8 会映射为 data/ETF_SUBSCRIPTION_EM.js。
       - name: "💰 ETF 申购赎回（东财口径，盘前/盘后/全量）"
         if: steps.cat.outputs.category == 'premarket' || steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
-        # 🛡 2026-09-03 一劳永逸根因修复（根因④）：该步曾独占 25.5 分钟拖垮整轮 run，
-        #   导致后续 LHB/候选池等步骤排队、盘中卡迟到。加 20min 硬超时，超时即判该步失败
-        #   （continue-on-error 放行），不阻塞其余步骤，CI 不再被单源hog。
-        timeout-minutes: 20
         continue-on-error: true
         shell: bash
         run: |
