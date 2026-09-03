@@ -15,8 +15,8 @@ name: "🐕 v8 数据抓取看门狗(云端自愈)"
 
 on:
   schedule:
-    # 交易日 08:00-17:30 CST 每 30 分（UTC 00:00-09:30）。覆盖盘前/盘中/盘后全窗口。
-    - cron: '*/30 0-9 * * 1-5'
+    # 交易日 08:00-21:30 CST 每 30 分（UTC 00:00-13:30）。覆盖盘前/盘中/盘后+晚间全窗口。
+    - cron: '*/30 0-13 * * 1-5'
   workflow_dispatch:
     inputs:
       force_category:
@@ -71,6 +71,8 @@ jobs:
           elif in_window(13*60, 15*60+30):      # 13:00-15:30 下午盘中
               cat = "intraday"
           elif in_window(17*60, 17*60+40):      # 17:00-17:40 盘后
+              cat = "post_close"
+          elif in_window(17*60+41, 21*60+30):   # 17:41-21:30 晚间盘后（2026-09-03 阿狸咪：补晚间空窗）
               cat = "post_close"
           else:
               print("[watchdog] 非交易时段，跳过"); sys.exit(0)
