@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "9709230f4";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "1b8da62a0";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -511,7 +511,7 @@ window.__domReadyFns=[];
     <script src="data/SECTOR_FUND_FLOW.js?v=4497173801" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=31a6b6fa01" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=a04b075232" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=d0e01ae55d" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=a95d84e813" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=a0c77631fc" defer></script>
@@ -531,7 +531,7 @@ window.__domReadyFns=[];
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/POTENTIAL_PICKS.js?v=f7d1a791f8" defer></script>
 <script src="data/INDEX_QUOTES.js?v=068137d11c" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=816c960d88" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=93eed2221b" defer></script>
 <script src="data/MARGIN_DATA.js?v=878ae75123" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=6912aaca9d" defer></script>
 <script src="data/IPO_DATA.js?v=53347da8c2" defer></script>
@@ -547,7 +547,7 @@ window.__domReadyFns=[];
     <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
     <script src="data/MARKET_REGIME.js?v=791b820fab" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
-    <script src="data/RISK_GAUGE.js?v=66b4af86c7" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
+    <script src="data/RISK_GAUGE.js?v=b602a16dd6" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
     <script src="data/SECTOR_RECOMMENDATION.js?v=1070b161c8" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
     <script src="data/WEEKEND_META_REPORT.js?v=b0f507a4dd" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
   <script src="data/DELISTED.js?v=625439c57a" defer></script>
@@ -1489,12 +1489,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=2d24906e86" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=cf4c35af3b" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=3f9b895d58" defer></script>
-<script src="data/HEALTH_CHECK.js?v=0817cc75c3" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=732892fc38" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=e3881c956b" defer></script>
+<script src="data/RUNNER_STATUS.js?v=105e3c55f0" defer></script>
+<script src="data/HEALTH_CHECK.js?v=1549f07f04" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=94c811faca" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=7e18a83e1e" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 MARKET_PATH_PROBABILITY 注入（AI预测卡用） -->
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=fa01e063f6" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=5562dbcf1f" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=ac04776279" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=258e585586" defer></script>
@@ -12441,7 +12441,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=0817cc75c3')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=1549f07f04')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
