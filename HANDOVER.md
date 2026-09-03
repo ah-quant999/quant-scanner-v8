@@ -112,3 +112,17 @@
 - `data/SECTOR_FUND_TRACK.js` 是**孤儿死文件**（前端 0 引用、仓库无生成器，疑上次轻量化删卡漏删数据）——阿狸咪今晚删文件+健康检查排除，**小九不要在本机重跑或恢复它**；
 - `FOUR_VOLUME_BACKTEST` 0 信号时 update_time 不前移导致健康面板误报 FAIL——阿狸咪改 `strategy_four_volume.py` 0 信号也刷新时间戳；
 - 探针自动路由/并行化/因子回测挂链已于今晨上线，今晚 16:40 A 批首次实战，小九只需旁观。
+
+---
+
+## 【07:15 更正+收尾】零遗留终审（阿狸咪 07:15 写，主人上班前令）
+
+**更正 06:55 段两处**（以本段为准）：
+1. ~~"SECTOR_FUND_TRACK 孤儿死文件，阿狸咪今晚删文件"~~ → **已改为非破坏性处置**：该文件由云端 cn_fetch step9 生成器持续产出（#1257 实跑 success），删文件会被下轮链复活。已改 `v8_health_check.py`：新增 `_RETIRED_FILES={"SECTOR_FUND_TRACK"}` 从 items[] 排除 → `all_SECTOR_FUND_TRACK` 误报 FAIL 消除。**彻底清理（删生成器步骤+raw/data 文件）属破坏性操作，待主人拍板**（热门赛道卡 09-02 曾被主人令恢复过一次，后再移除，意图存疑不硬删）。
+2. ~~"FOUR_VOLUME_BACKTEST 待办"~~ → **已修完**：`strategy_four_volume.py` 新增 `write_four_volume_backtest_js()`，链上每次跑完四量即刷新 `.js` 规范化外壳（前端策略回顾读 .js 非 .json；此前 09-02 手工空壳无人回写）。`--backtest>0` 手动跑时自动附带真实分层。下轮链（今晚 16:40）生效后 `all_FOUR_VOLUME_BACKTEST` FAIL 消除。
+
+**收尾补丁质量关**：patch_final_audit.py 锚点断言 count==1 ×4 组 → py_compile 双文件 0 错 → Contents API PUT → 回读逐字节一致 ×2。
+
+**当前健康面板预期**（下轮巡检起）：3 个 FAIL → 0（FACTOR_LAB 待小九恢复跑批后消除；另两项已消误报源）。
+
+**待主人拍板（不阻塞）**：①生命周期 3 卡编号方案甲/乙（已当面汇报）；②SECTOR_FUND_TRACK 彻底清理；③今晚 16:40 A 批探针路由首次实战，明早看 B 批 calc_stock_rps 耗时应 60min→10-15min。
