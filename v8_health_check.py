@@ -2527,6 +2527,17 @@ def main():
     if args.alert:
         send_report_email(report, healed=healed, failed=failed)
 
+    # 🛡 2026-09-03 阿狸咪令（hosted 应急通道连续 3 天 failure 根因之一，当场修）：
+    #   深夜/盘后早期跑健康检查时，算法链产物（三重共识/四量终极/全站精选/相对强度/
+    #   逆势龙头）隔夜陈旧是【常态】（阈值 747 分钟 ≈ 昨日 17:11 后必然超时）→
+    #   overall=fail → rc=2 → hosted 兜底 workflow 整链判死，连带
+    #   「推送重建 data/*.js / 原子提交 ?v / 云端兜底调度」三步全 skipped。
+    #   修复：兜底链设置 V8_HEALTH_SOFT_EXIT=1（软模式）→ 报告/自愈/邮件照常，
+    #   退出码恒 0，不再作失败信号。主 lane（巡检/每日审核/看门狗）不设此变量，
+    #   严格语义完全不变——告警职责仍由 strict lane 承担。
+    if os.environ.get("V8_HEALTH_SOFT_EXIT") == "1":
+        print("[INFO] V8_HEALTH_SOFT_EXIT=1 → 软退出模式：rc=0（仅报告+自愈+告警，不作失败信号）")
+        sys.exit(0)
     sys.exit(0 if report["overall"] == "ok" else 2)
 
 
@@ -2578,4 +2589,8 @@ if __name__ == "__main__":
                 print("[GUARD] 崩溃告警邮件已发送")
             except Exception as _e3:
                 print(f"[WARN] 崩溃告警邮件发送失败: {_e3}")
+        # 🛡 2026-09-03 软模式：兜底链里真崩溃也不得杀链（infra 邮件已发，告警不丢）
+        if os.environ.get("V8_HEALTH_SOFT_EXIT") == "1":
+            print("[GUARD] V8_HEALTH_SOFT_EXIT=1 → 崩溃软退出 rc=0（兜底链继续，infra 邮件已发）")
+            sys.exit(0)
         sys.exit(2)
