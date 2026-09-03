@@ -1,22 +1,22 @@
 {
-  "update_time": "2026-09-04 01:53:27",
-  "pool_size": 58,
-  "raw_pool_size": 58,
+  "update_time": "2026-09-04 02:42:37",
+  "pool_size": 57,
+  "raw_pool_size": 57,
   "selected_size": 3,
   "consensus_count": 0,
   "status_counts": {
     "buy_dip": 6,
-    "weak": 41,
+    "weak": 39,
     "topped": 3,
-    "strong": 8
+    "strong": 9
   },
   "by_algo": {
     "四量终极": {
-      "total": 58,
+      "total": 57,
       "buy_dip": 6,
-      "weak": 41,
+      "weak": 39,
       "topped": 3,
-      "strong": 8
+      "strong": 9
     }
   },
   "items": [
@@ -303,7 +303,7 @@
       "code": "300179",
       "name": "四方达",
       "algo": "四量终极",
-      "list_date": "2026-09-03",
+      "list_date": "2026-09-04",
       "entry_price": 36.11,
       "last_close": 37.85,
       "last_pct": 4.82,
@@ -824,6 +824,37 @@
       "sentiment_match": "caution",
       "sentiment_bonus": -1,
       "selected_score": 0.52,
+      "selected": false
+    },
+    {
+      "code": "002297",
+      "name": "润迈德－B",
+      "algo": "四量终极",
+      "list_date": "2026-09-04",
+      "entry_price": 21.89,
+      "last_close": 22.0,
+      "last_pct": 0.5,
+      "peak_pct": 0.5,
+      "drawdown": 0.0,
+      "days_in": 1,
+      "appear_count": 1,
+      "status": "strong",
+      "buy_hint": null,
+      "sell_hint": null,
+      "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+      "algos_hit": [
+        "四量终极"
+      ],
+      "consensus_count": 1,
+      "signal_type": "短线买点",
+      "industry": "金属制品业",
+      "concept_top": "小金属概念",
+      "sector_match": "top_inflow",
+      "sector_net": 11.76,
+      "sector_bonus": 1.18,
+      "sentiment_match": "caution",
+      "sentiment_bonus": 3,
+      "selected_score": 7.18,
       "selected": false
     },
     {
@@ -1540,72 +1571,10 @@
       "selected": false
     },
     {
-      "code": "002297",
-      "name": "润迈德－B",
-      "algo": "四量终极",
-      "list_date": "2026-09-03",
-      "entry_price": 22.0,
-      "last_close": 22.0,
-      "last_pct": 0.0,
-      "peak_pct": 0.0,
-      "drawdown": 0.0,
-      "days_in": 1,
-      "appear_count": 1,
-      "status": "weak",
-      "buy_hint": null,
-      "sell_hint": "走弱：峰值未跑赢基准价",
-      "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
-      "algos_hit": [
-        "四量终极"
-      ],
-      "consensus_count": 1,
-      "signal_type": "短线买点",
-      "industry": "金属制品业",
-      "concept_top": "小金属概念",
-      "sector_match": "top_inflow",
-      "sector_net": 11.76,
-      "sector_bonus": 1.18,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": 0.18,
-      "selected": false
-    },
-    {
-      "code": "300857",
-      "name": "协创数据",
-      "algo": "四量终极",
-      "list_date": "2026-09-03",
-      "entry_price": 265.88,
-      "last_close": 265.88,
-      "last_pct": 0.0,
-      "peak_pct": 0.0,
-      "drawdown": 0.0,
-      "days_in": 1,
-      "appear_count": 1,
-      "status": "weak",
-      "buy_hint": null,
-      "sell_hint": "走弱：峰值未跑赢基准价",
-      "signal_reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
-      "algos_hit": [
-        "四量终极"
-      ],
-      "consensus_count": 1,
-      "signal_type": "短线买点",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "concept_top": "深圳特区",
-      "sector_match": "top_inflow",
-      "sector_net": 22.15,
-      "sector_bonus": 2.21,
-      "sentiment_match": "caution",
-      "sentiment_bonus": -1,
-      "selected_score": 1.21,
-      "selected": false
-    },
-    {
       "code": "600150",
       "name": "中国船舶",
       "algo": "四量终极",
-      "list_date": "2026-09-03",
+      "list_date": "2026-09-04",
       "entry_price": 34.69,
       "last_close": 34.32,
       "last_pct": -1.07,
@@ -1873,5 +1842,5 @@
     ]
   },
   "select_threshold": 8.0,
-  "note": "基于 v8 算法跟踪池 58 只去重 → 58 只；K 批二维精选（板块流入 × 情绪周期 退潮）→ 进精选 3 只；阈值源自专家 track_daily.py analyze()（强势/回调6-12%/见顶/走弱）；2026-09-03 已下线「板块龙头 / 大牛股猎手」已过滤"
+  "note": "基于 v8 算法跟踪池 57 只去重 → 57 只；K 批二维精选（板块流入 × 情绪周期 退潮）→ 进精选 3 只；阈值源自专家 track_daily.py analyze()（强势/回调6-12%/见顶/走弱）；2026-09-03 已下线「板块龙头 / 大牛股猎手」已过滤"
 }

@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-04 00:55:08",
+  "update_time": "2026-09-04 02:03:43",
   "data_date": "update_time",
   "track_start": "2026-08-17",
   "history_days": 14,
@@ -183,12 +183,6 @@
     },
     {
       "level": "warn",
-      "code": "300475",
-      "name": "香农芯创",
-      "text": "香农芯创(300475) 于 2026-09-03 跌出共识（曾连续 5 日）"
-    },
-    {
-      "level": "warn",
       "code": "601138",
       "name": "",
       "text": "(601138) 于 2026-08-30 跌出共识（曾连续 1 日）"
@@ -204,18 +198,6 @@
       "code": "002463",
       "name": "沪电股份",
       "text": "沪电股份(002463) 于 2026-09-02 跌出共识（曾连续 4 日）"
-    },
-    {
-      "level": "warn",
-      "code": "600362",
-      "name": "江西铜业",
-      "text": "江西铜业(600362) 于 2026-09-03 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "warn",
-      "code": "301536",
-      "name": "星宸科技",
-      "text": "星宸科技(301536) 于 2026-09-03 跌出共识（曾连续 1 日）"
     }
   ],
   "sector_cluster": {
@@ -244,46 +226,46 @@
   "backtest_signal": {
     "method": "baostock 真实收盘价全面回测",
     "latest_date": "2026-09-02",
-    "total": 293,
+    "total": 299,
     "best_hold_days": 1,
     "periods": {
       "1d": {
         "win_rate": 56.9,
-        "avg_return": 0.3,
+        "avg_return": 0.29,
         "sharpe": 0.06,
-        "count": 281,
+        "count": 287,
         "best": 14.99,
         "worst": -10.02
       },
       "3d": {
         "win_rate": 39.4,
-        "avg_return": -0.9,
+        "avg_return": -0.88,
         "sharpe": -0.13,
-        "count": 281,
+        "count": 287,
         "best": 15.06,
         "worst": -10.04
       },
       "5d": {
         "win_rate": 46.8,
-        "avg_return": -0.24,
+        "avg_return": -0.23,
         "sharpe": -0.03,
-        "count": 281,
+        "count": 287,
         "best": 15.06,
         "worst": -10.08
       },
       "10d": {
         "win_rate": 51.6,
-        "avg_return": 0.84,
+        "avg_return": 0.83,
         "sharpe": 0.09,
-        "count": 281,
+        "count": 287,
         "best": 15.07,
         "worst": -10.08
       },
       "20d": {
         "win_rate": 48.7,
-        "avg_return": 0.74,
+        "avg_return": 0.72,
         "sharpe": 0.09,
-        "count": 281,
+        "count": 287,
         "best": 15.07,
         "worst": -10.04
       }
@@ -292,17 +274,17 @@
   "threshold_sensitivity": [
     {
       "band": "≥80",
-      "count": 115,
+      "count": 118,
       "win_rate_5d": 59.8,
-      "avg_ret_5d": 1.92,
+      "avg_ret_5d": 1.87,
       "best_win_rate": 64.3,
       "best_hold_days": 20
     },
     {
       "band": "70~80",
-      "count": 178,
+      "count": 181,
       "win_rate_5d": 39.9,
-      "avg_ret_5d": -1.49,
+      "avg_ret_5d": -1.47,
       "best_win_rate": 55.2,
       "best_hold_days": 1
     }
@@ -312,8 +294,8 @@
       {
         "period": "1d",
         "strict_win": 56.9,
-        "strict_ret": 0.3,
-        "strict_count": 281,
+        "strict_ret": 0.29,
+        "strict_count": 287,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -321,8 +303,8 @@
       {
         "period": "3d",
         "strict_win": 39.4,
-        "strict_ret": -0.9,
-        "strict_count": 281,
+        "strict_ret": -0.88,
+        "strict_count": 287,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -330,8 +312,8 @@
       {
         "period": "5d",
         "strict_win": 46.8,
-        "strict_ret": -0.24,
-        "strict_count": 281,
+        "strict_ret": -0.23,
+        "strict_count": 287,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -339,8 +321,8 @@
       {
         "period": "10d",
         "strict_win": 51.6,
-        "strict_ret": 0.84,
-        "strict_count": 281,
+        "strict_ret": 0.83,
+        "strict_count": 287,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -348,8 +330,8 @@
       {
         "period": "20d",
         "strict_win": 48.7,
-        "strict_ret": 0.74,
-        "strict_count": 281,
+        "strict_ret": 0.72,
+        "strict_count": 287,
         "loose_win": 0.0,
         "loose_ret": 0.0,
         "loose_count": 0
@@ -362,9 +344,9 @@
     "history_days": 14,
     "summary": {
       "1d": {
-        "count": 12,
-        "win_rate": 33.33,
-        "avg_return": 2.91
+        "count": 13,
+        "win_rate": 30.77,
+        "avg_return": 2.54
       },
       "3d": {
         "count": 8,
@@ -372,14 +354,14 @@
         "avg_return": 4.4
       },
       "5d": {
-        "count": 7,
-        "win_rate": 42.86,
-        "avg_return": 3.56
+        "count": 9,
+        "win_rate": 44.44,
+        "avg_return": 2.85
       },
       "10d": {
-        "count": 2,
-        "win_rate": 100.0,
-        "avg_return": 9.17
+        "count": 4,
+        "win_rate": 75.0,
+        "avg_return": 1.71
       },
       "20d": {
         "count": 0,
@@ -451,12 +433,21 @@
         }
       },
       {
+        "code": "688012",
+        "name": "",
+        "enter_date": "2026-08-19",
+        "offsets": {
+          "10d": -14.39
+        }
+      },
+      {
         "code": "300765",
         "name": "石药创新",
         "enter_date": "2026-08-19",
         "offsets": {
           "1d": 20.0,
-          "3d": 13.56
+          "3d": 13.56,
+          "10d": 2.9
         }
       },
       {
@@ -532,7 +523,8 @@
         "name": "香农芯创",
         "enter_date": "2026-08-30",
         "offsets": {
-          "1d": 0.0
+          "1d": 0.0,
+          "5d": 2.04
         }
       },
       {
@@ -540,7 +532,16 @@
         "name": "",
         "enter_date": "2026-08-30",
         "offsets": {
-          "1d": 0.0
+          "1d": 0.0,
+          "5d": -1.31
+        }
+      },
+      {
+        "code": "600362",
+        "name": "江西铜业",
+        "enter_date": "2026-09-03",
+        "offsets": {
+          "1d": -1.9
         }
       }
     ]
