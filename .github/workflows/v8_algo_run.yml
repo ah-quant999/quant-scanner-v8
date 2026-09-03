@@ -89,16 +89,46 @@ name: "🇨🇳 v8 盘后算法链(cn)"
 #   算法链主力已迁「☁️ v8 盘后算法链(云端)」v8_algo_cloud.yml（ubuntu-latest）。
 #   双路同时跑会向 main 推同一批 raw_data 互相覆盖，故 cn 版必须禁 cron。
 #   应急用法：云端版挂时手动 dispatch 本 workflow（cn runner 在线时仍能补算）。
+#
+# 🧭 2026-09-04 探针自动路由升格（主人令「都按你的建议做」）：本 workflow 从「应急回退」
+#   升格为「盘后链主力执行机」——云端 v8_algo_cloud.yml 每轮 schedule/repository_dispatch
+#   跑前探针查 lemoncat-cn（本机，中国 IP）是否 online+idle：是 → 按 CST 小时算 stage 转派
+#   本链，云端只留壳；否 → 云端自跑，永不断供。背景：08-05 迁云端因本机 git 被重置+API
+#   同步截断（三层修复已落地），2026-09-03 实测 cn#23/#24 全链 84min（云端同链 2h40m，
+#   ~85% 耗时=云端跨境抓数）。stage/force_run/bypass_time_gate 输入与云端分批口径一致。
 on:
   workflow_dispatch:
+    # 2026-09-04 探针路由配套：与云端 v8_algo_cloud.yml 分批口径一致
+    inputs:
+      stage:
+        description: '分批 stage（A采集/B选股/C回测/D汇总，留空=全链）。探针路由自动填写。'
+        type: string
+        default: ''
+      force_run:
+        description: '强制运行（忽略交易日/时间门控，周末/假期审计用）'
+        type: boolean
+        default: false
+      bypass_time_gate:
+        description: '绕过选股时间守门(应急:凌晨/盘前补跑用，默认关，勾选即放行)'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
+  actions: read
+
+# 🔒 2026-09-04 探针路由配套：单 runner 天然串行，但排队中的陈旧 dispatch 要封顶
+#   （1 跑 + 1 排队，与云端 v8-algo-cloud 同口径；cancel-in-progress: false 绝不打断在跑链丢产物）。
+concurrency:
+  group: v8-algo-cn
+  cancel-in-progress: false
 
 jobs:
   algo:
     runs-on: [self-hosted, cn]
-    timeout-minutes: 120
+    # 2026-09-04 提升 120 → 240：探针路由后本链承接云端分批；stage 空=全链（实测 84min）
+    #   + update_v8 + health_check + 兜底推送 40min ≈ 150min 逼近旧上限，留足余量。
+    timeout-minutes: 240
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # ⛔️ 2026-08-14 主人令永久修复：WorkBuddy safe-delete 批量删除守卫默认阈值 50
@@ -239,11 +269,21 @@ jobs:
           }
           exit 0
 
-      - name: "🧮 运行盘后算法链 → raw_data/ → 推送"
+      - name: "🧮 运行盘后算法链 → raw_data/ → 推送（2026-09-04 支持分批 stage）"
         shell: powershell
         continue-on-error: true
+        env:
+          V8_FORCE_RUN: ${{ github.event.inputs.force_run == 'true' && '1' || '' }}
+          TIME_GATE_BYPASS: ${{ github.event.inputs.bypass_time_gate == 'true' && '1' || '' }}
         run: |
-          python algorithms/run_algorithms.py
+          $stage = "${{ github.event.inputs.stage }}"
+          if ([string]::IsNullOrWhiteSpace($stage)) {
+            Write-Host "stagerouter: no stage -> full chain"
+            python algorithms/run_algorithms.py
+          } else {
+            Write-Host "stagerouter: stage = $stage"
+            python algorithms/run_algorithms.py --stage $stage
+          }
 
       # 🛡 2026-08-18 主人紧急令根治：算法链收尾前先做 4 件事，确保 data/*.js 与 HEALTH_CHECK.js
       #   必刷新——bridge_raw_data 防 raw_data 内部改名断点（如 triple_resonance_history → triple_history），
@@ -258,6 +298,59 @@ jobs:
         shell: powershell
         run: |
           python update_v8.py
+
+      - name: "🔄 同步 ALGO_TRACK 缓存戳 ?v（Contents API 直推 index.html）"
+        # 2026-09-04 自云端 v8_algo_cloud.yml 移植（包装层对齐·主人令「都按你的建议做」）：
+        #   run_algorithms 重写 data/ALGO_TRACK.js 后，index.html 的 ?v 必须跟着变，
+        #   否则 CDN 吐旧副本。cn workspace 无 index.html（API 同步只拉 algorithms/），
+        #   故改从 Contents API 读 main 的 index.html（905KB < 1MB 限额，超限自动回落 raw 模式）。
+        #   ?v 计算与 build/reconcile 逐字符一致（原始字节 + republish_time 中性化）。
+        timeout-minutes: 6
+        continue-on-error: true
+        if: always() && steps.sync_api.outcome == 'success'
+        shell: powershell
+        run: |
+          $code = @'
+          import os, re, hashlib, base64, json, urllib.request
+          token = os.environ["GITHUB_TOKEN"]
+          REPO = "ah-quant999/quant-scanner-v8"
+          API = "https://api.github.com/repos/" + REPO
+          H = {"Authorization": "Bearer " + token, "Accept": "application/vnd.github+json",
+               "X-GitHub-Api-Version": "2022-11-28"}
+          p = os.path.join("data", "ALGO_TRACK.js")
+          if not os.path.exists(p):
+              print("ALGO_TRACK.js missing in workspace, skip")
+              raise SystemExit(0)
+          b = open(p, "rb").read()
+          neutral = re.sub(rb'"republish_time"\s*:\s*"[^"]*"', b'"republish_time":""', b)
+          t = hashlib.sha1(neutral).hexdigest()[:10]
+          if not t:
+              print("hash empty, skip")
+              raise SystemExit(0)
+          req = urllib.request.Request(API + "/contents/index.html?ref=main", headers=H)
+          meta = json.load(urllib.request.urlopen(req, timeout=120))
+          sha = meta["sha"]
+          if meta.get("content"):
+              html = base64.b64decode(meta["content"]).decode("utf-8")
+          else:
+              raw_h = dict(H)
+              raw_h["Accept"] = "application/vnd.github.raw"
+              html = urllib.request.urlopen(
+                  urllib.request.Request(API + "/contents/index.html?ref=main", headers=raw_h),
+                  timeout=180).read().decode("utf-8")
+          new = re.sub(r'(ALGO_TRACK\.js)\?v=\w+', lambda m: m.group(1) + "?v=" + t, html)
+          if new == html:
+              print("ALGO_TRACK ?v already up to date:", t)
+          else:
+              body = json.dumps({"message": "chore: cn algo chain sync ALGO_TRACK ?v",
+                                 "content": base64.b64encode(new.encode("utf-8")).decode(),
+                                 "sha": sha, "branch": "main"}).encode()
+              req = urllib.request.Request(API + "/contents/index.html", data=body, headers=H, method="PUT")
+              print("push index.html ALGO_TRACK ?v:", urllib.request.urlopen(req).getcode(), "v=", t)
+          '@
+          $tmp = Join-Path $env:RUNNER_TEMP "sync_algotrack_v.py"
+          Set-Content -Path $tmp -Value $code -Encoding UTF8
+          python $tmp
 
       - name: "🩺 刷新 HEALTH_CHECK.js (v8_health_check)"
         # 2026-08-30：本 runner 在中国内网，v8_health_check.py 内部的线上比对
