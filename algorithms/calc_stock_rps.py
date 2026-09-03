@@ -21,7 +21,7 @@ calc_stock_rps.py — 个股相对强度 RPS + RS + 年线门禁
   above_ma250          : 收盘价 > MA250, A 档硬门禁
   above_ma200          : 收盘价 > MA200
 """
-import os, sys, json, time, gc, argparse
+import os, sys, json, time, gc, argparse, threading
 from datetime import datetime, timedelta
 from collections import defaultdict
 
@@ -48,47 +48,54 @@ INDEX_CODE = "000300"  # 沪深300
 INDEX_FALLBACK = "000001"  # 上证指数兜底
 INDEX_MARKET = "sh"    # 上海
 
-# ---- mootdx 客户端(单例 + 周期重置, 防 socket 泄漏) ----
-_TDX_CLIENT = None
-_TDX_CALL_COUNT = 0
+# ---- mootdx 客户端 ----
+# 🚀 2026-09-04 并行化（主人令「我只要又快又准」）：单例 → 线程本地连接。
+#   pytdx 客户端非线程安全，多线程共享同一 socket 会串包/串号；
+#   改为每线程独立连接（通达信服务器本就按连接服务，多连接安全），周期重置逻辑保留。
+_TDX_LOCAL = threading.local()
 _TDX_RESET_INTERVAL = 50
 
 
+def _tdx_state():
+    st = getattr(_TDX_LOCAL, "st", None)
+    if st is None:
+        st = {"client": None, "calls": 0}
+        _TDX_LOCAL.st = st
+    return st
+
+
 def _get_tdx():
-    global _TDX_CLIENT
-    if _TDX_CLIENT is None:
+    st = _tdx_state()
+    if st["client"] is None:
         try:
             from mootdx.quotes import Quotes
-            _TDX_CLIENT = Quotes.factory(market='std')
+            st["client"] = Quotes.factory(market='std')
         except Exception as e:
             print(f"[mootdx] init failed: {e}")
-            _TDX_CLIENT = None
-    return _TDX_CLIENT
+            st["client"] = None
+    return st["client"]
 
 
 def _tdx_reset():
-    global _TDX_CLIENT, _TDX_CALL_COUNT
-    try:
-        _TDX_CLIENT = None
-    except Exception:
-        pass
+    st = _tdx_state()
+    st["client"] = None
+    st["calls"] = 0
     try:
         gc.collect()
     except Exception:
         pass
-    _TDX_CALL_COUNT = 0
 
 
 def _query_kline_mootdx(code, days):
     """mootdx 通达信直连日K线。code: 6位。返回归一化 DataFrame 或 None。"""
-    global _TDX_CALL_COUNT
+    st = _tdx_state()
     client = _get_tdx()
     if client is None:
         return None
     try:
         df = client.bars(symbol=code, category=9, offset=days)
-        _TDX_CALL_COUNT += 1
-        if _TDX_CALL_COUNT >= _TDX_RESET_INTERVAL:
+        st["calls"] += 1
+        if st["calls"] >= _TDX_RESET_INTERVAL:
             _tdx_reset()
         if df is None or len(df) < 20:
             return None
@@ -179,6 +186,7 @@ def _query_kline_em(code, secid_prefix, days):
 
 # ---- 2026-08-22 主人令一劳永逸：baostock 第三兜底（mootdx/东财均不可达时，A股）----
 _BS_LOGGED_IN = False
+_BS_LOCK = threading.Lock()  # 🚀 2026-09-04 并行化：共享登录会话非线程安全，串行化兜底
 def _query_kline_bs(code, days):
     """baostock 日K兜底（仅 A股，6 位数字代码）。返回 DataFrame 或 None。
 
@@ -236,8 +244,9 @@ def _query_kline(code, market, days):
     df = _query_kline_em(code, prefix, days)
     if df is not None and len(df) >= 60:
         return df
-    # baostock 第三兜底（A股）
-    return _query_kline_bs(code, days)
+    # baostock 第三兜底（A股；🚀 2026-09-04 并行化：共享登录会话非线程安全，全局锁串行化）
+    with _BS_LOCK:
+        return _query_kline_bs(code, days)
 
 
 # ---- 港股 K 线 + 恒指（2026-08-22 主人令：补齐港股 RPS，按市场分组算百分位）----
@@ -320,9 +329,13 @@ def _load_cache(code, max_age_days=1):
         return None
 
 
+_CACHE_LOCK = threading.Lock()  # 🚀 2026-09-04 并行化：并发写缓存加锁
+
+
 def _save_cache(code, df):
     try:
-        df.to_json(_cache_path(code), orient="records", force_ascii=False)
+        with _CACHE_LOCK:
+            df.to_json(_cache_path(code), orient="records", force_ascii=False)
     except Exception:
         pass
 
@@ -541,6 +554,9 @@ def main():
                         help="缓存最大天数")
     parser.add_argument("--limit", type=int, default=0,
                         help="仅处理前 N 只(调试用), 0=全部")
+    parser.add_argument("--workers", type=int,
+                        default=int(os.environ.get("RPS_WORKERS", "8")),
+                        help="并行抓数线程数(默认8; 🚀 2026-09-04 并行化)")
     args = parser.parse_args()
 
     print(f"[{datetime.now().strftime('%H:%M:%S')}] 开始计算个股 RPS/RS/年线")
@@ -582,21 +598,38 @@ def main():
     metrics_map = {}
     code_market = {}
     ok = fail = 0
-    for i, s in enumerate(stocks, 1):
-        code = s["code"]
-        name = s["name"]
-        code_market[code] = s["market"]
-        print(f"[{i}/{len(stocks)}] {code} {name} ", end="", flush=True)
+    # 🚀 2026-09-04 并行化（主人令「我只要又快又准」）：串行逐只抓数实测 60min（占全链 37%）
+    #   → 线程池并行，预期 10-15min。口径完全不变：每票仍 mootdx→东财→baostock 三级兜底
+    #   + 当日缓存；指数 df 只读共享；进度按完成序输出（持续有输出，防监督器静默杀）。
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    def _work(s):
         idx = hk_index_df if s["market"] == "hk" else cn_index_df
-        df = fetch_stock_df(code, s["market"])
-        m = compute_metrics(df, idx)
-        if m:
-            metrics_map[code] = m
-            ok += 1
-            print(f"✓ close={m['close']} ret50={m['ret50']:.1f}%")
-        else:
-            fail += 1
-            print(f"✗ 数据不足({len(df) if df is not None else 0}条)")
+        df = fetch_stock_df(s["code"], s["market"])
+        return compute_metrics(df, idx), (len(df) if df is not None else 0)
+
+    workers = max(1, args.workers)
+    print(f"并行抓数: {workers} 线程 x {len(stocks)} 只...")
+    done_n = 0
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futs = {pool.submit(_work, s): s for s in stocks}
+        for fut in as_completed(futs):
+            s = futs[fut]
+            done_n += 1
+            code_market[s["code"]] = s["market"]
+            m = None
+            nrows = 0
+            try:
+                m, nrows = fut.result()
+            except Exception as e:
+                print(f"  [thread] {s['code']} {s['name']} error: {e}")
+            if m:
+                metrics_map[s["code"]] = m
+                ok += 1
+                print(f"[{done_n}/{len(stocks)}] {s['code']} {s['name']} ✓ close={m['close']} ret50={m['ret50']:.1f}%")
+            else:
+                fail += 1
+                print(f"[{done_n}/{len(stocks)}] {s['code']} {s['name']} ✗ 数据不足({nrows}条)")
 
     print(f"\n取数完成: 成功 {ok}, 失败 {fail}")
     if not metrics_map:
