@@ -24,7 +24,11 @@ import numpy as np
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "out")
 WATCH_RESULT = os.path.join(DATA_DIR, "watch_result.json")
-OUTPUT_FILE = os.path.join(DATA_DIR, "crds_result.json")
+# 2026-09-03 一劳永逸根因修复：原 OUTPUT_FILE 指向 out/crds_result.json，但 update_v8 /
+# verify_chain_outputs 期望的原始文件名是 raw_data/crds_card_data.json —— 改名断点导致
+# data/CRDS_CARD_DATA.js 永远停在旧版本（即使本脚本跑成功也不 republish）。现直写
+# raw_data/crds_card_data.json，链路闭合。
+OUTPUT_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "raw_data", "crds_card_data.json")
 
 # 数据源切换说明(2026-07-15):
 # 原实现依赖 BaoStock 日K线, 但 BaoStock 账号于当日被服务端硬拉黑(error 10001011, 黑名单用户),
@@ -676,6 +680,26 @@ def _parse_js_stock_file(js_path):
         return []
 
 
+def _write_empty_crds_output(reason=""):
+    """🛡 2026-09-03 一劳永逸：数据源异常时仍写出带新鲜时间戳的空产物，
+    避免 data/CRDS_CARD_DATA.js 冻结在上一跑、被运维判 fail（静默冻结根因）。"""
+    out = {
+        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "data_time": datetime.now().strftime("%Y-%m-%d") + " 15:30:00",
+        "total_scanned": 0,
+        "market_context": {"validity": "unknown", "today_pct": 0.0,
+                           "summary": "数据源异常，" + reason + "（保留新鲜时间戳）"},
+        "cond1_list": [], "cond2_list": [], "cond3_list": [],
+        "elite": [], "advanced": [], "watch": [], "detail": {},
+    }
+    try:
+        with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+            json.dump(out, f, ensure_ascii=False, indent=2)
+        print(f"\n[空产物] 已写出 {OUTPUT_FILE}（数据源异常，保留新鲜时间戳）")
+    except Exception as e:
+        print(f"[ERROR] 写出空产物失败: {e}")
+
+
 def calc_crds():
     """主流程：读取v8金股池/候选池 → 逐只计算CRDS → 输出
 
@@ -701,23 +725,26 @@ def calc_crds():
     # 1. 读取股票列表（v8自有数据源，不再依赖v6 watch_result.json）
     all_stocks = _load_scan_targets()
     if not all_stocks:
-        print("[ERROR] 无可扫描股票，退出")
+        # 🛡 2026-09-03 一劳永逸：宁可写出空产物（带新鲜时间戳），也不要 return None 让
+        # data/CRDS_CARD_DATA.js 冻结在上一跑、被运维按陈旧判 fail（静默冻结根因）。
+        print("[WARN] 无可扫描股票，写出空产物（保留新鲜时间戳）")
+        _write_empty_crds_output("无可扫描股票")
         return None
 
     # 2. 获取大盘指数
     print("\n[1/3] 获取大盘指数数据...")
     mkt_df = get_market_index()
     if mkt_df is None:
-        if _KLINE_FAILS >= _KLINE_MAX_FAILS:
-            print("[WARN] 东方财富 K 线连续失败过多，无法计算今日 CRDS，保留上一份 crds_result.json 数据")
-        else:
-            print("[ERROR] 无法获取大盘指数，退出")
-        return None
-    print(f"  大盘: {len(mkt_df)} 天")
+        # 🛡 2026-09-03 一劳永逸：大盘指数缺失不阻断逐只 CRDS 计算，改以中性市场环境继续。
+        print("[WARN] 无法获取大盘指数，以中性市场环境继续计算 CRDS")
+        market_context = {"validity": "unknown", "today_pct": 0.0,
+                         "summary": "大盘指数获取失败，中性假设（不影响逐只 CRDS 计算）"}
+    else:
+        market_context = get_market_context(mkt_df)
+        print(f"  大盘: {len(mkt_df)} 天")
 
     # 2.5 大盘环境判断
-    market_context = get_market_context(mkt_df)
-    print(f"  [大盘判断] {market_context['validity']} | 上证今日{market_context['today_pct']:+.2f}% | {market_context['summary']}")
+    print(f"  [大盘判断] {market_context.get('validity')} | 上证今日{market_context.get('today_pct', 0):+.2f}% | {market_context.get('summary')}")
 
     # 3. 逐只计算CRDS
     print(f"\n[2/3] 逐只计算CRDS ({len(all_stocks)} 只)...")

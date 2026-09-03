@@ -178,13 +178,17 @@ STAGES = {
         "calc_crds.py", "build_candidate_pool.py", "calc_stock_rps.py", "generate_top10.py",
         "strategy_four_volume_60m.py", "strategy_four_volume.py",
         "market_path_probability.py", "market_regime.py", "sector_recommendation.py",
+        "update_triple_resonance_history.py",   # 累积 triple_resonance_history（在 gen_triple_consensus 之前）
         "gen_triple_consensus.py", "gen_triple_track.py", "calc_volatility_watch.py",
         "gen_stock_stop.py", "gen_algo_track.py", "calc_sentiment_cycle.py",
         "refresh_dividend_cninfo.py", "calc_potential_picks.py",
+        "refresh_stock_metadata.py", "fetch_weekend_run.py",   # 周末复盘/周度汇总（原 ORDER 漏挂 STAGE）
         "auto_run_dn_algorithm.py", "track_h_auto_buy.py",
     ],
     "C": [  # 回测批（~19:00 CST，依赖 top10/crds history）：backtest 全家
         "scripts/ab_universe_backtest.py", "backtest_tdx.py", "backtest_comprehensive.py",
+        "export_optimized_strategy.py",   # 读 backtest_tdx.json 汇总优化策略（在 backtest_tdx 之后）
+        "v8/backtest_crds.py", "v8/backtest_rps.py",   # 逆势龙头/相对强度 回测（原 ORDER 漏挂 STAGE）
     ],
     "D": [  # 汇总批（~20:00 CST，依赖全部）：final_recommend + LHB历史/7d/生命周期
         "final_recommend.py",

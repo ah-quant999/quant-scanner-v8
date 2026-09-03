@@ -115,8 +115,9 @@ def main():
     check_stock_picking_ready(by='gen_triple_consensus')
 
     top10 = load_json(os.path.join(DATA_DIR, "top10_daily.json"), {})
-    # 🔴 2026-08-06 改 v8 命名：stage_to_raw 把 out/cockpit_tier_recommend_alimi.json 提升为 raw_data//* cockpit_tier_recommend.json 已下线 2026-09-03 */
-    tier = load_json(os.path.join(DATA_DIR, "/* cockpit_tier_recommend.json 已下线 2026-09-03 */"), {})
+    # 2026-09-03 主人令：驾驶舱(分档)已下线，三重共识不再依赖驾驶舱分档（in_a/in_b 恒为假）。
+    # 保留 tier={} 占位，避免加载已删除文件报错；严格三重共识改为仅以 TOP10+基本面A 判定。
+    tier = {}
     fundamental = load_json(os.path.join(DATA_DIR, "fundamental_quality.json"), {})
     gold_pool = load_json(os.path.join(DATA_DIR, "gold_pool.json"), {})
 

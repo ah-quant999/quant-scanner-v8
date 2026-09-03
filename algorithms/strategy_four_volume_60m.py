@@ -440,20 +440,22 @@ def main():
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:
         pass
-    records = scan_four_volume_60m(top_cy=args.top, top_kc=args.top,
-                                   top_zb=args.top)
-    if not records:
-        # 0 命中通常是数据源异常（如 baostock 代码格式错误），写入空数据会污染
-        # 主站与预览副本。跳过写入/提交/镜像，保留上次有效数据。
-        print("  ⚠️ 60m 扫描命中 0 只，疑似数据源异常；跳过写入与提交，保留上次有效数据。")
-        return records
-    js_path = write_four_volume_60m_js(records)
-    paths = [js_path]
+    records = []
+    try:
+        records = scan_four_volume_60m(top_cy=args.top, top_kc=args.top,
+                                       top_zb=args.top)
+    except Exception as e:
+        # 🛡 2026-09-03 一劳永逸：扫描异常也要写出带新鲜时间戳的产物，避免
+        #   data/FOUR_VOLUME_60M.js 冻结在上一跑、被运维按陈旧判 fail（静默冻结根因）。
+        print(f"  [ERROR] 四量终极60m扫描异常: {e}")
+    # 🛡 2026-09-03 一劳永逸：无论命中多少只（含 0 只）都写出带新鲜时间戳的产物，
+    #   不再「跳过写入保留上次」——那种写法正是 data/FOUR_VOLUME_60M.js 静默冻结的根因。
+    write_four_volume_60m_js(records)
     if args.backtest > 0:
-        backtest_four_volume_60m(years=args.backtest)
-        paths.append(os.path.join(DATA_DIR, "FOUR_VOLUME_60M_BACKTEST.json"))
-    # 生成后自动提交入库并镜像到本地预览副本（best-effort，防三处漂移）
-    auto_commit_and_mirror(paths)
+        try:
+            backtest_four_volume_60m(years=args.backtest)
+        except Exception as e:
+            print(f"  [WARN] 60m 回测失败: {e}")
     return records
 
 

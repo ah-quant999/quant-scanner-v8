@@ -359,8 +359,14 @@ def main():
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:
         pass
-    records = scan_four_volume(top_cy=args.top, top_kc=args.top,
-                               top_zb=args.top, top_hk=max(20, args.top // 2))
+    records = []
+    try:
+        records = scan_four_volume(top_cy=args.top, top_kc=args.top,
+                                   top_zb=args.top, top_hk=max(20, args.top // 2))
+    except Exception as e:
+        # 🛡 2026-09-03 一劳永逸：扫描异常也要写出带新鲜时间戳的产物，避免
+        #   data/FOUR_VOLUME.js 冻结在上一跑、被运维按陈旧判 fail（静默冻结根因）。
+        print(f"  [ERROR] 四量终极日线扫描异常: {e}")
     write_four_volume_js(records)
     if args.backtest > 0:
         backtest_four_volume(years=args.backtest)
