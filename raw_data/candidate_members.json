@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-04 03:07:40",
+  "update_time": "2026-09-04 03:26:04",
   "total": 459,
   "hysteresis_days": 5,
   "source_dist": {
@@ -473,7 +473,7 @@
     },
     "sz_000938": {
       "code": "000938",
-      "name": "紫光股份",
+      "name": "民生国际",
       "market": "sz",
       "board_label": "主板",
       "sources": [
@@ -619,7 +619,7 @@
     },
     "sz_002536": {
       "code": "002536",
-      "name": "飞龙股份",
+      "name": "百乐皇宫",
       "market": "sz",
       "board_label": "主板",
       "sources": [
@@ -743,7 +743,7 @@
     },
     "sz_000725": {
       "code": "000725",
-      "name": "000725",
+      "name": "恒都集团",
       "market": "sz",
       "board_label": "主板",
       "sources": [
@@ -805,7 +805,7 @@
     },
     "sz_000636": {
       "code": "000636",
-      "name": "风华高科",
+      "name": "KLN",
       "market": "sz",
       "board_label": "主板",
       "sources": [
@@ -1077,7 +1077,7 @@
     },
     "sz_002396": {
       "code": "002396",
-      "name": "星网锐捷",
+      "name": "青城新药－B",
       "market": "sz",
       "board_label": "主板",
       "sources": [
@@ -1132,7 +1132,7 @@
     },
     "sz_002008": {
       "code": "002008",
-      "name": "大族激光",
+      "name": "凤凰卫视",
       "market": "sz",
       "board_label": "主板",
       "sources": [
@@ -1269,7 +1269,7 @@
     },
     "sz_002407": {
       "code": "002407",
-      "name": "多氟多",
+      "name": "高视医疗",
       "market": "sz",
       "board_label": "主板",
       "sources": [
@@ -1341,7 +1341,7 @@
     },
     "sz_002297": {
       "code": "002297",
-      "name": "博云新材",
+      "name": "润迈德－B",
       "market": "sz",
       "board_label": "主板",
       "sources": [
@@ -1445,7 +1445,7 @@
     },
     "sz_002436": {
       "code": "002436",
-      "name": "兴森科技",
+      "name": "凌雄科技",
       "market": "sz",
       "board_label": "主板",
       "sources": [
@@ -1490,7 +1490,7 @@
     },
     "sz_002371": {
       "code": "002371",
-      "name": "北方华创",
+      "name": "创联控股",
       "market": "sz",
       "board_label": "主板",
       "sources": [
@@ -1822,7 +1822,7 @@
     },
     "sz_002281": {
       "code": "002281",
-      "name": "光迅科技",
+      "name": "兴泸水务",
       "market": "sz",
       "board_label": "主板",
       "sources": [
@@ -2073,7 +2073,7 @@
     },
     "sz_002155": {
       "code": "002155",
-      "name": "湖南黄金",
+      "name": "森松国际",
       "market": "sz",
       "board_label": "主板",
       "sources": [
@@ -2167,7 +2167,7 @@
     },
     "sz_000807": {
       "code": "000807",
-      "name": "云铝股份",
+      "name": "上海实业环境",
       "market": "sz",
       "board_label": "主板",
       "sources": [
@@ -2248,7 +2248,7 @@
     },
     "sz_002156": {
       "code": "002156",
-      "name": "通富微电",
+      "name": "建发物业",
       "market": "sz",
       "board_label": "主板",
       "sources": [

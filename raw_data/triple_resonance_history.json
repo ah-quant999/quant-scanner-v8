@@ -288,6 +288,9 @@
     "301536": {
       "2026-09-03": 0,
       "2026-09-04": 128.18
+    },
+    "000807": {
+      "2026-09-04": 27.38
     }
   },
   "_tracking_latest": {
@@ -375,9 +378,9 @@
     "688331": {
       "enter_date": "2026-08-17",
       "enter_close": 0,
-      "last_date": "2026-08-20",
-      "last_close": 128.31,
-      "status": "dropped",
+      "last_date": "2026-09-04",
+      "last_close": 133.52,
+      "status": "near",
       "streak": 2,
       "total_days": 2
     },
@@ -437,9 +440,9 @@
     "300765": {
       "enter_date": "2026-08-19",
       "enter_close": 44.4,
-      "last_date": "2026-08-29",
-      "last_close": 49.0,
-      "status": "dropped",
+      "last_date": "2026-09-04",
+      "last_close": 44.4,
+      "status": "near",
       "streak": 2,
       "total_days": 3
     },
@@ -551,7 +554,7 @@
       "enter_date": "2026-08-30",
       "enter_close": 172.1,
       "last_date": "2026-09-04",
-      "last_close": 169.65,
+      "last_close": 175.61,
       "status": "near",
       "streak": 6,
       "total_days": 6
@@ -600,12 +603,20 @@
       "status": "near",
       "streak": 2,
       "total_days": 2
+    },
+    "000807": {
+      "enter_date": "2026-09-04",
+      "enter_close": 27.38,
+      "last_date": "2026-09-04",
+      "last_close": 27.38,
+      "status": "near",
+      "streak": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-09-04 02:03:33"
+    "last_update": "2026-09-04 04:52:40"
   },
   "2026-08-18": [
     {
@@ -1200,7 +1211,7 @@
       "status": "near"
     }
   ],
-  "update_time": "2026-09-04 02:03:33",
+  "update_time": "2026-09-04 04:52:40",
   "2026-08-30": [
     {
       "code": "300475",
@@ -1623,47 +1634,56 @@
   ],
   "2026-09-04": [
     {
-      "code": "300475",
-      "name": "香农芯创",
-      "market": "sz",
-      "board": "创业板",
-      "close": 169.65,
-      "pct_chg": -4.69,
-      "total_score": 29.1,
+      "code": "688331",
+      "name": "荣昌生物",
+      "market": "sh",
+      "board": "科创板",
+      "close": 133.52,
+      "pct_chg": -0.35,
+      "total_score": 59.0,
       "quality_grade": "A",
-      "industry": "批发业",
+      "industry": "医药制造业",
       "sectors": [
-        "科技风格",
-        "MSCI中国",
-        "2026一季报预增",
-        "2026中报预增",
-        "深股通",
-        "半导体概念",
-        "批发业",
-        "存储芯片"
+        "医药制造业"
       ],
-      "signal_count": 1,
+      "signal_count": 2,
       "status": "near"
     },
     {
-      "code": "600362",
-      "name": "江西铜业",
-      "market": "sh",
+      "code": "000807",
+      "name": "上海实业环境",
+      "market": "sz",
       "board": "主板",
-      "close": 49.01,
-      "pct_chg": -0.39,
-      "total_score": 28.3,
-      "quality_grade": "C",
+      "close": 27.38,
+      "pct_chg": 3.05,
+      "total_score": 58.4,
+      "quality_grade": "A",
       "industry": "有色金属冶炼和压延加工业",
       "sectors": [
-        "参股银行",
-        "新材料",
-        "一带一路",
-        "MSCI中国",
-        "有色金属冶炼和压延加工业",
+        "深股通",
+        "稀缺资源",
+        "深证100R",
         "2026中报预增",
-        "机构重仓",
-        "稀缺资源"
+        "深成500",
+        "有色金属冶炼和压延加工业",
+        "HS300",
+        "MSCI中国"
+      ],
+      "signal_count": 2,
+      "status": "near"
+    },
+    {
+      "code": "300765",
+      "name": "石药创新",
+      "market": "sz",
+      "board": "创业板",
+      "close": 44.4,
+      "pct_chg": -0.09,
+      "total_score": 57.1,
+      "quality_grade": "A",
+      "industry": "食品制造业",
+      "sectors": [
+        "食品制造业"
       ],
       "signal_count": 2,
       "status": "near"
@@ -1671,17 +1691,47 @@
     {
       "code": "301536",
       "name": "星宸科技",
-      "market": "创业板",
+      "market": "sz",
       "board": "创业板",
       "close": 128.18,
-      "pct_chg": 0,
-      "total_score": 25,
+      "pct_chg": -1.15,
+      "total_score": 55.3,
       "quality_grade": "A",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "计算机、通信和其他电子设备制造业"
+        "超清视频",
+        "AI眼镜",
+        "2026中报预增",
+        "激光雷达",
+        "计算机、通信和其他电子设备制造业",
+        "电子后视镜",
+        "生物识别",
+        "机构重仓"
       ],
       "signal_count": 2,
+      "status": "near"
+    },
+    {
+      "code": "300475",
+      "name": "香农芯创",
+      "market": "sz",
+      "board": "创业板",
+      "close": 175.61,
+      "pct_chg": 4.65,
+      "total_score": 48.4,
+      "quality_grade": "A",
+      "industry": "批发业",
+      "sectors": [
+        "深股通",
+        "2026中报预增",
+        "批发业",
+        "2026一季报预增",
+        "半导体概念",
+        "存储芯片",
+        "MSCI中国",
+        "科技风格"
+      ],
+      "signal_count": 1,
       "status": "near"
     }
   ]

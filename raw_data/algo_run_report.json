@@ -1,15 +1,15 @@
 {
-  "update_time": "2026-09-04 02:42:35",
-  "run_start": "2026-09-04 01:32:35",
+  "update_time": "2026-09-04 05:48:16",
+  "run_start": "2026-09-04 02:51:49",
   "ok": 41,
   "fail": 2,
   "failed_scripts": [
     {
-      "script": "scripts/ab_universe_backtest.py",
-      "reason": "监督器静默杀(>15min 无输出)"
+      "script": "calc_stock_rps.py",
+      "reason": "超时 >60min"
     },
     {
-      "script": "auto_run_dn_algorithm.py",
+      "script": "scripts/ab_universe_backtest.py",
       "reason": "监督器静默杀(>15min 无输出)"
     }
   ],

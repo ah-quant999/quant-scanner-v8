@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-09-04 02:11:58",
-  "generated": "2026-09-04 02:11:58",
+  "update_time": "2026-09-04 05:25:01",
+  "generated": "2026-09-04 05:25:01",
   "period_start": "2026-08-24",
   "period_end": "2026-08-30",
   "stats": {
@@ -9,35 +9,29 @@
     "tracked_files": 10,
     "ok_files": 8,
     "missing_files": 2,
-    "latest_health": {
-      "ok": 103,
-      "warn": 5,
-      "fail": 6,
-      "total": 114,
-      "updated": "2026-09-04 00:53:13"
-    }
+    "latest_health": null
   },
   "freshness": [
     {
       "file": "lhb_data.json",
       "label": "龙虎榜",
       "status": "ok",
-      "update_time": "2026-09-03 23:31:24",
+      "update_time": "2026-09-04 01:38:37",
       "size_kb": 21.2
     },
     {
       "file": "triple_history.json",
       "label": "三重共振历史",
       "status": "ok",
-      "update_time": "2026-09-04 00:01:27",
-      "size_kb": 26.2
+      "update_time": "2026-09-04 00:54:58",
+      "size_kb": 25.7
     },
     {
       "file": "top10_daily.json",
       "label": "全站精选",
       "status": "ok",
-      "update_time": "2026-09-04 01:43:27",
-      "size_kb": 29.5
+      "update_time": "2026-09-04 04:26:36",
+      "size_kb": 29.6
     },
     {
       "file": "/* cockpit 已下线 2026-09-03 */_tier_recommend.json",
@@ -49,29 +43,29 @@
       "file": "sector_rs.json",
       "label": "板块相对强度",
       "status": "ok",
-      "update_time": "2026-09-03 23:30",
+      "update_time": "2026-09-04 01:37",
       "size_kb": 72.1
     },
     {
       "file": "final_recommend.json",
       "label": "最终推荐池",
       "status": "ok",
-      "update_time": "2026-09-03 05:09:09",
-      "size_kb": 40.4
+      "update_time": "2026-09-04 02:35:05",
+      "size_kb": 69.7
     },
     {
       "file": "gold_pool.json",
       "label": "黄金池",
       "status": "ok",
-      "update_time": "2026-09-04 00:20:14",
-      "size_kb": 488.2
+      "update_time": "2026-09-04 02:42:36",
+      "size_kb": 521.5
     },
     {
       "file": "candidate.json",
       "label": "候选池",
       "status": "ok",
-      "update_time": "2026-09-03 23:32:58",
-      "size_kb": 245.9
+      "update_time": "2026-09-04 01:40:08",
+      "size_kb": 187.2
     },
     {
       "file": "four_volume.json",
@@ -83,8 +77,8 @@
       "file": "crds_card_data.json",
       "label": "逆势龙头",
       "status": "ok",
-      "update_time": "2026-09-04 01:39:34",
-      "size_kb": 59.1
+      "update_time": "2026-09-04 03:24:48",
+      "size_kb": 0.4
     }
   ],
   "source_note": "v8 周度运行汇总（轻量，离线可跑；由 algorithms/run_algorithms.py 周末链路调用）"
