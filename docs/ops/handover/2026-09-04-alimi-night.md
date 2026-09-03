@@ -61,3 +61,21 @@
 6. 选股策略页：三重共识/最终推荐/四量 更新时间应为 09-04 02:xx（cn#24 产物）；
 7. algo_run_report.json 的 failed_scripts 应只剩 ab_universe_backtest（或 0）；
 8. 健康面板 SECTOR_FUND_TRACK 若仍 09-02 → 查 v8_cn_fetch_cloud #1260 日志 build_sector_fund_track 步骤。
+
+---
+
+## 【03:30 终验完成】cn#24 success——时间闸门根修实证生效（阿狸咪）
+
+**cn#24**：success（01:31→03:28，链本体 ~84min）。algo_run_report：**41 成功 / 2 失败，skipped_by_time_gate = []（根修生效）**。
+
+| 数据文件 | 时间 | 状态 |
+|---|---|---|
+| TRIPLE_CONSENSUS | 09-04 02:03 | ✅ 完整产出；count=0 为**真结果**（无股票同时满足三条严格标准），near_miss 5 只全字段齐（荣昌生物 rank1） |
+| FINAL_RECOMMEND_DATA | 09-04 02:35 | ✅ 66 候选；Top5 全字段（紫金 rank1 sources=[ROE_TTM,高手跟踪]——点前缀根修自愈实证，close/止损/目标/支撑/ATR/backtest/tracking/action 全齐） |
+| CRDS_CARD_DATA | 09-04 01:39 | ✅ total_scanned=137（脱离 21:33 半成品） |
+| BACKTEST_COMPREHENSIVE | 09-04 01:58 | ✅ 脱离 13:14 旧值 |
+| CANDIDATE_QUOTES / H_AUTO_BUY | 01:54 / 00:20 | ✅ |
+
+剩余 2 失败均为监督器静默杀（>15min 无输出）：ab_universe_backtest + auto_run_dn_algorithm——**明日待办 #1**，查这两脚本为何长时间无输出（云端同病）。
+
+其他遗留（交接原 8 条核对清单基础上）：SECTOR_FUND_TRACK 仍 09-02 16:18（查 v8_cn_fetch_cloud #1260 日志）；FACTOR_LAB 09-03 01:55 / MACRO / ETF_SUBSCRIPTION 12:5x 未被 algo 链覆盖（归 cn_fetch 链，今日白天链会刷）。
