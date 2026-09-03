@@ -79,3 +79,20 @@
 剩余 2 失败均为监督器静默杀（>15min 无输出）：ab_universe_backtest + auto_run_dn_algorithm——**明日待办 #1**，查这两脚本为何长时间无输出（云端同病）。
 
 其他遗留（交接原 8 条核对清单基础上）：SECTOR_FUND_TRACK 仍 09-02 16:18（查 v8_cn_fetch_cloud #1260 日志）；FACTOR_LAB 09-03 01:55 / MACRO / ETF_SUBSCRIPTION 12:5x 未被 algo 链覆盖（归 cn_fetch 链，今日白天链会刷）。
+
+---
+
+## 【06:50 补充】主人晨起令「2到5现在做」——四件全部落地（阿狸咪 06:50 写）
+
+| # | 事项 | 落地内容 | 核对方法 |
+|---|---|---|---|
+| 2 | **探针自动路由** | `v8_algo_cloud.yml` 新增「🧭 探针路由」步：schedule/repository_dispatch 跑前用 V8_GH_TOKEN 查 lemoncat-cn 是否 online+idle → 在线则按 CST 小时算 stage 转派 cn 链（v8_algo_run.yml inputs.stage），云端重活全跳；离线/忙/转派失败**一律回落云端永不断供**。手动 workflow_dispatch 不路由（保留 force_run 语义） | 今晚 16:40 stage A 看云端 run 日志「🧭 探针路由」输出 |
+| 3 | **calc_stock_rps 并行化** | 串行 60min（占全链 37%）→ 8 线程并行：mootdx 改线程本地连接（pytdx 非线程安全）、baostock 全局锁串行化、缓存写加锁；三级兜底与输出口径不变 | 明晚 B 批 step 耗时应 60min→10-15min |
+| 4 | **cn 版包装层移植** | `v8_algo_run.yml`：inputs（stage/force_run/bypass_time_gate）+ concurrency（v8-algo-cn，1跑1排队）+ timeout 120→240 + 运行步支持 --stage + **ALGO_TRACK ?v 缓存戳步**（Contents API 读 main index.html，>1MB 回落 raw 模式） | 路由发生后看 cn run 步骤列表 |
+| 5 | **因子实验室升4⭐证据链** | 新脚本 `algorithms/factor_lab_backtest.py`（异常量比五分位分层 point-in-time 回测：700日长历史×~40调仓点，各层净收/胜率/净值回撤/OOS/分季稳定性 + ROE Top30 对比），挂链 STAGE-C，`update_v8` 映射 window.FACTOR_LAB_BACKTEST，暂未上架因子卡新增「📊 独立分层回测」区块（升3⭐判据自动判定） | 今晚 19:15 C 批后暂未上架卡出现回测表 |
+
+**质量关**：回测脚本过了**沙箱单元测试**（合成数据植入已知效应 → 正确测出 PASS）；run_algorithms 生产级 STAGES 并集 assert 通过；node 23 段 0 错；4+2 文件全部回读逐字节一致。
+
+**⚠️ 生效时点**：探针路由/并行化/回测挂链均自**下一轮链**（今晚 16:40 A 批）生效；cn 版 workflow 变更自下次 dispatch 生效。
+
+**小九注意**：① `v8/factor_lab_gen.py`（本机脚本）今晚不动，全市场扫描开关未实现（卡片措辞已中性化）；② 云端链被路由跳过时结论是 success（秒级完成属正常，看日志「🧭 探针路由」确认转派）；③ cn#24 之后 runner 无异常不要手动 dispatch。
