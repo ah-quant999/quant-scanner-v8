@@ -1480,6 +1480,13 @@ _OCR_DEPENDENCY_FILES = {
     "STOCK_MOMENTUM_STATE",
     "STOCK_MOMENTUM_STATE_V2",
 }
+_RETIRED_FILES = {
+    # 🛡 2026-09-04 一劳永逸：热门赛道资金追踪卡已随 09-03 暂未上架轻量化重构移除（前端 0 引用），
+    # 但云端 cn_fetch 生成器仍在产出、文件残留 main。陈旧=预期（无消费者），
+    # 从 items[] 完全排除，消除 all_SECTOR_FUND_TRACK 永远 FAIL 的误报。
+    # 待主人拍板「彻底清理」后，连同 cn_fetch 生成器步骤与数据文件一并删除。
+    "SECTOR_FUND_TRACK",
+}
 _LOW_FREQ_FILES = {
     "STOCK_PROFILE", "WEEKEND_META_REPORT", "PORTFOLIO", "PORTFOLIO_COST",
     "CONCEPT_ETF_MAP", "OPTIMIZED_STRATEGY", "BACKTEST_TDX",
@@ -1509,6 +1516,9 @@ def check_all_data_files():
             continue
         # 🛡 2026-08-19 一劳永逸：OCR 依赖文件彻底跳过（不输出 items[] → 不渲染告警卡）
         if vid in _OCR_DEPENDENCY_FILES:
+            continue
+        # 🛡 2026-09-04 一劳永逸：已下线卡的残留数据文件（生成器仍在跑但前端无消费者）
+        if vid in _RETIRED_FILES:
             continue
         # 🛡 2026-08-28 一劳永逸：取线上站点与本地文件中时间戳较新的一个，
         # 避免算法链刚部署但 CDN 缓存未刷新导致的旧值误报，同时兼容本地未 pull 的场景。
