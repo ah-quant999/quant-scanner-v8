@@ -1,11 +1,11 @@
-window.CRDS_BACKTEST = {
- "update_time": "2026-09-03 08:11:06",
+window.ALLSITE_BACKTEST = {
+ "update_time": "2026-09-03 08:11:07",
  "summary": {
-  "update_time": "2026-09-03 08:11:06",
-  "total_signals": 4,
-  "calc_time": "2026-09-03 08:11:06",
-  "method": "CRDS 逆势龙头 advanced 档历史回测：信号日收盘价买入，持有N个交易日收盘价卖出（不处理节假日，按日历日+1/3/5/10/20）",
-  "signal_date_range": "2026-08-01 ~ 2026-08-01",
+  "update_time": "2026-09-03 08:11:07",
+  "total_signals": 0,
+  "calc_time": "2026-09-03 08:11:07",
+  "method": "全站精选历史回测 · 无历史 final_recommend 信号（每日归档自 2026-09-02 起生效，待累积 dated 快照）",
+  "signal_date_range": "—",
   "by_period": {
    "1": {
     "samples": 0,

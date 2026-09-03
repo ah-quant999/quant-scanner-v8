@@ -1,12 +1,16 @@
 {
-  "update_time": "2026-09-03 05:36:23",
-  "run_start": "2026-09-03 04:07:55",
-  "ok": 43,
-  "fail": 6,
+  "update_time": "2026-09-03 08:11:27",
+  "run_start": "2026-09-03 05:40:38",
+  "ok": 42,
+  "fail": 7,
   "failed_scripts": [
     {
       "script": "calc_crds.py",
       "reason": "退出码 1 | ============================================================"
+    },
+    {
+      "script": "calc_stock_rps.py",
+      "reason": "超时 >60min"
     },
     {
       "script": "generate_top10.py",

@@ -1,13 +1,15 @@
 {
-"update_time": "2026-09-03 05:24:02",
-"total": 9609,
-"new_listings_count": 0,
+"update_time": "2026-09-03 07:57:27",
+"total": 9610,
+"new_listings_count": 1,
 "delisted_count": 0,
-"new_listings": [],
+"new_listings": [
+"561530 银行ETF银华"
+],
 "delisted": [],
-"meta_enriched": 0,
+"meta_enriched": 1,
 "guard_tripped": false,
 "guard_reasons": [],
 "old_universe": 9609,
-"fresh_universe": 9609
+"fresh_universe": 9610
 }

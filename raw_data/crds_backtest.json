@@ -1,302 +1,63 @@
 {
-  "update_time": "2026-09-03 07:29:05",
+  "update_time": "2026-09-03 08:11:06",
   "summary": {
-    "update_time": "2026-09-03 07:29:05",
-    "total_signals": 7,
-    "calc_time": "2026-09-03 07:29:05",
+    "update_time": "2026-09-03 08:11:06",
+    "total_signals": 4,
+    "calc_time": "2026-09-03 08:11:06",
     "method": "CRDS 逆势龙头 advanced 档历史回测：信号日收盘价买入，持有N个交易日收盘价卖出（不处理节假日，按日历日+1/3/5/10/20）",
-    "signal_date_range": "2026-08-01 ~ 2026-09-02",
+    "signal_date_range": "2026-08-01 ~ 2026-08-01",
     "by_period": {
       "1": {
-        "samples": 4,
-        "win_rate": 100.0,
-        "avg_return": 4.04,
-        "best_return": 4.56,
-        "worst_return": 3.03,
-        "win_avg": 4.04,
+        "samples": 0,
+        "win_rate": 0,
+        "avg_return": 0,
+        "best_return": 0,
+        "worst_return": 0,
+        "win_avg": 0,
         "loss_avg": 0,
         "profit_loss_ratio": 0
       },
       "3": {
-        "samples": 4,
-        "win_rate": 100.0,
-        "avg_return": 16.93,
-        "best_return": 21.7,
-        "worst_return": 12.16,
-        "win_avg": 16.93,
+        "samples": 0,
+        "win_rate": 0,
+        "avg_return": 0,
+        "best_return": 0,
+        "worst_return": 0,
+        "win_avg": 0,
         "loss_avg": 0,
         "profit_loss_ratio": 0
       },
       "5": {
-        "samples": 4,
-        "win_rate": 100.0,
-        "avg_return": 27.18,
-        "best_return": 44.32,
-        "worst_return": 18.75,
-        "win_avg": 27.18,
+        "samples": 0,
+        "win_rate": 0,
+        "avg_return": 0,
+        "best_return": 0,
+        "worst_return": 0,
+        "win_avg": 0,
         "loss_avg": 0,
         "profit_loss_ratio": 0
       },
       "10": {
-        "samples": 4,
-        "win_rate": 100.0,
-        "avg_return": 30.91,
-        "best_return": 49.33,
-        "worst_return": 19.36,
-        "win_avg": 30.91,
+        "samples": 0,
+        "win_rate": 0,
+        "avg_return": 0,
+        "best_return": 0,
+        "worst_return": 0,
+        "win_avg": 0,
         "loss_avg": 0,
         "profit_loss_ratio": 0
       },
       "20": {
-        "samples": 4,
-        "win_rate": 75.0,
-        "avg_return": 28.8,
-        "best_return": 54.98,
-        "worst_return": -0.1,
-        "win_avg": 38.44,
-        "loss_avg": -0.1,
-        "profit_loss_ratio": 399.43
+        "samples": 0,
+        "win_rate": 0,
+        "avg_return": 0,
+        "best_return": 0,
+        "worst_return": 0,
+        "win_avg": 0,
+        "loss_avg": 0,
+        "profit_loss_ratio": 0
       }
     }
   },
-  "signals": [
-    {
-      "signal_date": "2026-08-01",
-      "entry_trade_date": "2026-08-03",
-      "code": "000603",
-      "name": "盛达资源",
-      "entry_price": 25.72,
-      "periods": {
-        "1": {
-          "return_pct": 3.03,
-          "exit_price": 26.5,
-          "exit_date": "2026-08-04"
-        },
-        "3": {
-          "return_pct": 21.7,
-          "exit_price": 31.3,
-          "exit_date": "2026-08-06"
-        },
-        "5": {
-          "return_pct": 44.32,
-          "exit_price": 37.12,
-          "exit_date": "2026-08-10"
-        },
-        "10": {
-          "return_pct": 25.23,
-          "exit_price": 32.21,
-          "exit_date": "2026-08-13"
-        },
-        "20": {
-          "return_pct": 54.98,
-          "exit_price": 39.86,
-          "exit_date": "2026-08-24"
-        }
-      }
-    },
-    {
-      "signal_date": "2026-08-01",
-      "entry_trade_date": "2026-08-03",
-      "code": "002396",
-      "name": "星网锐捷",
-      "entry_price": 24.96,
-      "periods": {
-        "1": {
-          "return_pct": 4.53,
-          "exit_price": 26.09,
-          "exit_date": "2026-08-04"
-        },
-        "3": {
-          "return_pct": 16.27,
-          "exit_price": 29.02,
-          "exit_date": "2026-08-06"
-        },
-        "5": {
-          "return_pct": 20.31,
-          "exit_price": 30.03,
-          "exit_date": "2026-08-10"
-        },
-        "10": {
-          "return_pct": 29.73,
-          "exit_price": 32.38,
-          "exit_date": "2026-08-13"
-        },
-        "20": {
-          "return_pct": 28.53,
-          "exit_price": 32.08,
-          "exit_date": "2026-08-24"
-        }
-      }
-    },
-    {
-      "signal_date": "2026-08-01",
-      "entry_trade_date": "2026-08-03",
-      "code": "000636",
-      "name": "风华高科",
-      "entry_price": 51.96,
-      "periods": {
-        "1": {
-          "return_pct": 4.56,
-          "exit_price": 54.33,
-          "exit_date": "2026-08-04"
-        },
-        "3": {
-          "return_pct": 12.16,
-          "exit_price": 58.28,
-          "exit_date": "2026-08-06"
-        },
-        "5": {
-          "return_pct": 18.75,
-          "exit_price": 61.7,
-          "exit_date": "2026-08-10"
-        },
-        "10": {
-          "return_pct": 19.36,
-          "exit_price": 62.02,
-          "exit_date": "2026-08-13"
-        },
-        "20": {
-          "return_pct": -0.1,
-          "exit_price": 51.91,
-          "exit_date": "2026-08-24"
-        }
-      }
-    },
-    {
-      "signal_date": "2026-08-01",
-      "entry_trade_date": "2026-08-03",
-      "code": "300534",
-      "name": "陇神戎发",
-      "entry_price": 12.67,
-      "periods": {
-        "1": {
-          "return_pct": 4.03,
-          "exit_price": 13.18,
-          "exit_date": "2026-08-04"
-        },
-        "3": {
-          "return_pct": 17.6,
-          "exit_price": 14.9,
-          "exit_date": "2026-08-06"
-        },
-        "5": {
-          "return_pct": 25.34,
-          "exit_price": 15.88,
-          "exit_date": "2026-08-10"
-        },
-        "10": {
-          "return_pct": 49.33,
-          "exit_price": 18.92,
-          "exit_date": "2026-08-13"
-        },
-        "20": {
-          "return_pct": 31.81,
-          "exit_price": 16.7,
-          "exit_date": "2026-08-24"
-        }
-      }
-    },
-    {
-      "signal_date": "2026-09-02",
-      "entry_trade_date": "2026-09-02",
-      "code": "600103",
-      "name": "青山纸业",
-      "entry_price": 3.93,
-      "periods": {
-        "1": {
-          "return_pct": null,
-          "exit_price": null,
-          "exit_date": "2026-09-03"
-        },
-        "3": {
-          "return_pct": null,
-          "exit_price": null,
-          "exit_date": "2026-09-05"
-        },
-        "5": {
-          "return_pct": null,
-          "exit_price": null,
-          "exit_date": "2026-09-07"
-        },
-        "10": {
-          "return_pct": null,
-          "exit_price": null,
-          "exit_date": "2026-09-12"
-        },
-        "20": {
-          "return_pct": null,
-          "exit_price": null,
-          "exit_date": "2026-09-22"
-        }
-      }
-    },
-    {
-      "signal_date": "2026-09-02",
-      "entry_trade_date": "2026-09-02",
-      "code": "600722",
-      "name": "金牛化工",
-      "entry_price": 19.26,
-      "periods": {
-        "1": {
-          "return_pct": null,
-          "exit_price": null,
-          "exit_date": "2026-09-03"
-        },
-        "3": {
-          "return_pct": null,
-          "exit_price": null,
-          "exit_date": "2026-09-05"
-        },
-        "5": {
-          "return_pct": null,
-          "exit_price": null,
-          "exit_date": "2026-09-07"
-        },
-        "10": {
-          "return_pct": null,
-          "exit_price": null,
-          "exit_date": "2026-09-12"
-        },
-        "20": {
-          "return_pct": null,
-          "exit_price": null,
-          "exit_date": "2026-09-22"
-        }
-      }
-    },
-    {
-      "signal_date": "2026-09-02",
-      "entry_trade_date": "2026-09-02",
-      "code": "002396",
-      "name": "星网锐捷",
-      "entry_price": 39.83,
-      "periods": {
-        "1": {
-          "return_pct": null,
-          "exit_price": null,
-          "exit_date": "2026-09-03"
-        },
-        "3": {
-          "return_pct": null,
-          "exit_price": null,
-          "exit_date": "2026-09-05"
-        },
-        "5": {
-          "return_pct": null,
-          "exit_price": null,
-          "exit_date": "2026-09-07"
-        },
-        "10": {
-          "return_pct": null,
-          "exit_price": null,
-          "exit_date": "2026-09-12"
-        },
-        "20": {
-          "return_pct": null,
-          "exit_price": null,
-          "exit_date": "2026-09-22"
-        }
-      }
-    }
-  ]
+  "signals": []
 }
