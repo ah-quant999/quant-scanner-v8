@@ -259,6 +259,7 @@ jobs:
       - name: "💰 ETF 申购赎回（东财口径，盘前/盘后/全量）"
         if: steps.cat.outputs.category == 'premarket' || steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
         continue-on-error: true
+        timeout-minutes: 20
         shell: bash
         run: |
           python scripts/fetch_etf_subscription_em.py
