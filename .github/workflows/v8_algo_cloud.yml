@@ -324,9 +324,29 @@ jobs:
         run: |
           python algorithms/check_trading_day.py
 
+      - name: "🔇 静默闸门（防空转派发撑爆仓库）"
+        id: silent
+        run: |
+          HH=$(TZ=Asia/Shanghai date +%H)
+          if [ "$HH" -ge 18 ] || [ "$HH" -lt 6 ]; then
+            echo "skip_silent=false" >> "$GITHUB_OUTPUT"
+            echo "🟢 盘后窗口，放行全链"
+            exit 0
+          fi
+          LAST_TS=$(git log -1 --format=%ct -- raw_data/ data/ 2>/dev/null || echo 0)
+          NOW_TS=$(date +%s)
+          DIFF=$(( (NOW_TS - ${LAST_TS:-0}) / 60 ))
+          if [ "${DIFF:-999}" -lt 30 ]; then
+            echo "skip_silent=true" >> "$GITHUB_OUTPUT"
+            echo "🔇 盘中且距上次数据推送 ${DIFF}min<30min 静默阈值，跳过空转重算"
+            exit 0
+          fi
+          echo "skip_silent=false" >> "$GITHUB_OUTPUT"
+          echo "🟡 盘中但距上次推送 ${DIFF}min，放行一次"
+
       - name: "🧮 运行盘后算法链 → raw_data/ → 推送"
         id: algo
-        if: steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true'
+        if: steps.silent.outputs.skip_silent != 'true' && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true')
         # 🔴 2026-08-30 23:3x 抬高步级墙钟 90 → 150（实测 run 33316835316 坐实）：
         #   周末 force_run 全量补算时，本步跑到 70 分钟仍未完成，距 90 分钟限时仅剩
         #   20 分钟——一旦超时被硬杀，后续 bridge / ALGO_TRACK / 兜底推送 / **产物完整性
@@ -386,19 +406,19 @@ jobs:
       #   必刷新——bridge_raw_data 防 raw_data 内部改名断点（如 triple_resonance_history → triple_history），
       #   update_v8 重生成 data/*.js，v8_health_check 刷新 HEALTH_CHECK.js。
       - name: "🔗 桥接 raw_data 内部改名（bridge_raw_data.py）"
-        if: steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true'
+        if: steps.silent.outputs.skip_silent != 'true' && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true')
         run: |
           python algorithms/bridge_raw_data.py || true
 
       # 2026-08-08 修复：算法链产出 candidate.json 后，立即刷新候选池行情，
       # 避免 runner 状态卡 CANDIDATE_QUOTES 长期显示「空」。
       - name: "📈 刷新候选池行情（CANDIDATE_QUOTES）"
-        if: steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true'
+        if: steps.silent.outputs.skip_silent != 'true' && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true')
         run: |
           python cloud_fetch_v8.py --only CANDIDATE_QUOTES || true
 
       - name: "📤 兜底推送（若上一步未推）"
-        if: steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true'
+        if: steps.silent.outputs.skip_silent != 'true' && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true')
         run: |
           # 2026-08-22 根因⑪收口：去掉 || true —— 推送失败必须让 job 失败，
           # 否则「算法链算完但推送 422 失败」永远被假 success 掩盖。
@@ -415,7 +435,7 @@ jobs:
       #   此步只在算法链收尾重算 ALGO_TRACK.js 的 ?v 并推送 index.html（Contents API，避开 cn git 墙）。
       #   只改 ALGO_TRACK 一项，不碰 COMMODITY 等（避免用陈旧本地文件覆盖 build/deploy 已对齐的 ?v）。
       - name: "🔄 同步 ALGO_TRACK 缓存戳 ?v 并推送 index.html"
-        if: steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true'
+        if: steps.silent.outputs.skip_silent != 'true' && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -477,7 +497,7 @@ jobs:
       #    v8_ops_watch）可见；同时写 $GITHUB_STEP_SUMMARY + raw_data/algo_chain_report.json，
       #    让主人一眼看到断在哪一环，而不是对着全绿的 job 发呆。
       - name: "🛡 产物完整性闸门（核心产物必须本交易日产出）"
-        if: steps.trading.outputs.is_trading_day == 'true'
+        if: steps.silent.outputs.skip_silent != 'true' && (steps.trading.outputs.is_trading_day == 'true')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
