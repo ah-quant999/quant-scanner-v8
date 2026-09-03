@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "f904118d0";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "8c1d3a4f0";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -538,7 +538,7 @@ window.__domReadyFns=[];
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/POTENTIAL_PICKS.js?v=11bac406de" defer></script>
 <script src="data/INDEX_QUOTES.js?v=e31ff29551" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=bfffad7dac" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=853ef4415a" defer></script>
 <script src="data/MARGIN_DATA.js?v=878ae75123" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=149695cabd" defer></script>
 <script src="data/IPO_DATA.js?v=29a5efed36" defer></script>
@@ -1496,12 +1496,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=909e4353cc" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=3e00228da7" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=6694b8aefa" defer></script>
-<script src="data/HEALTH_CHECK.js?v=468ef5ac6a" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=73a5f4754c" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=cb38d0b390" defer></script>
+<script src="data/RUNNER_STATUS.js?v=881f129d36" defer></script>
+<script src="data/HEALTH_CHECK.js?v=1b363f1a8a" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=bb30da61cc" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=bb6f6ad7e5" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 MARKET_PATH_PROBABILITY 注入（AI预测卡用） -->
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=805de7cd85" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=7c88313ccd" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=ac04776279" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=258e585586" defer></script>
@@ -12458,7 +12458,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=468ef5ac6a')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=1b363f1a8a')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
