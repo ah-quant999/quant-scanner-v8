@@ -324,22 +324,55 @@ jobs:
         run: |
           python algorithms/check_trading_day.py
 
-      - name: "🔇 静默闸门（防空转派发撑爆仓库·全时段统一阈值）"
+      - name: "🔇 静默闸门 V3（只收敛 repository_dispatch 风暴，不碰合法批量）"
         id: silent
+        env:
+          GH_EVENT: ${{ github.event_name }}
+          IS_TRADING_DAY: ${{ steps.trading.outputs.is_trading_day }}
         run: |
-          # 全时段统一：距上次 raw_data/ + data/ 推送 <30min 即视为空转重算，静默跳过。
-          # 盘后批量（如 18:05 兜底备份）距收盘日推常 >100min，必然放行；
-          # 阿狸咪兜底调度 2-3min 空转在首推后 30min 内一律静默，彻底收敛仓库膨胀。
-          LAST_TS=$(git log -1 --format=%ct -- raw_data/ data/ 2>/dev/null || echo 0)
-          NOW_TS=$(date +%s)
-          DIFF=$(( (NOW_TS - ${LAST_TS:-0}) / 60 ))
-          if [ "${DIFF:-999}" -lt 30 ]; then
+          # V3 (2026-09-03 19:4x) 修正 V2 致命回归：V2 用「距上次 raw_data/+data/ 提交<30min」
+          #   判空转，但 v8 cn fetch 每 8~20min 就推一次 data/，DIFF 永远 <30 →
+          #   把 16:40/18:10/19:15/20:00 的合法 schedule 批也全静默（当晚盘后链 0 产出实锤）。
+          # 原则：
+          #   1) schedule / workflow_dispatch 一律放行 —— 每天最多 4+1 次合法批量，风暴不在这；
+          #   2) repository_dispatch（阿狸咪兜底风暴）只在
+          #      「交易日 && 选股时间窗(HH>=18 或 HH<6) && 选股三模块今晚尚未产出」时放行；
+          #      非交易日 / 盘中 / 已产出 一律静默 ——「限定盘后批量+静默阈值」合体；
+          #   3) 新鲜判定读 git 内容级 update_time（>=16 点算今晚产出），
+          #      免疫 cn_fetch 只 bump ?v 的伪新鲜。
+          if [ "$GH_EVENT" != "repository_dispatch" ]; then
+            echo "skip_silent=false" >> "$GITHUB_OUTPUT"
+            echo "🟢 事件=$GH_EVENT 属合法批量，放行"
+            exit 0
+          fi
+          if [ "$IS_TRADING_DAY" != "true" ]; then
             echo "skip_silent=true" >> "$GITHUB_OUTPUT"
-            echo "🔇 距上次数据推送 ${DIFF}min<30min 静默阈值，跳过空转重算"
+            echo "🔇 dispatch×非交易日：算法链必被交易日 gate 跳过，纯空转，静默"
+            exit 0
+          fi
+          HH=$(TZ=Asia/Shanghai date +%H)
+          if [ "$HH" -ge 6 ] && [ "$HH" -lt 18 ]; then
+            echo "skip_silent=true" >> "$GITHUB_OUTPUT"
+            echo "🔇 dispatch×选股无效时段(${HH}点)：选股必被时间 gate 跳过，纯空转，静默"
+            exit 0
+          fi
+          TODAY=$(TZ=Asia/Shanghai date +%F)
+          FRESH=0
+          for f in TRIPLE_CONSENSUS FOUR_VOLUME CRDS_CARD_DATA; do
+            UT=$(git show HEAD:data/$f.js 2>/dev/null                  | grep -o '"update_time"[^"]*"[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}'                  | head -1 | grep -o '[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\} [0-9]\{2\}$')
+            case "$UT" in
+              "$TODAY "*)
+                UTH=$((10#${UT##* }))
+                if [ "$UTH" -ge 16 ]; then FRESH=$((FRESH+1)); fi ;;
+            esac
+          done
+          if [ "$FRESH" -eq 3 ]; then
+            echo "skip_silent=true" >> "$GITHUB_OUTPUT"
+            echo "🔇 dispatch×盘后但选股三模块今晚已产出(${FRESH}/3)，静默防重算"
             exit 0
           fi
           echo "skip_silent=false" >> "$GITHUB_OUTPUT"
-          echo "🟢 距上次推送 ${DIFF}min≥30min，放行一次"
+          echo "🟡 交易日盘后且选股模块未产出(${FRESH}/3)，放行 dispatch 补跑"
 
       - name: "🧮 运行盘后算法链 → raw_data/ → 推送"
         id: algo
