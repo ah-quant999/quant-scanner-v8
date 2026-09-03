@@ -4722,7 +4722,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var ar = d.avg_return == null ? '—' : d.avg_return;
           var first = (stratList.indexOf(s) === 0);
           html += '<td style="padding:6px;text-align:center;font-weight:700;color:'+_colorWR(wr)+';">'+(typeof wr === 'number' ? wr.toFixed(1) : wr)+'%</td>';
-          html += '<td style="padding:6px;text-align:center;color:'+_colorPL(ar)+';'+(first?'':'border-left:1px solid var(--border2);')+'">'
+          html += '<td style="padding:6px;text-align:center;color:'+_colorPL(ar)+';'+(first?'':'border-left:1px solid var(--border2);')+'">'+(typeof ar==='number'?(ar>0?'+':'')+ar.toFixed(2):ar)+'%</td>';
         });
         html += '</tr>';
       });
