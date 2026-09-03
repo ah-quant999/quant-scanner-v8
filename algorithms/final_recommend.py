@@ -7,11 +7,11 @@
   - raw_data/cockpit_tier_recommend.json
   - raw_data/top10_daily.json   (四量终极 / 主站 TOP10)
   - raw_data/crds_card_data.json (逆势龙头)
-  - raw_data/lhb_data.json      (龙虎榜 → 大牛股猎手机游共振)
+  - raw_data/lhb_data.json      (龙虎榜，已下线算法不再依赖)
   - raw_data/sector_rs.json     (板块相对强度)
   - raw_data/stock_profile.json (个股行业/概念)
   - raw_data/crisis_data.json   (危机雷达，决定是否并入逆势龙头)
-  - raw_data/cockpit_backtest.json (驾驶舱历史回测，用于 Top3 回测/跟踪)
+  - (cockpit_backtest.json 已下线)
   - raw_data/triple_track.json     (三重跟踪告警，用于 Top3 跟踪)
 
 输出：
@@ -339,7 +339,7 @@ def main():
         "best_return": cb.get("best_return"),
         "worst_return": cb.get("worst_return"),
         "valid": cb.get("total_count"),
-        "best_hold_days": 3,  # 驾驶舱回测按固定窗口
+        "best_hold_days": 3,  # 历史口径保留
     }
 
     crisis_score = safe_float(crisis.get("score"), 0.0)
@@ -431,25 +431,7 @@ def main():
             if s.get("enter_date"):
                 r["enter_dates"].append(s["enter_date"])
 
-    # 2) 驾驶舱 A/B 档
-    for tier, label in [("tier_a", "驾驶舱A档"), ("tier_b", "驾驶舱B档")]:
-        for s in cockpit.get(tier) or []:
-            code = s.get("code")
-            if not code:
-                continue
-            r = ensure(code, s.get("name"), s.get("market"), s.get("board"))
-            tech = safe_float(s.get("tech_score"))
-            qs = safe_float(s.get("quality_score"))
-            total = safe_float(s.get("total_score")) or (tech + qs)
-            if tier == "tier_a":
-                # 2026-08-13 公平性修复：起点 2.5 偏高，驾驶舱A档天然占优；
-                # 降到 1.5 与其他源（四量/大牛股/板块龙头）同量级基准。
-                src_score = 1.5 + min(1.5, max(0.0, (total - 50) / 50.0 * 1.5))
-            else:
-                src_score = 1.0
-            r["sources"].append(label)
-            r["source_scores"][label] = round(src_score, 2)
-            r["industry"] = r["industry"] or (s.get("industry") or "")
+    # 2026-09-03 主人令：#2 驾驶舱 A/B 档 source 整段下线（cockpit.* 不再读，sources 也不再 append "驾驶舱A档/B档"）
             r["concepts"] = list(set((r["concepts"] or []) + (s.get("concepts") or [])))
             r["reasons"].append(f"{label} 技术{tech:.0f} 质量{qs:.0f}")
             # ── 60m 共振确认（A 档仅标签，不改变评分）──
@@ -512,8 +494,7 @@ def main():
             elif top10.get("update_time"):
                 r["enter_dates"].append(top10["update_time"][:10])
 
-    # 4) 全站精选：与驾驶舱A/B档同源，不再重复计分，但保留源标签用于展示
-    #    （后续 render 时可单独展示 A/B 档）
+    # 2026-09-03 主人令：#4 全站精选 source 整段下线（allsite.* 不再读）
 
     # 5) 逆势龙头：仅在危机雷达高位时并入
     if crisis_high:
@@ -534,81 +515,8 @@ def main():
                 if s.get("enter_date"):
                     r["enter_dates"].append(s["enter_date"])
 
-    # 6) 大牛股猎手：龙虎榜机构+游资共振
-    for s in lhb.get("stocks") or []:
-        inst = safe_float(s.get("inst_net_万"))
-        yz = safe_float(s.get("yz_net_万"))
-        if inst > 0 and yz > 0:
-            code = s.get("code")
-            if not code:
-                continue
-            r = ensure(code, s.get("name"), "", "")
-            src_score = min(3.5, 2.0 + (inst + yz) / 80000.0)
-            # ── 60min 动量延续确认（龙虎榜 T 日进场 → T+1 分钟级动量仍在 = 非一日游）──
-            _60m_lhb = _60m_hits.get(norm_code(code))
-            if _60m_lhb:
-                _60m_lhb_bonus = 0.5
-                src_score += _60m_lhb_bonus
-                r["signals"].append("60min动量延续")
-                r["_60m_resonance"] = True
-            # ── end 60m ──
-            src_score = round(min(4.0, src_score), 2)
-            r["sources"].append("大牛股猎手")
-            r["source_scores"]["大牛股猎手"] = round(src_score, 2)
-            r["close"] = s.get("close") or r["close"]
-            r["pct_chg"] = s.get("pct") or r["pct_chg"]
-            r["reasons"].append(f"大牛股猎手 机构{inst/10000:.1f}亿+游资{yz/10000:.1f}亿")
-            r["signals"].append(s.get("category") or "机游共振")
-            if s.get("reason"):
-                r["signals"].append(s["reason"])
-            if lhb.get("date"):
-                r["enter_dates"].append(lhb["date"])
-
-    # 7) 板块龙头：当前强势板块里的金股池成员（让“板块强→个股被推”生效）
-    gp_stocks = gold_pool.get("stocks") or {}
-    if isinstance(gp_stocks, dict):
-        gp_items = list(gp_stocks.values())
-    else:
-        gp_items = list(gp_stocks)
-    for s in gp_items:
-        code = s.get("code") if isinstance(s, dict) else None
-        if not code:
-            continue
-        # 先补齐画像
-        prof = profiles.get(norm_code(code)) or profiles.get(code)
-        tmp_stock = {
-            "industry": s.get("industry") or (prof.get("industry") if prof else "") or "",
-            "concepts": list(set((s.get("concepts") or []) + (prof.get("concepts") if prof else []))),
-            "name": s.get("name", ""),
-        }
-        sec_score, sec_hits = sector_score_for(tmp_stock, rel_set, abs_set, score_map)
-        if sec_score <= 0:
-            continue
-        # 只取每个强势板块里综合板块分最高的前若干只，避免噪声
-        r = ensure(code, s.get("name"), s.get("market"), s.get("board"))
-        # 2026-08-13 公平性修复：板块龙头源分=入选权重(0.5)+板块强度(sec_score)，
-        # 末尾 sec_add 对已含板块龙头源的票置 0，避免板块被双重计价。
-        src_score = round(min(3.0, 0.5 + sec_score), 2)
-        r["sources"].append("板块龙头")
-        r["source_scores"]["板块龙头"] = src_score
-        r["industry"] = r["industry"] or tmp_stock["industry"]
-        r["concepts"] = list(set(r["concepts"] + tmp_stock["concepts"]))
-        r["close"] = s.get("close") or r["close"]
-        r["pct_chg"] = s.get("pct_chg") or r["pct_chg"]
-        r["stop_loss"] = s.get("stop_loss") or r["stop_loss"]
-        r["target_price"] = s.get("target_price") or r["target_price"]
-        r["risk_reward"] = s.get("risk_reward") or r["risk_reward"]
-        r["reasons"].append(f"板块龙头 {','.join([h['name'] for h in sec_hits[:2]])}")
-        r["signals"].append("板块强势")
-        # 合并板块命中（去重），保留涨幅
-        existing = {h["name"] for h in r["sector_hits"]}
-        for h in sec_hits:
-            if h["name"] not in existing:
-                r["sector_hits"].append(h)
-                existing.add(h["name"])
-        if s.get("first_date"):
-            r["enter_dates"].append(s["first_date"])
-
+    # 2026-09-03 主人令：#6 大牛股猎手 source 整段下线（不再 append "大牛股猎手"，lhb 数据仍可被其他源使用）
+    # 2026-09-03 主人令：#7 板块龙头 source 整段下线（不再 append "板块龙头"，sec_score 仍可用于其他源加分）
     # ── 第8节 因子实验室因子（方案B：智能融合，非简单硬加权）──
     # 维度1 异常换手率：缩量=因子高=强势（abnormal_turnover.top 前30）；放量弱势=bottom（扣0.5）
     # 维度2 ROE_TTM：全市场主板大市值档 Top30（高 ROE=质量）
@@ -785,8 +693,8 @@ def main():
           仅含中线策略源(mid)归"中长线"；纯短线策略源保持"短线"（2026-08-13 公平性修复：标签须反映策略真实属性）
         2026-08-11 主人令：候选池的中长线列之前永远"暂无"——是判定过严。
         """
-        short = {"四量终极", "大牛股猎手", "板块龙头"}
-        mid = {"三重共识", "驾驶舱A档", "驾驶舱B档"}
+        short = {"四量终极"}  # 2026-09-03 主人令：大牛股猎手/板块龙头已下线
+        mid = {"三重共识"}  # 2026-09-03 主人令：驾驶舱A/B档已下线
         defense = {"逆势龙头·精锐", "逆势龙头·进阶", "逆势龙头·观察"}
         srcs = set(sources)
         has_short = bool(srcs & short)
@@ -857,7 +765,7 @@ def main():
                 "avg_return": round(safe_float(summary.get("avg_return")), 2),
                 "best_return": round(safe_float(summary.get("best_return")), 2),
                 "worst_return": round(safe_float(summary.get("worst_return")), 2),
-                "note": f"该股历史共触发 {summary.get('signals')} 次驾驶舱/共振信号",
+                "note": f"该股历史共触发 {summary.get('signals')} 次共振信号",  # 2026-09-03 主人令：驾驶舱已下线
             }
         elif strategy_backtest:
             # 个股无历史：展示策略级回测作为参考
@@ -1063,7 +971,7 @@ def main():
         f.write(js)
     print(f"[ok] {js_path}")
 
-    # 🗂 历史归档（供 v8/backtest_allsite.py 真实回测）：按 update_time 日期落盘 raw_data/history
+    # 🗂 历史归档（all_site_backtest.py 已删除）：按 update_time 日期落盘 raw_data/history
     # 与 calc_crds.py 同源思路——只有落盘「每日 dated 快照」回测才有过去信号日可算前向收益。
     try:
         _dt = (result.get("update_time") or "")[:10].replace("-", "")

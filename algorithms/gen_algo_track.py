@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""gen_algo_track.py — 三算法（四量终极/板块龙头/大牛股猎手）独立追踪
+"""gen_algo_track.py — 单 algo（四量终极）独立追踪（2026-09-03 主人令：板块龙头/大牛股猎手已全方位下线）
 
 输入：
   - data/FOUR_VOLUME.js          四量终极日线信号
   - data/FOUR_VOLUME_60M.js      四量终极60分钟信号
-  - data/FINAL_RECOMMEND_DATA.js 推荐池（含板块龙头/大牛股猎手 source 标记）
+  - data/FINAL_RECOMMEND_DATA.js 推荐池（已无已下线 algo source）
   - raw_data/stock_quote.json    行情（取 entry_price）
   - raw_data/algo_track.json     上期追踪状态
 
@@ -200,8 +200,7 @@ def _extract_from_final_rec(source_name):
         code = s.get("code")
         if not code:
             continue
-        # algo name mapping
-        algo_map = {"板块龙头": "sector_lead", "大牛股猎手": "big_bull"}
+        # 2026-09-03 主人令：板块龙头/大牛股猎手已下线，algo_map 留作 audit 痕迹，禁止实际引用
         results.append({
             "code": str(code),
             "name": s.get("name", ""),
@@ -268,7 +267,7 @@ def _advance_tracking(prev_tracking, qmap, today):
 
 
 def main():
-    print(f"\n[gen_algo_track] {_now_cst():%Y-%m-%d %H:%M:%S}  三算法追踪")
+    print(f"\n[gen_algo_track] {_now_cst():%Y-%m-%d %H:%M:%S}  单 algo（四量终极）追踪")
     today = _today_str()
     today_dashed = _today_dashed()
     cutoff_90d = (_now_cst() - timedelta(days=WINDOW_DAYS)).strftime("%Y%m%d")
@@ -282,18 +281,7 @@ def main():
     print(f"  ▶ 四量终极 = {len(fv_signals)} 只: " +
           ", ".join(f"{s['name']}({s['code']})" for s in fv_signals))
 
-    # 1b. 板块龙头
-    sl_signals = _extract_from_final_rec("板块龙头")
-    all_signals["sector_lead"] = sl_signals
-    print(f"  ▶ 板块龙头 = {len(sl_signals)} 只: " +
-          ", ".join(f"{s['name']}({s['code']})" for s in sl_signals))
-
-    # 1c. 大牛股猎手（直接从龙虎榜提取，不依赖 FINAL_RECOMMEND_DATA）
-    bb_signals = _extract_big_bull()
-    all_signals["big_bull"] = bb_signals
-    print(f"  ▶ 大牛股猎手 = {len(bb_signals)} 只: " +
-          ", ".join(f"{s['name']}({s['code']})" for s in bb_signals))
-
+    # 2026-09-03 主人令：板块龙头 / 大牛股猎手 两 algo 桶整体下线，只保留四量终极
     # ---- 2. 读行情 ----
     stock_quote = _load_json(RAW / "stock_quote.json")
     qmap = _quote_map(stock_quote)
@@ -382,10 +370,9 @@ def main():
         }
         total_stats[algo_key] = algo_stats
 
+        # 2026-09-03 主人令：仅保留四量终极；板块龙头 / 大牛股猎手 已下线
         algo_display_names = {
             "four_volume": "四量终极",
-            "sector_lead": "板块龙头",
-            "big_bull": "大牛股猎手",
         }
 
         result_algos.append({
