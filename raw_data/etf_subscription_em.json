@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-04 03:00:50",
+  "update_time": "2026-09-04 06:52:07",
   "source": "akshare etf_em (东财/同花顺)",
   "metric": "规模AUM(回退)",
   "categories": {
@@ -7,7 +7,7 @@
       "name": "股票型",
       "net_amount_yi": 0.0,
       "scale_yi": 0.0,
-      "n_funds": 1618,
+      "n_funds": 1620,
       "top5": []
     },
     "bond": {
