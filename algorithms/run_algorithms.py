@@ -35,6 +35,7 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     "gen_stock_profile.py": 2700,
     "v8/backtest_crds.py": 2400,    # 逆势龙头 CRDS 回测：读 crds history + baostock 取 K 线回填收益
     "v8/backtest_rps.py": 1800,     # 相对强度 RPS 回测：读 stock_rps 截面（占位，RPS 为截面指标非信号引擎）
+    "factor_lab_backtest.py": 1800,  # 🆕 700日长历史抓取+五分位分层回测（cn ~5min / 云端 ~15min）
 }
 
 
@@ -158,6 +159,8 @@ ORDER = [
     #   三者失败均不影响选股结果，仅自身卡片可能不刷新。
     "v8/backtest_crds.py",            # → data/CRDS_BACKTEST.js（逆势龙头 CRDS 真实历史回测）
     "v8/backtest_rps.py",             # → data/RPS_BACKTEST.js（相对强度 RPS 回测，截面有效性）
+    # 🆕 2026-09-04 主人令「都按你的建议做」：因子实验室独立分层回测（升4⭐证据链）
+    "factor_lab_backtest.py",         # → data/FACTOR_LAB_BACKTEST.js（五分位分层·胜率/回撤/OOS）
 ]
 
 
@@ -191,6 +194,7 @@ STAGES = {
         "scripts/ab_universe_backtest.py", "backtest_tdx.py", "backtest_comprehensive.py",
         "export_optimized_strategy.py",   # 读 backtest_tdx.json 汇总优化策略（在 backtest_tdx 之后）
         "v8/backtest_crds.py", "v8/backtest_rps.py",   # 逆势龙头/相对强度 回测（原 ORDER 漏挂 STAGE）
+        "factor_lab_backtest.py",   # 🆕 因子实验室分层回测（读 _rps_cache，依赖 B 批 calc_stock_rps）
     ],
     "D": [  # 汇总批（~20:00 CST，依赖全部）：final_recommend + LHB历史/7d/生命周期
         "final_recommend.py",
