@@ -310,6 +310,18 @@ STOCK_PICKING_SCRIPTS = {
     "gen_stock_stop.py",             # ATR 止损止盈（读候选宇宙日K）
     "gen_lhb_7d.py",                 # 龙虎榜 7 日累计（选股向汇总）
 }
+# 🔴 2026-09-03 主人令「回测页跟着最终推荐的算法时间走，太早算就无效、浪费」：
+#   回测批与选股批同一盘后门控 —— 交易日盘中/盘前（06:00-17:59）即使 force 跑链，
+#   也禁止重算回测，防止用半日数据重算出「看起来新鲜」的假回测（今日 13:14 事故根因：
+#   STOCK_PICKING_SCRIPTS 门控漏掉回测批，盘中 force 链跳过选股但照跑回测并重刷 update_time）。
+BACKTEST_SCRIPTS = {
+    "scripts/ab_universe_backtest.py",
+    "backtest_tdx.py",
+    "backtest_comprehensive.py",
+    "export_optimized_strategy.py",
+    "v8/backtest_crds.py",
+    "v8/backtest_rps.py",
+}
 # 18:00 = 所有盘后数据（龙虎榜/北向/板块资金/个股行情/机构调研等）稳定就绪时间
 _STOCK_PICKING_READY_HOUR, _STOCK_PICKING_READY_MIN = 18, 0
 # 次日凌晨补跑的截止时刻（CST）：过了这个点就属于新交易日的盘前，不再放行
@@ -691,8 +703,8 @@ def step_run(order=None):
             skipped.append(script)
             continue
         # 🔴 盘后选股策略门控：未到 18:00 且脚本属于选股策略 → 跳过
-        if not picking_ready and script in STOCK_PICKING_SCRIPTS:
-            print(f"  ⏭️  {script}  ← 跳过（盘后数据未全就绪，18:00 前禁止生成选股结果）")
+        if not picking_ready and (script in STOCK_PICKING_SCRIPTS or script in BACKTEST_SCRIPTS):
+            print(f"  ⏭️  {script}  ← 跳过（盘后数据未全就绪，18:00 前禁止生成选股/回测结果，防半日数据假回测）")
             skipped.append(script)
             continue
         # 🛡 2026-08-26 一劳永逸（bug7/bug8）：final_recommend 必须先过就绪门控，
