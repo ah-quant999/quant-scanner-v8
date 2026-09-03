@@ -1,10 +1,10 @@
 window.FOUR_VOLUME={
- "update_time": "2026-09-03 18:48:17",
+ "update_time": "2026-09-03 20:06:45",
  "total": 3,
  "stocks": [
   {
    "code": "002297",
-   "name": "博云新材",
+   "name": "润迈德－B",
    "market": "sz",
    "board_label": "主板",
    "close": 22.0,

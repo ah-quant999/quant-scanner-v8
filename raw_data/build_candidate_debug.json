@@ -1,13 +1,13 @@
 {
-  "DATA": "out",
-  "V8_OUT_DIR": "out",
+  "DATA": "/home/runner/work/quant-scanner-v8/quant-scanner-v8/algorithms/../out",
+  "V8_OUT_DIR": "",
   "guanlan_watchlist": {
     "exists": true,
     "stocks": 5
   },
   "guanlan_reports": {
     "exists": true,
-    "reports": 19,
+    "reports": 20,
     "stocks_in_reports": 5
   },
   "source_dist": {
