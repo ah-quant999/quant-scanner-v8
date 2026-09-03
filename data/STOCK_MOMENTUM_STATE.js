@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-03 17:04",
- "generated": "2026-09-03 17:04",
+ "update_time": "2026-09-03 17:21",
+ "generated": "2026-09-03 17:21",
  "meta": {
-  "generated": "2026-09-03 17:04",
+  "generated": "2026-09-03 17:21",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 3,
   "days_with_consensus": 0,
@@ -27,15 +27,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "688485",
       "name": "九州一轨",
-      "change_pct": 12.788,
-      "price": 99.93,
+      "change_pct": 12.675,
+      "price": 99.83,
       "category": "突破"
      },
      {
       "code": "002536",
       "name": "飞龙股份",
-      "change_pct": 9.213,
-      "price": 63.42,
+      "change_pct": 8.541,
+      "price": 63.03,
       "category": "突破"
      },
      {
@@ -55,8 +55,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002811",
       "name": "郑中设计",
-      "change_pct": 8.047,
-      "price": 15.71,
+      "change_pct": 7.84,
+      "price": 15.68,
       "category": "突破"
      },
      {
@@ -76,8 +76,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301086",
       "name": "鸿富瀚",
-      "change_pct": 15.319,
-      "price": 157.78,
+      "change_pct": 15.166,
+      "price": 157.57,
       "category": "突破"
      },
      {
@@ -97,22 +97,29 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300649",
       "name": "杭州园林",
-      "change_pct": 7.57,
-      "price": 29.13,
+      "change_pct": 8.013,
+      "price": 29.25,
+      "category": "突破"
+     },
+     {
+      "code": "688448",
+      "name": "磁谷科技",
+      "change_pct": 3.551,
+      "price": 71.45,
       "category": "突破"
      },
      {
       "code": "301628",
       "name": "强达电路",
-      "change_pct": 6.217,
-      "price": 110.71,
+      "change_pct": 6.361,
+      "price": 110.86,
       "category": "突破"
      },
      {
       "code": "600172",
       "name": "黄河旋风",
-      "change_pct": 7.864,
-      "price": 15.91,
+      "change_pct": 7.932,
+      "price": 15.92,
       "category": "突破"
      },
      {
@@ -125,15 +132,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600869",
       "name": "远东股份",
-      "change_pct": 7.897,
-      "price": 21.04,
+      "change_pct": 7.949,
+      "price": 21.05,
       "category": "突破"
      },
      {
       "code": "300889",
       "name": "爱克股份",
-      "change_pct": 8.228,
-      "price": 27.36,
+      "change_pct": 8.307,
+      "price": 27.38,
       "category": "突破"
      },
      {
@@ -146,22 +153,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002443",
       "name": "金洲管道",
-      "change_pct": 4.938,
-      "price": 11.05,
+      "change_pct": 6.078,
+      "price": 11.17,
       "category": "突破"
      },
      {
       "code": "301119",
       "name": "正强股份",
-      "change_pct": 4.885,
-      "price": 27.27,
+      "change_pct": 4.731,
+      "price": 27.23,
       "category": "突破"
      },
      {
       "code": "300400",
       "name": "劲拓股份",
-      "change_pct": 13.351,
-      "price": 33.62,
+      "change_pct": 13.452,
+      "price": 33.65,
       "category": "突破"
      },
      {
@@ -174,15 +181,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603353",
       "name": "和顺石油",
-      "change_pct": 7.572,
-      "price": 37.22,
+      "change_pct": 8.902,
+      "price": 37.68,
       "category": "突破"
      },
      {
       "code": "603303",
       "name": "得邦照明",
-      "change_pct": 3.939,
-      "price": 25.86,
+      "change_pct": 3.778,
+      "price": 25.82,
       "category": "突破"
      }
     ],
@@ -190,15 +197,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "688485",
       "name": "九州一轨",
-      "change_pct": 12.788,
-      "price": 99.93,
+      "change_pct": 12.675,
+      "price": 99.83,
       "category": "加速"
      },
      {
       "code": "002536",
       "name": "飞龙股份",
-      "change_pct": 9.213,
-      "price": 63.42,
+      "change_pct": 8.541,
+      "price": 63.03,
       "category": "加速"
      },
      {
@@ -218,8 +225,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002811",
       "name": "郑中设计",
-      "change_pct": 8.047,
-      "price": 15.71,
+      "change_pct": 7.84,
+      "price": 15.68,
       "category": "加速"
      },
      {
@@ -239,8 +246,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301086",
       "name": "鸿富瀚",
-      "change_pct": 15.319,
-      "price": 157.78,
+      "change_pct": 15.166,
+      "price": 157.57,
       "category": "加速"
      },
      {
@@ -260,22 +267,29 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300649",
       "name": "杭州园林",
-      "change_pct": 7.57,
-      "price": 29.13,
+      "change_pct": 8.013,
+      "price": 29.25,
+      "category": "加速"
+     },
+     {
+      "code": "688448",
+      "name": "磁谷科技",
+      "change_pct": 3.551,
+      "price": 71.45,
       "category": "加速"
      },
      {
       "code": "301628",
       "name": "强达电路",
-      "change_pct": 6.217,
-      "price": 110.71,
+      "change_pct": 6.361,
+      "price": 110.86,
       "category": "加速"
      },
      {
       "code": "600172",
       "name": "黄河旋风",
-      "change_pct": 7.864,
-      "price": 15.91,
+      "change_pct": 7.932,
+      "price": 15.92,
       "category": "加速"
      },
      {
@@ -288,15 +302,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600869",
       "name": "远东股份",
-      "change_pct": 7.897,
-      "price": 21.04,
+      "change_pct": 7.949,
+      "price": 21.05,
       "category": "加速"
      },
      {
       "code": "300889",
       "name": "爱克股份",
-      "change_pct": 8.228,
-      "price": 27.36,
+      "change_pct": 8.307,
+      "price": 27.38,
       "category": "加速"
      },
      {
@@ -309,22 +323,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002443",
       "name": "金洲管道",
-      "change_pct": 4.938,
-      "price": 11.05,
+      "change_pct": 6.078,
+      "price": 11.17,
       "category": "加速"
      },
      {
       "code": "301119",
       "name": "正强股份",
-      "change_pct": 4.885,
-      "price": 27.27,
+      "change_pct": 4.731,
+      "price": 27.23,
       "category": "加速"
      },
      {
       "code": "300400",
       "name": "劲拓股份",
-      "change_pct": 13.351,
-      "price": 33.62,
+      "change_pct": 13.452,
+      "price": 33.65,
       "category": "加速"
      },
      {
@@ -337,15 +351,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603353",
       "name": "和顺石油",
-      "change_pct": 7.572,
-      "price": 37.22,
+      "change_pct": 8.902,
+      "price": 37.68,
       "category": "加速"
      },
      {
       "code": "603303",
       "name": "得邦照明",
-      "change_pct": 3.939,
-      "price": 25.86,
+      "change_pct": 3.778,
+      "price": 25.82,
       "category": "加速"
      }
     ],
@@ -353,15 +367,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "688485",
       "name": "九州一轨",
-      "change_pct": 12.788,
-      "price": 99.93,
+      "change_pct": 12.675,
+      "price": 99.83,
       "category": "短线选股"
      },
      {
       "code": "002536",
       "name": "飞龙股份",
-      "change_pct": 9.213,
-      "price": 63.42,
+      "change_pct": 8.541,
+      "price": 63.03,
       "category": "短线选股"
      },
      {
@@ -381,8 +395,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002811",
       "name": "郑中设计",
-      "change_pct": 8.047,
-      "price": 15.71,
+      "change_pct": 7.84,
+      "price": 15.68,
       "category": "短线选股"
      },
      {
@@ -402,8 +416,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301086",
       "name": "鸿富瀚",
-      "change_pct": 15.319,
-      "price": 157.78,
+      "change_pct": 15.166,
+      "price": 157.57,
       "category": "短线选股"
      },
      {
@@ -423,22 +437,29 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300649",
       "name": "杭州园林",
-      "change_pct": 7.57,
-      "price": 29.13,
+      "change_pct": 8.013,
+      "price": 29.25,
+      "category": "短线选股"
+     },
+     {
+      "code": "688448",
+      "name": "磁谷科技",
+      "change_pct": 3.551,
+      "price": 71.45,
       "category": "短线选股"
      },
      {
       "code": "301628",
       "name": "强达电路",
-      "change_pct": 6.217,
-      "price": 110.71,
+      "change_pct": 6.361,
+      "price": 110.86,
       "category": "短线选股"
      },
      {
       "code": "600172",
       "name": "黄河旋风",
-      "change_pct": 7.864,
-      "price": 15.91,
+      "change_pct": 7.932,
+      "price": 15.92,
       "category": "短线选股"
      },
      {
@@ -451,15 +472,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "600869",
       "name": "远东股份",
-      "change_pct": 7.897,
-      "price": 21.04,
+      "change_pct": 7.949,
+      "price": 21.05,
       "category": "短线选股"
      },
      {
       "code": "300889",
       "name": "爱克股份",
-      "change_pct": 8.228,
-      "price": 27.36,
+      "change_pct": 8.307,
+      "price": 27.38,
       "category": "短线选股"
      },
      {
@@ -472,22 +493,22 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "002443",
       "name": "金洲管道",
-      "change_pct": 4.938,
-      "price": 11.05,
+      "change_pct": 6.078,
+      "price": 11.17,
       "category": "短线选股"
      },
      {
       "code": "301119",
       "name": "正强股份",
-      "change_pct": 4.885,
-      "price": 27.27,
+      "change_pct": 4.731,
+      "price": 27.23,
       "category": "短线选股"
      },
      {
       "code": "300400",
       "name": "劲拓股份",
-      "change_pct": 13.351,
-      "price": 33.62,
+      "change_pct": 13.452,
+      "price": 33.65,
       "category": "短线选股"
      },
      {
@@ -500,15 +521,15 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603353",
       "name": "和顺石油",
-      "change_pct": 7.572,
-      "price": 37.22,
+      "change_pct": 8.902,
+      "price": 37.68,
       "category": "短线选股"
      },
      {
       "code": "603303",
       "name": "得邦照明",
-      "change_pct": 3.939,
-      "price": 25.86,
+      "change_pct": 3.778,
+      "price": 25.82,
       "category": "短线选股"
      }
     ]
