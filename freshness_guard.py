@@ -138,6 +138,25 @@ def get_lhb_content_date(filepath):
         return None
 
 
+def is_stopped_disclosure(filepath):
+    """
+    判断该文件是否为「数据源已永久停止披露」的占位文件。
+
+    典型：raw_data/north_fund.json 恒为
+        {"stopped": true, "note": "港交所 2024-05 后停止披露北向 top_buy"}
+    内容不会再变化，两次抓取间隔必然 > 其 60 分钟阈值 → 永久假阳性 STALE。
+    🛡 2026-09-03 修复（主人授权）：内容标记 stopped:true 时视为 FRESH。
+    """
+    p = RAW_DIR / filepath
+    if not p.exists():
+        return False
+    try:
+        d = json.load(open(p, encoding="utf-8"))
+        return isinstance(d, dict) and d.get("stopped") is True
+    except Exception:
+        return False
+
+
 def get_file_age(filepath):
     """返回文件年龄（分钟），文件不存在返回 None（视为无限旧）。
 
@@ -241,10 +260,16 @@ def check_freshness(category=None, threshold_override=None):
     lines = []
 
     for filename, rule in FRESHNESS_RULES.items():
-        # 只检查匹配类别的文件（all 类别始终检查；午休也检查 intraday）
-        if rule["category"] not in ("all", category):
-            if not (lunch_mode and rule["category"] == "intraday"):
-                continue
+        # 🛡 2026-09-03 修复（主人授权）：category="all" 曾是「空集恒真」陷阱——
+        #    FRESHNESS_RULES 里没有任何文件 category=="all"，下面这层过滤会把每条规则
+        #    全部 continue 掉 → 0 个文件被检查 → 恒返回 FRESH，
+        #    导致「all FRESH」长期被误当成交叉验证证据（vacuous truth）。
+        #    现语义修正为：category="all" = 检查全部文件（各用自身阈值）。
+        if category != "all":
+            # 只检查匹配类别的文件（all 类别始终检查；午休也检查 intraday）
+            if rule["category"] not in ("all", category):
+                if not (lunch_mode and rule["category"] == "intraday"):
+                    continue
 
         threshold = threshold_override or rule["threshold"]
         # 午休模式：阈值放大到 LUNCH_ALLOW_AGE
@@ -274,6 +299,11 @@ def check_freshness(category=None, threshold_override=None):
                 "update_time": ut,
             })
             stale_count += 1
+        elif is_stopped_disclosure(filename):
+            # ── 停止披露豁免 ──
+            # 数据源永久停更（如 north_fund 北向 top_buy）的占位文件，内容恒为
+            # {"stopped": true, ...} → 不再以年龄判陈旧，直接计为新鲜，杜绝永久假阳性。
+            fresh_count += 1
         elif semantic_stale:
             # 内容 date 早于最新已发布交易日（典型：17:00 边界 mtime 新鲜但仍是昨日龙虎榜）
             stale_files.append({
