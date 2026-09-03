@@ -5,7 +5,7 @@ name: "⏱️ v8 数据新鲜度守门(每小时)"
 
 on:
   schedule:
-    - cron: '0 * * * *'     # 每小时（UTC，对应 CST 每整点）
+    - cron: '10,40 * * * *'  # 每小时两档错峰（2026-09-03 阿狸咪：整点档被平台高频skip，实测一天仅命中2次）
   workflow_dispatch:
 
 permissions:
