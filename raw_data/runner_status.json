@@ -1,1 +1,38 @@
-{"run_time":"2026-09-03 09:27:37","category":"all","hostname":"","modules":{"CANDIDATE_QUOTES":{"status":"ok","msg":"成功"}},"summary":{"total":1,"ok":1,"empty":0,"fail":0}}
+{
+  "update_time": "2026-09-03 09:31:44",
+  "status": "warn",
+  "process": {
+    "ok": true,
+    "listener": true,
+    "worker": false,
+    "details": [
+      "runner.listener"
+    ]
+  },
+  "service": {
+    "ok": false,
+    "status": "NOT_FOUND",
+    "exists": false
+  },
+  "worker_logs": {
+    "ok": true,
+    "errors": [],
+    "scanned": 0,
+    "message": "最近日志无错误"
+  },
+  "github": {
+    "ok": false,
+    "error": "请求失败: <urlopen error [Errno 11001] getaddrinfo failed>",
+    "consecutive_failures": 0,
+    "checkout_failures": 0
+  },
+  "runner_env": {
+    "ok": true,
+    "threshold": 100000,
+    "message": "阈值=100000（一劳永逸目标 2000）"
+  },
+  "actions_taken": [
+    "进程缺失拉起 run.cmd: 成功 (进程拉起成功(Listener 已就绪, 3s))"
+  ],
+  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=请求失败: <urlopen error [Errno 11001] getaddrinfo failed>"
+}
