@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-03 11:27:45",
+  "update_time": "2026-09-03 12:34:26",
   "data_date": "2026-09-03",
   "source": "CONCEPT_RANKING × STOCK_PROFILE × STOCK_QUOTE",
   "hot_concepts_count": 33,
@@ -7,79 +7,58 @@
     "金融地产风格",
     "周期股",
     "券商概念",
+    "培育钻石",
     "大盘价值",
     "互联网金融",
-    "宁组合",
-    "破增发价股",
-    "参股期货",
-    "AI应用",
-    "AIGC概念"
+    "破净股",
+    "证金持股",
+    "黄金概念",
+    "参股券商"
   ],
   "picks": [
     {
-      "code": "300059",
-      "name": "东方财富",
-      "pct": 1.43,
-      "amount_yi": 19.17,
-      "hot_concepts": [
-        "AIGC概念",
-        "AI应用",
-        "互联网金融",
-        "券商概念",
-        "参股期货",
-        "周期股",
-        "国产软件",
-        "权重股",
-        "茅指数",
-        "证金持股",
-        "金融地产风格"
-      ],
-      "hot_count": 11,
-      "total_score": 14.53
-    },
-    {
       "code": "601318",
       "name": "中国平安",
-      "pct": 3.07,
-      "amount_yi": 35.37,
+      "pct": 2.95,
+      "amount_yi": 45.27,
       "hot_concepts": [
         "IPO受益",
         "互联网金融",
+        "养老概念",
         "参股券商",
         "周期股",
         "大盘价值",
-        "权重股",
         "破净股",
+        "红利股",
         "证金持股",
         "金融地产风格"
       ],
-      "hot_count": 9,
-      "total_score": 14.26
+      "hot_count": 10,
+      "total_score": 14.88
     },
     {
       "code": "600030",
       "name": "中信证券",
-      "pct": 1.68,
-      "amount_yi": 17.11,
+      "pct": 1.64,
+      "amount_yi": 23.0,
       "hot_concepts": [
         "互联网金融",
         "券商概念",
         "参股期货",
         "周期股",
-        "权重股",
         "科创板做市商",
         "行业龙头",
         "证金持股",
         "金融地产风格"
       ],
-      "hot_count": 9,
-      "total_score": 13.47
+      "hot_count": 8,
+      "total_score": 13.51
     },
     {
       "code": "000776",
       "name": "广发证券",
-      "pct": 4.25,
-      "amount_yi": 12.58,
+      "pct": 3.5,
+      "amount_yi": 15.21,
       "hot_concepts": [
         "互联网金融",
         "券商概念",
@@ -88,13 +67,29 @@
         "金融地产风格"
       ],
       "hot_count": 5,
-      "total_score": 12.05
+      "total_score": 12.2
+    },
+    {
+      "code": "300059",
+      "name": "东方财富",
+      "pct": 1.11,
+      "amount_yi": 23.53,
+      "hot_concepts": [
+        "互联网金融",
+        "券商概念",
+        "参股期货",
+        "周期股",
+        "证金持股",
+        "金融地产风格"
+      ],
+      "hot_count": 6,
+      "total_score": 12.07
     },
     {
       "code": "600999",
       "name": "招商证券",
-      "pct": 2.36,
-      "amount_yi": 6.78,
+      "pct": 1.43,
+      "amount_yi": 8.64,
       "hot_concepts": [
         "互联网金融",
         "券商概念",
@@ -105,13 +100,13 @@
         "金融地产风格"
       ],
       "hot_count": 7,
-      "total_score": 12.02
+      "total_score": 12.06
     },
     {
       "code": "600958",
       "name": "东方证券",
-      "pct": 1.2,
-      "amount_yi": 2.82,
+      "pct": 0.98,
+      "amount_yi": 3.6,
       "hot_concepts": [
         "IPO受益",
         "互联网金融",
@@ -123,13 +118,13 @@
         "金融地产风格"
       ],
       "hot_count": 8,
-      "total_score": 11.6
+      "total_score": 11.92
     },
     {
       "code": "601688",
       "name": "华泰证券",
-      "pct": 1.82,
-      "amount_yi": 4.95,
+      "pct": 1.35,
+      "amount_yi": 6.48,
       "hot_concepts": [
         "互联网金融",
         "券商概念",
@@ -140,80 +135,56 @@
         "金融地产风格"
       ],
       "hot_count": 7,
-      "total_score": 11.57
+      "total_score": 11.81
+    },
+    {
+      "code": "601601",
+      "name": "中国太保",
+      "pct": 4.63,
+      "amount_yi": 19.2,
+      "hot_concepts": [
+        "养老概念",
+        "周期股",
+        "证金持股",
+        "金融地产风格"
+      ],
+      "hot_count": 4,
+      "total_score": 11.44
     },
     {
       "code": "601628",
       "name": "中国人寿",
-      "pct": 3.7,
-      "amount_yi": 11.44,
+      "pct": 3.64,
+      "amount_yi": 14.41,
       "hot_concepts": [
         "参股期货",
         "周期股",
-        "权重股",
         "行业龙头",
         "证金持股",
         "金融地产风格"
       ],
-      "hot_count": 6,
-      "total_score": 11.16
+      "hot_count": 5,
+      "total_score": 11.37
     },
     {
-      "code": "601211",
-      "name": "国泰海通",
-      "pct": 1.42,
-      "amount_yi": 5.96,
+      "code": "000783",
+      "name": "长江证券",
+      "pct": 4.62,
+      "amount_yi": 14.62,
       "hot_concepts": [
         "互联网金融",
         "券商概念",
-        "周期股",
-        "权重股",
-        "科创板做市商",
-        "证金持股",
+        "参股期货",
         "金融地产风格"
       ],
-      "hot_count": 7,
-      "total_score": 11.05
-    },
-    {
-      "code": "601066",
-      "name": "中信建投",
-      "pct": 1.81,
-      "amount_yi": 2.16,
-      "hot_concepts": [
-        "互联网金融",
-        "券商概念",
-        "周期股",
-        "破增发价股",
-        "科创板做市商",
-        "证金持股",
-        "金融地产风格"
-      ],
-      "hot_count": 7,
-      "total_score": 10.96
-    },
-    {
-      "code": "300033",
-      "name": "同花顺",
-      "pct": 2.51,
-      "amount_yi": 14.3,
-      "hot_concepts": [
-        "AIGC概念",
-        "AI应用",
-        "互联网金融",
-        "券商概念",
-        "国产软件",
-        "行业龙头",
-        "证金持股"
-      ],
-      "hot_count": 7,
-      "total_score": 10.73
+      "hot_count": 4,
+      "total_score": 11.01
     },
     {
       "code": "601377",
       "name": "兴业证券",
-      "pct": 1.36,
-      "amount_yi": 2.08,
+      "pct": 1.02,
+      "amount_yi": 2.96,
       "hot_concepts": [
         "IPO受益",
         "互联网金融",
@@ -224,13 +195,46 @@
         "金融地产风格"
       ],
       "hot_count": 7,
-      "total_score": 10.6
+      "total_score": 10.85
+    },
+    {
+      "code": "601899",
+      "name": "紫金矿业",
+      "pct": 1.52,
+      "amount_yi": 39.18,
+      "hot_concepts": [
+        "周期股",
+        "小金属概念",
+        "稀缺资源",
+        "行业龙头",
+        "证金持股",
+        "锂矿概念",
+        "黄金概念"
+      ],
+      "hot_count": 7,
+      "total_score": 10.79
+    },
+    {
+      "code": "601211",
+      "name": "国泰海通",
+      "pct": 1.14,
+      "amount_yi": 7.16,
+      "hot_concepts": [
+        "互联网金融",
+        "券商概念",
+        "周期股",
+        "科创板做市商",
+        "证金持股",
+        "金融地产风格"
+      ],
+      "hot_count": 6,
+      "total_score": 10.73
     },
     {
       "code": "000166",
       "name": "申万宏源",
-      "pct": 1.33,
-      "amount_yi": 1.71,
+      "pct": 0.89,
+      "amount_yi": 2.21,
       "hot_concepts": [
         "互联网金融",
         "券商概念",
@@ -241,46 +245,32 @@
         "金融地产风格"
       ],
       "hot_count": 7,
-      "total_score": 10.6
+      "total_score": 10.7
     },
     {
-      "code": "601601",
-      "name": "中国太保",
-      "pct": 4.26,
-      "amount_yi": 13.86,
-      "hot_concepts": [
-        "周期股",
-        "权重股",
-        "证金持股",
-        "金融地产风格"
-      ],
-      "hot_count": 4,
-      "total_score": 10.51
-    },
-    {
-      "code": "002736",
-      "name": "国信证券",
-      "pct": 1.08,
-      "amount_yi": 1.15,
+      "code": "601066",
+      "name": "中信建投",
+      "pct": 1.61,
+      "amount_yi": 2.82,
       "hot_concepts": [
         "互联网金融",
         "券商概念",
         "周期股",
-        "大盘价值",
         "科创板做市商",
+        "证金持股",
         "金融地产风格"
       ],
       "hot_count": 6,
-      "total_score": 10.22
+      "total_score": 10.54
     }
   ],
   "rejected_summary": {
-    "no_hot_concept": 7346,
-    "too_hot": 50,
-    "too_cold": 48,
+    "no_hot_concept": 7998,
+    "too_hot": 43,
+    "too_cold": 25,
     "small_mv": 0,
     "big_mv": 0,
-    "no_quote": 29
+    "no_quote": 0
   },
   "filters": {
     "pct_range": "[-3%, +5%]（温和，未被炒高）",
