@@ -1476,7 +1476,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
          此处再引入 data/STOCK_RPS_DATA.js（旧 01:56 版本）会覆盖最新数据 → 相对强度子页/状态胶囊均读到陈旧值。
          删除重复注入，确保全局只保留一份最新 RPS 数据。 -->
 <!-- 2026-09-03 主人令：COCKPIT_BACKTEST.js / HUNTER_BACKTEST.js 脚本标签删除（脚本文件早已全方位下线，留着只会在浏览器控制台制造 404 噪音、影响运维健康检查"失败/诊断详情"，一并清干净） -->
-<script src="data/BACKTEST_COMPREHENSIVE.js?v=7e7f2f25ef" defer></script>
+<script src="data/BACKTEST_COMPREHENSIVE.js?v=138cc82152" defer></script>
 <script src="data/BACKTEST_TDX.js?v=b1589ec11f" defer></script>
 
 <script src="data/OPTIMIZED_STRATEGY.js?v=f4fabe4f73" defer></script>
@@ -1507,10 +1507,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=258e585586" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=f4bc653137" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
-    <script src="data/FOUR_VOLUME_BACKTEST.js?v=e1655f6cbb" defer></script>
+    <script src="data/FOUR_VOLUME_BACKTEST.js?v=7b774c251c" defer></script>
     <script src="data/ALLSITE_BACKTEST.js?v=ce0b14d18e" defer></script>
-    <script src="data/CRDS_BACKTEST.js?v=a76a697910" defer></script>
-    <script src="data/RPS_BACKTEST.js?v=90bde321e1" defer></script>
+    <script src="data/CRDS_BACKTEST.js?v=7ac3fb020e" defer></script>
+    <script src="data/RPS_BACKTEST.js?v=1e6fa8483c" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -4177,7 +4177,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   function _renderPeriodBacktestCard(meta, data){
     var html = '<div style="margin:14px 0;border-left:4px solid '+meta.color+';" class="card">';
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
-    html += '<span style="font-size:15px;font-weight:700;color:'+meta.color+';">'+meta.icon+' '+meta.name+'</span>';
+    html += '<span style="font-size:15px;font-weight:700;color:'+meta.color+';">'+meta.icon+' '+meta.name+'</span>';html += '<span style="font-size:10px;font-weight:700;color:#14b8a6;background:rgba(20,184,166,.14);border:1px solid rgba(20,184,166,.35);padding:1px 7px;border-radius:10px;white-space:nowrap;margin-left:4px;">📈 选股策略</span>';
     html += '<span style="font-size:11px;color:var(--dim);">'+meta.desc+'</span>';
     html += '<span style="padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);">'+_btStars(meta.stars)+'</span>';
     html += '</div>';
@@ -4646,7 +4646,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         var wrCell = m.ready ? '<span style="font-weight:700;color:'+_colorWR(m.wr)+';">'+m.wr.toFixed(1)+'%</span>' : '<span style="color:var(--dim);">—</span>';
         var arCell = m.ready ? '<span style="color:'+_colorPL(m.ar)+';">'+(m.ar>0?'+':'')+m.ar.toFixed(2)+'%</span>' : '<span style="color:var(--dim);">—</span>';
         html += '<tr style="border-bottom:1px solid rgba(148,163,184,.1);">';
-        html += '<td style="padding:6px;color:var(--txt);font-weight:700;">'+s.icon+' '+s.name+'</td>';
+        html += '<td style="padding:6px;color:var(--txt);font-weight:700;">'+s.icon+' '+s.name+' <span style="font-size:9px;font-weight:700;color:#14b8a6;background:rgba(20,184,166,.14);border:1px solid rgba(20,184,166,.35);padding:1px 5px;border-radius:4px;white-space:nowrap;">📈 选股策略</span></td>';
         html += '<td style="padding:6px;color:#fbbf24;font-size:11px;white-space:nowrap;">'+starStr+'</td>';
         html += '<td style="padding:6px;color:var(--sub);font-size:10.5px;">'+_esc(s.key==='triple'?'共振分档·baostock全回测':'信号日买/持N日卖')+'</td>';
         html += '<td style="padding:6px;text-align:right;color:var(--sub);">'+(m.sample||0)+'</td>';
