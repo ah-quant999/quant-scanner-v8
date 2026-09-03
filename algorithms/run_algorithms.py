@@ -148,6 +148,8 @@ ORDER = [
     #   track_h_auto_buy.py 默认 emit-js（写 data/H_AUTO_BUY_TRACK.js，写 raw_data/h_auto_buy_history.json）。
     #   这两个之前一直在算法链外，导致反推算法即使跑出结果也没人调度、没人推送、没人可见。
     "auto_run_dn_algorithm.py",
+    #   2026-09-04 强势突破选股（高手反推 v1）：依赖当日 h_auto_buy 池，须在其后、track 前跑。
+    "strong_breakout.py",
     "track_h_auto_buy.py",
     #   杜绝「某选股还没跑完，推荐却已生成」的抢跑问题。
     "final_recommend.py",              # → FINAL_RECOMMEND_DATA.js（跨策略共振 Top5，管线最终产物，置于末尾）
@@ -183,7 +185,7 @@ STAGES = {
         "gen_stock_stop.py", "gen_algo_track.py", "calc_sentiment_cycle.py",
         "refresh_dividend_cninfo.py", "calc_potential_picks.py",
         "refresh_stock_metadata.py", "fetch_weekend_run.py",   # 周末复盘/周度汇总（原 ORDER 漏挂 STAGE）
-        "auto_run_dn_algorithm.py", "track_h_auto_buy.py",
+        "auto_run_dn_algorithm.py", "strong_breakout.py", "track_h_auto_buy.py",
     ],
     "C": [  # 回测批（~19:00 CST，依赖 top10/crds history）：backtest 全家
         "scripts/ab_universe_backtest.py", "backtest_tdx.py", "backtest_comprehensive.py",
@@ -305,6 +307,7 @@ STOCK_PICKING_SCRIPTS = {
     "gen_algo_track.py",             # 算法追踪
     "calc_sentiment_cycle.py",       # 情绪周期（读 LIMIT_UP_HEATMAP）
     "auto_run_dn_algorithm.py",      # H 反推算法
+    "strong_breakout.py",            # 强势突破选股（高手反推版，依赖当日 h_auto_buy 池）
     "track_h_auto_buy.py",           # H 反推跟踪
     "calc_volatility_watch.py",      # 波动率观察选股
     "gen_stock_stop.py",             # ATR 止损止盈（读候选宇宙日K）

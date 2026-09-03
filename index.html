@@ -1489,6 +1489,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=615ce8c156" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=3948aa8153" defer></script>
+    <!-- 🆕 2026-09-04 强势突破选股（高手算法反推版 v1，strong_breakout.py 盘后产出） -->
+    <script src="data/STRONG_BREAKOUT.js?v=be64d5a4e2" defer></script>
     <script src="data/FACTOR_LAB.js?v=1a0b83babd" defer></script>
 <!-- 2026-08-31 轻量化：data/ALGO_TRACK.js（42.4 KB）前端零引用，停止注入（省 42.4 KB） -->
 <script src="data/ETF_PULSE.js?v=4474fd3f75" defer></script>
@@ -2613,6 +2615,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <div id="st-life" class="st-pane">
       <div class="card" id="lifeBody" style="border-left:4px solid #38bdf8;">
         <div class="note" style="padding:20px;text-align:center;color:var(--dim);">⏳ v8 选股生命周期加载中…</div>
+      </div>
+      <div class="card" id="strongBreakoutBody" style="border-left:4px solid #ef5350;margin-top:14px;">
+        <div class="note" style="padding:20px;text-align:center;color:var(--dim);">⚡ 强势突破（算法自算）加载中…</div>
       </div>
       <div class="card" id="imaStrongBody" style="border-left:4px solid #a78bfa;margin-top:14px;">
         <div class="note" style="padding:20px;text-align:center;color:var(--dim);">📡 高手强势股跟踪（ima 自动同步）加载中…</div>
@@ -4854,6 +4859,69 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   };
 
   /* ════════════════════════════════════════════════════════════════════
+     ⚡ 强势突破选股（高手算法反推版 v1，算法自算）
+     数据源 window.STRONG_BREAKOUT（strong_breakout.py 盘后产出：涨幅≥5% + 量比≥1.35 + 收位≥0.55 + 5日累计∈[0.5,15]%）。
+     渲染进 #strongBreakoutBody（#st-life 子页面，置于高手强势股跟踪上方）。
+     ════════════════════════════════════════════════════════════════════ */
+  window.__renderStrongBreakout = function(){
+    var dst = document.getElementById('strongBreakoutBody');
+    if(!dst) return;
+    function _e(s){ return String(s==null?'':s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+    var D = window.STRONG_BREAKOUT;
+    if(!D || !D.stocks || !D.stocks.length){
+      // 数据未就绪 → 自愈重试（覆盖 defer 加载窗口）
+      if(!(window.__sbRetry && window.__sbRetry >= 15)){
+        window.__sbRetry = (window.__sbRetry || 0) + 1;
+        setTimeout(window.__renderStrongBreakout, 700);
+      } else {
+        dst.innerHTML = '<div class="note" style="padding:20px;text-align:center;color:var(--dim);">⚡ 强势突破（算法自算）<br><span style="font-size:11px">数据加载中…若长时间为空请硬刷新 (Ctrl/Cmd+F5)</span></div>';
+      }
+      return;
+    }
+    window.__sbRetry = 0;
+    function _c(v){ var n=parseFloat(v); return isNaN(n)?'var(--sub)':(n>0?'#ef5350':(n<0?'#26a69a':'var(--sub)')); }
+    function _p(v){ var n=parseFloat(v); return isNaN(n)?'--':((n>0?'+':'')+n.toFixed(2)+'%'); }
+    function _n(v,d){ var x=parseFloat(v); return isNaN(x)?'--':x.toFixed(d==null?2:d); }
+    var html = '';
+    // 头部：名称 + 自算标签 + 更新时间
+    html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">';
+    html += '⚡ <span style="font-weight:700;font-size:14px;color:var(--txt);">强势突破</span>';
+    html += '<span style="font-size:10px;color:#ef5350;font-weight:600;background:rgba(239,83,80,.14);padding:1px 7px;border-radius:4px;">算法自算 · 高手反推 v1</span>';
+    if(typeof _uBadge === 'function') html += _uBadge('盘后','短线',(D.update_time||'').slice(0,16));
+    html += '</div>';
+    if(D.method) html += '<div style="font-size:11px;color:var(--dim);margin-bottom:8px;line-height:1.6;">口径：'+_e(D.method)+'</div>';
+    // 汇总胶囊
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;font-size:11px;">';
+    html += '<span style="padding:2px 8px;border-radius:10px;font-weight:600;color:#ef5350;background:#ef535022;border:1px solid #ef535055;">入选 '+(D.picked_count!=null?D.picked_count:D.stocks.length)+'</span>';
+    if(D.core_top_n!=null) html += '<span style="padding:2px 8px;border-radius:10px;font-weight:600;color:#fbbf24;background:#fbbf2422;border:1px solid #fbbf2455;">★ Core '+D.core_top_n+'</span>';
+    if(D.pool_count!=null) html += '<span style="padding:2px 8px;border-radius:10px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.35);">池基数 '+D.pool_count+'</span>';
+    html += '</div>';
+    html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;color:var(--sub);">';
+    html += '<thead><tr style="color:var(--dim);text-align:right;">'
+      + '<th style="padding:5px 6px;text-align:left;">代码</th><th style="padding:5px 6px;text-align:left;">名称</th>'
+      + '<th style="padding:5px 6px;text-align:left;">行业</th>'
+      + '<th style="padding:5px 6px;">涨幅</th><th style="padding:5px 6px;">量比</th>'
+      + '<th style="padding:5px 6px;">收位</th><th style="padding:5px 6px;">5日累计</th>'
+      + '<th style="padding:5px 6px;">评分</th><th style="padding:5px 6px;">Core</th></tr></thead><tbody>';
+    D.stocks.slice(0, 50).forEach(function(s){
+      html += '<tr style="border-top:1px solid var(--border);">'
+        + '<td style="padding:5px 6px;color:var(--txt);font-weight:600;">'+(s.code||'')+'</td>'
+        + '<td style="padding:5px 6px;color:var(--txt);">'+_e(s.name||'')+'</td>'
+        + '<td style="padding:5px 6px;color:var(--dim);max-width:160px;">'+_e((s.industry||'').replace(/[业制制造]+$|\s*Ⅱ$/g,''))+'</td>'
+        + '<td style="padding:5px 6px;text-align:right;color:'+_c(s.pct)+';font-weight:600;">'+_p(s.pct)+'</td>'
+        + '<td style="padding:5px 6px;text-align:right;color:var(--txt);">'+_n(s.vol_ratio)+'</td>'
+        + '<td style="padding:5px 6px;text-align:right;">'+_n(s.close_pos)+'</td>'
+        + '<td style="padding:5px 6px;text-align:right;color:'+_c(s.ret5)+';">'+_p(s.ret5)+'</td>'
+        + '<td style="padding:5px 6px;text-align:right;color:var(--txt);">'+_n(s.score,1)+'</td>'
+        + '<td style="padding:5px 6px;text-align:center;">'+(s.core?'<span style="color:#fbbf24;">★</span>':'<span style="color:var(--dim);">—</span>')+'</td>'
+        + '</tr>';
+    });
+    html += '</tbody></table></div>';
+    if(D.stocks.length>50) html += '<div class="note" style="text-align:center;color:var(--dim);padding:8px;font-size:11px;">仅展示评分前 50 / 共 '+D.stocks.length+' 只</div>';
+    dst.innerHTML = html;
+  };
+
+  /* ════════════════════════════════════════════════════════════════════
      📡 高手强势股跟踪（ima 自动同步）
      数据源 window.IMA_STRONG_STOCK（fetch_ima_strong_stock.py 每日 15:45 抓取 ima 分享页）。
      渲染进 #imaStrongBody（#st-life 子页面，置于选股生命周期下方）。
@@ -5042,7 +5110,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   };
 
   // DOM ready hook
-  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} }
+  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} }
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', _renderPostReady);
   } else {
@@ -9959,6 +10027,7 @@ window.showRestrictedItems = showRestrictedItems;
     if(n==='pool' && typeof window.renderStPool==='function') setTimeout(window.renderStPool, 30);
     if(n==='life' && typeof window.__renderLifecycleSection==='function') setTimeout(window.__renderLifecycleSection, 30);
     if(n==='life' && typeof window.__renderImaStrongStock==='function') setTimeout(window.__renderImaStrongStock, 30);
+    if(n==='life' && typeof window.__renderStrongBreakout==='function') setTimeout(window.__renderStrongBreakout, 30);
     if(n==='life' && typeof window.__renderFactorLab==='function') setTimeout(window.__renderFactorLab, 30);
     // 🛡 2026-09-02 主人令根治：切换后立即启动「子 tab 数据就绪重试」（见 __stRetryTab），消除 defer 未注入导致的首渲空卡
     try{ window.__stRetryTab(n); }catch(e){}
