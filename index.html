@@ -745,6 +745,7 @@ window.V8_CAL = {weeks:[],legend:[]};
   /* 统一「已跑完」胶囊文案（2026-08-09 修复：「已完成」→「已跑」，与「已入仓」成对；
    *  2026-08-11 主人令：分三态时段守卫——「盘中显示已跑完」违背直觉；
    *  改为：盘前 不显示，盘中 ⏳ 今日盘中预览，盘后 ✅ 今日已跑完；旧日仍按 ✅ MM-DD 已跑）
+   *  2026-09-03 主人令：所有状态一律带准确 MM-DD HH:MM（见 _runBadgeInfo 内注释），不再出现无日期时间的「今日已跑完」。
    * 入参：gen_time / data_time / update_time 时间字符串
    * 返回：{ show:Boolean, label:String }
    * 规则：
@@ -773,6 +774,16 @@ window.V8_CAL = {weeks:[],legend:[]};
   window._runBadgeInfo = function(genTimeStr){
     var dataDate = window._extractDateStr(genTimeStr);
     if(!dataDate) return { show:false, label:'' };
+    /* 2026-09-03 主人令：胶囊必须写「准确跑完的日期+时间」，禁止只写「今日已跑完」——
+     *   链中途半成品（13:14 假回测 / 20:07 半程）曾与终稿同样显示「今日已跑完」，无法分辨。
+     *   现所有状态一律带 MM-DD HH:MM：今日 → 「✅ 09-03 21:47 已跑完」，更早 → 「✅ 09-02 20:58 已跑」。 */
+    var _bd = window._parseAsCST ? window._parseAsCST(genTimeStr) : null;
+    var _hm = (_bd && !isNaN(_bd.getTime()) && window._fmtHmCST) ? window._fmtHmCST(_bd) : '';
+    if(!_hm){
+      var _bhm = String(genTimeStr||'').match(/(\d{1,2}:\d{2})/);
+      if(_bhm) _hm = _bhm[1];
+    }
+    var _stamp = dataDate.slice(5) + (_hm ? ' ' + _hm : '');
     var now = new Date();
     var parts = window._cstParts ? window._cstParts(now) : null;
     if(!parts) return { show:false, label:'' };
@@ -786,11 +797,11 @@ window.V8_CAL = {weeks:[],legend:[]};
     var isPost = (parts.hh >= 15);
     if(diff === 0){
       if(isPre)  return { show:false, label:'' };
-      if(!isPost) return { show:true, label:'⏳ 今日盘中预览' };
-      return { show:true, label:'✅ 今日已跑完' };
+      if(!isPost) return { show:true, label:'⏳ '+_stamp+' 盘中预览' };
+      return { show:true, label:'✅ '+_stamp+' 已跑完' };
     }
-    if(diff === 1) return { show:true, label:'✅ 昨日 已跑' }; // 与 _uBadge「昨日」保持一致
-    if(diff <= 30) return { show:true, label:'✅ '+dataDate.slice(5)+' 已跑' }; // "08-06 已跑"
+    if(diff === 1) return { show:true, label:'✅ '+_stamp+' 已跑' };
+    if(diff <= 30) return { show:true, label:'✅ '+_stamp+' 已跑' };
     return { show:false, label:'' };
   };
   /* 统一相对时间：非交易日且数据日期为上一交易日，显示「上一交易日收盘」 */
@@ -12724,6 +12735,8 @@ window.__renderV8CalToday();
     }
     h+='<span class="fr-enter">· 入选日 '+_fe(s.enter_date||'—')+'</span>';
     h+='<span class="fr-tag '+horizon[1]+'">'+_fe(horizon[0])+'</span>';
+    // 2026-09-03 主人令：综合评分写出来（所有名次统一渲染）
+    if(s.final_score!=null) h+='<span class="fr-tag" style="background:rgba(245,158,11,.15);color:#f59e0b;border-color:rgba(245,158,11,.4);font-weight:800">⭐ 综合 '+_fn(s.final_score,1)+'</span>';
     h+='</div>';
 
     // 概念标签
@@ -12795,6 +12808,25 @@ window.__renderV8CalToday();
     if(s.atr!=null) h+='ATR <b>'+_fn(s.atr)+'</b>';
     h+='</div>';
 
+    // 2026-09-03 主人令：新增分析角度（带评分）· 所有名次统一渲染，字段缺省自动省略不空块
+    (function(){
+      var bt = s.backtest || {};
+      var lines='';
+      if(bt.win_rate!=null && (bt.signals||0)>0){
+        var _wc = bt.win_rate>=55?'var(--up)':(bt.win_rate<=45?'var(--down)':'var(--gold)');
+        lines+='<span>🎯 个股历史共振 <b>'+bt.signals+'</b> 次 · 胜率 <b style="color:'+_wc+'">'+_fn(bt.win_rate,1)+'%</b> · 均收益 <b>'+((bt.avg_return||0)>0?'+':'')+_fn(bt.avg_return,2)+'%</b></span>';
+      } else if(bt.win_rate!=null && bt.win_rate>0){
+        lines+='<span>🎯 策略级回测：最佳持有 '+(bt.best_hold_days||'--')+' 天 · 胜率 <b>'+_fn(bt.win_rate,1)+'%</b> · 均收益 <b>'+((bt.avg_return||0)>0?'+':'')+_fn(bt.avg_return,2)+'%</b></span>';
+      }
+      var tk = s.tracking || {};
+      if(tk.entry_price!=null){
+        var rp = tk.return_pct||0;
+        var _pc = rp>0?'var(--up)':(rp<0?'var(--down)':'var(--sub)');
+        lines+='<span>📋 跟踪：'+_fe(tk.entry_date||'--')+' 入场 ¥'+_fn(tk.entry_price)+' · 浮盈 <b style="color:'+_pc+'">'+(rp>0?'+':'')+_fn(rp,2)+'%</b> · '+_fe(tk.note||'')+'</span>';
+      }
+      if(s.action) lines+='<span>🎪 操作建议：<b>'+_fe(s.action)+'</b></span>';
+      if(lines) h+='<div class="fr-row" style="gap:6px 14px;font-size:11.5px;color:var(--sub);flex-wrap:wrap;margin-top:4px">'+lines+'</div>';
+    })();
     if(s.reason) h+='<div class="fr-reason"><b style="color:var(--txt)">入选依据：</b>'+_fe(s.reason)+'</div>';
     h+='</div>';
     return h;
@@ -12843,6 +12875,25 @@ window.__renderV8CalToday();
         if(it && it.code){ _algoIndex[String(it.code)] = { cons: it.consensus_count||0, algos: Array.isArray(it.algos_hit) ? it.algos_hit : [] }; }
       });
     }catch(e){ console.warn('[renderFinalRec] algoIndex', e); }
+    // 2026-09-03 主人令：Top5/共振轨字段缺失前端兜底（数据侧 final_recommend 点前缀修复次日生效）
+    //   '.601899' 类 ROE_TTM/高手跟踪源票 close/concepts/industry 全空 → 从 STOCK_PROFILE/STOCK_QUOTE 补齐
+    try{
+      var _profAll = (window.STOCK_PROFILE && window.STOCK_PROFILE.profiles) || {};
+      var _sqAll = (window.STOCK_QUOTE && window.STOCK_QUOTE.stocks) || {};
+      function _frNk(c){ return String(c||'').replace(/\D/g,''); }
+      function _frFill(s){
+        var nk=_frNk(s.code);
+        var prof=_profAll[nk]||{};
+        if(!s.industry && prof.industry) s.industry=prof.industry;
+        if((!s.concepts||!s.concepts.length) && prof.concepts) s.concepts=prof.concepts.slice(0,8);
+        if(s.close==null){
+          var prefs=['','sz','sh','bj'];
+          for(var i=0;i<prefs.length;i++){ var q=_sqAll[prefs[i]+nk]; if(q&&q.price!=null){ s.close=q.price; if(s.pct_chg==null) s.pct_chg=q.pct; break; } }
+        }
+      }
+      (D.stocks||[]).forEach(_frFill);
+      (D.consensus_stocks||[]).forEach(_frFill);
+    }catch(e){ console.warn('[renderFinalRec] enrich', e); }
     // 状态徽标行（统一 pill 风格）
     (function(){
       var sb=document.getElementById('finalStatusBadges'); if(!sb) return;
@@ -12975,12 +13026,20 @@ window.__renderV8CalToday();
       var pct=s.pct_chg;
       var price=s.close;
       var tags='';
+      // 2026-09-03 主人令：评分写出来（按 final_score 降序、分数越高排越前面）——含基本面因子 ROE_TTM 计分
+      if(s.final_score!=null) tags+='<span class="no-shrink" style="display:inline-block;padding:2px 7px;border-radius:999px;background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.4);font-size:11px;font-weight:800;white-space:nowrap" title="综合评分 = 各源强度 + 共振×1.5 + 板块加分（基本面因子 ROE_TTM 计入源强度）">⭐ '+_fn(s.final_score,1)+'分</span>';
       tags+=_mkTag(board, _boardColor(board));
       // 2026-08-13 主人令：取消「已降权」市场歧视标签；港股暂无基本面数据源，
       // 以灰色信息标签「数据待补」提示，不压分、不警告。
       if(isHK) tags+='<span class="no-shrink"  style="display:inline-block;padding:2px 7px;border-radius:999px;background:#64748b22;color:#94a3b8;border:1px solid #64748b40;font-size:10px;font-weight:600;white-space:nowrap">数据待补</span>';
       if(s.industry) tags+=_mkTag(s.industry, '#64748b');
-      (s.concepts||[]).slice(0,4).forEach(function(c){ tags+=_mkTag(c, '#38bdf8'); });
+      (s.concepts||[]).slice(0,8).forEach(function(c){ tags+=_mkTag(c, '#38bdf8'); });  /* 2026-09-03 主人令：后缀标签 4→8 */
+      // 2026-09-03 主人令：RPS 相对强度评分（新分析角度·带分）
+      try{
+        var _rmap = window.__rpsMapByCode || (window.__rpsMapByCode = window._buildRpsMap ? window._buildRpsMap() : {});
+        var _rr = _rmap[String(s.code)||''];
+        if(_rr && _rr.rps_max!=null) tags+='<span class="no-shrink" style="display:inline-block;padding:2px 7px;border-radius:999px;background:rgba(20,184,166,.15);color:#14b8a6;border:1px solid rgba(20,184,166,.4);font-size:11px;font-weight:700;white-space:nowrap" title="相对强度 RPS 段位：'+_fe(_rr.tier||'')+'">📈 RPS '+_rr.rps_max.toFixed(0)+'</span>';
+      }catch(_e){}
       // 2026-09-01 主人令：🆕 多 algo 共识加权（3/3→+5、2/3→+3、1/3→+1）→ 蓝色 chip 显示在 tags 行
       try{
         var _ai = _algoIndex[String(s.code)||''];
@@ -13045,10 +13104,13 @@ window.__renderV8CalToday();
       return '<div>'+items.map(_renderStock).join('')+'</div>';
     }
 
+    // 2026-09-03 主人令：短线只展示评分前 20 名（64 只太多），其余按分截断；中长线全展
+    var _SHORT_TOP = 20;
+    var shortShow = shortList.slice(0, _SHORT_TOP);
     var h='<div style="font-size:13px;font-weight:700;color:var(--up);margin-bottom:4px">🎯 今日推荐候选池 '+ordered.length+' 只（按综合分排序 · 短线'+shortList.length+' · 中长线'+longList.length+'）</div>';
-    h+='<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">公平原则：A股/港股统一按 final_score 排序，市场来源本身不是负面信号。港股因暂无基本面数据源，标记「数据待补」（灰色信息标签，不降权）。</div>';
+    h+='<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">公平原则：A股/港股统一按 final_score 排序，市场来源本身不是负面信号。港股因暂无基本面数据源，标记「数据待补」（灰色信息标签，不降权）。'+(shortList.length>_SHORT_TOP?'短线仅展示评分前 '+_SHORT_TOP+' 名，其余 '+(shortList.length-_SHORT_TOP)+' 只按分截断。':'')+'</div>';
     h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">'
-      +'<div><div style="font-size:12px;font-weight:800;color:#38bdf8;margin-bottom:6px;display:flex;align-items:center;gap:4px;">⚡ 短线候选 <span style="font-size:11px;font-weight:600;color:var(--dim)">('+shortList.length+')</span></div>'+_renderColumn(shortList,'短线候选','⚡','#38bdf8')+'</div>'
+      +'<div><div style="font-size:12px;font-weight:800;color:#38bdf8;margin-bottom:6px;display:flex;align-items:center;gap:4px;">⚡ 短线候选 <span style="font-size:11px;font-weight:600;color:var(--dim)">(评分前 '+shortShow.length+'/'+shortList.length+')</span></div>'+_renderColumn(shortShow,'短线候选','⚡','#38bdf8')+'</div>'
       +'<div><div style="font-size:12px;font-weight:800;color:#22c55e;margin-bottom:6px;display:flex;align-items:center;gap:4px;">🌿 中长线候选 <span style="font-size:11px;font-weight:600;color:var(--dim)">('+longList.length+')</span></div>'+_renderColumn(longList,'中长线候选','🌿','#22c55e')+'</div>'
       +'</div>';
 
