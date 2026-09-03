@@ -531,7 +531,7 @@ window.__domReadyFns=[];
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/POTENTIAL_PICKS.js?v=f233e0dda1" defer></script>
 <script src="data/INDEX_QUOTES.js?v=2eef47eb6d" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=55a2cf5202" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=11b26c169f" defer></script>
 <script src="data/MARGIN_DATA.js?v=3461a6538e" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=3a96b8740f" defer></script>
 <script src="data/IPO_DATA.js?v=b4f985400f" defer></script>
@@ -1503,12 +1503,12 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=39f8795a87" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=ee6f655d59" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=9094b3b299" defer></script>
-<script src="data/HEALTH_CHECK.js?v=313b4eba3e" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=6cd5625be3" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=de5ca2e39a" defer></script>
+<script src="data/RUNNER_STATUS.js?v=304f09a654" defer></script>
+<script src="data/HEALTH_CHECK.js?v=dd1d66a3eb" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=5e0d35d9c6" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=951f776be0" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 MARKET_PATH_PROBABILITY 注入（AI预测卡用） -->
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=4e2f9d6476" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=2f8194c864" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=758fa38032" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=9fffcc6505" defer></script>
@@ -12619,7 +12619,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=313b4eba3e')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=dd1d66a3eb')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
