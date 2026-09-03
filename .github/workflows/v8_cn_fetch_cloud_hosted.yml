@@ -30,6 +30,11 @@ on:
 
 permissions:
   contents: write
+  # 🛡 2026-09-03 阿狸咪令（hosted 兜底连续 3 天 failure 根因之二，当场修）：
+  #   self_heal 自愈派发（v8_health_check）与云端兜底调度（cloud_dispatcher.py）
+  #   都是 workflow_dispatch 调用，默认 GITHUB_TOKEN 只有 contents:write
+  #   → HTTP 403 "Resource not accessible by integration"，自愈永远派不出去。
+  actions: write
 
 concurrency:
   group: v8-cn-fetch-cloud-hosted
@@ -221,6 +226,13 @@ jobs:
           python update_v8.py
 
       - name: "🩺 刷新 HEALTH_CHECK.js (v8_health_check)"
+        # 🛡 2026-09-03 阿狸咪令（hosted 兜底连续 3 天 failure 根因之一，当场修）：
+        #   深夜/盘后早期档算法链产物隔夜陈旧属常态 → overall=fail → rc=2 →
+        #   本步失败 → 下方「推送重建 data/*.js / 原子 ?v / 云端兜底调度」全 skipped。
+        #   兜底链改软模式：报告照写、自愈照派（配合 actions:write 权限已通）、
+        #   退出码恒 0；告警职责仍由 strict 主 lane（巡检/每日审核）承担。
+        env:
+          V8_HEALTH_SOFT_EXIT: "1"
         shell: bash
         run: |
           python v8_health_check.py
