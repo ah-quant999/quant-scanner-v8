@@ -388,14 +388,18 @@ def main():
     })
 
     def ensure(code, name, market, board):
-        r = pool[norm_code(code)]
+        # 2026-09-03 主人令修复：FACTOR_LAB/外部源代码带 '.' 前缀（如 '.601899'），
+        #   norm_code 不剥点 → pool key 带点 → 画像/止损/行情 lookup 全失配，
+        #   Top5 第1/2名 concepts=0、reason 空、止损/目标/盈亏比全 None（第3名四量终极源正常）。
+        _nc = norm_code(code).lstrip('.')
+        r = pool[_nc]
         if not r["code"]:
-            r["code"] = code
-            r["name"] = fix_name(code, name)
-            r["market"] = market or market_prefix(code)
-            r["board"] = board or board_from_code(code)
+            r["code"] = _nc
+            r["name"] = fix_name(_nc, name)
+            r["market"] = market or market_prefix(_nc)
+            r["board"] = board or board_from_code(_nc)
             # 从 STOCK_STOP_DATA 预填支撑/压力/ATR/止损/目标（如存在）
-            ss = stop_stocks.get(norm_code(code)) or stop_stocks.get(code)
+            ss = stop_stocks.get(_nc) or stop_stocks.get(code)
             if ss:
                 for k in ["support", "resistance", "atr", "stop_loss", "target_price", "risk_reward"]:
                     if ss.get(k) is not None:
@@ -565,6 +569,12 @@ def main():
             r["sources"].append("ROE_TTM")
             r["source_scores"]["ROE_TTM"] = round(sc, 2)
             r["signals"].append("高ROE")
+            # 2026-09-03 主人令：补入选依据与行情（之前第1/2名 reason 空、无价格→分析不如第3名）
+            r["reasons"].append(f"基本面因子 高ROE 排名第{i + 1}")
+            if s.get("close"):
+                r["close"] = s.get("close") or r["close"]
+            if s.get("pct_chg"):
+                r["pct_chg"] = s.get("pct_chg") or r["pct_chg"]
             if s.get("first_date"):
                 r["enter_dates"].append(s["first_date"])
 
@@ -597,6 +607,7 @@ def main():
                 r["sources"].append("高手跟踪")
                 r["source_scores"]["高手跟踪"] = round(sc, 2)
                 r["signals"].append("高手共振")
+                r["reasons"].append("高手强势股跟踪池共振（IMA 状态有效）")
                 _hit += 1
         print("[ok] 高手共振命中 v8 池 %d 只" % _hit)
     else:
@@ -612,6 +623,21 @@ def main():
                 r["industry"] = prof.get("industry") or ""
             if prof.get("concepts"):
                 r["concepts"] = list(set(r["concepts"] + prof.get("concepts")))
+
+    # 2026-09-03 主人令：候选池行情兜底——ROE_TTM/高手跟踪单源票常无 close，
+    #   导致止损/目标/盈亏比全空、前端"第1/2名分析不如第3名"。从 CANDIDATE_QUOTES 补价。
+    _cq_map = {}
+    for _q in ((load_js("CANDIDATE_QUOTES.js", "CANDIDATE_QUOTES") or {}).get("items") or []):
+        if isinstance(_q, dict) and _q.get("code"):
+            _cq_map[norm_code(_q["code"]).lstrip('.')] = _q
+    for key, r in pool.items():
+        if not r["close"]:
+            _q = _cq_map.get(key) or _cq_map.get(norm_code(key).lstrip('.'))
+            if _q:
+                if _q.get("price"):
+                    r["close"] = _q["price"]
+                if _q.get("chg") and not r["pct_chg"]:
+                    r["pct_chg"] = _q["chg"]
 
     # 计算板块加分 与 最终分
     scored = []
@@ -718,7 +744,7 @@ def main():
     # 清理输出字段
     out_stocks = []
     for s in top:
-        code = norm_code(s["code"])
+        code = norm_code(s["code"]).lstrip('.')  # 2026-09-03 主人令：剥点（与 R1 ensure 对齐）
         # market 统一为交易所前缀；原始 s["market"] 可能是中文描述，不可靠
         market = market_prefix(code)
         board = s["board"] or board_from_code(code)
@@ -841,7 +867,7 @@ def main():
             "_60m_resonance": s.get("_60m_resonance", False),
             "reason": "；".join(s["reasons"][:3]),
             "industry": s["industry"],
-            "concepts": s["concepts"][:6],
+            "concepts": s["concepts"][:8],  # 2026-09-03 主人令：6→8
             "backtest": backtest,
             "tracking": tracking,
             "action": _action_label,
@@ -903,7 +929,7 @@ def main():
             "_60m_resonance": s.get("_60m_resonance", False),
             "reason": "；".join(s["reasons"][:3]),
             "industry": s["industry"],
-            "concepts": s["concepts"][:6],
+            "concepts": s["concepts"][:8],  # 2026-09-03 主人令：6→8
             "backtest": {},  # 共振最强不重复跑回测
             "tracking": tracking,
             "action": _action_label,
@@ -946,7 +972,7 @@ def main():
                 "sources": sorted(set(x["sources"])),
                 "signals": sorted(set(x.get("signals") or []))[:6],
                 "industry": x.get("industry", ""),
-                "concepts": x.get("concepts", [])[:6],
+                "concepts": x.get("concepts", [])[:8],  # 2026-09-03 主人令：6→8
                 "enter_date": (min([d for d in x.get("enter_dates", []) if d]) if x.get("enter_dates") else None) or datetime.now().strftime("%Y-%m-%d"),
                 "stop_loss": round(safe_float(x.get("stop_loss")), 2) if x.get("stop_loss") is not None else None,
                 "target_price": round(safe_float(x.get("target_price")), 2) if x.get("target_price") is not None else None,
