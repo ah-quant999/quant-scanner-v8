@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-09-03 23:27:12",
-  "total": 477,
+  "update_time": "2026-09-04 00:13:45",
+  "total": 479,
   "grade_summary": {
-    "A": 30,
+    "A": 29,
     "B": 25,
-    "C": 124,
-    "D": 177,
-    "no_data": 121
+    "C": 125,
+    "D": 176,
+    "no_data": 124
   },
   "stocks": {
     "hk_00001": {
@@ -24,6 +24,13 @@
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
     "hk_00012": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_00013": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -681,6 +688,13 @@
       "revenue_growth": null,
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
+    "hk_03696": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
     "hk_03750": {
       "score": 0,
       "grade": "",
@@ -808,6 +822,13 @@
       "reason": "港股暂无基本面数据源(中性不扣分)"
     },
     "hk_09901": {
+      "score": 0,
+      "grade": "",
+      "roe": null,
+      "revenue_growth": null,
+      "reason": "港股暂无基本面数据源(中性不扣分)"
+    },
+    "hk_09903": {
       "score": 0,
       "grade": "",
       "roe": null,
@@ -1222,9 +1243,10 @@
       "revenue_growth": 70.9484,
       "reason": "ROE偏低(5.6%) | 营收高增(70.9%)",
       "news": {
-        "score": 15,
+        "score": 5,
         "tags": [
-          "中报预增"
+          "中报预增",
+          "处罚"
         ]
       }
     },
@@ -1274,6 +1296,19 @@
       "roe": 2.0854999999999997,
       "revenue_growth": 6.369800000000001,
       "reason": "ROE差(2.1%) | 营收持平(6.4%)"
+    },
+    "sh_600703": {
+      "score": 25,
+      "grade": "D",
+      "roe": -0.2814,
+      "revenue_growth": 11.3564,
+      "reason": "ROE差(-0.3%) | 营收增长(11.4%)",
+      "news": {
+        "score": -15,
+        "tags": [
+          "中报首亏"
+        ]
+      }
     },
     "sh_600721": {
       "score": 25,
@@ -1435,13 +1470,6 @@
       "roe": 4.0527,
       "revenue_growth": 0.8428,
       "reason": "ROE差(4.1%) | 营收持平(0.8%)"
-    },
-    "sh_601601": {
-      "score": 30,
-      "grade": "D",
-      "roe": 9.905999999999999,
-      "revenue_growth": 6.6043,
-      "reason": "ROE偏低(9.9%) | 营收持平(6.6%)"
     },
     "sh_601606": {
       "score": 25,
@@ -1719,13 +1747,7 @@
       "grade": "D",
       "roe": 2.9007,
       "revenue_growth": 17.5542,
-      "reason": "ROE差(2.9%) | 营收增长(17.6%)",
-      "news": {
-        "score": -10,
-        "tags": [
-          "处罚"
-        ]
-      }
+      "reason": "ROE差(2.9%) | 营收增长(17.6%)"
     },
     "sh_688031": {
       "score": 25,
@@ -2558,19 +2580,6 @@
         ]
       }
     },
-    "sh_688808": {
-      "score": 70,
-      "grade": "A",
-      "roe": 26.471099999999996,
-      "revenue_growth": 41.7718,
-      "reason": "ROE优质(26.5%) | 营收高增(41.8%)",
-      "news": {
-        "score": 15,
-        "tags": [
-          "中报预增"
-        ]
-      }
-    },
     "sh_688820": {
       "score": 25,
       "grade": "D",
@@ -2656,13 +2665,7 @@
       "grade": "C",
       "roe": 8.136899999999999,
       "revenue_growth": 32.947199999999995,
-      "reason": "ROE偏低(8.1%) | 营收高增(32.9%)",
-      "news": {
-        "score": 8,
-        "tags": [
-          "回购"
-        ]
-      }
+      "reason": "ROE偏低(8.1%) | 营收高增(32.9%)"
     },
     "sz_000426": {
       "score": 65,
@@ -2760,19 +2763,6 @@
         "score": 15,
         "tags": [
           "中报预增"
-        ]
-      }
-    },
-    "sz_000712": {
-      "score": 15,
-      "grade": "D",
-      "roe": 0.5312,
-      "revenue_growth": 1.462,
-      "reason": "ROE差(0.5%) | 营收持平(1.5%)",
-      "news": {
-        "score": -15,
-        "tags": [
-          "中报预减"
         ]
       }
     },
@@ -3010,6 +3000,19 @@
         "score": 15,
         "tags": [
           "中报预增"
+        ]
+      }
+    },
+    "sz_002297": {
+      "score": 45,
+      "grade": "C",
+      "roe": 7.6936,
+      "revenue_growth": 22.2275,
+      "reason": "ROE偏低(7.7%) | 营收高增(22.2%)",
+      "news": {
+        "score": 15,
+        "tags": [
+          "一季报预增"
         ]
       }
     },

@@ -1,16 +1,16 @@
 {
-  "update_time": "2026-09-04 00:03",
+  "update_time": "2026-09-04 01:11",
   "window_days": 90,
   "total_stats": {
     "four_volume": {
-      "tracking": 57,
+      "tracking": 58,
       "history_samples": 0,
       "win_rate": 0,
       "avg_return": 0,
       "exit_target": 0,
       "exit_stop": 0,
       "exit_timeout": 0,
-      "today_signals": 4
+      "today_signals": 6
     }
   },
   "algos": [
@@ -18,14 +18,14 @@
       "algo": "four_volume",
       "display_name": "四量终极",
       "stats": {
-        "tracking": 57,
+        "tracking": 58,
         "history_samples": 0,
         "win_rate": 0,
         "avg_return": 0,
         "exit_target": 0,
         "exit_stop": 0,
         "exit_timeout": 0,
-        "today_signals": 4
+        "today_signals": 6
       },
       "tracking": [
         {
@@ -38,7 +38,7 @@
           "last_close": 39.36,
           "last_pct": -3.77,
           "peak_pct": 3.81,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -57,7 +57,7 @@
           "last_close": 123.94,
           "last_pct": -17.92,
           "peak_pct": 10.0,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -76,7 +76,7 @@
           "last_close": 60.01,
           "last_pct": -7.85,
           "peak_pct": 3.81,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -95,7 +95,7 @@
           "last_close": 109.76,
           "last_pct": -10.07,
           "peak_pct": 0.98,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -114,7 +114,7 @@
           "last_close": 51.15,
           "last_pct": -9.4,
           "peak_pct": 1.31,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -133,7 +133,7 @@
           "last_close": 135.8,
           "last_pct": -5.19,
           "peak_pct": 10.18,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -152,7 +152,7 @@
           "last_close": 19.17,
           "last_pct": -22.86,
           "peak_pct": 0.0,
-          "days_in": 47,
+          "days_in": 48,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -171,7 +171,7 @@
           "last_close": 4.97,
           "last_pct": -6.05,
           "peak_pct": 18.53,
-          "days_in": 47,
+          "days_in": 48,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -190,7 +190,7 @@
           "last_close": 34.39,
           "last_pct": -20.32,
           "peak_pct": 0.0,
-          "days_in": 47,
+          "days_in": 48,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -209,7 +209,7 @@
           "last_close": 39.65,
           "last_pct": 20.26,
           "peak_pct": 22.41,
-          "days_in": 47,
+          "days_in": 48,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -228,7 +228,7 @@
           "last_close": 247.61,
           "last_pct": 5.01,
           "peak_pct": 7.53,
-          "days_in": 47,
+          "days_in": 48,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -247,7 +247,7 @@
           "last_close": 202.29,
           "last_pct": -7.63,
           "peak_pct": 0.0,
-          "days_in": 46,
+          "days_in": 47,
           "appear_count": 1,
           "last_seen": "20260817",
           "signal_detail": {
@@ -266,7 +266,7 @@
           "last_close": 83.75,
           "last_pct": -16.07,
           "peak_pct": 3.64,
-          "days_in": 46,
+          "days_in": 47,
           "appear_count": 1,
           "last_seen": "20260817",
           "signal_detail": {
@@ -285,7 +285,7 @@
           "last_close": 20.06,
           "last_pct": -14.38,
           "peak_pct": 0.81,
-          "days_in": 46,
+          "days_in": 47,
           "appear_count": 1,
           "last_seen": "20260817",
           "signal_detail": {
@@ -304,7 +304,7 @@
           "last_close": 89.56,
           "last_pct": -7.67,
           "peak_pct": 0.0,
-          "days_in": 45,
+          "days_in": 46,
           "appear_count": 1,
           "last_seen": "20260819",
           "signal_detail": {
@@ -323,7 +323,7 @@
           "last_close": 87.8,
           "last_pct": -21.14,
           "peak_pct": 0.0,
-          "days_in": 45,
+          "days_in": 46,
           "appear_count": 1,
           "last_seen": "20260819",
           "signal_detail": {
@@ -342,7 +342,7 @@
           "last_close": 180.36,
           "last_pct": -2.69,
           "peak_pct": 0.0,
-          "days_in": 45,
+          "days_in": 46,
           "appear_count": 1,
           "last_seen": "20260819",
           "signal_detail": {
@@ -361,7 +361,7 @@
           "last_close": 87.68,
           "last_pct": -7.32,
           "peak_pct": 2.29,
-          "days_in": 45,
+          "days_in": 46,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -380,7 +380,7 @@
           "last_close": 143.98,
           "last_pct": -21.39,
           "peak_pct": 0.0,
-          "days_in": 45,
+          "days_in": 46,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -399,7 +399,7 @@
           "last_close": 39.36,
           "last_pct": -10.1,
           "peak_pct": 7.47,
-          "days_in": 45,
+          "days_in": 46,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -418,7 +418,7 @@
           "last_close": 16.13,
           "last_pct": -2.54,
           "peak_pct": 12.75,
-          "days_in": 45,
+          "days_in": 46,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -437,7 +437,7 @@
           "last_close": 65.29,
           "last_pct": 2.66,
           "peak_pct": 8.02,
-          "days_in": 45,
+          "days_in": 46,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -456,7 +456,7 @@
           "last_close": 131.99,
           "last_pct": -12.21,
           "peak_pct": 3.35,
-          "days_in": 45,
+          "days_in": 46,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -475,7 +475,7 @@
           "last_close": 347.01,
           "last_pct": -16.79,
           "peak_pct": 1.12,
-          "days_in": 45,
+          "days_in": 46,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -494,7 +494,7 @@
           "last_close": 373.6,
           "last_pct": -11.48,
           "peak_pct": 3.57,
-          "days_in": 45,
+          "days_in": 46,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -513,7 +513,7 @@
           "last_close": 373.49,
           "last_pct": -8.22,
           "peak_pct": 1.98,
-          "days_in": 45,
+          "days_in": 46,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -532,7 +532,7 @@
           "last_close": 118.76,
           "last_pct": -11.37,
           "peak_pct": 4.34,
-          "days_in": 45,
+          "days_in": 46,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -551,7 +551,7 @@
           "last_close": 32.91,
           "last_pct": -6.45,
           "peak_pct": 2.05,
-          "days_in": 45,
+          "days_in": 46,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -570,7 +570,7 @@
           "last_close": 35.19,
           "last_pct": -2.68,
           "peak_pct": 5.92,
-          "days_in": 45,
+          "days_in": 46,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -589,7 +589,7 @@
           "last_close": 30.0,
           "last_pct": -24.49,
           "peak_pct": 4.46,
-          "days_in": 45,
+          "days_in": 46,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -608,7 +608,7 @@
           "last_close": 168.22,
           "last_pct": -10.35,
           "peak_pct": 0.0,
-          "days_in": 39,
+          "days_in": 40,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -627,9 +627,9 @@
           "last_close": 44.26,
           "last_pct": -4.16,
           "peak_pct": 0.0,
-          "days_in": 39,
+          "days_in": 40,
           "appear_count": 1,
-          "last_seen": "20260904",
+          "last_seen": "20260903",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
@@ -646,7 +646,7 @@
           "last_close": 17.7,
           "last_pct": -22.91,
           "peak_pct": 0.0,
-          "days_in": 39,
+          "days_in": 40,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -665,7 +665,7 @@
           "last_close": 57.9,
           "last_pct": -14.04,
           "peak_pct": 0.0,
-          "days_in": 39,
+          "days_in": 40,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -684,7 +684,7 @@
           "last_close": 30.81,
           "last_pct": -14.8,
           "peak_pct": 0.0,
-          "days_in": 39,
+          "days_in": 40,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -703,7 +703,7 @@
           "last_close": 813.0,
           "last_pct": -13.79,
           "peak_pct": 0.0,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -722,7 +722,7 @@
           "last_close": 58.0,
           "last_pct": 8.72,
           "peak_pct": 9.41,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -741,9 +741,9 @@
           "last_close": 19.3,
           "last_pct": -2.67,
           "peak_pct": 0.0,
-          "days_in": 31,
+          "days_in": 32,
           "appear_count": 1,
-          "last_seen": "20260821",
+          "last_seen": "20260904",
           "signal_detail": {
             "period": "60m",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
@@ -760,7 +760,7 @@
           "last_close": 123.5,
           "last_pct": -9.71,
           "peak_pct": 0.0,
-          "days_in": 30,
+          "days_in": 31,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -779,7 +779,7 @@
           "last_close": 143.19,
           "last_pct": -5.01,
           "peak_pct": 1.76,
-          "days_in": 30,
+          "days_in": 31,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -798,7 +798,7 @@
           "last_close": 175.61,
           "last_pct": -0.98,
           "peak_pct": 1.67,
-          "days_in": 30,
+          "days_in": 31,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -817,7 +817,7 @@
           "last_close": 284.0,
           "last_pct": -11.79,
           "peak_pct": 0.0,
-          "days_in": 30,
+          "days_in": 31,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -836,7 +836,7 @@
           "last_close": 426.39,
           "last_pct": -16.41,
           "peak_pct": 0.0,
-          "days_in": 30,
+          "days_in": 31,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -855,7 +855,7 @@
           "last_close": 46.36,
           "last_pct": -8.52,
           "peak_pct": 2.98,
-          "days_in": 30,
+          "days_in": 31,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -874,7 +874,7 @@
           "last_close": 127.14,
           "last_pct": -3.01,
           "peak_pct": 0.0,
-          "days_in": 30,
+          "days_in": 31,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -893,7 +893,7 @@
           "last_close": 46.92,
           "last_pct": -4.92,
           "peak_pct": 1.52,
-          "days_in": 30,
+          "days_in": 31,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -912,7 +912,7 @@
           "last_close": 116.42,
           "last_pct": -7.23,
           "peak_pct": 0.0,
-          "days_in": 30,
+          "days_in": 31,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -931,7 +931,7 @@
           "last_close": 27.54,
           "last_pct": -4.77,
           "peak_pct": 0.0,
-          "days_in": 28,
+          "days_in": 29,
           "appear_count": 1,
           "last_seen": "20260831",
           "signal_detail": {
@@ -950,7 +950,7 @@
           "last_close": 25.07,
           "last_pct": -8.1,
           "peak_pct": 3.78,
-          "days_in": 21,
+          "days_in": 22,
           "appear_count": 1,
           "last_seen": "20260901",
           "signal_detail": {
@@ -969,7 +969,7 @@
           "last_close": 4.68,
           "last_pct": -8.24,
           "peak_pct": 0.0,
-          "days_in": 16,
+          "days_in": 17,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -988,7 +988,7 @@
           "last_close": 42.72,
           "last_pct": 0.73,
           "peak_pct": 1.74,
-          "days_in": 13,
+          "days_in": 14,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1007,7 +1007,7 @@
           "last_close": 7.93,
           "last_pct": -4.11,
           "peak_pct": 0.0,
-          "days_in": 13,
+          "days_in": 14,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1026,7 +1026,7 @@
           "last_close": 24.38,
           "last_pct": -1.61,
           "peak_pct": 0.0,
-          "days_in": 11,
+          "days_in": 12,
           "appear_count": 1,
           "last_seen": "20260903",
           "signal_detail": {
@@ -1045,7 +1045,7 @@
           "last_close": 14.57,
           "last_pct": 4.52,
           "peak_pct": 4.66,
-          "days_in": 11,
+          "days_in": 12,
           "appear_count": 1,
           "last_seen": "20260903",
           "signal_detail": {
@@ -1058,32 +1058,51 @@
           "code": "002297",
           "name": "润迈德－B",
           "algo": "four_volume",
-          "list_date": "20260904",
-          "list_date_dashed": "2026-09-04",
-          "entry_price": 21.89,
-          "last_close": 21.89,
+          "list_date": "20260903",
+          "list_date_dashed": "2026-09-03",
+          "entry_price": 22.0,
+          "last_close": 22.0,
           "last_pct": 0.0,
           "peak_pct": 0.0,
-          "days_in": 0,
+          "days_in": 1,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
-            "period": "60m",
+            "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
-            "pct_chg": 17.94
+            "pct_chg": 10.0
+          }
+        },
+        {
+          "code": "300857",
+          "name": "协创数据",
+          "algo": "four_volume",
+          "list_date": "20260903",
+          "list_date_dashed": "2026-09-03",
+          "entry_price": 265.88,
+          "last_close": 265.88,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 1,
+          "appear_count": 1,
+          "last_seen": "20260904",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+            "pct_chg": 1.46
           }
         },
         {
           "code": "600150",
           "name": "中国船舶",
           "algo": "four_volume",
-          "list_date": "20260904",
-          "list_date_dashed": "2026-09-04",
+          "list_date": "20260903",
+          "list_date_dashed": "2026-09-03",
           "entry_price": 34.69,
-          "last_close": 34.69,
-          "last_pct": 0.0,
+          "last_close": 34.32,
+          "last_pct": -1.07,
           "peak_pct": 0.0,
-          "days_in": 0,
+          "days_in": 1,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1096,13 +1115,13 @@
           "code": "300179",
           "name": "四方达",
           "algo": "four_volume",
-          "list_date": "20260904",
-          "list_date_dashed": "2026-09-04",
+          "list_date": "20260903",
+          "list_date_dashed": "2026-09-03",
           "entry_price": 36.11,
-          "last_close": 36.11,
-          "last_pct": 0.0,
-          "peak_pct": 0.0,
-          "days_in": 0,
+          "last_close": 37.85,
+          "last_pct": 4.82,
+          "peak_pct": 4.82,
+          "days_in": 1,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
