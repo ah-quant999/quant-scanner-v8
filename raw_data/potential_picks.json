@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-09-03 07:51:10",
-  "data_date": "2026-09-02",
+  "update_time": "2026-09-03 10:25:37",
+  "data_date": "2026-09-03",
   "source": "CONCEPT_RANKING × STOCK_PROFILE × STOCK_QUOTE",
   "hot_concepts_count": 33,
   "hot_concepts": [
@@ -17,113 +17,42 @@
   ],
   "picks": [
     {
-      "code": "000768",
-      "name": "中航西飞",
-      "pct": 1.77,
-      "amount_yi": 16.43,
+      "code": "600869",
+      "name": "远东股份",
+      "pct": 4.77,
+      "amount_yi": 26.67,
       "hot_concepts": [
-        "军工",
-        "军民融合",
-        "大飞机",
-        "航天航空",
-        "航母概念",
-        "通用航空"
-      ],
-      "hot_count": 6,
-      "total_score": 10.46
-    },
-    {
-      "code": "302132",
-      "name": "中航成飞",
-      "pct": 4.34,
-      "amount_yi": 17.74,
-      "hot_concepts": [
-        "军工",
-        "大飞机",
-        "无人机",
-        "航天航空"
-      ],
-      "hot_count": 4,
-      "total_score": 10.46
-    },
-    {
-      "code": "600760",
-      "name": "中航沈飞",
-      "pct": 0.99,
-      "amount_yi": 16.35,
-      "hot_concepts": [
-        "2026中报预减",
-        "军工",
-        "军民融合",
-        "大飞机",
-        "无人机",
-        "航天航空"
-      ],
-      "hot_count": 6,
-      "total_score": 10.39
-    },
-    {
-      "code": "002361",
-      "name": "神剑股份",
-      "pct": 3.96,
-      "amount_yi": 18.94,
-      "hot_concepts": [
-        "军工",
-        "军民融合",
-        "碳纤维"
-      ],
-      "hot_count": 3,
-      "total_score": 9.99
-    },
-    {
-      "code": "600765",
-      "name": "中航重机",
-      "pct": 2.33,
-      "amount_yi": 4.71,
-      "hot_concepts": [
-        "军工",
-        "军民融合",
-        "大飞机",
-        "无人机",
-        "航天航空",
-        "航母概念"
-      ],
-      "hot_count": 6,
-      "total_score": 9.65
-    },
-    {
-      "code": "002490",
-      "name": "山东墨龙",
-      "pct": 3.95,
-      "amount_yi": 11.15,
-      "hot_concepts": [
-        "天然气",
-        "油气设服",
-        "油气资源",
+        "复合集流体",
+        "水利建设",
         "海工装备",
-        "页岩气"
+        "特高压",
+        "铜缆高速连接"
       ],
       "hot_count": 5,
-      "total_score": 9.42
+      "total_score": 10.19
     },
     {
-      "code": "600378",
-      "name": "昊华科技",
-      "pct": 3.23,
-      "amount_yi": 53.88,
+      "code": "002639",
+      "name": "雪人集团",
+      "pct": 3.47,
+      "amount_yi": 8.26,
       "hot_concepts": [
-        "军工",
-        "大飞机",
-        "航母概念"
+        "2026中报预减",
+        "天然气",
+        "小盘成长",
+        "水利建设",
+        "油气设服",
+        "油气资源",
+        "空气能热泵"
       ],
-      "hot_count": 3,
-      "total_score": 9.25
+      "hot_count": 7,
+      "total_score": 9.83
     },
     {
-      "code": "300719",
-      "name": "安达维尔",
-      "pct": 1.37,
-      "amount_yi": 0.83,
+      "code": "002297",
+      "name": "博云新材",
+      "pct": 0.7,
+      "amount_yi": 8.21,
       "hot_concepts": [
         "军工",
         "军民融合",
@@ -134,58 +63,62 @@
         "通用航空"
       ],
       "hot_count": 7,
-      "total_score": 9.25
+      "total_score": 9.65
     },
     {
-      "code": "600893",
-      "name": "航发动力",
-      "pct": 0.83,
-      "amount_yi": 14.98,
+      "code": "002510",
+      "name": "天汽模",
+      "pct": 2.77,
+      "amount_yi": 0.49,
       "hot_concepts": [
         "军工",
+        "军民融合",
         "大飞机",
+        "并购重组概念",
         "无人机",
-        "航天航空",
-        "航母概念",
         "通用航空"
       ],
       "hot_count": 6,
-      "total_score": 9.12
+      "total_score": 8.93
     },
     {
-      "code": "300581",
-      "name": "晨曦航空",
-      "pct": 2.65,
-      "amount_yi": 4.59,
+      "code": "300719",
+      "name": "安达维尔",
+      "pct": -0.4,
+      "amount_yi": 0.11,
       "hot_concepts": [
         "军工",
         "军民融合",
+        "大飞机",
+        "无人机",
+        "碳纤维",
+        "航天航空",
+        "通用航空"
+      ],
+      "hot_count": 7,
+      "total_score": 8.49
+    },
+    {
+      "code": "002985",
+      "name": "北摩高科",
+      "pct": 0.81,
+      "amount_yi": 0.2,
+      "hot_concepts": [
+        "军工",
+        "军民融合",
+        "大飞机",
         "无人机",
         "航天航空",
-        "超跌股"
+        "通用航空"
       ],
-      "hot_count": 5,
-      "total_score": 8.96
-    },
-    {
-      "code": "300722",
-      "name": "新余国科",
-      "pct": 3.64,
-      "amount_yi": 2.58,
-      "hot_concepts": [
-        "军工",
-        "军民融合",
-        "无人机",
-        "航天航空"
-      ],
-      "hot_count": 4,
-      "total_score": 8.96
+      "hot_count": 6,
+      "total_score": 8.44
     },
     {
       "code": "600150",
       "name": "中国船舶",
-      "pct": -1.45,
-      "amount_yi": 24.17,
+      "pct": 1.62,
+      "amount_yi": 5.54,
       "hot_concepts": [
         "军工",
         "军民融合",
@@ -194,13 +127,13 @@
         "航母概念"
       ],
       "hot_count": 5,
-      "total_score": 8.86
+      "total_score": 8.23
     },
     {
       "code": "002560",
       "name": "通达股份",
-      "pct": 1.61,
-      "amount_yi": 1.65,
+      "pct": 0.63,
+      "amount_yi": 0.24,
       "hot_concepts": [
         "2026中报预减",
         "军工",
@@ -210,13 +143,72 @@
         "特高压"
       ],
       "hot_count": 6,
-      "total_score": 8.86
+      "total_score": 8.23
+    },
+    {
+      "code": "000768",
+      "name": "中航西飞",
+      "pct": 0.26,
+      "amount_yi": 1.53,
+      "hot_concepts": [
+        "军工",
+        "军民融合",
+        "大飞机",
+        "航天航空",
+        "航母概念",
+        "通用航空"
+      ],
+      "hot_count": 6,
+      "total_score": 8.22
+    },
+    {
+      "code": "002536",
+      "name": "飞龙股份",
+      "pct": 4.6,
+      "amount_yi": 13.42,
+      "hot_concepts": [
+        "2026中报预减",
+        "小盘成长",
+        "汽车热管理"
+      ],
+      "hot_count": 3,
+      "total_score": 8.11
+    },
+    {
+      "code": "300252",
+      "name": "金信诺",
+      "pct": 1.66,
+      "amount_yi": 4.0,
+      "hot_concepts": [
+        "军工",
+        "军民融合",
+        "航母概念",
+        "铜缆高速连接"
+      ],
+      "hot_count": 4,
+      "total_score": 8.11
+    },
+    {
+      "code": "600038",
+      "name": "中直股份",
+      "pct": -0.4,
+      "amount_yi": 0.2,
+      "hot_concepts": [
+        "军工",
+        "军民融合",
+        "大飞机",
+        "无人机",
+        "航天航空",
+        "通用航空"
+      ],
+      "hot_count": 6,
+      "total_score": 8.03
     },
     {
       "code": "600879",
       "name": "航天电子",
-      "pct": -0.82,
-      "amount_yi": 8.76,
+      "pct": -0.69,
+      "amount_yi": 1.15,
       "hot_concepts": [
         "2026中报预减",
         "军工",
@@ -226,13 +218,28 @@
         "航天航空"
       ],
       "hot_count": 6,
-      "total_score": 8.79
+      "total_score": 8.03
     },
     {
-      "code": "600118",
-      "name": "中国卫星",
-      "pct": -1.26,
-      "amount_yi": 10.61,
+      "code": "002171",
+      "name": "楚江新材",
+      "pct": 0.1,
+      "amount_yi": 0.31,
+      "hot_concepts": [
+        "军工",
+        "军民融合",
+        "大飞机",
+        "碳纤维",
+        "铜缆高速连接"
+      ],
+      "hot_count": 5,
+      "total_score": 7.87
+    },
+    {
+      "code": "300900",
+      "name": "广联航空",
+      "pct": 0.29,
+      "amount_yi": 0.52,
       "hot_concepts": [
         "军工",
         "军民融合",
@@ -241,16 +248,16 @@
         "航天航空"
       ],
       "hot_count": 5,
-      "total_score": 8.73
+      "total_score": 7.86
     }
   ],
   "rejected_summary": {
     "no_hot_concept": 7842,
-    "too_hot": 53,
-    "too_cold": 135,
+    "too_hot": 18,
+    "too_cold": 42,
     "small_mv": 0,
     "big_mv": 0,
-    "no_quote": 0
+    "no_quote": 57
   },
   "filters": {
     "pct_range": "[-3%, +5%]（温和，未被炒高）",
