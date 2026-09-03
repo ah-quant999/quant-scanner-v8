@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-03 17:03:21",
+  "update_time": "2026-09-03 18:04:56",
   "total": 479,
   "hysteresis_days": 5,
   "source_dist": {
@@ -4367,7 +4367,7 @@
     },
     "hk_03696": {
       "code": "03696",
-      "name": "英矽智能",
+      "name": "03696",
       "market": "hk",
       "board_label": "港股",
       "sources": [
