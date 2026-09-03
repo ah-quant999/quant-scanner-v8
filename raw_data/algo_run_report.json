@@ -1,11 +1,15 @@
 {
-  "update_time": "2026-09-03 10:30:16",
-  "run_start": "2026-09-03 09:34:20",
-  "ok": 26,
-  "fail": 1,
+  "update_time": "2026-09-03 11:33:30",
+  "run_start": "2026-09-03 10:32:57",
+  "ok": 25,
+  "fail": 2,
   "failed_scripts": [
     {
       "script": "scripts/ab_universe_backtest.py",
+      "reason": "监督器静默杀(>15min 无输出)"
+    },
+    {
+      "script": "refresh_dividend_cninfo.py",
       "reason": "监督器静默杀(>15min 无输出)"
     }
   ],
