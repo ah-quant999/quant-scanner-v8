@@ -32,11 +32,13 @@ on:
     # 2026-08-20 主人令：主档从 18:30 推迟到 19:15 CST，确保全部盘后数据源完整就绪后再跑选股算法。
     # 内部仍用 A 股交易日历 gate，非交易日自动跳过，同时覆盖调休上班日（股市开市）。
     # 🔴 2026-09-02 主人令「分批跑」：4 个 cron 各对应一个 stage（job 内按 CST 小时分派）：
-    #   A 采集批(16:40) / B 选股批(18:10) / C 回测批(19:15) / D 汇总批(20:00, final_recommend)
+    # 🛡 2026-09-04 主人令时序重排：策略全部数据出来 → 最终推荐上线(D 20:00) → 然后才是回测(E 21:00)。
+    #   原 C 回测批 19:15 早于 final_recommend 20:00 → 回测汇总胶囊(01:59)早于策略完成(05:48)倒挂，键名 C 退役。
+    #   A 采集批(16:40) / B 选股批(18:10) / D 汇总批(20:00, final_recommend) / E 回测批(21:00)
     - cron: '40 8 * * *'   # 16:40 CST 数据采集批(A)
     - cron: '10 10 * * *'  # 18:10 CST 选股批(B)
-    - cron: '15 11 * * *'  # 19:15 CST 回测批(C)
-    - cron: '0 12 * * *'   # 20:00 CST 汇总批(D, final_recommend)
+    - cron: '0 12 * * *'   # 20:00 CST 汇总批(D, factor_lab_gen + final_recommend)
+    - cron: '0 13 * * *'   # 21:00 CST 回测批(E, 最终推荐上线后)
   repository_dispatch:
     # 2026-09-01 加固：允许本机 WorkBuddy 自动化 / 手动经 API 主动唤醒盘后链，
     #   不再单纯依赖 GitHub schedule（已知静默失效）。types 见下。
@@ -424,14 +426,14 @@ jobs:
             echo "→ 不满足(在线+空闲)，走云端"
             exit 0
           fi
-          # 与云端分批同口径：按 CST 小时算 stage（16:40采集/18:10选股/19:15回测/20:00汇总）
+          # 与云端分批同口径：按 CST 小时算 stage（16:40采集/18:10选股/20:00汇总/21:00回测，2026-09-04 重排）
           HH=$(TZ=Asia/Shanghai date +%H)
           STAGE=""
           case "$HH" in
             16|17) STAGE="A" ;;
             18)    STAGE="B" ;;
-            19)    STAGE="C" ;;
             20)    STAGE="D" ;;
+            21)    STAGE="E" ;;
             *)     STAGE="" ;;
           esac
           DCODE=$(curl -sS -o /tmp/dispatch_resp.txt -w "%{http_code}" -X POST \
@@ -469,8 +471,8 @@ jobs:
             case "$HH" in
               16|17) STAGE=A ;;   # 16:40 采集批
               18)    STAGE=B ;;   # 18:10 选股批
-              19)    STAGE=C ;;   # 19:15 回测批
-              20)    STAGE=D ;;   # 20:00 汇总批(final_recommend)
+              20)    STAGE=D ;;   # 20:00 汇总批(factor_lab_gen + final_recommend)
+              21)    STAGE=E ;;   # 21:00 回测批（最终推荐上线后，2026-09-04 时序重排）
               *)     STAGE="" ;;   # 小时漂移兜底：跑全链
             esac
           fi

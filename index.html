@@ -2214,30 +2214,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         return arr;
       };
 
-      // 🛡 2026-08-31 一劳永逸：共振日历必须显式标注「数据是哪一天」。
-      //   历史教训：LHB_DATA.update_time 每轮跑批都刷新（显示"更新于 X 分钟前"），
-      //   但 date 可能仍停在上一个交易日（当日龙虎榜 17:30 后才发布）→
-      //   主人看到"刚更新"却找不到当日数据，误判为"日历又空了"。
-      //   另：LHB_HISTORY 里当日若为 {'trading': false, 'error': ...} 占位，
-      //   _rcDays() 会将其过滤 → 今天那格空白且无任何原因说明。
-      //   现统一在标题上打「数据日期」badge，非当日时追加橙色「今日未发布」提示。
-      window._rcDataDateBadge = function(lhbDate){
-        if(!lhbDate || String(lhbDate).length !== 8){ return ''; }
-        var iso = String(lhbDate);
-        var txt = '数据日期 ' + iso.slice(4,6) + '-' + iso.slice(6,8);
-        var n = new Date();
-        var today = String(n.getFullYear())
-                  + String(n.getMonth()+1).padStart(2,'0')
-                  + String(n.getDate()).padStart(2,'0');
-        var isToday = (iso === today);
-        var color = isToday ? '#26a69a' : '#f59e0b';
-        var tip   = isToday ? '' : ' · 今日未发布';
-        return '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;'
-             + 'border-radius:8px;font-size:11.5px;font-weight:600;'
-             + 'background:rgba(255,255,255,.05);color:' + color + ';'
-             + 'border:1px solid ' + color + '55;white-space:nowrap;margin-left:6px">'
-             + '📌 ' + txt + tip + '</span>';
-      };
+      // 🗑 2026-09-04 主人令：_rcDataDateBadge「数据日期·今日未发布」胶囊已删除——
+      //   机构共振/北向日历双胶囊冗余且「今日未发布」误导（LHB 当日 17:30 后才发布本属正常）。
+      //   保留标准「更新于」胶囊（_uBadge）。原函数连同注释一并移除（死代码彻底清理）。
     })();
     </script>
 
@@ -2995,7 +2974,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     var h = '';
     h += '<div class="cal-header-row">';
-    h += '<span class="cal-title">📅 机游共振日历 ' + (window._rcDataDateBadge ? _rcDataDateBadge(lhbDate) : '') + _uBadge('盘后', '短线', updateTime) + '</span>';
+    h += '<span class="cal-title">📅 机游共振日历 ' + _uBadge('盘后', '短线', updateTime) + '</span>';
     h += '<span class="cal-meta">'
        + '<button class="cal-nav-btn" onclick="_jyCalPrev()" title="上个月">◀</button>'
        + ' <span id="jyCalYearMonth">' + year + '年' + (month+1) + '月</span> '
@@ -3431,7 +3410,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     var h = '';
     h += '<div class="cal-header-row">';
-    h += '<span class="cal-title">🌊 北向资金日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span> ' + (window._rcDataDateBadge ? _rcDataDateBadge(_lhbDateTop) : '') + _uBadge('盘后', '短线', (window.LHB_DATA && window.LHB_DATA.update_time) || NF.update_time) + '</span>';
+    h += '<span class="cal-title">🌊 北向资金日历 <span style="font-size:11px;font-weight:500;color:var(--dim);margin-left:8px">龙虎榜北向席位动向（非全市场北向资金）</span> ' + _uBadge('盘后', '短线', (window.LHB_DATA && window.LHB_DATA.update_time) || NF.update_time) + '</span>';
     h += '<span class="cal-meta">'
        + '<button class="cal-nav-btn" onclick="_northCalPrev()" title="上个月">◀</button>'
        + ' <span id="northCalYearMonth">' + year + '年' + (month+1) + '月</span> '
@@ -11442,7 +11421,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(251,191,36,.18),rgba(251,
     // 2026-08-30 主人令：斐波那契双卡 + 商品涨价弹性榜三卡置顶到「已下架」顶部，盘前条幅下方。
     //   原在盘后分组底部，现作为首屏辅助观测卡常驻。
     h+=`<div class="card" style="margin-bottom:16px;border-left:4px solid #7b1fa2;">
-  `+v8CardHeader('🧪','斐波那契F观测窗','','update_time',window.SH_FIB)+`
+  `+v8CardHeader('🧪','斐波那契F观测窗','','update_time',Object.assign({},window.SH_FIB,{slot:'盘前',horizon:'中长线'}))+`
   <div style="font-size:11px;color:var(--dim);margin:-6px 0 10px 0;line-height:1.5;">📌 基于日K收盘数据计算，仅收盘后更新，盘前/盘中不刷新</div>`;
 var _fib2=window.SH_FIB||{};
 if(_fib2.windows&&_fib2.windows.length){
@@ -11534,7 +11513,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     var sigT=w52.update_time||lu.update_time||hd.update_time||'';
     var hasSig=(w52.total||0)>0 || (lu.sectors&&lu.dates) || (hd.current_clusters&&hd.current_clusters.length);
     h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #7b1fa2;">';
-    h+=v8CardHeader('🎯','精选预判信号','事件型盘后','update_time',{update_time:sigT},!hasSig);
+    h+=v8CardHeader('🎯','精选预判信号','事件型盘后','update_time',{update_time:sigT,slot:'盘后',horizon:'短线'},!hasSig);
     h+='<div style="padding:0;">';
     if(hasSig){
       var n52=w52.total||0;
@@ -11614,7 +11593,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     /* 4. 中信期货 */
     var cffex=window.CFFEX_HOLDINGS||{}, cffexT=cffex.update_time||'';
     h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #7cb342;">';
-    h+=v8CardHeader('📊','中信期货','','update_time',{update_time:cffexT},!cffex||!cffex.items);
+    h+=v8CardHeader('📊','中信期货','','update_time',{update_time:cffexT,slot:'盘后',horizon:'中长线'},!cffex||!cffex.items);
     h+='<div style="padding:12px 14px;">';
     if(cffex&&cffex.items&&cffex.items.length){
       var groups={}; cffex.items.forEach(function(it){ var v=it.variety||''; if(!groups[v]) groups[v]=[]; groups[v].push(it); });
@@ -11642,7 +11621,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     /* 5. 两融余额走势 */
     var margin=window.MARGIN_DATA||{}, marginT=margin.update_time||'';
     h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #1976d2;">';
-    h+=v8CardHeader('📊','两融余额走势（亿元）','','update_time',{update_time:marginT},!margin||!margin.sh||!margin.sh.length);
+    h+=v8CardHeader('📊','两融余额走势（亿元）','','update_time',{update_time:marginT,slot:'盘后',horizon:'中长线'},!margin||!margin.sh||!margin.sh.length);
     h+='<div style="padding:12px 14px;">';
     if(margin&&margin.sh&&margin.sh.length){
       h+='<div id="v8MarginChart" style="width:100%;height:240px;"></div>';
@@ -11655,7 +11634,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     var esub=window.ETF_SUBSCRIPTION||{}, esubT=esub.update_time||'';
     var _esubDate = esubT ? esubT.slice(0,16) : '最近跑批';
     h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #00acc1;">';
-    h+=v8CardHeader('📈','宽基ETF净申赎（亿份）','','update_time',{update_time:esubT},!esub||!esub.sh||!esub.sh.length);
+    h+=v8CardHeader('📈','宽基ETF净申赎（亿份）','','update_time',{update_time:esubT,slot:'盘后',horizon:'中长线'},!esub||!esub.sh||!esub.sh.length);
     h+='<div style="padding:12px 14px;">';
     if(esub&&esub.sh&&esub.sh.length){
       h+='<div style="font-size:11px;color:#38bdf8;margin-bottom:8px;">沪深300/中证500/中证1000/创业板/科创50/上证50/A500 宽基指数ETF每日净申购赎回份额</div>';

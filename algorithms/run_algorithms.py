@@ -153,6 +153,9 @@ ORDER = [
     "strong_breakout.py",
     "track_h_auto_buy.py",
     #   杜绝「某选股还没跑完，推荐却已生成」的抢跑问题。
+    #   🆕 2026-09-04 主人令：因子实验室(FACTOR_LAB.js)此前零调度成孤儿（运维红灯）——
+    #      生成器 v8/factor_lab_gen.py 挂在 final_recommend 之前（final_recommend 方案B融合读它）。
+    "v8/factor_lab_gen.py",            # → data/FACTOR_LAB.js（异常换手率·重点池 + ROE 全市场主板）
     "final_recommend.py",              # → FINAL_RECOMMEND_DATA.js（跨策略共振 Top5，管线最终产物，置于末尾）
     #   前端策略回顾卡长期为空/陈旧）。统一挂链尾（依赖各自历史/截面数据已就位）。
     #   - rps：读 stock_rps 截面（RPS 为相对强度指标，非选股信号引擎，回测为截面有效性说明）
@@ -190,15 +193,28 @@ STAGES = {
         "refresh_stock_metadata.py", "fetch_weekend_run.py",   # 周末复盘/周度汇总（原 ORDER 漏挂 STAGE）
         "auto_run_dn_algorithm.py", "strong_breakout.py", "track_h_auto_buy.py",
     ],
-    "C": [  # 回测批（~19:00 CST，依赖 top10/crds history）：backtest 全家
+    # 🛡 2026-09-04 主人令「策略全部数据出来→最终数据上线→然后才是回测」时序重排：
+    #   原 C(回测 19:15) 在 D(final_recommend 20:00) 之前 → 回测汇总胶囊早于最终推荐，时序倒挂。
+    #   现改为 A(16:40 采集) → B(18:10 选股) → D(20:00 汇总·最终推荐上线) → E(21:00 回测)。
+    #   键名 C 退役；回测批内容原样迁入 E，另收编 strategy_four_volume.py（回测模式，SCRIPT_ENV 注入）。
+    "E": [  # 回测批（~21:00 CST，最终推荐上线后）：backtest 全家
         "scripts/ab_universe_backtest.py", "backtest_tdx.py", "backtest_comprehensive.py",
         "export_optimized_strategy.py",   # 读 backtest_tdx.json 汇总优化策略（在 backtest_tdx 之后）
         "v8/backtest_crds.py", "v8/backtest_rps.py",   # 逆势龙头/相对强度 回测（原 ORDER 漏挂 STAGE）
         "factor_lab_backtest.py",   # 🆕 因子实验室分层回测（读 _rps_cache，依赖 B 批 calc_stock_rps）
+        "strategy_four_volume.py",  # 四量终极回测模式（SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js，根治孤儿）
     ],
-    "D": [  # 汇总批（~20:00 CST，依赖全部）：final_recommend + LHB历史/7d/生命周期
+    "D": [  # 汇总批（~20:00 CST，依赖全部）：因子实验室 + final_recommend（LHB历史/7d/生命周期由主流程前置）
+        "v8/factor_lab_gen.py",   # → data/FACTOR_LAB.js（final_recommend 方案B融合依赖，必须在前）
         "final_recommend.py",
     ],
+}
+
+# 🛡 2026-09-04 主人令：回测批需要「选股脚本以回测模式运行」——runner 对所有脚本无参调用，
+#   故按脚本注入环境变量（strategy_four_volume.py 读 V8_BACKTEST_YEARS>0 时同时跑近 N 年回测
+#   并补写 data/FOUR_VOLUME_BACKTEST.js）。仅影响 E 回测批；B 选股批无注入、保持轻快。
+SCRIPT_ENV = {
+    "strategy_four_volume.py": {"V8_BACKTEST_YEARS": "3"},
 }
 # 自校验：STAGES 并集必须精确覆盖 ORDER（无遗漏/多余，保证分批模式不丢脚本）
 _STAGE_UNION = set()
@@ -723,6 +739,9 @@ def step_run(order=None):
         print(f"  ▶ {script}  ({datetime.now():%H:%M:%S})  [监督执行·静默杀≥{SILENCE_KILL_SEC//60}min]")
         # 2026-09-01 主人令「监督跑算法更先进」：用监督式执行器替代朴素 subprocess.run
         #   —— 实时写心跳 + 静默超时即杀进程续跑（永不再 30~60min 死等单脚本卡死）。
+        # 🛡 2026-09-04：按脚本注入环境变量（SCRIPT_ENV，如 E 回测批让 strategy_four_volume 跑回测模式）
+        for _ek, _ev in SCRIPT_ENV.get(script, {}).items():
+            os.environ[_ek] = _ev
         _to = _script_timeout(script)
         try:
             rc, last_lines, killed_reason = _supervised_run(script, path, _to)
@@ -876,10 +895,10 @@ def main():
     else:
         order = STAGES[stage]
         print(f"  🎯 stage={stage} 仅跑 {len(order)} 个脚本（其余由对应批次产出）")
-    step_run(order=order)
-    n = step_stage()
-    # 🔴 2026-08-25 一劳永逸：链尾保底，确保驾驶舱建议 + 板块推荐 data/X.js 必新鲜
-    #   仅全链(无--stage)或 D 汇总批执行；A/B/C 批跳过（D 批会补）
+    # 🛡 2026-09-04 主人令一劳永逸：生命周期/LHB 累积前置——必须先落当日 v8 选股生命周期池，
+    #   D 批 final_recommend 才能覆盖生命周期卡股票（原顺序 final_recommend 05:37 →
+    #   pool_tracker 05:48 倒挂，最终推荐用的是昨日池，主人质疑「不够权威」实锤）。
+    #   仅全链(无--stage)或 D 汇总批执行；A/B/E 批跳过（D 批会补）。
     if stage in (None, "D"):
         # 🔴 盘后选股策略门控：LHB 7日累计属于选股向汇总，未到 18:00 不处理当日龙虎榜数据
         if _is_post_close_picking_ready() and _is_trading_day_now():
@@ -889,7 +908,9 @@ def main():
         else:
             print("\n[2.5-2.7] ⏭️ 跳过 LHB 历史累积 + LHB 7日累计 + v8 选股生命周期（非交易日或盘后策略未就绪）")
     else:
-        print(f"\n[2.5-2.7] ⏭️ 跳过 LHB 历史累积 + 驾驶舱保底（stage={stage}，交由 D 汇总批执行）")
+        print(f"\n[2.5-2.7] ⏭️ 跳过 LHB 历史累积 + 生命周期前置（stage={stage}，交由 D 汇总批执行）")
+    step_run(order=order)
+    n = step_stage()
     step_push()
     print(f"\n=== 完成。staged {n} 个文件 ===")
 

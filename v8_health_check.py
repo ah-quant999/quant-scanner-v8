@@ -56,10 +56,14 @@ RAW_DIR = Path("raw_data")
 # expected：频率说明；max_age：按时段动态计算，这里先给默认阈值（分钟）
 CARD_DEFS = [
     # 今日事件（盘前）
-    {"id": "V8_CAL", "name": "重要事件日历", "page": "今日事件", "freq": "每周日+月末", "max_age": 1500, "key_fields": ["weeks", "month"]},
-    {"id": "IPO_DATA", "name": "打新研判", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["stocks"], "weekend_update": False},
-    {"id": "JUDGMENT_DATA", "name": "今日判定", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["verdict", "indices"], "weekend_update": False},
-    {"id": "MACRO_DATA", "name": "今日宏观解读", "page": "今日事件", "freq": "每日盘前", "max_age": 360, "key_fields": ["global_macro", "monetary"], "weekend_update": False, "manual_dep": True, "manual_note": "人工撰写宏观解读（管线仅补cpi/pmi，rich结构需主人更新）"},
+    # 🛡 2026-09-04 主人令一劳永逸：事件类卡整夜红灯根治。
+    #   V8_CAL 每周日+月末更新 → 7天红线（weekly 特判，不走 adjust/cap 的 24h 收紧）；
+    #   IPO/JUDGMENT/MACRO 每日仅 08:25 premarket 批更新一次 → max_age 1440（24h 铁律），
+    #   未到下一批次不红灯（原 360min 导致昨日午间数据在今日盘前批前被判 fail 满屏红）。
+    {"id": "V8_CAL", "name": "重要事件日历", "page": "今日事件", "freq": "每周日+月末", "max_age": 10080, "key_fields": ["weeks", "month"], "weekly": True},
+    {"id": "IPO_DATA", "name": "打新研判", "page": "今日事件", "freq": "每日盘前", "max_age": 1440, "key_fields": ["stocks"], "weekend_update": False},
+    {"id": "JUDGMENT_DATA", "name": "今日判定", "page": "今日事件", "freq": "每日盘前", "max_age": 1440, "key_fields": ["verdict", "indices"], "weekend_update": False},
+    {"id": "MACRO_DATA", "name": "今日宏观解读", "page": "今日事件", "freq": "每日盘前", "max_age": 1440, "key_fields": ["global_macro", "monetary"], "weekend_update": False, "manual_dep": True, "manual_note": "人工撰写宏观解读（管线仅补cpi/pmi，rich结构需主人更新）"},
     # NT_DATA(nt_data.json) 由 algorithms/fetch_orphan_nt_data.py 产出，归 run_algorithms.py(算法链)，
     # 不在 cloud_fetch_v8.py 的 premarket 注册表内 —— 按 page 映射派发 cn_fetch premarket 永远刷不到它，
     # 故显式覆盖自愈类别为 algo_run（2026-08-11 第155轮看门狗定位并根治）。
@@ -92,6 +96,11 @@ CARD_DEFS = [
     #   移除该项登记;下面"全量数据审计"循环的 derived = {..., "SIX_DIM_RADAR"}
     #   已保护它不报"缺失或解析失败"。前端 renderSixDim 直接读 SH_FIB,无副作用。
     {"id": "MARGIN_DATA", "name": "融资融券", "page": "盘后数据", "freq": "收盘后1次", "max_age": 1440, "key_fields": ["sh"], "heal_cat": "post_close"},  # 2026-08-18 主人令一劳永逸：交易所每日16:15发布1次，360min 阈值导致 22:15 必误报 → 1440（24h，符合主人 24h 铁律）
+    # 🛡 2026-09-04 主人令一劳永逸：孤儿文件转正——此前无生成调度（all_ 动态扫描按通用 1440 红线误报 fail）。
+    #   FACTOR_LAB 由 v8/factor_lab_gen.py 挂 STAGES[B] 产出；FOUR_VOLUME_BACKTEST 由 strategy_four_volume.py
+    #   在回测批（STAGES[E]，注入 V8_BACKTEST_YEARS）产出。登记后走运维卡区正式判定，all_ 扫描跳过。
+    {"id": "FACTOR_LAB", "name": "因子实验室", "page": "盘后数据", "freq": "每日盘后(挂链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
+    {"id": "FOUR_VOLUME_BACKTEST", "name": "四量终极回测", "page": "盘后数据", "freq": "每日回测批", "max_age": 1440, "key_fields": ["periods"], "heal_cat": "algo_run"},
     {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "实时数据", "freq": "盘中每30分（日行情取最近交易日）", "max_age": 120, "key_fields": ["items"], "heal_cat": "intraday"},  # 2026-08-31 修复：cloud_fetch_v8.py 的 tasks 列表含 CFFEX_HOLDINGS，盘中每 30 分执行并刷新 update_time，但数据为日行情取最近交易日；HC 分类应与调度一致，避免盘后/盘中口径冲突
     {"id": "CRISIS_DATA", "name": "危机雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["currency", "global"], "heal_cat": "premarket"},  # 危机雷达每日 08:25 跑一次
     {"id": "MARKET_FUND_FLOW_DATA", "name": "盘后资金流向", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["daily"], "heal_cat": "premarket"},  # 资金流日频时间轴——08:25 必跑一次（防漏跑）
@@ -1188,10 +1197,11 @@ def adjust_max_age(def_max, page=None):
         if is_trade_day and 8.0 <= h < 10.0:
             # 盘前窗口：期望已更新，但允许 180 分钟（可能稍晚）
             return min(def_max, 180)
-        # 10:00 后当日不会再更新（下次是次日 08:25）
-        # 给到次日早盘都算正常
+        # 🛡 2026-09-04 主人令一劳永逸：08:25 批是当日唯一更新点，其余所有时段（含
+        #   凌晨/前夜/午后）统一 24h 铁律——原 960/1200 导致「昨日午间数据在今日
+        #   盘前批之前」整夜红灯（昨 12:53 → 今 04:53 即报警）。24h 内必有盘前批兜底。
         if is_trade_day:
-            return 960 if h < 23 else 1200  # 到次日 08:00~09:00
+            return 1440  # 到次日 08:25 盘前批都算正常
         # 周末：覆盖到周一早盘
         return 2880
 
@@ -1310,10 +1320,15 @@ def check_data_cards():
             continue
         ts = data.get("update_time") or data.get("date") or data.get("lastUpdated") or "--"
         dt = parse_time(ts)
-        max_age = adjust_max_age(d["max_age"], page=d.get("page"))
-        # 🛡 主人铁律 2026-08-18：分 page × 分时段红线（仅实时数据盘中 2h / 其他 24h）
-        # 硬 cap 必须在 adjust_max_age 之后叠加，否则盘中/盘后自适应逻辑被绕过
-        max_age = min(max_age, _hard_cap_for_owner_rule(page=d.get("page")))
+        # 🛡 2026-09-04 主人令：周更卡（V8_CAL 每周日+月末）直接用自身 max_age（10080=7天），
+        #   不走 adjust/cap 的 24h 收紧——否则周中必被「今日事件 24h cap」误判 stale。
+        if d.get("weekly"):
+            max_age = d["max_age"]
+        else:
+            max_age = adjust_max_age(d["max_age"], page=d.get("page"))
+            # 🛡 主人铁律 2026-08-18：分 page × 分时段红线（仅实时数据盘中 2h / 其他 24h）
+            # 硬 cap 必须在 adjust_max_age 之后叠加，否则盘中/盘后自适应逻辑被绕过
+            max_age = min(max_age, _hard_cap_for_owner_rule(page=d.get("page")))
 
         # 盘中 premarket_cleared 异常自愈检测：实时数据在交易时段被标记为盘前清空，属于误清空
         prem_cleared = data.get("premarket_cleared") is True

@@ -101,7 +101,7 @@ on:
     # 2026-09-04 探针路由配套：与云端 v8_algo_cloud.yml 分批口径一致
     inputs:
       stage:
-        description: '分批 stage（A采集/B选股/C回测/D汇总，留空=全链）。探针路由自动填写。'
+        description: '分批 stage（A采集/B选股/D汇总/E回测，留空=全链）。探针路由自动填写。'
         type: string
         default: ''
       force_run:

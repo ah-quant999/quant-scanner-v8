@@ -338,6 +338,13 @@ def backtest_four_volume(years=3, top_cy=60, top_kc=60, top_zb=60, top_hk=30):
     out = os.path.join(DATA_DIR, "FOUR_VOLUME_BACKTEST.json")
     with open(out, "w", encoding="utf-8") as f:
         json.dump(summary, f, ensure_ascii=False, indent=1)
+    # 🛡 2026-09-04 主人令一劳永逸：同步补写 data/FOUR_VOLUME_BACKTEST.js —— 此前只写 .json，
+    #   .js 自 09-02 手工跑后无人再生成（运维 all_ 动态扫描按通用 24h 红线必报孤儿 fail）。
+    summary_out = dict(summary)
+    summary_out["update_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open(os.path.join(DATA_DIR, "FOUR_VOLUME_BACKTEST.js"), "w", encoding="utf-8") as f:
+        f.write("/* 四量终极历史回测 strategy_four_volume.py --backtest 产出 */\n")
+        f.write("window.FOUR_VOLUME_BACKTEST = " + json.dumps(summary_out, ensure_ascii=False) + ";\n")
     p5 = summary["periods"]["5d"]
     print(f"  四量终极回测: {total_signals} 个信号, "
           f"T+5 胜率 {p5['win_rate']}% / 均值 {p5['avg_return']}%")
@@ -350,8 +357,9 @@ def main():
     check_stock_picking_ready(by='strategy_four_volume')
 
     ap = argparse.ArgumentParser(description="四量终极 选股策略")
-    ap.add_argument("--backtest", type=int, default=0,
-                    help="同时跑近 N 年回测(0=不跑)")
+    ap.add_argument("--backtest", type=int,
+                    default=int(os.environ.get("V8_BACKTEST_YEARS", "0") or 0),
+                    help="同时跑近 N 年回测(0=不跑；E 回测批经 SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3)")
     ap.add_argument("--top", type=int, default=80,
                     help="每板成交量前N(默认80, 控制扫描规模)")
     args = ap.parse_args()
