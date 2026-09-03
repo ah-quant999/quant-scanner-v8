@@ -230,7 +230,10 @@ def main():
             else:
                 print(f"[{now:%H:%M}] algo_cloud 数据陈旧需补跑: {stale} -> {_dispatch(_WF_ALGO)}")
         else:
-            _bell(_WF_ALGO, rule_s, rule_f, now)
+            # V5 2026-09-03 主人令「风暴一劳永逸」：回测/AI 数据已新鲜时，不因 run 失败/取消
+            #   重试按铃——假阳性失败会引 30min 循环派发 → 队列互踩风暴（2026-09-03 实证）。
+            #   主档 schedule(16:40/18:10/19:15/20:00) + 21:30 内容级最终闸已覆盖兜底。
+            print(f"[{now:%H:%M}] algo_cloud 回测/AI 数据已新鲜 -> 跳过按铃（含失败重试，防风暴）")
 
     print("=== done ===")
 
