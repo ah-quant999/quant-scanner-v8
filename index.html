@@ -2617,9 +2617,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="card" id="imaStrongBody" style="border-left:4px solid #a78bfa;margin-top:14px;">
         <div class="note" style="padding:20px;text-align:center;color:var(--dim);">📡 高手强势股跟踪（ima 自动同步）加载中…</div>
       </div>
-      <div class="card" id="factorLabBody" style="border-left:4px solid #22d3ee;margin-top:14px;">
-        <div class="note" style="padding:20px;text-align:center;color:var(--dim);">🧪 因子实验室（异常换手率 · ROE_TTM 大市值档）加载中…</div>
-      </div>
+      <!-- 2026-09-03 主人令：因子实验室迁至「暂未上架」（★★ 观测仓·调试与回测中；升 4⭐ 再转正选股策略子页），此处移除 -->
     </div><!--/st-life-->
 
     <!-- ===== TAB 页面：个股相对强度 (RPS + RS + 年线) ===== -->
@@ -4227,6 +4225,30 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           → ③ 4 桶（全部展示，跟在精选下方） → ④ 待确认剔除（放在最下面）
      删除：置顶两卡、情绪/板块横排、4 桶明细表、已剔除本机记录、冗余 footer。
      ════════════════════════════════════════════════════════════════════ */
+  /* ═══ 2026-09-03 主人令：高手共振口径统一（一劳永逸）═══
+     根因：源数据存在 .601899 点前缀家族，池徽章按原始码精确匹配（IMA∩生命周期池=1）、
+     最终推荐信号按数据侧 IMA 成员判定（Top5=3），两处口径不同。统一：全局规范化码 + 单一判定，两处共用。 */
+  window.__v8NormCode = function(c){
+    try{ return String(c==null?'':c).toLowerCase().trim().replace(/^[.\s]*(sh|sz|bj)?[.\s]*/,''); }catch(e){ return String(c||''); }
+  };
+  window.__gaoshouSet = function(){
+    if(window.__gaoshouSetCache) return window.__gaoshouSetCache;
+    var _m = {};
+    try{ ((window.IMA_STRONG_STOCK && window.IMA_STRONG_STOCK.stocks) || []).forEach(function(s){ if(s && s.code) _m[window.__v8NormCode(s.code)] = s; }); }catch(e){}
+    window.__gaoshouSetCache = _m;
+    return _m;
+  };
+  window.__inGaoshouReso = function(code){ return !!window.__gaoshouSet()[window.__v8NormCode(code)]; };
+  window.__gaoshouResoCount = function(){
+    var g = window.__gaoshouSet(), uni = {}, n = 0;
+    try{ ((window.V8_POOL_TRACKER && window.V8_POOL_TRACKER.items) || []).forEach(function(x){ if(x && x.code) uni[window.__v8NormCode(x.code)] = 1; }); }catch(e){}
+    try{
+      var FR = window.FINAL_RECOMMEND_DATA || {};
+      ((FR.all_candidates || []).concat(FR.consensus_stocks || []).concat(FR.stocks || [])).forEach(function(x){ if(x && x.code) uni[window.__v8NormCode(x.code)] = 1; });
+    }catch(e){}
+    for(var k in g){ if(uni[k]) n++; }
+    return n;
+  };
   window.__renderLifecycleSection = function(){
     var dst = document.getElementById('lifeBody');
     if(!dst) return;
@@ -4242,7 +4264,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var _imaMap = {};
       try{ ((window.IMA_STRONG_STOCK && window.IMA_STRONG_STOCK.stocks) || []).forEach(function(s){ if(s && s.code) _imaMap[s.code] = s; }); }catch(_){}
       function _resoBadge(code){
-        if(_imaMap[code]) return '<span style="font-size:9px;font-weight:700;color:#fbbf24;background:rgba(251,191,36,.16);border:1px solid rgba(251,191,36,.4);padding:1px 4px;border-radius:4px;white-space:nowrap;" title="高手强势股跟踪也命中（外部共振源）">🏆</span>';
+        if((window.__inGaoshouReso ? window.__inGaoshouReso(code) : _imaMap[code])) return '<span style="font-size:9px;font-weight:700;color:#fbbf24;background:rgba(251,191,36,.16);border:1px solid rgba(251,191,36,.4);padding:1px 4px;border-radius:4px;white-space:nowrap;" title="高手强势股跟踪也命中（外部共振源）">🏆</span>';
         return '';
       }
       var removedMap = _loadRemovedMap();
@@ -4865,7 +4887,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var _imaSet = {}; (D.stocks||[]).forEach(function(s){ if(s && s.code) _imaSet[s.code] = s; });
     var _v8Items = (window.V8_POOL_TRACKER && window.V8_POOL_TRACKER.items) || [];
     var _v8Map = {}; _v8Items.forEach(function(x){ if(x && x.code) _v8Map[x.code] = x; });
-    var _reso = 0; for(var _c1 in _imaSet){ if(_v8Map[_c1]) _reso++; }
+    var _reso = (typeof window.__gaoshouResoCount==='function') ? window.__gaoshouResoCount() : 0; /* 2026-09-03 主人令：口径统一=IMA池∩v8选股体系（生命周期池+最终推荐候选），与 Top5「高手共振」同一判定 */
     // 头部胶囊：更新于 + 已跟踪 N + 高手共振 N
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">';
     html += '📡 <span style="font-weight:700;font-size:14px;color:var(--txt);">高手强势股跟踪</span>';
@@ -4967,23 +4989,56 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var mkt = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : {open:false,name:'未知',icon:'⚪',color:'#94a3b8'};
     var gateBanner = '<div style="font-size:12px;padding:5px 9px;border-radius:6px;margin-bottom:9px;background:'+(mkt.open?'rgba(94,224,160,.12)':'rgba(255,107,129,.10)')+';color:'+(mkt.color||'#94a3b8')+';">'
       + (mkt.icon||'⚪')+' 择时闸门：'+(mkt.name||'未知')+' · '+(mkt.open?'可开新仓 → 因子前20%标的打「🟢可关注」':'不开新仓 → 仅作观察')+'</div>';
+    /* ═══ 2026-09-03 主人令：卡面只展示「🟢可关注」标的（2 种因子），完整榜单点击弹窗查看；
+       胶囊统一格式（更新时间紧跟卡名，删除靠右时间）；★★ 观测仓 · 调试与回测中，升 4⭐ 后转正「选股策略」子页 ═══ */
+    function _gatePass(r, kind){
+      var fv = kind==='at' ? r.factor_at : r.roe_ttm;
+      var g = (typeof window.v8FactorGate==='function') ? window.v8FactorGate(fv, kind==='at'?atVals:roeVals, 0.2) : {pass:false};
+      return !!(g && g.pass);
+    }
+    var atFocus = atTopArr.filter(function(r){ return _gatePass(r,'at'); });
+    var roeFocus = roeTopArr.filter(function(r){ return _gatePass(r,'roe'); });
+    function _focusBlock(title, color, rows, kind, popKind, popLabel){
+      var inner = rows.map(function(r){ return row(r,kind); }).join('')
+        || '<div class="note" style="color:var(--dim);padding:4px 0;">本期无可关注标的（择时闸门关闭或因子分位未进前 20%）</div>';
+      return '<div style="font-weight:600;margin:8px 0 4px;color:'+color+';">'+title+' · 🟢可关注 <b>'+rows.length+'</b> 只</div>'
+        + inner
+        + '<div style="margin:6px 0 2px;"><span onclick="window.__flPopup(\''+popKind+'\')" style="cursor:pointer;display:inline-block;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600;color:#22d3ee;border:1px solid rgba(34,211,238,.4);background:rgba(34,211,238,.08);">📄 '+popLabel+'</span></div>';
+    }
+    var _flStamp = _e(String(D.update_time||'').slice(5,16));
     var html = ''
       + '<div style="padding:14px 16px;">'
-      + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
+      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
       + '<b style="font-size:15px;">🧪 因子实验室</b>'
-      + '<span style="font-size:12px;color:var(--dim)">更新 '+_e(D.update_time)+'</span></div>'
+      + '<span style="color:#fbbf24;font-size:12px;letter-spacing:1px;">⭐⭐</span>'
+      + '<span style="font-size:10px;font-weight:600;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px;">观测仓 · 调试与回测中</span>'
+      + '<span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);white-space:nowrap;">🕐 更新 '+_flStamp+'</span></div>'
       + gateBanner
       + '<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">重点池 '+_e(m.n_universe)+' 只 · 异常换手率有效 '+_e(m.n_at_valid)+' · ROE大市值档 '+_e(m.n_roe_large)+'　'
       + '<span style="color:#22c55e">●</span>缩量强势 <span style="color:#ef5350">●</span>放量弱势</div>'
-      + '<div style="font-weight:600;margin:8px 0 4px;color:#22d3ee;">① 异常换手率（缩量=多，因子越高越强势）— Top 30</div>'
-      + atTop
-      + '<div style="font-weight:600;margin:10px 0 4px;color:#f87171;">放量最严重（弱势）— Bottom 10</div>'
-      + atBot
-      + '<div style="font-weight:600;margin:12px 0 4px;color:#38bdf8;">② ROE(TTM) 全市场主板·大市值档（成交额代理 Top1/3）— Top 30</div>'
-      + roeTop
+      + _focusBlock('① 异常换手率（缩量=多，因子越高越强势）','#22d3ee',atFocus,'at','at','完整榜单：Top30 强势 + Bottom10 放量弱势')
+      + _focusBlock('② ROE(TTM) 全市场主板·大市值档（成交额代理 Top1/3）','#38bdf8',roeFocus,'roe','roe','完整榜单：ROE Top30')
       + '<div style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5;">口径：异常换手率=当月换手率÷过去12月均值（缩量→低关注→强势），仍用重点池(351只)；ROE_TTM=最近4季度 roeAvg 求和，已切换为全市场主板(3193只)·大市值档(成交额top1/3)。均经 v2 回测验证显著（Spearman IC t=4.3 / 3.3，样本内外一致）。🟢可关注=择时开放且因子进入前20%分位。仅研究参考，非买卖建议。</div>'
+      + '<div style="font-size:11px;color:#fbbf24;margin-top:6px;line-height:1.5;">⭐ 升级路径（2026-09-03 主人令）：现为 ★★ 观测仓——补独立分层回测（胜率/最大回撤）+ 全市场扫描，达标升 4⭐ 后转正为「选股策略」子页。</div>'
       + '</div>';
     dst.innerHTML = html;
+    // 弹窗：完整榜单（复用闭包内 row() 与全量数组，2026-09-03 主人令）
+    window.__flPopup = function(kind){
+      var _title = kind==='at' ? '🧪 异常换手率 · 完整榜单' : '🧪 ROE(TTM) 大市值档 · 完整榜单';
+      var _body = kind==='at'
+        ? (atTop + '<div style="font-weight:600;margin:10px 0 4px;color:#f87171;">放量最严重（弱势）— Bottom 10</div>' + atBot)
+        : roeTop;
+      var mask = document.createElement('div');
+      mask.className = '_flmask';
+      mask.style.cssText = 'position:fixed;inset:0;background:rgba(2,6,17,.72);z-index:99998;display:flex;align-items:center;justify-content:center;padding:20px;';
+      mask.onclick = function(ev){ if(ev.target===mask) mask.remove(); };
+      var box = document.createElement('div');
+      box.style.cssText = 'background:#0d1626;border:1px solid #243150;border-radius:12px;max-width:860px;width:100%;max-height:80vh;overflow-y:auto;padding:16px 18px;';
+      box.innerHTML = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><b style="font-size:14px;color:#e8f0ff;">'+_title+'</b>'
+        + '<span style="cursor:pointer;color:#93a4c4;font-size:20px;padding:0 6px;margin-left:auto;" onclick="this.closest(\'._flmask\').remove()">×</span></div>' + _body;
+      mask.appendChild(box);
+      document.body.appendChild(mask);
+    };
   };
 
   // DOM ready hook
@@ -10627,6 +10682,8 @@ window.showRestrictedItems = showRestrictedItems;
        + '<div id="dbgEtfMapBody"><div class="note">加载中…</div></div>'
        + '<hr style="border:none;border-top:1px dashed rgba(56,189,248,.25);margin:12px 0;">'
        + '<div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.3);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.7;color:var(--sub);">研究信号，未纳入推荐链路。</div></div>';
+    // ═══ 2026-09-03 主人令：因子实验室迁入暂未上架（★★ 观测仓 · 调试与回测中；升 4⭐ 再转正选股策略子页）═══
+    h += '<div class="card" id="factorLabBody" style="margin-bottom:16px;border-left:4px solid #22d3ee;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">🧪 因子实验室（异常换手率 · ROE_TTM 大市值档）加载中…</div></div>';
     // 2026-09-02 主人令：强势突破 pane、模块去向索引、动量共识/H反推/两套算法回测对比 全部删除。
     //   暂未上架只保留：热门赛道资金追踪曲线卡 + AI预测/潜力挖掘/ETF龙头参考 3 张卡。
     el.innerHTML=h;
@@ -10655,6 +10712,8 @@ window.showRestrictedItems = showRestrictedItems;
     try{ if(typeof window._fillPotentialPicks==='function') window._fillPotentialPicks(); }catch(e){ console.warn('潜力挖掘卡渲染失败',e); }
     // 🛡 2026-09-02 主人令：ETF·龙头参考 抽为独立函数 + 自愈重试（原内联，defer 未就绪即永久空卡）
     window._fillEtfMap();
+    // 🧪 2026-09-03 主人令：因子实验室迁入暂未上架后随本函数重渲（此前 DOM ready 时容器尚不存在）
+    try{ if(typeof window.__renderFactorLab==='function') window.__renderFactorLab(); }catch(e){ console.warn('因子实验室卡渲染失败', e); }
   }
 
   /* ═══════════ 2026-08-19 主人令：2 张新卡 render 函数（宏观+板块推荐）══ 暂未上架·调试专区 ═══════════ */
@@ -11716,6 +11775,21 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
         _sb.style.display = 'none';
       }
     }catch(e){ console.warn('[renderV8Crds] stale bar failed', e); }
+    // ⏳ 2026-09-03 主人令：半成品闸门 —— 链中途写出的空壳（扫描0只+全列表空）显式标示「盘后计算中」，不再呈错误态
+    try{
+      var _crdsHalf = !d.total_scanned && !((d.cond1_list&&d.cond1_list.length)||(d.cond2_list&&d.cond2_list.length)||(d.cond3_list&&d.cond3_list.length)||(d.elite&&d.elite.length)||(d.advanced&&d.advanced.length)||(d.watch&&d.watch.length));
+      var _hb = document.getElementById(p+'crdsHalfBar');
+      if(!_hb){
+        _hb = document.createElement('div');
+        _hb.id = p+'crdsHalfBar';
+        _hb.style.cssText = 'display:none;margin:0 0 12px;padding:10px 14px;border-radius:10px;font-size:13px;font-weight:600;line-height:1.6;background:rgba(251,191,36,.10);border:1px solid rgba(251,191,36,.4);color:#fde68a;';
+        el.insertBefore(_hb, el.firstChild);
+      }
+      if(_crdsHalf){
+        _hb.style.display = 'block';
+        _hb.innerHTML = '⏳ 盘后计算中：算法链正在重算 CRDS（当前为 '+_crdsRel(d.update_time||'')+' 的中途快照，扫描 0 只）。<b>非报错</b>，全量跑完后本卡自动恢复；期间请勿据此卡决策。';
+      } else { _hb.style.display = 'none'; }
+    }catch(e){ console.warn('[renderV8Crds] half gate failed', e); }
     // 覆盖说明
     var covEl=document.getElementById(p+'crdsCoverage');
     if(covEl){
@@ -12770,7 +12844,7 @@ window.__renderV8CalToday();
     // 信号标签
     if(s.signals && s.signals.length){
       h+='<div class="fr-signals">';
-      s.signals.slice(0,10).forEach(function(sig){ h+='<span class="fr-sig">'+_fe(sig)+'</span>'; });
+      s.signals.filter(function(sig){ return String(sig).indexOf('高手共振')<0 || (typeof window.__inGaoshouReso==='function' && window.__inGaoshouReso(s.code)); }).slice(0,10).forEach(function(sig){ h+='<span class="fr-sig">'+_fe(sig)+'</span>'; });
       h+='</div>';
     }
 
@@ -13091,7 +13165,7 @@ window.__renderV8CalToday();
         +'<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:10.5px;color:var(--dim);margin-top:2px;">'
         +'<span style="color:var(--up);font-weight:700">共振'+s.resonance+'源</span>'
         +'<span>· '+_fe(s.enter_date||'—')+'</span>'
-        +(s.signals&&s.signals.length?'<span style="color:var(--gold);">· '+(s.signals||[]).slice(0,3).map(_fe).join('+')+'</span>':'')
+        +(s.signals&&s.signals.length?'<span style="color:var(--gold);">· '+(s.signals||[]).filter(function(sig){return String(sig).indexOf('高手共振')<0||(typeof window.__inGaoshouReso==='function'&&window.__inGaoshouReso(s.code));}).slice(0,3).map(_fe).join('+')+'</span>':'')
         // 🔴 2026-08-13 主人令修正：plan 改用普通 inline flow，不再 margin-left:auto 推到右
         //   之前 plan (止损/目标/盈亏比) 被推到右→主人「分析字段少了」错觉（实际在右边，主人没看到）
         //   现改为 inline 紧跟信号后,即使 plan 没数据也不占位
