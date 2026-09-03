@@ -1,16 +1,16 @@
 {
-  "update_time": "2026-09-03 20:23",
+  "update_time": "2026-09-04 00:03",
   "window_days": 90,
   "total_stats": {
     "four_volume": {
-      "tracking": 58,
+      "tracking": 57,
       "history_samples": 0,
       "win_rate": 0,
       "avg_return": 0,
       "exit_target": 0,
       "exit_stop": 0,
       "exit_timeout": 0,
-      "today_signals": 6
+      "today_signals": 4
     }
   },
   "algos": [
@@ -18,14 +18,14 @@
       "algo": "four_volume",
       "display_name": "四量终极",
       "stats": {
-        "tracking": 58,
+        "tracking": 57,
         "history_samples": 0,
         "win_rate": 0,
         "avg_return": 0,
         "exit_target": 0,
         "exit_stop": 0,
         "exit_timeout": 0,
-        "today_signals": 6
+        "today_signals": 4
       },
       "tracking": [
         {
@@ -629,7 +629,7 @@
           "peak_pct": 0.0,
           "days_in": 39,
           "appear_count": 1,
-          "last_seen": "20260903",
+          "last_seen": "20260904",
           "signal_detail": {
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉",
@@ -743,7 +743,7 @@
           "peak_pct": 0.0,
           "days_in": 31,
           "appear_count": 1,
-          "last_seen": "20260903",
+          "last_seen": "20260821",
           "signal_detail": {
             "period": "60m",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
@@ -1058,53 +1058,34 @@
           "code": "002297",
           "name": "润迈德－B",
           "algo": "four_volume",
-          "list_date": "20260903",
-          "list_date_dashed": "2026-09-03",
-          "entry_price": 22.0,
-          "last_close": 22.0,
+          "list_date": "20260904",
+          "list_date_dashed": "2026-09-04",
+          "entry_price": 21.89,
+          "last_close": 21.89,
           "last_pct": 0.0,
           "peak_pct": 0.0,
           "days_in": 0,
           "appear_count": 1,
-          "last_seen": "20260903",
+          "last_seen": "20260904",
           "signal_detail": {
-            "period": "daily",
+            "period": "60m",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
-            "pct_chg": 10.0
-          }
-        },
-        {
-          "code": "300857",
-          "name": "协创数据",
-          "algo": "four_volume",
-          "list_date": "20260903",
-          "list_date_dashed": "2026-09-03",
-          "entry_price": 265.88,
-          "last_close": 265.88,
-          "last_pct": 0.0,
-          "peak_pct": 0.0,
-          "days_in": 0,
-          "appear_count": 1,
-          "last_seen": "20260903",
-          "signal_detail": {
-            "period": "daily",
-            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
-            "pct_chg": 1.46
+            "pct_chg": 17.94
           }
         },
         {
           "code": "600150",
           "name": "中国船舶",
           "algo": "four_volume",
-          "list_date": "20260903",
-          "list_date_dashed": "2026-09-03",
+          "list_date": "20260904",
+          "list_date_dashed": "2026-09-04",
           "entry_price": 34.69,
           "last_close": 34.69,
           "last_pct": 0.0,
           "peak_pct": 0.0,
           "days_in": 0,
           "appear_count": 1,
-          "last_seen": "20260903",
+          "last_seen": "20260904",
           "signal_detail": {
             "period": "60m",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉",
@@ -1115,15 +1096,15 @@
           "code": "300179",
           "name": "四方达",
           "algo": "four_volume",
-          "list_date": "20260903",
-          "list_date_dashed": "2026-09-03",
+          "list_date": "20260904",
+          "list_date_dashed": "2026-09-04",
           "entry_price": 36.11,
           "last_close": 36.11,
           "last_pct": 0.0,
           "peak_pct": 0.0,
           "days_in": 0,
           "appear_count": 1,
-          "last_seen": "20260903",
+          "last_seen": "20260904",
           "signal_detail": {
             "period": "60m",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
@@ -1136,7 +1117,7 @@
   ],
   "_meta": {
     "version": "v1",
-    "schema_date": "2026-09-03",
+    "schema_date": "2026-09-04",
     "note": "三算法独立追踪；entry=信号日收盘，exit=timeout≥90天（stop/target待接止损数据）"
   }
 }

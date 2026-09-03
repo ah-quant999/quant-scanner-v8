@@ -1,8 +1,8 @@
 {
-  "update_time": "2026-09-03 20:07:37",
+  "update_time": "2026-09-04 00:01:38",
   "data_date": "update_time",
   "track_start": "2026-08-17",
-  "history_days": 13,
+  "history_days": 14,
   "strict_count": 0,
   "near_count": 0,
   "tracked": [],
@@ -341,12 +341,12 @@
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
     "track_start": "2026-08-17",
-    "history_days": 13,
+    "history_days": 14,
     "summary": {
       "1d": {
-        "count": 12,
-        "win_rate": 33.33,
-        "avg_return": 2.91
+        "count": 13,
+        "win_rate": 30.77,
+        "avg_return": 2.69
       },
       "3d": {
         "count": 8,
@@ -354,9 +354,9 @@
         "avg_return": 4.4
       },
       "5d": {
-        "count": 7,
-        "win_rate": 42.86,
-        "avg_return": 3.56
+        "count": 8,
+        "win_rate": 37.5,
+        "avg_return": 2.94
       },
       "10d": {
         "count": 2,
@@ -514,13 +514,22 @@
         "name": "香农芯创",
         "enter_date": "2026-08-30",
         "offsets": {
-          "1d": 0.0
+          "1d": 0.0,
+          "5d": -1.42
         }
       },
       {
         "code": "601138",
         "name": "",
         "enter_date": "2026-08-30",
+        "offsets": {
+          "1d": 0.0
+        }
+      },
+      {
+        "code": "600362",
+        "name": "江西铜业",
+        "enter_date": "2026-09-03",
         "offsets": {
           "1d": 0.0
         }
