@@ -50,20 +50,27 @@ ROOT = os.path.dirname(ALGO)
 #   必需=False → 只告警，不影响退出码（低频/依赖外部源的产物）
 # 只列「每交易日必须刷新」的选股链路产物；PORTFOLIO_COST / CONCEPT_ETF_MAP
 # 一类低频文件不在此列（它们陈旧属正常，由 HEALTH_CHECK 白名单管）。
+# 🔴 2026-09-03 主人授权方案①（run #1462 step14 假阳性根治）：
+#   data/*.js 重生成职责在 build 部署工作流（v8_build_deploy 从 raw_data 重建），
+#   云端算法链只保证 raw_data 数据源头层产出。链内闸门若严格要求 data 层新鲜，
+#   链内只要漏重生任一前端文件就假阳性 exit 1（#1462 实锤：raw_data 层全新鲜，
+#   data 层 TRIPLE/CRDS/TOP10 停 09-02 → 判负，实际数据完整，21:33 build 补齐）。
+#   故 data/*.js 层降为 warn-only（状态照常展示供运维面板消费，不参与判失败），
+#   raw_data 源头层保持严格判定，不放水。
 CRITICAL = [
     ("候选池",       "raw_data/candidate.json",        True),
-    ("候选池(前端)", "data/CANDIDATE.js",              True),
+    ("候选池(前端)", "data/CANDIDATE.js",              False),
     ("逆势龙头CRDS", "raw_data/crds_card_data.json",   True),
-    ("逆势龙头(前端)", "data/CRDS_CARD_DATA.js",       True),
-    ("相对强度RPS",  "data/STOCK_RPS.js",              True),
+    ("逆势龙头(前端)", "data/CRDS_CARD_DATA.js",       False),
+    ("相对强度RPS",  "data/STOCK_RPS.js",              False),
     ("全站精选TOP10", "raw_data/top10_daily.json",     True),
-    ("全站精选(前端)", "data/TOP10_DAILY.js",          True),
+    ("全站精选(前端)", "data/TOP10_DAILY.js",          False),
     ("三重共识",     "raw_data/triple_consensus.json", True),
-    ("三重共识(前端)", "data/TRIPLE_CONSENSUS.js",     True),
-    ("四量终极",     "data/FOUR_VOLUME.js",            True),
-    ("四量终极60m",  "data/FOUR_VOLUME_60M.js",        True),
+    ("三重共识(前端)", "data/TRIPLE_CONSENSUS.js",     False),
+    ("四量终极",     "data/FOUR_VOLUME.js",            False),
+    ("四量终极60m",  "data/FOUR_VOLUME_60M.js",        False),
     ("最终推荐",     "raw_data/final_recommend.json",  True),
-    ("最终推荐(前端)", "data/FINAL_RECOMMEND_DATA.js", True),
+    ("最终推荐(前端)", "data/FINAL_RECOMMEND_DATA.js", False),
     ("金股池",       "raw_data/gold_pool.json",        False),
     # 2026-08-28 主人令：mahoro 数据源不再跟踪，已从闸门清单移除
 ]
