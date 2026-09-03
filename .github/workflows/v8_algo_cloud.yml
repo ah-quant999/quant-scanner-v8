@@ -55,6 +55,8 @@ on:
 
 permissions:
   contents: write
+  # 2026-09-04 探针路由：转派 workflow 需要 actions: write（用 PAT 时由 PAT scope 决定，此处兜底）
+  actions: write
 
 # 🔴 2026-08-21 19:2x 一劳永逸根因修复（主人令「核查，一劳永逸式修复」）：
 #   本 workflow 此前**没有 concurrency 段** → 算法链失败后自愈派发器
@@ -386,9 +388,67 @@ jobs:
           echo "skip_silent=false" >> "$GITHUB_OUTPUT"
           echo "🟡 交易日盘后且选股模块未产出(${FRESH}/3)，放行 dispatch 补跑"
 
+      # 🧭 2026-09-04 探针自动路由（主人令「都按你的建议做」·治本：云端跨境抓数占全链 ~85%）：
+      #   每轮 schedule/repository_dispatch 跑前查 lemoncat-cn（小九单位机，中国 IP）是否 online+idle：
+      #     在线+空闲 → 按 CST 小时算 stage 转派 cn 链（v8_algo_run.yml，实测全链 84min vs 云端 2h40m），云端后续重活全跳过；
+      #     离线/忙/转派失败 → 一律回落云端自跑，永不断供。
+      #   手动 workflow_dispatch 不路由（保留 force_run/bypass_time_gate 人工语义）。
+      #   失败自愈：若 cn 接单后中途断供，看门狗下次 dispatch 时探针见 offline 自动回落云端。
+      - name: "🧭 探针路由：lemoncat-cn 在线且空闲则转派国内机"
+        id: route
+        if: (github.event_name == 'schedule' || github.event_name == 'repository_dispatch') && steps.silent.outputs.skip_silent != 'true'
+        env:
+          PROBE_TOKEN: ${{ secrets.V8_GH_TOKEN || secrets.GITHUB_TOKEN }}
+          IS_TRADING_DAY: ${{ steps.trading.outputs.is_trading_day }}
+        run: |
+          set -eo pipefail
+          echo "route=cloud" >> "$GITHUB_OUTPUT"
+          REPO="ah-quant999/quant-scanner-v8"
+          # 非交易日：云端运行步自会跳过，无需路由（周末审计走手动 dispatch，不进本分支）
+          if [ "$IS_TRADING_DAY" != "true" ]; then
+            echo "非交易日：不路由"; exit 0
+          fi
+          CODE=$(curl -sS -o /tmp/runners_probe.json -w "%{http_code}" \
+            -H "Authorization: token $PROBE_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/actions/runners" 2>/dev/null || echo 000)
+          if [ "$CODE" != "200" ]; then
+            echo "::warning::runner 列表 API HTTP=$CODE → 保守走云端"
+            exit 0
+          fi
+          STATE=$(jq -r '[.runners[]? | select(.name=="lemoncat-cn")] | if length==0 then "missing" else (.[0].status) end' /tmp/runners_probe.json)
+          BUSY=$(jq -r '[.runners[]? | select(.name=="lemoncat-cn")] | if length==0 then "-" else (.[0].busy|tostring) end' /tmp/runners_probe.json)
+          echo "lemoncat-cn: state=$STATE busy=$BUSY"
+          # 只在「在线 + 空闲」时转派；busy 忙说明 cn_fetch 自托管链在跑，别插队
+          if [ "$STATE" != "online" ] || [ "$BUSY" != "false" ]; then
+            echo "→ 不满足(在线+空闲)，走云端"
+            exit 0
+          fi
+          # 与云端分批同口径：按 CST 小时算 stage（16:40采集/18:10选股/19:15回测/20:00汇总）
+          HH=$(TZ=Asia/Shanghai date +%H)
+          STAGE=""
+          case "$HH" in
+            16|17) STAGE="A" ;;
+            18)    STAGE="B" ;;
+            19)    STAGE="C" ;;
+            20)    STAGE="D" ;;
+            *)     STAGE="" ;;
+          esac
+          DCODE=$(curl -sS -o /tmp/dispatch_resp.txt -w "%{http_code}" -X POST \
+            -H "Authorization: token $PROBE_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$REPO/actions/workflows/v8_algo_run.yml/dispatches" \
+            -d "{\"ref\":\"main\",\"inputs\":{\"stage\":\"$STAGE\"}}" 2>/dev/null || echo 000)
+          if [ "$DCODE" = "204" ]; then
+            echo "route=cn" >> "$GITHUB_OUTPUT"
+            echo "🇨🇳 已转派 cn 链(stage=${STAGE:-ALL})，本云端链后续重活跳过"
+          else
+            echo "::warning::转派 HTTP=$DCODE → 回落云端自跑"
+          fi
+
       - name: "🧮 运行盘后算法链 → raw_data/ → 推送"
         id: algo
-        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true')
+        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true') && steps.route.outputs.route != 'cn'
         # 🔴 2026-08-30 23:3x 抬高步级墙钟 90 → 150（实测 run 33316835316 坐实）：
         #   周末 force_run 全量补算时，本步跑到 70 分钟仍未完成，距 90 分钟限时仅剩
         #   20 分钟——一旦超时被硬杀，后续 bridge / ALGO_TRACK / 兜底推送 / **产物完整性
@@ -451,19 +511,19 @@ jobs:
       #   必刷新——bridge_raw_data 防 raw_data 内部改名断点（如 triple_resonance_history → triple_history），
       #   update_v8 重生成 data/*.js，v8_health_check 刷新 HEALTH_CHECK.js。
       - name: "🔗 桥接 raw_data 内部改名（bridge_raw_data.py）"
-        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true')
+        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true') && steps.route.outputs.route != 'cn'
         run: |
           python algorithms/bridge_raw_data.py || true
 
       # 2026-08-08 修复：算法链产出 candidate.json 后，立即刷新候选池行情，
       # 避免 runner 状态卡 CANDIDATE_QUOTES 长期显示「空」。
       - name: "📈 刷新候选池行情（CANDIDATE_QUOTES）"
-        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true')
+        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true') && steps.route.outputs.route != 'cn'
         run: |
           python cloud_fetch_v8.py --only CANDIDATE_QUOTES || true
 
       - name: "📤 兜底推送（若上一步未推）"
-        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true')
+        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true') && steps.route.outputs.route != 'cn'
         run: |
           # 2026-08-22 根因⑪收口：去掉 || true —— 推送失败必须让 job 失败，
           # 否则「算法链算完但推送 422 失败」永远被假 success 掩盖。
@@ -483,7 +543,7 @@ jobs:
       #   此步只在算法链收尾重算 ALGO_TRACK.js 的 ?v 并推送 index.html（Contents API，避开 cn git 墙）。
       #   只改 ALGO_TRACK 一项，不碰 COMMODITY 等（避免用陈旧本地文件覆盖 build/deploy 已对齐的 ?v）。
       - name: "🔄 同步 ALGO_TRACK 缓存戳 ?v 并推送 index.html"
-        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true')
+        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || github.event.inputs.force_run == 'true') && steps.route.outputs.route != 'cn'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -545,7 +605,7 @@ jobs:
       #    v8_ops_watch）可见；同时写 $GITHUB_STEP_SUMMARY + raw_data/algo_chain_report.json，
       #    让主人一眼看到断在哪一环，而不是对着全绿的 job 发呆。
       - name: "🛡 产物完整性闸门（核心产物必须本交易日产出）"
-        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true')
+        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true') && steps.route.outputs.route != 'cn'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
