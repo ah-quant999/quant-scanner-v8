@@ -340,7 +340,10 @@ jobs:
           # 2026-08-22 来源驱动增量推送（主人令升级）：git status 收集"本次 changed"作清单，
           #   聚焦推送本次产物（cloud_fetch save + 外部脚本全部写入），不再全量 848 文件扫描，
           #   配合 api_push_raw 的 PUSH_FILES，单次 tree 请求大小与仓库规模解耦（422 根治）。
-          MANIFEST=$(git status --porcelain raw_data/ data/ | awk '{print $2}' | tr '\n' ',')
+          # 2026-09-03 派发风暴去重（B·小九接手）：剥时间戳比对，仅时间戳变的伪变更不进 PUSH_FILES
+          #   脚本失败则回退原 git status 清单（安全优先，绝不漏推真数据）
+          MANIFEST=$(python .github/scripts/dedup_fetch_manifest.py raw_data/ data/ 2>/dev/null) \
+            || MANIFEST=$(git status --porcelain raw_data/ data/ | awk '{print $2}' | tr '\n' ',')
           if [ -z "$MANIFEST" ]; then
             echo "ℹ️ 本次无 raw_data/data 变更，跳过推送"
           else
@@ -410,7 +413,9 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
-          DATA_MANIFEST=$(git status --porcelain data/ | awk '{print $2}' | tr '\n' ',')
+          # 2026-09-03 派发风暴去重（B·小九接手）：data/*.js 同理剥时间戳比对
+          DATA_MANIFEST=$(python .github/scripts/dedup_fetch_manifest.py data/ 2>/dev/null) \
+            || DATA_MANIFEST=$(git status --porcelain data/ | awk '{print $2}' | tr '\n' ',')
           if [ -z "$DATA_MANIFEST" ]; then
             echo "ℹ️ 本次无 data 变更，跳过推送"
           else
