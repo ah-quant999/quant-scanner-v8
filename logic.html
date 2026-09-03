@@ -8158,51 +8158,6 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     }
     h+='</div></div>';
 
-    /* ===== 🎯 已下架选股模块（2026-08-29 主人令：同源弱alpha选股tab下沉，保留可查） ===== */
-    h+=`<div style="display:inline-block;margin:14px 0 8px 0;padding:4px 10px;font-size:11.5px;font-weight:700;color:#c4b5fd;background:rgba(167,139,250,.10);border:1px solid rgba(167,139,250,.28);border-radius:6px;">└ 🎯 盘后 · 已下架选股模块（同源弱alpha · 保留可查）</div>`;
-    h+=`<div id="st-hunter" style="margin-bottom:16px"><div id="hunterContainer"></div></div>`;
-    h+=`<div id="st-cockpit" style="margin-bottom:16px"><div id="stCockpit"></div></div>`;
-    h+=`<div id="st-allsite" style="margin-bottom:16px"><div id="stAllsite"></div></div>`;
-    h+=`<div id="st-fv" style="margin-bottom:16px">
-      <div class="card" id="stfvCard">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-          🔥 <span style="font-weight:700;font-size:14px;color:var(--txt);">四量终极</span>
-          <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span>
-          <span id="stfvTime"><span class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;"><span aria-hidden="true">🐻</span><span style="margin-left:4px">更新于</span><span style="color:#9fd0ff;font-weight:600;margin-left:4px">已加载</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">盘后</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">短线</span></span></span>
-          <span id="stfvRunBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);">✅ 今日已跑完</span>
-          <span id="stfvHoldBadge" style="display:none;margin-left:6px;"></span>
-        </div>
-        <div id="stfvNote" style="font-size:11px;color:var(--dim);margin-bottom:10px;line-height:1.6;"></div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:14px;">
-          <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">
-            <div style="font-size:10px;color:var(--dim);margin-bottom:4px;">🎯 QD 命中</div>
-            <div id="stfvQD" style="font-size:24px;font-weight:800;color:var(--orange);">0</div>
-            <div style="font-size:10px;color:var(--dim);">四路共振</div>
-          </div>
-          <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">
-            <div style="font-size:10px;color:var(--dim);margin-bottom:4px;">🔥 游资点火</div>
-            <div id="stfvYZC" style="font-size:24px;font-weight:800;color:var(--up);">0</div>
-            <div style="font-size:10px;color:var(--dim);">YZC 触发</div>
-          </div>
-          <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">
-            <div style="font-size:10px;color:var(--dim);margin-bottom:4px;">🏦 机构托底</div>
-            <div id="stfvJG" style="font-size:24px;font-weight:800;color:var(--cyan);">0</div>
-            <div style="font-size:10px;color:var(--dim);">JG 托底</div>
-          </div>
-          <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">
-            <div style="font-size:10px;color:var(--dim);margin-bottom:4px;">⚡ 当天金叉</div>
-            <div id="stfvXC" style="font-size:24px;font-weight:800;color:var(--gold);">0</div>
-            <div style="font-size:10px;color:var(--dim);">XC 金叉</div>
-          </div>
-          <div style="padding:12px;background:var(--bg2);border-radius:8px;border:1px solid var(--border);text-align:center;">
-            <div style="font-size:10px;color:var(--dim);margin-bottom:4px;">📈 四路翻多</div>
-            <div id="stfvFOUR" style="font-size:24px;font-weight:800;color:var(--purple);">0</div>
-            <div style="font-size:10px;color:var(--dim);">FOUR 信号</div>
-          </div>
-        </div>
-        <div id="stfvHits"></div>
-      </div>
-    </div>`;
 
     /* 2026-08-30 主人令：斐波那契双卡 + 商品涨价弹性榜三卡已上移至「已下架」顶部盘前条幅下方 */
 
@@ -8218,11 +8173,6 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     try{ if(window.renderMarketFundFlow) window.renderMarketFundFlow(window.MARKET_FUND_FLOW_DATA||{}); }catch(e){console.warn("已下架·资金流时间轴渲染失败",e);}
     try{ if(window.drawAmountChart) window.drawAmountChart(); }catch(e){console.warn("已下架·成交额渲染失败",e);}
     try{ if(window.drawUpDownChart) window.drawUpDownChart(); }catch(e){console.warn("已下架·涨跌家数渲染失败",e);}
-    /* 2026-08-29 主人令：下沉选股模块渲染（同源弱alpha tab） */
-    /* 2026-09-03 主人令：renderHunter 调用入口已删（猎手全方位下线） */
-    /* 2026-09-03 主人令：renderCockpit 调用入口已删（驾驶舱全方位下线） */
-    /* 2026-09-03 主人令：renderAllsite 调用入口已删（全站全方位下线） */
-    try{ if(window.renderFourVolume) window.renderFourVolume(); }catch(e){console.warn("已下架·四量终极渲染失败",e);}
     /* 2026-08-29 主人令：下沉盘后观测卡渲染（斐波那契窗口 + 商品涨价弹性榜） */
     try{ if(window.renderFib) window.renderFib(window.SH_FIB||{}); }catch(e){console.warn("已下架·斐波那契渲染失败",e);}
     try{ if(typeof window._fillCommodityElasticity==='function') window._fillCommodityElasticity(); }catch(e){console.warn("已下架·商品涨价弹性榜渲染失败",e);}
