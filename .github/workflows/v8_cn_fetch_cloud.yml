@@ -272,6 +272,10 @@ jobs:
       # 仅生成 raw_data/etf_subscription_em.json，后续 update_v8 会映射为 data/ETF_SUBSCRIPTION_EM.js。
       - name: "💰 ETF 申购赎回（东财口径，盘前/盘后/全量）"
         if: steps.cat.outputs.category == 'premarket' || steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
+        # 🛡 2026-09-03 一劳永逸根因修复（根因④）：该步曾独占 25.5 分钟拖垮整轮 run，
+        #   导致后续 LHB/候选池等步骤排队、盘中卡迟到。加 20min 硬超时，超时即判该步失败
+        #   （continue-on-error 放行），不阻塞其余步骤，CI 不再被单源hog。
+        timeout-minutes: 20
         continue-on-error: true
         shell: bash
         run: |

@@ -112,11 +112,11 @@ CATEGORY_MAP = {
     # 「盘前不清空、保留昨日 T+1 收盘值」是另一个语义，由下方 _clear_intraday_for_premarket 的 KEEP_VARS 负责。
     "ETF_DAILY_MONITOR": "intraday",
     "ETF_SUBSCRIPTION": "premarket",  # T+1 盘后/盘前更新一次即可
-    "SECTOR_FUND_FLOW": "intraday",
-    "SECTOR_FUND_FLOW_INTRADAY": "intraday",  # 分时快照，跟随 SECTOR_FUND_FLOW 同周期
+    "SECTOR_FUND_FLOW": "intraday,post_close",  # 2026-09-03 根治：盘中 cron 偶发丢档→收盘定格值无着落；加 post_close 兜底（过滤已 comma-aware）
+    "SECTOR_FUND_FLOW_INTRADAY": "intraday,post_close",  # 分时快照，跟随 SECTOR_FUND_FLOW 同周期；盘后追加收盘定格点
     "CAPITAL_FLOW_DATA": "intraday",
     "CONCEPT_RANKING": "intraday",
-    "LIMIT_UP_HEATMAP": "intraday",
+    "LIMIT_UP_HEATMAP": "intraday,post_close",  # 2026-09-03 根治：盘中 cron 偶发丢档→收盘定格值无着落；加 post_close 兜底（过滤已 comma-aware）
     "LIMIT_UP_BROKEN": "intraday",
     "CANDIDATE_QUOTES": "intraday",  # 候选池实时行情：行业树图第二层（个股）数据源
     "SH_SZ_HISTORY": "intraday",  # 沪深成交额历史（滚动窗口，盘中最少5刷）
@@ -3251,7 +3251,7 @@ def main(category=None, only=None):
         target_vars = set(CATEGORY_MAP.keys())
         print(f"🎯 全量兜底模式，涉及 {len(target_vars)} 个变量")
     elif category:
-        target_vars = {var for var, cat in CATEGORY_MAP.items() if cat == category}
+        target_vars = {var for var, cat in CATEGORY_MAP.items() if category in [x.strip() for x in cat.split(",")]}
         if not target_vars:
             print(f"⚠️ 未知 category={category}，无任务可执行")
             return 0
