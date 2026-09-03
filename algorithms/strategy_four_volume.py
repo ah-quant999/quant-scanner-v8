@@ -292,6 +292,54 @@ def write_four_volume_js(records, out_dir=DATA_DIR):
     return path
 
 
+
+
+def write_four_volume_backtest_js(records, bt_summary=None, out_dir=DATA_DIR):
+    """写出 data/FOUR_VOLUME_BACKTEST.js 规范化外壳（策略回顾回测区 window.FOUR_VOLUME_BACKTEST）。
+
+    🛡 2026-09-04 主人令·一劳永逸：外壳此前为 09-02 手工空壳、无人回写 → update_time 冻结，
+    健康面板 all_FOUR_VOLUME_BACKTEST 永远 FAIL（误报）。每次四量跑完即刷新本外壳；
+    bt_summary（backtest_four_volume 返回值）存在时附带真实分层回测数据（1d→1 等键名映射）。
+    """
+    try:
+        from zoneinfo import ZoneInfo
+        now = datetime.now(ZoneInfo("Asia/Shanghai"))
+    except Exception:
+        now = datetime.now() + timedelta(hours=8)  # 兜底：UTC+8
+    update_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    n = len(records or [])
+    by_period = {}
+    if bt_summary:
+        for k, v in (bt_summary.get("periods") or {}).items():
+            by_period[str(k).replace("d", "")] = {
+                "samples": v.get("count", 0),
+                "win_rate": v.get("win_rate", 0),
+                "avg_return": v.get("avg_return", 0),
+                "best_return": v.get("best", 0),
+                "worst_return": v.get("worst", 0),
+            }
+    method = "四量终极历史回测：信号日收盘价买入，持有N个交易日收盘价卖出"
+    if not by_period:
+        method += ("（当前 0 信号，待四量信号恢复后自动填充）" if n == 0
+                   else "（当前 %d 信号；深度分层回测待 --backtest 手动跑）" % n)
+    data = {
+        "update_time": update_time,
+        "summary": {
+            "update_time": update_time,
+            "calc_time": update_time,
+            "total_signals": (bt_summary or {}).get("total_signals", n),
+            "method": method,
+            "signal_date_range": "—",
+            "by_period": by_period,
+        },
+    }
+    path = os.path.join(out_dir, "FOUR_VOLUME_BACKTEST.js")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("window.FOUR_VOLUME_BACKTEST = " + json.dumps(data, ensure_ascii=False, indent=1) + ";\n")
+    print(f"  ✅ 写出 {path}（回测外壳刷新，{data['summary']['total_signals']} 信号）")
+    return path
+
+
 def backtest_four_volume(years=3, top_cy=60, top_kc=60, top_zb=60, top_hk=30):
     """回看近 N 年，对活跃股池逐只找 XG 信号日，统计持有收益（非未来函数）。"""
     bars = max(DAILY_BARS, int(years * 250) + 60)
@@ -376,8 +424,12 @@ def main():
         #   data/FOUR_VOLUME.js 冻结在上一跑、被运维按陈旧判 fail（静默冻结根因）。
         print(f"  [ERROR] 四量终极日线扫描异常: {e}")
     write_four_volume_js(records)
+    bt_summary = None
     if args.backtest > 0:
-        backtest_four_volume(years=args.backtest)
+        bt_summary = backtest_four_volume(years=args.backtest)
+    # 🛡 2026-09-04 一劳永逸：策略回顾回测区读 .js 外壳（非 .json），此前为 09-02 手工
+    #   空壳无人回写 → update_time 冻结、健康面板 all_FOUR_VOLUME_BACKTEST 永远 FAIL（误报）。
+    write_four_volume_backtest_js(records, bt_summary)
     return records
 
 
