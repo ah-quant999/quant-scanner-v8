@@ -1,0 +1,308 @@
+# 九宝量化 v8.0 — 构建 + 部署（GitHub 云端 ubuntu-latest）
+#
+# 2026-08-01 周末改造：
+#   1) push 事件（cn runner 推 raw_data 或 v6 算法端推 post_close raw_data）
+#      改用 --detect-changes：只构建发生变化的那几个 data/*.js，不全站重部署。
+#   2) 保留 17:00 CST 盘后算法换算调度：对 post_close 类别做一次 selective build，
+#      确保 v6 算法端在非 push 场景下也能被构建到。
+#   3) concurrency 保持 serial，防止并发 push 冲突。
+#
+# 触发策略（2026-08-01 审计修正，2026-08-03 修正 auto-deploy，2026-08-03 扩展风险温度计）：
+#   - push raw_data/**  → 检测变化 → 只构建受影响类别（v6 算法端推 raw_data 由此触发）
+#   - workflow_run: 🇨🇳 v8 中国数据抓取(cn) / 🌍 v8 实时风险温度计 成功完成后 → 自动构建部署
+#     原因：cn runner / 云端 workflow 用 GITHUB_TOKEN push raw_data 不会触发 push 类 workflow，
+#     用 workflow_run 原生机制绕过该限制，实现"抓取完成即自动部署"，无需小九手动 dispatch。
+#   - workflow_dispatch → 全量构建（人工兜底）
+#
+# ⚠️ 已移除原 17:00 schedule：它会与 19:15 前尚未完成的算法链竞态，用旧 raw_data
+#   先构建部署一版陈旧数据；而算法链 19:15 推送 raw_data 时会经 push 触发本工作流
+#   自动重新构建，schedule 纯属冗余且有害，故删除。
+
+name: "☁️ v8 构建部署(云端ubuntu)"
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'raw_data/**'
+      - 'data/**'
+      - '!data/freshness_status.json'
+      - 'index.html'
+      - 'update_v8.py'
+      - 'v8_health_check.py'
+      - 'v8_cloud_watchdog.py'
+      - 'guard_index_sections.py'
+      - 'guard_v8_freshness.py'
+      - 'v8_deploy_guard.py'
+      - 'algorithms/**'
+      - 'v8_postclose_guard.py'
+      - 'data/.workbuddy/**'   # 自愈调度锁文件改动也会触发重新构建 HEALTH_CHECK.js
+  workflow_run:
+    workflows:
+      - "🇨🇳 v8 中国数据抓取(cn·应急)"
+      - "🇨🇳 v8 中国数据抓取(云端)"
+      - "☁️ v8 盘后算法链(云端)"
+      - "🌍 v8 实时风险温度计"
+      - "☁️ v8 盘中算法追踪(轻量)"
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read   # v8_health_check.py 查 /actions/runners 需要此权限；不加则 401
+
+concurrency:
+  # 🛡 2026-08-31 一劳永逸根治「构建部署永不成功 / 持续 cancelled」：
+  #   根因：云端多个 workflow（盘中算法追踪 / 风险温度计 / cn抓取 / 盘后算法链 / 龙虎榜…）
+  #   用 PAT（actor=ah-quant999，≠ github-actions[bot]）push raw_data/data，每次都命中
+  #   on.push → 触发一场 build。cancel-in-progress 让新 build 取消在跑的旧 build →
+  #   只要触发频率高于单次构建时长(~14min)，build 永远被取消、data 永不重生（今日6h零成功）。
+  #   修复：并发组按事件类型隔离——push / workflow_run / workflow_dispatch 各占独立组。
+  #   · push 组：机器人 raw_data 推送互相取消（无害，本就由下方 workflow_run 兜底）。
+  #   · workflow_run 组：云端 workflow 成功完成才触发，与 push 组互不干扰 → 必定跑完并部署。
+  #   · workflow_dispatch 组：手动兜底，必定跑完。
+  #   效果：无论 push 风暴多密，workflow_run/dispatch 的构建都能独立跑完，data 必重生。
+  group: v8-build-deploy-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      trading: ${{ steps.t.outputs.trading }}
+    steps:
+      - id: t
+        shell: bash
+        run: |
+          TH=$(TZ=Asia/Shanghai date +%-H); TM=$(TZ=Asia/Shanghai date +%-M)
+          TR=0
+          if { [ "$TH" -eq 9 ] && [ "$TM" -ge 25 ]; } || [ "$TH" -eq 10 ] || { [ "$TH" -eq 11 ] && [ "$TM" -le 30 ]; } || [ "$TH" -eq 13 ] || [ "$TH" -eq 14 ]; then TR=1; fi
+          echo "trading=$([ "$TR" -eq 1 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "🕒 当前北京时间 ${TH}:${TM} → 交易时段=$([ "$TR" -eq 1 ] && echo YES || echo NO)"
+  build:
+    needs: [gate]
+    runs-on: ubuntu-latest
+    # 🛡 2026-08-31 第二处根治：超时线曾为 15 分钟，但「📤 部署到 main」步会
+    #   `git reset --hard FETCH_HEAD` 后必跑一次【全量】update_v8.py（约 14 分钟），
+    #   叠加 checkout/依赖/护栏/构建步，整 job 常态 >15 分钟 → 被 GitHub 以
+    #   timeout 判 `cancelled`（与并发取消同为 cancelled，极易误诊）。原 6h「零成功」
+    #   实为「并发取消(前 60-600s)」+「超时取消(满 15min)」双重夹击。并发按事件分桶修
+    #   复后构建能跑满 15min 才暴露此超时 bug。提至 60 分钟：全量构建(~14min)+
+    #   部署步二次全量(~14min，仅 workflow_dispatch 触发)仍留足余量，正常流水线
+    #   (selective+全量≈16min) 更宽松。GitHub 免费 runner 单 job 上限 6h，60 安全。
+    timeout-minutes: 60
+    # 🛡 构建条件：workflow_run 上游成功 / 手动 dispatch / 任意 push 均构建。
+    #   注：曾误以为「bot 自触发」靠 github.actor=='github-actions[bot]' 排除，但实测云端
+    #   workflow 用 PAT 推送，actor 实为 ah-quant999（≠ github-actions[bot]），故 actor 过滤无效。
+    #   真正的根治在上方 concurrency：按事件类型分桶，workflow_run/dispatch 组不被 push 风暴取消，
+    #   必定跑完并部署；push 组的机器人互相取消无害（数据由 workflow_run 兜底重建）。
+    # 🛡 2026-09-03 交易时段优先级闸门（盘中风暴一劳永逸根治）：盘中全量 build 排队，不抢 CI；
+    #   盘中数据由 cn_fetch 自闭环推送 data/*.js 直接上线。盘后/手动才跑全量构建部署。
+    if: needs.gate.outputs.trading != 'true' && ((github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || (github.event_name == 'workflow_dispatch') || (github.event_name == 'push'))
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # ★ 2026-08-15 根治 build clobber：必须全量克隆（fetch-depth: 0），否则浅克隆
+          #   reset --hard FETCH_HEAD 拉不到 cn 单独推送的 5 个 extra 文件（STOCK_RPS 等）
+          #   最新 blob，本地副本落后 → ?v 算成陈旧值 → CDN 吐旧副本。全量克隆保证
+          #   reset 后本地 data/*.js 与线上严格一致，?v 一律取本地文件即权威。
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: "📦 安装 Python 依赖（云端构建必需：pandas/akshare/requests/PyYAML）"
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: "🛡️ 确保 .nojekyll 存在（防 Jekyll 因 _ 前缀目录报错致整站构建失败）"
+        run: |
+          if [ ! -f .nojekyll ]; then touch .nojekyll; echo "rebuild missing .nojekyll"; else echo ".nojekyll ok"; fi
+          git add -f .nojekyll
+
+      - name: "🛡️ 护栏：校验关键板块未被误删/清空"
+        run: python guard_index_sections.py
+
+      - name: "🛡️ 护栏：v6备忘录 防覆盖（缺失/截断自愈 + 缓存击穿）"
+        run: python guard_v6_memo.py
+
+      - name: "🏗️ 构建 data/*.js（selective）"
+        env:
+          # V8_GH_TOKEN 是含 actions:read+list runners 权限的 PAT（已存为 repo secret）。
+          # GHA 默认 GITHUB_TOKEN 即便声明 actions:read 也无权列 self-hosted runners。
+          # v8_health_check.py 通过 _load_token() 优先选 V8_GITHUB_TOKEN > GITHUB_TOKEN > 本地文件。
+          V8_GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+          # ★ 2026-08-15 根治 build clobber：update_v8.py 的 ?v 计算需 GITHUB_TOKEN 才能
+          #   取线上真实 data/*.js 内容（git blobs API），避免用落后本地 checkout 算陈旧 ?v。
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "调度触发：构建 post_close 类别"
+            python update_v8.py --category post_close
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "手动触发：全量构建"
+            python update_v8.py
+          else
+            echo "raw_data push 触发：检测变化并 selective build"
+            python update_v8.py --detect-changes
+          fi
+
+      - name: "🛡️ 部署前校验：关键 data/*.js 非空（防空 raw_data 覆盖成 shell 致整站空）"
+        run: python v8_deploy_guard.py
+
+      - name: "📤 部署到 main（GitHub Pages 源）"
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # ★ 2026-08-15 根治 build clobber：update_v8.py 的 ?v 计算需 GITHUB_TOKEN 才能
+          #   取线上真实 data/*.js 内容（git blobs API）对齐 ?v（仅用于 cn 单独推送的 5 个
+          #   extra 文件；构建机自身重写的文件用本地新鲜内容）。reconcile_cache_busters.py
+          #   步骤已从 build 移除——它在单提交构建里无法同时正确服务「本地新文件」与「线上
+          #   extra 文件」，会 clobber update_v8.py 已写对的 ?v。独立 reconcile workflow 仍用
+          #   线上做全局自愈（每 15 分钟 + 推送触发）。
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # push 被拒后重试时会重新跑 update_v8.py -> v8_health_check.py，必须同样带 token
+          V8_GITHUB_TOKEN: ${{ secrets.V8_GH_TOKEN }}
+        run: |
+          git config user.name "v8-cloud-bot"
+          git config user.email "v8-bot@users.noreply.github.com"
+          REPO="https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
+          # ⚠️ 不要改回 git rebase：data/*.js 是构建产物，两趟构建并发时 rebase 必然
+          #   在生成文件上产生 content conflict -> rebase --abort -> 整个部署失败
+          #   （2026-08-04 23:50 实例：data/HEALTH_CHECK.js CONFLICT，部署挂掉）。
+          #   正确做法：push 被拒 = 远端已前进，同步远端后用最新 raw_data 重新全量构建，
+          #   产物由构建决定而非由合并决定，天然无冲突且不会用旧产物覆盖新数据。
+          for i in 1 2 3; do
+            # 🔒 取远端最新 main（含阿狸咪/cn 直接推仓的 data/*.js），消除 push 事件
+            #   checkout 滞后导致的 ?v 陈旧失配：先 sync 远端再 reconcile，确保 ?v 对齐到
+            #   「当前线上最新数据」而非构建机滞后副本（2026-08-15 缓存戳铁律根因修复·续）。
+            #   这 5 个文件(FOUR_VOLUME/FOUR_VOLUME_60M/STOCK_RPS/STOCK_STOP_DATA/
+            #   FINAL_RECOMMEND_DATA) 只由 cn 直接推，update_v8 不重建，构建机 checkout
+            #   若落后 cn 最新推送就会拿到旧内容算旧 ?v → CDN 吐旧副本。先 reset 到
+            #   FETCH_HEAD 即拿到 cn 最新版，reconcile 即可对齐。
+            git fetch "$REPO" main
+            # ★★ 2026-08-18 根因修复：build bot 不要擦除人工前端改动 ★★
+            #   `git reset --hard FETCH_HEAD` 会把 index.html 上的人工 UI 修改（如 v6备忘录
+            #   iframe 加载兜底、子 tab 顺序调整、卡片增删）全部擦回远端旧版。此处先备份
+            #   本地 index.html，reset 后立即恢复；后续 update_v8.py 只会更新 data/*.js
+            #   的 ?v 戳、guard_v6_memo.py 只会刷新 v6_memo.html 的戳，不会破坏人工改动。
+            cp index.html /tmp/index.html.manual
+            git reset --hard FETCH_HEAD
+            cp /tmp/index.html.manual index.html
+            # 同步 cn runner 单独推送的 5 个 extra 文件（update_v8.py 不重建这些），
+            #   确保 ?v 计算基于线上真实最新内容。
+            git checkout FETCH_HEAD -- data/FOUR_VOLUME.js data/FOUR_VOLUME_60M.js data/STOCK_RPS.js data/STOCK_STOP_DATA.js data/FINAL_RECOMMEND_DATA.js
+            # ★ update_v8.py 是 build 内 ?v 的唯一权威：自身重写过的文件用本地新鲜内容，
+            #   cn 单独推送的 5 个 extra 文件用线上真实内容（GITHUB_TOKEN 经 git blobs API）。
+            #   二者都已中性化 republish_time 后取 sha1 前 10 位，与独立 reconcile 完全一致。
+            #   —— 此处不再跑 reconcile_cache_busters.py（单提交构建里它无法同时正确，会 clobber）。
+            # 🔴 2026-08-18 根因修复：sync 远端后必须全量构建。原 --detect-changes 在
+            #   `git reset --hard FETCH_HEAD` 后，HEAD~1..HEAD 的 diff 已经看不到 raw_data
+            #   变化（变化被包含在更早的远端提交里），导致 detect_changes 返回 0 个变化、
+            #   跳过所有 data/*.js 重建 → 盘中数据永远停留在旧版本。注释已要求"全量重建"，
+            #   实现却用了 detect_changes，这是实现与注释不一致的致命 bug。
+            python update_v8.py
+
+            # 🛡 2026-08-29 跨层一致性闸门：raw_data 新但 data/*.js 没重建的错位（如 CANDIDATE 卡 3 天）
+            #   必须在此步拦截，防止陈旧消费层被推送上线。
+            #   升级阶段先软失败（告警但不阻断），待已知 2 处不一致修复后改为硬失败。
+            python v8_verify_layer_parity.py || true
+
+            # ★★ 2026-08-16 根治「逻辑详解页 v6备忘录 一直打不开」★★
+            #   根因：上面第 85 行的 guard_v6_memo.py 已正确把 index.html 的
+            #   iframe 戳改成 sha10(v6_memo.html)，但紧接着的 `git reset --hard FETCH_HEAD`
+            #   把该修正整个擦回远端旧值；而 update_v8.py 只重算 data/*.js 的 ?v、
+            #   完全不碰 v6_memo.html 的戳 → 提交出去的 v6 戳永远停在远端旧值，
+            #   浏览器/CDN 便一直按旧 URL 吐早已作废的旧副本 → 页面空白。
+            #   （独立 reconcile workflow 的正则只匹配 data/[A-Z0-9_]+\.js，也不覆盖 v6_memo，
+            #    故此戳无任何自愈网 —— 必须在 reset 之后重跑 guard 才能对齐。）
+            #   修复：reset 之后重新执行 guard，使 v6 戳与实际落库内容严格一致。
+            python guard_v6_memo.py
+            # 🛡 2026-08-25 一劳永逸(任务②)：注入构建版本戳，配合 index.html 版本戳缓存破坏，
+            #   部署新版本后用户自动刷新，彻底免疫「看到重构前旧 HTML（动量共识卡多页重复等）」。
+            python - <<'PYS'
+          import re, subprocess
+          p='index.html'
+          s=open(p,encoding='utf-8').read()
+          sha=subprocess.check_output(['git','rev-parse','--short','HEAD']).decode().strip()
+          s=re.sub(r'var BUILD = "(?:BUILD_SHA_PLACEHOLDER|[0-9a-f]{7,40})"', 'var BUILD = "'+sha+'"', s)
+          open(p,'w',encoding='utf-8').write(s)
+          print('✅ 已注入构建版本戳', sha)
+          PYS
+            # 🛡 2026-08-25 一劳永逸(任务①)：关键 data 文件须为今日新鲜，否则阻断部署防陈旧上线。
+            #   update_v8.py 写回的是 raw_data 内嵌时间戳（「不得造假」铁律），故能真实反映数据新鲜度；
+            #   仅当内嵌时间戳确凿陈旧(>36h)才拦截；格式缺失/无时间戳仅告警不拦截，避免误伤正常部署。
+            python - <<'PYF'
+          import re, datetime, sys
+          crit={'data/COCKPIT_ADVICE.js':['gen_time','update_time','calc_time'],
+                'data/SECTOR_RECOMMENDATION.js':['gen_time','update_time','calc_time']}
+          tz=datetime.timezone(datetime.timedelta(hours=8)); now=datetime.datetime.now(tz)
+          stale=[]
+          for f,keys in crit.items():
+              try: s=open(f,encoding='utf-8').read()
+              except Exception: print('  ⚠️',f,'(缺失,仅告警)'); continue
+              found=None
+              for k in keys:
+                  m=re.search(k+r'\s*[:=]\s*["\']?(\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2})', s)
+                  if m: found=m.group(1).replace('T',' '); break
+              if not found: print('  ⚠️',f,'(无时间戳,仅告警)'); continue
+              dt=datetime.datetime.strptime(found[:16],'%Y-%m-%d %H:%M').replace(tzinfo=tz)
+              age=(now-dt).total_seconds()/3600
+              if age>36: stale.append(f+'(陈旧%.1fh,%s)'%(age,found))
+          if stale:
+              print('❌ 关键数据陈旧，阻断部署（避免上线过期数据）：')
+              [print('  -',x) for x in stale]; sys.exit(1)
+          print('✅ 关键数据均为今日新鲜')
+          PYF
+            # 🛡 2026-08-26 一劳永逸根因修复（涨跌家/资金60日/共振日历长期「只1天/空」）：
+            #   累加型 raw_data 此前只靠 cn_fetch/algo_cloud 的 api_push_raw（Contents API + git status 变更清单），
+            #   遇大 tree 会 HTTP 422 失败且 continue-on-error 吞掉 → 这些文件永不持久化 → 每轮构建从陈旧基线重来（死亡螺旋）。
+            #   现由本部署步用【可靠 git】一并提交累加型小文件（非缓存），确保下一轮 checkout 拿到真实累积基线。
+            #   仅列历史累加型文件，避免把 kline/_rps 等缓存（共 51M）塞进仓库。
+            # 🛡 2026-09-02 一劳永逸根因修复（?v 缓存戳防线·提交前守卫）：
+            #   上方 update_v8.py 已重写 ?v，但 BUILD 戳注入/护栏步骤不碰 ?v，故此处再跑一次
+            #   --only-cache-busters 确保「即将提交的 index.html ?v」与「即将提交的 data/*.js 实际
+            #   内容」严格一致；随后核验，若仍失配则强制再重写一次。即便本 build 因 push 组
+            #   cancel-in-progress 被取消，v8_cache_buster_reconcile 也会在 15 分钟内兜底纠正，双保险。
+            python update_v8.py --only-cache-busters
+            python -c "import re,hashlib,pathlib; idx=pathlib.Path('index.html').read_text(encoding='utf-8'); bad=[(s,v) for s,v in re.findall(r'data/([A-Z0-9_]+)\.js\?v=([0-9a-f]{1,40})',idx) if (lambda p: p.exists() and hashlib.sha1(re.sub(r'\"republish_time\"\s*:\s*\"[^\"]*\"','\"republish_time\":\"\"',p.read_text(encoding='utf-8')).encode()).hexdigest()[:10]!=v)(pathlib.Path('data')/(s+'.js'))]; print('❌ ?v 仍失配',bad) if bad else print('✅ 提交前核验：index.html 全部 ?v 与 data/*.js 实际内容一致'); (lambda: __import__('subprocess').run(['python','update_v8.py','--only-cache-busters'],check=True) if bad else None)()"
+            # 🛡 安全：先把任何落入 data/ 的密钥/令牌文件从索引移除，避免一并由 git add 提交到
+            #   公开仓库（git add 不会自动 unstage 已跟踪的敏感文件；此前 -f 曾把 .mahoro_cookies.txt 等强制入库）。
+            git rm --cached --ignore-unmatch \
+              data/.mahoro_cookies.txt data/.github_pat.txt data/zsxq_token.json \
+              data/.wc_jwt_cache.json data/.neodata_token data/zszxq_token.json 2>/dev/null || true
+            git add data/ index.html .nojekyll v6_memo.html v6_memo.golden.html guard_v6_memo.py \
+              raw_data/sh_sz_history.json \
+              raw_data/sector_fund_flow_history.json \
+              raw_data/triple_resonance_history.json \
+              raw_data/triple_history.json \
+              raw_data/triple_track.json \
+              raw_data/h_auto_buy_history.json \
+              raw_data/lhb_history.json \
+              raw_data/stock_profile.json
+            if git diff --cached --quiet; then
+              echo "ℹ️ 无数据变化，跳过部署（远端已是最新构建）"
+              exit 0
+            fi
+            git commit -m "v8 build: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
+            if git push "$REPO" HEAD:main; then
+              echo "✅ 已部署 main（第 $i 次尝试，GitHub Pages 自动重建）"; exit 0
+            fi
+            echo "⚠️ push 被拒（远端已前进），同步远端并按最新 raw_data 全量重建后重试 ($i/3)"
+            git fetch "$REPO" main
+            # 重试路径同样备份/恢复 index.html，避免人工前端改动被擦除
+            cp index.html /tmp/index.html.manual
+            git reset --hard FETCH_HEAD
+            cp /tmp/index.html.manual index.html
+            git checkout FETCH_HEAD -- data/FOUR_VOLUME.js data/FOUR_VOLUME_60M.js data/STOCK_RPS.js data/STOCK_STOP_DATA.js data/FINAL_RECOMMEND_DATA.js
+            # 🔴 2026-08-18 根因修复：重试路径同样必须全量构建，不能用 --detect-changes
+            #   （原因同上：reset 后 HEAD~1..HEAD 已无法反映 raw_data 的真实变化）。
+            python update_v8.py
+            # ★ 同上：reset 已擦掉 v6 戳修正，重试路径也必须重跑 guard 对齐（否则重试成功的
+            #   那一趟提交仍带旧 v6 戳，v6备忘录继续打不开）。
+            python guard_v6_memo.py
+          done
+          echo "❌ 3 次重试后仍失败"; exit 1
