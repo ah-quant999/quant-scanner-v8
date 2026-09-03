@@ -931,7 +931,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge; window._holdBadge = _holdB
 
 /* ===== 🎯 今日判定 · 可入手候选 HTML 构建（2026-08-08 重构） =====
    规则：① 只保留「值得买入」的股票；② 按统一买入评分降序；③ 每只股票汇总关键详情；④ 三不原则独立第二行。
-   数据：🥇三重共识 > 🥈驾驶舱 A 档 > 🥉四量终极（金股池移出本卡，见独立「黄金池」卡片）；渲染由 initCardBadges / switchSec('td') 触发。 */
+   数据：🥇三重共识 > 🥉四量终极（驾驶舱 A 档已下线）（金股池移出本卡，见独立「黄金池」卡片）；渲染由 initCardBadges / switchSec('td') 触发。 */
 function __judgmentCandidatesHTML(){
   var SQ = window.STOCK_QUOTE || {};
   var sq = SQ.stocks || {};
@@ -2476,7 +2476,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         <div id="ttCluster"></div>
       </div>
       <div class="card">
-        <h3><span class="ic">🔗</span>全站精选重叠度 - 盘后</h3>
+        <h3><span class="ic">📊</span>选股池重叠度 - 盘后</h3>
         <div class="note">当前跟踪池（严格+差一步）与全站其他精选层的重叠，辅助判断市场共识集中度。</div>
         <div id="ttOverlap"></div>
       </div>
@@ -4305,11 +4305,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
       html += '<span style="font-size:15px;font-weight:700;color:var(--txt);">v8 选股生命周期</span>';
       html += '<span style="font-size:11px;color:var(--dim);">三 algo 跟踪池去重 → 专家阈值判状态（强势/买点/见顶/走弱）· 二维精选（板块流入×情绪周期）</span>';
-      html += '</div>';
-      // 2026-09-02 主人令：头部状态条被覆盖，严格还原「更新于 / 已跑已推仓」（不自由发挥，不多加 pill）
-      html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
+      // 2026-09-03 主人令：「已跑」「已推仓」分开执行，胶囊也分开，紧跟卡片名不另起一行（与严格三重共识 / 四量终极 / 逆势龙头保持同一行 3 胶囊样式）
       html += _uBadge(_isPre?'盘前':'盘后','短线',_upd);
-      html += _holdBadge(_upd, pt.selected_size||0, '已跑已推仓');
+      var _v8RunInfo = window._runBadgeInfo ? window._runBadgeInfo(_upd) : null;
+      if(_v8RunInfo && _v8RunInfo.show){
+        html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);white-space:nowrap">'+_v8RunInfo.label+'</span>';
+      }
+      html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#60a5fa;background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.3);white-space:nowrap">📦 '+(pt.selected_size||0)+' 已推仓</span>';
       html += '</div>';
 
       /* ─── ① 多 algo 共识（全部展示） ─── */
@@ -4527,7 +4529,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var pills = [];
 
       // 2026-08-30 主人令「保留综合回测+星级对比；降级已下线策略/TOP5」：
-      // 驾驶舱回测（胜率≈随机）与 TOP5（样本极少）不再单独占胶囊位，
+      // 已下线策略的回测（胜率≈随机）与 TOP5（样本极少）不再单独占胶囊位，
       // 统一收敛到下方「策略星级对比表」与「综合回测」中展示，避免重复与误导。
 
       // ① TDX信号最强策略（从BACKTEST_TDX取T+5胜率最高的）
@@ -9905,7 +9907,7 @@ window.showRestrictedItems = showRestrictedItems;
       _t++;
       if(_chk()||_t>15){
         clearInterval(_id);
-        if(stRendered[n]) stRendered[n]=0; // 解除守卫，确保 cockpit/allsite 等(无按钮)也能重渲
+        if(stRendered[n]) stRendered[n]=0; // 解除守卫，确保历史 tab（即便无按钮）也能重渲
         try{ renderStTab(n); }catch(e){ console.warn('[stRetryTab]',n,e); }
         return;
       }
@@ -11815,12 +11817,8 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     DATA.market_alerts = window.MARKET_ALERTS||null;
     DATA.volatility = window.VOLATILITY||null;
     DATA.gold_pool = window.GOLD_POOL||null;
-    DATA.allsite = null;  /* 2026-09-03 主人令：window.COCKPIT_TIER_RECOMMEND 已下线（原代 cockpit 整片已删） */
-    DATA.cockpit_tier = null;  /* 2026-09-03 主人令：同上 */
-    // 2026-09-03 主人令：COCKPIT_BACKTEST / COCKPIT_TIER_RECOMMEND / COCKPIT_ADVICE 整片已全方位下线
-    //     （commit 1/3 已删 DOM/函数/CSS，commit 2/3 已删脚本与 JSON；DATA.* 死赋值仅作审计存档）
-    DATA.cockpit_backtest = null;  /* COCKPIT_BACKTEST.js 已删，运维/UI 都已无引用 */
-    DATA.cockpit_advice = null;  /* 2026-09-03 主人令：window.COCKPIT_ADVICE 已下线 */
+    // 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND / COCKPIT_BACKTEST / COCKPIT_ADVICE 整片已全方位下线
+    //     window.X 已全删，DATA.xxx dead assignment 同步删除（不留 null 占位）
     DATA.candidate = window.CANDIDATE||null;
     DATA.backtest_comprehensive = window.BACKTEST_COMPREHENSIVE||null;
     DATA.backtest_tdx = window.BACKTEST_TDX||null;
