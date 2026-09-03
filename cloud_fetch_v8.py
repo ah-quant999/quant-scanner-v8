@@ -236,6 +236,31 @@ def save(var, obj):
     print(f"  ✅ {var} → raw_data/{fname}")
 
 
+def _clear_premarket_marker(label):
+    """🛡 2026-09-03 一劳永逸：盘中/盘后 fetch 返回空时，清除盘前残留的 premarket_cleared 标记，
+    避免「盘中仍顶着盘前清空标记」误导 HEALTH_CHECK 误报 fail（ETF_INTRADAY_HEAT / SECTOR_FUND_FLOW
+    早盘东财延迟镜像偶发空，盘前占位 legitimately 残留）。不动 update_time —— 年龄新鲜度检查仍能
+    兜底「真·长期无数据」（盘中卡 2h 红线，超龄照常 fail）。仅由 run() 在 09:30 后空结果时调用；
+    盘前(08:25-09:30)阶段标记本就正确，不在此清除（由 _clear_intraday_for_premarket 统一负责）。"""
+    fname = VAR_TO_RAW.get(label)
+    if not fname:
+        return
+    path = RAW_DIR / fname
+    if not path.exists():
+        return
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return
+    if data.pop("premarket_cleared", None) is not None:
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, separators=(",", ":"), default=str)
+            print(f"  🧹 {label}: 清除盘前残留 premarket_cleared 标记（保留原有数据，update_time 不变）")
+        except Exception as e:
+            print(f"  ⚠️ {label}: 清除 premarket_cleared 失败: {e}")
+
+
 # ───────────────────────── 东方财富「延迟镜像」直连 ─────────────────────────
 # 说明：东方财富 push2.eastmoney.com / push2his.eastmoney.com 的实时资金流接口
 # 在本机/runner 网络下被 WAF 以 TCP 重置（ConnectionError: RemoteDisconnected）拒绝；
@@ -1059,6 +1084,12 @@ def run(label, fn, retries=2):
             else:
                 print(f"  ⚠️ {label}: 返回空，跳过")
                 _run_status[label] = {"status": "empty", "msg": "返回空"}
+                # 🛡 2026-09-03 一劳永逸：09:30 后盘中/盘后空结果 → 清盘前残留 premarket_cleared 标记，
+                #   避免「盘中仍顶着盘前清空标记」误报 HEALTH_CHECK fail（阿狸咪 08:55 文档漏报的 2 个新 bug）。
+                #   盘前(08:25-09:30)标记本就正确，跳过不清。
+                _h = now_cst().hour + now_cst().minute / 60.0
+                if _h >= 9.5:
+                    _clear_premarket_marker(label)
             return
         except Exception as e:
             last_err = e

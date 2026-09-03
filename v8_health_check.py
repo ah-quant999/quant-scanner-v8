@@ -1319,13 +1319,27 @@ def check_data_cards():
         prem_cleared = data.get("premarket_cleared") is True
         # 注意：page 变量在下方才赋值，此处必须直接取 d["page"]，否则会误用上一轮循环的残留值
         if prem_cleared and d.get("page") == "实时数据" and is_intraday_session():
-            _emit(d, {
-                "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
-                "status": "fail", "last_update": str(ts), "age_min": 0,
-                "premarket_cleared": True,
-                "message": f"盘中交易时段被异常标记为 premarket_cleared（update_time={fmt_rel_time(ts)}）"
-            })
-            continue
+            # 🛡 2026-09-03 一劳永逸：开盘前 30min(09:30-10:00)东财延迟镜像偶发空，premarket_cleared
+            #   属预期占位（cloud_fetch 盘中空结果已自愈清标记），不误报 fail；10:00 后仍残留才判
+            #   真·盘中误清空异常。配合 cloud_fetch_v8._clear_premarket_marker 自愈闭环。
+            _open = now_cst().replace(hour=9, minute=30, second=0, microsecond=0)
+            _mins_since_open = (now_cst() - _open).total_seconds() / 60.0
+            if _mins_since_open >= 30:
+                _emit(d, {
+                    "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
+                    "status": "fail", "last_update": str(ts), "age_min": 0,
+                    "premarket_cleared": True,
+                    "message": f"盘中交易时段被异常标记为 premarket_cleared（update_time={fmt_rel_time(ts)}）"
+                })
+                continue
+            else:
+                _emit(d, {
+                    "id": d["id"], "name": d["name"], "page": d["page"], "freq": d["freq"],
+                    "status": "ok", "last_update": str(ts), "age_min": 0,
+                    "premarket_cleared": True,
+                    "message": f"盘前清空占位，开盘初期东财镜像待刷新（update_time={fmt_rel_time(ts)}）"
+                })
+                continue
 
         if dt is None:
             _emit(d, {
