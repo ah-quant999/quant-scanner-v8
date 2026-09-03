@@ -340,11 +340,14 @@ jobs:
           #      非交易日 / 盘中 / 已产出 一律静默 ——「限定盘后批量+静默阈值」合体；
           #   3) 新鲜判定读 git 内容级 update_time（>=16 点算今晚产出），
           #      免疫 cn_fetch 只 bump ?v 的伪新鲜。
-          if [ "$GH_EVENT" != "repository_dispatch" ]; then
+          if [ "$GH_EVENT" = "schedule" ]; then
             echo "skip_silent=false" >> "$GITHUB_OUTPUT"
-            echo "🟢 事件=$GH_EVENT 属合法批量，放行"
+            echo "🟢 schedule 定时批量(16:40/18:10/19:15/20:00)，放行"
             exit 0
           fi
+          # V4 修正：阿狸咪风暴的主力是 workflow_dispatch（Actions 页满屏 30s "Manually run"），
+          #   V3 只查 repository_dispatch 会把 workflow_dispatch 风暴全放回来。
+          #   故非 schedule 一律走下方新鲜度检查；手动 force_run 在各步骤 if 里自带绕过。
           if [ "$IS_TRADING_DAY" != "true" ]; then
             echo "skip_silent=true" >> "$GITHUB_OUTPUT"
             echo "🔇 dispatch×非交易日：算法链必被交易日 gate 跳过，纯空转，静默"
