@@ -1,15 +1,15 @@
 window.FOUR_VOLUME={
- "update_time": "2026-09-02 04:44:06",
- "total": 1,
+ "update_time": "2026-09-03 18:17:19",
+ "total": 3,
  "stocks": [
   {
-   "code": "300418",
-   "name": "昆仑万维",
+   "code": "002297",
+   "name": "博云新材",
    "market": "sz",
-   "board_label": "创业板",
-   "close": 45.94,
-   "pct_chg": 4.43,
-   "turnover_rate": 0,
+   "board_label": "主板",
+   "close": 22.0,
+   "pct_chg": 10.0,
+   "turnover_rate": 31.38,
    "mv_yi": 0,
    "fund_type": "混合",
    "components": {
@@ -27,8 +27,64 @@ window.FOUR_VOLUME={
    "four": true,
    "qd": true,
    "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
-   "signal_date": "2026-09-01",
-   "enter_date": "2026-09-01"
+   "signal_date": "2026-09-03",
+   "enter_date": "2026-09-03"
+  },
+  {
+   "code": "601872",
+   "name": "招商轮船",
+   "market": "sh",
+   "board_label": "主板",
+   "close": 19.3,
+   "pct_chg": 8.37,
+   "turnover_rate": 1.82,
+   "mv_yi": 0,
+   "fund_type": "混合",
+   "components": {
+    "游资点火": true,
+    "机构托底": true,
+    "广度翻多": true,
+    "主力动量翻多": true,
+    "机构金叉": false,
+    "散户金叉": true,
+    "主力金叉": true
+   },
+   "yzc": true,
+   "jg": true,
+   "xc": true,
+   "four": true,
+   "qd": true,
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 散户金叉 + 主力金叉",
+   "signal_date": "2026-09-03",
+   "enter_date": "2026-09-03"
+  },
+  {
+   "code": "300857",
+   "name": "协创数据",
+   "market": "sz",
+   "board_label": "创业板",
+   "close": 265.88,
+   "pct_chg": 1.46,
+   "turnover_rate": 3.84,
+   "mv_yi": 0,
+   "fund_type": "混合",
+   "components": {
+    "游资点火": true,
+    "机构托底": true,
+    "广度翻多": true,
+    "主力动量翻多": true,
+    "机构金叉": false,
+    "散户金叉": false,
+    "主力金叉": false
+   },
+   "yzc": true,
+   "jg": true,
+   "xc": true,
+   "four": true,
+   "qd": true,
+   "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+   "signal_date": "2026-09-03",
+   "enter_date": "2026-09-03"
   }
  ]
 };
