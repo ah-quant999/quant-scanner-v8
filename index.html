@@ -4315,6 +4315,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '<div style="margin:14px 0;" class="card">';
       html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">';
       html += '<span style="font-size:15px;font-weight:700;color:var(--txt);">v8 选股生命周期</span>';
+      html += '<span style="font-size:10.5px;color:var(--dim);font-weight:600;letter-spacing:.5px;">· ③持有管理</span>'; /* 2026-09-04 主人令·方案乙：角色标签 */
       html += '<span style="font-size:11px;color:var(--dim);">三 algo 跟踪池去重 → 专家阈值判状态（强势/买点/见顶/走弱）· 二维精选（板块流入×情绪周期）</span>';
       // 2026-09-03 主人令：「已跑」「已推仓」分开执行，胶囊也分开，紧跟卡片名不另起一行（与严格三重共识 / 四量终极 / 逆势龙头保持同一行 3 胶囊样式）
       html += _uBadge(_isPre?'盘前':'盘后','短线',_upd);
@@ -4866,6 +4867,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     // 头部：名称 + 自算标签 + 更新时间
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">';
     html += '⚡ <span style="font-weight:700;font-size:14px;color:var(--txt);">强势突破</span>';
+    html += '<span style="font-size:10.5px;color:var(--dim);font-weight:600;letter-spacing:.5px;">· ①发现信号</span>'; /* 2026-09-04 主人令·方案乙：角色标签 */
     html += '<span style="font-size:10px;color:#ef5350;font-weight:600;background:rgba(239,83,80,.14);padding:1px 7px;border-radius:4px;">算法自算 · 高手反推 v1</span>';
     if(typeof _uBadge === 'function') html += _uBadge('盘后','短线',(D.update_time||'').slice(0,16));
     html += '</div>';
@@ -4939,6 +4941,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     // 头部胶囊：更新于 + 已跟踪 N + 高手共振 N
     html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">';
     html += '📡 <span style="font-weight:700;font-size:14px;color:var(--txt);">高手强势股跟踪</span>';
+    html += '<span style="font-size:10.5px;color:var(--dim);font-weight:600;letter-spacing:.5px;">· ②共振确认</span>'; /* 2026-09-04 主人令·方案乙：角色标签 */
     html += '<span style="font-size:10px;color:#a78bfa;font-weight:600;background:rgba(167,139,250,.14);padding:1px 7px;border-radius:4px;">ima 自动同步</span>';
     if(D.note_url) html += '<a href="'+_e(D.note_url)+'" target="_blank" style="font-size:11px;color:#a78bfa;text-decoration:none;">原帖↗</a>';
     if(typeof _uBadge === 'function') html += _uBadge('盘后','短线',(D.update_time||'').slice(0,16).replace('T',' '));
