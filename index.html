@@ -1491,6 +1491,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/IMA_STRONG_STOCK.js?v=3948aa8153" defer></script>
     <!-- 🆕 2026-09-04 强势突破选股（高手算法反推版 v1，strong_breakout.py 盘后产出） -->
     <script src="data/STRONG_BREAKOUT.js?v=afe57eb43d" defer></script>
+    <script src="data/FACTOR_LAB_BACKTEST.js?v=0000000000" defer></script>
     <script src="data/FACTOR_LAB.js?v=1a0b83babd" defer></script>
 <!-- 2026-08-31 轻量化：data/ALGO_TRACK.js（42.4 KB）前端零引用，停止注入（省 42.4 KB） -->
 <script src="data/ETF_PULSE.js?v=4474fd3f75" defer></script>
@@ -5087,7 +5088,36 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + _focusBlock('① 异常换手率（缩量=多，因子越高越强势）','#22d3ee',atFocus,'at','at','完整榜单：Top30 强势 + Bottom10 放量弱势')
       + _focusBlock('② ROE(TTM) 全市场主板·大市值档（成交额代理 Top1/3）','#38bdf8',roeFocus,'roe','roe','完整榜单：ROE Top30')
       + '<div style="font-size:11px;color:var(--dim);margin-top:10px;line-height:1.5;">口径：异常换手率=当月换手率÷过去12月均值（缩量→低关注→强势），仍用重点池(351只)；ROE_TTM=最近4季度 roeAvg 求和，已切换为全市场主板(3193只)·大市值档(成交额top1/3)。均经 v2 回测验证显著（Spearman IC t=4.3 / 3.3，样本内外一致）。🟢可关注=择时开放且因子进入前20%分位。仅研究参考，非买卖建议。</div>'
-      + '<div style="font-size:11px;color:#fbbf24;margin-top:6px;line-height:1.5;">⭐ 升级路径（2026-09-03 主人令）：现为 ★★ 观测仓——补独立分层回测（胜率/最大回撤）+ 全市场扫描，达标升 4⭐ 后转正为「选股策略」子页。</div>'
+      + '<div style="font-size:11px;color:#fbbf24;margin-top:6px;line-height:1.5;">⭐ 升级路径（2026-09-03 主人令）：现为 ★★ 观测仓——独立分层回测已挂链自动产出（见下📊，升3⭐判据：利差>0+Top胜率≥55%+OOS同号）；剩全市场扫描（--abn-universe full）开启后复验，达标升 4⭐ 转正「选股策略」子页。</div>'
+      + (function(){
+          var BT = window.FACTOR_LAB_BACKTEST;
+          if(!BT || !BT.abnormal_volume || BT.abnormal_volume.error)
+            return '<div style="font-size:11px;color:var(--dim);margin-top:10px;padding:8px 10px;border:1px dashed rgba(148,163,184,.3);border-radius:8px;">📊 独立分层回测：⏳ 数据生成中（已挂链回测批，产出后自动显示）</div>';
+          var A = BT.abnormal_volume, R = BT.roe_largecap || {};
+          function _num(v,d){ return (v==null||isNaN(v))?'—':Number(v).toFixed(d==null?2:d); }
+          var L = A.layers||{};
+          function _row(lb,st,color){
+            if(!st) return '';
+            return '<tr>'
+              +'<td style="padding:2px 6px;color:'+color+';font-weight:600;">'+lb+'</td>'
+              +'<td style="padding:2px 6px;">'+_num(st.avg_10d,2)+'%</td>'
+              +'<td style="padding:2px 6px;">'+_num(st.win_10d,1)+'%</td>'
+              +'<td style="padding:2px 6px;">'+(st.nav_mdd_10d!=null?_num(st.nav_mdd_10d,1)+'%':'—')+'</td></tr>';
+          }
+          var verdict = A.verdict_3star==='PASS'
+            ? '<span style="color:#22c55e;font-weight:700;">✅ 达 3⭐ 证据</span>'
+            : '<span style="color:#fbbf24;font-weight:600;">⏳ 未达标（继续观测）</span>';
+          var ex = R.excess_10d;
+          return '<div style="margin-top:10px;padding:8px 10px;border:1px solid rgba(148,163,184,.2);border-radius:8px;background:rgba(148,163,184,.05);">'
+            + '<div style="font-size:11.5px;font-weight:700;margin-bottom:4px;">📊 独立分层回测（每10交易日调仓 · 次日开盘入场 · 扣0.20%成本） '+verdict+'</div>'
+            + '<table style="width:100%;border-collapse:collapse;font-size:10.5px;">'
+            + '<tr style="color:var(--dim);"><td style="padding:2px 6px;">层</td><td style="padding:2px 6px;">10日净均收</td><td style="padding:2px 6px;">胜率</td><td style="padding:2px 6px;">净值回撤</td></tr>'
+            + _row('L1(缩量最强)',L['1'],'#ef5350') + _row('L2',L['2'],'var(--fg)') + _row('L3',L['3'],'var(--fg)') + _row('L4',L['4'],'var(--fg)') + _row('L5(放量最弱)',L['5'],'#26a69a')
+            + '</table>'
+            + '<div style="font-size:10.5px;color:var(--dim);margin-top:4px;line-height:1.5;">异常量比 Top−Bottom 利差 '+_num(A.spread_top_bottom_10d_pct,2)+'%/10日 · 样本外(OOS) '+_num(A.spread_oos_pct,2)+'% · '+_e(A.n_points)+' 个调仓点 · '
+            + (ex!=null ? 'ROE Top30 超额 '+_num(ex,2)+'%/10日（当期分组回看，弱证据）' : '')
+            + '</div></div>';
+        })()
       + '</div>';
     dst.innerHTML = html;
     // 弹窗：完整榜单（复用闭包内 row() 与全量数组，2026-09-03 主人令）
