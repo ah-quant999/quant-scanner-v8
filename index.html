@@ -10060,6 +10060,11 @@ window.showRestrictedItems = showRestrictedItems;
 /* ===== 运维子页：v6 精选 / 暂未上架 / 已下架 移植（精简、暗色主题） ===== */
 (function(){
   const $=id=>document.getElementById(id);
+  // 🛡 2026-09-03 修复：renderDelisted 斐波那契卡调用 num()，但本 IIFE 从未定义 num
+  //   （num 仅在 6657/9555 两个子 IIFE 内定义，非全局）→ SH_FIB 有数据时抛
+  //   ReferenceError → renderDelisted 整页捕获并显示「renderDelisted 错误」。
+  //   此处与 6657/9555 保持同一签名，恢复斐波那契卡渲染。
+  const num=(v,d)=>v==null||isNaN(v)?'--':Number(v).toFixed(d==null?2:d);
   const DATA={};
 
   /* ---- 相对时间（v8 风格：今日/昨日/N天前 HH:MM，统一中国时间） ---- */
