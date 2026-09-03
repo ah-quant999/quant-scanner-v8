@@ -56,12 +56,16 @@ def strip_ts(text):
 
 
 def head_text(f):
-    try:
-        return subprocess.check_output(
-            ['git', 'show', 'HEAD:' + f], stderr=subprocess.DEVNULL
-        ).decode('utf-8', 'replace')
-    except Exception:
-        return None
+    # 🔧 2026-09-03 一劳永逸升级：比对基准优先用远端真源 origin/main（消除本地 HEAD 陈旧边界），
+    #   回退 HEAD；都取不到则视为新增/未知 → 保留推送（绝不漏推真数据）。
+    for ref in ('origin/main', 'HEAD'):
+        try:
+            return subprocess.check_output(
+                ['git', 'show', ref + ':' + f], stderr=subprocess.DEVNULL
+            ).decode('utf-8', 'replace')
+        except Exception:
+            continue
+    return None
 
 
 def main():

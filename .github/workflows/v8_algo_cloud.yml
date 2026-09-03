@@ -390,7 +390,10 @@ jobs:
           # 推送失败即让 job 失败，dispatch_guard 才能感知并重试，杜绝假 success。
           # 2026-08-22 来源驱动：git status 收集本次 changed 作清单，避免与 run_algorithms
           # 内部 step_push 重复全量 848 扫描（与 api_push_raw PUSH_FILES 配合，422 根治闭环）。
-          MANIFEST=$(git status --porcelain raw_data/ data/ | awk '{print $2}' | tr '\n' ',')
+          # 2026-09-03 派发风暴去重（B·小九接手）：算法链盘后产物同理剥时间戳比对，仅时间戳变的伪变更不进 PUSH_FILES
+          #   脚本失败则回退原 git status 清单（安全优先，绝不漏推真数据）
+          MANIFEST=$(python .github/scripts/dedup_fetch_manifest.py raw_data/ data/ 2>/dev/null) \
+            || MANIFEST=$(git status --porcelain raw_data/ data/ | awk '{print $2}' | tr '\n' ',')
           if [ -n "$MANIFEST" ]; then
             echo "📋 本次变更清单: ${MANIFEST%,}"
             PUSH_FILES="$MANIFEST" python api_push_raw.py
@@ -420,7 +423,10 @@ jobs:
           # 2026-08-22 根因⑪收口：去掉 || true —— 推送失败必须让 job 失败，
           # 否则「算法链算完但推送 422 失败」永远被假 success 掩盖。
           # 2026-08-22 来源驱动增量：只推本次 changed，避免全量 848 扫描。
-          MANIFEST=$(git status --porcelain raw_data/ data/ | awk '{print $2}' | tr '\n' ',')
+          # 2026-09-03 派发风暴去重（B·小九接手）：算法链盘后产物同理剥时间戳比对，仅时间戳变的伪变更不进 PUSH_FILES
+          #   脚本失败则回退原 git status 清单（安全优先，绝不漏推真数据）
+          MANIFEST=$(python .github/scripts/dedup_fetch_manifest.py raw_data/ data/ 2>/dev/null) \
+            || MANIFEST=$(git status --porcelain raw_data/ data/ | awk '{print $2}' | tr '\n' ',')
           if [ -n "$MANIFEST" ]; then
             PUSH_FILES="$MANIFEST" python api_push_raw.py
           else
