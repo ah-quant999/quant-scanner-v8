@@ -1,32 +1,15 @@
 {
-  "check_time": "2026-09-03 07:59:55",
+  "check_time": "2026-09-03 09:38:22",
   "last_trade_close": "2026-09-02 15:30:00",
   "is_trading_day": true,
-  "core_stale": [
-    {
-      "var": "COCKPIT_BACKTEST",
-      "reason": "文件缺失",
-      "category": "algo"
-    }
-  ],
-  "warn_stale": [
-    {
-      "var": "COCKPIT_ADVICE",
-      "reason": "文件缺失",
-      "category": "algo"
-    },
-    {
-      "var": "COCKPIT_TIER_RECOMMEND",
-      "reason": "文件缺失",
-      "category": "algo"
-    }
-  ],
+  "core_stale": [],
+  "warn_stale": [],
   "frozen_stale": [],
   "no_update_time": [],
   "summary": {
     "total_checked": 49,
-    "core_stale": 1,
-    "warn_stale": 2,
+    "core_stale": 0,
+    "warn_stale": 0,
     "frozen_stale": 0,
     "no_timestamp": 0
   },
