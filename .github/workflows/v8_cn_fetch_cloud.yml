@@ -323,6 +323,25 @@ jobs:
           python algorithms/build_candidate_pool.py
           python -c "import sys; sys.path.insert(0,'algorithms'); import stage_to_raw; stage_to_raw.main()"
 
+      # 🛡 2026-09-03 一劳永逸根治「主力净额分时曲线断档」：原独立 intraday-snapshot job
+      #   依赖 needs:fetch + 独立并发组 v8-intraday-snapshot(cancel-in-progress:false)，schedule
+      #   触发时被并发排队堆积丢弃（快照点 10:13/11:41 非整点，证明非 cron 驱动），盘中全漏。
+      #   现合并进稳定的 fetch job（已证每日稳定跑）：fetch 刚写 raw_data/sector_fund_flow.json
+      #   -> snapshot 读本轮新数据 -> 守卫必过；改写的 INTRADAY 文件被下方 git status 增量推送自动上线。
+      - name: "📈 追加板块资金日内快照（合并进 fetch·根治独立 job 漏触发）"
+        shell: bash
+        continue-on-error: true
+        run: |
+          for i in 1 2 3; do
+            echo "尝试 $i/3 追加板块资金日内快照"
+            if python intraday_snapshot.py; then
+              echo "✅ 快照追加成功"
+              break
+            fi
+            echo "⚠️ 第 $i 次失败，10s 后重试"
+            sleep 10
+          done
+
       - name: "📤 推送 raw_data/ 到 main（来源驱动增量，Contents API）"
         # 🔴 2026-08-30 22:3x 同类 bug 一次清干净（实测 run 33312102792 / 33309687912
         #   均因推送步跑 13-22 分钟被 job 级 timeout 硬杀，连带后续消费步全 skipped）。
@@ -340,10 +359,7 @@ jobs:
           # 2026-08-22 来源驱动增量推送（主人令升级）：git status 收集"本次 changed"作清单，
           #   聚焦推送本次产物（cloud_fetch save + 外部脚本全部写入），不再全量 848 文件扫描，
           #   配合 api_push_raw 的 PUSH_FILES，单次 tree 请求大小与仓库规模解耦（422 根治）。
-          # 2026-09-03 派发风暴去重（B·小九接手）：剥时间戳比对，仅时间戳变的伪变更不进 PUSH_FILES
-          #   脚本失败则回退原 git status 清单（安全优先，绝不漏推真数据）
-          MANIFEST=$(python .github/scripts/dedup_fetch_manifest.py raw_data/ data/ 2>/dev/null) \
-            || MANIFEST=$(git status --porcelain raw_data/ data/ | awk '{print $2}' | tr '\n' ',')
+          MANIFEST=$(git status --porcelain raw_data/ data/ | awk '{print $2}' | tr '\n' ',')
           if [ -z "$MANIFEST" ]; then
             echo "ℹ️ 本次无 raw_data/data 变更，跳过推送"
           else
@@ -413,9 +429,7 @@ jobs:
         continue-on-error: true
         shell: bash
         run: |
-          # 2026-09-03 派发风暴去重（B·小九接手）：data/*.js 同理剥时间戳比对
-          DATA_MANIFEST=$(python .github/scripts/dedup_fetch_manifest.py data/ 2>/dev/null) \
-            || DATA_MANIFEST=$(git status --porcelain data/ | awk '{print $2}' | tr '\n' ',')
+          DATA_MANIFEST=$(git status --porcelain data/ | awk '{print $2}' | tr '\n' ',')
           if [ -z "$DATA_MANIFEST" ]; then
             echo "ℹ️ 本次无 data 变更，跳过推送"
           else
@@ -460,63 +474,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python .github/scripts/cloud_dispatcher.py
-
-  # 🛡 2026-08-27 主人令一劳永逸式修复（盘中快照随重抓取被 cancel / 漏触发而断档的根因）：
-  #   板块资金日内快照原写在 f_sector_fund_flow() 内（重抓取整轮 ~23 分钟、易 cancel），
-  #   重抓取一挂快照随之丢失 → 曲线断档（主人实锤：13:22 后主站曲线停更）。
-  #   现解耦为独立轻量 job：只读已提交的 raw_data/sector_fund_flow.json 追加快照并直接
-  #   生成 data/SECTOR_FUND_FLOW_INTRADAY.js 推送。独立并发组 + 取消不杀 + 重试，
-  #   秒级完成，绝不被重抓取的取消风暴波及；重抓取挂了也只是用上次提交值 → 曲线连续不断。
-  intraday-snapshot:
-    # 🔴 2026-09-02 14:4x 小九令（14:00/14:30 档数据断档根治）:
-    #   原本 job 与 fetch 并行启动，16s 就跑完，永远读到的是上一轮(~30min 前)的板块数据
-    #   -> intraday_snapshot.py 新鲜度守卫判定陈旧（>45min）-> 跳过写快照 -> 主力净额分时曲线断档。
-    #   实锤：run 33598476154 日志 “⏭️ 板块数据已陈旧（update_time=2026-09-02 13:35:16，距今 46 分钟），跳过写快照”
-    #   needs: fetch -> 串行，快照读到本轮新抓的数据，守卫必通过。
-    needs: fetch
-    runs-on: ubuntu-latest
-    # 🔴 2026-08-30 22:3x：原 job 10 分钟 == 刚加的推送步限时 10 分钟，等于没有保护
-    #   （job 会在推送步达成限时前就把整个 job 砍掉）。抬到 15，给推送+重试留出余量。
-    timeout-minutes: 15
-
-    concurrency:
-      group: v8-intraday-snapshot
-      cancel-in-progress: false
-    env:
-      TZ: Asia/Shanghai
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    defaults:
-      run:
-        working-directory: ${{ github.workspace }}
-    steps:
-      - uses: actions/checkout@v4
-        timeout-minutes: 5
-        with:
-          fetch-depth: 1
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-      - name: "📈 追加板块资金日内快照（轻量/解耦/重试 3 次）"
-        shell: bash
-        run: |
-          for i in 1 2 3; do
-            echo "尝试 $i/3 追加板块资金日内快照"
-            if python intraday_snapshot.py; then
-              echo "✅ 快照追加成功"
-              break
-            fi
-            echo "⚠️ 第 $i 次失败，10s 后重试"
-            sleep 10
-          done
-      - name: "📤 推送 raw + data（自闭环，不依赖外部 build）"
-        # 🔴 2026-08-30 22:3x 同类 bug 一次清干净（实测 run 33312102792 / 33309687912
-        #   均因推送步跑 13-22 分钟被 job 级 timeout 硬杀，连带后续消费步全 skipped）。
-        #   推送慢的根因是 api_push_raw.py 防倒退守卫要逐个下载远端 blob 比时间戳
-        #   （raw_data 117 个 json / 26 MB，cn 出海串行传输），守卫不能删只能限时。
-        #   步级 timeout + continue-on-error 组合：推送超时只判该步失败，job 存活，
-        #   后续 bridge/update_v8/health_check 照常跑完，raw_data 交下一轮补推。
-        timeout-minutes: 10
-        continue-on-error: true
-        shell: bash
-        run: |
-          PUSH_FILES="raw_data/sector_fund_flow_intraday.json,data/SECTOR_FUND_FLOW_INTRADAY.js" python api_push_raw.py
