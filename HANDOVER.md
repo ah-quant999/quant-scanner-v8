@@ -42,3 +42,22 @@
 3. 暂未上架页：因子实验室卡正常渲染（⭐⭐+可关注+弹窗）；
 4. CRDS 卡：脱离 21:33 半成品（total_scanned>0）；
 5. 高手池徽章数与最终推荐高手共振数口径一致。
+
+---
+
+## 【01:45 补充】cn#23 收尾异常 + 时间闸门根修 + cn#24 重派（阿狸咪 01:45 写）
+
+**cn#23 结局**：结论 cancelled（01:26 step8 兜底推送中被取消，非人为；数据推送 step4-7 已全部落 main）。算法链本体 84m28s（云端 2h40m → 提速 ~50%+），**39 成功 / 4 失败**。
+
+**4 失败与根因**（algo_run_report.json 实锤）：
+| 脚本 | 原因 | 处置 |
+|---|---|---|
+| gen_triple_consensus.py / strategy_four_volume.py / final_recommend.py | 脚本级时间闸门 check_stock_picking_ready 只判 ≥18:00，无凌晨补跑窗口；链跨午夜 00:0x~00:30 轮到它们被误拒 | ✅ **根修已上 main（commit 827509ad64）**：time_gate.py 补 00:00~05:59 放行窗口，与链级闸门口径对齐 |
+| scripts/ab_universe_backtest.py | 监督器静默杀 >15min（云端同病，老问题） | 📌 明日待办：查该脚本为何 15min 无输出 |
+
+**cn#24**：01:31 已重派（含 time_gate 根修代码），预计 ~02:55 完成，将补产 TRIPLE_CONSENSUS / FINAL_RECOMMEND_DATA / FOUR_VOLUME（含 BACKTEST）。SECTOR_FUND_TRACK 归属云端 v8_cn_fetch_cloud（#1260 success 但数据仍 09-02 16:18，待查）；FOUR_VOLUME_BACKTEST 由 strategy_four_volume 产出，根修后 #24 自愈。
+
+**明早核对清单增补**：
+6. 选股策略页：三重共识/最终推荐/四量 更新时间应为 09-04 02:xx（cn#24 产物）；
+7. algo_run_report.json 的 failed_scripts 应只剩 ab_universe_backtest（或 0）；
+8. 健康面板 SECTOR_FUND_TRACK 若仍 09-02 → 查 v8_cn_fetch_cloud #1260 日志 build_sector_fund_track 步骤。
