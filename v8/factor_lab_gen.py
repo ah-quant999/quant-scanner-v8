@@ -27,7 +27,18 @@ CACHE_A  = os.path.join(WORK, "flab_abn_cache.json")   # 异常换手率(重点�
 CACHE_R  = os.path.join(WORK, "flab_roe_cache.json")   # ROE 全市场主板
 KL_ABN_START = "2025-06-01"
 KL_AMT_START = "2026-06-01"
-KL_END   = dt.date.today().strftime("%Y-%m-%d")   # 动态到今日（盘中数据收盘后可得；根治硬编码 2026-08-31 过期）
+
+def last_trade_day(ref=None):
+    """取 ref 的上一交易日（仅处理周末，节假日极少落在周六运行，后续可接 holiday 表）"""
+    d = ref or dt.datetime.now()
+    # 若 d 是 datetime，先转成 date
+    if isinstance(d, dt.datetime):
+        d = d.date()
+    while d.weekday() >= 5:  # Sat=5, Sun=6
+        d -= dt.timedelta(days=1)
+    return d.strftime("%Y-%m-%d")
+
+KL_END   = last_trade_day()                        # 动态到上一交易日（根治周末 query_all_stock 返回 0 只）
 ASOF_YM  = KL_END[:7]                              # abn 因子按月刷新标记（ym() 同格式）
 ASOF_Q   = "%dQ%d" % (int(KL_END[:4]), (int(KL_END[5:7]) - 1) // 3 + 1)  # ROE 按季刷新标记
 ROE_YEARS = range(2025, 2027)
@@ -207,6 +218,9 @@ def main():
 
     # ---- ROE 全市场主板 ----
     mcodes = get_main_universe(); log("主板 universe", len(mcodes))
+    if len(mcodes) < 1000:
+        log("ERROR: 主板 universe 异常过少（" + str(len(mcodes)) + "），中止推送，避免空 ROE 数据上线")
+        bs.logout(); return
     r = load_cache(CACHE_R)
     for i, code in enumerate(mcodes):
         # 🛡 2026-09-04：按季刷新（asof_q 标记）——季报披露后下一季度自动重算
@@ -240,6 +254,10 @@ def main():
     large.sort(key=lambda x: x["roe_ttm"], reverse=True)
     top30 = large[:30]
     log("全市场有效", n, "大市值档", len(large), "Top30首只", top30[0]["code"] if top30 else "无")
+
+    if len(at_valid) < 10 or len(large) < 10:
+        log("ERROR: 有效样本不足（abn=" + str(len(at_valid)) + ", roe_large=" + str(len(large)) + "），中止推送")
+        bs.logout(); return
 
     out = {
         "update_time": dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
