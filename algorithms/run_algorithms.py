@@ -152,6 +152,12 @@ ORDER = [
     #   2026-09-04 强势突破选股（高手反推 v1）：依赖当日 h_auto_buy 池，须在其后、track 前跑。
     "strong_breakout.py",
     "track_h_auto_buy.py",
+    # 🛡 2026-09-04 主人令（一劳永逸挂链）：动量共识筛选器此前零调度成孤儿——
+    #   只被 update_v8.py 的 run_experiment_cards() 副作用式调用（部署链，失败仅告警不阻断），
+    #   算法链从不调度 → 它是最终推荐 8 源里唯一「链外依赖」的一源，与强势突破不对称。
+    #   现正式挂链（B 批，依赖 A 批 fetch_stock_quote_v8.py 产出的 STOCK_QUOTE，纯本地计算无重抓）。
+    #   runner 无参调用 → 由 SCRIPT_ENV 注入 V8_MOMENTUM_EMIT_JS=1 触发 --emit-js 等价行为。
+    "scripts/momentum_common_filter.py",   # → data/MOMENTUM_FILTER.js（动量共识筛选·无未来函数版）
     #   杜绝「某选股还没跑完，推荐却已生成」的抢跑问题。
     #   🆕 2026-09-04 主人令：因子实验室(FACTOR_LAB.js)此前零调度成孤儿（运维红灯）——
     #      生成器 v8/factor_lab_gen.py 挂在 final_recommend 之前（final_recommend 方案B融合读它）。
@@ -192,6 +198,7 @@ STAGES = {
         "refresh_dividend_cninfo.py", "calc_potential_picks.py",
         "refresh_stock_metadata.py", "fetch_weekend_run.py",   # 周末复盘/周度汇总（原 ORDER 漏挂 STAGE）
         "auto_run_dn_algorithm.py", "strong_breakout.py", "track_h_auto_buy.py",
+        "scripts/momentum_common_filter.py",   # 🆕 2026-09-04 挂链：动量共识筛选（读 STOCK_QUOTE，纯本地）
     ],
     # 🛡 2026-09-04 主人令「策略全部数据出来→最终数据上线→然后才是回测」时序重排：
     #   原 C(回测 19:15) 在 D(final_recommend 20:00) 之前 → 回测汇总胶囊早于最终推荐，时序倒挂。
@@ -215,6 +222,9 @@ STAGES = {
 #   并补写 data/FOUR_VOLUME_BACKTEST.js）。仅影响 E 回测批；B 选股批无注入、保持轻快。
 SCRIPT_ENV = {
     "strategy_four_volume.py": {"V8_BACKTEST_YEARS": "3"},
+    # 🆕 2026-09-04 挂链配套：动量共识筛选器需 --emit-js 才写 data/MOMENTUM_FILTER.js，
+    #   而 runner 对所有脚本无参调用 → 用环境变量触发（脚本内已支持，与 --emit-js 等价且幂等）。
+    "scripts/momentum_common_filter.py": {"V8_MOMENTUM_EMIT_JS": "1"},
 }
 # 自校验：STAGES 并集必须精确覆盖 ORDER（无遗漏/多余，保证分批模式不丢脚本）
 _STAGE_UNION = set()
@@ -328,6 +338,7 @@ STOCK_PICKING_SCRIPTS = {
     "calc_sentiment_cycle.py",       # 情绪周期（读 LIMIT_UP_HEATMAP）
     "auto_run_dn_algorithm.py",      # H 反推算法
     "strong_breakout.py",            # 强势突破选股（高手反推版，依赖当日 h_auto_buy 池）
+    "scripts/momentum_common_filter.py",  # 🆕 2026-09-04 挂链：动量共识筛选（读 STOCK_QUOTE 实时快照，属选股类，18:00 前禁跑）
     "track_h_auto_buy.py",           # H 反推跟踪
     "calc_volatility_watch.py",      # 波动率观察选股
     "gen_stock_stop.py",             # ATR 止损止盈（读候选宇宙日K）

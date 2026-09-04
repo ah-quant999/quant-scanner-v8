@@ -1323,6 +1323,27 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
 
 
       <div class="card">
+        <h3><span class="ic">🧩</span>最终推荐 8 源 ↔ 算法链分批对应表（2026-09-04 主人令接入后对齐）</h3>
+        <div class="logic-p">最终推荐共聚合 <b>8 个源</b>，全部由盘后算法链在链上自产（2026-09-04 起动量共识正式挂链，此前它是唯一靠部署脚本副作用产出的链外依赖）。算法链分批时序：<b>A 采集批(~16:40) → B 选股批(~18:10) → D 汇总批(~20:00，产出最终推荐) → E 回测批(~21:00)</b>；repository_dispatch 不带 stage 时跑全链（含 final_recommend）。</div>
+        <table class="lg-table">
+          <tr><th>#</th><th>源（前端标签）</th><th>数据文件</th><th>产出脚本</th><th>批次</th><th>加分规则</th></tr>
+          <tr><td>1</td><td>三重共识</td><td>三重共识系列</td><td>gen_triple_consensus.py</td><td>B</td><td>独立选股源（主站 TOP10 ∩ 基本面 A 档）</td></tr>
+          <tr><td>2</td><td>四量终极</td><td>四量终极 60m/日线</td><td>strategy_four_volume(_60m).py</td><td>B</td><td>独立选股源（4 重共振）</td></tr>
+          <tr><td>3</td><td>逆势龙头</td><td>CRDS 卡数据</td><td>calc_crds.py</td><td>B</td><td><b>弱市专用</b>（危机雷达≥50 才并入）精锐+3.0 / 进阶+2.0 / 观察+1.0</td></tr>
+          <tr><td>4</td><td>异常换手率</td><td>因子实验室</td><td>v8/factor_lab_gen.py</td><td>D</td><td>前 5 名 +2.0 / 6-15 名 +1.5 / 16-30 名 +1.0，非开仓期 ×0.3</td></tr>
+          <tr><td>5</td><td>ROE_TTM</td><td>因子实验室</td><td>v8/factor_lab_gen.py</td><td>D</td><td>同上分层，非开仓期 ×0.3</td></tr>
+          <tr><td>6</td><td>高手跟踪</td><td>高手强势股跟踪池</td><td>ima 强势股自动同步</td><td>同步任务</td><td>共振 +1（IMA 状态非见顶/走弱），非开仓期 ×0.3</td></tr>
+          <tr><td>7</td><td>强势突破</td><td>强势突破卡数据</td><td>strong_breakout.py</td><td>B</td><td>🆕 2026-09-04 主人令：core 前 30 共振 +1，非开仓期 ×0.3</td></tr>
+          <tr><td>8</td><td>动量共识</td><td>动量共识筛选卡数据</td><td>scripts/momentum_common_filter.py</td><td>B</td><td>🆕 2026-09-04 主人令：candidates 全量共振 +1，非开仓期 ×0.3</td></tr>
+        </table>
+        <div class="logic-h">四层保障（云端 / 双机 / 运维 / 算法链）</div>
+        <div class="logic-p">· <b>算法链</b>：8 源全部在链上自产，且全部纳入「盘后选股门控」——18:00 前一律不跑，防半日数据出假选股（2026-08-20 主人令）。<br>· <b>云端 / 双机</b>：算法链跑前探针路由——本机 runner（lemoncat-cn）在线且空闲则按批转派 cn 链，否则云端跑全链，永不断供；两机共用同一份算法链代码，源配置天然一致。<br>· <b>运维</b>：健康面板对各源数据卡的新鲜度统一按 360 分钟阈值监控；某源红灯 = 看它产出脚本在哪个批次，等对应批次跑完即可自愈。<br>· <b>生效时点</b>：算法链 run 启动时即锁定代码快照——push 新源后<b>正在跑的链不可见</b>，下一次 checkout 才生效。若当晚推荐卡没出现新源标签，先看链的启动时间，勿误报故障。</div>
+        <div class="logic-h">不接入的源</div>
+        <div class="logic-p"><b>选股生命周期</b>（2026-09-04 主人拍板）：不做入选 source，二期转为<b>负向护栏</b>（只对已入选标的做剔除/降权，不做发现信号）——它管的是「已持有/已入选」的票，不是找新票。</div>
+      </div>
+
+
+      <div class="card">
         <h3><span class="ic">🎖️</span>「高手共振」徽章口径（2026-09-04 对齐）</h3>
         <div class="logic-p">最终推荐/候选池卡片中可能出现「高手共振」徽章或 Top5「共振来源」含高手跟踪，两处<b>统计口径不同</b>，不可混为一谈。</div>
         <table class="lg-table">
@@ -1344,8 +1365,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">本矩阵按主站实际卡片顺序，明确每张卡片的时间/任务/执行机/前端位置，防止后续 CI 或回滚覆盖后再出现卡片位置/刷新标签错误。</div>
         <table class="lg-table">
           <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
-          <tr><td>15:30 收盘后</td><td>最终推荐 Top5</td><td>cn runner v8_algo_cloud</td><td>最终推荐页首卡</td></tr>
-          <tr><td>15:30 收盘后</td><td>今日推荐候选池聚合</td><td>cn runner v8_algo_cloud</td><td>最终推荐页次卡</td></tr>
+          <tr><td>15:30 收盘后</td><td>最终推荐 Top5</td><td>算法链汇总批（云端 / cn 双机探针路由自动择一）</td><td>最终推荐页首卡</td></tr>
+          <tr><td>15:30 收盘后</td><td>今日推荐候选池聚合</td><td>算法链汇总批（云端 / cn 双机探针路由自动择一）</td><td>最终推荐页次卡</td></tr>
         </table>
       </div>
 
@@ -1393,6 +1414,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><td>4</td><td>🧬 选股生命周期</td><td>逐日累积快照跟踪（入池→持仓→走弱→剔除），与选股策略子页一致口径</td><td><b style="color:#fbbf24">⭐⭐⭐</b></td></tr>
           <tr><td>5</td><td>📈 相对强度</td><td>个股 RPS 百分位(50/120/250日) + 曼斯菲尔德 RS + 250日年线门禁（排名/筛选层）</td><td><b style="color:#fbbf24">⭐⭐⭐</b></td></tr>
           <tr><td>6</td><td>📊 逆势龙头</td><td>CRDS（弱市专用）</td><td><span style="font-size:10px;color:#94a3b8;font-weight:500;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用</span></td></tr>
+          <tr><td>7</td><td>⚡ 强势突破</td><td>高手算法反推 v1（涨幅≥5% + 量比≥1.35 + 收位≥0.55），core 前 30</td><td><span style="font-size:10px;color:#60a5fa;font-weight:500;background:rgba(96,165,250,.12);padding:1px 6px;border-radius:4px">🆕 共振源</span></td></tr>
+          <tr><td>8</td><td>📡 动量共识</td><td>无未来函数版筛选器（S1/S2/S3 三重规则，仅入选日当天可知条件）</td><td><span style="font-size:10px;color:#60a5fa;font-weight:500;background:rgba(96,165,250,.12);padding:1px 6px;border-radius:4px">🆕 共振源</span></td></tr>
         </table>
 
         <div class="logic-h">排序逻辑</div>
@@ -1897,7 +1920,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">部署链路</div>
         <div class="logic-p"><b>v8 独立仓库</b>：中国数据抓取（cn_fetch）→ 推送 raw_data → GitHub Actions 自动触发 build_deploy（workflow_run）→ 构建 data/*.js → 推 main → GitHub Pages 自动发布。小九本机<b>只监督、不手动部署</b>。</div>
         <div class="logic-h">双机状态</div>
-        <div class="logic-p"><b>GitHub 云端（ubuntu runner）</b>：执行<b>中国数据抓取 v8_cn_fetch_cloud</b> + 盘后算法链 <b>v8_algo_cloud</b> + 构建/部署/体检/备份/自愈/健康监控；2026-08-05 起主链已全部云端化。<b>小九（单位机 / lemoncat-cn）</b>：仅作为 GitHub self-hosted runner 应急回退（workflow_dispatch），日常不跑 cron 主链；运行云端管线看门狗监督。<b>阿狸咪（家中机）</b>：本地预览用（file:///E:/workspace/stock-scanner/index.html），不上主站、不接部署/救火。</div>
+        <div class="logic-p"><b>GitHub 云端（ubuntu runner）</b>：执行<b>中国数据抓取 v8_cn_fetch_cloud</b> + 盘后算法链 <b>v8_algo_cloud</b> + 构建/部署/体检/备份/自愈/健康监控；2026-08-05 起主链已全部云端化。<b>小九（单位机 / lemoncat-cn）</b>：白天班（7:45–17:45）独家值守；同时是算法链探针路由的 cn 执行机——跑前探针发现它在线且空闲，则按批次转派 cn 链（≈84min），否则回落云端全链（≈2h40m），失败永不断供。<b>阿狸咪（家中机）</b>：夜间/周末班（18:00–次日 7:30 + 周末）部署 v8 主力，与白天班分时交接；本地预览一律用真身仓库 <code>E:/qs_workspaces/quant-scanner-v8/index.html</code>。<b style="color:#ef5350">🔴 禁用 E:/workspace 任何路径</b>（2026-09-04 实证它是坚果云 junction，同步层会整仓删除仓库，该路径已永久废弃）。</div>
       </div>
 
       

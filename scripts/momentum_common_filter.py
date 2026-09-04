@@ -194,7 +194,12 @@ def main():
         with open(f"{ROOT}/raw_data/momentum_filter_result.json", "w", encoding="utf-8") as f:
             json.dump(out, f, ensure_ascii=False, indent=1)
         print(f"\n已输出 raw_data/momentum_filter_result.json（{len(cands)} 只）")
-    if "--emit-js" in sys.argv:
+    # 🛡 2026-09-04 主人令（一劳永逸挂链）：算法链 runner 对所有脚本无参调用，
+    #   仅靠 --emit-js 会导致挂链后不产出 data/MOMENTUM_FILTER.js。现支持环境变量
+    #   V8_MOMENTUM_EMIT_JS=1 等价触发（与 strategy_four_volume.py 的 V8_BACKTEST_YEARS 同款做法）。
+    #   update_v8.py 的 --emit-js 调用方式保持不变，两条路径均幂等（中性化比较，状态未变不重写）。
+    _emit_js = ("--emit-js" in sys.argv) or bool(os.environ.get("V8_MOMENTUM_EMIT_JS"))
+    if _emit_js:
         out["republish_time"] = now
         js = "window.MOMENTUM_FILTER = " + json.dumps(out, ensure_ascii=False) + ";\n"
         js_path = f"{ROOT}/data/MOMENTUM_FILTER.js"
