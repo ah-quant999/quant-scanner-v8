@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-09-04 20:24:32",
+  "update_time": "2026-09-04 21:02:55",
   "source": "akshare fund_etf_spot_em (东方财富)",
   "metric": "净流入(亿元) + 规模(亿元)",
   "categories": {
     "stock": {
       "name": "股票型",
       "net_amount_yi": -74.55151474999995,
-      "scale_yi": 29337.786293090023,
+      "scale_yi": 29312.268329560025,
       "n_funds": 1304,
       "top5": [
         {
@@ -51,7 +51,7 @@
     "money": {
       "name": "货币型",
       "net_amount_yi": 0.58801989,
-      "scale_yi": 545.6449030599999,
+      "scale_yi": 545.73898306,
       "n_funds": 50,
       "top5": [
         {
@@ -89,13 +89,13 @@
     "commodity": {
       "name": "商品型",
       "net_amount_yi": -2.5789582099999997,
-      "scale_yi": 3576.591997299999,
+      "scale_yi": 3580.82649999,
       "n_funds": 55,
       "top5": [
         {
           "code": "518880",
           "name": "黄金ETF华安",
-          "scale_yi": 1073.28,
+          "scale_yi": 1074.19,
           "net_amount_yi": 3.075
         },
         {
@@ -113,13 +113,13 @@
         {
           "code": "518800",
           "name": "黄金ETF国泰",
-          "scale_yi": 363.6,
+          "scale_yi": 360.82,
           "net_amount_yi": 0.2892
         },
         {
           "code": "512400",
           "name": "有色金属ETF南方",
-          "scale_yi": 259.05,
+          "scale_yi": 266.02,
           "net_amount_yi": -3.7674
         }
       ]
@@ -127,7 +127,7 @@
     "cross_border": {
       "name": "跨境型",
       "net_amount_yi": 15.658460359999998,
-      "scale_yi": 6179.138310639996,
+      "scale_yi": 6190.613124069998,
       "n_funds": 192,
       "top5": [
         {
@@ -151,13 +151,13 @@
         {
           "code": "513050",
           "name": "中概互联网ETF易方达",
-          "scale_yi": 362.69,
+          "scale_yi": 365.1,
           "net_amount_yi": 2.2056
         },
         {
           "code": "513130",
           "name": "恒生科技ETF华泰柏瑞",
-          "scale_yi": 319.32,
+          "scale_yi": 324.52,
           "net_amount_yi": 1.6589
         }
       ]
