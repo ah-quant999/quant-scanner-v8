@@ -4,15 +4,14 @@
 
 输入：
   - raw_data/triple_consensus.json
-  - raw_data/cockpit_tier_recommend.json
   - raw_data/top10_daily.json   (四量终极 / 主站 TOP10)
   - raw_data/crds_card_data.json (逆势龙头)
-  - raw_data/lhb_data.json      (龙虎榜，已下线算法不再依赖)
   - raw_data/sector_rs.json     (板块相对强度)
   - raw_data/stock_profile.json (个股行业/概念)
   - raw_data/crisis_data.json   (危机雷达，决定是否并入逆势龙头)
-  - (cockpit_backtest.json 已下线)
   - raw_data/triple_track.json     (三重跟踪告警，用于 Top3 跟踪)
+  - (2026-09-04 主人令：cockpit_tier_recommend / cockpit_backtest / lhb 数据源整段删除——驾驶舱/大牛股猎手已下线，
+     backtest 输出字段一并移除，前端无消费方，verify_chain_outputs 不校验)
 
 输出：
   - raw_data/final_recommend.json
@@ -270,10 +269,8 @@ def main():
     from utils.time_gate import check_stock_picking_ready
     check_stock_picking_ready(by='final_recommend')
     triple = load_json("triple_consensus.json")
-    cockpit = load_json("cockpit_tier_recommend.json")
     top10 = load_json("top10_daily.json")
     crds = load_json("crds_card_data.json")
-    lhb = load_json("lhb_data.json")
     sector_rs = load_json("sector_rs.json")
     profile = load_json("stock_profile.json")
     crisis = load_json("crisis_data.json")
@@ -307,21 +304,7 @@ def main():
             _60m_hits[c] = item
     print(f"[info] 四量数据({_four_vol_src}): 加载 {len(_60m_hits)} 只命中")
 
-    # 读取回测/跟踪数据（用于 Top3 卡片展示）
-    cb = load_json("cockpit_backtest.json")
-    cb_summary = {x.get("code"): x for x in (cb.get("stock_summary") or []) if x.get("code")}
-    cb_results = {}
-    for r in cb.get("results") or []:
-        code = r.get("code")
-        if not code:
-            continue
-        if code not in cb_results:
-            cb_results[code] = []
-        cb_results[code].append(r)
-    # 按 entry_date 取最新结果
-    for code in cb_results:
-        cb_results[code].sort(key=lambda x: x.get("entry_date", ""), reverse=True)
-
+    # 2026-09-04 主人令：cockpit_backtest 死数据源整段删除（生成器 09-03 下线，load 恒空，仅产出全零 backtest 垃圾）
     tt = load_json("triple_track.json")
     tt_alerts = {}
     for a in tt.get("alerts") or []:
@@ -329,18 +312,6 @@ def main():
         if not code:
             continue
         tt_alerts.setdefault(code, []).append(a)
-
-    # 综合回测策略级统计（个股无历史时作为策略置信度展示）
-    # cockpit_backtest.json 顶层字段即整体统计
-    strategy_backtest = {
-        "total": cb.get("total_count"),
-        "win_rate": cb.get("win_rate"),
-        "avg_return": cb.get("avg_return"),
-        "best_return": cb.get("best_return"),
-        "worst_return": cb.get("worst_return"),
-        "valid": cb.get("total_count"),
-        "best_hold_days": 3,  # 历史口径保留
-    }
 
     crisis_score = safe_float(crisis.get("score"), 0.0)
     crisis_high = crisis_score >= CRISIS_HIGH_THRESHOLD
@@ -778,50 +749,9 @@ def main():
             signals = [f"{src}共振" for src in sorted(set(s["sources"]))]
 
         # ---- 回测 & 跟踪（当前 Top3 股票的历史表现与入选后状态） ----
-        summary = cb_summary.get(code)
-        latest_result = cb_results.get(code, [None])[0]
         alerts = tt_alerts.get(code, [])
 
-        if summary and summary.get("signals", 0) > 0:
-            backtest = {
-                "signals": int(summary.get("signals") or 0),
-                "win_count": int(summary.get("win_count") or 0),
-                "loss_count": int(summary.get("loss_count") or 0),
-                "win_rate": round(safe_float(summary.get("win_rate")), 1),
-                "avg_return": round(safe_float(summary.get("avg_return")), 2),
-                "best_return": round(safe_float(summary.get("best_return")), 2),
-                "worst_return": round(safe_float(summary.get("worst_return")), 2),
-                "note": f"该股历史共触发 {summary.get('signals')} 次共振信号",  # 2026-09-03 主人令：驾驶舱已下线
-            }
-        elif strategy_backtest:
-            # 个股无历史：展示策略级回测作为参考
-            best_hold = strategy_backtest.get("best_hold_days")
-            backtest = {
-                "signals": int(strategy_backtest.get("total_signals") or strategy_backtest.get("valid_signals") or strategy_backtest.get("total") or 0),
-                "win_rate": round(safe_float(strategy_backtest.get("best_hold_win_rate") or strategy_backtest.get("win_rate")), 1),
-                "avg_return": round(safe_float(strategy_backtest.get("best_hold_avg_return") or strategy_backtest.get("avg_return")), 2),
-                "best_hold_days": best_hold,
-                "note": f"个股暂无历史信号，展示策略级统计（最佳持有 {best_hold} 天）",
-            }
-        else:
-            backtest = {"signals": 0, "win_rate": 0.0, "avg_return": 0.0, "note": "暂无回测数据"}
-
-        if latest_result:
-            entry_price = safe_float(latest_result.get("entry_price"))
-            latest_price = safe_float(latest_result.get("latest_price"))
-            ret = safe_float(latest_result.get("return_pct"))
-            tracking = {
-                "entry_date": latest_result.get("entry_date") or enter_date,
-                "entry_price": round(entry_price, 2) if entry_price else None,
-                "latest_price": round(latest_price, 2) if latest_price else None,
-                "return_pct": round(ret, 2),
-                "hold_days": int(latest_result.get("hold_days") or 1),
-                "exit_type": latest_result.get("exit_type") or "hold",
-                "stop_loss": round(safe_float(latest_result.get("stop_loss")), 2) if latest_result.get("stop_loss") is not None else None,
-                "target_price": round(safe_float(latest_result.get("target_price")), 2) if latest_result.get("target_price") is not None else None,
-                "note": "已入场跟踪中" if (latest_result.get("exit_type") == "hold" or latest_result.get("hold_days", 1) <= 1) else "已触发退出",
-            }
-        elif close:
+        if close:
             # 没有历史跟踪记录：以今日入选价 = 当前价展示
             tracking = {
                 "entry_date": enter_date,
@@ -868,7 +798,6 @@ def main():
             "reason": "；".join(s["reasons"][:3]),
             "industry": s["industry"],
             "concepts": s["concepts"][:8],  # 2026-09-03 主人令：6→8
-            "backtest": backtest,
             "tracking": tracking,
             "action": _action_label,
             "market_regime": _regime_name,
@@ -930,7 +859,6 @@ def main():
             "reason": "；".join(s["reasons"][:3]),
             "industry": s["industry"],
             "concepts": s["concepts"][:8],  # 2026-09-03 主人令：6→8
-            "backtest": {},  # 共振最强不重复跑回测
             "tracking": tracking,
             "action": _action_label,
             "market_regime": _regime_name,

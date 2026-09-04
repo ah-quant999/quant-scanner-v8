@@ -13086,15 +13086,9 @@ window.__renderV8CalToday();
     h+='</div>';
 
     // 2026-09-03 主人令：新增分析角度（带评分）· 所有名次统一渲染，字段缺省自动省略不空块
+    // 2026-09-04 主人令：backtest 字段已随后端 cockpit_backtest 死源一并删除（此前恒输出全零，两分支永不渲染）
     (function(){
-      var bt = s.backtest || {};
       var lines='';
-      if(bt.win_rate!=null && (bt.signals||0)>0){
-        var _wc = bt.win_rate>=55?'var(--up)':(bt.win_rate<=45?'var(--down)':'var(--gold)');
-        lines+='<span>🎯 个股历史共振 <b>'+bt.signals+'</b> 次 · 胜率 <b style="color:'+_wc+'">'+_fn(bt.win_rate,1)+'%</b> · 均收益 <b>'+((bt.avg_return||0)>0?'+':'')+_fn(bt.avg_return,2)+'%</b></span>';
-      } else if(bt.win_rate!=null && bt.win_rate>0){
-        lines+='<span>🎯 策略级回测：最佳持有 '+(bt.best_hold_days||'--')+' 天 · 胜率 <b>'+_fn(bt.win_rate,1)+'%</b> · 均收益 <b>'+((bt.avg_return||0)>0?'+':'')+_fn(bt.avg_return,2)+'%</b></span>';
-      }
       var tk = s.tracking || {};
       if(tk.entry_price!=null){
         var rp = tk.return_pct||0;
