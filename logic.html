@@ -1320,6 +1320,21 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-h">使用边界</div>
         <div class="logic-p">Top3 是「高置信候选」而非「必然买入」；仍需结合市场环境、仓位管理与个人风险偏好做最终决策。</div>
       </div>
+
+
+      <div class="card">
+        <h3><span class="ic">🎖️</span>「高手共振」徽章口径（2026-09-04 对齐）</h3>
+        <div class="logic-p">最终推荐/候选池卡片中可能出现「高手共振」徽章或 Top5「共振来源」含高手跟踪，两处<b>统计口径不同</b>，不可混为一谈。</div>
+        <table class="lg-table">
+          <tr><th>口径</th><th>集合</th><th>含义</th></tr>
+          <tr><td>高手共振徽章</td><td><b>IMA 池 ∩ 选股生命周期池</b></td><td>该票既在 IMA 同步的高手池中，又已进入生命周期的精选/跟踪池——双重验证</td></tr>
+          <tr><td>Top5 共振来源含「高手」</td><td><b>该票 ∈ IMA 池</b></td><td>仅表示 IMA 同步名单里有它，不表示已进入生命周期精选池</td></tr>
+        </table>
+        <div class="logic-h">实例</div>
+        <div class="logic-p">某日前 5 名中有 3 只的共振来源含「高手」，但「高手共振」徽章可能只有 1 只——这是因为 Top5 口径只看「是否 ∈ IMA 池」，而徽章口径要求「∈ IMA 池 且 ∈ 生命周期精选池」。前者宽松、后者严格，所以数量不同是<b>正常结果</b>。</div>
+        <div class="logic-h">使用建议</div>
+        <div class="logic-p">优先看<b>徽章</b>（双重验证）；Top5 来源里的「高手」只说明 IMA 关注了，需结合其他来源和生命周期状态再判断。</div>
+      </div>
     </div>
 
                          
@@ -1399,7 +1414,24 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
 
       
       <div class="card">
-        <h3><span class="ic">📋</span>📋 选股策略页 · 卡片归属与刷新对齐矩阵（2026-09-02 自动对齐）</h3>
+              <div class="card">
+        <h3><span class="ic">🧬</span>选股生命周期 3 卡关系（2026-09-04 主人令·方案乙）</h3>
+        <div class="logic-p"><b>结论</b>：相辅相成，构成一条「发现 → 共振确认 → 持有管理」的流水线；三张卡<b>角色不同、不重复、不独立</b>，应组合使用。</div>
+        <table class="lg-table">
+          <tr><th>卡</th><th>角色</th><th>数据从哪来</th><th>看什么</th></tr>
+          <tr><td>⚡ 强势突破</td><td>① 发现信号（买入候选）</td><td>独立算法自算：涨≥3% + 量比≥1.2 + 突破20日高点 + RPS前25%，自带 T+1~T+10 回测</td><td>有没有新的启动信号</td></tr>
+          <tr><td>📡 高手强势股跟踪</td><td>② 共振确认（高手在买什么）</td><td>IMA 自动同步，非算法产出</td><td>外部情报是否与算法信号共振</td></tr>
+          <tr><td>🧬 选股生命周期</td><td>③ 持有管理（已入选的票怎么办）</td><td>四量终极跟踪池去重 → 判 4 状态（🟢强势/🟡买点/🟠见顶/🔴走弱）+ 精选池（板块/资金验证）</td><td>入选后如何跟踪、何时离场</td></tr>
+        </table>
+        <div class="logic-h">一张图关系</div>
+        <div class="logic-p">· <b>强势突破 + 高手跟踪</b>负责「发现新票」——前者是算法信号，后者是外部情报；二者共振可提升发现质量。<br>· <b>选股生命周期</b>负责「管住手里的票」——对已入选标的做持有期状态管理。<br>· <b>最终推荐</b>站在它们上游汇总，把多策略共振结果收敛为 Top3 买卖观察。</div>
+        <div class="logic-h">编号约定（方案乙）</div>
+        <div class="logic-p">卡序不动，仅在卡名后追加角色小标签：⚡ 强势突破<b>·①发现信号</b>、📡 高手强势股跟踪<b>·②共振确认</b>、🧬 选股生命周期<b>·③持有管理</b>。编号按「发现→确认→持有」流程语义排列，与 DOM 位置无关。</div>
+        <div class="logic-h">常见误读</div>
+        <div class="logic-p">· 误把「高手跟踪」当成独立买点——它只是共振确认，命中多≠质量高。<br>· 误把「选股生命周期」当成发现信号——它管的是已持仓/已入选票，不是找新票。<br>· 误把「强势突破」当持有管理——它只负责发现，后续跟踪交给生命周期。</div>
+      </div>
+
+<h3><span class="ic">📋</span>📋 选股策略页 · 卡片归属与刷新对齐矩阵（2026-09-02 自动对齐）</h3>
         <div class="logic-p">本矩阵按主站实际卡片顺序，明确每张卡片的时间/任务/执行机/前端位置，防止后续 CI 或回滚覆盖后再出现卡片位置/刷新标签错误。</div>
         <table class="lg-table">
           <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
@@ -1412,20 +1444,54 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
       </div>
 
 <div class="card">
-        <h3><span class="ic">🧪</span>因子实验室（🧬 选股生命周期 tab · 2026-09 新增）</h3>
-        <div class="logic-p">把 v2 回测验证显著的两个单因子做成「可观测截面排名 + 择时闸门」，作为选股策略的<b>因子观察层</b>。当前<b>尚未并入最终推荐加权</b>（属研究/预警信号，不参与 final_recommend 名单生成）。</div>
-        <div class="logic-h">① 异常换手率（重点池 351 只口径）</div>
-        <div class="logic-p">· 因子 = −(当月换手率 ÷ 过去12月均值)。缩量 → 因子高 → 低关注度强势股。<br>· v2 回测：Spearman IC t=<b>4.26</b>（全样本显著，样本内外一致）；多空组合 ls_nw_t=1.78（边界显著）→ 仅作排序/门控，不作独立策略。<br>· 展示：Top30 缩量最强 + Bottom10 放量最严重（反向警示）。</div>
-        <div class="logic-h">② ROE(TTM) 全市场主板（3193 只口径）</div>
-        <div class="logic-p">· 因子 = 最近4季度 roeAvg 求和(TTM)；仅取大市值档（成交额代理 Top1/3）排序 Top30。<br>· 重点池 60% 为双创，ROE大市值档在重点池是噪声 → 已按主人令改为<b>全市场主板</b>口径（sh.60/sz.00，实测 3193 只）。<br>· v2 回测：ROE_TTM 全样本不显著(t=1.26)；<b>仅大市值档显著</b>(t=3.25) → 必须限大市值档。</div>
-        <div class="logic-h">③ 择时闸门 v8FactorGate()</div>
+              <div class="card">
+        <h3><span class="ic">🧪</span>因子实验室（2026-09 新增 · 暂未上架调试区）</h3>
+        <div class="logic-p">把 v2 回测验证显著的单因子做成「可观测截面排名 + 择时闸门」，作为选股策略的<b>因子观察层</b>。当前<b>尚未并入最终推荐加权</b>（属研究/预警信号，不参与 final_recommend 名单生成）。<b>2026-09-04 主人令</b>：因子实验室先放在<b>暂未上架</b>里调试和回测；待验证升级到<b>⭐⭐⭐⭐（4 星）</b>后，再迁回选股策略页下方成立子页面。</div>
+        <div class="logic-h">当前因子</div>
+        <table class="lg-table">
+          <tr><th>因子</th><th>定义</th><th>显著性</th><th>展示</th></tr>
+          <tr><td>异常换手率</td><td>−(当月换手率 ÷ 过去12月均值)。缩量 → 因子高 → 低关注度强势股</td><td>Spearman IC t=4.26（全样本显著）</td><td>Top30 缩量最强 + Bottom10 放量最严重</td></tr>
+          <tr><td>ROE(TTM)</td><td>最近4季度 roeAvg 求和(TTM)；仅大市值档（成交额 Top1/3）</td><td>全样本不显著(t=1.26)；<b>仅大市值档显著</b>(t=3.25)</td><td>全市场主板大市值 Top30</td></tr>
+        </table>
+        <div class="logic-h">择时闸门 v8FactorGate()</div>
         <div class="logic-p">每行个股打 🟢可关注 需同时满足：① 全站唯一择时权威 <code>v8MarketGate()</code> 开仓（仅「阴跌磨底/恐慌下行」开放）；② 该因子值进入全样本前 20% 分位。否则显示原因徽章（择时封闭 / 因子未达分位）。与三重共识等共用同一择时闸门，口径一致。</div>
         <div class="logic-h">数据来源与刷新</div>
-        <div class="logic-p">· 数据源：baostock 历史换手率/ROE/成交额（本地系统 Python 抓取；云端 runner 无中国行情权限，故为<b>本机生成</b>）。<br>· 刷新：小九本机定时任务（双机之一）周期重算 → 提交 data/FACTOR_LAB.js + raw_data/factor_lab.json → 推送 main → 云端构建自动部署。<br>· 口径铁律：不得造假；数据过期时卡片显「加载中/数据陈旧」而非编造信号。</div>
+        <div class="logic-p">· 数据源：baostock 历史换手率/ROE/成交额（本地系统 Python 抓取；云端 runner 无中国行情权限，故为<b>本机生成</b>）。<br>· 刷新：小九本机定时任务周期重算 → 提交 data/FACTOR_LAB_BACKTEST.js + raw_data/factor_lab.json → 推送 main → 云端构建自动部署。<br>· 口径铁律：不得造假；数据过期时卡片显「加载中/数据陈旧」而非编造信号。</div>
+        <div class="logic-h">4⭐ 升级路线图</div>
+        <div class="logic-p">1) 先在暂未上架跑分层回测（信号 vs 次日开盘收益、胜率、回撤、OOS 稳定性）；<br>2) 只有当因子策略本身达到 ⭐⭐⭐⭐ 可信度，且与现有选股策略低相关时；<br>3) 才在选股策略页下方成立「因子实验室」独立子页面，并可能纳入最终推荐加权。</div>
       </div>
 
 <div class="card">
         <h3><span class="ic">🥇</span>三重共识 - 说明</h3>
+        <div class="logic-h">判定公式</div>
+        <div class="logic-p">主站 TOP10（total_score ≥70） ∩ 驾驶舱 A档 ∩ 基本面质量 A档，三者同时满足即严格共识。可信度最高（⭐⭐⭐⭐⭐）——3 个独立维度一致才入选，命中即高质量。</div>
+        <div class="logic-h">分组展示</div>
+        <div class="logic-p">· <b class="up">严格共识（3/3）</b>：无条件优先看<br>· <b style="color:var(--gold)">优先观察（2/3，total_score≥75）</b>：差1步<br>· <b style="color:var(--dim)">扩展观察（2/3，total_score&lt;75）</b>：差2步</div>
+        <div class="logic-h">评分·完整公式</div>
+        <div class="logic-p">原始加分 = 基础(~75) + 增强(~21) + 形态(~16) + 资金(~8) + 板块(~5) + 机构/事件(~7) + 基本面(-10~+40) + 回测反哺(±10)。<br><b>最终 total_score 已归一化到 0~100</b>，≥80 分为「精选」、≥70 分为「观察」。<br><b class="up">2026-08-30 P0 升级</b>：① 接入 <code>v8MarketGate()</code> 等价择时门控（仅 grind/panic 正常打分，其余状态降权）；② 5日突破（唯一 T+10 正期望信号）+5；③ 剔除缠论买点（T+10 负期望）与龙虎榜机游共振（空转/无证据）的加分；④ 默认持有期 T+10。</div>
+        <table class="lg-table">
+          <tr><th>维度</th><th>原始满分</th><th>细则</th></tr>
+          <tr><td>金钻起涨/黄柱</td><td>25</td><td>金钻起涨或金钻黄柱信号</td></tr>
+          <tr><td>机构变红</td><td>25</td><td>四量图机构资金介入</td></tr>
+          <tr><td>上涨趋势</td><td>25</td><td>EMA多头+量能+价格确认</td></tr>
+          <tr><td>5日突破</td><td>+5</td><td>收盘&gt;昨收 且 今日高价≥近5日高价最高（与 backtest_tdx 口径对齐；唯一 T+10 正期望信号）</td></tr>
+          <tr><td>增强因子</td><td>-6~+16</td><td>20日动量(<b>2026-08-28 起反向计分</b>：≥50% −6 / 35~50% −3 / 20~35% −1 / 0~10% +2)+RSI风控(±5)+连续共振(+2/天上限8)</td></tr>
+          <tr><td>形态分</td><td>~16</td><td>EMA结构+非涨停+20日涨幅控制+RSI控制+形态A奖励</td></tr>
+          <tr><td>资金动力</td><td>-2~+8</td><td>主力净流入≥1亿 +5 / &gt;0 +2 / <b>净流出≤−1亿 −2</b>；龙虎榜机构净买入+3<br><span style="color:var(--dim);font-size:11px;">机游共振加分已剔除（2026-08-30 P0）：近30日命中 0/20，无回测证据，不再抬分。</span></td></tr>
+          <tr><td>板块共振</td><td>-3~+5</td><td>取所属<b>赛道</b>中净流入最强者：&gt;5亿 +5 / &gt;1亿 +2 / &lt;−5亿 −3。<br><b>2026-08-29 修正三处</b>：① 原只读「净流入榜」（全为正数），导致<b>扣分分支从未触发</b>——板块失血从不扣分；② 已过滤业绩/指数/风格类<b>非赛道标签</b>（「题材股 −129 亿」这类会淹没真实赛道，全市场最大净流入仅 32.94 亿）；③ 改为<b>取最强单板块</b>而非求和——概念高度重叠会重复计数，实测求和可达 −1338 亿。</td></tr>
+          <tr><td>机构/事件</td><td>~7</td><td>52周新高+4/分析师关注+3（2026-08-28 起不再跟踪 mahoro）</td></tr>
+          <tr><td>基本面质量分</td><td>-10~+40</td><td>A级+40/B级+5/C级0/D级-10</td></tr>
+          <tr><td>回测反哺</td><td>±10</td><td>按信号组合的历史 T+3 胜率偏离 50% 的程度加减分</td></tr>
+        </table>
+        <div class="logic-h">归一化口径</div>
+        <div class="logic-p">total_score = min(100, 原始总分 / 130 × 100)。历史快照已同步回刷，保证「≥80 精选 / ≥70 观察」的阈值在所有日期口径一致。<br><span style="color:var(--dim);">注：2026-06 那批早期快照缺少评分明细、无法还原原始分，按要求保持原样未改（不编造数据）。</span></div>
+        <div class="logic-h">建议持有期（2026-08-28 新增）</div>
+        <div class="logic-p">按可信口径回测（入场价 = 信号日次一交易日<b>开盘价</b>，扣除往返 0.20% 成本），持有期与超额收益强相关：<br><span style="color:var(--dim);">注：上述为专项「持有期」回测（已扣成本）；客户区「策略回测」信号表为<b>毛胜率、未扣成本</b>，见各表⚠️提示，二者口径不同请勿混用。</span><br>· <b class="down">T+1 / T+3 / T+5：相对上证指数超额 −0.59% / −1.90% / −1.78%</b> —— 短期反而跑输大盘<br>· <b class="up">T+10：相对上证超额 +5.72%，胜率 63.7%；相对国证A指 +4.53%，相对中证1000 +2.22%</b><br>· <b class="up">T+20：相对上证超额 +5.56%，胜率 68.2%</b><br>因此全站默认<b>建议持有 10 个交易日</b>，不宜按 1~5 日的短线思路操作。<br><span style="color:var(--dim);">注：中证1000 口径下 T+10 超额只剩 +2.22%，说明约 3.5pp 的「超额」实质是小盘风格 beta；真正的选股 alpha 约 2~4.5pp。</span></div>
+        <div class="logic-h">评分有效性验证</div>
+        <div class="logic-p">按当日评分分三组回测（T+10）：<b class="up">前 1/3 超额胜率 81.5%</b>，后 1/3 为 58.0%；分月看 T+10 超额收益 6 月 +18.7% / 7 月 +3.8% / 8 月 +4.8%，三个月全为正。<br>结论：评分的主要价值是提升<b>胜率与稳定性</b>，而非拉高单笔收益。</div>
+        <div class="logic-h">历史追踪</div>
+        <div class="logic-p">持仓表、催化剂兑现、回测N日胜率、严格vs宽松、阈值敏感性、板块聚类、重叠度、每日入选历史。</div>
+      </div>
         <div class="logic-h">判定公式</div>
         <div class="logic-p">主站 TOP10（total_score ≥70） ∩ 驾驶舱 A档 ∩ 基本面质量 A档，三者同时满足即严格共识。可信度最高（⭐⭐⭐⭐⭐）——3 个独立维度一致才入选，命中即高质量。</div>
         <div class="logic-h">分组展示</div>
@@ -1692,7 +1758,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>15:30 / 17:20</td><td>v8_cn_fetch_cloud</td><td>盘后</td><td>EXPERIMENT、期指主力合约、大盘资金流累积序列、ETF日监控再补抓(T+1收盘定稿)、龙虎榜历史回填</td></tr>
           <tr><td>16:30</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓</td><td>港股16:00收盘后补抓恒指/港股候选/盘中模块收盘值（A股已收盘，不重复抓A股）</td></tr>
           <tr><td>盘中每30分</td><td>v8_risk_gauge</td><td>危机雷达</td><td>危机雷达/风险温度计实时刷新（美股开盘情绪覆盖 19:00-22:00 北京时间）</td></tr>
-          <tr><td>16:40 / 18:10 / 19:15 / 20:00（A/B/C/D 四批）</td><td>v8_algo_cloud</td><td>盘后算法（云端主链·分批跑）</td><td>A采集/B选股/C回测/D汇总(final_recommend)；龙虎榜/三重共识/逆势龙头/top10/回测/板块资金流趋势/停牌预警/市场预警/NT数据（已迁 GitHub 云端 ubuntu）</td></tr>
+          <tr><td>16:40 / 18:10 / 19:15 / 20:00（A/B/C/D 四批）</td><td>v8_algo_cloud<br><span style="color:var(--cyan)">+ 探针路由</span></td><td>盘后算法（云端主链·分批跑）</td><td>A采集/B选股/C回测/D汇总(final_recommend)；龙虎榜/三重共识/逆势龙头/top10/回测/板块资金流趋势/停牌预警/市场预警/NT数据（已迁 GitHub 云端 ubuntu）。<br><span style="color:var(--cyan)">调度前探针检查 lemoncat-cn 状态：online+idle 则 A/B/C 批转派中国节点；离线/忙/失败均回落云端。</span></td></tr>
           <tr><td>23:00</td><td>v8_backup</td><td>每日备份</td><td>备份 raw_data/*.json 防意外丢失（push 至 main）</td></tr>
           <tr><td>09:00 / 17:00</td><td>v8_algo</td><td>体检</td><td>46 模块新鲜度体检（云端）</td></tr>
           <tr><td>非交易时段每2h</td><td>runner_health_alert</td><td>健康监控</td><td>lemoncat-cn runner 离线 → 开 Issue 告警（云端，工作日13-21点/周末0-20点）</td></tr>
@@ -1810,6 +1876,19 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p">盘中数据按固定周期刷新，盘后数据在日终批处理后统一更新。面板统一使用相对时间（今日/昨日/X天前+时分）。</div>
         <div class="logic-h">免责声明</div>
         <div class="note">所有数据仅供参考，不构成投资建议。</div>
+      </div>
+
+
+      <div class="card">
+        <h3><span class="ic">🔴</span>main 回退事故与 force push 禁令（2026-09-04）</h3>
+        <div class="logic-h">事故经过</div>
+        <div class="logic-p">2026-09-04 08:15-08:35 间，main 被某客户端用<b>陈旧本地副本 force push</b> 回退到 06:56(4396e93d)，丢失 07:15 之后的约 29 个提交/173 个文件（含方案乙角色标签、健康检查补丁、交接补记、08:09 CI build 等）。嫌疑最大为小九机部署脚本内置 <code>--force</code> 参数。</div>
+        <div class="logic-h">恢复方法</div>
+        <div class="logic-p">阿狸咪用 GitHub Git Database API 将 <code>refs/heads/main</code> 以纯 fast-forward 方式恢复到真实最新提交（<code>1049319b</code>），对象仍在远端因此零丢失；随后在其上继续完成 SECTOR_FUND_TRACK 清理。</div>
+        <div class="logic-h">根修措施</div>
+        <div class="logic-p">· GitHub 仓库设置 <b>main 分支保护</b>：<code>allow_force_pushes=false</code> + <code>allow_deletions=false</code> + <code>enforce_admins=true</code>，任何账号（含仓库管理员）均无法 force push/删除 main。<br>· 普通推送完全不受影响。</div>
+        <div class="logic-h">push 前必做（小九铁律）</div>
+        <div class="logic-p">1) <code>git fetch origin main</code>；<br>2) <code>git rebase origin/main</code> 或 <code>git reset --hard origin/main</code>；<br>3) 再普通推送。<b>严禁 <code>git push --force</code> 或 <code>+main</code>。</b></div>
       </div>
 
       
@@ -2067,6 +2146,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">⑨ 算法时间守门 time_gate（防数据未就绪就跑）</div>
         <div class="logic-p">主人「算法链一定要安排在数据全部出来后跑」：小九 16:18 本地手动跑 final_recommend，但港股 16:30 才完整 → 新增 <code>algorithms/utils/time_gate.py</code>，final_recommend 入口加 <code>check(['hk','lhb'])</code>（港股≥16:30 / 龙虎榜≥17:30，早于则 sys.exit(1)；应急 TIME_GATE_BYPASS=1）。数据就绪时间口径：A股15:30 / 港股16:30 / LHB17:30 / 美股06:00。</div>
 
+        <div class="logic-p" style="color:var(--sub)"><b>2026-09-03 夜班补充（双口径统一）</b>：原 <code>check_stock_picking_ready()</code> 仅判 <code>now.hour &gt;= 18</code>，无凌晨补跑窗口；而链级 <code>_is_post_close_picking_ready()</code> 放行 00:00~05:59。长链跨午夜时两处口径冲突，导致 09-03 夜 cn#23 中 3 个脚本因时间闸门退出码 1 失败。修复：脚本级补 <code>if 0 &lt;= now.hour &lt; 6: return（视为盘后就绪）</code>，与链级口径对齐。属代码级修复，前端无感知。</div>
+
         <div class="logic-h">⑩ 资金验证卡 fetcher 字段不全（render 兜底 + 体检 disclaimer）</div>
         <div class="logic-p"><code>SECTOR_FUND_FLOW_TREND.js</code> 板块 5/10/20/60 日累计由 fetcher 本地 history 累加 + 东财历史接口补全。<b>2026-08-20 已修复</b>：放宽 20/60 日累计门槛、扩大东财接口覆盖，20 日「流出」列已能正常展示（如 AI应用/人工智能/DeepSeek概念/证金持股等）。卡片底部无黄字警告。</div>
 
@@ -2075,6 +2156,9 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
 
         <div class="logic-h">⑫ 动量共识卡删重复时间戳 + ⑬ 对齐审计结论</div>
         <div class="logic-p">⑫ 删动量共识说明段尾部重复「更新 08-19 18:26」（顶部胶囊已够）。⑬ 三轴审计：raw_data→data 88 个全对齐（0 缺 data）；data→render 11 个孤儿 data（MACRO 已删，10 个历史待小九）；algorithm→ORDER 20 个孤儿算法（4 个今晚已补，其余待小九）。<b>待小九</b>：历史孤儿 data 10 个 + 孤儿算法 ~16 个 + fetcher 补字段 + algo 网络瞬断根治。</div>
+
+        <div class="logic-h">⑭ 算法链耗时优化（calc_stock_rps 8 线程并行 · 2026-09-03 夜班）</div>
+        <div class="logic-p">云端算法链原串行耗时 ~2h40m，逐脚本解析日志定位 <code>calc_stock_rps.py</code> 占 ~60min（37%）。根因：跨境抓数（mootdx/baostock）串行。修复：<code>ThreadPoolExecutor(max_workers=8)</code> 并行化，每线程独立连接（pytdx 非线程安全 → <code>threading.local</code> 隔离；baostock <code>_BS_LOCK</code> 全局锁；缓存写加锁；<code>as_completed</code> 完成序输出）。预期 60min → 10~15min，整链提速约 50%。<b>仅云端主链生效</b>，属性能优化、前端无感知。</div>
 
         <div class="logic-h">📌 双机分时铁律（现行模型，2026-08-29 更新）</div>
         <div class="logic-p"><b>云端主链 24/7</b>：GitHub Actions ubuntu-latest 跑 <code>v8_cn_fetch_cloud</code>（数据抓取）+ <code>v8_algo_cloud</code>（算法链）+ <code>v8_build_deploy</code>（部署）+ <code>v8_health_patrol</code>/<code>v8_freshness_watch</code>（兜底监控），全部 cron 自动调度，<b>不依赖本地机器</b>。<b>小九（单位机 / lemoncat-cn runner）</b>：看门狗监督 + 应急 <code>workflow_dispatch</code> 兜底，不再跑 cron 主链。<b>阿狸咪（家中机）</b>：本地预览用（<code>file:///E:/workspace/stock-scanner/index.html</code>），不接部署、不接救火。改完+审计通过即直接上线，不再逐次请示（2026-08-29 主人授权放宽）。</div>
