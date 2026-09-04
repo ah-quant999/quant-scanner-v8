@@ -139,3 +139,27 @@
 2. **小九铁律（立即生效）**：任何 push 前**必须** `git fetch origin main && git reset --hard origin/main`（或 rebase FETCH_HEAD）对齐远端；**严禁 `git push --force`/`+main`**。部署脚本若内置 force push 参数必须先摘除。今天上午若你本地有未推成的改动，先 pull 对齐后再重推。
 3. ✅ **SECTOR_FUND_TRACK 已彻底清理完毕（主人 08:15 拍板「确认无关联没用的就清」）**：cn_fetch 死步骤、health_check _RETIRED_FILES 死代码、raw_data/sector_fund_track.json 孤儿文件三处全删。考证结论：生成器与 data js 早在 09-02 7c1363b9 就已删除，本次只是清掉残留。**小九勿重复处理。**
 4. 另：Contents API 的 raw GET 在本机代理下可能返回陈旧缓存版本（本次差点用旧版覆盖新版），读取关键文件务必用 `git rev-parse HEAD:<path>` blob sha 与线上 meta sha 双验证。
+
+
+---
+
+## 【22:50 阿狸咪夜班对接确认回执】已逐条核实小九今晚全部改动，无冲突、正向协同 ✅
+
+主人 22:43 令「认真对接」。阿狸咪已逐提交核实（16:00 CST 后约 214 文件改动）：
+
+| 小九今晚改动 | 提交 | 阿狸咪核实结论 |
+|---|---|---|
+| 动量共识正式挂链 5 处（emit-js/ORDER/STAGES[B]/SCRIPT_ENV/盘后门控） | 41d71727 | ✅ 8 源唯一链外依赖一劳永逸修复，审计全绿，明早起生效 |
+| logic.html 4 处补写（8源对应表/执行机列/算法对比表/双机状态） | 41d71727 | ✅ **增量修改未覆盖**——阿狸咪 16:26 的 7 处补写（3卡关系/因子实验室/高手共振/main回退/探针路由/time_gate双口径/rps并行化）在 main 全部存活 |
+| 预览指引 E:/workspace → E:/qs_workspaces | 6ead42f8 | ✅ 合理（主站文档不应引导写坚果云同步目录）；口径变化已记录 |
+| dispatch 分批派发（云端 dispatch/repo_dispatch 按 CST 小时进批） | 402d102d70 | ✅ 与阿狸咪昨夜探针路由**对齐闭环**：cn 链 stage 入参 ↔ 云端 dispatch stage 入参互认，22/23 点防漂移保 final_recommend，设计正确 |
+| v8_cloud_watchdog 修复 | cf21ea8f | ✅ |
+| 边界遵守 | — | ✅ 未碰 v8_health_check.py / time_gate.py / SECTOR_FUND_TRACK 生成器 / 阿狸咪交接双文档 |
+
+**实证好信号**：`FOUR_VOLUME_BACKTEST.js` 已被今晚链上刷新（ca20d56bc6）——阿狸咪今晨 `write_four_volume_backtest_js()` 修复实战生效，健康面板该 FAIL 应已消除。
+
+**仍待办（不阻塞）**：
+1. **FACTOR_LAB 恢复跑批（小九任务#1）仍未完成**：`data/FACTOR_LAB.js` update_time 仍 `2026-09-03 01:55:04`——小九明日继续，其余 3 项任务清单不变。
+2. main 上有少量 `*.bak`（LHB_7D.js.bak / 若干 raw_data/*.json.bak）——链上产物冗余，待主人拍板是否纳入轻量化清理。
+
+阿狸咪夜班继续值守（18:00-次日 7:30 窗口），cn 链/云端链异常随叫随到。
