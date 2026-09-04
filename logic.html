@@ -2183,8 +2183,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">⑭ 算法链耗时优化（calc_stock_rps 8 线程并行 · 2026-09-03 夜班）</div>
         <div class="logic-p">云端算法链原串行耗时 ~2h40m，逐脚本解析日志定位 <code>calc_stock_rps.py</code> 占 ~60min（37%）。根因：跨境抓数（mootdx/baostock）串行。修复：<code>ThreadPoolExecutor(max_workers=8)</code> 并行化，每线程独立连接（pytdx 非线程安全 → <code>threading.local</code> 隔离；baostock <code>_BS_LOCK</code> 全局锁；缓存写加锁；<code>as_completed</code> 完成序输出）。预期 60min → 10~15min，整链提速约 50%。<b>仅云端主链生效</b>，属性能优化、前端无感知。</div>
 
-        <div class="logic-h">📌 双机分时铁律（现行模型，2026-08-29 更新）</div>
-        <div class="logic-p"><b>云端主链 24/7</b>：GitHub Actions ubuntu-latest 跑 <code>v8_cn_fetch_cloud</code>（数据抓取）+ <code>v8_algo_cloud</code>（算法链）+ <code>v8_build_deploy</code>（部署）+ <code>v8_health_patrol</code>/<code>v8_freshness_watch</code>（兜底监控），全部 cron 自动调度，<b>不依赖本地机器</b>。<b>小九（单位机 / lemoncat-cn runner）</b>：看门狗监督 + 应急 <code>workflow_dispatch</code> 兜底，不再跑 cron 主链。<b>阿狸咪（家中机）</b>：本地预览用（<code>file:///E:/workspace/stock-scanner/index.html</code>），不接部署、不接救火。改完+审计通过即直接上线，不再逐次请示（2026-08-29 主人授权放宽）。</div>
+        <div class="logic-h">📌 双机分时铁律（现行模型，2026-09-04 更新）</div>
+        <div class="logic-p"><b>云端主链 24/7</b>：GitHub Actions ubuntu-latest 跑 <code>v8_cn_fetch_cloud</code>（数据抓取）+ <code>v8_algo_cloud</code>（算法链）+ <code>v8_build_deploy</code>（部署）+ <code>v8_health_patrol</code>/<code>v8_freshness_watch</code>（兜底监控），全部 cron 自动调度，<b>不依赖本地机器</b>。<b>小九（单位机 / lemoncat-cn runner）</b>：看门狗监督 + 应急 <code>workflow_dispatch</code> 兜底 + 算法链探针路由 cn 执行机，不跑 cron 主链（主链云端 cron）。<b>阿狸咪（家中机）</b>：夜间/周末班（18:00–次日 7:30 + 周末）部署 v8 主力；本地预览一律用真身仓库 <code>E:/qs_workspaces/quant-scanner-v8/index.html</code>（<b style="color:#ef5350">🔴 禁用 E:/workspace 任何路径——坚果云 junction，2026-09-04 实证会整仓删除仓库</b>）。改完+审计通过即直接上线，不再逐次请示（2026-08-29 主人授权放宽）。</div>
 
         <div class="logic-h" style="background:linear-gradient(135deg,#7c2d12,#9a3412);color:#fed7aa;padding:8px 12px;border-radius:6px;margin:12px 0;">📋 2026-08-11 今日改动汇总（双机运维/逻辑详解/防覆盖）</div>
         <div class="logic-p"><b>推送入库</b>：commit <code>c232edf5a</code> 起所有本地→远端已同步（<code>git pull --rebase</code> 验证）。共 7 个功能 commit + 多份 v8 build。</div>
