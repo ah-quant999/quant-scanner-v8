@@ -237,8 +237,8 @@ jobs:
             #   仅当内嵌时间戳确凿陈旧(>36h)才拦截；格式缺失/无时间戳仅告警不拦截，避免误伤正常部署。
             python - <<'PYF'
           import re, datetime, sys
-          crit={'data/COCKPIT_ADVICE.js':['gen_time','update_time','calc_time'],
-                'data/SECTOR_RECOMMENDATION.js':['gen_time','update_time','calc_time']}
+          # 2026-09-04 主人令收尾：COCKPIT_ADVICE.js 已随「干掉驾驶舱」下线，crit 仅留 SECTOR_RECOMMENDATION
+          crit={'data/SECTOR_RECOMMENDATION.js':['gen_time','update_time','calc_time']}
           tz=datetime.timezone(datetime.timedelta(hours=8)); now=datetime.datetime.now(tz)
           stale=[]
           for f,keys in crit.items():

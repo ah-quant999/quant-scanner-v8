@@ -31,8 +31,7 @@ T1_FILES = [
     "data/LHB_DATA.js",
     "data/INST_TRADE.js",
     "data/TRIPLE_CONSENSUS.js",
-    "data/COCKPIT_TIER_RECOMMEND.js",
-    "data/COCKPIT_ADVICE.js",
+    # 2026-09-04 主人令收尾：COCKPIT_TIER_RECOMMEND/COCKPIT_ADVICE 已删（驾驶舱模块下线）
     "data/SH_FIB.js",
     "data/SZ_FIB.js",
     "data/NT_DATA.js",

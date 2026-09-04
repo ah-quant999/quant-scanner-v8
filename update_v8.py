@@ -58,9 +58,9 @@ DATA_SOURCES = {
     #   raw_data/triple_resonance_history.json，而此处原读旧名 triple_history.json（同源不同名），
     #   桥接顺序一错位就吃陈旧基线 → 共振日历缺 08-24 等。改为直接读生成器真输出，消除重命名歧义。
     "triple_resonance_history.json": "TRIPLE_HISTORY",
-    "cockpit_tier_recommend.json": "COCKPIT_TIER_RECOMMEND",
+    # 2026-09-04 主人令收尾：cockpit_tier_recommend / cockpit_advice / cockpit_backtest 三映射已删
+    #   （09-03「干掉驾驶舱」系列删了生成器与 raw_data，映射永不命中，纯死代码）
     "top10_daily.json":            "TOP10_DAILY",
-    "cockpit_advice.json":         "COCKPIT_ADVICE",
     "sh_fib.json":                 "SH_FIB",
     "sz_fib.json":                 "SZ_FIB",
     "sector_rs.json":              "SECTOR_RS",
@@ -80,7 +80,7 @@ DATA_SOURCES = {
     "capital_flow_data.json":      "CAPITAL_FLOW_DATA",
     "candidate.json":              "CANDIDATE",
     "backtest_comprehensive.json": "BACKTEST_COMPREHENSIVE",
-    "cockpit_backtest.json":       "COCKPIT_BACKTEST",
+    # 2026-09-04 主人令收尾：cockpit_backtest.json 映射已删（驾驶舱模块下线）
     "backtest_tdx.json":           "BACKTEST_TDX",
     "optimized_strategy.json":     "OPTIMIZED_STRATEGY",
     "experiment.json":             "EXPERIMENT",
@@ -186,9 +186,7 @@ CATEGORY_MAP = {
     "SZ_FIB": "post_close",
     "INST_TRADE": "post_close",
     "CRDS_CARD_DATA": "post_close",
-    "COCKPIT_TIER_RECOMMEND": "post_close",
-    "COCKPIT_ADVICE": "post_close",
-    "COCKPIT_BACKTEST": "post_close",
+    # 2026-09-04 主人令收尾：COCKPIT_TIER_RECOMMEND/COCKPIT_ADVICE/COCKPIT_BACKTEST heal 分类已删（模块下线）
     "BACKTEST_TDX": "post_close",
     "BACKTEST_COMPREHENSIVE": "post_close",
     "FACTOR_LAB_BACKTEST": "post_close",
@@ -251,12 +249,7 @@ def _make_lite(name, obj):
         lite = {k: v for k, v in obj.items() if k != 'details'}
         lite['_lite_note'] = 'details 回测明细已裁剪，仅保留 overview/comparison'
         return lite
-    if name == 'COCKPIT_BACKTEST':
-        lite = {k: v for k, v in obj.items() if k != 'results'}
-        results = obj.get('results', [])
-        lite['results'] = results[:20]
-        lite['_lite_note'] = 'results 已裁剪至最近 20 条明细'
-        return lite
+    # 2026-09-04 主人令收尾：COCKPIT_BACKTEST lite 裁剪分支已删（驾驶舱模块下线，永不命中）
     if name == 'GOLD_POOL':
         lite = {k: v for k, v in obj.items() if k != 'stocks'}
         stocks_lite = {}

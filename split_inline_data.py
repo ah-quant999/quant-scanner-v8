@@ -28,13 +28,7 @@ def make_lite(name, obj):
         lite = {k: v for k, v in obj.items() if k != 'details'}
         lite['_lite_note'] = 'details 回测明细已裁剪，仅保留 overview/comparison'
         return lite
-    if name == 'COCKPIT_BACKTEST':
-        # 保留聚合统计，results 只留最近 20 条
-        lite = {k: v for k, v in obj.items() if k != 'results'}
-        results = obj.get('results', [])
-        lite['results'] = results[:20]
-        lite['_lite_note'] = 'results 已裁剪至最近 20 条明细'
-        return lite
+    # 2026-09-04 主人令收尾：COCKPIT_BACKTEST 裁剪分支已删（驾驶舱模块下线）
     if name == 'GOLD_POOL':
         # 保留 stocks 的 latest 聚合字段，去掉每日 history 明细
         lite = {k: v for k, v in obj.items() if k != 'stocks'}
