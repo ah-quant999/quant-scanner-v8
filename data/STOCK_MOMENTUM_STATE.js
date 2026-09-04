@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-04 16:36",
- "generated": "2026-09-04 16:36",
+ "update_time": "2026-09-04 16:54",
+ "generated": "2026-09-04 16:54",
  "meta": {
-  "generated": "2026-09-04 16:36",
+  "generated": "2026-09-04 16:54",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 4,
   "days_with_consensus": 0,
@@ -394,6 +394,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
    "categories": {
     "突破": [
      {
+      "code": "920075",
+      "name": "柏星龙",
+      "change_pct": 30.0,
+      "price": 21.32,
+      "category": "突破"
+     },
+     {
       "code": "603378",
       "name": "*ST亚士",
       "change_pct": 8.0,
@@ -518,9 +525,30 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "change_pct": 10.039,
       "price": 5.59,
       "category": "突破"
+     },
+     {
+      "code": "002397",
+      "name": "梦洁股份",
+      "change_pct": 3.175,
+      "price": 3.9,
+      "category": "突破"
+     },
+     {
+      "code": "300498",
+      "name": "温氏股份",
+      "change_pct": 6.151,
+      "price": 15.36,
+      "category": "突破"
      }
     ],
     "加速": [
+     {
+      "code": "920075",
+      "name": "柏星龙",
+      "change_pct": 30.0,
+      "price": 21.32,
+      "category": "加速"
+     },
      {
       "code": "603378",
       "name": "*ST亚士",
@@ -538,6 +566,13 @@ window.STOCK_MOMENTUM_STATE = (function() {
     ],
     "短线选股": [
      {
+      "code": "920075",
+      "name": "柏星龙",
+      "change_pct": 30.0,
+      "price": 21.32,
+      "category": "短线选股"
+     },
+     {
       "code": "603378",
       "name": "*ST亚士",
       "change_pct": 8.0,
@@ -661,6 +696,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "新五丰",
       "change_pct": 10.039,
       "price": 5.59,
+      "category": "短线选股"
+     },
+     {
+      "code": "002397",
+      "name": "梦洁股份",
+      "change_pct": 3.175,
+      "price": 3.9,
+      "category": "短线选股"
+     },
+     {
+      "code": "300498",
+      "name": "温氏股份",
+      "change_pct": 6.151,
+      "price": 15.36,
       "category": "短线选股"
      }
     ],
@@ -775,6 +824,20 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "新五丰",
       "change_pct": 10.039,
       "price": 5.59,
+      "category": "强势股"
+     },
+     {
+      "code": "002397",
+      "name": "梦洁股份",
+      "change_pct": 3.175,
+      "price": 3.9,
+      "category": "强势股"
+     },
+     {
+      "code": "300498",
+      "name": "温氏股份",
+      "change_pct": 6.151,
+      "price": 15.36,
       "category": "强势股"
      }
     ]
