@@ -4397,7 +4397,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);">代码</th>';
         html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);">名称</th>';
         html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);">信号</th>';
-        html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);">概念</th>';
+        html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);">行业</th>';
+        html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);" title="板块净流入最优概念置顶；悬停显示全部概念（来自 STOCK_PROFILE 全量档案）">概念</th>';
         html += '<th style="padding:7px 8px;text-align:right;color:var(--gold);">精选分</th>';
         html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);" title="algo 入选日期 = 入场时间">入场时间</th>';
         html += '<th style="padding:7px 8px;text-align:right;color:var(--gold);" title="从 algo 入选那天起到当前的累计涨幅（基准 entry_price）">入场以来</th>';
@@ -4414,13 +4415,34 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
           var conceptColor = it.sector_match==='top_inflow' ? '#22c55e' : (it.sector_match==='outflow' ? '#ef5350' : 'var(--dim)');
           var sigColor = it.signal_type==='多算法共识' ? '#38bdf8' : (it.signal_type==='强势突破' ? '#ef5350' : (it.signal_type==='板块联动' ? '#22c55e' : 'var(--sub)'));
-          var _concept = it.concept_top || it.industry || '—';
           var _entryLabel = _entryDate ? _entryDate + (_daysIn!=null ? '（'+_daysIn+'天）' : '') : '—';
+          /* 2026-09-04 主人令（A+B 混合方案）：行业独立列 + 概念列=板块最优置顶·前2全展示·悬停 tooltip 全量概念
+             数据源：window.STOCK_PROFILE.profiles[code] = {industry, concepts[]}（由 STOCK_LIST 就地合成，9613 只全量） */
+          var _profAll = (window.STOCK_PROFILE && window.STOCK_PROFILE.profiles) || {};
+          var _norm = window.__v8NormCode ? window.__v8NormCode(_code) : _code;
+          var _prof = _profAll[_code] || _profAll[_norm] || {};
+          var _industry = _prof.industry || it.industry || '—';
+          var _conceptsAll = (Array.isArray(_prof.concepts) && _prof.concepts.length) ? _prof.concepts.slice() : (it.concept_top ? [it.concept_top] : []);
+          var _topConcept = it.concept_top || '';
+          if(_topConcept){ _conceptsAll = [_topConcept].concat(_conceptsAll.filter(function(c){ return c && c !== _topConcept; })); }
+          var _conceptTip = '行业：' + _industry + '（共 ' + _conceptsAll.length + ' 个概念）';
+          if(_topConcept && (typeof _secNet==='number')) _conceptTip += '\n板块净流入 ' + (_secNet>0?'+':'') + _secNet.toFixed(1) + ' 亿';
+          if(_conceptsAll.length) _conceptTip += '\n' + _conceptsAll.join(' · ');
+          var _showConcepts = _conceptsAll.slice(0, 2);
+          var _extraCnt = _conceptsAll.length - _showConcepts.length;
+          var _conceptHtml = _showConcepts.map(function(c, i){
+            var _col = (i === 0 && _topConcept) ? conceptColor : 'var(--txt)';
+            var _bold = (i === 0 && _topConcept) ? '800' : '500';
+            return '<span style="color:'+_col+';font-weight:'+_bold+';">'+_esc(c)+'</span>';
+          }).join('<span style="color:var(--dim);"> · </span>');
+          if(_extraCnt > 0) _conceptHtml += '<span style="color:var(--dim);"> +'+_extraCnt+'</span>';
+          if(!_conceptHtml) _conceptHtml = '<span style="color:var(--dim);">—</span>';
           html += '<tr style="border-bottom:1px solid rgba(148,163,184,.08);background:rgba(251,191,36,.03);">';
           html += '<td style="padding:6px 8px;color:var(--txt);font-weight:700;font-size:12.5px;font-family:ui-monospace,monospace;white-space:nowrap;">'+_esc(_code)+'</td>';
           html += '<td style="padding:6px 8px;color:var(--txt);font-weight:600;white-space:nowrap;">'+_esc(_name)+' '+_resoBadge(_code)+'</td>';
           html += '<td style="padding:6px 8px;color:'+sigColor+';font-weight:600;">'+_esc(it.signal_type||'')+'</td>';
-          html += '<td style="padding:6px 8px;color:'+conceptColor+';font-weight:600;" title="板块净流入 '+(_secNet>0?'+':'')+_secNet.toFixed(1)+'亿">'+_esc(_concept)+'</td>';
+          html += '<td style="padding:6px 8px;color:var(--sub);font-weight:600;white-space:nowrap;">'+_esc(_industry)+'</td>';
+          html += '<td style="padding:6px 8px;font-size:12px;min-width:180px;" title="'+_esc(_conceptTip).replace(/"/g,'&quot;').replace(/'/g,'&#39;')+'">'+_conceptHtml+'</td>';
           html += '<td style="padding:6px 8px;text-align:right;color:var(--gold);font-weight:800;font-size:13px;">'+(_selScore>0?'+':'')+_selScore.toFixed(1)+'</td>';
           html += '<td style="padding:6px 8px;color:var(--txt);font-weight:600;white-space:nowrap;" title="入选价 '+((typeof it.entry_price==='number')?it.entry_price.toFixed(2):'—')+'">'+_esc(_entryLabel)+'</td>';
           html += '<td style="padding:6px 8px;text-align:right;font-weight:800;font-size:13.5px;color:'+periodColor+';">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</td>';
