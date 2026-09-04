@@ -132,3 +132,10 @@
 - ✅ 主人拍板**方案乙**已上线（commit a6d202a620d0）：选股生命周期 3 卡卡名后追加角色小标签（⚡强势突破·①发现信号 / 📡高手跟踪·②共振确认 / 🧬选股生命周期·③持有管理），卡序不动、10.5px dim 灰非徽章样式。语法审计 0 错 + diff 恰 3 行 + 回读逐字节一致。小九白天**无需重复此改动**。
 - ⏳ 仍待主人拍板：SECTOR_FUND_TRACK 彻底清理（删生成器+文件）。
 - ⏳ 小九今日 4 项不变：FACTOR_LAB 恢复跑批 / 因子全市场扫描 / 监督器静默杀×2 诊断 / cn#23 step8 cancel（低优先）。
+
+
+## 🔴 08:45 紧急补记（阿狸咪）：main 回退事故 + SECTOR_FUND_TRACK 清理完成
+1. **main 曾被强制回退**：08:15-08:35 窗口内，main 被**某个客户端用陈旧本地副本 force push 回退到 06:56(4396e93d)**，丢掉了 07:15 之后的全部提交（方案乙角色标签 a6d202a6、health_check 补丁、07:25 交接补记、08:09 CI build 等约 29 个提交/173 文件）。**阿狸咪已用 Git Database refs API 无损恢复到 1049319b**（纯 fast-forward，零丢失），随后在其上完成 SECTOR_FUND_TRACK 清理（21e0574e/9329d358/0b2a56bd 三个提交）。
+2. **小九铁律（立即生效）**：任何 push 前**必须** `git fetch origin main && git reset --hard origin/main`（或 rebase FETCH_HEAD）对齐远端；**严禁 `git push --force`/`+main`**。部署脚本若内置 force push 参数必须先摘除。今天上午若你本地有未推成的改动，先 pull 对齐后再重推。
+3. ✅ **SECTOR_FUND_TRACK 已彻底清理完毕（主人 08:15 拍板「确认无关联没用的就清」）**：cn_fetch 死步骤、health_check _RETIRED_FILES 死代码、raw_data/sector_fund_track.json 孤儿文件三处全删。考证结论：生成器与 data js 早在 09-02 7c1363b9 就已删除，本次只是清掉残留。**小九勿重复处理。**
+4. 另：Contents API 的 raw GET 在本机代理下可能返回陈旧缓存版本（本次差点用旧版覆盖新版），读取关键文件务必用 `git rev-parse HEAD:<path>` blob sha 与线上 meta sha 双验证。
