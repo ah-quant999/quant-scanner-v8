@@ -1,592 +1,421 @@
 {
-  "update_time": "2026-09-03 01:55:04",
+  "update_time": "2026-09-05 07:11:11",
   "meta": {
-    "universe": "重点池(持仓+候选+黄金)",
-    "n_universe": 351,
-    "n_at_valid": 343,
-    "n_roe_large": 1054,
+    "universe": "重点池(持仓+候选+黄金)·异常换手率 / 全市场主板·ROE",
+    "n_universe": 348,
+    "n_at_valid": 339,
+    "n_roe_large": 0,
     "abnormal_def": "当月换手率÷过去12月均值; 缩量=因子高=强势",
-    "roe_def": "全市场主板(3193) · 大市值档(成交额代理top1/3)按ROE_TTM降序 Top30",
+    "roe_def": "全市场主板(3193)·大市值档(成交额代理top1/3)按ROE_TTM降序 Top30",
     "roe_universe": "全市场主板"
   },
   "abnormal_turnover": {
     "top": [
       {
-        "code": "sh.688729",
-        "name": "屹唐股份",
-        "close": 24.9,
-        "abn": 0.287,
-        "factor_at": -0.2869,
-        "roe_ttm": 0.22,
-        "size_proxy": 12643499487.4
-      },
-      {
         "code": "sh.688629",
         "name": "华丰科技",
-        "close": 136.29,
-        "abn": 0.337,
-        "factor_at": -0.3365,
-        "roe_ttm": 0.48,
-        "size_proxy": 42782425590.6
+        "close": 122.4,
+        "abn": 0.043,
+        "factor_at": -0.0431,
+        "roe_ttm": null,
+        "size_proxy": 40415689996.2,
+        "asof_ym": "2026-09"
       },
       {
-        "code": "sz.000591",
-        "name": "太阳能",
-        "close": 4.28,
-        "abn": 0.364,
-        "factor_at": -0.3636,
-        "roe_ttm": 0.11,
-        "size_proxy": 9806737070.9
-      },
-      {
-        "code": "sz.301389",
-        "name": "隆扬电子",
-        "close": 61.45,
-        "abn": 0.374,
-        "factor_at": -0.3739,
-        "roe_ttm": 0.11,
-        "size_proxy": 14169770732.1
-      },
-      {
-        "code": "sh.688249",
-        "name": "晶合集成",
-        "close": 38.77,
-        "abn": 0.381,
-        "factor_at": -0.3814,
-        "roe_ttm": 0.07,
-        "size_proxy": 27858103014.6
-      },
-      {
-        "code": "sz.300450",
-        "name": "先导智能",
-        "close": 33.62,
-        "abn": 0.411,
-        "factor_at": -0.4105,
-        "roe_ttm": 0.31,
-        "size_proxy": 71006446782.4
-      },
-      {
-        "code": "sz.002084",
-        "name": "海鸥住工",
-        "close": 6.38,
-        "abn": 0.415,
-        "factor_at": -0.4146,
-        "roe_ttm": -0.18,
-        "size_proxy": 2480769775.7
+        "code": "sh.688729",
+        "name": "屹唐股份",
+        "close": 22.02,
+        "abn": 0.047,
+        "factor_at": -0.0473,
+        "roe_ttm": null,
+        "size_proxy": 11953833752.4,
+        "asof_ym": "2026-09"
       },
       {
         "code": "sz.002074",
         "name": "国轩高科",
-        "close": 26.71,
-        "abn": 0.437,
-        "factor_at": -0.4365,
-        "roe_ttm": 0.23,
-        "size_proxy": 46074298149.8
+        "close": 25.95,
+        "abn": 0.049,
+        "factor_at": -0.0489,
+        "roe_ttm": null,
+        "size_proxy": 43287124755.2,
+        "asof_ym": "2026-09"
       },
       {
-        "code": "sh.688147",
-        "name": "微导纳米",
-        "close": 125.6,
-        "abn": 0.441,
-        "factor_at": -0.4409,
-        "roe_ttm": 0.21,
-        "size_proxy": 15144646491.0
-      },
-      {
-        "code": "sz.301377",
-        "name": "鼎泰高科",
-        "close": 419.86,
-        "abn": 0.462,
-        "factor_at": -0.4624,
-        "roe_ttm": 0.61,
-        "size_proxy": 23471425913.0
-      },
-      {
-        "code": "sz.300724",
-        "name": "捷佳伟创",
-        "close": 56.39,
-        "abn": 0.498,
-        "factor_at": -0.4984,
-        "roe_ttm": 0.48,
-        "size_proxy": 36019643875.4
-      },
-      {
-        "code": "sh.600967",
-        "name": "内蒙一机",
-        "close": 11.08,
-        "abn": 0.507,
-        "factor_at": -0.507,
-        "roe_ttm": 0.09,
-        "size_proxy": 19980000025.3
-      },
-      {
-        "code": "sz.300456",
-        "name": "赛微电子",
-        "close": 40.26,
-        "abn": 0.517,
-        "factor_at": -0.5169,
-        "roe_ttm": 0.86,
-        "size_proxy": 47280345809.7
-      },
-      {
-        "code": "sh.688802",
-        "name": "沐曦股份",
-        "close": 691.2,
-        "abn": 0.527,
-        "factor_at": -0.5268,
-        "roe_ttm": -0.14,
-        "size_proxy": 29882022747.6
-      },
-      {
-        "code": "sz.002865",
-        "name": "钧达股份",
-        "close": 39.75,
-        "abn": 0.532,
-        "factor_at": -0.5321,
-        "roe_ttm": -0.54,
-        "size_proxy": 20920686838.1
-      },
-      {
-        "code": "sh.601012",
-        "name": "隆基绿能",
-        "close": 12.07,
-        "abn": 0.532,
-        "factor_at": -0.5322,
-        "roe_ttm": -0.28,
-        "size_proxy": 57013460249.1
-      },
-      {
-        "code": "sh.688331",
-        "name": "荣昌生物",
-        "close": 121.78,
-        "abn": 0.539,
-        "factor_at": -0.5389,
-        "roe_ttm": 0.87,
-        "size_proxy": 18830926790.7
-      },
-      {
-        "code": "sh.688603",
-        "name": "天承科技",
-        "close": 119.16,
-        "abn": 0.54,
-        "factor_at": -0.5399,
-        "roe_ttm": 0.2,
-        "size_proxy": 9561126186.1
-      },
-      {
-        "code": "sz.301165",
-        "name": "锐捷网络",
-        "close": 127.33,
-        "abn": 0.546,
-        "factor_at": -0.5459,
-        "roe_ttm": 0.45,
-        "size_proxy": 25571178695.3
+        "code": "sh.688249",
+        "name": "晶合集成",
+        "close": 35.07,
+        "abn": 0.056,
+        "factor_at": -0.0559,
+        "roe_ttm": null,
+        "size_proxy": 26272956025.6,
+        "asof_ym": "2026-09"
       },
       {
         "code": "sz.300014",
         "name": "亿纬锂能",
-        "close": 52.76,
-        "abn": 0.57,
-        "factor_at": -0.5701,
-        "roe_ttm": 0.28,
-        "size_proxy": 79208836419.8
+        "close": 51.04,
+        "abn": 0.062,
+        "factor_at": -0.0616,
+        "roe_ttm": null,
+        "size_proxy": 74536730765.4,
+        "asof_ym": "2026-09"
       },
       {
-        "code": "sz.300037",
-        "name": "新宙邦",
-        "close": 65.6,
-        "abn": 0.583,
-        "factor_at": -0.5828,
-        "roe_ttm": 0.31,
-        "size_proxy": 27776543286.1
+        "code": "sh.688027",
+        "name": "国盾量子",
+        "close": 370.5,
+        "abn": 0.063,
+        "factor_at": -0.0626,
+        "roe_ttm": null,
+        "size_proxy": 27695701649.9,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sz.300450",
+        "name": "先导智能",
+        "close": 31.57,
+        "abn": 0.063,
+        "factor_at": -0.0631,
+        "roe_ttm": null,
+        "size_proxy": 66770688811.3,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sh.601100",
+        "name": "恒立液压",
+        "close": 99.03,
+        "abn": 0.065,
+        "factor_at": -0.0653,
+        "roe_ttm": null,
+        "size_proxy": 20333018012.3,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sz.300136",
+        "name": "信维通信",
+        "close": 56.18,
+        "abn": 0.066,
+        "factor_at": -0.0658,
+        "roe_ttm": null,
+        "size_proxy": 95746269958.7,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sz.002865",
+        "name": "钧达股份",
+        "close": 38.23,
+        "abn": 0.068,
+        "factor_at": -0.0678,
+        "roe_ttm": null,
+        "size_proxy": 19671038675.3,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sz.000591",
+        "name": "太阳能",
+        "close": 4.24,
+        "abn": 0.068,
+        "factor_at": -0.0679,
+        "roe_ttm": null,
+        "size_proxy": 9232058284.0,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sh.688525",
+        "name": "佰维存储",
+        "close": 213.29,
+        "abn": 0.07,
+        "factor_at": -0.07,
+        "roe_ttm": null,
+        "size_proxy": 115359685239.4,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sz.300346",
+        "name": "南大光电",
+        "close": 50.59,
+        "abn": 0.073,
+        "factor_at": -0.0726,
+        "roe_ttm": null,
+        "size_proxy": 50397564164.1,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sz.300661",
+        "name": "圣邦股份",
+        "close": 106.92,
+        "abn": 0.073,
+        "factor_at": -0.0733,
+        "roe_ttm": null,
+        "size_proxy": 33111164133.2,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sz.300442",
+        "name": "润泽科技",
+        "close": 62.93,
+        "abn": 0.074,
+        "factor_at": -0.0743,
+        "roe_ttm": null,
+        "size_proxy": 57987576719.5,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sh.688331",
+        "name": "荣昌生物",
+        "close": 124.24,
+        "abn": 0.075,
+        "factor_at": -0.0752,
+        "roe_ttm": null,
+        "size_proxy": 17846596170.3,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sh.601012",
+        "name": "隆基绿能",
+        "close": 11.77,
+        "abn": 0.076,
+        "factor_at": -0.0761,
+        "roe_ttm": null,
+        "size_proxy": 53653660127.7,
+        "asof_ym": "2026-09"
       },
       {
         "code": "sz.301358",
         "name": "湖南裕能",
-        "close": 62.0,
-        "abn": 0.592,
-        "factor_at": -0.5923,
-        "roe_ttm": 0.42,
-        "size_proxy": 31545770474.7
+        "close": 55.82,
+        "abn": 0.076,
+        "factor_at": -0.0763,
+        "roe_ttm": null,
+        "size_proxy": 29780322652.3,
+        "asof_ym": "2026-09"
       },
       {
-        "code": "sz.002460",
-        "name": "赣锋锂业",
-        "close": 53.89,
-        "abn": 0.593,
-        "factor_at": -0.5934,
-        "roe_ttm": 0.17,
-        "size_proxy": 79569713406.5
-      },
-      {
-        "code": "sz.300803",
-        "name": "指南针",
-        "close": 85.29,
-        "abn": 0.596,
-        "factor_at": -0.5964,
-        "roe_ttm": 0.22,
-        "size_proxy": 69977089794.0
-      },
-      {
-        "code": "sz.300438",
-        "name": "鹏辉能源",
-        "close": 59.14,
-        "abn": 0.6,
-        "factor_at": -0.5997,
-        "roe_ttm": 0.26,
-        "size_proxy": 34059016970.9
-      },
-      {
-        "code": "sz.300604",
-        "name": "长川科技",
-        "close": 279.03,
-        "abn": 0.618,
-        "factor_at": -0.6184,
-        "roe_ttm": 0.82,
-        "size_proxy": 84478764976.9
-      },
-      {
-        "code": "sz.300059",
-        "name": "东方财富",
-        "close": 19.39,
-        "abn": 0.619,
-        "factor_at": -0.6187,
-        "roe_ttm": 0.37,
-        "size_proxy": 174259752115.9
-      },
-      {
-        "code": "sz.300499",
-        "name": "高澜股份",
-        "close": 32.42,
-        "abn": 0.621,
-        "factor_at": -0.6213,
-        "roe_ttm": 0.08,
-        "size_proxy": 22828837304.5
+        "code": "sh.688981",
+        "name": "中芯国际",
+        "close": 121.14,
+        "abn": 0.076,
+        "factor_at": -0.0765,
+        "roe_ttm": null,
+        "size_proxy": 150360285532.9,
+        "asof_ym": "2026-09"
       },
       {
         "code": "sh.600406",
         "name": "国电南瑞",
-        "close": 22.97,
-        "abn": 0.632,
-        "factor_at": -0.6322,
-        "roe_ttm": 0.33,
-        "size_proxy": 36063152470.3
+        "close": 22.71,
+        "abn": 0.078,
+        "factor_at": -0.0777,
+        "roe_ttm": null,
+        "size_proxy": 33982640440.6,
+        "asof_ym": "2026-09"
       },
       {
-        "code": "sh.688502",
-        "name": "茂莱光学",
-        "close": 444.88,
-        "abn": 0.64,
-        "factor_at": -0.6404,
-        "roe_ttm": 0.06,
-        "size_proxy": 12876527018.0
+        "code": "sz.301308",
+        "name": "江波龙",
+        "close": 347.0,
+        "abn": 0.079,
+        "factor_at": -0.0794,
+        "roe_ttm": null,
+        "size_proxy": 103114089026.7,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sz.300024",
+        "name": "机器人",
+        "close": 14.28,
+        "abn": 0.08,
+        "factor_at": -0.0803,
+        "roe_ttm": null,
+        "size_proxy": 15294703325.5,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sh.688498",
+        "name": "源杰科技",
+        "close": 1466.0,
+        "abn": 0.082,
+        "factor_at": -0.0824,
+        "roe_ttm": null,
+        "size_proxy": 71646008303.0,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sh.688041",
+        "name": "海光信息",
+        "close": 243.67,
+        "abn": 0.083,
+        "factor_at": -0.0829,
+        "roe_ttm": null,
+        "size_proxy": 143978446006.7,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sz.000988",
+        "name": "华工科技",
+        "close": 95.6,
+        "abn": 0.083,
+        "factor_at": -0.083,
+        "roe_ttm": null,
+        "size_proxy": 130931664288.2,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sz.300548",
+        "name": "长芯博创",
+        "close": 193.78,
+        "abn": 0.083,
+        "factor_at": -0.0832,
+        "roe_ttm": null,
+        "size_proxy": 67701779323.0,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sh.688469",
+        "name": "芯联集成",
+        "close": 8.3,
+        "abn": 0.085,
+        "factor_at": -0.0847,
+        "roe_ttm": null,
+        "size_proxy": 21343684365.5,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sh.688147",
+        "name": "微导纳米",
+        "close": 100.89,
+        "abn": 0.085,
+        "factor_at": -0.085,
+        "roe_ttm": null,
+        "size_proxy": 14493057774.0,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sz.301165",
+        "name": "锐捷网络",
+        "close": 109.7,
+        "abn": 0.086,
+        "factor_at": -0.0856,
+        "roe_ttm": null,
+        "size_proxy": 24464448809.4,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sh.600056",
+        "name": "中国医药",
+        "close": 9.06,
+        "abn": 0.086,
+        "factor_at": -0.0861,
+        "roe_ttm": null,
+        "size_proxy": 4194096047.8,
+        "asof_ym": "2026-09"
       }
     ],
     "bottom": [
       {
-        "code": "sz.002437",
-        "name": "誉衡药业",
-        "close": 4.37,
-        "abn": 6.636,
-        "factor_at": -6.6356,
-        "roe_ttm": 0.4,
-        "size_proxy": 9289619099.8
+        "code": "sh.600479",
+        "name": "千金药业",
+        "close": 13.15,
+        "abn": 2.912,
+        "factor_at": -2.9125,
+        "roe_ttm": null,
+        "size_proxy": 2154382103.9,
+        "asof_ym": "2026-09"
       },
       {
-        "code": "sh.600613",
-        "name": "神奇制药",
-        "close": 11.16,
-        "abn": 6.39,
-        "factor_at": -6.3895,
-        "roe_ttm": 0.05,
-        "size_proxy": 2005373646.0
+        "code": "sz.300413",
+        "name": "芒果超媒",
+        "close": 21.25,
+        "abn": 1.999,
+        "factor_at": -1.9988,
+        "roe_ttm": null,
+        "size_proxy": 10587898883.1,
+        "asof_ym": "2026-09"
       },
       {
-        "code": "sz.300534",
-        "name": "陇神戎发",
-        "close": 13.94,
-        "abn": 5.842,
-        "factor_at": -5.8416,
-        "roe_ttm": 0.16,
-        "size_proxy": 5296276250.5
-      },
-      {
-        "code": "sz.301080",
-        "name": "百普赛斯",
-        "close": 76.55,
-        "abn": 5.502,
-        "factor_at": -5.5017,
-        "roe_ttm": 0.17,
-        "size_proxy": 5564614420.7
-      },
-      {
-        "code": "sz.301520",
-        "name": "万邦医药",
-        "close": 61.29,
-        "abn": 5.414,
-        "factor_at": -5.4136,
-        "roe_ttm": 0.05,
-        "size_proxy": 3520264820.8
+        "code": "sz.003040",
+        "name": "楚天龙",
+        "close": 21.12,
+        "abn": 1.478,
+        "factor_at": -1.4782,
+        "roe_ttm": null,
+        "size_proxy": 12017524051.7,
+        "asof_ym": "2026-09"
       },
       {
         "code": "sh.600127",
         "name": "金健米业",
-        "close": 12.04,
-        "abn": 5.346,
-        "factor_at": -5.3463,
-        "roe_ttm": 0.01,
-        "size_proxy": 4774104343.4
+        "close": 12.3,
+        "abn": 1.447,
+        "factor_at": -1.4468,
+        "roe_ttm": null,
+        "size_proxy": 5229576679.3,
+        "asof_ym": "2026-09"
       },
       {
-        "code": "sh.600664",
-        "name": "哈药股份",
-        "close": 9.12,
-        "abn": 4.924,
-        "factor_at": -4.9236,
-        "roe_ttm": 0.22,
-        "size_proxy": 10921089729.7
+        "code": "sz.000560",
+        "name": "我爱我家",
+        "close": 3.15,
+        "abn": 1.12,
+        "factor_at": -1.12,
+        "roe_ttm": null,
+        "size_proxy": 7838531321.8,
+        "asof_ym": "2026-09"
       },
       {
-        "code": "sz.300996",
-        "name": "普联软件",
-        "close": 14.26,
-        "abn": 4.727,
-        "factor_at": -4.7267,
-        "roe_ttm": 0.06,
-        "size_proxy": 5951572141.7
+        "code": "sz.002437",
+        "name": "誉衡药业",
+        "close": 3.94,
+        "abn": 1.035,
+        "factor_at": -1.0351,
+        "roe_ttm": null,
+        "size_proxy": 9352487233.5,
+        "asof_ym": "2026-09"
       },
       {
-        "code": "sh.600721",
-        "name": "百花医药",
-        "close": 13.9,
-        "abn": 4.677,
-        "factor_at": -4.6773,
-        "roe_ttm": 0.12,
-        "size_proxy": 5853812772.3
+        "code": "sz.002886",
+        "name": "沃特股份",
+        "close": 25.11,
+        "abn": 0.954,
+        "factor_at": -0.9543,
+        "roe_ttm": null,
+        "size_proxy": 5526332959.9,
+        "asof_ym": "2026-09"
       },
       {
-        "code": "sh.688356",
-        "name": "键凯科技",
-        "close": 91.0,
-        "abn": 4.359,
-        "factor_at": -4.3589,
-        "roe_ttm": 0.1,
-        "size_proxy": 2831793812.3
+        "code": "sh.688185",
+        "name": "康希诺",
+        "close": 68.93,
+        "abn": 0.883,
+        "factor_at": -0.883,
+        "roe_ttm": null,
+        "size_proxy": 3661581036.3,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sz.002084",
+        "name": "海鸥住工",
+        "close": 7.1,
+        "abn": 0.882,
+        "factor_at": -0.8825,
+        "roe_ttm": null,
+        "size_proxy": 2586716553.1,
+        "asof_ym": "2026-09"
+      },
+      {
+        "code": "sh.600967",
+        "name": "内蒙一机",
+        "close": 13.66,
+        "abn": 0.706,
+        "factor_at": -0.7056,
+        "roe_ttm": null,
+        "size_proxy": 19140475828.0,
+        "asof_ym": "2026-09"
       }
     ]
   },
   "roe_largecap": {
-    "top": [
-      {
-        "code": "sz.001309",
-        "name": "1",
-        "close": 436.5,
-        "roe_ttm": 1.83,
-        "size_proxy": 9709989027.2
-      },
-      {
-        "code": "sh.600221",
-        "name": "1",
-        "close": 1.3,
-        "roe_ttm": 1.6,
-        "size_proxy": 416332413.5
-      },
-      {
-        "code": "sh.605499",
-        "name": "1",
-        "close": 119.98,
-        "roe_ttm": 1.25,
-        "size_proxy": 1046948098.8
-      },
-      {
-        "code": "sz.002379",
-        "name": "1",
-        "close": 18.14,
-        "roe_ttm": 1.1,
-        "size_proxy": 1020322465.6
-      },
-      {
-        "code": "sh.603268",
-        "name": "1",
-        "close": 194.23,
-        "roe_ttm": 1.07,
-        "size_proxy": 1312292178.4
-      },
-      {
-        "code": "sh.600961",
-        "name": "1",
-        "close": 27.35,
-        "roe_ttm": 1.03,
-        "size_proxy": 1636101751.9
-      },
-      {
-        "code": "sh.603929",
-        "name": "1",
-        "close": 165.31,
-        "roe_ttm": 0.98,
-        "size_proxy": 1533479189.1
-      },
-      {
-        "code": "sz.000688",
-        "name": "1",
-        "close": 31.8,
-        "roe_ttm": 0.95,
-        "size_proxy": 906904843.7
-      },
-      {
-        "code": "sh.605117",
-        "name": "1",
-        "close": 88.04,
-        "roe_ttm": 0.93,
-        "size_proxy": 1712497487.3
-      },
-      {
-        "code": "sh.601336",
-        "name": "1",
-        "close": 60.12,
-        "roe_ttm": 0.93,
-        "size_proxy": 1635447673.3
-      },
-      {
-        "code": "sh.600809",
-        "name": "1",
-        "close": 116.76,
-        "roe_ttm": 0.93,
-        "size_proxy": 1229689645.7
-      },
-      {
-        "code": "sz.000506",
-        "name": "1",
-        "close": 20.3,
-        "roe_ttm": 0.92,
-        "size_proxy": 1202099463.1
-      },
-      {
-        "code": "sz.000981",
-        "name": "1",
-        "close": 2.68,
-        "roe_ttm": 0.91,
-        "size_proxy": 764868941.8
-      },
-      {
-        "code": "sh.600519",
-        "name": "1",
-        "close": 1299.52,
-        "roe_ttm": 0.89,
-        "size_proxy": 5485246987.3
-      },
-      {
-        "code": "sh.601899",
-        "name": "1",
-        "close": 33.67,
-        "roe_ttm": 0.87,
-        "size_proxy": 9537273260.2
-      },
-      {
-        "code": "sz.001337",
-        "name": "1",
-        "close": 53.5,
-        "roe_ttm": 0.87,
-        "size_proxy": 758936580.3
-      },
-      {
-        "code": "sh.603444",
-        "name": "1",
-        "close": 383.49,
-        "roe_ttm": 0.86,
-        "size_proxy": 723954490.5
-      },
-      {
-        "code": "sh.603699",
-        "name": "1",
-        "close": 50.94,
-        "roe_ttm": 0.85,
-        "size_proxy": 341200275.8
-      },
-      {
-        "code": "sh.601628",
-        "name": "1",
-        "close": 38.5,
-        "roe_ttm": 0.82,
-        "size_proxy": 1535871600.7
-      },
-      {
-        "code": "sh.600066",
-        "name": "1",
-        "close": 29.79,
-        "roe_ttm": 0.8,
-        "size_proxy": 656711956.8
-      },
-      {
-        "code": "sz.002027",
-        "name": "1",
-        "close": 4.97,
-        "roe_ttm": 0.78,
-        "size_proxy": 888245666.0
-      },
-      {
-        "code": "sz.000408",
-        "name": "1",
-        "close": 78.39,
-        "roe_ttm": 0.76,
-        "size_proxy": 1180217275.1
-      },
-      {
-        "code": "sz.002463",
-        "name": "1",
-        "close": 124.91,
-        "roe_ttm": 0.75,
-        "size_proxy": 9433704594.1
-      },
-      {
-        "code": "sz.002611",
-        "name": "1",
-        "close": 15.23,
-        "roe_ttm": 0.74,
-        "size_proxy": 625253220.8
-      },
-      {
-        "code": "sh.603993",
-        "name": "1",
-        "close": 19.06,
-        "roe_ttm": 0.73,
-        "size_proxy": 5607336626.1
-      },
-      {
-        "code": "sz.002842",
-        "name": "1",
-        "close": 38.91,
-        "roe_ttm": 0.73,
-        "size_proxy": 1870175968.8
-      },
-      {
-        "code": "sz.001389",
-        "name": "1",
-        "close": 162.73,
-        "roe_ttm": 0.73,
-        "size_proxy": 1772725686.1
-      },
-      {
-        "code": "sh.603629",
-        "name": "1",
-        "close": 122.16,
-        "roe_ttm": 0.72,
-        "size_proxy": 4926565121.4
-      },
-      {
-        "code": "sh.603893",
-        "name": "1",
-        "close": 194.59,
-        "roe_ttm": 0.72,
-        "size_proxy": 3520261909.7
-      },
-      {
-        "code": "sh.600989",
-        "name": "1",
-        "close": 24.3,
-        "roe_ttm": 0.71,
-        "size_proxy": 1907533937.6
-      }
-    ]
+    "top": []
   }
 }
