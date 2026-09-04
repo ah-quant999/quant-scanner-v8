@@ -10814,6 +10814,57 @@ window.showRestrictedItems = showRestrictedItems;
        + '<div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.3);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.7;color:var(--sub);">研究信号，未纳入推荐链路。</div></div>';
     // ═══ 2026-09-03 主人令：因子实验室迁入暂未上架（★★ 观测仓 · 调试与回测中；升 4⭐ 再转正选股策略子页）═══
     h += '<div class="card" id="factorLabBody" style="margin-bottom:16px;border-left:4px solid #22d3ee;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">🧪 因子实验室（异常换手率 · ROE_TTM 大市值档）加载中…</div></div>';
+    // ═══ 2026-09-04 主人令：宏观景气背景（K型分层）迁入暂未上架（主人自看 · 背景认知 · 适合查阅不适合盯盘）═══
+    //   静态内容内联，无 data 依赖/无管线；数据源：沧海一土狗（公众号）K型行业景气图；每月 1 日随宏观数据手动更新此处。
+    //   红涨绿跌铁律适用：增速为正=红(扩张)，为负=绿(收缩)。
+    h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #fbbf24;">'
+       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
+       + '<span style="font-size:15px;font-weight:700;color:#fbbf24;">🌍 宏观景气背景 · K 型分层</span>'
+       + '<span style="font-size:12px;color:var(--dim);">7月数据 · 来源：沧海一土狗 · 每月更新</span></div>'
+       + '<div style="font-size:11px;color:var(--dim);margin-bottom:10px;">帮你理解<b style="color:var(--txt);">为什么某些板块资金持续流入</b>（外需+AI+技改 vs 地产链+财政收缩）——背景认知，适合查阅不适合盯盘。</div>'
+       + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:10px;">'
+       // ── 扩张区（K型上端 · 红） ──
+       + '<div style="background:rgba(239,83,80,.06);border:1px solid rgba(239,83,80,.25);border-radius:7px;padding:9px 11px;">'
+       + '<div style="font-size:12.5px;font-weight:700;color:#ef5350;margin-bottom:5px;">▲ 扩张区 · K 型上端</div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">出口</span><b style="color:#ef5350;">+23.9%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">通讯器材零售</span><b style="color:#ef5350;">+15~20%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">高技术制造业</span><b style="color:#ef5350;">+13.8%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">计算机通信电子</span><b style="color:#ef5350;">+19.1%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">铁路运输设备</span><b style="color:#ef5350;">+13.6%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">专用设备</span><b style="color:#ef5350;">+12.6%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">装备制造业</span><b style="color:#ef5350;">+9.7%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">化妆品零售</span><b style="color:#ef5350;">+6.3%</b></div>'
+       + '</div>'
+       // ── 中性区（灰） ──
+       + '<div style="background:rgba(154,164,178,.06);border:1px solid rgba(154,164,178,.25);border-radius:7px;padding:9px 11px;">'
+       + '<div style="font-size:12.5px;font-weight:700;color:#9aa4b2;margin-bottom:5px;">◆ 中性区 · 总量平稳</div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">规上工业增加值</span><b style="color:#9aa4b2;">+4.5%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">社会消费品零售</span><b style="color:#9aa4b2;">+0.6%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">调查失业率</span><b style="color:#9aa4b2;">5.2%</b></div>'
+       + '<div style="margin-top:10px;padding-top:8px;border-top:1px dashed rgba(154,164,178,.3);font-size:11px;line-height:1.7;color:var(--dim);">总量无感，结构剧烈分化——这正是 K 型的含义。</div>'
+       + '</div>'
+       // ── 收缩区（K型下端 · 绿） ──
+       + '<div style="background:rgba(38,166,154,.06);border:1px solid rgba(38,166,154,.25);border-radius:7px;padding:9px 11px;">'
+       + '<div style="font-size:12.5px;font-weight:700;color:#26a69a;margin-bottom:5px;">▼ 收缩区 · K 型下端</div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">房地产投资</span><b style="color:#26a69a;">-19.2%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">汽车零售</span><b style="color:#26a69a;">-17.0%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">基建投资(7月单月)</span><b style="color:#26a69a;">-12.9%~-14.7%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">煤炭开采</span><b style="color:#26a69a;">-10.8%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">金银珠宝零售</span><b style="color:#26a69a;">-10.1%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">家具建材零售</span><b style="color:#26a69a;">-3~-9%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">基建投资(累计)</span><b style="color:#26a69a;">-3.6%</b></div>'
+       + '<div style="display:flex;justify-content:space-between;font-size:12px;line-height:1.95;"><span style="color:var(--txt);">财政支出(二季度)</span><b style="color:#26a69a;">-8.4%</b></div>'
+       + '</div>'
+       + '</div>'
+       // ── 框架要点（沧海一土狗） ──
+       + '<div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.3);border-radius:7px;padding:9px 12px;margin-top:10px;font-size:12px;line-height:1.8;color:var(--sub);">'
+       + '<b style="color:#fbbf24;">📖 框架要点（沧海一土狗 · 金融抑制模型）：</b>'
+       + '① 货币政策刺激<b style="color:var(--txt);">外需</b>、财政政策刺激<b style="color:var(--txt);">内需</b>（宋铮 <i>Growing Like China</i> 框架）；'
+       + '② 社零 3.7% 年增目标（2030 年 60 万亿）约束降息空间 → 政策组合转向<b style="color:var(--txt);">财政为主</b>；'
+       + '③ 投资曲线弹性是核心特征值：缺弹性时降息抑制内需（资金外流+出口），弹性修复后降息才利好股市；'
+       + '④ 对 A 股映射：<b style="color:#ef5350;">外需+AI+技改链</b>景气持续 vs <b style="color:#26a69a;">地产链+基建链</b>收缩——与行业树图/板块资金的分化互为印证。</div>'
+       + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;">🔭 仅供研究参考，不构成个人投资建议 · 数据时点以原文为准</div>'
+       + '</div>';
     // 2026-09-02 主人令：强势突破 pane、模块去向索引、动量共识/H反推/两套算法回测对比 全部删除。
     //   暂未上架只保留：热门赛道资金追踪曲线卡 + AI预测/潜力挖掘/ETF龙头参考 3 张卡。
     el.innerHTML=h;
