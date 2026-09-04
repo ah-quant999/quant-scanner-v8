@@ -1,41 +1,41 @@
 {
  "years": 3,
- "total_signals": 0,
+ "total_signals": 1474,
  "periods": {
   "1d": {
-   "count": 0,
-   "win_rate": 0,
-   "avg_return": 0,
-   "best": 0,
-   "worst": 0
+   "count": 1470,
+   "win_rate": 49.4,
+   "avg_return": 0.66,
+   "best": 20.58,
+   "worst": -21.09
   },
   "3d": {
-   "count": 0,
-   "win_rate": 0,
-   "avg_return": 0,
-   "best": 0,
-   "worst": 0
+   "count": 1464,
+   "win_rate": 54.4,
+   "avg_return": 1.86,
+   "best": 59.48,
+   "worst": -24.44
   },
   "5d": {
-   "count": 0,
-   "win_rate": 0,
-   "avg_return": 0,
-   "best": 0,
-   "worst": 0
+   "count": 1462,
+   "win_rate": 54.6,
+   "avg_return": 2.57,
+   "best": 122.03,
+   "worst": -29.66
   },
   "10d": {
-   "count": 0,
-   "win_rate": 0,
-   "avg_return": 0,
-   "best": 0,
-   "worst": 0
+   "count": 1458,
+   "win_rate": 57.2,
+   "avg_return": 3.84,
+   "best": 268.03,
+   "worst": -32.98
   },
   "20d": {
-   "count": 0,
-   "win_rate": 0,
-   "avg_return": 0,
-   "best": 0,
-   "worst": 0
+   "count": 1438,
+   "win_rate": 59.9,
+   "avg_return": 8.46,
+   "best": 362.09,
+   "worst": -46.11
   }
  }
 }

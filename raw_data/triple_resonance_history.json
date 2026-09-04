@@ -616,7 +616,7 @@
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-09-04 06:34:51"
+    "last_update": "2026-09-04 19:48:36"
   },
   "2026-08-18": [
     {
@@ -1211,7 +1211,7 @@
       "status": "near"
     }
   ],
-  "update_time": "2026-09-04 06:34:51",
+  "update_time": "2026-09-04 19:48:36",
   "2026-08-30": [
     {
       "code": "300475",
@@ -1634,104 +1634,26 @@
   ],
   "2026-09-04": [
     {
-      "code": "688331",
-      "name": "荣昌生物",
-      "market": "sh",
-      "board": "科创板",
-      "close": 133.52,
-      "pct_chg": -0.35,
-      "total_score": 59.0,
-      "quality_grade": "A",
-      "industry": "医药制造业",
-      "sectors": [
-        "医药制造业"
-      ],
-      "signal_count": 2,
-      "status": "near"
-    },
-    {
       "code": "000807",
-      "name": "上海实业环境",
+      "name": "云铝股份",
       "market": "sz",
       "board": "主板",
       "close": 27.38,
       "pct_chg": 3.05,
-      "total_score": 58.4,
+      "total_score": 61.5,
       "quality_grade": "A",
       "industry": "有色金属冶炼和压延加工业",
       "sectors": [
-        "深股通",
         "稀缺资源",
         "深证100R",
-        "2026中报预增",
-        "深成500",
         "有色金属冶炼和压延加工业",
+        "2026中报预增",
         "HS300",
-        "MSCI中国"
-      ],
-      "signal_count": 2,
-      "status": "near"
-    },
-    {
-      "code": "300765",
-      "name": "石药创新",
-      "market": "sz",
-      "board": "创业板",
-      "close": 44.4,
-      "pct_chg": -0.09,
-      "total_score": 57.1,
-      "quality_grade": "A",
-      "industry": "食品制造业",
-      "sectors": [
-        "食品制造业"
-      ],
-      "signal_count": 2,
-      "status": "near"
-    },
-    {
-      "code": "301536",
-      "name": "星宸科技",
-      "market": "sz",
-      "board": "创业板",
-      "close": 128.18,
-      "pct_chg": -1.15,
-      "total_score": 55.3,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "超清视频",
-        "AI眼镜",
-        "2026中报预增",
-        "激光雷达",
-        "计算机、通信和其他电子设备制造业",
-        "电子后视镜",
-        "生物识别",
-        "机构重仓"
-      ],
-      "signal_count": 2,
-      "status": "near"
-    },
-    {
-      "code": "300475",
-      "name": "香农芯创",
-      "market": "sz",
-      "board": "创业板",
-      "close": 175.61,
-      "pct_chg": 4.65,
-      "total_score": 48.4,
-      "quality_grade": "A",
-      "industry": "批发业",
-      "sectors": [
-        "深股通",
-        "2026中报预增",
-        "批发业",
-        "2026一季报预增",
-        "半导体概念",
-        "存储芯片",
         "MSCI中国",
-        "科技风格"
+        "深成500",
+        "深股通"
       ],
-      "signal_count": 1,
+      "signal_count": 2,
       "status": "near"
     }
   ]

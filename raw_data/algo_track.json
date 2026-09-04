@@ -1,16 +1,16 @@
 {
-  "update_time": "2026-09-04 19:57",
+  "update_time": "2026-09-04 20:05",
   "window_days": 90,
   "total_stats": {
     "four_volume": {
-      "tracking": 58,
+      "tracking": 66,
       "history_samples": 0,
       "win_rate": 0,
       "avg_return": 0,
       "exit_target": 0,
       "exit_stop": 0,
       "exit_timeout": 0,
-      "today_signals": 6
+      "today_signals": 11
     }
   },
   "algos": [
@@ -18,14 +18,14 @@
       "algo": "four_volume",
       "display_name": "四量终极",
       "stats": {
-        "tracking": 58,
+        "tracking": 66,
         "history_samples": 0,
         "win_rate": 0,
         "avg_return": 0,
         "exit_target": 0,
         "exit_stop": 0,
         "exit_timeout": 0,
-        "today_signals": 6
+        "today_signals": 11
       },
       "tracking": [
         {
@@ -1128,6 +1128,158 @@
             "period": "daily",
             "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
             "pct_chg": 1.46
+          }
+        },
+        {
+          "code": "688170",
+          "name": "德龙激光",
+          "algo": "four_volume",
+          "list_date": "20260904",
+          "list_date_dashed": "2026-09-04",
+          "entry_price": 61.9,
+          "last_close": 61.9,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260904",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+            "pct_chg": 17.5
+          }
+        },
+        {
+          "code": "300300",
+          "name": "海峡创新",
+          "algo": "four_volume",
+          "list_date": "20260904",
+          "list_date_dashed": "2026-09-04",
+          "entry_price": 9.13,
+          "last_close": 9.13,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260904",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+            "pct_chg": 16.01
+          }
+        },
+        {
+          "code": "300672",
+          "name": "国科微",
+          "algo": "four_volume",
+          "list_date": "20260904",
+          "list_date_dashed": "2026-09-04",
+          "entry_price": 169.98,
+          "last_close": 169.98,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260904",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+            "pct_chg": -9.97
+          }
+        },
+        {
+          "code": "688167",
+          "name": "炬光科技",
+          "algo": "four_volume",
+          "list_date": "20260904",
+          "list_date_dashed": "2026-09-04",
+          "entry_price": 299.5,
+          "last_close": 299.5,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260904",
+          "signal_detail": {
+            "period": "daily",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+            "pct_chg": 5.39
+          }
+        },
+        {
+          "code": "603067",
+          "name": "振华股份",
+          "algo": "four_volume",
+          "list_date": "20260904",
+          "list_date_dashed": "2026-09-04",
+          "entry_price": 39.04,
+          "last_close": 39.04,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260904",
+          "signal_detail": {
+            "period": "60m",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+            "pct_chg": 12.6
+          }
+        },
+        {
+          "code": "600601",
+          "name": "方正科技",
+          "algo": "four_volume",
+          "list_date": "20260904",
+          "list_date_dashed": "2026-09-04",
+          "entry_price": 13.32,
+          "last_close": 13.32,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260904",
+          "signal_detail": {
+            "period": "60m",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 机构金叉 + 主力金叉",
+            "pct_chg": 11.0
+          }
+        },
+        {
+          "code": "688020",
+          "name": "方邦股份",
+          "algo": "four_volume",
+          "list_date": "20260904",
+          "list_date_dashed": "2026-09-04",
+          "entry_price": 135.07,
+          "last_close": 135.07,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260904",
+          "signal_detail": {
+            "period": "60m",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0) + 主力金叉",
+            "pct_chg": 10.48
+          }
+        },
+        {
+          "code": "688403",
+          "name": "汇成股份",
+          "algo": "four_volume",
+          "list_date": "20260904",
+          "list_date_dashed": "2026-09-04",
+          "entry_price": 24.39,
+          "last_close": 24.39,
+          "last_pct": 0.0,
+          "peak_pct": 0.0,
+          "days_in": 0,
+          "appear_count": 1,
+          "last_seen": "20260904",
+          "signal_detail": {
+            "period": "60m",
+            "reason": "游资点火(YZC) + 机构托底(JG) + 广度翻多(GB1≥0) + 主力动量翻多(V6≥0)",
+            "pct_chg": 1.92
           }
         }
       ],

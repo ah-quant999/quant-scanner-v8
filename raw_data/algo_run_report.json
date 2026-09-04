@@ -1,40 +1,20 @@
 {
-  "update_time": "2026-09-04 07:53:49",
-  "run_start": "2026-09-04 05:51:16",
-  "ok": 35,
-  "fail": 7,
+  "update_time": "2026-09-04 22:01:48",
+  "run_start": "2026-09-04 18:25:16",
+  "ok": 43,
+  "fail": 3,
   "failed_scripts": [
-    {
-      "script": "calc_crds.py",
-      "reason": "退出码 1 | ============================================================"
-    },
-    {
-      "script": "generate_top10.py",
-      "reason": "退出码 1 | ============================================================"
-    },
-    {
-      "script": "scripts/ab_universe_backtest.py",
-      "reason": "监督器静默杀(>15min 无输出)"
-    },
-    {
-      "script": "strategy_four_volume_60m.py",
-      "reason": "退出码 1 |    绕开（应急）: TIME_GATE_BYPASS=1 环境变量"
-    },
-    {
-      "script": "strategy_four_volume.py",
-      "reason": "退出码 1 |    绕开（应急）: TIME_GATE_BYPASS=1 环境变量"
-    },
-    {
-      "script": "gen_triple_consensus.py",
-      "reason": "退出码 1 | ============================================================"
-    },
     {
       "script": "auto_run_dn_algorithm.py",
       "reason": "监督器静默杀(>15min 无输出)"
     },
     {
-      "script": "final_recommend.py",
-      "reason": "就绪门控未通过（上游选股输入陈旧/缺失）"
+      "script": "v8/factor_lab_gen.py",
+      "reason": "超时 >30min"
+    },
+    {
+      "script": "factor_lab_backtest.py",
+      "reason": "超时 >30min"
     }
   ],
   "skipped_by_time_gate": []

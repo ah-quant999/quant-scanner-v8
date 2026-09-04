@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-04 06:35:01",
+  "update_time": "2026-09-04 19:48:46",
   "data_date": "update_time",
   "track_start": "2026-08-17",
   "history_days": 14,
@@ -218,9 +218,9 @@
     "best_hold_days": 1,
     "periods": {
       "1d": {
-        "win_rate": 56.9,
-        "avg_return": 0.29,
-        "sharpe": 0.06,
+        "win_rate": 55.7,
+        "avg_return": 0.24,
+        "sharpe": 0.05,
         "count": 287,
         "best": 14.99,
         "worst": -10.02
@@ -234,24 +234,24 @@
         "worst": -10.04
       },
       "5d": {
-        "win_rate": 46.8,
-        "avg_return": -0.23,
-        "sharpe": -0.03,
+        "win_rate": 44.9,
+        "avg_return": -0.45,
+        "sharpe": -0.05,
         "count": 287,
         "best": 15.06,
         "worst": -10.08
       },
       "10d": {
-        "win_rate": 51.6,
-        "avg_return": 0.83,
-        "sharpe": 0.09,
+        "win_rate": 48.9,
+        "avg_return": 0.59,
+        "sharpe": 0.06,
         "count": 287,
         "best": 15.07,
         "worst": -10.08
       },
       "20d": {
-        "win_rate": 48.7,
-        "avg_return": 0.72,
+        "win_rate": 48.5,
+        "avg_return": 0.82,
         "sharpe": 0.09,
         "count": 287,
         "best": 15.07,
@@ -263,17 +263,17 @@
     {
       "band": "≥80",
       "count": 118,
-      "win_rate_5d": 59.8,
-      "avg_ret_5d": 1.87,
-      "best_win_rate": 64.3,
+      "win_rate_5d": 56.4,
+      "avg_ret_5d": 1.59,
+      "best_win_rate": 60.8,
       "best_hold_days": 20
     },
     {
       "band": "70~80",
       "count": 181,
-      "win_rate_5d": 39.9,
-      "avg_ret_5d": -1.47,
-      "best_win_rate": 55.2,
+      "win_rate_5d": 38.5,
+      "avg_ret_5d": -1.64,
+      "best_win_rate": 54.2,
       "best_hold_days": 1
     }
   ],
@@ -281,8 +281,8 @@
     "periods": [
       {
         "period": "1d",
-        "strict_win": 56.9,
-        "strict_ret": 0.29,
+        "strict_win": 55.7,
+        "strict_ret": 0.24,
         "strict_count": 287,
         "loose_win": 0.0,
         "loose_ret": 0.0,
@@ -299,8 +299,8 @@
       },
       {
         "period": "5d",
-        "strict_win": 46.8,
-        "strict_ret": -0.23,
+        "strict_win": 44.9,
+        "strict_ret": -0.45,
         "strict_count": 287,
         "loose_win": 0.0,
         "loose_ret": 0.0,
@@ -308,8 +308,8 @@
       },
       {
         "period": "10d",
-        "strict_win": 51.6,
-        "strict_ret": 0.83,
+        "strict_win": 48.9,
+        "strict_ret": 0.59,
         "strict_count": 287,
         "loose_win": 0.0,
         "loose_ret": 0.0,
@@ -317,8 +317,8 @@
       },
       {
         "period": "20d",
-        "strict_win": 48.7,
-        "strict_ret": 0.72,
+        "strict_win": 48.5,
+        "strict_ret": 0.82,
         "strict_count": 287,
         "loose_win": 0.0,
         "loose_ret": 0.0,

@@ -1,21 +1,21 @@
 window.RPS_BACKTEST = {
- "update_time": "2026-09-04 07:53:47",
+ "update_time": "2026-09-04 21:31:47",
  "summary": {
-  "update_time": "2026-09-04 07:53:47",
-  "total_signals": 70,
-  "calc_time": "2026-09-04 07:53:47",
+  "update_time": "2026-09-04 21:31:47",
+  "total_signals": 72,
+  "calc_time": "2026-09-04 21:31:47",
   "method": "RPS 相对强度 A档历史回测：信号日收盘价买入，持有N个交易日收盘价卖出（不处理节假日，按日历日+1/3/5/10/20）",
   "signal_date_range": "2026-09-03 ~ 2026-09-04",
   "by_period": {
    "1": {
-    "samples": 0,
-    "win_rate": 0,
-    "avg_return": 0,
-    "best_return": 0,
-    "worst_return": 0,
-    "win_avg": 0,
-    "loss_avg": 0,
-    "profit_loss_ratio": 0
+    "samples": 36,
+    "win_rate": 16.67,
+    "avg_return": -2.72,
+    "best_return": 10.0,
+    "worst_return": -10.02,
+    "win_avg": 2.78,
+    "loss_avg": -3.82,
+    "profit_loss_ratio": 0.73
    },
    "3": {
     "samples": 0,
@@ -68,8 +68,8 @@ window.RPS_BACKTEST = {
    "entry_price": 99.83,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -4.37,
+     "exit_price": 95.47,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -102,8 +102,8 @@ window.RPS_BACKTEST = {
    "entry_price": 8.55,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -9.01,
+     "exit_price": 7.78,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -136,8 +136,8 @@ window.RPS_BACKTEST = {
    "entry_price": 91.18,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -5.68,
+     "exit_price": 86.0,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -170,8 +170,8 @@ window.RPS_BACKTEST = {
    "entry_price": 12.67,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -2.92,
+     "exit_price": 12.3,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -204,8 +204,8 @@ window.RPS_BACKTEST = {
    "entry_price": 39.65,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -6.66,
+     "exit_price": 37.01,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -238,8 +238,8 @@ window.RPS_BACKTEST = {
    "entry_price": 35.1,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -0.83,
+     "exit_price": 34.81,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -272,8 +272,8 @@ window.RPS_BACKTEST = {
    "entry_price": 17.33,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -0.75,
+     "exit_price": 17.2,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -306,8 +306,8 @@ window.RPS_BACKTEST = {
    "entry_price": 6.91,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": 2.75,
+     "exit_price": 7.1,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -340,8 +340,8 @@ window.RPS_BACKTEST = {
    "entry_price": 9.09,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -0.77,
+     "exit_price": 9.02,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -374,8 +374,8 @@ window.RPS_BACKTEST = {
    "entry_price": 175.64,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -7.2,
+     "exit_price": 163.0,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -408,8 +408,8 @@ window.RPS_BACKTEST = {
    "entry_price": 39.25,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -7.11,
+     "exit_price": 36.46,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -442,8 +442,8 @@ window.RPS_BACKTEST = {
    "entry_price": 45.8,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": 1.42,
+     "exit_price": 46.45,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -476,8 +476,8 @@ window.RPS_BACKTEST = {
    "entry_price": 45.22,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": 0.0,
+     "exit_price": 45.22,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -510,8 +510,8 @@ window.RPS_BACKTEST = {
    "entry_price": 85.56,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -4.5,
+     "exit_price": 81.71,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -544,8 +544,8 @@ window.RPS_BACKTEST = {
    "entry_price": 46.6,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -1.95,
+     "exit_price": 45.69,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -578,8 +578,8 @@ window.RPS_BACKTEST = {
    "entry_price": 180.36,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -6.2,
+     "exit_price": 169.17,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -612,8 +612,8 @@ window.RPS_BACKTEST = {
    "entry_price": 11.8,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": 1.19,
+     "exit_price": 11.94,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -646,8 +646,8 @@ window.RPS_BACKTEST = {
    "entry_price": 4.42,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -2.94,
+     "exit_price": 4.29,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -680,8 +680,8 @@ window.RPS_BACKTEST = {
    "entry_price": 19.2,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": 10.0,
+     "exit_price": 21.12,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -714,8 +714,8 @@ window.RPS_BACKTEST = {
    "entry_price": 37.5,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": 1.07,
+     "exit_price": 37.9,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -748,8 +748,8 @@ window.RPS_BACKTEST = {
    "entry_price": 8.79,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -8.53,
+     "exit_price": 8.04,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -782,8 +782,8 @@ window.RPS_BACKTEST = {
    "entry_price": 43.0,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -4.21,
+     "exit_price": 41.19,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -816,8 +816,8 @@ window.RPS_BACKTEST = {
    "entry_price": 5.69,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -10.02,
+     "exit_price": 5.12,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -850,8 +850,8 @@ window.RPS_BACKTEST = {
    "entry_price": 44.24,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -0.81,
+     "exit_price": 43.88,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -884,8 +884,8 @@ window.RPS_BACKTEST = {
    "entry_price": 14.26,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -7.78,
+     "exit_price": 13.15,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -918,8 +918,8 @@ window.RPS_BACKTEST = {
    "entry_price": 20.99,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -1.67,
+     "exit_price": 20.64,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -952,8 +952,8 @@ window.RPS_BACKTEST = {
    "entry_price": 4.25,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -7.29,
+     "exit_price": 3.94,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -986,8 +986,8 @@ window.RPS_BACKTEST = {
    "entry_price": 73.93,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -6.76,
+     "exit_price": 68.93,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -1020,8 +1020,8 @@ window.RPS_BACKTEST = {
    "entry_price": 37.0,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -2.27,
+     "exit_price": 36.16,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -1054,8 +1054,8 @@ window.RPS_BACKTEST = {
    "entry_price": 7.03,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": 0.28,
+     "exit_price": 7.05,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -1088,8 +1088,8 @@ window.RPS_BACKTEST = {
    "entry_price": 89.56,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -0.74,
+     "exit_price": 88.9,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -1122,8 +1122,8 @@ window.RPS_BACKTEST = {
    "entry_price": 7.33,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -0.41,
+     "exit_price": 7.3,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -1156,8 +1156,8 @@ window.RPS_BACKTEST = {
    "entry_price": 135.15,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -0.05,
+     "exit_price": 135.08,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -1190,8 +1190,8 @@ window.RPS_BACKTEST = {
    "entry_price": 11.04,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -1.0,
+     "exit_price": 10.93,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -1224,8 +1224,8 @@ window.RPS_BACKTEST = {
    "entry_price": 52.95,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -1.87,
+     "exit_price": 51.96,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -1258,8 +1258,8 @@ window.RPS_BACKTEST = {
    "entry_price": 25.69,
    "periods": {
     "1": {
-     "return_pct": null,
-     "exit_price": null,
+     "return_pct": -0.35,
+     "exit_price": 25.6,
      "exit_date": "2026-09-04"
     },
     "3": {
@@ -1281,6 +1281,1230 @@ window.RPS_BACKTEST = {
      "return_pct": null,
      "exit_price": null,
      "exit_date": "2026-09-23"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "688485",
+   "name": "九州一轨",
+   "entry_price": 95.47,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600664",
+   "name": "哈药股份",
+   "entry_price": 7.78,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "002396",
+   "name": "星网锐捷",
+   "entry_price": 37.01,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300903",
+   "name": "科翔股份",
+   "entry_price": 86.0,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600127",
+   "name": "金健米业",
+   "entry_price": 12.3,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "002084",
+   "name": "海鸥住工",
+   "entry_price": 7.1,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300209",
+   "name": "行云科技",
+   "entry_price": 34.81,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600722",
+   "name": "金牛化工",
+   "entry_price": 17.2,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "688143",
+   "name": "长盈通",
+   "entry_price": 163.0,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600988",
+   "name": "赤峰黄金",
+   "entry_price": 45.69,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "603618",
+   "name": "杭电股份",
+   "entry_price": 36.46,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "003040",
+   "name": "楚天龙",
+   "entry_price": 21.12,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600227",
+   "name": "赤天化",
+   "entry_price": 4.29,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "603186",
+   "name": "华正新材",
+   "entry_price": 169.17,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300759",
+   "name": "康龙化成",
+   "entry_price": 41.19,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600547",
+   "name": "山东黄金",
+   "entry_price": 37.9,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "002437",
+   "name": "誉衡药业",
+   "entry_price": 3.94,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600121",
+   "name": "郑州煤电",
+   "entry_price": 5.12,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300189",
+   "name": "神农种业",
+   "entry_price": 7.05,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600479",
+   "name": "千金药业",
+   "entry_price": 13.15,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300684",
+   "name": "中石科技",
+   "entry_price": 88.9,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "688185",
+   "name": "康希诺",
+   "entry_price": 68.93,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300454",
+   "name": "深信服",
+   "entry_price": 135.08,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300420",
+   "name": "五洋自控",
+   "entry_price": 8.04,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300139",
+   "name": "晓程科技",
+   "entry_price": 51.96,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "601168",
+   "name": "西部矿业",
+   "entry_price": 38.79,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "002716",
+   "name": "湖南白银",
+   "entry_price": 11.22,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "601212",
+   "name": "白银有色",
+   "entry_price": 7.3,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "000560",
+   "name": "我爱我家",
+   "entry_price": 3.15,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600693",
+   "name": "东百集团",
+   "entry_price": 10.93,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "600489",
+   "name": "中金黄金",
+   "entry_price": 25.6,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "301086",
+   "name": "鸿富瀚",
+   "entry_price": 157.43,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "300613",
+   "name": "富瀚微",
+   "entry_price": 72.37,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "002297",
+   "name": "博云新材",
+   "entry_price": 21.32,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "603259",
+   "name": "603259",
+   "entry_price": 153.83,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
+    }
+   }
+  },
+  {
+   "signal_date": "2026-09-04",
+   "entry_trade_date": "2026-09-04",
+   "code": "000977",
+   "name": "浪潮信息",
+   "entry_price": 77.72,
+   "periods": {
+    "1": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-05"
+    },
+    "3": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-07"
+    },
+    "5": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-09"
+    },
+    "10": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-14"
+    },
+    "20": {
+     "return_pct": null,
+     "exit_price": null,
+     "exit_date": "2026-09-24"
     }
    }
   }

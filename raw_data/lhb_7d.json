@@ -1,19 +1,11 @@
 {
-  "update_time": "2026-09-04 02:42:36",
+  "update_time": "2026-09-04 18:25:15",
   "range": [
-    "2026-08-26",
-    "2026-09-03"
+    "2026-08-27",
+    "2026-09-04"
   ],
   "days_count": 7,
   "daily_summary": [
-    {
-      "date": "2026-08-26",
-      "total": 58,
-      "resonance": 0,
-      "inst_only": 1,
-      "yz_only": 6,
-      "north_present": 27
-    },
     {
       "date": "2026-08-27",
       "total": 58,
@@ -61,6 +53,14 @@
       "inst_only": 0,
       "yz_only": 7,
       "north_present": 31
+    },
+    {
+      "date": "2026-09-04",
+      "total": 55,
+      "resonance": 2,
+      "inst_only": 1,
+      "yz_only": 7,
+      "north_present": 30
     }
   ],
   "top_inst_buy": [
@@ -72,16 +72,6 @@
       "north_net": 25783.0,
       "combined_net": 47864.9,
       "days": 1,
-      "resonance_days": 0
-    },
-    {
-      "code": "688828",
-      "name": "国仪公司",
-      "inst_net": 26031.0,
-      "yz_net": -13891.7,
-      "north_net": 0.0,
-      "combined_net": 12139.3,
-      "days": 2,
       "resonance_days": 0
     },
     {
@@ -113,9 +103,29 @@
       "combined_net": 22102.9,
       "days": 2,
       "resonance_days": 0
+    },
+    {
+      "code": "000876",
+      "name": "新希望",
+      "inst_net": 12643.3,
+      "yz_net": -13829.1,
+      "north_net": 4699.5,
+      "combined_net": -1185.8,
+      "days": 1,
+      "resonance_days": 0
     }
   ],
   "top_inst_sell": [
+    {
+      "code": "000977",
+      "name": "浪潮信息",
+      "inst_net": -86270.8,
+      "yz_net": 66514.5,
+      "north_net": 13622.3,
+      "combined_net": -19756.3,
+      "days": 2,
+      "resonance_days": 0
+    },
     {
       "code": "600378",
       "name": "昊华科技",
@@ -127,47 +137,47 @@
       "resonance_days": 0
     },
     {
+      "code": "603256",
+      "name": "宏和科技",
+      "inst_net": -31341.0,
+      "yz_net": -30439.8,
+      "north_net": 19443.3,
+      "combined_net": -61780.8,
+      "days": 1,
+      "resonance_days": 0
+    },
+    {
       "code": "600354",
       "name": "敦煌种业",
       "inst_net": -25313.4,
-      "yz_net": 14341.8,
+      "yz_net": 31039.0,
       "north_net": 0.0,
-      "combined_net": -10971.6,
-      "days": 3,
+      "combined_net": 5725.6,
+      "days": 4,
       "resonance_days": 0
     },
     {
       "code": "002437",
       "name": "誉衡药业",
-      "inst_net": -22990.2,
-      "yz_net": 21736.1,
-      "north_net": -2026.9,
-      "combined_net": -1254.1,
-      "days": 5,
-      "resonance_days": 0
-    },
-    {
-      "code": "603228",
-      "name": "景旺电子",
-      "inst_net": -22159.4,
-      "yz_net": -11654.9,
-      "north_net": 874.0,
-      "combined_net": -33814.3,
-      "days": 1,
-      "resonance_days": 0
-    },
-    {
-      "code": "003040",
-      "name": "楚天龙",
-      "inst_net": -21337.2,
-      "yz_net": 9302.8,
-      "north_net": -2918.0,
-      "combined_net": -12034.4,
+      "inst_net": -23230.0,
+      "yz_net": 32795.1,
+      "north_net": -4327.6,
+      "combined_net": 9565.1,
       "days": 4,
       "resonance_days": 0
     }
   ],
   "top_yz_buy": [
+    {
+      "code": "000977",
+      "name": "浪潮信息",
+      "inst_net": -86270.8,
+      "yz_net": 66514.5,
+      "north_net": 13622.3,
+      "combined_net": -19756.3,
+      "days": 2,
+      "resonance_days": 0
+    },
     {
       "code": "002536",
       "name": "飞龙股份",
@@ -189,13 +199,13 @@
       "resonance_days": 0
     },
     {
-      "code": "000977",
-      "name": "浪潮信息",
-      "inst_net": -8902.4,
-      "yz_net": 54139.2,
-      "north_net": -2966.3,
-      "combined_net": 45236.8,
-      "days": 1,
+      "code": "003040",
+      "name": "楚天龙",
+      "inst_net": -13728.3,
+      "yz_net": 53856.5,
+      "north_net": 17018.0,
+      "combined_net": 40128.2,
+      "days": 4,
       "resonance_days": 0
     },
     {
@@ -207,27 +217,17 @@
       "combined_net": 46635.1,
       "days": 3,
       "resonance_days": 0
-    },
-    {
-      "code": "002015",
-      "name": "协鑫能科",
-      "inst_net": -1343.7,
-      "yz_net": 46672.0,
-      "north_net": 16621.3,
-      "combined_net": 45328.3,
-      "days": 2,
-      "resonance_days": 0
     }
   ],
   "top_yz_sell": [
     {
-      "code": "002412",
-      "name": "汉森制药",
-      "inst_net": 8410.6,
-      "yz_net": -28950.7,
-      "north_net": 0.0,
-      "combined_net": -20540.1,
-      "days": 5,
+      "code": "603256",
+      "name": "宏和科技",
+      "inst_net": -31341.0,
+      "yz_net": -30439.8,
+      "north_net": 19443.3,
+      "combined_net": -61780.8,
+      "days": 1,
       "resonance_days": 0
     },
     {
@@ -251,23 +251,23 @@
       "resonance_days": 0
     },
     {
-      "code": "601208",
-      "name": "东材科技",
-      "inst_net": 2553.8,
-      "yz_net": -22616.4,
-      "north_net": -4049.7,
-      "combined_net": -20062.6,
-      "days": 1,
+      "code": "002412",
+      "name": "汉森制药",
+      "inst_net": 4840.8,
+      "yz_net": -24932.9,
+      "north_net": 0.0,
+      "combined_net": -20092.1,
+      "days": 4,
       "resonance_days": 0
     },
     {
-      "code": "000560",
-      "name": "我爱我家",
-      "inst_net": -4957.0,
-      "yz_net": -18685.6,
-      "north_net": -3052.7,
-      "combined_net": -23642.6,
-      "days": 4,
+      "code": "002742",
+      "name": "冀衡医药",
+      "inst_net": 0.0,
+      "yz_net": -24481.7,
+      "north_net": 0.0,
+      "combined_net": -24481.7,
+      "days": 6,
       "resonance_days": 0
     }
   ],
@@ -293,6 +293,16 @@
       "resonance_days": 1
     },
     {
+      "code": "000592",
+      "name": "平潭发展",
+      "inst_net": 8508.5,
+      "yz_net": 29757.3,
+      "north_net": 10121.7,
+      "combined_net": 38265.8,
+      "days": 1,
+      "resonance_days": 1
+    },
+    {
       "code": "002636",
       "name": "金安国纪",
       "inst_net": 1859.7,
@@ -311,19 +321,19 @@
       "combined_net": 25414.6,
       "days": 1,
       "resonance_days": 1
-    },
-    {
-      "code": "300911",
-      "name": "亿田智能",
-      "inst_net": 15516.9,
-      "yz_net": 6586.0,
-      "north_net": 7656.8,
-      "combined_net": 22102.9,
-      "days": 2,
-      "resonance_days": 0
     }
   ],
   "top_north_buy": [
+    {
+      "code": "600869",
+      "name": "远东股份",
+      "inst_net": 0.0,
+      "yz_net": 9683.4,
+      "north_net": 37659.6,
+      "combined_net": 9683.4,
+      "days": 1,
+      "resonance_days": 0
+    },
     {
       "code": "002297",
       "name": "博云新材",
@@ -345,6 +355,16 @@
       "resonance_days": 0
     },
     {
+      "code": "301171",
+      "name": "易点天下",
+      "inst_net": -1585.2,
+      "yz_net": 6160.0,
+      "north_net": 24132.6,
+      "combined_net": 4574.8,
+      "days": 1,
+      "resonance_days": 0
+    },
+    {
       "code": "300364",
       "name": "中文在线",
       "inst_net": 16202.3,
@@ -352,26 +372,6 @@
       "north_net": 23795.9,
       "combined_net": 19646.7,
       "days": 2,
-      "resonance_days": 0
-    },
-    {
-      "code": "600172",
-      "name": "黄河旋风",
-      "inst_net": 0.0,
-      "yz_net": 5183.7,
-      "north_net": 23053.1,
-      "combined_net": 5183.7,
-      "days": 1,
-      "resonance_days": 0
-    },
-    {
-      "code": "000962",
-      "name": "东方钽业",
-      "inst_net": 5600.3,
-      "yz_net": 5109.7,
-      "north_net": 18051.9,
-      "combined_net": 10710.0,
-      "days": 1,
       "resonance_days": 0
     }
   ],
@@ -397,6 +397,16 @@
       "resonance_days": 0
     },
     {
+      "code": "002491",
+      "name": "通鼎互联",
+      "inst_net": 1237.1,
+      "yz_net": -990.3,
+      "north_net": -22286.0,
+      "combined_net": 246.8,
+      "days": 1,
+      "resonance_days": 0
+    },
+    {
       "code": "002008",
       "name": "大族激光",
       "inst_net": -8861.9,
@@ -404,16 +414,6 @@
       "north_net": -17865.3,
       "combined_net": 21124.2,
       "days": 1,
-      "resonance_days": 0
-    },
-    {
-      "code": "002491",
-      "name": "通鼎互联",
-      "inst_net": -5327.3,
-      "yz_net": 1363.9,
-      "north_net": -17622.6,
-      "combined_net": -3963.4,
-      "days": 2,
       "resonance_days": 0
     },
     {

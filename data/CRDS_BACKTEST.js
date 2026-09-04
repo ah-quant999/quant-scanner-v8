@@ -1,9 +1,9 @@
 window.CRDS_BACKTEST = {
- "update_time": "2026-09-04 07:39:41",
+ "update_time": "2026-09-04 21:17:18",
  "summary": {
-  "update_time": "2026-09-04 07:39:41",
+  "update_time": "2026-09-04 21:17:18",
   "total_signals": 4,
-  "calc_time": "2026-09-04 07:39:41",
+  "calc_time": "2026-09-04 21:17:18",
   "method": "CRDS 逆势龙头 advanced 档历史回测：信号日收盘价买入，持有N个交易日收盘价卖出（不处理节假日，按日历日+1/3/5/10/20）",
   "signal_date_range": "2026-08-01 ~ 2026-08-01",
   "by_period": {

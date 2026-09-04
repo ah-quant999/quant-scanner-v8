@@ -1,17 +1,13 @@
 {
-"update_time": "2026-09-04 07:23:06",
+"update_time": "2026-09-04 20:20:46",
 "total": 9613,
-"new_listings_count": 3,
+"new_listings_count": 0,
 "delisted_count": 0,
-"new_listings": [
-"589430 科创芯片设计ETF华宝",
-"526060 港股通信息技术ETF华...",
-"158011 创业板软件ETF国泰"
-],
+"new_listings": [],
 "delisted": [],
-"meta_enriched": 3,
+"meta_enriched": 0,
 "guard_tripped": false,
 "guard_reasons": [],
-"old_universe": 9610,
+"old_universe": 9613,
 "fresh_universe": 9613
 }
