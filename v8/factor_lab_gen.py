@@ -10,13 +10,15 @@
   raw_data/factor_lab.json + data/FACTOR_LAB.js (window.FACTOR_LAB)
 同一进程内原子 commit + fetch + rebase + push（防止 Nutstore 回退插针）。
 
-数据源：baostock（系统 Python 3.12.8）。断点续跑：缓存存仓库外（Nutstore 碰不到）。
+数据源：baostock。断点续跑：缓存默认存 raw_data/flab_work（随 git 提交，云端/双机共享热缓存）；
+本机可用环境变量 V8_FLAB_WORK 指到仓库外。2026-09-04 云端适配：REPO/WORK 自适应 + 链内跳过自带推送。
 """
 import baostock as bs, json, time, datetime as dt, re, os, subprocess, sys
 
-REPO = "E:/workspace/stock-scanner"
-# 缓存目录放仓库外，避免 Nutstore 把未跟踪文件删掉导致无法续跑
-WORK = "C:/Users/HH20210606/.v8_factor_lab"
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # 自适应：本机 E:/workspace/stock-scanner = 云端 checkout 根（2026-09-04 云端适配，根治硬编码路径致云端必挂）
+# 缓存目录：默认仓库内 raw_data/flab_work（随 git 提交 → 云端/双机共享热缓存，冷启动逐晚收敛）；
+# 本机想放仓库外可用环境变量 V8_FLAB_WORK 覆盖
+WORK = os.environ.get("V8_FLAB_WORK") or os.path.join(REPO, "raw_data", "flab_work")
 if not os.path.exists(WORK):
     os.makedirs(WORK, exist_ok=True)
 OUT_JSON = os.path.join(REPO, "raw_data", "factor_lab.json")
@@ -25,7 +27,9 @@ CACHE_A  = os.path.join(WORK, "flab_abn_cache.json")   # 异常换手率(重点�
 CACHE_R  = os.path.join(WORK, "flab_roe_cache.json")   # ROE 全市场主板
 KL_ABN_START = "2025-06-01"
 KL_AMT_START = "2026-06-01"
-KL_END   = "2026-08-31"
+KL_END   = dt.date.today().strftime("%Y-%m-%d")   # 动态到今日（盘中数据收盘后可得；根治硬编码 2026-08-31 过期）
+ASOF_YM  = KL_END[:7]                              # abn 因子按月刷新标记（ym() 同格式）
+ASOF_Q   = "%dQ%d" % (int(KL_END[:4]), (int(KL_END[5:7]) - 1) // 3 + 1)  # ROE 按季刷新标记
 ROE_YEARS = range(2025, 2027)
 ROE_QTRS  = (1, 2, 3, 4)
 FORCE = "--force" in " ".join(sys.argv)
@@ -157,7 +161,8 @@ def main():
     kcodes = get_key_codes(); log("重点池", len(kcodes))
     a = load_cache(CACHE_A)
     for i, code in enumerate(kcodes):
-        if (not FORCE) and code in a and a[code].get("factor_at") is not None:
+        # 🛡 2026-09-04：按月刷新（asof_ym 标记）——旧版「算过即永久跳过」导致因子冻结在计算当月
+        if (not FORCE) and code in a and a[code].get("factor_at") is not None and a[code].get("asof_ym") == ASOF_YM:
             continue
         name = get_name(code)
         kl = get_kline_abn(code)
@@ -182,6 +187,7 @@ def main():
             "factor_at": round(factor_at, 4) if factor_at is not None else None,
             "roe_ttm": a[code].get("roe_ttm") if code in a else None,
             "size_proxy": round(size, 1) if size else 0.0,
+            "asof_ym": ASOF_YM,
         }
         if (i+1) % 25 == 0:
             save_cache(a, CACHE_A)
@@ -203,7 +209,8 @@ def main():
     mcodes = get_main_universe(); log("主板 universe", len(mcodes))
     r = load_cache(CACHE_R)
     for i, code in enumerate(mcodes):
-        if (not FORCE) and code in r and r[code].get("roe_ttm") is not None and r[code].get("size_proxy"):
+        # 🛡 2026-09-04：按季刷新（asof_q 标记）——季报披露后下一季度自动重算
+        if (not FORCE) and code in r and r[code].get("roe_ttm") is not None and r[code].get("size_proxy") and r[code].get("asof_q") == ASOF_Q:
             continue
         name = get_name(code)
         amt, last = get_kline_amt(code)
@@ -213,6 +220,7 @@ def main():
             "close": round(last, 2) if last is not None else None,
             "roe_ttm": round(roe, 2) if roe is not None else None,
             "size_proxy": round(amt, 1) if amt else 0.0,
+            "asof_q": ASOF_Q,
         }
         if (i+1) % 25 == 0:
             save_cache(r, CACHE_R)
@@ -252,6 +260,12 @@ def main():
     open(OUT_JS, "w", encoding="utf-8").write(js)
 
     # 更新 index.html 的 ?v 缓存戳 + 强制 ROE 段文案为全市场主板口径
+    # ===== 同一进程内原子提交推送（仅本机 standalone 模式；链内由 run_algorithms 统一提交，防双推插针） =====
+    if os.environ.get("V8_IN_CHAIN") == "1":
+        log("链内模式(V8_IN_CHAIN=1)：跳过自带 ?v 改写与 git 推送（链尾 update_v8 统一重戳 ?v + 推送）")
+        bs.logout()
+        log("DONE(in-chain)")
+        return
     try:
         import hashlib
         h = hashlib.sha1(js.encode("utf-8")).hexdigest()[:10]

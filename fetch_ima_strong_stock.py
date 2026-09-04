@@ -20,7 +20,7 @@ import json
 import os
 import re
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 RAW_DIR = os.path.join(ROOT, "raw_data")
@@ -186,7 +186,8 @@ def main():
         return
 
     out = {
-        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        # 🛡 2026-09-04：固定北京时间——云端 runner 是 UTC，旧写法 now() 让卡片把 20:17 显示成 12:17
+        "update_time": datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S"),
         "source": "ima",
         "note_url": args.url,
         "summary": data["summary"],

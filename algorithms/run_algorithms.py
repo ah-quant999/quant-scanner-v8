@@ -36,6 +36,7 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     "v8/backtest_crds.py": 2400,    # 逆势龙头 CRDS 回测：读 crds history + baostock 取 K 线回填收益
     "v8/backtest_rps.py": 1800,     # 相对强度 RPS 回测：读 stock_rps 截面（占位，RPS 为截面指标非信号引擎）
     "factor_lab_backtest.py": 1800,  # 🆕 700日长历史抓取+五分位分层回测（cn ~5min / 云端 ~15min）
+    "v8/factor_lab_gen.py": 5400,    # 🛡 2026-09-04 云端适配：全市场主板 baostock 逐只，冷启动 ~50-90min（缓存随 raw_data/flab_work 入仓逐晚收敛，热缓存后数分钟）
 }
 
 
@@ -750,6 +751,8 @@ def step_run(order=None):
         print(f"  ▶ {script}  ({datetime.now():%H:%M:%S})  [监督执行·静默杀≥{SILENCE_KILL_SEC//60}min]")
         # 2026-09-01 主人令「监督跑算法更先进」：用监督式执行器替代朴素 subprocess.run
         #   —— 实时写心跳 + 静默超时即杀进程续跑（永不再 30~60min 死等单脚本卡死）。
+        # 🛡 2026-09-04：链内脚本统一打标 V8_IN_CHAIN=1（v8/ 独立脚本据此跳过自带 git 推送，防双推插针）
+        os.environ["V8_IN_CHAIN"] = "1"
         # 🛡 2026-09-04：按脚本注入环境变量（SCRIPT_ENV，如 E 回测批让 strategy_four_volume 跑回测模式）
         for _ek, _ev in SCRIPT_ENV.get(script, {}).items():
             os.environ[_ek] = _ev
