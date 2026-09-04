@@ -832,6 +832,56 @@ window.V8_CAL = {weeks:[],legend:[]};
     if(diff === 1) return '昨日 ' + hm;
     return diff + '天前 ' + hm;
   };
+  /* 🛡 2026-09-04 主人令「一劳永逸」：全站「更新于」胶囊内置陈旧度自判。
+     ── 背景（主人 09-04 19:39 提问「盘后数据页每个卡时间都不对…是不是数据也是错的啊」）──
+     多张卡的数据停留在凌晨/前一日批次（如 FACTOR_LAB 停 09-03、CONCEPT_ETF_MAP 停 08-18），
+     胶囊却照常显示时间，主人无法分辨「数据新鲜」还是「批次根本没跑」，
+     只能反复靠截图问 AI「是不是更新链断了」。
+     ── 修法 ──
+     把陈旧判定下沉到 _uBadge()：超过 SLA 的胶囊自动变红并追加「⚠️ 已停更 N 天」。
+     一处改，全站所有走 _uBadge/setBadge 的卡自动生效，无需逐卡改。
+     ── SLA 分档（按 slot 语义，单位：小时）──
+       实时/盘中  → 1.5h（仅交易时段内判定，避免夜间/周末满屏误报）
+       盘前       → 20h（当日 08:25 产出，隔日盘前前仍算新）
+       盘后/收盘后→ 22h（当日收盘后产出，隔日收盘前仍算新）
+       其它/空    → 72h（周级/月级/手动维护类数据兜底）
+  */
+  window._staleSlaHours = function(slot){
+    var s = String(slot||'');
+    if(s.indexOf('实时') >= 0 || s.indexOf('盘中') >= 0) return 1.5;
+    if(s.indexOf('盘前') >= 0) return 20;
+    if(s.indexOf('盘后') >= 0 || s.indexOf('收盘') >= 0) return 22;
+    return 72;
+  };
+  /* 交易时段判定（CST 周一至周五 09:15-15:15）：仅此窗口内才对「实时/盘中」卡做 1.5h SLA 判定 */
+  window._isMarketHoursCST = function(){
+    try{
+      var p = window._cstParts ? window._cstParts(new Date()) : null;
+      if(!p) return false;
+      // _cstParts 不返回 dow，用 UTC 锚定的日历日反推星期（与 CST 日历日一致）
+      var dow = new Date(Date.UTC(p.y, p.m - 1, p.d)).getUTCDay();
+      if(dow === 0 || dow === 6) return false;   // 周末不判陈旧
+      var t = p.hh * 60 + (p.mm || 0);
+      return t >= 555 && t <= 915;                    // 09:15 - 15:15
+    }catch(e){ return false; }
+  };
+  /* 返回 null（无法判定）/ {stale:false} / {stale:true, text:'⚠️ 已停更 N 天', ageH:数值} */
+  window._staleMark = function(ts, slot){
+    try{
+      if(!ts) return null;
+      var d = window._parseAsCST ? window._parseAsCST(ts) : null;
+      if(!d || isNaN(d.getTime())) return null;
+      var ageH = (Date.now() - d.getTime()) / 36e5;
+      if(ageH < 0) return { stale:false, ageH:ageH, text:'' };   // 未来时间：交给 _fmtAshareRel 显示 ⚠️未来
+      var sla = window._staleSlaHours(slot);
+      // 实时/盘中类：非交易时段（收盘后、周末、节假日）不判陈旧，避免夜间与周末满屏红
+      if(sla <= 1.5 && !window._isMarketHoursCST()) return { stale:false, ageH:ageH, text:'' };
+      if(ageH <= sla) return { stale:false, ageH:ageH, text:'' };
+      var days = Math.floor(ageH / 24);
+      var txt = days >= 1 ? ('⚠️ 已停更 ' + days + ' 天') : ('⚠️ 已停更 ' + Math.round(ageH) + ' 小时');
+      return { stale:true, ageH:ageH, text:txt };
+    }catch(e){ return null; }
+  };
 })();
 </script>
 <script>
@@ -852,6 +902,14 @@ function _uBadge(slot, horizon, ts, sub){
   }
   var sHTML = slot ? ' '+slot : '';
   var hHTML = horizon ? ' '+horizon : '';
+  // 🛡 2026-09-04 主人令「一劳永逸」：陈旧度自判下沉到胶囊本体。
+  //   超过 SLA 的数据 → 胶囊变红并追加「⚠️ 已停更 N 天」，让主人一眼区分
+  //   「数据新鲜」与「批次根本没跑」，不再需要靠截图问 AI。全站 _uBadge/setBadge 调用点自动生效。
+  var _st = (window._staleMark && window._staleMark(ts, slot)) || null;
+  if(_st && _st.stale){
+    return '<span title="数据源已超过更新时效（'+(Math.round(_st.ageH*10)/10)+' 小时未刷新），请检查对应抓取/算法任务" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(239,68,68,.14);color:#f87171;border:1px solid rgba(239,68,68,.38);white-space:nowrap">🦊 更新于 '+t+sHTML+hHTML+' '+_st.text+'</span>'
+      + (sub ? ' <span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">' + sub + '</span>' : '');
+  }
   // 统一轻量 pill 风格（与最终推荐 finalStatusBadges 一致）
   return '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);white-space:nowrap">🦊 更新于 '+t+sHTML+hHTML+'</span>'
     + (sub ? ' <span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">' + sub + '</span>' : '');
@@ -4934,7 +4992,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     html += '⚡ <span style="font-weight:700;font-size:14px;color:var(--txt);">强势突破</span>';
     html += '<span style="font-size:10.5px;color:var(--dim);font-weight:600;letter-spacing:.5px;">· ①发现信号</span>'; /* 2026-09-04 主人令·方案乙：角色标签 */
     html += '<span style="font-size:10px;color:#ef5350;font-weight:600;background:rgba(239,83,80,.14);padding:1px 7px;border-radius:4px;">算法自算 · 高手反推 v1</span>';
-    if(typeof _uBadge === 'function') html += _uBadge('盘后','短线',(D.update_time||'').slice(0,16));
+    // 🛡 2026-09-04 一劳永逸：不再 slice(0,16) 截断——完整时间戳交给 _fmtAshareRel 解析，
+    //   截断会让「秒」丢失虽不影响日差计算，但 ISO 串被切成半截属隐患，统一传原值。
+    if(typeof _uBadge === 'function') html += _uBadge('盘后','短线',(D.update_time||''));
     html += '</div>';
     if(D.method) html += '<div style="font-size:11px;color:var(--dim);margin-bottom:8px;line-height:1.6;">口径：'+_e(D.method)+'</div>';
     // 汇总胶囊
@@ -5009,7 +5069,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     html += '<span style="font-size:10.5px;color:var(--dim);font-weight:600;letter-spacing:.5px;">· ②共振确认</span>'; /* 2026-09-04 主人令·方案乙：角色标签 */
     html += '<span style="font-size:10px;color:#a78bfa;font-weight:600;background:rgba(167,139,250,.14);padding:1px 7px;border-radius:4px;">ima 自动同步</span>';
     if(D.note_url) html += '<a href="'+_e(D.note_url)+'" target="_blank" style="font-size:11px;color:#a78bfa;text-decoration:none;">原帖↗</a>';
-    if(typeof _uBadge === 'function') html += _uBadge('盘后','短线',(D.update_time||'').slice(0,16).replace('T',' '));
+    // 🛡 2026-09-04 一劳永逸：同上，不再 slice(0,16)，传完整时间戳给 _fmtAshareRel
+    if(typeof _uBadge === 'function') html += _uBadge('盘后','短线',(D.update_time||''));
     // 已跟踪 N（语义真实，非已入仓）
     html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(167,139,250,.12);color:#a78bfa;border:1px solid rgba(167,139,250,.3);white-space:nowrap">📋 已跟踪 <b style="margin-left:2px">'+(D.stocks?D.stocks.length:0)+'</b></span>';
     if(_reso>0) html += '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(251,191,36,.12);color:#fbbf24;border:1px solid rgba(251,191,36,.3);white-space:nowrap">🏆 高手共振 <b style="margin-left:2px">'+_reso+'</b></span>';
@@ -5121,14 +5182,19 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         + inner
         + '<div style="margin:6px 0 2px;"><span onclick="window.__flPopup(\''+popKind+'\')" style="cursor:pointer;display:inline-block;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600;color:#22d3ee;border:1px solid rgba(34,211,238,.4);background:rgba(34,211,238,.08);">📄 '+popLabel+'</span></div>';
     }
-    var _flStamp = _e(String(D.update_time||'').slice(5,16));
+    // 🛡 2026-09-04 主人令（image#1 真凶·一劳永逸）：原为 slice(5,16) 裸时间戳「🕐 更新 09-03 01:55」，
+    //   既无「昨日/N天前」相对语义（主人误读成"今日凌晨"），也与全站「🦊 更新于 …」胶囊格式不一致。
+    //   现统一走 _uBadge('盘后','中长线', …)：格式与全站一致 + 自动获得「⚠️ 已停更 N 天」陈旧告警。
+    var _flBadge = (typeof _uBadge === 'function')
+      ? _uBadge('盘后', '中长线', D.update_time || '')
+      : '<span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#fb923c;background:rgba(251,146,60,.12);border:1px solid rgba(251,146,60,.3);white-space:nowrap;">🦊 更新于 '+_e(String(D.update_time||'--'))+'</span>';
     var html = ''
       + '<div style="padding:14px 16px;">'
       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
       + '<b style="font-size:15px;">🧪 因子实验室</b>'
       + '<span style="color:#fbbf24;font-size:12px;letter-spacing:1px;">⭐⭐</span>'
       + '<span style="font-size:10px;font-weight:600;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px;">观测仓 · 调试与回测中</span>'
-      + '<span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);white-space:nowrap;">🕐 更新 '+_flStamp+'</span></div>'
+      + _flBadge + '</div>'
       + gateBanner
       + '<div style="font-size:12px;color:var(--dim);margin-bottom:8px;">重点池 '+_e(m.n_universe)+' 只 · 异常换手率有效 '+_e(m.n_at_valid)+' · ROE大市值档 '+_e(m.n_roe_large)+'　'
       + '<span style="color:#22c55e">●</span>缩量强势 <span style="color:#ef5350">●</span>放量弱势</div>'
@@ -9320,7 +9386,7 @@ function drawUpDownChart(){
       h+='</div>';
     }
     $b.innerHTML=h;
-    if($t) $t.innerHTML=_uBadge('收盘后','短线',data.update_time);
+    if($t) $t.innerHTML=_uBadge('盘后','短线',data.update_time);
   }
   window.renderMarketBreadth = renderMarketBreadth;
 
@@ -9528,7 +9594,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 🛡 2026-08-31 一劳永逸：各指标真实公布日已在上方胶囊内逐行展示（如 LPR 08-20）。
     //   顶部时间 pill 改用 MACRO_DATA 文件更新时间（今日盘前已刷新），避免 _fmtAshareRel 把
     //   LPR 月度公布日(08-20)算成「11天前」吓人红字；月度指标本就是最新一档，无需按日龄报警。
-    if($t) $t.innerHTML=_uBadge('收盘后','中长线', d.update_time || (d.monetary&&m.lpr&&m.lpr.date));
+    if($t) $t.innerHTML=_uBadge('盘后','中长线', d.update_time || (d.monetary&&m.lpr&&m.lpr.date));
   }
   window.renderMacroSummary = renderMacroSummary;
 
@@ -9677,7 +9743,7 @@ window.showRestrictedItems = showRestrictedItems;
     h+='<div id="restrictedCalendarTable" style="display:none;"></div>';
     $b.innerHTML=h;
     showRestrictedItems('d7');
-    if($t) $t.innerHTML=_uBadge('收盘后','短线',d.update_time);
+    if($t) $t.innerHTML=_uBadge('盘后','短线',d.update_time);
   }
   window.renderRestrictedCalendar = renderRestrictedCalendar;
 
@@ -9711,7 +9777,7 @@ window.showRestrictedItems = showRestrictedItems;
     h+='<div id="forecastCalendarTable" style="display:none;"></div>';
     $b.innerHTML=h;
     showForecastItems('increase');
-    if($t) $t.innerHTML=_uBadge('收盘后','短线',d.update_time);
+    if($t) $t.innerHTML=_uBadge('盘后','短线',d.update_time);
   }
   window.renderForecastCalendar = renderForecastCalendar;
 
@@ -10159,8 +10225,10 @@ window.showRestrictedItems = showRestrictedItems;
     const slotEl = $('stPoolSlot');
     if(tEl){
       try{
-        tEl.innerHTML = window._uBadge ? window._uBadge('盘后','短线', cand.update_time || '') : ((cand.update_time||'--').slice(0,16).replace('T',' '));
-      }catch(e){ tEl.textContent = (cand.update_time||'--').slice(0,16).replace('T',' '); }
+        // 🛡 2026-09-04 一劳永逸：fallback 亦走 _fmtAshareRel，保持「今日/昨日/N天前」统一语义
+        tEl.innerHTML = window._uBadge ? window._uBadge('盘后','短线', cand.update_time || '')
+          : ((window._fmtAshareRel && window._fmtAshareRel(cand.update_time || '')) || ((cand.update_time||'--').slice(0,16).replace('T',' ')));
+      }catch(e){ tEl.textContent = (window._fmtAshareRel && window._fmtAshareRel(cand.update_time || '')) || (cand.update_time||'--').slice(0,16).replace('T',' '); }
     }
     if(slotEl){
       // 候选股池是 premarket 生成的上游水源；9:30 前显示「盘前·待开盘」更直观
@@ -11836,7 +11904,13 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     var mods = d.modules || [];
     function modulesHtml(){
       var h='<div class="card" style="border-left:4px solid #c4b5fd;">';
-        h+='<h3><span class="ic">🧪</span>实验区·模块去向索引 <span class="fresh">'+(d.update_time||"--")+"</span></h3>";
+        // 🛡 2026-09-04 主人令（一劳永逸）：原为裸时间戳 d.update_time（形如 2026-09-02，无相对语义），
+        //   与全站「🦊 更新于 …」胶囊格式不一致。统一走 _uBadge（slot='手动' → 72h SLA 兜底，
+        //   超期自动变红并追加「⚠️ 已停更 N 天」）。
+        var _idxBadge = (typeof _uBadge === 'function')
+          ? _uBadge('手动', '', d.update_time || '')
+          : '<span class="fresh">'+(d.update_time||'--')+'</span>';
+        h+='<h3><span class="ic">🧪</span>实验区·模块去向索引 '+_idxBadge+"</h3>";
         h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;padding:12px 14px;">';
       mods.forEach(function(m){
         h+='<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;">'
@@ -12174,10 +12248,18 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
         statusEl.innerHTML = '<span class="status-dot s-warn"></span>待扫描';
         return;
       }
-      timeEl.textContent = String(dispTs).slice(0,16).replace('T',' ');
+      // 🛡 2026-09-04 主人令（一劳永逸）：原为 slice(0,16) 裸时间戳「2026-09-03 01:55」，
+      //   缺「今日/昨日/N天前」相对语义，主人多次误读为"今天的"。统一走 _fmtAshareRel。
+      var _relTs = (window._fmtAshareRel ? window._fmtAshareRel(dispTs) : null)
+                   || String(dispTs).slice(0,16).replace('T',' ');
+      // 陈旧（>72h · 运维页按周级兜底）→ 标红，让「批次没跑」一眼可见
+      var _sm = window._staleMark ? window._staleMark(dispTs, '') : null;
+      timeEl.innerHTML = (_sm && _sm.stale)
+        ? '<span style="color:#f87171;font-weight:600">' + _relTs + ' ' + _sm.text + '</span>'
+        : _relTs;
       // 真实数据时间 ≠ 心跳时间时，标注「(数据)」避免误导
       if(realTs && item && item.last_update && String(realTs).slice(0,16) !== String(item.last_update).slice(0,16)){
-        timeEl.textContent += ' (数据)';
+        timeEl.innerHTML += ' (数据)';
       }
       var cls = item ? (item.status==='ok' ? 's-ok' : (item.status==='fail' ? 's-fail' : 's-warn')) : 's-warn';
       var txt = item ? (item.status==='ok' ? '正常' : (item.status==='fail' ? '失败' : '待更新')) : '待扫描';
@@ -12229,7 +12311,9 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       var D = window.FACTOR_LAB;
       var ts = (D && (D.update_time || (D.meta && D.meta.update_time))) || '';
       if(!ts){ timeEl.textContent='--'; statusEl.innerHTML='<span class="status-dot s-warn"></span>待扫描'; return; }
-      timeEl.textContent = String(ts).slice(0,16).replace('T',' ');
+      // 🛡 2026-09-04 主人令（一劳永逸）：统一走 _fmtAshareRel（「昨日 01:55」而非裸「2026-09-03 01:55」）
+      timeEl.textContent = (window._fmtAshareRel ? window._fmtAshareRel(ts) : null)
+                           || String(ts).slice(0,16).replace('T',' ');
       var ageH = (Date.now() - new Date(String(ts).replace(/-/g,'/')).getTime())/36e5;
       // 因子为本地计算、周级刷新，72h 内视为正常
       var cls = ageH < 72 ? 's-ok' : 's-warn';

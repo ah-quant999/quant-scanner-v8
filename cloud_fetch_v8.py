@@ -95,13 +95,17 @@ CATEGORY_MAP = {
     "MARGIN_DATA": "premarket,post_close",
     # 2026-08-31：期指主力合约为盘中实时，放回实时数据页，改为 intraday 抓取
     "CFFEX_HOLDINGS": "intraday",
-    "MACRO_DATA": "premarket",
+    # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：盘后数据页「宏观数据速览」卡读本变量，
+    #   原只标 premarket → 盘后档(17:20/18:20/19:20)根本不抓它，页面却标着「收盘后」语义，
+    #   主人截图质问「盘后数据页每个卡时间都不对」。加 post_close 使盘后必重抓一次。
+    "MACRO_DATA": "premarket,post_close",
     "CRISIS_DATA": "premarket",
     "MACRO_BRIEF": "premarket",
     "JUDGMENT_DATA": "premarket",
     "NORTH_FUND": "premarket",
     "ANALYST_RATINGS": "premarket",
-    "W52_HIGH": "premarket",
+    # 🛡 2026-09-04 同上：盘后数据页「市场宽度 · 新高家数与宽度评分」卡读本变量（52周新高广度）。
+    "W52_HIGH": "premarket,post_close",
     "HERDING_DATA": "premarket",
     # 盘中（含 ETF 三连板、板块资金三连板盘中追热等实时场景）
     "INDEX_QUOTES": "intraday",
@@ -134,8 +138,11 @@ CATEGORY_MAP = {
     "AVG_PRICE_DATA": "intraday",
     "OVERSEAS_MARKETS": "intraday",  # 亚太市场(日经/恒生/KOSPI/台湾)：交易时段实时更新，盘中每轮刷新
     # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告，日频更新即可
-    "RESTRICTED_RELEASE": "premarket",
-    "PERFORMANCE_FORECAST": "premarket",
+    # 🛡 2026-09-04 主人令（一劳永逸·根因修复）：注释写「盘后数据页」却只在盘前抓 —— 语义错配。
+    #   页面把这两张卡标成「收盘后/盘后」，但盘后档不抓 → 卡片永远显示早上那一档的时间。
+    #   加 post_close，使盘后档(17:20/18:20/19:20)必定重抓，与页面语义对齐。
+    "RESTRICTED_RELEASE": "premarket,post_close",
+    "PERFORMANCE_FORECAST": "premarket,post_close",
 }
 
 _ak = None
