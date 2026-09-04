@@ -109,17 +109,20 @@ def fetch_a_daily_gtimg(code, market="sh", bars=250):
     return df
 
 
-def _sina_rank(num=300):
-    """新浪沪深A按成交额排序，最多翻 3 页×200。返回 list[dict]。"""
+def _sina_rank(num=300, node="hs_a"):
+    """新浪按成交额排序，最多翻 3 页×200。返回 list[dict]。
+
+    node 指定板块：hs_a=全市场 / cyb=创业板 / kcb=科创板。
+    """
     arr = []
     page = 1
     while len(arr) < num and page <= 3:
-        url = f"{RANK_API}?page={page}&num=200&sort=amount&asc=0&node=hs_a"
+        url = f"{RANK_API}?page={page}&num=200&sort=amount&asc=0&node={node}"
         try:
             raw = _http(url)
             batch = json.loads(raw)
         except Exception as e:  # noqa: BLE001
-            print(f"  [GTimg] 新浪排行第{page}页失败: {e}")
+            print(f"  [GTimg] 新浪排行第{page}页失败(node={node}): {e}")
             break
         if not batch:
             break
@@ -185,37 +188,59 @@ def _fallback_from_candidate_pool(top_cy, top_kc, top_zb):
 
 
 def fetch_volume_top_stocks_gtimg(top_cy=100, top_kc=100, top_zb=100, top_hk=50):
-    """活跃股池：按成交额排序分流 创业板/科创板/主板。港股暂不支持（返回空）。"""
-    try:
-        rank = _sina_rank(max(top_cy + top_kc + top_zb, 300))
-    except Exception as e:  # noqa: BLE001
-        print(f"  [GTimg] 新浪活跃股排行失败: {e}")
-        rank = []
-    if not rank:
-        print("  [GTimg] 新浪排行无数据，启用候选池兜底...")
-        return _fallback_from_candidate_pool(top_cy, top_kc, top_zb)
+    """活跃股池：分板块取数（创业板=cyb / 科创板=kcb / 主板=hs_a），避免主板在「全市场按成交额排序」中挤占创业/科创名额。
+
+    港股暂不支持（返回空）。
+    """
+    def _split(rank):
+        cy, kc, zb = [], [], []
+        for x in rank:
+            sym = (x.get("symbol") or "").lower()
+            code = sym[2:] if sym.startswith(("sh", "sz")) else sym
+            if not code.isdigit():
+                continue
+            market = "sh" if sym.startswith("sh") else "sz"
+            name = x.get("name") or code
+            try:
+                to = float(x.get("turnoverratio") or 0)
+            except Exception:  # noqa: BLE001
+                to = 0.0
+            if code.startswith(("300", "301")):
+                cy.append((code, name, market, "创业板", 0, to, 0, "混合"))
+            elif code.startswith(("688", "689")):
+                kc.append((code, name, market, "科创板", 0, to, 0, "混合"))
+            else:
+                zb.append((code, name, market, "主板", 0, to, 0, "混合"))
+        return cy, kc, zb
+
+    # 2026-09-04 修复：分板块取数，杜绝主板挤占创业/科创名额。
+    # 旧逻辑 _sina_rank(300) 全市场只取前 300，前 300 里创业+科创合计仅 ~65 只 →
+    # 分流后 cy/kc 不足 100 → 前端「观测候选股池」标黄（误报）。
     cy, kc, zb = [], [], []
-    for x in rank:
-        sym = (x.get("symbol") or "").lower()
-        code = sym[2:] if sym.startswith(("sh", "sz")) else sym
-        if not code.isdigit():
-            continue
-        market = "sh" if sym.startswith("sh") else "sz"
-        name = x.get("name") or code
+    try:
+        cy = _split(_sina_rank(top_cy, node="cyb"))[0]
+    except Exception as e:  # noqa: BLE001
+        print(f"  [GTimg] 创业板排行失败: {e}")
+    try:
+        kc = _split(_sina_rank(top_kc, node="kcb"))[1]
+    except Exception as e:  # noqa: BLE001
+        print(f"  [GTimg] 科创板排行失败: {e}")
+    try:
+        # 主板无单一节点：合并沪市(sh_a)+深市(sz_a)活跃榜，过滤掉创业/科创后取前 top_zb。
+        # （hs_a 全市场每页仅 100 只、主板占 ~62，不足以取满；两市分取可稳定得 ~120 主板）
+        zb_rank = _sina_rank(top_zb, node="sh_a") + _sina_rank(top_zb, node="sz_a")
+        zb = _split(zb_rank)[2]
+    except Exception as e:  # noqa: BLE001
+        print(f"  [GTimg] 主板排行失败(sh_a+sz_a)，回退 hs_a: {e}")
         try:
-            to = float(x.get("turnoverratio") or 0)
-        except Exception:  # noqa: BLE001
-            to = 0.0
-        if code.startswith(("300", "301")):
-            cy.append((code, name, market, "创业板", 0, to, 0, "混合"))
-        elif code.startswith(("688", "689")):
-            kc.append((code, name, market, "科创板", 0, to, 0, "混合"))
-        else:
-            zb.append((code, name, market, "主板", 0, to, 0, "混合"))
+            zb = _split(_sina_rank(max(top_zb, 300), node="hs_a"))[2]
+        except Exception as e2:  # noqa: BLE001
+            print(f"  [GTimg] 主板排行失败: {e2}")
+
     stocks = cy[:top_cy] + kc[:top_kc] + zb[:top_zb]
     print(f"  [GTimg] 活跃股池: 创业{len(cy[:top_cy])} 科创{len(kc[:top_kc])} 主板{len(zb[:top_zb])}")
 
-    # 部分板块为空（排行页翻页中断等）→ 用候选池补齐缺失板块，不覆盖已抓到的
+    # 部分板块为空（节点不可达等）→ 用候选池补齐缺失板块，不覆盖已抓到的
     missing = [b for b, lst in (("创业板", cy), ("科创板", kc), ("主板", zb)) if not lst]
     if missing:
         print(f"  [GTimg] 板块缺失 {missing}，候选池补齐...")
