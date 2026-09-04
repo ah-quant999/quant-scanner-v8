@@ -4397,8 +4397,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);">代码</th>';
         html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);">名称</th>';
         html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);">信号</th>';
-        html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);">行业</th>';
-        html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);" title="板块净流入最优概念置顶；悬停显示全部概念（来自 STOCK_PROFILE 全量档案）">概念</th>';
+        html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);" title="行业·板块最优概念置顶·其余概念前1；悬停显示全部概念（STOCK_PROFILE 全量档案）">行业·概念</th>';
         html += '<th style="padding:7px 8px;text-align:right;color:var(--gold);">精选分</th>';
         html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);" title="algo 入选日期 = 入场时间">入场时间</th>';
         html += '<th style="padding:7px 8px;text-align:right;color:var(--gold);" title="从 algo 入选那天起到当前的累计涨幅（基准 entry_price）">入场以来</th>';
@@ -4425,12 +4424,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var _conceptsAll = (Array.isArray(_prof.concepts) && _prof.concepts.length) ? _prof.concepts.slice() : (it.concept_top ? [it.concept_top] : []);
           var _topConcept = it.concept_top || '';
           if(_topConcept){ _conceptsAll = [_topConcept].concat(_conceptsAll.filter(function(c){ return c && c !== _topConcept; })); }
-          var _conceptTip = '行业：' + _industry + '（共 ' + _conceptsAll.length + ' 个概念）';
+          var _conceptTip = '共 ' + _conceptsAll.length + ' 个概念（行业：' + _industry + '）';
           if(_topConcept && (typeof _secNet==='number')) _conceptTip += '\n板块净流入 ' + (_secNet>0?'+':'') + _secNet.toFixed(1) + ' 亿';
           if(_conceptsAll.length) _conceptTip += '\n' + _conceptsAll.join(' · ');
           var _showConcepts = _conceptsAll.slice(0, 2);
           var _extraCnt = _conceptsAll.length - _showConcepts.length;
-          var _conceptHtml = _showConcepts.map(function(c, i){
+          var _conceptHtml = '<span style="color:var(--sub);font-weight:700;">'+_esc(_industry)+'</span>';
+          if(_conceptHtml) _conceptHtml += '<span style="color:var(--dim);"> · </span>';
+          _conceptHtml += _showConcepts.map(function(c, i){
             var _col = (i === 0 && _topConcept) ? conceptColor : 'var(--txt)';
             var _bold = (i === 0 && _topConcept) ? '800' : '500';
             return '<span style="color:'+_col+';font-weight:'+_bold+';">'+_esc(c)+'</span>';
@@ -4441,8 +4442,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           html += '<td style="padding:6px 8px;color:var(--txt);font-weight:700;font-size:12.5px;font-family:ui-monospace,monospace;white-space:nowrap;">'+_esc(_code)+'</td>';
           html += '<td style="padding:6px 8px;color:var(--txt);font-weight:600;white-space:nowrap;">'+_esc(_name)+' '+_resoBadge(_code)+'</td>';
           html += '<td style="padding:6px 8px;color:'+sigColor+';font-weight:600;">'+_esc(it.signal_type||'')+'</td>';
-          html += '<td style="padding:6px 8px;color:var(--sub);font-weight:600;white-space:nowrap;">'+_esc(_industry)+'</td>';
-          html += '<td style="padding:6px 8px;font-size:12px;min-width:180px;" title="'+_esc(_conceptTip).replace(/"/g,'&quot;').replace(/'/g,'&#39;')+'">'+_conceptHtml+'</td>';
+          html += '<td style="padding:6px 8px;font-size:12px;min-width:200px;" title="'+_esc(_conceptTip).replace(/"/g,'&quot;').replace(/'/g,'&#39;')+'">'+_conceptHtml+'</td>';
           html += '<td style="padding:6px 8px;text-align:right;color:var(--gold);font-weight:800;font-size:13px;">'+(_selScore>0?'+':'')+_selScore.toFixed(1)+'</td>';
           html += '<td style="padding:6px 8px;color:var(--txt);font-weight:600;white-space:nowrap;" title="入选价 '+((typeof it.entry_price==='number')?it.entry_price.toFixed(2):'—')+'">'+_esc(_entryLabel)+'</td>';
           html += '<td style="padding:6px 8px;text-align:right;font-weight:800;font-size:13.5px;color:'+periodColor+';">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</td>';
