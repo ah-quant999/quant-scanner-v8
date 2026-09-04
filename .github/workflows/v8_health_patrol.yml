@@ -30,7 +30,11 @@ on:
   workflow_run:
     workflows:
       - "🇨🇳 v8 中国数据抓取(云端)"
-      - "☁️ v8 盘后算法链(云端)"
+      # 🔴 2026-09-04 主人令(风暴根治·刀1): 移除「☁️ v8 盘后算法链(云端)」——
+      #   algo_cloud 每轮完成(哪怕被静默闸门秒退)都会触发 patrol, patrol 自愈又派
+      #   algo_cloud, 形成「algo秒退→workflow_run触发patrol→heal派发→algo」自激励
+      #   闭环(实测 CST 12:23-13:00 十八连发, 2 分钟一轮)。patrol 改由 cn_fetch
+      #   (30min cron)完成事件 + 自身 schedule(30min) 驱动。
       # 注：build_deploy 自身已跑 health_check + 自愈，patrol 不再对其重复巡检，省 PAT（避免双跑 health_check）
     types: [completed]
     branches: [main]

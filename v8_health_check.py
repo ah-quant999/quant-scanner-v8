@@ -709,6 +709,15 @@ def _dispatch_algo_run(picking_only=False):
     #   v8_algo_cloud 的交易日历 gate 会跳过算法链 step7（实证 08-22 03:2x 一批 run 全 skipped 秒退）
     if not _is_trading_day(date.today()):
         return True, "非交易日（周末/节假日），跳过 algo_run 派发", False
+    # 🔴 2026-09-04 主人令(风暴根治·刀2): algo_cloud 产出为盘后数据, 盘中派发必被
+    #   静默闸门 V5 秒退(内容级收敛), 派发=纯风暴燃料(12:23-13:00 十八连发实锤——
+    #   原 18:00 闸门只拦 picking_only, 混入非选股卡即绕过)。仅 16:00-21:30 CST
+    #   允许 heal 派发 algo_cloud(盘后产出窗口)。
+    _cst_now = now_cst()
+    _cst_min = _cst_now.hour * 60 + _cst_now.minute
+    if not (16 * 60 <= _cst_min <= 21 * 60 + 30):
+        return True, (f"当前 {_cst_now.strftime('%H:%M')} 非盘后产出窗口(16:00-21:30)，"
+                      "跳过 algo_run 派发（防风暴·2026-09-04 主人令）"), False
     # 🔴 2026-08-22 根因⑨（主人令）：选股类卡片在 18:00 前派发 = 空转——
     #   run_algorithms 的 18:00 时间闸会把 20+ 选股脚本全跳过（实证 15:34/15:46/15:50
     #   三轮 success 却零产出）。仅当触发原因全为选股类且未到 18:00 才拦；
@@ -726,6 +735,23 @@ def _dispatch_algo_run(picking_only=False):
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
     }
+    # 🔴 2026-09-04 主人令(风暴根治·刀3): 用 GitHub 事实状态做去抖——本地锁随 runner
+    #   workspace 丢弃、锁推送与高频数据管线竞态大量丢失(实测 18 连发穿过 25min 去抖)。
+    #   改查最近 runs: HEAL_DEBOUNCE_MIN 分钟内已有本 workflow 的 run(无论状态)即跳过。
+    try:
+        _runs_url = f"https://api.github.com/repos/{REPO}/actions/workflows/{ALGO_RUN_WORKFLOW_ID}/runs?per_page=5"
+        _recent = json.loads(urllib.request.urlopen(
+            urllib.request.Request(_runs_url, headers=headers), timeout=30).read()).get("workflow_runs", [])
+        from datetime import datetime as _dt, timezone as _tz
+        for _r in _recent:
+            _rc = _dt.strptime(_r["created_at"][:19], "%Y-%m-%dT%H:%M:%S").replace(tzinfo=_tz.utc)
+            _age_min = (_dt.now(_tz.utc) - _rc).total_seconds() / 60
+            if _age_min < HEAL_DEBOUNCE_MIN:
+                return True, (f"最近 {HEAL_DEBOUNCE_MIN} 分钟内已有 algo_run "
+                              f"(created {_r['created_at']}, {_r['status']})，跳过派发"
+                              "（API 事实去抖·2026-09-04 主人令）"), False
+    except Exception as _e:
+        print(f"[WARN] algo_run API 事实去抖查询失败(保守放行): {_e}")
     pending, since = _has_pending_run(ALGO_RUN_WORKFLOW_ID, headers)
     if pending:
         return True, f"已有排队中的 algo_run 运行(created {since})，跳过派发（避免顶掉该 pending run）", False
