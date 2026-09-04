@@ -54,6 +54,13 @@ on:
         description: '绕过选股时间守门(应急:凌晨/盘前补跑用，默认关，勾选即放行)'
         type: boolean
         default: false
+      stage:
+        # 2026-09-04 dispatch 分批改造（主人令，防风暴查证通过后实施）：与 cn 链
+        # v8_algo_run.yml 的 stage 入参对齐——留空=按北京时间小时自动分派，
+        # A=采集 B=选股 D=汇总 E=回测，all=全链应急。
+        description: '批次(留空=按北京时间小时自动分派)：A=采集 B=选股 D=汇总 E=回测 all=全链应急'
+        type: string
+        default: ''
 
 permissions:
   contents: write
@@ -464,16 +471,32 @@ jobs:
         timeout-minutes: 320
         run: |
           set +e
-          # 🔴 2026-09-02 主人令「分批跑」：schedule 触发按 CST 小时分派 stage；手动/dispatch 跑全链
+          # 🔴 2026-09-02 主人令「分批跑」：schedule 触发按 CST 小时分派 stage。
+          # 🔴 2026-09-04 dispatch 分批改造（主人令，防风暴查证通过后实施）：
+          #   此前 dispatch/repository_dispatch 一律跑全链 9-12h——slot_scheduler 兜底派发
+          #   每轮都是全链（job 360min 上限大概率被掐断白跑，FINAL_RECOMMEND 曾拖到 05:37）。
+          #   现改为：inputs.stage 显式指定优先（all=全链应急，repository_dispatch 可带
+          #   client_payload.stage）；未指定时 schedule 与 dispatch/repo_dispatch 一律按
+          #   CST 小时进批。不新增任何派发者（slot_scheduler/patrol 节拍与三重防风暴
+          #   闸门不变），只改派发产物的 run 形态（9-12h 全链 → 1-2h 批次）。
+          #   22/23 及夜间小时不进批（防 20:00 D 批漂移到 23:0x 后按小时误进 E 批、
+          #   当晚 final_recommend 丢失），仍全链兜底。
           STAGE=""
-          if [ "${GITHUB_EVENT_NAME}" = "schedule" ]; then
-            HH=$(TZ=Asia/Shanghai date +%H)
+          HH=$(TZ=Asia/Shanghai date +%H)
+          IN_STAGE="$(printf '%s' "${{ github.event.inputs.stage || github.event.client_payload.stage || '' }}" | tr -cd 'A-Za-z' | tr 'a-z' 'A-Z')"
+          if [ -n "$IN_STAGE" ]; then
+            case "$IN_STAGE" in
+              A|B|D|E) STAGE="$IN_STAGE" ;;
+              ALL)     STAGE="" ;;   # 显式全链应急
+              *)       STAGE="" ;;
+            esac
+          else
             case "$HH" in
               16|17) STAGE=A ;;   # 16:40 采集批
-              18)    STAGE=B ;;   # 18:10 选股批
+              18|19) STAGE=B ;;   # 18:10 选股批（含 19 点漂移补跑）
               20)    STAGE=D ;;   # 20:00 汇总批(factor_lab_gen + final_recommend)
               21)    STAGE=E ;;   # 21:00 回测批（最终推荐上线后，2026-09-04 时序重排）
-              *)     STAGE="" ;;   # 小时漂移兜底：跑全链
+              *)     STAGE="" ;;  # 小时漂移/夜间兜底：跑全链
             esac
           fi
           echo "🎯 event=${GITHUB_EVENT_NAME} CST=${HH:-?} → stage=${STAGE:-ALL}"
