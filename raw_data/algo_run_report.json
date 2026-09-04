@@ -1,16 +1,20 @@
 {
-  "update_time": "2026-09-04 22:01:48",
-  "run_start": "2026-09-04 18:25:16",
+  "update_time": "2026-09-05 01:05:06",
+  "run_start": "2026-09-04 22:05:55",
   "ok": 43,
-  "fail": 3,
+  "fail": 4,
   "failed_scripts": [
     {
-      "script": "auto_run_dn_algorithm.py",
-      "reason": "监督器静默杀(>15min 无输出)"
+      "script": "calc_sentiment_cycle.py",
+      "reason": "退出码 1 | TypeError: '<' not supported between instances of 'list' and 'int'"
     },
     {
       "script": "v8/factor_lab_gen.py",
       "reason": "超时 >30min"
+    },
+    {
+      "script": "v8/backtest_rps.py",
+      "reason": "监督器静默杀(>15min 无输出)"
     },
     {
       "script": "factor_lab_backtest.py",

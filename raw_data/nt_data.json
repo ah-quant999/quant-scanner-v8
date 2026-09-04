@@ -1,17 +1,17 @@
 {
-  "update_time": "2026-09-04 19:50",
+  "update_time": "2026-09-04 23:11",
   "alerts": [
     {
       "type": "summary",
       "severity": "medium",
       "message": "ETF监测中，3涨9跌",
-      "time": "19:50"
+      "time": "23:11"
     },
     {
       "type": "etf",
       "severity": "medium",
       "message": "酒ETF 大涨 3.09%",
-      "time": "19:51"
+      "time": "23:12"
     }
   ],
   "etfFlow": {

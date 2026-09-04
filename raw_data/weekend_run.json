@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-09-04 20:20:46",
-  "generated": "2026-09-04 20:20:46",
+  "update_time": "2026-09-04 23:38:35",
+  "generated": "2026-09-04 23:38:35",
   "period_start": "2026-08-24",
   "period_end": "2026-08-30",
   "stats": {
@@ -16,7 +16,7 @@
       "file": "lhb_data.json",
       "label": "龙虎榜",
       "status": "ok",
-      "update_time": "2026-09-04 18:15:46",
+      "update_time": "2026-09-04 21:05:03",
       "size_kb": 21.7
     },
     {
@@ -30,7 +30,7 @@
       "file": "top10_daily.json",
       "label": "全站精选",
       "status": "ok",
-      "update_time": "2026-09-04 18:52:45",
+      "update_time": "2026-09-04 22:36:03",
       "size_kb": 29.2
     },
     {
@@ -43,8 +43,8 @@
       "file": "sector_rs.json",
       "label": "板块相对强度",
       "status": "ok",
-      "update_time": "2026-09-04 18:17",
-      "size_kb": 72.1
+      "update_time": "2026-09-04 21:06",
+      "size_kb": 72.0
     },
     {
       "file": "final_recommend.json",
@@ -64,7 +64,7 @@
       "file": "candidate.json",
       "label": "候选池",
       "status": "ok",
-      "update_time": "2026-09-04 18:21:11",
+      "update_time": "2026-09-04 21:11:03",
       "size_kb": 243.5
     },
     {
@@ -77,7 +77,7 @@
       "file": "crds_card_data.json",
       "label": "逆势龙头",
       "status": "ok",
-      "update_time": "2026-09-04 18:42:10",
+      "update_time": "2026-09-04 22:25:45",
       "size_kb": 0.4
     }
   ],

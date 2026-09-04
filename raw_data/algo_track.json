@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-04 20:05",
+  "update_time": "2026-09-04 23:20",
   "window_days": 90,
   "total_stats": {
     "four_volume": {
@@ -38,7 +38,7 @@
           "last_close": 37.8,
           "last_pct": -7.58,
           "peak_pct": 3.81,
-          "days_in": 53,
+          "days_in": 54,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -57,7 +57,7 @@
           "last_close": 125.42,
           "last_pct": -16.93,
           "peak_pct": 10.0,
-          "days_in": 53,
+          "days_in": 54,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -76,7 +76,7 @@
           "last_close": 57.94,
           "last_pct": -11.03,
           "peak_pct": 3.81,
-          "days_in": 53,
+          "days_in": 54,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -95,7 +95,7 @@
           "last_close": 106.92,
           "last_pct": -12.4,
           "peak_pct": 0.98,
-          "days_in": 53,
+          "days_in": 54,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -114,7 +114,7 @@
           "last_close": 51.04,
           "last_pct": -9.6,
           "peak_pct": 1.31,
-          "days_in": 53,
+          "days_in": 54,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -133,7 +133,7 @@
           "last_close": 127.16,
           "last_pct": -11.22,
           "peak_pct": 10.18,
-          "days_in": 53,
+          "days_in": 54,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -152,7 +152,7 @@
           "last_close": 18.64,
           "last_pct": -24.99,
           "peak_pct": 0.0,
-          "days_in": 51,
+          "days_in": 52,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -171,7 +171,7 @@
           "last_close": 5.18,
           "last_pct": -2.08,
           "peak_pct": 18.53,
-          "days_in": 51,
+          "days_in": 52,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -190,7 +190,7 @@
           "last_close": 34.0,
           "last_pct": -21.22,
           "peak_pct": 0.0,
-          "days_in": 51,
+          "days_in": 52,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -209,7 +209,7 @@
           "last_close": 37.01,
           "last_pct": 12.25,
           "peak_pct": 22.41,
-          "days_in": 51,
+          "days_in": 52,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -228,7 +228,7 @@
           "last_close": 240.0,
           "last_pct": 1.78,
           "peak_pct": 7.53,
-          "days_in": 51,
+          "days_in": 52,
           "appear_count": 1,
           "last_seen": "20260816",
           "signal_detail": {
@@ -247,7 +247,7 @@
           "last_close": 193.78,
           "last_pct": -11.52,
           "peak_pct": 0.0,
-          "days_in": 50,
+          "days_in": 51,
           "appear_count": 1,
           "last_seen": "20260817",
           "signal_detail": {
@@ -266,7 +266,7 @@
           "last_close": 81.2,
           "last_pct": -18.62,
           "peak_pct": 3.64,
-          "days_in": 50,
+          "days_in": 51,
           "appear_count": 1,
           "last_seen": "20260817",
           "signal_detail": {
@@ -285,7 +285,7 @@
           "last_close": 20.06,
           "last_pct": -14.38,
           "peak_pct": 0.81,
-          "days_in": 50,
+          "days_in": 51,
           "appear_count": 1,
           "last_seen": "20260817",
           "signal_detail": {
@@ -304,7 +304,7 @@
           "last_close": 88.9,
           "last_pct": -8.35,
           "peak_pct": 0.0,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260819",
           "signal_detail": {
@@ -323,7 +323,7 @@
           "last_close": 84.23,
           "last_pct": -24.34,
           "peak_pct": 0.0,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260819",
           "signal_detail": {
@@ -342,7 +342,7 @@
           "last_close": 169.17,
           "last_pct": -8.72,
           "peak_pct": 0.0,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260819",
           "signal_detail": {
@@ -361,7 +361,7 @@
           "last_close": 82.89,
           "last_pct": -12.39,
           "peak_pct": 2.29,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -380,7 +380,7 @@
           "last_close": 147.2,
           "last_pct": -19.63,
           "peak_pct": 0.0,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -399,7 +399,7 @@
           "last_close": 38.34,
           "last_pct": -12.43,
           "peak_pct": 7.47,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -418,7 +418,7 @@
           "last_close": 15.36,
           "last_pct": -7.19,
           "peak_pct": 12.75,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -437,7 +437,7 @@
           "last_close": 62.22,
           "last_pct": -2.17,
           "peak_pct": 8.02,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -456,7 +456,7 @@
           "last_close": 127.16,
           "last_pct": -15.42,
           "peak_pct": 3.35,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -475,7 +475,7 @@
           "last_close": 324.8,
           "last_pct": -22.12,
           "peak_pct": 1.12,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -494,7 +494,7 @@
           "last_close": 354.71,
           "last_pct": -15.95,
           "peak_pct": 3.57,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -513,7 +513,7 @@
           "last_close": 361.29,
           "last_pct": -11.22,
           "peak_pct": 1.98,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -532,7 +532,7 @@
           "last_close": 114.0,
           "last_pct": -14.93,
           "peak_pct": 4.34,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -551,7 +551,7 @@
           "last_close": 31.7,
           "last_pct": -9.89,
           "peak_pct": 2.05,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -570,7 +570,7 @@
           "last_close": 33.41,
           "last_pct": -7.61,
           "peak_pct": 5.92,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -589,7 +589,7 @@
           "last_close": 28.77,
           "last_pct": -27.59,
           "peak_pct": 4.46,
-          "days_in": 49,
+          "days_in": 50,
           "appear_count": 1,
           "last_seen": "20260818",
           "signal_detail": {
@@ -608,7 +608,7 @@
           "last_close": 163.02,
           "last_pct": -13.13,
           "peak_pct": 0.0,
-          "days_in": 43,
+          "days_in": 44,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -627,7 +627,7 @@
           "last_close": 45.43,
           "last_pct": -1.62,
           "peak_pct": 0.0,
-          "days_in": 43,
+          "days_in": 44,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -646,7 +646,7 @@
           "last_close": 17.49,
           "last_pct": -23.82,
           "peak_pct": 0.0,
-          "days_in": 43,
+          "days_in": 44,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -665,7 +665,7 @@
           "last_close": 57.62,
           "last_pct": -14.46,
           "peak_pct": 0.0,
-          "days_in": 43,
+          "days_in": 44,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -684,7 +684,7 @@
           "last_close": 29.88,
           "last_pct": -17.37,
           "peak_pct": 0.0,
-          "days_in": 43,
+          "days_in": 44,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -703,7 +703,7 @@
           "last_close": 814.0,
           "last_pct": -13.68,
           "peak_pct": 0.0,
-          "days_in": 35,
+          "days_in": 36,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -722,7 +722,7 @@
           "last_close": 58.24,
           "last_pct": 9.17,
           "peak_pct": 9.41,
-          "days_in": 35,
+          "days_in": 36,
           "appear_count": 1,
           "last_seen": "20260821",
           "signal_detail": {
@@ -741,7 +741,7 @@
           "last_close": 19.2,
           "last_pct": -3.18,
           "peak_pct": 0.0,
-          "days_in": 35,
+          "days_in": 36,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -760,7 +760,7 @@
           "last_close": 118.43,
           "last_pct": -13.42,
           "peak_pct": 0.0,
-          "days_in": 34,
+          "days_in": 35,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -779,7 +779,7 @@
           "last_close": 137.5,
           "last_pct": -8.78,
           "peak_pct": 1.76,
-          "days_in": 34,
+          "days_in": 35,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -798,7 +798,7 @@
           "last_close": 164.85,
           "last_pct": -7.04,
           "peak_pct": 1.67,
-          "days_in": 34,
+          "days_in": 35,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -817,7 +817,7 @@
           "last_close": 279.0,
           "last_pct": -13.34,
           "peak_pct": 0.0,
-          "days_in": 34,
+          "days_in": 35,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -836,7 +836,7 @@
           "last_close": 405.48,
           "last_pct": -20.51,
           "peak_pct": 0.0,
-          "days_in": 34,
+          "days_in": 35,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -855,7 +855,7 @@
           "last_close": 46.13,
           "last_pct": -8.98,
           "peak_pct": 2.98,
-          "days_in": 34,
+          "days_in": 35,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -874,7 +874,7 @@
           "last_close": 121.17,
           "last_pct": -7.56,
           "peak_pct": 0.0,
-          "days_in": 34,
+          "days_in": 35,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -893,7 +893,7 @@
           "last_close": 45.35,
           "last_pct": -8.11,
           "peak_pct": 1.52,
-          "days_in": 34,
+          "days_in": 35,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -912,7 +912,7 @@
           "last_close": 111.5,
           "last_pct": -11.15,
           "peak_pct": 0.0,
-          "days_in": 34,
+          "days_in": 35,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -931,7 +931,7 @@
           "last_close": 26.78,
           "last_pct": -7.4,
           "peak_pct": 0.0,
-          "days_in": 32,
+          "days_in": 33,
           "appear_count": 1,
           "last_seen": "20260831",
           "signal_detail": {
@@ -950,7 +950,7 @@
           "last_close": 25.71,
           "last_pct": -5.76,
           "peak_pct": 3.78,
-          "days_in": 25,
+          "days_in": 26,
           "appear_count": 1,
           "last_seen": "20260901",
           "signal_detail": {
@@ -969,7 +969,7 @@
           "last_close": 4.81,
           "last_pct": -5.69,
           "peak_pct": 0.0,
-          "days_in": 20,
+          "days_in": 21,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -988,7 +988,7 @@
           "last_close": 42.54,
           "last_pct": 0.31,
           "peak_pct": 1.74,
-          "days_in": 17,
+          "days_in": 18,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1007,7 +1007,7 @@
           "last_close": 8.14,
           "last_pct": -1.57,
           "peak_pct": 0.0,
-          "days_in": 17,
+          "days_in": 18,
           "appear_count": 1,
           "last_seen": "20260902",
           "signal_detail": {
@@ -1026,7 +1026,7 @@
           "last_close": 24.4,
           "last_pct": -1.53,
           "peak_pct": 0.0,
-          "days_in": 15,
+          "days_in": 16,
           "appear_count": 1,
           "last_seen": "20260903",
           "signal_detail": {
@@ -1045,7 +1045,7 @@
           "last_close": 15.73,
           "last_pct": 12.84,
           "peak_pct": 12.84,
-          "days_in": 15,
+          "days_in": 16,
           "appear_count": 1,
           "last_seen": "20260903",
           "signal_detail": {
@@ -1064,7 +1064,7 @@
           "last_close": 21.32,
           "last_pct": -2.6,
           "peak_pct": 0.5,
-          "days_in": 4,
+          "days_in": 5,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1083,7 +1083,7 @@
           "last_close": 37.47,
           "last_pct": 8.01,
           "peak_pct": 8.01,
-          "days_in": 4,
+          "days_in": 5,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1102,7 +1102,7 @@
           "last_close": 36.69,
           "last_pct": 1.61,
           "peak_pct": 4.82,
-          "days_in": 4,
+          "days_in": 5,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {
@@ -1121,7 +1121,7 @@
           "last_close": 252.9,
           "last_pct": -4.88,
           "peak_pct": 0.0,
-          "days_in": 2,
+          "days_in": 3,
           "appear_count": 1,
           "last_seen": "20260904",
           "signal_detail": {

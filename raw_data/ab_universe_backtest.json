@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-04T19:05:15",
+  "update_time": "2026-09-04T22:47:10",
   "days": [
     {
       "date": "2026-08-29",
@@ -11752,7 +11752,10 @@
               "name": "我爱我家",
               "price": 2.64,
               "pct": 10.0,
-              "returns": null
+              "returns": {
+                "1": -0.2,
+                "3": -10.545
+              }
             },
             {
               "code": "000565",
@@ -26777,7 +26780,10 @@
               "name": "我爱我家",
               "price": 2.9,
               "pct": 9.848,
-              "returns": null
+              "returns": {
+                "1": -0.2,
+                "3": -10.545
+              }
             },
             {
               "code": "000607",
@@ -34941,6 +34947,20 @@
           "universe_size": 23,
           "hits": [
             {
+              "code": "002104",
+              "name": "恒宝股份",
+              "price": 14.05,
+              "pct": 7.663,
+              "returns": null
+            },
+            {
+              "code": "003040",
+              "name": "楚天龙",
+              "price": 21.12,
+              "pct": 10.0,
+              "returns": null
+            },
+            {
               "code": "300413",
               "name": "芒果超媒",
               "price": 21.25,
@@ -34948,11 +34968,25 @@
               "returns": null
             }
           ],
-          "n_hits": 1
+          "n_hits": 3
         },
         "candidate": {
           "universe_size": 348,
           "hits": [
+            {
+              "code": "000560",
+              "name": "我爱我家",
+              "price": 3.15,
+              "pct": 10.14,
+              "returns": null
+            },
+            {
+              "code": "002104",
+              "name": "恒宝股份",
+              "price": 14.05,
+              "pct": 7.663,
+              "returns": null
+            },
             {
               "code": "002354",
               "name": "天娱数科",
@@ -34968,6 +35002,20 @@
               "returns": null
             },
             {
+              "code": "002714",
+              "name": "牧原股份",
+              "price": 43.97,
+              "pct": 4.491,
+              "returns": null
+            },
+            {
+              "code": "003040",
+              "name": "楚天龙",
+              "price": 21.12,
+              "pct": 10.0,
+              "returns": null
+            },
+            {
               "code": "300058",
               "name": "蓝色光标",
               "price": 13.97,
@@ -34975,10 +35023,59 @@
               "returns": null
             },
             {
+              "code": "300300",
+              "name": "海峡创新",
+              "price": 9.13,
+              "pct": 16.01,
+              "returns": null
+            },
+            {
               "code": "300413",
               "name": "芒果超媒",
               "price": 21.25,
               "pct": 5.459,
+              "returns": null
+            },
+            {
+              "code": "300468",
+              "name": "四方精创",
+              "price": 27.5,
+              "pct": 14.583,
+              "returns": null
+            },
+            {
+              "code": "300498",
+              "name": "温氏股份",
+              "price": 15.36,
+              "pct": 6.151,
+              "returns": null
+            },
+            {
+              "code": "300674",
+              "name": "宇信科技",
+              "price": 18.19,
+              "pct": 5.266,
+              "returns": null
+            },
+            {
+              "code": "300773",
+              "name": "拉卡拉",
+              "price": 16.9,
+              "pct": 6.423,
+              "returns": null
+            },
+            {
+              "code": "600095",
+              "name": "湘财股份",
+              "price": 10.17,
+              "pct": 7.505,
+              "returns": null
+            },
+            {
+              "code": "600150",
+              "name": "中国船舶",
+              "price": 37.47,
+              "pct": 9.178,
               "returns": null
             },
             {
@@ -35010,6 +35107,13 @@
               "returns": null
             },
             {
+              "code": "688170",
+              "name": "德龙激光",
+              "price": 61.9,
+              "pct": 17.502,
+              "returns": null
+            },
+            {
               "code": "688205",
               "name": "德科立",
               "price": 194.0,
@@ -35024,6 +35128,13 @@
               "returns": null
             },
             {
+              "code": "688271",
+              "name": "联影医疗",
+              "price": 108.58,
+              "pct": 3.331,
+              "returns": null
+            },
+            {
               "code": "688318",
               "name": "财富趋势",
               "price": 88.87,
@@ -35031,7 +35142,7 @@
               "returns": null
             }
           ],
-          "n_hits": 11
+          "n_hits": 24
         },
         "all": {
           "universe_size": 7156,
@@ -35118,6 +35229,13 @@
               "name": "万泽股份",
               "price": 24.92,
               "pct": 3.018,
+              "returns": null
+            },
+            {
+              "code": "000560",
+              "name": "我爱我家",
+              "price": 3.15,
+              "pct": 10.14,
               "returns": null
             },
             {
@@ -35359,6 +35477,13 @@
               "returns": null
             },
             {
+              "code": "002104",
+              "name": "恒宝股份",
+              "price": 14.05,
+              "pct": 7.663,
+              "returns": null
+            },
+            {
               "code": "002124",
               "name": "天邦食品",
               "price": 2.42,
@@ -35569,6 +35694,13 @@
               "returns": null
             },
             {
+              "code": "002714",
+              "name": "牧原股份",
+              "price": 43.97,
+              "pct": 4.491,
+              "returns": null
+            },
+            {
               "code": "002721",
               "name": "金一文化",
               "price": 3.15,
@@ -35678,6 +35810,13 @@
               "name": "祖名股份",
               "price": 24.74,
               "pct": 3.083,
+              "returns": null
+            },
+            {
+              "code": "003040",
+              "name": "楚天龙",
+              "price": 21.12,
+              "pct": 10.0,
               "returns": null
             },
             {
@@ -35905,6 +36044,13 @@
               "returns": null
             },
             {
+              "code": "300300",
+              "name": "海峡创新",
+              "price": 9.13,
+              "pct": 16.01,
+              "returns": null
+            },
+            {
               "code": "300334",
               "name": "津膜科技",
               "price": 8.34,
@@ -35954,10 +36100,24 @@
               "returns": null
             },
             {
+              "code": "300468",
+              "name": "四方精创",
+              "price": 27.5,
+              "pct": 14.583,
+              "returns": null
+            },
+            {
               "code": "300494",
               "name": "盛天网络",
               "price": 8.53,
               "pct": 3.019,
+              "returns": null
+            },
+            {
+              "code": "300498",
+              "name": "温氏股份",
+              "price": 15.36,
+              "pct": 6.151,
               "returns": null
             },
             {
@@ -36017,6 +36177,13 @@
               "returns": null
             },
             {
+              "code": "300674",
+              "name": "宇信科技",
+              "price": 18.19,
+              "pct": 5.266,
+              "returns": null
+            },
+            {
               "code": "300703",
               "name": "创源股份",
               "price": 14.34,
@@ -36042,6 +36209,13 @@
               "name": "立华股份",
               "price": 21.45,
               "pct": 5.096,
+              "returns": null
+            },
+            {
+              "code": "300773",
+              "name": "拉卡拉",
+              "price": 16.9,
+              "pct": 6.423,
               "returns": null
             },
             {
@@ -36465,6 +36639,13 @@
               "returns": null
             },
             {
+              "code": "600095",
+              "name": "湘财股份",
+              "price": 10.17,
+              "pct": 7.505,
+              "returns": null
+            },
+            {
               "code": "600108",
               "name": "亚盛集团",
               "price": 4.36,
@@ -36476,6 +36657,13 @@
               "name": "长春一东",
               "price": 17.17,
               "pct": 3.684,
+              "returns": null
+            },
+            {
+              "code": "600150",
+              "name": "中国船舶",
+              "price": 37.47,
+              "pct": 9.178,
               "returns": null
             },
             {
@@ -37102,6 +37290,13 @@
               "returns": null
             },
             {
+              "code": "688170",
+              "name": "德龙激光",
+              "price": 61.9,
+              "pct": 17.502,
+              "returns": null
+            },
+            {
               "code": "688205",
               "name": "德科立",
               "price": 194.0,
@@ -37120,6 +37315,13 @@
               "name": "亚信安全",
               "price": 13.36,
               "pct": 7.568,
+              "returns": null
+            },
+            {
+              "code": "688271",
+              "name": "联影医疗",
+              "price": 108.58,
+              "pct": 3.331,
               "returns": null
             },
             {
@@ -37207,7 +37409,7 @@
               "returns": null
             }
           ],
-          "n_hits": 310
+          "n_hits": 323
         }
       }
     }
