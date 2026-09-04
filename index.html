@@ -531,7 +531,7 @@ window.__domReadyFns=[];
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/POTENTIAL_PICKS.js?v=52de2fdc4b" defer></script>
 <script src="data/INDEX_QUOTES.js?v=31543a7667" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=a420c34129" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=2bc0cfe7a3" defer></script>
 <script src="data/MARGIN_DATA.js?v=b6aa411171" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=d5603387c4" defer></script>
 <script src="data/IPO_DATA.js?v=fda082327f" defer></script>
@@ -1503,15 +1503,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=b5eb460050" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=de109e31e1" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=a45d659a2d" defer></script>
-<script src="data/HEALTH_CHECK.js?v=bfb3c17063" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=d2b4c0fd45" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=def80ea462" defer></script>
+<script src="data/RUNNER_STATUS.js?v=1419234db0" defer></script>
+<script src="data/HEALTH_CHECK.js?v=9c60d3cf59" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=7b241e54fc" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=045701412f" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 MARKET_PATH_PROBABILITY 注入（AI预测卡用） -->
     <script src="data/MARKET_PATH_PROBABILITY.js?v=984c783b3a" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=5ec15fad03" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=3c1ea2a3d9" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=48fc7a4315" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=d49d5d5569" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=0549b663b8" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=e1655f6cbb" defer></script>
@@ -10757,7 +10757,7 @@ window.showRestrictedItems = showRestrictedItems;
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=5ec15fad03';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=48fc7a4315';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -10766,7 +10766,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=3c1ea2a3d9';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=d49d5d5569';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -12745,7 +12745,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=bfb3c17063')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=9c60d3cf59')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
