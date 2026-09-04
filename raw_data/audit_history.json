@@ -1322,5 +1322,80 @@
     "message": "未找到元素"
    }
   ]
+ },
+ {
+  "date": "2026-09-04",
+  "time": "17:42:30",
+  "overall": "warn",
+  "summary": {
+   "ok": 107,
+   "warn": 10,
+   "fail": 2,
+   "total": 119
+  },
+  "warn_items": [
+   {
+    "id": "DELISTED",
+    "name": "已下架股票目录",
+    "message": "更新于 4天前 00:00"
+   },
+   {
+    "id": "local_sync",
+    "name": "本地与 origin/main 同步",
+    "message": "git fetch origin 失败（网络/认证）：TimeoutExpired，跳过同步检查"
+   },
+   {
+    "id": "dom_taskScheduleBody",
+    "name": "DOM #taskScheduleBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttBackBody",
+    "name": "DOM #ttBackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttThrBody",
+    "name": "DOM #ttThrBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttSvlBody",
+    "name": "DOM #ttSvlBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttTrackBody",
+    "name": "DOM #ttTrackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsAdvBody",
+    "name": "DOM #stcrdsAdvBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsEliteBody",
+    "name": "DOM #stcrdsEliteBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_healthCheckBody",
+    "name": "DOM #healthCheckBody",
+    "message": "静态占位符(JS渲染)"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "FACTOR_LAB",
+    "name": "因子实验室",
+    "message": "更新于 2天前 01:55；超过阈值 791 分钟"
+   },
+   {
+    "id": "dom_phMacroBody",
+    "name": "DOM #phMacroBody",
+    "message": "未找到元素"
+   }
+  ]
  }
 ]
