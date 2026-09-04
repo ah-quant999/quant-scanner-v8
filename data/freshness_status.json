@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-09-04 07:07:23",
+  "check_time": "2026-09-04 11:56:58",
   "last_trade_close": "2026-09-03 15:30:00",
   "is_trading_day": true,
   "core_stale": [],
@@ -7,7 +7,7 @@
   "frozen_stale": [],
   "no_update_time": [],
   "summary": {
-    "total_checked": 49,
+    "total_checked": 46,
     "core_stale": 0,
     "warn_stale": 0,
     "frozen_stale": 0,
@@ -59,9 +59,6 @@
     "SZ_FIB": "post_close",
     "INST_TRADE": "post_close",
     "CRDS_CARD_DATA": "post_close",
-    "COCKPIT_TIER_RECOMMEND": "post_close",
-    "COCKPIT_ADVICE": "post_close",
-    "COCKPIT_BACKTEST": "post_close",
     "BACKTEST_TDX": "post_close",
     "BACKTEST_COMPREHENSIVE": "post_close",
     "FACTOR_LAB_BACKTEST": "post_close",
