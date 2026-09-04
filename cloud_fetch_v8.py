@@ -299,6 +299,39 @@ def _em_get_with_retry(url, *, params, headers, timeout, max_attempts=3, label="
     raise RuntimeError(f"push2 重试{max_attempts}次仍失败: {last_err}")
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 东财占位符归一（2026-09-04 主人令一劳永逸根治）
+# 现象：盘前/停牌/无成交时，push2 的 f2/f3/f5/f6/f104/f105/f106 等字段返回字符串 '-' / '--' / ''
+#       而非数字。下游普遍写作 int(r.get("fXX") or 0)，但 '-' 是**非空字符串** → `or 0` 不生效
+#       → ValueError: invalid literal for int() with base 10: '-' → 整个 fn_xxx 报 fail。
+# 实证：2026-09-04 08:52 那轮 INDEX_QUOTES + CAPITAL_FLOW_DATA 双双因此失败 →
+#       「2 个模块抓取失败，阻止空壳推送」→ 整轮数据作废，白等两轮才补齐。
+# 修法：在**数据入口**把占位符统一归一成 None，则全部 40 处 `or 0` / `_to_yi` 自动生效，
+#       无需逐点修改，也不会改变任何有效数值的语义。
+# ─────────────────────────────────────────────────────────────────────────────
+_EM_PLACEHOLDERS = {"", "-", "--"}
+
+
+def _em_clean_value(v):
+    """东财字段值归一：占位符('-','--','') → None；其余原样返回（不做类型转换，语义不变）。"""
+    if isinstance(v, str) and v.strip() in _EM_PLACEHOLDERS:
+        return None
+    return v
+
+
+def _em_clean_rows(rows):
+    """对东财 diff 列表（list[dict]）逐字段归一占位符。非 list 原样返回，任何情况下都不抛异常。"""
+    if not isinstance(rows, list):
+        return rows
+    out = []
+    for r in rows:
+        if isinstance(r, dict):
+            out.append({k: _em_clean_value(v) for k, v in r.items()})
+        else:
+            out.append(r)
+    return out
+
+
 def em_clist(fs, fields, fid="f62", stat="1", pz=5000, po="1", pn=1, timeout=15):
     """东方财富 clist 接口（push2delay 镜像）。返回 data.diff 列表（每项为字段字典）。
     po="1" 降序(取净流入最高)，po="0" 升序(取净流出最高)。
@@ -321,7 +354,7 @@ def em_clist(fs, fields, fid="f62", stat="1", pz=5000, po="1", pn=1, timeout=15)
         return []
     if not d.get("data"):
         return []
-    return d["data"].get("diff", []) or []
+    return _em_clean_rows(d["data"].get("diff", []) or [])
 
 def _to_yi(v):
     """东财字段单位为元，转亿（保留2位）。"""
@@ -917,7 +950,7 @@ def _fetch_us_overnight_em():
                     "fields": "f12,f14,f3", "secids": "100.GSPC,100.IXIC,100.DJI"},
             headers=_EM_HEADERS, timeout=15)
         j = r.json()
-        rows = (j.get("data", {}).get("diff") or [])
+        rows = _em_clean_rows((j.get("data") or {}).get("diff") or [])
         if not rows:
             return ""
         parts = []
@@ -1025,7 +1058,7 @@ def _fetch_overseas_indices():
                     "secids": ",".join(s for s, _, _ in sec_map)},
             headers=_EM_HEADERS, timeout=15)
         j = r.json()
-        rows = (j.get("data", {}) or {}).get("diff") or []
+        rows = _em_clean_rows((j.get("data", {}) or {}).get("diff") or [])
         by_code = {x.get("f12"): x for x in rows if x.get("f12")}
     except Exception as e:
         print(f"    ⚠️ 海外指数抓取失败: {e}")
@@ -1296,7 +1329,7 @@ def f_index_quotes():
                         "fields": "f2,f3,f4,f5,f6,f12,f13,f14,f18,f20,f21,f104,f105,f106", "secids": secids},
                 headers=_EM_HEADERS, timeout=15)
             j = r.json()
-            rows = j.get("data", {}).get("diff", []) or []
+            rows = _em_clean_rows((j.get("data") or {}).get("diff", []) or [])
             if rows:
                 break
         except Exception as e:
@@ -1389,7 +1422,7 @@ def f_candidate_quotes():
                             "secids": ",".join(batch)},
                     headers=_EM_HEADERS, timeout=15)
                 j = r.json()
-                rows = j.get("data", {}).get("diff", []) or []
+                rows = _em_clean_rows((j.get("data") or {}).get("diff", []) or [])
                 if rows:
                     break
             except Exception as e:
@@ -2240,7 +2273,7 @@ def f_w52_high():
     r = _requests.get(f"{_EM_DELAY}/api/qt/clist/get", params=params,
                       headers=_EM_HEADERS, timeout=15).json()
     data = r.get("data") or {}
-    rows = data.get("diff") or []
+    rows = _em_clean_rows(data.get("diff") or [])
     if not rows:
         return None
     total = data.get("total") or len(rows)
