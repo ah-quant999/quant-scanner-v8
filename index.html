@@ -1465,7 +1465,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-30 阿狸咪加注：东方财富口径 ETF 申购赎回（股票/债券/货币/商品/跨境 5 类 + 亿元），
      与 ETF_SUBSCRIPTION.js（宽基指数 + 亿份）并行使用，不替换。新口径在 ETF 三合一卡
      使用 window.ETF_SUBSCRIPTION_EM，旧口径保留向下兼容。缓存戳由 update_v8 在后续 build 自动刷新。 -->
-<script src="data/ETF_SUBSCRIPTION_EM.js?v=68b673a38b" defer></script>
+<script src="data/ETF_SUBSCRIPTION_EM.js?v=19c1b2f3a8" defer></script>
 <script src="data/LIMIT_UP_HEATMAP.js?v=6e422327ff" defer></script>
 <script src="data/LIMIT_UP_BROKEN.js?v=024ef0127e" defer></script>
 <script src="data/HERDING_DATA.js?v=131317284c" defer></script>
@@ -7039,7 +7039,8 @@ window.__renderV8CalFull();
       bar('🏛 机构面',instScore,instDetail.join(' · ')||'观望为主',instScore>=7?'#1fd17b':instScore>=4?'#fbbf24':'#f4495d')+
       '</div>';
     $('phThermoBody').innerHTML=h;
-    setBadge('phThermoTime','实时','—',fib.update_time||sf.update_time||margin.update_time);
+    // 🛡 2026-09-04 一劳永逸：去掉 SH_FIB（盘前固定06:00刷一次，劫持"实时/盘中"语义），改取真盘中刷新源：margin / sector_fund_flow / cffex。
+    setBadge('phThermoTime','实时','—', margin.update_time || sf.update_time || cffex.update_time);
   }
 
   /* ---- 3. 六维共振雷达（量能/情绪/资金/估值/技术/外围） ---- */
@@ -7110,7 +7111,7 @@ window.__renderV8CalFull();
     if(svg){
       svg.innerHTML=grid+axes+`<polygon points="${dpts.join(' ')}" fill="rgba(56,189,248,.25)" stroke="#38bdf8" stroke-width="2"/>`+dpts.map((p,i)=>`<circle cx="${p.split(',')[0]}" cy="${p.split(',')[1]}" r="3" fill="#38bdf8"/>`).join('');
     }
-    setBadge('phRadarTime','盘中','中线',fib.update_time||sf.update_time||margin.update_time);
+    setBadge('phRadarTime','盘中','中线', margin.update_time || sf.update_time || cffex.update_time || crisis.update_time);
   }
 
   /* ---- 4. 六维预警雷达 ---- */
@@ -11756,16 +11757,36 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     }
     h+='</div></div>';
 
-    /* 6. 宽基ETF净申赎 */
-    var esub=window.ETF_SUBSCRIPTION||{}, esubT=esub.update_time||'';
+    /* 6. 宽基ETF净申赎（东方财富口径·亿元）
+       2026-09-04 一劳永逸修复：旧实现读 window.ETF_SUBSCRIPTION（宽基指数+亿份·已弃用），
+       主人 09-01 令切到东方财富分类（股票型/债券型/货币型/商品型/跨境型）+ 亿元。 */
+    var esub=window.ETF_SUBSCRIPTION_EM||{}, esubT=esub.update_time||'';
+    var hasEsub = esub && esub.categories && (esub.categories.stock || esub.categories.bond);
     var _esubDate = esubT ? esubT.slice(0,16) : '最近跑批';
     h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #00acc1;">';
-    h+=v8CardHeader('📈','宽基ETF净申赎（亿份）','','update_time',{update_time:esubT,slot:'盘后',horizon:'中长线'},!esub||!esub.sh||!esub.sh.length);
+    h+=v8CardHeader('📈','宽基ETF净申赎（亿元·东财口径）','','update_time',{update_time:esubT,slot:'盘后',horizon:'中长线'},!hasEsub);
     h+='<div style="padding:12px 14px;">';
-    if(esub&&esub.sh&&esub.sh.length){
-      h+='<div style="font-size:11px;color:#38bdf8;margin-bottom:8px;">沪深300/中证500/中证1000/创业板/科创50/上证50/A500 宽基指数ETF每日净申购赎回份额</div>';
-      h+='<div style="font-size:10px;color:var(--dim);margin-bottom:6px;">数据截至 '+_esubDate+'（交易所日频·盘后定基，与上方盘中 ETF 三合一窗口不同源，对照请以各自时间为准）</div>';
-      h+='<div id="v8EtfChart" style="width:100%;height:240px;"></div>';
+    if(hasEsub){
+      h+='<div style="font-size:11px;color:#38bdf8;margin-bottom:8px;">东方财富 ETF 分类（股票型 / 债券型 / 货币型 / 商品型 / 跨境型）· 净申赎金额（亿元）· 数据源 akshare etf_em</div>';
+      h+='<div style="font-size:10px;color:var(--dim);margin-bottom:10px;">数据截至 '+_esubDate+'（口径：'+ (esub.metric||'规模AUM') +'，与上方盘中 ETF 三合一窗口不同源）</div>';
+      // 5 类分类表格（替代旧宽基指数时间轴）
+      h+='<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+      h+='<thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:6px 8px;color:var(--dim);font-weight:600;">类型</th><th style="text-align:right;padding:6px 8px;color:var(--dim);font-weight:600;">净申赎(亿)</th><th style="text-align:right;padding:6px 8px;color:var(--dim);font-weight:600;">规模(亿)</th><th style="text-align:right;padding:6px 8px;color:var(--dim);font-weight:600;">只数</th></tr></thead><tbody>';
+      var catOrder=[['stock','股票型'],['bond','债券型'],['money','货币型'],['commodity','商品型'],['cross_border','跨境型']];
+      catOrder.forEach(function(pair){
+        var k=pair[0], cn=pair[1];
+        var c=(esub.categories||{})[k]||{};
+        var net=c.net_amount_yi||0, scl=c.scale_yi||0, nf=c.n_funds||0;
+        var netColor = net>0?'var(--up)':net<0?'var(--down)':'var(--sub)';
+        var netStr = (net>0?'+':'') + net.toFixed(2);
+        h+='<tr style="border-bottom:1px solid rgba(148,163,184,.08);"><td style="padding:7px 8px;color:var(--txt);">'+cn+'</td><td style="padding:7px 8px;text-align:right;color:'+netColor+';font-weight:600;">'+netStr+'</td><td style="padding:7px 8px;text-align:right;color:var(--txt);">'+(scl?scl.toFixed(1):'--')+'</td><td style="padding:7px 8px;text-align:right;color:var(--sub);">'+nf+'</td></tr>';
+      });
+      h+='</tbody></table>';
+      // 全 0 警告
+      var allZero = catOrder.every(function(p){ var c=(esub.categories||{})[p[0]]||{}; return (c.net_amount_yi||0)===0 && (c.scale_yi||0)===0; });
+      if(allZero){
+        h+='<div style="margin-top:10px;font-size:12px;color:var(--down);background:rgba(239,83,80,.08);border:1px solid rgba(239,83,80,.25);border-radius:6px;padding:10px;">⚠️ 数据全 0——fetcher akshare 接口当前版本异常，待回退接口修复</div>';
+      }
     } else {
       h+='<div class="note" style="text-align:center;">ETF申赎数据暂不可用</div>';
     }
@@ -11778,7 +11799,8 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
 
     el.innerHTML=h;
     drawV8MarginChart();
-    drawV8EtfChart();
+    // 2026-09-04 一劳永逸：宽基ETF卡已从 chart 改为 5 类分类表格，不再调用 drawV8EtfChart()。
+    //  try{ drawV8EtfChart(); } 已删除，避免读已弃用的 window.ETF_SUBSCRIPTION 旧文件。
     // 2026-08-29 一劳永逸：删 renderMacro 调用——opTab4 无 phMacroBody 抛 null 已被主人之前在 initPostMarket 9680 注释；
     //   下面 3 个 safe 调用使用与 initPostMarket 同样的窗口数据来源（line 9658-9660 已对齐）：
     // 🛡 2026-08-31: FOMC_DATA 数据源未配置，当前为空对象，温度计缺 FOMC 维度。
