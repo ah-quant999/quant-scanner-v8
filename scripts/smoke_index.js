@@ -90,8 +90,7 @@ const dom = new JSDOM(htmlContent, {
     inject('GOLD_POOL.js', 'GOLD_POOL');
     inject('STOCK_QUOTE.js', 'STOCK_QUOTE');
     inject('CANDIDATE.js', 'CANDIDATE');
-    inject('COCKPIT_TIER_RECOMMEND.js', 'COCKPIT_TIER_RECOMMEND');
-    inject('COCKPIT_ADVICE.js', 'COCKPIT_ADVICE');
+    // 2026-09-04 主人令收尾：COCKPIT_TIER_RECOMMEND/COCKPIT_ADVICE 已全方位下线，smoke 不再注入
     inject('CRDS_CARD_DATA.js', 'CRDS_CARD_DATA');
     inject('TRIPLE_CONSENSUS.js', 'TRIPLE_CONSENSUS');
     // _safeArr 兜底
