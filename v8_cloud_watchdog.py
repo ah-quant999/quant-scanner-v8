@@ -339,6 +339,7 @@ RUNNING_GRACE_MIN = 45
 # 算法链与轻量 workflow 不同：单轮合法运行时长可达 60~150min（step 超时 150min / job 200min）。
 # 故不能用 RUNNING_GRACE_MIN=45 一刀切（会误报）。这里用专属阈值：
 ALGO_WORKFLOW_FILE = "v8_algo_cloud.yml"
+ALGO_WORKFLOW_NAME = "☁️ v8 盘后算法链(云端)"   # 2026-09-04 修复：2bb75e57 引用但漏定义 → NameError 致看门狗整轮崩溃
 ALGO_STUCK_MIN = 165        # 算法链 step 150min/job 200min：>165min 仍 in_progress 必为整条卡死
 ALGO_STALE_MIN = 1500       # 距上次成功 >25h 且处于盘后窗口 → 疑似漏跑（交易日每天 19:15/20:00 两档）
 ALGO_SILENCE_KILL_MIN = 15  # 与 run_algorithms.SILENCE_KILL_SEC 对齐：本地心跳静默超 15min+余量 → 卡死
