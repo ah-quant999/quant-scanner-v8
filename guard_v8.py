@@ -75,12 +75,27 @@ def repush():
 
         run(["git", "commit", "-m", "guard: restore v8 lightweight"], cwd=tmp)
         log("推送 main...")
-        code, out, err = run(["git", "push", "origin", "main", "--force"], cwd=tmp)
-        if code == 0:
-            log(f"v8 已恢复 ({out.splitlines()[-1] if out else 'OK'})")
-            return True
-        log(f"推送失败: {err}")
-        return False
+        # 🛡 分支保护已生效（2026-09-04，main 禁 force push）：
+        # 改为先 fetch 对齐再普通推送；被拒（并发互踩/保护）时 fetch+rebase 后重试，
+        # 与 .github/workflows/v8_algo_intraday_lite.yml 的加固模式一致。
+        pushed = False
+        for i in (1, 2, 3):
+            code, out, err = run(["git", "push", "origin", "main"], cwd=tmp)
+            if code == 0:
+                pushed = True
+                break
+            log(f"⚠️ push 被拒（并发互踩/保护），fetch+rebase 后重试 ({i}/3)")
+            if run(["git", "fetch", "--depth=100", "origin", "main"], cwd=tmp)[0] != 0:
+                break
+            if run(["git", "rebase", "FETCH_HEAD"], cwd=tmp)[0] != 0:
+                run(["git", "rebase", "--abort"], cwd=tmp)
+                log("❌ rebase 冲突：远端已有更新内容，放弃本轮（绝不 force），以远端为准")
+                return False
+        if not pushed:
+            log("推送失败: 3 次重试后仍失败")
+            return False
+        log(f"v8 已恢复 ({out.splitlines()[-1] if out else 'OK'})")
+        return True
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 

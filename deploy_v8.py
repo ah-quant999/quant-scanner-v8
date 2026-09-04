@@ -7,7 +7,10 @@
 
 注意：
 - quant-scanner-v8 是独立仓库，GitHub Pages 从 main 分支直接服务。
-- 本脚本使用列表参数 + --force 推送，避免 shell 对路径的误解析。
+- 本脚本使用列表参数调用 git，避免 shell 对路径的误解析。
+- 推送策略（2026-09-04）：main 分支保护已生效（禁 force push），
+  故改为普通推送；被拒（并发互踩/保护）时先 fetch 对齐再 rebase，
+  最多重试 3 次，绝不 force。
 """
 
 import os, shutil, subprocess, sys, tempfile
@@ -96,9 +99,24 @@ def deploy():
 
         run(["git", "commit", "-m", "deploy v8 lightweight"], cwd=tmp)
         log("🚀 推送到 main...")
-        code, out, err = run(["git", "push", "origin", "main", "--force"], cwd=tmp)
-        if code != 0:
-            log(f"推送失败: {err}")
+        # 🛡 分支保护已生效（2026-09-04，main 禁 force push）：
+        # 改为先 fetch 对齐再普通推送；被拒（并发互踩/保护）时 fetch+rebase 后重试，
+        # 与 .github/workflows/v8_algo_intraday_lite.yml 的加固模式一致。
+        pushed = False
+        for i in (1, 2, 3):
+            code, out, err = run(["git", "push", "origin", "main"], cwd=tmp)
+            if code == 0:
+                pushed = True
+                break
+            log(f"⚠️ push 被拒（并发互踩/保护），fetch+rebase 后重试 ({i}/3)")
+            if run(["git", "fetch", "--depth=100", "origin", "main"], cwd=tmp)[0] != 0:
+                break
+            if run(["git", "rebase", "FETCH_HEAD"], cwd=tmp)[0] != 0:
+                run(["git", "rebase", "--abort"], cwd=tmp)
+                log("❌ rebase 冲突：远端已有更新内容，放弃本轮（绝不 force），以远端为准")
+                return 1
+        if not pushed:
+            log("推送失败: 3 次重试后仍失败")
             return 1
         log("✅ v8 部署成功！")
         log("   🌐 https://ah-quant999.github.io/quant-scanner-v8/")
