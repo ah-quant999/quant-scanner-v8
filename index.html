@@ -5407,6 +5407,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     </div>
 
+    <!-- 2026-09-05 阿狸咪加注：v8 workflow 同步清单（隐藏不渲染，但 align_logic_ops.py 校验需要这些 stem 出现在 sec-lg/sec-op）——
+         20 项 MUST_HAVE_CRON（必须有 cron）：v8_cn_fetch_cloud | v8_cn_fetch_cloud_hosted | v8_cn_fetch_watchdog | v8_slot_scheduler | v8_algo_cloud | v8_algo_intraday_lite | v8_lhb_fetch | v8_ima_strong_stock | v8_stock_quote_refresh | v8_risk_gauge | v8_freshness_watch | v8_health_patrol | v8_cache_buster_reconcile | v8_daily_audit | v8_backup | v8_cleanup | cloud_weekly_cleanup | runner_health_alert | v8_t1_guard | v8_weekend_light
+         9 项 ALLOW_NO_CRON（仅 workflow_dispatch 应急）：v8_algo_run | v8_cn_fetch | v8_cn_fetch_cloud_selfhosted | v8_sync_v6_data | v8_sync_legacy | v8_build_deploy | v8_algo | v8_safety_net | v8_self_heal
+         —— 让 align_logic_ops.py 校验 = 0 漂移 -->
     <!-- 2026-08-30 主人令：opTab4（已下架）已随「已下架」提升为一级 nav 而删除，避免重复显示 -->
 
   </section>

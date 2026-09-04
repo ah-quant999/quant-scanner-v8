@@ -26,6 +26,15 @@ DATA = ROOT / "data"
 SITE = "https://ah-quant999.github.io/quant-scanner-v8"
 MIN_BYTES = 512  # data 文件小于此视为可疑截断/空
 
+# 合法小文件白名单（数据本身极短：北向已停披 / 运行监控 / 周报元数据 等不算截断）
+LEGIT_TINY = {
+    "NORTH_FUND.js", "RUNNER_STATUS.js", "RUNNER_STATUS_HEALTH.js",
+    "WEEKEND_META_REPORT.js", "IPO_SCORE.js", "HOLIDAY_NOTICE.js",
+}
+
+# 持久日志路径——r每晚结果有迹可查（存 git，跟 front 共享）
+LOG_PATH = ROOT / "raw_data" / "audit_nightly.log"
+
 
 def download(url):
     req = urllib.request.Request(url, headers={
@@ -52,6 +61,9 @@ def main():
         for f in sorted(DATA.glob("*.js")):
             local = f.read_bytes()
             if len(local) < MIN_BYTES:
+                if f.name in LEGIT_TINY:
+                    # 合法小文件（数据本身极短）—— 跳过截断判定
+                    continue
                 problems.append("数据截断/过短: %s (%d 字节)" % (f.name, len(local)))
                 continue
             remote = download("%s/data/%s" % (SITE, f.name))
@@ -76,8 +88,28 @@ def main():
     print("发现问题 %d 项：" % len(problems))
     print("\n".join(" - " + p for p in problems) or "✅ 轻量审计通过：部署一致、数据完整、备份可用")
 
+    # 落盘：每晚结果追加到 raw_data/audit_nightly.log（与 fresh watch 同级，是 front 可见入口）
+    try:
+        import json as _json, datetime as _dt
+        rec = {
+            "time": _dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "problems": len(problems),
+            "details": problems,
+            "exit": 1 if problems else 0,
+        }
+        LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with LOG_PATH.open("a", encoding="utf-8") as _f:
+            _f.write(_json.dumps(rec, ensure_ascii=False) + "\n")
+        try:
+            hist = sum(1 for _ in LOG_PATH.open(encoding="utf-8"))
+        except Exception:
+            hist = 0
+        print("persisted %s (running history %d lines)" % (LOG_PATH.name, hist))
+    except Exception as _e:
+        print("audit nightly log persist failed: %s" % _e)
+
     if problems:
-        print("\n🔧 尝试触发缓存戳自愈(reconcile)…")
+        print("\nattempting cache buster reconcile healing...")
         try:
             subprocess.run([sys.executable, str(ROOT / "scripts" / "reconcile_cache_busters.py")],
                            cwd=str(ROOT), timeout=120)

@@ -24,25 +24,40 @@ INDEX = os.path.join(ROOT, "index.html")
 
 # 必须有 cron 且必须在逻辑详解/运维页文档化的 workflow（其余为应急/探针/legacy，不强制）
 MUST_HAVE_CRON = {
+    # 有 cron 的 v8 主链 workflow（必须文档化）
     "v8_cn_fetch_cloud": "中国数据抓取(云端)",
+    "v8_cn_fetch_cloud_hosted": "中国数据抓取(selfhosted 备援)",
+    "v8_cn_fetch_watchdog": "抓取看门狗",
+    "v8_slot_scheduler": "盘前/盘中/盘后调度分发",
     "v8_algo_cloud": "盘后算法链(云端主链)",
-    "v8_algo": "46模块新鲜度体检",
+    "v8_algo_intraday_lite": "盘中轻量算法链",
+    "v8_lhb_fetch": "龙虎榜抓取",
+    "v8_ima_strong_stock": "高手 ima 强势股(周一-五 07:45)",
+    "v8_stock_quote_refresh": "盘中行情刷新",
     "v8_risk_gauge": "危机雷达/风险温度计",
-    "runner_health_alert": "Runner健康监控",
-    "v8_safety_net": "Safety Net兜底",
+    "v8_freshness_watch": "数据新鲜度值守",
+    "v8_health_patrol": "健康巡检",
+    "v8_cache_buster_reconcile": "?v 缓存戳对齐",
+    "v8_daily_audit": "每晚全站审核",
     "v8_backup": "每日自动备份",
-    "v8_self_heal": "云端自愈",
-    "v8_cleanup": "缓存清理",
+    "v8_cleanup": "缓存清理(周日)",
     "cloud_weekly_cleanup": "周度清理",
+    "runner_health_alert": "Runner健康监控",
+    "v8_t1_guard": "周六 T+1 兜底",
+    "v8_weekend_light": "周末轻量维护(周六/日)",
 }
 
 # 文档里允许出现但刻意无 cron（仅 workflow_dispatch 应急）的 workflow
 ALLOW_NO_CRON = {
-    "v8_algo_run",        # 盘后算法链应急回退（主链已迁 v8_algo_cloud）
-    "v8_cn_fetch",        # 中国节点应急回退（主链已迁 v8_cn_fetch_cloud）
-    "v8_sync_v6_data",    # v6→v8 数据桥（应急）
-    "v8_sync_legacy",     # legacy 同步（已退役）
-    "v8_build_deploy",    # 由 workflow_run 触发，无 cron
+    "v8_algo_run",                # 盘后算法链应急回退（主链已迁 v8_algo_cloud）
+    "v8_cn_fetch",                # 中国节点应急回退（主链已迁 v8_cn_fetch_cloud）
+    "v8_cn_fetch_cloud_selfhosted", # selfhosted 备援（无 cron，按需 dispatch）
+    "v8_sync_v6_data",            # v6→v8 数据桥（应急）
+    "v8_sync_legacy",             # legacy 同步（已退役）
+    "v8_build_deploy",            # 由 workflow_run 触发，无 cron
+    "v8_algo",                    # 46 模块新鲜度体检（已迁 dispatch-only，老引用）
+    "v8_safety_net",              # Safety Net 兜底（已迁 dispatch-only，老引用）
+    "v8_self_heal",               # 云端自愈（已迁 dispatch-only，老引用）
 }
 
 

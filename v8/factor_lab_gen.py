@@ -41,7 +41,8 @@ def last_trade_day(ref=None):
 KL_END   = last_trade_day()                        # 动态到上一交易日（根治周末 query_all_stock 返回 0 只）
 ASOF_YM  = KL_END[:7]                              # abn 因子按月刷新标记（ym() 同格式）
 ASOF_Q   = "%dQ%d" % (int(KL_END[:4]), (int(KL_END[5:7]) - 1) // 3 + 1)  # ROE 按季刷新标记
-ROE_YEARS = range(2025, 2027)
+# ROE 因子取近 7 年（含当前年），动态滑动——根治硬编码 2025-2027 在 2027-01-01 起的冻结
+ROE_YEARS = list(range(max(2015, dt.datetime.now().year - 6), dt.datetime.now().year + 1))
 ROE_QTRS  = (1, 2, 3, 4)
 FORCE = "--force" in " ".join(sys.argv)
 
