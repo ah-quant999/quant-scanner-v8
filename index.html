@@ -4204,10 +4204,27 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   }
 
   /* ════════════════════════════════════════════════════════════════════
+     选股生命周期详情弹窗（2026-09-04 主人令：走弱桶 / 待确认剔除 不直接铺大网格）
+     ════════════════════════════════════════════════════════════════════ */
+  window.__lifeModalCache = window.__lifeModalCache || {};
+  window.openLifeModal = function(title, bodyHtml){
+    var t = document.getElementById('lifeModalTitle');
+    var b = document.getElementById('lifeModalBody');
+    var m = document.getElementById('lifeMask');
+    if(t) t.textContent = title || '';
+    if(b) b.innerHTML = bodyHtml || '';
+    if(m) m.classList.add('show');
+  };
+  window.closeLifeModal = function(){
+    var m = document.getElementById('lifeMask');
+    if(m) m.classList.remove('show');
+  };
+
+  /* ════════════════════════════════════════════════════════════════════
      v8 选股生命周期（2026-09-01 主人令：作为「选股策略」子页面，置于三重共识之后）
      渲染进 #lifeBody（#st-life 子页面容器）。
      布局：① 多 algo 共识（全部展示） → ② 精选池（全部展示，跟在共识下方）
-          → ③ 4 桶（全部展示，跟在精选下方） → ④ 待确认剔除（放在最下面）
+          → ③ 4 桶（前3桶直接展示，走弱桶弹窗） → ④ 待确认剔除（弹窗）
      删除：置顶两卡、情绪/板块横排、4 桶明细表、已剔除本机记录、冗余 footer。
      ════════════════════════════════════════════════════════════════════ */
   /* ═══ 2026-09-03 主人令：高手共振口径统一（一劳永逸）═══
@@ -4375,14 +4392,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         html += '<div style="margin:10px 0;padding:0;border:1px solid rgba(251,191,36,.35);border-radius:10px;background:rgba(251,191,36,.04);">';
         html += '<div style="padding:10px 12px;font-size:13px;font-weight:700;color:var(--gold);">🌟 精选池 '+selectedItems.length+' 只 · 板块流入×情绪周期双优 · 按精选分↓</div>';
         html += '<div style="padding:8px 10px;">';
-        html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;">';
+        html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12.5px;">';
         html += '<thead><tr style="background:rgba(251,191,36,.08);border-bottom:1.5px solid rgba(251,191,36,.3);">';
-        html += '<th style="padding:5px;text-align:left;color:var(--gold);">代码</th>';
-        html += '<th style="padding:5px;text-align:left;color:var(--gold);">名称</th>';
-        html += '<th style="padding:5px;text-align:left;color:var(--gold);">信号</th>';
-        html += '<th style="padding:5px;text-align:right;color:var(--gold);">精选分</th>';
-        html += '<th style="padding:5px;text-align:left;color:var(--gold);">板块</th>';
-        html += '<th style="padding:5px;text-align:right;color:var(--gold);" title="从 algo 入选那天起到当前的累计涨幅（基准 entry_price）">入场以来</th>';
+        html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);">代码</th>';
+        html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);">名称</th>';
+        html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);">信号</th>';
+        html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);">概念</th>';
+        html += '<th style="padding:7px 8px;text-align:right;color:var(--gold);">精选分</th>';
+        html += '<th style="padding:7px 8px;text-align:left;color:var(--gold);" title="algo 入选日期 = 入场时间">入场时间</th>';
+        html += '<th style="padding:7px 8px;text-align:right;color:var(--gold);" title="从 algo 入选那天起到当前的累计涨幅（基准 entry_price）">入场以来</th>';
         html += '</tr></thead><tbody>';
         selectedItems.forEach(function(it){
           if(!it) return;
@@ -4391,23 +4409,28 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           var _selScore = (typeof it.selected_score==='number') ? it.selected_score : 0;
           var _lastPct = (typeof it.last_pct==='number') ? it.last_pct : 0;
           var _secNet = (typeof it.sector_net==='number') ? it.sector_net : 0;
+          var _daysIn = (typeof it.days_in==='number') ? it.days_in : null;
+          var _entryDate = it.list_date || '';
           var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
           var conceptColor = it.sector_match==='top_inflow' ? '#22c55e' : (it.sector_match==='outflow' ? '#ef5350' : 'var(--dim)');
           var sigColor = it.signal_type==='多算法共识' ? '#38bdf8' : (it.signal_type==='强势突破' ? '#ef5350' : (it.signal_type==='板块联动' ? '#22c55e' : 'var(--sub)'));
+          var _concept = it.concept_top || it.industry || '—';
+          var _entryLabel = _entryDate ? _entryDate + (_daysIn!=null ? '（'+_daysIn+'天）' : '') : '—';
           html += '<tr style="border-bottom:1px solid rgba(148,163,184,.08);background:rgba(251,191,36,.03);">';
-          html += '<td style="padding:4px 6px;color:var(--txt);font-weight:600;">'+_esc(_code)+'</td>';
-          html += '<td style="padding:4px 6px;color:var(--txt);">'+_esc(_name)+' '+_resoBadge(_code)+'</td>';
-          html += '<td style="padding:4px 6px;color:'+sigColor+';font-size:10.5px;">'+_esc(it.signal_type||'')+'</td>';
-          html += '<td style="padding:4px 6px;text-align:right;color:var(--gold);font-weight:700;">'+(_selScore>0?'+':'')+_selScore.toFixed(1)+'</td>';
-          html += '<td style="padding:4px 6px;color:'+conceptColor+';font-size:10.5px;" title="净流入 '+(_secNet>0?'+':'')+_secNet.toFixed(1)+'亿">'+(it.concept_top?_esc(it.concept_top):'—')+'</td>';
-          html += '<td style="padding:4px 6px;text-align:right;font-weight:700;color:'+periodColor+';">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</td>';
+          html += '<td style="padding:6px 8px;color:var(--txt);font-weight:700;font-size:12.5px;font-family:ui-monospace,monospace;white-space:nowrap;">'+_esc(_code)+'</td>';
+          html += '<td style="padding:6px 8px;color:var(--txt);font-weight:600;white-space:nowrap;">'+_esc(_name)+' '+_resoBadge(_code)+'</td>';
+          html += '<td style="padding:6px 8px;color:'+sigColor+';font-weight:600;">'+_esc(it.signal_type||'')+'</td>';
+          html += '<td style="padding:6px 8px;color:'+conceptColor+';font-weight:600;" title="板块净流入 '+(_secNet>0?'+':'')+_secNet.toFixed(1)+'亿">'+_esc(_concept)+'</td>';
+          html += '<td style="padding:6px 8px;text-align:right;color:var(--gold);font-weight:800;font-size:13px;">'+(_selScore>0?'+':'')+_selScore.toFixed(1)+'</td>';
+          html += '<td style="padding:6px 8px;color:var(--txt);font-weight:600;white-space:nowrap;" title="入选价 '+((typeof it.entry_price==='number')?it.entry_price.toFixed(2):'—')+'">'+_esc(_entryLabel)+'</td>';
+          html += '<td style="padding:6px 8px;text-align:right;font-weight:800;font-size:13.5px;color:'+periodColor+';">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</td>';
           html += '</tr>';
         });
         html += '</tbody></table></div>';
         html += '</div></div>';
       }
 
-      /* ─── ③ 4 桶（全部展示，跟在精选下方） ─── */
+      /* ─── ③ 4 桶（强势/买点/见顶 直接展示，走弱 弹窗） ─── */
       var buckets = [
         {key:'strong',  label:'🟢强势',   color:'#22c55e', bg:'rgba(34,197,94,.10)',   border:'rgba(34,197,94,.35)'},
         {key:'buy_dip', label:'🟡回调买点', color:'#fbbf24', bg:'rgba(251,191,36,.10)',  border:'rgba(251,191,36,.35)'},
@@ -4415,6 +4438,37 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         {key:'weak',    label:'🔴走弱',   color:'#ef5350', bg:'rgba(239,83,80,.10)',   border:'rgba(239,83,80,.35)'},
       ];
       var statusFilter = {strong:'strong', buy_dip:'buy_dip', topped:'topped', weak:'weak'};
+      function _buildBucketGrid(items, border){
+        var g = '';
+        if(items && items.length){
+          g += '<div style="padding:6px 10px 8px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;">';
+          items.forEach(function(it){
+            if(!it) return;
+            var _code = it.code || '';
+            var _name = it.name || '';
+            var _lastPct = (typeof it.last_pct==='number') ? it.last_pct : 0;
+            var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
+            var _cons = (typeof it.consensus_count==='number') ? it.consensus_count : 0;
+            var _isSel = !!it.selected;
+            g += '<div style="padding:6px 8px;border:1px solid '+border+';border-radius:6px;background:rgba(15,23,42,.45);display:flex;flex-direction:column;gap:4px;min-width:0;">';
+            g +=   '<div style="display:flex;align-items:center;gap:6px;min-width:0;">';
+            g +=     '<span style="color:var(--txt);font-weight:700;font-size:11px;font-family:ui-monospace,monospace;white-space:nowrap;">'+_esc(_code)+'</span>';
+            g +=     '<span style="color:var(--txt);font-size:10.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+_esc(_name)+'</span>';
+            g +=   '</div>';
+            g +=   '<div style="display:flex;align-items:center;gap:4px;margin-top:auto;min-width:0;">';
+            if(_isSel){ g += '<span style="font-size:9px;font-weight:700;color:var(--gold);">🌟</span>'; }
+            if(_cons>=2){ g += '<span style="font-size:9px;font-weight:700;color:#38bdf8;padding:1px 4px;border-radius:4px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);">🤝'+_cons+'</span>'; }
+            g += _resoBadge(_code);
+            g +=     '<span style="margin-left:auto;font-weight:700;font-size:11.5px;color:'+periodColor+';white-space:nowrap;">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
+            g +=   '</div>';
+            g += '</div>';
+          });
+          g += '</div>';
+        } else {
+          g += '<div style="padding:6px 12px 10px;font-size:11px;color:var(--dim);">该桶 0 只</div>';
+        }
+        return g;
+      }
       html += '<div style="margin:10px 0;">';
       buckets.forEach(function(b){
         var n = sc[b.key]||0;
@@ -4423,72 +4477,61 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           bucketItems = (pt.items||[]).filter(function(x){ return x && x.status === statusFilter[b.key]; });
           bucketItems = _sortBucket(bucketItems, 'last_pct', false);
         }catch(e){ console.warn('[life] bucket filter', e); }
+        if(b.key === 'weak'){
+          window.__lifeModalCache.weak = _buildBucketGrid(bucketItems, b.border);
+          html += '<div style="border:1px solid '+b.border+';border-radius:8px;background:'+b.bg+';margin-bottom:8px;cursor:pointer;user-select:none;" onclick="openLifeModal(\''+b.label+' '+n+' 只\', window.__lifeModalCache.weak)">';
+          html +=   '<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;">';
+          html +=     '<span style="font-size:12px;font-weight:700;color:'+b.color+';">'+b.label+' '+n+'</span>';
+          html +=     '<span style="font-size:10.5px;color:var(--dim);font-weight:500;">点击查看明细</span>';
+          html +=   '</div>';
+          html += '</div>';
+          return;
+        }
         html += '<details open style="border:1px solid '+b.border+';border-radius:8px;background:'+b.bg+';margin-bottom:8px;">';
         html +=   '<summary style="cursor:pointer;user-select:none;padding:6px 12px;font-size:12px;font-weight:700;color:'+b.color+';list-style:none;display:flex;align-items:center;gap:8px;">';
         html +=     '<span style="display:inline-block;padding:2px 10px;border-radius:6px;">'+b.label+' '+n+'</span>';
         html +=     '<span style="font-size:10.5px;color:var(--dim);font-weight:500;">共 '+(bucketItems?bucketItems.length:0)+' 只</span>';
         html +=   '</summary>';
-        if(bucketItems && bucketItems.length){
-          html += '<div style="padding:6px 10px 8px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;">';
-          bucketItems.forEach(function(it){
-            if(!it) return;
-            var _code = it.code || '';
-            var _name = it.name || '';
-            var _lastPct = (typeof it.last_pct==='number') ? it.last_pct : 0;
-            var periodColor = _lastPct > 0 ? '#ef5350' : (_lastPct < 0 ? '#26a69a' : 'var(--sub)');
-            var _cons = (typeof it.consensus_count==='number') ? it.consensus_count : 0;
-            var _isSel = !!it.selected;
-            html += '<div style="padding:6px 8px;border:1px solid '+b.border+';border-radius:6px;background:rgba(15,23,42,.45);display:flex;flex-direction:column;gap:4px;min-width:0;">';
-            html +=   '<div style="display:flex;align-items:center;gap:6px;min-width:0;">';
-            html +=     '<span style="color:var(--txt);font-weight:700;font-size:11px;font-family:ui-monospace,monospace;white-space:nowrap;">'+_esc(_code)+'</span>';
-            html +=     '<span style="color:var(--txt);font-size:10.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+_esc(_name)+'</span>';
-            html +=   '</div>';
-            html +=   '<div style="display:flex;align-items:center;gap:4px;margin-top:auto;min-width:0;">';
-            if(_isSel){ html += '<span style="font-size:9px;font-weight:700;color:var(--gold);">🌟</span>'; }
-            if(_cons>=2){ html += '<span style="font-size:9px;font-weight:700;color:#38bdf8;padding:1px 4px;border-radius:4px;background:rgba(56,189,248,.18);border:1px solid rgba(56,189,248,.4);">🤝'+_cons+'</span>'; }
-            html += _resoBadge(_code);
-            html +=     '<span style="margin-left:auto;font-weight:700;font-size:11.5px;color:'+periodColor+';white-space:nowrap;">'+(_lastPct>0?'+':'')+_lastPct.toFixed(2)+'%</span>';
-            html +=   '</div>';
-            html += '</div>';
-          });
-          html += '</div>';
-        } else {
-          html += '<div style="padding:6px 12px 10px;font-size:11px;color:var(--dim);">该桶 0 只</div>';
-        }
+        html += _buildBucketGrid(bucketItems, b.border);
         html += '</details>';
       });
       html += '</div>';
 
-      /* ─── ④ 待确认剔除（放在最下面） ─── */
+      /* ─── ④ 待确认剔除（弹窗） ─── */
       var toRemove = [];
       try{
         toRemove = (pt.items || []).filter(function(it){ return (it && (it.status==='weak'||it.status==='topped')) && !removedMap[it.code]; });
       }catch(e){ console.warn('[life] toRemove filter', e); toRemove = []; }
       if(toRemove && toRemove.length){
         try{ toRemove = _sortBucket(toRemove, 'drawdown', false); }catch(e){ console.warn('[life] sortBucket', e); }
-        html += '<details open style="margin:10px 0;border:1px solid rgba(239,83,80,.3);border-radius:8px;background:rgba(239,83,80,.04);">';
-      html += '<summary style="cursor:pointer;user-select:none;padding:8px 12px;font-size:12.5px;font-weight:700;color:#ef5350;list-style:none;">⚠️ 待确认剔除（走弱/见顶，共 '+(toRemove?toRemove.length:0)+' 只）· 点击可收起 · 本机记录不污染主站</summary>';
-      html += '<div style="padding:6px 10px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;">';
-      toRemove.forEach(function(it){
-        var _code = (it && it.code) || '';
-        var _name = (it && it.name) || '';
-        var _drawdown = (it && typeof it.drawdown==='number') ? it.drawdown : 0;
-        var _status = (it && it.status) || '';
-        var statusCol = statusColor[_status] || 'var(--dim)';
-        html += '<div style="padding:6px 8px;border:1px solid rgba(239,83,80,.3);border-radius:6px;background:rgba(15,23,42,.45);display:flex;flex-direction:column;gap:4px;min-width:0;">';
-        html += '<div style="display:flex;align-items:center;gap:6px;min-width:0;">';
-        html += '<span style="color:var(--txt);font-weight:700;font-size:11px;font-family:ui-monospace,monospace;white-space:nowrap;">'+_esc(_code)+'</span>';
-        html += '<span style="color:var(--txt);font-size:10.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+_esc(_name)+'</span>';
+        var toRemoveHtml = '<div style="padding:6px 10px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;">';
+        toRemove.forEach(function(it){
+          var _code = (it && it.code) || '';
+          var _name = (it && it.name) || '';
+          var _drawdown = (it && typeof it.drawdown==='number') ? it.drawdown : 0;
+          var _status = (it && it.status) || '';
+          var statusCol = statusColor[_status] || 'var(--dim)';
+          toRemoveHtml += '<div style="padding:6px 8px;border:1px solid rgba(239,83,80,.3);border-radius:6px;background:rgba(15,23,42,.45);display:flex;flex-direction:column;gap:4px;min-width:0;">';
+          toRemoveHtml += '<div style="display:flex;align-items:center;gap:6px;min-width:0;">';
+          toRemoveHtml += '<span style="color:var(--txt);font-weight:700;font-size:11px;font-family:ui-monospace,monospace;white-space:nowrap;">'+_esc(_code)+'</span>';
+          toRemoveHtml += '<span style="color:var(--txt);font-size:10.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+_esc(_name)+'</span>';
+          toRemoveHtml += '</div>';
+          toRemoveHtml += '<div style="display:flex;align-items:center;gap:4px;margin-top:auto;min-width:0;">';
+          toRemoveHtml += '<span style="font-size:9px;color:'+statusCol+';padding:1px 4px;border-radius:4px;background:'+statusColor[_status]+'22;white-space:nowrap;">'+_esc(statusLabel[_status]||_status)+'</span>';
+          toRemoveHtml += _resoBadge(_code);
+          toRemoveHtml += '<span style="font-size:9px;color:var(--dim);white-space:nowrap;">回撤 '+_drawdown.toFixed(1)+'%</span>';
+          toRemoveHtml += '<span style="margin-left:auto;color:#38bdf8;font-size:10px;cursor:pointer;user-select:none;white-space:nowrap;" onclick="window.__removeStock(\''+_esc(_code)+'\'); closeLifeModal();">确认剔除 ✕</span>';
+          toRemoveHtml += '</div>';
+          toRemoveHtml += '</div>';
+        });
+        toRemoveHtml += '</div>';
+        window.__lifeModalCache.toRemove = toRemoveHtml;
+        html += '<div style="border:1px solid rgba(239,83,80,.3);border-radius:8px;background:rgba(239,83,80,.04);margin:10px 0;cursor:pointer;user-select:none;" onclick="openLifeModal(\'⚠️ 待确认剔除（走弱/见顶） '+toRemove.length+' 只\', window.__lifeModalCache.toRemove)">';
+        html +=   '<div style="padding:8px 12px;display:flex;align-items:center;gap:8px;">';
+        html +=     '<span style="font-size:12.5px;font-weight:700;color:#ef5350;">⚠️ 待确认剔除（走弱/见顶，共 '+toRemove.length+' 只）</span>';
+        html +=     '<span style="font-size:10.5px;color:var(--dim);font-weight:500;">点击查看明细 · 本机记录不污染主站</span>';
+        html +=   '</div>';
         html += '</div>';
-        html += '<div style="display:flex;align-items:center;gap:4px;margin-top:auto;min-width:0;">';
-        html += '<span style="font-size:9px;color:'+statusCol+';padding:1px 4px;border-radius:4px;background:'+statusColor[_status]+'22;white-space:nowrap;">'+_esc(statusLabel[_status]||_status)+'</span>';
-        html += _resoBadge(_code);
-        html += '<span style="font-size:9px;color:var(--dim);white-space:nowrap;">回撤 '+_drawdown.toFixed(1)+'%</span>';
-        html += '<span style="margin-left:auto;color:#38bdf8;font-size:10px;cursor:pointer;user-select:none;white-space:nowrap;" onclick="window.__removeStock(\''+_esc(_code)+'\')">确认剔除 ✕</span>';
-        html += '</div>';
-        html += '</div>';
-      });
-      html += '</div></details>';
       }
 
       /* ─── ⑤ 选股策略回测（按用户反问 2026-09-02 22:50：回测都归到回测汇总 tab 了，不在选股 tab 里重复写一份）
@@ -5302,6 +5345,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <div class="modal">
     <h3><span id="calDate"></span><span class="close" onclick="closeCal()">×</span></h3>
     <div id="calEvents"></div>
+  </div>
+</div>
+
+<!-- 选股生命周期详情 modal（2026-09-04 主人令：走弱/待确认剔除 不直接铺大网格，点击摘要弹窗查看） -->
+<div class="mask" id="lifeMask" onclick="if(event.target===this)closeLifeModal()">
+  <div class="modal" style="max-width:920px;width:100%;">
+    <h3><span id="lifeModalTitle"></span><span class="close" onclick="closeLifeModal()">×</span></h3>
+    <div id="lifeModalBody"></div>
   </div>
 </div>
 
