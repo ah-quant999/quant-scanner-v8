@@ -15,6 +15,7 @@ update_triple_resonance_history.py — 三重共识历史快照累加器（本�
 """
 import json
 import os
+import re
 
 try:
     _ = BASE
@@ -87,7 +88,9 @@ def main():
 
     history = load_json(OUTPUT, {})
     # 仅保留真实日期 key（排除 _ 开头的 meta）
-    date_keys = sorted([k for k in history.keys() if not k.startswith(META_PREFIX)])
+    # 🛡 2026-09-06 一劳永逸：只认 YYYY-MM-DD 日期键（排除 _meta 与顶层 update_time 等非日期键，
+    # 顶层 update_time 是 08-29 有意补写的全站约定，保留；但不得混进日期键列表）
+    date_keys = sorted([k for k in history.keys() if re.fullmatch(r"\d{4}-\d{2}-\d{2}", k)])
     prev_date = None
     for dk in date_keys:
         if dk < today:
