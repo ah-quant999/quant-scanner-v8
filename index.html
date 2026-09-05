@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "db27fedf3";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "edbda4f4f";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -531,7 +531,7 @@ window.__domReadyFns=[];
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/POTENTIAL_PICKS.js?v=a175dafed0" defer></script>
 <script src="data/INDEX_QUOTES.js?v=a19fa902aa" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=d368a245b8" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=7997a95378" defer></script>
 <script src="data/MARGIN_DATA.js?v=3fea6700c3" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=d93c58be00" defer></script>
 <script src="data/IPO_DATA.js?v=f256db4258" defer></script>
@@ -549,7 +549,7 @@ window.__domReadyFns=[];
     <script src="data/MARKET_REGIME.js?v=b2d9533b0f" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
     <script src="data/RISK_GAUGE.js?v=cffc60965f" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
     <script src="data/SECTOR_RECOMMENDATION.js?v=2f51d8fefb" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
-    <script src="data/WEEKEND_META_REPORT.js?v=572262040a" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
+    <script src="data/WEEKEND_META_REPORT.js?v=d5951f8ce3" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
   <script src="data/DELISTED.js?v=625439c57a" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=3742dd9207" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
@@ -1555,23 +1555,23 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/ETF_PULSE.js?v=8e078354c9" defer></script>
 <script src="data/ETF_DAILY_MONITOR.js?v=b8525ac5dd" defer></script>
 <script src="data/TOP10_DAILY.js?v=0078a89cdb" defer></script>
-<script src="data/WEEKEND_RUN.js?v=688bd7968b" defer></script>
+<script src="data/WEEKEND_RUN.js?v=0d6095ff1b" defer></script>
 <script src="data/W52_HIGH.js?v=e03af064be" defer></script>
 <!-- 2026-08-30：盘后数据页新增解禁日历 + 业绩预告 -->
 <script src="data/RESTRICTED_RELEASE.js?v=e9e224d8b9" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=7c9d9ed4c6" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=393915f7cd" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=4757f3c7b5" defer></script>
-<script src="data/HEALTH_CHECK.js?v=dec18ef838" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=227f2e9e40" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=16581c9d66" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=d49d646bec" defer></script>
+<script src="data/HEALTH_CHECK.js?v=eb7e8f4d39" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=f8648235e8" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=830f637f32" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 MARKET_PATH_PROBABILITY 注入（AI预测卡用） -->
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=afc7f746b7" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=2cc9797447" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=4b6c3a1732" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=7f1f66bb7b" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=7e97b6f063" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=ce79213686" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=10d1d01bdb" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=e456c19c33" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=acd95551b5" defer></script>
     <!-- 2026-09-04 主人令收尾：ALLSITE_BACKTEST.js 注入已删（生成器/raw_data 已于 09-03「干掉全站精选」系列删除，前端无任何代码读 window.ALLSITE_BACKTEST，标签纯 404 噪音） -->
@@ -10833,7 +10833,7 @@ window.showRestrictedItems = showRestrictedItems;
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=4b6c3a1732';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=ce79213686';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -10842,7 +10842,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=7f1f66bb7b';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=10d1d01bdb';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -12753,7 +12753,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=dec18ef838')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=eb7e8f4d39')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
