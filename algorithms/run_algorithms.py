@@ -34,7 +34,6 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     "calc_crds.py": 2700,        # 逆势龙头 CRDS，同样遍历较广
     "gen_stock_profile.py": 2700,
     "v8/backtest_crds.py": 2400,    # 逆势龙头 CRDS 回测：读 crds history + baostock 取 K 线回填收益
-    "v8/backtest_rps.py": 1800,     # 相对强度 RPS 回测：读 stock_rps 截面（占位，RPS 为截面指标非信号引擎）
     "factor_lab_backtest.py": 1800,  # 🆕 700日长历史抓取+五分位分层回测（cn ~5min / 云端 ~15min）
     "v8/factor_lab_gen.py": 5400,    # 🛡 2026-09-04 云端适配：全市场主板 baostock 逐只，冷启动 ~50-90min（缓存随 raw_data/flab_work 入仓逐晚收敛，热缓存后数分钟）
 }
@@ -168,7 +167,6 @@ ORDER = [
     #   - rps：读 stock_rps 截面（RPS 为相对强度指标，非选股信号引擎，回测为截面有效性说明）
     #   三者失败均不影响选股结果，仅自身卡片可能不刷新。
     "v8/backtest_crds.py",            # → data/CRDS_BACKTEST.js（逆势龙头 CRDS 真实历史回测）
-    "v8/backtest_rps.py",             # → data/RPS_BACKTEST.js（相对强度 RPS 回测，截面有效性）
     # 🆕 2026-09-04 主人令「都按你的建议做」：因子实验室独立分层回测（升4⭐证据链）
     "factor_lab_backtest.py",         # → data/FACTOR_LAB_BACKTEST.js（五分位分层·胜率/回撤/OOS）
 ]
@@ -208,7 +206,7 @@ STAGES = {
     "E": [  # 回测批（~21:00 CST，最终推荐上线后）：backtest 全家
         "scripts/ab_universe_backtest.py", "backtest_tdx.py", "backtest_comprehensive.py",
         "export_optimized_strategy.py",   # 读 backtest_tdx.json 汇总优化策略（在 backtest_tdx 之后）
-        "v8/backtest_crds.py", "v8/backtest_rps.py",   # 逆势龙头/相对强度 回测（原 ORDER 漏挂 STAGE）
+        "v8/backtest_crds.py",   # 逆势龙头 回测（原 ORDER 漏挂 STAGE）
         "factor_lab_backtest.py",   # 🆕 因子实验室分层回测（读 _rps_cache，依赖 B 批 calc_stock_rps）
         "strategy_four_volume.py",  # 四量终极回测模式（SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js，根治孤儿）
     ],
@@ -355,7 +353,6 @@ BACKTEST_SCRIPTS = {
     "backtest_comprehensive.py",
     "export_optimized_strategy.py",
     "v8/backtest_crds.py",
-    "v8/backtest_rps.py",
 }
 # 18:00 = 所有盘后数据（龙虎榜/北向/板块资金/个股行情/机构调研等）稳定就绪时间
 _STOCK_PICKING_READY_HOUR, _STOCK_PICKING_READY_MIN = 18, 0
