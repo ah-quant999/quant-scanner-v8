@@ -205,6 +205,7 @@ STAGES = {
     #   键名 C 退役；回测批内容原样迁入 E，另收编 strategy_four_volume.py（回测模式，SCRIPT_ENV 注入）。
     "E": [  # 回测批（~21:00 CST，最终推荐上线后）：backtest 全家
         "scripts/ab_universe_backtest.py", "backtest_tdx.py", "backtest_comprehensive.py",
+        "backtest_expectancy.py",          # 🆕 期望收益回测：walk-forward 产出 raw_data/backtest_expectancy.json
         "export_optimized_strategy.py",   # 读 backtest_tdx.json 汇总优化策略（在 backtest_tdx 之后）
         "v8/backtest_crds.py",   # 逆势龙头 回测（原 ORDER 漏挂 STAGE）
         "factor_lab_backtest.py",   # 🆕 因子实验室分层回测（读 _rps_cache，依赖 B 批 calc_stock_rps）
@@ -221,6 +222,7 @@ STAGES = {
 #   并补写 data/FOUR_VOLUME_BACKTEST.js）。仅影响 E 回测批；B 选股批无注入、保持轻快。
 SCRIPT_ENV = {
     "strategy_four_volume.py": {"V8_BACKTEST_YEARS": "3"},
+    "backtest_expectancy.py": {"V8_USE_BAOSTOCK": "1"},   # 🆕 runner 用 baostock 拉全量K线，产出新鲜回测
     # 🆕 2026-09-04 挂链配套：动量共识筛选器需 --emit-js 才写 data/MOMENTUM_FILTER.js，
     #   而 runner 对所有脚本无参调用 → 用环境变量触发（脚本内已支持，与 --emit-js 等价且幂等）。
     "scripts/momentum_common_filter.py": {"V8_MOMENTUM_EMIT_JS": "1"},
@@ -351,6 +353,7 @@ BACKTEST_SCRIPTS = {
     "scripts/ab_universe_backtest.py",
     "backtest_tdx.py",
     "backtest_comprehensive.py",
+    "backtest_expectancy.py",
     "export_optimized_strategy.py",
     "v8/backtest_crds.py",
 }
