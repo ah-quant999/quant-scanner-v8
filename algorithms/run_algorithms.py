@@ -545,6 +545,48 @@ def _final_recommend_gate(run_start):
     return False
 
 
+def _restore_empty_raw_outputs(run_start):
+    """🆕 2026-09-05 cn 离线兜底（架构性P0专项）：本轮算法链写出的空/占位 raw_data 产物
+    还原到 HEAD 版本，阻止数据源离线时的空数据经 api_push/CI 覆盖线上好版本。
+    仅对前端消费的数据模块（DATA_SOURCES 命中）判空；状态文件/中间产物豁免。"""
+    try:
+        if V8_ROOT not in sys.path:
+            sys.path.insert(0, V8_ROOT)
+        from update_v8 import DATA_SOURCES, _is_raw_empty_or_stale
+    except Exception as e:
+        print(f"  ⚠️ import update_v8 失败（兜底跳过空产物还原）: {e}")
+        return
+    raw_dir = os.path.join(V8_ROOT, "raw_data")
+    if not os.path.isdir(raw_dir):
+        return
+    restored = []
+    for fname in os.listdir(raw_dir):
+        if fname not in DATA_SOURCES:
+            continue
+        fp = os.path.join(raw_dir, fname)
+        try:
+            if os.path.getmtime(fp) < run_start.timestamp():
+                continue
+        except Exception:
+            continue
+        try:
+            import pathlib
+            is_empty, reason = _is_raw_empty_or_stale(pathlib.Path(fp))
+        except Exception:
+            continue
+        if is_empty:
+            try:
+                subprocess.run(["git", "checkout", "HEAD", "--", f"raw_data/{fname}"],
+                                cwd=V8_ROOT, capture_output=True, text=True, timeout=60)
+                restored.append((fname, reason))
+                FAILED_SCRIPTS.append((fname, f"产物空/占位({reason})→已还原HEAD防写空"))
+            except Exception as e:
+                print(f"  ⚠️ 还原 {fname} 失败: {e}")
+    if restored:
+        print(f"\n  🛑 cn 离线兜底：{len(restored)} 个空产物已还原 HEAD（不污染线上）: " +
+              ", ".join(f"{f}({r})" for f, r in restored))
+
+
 def _write_run_report(ok, fail, skipped, run_start):
     """🛡 2026-08-28：把本轮算法链执行结果落盘 raw_data/algo_run_report.json，
     供链尾 verify_chain_outputs 闸门与运维面板消费，杜绝「静默吞失败」。"""
@@ -804,6 +846,7 @@ def step_run(order=None):
         "ok": ok, "fail": fail,
         "note": "算法链本轮执行完毕",
     })
+    _restore_empty_raw_outputs(run_start)
     _write_run_report(ok, fail, skipped, run_start)
 
 
