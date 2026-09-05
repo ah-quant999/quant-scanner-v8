@@ -1280,6 +1280,12 @@ def _hard_cap_for_owner_rule(n=None, page=None):
         但盘中 09:00-15:30 距上次收盘 17.5h，按通用 2h 红线会被误报 fail）
     """
     n = n or now_cst()
+    # 🛡 2026-09-06 一劳永逸：运维/静态卡（防误删清单/已下架/暂未上架）7 天红线全时段生效——
+    #   原豁免只写在「盘中」分支（下方 is_market_closed 内），周末/节假日落到「非交易日 T+1 cap」
+    #   （≈3.7 天），更新于 4-5 天前的静态文档必超 → fail → manual_dep 降 warn「待更新」满屏。
+    #   静态文档按周手动更新，7 天红线与 adjust_max_age 的运维豁免（10080）对齐，两条路径都放行。
+    if page == "运维":
+        return 7 * 24 * 60
     if not is_market_closed(n):
         if page == "实时数据":
             h = n.hour + n.minute / 60.0
