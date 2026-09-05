@@ -8,6 +8,7 @@ generate_top10.py — 多维共振评分 + 每日TOP10精选
 import json
 import os
 import re
+import math
 
 try:
     _ = BASE
@@ -464,6 +465,166 @@ def _range_continuation_score(vm):
     return 0
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 🔴 P4 研究因子（2026-09-05 主人拍板）：残差动量（反向）+ 漂移门控（因子级开关）
+# 回测结论（walk-forward T+10，2026-09-05）：
+#   p4_resid5   edge10=-5.39 (n=167, T5/T10同号) → 残差动量正向=过热，扣分
+#   p4_lowvol45 edge10=-3.18 (n=37, 与T5异号)   → 证据矛盾，不启用（观察项）
+#   门控: 开门(grind/panic) 整体 +3.29%/58.9% vs 关门 -1.74%/48.2% → 门控有效
+#   残差动量 开门edge=-3.34(n=137) / 关门edge=+0.13(n=30) → 只在开门日扣分
+# 权重全部运行期读 raw_data/backtest_expectancy.json 自动刷新；缺失回退下方硬编码。
+# ─────────────────────────────────────────────────────────────────────────────
+P4_FALLBACK_EDGE = {
+    "residmom": {"edge10": -5.387, "edge5": -1.22, "n": 167},
+    "lowvol":   {"edge10": -3.178, "edge5": 0.647, "n": 37},   # T5/T10 异号 → 自动弃用
+}
+P4_EDGE_TO_SCORE = 2.5
+P4_SCORE_CAP, P4_SCORE_FLOOR = 6, -6
+P4_GATE_MIN_N = 30          # 门控状态分桶最小样本，不足回退全局 edge
+P4_MIN_EDGE = 1.0           # |edge10| 低于此不启用（防噪）
+
+_P4_MKT_KLINE = None
+_P4_MKT_LOADED = False
+
+
+def _p4_market_kline():
+    """上证指数日K（市场代理）：[(date, close)] 升序。
+    依次尝试 kline_cache 的 000001.json / sh_000001.json / sh.000001.json，再实时拉取。"""
+    global _P4_MKT_KLINE, _P4_MKT_LOADED
+    if _P4_MKT_LOADED:
+        return _P4_MKT_KLINE
+    _P4_MKT_LOADED = True
+    rows = []
+    for fn in ("000001.json", "sh_000001.json", "sh.000001.json"):
+        try:
+            with open(os.path.join(_KLINE_DIR, fn), "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if isinstance(data, list) and len(data) >= 60:
+                rows = [(r["date"], float(r["close"])) for r in data
+                        if r.get("date") and r.get("close") and float(r["close"]) > 0]
+                if rows:
+                    break
+        except Exception:
+            continue
+    if len(rows) < 60:
+        recs = _fetch_kline_fallback("000001")
+        rows = [(r["date"], float(r["close"])) for r in recs if r.get("date") and r.get("close")]
+    rows.sort(key=lambda x: x[0])
+    _P4_MKT_KLINE = rows
+    return rows
+
+
+def _p4_realized_vol(closes, window=20):
+    """年化实现波动率(%)，closes 为升序收盘价列表（取最后 window+1 个点）"""
+    if closes is None or len(closes) < window + 1:
+        return None
+    seg = closes[-(window + 1):]
+    rets = []
+    for i in range(1, len(seg)):
+        if seg[i - 1] > 0 and seg[i] > 0:
+            rets.append(math.log(seg[i] / seg[i - 1]))
+    if len(rets) < window:
+        return None
+    m = sum(rets) / len(rets)
+    var = sum((x - m) ** 2 for x in rets) / (len(rets) - 1)
+    return math.sqrt(var) * math.sqrt(252) * 100.0
+
+
+def _p4_lowvol_metrics(code):
+    """个股 20 日年化波动率(%)；数据不足返回 None"""
+    recs = _load_kline_full(code)
+    if len(recs) < 21:
+        return None
+    return _p4_realized_vol([r["close"] for r in recs], 20)
+
+
+def _p4_resid_mom_metrics(code, window=20, est=60):
+    """20日残差动量(%)：个股收益 − β×市场收益；β 过去 est 日 OLS。
+    市场K线缺失返回 None（宁缺毋假）。"""
+    mkt = _p4_market_kline()
+    if not mkt or len(mkt) < est + window + 1:
+        return None
+    recs = _load_kline_full(code)
+    if len(recs) < est + window + 1:
+        return None
+    mkt_map = dict(mkt)
+    pairs = [(r["close"], mkt_map[r["date"]]) for r in recs if r["date"] in mkt_map]
+    if len(pairs) < est + window + 1:
+        return None
+    pairs = pairs[-(est + window + 1):]
+    sc = [p[0] for p in pairs]
+    mc = [p[1] for p in pairs]
+    n = len(sc)
+    sret = [math.log(sc[k] / sc[k - 1]) for k in range(1, n) if sc[k - 1] > 0 and sc[k] > 0]
+    mret = [math.log(mc[k] / mc[k - 1]) for k in range(1, n) if mc[k - 1] > 0 and mc[k] > 0]
+    if len(sret) != len(mret) or len(sret) < est:
+        return None
+    ms, mm = sum(sret) / len(sret), sum(mret) / len(mret)
+    cov = sum((a - ms) * (b - mm) for a, b in zip(sret, mret)) / (len(sret) - 1)
+    var = sum((b - mm) ** 2 for b in mret) / (len(mret) - 1)
+    beta = cov / var if var > 1e-12 else 1.0
+    beta = max(0.2, min(2.5, beta))
+    stock_r = (sc[-1] - sc[-1 - window]) / sc[-1 - window] * 100
+    mkt_r = (mc[-1] - mc[-1 - window]) / mc[-1 - window] * 100
+    return stock_r - beta * mkt_r
+
+
+# P4 运行期权重：从 backtest_expectancy.json 读 edge（在 load_json 之后执行）
+P4_EDGE = {k: dict(v) for k, v in P4_FALLBACK_EDGE.items()}
+P4_BY_FACTOR_GATE = {}
+try:
+    _bt_p4 = load_json(os.path.join(DATA_DIR, "backtest_expectancy.json"), {})
+    _p4_map = {"p4_lowvol45": "lowvol", "p4_lowvol55": "lowvol",
+               "p4_resid5": "residmom", "p4_resid10": "residmom"}
+    for _k, _v in (_bt_p4.get("by_factor") or {}).items():
+        _name = _p4_map.get(_k)
+        if not _name:
+            continue
+        _rec = {"edge10": _v.get("edge10", 0) or 0,
+                "edge5": _v.get("edge5", 0) or 0,
+                "n": _v.get("n_on10", 0) or 0}
+        _cur = P4_EDGE.get(_name)
+        if _name not in P4_EDGE or abs(_rec["edge10"]) > abs(_cur["edge10"]):
+            P4_EDGE[_name] = _rec      # 取该因子最强档位作为权重依据
+    P4_BY_FACTOR_GATE = (_bt_p4.get("by_regime") or {}).get("by_factor_gate") or {}
+except Exception:
+    pass
+
+
+def _p4_effective_edge(name, current_regime):
+    """漂移门控核心：当前市况开门(grind/panic)/关门状态分桶 n≥MIN_N → 用状态 edge；
+    否则回退全局 edge。返回 (edge10, edge5, n)。"""
+    is_open = current_regime in ("grind", "panic") if current_regime else None
+    key = "open" if is_open else ("closed" if is_open is False else None)
+    rec_g = (P4_BY_FACTOR_GATE.get(name) or {}) if key else {}
+    if key and (rec_g.get(f"n_{key}10") or 0) >= P4_GATE_MIN_N:
+        return (rec_g.get(f"edge_{key}10") or 0,
+                rec_g.get(f"edge_{key}5") or 0,
+                rec_g.get(f"n_{key}10") or 0)
+    rec = P4_EDGE.get(name) or {}
+    return rec.get("edge10", 0) or 0, rec.get("edge5", 0) or 0, rec.get("n", 0) or 0
+
+
+def p4_score_for(name, current_regime=None):
+    """P4 因子分：状态优先 edge → 防噪闸门（|edge|≥1 且 T5/T10 同号）→ 收缩 → clamp"""
+    e10, e5, n = _p4_effective_edge(name, current_regime)
+    if abs(e10) < P4_MIN_EDGE:
+        return 0                                  # edge 太小不启用（防噪）
+    if e5 is not None and (e5 > 0) != (e10 > 0):
+        return 0                                  # T5/T10 异号 → 证据矛盾不启用
+    conf = min(1.0, n / 120.0) if n > 0 else 1.0
+    sc = max(P4_SCORE_FLOOR, min(P4_SCORE_CAP, round(e10 * P4_EDGE_TO_SCORE)))
+    return int(round(sc * conf))
+
+
+def _p4_partial(full, ratio):
+    """满额分的 ratio 折扣档，保持符号且非零（full=0 → 0）"""
+    if not full:
+        return 0
+    v = round(full * ratio)
+    return v if v else (1 if full > 0 else -1)
+
+
 def _migrate_old_top10_scores(hist_dir):
     """将历史 top10_daily_YYYYMMDD.json 中旧 raw 评分（>100）统一归一化到 0~100，
     保证回测与阈值口径一致。
@@ -786,6 +947,34 @@ def main():
             research_detail.append(f"上涨中继+{rs}")
         enhance += research_score
 
+        # ── P4 研究因子（2026-09-05）：残差动量（反向），漂移门控做状态优先定权 ──
+        # 分数 = 状态分桶 edge（开门/关门 n≥30 优先，回退全局）× 防噪闸门 × 收缩；
+        # 当前回测：residmom 开门 −6 分/关门 0 分（关门 edge≈0 自动失效），lowvol 弃用观察。
+        p4_score = 0
+        p4_detail = []
+        _lv = _p4_lowvol_metrics(raw_code)
+        if _lv is not None:
+            _s_lv = 0
+            if _lv <= 45:
+                _s_lv = p4_score_for("lowvol", current_regime)
+            elif _lv <= 55:
+                _s_lv = _p4_partial(p4_score_for("lowvol", current_regime), 0.5)
+            if _s_lv:
+                p4_score += _s_lv
+                p4_detail.append(f"低波动{_lv:.0f}%{_s_lv:+d}")
+        _rm = _p4_resid_mom_metrics(raw_code)
+        if _rm is not None:
+            _s_rm = 0
+            if _rm >= 10:
+                _s_rm = p4_score_for("residmom", current_regime)          # 强正残差满额罚
+            elif _rm >= 5:
+                _s_rm = _p4_partial(p4_score_for("residmom", current_regime), 0.6)
+            # 负残差不罚：超跌机会由 P3 超跌反弹因子判定（避免反转/动量逻辑互斥）
+            if _s_rm:
+                p4_score += _s_rm
+                p4_detail.append(f"残差动量{_rm:+.1f}%{_s_rm:+d}")
+        enhance += p4_score
+
         # ── 技术形态分 (2026-07-26): 把驾驶舱 A 档条件合并进主站打分 ──
         # 条件：上涨趋势 + 机构变红 + RSI<68 + 20日涨幅<35% + EMA>=5 + 非涨停
         ema_up = s.get("ema_up") or latest.get("ema_up") or 0
@@ -997,6 +1186,7 @@ def main():
                 "backtest": score_backtest,
                 "breakout": 5 if breakout_5d else 0,
                 "research": research_score,
+                "p4": p4_score,
                 "signals": {
                     "chan": has_chan,
                     "jinzuan": has_qizhang or has_huangzhu,
@@ -1014,6 +1204,7 @@ def main():
                 "inst": " | ".join(inst_detail) if inst_detail else "",
                 "quality": quality_detail,
                 "research": " | ".join(research_detail) if research_detail else "",
+                "p4": " | ".join(p4_detail) if p4_detail else "",
             },
         })
 
@@ -1057,6 +1248,7 @@ def main():
             "score_backtest": bd.get("backtest", 0),
             "score_breakout": bd.get("breakout", 0),
             "score_research": bd.get("research", 0),
+            "score_p4": bd.get("p4", 0),
             "win_rate": s.get("win_rate", None),
             "quality_grade": s.get("quality_grade", ""),
             "signals": bd["signals"],
@@ -1066,6 +1258,8 @@ def main():
             "sector_detail": dt["sector"],
             "inst_detail": dt["inst"],
             "quality_detail": dt.get("quality", ""),
+            "research_detail": dt.get("research", ""),
+            "p4_detail": dt.get("p4", ""),
         })
 
     count_80plus = sum(1 for s in scored if s.get("total_score", 0) >= 80)
