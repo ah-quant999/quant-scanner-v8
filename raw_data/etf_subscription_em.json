@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-09-05 17:22:20",
+  "update_time": "2026-09-05 18:25:33",
   "source": "akshare fund_etf_spot_em (东方财富)",
   "metric": "净流入(亿元) + 规模(亿元)",
   "categories": {
     "stock": {
       "name": "股票型",
       "net_amount_yi": -74.55151474999994,
-      "scale_yi": 29294.34756580001,
+      "scale_yi": 29320.923430830037,
       "n_funds": 1304,
       "top5": [
         {
@@ -36,7 +36,7 @@
         {
           "code": "159915",
           "name": "创业板ETF易方达",
-          "scale_yi": 643.83,
+          "scale_yi": 655.33,
           "net_amount_yi": -6.5979
         }
       ]
@@ -51,7 +51,7 @@
     "money": {
       "name": "货币型",
       "net_amount_yi": 0.58801989,
-      "scale_yi": 545.76366306,
+      "scale_yi": 545.83498306,
       "n_funds": 50,
       "top5": [
         {
@@ -89,31 +89,31 @@
     "commodity": {
       "name": "商品型",
       "net_amount_yi": -2.5789582099999997,
-      "scale_yi": 3577.8750082399997,
+      "scale_yi": 3582.3584552899997,
       "n_funds": 55,
       "top5": [
         {
           "code": "518880",
           "name": "黄金ETF华安",
-          "scale_yi": 1074.19,
+          "scale_yi": 1073.28,
           "net_amount_yi": 3.075
         },
         {
           "code": "159937",
           "name": "黄金ETF博时",
-          "scale_yi": 431.6,
+          "scale_yi": 431.69,
           "net_amount_yi": -0.0785
         },
         {
           "code": "159934",
           "name": "黄金ETF易方达",
-          "scale_yi": 376.99,
+          "scale_yi": 378.91,
           "net_amount_yi": 0.5838
         },
         {
           "code": "518800",
           "name": "黄金ETF国泰",
-          "scale_yi": 360.82,
+          "scale_yi": 363.6,
           "net_amount_yi": 0.2892
         },
         {
@@ -127,7 +127,7 @@
     "cross_border": {
       "name": "跨境型",
       "net_amount_yi": 15.658460359999998,
-      "scale_yi": 6194.036868179998,
+      "scale_yi": 6197.261920499997,
       "n_funds": 192,
       "top5": [
         {
@@ -139,7 +139,7 @@
         {
           "code": "159941",
           "name": "纳指ETF广发",
-          "scale_yi": 375.13,
+          "scale_yi": 375.15,
           "net_amount_yi": 0.5069
         },
         {
