@@ -5214,7 +5214,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     function _focusBlock(title, color, rows, kind, popKind, popLabel){
       var showRows = rows.slice(0, FL_DISPLAY_TOP_N);
       var inner = showRows.length
-        ? '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">'
+        ? '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">'
             + showRows.map(function(r){ return row(r,kind); }).join('') + '</div>'
         : '<div class="note" style="color:var(--dim);padding:4px 0;">本期无可关注标的（择时闸门关闭或因子分位未进前 20%）</div>';
       var suffix = rows.length > FL_DISPLAY_TOP_N
