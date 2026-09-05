@@ -1,36 +1,36 @@
 {
-  "update_time": "2026-09-05 15:57:00",
+  "update_time": "2026-09-05 16:20:05",
   "source": "akshare fund_etf_spot_em (东方财富)",
   "metric": "净流入(亿元) + 规模(亿元)",
   "categories": {
     "stock": {
       "name": "股票型",
       "net_amount_yi": -74.55151474999994,
-      "scale_yi": 29277.452323800033,
+      "scale_yi": 29266.077994610052,
       "n_funds": 1304,
       "top5": [
         {
           "code": "511880",
           "name": "银华日利ETF",
-          "scale_yi": 1122.69,
+          "scale_yi": 1114.51,
           "net_amount_yi": 1.2675
         },
         {
           "code": "510300",
           "name": "沪深300ETF华泰柏瑞",
-          "scale_yi": 1067.25,
+          "scale_yi": 1059.69,
           "net_amount_yi": -1.3546
         },
         {
           "code": "511990",
           "name": "华宝添益ETF",
-          "scale_yi": 930.84,
+          "scale_yi": 905.99,
           "net_amount_yi": 4.0944
         },
         {
           "code": "588000",
           "name": "科创50ETF华夏",
-          "scale_yi": 857.68,
+          "scale_yi": 871.64,
           "net_amount_yi": -20.5813
         },
         {
@@ -51,7 +51,7 @@
     "money": {
       "name": "货币型",
       "net_amount_yi": 0.58801989,
-      "scale_yi": 545.7036630599999,
+      "scale_yi": 545.0664970099999,
       "n_funds": 50,
       "top5": [
         {
@@ -63,7 +63,7 @@
         {
           "code": "511660",
           "name": "货币ETF建信",
-          "scale_yi": 77.93,
+          "scale_yi": 77.38,
           "net_amount_yi": -0.1549
         },
         {
@@ -89,7 +89,7 @@
     "commodity": {
       "name": "商品型",
       "net_amount_yi": -2.5789582099999997,
-      "scale_yi": 3582.383179109999,
+      "scale_yi": 3582.616269109999,
       "n_funds": 55,
       "top5": [
         {
@@ -127,7 +127,7 @@
     "cross_border": {
       "name": "跨境型",
       "net_amount_yi": 15.658460359999998,
-      "scale_yi": 6192.269929109999,
+      "scale_yi": 6189.606883449999,
       "n_funds": 192,
       "top5": [
         {
