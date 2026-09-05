@@ -4981,7 +4981,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var SB_DISPLAY_TOP_N = 10;
     var _showStocks = D.stocks.slice(0, SB_DISPLAY_TOP_N);
     var _inner = _showStocks.length
-      ? '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">' + _showStocks.map(rowCard).join('') + '</div>'
+      ? '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">' + _showStocks.map(rowCard).join('') + '</div>'
       : '<div class="note" style="color:var(--dim);padding:4px 0;">本期无标的</div>';
     var _suffix = D.stocks.length > SB_DISPLAY_TOP_N
       ? ' <span style="font-size:11px;color:var(--dim);font-weight:500;">· 仅展示前 '+SB_DISPLAY_TOP_N+' 只 / 共 '+D.stocks.length+' 只（其余点击下方 📄 完整榜单）</span>'
