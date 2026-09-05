@@ -208,6 +208,7 @@ STAGES = {
         "backtest_expectancy.py",          # 🆕 期望收益回测：walk-forward 产出 raw_data/backtest_expectancy.json
         "export_optimized_strategy.py",   # 读 backtest_tdx.json 汇总优化策略（在 backtest_tdx 之后）
         "v8/backtest_crds.py",   # 逆势龙头 回测（原 ORDER 漏挂 STAGE）
+        "v8/backtest_rps.py",   # 🆕 2026-09-06 主人令：RPS A档 30 天样本考核（读 history/stock_rps_* 日归档 → raw_data/rps_backtest.json；baostock 失败自动降级空回测不挂 CI）
         "factor_lab_backtest.py",   # 🆕 因子实验室分层回测（读 _rps_cache，依赖 B 批 calc_stock_rps）
         "strategy_four_volume.py",  # 四量终极回测模式（SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js，根治孤儿）
     ],
