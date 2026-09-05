@@ -5059,9 +5059,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     }
     window.__imaRetry = 0;
     var sum = D.summary || {};
-    var filter = window.__imaFilter || '全部';
-    var rows = D.stocks.slice().filter(function(s){ return filter==='全部' || (s.status||'')===filter; });
-    rows.sort(function(a,b){ return (parseFloat(b.change_pct)||0) - (parseFloat(a.change_pct)||0); });
+    /* 2026-09-06 主人令：主卡固定展示「强势」前 10 只（涨跌幅降序），其余全部进 📄 弹窗（筛选交互随迁） */
+    var _sortByChg = function(a,b){ return (parseFloat(b.change_pct)||0) - (parseFloat(a.change_pct)||0); };
+    var _strongAll = D.stocks.filter(function(s){ return (s.status||'')==='强势'; }).sort(_sortByChg);
+    var _showRows = _strongAll.slice(0, 10);
     var statusMap = {'强势':'#22c55e','正常':'#38bdf8','回落':'#fbbf24','见顶':'#fb923c','走弱':'#ef5350'};
     function _c(v){ var n=parseFloat(v); return isNaN(n)?'var(--sub)':(n>0?'#ef5350':(n<0?'#26a69a':'var(--sub)')); }
     function _p(v){ var n=parseFloat(v); return isNaN(n)?'--':((n>0?'+':'')+n.toFixed(2)+'%'); }
@@ -5107,54 +5108,75 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       html += '<span style="padding:2px 8px;border-radius:10px;font-weight:600;color:'+col+';background:'+col+'22;border:1px solid '+col+'55;">'+label+' <b>'+sumV+'</b>'+suffix+'</span>';
     });
     html += '</div>';
+    html += '<div style="font-weight:600;margin:2px 0 6px;color:#22c55e;">🟢 强势股 · 前 '+Math.min(10,_strongAll.length)+' 直接展示<b style="margin-left:4px;">'+_strongAll.length+'</b>'+(D.stocks.length>_strongAll.length?' <span style="font-size:11px;color:var(--dim);font-weight:500;">· 其余点击下方查看</span>':'')+'</div>';
+    function _tableHtml(list){
+      if(!list.length) return '<div class="note" style="text-align:center;color:var(--dim);padding:12px;">当前无强势标的</div>';
+      var h = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;color:var(--sub);">';
+      h += '<thead><tr style="color:var(--dim);text-align:right;">'
+        + '<th style="padding:5px 6px;text-align:left;">代码</th><th style="padding:5px 6px;text-align:left;">名称</th>'
+        + '<th style="padding:5px 6px;text-align:left;">行业</th><th style="padding:5px 6px;text-align:left;">首入选</th>'
+        + '<th style="padding:5px 6px;">基准价</th><th style="padding:5px 6px;">最新价</th>'
+        + '<th style="padding:5px 6px;">涨跌幅</th><th style="padding:5px 6px;">回撤</th>'
+        + '<th style="padding:5px 6px;">连涨</th><th style="padding:5px 6px;text-align:left;">状态</th>'
+        + '<th style="padding:5px 6px;text-align:left;">买点提示</th><th style="padding:5px 6px;text-align:left;">v8 命中</th></tr></thead><tbody>';
+      list.forEach(function(s){
+        var dp=parseFloat(s.drawdown_pct);
+        var dcol=isNaN(dp)?'var(--sub)':(dp>0?'#ef5350':(dp<0?'#26a69a':'var(--sub)'));
+        var sc=statusMap[s.status]||'#94a3b8';
+        // v8 命中：该 IMA 股票是否同时在 v8 选股生命周期池
+        var _v8 = _v8Map[s.code] || null;
+        var _v8Html = '<span style="font-size:10px;color:var(--dim);">—</span>';
+        if(_v8){
+          var _vs = _v8.status||'';
+          var _vc = {'strong':'#22c55e','buy_dip':'#fbbf24','topped':'#fb923c','weak':'#ef5350','normal':'#38bdf8'}[_vs]||'#94a3b8';
+          _v8Html = '<span style="display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:600;color:'+_vc+';background:'+_vc+'22;">🏆 '+(window.__v8StatusLabel ? window.__v8StatusLabel[_vs]||_vs : _vs)+'</span>';
+        }
+        h += '<tr style="border-top:1px solid var(--border);">'
+          + '<td style="padding:5px 6px;color:var(--txt);font-weight:600;">'+(s.code||'')+'</td>'
+          + '<td style="padding:5px 6px;color:var(--txt);">'+_e(s.name||'')+'</td>'
+          + '<td style="padding:5px 6px;color:var(--dim);">'+_e(s.industry||'')+'</td>'
+          + '<td style="padding:5px 6px;color:var(--dim);">'+_e(s.first_selected||'')+'</td>'
+          + '<td style="padding:5px 6px;text-align:right;">'+_pr(s.base_price)+'</td>'
+          + '<td style="padding:5px 6px;text-align:right;color:var(--txt);">'+_pr(s.latest_price)+'</td>'
+          + '<td style="padding:5px 6px;text-align:right;color:'+_c(s.change_pct)+';font-weight:600;">'+_p(s.change_pct)+'</td>'
+          + '<td style="padding:5px 6px;text-align:right;color:'+dcol+';">'+_p(s.drawdown_pct)+'</td>'
+          + '<td style="padding:5px 6px;text-align:right;">'+(s.consecutive_up||0)+'</td>'
+          + '<td style="padding:5px 6px;"><span style="display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:600;color:'+sc+';background:'+sc+'22;">'+_e(s.status||'')+'</span></td>'
+          + '<td style="padding:5px 6px;color:var(--dim);max-width:200px;">'+_e(s.buy_point||'')+'</td>'
+          + '<td style="padding:5px 6px;">'+_v8Html+'</td>'
+          + '</tr>';
+      });
+      h += '</tbody></table></div>';
+      return h;
+    }
+    html += _tableHtml(_showRows);
+    html += '<div style="margin:6px 0 2px;"><span onclick="window.__imaFullPopup()" style="cursor:pointer;display:inline-block;padding:4px 14px;border-radius:8px;font-size:12px;font-weight:600;color:#38bdf8;border:1px solid rgba(56,189,248,.4);background:rgba(56,189,248,.08);">📄 全部标的（共 '+_allN+' 只）</span></div>';
+    dst.innerHTML = html;
+  };
+  /* 2026-09-06 主人令：筛选胶囊 + 完整表格整体迁入弹窗（原主卡筛选行下线） */
+  window.__imaFullPopup = function(){
+    var filter = window.__imaFilter || '全部';
+    var _rows = D.stocks.filter(function(s){ return filter==='全部' || (s.status||'')===filter; }).sort(_sortByChg);
     var statuses = []; D.stocks.forEach(function(s){ var st=s.status||''; if(st && statuses.indexOf(st)<0) statuses.push(st); });
-    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">';
+    var caps = '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">';
     ['全部'].concat(statuses).forEach(function(c){
       var on=(c===filter); var col=c==='全部'?'#38bdf8':(statusMap[c]||'#94a3b8');
       var _cn = (c==='全部') ? _allN : (_realByStatus[c]!=null?_realByStatus[c]:0);
-      html += '<span onclick="window.__imaSetFilter(\''+c+'\')" style="cursor:pointer;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600;color:'+(on?col:'var(--sub)')+';background:'+(on?col+'22':'rgba(148,163,184,.12)')+';border:1px solid '+(on?col+'88':'rgba(148,163,184,.3)')+';">'+c+' <b>'+_cn+'</b></span>';
+      caps += '<span onclick="window.__imaSetFilter(\''+c+'\')" style="cursor:pointer;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600;color:'+(on?col:'var(--sub)')+';background:'+(on?col+'22':'rgba(148,163,184,.12)')+';border:1px solid '+(on?col+'88':'rgba(148,163,184,.3)')+';">'+c+' <b>'+_cn+'</b></span>';
     });
-    html += '</div>';
-    html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;color:var(--sub);">';
-    html += '<thead><tr style="color:var(--dim);text-align:right;">'
-      + '<th style="padding:5px 6px;text-align:left;">代码</th><th style="padding:5px 6px;text-align:left;">名称</th>'
-      + '<th style="padding:5px 6px;text-align:left;">行业</th><th style="padding:5px 6px;text-align:left;">首入选</th>'
-      + '<th style="padding:5px 6px;">基准价</th><th style="padding:5px 6px;">最新价</th>'
-      + '<th style="padding:5px 6px;">涨跌幅</th><th style="padding:5px 6px;">回撤</th>'
-      + '<th style="padding:5px 6px;">连涨</th><th style="padding:5px 6px;text-align:left;">状态</th>'
-      + '<th style="padding:5px 6px;text-align:left;">买点提示</th><th style="padding:5px 6px;text-align:left;">v8 命中</th></tr></thead><tbody>';
-    rows.forEach(function(s){
-      var dp=parseFloat(s.drawdown_pct);
-      var dcol=isNaN(dp)?'var(--sub)':(dp>0?'#ef5350':(dp<0?'#26a69a':'var(--sub)'));
-      var sc=statusMap[s.status]||'#94a3b8';
-      // v8 命中：该 IMA 股票是否同时在 v8 选股生命周期池
-      var _v8 = _v8Map[s.code] || null;
-      var _v8Html = '<span style="font-size:10px;color:var(--dim);">—</span>';
-      if(_v8){
-        var _vs = _v8.status||'';
-        var _vc = {'strong':'#22c55e','buy_dip':'#fbbf24','topped':'#fb923c','weak':'#ef5350','normal':'#38bdf8'}[_vs]||'#94a3b8';
-        _v8Html = '<span style="display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:600;color:'+_vc+';background:'+_vc+'22;">🏆 '+(window.__v8StatusLabel ? window.__v8StatusLabel[_vs]||_vs : _vs)+'</span>';
-      }
-      html += '<tr style="border-top:1px solid var(--border);">'
-        + '<td style="padding:5px 6px;color:var(--txt);font-weight:600;">'+(s.code||'')+'</td>'
-        + '<td style="padding:5px 6px;color:var(--txt);">'+_e(s.name||'')+'</td>'
-        + '<td style="padding:5px 6px;color:var(--dim);">'+_e(s.industry||'')+'</td>'
-        + '<td style="padding:5px 6px;color:var(--dim);">'+_e(s.first_selected||'')+'</td>'
-        + '<td style="padding:5px 6px;text-align:right;">'+_pr(s.base_price)+'</td>'
-        + '<td style="padding:5px 6px;text-align:right;color:var(--txt);">'+_pr(s.latest_price)+'</td>'
-        + '<td style="padding:5px 6px;text-align:right;color:'+_c(s.change_pct)+';font-weight:600;">'+_p(s.change_pct)+'</td>'
-        + '<td style="padding:5px 6px;text-align:right;color:'+dcol+';">'+_p(s.drawdown_pct)+'</td>'
-        + '<td style="padding:5px 6px;text-align:right;">'+(s.consecutive_up||0)+'</td>'
-        + '<td style="padding:5px 6px;"><span style="display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:600;color:'+sc+';background:'+sc+'22;">'+_e(s.status||'')+'</span></td>'
-        + '<td style="padding:5px 6px;color:var(--dim);max-width:200px;">'+_e(s.buy_point||'')+'</td>'
-        + '<td style="padding:5px 6px;">'+_v8Html+'</td>'
-        + '</tr>';
-    });
-    html += '</tbody></table></div>';
-    if(!rows.length) html += '<div class="note" style="text-align:center;color:var(--dim);padding:12px;">当前筛选「'+_e(filter)+'」无匹配</div>';
-    dst.innerHTML = html;
+    caps += '</div>';
+    var mask=document.createElement('div');
+    mask.style.cssText='position:fixed;inset:0;background:rgba(2,6,17,.72);z-index:99998;display:flex;align-items:center;justify-content:center;padding:20px;';
+    mask.onclick=function(ev){ if(ev.target===mask) mask.remove(); };
+    var box=document.createElement('div');
+    box.style.cssText='background:#0d1626;border:1px solid #243150;border-radius:12px;max-width:960px;width:100%;max-height:80vh;overflow-y:auto;padding:16px 18px;';
+    box.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><b style="font-size:14px;color:#e8f0ff;">📡 高手强势股跟踪 · 全部标的</b>'
+      +'<span style="cursor:pointer;color:#93a4c4;font-size:20px;padding:0 6px;margin-left:auto;" onclick="this.parentElement.parentElement.remove()">×</span></div>'
+      + caps + _tableHtml(_rows);
+    mask.appendChild(box);
+    document.body.appendChild(mask);
   };
-  window.__imaSetFilter = function(f){ window.__imaFilter = f; window.__renderImaStrongStock(); };
+  window.__imaSetFilter = function(f){ window.__imaFilter = f; var _m=document.querySelector('div[style*="z-index:99998"]'); if(_m) _m.remove(); window.__imaFullPopup(); };
 
   // ===== 因子实验室（异常换手率 + ROE_TTM 大市值档）=====
   window.__flRetry = 0;
