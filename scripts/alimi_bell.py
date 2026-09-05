@@ -35,7 +35,13 @@ import datetime
 import urllib.request
 import urllib.error
 
-_PAT_FILE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".gh_pat")
+# 安全铁律(2026-09-05): token 单点存仓库外 ~/.workbuddy/v8_gh_pat(坚果云同步范围外);
+# 仓库内 .gh_pat 仅作未迁移机器的兜底, 严禁新建含明文 token 的同步盘文件
+_PAT_CANDIDATES = [
+    os.path.join(os.path.expanduser("~"), ".workbuddy", "v8_gh_pat"),
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".gh_pat"),
+]
+_PAT_FILE = next((p for p in _PAT_CANDIDATES if os.path.exists(p)), _PAT_CANDIDATES[0])
 _REPO = "ah-quant999/quant-scanner-v8"
 _CST = datetime.timezone(datetime.timedelta(hours=8))
 
