@@ -109,7 +109,10 @@ def _query_kline_mootdx(code, days):
         out["pctChg"] = out["pctChg"].fillna(0.0)
         return out
     except Exception:
-        _KLINE_FAILS += 1
+        # 🛡 2026-09-05 一劳永逸：mootdx 失败是常态（云端无 tdx 客户端/本机网络层拦截），
+        # 绝不可累加到全局 _KLINE_FAILS——否则连败 40 次会把东方财富兜底也拖死，
+        # 导致 CRDS 逐只 K 线全失败、total_scanned=0（静默 0 命中根因）。
+        # _KLINE_FAILS 只统计「真兜底」东方财富的连续失败。
         _tdx_reset()
         return None
 
