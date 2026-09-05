@@ -18,7 +18,7 @@ v8 Pre-deploy audit（CI 自动门禁，2026-09-05 主人令一劳永逸落地�
 
 铁律：纯标准库 + 仅调本地子进程，可被 GitHub Actions ubuntu-latest 干净跑通。
 """
-import os, re, sys, subprocess, json, glob
+import os, re, sys, subprocess, json, glob, datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent.parent  # .github/scripts/ → repo root
@@ -122,6 +122,32 @@ def check_align_logic_ops():
     return (True, "align_logic_ops EXIT 0（逻辑详解页与真 workflow 对齐）")
 
 
+def write_audit_log(results, exit_code):
+    """落盘三件套审计轨迹到 raw_data/code_audit.log（append）。
+    让「何时/谁跑过三件套」有据可查。*.log 已被 .gitignore 忽略 → 不入库、不污染工作树。
+    日志失败绝不阻断 deploy（静默吞掉）。
+    """
+    try:
+        log_path = ROOT / "raw_data" / "code_audit.log"
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        env = "github-actions" if os.environ.get("GITHUB_ACTIONS") else "local"
+        try:
+            sha = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=str(ROOT),
+                                 capture_output=True, text=True, timeout=10).stdout.strip()
+        except Exception:
+            sha = "unknown"
+        if not sha:
+            sha = "unknown"
+        status = "PASS" if exit_code == 0 else "FAIL"
+        head = f"[{ts}] env={env} commit={sha} result={status}"
+        body = "\n".join(f"    {lb}: {'OK' if ok else 'FAIL'} - {msg}" for lb, ok, msg in results)
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(head + "\n" + body + "\n\n")
+    except Exception:
+        pass
+
+
 def main():
     checks = [
         ("[1/4] py_compile", check_py_compile),
@@ -133,14 +159,17 @@ def main():
     print("v8 pre-deploy audit（CI 自动门禁，2026-09-05 启用）")
     print("=" * 60)
     fails = 0
+    results = []
     for label, fn in checks:
         ok, msg = fn()
         icon = "✅" if ok else "❌"
         print(f"  {icon} {label}: {msg}")
+        results.append((label, ok, msg))
         if not ok:
             fails += 1
             errors.append(f"{label}: {msg}")
     print("=" * 60)
+    write_audit_log(results, 0 if fails == 0 else 1)
     if fails:
         print(f"🚫 {fails} 项校验失败 → 阻断 deploy！")
         for e in errors:
