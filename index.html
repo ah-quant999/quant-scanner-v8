@@ -8644,8 +8644,9 @@ function drawUpDownChart(){
     const ok = summary.ok || 0;
     const fail = summary.fail || 0;
     const empty = summary.empty || 0;
-    const statusColor = fail > 0 ? 'var(--up)' : (empty > 0 ? 'var(--gold)' : 'var(--down)');
-    const statusText = fail > 0 ? '有失败' : (empty > 0 ? '部分空' : '正常');
+    const staleCount = Object.values(modules).filter(function(m){ return m && m.status === 'stale'; }).length;
+    const statusColor = fail > 0 ? 'var(--up)' : (empty > 0 ? 'var(--gold)' : (staleCount > 0 ? 'var(--up)' : 'var(--down)'));
+    const statusText = fail > 0 ? '有失败' : (empty > 0 ? '部分空' : (staleCount > 0 ? '数据源离线空(' + staleCount + ')' : '正常'));
     // 关注与全球宏观、资金流时间轴直接相关的模块
     const watch = ['MACRO_DATA','MARKET_FUND_FLOW_DATA','INDEX_QUOTES','ETF_INTRADAY_HEAT','SECTOR_FUND_FLOW'];
     let watchHtml = '';
@@ -8664,7 +8665,7 @@ function drawUpDownChart(){
         '<span style="font-size:11px;color:'+statusColor+';flex:0 0 auto;">● '+statusText+'</span>'+
       '</div>'+
       '<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">'+
-        '共 '+total+' 模块 · 成功 '+ok+' · 空 '+empty+' · 失败 '+fail+
+        '共 '+total+' 模块 · 成功 '+ok+' · 空 '+empty+' · 失败 '+fail+(staleCount > 0 ? (' · 离线空 ' + staleCount) : '')+
         (rs.hostname ? ' · 节点 '+_esc(rs.hostname) : '')+
       '</div>'+
       '<div style="display:flex;flex-wrap:wrap;gap:4px 0;margin-bottom:10px;">'+watchHtml+'</div>';

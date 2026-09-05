@@ -806,6 +806,36 @@ def _load_js_var_file(path):
     return var, None
 
 
+def _is_raw_empty_or_stale(raw_path):
+    """🆕 2026-09-05 cn 离线兜底：判空/占位。空则不重建 data/X.js（保留线上旧版）。
+    返回 (is_empty, reason)。阈值保守，不误杀合法小产物（CRDS 带 scan_stats 空产物~200B 不误杀）。"""
+    try:
+        size = raw_path.stat().st_size
+    except Exception:
+        return (True, "文件不存在")
+    if size < 30:
+        return (True, f"文件过小({size}B)")
+    try:
+        obj = json.loads(raw_path.read_text(encoding="utf-8"))
+    except Exception:
+        return (True, "JSON 解析失败")
+    if isinstance(obj, list) and len(obj) == 0:
+        return (True, "顶层为空列表")
+    if isinstance(obj, dict):
+        if obj.get("validity") == "unknown":
+            return (True, "数据源异常占位(validity=unknown)")
+        mc = obj.get("market_context") or {}
+        if obj.get("total_scanned") == 0 and mc.get("validity") not in ("ok", "good", "normal"):
+            return (True, "0命中且数据源有效性异常")
+        if set(obj.keys()) <= {"update_time"}:
+            return (True, "仅含时间戳的占位对象")
+    return (False, "")
+
+
+# 🆕 2026-09-05 变量名→raw_data 文件名反向映射（供 RUNNER_STATUS 标 stale）
+_VAR_TO_RAW = {v: k for k, v in DATA_SOURCES.items()}
+
+
 def stamp_missing_update_time():
     """2026-08-22 主人令：为缺失 update_time 的 data/*.js 补入生成时间戳。
 
@@ -855,6 +885,15 @@ def _expand_runner_status():
             expanded[name] = modules[name]
         else:
             expanded[name] = {"status": "skip", "msg": "本周期未运行（未出现在 runner_status）"}
+        # 🆕 2026-09-05 cn 离线兜底：该模块 raw_data 空/占位 → 标 stale（数据源离线可见）
+        _fname = _VAR_TO_RAW.get(name)
+        if _fname:
+            _rp = RAW_DIR / _fname
+            if _rp.exists():
+                _e, _r = _is_raw_empty_or_stale(_rp)
+                if _e:
+                    expanded[name] = {**expanded[name], "status": "stale",
+                                      "msg": f"数据源离线/产物空：{_r}"}
     out = dict(src)
     out["modules"] = expanded
     out["_expanded"] = True
@@ -975,6 +1014,12 @@ def build(category=None, detect_changes=False):
             continue
         obj = _load_json(src_path)
         if obj is None:
+            skipped += 1
+            continue
+        # 🆕 2026-09-05 cn 离线兜底：空/占位产物跳过重建，保留线上旧版 data/X.js（不写空污染前端）
+        is_empty, empty_reason = _is_raw_empty_or_stale(src_path)
+        if is_empty:
+            print(f"  ⏭️  {src_path.name} 判空/占位（{empty_reason}），跳过重建 data/{var_name}.js（保留线上旧版）")
             skipped += 1
             continue
         out_path = _write_js(var_name, obj)
