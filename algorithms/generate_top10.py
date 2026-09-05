@@ -372,6 +372,95 @@ def breakout_5d_of(code, asof_date=None):
     return today["high"] >= high_5d and today["close"] > prev["close"]
 
 
+def _kline_volume_metrics(code, asof_date=None):
+    """返回个股量能与位置指标：20日均量、量比、30日/5日分位、今日涨跌幅等；
+    用于 P3 研究驱动因子（量能突破、温水煮青蛙、超跌反弹、上涨中继）。"""
+    recs = _load_kline_full(code)
+    if len(recs) < 30:
+        return None
+    if asof_date:
+        recs = [r for r in recs if r["date"] <= asof_date]
+        if len(recs) < 30:
+            return None
+    today = recs[-1]
+    prev_20 = recs[-21:-1]
+    vol_20 = sum(r["volume"] for r in prev_20) / len(prev_20)
+    high_30 = max(r["high"] for r in recs[-30:])
+    low_30 = min(r["low"] for r in recs[-30:])
+    high_5 = max(r["high"] for r in recs[-5:])
+    low_5 = min(r["low"] for r in recs[-5:])
+    open_t = today["open"]
+    close_t = today["close"]
+    return {
+        "today": today,
+        "vol_ratio": (today["volume"] / vol_20) if vol_20 > 0 else 1.0,
+        "vol_20": vol_20,
+        "range_pos_30": ((close_t - low_30) / (high_30 - low_30)) if high_30 > low_30 else 0.5,
+        "range_pos_5": ((close_t - low_5) / (high_5 - low_5)) if high_5 > low_5 else 0.5,
+        "pct_today": ((close_t - open_t) / open_t * 100) if open_t > 0 else 0.0,
+        "recs": recs,
+    }
+
+
+def _volume_surge_score(vm):
+    """量能突破：A股实证中换手率/量能是 t 值最高的有效因子。
+    放量确认价格行为时加分，缩量拉升不额外奖励。"""
+    if not vm:
+        return 0
+    vr = vm["vol_ratio"]
+    if vr >= 2.5:
+        return 3
+    if vr >= 1.8:
+        return 2
+    if vr >= 1.3:
+        return 1
+    return 0
+
+
+def _frog_in_pan_score(vm):
+    """温水煮青蛙（frog in the pan）：连续小阳线、低波动，市场反应不足。
+    参考截图#11动量因子本意。"""
+    if not vm:
+        return 0
+    streak = 0
+    for r in reversed(vm["recs"]):
+        open_p = r["open"]
+        if open_p <= 0:
+            break
+        pct = (r["close"] - open_p) / open_p * 100
+        range_pct = (r["high"] - r["low"]) / open_p * 100
+        if 0.2 <= pct <= 3.0 and range_pct < 5.0:
+            streak += 1
+        else:
+            break
+    if streak >= 5:
+        return 4
+    if streak >= 3:
+        return 2
+    return 0
+
+
+def _oversold_bounce_score(vm, pct20):
+    """超跌反弹：20日跌幅>10%，今日收阳，且量能放大（资金开始承接）。"""
+    if not vm or pct20 is None or pct20 > -10:
+        return 0
+    if vm["pct_today"] <= 0:
+        return 0
+    if vm["vol_ratio"] < 1.2:
+        return 0
+    return 3
+
+
+def _range_continuation_score(vm):
+    """上涨中继：长周期仍处高位（30日分位>70%），短周期已回落至低位（5日分位<30%）。
+    对应截图#11长周期不破70分位、短周期跌破30分位的上涨中继逻辑。"""
+    if not vm:
+        return 0
+    if vm["range_pos_30"] >= 0.7 and vm["range_pos_5"] <= 0.3:
+        return 3
+    return 0
+
+
 def _migrate_old_top10_scores(hist_dir):
     """将历史 top10_daily_YYYYMMDD.json 中旧 raw 评分（>100）统一归一化到 0~100，
     保证回测与阈值口径一致。
@@ -669,6 +758,31 @@ def main():
         if breakout_5d:
             enhance += 5
 
+        # ── P3 研究驱动量能/行为因子（2026-09-05）──
+        # 截图研究结论：A股换手率/量能 t 值最高；动量应捕捉「温水煮青蛙」式市场反应不足；
+        # 上涨中继 = 长周期强势 + 短周期回落。四个因子均只从 K 线（开高低收量）计算，
+        # 与现有信号正交，作为 enhance 增量，单票上限 +13。
+        vm = _kline_volume_metrics(raw_code)
+        research_score = 0
+        research_detail = []
+        rs = _volume_surge_score(vm)
+        if rs:
+            research_score += rs
+            research_detail.append(f"量能突破x{vm['vol_ratio']:.1f}+{rs}")
+        rs = _frog_in_pan_score(vm)
+        if rs:
+            research_score += rs
+            research_detail.append(f"温水煮青蛙+{rs}")
+        rs = _oversold_bounce_score(vm, pct20)
+        if rs:
+            research_score += rs
+            research_detail.append(f"超跌反弹+{rs}")
+        rs = _range_continuation_score(vm)
+        if rs:
+            research_score += rs
+            research_detail.append(f"上涨中继+{rs}")
+        enhance += research_score
+
         # ── 技术形态分 (2026-07-26): 把驾驶舱 A 档条件合并进主站打分 ──
         # 条件：上涨趋势 + 机构变红 + RSI<68 + 20日涨幅<35% + EMA>=5 + 非涨停
         ema_up = s.get("ema_up") or latest.get("ema_up") or 0
@@ -879,12 +993,13 @@ def main():
                 "quality": quality_score,
                 "backtest": score_backtest,
                 "breakout": 5 if breakout_5d else 0,
+                "research": research_score,
                 "signals": {
                     "chan": has_chan,
                     "jinzuan": has_qizhang or has_huangzhu,
                     "jigou": has_jigou,
                     "trend": has_trend,
-                    "form_A": has_trend and has_jigou and ema_up >= 5 and rsi < 68 and pct20 < 35 and not limit_up,
+                    "form_A": sig_jinzuan and has_chan and ema_up >= 5 and rsi < 68 and pct20 < 35 and not limit_up,
                 },
             },
             "win_rate": round(win_rate, 1),
@@ -895,6 +1010,7 @@ def main():
                 "sector": sector_detail,
                 "inst": " | ".join(inst_detail) if inst_detail else "",
                 "quality": quality_detail,
+                "research": " | ".join(research_detail) if research_detail else "",
             },
         })
 
@@ -937,6 +1053,7 @@ def main():
             "score_quality": bd.get("quality", 0),
             "score_backtest": bd.get("backtest", 0),
             "score_breakout": bd.get("breakout", 0),
+            "score_research": bd.get("research", 0),
             "win_rate": s.get("win_rate", None),
             "quality_grade": s.get("quality_grade", ""),
             "signals": bd["signals"],
