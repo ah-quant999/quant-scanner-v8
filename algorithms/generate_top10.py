@@ -67,6 +67,18 @@ SIGNAL_SCORE_CAP, SIGNAL_SCORE_FLOOR = 30, -30
 def _signal_score_from_edge(edge):
     return max(SIGNAL_SCORE_FLOOR, min(SIGNAL_SCORE_CAP, round(edge * SIGNAL_EDGE_TO_SCORE)))
 
+def load_json(path, default=None):
+    """安全加载JSON"""
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return default if default is not None else {}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 🔴 P2 信号边缘权重（运行期加载）：必须在 load_json 定义之后执行
+# ─────────────────────────────────────────────────────────────────────────────
 SIGNAL_EDGE = dict(SIGNAL_EDGE_DEFAULT)
 SIGNAL_N, SIGNAL_CONSISTENT = {}, {}
 try:
@@ -112,15 +124,6 @@ def bt_edge10_for(chan, jinzuan, jigou, trend):
     key = f"{int(chan)},{int(jinzuan)},{int(jigou)},{int(trend)}"
     rec = BT_BY_SIGNAL.get(key)
     return float((rec or {}).get("edge10", 0) or 0)
-
-
-def load_json(path, default=None):
-    """安全加载JSON"""
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return default if default is not None else {}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
