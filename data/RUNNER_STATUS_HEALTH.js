@@ -1,1 +1,1 @@
-window.RUNNER_STATUS_HEALTH = {"runner":"lemoncat-cn","state":"online","checked_at_utc":"2026-09-05T14:19:48Z","checked_at_bj":"2026-09-05 22:19:48","update_time":"2026-09-05 22:19:48","source":"runner_health_alert.yml"};
+window.RUNNER_STATUS_HEALTH = {"runner":"lemoncat-cn","state":"online","checked_at_utc":"2026-09-05T17:58:45Z","checked_at_bj":"2026-09-06 01:58:45","update_time":"2026-09-06 01:58:45","source":"runner_health_alert.yml"};
