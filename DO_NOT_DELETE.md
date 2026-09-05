@@ -236,3 +236,7 @@
 
 > 🟢 豁免 `data/TOP5_TRACK.js`：TOP5 滚动跟踪样本<30 长期空表，主人 2026-08-30 令彻底删除（A 方案），随孤儿脚本一并移除，无前端/下游依赖。
 > 🟢 豁免 `algorithms/gen_top5_track.py`：随 TOP5_TRACK 数据一并删除的孤儿算法脚本，run_algorithms.py 已移除其调度，无任何前端/下游依赖。
+
+> 🟢 豁免 `data/RPS_BACKTEST.js`：RPS 相对强度选股层已按主人令（2026-09-05）从选股策略子页全方位下线，data/RPS_BACKTEST.js 全站0引用，允许删除（2026-09-05 轻量化收尾）。
+> 🟢 豁免 `raw_data/backtest_h_vs_momentum.json`：老动量 vs H反推回测残留，已归档，全站0引用，允许删除（2026-09-05 轻量化收尾）。
+> 🟢 豁免 `raw_data/hunter_backtest.json`：大牛股猎手回测残留，已按主人令（2026-09-03）下线，全站0引用，允许删除（2026-09-05 轻量化收尾）。
