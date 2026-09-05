@@ -576,30 +576,32 @@ def calc_crds_for_stock(stock_df, mkt_df, code, name, board_label):
 
 
 def _load_scan_targets():
-    """从v8自有数据源加载CRDS扫描标的（不再依赖v6 watch_result.json）。
+    """从v8自有数据源加载CRDS扫描标的，方案A:合并所有候选源去重。
 
-    优先级: gold_pool_stocks.json(算法链原始) > gold_pool.json(raw) > GOLD_POOL.js(前端)
-    每个源返回 [{code, name, board_label, market_label, pct_chg}, ...]
+    遍历 4 个候选源(out/gold_pool_stocks.json > raw_data/gold_pool.json >
+    data/GOLD_POOL.js > data/CANDIDATE.js)按 code 去重合并,金股层(标记 is_gold=True)
+    排序在前以保留"金股精选"语义,候选层补全到宽宇宙(典型 474 只)。
+    返回 [{code, name, board_label, market_label, pct_chg, is_gold}, ...]
     """
     import re as _re
 
-    # 候选数据源路径（按优先级）
     _base = os.path.dirname(os.path.abspath(__file__))
     _out_dir = os.path.join(_base, "..", "out")
     _raw_dir = os.path.join(_base, "..", "raw_data")
     _data_dir = os.path.join(_base, "..", "data")
 
+    # 源定义: (label, path, json_key, is_gold_layer)
     _sources = [
-        ("金股池(算法链)", os.path.join(_out_dir, "gold_pool_stocks.json"), "stocks"),
-        ("金股池(raw)", os.path.join(_raw_dir, "gold_pool.json"), "stocks"),
-        ("金股池(前端JS)", os.path.join(_data_dir, "GOLD_POOL.js"), None),  # JS需特殊解析
-        ("候选池(前端JS)", os.path.join(_data_dir, "CANDIDATE.js"), None),
+        ("金股池(算法链)", os.path.join(_out_dir, "gold_pool_stocks.json"), "stocks", True),
+        ("金股池(raw.stocks)", os.path.join(_raw_dir, "gold_pool.json"), "stocks", True),
+        ("金股池(前端JS)", os.path.join(_data_dir, "GOLD_POOL.js"), None, True),
+        ("候选池(前端JS)", os.path.join(_data_dir, "CANDIDATE.js"), None, False),
     ]
 
-    for label, path, key in _sources:
+    merged = {}  # code -> {code, name, board_label, market_label, pct_chg, is_gold, _from}
+    for label, path, key, is_gold in _sources:
         try:
             if path.endswith(".js") and key is None:
-                # 解析 window.XXX = {...}; 格式
                 stocks = _parse_js_stock_file(path)
             else:
                 with open(path, "r", encoding="utf-8") as _f:
@@ -608,43 +610,50 @@ def _load_scan_targets():
 
             if not stocks:
                 continue
-            # 兼容 dict 格式（如 gold_pool.json 的 stocks 为 {sh_600xxx: {...}}）
+            # 兼容 dict 格式(如 gold_pool.json 的 stocks 为 {sh_600xxx: {...}})
             if isinstance(stocks, dict):
                 stocks = list(stocks.values())
 
-            # 标准化: 确保每项有 code 字段，且只保留 A 股 6 位代码
-            _normalized = []
-            _seen_codes = set()
+            _added = 0
             for s in stocks:
-                if isinstance(s, dict):
-                    raw_code = str(s.get("code", "") or s.get("stock_code", "") or "")
-                    nc = _re.sub(r'[^0-9]', '', raw_code)
-                    # 过滤港股/基金/指数等非 A 股 6 位代码
-                    if not nc or len(nc) != 6 or nc in _seen_codes:
-                        continue
-                    # 进一步按 market/board 过滤港股（防止 5 位/7 位混进来）
-                    mk = str(s.get("market", "") or s.get("market_label", "")).lower()
-                    bd = str(s.get("board_label", "") or s.get("board", ""))
-                    if mk == "hk" or bd == "港股":
-                        continue
-                    _seen_codes.add(nc)
-                    _normalized.append({
-                        "code": nc,
-                        "name": s.get("name", "") or s.get("stock_name", ""),
-                        "board_label": bd,
-                        "market_label": s.get("market_label", "") or s.get("market", ""),
-                        "pct_chg": s.get("pct_chg", 0) or s.get("pctChg", 0) or s.get("change_pct", 0),
-                    })
+                if not isinstance(s, dict):
+                    continue
+                raw_code = str(s.get("code", "") or s.get("stock_code", "") or "")
+                nc = _re.sub(r'[^0-9]', '', raw_code)
+                # 仅保留 A 股 6 位代码,跳过港股/基金/指数等
+                if not nc or len(nc) != 6 or nc in merged:
+                    continue
+                mk = str(s.get("market", "") or s.get("market_label", "")).lower()
+                bd = str(s.get("board_label", "") or s.get("board", ""))
+                if mk == "hk" or bd == "港股":
+                    continue
+                merged[nc] = {
+                    "code": nc,
+                    "name": s.get("name", "") or s.get("stock_name", ""),
+                    "board_label": bd,
+                    "market_label": s.get("market_label", "") or s.get("market", ""),
+                    "pct_chg": s.get("pct_chg", 0) or s.get("pctChg", 0) or s.get("change_pct", 0),
+                    "is_gold": is_gold,
+                    "_from": label,
+                }
+                _added += 1
 
-            if _normalized:
-                print(f"  [数据源] {label}: {len(_normalized)} 只股票")
-                return _normalized
+            if _added:
+                print(f"  [数据源] {label}: +{_added} (新增)")
         except Exception as e:
             print(f"  [跳过] {label}: {e}")
             continue
 
-    print("  [WARN] 所有数据源均不可用")
-    return []
+    if not merged:
+        print("  [WARN] 所有数据源均不可用")
+        return []
+
+    # 金股优先, 其余按 code 升序
+    _result = sorted(merged.values(), key=lambda x: (0 if x.get("is_gold") else 1, x.get("code", "")))
+    gold_n = sum(1 for x in _result if x.get("is_gold"))
+    print(f"  [合并完成] 总 {len(_result)} 只 (金股 {gold_n} + 候选 {len(_result)-gold_n})")
+    return _result
+
 
 
 def _parse_js_stock_file(js_path):
