@@ -1261,8 +1261,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">· <b>📅 机游共振日历</b>（jyCalContainer）：逐日展示龙虎榜「机游共振 / 机构独买 / 游资独买」上榜标的与净买额。<br>· <b>🌊 北向席位日历</b>（northCalContainer）：逐日北向席位净买卖明细与连续净买信号。<br>· <b>🔍 每日洞察</b>：涨跌概况 / 资金流向 / 热点板块 / 异动信号聚合。</div>
         <div class="logic-h">数据口径</div>
         <div class="logic-p">统一由 <code>window._rcDays()</code> 聚合 <b>LHB_HISTORY</b>（多日历史，保证 7 日连续数据）+ <b>LHB_DATA</b>（当日降级兜底）产出。2026-08-08 清理了与 sec-rc 新实现同名冲突的旧 <code>renderJyCalendar</code> / <code>renderNorthCalendar</code>（曾渲染进不存在容器，导致日历覆盖、7 日数据时有时无），现仅保留单一聚合实现。</div>
-        <div class="logic-h">与「大牛股猎手」的关系</div>
-        <div class="logic-p">大牛股猎手（选股策略 tab）是共振日历「机游共振」信号的<b>选股化落地</b>——把当日上榜的机游共振标的做成中线观察池；共振日历仍是完整的每日机游/北向/洞察总览。</div>
+        <div class="logic-h">已下架：大牛股猎手（2026-09-03 主人令）</div>
+        <div class="logic-p">现已从选股策略子页全方位下线，相关机游共振信号由「📡 机游共振日历」承接展示；本段仅作历史说明保留。</div>
       </div>
 
       
