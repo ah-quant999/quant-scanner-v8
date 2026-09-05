@@ -10088,7 +10088,34 @@ window.showRestrictedItems = showRestrictedItems;
 
     const alerts=track.alerts||[];
     $('ttAlertCount').textContent=alerts.length;
-    $('ttAlerts').innerHTML=alerts.length?alerts.map(a=>'<div class="tp-alert '+a.level+'">'+a.text+'</div>').join(''):'<div class="tp-empty">当前无状态迁移告警'+needDaysMsg+'</div>';
+    // 2026-09-06 主人令：主卡只显示最近 5 个「有告警的交易日」，其余点击「📄 全部告警」弹窗查看
+    //   （alerts 无独立 date 字段，日期嵌在 text 内「于 YYYY-MM-DD」——正则抽取，取出现日期降序前 5 个）
+    var TT_ALERT_RECENT_DAYS = 5;
+    var _aDate = function(a){ var m=String(a.text||'').match(/于\s*(\d{4}-\d{2}-\d{2})/); return m?m[1]:''; };
+    var _allDates = alerts.map(_aDate).filter(Boolean).filter(function(v,i,arr){ return arr.indexOf(v)===i; }).sort().reverse();
+    var _recentSet = {};
+    _allDates.slice(0, TT_ALERT_RECENT_DAYS).forEach(function(d){ _recentSet[d]=1; });
+    var _recentAlerts = alerts.filter(function(a){ return _recentSet[_aDate(a)]; });
+    var _oldAlerts = alerts.filter(function(a){ return !_recentSet[_aDate(a)]; });
+    var _alertHtml = _recentAlerts.length
+      ? _recentAlerts.map(function(a){ return '<div class="tp-alert '+a.level+'">'+a.text+'</div>'; }).join('')
+      : '<div class="tp-empty">最近 '+TT_ALERT_RECENT_DAYS+' 个交易日无状态迁移告警'+needDaysMsg+'</div>';
+    if(_oldAlerts.length){
+      window.__ttAlertPopup = function(){
+        var mask=document.createElement('div');
+        mask.style.cssText='position:fixed;inset:0;background:rgba(2,6,17,.72);z-index:99998;display:flex;align-items:center;justify-content:center;padding:20px;';
+        mask.onclick=function(ev){ if(ev.target===mask) mask.remove(); };
+        var box=document.createElement('div');
+        box.style.cssText='background:#0d1626;border:1px solid #243150;border-radius:12px;max-width:680px;width:100%;max-height:80vh;overflow-y:auto;padding:16px 18px;';
+        box.innerHTML='<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><b style="font-size:14px;color:#e8f0ff;">🔔 状态迁移 &amp; 告警 · 全部 '+alerts.length+' 条</b>'
+          +'<span style="cursor:pointer;color:#93a4c4;font-size:20px;padding:0 6px;margin-left:auto;" onclick="this.parentElement.parentElement.remove()">×</span></div>'
+          + alerts.map(function(a){ return '<div class="tp-alert '+a.level+'">'+a.text+'</div>'; }).join('');
+        mask.appendChild(box);
+        document.body.appendChild(mask);
+      };
+      _alertHtml += '<div style="margin-top:8px;text-align:center;"><span onclick="window.__ttAlertPopup()" style="cursor:pointer;display:inline-block;padding:4px 14px;border-radius:8px;font-size:12px;font-weight:600;color:#fbbf24;border:1px solid rgba(251,191,36,.4);background:rgba(251,191,36,.08);">📄 全部告警（共 '+alerts.length+' 条 · 含更早 '+_oldAlerts.length+' 条）</span></div>';
+    }
+    $('ttAlerts').innerHTML=_alertHtml;
 
     const catRows=(track.tracked||[]).filter(t=>t.catalysts&&t.catalysts.length);
     $('ttCatalyst').innerHTML=catRows.length?catRows.map(t=>'<div class="tp-stock" style="padding:8px 0;border:0"><b>'+t.name+'</b> <span class="tp-code">'+t.code+'</span> '+t.catalysts.map(c=>{const c2=c.reaction==='已兑现(价涨)'?'ok':c.reaction==='走弱'?'weak':'';return '<span class="tp-catalyst '+c2+'">'+c.tag+(c.score?' '+(c.score>0?'+':'')+c.score:'')+' · '+c.reaction+'</span>';}).join('')+'</div>').join(''):'<div class="tp-empty">当前跟踪池无催化剂消息面记录'+needDaysMsg+'</div>';
