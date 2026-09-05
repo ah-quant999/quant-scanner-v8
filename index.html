@@ -5102,9 +5102,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       var g = (typeof window.v8FactorGate==='function') ? window.v8FactorGate(fv, kind==='at'?atVals:roeVals, 0.2) : {pass:false,reason:'',color:'#94a3b8'};
       var badge = g.pass ? '<span style="color:#5ee0a0;font-size:11px;">🟢可关注</span>'
                          : '<span style="color:'+g.color+';font-size:10px;">'+_e(g.reason)+'</span>';
-      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-left:3px solid '+accent+';margin:3px 0;font-size:13px;">'
-        + '<span><b>'+code+'</b> '+name+' <span style="color:var(--dim)">'+close+'</span></span>'
-        + '<span style="display:flex;gap:8px;align-items:center;"><span style="color:'+accent+'">'+main+'</span>'+badge+'</span></div>';
+      // 2026-09-05 主人令：行布局改为 grid 一行 3 列（代码名+价 | 指标值 | 可关注），原 flex 嵌套因容器宽度受限导致指标/标签被挤成垂直两行
+      return '<div style="display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:14px;padding:6px 10px;border-left:3px solid '+accent+';margin:3px 0;font-size:13px;">'
+        + '<span style="min-width:0;overflow:hidden;text-overflow:ellipsis;"><b>'+code+'</b> '+name+' <span style="color:var(--dim)">'+close+'</span></span>'
+        + '<span style="color:'+accent+';white-space:nowrap;">'+main+'</span>'
+        + '<span style="white-space:nowrap;">'+badge+'</span></div>';
     }
     var atTop = atTopArr.map(function(r){return row(r,'at');}).join('')
       || '<div class="note" style="color:var(--dim)">无有效数据</div>';
