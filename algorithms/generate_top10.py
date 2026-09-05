@@ -45,6 +45,75 @@ NORM_DIVISOR = 130
 NORM_VERSION = 130          # 写入快照，供迁移函数识别是否已按本口径归一
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 🔴 P2 信号边缘权重（2026-09-05）：全部来自 walk-forward 回测 edge
+# 来源：raw_data/backtest_expectancy.json · by_factor · T+10 edge（全站默认持有 10 日口径）
+#   sig_jinzuan +8.11  → 强正，重赏
+#   sig_chan    +3.68  → 温和正（与金钻共振时组合 edge +8.37，全样本最优组合）
+#   sig_trend   -7.54  → 反向，惩罚（旧代码 +25 赏，与回测相反）
+#   sig_jigou   -10.36 → 强反向，重罚（旧代码 +25 赏，与回测相反）
+# 运行期尝试读取该 JSON 覆盖默认值，回测重跑后权重自动刷新；读取失败回退硬编码。
+# P1 硬化：signal_confidence 按样本量 + T+5/T+10 符号一致性做收缩，防过拟合（薄样本/矛盾证据→0）。
+# ─────────────────────────────────────────────────────────────────────────────
+SIGNAL_EDGE_DEFAULT = {
+    "jinzuan": 8.11,
+    "chan":    3.68,
+    "trend":  -7.54,
+    "jigou":  -10.36,
+}
+SIGNAL_EDGE_TO_SCORE = 2.5   # 每 1% edge ≈ 2.5 分
+SIGNAL_SCORE_CAP, SIGNAL_SCORE_FLOOR = 30, -30
+
+def _signal_score_from_edge(edge):
+    return max(SIGNAL_SCORE_FLOOR, min(SIGNAL_SCORE_CAP, round(edge * SIGNAL_EDGE_TO_SCORE)))
+
+SIGNAL_EDGE = dict(SIGNAL_EDGE_DEFAULT)
+SIGNAL_N, SIGNAL_CONSISTENT = {}, {}
+try:
+    _bt = load_json(os.path.join(DATA_DIR, "backtest_expectancy.json"), {})
+    for _k, _v in (_bt.get("by_factor") or {}).items():
+        _name = {"sig_jinzuan": "jinzuan", "sig_chan": "chan",
+                 "sig_trend": "trend", "sig_jigou": "jigou"}.get(_k)
+        if not _name:
+            continue
+        SIGNAL_EDGE[_name] = _v.get("edge10", SIGNAL_EDGE[_name])
+        SIGNAL_N[_name] = _v.get("n_on10", 0)
+        SIGNAL_CONSISTENT[_name] = (_v.get("edge5", 0) > 0) == (_v.get("edge10", 0) > 0)
+except Exception as _e:
+    print(f"  ⚠️ 回测边缘权重加载失败，用硬编码默认: {_e}")
+SIGNAL_SCORE = {k: _signal_score_from_edge(v) for k, v in SIGNAL_EDGE.items()}
+
+def signal_confidence(name):
+    """P1 证据置信度（0~1）：样本少或符号矛盾→收缩到 0，避免薄证据主导排名"""
+    n = SIGNAL_N.get(name, 0)
+    if n <= 0:
+        return 1.0
+    conf = min(1.0, n / 120.0)
+    if not SIGNAL_CONSISTENT.get(name, True):
+        conf *= 0.5
+    return conf
+
+def signal_edge_score(name, present):
+    if not present:
+        return 0
+    return int(round(SIGNAL_SCORE.get(name, 0) * signal_confidence(name)))
+
+# P2 回测反哺：用 walk-forward by_signal T+10 edge 直接修正排名（替代原 cockpit T+3 胜率，已下线恒50）
+BT_BY_SIGNAL = {}
+try:
+    _bt2 = load_json(os.path.join(DATA_DIR, "backtest_expectancy.json"), {})
+    BT_BY_SIGNAL = _bt2.get("by_signal", {})
+except Exception:
+    BT_BY_SIGNAL = {}
+
+def bt_edge10_for(chan, jinzuan, jigou, trend):
+    """给定四信号布尔 (chan, jinzuan, jigou, trend) → walk-forward T+10 edge(%)；
+    组合缺失回退 0（中性）。key 格式与 backtest_expectancy.json by_signal 一致：'c,j,t,tr'"""
+    key = f"{int(chan)},{int(jinzuan)},{int(jigou)},{int(trend)}"
+    rec = BT_BY_SIGNAL.get(key)
+    return float((rec or {}).get("edge10", 0) or 0)
+
+
 def load_json(path, default=None):
     """安全加载JSON"""
     try:
@@ -413,25 +482,9 @@ def main():
     freshness_warn("行业概念映射", industry_map, max_age_days=2.0)
     print("  ────────────────")
 
-    # ── 2.5 加载驾驶舱回测胜率并按信号组合聚合 ──
-    backtest = {}  # 2026-09-03 主人令：cockpit_backtest.json 已下线，置空
-    bt_by_signal = {}
-    bt_total_wins = bt_total_losses = 0
-    for date_list in backtest.get("by_date", {}).values():
-        for rec in date_list:
-            sigs = rec.get("signals", {})
-            key = (bool(sigs.get("chan")), bool(sigs.get("jinzuan")),
-                   bool(sigs.get("jigou")), bool(sigs.get("trend")))
-            st = bt_by_signal.setdefault(key, {"wins": 0, "losses": 0})
-            if rec.get("is_win"):
-                st["wins"] += 1
-                bt_total_wins += 1
-            elif rec.get("is_loss"):
-                st["losses"] += 1
-                bt_total_losses += 1
-    # 整体胜率作为无样本/少样本时的平滑基准
-    bt_total_n = bt_total_wins + bt_total_losses
-    bt_base_rate = bt_total_wins / bt_total_n * 100 if bt_total_n > 0 else 50.0
+    # ── 2.5 回测反哺数据源（P2）：walk-forward by_signal T+10 edge ──
+    # 已在模块级 BT_BY_SIGNAL / bt_edge10_for() 加载（来自 raw_data/backtest_expectancy.json）。
+    # 原 cockpit_backtest.json 已下线，旧的 T+3 胜率反哺恒为 50，已整体替换。
 
     # ── 2.6 P0-1 择时门控（2026-08-30）：与前端 v8MarketGate() 对齐 ──
     # 唯一权威 = regime_filter（grind/panic 才开仓）。非开仓状态整体降权，
@@ -460,15 +513,7 @@ def main():
           f"× regime_w={regime_weight:.2f}→{regime_weight_adj:.2f}({regime_action}) "
           f"→ 乘子={gate_multiplier:.3f}")
 
-    def bt_win_rate_for(sigs):
-        """给定四信号布尔元组，返回带拉普拉斯平滑的历史 T+3 胜率(%)"""
-        key = (bool(sigs[0]), bool(sigs[1]), bool(sigs[2]), bool(sigs[3]))
-        st = bt_by_signal.get(key, {"wins": 0, "losses": 0})
-        n = st["wins"] + st["losses"]
-        # 拉普拉斯平滑：小样本向整体胜率回归；样本越多越相信自己
-        wins = st["wins"] + bt_base_rate / 100 * 5  # 先验等效 5 个样本
-        total = n + 5
-        return wins / total * 100 if total > 0 else bt_base_rate
+    # P2：T+3 胜率反哺已替换为模块级 bt_edge10_for()（walk-forward T+10 edge），见下方 score_backtest。
 
     # ── 3. 构建辅助查询映射 ──
     # 板块资金：板块名→净流入(亿)
@@ -562,21 +607,21 @@ def main():
         code = s.get("code", "")
         raw_code = code or key.replace("sz_", "").replace("sh_", "").replace("hk_", "")
 
-        # 基础信号 (0-75)  —— 2026-08-30 P0：剔除缠论买点（T+10 负期望）
+        # 基础信号（P2 重写 2026-09-05）：权重 = walk-forward T+10 edge × 置信度收缩
+        #   金钻 +20 / 缠论 +9 / 机构变红 −26 / 上涨趋势 −19
+        #   旧代码三信号各 +25，把两个反向因子（机构变红/上涨趋势）当正向用，与回测相反。
         has_chan = bool(latest.get("缠论买_日K"))
         has_qizhang = bool(latest.get("金钻_起涨"))
         has_huangzhu = bool(latest.get("金钻_黄柱"))
         has_jigou = bool(latest.get("四量图_机构变红"))
         has_trend = bool(latest.get("上涨趋势"))
-        sig_count = sum([has_qizhang or has_huangzhu, has_jigou, has_trend])
+        sig_jinzuan = has_qizhang or has_huangzhu
+        sig_count = sum([sig_jinzuan, has_chan, has_jigou, has_trend])
 
-        base = 0
-        if has_qizhang or has_huangzhu:
-            base += 25
-        if has_jigou:
-            base += 25
-        if has_trend:
-            base += 25
+        base = (signal_edge_score("jinzuan", sig_jinzuan)
+                + signal_edge_score("chan", has_chan)
+                + signal_edge_score("jigou", has_jigou)
+                + signal_edge_score("trend", has_trend))
 
         # 增强因子 (-10 ~ +13)
         enhance = 0
@@ -605,16 +650,15 @@ def main():
         elif rsi < 30:
             enhance += 3
 
-        # 连续共振天数（2026-08-30 P0：剔除缠论买点）
+        # 连续共振天数（P2：仅统计正向因子 金钻/缠论 的连续出现；反向因子不计入）
         consecutive = 0
         sorted_hist = sorted(hist, key=lambda h: h.get("date", ""), reverse=True)
         for h in sorted_hist:
             h_sig = sum([
                 bool(h.get("金钻_起涨") or h.get("金钻_黄柱")),
-                bool(h.get("四量图_机构变红")),
-                bool(h.get("上涨趋势")),
+                bool(h.get("缠论买_日K")),
             ])
-            if h_sig >= 2:
+            if h_sig >= 1:
                 consecutive += 1
             else:
                 break
@@ -647,9 +691,9 @@ def main():
             form_score += 2
         if rsi < 68:
             form_score += 2
-        if has_trend and has_jigou and ema_up >= 5 and rsi < 68 and pct20 < 35 and not limit_up:
+        if sig_jinzuan and has_chan and ema_up >= 5 and rsi < 68 and pct20 < 35 and not limit_up:
             form_score += 5
-            form_detail.append("形态A")
+            form_detail.append("形态A(金钻+缠论)")
         # 涨停过热直接惩罚（与形态A条件对齐）
         if limit_up:
             form_score -= 5
@@ -772,13 +816,15 @@ def main():
         # ── 原始总分（各维度绝对加分之和）──
         raw_total = base + enhance + form_score + fund + sector_score + inst + quality_score
 
-        # ── 回测胜率反哺（2026-07-25）──
-        # 根据当前信号组合的历史 T+3 胜率做乘子修正：胜率越高越加分，越低越降权
-        sig_tuple = (has_chan, has_qizhang or has_huangzhu, has_jigou, has_trend)
-        win_rate = bt_win_rate_for(sig_tuple)
-        # 以 50% 为中性基准；每偏离 10% ±5 分，限制 ±10 分
-        score_backtest = max(-10, min(10, round((win_rate - 50) / 10 * 5)))
+        # ── 回测反哺（P2 重写 2026-09-05）：walk-forward 信号组合 T+10 edge 直接修正 ──
+        # edge 每 1% ≈ ±1 分，clamp ±10；组合缺失回退 0（中性）。
+        sig_tuple = (has_chan, sig_jinzuan, has_jigou, has_trend)
+        bt_edge10 = bt_edge10_for(*sig_tuple)
+        score_backtest = max(-10, min(10, round(bt_edge10)))
         raw_total = raw_total + score_backtest
+        # T+10 胜率（用于前端展示，来自同一 walk-forward 回测；缺失组合回退 50）
+        _wr_rec = BT_BY_SIGNAL.get(f"{int(has_chan)},{int(sig_jinzuan)},{int(has_jigou)},{int(has_trend)}")
+        win_rate = float((_wr_rec or {}).get("win10", 50.0)) if _wr_rec else 50.0
 
         # 🚦 P0-1 门禁乘子：IC × Regime 联合微调（早于归一化，确保 max_score 口径一致）
         raw_total = raw_total * gate_multiplier
