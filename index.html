@@ -1575,7 +1575,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=53e4407d47" defer></script>
     <!-- 2026-09-04 主人令收尾：ALLSITE_BACKTEST.js 注入已删（生成器/raw_data 已于 09-03「干掉全站精选」系列删除，前端无任何代码读 window.ALLSITE_BACKTEST，标签纯 404 噪音） -->
     <script src="data/CRDS_BACKTEST.js?v=7d710f23c2" defer></script>
-    <script src="data/RPS_BACKTEST.js?v=c382743cfe" defer></script>
 <!-- build-bump: 2026-08-15T18:35:00+08:00 force-refresh -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
@@ -2439,7 +2438,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   <section id="sec-st">
     <div class="sec-head" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <h2 style="margin:0;">🎯 选股策略</h2>
-      <span class="tag">选股池 · 三重共识（主入口） · 选股生命周期 · 相对强度(RPS) · 逆势龙头(CRDS)</span>
+      <span class="tag">选股池 · 三重共识（主入口） · 选股生命周期 · 逆势龙头(CRDS)</span>
     </div>
     <!-- 建议持有期纪律 banner 已于 2026-08-30 移至逻辑详解页「选股策略·持有期纪律」段，此处不再展示（避免客户可看区域堆文字） -->
     <!-- TAB 按钮行（横排，独立于内容区） -->
@@ -2449,7 +2448,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <button class="st-tab" data-st="tc" onclick="switchSt('tc')">🥇 三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="fv" onclick="switchSt('fv')">🔥 四量终极 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐</span></button>
       <button class="st-tab" data-st="life" onclick="switchSt('life')">🧬 选股生命周期 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
-      <button class="st-tab" data-st="rps" onclick="switchSt('rps')">📈 相对强度 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐</span></button>
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用·固定</span></button>
     </div>
 
@@ -2663,60 +2661,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <!-- 2026-09-03 主人令：因子实验室迁至「暂未上架」（★★ 观测仓·调试与回测中；升 4⭐ 再转正选股策略子页），此处移除 -->
     </div><!--/st-life-->
 
-    <!-- ===== TAB 页面：个股相对强度 (RPS + RS + 年线) ===== -->
-    <div id="st-rps" class="st-pane">
-      <div class="card" id="strpsCard">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-          📈 <span style="font-weight:700;font-size:14px;color:var(--txt);">个股相对强度 · RPS + RS + 年线</span>
-          <span style="margin-left:4px;font-size:10px;color:#94a3b8;font-weight:500;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">自下而上</span>
-          <span id="strpsTime"></span>
-          <span id="strpsRunBadge" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.15);border:1px solid rgba(148,163,184,.35);vertical-align:middle">✅ 已计算</span>
-        </div>
-        <div style="font-size:11px;color:var(--dim);margin-bottom:12px;line-height:1.6;">
-          排名池：候选池 universe（<span id="strpsUniCount">--</span>只，<b style="color:#fbbf24">候选池内排名·非全市场</b>）；指数：<span id="strpsIndexName">--</span>；A档硬门禁：站上250日线 + RS&gt;0 + RPSmax≥90。
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
-          <label style="font-size:12px;color:var(--sub);">分层：</label>
-          <select id="strpsTierFilter" onchange="renderRpsScreen()" style="background:var(--bg2);color:var(--txt);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;">
-            <option value="all">全部</option>
-            <option value="A" selected>A档（拿住别动）</option>
-            <option value="B">B档（强势观察）</option>
-            <option value="C">C档（关注）</option>
-          </select>
-          <label style="font-size:12px;color:var(--sub);margin-left:8px;">最小RPS：</label>
-          <select id="strpsRpsFilter" onchange="renderRpsScreen()" style="background:var(--bg2);color:var(--txt);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;">
-            <option value="0">0</option>
-            <option value="80">80</option>
-            <option value="90" selected>90（推荐）</option>
-            <option value="95">95</option>
-          </select>
-          <span style="font-size:11px;color:var(--dim);">推荐 90：A档硬门禁阈值，兼顾数量与强度</span>
-          <button onclick="renderRpsScreen()" style="margin-left:auto;background:var(--cyan);color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;">刷新</button>
-        </div>
-        <table id="strpsTable" style="width:100%;border-collapse:collapse;font-size:12px;">
-          <thead><tr style="border-bottom:1px solid var(--border);">
-            <th style="text-align:left;padding:6px;">名称</th>
-            <th style="text-align:center;padding:6px;">档</th>
-            <th style="text-align:center;padding:6px;">RPS50</th>
-            <th style="text-align:center;padding:6px;">RPS120</th>
-            <th style="text-align:center;padding:6px;">RPS250</th>
-            <th style="text-align:center;padding:6px;">RPSmax</th>
-            <th style="text-align:center;padding:6px;">RS</th>
-            <th style="text-align:center;padding:6px;">年线</th>
-            <th style="text-align:center;padding:6px;">收盘价</th>
-          </tr></thead>
-          <tbody id="strpsBody"></tbody>
-        </table>
-        <div id="strpsEmpty" style="display:none;padding:14px;color:var(--dim);font-size:13px;text-align:center;">暂无满足条件的个股</div>
-      </div>
-
-      <!-- 2026-08-30 主人令「我只要最有效的东西」删除：RPS 分层回测卡（id=strpsBacktestCard）
-           删除理由（审计取证，非主观）：该卡并非真实回测——renderRpsBacktest() 用
-           ret=(r.ret50/50)*hold 把「50日已实现收益」线性折算成持有期收益，且用【今日截面】
-           的 RPS/RS/年线分层去回看历史收益，存在前视偏差(look-ahead bias)；
-           卡片自带文案亦写明「历史模拟 / 近似模拟 / 仅供内部验证」。
-           真实回测请以「🔒 策略回测 → K线信号60日回测 / 综合回测」为准。 -->
-    </div><!--/st-rps-->
 
 
     <!-- 2026-08-31 一劳永逸：删除重复的「观测候选股池」TAB 旧副本（迁移时复制未删），
@@ -4024,7 +3968,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   }
 
   /* 2026-09-02 主人令：选股模块星级表全局化（原在已下架分组内，现卡片迁回选股策略仍需共享） */
-  window.__MODULE_STARS = { fourvolume:4, crds:3, triple:5, rps:3 };  /* 2026-09-03 主人令：hunter/cockpit/allsite 已全方位下线，从 __MODULE_STARS 字典移除 */
+  window.__MODULE_STARS = { fourvolume:4, crds:3, triple:5 };  /* 2026-09-03 主人令：hunter/cockpit/allsite/rps 已全方位下线，从 __MODULE_STARS 字典移除 */
   window.__moduleStarsHTML = function(k){ var n=(window.__MODULE_STARS&&window.__MODULE_STARS[k])||0; var x=''; for(var i=0;i<n;i++) x+='⭐'; return x || '—'; };
   // ══ 2026-09-02 主人令：策略回测单一来源（一劳永逸）══
   //   主策略区(__renderBacktestSection) / 选股生命周期(__renderLifecycleSection) / 星级表模块行(_buildStrategyRating)
@@ -4034,10 +3978,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   window.__STRATEGY_BACKTESTS = [
     // 2026-09-03 主人令：已下架策略（cockpit/allsite/hunter）整体从回测区退出，
     // 既然选股策略子页已彻底删除（九宝不让「选股已删回测还在」），回测卡也不必保留。
-    // 当前 active 仅留真正仍在选股策略子页展示的 3 个主策略（fourvolume/crds/rps）。
+    // 当前 active 仅留真正仍在选股策略子页展示的 2 个主策略（fourvolume/crds）。
     {key:'fourvolume', name:'四量终极',     stars:4, icon:'📊', desc:'四量信号历史回测',         color:'#38bdf8', var:'FOUR_VOLUME_BACKTEST'},
     {key:'crds',       name:'逆势龙头CRDS', stars:3, icon:'🐉', desc:'CRDS advanced 档历史回测', color:'#ef4444', var:'CRDS_BACKTEST'},
-    {key:'rps',        name:'相对强度RPS',  stars:3, icon:'📉', desc:'RPS 相对强度信号历史回测',  color:'#14b8a6', var:'RPS_BACKTEST'}
   ];
   // 2026-09-03 主人令：cockpit/allsite 大牛股/全站精选 全部移出回测区，DELISTED 保留为空数组
   //   (防止 _renderBacktestCardsFrom 空引用报错)。如需历史胜率回溯请前往逻辑详解页相关章节。
@@ -4143,6 +4086,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       });
     }
 
+    // ②-b 中线最强（2026-09-05 主人令：策略回顾漏了 T+20 严格版，单独标「中线最强」与短线最佳区分）
+    if(bc && bc.comparison && bc.comparison.hold_20d && bc.comparison.hold_20d.resonance_gte80){
+      var d20 = bc.comparison.hold_20d.resonance_gte80;
+      if(d20 && d20.count){
+        rows.push({name:'🧲 共振≥80 严格·中线(T+20)', cat:'共振·中线', win_rate:d20.win_rate, avg_return:d20.avg_return, sample:d20.count, extra:'T+20', isMid:true});
+      }
+    }
+
     // ③ K线信号（BACKTEST_TDX.summary，取 T+1 主口径 + 标注 T+5）
     if(bd && bd.summary){
       var sigCat = {
@@ -4203,7 +4154,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     // 🛡 2026-08-26 一劳永逸根因修复：原按"综合分"排序，avg_return 权重过大，
     //   把低胜率但 avg_return 偏高的策略顶到最上并标"👑最强"，与真实强度背离。
     //   现改为【胜率降序、平局看平均收益降序】——胜率最高的策略才是"最强"，排序有唯一主依据。
-    rows.sort(function(a,b){ return (b.win_rate - a.win_rate) || (b.avg_return - a.avg_return); });
+    rows.sort(function(a,b){ if(a.isMid !== b.isMid) return a.isMid ? -1 : 1; return (b.win_rate - a.win_rate) || (b.avg_return - a.avg_return); });
     return rows;
   }
 
@@ -4698,7 +4649,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
    如需历史胜率对比请跳转「逻辑详解」页面相关章节。 */
 
     /* ══ 2026-09-03 主人令：📊 各选股策略回测汇总 + 📐 各策略回测如何算（用户明确要求） ══
-       仅覆盖仍活跃在选股策略子页的 4 个策略：三重共识 / 四量终极 / 逆势龙头CRDS / 相对强度RPS。
+       仅覆盖仍活跃在选股策略子页的 3 个策略：三重共识 / 四量终极 / 逆势龙头CRDS。
        已下架的大牛股猎手 / 驾驶舱 / 全站精选 不在此列（其回测已随选股一并删除）。
        全部读取各策略回测源实时数据，样本累积后自动刷新，不写死。
        2026-09-03 主人令②：「📐 各策略回测如何算」整块迁往 logic.html 逻辑详解页 lg-st 子页（回测汇总卡内），本页不再渲染。 */
@@ -4713,9 +4664,6 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         { key:'crds', name:'逆势龙头CRDS', icon:'🐉', color:'#ef4444',
           method:'CRDS advanced 档历史回测：信号日收盘价买入，持有 N 个交易日收盘价卖出（不处理节假日，按日历日 +1/3/5/10/20）。',
           def:'胜率=收益>0占比；平均收益=收益均值%。' },
-        { key:'rps', name:'相对强度RPS', icon:'📉', color:'#14b8a6',
-          method:'RPS 相对强度 A 档历史回测：信号日收盘价买入，持有 N 个交易日收盘价卖出（不处理节假日，按日历日 +1/3/5/10/20）。',
-          def:'胜率=收益>0占比；平均收益=收益均值%。' }
       ];
       function _metric(s){
         if(s.key==='triple'){
@@ -4727,7 +4675,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
           if(best){ return {sample:(best.valid!=null?best.valid:best.total)||0, hold:best.best_hold_days, wr:best.best_win_rate, ar:best.best_avg_return, upd:(window.BACKTEST_COMPREHENSIVE||{}).calc_time||'', ready:true}; }
           return {sample:0, ready:false, upd:''};
         }
-        var vname = s.key==='fourvolume' ? 'FOUR_VOLUME_BACKTEST' : (s.key==='crds' ? 'CRDS_BACKTEST' : 'RPS_BACKTEST');
+        var vname = s.key==='fourvolume' ? 'FOUR_VOLUME_BACKTEST' : 'CRDS_BACKTEST';
         var sm=((window[vname]||{}).summary||{});
         var total=sm.total_signals||0, bp=sm.by_period||{}, upd=sm.update_time||sm.calc_time||'';
 
@@ -4750,7 +4698,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
             if(rows.length) _strategies.push({name:_tm[k].n,icon:_tm[k].i,rows:rows});
           });
         }
-        [['FOUR_VOLUME_BACKTEST','四量终极','🔥'],['CRDS_BACKTEST','逆势龙头CRDS','🐉'],['RPS_BACKTEST','相对强度RPS','📈']].forEach(function(m){
+        [['FOUR_VOLUME_BACKTEST','四量终极','🔥'],['CRDS_BACKTEST','逆势龙头CRDS','🐉']].forEach(function(m){
           var sm=((window[m[0]]||{}).summary||{}), bp=sm.by_period||{}, rows=[];
           [1,3,5,10,20].forEach(function(p){ var r=bp[String(p)]||{}; rows.push({period:p,sample:r.samples||0,win_rate:r.win_rate,avg_return:r.avg_return}); });
           _strategies.push({name:m[1],icon:m[2],rows:rows});
@@ -10169,13 +10117,10 @@ window.showRestrictedItems = showRestrictedItems;
     else if(tab==='fv'){ /* 跨脚本块：必须走 window，裸调用会 ReferenceError（2026-08-07 修） */
       if(!stRendered.fv){ stRendered.fv=1; }
       try{ window.renderFourVolume(); }catch(e){ console.warn('四量终极渲染失败',e); } }
-    else if(tab==='rps'){
-      if(!stRendered.rps){ stRendered.rps=1; }
-      try{ window.renderRpsScreen(); }catch(e){ console.warn('相对强度渲染失败',e); } }
   }
   window.switchSt=function(n){
     document.querySelectorAll('.st-tab').forEach(b=>b.classList.toggle('active', b.dataset.st===n));
-    ['tc','fv','crds','rps','pool','life'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
+    ['tc','fv','crds','pool','life'].forEach(id=>{var p=document.getElementById('st-'+id); if(p)p.classList.toggle('active', id===n);});
     renderStTab(n);
     // 2026-08-29 主人令：选股池子页渲染
     if(n==='pool' && typeof window.renderStPool==='function') setTimeout(window.renderStPool, 30);
@@ -10193,7 +10138,6 @@ window.showRestrictedItems = showRestrictedItems;
     var _map={
       pool:function(){return !!(window.CANDIDATE&&(window.CANDIDATE.stocks||window.CANDIDATE.source_dist));},
       tc:function(){return !!(window.TRIPLE_CONSENSUS||window.TRIPLE_TRACK);},
-      rps:function(){return !!(window.STOCK_RPS_DATA&&(window.STOCK_RPS_DATA.records||[]).length);},
       crds:function(){return !!window.CRDS_CARD_DATA;},
       life:function(){return !!(window.V8_POOL_TRACKER&&window.V8_POOL_TRACKER.items&&window.V8_POOL_TRACKER.items.length);}
     };
@@ -12440,111 +12384,6 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
   /* 2026-09-03 主人令：renderCockpit 不再挂载到 window */
   window.renderV8Crds=renderV8Crds;
 
-  /* ===== 个股相对强度 RPS + RS + 年线（2026-08-08 新增） ===== */
-  function _rps$(id){ return document.getElementById(id); }
-  function _rpsEscapeHtml(s){
-    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-  function _buildRpsMap(){
-    var D=window.STOCK_RPS_DATA||{};
-    var m={};
-    (D.records||[]).forEach(function(r){ if(r && r.code) m[r.code]=r; });
-    return m;
-  }
-  window._buildRpsMap=_buildRpsMap;
-  window.__rpsMapByCode=null;
-  function _rpsBadge(tier){
-    var colors={A:'linear-gradient(135deg,#15803d,#22c55e)',B:'linear-gradient(135deg,#2563eb,#3b82f6)',C:'linear-gradient(135deg,#a16207,#eab308)'};
-    var c=colors[tier]||'var(--sub)';
-    return '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;color:#fff;background:'+c+';">'+tier+'</span>';
-  }
-  function _rpsCell(v, hi){
-    if(v==null) return '<span style="color:var(--dim)">—</span>';
-    v=Number(v);
-    var color= v>=90 ? '#22c55e' : v>=80 ? '#3b82f6' : v>=60 ? '#eab308' : '#94a3b8';
-    if(hi) color='#22c55e';
-    return '<span style="font-weight:700;color:'+color+'">'+v.toFixed(1)+'</span>';
-  }
-  function _rpsTrend(above){
-    return above
-      ? '<span style="color:#22c55e;font-weight:700">站上</span>'
-      : '<span style="color:#ef4444;font-weight:700">跌破</span>';
-  }
-  function _rpsName(name, code, market){
-    var prefix=(market||'').toLowerCase()==='sh'?'sh_':'sz_';
-    return '<span style="font-weight:700;color:var(--txt)">'+_rpsEscapeHtml(name)+'</span><br><span style="font-size:10px;color:var(--dim)">'+prefix+code+'</span>';
-  }
-  function renderRpsScreen(){
-    var D=window.STOCK_RPS_DATA||{};
-    var recs=D.records||[];
-    var time=D.update_time||'';
-    var uni=D.universe_count||0;
-    var idxName=D.index_name||'--';
-    var tierF=_rps$('strpsTierFilter')?_rps$('strpsTierFilter').value:'A';
-    var rpsMin=_rps$('strpsRpsFilter')?Number(_rps$('strpsRpsFilter').value):90;
-    var body=_rps$('strpsBody'); if(!body) return;
-    _rps$('strpsUniCount').textContent=uni;
-    _rps$('strpsIndexName').textContent=idxName;
-    if(_rps$('strpsTime')){
-      // 2026-09-01 修复：不传硬编码'盘后'，让 _getSlot 根据真实时间判断（凌晨=盘前）
-      try{
-        var _rpsSlot = (window._getSlot ? window._getSlot(time) : {slot:'盘后', horizon:'短线'});
-        _rps$('strpsTime').innerHTML=_uBadge(_rpsSlot.slot, _rpsSlot.horizon, time||'已加载');
-      }catch(e){ _rps$('strpsTime').textContent=time||''; }
-    }
-    var filtered=recs.filter(function(r){
-      if(!r) return false;
-      if(tierF!=='all' && (r.tier||'')!==tierF) return false;
-      return (r.rps_max||0)>=rpsMin;
-    });
-    // 2026-08-09：先按 A/B/C 档排，同档内按 rps_max 高→低，再按 rs 高→低
-    var tierOrder={A:0,B:1,C:2,D:3};
-    filtered.sort(function(a,b){
-      var ta=tierOrder[(a.tier||'D')]||3, tb=tierOrder[(b.tier||'D')]||3;
-      if(ta!==tb) return ta-tb;
-      return (b.rps_max||0)-(a.rps_max||0) || (b.rs||0)-(a.rs||0);
-    });
-    var h='';
-    filtered.forEach(function(r){
-      var isHi50=(r.rps50||0)>=(r.rps_max||0);
-      var isHi120=(r.rps120||0)>=(r.rps_max||0);
-      var isHi250=(r.rps250||0)>=(r.rps_max||0);
-      h+='<tr style="border-bottom:1px solid rgba(148,163,184,.12);">'+
-        '<td style="padding:6px;">'+_rpsName(r.name,r.code,r.market)+'</td>'+
-        '<td style="text-align:center;padding:6px;">'+_rpsBadge(r.tier)+'</td>'+
-        '<td style="text-align:center;padding:6px;">'+_rpsCell(r.rps50,isHi50)+'</td>'+
-        '<td style="text-align:center;padding:6px;">'+_rpsCell(r.rps120,isHi120)+'</td>'+
-        '<td style="text-align:center;padding:6px;">'+_rpsCell(r.rps250,isHi250)+'</td>'+
-        '<td style="text-align:center;padding:6px;">'+_rpsCell(r.rps_max,true)+'</td>'+
-        '<td style="text-align:center;padding:6px;"><span style="font-weight:700;color:'+((r.rs||0)>0?'#22c55e':'#ef4444')+'">'+(r.rs==null?'—':Number(r.rs).toFixed(2))+'</span></td>'+
-        '<td style="text-align:center;padding:6px;">'+_rpsTrend(r.above_ma250)+'</td>'+
-        '<td style="text-align:center;padding:6px;">'+(r.close==null?'—':Number(r.close).toFixed(2))+'</td>'+
-      '</tr>';
-    });
-    body.innerHTML=h;
-    var empty=_rps$('strpsEmpty');
-    if(empty) empty.style.display=filtered.length?'none':'block';
-    var badge=_rps$('strpsRunBadge');
-    if(badge){
-      // 2026-09-01 修复：RPS 数据常在凌晨生成，开盘前不可显示"今日已计算"。
-      // 统一调用 _runBadgeInfo（含盘前/盘中/盘后守卫），不再自行构造"✅ MM-DD 已计算"。
-      var rawDate = D.calc_date || D.update_time || time || '';
-      var info = window._runBadgeInfo ? window._runBadgeInfo(rawDate) : null;
-      var badgeText = '';
-      if(info && info.show){
-        badgeText = info.label;
-      } else {
-        // 兜底：手动提取日期
-        var extracted = window._extractDateStr ? window._extractDateStr(rawDate) : '';
-        if(!extracted){ try{ extracted = String(rawDate).match(/\d{4}-\d{2}-\d{2}/)?String(rawDate).match(/\d{4}-\d{2}-\d{2}/)[0]:''; }catch(e){} }
-        if(extracted) badgeText = '✅ '+extracted.slice(5)+' 已计算';
-        else badgeText = '✅ 已计算';
-      }
-      badge.textContent = badgeText;
-      badge.style.display = badgeText ? 'inline-block' : 'none';
-    }
-  }
-  window.renderRpsScreen=renderRpsScreen;
 
   /* 2026-08-30 主人令「我只要最有效的东西」删除：renderRpsBacktest()
      删除理由：该函数为「模拟」而非真实回测 —— 用 ret=(r.ret50/50)*hold 把 50 日已实现收益
