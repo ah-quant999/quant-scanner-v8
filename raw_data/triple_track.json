@@ -1,11 +1,46 @@
 {
-  "update_time": "2026-09-04 23:10:00",
-  "data_date": "update_time",
-  "track_start": "2026-08-17",
-  "history_days": 14,
+  "update_time": "2026-09-06 07:09:46",
+  "data_date": "2026-09-04",
+  "track_start": "2026-09-04",
+  "history_days": 13,
   "strict_count": 0,
-  "near_count": 0,
-  "tracked": [],
+  "near_count": 1,
+  "tracked": [
+    {
+      "code": "000807",
+      "name": "云铝股份",
+      "market": "sz",
+      "board": "主板",
+      "status": "near",
+      "total_score": 61.5,
+      "quality_grade": "A",
+      "industry": "有色金属冶炼和压延加工业",
+      "sectors": [
+        "稀缺资源",
+        "深证100R",
+        "有色金属冶炼和压延加工业",
+        "2026中报预增",
+        "HS300",
+        "MSCI中国",
+        "深成500",
+        "深股通"
+      ],
+      "signal_count": 2,
+      "enter_date": "2026-09-04",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 27.38,
+      "current_close": 27.38,
+      "pnl_pct": 0.0,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    }
+  ],
   "alerts": [
     {
       "level": "warn",
@@ -189,12 +224,53 @@
     }
   ],
   "sector_cluster": {
-    "by_industry": [],
-    "by_sector": [],
-    "concentration": 0
+    "by_industry": [
+      {
+        "industry": "有色金属冶炼和压延加工业",
+        "count": 1,
+        "names": [
+          "云铝股份"
+        ]
+      }
+    ],
+    "by_sector": [
+      {
+        "sector": "稀缺资源",
+        "count": 1
+      },
+      {
+        "sector": "深证100R",
+        "count": 1
+      },
+      {
+        "sector": "有色金属冶炼和压延加工业",
+        "count": 1
+      },
+      {
+        "sector": "2026中报预增",
+        "count": 1
+      },
+      {
+        "sector": "HS300",
+        "count": 1
+      },
+      {
+        "sector": "MSCI中国",
+        "count": 1
+      },
+      {
+        "sector": "深成500",
+        "count": 1
+      },
+      {
+        "sector": "深股通",
+        "count": 1
+      }
+    ],
+    "concentration": 100.0
   },
   "overlap": {
-    "total_tracked": 0,
+    "total_tracked": 1,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
@@ -328,8 +404,8 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-08-17",
-    "history_days": 14,
+    "track_start": "2026-09-04",
+    "history_days": 13,
     "summary": {
       "1d": {
         "count": 13,

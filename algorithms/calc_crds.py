@@ -185,12 +185,70 @@ def _query_kline_em(code, secid_prefix, days):
     return None
 
 
+_TX_KLINE_FAILS = 0
+_TX_KLINE_MAX_FAILS = 40
+
+
+def _query_kline_tx(code, secid_prefix, days):
+    """🛡 2026-09-06 第三兜底：腾讯日K线(web.ifzq.gtimg.cn)。
+    本机/云端/美区实测均可直连、无需 key、无严格限流(0.2s/只)——根治「执行机不对全灭」：
+    mootdx 不可用 + 东财被限流时 K 线仍有活源，不再整轮 0 扫描空覆盖。
+    code: 6位; secid_prefix: '1'(沪)/'0'(深)。返回与东财兜底同构的 DataFrame 或 None。"""
+    global _TX_KLINE_FAILS
+    if _TX_KLINE_FAILS >= _TX_KLINE_MAX_FAILS:
+        return None
+    symbol = ("sh" if secid_prefix == "1" else "sz") + code
+    url = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
+    params = {"param": f"{symbol},day,,,{days + MA_DAYS + 30},qfq"}
+    try:
+        r = _requests.get(url, params=params, timeout=12,
+                          headers={"User-Agent": "Mozilla/5.0 (v8-crds;quant)"})
+        if r.status_code != 200:
+            _TX_KLINE_FAILS += 1
+            return None
+        node = (r.json().get("data") or {}).get(symbol) or {}
+        rows_raw = node.get("qfqday") or node.get("day") or []
+        rows = []
+        for p in rows_raw:
+            if len(p) < 6:
+                continue
+            try:
+                vol = float(p[5])            # 手
+                close = float(p[2])
+                rows.append({
+                    "date": p[0],
+                    "open": float(p[1]),
+                    "close": close,
+                    "high": float(p[3]),
+                    "low": float(p[4]),
+                    "volume": vol,
+                    "amount": close * vol * 100.0,  # 近似成交额(元)，仅 VR 均量/量比用途
+                    "turn": 0.0,                     # 腾讯不含换手率；TS 仅展示用不影响评分
+                })
+            except (ValueError, TypeError):
+                continue
+        if len(rows) < LOOKBACK_DAYS:
+            _TX_KLINE_FAILS += 1
+            return None
+        df = pd.DataFrame(rows).sort_values("date").reset_index(drop=True)
+        df["pctChg"] = ((df["close"] / df["close"].shift(1) - 1) * 100).round(2)
+        df["pctChg"] = df["pctChg"].fillna(0.0)
+        _TX_KLINE_FAILS = 0
+        return df
+    except Exception:
+        _TX_KLINE_FAILS += 1
+        return None
+
+
 def _query_kline(code, secid_prefix, days):
-    """取数调度: mootdx 优先, 东方财富兜底。"""
+    """取数调度: mootdx 优先, 东方财富兜底, 腾讯第三兜底(2026-09-06)。"""
     df = _query_kline_mootdx(code, days)
     if df is not None and len(df) >= LOOKBACK_DAYS:
         return df
-    return _query_kline_em(code, secid_prefix, days)
+    df = _query_kline_em(code, secid_prefix, days)
+    if df is not None and len(df) >= LOOKBACK_DAYS:
+        return df
+    return _query_kline_tx(code, secid_prefix, days)
 
 
 def _load_index_quotes():
@@ -693,25 +751,10 @@ def _parse_js_stock_file(js_path):
 
 
 def _write_empty_crds_output(reason=""):
-    """🛡 2026-09-03 一劳永逸：数据源异常时仍写出带新鲜时间戳的空产物，
-    避免 data/CRDS_CARD_DATA.js 冻结在上一跑、被运维判 fail（静默冻结根因）。"""
-    out = {
-        "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "data_time": datetime.now().strftime("%Y-%m-%d") + " 15:30:00",
-        "total_scanned": 0,
-        "scan_stats": {"candidates": 0, "succeeded": 0, "failed": 0,
-                       "kline_source_used": "none", "note": reason},
-        "market_context": {"validity": "unknown", "today_pct": 0.0,
-                           "summary": "数据源异常，" + reason + "（保留新鲜时间戳）"},
-        "cond1_list": [], "cond2_list": [], "cond3_list": [],
-        "elite": [], "advanced": [], "watch": [], "detail": {},
-    }
-    try:
-        with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-            json.dump(out, f, ensure_ascii=False, indent=2)
-        print(f"\n[空产物] 已写出 {OUTPUT_FILE}（数据源异常，保留新鲜时间戳）")
-    except Exception as e:
-        print(f"[ERROR] 写出空产物失败: {e}")
+    """🛡 2026-09-06 主人令：数据源异常时空产物不再覆盖旧数据——空卡比 stale 更伤。
+    原 09-03「写空产物带新鲜时间戳防冻结」与本令冲突，按主人令以后者为准：
+    直接保留旧 crds_card_data.json，仅打印告警（调用点无需改动，本函数短路）。"""
+    print(f"\n[SKIP] 数据源异常（{reason}）——按 2026-09-06 主人令保留旧 crds_card_data.json，不写空产物")
 
 
 def calc_crds():
@@ -785,6 +828,11 @@ def calc_crds():
             failed_count += 1
             print(f"\n  [WARN] {code} 计算异常: {e}")
             continue
+
+    # 🛡 2026-09-06 主人令：K线全灭时空结果严禁覆盖旧数据——保留旧文件，卡片显示上一跑而非清空
+    if not results:
+        print(f"\n[ABORT] {len(all_stocks)} 只候选 K 线全部获取失败（failed={failed_count}）——保留旧 crds_card_data.json，不覆盖")
+        return None
 
     # 4. 汇总
     print(f"\n  CRDS有效: {len(results)} 只")

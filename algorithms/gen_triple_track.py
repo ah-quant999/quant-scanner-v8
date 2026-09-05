@@ -23,6 +23,7 @@ gen_triple_track.py — 三重共识「历史追踪」跟踪 + 回测分析器
 """
 import json
 import os
+import re
 
 try:
     _ = BASE
@@ -115,7 +116,9 @@ def main():
     tracking = history.get("_tracking_latest", {})
     meta = history.get("_meta", {})
 
-    date_keys = sorted([k for k in history.keys() if not k.startswith("_")])
+    # 🛡 2026-09-06 一劳永逸：只认 YYYY-MM-DD 日期键——任何非日期脏键（如顶层 update_time）
+    # 都不再可能被排序成「今天」（此前 "update_time" > "2026-…" 导致 today 取错、当日记录恒空、三卡全空）
+    date_keys = sorted([k for k in history.keys() if re.fullmatch(r"\d{4}-\d{2}-\d{2}", k)])
     today = date_keys[-1] if date_keys else datetime.now().strftime("%Y-%m-%d")
     today_records = history.get(today, []) if isinstance(history.get(today), list) else []
 
