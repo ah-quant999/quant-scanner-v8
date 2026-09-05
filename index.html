@@ -4952,29 +4952,89 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     if(D.core_top_n!=null) html += '<span style="padding:2px 8px;border-radius:10px;font-weight:600;color:#fbbf24;background:#fbbf2422;border:1px solid #fbbf2455;">★ Core '+D.core_top_n+'</span>';
     if(D.pool_count!=null) html += '<span style="padding:2px 8px;border-radius:10px;font-weight:600;color:var(--sub);background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.35);">池基数 '+D.pool_count+'</span>';
     html += '</div>';
-    html += '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;color:var(--sub);">';
-    html += '<thead><tr style="color:var(--dim);text-align:right;">'
-      + '<th style="padding:5px 6px;text-align:left;">代码</th><th style="padding:5px 6px;text-align:left;">名称</th>'
-      + '<th style="padding:5px 6px;text-align:left;">行业</th>'
-      + '<th style="padding:5px 6px;">涨幅</th><th style="padding:5px 6px;">量比</th>'
-      + '<th style="padding:5px 6px;">收位</th><th style="padding:5px 6px;">5日累计</th>'
-      + '<th style="padding:5px 6px;">评分</th><th style="padding:5px 6px;">Core</th></tr></thead><tbody>';
-    D.stocks.slice(0, 50).forEach(function(s){
-      html += '<tr style="border-top:1px solid var(--border);">'
-        + '<td style="padding:5px 6px;color:var(--txt);font-weight:600;">'+(s.code||'')+'</td>'
-        + '<td style="padding:5px 6px;color:var(--txt);">'+_e(s.name||'')+'</td>'
-        + '<td style="padding:5px 6px;color:var(--dim);max-width:160px;">'+_e((s.industry||'').replace(/[业制制造]+$|\s*Ⅱ$/g,''))+'</td>'
-        + '<td style="padding:5px 6px;text-align:right;color:'+_c(s.pct)+';font-weight:600;">'+_p(s.pct)+'</td>'
-        + '<td style="padding:5px 6px;text-align:right;color:var(--txt);">'+_n(s.vol_ratio)+'</td>'
-        + '<td style="padding:5px 6px;text-align:right;">'+_n(s.close_pos)+'</td>'
-        + '<td style="padding:5px 6px;text-align:right;color:'+_c(s.ret5)+';">'+_p(s.ret5)+'</td>'
-        + '<td style="padding:5px 6px;text-align:right;color:var(--txt);">'+_n(s.score,1)+'</td>'
-        + '<td style="padding:5px 6px;text-align:center;">'+(s.core?'<span style="color:#fbbf24;">★</span>':'<span style="color:var(--dim);">—</span>')+'</td>'
-        + '</tr>';
-    });
-    html += '</tbody></table></div>';
-    if(D.stocks.length>50) html += '<div class="note" style="text-align:center;color:var(--dim);padding:8px;font-size:11px;">仅展示评分前 50 / 共 '+D.stocks.length+' 只</div>';
+    // 🛡 2026-09-05 主人令（与 factor_lab 同口径）：主卡只展示评分最高前 10 只；其余点击 📄 完整榜单弹窗查看。
+    //   D.stocks 已按 rank 升序（= score 降序）排序（strong_breakout.py 产出），直接 slice(0,10)。
+    //   高手共振：与 ima 卡同口径——若同时命中 v8 选股生命周期池 → 标注 🏆 v8 命中（强/弱阶段）。
+    var _v8Items = (window.V8_POOL_TRACKER && window.V8_POOL_TRACKER.items) || [];
+    var _v8Map = {}; _v8Items.forEach(function(x){ if(x && x.code) _v8Map[x.code] = x; });
+    function rowCard(s){
+      var code = _e(s.code), name = _e(s.name);
+      var accent = s.core ? '#fbbf24' : '#ef5350';  /* Core 标金边，非 Core 沿用卡色 */
+      var _v8 = _v8Map[s.code] || null;
+      var _v8Badge = '';
+      if(_v8){
+        var _vs = _v8.status||'';
+        var _vc = {'strong':'#22c55e','buy_dip':'#fbbf24','topped':'#fb923c','weak':'#ef5350','normal':'#38bdf8'}[_vs]||'#94a3b8';
+        _v8Badge = '<span style="display:inline-block;padding:1px 6px;border-radius:8px;font-size:9.5px;font-weight:600;color:'+_vc+';background:'+_vc+'22;">🏆'+(window.__v8StatusLabel?window.__v8StatusLabel[_vs]||_vs:_vs)+'</span>';
+      }
+      var industry = _e((s.industry||'').replace(/[业制制造]+$|\s*Ⅱ$/g,''));
+      return '<div style="border:1px solid '+accent+'44;border-left:3px solid '+accent+';border-radius:8px;padding:6px 8px;font-size:12px;background:rgba(148,163,184,.05);">'
+        + '<div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><b>'+code+'</b> <span style="color:var(--sub);font-weight:400;">'+name+'</span>'
+        + (s.core ? ' <span style="color:#fbbf24;font-size:11px;">★Core</span>' : '')
+        + '</div>'
+        + '<div style="color:var(--dim);font-size:10.5px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+industry+'</div>'
+        + '<div style="margin-top:3px;font-size:11px;"><span style="color:'+_c(s.pct)+';font-weight:700;">'+_p(s.pct)+'</span> · 量比 <b style="color:var(--txt);">'+_n(s.vol_ratio)+'</b> · 收位 <b style="color:var(--txt);">'+_n(s.close_pos)+'</b></div>'
+        + '<div style="color:var(--dim);font-size:10.5px;margin-top:1px;">5日 <span style="color:'+_c(s.ret5)+';font-weight:600;">'+_p(s.ret5)+'</span> · 评分 <b style="color:#fbbf24;">'+_n(s.score,1)+'</b></div>'
+        + (_v8Badge ? '<div style="margin-top:3px;">'+_v8Badge+'</div>' : '')
+        + '</div>';
+    }
+    var SB_DISPLAY_TOP_N = 10;
+    var _showStocks = D.stocks.slice(0, SB_DISPLAY_TOP_N);
+    var _inner = _showStocks.length
+      ? '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">' + _showStocks.map(rowCard).join('') + '</div>'
+      : '<div class="note" style="color:var(--dim);padding:4px 0;">本期无标的</div>';
+    var _suffix = D.stocks.length > SB_DISPLAY_TOP_N
+      ? ' <span style="font-size:11px;color:var(--dim);font-weight:500;">· 仅展示前 '+SB_DISPLAY_TOP_N+' 只 / 共 '+D.stocks.length+' 只（其余点击下方 📄 完整榜单）</span>'
+      : (D.stocks.length > 0 ? ' <span style="font-size:11px;color:var(--dim);font-weight:500;">· 全部 '+D.stocks.length+' 只</span>' : '');
+    html += '<div style="font-weight:600;margin:10px 0 4px;color:#ef5350;">核心标的 · 🟢（评分前 '+SB_DISPLAY_TOP_N+' 直接展示）<b style="margin-left:4px;">'+D.stocks.length+'</b>'+_suffix+'</div>'
+      + _inner
+      + '<div style="margin:6px 0 2px;"><span onclick="window.__sbPopup()" style="cursor:pointer;display:inline-block;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600;color:#ef5350;border:1px solid rgba(239,83,80,.4);background:rgba(239,83,80,.08);">📄 完整榜单（Top '+D.stocks.length+'）</span></div>';
     dst.innerHTML = html;
+    /* 🛡 弹窗：完整榜单（沿用原表格样式 + 新增「高手共振」列，2026-09-05 与 ima 卡同口径） */
+    window.__sbPopup = function(){
+      var mask = document.createElement('div');
+      mask.className = '_sbmask';
+      mask.style.cssText = 'position:fixed;inset:0;background:rgba(2,6,17,.72);z-index:99998;display:flex;align-items:center;justify-content:center;padding:20px;';
+      mask.onclick = function(ev){ if(ev.target===mask) mask.remove(); };
+      var box = document.createElement('div');
+      box.style.cssText = 'background:#0d1626;border:1px solid #243150;border-radius:12px;max-width:960px;width:100%;max-height:80vh;overflow-y:auto;padding:16px 18px;';
+      var rows = '';
+      D.stocks.forEach(function(s){
+        var _v8 = _v8Map[s.code] || null;
+        var _v8Cell = '<span style="font-size:10px;color:var(--dim);">—</span>';
+        if(_v8){
+          var _vs = _v8.status||'';
+          var _vc = {'strong':'#22c55e','buy_dip':'#fbbf24','topped':'#fb923c','weak':'#ef5350','normal':'#38bdf8'}[_vs]||'#94a3b8';
+          _v8Cell = '<span style="display:inline-block;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:600;color:'+_vc+';background:'+_vc+'22;">🏆'+(window.__v8StatusLabel?window.__v8StatusLabel[_vs]||_vs:_vs)+'</span>';
+        }
+        rows += '<tr style="border-top:1px solid var(--border);">'
+          + '<td style="padding:5px 6px;color:var(--txt);font-weight:600;">'+(s.code||'')+'</td>'
+          + '<td style="padding:5px 6px;color:var(--txt);">'+_e(s.name||'')+'</td>'
+          + '<td style="padding:5px 6px;color:var(--dim);max-width:160px;">'+_e((s.industry||'').replace(/[业制制造]+$|\s*Ⅱ$/g,''))+'</td>'
+          + '<td style="padding:5px 6px;text-align:right;color:'+_c(s.pct)+';font-weight:600;">'+_p(s.pct)+'</td>'
+          + '<td style="padding:5px 6px;text-align:right;color:var(--txt);">'+_n(s.vol_ratio)+'</td>'
+          + '<td style="padding:5px 6px;text-align:right;">'+_n(s.close_pos)+'</td>'
+          + '<td style="padding:5px 6px;text-align:right;color:'+_c(s.ret5)+';">'+_p(s.ret5)+'</td>'
+          + '<td style="padding:5px 6px;text-align:right;color:var(--txt);">'+_n(s.score,1)+'</td>'
+          + '<td style="padding:5px 6px;text-align:center;">'+(s.core?'<span style="color:#fbbf24;">★</span>':'<span style="color:var(--dim);">—</span>')+'</td>'
+          + '<td style="padding:5px 6px;text-align:center;">'+_v8Cell+'</td>'
+          + '</tr>';
+      });
+      box.innerHTML = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><b style="font-size:14px;color:#e8f0ff;">⚡ 强势突破 · 完整榜单</b>'
+        + '<span style="font-size:11px;color:var(--dim);">（共 '+D.stocks.length+' 只 · 含「高手共振」= 与 v8 选股生命周期池交集）</span>'
+        + '<span style="cursor:pointer;color:#93a4c4;font-size:20px;padding:0 6px;margin-left:auto;" onclick="this.closest(\'._sbmask\').remove()">×</span></div>'
+        + '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;color:var(--sub);">'
+        + '<thead><tr style="color:var(--dim);text-align:right;">'
+        + '<th style="padding:5px 6px;text-align:left;">代码</th><th style="padding:5px 6px;text-align:left;">名称</th>'
+        + '<th style="padding:5px 6px;text-align:left;">行业</th>'
+        + '<th style="padding:5px 6px;">涨幅</th><th style="padding:5px 6px;">量比</th>'
+        + '<th style="padding:5px 6px;">收位</th><th style="padding:5px 6px;">5日累计</th>'
+        + '<th style="padding:5px 6px;">评分</th><th style="padding:5px 6px;">Core</th>'
+        + '<th style="padding:5px 6px;">高手共振</th></tr></thead>'
+        + '<tbody>'+rows+'</tbody></table></div>';
+      mask.appendChild(box);
+      document.body.appendChild(mask);
+    };
   };
 
   /* ════════════════════════════════════════════════════════════════════
