@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "501f96257";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "905f43996";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -531,9 +531,9 @@ window.__domReadyFns=[];
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/POTENTIAL_PICKS.js?v=a175dafed0" defer></script>
 <script src="data/INDEX_QUOTES.js?v=a19fa902aa" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=568d0c2279" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=7b929ba94e" defer></script>
 <script src="data/MARGIN_DATA.js?v=3fea6700c3" defer></script>
-<script src="data/CFFEX_HOLDINGS.js?v=d93c58be00" defer></script>
+<script src="data/CFFEX_HOLDINGS.js?v=306067e63c" defer></script>
 <script src="data/IPO_DATA.js?v=f256db4258" defer></script>
     <script src="data/CRISIS_DATA.js?v=f2d3dfd49d" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=bd76d57057" defer></script>
@@ -1505,7 +1505,7 @@ function _buildJudgmentEnvHTML(d){
 }
 window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 </script>
-<script src="data/CRDS_CARD_DATA.js?v=f0c0193821" defer></script>
+<script src="data/CRDS_CARD_DATA.js?v=30ad2845be" defer></script>
 <script src="data/TRIPLE_CONSENSUS.js?v=be9cace032" defer></script>
 <script src="data/TRIPLE_TRACK.js?v=e276297291" defer></script>
 <script src="data/TRIPLE_HISTORY.js?v=0b9e03e615" defer></script>
@@ -1550,7 +1550,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 🆕 2026-09-04 强势突破选股（高手算法反推版 v1，strong_breakout.py 盘后产出） -->
     <script src="data/STRONG_BREAKOUT.js?v=dd59505457" defer></script>
     <script src="data/FACTOR_LAB_BACKTEST.js?v=0000000000" defer></script>
-    <script src="data/RPS_BACKTEST.js?v=922c8ae896" defer></script>
+    <script src="data/RPS_BACKTEST.js?v=c13bd38703" defer></script>
     <script src="data/FACTOR_LAB.js?v=3810886084" defer></script>
 <!-- 2026-08-31 轻量化：data/ALGO_TRACK.js（42.4 KB）前端零引用，停止注入（省 42.4 KB） -->
 <script src="data/ETF_PULSE.js?v=8e078354c9" defer></script>
@@ -1563,16 +1563,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/PERFORMANCE_FORECAST.js?v=7c9d9ed4c6" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=dd792ee66e" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=53f26c0ba2" defer></script>
-<script src="data/HEALTH_CHECK.js?v=eaed9eb318" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=f76652cec8" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=81dca24db7" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=4da7e2de3a" defer></script>
+<script src="data/HEALTH_CHECK.js?v=f7f026d690" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=ccb783fb04" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=569a6f07d4" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 MARKET_PATH_PROBABILITY 注入（AI预测卡用） -->
-    <script src="data/MARKET_PATH_PROBABILITY.js?v=1f31a14aef" defer></script>
+    <script src="data/MARKET_PATH_PROBABILITY.js?v=cee438daa6" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=16ebe8db7a" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=99b4f605f0" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=cf23b41da3" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=3b6f0623f8" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=b460428524" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=8f1312b623" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=acd95551b5" defer></script>
     <!-- 2026-09-04 主人令收尾：ALLSITE_BACKTEST.js 注入已删（生成器/raw_data 已于 09-03「干掉全站精选」系列删除，前端无任何代码读 window.ALLSITE_BACKTEST，标签纯 404 噪音） -->
@@ -2104,7 +2104,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">📈</span>期指主力合约 · 情绪方向 · <span class="fresh" id="futuresMainTime">—</span></h3>
       <div id="futuresMainBody" style="font-size:13px;color:var(--txt);">加载中…</div>
-      <div class="note">基差（升贴水）需对应现货指数，当前展示期货主力合约相对昨结涨跌与持仓量。</div>
+      <div class="note">📌 基差 = 期货主力 − 现货指数（IF↔沪深300 / IC↔中证500 / IH↔上证50 / IM↔中证1000）；年化升贴水率 = 基差率 ÷ 距到期日 × 365（到期日=合约月份第三个周五）。升水(+)红色=多头信心，贴水(−)绿色=对冲需求/偏空；贴水骤深=对冲恐慌，贴水收敛=信心修复。现货缺失时自动隐藏基差行。</div>
     </div>
 
         <!-- 情绪周期·连板天梯（2026-08-08 从暂未上架迁到实时数据） -->
@@ -9629,7 +9629,19 @@ function drawUpDownChart(){
   }
   window.renderOverseasMarkets = renderOverseasMarkets;
 
-  /* ---- 14. 期指主力合约 · 情绪方向（实时数据补位） ---- */
+  /* ---- 14. 期指主力合约 · 情绪罗盘（2026-09-06 主人令：接现货基差+年化升贴水率+三个判断自动解读） ---- */
+  var _FUT_NAME={IC:'中证500',IF:'沪深300',IH:'上证50',IM:'中证1000'};
+  function _cffexExpiryDays(sym){
+    // 股指期货合约到期日 = 合约月份第三个周五（sym 形如 IC2609）
+    try{
+      var m=(sym||'').match(/^([A-Z]{2})(\d{2})(\d{2})$/); if(!m) return 30;
+      var y=2000+Number(m[2]), mo=Number(m[3]);
+      var d=new Date(y, mo-1, 1), fris=[];
+      while(d.getMonth()===mo-1){ if(d.getDay()===5) fris.push(d.getDate()); d.setDate(d.getDate()+1); }
+      var exp=new Date(y, mo-1, fris[2]||fris[fris.length-1]||15, 15, 0, 0);
+      return Math.max(Math.ceil((exp-Date.now())/86400000), 1);
+    }catch(e){ return 30; }
+  }
   function renderFuturesMain(d){
     const $b=$('futuresMainBody'), $t=$('futuresMainTime');
     if(!$b) return;
@@ -9640,28 +9652,67 @@ function drawUpDownChart(){
       byV[it.variety].push(it);
     });
     const watch=['IC','IF','IH','IM'];
-    // 2026-08-31：胶囊改小，内部改成一行
+    const spot=d.spot||{};
+    const chgMap={}, oiMap={};
     let h='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;">';
     watch.forEach(v=>{
       const arr=byV[v];
       if(!arr || !arr.length) return;
       const main=arr.slice().sort((a,b)=>b.open_interest-a.open_interest)[0];
       const chg=main.pre_settle?(main.close-main.pre_settle)/main.pre_settle*100:null;
+      chgMap[v]=chg; oiMap[v]=main.open_interest||0;
       const col=chg>0?'var(--up)':(chg<0?'var(--down)':'var(--sub)');
       const arrow=chg>0?'▲':(chg<0?'▼':'—');
-      const nameMap={IC:'中证500',IF:'沪深300',IH:'上证50',IM:'中证1000'};
       h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;">';
       h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">';
-      h+='<span style="font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+nameMap[v]+' <span style="font-size:10px;color:var(--dim);">'+main.symbol+'</span></span>';
+      h+='<span style="font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+_FUT_NAME[v]+' <span style="font-size:10px;color:var(--dim);">'+main.symbol+'</span></span>';
       h+='<span style="font-size:16px;font-weight:800;color:var(--txt);flex-shrink:0;">'+Number(main.close).toFixed(1)+'</span>';
       h+='</div>';
       h+='<div style="display:flex;justify-content:space-between;align-items:center;">';
       h+='<span style="font-size:12px;font-weight:700;color:'+col+';">'+arrow+' '+(chg==null?'--':(chg>0?'+':'')+chg.toFixed(2)+'%')+'</span>';
-      h+='<span style="font-size:10px;color:var(--dim);flex-shrink:0;">持仓 '+main.open_interest.toLocaleString()+' · 昨结 '+main.pre_settle+'</span>';
+      h+='<span style="font-size:10px;color:var(--dim);flex-shrink:0;">持仓 '+main.open_interest.toLocaleString()+'</span>';
       h+='</div>';
+      // 基差行（2026-09-06：现货缺失时自动隐藏，降级不报错）
+      const sp=spot[v];
+      if(sp && sp.price){
+        const basis=main.close-sp.price;
+        const ann=basis/sp.price*100/_cffexExpiryDays(main.symbol)*365;
+        const bc=basis>=0?'var(--up)':'var(--down)';
+        h+='<div style="margin-top:5px;padding-top:5px;border-top:1px dashed var(--border2);display:flex;justify-content:space-between;align-items:center;">';
+        h+='<span style="font-size:11px;color:var(--sub);">基差 <b style="color:'+bc+';">'+(basis>=0?'+':'')+basis.toFixed(1)+'</b></span>';
+        h+='<span style="font-size:11px;font-weight:700;color:'+bc+';">年化 '+(ann>=0?'+':'')+ann.toFixed(1)+'%</span>';
+        h+='</div>';
+        h+='<div style="font-size:10px;color:var(--dim);margin-top:2px;">现货 '+sp.price.toFixed(1)+' · '+(basis>=0?'升水=多头信心':'贴水=对冲需求')+'</div>';
+      }
       h+='</div>';
     });
     h+='</div>';
+    // 📌 三个判断自动解读（2026-09-06 主人令：让卡片自己说话）
+    const have=watch.filter(v=>chgMap[v]!=null);
+    if(have.length===4){
+      const small=(chgMap.IM+chgMap.IC)/2, big=(chgMap.IH+chgMap.IF)/2, diff=small-big;
+      const f1=(x)=>(x>=0?'+':'')+x.toFixed(1);
+      let j1= diff<=-0.8 ? '⚠️ 中小盘期指显著弱于大盘（差 '+f1(diff)+'pp）→ 资金切向大盘价值/红利避险，中小盘持仓注意风险'
+           : diff>=0.8 ? '✅ 中小盘期指显著强于大盘（差 '+f1(diff)+'pp）→ 风格偏向中小盘进攻'
+           : '➖ 大小盘风格均衡（差 '+f1(diff)+'pp），暂无风格切换信号';
+      const vMax=watch.reduce((a,b)=>oiMap[b]>oiMap[a]?b:a);
+      const oiW=(oiMap[vMax]/1e4).toFixed(1);
+      let j2= chgMap[vMax]<-0.3 ? '⚠️ '+_FUT_NAME[vMax]+'('+vMax+') 持仓 '+oiW+'万手全场最大且价跌 → 空头/对冲盘拥挤；「持仓降+价稳=回补反弹」「持仓升+价跌=下行未完」'
+           : chgMap[vMax]>0.3 ? '✅ 最大持仓品种 '+vMax+' 上涨，对冲压力不重'
+           : '➖ 最大持仓品种 '+vMax+'（'+oiW+'万手）窄幅波动，多空对冲均不激进';
+      const nUp=have.filter(v=>chgMap[v]>0).length;
+      const avg=have.reduce((s,v)=>s+chgMap[v],0)/have.length;
+      const f2=(x)=>(x>=0?'+':'')+x.toFixed(2)+'%';
+      let j3= nUp>=3 ? '✅ 偏多（'+nUp+'涨'+(4-nUp)+'跌，均 '+f2(avg)+'）'
+           : nUp<=1 ? '🛡 偏防御（仅'+nUp+'涨，均 '+f2(avg)+'）；极端分化日小盘流动性收缩，次日中小盘接力弱'
+           : '➖ 多空拉锯（2涨2跌，均 '+f2(avg)+'）';
+      h+='<div style="margin-top:10px;padding:9px 12px;background:rgba(255,255,255,.02);border:1px solid var(--border2);border-radius:10px;font-size:12px;line-height:1.8;color:var(--txt);">';
+      h+='<div style="font-weight:700;color:var(--sub);margin-bottom:2px;">📌 三个判断（自动解读）</div>';
+      h+='<div>① <b>风格分化</b>：'+j1+'</div>';
+      h+='<div>② <b>空头/对冲压力</b>：'+j2+'</div>';
+      h+='<div>③ <b>情绪方向</b>：'+j3+'</div>';
+      h+='</div>';
+    }
     $b.innerHTML=h;
     if($t) $t.innerHTML=_uBadge('盘中','短线',d.update_time);
   }
@@ -11034,7 +11085,7 @@ window.showRestrictedItems = showRestrictedItems;
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=16ebe8db7a';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=3b6f0623f8';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -11043,7 +11094,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=99b4f605f0';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=b460428524';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -12958,7 +13009,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=eaed9eb318')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=f7f026d690')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
