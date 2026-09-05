@@ -1562,6 +1562,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/PERFORMANCE_FORECAST.js?v=0edd1490d5" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=09f9d299b8" defer></script>
+    <script src="data/AUDIT_TRAIL.js" defer></script>
 <script src="data/HEALTH_CHECK.js?v=70ec5b0939" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=444ff641f0" defer></script>
     <script src="data/SENTIMENT_CYCLE.js?v=c3c93ab6f8" defer></script>
@@ -5267,6 +5268,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       </div>
     </div>
 
+    <div class="card" style="margin-bottom:16px;border-left:3px solid var(--gold)">
+      <h3><span class="ic">🧾</span>审计轨迹 <span class="fresh" id="auditTrailTime">—</span></h3>
+      <div id="auditTrailBody"><div style="font-size:12px;color:var(--dim)">等待审计数据…</div></div>
+    </div>
+
     <!-- ═══════════════ 📋 静态配置区（部署时写入/手动维护） ═══════════════ -->
 
     <div style="text-align:center;margin:18px 0 10px;padding:6px 0;border-bottom:2px solid var(--border);font-size:12px;font-weight:700;color:var(--dim);letter-spacing:2px">📋 静态配置区 · 部署时写入</div>
@@ -8712,6 +8718,57 @@ function drawUpDownChart(){
     try{ renderDataFreshness(); }catch(e){ console.warn('renderDataFreshness fail', e); }
   }
 
+  function renderAuditTrail(at){
+    const el = document.getElementById('auditTrailBody');
+    if(!el) return;
+    const _esc = function(v){ return String(v==null?'':v).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
+    if(!at || !at.latest){
+      el.innerHTML = '<div style="font-size:12px;color:var(--dim)">暂无审计轨迹（等待每日 22:30 云端审计 + 23:30 本机审计产出）</div>';
+      return;
+    }
+    const latest = at.latest || {};
+    const sum = latest.summary || {};
+    const overall = latest.overall || 'unknown';
+    const oc = overall === 'ok' ? 'var(--down)' : (overall === 'fail' ? 'var(--up)' : 'var(--gold)');
+    const latestHtml =
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'+
+        '<span style="font-size:12px;color:var(--sub);flex:0 0 auto;">最近审计</span>'+
+        '<b style="font-size:13px;flex:0 0 auto;">'+_esc(latest.date||'')+' '+_esc(latest.time||'')+'</b>'+
+        '<span style="font-size:11px;color:'+oc+';flex:0 0 auto;">● '+_esc(overall)+'</span>'+
+      '</div>'+
+      '<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">'+
+        '通过 '+(sum.ok||0)+' · 警告 '+(sum.warn||0)+' · 失败 '+(sum.fail||0)+' · 共 '+(sum.total||0)+
+      '</div>';
+    const hist = (at.history || []).slice(-6).reverse();
+    let histHtml = '';
+    hist.forEach(function(h){
+      const s = h.summary || {};
+      const o = h.overall || 'unknown';
+      const c = o === 'ok' ? 'var(--down)' : (o === 'fail' ? 'var(--up)' : 'var(--gold)');
+      histHtml += '<div style="display:flex;gap:8px;font-size:11px;color:var(--sub);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)">'+
+        '<span style="flex:0 0 auto;color:var(--dim)">'+_esc(h.date||'')+'</span>'+
+        '<span style="flex:0 0 auto;color:'+c+'">'+_esc(o)+'</span>'+
+        '<span>✓'+(s.ok||0)+' ⚠'+(s.warn||0)+' ✗'+(s.fail||0)+'</span>'+
+      '</div>';
+    });
+    const histBlock = histHtml ?
+      '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">'+
+        '<div style="font-size:12px;font-weight:700;color:var(--txt);margin-bottom:6px;">🕓 审计历史（最近 '+hist.length+' 次）</div>'+
+        histHtml +
+      '</div>' : '';
+    const nightly = at.nightly || [];
+    let nightlyBlock;
+    if(nightly.length){
+      const last = nightly[nightly.length-1];
+      nightlyBlock = '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--sub);">🌙 本机夜间审计：'+nightly.length+' 条（最近 '+_esc(last.date||'')+' '+_esc(last.time||'')+'）</div>';
+    } else {
+      nightlyBlock = '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--dim);">🌙 本机夜间审计：暂无（23:30 本机任务产出）</div>';
+    }
+    el.innerHTML = latestHtml + histBlock + nightlyBlock;
+    const tEl = document.getElementById('auditTrailTime');
+    if(tEl) tEl.textContent = at.generated_at ? _esc(at.generated_at) : (latest.date||'');
+  }
+
   /* ---- 任务运行看板（按前端页面→卡片顺序，每个时段成功✓失败✗） ---- */
 
   const V8_PAGE_SCHEDULE = {
@@ -9775,6 +9832,7 @@ window.showRestrictedItems = showRestrictedItems;
     safe(renderSfIntradayChart, window.SECTOR_FUND_FLOW_INTRADAY || {});
     // 已下架：safe(renderMacro, window.MACRO_DATA || {});
     safe(renderRunnerTrack, window.RUNNER_STATUS || {});
+    safe(renderAuditTrail, window.AUDIT_TRAIL || {});
     safe(renderTaskSchedule);
     safe(renderHealthCheck);
     // 2026-08-16: 商品涨价弹性榜已从选股策略TAB移至盘后数据section，需在此处渲染
