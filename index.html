@@ -5126,10 +5126,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     }
     var atFocus = atTopArr.filter(function(r){ return _gatePass(r,'at'); });
     var roeFocus = roeTopArr.filter(function(r){ return _gatePass(r,'roe'); });
+    // 🛡 2026-09-05 主人令（factor_lab 主卡只显示评分最高前 10 只）：其余点击 📄 完整榜单按钮查看；弹窗保持原样不动
+    var FL_DISPLAY_TOP_N = 10;
     function _focusBlock(title, color, rows, kind, popKind, popLabel){
-      var inner = rows.map(function(r){ return row(r,kind); }).join('')
+      var showRows = rows.slice(0, FL_DISPLAY_TOP_N);
+      var inner = showRows.map(function(r){ return row(r,kind); }).join('')
         || '<div class="note" style="color:var(--dim);padding:4px 0;">本期无可关注标的（择时闸门关闭或因子分位未进前 20%）</div>';
-      return '<div style="font-weight:600;margin:8px 0 4px;color:'+color+';">'+title+' · 🟢可关注 <b>'+rows.length+'</b> 只</div>'
+      var suffix = rows.length > FL_DISPLAY_TOP_N
+        ? ' <span style="font-size:11px;color:var(--dim);font-weight:500;">· 仅展示前 '+FL_DISPLAY_TOP_N+' 只 / 共 '+rows.length+' 只（其余查看下方完整榜单）</span>'
+        : (rows.length > 0 ? ' <span style="font-size:11px;color:var(--dim);font-weight:500;">· 全部 '+rows.length+' 只</span>' : '');
+      return '<div style="font-weight:600;margin:8px 0 4px;color:'+color+';">'+title+' · 🟢可关注 <b>'+rows.length+'</b> 只'+suffix+'</div>'
         + inner
         + '<div style="margin:6px 0 2px;"><span onclick="window.__flPopup(\''+popKind+'\')" style="cursor:pointer;display:inline-block;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:600;color:#22d3ee;border:1px solid rgba(34,211,238,.4);background:rgba(34,211,238,.08);">📄 '+popLabel+'</span></div>';
     }
