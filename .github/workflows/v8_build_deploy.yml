@@ -151,6 +151,9 @@ jobs:
             python update_v8.py --detect-changes
           fi
 
+      - name: "🛡️ Pre-deploy audit（CI 自动门禁，2026-09-05 启用）"
+        run: python .github/scripts/pre_deploy_audit.py
+
       - name: "🛡️ 部署前校验：关键 data/*.js 非空（防空 raw_data 覆盖成 shell 致整站空）"
         run: python v8_deploy_guard.py
 

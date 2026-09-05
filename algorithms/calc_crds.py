@@ -687,6 +687,8 @@ def _write_empty_crds_output(reason=""):
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "data_time": datetime.now().strftime("%Y-%m-%d") + " 15:30:00",
         "total_scanned": 0,
+        "scan_stats": {"candidates": 0, "succeeded": 0, "failed": 0,
+                       "kline_source_used": "none", "note": reason},
         "market_context": {"validity": "unknown", "today_pct": 0.0,
                            "summary": "数据源异常，" + reason + "（保留新鲜时间戳）"},
         "cond1_list": [], "cond2_list": [], "cond3_list": [],
@@ -748,6 +750,8 @@ def calc_crds():
 
     # 3. 逐只计算CRDS
     print(f"\n[2/3] 逐只计算CRDS ({len(all_stocks)} 只)...")
+    _tdx_start = _TDX_CALL_COUNT
+    failed_count = 0
     results = []
     for i, s in enumerate(all_stocks):
         code = s.get("code", "")
@@ -766,6 +770,7 @@ def calc_crds():
                 crds["market_label"] = s.get("market_label", "")
                 results.append(crds)
         except Exception as e:
+            failed_count += 1
             print(f"\n  [WARN] {code} 计算异常: {e}")
             continue
 
@@ -791,10 +796,25 @@ def calc_crds():
     data_date = datetime.now().strftime("%Y-%m-%d")
 
     # 5. 输出
+    _tdx_end = _TDX_CALL_COUNT
+    if results:
+        if _tdx_end > _tdx_start:
+            _src = "mootdx(eastmoney兜底可用)"
+        else:
+            _src = "eastmoney(mootdx不可用)"
+    else:
+        _src = "none(全部失败)"
+    scan_stats = {
+        "candidates": len(all_stocks),
+        "succeeded": len(results),
+        "failed": failed_count,
+        "kline_source_used": _src,
+    }
     output = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "data_time": data_date + " 15:30:00",
         "total_scanned": len(results),
+        "scan_stats": scan_stats,
         "market_context": market_context,
         "cond1_list": [{"code": r["code"], "name": r["name"], "board_label": r["board_label"]} for r in cond1_list],
         "cond2_list": [{"code": r["code"], "name": r["name"], "board_label": r["board_label"]} for r in cond2_list],

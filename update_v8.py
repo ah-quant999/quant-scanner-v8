@@ -129,6 +129,12 @@ DATA_SOURCES = {
     "performance_forecast.json":  "PERFORMANCE_FORECAST",
 }
 
+# 🆕 2026-09-05 主人令一劳永逸：运维看板全量覆盖 + 审计轨迹
+#   ALL_MODULE_NAMES = 数据管线全部模块变量名（剔除仅元数据/健康类），
+#   供 RUNNER_STATUS 补全 + AUDIT_TRAIL 复用，确保运维卡真实覆盖所有模块。
+_AUDIT_TRAIL_EXCLUDE = {"RUNNER_STATUS", "RUNNER_STATUS_HEALTH", "HEALTH_CHECK", "AUDIT_TRAIL"}
+ALL_MODULE_NAMES = sorted(n for n in DATA_SOURCES.values() if n not in _AUDIT_TRAIL_EXCLUDE)
+
 # 变量名 → 更新时段
 CATEGORY_MAP = {
     # 盘前（08:25 cn / 08:35 deploy）
@@ -829,6 +835,99 @@ def stamp_missing_update_time():
         print(f"✅ 已为 {stamp_count} 个 data/*.js 补 update_time")
 
 
+# 🆕 2026-09-05 主人令一劳永逸：运维看板全量覆盖 + 审计轨迹
+def _expand_runner_status():
+    """把 runner_status.json 的 modules 补全到 ALL_MODULE_NAMES 全量。
+    已跑模块用其 status/msg；未跑模块标 skip（运维看板真实覆盖，不再只报跑过的若干）。"""
+    p = RAW_DIR / "runner_status.json"
+    if not p.exists():
+        print("  ⏭️  runner_status.json 不存在，跳过 RUNNER_STATUS 补全")
+        return
+    try:
+        src = json.loads(p.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"  [WARN] runner_status.json 解析失败，跳过补全: {e}")
+        return
+    modules = src.get("modules", {}) or {}
+    expanded = {}
+    for name in ALL_MODULE_NAMES:
+        if name in modules:
+            expanded[name] = modules[name]
+        else:
+            expanded[name] = {"status": "skip", "msg": "本周期未运行（未出现在 runner_status）"}
+    out = dict(src)
+    out["modules"] = expanded
+    out["_expanded"] = True
+    out["_module_total"] = len(ALL_MODULE_NAMES)
+    out["_module_run"] = len(modules)
+    js_path = DATA_DIR / "RUNNER_STATUS.js"
+    try:
+        with open(js_path, "w", encoding="utf-8") as f:
+            f.write("window.RUNNER_STATUS = ")
+            json.dump(out, f, ensure_ascii=False, separators=(',', ':'))
+            f.write(";\n")
+        print(f"  ✅ RUNNER_STATUS 补全 {len(modules)}/{len(ALL_MODULE_NAMES)} 模块")
+    except Exception as e:
+        print(f"  [WARN] 写出 RUNNER_STATUS.js 失败: {e}")
+
+
+def _generate_audit_trail():
+    """合并云端 audit_history.json（v8_daily_audit 22:30 CST 写）
+    + 本机 audit_nightly.log（23:30 写 JSONL，可能不存在）为 AUDIT_TRAIL。"""
+    history = []
+    hp = RAW_DIR / "audit_history.json"
+    if hp.exists():
+        try:
+            history = json.loads(hp.read_text(encoding="utf-8"))
+            if not isinstance(history, list):
+                history = [history]
+        except Exception as e:
+            print(f"  [WARN] audit_history.json 解析失败: {e}")
+            history = []
+    nightly = []
+    nl = RAW_DIR / "audit_nightly.log"
+    if nl.exists():
+        try:
+            for line in nl.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    nightly.append(json.loads(line))
+                except Exception:
+                    continue
+        except Exception as e:
+            print(f"  [WARN] audit_nightly.log 读取失败: {e}")
+    latest = history[-1] if history else None
+    return {
+        "latest": latest,
+        "history": history[-20:],
+        "nightly": nightly,
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+
+def _write_audit_trail_js(trail):
+    js_path = DATA_DIR / "AUDIT_TRAIL.js"
+    try:
+        with open(js_path, "w", encoding="utf-8") as f:
+            f.write("window.AUDIT_TRAIL = ")
+            json.dump(trail, f, ensure_ascii=False, separators=(',', ':'))
+            f.write(";\n")
+        print(f"  ✅ 写出 AUDIT_TRAIL.js（latest={'有' if trail.get('latest') else '无'}, "
+              f"history={len(trail.get('history', []))}, nightly={len(trail.get('nightly', []))}）")
+    except Exception as e:
+        print(f"  [WARN] 写出 AUDIT_TRAIL.js 失败: {e}")
+
+
+def _post_build_extras():
+    """🆕 2026-09-05：build 后补 RUNNER_STATUS 全量 + AUDIT_TRAIL（供运维看板消费）。"""
+    print("  🔧 生成运维 extras（RUNNER_STATUS 全量 + AUDIT_TRAIL）...")
+    _expand_runner_status()
+    _write_audit_trail_js(_generate_audit_trail())
+
+
+
 def build(category=None, detect_changes=False):
     if not RAW_DIR.exists():
         print(f"⚠️  raw_data/ 目录不存在（{RAW_DIR}）。保持既有 data/*.js 不变。")
@@ -1037,6 +1136,8 @@ def main():
         run_experiment_cards()
         # 2026-08-22 主人令：为缺 update_time 的 data/*.js 补时间戳（须在全部生成之后）
         stamp_missing_update_time()
+        # 🆕 2026-09-05 主人令：build 后补 RUNNER_STATUS 全量 + AUDIT_TRAIL
+        _post_build_extras()
         # 2026-08-15 缓存戳铁律修复：必须在全部数据生成（含 run_experiment_cards
         # 重写的 COMMODITY_ELASTICITY.js 等）之后才算 ?v，否则 ?v 与最终文件内容
         # 不符 → CDN 吐旧副本。
