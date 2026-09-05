@@ -123,6 +123,25 @@ def last_published_lhb_date(now):
     return cand
 
 
+def is_pre_t1_hours(now=None):
+    """非交易日 T+1 未发布闸门（主人 2026-09-05 令）。
+
+    周末/法定假期的 09:00 之前，T+1 数据尚未发布：
+      - 今日事件  最早 08:25
+      - 实时数据  09:30 之后才稳定
+      - 盘后/选股 T+1 要 18:30+
+    此时任何抓取都会拿到前一天数据或误把陈旧当"新鲜"，应直接跳过。
+    交易日不受此闸门限制（盘中/盘后调度照常）。
+
+    返回 True 表示「应在 T+1 发布前跳过抓取/检查」。
+    """
+    if now is None:
+        now = now_cst()
+    if is_trading_day(now.date()):
+        return False
+    return now.hour < 9
+
+
 def get_lhb_content_date(filepath):
     """读取 lhb_data.json 的 date 字段（YYYYMMDD，int）。缺失/异常返回 None。"""
     p = RAW_DIR / filepath
@@ -241,6 +260,10 @@ def check_freshness(category=None, threshold_override=None):
     检查数据新鲜度。
     返回 (stale_files, fresh_count, stale_count, report_lines)
     """
+    # 🛡 2026-09-05 主人令：非交易日 T+1 未发布闸门（09:00 前跳过）
+    if is_pre_t1_hours():
+        return [], 0, 0, ["非交易日T+1未发布(09:00前闸门)，跳过抓取"]
+
     now = now_cst()
     hhmm = int(now.strftime("%H%M"))
 
