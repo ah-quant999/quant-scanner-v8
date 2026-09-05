@@ -1,6 +1,6 @@
 {
  "month": "2026年9月",
- "update_time": "2026-09-04 20:09",
+ "update_time": "2026-09-05 08:25",
  "legend": [
   {
    "title": "重要政策",
@@ -142,19 +142,19 @@
     {
      "num": 4,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "🇺🇸 美国非农",
        "cls": "us",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 5,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": []
     },
     {
