@@ -106,9 +106,6 @@ DATA_SOURCES = {
     # 🛡 2026-08-18 一劳永逸式修复：补入 weekend_run.json → WEEKEND_RUN 映射
     #   原 update_v8 漏挂此映射 → data/WEEKEND_RUN.js 永远不被重新生成 → 健康巡检永远 warn
     "weekend_run.json":            "WEEKEND_RUN",
-    # 2026-08-19 主人令：路径概率预测卡（艾略特波浪+江恩+缠论+形态匹配），需 5 年长 K 线
-    "index_history.json":          "INDEX_HISTORY",
-    "market_path_probability.json": "MARKET_PATH_PROBABILITY",
     # 2026-08-19 主人令：利率上行期板块推荐框架（宏观+板块RS+资金流+周期融合；macro.json 删除孤儿后由 market_regime.json 单源触发）
     "market_regime.json":           "MARKET_REGIME",
     "sector_recommendation.json":   "SECTOR_RECOMMENDATION",
