@@ -141,7 +141,6 @@ CORE_SOURCES_ALGO = {
     #    MARKET_PATH_PROBABILITY 路径概率）由 19:15 算法链产出，纳入 CORE 监控/自愈，
     #    防算法链失败时卡静默陈旧（48h 阈值，交易日每日更新）。
     "INDEX_HISTORY": 48,
-    "MARKET_PATH_PROBABILITY": 48,
 }
 
 # ── 分类三：无云端生产者的冻结快照 ────────────────────────────────────
