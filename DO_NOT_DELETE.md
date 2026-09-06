@@ -96,6 +96,18 @@
 >
 > **防孤儿双保险**：① `update_v8.py` DATA_SOURCES 已加 `"rps_backtest.json": "RPS_BACKTEST"` 映射（weekly_cleanup 有映射不删）；② 本清单 pre-commit 拦截 `raw_data/*.json` 删除。**任何轻量化/瘦身/清理操作不得删除上表文件**。
 
+**🛡 2026-09-06 主人令：暂未上架两卡实证链保护段（AI预测回测 + 潜力挖掘快照考核）**
+
+> **考核标准**：① AI 预测路径概率 walk-forward 回测 `raw_data/path_probability_backtest.json`（E 批每日刷新）——verdict=VALID 才算有真实 edge（判据全文见 logic.html AI 预测段：样本≥100 且 主路径命中率−基率≥+3pp 且 Brier 低于基线）；② 潜力挖掘自 2026-09-06 起满 **30 个交易日**（约 2026-10-中），Top15 的 T+5 胜率/平均收益跑赢全市场基线 → 留并升级（接 fetch_fundamental_quality 补估值维度）；跑不赢 → 降级下架。
+>
+> | 文件 | 作用 | 产出方 |
+> |---|---|---|
+> | `algorithms/path_probability_backtest.py` | AI预测 walk-forward 回测引擎（复用生产匹配引擎，防前视） | 算法链 E 批 |
+> | `raw_data/path_probability_backtest.json` + `data/PATH_PROB_BACKTEST.js` | 回测产物（update_v8 已加映射防孤儿清理） | E 批每日刷新 |
+> | `raw_data/history/potential_*.json` | 潜力挖掘每日快照（考核唯一输入源，删了考核直接报废） | `calc_potential_picks.py`（主链每日归档） |
+>
+> **任何轻量化/瘦身/清理操作不得删除上表文件。**
+
 ---
 
 ## 🟠 核心脚本 (根目录 *.py)
