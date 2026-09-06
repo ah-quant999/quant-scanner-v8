@@ -2104,7 +2104,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <div class="card" style="margin-bottom:16px">
       <h3><span class="ic">📈</span>期指主力合约 · 情绪方向 · <span class="fresh" id="futuresMainTime">—</span></h3>
       <div id="futuresMainBody" style="font-size:13px;color:var(--txt);">加载中…</div>
-      <div class="note">📌 基差 = 期货主力 − 现货指数（IF↔沪深300 / IC↔中证500 / IH↔上证50 / IM↔中证1000）；年化升贴水率 = 基差率 ÷ 距到期日 × 365（到期日=合约月份第三个周五）。升水(+)红色=多头信心，贴水(−)绿色=对冲需求/偏空；贴水骤深=对冲恐慌，贴水收敛=信心修复。现货缺失时自动隐藏基差行。</div>
+      <div class="note">📌 基差 = 期货主力 − 现货指数（IF↔沪深300 / IC↔中证500 / IH↔上证50 / IM↔中证1000）；年化升贴水率 = 基差率 ÷ 距到期日 × 365（到期日=合约月份第三个周五）。升水(+)红色=多头信心，贴水(−)绿色=对冲需求/偏空；贴水骤深=对冲恐慌，贴水收敛=信心修复。现货缺失时自动隐藏基差行。 名称旁标签=盘型：IH超大盘 / IF大盘 / IC中盘 / IM小盘；中小盘观测=IC+IM，对应下方「风格分化」判断。</div>
     </div>
 
         <!-- 情绪周期·连板天梯（2026-08-08 从暂未上架迁到实时数据） -->
@@ -5153,8 +5153,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     html += _tableHtml(_showRows);
     html += '<div style="margin:6px 0 2px;"><span onclick="window.__imaFullPopup()" style="cursor:pointer;display:inline-block;padding:4px 14px;border-radius:8px;font-size:12px;font-weight:600;color:#38bdf8;border:1px solid rgba(56,189,248,.4);background:rgba(56,189,248,.08);">📄 全部标的（共 '+_allN+' 只）</span></div>';
     dst.innerHTML = html;
-  };
-  /* 2026-09-06 主人令：筛选胶囊 + 完整表格整体迁入弹窗（原主卡筛选行下线） */
+  /* 2026-09-06 主人令：筛选胶囊 + 完整表格整体迁入弹窗（原主卡筛选行下线）
+     🛡 09:10 修复：__imaFullPopup / __imaSetFilter 原定义在渲染函数体【外部】，
+       引用的 D/_sortByChg/statusMap/_realByStatus/_allN/_tableHtml 均为渲染函数
+       局部变量 → 点击时 ReferenceError，「📄 全部标的」点不开。
+       现移入函数体内，闭包捕获局部变量；随每次渲染刷新闭包，行为一致。 */
   window.__imaFullPopup = function(){
     var filter = window.__imaFilter || '全部';
     var _rows = D.stocks.filter(function(s){ return filter==='全部' || (s.status||'')===filter; }).sort(_sortByChg);
@@ -5178,6 +5181,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     document.body.appendChild(mask);
   };
   window.__imaSetFilter = function(f){ window.__imaFilter = f; var _m=document.querySelector('div[style*="z-index:99998"]'); if(_m) _m.remove(); window.__imaFullPopup(); };
+  }; /* ← 闭合 __renderImaStrongStock（__imaFullPopup/__imaSetFilter 已移入其体内） */
 
   // ===== 因子实验室（异常换手率 + ROE_TTM 大市值档）=====
   window.__flRetry = 0;
@@ -8914,22 +8918,22 @@ function drawUpDownChart(){
       '<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">'+
         '通过 '+(sum.ok||0)+' · 警告 '+(sum.warn||0)+' · 失败 '+(sum.fail||0)+' · 共 '+(sum.total||0)+
       '</div>';
-    const hist = (at.history || []).slice(-6).reverse();
+    const hist = (at.history || []).slice(-5).reverse();
     let histHtml = '';
     hist.forEach(function(h){
       const s = h.summary || {};
       const o = h.overall || 'unknown';
       const c = o === 'ok' ? 'var(--down)' : (o === 'fail' ? 'var(--up)' : 'var(--gold)');
-      histHtml += '<div style="display:flex;gap:8px;font-size:11px;color:var(--sub);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04)">'+
-        '<span style="flex:0 0 auto;color:var(--dim)">'+_esc(h.date||'')+'</span>'+
-        '<span style="flex:0 0 auto;color:'+c+'">'+_esc(o)+'</span>'+
-        '<span>✓'+(s.ok||0)+' ⚠'+(s.warn||0)+' ✗'+(s.fail||0)+'</span>'+
+      histHtml += '<div style="display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--sub);padding:6px 8px;border:1px solid var(--border2);border-radius:8px;background:var(--card2);min-width:0;overflow:hidden;">'+
+        '<span style="color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+_esc(h.date||'')+'</span>'+
+        '<span style="color:'+c+';font-weight:700;">● '+_esc(o)+'</span>'+
+        '<span style="white-space:nowrap;">✓'+(s.ok||0)+' ⚠'+(s.warn||0)+' ✗'+(s.fail||0)+'</span>'+
       '</div>';
     });
     const histBlock = histHtml ?
       '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">'+
         '<div style="font-size:12px;font-weight:700;color:var(--txt);margin-bottom:6px;">🕓 审计历史（最近 '+hist.length+' 次）</div>'+
-        histHtml +
+        '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">'+histHtml+'</div>'+
       '</div>' : '';
     const nightly = at.nightly || [];
     let nightlyBlock;
@@ -9631,6 +9635,7 @@ function drawUpDownChart(){
 
   /* ---- 14. 期指主力合约 · 情绪罗盘（2026-09-06 主人令：接现货基差+年化升贴水率+三个判断自动解读） ---- */
   var _FUT_NAME={IC:'中证500',IF:'沪深300',IH:'上证50',IM:'中证1000'};
+  var _FUT_SIZE={IH:'超大盘',IF:'大盘',IC:'中盘',IM:'小盘'};  // 2026-09-06 主人令：四卡标注盘型，中小盘观测=IC+IM
   function _cffexExpiryDays(sym){
     // 股指期货合约到期日 = 合约月份第三个周五（sym 形如 IC2609）
     try{
@@ -9665,7 +9670,7 @@ function drawUpDownChart(){
       const arrow=chg>0?'▲':(chg<0?'▼':'—');
       h+='<div style="background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:10px;">';
       h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">';
-      h+='<span style="font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+_FUT_NAME[v]+' <span style="font-size:10px;color:var(--dim);">'+main.symbol+'</span></span>';
+      h+='<span style="font-size:12px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+_FUT_NAME[v]+'<span style="font-size:9px;color:var(--dim);border:1px solid var(--border2);border-radius:3px;padding:0 3px;margin-left:4px;">'+(_FUT_SIZE[v]||'')+'</span> <span style="font-size:10px;color:var(--dim);">'+main.symbol+'</span></span>';
       h+='<span style="font-size:16px;font-weight:800;color:var(--txt);flex-shrink:0;">'+Number(main.close).toFixed(1)+'</span>';
       h+='</div>';
       h+='<div style="display:flex;justify-content:space-between;align-items:center;">';
@@ -12376,8 +12381,31 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     }
     /* 2026-08-30 主人令：弱市专用兑现卡删除 —— 与 stcrdsMarketContext 大盘判断信息重复，且容易因 mc.validity
        命名不同步导致两处打架。现在用单一权威源 mc.validity 在大盘判断卡内（stcrdsMarketContext）直接呈现。 */
-    function fillList(listEl,arr,html){if(!arr||!arr.length){listEl.innerHTML=html;return;}
-      listEl.innerHTML=arr.map(function(s){return '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+s.name+'('+s.code+')</div>';}).join('');
+    /* 2026-09-06 主人令：子卡列表只直显前 10 只，其余折叠「点击展开查看」（5 个子卡统一走 _crdsFillFold） */
+    window._crdsToggleFold=function(btn){
+      var b=document.getElementById(btn.getAttribute('data-t'));
+      if(!b) return;
+      var open=b.style.display!=='none';
+      b.style.display=open?'none':'block';
+      btn.textContent=open?'▾ 展开其余 '+btn.getAttribute('data-n')+' 只':'▴ 收起';
+    };
+    var _crdsFoldSeq=0;
+    function _crdsFillFold(listEl,items,renderItem,emptyHtml,restGrid){
+      if(!listEl) return;
+      if(!items||!items.length){ listEl.innerHTML=emptyHtml; return; }
+      var head=items.slice(0,10).map(renderItem).join('');
+      if(items.length<=10){ listEl.innerHTML=head; return; }
+      var id='crdsFold'+(++_crdsFoldSeq);
+      var rest=items.slice(10).map(renderItem).join('');
+      var restHtml=restGrid
+        ? '<div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 14px;">'+rest+'</div>'
+        : rest;
+      listEl.innerHTML=head
+        +'<div id="'+id+'" style="display:none;">'+restHtml+'</div>'
+        +'<div data-t="'+id+'" data-n="'+(items.length-10)+'" onclick="_crdsToggleFold(this)" style="text-align:center;padding:4px 0 2px;cursor:pointer;user-select:none;font-size:11px;color:#38bdf8;">▾ 展开其余 '+(items.length-10)+' 只</div>';
+    }
+    function fillList(listEl,arr,html){
+      _crdsFillFold(listEl,arr,function(s){return '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+s.name+'('+s.code+')</div>';},html,listEl&&listEl.style.display==='grid'||false);
     }
     var l1=d.cond1_list||[],l2=d.cond2_list||[],l3=d.cond3_list||[];
     document.getElementById(p+'crdsCnt1').textContent=l1.length;
@@ -12425,11 +12453,11 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
         }
       }
     })();
-    (function(){var e=document.getElementById(p+'crdsEliteBody');if(!e)return;if(!elite.length){e.innerHTML='<span style="color:var(--dim);">今日无（精选级需3条件全满足，稀疏信号）</span>';return;}
-      e.innerHTML=elite.map(function(s){return '<b style="color:#1D9E75;">'+s.name+'('+s.code+')</b> CRDS='+s.score+'<br>';}).join('');
+    (function(){var e=document.getElementById(p+'crdsEliteBody');if(!e)return;
+      _crdsFillFold(e,elite,function(s){return '<b style="color:#1D9E75;">'+s.name+'('+s.code+')</b> CRDS='+s.score+'<br>';},'<span style="color:var(--dim);">今日无（精选级需3条件全满足，稀疏信号）</span>',false);
     })();
-    (function(){var e=document.getElementById(p+'crdsAdvBody');if(!e)return;if(!adv.length){e.innerHTML='<span style="color:var(--dim);">今日无</span>';return;}
-      e.innerHTML=adv.map(function(s){return s.name+'('+s.code+') CRDS='+s.score+'<br>';}).join('');
+    (function(){var e=document.getElementById(p+'crdsAdvBody');if(!e)return;
+      _crdsFillFold(e,adv,function(s){return s.name+'('+s.code+') CRDS='+s.score+'<br>';},'<span style="color:var(--dim);">今日无</span>',false);
     })();
     // 历史
     var he=document.getElementById(p+'crdsHistory'), hist=d.history||[];
