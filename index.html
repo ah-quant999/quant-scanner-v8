@@ -531,7 +531,7 @@ window.__domReadyFns=[];
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/POTENTIAL_PICKS.js?v=a175dafed0" defer></script>
 <script src="data/INDEX_QUOTES.js?v=2801cc288b" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=d53b6b7ed3" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=eff02fd10e" defer></script>
 <script src="data/MARGIN_DATA.js?v=1acfd55f57" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=a12b47f02b" defer></script>
 <script src="data/IPO_DATA.js?v=b704390de3" defer></script>
@@ -1563,16 +1563,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/PERFORMANCE_FORECAST.js?v=1db6265d2f" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=92d7ec0b91" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=b6af6f4370" defer></script>
-<script src="data/HEALTH_CHECK.js?v=28bb7e3857" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=445a923178" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=0cfa591f9f" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=58f7db802b" defer></script>
+<script src="data/HEALTH_CHECK.js?v=a73fb80b01" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=ce3a383e1c" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=f82c826229" defer></script>
     <!-- 2026-09-06 主人令：AI预测卡恢复（定位=预测大盘后续的前瞻参考，非评判信号） -->
     <script src="data/MARKET_PATH_PROBABILITY.js?v=9d2cff7ac0" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=353367ddad" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=c7111f341e" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=e4fed8b815" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=43b681fb1f" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=f1f638a221" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=09d0f26c9c" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=f4d7a02a54" defer></script>
     <!-- 2026-09-04 主人令收尾：ALLSITE_BACKTEST.js 注入已删（生成器/raw_data 已于 09-03「干掉全站精选」系列删除，前端无任何代码读 window.ALLSITE_BACKTEST，标签纯 404 噪音） -->
@@ -11090,7 +11090,7 @@ window.showRestrictedItems = showRestrictedItems;
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=353367ddad';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=43b681fb1f';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -11099,7 +11099,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=c7111f341e';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=f1f638a221';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -13038,7 +13038,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=28bb7e3857')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=a73fb80b01')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
