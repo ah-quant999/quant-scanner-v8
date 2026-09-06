@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """
 gen_triple_consensus.py — 三重共识选股
-共识定义（严格）：同时满足
+共识定义（2026-09-06 审计修复，驾驶舱 09-03 下线后由三维权变二维）：
   1) 主站 TOP10 精选（generate_top10.py 输出前 10 名，且
      total_score >= max(max_score * 0.5, 25)，避免评分尺度变化后硬门槛失效）
-  2) 驾驶舱 A 档（gen_cockpit_tier_recommend.py 的 tier_a）
-  3) 基本面 A 档（fundamental_quality.json 中 grade 为 A）
+  2) 基本面 A 档（fundamental_quality.json 中 grade 为 A）
 
-同时输出 near_miss：满足 2/3 条件的观察清单。
+同时输出 near_miss：有 TOP10 精选但缺基本面 A 档（差1步）的观察清单。
 输出：data/triple_consensus.json
 """
 import json
@@ -177,8 +176,9 @@ def main():
         in_ab = bool(a or b)
         in_fund = code in good_fund
 
-        # 严格三重：主站TOP10精选 + A档 + 基本面A档
-        if in_top and in_a and in_fund:
+        # 🐛 2026-09-06 审计修复（P0级）：原 `in_top and in_a and in_fund` 在驾驶舱下线（tier={}，
+        # in_a 恒 False）后导致严格共识自 09-03 起【永远为空】。现共识 = 主站TOP10精选 ∩ 基本面A档（二维）。
+        if in_top and in_fund:
             src = top or a
             rec = {
                 "code": src.get("code", code),
@@ -206,14 +206,9 @@ def main():
             consensus.append(enrich_extra(rec, code, gp_map, meta_map))
             continue
 
-        # near_miss：满足 2/3（主站TOP10精选 / 驾驶舱A或B档 / 基本面A档）
-        # 2026-07-27 修正：驾驶舱 B 档同样代表机构/技术质量信号，应计入候补条件，
-        # 否则会出现 TOP10≥75 且 tier_b 的个股（如特锐德）被排除在优先观察之外。
-        score = sum([in_top, in_ab, in_fund])
-        # 2026-08-01 修正：原 `== 2` 会把「TOP10≥70 + 驾驶舱B档 + 基本面A档」这类
-        # 三条件相对满足（in_ab 经 B 档为真 → score=3）却非严格共识（缺 in_a）的强票
-        # 静默丢弃。严格共识已在上方 continue，故此处 `>= 2` 只会纳入候补、不会重复。
-        if score >= 2:
+        # near_miss（2026-09-06 审计修复）：有 TOP10 精选但缺基本面 A 档 → 差1步观察清单。
+        # 驾驶舱 A/B 档来源已随 09-03 下线消失（in_a/in_b 恒 False），差2步无来源。
+        if in_top and not in_fund:
             src = top or a or b
             rec = {
                 "code": src.get("code", code),
@@ -248,8 +243,8 @@ def main():
         "data_time": top10.get("update_time", ""),
         "count": len(consensus),
         "near_miss_count": len(near_miss),
-        "criteria": "主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)）· 驾驶舱A档 · 基本面A档",
-        "near_miss_criteria": "以上三条满足任意两条（驾驶舱A/B档均计入）",
+        "criteria": "主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)） · 基本面A档（驾驶舱维度 2026-09-03 下线后移除）",
+        "near_miss_criteria": "有TOP10精选但缺基本面A档（差1步）",
         "stocks": consensus,
         "near_miss": near_miss,
     }
@@ -270,7 +265,7 @@ def main():
     print(f"  ✅ 三重共识: {len(consensus)} 只")
     for s in consensus:
         print(f"     {s['name']}({s['code']}) TOP10#{s['top10_rank']} 评分{s['total_score']} A档{s['a_score']} 基本面{s['quality_grade']}")
-    print(f"  ⚠️ 差一步(2/3): {len(near_miss)} 只")
+    print(f"  ⚠️ 差一步(缺基本面A): {len(near_miss)} 只")
     for s in near_miss[:5]:
         tags = []
         if s["in_top10"]: tags.append("TOP10")
