@@ -2040,17 +2040,13 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h" style="background:transparent;color:#bbf7d0;padding:8px 0;border-radius:0;margin:12px 0;">📋 2026-08-20 今晚改动汇总（AI 预测子TAB / 本地禁跑算法护栏 / 算法链补链 / 镜像同步）· 阿狸咪</div>
         <div class="logic-p"><b>主人令</b>：潜力挖掘删除 → 重写「AI 预测」子TAB（小九 market_path_probability 算法）；算法必须有定时任务跟踪、跟着算法链 19:15 计算部署；本地禁止手动跑算法；审计后推仓入库；与运维/逻辑详解页对齐。以下为 8/20 全部实质改动，均已在 main 生效。</div>
 
-        <div class="logic-h">① 「潜力挖掘」子TAB 已删除 → 重写「🤖 AI 预测」子TAB</div>
+        <div class="logic-h">① AI 预测卡已删除（2026-09-06 最终拍板）</div>
         <div class="logic-p">
-        <ul>
-          <li>删除：<code>data/POTENTIAL_PICKS.js</code> 引用、<code>ulPanePP</code> pane、<code>_fillPotentialPicks</code> 渲染函数、<code>_ppFilterConcept</code> 筛选、ETF 克隆逻辑、调试专区 <code>ulMppPanel</code> 宿主。</li>
-          <li>新增：<code>data/MARKET_PATH_PROBABILITY.js</code> + <code>data/INDEX_HISTORY.js</code> 加载（原缺失 → 卡永久空）、<code>ulPaneAI</code> pane、<b>重写</b> <code>_fillAiPrediction()</code>（非复制）：路径概率 ABC（红涨绿跌）+ 当前状态（收盘/60日位置/MA5·20·60/MACD/量能）+ 江恩窗口（is_near 高亮）+ 黄金分割位（贴近收盘 ⚡）+ 缠论分型（顶红/底绿）+ 免责声明；defer 时序自愈轮询杜绝空卡。</li>
-          <li>算法链更新：<code>run_algorithms.py ORDER</code> 补入 <code>scripts/fetch_index_history.py</code>（此前无任何调度方）；<code>fetch_index_history.py</code> / <code>market_path_probability.py</code> 双 bridge 到 <code>raw_data/</code>（此前只写 out/ → update_v8 永远读旧）。19:15 盘后算法链自动产出 → build 部署。</li>
-        </ul>
+        经 108 组参数扫描、180 组条件化匹配扫描、8 特征 logistic walk-forward 监督校准三轮实证，均未过判据门（OOS 命中 &gt; 基率+3pp 且 Brier &lt; 基线）。回测事实归档：训练集全部 Brier 增益为负；OOS 命中 33.1% vs 基率 39.4%、Brier 0.755 vs 0.660；条件化最佳增益 −0.58pp；logistic 最佳 +1.14pp（λ=0.7 重度收缩，信号贡献极小）。已删除：卡片、<code>data/MARKET_PATH_PROBABILITY.js</code>、<code>raw_data/market_path_probability.json</code>、<code>algorithms/market_path_probability.py</code>，并从 <code>run_algorithms.py</code> / <code>update_v8.py</code> 移除管线。<code>fetch_index_history.py</code> 仍保留，继续维护 <code>data/INDEX_HISTORY.js</code>。
         </div>
 
         <div class="logic-h">② 本地禁止手动跑算法（一劳永逸护栏）</div>
-        <div class="logic-p"><code>algorithms/utils/time_gate.py</code> 新增 <code>check_cloud_only()</code>：非 <code>GITHUB_ACTIONS</code>/<code>CI</code> 且未显式 <code>ALLOW_LOCAL_ALGO=1</code> 时直接退出。已接入 <code>run_algorithms.py</code> / <code>fetch_index_history.py</code> / <code>market_path_probability.py</code> / <code>gen_lhb_7d.py</code> / <code>cockpit_backtest_now.py</code> / <code>build_candidate_pool.py</code> / <code>gen_algo_track.py</code> / <code>momentum_common_filter.py</code>。根治「本地手动跑算法产数据 → 本地 file:/// 版与主站分叉」。</div>
+        <div class="logic-p"><code>algorithms/utils/time_gate.py</code> 新增 <code>check_cloud_only()</code>：非 <code>GITHUB_ACTIONS</code>/<code>CI</code> 且未显式 <code>ALLOW_LOCAL_ALGO=1</code> 时直接退出。已接入 <code>run_algorithms.py</code> / <code>fetch_index_history.py</code> / <code>gen_lhb_7d.py</code> / <code>cockpit_backtest_now.py</code> / <code>build_candidate_pool.py</code> / <code>gen_algo_track.py</code> / <code>momentum_common_filter.py</code>。根治「本地手动跑算法产数据 → 本地 file:/// 版与主站分叉」。</div>
 
         <div class="logic-h">③ 本地 ↔ 主站镜像同步（每 15 分钟）</div>
         <div class="logic-p">WorkBuddy 自动化「九宝量化-本地↔主站镜像同步(每15分)」跑 <code>scripts/sync_local_mirror.py</code>：仅当工作区干净才 <code>reset --hard origin/main</code>（脏则跳过防误吞），确保本地 <code>file:///</code> 打开 = 线上 GitHub Pages。云端 build 推了新数据，本地 15 分钟内自动对齐。</div>
@@ -2076,7 +2072,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>双机一致性</td><td>主站 = 唯一权威；本地镜像同步对齐</td><td>本机跑过会<b>分叉主站</b>（主人 8/20 截图根因）</td><td>云端远优</td></tr>
           <tr><td>合规/护栏</td><td>无需护栏（本来就不该跑）</td><td><code>check_cloud_only()</code> 已封死 9 脚本</td><td>云端</td></tr>
         </table>
-        <b>铁律（2026-08-20）</b>：所有数据由云端 <code>v8_algo_cloud</code>（19:15 CST）+ <code>v8_cn_fetch_cloud</code> 统一产出部署；本地只做代码开发/镜像同步（<code>sync_local_mirror.py</code> 每 15 分拉 <code>origin/main</code>），不再手动跑算法产数据。<code>time_gate.check_cloud_only()</code> 在 <code>run_algorithms.py</code> / <code>fetch_index_history.py</code> / <code>market_path_probability.py</code> / <code>gen_lhb_7d.py</code> / <code>cockpit_backtest_now.py</code> / <code>build_candidate_pool.py</code> / <code>gen_algo_track.py</code> / <code>momentum_common_filter.py</code> 共 8 入口拦截。
+        <b>铁律（2026-08-20）</b>：所有数据由云端 <code>v8_algo_cloud</code>（19:15 CST）+ <code>v8_cn_fetch_cloud</code> 统一产出部署；本地只做代码开发/镜像同步（<code>sync_local_mirror.py</code> 每 15 分拉 <code>origin/main</code>），不再手动跑算法产数据。<code>time_gate.check_cloud_only()</code> 在 <code>run_algorithms.py</code> / <code>fetch_index_history.py</code> / <code>gen_lhb_7d.py</code> / <code>cockpit_backtest_now.py</code> / <code>build_candidate_pool.py</code> / <code>gen_algo_track.py</code> / <code>momentum_common_filter.py</code> 共 8 入口拦截。
         </div>
 
         <div class="logic-h">⑦ 主人追问「数据源连通性本机优，是不是该选本机？」的回答（2026-08-20）</div>
@@ -2113,9 +2109,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p">主人问「能否做这种预测」→ 拍板做 v8 卡片版 + 5 年长 K 线：
         <ul>
           <li><code>scripts/fetch_index_history.py</code>：akshare 拉上证 5 年日 K → <code>raw_data/index_history.json</code> → <code>data/INDEX_HISTORY.js</code>（92KB）</li>
-          <li><code>algorithms/market_path_probability.py</code>：均线+MACD+江恩时间窗(F21/34/55/89)+缠论分型+涨跌方向形态匹配(≥65%一致率)+路径概率 ABC → <code>data/MARKET_PATH_PROBABILITY.js</code></li>          <li>🆕 <b>2026-09-06 主人令·实证升级</b>：新增 <code>algorithms/path_probability_backtest.py</code>（挂算法链 E 批 21:00）——逐日只用 ≤t 的 K 线复跑生产匹配引擎（walk-forward 防前视），预测 ABC 概率 vs 实际 T+5 路径对照。判据：<b>有效</b> = 有效样本≥100 且 主路径命中率−基率(最大类)≥+3pp 且 Brier&lt;基线Brier；<b>观望</b> = 仅 Brier 优于基线；<b>无效</b> = 其余（含样本不足）。产出 <code>raw_data/path_probability_backtest.json</code>（update_v8 映射 PATH_PROB_BACKTEST.js）。用真实 edge 决定卡的去留与调参（THRESH/TOPK/窗口），严禁无回测调参。</li>
-          <li>🆕 <b>2026-09-06 主人拍板：定位澄清 → 卡片恢复</b>：AI 预测卡的定位是「预测大盘后续走势」的前瞻参考卡，不是被评判的选股信号。回测事实（如实保留）：108 组参数扫描（前 80% 选参 / 后 20% OOS）训练集全部 Brier 增益为负、OOS 命中 33.1% vs 基率 39.4%、Brier 0.755 vs 0.660——暂无统计优势。处置：卡片在 index.html + logic.html 恢复展示（卡内标注「回测暂无统计优势，解读请保守」），walk-forward 回测管线与孤儿数据维持移除。<b>2026-09-06 下午追加两轮提升实验（主人令），均未过门：</b>① 状态条件化匹配——趋势/波动率/量能状态过滤 × 180 组参数，训练集 0/180 组 Brier 优于基线，OOS 最佳增益 −0.58pp；② 监督校准——8 特征（ret1/5/20、MA20/60 偏离、波动率分位、量能分位、60日区间位置）多分类 logistic，walk-forward 每 60 日重训 + λ 收缩扫描，OOS 最佳 +1.14pp（H=5、λ=0.7 重度收缩＝信号本身贡献很小）但 Brier 仍劣于基线。判据门「OOS 命中>基率+3pp 且 Brier<基线」双轮未过 → 维持「前瞻情景参考 · 解读请保守」定位，卡不变。
-          <li>🆕 <b>潜力挖掘·30 交易日考核（同 RPS 口径）</b>：<code>calc_potential_picks.py</code> 每日快照归档 <code>raw_data/history/potential_*.json</code>（此前选完即丢、永远无法回测，2026-09-06 补上）。自 09-06 起满 30 个交易日：Top15 的 T+5 胜率/平均收益跑赢全市场基线 → 留并升级（接 fetch_fundamental_quality 补估值维度）；跑不赢 → 降级下架。保护条目见 DO_NOT_DELETE.md。</li>
+          <li>❌ <code>algorithms/market_path_probability.py</code> 已删除：原生成路径概率 ABC 数据，因卡下架随之下线。</li>          <li>🆕 <b>2026-09-06 主人令·实证升级</b>：新增 <code>algorithms/path_probability_backtest.py</code>（挂算法链 E 批 21:00）——逐日只用 ≤t 的 K 线复跑生产匹配引擎（walk-forward 防前视），预测 ABC 概率 vs 实际 T+5 路径对照。判据：<b>有效</b> = 有效样本≥100 且 主路径命中率−基率(最大类)≥+3pp 且 Brier&lt;基线Brier；<b>观望</b> = 仅 Brier 优于基线；<b>无效</b> = 其余（含样本不足）。产出 <code>raw_data/path_probability_backtest.json</code>（update_v8 映射 PATH_PROB_BACKTEST.js）。用真实 edge 决定卡的去留与调参（THRESH/TOPK/窗口），严禁无回测调参。</li>
+          <li>🆕 <b>2026-09-06 主人最终拍板：删除 AI 预测卡</b>：因三轮实证均未过判据门，卡片、函数、数据注入、数据文件、生成脚本、管线映射已全部删除。研究档案保留本段，便于三年后回看。</li>
           <li>✅ 已加入 <code>run_algorithms.py ORDER</code>（云端 19:15 盘后算法链自动跑；2026-08-20 补入上游 <code>fetch_index_history.py</code> + 双 bridge 到 <code>raw_data/</code>，根治 K 线/概率卡永不更新的链路断点）</li>
         </ul>
         <b>诚实标注</b>：⚠️ 历史回测仅供参考；预测市场不存在稳定高准确率方法。实盘验证 ≥3 个月。当前（8/19 收 3894.42）：A=37.9% / B=18.3% / C=43.7%，江恩 F34=8/23 临近。</div>
@@ -6757,21 +6752,10 @@ window.showRestrictedItems = showRestrictedItems;
     // ── pane4: 🧪 调试专区 ──
     h+='<div class="ul-pane" id="ulPaneDbg" style="display:'+(_ulAct==='dbg'?'block':'none')+'">';
     // 2026-08-30 根因修复：调试专区容器曾因提前闭合（line 11172 旧 bug）导致
-    //   AI预测/潜力挖掘/ETF龙头/个股动量状态 四卡溢出到两个子Tab之外，
+    //   潜力挖掘/ETF龙头/个股动量状态 三卡溢出到两个子Tab之外，
     //   造成「强势突破」与「调试专区」内容一模一样。现保持容器打开直到 line 11465，
-    //   把这些卡真正收进调试专区；强势突破 pane 只保留三卡。
+    //   把这些卡真正收进调试专区；强势突破 pane 只保留两卡。
 
-    // ── 2026-08-29 主人令：AI 预测 + 潜力挖掘 2 卡并入调试专区（删 AI 预测 / 潜力挖掘 子页面后补位） ──
-    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';
-    h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
-    h+='<span style="font-size:15px;font-weight:700;color:#38bdf8;">🤖 AI 预测 · 市场路径概率</span>';
-    h+='<span class="fresh" id="aiPredFresh">—</span>';
-    h+='<span style="font-size:12px;color:var(--dim);">艾略特 + 江恩 + 缠论 + 形态匹配 · 上证指数</span>';
-    h+='</div>';
-    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">基于 5 年上证日 K 线：涨跌方向形态匹配（≥65% 一致率）统计后续路径分布，<b style="color:#fbbf24">仅供研究，不构成投资建议</b>。</div>';
-    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">📌 定位：<b style="color:#38bdf8">预测大盘后续走势的前瞻情景参考</b>（非评判信号）· walk-forward 回测暂无统计优势，解读请保守。</div>';
-    h+='<div id="aiPredBody"><div class="note">加载中…</div></div>';
-    h+='</div>';
 
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a78bfa;">';
     h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
@@ -7015,14 +6999,12 @@ h+='</div>';  // /ulPaneDbg
     // 2026-08-30 主人令:渲染兜底
     if(!h || h.length<200){ el.innerHTML='<div style=\"text-align:center;padding:40px;color:var(--dim);\"><div style=\"font-size:32px;margin-bottom:12px;\">📭</div><div style=\"font-size:14px;\">已下架卡片暂无可用数据</div><div style=\"font-size:12px;margin-top:8px;\">稍后再试或检查数据源</div></div>'; }
     // 2026-08-20 主人令：潜力挖掘已删除，替换为 AI 预测（market_path_probability 算法，重写非复制）
-    // 🛡 2026-08-23 根因修复：_fillAiPrediction 定义在 11694 行（本行之后），
-    // 🛡 2026-08-23 根因修复（强化版）：_fillAiPrediction 定义在 11694 行（本行之后）。
     // 原同步调用时函数尚不存在 → typeof 判定 undefined 被跳过 → AI预测 卡永不渲染；
     // 后改 setTimeout(0) 仍偶发受时序/缓存影响。现统一用 DOMContentLoaded 触发：
-    // 此时 HTML 解析已完成（函数已定义）、head 的 defer 数据脚本已执行（window.MARKET_PATH_PROBABILITY 已就绪）、
+    // 此时 HTML 解析已完成（函数已定义）、head 的 defer 数据脚本已执行、
     // DOM 元素已存在，彻底免疫时序问题；若脚本晚到（readyState 非 loading）则立即渲染。
     // 2026-08-29 主人令：AI 预测 / 潜力挖掘 2 子页面已删除，DOMContentLoaded 触发器一并移除；
-    // _fillAiPrediction / _fillPotentialPicks 函数体保留以备复用（v8 「数据全量注入」铁律），data 注入链路不受影响。
+    // _fillPotentialPicks 函数体保留以备复用（v8 「数据全量注入」铁律），data 注入链路 unaffected。
     try{
       // 🛡 2026-08-18 主人令：ETF·龙头参考 直接渲染（不依赖已删的 etfMapBody 克隆）
       //   数据源：CONCEPT_RANKING.items（概念 top 8）+ SECTOR_FUND_FLOW.sectors_in（行业 top 6）
@@ -7104,7 +7086,6 @@ h+='</div>';  // /ulPaneDbg
       var tabs = document.querySelectorAll('#sec-ul .ul-tab');
       for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
       if(btn) btn.classList.add('active');
-      // 2026-08-29 主人令：AI 预测 子 tab 已删除，其强制渲染分支一并移除（_fillAiPrediction 函数体保留以备复用）。
       // 2026-08-29 主人令：潜力挖掘 子 tab 已删除，其强制渲染分支一并移除（_fillPotentialPicks 函数体保留以备复用）。
     };
     // ⚖️ 2026-08-14 主人令：renderPortfolio 调用已删除（持仓跟踪卡整段移除）
@@ -7118,7 +7099,7 @@ h+='</div>';  // /ulPaneDbg
     // 2026-08-29：AI 预测 / 潜力挖掘 2 卡迁入调试专区后，子 tab 触发器被移除导致空卡；
     // 在 renderUnlisted 末尾主动触发填充，数据未到则函数内部轮询自愈。
     try{ if(typeof window._fillPotentialPicks==='function') window._fillPotentialPicks(); }catch(e){ console.warn('潜力挖掘卡渲染失败',e); }
-    // 🛡 2026-08-19 主人令：render 调用（宏观+板块推荐；路径概率已迁 AI 预测子TAB 由 _fillAiPrediction 渲染）
+    // 🛡 2026-08-19 主人令：render 调用（宏观+板块推荐）
     try{ if(typeof window.renderMarketRegimeCard==='function') window.renderMarketRegimeCard(); }catch(e){console.warn("宏观卡渲染失败",e);}
     try{ if(typeof window.renderSectorRecommendationCard==='function') window.renderSectorRecommendationCard(); }catch(e){console.warn("板块推荐卡渲染失败",e);}
   }
@@ -8831,7 +8812,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
   window.renderDelisted=renderDelisted;
   // 🛡 2026-08-19 阿狸咪根治空白bug：整个 JS 在 IIFE 内，render 函数必须显式挂 window
   //   否则 try/catch 中 `typeof window.renderXxx` 恒为 undefined → 容器永远空 → 「啥都没有」
-  //   2026-08-20：renderMarketPathProbability 已删除（路径概率迁至「AI 预测」子TAB 由 _fillAiPrediction 渲染）
+  //   2026-08-20：renderMarketPathProbability 已删除
   window.renderMarketRegimeCard = renderMarketRegimeCard;
   window.renderSectorRecommendationCard = renderSectorRecommendationCard;
 
