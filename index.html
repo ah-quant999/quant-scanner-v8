@@ -624,12 +624,12 @@ window.V8_CAL = {weeks:[],legend:[]};
   /* ==========================================================================
      ⚖️ 全站唯一择时裁决源 v8MarketGate()（2026-08-29 主人令：对齐三处冲突信号）
      --------------------------------------------------------------------------
-     背景：此前「今日判定·今日信号 / AI市场速览 / 驾驶舱两盏灯」三处各自出结论，
-           且驾驶舱灯2（企稳回升=🟢）与「提胜率优化策略」（同 regime = ⛔不开仓）
+     背景：此前「今日判定·今日信号 / AI市场速览」多处各自出结论，
+           与「提胜率优化策略」（同 regime = ⛔不开仓）
            直接矛盾，用户无法判断该信谁。
      裁决：全站择时【唯一】以 OPTIMIZED_STRATEGY.current_regime 为准 —— 它是全站
            唯一有回测证据的择时信号（T+10 胜率 54.6% vs 无门控基准 48.1%，+6.5pp）。
-           其余三处（今日信号 / AI速览 / 驾驶舱双灯）全部降级为「读盘观测」，
+           其余两处（今日信号 / AI速览）降级为「读盘观测」，
            无回测证据，不得用于决策。
      输出：{ok, regime, name, open, icon, color, verdict, evidence, date}
      ========================================================================== */
@@ -998,7 +998,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge; window._holdBadge = _holdB
 
 /* ===== 🎯 今日判定 · 可入手候选 HTML 构建（2026-08-08 重构） =====
    规则：① 只保留「值得买入」的股票；② 按统一买入评分降序；③ 每只股票汇总关键详情；④ 三不原则独立第二行。
-   数据：🥇三重共识 > 🥉四量终极（驾驶舱 A 档已下线）（金股池移出本卡，见独立「黄金池」卡片）；渲染由 initCardBadges / switchSec('td') 触发。 */
+   数据：🥇三重共识 > 🥉四量终极（金股池移出本卡，见独立「黄金池」卡片）；渲染由 initCardBadges / switchSec('td') 触发。 */
 function __judgmentCandidatesHTML(){
   var SQ = window.STOCK_QUOTE || {};
   var sq = SQ.stocks || {};
@@ -1038,8 +1038,6 @@ function __judgmentCandidatesHTML(){
     });
   });
 
-  // 2) 驾驶舱 A 档（中长线趋势质量）—— 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND.js 已全方位下线，
-  //     整段 forEach 删除（commit 1/3 漏未扫到）。驾驶舱 tier_a/港股 market 区分等业务一并归零。
 
   // 3) 四量终极（QD 共振，短线量能突破）
   _safeArr(window.FOUR_VOLUME && window.FOUR_VOLUME.stocks).forEach(function(s){
@@ -1917,7 +1915,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
         }
         var h='';
 
-        /* ===== ⚖️ 择时提示条（2026-08-29 主人令：AI速览 与 今日信号/驾驶舱灯 冲突，统一指向唯一裁决） =====
+        /* ===== ⚖️ 择时提示条（2026-08-29 主人令：AI速览 与 今日信号 冲突，统一指向唯一裁决） =====
            本卡各行为盘中观察 + 后端规则/关键词兜底亮灯，全站无回测证据，不得作为开仓依据。 */
         var _ga = (typeof window.v8MarketGate==='function') ? window.v8MarketGate() : {ok:false,name:'暂无数据',icon:'⚪',color:'#94a3b8',verdict:'等待数据',date:''};
         h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 12px;margin-bottom:8px;'
@@ -2454,7 +2452,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <button class="st-tab" data-st="crds" onclick="switchSt('crds')">📊 逆势龙头 <span style="margin-left:4px;font-size:10px;font-weight:500;color:#94a3b8;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用·固定</span></button>
     </div>
 
-    <!-- ===== 2026-09-02 主人令：大牛股猎手 / 驾驶舱 / 全站精选 与选股策略高度重复，彻底删除；四量终极迁回选股策略子页 ===== -->
+    <!-- ===== 2026-09-02 主人令：大牛股猎手 / 全站精选 与选股策略高度重复，彻底删除；四量终极迁回选股策略子页 ===== -->
 
     <!-- ===== TAB 页面：🧭 选股池（2026-08-29 主人令：从盘后数据·已下架迁至选股策略子页；2026-08-30 移到首位并改为点击展开） ===== -->
     <div id="st-pool" class="st-pane active">
@@ -2476,7 +2474,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="card">
         <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🥇</span>严格三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span> <span style="font-size:11px;color:var(--sub);font-weight:400">最严</span> <span style="color:var(--dim);font-weight:400">- 盘后 ·</span> <span class="fresh" id="tcTime">—</span> <!-- 2026-08-31 主人令：统一胶囊版式（绿色 ✅ 与 finalStatusBadges 一致）。renderTc 时 _tcRun.textContent = _tcInfo.label 会覆盖本默认文本 --><span id="tcRunBadge" style="display:none;margin-left:0;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);vertical-align:middle;white-space:nowrap;align-items:center;gap:4px;">✅ 已就绪</span> <span id="tcEnteredBadge" style="display:none;vertical-align:middle;"></span></h3>
         <div id="tcConsensus" class="tp-stocklist"></div>
-        <div class="note">筛选：主站TOP10精选 且 基本面A档（驾驶舱维度已于 09-03 下线移除）。下方「优先观察」为差1步备选（TOP10精选但缺基本面A）。「扩展观察」（差2步）随驾驶舱下线已无来源。</div> <!-- 2026-09-06 审计修复：与 gen_triple_consensus 新口径同步 -->
+        <div class="note">筛选：主站TOP10精选 且 基本面A档。下方「优先观察」为差1步备选（TOP10精选但缺基本面A）。</div> <!-- 2026-09-06 审计修复：与 gen_triple_consensus 新口径同步 -->
       </div>
       <div class="card">
         <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🎯</span>优先观察（差1步）· <span class="fresh" id="tcNearCount">0</span> <span style="font-size:11px;color:var(--sub);font-weight:400">- 盘后 ·</span> <span class="fresh" id="tcNearTime">—</span></h3>
@@ -3997,7 +3995,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   };
 
   /* 2026-09-03 主人令：renderHunter 大牛股猎手函数体删除。
-     与已下架的 驾驶舱/全站精选 一起全方位下线。
+     与已下架的全站精选一起全方位下线。
      原始 LHB 数据仍由 data/LHB_DATA.js 提供；renderHunter 不再挂载到 window。
      若需「机游核心共振」请看「机构买卖」+「三重共识」。*/
 
@@ -4067,7 +4065,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
   // ═══ 2026-08-13 主人令：策略星级对比表（聚合已有回测数据） ═══
   // 2026-09-03 主人令：数据来源仅保留仍活跃的回测源（BACKTEST_COMPREHENSIVE + BACKTEST_TDX + OPTIMIZED_STRATEGY）。
-  //     已下线驾驶舱（COCKPIT_BACKTEST）整段删除（脚本标签、DATA 映射、星级表数据源三处都清干净）。
+  //     COCKPIT_BACKTEST 已下线。
   // 综合分 = (胜率-50)×1 + 平均收益×8 + min(8, log10(样本)×2)
   // 星级：≥30⭐⭐⭐⭐⭐ / ≥20⭐⭐⭐⭐ / ≥12⭐⭐⭐ / ≥6⭐⭐ / ≥0⭐ / <0无星
   function _buildStrategyRating(){
@@ -4076,7 +4074,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     var bd = window.BACKTEST_TDX || {};
     var op = window.OPTIMIZED_STRATEGY || {};
 
-    // ① 已下架的驾驶舱回测整段移除 —— 2026-09-03 主人令：COCKPIT_BACKTEST.js 已全方位下线，星级表只跑仍在线的回测源
+    // ① COCKPIT_BACKTEST 已下线，星级表只跑仍在线的回测源
 
     // ② 共振（BACKTEST_COMPREHENSIVE.comparison.hold_1d）
     if(bc && bc.comparison && bc.comparison.hold_1d){
@@ -4653,7 +4651,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 
     /* ══ 2026-09-03 主人令：📊 各选股策略回测汇总 + 📐 各策略回测如何算（用户明确要求） ══
        仅覆盖仍活跃在选股策略子页的 3 个策略：三重共识 / 四量终极 / 逆势龙头CRDS。
-       已下架的大牛股猎手 / 驾驶舱 / 全站精选 不在此列（其回测已随选股一并删除）。
+       已下架的大牛股猎手 / 全站精选 不在此列（其回测已随选股一并删除）。
        全部读取各策略回测源实时数据，样本累积后自动刷新，不写死。
        2026-09-03 主人令②：「📐 各策略回测如何算」整块迁往 logic.html 逻辑详解页 lg-st 子页（回测汇总卡内），本页不再渲染。 */
     (function(){
@@ -4946,9 +4944,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     }
     html += '</div>';
 
-    /* 2026-09-03 主人令：「🗂 特殊口径算法回测」整段删除（驾驶舱 IIFE + 全站精选 IIFE）
+    /* 2026-09-03 主人令：「🗂 特殊口径算法回测」整段删除（全站精选 IIFE）
        —— 既然选股已彻底删除，回测层不再保留其历史胜率卡。 */
-        /* 2026-09-03 主人令：原「🗂 特殊口径算法回测」内的驾驶舱 IIFE + 全站精选 IIFE 整段删除
+        /* 2026-09-03 主人令：原「🗂 特殊口径算法回测」内的全站精选 IIFE 整段删除
        （「已下架策略历史胜率卡」不再展示）。 */
 
 
@@ -5914,7 +5912,6 @@ function switchSec(sec,el){
       try{ window.renderTodayEventForecast(window.PERFORMANCE_FORECAST || {}); }catch(e){}
     }, 80);
   }
-  // 潜力参考（pr）已改为选股策略(st)内部子TAB，由 switchSt('pr') 触发，此处不重复处理
   // 共振日历：进入时确保默认 tab1（机游共振）渲染（rcTab1 默认 active，但 switchRcTab 仅在点 tab 时触发）
   if(sec==='rc' && typeof window.switchRcTab==='function') setTimeout(function(){ try{ window.switchRcTab('tab1', document.querySelector('.rc-tab-btn.active')); }catch(e){} }, 30);
   // tab 切换后 echarts 实例需要 resize（容器从 display:none 恢复时尺寸为 0）
@@ -6295,7 +6292,7 @@ function switchSec(sec,el){
     const goldList = (window.GOLD_POOL && (window.GOLD_POOL.stocks || window.GOLD_POOL.candidates))
                   || [];
     // COCKPIT 优先用 tier_a/tier_b（array 数组）合并 —— 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND 已全方位下线
-    const cock = {};  /* cockpit 已下线，留 {} 占位以防 cockList 报 TypeError */
+    const cock = {};
     const cockList = [];  /* 已下线 algorithm，列表永远为空 */
     // CRDS 用 cond1_list/cond2_list/cond3_list/cond4_list（按实际 schema）
     const crds = window.CRDS_CARD_DATA||{};
@@ -6385,15 +6382,9 @@ function switchSec(sec,el){
       // COCKPIT tier_a / tier_b 补充
       var tiers=['tier_a','tier_b'];
       for(var ti=0;ti<tiers.length;ti++){
-        var ts=(cock[tiers[ti]]||[]);
-        for(var j=0;j<ts.length;j++){
-          var ct=ts[j]; if(!ct) continue; var cc=ct.code||'?';
-          var dup=false;
-          for(var k=0;k<stocks.length;k++){if(stocks[k].code===cc){dup=true;break;}}
-          /* 2026-09-03 主人令：驾驶舱 tier_a/tier_b 候选池入口已全方位下线，删除 */
-        }
+        /* COCKPIT_TIER_RECOMMEND 已下线（2026-09-03）：tier_a/tier_b 候选池入口整段删除 */
       }
-      // cockpit_advice watch 补充 —— 2026-09-03 主人令：COCKPIT_ADVICE 已全方位下线，整段删除（原本是为去重，但已无数据源可读）
+      // COCKPIT_ADVICE 已下线（2026-09-03）：watch 补充整段删除
 
       if(sectors.length===0 && stocks.length===0) return '';
 
@@ -6577,7 +6568,7 @@ function switchSec(sec,el){
     const cstocks = cd.stocks || {};
     const ckey = Object.keys(cstocks).find(k=>normCode(cstocks[k].code)===nc);
     if(ckey) hits.push({name:'🎯 候选池', color:'var(--cyan)', detail:(cstocks[ckey].sources||[]).join(' / ')});
-    // 驾驶舱 —— 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND 已全方位下线，整段删除（cp/cpa/cpb 占位变量连同 if(cpa)/else if(cpb) 命中 push 一起不再保留）
+    // COCKPIT_TIER_RECOMMEND 已下线（2026-09-03）：cp/cpa/cpb 占位变量连同 if(cpa)/else if(cpb) 命中 push 一起不再保留
     const cp = {};       /* 已下线，留 {} 占位以防后续读 cp.XXX 抛错 */
     const cpa = null;    /* cockpit.tier_a 已下线，永远为 null */
     const cpb = null;    /* cockpit.tier_b 已下线，永远为 null */
@@ -10327,7 +10318,7 @@ window.showRestrictedItems = showRestrictedItems;
     }
     h+='</div>';
     h+='<div class="tp-meta"><span class="tp-score">'+(p.total_score||0)+'</span>';
-    // 2026-09-06 审计修复：驾驶舱下线后 a_score 恒 0，去掉「A档0分」死字段展示
+    // 2026-09-06 审计修复：去掉「A档0分」死字段展示
     h+=' <span>TOP10#'+(p.top10_rank||'-')+' · 基本面'+(p.quality_grade||'-')+'</span></div>';
     let tags='';
     if(p.industry)tags+=makeTag('🏭 '+p.industry,'ind');
@@ -10867,13 +10858,13 @@ window.showRestrictedItems = showRestrictedItems;
      renderAlgoCard 是 buildAllsiteSelectionHTML 内部的「A/B 档股票卡」专属渲染器，全站精选已被下线，没有调用方了。
      若需「候选池 A/B 档」渲染请去最终推荐「今日推荐候选池」。*/
     /* 2026-09-03 主人令：renderAllsite 全站精选函数体删除。
-     全站精选与已下架的 hunter/驾驶舱 一起，所有引用（sec-as / 共振源 / chips 标签）都不再渲染。
+     全站精选与已下架的 hunter 一起，所有引用（sec-as / 共振源 / chips 标签）都不再渲染。
      若需「更大候选池」请看「最终推荐 · 今日推荐候选池」。*/
 
-  /* 2026-09-03 主人令：驾驶舱（cockpitBlock / cockpitMiniCol / cockpitCollectCodes / cockpitResonanceFilter / cockpitSetFilter / renderCockpit / renderCockpitResonance / renderCockpitBacktest / renderCockpitBacktest60 / renderCockpitAdvice）整片删除。
+  /* 2026-09-03 主人令：驾驶舱函数（cockpitBlock / cockpitMiniCol / renderCockpit 等）已全方位下线。
      cockpit 与已下架的 hunter/allsite 一起，所有引用（sec-cp / chips 标签 / 共振源 / 回测汇总 / DATA 映射）都不再渲染。
      若需市场强弱 / 赛道 / 三层候选 综合视图，统一看「机构买卖」+「三重共识」+「最终推荐」。
-     驾驶舱函数体删除约 700 行；DATA.cockpit_tier / DATA.cockpit_backtest / DATA.cockpit_advice / DATA.allsite 同步下线。*/
+     DATA.cockpit_tier / DATA.cockpit_backtest / DATA.cockpit_advice / DATA.allsite 同步下线。*/
 
   function genericSource(k){
     var map={'主板成交前100':'主板活跃成交池','创业板成交前100':'创业板活跃成交池','科创板成交前100':'科创板活跃成交池','港股成交前50':'港股活跃成交池','外资研投':'公开资讯源'};
@@ -11266,7 +11257,6 @@ window.showRestrictedItems = showRestrictedItems;
       }
     };
     // ⚖️ 2026-08-14 主人令：renderPortfolio 调用已删除（持仓跟踪卡整段移除）
-    // 2026-08-14 主人令：涨价榜/情绪周期/潜力挖掘 fill 改由 switchSt('pr') 触发（已迁选股策略子TAB）
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderUnlisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
 
     // 🛡 2026-08-20：自愈轮询已提前到 renderUnlisted 函数开头（防止首调失败时自愈永不启动），
@@ -11356,7 +11346,6 @@ window.showRestrictedItems = showRestrictedItems;
     host.innerHTML = h;
   }
 
-  /* ═══════════ 2026-08-13 三张新卡填充函数（涨价榜/情绪周期；潜力挖掘 09-06 已全链删除）══ 暂未上架观察 ═══════════ */
 
   // 💹 商品涨价弹性榜（2026-08-15 主人令：三段分组卡片，参考板块周期轮动路线表风格）
   // 💹 商品涨价弹性榜（2026-08-15 主人令：多列紧凑 grid，全部品种不隐藏）
@@ -12090,7 +12079,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     }
     h+='</div></div>';
 
-    /* 2026-09-02 主人令：已下架选股模块整体删除（大牛股猎手/驾驶舱/全站精选与选股策略高度重复；
+    /* 2026-09-02 主人令：已下架选股模块整体删除（大牛股猎手/全站精选与选股策略高度重复；
        四量终极迁回「选股策略」子页面）。星级表 __MODULE_STARS 已提前到全局作用域。 */
 
     /* 2026-08-30 主人令：斐波那契双卡 + 商品涨价弹性榜三卡已上移至「已下架」顶部盘前条幅下方 */
@@ -13339,7 +13328,7 @@ window.__renderV8CalToday();
     h+='</div>';
 
     // 2026-09-03 主人令：新增分析角度（带评分）· 所有名次统一渲染，字段缺省自动省略不空块
-    // 2026-09-04 主人令：backtest 字段已随后端 cockpit_backtest 死源一并删除（此前恒输出全零，两分支永不渲染）
+    // 2026-09-04 主人令：backtest 字段已删除（此前恒输出全零，两分支永不渲染）
     (function(){
       var lines='';
       var tk = s.tracking || {};
