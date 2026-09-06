@@ -1504,6 +1504,8 @@ def f_margin_data():
 
 def f_cffex_holdings():
     # 中金所股指期货日行情：动态取最近有数据的交易日（盘后数据通常当日稍晚才出）
+    # 🧭 2026-09-06 主人令：补抓现货指数(IF↔沪深300/IC↔中证500/IH↔上证50/IM↔中证1000)，
+    #    前端算 基差=期货-现货、年化升贴水率=基差率/剩余天数*365 —— 卡片从"跌了没"升级"情绪温度计"。
     ak = get_ak()
     base = now_cst()
     for back in range(0, 8):
@@ -1513,10 +1515,37 @@ def f_cffex_holdings():
         except Exception as e:
             df = None
         if df is not None and not df.empty:
-            return {"items": df.to_dict(orient="records"),
-                    "update_time": dd,
-                    "note": "中金所股指期货日行情（最近交易日 %s）" % dd}
+            out = {"items": df.to_dict(orient="records"),
+                   "update_time": dd,
+                   "note": "中金所股指期货日行情（最近交易日 %s）" % dd,
+                   "spot": _cffex_spot_quotes()}
+            return out
     return None
+
+
+def _cffex_spot_quotes():
+    # 现货指数实时价（东财 push2delay 镜像，与 f_index_quotes 同链）。失败返回 {}，前端降级隐藏基差行。
+    secmap = {"IF": ("1.000300", "沪深300"), "IC": ("1.000905", "中证500"),
+              "IH": ("1.000016", "上证50"), "IM": ("1.000852", "中证1000")}
+    spot = {}
+    try:
+        secids = ",".join(v[0] for v in secmap.values())
+        r = _requests.get(
+            "%s/api/qt/ulist.np/get" % _EM_DELAY,
+            params={"fltt": "2", "invt": "2", "ut": "b2884a393a59ad64002292a3e90d46a5",
+                    "fields": "f2,f12,f14", "secids": secids},
+            headers=_EM_HEADERS, timeout=15)
+        j = r.json()
+        px = {}
+        for row in (j.get("data") or {}).get("diff", []) or []:
+            px[str(row.get("f12"))] = round(float(row.get("f2") or 0), 2)
+        for var, (sec, nm) in secmap.items():
+            code = sec.split(".")[1]
+            if px.get(code):
+                spot[var] = {"code": code, "name": nm, "price": px[code]}
+    except Exception as e:
+        print("  ⚠️ 期货现货指数(基差)抓取失败，前端降级为无基差:", e)
+    return spot
 
 def f_macro_data():
     """宏观数据：保留已有丰富字段，增量更新 CPI/PMI 及债券/Shibor/LPR/M2 前值"""

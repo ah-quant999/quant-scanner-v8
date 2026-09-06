@@ -708,7 +708,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/INDEX_QUOTES.js?v=9e1ea72480" defer></script>
   <script src="data/AI_MARKET_BRIEF.js?v=65ec8567d7" defer></script>
   <script src="data/MARGIN_DATA.js?v=9a36d79d76" defer></script>
-  <script src="data/CFFEX_HOLDINGS.js?v=ab4e8b8da5" defer></script>
+  <script src="data/CFFEX_HOLDINGS.js?v=306067e63c" defer></script>
   <script src="data/IPO_DATA.js?v=d8ab82ee25" defer></script>
   <script src="data/CRISIS_DATA.js?v=d5eff40132" defer></script>
   <script src="data/JUDGMENT_DATA.js?v=2f9f5ef94a" defer></script>
@@ -1212,6 +1212,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <div class="logic-p">以东方财富「创历史新高」成分家数（W52_HIGH）作为新高广度信号，反映市场参与上涨的宽度。2026-08-31 起标题改为「新高家数与宽度评分」，避免「市场宽度」一词过于抽象。展示：今日历史新高家数、宽度评分（按家数映射 20/30/45/60/75/90）、领涨新高股 TOP8。所有胶囊改小、内部一行。</div>
         <div class="logic-h">期指主力合约 · 情绪方向</div>
         <div class="logic-p">中金所股指期货主力合约（IC/IF/IH/IM）收盘价、相对昨结涨跌、持仓量。数据来自 CFFEX_HOLDINGS（akshare get_cffex_daily），<b>2026-08-31 起由盘后数据页迁回实时数据页</b>，跟随盘中每 30 分刷新，标签显示「盘中 · 短线」。胶囊改小、内部一行。</div>
+        <div class="logic-p" style="margin-top:6px;">· <b>基差口径（2026-09-06 主人令：升级「情绪温度计」）</b>：基差 = 期货主力收盘 − 现货指数（IF↔沪深300 / IC↔中证500 / IH↔上证50 / IM↔中证1000，东财 push2delay 与 f_index_quotes 同链抓取，spot 段随 CFFEX_HOLDINGS.json 下发）；年化升贴水率 = 基差率 ÷ 距到期日 × 365（到期日 = 合约月份第三个周五）。<b>升水(+)红=多头信心回暖；贴水(−)绿=对冲需求/偏空</b>；IC/IM 长期贴水=中性策略对冲需求常态，贴水骤深=对冲恐慌，贴水收敛=信心修复。对冲成本视角：贴水越深，开空对冲展期亏损越大（"贵"的保险）。现货缺失时自动隐藏基差行（降级不报错）。<br>· <b>三个判断（卡内自动解读，阈值固定）</b>：① <b>风格分化</b> = (IM+IC)/2 − (IH+IF)/2 涨跌差：≤ −0.8pp → 资金切向大盘价值/红利避险（中小盘持仓风险警示），≥ +0.8pp → 风格偏向中小盘进攻，其余 = 均衡；② <b>空头/对冲压力</b> = 持仓最大品种价跌（chg ≤ −0.3%）→ 空头/对冲盘拥挤，后续盯组合「持仓降+价稳=空头回补反弹信号 / 持仓升+价跌=增仓下行未完」，价涨（≥ +0.3%）→ 对冲压力不重；③ <b>情绪方向</b> = 四品种涨跌家数与均值：≥3 涨 → 偏多，≤1 涨 → 偏防御（极端分化日通常伴随小盘流动性收缩，次日中小盘接力弱），2 涨 2 跌 → 多空拉锯。</div>
         <div class="logic-h">宏观数据速览</div>
         <div class="logic-p">LPR / M2 / CPI / PMI / 中美利差 / USDCNH / VIX / 黄金 / 原油 / 铜。数据来自 MACRO_DATA，日频更新，盘前 08:25 抓取。2026-08-31 起每个指标胶囊改小，标签、数值、变动、日期压缩为一行。</div>
         <div class="logic-h">解禁日历</div>
