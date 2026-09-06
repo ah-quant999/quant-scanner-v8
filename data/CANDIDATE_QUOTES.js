@@ -1,1 +1,1 @@
-window.CANDIDATE_QUOTES = {"no_data":true,"premarket_cleared":true,"note":"盘前候选池实时行情待开盘刷新","quotes":[],"update_time":"2026-09-07 00:44:19","republish_time":"2026-09-07 00:57:20"};
+window.CANDIDATE_QUOTES = {"no_data":true,"premarket_cleared":true,"note":"盘前候选池实时行情待开盘刷新","quotes":[],"update_time":"2026-09-07 01:46:08","republish_time":"2026-09-07 01:57:02"};
