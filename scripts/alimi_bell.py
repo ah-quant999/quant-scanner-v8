@@ -160,8 +160,8 @@ def _algo_data_need_bell(now):
     if now.weekday() >= 5:
         return None
     today = now.date().isoformat()
-    # 2026-08-20 主人令审计补全：加入 AI 预测卡（INDEX_HISTORY/MARKET_PATH_PROBABILITY），
-    # 防 19:15 算法链失败时 AI 预测子TAB 静默陈旧。
+    # 2026-08-20 主人令审计补全：加入 INDEX_HISTORY，
+    # 防 19:15 算法链失败时 K 线归档静默陈旧。
     # 2026-09-04 主人令收尾：COCKPIT_BACKTEST 已删（驾驶舱模块下线，留在清单会因文件消失永久误报按铃）
     vars_ = ["BACKTEST_TDX", "BACKTEST_COMPREHENSIVE",
              "INDEX_HISTORY"]
