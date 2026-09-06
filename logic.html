@@ -775,7 +775,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/HEALTH_CHECK.js?v=d88e359ac0" defer></script>
   <script src="data/COMMODITY_ELASTICITY.js?v=b07e27a704" defer></script>
   <script src="data/SENTIMENT_CYCLE.js?v=45cbe14a15" defer></script>
-  <!-- 2026-09-06 主人令：AI预测卡已下架，MARKET_PATH_PROBABILITY 注入移除 -->
+  <script src="data/MARKET_PATH_PROBABILITY.js?v=44da58cc57" defer></script>
   <script src="data/STOCK_MOMENTUM_STATE.js?v=b85a9da176" defer></script>
   <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=2a7ed92426" defer></script>
   <script src="data/MOMENTUM_FILTER.js?v=ea9c132218" defer></script>
@@ -2115,7 +2115,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <ul>
           <li><code>scripts/fetch_index_history.py</code>：akshare 拉上证 5 年日 K → <code>raw_data/index_history.json</code> → <code>data/INDEX_HISTORY.js</code>（92KB）</li>
           <li><code>algorithms/market_path_probability.py</code>：均线+MACD+江恩时间窗(F21/34/55/89)+缠论分型+涨跌方向形态匹配(≥65%一致率)+路径概率 ABC → <code>data/MARKET_PATH_PROBABILITY.js</code></li>          <li>🆕 <b>2026-09-06 主人令·实证升级</b>：新增 <code>algorithms/path_probability_backtest.py</code>（挂算法链 E 批 21:00）——逐日只用 ≤t 的 K 线复跑生产匹配引擎（walk-forward 防前视），预测 ABC 概率 vs 实际 T+5 路径对照。判据：<b>有效</b> = 有效样本≥100 且 主路径命中率−基率(最大类)≥+3pp 且 Brier&lt;基线Brier；<b>观望</b> = 仅 Brier 优于基线；<b>无效</b> = 其余（含样本不足）。产出 <code>raw_data/path_probability_backtest.json</code>（update_v8 映射 PATH_PROB_BACKTEST.js）。用真实 edge 决定卡的去留与调参（THRESH/TOPK/窗口），严禁无回测调参。</li>
-          <li>🆕 <b>2026-09-06 重跑结论：INVALID → 已下架</b>：主人令「调参重跑」后做 108 组参数扫描（窗口 20/40/60 × 相似阈值 0.55–0.70 × topk 10/20/30 × horizon 5/10/20，前 80% 选参 / 后 20% OOS 验证），训练集全部参数 Brier 增益为负、OOS 命中 33.1% vs 基率 39.4%、Brier 0.755 vs 0.660——形态匹配概率在 T+5 尺度≈噪声，无参数体制有真实 edge。已下架：移除暂未上架 AI 预测卡（index.html + logic.html 同源镜像）、停跑回测、删孤儿数据。</li>
+          <li>🆕 <b>2026-09-06 主人拍板：定位澄清 → 卡片恢复</b>：AI 预测卡的定位是「预测大盘后续走势」的前瞻参考卡，不是被评判的选股信号。回测事实（如实保留）：108 组参数扫描（前 80% 选参 / 后 20% OOS）训练集全部 Brier 增益为负、OOS 命中 33.1% vs 基率 39.4%、Brier 0.755 vs 0.660——暂无统计优势。处置：卡片在 index.html + logic.html 恢复展示（卡内标注「回测暂无统计优势，解读请保守」），walk-forward 回测管线与孤儿数据维持移除。</li>
           <li>🆕 <b>潜力挖掘·30 交易日考核（同 RPS 口径）</b>：<code>calc_potential_picks.py</code> 每日快照归档 <code>raw_data/history/potential_*.json</code>（此前选完即丢、永远无法回测，2026-09-06 补上）。自 09-06 起满 30 个交易日：Top15 的 T+5 胜率/平均收益跑赢全市场基线 → 留并升级（接 fetch_fundamental_quality 补估值维度）；跑不赢 → 降级下架。保护条目见 DO_NOT_DELETE.md。</li>
           <li>✅ 已加入 <code>run_algorithms.py ORDER</code>（云端 19:15 盘后算法链自动跑；2026-08-20 补入上游 <code>fetch_index_history.py</code> + 双 bridge 到 <code>raw_data/</code>，根治 K 线/概率卡永不更新的链路断点）</li>
         </ul>
@@ -6764,6 +6764,17 @@ window.showRestrictedItems = showRestrictedItems;
     //   把这些卡真正收进调试专区；强势突破 pane 只保留三卡。
 
     // ── 2026-08-29 主人令：AI 预测 + 潜力挖掘 2 卡并入调试专区（删 AI 预测 / 潜力挖掘 子页面后补位） ──
+    h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">';
+    h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
+    h+='<span style="font-size:15px;font-weight:700;color:#38bdf8;">🤖 AI 预测 · 市场路径概率</span>';
+    h+='<span class="fresh" id="aiPredFresh">—</span>';
+    h+='<span style="font-size:12px;color:var(--dim);">艾略特 + 江恩 + 缠论 + 形态匹配 · 上证指数</span>';
+    h+='</div>';
+    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">基于 5 年上证日 K 线：涨跌方向形态匹配（≥65% 一致率）统计后续路径分布，<b style="color:#fbbf24">仅供研究，不构成投资建议</b>。</div>';
+    h+='<div style="font-size:11px;color:var(--dim);margin-bottom:8px;">📌 定位：<b style="color:#38bdf8">预测大盘后续走势的前瞻情景参考</b>（非评判信号）· walk-forward 回测暂无统计优势，解读请保守。</div>';
+    h+='<div id="aiPredBody"><div class="note">加载中…</div></div>';
+    h+='</div>';
+
     h+='<div class="card" style="margin-bottom:16px;border-left:4px solid #a78bfa;">';
     h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">';
     h+='<span style="font-size:15px;font-weight:700;color:#a78bfa;">🔮 潜力挖掘</span>';
@@ -7108,7 +7119,7 @@ h+='</div>';  // /ulPaneDbg
     try{ if(typeof window.renderUnlisted==='function' && document.getElementById('unlistedPanel') && document.getElementById('unlistedPanel').innerHTML.length<1000) window.renderUnlisted(); }catch(e){}
     // 2026-08-29：AI 预测 / 潜力挖掘 2 卡迁入调试专区后，子 tab 触发器被移除导致空卡；
     // 在 renderUnlisted 末尾主动触发填充，数据未到则函数内部轮询自愈。
-    // 2026-09-06 主人令：AI预测卡 walk-forward 回测 INVALID（108组参数扫描均无 edge）→ 已下架
+    try{ if(typeof window._fillAiPrediction==='function') window._fillAiPrediction(); }catch(e){ console.warn('AI预测卡渲染失败',e); }
     try{ if(typeof window._fillPotentialPicks==='function') window._fillPotentialPicks(); }catch(e){ console.warn('潜力挖掘卡渲染失败',e); }
     // 🛡 2026-08-19 主人令：render 调用（宏观+板块推荐；路径概率已迁 AI 预测子TAB 由 _fillAiPrediction 渲染）
     try{ if(typeof window.renderMarketRegimeCard==='function') window.renderMarketRegimeCard(); }catch(e){console.warn("宏观卡渲染失败",e);}
@@ -7409,7 +7420,124 @@ h+='</div>';  // /ulPaneDbg
 
   // 🤖 AI 预测 · 市场路径概率（2026-08-20 主人令：重写自 market_path_probability 算法，潜力挖掘已删除）
   //   展示：路径概率 ABC + 当前状态（收盘/60日位置/MA/MACD/量能）+ 江恩窗口 + 黄金分割 + 缠论分型
-  /* 2026-09-06 主人令：_fillAiPrediction 已随 AI预测卡下架删除 */
+  window._fillAiPrediction = function(){
+    var dst = document.getElementById('aiPredBody');
+    if(!dst) return;
+    var d = window.MARKET_PATH_PROBABILITY || {};
+    if(!d.current){
+      // 🛡 自愈（2026-08-23 主人令「还是空白」根因修复）：
+      //   原 head defer 引入的 ?v 写死为 8/20 旧哈希 → CDN/浏览器缓存旧空壳 → 数据永远缺失。
+      //   除 15s 轮询外，主动用「时间戳 ?v」重新注入脚本强制绕过缓存拉取最新文件；
+      //   若算法链尚未产出（真缺数据）则保留「暂不可用」提示，绝不永久空白。
+      if(!window.__aiInjected){
+        window.__aiInjected = true;
+        var _s = document.createElement('script');
+        // 🛡 2026-08-23 修复：原把时间戳拼进 ?v 值（?v=xxx123456）污染缓存键 → 重注入必失败；
+        //  又试过 ?cb= 时间戳，但被 reconcile_cache_busters 正则整体归一成 ?v=<内容哈希> 而丢弃自定义参数。
+        //  现改裸路径：构建时自动补 ?v=<内容哈希>（每次内容变化哈希必变 → 天然跨构建缓存失效），
+        //  运行时即加载当前数据文件，杜绝畸形 URL 与陈旧缓存。
+        // 运行时动态拼接 ?时间戳，拆分字符串避免 reconcile_cache_busters 把静态 ?v 和时间戳粘成畸形 URL
+        var _base = 'data/MARKET_PATH_PROBABILITY' + '.js';
+        _s.src = _base + '?' + Date.now();
+        _s.onload = function(){ try{ window._fillAiPrediction(); }catch(e){} };
+        _s.onerror = function(){};
+        document.head.appendChild(_s);
+      }
+      if(!window.__aiRetryTimer){
+        window.__aiRetryN = 0;
+        window.__aiRetryTimer = setInterval(function(){
+          window.__aiRetryN++;
+          if(window.MARKET_PATH_PROBABILITY && window.MARKET_PATH_PROBABILITY.current){
+            clearInterval(window.__aiRetryTimer); window.__aiRetryTimer=null; window.__aiRetryN=0;
+            try{ window._fillAiPrediction(); }catch(e){}
+          } else if(window.__aiRetryN > 30){
+            clearInterval(window.__aiRetryTimer); window.__aiRetryTimer=null; window.__aiRetryN=0;
+            var dd = document.getElementById('aiPredBody');
+            if(dd) dd.innerHTML = '<div class="note">AI 预测数据暂不可用（等待盘后算法链 19:15 生成，或本地未构建 MarketPathProbability）</div>';
+          }
+        }, 500);
+      }
+      return;
+    }
+    if(window.__aiRetryTimer){ clearInterval(window.__aiRetryTimer); window.__aiRetryTimer=null; window.__aiRetryN=0; }
+    var c = d.current, prob = d.path_probability||{}, gann = d.gann_windows||[];
+    var fibs = d.fib_retracements||[], fr = d.chan_fractals||[];
+    var A=prob.A_up||0, B=prob.B_down||0, C=prob.C_flat||0, sample=prob.sample||0;
+    // ⚖️ 更新胶囊（盘后 · 中长线观察）
+    try{ var tm=document.getElementById('aiPredFresh'); if(tm) tm.innerHTML = _uBadge('盘后','中长线',(d.meta&&d.meta.update_time)||d.update_time||null); }catch(e){}
+    var html = '';
+
+    // ① 当前状态条（收盘 / 60日位置 / MA趋势 / MACD / 量能）
+    html += '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px;padding:10px;background:rgba(56,189,248,.06);border-radius:8px;">';
+    html += '<div style="text-align:center;"><div style="font-size:10px;color:var(--dim);">今日收 · '+(c.date||'').slice(5)+'</div><div style="font-size:17px;font-weight:800;color:var(--txt);">'+(c.close||'-')+'</div></div>';
+    html += '<div style="text-align:center;"><div style="font-size:10px;color:var(--dim);">60日位置</div><div style="font-size:17px;font-weight:800;color:'+(c.pos_in_60d<0.4?'var(--down)':c.pos_in_60d>0.6?'var(--up)':'#f59e0b')+';">'+Math.round((c.pos_in_60d||0)*100)+'%</div></div>';
+    html += '<div style="text-align:center;"><div style="font-size:10px;color:var(--dim);">MA5/20/60</div><div style="font-size:13px;font-weight:700;color:'+(c.ma_trend==='多头'?'var(--up)':c.ma_trend==='空头'?'var(--down)':'#f59e0b')+';">'+c.ma_trend+'</div><div style="font-size:9.5px;color:var(--dim);">'+(c.ma5||'-')+' / '+(c.ma20||'-')+' / '+(c.ma60||'-')+'</div></div>';
+    html += '<div style="text-align:center;"><div style="font-size:10px;color:var(--dim);">MACD</div><div style="font-size:13px;font-weight:700;color:'+(c.macd==='金叉'?'var(--up)':c.macd==='死叉'?'var(--down)':'#f59e0b')+';">'+c.macd+'</div><div style="font-size:9.5px;color:var(--dim);">DIF-DEA '+(c.macd_dif!=null?c.macd_dif:'-')+'</div></div>';
+    html += '<div style="text-align:center;"><div style="font-size:10px;color:var(--dim);">量能</div><div style="font-size:13px;font-weight:700;color:var(--txt);">'+c.volume+'</div></div>';
+    html += '</div>';
+
+    // ② 路径概率 ABC（红涨绿跌铁律：A 上行红 / B 下行绿）
+    html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">';
+    html += '<div style="background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.4);border-radius:8px;padding:12px;text-align:center;"><div style="font-size:11px;color:#ef5350;font-weight:700;">A 上行延续</div><div style="font-size:32px;font-weight:800;color:#ef5350;line-height:1;">'+A.toFixed(1)+'%</div><div style="font-size:10px;color:var(--dim);margin-top:2px;">5日涨&gt;1%</div></div>';
+    html += '<div style="background:rgba(38,166,154,.12);border:1px solid rgba(38,166,154,.4);border-radius:8px;padding:12px;text-align:center;"><div style="font-size:11px;color:#26a69a;font-weight:700;">B 下行调整</div><div style="font-size:32px;font-weight:800;color:#26a69a;line-height:1;">'+B.toFixed(1)+'%</div><div style="font-size:10px;color:var(--dim);margin-top:2px;">5日跌&lt;-1%</div></div>';
+    html += '<div style="background:rgba(148,163,184,.12);border:1px solid rgba(148,163,184,.4);border-radius:8px;padding:12px;text-align:center;"><div style="font-size:11px;color:var(--sub);font-weight:700;">C 宽幅震荡</div><div style="font-size:32px;font-weight:800;color:var(--sub);line-height:1;">'+C.toFixed(1)+'%</div><div style="font-size:10px;color:var(--dim);margin-top:2px;">|5日|≤1%</div></div>';
+    html += '</div>';
+
+    // ③ 江恩时间窗口（is_near 高亮）
+    if(gann.length){
+      html += '<div style="background:var(--bg2);border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
+      html += '<div style="font-size:11px;color:var(--sub);font-weight:700;margin-bottom:8px;">🔯 江恩时间窗口（锚点：'+(gann[0].anchor_date||'-')+' 近89日低点 '+(gann[0].anchor_price||'-')+'）</div>';
+      html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">';
+      for(var i=0;i<gann.length;i++){
+        var w=gann[i];
+        var c2=w.is_near?'#fbbf24':'var(--dim)';
+        var bg=w.is_near?'rgba(251,191,36,.12)':'transparent';
+        html += '<div style="text-align:center;padding:6px;background:'+bg+';border:1px solid '+(w.is_near?'rgba(251,191,36,.4)':'var(--border)')+';border-radius:6px;">';
+        html += '<div style="font-size:11px;font-weight:700;color:'+c2+';">F'+w.F+'</div>';
+        html += '<div style="font-size:11px;color:var(--txt);">'+(w.target_date||'').slice(5)+'</div>';
+        html += '<div style="font-size:10px;color:'+c2+';">'+(w.days_to_today>0?'+':'')+w.days_to_today+'天</div>';
+        html += '</div>';
+      }
+      html += '</div></div>';
+    }
+
+    // ④ 黄金分割位（近60日高低回撤位，价格贴近当前收盘高亮）
+    if(fibs.length){
+      html += '<div style="background:var(--bg2);border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
+      html += '<div style="font-size:11px;color:var(--sub);font-weight:700;margin-bottom:8px;">📐 黄金分割位（近60日高 '+(c.recent_60d_high||'-')+' / 低 '+(c.recent_60d_low||'-')+'）</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+      for(var j=0;j<fibs.length;j++){
+        var f=fibs[j];
+        var near = c.close!=null && Math.abs(c.close-f.price)/f.price < 0.015;
+        var fc = near ? '#fbbf24' : 'var(--txt)';
+        var fb = near ? 'rgba(251,191,36,.15)' : 'rgba(148,163,184,.08)';
+        var fbd = near ? 'rgba(251,191,36,.4)' : 'var(--border)';
+        html += '<div style="padding:6px 10px;background:'+fb+';border:1px solid '+fbd+';border-radius:6px;font-size:11px;color:'+fc+';'+(near?'font-weight:700;':'')+'">'+(f.ratio*100).toFixed(1)+'%位 '+(f.price||'-')+(near?' ⚡':'')+'</div>';
+      }
+      html += '</div></div>';
+    }
+
+    // ⑤ 缠论分型（近60日自动识别顶底分型序列）
+    if(fr.length){
+      html += '<div style="background:var(--bg2);border-radius:8px;padding:10px 12px;margin-bottom:10px;">';
+      html += '<div style="font-size:11px;color:var(--sub);font-weight:700;margin-bottom:8px;">🀄 缠论分型（近60日自动识别，顶红/底绿）</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:5px;">';
+      for(var k=0;k<fr.length;k++){
+        var fp=fr[k];
+        var fc2 = fp.type==='顶' ? '#ef5350' : '#26a69a';
+        html += '<span style="padding:3px 8px;background:rgba(148,163,184,.08);border:1px solid var(--border);border-radius:6px;font-size:10.5px;color:var(--sub);">'+fp.type+' '+(fp.date||'').slice(5)+' <b style="color:'+fc2+';">'+fp.price+'</b></span>';
+      }
+      html += '</div></div>';
+    }
+
+    // ⑥ 免责 + 数据说明
+    html += '<hr style="border:none;border-top:1px dashed rgba(56,189,248,.25);margin:12px 0;">';
+    html += '<div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.3);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--dim);">';
+    html += '形态匹配样本 '+sample+' 段（涨跌方向序列≥65%一致率）· 数据 '+(d.meta.data_range||'')+'（'+(d.meta.kline_count||'-')+' 根日K）· <b style="color:#fbbf24">⚠️ 历史回测仅供参考；预测市场不存在稳定高准确率方法，实盘验证 ≥3 个月。</b>';
+    html += '</div>';
+
+    dst.innerHTML = html;
+  };
 
 
   // 🔮 2026-08-23 恢复：潜力挖掘 2.0 填充函数（板块+股票预测推荐，读 window.POTENTIAL_PICKS）
