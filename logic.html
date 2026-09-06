@@ -854,7 +854,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
 <div class="card">
         <h3><span class="ic">📈</span>今日业绩预告 - 说明（2026-08-30 主人令 / 2026-08-31 口径+布局修正）</h3>
         <div class="logic-h">定位</div>
-        <div class="logic-p">只统计<b>公告日为当日</b>的业绩预告（预增/预减/预亏/不确定 + 今日预增 TOP4），位于<b>今日事件</b> tab。当日无新增时不隐藏，显示「今日（日期）无新增业绩预告」并附最近一批公告日期与家数。2026-08-31 起汇总胶囊一行 6 列（4 类型 + 总数 + 净增=预增−预减），窄屏自适应；汇总列均提供 `<div title>` 鼠标悬浮解释；内部仍保持单行布局。</div>
+        <div class="logic-p">只统计<b>公告日为当日</b>的业绩预告（预增/预减/预亏/不确定 + 今日预增 TOP4），位于<b>今日事件</b> tab。当日无新增时不隐藏，显示「今日（日期）无新增业绩预告」并附最近一批公告日期与家数。2026-08-31 起汇总胶囊一行 6 列（4 类型 + 总数 + 净增=预增−预减），窄屏自适应；汇总列均提供 `&lt;div title&gt;` 鼠标悬浮解释；内部仍保持单行布局。</div>
         <div class="logic-h">数据口径</div>
         <div class="logic-p"><code>PERFORMANCE_FORECAST</code>（东方财富业绩预告 stock_yjyg_em）。日频更新，盘前 08:25 抓取。抓取时按<b>公告日期</b>筛出 <code>today_summary</code> / <code>today_items</code>；<code>summary</code> 仍是<b>全报告期累计</b>，两口径不混用。</div>
         <div class="logic-h">与盘后「业绩预告」卡的区别</div>
@@ -9214,11 +9214,15 @@ function switchLg(id,el){
     var st=document.getElementById('v6MemoStatus');
     if(d&&err){
       err.style.display='none';
-      // 2026-08-23 修复：只在检测到 iframe 内容为空/异常时才重载，避免 iOS Safari 重复加载。
+      // 🛡 2026-09-06 修复：iframe src 初始为空且从未被赋值 → v6 子页永远空白。
+      //   首次切入 v6 tab 时补赋 src；已加载过但检测到空白时才重载（防 iOS Safari 重复加载）。
       try{
+        var _hasSrc = d.getAttribute('src') && d.src.indexOf('v6_memo')>=0;
         var isEmpty = !d.contentDocument || !d.contentDocument.body || d.contentDocument.body.innerHTML.length<500;
-        if(isEmpty && d.src && d.src.indexOf('v6_memo')>=0){
-          d.src = d.src.split('?')[0] + '?' + Date.now();
+        if(!_hasSrc){
+          d.src = 'v6_memo.html?standalone=1&t=' + Date.now();
+        } else if(isEmpty){
+          d.src = d.src.split('?')[0] + '?standalone=1&t=' + Date.now();
         }
       }catch(e){}
     }
