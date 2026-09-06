@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-09-06 13:58:08",
+  "update_time": "2026-09-06 15:54:35",
   "source": "akshare fund_etf_spot_em (东方财富)",
   "metric": "净流入(亿元) + 规模(亿元)",
   "categories": {
     "stock": {
       "name": "股票型",
       "net_amount_yi": -74.55151474999994,
-      "scale_yi": 29301.24911474002,
+      "scale_yi": 29306.854429540035,
       "n_funds": 1304,
       "top5": [
         {
@@ -51,7 +51,7 @@
     "money": {
       "name": "货币型",
       "net_amount_yi": 0.58801989,
-      "scale_yi": 545.6449030599999,
+      "scale_yi": 547.6328810599999,
       "n_funds": 50,
       "top5": [
         {
@@ -75,7 +75,7 @@
         {
           "code": "159001",
           "name": "货币ETF易方达",
-          "scale_yi": 29.75,
+          "scale_yi": 31.73,
           "net_amount_yi": -0.073
         },
         {
@@ -89,7 +89,7 @@
     "commodity": {
       "name": "商品型",
       "net_amount_yi": -2.5789582099999997,
-      "scale_yi": 3582.383179109999,
+      "scale_yi": 3582.41033911,
       "n_funds": 55,
       "top5": [
         {
@@ -127,7 +127,7 @@
     "cross_border": {
       "name": "跨境型",
       "net_amount_yi": 15.658460359999998,
-      "scale_yi": 6192.269929109999,
+      "scale_yi": 6192.350189109998,
       "n_funds": 192,
       "top5": [
         {
