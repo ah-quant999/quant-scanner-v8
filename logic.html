@@ -732,8 +732,6 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/TRIPLE_CONSENSUS.js?v=567e9fb230" defer></script>
   <script src="data/TRIPLE_TRACK.js?v=35b9ff2a0a" defer></script>
   <script src="data/TRIPLE_HISTORY.js?v=64972c29af" defer></script>
-  <!-- 2026-09-03 主人令：COCKPIT_TIER_RECOMMEND.js 已删（驾驶舱全方位下线） -->
-  <!-- 2026-09-03 主人令：COCKPIT_ADVICE.js 已删（驾驶舱全方位下线） -->
   <script src="data/V8_CAL.js?v=ee623e0834"></script>
   <script src="data/SH_FIB.js?v=4bbea72b7b" defer></script>
   <script src="data/SZ_FIB.js?v=a28b0a37f0" defer></script>
@@ -755,7 +753,6 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/FOUR_VOLUME_60M.js?v=af87ef8c3e" defer></script>
   <script src="data/STOCK_STOP_DATA.js?v=bed314b262" defer></script>
   <script src="data/BACKTEST_COMPREHENSIVE.js?v=b6991845a5" defer></script>
-  <!-- 2026-09-03 主人令：COCKPIT_BACKTEST.js 已删（驾驶舱全方位下线） -->
   <script src="data/BACKTEST_TDX.js?v=44eeb2ea13" defer></script>
   <!-- 2026-09-03 主人令：HUNTER_BACKTEST.js 已删（大牛股猎手全方位下线） -->
   <script src="data/OPTIMIZED_STRATEGY.js?v=c8b62a8ad4" defer></script>
@@ -1385,7 +1382,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
             <li>📊 <b>实时行情</b>：现价、涨跌幅、成交量/额、今开/昨收/最高/最低</li>
             <li>🎯 <b>止盈止损</b>：止损位、目标位、盈亏比、操作建议</li>
             <li>🏷 <b>概念行业概览</b>：板块、行业、题材概念标签</li>
-            <li>🎖️ <b>选股策略命中</b>：是否命中三重共识、金股池、候选池、逆势龙头、四量终极（驾驶舱 09-03 已下线）</li>
+            <li>🎖️ <b>选股策略命中</b>：是否命中三重共识、金股池、候选池、逆势龙头、四量终极</li>
             <li>💧 <b>关联板块资金流向</b>：该股所属概念/板块当日资金流向</li>
             <li>🐉 <b>龙虎榜</b>：上榜日期、机构/游资净买、上榜原因</li>
             <li>🚫 <b>停牌识别</b>：停牌状态与原因</li>
@@ -1411,7 +1408,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
         <h3><span class="ic">🗂️</span>算法对比与可信度排序</h3>
         <table class="lg-table">
           <tr><th>序</th><th>算法</th><th>一句话定义</th><th>可信度</th></tr>
-          <tr><td>2</td><td>🥇 三重共识</td><td>主站TOP10精选 ∩ 基本面A档（2 重过滤，cockpit 已下线）</td><td><b style="color:#fbbf24">⭐⭐⭐⭐⭐</b> 最严</td></tr>
+          <tr><td>2</td><td>🥇 三重共识</td><td>主站TOP10精选 ∩ 基本面A档（2 重过滤）</td><td><b style="color:#fbbf24">⭐⭐⭐⭐⭐</b> 最严</td></tr>
           <tr><td>3</td><td>🔥 四量终极</td><td>游资点火+机构托底+当天金叉+四路翻多（4 重共振 + 3 年回测）</td><td><b style="color:#fbbf24">⭐⭐⭐⭐</b></td></tr>
           <tr><td>4</td><td>🧬 选股生命周期</td><td>逐日累积快照跟踪（入池→持仓→走弱→剔除），与选股策略子页一致口径</td><td><b style="color:#fbbf24">⭐⭐⭐</b></td></tr>
           <tr><td>5</td><td>📈 相对强度</td><td>个股 RPS 百分位(50/120/250日) + 曼斯菲尔德 RS + 250日年线门禁（排名/筛选层）</td><td><b style="color:#fbbf24">⭐⭐⭐</b></td></tr>
@@ -1422,9 +1419,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
 
         <div class="logic-h">排序逻辑</div>
         <ul style="margin:6px 0 0 18px;font-size:13px;line-height:1.85;color:var(--txt);">
-          <li><b>三重共识最可信</b>是因为它有 <b>2 个独立维度</b>（主站评分/基本面质量；驾驶舱分级维度已于 09-03 下线移除）<b>一致才入选</b>，命中即高质量。</li>
+          <li><b>三重共识最可信</b>是因为它有 <b>2 个独立维度</b>（主站评分/基本面质量）<b>一致才入选</b>，命中即高质量。</li>
           <li><b>四量终极</b> 4 重共振 + 3 年回测验证，信号明确，<b>命中即四条件齐发</b>，回测稳健。</li>
-          <li><b>驾驶舱（已下线 2026-09-03）</b>原 A/B 档分级口径不再生效。</li>
           <li><b>全站精选（已下线 2026-09-03）</b>曾是综合池，单信号强度弱。</li>
           <li><b>逆势龙头 CRDS</b> 是<b>专用场景</b>（弱市找强势股），不通用——所以不挂星级，只标"弱市专用"挂在末尾。</li>
           <li style="color:var(--gold)"><b>2026-08-29 主人令</b>：<b>🧭 选股池</b>作为选股策略子页（🧭 选股池 tab）——上游水源多源信号初筛池（主板+创业板+科创板成交前100 + 港股成交前50 + 外资研投），三板合计≥280视为健康。</li>
@@ -1462,7 +1458,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
           <tr><td>16:40 A批采集</td><td>龙虎榜/行情/板块RS/指数历史/港股</td><td>云端 v8_algo_cloud (--stage A)</td><td>选股策略·选股池/板块资金流</td></tr>
           <tr><td>18:10 B批选股</td><td>三重共识/相对强度/CRDS/四量终极/选股生命周期</td><td>云端 v8_algo_cloud (--stage B)</td><td>选股策略各子 tab</td></tr>
-          <tr><td>19:15 C批回测</td><td>backtest_tdx/comprehensive/cockpit/hunter/crds/allsite/rps</td><td>云端 v8_algo_cloud (--stage C)</td><td>策略回顾·回测区</td></tr>
+          <tr><td>19:15 C批回测</td><td>backtest_tdx/comprehensive/crds/rps</td><td>云端 v8_algo_cloud (--stage C)</td><td>策略回顾·回测区</td></tr>
           <tr><td>20:00 D批汇总</td><td>final_recommend + LHB历史/7d/生命周期</td><td>云端 v8_algo_cloud (--stage D)</td><td>今日推荐候选池·Top3</td></tr>
           <tr><td>本地因子(盘后/周末)</td><td>异常换手率(重点池) + ROE(TTM)全市场主板 · 因子实验室卡</td><td>小九本机 baostock 生成 → push main</td><td>选股策略·🧬生命周期 tab</td></tr>
         </table>
@@ -1489,9 +1485,9 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
 <div class="card">
         <h3><span class="ic">🥇</span>三重共识 - 说明</h3>
         <div class="logic-h">判定公式</div>
-        <div class="logic-p">主站 TOP10（total_score ≥70） ∩ 基本面质量 A档，双维同时满足即共识（驾驶舱 A 档维度已于 2026-09-03 随驾驶舱下线移除，原「三重」由三维权变二维）。可信度最高（⭐⭐⭐⭐⭐）——2 个独立维度一致才入选，命中即高质量。</div>
+        <div class="logic-p">主站 TOP10（total_score ≥70） ∩ 基本面质量 A档，双维同时满足即共识。可信度最高（⭐⭐⭐⭐⭐）——2 个独立维度一致才入选，命中即高质量。</div>
         <div class="logic-h">分组展示</div>
-        <div class="logic-p">· <b class="up">严格共识（2/2）</b>：无条件优先看<br>· <b style="color:var(--gold)">优先观察（1/2）</b>：差1步（TOP10精选但缺基本面A）<br>· <b style="color:var(--dim)">扩展观察（差2步）</b>：驾驶舱下线后已无来源</div>
+        <div class="logic-p">· <b class="up">严格共识（2/2）</b>：无条件优先看<br>· <b style="color:var(--gold)">优先观察（1/2）</b>：差1步（TOP10精选但缺基本面A）</div>
         <div class="logic-h">评分·完整公式</div>
         <div class="logic-p"><b>总分 = 各因子按「数据来源 → 评判逻辑 → 加分区间」逐项量化后求和，最后归一化到 0~100。</b>基础信号权重<b>完全由 walk-forward 回测期望（胜率×收益，带收缩）驱动</b>：对每个信号取其在 backtest_expectancy.json 的 T+10 edge，正 edge → 加分、负 edge → 扣分，彻底替代原拍脑袋的 +25 均权；权重再乘以 <b>P1 置信度收缩</b>（样本量 n/120 与 T+5/T+10 符号一致性，薄样本或符号矛盾 → 向 0 收缩，如缠论因 T+5 符号矛盾有效权重 ×0.5）。<br><b>市场级调节器</b>：v8MarketGate() 择时门控作为全局情绪/市况调节器——仅 grind/panic 状态正常打分，其余状态对总分乘子降权，避免弱势市况下机械追高。<br><b>板块取主板块流入</b>：板块共振取所属<b>赛道净流入最强者</b>（非全市场求和），并过滤业绩/指数/风格类非赛道标签，避免概念重叠重复计数与板块失血从不扣分。<br>原始分构成：基础(金钻+20/缠论+9/机构变红−26/上涨趋势−19) + 增强(~21) + 形态(~16) + 资金(~8) + 板块(~5) + 机构/事件(~7) + 基本面(−10~+40) + 回测反哺(±10) + 研究驱动因子(~13) + P4残差动量/门控(−6~0)。最终 total_score = min(100, 原始总分/130×100)；≥80 精选 / ≥70 观察。</div>
         <table class="lg-table">
@@ -1509,7 +1505,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><td>板块共振</td><td>赛道净流入（取所属最强单板块）</td><td>取所属赛道净流入最强者&gt;5亿 +5 / &gt;1亿 +2 / &lt;−5亿 −3；过滤业绩/指数/风格类非赛道标签</td><td>−3~+5</td></tr>
           <tr><td>机构/事件</td><td>52周新高 / 分析师关注</td><td>52周新高 +4 / 分析师关注 +3</td><td>~7</td></tr>
           <tr><td>基本面质量分</td><td>fundamental_quality.json（ROE/营收/净利/分红）</td><td>A级+40 / B级+5 / C级0 / D级−10</td><td>−10~+40</td></tr>
-          <tr><td>回测反哺</td><td>backtest_expectancy.json by_signal（T+10 edge）</td><td>按信号组合 walk-forward T+10 edge 直接修正，每 1% edge ≈ ±1 分（替代原 cockpit T+3 胜率，已下线恒50）</td><td>±10</td></tr>
+          <tr><td>回测反哺</td><td>backtest_expectancy.json by_signal（T+10 edge）</td><td>按信号组合 walk-forward T+10 edge 直接修正，每 1% edge ≈ ±1 分</td><td>±10</td></tr>
         </table>
         <div class="logic-h">归一化口径</div>
         <div class="logic-p">total_score = min(100, 原始总分 / 130 × 100)。历史快照已同步回刷，保证「≥80 精选 / ≥70 观察」的阈值在所有日期口径一致。<br><span style="color:var(--dim);">注：2026-06 那批早期快照缺少评分明细、无法还原原始分，按要求保持原样未改（不编造数据）。</span></div>
@@ -1529,7 +1525,6 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <b>该看「三重共识」买卖，其他都是辅助/背景。</b><br>
           · 🥇 三重共识：可直接作为买卖候选池<br>
           · 🌐 全站精选（已下线）：曾扩大观察范围<br>
-          · 🚀 驾驶舱（已下线）：原市场环境观察<br>
           · 📦 股池构成：只是背景信息，不用于买卖
         </div>
       </div>
@@ -1557,7 +1552,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
 <div class="card">
         <h3><span class="ic">🔥</span>四量终极 - 说明</h3>
         <div class="logic-h">定位</div>
-        <div class="logic-p">游资点火 + 机构托底 + 当天金叉 + 四路翻多四条件<b>同时共振</b>才入选，命中即四路信号齐发。4 重共振 + 3 年回测验证，信号明确 → 可信度 ⭐⭐⭐⭐，排在驾驶舱前。</div>
+        <div class="logic-p">游资点火 + 机构托底 + 当天金叉 + 四路翻多四条件<b>同时共振</b>才入选，命中即四路信号齐发。4 重共振 + 3 年回测验证，信号明确 → 可信度 ⭐⭐⭐⭐。</div>
         <div class="logic-h">四个条件（全部满足 = QD 共振）</div>
         <table class="lg-table">
           <tr><th>条件</th><th>含义</th><th>技术定义</th></tr>
@@ -1677,7 +1672,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">幸存者偏差控制</div>
         <div class="logic-p">通达信 60 日回测会累积每日金股池快照，用「最近 90 天内所有快照的并集」作为回测宇宙。这样可以纳入那些曾经入选、后来跌出池的股票，降低「只测现存强势股」导致胜率高估的问题。快照累积不足时，面板会标注「仍含幸存者偏差」。</div>
         <div class="logic-h">买卖建议原则</div>
-        <div class="logic-p">驾驶舱给出的「最佳持有期」优先看胜率，但同时要求样本量足够。小样本信号不会直接推荐，避免偶然性。</div>
+        <div class="logic-p">最佳持有期判定优先看胜率与样本量双约束，样本不足信号不会直接推荐，避免偶然性。</div>
       </div>
 
       
@@ -2353,7 +2348,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">新股上市 / 退市股 周度元数据巡检</div>
         <div class="logic-p">已并入现有<b>周末轻量维护</b>任务（不新建 automation）：<br>· <code>v8_weekend_light.py</code> 调用 <code>algorithms/refresh_stock_metadata.py</code> 每周跑一次全量 A 股 + 港股名称列表。<br>· 与上周比对，识别<b>新股上市</b>（新增代码）和<b>退市股</b>（消失代码）。<br>· 为新股补充 <b>industry / board / concepts / pinyin</b> 静态映射（写入 <code>algorithms/stock_industry_concepts.json</code> 与 <code>algorithms/stock_pinyin.json</code>），确保个股查询、板块/行业/概念标签正确。<br>· 退市股归档至 <code>raw_data/delisted_stocks.json</code>，保留最后已知的板块/行业，不影响活跃股票列表。</div>
         <div class="logic-h">2026-08-09 审计结论</div>
-        <div class="logic-p">展示层诚实：无硬编码假「今日」、无使用重打包戳冒充数据时间、?v= 缓存戳等于真实数据日期。当前检出 <b>COCKPIT_ADVICE 信号样本陈旧（最新 signal_date 2026-07-09，最近交易日 2026-08-07）</b>，已告警并加前端警示。完整报告见 <code>AUDIT_TIME_DATA_2026-08-09.html</code>。</div>
+        <div class="logic-p">展示层诚实：无硬编码假「今日」、无使用重打包戳冒充数据时间、?v= 缓存戳等于真实数据日期。完整报告见 <code>AUDIT_TIME_DATA_2026-08-09.html</code>。</div>
       </div>
     </div>
 
@@ -2518,7 +2513,6 @@ function switchSec(sec,el){
       try{ window.renderTodayEventForecast(window.PERFORMANCE_FORECAST || {}); }catch(e){}
     }, 80);
   }
-  // 潜力参考（pr）已改为选股策略(st)内部子TAB，由 switchSt('pr') 触发，此处不重复处理
   // 共振日历：进入时确保默认 tab1（机游共振）渲染（rcTab1 默认 active，但 switchRcTab 仅在点 tab 时触发）
   if(sec==='rc' && typeof window.switchRcTab==='function') setTimeout(function(){ try{ window.switchRcTab('tab1', document.querySelector('.rc-tab-btn.active')); }catch(e){} }, 30);
   // tab 切换后 echarts 实例需要 resize（容器从 display:none 恢复时尺寸为 0）
@@ -2874,7 +2868,7 @@ function switchSec(sec,el){
     if(f.grade==='A'){ signals.push({t:'绩优股',a:'回调逢低关注',c:'up'}); score+=1; }
     else if(f.grade==='D'){ signals.push({t:'基本面差',a:'规避',c:'down'}); score-=1; }
 
-    // 5. 策略共振（候选池/金股池/驾驶舱/CRDS/四量 任一命中即加分）
+    // 5. 策略共振（候选池/金股池/CRDS/四量 任一命中即加分）
     // 🔴 2026-08-12 主人紧急修复：_in 兼容 dict/array 两种 schema
     //   根因：GOLD_POOL.stocks / CANDIDATE.stocks 都是 {key: stock} dict
     //   而 .some() 只对 array 有效 → arr.some is not a function 抛错
@@ -2892,9 +2886,8 @@ function switchSec(sec,el){
                   || [];
     const goldList = (window.GOLD_POOL && (window.GOLD_POOL.stocks || window.GOLD_POOL.candidates))
                   || [];
-    // COCKPIT 优先用 tier_a/tier_b（array 数组）合并
-    const cock = window.COCKPIT_TIER_RECOMMEND||{};
-    const cockList = [].concat(cock.tier_a||[], cock.tier_b||[]);
+    // COCKPIT_TIER_RECOMMEND 已下线（2026-09-03）：cockList 恒空，下方 if(_in(cockList)) 自然跳过
+    const cockList = [];
     // CRDS 用 cond1_list/cond2_list/cond3_list/cond4_list（按实际 schema）
     const crds = window.CRDS_CARD_DATA||{};
     const crdsList = [].concat(crds.cond1_list||[], crds.cond2_list||[], crds.cond3_list||[], crds.cond4_list||[]);
@@ -2902,7 +2895,7 @@ function switchSec(sec,el){
     const fourList = (window.FOUR_VOLUME && window.FOUR_VOLUME.stocks) || [];
     if(_in(candList)) hitN++;
     if(_in(goldList)) hitN++;
-    if(_in(cockList)) hitN++;
+    // COCKPIT 下线：skip
     if(_in(crdsList)) hitN++;
     if(_in(fourList)) hitN++;
     if(hitN>=3){ signals.push({t:hitN+' 策略共振命中',a:'强共识买点',c:'up'}); score+=2; }
@@ -2953,7 +2946,7 @@ function switchSec(sec,el){
     try {
       var fr = window.FINAL_RECOMMEND_DATA || {};
       var sff = (window.SECTOR_FUND_FLOW || {});
-      var cock = window.COCKPIT_TIER_RECOMMEND || {};
+      var cock = {};  // COCKPIT_TIER_RECOMMEND 已下线（2026-09-03），保留占位以防其他位置引用 cock
 
       // --- 收集主线板块 ---
       var sectors = [];
@@ -2980,25 +2973,7 @@ function switchSec(sec,el){
         stocks.push({code:st.code||'?',name:st.name||'?',score:st.final_score||0,
           src:(st.sources||[]).join('+'),stop:st.stop_loss,target:st.target_price});
       }
-      // COCKPIT tier_a / tier_b 补充
-      var tiers=['tier_a','tier_b'];
-      for(var ti=0;ti<tiers.length;ti++){
-        var ts=(cock[tiers[ti]]||[]);
-        for(var j=0;j<ts.length;j++){
-          var ct=ts[j]; if(!ct) continue; var cc=ct.code||'?';
-          var dup=false;
-          for(var k=0;k<stocks.length;k++){if(stocks[k].code===cc){dup=true;break;}}
-          if(!dup) stocks.push({code:cc,name:ct.name||'?',src:'驾驶舱'+(ti===0?'A':'B')+'档'});
-        }
-      }
-      // cockpit_advice watch 补充
-      var ca=(window.COCKPIT_ADVICE||{}).watch||[];
-      for(var w=0;w<ca.length;w++){
-        var cw=ca[w]; if(!cw) continue; var cwc=cw.code||'?';
-        var dup2=false;
-        for(var k=0;k<stocks.length;k++){if(stocks[k].code===cwc){dup2=true;break;}}
-        if(!dup2) stocks.push({code:cwc,name:cw.name||'?',src:'驾驶舱回测',ret3d:cw.ret_3d});
-      }
+      // COCKPIT_TIER_RECOMMEND / COCKPIT_ADVICE 已下线（2026-09-03）：tier_a/tier_b/watch 补充已无数据源，整段删除
 
       if(sectors.length===0 && stocks.length===0) return '';
 
@@ -3180,12 +3155,7 @@ function switchSec(sec,el){
     const cstocks = cd.stocks || {};
     const ckey = Object.keys(cstocks).find(k=>normCode(cstocks[k].code)===nc);
     if(ckey) hits.push({name:'🎯 候选池', color:'var(--cyan)', detail:(cstocks[ckey].sources||[]).join(' / ')});
-    // 驾驶舱
-    const cp = window.COCKPIT_TIER_RECOMMEND || {};
-    const cpa = (cp.tier_a||[]).find(r=>normCode(r.code)===nc);
-    const cpb = (cp.tier_b||[]).find(r=>normCode(r.code)===nc);
-    if(cpa) hits.push({name:'🚀 驾驶舱 A档', color:'#ffd54f', detail:'评分 '+cpa.total_score+' · '+ (cpa.comment||'-')});
-    else if(cpb) hits.push({name:'🚁 驾驶舱 B档', color:'var(--gold)', detail:'评分 '+cpb.total_score+' · '+(cpb.comment||'-')});
+    // COCKPIT_TIER_RECOMMEND 已下线（2026-09-03）：tier_a/tier_b 命中判断整段删除
     // 逆势龙头
     const crds = window.CRDS_CARD_DATA || {};
     let crdsCond='';
@@ -6270,7 +6240,6 @@ window.showRestrictedItems = showRestrictedItems;
   }
   /* 2026-09-03 主人令：logic.html 内 renderAllsite 整段删除 */
 
-  /* 2026-09-03 主人令：logic.html 内 cockpit 整片渲染函数删除（与 index.html 同步） */
 
   function genericSource(k){
     var map={'主板成交前100':'主板活跃成交池','创业板成交前100':'创业板活跃成交池','科创板成交前100':'科创板活跃成交池','港股成交前50':'港股活跃成交池','外资研投':'公开资讯源'};
@@ -6379,7 +6348,7 @@ window.showRestrictedItems = showRestrictedItems;
     var h='';
     var _ulAct = window.__ulActivePane || 'strong';  // 🛡 记住激活的子 tab（重渲染跟随）
 
-    // ═══ 2026-08-16/18 主人令：暂未上架改子Tab导航（强势突破/AI预测/调试专区）；2026-08-20 潜力挖掘已删除→AI预测 ═══
+    // ═══ 2026-08-16/18 主人令：暂未上架改子Tab导航（强势突破/AI预测/调试专区） ═══
     h+='<style>.ul-pane{display:none}.ul-pane.active{display:block}.ul-tab{font-size:12.5px;font-weight:600;color:var(--sub);background:transparent;border:1px solid var(--border);border-radius:8px;padding:6px 13px;cursor:pointer;transition:all .15s}.ul-tab:hover{color:var(--txt);background:var(--bg2)}.ul-tab.active{color:var(--txt);background:var(--card2);border-color:var(--border2);box-shadow:0 1px 4px rgba(0,0,0,.12)}</style>';
     h+='<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:8px;">';
     h+='<div class="ul-tab' + (_ulAct==='strong'?' active':'') + '" data-ultab="strong" onclick="window.__ulSwitch(this,\'strong\')">🚀 强势突破</div>';
@@ -6389,7 +6358,6 @@ window.showRestrictedItems = showRestrictedItems;
     // ── pane4: 🧪 调试专区 ──
     h+='<div class="ul-pane" id="ulPaneDbg" style="display:'+(_ulAct==='dbg'?'block':'none')+'">';
     // 2026-08-30 根因修复：调试专区容器曾因提前闭合（line 11172 旧 bug）导致
-    //   潜力挖掘/ETF龙头/个股动量状态 三卡溢出到两个子Tab之外，
     //   造成「强势突破」与「调试专区」内容一模一样。现保持容器打开直到 line 11465，
     //   把这些卡真正收进调试专区；强势突破 pane 只保留两卡。
 
@@ -6417,7 +6385,6 @@ window.showRestrictedItems = showRestrictedItems;
 h+='</div>';  // /ulPaneDbg
 
     // ── 🛡 2026-08-19 主人令：2 张新卡（宏观+板块推荐）暂未上架实验区 · 调试专区底部 ──
-    //    2026-08-20 主人令：路径概率预测卡已迁出调试专区 → 独立「AI 预测」子TAB（潜力挖掘删除，算法链 19:15 自动更新）
 
     // ⚖️ 2026-08-14 主人令："这个没用，删了吧"：TOP3 持仓跟踪卡片 HTML 已删除
     h+='';
@@ -6426,9 +6393,7 @@ h+='</div>';  // /ulPaneDbg
 
     // ── 2026-08-11 主人令：💰 平均股价（全A等权）已迁到「📡 实时数据」tab 跟随 AI 市场速览展示 ──
 
-    // ════ 2026-08-14 主人令：商品涨价弹性榜已迁至选股策略子TAB「潜力参考」(st-pr)，此处不再渲染 ═══
 
-    // 2026-08-14 主人令：情绪周期定位/潜力挖掘 已迁至选股策略子TAB「潜力参考」(st-pr)，此处不再重复渲染
     // 2026-08-18 主人令：ETF·龙头参考 已迁入「暂未上架 > 调试专区」，此处不再重复渲染
 
     // ── 🎭 情绪周期 · 连板天梯（合并紧凑版）已迁到实时数据区，见 window.__renderCycleLadderCard ──
@@ -6620,8 +6585,6 @@ h+='</div>';  // /ulPaneDbg
     h+='</div></div>';  // /H反推卡
     // ── 2026-08-29 主人令：🤖 AI 预测 子页面已删除（卡并入调试专区，见 P3 插入段），pane2 此处不再渲染 ──
 
-    // ── 2026-08-29 主人令：🔮 潜力挖掘 子页面已删除（卡并入调试专区，见 P3 插入段），pane3 此处不再渲染 ──
-    // 2026-08-27 一劳永逸：删除潜力挖掘 ETF·龙头参考 克隆卡 一并并入调试专区 (dbgEtfMapBody 单点)
 
     el.innerHTML=h;
     // 2026-08-30 主人令:渲染兜底
