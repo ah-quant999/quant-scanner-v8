@@ -120,7 +120,6 @@ jobs:
               #   以下 7 个为全量扫描出的「命名不一致」清单（含 4.1MB 的 STOCK_QUOTE），全部纳入保护。
               "AI_MARKET_BRIEF",
               "INDEX_HISTORY",
-              "MARKET_PATH_PROBABILITY",
               "RUNNER_STATUS",
               "SECTOR_FUND_FLOW_INTRADAY",
               "STOCK_QUOTE",
