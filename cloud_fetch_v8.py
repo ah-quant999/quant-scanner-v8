@@ -68,7 +68,6 @@ VAR_TO_RAW = {
     "LIMIT_UP_HEATMAP": "limit_up_heatmap.json",
     "LIMIT_UP_BROKEN": "limit_up_broken.json",
     "CAPITAL_FLOW_DATA": "capital_flow_data.json",
-    "ETF_SUBSCRIPTION": "etf_subscription.json",
     "NORTH_FUND": "north_fund.json",
     "MARKET_FUND_FLOW_DATA": "market_fund_flow_data.json",
     "W52_HIGH": "w52_high.json",
@@ -115,7 +114,6 @@ CATEGORY_MAP = {
     # 该卡片配合 ETF 三连板实时卡，盘中每 30 分需要刷新，改成 post_close 会把它踢出盘中抓取（2026-08-11 回归）。
     # 「盘前不清空、保留昨日 T+1 收盘值」是另一个语义，由下方 _clear_intraday_for_premarket 的 KEEP_VARS 负责。
     "ETF_DAILY_MONITOR": "intraday",
-    "ETF_SUBSCRIPTION": "premarket",  # T+1 盘后/盘前更新一次即可
     "SECTOR_FUND_FLOW": "intraday,post_close",  # 2026-09-03 根治：盘中 cron 偶发丢档→收盘定格值无着落；加 post_close 兜底（过滤已 comma-aware）
     "SECTOR_FUND_FLOW_INTRADAY": "intraday,post_close",  # 分时快照，跟随 SECTOR_FUND_FLOW 同周期；盘后追加收盘定格点
     "CAPITAL_FLOW_DATA": "intraday",
@@ -2087,103 +2085,6 @@ def f_capital_flow_data():
         "note": "全市场个股主力净流入(亿)，来源东方财富push2delay；非席位四路口径",
     }
 
-# 宽基ETF申赎：行业/主题排除关键词（与 v6 fetch_etf_subscription.py 保持一致）
-_ETF_SECTOR_KEYWORDS = [
-    '半导体','芯片','医药','医疗','券商','银行','煤炭','通信','消费','军工','电池','新能源','光伏','有色','化工',
-    '物联网','云计算','互联','科技','传媒','地产','基建','食品','汽车','钢铁','建材','农业','环保','旅游','教育',
-    '港股','恒生','H股','德国','日本','法国','印度','越南','黄金','原油','豆粕','能源','商品','货币','债券','国债',
-    '国开','政金','城投','信用','短融','存单','理财','标普','纳斯达克','MSCI','富时','央企','国企','产业','畜牧',
-    '养殖','种植','渔业','种业','化肥','农药','服装','家电','造纸','包装','石油','天然气','电力','水务','燃气',
-    '供热','固废','污水','风电','核电','水电','储能','氢能','生物质','充电桩','换电','锂电','钠电','固态','燃料电池',
-    '电机','电控','轨道交通','航空航天','船舶','港口','机场','公路','铁路','物流','快递','仓储','供应链','贸易',
-    '零售','电商','免税','餐饮','酒店','演艺','会展','体育','游戏','动漫','影视','音乐','广告','营销','家政','共享',
-    '租赁','卫星','火箭','基因','干细胞','机器人','无人机','虚拟','增强','量子','纳米','石墨烯','超导','核聚变',
-    '信创','电子','电信','5G','6G','AI','智能制造','工业','芯','数字','大数据','金融科技','区块链','元宇宙','碳中和',
-]
-_ETF_BROAD_PATTERNS = [
-    r'(?:沪深)?300(?:ETF|指数|基金|[A-Z]|增|价值|成长|质量|ESG|红利|指增|增强)?$',
-    r'^(?:中证)?500(?:ETF|指数|基金|质量|低波|价值|成长|增强)?$',
-    r'^(?:中证)?1000(?:ETF|指数|基金|价值|成长|增强)?$',
-    r'^(?:上证)?50(?:ETF|指数|基金|[A-Z])?$',
-    r'^(?:上证)?180(?:ETF|指数|基金|[A-Z])?$',
-    r'^创业板(?:ETF|指数|50)?$',
-    r'^创50(?:ETF)?$',
-    r'^(?:科创板|科创)(?:50|100|200)(?:ETF|指数|基金|[A-Za-z])?$',
-    r'^(?:中证)?A500(?:ETF|基金|指数|龙头|添富|富国|华宝|中金|申万|银河|红利|增强|[A-Z])?$',
-    r'^A500[EF]?$',
-    r'^综指ETF$',
-    r'^(?:上证|沪深|中证)综合(?:ETF|指数)?$',
-    r'^AH300ETF$',
-    r'^AH500ETF$',
-    r'^A50ETF$',
-    r'^双创50(?:ETF)?$',
-]
-
-def _is_broad_etf(name):
-    n = str(name or "").strip()
-    for kw in _ETF_SECTOR_KEYWORDS:
-        if kw in n:
-            return False
-    for p in _ETF_BROAD_PATTERNS:
-        if __import__("re").search(p, n):
-            return True
-    return False
-
-def _trade_dates(n=60):
-    dates = []
-    d = now_cst()
-    while len(dates) < n:
-        if d.weekday() < 5:
-            dates.append(d.strftime("%Y%m%d"))
-        d -= timedelta(days=1)
-    return list(reversed(dates))
-
-def f_etf_subscription():
-    """宽基ETF净申赎：上交所ETF份额日环比，筛选宽基指数ETF。
-    输出结构与 v6 ETF_SUBSCRIPTION 一致：{sh:[{date,date_raw,total_shares_bil,net_subscribe_bil}], update_time}
-    """
-    dates = _trade_dates(60)
-    result = {"sh": [], "sh_all": [], "update_time": ""}
-    prev_total = None
-    prev_total_all = None
-    for d in dates:
-        try:
-            df = get_ak().fund_etf_scale_sse(date=d)
-            if df is None or len(df) == 0:
-                continue
-            # 基金份额字段名兼容
-            share_col = "基金份额" if "基金份额" in df.columns else None
-            if share_col is None:
-                continue
-            df_broad = df[df["基金简称"].apply(_is_broad_etf)]
-            broad_shares = float(df_broad[share_col].sum()) if len(df_broad) else 0.0
-            all_shares = float(df[share_col].sum())
-            dt_fmt = f"{int(d[4:6])}/{int(d[6:8])}"
-            dt_raw = f"{d[:4]}-{d[4:6]}-{d[6:]}"
-            entry = {"date": dt_fmt, "date_raw": dt_raw, "total_shares_bil": round(broad_shares / 1e8, 2)}
-            if prev_total is not None:
-                entry["net_subscribe_bil"] = round((broad_shares - prev_total) / 1e8, 2)
-            else:
-                entry["net_subscribe_bil"] = 0.0
-            result["sh"].append(entry)
-            prev_total = broad_shares
-
-            entry_all = {"date": dt_fmt, "date_raw": dt_raw, "total_shares_bil": round(all_shares / 1e8, 2)}
-            if prev_total_all is not None:
-                entry_all["net_subscribe_bil"] = round((all_shares - prev_total_all) / 1e8, 2)
-            else:
-                entry_all["net_subscribe_bil"] = 0.0
-            result["sh_all"].append(entry_all)
-            prev_total_all = all_shares
-        except Exception:
-            pass
-        time.sleep(0.15)
-    if not result["sh"]:
-        return None
-    result["update_time"] = now_cst().strftime("%Y-%m-%d %H:%M")
-    print(f"  ✅ 宽基ETF净申赎：{len(result['sh'])} 条")
-    return result
-
 def f_north_fund():
     # 北向资金：港交所 2024-05 后停止披露 top_buy，系统标「停止」
     return {"stopped": True, "note": "港交所 2024-05 后停止披露北向 top_buy，无实时数据"}
@@ -3700,7 +3601,6 @@ def main(category=None, only=None):
         ("LIMIT_UP_HEATMAP", f_limit_up_heatmap),
         ("LIMIT_UP_BROKEN", f_limit_up_broken),
         ("CAPITAL_FLOW_DATA", f_capital_flow_data),
-        ("ETF_SUBSCRIPTION", f_etf_subscription),
         ("NORTH_FUND", f_north_fund),
         ("MARKET_FUND_FLOW_DATA", f_market_fund_flow_data),
         ("W52_HIGH", f_w52_high),

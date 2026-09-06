@@ -744,7 +744,6 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/NORTH_FUND.js?v=fefb1266e3" defer></script>
   <script src="data/MARKET_ALERTS.js?v=f280879de6" defer></script>
   <script src="data/MARKET_FUND_FLOW_DATA.js?v=fe827a5db7" defer></script>
-  <script src="data/ETF_SUBSCRIPTION.js?v=2cc7309e1f" defer></script>
   <script src="data/ETF_SUBSCRIPTION_EM.js?v=edbb4a9085" defer></script>
   <script src="data/LIMIT_UP_HEATMAP.js?v=290e9631f6" defer></script>
   <script src="data/LIMIT_UP_BROKEN.js?v=cee690d979" defer></script>
@@ -1842,7 +1841,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
       </div>
 
 <div class="card">
-        <div class="logic-p">· <b>v6精选</b>：选股驾驶舱+全站精选（15个JSON映射到DATA.*）<br>· <b>暂未上架</b>：V6卡片真实渲染（F窗口/金股池停牌/波动率/精选预判/四路资金/大盘资金流/期指/两融/ETF申赎）<br>· <b>已下架</b>：2026-07-30 起已<b>全面接入真实数据（11张卡）</b>，观测候选股池(CANDIDATE) 置顶，其余分别来自 F窗口实时监测(SH_FIB) / 金股池停牌监测(GOLD_POOL) / 波动率结构观测(VOLATILITY) / 精选预判信号(W52_HIGH·LIMIT_UP_HEATMAP·HERDING_DATA) / 四路资金流向对比(CAPITAL_FLOW_DATA) / 上交所大盘资金流时间轴(MARKET_FUND_FLOW_DATA) / 股指期货升贴水(CFFEX_HOLDINGS) / 两融余额走势(MARGIN_DATA) / 宽基ETF净申赎(ETF_SUBSCRIPTION) / 国家队ETF资金流向(ETF_INTRADAY_HEAT)；数据缺失时显示友好提示而非空白。</div>
+        <div class="logic-p">· <b>v6精选</b>：选股驾驶舱+全站精选（15个JSON映射到DATA.*）<br>· <b>暂未上架</b>：V6卡片真实渲染（F窗口/金股池停牌/波动率/精选预判/四路资金/大盘资金流/期指/两融/ETF申赎）<br>· <b>已下架</b>：2026-07-30 起已<b>全面接入真实数据（11张卡）</b>，观测候选股池(CANDIDATE) 置顶，其余分别来自 F窗口实时监测(SH_FIB) / 金股池停牌监测(GOLD_POOL) / 波动率结构观测(VOLATILITY) / 精选预判信号(W52_HIGH·LIMIT_UP_HEATMAP·HERDING_DATA) / 四路资金流向对比(CAPITAL_FLOW_DATA) / 上交所大盘资金流时间轴(MARKET_FUND_FLOW_DATA) / 股指期货升贴水(CFFEX_HOLDINGS) / 两融余额走势(MARGIN_DATA) / 宽基ETF净申赎·东财口径(ETF_SUBSCRIPTION_EM) / 国家队ETF资金流向(ETF_INTRADAY_HEAT)；数据缺失时显示友好提示而非空白。</div>
       </div>
 
       
@@ -7794,70 +7793,6 @@ h+='</div>';  // /ulPaneDbg
     el.innerHTML=html;
   }
 
-  function drawV8EtfChart(){
-    var data=window.ETF_SUBSCRIPTION||{};
-    var shData=data.sh||[];
-    if(!shData.length) return;
-    var el=document.getElementById('v8EtfChart');
-    if(!el) return;
-    var W=el.offsetWidth||680, H=240;
-    var PAD={top:45, left:55, bottom:36, right:10};
-    var gw=W-PAD.left-PAD.right, gh=H-PAD.top-PAD.bottom;
-    var vals=shData.map(function(d){return d.net_subscribe_bil||0;});
-    var minV=Math.min.apply(null,vals.concat([0]))*1.1, maxV=Math.max.apply(null,vals.concat([0]))*1.1;
-    if(minV===maxV){ minV-=10; maxV+=10; }
-    var yScale=function(v){ return PAD.top+gh-(v-minV)/(maxV-minV)*gh; };
-    var xScale=function(i){ return PAD.left+gw*i/(shData.length-1); };
-    var barW=Math.max(2, gw/shData.length*0.6);
-    var html='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:100%;">';
-    html+='<line x1="'+PAD.left+'" y1="'+PAD.top+'" x2="'+PAD.left+'" y2="'+(H-PAD.bottom)+'" stroke="#555" stroke-width="1"/>';
-    var zeroY=yScale(0);
-    html+='<line x1="'+PAD.left+'" y1="'+zeroY.toFixed(1)+'" x2="'+(W-PAD.right)+'" y2="'+zeroY.toFixed(1)+'" stroke="#666" stroke-width="1" stroke-dasharray="3"/>';
-    shData.forEach(function(d,i){
-      var v=d.net_subscribe_bil||0;
-      var x=xScale(i)-barW/2;
-      var y=v>=0?yScale(v):zeroY;
-      var h=Math.abs(yScale(v)-zeroY);
-      var color=v>=0?'#42a5f5':'#ef5350';
-      html+='<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+barW.toFixed(1)+'" height="'+h.toFixed(1)+'" fill="'+color+'" opacity="0.8"/>';
-    });
-    var etfLast=shData[shData.length-1];
-    if(etfLast){
-      var elx=xScale(shData.length-1);
-      var elv=etfLast.net_subscribe_bil||0;
-      var label=elv.toFixed(1)+'亿份';
-      html+='<text x="'+elx.toFixed(1)+'" y="'+(PAD.top-8).toFixed(1)+'" text-anchor="middle" font-size="10" fill="'+(elv>=0?'#42a5f5':'#ef5350')+'" font-weight="bold">'+label+'</text>';
-    }
-    for(var i=0;i<=4;i++){
-      var v=minV+(maxV-minV)*(1-i/4);
-      var y=yScale(v);
-      var absV=Math.abs(v);
-      var label=absV>=1000?v.toFixed(0):absV>=10?v.toFixed(1):v.toFixed(2);
-      html+='<text x="'+(PAD.left-8)+'" y="'+(y+4)+'" text-anchor="end" font-size="10" fill="#888">'+label+'</text>';
-      html+='<line x1="'+PAD.left+'" y1="'+y.toFixed(1)+'" x2="'+(W-PAD.right)+'" y2="'+y.toFixed(1)+'" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>';
-    }
-    var showCount=Math.min(shData.length,6);
-    var idxStep=Math.max(1,Math.floor((shData.length-1)/Math.max(1,showCount-1)));
-    // 🔴 2026-08-12 修复：与两融 chart 一致——循环不包含最后一个，避免与下方单独高亮重叠
-    for(var si=0; si<shData.length-1; si+=idxStep){
-      var i=si;
-      var x=xScale(i);
-      var dt=shData[i].date||'';
-      if(dt && dt.length===8 && dt.indexOf('/')<0) dt=dt.slice(4,6)+'/'+dt.slice(6);
-      html+='<text x="'+x.toFixed(1)+'" y="'+(H-PAD.bottom+14)+'" text-anchor="middle" font-size="10" fill="#888">'+dt+'</text>';
-    }
-    if(shData.length>0){
-      var li=shData.length-1, lx=xScale(li);
-      var ldt=shData[li].date||'';
-      if(ldt && ldt.length===8 && ldt.indexOf('/')<0) ldt=ldt.slice(4,6)+'/'+ldt.slice(6);
-      html+='<text x="'+lx.toFixed(1)+'" y="'+(H-PAD.bottom+14)+'" text-anchor="middle" font-size="10" fill="#42a5f5" font-weight="bold">'+ldt+'</text>';
-    }
-    html+='<text x="'+(PAD.left+5)+'" y="'+(PAD.top-8)+'" font-size="11" fill="#42a5f5">● 宽基ETF净申购</text>';
-    html+='<text x="'+(PAD.left+140)+'" y="'+(PAD.top-8)+'" font-size="11" fill="#ef5350">● 净赎回</text>';
-    html+='</svg>';
-    el.innerHTML=html;
-  }
-
   function renderDelisted(elId){
     // 2026-08-30 主人令：运维内 opTab4 已删除，默认容器改为一级 nav 的 delistedTopPanel
     var el=$(elId||'delistedTopPanel');
@@ -8097,27 +8032,13 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     }
     h+='</div></div>';
 
-    /* 6. 宽基ETF净申赎 */
-    var esub=window.ETF_SUBSCRIPTION||{}, esubT=esub.update_time||'';
-    var _esubDate = esubT ? esubT.slice(0,16) : '最近跑批';
-    h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #00acc1;">';
-    h+=v8CardHeader('📈','宽基ETF净申赎（亿份）','','update_time',{update_time:esubT},!esub||!esub.sh||!esub.sh.length);
-    h+='<div style="padding:12px 14px;">';
-    if(esub&&esub.sh&&esub.sh.length){
-      h+='<div style="font-size:11px;color:#38bdf8;margin-bottom:8px;">沪深300/中证500/中证1000/创业板/科创50/上证50/A500 宽基指数ETF每日净申购赎回份额</div>';
-      h+='<div style="font-size:10px;color:var(--dim);margin-bottom:6px;">数据截至 '+_esubDate+'（交易所日频·盘后定基，与上方盘中 ETF 三合一窗口不同源，对照请以各自时间为准）</div>';
-      h+='<div id="v8EtfChart" style="width:100%;height:240px;"></div>';
-    } else {
-      h+='<div class="note" style="text-align:center;">ETF申赎数据暂不可用</div>';
-    }
-    h+='</div></div>';
+    /* 6. 宽基ETF净申赎：2026-09-06 轻量化移除旧口径（宽基+亿份）卡——东财口径展示见主站「已下架」区 window.ETF_SUBSCRIPTION_EM */
 
 
     /* 2026-08-30 主人令：斐波那契双卡 + 商品涨价弹性榜三卡已上移至「已下架」顶部盘前条幅下方 */
 
     el.innerHTML=h;
     drawV8MarginChart();
-    drawV8EtfChart();
     // 2026-08-29 一劳永逸：删 renderMacro 调用——opTab4 无 phMacroBody 抛 null 已被主人之前在 initPostMarket 9680 注释；
     //   下面 3 个 safe 调用使用与 initPostMarket 同样的窗口数据来源（line 9658-9660 已对齐）：
     // 🛡 2026-08-31: FOMC_DATA 数据源未配置，当前为空对象，温度计缺 FOMC 维度。
@@ -8373,7 +8294,6 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     DATA.capital_flow = window.CAPITAL_FLOW_DATA||null;
     DATA.cffex = window.CFFEX_HOLDINGS||null;
     DATA.margin = window.MARGIN_DATA||null;
-    DATA.etf_sub = window.ETF_SUBSCRIPTION||null;
     DATA.etf_heat = window.ETF_INTRADAY_HEAT||null;
 
     // 「暂未上架/已下架」Tab 不再挂时间胶囊（2026-08-06 主人确立：Tab 类别名属大卡，不显示具体时间）
@@ -8457,7 +8377,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
   function _renderOpDiagnostics(){
     var diags = [];
     // 2026-08-29 一劳永逸：非交易时段（周末/节假日 + 工作日 15:00-09:30 + 午休 11:30-13:00）
-    //   post_close 模块（MARGIN_DATA / ETF_SUBSCRIPTION 等交易所日频数据）天然返回空，
+    //   post_close 模块（MARGIN_DATA 等交易所日频数据）天然返回空，
     //   与真故障不同，不应进"失败/诊断详情"。只在交易时段 + 盘中报空模块。
     function _isNonTradingWindow(){
       var now = new Date();

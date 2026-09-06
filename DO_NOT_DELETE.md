@@ -75,7 +75,7 @@
 | `raw_data/ic_gate.json` | IC 门禁 MVP 每日产物（策略 gate 信号 + ic_weight） | algorithms/generate_top10.py:614 下游消费；也供 gen_triple_consensus/calc_crds 准出门禁 |
 | `raw_data/strategy_regime_gate.json` | regime 每日门禁（按主人在 2026-08-19 利率上行期框架给各策略 weight） | 下游选股脚本 compute × weight |
 | `raw_data/avg_price.json` | 平均股价（通达信 880003）每日最新值 + 5 日历史 | 由 `scripts/fetch_avg_price.py` 产出；UI 评估后再接驾驶舱/暂未上架页 |
-| `raw_data/etf_subscription_em.json` | ETF 申购赎回东方财富分类聚合（5 类 + 亿元） | 替换旧 `data/ETF_SUBSCRIPTION.js` 宽基+亿份口径；旧文件记录在豁免段 |
+| `raw_data/etf_subscription_em.json` | ETF 申购赎回东方财富分类聚合（5 类 + 亿元） | 旧宽基+亿份口径（data/ETF_SUBSCRIPTION.js / raw_data/etf_subscription.json）已于 2026-09-06 主人令轻量化全链删除 |
 | `raw_data/freshness_sla.json` | 新鲜度 SLA 体检输出（最近 13 个核心 raw_data 文件的 update_time 状态） | `scripts/freshness_sla.py` 产出；挂 `v8_algo.yml 17:00` |
 
 **🛡 2026-09-06 主人令：RPS 相对强度「30 天样本考核」保护段（前端入口已下线，数据链必须保留到考核出结果）**

@@ -29,7 +29,6 @@ _MODULES = [
     {"id": "ETF_4WAY",       "name": "ETF 四路资金流向",      "reason": "稳定但缺 ETF 全量榜单交付",                "status": "evaluation"},
     {"id": "SECTOR_PHASE_HISTORY", "name": "板块周期历史曲线", "reason": "vs push2 接口 5d/10d/20d/60d 趋势",     "status": "spec_lock"},
     {"id": "INDUSTRY_TREE_DRILL", "name": "行业树图（下钻）",  "reason": "申万三级下钻与个股联动未对齐",            "status": "blocked"},
-    {"id": "ETF_SUBSCRIPTION",  "name": "ETF 申购赎回",        "reason": "等东财口径切换完成（fetch_etf_subscription_em.py 已建）", "status": "wip"},
     {"id": "STOCK_RPS_MULTI",   "name": "相对强度多周期",      "reason": "数据齐备，前端卡片未设计",                "status": "design"},
     # 🛡 2026-09-02 主人令：3⭐ 大牛股猎手已决定删除，其独立实验卡（大牛股猎手 X）从模块去向索引移除。
     {"id": "RUNNER_HEALTH",     "name": "Runner 健康监控卡",   "reason": "RUNNER_STATUS 数据已有，前端图表规格未定", "status": "design"},
