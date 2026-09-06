@@ -170,6 +170,23 @@ def main():
     with open(raw_path, "w", encoding="utf-8") as f:
         json.dump(result, f, ensure_ascii=False, indent=2)
 
+    # 🛡 2026-09-06 主人令：每日快照归档 → raw_data/history/potential_YYYYMMDD.json
+    #   （此前选完即丢，永远无法回测；此目录是潜力挖掘 30 交易日考核的唯一输入源，
+    #    删了考核直接报废，保护条目见 DO_NOT_DELETE.md）
+    try:
+        _dd = (result.get("data_date") or "").replace("-", "")
+        if _dd:
+            _hist_dir = os.path.join(RAW, "history")
+            os.makedirs(_hist_dir, exist_ok=True)
+            _hist_path = os.path.join(_hist_dir, f"potential_{_dd}.json")
+            with open(_hist_path, "w", encoding="utf-8") as f:
+                json.dump(result, f, ensure_ascii=False, indent=2)
+            print(f"[ok] 快照归档 {_hist_path}  picks={len(picks)}")
+        else:
+            print("[warn] data_date 为空，本次未归档快照")
+    except Exception as _e:
+        print(f"[warn] 快照归档失败（不影响主输出）: {_e}")
+
 
 if __name__ == "__main__":
     main()
