@@ -1122,11 +1122,12 @@ def run(label, fn, retries=2):
             else:
                 print(f"  ⚠️ {label}: 返回空，跳过")
                 _run_status[label] = {"status": "empty", "msg": "返回空"}
-                # 🛡 2026-09-03 一劳永逸：09:30 后盘中/盘后空结果 → 清盘前残留 premarket_cleared 标记，
+                # 🛡 2026-09-07 一劳永逸：09:30 后盘中/盘后空结果 → 清盘前残留 premarket_cleared 标记，
                 #   避免「盘中仍顶着盘前清空标记」误报 HEALTH_CHECK fail（阿狸咪 08:55 文档漏报的 2 个新 bug）。
-                #   盘前(08:25-09:30)标记本就正确，跳过不清。
+                #   阈值 9.5 → 10.0：盘前清空窗口已推迟到 09:15–10:00（主人令），09:30 轮刚写下的
+                #   premarket_cleared 不能被自己这轮的空结果立刻摘掉，否则前端文案会退回「暂无数据」。
                 _h = now_cst().hour + now_cst().minute / 60.0
-                if _h >= 9.5:
+                if _h >= 10.0:
                     _clear_premarket_marker(label)
             return
         except Exception as e:
@@ -3060,13 +3061,26 @@ def f_v8_cal(today=None):
 
 
 def _clear_intraday_for_premarket(category, only=None):
-    """盘前任务完成后，清空盘中/实时模块的当日数据，避免把昨日收盘数据挂到开盘前。
+    """盘前清空盘中/实时模块的当日数据，避免把昨日收盘数据挂到开盘前。
     明确保留用户指定卡片：上证+深证成交金额/涨跌家数(SH_SZ_HISTORY)、
     主力净流入(CAPITAL_FLOW_DATA)、涨停热力(LIMIT_UP_HEATMAP)。
-    
-    2026-08-10 盘中自愈加固：若当前已处于盘中/收盘后时段（非 00:00-09:30），
+
+    🛡 2026-09-07 主人令（一劳永逸·时点修复）：清空时点由「08:25 盘前轮」推迟到「临近开盘」。
+      原实现挂在 08:25 premarket 轮尾部，一抓完就把 INDEX_QUOTES / ETF_PULSE /
+      ETF_INTRADAY_HEAT / SECTOR_FUND_FLOW / CANDIDATE_QUOTES / MARKET_ALERTS /
+      OVERSEAS_MARKETS 抹成空 stub → 开盘前 60+ 分钟整段空窗
+      （主人原话：「盘前清空的几个卡不应这么早就清空，要9点25分左右才清空」）。
+      这与 index.html 概念资金热力卡注释「清空由后端在开盘前集合竞价窗口
+      (09:15–09:30)统一触发一次」的设计意图本就矛盾——实现写在了 08:25。
+      现改为：仅在真实时间 09:15–10:00 窗口内执行（覆盖 09:30 盘中首轮），
+      08:25 盘前轮照常抓数据但【不再清空】，昨日数据保留到开盘前，
+      由 09:30 盘中首轮在抓取【之前】接棒清空并立刻用今日实时数据覆盖。
+
+    2026-08-10 盘中自愈加固：若当前已处于 10:00 之后（盘中已推进），
     说明调用链有 bug 导致盘前清空逻辑在盘中被触发，直接拒绝执行，防止误清空。"""
-    if category != "premarket" or only is not None:
+    if only is not None:
+        return
+    if category not in ("premarket", "intraday"):
         return
     # 周末/法定假日：不执行清空，保留最后一个交易日（周五）的收盘/盘中数据
     if not _is_trading_day():
@@ -3074,9 +3088,14 @@ def _clear_intraday_for_premarket(category, only=None):
         return
     now = now_cst()
     h = now.hour + now.minute / 60.0
-    if h >= 9.5:  # 09:30 及以后属于盘中或收盘后，禁止执行盘前清空
-        print(f"🚨 盘中自愈守卫：当前 {now.strftime('%H:%M')} 已非盘前时段，"
-              f"拒绝执行 intraday 模块清空（防止 10:49 类误清空再次发生）")
+    # 🛡 2026-09-07 主人令：太早不清空——08:25 盘前轮直接跳过，昨日数据保留到开盘前
+    if h < 9.25:  # 09:15 之前
+        print(f"⏸️ 当前 {now.strftime('%H:%M')} 未到 09:15（临近开盘窗口），"
+              f"跳过盘中模块清空（昨日数据保留到开盘前，由 09:30 盘中首轮接棒）")
+        return
+    if h >= 10.0:  # 10:00 及以后盘中数据已就绪，禁止再清空
+        print(f"🚨 盘中自愈守卫：当前 {now.strftime('%H:%M')} 已过 10:00，"
+              f"拒绝执行 intraday 模块清空（防止误清已抓到的当日数据）")
         return
     today_iso = now.strftime("%Y-%m-%d")
     today_m_d = f"{now.month}/{now.day}"
@@ -3655,13 +3674,20 @@ def main(category=None, only=None):
         except Exception as e:
             print(f"  ⚠️ 四量终极子进程失败: {e}")
 
+    # 🛡 2026-09-07 主人令：盘中首轮（09:30）在抓取【之前】接棒执行盘前清空。
+    #   必须早于 tasks —— 否则会把本轮刚抓到的今日实时数据抹成空 stub（比不清空更糟）。
+    #   时间窗守卫 09:15–10:00 在函数内：08:25 盘前轮、09:00 轮、下午各轮均自动跳过。
+    if category == "intraday" and only is None:
+        _clear_intraday_for_premarket(category, only=only)
+
     for var, fn in tasks:
         if target_vars is not None and var not in target_vars:
             continue
         run(var, fn)
 
-    # 盘前必须把盘中/实时模块的当日数据清空，避免昨日收盘数据挂到开盘前（仅在 premarket 阶段执行）
-    _clear_intraday_for_premarket(category, only=only)
+    # 盘前把盘中/实时模块的当日数据清空（08:25 轮会被时间窗守卫跳过，实际由 09:30 盘中首轮执行）
+    if category == "premarket":
+        _clear_intraday_for_premarket(category, only=only)
 
     # 盘中/收盘/全量抓取后，用实时 raw_data 生成 AI 盘面解读（规则引擎，零成本，稳定可调试）
     # post_close 15:30 运行会生成「收盘」版解读，避免盘中 13:xx 的评论挂到次日。
