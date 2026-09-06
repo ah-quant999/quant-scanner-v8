@@ -101,7 +101,7 @@ ORDER = [
     "fetch_lhb.py",
     # 🛡 2026-08-20 一劳永逸：5 年长 K 线 fetcher 补入算法链（此前无任何调度方，
     #   且只写 out/ 不 bridge raw_data/ → INDEX_HISTORY/MARKET_PATH_PROBABILITY 永不更新）。
-    #   必须在 market_path_probability.py 之前执行（它是概率卡的输入源）。
+    #   必须在 market_path_probability.py 之前执行（历史沿用，现仅维护 INDEX_HISTORY）
     "scripts/fetch_index_history.py",
     # 🛡 2026-08-29 主人令：补跑第二基准（中证1000 / 国证A指），判断 +6% excess 是 alpha 还是风格 beta。
     "scripts/fetch_index_history_multi.py",
@@ -116,7 +116,6 @@ ORDER = [
     "export_optimized_strategy.py",    # → raw_data/optimized_strategy.json（读 backtest_tdx.json 汇总优化策略效果）
     "strategy_four_volume_60m.py",     # → data/FOUR_VOLUME_60M.js（四量终极60min版，baostock独立数据源）
     "strategy_four_volume.py",         # 🛡 2026-08-19 阿狸咪根治孤儿：日线版 FOUR_VOLUME.js 一直在 ORDER 漏挂 → 四星终极卡 4 格 0。render 端已合并读 60m 兜底，这里补齐日线数据链。
-    "market_path_probability.py",      # 🛡 2026-08-19 阿狸咪补对齐：路径概率预测卡 → data/INDEX_HISTORY.js + data/MARKET_PATH_PROBABILITY.js（5年上证K线+江恩+缠论+形态匹配+路径ABC）
     "market_regime.py",                # 🛡 2026-08-19 阿狸咪补对齐：宏观环境卡 → data/MACRO.js + data/MARKET_REGIME.js（国债+LPR+银行间利率+利率上行期板块推荐框架）
     "sector_recommendation.py",        # 🛡 2026-08-19 阿狸咪补对齐：板块推荐卡 → data/SECTOR_RECOMMENDATION.js（13板块按优先级+异动跟随/已涨过标）
     "update_triple_resonance_history.py",  # 累积 triple_resonance_history
@@ -190,7 +189,7 @@ STAGES = {
     "B": [  # 选股批（~18:10 CST，盘后数据齐）：核心选股策略
         "calc_crds.py", "build_candidate_pool.py", "calc_stock_rps.py", "generate_top10.py",
         "strategy_four_volume_60m.py", "strategy_four_volume.py",
-        "market_path_probability.py", "market_regime.py", "sector_recommendation.py",
+        "market_regime.py", "sector_recommendation.py",
         "update_triple_resonance_history.py",   # 累积 triple_resonance_history（在 gen_triple_consensus 之前）
         "gen_triple_consensus.py", "gen_triple_track.py", "calc_volatility_watch.py",
         "gen_stock_stop.py", "gen_algo_track.py", "calc_sentiment_cycle.py",
