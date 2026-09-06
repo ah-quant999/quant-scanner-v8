@@ -1,41 +1,73 @@
 {
  "years": 3,
- "total_signals": 1474,
+ "total_signals": 1470,
+ "cost_bps_per_side": 15,
+ "cost_adjusted": true,
  "periods": {
   "1d": {
-   "count": 1470,
-   "win_rate": 49.4,
-   "avg_return": 0.66,
-   "best": 20.58,
-   "worst": -21.09
+   "count": 1466,
+   "samples": 1466,
+   "win": 658,
+   "loss": 808,
+   "draw": 0,
+   "win_rate": 44.9,
+   "avg_return": 0.36,
+   "best_return": 20.28,
+   "worst_return": -21.39,
+   "max_drawdown": -77.64,
+   "sharpe_ratio": 0.08
   },
   "3d": {
-   "count": 1464,
-   "win_rate": 54.4,
-   "avg_return": 1.86,
-   "best": 59.48,
-   "worst": -24.44
+   "count": 1460,
+   "samples": 1460,
+   "win": 762,
+   "loss": 698,
+   "draw": 0,
+   "win_rate": 52.2,
+   "avg_return": 1.6,
+   "best_return": 59.18,
+   "worst_return": -24.74,
+   "max_drawdown": -82.89,
+   "sharpe_ratio": 0.19
   },
   "5d": {
-   "count": 1462,
-   "win_rate": 54.6,
-   "avg_return": 2.57,
-   "best": 122.03,
-   "worst": -29.66
+   "count": 1458,
+   "samples": 1458,
+   "win": 767,
+   "loss": 691,
+   "draw": 0,
+   "win_rate": 52.6,
+   "avg_return": 2.33,
+   "best_return": 121.73,
+   "worst_return": -29.96,
+   "max_drawdown": -94.33,
+   "sharpe_ratio": 0.21
   },
   "10d": {
-   "count": 1458,
-   "win_rate": 57.2,
-   "avg_return": 3.84,
-   "best": 268.03,
-   "worst": -32.98
+   "count": 1454,
+   "samples": 1454,
+   "win": 816,
+   "loss": 638,
+   "draw": 0,
+   "win_rate": 56.1,
+   "avg_return": 3.58,
+   "best_return": 267.73,
+   "worst_return": -33.28,
+   "max_drawdown": -73.2,
+   "sharpe_ratio": 0.23
   },
   "20d": {
-   "count": 1438,
-   "win_rate": 59.9,
-   "avg_return": 8.46,
-   "best": 362.09,
-   "worst": -46.11
+   "count": 1434,
+   "samples": 1434,
+   "win": 848,
+   "loss": 586,
+   "draw": 0,
+   "win_rate": 59.1,
+   "avg_return": 8.2,
+   "best_return": 361.79,
+   "worst_return": -46.41,
+   "max_drawdown": -152.54,
+   "sharpe_ratio": 0.31
   }
  }
 }
