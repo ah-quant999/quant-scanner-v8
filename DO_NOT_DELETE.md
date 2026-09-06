@@ -55,7 +55,7 @@
 | `data/DO_NOT_DELETE.js` | 禁止删除清单的视图（window.DO_NOT_DELETE_HTML + UPDATED 注入）；由 `scripts/gen_do_not_delete_js.py` 从 `DO_NOT_DELETE.md` 解析；sha10 缓存戳已回写 index.html | 逻辑详解页「🛡️ 防删」子页 100% 依赖；删除即子页回到「加载中…」 |
 
 > 🟢 **豁免清单（DO_NOT_DELETE.md 为唯一裁判，pre-commit hook 读取本区块内含「豁免」二字的行、放行其中反引号包裹的路径删除）**：
-> 🟢 豁免 `data/POTENTIAL_PICKS.js` + `raw_data/potential_picks.json`：潜力挖掘页已删，孤儿产物，全站0引用，允许删除（2026-08-20 主人令）。
+> 🟢 豁免 `data/POTENTIAL_PICKS.js` + `raw_data/potential_picks.json` + `raw_data/history/potential_*.json` + `algorithms/calc_potential_picks.py`：已于 2026-09-06 主人令全链删除（卡下线、考核取消），云端残留允许清理，勿复活。
 > 🟢 豁免 `data/BLOAT_CHECK.js`：v8_bloat_check.py 已停生成（产物迁 .workbuddy/v8_bloat_report.json），全站0引用，允许删除（2026-08-29 轻量化收尾）。
 > 🟢 豁免 `data/DELISTED_STOCKS.js`：renderDelisted 已改读 raw_data/delisted_stocks.json，update_v8.py 已移除映射，全站0引用，允许删除（2026-08-29 轻量化收尾）。
 > 🟢 豁免 `data/MAHORO.js` + `algorithms/fetch_maharo_signals.py` + `.github/workflows/mahoro_refresh.yml` + `scripts/monitor_maharo_refresh.py`：mahoro 全链路引用/监控已移除（commit 7193a5b93），功能上等同删除，全站0引用，允许物理删除（2026-08-29 主人令：mahoro 孤儿清理）。
@@ -96,20 +96,20 @@
 >
 > **防孤儿双保险**：① `update_v8.py` DATA_SOURCES 已加 `"rps_backtest.json": "RPS_BACKTEST"` 映射（weekly_cleanup 有映射不删）；② 本清单 pre-commit 拦截 `raw_data/*.json` 删除。**任何轻量化/瘦身/清理操作不得删除上表文件**。
 
-**🛡 2026-09-06 主人令：暂未上架两卡实证链保护段（AI预测回测 + 潜力挖掘快照考核）**
+**🛡 2026-09-06 主人令：暂未上架实证链保护段（AI预测三轮实证归档；潜力挖掘当晚全链下线）**
 
 > **AI 预测路径概率卡**：2026-09-06 经 108 组参数扫描、180 组条件化匹配扫描、8 特征 logistic  walk-forward  监督校准三轮实证，均未过判据门（OOS 命中 > 基率+3pp 且 Brier < 基线）。2026-09-06 主人最终拍板：**删除该卡及全部数据链**。已删除：`index.html` / `logic.html` 卡块与函数、`data/MARKET_PATH_PROBABILITY.js`、`raw_data/market_path_probability.json`、`algorithms/market_path_probability.py`，并从 `run_algorithms.py` / `update_v8.py` 移除管线。
 >
-> ② 潜力挖掘自 2026-09-06 起满 **30 个交易日**（约 2026-10-中），Top15 的 T+5 胜率/平均收益跑赢全市场基线 → 留并升级（接 fetch_fundamental_quality 补估值维度）；跑不赢 → 降级下架。
+> ② 潜力挖掘：原定 30 交易日快照考核 —— 2026-09-06 晚主人拍板取消（无独立回测链、与三重共识/动量共识高度重叠、信息增量不足），全链下线，potential 文件允许清理、勿复活。
 >
 > | 文件 | 作用 | 产出方 | 状态 |
 > |---|---|---|---|
 > | `algorithms/market_path_probability.py` | 原 AI 预测数据生成器 | 已从算法链移除 | ❌ 已删除 |
 > | `data/MARKET_PATH_PROBABILITY.js` | 原前端数据注入 | `update_v8.py` | ❌ 已删除 |
 > | `raw_data/market_path_probability.json` | 原算法产物 | `market_path_probability.py` | ❌ 已删除 |
-> | `raw_data/history/potential_*.json` | 潜力挖掘每日快照（考核唯一输入源，删了考核直接报废） | `calc_potential_picks.py`（主链每日归档） | ✅ 保护中（30 天考核进行，约 2026-10-中） |
+> | `raw_data/history/potential_*.json` + `data/POTENTIAL_PICKS.js` + `raw_data/potential_picks.json` + `algorithms/calc_potential_picks.py` | 潜力挖掘全链 | 已全部删除 | ❌ 已删除（考核取消） |
 >
-> **任何轻量化/瘦身/清理操作不得删除上表「潜力挖掘快照」文件；AI 预测相关文件已删除，勿以本段为由复活。**
+> **AI 预测与潜力挖掘相关文件均已删除，均勿以本段为由复活。**
 
 ---
 
