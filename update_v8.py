@@ -120,6 +120,7 @@ DATA_SOURCES = {
     "stock_rps.json":              "STOCK_RPS_DATA",
     "factor_lab_backtest.json":    "FACTOR_LAB_BACKTEST",  # 🆕 2026-09-04 因子实验室独立分层回测
     "rps_backtest.json":           "RPS_BACKTEST",  # 🆕 2026-09-06 主人令：RPS 30天样本考核防孤儿（weekly_cleanup 有映射不删；考核详见 DO_NOT_DELETE.md / logic.html）
+    # "path_probability_backtest.json": "PATH_PROB_BACKTEST",  # 2026-09-06 已注释：AI预测卡下架，停止发布
     # 🛡 2026-08-30 一劳永逸式：补 ETF 申购赎回东方财富口径（股票/债券/货币/商品/跨境 5 类 + 亿元），
     #   替代旧宽基指数 + 亿份口径（旧 ETF_SUBSCRIPTION.js 保留作 legacy，不入 DATA_SOURCES）。
     #   旧 data/ETF_SUBSCRIPTION.js 已写好的 "sh"/"sz"/"update_time" 老口径**保留**，前端同时读 window.ETF_SUBSCRIPTION。
