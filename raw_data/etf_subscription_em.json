@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-09-07 04:01:25",
+  "update_time": "2026-09-07 05:03:08",
   "source": "akshare fund_etf_spot_em (东方财富)",
   "metric": "净流入(亿元) + 规模(亿元)",
   "categories": {
     "stock": {
       "name": "股票型",
       "net_amount_yi": -74.55151474999994,
-      "scale_yi": 29298.54546659002,
+      "scale_yi": 29295.550560450025,
       "n_funds": 1304,
       "top5": [
         {
@@ -51,13 +51,13 @@
     "money": {
       "name": "货币型",
       "net_amount_yi": 0.58801989,
-      "scale_yi": 548.71061458,
+      "scale_yi": 546.88840435,
       "n_funds": 50,
       "top5": [
         {
           "code": "159201",
           "name": "自由现金流ETF华夏",
-          "scale_yi": 164.33,
+          "scale_yi": 161.84,
           "net_amount_yi": 0.1212
         },
         {
@@ -69,7 +69,7 @@
         {
           "code": "159399",
           "name": "现金流ETF国泰",
-          "scale_yi": 43.63,
+          "scale_yi": 44.86,
           "net_amount_yi": 0.3193
         },
         {
@@ -89,13 +89,13 @@
     "commodity": {
       "name": "商品型",
       "net_amount_yi": -2.5789582099999997,
-      "scale_yi": 3579.69976582,
+      "scale_yi": 3583.67065029,
       "n_funds": 55,
       "top5": [
         {
           "code": "518880",
           "name": "黄金ETF华安",
-          "scale_yi": 1074.19,
+          "scale_yi": 1073.28,
           "net_amount_yi": 3.075
         },
         {
@@ -113,7 +113,7 @@
         {
           "code": "518800",
           "name": "黄金ETF国泰",
-          "scale_yi": 360.82,
+          "scale_yi": 363.6,
           "net_amount_yi": 0.2892
         },
         {
@@ -127,7 +127,7 @@
     "cross_border": {
       "name": "跨境型",
       "net_amount_yi": 15.658460359999998,
-      "scale_yi": 6195.12067088,
+      "scale_yi": 6203.531488399998,
       "n_funds": 192,
       "top5": [
         {
