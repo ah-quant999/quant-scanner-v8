@@ -530,7 +530,7 @@ window.__domReadyFns=[];
 <script src="data/CONCEPT_RANKING.js?v=9eebef2abb" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/INDEX_QUOTES.js?v=72be861ad0" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=e27531362d" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=089b007630" defer></script>
 <script src="data/MARGIN_DATA.js?v=3c891fb841" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=d29c7dedf6" defer></script>
 <script src="data/IPO_DATA.js?v=56c226435c" defer></script>
@@ -1562,10 +1562,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/PERFORMANCE_FORECAST.js?v=9f0cddda2f" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=a87b6a4297" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=90d20c8818" defer></script>
-<script src="data/HEALTH_CHECK.js?v=51a0fbaf69" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=4c7019a1f5" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=fbecc731b6" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=17260fa2e4" defer></script>
+<script src="data/HEALTH_CHECK.js?v=56c3ae2c03" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=8a904f1fc7" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=bebbeae1be" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=1adba88ce2" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=6afbf538a0" defer></script>
@@ -12984,7 +12984,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=51a0fbaf69')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=56c3ae2c03')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
