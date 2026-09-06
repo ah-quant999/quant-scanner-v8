@@ -33,7 +33,6 @@
     "INDEX_QUOTES": "intraday",
     "ETF_PULSE": "intraday",
     "ETF_INTRADAY_HEAT": "intraday",
-    "ETF_SUBSCRIPTION": "premarket",
     "ETF_DAILY_MONITOR": "intraday",
     "SECTOR_FUND_FLOW": "intraday,post_close",
     "SECTOR_FUND_FLOW_INTRADAY": "intraday,post_close",
