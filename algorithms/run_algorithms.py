@@ -91,9 +91,9 @@ ORDER = [
     "fetch_stock_names.py",
     # 🛡 2026-08-26 一劳永逸（对齐）：原 gen_stock_profile.py 仅被 cloud_fetch_v8 在 post_close
     #   副作用式调用，run_algorithms 算法链从不调度 → 本地跑/该步跳过时 stock_profile.json 陈旧，
-    #   致 calc_potential_picks(潜力挖掘) 与 final_recommend 读脏数据。现正式挂链（仅依赖 stock_names），
+    #   致 final_recommend 读脏数据。现正式挂链（仅依赖 stock_names），
     #   使算法链自洽、不依赖上游副作用。门控仍保留作安全网。
-    "gen_stock_profile.py",            # → raw_data/stock_profile.json（个股行业/概念，潜力挖掘&最终推荐共用）
+    "gen_stock_profile.py",            # → raw_data/stock_profile.json（个股行业/概念，最终推荐用）
     "fetch_stock_quote_v8.py",         # → raw_data/stock_quote.json + data/STOCK_QUOTE.js（全市场实时报价快照，查股功能用）
     "fetch_sh_index_fib.py",
     "fetch_inst_trade.py",
@@ -137,7 +137,6 @@ ORDER = [
     # ── 2026-08-17 主人怒令「每个前端的算法都全面审计」补入：之前完全不调度，前端卡永远陈旧 ──
     "calc_sentiment_cycle.py",          # → data/SENTIMENT_CYCLE.js（情绪周期，读 LIMIT_UP_HEATMAP；之前无任何 workflow 调用 = 孤儿）
     "refresh_dividend_cninfo.py",       # → 更新 STOCK_QUOTE 分红字段（读 PORTFOLIO/CANDIDATE/GOLD_POOL；之前无任何 workflow 调用）
-    "calc_potential_picks.py",          # 🔮 2026-08-23 恢复：潜力挖掘（板块+股票预测推荐） → data/POTENTIAL_PICKS.js（读 CONCEPT_RANKING+STOCK_PROFILE+STOCK_QUOTE）
     # 🛡 2026-08-18 一劳永逸式修复：以下两脚本原不在 run_algorithms 链中，导致前端卡长期陈旧
     #   - refresh_stock_metadata.py → raw_data/weekend_meta_report.json（周末复盘，月度个股资料）
     #   - fetch_weekend_run.py → raw_data/weekend_run.json（周度运行汇总）
@@ -193,7 +192,7 @@ STAGES = {
         "update_triple_resonance_history.py",   # 累积 triple_resonance_history（在 gen_triple_consensus 之前）
         "gen_triple_consensus.py", "gen_triple_track.py", "calc_volatility_watch.py",
         "gen_stock_stop.py", "gen_algo_track.py", "calc_sentiment_cycle.py",
-        "refresh_dividend_cninfo.py", "calc_potential_picks.py",
+        "refresh_dividend_cninfo.py",
         "refresh_stock_metadata.py", "fetch_weekend_run.py",   # 周末复盘/周度汇总（原 ORDER 漏挂 STAGE）
         "auto_run_dn_algorithm.py", "strong_breakout.py", "track_h_auto_buy.py",
         "scripts/momentum_common_filter.py",   # 🆕 2026-09-04 挂链：动量共识筛选（读 STOCK_QUOTE，纯本地）
