@@ -98,16 +98,18 @@
 
 **🛡 2026-09-06 主人令：暂未上架两卡实证链保护段（AI预测回测 + 潜力挖掘快照考核）**
 
-> **考核标准**：① **AI 预测路径概率 —— 2026-09-06 主人拍板：定位=「预测大盘后续」的前瞻参考卡 → 前端恢复展示**。walk-forward 回测（E 批逐日复跑生产匹配引擎）首轮 verdict=INVALID；主人令「重跑+调参」后做 108 组参数扫描（窗口 20/40/60 × 相似阈值 0.55–0.70 × topk 10/20/30 × horizon 5/10/20，前 80% 选参 / 后 20% OOS 验证）：**训练集全部参数 Brier 增益为负、OOS 命中 33.1% vs 基率 39.4%、Brier 0.755 vs 0.660**——形态匹配概率在 T+5 尺度≈噪声，无任何参数体制有真实 edge。回测管线（`path_probability_backtest.py`）与孤儿数据维持移除；前端 AI 预测卡已在 index.html + logic.html 恢复（2026-09-06），卡内标注「回测暂无统计优势，解读请保守」。（参考判据见 logic.html AI 预测段）
+> **AI 预测路径概率卡**：2026-09-06 经 108 组参数扫描、180 组条件化匹配扫描、8 特征 logistic  walk-forward  监督校准三轮实证，均未过判据门（OOS 命中 > 基率+3pp 且 Brier < 基线）。2026-09-06 主人最终拍板：**删除该卡及全部数据链**。已删除：`index.html` / `logic.html` 卡块与函数、`data/MARKET_PATH_PROBABILITY.js`、`raw_data/market_path_probability.json`、`algorithms/market_path_probability.py`，并从 `run_algorithms.py` / `update_v8.py` 移除管线。
+>
 > ② 潜力挖掘自 2026-09-06 起满 **30 个交易日**（约 2026-10-中），Top15 的 T+5 胜率/平均收益跑赢全市场基线 → 留并升级（接 fetch_fundamental_quality 补估值维度）；跑不赢 → 降级下架。
 >
 > | 文件 | 作用 | 产出方 | 状态 |
 > |---|---|---|---|
-> | `algorithms/path_probability_backtest.py` | AI预测 walk-forward 回测引擎 | 算法链 E 批 | ⚠️ 2026-09-06 已移出 E 批调度（回测不再作为评判依据） |
-> | `raw_data/path_probability_backtest.json` + `data/PATH_PROB_BACKTEST.js` | 回测产物 | E 批每日刷新 | ❌ 2026-09-06 已删除（孤儿数据） |
+> | `algorithms/market_path_probability.py` | 原 AI 预测数据生成器 | 已从算法链移除 | ❌ 已删除 |
+> | `data/MARKET_PATH_PROBABILITY.js` | 原前端数据注入 | `update_v8.py` | ❌ 已删除 |
+> | `raw_data/market_path_probability.json` | 原算法产物 | `market_path_probability.py` | ❌ 已删除 |
 > | `raw_data/history/potential_*.json` | 潜力挖掘每日快照（考核唯一输入源，删了考核直接报废） | `calc_potential_picks.py`（主链每日归档） | ✅ 保护中（30 天考核进行，约 2026-10-中） |
 >
-> **任何轻量化/瘦身/清理操作不得删除上表「潜力挖掘快照」文件；AI 预测回测相关文件已下架，勿以本段为由复活。**
+> **任何轻量化/瘦身/清理操作不得删除上表「潜力挖掘快照」文件；AI 预测相关文件已删除，勿以本段为由复活。**
 
 ---
 
