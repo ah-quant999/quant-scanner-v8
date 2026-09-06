@@ -875,6 +875,12 @@ window.V8_CAL = {weeks:[],legend:[]};
       var sla = window._staleSlaHours(slot);
       // 实时/盘中类：非交易时段（收盘后、周末、节假日）不判陈旧，避免夜间与周末满屏红
       if(sla <= 1.5 && !window._isMarketHoursCST()) return { stale:false, ageH:ageH, text:'' };
+      // 2026-09-06 fix: 日频/盘后/中长线数据按「流逝的交易日」计数，非交易日天然允许用上一交易日数据
+      if(sla >= 22){
+        var tradingDays = window._tradingDaysBetween ? window._tradingDaysBetween(d, new Date()) : Math.floor(ageH / 24);
+        if(tradingDays <= 0) return { stale:false, ageH:ageH, text:'' };
+        return { stale:true, ageH:ageH, text:'⚠️ 已停更 ' + tradingDays + ' 个交易日' };
+      }
       if(ageH <= sla) return { stale:false, ageH:ageH, text:'' };
       var days = Math.floor(ageH / 24);
       var txt = days >= 1 ? ('⚠️ 已停更 ' + days + ' 天') : ('⚠️ 已停更 ' + Math.round(ageH) + ' 小时');
