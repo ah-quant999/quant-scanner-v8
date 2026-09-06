@@ -1,1 +1,43 @@
-{"run_time":"2026-09-07 00:02:17","category":"all","hostname":"","modules":{"CANDIDATE_QUOTES":{"status":"ok","msg":"成功"}},"summary":{"total":1,"ok":1,"empty":0,"fail":0}}
+{
+  "update_time": "2026-09-07 00:07:50",
+  "status": "ok",
+  "process": {
+    "ok": true,
+    "listener": true,
+    "worker": true,
+    "details": [
+      "runner.listener",
+      "runner.worker"
+    ]
+  },
+  "service": {
+    "ok": false,
+    "status": "NOT_FOUND",
+    "exists": false
+  },
+  "worker_logs": {
+    "ok": true,
+    "errors": [],
+    "scanned": 1,
+    "message": "最近日志无错误"
+  },
+  "github": {
+    "ok": true,
+    "consecutive_failures": 0,
+    "checkout_failures": 0,
+    "latest_run_id": 34044128705,
+    "latest_failed": false,
+    "latest_status": "in_progress",
+    "stuck_min": 6,
+    "is_fail": false,
+    "is_warn": false,
+    "message": "self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 盘后算法链(cn) in_progress (已卡住 6 分)"
+  },
+  "runner_env": {
+    "ok": true,
+    "threshold": 100000,
+    "message": "阈值=100000（一劳永逸目标 2000）"
+  },
+  "actions_taken": [],
+  "message": "runner进程=正常; 服务=NOT_FOUND; 日志=最近日志无错误; GitHub=self-hosted 最近 15 条中连续失败 0 次，checkout 失败 0 次，最新 🇨🇳 v8 盘后算法链(cn) in_progress (已卡住 6 分)"
+}
