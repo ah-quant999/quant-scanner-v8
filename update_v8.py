@@ -212,9 +212,8 @@ CATEGORY_MAP = {
     "AVG_PRICE_DATA": "intraday",
     # 2026-08-15：ALGO_TRACK 依赖 FINAL_RECOMMEND_DATA + FOUR_VOLUME，归属盘后
     "ALGO_TRACK": "post_close",
-    # 2026-08-19：路径概率预测卡数据源（盘后跑，与算法链节奏一致）
+    # 2026-08-19：INDEX_HISTORY（5年K线）数据源（盘后跑，与算法链节奏一致）
     "INDEX_HISTORY": "post_close",
-    "MARKET_PATH_PROBABILITY": "post_close",
     # 2026-08-19：板块推荐框架数据源（盘后跑宏观+板块融合；MACRO.js 已删孤儿→不注册）
     "MARKET_REGIME": "post_close",
     "SECTOR_RECOMMENDATION": "post_close",
