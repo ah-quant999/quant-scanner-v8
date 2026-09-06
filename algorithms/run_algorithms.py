@@ -210,6 +210,7 @@ STAGES = {
         "v8/backtest_crds.py",   # 逆势龙头 回测（原 ORDER 漏挂 STAGE）
         "v8/backtest_rps.py",   # 🆕 2026-09-06 主人令：RPS A档 30 天样本考核（读 history/stock_rps_* 日归档 → raw_data/rps_backtest.json；baostock 失败自动降级空回测不挂 CI）
         "factor_lab_backtest.py",   # 🆕 因子实验室分层回测（读 _rps_cache，依赖 B 批 calc_stock_rps）
+        "path_probability_backtest.py",  # 🆕 2026-09-06 主人令：AI预测路径概率 walk-forward 回测（复用生产匹配引擎逐日评估 → raw_data/path_probability_backtest.json）
         "strategy_four_volume.py",  # 四量终极回测模式（SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js，根治孤儿）
     ],
     "D": [  # 汇总批（~20:00 CST，依赖全部）：因子实验室 + final_recommend（LHB历史/7d/生命周期由主流程前置）
