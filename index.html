@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "f0bccb4c8";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "2c132030d";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -530,7 +530,7 @@ window.__domReadyFns=[];
 <script src="data/CONCEPT_RANKING.js?v=5149d0227b" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/INDEX_QUOTES.js?v=bee7abe628" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=5770954414" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=f03c26c969" defer></script>
 <script src="data/MARGIN_DATA.js?v=f1e1c834c6" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=99c0cecd89" defer></script>
 <script src="data/IPO_DATA.js?v=b816b70010" defer></script>
@@ -1566,14 +1566,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/PERFORMANCE_FORECAST.js?v=126a83fb5b" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=aa074c8849" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=8fc0bc09af" defer></script>
-<script src="data/HEALTH_CHECK.js?v=4eaa325291" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=6f813c4cdc" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=8d38d4e629" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=9ee19f35c8" defer></script>
+<script src="data/HEALTH_CHECK.js?v=4c0a5a21fd" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=8ada102f10" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=a9c2fe3f75" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=0c0db6fdec" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=e6ef678e90" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=5b769ff5a2" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=ffb63d10e9" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=ee63d9d371" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=69baa71f75" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=f4d7a02a54" defer></script>
     <!-- 2026-09-04 主人令收尾：ALLSITE_BACKTEST.js 注入已删（生成器/raw_data 已于 09-03「干掉全站精选」系列删除，前端无任何代码读 window.ALLSITE_BACKTEST，标签纯 404 噪音） -->
@@ -5450,139 +5450,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.6;">子 tab 已于 09-03 轻量化下线；数据链（STOCK_RPS / rps_backtest）保留每日续跑纯观测。RPS <b>不参与</b>选股评分权重（引擎 0 引用），本卡仅考核观测，不构成投资建议。T+3 / T+20 为参考列。</div>';
   };
 
-  // ===== 🔭 主题空间 · 价值投资 实验卡（2026-09-06 主人令：暂未上架·实验区最下方 · 实验版）=====
-  // 实验版边界：纯前端交叉现有数据（STOCK_LIST 概念标签 × PERFORMANCE_FORECAST 业绩预告 × FACTOR_LAB ROE榜），
-  // 无新增管线、不进选股评分；业务实质（订单/管线/收入占比）数据源缺失 → 属「正确版」升级项，30天观察达标后再立项。
-  window.__tvRetry = 0;
-  window.__tvTheme = 'ai_pharma';
-  window.__TV_THEMES = {
-    ai_pharma: { label:'🧬 AI制药', kws:['AI制药','创新药','CRO','生物医药','医药外包'] },
-    ai_med:    { label:'🏥 AI医疗', kws:['AI医疗','智慧医疗','互联网医疗','医疗信息化','远程医疗'] },
-    robot:     { label:'🤖 人形机器人', kws:['人形机器人','机器人','减速器','具身智能'] },
-    solid:     { label:'🔋 固态电池', kws:['固态电池','钠离子电池','锂电池','电池技术'] },
-    lowalt:    { label:'🚁 低空经济', kws:['低空经济','eVTOL','无人机','通用航空'] },
-    compute:   { label:'🖥 算力/CPO', kws:['CPO','光通信','算力','液冷','数据中心'] },
-    dataelem:  { label:'🗂 数据要素', kws:['数据要素','数据安全','数字经济'] }
-  };
-  window.__tvSetTheme = function(k){
-    window.__tvTheme = k;
-    window.__tvRetry = 0; // 重置：若数据未就绪允许重新走重试
-    window.__renderThemeValue();
-  };
-  window.__renderThemeValue = function(){
-    var dst = document.getElementById('themeValueBody');
-    if(!dst) return;
-    var _ev = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
-    var L = window.STOCK_LIST, arr = (L && L.data) || null;
-    var PF = window.PERFORMANCE_FORECAST, FL = window.FACTOR_LAB;
-    if((!arr || !arr.length) && !(window.STOCK_PROFILE && window.STOCK_PROFILE.profiles)){
-      if(window.__tvRetry < 20){ window.__tvRetry++; setTimeout(window.__renderThemeValue, 900); return; }
-      dst.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">🔭 股票画像（STOCK_LIST）尚未加载到位，稍后重进本页即可重试</div>';
-      return;
-    }
-    // 证据映射：① 业绩预告正向（预增/扭亏/略增）② ROE 大市值档 Top30
-    var perfMap = {};
-    ((PF && PF.items) || []).forEach(function(it){
-      if(!it || !it.code) return;
-      if(['预增','扭亏','略增','续盈','续增'].indexOf(it.type) < 0) return;
-      if(perfMap[it.code] == null) perfMap[it.code] = it;
-    });
-    var roeMap = {};
-    ((FL && FL.roe_largecap && FL.roe_largecap.top) || []).forEach(function(r){
-      if(r && r.code) roeMap[String(r.code).replace(/^[^.]+\./, '')] = r;
-    });
-    var nScanned = 0, hits = [];
-    function pushHit(code, name, industry, concepts){
-      nScanned++;
-      var th = window.__TV_THEMES[window.__tvTheme] || window.__TV_THEMES.ai_pharma;
-      var matched = [];
-      for(var ci=0; ci<concepts.length; ci++){
-        var c = concepts[ci];
-        if(!c) continue;
-        for(var ki=0; ki<th.kws.length; ki++){
-          var kw = th.kws[ki];
-          if(c.indexOf(kw) >= 0 || kw.indexOf(c) >= 0){ if(matched.indexOf(c) < 0) matched.push(c); break; }
-        }
-      }
-      if(matched.length) hits.push({code:code, name:name, industry:industry, tags:matched, perf:perfMap[code]||null, roe:roeMap[code]||null});
-    }
-    if(arr && arr.length){
-      for(var i=0; i<arr.length; i++){
-        var s = arr[i];
-        if(s && s.code) pushHit(s.code, s.name||'', s.industry||'', s.concepts||[]);
-      }
-    } else {
-      var profiles = window.STOCK_PROFILE.profiles;
-      for(var code in profiles){
-        var p = profiles[code];
-        if(p) pushHit(code, '', p.industry||'', p.concepts||[]);
-      }
-    }
-    function perfBadge(it){
-      if(!it) return '';
-      var isProfit = (it.indicator||'').indexOf('利润') >= 0;
-      var v = (it.change_pct == null) ? '' : (it.change_pct > 0 ? '+' : '') + it.change_pct.toFixed(1) + '%';
-      return '<span style="font-size:10px;color:#ef5350;font-weight:600;">📈' + _ev(it.type) + (v ? ' ' + v : '') + '(' + (isProfit?'净利':'营收') + ')</span>';
-    }
-    function roeBadge(r){
-      if(!r || r.roe_ttm == null) return '';
-      return '<span style="font-size:10px;color:#38bdf8;font-weight:600;">💎 ROE_TTM ' + r.roe_ttm.toFixed(1) + '%</span>';
-    }
-    // 分档：A=概念+业绩正向  B=概念+ROE榜  C=仅概念命中（按 A→B→C、命中标签数、业绩幅度排序）
-    hits.forEach(function(x){ x.tier = x.perf ? 0 : (x.roe ? 1 : 2); });
-    hits.sort(function(a,b){
-      return a.tier - b.tier || b.tags.length - a.tags.length
-        || ((b.perf && b.perf.change_pct) || 0) - ((a.perf && a.perf.change_pct) || 0);
-    });
-    var TV_MAX = 60;
-    var shown = hits.slice(0, TV_MAX);
-    var nA = 0, nB = 0;
-    hits.forEach(function(x){ if(x.tier===0) nA++; else if(x.tier===1) nB++; });
-    var cards = shown.map(function(x){
-      var border = x.tier===0 ? '#ef5350' : (x.tier===1 ? '#38bdf8' : '#94a3b8');
-      var tagStr = x.tags.slice(0,2).map(_ev).join(' / ') + (x.tags.length > 2 ? ' +' + (x.tags.length-2) : '');
-      var badge = perfBadge(x.perf);
-      var b2 = roeBadge(x.roe);
-      if(badge && b2) badge += ' ' + b2; else if(b2) badge = b2;
-      if(!badge) badge = '<span style="font-size:10px;color:var(--dim);">仅概念命中</span>';
-      return '<div style="border:1px solid ' + border + '44;border-left:3px solid ' + border + ';border-radius:8px;padding:6px 8px;font-size:12px;background:rgba(148,163,184,.05);">'
-        + '<div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><b>' + _ev(x.code) + '</b> <span style="color:var(--sub);font-weight:400;">' + _ev(x.name) + '</span></div>'
-        + '<div style="color:var(--dim);font-size:10.5px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + _ev(x.industry) + '</div>'
-        + '<div style="color:var(--sub);font-size:10.5px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">🏷 ' + tagStr + '</div>'
-        + '<div style="margin-top:3px;">' + badge + '</div>'
-        + '</div>';
-    }).join('');
-    var chips = '';
-    for(var tk in window.__TV_THEMES){
-      var t = window.__TV_THEMES[tk];
-      var act = tk === window.__tvTheme;
-      chips += '<button onclick="window.__tvSetTheme(\'' + tk + '\')" style="padding:5px 12px;border-radius:8px;font-size:12px;cursor:pointer;border:1px solid ' + (act ? '#a78bfa' : 'var(--border)') + ';background:' + (act ? 'rgba(167,139,250,.15)' : 'var(--card)') + ';color:' + (act ? '#c4b5fd' : 'var(--sub)') + ';font-weight:600;transition:.15s;">' + t.label + '</button>';
-    }
-    var stamp = (L && L.update_time) || (window.STOCK_PROFILE && window.STOCK_PROFILE.update_time) || '—';
-    var nPerf = Object.keys(perfMap).length, nRoe = Object.keys(roeMap).length;
-    dst.innerHTML = ''
-      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-      + '<b style="font-size:15px;">🔭 主题空间 · 价值投资</b>'
-      + '<span style="font-size:10px;font-weight:600;color:#a78bfa;background:rgba(167,139,250,.12);padding:1px 6px;border-radius:4px;">实验版 · 纯前端交叉 · 无新增管线</span>'
-      + '<span class="fresh">画像 ' + _ev(stamp) + '</span>'
-      + '</div>'
-      + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">' + chips + '</div>'
-      + '<div style="font-size:11.5px;color:var(--sub);margin-bottom:8px;line-height:1.6;">'
-      + '本主题命中 <b style="color:var(--txt);">' + hits.length + '</b> 只：'
-      + '<span style="color:#ef5350;font-weight:600;">A档 概念+业绩正向 ' + nA + '</span> · '
-      + '<span style="color:#38bdf8;font-weight:600;">B档 概念+ROE榜 ' + nB + '</span> · '
-      + '<span style="color:var(--dim);">C档 仅概念 ' + (hits.length - nA - nB) + '</span>'
-      + '<br>证据覆盖现状：业绩预告正向 ' + nPerf + ' 只 · ROE大市值榜 ' + nRoe + ' 只 / 画像全市场 ' + nScanned + ' 只 —— 基本面证据极窄属实验版现状，全市场基本面管线 = 正确版升级项。'
-      + '</div>'
-      + (cards ? '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;">' + cards + '</div>'
-               : '<div class="note" style="color:var(--dim);">本主题无概念命中，换个主题试试</div>')
-      + (hits.length > TV_MAX ? '<div style="font-size:11px;color:var(--dim);margin-top:6px;">仅展示前 ' + TV_MAX + ' 只 / 共 ' + hits.length + ' 只（按 A→B→C、命中标签数、业绩幅度排序）</div>' : '')
-      + '<div style="background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.3);border-radius:7px;padding:8px 10px;margin-top:10px;font-size:11px;line-height:1.7;color:var(--sub);">'
-      + '⚠️ <b style="color:#c4b5fd;">实验版边界</b>：概念标签 ≠ 业务实质（无订单/管线/收入占比数据源）。「华兰股份有没有 AI 制药实质」这类问题需「正确版」管线（财报三表 + 主营构成 + 公告关键词 + 估值模型）支撑——本卡 30 天观察达标后再立项。30 天样本考核链未挂（实验版纯人工观察），不进选股评分，不构成投资建议。'
-      + '</div>';
-  };
-
-  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderRpsAudit(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} }
+  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderRpsAudit(); }catch(e){} }
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', _renderPostReady);
   } else {
@@ -11005,9 +10873,6 @@ window.showRestrictedItems = showRestrictedItems;
       if(tab==='lab' && typeof window.__renderRpsAudit==='function'){
         try{ window.__renderRpsAudit(); }catch(e){}
       }
-      if(tab==='lab' && typeof window.__renderThemeValue==='function'){
-        try{ window.__renderThemeValue(); }catch(e){}
-      }
     };
     if(!window.__ulSelfHealTimer){
       window.__ulSelfHealTimer=setInterval(function(){
@@ -11040,7 +10905,7 @@ window.showRestrictedItems = showRestrictedItems;
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=0c0db6fdec';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=ffb63d10e9';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -11049,7 +10914,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=e6ef678e90';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=ee63d9d371';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -11082,7 +10947,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 2026-08-14 主人令：情绪周期定位/潜力挖掘 已迁至选股策略子TAB「潜力参考」(st-pr)，此处不再重复渲染
     // 2026-08-18 主人令：ETF·龙头参考 已迁入「暂未上架 > 调试专区」，此处不再重复渲染
 
-    // 暂未上架页经 09-01/09-02 多轮重构，当前卡片清单以 renderUnlisted 实际渲染为准（概念ETF龙头参考/因子实验室/RPS考核/主题空间实验卡/宏观景气K型）。
+    // 暂未上架页经 09-01/09-02 多轮重构，当前卡片清单以 renderUnlisted 实际渲染为准（概念ETF龙头参考/因子实验室/RPS考核/宏观景气K型）。
 
     // ===== 子 tab 导航（实验区 · 宏观观测）=====
     h += '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:10px;">'
@@ -11106,8 +10971,6 @@ window.showRestrictedItems = showRestrictedItems;
     // ═══ 2026-09-06 主人令：RPS 相对强度「30 天样本考核」卡迁回实验区 pane —— 前端展示不会被遗忘；
     //     数据链保留纯观测（E 批 21:00 每日续跑），不参与选股评分权重；达标才谈恢复子 tab/进评分 ═══
     h += '<div class="card" id="rpsAuditBody" style="margin-bottom:16px;border-left:4px solid #94a3b8;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">📈 相对强度 RPS · 30 天样本考核 加载中…</div></div>';
-    // ═══ 2026-09-06 主人令：主题空间·价值投资 实验版卡迁入实验区最下方（概念×业绩×ROE 纯前端交叉，无新增管线）═══
-    h += '<div class="card" id="themeValueBody" style="margin-bottom:16px;border-left:4px solid #a78bfa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">🔭 主题空间 · 价值投资 实验卡 加载中…</div></div>';
     h += '</div>'; // /ulPaneLab
 
     // ===== 宏观观测 pane =====
@@ -11184,9 +11047,6 @@ window.showRestrictedItems = showRestrictedItems;
       if(tab==='lab' && typeof window.__renderRpsAudit==='function'){
         try{ window.__renderRpsAudit(); }catch(e){}
       }
-      if(tab==='lab' && typeof window.__renderThemeValue==='function'){
-        try{ window.__renderThemeValue(); }catch(e){}
-      }
     };
     // ⚖️ 2026-08-14 主人令：renderPortfolio 调用已删除（持仓跟踪卡整段移除）
     // 2026-08-14 主人令：涨价榜/情绪周期/潜力挖掘 fill 改由 switchSt('pr') 触发（已迁选股策略子TAB）
@@ -11202,8 +11062,6 @@ window.showRestrictedItems = showRestrictedItems;
     // 🧪 2026-09-03 主人令：因子实验室迁入暂未上架后随本函数重渲（此前 DOM ready 时容器尚不存在）
     try{ if(typeof window.__renderFactorLab==='function') window.__renderFactorLab(); }catch(e){ console.warn('因子实验室卡渲染失败', e); }
     try{ if(typeof window.__renderRpsAudit==='function') window.__renderRpsAudit(); }catch(e){ console.warn('RPS考核卡渲染失败', e); }
-    // 🔭 2026-09-06 主人令：主题空间·价值投资 实验卡随 renderUnlisted 重渲（实验区最下方）
-    try{ if(typeof window.__renderThemeValue==='function') window.__renderThemeValue(); }catch(e){ console.warn('主题空间实验卡渲染失败', e); }
   }
 
   /* ═══════════ 2026-08-19 主人令：2 张新卡 render 函数（宏观+板块推荐）══ 暂未上架·调试专区 ═══════════ */
@@ -12920,7 +12778,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=4eaa325291')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=4c0a5a21fd')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
