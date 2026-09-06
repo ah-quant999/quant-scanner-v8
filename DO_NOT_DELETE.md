@@ -98,15 +98,16 @@
 
 **🛡 2026-09-06 主人令：暂未上架两卡实证链保护段（AI预测回测 + 潜力挖掘快照考核）**
 
-> **考核标准**：① AI 预测路径概率 walk-forward 回测 `raw_data/path_probability_backtest.json`（E 批每日刷新）——verdict=VALID 才算有真实 edge（判据全文见 logic.html AI 预测段：样本≥100 且 主路径命中率−基率≥+3pp 且 Brier 低于基线）；② 潜力挖掘自 2026-09-06 起满 **30 个交易日**（约 2026-10-中），Top15 的 T+5 胜率/平均收益跑赢全市场基线 → 留并升级（接 fetch_fundamental_quality 补估值维度）；跑不赢 → 降级下架。
+> **考核标准**：① **AI 预测路径概率 —— 2026-09-06 回测结论 INVALID，已下架**。walk-forward 回测（E 批逐日复跑生产匹配引擎）首轮 verdict=INVALID；主人令「重跑+调参」后做 108 组参数扫描（窗口 20/40/60 × 相似阈值 0.55–0.70 × topk 10/20/30 × horizon 5/10/20，前 80% 选参 / 后 20% OOS 验证）：**训练集全部参数 Brier 增益为负、OOS 命中 33.1% vs 基率 39.4%、Brier 0.755 vs 0.660**——形态匹配概率在 T+5 尺度≈噪声，无任何参数体制有真实 edge。已下架：移除暂未上架 AI 预测卡（index.html + logic.html 同源镜像）、停跑 `path_probability_backtest.py`、删除孤儿数据 `raw_data/path_probability_backtest.json` + `data/PATH_PROB_BACKTEST.js`。（参考判据见 logic.html AI 预测段）
+> ② 潜力挖掘自 2026-09-06 起满 **30 个交易日**（约 2026-10-中），Top15 的 T+5 胜率/平均收益跑赢全市场基线 → 留并升级（接 fetch_fundamental_quality 补估值维度）；跑不赢 → 降级下架。
 >
-> | 文件 | 作用 | 产出方 |
-> |---|---|---|
-> | `algorithms/path_probability_backtest.py` | AI预测 walk-forward 回测引擎（复用生产匹配引擎，防前视） | 算法链 E 批 |
-> | `raw_data/path_probability_backtest.json` + `data/PATH_PROB_BACKTEST.js` | 回测产物（update_v8 已加映射防孤儿清理） | E 批每日刷新 |
-> | `raw_data/history/potential_*.json` | 潜力挖掘每日快照（考核唯一输入源，删了考核直接报废） | `calc_potential_picks.py`（主链每日归档） |
+> | 文件 | 作用 | 产出方 | 状态 |
+> |---|---|---|---|
+> | `algorithms/path_probability_backtest.py` | AI预测 walk-forward 回测引擎 | 算法链 E 批 | ⚠️ 2026-09-06 已移出 E 批调度（卡下架） |
+> | `raw_data/path_probability_backtest.json` + `data/PATH_PROB_BACKTEST.js` | 回测产物 | E 批每日刷新 | ❌ 2026-09-06 已删除（孤儿数据） |
+> | `raw_data/history/potential_*.json` | 潜力挖掘每日快照（考核唯一输入源，删了考核直接报废） | `calc_potential_picks.py`（主链每日归档） | ✅ 保护中（30 天考核进行，约 2026-10-中） |
 >
-> **任何轻量化/瘦身/清理操作不得删除上表文件。**
+> **任何轻量化/瘦身/清理操作不得删除上表「潜力挖掘快照」文件；AI 预测回测相关文件已下架，勿以本段为由复活。**
 
 ---
 
