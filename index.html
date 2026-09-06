@@ -5456,13 +5456,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   window.__tvRetry = 0;
   window.__tvTheme = 'ai_pharma';
   window.__TV_THEMES = {
-    ai_pharma: { label:'🧬 AI制药', kws:['AI制药','创新药','CRO','生物医药','医药外包'] },
-    ai_med:    { label:'🏥 AI医疗', kws:['AI医疗','智慧医疗','互联网医疗','医疗信息化','远程医疗'] },
+    // 2026-09-06 实测校对：关键词已对齐 STOCK_LIST 真实概念标签
+    //   原版 AI医疗/智慧医疗/远程医疗等 5 个词在数据源 0 命中，已替换为真实存在的标签
+    ai_pharma: { label:'🧬 AI制药',     kws:['AI制药（医疗）','AI制药','创新药','CRO','创新医疗服务'] },
+    ai_med:    { label:'🏥 AI医疗',     kws:['互联医疗','精准医疗','创新医疗服务','医疗器械概念','医药医疗风格','毛发医疗','诊断','基因'] },
     robot:     { label:'🤖 人形机器人', kws:['人形机器人','机器人','减速器','具身智能'] },
-    solid:     { label:'🔋 固态电池', kws:['固态电池','钠离子电池','锂电池','电池技术'] },
-    lowalt:    { label:'🚁 低空经济', kws:['低空经济','eVTOL','无人机','通用航空'] },
-    compute:   { label:'🖥 算力/CPO', kws:['CPO','光通信','算力','液冷','数据中心'] },
-    dataelem:  { label:'🗂 数据要素', kws:['数据要素','数据安全','数字经济'] }
+    solid:     { label:'🔋 固态电池',   kws:['固态电池','钠离子电池','刀片电池','电池技术'] },
+    lowalt:    { label:'🚁 低空经济',   kws:['低空经济','eVTOL','飞行汽车','无人机','通用航空'] },
+    compute:   { label:'🖥 算力CPO',    kws:['CPO','光通信','算力','液冷','数据中心','东数西算'] },
+    dataelem:  { label:'🗂 数据要素',   kws:['数据要素','数据确权','数据安全','数字经济','数字货币','信创'] }
   };
   window.__tvSetTheme = function(k){
     window.__tvTheme = k;
