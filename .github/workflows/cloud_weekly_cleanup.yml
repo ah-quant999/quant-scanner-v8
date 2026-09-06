@@ -94,7 +94,6 @@ jobs:
               "final_recommend.json",
               "fundamental_quality.json",
               "lhb_7d.json",
-              "potential_picks.json",
               "sentiment_cycle.json",
               "stock_rps.json",
               "stop_target_optimization.json",
