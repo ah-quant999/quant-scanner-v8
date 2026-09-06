@@ -1322,5 +1322,95 @@
     "message": "未找到元素"
    }
   ]
+ },
+ {
+  "date": "2026-09-06",
+  "time": "17:12:27",
+  "overall": "fail",
+  "summary": {
+   "ok": 102,
+   "warn": 11,
+   "fail": 4,
+   "total": 117
+  },
+  "warn_items": [
+   {
+    "id": "FOUR_VOLUME_BACKTEST",
+    "name": "四量终极回测",
+    "message": "更新于 今日 00:14；关键字段空值：periods"
+   },
+   {
+    "id": "local_sync",
+    "name": "本地与 origin/main 同步",
+    "message": "git fetch origin 失败（网络/认证）：TimeoutExpired，跳过同步检查"
+   },
+   {
+    "id": "dom_taskScheduleBody",
+    "name": "DOM #taskScheduleBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttBackBody",
+    "name": "DOM #ttBackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttThrBody",
+    "name": "DOM #ttThrBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttSvlBody",
+    "name": "DOM #ttSvlBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_ttTrackBody",
+    "name": "DOM #ttTrackBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsAdvBody",
+    "name": "DOM #stcrdsAdvBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_stcrdsEliteBody",
+    "name": "DOM #stcrdsEliteBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "dom_healthCheckBody",
+    "name": "DOM #healthCheckBody",
+    "message": "静态占位符(JS渲染)"
+   },
+   {
+    "id": "all_RUNNER_STATUS",
+    "name": "RUNNER_STATUS",
+    "message": "RUNNER_STATUS.js 无 update_time/date/generated 时间戳，无法判龄（缺审计登记）"
+   }
+  ],
+  "fail_items": [
+   {
+    "id": "NT_DATA",
+    "name": "市场提示",
+    "message": "更新于 3天前 23:11；超过阈值 1440 分钟"
+   },
+   {
+    "id": "dom_phMacroBody",
+    "name": "DOM #phMacroBody",
+    "message": "未找到元素"
+   },
+   {
+    "id": "all_H_AUTO_BUY",
+    "name": "H_AUTO_BUY",
+    "message": "H_AUTO_BUY.js 更新于 3天前 06:54；超过通用红线 3641 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   },
+   {
+    "id": "all_IMA_STRONG_STOCK",
+    "name": "IMA_STRONG_STOCK",
+    "message": "IMA_STRONG_STOCK.js 更新于 3天前 12:17；超过通用红线 3641 分钟（主人铁律：交易日 24h / 非交易日 T+1 18:30）"
+   }
+  ]
  }
 ]
