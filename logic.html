@@ -6420,7 +6420,10 @@ window.showRestrictedItems = showRestrictedItems;
 
   /* ---- 初始化 ---- */
   function initPostMarket(){
-    const safe=(fn,...args)=>{try{fn(...args);}catch(e){console.warn('模块渲染失败',fn&&fn.name,e);}};
+    // 2026-09-06 一劳永逸：safe 同时守卫"函数缺失"和"函数抛错"。
+    //   logic.html 是独立的逻辑详解页（不嵌主站 index.html），
+    //   所以对主站风格的 renderXXX 函数要严格 typeof，否则一旦函数被下架，调用即 ReferenceError 中断 initPostMarket 后续流程。
+    const safe=(fn,...args)=>{if(typeof fn!=='function'){return;}try{fn(...args);}catch(e){console.warn('模块渲染失败',fn&&fn.name,e);}};
 
     // 实时数据区 section header 不显示具体时间（主人 2026-08-06 06:54 明确指示：
     //   「实时数据 / 今日事件 / 盘后数据」三个 section header 是分类标题级大卡，
@@ -8371,12 +8374,12 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
 
     // 「暂未上架/已下架」Tab 不再挂时间胶囊（2026-08-06 主人确立：Tab 类别名属大卡，不显示具体时间）
 
-    var safe=function(fn){try{fn();}catch(e){console.warn('运维子页渲染失败',e);}};
-    safe(renderAllsite);
-    safe(renderCockpit);
-    // 传 'st' 前缀：stcrdsTime / stcrdsCoverage 等 DOM id 在运维 section 下都带 st 前缀（2026-08-06 主人纠正：原调用未传前缀导致胶囊找不到）
-    safe(function(){ renderV8Crds('st'); });
-    // 数据健康总览由 renderRunnerTrack 统一渲染（含文件新鲜度+上游诊断），此处不再独立调用
+    // 2026-09-06 一劳永逸：renderAllsite/renderCockpit 已随 9/2 下架清除，调用入口同时移除
+    //   （之前 line 8378/8379 残留会触发 "renderCockpit is not defined" 顶层 ReferenceError，
+    //   阻断 line 9064 switchLg 定义 → 用户点击所有 tab 都无响应）；
+    //   现仅留 stub 调用，缺函数即放弃，绝不抛错冒泡。
+    var safe=function(fn){try{if(typeof fn==='function')fn();else console.warn('运维子页渲染跳过：函数不存在');}catch(e){console.warn('运维子页渲染失败',e);}};
+    safe(window.renderV8Crds && function(){ renderV8Crds('st'); });
   }
   window.__renderOps=renderOps;
 
@@ -8543,7 +8546,8 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     dgEl.style.fontSize = '11px';
   }
   window.renderExtDataSources=renderExtDataSources;
-  window.renderCockpit=renderCockpit;
+  // 2026-09-06 一劳永逸：window.renderCockpit=renderCockpit 已删除（renderCockpit 函数 9/2 同步下架）
+  //   之前这行顶层 ReferenceError 阻断 line 9064 的 switchLg 定义 → 点击所有 tab 无响应。
   window.renderV8Crds=renderV8Crds;
 
   /* ===== 个股相对强度 RPS + RS + 年线（2026-08-08 新增） ===== */
