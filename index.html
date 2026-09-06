@@ -9652,7 +9652,7 @@ function drawUpDownChart(){
       if(!byV[it.variety]) byV[it.variety]=[];
       byV[it.variety].push(it);
     });
-    const watch=['IC','IF','IH','IM'];
+    const watch=['IH','IF','IC','IM'];  // 2026-09-06 主人令：排序=超大盘(IH)→大盘(IF)→中盘(IC)→小盘(IM)
     const spot=d.spot||{};
     const chgMap={}, oiMap={};
     let h='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;">';
