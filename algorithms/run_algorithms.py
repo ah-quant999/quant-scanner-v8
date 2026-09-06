@@ -417,6 +417,37 @@ def _last_trading_day():
     return v8_date.last_trading_day(max_lookback=15)
 
 
+def _is_t1_data_day():
+    """🛡 2026-09-07 主人令铁律落地（根治 09-05 周六全链空转）：
+    判定「今天是否持有上一交易日的 T+1 数据」——即今天 == 上一交易日的次日。
+
+    背景（主人原话：「周六和假期第一天都有 T+1 数据，怎么可能不跑，这逻辑就是错的」）：
+      龙虎榜 / 机构调研 / 大宗交易 / 融资融券 / 股东增减 等 T+1 类数据，
+      在交易日收盘后由交易所陆续发布，**到次日（周六 / 假期首日）才完整**。
+      因此周六与假期第一天**必须照常采集**，绝不是「非交易日无新数据」。
+
+    原实现缺陷：backfill 模式一刀切 `skip_fetch=True` 跳过全部 fetch_* 采集，
+      使周六全链拿不到任何 T+1 新源 → generate_top10 等生成器检测到输入陈旧
+      → 按「不得造假」原则保留上一版本 → D 批 final_recommend 就绪门控拒绝产出
+      → **整链 11 个 run 全 success 却零产出**，前端卡片显示「已停更 N 个交易日」。
+      实测 2026-09-05（周六）：16:40 A 批 / 18:10 B 批无新源空转，
+      top10_daily.json 与 v8_pool_tracker.json 停在 09-04 22:36/22:05。
+
+    修复口径（与「算法链工作日历规则」一致）：
+      周六 / 假期第一天 → T+1 窗口，照常采集（skip_fetch=False）
+      假期中段 / 最后一天 → 无 T+1，跳过采集（skip_fetch=True，省 API）
+      交易日 → official 模式，本就全量采集（不受本函数影响）
+    """
+    try:
+        ltd = v8_date.last_trading_day(max_lookback=15)  # 上一交易日 YYYY-MM-DD
+        today = datetime.now().strftime("%Y-%m-%d")
+        delta = (datetime.strptime(today, "%Y-%m-%d")
+                 - datetime.strptime(ltd, "%Y-%m-%d")).days
+        return delta == 1  # 恰好是上一交易日的次日 = 持有 T+1
+    except Exception:
+        return False  # 判定时失败：保守按「无 T+1」处理（不改变原有行为）
+
+
 def _run_mode():
     """返回本轮运行模式：
     official   交易日 + 盘后窗口(18:00-23:59 / 00:00-05:59) → 全量采集+计算+推送（官方刷新，日期=今天）
@@ -758,9 +789,16 @@ def step_run(order=None):
     is_td = _is_trading_day_now()
     if mode == "backfill":
         os.environ["V8_REF_DATE"] = _last_trading_day()  # 回填：日期改写上一交易日
-    skip_fetch = (mode == "backfill")  # 非交易日无新实时数据，跳过 fetch_* 采集脚本（计算照常跑）
+    # 🛡 2026-09-07 主人令铁律：周六 / 假期第一天持有上一交易日的 T+1 数据（龙虎榜/机构调研/
+    #   大宗/两融等收盘后发布、次日才全），**必须照常采集**，不得一刀切跳过。
+    #   仅「假期中段/最后一天」这类确无 T+1 的日子才跳过采集（省 API、避免空转）。
+    #   交易日 official 模式本就全量采集，不受影响。
+    _t1 = _is_t1_data_day()
+    skip_fetch = (mode == "backfill" and not _t1)
     print(f"  🕐 当前时间 {datetime.now():%H:%M} | 盘后选股就绪 {'✅' if picking_ready else '⏳'}"
-          f" | 模式={mode}{' | 回填:跳过实时采集+日期改写上一交易日' if skip_fetch else ''}")
+          f" | 模式={mode}"
+          + (f" | T+1窗口✅照常采集（上一交易日的次日）" if (mode == "backfill" and _t1) else "")
+          + (f" | 回填:跳过实时采集+日期改写上一交易日" if skip_fetch else ""))
     ok, fail = 0, 0
     skipped = []
     for script in order:
