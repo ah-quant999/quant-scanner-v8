@@ -1,0 +1,45 @@
+{
+  "update_time": "2026-09-06 09:16:16",
+  "data_range": "2022-01-04 ~ 2026-09-01",
+  "engine": {
+    "source": "algorithms/market_path_probability.py（生产口径复用）",
+    "match": "方向一致率≥0.65 取Top20 加权",
+    "horizon_days": 5,
+    "path_def": "A=T+5>+1% B=T+5<-1% C=其余"
+  },
+  "eval": {
+    "n_days": 865,
+    "n_valid": 865,
+    "n_no_match": 0
+  },
+  "overall": {
+    "hit_rate": 31.9,
+    "hit_gain_pp_vs_max_base": -9.83,
+    "random_base_hit": 34.4,
+    "base_rates": {
+      "A": 30.2,
+      "B": 28.1,
+      "C": 41.7
+    },
+    "brier": 0.8066,
+    "brier_base": 0.6559,
+    "brier_gain": -0.1507,
+    "avg_f5_pct": 0.139
+  },
+  "conditional": {
+    "pA_ge40": {
+      "n": 265,
+      "rate": 26.0,
+      "base": 30.2,
+      "lift_pp": -4.1
+    },
+    "pB_ge40": {
+      "n": 215,
+      "rate": 27.4,
+      "base": 28.1,
+      "lift_pp": -0.7
+    }
+  },
+  "verdict": "INVALID",
+  "verdict_note": "无效：Brier 未优于基线（0.807 vs 0.656），当前形态匹配概率≈噪声"
+}
