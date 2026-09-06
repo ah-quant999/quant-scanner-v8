@@ -1,5 +1,5 @@
 {
-  "check_time": "2026-09-05 00:06:51",
+  "check_time": "2026-09-06 18:29:21",
   "last_trade_close": "2026-09-04 15:30:00",
   "is_trading_day": false,
   "core_stale": [],
@@ -7,7 +7,7 @@
   "frozen_stale": [],
   "no_update_time": [],
   "summary": {
-    "total_checked": 46,
+    "total_checked": 45,
     "core_stale": 0,
     "warn_stale": 0,
     "frozen_stale": 0,
