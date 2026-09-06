@@ -6583,19 +6583,11 @@ h+='</div>';  // /ulPaneDbg
       h+='</div></details>';
     }
     h+='</div></div>';  // /H反推卡
-    // ── 2026-08-29 主人令：🤖 AI 预测 子页面已删除（卡并入调试专区，见 P3 插入段），pane2 此处不再渲染 ──
 
 
     el.innerHTML=h;
     // 2026-08-30 主人令:渲染兜底
     if(!h || h.length<200){ el.innerHTML='<div style=\"text-align:center;padding:40px;color:var(--dim);\"><div style=\"font-size:32px;margin-bottom:12px;\">📭</div><div style=\"font-size:14px;\">已下架卡片暂无可用数据</div><div style=\"font-size:12px;margin-top:8px;\">稍后再试或检查数据源</div></div>'; }
-    // 2026-08-20 主人令：潜力挖掘已删除，曾替换为 AI 预测；2026-09-06 AI 预测卡因实证未过门已下架
-    // 原同步调用时函数尚不存在 → typeof 判定 undefined 被跳过 → AI预测 卡永不渲染；
-    // 后改 setTimeout(0) 仍偶发受时序/缓存影响。现统一用 DOMContentLoaded 触发：
-    // 此时 HTML 解析已完成（函数已定义）、head 的 defer 数据脚本已执行、
-    // DOM 元素已存在，彻底免疫时序问题；若脚本晚到（readyState 非 loading）则立即渲染。
-    // 2026-08-29 主人令：AI 预测 / 潜力挖掘 2 子页面已删除，DOMContentLoaded 触发器一并移除；
-    // 填充函数已于 2026-09-06 随潜力挖掘全链下线一并删除。
     try{
       // 🛡 2026-08-18 主人令：ETF·龙头参考 直接渲染（不依赖已删的 etfMapBody 克隆）
       //   数据源：CONCEPT_RANKING.items（概念 top 8）+ SECTOR_FUND_FLOW.sectors_in（行业 top 6）
@@ -6666,7 +6658,6 @@ h+='</div>';  // /ulPaneDbg
       var _etfSrcTs = (window.CONCEPT_RANKING||{}).update_time || (window.SECTOR_FUND_FLOW||{}).update_time || em.update_time || null;
       var _etfBadge = _uBadge('盘后','短线',_etfSrcTs);
       if(tm) tm.innerHTML = _etfBadge;
-      // 2026-08-27 一劳永逸：删除克隆到潜力挖掘的逻辑（卡片只存在于调试专区，杜绝重复）
     }catch(e){ console.warn('ETF龙头渲染失败',e); }
     // 2026-08-16 子Tab 切换函数
     window.__ulSwitch = function(btn, tab){
@@ -6677,10 +6668,8 @@ h+='</div>';  // /ulPaneDbg
       var tabs = document.querySelectorAll('#sec-ul .ul-tab');
       for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
       if(btn) btn.classList.add('active');
-      // 2026-08-29 主人令：潜力挖掘 子 tab 已删除，其强制渲染分支一并移除；填充函数 2026-09-06 已随全链删除。
     };
     // ⚖️ 2026-08-14 主人令：renderPortfolio 调用已删除（持仓跟踪卡整段移除）
-    // 2026-08-14 主人令：涨价榜/情绪周期/潜力挖掘 fill 改由 switchSt('pr') 触发（已迁选股策略子TAB）
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderUnlisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
 
     // 🛡 2026-08-20：自愈轮询已提前到 renderUnlisted 函数开头（防止首调失败时自愈永不启动），
@@ -6765,7 +6754,6 @@ h+='</div>';  // /ulPaneDbg
     host.innerHTML = h;
   }
 
-  /* ═══════════ 2026-08-13 三张新卡填充函数（涨价榜/情绪周期/潜力挖掘）══ 暂未上架观察 ═══════════ */
 
   // 💹 商品涨价弹性榜（2026-08-15 主人令：三段分组卡片，参考板块周期轮动路线表风格）
   // 💹 商品涨价弹性榜（2026-08-15 主人令：多列紧凑 grid，全部品种不隐藏）
