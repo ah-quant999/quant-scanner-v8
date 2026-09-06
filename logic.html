@@ -9076,6 +9076,9 @@ function switchLg(id,el){
   var pane=document.getElementById('lg-'+id);
   if(pane) pane.classList.add('active');
   if(el) el.classList.add('active');
+  // 🛡 2026-09-06 修复：切 tab 后滚动位置不重置——用户在长页面中部/底部点 tab，pane 已切换但视口停在原处，
+  //   看起来像「点了没反应 / 内容串页」（实为当前视口落在新 pane 的中下部）。切完立即回顶（导航条也在顶部，回顶后 tab 高亮与新内容一目了然）。
+  try{ window.scrollTo({top:0, behavior:'instant'}); }catch(_){ window.scrollTo(0,0); }
   if(id==='st' && typeof window.__renderLgBacktest === 'function'){ setTimeout(window.__renderLgBacktest, 60); }
   if(id==='v6'){
     var d=document.getElementById('v6MemoFrame');
