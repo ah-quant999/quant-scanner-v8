@@ -2604,7 +2604,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
                 <span style="margin-left:auto;font-size:13px;font-weight:700;color:#1D9E75;"><span id="stcrdsEliteCnt">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
                 <span id="stcrdsEliteArr" style="font-size:10px;color:var(--dim);">▴</span>
               </div>
-              <div id="stcrdsEliteBody" style="display:block;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:300px;overflow-y:auto;"></div>
+              <div id="stcrdsEliteBody" style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px 10px;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:300px;overflow-y:auto;"></div>
             </div>
             <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
               <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('stcrdsAdvBody','crdsAdvArr')">
@@ -2614,7 +2614,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
                 <span id="stcrdsAdvHint"></span>
                 <span id="stcrdsAdvArr" style="font-size:10px;color:var(--dim);">▴</span>
               </div>
-              <div id="stcrdsAdvBody" style="display:block;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:300px;overflow-y:auto;"></div>
+              <div id="stcrdsAdvBody" style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px 10px;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:300px;overflow-y:auto;"></div>
             </div>
             <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
               <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('stcrdsList1','crdsArr1')">
@@ -2623,7 +2623,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
                 <span style="margin-left:auto;font-size:13px;font-weight:700;color:#185FA5;"><span id="stcrdsCnt1">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
                 <span id="stcrdsArr1" style="font-size:10px;color:var(--dim);">▴</span>
               </div>
-              <div id="stcrdsList1" style="display:block;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:360px;overflow-y:auto;"></div>
+              <div id="stcrdsList1" style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px 10px;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:360px;overflow-y:auto;"></div>
             </div>
             <div style="border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--card);overflow:hidden;">
               <div style="display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;user-select:none;" onclick="tsToggle('stcrdsList2','crdsArr2')">
@@ -2632,7 +2632,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
                 <span style="margin-left:auto;font-size:13px;font-weight:700;color:#C62828;"><span id="stcrdsCnt2">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
                 <span id="stcrdsArr2" style="font-size:10px;color:var(--dim);">▴</span>
               </div>
-              <div id="stcrdsList2" style="display:block;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:300px;overflow-y:auto;"></div>
+              <div id="stcrdsList2" style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px 10px;padding:0 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.7;max-height:300px;overflow-y:auto;"></div>
             </div>
           </div>
           <div>
@@ -2643,7 +2643,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
                 <span style="margin-left:auto;font-size:13px;font-weight:700;color:#3B6D11;"><span id="stcrdsCnt3">0</span><span style="font-size:10px;color:var(--dim);">只</span></span>
                 <span id="stcrdsArr3" style="font-size:10px;color:var(--dim);">▴</span>
               </div>
-              <div id="stcrdsList3" style="display:grid;grid-template-columns:1fr 1fr;gap:3px 14px;padding:4px 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.6;"></div>
+              <div id="stcrdsList3" style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px 10px;padding:4px 10px 8px 10px;font-size:11px;color:var(--sub);line-height:1.6;"></div>
             </div>
           </div>
         </div>
@@ -12039,17 +12039,17 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     var _crdsFoldSeq=0;
     function _crdsFillFold(listEl,items,renderItem,emptyHtml,restGrid){
       if(!listEl) return;
-      if(!items||!items.length){ listEl.innerHTML=emptyHtml; return; }
-      var head=items.slice(0,10).map(renderItem).join('');
-      if(items.length<=10){ listEl.innerHTML=head; return; }
+      if(!items||!items.length){ listEl.innerHTML='<div style="grid-column:1/-1;">'+emptyHtml+'</div>'; return; }
+      var head=items.slice(0,20).map(renderItem).join('');
+      if(items.length<=20){ listEl.innerHTML=head; return; }
       var id='crdsFold'+(++_crdsFoldSeq);
-      var rest=items.slice(10).map(renderItem).join('');
+      var rest=items.slice(20).map(renderItem).join('');
       var restHtml=restGrid
-        ? '<div style="display:grid;grid-template-columns:1fr 1fr;gap:3px 14px;">'+rest+'</div>'
+        ? '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px 10px;">'+rest+'</div>'
         : rest;
       listEl.innerHTML=head
-        +'<div id="'+id+'" style="display:none;">'+restHtml+'</div>'
-        +'<div data-t="'+id+'" data-n="'+(items.length-10)+'" onclick="_crdsToggleFold(this)" style="text-align:center;padding:4px 0 2px;cursor:pointer;user-select:none;font-size:11px;color:#38bdf8;">▾ 展开其余 '+(items.length-10)+' 只</div>';
+        +'<div id="'+id+'" style="display:none;grid-column:1/-1;">'+restHtml+'</div>'
+        +'<div data-t="'+id+'" data-n="'+(items.length-20)+'" onclick="_crdsToggleFold(this)" style="grid-column:1/-1;text-align:center;padding:4px 0 2px;cursor:pointer;user-select:none;font-size:11px;color:#38bdf8;">▾ 展开其余 '+(items.length-20)+' 只</div>';
     }
     function fillList(listEl,arr,html){
       _crdsFillFold(listEl,arr,function(s){return '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+s.name+'('+s.code+')</div>';},html,listEl&&listEl.style.display==='grid'||false);
@@ -12101,10 +12101,10 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       }
     })();
     (function(){var e=document.getElementById(p+'crdsEliteBody');if(!e)return;
-      _crdsFillFold(e,elite,function(s){return '<b style="color:#1D9E75;">'+s.name+'('+s.code+')</b> CRDS='+s.score+'<br>';},'<span style="color:var(--dim);">今日无（精选级需3条件全满足，稀疏信号）</span>',false);
+      _crdsFillFold(e,elite,function(s){return '<b style="color:#1D9E75;">'+s.name+'('+s.code+')</b> CRDS='+s.score+'<br>';},'<span style="color:var(--dim);">今日无（精选级需3条件全满足，稀疏信号）</span>',true);
     })();
     (function(){var e=document.getElementById(p+'crdsAdvBody');if(!e)return;
-      _crdsFillFold(e,adv,function(s){return s.name+'('+s.code+') CRDS='+s.score+'<br>';},'<span style="color:var(--dim);">今日无</span>',false);
+      _crdsFillFold(e,adv,function(s){return s.name+'('+s.code+') CRDS='+s.score+'<br>';},'<span style="color:var(--dim);">今日无</span>',true);
     })();
     // 历史
     var he=document.getElementById(p+'crdsHistory'), hist=d.history||[];
