@@ -1010,7 +1010,7 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
         <div class="logic-h">ETF资金热度</div>
         <div class="logic-p">宽基指数ETF每日净申购赎回份额折线图，T+0实时估算国家队动向。数据源：etf_intraday_heat.json（akshare fund_etf_hist_em）。展示沪深300/中证500/创业板/科创50/上证50等主要宽基ETF。</div>
         <div class="logic-h">主力净额分时累计曲线（2026-08-18 主人令：数据源说明从卡片移到逻辑详解）</div>
-        <div class="logic-p">📌 <b>实时数据源</b> SECTOR_FUND_FLOW_INTRADAY（cn_fetch 每30分钟快照 Top15流入+Top5流出）。盘前清空、盘中累积、盘后自然定基——一段连续 time-series 即完整曲线。<b style="color:#f59e0b">不依赖高频 tick</b>，调度与你"不要太频繁"偏好一致。</div>
+        <div class="logic-p">📌 <b>实时数据源</b> SECTOR_FUND_FLOW_INTRADAY（cn_fetch 每30分钟快照 Top15流入+Top5流出）。<b>盘前不清空</b>——保留上一交易日全天快照供开盘前查阅，由 09:30 盘中首轮自然覆盖为当日数据；盘中累积、盘后自然定基——一段连续 time-series 即完整曲线。<b style="color:#f59e0b">不依赖高频 tick</b>，调度与你"不要太频繁"偏好一致。<br>⏱ <b>盘前清空时点（2026-09-07 主人令）</b>：其余盘中/实时卡（指数快照/ETF脉搏/ETF资金热度/板块资金/候选池行情/市场预警/亚太市场）的清空由 09:15–10:00 窗口内的盘中首轮执行，08:25 盘前轮只抓数据不再清空。</div>
       </div>
 
     </div>
