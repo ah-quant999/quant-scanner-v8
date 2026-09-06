@@ -5397,6 +5397,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       .op-tab-btn{padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid #243150;background:#0f1a2e;color:#93a4c4;transition:.15s}
       .op-tab-btn:hover{border-color:#38bdf8;color:#cfe3ff}
       .op-tab-btn.active{background:linear-gradient(135deg,#13243f,#0e2747);border-color:#38bdf8;color:#fff;box-shadow:0 0 0 1px rgba(56,189,248,.4)}
+      .ul-tab.active{background:linear-gradient(135deg,#13243f,#0e2747);border-color:#38bdf8;color:#fff;box-shadow:0 0 0 1px rgba(56,189,248,.4)}
       .op-tab-time{font-size:10px;font-weight:500;color:var(--sub);margin-left:6px;white-space:nowrap}
       .op-tab-pane{display:none}
       .op-tab-pane.active{display:block}
@@ -10790,19 +10791,23 @@ window.showRestrictedItems = showRestrictedItems;
     // 🛡 2026-08-26 一劳永逸：提前暴露 __ulSwitch，子 tab 按钮在 renderUnlisted 任何位置抛错后仍可切换
     window.__ulSwitch = function(btn, tab){
       window.__ulActivePane = tab;  // guard: 记住当前子 tab，重渲染不再 snap-back
-      // 2026-09-01 主人令：AI预测 / 潜力挖掘 / ETF·龙头参考 三卡已彻底删除，调试专区 tab 一并取消，
-      //   子 tab 现只剩「强势突破」一个 pane，故此处只切 ulPaneStrong。
-      var pStrong=document.getElementById('ulPaneStrong');
-      if(pStrong) pStrong.style.display=(tab==='strong')?'block':'none';
+      var pLab=document.getElementById('ulPaneLab');
+      var pMacro=document.getElementById('ulPaneMacro');
+      if(pLab) pLab.style.display=(tab==='lab')?'block':'none';
+      if(pMacro) pMacro.style.display=(tab==='macro')?'block':'none';
       var tabs=document.querySelectorAll('#sec-ul .ul-tab');
       for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
       if(btn) btn.classList.add('active');
+      // 切到宏观观测时兜底触发 RPS 考核卡渲染（避免 defer 数据未到时空卡）
+      if(tab==='macro' && typeof window.__renderRpsAudit==='function'){
+        try{ window.__renderRpsAudit(); }catch(e){}
+      }
     };
     if(!window.__ulSelfHealTimer){
       window.__ulSelfHealTimer=setInterval(function(){
         var p=document.getElementById('unlistedPanel');
         if(!p) return;
-        if(p.innerHTML.length>=1000 && p.innerHTML.indexOf('ulPaneStrong')>=0) return; // 已渲染成功停止
+        if(p.innerHTML.length>=1000 && p.innerHTML.indexOf('ulPaneLab')>=0) return; // 已渲染成功停止
         if(typeof window.renderUnlisted==='function'){
           console.log('[ulSelfHeal] retry renderUnlisted len='+p.innerHTML.length);
           try{ window.renderUnlisted(); }catch(e){ console.warn('[ulSelfHeal] rethrow:',e.message); }
@@ -10851,9 +10856,10 @@ window.showRestrictedItems = showRestrictedItems;
     // 填充「今日判定 · 环境态势」卡（2026-08-07 已迁回今日事件；函数注册在今日事件卡脚本块）
     if(typeof window.__renderJudgmentBody==='function') window.__renderJudgmentBody();
     var h='';
-    var _ulAct = window.__ulActivePane || 'strong';  // 🛡 记住激活的子 tab（重渲染跟随）
+    var _ulAct = window.__ulActivePane || 'lab';  // 🛡 记住激活的子 tab（重渲染跟随）
 
-    // 2026-09-02 主人令：暂未上架取消所有子页面，直接平铺 4 张卡。
+    // 2026-09-06 主人令：暂未上架恢复「实验区 / 宏观观测」两个子 tab；
+    //   实验区 = 概念ETF龙头参考 + 因子实验室；宏观观测 = RPS 30天考核 + 宏观景气K型。
 
     // ── 🛡 2026-08-19 主人令：2 张新卡（宏观+板块推荐）暂未上架实验区 · 原调试专区底部 ──
     //    2026-08-20 主人令：路径概率预测卡已迁出调试专区 → 独立「AI 预测」子TAB（潜力挖掘删除，算法链 19:15 自动更新）
@@ -10870,9 +10876,16 @@ window.showRestrictedItems = showRestrictedItems;
     // 2026-08-14 主人令：情绪周期定位/潜力挖掘 已迁至选股策略子TAB「潜力参考」(st-pr)，此处不再重复渲染
     // 2026-08-18 主人令：ETF·龙头参考 已迁入「暂未上架 > 调试专区」，此处不再重复渲染
 
-    // 暂未上架页经 09-01/09-02 多轮重构，当前卡片清单以 renderUnlisted 实际渲染为准（AI预测/概念ETF龙头参考/因子实验室/RPS考核/宏观景气K型）。
+    // 暂未上架页经 09-01/09-02 多轮重构，当前卡片清单以 renderUnlisted 实际渲染为准（概念ETF龙头参考/因子实验室/RPS考核/宏观景气K型）。
 
+    // ===== 子 tab 导航（实验区 · 宏观观测）=====
+    h += '<div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:10px;">'
+       + '<button class="ul-tab active" data-ul="lab" onclick="window.__ulSwitch(this,\'lab\')" style="padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--sub);font-weight:600;transition:.15s;">🧪 实验区</button>'
+       + '<button class="ul-tab" data-ul="macro" onclick="window.__ulSwitch(this,\'macro\')" style="padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--sub);font-weight:600;transition:.15s;">🌍 宏观观测</button>'
+       + '</div>';
 
+    // ===== 实验区 pane =====
+    h += '<div id="ulPaneLab">';
     h += '<div class="card" style="margin-bottom:16px;border-left:4px solid #38bdf8;">'
        + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">'
        + '<span style="font-size:15px;font-weight:700;color:#38bdf8;">📌 概念/行业 → ETF·龙头 参考</span>'
@@ -10884,10 +10897,14 @@ window.showRestrictedItems = showRestrictedItems;
        + '<div style="background:rgba(56,189,248,.05);border:1px solid rgba(56,189,248,.3);border-radius:7px;padding:8px 10px;font-size:12px;line-height:1.7;color:var(--sub);">研究信号，未纳入推荐链路。</div></div>';
     // ═══ 2026-09-03 主人令：因子实验室迁入暂未上架（★★ 观测仓 · 调试与回测中；升 4⭐ 再转正选股策略子页）═══
     h += '<div class="card" id="factorLabBody" style="margin-bottom:16px;border-left:4px solid #22d3ee;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">🧪 因子实验室（异常换手率 · ROE_TTM 大市值档）加载中…</div></div>';
-    // ═══ 2026-09-06 主人令：RPS 相对强度「30 天样本考核」卡迁入暂未上架（因子实验室下方）——有前端展示不会被遗忘；
+    h += '</div>'; // /ulPaneLab
+
+    // ===== 宏观观测 pane =====
+    h += '<div id="ulPaneMacro" style="display:none;">';
+    // ═══ 2026-09-06 主人令：RPS 相对强度「30 天样本考核」卡迁入宏观观测 pane ——有前端展示不会被遗忘；
     //     数据链保留纯观测（E 批 21:00 每日续跑），不参与选股评分权重；达标才谈恢复子 tab/进评分 ═══
     h += '<div class="card" id="rpsAuditBody" style="margin-bottom:16px;border-left:4px solid #94a3b8;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">📈 相对强度 RPS · 30 天样本考核 加载中…</div></div>';
-    // ═══ 2026-09-04 主人令：宏观景气背景（K型分层）迁入暂未上架（主人自看 · 背景认知 · 适合查阅不适合盯盘）═══
+    // ═══ 2026-09-04 主人令：宏观景气背景（K型分层）迁入宏观观测 pane（主人自看 · 背景认知 · 适合查阅不适合盯盘）═══
     //   静态内容内联，无 data 依赖/无管线；数据源：沧海一土狗（公众号）K型行业景气图；每月 1 日随宏观数据手动更新此处。
     //   更新记录：2026-09-04 部署（7月数据口径）；下次更新 2026-10-01（主人 09-04 令：标题行须带「更新于/下次更新」）。
     //   红涨绿跌铁律适用：增速为正=红(扩张)，为负=绿(收缩)。
@@ -10939,19 +10956,26 @@ window.showRestrictedItems = showRestrictedItems;
        + '④ 对 A 股映射：<b style="color:#ef5350;">外需+AI+技改链</b>景气持续 vs <b style="color:#26a69a;">地产链+基建链</b>收缩——与行业树图/板块资金的分化互为印证。</div>'
        + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;">🔭 仅供研究参考，不构成个人投资建议 · 数据时点以原文为准</div>'
        + '</div>';
+    h += '</div>'; // /ulPaneMacro
     // 2026-09-02 主人令：强势突破 pane、模块去向索引、动量共识/H反推/两套算法回测对比 全部删除（卡片清单以 renderUnlisted 为准）。
     el.innerHTML=h;
+    // 恢复上次激活的子 tab（默认实验区）
+    setTimeout(function(){ window.__ulSwitch(document.querySelector('#sec-ul .ul-tab[data-ul="'+_ulAct+'"]'), _ulAct); }, 0);
     // 2026-08-30 主人令:渲染兜底
     if(!h || h.length<200){ el.innerHTML='<div style=\"text-align:center;padding:40px;color:var(--dim);\"><div style=\"font-size:32px;margin-bottom:12px;\">📭</div><div style=\"font-size:14px;\">已下架卡片暂无可用数据</div><div style=\"font-size:12px;margin-top:8px;\">稍后再试或检查数据源</div></div>'; }
-    // 2026-09-01 主人令（轻量化）：AI预测 / 潜力挖掘 / ETF·龙头参考 三卡及其填充函数、data 注入、
-    //   调试专区 tab 全部彻底删除（不保留"以备复用"的死代码）。子 tab 只剩「强势突破」，__ulSwitch 已简化。
+    // 2026-09-06 主人令：子 tab 恢复为「实验区 / 宏观观测」，__ulSwitch 同步切 lab/macro pane。
     window.__ulSwitch = function(btn, tab){
       window.__ulActivePane = tab;
-      var pStrong = document.getElementById('ulPaneStrong');
-      if(pStrong) pStrong.style.display = (tab === 'strong') ? 'block' : 'none';
+      var pLab = document.getElementById('ulPaneLab');
+      var pMacro = document.getElementById('ulPaneMacro');
+      if(pLab) pLab.style.display = (tab === 'lab') ? 'block' : 'none';
+      if(pMacro) pMacro.style.display = (tab === 'macro') ? 'block' : 'none';
       var tabs = document.querySelectorAll('#sec-ul .ul-tab');
       for(var j=0;j<tabs.length;j++) tabs[j].classList.remove('active');
       if(btn) btn.classList.add('active');
+      if(tab==='macro' && typeof window.__renderRpsAudit==='function'){
+        try{ window.__renderRpsAudit(); }catch(e){}
+      }
     };
     // ⚖️ 2026-08-14 主人令：renderPortfolio 调用已删除（持仓跟踪卡整段移除）
     // 2026-08-14 主人令：涨价榜/情绪周期/潜力挖掘 fill 改由 switchSt('pr') 触发（已迁选股策略子TAB）
