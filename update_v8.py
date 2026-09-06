@@ -1045,7 +1045,7 @@ def run_experiment_cards():
     三脚本读 data/*.js（build 刚生成的），写 data/COMMODITY_ELASTICITY.js 等。
     2026-08-16 主人令：新增动量共识筛选器（momentum_common_filter.py --emit-js →
     data/MOMENTUM_FILTER.js），与动量卡一起跟踪。
-    2026-08-20 主人令：潜力挖掘页已删除 → calc_potential_picks.py 从实验链路移除。
+    2026-08-20 主人令：潜力挖掘页已删除 → calc_potential_picks.py 从实验链路移除；2026-09-06 主人令：全链（脚本/数据/前端卡）彻底删除。
     任何模块失败不阻断主流程（仅告警），避免拖垮云端抓取。
     """
     import subprocess
