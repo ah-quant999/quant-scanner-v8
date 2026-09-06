@@ -68,7 +68,6 @@ DATA_SOURCES = {
     "north_fund.json":             "NORTH_FUND",
     "market_alerts.json":          "MARKET_ALERTS",
     "market_fund_flow_data.json":  "MARKET_FUND_FLOW_DATA",
-    "etf_subscription.json":       "ETF_SUBSCRIPTION",
     "w52_high.json":               "W52_HIGH",
     "limit_up_heatmap.json":       "LIMIT_UP_HEATMAP",
     "limit_up_broken.json":        "LIMIT_UP_BROKEN",
@@ -118,10 +117,8 @@ DATA_SOURCES = {
     "factor_lab_backtest.json":    "FACTOR_LAB_BACKTEST",  # 🆕 2026-09-04 因子实验室独立分层回测
     "rps_backtest.json":           "RPS_BACKTEST",  # 🆕 2026-09-06 主人令：RPS 30天样本考核防孤儿（weekly_cleanup 有映射不删；考核详见 DO_NOT_DELETE.md / logic.html）
     # "path_probability_backtest.json": "PATH_PROB_BACKTEST",  # 2026-09-06 已注释：AI预测卡下架，停止发布
-    # 🛡 2026-08-30 一劳永逸式：补 ETF 申购赎回东方财富口径（股票/债券/货币/商品/跨境 5 类 + 亿元），
-    #   替代旧宽基指数 + 亿份口径（旧 ETF_SUBSCRIPTION.js 保留作 legacy，不入 DATA_SOURCES）。
-    #   旧 data/ETF_SUBSCRIPTION.js 已写好的 "sh"/"sz"/"update_time" 老口径**保留**，前端同时读 window.ETF_SUBSCRIPTION。
-    #   新增 window.ETF_SUBSCRIPTION_EM 走东财口径（5 类聚合 + 亿元）。
+    # 🛡 2026-08-30 一劳永逸式：补 ETF 申购赎回东方财富口径（股票/债券/货币/商品/跨境 5 类 + 亿元）。
+    #   2026-09-06 主人令轻量化：旧宽基+亿份口径全链删除（fetcher/映射/前端注入），仅保留东财口径 window.ETF_SUBSCRIPTION_EM。
     "etf_subscription_em.json":   "ETF_SUBSCRIPTION_EM",
     # 2026-08-30：盘后数据页新增解禁日历 + 业绩预告
     "restricted_release.json":    "RESTRICTED_RELEASE",
@@ -165,7 +162,6 @@ CATEGORY_MAP = {
     "INDEX_QUOTES": "intraday",
     "ETF_PULSE": "intraday",
     "ETF_INTRADAY_HEAT": "intraday",
-    "ETF_SUBSCRIPTION": "premarket",
     "ETF_DAILY_MONITOR": "intraday",
     # 🛡 2026-09-04 一劳永逸（两处映射不一致根治）：cloud_fetch_v8.py 早在 2026-09-03 就把这两个
     #   改成 "intraday,post_close"（盘中 cron 偶发丢档→收盘定格值无着落），但 update_v8.py 侧漏同步，
