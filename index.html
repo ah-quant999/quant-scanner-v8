@@ -531,7 +531,7 @@ window.__domReadyFns=[];
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/POTENTIAL_PICKS.js?v=a175dafed0" defer></script>
 <script src="data/INDEX_QUOTES.js?v=993eb95a29" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=8316ded3da" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=406bda9856" defer></script>
 <script src="data/MARGIN_DATA.js?v=9c53e677d6" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=f721303b31" defer></script>
 <script src="data/IPO_DATA.js?v=5b60977a27" defer></script>
@@ -547,7 +547,7 @@ window.__domReadyFns=[];
     <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
     <script src="data/MARKET_REGIME.js?v=b2d9533b0f" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
-    <script src="data/RISK_GAUGE.js?v=fef72dad24" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
+    <script src="data/RISK_GAUGE.js?v=da9601c820" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
     <script src="data/SECTOR_RECOMMENDATION.js?v=2f51d8fefb" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
     <script src="data/WEEKEND_META_REPORT.js?v=d5951f8ce3" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
   <script src="data/DELISTED.js?v=625439c57a" defer></script>
@@ -1562,16 +1562,16 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=4609966573" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=d50804171a" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=1012850f0b" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=2424358f2a" defer></script>
-<script src="data/HEALTH_CHECK.js?v=b4c7ee1aba" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=119736e13b" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=4abbade131" defer></script>
+<script src="data/RUNNER_STATUS.js?v=430b1bdad2" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=8444cd2d90" defer></script>
+<script src="data/HEALTH_CHECK.js?v=0ec1ebf5b7" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=dc548edbb1" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=6e73362a8b" defer></script>
     <!-- 2026-09-06 主人令：AI预测卡已下架，MARKET_PATH_PROBABILITY 注入移除（market_path_probability.py 仍维护 INDEX_HISTORY） -->
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=db96901d01" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=6685a69b7a" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=6188614a4a" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=6df7424dea" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=87cea0f0b4" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=f9c4bf32fb" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=f4d7a02a54" defer></script>
     <!-- 2026-09-04 主人令收尾：ALLSITE_BACKTEST.js 注入已删（生成器/raw_data 已于 09-03「干掉全站精选」系列删除，前端无任何代码读 window.ALLSITE_BACKTEST，标签纯 404 噪音） -->
@@ -10972,7 +10972,7 @@ window.showRestrictedItems = showRestrictedItems;
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=db96901d01';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=6df7424dea';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -10981,7 +10981,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=6685a69b7a';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=87cea0f0b4';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -12911,7 +12911,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=b4c7ee1aba')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=0ec1ebf5b7')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
