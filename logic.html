@@ -2038,7 +2038,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
 
                                                                      
         <div class="logic-h" style="background:transparent;color:#bbf7d0;padding:8px 0;border-radius:0;margin:12px 0;">📋 2026-08-20 今晚改动汇总（AI 预测子TAB / 本地禁跑算法护栏 / 算法链补链 / 镜像同步）· 阿狸咪</div>
-        <div class="logic-p"><b>主人令</b>：潜力挖掘删除 → 重写「AI 预测」子TAB（小九 market_path_probability 算法）；算法必须有定时任务跟踪、跟着算法链 19:15 计算部署；本地禁止手动跑算法；审计后推仓入库；与运维/逻辑详解页对齐。以下为 8/20 全部实质改动，均已在 main 生效。</div>
+        <div class="logic-p"><b>主人令</b>：AI 预测卡经三轮实证未过判据门，已删除；本地禁止手动跑算法；审计后推仓入库；与运维/逻辑详解页对齐。以下为 8/20 全部实质改动，均已在 main 生效。</div>
 
         <div class="logic-h">① AI 预测卡已删除（2026-09-06 最终拍板）</div>
         <div class="logic-p">
@@ -2109,7 +2109,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p">主人问「能否做这种预测」→ 拍板做 v8 卡片版 + 5 年长 K 线：
         <ul>
           <li><code>scripts/fetch_index_history.py</code>：akshare 拉上证 5 年日 K → <code>raw_data/index_history.json</code> → <code>data/INDEX_HISTORY.js</code>（92KB）</li>
-          <li>❌ <code>algorithms/market_path_probability.py</code> 已删除：原生成路径概率 ABC 数据，因卡下架随之下线。</li>          <li>🆕 <b>2026-09-06 主人令·实证升级</b>：新增 <code>algorithms/path_probability_backtest.py</code>（挂算法链 E 批 21:00）——逐日只用 ≤t 的 K 线复跑生产匹配引擎（walk-forward 防前视），预测 ABC 概率 vs 实际 T+5 路径对照。判据：<b>有效</b> = 有效样本≥100 且 主路径命中率−基率(最大类)≥+3pp 且 Brier&lt;基线Brier；<b>观望</b> = 仅 Brier 优于基线；<b>无效</b> = 其余（含样本不足）。产出 <code>raw_data/path_probability_backtest.json</code>（update_v8 映射 PATH_PROB_BACKTEST.js）。用真实 edge 决定卡的去留与调参（THRESH/TOPK/窗口），严禁无回测调参。</li>
+          <li>❌ <code>algorithms/market_path_probability.py</code> 已删除：原生成路径概率 ABC 数据，因卡下架随之下线。</li>
+          <li>❌ <code>algorithms/path_probability_backtest.py</code> 已随 AI 预测卡下架删除。</li>
           <li>🆕 <b>2026-09-06 主人最终拍板：删除 AI 预测卡</b>：因三轮实证均未过判据门，卡片、函数、数据注入、数据文件、生成脚本、管线映射已全部删除。研究档案保留本段，便于三年后回看。</li>
           <li>✅ 已加入 <code>run_algorithms.py ORDER</code>（云端 19:15 盘后算法链自动跑；2026-08-20 补入上游 <code>fetch_index_history.py</code> + 双 bridge 到 <code>raw_data/</code>，根治 K 线/概率卡永不更新的链路断点）</li>
         </ul>
@@ -6998,7 +6999,7 @@ h+='</div>';  // /ulPaneDbg
     el.innerHTML=h;
     // 2026-08-30 主人令:渲染兜底
     if(!h || h.length<200){ el.innerHTML='<div style=\"text-align:center;padding:40px;color:var(--dim);\"><div style=\"font-size:32px;margin-bottom:12px;\">📭</div><div style=\"font-size:14px;\">已下架卡片暂无可用数据</div><div style=\"font-size:12px;margin-top:8px;\">稍后再试或检查数据源</div></div>'; }
-    // 2026-08-20 主人令：潜力挖掘已删除，替换为 AI 预测（market_path_probability 算法，重写非复制）
+    // 2026-08-20 主人令：潜力挖掘已删除，曾替换为 AI 预测；2026-09-06 AI 预测卡因实证未过门已下架
     // 原同步调用时函数尚不存在 → typeof 判定 undefined 被跳过 → AI预测 卡永不渲染；
     // 后改 setTimeout(0) 仍偶发受时序/缓存影响。现统一用 DOMContentLoaded 触发：
     // 此时 HTML 解析已完成（函数已定义）、head 的 defer 数据脚本已执行、
