@@ -8,9 +8,9 @@ gen_triple_track.py — 三重共识「历史追踪」跟踪 + 回测分析器
   - data/gold_pool.json                 （当前收盘价/最新）
   - data/fundamental_quality.json       （催化剂 news.tags / 评分加减）
   - data/backtest_comprehensive.json    （baostock 真实收盘价滚动回测，信号层）
-  - data/cockpit_backtest.json          （by_score 阈值分组回测）
   - data/top10_daily.json               （TOP10≥70，用于全站精选重叠度）
-  - data/cockpit_tier_recommend_alimi.json （A/B 档，用于重叠度）
+  （2026-09-06 审计修复：cockpit_backtest.json / cockpit_tier_recommend.json 随驾驶舱 09-03 下线，
+   相关读取与重叠度输出已移除——文件不存在时此前输出「与驾驶舱重叠 0」属伪数据）
 
 写出：data/triple_track.json（前端 历史追踪 页消费）
 
@@ -104,10 +104,8 @@ def main():
     gold_pool = load_json(os.path.join(DATA_DIR, "gold_pool.json"), {})
     fq = load_json(os.path.join(DATA_DIR, "fundamental_quality.json"), {})
     bc = load_json(os.path.join(DATA_DIR, "backtest_comprehensive.json"), {})
-    cb = load_json(os.path.join(DATA_DIR, "cockpit_backtest.json"), {})
     top10 = load_json(os.path.join(DATA_DIR, "top10_daily.json"), {})
-    # 🔴 2026-08-06 改 v8 命名：stage_to_raw 提升为 raw_data/cockpit_tier_recommend.json
-    tier = load_json(os.path.join(DATA_DIR, "cockpit_tier_recommend.json"), {})
+    # 2026-09-06 审计修复：cockpit_backtest.json / cockpit_tier_recommend.json 读取移除（驾驶舱 09-03 下线）
 
     fq_stocks = fq.get("stocks", {}) if isinstance(fq, dict) else {}
     gp_stocks = gold_pool.get("stocks", {}) if isinstance(gold_pool, dict) else {}
@@ -227,7 +225,7 @@ def main():
     period_map = {"1d": "hold_1d", "3d": "hold_3d", "5d": "hold_5d", "10d": "hold_10d", "20d": "hold_20d"}
     backtest_signal = {
         "method": bc.get("method", ""),
-        "latest_date": cb.get("latest_date", bc.get("calc_time", "")),
+        "latest_date": bc.get("calc_time", ""),
         "total": res_all.get("total", 0),
         "best_hold_days": res_all.get("best_hold_days", 0),
         "periods": {},
@@ -361,16 +359,12 @@ def main():
     for s in top10.get("top10", []):
         if (s.get("total_score") or 0) >= 70:
             top10_ge70.add(ncode(s.get("code")))
-    cockpit_a = set(ncode(s.get("code")) for s in tier.get("tier_a", []))
-    cockpit_b = set(ncode(s.get("code")) for s in tier.get("tier_b", []))
+    # 2026-09-06 审计修复：cockpit_a/cockpit_b 重叠度输出移除（驾驶舱下线，tier 恒空属伪数据；
+    # 前端 ttOverlap 仅消费 top10_ge70，此改动零前端影响）
     overlap = {
         "total_tracked": len(today_codes),
         "top10_ge70": {"count": len(top10_ge70), "overlap": len(today_codes & top10_ge70),
                        "names": [t["name"] for t in tracked if ncode(t["code"]) in (top10_ge70 & today_codes)]},
-        "cockpit_a": {"count": len(cockpit_a), "overlap": len(today_codes & cockpit_a),
-                      "names": [t["name"] for t in tracked if ncode(t["code"]) in (cockpit_a & today_codes)]},
-        "cockpit_b": {"count": len(cockpit_b), "overlap": len(today_codes & cockpit_b),
-                      "names": [t["name"] for t in tracked if ncode(t["code"]) in (cockpit_b & today_codes)]},
     }
 
     result = {
