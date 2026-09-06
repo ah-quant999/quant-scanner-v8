@@ -1,11 +1,11 @@
 {
-  "update_time": "2026-09-04 20:05:16",
-  "data_date": "2026-09-04",
+  "update_time": "2026-09-07 03:02:02",
+  "data_date": "2026-09-07",
   "source": "LIMIT_UP_HEATMAP",
   "phase": "退潮",
   "color": "#f97316",
   "score": 64.0,
-  "delta_pct": -85.45,
+  "delta_pct": -83.04,
   "advice": "⚠️ 情绪退潮中：高位股注意回撤，关注高低切换",
   "metrics": {
     "total_up": 39,
@@ -38,6 +38,6 @@
       "chg": 9.99
     }
   ],
-  "prev_total": 268,
+  "prev_total": 230,
   "note": "冰点=涨停<30家且最高板≤2（报复性窗口临近）；高潮=涨停≥80且最高板≥5；退潮=较昨日-30%+"
 }

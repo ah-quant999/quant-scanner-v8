@@ -530,7 +530,7 @@ window.__domReadyFns=[];
 <script src="data/CONCEPT_RANKING.js?v=9eebef2abb" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/INDEX_QUOTES.js?v=f88b4373ed" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=982e075da2" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=0b4ef284ce" defer></script>
 <script src="data/MARGIN_DATA.js?v=0eb526b993" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=d29c7dedf6" defer></script>
 <script src="data/IPO_DATA.js?v=1cac046ac9" defer></script>
@@ -1562,14 +1562,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/PERFORMANCE_FORECAST.js?v=d69b64bdf8" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=595ede0167" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=30075f0c3d" defer></script>
-<script src="data/HEALTH_CHECK.js?v=ee5bbc22a4" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=068c4d5389" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=4f5287d667" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=63d6df0077" defer></script>
+<script src="data/HEALTH_CHECK.js?v=ac9ae9d64e" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=f60ca0c964" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=522de1715f" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=1adba88ce2" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=6afbf538a0" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=3d38a402f6" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=9a845df2e7" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=7c78b8d6bf" defer></script>
     <!-- 2026-09-04 主人令收尾：ALLSITE_BACKTEST.js 注入已删（生成器/raw_data 已于 09-03「干掉全站精选」系列删除，前端无任何代码读 window.ALLSITE_BACKTEST，标签纯 404 噪音） -->
@@ -12984,7 +12984,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
   console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
   setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=ee5bbc22a4')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=ac9ae9d64e')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
       var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
       if(remoteTs && remoteTs!==localTs){
