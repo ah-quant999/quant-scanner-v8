@@ -2459,7 +2459,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- ===== TAB 页面：🧭 选股池（2026-08-29 主人令：从盘后数据·已下架迁至选股策略子页；2026-08-30 移到首位并改为点击展开） ===== -->
     <div id="st-pool" class="st-pane active">
       <div class="card" style="border-left:4px solid #f9a8d4;">
-        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🧭</span>观测候选股池 <span id="stPoolTime">—</span> <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span> <span id="stPoolSlot" style="font-size:11px;color:var(--sub);font-weight:400">上游水源 · 盘后</span></h3>
+        <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🧭</span>观测候选股池 <span id="stPoolTime">—</span> <span id="stPoolSlot" style="font-size:11px;color:var(--sub);font-weight:400">上游水源 · 盘后</span></h3> <!-- 2026-09-06 审计修复：选股池是初筛池非信号策略，与文档口径一致不挂星级 -->
         <div id="stPoolSourceDist" class="tp-stocklist"></div>
         <!-- 2026-09-02 主人令：外资研投默认直接展开，其余来源收起在下方弹窗式展开 -->
         <div id="stPoolGlList" class="tp-stocklist"></div>
@@ -2476,7 +2476,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       <div class="card">
         <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🥇</span>严格三重共识 <span style="color:#fbbf24;font-size:12px;letter-spacing:1px">⭐⭐⭐⭐⭐</span> <span style="font-size:11px;color:var(--sub);font-weight:400">最严</span> <span style="color:var(--dim);font-weight:400">- 盘后 ·</span> <span class="fresh" id="tcTime">—</span> <!-- 2026-08-31 主人令：统一胶囊版式（绿色 ✅ 与 finalStatusBadges 一致）。renderTc 时 _tcRun.textContent = _tcInfo.label 会覆盖本默认文本 --><span id="tcRunBadge" style="display:none;margin-left:0;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);vertical-align:middle;white-space:nowrap;align-items:center;gap:4px;">✅ 已就绪</span> <span id="tcEnteredBadge" style="display:none;vertical-align:middle;"></span></h3>
         <div id="tcConsensus" class="tp-stocklist"></div>
-        <div class="note">筛选：主站TOP10≥70 且 基本面A档。下方「优先/扩展观察」为差1步/差2步备选（主站评分≥75）。</div>
+        <div class="note">筛选：主站TOP10精选 且 基本面A档（驾驶舱维度已于 09-03 下线移除）。下方「优先观察」为差1步备选（TOP10精选但缺基本面A）。「扩展观察」（差2步）随驾驶舱下线已无来源。</div> <!-- 2026-09-06 审计修复：与 gen_triple_consensus 新口径同步 -->
       </div>
       <div class="card">
         <h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;"><span class="ic">🎯</span>优先观察（差1步）· <span class="fresh" id="tcNearCount">0</span> <span style="font-size:11px;color:var(--sub);font-weight:400">- 盘后 ·</span> <span class="fresh" id="tcNearTime">—</span></h3>
@@ -2578,7 +2578,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- ===== TAB 页面：逆势龙头(CRDS) ===== -->
     <div id="st-crds" class="st-pane"><div class="card" id="stv8CrdsCard">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-          📊 <span style="font-weight:700;font-size:14px;color:var(--txt);">CRDS · 逆势龙头</span><span style="color:#fbbf24;font-size:12px;letter-spacing:1px;margin-left:6px;">⭐⭐⭐</span>
+          📊 <span style="font-weight:700;font-size:14px;color:var(--txt);">CRDS · 逆势龙头</span><!-- 2026-09-06 审计修复：弱市专用不评星（与文档/tab按钮一致），移除 ⭐⭐⭐ -->
           <span style="margin-left:6px;font-size:10px;color:#94a3b8;font-weight:500;background:rgba(148,163,184,.12);padding:1px 6px;border-radius:4px">弱市专用</span>
           <span id="stcrdsTime"><span class="ucard-updated-badge" style="display:inline-flex;align-items:center;flex-wrap:wrap;gap:0;font-size:11px;font-weight:500;color:#cfe3ff;background:linear-gradient(135deg,#13243f,#0e2747);border:1px solid #244066;padding:3px 10px;border-radius:10px;"><span aria-hidden="true">🐻</span><span style="margin-left:4px">更新于</span><span style="color:#9fd0ff;font-weight:600;margin-left:4px">已加载</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#9fd0ff;font-weight:600">盘后</span><span style="opacity:.55;margin-left:6px">·</span><span style="font-size:10px;color:#f5b3d6;font-weight:600">短线</span></span></span>
           <!-- 2026-08-31 主人令：统一胶囊版式（绿色 ✅ 与 finalStatusBadges 一致）。JS 会 textContent 覆盖 --><span id="stcrdsRunBadge" style="display:none;margin-left:6px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;color:#22c55e;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);vertical-align:middle;align-items:center;gap:4px;white-space:nowrap;">✅ 已就绪</span>
@@ -3971,7 +3971,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
   }
 
   /* 2026-09-02 主人令：选股模块星级表全局化（原在已下架分组内，现卡片迁回选股策略仍需共享） */
-  window.__MODULE_STARS = { fourvolume:4, crds:3, triple:5 };  /* 2026-09-03 主人令：hunter/cockpit/allsite/rps 已全方位下线，从 __MODULE_STARS 字典移除 */
+  window.__MODULE_STARS = { fourvolume:4, triple:5 };  /* 2026-09-06 审计修复：crds 移除（弱市专用不评星，与文档一致）；hunter/cockpit/allsite/rps 已全方位下线 */
   window.__moduleStarsHTML = function(k){ var n=(window.__MODULE_STARS&&window.__MODULE_STARS[k])||0; var x=''; for(var i=0;i<n;i++) x+='⭐'; return x || '—'; };
   // ══ 2026-09-02 主人令：策略回测单一来源（一劳永逸）══
   //   主策略区(__renderBacktestSection) / 选股生命周期(__renderLifecycleSection) / 星级表模块行(_buildStrategyRating)
@@ -3983,7 +3983,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     // 既然选股策略子页已彻底删除（九宝不让「选股已删回测还在」），回测卡也不必保留。
     // 当前 active 仅留真正仍在选股策略子页展示的 2 个主策略（fourvolume/crds）。
     {key:'fourvolume', name:'四量终极',     stars:4, icon:'📊', desc:'四量信号历史回测',         color:'#38bdf8', var:'FOUR_VOLUME_BACKTEST'},
-    {key:'crds',       name:'逆势龙头CRDS', stars:3, icon:'🐉', desc:'CRDS advanced 档历史回测', color:'#ef4444', var:'CRDS_BACKTEST'},
+    {key:'crds',       name:'逆势龙头CRDS', stars:0, icon:'🐉', desc:'CRDS advanced 档历史回测', color:'#ef4444', var:'CRDS_BACKTEST'}, /* 2026-09-06 审计修复：弱市专用不评星，回测卡不再挂 3⭐ */
   ];
   // 2026-09-03 主人令：cockpit/allsite 大牛股/全站精选 全部移出回测区，DELISTED 保留为空数组
   //   (防止 _renderBacktestCardsFrom 空引用报错)。如需历史胜率回溯请前往逻辑详解页相关章节。
@@ -10325,7 +10325,8 @@ window.showRestrictedItems = showRestrictedItems;
     }
     h+='</div>';
     h+='<div class="tp-meta"><span class="tp-score">'+(p.total_score||0)+'</span>';
-    h+=' <span>TOP10#'+(p.top10_rank||'-')+' · A档'+(p.a_score||0)+'分 · 基本面'+(p.quality_grade||'-')+'</span></div>';
+    // 2026-09-06 审计修复：驾驶舱下线后 a_score 恒 0，去掉「A档0分」死字段展示
+    h+=' <span>TOP10#'+(p.top10_rank||'-')+' · 基本面'+(p.quality_grade||'-')+'</span></div>';
     let tags='';
     if(p.industry)tags+=makeTag('🏭 '+p.industry,'ind');
     (p.sectors||[]).slice(0,6).forEach(s=>tags+=makeTag(s,'sec'));
@@ -10648,7 +10649,7 @@ window.showRestrictedItems = showRestrictedItems;
     if(n==='life' && typeof window.__renderLifecycleSection==='function') setTimeout(window.__renderLifecycleSection, 30);
     if(n==='life' && typeof window.__renderImaStrongStock==='function') setTimeout(window.__renderImaStrongStock, 30);
     if(n==='life' && typeof window.__renderStrongBreakout==='function') setTimeout(window.__renderStrongBreakout, 30);
-    if(n==='life' && typeof window.__renderFactorLab==='function') setTimeout(window.__renderFactorLab, 30);
+    // 2026-09-06 审计修复：__renderFactorLab 死调用移除（因子实验室容器已迁暂未上架·实验区，life tab 无此容器）
     // 🛡 2026-09-02 主人令根治：切换后立即启动「子 tab 数据就绪重试」（见 __stRetryTab），消除 defer 未注入导致的首渲空卡
     try{ window.__stRetryTab(n); }catch(e){}
   };
@@ -12190,7 +12191,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       var timeEl=document.getElementById(p+'crdsTime');
       if(timeEl){
         var _ts=d && d.update_time ? d.update_time : '已加载';
-        var _validity = (mc && mc.validity) ? mc.validity : '未知';
+        var _validity = (d && d.market_context && d.market_context.validity) ? d.market_context.validity : '未知'; /* 🐛 2026-09-06 P0 修复：原读 mc，但 var mc 在下方「大盘环境」段才赋值（var 提升→此处恒 undefined），时间胶囊状态词（出局/观望/正常）永远空白 */
         var _statusKw = '';
         if(_validity === '失效') _statusKw = ' · 出局';
         else if(_validity === '低效') _statusKw = ' · 观望';
