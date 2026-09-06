@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- 🛡 2026-09-06 缓存防护：曾发生用户浏览器滞留旧版数小时导致「tab 全断」误判。meta 提示浏览器别缓存 HTML；真实版本以右下角 FILE_STAMP（document.lastModified）为准。 -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>九宝量化 v8 · 逻辑详解</title>
 <!-- 2026-08-31 轻量化：逻辑详解页从 index.html 拆出为独立页（本体 153.6 KB 不再进首屏）。
      依赖的全局脚本块（管理员锁 / 盘后模块 / 运维·逻辑模块）随页复制，保证交互不缺失。 -->
@@ -9151,6 +9155,17 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
 </script>
 
 <!-- 2026-09-01 修复：删除错误的「显示所有子面板」兜底脚本。导航依赖 .lg-pane.active 控制，强制全部显示会让导航失效。 -->
+
+<!-- 🛡 2026-09-06 版本戳：右下角常显文件时间（document.lastModified）。用于一眼识别浏览器加载的是否为最新版——
+     若与仓库最新提交时间不符，说明浏览器滞留旧缓存，请 Ctrl+F5 或 DevTools 右键刷新→「清空缓存并硬性重新加载」。 -->
+<div id="lgFileStamp" title="当前加载文件的最后修改时间；若明显早于最新部署时间=浏览器缓存未更新，请硬刷新" style="position:fixed;right:10px;bottom:8px;z-index:9999;font-size:10px;font-family:monospace;color:#5a6b8c;opacity:.75;pointer-events:auto;cursor:default;background:rgba(8,16,24,.55);padding:2px 7px;border-radius:6px;border:1px solid rgba(90,107,140,.25);"></div>
+<script>
+(function(){
+  var el=document.getElementById('lgFileStamp');
+  if(el) el.textContent='页面版本 '+(document.lastModified||'?');
+  console.log('%c[logic.html] 页面文件时间: '+(document.lastModified||'?')+'（右下角同步显示；明显偏旧=请硬刷新）','color:#38bdf8');
+})();
+</script>
 
 </body>
 </html>
