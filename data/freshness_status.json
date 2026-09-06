@@ -69,7 +69,6 @@
     "AVG_PRICE_DATA": "intraday",
     "ALGO_TRACK": "post_close",
     "INDEX_HISTORY": "post_close",
-    "MARKET_PATH_PROBABILITY": "post_close",
     "MARKET_REGIME": "post_close",
     "SECTOR_RECOMMENDATION": "post_close",
     "FINAL_RECOMMEND_DATA": "post_close",
