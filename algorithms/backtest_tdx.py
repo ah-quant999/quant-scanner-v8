@@ -51,6 +51,9 @@ OUT = os.path.join(DATA_DIR, "backtest_tdx.json")
 TODAY = datetime.now().strftime("%Y-%m-%d")
 HOLD_DAYS = [1, 3, 5, 10, 20]  # 2026-07-26: 从 3d/5d 扩展到 1/3/5/10/20d
 
+# 2026-09-06 主人令 P1-A：A 股交易成本默认假设（单边 万分之1.5，双边 0.3%）
+COST_BPS = 15
+
 # ═══ 2026-08-09 主人令：提胜率优化策略（①+②+③）═══
 # ① 持仓周期纪律：把最长持有期从 20d 收紧到 10d
 # ② 多源共振过滤：只做 ≥3 信号共振（ge3）
@@ -383,7 +386,7 @@ def calc_forward_return(rows, idx, hold_days, board="主板"):
             break
 
     raw_ret = round((rows[target]["close"] - entry) / entry * 100, 2)
-    early_ret = round((exit_price - entry) / entry * 100, 2)
+    early_ret = round((exit_price - entry) / entry * 100 - 2 * COST_BPS / 100, 2)  # P1-A 扣双边 0.3%
     return {
         "ret": early_ret,
         "raw_ret": raw_ret,
@@ -391,6 +394,7 @@ def calc_forward_return(rows, idx, hold_days, board="主板"):
         "stop_loss": stop_loss,
         "target_price": target_price,
         "risk_reward": rr,
+        "cost_adjusted": True,
     }
 
 

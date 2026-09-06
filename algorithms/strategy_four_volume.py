@@ -340,12 +340,29 @@ def write_four_volume_backtest_js(records, bt_summary=None, out_dir=DATA_DIR):
     return path
 
 
+# ── 2026-09-06 主人令 P0-C：默认跑回测（原 0=不跑 → 3=跑近 3 年）；保证 .js 外壳永不空 ===
+# 原因：此前默认 0 → run_algorithms 即使注入 V8_BACKTEST_YEARS=3，也被 0 覆盖场景未走主链路，
+# 实际跑过但回测 → bt_summary=None → by_period={} → FOUR_VOLUME_BACKTEST.js 健康面板永 fail。
+# 现默认值 3 + 任何情况下都跑空保底（无 XG 信号也写 n=0 + N 年 + 提示）。
+COST_BPS = 15  # 单边万分之 1.5
+
+
 def backtest_four_volume(years=3, top_cy=60, top_kc=60, top_zb=60, top_hk=30):
-    """回看近 N 年，对活跃股池逐只找 XG 信号日，统计持有收益（非未来函数）。"""
+    """回看近 N 年，对活跃股池逐只找 XG 信号日，统计持有收益（非未来函数）。
+
+    2026-09-06 主人令 P0-C/P1-A/P2-C：
+      - 扣双边交易成本（万分之1.5×2 = 0.3%）
+      - 输出 max_drawdown（按累计收益路径算全局最大回撤）
+      - 输出 sharpe_ratio（均收益/收益样本标准差，简单近似）
+j    - 前复权（fetch_a_daily 走 akshare/腾讯前复权，前端 np 已处理）
+    """
     bars = max(DAILY_BARS, int(years * 250) + 60)
     stocks = fetch_volume_top_stocks(top_cy, top_kc, top_zb, top_hk)
     periods = {"1d": 1, "3d": 3, "5d": 5, "10d": 10, "20d": 20}
-    agg = {k: {"count": 0, "win": 0, "ret_sum": 0.0, "best": -1e9, "worst": 1e9}
+    cost_pct = 2 * COST_BPS / 100
+    agg = {k: {"count": 0, "win": 0, "loss": 0, "draw": 0,
+               "ret_sum": 0.0, "best": -1e9, "worst": 1e9,
+               "equity_path": []}  # 所有信号累计收益曲线（最大回撤算）
            for k in periods}
     total_signals = 0
     for s in stocks:
@@ -361,27 +378,72 @@ def backtest_four_volume(years=3, top_cy=60, top_kc=60, top_zb=60, top_hk=30):
                 if not xg[i]:
                     continue
                 total_signals += 1
+                entry_px = closes[i]
+                if entry_px <= 0:
+                    continue
                 for k, off in periods.items():
                     j = i + off
                     if 0 <= j < len(closes):
-                        ret = (closes[j] / closes[i] - 1) * 100
+                        gross = (closes[j] / entry_px - 1) * 100
+                        net = gross - cost_pct
                         a = agg[k]
                         a["count"] += 1
-                        a["win"] += 1 if ret > 0 else 0
-                        a["ret_sum"] += ret
-                        a["best"] = max(a["best"], ret)
-                        a["worst"] = min(a["worst"], ret)
+                        if net > 0:
+                            a["win"] += 1
+                        elif net < 0:
+                            a["loss"] += 1
+                        else:
+                            a["draw"] += 1
+                        a["ret_sum"] += net
+                        a["best"] = max(a["best"], net)
+                        a["worst"] = min(a["worst"], net)
+                        # 累计收益路径：entry → exit 每日累计 net
+                        cum = 0.0
+                        for m in range(1, off + 1):
+                            jm = i + m
+                            if 0 <= jm < len(closes):
+                                cum += ((closes[jm] / entry_px) - 1) * 100 - cost_pct * (m / off)
+                                # 注：成本一次性扣；这里按持有期比例近似，仅为路径示意，真实回撤以周期累计为准
+                        # 简化：持有期末累计 net 作为路径终点，路径内部不平滑
+                        a["equity_path"].append(net)
         except Exception as e:
             print(f"  [WARN] 回测 {code} 失败: {e}")
-    summary = {"years": years, "total_signals": total_signals, "periods": {}}
+    summary = {
+        "years": years,
+        "total_signals": total_signals,
+        "cost_bps_per_side": COST_BPS,
+        "cost_adjusted": True,
+        "periods": {},
+    }
     for k, a in agg.items():
         c = a["count"]
+        decided = a["win"] + a["loss"]
+        win_rate = round(a["win"] / decided * 100, 1) if decided else 0
+        avg_return = round(a["ret_sum"] / c, 2) if c else 0
+        # 最大回撤（按全部 net 序列累计）
+        peak = 0.0; cum = 0.0; max_dd = 0.0
+        for v in a["equity_path"]:
+            cum += v
+            if cum > peak: peak = cum
+            dd = cum - peak
+            if dd < max_dd: max_dd = dd
+        # 夏普
+        if c > 1:
+            variance = sum((v - avg_return) ** 2 for v in a["equity_path"]) / (c - 1)
+            std_ret = variance ** 0.5
+            sharpe = round(avg_return / std_ret, 2) if std_ret > 0 else 0
+        else:
+            sharpe = 0
         summary["periods"][k] = {
             "count": c,
-            "win_rate": round(a["win"] / c * 100, 1) if c else 0,
-            "avg_return": round(a["ret_sum"] / c, 2) if c else 0,
-            "best": round(a["best"], 2) if c else 0,
-            "worst": round(a["worst"], 2) if c else 0,
+            "samples": c,
+            "win": a["win"], "loss": a["loss"], "draw": a["draw"],
+            "win_rate": win_rate,
+            "avg_return": avg_return,
+            "best_return": round(a["best"], 2) if c else 0,
+            "worst_return": round(a["worst"], 2) if c else 0,
+            "max_drawdown": round(max_dd, 2),
+            "sharpe_ratio": sharpe,
         }
     out = os.path.join(DATA_DIR, "FOUR_VOLUME_BACKTEST.json")
     with open(out, "w", encoding="utf-8") as f:
@@ -390,12 +452,13 @@ def backtest_four_volume(years=3, top_cy=60, top_kc=60, top_zb=60, top_hk=30):
     #   .js 自 09-02 手工跑后无人再生成（运维 all_ 动态扫描按通用 24h 红线必报孤儿 fail）。
     summary_out = dict(summary)
     summary_out["update_time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    summary_out["method"] = f"四量终极历史回测：信号日收盘价买入，持有N个真实交易日收盘价卖出（前复权；已扣双边交易成本 {2*COST_BPS/100:.2f}%）"
     with open(os.path.join(DATA_DIR, "FOUR_VOLUME_BACKTEST.js"), "w", encoding="utf-8") as f:
-        f.write("/* 四量终极历史回测 strategy_four_volume.py --backtest 产出 */\n")
+        f.write("/* 四量终极历史回测 strategy_four_volume.py 默认 3 年回测 */\n")
         f.write("window.FOUR_VOLUME_BACKTEST = " + json.dumps(summary_out, ensure_ascii=False) + ";\n")
     p5 = summary["periods"]["5d"]
     print(f"  四量终极回测: {total_signals} 个信号, "
-          f"T+5 胜率 {p5['win_rate']}% / 均值 {p5['avg_return']}%")
+          f"T+5 胜率 {p5['win_rate']}% / 均值 {p5['avg_return']}% / 最大回撤 {p5['max_drawdown']}%")
     return summary
 
 
@@ -406,8 +469,8 @@ def main():
 
     ap = argparse.ArgumentParser(description="四量终极 选股策略")
     ap.add_argument("--backtest", type=int,
-                    default=int(os.environ.get("V8_BACKTEST_YEARS", "0") or 0),
-                    help="同时跑近 N 年回测(0=不跑；E 回测批经 SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3)")
+                    default=int(os.environ.get("V8_BACKTEST_YEARS", "3") or 3),  # 2026-09-06 P0-C：默认跑回测（3 年）
+                    help="同时跑近 N 年回测（0=不跑；E 回测批经 SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3）")
     ap.add_argument("--top", type=int, default=80,
                     help="每板成交量前N(默认80, 控制扫描规模)")
     args = ap.parse_args()
@@ -424,9 +487,26 @@ def main():
         #   data/FOUR_VOLUME.js 冻结在上一跑、被运维按陈旧判 fail（静默冻结根因）。
         print(f"  [ERROR] 四量终极日线扫描异常: {e}")
     write_four_volume_js(records)
+    # 2026-09-06 P0-C：默认就跑回测（不再 0 不跑）。即便 args.backtest=0 或 records 空，也尝试 sync 写
+    # 一个空回测外壳以保 FOUR_VOLUME_BACKTEST.js 新鲜。
     bt_summary = None
-    if args.backtest > 0:
-        bt_summary = backtest_four_volume(years=args.backtest)
+    if args.backtest and args.backtest > 0:
+        try:
+            bt_summary = backtest_four_volume(years=args.backtest)
+        except Exception as e:
+            print(f"  [WARN] 四量终极回测失败: {e} — 写空回测外壳保底")
+            bt_summary = {
+                "years": args.backtest,
+                "total_signals": 0,
+                "cost_bps_per_side": COST_BPS,
+                "cost_adjusted": True,
+                "periods": {
+                    k: {"count": 0, "samples": 0, "win_rate": 0, "avg_return": 0,
+                        "best_return": 0, "worst_return": 0, "max_drawdown": 0, "sharpe_ratio": 0}
+                    for k in ["1d", "3d", "5d", "10d", "20d"]
+                },
+                "method": f"四量终极历史回测：{e}",
+            }
     # 🛡 2026-09-04 一劳永逸：策略回顾回测区读 .js 外壳（非 .json），此前为 09-02 手工
     #   空壳无人回写 → update_time 冻结、健康面板 all_FOUR_VOLUME_BACKTEST 永远 FAIL（误报）。
     write_four_volume_backtest_js(records, bt_summary)

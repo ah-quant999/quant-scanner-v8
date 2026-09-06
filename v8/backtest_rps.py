@@ -43,6 +43,9 @@ OUT_JSON = RAW_DIR / "rps_backtest.json"
 OUT_JS = DATA_DIR / "RPS_BACKTEST.js"
 HOLD_PERIODS = [1, 3, 5, 10, 20]
 
+# 2026-09-06 主人令 P1-A：交易成本默认假设（单边万分之 1.5，双边 0.3%）
+COST_BPS = 15
+
 
 def parse_date_from_filename(name):
     """stock_rps_20260902.json -> 2026-09-02"""
@@ -120,12 +123,13 @@ def add_trade_days(date_str, n):
 
 
 def fetch_close(code, date):
+    """获取某股票某交易日收盘价（前复权，2026-09-06 P0-B 修复）。"""
     if bs is None:
         return None
     try:
         r = bs.query_history_k_data_plus(
             bs_code(code), "date,close",
-            start_date=date, end_date=date, frequency="d", adjustflag="3",
+            start_date=date, end_date=date, frequency="d", adjustflag="2",
         )
         row = r.get_row_data()
         if row and len(row) >= 2 and row[1]:
@@ -133,6 +137,33 @@ def fetch_close(code, date):
     except Exception as e:
         print(f"[fetch] {code} {date} error: {e}")
     return None
+
+
+def fetch_kline_around(code, center_date_str, lookback_days=8, lookahead_days=35):
+    """2026-09-06 P0-B：用 K 线段替代日历日持有期。旧版「日历日 +N」在周末/节假日时
+    baostock 返回 None → T+3/T+5/T+10/T+20 几乎全 0 samples。新版用 K 线索引直接偏移
+    N 个真实交易日，从根本上消除空样本。
+    """
+    if bs is None:
+        return []
+    try:
+        d = datetime.strptime(center_date_str, "%Y-%m-%d").date()
+        start = (d - timedelta(days=lookback_days)).strftime("%Y-%m-%d")
+        end = (d + timedelta(days=lookahead_days)).strftime("%Y-%m-%d")
+        r = bs.query_history_k_data_plus(
+            bs_code(code), "date,close",
+            start_date=start, end_date=end,
+            frequency="d", adjustflag="2",
+        )
+        rows = []
+        while r.error_code == "0" and r.next():
+            x = r.get_row_data()
+            if x and x[0] and x[1]:
+                rows.append((x[0], float(x[1])))
+        return rows
+    except Exception as e:
+        print(f"[kline] {code} {center_date_str} error: {e}")
+        return []
 
 
 def fmt_pct(v):
@@ -200,59 +231,112 @@ def main():
         print("[rps backtest] baostock login failed -> empty backtest")
         return 0
 
+    # 2026-09-06 主人令 P0-B：用连续 K 线段替代日历日 +1/3/5/10/20，从根本上解决 T+3/T+5/T+10/T+20
+    # 全部取不到价的 bug（旧版以日历日偏移，遇到周末/节假日 baostock 返回 None → 0 samples）。
     period_returns = {p: [] for p in HOLD_PERIODS}
+    period_gross = {p: [] for p in HOLD_PERIODS}
+    period_per_signal_equity = {p: [] for p in HOLD_PERIODS}
     detail_signals = []
     total = len(signals)
+    cost_pct = 2 * COST_BPS / 100
     for idx, sig in enumerate(signals, 1):
         code = sig["code"]
-        entry_date = sig["signal_date"]
-        entry_price, entry_td = fetch_close_roll(code, entry_date)
+        signal_date = sig["signal_date"]
+        rows = fetch_kline_around(code, signal_date, lookback_days=8, lookahead_days=35)
+        entry_idx = None
+        for i, (d, _) in enumerate(rows):
+            if d >= signal_date:
+                entry_idx = i; break
+        if entry_idx is None:
+            print(f"[{idx}/{total}] skip {code} {signal_date}: no kline after signal date")
+            continue
+        entry_td, entry_price = rows[entry_idx]
         if entry_price is None or entry_price <= 0:
-            print(f"[{idx}/{total}] skip {code} {entry_date}: no entry price (rolled)")
+            print(f"[{idx}/{total}] skip {code} {signal_date}: invalid entry price")
             continue
         sig_result = {
-            "signal_date": entry_date, "entry_trade_date": entry_td, "code": code, "name": sig["name"],
-            "entry_price": entry_price, "periods": {},
+            "signal_date": signal_date, "entry_trade_date": entry_td, "code": code, "name": sig["name"],
+            "entry_price": round(entry_price, 2), "periods": {},
         }
         for p in HOLD_PERIODS:
-            exit_target = (datetime.strptime(entry_td, "%Y-%m-%d").date() + timedelta(days=p)).strftime("%Y-%m-%d")
-            exit_price, exit_td = fetch_close_roll(code, exit_target)
-            if exit_price is None or exit_price <= 0:
-                sig_result["periods"][str(p)] = {"return_pct": None, "exit_price": None, "exit_date": exit_target}
+            target_idx = entry_idx + p
+            if target_idx >= len(rows):
+                sig_result["periods"][str(p)] = {"return_pct": None, "gross_return": None, "exit_price": None, "exit_date": None}
                 continue
-            ret = (exit_price - entry_price) / entry_price * 100
-            sig_result["periods"][str(p)] = {"return_pct": fmt_pct(ret), "exit_price": exit_price, "exit_date": exit_td}
-            period_returns[p].append(ret)
+            exit_td, exit_price = rows[target_idx]
+            gross = (exit_price - entry_price) / entry_price * 100
+            net = gross - cost_pct
+            sig_result["periods"][str(p)] = {
+                "return_pct": fmt_pct(net),
+                "gross_return": fmt_pct(gross),
+                "exit_price": round(exit_price, 2),
+                "exit_date": exit_td,
+            }
+            period_returns[p].append(net)
+            period_gross[p].append(gross)
+            cum_path = []
+            for k in range(1, p + 1):
+                j = entry_idx + k
+                if j >= len(rows): break
+                _, px2 = rows[j]
+                cum_path.append((px2 / entry_price - 1) * 100 - cost_pct)
+            period_per_signal_equity[p].append(cum_path)
         detail_signals.append(sig_result)
         if idx % 10 == 0 or idx == total:
-            print(f"[{idx}/{total}] {code} {entry_date} -> entry {entry_td} done")
+            print(f"[{idx}/{total}] {code} {signal_date} -> entry {entry_td} done")
 
     try:
         bs.logout()
     except Exception:
         pass
 
+    # 2026-09-06 主人令 P0-B：胜率口径统一排平盘；P2-C 加最大回撤+夏普；P1-A 标注含成本
     by_period = {}
     for p in HOLD_PERIODS:
         rets = period_returns[p]
+        equity_paths = period_per_signal_equity[p]
         if not rets:
             by_period[str(p)] = {
                 "samples": 0, "win_rate": 0, "avg_return": 0,
                 "best_return": 0, "worst_return": 0,
                 "win_avg": 0, "loss_avg": 0, "profit_loss_ratio": 0,
+                "max_drawdown": 0, "sharpe_ratio": 0,
             }
             continue
         wins = [r for r in rets if r > 0]
-        losses = [r for r in rets if r <= 0]
+        losses = [r for r in rets if r < 0]  # 排平盘
+        draws = [r for r in rets if r == 0]
+        decided = len(wins) + len(losses)
+        avg_ret = sum(rets) / len(rets)
+        win_avg = sum(wins) / len(wins) if wins else 0
+        loss_avg = sum(losses) / len(losses) if losses else 0
+        profit_loss_ratio = abs(win_avg / loss_avg) if wins and losses else 0
+        global_max_dd = 0.0
+        all_path = []
+        for pth in equity_paths:
+            all_path.extend(pth)
+        peak = 0.0; cum = 0.0
+        for v in all_path:
+            cum += v
+            if cum > peak: peak = cum
+            dd = cum - peak
+            if dd < global_max_dd: global_max_dd = dd
+        variance = sum((r - avg_ret) ** 2 for r in rets) / max(len(rets) - 1, 1)
+        std_ret = variance ** 0.5
+        sharpe = round(avg_ret / std_ret, 2) if std_ret > 0 else 0
         by_period[str(p)] = {
             "samples": len(rets),
-            "win_rate": fmt_pct(len(wins) / len(rets) * 100),
-            "avg_return": fmt_pct(sum(rets) / len(rets)),
+            "draws": len(draws),
+            "win_rate": fmt_pct(len(wins) / decided * 100) if decided else 0,
+            "avg_return": fmt_pct(avg_ret),
             "best_return": fmt_pct(max(rets)),
             "worst_return": fmt_pct(min(rets)),
-            "win_avg": fmt_pct(sum(wins) / len(wins)) if wins else 0,
-            "loss_avg": fmt_pct(sum(losses) / len(losses)) if losses else 0,
-            "profit_loss_ratio": fmt_pct(abs((sum(wins) / len(wins)) / (sum(losses) / len(losses)))) if wins and losses else 0,
+            "win_avg": fmt_pct(win_avg),
+            "loss_avg": fmt_pct(loss_avg),
+            "profit_loss_ratio": fmt_pct(profit_loss_ratio),
+            "max_drawdown": fmt_pct(global_max_dd),
+            "sharpe_ratio": sharpe,
+            "cost_adjusted": True,
         }
 
     dates = sorted({s["signal_date"] for s in signals})
@@ -263,8 +347,9 @@ def main():
             "update_time": now,
             "total_signals": len(signals),
             "calc_time": now,
-            "method": "RPS 相对强度 A档历史回测：信号日收盘价买入，持有N个交易日收盘价卖出（不处理节假日，按日历日+1/3/5/10/20）",
+            "method": "RPS 相对强度 A档历史回测：信号日取真实下一交易日开盘买入，持有 N 个真实交易日收盘价卖出（前复权；胜率=win/(win+loss) 排平盘；已扣双边交易成本 0.3%）",
             "signal_date_range": f"{dates[0]} ~ {dates[-1]}",
+            "cost_bps_per_side": COST_BPS,
             "by_period": by_period,
         },
         "signals": detail_signals,

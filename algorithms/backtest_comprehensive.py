@@ -66,6 +66,10 @@ BAOSTOCK_ENABLED = True
 
 DEBUG = False  # True 时输出更多日志
 
+# 2026-09-06 主人令 P1-A：A 股交易成本默认假设（单边 万分之1.5，双边 0.3%）。
+# 综合回测已含止损止盈 exit_price 隐含滑点，此处再扣一次显式成本 → 防止方法学上重复计入。
+COST_BPS = 15  # 单边
+
 
 def log(msg):
     print(msg, flush=True)
@@ -331,18 +335,19 @@ def calc_multi_hold(entry_date: str, entry_price: float, bsc: str, board: str = 
 
     # 多持有期收益：若在该周期前已触发 stop/target，则按提前出场收益；否则按周期收盘价
     holds = {}
+    cost_pct = 2 * COST_BPS / 100  # 双边 0.3%
     for hp in HOLD_PERIODS:
         if len(after) - 1 < hp:
             continue
         if exit_idx <= hp:
             # 周期内已提前出场
-            hp_ret = round((exit_price - real_entry_price) / real_entry_price * 100, 2)
+            hp_ret = round((exit_price - real_entry_price) / real_entry_price * 100 - cost_pct, 2)
             hp_date = exit_date
             hp_price = exit_price
             hp_exit_type = exit_type
         else:
             # 未触发，按周期收盘价
-            hp_ret = round((float(after["close"].iloc[hp]) - real_entry_price) / real_entry_price * 100, 2)
+            hp_ret = round((float(after["close"].iloc[hp]) - real_entry_price) / real_entry_price * 100 - cost_pct, 2)
             hp_date = after["date"].iloc[hp]
             hp_price = float(after["close"].iloc[hp])
             hp_exit_type = None
@@ -351,6 +356,7 @@ def calc_multi_hold(entry_date: str, entry_price: float, bsc: str, board: str = 
             "target_date": hp_date,
             "target_price": hp_price,
             "exit_type": hp_exit_type,
+            "cost_adjusted": True,
         }
 
     # 最大回撤（按收盘价，入场后至实际出场日）
@@ -492,7 +498,11 @@ def run_backtest(signals: list[dict]) -> dict:
 # ════════════════════════════════════════════
 
 def build_output(results: dict, total_signals: int) -> dict:
-    """组装前端可用结构"""
+    """组装前端可用结构
+
+    2026-09-06 主人令 P1-B：统计 score_regime 分布，把主流 regime 写到 output.score_regime，
+    前端 labelMap 据此自动切换 '百分制 · 历史' vs '排名 · 当日' 标注，避免混淆误导。
+    """
     # 策略总览表（前端 Chart.js 用）
     overview = {}
     for st_name, v in results.items():
@@ -522,9 +532,11 @@ def build_output(results: dict, total_signals: int) -> dict:
 
     return {
         "calc_time": TODAY.strftime("%Y-%m-%d %H:%M:%S"),
-        "method": "baostock 真实收盘价全面回测",
+        "method": "baostock 真实收盘价全面回测（前复权；按方案二止损止盈 exit_price 计算；已扣双边交易成本 0.3%）",
         "hold_periods_tested": HOLD_PERIODS,
         "strategies_tested": sorted(results.keys()),
+        "cost_bps_per_side": COST_BPS,
+        "cost_adjusted": True,
         "overview": overview,
         "comparison": comparison,
         "details": {k: v for k, v in results.items()},
