@@ -27,10 +27,14 @@ name: "📈 v8 STOCK_QUOTE 轻量 refresh"
 on:
   schedule:
     # 09:00-16:30 北京时间（UTC 01:00-08:30），每 30 分钟一次
-    # 🔧 2026-09-07 重新注册 schedule：GitHub 调度器静默丢失本 workflow 的 cron 注册，
-    #   自 2026-09-04 10:41(UTC) 起零 schedule 触发（仅 workflow_dispatch 手动可跑）。
-    #   本注释变更强制 GitHub 重新解析并注册 cron。
-    - cron: '*/30 1-8 * * 1-5'
+    # 🔧 2026-09-07 一修失败：仅改注释未唤醒调度器（09-07 全天 6 轮全是 workflow_dispatch，
+    #   schedule 自 09-04 18:41 起零触发 → 实测「注释变更」不足以让 GitHub 重新注册 cron）。
+    # 🔧 2026-09-07 二修（结构性变更）：把 '*/30 1-8 * * 1-5' 拆成显式「整点 + 半点」两条 cron 行。
+    #   语义等价（北京 09:00/09:30/…/16:30），但对 schedule 段做结构改动，强制重新注册。
+    #   兜底不撤：82038f74(15分级) + 11:10/13:10/15:10 三档仍常驻；cron 恢复后由
+    #   「age<=15min」与「查活跃 run」双重防互踩拦截，不会重复派发。
+    - cron: '0 1-8 * * 1-5'
+    - cron: '30 1-8 * * 1-5'
   workflow_dispatch:
     inputs:
       skip_trading_day_gate:
