@@ -1,30 +1,37 @@
 {
-  "update_time": "2026-09-07 21:16:58",
-  "data_date": "2026-09-07",
-  "track_start": "2026-09-07",
-  "history_days": 14,
-  "strict_count": 0,
-  "near_count": 2,
+  "update_time": "2026-09-08 00:38:23",
+  "data_date": "2026-09-08",
+  "track_start": "2026-09-08",
+  "history_days": 15,
+  "strict_count": 4,
+  "near_count": 0,
   "tracked": [
     {
-      "code": "688808",
-      "name": "联讯仪器",
+      "code": "601899",
+      "name": "紫金矿业",
       "market": "sh",
-      "board": "科创板",
-      "status": "near",
-      "total_score": 55.9,
+      "board": "主板",
+      "status": "strict",
+      "total_score": 39.1,
       "quality_grade": "A",
-      "industry": "仪器仪表制造业",
+      "industry": "有色金属矿采选业",
       "sectors": [
-        "仪器仪表制造业"
+        "2026中报预增",
+        "一带一路",
+        "稀缺资源",
+        "机构重仓",
+        "反转股",
+        "MSCI中国",
+        "有色金属矿采选业",
+        "锂矿概念"
       ],
-      "signal_count": null,
-      "enter_date": "2026-09-07",
-      "hold_days": 1,
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 9,
       "consecutive_days": 1,
-      "first_close": 2465.0,
-      "current_close": 2465.0,
-      "pnl_pct": 0.0,
+      "first_close": 33.36,
+      "current_close": 32.87,
+      "pnl_pct": -1.47,
       "catalysts": [
         {
           "tag": "中报预增",
@@ -34,41 +41,97 @@
       ]
     },
     {
-      "code": "300760",
-      "name": "迈瑞医疗",
+      "code": "300476",
+      "name": "胜宏科技",
       "market": "sz",
       "board": "创业板",
-      "status": "near",
-      "total_score": 44.7,
+      "status": "strict",
+      "total_score": 45.3,
+      "quality_grade": "A",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "百元股",
+        "深证100R",
+        "计算机、通信和其他电子设备制造业",
+        "深股通",
+        "小米概念",
+        "MSCI中国",
+        "PCB",
+        "物联网"
+      ],
+      "signal_count": 1,
+      "enter_date": "2026-08-17",
+      "hold_days": 3,
+      "consecutive_days": 1,
+      "first_close": 0,
+      "current_close": 233.46,
+      "pnl_pct": null,
+      "catalysts": []
+    },
+    {
+      "code": "300274",
+      "name": "阳光电源",
+      "market": "sz",
+      "board": "创业板",
+      "status": "strict",
+      "total_score": 36.6,
+      "quality_grade": "A",
+      "industry": "电气机械和器材制造业",
+      "sectors": [
+        "电气机械和器材制造业",
+        "百元股",
+        "HS300",
+        "充电桩",
+        "深证100R",
+        "深股通",
+        "MSCI中国",
+        "行业龙头"
+      ],
+      "signal_count": 1,
+      "enter_date": "2026-08-17",
+      "hold_days": 3,
+      "consecutive_days": 1,
+      "first_close": 0,
+      "current_close": 88.75,
+      "pnl_pct": null,
+      "catalysts": []
+    },
+    {
+      "code": "300604",
+      "name": "长川科技",
+      "market": "sz",
+      "board": "创业板",
+      "status": "strict",
+      "total_score": 29.8,
       "quality_grade": "A",
       "industry": "专用设备制造业",
       "sectors": [
-        "独角兽",
-        "MSCI中国",
-        "深股通",
-        "HS300",
-        "医疗器械概念",
-        "深证100R",
+        "2026中报预增",
         "专用设备制造业",
-        "百元股"
+        "百元股",
+        "深股通",
+        "大盘股",
+        "基金重仓",
+        "MSCI中国",
+        "深成500"
       ],
-      "signal_count": null,
-      "enter_date": "2026-09-07",
-      "hold_days": 1,
+      "signal_count": 0,
+      "enter_date": "2026-08-17",
+      "hold_days": 3,
       "consecutive_days": 1,
-      "first_close": 169.91,
-      "current_close": 169.91,
-      "pnl_pct": 0.0,
-      "catalysts": []
+      "first_close": 0,
+      "current_close": 270.5,
+      "pnl_pct": null,
+      "catalysts": [
+        {
+          "tag": "中报预增",
+          "score": 15,
+          "reaction": "—"
+        }
+      ]
     }
   ],
   "alerts": [
-    {
-      "level": "warn",
-      "code": "601899",
-      "name": "紫金矿业",
-      "text": "紫金矿业(601899) 于 2026-08-30 跌出共识（曾连续 4 日）"
-    },
     {
       "level": "warn",
       "code": "603993",
@@ -113,12 +176,6 @@
     },
     {
       "level": "warn",
-      "code": "300274",
-      "name": "阳光电源",
-      "text": "阳光电源(300274) 于 2026-08-18 跌出共识（曾连续 2 日）"
-    },
-    {
-      "level": "warn",
       "code": "688331",
       "name": "荣昌生物",
       "text": "荣昌生物(688331) 于 2026-09-04 跌出共识（曾连续 2 日）"
@@ -131,12 +188,6 @@
     },
     {
       "level": "warn",
-      "code": "300476",
-      "name": "胜宏科技",
-      "text": "胜宏科技(300476) 于 2026-08-19 跌出共识（曾连续 2 日）"
-    },
-    {
-      "level": "warn",
       "code": "002371",
       "name": "创联控股",
       "text": "创联控股(002371) 于 2026-08-19 跌出共识（曾连续 3 日）"
@@ -146,12 +197,6 @@
       "code": "002396",
       "name": "青城新药－B",
       "text": "青城新药－B(002396) 于 2026-08-18 跌出共识（曾连续 2 日）"
-    },
-    {
-      "level": "warn",
-      "code": "300604",
-      "name": "长川科技",
-      "text": "长川科技(300604) 于 2026-08-19 跌出共识（曾连续 3 日）"
     },
     {
       "level": "warn",
@@ -278,40 +323,114 @@
       "code": "000807",
       "name": "云铝股份",
       "text": "云铝股份(000807) 于 2026-09-04 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "688808",
+      "name": "联讯仪器",
+      "text": "联讯仪器(688808) 于 2026-09-07 跌出共识（曾连续 1 日）"
+    },
+    {
+      "level": "warn",
+      "code": "300760",
+      "name": "迈瑞医疗",
+      "text": "迈瑞医疗(300760) 于 2026-09-07 跌出共识（曾连续 1 日）"
     }
   ],
   "sector_cluster": {
     "by_industry": [
       {
-        "industry": "仪器仪表制造业",
+        "industry": "有色金属矿采选业",
         "count": 1,
         "names": [
-          "联讯仪器"
+          "紫金矿业"
+        ]
+      },
+      {
+        "industry": "计算机、通信和其他电子设备制造业",
+        "count": 1,
+        "names": [
+          "胜宏科技"
+        ]
+      },
+      {
+        "industry": "电气机械和器材制造业",
+        "count": 1,
+        "names": [
+          "阳光电源"
         ]
       },
       {
         "industry": "专用设备制造业",
         "count": 1,
         "names": [
-          "迈瑞医疗"
+          "长川科技"
         ]
       }
     ],
     "by_sector": [
       {
-        "sector": "仪器仪表制造业",
-        "count": 1
-      },
-      {
-        "sector": "独角兽",
-        "count": 1
-      },
-      {
         "sector": "MSCI中国",
-        "count": 1
+        "count": 4
+      },
+      {
+        "sector": "百元股",
+        "count": 3
       },
       {
         "sector": "深股通",
+        "count": 3
+      },
+      {
+        "sector": "2026中报预增",
+        "count": 2
+      },
+      {
+        "sector": "深证100R",
+        "count": 2
+      },
+      {
+        "sector": "一带一路",
+        "count": 1
+      },
+      {
+        "sector": "稀缺资源",
+        "count": 1
+      },
+      {
+        "sector": "机构重仓",
+        "count": 1
+      },
+      {
+        "sector": "反转股",
+        "count": 1
+      },
+      {
+        "sector": "有色金属矿采选业",
+        "count": 1
+      },
+      {
+        "sector": "锂矿概念",
+        "count": 1
+      },
+      {
+        "sector": "计算机、通信和其他电子设备制造业",
+        "count": 1
+      },
+      {
+        "sector": "小米概念",
+        "count": 1
+      },
+      {
+        "sector": "PCB",
+        "count": 1
+      },
+      {
+        "sector": "物联网",
+        "count": 1
+      },
+      {
+        "sector": "电气机械和器材制造业",
         "count": 1
       },
       {
@@ -319,11 +438,11 @@
         "count": 1
       },
       {
-        "sector": "医疗器械概念",
+        "sector": "充电桩",
         "count": 1
       },
       {
-        "sector": "深证100R",
+        "sector": "行业龙头",
         "count": 1
       },
       {
@@ -331,14 +450,22 @@
         "count": 1
       },
       {
-        "sector": "百元股",
+        "sector": "大盘股",
+        "count": 1
+      },
+      {
+        "sector": "基金重仓",
+        "count": 1
+      },
+      {
+        "sector": "深成500",
         "count": 1
       }
     ],
-    "concentration": 50.0
+    "concentration": 25.0
   },
   "overlap": {
-    "total_tracked": 2,
+    "total_tracked": 4,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
@@ -462,18 +589,18 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-09-07",
-    "history_days": 14,
+    "track_start": "2026-09-08",
+    "history_days": 15,
     "summary": {
       "1d": {
-        "count": 14,
-        "win_rate": 28.57,
-        "avg_return": 2.36
+        "count": 16,
+        "win_rate": 31.25,
+        "avg_return": 2.52
       },
       "3d": {
-        "count": 8,
-        "win_rate": 62.5,
-        "avg_return": 4.4
+        "count": 9,
+        "win_rate": 55.56,
+        "avg_return": 3.24
       },
       "5d": {
         "count": 9,
@@ -481,9 +608,9 @@
         "avg_return": 2.85
       },
       "10d": {
-        "count": 6,
-        "win_rate": 66.67,
-        "avg_return": 0.86
+        "count": 7,
+        "win_rate": 71.43,
+        "avg_return": 2.39
       },
       "20d": {
         "count": 0,
@@ -623,7 +750,8 @@
         "enter_date": "2026-08-22",
         "offsets": {
           "1d": 0.0,
-          "3d": 9.68
+          "3d": 9.68,
+          "10d": 11.56
         }
       },
       {
@@ -665,7 +793,8 @@
         "name": "江西铜业",
         "enter_date": "2026-09-03",
         "offsets": {
-          "1d": -1.9
+          "1d": -1.9,
+          "3d": -6.1
         }
       },
       {
@@ -674,6 +803,22 @@
         "enter_date": "2026-09-04",
         "offsets": {
           "1d": 0.0
+        }
+      },
+      {
+        "code": "688808",
+        "name": "联讯仪器",
+        "enter_date": "2026-09-07",
+        "offsets": {
+          "1d": 7.78
+        }
+      },
+      {
+        "code": "300760",
+        "name": "迈瑞医疗",
+        "enter_date": "2026-09-07",
+        "offsets": {
+          "1d": -0.42
         }
       }
     ]
