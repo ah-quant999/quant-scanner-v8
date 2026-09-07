@@ -1494,6 +1494,9 @@ _KNOWN_EXTRA_PAGES = {
 # window 变量名 ≠ 文件名 的别名映射（文件 id → window 变量名候选）
 _WINDOW_VAR_ALIASES = {
     "STOCK_MOMENTUM_STATE_V2": ["STOCK_MOMENTUM_ENHANCED"],
+    # 2026-09-07 一劳永逸：文件名 maharo_macro.js 但 window 变量是 MAHORO_MACRO（拼写不一致），
+    #   通用全量审计解析失败 -> 长期误报「maharo_macro.js 缺失或解析失败（未被 CARD_DEFS 登记）」红灯。
+    "maharo_macro": ["MAHORO_MACRO", "MAHARO_MACRO"],
     "PORTFOLIO": ["PORTFOLIO_DATA"],
     "STOCK_RPS": ["STOCK_RPS_DATA"],
 }
