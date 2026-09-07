@@ -1,33 +1,21 @@
 {
-  "update_time": "2026-09-07 15:58:43",
-  "run_start": "2026-09-07 15:37:14",
-  "ok": 22,
-  "fail": 0,
-  "failed_scripts": [],
-  "skipped_by_time_gate": [
-    "calc_crds.py",
-    "build_candidate_pool.py",
-    "calc_stock_rps.py",
-    "generate_top10.py",
-    "scripts/ab_universe_backtest.py",
-    "backtest_tdx.py",
-    "backtest_comprehensive.py",
-    "export_optimized_strategy.py",
-    "strategy_four_volume_60m.py",
-    "strategy_four_volume.py",
-    "update_triple_resonance_history.py",
-    "gen_triple_consensus.py",
-    "gen_triple_track.py",
-    "calc_volatility_watch.py",
-    "gen_stock_stop.py",
-    "gen_algo_track.py",
-    "calc_sentiment_cycle.py",
-    "auto_run_dn_algorithm.py",
-    "strong_breakout.py",
-    "track_h_auto_buy.py",
-    "scripts/momentum_common_filter.py",
-    "final_recommend.py",
-    "v8/backtest_crds.py",
-    "backtest_expectancy.py"
-  ]
+  "update_time": "2026-09-07 20:18:31",
+  "run_start": "2026-09-07 18:22:00",
+  "ok": 19,
+  "fail": 3,
+  "failed_scripts": [
+    {
+      "script": "calc_crds.py",
+      "reason": "超时 >45min"
+    },
+    {
+      "script": "gen_triple_consensus.py",
+      "reason": "退出码 1 | AttributeError: 'NoneType' object has no attribute 'get'"
+    },
+    {
+      "script": "auto_run_dn_algorithm.py",
+      "reason": "监督器静默杀(>15min 无输出)"
+    }
+  ],
+  "skipped_by_time_gate": []
 }
