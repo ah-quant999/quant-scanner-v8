@@ -1,41 +1,42 @@
 {
-  "update_time": "2026-09-07 09:23:13",
+  "update_time": "2026-09-07 12:40:51",
   "data_date": "2026-09-07",
   "source": "LIMIT_UP_HEATMAP",
   "phase": "退潮",
   "color": "#f97316",
-  "score": 64.0,
-  "delta_pct": -83.04,
+  "score": 85.0,
+  "delta_pct": -68.7,
   "advice": "⚠️ 情绪退潮中：高位股注意回撤，关注高低切换",
   "metrics": {
-    "total_up": 39,
-    "max_ladder": 5,
-    "high_ladder_count": 1,
+    "total_up": 72,
+    "max_ladder": 6,
+    "high_ladder_count": 4,
     "sectors_count": 15
   },
   "ladder_dist": {
-    "1": 32,
-    "2": 6,
-    "5": 1
+    "1": 60,
+    "2": 8,
+    "3": 3,
+    "6": 1
   },
   "leaders": [
     {
       "code": "605577",
       "name": "龙版传媒",
-      "lbc": 5,
-      "chg": 9.97
+      "lbc": 6,
+      "chg": 10.03
     },
     {
-      "code": "605398",
-      "name": "新炬网络",
-      "lbc": 2,
-      "chg": 9.98
+      "code": "600108",
+      "name": "亚盛集团",
+      "lbc": 3,
+      "chg": 10.09
     },
     {
-      "code": "605580",
-      "name": "恒盛能源",
-      "lbc": 2,
-      "chg": 9.99
+      "code": "002403",
+      "name": "爱仕达",
+      "lbc": 3,
+      "chg": 10.02
     }
   ],
   "prev_total": 230,

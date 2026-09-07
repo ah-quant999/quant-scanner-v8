@@ -530,7 +530,7 @@ window.__domReadyFns=[];
 <script src="data/CONCEPT_RANKING.js?v=d8e50eecc2" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/INDEX_QUOTES.js?v=3b0ac2e36d" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=3789c42305" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=113ea3fcf6" defer></script>
 <script src="data/MARGIN_DATA.js?v=a3efcb4653" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=1ee481796a" defer></script>
 <script src="data/IPO_DATA.js?v=23250f2117" defer></script>
@@ -1564,10 +1564,10 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/PERFORMANCE_FORECAST.js?v=9cf810b605" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=253af46412" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=a36b4ab934" defer></script>
-<script src="data/HEALTH_CHECK.js?v=e3d106da8e" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=9562801557" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=98f1078a20" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=3b06ea5c25" defer></script>
+<script src="data/HEALTH_CHECK.js?v=dc8d643370" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=8c1a1fb848" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=910d6e106a" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=1adba88ce2" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=6afbf538a0" defer></script>
@@ -13049,7 +13049,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }
   var seen=(function(){ try{ var h=window.HEALTH_CHECK||{}; return h.update_time||h.updated_at||h.updated||h.last_update||''; }catch(e){ return ''; } })();
   function _check(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=e3d106da8e')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=dc8d643370')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var remote=_pickTs(t);
       if(remote){
         if(seen && remote!==seen){
