@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "5b5c103a2";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "b223c4c27";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -530,7 +530,7 @@ window.__domReadyFns=[];
 <script src="data/CONCEPT_RANKING.js?v=a7b0830150" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/INDEX_QUOTES.js?v=d64da851df" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=feee7e0418" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=fc3e128c10" defer></script>
 <script src="data/MARGIN_DATA.js?v=a7d4e1ce9f" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=08c461563c" defer></script>
 <script src="data/IPO_DATA.js?v=fbfbbf458c" defer></script>
@@ -1563,15 +1563,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=794786bd3b" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=e9dda674d8" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=67135a77ab" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=68df023da7" defer></script>
-<script src="data/HEALTH_CHECK.js?v=c3518fa55b" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=a2437bcbc4" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=d8894422fd" defer></script>
+<script src="data/RUNNER_STATUS.js?v=c6c3e62a8e" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=18ac391d1e" defer></script>
+<script src="data/HEALTH_CHECK.js?v=0ee68e08d2" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=cf490e4b93" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=b77b9d324b" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=e09e5dbc07" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=082979bea6" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=f882fa86dd" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=fdf2201ac8" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=aec607fd6b" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=05082d83ac" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=7c78b8d6bf" defer></script>
     <!-- 2026-09-04 主人令收尾：ALLSITE_BACKTEST.js 注入已删（生成器/raw_data 已于 09-03「干掉全站精选」系列删除，前端无任何代码读 window.ALLSITE_BACKTEST，标签纯 404 噪音） -->
@@ -11034,7 +11034,7 @@ window.showRestrictedItems = showRestrictedItems;
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=e09e5dbc07';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=fdf2201ac8';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -11043,7 +11043,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=082979bea6';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=aec607fd6b';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -13072,7 +13072,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }
   var seen=(function(){ try{ var h=window.HEALTH_CHECK||{}; return h.update_time||h.updated_at||h.updated||h.last_update||''; }catch(e){ return ''; } })();
   function _check(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=c3518fa55b')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=0ee68e08d2')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var remote=_pickTs(t);
       if(remote){
         if(seen && remote!==seen){
