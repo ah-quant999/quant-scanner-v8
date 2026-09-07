@@ -419,18 +419,8 @@ def main():
                 r["enter_dates"].append(s["enter_date"])
 
     # 2026-09-03 主人令：#2 驾驶舱 A/B 档 source 整段下线（cockpit.* 不再读，sources 也不再 append "驾驶舱A档/B档"）
-            r["concepts"] = list(set((r["concepts"] or []) + (s.get("concepts") or [])))
-            r["reasons"].append(f"{label} 技术{tech:.0f} 质量{qs:.0f}")
-            # ── 60m 共振确认（A 档仅标签，不改变评分）──
-            _60m_a = _60m_hits.get(norm_code(code))
-            if _60m_a and tier == "tier_a":
-                r["signals"].append("60m共振确认")
-                r["_60m_resonance"] = True
-            # ── end 60m ──
-            if s.get("comment"):
-                r["signals"].append(s["comment"])
-            if s.get("enter_date"):
-                r["enter_dates"].append(s["enter_date"])
+    # 2026-09-07 一劳永逸：清理该次下线遗留的孤儿代码块（仍引用已删除的 label/tech/qs/tier），
+    #   导致 UnboundLocalError 崩溃 → D 档 final_recommend 持续未产出（红灯 all_FINAL_RECOMMEND_DATA）。
 
     # 3) 四量终极 (top10_daily.top10)
     SIG_MAP = {
