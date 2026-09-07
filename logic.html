@@ -1323,7 +1323,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
 
       <div class="card">
         <h3><span class="ic">🧩</span>最终推荐 8 源 ↔ 算法链分批对应表（2026-09-04 主人令接入后对齐）</h3>
-        <div class="logic-p">最终推荐共聚合 <b>8 个源</b>，全部由盘后算法链在链上自产（2026-09-04 起动量共识正式挂链，此前它是唯一靠部署脚本副作用产出的链外依赖）。算法链分批时序：<b>A 采集批(~16:40) → B 选股批(~18:10) → D 汇总批(~20:00，产出最终推荐) → E 回测批(~21:00)</b>；repository_dispatch 不带 stage 时跑全链（含 final_recommend）。</div>
+        <div class="logic-p">最终推荐共聚合 <b>8 个源</b>，全部由盘后算法链在链上自产（2026-09-04 起动量共识正式挂链，此前它是唯一靠部署脚本副作用产出的链外依赖）。算法链分批时序：<b>A 采集批(~16:40) → B 选股批(~18:10) → D 汇总批(~20:00，产出最终推荐) → E 回测批(~21:00)</b>；repository_dispatch 不带 stage 时跑全链（含 final_recommend）。<br>非交易日不以「是否开市」一刀切：判据为「今天 == 上一交易日的次日」——<b>周六 / 假期首日 = T+1 窗口，照常全量跑（含采集）</b>；周日及假期中段/末日无 T+1 新源，跳过采集仅重算（2026-09-07 起）。</div>
         <table class="lg-table">
           <tr><th>#</th><th>源（前端标签）</th><th>数据文件</th><th>产出脚本</th><th>批次</th><th>加分规则</th></tr>
           <tr><td>1</td><td>三重共识</td><td>三重共识系列</td><td>gen_triple_consensus.py</td><td>B</td><td>独立选股源（主站 TOP10 ∩ 基本面 A 档）</td></tr>
@@ -1784,7 +1784,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>工作日13/15/17/19/21点 · 周末0-20点每2h</td><td>runner_health_alert</td><td>Runner 健康监控（离线开 Issue；workflow 当前 active，无需手动 unpause）</td><td>云端</td></tr>
           <tr><td>09:00</td><td>v8_algo</td><td>盘前预检（46模块新鲜度体检）</td><td>云端</td></tr>
           <tr><td>17:00</td><td>v8_algo</td><td>收盘后总检（46模块新鲜度体检）</td><td>云端</td></tr>
-          <tr><td>16:40 / 18:10 / 19:15 / 20:00</td><td>v8_algo_cloud</td><td>盘后算法链分批（A采集/B选股/C回测/D汇总 final_recommend；龙虎榜/三重共识/逆势龙头/top10/回测）</td><td>GitHub 云端 ubuntu（主链·四批按时触发）</td></tr>
+          <tr><td>16:40 / 18:10 / 20:00 / 21:00</td><td>v8_algo_cloud</td><td>盘后算法链分批（<b>A采集 → B选股 → D汇总(最终推荐) → E回测</b>；原 C 回测批已退役，2026-09-04 时序重排为推荐上线后再跑回测）</td><td>GitHub 云端 ubuntu（主链·四批按时触发）</td></tr>
+          <tr style="background:rgba(56,189,248,.06);"><td>16:40 起</td><td>v8_algo_run（cn）</td><td>本机在线且空闲时，云端按小时把对应批次<b>转派本机</b>执行（中国 IP 抓中文数据更快，全链约 84 分钟 vs 云端 2h40m）</td><td>本机（小九，cn runner）</td></tr>
           <tr><td>23:00</td><td>v8_backup</td><td>每日自动备份 raw_data</td><td>云端</td></tr>
           <tr style="background:rgba(56,189,248,.06);"><td colspan="4" style="text-align:center;font-size:12px;color:var(--dim);">↓ push raw_data → 自动触发 v8_build_deploy → GitHub Pages 部署</td></tr>
         </table>
@@ -1793,6 +1794,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <table class="lg-table">
           <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
           <tr><td>09:00</td><td>v8_cn_fetch_cloud</td><td>T+1 周度/月度统一刷新（日历/今日判定/IPO/两融/宏观等）</td><td>云端</td></tr>
+          <tr style="background:rgba(251,191,36,.08);"><td>16:40 / 18:10 / 20:00 / 21:00</td><td>v8_algo_cloud<br>（在线时转派本机）</td><td>盘后算法链<b>照常全量跑（含采集）</b>：周六属于 <b>T+1 数据窗口</b>——龙虎榜 / 机构调研 / 大宗交易 / 融资融券 / 股东增减 等均在交易日收盘后发布、<b>次日才完整</b>，故周六必须照常抓取并重算选股与最终推荐。<br><span style="color:#fbbf24;">🛡 2026-09-07 修复：此前把「非交易日」一律视为无新数据而跳过采集，导致周六整链空转（跑了却零产出，卡片显示「已停更」）。现按「是否持有 T+1」判定，不再按「是否交易日」一刀切。</span></td><td>云端 / 本机</td></tr>
           <tr><td>0-20点每2h</td><td>runner_health_alert</td><td>Runner 健康监控（离线开 Issue）</td><td>云端</td></tr>
           <tr><td>15:30</td><td>周末选股四模块T+1更新部署</td><td>选股数据更新+部署+臃肿度/崩溃风险体检（v8_bloat_check.py --alert，仅周六）</td><td>本机</td></tr>
           <tr style="background:rgba(56,189,248,.06);"><td>19:30</td><td>v8_weekend_light.py（WorkBuddy 周末轻量维护）</td><td>读交接 / 新股上市+退市股元数据巡检 / 更新 WEEKEND_RUN.js / dispatch 部署</td><td>本机（阿狸咪）</td></tr>
@@ -1803,9 +1805,19 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <table class="lg-table">
           <tr><th>时间</th><th>Workflow</th><th>内容</th><th>执行方</th></tr>
           <tr><td>15:30</td><td>周末选股四模块T+1更新部署</td><td>选股数据更新+部署（不含臃肿度体检）</td><td>本机</td></tr>
+          <tr style="background:rgba(148,163,184,.08);"><td>全天</td><td>v8_algo_cloud（算法链）</td><td><b>不跑算法链</b>：周日距上一交易日已满 2 天，不持有 T+1 数据（该拿的周六已拿完），跑了也无新源只会空转，故所有算法链兜底/最终闸任务一律跳过、严禁派发</td><td>—</td></tr>
           <tr style="background:rgba(56,189,248,.06);"><td>19:30</td><td>v8_weekend_light.py（WorkBuddy 周末轻量维护）</td><td>读交接 / 新股上市+退市股元数据巡检 / 更新 WEEKEND_RUN.js / dispatch 部署</td><td>本机（阿狸咪）</td></tr>
           <tr><td>23:00</td><td>v8_cleanup</td><td>缓存/日志清理</td><td>云端 ubuntu</td></tr>
         </table>
+
+        <div class="logic-h">法定假期（口径同周末）</div>
+        <table class="lg-table">
+          <tr><th>时间</th><th>内容</th><th>是否采集</th></tr>
+          <tr style="background:rgba(251,191,36,.08);"><td>假期<b>第一天</b></td><td>持有假期前最后一个交易日的 T+1 数据（龙虎榜 / 机构调研 / 大宗 / 两融等收盘后发布、次日才全）</td><td>✅ <b>照常全量跑（含采集）</b></td></tr>
+          <tr><td>假期<b>中段 / 最后一天</b></td><td>距上一交易日已 ≥2 天，无 T+1 新源</td><td>⏭ 跳过采集（仅重算，省接口）</td></tr>
+          <tr><td>补班日（调休上班）</td><td>按交易日处理</td><td>✅ 全量跑</td></tr>
+        </table>
+        <div class="logic-p" style="color:var(--dim);">判据统一为「今天是否 == 上一交易日的次日」：是 ⇒ 持有 T+1 ⇒ 照常采集；否 ⇒ 跳过。<span style="color:#fbbf24;">（2026-09-07 起，取代旧的「非交易日一律不采集」一刀切口径）</span></div>
 
         <div class="logic-h">应急（仅手动）</div>
         <table class="lg-table">
