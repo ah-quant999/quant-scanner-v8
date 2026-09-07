@@ -1,11 +1,11 @@
 {
-  "update_time": "2026-09-08 01:16:16",
+  "update_time": "2026-09-08 03:58:30",
   "date": "2026-09-07",
   "method": "强势突破(高手反推v1): 涨幅≥5.0% + 量比≥1.35(5日均量) + 收位≥0.55 + 5日累计∈[0.5,15.0]%",
   "version": "v1 (2026-09-03 样本 31/31 全召回)",
-  "pool_count": 896,
-  "kline_fail": 41,
-  "picked_count": 157,
+  "pool_count": 941,
+  "kline_fail": 19,
+  "picked_count": 158,
   "core_top_n": 30,
   "stocks": [
     {
@@ -2349,6 +2349,24 @@
       "core": false
     },
     {
+      "code": "515880",
+      "symbol": "sh515880",
+      "name": "通信ETF国泰",
+      "industry": "",
+      "board": "ETF",
+      "close": 0.677,
+      "pct": 5.95,
+      "vol_ratio": 1.463,
+      "close_pos": 0.897,
+      "ret5": 0.74,
+      "upper_shadow": 0.44,
+      "above_ma20": true,
+      "trade_date": "2026-09-07",
+      "score": 16.38,
+      "rank": 131,
+      "core": false
+    },
+    {
       "code": "300400",
       "symbol": "sz300400",
       "name": "劲拓股份",
@@ -2363,7 +2381,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 16.376,
-      "rank": 131,
+      "rank": 132,
       "core": false
     },
     {
@@ -2381,7 +2399,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 16.261,
-      "rank": 132,
+      "rank": 133,
       "core": false
     },
     {
@@ -2399,7 +2417,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 16.23,
-      "rank": 133,
+      "rank": 134,
       "core": false
     },
     {
@@ -2417,7 +2435,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 16.109,
-      "rank": 134,
+      "rank": 135,
       "core": false
     },
     {
@@ -2435,7 +2453,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 16.068,
-      "rank": 135,
+      "rank": 136,
       "core": false
     },
     {
@@ -2453,7 +2471,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 16.063,
-      "rank": 136,
+      "rank": 137,
       "core": false
     },
     {
@@ -2471,7 +2489,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 15.866,
-      "rank": 137,
+      "rank": 138,
       "core": false
     },
     {
@@ -2489,7 +2507,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 15.768,
-      "rank": 138,
+      "rank": 139,
       "core": false
     },
     {
@@ -2507,7 +2525,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 15.652,
-      "rank": 139,
+      "rank": 140,
       "core": false
     },
     {
@@ -2525,7 +2543,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 15.63,
-      "rank": 140,
+      "rank": 141,
       "core": false
     },
     {
@@ -2543,7 +2561,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 15.566,
-      "rank": 141,
+      "rank": 142,
       "core": false
     },
     {
@@ -2561,7 +2579,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 15.533,
-      "rank": 142,
+      "rank": 143,
       "core": false
     },
     {
@@ -2579,7 +2597,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 15.426,
-      "rank": 143,
+      "rank": 144,
       "core": false
     },
     {
@@ -2597,7 +2615,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 15.303,
-      "rank": 144,
+      "rank": 145,
       "core": false
     },
     {
@@ -2615,7 +2633,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 15.134,
-      "rank": 145,
+      "rank": 146,
       "core": false
     },
     {
@@ -2633,7 +2651,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 14.958,
-      "rank": 146,
+      "rank": 147,
       "core": false
     },
     {
@@ -2651,7 +2669,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 14.907,
-      "rank": 147,
+      "rank": 148,
       "core": false
     },
     {
@@ -2669,7 +2687,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 14.778,
-      "rank": 148,
+      "rank": 149,
       "core": false
     },
     {
@@ -2687,7 +2705,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 14.722,
-      "rank": 149,
+      "rank": 150,
       "core": false
     },
     {
@@ -2705,7 +2723,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 14.641,
-      "rank": 150,
+      "rank": 151,
       "core": false
     },
     {
@@ -2723,7 +2741,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 14.583,
-      "rank": 151,
+      "rank": 152,
       "core": false
     },
     {
@@ -2741,7 +2759,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 14.472,
-      "rank": 152,
+      "rank": 153,
       "core": false
     },
     {
@@ -2759,7 +2777,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 13.99,
-      "rank": 153,
+      "rank": 154,
       "core": false
     },
     {
@@ -2777,7 +2795,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 13.846,
-      "rank": 154,
+      "rank": 155,
       "core": false
     },
     {
@@ -2795,7 +2813,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 13.737,
-      "rank": 155,
+      "rank": 156,
       "core": false
     },
     {
@@ -2813,7 +2831,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 13.632,
-      "rank": 156,
+      "rank": 157,
       "core": false
     },
     {
@@ -2831,7 +2849,7 @@
       "above_ma20": true,
       "trade_date": "2026-09-07",
       "score": 13.032,
-      "rank": 157,
+      "rank": 158,
       "core": false
     }
   ]
