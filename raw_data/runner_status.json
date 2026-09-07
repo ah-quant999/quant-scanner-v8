@@ -1,12 +1,11 @@
 {
-  "update_time": "2026-09-07 12:59:47",
+  "update_time": "2026-09-07 13:10:16",
   "status": "warn",
   "process": {
     "ok": true,
     "listener": true,
     "worker": false,
     "details": [
-      "compattelrunner",
       "runner.listener"
     ]
   },
