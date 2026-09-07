@@ -544,7 +544,7 @@ window.__domReadyFns=[];
     <script src="data/H_AUTO_BUY_TRACK.js?v=447d714a39" defer></script>
     <script src="data/UNLISTED_PANEL.js?v=e4a2df05e9" defer></script>
     <!-- 2026-09-07 主人令：机构研究·maharo 聚合卡（本机 cookie 拉取，云端无权限；数据由 .workbuddy/maharo_daily_pull.py 每日生成 data/maharo_macro.js） -->
-    <script src="data/maharo_macro.js?v=20260907" defer></script>
+    <script src="data/maharo_macro.js?v=20260907b" defer></script>
     <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
     <script src="data/MARKET_REGIME.js?v=0070f023eb" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
@@ -11106,6 +11106,14 @@ window.showRestrictedItems = showRestrictedItems;
 
     // ===== 宏观观测 pane =====
     h += '<div id="ulPaneMacro" style="display:none;">';
+    // ═══ 2026-09-07 主人令（二改）：卡只放宏观页最顶部（禁止在实验区显示）；
+    //   内容以 AI 解析建议为主（日→周→月三层，AI 阅读后撰写），新闻条目折叠为附录；标题行带「更新于」。
+    h += '<div class="card" id="maharoCard" style="margin-bottom:16px;border-left:4px solid #34d399;">'
+       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
+       + '<span style="font-size:15px;font-weight:700;color:#34d399;">📚 机构研究 · AI 解析建议</span>'
+       + '<span class="fresh" id="maharoFresh">—</span>'
+       + '<span style="font-size:12px;color:var(--dim);">观澜台/金斧头等 7 源 · AI 阅读后撰写 · 每日 08:30 更新</span></div>'
+       + '<div id="maharoCardBody"><div class="note">加载中…</div></div></div>';
     // ═══ 2026-09-06 主人令：新周期判定卡（海外宏观+AI 大周期 · 事件驱动）═══
     //   位置：K 型卡上方（事件驱动更新频率 > K 型月度更新）；
     //   形式：双源对比（白话愍博士原文 vs 我交叉验证），差异处红框高亮；
@@ -11233,15 +11241,6 @@ window.showRestrictedItems = showRestrictedItems;
        + '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;">🔭 仅供研究参考，不构成个人投资建议 · 数据时点以原文为准</div>'
        + '</div>';
     h += '</div>'; // /ulPaneMacro
-    // ═══ 2026-09-07 主人令：机构研究·maharo 聚合卡（📚 实验区·宏观观测 pane）═══
-    //   数据源：本机 .workbuddy/maharo_daily_pull.py 每日 08:30 拉取 mahoro 付费源 → data/maharo_macro.js。
-    //   仅管理员可见；展示源健康 + 命中关注词 + 机构核心 + 可展开全部。
-    h += '<div class="card" id="maharoCard" style="margin-bottom:16px;border-left:4px solid #34d399;">'
-       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-       + '<span style="font-size:15px;font-weight:700;color:#34d399;">📚 机构研究 · mahoro 聚合</span>'
-       + '<span class="fresh" id="maharoFresh">—</span>'
-       + '<span style="font-size:12px;color:var(--dim);">观澜台/金斧头等 7 源 · 每日 08:30 本机更新</span></div>'
-       + '<div id="maharoCardBody"><div class="note">加载中…</div></div></div>';
     // 2026-09-02 主人令：强势突破 pane、模块去向索引、动量共识/H反推/两套算法回测对比 全部删除（卡片清单以 renderUnlisted 为准）。
     el.innerHTML=h;
     // 恢复上次激活的子 tab（默认实验区）
@@ -11293,42 +11292,66 @@ window.showRestrictedItems = showRestrictedItems;
       return;
     }
     var fresh = document.getElementById('maharoFresh');
-    if(fresh) fresh.textContent = '更新 '+d.updated_at;
+    if(fresh) fresh.textContent = '更新于 '+d.updated_at;
+    function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function renderLines(txt){
+      var rows = String(txt||'').split('\n'); var out = '';
+      rows.forEach(function(ln){
+        if(!ln.trim()) return;
+        var s = esc(ln.trim());
+        if(s.indexOf('- ')===0){
+          out += '<div style="display:flex;align-items:flex-start;gap:8px;padding:2px 0 2px 6px;"><span style="color:#34d399;flex-shrink:0;">\u2022</span><span>'+s.slice(2)+'</span></div>';
+        } else if(s.indexOf('\u3010')===0){
+          out += '<div style="font-weight:700;color:#34d399;margin:9px 0 3px;font-size:12.5px;">'+s+'</div>';
+        } else if(s.indexOf('\u2192')===0){
+          out += '<div style="color:#fbbf24;padding:2px 0 2px 6px;">'+s+'</div>';
+        } else {
+          out += '<div style="padding:2px 0;">'+s+'</div>';
+        }
+      });
+      return out;
+    }
     var h = '';
+    var ins = d.insights || {};
+    var blocks = [
+      {k:'daily',   icon:'\ud83d\udccc', name:'\u4eca\u65e5\u89e3\u6790', col:'#34d399', bg:'rgba(52,211,153,.06)', bd:'rgba(52,211,153,.35)'},
+      {k:'weekly',  icon:'\ud83d\udcc5', name:'\u672c\u5468\u89e3\u6790', col:'#60a5fa', bg:'rgba(96,165,250,.06)', bd:'rgba(96,165,250,.35)'},
+      {k:'monthly', icon:'\ud83d\uddd3\ufe0f', name:'\u672c\u6708\u89e3\u6790', col:'#fbbf24', bg:'rgba(251,191,36,.05)', bd:'rgba(251,191,36,.35)'}
+    ];
+    var anyIns = false;
+    blocks.forEach(function(b){
+      var it = ins[b.k];
+      if(!it || !it.text) return;
+      anyIns = true;
+      var meta = it.generated_at || it.date || it.period || '';
+      h += '<div style="background:'+b.bg+';border:1px solid '+b.bd+';border-radius:7px;padding:10px 13px;margin-bottom:10px;">'
+         + '<div style="font-size:12.5px;font-weight:700;color:'+b.col+';margin-bottom:6px;">'+b.icon+' '+b.name
+         + '<span style="font-weight:400;font-size:10.5px;color:var(--dim);margin-left:8px;">'+esc(meta)+'</span></div>'
+         + '<div style="font-size:12px;line-height:1.65;color:var(--txt);">'+renderLines(it.text)+'</div></div>';
+    });
+    if(!anyIns){
+      h += '<div class="note" style="padding:12px;text-align:center;">\u89e3\u6790\u5f85\u751f\u6210\uff08\u6bcf\u65e5 08:30 \u81ea\u52a8\u5316\u9605\u8bfb\u540e\u64b0\u5199\uff09</div>';
+    }
     if(d.sources && d.sources.length){
-      h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;">';
+      h += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px;">';
       d.sources.forEach(function(s){
-        var col = s.stale ? '#ef5350' : '#34d399';
-        h += '<span style="font-size:11px;padding:2px 7px;border-radius:10px;border:1px solid '+col+';color:'+col+';">'+s.label+' · '+(s.latest||'-')+(s.stale?' ⚠':'')+'</span>';
+        var col = s.stale ? '#ef5350' : '#26a69a';
+        h += '<span style="font-size:11px;padding:2px 7px;border-radius:10px;border:1px solid '+col+';color:'+col+';">'+s.label+' \u00b7 '+(s.latest||'-')+(s.stale?' \u26a0':'')+'</span>';
       });
       h += '</div>';
     }
-    if(d.watched && d.watched.length){
-      h += '<div style="font-size:12px;font-weight:700;color:#fbbf24;margin:6px 0 5px;">★ 命中关注词（'+d.watched.length+'）</div>';
-      h += '<div style="display:flex;flex-direction:column;gap:6px;">';
-      d.watched.forEach(function(r){
-        var prev = r.prev ? '<div style="color:var(--dim);font-size:10.5px;margin-top:2px;">'+(r.prev.length>120?r.prev.slice(0,120)+'…':r.prev)+'</div>' : '';
-        h += '<div style="background:rgba(251,191,36,.05);border-left:2px solid rgba(251,191,36,.4);padding:5px 8px;border-radius:5px;font-size:11.5px;line-height:1.5;">'
-           + '<b style="color:var(--txt);">【'+r.source_label+'】</b>'+(r.title||'')+'<br><span style="color:var(--dim);font-size:10.5px;">✍'+(r.author||'')+' ｜ 🕐'+(r.ts||'')+'</span>'+prev+'</div>';
-      });
-      h += '</div>';
-    }
-    if(d.core && d.core.length){
-      h += '<div style="font-size:12px;font-weight:700;color:#34d399;margin:10px 0 5px;">◆ 机构核心 · 观澜台/金斧头（'+d.core.length+'）</div>';
-      h += '<div style="display:flex;flex-direction:column;gap:6px;">';
-      d.core.forEach(function(r){
-        h += '<div style="background:rgba(52,211,153,.05);border-left:2px solid rgba(52,211,153,.4);padding:5px 8px;border-radius:5px;font-size:11.5px;line-height:1.5;">'
-           + '<b style="color:var(--txt);">【'+r.source_label+'】</b>'+(r.title||'')+'<br><span style="color:var(--dim);font-size:10.5px;">✍'+(r.author||'')+' ｜ 🕐'+(r.ts||'')+'</span></div>';
-      });
-      h += '</div>';
-    }
-    if(d.all_lite && d.all_lite.length){
-      h += '<details style="margin-top:10px;font-size:11px;color:var(--dim);"><summary style="cursor:pointer;color:var(--sub);">全部最新 '+d.all_lite.length+' 条（点击展开）</summary>';
-      d.all_lite.forEach(function(r){
-        h += '<div style="padding:3px 0;border-top:1px dashed rgba(255,255,255,.06);">【'+r.source_label+'】'+(r.title||'')+' ｜ '+(r.ts||'')+'</div>';
-      });
-      h += '</details>';
-    }
+    h += '<details style="font-size:11px;color:var(--dim);"><summary style="cursor:pointer;color:var(--sub);">\ud83d\udcf0 \u539f\u59cb\u6761\u76ee\u9644\u5f55\uff08\u547d\u4e2d '+((d.watched||[]).length)+' \u00b7 \u6838\u5fc3 '+((d.core||[]).length)+' \u00b7 \u5168\u90e8 '+((d.all_lite||[]).length)+'\uff0c\u70b9\u51fb\u5c55\u5f00\uff09</summary>';
+    (d.watched||[]).forEach(function(r){
+      h += '<div style="padding:3px 0;border-top:1px dashed rgba(255,255,255,.06);">\u2605\u3010'+r.source_label+'\u3011'+esc(r.title)+' \uff5c '+esc(r.ts)+'</div>';
+    });
+    (d.core||[]).forEach(function(r){
+      h += '<div style="padding:3px 0;border-top:1px dashed rgba(255,255,255,.06);">\u25c6\u3010'+r.source_label+'\u3011'+esc(r.title)+' \uff5c '+esc(r.ts)+'</div>';
+    });
+    (d.all_lite||[]).forEach(function(r){
+      h += '<div style="padding:2px 0;border-top:1px dashed rgba(255,255,255,.04);">\u3010'+r.source_label+'\u3011'+esc(r.title)+' \uff5c '+esc(r.ts)+'</div>';
+    });
+    h += '</details>';
+    h += '<div style="font-size:10.5px;color:var(--dim);margin-top:8px;">\ud83d\udd2d \u89e3\u6790\u4e3a AI \u9605\u8bfb\u673a\u6784\u6e90\u540e\u751f\u6210\uff0c\u4ec5\u4f9b\u7814\u7a76\u53c2\u8003\uff0c\u4e0d\u6784\u6210\u4e2a\u4eba\u6295\u8d44\u5efa\u8bae</div>';
     host.innerHTML = h;
   }
   window._fillMahoroCard = renderMahoroCard;
