@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-09-08 02:55:30",
+  "update_time": "2026-09-08 04:00:40",
   "source": "akshare fund_etf_spot_em (东方财富)",
   "metric": "净流入(亿元) + 规模(亿元)",
   "categories": {
     "stock": {
       "name": "股票型",
       "net_amount_yi": 72.85748766999991,
-      "scale_yi": 29755.850199199962,
+      "scale_yi": 29764.27997377994,
       "n_funds": 1307,
       "top5": [
         {
@@ -127,7 +127,7 @@
     "cross_border": {
       "name": "跨境型",
       "net_amount_yi": -7.4544455900000015,
-      "scale_yi": 6163.619603580001,
+      "scale_yi": 6163.997044220002,
       "n_funds": 192,
       "top5": [
         {
