@@ -416,6 +416,7 @@ def run_for_today(emit_js=False, target_date=None):
             continue
         expert_candidates.append(c)
 
+    _now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     out = {
         "date": target_date,
         "snapshot_date": snapshot_date,
@@ -429,7 +430,11 @@ def run_for_today(emit_js=False, target_date=None):
         "expert_method": f"{EXPERT_MAX_PRICE}元以下 + 主板 + 医药/化工/贵金属/农业（高手画像版）",
         "expert_count": len(expert_candidates),
         "expert_candidates": expert_candidates,
-        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "generated_at": _now_str,
+        # 🛡 2026-09-07：update_time 是健康面板判新鲜度的唯一字段。旧版靠 update_v8.py
+        #    事后注入（时机不可控，且依赖 build 覆盖到本文件），一旦注入没落到这里，
+        #    前端就显示"无时间戳/陈旧"。本脚本直接产出，保证任何时候 H_AUTO_BUY.js 自带时间戳。
+        "update_time": _now_str,
         "source": "raw_data/h_auto_buy 反推算法，无 PDF OCR 依赖",
         # 🛡 2026-09-07 可观测性：让「降产出数」与「取数全挂」在产物里显式可见，
         #   而不是像本次事故那样只表现为"文件不存在"，排查要翻日志才知道。
