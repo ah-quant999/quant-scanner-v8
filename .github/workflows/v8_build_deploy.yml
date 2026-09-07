@@ -211,8 +211,13 @@ jobs:
 
             # 🛡 2026-08-29 跨层一致性闸门：raw_data 新但 data/*.js 没重建的错位（如 CANDIDATE 卡 3 天）
             #   必须在此步拦截，防止陈旧消费层被推送上线。
-            #   升级阶段先软失败（告警但不阻断），待已知 2 处不一致修复后改为硬失败。
-            python v8_verify_layer_parity.py || true
+            # 🔴 2026-09-08 主人令「禁止假 success」：原 `|| true` 让部署前**唯一的**
+            #    跨层闸门形同虚设（脚本自述「升级阶段先软失败」）。现实测 69 对
+            #    跨层校验全部通过仅剩 1 个 warn → 已具备硬失败条件，改为让 job 红。
+            python v8_verify_layer_parity.py || {
+              echo "::error::跨层一致性校验失败：data/*.js 与 raw_data/*.json 不一致或有陈旧，禁止部署";
+              exit 1;
+            }
 
             # ★★ 2026-08-16 根治「逻辑详解页 v6备忘录 一直打不开」★★
             #   根因：上面第 85 行的 guard_v6_memo.py 已正确把 index.html 的

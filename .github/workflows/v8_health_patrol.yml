@@ -169,7 +169,15 @@ jobs:
           echo "🛌 等 10 分钟让 cn_fetch/algo_run 完成数据更新..."
           sleep 600
           echo "=== 验证回查 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M') ==="
-          python v8_health_check.py --no-heal 2>&1 | tee verify_output.txt || true
+          # 🔴 2026-09-08 主人令「禁止假 success」：原 `|| true` 会连「health_check 脚本
+          #    本身崩溃（无输出）」一起吞掉 → REMAIN_FAIL 数到 0 → 判定通过 → 假绿灯。
+          #    改用 PIPESTATUS[0] 捕获真实退出码，脚本崩溃即红。
+          python v8_health_check.py --no-heal 2>&1 | tee verify_output.txt
+          _HC_RC=${PIPESTATUS[0]}
+          if [ "$_HC_RC" != "0" ]; then
+            echo "::error::v8_health_check.py 执行失败（exit=$_HC_RC），回查结果不可信，判定为失败"
+            exit 1
+          fi
           # 同上：`|| true` + ${VAR:-0} 兜底，避免 grep 无匹配时污染 step outputs
           # 并使下面 `[ "$REMAIN_FAIL" -gt 0 ]` 因变量含换行而报 "integer expression expected"。
           REMAIN_FAIL=$(grep -c '"status": "fail"' verify_output.txt 2>/dev/null || true)

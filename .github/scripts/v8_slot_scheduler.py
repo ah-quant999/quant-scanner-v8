@@ -81,6 +81,19 @@ def _list_runs(wf_file, per_page=50):
 
 
 def _dispatch(wf_file, inputs=None):
+    # 🔴 2026-09-08 一劳永逸「根治互踢/暴风/覆盖」：算法链派发改走 repository_dispatch
+    #   (type=trigger_algo)。原 workflow_dispatch 直派 v8_algo_cloud.yml 会绕开该 workflow
+    #   的探针路由（其注释明写「手动 dispatch 不路由」），导致所有派发源全砸在同一台
+    #   云端机、同一个 concurrency group → 互相取消。2026-09-07 当晚 13 次派发 9 次被
+    #   cancelled 即此因。改后由探针自动转派 cn 小九机（不同 concurrency group）。
+    if wf_file == 'v8_algo_cloud.yml':
+        r = _api('POST', f'/repos/{REPO}/dispatches',
+                 {'event_type': 'trigger_algo'})
+        if r == {}:
+            print(f'  ❌ 派发 {wf_file} 失败(repository_dispatch/trigger_algo)')
+            return False
+        print(f'  ✅ 已派发 {wf_file}（repository_dispatch/trigger_algo，经探针路由 cn 优先）')
+        return True
     payload = {'ref': 'main'}
     if inputs:
         payload['inputs'] = inputs
