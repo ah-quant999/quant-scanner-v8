@@ -1458,7 +1458,7 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
           <tr><td>16:40 A批采集</td><td>龙虎榜/行情/板块RS/指数历史/港股</td><td>云端 v8_algo_cloud (--stage A)</td><td>选股策略·选股池/板块资金流</td></tr>
           <tr><td>18:10 B批选股</td><td>三重共识/相对强度/CRDS/四量终极/选股生命周期</td><td>云端 v8_algo_cloud (--stage B)</td><td>选股策略各子 tab</td></tr>
-          <tr><td>19:15 C批回测</td><td>backtest_tdx/comprehensive/crds/rps</td><td>云端 v8_algo_cloud (--stage C)</td><td>策略回顾·回测区</td></tr>
+          <tr><td>21:00 E批回测</td><td>趋势/综合/逆势龙头/相对强度/四量等回测</td><td>云端 v8_algo_cloud (--stage E)</td><td>策略回顾·回测区</td></tr>
           <tr><td>20:00 D批汇总</td><td>final_recommend + LHB历史/7d/生命周期</td><td>云端 v8_algo_cloud (--stage D)</td><td>今日推荐候选池·Top3</td></tr>
           <tr><td>本地因子(盘后/周末)</td><td>异常换手率(重点池) + ROE(TTM)全市场主板 · 因子实验室卡</td><td>小九本机 baostock 生成 → push main</td><td>选股策略·🧬生命周期 tab</td></tr>
         </table>
@@ -1830,7 +1830,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         </table>
 
         <div class="logic-h">关键设计原则</div>
-        <div class="logic-p"><b>龙虎榜必须等 17 点交易所发布后才能取完整数据</b>，因此盘后算法链固定在 19:15（2026-08-20 主人令，确保龙虎榜/北向等全部盘后数据就绪）。盘中只刷新 T+0 快照，不跑盘后算法，避免用陈旧数据算出错误共识。<b>Safety Net</b>是保险机制——中国数据抓取已迁云端 24/7 在线，Safety Net 是「断线时自动补跑」而非「日常调度」。</div>
+        <div class="logic-p"><b>龙虎榜必须等 17 点交易所发布后才能取完整数据</b>，因此盘后算法链按批次分布在 16:40~21:00（2026-09-02 起改分批：A采集16:40 → B选股18:10 → D汇总20:00 → E回测21:00；取代 2026-08-20 的 19:15 单档）。盘中只刷新 T+0 快照，不跑盘后算法，避免用陈旧数据算出错误共识。<b>Safety Net</b>是保险机制——中国数据抓取已迁云端 24/7 在线，Safety Net 是「断线时自动补跑」而非「日常调度」。</div>
         <div class="logic-p" style="margin-top:8px;color:var(--sub);">📌 <b>盘后算法链顺序铁律（2026-08-08 修复）</b>：<code style="background:var(--bg2);padding:1px 4px;border-radius:3px">generate_top10.py</code> 必须在 <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">backtest_comprehensive.py</code> / <code style="background:var(--bg2);padding:1px 4px;border-radius:3px">cockpit_backtest_now.py</code> <b>之前</b>执行——综合回测依赖 top10 当日快照（<code style="background:var(--bg2);padding:1px 4px;border-radius:3px">raw_data/history/top10_daily_YYYYMMDD.json</code>），顺序倒置会导致「综合回测」卡长期为空。当前固定顺序：build_candidate_pool → generate_top10 → backtest_tdx → backtest_comprehensive → cockpit_backtest_now。</div>
       </div>
 
@@ -1857,7 +1857,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><th>时段</th><th>职责</th><th>失败影响</th><th>兜底</th></tr>
           <tr><td>盘前 08:25</td><td>把当日已知事件、预警、宏观状态准备好</td><td>事件/日历显示旧数据</td><td>Safety Net 2h 后补跑</td></tr>
           <tr><td>盘中 09:40~15:10</td><td>刷新实时行情、资金、ETF、涨停热力</td><td>实时区时间戳停滞</td><td>盘中自愈器每30分检测补跑 + 下一档自动覆盖</td></tr>
-          <tr><td>盘后 19:15</td><td>基于完整收盘数据生成选股结果</td><td>三重共识/选股结果用隔夜数据</td><td>周六 self_heal 补跑</td></tr>
+          <tr><td>盘后 18:10</td><td>基于完整收盘数据生成选股结果（B 选股批）</td><td>三重共识/选股结果用隔夜数据</td><td>周六 self_heal 补跑</td></tr>
           <tr><td>构建部署</td><td>raw_data push 触发 selective build → Pages</td><td>线上数据不更新</td><td>manual dispatch</td></tr>
         </table>
       </div>
@@ -2060,7 +2060,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-h">③ 本地 ↔ 主站镜像同步（每 15 分钟）</div>
         <div class="logic-p">WorkBuddy 自动化「九宝量化-本地↔主站镜像同步(每15分)」跑 <code>scripts/sync_local_mirror.py</code>：仅当工作区干净才 <code>reset --hard origin/main</code>（脏则跳过防误吞），确保本地 <code>file:///</code> 打开 = 线上 GitHub Pages。云端 build 推了新数据，本地 15 分钟内自动对齐。</div>
 
-        <div class="logic-h">④ 盘后算法链 18:30 → 19:15（8/20 晚间指令）</div>
+        <div class="logic-h">④ 盘后算法链 18:30 → 19:15 单档（8/20 晚间指令）<span style="font-size:12px;color:var(--dim);font-weight:400;"> · 已于 2026-09-02 演进为 16:40/18:10/20:00/21:00 四批</span></div>
         <div class="logic-p"><code>v8_algo_cloud.yml</code> cron <code>30 10</code> → <code>15 11</code>（UTC，即 CST 19:15），确保龙虎榜/北向/板块资金等全部盘后数据就绪后再跑选股算法；<code>alimi_bell.py</code> 按铃/陈旧检查窗口同步 19:15。候选股池 post_close 档接入外资研投 + mahoro 数据源。</div>
 
         <div class="logic-h">⑤ 算法产物推送范围修复（8/20 晚间指令）</div>
@@ -2099,7 +2099,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
 
         <div class="logic-h">⑧ 主人 8/20 23:07 拍板：方案 A 维持现状（决策铁律 + B 方案切换触发条件）</div>
         <div class="logic-p">
-        <b>决策（永久）</b>：主人拍板方案 A——云端全栈（v8_cn_fetch_cloud + v8_algo_cloud 19:15）持续跑，本机只做代码开发 + 镜像同步，不引入混合架构。<br><br>
+        <b>决策（永久）</b>：主人拍板方案 A——云端全栈（v8_cn_fetch_cloud + v8_algo_cloud 16:40 起分批）持续跑，本机只做代码开发 + 镜像同步，不引入混合架构。<br><br>
         <b>B 方案（混合架构）切换触发条件</b>：<b>采集失败率 ≥10%</b> 持续一个月。具体判定：<br>
         · <b>失败率定义</b>：每交易日盘后 18:30 检查 <code>v8_cn_fetch_cloud.yml</code> 抓取的核心模块（gold_pool / candidate / sector_rs / lhb / inst_trade / macro / sentiment_cycle 等）的 <code>update_time</code>；以「同日未更新」为失败。「<code>guard_v8_freshness</code> CORE 监控 ≥24h 陈旧」+「alimi_bell 按铃告警」为辅助信号。<br>
         · <b>触发动作</b>：<code>alimi_bell</code> 邮件告警阈值调严（30min → 15min）+ 阿狸咪邮件「云端采集失败率 ≥10%，建议评估 B 方案」+ 临时允许 <code>ALLOW_LOCAL_ALGO=1</code> 跑一次本机采集做交叉验证。<br>
@@ -2121,7 +2121,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <li>❌ <code>algorithms/market_path_probability.py</code> 已删除：原生成路径概率 ABC 数据，因卡下架随之下线。</li>
           <li>❌ <code>algorithms/path_probability_backtest.py</code> 已随 AI 预测卡下架删除。</li>
           <li>🆕 <b>2026-09-06 主人最终拍板：删除 AI 预测卡</b>：因三轮实证均未过判据门，卡片、函数、数据注入、数据文件、生成脚本、管线映射已全部删除。研究档案保留本段，便于三年后回看。</li>
-          <li>✅ 已加入 <code>run_algorithms.py ORDER</code>（云端 19:15 盘后算法链自动跑；2026-08-20 补入上游 <code>fetch_index_history.py</code> + 双 bridge 到 <code>raw_data/</code>，根治 K 线/概率卡永不更新的链路断点）</li>
+          <li>✅ 已加入 <code>run_algorithms.py ORDER</code>（云端盘后算法链（16:40 起分批）自动跑；2026-08-20 补入上游 <code>fetch_index_history.py</code> + 双 bridge 到 <code>raw_data/</code>，根治 K 线/概率卡永不更新的链路断点）</li>
         </ul>
         <b>诚实标注</b>：⚠️ 历史回测仅供参考；预测市场不存在稳定高准确率方法。实盘验证 ≥3 个月。当前（8/19 收 3894.42）：A=37.9% / B=18.3% / C=43.7%，江恩 F34=8/23 临近。</div>
 
@@ -5219,7 +5219,7 @@ function drawUpDownChart(){
 
           {name:'盘后资金流向', source:'MARKET_FUND_FLOW_DATA', freq:'收盘后1次', slots:['17:30'], note:'全天资金总结'},
 
-          {name:'候选池', source:'CANDIDATE', freq:'收盘后1次', slots:['20:00'], note:'算法初筛名单（v8_algo_cloud 19:15 跑批，约20:00产出）'},
+          {name:'候选池', source:'CANDIDATE', freq:'收盘后1次', slots:['20:00'], note:'算法初筛名单（v8_algo_cloud B选股批 18:10 跑批，约20:00产出）'},
 
           {name:'黄金池', source:'GOLD_POOL', freq:'收盘后1次', slots:['17:30'], note:'精选标的'},
 
@@ -5239,7 +5239,7 @@ function drawUpDownChart(){
 
         cards:[
 
-          {name:'候选池（盘中/盘后）', source:'CANDIDATE', freq:'收盘后1次', slots:['20:00'], note:'算法初筛名单（v8_algo_cloud 19:15 跑批产出，无独立盘中更新）'},
+          {name:'候选池（盘中/盘后）', source:'CANDIDATE', freq:'收盘后1次', slots:['20:00'], note:'算法初筛名单（v8_algo_cloud B选股批 18:10 跑批产出，无独立盘中更新）'},
 
           {name:'黄金池', source:'GOLD_POOL', freq:'收盘后1次', slots:['19:15'], note:'精选标的'},
 
@@ -5267,7 +5267,7 @@ function drawUpDownChart(){
 
           {name:'中国数据抓取 (v8_cn_fetch_cloud)', source:'RUNNER_STATUS', freq:'工作日 cron · 云端', slots:['08:25','09:00','09:30','10:00','10:30','11:00','11:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:20'], note:'核心数据管线 · GitHub Actions 云端 ubuntu-latest 主链（含 17:20 龙虎榜收盘后刷新）'},
 
-          {name:'盘后算法链 (v8_algo_cloud)', source:'TRIPLE_CONSENSUS', freq:'工作日19:15主档', slots:['19:15'], note:'候选池/黄金池/三重共识/回测 · 已迁 GitHub Actions 云端 ubuntu-latest · 冗余由本机每30分检查dispatch兜底'},
+          {name:'盘后算法链 (v8_algo_cloud)', source:'TRIPLE_CONSENSUS', freq:'工作日晚间分批', slots:['16:40','18:10','20:00','21:00'], note:'A采集16:40 / B选股18:10 / D汇总20:00(最终推荐) / E回测21:00 · 已迁 GitHub Actions 云端 ubuntu-latest · 冗余由本机每30分检查dispatch兜底'},
 
           {name:'每日数据体检', source:'HEALTH_CHECK', freq:'每日2次', slots:['09:00','17:00'], note:'数据完整性检查 · 覆盖构建/部署/备份健康'},
 
@@ -6227,7 +6227,7 @@ window.showRestrictedItems = showRestrictedItems;
         var _ph2 = window._cstParts ? window._cstParts(new Date()) : null;
         var _ph2IsPost = _ph2 && _ph2.hh >= 15;
         var _next = _ph2IsPost
-          ? '今日盘后跑批已完成，下一次盘后重刷约 19:15'
+          ? '今日盘后跑批已完成，下一次盘后重刷约 20:00'
           : '下一轮盘中抓取（一般 30 分钟内自动到位），也可手动触发 <code>v8_algo_cloud</code>';
         h+='<div style="background:rgba(239,83,80,.12);border:1px solid rgba(239,83,80,.35);border-radius:8px;padding:10px 14px;margin-bottom:14px;color:#ef5350;font-size:12px;line-height:1.6;font-family:\"PingFang SC\",\"Microsoft YaHei\",\"Hiragino Sans GB\",sans-serif;">'
           +'<b>⚠️ A股数据缺失</b>：当前全站精选仅含港股，原因是盘后扫描时 A股活跃股池抓取失败。'+_next+'。'
@@ -6433,7 +6433,7 @@ h+='</div>';  // /ulPaneDbg
       // 盘前/盘中：双卡数据未齐备，不渲染对比表
       h+='<div style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:7px;padding:10px 12px;font-size:12.5px;line-height:1.7;color:var(--sub);">';
       h+='⏳ <b>等待盘后双卡数据齐备</b>：本卡需「H 反推短线买点」+「动量共识筛选」均更新后方可展示有效对比。<br>';
-      h+='当前状态：H反推 <b>'+(_habTime||'—')+'</b> · 动量共识 <b>'+(_mfTime||'—')+'</b> · 通常 19:15 后自动齐备。</div>';
+      h+='当前状态：H反推 <b>'+(_habTime||'—')+'</b> · 动量共识 <b>'+(_mfTime||'—')+'</b> · 通常 20:00 前后自动齐备。</div>';
     } else {
       var _ha=_cmp.algorithms.h_reverse, _sb=_cmp.algorithms.strong_breakout;
       var _hz=[['t1','T+1'],['t3','T+3'],['t5','T+5'],['t10','T+10']];
@@ -6472,7 +6472,7 @@ h+='</div>';  // /ulPaneDbg
     if(_mf && _mf.generated) h+=_uBadge('盘后','筛选',_mf.generated);
     h+='</h3>';
     if(!_mf || (!_mf.stocks && !_mf.s1 && !_mf.total)){
-      h+='<div class="note">动量共识筛选数据未生成（由 momentum_common_filter.py 产出，盘后 19:15 后通常可用）</div>';
+      h+='<div class="note">动量共识筛选数据未生成（挂 B 选股批，盘后 18:10 起跑、约 19:15 后通常可用）</div>';
     } else {
       // 1) 统计概览
       var _mfTot=_mf.total||((_mf.s1&&_mf.s1.count)||0)+((_mf.s2&&_mf.s2.count)||0)+((_mf.s3&&_mf.s3.count)||0);
@@ -6580,7 +6580,7 @@ h+='</div>';  // /ulPaneDbg
       }
       h+='</table>';
     } else {
-      h+='<div class="note" style="text-align:center;">⏳ 当日候选未产出（盘后 19:15 算法链自动跑）</div>';
+      h+='<div class="note" style="text-align:center;">⏳ 当日候选未产出（盘后 B 选股批 18:10 自动跑）</div>';
     }
     if(habDayKeys.length){
       h+='<details style="margin-top:12px;"><summary style="cursor:pointer;color:var(--sub);font-size:12px;">📊 近 '+habDayKeys.length+' 日跟踪明细（每只候选 T+1/T+5 命中）</summary>';
