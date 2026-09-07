@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "d6bb0d821";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "08e69b47d";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -530,7 +530,7 @@ window.__domReadyFns=[];
 <script src="data/CONCEPT_RANKING.js?v=e5afdebbc3" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/INDEX_QUOTES.js?v=52ed57ad39" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=7cfe940bdd" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=02ee97aa66" defer></script>
 <script src="data/MARGIN_DATA.js?v=b2936ee095" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=7085651957" defer></script>
 <script src="data/IPO_DATA.js?v=8e8bf16b8c" defer></script>
@@ -1517,8 +1517,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/V8_CAL.js?v=aae196ea07"></script>
 <script src="data/SH_FIB.js?v=d2d698c7d6" defer></script>
 <script src="data/SZ_FIB.js?v=76d0e24408" defer></script>
-<script src="data/SECTOR_RS.js?v=f64dca8ed8" defer></script>
-<script src="data/SECTOR_PHASE_HISTORY.js?v=73a73f90f3" defer></script>
+<script src="data/SECTOR_RS.js?v=93c51a87bb" defer></script>
+<script src="data/SECTOR_PHASE_HISTORY.js?v=6c1e314a1d" defer></script>
 <script src="data/INST_TRADE.js?v=7e2981e5be" defer></script>
 <script src="data/NORTH_FUND.js?v=2ce58e8aee" defer></script>
 <script src="data/MARKET_ALERTS.js?v=7dc7d58962" defer></script>
@@ -1532,7 +1532,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/VOLATILITY.js?v=51aeae7fbb" defer></script>
 <script src="data/CAPITAL_FLOW_DATA.js?v=a082eaeee0" defer></script>
 <script src="data/SH_SZ_HISTORY.js?v=42ccc438cc" defer></script>
-<script src="data/CANDIDATE.js?v=d4c0e4779e" defer></script>
+<script src="data/CANDIDATE.js?v=269790e8ec" defer></script>
     <script src="data/FOUR_VOLUME.js?v=dae4e4dee4" defer></script>
     <script src="data/FOUR_VOLUME_60M.js?v=d9c32e3ae1" defer></script>
     <script src="data/STOCK_STOP_DATA.js?v=4839d88fe8" defer></script>
@@ -1564,17 +1564,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/PERFORMANCE_FORECAST.js?v=966cab4956" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=bba09a7879" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=ffaca36dd0" defer></script>
-<script src="data/HEALTH_CHECK.js?v=3923814f1d" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=ed6ab4e5e0" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=a951ea9c71" defer></script>
+<script src="data/HEALTH_CHECK.js?v=cbd712da16" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=1778d963e2" defer></script>
     <!-- 2026-09-07 主人令：中信 PE 极值温度计 + PE<10 历史回测 双卡（暂未上架·实验区最下方） -->
     <script src="data/CITIC_PE_THERMO.js?v=0ea0410af6" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=77bfe41e61" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=6a531e6f7e" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=64b9e04b29" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=4baa03b1f9" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=3ba6acb28d" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=0a0fbc4737" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=bc69bac86d" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=369927a121" defer></script>
     <!-- 2026-09-04 主人令收尾：ALLSITE_BACKTEST.js 注入已删（生成器/raw_data 已于 09-03「干掉全站精选」系列删除，前端无任何代码读 window.ALLSITE_BACKTEST，标签纯 404 噪音） -->
@@ -13312,7 +13312,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }
   var seen=(function(){ try{ var h=window.HEALTH_CHECK||{}; return h.update_time||h.updated_at||h.updated||h.last_update||''; }catch(e){ return ''; } })();
   function _check(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=3923814f1d')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=cbd712da16')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var remote=_pickTs(t);
       if(remote){
         if(seen && remote!==seen){
