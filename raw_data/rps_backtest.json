@@ -1,21 +1,26 @@
 {
-  "update_time": "2026-09-04 21:31:47",
+  "update_time": "2026-09-07 15:58:40",
   "summary": {
-    "update_time": "2026-09-04 21:31:47",
+    "update_time": "2026-09-07 15:58:40",
     "total_signals": 72,
-    "calc_time": "2026-09-04 21:31:47",
-    "method": "RPS 相对强度 A档历史回测：信号日收盘价买入，持有N个交易日收盘价卖出（不处理节假日，按日历日+1/3/5/10/20）",
+    "calc_time": "2026-09-07 15:58:40",
+    "method": "RPS 相对强度 A档历史回测：信号日取真实下一交易日开盘买入，持有 N 个真实交易日收盘价卖出（前复权；胜率=win/(win+loss) 排平盘；已扣双边交易成本 0.3%）",
     "signal_date_range": "2026-09-03 ~ 2026-09-04",
+    "cost_bps_per_side": 15,
     "by_period": {
       "1": {
         "samples": 36,
-        "win_rate": 16.67,
-        "avg_return": -2.72,
-        "best_return": 10.0,
-        "worst_return": -10.02,
-        "win_avg": 2.78,
-        "loss_avg": -3.82,
-        "profit_loss_ratio": 0.73
+        "draws": 0,
+        "win_rate": 13.89,
+        "avg_return": -3.02,
+        "best_return": 9.7,
+        "worst_return": -10.32,
+        "win_avg": 2.98,
+        "loss_avg": -3.99,
+        "profit_loss_ratio": 0.75,
+        "max_drawdown": -108.74,
+        "sharpe_ratio": -0.75,
+        "cost_adjusted": true
       },
       "3": {
         "samples": 0,
@@ -25,7 +30,9 @@
         "worst_return": 0,
         "win_avg": 0,
         "loss_avg": 0,
-        "profit_loss_ratio": 0
+        "profit_loss_ratio": 0,
+        "max_drawdown": 0,
+        "sharpe_ratio": 0
       },
       "5": {
         "samples": 0,
@@ -35,7 +42,9 @@
         "worst_return": 0,
         "win_avg": 0,
         "loss_avg": 0,
-        "profit_loss_ratio": 0
+        "profit_loss_ratio": 0,
+        "max_drawdown": 0,
+        "sharpe_ratio": 0
       },
       "10": {
         "samples": 0,
@@ -45,7 +54,9 @@
         "worst_return": 0,
         "win_avg": 0,
         "loss_avg": 0,
-        "profit_loss_ratio": 0
+        "profit_loss_ratio": 0,
+        "max_drawdown": 0,
+        "sharpe_ratio": 0
       },
       "20": {
         "samples": 0,
@@ -55,7 +66,9 @@
         "worst_return": 0,
         "win_avg": 0,
         "loss_avg": 0,
-        "profit_loss_ratio": 0
+        "profit_loss_ratio": 0,
+        "max_drawdown": 0,
+        "sharpe_ratio": 0
       }
     }
   },
@@ -68,29 +81,34 @@
       "entry_price": 99.83,
       "periods": {
         "1": {
-          "return_pct": -4.37,
+          "return_pct": -4.67,
+          "gross_return": -4.37,
           "exit_price": 95.47,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -102,29 +120,34 @@
       "entry_price": 8.55,
       "periods": {
         "1": {
-          "return_pct": -9.01,
+          "return_pct": -9.31,
+          "gross_return": -9.01,
           "exit_price": 7.78,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -136,29 +159,34 @@
       "entry_price": 91.18,
       "periods": {
         "1": {
-          "return_pct": -5.68,
+          "return_pct": -5.98,
+          "gross_return": -5.68,
           "exit_price": 86.0,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -170,29 +198,34 @@
       "entry_price": 12.67,
       "periods": {
         "1": {
-          "return_pct": -2.92,
+          "return_pct": -3.22,
+          "gross_return": -2.92,
           "exit_price": 12.3,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -204,29 +237,34 @@
       "entry_price": 39.65,
       "periods": {
         "1": {
-          "return_pct": -6.66,
+          "return_pct": -6.96,
+          "gross_return": -6.66,
           "exit_price": 37.01,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -238,29 +276,34 @@
       "entry_price": 35.1,
       "periods": {
         "1": {
-          "return_pct": -0.83,
+          "return_pct": -1.13,
+          "gross_return": -0.83,
           "exit_price": 34.81,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -272,29 +315,34 @@
       "entry_price": 17.33,
       "periods": {
         "1": {
-          "return_pct": -0.75,
+          "return_pct": -1.05,
+          "gross_return": -0.75,
           "exit_price": 17.2,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -306,29 +354,34 @@
       "entry_price": 6.91,
       "periods": {
         "1": {
-          "return_pct": 2.75,
+          "return_pct": 2.45,
+          "gross_return": 2.75,
           "exit_price": 7.1,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -340,29 +393,34 @@
       "entry_price": 9.09,
       "periods": {
         "1": {
-          "return_pct": -0.77,
+          "return_pct": -1.07,
+          "gross_return": -0.77,
           "exit_price": 9.02,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -374,29 +432,34 @@
       "entry_price": 175.64,
       "periods": {
         "1": {
-          "return_pct": -7.2,
+          "return_pct": -7.5,
+          "gross_return": -7.2,
           "exit_price": 163.0,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -408,29 +471,34 @@
       "entry_price": 39.25,
       "periods": {
         "1": {
-          "return_pct": -7.11,
+          "return_pct": -7.41,
+          "gross_return": -7.11,
           "exit_price": 36.46,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -442,29 +510,34 @@
       "entry_price": 45.8,
       "periods": {
         "1": {
-          "return_pct": 1.42,
+          "return_pct": 1.12,
+          "gross_return": 1.42,
           "exit_price": 46.45,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -476,29 +549,34 @@
       "entry_price": 45.22,
       "periods": {
         "1": {
-          "return_pct": 0.0,
+          "return_pct": -0.3,
+          "gross_return": 0.0,
           "exit_price": 45.22,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -510,29 +588,34 @@
       "entry_price": 85.56,
       "periods": {
         "1": {
-          "return_pct": -4.5,
+          "return_pct": -4.8,
+          "gross_return": -4.5,
           "exit_price": 81.71,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -544,29 +627,34 @@
       "entry_price": 46.6,
       "periods": {
         "1": {
-          "return_pct": -1.95,
+          "return_pct": -2.25,
+          "gross_return": -1.95,
           "exit_price": 45.69,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -578,29 +666,34 @@
       "entry_price": 180.36,
       "periods": {
         "1": {
-          "return_pct": -6.2,
+          "return_pct": -6.5,
+          "gross_return": -6.2,
           "exit_price": 169.17,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -612,29 +705,34 @@
       "entry_price": 11.8,
       "periods": {
         "1": {
-          "return_pct": 1.19,
+          "return_pct": 0.89,
+          "gross_return": 1.19,
           "exit_price": 11.94,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -646,29 +744,34 @@
       "entry_price": 4.42,
       "periods": {
         "1": {
-          "return_pct": -2.94,
+          "return_pct": -3.24,
+          "gross_return": -2.94,
           "exit_price": 4.29,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -680,29 +783,34 @@
       "entry_price": 19.2,
       "periods": {
         "1": {
-          "return_pct": 10.0,
+          "return_pct": 9.7,
+          "gross_return": 10.0,
           "exit_price": 21.12,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -714,29 +822,34 @@
       "entry_price": 37.5,
       "periods": {
         "1": {
-          "return_pct": 1.07,
+          "return_pct": 0.77,
+          "gross_return": 1.07,
           "exit_price": 37.9,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -748,29 +861,34 @@
       "entry_price": 8.79,
       "periods": {
         "1": {
-          "return_pct": -8.53,
+          "return_pct": -8.83,
+          "gross_return": -8.53,
           "exit_price": 8.04,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -782,29 +900,34 @@
       "entry_price": 43.0,
       "periods": {
         "1": {
-          "return_pct": -4.21,
+          "return_pct": -4.51,
+          "gross_return": -4.21,
           "exit_price": 41.19,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -816,29 +939,34 @@
       "entry_price": 5.69,
       "periods": {
         "1": {
-          "return_pct": -10.02,
+          "return_pct": -10.32,
+          "gross_return": -10.02,
           "exit_price": 5.12,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -850,29 +978,34 @@
       "entry_price": 44.24,
       "periods": {
         "1": {
-          "return_pct": -0.81,
+          "return_pct": -1.11,
+          "gross_return": -0.81,
           "exit_price": 43.88,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -884,29 +1017,34 @@
       "entry_price": 14.26,
       "periods": {
         "1": {
-          "return_pct": -7.78,
+          "return_pct": -8.08,
+          "gross_return": -7.78,
           "exit_price": 13.15,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -918,29 +1056,34 @@
       "entry_price": 20.99,
       "periods": {
         "1": {
-          "return_pct": -1.67,
+          "return_pct": -1.97,
+          "gross_return": -1.67,
           "exit_price": 20.64,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -952,29 +1095,34 @@
       "entry_price": 4.25,
       "periods": {
         "1": {
-          "return_pct": -7.29,
+          "return_pct": -7.59,
+          "gross_return": -7.29,
           "exit_price": 3.94,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -986,29 +1134,34 @@
       "entry_price": 73.93,
       "periods": {
         "1": {
-          "return_pct": -6.76,
+          "return_pct": -7.06,
+          "gross_return": -6.76,
           "exit_price": 68.93,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -1020,29 +1173,34 @@
       "entry_price": 37.0,
       "periods": {
         "1": {
-          "return_pct": -2.27,
+          "return_pct": -2.57,
+          "gross_return": -2.27,
           "exit_price": 36.16,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -1054,29 +1212,34 @@
       "entry_price": 7.03,
       "periods": {
         "1": {
-          "return_pct": 0.28,
+          "return_pct": -0.02,
+          "gross_return": 0.28,
           "exit_price": 7.05,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -1088,29 +1251,34 @@
       "entry_price": 89.56,
       "periods": {
         "1": {
-          "return_pct": -0.74,
+          "return_pct": -1.04,
+          "gross_return": -0.74,
           "exit_price": 88.9,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -1122,29 +1290,34 @@
       "entry_price": 7.33,
       "periods": {
         "1": {
-          "return_pct": -0.41,
+          "return_pct": -0.71,
+          "gross_return": -0.41,
           "exit_price": 7.3,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -1156,29 +1329,34 @@
       "entry_price": 135.15,
       "periods": {
         "1": {
-          "return_pct": -0.05,
+          "return_pct": -0.35,
+          "gross_return": -0.05,
           "exit_price": 135.08,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -1190,29 +1368,34 @@
       "entry_price": 11.04,
       "periods": {
         "1": {
-          "return_pct": -1.0,
+          "return_pct": -1.3,
+          "gross_return": -1.0,
           "exit_price": 10.93,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -1224,29 +1407,34 @@
       "entry_price": 52.95,
       "periods": {
         "1": {
-          "return_pct": -1.87,
+          "return_pct": -2.17,
+          "gross_return": -1.87,
           "exit_price": 51.96,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -1258,29 +1446,34 @@
       "entry_price": 25.69,
       "periods": {
         "1": {
-          "return_pct": -0.35,
+          "return_pct": -0.65,
+          "gross_return": -0.35,
           "exit_price": 25.6,
           "exit_date": "2026-09-04"
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-06"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-08"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-13"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-23"
+          "exit_date": null
         }
       }
     },
@@ -1293,28 +1486,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1327,28 +1525,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1361,28 +1564,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1395,28 +1603,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1429,28 +1642,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1463,28 +1681,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1497,28 +1720,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1531,28 +1759,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1565,28 +1798,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1599,28 +1837,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1633,28 +1876,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1667,28 +1915,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1701,28 +1954,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1735,28 +1993,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1769,28 +2032,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1803,28 +2071,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1837,28 +2110,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1871,28 +2149,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1905,28 +2188,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1939,28 +2227,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -1973,28 +2266,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -2007,28 +2305,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -2041,28 +2344,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -2075,28 +2383,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -2109,28 +2422,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -2143,28 +2461,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -2177,28 +2500,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -2211,28 +2539,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -2245,28 +2578,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -2279,28 +2617,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -2313,28 +2656,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -2347,28 +2695,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -2381,28 +2734,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -2415,28 +2773,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -2449,28 +2812,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     },
@@ -2483,28 +2851,33 @@
       "periods": {
         "1": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-05"
+          "exit_date": null
         },
         "3": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-07"
+          "exit_date": null
         },
         "5": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-09"
+          "exit_date": null
         },
         "10": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-14"
+          "exit_date": null
         },
         "20": {
           "return_pct": null,
+          "gross_return": null,
           "exit_price": null,
-          "exit_date": "2026-09-24"
+          "exit_date": null
         }
       }
     }
