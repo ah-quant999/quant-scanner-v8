@@ -27,6 +27,9 @@ name: "📈 v8 STOCK_QUOTE 轻量 refresh"
 on:
   schedule:
     # 09:00-16:30 北京时间（UTC 01:00-08:30），每 30 分钟一次
+    # 🔧 2026-09-07 重新注册 schedule：GitHub 调度器静默丢失本 workflow 的 cron 注册，
+    #   自 2026-09-04 10:41(UTC) 起零 schedule 触发（仅 workflow_dispatch 手动可跑）。
+    #   本注释变更强制 GitHub 重新解析并注册 cron。
     - cron: '0,30 1-8 * * 1-5'
   workflow_dispatch:
     inputs:
