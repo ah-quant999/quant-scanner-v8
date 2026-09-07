@@ -392,9 +392,14 @@ jobs:
             exit 0
           fi
           HH=$(TZ=Asia/Shanghai date +%H)
-          if [ "$HH" -ge 6 ] && [ "$HH" -lt 18 ]; then
+          # 🔴 2026-09-07 一劳永逸修复（22 个红灯根因）：原 [6,18) 静默窗写于 09-03，
+          #   09-04 时序重排把 A 采集批挪到 16:40 后，16/17 点 dispatch 被误杀 →
+          #   cron 又静默失效（本 workflow 多 cron 顽疾）→ A 档既无 schedule 又被闸门拦，
+          #   当天采集批 0 产出，连锁 22 项 heal_cat=algo_run 红灯。
+          #   现放行 16/17 点：主步骤按 CST 小时映射得 STAGE=A（采集批，非全链），无风暴风险。
+          if [ "$HH" -ge 6 ] && [ "$HH" -lt 16 ]; then
             echo "skip_silent=true" >> "$GITHUB_OUTPUT"
-            echo "🔇 dispatch×选股无效时段(${HH}点)：选股必被时间 gate 跳过，纯空转，静默"
+            echo "🔇 dispatch×无效时段(${HH}点)：6-15 点无盘后批次，纯空转，静默"
             exit 0
           fi
           # V5 (2026-09-03 22:xx 主人令「风暴一劳永逸」) 封午夜翻日洞：
