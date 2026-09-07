@@ -69,6 +69,9 @@
 | 10 | `c54c5f44d` | **algorithms/run_algorithms.py（P0 修 gen_lhb_7d 漏挂 ORDER）** |
 | 11 | `68428e9d3` | DO_NOT_DELETE.md（CITIC PE 全链保护段） |
 | 12 | `9ea7dea8f` | .github/workflows/cloud_weekly_cleanup.yml（CITIC 防孤儿） |
+| 13 | `e19fa9eb7` | **4 个 v8_cn_fetch*.yml（42 软失败步改「软失败但强制 ::error:: 告警」）** |
+
+> 📌 第 13 项是 07:06 本班最后一颗子弹出膛，写在**第七章补记**，别漏看。
 
 ---
 
@@ -116,8 +119,46 @@
 - ✅ 体检：44 项全绿
 - ⚠️ 本地未跟踪文件：`raw_data/algo_chain_report.json`（你的跑批报告，未入库，无害）
 
+### 6.1 改后三件套（07:10 复跑，全绿）
+
+| 项 | 命令/口径 | 结果 |
+|----|-----------|------|
+| ① py_compile | `compileall -q algorithms v8 scripts`（本轮无 .py 改动，全量兜底） | **0 错** ✅ |
+| ② inline script | index.html **23 段** / logic.html **6 段** → `new Function` | **0 错** ✅ |
+| ③ 对齐审计 | `align_logic_ops.py` | **EXIT 0** ✅ |
+| ③ 完整性计数 | 磁盘根 `data/*.js`=**100** / 索引递归=**103** / 远端 tip=**103**（差 3 个在 `data/archive/`，同口径一致） | **一致** ✅ |
+| ③+ YAML | 29 个 workflow `yaml.safe_load` | **0 错** ✅ |
+
 ---
 
-**交接人**：阿狸咪（2026-09-08 06:50）
+## 七、补记 07:06 `e19fa9eb7` —— 软失败不再「静默溜走」
+
+### 7.1 背景（主人拍板）
+
+`v8_cn_fetch*.yml` 里的 `continue-on-error: true` 是 **2026-08-18 主人亲自定的「消费层软失败」**（注释引证据：当年硬失败曾致 9+ 连败），与昨晚「禁止假 success」铁律表面冲突。主人裁决：**软失败保留，但失败必须强制告警** —— 既不阻断消费链，也不许假装没事。
+
+### 7.2 改造内容（4 workflow / 42 步，三层告警）
+
+| 层 | 做法 | 效果 |
+|----|------|------|
+| ① 单步 | 每步加 `id: soft_N`，run 末尾 `_v8_rc=$?`；非零则 `echo "::error title=v8-softfail:soft_N(exit=N)::<中文步名> 软失败…"` + `exit 1` | Actions UI 该步**显示红叉**并产 error annotation，但 job 不阻断 |
+| ② job 汇总 | 每个 job 末尾新增「📢软失败汇总告警」步（`if: always()`），按**显式 id 列表**遍历 `${{ steps.soft_N.outcome }}` | 一条 annotation + 写进 `GITHUB_STEP_SUMMARY`，巡检一眼看全 |
+| ③ 编码 | title 一律 **ASCII**（`v8-softfail:soft_N` / `v8-softfail-summary`），message 保留中文 | Windows 老版 PS 按 ANSI 读无 BOM 脚本，emoji/全角括号有解析隐患；title 是机器解析字段 |
+
+### 7.3 顺带修的 3 类真 bug（不修则告警本身也是假的）
+
+1. **循环步守卫失效**：多处「for i in 1 2 3 重试」步（index.html `?v` 原子提交 3 处、intraday_snapshot 1 处），3 次全失败时 `done` 退出码仍是 0 → 守卫形同虚设。改为循环内置成功标记 `_v8_ok`，守卫按标记判定。
+2. **hosted LHB 回填**补守卫（原先失败无声）。
+3. **汇总取 env 不可靠**：`env | grep` 抓软失败步改为显式 id 列表。
+
+### 7.4 给小九的验收口径
+
+- 后续任一轮 `v8_cn_fetch*` 跑完：**annotation 数 = 软失败步数 + 1（汇总步）**，对不上就是新埋了没登记的软失败步。
+- 看到 `v8-softfail-summary` 标题的告警 → 点进去看是哪些步软失败，**该补跑的补跑**，不要因为 job 是绿的就当没事。
+- 新增软失败步时**必须同时**：① 给 `id: soft_N` ② 加退出码守卫 ③ 把 id 写进该 job 的汇总步列表。三步缺一即退化成静默失败。
+
+---
+
+**交接人**：阿狸咪（2026-09-08 06:50，第七章补记 07:10）
 **接手人**：小九
 **本报告仅供研究参考，不构成投资建议。**
