@@ -176,8 +176,27 @@ def _algo_data_need_bell(now):
 
 
 def _dispatch(workflow_id, payload=None):
+    """按铃派发。
+
+    🛡 2026-09-07 一劳永逸：算法链（v8_algo_cloud.yml）改走 repository_dispatch。
+    原 workflow_dispatch 直派会绕开 v8_algo_cloud.yml 的探针路由（该文件注释明写
+    「手动 dispatch 不路由」），所有派发源（本机按铃 / WorkBuddy 自动化 / 云端 cron）
+    全砸在同一台云端机、同一个 concurrency group 上 → 互踢 / 暴风 / 覆盖。
+    2026-09-07 当晚 13 次派发 9 次被 cancelled，最终推荐被拖到 21:55 即源于此。
+    改走 repository_dispatch(type=trigger_algo) 后，探针自动把链转派 cn 小九机
+    （不同 concurrency group v8-algo-cn），cn 离线才回落云端 —— 从根上不再互踢。
+    其它 workflow（如 v8_cn_fetch_cloud.yml）仍走原 workflow_dispatch，不受影响。
+    """
     if _DRY:
         return "DRY-RUN(跳过真实dispatch)"
+    if workflow_id == _WF_ALGO:
+        st, data = _api(
+            f"/repos/{_REPO}/dispatches",
+            method="POST", data={"event_type": "trigger_algo"},
+        )
+        if st == 204:
+            return "DISPATCH OK(204 · repository_dispatch/trigger_algo → 探针路由 cn 优先)"
+        return f"DISPATCH FAIL({st}): {data.get('error', '')[:150]}"
     st, data = _api(
         f"/repos/{_REPO}/actions/workflows/{workflow_id}/dispatches",
         method="POST", data=payload or {"ref": "main"},

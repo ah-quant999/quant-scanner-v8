@@ -36,6 +36,12 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     "v8/backtest_crds.py": 2400,    # 逆势龙头 CRDS 回测：读 crds history + baostock 取 K 线回填收益
     "factor_lab_backtest.py": 1800,  # 🆕 700日长历史抓取+五分位分层回测（cn ~5min / 云端 ~15min）
     "v8/factor_lab_gen.py": 5400,    # 🛡 2026-09-04 云端适配：全市场主板 baostock 逐只，冷启动 ~50-90min（缓存随 raw_data/flab_work 入仓逐晚收敛，热缓存后数分钟）
+    # 🛡 2026-09-07 一劳永逸：H 反推对「全市场涨幅≥3%」的数百只逐只取前 4 日均量。
+    #   原为串行逐只 HTTP（云端抓中国源必挂）→ 30min 被 kill → 产物文件写不出来
+    #   → track 兜底读旧 H_AUTO_BUY.js → 前端卡冻结 3 天（09-05~09-07 事故）。
+    #   现已改为「本地缓存优先 + 三级兜底链 + 16 线程并发」，实测分钟级；此处登记
+    #   显式预算 2400s，避免冷缓存首轮（缓存未命中、全走网络）时再被误杀。
+    "auto_run_dn_algorithm.py": 2400,
 }
 
 
