@@ -167,6 +167,11 @@ ORDER = [
     "v8/backtest_crds.py",            # → data/CRDS_BACKTEST.js（逆势龙头 CRDS 真实历史回测）
     # 🆕 2026-09-04 主人令「都按你的建议做」：因子实验室独立分层回测（升4⭐证据链）
     "factor_lab_backtest.py",         # → data/FACTOR_LAB_BACKTEST.js（五分位分层·胜率/回撤/OOS）
+    # 🛡 2026-09-07 修复：以下两脚本曾只挂 E 批 STAGES、漏挂 ORDER → 模块级自校验
+    #   `_STAGE_UNION == set(ORDER)` 断言崩（仅STAGES有两脚本），盘后链启动即死、0 产出。
+    #   此前被 V5 心跳闸门跳过链本体掩盖，2026-09-07 17:40 #1579 首次真跑暴露。
+    "backtest_expectancy.py",         # → raw_data/backtest_expectancy.json（期望收益回测，与 E 批同位）
+    "v8/backtest_rps.py",             # → raw_data/rps_backtest.json（2026-09-06 主人令 RPS A档 30 天考核）
 ]
 
 
