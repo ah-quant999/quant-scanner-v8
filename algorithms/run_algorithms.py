@@ -211,6 +211,10 @@ STAGES = {
         "refresh_dividend_cninfo.py",
         "refresh_stock_metadata.py", "fetch_weekend_run.py",   # 周末复盘/周度汇总（原 ORDER 漏挂 STAGE）
         "auto_run_dn_algorithm.py", "strong_breakout.py", "track_h_auto_buy.py",
+        # 2026-09-08 一劳永逸：gen_lhb_7d.py 此前只存在于 STOCK_PICKING_SCRIPTS 与 step 顺序表里，
+        # 从未挂进 STAGES -> 分批模式（A/B/D/E）永远跑不到它，data/LHB_7D.js 卡在 09-04 的红灯根因。
+        # 挂 B 批：依赖 A 批 fetch_lhb.py 产出的当日龙虎榜，属选股向汇总。
+        "gen_lhb_7d.py",
         "scripts/momentum_common_filter.py",   # 🆕 2026-09-04 挂链：动量共识筛选（读 STOCK_QUOTE，纯本地）
     ],
     # 🛡 2026-09-04 主人令「策略全部数据出来→最终数据上线→然后才是回测」时序重排：
