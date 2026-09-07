@@ -1,6 +1,6 @@
 {
  "month": "2026年9月",
- "update_time": "2026-09-07 22:14",
+ "update_time": "2026-09-08 00:26",
  "legend": [
   {
    "title": "重要政策",
@@ -172,24 +172,24 @@
     {
      "num": 7,
      "dim": false,
-     "today": true,
+     "today": false,
      "events": [
       {
        "text": "🇨🇳 中国出口",
        "cls": "data",
-       "released": false
+       "released": true
       },
       {
        "text": "🇺🇸 美股休市（劳动节）",
        "cls": "us",
-       "released": false
+       "released": true
       }
      ]
     },
     {
      "num": 8,
      "dim": false,
-     "today": false,
+     "today": true,
      "events": []
     },
     {

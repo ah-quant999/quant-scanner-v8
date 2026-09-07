@@ -1,5 +1,5 @@
 window.FOUR_VOLUME={
- "update_time": "2026-09-07 21:16:01",
+ "update_time": "2026-09-08 00:30:45",
  "total": 13,
  "stocks": [
   {
@@ -228,7 +228,7 @@ window.FOUR_VOLUME={
   },
   {
    "code": "002436",
-   "name": "凌雄科技",
+   "name": "兴森科技",
    "market": "sz",
    "board_label": "主板",
    "close": 36.75,
