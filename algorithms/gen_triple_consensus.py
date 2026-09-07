@@ -179,7 +179,7 @@ def main():
         # 🐛 2026-09-06 审计修复（P0级）：原 `in_top and in_a and in_fund` 在驾驶舱下线（tier={}，
         # in_a 恒 False）后导致严格共识自 09-03 起【永远为空】。现共识 = 主站TOP10精选 ∩ 基本面A档（二维）。
         if in_top and in_fund:
-            src = top or a
+            src = top or a or {}
             rec = {
                 "code": src.get("code", code),
                 "name": src.get("name", ""),
@@ -187,9 +187,11 @@ def main():
                 "board": src.get("board", src.get("market", "")),
                 "total_score": top.get("total_score", 0),
                 "top10_rank": top.get("rank", 0),
-                "a_score": a.get("total_score", 0),
-                "quality_grade": top.get("quality_grade", a.get("quality_grade", "")),
-                "quality_score": top.get("score_quality", a.get("quality_score", 0)),
+                # 2026-09-07 修复：驾驶舱下线后 a_map 恒空 → a 恒 None，原 `a.get(...)` 直接
+                # AttributeError 崩掉整个脚本（三重共识自 09-04 起持续未产出）。统一 (a or {}) 兜底。
+                "a_score": (a or {}).get("total_score", 0),
+                "quality_grade": top.get("quality_grade", (a or {}).get("quality_grade", "")),
+                "quality_score": top.get("score_quality", (a or {}).get("quality_score", 0)),
                 "close": top.get("close", 0),
                 "pct_chg": top.get("pct_chg", 0),
                 "pct_chg_20d": top.get("pct_chg_20d", 0),
@@ -243,7 +245,7 @@ def main():
         "data_time": top10.get("update_time", ""),
         "count": len(consensus),
         "near_miss_count": len(near_miss),
-        "criteria": "主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)） · 基本面A档（驾驶舱维度 2026-09-03 下线后移除）",
+        "criteria": "主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)） · 基本面A档",
         "near_miss_criteria": "有TOP10精选但缺基本面A档（差1步）",
         "stocks": consensus,
         "near_miss": near_miss,

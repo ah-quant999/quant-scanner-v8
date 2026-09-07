@@ -5,16 +5,29 @@
     "category": "post_close"
   },
   "post_close": {
-    "ts": "2026-08-28 16:09:53",
+    "ts": "2026-09-07 20:24:31",
     "vars": [
       "VOLATILITY"
     ]
   },
   "algo": {
-    "ts": "2026-08-28 16:09:53",
+    "ts": "2026-09-07 20:24:31",
     "vars": [
-      "CRDS_CARD_DATA",
+      "BACKTEST_COMPREHENSIVE",
+      "BACKTEST_TDX",
       "LHB_7D"
+    ]
+  },
+  "premarket,intraday": {
+    "ts": "2026-09-07 20:24:31",
+    "vars": [
+      "CRISIS_DATA"
+    ]
+  },
+  "premarket": {
+    "ts": "2026-09-07 20:24:31",
+    "vars": [
+      "V8_CAL"
     ]
   }
 }
