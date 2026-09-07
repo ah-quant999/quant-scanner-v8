@@ -5563,12 +5563,11 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     }
     var stamp = (L && L.update_time) || (window.STOCK_PROFILE && window.STOCK_PROFILE.update_time) || '—';
     var nPerf = Object.keys(perfMap).length, nRoe = Object.keys(roeMap).length;
+    // 🛡 2026-09-07 主人令：「更新于」改全站统一 v8CardHeader 版式（🦊 胶囊 + slot/horizon）；
+    //   顶行内联「实验版 · 纯前端交叉 · 无新增管线」紫底 chip + 底色「实验版边界」框 一并删除（统一朴素风）。
     dst.innerHTML = ''
-      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-      + '<b style="font-size:15px;">🔭 主题空间 · 价值投资</b>'
-      + '<span style="font-size:10px;font-weight:600;color:#a78bfa;background:rgba(167,139,250,.12);padding:1px 6px;border-radius:4px;">实验版 · 纯前端交叉 · 无新增管线</span>'
-      + '<span class="fresh">画像 ' + _ev(stamp) + '</span>'
-      + '</div>'
+      + window.v8CardHeader('🔭','主题空间 · 价值投资','概念 × 业绩预告 × ROE 交叉（实验版）','update_time',{update_time:stamp, slot:'盘后', horizon:'中长线'})
+      + '<div style="padding:12px 14px;">'
       + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">' + chips + '</div>'
       + '<div style="font-size:11.5px;color:var(--sub);margin-bottom:8px;line-height:1.6;">'
       + '本主题命中 <b style="color:var(--txt);">' + hits.length + '</b> 只：'
@@ -5580,9 +5579,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + (cards ? '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;">' + cards + '</div>'
                : '<div class="note" style="color:var(--dim);">本主题无概念命中，换个主题试试</div>')
       + (hits.length > TV_MAX ? '<div style="font-size:11px;color:var(--dim);margin-top:6px;">仅展示前 ' + TV_MAX + ' 只 / 共 ' + hits.length + ' 只（按 A→B→C、命中标签数、业绩幅度排序）</div>' : '')
-      + '<div style="background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.3);border-radius:7px;padding:8px 10px;margin-top:10px;font-size:11px;line-height:1.7;color:var(--sub);">'
-      + '⚠️ <b style="color:#c4b5fd;">实验版边界</b>：概念标签 ≠ 业务实质（无订单/管线/收入占比数据源）。「<b style="color:var(--txt);">某 AI 制药概念股</b>有没有业务实质」这类问题需「正确版」管线（财报三表 + 主营构成 + 公告关键词 + 估值模型）支撑——本卡 <b>20 个交易日</b>观察达标后再立项。<b>20 个交易日</b>样本考核链未挂（实验版纯人工观察），不进选股评分，不构成投资建议。'
-      + '</div>';
+      + '</div>';   // /padding 12 14
   };
 
 
@@ -11297,7 +11294,7 @@ window.showRestrictedItems = showRestrictedItems;
     //     数据链保留纯观测（E 批 21:00 每日续跑），不参与选股评分权重；达标才谈恢复子 tab/进评分 ═══
     h += '<div class="card" id="rpsAuditBody" style="margin-bottom:16px;border-left:4px solid #94a3b8;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">📈 相对强度 RPS · 30 天样本考核 加载中…</div></div>';
     // ═══ 2026-09-06 主人令：主题空间·价值投资 实验版卡迁入实验区最下方（概念×业绩×ROE 纯前端交叉，无新增管线）═══
-    h += '<div class="card" id="themeValueBody" style="margin-bottom:16px;border-left:4px solid #a78bfa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">🔭 主题空间 · 价值投资 实验卡 加载中…</div></div>';
+    h += '<div class="card" id="themeValueBody" style="margin-bottom:16px;border-left:4px solid var(--cyan);"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">🔭 主题空间 · 价值投资 实验卡 加载中…</div></div>';
 
     // ═══ 2026-09-07 主人令：中信 PE 极值温度计（未来卡）+ PE<10 历史回测卡 挂实验区最下方 · 2 张 ═══
     //   数据源：raw_data/citic_pe_history.json (baostock 2010-2026, 4051 行)
