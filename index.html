@@ -11109,10 +11109,12 @@ window.showRestrictedItems = showRestrictedItems;
     // ═══ 2026-09-07 主人令（二改）：卡只放宏观页最顶部（禁止在实验区显示）；
     //   内容以 AI 解析建议为主（日→周→月三层，AI 阅读后撰写），新闻条目折叠为附录；标题行带「更新于」。
     h += '<div class="card" id="maharoCard" style="margin-bottom:16px;border-left:4px solid #34d399;">'
-       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
-       + '<span style="font-size:15px;font-weight:700;color:#34d399;">📚 机构研究 · AI 解析建议</span>'
-       + '<span class="fresh" id="maharoFresh">—</span>'
-       + '<span style="font-size:12px;color:var(--dim);">观澜台/金斧头等 7 源 · AI 阅读后撰写 · 每日 08:30 更新</span></div>'
+       // 2026-09-07 主人令：「更新于」改为全站统一 v8CardHeader 版式（🦊 胶囊 setBadge 补填），副标题文案保留
+       + '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;row-gap:4px;padding:10px 14px;border-bottom:1px solid var(--border);border-radius:12px 12px 0 0;min-width:0;">'
+       + '<span style="font-size:15px;line-height:1;flex:0 0 auto;">📚</span>'
+       + '<span style="font-size:14px;font-weight:800;color:var(--cyan);flex:0 0 auto;white-space:nowrap;">机构研究 · AI 解析建议</span>'
+       + '<span style="flex:0 0 auto;" id="maharoFresh">—</span>'
+       + '<span style="font-size:11px;color:var(--dim);margin-left:4px;flex:0 1 auto;min-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">观澜台/金斧头等 7 源 · AI 阅读后撰写 · 每日 08:30 更新</span></div>'
        + '<div id="maharoCardBody"><div class="note">加载中…</div></div></div>';
     // ═══ 2026-09-06 主人令：新周期判定卡（海外宏观+AI 大周期 · 事件驱动）═══
     //   位置：K 型卡上方（事件驱动更新频率 > K 型月度更新）；
@@ -11292,7 +11294,7 @@ window.showRestrictedItems = showRestrictedItems;
       return;
     }
     var fresh = document.getElementById('maharoFresh');
-    if(fresh) fresh.textContent = '更新于 '+d.updated_at;
+    if(fresh && typeof setBadge === 'function') setBadge('maharoFresh','盘前','短线', d.updated_at);
     function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
     function renderLines(txt){
       var rows = String(txt||'').split('\n'); var out = '';
@@ -12134,26 +12136,58 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
     var hasEsub = esub && esub.categories && (esub.categories.stock || esub.categories.bond);
     var _esubDate = esubT ? esubT.slice(0,16) : '最近跑批';
     h+='<div class="card" style="margin-bottom:14px;border-left:4px solid #00acc1;">';
-    h+=v8CardHeader('📈','宽基ETF净申赎（亿元·东财口径）','','update_time',{update_time:esubT,slot:'盘后',horizon:'中长线'},!hasEsub);
+    h+=v8CardHeader('📈','ETF净申赎（亿元·东财五分类）','','update_time',{update_time:esubT,slot:'盘后',horizon:'中长线'},!hasEsub);
     h+='<div style="padding:12px 14px;">';
     if(hasEsub){
       h+='<div style="font-size:11px;color:#38bdf8;margin-bottom:8px;">东方财富 ETF 分类（股票型 / 债券型 / 货币型 / 商品型 / 跨境型）· 净申赎金额（亿元）· 数据源 akshare etf_em</div>';
       h+='<div style="font-size:10px;color:var(--dim);margin-bottom:10px;">数据截至 '+_esubDate+'（口径：'+ (esub.metric||'规模AUM') +'，与上方盘中 ETF 三合一窗口不同源）</div>';
-      // 5 类分类表格（替代旧宽基指数时间轴）
-      h+='<table style="width:100%;border-collapse:collapse;font-size:12px;">';
-      h+='<thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:6px 8px;color:var(--dim);font-weight:600;">类型</th><th style="text-align:right;padding:6px 8px;color:var(--dim);font-weight:600;">净申赎(亿)</th><th style="text-align:right;padding:6px 8px;color:var(--dim);font-weight:600;">规模(亿)</th><th style="text-align:right;padding:6px 8px;color:var(--dim);font-weight:600;">只数</th></tr></thead><tbody>';
+      // 2026-09-07 主人令：恢复"原来那种看线的"柱状图形态（网格线+零轴虚线复刻旧图观感），数据仍用东财五分类口径。
+      //   红涨绿跌铁律：净申赎正=红柱 var(--up)，负=绿柱 var(--down)。
       var catOrder=[['stock','股票型'],['bond','债券型'],['money','货币型'],['commodity','商品型'],['cross_border','跨境型']];
-      catOrder.forEach(function(pair){
-        var k=pair[0], cn=pair[1];
-        var c=(esub.categories||{})[k]||{};
-        var net=c.net_amount_yi||0, scl=c.scale_yi||0, nf=c.n_funds||0;
-        var netColor = net>0?'var(--up)':net<0?'var(--down)':'var(--sub)';
-        var netStr = (net>0?'+':'') + net.toFixed(2);
-        h+='<tr style="border-bottom:1px solid rgba(148,163,184,.08);"><td style="padding:7px 8px;color:var(--txt);">'+cn+'</td><td style="padding:7px 8px;text-align:right;color:'+netColor+';font-weight:600;">'+netStr+'</td><td style="padding:7px 8px;text-align:right;color:var(--txt);">'+(scl?scl.toFixed(1):'--')+'</td><td style="padding:7px 8px;text-align:right;color:var(--sub);">'+nf+'</td></tr>';
+      var _cats=catOrder.map(function(p){ var c=(esub.categories||{})[p[0]]||{}; return {cn:p[1], net:c.net_amount_yi||0, scl:c.scale_yi||0, nf:c.n_funds||0}; });
+      var W=680, H=260, PAD={top:38, left:60, bottom:46, right:14};
+      var gw=W-PAD.left-PAD.right, gh=H-PAD.top-PAD.bottom;
+      var vals=_cats.map(function(c){return c.net;});
+      var maxV=Math.max.apply(null,vals.concat([0])), minV=Math.min.apply(null,vals.concat([0]));
+      var span=maxV-minV; if(span<1){ span=1; maxV+=0.5; minV-=0.5; } else { maxV+=span*0.12; minV-=span*0.12; }
+      var yScale=function(v){ return PAD.top+gh-(v-minV)/(maxV-minV)*gh; };
+      var xScale=function(i){ return PAD.left+gw*(i+0.5)/_cats.length; };
+      var barW=Math.min(64, gw/_cats.length*0.52);
+      var svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;">';
+      // 横向网格线 + Y 轴刻度（旧图划线观感复刻）
+      for(var gi=0;gi<=4;gi++){
+        var gv=minV+(maxV-minV)*(1-gi/4), gy=yScale(gv);
+        var gAbs=Math.abs(gv); var gLbl=gAbs>=100?gv.toFixed(0):gAbs>=10?gv.toFixed(1):gv.toFixed(2);
+        svg+='<line x1="'+PAD.left+'" y1="'+gy.toFixed(1)+'" x2="'+(W-PAD.right)+'" y2="'+gy.toFixed(1)+'" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>';
+        svg+='<text x="'+(PAD.left-8)+'" y="'+(gy+4).toFixed(1)+'" text-anchor="end" font-size="10" fill="#888">'+gLbl+'</text>';
+      }
+      // 零轴虚线
+      var zeroY=yScale(0);
+      svg+='<line x1="'+PAD.left+'" y1="'+zeroY.toFixed(1)+'" x2="'+(W-PAD.right)+'" y2="'+zeroY.toFixed(1)+'" stroke="#666" stroke-width="1" stroke-dasharray="4 3"/>';
+      svg+='<line x1="'+PAD.left+'" y1="'+PAD.top+'" x2="'+PAD.left+'" y2="'+(H-PAD.bottom)+'" stroke="#555" stroke-width="1"/>';
+      // 柱体 + 数值标注 + 类目名
+      _cats.forEach(function(c,i){
+        var v=c.net, cx=xScale(i);
+        var yv=v>=0?yScale(v):zeroY;
+        var hh=Math.max(1,Math.abs(yScale(v)-zeroY));
+        var color=v>0?'var(--up)':v<0?'var(--down)':'#64748b';
+        svg+='<rect x="'+(cx-barW/2).toFixed(1)+'" y="'+yv.toFixed(1)+'" width="'+barW.toFixed(1)+'" height="'+hh.toFixed(1)+'" rx="3" fill="'+color+'" opacity="0.85"/>';
+        var vLbl=(v>0?'+':'')+v.toFixed(2);
+        var lblY=v>=0?(yv-6):(yv+hh+14);
+        svg+='<text x="'+cx.toFixed(1)+'" y="'+lblY.toFixed(1)+'" text-anchor="middle" font-size="11" font-weight="bold" fill="'+color+'">'+vLbl+'</text>';
+        svg+='<text x="'+cx.toFixed(1)+'" y="'+(H-PAD.bottom+16)+'" text-anchor="middle" font-size="11" fill="var(--txt)">'+c.cn+'</text>';
+        svg+='<text x="'+cx.toFixed(1)+'" y="'+(H-PAD.bottom+31)+'" text-anchor="middle" font-size="10" fill="var(--dim)">'+(c.nf?c.nf+'只':'--')+'</text>';
       });
-      h+='</tbody></table>';
+      // 图例 + 合计
+      var tot=0; _cats.forEach(function(c){tot+=c.net;});
+      var totCol=tot>0?'var(--up)':tot<0?'var(--down)':'var(--sub)';
+      svg+='<text x="'+(PAD.left+5)+'" y="'+(PAD.top-10)+'" font-size="11" fill="var(--up)">● 净申购</text>';
+      svg+='<text x="'+(PAD.left+78)+'" y="'+(PAD.top-10)+'" font-size="11" fill="var(--down)">● 净赎回</text>';
+      svg+='<text x="'+(W-PAD.right)+'" y="'+(PAD.top-10)+'" text-anchor="end" font-size="11" font-weight="bold" fill="'+totCol+'">合计 '+(tot>0?'+':'')+tot.toFixed(2)+' 亿</text>';
+      svg+='</svg>';
+      h+='<div style="margin-bottom:6px;">'+svg+'</div>';
       // 全 0 警告
-      var allZero = catOrder.every(function(p){ var c=(esub.categories||{})[p[0]]||{}; return (c.net_amount_yi||0)===0 && (c.scale_yi||0)===0; });
+      var allZero = _cats.every(function(c){ return c.net===0 && c.scl===0; });
       if(allZero){
         h+='<div style="margin-top:10px;font-size:12px;color:var(--down);background:rgba(239,83,80,.08);border:1px solid rgba(239,83,80,.25);border-radius:6px;padding:10px;">⚠️ 数据全 0——fetcher akshare 接口当前版本异常，待回退接口修复</div>';
       }
@@ -12169,7 +12203,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
 
     el.innerHTML=h;
     drawV8MarginChart();
-    // 2026-09-04 一劳永逸：宽基ETF卡已从 chart 改为 5 类分类表格，不再调用旧口径图表函数（2026-09-06 函数全链下线）。
+    // 2026-09-07 主人令：宽基ETF卡恢复柱状图形态（数据仍东财五分类，不回退旧口径图表函数——旧口径 fetch 链保持下线）。
     // 2026-08-29 一劳永逸：删 renderMacro 调用——opTab4 无 phMacroBody 抛 null 已被主人之前在 initPostMarket 9680 注释；
     //   下面 3 个 safe 调用使用与 initPostMarket 同样的窗口数据来源（line 9658-9660 已对齐）：
     // 🛡 2026-08-31: FOMC_DATA 数据源未配置，当前为空对象，温度计缺 FOMC 维度。
