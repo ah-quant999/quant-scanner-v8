@@ -1567,6 +1567,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/AUDIT_TRAIL.js?v=7fc6343f66" defer></script>
 <script src="data/HEALTH_CHECK.js?v=0bed418452" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=b705ef849c" defer></script>
+    <!-- 2026-09-07 主人令：中信 PE 极值温度计 + PE<10 历史回测 双卡（暂未上架·实验区最下方） -->
+    <script src="data/CITIC_PE_THERMO.js?v=e935c67127" defer></script>
+    <script src="data/CITIC_PE_BACKTEST.js?v=2e056a934e" defer></script>
     <script src="data/SENTIMENT_CYCLE.js?v=6688f08723" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=6a90a3683f" defer></script>
@@ -5582,7 +5585,194 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '</div>';
   };
 
-  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderRpsAudit(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} }
+
+  // ===== 🌡 中信 PE 极值温度计（未来卡 · 2026-09-07 主人令：暂未上架·实验区最下方）=====
+  window.__cpRetry = 0;
+  window.__renderCiticPeThermo = function(){
+    var dst = document.getElementById('citicPeThermoBody');
+    if(!dst) return;
+    var _ev = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+    var T = window.CITIC_PE_THERMO;
+    if(!T || !T.current){
+      if(window.__cpRetry < 25){ window.__cpRetry++; setTimeout(window.__renderCiticPeThermo, 600); return; }
+      dst.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">🌡 中信 PE 极值温度计 数据未到位（CITIC_PE_THERMO 未注入）</div>';
+      return;
+    }
+    var c = T.current, p = T.percentile, sig = T.signal, vh = T.valuation_history, bbc = T.big_bottom_compare;
+    var bbcRows = bbc.map(function(b){
+      var r60  = b.ret_60d==null?'-':(b.ret_60d>0?'+':'')+b.ret_60d+'%';
+      var r120 = b.ret_120d==null?'-':(b.ret_120d>0?'+':'')+b.ret_120d+'%';
+      var r250 = b.ret_250d==null?'-':(b.ret_250d>0?'+':'')+b.ret_250d+'%';
+      var c60  = b.ret_60d==null?'var(--dim)':(b.ret_60d>0?'#ef5350':'#26a69a');
+      var c120 = b.ret_120d==null?'var(--dim)':(b.ret_120d>0?'#ef5350':'#26a69a');
+      var c250 = b.ret_250d==null?'var(--dim)':(b.ret_250d>0?'#ef5350':'#26a69a');
+      return '<tr>'
+        + '<td style="padding:4px 6px;font-size:11.5px;color:var(--sub);white-space:nowrap;">' + b.date + '</td>'
+        + '<td style="padding:4px 6px;font-size:11.5px;">' + b.tag + '</td>'
+        + '<td style="padding:4px 6px;font-size:12px;text-align:right;font-weight:600;">' + b.pe + '</td>'
+        + '<td style="padding:4px 6px;font-size:12px;text-align:right;">' + (b.pb||'-') + '</td>'
+        + '<td style="padding:4px 6px;font-size:12px;text-align:right;color:' + c60 + ';">' + r60 + '</td>'
+        + '<td style="padding:4px 6px;font-size:12px;text-align:right;color:' + c120 + ';">' + r120 + '</td>'
+        + '<td style="padding:4px 6px;font-size:12px;text-align:right;color:' + c250 + ';">' + r250 + '</td>'
+        + '</tr>';
+    }).join('');
+    var pct = p.pe_rank || 50;
+    var barLeft = 'left:calc(' + Math.max(0, Math.min(100, pct)) + '% - 4px)';
+    dst.innerHTML = ''
+      + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
+      + '<b style="font-size:15px;">🌡 中信 PE 极值温度计</b>'
+      + '<span style="font-size:10px;font-weight:600;color:#fbbf24;background:rgba(251,191,36,.12);padding:1px 6px;border-radius:4px;">参考级 · 自上而下择时 · 不作交易信号</span>'
+      + '<span class="fresh">' + _ev(T.update_time) + ' · 数据 ' + _ev(T.data_date) + '</span>'
+      + '</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">'
+      + '<div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.3);border-radius:8px;padding:10px 12px;">'
+      + '<div style="font-size:11px;color:var(--dim);margin-bottom:3px;">📌 实时收盘价</div>'
+      + '<div style="font-size:22px;font-weight:800;color:#38bdf8;">¥' + c.price + '</div>'
+      + '</div>'
+      + '<div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.3);border-radius:8px;padding:10px 12px;">'
+      + '<div style="font-size:11px;color:var(--dim);margin-bottom:3px;">📊 PE TTM</div>'
+      + '<div style="font-size:22px;font-weight:800;color:#fbbf24;">' + c.pe_ttm + '<span style="font-size:11px;color:var(--dim);font-weight:400;margin-left:4px;">倍</span></div>'
+      + '<div style="font-size:10.5px;color:var(--sub);margin-top:2px;">PB ' + (c.pb_mrq||'-') + ' 倍</div>'
+      + '</div>'
+      + '<div style="background:' + sig.color + '14;border:1px solid ' + sig.color + '88;border-radius:8px;padding:10px 12px;">'
+      + '<div style="font-size:11px;color:var(--dim);margin-bottom:3px;">🚦 信号灯</div>'
+      + '<div style="font-size:18px;font-weight:800;color:' + sig.color + ';">' + sig.label + '</div>'
+      + '<div style="font-size:10.5px;color:var(--sub);margin-top:2px;">阈值 &lt;' + sig.pe_threshold.deep + ' 深度 / &lt;' + sig.pe_threshold.value + ' 低估 / &gt;' + sig.pe_threshold.expensive + ' 偏贵</div>'
+      + '</div>'
+      + '</div>'
+      + '<div style="background:rgba(148,163,184,.06);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px;">'
+      + '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-bottom:6px;">'
+      + '<span>📐 当前 PE TTM 在近 ' + Math.round(vh.days_total/244) + ' 年（' + vh.days_total + ' 个交易日）的位置</span>'
+      + '<span style="font-weight:700;color:' + sig.color + ';">' + (p.pe_rank||0) + '% 百分位</span>'
+      + '</div>'
+      + '<div style="position:relative;height:18px;background:linear-gradient(90deg,#26a69a 0%,#94a3b8 50%,#ef5350 100%);border-radius:4px;margin-bottom:6px;">'
+      + '<div style="position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--txt);opacity:.5;left:25%;"></div>'
+      + '<div style="position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--txt);opacity:.5;left:50%;"></div>'
+      + '<div style="position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--txt);opacity:.5;left:75%;"></div>'
+      + '<div style="position:absolute;top:-7px;' + barLeft + ';width:8px;height:32px;background:' + sig.color + ';border:2px solid #fff;border-radius:2px;box-shadow:0 1px 4px rgba(0,0,0,.3);"></div>'
+      + '<div style="position:absolute;top:-26px;' + barLeft + ';transform:translateX(-50%);background:' + sig.color + ';color:#fff;font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;white-space:nowrap;">PE ' + c.pe_ttm + '</div>'
+      + '</div>'
+      + '<div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim);">'
+      + '<span>0%（历史最低 ' + (p.pe_p25?p.pe_p25.toFixed(1):'?') + ' 附近）</span>'
+      + '<span>p25=' + (p.pe_p25||'-') + ' / p50=' + (p.pe_p50||'-') + ' / p75=' + (p.pe_p75||'-') + '</span>'
+      + '<span>100%（历史最高）</span>'
+      + '</div>'
+      + '<div style="font-size:10.5px;color:var(--sub);margin-top:6px;line-height:1.6;">'
+      + '近 16 年 PE&lt;10 出现 ' + vh.days_below_pe10 + ' 天（' + vh.pct_below_pe10 + '%）· PE&lt;12 出现 ' + vh.days_below_pe12 + ' 天（' + vh.pct_below_pe12 + '%）· PE&lt;15 出现 ' + vh.days_below_pe15 + ' 天（' + vh.pct_below_pe15 + '%）'
+      + '</div></div>'
+      + '<div style="font-size:12.5px;font-weight:700;color:var(--txt);margin-bottom:6px;">📚 历史上 9 次关键大底日 · 中信当时估值 + 后续持有期收益</div>'
+      + '<div style="overflow-x:auto;margin-bottom:8px;">'
+      + '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
+      + '<thead><tr style="background:rgba(148,163,184,.1);">'
+      + '<th style="padding:5px 6px;text-align:left;font-size:11px;color:var(--sub);">日期</th>'
+      + '<th style="padding:5px 6px;text-align:left;font-size:11px;color:var(--sub);">事件</th>'
+      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:var(--sub);">PE</th>'
+      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:var(--sub);">PB</th>'
+      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:#ef5350;">+60d</th>'
+      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:#ef5350;">+120d</th>'
+      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:#ef5350;">+250d</th>'
+      + '</tr></thead>'
+      + '<tbody>' + bbcRows + '</tbody>'
+      + '</table></div>'
+      + '<div style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.3);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);">'
+      + '⚠️ <b style="color:#fbbf24;">温度计 = 参考级</b>：PE/PB 是截面 TTM，未做盈利质量修正；信号灯<b>不</b>触发交易动作。'
+      + '回测卡独立给出「PE&lt;10 买入后持有 60/120/250 日」的历史胜率。'
+      + '数据范围 ' + _ev(T.data_range[0]) + ' ~ ' + _ev(T.data_range[1]) + '（' + T.row_count + ' 个交易日） · baostock · sh.600030'
+      + '</div>';
+  };
+
+  // ===== 📊 中信 PE<10 历史回测卡（2026-09-07 主人令：暂未上架·实验区最下方）=====
+  window.__cbRetry = 0;
+  window.__renderCiticPeBacktest = function(){
+    var dst = document.getElementById('citicPeBacktestBody');
+    if(!dst) return;
+    var _ev = function(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+    var B = window.CITIC_PE_BACKTEST;
+    if(!B || !B.result){
+      if(window.__cbRetry < 25){ window.__cbRetry++; setTimeout(window.__renderCiticPeBacktest, 600); return; }
+      dst.innerHTML = '<div class="note" style="padding:18px;text-align:center;color:var(--dim);">📊 中信 PE&lt;10 历史回测 数据未到位</div>';
+      return;
+    }
+    var thresholds = ['pe<10','pe<12','pe<15','pe<20'];
+    var holdDays   = ['hold_60d','hold_120d','hold_250d'];
+    var mat = '<table style="width:100%;border-collapse:collapse;font-size:11.5px;"><thead><tr style="background:rgba(96,165,250,.1);">'
+      + '<th style="padding:6px;text-align:left;font-size:11.5px;color:var(--sub);">阈值 \\ 持仓</th>'
+      + '<th style="padding:6px;text-align:center;font-size:11.5px;color:var(--sub);">60 日</th>'
+      + '<th style="padding:6px;text-align:center;font-size:11.5px;color:var(--sub);">120 日</th>'
+      + '<th style="padding:6px;text-align:center;font-size:11.5px;color:#fbbf24;font-weight:800;">250 日 ⭐</th>'
+      + '</tr></thead><tbody>';
+    thresholds.forEach(function(th, ti){
+      var bg = ti%2===0 ? 'rgba(148,163,184,.04)' : 'transparent';
+      mat += '<tr style="background:' + bg + ';">'
+        + '<td style="padding:7px 6px;font-weight:700;color:#60a5fa;">' + th + '</td>';
+      holdDays.forEach(function(hd){
+        var r = B.result[th][hd];
+        if(!r){ mat += '<td style="padding:7px 6px;text-align:center;color:var(--dim);">—</td>'; return; }
+        var wrC = r.win_rate >= 60 ? '#26a69a' : (r.win_rate >= 50 ? '#94a3b8' : '#ef5350');
+        var arC = r.avg_ret > 0 ? '#ef5350' : '#26a69a';
+        mat += '<td style="padding:7px 6px;text-align:center;">'
+          + '<div style="font-size:11px;color:var(--dim);">N=' + r.n + '</div>'
+          + '<div style="font-weight:700;font-size:13.5px;color:' + wrC + ';">' + r.win_rate + '%</div>'
+          + '<div style="font-size:11.5px;color:' + arC + ';">' + (r.avg_ret>0?'+':'') + r.avg_ret + '%</div>'
+          + '</td>';
+      });
+      mat += '</tr>';
+    });
+    mat += '</tbody></table>';
+    var sigRows = (B.signal_list_pe10_hold250 || []).slice(0, 6).map(function(s){
+      var rc = s.ret_250d_pct > 0 ? '#ef5350' : '#26a69a';
+      return '<tr>'
+        + '<td style="padding:4px 6px;font-size:11.5px;color:var(--sub);">' + s.date + '</td>'
+        + '<td style="padding:4px 6px;font-size:11.5px;text-align:right;">' + s.pe + '</td>'
+        + '<td style="padding:4px 6px;font-size:11.5px;text-align:right;">¥' + s.price + '</td>'
+        + '<td style="padding:4px 6px;font-size:11.5px;text-align:right;">¥' + s.end_price + '</td>'
+        + '<td style="padding:4px 6px;font-size:12px;text-align:right;font-weight:700;color:' + rc + ';">' + (s.ret_250d_pct>0?'+':'') + s.ret_250d_pct + '%</td>'
+        + '<td style="padding:4px 6px;font-size:11px;text-align:right;color:#ef5350;">' + s.max_dd_pct + '%</td>'
+        + '</tr>';
+    }).join('');
+    var insightItems = (B.insights || []).map(function(x){
+      return '<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:4px;">'
+        + '<span style="color:#60a5fa;font-weight:700;flex-shrink:0;">·</span>'
+        + '<span>' + _ev(x) + '</span></div>';
+    }).join('');
+    dst.innerHTML = ''
+      + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
+      + '<b style="font-size:15px;">📊 中信 PE&lt;10 历史回测</b>'
+      + '<span style="font-size:10px;font-weight:600;color:#60a5fa;background:rgba(96,165,250,.12);padding:1px 6px;border-radius:4px;">纯历史回测 · 不预测未来</span>'
+      + '<span class="fresh">' + _ev(B.update_time) + ' · 数据 ' + _ev(B.data_range[0]) + ' ~ ' + _ev(B.data_range[1]) + '</span>'
+      + '</div>'
+      + '<div style="background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.25);border-radius:7px;padding:8px 10px;font-size:11.5px;line-height:1.65;color:var(--sub);margin-bottom:10px;">'
+      + '<b style="color:#60a5fa;">方法：</b>' + _ev(B.method) + '<br>'
+      + '<b style="color:#60a5fa;">样本：</b>近 16 年全交易日（' + B.data_range[0] + ' ~ ' + B.data_range[1] + '） · <b>PE&lt;10 共 ' + B.signals_pe10_total + ' 次触发</b>'
+      + '<br><b style="color:var(--dim);">未计交易成本/分红再投；纯个股回测，无对冲。</b>'
+      + '</div>'
+      + '<div style="font-size:12.5px;font-weight:700;color:var(--txt);margin-bottom:6px;">🎯 阈值 × 持仓 敏感性矩阵（胜率 / 平均收益）</div>'
+      + '<div style="overflow-x:auto;margin-bottom:12px;">' + mat + '</div>'
+      + '<div style="background:rgba(96,165,250,.06);border:1px solid rgba(96,165,250,.3);border-radius:7px;padding:8px 10px;margin-bottom:10px;font-size:11.5px;line-height:1.7;color:var(--sub);">'
+      + '<div style="font-size:12px;font-weight:700;color:#60a5fa;margin-bottom:6px;">🔍 关键洞察</div>'
+      + insightItems
+      + '</div>'
+      + '<div style="font-size:12.5px;font-weight:700;color:var(--txt);margin-bottom:6px;">📜 PE&lt;10 持有 250 日 信号清单（前 6 条）</div>'
+      + '<div style="overflow-x:auto;margin-bottom:8px;">'
+      + '<table style="width:100%;border-collapse:collapse;font-size:11.5px;">'
+      + '<thead><tr style="background:rgba(96,165,250,.08);">'
+      + '<th style="padding:5px 6px;text-align:left;font-size:11px;color:var(--sub);">信号日</th>'
+      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:var(--sub);">PE</th>'
+      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:var(--sub);">买入价</th>'
+      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:var(--sub);">250日价</th>'
+      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:#ef5350;">250日收益</th>'
+      + '<th style="padding:5px 6px;text-align:right;font-size:11px;color:#ef5350;">持有期回撤</th>'
+      + '</tr></thead>'
+      + '<tbody>' + (sigRows || '<tr><td colspan="6" style="text-align:center;color:var(--dim);padding:12px;">无信号</td></tr>') + '</tbody>'
+      + '</table></div>'
+      + '<div style="background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.25);border-radius:7px;padding:8px 10px;font-size:11px;line-height:1.7;color:var(--sub);">'
+      + '⚠️ <b style="color:#60a5fa;">回测仅描述历史</b>，不构成未来收益承诺。原命题「没有一次牛市 PE&lt;10」<b style="color:#ef5350;">已部分证伪</b>：2018/2022 真大底中信 PE 分别是 15.4 / 11.6，<b>均未低于 10</b>。'
+      + 'PE&lt;10 实际是<b>罕见低估事件</b>（166 次 / 16 年），且<b>多早于大底 30-100 个交易日</b>（166 次里只有 2 次恰好落在已知大底日）。'
+      + '持有期内最大回撤 -37.5%，需极强耐心。'
+      + '</div>';
+  };
+
+  function _renderPostReady(){ try{ window.__renderBacktestSection(); }catch(e){} try{ window.__renderLifecycleSection(); }catch(e){} try{ window.__renderImaStrongStock(); }catch(e){} try{ window.__renderStrongBreakout(); }catch(e){} try{ window.__renderFactorLab(); }catch(e){} try{ window.__renderRpsAudit(); }catch(e){} try{ window.__renderThemeValue(); }catch(e){} try{ window.__renderCiticPeThermo(); }catch(e){} try{ window.__renderCiticPeBacktest(); }catch(e){} }
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', _renderPostReady);
   } else {
@@ -11002,6 +11192,12 @@ window.showRestrictedItems = showRestrictedItems;
       if(tab==='lab' && typeof window.__renderThemeValue==='function'){
         try{ window.__renderThemeValue(); }catch(e){}
       }
+      if(tab==='lab' && typeof window.__renderCiticPeThermo==='function'){
+        try{ window.__renderCiticPeThermo(); }catch(e){}
+      }
+      if(tab==='lab' && typeof window.__renderCiticPeBacktest==='function'){
+        try{ window.__renderCiticPeBacktest(); }catch(e){}
+      }
     };
     if(!window.__ulSelfHealTimer){
       window.__ulSelfHealTimer=setInterval(function(){
@@ -11102,7 +11298,12 @@ window.showRestrictedItems = showRestrictedItems;
     h += '<div class="card" id="rpsAuditBody" style="margin-bottom:16px;border-left:4px solid #94a3b8;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">📈 相对强度 RPS · 30 天样本考核 加载中…</div></div>';
     // ═══ 2026-09-06 主人令：主题空间·价值投资 实验版卡迁入实验区最下方（概念×业绩×ROE 纯前端交叉，无新增管线）═══
     h += '<div class="card" id="themeValueBody" style="margin-bottom:16px;border-left:4px solid #a78bfa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">🔭 主题空间 · 价值投资 实验卡 加载中…</div></div>';
-    h += '</div>'; // /ulPaneLab
+
+    // ═══ 2026-09-07 主人令：中信 PE 极值温度计（未来卡）+ PE<10 历史回测卡 挂实验区最下方 · 2 张 ═══
+    //   数据源：raw_data/citic_pe_history.json (baostock 2010-2026, 4051 行)
+    //   业务边界：参考级，不进选股评分；自上而下择时信号，与 v8 自下而上选股定位不混用
+    h += '<div class="card" id="citicPeThermoBody" style="margin-bottom:16px;border-left:4px solid #fbbf24;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">🌡 中信 PE 极值温度计 加载中…</div></div>';
+    h += '<div class="card" id="citicPeBacktestBody" style="margin-bottom:16px;border-left:4px solid #60a5fa;"><div class="note" style="padding:20px;text-align:center;color:var(--dim);">📊 中信 PE&lt;10 历史回测 加载中…</div></div>';    h += '</div>'; // /ulPaneLab
 
     // ===== 宏观观测 pane =====
     h += '<div id="ulPaneMacro" style="display:none;">';
@@ -11265,6 +11466,12 @@ window.showRestrictedItems = showRestrictedItems;
       if(tab==='lab' && typeof window.__renderThemeValue==='function'){
         try{ window.__renderThemeValue(); }catch(e){}
       }
+      if(tab==='lab' && typeof window.__renderCiticPeThermo==='function'){
+        try{ window.__renderCiticPeThermo(); }catch(e){}
+      }
+      if(tab==='lab' && typeof window.__renderCiticPeBacktest==='function'){
+        try{ window.__renderCiticPeBacktest(); }catch(e){}
+      }
     };
     // ⚖️ 2026-08-14 主人令：renderPortfolio 调用已删除（持仓跟踪卡整段移除）
     }catch(e){ el.innerHTML='<div class="card" style="color:var(--down);padding:14px;"><b>renderUnlisted 错误：</b>'+String(e)+'<br><pre style="font-size:11px;white-space:pre-wrap;">'+(e.stack||'')+'</pre></div>'; console.error(e); }
@@ -11281,6 +11488,8 @@ window.showRestrictedItems = showRestrictedItems;
     try{ if(typeof window.__renderRpsAudit==='function') window.__renderRpsAudit(); }catch(e){ console.warn('RPS考核卡渲染失败', e); }
     // 🔭 2026-09-06 主人令：主题空间·价值投资 实验卡随 renderUnlisted 重渲（实验区最下方）
     try{ if(typeof window.__renderThemeValue==='function') window.__renderThemeValue(); }catch(e){ console.warn('主题空间实验卡渲染失败', e); }
+    try{ if(typeof window.__renderCiticPeThermo==='function') window.__renderCiticPeThermo(); }catch(e){ console.warn('中信 PE 温度计渲染失败', e); }
+    try{ if(typeof window.__renderCiticPeBacktest==='function') window.__renderCiticPeBacktest(); }catch(e){ console.warn('中信 PE 回测卡渲染失败', e); }
     // 📚 2026-09-07 主人令：maharo 机构研究卡（本机 cookie 拉取，云端无权限）
     try{ if(typeof window._fillMahoroCard==='function') window._fillMahoroCard(); }catch(e){ console.warn('maharo 卡渲染失败',e); }
   }
