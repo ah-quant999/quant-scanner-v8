@@ -1,29 +1,36 @@
 {
-  "update_time": "2026-09-07 19:29:51",
-  "data_date": "2026-09-07",
-  "track_start": "2026-09-07",
-  "history_days": 14,
+  "update_time": "2026-09-07 21:02:44",
+  "data_date": "2026-09-04",
+  "track_start": "2026-09-04",
+  "history_days": 13,
   "strict_count": 0,
-  "near_count": 2,
+  "near_count": 1,
   "tracked": [
     {
-      "code": "688808",
-      "name": "联讯仪器",
-      "market": "sh",
-      "board": "科创板",
+      "code": "000807",
+      "name": "云铝股份",
+      "market": "sz",
+      "board": "主板",
       "status": "near",
-      "total_score": 55.9,
+      "total_score": 61.5,
       "quality_grade": "A",
-      "industry": "仪器仪表制造业",
+      "industry": "有色金属冶炼和压延加工业",
       "sectors": [
-        "仪器仪表制造业"
+        "稀缺资源",
+        "深证100R",
+        "有色金属冶炼和压延加工业",
+        "2026中报预增",
+        "HS300",
+        "MSCI中国",
+        "深成500",
+        "深股通"
       ],
-      "signal_count": null,
-      "enter_date": "2026-09-07",
+      "signal_count": 2,
+      "enter_date": "2026-09-04",
       "hold_days": 1,
       "consecutive_days": 1,
-      "first_close": 2465.0,
-      "current_close": 2465.0,
+      "first_close": 27.38,
+      "current_close": 27.38,
       "pnl_pct": 0.0,
       "catalysts": [
         {
@@ -32,34 +39,6 @@
           "reaction": "观察中"
         }
       ]
-    },
-    {
-      "code": "300760",
-      "name": "迈瑞医疗",
-      "market": "sz",
-      "board": "创业板",
-      "status": "near",
-      "total_score": 44.7,
-      "quality_grade": "A",
-      "industry": "专用设备制造业",
-      "sectors": [
-        "专用设备制造业",
-        "HS300",
-        "独角兽",
-        "百元股",
-        "医疗器械概念",
-        "MSCI中国",
-        "深股通",
-        "深证100R"
-      ],
-      "signal_count": null,
-      "enter_date": "2026-09-07",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 169.91,
-      "current_close": 169.91,
-      "pnl_pct": 0.0,
-      "catalysts": []
     }
   ],
   "alerts": [
@@ -119,12 +98,6 @@
     },
     {
       "level": "warn",
-      "code": "688331",
-      "name": "荣昌生物",
-      "text": "荣昌生物(688331) 于 2026-09-04 跌出共识（曾连续 2 日）"
-    },
-    {
-      "level": "warn",
       "code": "002916",
       "name": "",
       "text": "(002916) 于 2026-08-17 跌出共识（曾连续 1 日）"
@@ -158,12 +131,6 @@
       "code": "688012",
       "name": "",
       "text": "(688012) 于 2026-08-19 跌出共识（曾连续 1 日）"
-    },
-    {
-      "level": "warn",
-      "code": "300765",
-      "name": "石药创新",
-      "text": "石药创新(300765) 于 2026-09-04 跌出共识（曾连续 2 日）"
     },
     {
       "level": "warn",
@@ -239,12 +206,6 @@
     },
     {
       "level": "warn",
-      "code": "300475",
-      "name": "香农芯创",
-      "text": "香农芯创(300475) 于 2026-09-04 跌出共识（曾连续 6 日）"
-    },
-    {
-      "level": "warn",
       "code": "601138",
       "name": "",
       "text": "(601138) 于 2026-08-30 跌出共识（曾连续 1 日）"
@@ -260,50 +221,33 @@
       "code": "002463",
       "name": "沪电股份",
       "text": "沪电股份(002463) 于 2026-09-02 跌出共识（曾连续 4 日）"
-    },
-    {
-      "level": "warn",
-      "code": "600362",
-      "name": "江西铜业",
-      "text": "江西铜业(600362) 于 2026-09-04 跌出共识（曾连续 2 日）"
-    },
-    {
-      "level": "warn",
-      "code": "301536",
-      "name": "星宸科技",
-      "text": "星宸科技(301536) 于 2026-09-04 跌出共识（曾连续 2 日）"
-    },
-    {
-      "level": "warn",
-      "code": "000807",
-      "name": "云铝股份",
-      "text": "云铝股份(000807) 于 2026-09-04 跌出共识（曾连续 1 日）"
     }
   ],
   "sector_cluster": {
     "by_industry": [
       {
-        "industry": "仪器仪表制造业",
+        "industry": "有色金属冶炼和压延加工业",
         "count": 1,
         "names": [
-          "联讯仪器"
-        ]
-      },
-      {
-        "industry": "专用设备制造业",
-        "count": 1,
-        "names": [
-          "迈瑞医疗"
+          "云铝股份"
         ]
       }
     ],
     "by_sector": [
       {
-        "sector": "仪器仪表制造业",
+        "sector": "稀缺资源",
         "count": 1
       },
       {
-        "sector": "专用设备制造业",
+        "sector": "深证100R",
+        "count": 1
+      },
+      {
+        "sector": "有色金属冶炼和压延加工业",
+        "count": 1
+      },
+      {
+        "sector": "2026中报预增",
         "count": 1
       },
       {
@@ -311,34 +255,22 @@
         "count": 1
       },
       {
-        "sector": "独角兽",
-        "count": 1
-      },
-      {
-        "sector": "百元股",
-        "count": 1
-      },
-      {
-        "sector": "医疗器械概念",
-        "count": 1
-      },
-      {
         "sector": "MSCI中国",
+        "count": 1
+      },
+      {
+        "sector": "深成500",
         "count": 1
       },
       {
         "sector": "深股通",
         "count": 1
-      },
-      {
-        "sector": "深证100R",
-        "count": 1
       }
     ],
-    "concentration": 50.0
+    "concentration": 100.0
   },
   "overlap": {
-    "total_tracked": 2,
+    "total_tracked": 1,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
@@ -462,13 +394,13 @@
   },
   "self_backtest": {
     "note": "本策略(严格三重共识交集)自上线起逐日累积价格样本；样本≥2个交易日方可计算。当前为前向累积，与上方信号层回测互补。",
-    "track_start": "2026-09-07",
-    "history_days": 14,
+    "track_start": "2026-09-04",
+    "history_days": 13,
     "summary": {
       "1d": {
-        "count": 14,
-        "win_rate": 28.57,
-        "avg_return": 2.36
+        "count": 13,
+        "win_rate": 30.77,
+        "avg_return": 2.54
       },
       "3d": {
         "count": 8,
@@ -481,9 +413,9 @@
         "avg_return": 2.85
       },
       "10d": {
-        "count": 6,
-        "win_rate": 66.67,
-        "avg_return": 0.86
+        "count": 4,
+        "win_rate": 75.0,
+        "avg_return": 1.71
       },
       "20d": {
         "count": 0,
@@ -578,8 +510,7 @@
         "enter_date": "2026-08-20",
         "offsets": {
           "3d": -3.47,
-          "5d": 3.15,
-          "10d": 3.34
+          "5d": 3.15
         }
       },
       {
@@ -588,8 +519,7 @@
         "enter_date": "2026-08-20",
         "offsets": {
           "3d": -1.5,
-          "5d": -1.5,
-          "10d": -4.99
+          "5d": -1.5
         }
       },
       {
@@ -666,14 +596,6 @@
         "enter_date": "2026-09-03",
         "offsets": {
           "1d": -1.9
-        }
-      },
-      {
-        "code": "000807",
-        "name": "云铝股份",
-        "enter_date": "2026-09-04",
-        "offsets": {
-          "1d": 0.0
         }
       }
     ]
