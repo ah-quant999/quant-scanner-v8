@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-09-08 01:29:59",
+  "update_time": "2026-09-08 03:11:28",
   "universe": "重点池 A股（_rps_cache）",
   "cost_roundtrip": 0.002,
   "rebalance": "每10个交易日，入场=次日开盘",
   "abnormal_volume": {
     "n_points": 42,
     "point_dates": [
-      "2024-11-01",
+      "2024-11-07",
       "",
       "",
       "",
@@ -128,18 +128,18 @@
   },
   "roe_largecap": {
     "top30_n": 30,
-    "top30_avg_5d": 1.188,
-    "top30_win_5d": 51.2,
-    "univ_avg_5d": 1.218,
-    "excess_5d": -0.03,
-    "top30_avg_10d": 2.924,
-    "top30_win_10d": 56.5,
-    "univ_avg_10d": 2.736,
-    "excess_10d": 0.187,
-    "top30_avg_20d": 5.705,
-    "top30_win_20d": 58.0,
-    "univ_avg_20d": 5.416,
-    "excess_20d": 0.289,
+    "top30_avg_5d": 1.134,
+    "top30_win_5d": 52.4,
+    "univ_avg_5d": 1.219,
+    "excess_5d": -0.085,
+    "top30_avg_10d": 2.979,
+    "top30_win_10d": 57.6,
+    "univ_avg_10d": 2.733,
+    "excess_10d": 0.246,
+    "top30_avg_20d": 5.821,
+    "top30_win_20d": 61.3,
+    "univ_avg_20d": 5.41,
+    "excess_20d": 0.41,
     "methodology_limit": "当期 ROE 分组回看历史（隐含 ROE 排名持续性假设），证据强度弱于量比因子的 point-in-time 分层"
   }
 }
