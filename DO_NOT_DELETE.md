@@ -55,6 +55,7 @@
 | `data/DO_NOT_DELETE.js` | 禁止删除清单的视图（window.DO_NOT_DELETE_HTML + UPDATED 注入）；由 `scripts/gen_do_not_delete_js.py` 从 `DO_NOT_DELETE.md` 解析；sha10 缓存戳已回写 index.html | 逻辑详解页「🛡️ 防删」子页 100% 依赖；删除即子页回到「加载中…」 |
 
 > 🟢 **豁免清单（DO_NOT_DELETE.md 为唯一裁判，pre-commit hook 读取本区块内含「豁免」二字的行、放行其中反引号包裹的路径删除）**：
+> 🟢 🔴 **中信 PE 双卡保护段（2026-09-08 主人令，勿当孤儿误删）**：`v8/fetch_citic_pe.py` + `v8/gen_citic_pe.py` + `raw_data/citic_pe_history.json` + `raw_data/citic_pe_history.meta.json` + `data/CITIC_PE_THERMO.js` + `data/CITIC_PE_BACKTEST.js` 为完整活链（E 段算法链 21:00 每日调度 → 前端「暂未上架实验区最下方」双卡直读）。回测结论：PE<10 买入持有 250 日胜率 97.6%/均收益 +19.6%（4051 交易日样本）。当前 PE≈10.9（低估边缘）。**严禁删除任何一环**——删 fetcher 则断更，删 raw 则卡空，删 data/*.js 则卡片空白。
 > 🟢 豁免 `data/POTENTIAL_PICKS.js` + `raw_data/potential_picks.json` + `raw_data/history/potential_*.json` + `algorithms/calc_potential_picks.py`：已于 2026-09-06 主人令全链删除（卡下线、考核取消），云端残留允许清理，勿复活。
 > 🟢 豁免 `data/BLOAT_CHECK.js`：v8_bloat_check.py 已停生成（产物迁 .workbuddy/v8_bloat_report.json），全站0引用，允许删除（2026-08-29 轻量化收尾）。
 > 🟢 豁免 `data/DELISTED_STOCKS.js`：renderDelisted 已改读 raw_data/delisted_stocks.json，update_v8.py 已移除映射，全站0引用，允许删除（2026-08-29 轻量化收尾）。
