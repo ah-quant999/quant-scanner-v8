@@ -238,6 +238,7 @@ jobs:
           python cloud_fetch_v8.py --category "$cat"
 
       - name: "🐉 刷新当日 LHB 数据（仅 post_close）"
+        id: soft_1
         # 🛡️ 2026-08-30 修复：category=all（全量兜底/手动 dispatch）语义上应 ⊇ post_close，
         #   原写死 == 'post_close' 导致 all 时本步 skipped（实测 run 33312102792 五步全跳）。
         if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
@@ -248,7 +249,17 @@ jobs:
           python algorithms/fetch_lhb.py
           python -c "import sys; sys.path.insert(0,'algorithms'); import stage_to_raw; stage_to_raw.main()"
 
+          # 🔴 2026-09-08 主人令「软失败但强制告警」：本步 continue-on-error 保留（不阻断 job），
+          #   但失败必须显式打 ::error:: annotation —— 否则与 H_AUTO_BUY 断更 3 天
+          #   同款静默失败（脚本崩了、job 全绿、无人知晓）。
+          _v8_rc=$?
+          if [ "$_v8_rc" != "0" ]; then
+            echo "::error title=v8-softfail:soft_1(exit=$_v8_rc)::🐉 刷新当日 LHB 数据（仅 post_close） 软失败，退出码 $_v8_rc。本步不阻断 job，但对应数据可能未刷新，请核对健康面板该卡新鲜度。"
+            exit 1
+          fi
+
       - name: "🐉 回填 LHB 历史（仅 post_close）"
+        id: soft_2
         # 🛡️ 2026-08-30 修复：category=all（全量兜底/手动 dispatch）语义上应 ⊇ post_close，
         #   原写死 == 'post_close' 导致 all 时本步 skipped（实测 run 33312102792 五步全跳）。
         if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
@@ -257,8 +268,18 @@ jobs:
         run: |
           python backfill_lhb_history.py
 
+          # 🔴 2026-09-08 主人令「软失败但强制告警」：本步 continue-on-error 保留（不阻断 job），
+          #   但失败必须显式打 ::error:: annotation —— 否则与 H_AUTO_BUY 断更 3 天
+          #   同款静默失败（脚本崩了、job 全绿、无人知晓）。
+          _v8_rc=$?
+          if [ "$_v8_rc" != "0" ]; then
+            echo "::error title=v8-softfail:soft_2(exit=$_v8_rc)::🐉 回填 LHB 历史（仅 post_close） 软失败，退出码 $_v8_rc。本步不阻断 job，但对应数据可能未刷新，请核对健康面板该卡新鲜度。"
+            exit 1
+          fi
+
       # 2026-08-17 主人令：calc_commodity_elasticity.py 加入云端自动跑（之前从未自动跑过，导致国内期货 LC/SA 永远不显示）
       - name: "💹 商品涨价弹性榜重算（仅 post_close）"
+        id: soft_3
         # 🛡️ 2026-08-30 修复：category=all（全量兜底/手动 dispatch）语义上应 ⊇ post_close，
         #   原写死 == 'post_close' 导致 all 时本步 skipped（实测 run 33312102792 五步全跳）。
         if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
@@ -267,8 +288,18 @@ jobs:
         run: |
           python algorithms/calc_commodity_elasticity.py
 
+          # 🔴 2026-09-08 主人令「软失败但强制告警」：本步 continue-on-error 保留（不阻断 job），
+          #   但失败必须显式打 ::error:: annotation —— 否则与 H_AUTO_BUY 断更 3 天
+          #   同款静默失败（脚本崩了、job 全绿、无人知晓）。
+          _v8_rc=$?
+          if [ "$_v8_rc" != "0" ]; then
+            echo "::error title=v8-softfail:soft_3(exit=$_v8_rc)::💹 商品涨价弹性榜重算（仅 post_close） 软失败，退出码 $_v8_rc。本步不阻断 job，但对应数据可能未刷新，请核对健康面板该卡新鲜度。"
+            exit 1
+          fi
+
       # 2026-08-17 主人令：板块周期 fetch_sector_rs 之前从未自动跑过，导致 3 天前数据陈旧
       - name: "🔄 板块相对强度重算（仅 post_close）"
+        id: soft_4
         # 🛡️ 2026-08-30 修复：category=all（全量兜底/手动 dispatch）语义上应 ⊇ post_close，
         #   原写死 == 'post_close' 导致 all 时本步 skipped（实测 run 33312102792 五步全跳）。
         if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
@@ -278,8 +309,18 @@ jobs:
           python algorithms/fetch_sector_rs.py
           python -c "import sys; sys.path.insert(0,'algorithms'); import stage_to_raw; stage_to_raw.main()"
 
+          # 🔴 2026-09-08 主人令「软失败但强制告警」：本步 continue-on-error 保留（不阻断 job），
+          #   但失败必须显式打 ::error:: annotation —— 否则与 H_AUTO_BUY 断更 3 天
+          #   同款静默失败（脚本崩了、job 全绿、无人知晓）。
+          _v8_rc=$?
+          if [ "$_v8_rc" != "0" ]; then
+            echo "::error title=v8-softfail:soft_4(exit=$_v8_rc)::🔄 板块相对强度重算（仅 post_close） 软失败，退出码 $_v8_rc。本步不阻断 job，但对应数据可能未刷新，请核对健康面板该卡新鲜度。"
+            exit 1
+          fi
+
       # 2026-08-17 主人令：ETF 三件套（calc_etf_intraday.py）之前无 workflow 触发
       - name: "💹 ETF 三件套数据生成（post_close 兜底）"
+        id: soft_5
         # 🛡️ 2026-08-30 修复：category=all（全量兜底/手动 dispatch）语义上应 ⊇ post_close，
         #   原写死 == 'post_close' 导致 all 时本步 skipped（实测 run 33312102792 五步全跳）。
         if: steps.cat.outputs.category == 'post_close' || steps.cat.outputs.category == 'all'
@@ -288,7 +329,17 @@ jobs:
         run: |
           python algorithms/calc_etf_intraday.py
 
+          # 🔴 2026-09-08 主人令「软失败但强制告警」：本步 continue-on-error 保留（不阻断 job），
+          #   但失败必须显式打 ::error:: annotation —— 否则与 H_AUTO_BUY 断更 3 天
+          #   同款静默失败（脚本崩了、job 全绿、无人知晓）。
+          _v8_rc=$?
+          if [ "$_v8_rc" != "0" ]; then
+            echo "::error title=v8-softfail:soft_5(exit=$_v8_rc)::💹 ETF 三件套数据生成（post_close 兜底） 软失败，退出码 $_v8_rc。本步不阻断 job，但对应数据可能未刷新，请核对健康面板该卡新鲜度。"
+            exit 1
+          fi
+
       - name: "📤 推送 raw_data/ 到 main（Contents API）"
+        id: soft_6
         # 🔴 2026-08-18 主人根治令：消费层软失败。推送失败不阻断后续 bridge/update_v8/health_check。
         continue-on-error: true
         # 🔴 2026-08-30 22:2x 加步级限时（run 33312102792 实测本步 21.7 分钟未完成即被
@@ -301,6 +352,15 @@ jobs:
         run: |
           python api_push_raw.py
 
+          # 🔴 2026-09-08 主人令「软失败但强制告警」：本步 continue-on-error 保留（不阻断 job），
+          #   但失败必须显式打 ::error:: annotation —— 否则与 H_AUTO_BUY 断更 3 天
+          #   同款静默失败（脚本崩了、job 全绿、无人知晓）。
+          _v8_rc=$?
+          if [ "$_v8_rc" != "0" ]; then
+            echo "::error title=v8-softfail:soft_6(exit=$_v8_rc)::📤 推送 raw_data/ 到 main（Contents API） 软失败，退出码 $_v8_rc。本步不阻断 job，但对应数据可能未刷新，请核对健康面板该卡新鲜度。"
+            exit 1
+          fi
+
       # 🛡 2026-08-18 主人紧急令根治：抓完 raw_data 之后立即桥接（bridge_raw_data.py）
       #   + 重生成 data/*.js（update_v8.py）+ 刷新 HEALTH_CHECK.js（v8_health_check.py），
       #   闭环 4 步：fetch → bridge → update_v8 → health_check。否则 raw_data 新了但
@@ -311,13 +371,24 @@ jobs:
           python algorithms/bridge_raw_data.py
 
       - name: "🔄 重生成 data/*.js (update_v8)"
+        id: soft_7
         # 🔴 2026-08-18 主人根治令：消费层软失败。
         continue-on-error: true
         shell: bash
         run: |
           python update_v8.py
 
+          # 🔴 2026-09-08 主人令「软失败但强制告警」：本步 continue-on-error 保留（不阻断 job），
+          #   但失败必须显式打 ::error:: annotation —— 否则与 H_AUTO_BUY 断更 3 天
+          #   同款静默失败（脚本崩了、job 全绿、无人知晓）。
+          _v8_rc=$?
+          if [ "$_v8_rc" != "0" ]; then
+            echo "::error title=v8-softfail:soft_7(exit=$_v8_rc)::🔄 重生成 data/*.js (update_v8) 软失败，退出码 $_v8_rc。本步不阻断 job，但对应数据可能未刷新，请核对健康面板该卡新鲜度。"
+            exit 1
+          fi
+
       - name: "🩺 刷新 HEALTH_CHECK.js (v8_health_check)"
+        id: soft_8
         # 🔴 2026-08-18 主人根治令：health_check 硬失败曾 3 次拖垮 workflow → 软失败只留痕。
         # 🛡️ 2026-08-30 补充：cn runner 内网连线上 github.io/api 大量超时重试，
         #   实测单次 1847s(31min) 白耗 runner。加 8 分钟上限，超时按软失败处理。
@@ -327,7 +398,17 @@ jobs:
         run: |
           python v8_health_check.py
 
+          # 🔴 2026-09-08 主人令「软失败但强制告警」：本步 continue-on-error 保留（不阻断 job），
+          #   但失败必须显式打 ::error:: annotation —— 否则与 H_AUTO_BUY 断更 3 天
+          #   同款静默失败（脚本崩了、job 全绿、无人知晓）。
+          _v8_rc=$?
+          if [ "$_v8_rc" != "0" ]; then
+            echo "::error title=v8-softfail:soft_8(exit=$_v8_rc)::🩺 刷新 HEALTH_CHECK.js (v8_health_check) 软失败，退出码 $_v8_rc。本步不阻断 job，但对应数据可能未刷新，请核对健康面板该卡新鲜度。"
+            exit 1
+          fi
+
       - name: "🛡️ 原子提交 index.html ?v（与本次 data 同轮上线，根治 ?v 失配）"
+        id: soft_9
         # 2026-09-02 一劳永逸根治「?v 缓存戳失配」：生成器跑完 update_v8.py 已本地重写
         # index.html ?v，但此前从不推送 index.html → ?v 改动随 runner 销毁丢失；且 build_deploy
         # 的 push 组高频互相 cancel 时 ?v 永不提交。现本步用 git 把 ?v 与本次 data 同轮推上线。
@@ -341,25 +422,85 @@ jobs:
           git config user.name "v8-cloud-bot"
           git config user.email "v8-bot@users.noreply.github.com"
           REPO="https://x-access-token:${GIT_TOKEN}@github.com/ah-quant999/quant-scanner-v8.git"
+          _v8_ok=0
           for i in 1 2 3; do
             git fetch "$REPO" main
             git reset --hard FETCH_HEAD
             python update_v8.py --only-cache-busters
             git add -f index.html
             if git diff --cached --quiet; then
-              echo "ℹ️ ?v 已最新，无需推送"; break
+              echo "ℹ️ ?v 已最新，无需推送"; _v8_ok=1; break
             fi
             git commit -m "chore: 生成器原子提交 ?v → 防覆盖 ($(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M'))"
             if git push "$REPO" HEAD:main; then
-              echo "✅ 已原子提交 ?v (第 $i 次)"; break
+              echo "✅ 已原子提交 ?v (第 $i 次)"; _v8_ok=1; break
             fi
             echo "⚠️ push 被拒，同步远端后重试 ($i/3)"
           done
 
+          # 🔴 2026-09-08 主人令「软失败但强制告警」：本步 continue-on-error 保留（不阻断 job），
+          #   但失败必须显式打 ::error:: annotation —— 否则与 H_AUTO_BUY 断更 3 天
+          #   同款静默失败（脚本崩了、job 全绿、无人知晓）。
+          _v8_rc=0; [ "${_v8_ok:-1}" = "1" ] || _v8_rc=1
+          if [ "$_v8_rc" != "0" ]; then
+            echo "::error title=v8-softfail:soft_9(exit=$_v8_rc)::🛡️ 原子提交 index.html ?v（与本次 data 同轮上线，根治 ?v 失配） 软失败，退出码 $_v8_rc。本步不阻断 job，但对应数据可能未刷新，请核对健康面板该卡新鲜度。"
+            exit 1
+          fi
+
       - name: "🛰️ 云端兜底调度（算法链/温度计，幂等）"
+        id: soft_10
         if: success()
         continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           python .github/scripts/cloud_dispatcher.py
+
+          # 🔴 2026-09-08 主人令「软失败但强制告警」：本步 continue-on-error 保留（不阻断 job），
+          #   但失败必须显式打 ::error:: annotation —— 否则与 H_AUTO_BUY 断更 3 天
+          #   同款静默失败（脚本崩了、job 全绿、无人知晓）。
+          _v8_rc=$?
+          if [ "$_v8_rc" != "0" ]; then
+            echo "::error title=v8-softfail:soft_10(exit=$_v8_rc)::🛰️ 云端兜底调度（算法链/温度计，幂等） 软失败，退出码 $_v8_rc。本步不阻断 job，但对应数据可能未刷新，请核对健康面板该卡新鲜度。"
+            exit 1
+          fi
+      # 🔴 2026-09-08 主人令「软失败但强制 ::error:: 告警」：
+      #   上面各消费步保留 continue-on-error（不阻断 job，尊重 2026-08-18 软失败策略），
+      #   但每步失败已单独打 ::error:: annotation；这里再做一次集中汇总，
+      #   让巡检一眼看到本轮有哪些软失败——而不是翻遍日志才发现问题。
+      - name: "📢 软失败汇总告警（不阻断 job，但强制 annotation）"
+        if: always()
+        shell: bash
+        env:
+          V8_SF_soft_1: ${{ steps.soft_1.outcome }}
+          V8_SF_soft_2: ${{ steps.soft_2.outcome }}
+          V8_SF_soft_3: ${{ steps.soft_3.outcome }}
+          V8_SF_soft_4: ${{ steps.soft_4.outcome }}
+          V8_SF_soft_5: ${{ steps.soft_5.outcome }}
+          V8_SF_soft_6: ${{ steps.soft_6.outcome }}
+          V8_SF_soft_7: ${{ steps.soft_7.outcome }}
+          V8_SF_soft_8: ${{ steps.soft_8.outcome }}
+          V8_SF_soft_9: ${{ steps.soft_9.outcome }}
+          V8_SF_soft_10: ${{ steps.soft_10.outcome }}
+        run: |
+          FAILED=""
+          # 显式列出本 job 全部软失败步 id（生成期确定，不依赖 env 扫描，永不漏）
+          for sid in soft_1 soft_2 soft_3 soft_4 soft_5 soft_6 soft_7 soft_8 soft_9 soft_10; do
+            eval "v=\"\${V8_SF_$sid:-}\""
+            if [ "$v" = "failure" ] || [ "$v" = "cancelled" ]; then
+              FAILED="$FAILED $sid"
+            fi
+          done
+          if [ -n "$FAILED" ]; then
+            N=$(echo $FAILED | wc -w)
+            echo "::error title=v8-softfail-summary::软失败步（不阻断 job，但对应数据可能未刷新）：$FAILED"
+            {
+              echo "## ⚠️ 本轮软失败 ${N} 项（job 未阻断）"
+              echo ""
+              echo "以下消费步失败但按软失败策略未阻断 job，对应数据**可能未刷新**，请核对健康面板："
+              echo ""
+              for s in $FAILED; do echo "- \`$s\`"; done
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "✅ 本轮无软失败（所有消费步 outcome 非 failure）"
+          fi
