@@ -97,6 +97,10 @@ jobs:
               "sentiment_cycle.json",
               "stock_rps.json",
               "stop_target_optimization.json",
+              # 🆕 2026-09-08 主人令：中信 PE 双卡数据链（E 段 21:00 每日调度，前端直读）
+              #   不登记 → weekly_cleanup 判为孤儿删除 → 实验区双卡空白（详见 DO_NOT_DELETE.md 保护段）
+              "citic_pe_history.json",
+              "citic_pe_history.meta.json",
           }
           PROTECTED_DATA = {
               # 守护/中间文件，不被 index.html 直接引用但生产流程需要
@@ -124,6 +128,11 @@ jobs:
               "STOCK_QUOTE",
               "STOCK_RPS_DATA",
               "FINAL_RECOMMEND_DATA",
+              # 🆕 2026-09-08 主人令：中信 PE 双卡（window.CITIC_PE_THERMO / CITIC_PE_BACKTEST）
+              #   由 v8/gen_citic_pe.py 直写，不在 update_v8 DATA_SOURCES 1:1 映射内（一 raw 产两 js）
+              #   → 不保护会被 weekly_cleanup 判孤儿删除。
+              "CITIC_PE_THERMO",
+              "CITIC_PE_BACKTEST",
           }
           # 保留目录：历史快照、回测产物等整体保护
           PROTECTED_DIRS = {"history", "backtest", "optimize", "v8_cal_archive"}
