@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "1f55e8a24";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "06312e00d";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -530,7 +530,7 @@ window.__domReadyFns=[];
 <script src="data/CONCEPT_RANKING.js?v=719b52492e" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/INDEX_QUOTES.js?v=55f43daea2" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=2b8b162217" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=94b375eceb" defer></script>
 <script src="data/MARGIN_DATA.js?v=1035b202a3" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=96bbdc65d8" defer></script>
 <script src="data/IPO_DATA.js?v=83100021f5" defer></script>
@@ -1564,13 +1564,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/PERFORMANCE_FORECAST.js?v=bffea13aba" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=eb9aabed90" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=6ac75adc9d" defer></script>
-<script src="data/HEALTH_CHECK.js?v=d638d96465" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=5a638d674b" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=89c16c84b5" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=ea0072f2fa" defer></script>
+<script src="data/HEALTH_CHECK.js?v=74c85e24ae" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=13b20fe26a" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=c09d8d9b98" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=3574a0568f" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=2c98297ff0" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=5df13361b5" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=6477ad6bf8" defer></script>
     <script src="data/MOMENTUM_FILTER.js?v=6dc35911d8" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=7c78b8d6bf" defer></script>
@@ -11034,7 +11034,7 @@ window.showRestrictedItems = showRestrictedItems;
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=3574a0568f';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=5df13361b5';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -11043,7 +11043,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=2c98297ff0';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=6477ad6bf8';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -11925,11 +11925,11 @@ if(_fib2.windows&&_fib2.windows.length){
   var _c=_fib2.current||{};
   var _fut2=(_fib2.windows.filter(function(w){return w.status==='future';})||[])[0]||{};
   var _fibDescMap={'F(3)':'小反弹','F(5)':'短期变盘','F(8)':'8日变盘','F(13)':'13日重要','F(21)':'中期转折','F(34)':'趋势确认','F(55)':'大周期拐点'};
-  h+=`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;align-items:center;">`;
-  h+=`<span style="font-size:11px;background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.25);border-radius:12px;padding:3px 10px;color:var(--txt);">已回调 <b style="color:var(--cyan);">${_c.days_down!=null?_c.days_down:'--'}天</b></span>`;
-  h+=`<span style="font-size:11px;background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.25);border-radius:12px;padding:3px 10px;color:var(--txt);">累计 <b style="color:${_c.total_pct<0?'var(--down)':'var(--up)'}">${_c.total_pct!=null?num(_c.total_pct)+'%':'--'}</b></span>`;
-  h+=`<span style="font-size:11px;background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.25);border-radius:12px;padding:3px 10px;color:var(--txt);">下跌 <b style="color:${_c.total_points<0?'var(--down)':'var(--up)'}">${_c.total_points!=null?num(_c.total_points,1):'--'}</b></span>`;
-  h+=`<span style="font-size:11px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);border-radius:12px;padding:3px 10px;color:var(--txt);">距<b style="color:#a78bfa;">${_fut2.name||'F(?)'}</b> <b style="color:#d0bcff;">${_fut2.date?(_fut2.days_left>=0?_fut2.days_left:0)+'天':'—'}</b></span>`;
+  h+=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;align-items:stretch;">`;
+  h+=`<span style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:10px 12px;color:var(--txt);white-space:nowrap;">已回调 <b style="color:var(--cyan);font-size:16px;">${_c.days_down!=null?_c.days_down:'--'}天</b></span>`;
+  h+=`<span style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:10px 12px;color:var(--txt);white-space:nowrap;">累计 <b style="color:${_c.total_pct<0?'var(--down)':'var(--up)'};font-size:16px;">${_c.total_pct!=null?num(_c.total_pct)+'%':'--'}</b></span>`;
+  h+=`<span style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;background:rgba(148,163,184,.10);border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:10px 12px;color:var(--txt);white-space:nowrap;">下跌 <b style="color:${_c.total_points<0?'var(--down)':'var(--up)'};font-size:16px;">${_c.total_points!=null?num(_c.total_points,1):'--'}</b></span>`;
+  h+=`<span style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:14px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);border-radius:14px;padding:10px 12px;color:var(--txt);white-space:nowrap;">距<b style="color:#a78bfa;font-size:16px;">${_fut2.name||'F(?)'}</b> <b style="color:#d0bcff;font-size:16px;">${_fut2.date?(_fut2.days_left>=0?_fut2.days_left:0)+'天':'—'}</b></span>`;
   h+=`</div>`;
   var _trig2=_fib2.windows.filter(function(w){return w.status==='triggered'||w.status==='tracking';}).slice(0,3);
   var _miss2=_fib2.windows.filter(function(w){return w.status==='missed';}).slice(0,3);
@@ -13072,7 +13072,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }
   var seen=(function(){ try{ var h=window.HEALTH_CHECK||{}; return h.update_time||h.updated_at||h.updated||h.last_update||''; }catch(e){ return ''; } })();
   function _check(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=d638d96465')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=74c85e24ae')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var remote=_pickTs(t);
       if(remote){
         if(seen && remote!==seen){
