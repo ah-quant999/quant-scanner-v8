@@ -1565,7 +1565,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=e0cb329e52" defer></script>
     <script src="data/AUDIT_TRAIL.js?v=32cdd222b4" defer></script>
-<script src="data/HEALTH_CHECK.js?v=278677b843" defer></script>
+<script src="data/HEALTH_CHECK.js?v=be42014a3c" defer></script>
     <script src="data/COMMODITY_ELASTICITY.js?v=537a126162" defer></script>
     <!-- 2026-09-07 主人令：中信 PE 极值温度计 + PE<10 历史回测 双卡（暂未上架·实验区最下方） -->
     <script src="data/CITIC_PE_THERMO.js?v=c427620f1e" defer></script>
@@ -13312,7 +13312,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }
   var seen=(function(){ try{ var h=window.HEALTH_CHECK||{}; return h.update_time||h.updated_at||h.updated||h.last_update||''; }catch(e){ return ''; } })();
   function _check(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=278677b843')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=be42014a3c')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var remote=_pickTs(t);
       if(remote){
         if(seen && remote!==seen){
