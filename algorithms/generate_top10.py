@@ -17,7 +17,7 @@ except NameError:
 import sys
 from datetime import datetime
 
-from fundamental_helper import fq_key_of, quality_points
+from fundamental_helper import fq_key_of, quality_points, quality_veto
 from stop_target_logic import compute_stop_target_from_closes, board_from_code
 import regime_filter
 
@@ -846,6 +846,7 @@ def main():
 
     # ── 4. 计算多维共振评分 ──
     scored = []
+    VETO_COUNT = 0  # 质差一票否决计数（2026-09-07 主人令）
     for key, s in gp_stocks.items():
         hist = s.get("history", [])
         latest = hist[-1] if hist else {}
@@ -1119,6 +1120,16 @@ def main():
         fq = fundamental_stocks.get(fq_key, {})
         quality_score, quality_grade, quality_detail = quality_points(fq)
 
+        # ── 质差股一票否决（2026-09-07 主人令·贝塔派审计缺口补齐）──
+        # 共振链此前只做加分没有垃圾票出清。ST/当期亏损/营收崩塌直接出局，
+        # 不进 TOP10 → 三重共识 → 最终推荐任何下游环节。缺数据一律中性放行。
+        # ⚠️ 刻意不用 D 档否决：银行/券商低 ROE 全被标 D（行业歧视非质差），实证后收窄。
+        _veto_reason = quality_veto(name, fq)
+        if _veto_reason:
+            print(f"  ⛔ 质差一票否决 {name}({raw_code}): {_veto_reason}")
+            VETO_COUNT += 1
+            continue
+
         # ── 原始总分（各维度绝对加分之和）──
         raw_total = base + enhance + form_score + fund + sector_score + inst + quality_score
 
@@ -1210,6 +1221,8 @@ def main():
 
     # ── 5. 排序取TOP20 ──
     scored.sort(key=lambda x: -x["total_score"])
+    if VETO_COUNT:
+        print(f"  ⛔ 质差一票否决合计: {VETO_COUNT} 只（ST/当期亏损/营收崩塌，未进评分）")
 
     # 格式化为简洁输出（含完整评分明细）
     top10 = []

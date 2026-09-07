@@ -21,6 +21,7 @@
 """
 import json
 import os
+import re
 import sys
 from collections import defaultdict
 from datetime import datetime
@@ -32,6 +33,7 @@ DATA = os.path.join(ROOT, "data")
 # 名称归一化共享模块（2026-08-14 抽出，消除与 build_candidate_pool/guanlan_extractor/scanner 的重复）
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from name_utils import norm_code, fix_name, strip_entitlement_prefix, STANDARD_NAME_MAP  # noqa: E402
+from fundamental_helper import quality_veto  # noqa: E402  质差股一票否决（2026-09-07 主人令）
 
 CRISIS_HIGH_THRESHOLD = 50  # 危机雷达≥50才并入逆势龙头
 SECTOR_TOP_N = 15
@@ -275,6 +277,16 @@ def main():
     profile = load_json("stock_profile.json")
     crisis = load_json("crisis_data.json")
     gold_pool = load_json("gold_pool.json")
+
+    # ── 质差股一票否决（2026-09-07 主人令·贝塔派审计缺口补齐）──
+    # CRDS/板块龙头等旁路源不经过 generate_top10 漏斗，需在此汇总口兜底拦截。
+    # 构建 纯数字code→fq 查找（fq 键形如 sh_600030/hk_00005）。
+    _fq_stocks = (load_json("fundamental_quality.json") or {}).get("stocks") or {}
+    _fq_by_digits = {}
+    for _k, _v in _fq_stocks.items():
+        _d = re.sub(r"\D", "", _k)
+        if _d and _d not in _fq_by_digits:
+            _fq_by_digits[_d] = _v
 
     rel_set, abs_set, score_map = build_sector_maps(sector_rs)
 
@@ -662,6 +674,11 @@ def main():
     scored = []
     for key, r in pool.items():
         if len(r["sources"]) == 0:
+            continue
+        # ── 质差股一票否决兜底（2026-09-07 主人令）：拦旁路源（CRDS/板块龙头等）──
+        _vr = quality_veto(r["name"], _fq_by_digits.get(re.sub(r"\D", "", key), {}))
+        if _vr:
+            print(f"  ⛔ 最终推荐一票否决 {r['name']}({key}): {_vr}")
             continue
         sec_score, fresh_hits = sector_score_for(r, rel_set, abs_set, score_map)
         # 合并板块命中（板块龙头已写入部分命中）

@@ -12,11 +12,17 @@ fundamental_helper.py — 基本面分数复用模块（金股观测 / 驾驶舱
                                 缺失基本面数据统一按中性 0 分处理，不区分 A股/港股。
                                 （兼容 2026-07-25 修复前旧数据把港股误标 D 的情况）
 
+  - quality_veto(name, fq)    : 质差股一票否决（2026-09-07 主人令·贝塔派审计缺口补齐）。
+                                只拦"确凿质差"，缺数据一律中性（公平性原则不变）：
+                                ST/退市风险标记、真实 D 档（排除无数据兜底）、最近一期 ROE<0。
+                                generate_top10（共振漏斗入口）与 final_recommend（旁路源汇总口）两处调用。
+
 设计目的：金股观测与驾驶舱使用完全相同的评分逻辑，避免两套面板分数不一致。
 公平性原则（2026-08-13 主人令）：市场来源本身不是负面信号；缺数据 = 中性 0 分；
 加分只给真实正面信号，扣分只给真实负面信号。
 """
 import os
+import re
 import json
 
 BASE = os.path.dirname(os.path.abspath(__file__))
@@ -102,3 +108,29 @@ def quality_points(fq):
     if tags:
         detail = (detail + " | 消息:" + ",".join(tags)).strip(" |")
     return qs, grade, detail
+
+
+def quality_veto(name, fq):
+    """质差股一票否决（2026-09-07 主人令）。返回否决原因字符串；通过返回 ""。
+
+    规则（只拦"确凿质差"，缺数据 = 中性放行，与公平性原则一致）：
+      1) 名称含 ST / 退        → ST或退市风险标记
+      2) 最近一期 ROE<0        → 当期亏损
+      3) 营收同比 < -30%       → 营收崩塌
+    ⚠️ 刻意不用 grade=="D" 做否决：D 档=score<40，而银行/券商/公用事业 ROE
+    天然偏低（招行/中信证券/长电全被标 D，166/474=35%），D 档口径是行业歧视
+    不是质差信号（2026-09-07 干跑实证后收窄）。
+    fq 传 fundamental_quality.json stocks 里的单条记录（可为 {}）。
+    """
+    nm = str(name or "").upper()
+    if re.search(r"ST|退", nm):
+        return "ST或退市风险"
+    if not fq:
+        return ""
+    roe = fq.get("roe")
+    if roe is not None and roe < 0:
+        return f"当期亏损(ROE {roe:.1f}%)"
+    rev = fq.get("revenue_growth")
+    if rev is not None and rev < -30:
+        return f"营收崩塌({rev:.1f}%)"
+    return ""
