@@ -1,10 +1,10 @@
 {
-  "update_time": "2026-09-07 20:57:41",
+  "update_time": "2026-09-07 21:10:39",
   "data_time": "2026-09-07 15:30:00",
-  "total_scanned": 387,
+  "total_scanned": 388,
   "scan_stats": {
-    "candidates": 387,
-    "succeeded": 387,
+    "candidates": 388,
+    "succeeded": 388,
     "failed": 0,
     "kline_source_used": "mootdx(eastmoney兜底可用)"
   },
@@ -570,6 +570,11 @@
     {
       "code": "002463",
       "name": "沪电股份",
+      "board_label": "主板"
+    },
+    {
+      "code": "002466",
+      "name": "天齐锂业",
       "board_label": "主板"
     },
     {
@@ -1703,6 +1708,12 @@
     {
       "code": "002354",
       "name": "天娱数科",
+      "score": 0,
+      "enter_date": "2026-09-07"
+    },
+    {
+      "code": "002466",
+      "name": "天齐锂业",
       "score": 0,
       "enter_date": "2026-09-07"
     },
@@ -4846,6 +4857,21 @@
       "market_label": "sz",
       "board_label": "主板"
     },
+    "002466": {
+      "name": "天齐锂业",
+      "score": 0,
+      "conds": 1,
+      "cond1": false,
+      "cond2": false,
+      "cond3": true,
+      "zt_count": 0,
+      "zt_down_count": 0,
+      "af_peak": 0,
+      "vr_peak": 1.98,
+      "ts_peak": 0,
+      "market_label": "sz",
+      "board_label": "主板"
+    },
     "002484": {
       "name": "江海股份",
       "score": 58,
@@ -7832,7 +7858,7 @@
       "board_label": "科创板"
     },
     "688549": {
-      "name": "中巨芯-U",
+      "name": "中巨芯",
       "score": 0,
       "conds": 0,
       "cond1": false,
