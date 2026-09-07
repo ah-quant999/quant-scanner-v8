@@ -1329,8 +1329,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><td>1</td><td>三重共识</td><td>三重共识系列</td><td>gen_triple_consensus.py</td><td>B</td><td>独立选股源（主站 TOP10 ∩ 基本面 A 档）</td></tr>
           <tr><td>2</td><td>四量终极</td><td>四量终极 60m/日线</td><td>strategy_four_volume(_60m).py</td><td>B</td><td>独立选股源（4 重共振）</td></tr>
           <tr><td>3</td><td>逆势龙头</td><td>CRDS 卡数据</td><td>calc_crds.py</td><td>B</td><td><b>弱市专用</b>（危机雷达≥50 才并入）精锐+3.0 / 进阶+2.0 / 观察+1.0</td></tr>
-          <tr><td>4</td><td>异常换手率</td><td>因子实验室</td><td>v8/factor_lab_gen.py</td><td>D</td><td>前 5 名 +2.0 / 6-15 名 +1.5 / 16-30 名 +1.0，非开仓期 ×0.3</td></tr>
-          <tr><td>5</td><td>ROE_TTM</td><td>因子实验室</td><td>v8/factor_lab_gen.py</td><td>D</td><td>同上分层，非开仓期 ×0.3</td></tr>
+          <tr><td>4</td><td>异常换手率</td><td>因子实验室</td><td>v8/factor_lab_gen.py</td><td>E</td><td>前 5 名 +2.0 / 6-15 名 +1.5 / 16-30 名 +1.0，非开仓期 ×0.3</td></tr>
+          <tr><td>5</td><td>ROE_TTM</td><td>因子实验室</td><td>v8/factor_lab_gen.py</td><td>E</td><td>同上分层，非开仓期 ×0.3</td></tr>
           <tr><td>6</td><td>高手跟踪</td><td>高手强势股跟踪池</td><td>ima 强势股自动同步</td><td>同步任务</td><td>共振 +1（IMA 状态非见顶/走弱），非开仓期 ×0.3</td></tr>
           <tr><td>7</td><td>强势突破</td><td>强势突破卡数据</td><td>strong_breakout.py</td><td>B</td><td>🆕 2026-09-04 主人令：core 前 30 共振 +1，非开仓期 ×0.3</td></tr>
           <tr><td>8</td><td>动量共识</td><td>动量共识筛选卡数据</td><td>scripts/momentum_common_filter.py</td><td>B</td><td>🆕 2026-09-04 主人令：candidates 全量共振 +1，非开仓期 ×0.3</td></tr>
@@ -1475,8 +1475,8 @@ norm = clip((x - lo)/(hi - lo) * 100, 0, 100)</div>
           <tr><th>时间</th><th>任务</th><th>执行机</th><th>前端 Tab / 刷新标签</th></tr>
           <tr><td>16:40 A批采集</td><td>龙虎榜/行情/板块RS/指数历史/港股</td><td>云端 v8_algo_cloud (--stage A)</td><td>选股策略·选股池/板块资金流</td></tr>
           <tr><td>18:10 B批选股</td><td>三重共识/相对强度/CRDS/四量终极/选股生命周期</td><td>云端 v8_algo_cloud (--stage B)</td><td>选股策略各子 tab</td></tr>
-          <tr><td>21:00 E批回测</td><td>趋势/综合/逆势龙头/相对强度/四量等回测</td><td>云端 v8_algo_cloud (--stage E)</td><td>策略回顾·回测区</td></tr>
-          <tr><td>20:00 D批汇总</td><td>final_recommend + LHB历史/7d/生命周期</td><td>云端 v8_algo_cloud (--stage D)</td><td>今日推荐候选池·Top3</td></tr>
+          <tr><td>21:00 E批回测+因子实验室</td><td>趋势/综合/逆势龙头/相对强度/四量回测 + <b>因子实验室生成(v8/factor_lab_gen.py，2026-09-07 从 D 摘出·治互踢暴风)</b></td><td>云端 v8_algo_cloud (--stage E)</td><td>策略回顾·回测区 + 因子实验室卡</td></tr>
+          <tr><td>20:00 D批汇总</td><td>仅 final_recommend（LHB历史/7d/生命周期由 B 批主流程前置）</td><td>云端 v8_algo_cloud (--stage D)</td><td>今日推荐候选池·Top3</td></tr>
           <tr><td>本地因子(盘后/周末)</td><td>异常换手率(重点池) + ROE(TTM)全市场主板 · 因子实验室卡</td><td>小九本机 baostock 生成 → push main</td><td>选股策略·🧬生命周期 tab</td></tr>
         </table>
       </div>

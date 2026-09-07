@@ -170,6 +170,50 @@ def dispatch(wf_file, inputs=None):
     else:
         print(f"  ❌ 派发 {wf_file} 失败")
 
+
+# 🛡 2026-09-07 22:2x 一劳永逸根治（主人令「互踢/暴风/覆盖不想再看到」·方案 B 配套 2）：
+#   原 dispatch() 用 workflow_dispatch，触发 v8_algo_cloud.yml 时绕开探针路由（workflow_dispatch 不路由），
+#   云端硬扛 2h40m 且触发 v8-algo-cloud concurrency 互踢（今日 13 次派发 9 cancelled），
+#   同时多源（cloud_dispatcher + WorkBuddy 自动化）洪泛派发把 v8-algo-cloud 单并发槽打成死锁。
+#   改用 repository_dispatch（type=trigger_algo）后：
+#     ① 触发 v8_algo_cloud.yml:440 探针路由 → lemoncat-cn 在线则转派 v8_algo_run.yml（不同 concurrency
+#        group v8-algo-cn，与云端完全分离 → 永不互踢）→ cn 跑全链 84min；cn 离线才回落云端。
+#     ② 派发语义"唤醒"而非"覆盖"（type=trigger_algo），与 schedule 等同类，dispatch 内容级全收敛。
+#     ③ WorkBuddy 自动化若仍用 workflow_dispatch 也无法绕过——因为探针路由不接它。
+def dispatch_repo_dispatch(wf_file, event_type="trigger_algo", client_payload=None):
+    """配套 2 根治：派发方式由 workflow_dispatch 改 repository_dispatch（type=trigger_algo）。
+    触发 v8_algo_cloud.yml 的探针路由（line 440）：lemoncat-cn 在线则转派 v8_algo_run.yml（cn 链），
+    离线才回落云端。这是治互踢/覆盖的关键。"""
+    payload = {"event_type": event_type, "client_payload": client_payload or {}}
+    r = api("POST", f"/repos/{REPO}/dispatches", payload)
+    if r:
+        print(f"  ✅ repository_dispatch {wf_file} type={event_type} payload={client_payload or {}}")
+    else:
+        print(f"  ❌ repository_dispatch {wf_file} 失败（HTTP 见上）")
+
+
+def _final_recommend_still_stale():
+    """配套 2 根治：检查核心产物（final_recommend/crds_card_data/candidate）是否本日已新鲜。
+    至少一项仍陈旧 → True（仍要派），全部新鲜 → False（无需派），杜绝「成功假绿灯仍重派」覆盖风险。"""
+    today = datetime.datetime.now(CST).strftime("%Y-%m-%d")
+    files = [
+        "raw_data/final_recommend.json",
+        "raw_data/crds_card_data.json",
+        "raw_data/candidate.json",
+    ]
+    for f in files:
+        p = os.path.join(REPO_ROOT, f)
+        if not os.path.exists(p):
+            return True
+        try:
+            d = json.load(open(p, encoding="utf-8"))
+            ut = (d.get("update_time") or d.get("generated_at") or "").strip()
+            if not ut.startswith(today):
+                return True
+        except Exception:
+            return True
+    return False
+
 # 🔴 2026-08-24 一劳永逸根因修复（主人令「修复 2-3 号问题」之 #3）：
 #   盘后算法链 step（🧮 运行盘后算法链）偶发挂死（数据源/网络调用无超时等），
 #   会以 in_progress 状态长期占用 v8-algo-cloud 单并发槽（concurrency cancel-in-progress:false），
@@ -330,15 +374,24 @@ def main():
                 ran_today = True
                 print(f"  算法链: 今日 18:00 后已成功于 {ct.strftime('%H:%M')}，无需补发")
         if not ran_today:
-            # 算法链单轮 20-40 分钟：冷却 45 分钟（>单轮耗时，避免"上一轮刚跑完就再派"）；
-            # 今日失败 >=3 次即熔断，交人工（历史教训：不熔断会滚到 150 个 run / 403 限流）。
-            allow, why = dispatch_guard("v8_algo_cloud.yml", now,
-                                        cooldown_min=45, max_fail_today=3)
-            if allow:
-                print("  算法链: 今日尚未成功运行，派发（%s）" % why)
-                dispatch("v8_algo_cloud.yml")
+            # 🛡 2026-09-07 22:2x 一劳永逸根治（主人令「互踢/暴风/覆盖不想再看到」·方案 B 配套 1+2）：
+            #   ① cooldown 45→20 分钟（用户令≥20min）：与 v8_cn_fetch_cloud 30 分轮询错峰，永不重叠。
+            #   ② max_fail_today 3→2：熔断更激进（今日已观察 13 派发 9 cancelled 2 failure 浪费 2h+）。
+            #   ③ 派发改 repository_dispatch（dispatch_repo_dispatch）：触发 v8_algo_cloud.yml 探针路由
+            #      → lemoncat-cn 在线则转派 v8_algo_run.yml（cn 链，**与云端不同 concurrency group**
+            #      → 永不互踢）→ cn 跑全链 84min；cn 离线才回落云端，从根上治互踢/覆盖。
+            #   ④ _final_recommend_still_stale() 二次校验：防止 run "success 但无 final_recommend" 的
+            #      假绿灯（已被 2026-09-02 根因锁过：18:xx 创建的 run 18:00 门控跳过、success 但 0 产物）。
+            if not _final_recommend_still_stale():
+                print("  算法链: 核心产物（final_recommend/crds/candidate）均已今日新鲜，跳过重派")
             else:
-                print("  算法链: %s" % why)
+                allow, why = dispatch_guard("v8_algo_cloud.yml", now,
+                                            cooldown_min=20, max_fail_today=2)
+                if allow:
+                    print(f"  算法链: 产物仍陈旧 + {why} → repository_dispatch 触发探针路由（自动转派 cn）")
+                    dispatch_repo_dispatch("v8_algo_cloud.yml", client_payload={})
+                else:
+                    print("  算法链: %s" % why)
     else:
         if not _is_trading_day(now):
             print(f"  算法链: 非交易日（{now.strftime('%Y-%m-%d %H:%M')}），跳过算法链派发")
