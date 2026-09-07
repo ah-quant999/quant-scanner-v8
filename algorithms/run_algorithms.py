@@ -166,6 +166,11 @@ ORDER = [
     #   2026-09-04 强势突破选股（高手反推 v1）：依赖当日 h_auto_buy 池，须在其后、track 前跑。
     "strong_breakout.py",
     "track_h_auto_buy.py",
+    # 🛡 2026-09-08 P0 修复：gen_lhb_7d.py 被 5920e4cba 加进 STAGES["B"] 却漏挂 ORDER，
+    #   导致模块级 assert(_STAGE_UNION == set(ORDER)) 崩盘 → 整个算法链 import 即挂（B/E 段全废，
+    #   连带 09-07 新挂的 v8/fetch_citic_pe.py + v8/gen_citic_pe.py 也跑不到）。
+    #   补挂 ORDER（与 STAGES["B"] 同位：track_h_auto_buy 之后、momentum_common_filter 之前）。
+    "gen_lhb_7d.py",                   # → data/LHB_7D.js（龙虎榜 7 日累计，依赖 A 批 fetch_lhb.py）
     # 🛡 2026-09-04 主人令（一劳永逸挂链）：动量共识筛选器此前零调度成孤儿——
     #   只被 update_v8.py 的 run_experiment_cards() 副作用式调用（部署链，失败仅告警不阻断），
     #   算法链从不调度 → 它是最终推荐 8 源里唯一「链外依赖」的一源，与强势突破不对称。
