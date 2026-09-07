@@ -13023,9 +13023,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
 
   /* 🛡 2026-08-28 一劳永逸（主站审计 P0-3）：
      缓存戳 ?v= 一律从页面已注入的 <script src> 实时读取，不再手写 hash。
-     历史债务：IPO 卡注释写 ?v=bf5d738bc6、实际引用却是另一个 hash、报错信息又写一遍，
-     三处漂移导致排障时被误导，且手写 hash 不随构建更新 → CDN 吐旧副本。
-     现统一：script 标签是唯一真源，fetch 永远跟随它。 */
+     script 标签是唯一真源，fetch 永远跟随它。 */
   function _scriptUrl(file){
     try{
       var el=document.querySelector('script[src*="'+file+'"]');
@@ -13035,26 +13033,35 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
     return file+'?t=';
   }
 
-  /* 🛡 2026-08-28 一劳永逸（主站审计 P0-3，比审计结论更严重）：
-     HEALTH_CHECK.js 的实际字段名是 {"updated":"...", "items":[{..."last_update":"..."}]}，
-     原代码只读 update_time / updated_at → 恒为 '' → 下方 `if(!localTs) return`
-     直接短路返回，setInterval 从未注册 —— 版本自愈功能自上线起从未启动过。
-     现按优先级兼容全部四种字段名（与下方正则严格对齐）。 */
-  function _pickTs(o){ try{ return o.update_time||o.updated_at||o.updated||o.last_update||''; }catch(e){ return ''; } }
-  function _localTs(){ try{ return _pickTs(window.HEALTH_CHECK||{}); }catch(e){ return ''; } }
-  var localTs=_localTs();
-  if(!localTs) return; // 本地 HEALTH_CHECK 未就绪则跳过（避免误刷新）
-  console.log('[v8AutoReload] 版本自愈启动 本地='+localTs);
-  setInterval(function(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=bcdf30b499')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
-      var m=t.match(/"update_time"\s*:\s*"([^"]+)"|"updated_at"\s*:\s*"([^"]+)"|"updated"\s*:\s*"([^"]+)"|"last_update"\s*:\s*"([^"]+)"/);
-      var remoteTs=m?(m[1]||m[2]||m[3]||m[4]):'';
-      if(remoteTs && remoteTs!==localTs){
-        console.log('[v8AutoReload] 检测到新版本 '+remoteTs+' ≠ 本地 '+localTs+'，自动刷新');
-        try{ location.reload(); }catch(e){}
+  /* 🛡 2026-09-07 加固（主人令 A+B 双修）：根治「坐着的标签页看不到盘中更新」。
+     旧版缺陷：localTs 仅页面加载时捕获一次 + `if(!localTs) return` 在 HEALTH_CHECK 未就绪时
+     直接杀死 setInterval → 自愈从未真正运行；120s 间隔 + 后台标签节流 → 11:14 仍见 10:20。
+     现改为：① 轮询远端 update_time 与「上次见到的远端值」比对，任何变化即刷新；
+             ② 初始化不早退，setInterval 必注册；seen 优先取本地已渲染值，避免漏掉加载后首次变化；
+             ③ 间隔 60s + visibilitychange 切回前台立即探测，覆盖后台节流。 */
+  function _pickTs(t){
+    var m;
+    m=t && t.match(/"update_time"\s*:\s*"([^"]+)"/); if(m) return m[1];
+    m=t && t.match(/"updated_at"\s*:\s*"([^"]+)"/); if(m) return m[1];
+    m=t && t.match(/"updated"\s*:\s*"([^"]+)"/);   if(m) return m[1];
+    m=t && t.match(/"last_update"\s*:\s*"([^"]+)"/); if(m) return m[1];
+    return '';
+  }
+  var seen=(function(){ try{ var h=window.HEALTH_CHECK||{}; return h.update_time||h.updated_at||h.updated||h.last_update||''; }catch(e){ return ''; } })();
+  function _check(){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+      var remote=_pickTs(t);
+      if(remote){
+        if(seen && remote!==seen){
+          console.log('[v8AutoReload] 检测到新数据 '+remote+' ≠ '+seen+'，自动刷新');
+          try{ location.reload(); }catch(e){}
+        } else { seen=remote; }
       }
     }).catch(function(){});
-  },120000);
+  }
+  setInterval(_check,60000);
+  _check();
+  document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible'){ _check(); } });
 })();
 </script>
 
