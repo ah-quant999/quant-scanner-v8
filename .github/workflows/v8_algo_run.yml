@@ -271,7 +271,12 @@ jobs:
 
       - name: "🧮 运行盘后算法链 → raw_data/ → 推送（2026-09-04 支持分批 stage）"
         shell: powershell
-        continue-on-error: true
+        # 🔴 2026-09-08 主人令「禁止假 success」：原 continue-on-error: true 会让
+        #    整条算法链失败也显示绿色（cn 链无链尾闸门，全链崩了无人知）。
+        #    改为硬失败——保护性跳过/单脚本失败由 run_algorithms.py 内部记账，
+        #    真正需要红的必须红。
+        continue-on-error: false
+        timeout-minutes: 200
         env:
           V8_FORCE_RUN: ${{ github.event.inputs.force_run == 'true' && '1' || '' }}
           TIME_GATE_BYPASS: ${{ github.event.inputs.bypass_time_gate == 'true' && '1' || '' }}

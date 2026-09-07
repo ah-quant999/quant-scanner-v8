@@ -76,10 +76,15 @@ jobs:
         # 🔴 2026-08-19 一劳永逸补齐：盘中每 2h 重算四量终极/RPS/CRDS追踪
         # 写入 raw_data/algo_track.json（git tracked，下一步 api_push_raw 推），保证盘中卡片不过期
         run: |
-          set +e
-          python algorithms/gen_algo_track.py
-          echo "gen_algo_track exit: $?"
-          exit 0
+          # 🔴 2026-09-08 主人令「禁止假 success」：原 set +e + echo + 无条件 exit 0
+          #    会让 gen_algo_track 崩溃也显示绿色 → ALGO_TRACK 停更无人知。
+          #    改为捕获真实退出码，非零即让 job 变红。
+          rc=$?
+          echo "gen_algo_track exit: $rc"
+          if [ "$rc" != "0" ]; then
+            echo "::error::gen_algo_track.py 失败（exit=$rc），ALGO_TRACK 未刷新"
+            exit 1
+          fi
 
       - name: "🔄 重生成 data/ALGO_TRACK.js 并更新 index.html ?v 缓存戳"
         # ALGO_TRACK.js 由 update_v8.py 的 _make_js 从原始 raw_data 重生，
@@ -87,12 +92,14 @@ jobs:
         # 不传 --category：默认 build() 内部读 raw_data/*.json 全量重生，盘中每 2h 漂移可控（<5min）。
         # 注：MOMENTUM_FILTER.js 已迁到盘后 19:15 算法链，本 workflow 不再碰。
         run: |
-          python update_v8.py || echo "update_v8 warned, continue"
+          # 🔴 2026-09-08 主人令「禁止假 success」：update_v8 失败 = data/*.js 没重建 = 旧 JS 上线，必须红
+          python update_v8.py || { echo "::error::update_v8.py 失败，data/*.js 未重建"; exit 1; }
 
       - name: "🩺 刷新 HEALTH_CHECK.js"
-        continue-on-error: true
+        # 🔴 2026-09-08 主人令「禁止假 success」：删 continue-on-error + || true。
+        #    体检脚本跑挂 = 监控失效，必须可见。
         run: |
-          python v8_health_check.py || true
+          python v8_health_check.py || { echo "::error::v8_health_check.py 失败，健康面板未刷新"; exit 1; }
 
       - name: "📤 推送变更到 main（git push，全套 data/*.js + raw_data/*.json 自动）"
         env:

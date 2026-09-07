@@ -25,8 +25,14 @@ data/.neodata_token
 data/zszxq_token.json
 # 🛡 2026-08-27 主人令：算法运行时行情缓存（RPS/K线/TDX），纯本地加速用，严禁入库/推仓
 #   历史已入库文件由隔离索引 git rm --cached 移除（不删本地文件）
+#   ⚠️ 2026-09-08 主人新令覆盖（仅 kline_cache 一项）：
+#      「膨胀的很厉害？出真实数据才是最重要的，出来后再精简不行么？」
+#      → kline_cache 入仓。收益：云端 runner 也能零网络取数，根治「云端抓中国源
+#        超时被杀 → 产物写不出 → 下游读旧文件 → 静默断更」（H_AUTO_BUY 断更 3 天
+#        即此类）。代价：仓库 +46MB（2320 只）。后续精简方向：只留近 60 根 K 线、
+#        或仅主板 A 股，可把体积压到 1/4 以下。
 raw_data/_rps_cache/
-raw_data/kline_cache/
+# raw_data/kline_cache/   ← 2026-09-08 主人令：改为入仓（云端零网络取数，根治静默断更）
 raw_data/_tdx_cache/
 raw_data/backtest_kline_cache/
 

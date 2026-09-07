@@ -93,34 +93,57 @@ def main():
 
     stocks = {}
     ok = skip = fail = 0
-    for code, meta in universe.items():
-        gmkt = gtimg_market(code, meta["market"])
-        if not gmkt:
-            skip += 1
-            continue
-        digits = re.sub(r"\D", "", str(code))
+    # 🔴 2026-09-08 一劳永逸：原实现串行逐只 fetch_a_daily_gtimg（147~200 只，
+    #   单只 timeout 20s×3 重试最坏 60s → 串行最坏 ~12000s），云端/夜间极易超时被杀。
+    #   改为线程池并发（V8_STOP_WORKERS 可调，默认 8）。
+    from concurrent.futures import ThreadPoolExecutor
+    MAXW = int(os.environ.get("V8_STOP_WORKERS", "8"))
+
+    def _one(item):
+        code, meta = item
         try:
+            gmkt = gtimg_market(code, meta["market"])
+            if not gmkt:
+                return code, None, "skip"
+            digits = re.sub(r"\D", "", str(code))
             df = fetch_a_daily_gtimg(digits, gmkt, bars=250)
+            stats = compute_stop_target(df, board=meta.get("board", "主板"), strategy="general")
+            if not stats:
+                return code, None, "nostats"
+            stats["market"] = gmkt
+            return code, stats, "ok"
         except Exception as e:  # noqa: BLE001
-            print(f"  ⚠️ {code} 取K线异常: {e}")
-            fail += 1
-            continue
-        stats = compute_stop_target(df, board=meta.get("board", "主板"), strategy="general")
-        if not stats:
-            fail += 1
-            continue
-        stats["market"] = gmkt
-        stocks[str(code)] = stats
-        ok += 1
+            return code, None, f"err:{e}"
+
+    with ThreadPoolExecutor(max_workers=MAXW) as ex:
+        for code, stats, st in ex.map(_one, universe.items()):
+            if st == "ok":
+                stocks[str(code)] = stats
+                ok += 1
+            elif st == "skip":
+                skip += 1
+            else:
+                fail += 1
 
     method_desc = (
         "全站统一口径(方案三优化): 固定10%止损 + R:R=1.5止盈; "
         f"窗口=近{PRICE_WINDOW}日"
     )
+    # 🔴 2026-09-08 一劳永逸「禁止假绿灯」：原实现无论 ok 多少都无条件写盘并刷新
+    #   update_time → 取数全挂时产出「空数据 + 新时间戳」，健康面板判为新鲜、前端空白，
+    #   与 H_AUTO_BUY 断更 3 天无人发现属同一类静默失败。现：成功 0 只即拒绝写盘，
+    #   保留上一版数据并让调用方看到失败。
+    if ok == 0:
+        print(f"❌ 取数全部失败（成功 0 / 跳过 {skip} / 失败 {fail}），"
+              f"拒绝写盘：不产出空 STOCK_STOP_DATA 污染前端（保留上一版）")
+        return None
+    degraded = fail > 0 or ok < len(universe) * 0.5
     out = {
         "update_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "method": method_desc,
         "count": len(stocks),
+        "total_universe": len(universe),
+        "degraded": degraded,
         "stocks": stocks,
     }
     js_path = os.path.join(DATA_DIR, "STOCK_STOP_DATA.js")

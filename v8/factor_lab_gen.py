@@ -104,8 +104,36 @@ def get_key_codes():
             codes.add(c)
     return sorted(codes)
 
-def get_main_universe():
-    rs = bs.query_all_stock(day=KL_END)
+def resolve_data_date(max_back=10, min_rows=1000):
+    """2026-09-08 一劳永逸：解析「baostock 真正已有数据」的交易日。
+
+    【原 bug】KL_END = last_trade_day() 名不副实——它只在遇到周末时回退，
+    工作日直接返回「今天」。而 baostock 当日数据要收盘后数小时才生成（且盘前/
+    凌晨完全没有），用「今天」去 query_all_stock 必然返回 0 行
+    → get_main_universe 得 0 → 触发 <1000 保护性中止 → FACTOR_LAB 永久停在旧日期。
+    这正是 2026-09-05 起因子实验室连续断更的真根因（此前误判为「冷启动太慢」）。
+
+    【修法】从今天起逐日回退，取第一个返回行数 >= min_rows 的日期。
+    盘前/凌晨跑会自动退到上一已收盘交易日；周末/假期同理；全部无数据返回 None
+    让调用方显式报错（不再静默产出空数据）。
+    """
+    d = dt.datetime.now().date()
+    for i in range(max_back):
+        day = (d - dt.timedelta(days=i)).strftime("%Y-%m-%d")
+        rs = bs.query_all_stock(day=day)
+        n = 0
+        while rs.error_code == '0' and rs.next():
+            n += 1
+        if n >= min_rows:
+            if i:
+                log("数据日回退", f"{d.strftime('%Y-%m-%d')} → {day}（baostock 当日数据未生成，回退 {i} 天）")
+            return day
+        log("数据日探测", f"{day}: {n} 行（不足 {min_rows}），继续回退")
+    return None
+
+
+def get_main_universe(day=None):
+    rs = bs.query_all_stock(day=day or KL_END)
     codes = {}
     while rs.error_code == '0' and rs.next():
         v = rs.get_row_data()
@@ -178,6 +206,18 @@ def get_name(code):
 
 def main():
     lg = bs.login(); log("login", lg.error_code)
+    # 🔴 2026-09-08 一劳永逸：先解析「baostock 真正已生成数据」的日期并覆盖全局 KL_END。
+    #    原实现用「今天」去查，盘前/凌晨必返回 0 行 → universe 0 → 保护性中止 → FACTOR_LAB 停更
+    #    （2026-09-05 起连续断更的真根因，此前误判为冷启动慢）。
+    global KL_END, ASOF_YM, ASOF_Q
+    _dd = resolve_data_date()
+    if not _dd:
+        log("ERROR: 近 10 个自然日 baostock 均无数据，中止（不产出空 FACTOR_LAB）")
+        bs.logout(); return
+    KL_END = _dd
+    ASOF_YM = KL_END[:7]
+    ASOF_Q = "%dQ%d" % (int(KL_END[:4]), (int(KL_END[5:7]) - 1) // 3 + 1)
+    log("数据日", KL_END, "| ASOF_YM", ASOF_YM, "| ASOF_Q", ASOF_Q)
 
     # ---- 异常换手率（重点池） ----
     kcodes = get_key_codes(); log("重点池", len(kcodes))

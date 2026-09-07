@@ -341,6 +341,12 @@ def _build_result(sectors, benchmark, now_str, source="unknown"):
             else:
                 s[rel_f] = None
 
+    # 🔴 2026-09-08 一劳永逸「禁止假绿灯」：原实现无条件 data_available=True，
+    #    同花顺源不可达时（云端美国 IP 常态）sectors 全空仍宣称有数据 → 板块卡空白
+    #    但健康面板判新鲜。现：取数为空即标记不可用并拒绝写盘（保留上一版）。
+    if not sectors:
+        log(f"❌ 板块数据全空（0/{total}），拒绝写盘：不产出空 SECTOR_RS 污染前端（保留上一版）")
+        return None
     result = {
         "update_time": now_str,
         "data_date": now_str[:10],   # 2026-08-18 补：板块周期卡比对锚点
@@ -422,7 +428,10 @@ def _fetch_via_ths(now_str):
 
             if (i+1) % 20 == 0 or i == total - 1:
                 log(f"  进度 {i+1}/{total} ({name})")
-        except:
+        # 🔴 2026-09-08：原裸 `except: continue` 让失败完全静默（同花顺不可达时
+        #    全灭也只打印「成功获取 0 个」）。改为显式记录，失败可见。
+        except Exception as _e:
+            log(f"  ⚠️ {name} 取数失败: {type(_e).__name__}: {str(_e)[:60]}")
             continue
 
     log(f"  ✓ 成功获取 {len(sectors)} 个板块数据")
