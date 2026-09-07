@@ -1,17 +1,8 @@
 {
-  "update_time": "2026-09-07 21:11:55",
-  "run_start": "2026-09-07 20:20:17",
-  "ok": 0,
-  "fail": 1,
-  "failed_scripts": [
-    {
-      "script": "v8/factor_lab_gen.py",
-      "reason": "监督器静默杀(>15min 无输出)"
-    },
-    {
-      "script": "final_recommend.py",
-      "reason": "就绪门控未通过（上游选股输入陈旧/缺失）"
-    }
-  ],
+  "update_time": "2026-09-07 22:00:01",
+  "run_start": "2026-09-07 21:15:30",
+  "ok": 9,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": []
 }
