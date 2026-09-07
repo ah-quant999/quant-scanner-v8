@@ -14,6 +14,11 @@
 本机可用环境变量 V8_FLAB_WORK 指到仓库外。2026-09-04 云端适配：REPO/WORK 自适应 + 链内跳过自带推送。
 """
 import baostock as bs, json, time, datetime as dt, re, os, subprocess, sys
+# 2026-09-07 一劳永逸：BaoStock 底层 socket 无超时保护，单只查询阻塞会永久挂死整轮
+#   （实测卡在 roe 进度 100/3195 静止 5 分钟+）。设全局 socket 超时 → 阻塞转为可捕获异常，
+#   配合 get_roe_ttm / 主循环的 try 兜底，卡住的个股自动跳过而不是拖死全链。
+import socket as _socket
+_socket.setdefaulttimeout(20)
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # 自适应：本机 E:/workspace/stock-scanner = 云端 checkout 根（2026-09-04 云端适配，根治硬编码路径致云端必挂）
 # 缓存目录：默认仓库内 raw_data/flab_work（随 git 提交 → 云端/双机共享热缓存，冷启动逐晚收敛）；
@@ -139,17 +144,22 @@ def get_kline_amt(code):
 
 def get_roe_ttm(code):
     series = {}
-    for y in ROE_YEARS:
-        for q in ROE_QTRS:
-            rp = bs.query_profit_data(code, year=y, quarter=q)
-            while rp.error_code == '0' and rp.next():
-                v = rp.get_row_data()
-                try:
-                    if len(v) > 3 and v[3] not in ("", "None"):
-                        series[f"{y}{q:02d}"] = float(v[3])
-                except Exception:
-                    pass
-            time.sleep(0.02)
+    # 2026-09-07：单只查询阻塞时跳过该股（socket 超时已设 20s），不拖死全链
+    try:
+        for y in ROE_YEARS:
+            for q in ROE_QTRS:
+                rp = bs.query_profit_data(code, year=y, quarter=q)
+                while rp.error_code == '0' and rp.next():
+                    v = rp.get_row_data()
+                    try:
+                        if len(v) > 3 and v[3] not in ("", "None"):
+                            series[f"{y}{q:02d}"] = float(v[3])
+                    except Exception:
+                        pass
+                time.sleep(0.02)
+    except Exception as e:
+        log("⚠️ ROE 查询异常跳过", code, type(e).__name__, str(e)[:60])
+        return None
     order = sorted(series.keys())
     if len(order) < 4:
         return None
