@@ -1,12 +1,12 @@
 {
   "date": "2026-09-07",
   "snapshot_date": "2026-09-07",
-  "snapshot_time": "2026-09-07 23:18:36",
+  "snapshot_time": "2026-09-07 23:57:39",
   "method": "涨幅≥3.0% + 量比≥1.2（4日均量，H 反推最小可行版）",
   "total_scanned": 9962,
   "skipped_no_quote": 2,
   "hit_chg_only": 1306,
-  "final_count": 941,
+  "final_count": 896,
   "candidates": [
     {
       "code": "300096",
@@ -29,8 +29,8 @@
       "price": 43.18,
       "prev_close": 36.99,
       "volume": 5082383.0,
-      "avg_vol_4d": 6858.75,
-      "vol_ratio": 741.007,
+      "avg_vol_4d": 6859.25,
+      "vol_ratio": 740.953,
       "industry": "橡胶和塑料制品业",
       "board": "创业板"
     },
@@ -94,8 +94,8 @@
       "price": 40.4,
       "prev_close": 36.65,
       "volume": 4065682.0,
-      "avg_vol_4d": 7283.0,
-      "vol_ratio": 558.243,
+      "avg_vol_4d": 7283.5,
+      "vol_ratio": 558.204,
       "industry": "金属制品业",
       "board": "创业板"
     },
@@ -146,8 +146,8 @@
       "price": 6.02,
       "prev_close": 5.47,
       "volume": 48724554.0,
-      "avg_vol_4d": 103498.0,
-      "vol_ratio": 470.778,
+      "avg_vol_4d": 103499.0,
+      "vol_ratio": 470.773,
       "industry": "通用设备制造业",
       "board": "主板"
     },
@@ -172,8 +172,8 @@
       "price": 25.89,
       "prev_close": 24.97,
       "volume": 17370358.0,
-      "avg_vol_4d": 37189.25,
-      "vol_ratio": 467.08,
+      "avg_vol_4d": 37190.0,
+      "vol_ratio": 467.071,
       "industry": "电气机械和器材制造业",
       "board": "创业板"
     },
@@ -237,8 +237,8 @@
       "price": 2.09,
       "prev_close": 1.94,
       "volume": 75890292.0,
-      "avg_vol_4d": 185207.5,
-      "vol_ratio": 409.758,
+      "avg_vol_4d": 185208.0,
+      "vol_ratio": 409.757,
       "industry": "通用设备制造业",
       "board": "主板"
     },
@@ -250,8 +250,8 @@
       "price": 36.08,
       "prev_close": 31.22,
       "volume": 14133292.0,
-      "avg_vol_4d": 35463.0,
-      "vol_ratio": 398.536,
+      "avg_vol_4d": 35463.5,
+      "vol_ratio": 398.531,
       "industry": "金属制品业",
       "board": "创业板"
     },
@@ -289,8 +289,8 @@
       "price": 46.1,
       "prev_close": 44.02,
       "volume": 3250417.0,
-      "avg_vol_4d": 8557.75,
-      "vol_ratio": 379.821,
+      "avg_vol_4d": 8558.5,
+      "vol_ratio": 379.788,
       "industry": "汽车制造业",
       "board": "主板"
     },
@@ -302,8 +302,8 @@
       "price": 9.83,
       "prev_close": 9.18,
       "volume": 37946513.0,
-      "avg_vol_4d": 100734.0,
-      "vol_ratio": 376.7,
+      "avg_vol_4d": 100734.5,
+      "vol_ratio": 376.698,
       "industry": "建筑装饰、装修和其他建筑业",
       "board": "主板"
     },
@@ -386,19 +386,6 @@
       "board": "主板"
     },
     {
-      "code": "688022",
-      "symbol": "sh688022",
-      "name": "ST瀚川",
-      "pct": 5.44,
-      "price": 9.49,
-      "prev_close": 9.0,
-      "volume": 4447108.0,
-      "avg_vol_4d": 13202.5,
-      "vol_ratio": 336.838,
-      "industry": "专用设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "301516",
       "symbol": "sz301516",
       "name": "中远通",
@@ -406,8 +393,8 @@
       "price": 19.98,
       "prev_close": 16.65,
       "volume": 29616244.0,
-      "avg_vol_4d": 93815.25,
-      "vol_ratio": 315.687,
+      "avg_vol_4d": 93816.0,
+      "vol_ratio": 315.684,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -458,8 +445,8 @@
       "price": 24.71,
       "prev_close": 22.19,
       "volume": 21640002.0,
-      "avg_vol_4d": 68880.0,
-      "vol_ratio": 314.17,
+      "avg_vol_4d": 68880.75,
+      "vol_ratio": 314.166,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -497,8 +484,8 @@
       "price": 4.6,
       "prev_close": 4.43,
       "volume": 34829204.0,
-      "avg_vol_4d": 110308.5,
-      "vol_ratio": 315.744,
+      "avg_vol_4d": 110308.75,
+      "vol_ratio": 315.743,
       "industry": "化学原料和化学制品制造业",
       "board": "主板"
     },
@@ -510,8 +497,8 @@
       "price": 48.84,
       "prev_close": 44.4,
       "volume": 14251530.0,
-      "avg_vol_4d": 46262.0,
-      "vol_ratio": 308.061,
+      "avg_vol_4d": 46262.25,
+      "vol_ratio": 308.06,
       "industry": "汽车制造业",
       "board": "主板"
     },
@@ -523,8 +510,8 @@
       "price": 19.0,
       "prev_close": 17.15,
       "volume": 25916452.0,
-      "avg_vol_4d": 86709.0,
-      "vol_ratio": 298.89,
+      "avg_vol_4d": 86709.25,
+      "vol_ratio": 298.889,
       "industry": "电气机械和器材制造业",
       "board": "创业板"
     },
@@ -536,8 +523,8 @@
       "price": 30.07,
       "prev_close": 27.34,
       "volume": 6166158.0,
-      "avg_vol_4d": 20763.0,
-      "vol_ratio": 296.978,
+      "avg_vol_4d": 20763.25,
+      "vol_ratio": 296.975,
       "industry": "电气机械和器材制造业",
       "board": "主板"
     },
@@ -562,7 +549,7 @@
       "price": 16.01,
       "prev_close": 14.55,
       "volume": 85400671.0,
-      "avg_vol_4d": 293935.5,
+      "avg_vol_4d": 293935.75,
       "vol_ratio": 290.542,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
@@ -601,8 +588,8 @@
       "price": 84.5,
       "prev_close": 72.46,
       "volume": 25370629.0,
-      "avg_vol_4d": 91346.0,
-      "vol_ratio": 277.742,
+      "avg_vol_4d": 91346.25,
+      "vol_ratio": 277.741,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -627,8 +614,8 @@
       "price": 11.54,
       "prev_close": 10.96,
       "volume": 22100564.0,
-      "avg_vol_4d": 78214.0,
-      "vol_ratio": 282.565,
+      "avg_vol_4d": 78214.5,
+      "vol_ratio": 282.564,
       "industry": "批发业",
       "board": "主板"
     },
@@ -692,8 +679,8 @@
       "price": 99.59,
       "prev_close": 93.8,
       "volume": 2615951.0,
-      "avg_vol_4d": 9430.25,
-      "vol_ratio": 277.4,
+      "avg_vol_4d": 9431.0,
+      "vol_ratio": 277.378,
       "industry": "汽车制造业",
       "board": "创业板"
     },
@@ -731,8 +718,8 @@
       "price": 34.52,
       "prev_close": 30.33,
       "volume": 12968655.0,
-      "avg_vol_4d": 48710.5,
-      "vol_ratio": 266.239,
+      "avg_vol_4d": 48710.75,
+      "vol_ratio": 266.238,
       "industry": "专用设备制造业",
       "board": "创业板"
     },
@@ -744,8 +731,8 @@
       "price": 68.05,
       "prev_close": 61.86,
       "volume": 12121999.0,
-      "avg_vol_4d": 45863.25,
-      "vol_ratio": 264.307,
+      "avg_vol_4d": 45863.5,
+      "vol_ratio": 264.306,
       "industry": "电气机械和器材制造业",
       "board": "主板"
     },
@@ -757,23 +744,10 @@
       "price": 25.88,
       "prev_close": 24.39,
       "volume": 12502339.0,
-      "avg_vol_4d": 47657.75,
-      "vol_ratio": 262.336,
+      "avg_vol_4d": 47658.0,
+      "vol_ratio": 262.335,
       "industry": "生态保护和环境治理业",
       "board": "创业板"
-    },
-    {
-      "code": "688698",
-      "symbol": "sh688698",
-      "name": "伟创电气",
-      "pct": 8.48,
-      "price": 44.5,
-      "prev_close": 41.02,
-      "volume": 7969892.0,
-      "avg_vol_4d": 30812.0,
-      "vol_ratio": 258.662,
-      "industry": "仪器仪表制造业",
-      "board": "科创板"
     },
     {
       "code": "603668",
@@ -796,23 +770,10 @@
       "price": 9.54,
       "prev_close": 9.16,
       "volume": 32086853.0,
-      "avg_vol_4d": 124133.75,
+      "avg_vol_4d": 124134.0,
       "vol_ratio": 258.486,
       "industry": "医药制造业",
       "board": "主板"
-    },
-    {
-      "code": "688047",
-      "symbol": "sh688047",
-      "name": "龙芯中科",
-      "pct": 3.51,
-      "price": 105.48,
-      "prev_close": 101.9,
-      "volume": 6166698.0,
-      "avg_vol_4d": 23872.75,
-      "vol_ratio": 258.315,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "600770",
@@ -822,7 +783,7 @@
       "price": 5.59,
       "prev_close": 5.08,
       "volume": 42010293.0,
-      "avg_vol_4d": 167305.0,
+      "avg_vol_4d": 167305.25,
       "vol_ratio": 251.1,
       "industry": "电力、热力生产和供应业",
       "board": "主板"
@@ -835,8 +796,8 @@
       "price": 60.5,
       "prev_close": 54.52,
       "volume": 6411851.0,
-      "avg_vol_4d": 25626.5,
-      "vol_ratio": 250.204,
+      "avg_vol_4d": 25627.25,
+      "vol_ratio": 250.197,
       "industry": "汽车制造业",
       "board": "创业板"
     },
@@ -880,19 +841,6 @@
       "board": "创业板"
     },
     {
-      "code": "688700",
-      "symbol": "sh688700",
-      "name": "东威科技",
-      "pct": 15.09,
-      "price": 61.85,
-      "prev_close": 53.74,
-      "volume": 26802965.0,
-      "avg_vol_4d": 111511.75,
-      "vol_ratio": 240.36,
-      "industry": "专用设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "301529",
       "symbol": "sz301529",
       "name": "福赛科技",
@@ -900,8 +848,8 @@
       "price": 125.7,
       "prev_close": 107.0,
       "volume": 6173998.0,
-      "avg_vol_4d": 25969.75,
-      "vol_ratio": 237.738,
+      "avg_vol_4d": 25970.0,
+      "vol_ratio": 237.736,
       "industry": "汽车制造业",
       "board": "创业板"
     },
@@ -932,19 +880,6 @@
       "board": "主板"
     },
     {
-      "code": "688208",
-      "symbol": "sh688208",
-      "name": "道通科技",
-      "pct": 6.31,
-      "price": 27.3,
-      "prev_close": 25.68,
-      "volume": 15783421.0,
-      "avg_vol_4d": 64785.5,
-      "vol_ratio": 243.626,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "002985",
       "symbol": "sz002985",
       "name": "北摩高科",
@@ -952,8 +887,8 @@
       "price": 29.18,
       "prev_close": 27.71,
       "volume": 11390196.0,
-      "avg_vol_4d": 47024.0,
-      "vol_ratio": 242.221,
+      "avg_vol_4d": 47024.5,
+      "vol_ratio": 242.218,
       "industry": "铁路、船舶、航空航天和其他运输设备制造业",
       "board": "主板"
     },
@@ -965,8 +900,8 @@
       "price": 29.0,
       "prev_close": 26.14,
       "volume": 15584756.0,
-      "avg_vol_4d": 65406.5,
-      "vol_ratio": 238.275,
+      "avg_vol_4d": 65406.75,
+      "vol_ratio": 238.274,
       "industry": "专业技术服务业",
       "board": "创业板"
     },
@@ -1004,7 +939,7 @@
       "price": 2.25,
       "prev_close": 2.12,
       "volume": 135660032.0,
-      "avg_vol_4d": 569752.75,
+      "avg_vol_4d": 569753.0,
       "vol_ratio": 238.103,
       "industry": "渔业",
       "board": "主板"
@@ -1017,36 +952,10 @@
       "price": 7.62,
       "prev_close": 7.2,
       "volume": 36666077.0,
-      "avg_vol_4d": 153972.0,
-      "vol_ratio": 238.135,
+      "avg_vol_4d": 153972.25,
+      "vol_ratio": 238.134,
       "industry": "零售业",
       "board": "主板"
-    },
-    {
-      "code": "688190",
-      "symbol": "sh688190",
-      "name": "云路股份",
-      "pct": 4.4,
-      "price": 76.2,
-      "prev_close": 72.99,
-      "volume": 1681524.0,
-      "avg_vol_4d": 7042.5,
-      "vol_ratio": 238.768,
-      "industry": "黑色金属冶炼和压延加工业",
-      "board": "科创板"
-    },
-    {
-      "code": "688188",
-      "symbol": "sh688188",
-      "name": "柏楚电子",
-      "pct": 5.52,
-      "price": 101.3,
-      "prev_close": 96.0,
-      "volume": 4266828.0,
-      "avg_vol_4d": 18053.25,
-      "vol_ratio": 236.347,
-      "industry": "软件和信息技术服务业",
-      "board": "科创板"
     },
     {
       "code": "000978",
@@ -1056,8 +965,8 @@
       "price": 7.28,
       "prev_close": 6.62,
       "volume": 59267087.0,
-      "avg_vol_4d": 254132.0,
-      "vol_ratio": 233.214,
+      "avg_vol_4d": 254133.0,
+      "vol_ratio": 233.213,
       "industry": "公共设施管理业",
       "board": "主板"
     },
@@ -1101,19 +1010,6 @@
       "board": "主板"
     },
     {
-      "code": "688060",
-      "symbol": "sh688060",
-      "name": "云涌科技",
-      "pct": 5.69,
-      "price": 37.92,
-      "prev_close": 35.88,
-      "volume": 789349.0,
-      "avg_vol_4d": 3409.5,
-      "vol_ratio": 231.515,
-      "industry": "软件和信息技术服务业",
-      "board": "科创板"
-    },
-    {
       "code": "002650",
       "symbol": "sz002650",
       "name": "ST加加",
@@ -1134,7 +1030,7 @@
       "price": 3.25,
       "prev_close": 2.95,
       "volume": 113527892.0,
-      "avg_vol_4d": 505901.5,
+      "avg_vol_4d": 505901.75,
       "vol_ratio": 224.407,
       "industry": "通用设备制造业",
       "board": "主板"
@@ -1147,8 +1043,8 @@
       "price": 69.64,
       "prev_close": 66.76,
       "volume": 2027700.0,
-      "avg_vol_4d": 8909.5,
-      "vol_ratio": 227.589,
+      "avg_vol_4d": 8909.75,
+      "vol_ratio": 227.582,
       "industry": "铁路、船舶、航空航天和其他运输设备制造业",
       "board": "主板"
     },
@@ -1173,8 +1069,8 @@
       "price": 90.05,
       "prev_close": 84.23,
       "volume": 24512201.0,
-      "avg_vol_4d": 109402.25,
-      "vol_ratio": 224.056,
+      "avg_vol_4d": 109402.5,
+      "vol_ratio": 224.055,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
     },
@@ -1212,8 +1108,8 @@
       "price": 11.06,
       "prev_close": 10.48,
       "volume": 24858133.0,
-      "avg_vol_4d": 111297.5,
-      "vol_ratio": 223.349,
+      "avg_vol_4d": 111298.0,
+      "vol_ratio": 223.348,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
     },
@@ -1225,8 +1121,8 @@
       "price": 55.27,
       "prev_close": 52.66,
       "volume": 1937361.0,
-      "avg_vol_4d": 8671.5,
-      "vol_ratio": 223.417,
+      "avg_vol_4d": 8671.75,
+      "vol_ratio": 223.411,
       "industry": "生态保护和环境治理业",
       "board": "创业板"
     },
@@ -1264,8 +1160,8 @@
       "price": 14.1,
       "prev_close": 13.53,
       "volume": 4313700.0,
-      "avg_vol_4d": 19362.25,
-      "vol_ratio": 222.789,
+      "avg_vol_4d": 19362.5,
+      "vol_ratio": 222.786,
       "industry": "食品制造业",
       "board": "主板"
     },
@@ -1277,8 +1173,8 @@
       "price": 9.53,
       "prev_close": 9.02,
       "volume": 9285102.0,
-      "avg_vol_4d": 42138.5,
-      "vol_ratio": 220.347,
+      "avg_vol_4d": 42139.25,
+      "vol_ratio": 220.343,
       "industry": "专用设备制造业",
       "board": "主板"
     },
@@ -1329,23 +1225,10 @@
       "price": 6.63,
       "prev_close": 6.03,
       "volume": 22592473.0,
-      "avg_vol_4d": 105638.0,
-      "vol_ratio": 213.867,
+      "avg_vol_4d": 105638.25,
+      "vol_ratio": 213.866,
       "industry": "新闻和出版业",
       "board": "主板"
-    },
-    {
-      "code": "688628",
-      "symbol": "sh688628",
-      "name": "优利德",
-      "pct": 8.96,
-      "price": 83.42,
-      "prev_close": 76.56,
-      "volume": 6607366.0,
-      "avg_vol_4d": 30835.75,
-      "vol_ratio": 214.276,
-      "industry": "仪器仪表制造业",
-      "board": "科创板"
     },
     {
       "code": "688123",
@@ -1387,19 +1270,6 @@
       "board": "创业板"
     },
     {
-      "code": "688496",
-      "symbol": "sh688496",
-      "name": "*ST清越",
-      "pct": 7.87,
-      "price": 0.96,
-      "prev_close": 0.89,
-      "volume": 10416803.0,
-      "avg_vol_4d": 49244.75,
-      "vol_ratio": 211.531,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "603679",
       "symbol": "sh603679",
       "name": "华体科技",
@@ -1411,19 +1281,6 @@
       "vol_ratio": 209.51,
       "industry": "电气机械和器材制造业",
       "board": "主板"
-    },
-    {
-      "code": "688498",
-      "symbol": "sh688498",
-      "name": "源杰科技",
-      "pct": 16.1,
-      "price": 1702.0,
-      "prev_close": 1466.0,
-      "volume": 5639919.0,
-      "avg_vol_4d": 27608.5,
-      "vol_ratio": 204.282,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "000523",
@@ -1459,7 +1316,7 @@
       "price": 13.93,
       "prev_close": 12.66,
       "volume": 14605460.0,
-      "avg_vol_4d": 71043.25,
+      "avg_vol_4d": 71043.5,
       "vol_ratio": 205.585,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
@@ -1485,7 +1342,7 @@
       "price": 122.65,
       "prev_close": 111.5,
       "volume": 80100147.0,
-      "avg_vol_4d": 389941.25,
+      "avg_vol_4d": 389942.0,
       "vol_ratio": 205.416,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
@@ -1498,23 +1355,10 @@
       "price": 41.4,
       "prev_close": 39.45,
       "volume": 4935837.0,
-      "avg_vol_4d": 23808.75,
-      "vol_ratio": 207.312,
+      "avg_vol_4d": 23809.25,
+      "vol_ratio": 207.308,
       "industry": "铁路、船舶、航空航天和其他运输设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "001223",
-      "symbol": "sz001223",
-      "name": "欧克科技",
-      "pct": 7.07,
-      "price": 41.36,
-      "prev_close": 38.63,
-      "volume": 3067976.0,
-      "avg_vol_4d": 14940.75,
-      "vol_ratio": 205.343,
-      "industry": "专用设备制造业",
-      "board": "主板"
     },
     {
       "code": "605388",
@@ -1527,6 +1371,19 @@
       "avg_vol_4d": 86547.5,
       "vol_ratio": 206.699,
       "industry": "酒、饮料和精制茶制造业",
+      "board": "主板"
+    },
+    {
+      "code": "001223",
+      "symbol": "sz001223",
+      "name": "欧克科技",
+      "pct": 7.07,
+      "price": 41.36,
+      "prev_close": 38.63,
+      "volume": 3067976.0,
+      "avg_vol_4d": 14941.75,
+      "vol_ratio": 205.329,
+      "industry": "专用设备制造业",
       "board": "主板"
     },
     {
@@ -1576,8 +1433,8 @@
       "price": 86.96,
       "prev_close": 75.59,
       "volume": 9806551.0,
-      "avg_vol_4d": 49617.75,
-      "vol_ratio": 197.642,
+      "avg_vol_4d": 49618.25,
+      "vol_ratio": 197.64,
       "industry": "专用设备制造业",
       "board": "创业板"
     },
@@ -1602,8 +1459,8 @@
       "price": 30.58,
       "prev_close": 29.13,
       "volume": 2477989.0,
-      "avg_vol_4d": 12196.5,
-      "vol_ratio": 203.172,
+      "avg_vol_4d": 12197.0,
+      "vol_ratio": 203.164,
       "industry": "化学原料和化学制品制造业",
       "board": "创业板"
     },
@@ -1732,8 +1589,8 @@
       "price": 10.44,
       "prev_close": 9.97,
       "volume": 27493709.0,
-      "avg_vol_4d": 137930.5,
-      "vol_ratio": 199.33,
+      "avg_vol_4d": 137931.5,
+      "vol_ratio": 199.329,
       "industry": "专业技术服务业",
       "board": "主板"
     },
@@ -1745,7 +1602,7 @@
       "price": 1.6,
       "prev_close": 1.45,
       "volume": 165128178.0,
-      "avg_vol_4d": 844929.75,
+      "avg_vol_4d": 844930.25,
       "vol_ratio": 195.434,
       "industry": "批发业",
       "board": "主板"
@@ -1771,8 +1628,8 @@
       "price": 61.3,
       "prev_close": 57.35,
       "volume": 18675528.0,
-      "avg_vol_4d": 94712.25,
-      "vol_ratio": 197.182,
+      "avg_vol_4d": 94712.5,
+      "vol_ratio": 197.181,
       "industry": "电气机械和器材制造业",
       "board": "主板"
     },
@@ -1927,7 +1784,7 @@
       "price": 51.13,
       "prev_close": 48.85,
       "volume": 22264576.0,
-      "avg_vol_4d": 114801.75,
+      "avg_vol_4d": 114802.0,
       "vol_ratio": 193.939,
       "industry": "通用设备制造业",
       "board": "主板"
@@ -1940,36 +1797,10 @@
       "price": 38.6,
       "prev_close": 35.93,
       "volume": 33526590.0,
-      "avg_vol_4d": 176118.5,
-      "vol_ratio": 190.364,
+      "avg_vol_4d": 176119.0,
+      "vol_ratio": 190.363,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
-    },
-    {
-      "code": "688010",
-      "symbol": "sh688010",
-      "name": "福光股份",
-      "pct": 8.57,
-      "price": 27.25,
-      "prev_close": 25.1,
-      "volume": 7078893.0,
-      "avg_vol_4d": 37393.75,
-      "vol_ratio": 189.307,
-      "industry": "仪器仪表制造业",
-      "board": "科创板"
-    },
-    {
-      "code": "688765",
-      "symbol": "sh688765",
-      "name": "禾元生物",
-      "pct": 4.04,
-      "price": 38.08,
-      "prev_close": 36.6,
-      "volume": 4505936.0,
-      "avg_vol_4d": 23441.5,
-      "vol_ratio": 192.22,
-      "industry": "医药制造业",
-      "board": "科创板"
     },
     {
       "code": "603124",
@@ -2018,8 +1849,8 @@
       "price": 21.13,
       "prev_close": 19.75,
       "volume": 17277300.0,
-      "avg_vol_4d": 92357.0,
-      "vol_ratio": 187.071,
+      "avg_vol_4d": 92358.0,
+      "vol_ratio": 187.069,
       "industry": "零售业",
       "board": "主板"
     },
@@ -2044,8 +1875,8 @@
       "price": 12.24,
       "prev_close": 11.62,
       "volume": 9354520.0,
-      "avg_vol_4d": 49821.25,
-      "vol_ratio": 187.762,
+      "avg_vol_4d": 49821.5,
+      "vol_ratio": 187.761,
       "industry": "仪器仪表制造业",
       "board": "主板"
     },
@@ -2057,8 +1888,8 @@
       "price": 18.03,
       "prev_close": 17.23,
       "volume": 7386859.0,
-      "avg_vol_4d": 39244.75,
-      "vol_ratio": 188.225,
+      "avg_vol_4d": 39245.5,
+      "vol_ratio": 188.222,
       "industry": "汽车制造业",
       "board": "主板"
     },
@@ -2070,8 +1901,8 @@
       "price": 42.19,
       "prev_close": 39.44,
       "volume": 15823330.0,
-      "avg_vol_4d": 84788.0,
-      "vol_ratio": 186.622,
+      "avg_vol_4d": 84788.5,
+      "vol_ratio": 186.621,
       "industry": "电气机械和器材制造业",
       "board": "主板"
     },
@@ -2083,7 +1914,7 @@
       "price": 4.5,
       "prev_close": 4.36,
       "volume": 24531348.0,
-      "avg_vol_4d": 130718.75,
+      "avg_vol_4d": 130719.0,
       "vol_ratio": 187.665,
       "industry": "食品制造业",
       "board": "主板"
@@ -2096,8 +1927,8 @@
       "price": 12.31,
       "prev_close": 11.75,
       "volume": 13719200.0,
-      "avg_vol_4d": 73617.0,
-      "vol_ratio": 186.359,
+      "avg_vol_4d": 73617.25,
+      "vol_ratio": 186.358,
       "industry": "化学原料和化学制品制造业",
       "board": "主板"
     },
@@ -2122,8 +1953,8 @@
       "price": 61.03,
       "prev_close": 56.7,
       "volume": 6604897.0,
-      "avg_vol_4d": 35950.5,
-      "vol_ratio": 183.722,
+      "avg_vol_4d": 35951.0,
+      "vol_ratio": 183.719,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -2139,19 +1970,6 @@
       "vol_ratio": 184.249,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
-    },
-    {
-      "code": "688635",
-      "symbol": "sh688635",
-      "name": "长进光子",
-      "pct": 7.68,
-      "price": 282.45,
-      "prev_close": 262.3,
-      "volume": 2391446.0,
-      "avg_vol_4d": 13033.75,
-      "vol_ratio": 183.481,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "600857",
@@ -2226,8 +2044,8 @@
       "price": 48.94,
       "prev_close": 44.49,
       "volume": 42027157.0,
-      "avg_vol_4d": 234996.0,
-      "vol_ratio": 178.842,
+      "avg_vol_4d": 234996.75,
+      "vol_ratio": 178.841,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
     },
@@ -2239,7 +2057,7 @@
       "price": 3.15,
       "prev_close": 2.86,
       "volume": 62241123.0,
-      "avg_vol_4d": 349320.0,
+      "avg_vol_4d": 349320.25,
       "vol_ratio": 178.178,
       "industry": "纺织服装、服饰业",
       "board": "主板"
@@ -2252,8 +2070,8 @@
       "price": 12.36,
       "prev_close": 11.44,
       "volume": 21169415.0,
-      "avg_vol_4d": 117904.0,
-      "vol_ratio": 179.548,
+      "avg_vol_4d": 117904.5,
+      "vol_ratio": 179.547,
       "industry": "电气机械和器材制造业",
       "board": "主板"
     },
@@ -2265,8 +2083,8 @@
       "price": 11.08,
       "prev_close": 10.57,
       "volume": 8629203.0,
-      "avg_vol_4d": 47511.75,
-      "vol_ratio": 181.623,
+      "avg_vol_4d": 47512.25,
+      "vol_ratio": 181.621,
       "industry": "纺织业",
       "board": "创业板"
     },
@@ -2323,19 +2141,6 @@
       "board": "主板"
     },
     {
-      "code": "688102",
-      "symbol": "sh688102",
-      "name": "斯瑞新材",
-      "pct": 5.94,
-      "price": 32.48,
-      "prev_close": 30.66,
-      "volume": 16744270.0,
-      "avg_vol_4d": 93155.75,
-      "vol_ratio": 179.745,
-      "industry": "有色金属冶炼和压延加工业",
-      "board": "科创板"
-    },
-    {
       "code": "001389",
       "symbol": "sz001389",
       "name": "广合科技",
@@ -2356,8 +2161,8 @@
       "price": 45.08,
       "prev_close": 42.05,
       "volume": 7883213.0,
-      "avg_vol_4d": 44254.0,
-      "vol_ratio": 178.136,
+      "avg_vol_4d": 44254.25,
+      "vol_ratio": 178.135,
       "industry": "燃气生产和供应业",
       "board": "主板"
     },
@@ -2395,8 +2200,8 @@
       "price": 15.54,
       "prev_close": 14.89,
       "volume": 13625095.0,
-      "avg_vol_4d": 75856.25,
-      "vol_ratio": 179.617,
+      "avg_vol_4d": 75856.75,
+      "vol_ratio": 179.616,
       "industry": "生态保护和环境治理业",
       "board": "主板"
     },
@@ -2408,8 +2213,8 @@
       "price": 10.62,
       "prev_close": 10.29,
       "volume": 15519654.0,
-      "avg_vol_4d": 86091.5,
-      "vol_ratio": 180.269,
+      "avg_vol_4d": 86092.0,
+      "vol_ratio": 180.268,
       "industry": "燃气生产和供应业",
       "board": "主板"
     },
@@ -2434,8 +2239,8 @@
       "price": 16.35,
       "prev_close": 15.47,
       "volume": 14389476.0,
-      "avg_vol_4d": 80938.0,
-      "vol_ratio": 177.784,
+      "avg_vol_4d": 80938.5,
+      "vol_ratio": 177.783,
       "industry": "多式联运和运输代理业",
       "board": "创业板"
     },
@@ -2460,8 +2265,8 @@
       "price": 52.49,
       "prev_close": 47.72,
       "volume": 9658032.0,
-      "avg_vol_4d": 55370.25,
-      "vol_ratio": 174.426,
+      "avg_vol_4d": 55370.75,
+      "vol_ratio": 174.425,
       "industry": "商务服务业",
       "board": "主板"
     },
@@ -2486,8 +2291,8 @@
       "price": 69.01,
       "prev_close": 65.06,
       "volume": 4386304.0,
-      "avg_vol_4d": 24884.25,
-      "vol_ratio": 176.268,
+      "avg_vol_4d": 24884.75,
+      "vol_ratio": 176.265,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -2525,8 +2330,8 @@
       "price": 5.94,
       "prev_close": 5.74,
       "volume": 32461020.0,
-      "avg_vol_4d": 183228.25,
-      "vol_ratio": 177.162,
+      "avg_vol_4d": 183228.5,
+      "vol_ratio": 177.161,
       "industry": "公共设施管理业",
       "board": "主板"
     },
@@ -2564,8 +2369,8 @@
       "price": 60.3,
       "prev_close": 57.28,
       "volume": 4473182.0,
-      "avg_vol_4d": 25483.75,
-      "vol_ratio": 175.531,
+      "avg_vol_4d": 25484.0,
+      "vol_ratio": 175.529,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -2577,8 +2382,8 @@
       "price": 26.52,
       "prev_close": 24.49,
       "volume": 6574460.0,
-      "avg_vol_4d": 37894.5,
-      "vol_ratio": 173.494,
+      "avg_vol_4d": 37895.25,
+      "vol_ratio": 173.49,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -2590,8 +2395,8 @@
       "price": 31.32,
       "prev_close": 29.81,
       "volume": 18746390.0,
-      "avg_vol_4d": 107098.5,
-      "vol_ratio": 175.039,
+      "avg_vol_4d": 107099.25,
+      "vol_ratio": 175.038,
       "industry": "电气机械和器材制造业",
       "board": "主板"
     },
@@ -2635,19 +2440,6 @@
       "board": "创业板"
     },
     {
-      "code": "688661",
-      "symbol": "sh688661",
-      "name": "和林微纳",
-      "pct": 7.48,
-      "price": 104.15,
-      "prev_close": 96.9,
-      "volume": 5253937.0,
-      "avg_vol_4d": 30546.75,
-      "vol_ratio": 171.997,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "603150",
       "symbol": "sh603150",
       "name": "万朗磁塑",
@@ -2668,7 +2460,7 @@
       "price": 6.09,
       "prev_close": 5.9,
       "volume": 13584275.0,
-      "avg_vol_4d": 77879.25,
+      "avg_vol_4d": 77879.5,
       "vol_ratio": 174.427,
       "industry": "建筑装饰、装修和其他建筑业",
       "board": "主板"
@@ -2681,23 +2473,10 @@
       "price": 14.42,
       "prev_close": 13.87,
       "volume": 7110644.0,
-      "avg_vol_4d": 40957.75,
-      "vol_ratio": 173.609,
+      "avg_vol_4d": 40958.0,
+      "vol_ratio": 173.608,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
-    },
-    {
-      "code": "688017",
-      "symbol": "sh688017",
-      "name": "绿的谐波",
-      "pct": 5.42,
-      "price": 294.96,
-      "prev_close": 279.8,
-      "volume": 9480914.0,
-      "avg_vol_4d": 54943.5,
-      "vol_ratio": 172.558,
-      "industry": "通用设备制造业",
-      "board": "科创板"
     },
     {
       "code": "603322",
@@ -2739,19 +2518,6 @@
       "board": "创业板"
     },
     {
-      "code": "688416",
-      "symbol": "sh688416",
-      "name": "恒烁股份",
-      "pct": 8.36,
-      "price": 76.84,
-      "prev_close": 70.91,
-      "volume": 7091984.0,
-      "avg_vol_4d": 41879.25,
-      "vol_ratio": 169.344,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "688677",
       "symbol": "sh688677",
       "name": "海泰新光",
@@ -2785,7 +2551,7 @@
       "price": 8.87,
       "prev_close": 8.3,
       "volume": 32675342.0,
-      "avg_vol_4d": 193181.5,
+      "avg_vol_4d": 193181.75,
       "vol_ratio": 169.143,
       "industry": "土木工程建筑业",
       "board": "主板"
@@ -2902,7 +2668,7 @@
       "price": 20.75,
       "prev_close": 19.84,
       "volume": 32358815.0,
-      "avg_vol_4d": 192030.5,
+      "avg_vol_4d": 192030.75,
       "vol_ratio": 168.509,
       "industry": "综合",
       "board": "主板"
@@ -2915,7 +2681,7 @@
       "price": 11.7,
       "prev_close": 11.1,
       "volume": 71540703.0,
-      "avg_vol_4d": 426199.25,
+      "avg_vol_4d": 426199.75,
       "vol_ratio": 167.857,
       "industry": "汽车制造业",
       "board": "主板"
@@ -2928,23 +2694,10 @@
       "price": 69.59,
       "prev_close": 64.55,
       "volume": 7361651.0,
-      "avg_vol_4d": 44281.25,
-      "vol_ratio": 166.248,
+      "avg_vol_4d": 44282.0,
+      "vol_ratio": 166.245,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688135",
-      "symbol": "sh688135",
-      "name": "利扬芯片",
-      "pct": 7.82,
-      "price": 29.49,
-      "prev_close": 27.35,
-      "volume": 15292566.0,
-      "avg_vol_4d": 92010.0,
-      "vol_ratio": 166.205,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "300752",
@@ -2954,23 +2707,10 @@
       "price": 11.59,
       "prev_close": 11.02,
       "volume": 8614305.0,
-      "avg_vol_4d": 51394.5,
-      "vol_ratio": 167.611,
+      "avg_vol_4d": 51395.25,
+      "vol_ratio": 167.609,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688800",
-      "symbol": "sh688800",
-      "name": "瑞可达",
-      "pct": 9.05,
-      "price": 63.5,
-      "prev_close": 58.23,
-      "volume": 15836143.0,
-      "avg_vol_4d": 96538.75,
-      "vol_ratio": 164.039,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "605358",
@@ -2980,7 +2720,7 @@
       "price": 42.79,
       "prev_close": 40.15,
       "volume": 37520578.0,
-      "avg_vol_4d": 227171.0,
+      "avg_vol_4d": 227171.25,
       "vol_ratio": 165.164,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
@@ -2993,8 +2733,8 @@
       "price": 274.03,
       "prev_close": 252.9,
       "volume": 30841661.0,
-      "avg_vol_4d": 188557.25,
-      "vol_ratio": 163.567,
+      "avg_vol_4d": 188557.75,
+      "vol_ratio": 163.566,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -3010,19 +2750,6 @@
       "vol_ratio": 164.268,
       "industry": "造纸和纸制品业",
       "board": "主板"
-    },
-    {
-      "code": "688618",
-      "symbol": "sh688618",
-      "name": "三旺通信",
-      "pct": 6.02,
-      "price": 30.65,
-      "prev_close": 28.91,
-      "volume": 2487137.0,
-      "avg_vol_4d": 15210.5,
-      "vol_ratio": 163.514,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "000952",
@@ -3103,19 +2830,6 @@
       "board": "主板"
     },
     {
-      "code": "688031",
-      "symbol": "sh688031",
-      "name": "星环科技",
-      "pct": 10.5,
-      "price": 117.0,
-      "prev_close": 105.88,
-      "volume": 10914731.0,
-      "avg_vol_4d": 68664.5,
-      "vol_ratio": 158.957,
-      "industry": "软件和信息技术服务业",
-      "board": "科创板"
-    },
-    {
       "code": "603708",
       "symbol": "sh603708",
       "name": "家家悦",
@@ -3123,8 +2837,8 @@
       "price": 9.71,
       "prev_close": 9.42,
       "volume": 14224978.0,
-      "avg_vol_4d": 86825.5,
-      "vol_ratio": 163.834,
+      "avg_vol_4d": 86826.25,
+      "vol_ratio": 163.833,
       "industry": "零售业",
       "board": "主板"
     },
@@ -3149,7 +2863,7 @@
       "price": 12.22,
       "prev_close": 11.81,
       "volume": 27419966.0,
-      "avg_vol_4d": 168096.5,
+      "avg_vol_4d": 168097.25,
       "vol_ratio": 163.12,
       "industry": "电气机械和器材制造业",
       "board": "主板"
@@ -3181,19 +2895,6 @@
       "board": "主板"
     },
     {
-      "code": "600467",
-      "symbol": "sh600467",
-      "name": "好当家",
-      "pct": 3.27,
-      "price": 2.53,
-      "prev_close": 2.45,
-      "volume": 62994245.0,
-      "avg_vol_4d": 387978.0,
-      "vol_ratio": 162.366,
-      "industry": "渔业",
-      "board": "主板"
-    },
-    {
       "code": "300852",
       "symbol": "sz300852",
       "name": "四会富仕",
@@ -3207,6 +2908,19 @@
       "board": "创业板"
     },
     {
+      "code": "600467",
+      "symbol": "sh600467",
+      "name": "好当家",
+      "pct": 3.27,
+      "price": 2.53,
+      "prev_close": 2.45,
+      "volume": 62994245.0,
+      "avg_vol_4d": 387978.5,
+      "vol_ratio": 162.365,
+      "industry": "渔业",
+      "board": "主板"
+    },
+    {
       "code": "301132",
       "symbol": "sz301132",
       "name": "满坤科技",
@@ -3214,8 +2928,8 @@
       "price": 41.33,
       "prev_close": 38.58,
       "volume": 6507615.0,
-      "avg_vol_4d": 40745.75,
-      "vol_ratio": 159.713,
+      "avg_vol_4d": 40746.25,
+      "vol_ratio": 159.711,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -3285,19 +2999,6 @@
       "board": "创业板"
     },
     {
-      "code": "688332",
-      "symbol": "sh688332",
-      "name": "中科蓝讯",
-      "pct": 6.42,
-      "price": 98.53,
-      "prev_close": 92.59,
-      "volume": 8472720.0,
-      "avg_vol_4d": 53104.75,
-      "vol_ratio": 159.547,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "600156",
       "symbol": "sh600156",
       "name": "华升股份",
@@ -3331,7 +3032,7 @@
       "price": 17.08,
       "prev_close": 16.0,
       "volume": 59237753.0,
-      "avg_vol_4d": 373908.5,
+      "avg_vol_4d": 373909.0,
       "vol_ratio": 158.428,
       "industry": "化学原料和化学制品制造业",
       "board": "主板"
@@ -3344,7 +3045,7 @@
       "price": 51.25,
       "prev_close": 46.59,
       "volume": 15369245.0,
-      "avg_vol_4d": 98425.25,
+      "avg_vol_4d": 98425.75,
       "vol_ratio": 156.151,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
@@ -3370,8 +3071,8 @@
       "price": 10.1,
       "prev_close": 9.68,
       "volume": 4406966.0,
-      "avg_vol_4d": 27656.75,
-      "vol_ratio": 159.345,
+      "avg_vol_4d": 27657.25,
+      "vol_ratio": 159.342,
       "industry": "商务服务业",
       "board": "创业板"
     },
@@ -3422,23 +3123,10 @@
       "price": 19.06,
       "prev_close": 18.25,
       "volume": 27433966.0,
-      "avg_vol_4d": 174320.25,
-      "vol_ratio": 157.377,
+      "avg_vol_4d": 174321.0,
+      "vol_ratio": 157.376,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688313",
-      "symbol": "sh688313",
-      "name": "仕佳光子",
-      "pct": 9.38,
-      "price": 154.91,
-      "prev_close": 141.62,
-      "volume": 21977137.0,
-      "avg_vol_4d": 142689.25,
-      "vol_ratio": 154.021,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "000608",
@@ -3448,7 +3136,7 @@
       "price": 7.83,
       "prev_close": 7.36,
       "volume": 46894826.0,
-      "avg_vol_4d": 300673.0,
+      "avg_vol_4d": 300673.25,
       "vol_ratio": 155.966,
       "industry": "房地产业",
       "board": "主板"
@@ -3461,8 +3149,8 @@
       "price": 7.78,
       "prev_close": 7.55,
       "volume": 26869506.0,
-      "avg_vol_4d": 170076.25,
-      "vol_ratio": 157.985,
+      "avg_vol_4d": 170077.25,
+      "vol_ratio": 157.984,
       "industry": "零售业",
       "board": "主板"
     },
@@ -3474,8 +3162,8 @@
       "price": 48.56,
       "prev_close": 47.13,
       "volume": 2363042.0,
-      "avg_vol_4d": 14957.25,
-      "vol_ratio": 157.986,
+      "avg_vol_4d": 14957.5,
+      "vol_ratio": 157.984,
       "industry": "仪器仪表制造业",
       "board": "主板"
     },
@@ -3487,8 +3175,8 @@
       "price": 21.17,
       "prev_close": 20.33,
       "volume": 14765235.0,
-      "avg_vol_4d": 93920.5,
-      "vol_ratio": 157.21,
+      "avg_vol_4d": 93921.0,
+      "vol_ratio": 157.209,
       "industry": "住宿业",
       "board": "创业板"
     },
@@ -3539,7 +3227,7 @@
       "price": 17.58,
       "prev_close": 15.98,
       "volume": 51146062.0,
-      "avg_vol_4d": 335470.0,
+      "avg_vol_4d": 335470.5,
       "vol_ratio": 152.461,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
@@ -3565,8 +3253,8 @@
       "price": 40.92,
       "prev_close": 37.2,
       "volume": 20211785.0,
-      "avg_vol_4d": 132720.25,
-      "vol_ratio": 152.289,
+      "avg_vol_4d": 132720.75,
+      "vol_ratio": 152.288,
       "industry": "专用设备制造业",
       "board": "主板"
     },
@@ -3591,8 +3279,8 @@
       "price": 11.84,
       "prev_close": 11.36,
       "volume": 40438582.0,
-      "avg_vol_4d": 259350.5,
-      "vol_ratio": 155.923,
+      "avg_vol_4d": 259351.5,
+      "vol_ratio": 155.922,
       "industry": "零售业",
       "board": "主板"
     },
@@ -3636,19 +3324,6 @@
       "board": "主板"
     },
     {
-      "code": "688766",
-      "symbol": "sh688766",
-      "name": "普冉股份",
-      "pct": 8.18,
-      "price": 397.29,
-      "prev_close": 367.26,
-      "volume": 10587422.0,
-      "avg_vol_4d": 69242.25,
-      "vol_ratio": 152.904,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "301196",
       "symbol": "sz301196",
       "name": "唯科科技",
@@ -3656,8 +3331,8 @@
       "price": 88.68,
       "prev_close": 78.88,
       "volume": 9539087.0,
-      "avg_vol_4d": 63581.0,
-      "vol_ratio": 150.03,
+      "avg_vol_4d": 63581.5,
+      "vol_ratio": 150.029,
       "industry": "橡胶和塑料制品业",
       "board": "创业板"
     },
@@ -3708,23 +3383,10 @@
       "price": 113.4,
       "prev_close": 106.81,
       "volume": 8194675.0,
-      "avg_vol_4d": 53557.5,
-      "vol_ratio": 153.007,
+      "avg_vol_4d": 53558.0,
+      "vol_ratio": 153.006,
       "industry": "专用设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688809",
-      "symbol": "sh688809",
-      "name": "强一股份",
-      "pct": 8.64,
-      "price": 440.02,
-      "prev_close": 405.03,
-      "volume": 2395559.0,
-      "avg_vol_4d": 15883.5,
-      "vol_ratio": 150.821,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "002951",
@@ -3740,19 +3402,6 @@
       "board": "主板"
     },
     {
-      "code": "688078",
-      "symbol": "sh688078",
-      "name": "龙软科技",
-      "pct": 4.08,
-      "price": 27.07,
-      "prev_close": 26.01,
-      "volume": 2379733.0,
-      "avg_vol_4d": 15469.75,
-      "vol_ratio": 153.831,
-      "industry": "软件和信息技术服务业",
-      "board": "科创板"
-    },
-    {
       "code": "601231",
       "symbol": "sh601231",
       "name": "环旭电子",
@@ -3760,23 +3409,10 @@
       "price": 26.0,
       "prev_close": 24.73,
       "volume": 33648367.0,
-      "avg_vol_4d": 219902.25,
+      "avg_vol_4d": 219903.0,
       "vol_ratio": 153.015,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
-    },
-    {
-      "code": "688757",
-      "symbol": "sh688757",
-      "name": "胜科纳米",
-      "pct": 6.13,
-      "price": 29.95,
-      "prev_close": 28.22,
-      "volume": 10682043.0,
-      "avg_vol_4d": 70139.5,
-      "vol_ratio": 152.297,
-      "industry": "专业技术服务业",
-      "board": "科创板"
     },
     {
       "code": "301181",
@@ -3786,8 +3422,8 @@
       "price": 25.67,
       "prev_close": 24.6,
       "volume": 3045519.0,
-      "avg_vol_4d": 19855.75,
-      "vol_ratio": 153.382,
+      "avg_vol_4d": 19856.25,
+      "vol_ratio": 153.378,
       "industry": "汽车制造业",
       "board": "创业板"
     },
@@ -3831,32 +3467,6 @@
       "board": "创业板"
     },
     {
-      "code": "688512",
-      "symbol": "sh688512",
-      "name": "慧智微",
-      "pct": 4.48,
-      "price": 13.99,
-      "prev_close": 13.39,
-      "volume": 16139453.0,
-      "avg_vol_4d": 105906.75,
-      "vol_ratio": 152.393,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
-      "code": "688516",
-      "symbol": "sh688516",
-      "name": "奥特维",
-      "pct": 4.36,
-      "price": 42.87,
-      "prev_close": 41.08,
-      "volume": 9816333.0,
-      "avg_vol_4d": 64464.25,
-      "vol_ratio": 152.276,
-      "industry": "专用设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "300408",
       "symbol": "sz300408",
       "name": "三环集团",
@@ -3864,7 +3474,7 @@
       "price": 114.92,
       "prev_close": 108.4,
       "volume": 56505771.0,
-      "avg_vol_4d": 374790.0,
+      "avg_vol_4d": 374790.25,
       "vol_ratio": 150.766,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
@@ -3877,8 +3487,8 @@
       "price": 22.0,
       "prev_close": 20.0,
       "volume": 5632964.0,
-      "avg_vol_4d": 38054.5,
-      "vol_ratio": 148.024,
+      "avg_vol_4d": 38054.75,
+      "vol_ratio": 148.023,
       "industry": "非金属矿物制品业",
       "board": "主板"
     },
@@ -3894,19 +3504,6 @@
       "vol_ratio": 149.691,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688418",
-      "symbol": "sh688418",
-      "name": "震有科技",
-      "pct": 3.85,
-      "price": 32.66,
-      "prev_close": 31.45,
-      "volume": 3392341.0,
-      "avg_vol_4d": 22330.75,
-      "vol_ratio": 151.913,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "300842",
@@ -3955,8 +3552,8 @@
       "price": 30.46,
       "prev_close": 29.08,
       "volume": 12122949.0,
-      "avg_vol_4d": 80513.75,
-      "vol_ratio": 150.57,
+      "avg_vol_4d": 80514.25,
+      "vol_ratio": 150.569,
       "industry": "化学原料和化学制品制造业",
       "board": "主板"
     },
@@ -3974,19 +3571,6 @@
       "board": "主板"
     },
     {
-      "code": "688359",
-      "symbol": "sh688359",
-      "name": "三孚新科",
-      "pct": 8.12,
-      "price": 96.79,
-      "prev_close": 89.52,
-      "volume": 4732379.0,
-      "avg_vol_4d": 31940.5,
-      "vol_ratio": 148.162,
-      "industry": "化学原料和化学制品制造业",
-      "board": "科创板"
-    },
-    {
       "code": "603006",
       "symbol": "sh603006",
       "name": "联明股份",
@@ -3994,23 +3578,10 @@
       "price": 11.24,
       "prev_close": 10.8,
       "volume": 4430900.0,
-      "avg_vol_4d": 29376.5,
-      "vol_ratio": 150.831,
+      "avg_vol_4d": 29377.0,
+      "vol_ratio": 150.829,
       "industry": "汽车制造业",
       "board": "主板"
-    },
-    {
-      "code": "688657",
-      "symbol": "sh688657",
-      "name": "浩辰软件",
-      "pct": 4.2,
-      "price": 33.53,
-      "prev_close": 32.18,
-      "volume": 1615547.0,
-      "avg_vol_4d": 10723.25,
-      "vol_ratio": 150.658,
-      "industry": "软件和信息技术服务业",
-      "board": "科创板"
     },
     {
       "code": "300757",
@@ -4033,8 +3604,8 @@
       "price": 19.67,
       "prev_close": 18.92,
       "volume": 6737711.0,
-      "avg_vol_4d": 44705.5,
-      "vol_ratio": 150.713,
+      "avg_vol_4d": 44706.25,
+      "vol_ratio": 150.711,
       "industry": "专用设备制造业",
       "board": "创业板"
     },
@@ -4046,23 +3617,10 @@
       "price": 15.75,
       "prev_close": 15.28,
       "volume": 3815600.0,
-      "avg_vol_4d": 25239.25,
-      "vol_ratio": 151.177,
+      "avg_vol_4d": 25240.0,
+      "vol_ratio": 151.173,
       "industry": "文教、工美、体育和娱乐用品制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688383",
-      "symbol": "sh688383",
-      "name": "新益昌",
-      "pct": 7.02,
-      "price": 129.47,
-      "prev_close": 120.98,
-      "volume": 2481141.0,
-      "avg_vol_4d": 16725.75,
-      "vol_ratio": 148.343,
-      "industry": "专用设备制造业",
-      "board": "科创板"
     },
     {
       "code": "301171",
@@ -4085,8 +3643,8 @@
       "price": 58.89,
       "prev_close": 52.86,
       "volume": 12456166.0,
-      "avg_vol_4d": 86180.25,
-      "vol_ratio": 144.536,
+      "avg_vol_4d": 86181.0,
+      "vol_ratio": 144.535,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -4098,8 +3656,8 @@
       "price": 15.43,
       "prev_close": 14.03,
       "volume": 11150892.0,
-      "avg_vol_4d": 76646.5,
-      "vol_ratio": 145.485,
+      "avg_vol_4d": 76647.0,
+      "vol_ratio": 145.484,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
     },
@@ -4202,8 +3760,8 @@
       "price": 302.29,
       "prev_close": 279.0,
       "volume": 14151282.0,
-      "avg_vol_4d": 97468.25,
-      "vol_ratio": 145.189,
+      "avg_vol_4d": 97468.5,
+      "vol_ratio": 145.188,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -4267,8 +3825,8 @@
       "price": 83.51,
       "prev_close": 79.77,
       "volume": 4256632.0,
-      "avg_vol_4d": 29059.75,
-      "vol_ratio": 146.479,
+      "avg_vol_4d": 29060.0,
+      "vol_ratio": 146.477,
       "industry": "非金属矿物制品业",
       "board": "主板"
     },
@@ -4306,8 +3864,8 @@
       "price": 39.5,
       "prev_close": 37.9,
       "volume": 1429760.0,
-      "avg_vol_4d": 9790.0,
-      "vol_ratio": 146.043,
+      "avg_vol_4d": 9790.25,
+      "vol_ratio": 146.039,
       "industry": "电气机械和器材制造业",
       "board": "创业板"
     },
@@ -4332,8 +3890,8 @@
       "price": 101.36,
       "prev_close": 94.0,
       "volume": 6618001.0,
-      "avg_vol_4d": 46161.25,
-      "vol_ratio": 143.367,
+      "avg_vol_4d": 46161.5,
+      "vol_ratio": 143.366,
       "industry": "专用设备制造业",
       "board": "创业板"
     },
@@ -4345,8 +3903,8 @@
       "price": 16.98,
       "prev_close": 16.35,
       "volume": 6600442.0,
-      "avg_vol_4d": 45233.0,
-      "vol_ratio": 145.921,
+      "avg_vol_4d": 45233.5,
+      "vol_ratio": 145.919,
       "industry": "通用设备制造业",
       "board": "创业板"
     },
@@ -4371,23 +3929,10 @@
       "price": 128.08,
       "prev_close": 121.95,
       "volume": 2297016.0,
-      "avg_vol_4d": 15848.25,
-      "vol_ratio": 144.938,
+      "avg_vol_4d": 15848.75,
+      "vol_ratio": 144.934,
       "industry": "专用设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688656",
-      "symbol": "sh688656",
-      "name": "浩欧博",
-      "pct": 11.91,
-      "price": 116.92,
-      "prev_close": 104.48,
-      "volume": 1568427.0,
-      "avg_vol_4d": 11187.5,
-      "vol_ratio": 140.195,
-      "industry": "医药制造业",
-      "board": "科创板"
     },
     {
       "code": "301596",
@@ -4436,23 +3981,10 @@
       "price": 10.97,
       "prev_close": 10.54,
       "volume": 16838646.0,
-      "avg_vol_4d": 116310.0,
+      "avg_vol_4d": 116310.25,
       "vol_ratio": 144.774,
       "industry": "非金属矿物制品业",
       "board": "主板"
-    },
-    {
-      "code": "688166",
-      "symbol": "sh688166",
-      "name": "博瑞医药",
-      "pct": 7.07,
-      "price": 37.25,
-      "prev_close": 34.79,
-      "volume": 15904506.0,
-      "avg_vol_4d": 111545.0,
-      "vol_ratio": 142.584,
-      "industry": "医药制造业",
-      "board": "科创板"
     },
     {
       "code": "000428",
@@ -4466,32 +3998,6 @@
       "vol_ratio": 140.134,
       "industry": "住宿业",
       "board": "主板"
-    },
-    {
-      "code": "688630",
-      "symbol": "sh688630",
-      "name": "芯碁微装",
-      "pct": 10.59,
-      "price": 410.05,
-      "prev_close": 370.8,
-      "volume": 5251610.0,
-      "avg_vol_4d": 37650.0,
-      "vol_ratio": 139.485,
-      "industry": "专用设备制造业",
-      "board": "科创板"
-    },
-    {
-      "code": "688337",
-      "symbol": "sh688337",
-      "name": "普源精电",
-      "pct": 6.13,
-      "price": 42.61,
-      "prev_close": 40.15,
-      "volume": 4304605.0,
-      "avg_vol_4d": 30240.5,
-      "vol_ratio": 142.346,
-      "industry": "仪器仪表制造业",
-      "board": "科创板"
     },
     {
       "code": "300845",
@@ -4533,19 +4039,6 @@
       "board": "科创板"
     },
     {
-      "code": "688035",
-      "symbol": "sh688035",
-      "name": "德邦科技",
-      "pct": 8.47,
-      "price": 69.06,
-      "prev_close": 63.67,
-      "volume": 7718500.0,
-      "avg_vol_4d": 54926.5,
-      "vol_ratio": 140.524,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "301067",
       "symbol": "sz301067",
       "name": "显盈科技",
@@ -4557,19 +4050,6 @@
       "vol_ratio": 138.463,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688513",
-      "symbol": "sh688513",
-      "name": "苑东生物",
-      "pct": 3.69,
-      "price": 46.14,
-      "prev_close": 44.5,
-      "volume": 2262454.0,
-      "avg_vol_4d": 15779.25,
-      "vol_ratio": 143.382,
-      "industry": "医药制造业",
-      "board": "科创板"
     },
     {
       "code": "688008",
@@ -4596,19 +4076,6 @@
       "vol_ratio": 142.269,
       "industry": "土木工程建筑业",
       "board": "主板"
-    },
-    {
-      "code": "688531",
-      "symbol": "sh688531",
-      "name": "日联科技",
-      "pct": 8.63,
-      "price": 141.66,
-      "prev_close": 130.41,
-      "volume": 4881046.0,
-      "avg_vol_4d": 35078.75,
-      "vol_ratio": 139.145,
-      "industry": "专用设备制造业",
-      "board": "科创板"
     },
     {
       "code": "001360",
@@ -4709,7 +4176,7 @@
       "price": 5.55,
       "prev_close": 5.38,
       "volume": 15371041.0,
-      "avg_vol_4d": 108407.5,
+      "avg_vol_4d": 108408.0,
       "vol_ratio": 141.789,
       "industry": "新闻和出版业",
       "board": "主板"
@@ -4754,19 +4221,6 @@
       "board": "创业板"
     },
     {
-      "code": "688112",
-      "symbol": "sh688112",
-      "name": "鼎阳科技",
-      "pct": 7.68,
-      "price": 69.57,
-      "prev_close": 64.61,
-      "volume": 3506448.0,
-      "avg_vol_4d": 25377.5,
-      "vol_ratio": 138.172,
-      "industry": "仪器仪表制造业",
-      "board": "科创板"
-    },
-    {
       "code": "002470",
       "symbol": "sz002470",
       "name": "金正大",
@@ -4787,23 +4241,10 @@
       "price": 93.28,
       "prev_close": 89.7,
       "volume": 7450111.0,
-      "avg_vol_4d": 53018.75,
-      "vol_ratio": 140.518,
+      "avg_vol_4d": 53019.25,
+      "vol_ratio": 140.517,
       "industry": "软件和信息技术服务业",
       "board": "创业板"
-    },
-    {
-      "code": "688785",
-      "symbol": "sh688785",
-      "name": "恒运昌",
-      "pct": 7.29,
-      "price": 301.36,
-      "prev_close": 280.88,
-      "volume": 1096402.0,
-      "avg_vol_4d": 7946.5,
-      "vol_ratio": 137.973,
-      "industry": "专用设备制造业",
-      "board": "科创板"
     },
     {
       "code": "301316",
@@ -4813,7 +4254,7 @@
       "price": 38.47,
       "prev_close": 36.4,
       "volume": 12345317.0,
-      "avg_vol_4d": 88957.0,
+      "avg_vol_4d": 88957.25,
       "vol_ratio": 138.778,
       "industry": "软件和信息技术服务业",
       "board": "创业板"
@@ -4852,23 +4293,10 @@
       "price": 4.51,
       "prev_close": 4.35,
       "volume": 42546552.0,
-      "avg_vol_4d": 305792.25,
+      "avg_vol_4d": 305792.75,
       "vol_ratio": 139.135,
       "industry": "仪器仪表制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688767",
-      "symbol": "sh688767",
-      "name": "博拓生物",
-      "pct": 3.84,
-      "price": 38.94,
-      "prev_close": 37.5,
-      "volume": 2572906.0,
-      "avg_vol_4d": 18525.0,
-      "vol_ratio": 138.888,
-      "industry": "医药制造业",
-      "board": "科创板"
     },
     {
       "code": "002798",
@@ -4891,8 +4319,8 @@
       "price": 14.23,
       "prev_close": 13.59,
       "volume": 8979708.0,
-      "avg_vol_4d": 65004.25,
-      "vol_ratio": 138.14,
+      "avg_vol_4d": 65004.75,
+      "vol_ratio": 138.139,
       "industry": "生态保护和环境治理业",
       "board": "主板"
     },
@@ -4917,8 +4345,8 @@
       "price": 43.59,
       "prev_close": 41.0,
       "volume": 9692917.0,
-      "avg_vol_4d": 70851.75,
-      "vol_ratio": 136.806,
+      "avg_vol_4d": 70852.25,
+      "vol_ratio": 136.805,
       "industry": "专用设备制造业",
       "board": "主板"
     },
@@ -4934,19 +4362,6 @@
       "vol_ratio": 138.668,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
-    },
-    {
-      "code": "688003",
-      "symbol": "sh688003",
-      "name": "天准科技",
-      "pct": 7.32,
-      "price": 80.5,
-      "prev_close": 75.01,
-      "volume": 6089249.0,
-      "avg_vol_4d": 44993.0,
-      "vol_ratio": 135.338,
-      "industry": "专用设备制造业",
-      "board": "科创板"
     },
     {
       "code": "688696",
@@ -4982,8 +4397,8 @@
       "price": 358.22,
       "prev_close": 347.0,
       "volume": 10426494.0,
-      "avg_vol_4d": 76123.25,
-      "vol_ratio": 136.969,
+      "avg_vol_4d": 76124.0,
+      "vol_ratio": 136.967,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -5008,8 +4423,8 @@
       "price": 46.66,
       "prev_close": 44.53,
       "volume": 4486500.0,
-      "avg_vol_4d": 33054.75,
-      "vol_ratio": 135.729,
+      "avg_vol_4d": 33055.0,
+      "vol_ratio": 135.728,
       "industry": "纺织业",
       "board": "创业板"
     },
@@ -5034,23 +4449,10 @@
       "price": 99.88,
       "prev_close": 95.8,
       "volume": 2108212.0,
-      "avg_vol_4d": 15546.25,
-      "vol_ratio": 135.609,
+      "avg_vol_4d": 15546.5,
+      "vol_ratio": 135.607,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688670",
-      "symbol": "sh688670",
-      "name": "金迪克",
-      "pct": 5.13,
-      "price": 16.79,
-      "prev_close": 15.97,
-      "volume": 2185610.0,
-      "avg_vol_4d": 16259.25,
-      "vol_ratio": 134.423,
-      "industry": "医药制造业",
-      "board": "科创板"
     },
     {
       "code": "605058",
@@ -5060,8 +4462,8 @@
       "price": 28.54,
       "prev_close": 27.47,
       "volume": 2349408.0,
-      "avg_vol_4d": 17383.5,
-      "vol_ratio": 135.152,
+      "avg_vol_4d": 17384.0,
+      "vol_ratio": 135.148,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
     },
@@ -5079,19 +4481,6 @@
       "board": "主板"
     },
     {
-      "code": "688182",
-      "symbol": "sh688182",
-      "name": "灿勤科技",
-      "pct": 3.81,
-      "price": 27.51,
-      "prev_close": 26.5,
-      "volume": 5561347.0,
-      "avg_vol_4d": 41189.25,
-      "vol_ratio": 135.019,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "603306",
       "symbol": "sh603306",
       "name": "华懋科技",
@@ -5099,8 +4488,8 @@
       "price": 75.71,
       "prev_close": 71.57,
       "volume": 10488535.0,
-      "avg_vol_4d": 78468.0,
-      "vol_ratio": 133.666,
+      "avg_vol_4d": 78468.75,
+      "vol_ratio": 133.665,
       "industry": "汽车制造业",
       "board": "主板"
     },
@@ -5112,8 +4501,8 @@
       "price": 38.89,
       "prev_close": 35.35,
       "volume": 4821441.0,
-      "avg_vol_4d": 36852.25,
-      "vol_ratio": 130.832,
+      "avg_vol_4d": 36852.75,
+      "vol_ratio": 130.83,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
     },
@@ -5125,8 +4514,8 @@
       "price": 65.5,
       "prev_close": 63.0,
       "volume": 3778658.0,
-      "avg_vol_4d": 28043.5,
-      "vol_ratio": 134.743,
+      "avg_vol_4d": 28044.0,
+      "vol_ratio": 134.74,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -5164,7 +4553,7 @@
       "price": 6.82,
       "prev_close": 6.43,
       "volume": 37863398.0,
-      "avg_vol_4d": 284734.0,
+      "avg_vol_4d": 284734.75,
       "vol_ratio": 132.978,
       "industry": "家具制造业",
       "board": "主板"
@@ -5177,8 +4566,8 @@
       "price": 24.83,
       "prev_close": 23.59,
       "volume": 3800565.0,
-      "avg_vol_4d": 28485.25,
-      "vol_ratio": 133.422,
+      "avg_vol_4d": 28485.75,
+      "vol_ratio": 133.42,
       "industry": "零售业",
       "board": "创业板"
     },
@@ -5190,7 +4579,7 @@
       "price": 16.14,
       "prev_close": 15.57,
       "volume": 12739285.0,
-      "avg_vol_4d": 94828.0,
+      "avg_vol_4d": 94828.25,
       "vol_ratio": 134.341,
       "industry": "专用设备制造业",
       "board": "创业板"
@@ -5242,8 +4631,8 @@
       "price": 21.88,
       "prev_close": 21.09,
       "volume": 8923950.0,
-      "avg_vol_4d": 66816.25,
-      "vol_ratio": 133.56,
+      "avg_vol_4d": 66816.75,
+      "vol_ratio": 133.559,
       "industry": "电气机械和器材制造业",
       "board": "主板"
     },
@@ -5281,8 +4670,8 @@
       "price": 97.33,
       "prev_close": 91.17,
       "volume": 9853627.0,
-      "avg_vol_4d": 75263.5,
-      "vol_ratio": 130.922,
+      "avg_vol_4d": 75264.0,
+      "vol_ratio": 130.921,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -5294,8 +4683,8 @@
       "price": 69.08,
       "prev_close": 65.9,
       "volume": 3925460.0,
-      "avg_vol_4d": 29743.25,
-      "vol_ratio": 131.978,
+      "avg_vol_4d": 29743.5,
+      "vol_ratio": 131.977,
       "industry": "专用设备制造业",
       "board": "创业板"
     },
@@ -5320,8 +4709,8 @@
       "price": 38.61,
       "prev_close": 37.45,
       "volume": 9222402.0,
-      "avg_vol_4d": 69418.5,
-      "vol_ratio": 132.852,
+      "avg_vol_4d": 69419.0,
+      "vol_ratio": 132.851,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -5385,7 +4774,7 @@
       "price": 25.79,
       "prev_close": 24.89,
       "volume": 35684506.0,
-      "avg_vol_4d": 270671.5,
+      "avg_vol_4d": 270672.25,
       "vol_ratio": 131.837,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
@@ -5398,8 +4787,8 @@
       "price": 38.18,
       "prev_close": 36.66,
       "volume": 6952888.0,
-      "avg_vol_4d": 52900.0,
-      "vol_ratio": 131.435,
+      "avg_vol_4d": 52900.25,
+      "vol_ratio": 131.434,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
     },
@@ -5417,19 +4806,6 @@
       "board": "主板"
     },
     {
-      "code": "688525",
-      "symbol": "sh688525",
-      "name": "佰维存储",
-      "pct": 3.68,
-      "price": 221.14,
-      "prev_close": 213.29,
-      "volume": 17251097.0,
-      "avg_vol_4d": 131172.5,
-      "vol_ratio": 131.515,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "301387",
       "symbol": "sz301387",
       "name": "光大同创",
@@ -5437,8 +4813,8 @@
       "price": 56.43,
       "prev_close": 53.94,
       "volume": 2634198.0,
-      "avg_vol_4d": 20136.75,
-      "vol_ratio": 130.815,
+      "avg_vol_4d": 20137.5,
+      "vol_ratio": 130.811,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -5489,8 +4865,8 @@
       "price": 110.6,
       "prev_close": 106.92,
       "volume": 10584669.0,
-      "avg_vol_4d": 81049.5,
-      "vol_ratio": 130.595,
+      "avg_vol_4d": 81050.25,
+      "vol_ratio": 130.594,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -5515,8 +4891,8 @@
       "price": 24.29,
       "prev_close": 23.45,
       "volume": 3110698.0,
-      "avg_vol_4d": 23865.75,
-      "vol_ratio": 130.342,
+      "avg_vol_4d": 23866.0,
+      "vol_ratio": 130.34,
       "industry": "橡胶和塑料制品业",
       "board": "创业板"
     },
@@ -5541,8 +4917,8 @@
       "price": 8.0,
       "prev_close": 7.71,
       "volume": 6783168.0,
-      "avg_vol_4d": 52227.0,
-      "vol_ratio": 129.879,
+      "avg_vol_4d": 52227.25,
+      "vol_ratio": 129.878,
       "industry": "医药制造业",
       "board": "主板"
     },
@@ -5554,8 +4930,8 @@
       "price": 45.05,
       "prev_close": 43.68,
       "volume": 6527482.0,
-      "avg_vol_4d": 50135.0,
-      "vol_ratio": 130.198,
+      "avg_vol_4d": 50135.25,
+      "vol_ratio": 130.197,
       "industry": "专用设备制造业",
       "board": "主板"
     },
@@ -5571,19 +4947,6 @@
       "vol_ratio": 126.398,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688200",
-      "symbol": "sh688200",
-      "name": "华峰测控",
-      "pct": 7.08,
-      "price": 379.81,
-      "prev_close": 354.71,
-      "volume": 3837497.0,
-      "avg_vol_4d": 30197.0,
-      "vol_ratio": 127.082,
-      "industry": "专用设备制造业",
-      "board": "科创板"
     },
     {
       "code": "001324",
@@ -5716,32 +5079,6 @@
       "board": "主板"
     },
     {
-      "code": "688381",
-      "symbol": "sh688381",
-      "name": "帝奥微",
-      "pct": 7.3,
-      "price": 38.07,
-      "prev_close": 35.48,
-      "volume": 12774728.0,
-      "avg_vol_4d": 102230.5,
-      "vol_ratio": 124.96,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
-      "code": "603678",
-      "symbol": "sh603678",
-      "name": "火炬电子",
-      "pct": 4.24,
-      "price": 45.44,
-      "prev_close": 43.59,
-      "volume": 18044587.0,
-      "avg_vol_4d": 142117.25,
-      "vol_ratio": 126.97,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "主板"
-    },
-    {
       "code": "603179",
       "symbol": "sh603179",
       "name": "新泉股份",
@@ -5755,6 +5092,19 @@
       "board": "主板"
     },
     {
+      "code": "603678",
+      "symbol": "sh603678",
+      "name": "火炬电子",
+      "pct": 4.24,
+      "price": 45.44,
+      "prev_close": 43.59,
+      "volume": 18044587.0,
+      "avg_vol_4d": 142117.75,
+      "vol_ratio": 126.969,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "主板"
+    },
+    {
       "code": "002623",
       "symbol": "sz002623",
       "name": "亚玛顿",
@@ -5762,8 +5112,8 @@
       "price": 16.0,
       "prev_close": 15.48,
       "volume": 3432400.0,
-      "avg_vol_4d": 27050.0,
-      "vol_ratio": 126.891,
+      "avg_vol_4d": 27050.25,
+      "vol_ratio": 126.89,
       "industry": "非金属矿物制品业",
       "board": "主板"
     },
@@ -5775,23 +5125,10 @@
       "price": 38.16,
       "prev_close": 36.11,
       "volume": 17484770.0,
-      "avg_vol_4d": 139700.5,
+      "avg_vol_4d": 139701.0,
       "vol_ratio": 125.159,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688786",
-      "symbol": "sh688786",
-      "name": "悦安新材",
-      "pct": 5.74,
-      "price": 26.53,
-      "prev_close": 25.09,
-      "volume": 5089922.0,
-      "avg_vol_4d": 40716.5,
-      "vol_ratio": 125.009,
-      "industry": "金属制品业",
-      "board": "科创板"
     },
     {
       "code": "002726",
@@ -5827,8 +5164,8 @@
       "price": 60.13,
       "prev_close": 57.5,
       "volume": 2640440.0,
-      "avg_vol_4d": 21095.0,
-      "vol_ratio": 125.169,
+      "avg_vol_4d": 21095.25,
+      "vol_ratio": 125.168,
       "industry": "化学原料和化学制品制造业",
       "board": "创业板"
     },
@@ -5840,23 +5177,10 @@
       "price": 58.3,
       "prev_close": 55.08,
       "volume": 4738800.0,
-      "avg_vol_4d": 38226.5,
-      "vol_ratio": 123.966,
+      "avg_vol_4d": 38227.0,
+      "vol_ratio": 123.965,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
-    },
-    {
-      "code": "688720",
-      "symbol": "sh688720",
-      "name": "艾森股份",
-      "pct": 5.07,
-      "price": 60.47,
-      "prev_close": 57.55,
-      "volume": 4217032.0,
-      "avg_vol_4d": 33956.5,
-      "vol_ratio": 124.189,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "301041",
@@ -5896,19 +5220,6 @@
       "vol_ratio": 122.875,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688136",
-      "symbol": "sh688136",
-      "name": "科兴制药",
-      "pct": 3.74,
-      "price": 21.1,
-      "prev_close": 20.34,
-      "volume": 5929600.0,
-      "avg_vol_4d": 47494.0,
-      "vol_ratio": 124.849,
-      "industry": "医药制造业",
-      "board": "科创板"
     },
     {
       "code": "600183",
@@ -5983,23 +5294,10 @@
       "price": 40.54,
       "prev_close": 37.34,
       "volume": 21278057.0,
-      "avg_vol_4d": 175801.75,
+      "avg_vol_4d": 175802.75,
       "vol_ratio": 121.034,
       "industry": "专业技术服务业",
       "board": "创业板"
-    },
-    {
-      "code": "688079",
-      "symbol": "sh688079",
-      "name": "美迪凯",
-      "pct": 3.91,
-      "price": 15.43,
-      "prev_close": 14.85,
-      "volume": 11045335.0,
-      "avg_vol_4d": 89007.75,
-      "vol_ratio": 124.094,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "301106",
@@ -6009,8 +5307,8 @@
       "price": 19.98,
       "prev_close": 18.94,
       "volume": 7750190.0,
-      "avg_vol_4d": 63084.75,
-      "vol_ratio": 122.854,
+      "avg_vol_4d": 63085.0,
+      "vol_ratio": 122.853,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -6048,8 +5346,8 @@
       "price": 23.98,
       "prev_close": 23.23,
       "volume": 1650650.0,
-      "avg_vol_4d": 13314.5,
-      "vol_ratio": 123.974,
+      "avg_vol_4d": 13314.75,
+      "vol_ratio": 123.972,
       "industry": "纺织业",
       "board": "主板"
     },
@@ -6061,8 +5359,8 @@
       "price": 18.75,
       "prev_close": 18.0,
       "volume": 2247800.0,
-      "avg_vol_4d": 18229.25,
-      "vol_ratio": 123.307,
+      "avg_vol_4d": 18229.75,
+      "vol_ratio": 123.304,
       "industry": "橡胶和塑料制品业",
       "board": "创业板"
     },
@@ -6100,8 +5398,8 @@
       "price": 90.09,
       "prev_close": 86.92,
       "volume": 8666712.0,
-      "avg_vol_4d": 70238.25,
-      "vol_ratio": 123.39,
+      "avg_vol_4d": 70239.0,
+      "vol_ratio": 123.389,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -6132,19 +5430,6 @@
       "board": "科创板"
     },
     {
-      "code": "688535",
-      "symbol": "sh688535",
-      "name": "华海诚科",
-      "pct": 6.94,
-      "price": 101.04,
-      "prev_close": 94.48,
-      "volume": 6116062.0,
-      "avg_vol_4d": 50702.0,
-      "vol_ratio": 120.628,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "300004",
       "symbol": "sz300004",
       "name": "南风股份",
@@ -6152,7 +5437,7 @@
       "price": 9.18,
       "prev_close": 8.71,
       "volume": 42505036.0,
-      "avg_vol_4d": 350172.5,
+      "avg_vol_4d": 350172.75,
       "vol_ratio": 121.383,
       "industry": "通用设备制造业",
       "board": "创业板"
@@ -6178,8 +5463,8 @@
       "price": 48.56,
       "prev_close": 46.76,
       "volume": 7662642.0,
-      "avg_vol_4d": 62640.75,
-      "vol_ratio": 122.327,
+      "avg_vol_4d": 62641.0,
+      "vol_ratio": 122.326,
       "industry": "软件和信息技术服务业",
       "board": "主板"
     },
@@ -6191,8 +5476,8 @@
       "price": 36.2,
       "prev_close": 34.83,
       "volume": 7815278.0,
-      "avg_vol_4d": 63954.75,
-      "vol_ratio": 122.2,
+      "avg_vol_4d": 63955.25,
+      "vol_ratio": 122.199,
       "industry": "电气机械和器材制造业",
       "board": "创业板"
     },
@@ -6210,19 +5495,6 @@
       "board": "创业板"
     },
     {
-      "code": "688627",
-      "symbol": "sh688627",
-      "name": "精智达",
-      "pct": 11.19,
-      "price": 491.0,
-      "prev_close": 441.58,
-      "volume": 6921302.0,
-      "avg_vol_4d": 59021.75,
-      "vol_ratio": 117.267,
-      "industry": "专用设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "300745",
       "symbol": "sz300745",
       "name": "欣锐科技",
@@ -6236,19 +5508,6 @@
       "board": "创业板"
     },
     {
-      "code": "688683",
-      "symbol": "sh688683",
-      "name": "莱尔科技",
-      "pct": 3.2,
-      "price": 29.38,
-      "prev_close": 28.47,
-      "volume": 1241884.0,
-      "avg_vol_4d": 10135.75,
-      "vol_ratio": 122.525,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "301577",
       "symbol": "sz301577",
       "name": "美信科技",
@@ -6256,8 +5515,8 @@
       "price": 58.03,
       "prev_close": 56.08,
       "volume": 1166400.0,
-      "avg_vol_4d": 9573.75,
-      "vol_ratio": 121.833,
+      "avg_vol_4d": 9574.0,
+      "vol_ratio": 121.83,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -6282,8 +5541,8 @@
       "price": 16.02,
       "prev_close": 15.55,
       "volume": 16213980.0,
-      "avg_vol_4d": 133054.5,
-      "vol_ratio": 121.86,
+      "avg_vol_4d": 133055.0,
+      "vol_ratio": 121.859,
       "industry": "资本市场服务",
       "board": "主板"
     },
@@ -6347,23 +5606,10 @@
       "price": 1.51,
       "prev_close": 1.44,
       "volume": 16859500.0,
-      "avg_vol_4d": 140625.0,
+      "avg_vol_4d": 140625.25,
       "vol_ratio": 119.89,
       "industry": "批发业",
       "board": "主板"
-    },
-    {
-      "code": "688097",
-      "symbol": "sh688097",
-      "name": "博众精工",
-      "pct": 4.51,
-      "price": 46.38,
-      "prev_close": 44.38,
-      "volume": 7012957.0,
-      "avg_vol_4d": 58575.0,
-      "vol_ratio": 119.726,
-      "industry": "专用设备制造业",
-      "board": "科创板"
     },
     {
       "code": "300428",
@@ -6373,7 +5619,7 @@
       "price": 20.66,
       "prev_close": 20.05,
       "volume": 10337640.0,
-      "avg_vol_4d": 85673.5,
+      "avg_vol_4d": 85674.0,
       "vol_ratio": 120.663,
       "industry": "有色金属冶炼和压延加工业",
       "board": "创业板"
@@ -6444,19 +5690,6 @@
       "board": "创业板"
     },
     {
-      "code": "688072",
-      "symbol": "sh688072",
-      "name": "拓荆科技",
-      "pct": 4.82,
-      "price": 651.92,
-      "prev_close": 621.93,
-      "volume": 4136865.0,
-      "avg_vol_4d": 35059.5,
-      "vol_ratio": 117.996,
-      "industry": "专用设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "603730",
       "symbol": "sh603730",
       "name": "岱美股份",
@@ -6464,7 +5697,7 @@
       "price": 11.21,
       "prev_close": 10.84,
       "volume": 18003346.0,
-      "avg_vol_4d": 151534.0,
+      "avg_vol_4d": 151534.5,
       "vol_ratio": 118.807,
       "industry": "汽车制造业",
       "board": "主板"
@@ -6477,7 +5710,7 @@
       "price": 18.35,
       "prev_close": 17.45,
       "volume": 12710950.0,
-      "avg_vol_4d": 108127.5,
+      "avg_vol_4d": 108128.0,
       "vol_ratio": 117.555,
       "industry": "软件和信息技术服务业",
       "board": "创业板"
@@ -6503,7 +5736,7 @@
       "price": 8.73,
       "prev_close": 8.47,
       "volume": 82681146.0,
-      "avg_vol_4d": 695470.25,
+      "avg_vol_4d": 695470.75,
       "vol_ratio": 118.885,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
@@ -6568,8 +5801,8 @@
       "price": 65.2,
       "prev_close": 61.36,
       "volume": 2970609.0,
-      "avg_vol_4d": 25613.25,
-      "vol_ratio": 115.979,
+      "avg_vol_4d": 25613.75,
+      "vol_ratio": 115.977,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -6581,8 +5814,8 @@
       "price": 30.28,
       "prev_close": 29.38,
       "volume": 2631200.0,
-      "avg_vol_4d": 22297.0,
-      "vol_ratio": 118.007,
+      "avg_vol_4d": 22297.25,
+      "vol_ratio": 118.006,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
     },
@@ -6594,7 +5827,7 @@
       "price": 4.34,
       "prev_close": 4.21,
       "volume": 39174036.0,
-      "avg_vol_4d": 332293.75,
+      "avg_vol_4d": 332294.0,
       "vol_ratio": 117.89,
       "industry": "通用设备制造业",
       "board": "主板"
@@ -6607,23 +5840,10 @@
       "price": 73.7,
       "prev_close": 71.48,
       "volume": 8967310.0,
-      "avg_vol_4d": 76104.5,
-      "vol_ratio": 117.829,
+      "avg_vol_4d": 76105.25,
+      "vol_ratio": 117.828,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688207",
-      "symbol": "sh688207",
-      "name": "格灵深瞳",
-      "pct": 6.98,
-      "price": 18.4,
-      "prev_close": 17.2,
-      "volume": 12133521.0,
-      "avg_vol_4d": 105456.5,
-      "vol_ratio": 115.057,
-      "industry": "软件和信息技术服务业",
-      "board": "科创板"
     },
     {
       "code": "601208",
@@ -6637,32 +5857,6 @@
       "vol_ratio": 115.15,
       "industry": "化学原料和化学制品制造业",
       "board": "主板"
-    },
-    {
-      "code": "688625",
-      "symbol": "sh688625",
-      "name": "呈和科技",
-      "pct": 7.53,
-      "price": 56.38,
-      "prev_close": 52.43,
-      "volume": 6204799.0,
-      "avg_vol_4d": 54183.75,
-      "vol_ratio": 114.514,
-      "industry": "化学原料和化学制品制造业",
-      "board": "科创板"
-    },
-    {
-      "code": "688519",
-      "symbol": "sh688519",
-      "name": "南亚新材",
-      "pct": 7.75,
-      "price": 287.85,
-      "prev_close": 267.14,
-      "volume": 6051302.0,
-      "avg_vol_4d": 52956.0,
-      "vol_ratio": 114.27,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "300054",
@@ -6689,19 +5883,6 @@
       "vol_ratio": 115.238,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688729",
-      "symbol": "sh688729",
-      "name": "屹唐股份",
-      "pct": 4.13,
-      "price": 22.93,
-      "prev_close": 22.02,
-      "volume": 28876485.0,
-      "avg_vol_4d": 248097.0,
-      "vol_ratio": 116.392,
-      "industry": "专用设备制造业",
-      "board": "科创板"
     },
     {
       "code": "300706",
@@ -6750,7 +5931,7 @@
       "price": 3.93,
       "prev_close": 3.8,
       "volume": 147848823.0,
-      "avg_vol_4d": 1266577.0,
+      "avg_vol_4d": 1266577.25,
       "vol_ratio": 116.731,
       "industry": "零售业",
       "board": "主板"
@@ -6769,32 +5950,6 @@
       "board": "创业板"
     },
     {
-      "code": "688693",
-      "symbol": "sh688693",
-      "name": "锴威特",
-      "pct": 4.18,
-      "price": 75.55,
-      "prev_close": 72.52,
-      "volume": 1827837.0,
-      "avg_vol_4d": 15800.25,
-      "vol_ratio": 115.684,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
-      "code": "688629",
-      "symbol": "sh688629",
-      "name": "华丰科技",
-      "pct": 4.13,
-      "price": 127.46,
-      "prev_close": 122.4,
-      "volume": 11122356.0,
-      "avg_vol_4d": 96189.0,
-      "vol_ratio": 115.63,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "688028",
       "symbol": "sh688028",
       "name": "沃尔德",
@@ -6805,19 +5960,6 @@
       "avg_vol_4d": 87526.75,
       "vol_ratio": 114.487,
       "industry": "通用设备制造业",
-      "board": "科创板"
-    },
-    {
-      "code": "688403",
-      "symbol": "sh688403",
-      "name": "汇成股份",
-      "pct": 6.96,
-      "price": 25.52,
-      "prev_close": 23.86,
-      "volume": 78782329.0,
-      "avg_vol_4d": 693488.0,
-      "vol_ratio": 113.603,
-      "industry": "计算机、通信和其他电子设备制造业",
       "board": "科创板"
     },
     {
@@ -6854,23 +5996,10 @@
       "price": 93.77,
       "prev_close": 87.67,
       "volume": 60950018.0,
-      "avg_vol_4d": 537199.0,
+      "avg_vol_4d": 537199.75,
       "vol_ratio": 113.459,
       "industry": "专用设备制造业",
       "board": "主板"
-    },
-    {
-      "code": "688585",
-      "symbol": "sh688585",
-      "name": "上纬新材",
-      "pct": 4.76,
-      "price": 146.01,
-      "prev_close": 139.37,
-      "volume": 3445697.0,
-      "avg_vol_4d": 30055.25,
-      "vol_ratio": 114.645,
-      "industry": "化学原料和化学制品制造业",
-      "board": "科创板"
     },
     {
       "code": "300751",
@@ -6880,8 +6009,8 @@
       "price": 198.48,
       "prev_close": 191.92,
       "volume": 6941483.0,
-      "avg_vol_4d": 60171.25,
-      "vol_ratio": 115.362,
+      "avg_vol_4d": 60172.0,
+      "vol_ratio": 115.361,
       "industry": "专用设备制造业",
       "board": "创业板"
     },
@@ -6906,8 +6035,8 @@
       "price": 49.93,
       "prev_close": 48.24,
       "volume": 5888090.0,
-      "avg_vol_4d": 51176.5,
-      "vol_ratio": 115.055,
+      "avg_vol_4d": 51177.25,
+      "vol_ratio": 115.053,
       "industry": "批发业",
       "board": "创业板"
     },
@@ -6945,7 +6074,7 @@
       "price": 67.4,
       "prev_close": 64.18,
       "volume": 13962989.0,
-      "avg_vol_4d": 122809.5,
+      "avg_vol_4d": 122809.75,
       "vol_ratio": 113.696,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
@@ -6958,8 +6087,8 @@
       "price": 16.54,
       "prev_close": 16.02,
       "volume": 5153045.0,
-      "avg_vol_4d": 44936.0,
-      "vol_ratio": 114.675,
+      "avg_vol_4d": 44936.75,
+      "vol_ratio": 114.673,
       "industry": "非金属矿物制品业",
       "board": "主板"
     },
@@ -6971,7 +6100,7 @@
       "price": 50.2,
       "prev_close": 47.44,
       "volume": 43358992.0,
-      "avg_vol_4d": 384382.5,
+      "avg_vol_4d": 384382.75,
       "vol_ratio": 112.802,
       "industry": "非金属矿物制品业",
       "board": "主板"
@@ -7075,8 +6204,8 @@
       "price": 24.27,
       "prev_close": 23.15,
       "volume": 4056819.0,
-      "avg_vol_4d": 36238.5,
-      "vol_ratio": 111.948,
+      "avg_vol_4d": 36238.75,
+      "vol_ratio": 111.947,
       "industry": "木材加工和木、竹、藤、棕、草制品业",
       "board": "主板"
     },
@@ -7088,8 +6217,8 @@
       "price": 24.17,
       "prev_close": 23.29,
       "volume": 21264327.0,
-      "avg_vol_4d": 188813.75,
-      "vol_ratio": 112.621,
+      "avg_vol_4d": 188814.0,
+      "vol_ratio": 112.62,
       "industry": "专用设备制造业",
       "board": "主板"
     },
@@ -7114,8 +6243,8 @@
       "price": 5.95,
       "prev_close": 5.77,
       "volume": 14940559.0,
-      "avg_vol_4d": 132486.25,
-      "vol_ratio": 112.771,
+      "avg_vol_4d": 132486.5,
+      "vol_ratio": 112.77,
       "industry": "零售业",
       "board": "主板"
     },
@@ -7127,7 +6256,7 @@
       "price": 66.27,
       "prev_close": 64.19,
       "volume": 11135699.0,
-      "avg_vol_4d": 98838.75,
+      "avg_vol_4d": 98839.0,
       "vol_ratio": 112.665,
       "industry": "通用设备制造业",
       "board": "创业板"
@@ -7140,7 +6269,7 @@
       "price": 7.1,
       "prev_close": 6.85,
       "volume": 41166100.0,
-      "avg_vol_4d": 366774.0,
+      "avg_vol_4d": 366774.25,
       "vol_ratio": 112.238,
       "industry": "软件和信息技术服务业",
       "board": "创业板"
@@ -7166,8 +6295,8 @@
       "price": 50.7,
       "prev_close": 48.75,
       "volume": 2042443.0,
-      "avg_vol_4d": 18268.75,
-      "vol_ratio": 111.8,
+      "avg_vol_4d": 18269.0,
+      "vol_ratio": 111.798,
       "industry": "专用设备制造业",
       "board": "创业板"
     },
@@ -7205,8 +6334,8 @@
       "price": 108.9,
       "prev_close": 104.04,
       "volume": 2973738.0,
-      "avg_vol_4d": 26802.25,
-      "vol_ratio": 110.951,
+      "avg_vol_4d": 26803.0,
+      "vol_ratio": 110.948,
       "industry": "电气机械和器材制造业",
       "board": "创业板"
     },
@@ -7270,8 +6399,8 @@
       "price": 37.75,
       "prev_close": 36.06,
       "volume": 14230811.0,
-      "avg_vol_4d": 129051.0,
-      "vol_ratio": 110.273,
+      "avg_vol_4d": 129051.5,
+      "vol_ratio": 110.272,
       "industry": "专用设备制造业",
       "board": "创业板"
     },
@@ -7322,23 +6451,10 @@
       "price": 3.29,
       "prev_close": 3.16,
       "volume": 332544569.0,
-      "avg_vol_4d": 3013335.5,
+      "avg_vol_4d": 3013335.75,
       "vol_ratio": 110.358,
       "industry": "零售业",
       "board": "主板"
-    },
-    {
-      "code": "688257",
-      "symbol": "sh688257",
-      "name": "新锐股份",
-      "pct": 3.31,
-      "price": 52.8,
-      "prev_close": 51.11,
-      "volume": 13187994.0,
-      "avg_vol_4d": 119156.5,
-      "vol_ratio": 110.678,
-      "industry": "有色金属冶炼和压延加工业",
-      "board": "科创板"
     },
     {
       "code": "002122",
@@ -7348,7 +6464,7 @@
       "price": 2.82,
       "prev_close": 2.73,
       "volume": 12525200.0,
-      "avg_vol_4d": 113219.75,
+      "avg_vol_4d": 113220.0,
       "vol_ratio": 110.627,
       "industry": "通用设备制造业",
       "board": "主板"
@@ -7374,23 +6490,10 @@
       "price": 30.09,
       "prev_close": 28.45,
       "volume": 15335955.0,
-      "avg_vol_4d": 140894.0,
+      "avg_vol_4d": 140894.25,
       "vol_ratio": 108.847,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
-    },
-    {
-      "code": "688301",
-      "symbol": "sh688301",
-      "name": "奕瑞科技",
-      "pct": 3.57,
-      "price": 93.94,
-      "prev_close": 90.7,
-      "volume": 4447904.0,
-      "avg_vol_4d": 40389.75,
-      "vol_ratio": 110.125,
-      "industry": "专用设备制造业",
-      "board": "科创板"
     },
     {
       "code": "301279",
@@ -7406,32 +6509,6 @@
       "board": "创业板"
     },
     {
-      "code": "688392",
-      "symbol": "sh688392",
-      "name": "骄成超声",
-      "pct": 6.88,
-      "price": 172.9,
-      "prev_close": 161.77,
-      "volume": 3674566.0,
-      "avg_vol_4d": 34146.75,
-      "vol_ratio": 107.611,
-      "industry": "专用设备制造业",
-      "board": "科创板"
-    },
-    {
-      "code": "688429",
-      "symbol": "sh688429",
-      "name": "时创能源",
-      "pct": 5.29,
-      "price": 10.55,
-      "prev_close": 10.02,
-      "volume": 2389510.0,
-      "avg_vol_4d": 22009.0,
-      "vol_ratio": 108.57,
-      "industry": "电气机械和器材制造业",
-      "board": "科创板"
-    },
-    {
       "code": "003031",
       "symbol": "sz003031",
       "name": "中瓷电子",
@@ -7443,19 +6520,6 @@
       "vol_ratio": 107.998,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
-    },
-    {
-      "code": "688711",
-      "symbol": "sh688711",
-      "name": "宏微科技",
-      "pct": 4.46,
-      "price": 24.6,
-      "prev_close": 23.55,
-      "volume": 6477928.0,
-      "avg_vol_4d": 59385.75,
-      "vol_ratio": 109.082,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "301510",
@@ -7504,8 +6568,8 @@
       "price": 18.27,
       "prev_close": 17.49,
       "volume": 10215638.0,
-      "avg_vol_4d": 93945.75,
-      "vol_ratio": 108.74,
+      "avg_vol_4d": 93946.25,
+      "vol_ratio": 108.739,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -7523,19 +6587,6 @@
       "board": "科创板"
     },
     {
-      "code": "688685",
-      "symbol": "sh688685",
-      "name": "迈信林",
-      "pct": 3.18,
-      "price": 38.94,
-      "prev_close": 37.74,
-      "volume": 3054182.0,
-      "avg_vol_4d": 27940.5,
-      "vol_ratio": 109.31,
-      "industry": "铁路、船舶、航空航天和其他运输设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "003040",
       "symbol": "sz003040",
       "name": "楚天龙",
@@ -7547,19 +6598,6 @@
       "vol_ratio": 105.374,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
-    },
-    {
-      "code": "688607",
-      "symbol": "sh688607",
-      "name": "康众医疗",
-      "pct": 3.52,
-      "price": 40.03,
-      "prev_close": 38.67,
-      "volume": 1616863.0,
-      "avg_vol_4d": 14874.25,
-      "vol_ratio": 108.702,
-      "industry": "专用设备制造业",
-      "board": "科创板"
     },
     {
       "code": "000962",
@@ -7634,8 +6672,8 @@
       "price": 42.19,
       "prev_close": 40.5,
       "volume": 5596897.0,
-      "avg_vol_4d": 52107.5,
-      "vol_ratio": 107.411,
+      "avg_vol_4d": 52108.5,
+      "vol_ratio": 107.409,
       "industry": "汽车制造业",
       "board": "创业板"
     },
@@ -7647,23 +6685,10 @@
       "price": 16.87,
       "prev_close": 16.28,
       "volume": 11668454.0,
-      "avg_vol_4d": 108589.75,
+      "avg_vol_4d": 108590.25,
       "vol_ratio": 107.454,
       "industry": "非金属矿物制品业",
       "board": "创业板"
-    },
-    {
-      "code": "688376",
-      "symbol": "sh688376",
-      "name": "美埃科技",
-      "pct": 4.09,
-      "price": 64.9,
-      "prev_close": 62.35,
-      "volume": 1461910.0,
-      "avg_vol_4d": 13653.25,
-      "vol_ratio": 107.074,
-      "industry": "专用设备制造业",
-      "board": "科创板"
     },
     {
       "code": "603283",
@@ -7673,36 +6698,10 @@
       "price": 45.55,
       "prev_close": 43.7,
       "volume": 17204771.0,
-      "avg_vol_4d": 160972.75,
+      "avg_vol_4d": 160973.25,
       "vol_ratio": 106.88,
       "industry": "专用设备制造业",
       "board": "主板"
-    },
-    {
-      "code": "688150",
-      "symbol": "sh688150",
-      "name": "莱特光电",
-      "pct": 5.38,
-      "price": 38.79,
-      "prev_close": 36.81,
-      "volume": 7865138.0,
-      "avg_vol_4d": 74280.0,
-      "vol_ratio": 105.885,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
-      "code": "688598",
-      "symbol": "sh688598",
-      "name": "金博股份",
-      "pct": 7.2,
-      "price": 34.08,
-      "prev_close": 31.79,
-      "volume": 11984653.0,
-      "avg_vol_4d": 114792.5,
-      "vol_ratio": 104.403,
-      "industry": "非金属矿物制品业",
-      "board": "科创板"
     },
     {
       "code": "301563",
@@ -7712,8 +6711,8 @@
       "price": 117.4,
       "prev_close": 113.88,
       "volume": 1342244.0,
-      "avg_vol_4d": 12538.5,
-      "vol_ratio": 107.05,
+      "avg_vol_4d": 12539.0,
+      "vol_ratio": 107.046,
       "industry": "批发业",
       "board": "创业板"
     },
@@ -7783,19 +6782,6 @@
       "board": "创业板"
     },
     {
-      "code": "688156",
-      "symbol": "sh688156",
-      "name": "路德科技",
-      "pct": 7.63,
-      "price": 23.7,
-      "prev_close": 22.02,
-      "volume": 7568168.0,
-      "avg_vol_4d": 72887.75,
-      "vol_ratio": 103.833,
-      "industry": "生态保护和环境治理业",
-      "board": "科创板"
-    },
-    {
       "code": "300679",
       "symbol": "sz300679",
       "name": "电连技术",
@@ -7803,7 +6789,7 @@
       "price": 44.72,
       "prev_close": 43.0,
       "volume": 20838093.0,
-      "avg_vol_4d": 196837.5,
+      "avg_vol_4d": 196838.25,
       "vol_ratio": 105.864,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
@@ -7855,8 +6841,8 @@
       "price": 14.92,
       "prev_close": 14.09,
       "volume": 5841347.0,
-      "avg_vol_4d": 55957.0,
-      "vol_ratio": 104.39,
+      "avg_vol_4d": 55957.25,
+      "vol_ratio": 104.389,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
     },
@@ -7868,8 +6854,8 @@
       "price": 13.19,
       "prev_close": 12.64,
       "volume": 19570619.0,
-      "avg_vol_4d": 185697.75,
-      "vol_ratio": 105.39,
+      "avg_vol_4d": 185698.5,
+      "vol_ratio": 105.389,
       "industry": "石油、煤炭及其他燃料加工业",
       "board": "创业板"
     },
@@ -7900,19 +6886,6 @@
       "board": "主板"
     },
     {
-      "code": "688019",
-      "symbol": "sh688019",
-      "name": "安集科技",
-      "pct": 3.37,
-      "price": 219.65,
-      "prev_close": 212.5,
-      "volume": 4949014.0,
-      "avg_vol_4d": 46966.0,
-      "vol_ratio": 105.374,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "603826",
       "symbol": "sh603826",
       "name": "坤彩科技",
@@ -7920,7 +6893,7 @@
       "price": 17.38,
       "prev_close": 15.8,
       "volume": 6683720.0,
-      "avg_vol_4d": 66462.25,
+      "avg_vol_4d": 66462.5,
       "vol_ratio": 100.564,
       "industry": "化学原料和化学制品制造业",
       "board": "主板"
@@ -7972,8 +6945,8 @@
       "price": 29.98,
       "prev_close": 28.88,
       "volume": 17626077.0,
-      "avg_vol_4d": 168695.25,
-      "vol_ratio": 104.485,
+      "avg_vol_4d": 168695.75,
+      "vol_ratio": 104.484,
       "industry": "金属制品业",
       "board": "主板"
     },
@@ -7989,19 +6962,6 @@
       "vol_ratio": 103.075,
       "industry": "非金属矿物制品业",
       "board": "主板"
-    },
-    {
-      "code": "688089",
-      "symbol": "sh688089",
-      "name": "ST嘉必优",
-      "pct": 4.1,
-      "price": 8.88,
-      "prev_close": 8.53,
-      "volume": 1872002.0,
-      "avg_vol_4d": 17962.0,
-      "vol_ratio": 104.22,
-      "industry": "食品制造业",
-      "board": "科创板"
     },
     {
       "code": "300489",
@@ -8024,7 +6984,7 @@
       "price": 23.79,
       "prev_close": 22.85,
       "volume": 17573400.0,
-      "avg_vol_4d": 169470.0,
+      "avg_vol_4d": 169470.75,
       "vol_ratio": 103.696,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
@@ -8115,23 +7075,10 @@
       "price": 25.22,
       "prev_close": 24.28,
       "volume": 38686762.0,
-      "avg_vol_4d": 374258.5,
+      "avg_vol_4d": 374258.75,
       "vol_ratio": 103.369,
       "industry": "批发业",
       "board": "创业板"
-    },
-    {
-      "code": "688548",
-      "symbol": "sh688548",
-      "name": "广钢气体",
-      "pct": 3.23,
-      "price": 29.7,
-      "prev_close": 28.77,
-      "volume": 29895350.0,
-      "avg_vol_4d": 288093.25,
-      "vol_ratio": 103.77,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "600359",
@@ -8147,19 +7094,6 @@
       "board": "主板"
     },
     {
-      "code": "688530",
-      "symbol": "sh688530",
-      "name": "欧莱新材",
-      "pct": 5.55,
-      "price": 56.89,
-      "prev_close": 53.9,
-      "volume": 6924100.0,
-      "avg_vol_4d": 67808.25,
-      "vol_ratio": 102.113,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "301169",
       "symbol": "sz301169",
       "name": "零点有数",
@@ -8167,8 +7101,8 @@
       "price": 56.8,
       "prev_close": 54.38,
       "volume": 1697890.0,
-      "avg_vol_4d": 16569.0,
-      "vol_ratio": 102.474,
+      "avg_vol_4d": 16569.25,
+      "vol_ratio": 102.472,
       "industry": "商务服务业",
       "board": "创业板"
     },
@@ -8180,7 +7114,7 @@
       "price": 33.09,
       "prev_close": 31.25,
       "volume": 58480210.0,
-      "avg_vol_4d": 576723.75,
+      "avg_vol_4d": 576724.0,
       "vol_ratio": 101.401,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
@@ -8197,19 +7131,6 @@
       "vol_ratio": 102.315,
       "industry": "软件和信息技术服务业",
       "board": "创业板"
-    },
-    {
-      "code": "688233",
-      "symbol": "sh688233",
-      "name": "神工股份",
-      "pct": 4.43,
-      "price": 97.31,
-      "prev_close": 93.18,
-      "volume": 6899277.0,
-      "avg_vol_4d": 67414.5,
-      "vol_ratio": 102.341,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "688508",
@@ -8232,7 +7153,7 @@
       "price": 11.19,
       "prev_close": 10.76,
       "volume": 52891285.0,
-      "avg_vol_4d": 517027.75,
+      "avg_vol_4d": 517028.25,
       "vol_ratio": 102.299,
       "industry": "电气机械和器材制造业",
       "board": "主板"
@@ -8262,19 +7183,6 @@
       "vol_ratio": 101.971,
       "industry": "医药制造业",
       "board": "主板"
-    },
-    {
-      "code": "688352",
-      "symbol": "sh688352",
-      "name": "颀中科技",
-      "pct": 4.57,
-      "price": 17.16,
-      "prev_close": 16.41,
-      "volume": 19940609.0,
-      "avg_vol_4d": 196380.5,
-      "vol_ratio": 101.541,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "002248",
@@ -8310,7 +7218,7 @@
       "price": 5.4,
       "prev_close": 5.24,
       "volume": 16999500.0,
-      "avg_vol_4d": 166114.0,
+      "avg_vol_4d": 166114.25,
       "vol_ratio": 102.336,
       "industry": "新闻和出版业",
       "board": "主板"
@@ -8323,8 +7231,8 @@
       "price": 396.76,
       "prev_close": 376.21,
       "volume": 2778466.0,
-      "avg_vol_4d": 27594.0,
-      "vol_ratio": 100.691,
+      "avg_vol_4d": 27594.25,
+      "vol_ratio": 100.69,
       "industry": "金属制品业",
       "board": "创业板"
     },
@@ -8366,19 +7274,6 @@
       "vol_ratio": 97.41,
       "industry": "仪器仪表制造业",
       "board": "主板"
-    },
-    {
-      "code": "688652",
-      "symbol": "sh688652",
-      "name": "京仪装备",
-      "pct": 4.45,
-      "price": 132.72,
-      "prev_close": 127.07,
-      "volume": 4016700.0,
-      "avg_vol_4d": 39755.5,
-      "vol_ratio": 101.035,
-      "industry": "专用设备制造业",
-      "board": "科创板"
     },
     {
       "code": "001313",
@@ -8459,19 +7354,6 @@
       "board": "科创板"
     },
     {
-      "code": "688820",
-      "symbol": "sh688820",
-      "name": "盛合晶微",
-      "pct": 3.73,
-      "price": 128.8,
-      "prev_close": 124.17,
-      "volume": 8405410.0,
-      "avg_vol_4d": 83322.5,
-      "vol_ratio": 100.878,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "688479",
       "symbol": "sh688479",
       "name": "友车科技",
@@ -8485,19 +7367,6 @@
       "board": "科创板"
     },
     {
-      "code": "688503",
-      "symbol": "sh688503",
-      "name": "聚和材料",
-      "pct": 5.82,
-      "price": 67.8,
-      "prev_close": 64.07,
-      "volume": 13004341.0,
-      "avg_vol_4d": 130865.5,
-      "vol_ratio": 99.372,
-      "industry": "电气机械和器材制造业",
-      "board": "科创板"
-    },
-    {
       "code": "603688",
       "symbol": "sh603688",
       "name": "石英股份",
@@ -8505,7 +7374,7 @@
       "price": 46.62,
       "prev_close": 44.98,
       "volume": 15941373.0,
-      "avg_vol_4d": 158129.75,
+      "avg_vol_4d": 158130.0,
       "vol_ratio": 100.812,
       "industry": "非金属矿物制品业",
       "board": "主板"
@@ -8531,8 +7400,8 @@
       "price": 36.71,
       "prev_close": 35.33,
       "volume": 5530762.0,
-      "avg_vol_4d": 55087.25,
-      "vol_ratio": 100.4,
+      "avg_vol_4d": 55087.75,
+      "vol_ratio": 100.399,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -8544,7 +7413,7 @@
       "price": 28.02,
       "prev_close": 27.18,
       "volume": 18354170.0,
-      "avg_vol_4d": 181867.0,
+      "avg_vol_4d": 181867.5,
       "vol_ratio": 100.921,
       "industry": "软件和信息技术服务业",
       "board": "创业板"
@@ -8583,8 +7452,8 @@
       "price": 10.49,
       "prev_close": 10.16,
       "volume": 7074135.0,
-      "avg_vol_4d": 70230.25,
-      "vol_ratio": 100.728,
+      "avg_vol_4d": 70231.0,
+      "vol_ratio": 100.727,
       "industry": "食品制造业",
       "board": "主板"
     },
@@ -8609,7 +7478,7 @@
       "price": 65.63,
       "prev_close": 62.51,
       "volume": 9033626.0,
-      "avg_vol_4d": 91131.75,
+      "avg_vol_4d": 91132.0,
       "vol_ratio": 99.127,
       "industry": "仪器仪表制造业",
       "board": "创业板"
@@ -8626,19 +7495,6 @@
       "vol_ratio": 99.054,
       "industry": "房地产业",
       "board": "主板"
-    },
-    {
-      "code": "688419",
-      "symbol": "sh688419",
-      "name": "耐科装备",
-      "pct": 4.61,
-      "price": 49.27,
-      "prev_close": 47.1,
-      "volume": 3551275.0,
-      "avg_vol_4d": 36090.25,
-      "vol_ratio": 98.4,
-      "industry": "专用设备制造业",
-      "board": "科创板"
     },
     {
       "code": "002409",
@@ -8665,19 +7521,6 @@
       "vol_ratio": 99.059,
       "industry": "食品制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688125",
-      "symbol": "sh688125",
-      "name": "安达智能",
-      "pct": 4.45,
-      "price": 122.58,
-      "prev_close": 117.36,
-      "volume": 915294.0,
-      "avg_vol_4d": 9305.75,
-      "vol_ratio": 98.358,
-      "industry": "专用设备制造业",
-      "board": "科创板"
     },
     {
       "code": "688286",
@@ -8726,7 +7569,7 @@
       "price": 3.43,
       "prev_close": 3.12,
       "volume": 39696900.0,
-      "avg_vol_4d": 420670.75,
+      "avg_vol_4d": 420671.0,
       "vol_ratio": 94.366,
       "industry": "零售业",
       "board": "主板"
@@ -8765,23 +7608,10 @@
       "price": 40.11,
       "prev_close": 38.2,
       "volume": 17642045.0,
-      "avg_vol_4d": 181563.5,
+      "avg_vol_4d": 181564.0,
       "vol_ratio": 97.167,
       "industry": "非金属矿物制品业",
       "board": "主板"
-    },
-    {
-      "code": "688609",
-      "symbol": "sh688609",
-      "name": "九联科技",
-      "pct": 3.18,
-      "price": 9.09,
-      "prev_close": 8.81,
-      "volume": 12859068.0,
-      "avg_vol_4d": 130803.0,
-      "vol_ratio": 98.309,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "301536",
@@ -8856,7 +7686,7 @@
       "price": 29.85,
       "prev_close": 28.88,
       "volume": 10180516.0,
-      "avg_vol_4d": 104106.5,
+      "avg_vol_4d": 104107.0,
       "vol_ratio": 97.789,
       "industry": "公共设施管理业",
       "board": "创业板"
@@ -8908,8 +7738,8 @@
       "price": 40.7,
       "prev_close": 39.5,
       "volume": 1052600.0,
-      "avg_vol_4d": 10790.75,
-      "vol_ratio": 97.547,
+      "avg_vol_4d": 10791.25,
+      "vol_ratio": 97.542,
       "industry": "电气机械和器材制造业",
       "board": "创业板"
     },
@@ -8934,7 +7764,7 @@
       "price": 62.25,
       "prev_close": 60.39,
       "volume": 66937556.0,
-      "avg_vol_4d": 687297.0,
+      "avg_vol_4d": 687298.0,
       "vol_ratio": 97.392,
       "industry": "化学原料和化学制品制造业",
       "board": "创业板"
@@ -8973,23 +7803,10 @@
       "price": 15.74,
       "prev_close": 15.24,
       "volume": 8755600.0,
-      "avg_vol_4d": 90178.25,
+      "avg_vol_4d": 90178.75,
       "vol_ratio": 97.092,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
-    },
-    {
-      "code": "688293",
-      "symbol": "sh688293",
-      "name": "奥浦迈",
-      "pct": 4.19,
-      "price": 56.91,
-      "prev_close": 54.62,
-      "volume": 3757991.0,
-      "avg_vol_4d": 39042.25,
-      "vol_ratio": 96.254,
-      "industry": "研究和试验发展",
-      "board": "科创板"
     },
     {
       "code": "002172",
@@ -9012,7 +7829,7 @@
       "price": 73.99,
       "prev_close": 69.83,
       "volume": 8100505.0,
-      "avg_vol_4d": 85532.75,
+      "avg_vol_4d": 85533.25,
       "vol_ratio": 94.706,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
@@ -9057,32 +7874,6 @@
       "board": "科创板"
     },
     {
-      "code": "688456",
-      "symbol": "sh688456",
-      "name": "有研粉材",
-      "pct": 4.91,
-      "price": 74.52,
-      "prev_close": 71.03,
-      "volume": 5568278.0,
-      "avg_vol_4d": 58735.25,
-      "vol_ratio": 94.803,
-      "industry": "金属制品业",
-      "board": "科创板"
-    },
-    {
-      "code": "688082",
-      "symbol": "sh688082",
-      "name": "盛美上海",
-      "pct": 4.14,
-      "price": 281.4,
-      "prev_close": 270.2,
-      "volume": 3424220.0,
-      "avg_vol_4d": 36001.5,
-      "vol_ratio": 95.113,
-      "industry": "专用设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "688545",
       "symbol": "sh688545",
       "name": "兴福电子",
@@ -9092,19 +7883,6 @@
       "volume": 8440710.0,
       "avg_vol_4d": 89652.25,
       "vol_ratio": 94.149,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
-    },
-    {
-      "code": "688307",
-      "symbol": "sh688307",
-      "name": "中润光学",
-      "pct": 4.95,
-      "price": 47.29,
-      "prev_close": 45.06,
-      "volume": 3622431.0,
-      "avg_vol_4d": 38435.75,
-      "vol_ratio": 94.246,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "科创板"
     },
@@ -9142,23 +7920,10 @@
       "price": 4.03,
       "prev_close": 3.9,
       "volume": 51981568.0,
-      "avg_vol_4d": 547573.75,
+      "avg_vol_4d": 547574.25,
       "vol_ratio": 94.931,
       "industry": "公共设施管理业",
       "board": "主板"
-    },
-    {
-      "code": "688787",
-      "symbol": "sh688787",
-      "name": "海天瑞声",
-      "pct": 3.08,
-      "price": 96.19,
-      "prev_close": 93.32,
-      "volume": 2198369.0,
-      "avg_vol_4d": 23134.0,
-      "vol_ratio": 95.028,
-      "industry": "软件和信息技术服务业",
-      "board": "科创板"
     },
     {
       "code": "300709",
@@ -9181,7 +7946,7 @@
       "price": 15.85,
       "prev_close": 15.36,
       "volume": 14318688.0,
-      "avg_vol_4d": 151095.0,
+      "avg_vol_4d": 151095.5,
       "vol_ratio": 94.766,
       "industry": "化学原料和化学制品制造业",
       "board": "创业板"
@@ -9207,7 +7972,7 @@
       "price": 18.83,
       "prev_close": 18.15,
       "volume": 14951837.0,
-      "avg_vol_4d": 159187.0,
+      "avg_vol_4d": 159187.75,
       "vol_ratio": 93.926,
       "industry": "化学原料和化学制品制造业",
       "board": "创业板"
@@ -9220,7 +7985,7 @@
       "price": 18.02,
       "prev_close": 17.47,
       "volume": 19430289.0,
-      "avg_vol_4d": 207081.5,
+      "avg_vol_4d": 207081.75,
       "vol_ratio": 93.829,
       "industry": "废弃资源综合利用业",
       "board": "主板"
@@ -9233,7 +7998,7 @@
       "price": 55.35,
       "prev_close": 52.83,
       "volume": 4528246.0,
-      "avg_vol_4d": 48840.5,
+      "avg_vol_4d": 48840.75,
       "vol_ratio": 92.715,
       "industry": "专用设备制造业",
       "board": "创业板"
@@ -9272,8 +8037,8 @@
       "price": 4.04,
       "prev_close": 3.89,
       "volume": 38905300.0,
-      "avg_vol_4d": 418329.5,
-      "vol_ratio": 93.002,
+      "avg_vol_4d": 418330.0,
+      "vol_ratio": 93.001,
       "industry": "食品制造业",
       "board": "主板"
     },
@@ -9311,7 +8076,7 @@
       "price": 38.12,
       "prev_close": 36.86,
       "volume": 21155650.0,
-      "avg_vol_4d": 227957.5,
+      "avg_vol_4d": 227957.75,
       "vol_ratio": 92.805,
       "industry": "化学原料和化学制品制造业",
       "board": "主板"
@@ -9350,7 +8115,7 @@
       "price": 197.0,
       "prev_close": 187.66,
       "volume": 6143630.0,
-      "avg_vol_4d": 67380.25,
+      "avg_vol_4d": 67380.75,
       "vol_ratio": 91.178,
       "industry": "仪器仪表制造业",
       "board": "创业板"
@@ -9402,7 +8167,7 @@
       "price": 50.3,
       "prev_close": 48.79,
       "volume": 33723152.0,
-      "avg_vol_4d": 368011.25,
+      "avg_vol_4d": 368012.0,
       "vol_ratio": 91.636,
       "industry": "有色金属冶炼和压延加工业",
       "board": "主板"
@@ -9428,7 +8193,7 @@
       "price": 18.52,
       "prev_close": 17.86,
       "volume": 7929795.0,
-      "avg_vol_4d": 87221.0,
+      "avg_vol_4d": 87221.5,
       "vol_ratio": 90.916,
       "industry": "软件和信息技术服务业",
       "board": "创业板"
@@ -9467,7 +8232,7 @@
       "price": 12.81,
       "prev_close": 11.94,
       "volume": 119625577.0,
-      "avg_vol_4d": 1358362.25,
+      "avg_vol_4d": 1358362.75,
       "vol_ratio": 88.066,
       "industry": "房地产业",
       "board": "主板"
@@ -9506,8 +8271,8 @@
       "price": 15.37,
       "prev_close": 14.89,
       "volume": 7762004.0,
-      "avg_vol_4d": 86176.0,
-      "vol_ratio": 90.072,
+      "avg_vol_4d": 86176.75,
+      "vol_ratio": 90.071,
       "industry": "水的生产和供应业",
       "board": "主板"
     },
@@ -9532,7 +8297,7 @@
       "price": 17.34,
       "prev_close": 16.41,
       "volume": 15887087.0,
-      "avg_vol_4d": 180272.25,
+      "avg_vol_4d": 180273.25,
       "vol_ratio": 88.128,
       "industry": "金属制品业",
       "board": "主板"
@@ -9549,19 +8314,6 @@
       "vol_ratio": 88.924,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688401",
-      "symbol": "sh688401",
-      "name": "路维光电",
-      "pct": 3.39,
-      "price": 65.5,
-      "prev_close": 63.35,
-      "volume": 3716263.0,
-      "avg_vol_4d": 41547.25,
-      "vol_ratio": 89.447,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "300997",
@@ -9688,7 +8440,7 @@
       "price": 1.86,
       "prev_close": 1.8,
       "volume": 34199808.0,
-      "avg_vol_4d": 386257.0,
+      "avg_vol_4d": 386257.25,
       "vol_ratio": 88.542,
       "industry": "纺织业",
       "board": "主板"
@@ -9740,7 +8492,7 @@
       "price": 28.36,
       "prev_close": 27.24,
       "volume": 13354525.0,
-      "avg_vol_4d": 152822.25,
+      "avg_vol_4d": 152822.75,
       "vol_ratio": 87.386,
       "industry": "通用设备制造业",
       "board": "主板"
@@ -9811,19 +8563,6 @@
       "board": "创业板"
     },
     {
-      "code": "688147",
-      "symbol": "sh688147",
-      "name": "微导纳米",
-      "pct": 4.9,
-      "price": 105.83,
-      "prev_close": 100.89,
-      "volume": 9150895.0,
-      "avg_vol_4d": 105742.75,
-      "vol_ratio": 86.539,
-      "industry": "专用设备制造业",
-      "board": "科创板"
-    },
-    {
       "code": "300430",
       "symbol": "sz300430",
       "name": "*ST益通",
@@ -9870,7 +8609,7 @@
       "price": 14.5,
       "prev_close": 13.9,
       "volume": 15966890.0,
-      "avg_vol_4d": 185042.5,
+      "avg_vol_4d": 185042.75,
       "vol_ratio": 86.288,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
@@ -9961,7 +8700,7 @@
       "price": 32.72,
       "prev_close": 31.7,
       "volume": 126332020.0,
-      "avg_vol_4d": 1459829.75,
+      "avg_vol_4d": 1459830.75,
       "vol_ratio": 86.539,
       "industry": "电气机械和器材制造业",
       "board": "主板"
@@ -9987,23 +8726,10 @@
       "price": 29.33,
       "prev_close": 28.04,
       "volume": 9231250.0,
-      "avg_vol_4d": 108494.0,
+      "avg_vol_4d": 108494.5,
       "vol_ratio": 85.085,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
-    },
-    {
-      "code": "688610",
-      "symbol": "sh688610",
-      "name": "埃科光电",
-      "pct": 4.32,
-      "price": 155.92,
-      "prev_close": 149.46,
-      "volume": 1176148.0,
-      "avg_vol_4d": 13824.5,
-      "vol_ratio": 85.077,
-      "industry": "仪器仪表制造业",
-      "board": "科创板"
     },
     {
       "code": "002772",
@@ -10091,7 +8817,7 @@
       "price": 7.38,
       "prev_close": 7.13,
       "volume": 33517212.0,
-      "avg_vol_4d": 395668.0,
+      "avg_vol_4d": 395668.5,
       "vol_ratio": 84.71,
       "industry": "批发业",
       "board": "主板"
@@ -10104,23 +8830,10 @@
       "price": 89.0,
       "prev_close": 86.19,
       "volume": 9618126.0,
-      "avg_vol_4d": 113521.75,
-      "vol_ratio": 84.725,
+      "avg_vol_4d": 113522.5,
+      "vol_ratio": 84.724,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688667",
-      "symbol": "sh688667",
-      "name": "菱电电控",
-      "pct": 3.04,
-      "price": 91.19,
-      "prev_close": 88.5,
-      "volume": 653581.0,
-      "avg_vol_4d": 7722.25,
-      "vol_ratio": 84.636,
-      "industry": "计算机、通信和其他电子设备制造业",
-      "board": "科创板"
     },
     {
       "code": "688668",
@@ -10156,23 +8869,10 @@
       "price": 9.79,
       "prev_close": 9.5,
       "volume": 91031877.0,
-      "avg_vol_4d": 1082022.75,
+      "avg_vol_4d": 1082023.25,
       "vol_ratio": 84.131,
       "industry": "商务服务业",
       "board": "主板"
-    },
-    {
-      "code": "688308",
-      "symbol": "sh688308",
-      "name": "欧科亿",
-      "pct": 3.96,
-      "price": 87.51,
-      "prev_close": 84.18,
-      "volume": 7638832.0,
-      "avg_vol_4d": 91993.25,
-      "vol_ratio": 83.037,
-      "industry": "金属制品业",
-      "board": "科创板"
     },
     {
       "code": "601952",
@@ -10182,7 +8882,7 @@
       "price": 9.63,
       "prev_close": 9.32,
       "volume": 38317222.0,
-      "avg_vol_4d": 460339.5,
+      "avg_vol_4d": 460339.75,
       "vol_ratio": 83.237,
       "industry": "农副食品加工业",
       "board": "主板"
@@ -10260,8 +8960,8 @@
       "price": 77.78,
       "prev_close": 73.72,
       "volume": 4089413.0,
-      "avg_vol_4d": 50845.75,
-      "vol_ratio": 80.428,
+      "avg_vol_4d": 50846.25,
+      "vol_ratio": 80.427,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -10273,7 +8973,7 @@
       "price": 9.41,
       "prev_close": 9.02,
       "volume": 111502941.0,
-      "avg_vol_4d": 1374006.0,
+      "avg_vol_4d": 1374006.25,
       "vol_ratio": 81.152,
       "industry": "医药制造业",
       "board": "主板"
@@ -10286,8 +8986,8 @@
       "price": 18.03,
       "prev_close": 17.31,
       "volume": 5222500.0,
-      "avg_vol_4d": 64335.25,
-      "vol_ratio": 81.176,
+      "avg_vol_4d": 64336.0,
+      "vol_ratio": 81.175,
       "industry": "化学原料和化学制品制造业",
       "board": "主板"
     },
@@ -10303,32 +9003,6 @@
       "vol_ratio": 81.742,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
-    },
-    {
-      "code": "688478",
-      "symbol": "sh688478",
-      "name": "晶升股份",
-      "pct": 3.49,
-      "price": 43.0,
-      "prev_close": 41.55,
-      "volume": 3754336.0,
-      "avg_vol_4d": 46136.0,
-      "vol_ratio": 81.375,
-      "industry": "专用设备制造业",
-      "board": "科创板"
-    },
-    {
-      "code": "688323",
-      "symbol": "sh688323",
-      "name": "瑞华泰",
-      "pct": 3.52,
-      "price": 25.61,
-      "prev_close": 24.74,
-      "volume": 9032821.0,
-      "avg_vol_4d": 111419.75,
-      "vol_ratio": 81.07,
-      "industry": "橡胶和塑料制品业",
-      "board": "科创板"
     },
     {
       "code": "603626",
@@ -10468,8 +9142,8 @@
       "price": 69.95,
       "prev_close": 67.38,
       "volume": 1066300.0,
-      "avg_vol_4d": 13459.5,
-      "vol_ratio": 79.223,
+      "avg_vol_4d": 13459.75,
+      "vol_ratio": 79.221,
       "industry": "橡胶和塑料制品业",
       "board": "创业板"
     },
@@ -10481,7 +9155,7 @@
       "price": 38.99,
       "prev_close": 37.8,
       "volume": 60132420.0,
-      "avg_vol_4d": 755210.75,
+      "avg_vol_4d": 755211.0,
       "vol_ratio": 79.623,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
@@ -10494,7 +9168,7 @@
       "price": 93.35,
       "prev_close": 89.31,
       "volume": 18731859.0,
-      "avg_vol_4d": 238648.5,
+      "avg_vol_4d": 238648.75,
       "vol_ratio": 78.491,
       "industry": "非金属矿物制品业",
       "board": "创业板"
@@ -10520,7 +9194,7 @@
       "price": 55.53,
       "prev_close": 53.68,
       "volume": 10681245.0,
-      "avg_vol_4d": 135334.0,
+      "avg_vol_4d": 135334.25,
       "vol_ratio": 78.925,
       "industry": "通用设备制造业",
       "board": "创业板"
@@ -10559,8 +9233,8 @@
       "price": 6.79,
       "prev_close": 6.55,
       "volume": 37327284.0,
-      "avg_vol_4d": 482118.25,
-      "vol_ratio": 77.424,
+      "avg_vol_4d": 482119.0,
+      "vol_ratio": 77.423,
       "industry": "农、林、牧、渔专业及辅助性活动",
       "board": "主板"
     },
@@ -10585,7 +9259,7 @@
       "price": 2.49,
       "prev_close": 2.4,
       "volume": 7406360.0,
-      "avg_vol_4d": 96220.5,
+      "avg_vol_4d": 96220.75,
       "vol_ratio": 76.973,
       "industry": "土木工程建筑业",
       "board": "主板"
@@ -10611,8 +9285,8 @@
       "price": 55.45,
       "prev_close": 53.59,
       "volume": 1675589.0,
-      "avg_vol_4d": 21950.0,
-      "vol_ratio": 76.337,
+      "avg_vol_4d": 21950.5,
+      "vol_ratio": 76.335,
       "industry": "专用设备制造业",
       "board": "创业板"
     },
@@ -10689,7 +9363,7 @@
       "price": 30.07,
       "prev_close": 29.01,
       "volume": 3320754.0,
-      "avg_vol_4d": 44436.5,
+      "avg_vol_4d": 44436.75,
       "vol_ratio": 74.73,
       "industry": "专用设备制造业",
       "board": "创业板"
@@ -10715,7 +9389,7 @@
       "price": 1.65,
       "prev_close": 1.6,
       "volume": 542658654.0,
-      "avg_vol_4d": 7240840.25,
+      "avg_vol_4d": 7240840.75,
       "vol_ratio": 74.944,
       "industry": "零售业",
       "board": "主板"
@@ -10741,8 +9415,8 @@
       "price": 50.73,
       "prev_close": 48.84,
       "volume": 3648684.0,
-      "avg_vol_4d": 49176.5,
-      "vol_ratio": 74.196,
+      "avg_vol_4d": 49177.0,
+      "vol_ratio": 74.195,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
     },
@@ -10758,19 +9432,6 @@
       "vol_ratio": 74.183,
       "industry": "橡胶和塑料制品业",
       "board": "主板"
-    },
-    {
-      "code": "688066",
-      "symbol": "sh688066",
-      "name": "*ST航图",
-      "pct": 3.17,
-      "price": 8.15,
-      "prev_close": 7.9,
-      "volume": 5035935.0,
-      "avg_vol_4d": 68267.0,
-      "vol_ratio": 73.768,
-      "industry": "软件和信息技术服务业",
-      "board": "科创板"
     },
     {
       "code": "603823",
@@ -10838,19 +9499,6 @@
       "board": "创业板"
     },
     {
-      "code": "688669",
-      "symbol": "sh688669",
-      "name": "聚石化学",
-      "pct": 3.6,
-      "price": 72.5,
-      "prev_close": 69.98,
-      "volume": 2136256.0,
-      "avg_vol_4d": 30026.5,
-      "vol_ratio": 71.146,
-      "industry": "橡胶和塑料制品业",
-      "board": "科创板"
-    },
-    {
       "code": "002971",
       "symbol": "sz002971",
       "name": "和远气体",
@@ -10897,7 +9545,7 @@
       "price": 11.37,
       "prev_close": 11.03,
       "volume": 141833967.0,
-      "avg_vol_4d": 2030688.5,
+      "avg_vol_4d": 2030689.0,
       "vol_ratio": 69.845,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
@@ -10914,19 +9562,6 @@
       "vol_ratio": 68.151,
       "industry": "化学原料和化学制品制造业",
       "board": "主板"
-    },
-    {
-      "code": "688227",
-      "symbol": "sh688227",
-      "name": "品高股份",
-      "pct": 3.19,
-      "price": 73.35,
-      "prev_close": 71.08,
-      "volume": 2823307.0,
-      "avg_vol_4d": 41649.5,
-      "vol_ratio": 67.787,
-      "industry": "软件和信息技术服务业",
-      "board": "科创板"
     },
     {
       "code": "603595",
@@ -10979,19 +9614,6 @@
       "vol_ratio": 65.104,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "688605",
-      "symbol": "sh688605",
-      "name": "先锋精科",
-      "pct": 3.81,
-      "price": 72.72,
-      "prev_close": 70.05,
-      "volume": 3421210.0,
-      "avg_vol_4d": 54286.5,
-      "vol_ratio": 63.021,
-      "industry": "通用设备制造业",
-      "board": "科创板"
     },
     {
       "code": "600865",
@@ -11079,8 +9701,8 @@
       "price": 36.46,
       "prev_close": 35.05,
       "volume": 6298018.0,
-      "avg_vol_4d": 122447.0,
-      "vol_ratio": 51.435,
+      "avg_vol_4d": 122447.5,
+      "vol_ratio": 51.434,
       "industry": "非金属矿物制品业",
       "board": "主板"
     },
@@ -11189,6 +9811,19 @@
       "board": "港股"
     },
     {
+      "code": "920821",
+      "symbol": "bj920821",
+      "name": "则成电子",
+      "pct": 29.97,
+      "price": 23.59,
+      "prev_close": 18.15,
+      "volume": 14950160.0,
+      "avg_vol_4d": 3491300.0,
+      "vol_ratio": 4.282,
+      "industry": "",
+      "board": ""
+    },
+    {
       "code": "00681",
       "symbol": "hk00681",
       "name": "中民控股",
@@ -11265,6 +9900,32 @@
       "vol_ratio": 1.34,
       "industry": "",
       "board": "港股"
+    },
+    {
+      "code": "688498",
+      "symbol": "sh688498",
+      "name": "源杰科技",
+      "pct": 16.1,
+      "price": 1702.0,
+      "prev_close": 1466.0,
+      "volume": 5639919.0,
+      "avg_vol_4d": 2760917.75,
+      "vol_ratio": 2.043,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688700",
+      "symbol": "sh688700",
+      "name": "东威科技",
+      "pct": 15.09,
+      "price": 61.85,
+      "prev_close": 53.74,
+      "volume": 26802965.0,
+      "avg_vol_4d": 11151216.25,
+      "vol_ratio": 2.404,
+      "industry": "专用设备制造业",
+      "board": "科创板"
     },
     {
       "code": "00532",
@@ -11345,6 +10006,45 @@
       "board": "港股"
     },
     {
+      "code": "688656",
+      "symbol": "sh688656",
+      "name": "浩欧博",
+      "pct": 11.91,
+      "price": 116.92,
+      "prev_close": 104.48,
+      "volume": 1568427.0,
+      "avg_vol_4d": 1118782.75,
+      "vol_ratio": 1.402,
+      "industry": "医药制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "920178",
+      "symbol": "bj920178",
+      "name": "锐翔智能",
+      "pct": 10.11,
+      "price": 95.07,
+      "prev_close": 86.34,
+      "volume": 2082207.0,
+      "avg_vol_4d": 876065.25,
+      "vol_ratio": 2.377,
+      "industry": "",
+      "board": ""
+    },
+    {
+      "code": "688031",
+      "symbol": "sh688031",
+      "name": "星环科技",
+      "pct": 10.5,
+      "price": 117.0,
+      "prev_close": 105.88,
+      "volume": 10914731.0,
+      "avg_vol_4d": 6866494.25,
+      "vol_ratio": 1.59,
+      "industry": "软件和信息技术服务业",
+      "board": "科创板"
+    },
+    {
       "code": "00919",
       "symbol": "hk00919",
       "name": "现代健康科技",
@@ -11358,6 +10058,19 @@
       "board": "港股"
     },
     {
+      "code": "688630",
+      "symbol": "sh688630",
+      "name": "芯碁微装",
+      "pct": 10.59,
+      "price": 410.05,
+      "prev_close": 370.8,
+      "volume": 5251610.0,
+      "avg_vol_4d": 3765057.25,
+      "vol_ratio": 1.395,
+      "industry": "专用设备制造业",
+      "board": "科创板"
+    },
+    {
       "code": "920826",
       "symbol": "bj920826",
       "name": "盖世食品",
@@ -11369,6 +10082,32 @@
       "vol_ratio": 1.907,
       "industry": "",
       "board": ""
+    },
+    {
+      "code": "688698",
+      "symbol": "sh688698",
+      "name": "伟创电气",
+      "pct": 8.48,
+      "price": 44.5,
+      "prev_close": 41.02,
+      "volume": 7969892.0,
+      "avg_vol_4d": 3081259.0,
+      "vol_ratio": 2.587,
+      "industry": "仪器仪表制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688628",
+      "symbol": "sh688628",
+      "name": "优利德",
+      "pct": 8.96,
+      "price": 83.42,
+      "prev_close": 76.56,
+      "volume": 6607366.0,
+      "avg_vol_4d": 3083627.75,
+      "vol_ratio": 2.143,
+      "industry": "仪器仪表制造业",
+      "board": "科创板"
     },
     {
       "code": "159382",
@@ -11397,6 +10136,19 @@
       "board": "港股"
     },
     {
+      "code": "688313",
+      "symbol": "sh688313",
+      "name": "仕佳光子",
+      "pct": 9.38,
+      "price": 154.91,
+      "prev_close": 141.62,
+      "volume": 21977137.0,
+      "avg_vol_4d": 14269001.0,
+      "vol_ratio": 1.54,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
       "code": "512330",
       "symbol": "sh512330",
       "name": "信息科技ETF南方",
@@ -11408,6 +10160,71 @@
       "vol_ratio": 5.373,
       "industry": "",
       "board": "ETF"
+    },
+    {
+      "code": "688800",
+      "symbol": "sh688800",
+      "name": "瑞可达",
+      "pct": 9.05,
+      "price": 63.5,
+      "prev_close": 58.23,
+      "volume": 15836143.0,
+      "avg_vol_4d": 9653923.75,
+      "vol_ratio": 1.64,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688010",
+      "symbol": "sh688010",
+      "name": "福光股份",
+      "pct": 8.57,
+      "price": 27.25,
+      "prev_close": 25.1,
+      "volume": 7078893.0,
+      "avg_vol_4d": 3739428.5,
+      "vol_ratio": 1.893,
+      "industry": "仪器仪表制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688496",
+      "symbol": "sh688496",
+      "name": "*ST清越",
+      "pct": 7.87,
+      "price": 0.96,
+      "prev_close": 0.89,
+      "volume": 10416803.0,
+      "avg_vol_4d": 4924546.0,
+      "vol_ratio": 2.115,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688809",
+      "symbol": "sh688809",
+      "name": "强一股份",
+      "pct": 8.64,
+      "price": 440.02,
+      "prev_close": 405.03,
+      "volume": 2395559.0,
+      "avg_vol_4d": 1588394.0,
+      "vol_ratio": 1.508,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688416",
+      "symbol": "sh688416",
+      "name": "恒烁股份",
+      "pct": 8.36,
+      "price": 76.84,
+      "prev_close": 70.91,
+      "volume": 7091984.0,
+      "avg_vol_4d": 4187987.5,
+      "vol_ratio": 1.693,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
     },
     {
       "code": "00810",
@@ -11423,6 +10240,240 @@
       "board": "港股"
     },
     {
+      "code": "688531",
+      "symbol": "sh688531",
+      "name": "日联科技",
+      "pct": 8.63,
+      "price": 141.66,
+      "prev_close": 130.41,
+      "volume": 4881046.0,
+      "avg_vol_4d": 3507919.25,
+      "vol_ratio": 1.391,
+      "industry": "专用设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688035",
+      "symbol": "sh688035",
+      "name": "德邦科技",
+      "pct": 8.47,
+      "price": 69.06,
+      "prev_close": 63.67,
+      "volume": 7718500.0,
+      "avg_vol_4d": 5492683.25,
+      "vol_ratio": 1.405,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "920060",
+      "symbol": "bj920060",
+      "name": "万源通",
+      "pct": 6.96,
+      "price": 23.5,
+      "prev_close": 21.97,
+      "volume": 4903132.0,
+      "avg_vol_4d": 2041407.75,
+      "vol_ratio": 2.402,
+      "industry": "",
+      "board": ""
+    },
+    {
+      "code": "688022",
+      "symbol": "sh688022",
+      "name": "ST瀚川",
+      "pct": 5.44,
+      "price": 9.49,
+      "prev_close": 9.0,
+      "volume": 4447108.0,
+      "avg_vol_4d": 1320283.5,
+      "vol_ratio": 3.368,
+      "industry": "专用设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688766",
+      "symbol": "sh688766",
+      "name": "普冉股份",
+      "pct": 8.18,
+      "price": 397.29,
+      "prev_close": 367.26,
+      "volume": 10587422.0,
+      "avg_vol_4d": 6924276.5,
+      "vol_ratio": 1.529,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688635",
+      "symbol": "sh688635",
+      "name": "长进光子",
+      "pct": 7.68,
+      "price": 282.45,
+      "prev_close": 262.3,
+      "volume": 2391446.0,
+      "avg_vol_4d": 1303422.25,
+      "vol_ratio": 1.835,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688359",
+      "symbol": "sh688359",
+      "name": "三孚新科",
+      "pct": 8.12,
+      "price": 96.79,
+      "prev_close": 89.52,
+      "volume": 4732379.0,
+      "avg_vol_4d": 3194105.0,
+      "vol_ratio": 1.482,
+      "industry": "化学原料和化学制品制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688135",
+      "symbol": "sh688135",
+      "name": "利扬芯片",
+      "pct": 7.82,
+      "price": 29.49,
+      "prev_close": 27.35,
+      "volume": 15292566.0,
+      "avg_vol_4d": 9201031.0,
+      "vol_ratio": 1.662,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "920056",
+      "symbol": "bj920056",
+      "name": "能之光",
+      "pct": 7.33,
+      "price": 16.1,
+      "prev_close": 15.0,
+      "volume": 3748989.0,
+      "avg_vol_4d": 1888054.75,
+      "vol_ratio": 1.986,
+      "industry": "",
+      "board": ""
+    },
+    {
+      "code": "688661",
+      "symbol": "sh688661",
+      "name": "和林微纳",
+      "pct": 7.48,
+      "price": 104.15,
+      "prev_close": 96.9,
+      "volume": 5253937.0,
+      "avg_vol_4d": 3054730.5,
+      "vol_ratio": 1.72,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688208",
+      "symbol": "sh688208",
+      "name": "道通科技",
+      "pct": 6.31,
+      "price": 27.3,
+      "prev_close": 25.68,
+      "volume": 15783421.0,
+      "avg_vol_4d": 6478586.0,
+      "vol_ratio": 2.436,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688112",
+      "symbol": "sh688112",
+      "name": "鼎阳科技",
+      "pct": 7.68,
+      "price": 69.57,
+      "prev_close": 64.61,
+      "volume": 3506448.0,
+      "avg_vol_4d": 2537796.75,
+      "vol_ratio": 1.382,
+      "industry": "仪器仪表制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688785",
+      "symbol": "sh688785",
+      "name": "恒运昌",
+      "pct": 7.29,
+      "price": 301.36,
+      "prev_close": 280.88,
+      "volume": 1096402.0,
+      "avg_vol_4d": 794690.25,
+      "vol_ratio": 1.38,
+      "industry": "专用设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688003",
+      "symbol": "sh688003",
+      "name": "天准科技",
+      "pct": 7.32,
+      "price": 80.5,
+      "prev_close": 75.01,
+      "volume": 6089249.0,
+      "avg_vol_4d": 4499356.25,
+      "vol_ratio": 1.353,
+      "industry": "专用设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688383",
+      "symbol": "sh688383",
+      "name": "新益昌",
+      "pct": 7.02,
+      "price": 129.47,
+      "prev_close": 120.98,
+      "volume": 2481141.0,
+      "avg_vol_4d": 1672639.25,
+      "vol_ratio": 1.483,
+      "industry": "专用设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688166",
+      "symbol": "sh688166",
+      "name": "博瑞医药",
+      "pct": 7.07,
+      "price": 37.25,
+      "prev_close": 34.79,
+      "volume": 15904506.0,
+      "avg_vol_4d": 11154557.25,
+      "vol_ratio": 1.426,
+      "industry": "医药制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688381",
+      "symbol": "sh688381",
+      "name": "帝奥微",
+      "pct": 7.3,
+      "price": 38.07,
+      "prev_close": 35.48,
+      "volume": 12774728.0,
+      "avg_vol_4d": 10223116.25,
+      "vol_ratio": 1.25,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688060",
+      "symbol": "sh688060",
+      "name": "云涌科技",
+      "pct": 5.69,
+      "price": 37.92,
+      "prev_close": 35.88,
+      "volume": 789349.0,
+      "avg_vol_4d": 341008.5,
+      "vol_ratio": 2.315,
+      "industry": "软件和信息技术服务业",
+      "board": "科创板"
+    },
+    {
       "code": "688825",
       "symbol": "sh688825",
       "name": "长鑫科技",
@@ -11434,6 +10485,32 @@
       "vol_ratio": 1.613,
       "industry": "",
       "board": ""
+    },
+    {
+      "code": "688188",
+      "symbol": "sh688188",
+      "name": "柏楚电子",
+      "pct": 5.52,
+      "price": 101.3,
+      "prev_close": 96.0,
+      "volume": 4266828.0,
+      "avg_vol_4d": 1805408.5,
+      "vol_ratio": 2.363,
+      "industry": "软件和信息技术服务业",
+      "board": "科创板"
+    },
+    {
+      "code": "688200",
+      "symbol": "sh688200",
+      "name": "华峰测控",
+      "pct": 7.08,
+      "price": 379.81,
+      "prev_close": 354.71,
+      "volume": 3837497.0,
+      "avg_vol_4d": 3019747.0,
+      "vol_ratio": 1.271,
+      "industry": "专用设备制造业",
+      "board": "科创板"
     },
     {
       "code": "159994",
@@ -11456,10 +10533,49 @@
       "price": 1.049,
       "prev_close": 0.987,
       "volume": 12939543.0,
-      "avg_vol_4d": 7502145.5,
+      "avg_vol_4d": 7502145.75,
       "vol_ratio": 1.725,
       "industry": "",
       "board": "ETF"
+    },
+    {
+      "code": "688332",
+      "symbol": "sh688332",
+      "name": "中科蓝讯",
+      "pct": 6.42,
+      "price": 98.53,
+      "prev_close": 92.59,
+      "volume": 8472720.0,
+      "avg_vol_4d": 5310528.25,
+      "vol_ratio": 1.595,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688535",
+      "symbol": "sh688535",
+      "name": "华海诚科",
+      "pct": 6.94,
+      "price": 101.04,
+      "prev_close": 94.48,
+      "volume": 6116062.0,
+      "avg_vol_4d": 5070252.0,
+      "vol_ratio": 1.206,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688102",
+      "symbol": "sh688102",
+      "name": "斯瑞新材",
+      "pct": 5.94,
+      "price": 32.48,
+      "prev_close": 30.66,
+      "volume": 16744270.0,
+      "avg_vol_4d": 9315634.75,
+      "vol_ratio": 1.797,
+      "industry": "有色金属冶炼和压延加工业",
+      "board": "科创板"
     },
     {
       "code": "688090",
@@ -11472,6 +10588,19 @@
       "avg_vol_4d": 7958292.25,
       "vol_ratio": 1.268,
       "industry": "通用设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688618",
+      "symbol": "sh688618",
+      "name": "三旺通信",
+      "pct": 6.02,
+      "price": 30.65,
+      "prev_close": 28.91,
+      "volume": 2487137.0,
+      "avg_vol_4d": 1521114.75,
+      "vol_ratio": 1.635,
+      "industry": "计算机、通信和其他电子设备制造业",
       "board": "科创板"
     },
     {
@@ -11488,6 +10617,19 @@
       "board": "港股"
     },
     {
+      "code": "688757",
+      "symbol": "sh688757",
+      "name": "胜科纳米",
+      "pct": 6.13,
+      "price": 29.95,
+      "prev_close": 28.22,
+      "volume": 10682043.0,
+      "avg_vol_4d": 7014006.0,
+      "vol_ratio": 1.523,
+      "industry": "专业技术服务业",
+      "board": "科创板"
+    },
+    {
       "code": "588110",
       "symbol": "sh588110",
       "name": "科创成长ETF广发",
@@ -11501,6 +10643,19 @@
       "board": "ETF"
     },
     {
+      "code": "688337",
+      "symbol": "sh688337",
+      "name": "普源精电",
+      "pct": 6.13,
+      "price": 42.61,
+      "prev_close": 40.15,
+      "volume": 4304605.0,
+      "avg_vol_4d": 3024066.0,
+      "vol_ratio": 1.423,
+      "industry": "仪器仪表制造业",
+      "board": "科创板"
+    },
+    {
       "code": "515880",
       "symbol": "sh515880",
       "name": "通信ETF国泰",
@@ -11508,7 +10663,7 @@
       "price": 0.677,
       "prev_close": 0.639,
       "volume": 53692372.0,
-      "avg_vol_4d": 36402152.0,
+      "avg_vol_4d": 36402151.0,
       "vol_ratio": 1.475,
       "industry": "",
       "board": "ETF"
@@ -11525,6 +10680,32 @@
       "vol_ratio": 1.472,
       "industry": "",
       "board": "ETF"
+    },
+    {
+      "code": "688017",
+      "symbol": "sh688017",
+      "name": "绿的谐波",
+      "pct": 5.42,
+      "price": 294.96,
+      "prev_close": 279.8,
+      "volume": 9480914.0,
+      "avg_vol_4d": 5494401.0,
+      "vol_ratio": 1.726,
+      "industry": "通用设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688190",
+      "symbol": "sh688190",
+      "name": "云路股份",
+      "pct": 4.4,
+      "price": 76.2,
+      "prev_close": 72.99,
+      "volume": 1681524.0,
+      "avg_vol_4d": 704302.0,
+      "vol_ratio": 2.388,
+      "industry": "黑色金属冶炼和压延加工业",
+      "board": "科创板"
     },
     {
       "code": "588850",
@@ -11579,6 +10760,19 @@
       "board": "ETF"
     },
     {
+      "code": "688786",
+      "symbol": "sh688786",
+      "name": "悦安新材",
+      "pct": 5.74,
+      "price": 26.53,
+      "prev_close": 25.09,
+      "volume": 5089922.0,
+      "avg_vol_4d": 4071691.25,
+      "vol_ratio": 1.25,
+      "industry": "金属制品业",
+      "board": "科创板"
+    },
+    {
       "code": "159967",
       "symbol": "sz159967",
       "name": "创业板成长ETF华夏",
@@ -11590,6 +10784,19 @@
       "vol_ratio": 1.242,
       "industry": "",
       "board": "ETF"
+    },
+    {
+      "code": "688047",
+      "symbol": "sh688047",
+      "name": "龙芯中科",
+      "pct": 3.51,
+      "price": 105.48,
+      "prev_close": 101.9,
+      "volume": 6166698.0,
+      "avg_vol_4d": 2387321.25,
+      "vol_ratio": 2.583,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
     },
     {
       "code": "159388",
@@ -11644,6 +10851,19 @@
       "board": "ETF"
     },
     {
+      "code": "688670",
+      "symbol": "sh688670",
+      "name": "金迪克",
+      "pct": 5.13,
+      "price": 16.79,
+      "prev_close": 15.97,
+      "volume": 2185610.0,
+      "avg_vol_4d": 1625981.75,
+      "vol_ratio": 1.344,
+      "industry": "医药制造业",
+      "board": "科创板"
+    },
+    {
       "code": "159363",
       "symbol": "sz159363",
       "name": "创业板人工智能ETF华宝",
@@ -11670,6 +10890,45 @@
       "board": ""
     },
     {
+      "code": "688720",
+      "symbol": "sh688720",
+      "name": "艾森股份",
+      "pct": 5.07,
+      "price": 60.47,
+      "prev_close": 57.55,
+      "volume": 4217032.0,
+      "avg_vol_4d": 3395695.75,
+      "vol_ratio": 1.242,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688765",
+      "symbol": "sh688765",
+      "name": "禾元生物",
+      "pct": 4.04,
+      "price": 38.08,
+      "prev_close": 36.6,
+      "volume": 4505936.0,
+      "avg_vol_4d": 2344208.25,
+      "vol_ratio": 1.922,
+      "industry": "医药制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688512",
+      "symbol": "sh688512",
+      "name": "慧智微",
+      "pct": 4.48,
+      "price": 13.99,
+      "prev_close": 13.39,
+      "volume": 16139453.0,
+      "avg_vol_4d": 10590720.0,
+      "vol_ratio": 1.524,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
       "code": "159507",
       "symbol": "sz159507",
       "name": "通信ETF广发",
@@ -11681,6 +10940,19 @@
       "vol_ratio": 1.273,
       "industry": "",
       "board": "ETF"
+    },
+    {
+      "code": "688516",
+      "symbol": "sh688516",
+      "name": "奥特维",
+      "pct": 4.36,
+      "price": 42.87,
+      "prev_close": 41.08,
+      "volume": 9816333.0,
+      "avg_vol_4d": 6446476.75,
+      "vol_ratio": 1.523,
+      "industry": "专用设备制造业",
+      "board": "科创板"
     },
     {
       "code": "560780",
@@ -11696,6 +10968,19 @@
       "board": "ETF"
     },
     {
+      "code": "688657",
+      "symbol": "sh688657",
+      "name": "浩辰软件",
+      "pct": 4.2,
+      "price": 33.53,
+      "prev_close": 32.18,
+      "volume": 1615547.0,
+      "avg_vol_4d": 1072393.5,
+      "vol_ratio": 1.506,
+      "industry": "软件和信息技术服务业",
+      "board": "科创板"
+    },
+    {
       "code": "513310",
       "symbol": "sh513310",
       "name": "中韩半导体ETF华泰柏瑞",
@@ -11703,10 +10988,23 @@
       "price": 4.842,
       "prev_close": 4.651,
       "volume": 23544554.0,
-      "avg_vol_4d": 15318449.25,
+      "avg_vol_4d": 15318449.5,
       "vol_ratio": 1.537,
       "industry": "",
       "board": "ETF"
+    },
+    {
+      "code": "688078",
+      "symbol": "sh688078",
+      "name": "龙软科技",
+      "pct": 4.08,
+      "price": 27.07,
+      "prev_close": 26.01,
+      "volume": 2379733.0,
+      "avg_vol_4d": 1547017.25,
+      "vol_ratio": 1.538,
+      "industry": "软件和信息技术服务业",
+      "board": "科创板"
     },
     {
       "code": "512220",
@@ -11716,7 +11014,7 @@
       "price": 3.818,
       "prev_close": 3.654,
       "volume": 68652.0,
-      "avg_vol_4d": 56326.75,
+      "avg_vol_4d": 56327.0,
       "vol_ratio": 1.219,
       "industry": "",
       "board": "ETF"
@@ -11748,6 +11046,32 @@
       "board": "ETF"
     },
     {
+      "code": "688418",
+      "symbol": "sh688418",
+      "name": "震有科技",
+      "pct": 3.85,
+      "price": 32.66,
+      "prev_close": 31.45,
+      "volume": 3392341.0,
+      "avg_vol_4d": 2233139.75,
+      "vol_ratio": 1.519,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688767",
+      "symbol": "sh688767",
+      "name": "博拓生物",
+      "pct": 3.84,
+      "price": 38.94,
+      "prev_close": 37.5,
+      "volume": 2572906.0,
+      "avg_vol_4d": 1852561.75,
+      "vol_ratio": 1.389,
+      "industry": "医药制造业",
+      "board": "科创板"
+    },
+    {
       "code": "588030",
       "symbol": "sh588030",
       "name": "科创100ETF博时",
@@ -11768,7 +11092,7 @@
       "price": 1.258,
       "prev_close": 1.212,
       "volume": 1736029.0,
-      "avg_vol_4d": 1239054.25,
+      "avg_vol_4d": 1239054.5,
       "vol_ratio": 1.401,
       "industry": "",
       "board": "ETF"
@@ -11781,10 +11105,23 @@
       "price": 0.963,
       "prev_close": 0.927,
       "volume": 5198863.0,
-      "avg_vol_4d": 3910320.25,
+      "avg_vol_4d": 3910320.5,
       "vol_ratio": 1.33,
       "industry": "",
       "board": "ETF"
+    },
+    {
+      "code": "688513",
+      "symbol": "sh688513",
+      "name": "苑东生物",
+      "pct": 3.69,
+      "price": 46.14,
+      "prev_close": 44.5,
+      "volume": 2262454.0,
+      "avg_vol_4d": 1577956.75,
+      "vol_ratio": 1.434,
+      "industry": "医药制造业",
+      "board": "科创板"
     },
     {
       "code": "563560",
@@ -11798,6 +11135,19 @@
       "vol_ratio": 1.487,
       "industry": "",
       "board": "ETF"
+    },
+    {
+      "code": "688182",
+      "symbol": "sh688182",
+      "name": "灿勤科技",
+      "pct": 3.81,
+      "price": 27.51,
+      "prev_close": 26.5,
+      "volume": 5561347.0,
+      "avg_vol_4d": 4118965.75,
+      "vol_ratio": 1.35,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
     },
     {
       "code": "516050",
@@ -11850,6 +11200,19 @@
       "vol_ratio": 1.432,
       "industry": "",
       "board": ""
+    },
+    {
+      "code": "688079",
+      "symbol": "sh688079",
+      "name": "美迪凯",
+      "pct": 3.91,
+      "price": 15.43,
+      "prev_close": 14.85,
+      "volume": 11045335.0,
+      "avg_vol_4d": 8900805.0,
+      "vol_ratio": 1.241,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
     },
     {
       "code": "159821",
@@ -11917,6 +11280,32 @@
       "board": "ETF"
     },
     {
+      "code": "688525",
+      "symbol": "sh688525",
+      "name": "佰维存储",
+      "pct": 3.68,
+      "price": 221.14,
+      "prev_close": 213.29,
+      "volume": 17251097.0,
+      "avg_vol_4d": 13117296.75,
+      "vol_ratio": 1.315,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
+      "code": "688136",
+      "symbol": "sh688136",
+      "name": "科兴制药",
+      "pct": 3.74,
+      "price": 21.1,
+      "prev_close": 20.34,
+      "volume": 5929600.0,
+      "avg_vol_4d": 4749446.25,
+      "vol_ratio": 1.248,
+      "industry": "医药制造业",
+      "board": "科创板"
+    },
+    {
       "code": "588310",
       "symbol": "sh588310",
       "name": "科创创业ETF方正富邦",
@@ -11937,7 +11326,7 @@
       "price": 1.065,
       "prev_close": 1.034,
       "volume": 1281762.0,
-      "avg_vol_4d": 748944.75,
+      "avg_vol_4d": 748945.25,
       "vol_ratio": 1.711,
       "industry": "",
       "board": "ETF"
@@ -12021,6 +11410,19 @@
       "board": "ETF"
     },
     {
+      "code": "920981",
+      "symbol": "bj920981",
+      "name": "晶赛科技",
+      "pct": 3.37,
+      "price": 30.37,
+      "prev_close": 29.38,
+      "volume": 2765634.0,
+      "avg_vol_4d": 2090643.75,
+      "vol_ratio": 1.323,
+      "industry": "",
+      "board": ""
+    },
+    {
       "code": "159971",
       "symbol": "sz159971",
       "name": "创业板ETF富国",
@@ -12080,7 +11482,7 @@
       "price": 1.37,
       "prev_close": 1.327,
       "volume": 297608.0,
-      "avg_vol_4d": 227938.0,
+      "avg_vol_4d": 227938.25,
       "vol_ratio": 1.306,
       "industry": "",
       "board": "ETF"
@@ -12132,7 +11534,7 @@
       "price": 2.368,
       "prev_close": 2.296,
       "volume": 215536.0,
-      "avg_vol_4d": 161830.75,
+      "avg_vol_4d": 161831.0,
       "vol_ratio": 1.332,
       "industry": "",
       "board": "ETF"
@@ -12171,7 +11573,7 @@
       "price": 0.996,
       "prev_close": 0.967,
       "volume": 170736.0,
-      "avg_vol_4d": 120238.25,
+      "avg_vol_4d": 120238.5,
       "vol_ratio": 1.42,
       "industry": "",
       "board": "ETF"
@@ -12216,6 +11618,19 @@
       "board": "ETF"
     },
     {
+      "code": "688683",
+      "symbol": "sh688683",
+      "name": "莱尔科技",
+      "pct": 3.2,
+      "price": 29.38,
+      "prev_close": 28.47,
+      "volume": 1241884.0,
+      "avg_vol_4d": 1013606.5,
+      "vol_ratio": 1.225,
+      "industry": "计算机、通信和其他电子设备制造业",
+      "board": "科创板"
+    },
+    {
       "code": "515980",
       "symbol": "sh515980",
       "name": "人工智能ETF华富",
@@ -12223,7 +11638,7 @@
       "price": 1.029,
       "prev_close": 0.999,
       "volume": 2584576.0,
-      "avg_vol_4d": 2064032.75,
+      "avg_vol_4d": 2064033.0,
       "vol_ratio": 1.252,
       "industry": "",
       "board": "ETF"
@@ -12279,7 +11694,7 @@
       "price": 9.54,
       "prev_close": 9.16,
       "volume": 32086853.0,
-      "avg_vol_4d": 124133.75,
+      "avg_vol_4d": 124134.0,
       "vol_ratio": 258.486,
       "industry": "医药制造业",
       "board": "主板"
@@ -12344,8 +11759,8 @@
       "price": 8.0,
       "prev_close": 7.71,
       "volume": 6783168.0,
-      "avg_vol_4d": 52227.0,
-      "vol_ratio": 129.879,
+      "avg_vol_4d": 52227.25,
+      "vol_ratio": 129.878,
       "industry": "医药制造业",
       "board": "主板"
     },
@@ -12422,7 +11837,7 @@
       "price": 9.41,
       "prev_close": 9.02,
       "volume": 111502941.0,
-      "avg_vol_4d": 1374006.0,
+      "avg_vol_4d": 1374006.25,
       "vol_ratio": 81.152,
       "industry": "医药制造业",
       "board": "主板"
@@ -12441,14 +11856,14 @@
       "board": "主板"
     }
   ],
-  "generated_at": "2026-09-08 01:01:58",
-  "update_time": "2026-09-08 01:01:58",
+  "generated_at": "2026-09-08 01:14:27",
+  "update_time": "2026-09-08 01:14:27",
   "source": "raw_data/h_auto_buy 反推算法，无 PDF OCR 依赖",
   "kline_stat": {
-    "cache_fresh": 30,
-    "cache_stale": 8,
-    "net": 979,
-    "fail": 289
+    "cache_fresh": 519,
+    "cache_stale": 18,
+    "net": 490,
+    "fail": 279
   },
   "degraded": false,
   "degraded_reason": "",

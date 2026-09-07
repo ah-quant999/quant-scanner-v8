@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-09-08 01:13:14",
-  "run_start": "2026-09-08 00:18:20",
-  "ok": 21,
+  "update_time": "2026-09-08 01:38:55",
+  "run_start": "2026-09-07 23:48:48",
+  "ok": 47,
   "fail": 1,
   "failed_scripts": [
     {
-      "script": "strategy_four_volume_60m.py",
-      "reason": "监督器静默杀(>15min 无输出)"
+      "script": "v8/fetch_citic_pe.py",
+      "reason": "退出码 1 | [citic-pe-fetch] ❌ 增量无数据，退出"
     }
   ],
   "skipped_by_time_gate": []

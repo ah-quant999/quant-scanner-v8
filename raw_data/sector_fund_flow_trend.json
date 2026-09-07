@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-09-07 23:22",
+  "update_time": "2026-09-08 00:46",
   "data_type": "real",
   "summary": {
     "in_count": 40,
@@ -142,9 +142,9 @@
       "net_20d_days": 20,
       "net_60d": 385.65,
       "net_60d_days": 25,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 289.23,
+      "net_10d": 498.33,
       "net_10d_days": 10
     },
     {
@@ -158,9 +158,9 @@
       "net_20d_days": 20,
       "net_60d": 153.77,
       "net_60d_days": 25,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -253.14,
+      "net_10d": -126.39,
       "net_10d_days": 10
     },
     {
@@ -174,9 +174,9 @@
       "net_20d_days": 20,
       "net_60d": -210.61,
       "net_60d_days": 23,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -174.2,
+      "net_10d": -30.65,
       "net_10d_days": 10
     },
     {
@@ -205,9 +205,9 @@
       "net_20d_days": 20,
       "net_60d": 360.06,
       "net_60d_days": 25,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 183.52,
+      "net_10d": 276.68,
       "net_10d_days": 10
     },
     {
@@ -221,9 +221,9 @@
       "net_20d_days": 20,
       "net_60d": 198.68,
       "net_60d_days": 21,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 280.31,
+      "net_10d": 298.23,
       "net_10d_days": 10
     },
     {
@@ -253,9 +253,9 @@
       "net_20d_days": 20,
       "net_60d": 298.34,
       "net_60d_days": 23,
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_10d": 396.38,
+      "net_10d": 457.43,
       "net_10d_days": 10
     },
     {
@@ -270,9 +270,9 @@
       "source": "本地累加",
       "net_60d": 81.19,
       "net_60d_days": 25,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_20d_days": 25
+      "net_20d_days": 26
     },
     {
       "name": "小米概念",
@@ -285,9 +285,9 @@
       "net_20d_days": 20,
       "net_60d": 199.73,
       "net_60d_days": 24,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 254.94,
+      "net_10d": 351.63,
       "net_10d_days": 10
     },
     {
@@ -301,9 +301,9 @@
       "net_20d_days": 20,
       "net_60d": 275.86,
       "net_60d_days": 25,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -35.35,
+      "net_10d": 75.5,
       "net_10d_days": 10
     },
     {
@@ -317,9 +317,9 @@
       "net_20d_days": 20,
       "net_60d": 196.82,
       "net_60d_days": 21,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 196.94,
+      "net_10d": 251.41,
       "net_10d_days": 10
     },
     {
@@ -333,9 +333,9 @@
       "net_20d_days": 20,
       "net_60d": 1022.05,
       "net_60d_days": 25,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -54.78,
+      "net_10d": 163.38,
       "net_10d_days": 10
     },
     {
@@ -365,9 +365,9 @@
       "net_20d_days": 20,
       "net_60d": -3.23,
       "net_60d_days": 24,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -22.59,
+      "net_10d": 43.23,
       "net_10d_days": 10
     },
     {
@@ -412,9 +412,9 @@
       "net_20d_days": 20,
       "net_60d": 206.23,
       "net_60d_days": 24,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 122.35,
+      "net_10d": 265.18,
       "net_10d_days": 10
     },
     {
@@ -428,9 +428,9 @@
       "net_20d_days": 20,
       "net_60d": 654.19,
       "net_60d_days": 21,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 322.25,
+      "net_10d": 305.02,
       "net_10d_days": 10
     },
     {
@@ -460,9 +460,9 @@
       "net_20d_days": 20,
       "net_60d": 247.7,
       "net_60d_days": 24,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 23.68,
+      "net_10d": 89.91,
       "net_10d_days": 10
     },
     {
@@ -476,9 +476,9 @@
       "net_20d_days": 18,
       "net_60d": 380.49,
       "net_60d_days": 18,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 332.61,
+      "net_10d": 378.21,
       "net_10d_days": 10
     },
     {
@@ -520,9 +520,9 @@
       "net_20d_days": 20,
       "net_60d": 176.34,
       "net_60d_days": 25,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 97.41,
+      "net_10d": 152.22,
       "net_10d_days": 10
     },
     {
@@ -550,9 +550,9 @@
       "net_20d_days": 20,
       "net_60d": 57.78,
       "net_60d_days": 21,
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "in",
-      "net_10d": -41.35,
+      "net_10d": 9.84,
       "net_10d_days": 10
     },
     {
@@ -566,9 +566,9 @@
       "net_20d_days": 20,
       "net_60d": 452.19,
       "net_60d_days": 20,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 153.58,
+      "net_10d": 237.32,
       "net_10d_days": 10
     },
     {
@@ -582,9 +582,9 @@
       "net_20d_days": 10,
       "net_60d": -0.02,
       "net_60d_days": 10,
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_10d": 65.96,
+      "net_10d": 101.46,
       "net_10d_days": 10
     },
     {
@@ -598,9 +598,9 @@
       "net_20d_days": 20,
       "net_60d": -369.19,
       "net_60d_days": 21,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -101.05,
+      "net_10d": -67.41,
       "net_10d_days": 10
     },
     {
@@ -614,9 +614,9 @@
       "net_20d_days": 20,
       "net_60d": -183.99,
       "net_60d_days": 23,
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_10d": 45.51,
+      "net_10d": 108.94,
       "net_10d_days": 10
     },
     {
@@ -769,9 +769,9 @@
       "net_20d_days": 20,
       "net_60d": 385.65,
       "net_60d_days": 25,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 289.23,
+      "net_10d": 498.33,
       "net_10d_days": 10
     },
     {
@@ -785,9 +785,9 @@
       "net_20d_days": 20,
       "net_60d": 153.77,
       "net_60d_days": 25,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -253.14,
+      "net_10d": -126.39,
       "net_10d_days": 10
     },
     {
@@ -801,9 +801,9 @@
       "net_20d_days": 20,
       "net_60d": -210.61,
       "net_60d_days": 23,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -174.2,
+      "net_10d": -30.65,
       "net_10d_days": 10
     },
     {
@@ -832,9 +832,9 @@
       "net_20d_days": 20,
       "net_60d": 360.06,
       "net_60d_days": 25,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 183.52,
+      "net_10d": 276.68,
       "net_10d_days": 10
     },
     {
@@ -848,9 +848,9 @@
       "net_20d_days": 20,
       "net_60d": 198.68,
       "net_60d_days": 21,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 280.31,
+      "net_10d": 298.23,
       "net_10d_days": 10
     },
     {
@@ -880,9 +880,9 @@
       "net_20d_days": 20,
       "net_60d": 298.34,
       "net_60d_days": 23,
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_10d": 396.38,
+      "net_10d": 457.43,
       "net_10d_days": 10
     },
     {
@@ -897,9 +897,9 @@
       "source": "本地累加",
       "net_60d": 81.19,
       "net_60d_days": 25,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_20d_days": 25
+      "net_20d_days": 26
     },
     {
       "name": "小米概念",
@@ -912,9 +912,9 @@
       "net_20d_days": 20,
       "net_60d": 199.73,
       "net_60d_days": 24,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 254.94,
+      "net_10d": 351.63,
       "net_10d_days": 10
     },
     {
@@ -928,9 +928,9 @@
       "net_20d_days": 20,
       "net_60d": 275.86,
       "net_60d_days": 25,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -35.35,
+      "net_10d": 75.5,
       "net_10d_days": 10
     },
     {
@@ -944,9 +944,9 @@
       "net_20d_days": 20,
       "net_60d": 196.82,
       "net_60d_days": 21,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 196.94,
+      "net_10d": 251.41,
       "net_10d_days": 10
     },
     {
@@ -960,9 +960,9 @@
       "net_20d_days": 20,
       "net_60d": 1022.05,
       "net_60d_days": 25,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -54.78,
+      "net_10d": 163.38,
       "net_10d_days": 10
     },
     {
@@ -992,9 +992,9 @@
       "net_20d_days": 20,
       "net_60d": -3.23,
       "net_60d_days": 24,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -22.59,
+      "net_10d": 43.23,
       "net_10d_days": 10
     },
     {
@@ -1039,9 +1039,9 @@
       "net_20d_days": 20,
       "net_60d": 206.23,
       "net_60d_days": 24,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 122.35,
+      "net_10d": 265.18,
       "net_10d_days": 10
     },
     {
@@ -1055,9 +1055,9 @@
       "net_20d_days": 20,
       "net_60d": 654.19,
       "net_60d_days": 21,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 322.25,
+      "net_10d": 305.02,
       "net_10d_days": 10
     },
     {
@@ -1087,9 +1087,9 @@
       "net_20d_days": 20,
       "net_60d": 247.7,
       "net_60d_days": 24,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 23.68,
+      "net_10d": 89.91,
       "net_10d_days": 10
     },
     {
@@ -1103,9 +1103,9 @@
       "net_20d_days": 18,
       "net_60d": 380.49,
       "net_60d_days": 18,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 332.61,
+      "net_10d": 378.21,
       "net_10d_days": 10
     },
     {
@@ -1147,9 +1147,9 @@
       "net_20d_days": 20,
       "net_60d": 176.34,
       "net_60d_days": 25,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 97.41,
+      "net_10d": 152.22,
       "net_10d_days": 10
     },
     {
@@ -1177,9 +1177,9 @@
       "net_20d_days": 20,
       "net_60d": 57.78,
       "net_60d_days": 21,
-      "consecutive_days": 3,
+      "consecutive_days": 4,
       "trend": "in",
-      "net_10d": -41.35,
+      "net_10d": 9.84,
       "net_10d_days": 10
     },
     {
@@ -1193,9 +1193,9 @@
       "net_20d_days": 20,
       "net_60d": 452.19,
       "net_60d_days": 20,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 153.58,
+      "net_10d": 237.32,
       "net_10d_days": 10
     },
     {
@@ -1209,9 +1209,9 @@
       "net_20d_days": 10,
       "net_60d": -0.02,
       "net_60d_days": 10,
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_10d": 65.96,
+      "net_10d": 101.46,
       "net_10d_days": 10
     },
     {
@@ -1225,9 +1225,9 @@
       "net_20d_days": 20,
       "net_60d": -369.19,
       "net_60d_days": 21,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -101.05,
+      "net_10d": -67.41,
       "net_10d_days": 10
     },
     {
@@ -1241,9 +1241,9 @@
       "net_20d_days": 20,
       "net_60d": -183.99,
       "net_60d_days": 23,
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_10d": 45.51,
+      "net_10d": 108.94,
       "net_10d_days": 10
     },
     {
@@ -1295,15 +1295,15 @@
       "trend": "in"
     },
     "华为概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "2026中报预增": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "存储芯片": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "新能源汽车": {
@@ -1311,11 +1311,11 @@
       "trend": "in"
     },
     "消费电子概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "机器人概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "PCB概念": {
@@ -1323,27 +1323,27 @@
       "trend": "in"
     },
     "专精特新": {
-      "days": 2,
+      "days": 3,
       "trend": "in"
     },
     "半导体": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "小米概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "光纤概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "人形机器人": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "通信设备": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "光伏概念": {
@@ -1351,7 +1351,7 @@
       "trend": "in"
     },
     "先进封装": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "比亚迪概念": {
@@ -1363,11 +1363,11 @@
       "trend": "in"
     },
     "元件": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "液冷服务器": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "无人驾驶": {
@@ -1375,11 +1375,11 @@
       "trend": "in"
     },
     "商业航天": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "苹果概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "粤港澳大湾区": {
@@ -1391,7 +1391,7 @@
       "trend": "in"
     },
     "智能穿戴": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "储能": {
@@ -1399,23 +1399,23 @@
       "trend": "in"
     },
     "第三代半导体": {
-      "days": 3,
+      "days": 4,
       "trend": "in"
     },
     "F5G概念": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "MiniLED": {
-      "days": 2,
+      "days": 3,
       "trend": "in"
     },
     "创投": {
-      "days": 1,
+      "days": 2,
       "trend": "in"
     },
     "2026一季报预增": {
-      "days": 2,
+      "days": 3,
       "trend": "in"
     },
     "富士康概念": {
@@ -1751,9 +1751,25 @@
       "source": "本地累加",
       "net_60d": 81.19,
       "net_60d_days": 25,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_20d_days": 25
+      "net_20d_days": 26
+    },
+    {
+      "name": "华为概念",
+      "net": 300.34,
+      "net_5d": 5.72,
+      "net_20d": -1.48,
+      "type": "概念",
+      "net_5d_days": 5,
+      "source": "本地累加",
+      "net_20d_days": 20,
+      "net_60d": 385.65,
+      "net_60d_days": 25,
+      "consecutive_days": 2,
+      "trend": "in",
+      "net_10d": 498.33,
+      "net_10d_days": 10
     },
     {
       "name": "无人驾驶",
@@ -1782,25 +1798,10 @@
       "net_20d_days": 20,
       "net_60d": 298.34,
       "net_60d_days": 23,
-      "consecutive_days": 2,
+      "consecutive_days": 3,
       "trend": "in",
-      "net_10d": 396.38,
+      "net_10d": 457.43,
       "net_10d_days": 10
-    },
-    {
-      "name": "高股息精选",
-      "net": 46.65,
-      "net_5d": 252.54,
-      "net_20d": 339.65,
-      "net_60d": 339.65,
-      "type": "行业",
-      "consecutive_days": 8,
-      "trend": "in",
-      "net_5d_days": 5,
-      "net_10d": 339.65,
-      "net_10d_days": 8,
-      "net_20d_days": 8,
-      "net_60d_days": 8
     }
   ],
   "trend_20d": [
@@ -1943,9 +1944,9 @@
       "net_20d_days": 20,
       "net_60d": 654.19,
       "net_60d_days": 21,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 322.25,
+      "net_10d": 305.02,
       "net_10d_days": 10
     },
     {
@@ -1959,9 +1960,9 @@
       "net_20d_days": 20,
       "net_60d": 1022.05,
       "net_60d_days": 25,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -54.78,
+      "net_10d": 163.38,
       "net_10d_days": 10
     },
     {
@@ -1975,9 +1976,9 @@
       "net_20d_days": 20,
       "net_60d": 452.19,
       "net_60d_days": 20,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 153.58,
+      "net_10d": 237.32,
       "net_10d_days": 10
     },
     {
@@ -1991,9 +1992,9 @@
       "net_20d_days": 18,
       "net_60d": 380.49,
       "net_60d_days": 18,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 332.61,
+      "net_10d": 378.21,
       "net_10d_days": 10
     }
   ],
@@ -2120,9 +2121,9 @@
       "net_20d_days": 20,
       "net_60d": 1022.05,
       "net_60d_days": 25,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": -54.78,
+      "net_10d": 163.38,
       "net_10d_days": 10
     },
     {
@@ -2152,9 +2153,9 @@
       "net_20d_days": 20,
       "net_60d": 654.19,
       "net_60d_days": 21,
-      "consecutive_days": 1,
+      "consecutive_days": 2,
       "trend": "in",
-      "net_10d": 322.25,
+      "net_10d": 305.02,
       "net_10d_days": 10
     },
     {

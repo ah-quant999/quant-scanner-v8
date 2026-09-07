@@ -1,11 +1,11 @@
 window.CRDS_BACKTEST = {
- "update_time": "2026-09-07 21:28:27",
+ "update_time": "2026-09-08 01:29:32",
  "summary": {
-  "update_time": "2026-09-07 21:28:27",
-  "total_signals": 4,
-  "calc_time": "2026-09-07 21:28:27",
+  "update_time": "2026-09-08 01:29:32",
+  "total_signals": 32,
+  "calc_time": "2026-09-08 01:29:32",
   "method": "CRDS 逆势龙头 advanced 档历史回测：信号日取真实下一交易日开盘买入，持有 N 个真实交易日收盘价卖出（前复权；胜率=win/(win+loss) 排平盘；已扣双边交易成本 0.3%）",
-  "signal_date_range": "2026-08-01 ~ 2026-08-01",
+  "signal_date_range": "2026-08-01 ~ 2026-09-08",
   "cost_bps_per_side": 15,
   "by_period": {
    "1": {
