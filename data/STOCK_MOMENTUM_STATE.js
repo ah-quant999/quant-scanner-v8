@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-07 16:21",
- "generated": "2026-09-07 16:21",
+ "update_time": "2026-09-07 16:18",
+ "generated": "2026-09-07 16:18",
  "meta": {
-  "generated": "2026-09-07 16:21",
+  "generated": "2026-09-07 16:18",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 5,
   "days_with_consensus": 0,
@@ -415,8 +415,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301489",
       "name": "思泉新材",
-      "change_pct": 6.038,
-      "price": 138.91,
+      "change_pct": 5.954,
+      "price": 138.8,
       "category": "突破"
      },
      {
@@ -429,78 +429,71 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300808",
       "name": "久量股份",
-      "change_pct": 9.474,
-      "price": 24.96,
+      "change_pct": 8.421,
+      "price": 24.72,
       "category": "突破"
      },
      {
       "code": "002443",
       "name": "金洲管道",
-      "change_pct": 7.542,
-      "price": 11.55,
+      "change_pct": 5.028,
+      "price": 11.28,
       "category": "突破"
      },
      {
       "code": "301312",
       "name": "智立方",
-      "change_pct": 15.042,
-      "price": 86.96,
+      "change_pct": 15.028,
+      "price": 86.95,
       "category": "突破"
      },
      {
       "code": "300757",
       "name": "罗博特科",
-      "change_pct": 10.096,
-      "price": 631.94,
+      "change_pct": 8.951,
+      "price": 625.37,
       "category": "突破"
      },
      {
       "code": "300400",
       "name": "劲拓股份",
-      "change_pct": 6.693,
-      "price": 35.07,
+      "change_pct": 6.541,
+      "price": 35.02,
       "category": "突破"
      },
      {
       "code": "688656",
       "name": "浩欧博",
-      "change_pct": 11.907,
-      "price": 116.92,
-      "category": "突破"
-     },
-     {
-      "code": "603828",
-      "name": "*ST利达",
-      "change_pct": 3.682,
-      "price": 5.35,
+      "change_pct": 12.423,
+      "price": 117.46,
       "category": "突破"
      },
      {
       "code": "603991",
       "name": "领先股份",
-      "change_pct": 4.862,
-      "price": 167.36,
+      "change_pct": 4.085,
+      "price": 166.12,
       "category": "突破"
      },
      {
       "code": "301279",
       "name": "金道科技",
-      "change_pct": 3.424,
-      "price": 23.86,
+      "change_pct": 3.078,
+      "price": 23.78,
       "category": "突破"
      },
      {
       "code": "301041",
       "name": "金百泽",
-      "change_pct": 5.956,
-      "price": 30.6,
+      "change_pct": 5.263,
+      "price": 30.4,
       "category": "突破"
      },
      {
       "code": "301486",
       "name": "致尚科技",
-      "change_pct": 14.748,
-      "price": 197.0,
+      "change_pct": 13.216,
+      "price": 194.37,
       "category": "突破"
      },
      {
@@ -527,43 +520,43 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301132",
       "name": "满坤科技",
-      "change_pct": 7.128,
-      "price": 41.33,
-      "category": "突破"
-     },
-     {
-      "code": "603886",
-      "name": "元祖股份",
-      "change_pct": 3.244,
-      "price": 13.05,
+      "change_pct": 5.34,
+      "price": 40.64,
       "category": "突破"
      },
      {
       "code": "688498",
       "name": "源杰科技",
-      "change_pct": 16.098,
-      "price": 1702.0,
+      "change_pct": 15.28,
+      "price": 1690.0,
       "category": "突破"
      },
      {
       "code": "002620",
       "name": "*ST瑞和",
-      "change_pct": 3.22,
-      "price": 6.09,
+      "change_pct": 3.898,
+      "price": 6.13,
       "category": "突破"
      },
      {
       "code": "300811",
       "name": "铂科新材",
-      "change_pct": 16.616,
-      "price": 84.5,
+      "change_pct": 15.36,
+      "price": 83.59,
       "category": "突破"
      },
      {
       "code": "002827",
       "name": "高争民爆",
-      "change_pct": 7.407,
-      "price": 71.05,
+      "change_pct": 5.911,
+      "price": 70.06,
+      "category": "突破"
+     },
+     {
+      "code": "301128",
+      "name": "强瑞技术",
+      "change_pct": 5.011,
+      "price": 123.02,
       "category": "突破"
      }
     ],
@@ -585,8 +578,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301489",
       "name": "思泉新材",
-      "change_pct": 6.038,
-      "price": 138.91,
+      "change_pct": 5.954,
+      "price": 138.8,
       "category": "加速"
      },
      {
@@ -599,50 +592,43 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300808",
       "name": "久量股份",
-      "change_pct": 9.474,
-      "price": 24.96,
+      "change_pct": 8.421,
+      "price": 24.72,
       "category": "加速"
      },
      {
       "code": "002443",
       "name": "金洲管道",
-      "change_pct": 7.542,
-      "price": 11.55,
+      "change_pct": 5.028,
+      "price": 11.28,
       "category": "加速"
      },
      {
       "code": "301312",
       "name": "智立方",
-      "change_pct": 15.042,
-      "price": 86.96,
+      "change_pct": 15.028,
+      "price": 86.95,
       "category": "加速"
      },
      {
       "code": "300757",
       "name": "罗博特科",
-      "change_pct": 10.096,
-      "price": 631.94,
+      "change_pct": 8.951,
+      "price": 625.37,
       "category": "加速"
      },
      {
       "code": "300400",
       "name": "劲拓股份",
-      "change_pct": 6.693,
-      "price": 35.07,
+      "change_pct": 6.541,
+      "price": 35.02,
       "category": "加速"
      },
      {
       "code": "688656",
       "name": "浩欧博",
-      "change_pct": 11.907,
-      "price": 116.92,
-      "category": "加速"
-     },
-     {
-      "code": "603828",
-      "name": "*ST利达",
-      "change_pct": 3.682,
-      "price": 5.35,
+      "change_pct": 12.423,
+      "price": 117.46,
       "category": "加速"
      }
     ],
@@ -664,8 +650,8 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301489",
       "name": "思泉新材",
-      "change_pct": 6.038,
-      "price": 138.91,
+      "change_pct": 5.954,
+      "price": 138.8,
       "category": "短线选股"
      },
      {
@@ -678,78 +664,71 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "300808",
       "name": "久量股份",
-      "change_pct": 9.474,
-      "price": 24.96,
+      "change_pct": 8.421,
+      "price": 24.72,
       "category": "短线选股"
      },
      {
       "code": "002443",
       "name": "金洲管道",
-      "change_pct": 7.542,
-      "price": 11.55,
+      "change_pct": 5.028,
+      "price": 11.28,
       "category": "短线选股"
      },
      {
       "code": "301312",
       "name": "智立方",
-      "change_pct": 15.042,
-      "price": 86.96,
+      "change_pct": 15.028,
+      "price": 86.95,
       "category": "短线选股"
      },
      {
       "code": "300757",
       "name": "罗博特科",
-      "change_pct": 10.096,
-      "price": 631.94,
+      "change_pct": 8.951,
+      "price": 625.37,
       "category": "短线选股"
      },
      {
       "code": "300400",
       "name": "劲拓股份",
-      "change_pct": 6.693,
-      "price": 35.07,
+      "change_pct": 6.541,
+      "price": 35.02,
       "category": "短线选股"
      },
      {
       "code": "688656",
       "name": "浩欧博",
-      "change_pct": 11.907,
-      "price": 116.92,
-      "category": "短线选股"
-     },
-     {
-      "code": "603828",
-      "name": "*ST利达",
-      "change_pct": 3.682,
-      "price": 5.35,
+      "change_pct": 12.423,
+      "price": 117.46,
       "category": "短线选股"
      },
      {
       "code": "603991",
       "name": "领先股份",
-      "change_pct": 4.862,
-      "price": 167.36,
+      "change_pct": 4.085,
+      "price": 166.12,
       "category": "短线选股"
      },
      {
       "code": "301279",
       "name": "金道科技",
-      "change_pct": 3.424,
-      "price": 23.86,
+      "change_pct": 3.078,
+      "price": 23.78,
       "category": "短线选股"
      },
      {
       "code": "301041",
       "name": "金百泽",
-      "change_pct": 5.956,
-      "price": 30.6,
+      "change_pct": 5.263,
+      "price": 30.4,
       "category": "短线选股"
      },
      {
       "code": "301486",
       "name": "致尚科技",
-      "change_pct": 14.748,
-      "price": 197.0,
+      "change_pct": 13.216,
+      "price": 194.37,
       "category": "短线选股"
      },
      {
@@ -776,43 +755,43 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301132",
       "name": "满坤科技",
-      "change_pct": 7.128,
-      "price": 41.33,
-      "category": "短线选股"
-     },
-     {
-      "code": "603886",
-      "name": "元祖股份",
-      "change_pct": 3.244,
-      "price": 13.05,
+      "change_pct": 5.34,
+      "price": 40.64,
       "category": "短线选股"
      },
      {
       "code": "688498",
       "name": "源杰科技",
-      "change_pct": 16.098,
-      "price": 1702.0,
+      "change_pct": 15.28,
+      "price": 1690.0,
       "category": "短线选股"
      },
      {
       "code": "002620",
       "name": "*ST瑞和",
-      "change_pct": 3.22,
-      "price": 6.09,
+      "change_pct": 3.898,
+      "price": 6.13,
       "category": "短线选股"
      },
      {
       "code": "300811",
       "name": "铂科新材",
-      "change_pct": 16.616,
-      "price": 84.5,
+      "change_pct": 15.36,
+      "price": 83.59,
       "category": "短线选股"
      },
      {
       "code": "002827",
       "name": "高争民爆",
-      "change_pct": 7.407,
-      "price": 71.05,
+      "change_pct": 5.911,
+      "price": 70.06,
+      "category": "短线选股"
+     },
+     {
+      "code": "301128",
+      "name": "强瑞技术",
+      "change_pct": 5.011,
+      "price": 123.02,
       "category": "短线选股"
      }
     ],
@@ -820,29 +799,29 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "603991",
       "name": "领先股份",
-      "change_pct": 4.862,
-      "price": 167.36,
+      "change_pct": 4.085,
+      "price": 166.12,
       "category": "强势股"
      },
      {
       "code": "301279",
       "name": "金道科技",
-      "change_pct": 3.424,
-      "price": 23.86,
+      "change_pct": 3.078,
+      "price": 23.78,
       "category": "强势股"
      },
      {
       "code": "301041",
       "name": "金百泽",
-      "change_pct": 5.956,
-      "price": 30.6,
+      "change_pct": 5.263,
+      "price": 30.4,
       "category": "强势股"
      },
      {
       "code": "301486",
       "name": "致尚科技",
-      "change_pct": 14.748,
-      "price": 197.0,
+      "change_pct": 13.216,
+      "price": 194.37,
       "category": "强势股"
      },
      {
@@ -869,43 +848,43 @@ window.STOCK_MOMENTUM_STATE = (function() {
      {
       "code": "301132",
       "name": "满坤科技",
-      "change_pct": 7.128,
-      "price": 41.33,
-      "category": "强势股"
-     },
-     {
-      "code": "603886",
-      "name": "元祖股份",
-      "change_pct": 3.244,
-      "price": 13.05,
+      "change_pct": 5.34,
+      "price": 40.64,
       "category": "强势股"
      },
      {
       "code": "688498",
       "name": "源杰科技",
-      "change_pct": 16.098,
-      "price": 1702.0,
+      "change_pct": 15.28,
+      "price": 1690.0,
       "category": "强势股"
      },
      {
       "code": "002620",
       "name": "*ST瑞和",
-      "change_pct": 3.22,
-      "price": 6.09,
+      "change_pct": 3.898,
+      "price": 6.13,
       "category": "强势股"
      },
      {
       "code": "300811",
       "name": "铂科新材",
-      "change_pct": 16.616,
-      "price": 84.5,
+      "change_pct": 15.36,
+      "price": 83.59,
       "category": "强势股"
      },
      {
       "code": "002827",
       "name": "高争民爆",
-      "change_pct": 7.407,
-      "price": 71.05,
+      "change_pct": 5.911,
+      "price": 70.06,
+      "category": "强势股"
+     },
+     {
+      "code": "301128",
+      "name": "强瑞技术",
+      "change_pct": 5.011,
+      "price": 123.02,
       "category": "强势股"
      }
     ]
