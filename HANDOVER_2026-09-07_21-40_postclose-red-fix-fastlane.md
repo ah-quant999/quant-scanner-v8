@@ -18,20 +18,24 @@
 | 1 | V5 闸门放行 A 档时段：`[6,18)` → `[6,16)`，16/17 点 dispatch 走采集批（小时映射 STAGE=A，非全链，无风暴风险） | `.github/workflows/v8_algo_cloud.yml` | ✅ 已上线 |
 | 2 | **A 档派发自动化补位**（此前 B/D/E 都有兜底，唯独 A 档缺位靠死 cron）→ 新建交易日 16:40 `repository_dispatch` `trigger_algo` + `stage=A` | 自动化 `75e8cfe5` | ✅ ACTIVE |
 | 3 | **三重共识空指针崩溃修复**：驾驶舱下线后 `a_map` 恒空 → `a` 恒 `None`，`a.get(...)` 直接 AttributeError 崩脚本（**三重共识自 09-04 起持续未产出的真凶**）→ 统一 `(a or {})` 兜底 | `algorithms/gen_triple_consensus.py` L191-193 | ✅ 已入库 |
-| 4 | 盘后算法链当日调度时间线沉淀进逻辑详解页（平实矩阵：时间/任务/执行机/前端，不写脚本名数据名） | `logic.html` | ✅ 已上线 |
+| 4 | **最终推荐空指针崩溃修复**：09-03「驾驶舱 A/B 档下线」删代码时**残留孤儿代码块**（仍引用已删除的 `label`/`tech`/`qs`/`tier`）→ `UnboundLocalError`，**D 档 final_recommend 自 09-05 起持续未产出的真凶**。已整段清除 | `algorithms/final_recommend.py` L421-423 | ✅ 已入库 + 今晚产出 |
+| 5 | 盘后算法链当日调度时间线沉淀进逻辑详解页（平实矩阵：时间/任务/执行机/前端，不写脚本名数据名） | `logic.html` | ✅ 已上线 |
+
+> **今晚两个崩溃同源**：都是「功能下线时删代码删不干净，留下引用已删除变量的孤儿块」。建议后续同类下线操作后，**必须全量 grep 被删变量确认零残留**。
 
 ## 三、当前数据状态（21:34 健康检查：ok 100 / warn 2 / fail 7，红灯 22 → 9）
 
-**已自愈（今晚）**
+**已自愈（今晚，github.io 线上已生效）**
 | 卡 | update_time | 来源 |
 |---|---|---|
-| 四量终极 FOUR_VOLUME | 09-07 21:09 | cn 快链 |
+| 四量终极 FOUR_VOLUME | 09-07 21:57 | cn 快链 |
 | 三重共识 TRIPLE_CONSENSUS | 09-07 20:23 | cn 快链 + 本机补跑 |
 | 逆势龙头 CRDS | 09-07 20:57 | cn 快链 |
+| **最终推荐 FINAL_RECOMMEND_DATA** | **09-07 21:55** | **本机快链（修 bug 后跑出 5 只：紫金矿业/迈瑞医疗/福耀玻璃/源杰科技/敦煌种业）** |
 
 **仍红（全部 `heal_cat=algo_run`，只能靠算法链自愈）**
-`FACTOR_LAB`(09-05) / `FINAL_RECOMMEND_DATA`(09-05) / `BACKTEST_COMPREHENSIVE`(09-04) / `CRDS_BACKTEST`(09-05) / `H_AUTO_BUY`(09-04) / `INDEX_HISTORY`(09-06) / `maharo_macro`(--)
-→ **小九正在用本机快链补跑 D 档（因子实验室 + 最终推荐）**，E 档回测类留给夜间。
+`FACTOR_LAB`(09-05，因子实验室，小九本机后台仍在跑，18min+ 大计算) / `BACKTEST_COMPREHENSIVE`(09-04) / `CRDS_BACKTEST`(09-05) / `H_AUTO_BUY`(09-04) / `INDEX_HISTORY`(09-06) / `maharo_macro`(--)
+→ 除 FACTOR_LAB 外均为 **E 档回测类**，非核心展示卡，可放夜间低峰跑；`maharo_macro` 需确认数据源是否仍可用（09-04 起无产出）。
 
 ## 四、阿狸咪夜间作业要点（重要，请照做）
 
