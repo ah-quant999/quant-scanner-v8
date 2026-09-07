@@ -233,10 +233,21 @@ def main():
         log("ERROR: 主板 universe 异常过少（" + str(len(mcodes)) + "），中止推送，避免空 ROE 数据上线")
         bs.logout(); return
     r = load_cache(CACHE_R)
+    # 2026-09-07 一劳永逸「夜预算」：全市场主板 ~3200 只逐只走 baostock，
+    # 冷启动 2h+ 常撞 workflow timeout（云端 90min / 夜间服务端更慢）-> 整轮被杀、
+    # 缓存也不落盘 -> 下一轮又从 0 开始，永不收敛（FACTOR_LAB 常年 2-3 天前红灯的真根因）。
+    # 改法：每轮最多新取 BUDGET 只（已缓存且当季的自动跳过、不计入），到预算即停，
+    # 必定在时限内 save_cache 落盘 + 产出 FACTOR_LAB.js，逐晚增量收敛到全量。
+    BUDGET = int(os.environ.get("V8_FLAB_BUDGET", "1500"))
+    n_new = 0
     for i, code in enumerate(mcodes):
+        if n_new >= BUDGET:
+            log("达到本轮夜预算", BUDGET, "-> 停止新取，缓存已落盘，剩余下轮续跑")
+            break
         # 🛡 2026-09-04：按季刷新（asof_q 标记）——季报披露后下一季度自动重算
         if (not FORCE) and code in r and r[code].get("roe_ttm") is not None and r[code].get("size_proxy") and r[code].get("asof_q") == ASOF_Q:
             continue
+        n_new += 1
         name = get_name(code)
         amt, last = get_kline_amt(code)
         roe = get_roe_ttm(code)
