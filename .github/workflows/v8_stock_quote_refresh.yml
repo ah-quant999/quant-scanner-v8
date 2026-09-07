@@ -220,6 +220,19 @@ jobs:
           cd algorithms && python fetch_stock_quote_v8.py
           rc=$?
           echo "fetch_stock_quote_v8 exit: $rc"
+          # 🛡 2026-09-07 假 success 根治（主人令「禁止假 success · 一劳永逸」）：
+          #   fetch_stock_quote_v8.py 内置 A 股数量守卫——a_count < 3000（新浪+东财双源均不可用）
+          #   时 return 1 且【刻意不写输出、保留旧文件】，以防残缺数据覆盖全市场表。
+          #   但旧文件必然非空 → 下方 -s 检查 100% 通过 → 原本无条件 exit 0 → job 全绿，
+          #   2026-09-07 实测：本 workflow 一天 7 次 dispatch 全 success，
+          #   而 raw_data/stock_quote.json 停在 09-04 18:32（3 天未更新），
+          #   下游 TOP10/三重共识/最终推荐/候选池/CRDS 全部陈旧，主人看板「已停更 N 天」才暴露。
+          #   修复：rc != 0 一律显式 exit 1，让运维页/告警链路可见（与 2026-08-22「推送失败
+          #   不得被 exit 0 吞掉」的铁律同源）。保留旧数据的保护逻辑不动——那是正确的。
+          if [ "$rc" != "0" ]; then
+            echo "::error::fetch_stock_quote_v8 抓取失败 rc=$rc —— A股行情双源(新浪/东财)不可用，已按设计保留旧数据，本次未产出新行情"
+            exit 1
+          fi
           # 单独跑 fetch 时，merge_fundamental_quality 可能因 raw_data/fundamental_quality.json
           # 缺失而跳过（脚本内已 try/except），不影响主产物。我们对失败也兜底：raw_data 有内容即可。
           if [ ! -s ../raw_data/stock_quote.json ] || [ ! -s ../data/STOCK_QUOTE.js ]; then
