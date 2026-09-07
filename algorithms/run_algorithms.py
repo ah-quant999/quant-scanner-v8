@@ -172,6 +172,11 @@ ORDER = [
     #   此前被 V5 心跳闸门跳过链本体掩盖，2026-09-07 17:40 #1579 首次真跑暴露。
     "backtest_expectancy.py",         # → raw_data/backtest_expectancy.json（期望收益回测，与 E 批同位）
     "v8/backtest_rps.py",             # → raw_data/rps_backtest.json（2026-09-06 主人令 RPS A档 30 天考核）
+    # 🆕 2026-09-07 主人令「中信 PE 极值温度计 + 历史回测」双卡：fetcher 拉 sh.600030 PE/PB 时序
+    # (raw_data/citic_pe_history.json) + 生成器产 data/CITIC_PE_THERMO.js + CITIC_PE_BACKTEST.js。
+    # 同类纳入 E 回测批：baostock 数据源 + 夜间跑（不阻塞盘后 20:00 final_recommend）。
+    "v8/fetch_citic_pe.py",
+    "v8/gen_citic_pe.py",
 ]
 
 
@@ -206,19 +211,28 @@ STAGES = {
     #   原 C(回测 19:15) 在 D(final_recommend 20:00) 之前 → 回测汇总胶囊早于最终推荐，时序倒挂。
     #   现改为 A(16:40 采集) → B(18:10 选股) → D(20:00 汇总·最终推荐上线) → E(21:00 回测)。
     #   键名 C 退役；回测批内容原样迁入 E，另收编 strategy_four_volume.py（回测模式，SCRIPT_ENV 注入）。
-    "E": [  # 回测批（~21:00 CST，最终推荐上线后）：backtest 全家
+    "E": [  # 回测批（~21:00 CST，最终推荐上线后）：backtest 全家 + 因子实验室生成（长任务，放夜间/21:00 后跑）
         "scripts/ab_universe_backtest.py", "backtest_tdx.py", "backtest_comprehensive.py",
         "backtest_expectancy.py",          # 🆕 期望收益回测：walk-forward 产出 raw_data/backtest_expectancy.json
         "export_optimized_strategy.py",   # 读 backtest_tdx.json 汇总优化策略（在 backtest_tdx 之后）
         "v8/backtest_crds.py",   # 逆势龙头 回测（原 ORDER 漏挂 STAGE）
         "v8/backtest_rps.py",   # 🆕 2026-09-06 主人令：RPS A档 30 天样本考核（读 history/stock_rps_* 日归档 → raw_data/rps_backtest.json；baostock 失败自动降级空回测不挂 CI）
+        "v8/fetch_citic_pe.py",   # 🆕 2026-09-07 主人令「中信 PE 极值温度计」：拉 sh.600030 PE/PB 时序到 raw_data/citic_pe_history.json（断点续跑：< 1s/日；首跑 16 年；baostock 失败自动降级空跑不挂 CI）
+        "v8/gen_citic_pe.py",   # 🆕 2026-09-07 生成器：raw_data/citic_pe_history.json → data/CITIC_PE_THERMO.js + data/CITIC_PE_BACKTEST.js（双卡纯前端直读，纯本地计算无网络）
         "factor_lab_backtest.py",   # 🆕 因子实验室分层回测（读 _rps_cache，依赖 B 批 calc_stock_rps）
         # 2026-09-06 主人令：AI预测卡回测 INVALID → 下架，停跑 path_probability_backtest.py
         "strategy_four_volume.py",  # 四量终极回测模式（SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js，根治孤儿）
+        # 🛡 2026-09-07 主人令「互踢/暴风/覆盖不想再看到·方案 B 一劳永逸根治」：
+        #   原 D 批首脚本 v8/factor_lab_gen.py 冷启动 50-90min（注释自述），串行堵在
+        #   final_recommend 前 → 整批从理论 8min 拖到实测 35-90min。
+        #   实测 final_recommend.py:559 对 FACTOR_LAB 缺失只 print warn 跳过（今晚
+        #   FACTOR_LAB 停在 09-05 仍出 5 只），生成器根本不该绑在 final_recommend 关键路径上。
+        #   现把生成器从 D 摘到 E 批（21:00 夜间跑，不阻塞盘后 20:00 出最终推荐），
+        #   D 批瘦身至 final_recommend 单脚本 → 选股策略全部数据出来 30-40min 内出最终推荐。
+        "v8/factor_lab_gen.py",   # → data/FACTOR_LAB.js（夜间回测批跑，FAIL 也不阻塞 final_recommend）
     ],
-    "D": [  # 汇总批（~20:00 CST，依赖全部）：因子实验室 + final_recommend（LHB历史/7d/生命周期由主流程前置）
-        "v8/factor_lab_gen.py",   # → data/FACTOR_LAB.js（final_recommend 方案B融合依赖，必须在前）
-        "final_recommend.py",
+    "D": [  # 汇总批（~20:00 CST，依赖全部）：仅 final_recommend（LHB历史/7d/生命周期/factor_lab_gen 全部前置到 E 批·互踢暴风根治）
+        "final_recommend.py",   # 必需上游 = B 批产物（CRDS/TOP10/三重共识/crisis/sector_rs/stock_profile/triple_track）
     ],
 }
 
