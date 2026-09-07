@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "66ccd9b4b";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "b0b5ac7f2";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -530,7 +530,7 @@ window.__domReadyFns=[];
 <script src="data/CONCEPT_RANKING.js?v=27a1cf3c2b" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/INDEX_QUOTES.js?v=700c7ef21b" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=0463ba3d35" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=d094a8daa4" defer></script>
 <script src="data/MARGIN_DATA.js?v=b9b8621df6" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=772ccf6d97" defer></script>
 <script src="data/IPO_DATA.js?v=993e3d3cea" defer></script>
@@ -1539,19 +1539,19 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <!-- 2026-08-31 一劳永逸：window.STOCK_RPS_DATA 已由 line 492 data/STOCK_RPS.js 注入（最新 19:16 版本），
          此处再引入 data/STOCK_RPS_DATA.js（旧 01:56 版本）会覆盖最新数据 → 相对强度子页/状态胶囊均读到陈旧值。
          删除重复注入，确保全局只保留一份最新 RPS 数据。 -->
-<script src="data/BACKTEST_COMPREHENSIVE.js?v=9b79ef02b6" defer></script>
-<script src="data/BACKTEST_TDX.js?v=4c837842b1" defer></script>
+<script src="data/BACKTEST_COMPREHENSIVE.js?v=290efe3413" defer></script>
+<script src="data/BACKTEST_TDX.js?v=463470193e" defer></script>
 
-<script src="data/OPTIMIZED_STRATEGY.js?v=f2633c2ec8" defer></script>
+<script src="data/OPTIMIZED_STRATEGY.js?v=85a698cd57" defer></script>
 <script src="data/EXPERIMENT.js?v=79bb5bdadb" defer></script>
-<script src="data/FINAL_RECOMMEND_DATA.js?v=a7fa967ffb" defer></script>
+<script src="data/FINAL_RECOMMEND_DATA.js?v=4e408c5b5f" defer></script>
 <!-- 🆕 2026-08-31 阶段 1：v8 选股生命周期跟踪（专家方法论整合：状态机+卖点/买点提示） -->
 <script src="data/V8_POOL_TRACKER.js?v=a9670ef6a3" defer></script>
     <script src="data/IMA_STRONG_STOCK.js?v=1190ddbe51" defer></script>
     <!-- 🆕 2026-09-04 强势突破选股（高手算法反推版 v1，strong_breakout.py 盘后产出） -->
     <script src="data/STRONG_BREAKOUT.js?v=d34c7f927f" defer></script>
-    <script src="data/FACTOR_LAB_BACKTEST.js?v=19ea2e3f9c" defer></script>
-    <script src="data/RPS_BACKTEST.js?v=e019caef8d" defer></script>
+    <script src="data/FACTOR_LAB_BACKTEST.js?v=0e8c01c882" defer></script>
+    <script src="data/RPS_BACKTEST.js?v=6abd0bc813" defer></script>
     <script src="data/FACTOR_LAB.js?v=3810886084" defer></script>
 <!-- 2026-08-31 轻量化：data/ALGO_TRACK.js（42.4 KB）前端零引用，停止注入（省 42.4 KB） -->
 <script src="data/ETF_PULSE.js?v=505d020fdb" defer></script>
@@ -1563,15 +1563,15 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=1738b8df25" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=005275f415" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=a1774e94c2" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=96d99def3d" defer></script>
-<script src="data/HEALTH_CHECK.js?v=3802c93685" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=ffcd950f40" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=112bbbe973" defer></script>
+<script src="data/RUNNER_STATUS.js?v=7cc80aa96e" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=34c69ec369" defer></script>
+<script src="data/HEALTH_CHECK.js?v=fe36b9c3e1" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=323cbfc10e" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=11c126c52f" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=9469e229ab" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=294da40e33" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=23def16f20" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=fcc70e74d8" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=ff3b69c52a" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=e626ab7b4c" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=e2683dc92d" defer></script>
     <!-- 2026-09-04 主人令收尾：ALLSITE_BACKTEST.js 注入已删（生成器/raw_data 已于 09-03「干掉全站精选」系列删除，前端无任何代码读 window.ALLSITE_BACKTEST，标签纯 404 噪音） -->
@@ -11034,7 +11034,7 @@ window.showRestrictedItems = showRestrictedItems;
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=9469e229ab';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=fcc70e74d8';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -11043,7 +11043,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=294da40e33';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=ff3b69c52a';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -13106,7 +13106,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }
   var seen=(function(){ try{ var h=window.HEALTH_CHECK||{}; return h.update_time||h.updated_at||h.updated||h.last_update||''; }catch(e){ return ''; } })();
   function _check(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=3802c93685')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=fe36b9c3e1')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var remote=_pickTs(t);
       if(remote){
         if(seen && remote!==seen){
