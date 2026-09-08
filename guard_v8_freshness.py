@@ -58,6 +58,16 @@ def _is_market_open(now) -> bool:
     return (9 * 60 + 30 <= hm <= 11 * 60 + 30) or (13 * 60 <= hm <= 15 * 60)
 
 
+def _is_premarket_window(now, minutes_before_open: int = 180) -> bool:
+    """盘前窗口：开盘前 N 分钟内（默认 180min，即 06:30-09:30）。用于 NT_DATA 等
+    盘前不跑的模块豁免陈旧判定，避免清晨误报。"""
+    if not _is_trading_day(now.date()):
+        return False
+    hm = now.hour * 60 + now.minute
+    open_min = 9 * 60 + 30
+    return open_min - minutes_before_open <= hm < open_min
+
+
 def trading_days_between(start_date, end_date) -> int:
     """两个日期之间经过的交易日数（含两端；周末/节假日扣除；补班日计入）。
 
@@ -529,6 +539,11 @@ def main():
         core_stale = [(v, r) for (v, r) in core_stale if v != "STOCK_QUOTE"]
         core_notime = [v for v in core_notime if v != "STOCK_QUOTE"]
     warn_stale, warn_notime = check_group(WARN_SOURCES, close, "WARN", is_trading)
+    # 🛡 2026-09-08 NT_DATA 盘前 180min 豁免：NT_DATA 是 ETF 实时异动，盘前本就不刷新，
+    #    06:30-09:30 之间陈旧不告警、不派发，避免清晨误报。
+    if _is_premarket_window(now, 180):
+        warn_stale = [(v, r) for (v, r) in warn_stale if v != "NT_DATA"]
+        warn_notime = [v for v in warn_notime if v != "NT_DATA"]
     frozen_stale, frozen_notime = check_group(FROZEN_SOURCES, close, "FROZEN", is_trading)
 
     def _with_cat(items):
