@@ -61,6 +61,9 @@ FIELD_CONTEXT_OK = {
     # 2026-09-08 一劳永逸：STOCK_QUOTE 混合 A股/港股/ETF 现货，港股无涨跌幅限制
     #   (如 hk02738 华津国际控股 pct=551% 因 prev_close 异常)，±44% 边界不适用 -> 跳过。
     ('STOCK_QUOTE', 'pct'),
+    # 2026-09-08 一劳永逸：IMA_STRONG_STOCK.change_pct 是「自选以来区间涨幅」(非当日)，
+    #   可达 174% 等，±44% 当日边界不适用 -> 跳过。
+    ('IMA_STRONG_STOCK', 'change_pct'),
 }
 # update_time 陈旧阈值（天）：>2 软告警，>7 硬失败（豁免表除外）
 STALE_WARN_DAYS, STALE_FAIL_DAYS = 2, 7
