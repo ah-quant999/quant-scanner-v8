@@ -84,6 +84,7 @@ jobs:
 
       - name: "📥 回退·经 GitHub API 同步源码（仅 checkout 失败时）"
         if: steps.co.outcome == 'failure'
+        continue-on-error: true
         timeout-minutes: 10
         run: |
           set -e
@@ -146,6 +147,11 @@ jobs:
               if item["type"] != "blob":
                   continue
               path = item["path"]
+              # 🛡 2026-09-08 一劳永逸：self-hosted 走 API 同步时只拉 fetcher 真正需要的源码
+              # （algorithms/ 目录 + 根目录 .py），避免全仓上千 blob 打爆 secondary rate limit / 超时 10 分钟
+              # → job 卡死。fetch_stock_quote_v8.py 只依赖 algorithms/ 内模块，无需 data/raw_data/ 等大文件。
+              if not (path.startswith("algorithms/") or (path.count("/") == 0 and path.endswith(".py"))):
+                  continue
               l_sha = local_blob_sha(path)
               if l_sha == item["sha"]:
                   continue
