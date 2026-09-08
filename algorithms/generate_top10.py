@@ -445,14 +445,27 @@ def _frog_in_pan_score(vm):
 
 
 def _oversold_bounce_score(vm, pct20):
-    """超跌反弹：20日跌幅>10%，今日收阳，且量能放大（资金开始承接）。"""
+    """超跌反弹腿（2026-09-08 一劳永逸修复·口径定型）：梯度评分，非二进制。
+
+    越深跌 + 越强反转 + 越明显量能承接 → 分越高；仅作 enhance 增量，上限 4.5。
+      - 基础门槛：20日跌幅 pct20 <= -10% 才进入评分（否则 0，非超跌不评分）
+      - 超跌深度分(0~3)：pct20 ∈[-10,-40] 线性映射（-10→0, -20→1, -30→2, -40→3）；
+                        <-40 封顶 3（极深跌视为趋势破坏，不再加分，防接飞刀误判为强反弹）
+      - 反转确认：今日必须收阳(pct_today>0)才有承接意义，否则 0（无量反抽不计）
+      - 量能承接分(0~1.5)：vol_ratio>=1.2 才计（1.2→0, 2.7→1.5 线性）；<1.2 视为无量反抽不计
+    """
     if not vm or pct20 is None or pct20 > -10:
-        return 0
-    if vm["pct_today"] <= 0:
-        return 0
-    if vm["vol_ratio"] < 1.2:
-        return 0
-    return 3
+        return 0.0
+    if vm.get("pct_today", 0) <= 0:
+        return 0.0
+    depth = min(3.0, (-pct20 - 10.0) / 10.0)   # -10→0, -20→1, -30→2, -40→3
+    if pct20 < -40:
+        depth = 3.0
+    vr = vm.get("vol_ratio") or 0.0
+    vol_score = 0.0
+    if vr >= 1.2:
+        vol_score = min(1.5, (vr - 1.2) / 1.5)   # 1.2→0, 2.7→1.5
+    return round(depth + vol_score, 2)
 
 
 def _range_continuation_score(vm):

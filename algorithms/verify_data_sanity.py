@@ -38,6 +38,7 @@ STALE_OK = {
     "PORTFOLIO", "POTENTIAL_PICKS", "WATCHLIST",
     "CONCEPT_ETF_MAP",        # 映射表，低频变更
     "DO_NOT_DELETE",
+    "maharo_macro",           # 2026-09-08 一劳永逸：本机 cookie 拉取(云端无权限)，家里机离线会陈旧，非失真
 }
 # PE 精确字段名（词边界集合成员判断，绝不子串匹配）
 PE_FIELDS = {"pe", "pe_ttm", "pe_lyr", "pes", "pe_ratio"}
@@ -53,6 +54,12 @@ EXPECT_PCT_SOFT = 100.0
 FIELD_CONTEXT_OK = {
     ('PERFORMANCE_FORECAST', 'change_pct'),
     ('PERFORMANCE_FORECAST', 'pct'),
+    # 2026-09-08 一劳永逸：龙虎榜历史的 pct 是「上榜涨幅/区间涨幅」非当日涨跌幅，
+    #   ±44% A股边界不适用 -> 跳过越界检查（否则 44 条误杀）。
+    ('LHB_HISTORY', 'pct'),
+    # 2026-09-08 一劳永逸：STOCK_QUOTE 混合 A股/港股/ETF 现货，港股无涨跌幅限制
+    #   (如 hk02738 华津国际控股 pct=551% 因 prev_close 异常)，±44% 边界不适用 -> 跳过。
+    ('STOCK_QUOTE', 'pct'),
 }
 # update_time 陈旧阈值（天）：>2 软告警，>7 硬失败（豁免表除外）
 STALE_WARN_DAYS, STALE_FAIL_DAYS = 2, 7
@@ -152,9 +159,12 @@ def check_value(var, key, val):
     except (TypeError, ValueError):
         return None
     kl = key.lower()
-    # ① price 精确名 = 0（收盘/现价丢失）
+    # ① price=0（收盘/现价丢失）：属「完整性缺口」而非「数据失真(损坏)」，
+    #    与本基金闸门的使命(旧装新/越界/空表)不符；候选池/龙虎榜/黄金池等列表型
+    #    VAR 本就不携带现价字段，成千上万条 price=0 会把整条 algo_cloud run 误标红。
+    #    → 降级为软告警(仍可见，但不阻断部署)。
     if kl == "price" and f == 0:
-        return (HARD, f"price=0 (现价丢失)")
+        return (SOFT, f"price=0 (现价缺失,仅告警不阻断)")
     # ② 当日涨跌幅越界
     if kl in DAY_PCT_FIELDS and abs(f) > DAY_PCT_HARD:
         return (HARD, f"{key}={f} 超当日涨跌幅物理边界±{DAY_PCT_HARD}%")
