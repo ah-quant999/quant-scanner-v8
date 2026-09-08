@@ -69,25 +69,41 @@ def _sentiment_signal(label):
 
 def classify_sentiment(sh_chg, up_down_ratio):
     """情绪定级：涨跌家数比优先，沪指单点仅作微调
-    🛡 2026-09-08 一劳永逸修复：原逻辑只看沪指单点(>=0.5%才偏暖)，窄幅震荡市
-       (沪指日内<0.5%)每日落兜底'情绪震荡'→ 文字几天不变。现改为涨跌比优先。"""
+    🛡 2026-09-08 一劳永逸修复：
+      1) 涨跌比优先定级（原只看沪指单点，窄幅震荡市每日落兜底'情绪震荡'）。
+      2) 窄幅偏分支：沪指涨跌幅绝对值<0.5% 时，按涨跌比直接给偏暖/偏冷，不再死落'震荡'。
+      3) 剔除原 sh_chg>=1.0 / sh_chg<=-1.5 两处分支——在涨跌比优先后几乎不可达，且会覆盖
+         已定的涨跌比结论，造成'日内风向'文字忽高忽低。"""
     r = up_down_ratio or 0
+    narrow = abs(sh_chg) < 0.5
+
+    # 宽幅+极端涨跌比：直接定级
     if r >= 2.0 and sh_chg >= 0.3:
         return "情绪高涨", "普涨格局，资金积极", "green"
-    if r >= 1.5 and sh_chg >= -0.3:
-        return "情绪偏暖", "涨多跌少，热点活跃", "green"
     if r <= 0.5 and sh_chg <= -0.3:
         return "情绪冰点", "普跌格局，避险为主", "red"
+
+    # 窄幅（沪指<0.5%）按涨跌比分支，避免死落"情绪震荡"
+    if narrow:
+        if r >= 1.5:
+            return "情绪偏暖", "涨多跌少，热点活跃", "green"
+        if r <= 0.7:
+            return "情绪偏冷", "跌多涨少，谨慎操作", "red"
+        if r >= 1.2:
+            return "情绪温和", "震荡偏多，精选个股", "green"
+        if r <= 0.85:
+            return "情绪谨慎", "震荡偏弱，控制仓位", "yellow"
+        return "情绪震荡", "多空拉锯，观望为主", "yellow"
+
+    # 非窄幅：涨跌比+沪指方向综合
+    if r >= 1.5 and sh_chg >= -0.3:
+        return "情绪偏暖", "涨多跌少，热点活跃", "green"
     if r <= 0.7 and sh_chg <= 0.3:
-        return "情绪偏冷", "跌多涨少，谨慎操作", "red"
+        return "情绪偏冷", "跌多跌少，谨慎操作", "red"
     if r >= 1.0 and sh_chg >= 0.2:
         return "情绪温和", "震荡偏多，精选个股", "green"
     if r < 1.0 and sh_chg <= -0.2:
         return "情绪谨慎", "震荡偏弱，控制仓位", "yellow"
-    if sh_chg >= 1.0:
-        return "情绪高涨", "普涨格局，资金积极", "green"
-    if sh_chg <= -1.5:
-        return "情绪冰点", "普跌格局，避险为主", "red"
     return "情绪震荡", "多空拉锯，观望为主", "yellow"
 
 
@@ -123,15 +139,18 @@ def health_lights(indices, up_down_ratio, main_net):
         structure = ("结构震荡", "yellow")
 
     # 资金：主力净流入（亿）
+    # 🛡 2026-09-08 一劳永逸修复：原口径用概念净流入前十之和(永远正数)且阈值100/20，
+    #    资金灯恒"大幅流入"，其下分支全部死行。改用真实双向主力净额 market_net + 300亿阈值，
+    #    让资金灯恢复区分度。
     if main_net is None:
         fund = ("资金待更新", "gray")
-    elif main_net >= 100:
+    elif main_net >= 300:
         fund = ("资金大幅流入", "green")
-    elif main_net >= 20:
+    elif main_net >= 60:
         fund = ("资金流入", "green")
-    elif main_net <= -100:
+    elif main_net <= -300:
         fund = ("资金大幅流出", "red")
-    elif main_net <= -20:
+    elif main_net <= -60:
         fund = ("资金流出", "red")
     else:
         fund = ("资金均衡", "yellow")
