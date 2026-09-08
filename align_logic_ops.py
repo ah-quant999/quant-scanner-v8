@@ -56,8 +56,6 @@ ALLOW_NO_CRON = {
     "v8_sync_legacy",             # legacy 同步（已退役）
     "v8_build_deploy",            # 由 workflow_run 触发，无 cron
     "v8_algo",                    # 46 模块新鲜度体检（已迁 dispatch-only，老引用）
-    "v8_safety_net",              # Safety Net 兜底（已迁 dispatch-only，老引用）
-    "v8_self_heal",               # 云端自愈（已迁 dispatch-only，老引用）
 }
 
 
