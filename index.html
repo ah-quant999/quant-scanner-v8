@@ -880,6 +880,19 @@ window.V8_CAL = {weeks:[],legend:[]};
       // 2026-09-06 fix: 非实时/盘中类数据（盘前/盘后/中长线/日频等）按「流逝的交易日」计数，非交易日天然允许用上一交易日数据
       if(sla > 1.5){
         var tradingDays = window._tradingDaysBetween ? window._tradingDaysBetween(d, new Date()) : Math.floor(ageH / 24);
+        // 2026-09-09 主人令：今日数据合理产出前，上一交易日的数据不算停更（删「昨日停更 1 日」误判）
+        //   盘前→09:30 前；盘后短线→18:30 前；其它（含长线/E 批/兜底）→22:30 前
+        //   tradingDays<=1 视作"昨日=上一交易日"→ 今日盘前/盘中直接置 0；>=2 真陈旧保留
+        var _nowParts = window._cstParts ? window._cstParts(new Date()) : null;
+        if(_nowParts){
+          var _dow = new Date(Date.UTC(_nowParts.y, _nowParts.m - 1, _nowParts.d)).getUTCDay();
+          var _isWk = (_dow >= 1 && _dow <= 5);
+          var _t = _nowParts.hh * 60 + (_nowParts.mm || 0);
+          var _cutoff = (s.indexOf('盘前') >= 0) ? 570 : ((s.indexOf('短线') >= 0) ? 1110 : 1350);
+          if(_isWk && _t < _cutoff){
+            tradingDays = (tradingDays <= 1) ? 0 : (tradingDays - 1);
+          }
+        }
         if(tradingDays <= 0) return { stale:false, ageH:ageH, text:'' };
         return { stale:true, ageH:ageH, text:'⚠️ 已停更 ' + tradingDays + ' 个交易日' };
       }
