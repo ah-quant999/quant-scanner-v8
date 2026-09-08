@@ -97,7 +97,11 @@ DATA_SOURCES = {
     "ai_market_brief.json":        "AI_MARKET_BRIEF",
     "runner_status.json":          "RUNNER_STATUS",
     "risk_gauge.json":             "RISK_GAUGE",
-    "stock_quote.json":            "STOCK_QUOTE",
+    # 🛡 2026-09-08 一劳永逸式根因修复：STOCK_QUOTE.js 由独立工作流 v8_stock_quote_refresh.yml 独占产出
+    #   （fetch_stock_quote_v8.py -> 写入 data/STOCK_QUOTE.js），不调用本脚本。若仍挂此映射，cn_fetch 跑 update_v8
+    #   会用仓库里陈旧的 raw_data/stock_quote.json 重生成 STOCK_QUOTE.js，把 refresh 刚写的新鲜版覆盖回旧时间戳
+    #   （今日实测：11:13 新鲜 -> cn_fetch 后回退 09:58，主站个股行情断档）。移除后 cn_fetch 不再重建它，
+    #   refresh 工作流为唯一写入方，根因消除。其余卡仍由本映射正常重建。
     "avg_price_data.json":         "AVG_PRICE_DATA",
     "algo_track.json":              "ALGO_TRACK",   # 2026-08-15 三算法独立追踪（四量终极/板块龙头/大牛股猎手）
     "weekend_meta_report.json":      "WEEKEND_META_REPORT",
