@@ -901,6 +901,9 @@ def _expand_runner_status():
                     expanded[name] = {**expanded[name], "status": "stale",
                                       "msg": f"数据源离线/产物空：{_r}"}
     out = dict(src)
+    # 🛡 2026-09-08 确保 RUNNER_STATUS.js 总有 update_time，兼容旧 runner_status.json
+    if not out.get("update_time") and out.get("run_time"):
+        out["update_time"] = out["run_time"]
     out["modules"] = expanded
     out["_expanded"] = True
     out["_module_total"] = len(ALL_MODULE_NAMES)
