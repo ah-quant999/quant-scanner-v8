@@ -3109,29 +3109,25 @@ def _clear_intraday_for_premarket(category, only=None):
         fname = VAR_TO_RAW.get(var)
         if not fname:
             continue
-        # 🛡 2026-09-09 主人令（一劳永逸 · 同类误伤第 6 次终结）：盘前【不再清空】任何盘中模块。
+        # 🛡 2026-09-09 主人令（一劳永逸 · 同类误伤第 6 次终结）：盘前【不再清空】任何盘中模块，
+        #    此处【纯跳过】——完整保留上一交易日真实值，等开盘后首次 intraday fetch 自然覆盖。
+        #
         #    复发史：08-11 ETF_DAILY_MONITOR「这是盘后的啊，清空了干嘛」/ 08-26 CONCEPT_RANKING
         #    「概念资金过早清空」/ 08-31 连板天梯「无数据」/ 09-01 板块资金 / 09-08 MACRO_DATA
-        #    「放盘后数据，为啥盘前会清空」……
-        #    根因：本函数只挡「09:30 之后」(h>=9.5)，00:00-09:29 任何一次 premarket 跑批都会清；
-        #    而 premarket 档整夜约每小时被派发一次 → 实测 2026-09-09 从 00:29 起每小时清一次（六连清）。
-        #    修复：一律改为与 KEEP_VARS 完全一致的「保留上一交易日真实值 + 打 premarket_cleared 标记」，
-        #    等开盘后首次 intraday fetch 自然覆盖。卡片永不再出现空窗，也不再依赖任何时间点。
-        note_map = {
-            "ETF_PULSE": "盘前保留上一交易日收盘值（量比/成交额），开盘后自动刷新",
-            "ETF_INTRADAY_HEAT": "盘前 ETF 资金热度为上一交易日值，开盘后自动更新",
-            "INDEX_QUOTES": "盘前指数快照为上一交易日收盘值，开盘后自动刷新",
-            "CANDIDATE_QUOTES": "盘前候选池行情为上一交易日收盘值，开盘后自动刷新",
-            "MARKET_ALERTS": "盘前市场预警为上一交易日值，开盘后自动刷新",
-            "SECTOR_FUND_FLOW": "盘前板块资金流为上一交易日值，开盘后自动刷新",
-        }
-        cur = _load_judgment_raw(var, fname) or {}
-        if not cur or cur.get("no_data"):
-            continue          # 无真实数据可留（或已是 stub）→ 不写，避免把空固化
-        cur.pop("no_data", None)
-        cur["premarket_cleared"] = True
-        cur["note"] = note_map.get(var, "盘前保留上一交易日值，开盘后自动刷新")
-        save(var, cur)
+        #    「放盘后数据，为啥盘前会清空」/ 09-09 本次。
+        #
+        #    根因：本函数时间门控只有上限（h>=9.5 才拒绝），00:00–09:29 任何一次 premarket 跑批都会清；
+        #    而 premarket 档整夜约每小时被派发一次 → 实测 2026-09-09 从 00:29 起每小时清一次（六连清，
+        #    00:29:19/01:30:16/02:32:55/03:34:07/04:36:49/05:38:26），整夜卡片全空。
+        #
+        #    ⚠️⚠️ 切勿在此写 premarket_cleared / no_data 标记！
+        #    前端 index.html 多处一见该标记就渲染「盘前清空，开盘后更新」占位而不渲染数据：
+        #      · 概念资金热力  var _cleared = !!(d && (d.premarket_cleared===true || d.no_data===true))
+        #      · 行业树图      var sfCleared = !!(SF && SF.premarket_cleared === true)
+        #      · 板块资金      const sffLive = (sff.no_data===true || sff.premarket_cleared===true) ? false : …
+        #    一旦打标，保留下来的真实数据会被前端重新藏起来 → 卡片照样空白，等于没修（v1 犯过此错）。
+        #    故必须与 KEEP_VARS 完全一致：【什么都不写，直接 continue】。
+        continue
 
     # SH_SZ_HISTORY：保留历史序列，仅剔除今日记录
     # 2026-08-10 小九：盘前清空也读远端 main 基线，防止本地 raw_data 被旧数据污染时把历史交易日丢掉。
