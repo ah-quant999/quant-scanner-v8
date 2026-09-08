@@ -124,7 +124,10 @@ def _parse_lhb_list_em(df):
             stocks.append({
                 'code': code,
                 'name': str(row.get('名称', '')),
-                'price': float(row.get('最新价', 0) or 0),
+                # 🛡 2026-09-08 修复：akshare stock_lhb_detail_em 返回列名为"收盘价"而非"最新价"，
+                #   旧映射导致所有 LHB 价格永远为 0.0， UI 与 verify_data_sanity 均报失真。
+                #   兼容兜底：优先"收盘价"，缺失再回退"最新价"（旧版本或新浪接口）。
+                'price': float(row.get('收盘价') or row.get('最新价', 0) or 0),
                 'pct': float(row.get('涨跌幅', 0) or 0),
                 'amount': float(row.get('龙虎榜净买额', 0) or 0),
                 'reason': str(row.get('上榜原因', '')),
@@ -463,7 +466,16 @@ def _update_lhb_history(results, date_str, trading=True):
         json.dump(hist, f, ensure_ascii=False, indent=2)
 
 if __name__ == "__main__":
-    from fetch_logger import record_success, record_failure
+    # 🛡 2026-09-08 降级：fetch_logger 在部分 runner/轻量环境可能缺失，
+    #   直接跑脚本时不因记录器缺失阻断 LHB 抓取（run_algorithms 调用走 main() 不触此分支）。
+    try:
+        from fetch_logger import record_success, record_failure
+    except Exception:
+        def record_success(p):
+            pass
+
+        def record_failure(p, e):
+            print(f"[WARN] 抓取失败: {e}")
     try:
         main()
         record_success(__file__)

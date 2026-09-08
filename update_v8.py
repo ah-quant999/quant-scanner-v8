@@ -62,10 +62,6 @@ DATA_SOURCES = {
     #   （09-03「干掉驾驶舱」系列删了生成器与 raw_data，映射永不命中，纯死代码）
     "top10_daily.json":            "TOP10_DAILY",
     "sh_fib.json":                 "SH_FIB",
-    # 2026-09-08 一劳永逸（同 INDEX_HISTORY 病根）：raw_data/factor_lab.json 从未登记映射，
-    # 日志明写「factor_lab.json 不在 DATA_SOURCES 映射中，跳过」，
-    # 即使 factor_lab_gen 产出新 raw 也永远转不成 data/FACTOR_LAB.js -> 该卡长期停在 09-05。
-    "factor_lab.json":             "FACTOR_LAB",
     "sz_fib.json":                 "SZ_FIB",
     "sector_rs.json":              "SECTOR_RS",
     "inst_trade.json":             "INST_TRADE",
@@ -823,6 +819,13 @@ def _is_raw_empty_or_stale(raw_path):
     if isinstance(obj, dict):
         if obj.get("validity") == "unknown":
             return (True, "数据源异常占位(validity=unknown)")
+        # 🛡 2026-09-08 一劳永逸：LHB/龙虎榜 raw_data/lhb_data.json 结构为 {date,update_time,stocks,summary}
+        #   stocks 列表有真实数据，但无 total_scanned/market_context，此前被误杀为"0命中+数据源异常"，
+        #   导致 data/LHB_DATA.js 长期为空。对含真实列表数据的 dict 放行。
+        for arr_key in ("stocks", "data", "list", "items", "rows"):
+            arr = obj.get(arr_key)
+            if isinstance(arr, list) and len(arr) > 0:
+                return (False, "")
         mc = obj.get("market_context") or {}
         if obj.get("total_scanned") == 0 and mc.get("validity") not in ("ok", "good", "normal"):
             return (True, "0命中且数据源有效性异常")
