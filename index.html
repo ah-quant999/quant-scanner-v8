@@ -909,12 +909,15 @@ function _uBadge(slot, horizon, ts, sub){
   }
   var sHTML = slot ? ' '+slot : '';
   var hHTML = horizon ? ' '+horizon : '';
+  // 2026-09-08 一劳永逸：过期数据不再挂「实时/盘中」新鲜度标签 —— 陈旧胶囊去掉 slot，
+  //   避免主人误以为停更的实时卡仍在按实时频率更新（过期不挂实时徽章）。
+  var _slotHtml = (slot === '实时' || slot === '盘中') ? '' : sHTML;
   // 🛡 2026-09-04 主人令「一劳永逸」：陈旧度自判下沉到胶囊本体。
   //   超过 SLA 的数据 → 胶囊变红并追加「⚠️ 已停更 N 天」，让主人一眼区分
   //   「数据新鲜」与「批次根本没跑」，不再需要靠截图问 AI。全站 _uBadge/setBadge 调用点自动生效。
   var _st = (window._staleMark && window._staleMark(ts, slot)) || null;
   if(_st && _st.stale){
-    return '<span title="数据源已超过更新时效（'+(Math.round(_st.ageH*10)/10)+' 小时未刷新），请检查对应抓取/算法任务" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(239,68,68,.14);color:#f87171;border:1px solid rgba(239,68,68,.38);white-space:nowrap">🦊 更新于 '+t+sHTML+hHTML+' '+_st.text+'</span>'
+    return '<span title="数据源已超过更新时效（'+(Math.round(_st.ageH*10)/10)+' 小时未刷新），请检查对应抓取/算法任务" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:600;background:rgba(239,68,68,.14);color:#f87171;border:1px solid rgba(239,68,68,.38);white-space:nowrap">🦊 更新于 '+t+_slotHtml+hHTML+' '+_st.text+'</span>'
       + (sub ? ' <span style="font-size:10px;color:var(--sub);font-weight:400;margin-left:6px">' + sub + '</span>' : '');
   }
   // 统一轻量 pill 风格（与最终推荐 finalStatusBadges 一致）
@@ -9284,7 +9287,7 @@ function drawUpDownChart(){
     if(!el) return;
     const _esc = function(v){ return String(v==null?'':v).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
     if(!at || !at.latest){
-      el.innerHTML = '<div style="font-size:12px;color:var(--dim)">暂无审计轨迹（等待每日 22:30 云端审计 + 23:30 本机审计产出）</div>';
+      el.innerHTML = '<div style="font-size:12px;color:var(--dim)">暂无审计轨迹（等待每日 22:30 云端审计产出）</div>';
       return;
     }
     const latest = at.latest || {};
@@ -9323,7 +9326,7 @@ function drawUpDownChart(){
       const last = nightly[nightly.length-1];
       nightlyBlock = '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--sub);">🌙 本机夜间审计：'+nightly.length+' 条（最近 '+_esc(last.date||'')+' '+_esc(last.time||'')+'）</div>';
     } else {
-      nightlyBlock = '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--dim);">🌙 本机夜间审计：暂无（23:30 本机任务产出）</div>';
+      nightlyBlock = '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--dim);">🌙 本机夜间审计：暂无（等待本机任务产出）</div>';
     }
     el.innerHTML = latestHtml + histBlock + nightlyBlock;
     const tEl = document.getElementById('auditTrailTime');

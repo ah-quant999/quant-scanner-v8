@@ -155,7 +155,9 @@ CATEGORY_MAP = {
     "MARKET_ALERTS": "intraday",
     # 🛡 2026-09-04 同上：盘后数据页「市场宽度 · 新高家数与宽度评分」卡读本变量（52周新高广度）。
     "W52_HIGH": "premarket,post_close",
-    "HERDING_DATA": "premarket",
+    # 2026-09-08 一劳永逸：HERDING_DATA(羊群效应) 由 f_herding_data() 读当日完整涨停池(_get_zt_pool)，
+    #   收盘后定稿 → 属 post_close，原挂 premarket 致盘中 cn_fetch 永远刷不到 / 盘前判 stale。
+    "HERDING_DATA": "post_close",
     "JUDGMENT_DATA": "premarket",
     "MACRO_BRIEF": "premarket",
 
