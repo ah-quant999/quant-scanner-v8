@@ -1,9 +1,9 @@
 window.STOCK_MOMENTUM_STATE = (function() {
   var data = {
- "update_time": "2026-09-08 20:45",
- "generated": "2026-09-08 20:45",
+ "update_time": "2026-09-08 20:54",
+ "generated": "2026-09-08 20:54",
  "meta": {
-  "generated": "2026-09-08 20:45",
+  "generated": "2026-09-08 20:54",
   "source": "h_reverse_upgraded_breakout(脱离PDF OCR)",
   "total_days": 6,
   "days_with_consensus": 0,
@@ -1078,10 +1078,59 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "突破"
      },
      {
+      "code": "159063",
+      "name": "粮食ETF南方",
+      "change_pct": 4.49,
+      "price": 1.186,
+      "category": "突破"
+     },
+     {
+      "code": "159587",
+      "name": "粮食ETF广发",
+      "change_pct": 4.29,
+      "price": 1.36,
+      "category": "突破"
+     },
+     {
+      "code": "159033",
+      "name": "粮食ETF国泰",
+      "change_pct": 4.47,
+      "price": 1.122,
+      "category": "突破"
+     },
+     {
+      "code": "159030",
+      "name": "粮食ETF华夏",
+      "change_pct": 4.32,
+      "price": 0.99,
+      "category": "突破"
+     },
+     {
       "code": "002790",
       "name": "瑞尔特",
       "change_pct": 10.079,
       "price": 6.99,
+      "category": "突破"
+     },
+     {
+      "code": "159038",
+      "name": "粮食ETF易方达",
+      "change_pct": 4.33,
+      "price": 1.06,
+      "category": "突破"
+     },
+     {
+      "code": "159031",
+      "name": "粮食ETF博时",
+      "change_pct": 4.58,
+      "price": 1.097,
+      "category": "突破"
+     },
+     {
+      "code": "159698",
+      "name": "粮食ETF鹏华",
+      "change_pct": 4.06,
+      "price": 1.051,
       "category": "突破"
      },
      {
@@ -1166,27 +1215,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "大连友谊",
       "change_pct": 10.076,
       "price": 7.21,
-      "category": "突破"
-     },
-     {
-      "code": "002652",
-      "name": "扬子新材",
-      "change_pct": 4.082,
-      "price": 4.59,
-      "category": "突破"
-     },
-     {
-      "code": "000928",
-      "name": "中钢国际",
-      "change_pct": 9.963,
-      "price": 5.96,
-      "category": "突破"
-     },
-     {
-      "code": "300727",
-      "name": "润禾材料",
-      "change_pct": 3.134,
-      "price": 31.92,
       "category": "突破"
      }
     ],
@@ -1579,10 +1607,59 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "短线选股"
      },
      {
+      "code": "159063",
+      "name": "粮食ETF南方",
+      "change_pct": 4.49,
+      "price": 1.186,
+      "category": "短线选股"
+     },
+     {
+      "code": "159587",
+      "name": "粮食ETF广发",
+      "change_pct": 4.29,
+      "price": 1.36,
+      "category": "短线选股"
+     },
+     {
+      "code": "159033",
+      "name": "粮食ETF国泰",
+      "change_pct": 4.47,
+      "price": 1.122,
+      "category": "短线选股"
+     },
+     {
+      "code": "159030",
+      "name": "粮食ETF华夏",
+      "change_pct": 4.32,
+      "price": 0.99,
+      "category": "短线选股"
+     },
+     {
       "code": "002790",
       "name": "瑞尔特",
       "change_pct": 10.079,
       "price": 6.99,
+      "category": "短线选股"
+     },
+     {
+      "code": "159038",
+      "name": "粮食ETF易方达",
+      "change_pct": 4.33,
+      "price": 1.06,
+      "category": "短线选股"
+     },
+     {
+      "code": "159031",
+      "name": "粮食ETF博时",
+      "change_pct": 4.58,
+      "price": 1.097,
+      "category": "短线选股"
+     },
+     {
+      "code": "159698",
+      "name": "粮食ETF鹏华",
+      "change_pct": 4.06,
+      "price": 1.051,
       "category": "短线选股"
      },
      {
@@ -1667,27 +1744,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "大连友谊",
       "change_pct": 10.076,
       "price": 7.21,
-      "category": "短线选股"
-     },
-     {
-      "code": "002652",
-      "name": "扬子新材",
-      "change_pct": 4.082,
-      "price": 4.59,
-      "category": "短线选股"
-     },
-     {
-      "code": "000928",
-      "name": "中钢国际",
-      "change_pct": 9.963,
-      "price": 5.96,
-      "category": "短线选股"
-     },
-     {
-      "code": "300727",
-      "name": "润禾材料",
-      "change_pct": 3.134,
-      "price": 31.92,
       "category": "短线选股"
      }
     ],
@@ -1756,10 +1812,59 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "category": "强势股"
      },
      {
+      "code": "159063",
+      "name": "粮食ETF南方",
+      "change_pct": 4.49,
+      "price": 1.186,
+      "category": "强势股"
+     },
+     {
+      "code": "159587",
+      "name": "粮食ETF广发",
+      "change_pct": 4.29,
+      "price": 1.36,
+      "category": "强势股"
+     },
+     {
+      "code": "159033",
+      "name": "粮食ETF国泰",
+      "change_pct": 4.47,
+      "price": 1.122,
+      "category": "强势股"
+     },
+     {
+      "code": "159030",
+      "name": "粮食ETF华夏",
+      "change_pct": 4.32,
+      "price": 0.99,
+      "category": "强势股"
+     },
+     {
       "code": "002790",
       "name": "瑞尔特",
       "change_pct": 10.079,
       "price": 6.99,
+      "category": "强势股"
+     },
+     {
+      "code": "159038",
+      "name": "粮食ETF易方达",
+      "change_pct": 4.33,
+      "price": 1.06,
+      "category": "强势股"
+     },
+     {
+      "code": "159031",
+      "name": "粮食ETF博时",
+      "change_pct": 4.58,
+      "price": 1.097,
+      "category": "强势股"
+     },
+     {
+      "code": "159698",
+      "name": "粮食ETF鹏华",
+      "change_pct": 4.06,
+      "price": 1.051,
       "category": "强势股"
      },
      {
@@ -1844,27 +1949,6 @@ window.STOCK_MOMENTUM_STATE = (function() {
       "name": "大连友谊",
       "change_pct": 10.076,
       "price": 7.21,
-      "category": "强势股"
-     },
-     {
-      "code": "002652",
-      "name": "扬子新材",
-      "change_pct": 4.082,
-      "price": 4.59,
-      "category": "强势股"
-     },
-     {
-      "code": "000928",
-      "name": "中钢国际",
-      "change_pct": 9.963,
-      "price": 5.96,
-      "category": "强势股"
-     },
-     {
-      "code": "300727",
-      "name": "润禾材料",
-      "change_pct": 3.134,
-      "price": 31.92,
       "category": "强势股"
      }
     ]
