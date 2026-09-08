@@ -69,25 +69,20 @@ jobs:
       run:
         shell: bash
     steps:
-      # 🛡️ 2026-08-21 20:45 一劳永逸根因修复（主人令「核查，一劳永逸式修复」）：
-      #   本 job runs-on 已是 [self-hosted]（小九单位机·中国 IP，绕开美国 IP 盘中反爬），源码同步仍沿用
-      #   给 [self-hosted, cn] 写的「逐 blob 走 Contents API 拉全仓上千文件」方案。
-      #   后果与 v8_algo_cloud 同源：并发场景下上千次 API 打爆 secondary rate limit
-      #   → blob 全 403 Forbidden → 同步步骤超时 → job 失败。
-      #   修复：checkout 优先（秒级、0 次 blob API），仅当 checkout 失败才回退 API 同步。
-      - name: "📥 Checkout 源码（云端 git 直连，秒级）"
-        id: co
-        continue-on-error: true
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: "📥 回退·经 GitHub API 同步源码（仅 checkout 失败时）"
-        if: steps.co.outcome == 'failure'
+      # 🛡️ 2026-09-08 一劳永逸根因修复（self-hosted 源码同步）：
+      #   本 job runs-on 已是 [self-hosted]（小九单位机·中国 IP，绕开美国 IP 盘中反爬）。
+      #   实测 self-hosted runner 拉不到 actions/checkout 动作 CDN（中国 IP 被墙/极慢）→ checkout 步骤
+      #   卡死 5+ 分钟且被 continue-on-error 掩盖为绿、timeout 也判 success，导致兜底 API 同步永不触发、
+      #   或全仓上千 blob 走 API 同步打爆 secondary rate limit 超时 → job 卡死、STOCK_QUOTE 断更。
+      #   根治：彻底删除 actions/checkout 步骤，self-hosted 直接走「仅拉 fetcher 真实依赖的
+      #   algorithms/ 目录 + 根目录 .py」的轻量 API 同步（秒级、不超时、continue-on-error 非致命），
+      #   并 mkdir -p raw_data data algorithms 保证 fetcher 输出目录存在。
+      - name: "📥 经 GitHub API 同步源码（self-hosted 直连·仅拉 fetcher 所需）"
         continue-on-error: true
         timeout-minutes: 10
         run: |
           set -e
+          mkdir -p raw_data data algorithms
           cat > "$RUNNER_TEMP/sync_src_v8cloud.py" <<'PYEOF'
           import os, base64, json, hashlib, urllib.request, time, sys
           token = os.environ["GITHUB_TOKEN"]
