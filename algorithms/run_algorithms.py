@@ -49,6 +49,11 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     "build_candidate_pool.py": 2400,       # missing[:200] 串行东财补全行业
     "fetch_sector_rs.py": 1800,            # ~90 同花顺板块串行
     "calc_volatility_watch.py": 1800,      # 多源兜底，源慢时串行拉长
+    # 🛡 2026-09-08 D2-A2 挂链补登：因子实验室生成器（v8/factor_lab_gen.py）此前零调度成孤儿
+    #   —— 2026-09-07 主人令已把它「从 D 摘到 E 批」，但只写在注释里，STAGES["E"]/ORDER 均未挂，
+    #   导致 data/FACTOR_LAB.js 长期无人刷新（运维暗灯）。现正式挂链并给足冷启动预算
+    #   （脚本自述冷启动 50-90min；热缓存后分钟级）。
+    "v8/factor_lab_gen.py": 5400,
 }
 
 
@@ -180,6 +185,8 @@ ORDER = [
     #   三者失败均不影响选股结果，仅自身卡片可能不刷新。
 
     # 🆕 2026-09-04 主人令「都按你的建议做」：因子实验室独立分层回测（升4⭐证据链）
+    # 🛡 2026-09-08 D2-A2：生成器挂在同一位置（ORDER 与 STAGES["E"] 必须同位，模块级 assert 强校验）
+    "v8/factor_lab_gen.py",               # → data/FACTOR_LAB.js（先产因子，再分层回测）
     "factor_lab_backtest.py",         # → data/FACTOR_LAB_BACKTEST.js（五分位分层·胜率/回撤/OOS）
     # 🛡 2026-09-07 修复：以下两脚本曾只挂 E 批 STAGES、漏挂 ORDER → 模块级自校验
     #   `_STAGE_UNION == set(ORDER)` 断言崩（仅STAGES有两脚本），盘后链启动即死、0 产出。
@@ -229,6 +236,11 @@ STAGES = {
         "backtest_expectancy.py",          # 🆕 期望收益回测：walk-forward 产出 raw_data/backtest_expectancy.json
         "export_optimized_strategy.py",   # 读 backtest_tdx.json 汇总优化策略（在 backtest_tdx 之后）
 
+        # 🛡 2026-09-08 D2-A2 一劳永逸（补上当年只写在注释里的挂链）：因子实验室生成器正式落 E 批，
+        #   与 ORDER 同位（在 factor_lab_backtest 之前：先产 FACTOR_LAB.js 再分层回测）。
+        #   链内由 run_algorithms.py 统一注入 V8_IN_CHAIN=1 → 本脚本自带 git push 自动跳过，
+        #   不会与链尾统一推送互踢（暴风根治前提不变）。
+        "v8/factor_lab_gen.py",   # → data/FACTOR_LAB.js + raw_data/factor_lab.json（baostock，冷启动长）
         "factor_lab_backtest.py",   # 🆕 因子实验室分层回测（读 _rps_cache，依赖 B 批 calc_stock_rps）
         # 2026-09-06 主人令：AI预测卡回测 INVALID → 下架，停跑 path_probability_backtest.py
         "strategy_four_volume.py",  # 四量终极回测模式（SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js，根治孤儿）
@@ -239,7 +251,6 @@ STAGES = {
         #   FACTOR_LAB 停在 09-05 仍出 5 只），生成器根本不该绑在 final_recommend 关键路径上。
         #   现把生成器从 D 摘到 E 批（21:00 夜间跑，不阻塞盘后 20:00 出最终推荐），
         #   D 批瘦身至 final_recommend 单脚本 → 选股策略全部数据出来 30-40min 内出最终推荐。
-
     ],
     "D": [  # 汇总批（~20:00 CST，依赖全部）：仅 final_recommend（LHB历史/7d/生命周期/factor_lab_gen 全部前置到 E 批·互踢暴风根治）
         "final_recommend.py",   # 必需上游 = B 批产物（CRDS/TOP10/三重共识/crisis/sector_rs/stock_profile/triple_track）
