@@ -1778,6 +1778,12 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         🛡 <b>NT_DATA 盘前 180min 豁免</b>：NT_DATA 为 ETF 实时异动，盘前本就不刷新；<code>guard_v8_freshness.py</code> 在 06:30–09:30 之间对 NT_DATA 陈旧/无时间豁免告警与派发，避免清晨误报。<br>
         🛡 <b>调度器深夜窗口漂移</b>：<code>v8_freshness_watch.yml</code> cron 由全天 <code>10,40 * * * *</code> 收紧为工作日 <code>10,40 0-14 * * 1-5</code>（CST 08:00–22:10）；本地 WorkBuddy 档期调度器 rrule 同步加 BYDAY/BYHOUR 限制（8–22 点、工作日），防止深夜窗口外空转漂移。</div>
 
+        <div class="logic-h">2026-09-08 补充修复：审计产物保护 + 过期不挂实时徽章 + NT_DATA 页面归属</div>
+        <div class="logic-p">【审计产物保护 / api_push_raw.py】新增模块级 _PROTECTED_RAW = {"raw_data/audit_history.json","raw_data/audit_nightly.log"}，在 walk_raw() 与 main() 的 PUSH_FILES 分支双重跳过这两个文件。根因：审计轨迹只由本机审计脚本经 git 推送，若经 api_push_raw 的 Git Database API 裸推，cn runner 工作区的旧审计文件会覆盖 main 上的新版、吞掉历史审计轨迹（实测 09-08 多轮审计记录丢失）。<br>
+        【过期不挂实时徽章 / index.html _uBadge】stale 分支新增加 _slotHtml 变量，对 slot 为「实时/盘中」的卡片过期时不再显示实时/盘中新鲜度标签，仅保留「更新于 + 时间 + 已停更」红色胶囊，避免主人误以为停更的实时卡仍在按实时频率更新。<br>
+        【NT_DATA 页面归属 / v8_health_check.py】NT_DATA 由盘后算法链 fetch_orphan_nt_data.py 产出，原挂「今日事件」页在 08:00-10:00 盘前被 adjust_max_age 收紧到 180min 误杀；现改挂「全量数据」页豁免（盘后产物本不可能 &lt;180min 新鲜），与上文 guard_v8_freshness.py 的 180min 豁免互补。</div>
+
+
         <table class="lg-table">
           <tr><th>时间槽</th><th>Workflow</th><th>类别</th><th>刷新的前端模块</th></tr>
           <tr><td>08:25（工作日）/ 09:00（周六日）</td><td>v8_cn_fetch_cloud</td><td>盘前</td><td>今日事件(V8_CAL日历+今日判定JUDGMENT_DATA+打新)、IPO、两融、宏观、危机雷达、北向、分析师评级、52周高、羊群效应、ETF申赎、解禁日历、业绩预告</td></tr>
