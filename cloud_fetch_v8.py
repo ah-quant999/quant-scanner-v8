@@ -3109,31 +3109,29 @@ def _clear_intraday_for_premarket(category, only=None):
         fname = VAR_TO_RAW.get(var)
         if not fname:
             continue
+        # 🛡 2026-09-09 主人令（一劳永逸 · 同类误伤第 6 次终结）：盘前【不再清空】任何盘中模块。
+        #    复发史：08-11 ETF_DAILY_MONITOR「这是盘后的啊，清空了干嘛」/ 08-26 CONCEPT_RANKING
+        #    「概念资金过早清空」/ 08-31 连板天梯「无数据」/ 09-01 板块资金 / 09-08 MACRO_DATA
+        #    「放盘后数据，为啥盘前会清空」……
+        #    根因：本函数只挡「09:30 之后」(h>=9.5)，00:00-09:29 任何一次 premarket 跑批都会清；
+        #    而 premarket 档整夜约每小时被派发一次 → 实测 2026-09-09 从 00:29 起每小时清一次（六连清）。
+        #    修复：一律改为与 KEEP_VARS 完全一致的「保留上一交易日真实值 + 打 premarket_cleared 标记」，
+        #    等开盘后首次 intraday fetch 自然覆盖。卡片永不再出现空窗，也不再依赖任何时间点。
         note_map = {
-            "ETF_DAILY_MONITOR": "盘前无主力净流入数据，开盘后自动刷新",
-            "ETF_PULSE": "未开盘/集合竞价中，量比与成交额尚未产生，开盘后自动刷新",
-            "ETF_INTRADAY_HEAT": "盘前 ETF 资金热度待刷新，开盘后自动更新",
-            "INDEX_QUOTES": "盘前指数快照待开盘刷新",
-            "CONCEPT_RANKING": "盘前概念排名待开盘刷新",
-            "CANDIDATE_QUOTES": "盘前候选池实时行情待开盘刷新",
-            "MARKET_ALERTS": "盘前市场预警待开盘刷新",
-            "SECTOR_FUND_FLOW": "盘前板块资金流待开盘刷新",
+            "ETF_PULSE": "盘前保留上一交易日收盘值（量比/成交额），开盘后自动刷新",
+            "ETF_INTRADAY_HEAT": "盘前 ETF 资金热度为上一交易日值，开盘后自动更新",
+            "INDEX_QUOTES": "盘前指数快照为上一交易日收盘值，开盘后自动刷新",
+            "CANDIDATE_QUOTES": "盘前候选池行情为上一交易日收盘值，开盘后自动刷新",
+            "MARKET_ALERTS": "盘前市场预警为上一交易日值，开盘后自动刷新",
+            "SECTOR_FUND_FLOW": "盘前板块资金流为上一交易日值，开盘后自动刷新",
         }
-        note = note_map.get(var, "盘前数据已清空，开盘后自动刷新")
-        stub = {"no_data": True, "premarket_cleared": True, "note": note}
-        if var == "ETF_INTRADAY_HEAT":
-            stub.update({"items": [], "inflow_top": [], "outflow_top": [], "categories": {}})
-        elif var == "INDEX_QUOTES":
-            stub["indices"] = []
-        elif var == "CONCEPT_RANKING":
-            stub["concepts"] = []
-        elif var == "CANDIDATE_QUOTES":
-            stub["quotes"] = []
-        elif var == "MARKET_ALERTS":
-            stub["alerts"] = []
-        elif var == "SECTOR_FUND_FLOW":
-            stub["sectors"] = []
-        save(var, stub)
+        cur = _load_judgment_raw(var, fname) or {}
+        if not cur or cur.get("no_data"):
+            continue          # 无真实数据可留（或已是 stub）→ 不写，避免把空固化
+        cur.pop("no_data", None)
+        cur["premarket_cleared"] = True
+        cur["note"] = note_map.get(var, "盘前保留上一交易日值，开盘后自动刷新")
+        save(var, cur)
 
     # SH_SZ_HISTORY：保留历史序列，仅剔除今日记录
     # 2026-08-10 小九：盘前清空也读远端 main 基线，防止本地 raw_data 被旧数据污染时把历史交易日丢掉。
