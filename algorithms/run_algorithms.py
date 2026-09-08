@@ -683,6 +683,19 @@ def _write_run_report(ok, fail, skipped, run_start):
 # ════════════════════════════════════════════════════════════════════════════
 # 单脚本静默卡死判定秒数（默认 15min）。V8_ALGO_SILENCE 可调大以防极重活误杀。
 SILENCE_KILL_SEC = int(_os.environ.get("V8_ALGO_SILENCE", "900"))
+# 🛡 2026-09-09 一劳永逸：长静默型重活的「静默杀」阈值单独放宽。
+#   背景：全局 15min 无输出即 kill 对绝大多数脚本正确，但对「长时间不发 stdout 的批量抓取型」会误杀
+#   —— 实测 v8/factor_lab_gen.py 在 2026-09-09 00:04 被静默杀（冷启动 50-90min，长段落无输出），
+#   产物写不出 → FACTOR_LAB 永远刷不出来，链尾还计「失败 1」。
+#   现在双保险：① 脚本自带心跳（v8/factor_lab_gen.py 每 30s 一行）② 此处给静默预算兜底。
+SILENCE_OVERRIDE = {
+    "v8/factor_lab_gen.py": 3600,   # 冷启动 50-90min，给 1h 静默预算（总时长仍受 5400s 超时约束）
+}
+
+
+def _silence_budget(script_name):
+    """返回该脚本的静默容忍秒数（覆盖表优先，其次环境变量，最后全局默认）。"""
+    return int(SILENCE_OVERRIDE.get(script_name, SILENCE_KILL_SEC))
 # 算法链心跳文件：实时进度 + 卡死信号，供 v8_cloud_watchdog 跨 run 监督 + 运维面板消费
 HEARTBEAT_PATH = os.path.join(V8_ROOT, "raw_data", "algo_heartbeat.json")
 
@@ -701,6 +714,7 @@ def _supervised_run(script, path, timeout):
     """监督式执行单个算法脚本；返回 (returncode, last_lines, killed_reason)。
     killed_reason ∈ {None, 'silence', 'timeout'}。"""
     start_ts = time.time()
+    silence_limit = _silence_budget(script)   # 🛡 2026-09-09：长静默型脚本单独放宽，防误杀
     ctx = {"last_output_ts": start_ts, "last_lines": [], "start_ts": start_ts}
     lock = threading.Lock()
 
@@ -756,8 +770,8 @@ def _supervised_run(script, path, timeout):
         if elapsed >= timeout:
             killed_reason = "timeout"
             break
-        # 静默杀：已起跑超过启动宽限期(30s) 且 连续无输出 ≥ SILENCE_KILL_SEC
-        if elapsed > 30 and silent >= SILENCE_KILL_SEC:
+        # 静默杀：已起跑超过启动宽限期(30s) 且 连续无输出 ≥ 该脚本的静默预算
+        if elapsed > 30 and silent >= silence_limit:
             killed_reason = "silence"
             break
         time.sleep(5)
