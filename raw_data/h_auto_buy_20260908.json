@@ -6,7 +6,7 @@
   "total_scanned": 9963,
   "skipped_no_quote": 2,
   "hit_chg_only": 988,
-  "final_count": 576,
+  "final_count": 599,
   "candidates": [
     {
       "code": "301206",
@@ -22,6 +22,19 @@
       "board": "创业板"
     },
     {
+      "code": "00661",
+      "symbol": "hk00661",
+      "name": "中国大冶有色金属",
+      "pct": 11.11,
+      "price": 0.17,
+      "prev_close": 0.153,
+      "volume": 55822000.0,
+      "avg_vol_4d": 39268.25,
+      "vol_ratio": 1421.556,
+      "industry": "",
+      "board": "港股"
+    },
+    {
       "code": "000789",
       "symbol": "sz000789",
       "name": "万年青",
@@ -33,6 +46,19 @@
       "vol_ratio": 923.118,
       "industry": "非金属矿物制品业",
       "board": "主板"
+    },
+    {
+      "code": "00568",
+      "symbol": "hk00568",
+      "name": "山东墨龙",
+      "pct": 7.88,
+      "price": 5.135,
+      "prev_close": 4.76,
+      "volume": 85294025.0,
+      "avg_vol_4d": 106058.0,
+      "vol_ratio": 804.221,
+      "industry": "",
+      "board": "港股"
     },
     {
       "code": "300261",
@@ -293,6 +319,19 @@
       "vol_ratio": 367.568,
       "industry": "医药制造业",
       "board": "主板"
+    },
+    {
+      "code": "00883",
+      "symbol": "hk00883",
+      "name": "中国海洋石油",
+      "pct": 3.94,
+      "price": 25.86,
+      "prev_close": 24.88,
+      "volume": 107258270.0,
+      "avg_vol_4d": 297268.25,
+      "vol_ratio": 360.813,
+      "industry": "",
+      "board": "港股"
     },
     {
       "code": "603075",
@@ -1881,6 +1920,19 @@
       "board": "主板"
     },
     {
+      "code": "00909",
+      "symbol": "hk00909",
+      "name": "明源云",
+      "pct": 3.15,
+      "price": 1.145,
+      "prev_close": 1.11,
+      "volume": 8021648.0,
+      "avg_vol_4d": 46851.5,
+      "vol_ratio": 171.214,
+      "industry": "",
+      "board": "港股"
+    },
+    {
       "code": "300363",
       "symbol": "sz300363",
       "name": "博腾股份",
@@ -3168,6 +3220,19 @@
       "board": "创业板"
     },
     {
+      "code": "00690",
+      "symbol": "hk00690",
+      "name": "联康生物科技集团",
+      "pct": 13.56,
+      "price": 0.067,
+      "prev_close": 0.059,
+      "volume": 58220000.0,
+      "avg_vol_4d": 527538.75,
+      "vol_ratio": 110.362,
+      "industry": "",
+      "board": "港股"
+    },
+    {
       "code": "600725",
       "symbol": "sh600725",
       "name": "云维股份",
@@ -4013,6 +4078,32 @@
       "board": "主板"
     },
     {
+      "code": "00532",
+      "symbol": "hk00532",
+      "name": "WKK INTL (HOLD)",
+      "pct": 15.62,
+      "price": 0.37,
+      "prev_close": 0.32,
+      "volume": 2990000.0,
+      "avg_vol_4d": 49741.25,
+      "vol_ratio": 60.111,
+      "industry": "",
+      "board": "港股"
+    },
+    {
+      "code": "00829",
+      "symbol": "hk00829",
+      "name": "神冠控股",
+      "pct": 15.71,
+      "price": 0.221,
+      "prev_close": 0.191,
+      "volume": 10690000.0,
+      "avg_vol_4d": 184979.25,
+      "vol_ratio": 57.79,
+      "industry": "",
+      "board": "港股"
+    },
+    {
       "code": "000576",
       "symbol": "sz000576",
       "name": "甘化科工",
@@ -4024,6 +4115,19 @@
       "vol_ratio": 65.589,
       "industry": "计算机、通信和其他电子设备制造业",
       "board": "主板"
+    },
+    {
+      "code": "00960",
+      "symbol": "hk00960",
+      "name": "龙湖集团",
+      "pct": 3.49,
+      "price": 6.225,
+      "prev_close": 6.015,
+      "volume": 19963214.0,
+      "avg_vol_4d": 305060.75,
+      "vol_ratio": 65.44,
+      "industry": "",
+      "board": "港股"
     },
     {
       "code": "603839",
@@ -4078,19 +4182,6 @@
       "board": "主板"
     },
     {
-      "code": "00532",
-      "symbol": "hk00532",
-      "name": "WKK INTL (HOLD)",
-      "pct": 15.62,
-      "price": 0.37,
-      "prev_close": 0.32,
-      "volume": 2990000.0,
-      "avg_vol_4d": 57362.5,
-      "vol_ratio": 52.125,
-      "industry": "",
-      "board": "港股"
-    },
-    {
       "code": "00400",
       "symbol": "hk00400",
       "name": "硬蛋创新",
@@ -4098,21 +4189,60 @@
       "price": 4.825,
       "prev_close": 4.585,
       "volume": 7641000.0,
-      "avg_vol_4d": 130068.25,
-      "vol_ratio": 58.746,
+      "avg_vol_4d": 149626.75,
+      "vol_ratio": 51.067,
       "industry": "",
       "board": "港股"
     },
     {
-      "code": "00829",
-      "symbol": "hk00829",
-      "name": "神冠控股",
-      "pct": 15.71,
-      "price": 0.221,
-      "prev_close": 0.191,
-      "volume": 10690000.0,
-      "avg_vol_4d": 227800.75,
-      "vol_ratio": 46.927,
+      "code": "00821",
+      "symbol": "hk00821",
+      "name": "汇盈控股",
+      "pct": 6.9,
+      "price": 0.465,
+      "prev_close": 0.435,
+      "volume": 3320000.0,
+      "avg_vol_4d": 67268.0,
+      "vol_ratio": 49.355,
+      "industry": "",
+      "board": "港股"
+    },
+    {
+      "code": "00159",
+      "symbol": "hk00159",
+      "name": "布莱克万矿业",
+      "pct": 23.91,
+      "price": 0.057,
+      "prev_close": 0.046,
+      "volume": 2756000.0,
+      "avg_vol_4d": 87830.25,
+      "vol_ratio": 31.379,
+      "industry": "",
+      "board": "港股"
+    },
+    {
+      "code": "00875",
+      "symbol": "hk00875",
+      "name": "从玉智农",
+      "pct": 19.3,
+      "price": 0.34,
+      "prev_close": 0.285,
+      "volume": 6387500.0,
+      "avg_vol_4d": 279798.75,
+      "vol_ratio": 22.829,
+      "industry": "",
+      "board": "港股"
+    },
+    {
+      "code": "00999",
+      "symbol": "hk00999",
+      "name": "小菜园",
+      "pct": 9.94,
+      "price": 8.13,
+      "prev_close": 7.395,
+      "volume": 2669600.0,
+      "avg_vol_4d": 92074.5,
+      "vol_ratio": 28.994,
       "industry": "",
       "board": "港股"
     },
@@ -4124,8 +4254,8 @@
       "price": 5.67,
       "prev_close": 5.45,
       "volume": 1571000.0,
-      "avg_vol_4d": 58872.0,
-      "vol_ratio": 26.685,
+      "avg_vol_4d": 59182.25,
+      "vol_ratio": 26.545,
       "industry": "",
       "board": "港股"
     },
@@ -4167,6 +4297,19 @@
       "vol_ratio": 2.153,
       "industry": "研究和试验发展",
       "board": "科创板"
+    },
+    {
+      "code": "00338",
+      "symbol": "hk00338",
+      "name": "上海石油化工股份",
+      "pct": 3.02,
+      "price": 1.195,
+      "prev_close": 1.16,
+      "volume": 10477000.0,
+      "avg_vol_4d": 925954.75,
+      "vol_ratio": 11.315,
+      "industry": "",
+      "board": "港股"
     },
     {
       "code": "688660",
@@ -4221,6 +4364,19 @@
       "board": "科创板"
     },
     {
+      "code": "00756",
+      "symbol": "hk00756",
+      "name": "森美控股",
+      "pct": 15.18,
+      "price": 1.1,
+      "prev_close": 0.955,
+      "volume": 81600.0,
+      "avg_vol_4d": 48973.25,
+      "vol_ratio": 1.666,
+      "industry": "",
+      "board": "港股"
+    },
+    {
       "code": "600770",
       "symbol": "sh600770",
       "name": "综艺股份",
@@ -4273,17 +4429,17 @@
       "board": "创业板"
     },
     {
-      "code": "159199",
-      "symbol": "sz159199",
-      "name": "石油ETF平安",
-      "pct": 3.13,
-      "price": 0.923,
-      "prev_close": 0.895,
-      "volume": 40951.0,
-      "avg_vol_4d": 5076.5,
-      "vol_ratio": 8.067,
+      "code": "00042",
+      "symbol": "hk00042",
+      "name": "东北电气",
+      "pct": 4.11,
+      "price": 0.228,
+      "prev_close": 0.219,
+      "volume": 428000.0,
+      "avg_vol_4d": 57886.5,
+      "vol_ratio": 7.394,
       "industry": "",
-      "board": "ETF"
+      "board": "港股"
     },
     {
       "code": "920786",
@@ -4310,6 +4466,19 @@
       "vol_ratio": 1.535,
       "industry": "仪器仪表制造业",
       "board": "创业板"
+    },
+    {
+      "code": "00698",
+      "symbol": "hk00698",
+      "name": "通达集团",
+      "pct": 5.15,
+      "price": 2.45,
+      "prev_close": 2.33,
+      "volume": 212200.0,
+      "avg_vol_4d": 32085.5,
+      "vol_ratio": 6.614,
+      "industry": "",
+      "board": "港股"
     },
     {
       "code": "688690",
@@ -4442,6 +4611,19 @@
       "board": "主板"
     },
     {
+      "code": "159199",
+      "symbol": "sz159199",
+      "name": "石油ETF平安",
+      "pct": 3.13,
+      "price": 0.923,
+      "prev_close": 0.895,
+      "volume": 40951.0,
+      "avg_vol_4d": 6067.75,
+      "vol_ratio": 6.749,
+      "industry": "",
+      "board": "ETF"
+    },
+    {
       "code": "002264",
       "symbol": "sz002264",
       "name": "新 华 都",
@@ -4505,6 +4687,19 @@
       "vol_ratio": 2.974,
       "industry": "专用设备制造业",
       "board": "创业板"
+    },
+    {
+      "code": "00860",
+      "symbol": "hk00860",
+      "name": "ＡＰＯＬＬＯ出行",
+      "pct": 10.0,
+      "price": 0.55,
+      "prev_close": 0.5,
+      "volume": 276400.0,
+      "avg_vol_4d": 150314.0,
+      "vol_ratio": 1.839,
+      "industry": "",
+      "board": "港股"
     },
     {
       "code": "000833",
@@ -4819,6 +5014,19 @@
       "board": ""
     },
     {
+      "code": "00513",
+      "symbol": "hk00513",
+      "name": "恒和集团",
+      "pct": 7.69,
+      "price": 0.14,
+      "prev_close": 0.13,
+      "volume": 100000.0,
+      "avg_vol_4d": 42164.0,
+      "vol_ratio": 2.372,
+      "industry": "",
+      "board": "港股"
+    },
+    {
       "code": "600127",
       "symbol": "sh600127",
       "name": "金健米业",
@@ -4908,6 +5116,19 @@
       "vol_ratio": 2.668,
       "industry": "研究和试验发展",
       "board": "创业板"
+    },
+    {
+      "code": "00915",
+      "symbol": "hk00915",
+      "name": "道和环球",
+      "pct": 4.44,
+      "price": 0.047,
+      "prev_close": 0.045,
+      "volume": 107000.0,
+      "avg_vol_4d": 25805.75,
+      "vol_ratio": 4.146,
+      "industry": "",
+      "board": "港股"
     },
     {
       "code": "002881",
@@ -5079,6 +5300,19 @@
       "board": "主板"
     },
     {
+      "code": "159587",
+      "symbol": "sz159587",
+      "name": "粮食ETF广发",
+      "pct": 4.29,
+      "price": 1.36,
+      "prev_close": 1.304,
+      "volume": 2704937.0,
+      "avg_vol_4d": 816410.5,
+      "vol_ratio": 3.313,
+      "industry": "",
+      "board": "ETF"
+    },
+    {
       "code": "688131",
       "symbol": "sh688131",
       "name": "皓元医药",
@@ -5209,6 +5443,19 @@
       "board": "主板"
     },
     {
+      "code": "00488",
+      "symbol": "hk00488",
+      "name": "丽新发展",
+      "pct": 6.43,
+      "price": 0.745,
+      "prev_close": 0.7,
+      "volume": 109500.0,
+      "avg_vol_4d": 70574.75,
+      "vol_ratio": 1.552,
+      "industry": "",
+      "board": "港股"
+    },
+    {
       "code": "301230",
       "symbol": "sz301230",
       "name": "泓博医药",
@@ -5300,6 +5547,19 @@
       "board": ""
     },
     {
+      "code": "00905",
+      "symbol": "hk00905",
+      "name": "胡桃资本",
+      "pct": 5.14,
+      "price": 0.184,
+      "prev_close": 0.175,
+      "volume": 402000.0,
+      "avg_vol_4d": 183284.25,
+      "vol_ratio": 2.193,
+      "industry": "",
+      "board": "港股"
+    },
+    {
       "code": "301339",
       "symbol": "sz301339",
       "name": "通行宝",
@@ -5311,19 +5571,6 @@
       "vol_ratio": 2.406,
       "industry": "软件和信息技术服务业",
       "board": "创业板"
-    },
-    {
-      "code": "159587",
-      "symbol": "sz159587",
-      "name": "粮食ETF广发",
-      "pct": 4.29,
-      "price": 1.36,
-      "prev_close": 1.304,
-      "volume": 2704937.0,
-      "avg_vol_4d": 989343.75,
-      "vol_ratio": 2.734,
-      "industry": "",
-      "board": "ETF"
     },
     {
       "code": "002221",
@@ -5690,6 +5937,19 @@
       "board": "主板"
     },
     {
+      "code": "00403",
+      "symbol": "hk00403",
+      "name": "星光集团",
+      "pct": 3.83,
+      "price": 0.19,
+      "prev_close": 0.183,
+      "volume": 140000.0,
+      "avg_vol_4d": 56440.75,
+      "vol_ratio": 2.48,
+      "industry": "",
+      "board": "港股"
+    },
+    {
       "code": "301016",
       "symbol": "sz301016",
       "name": "雷尔伟",
@@ -5740,6 +6000,19 @@
       "vol_ratio": 1.603,
       "industry": "商务服务业",
       "board": "主板"
+    },
+    {
+      "code": "00828",
+      "symbol": "hk00828",
+      "name": "王朝酒业",
+      "pct": 3.75,
+      "price": 0.166,
+      "prev_close": 0.16,
+      "volume": 148000.0,
+      "avg_vol_4d": 59955.5,
+      "vol_ratio": 2.468,
+      "industry": "",
+      "board": "港股"
     },
     {
       "code": "688400",
@@ -5976,6 +6249,19 @@
       "board": "主板"
     },
     {
+      "code": "159031",
+      "symbol": "sz159031",
+      "name": "粮食ETF博时",
+      "pct": 4.58,
+      "price": 1.097,
+      "prev_close": 1.049,
+      "volume": 266880.0,
+      "avg_vol_4d": 156610.5,
+      "vol_ratio": 1.704,
+      "industry": "",
+      "board": "ETF"
+    },
+    {
       "code": "603917",
       "symbol": "sh603917",
       "name": "合力科技",
@@ -6171,19 +6457,6 @@
       "board": "主板"
     },
     {
-      "code": "159030",
-      "symbol": "sz159030",
-      "name": "粮食ETF华夏",
-      "pct": 4.32,
-      "price": 0.99,
-      "prev_close": 0.949,
-      "volume": 1554784.0,
-      "avg_vol_4d": 928231.25,
-      "vol_ratio": 1.675,
-      "industry": "",
-      "board": "ETF"
-    },
-    {
       "code": "000564",
       "symbol": "sz000564",
       "name": "供销大集",
@@ -6197,6 +6470,32 @@
       "board": "主板"
     },
     {
+      "code": "159033",
+      "symbol": "sz159033",
+      "name": "粮食ETF国泰",
+      "pct": 4.47,
+      "price": 1.122,
+      "prev_close": 1.074,
+      "volume": 541929.0,
+      "avg_vol_4d": 346848.75,
+      "vol_ratio": 1.562,
+      "industry": "",
+      "board": "ETF"
+    },
+    {
+      "code": "159038",
+      "symbol": "sz159038",
+      "name": "粮食ETF易方达",
+      "pct": 4.33,
+      "price": 1.06,
+      "prev_close": 1.016,
+      "volume": 640565.0,
+      "avg_vol_4d": 389697.75,
+      "vol_ratio": 1.644,
+      "industry": "",
+      "board": "ETF"
+    },
+    {
       "code": "301336",
       "symbol": "sz301336",
       "name": "趣睡科技",
@@ -6208,6 +6507,32 @@
       "vol_ratio": 1.712,
       "industry": "家具制造业",
       "board": "创业板"
+    },
+    {
+      "code": "159063",
+      "symbol": "sz159063",
+      "name": "粮食ETF南方",
+      "pct": 4.49,
+      "price": 1.186,
+      "prev_close": 1.135,
+      "volume": 281597.0,
+      "avg_vol_4d": 185106.75,
+      "vol_ratio": 1.521,
+      "industry": "",
+      "board": "ETF"
+    },
+    {
+      "code": "159030",
+      "symbol": "sz159030",
+      "name": "粮食ETF华夏",
+      "pct": 4.32,
+      "price": 0.99,
+      "prev_close": 0.949,
+      "volume": 1554784.0,
+      "avg_vol_4d": 952778.5,
+      "vol_ratio": 1.632,
+      "industry": "",
+      "board": "ETF"
     },
     {
       "code": "001229",
@@ -6288,32 +6613,6 @@
       "board": "主板"
     },
     {
-      "code": "159063",
-      "symbol": "sz159063",
-      "name": "粮食ETF南方",
-      "pct": 4.49,
-      "price": 1.186,
-      "prev_close": 1.135,
-      "volume": 281597.0,
-      "avg_vol_4d": 199004.75,
-      "vol_ratio": 1.415,
-      "industry": "",
-      "board": "ETF"
-    },
-    {
-      "code": "159033",
-      "symbol": "sz159033",
-      "name": "粮食ETF国泰",
-      "pct": 4.47,
-      "price": 1.122,
-      "prev_close": 1.074,
-      "volume": 541929.0,
-      "avg_vol_4d": 381009.5,
-      "vol_ratio": 1.422,
-      "industry": "",
-      "board": "ETF"
-    },
-    {
       "code": "600815",
       "symbol": "sh600815",
       "name": "厦工股份",
@@ -6366,19 +6665,6 @@
       "board": ""
     },
     {
-      "code": "159031",
-      "symbol": "sz159031",
-      "name": "粮食ETF博时",
-      "pct": 4.58,
-      "price": 1.097,
-      "prev_close": 1.049,
-      "volume": 266880.0,
-      "avg_vol_4d": 213286.25,
-      "vol_ratio": 1.251,
-      "industry": "",
-      "board": "ETF"
-    },
-    {
       "code": "603989",
       "symbol": "sh603989",
       "name": "艾华集团",
@@ -6405,6 +6691,19 @@
       "board": "主板"
     },
     {
+      "code": "159981",
+      "symbol": "sz159981",
+      "name": "能源化工ETF建信",
+      "pct": 4.11,
+      "price": 1.748,
+      "prev_close": 1.679,
+      "volume": 7286118.0,
+      "avg_vol_4d": 4755527.75,
+      "vol_ratio": 1.532,
+      "industry": "",
+      "board": "ETF"
+    },
+    {
       "code": "002788",
       "symbol": "sz002788",
       "name": "鹭燕医药",
@@ -6416,6 +6715,19 @@
       "vol_ratio": 2.176,
       "industry": "批发业",
       "board": "主板"
+    },
+    {
+      "code": "00901",
+      "symbol": "hk00901",
+      "name": "华曦达",
+      "pct": 3.28,
+      "price": 70.75,
+      "prev_close": 68.5,
+      "volume": 268900.0,
+      "avg_vol_4d": 130000.5,
+      "vol_ratio": 2.068,
+      "industry": "",
+      "board": "港股"
     },
     {
       "code": "002146",
@@ -6483,19 +6795,6 @@
       "board": "主板"
     },
     {
-      "code": "159038",
-      "symbol": "sz159038",
-      "name": "粮食ETF易方达",
-      "pct": 4.33,
-      "price": 1.06,
-      "prev_close": 1.016,
-      "volume": 640565.0,
-      "avg_vol_4d": 480038.5,
-      "vol_ratio": 1.334,
-      "industry": "",
-      "board": "ETF"
-    },
-    {
       "code": "920422",
       "symbol": "bj920422",
       "name": "润普食品",
@@ -6509,19 +6808,6 @@
       "board": ""
     },
     {
-      "code": "159588",
-      "symbol": "sz159588",
-      "name": "石油ETF景顺",
-      "pct": 3.35,
-      "price": 1.295,
-      "prev_close": 1.253,
-      "volume": 191080.0,
-      "avg_vol_4d": 96554.0,
-      "vol_ratio": 1.979,
-      "industry": "",
-      "board": "ETF"
-    },
-    {
       "code": "603230",
       "symbol": "sh603230",
       "name": "内蒙新华",
@@ -6533,6 +6819,19 @@
       "vol_ratio": 1.732,
       "industry": "新闻和出版业",
       "board": "主板"
+    },
+    {
+      "code": "159588",
+      "symbol": "sz159588",
+      "name": "石油ETF景顺",
+      "pct": 3.35,
+      "price": 1.295,
+      "prev_close": 1.253,
+      "volume": 191080.0,
+      "avg_vol_4d": 96617.25,
+      "vol_ratio": 1.978,
+      "industry": "",
+      "board": "ETF"
     },
     {
       "code": "600727",
@@ -6704,6 +7003,19 @@
       "board": "主板"
     },
     {
+      "code": "159309",
+      "symbol": "sz159309",
+      "name": "油气ETF汇添富",
+      "pct": 3.09,
+      "price": 1.466,
+      "prev_close": 1.422,
+      "volume": 583492.0,
+      "avg_vol_4d": 294454.75,
+      "vol_ratio": 1.982,
+      "industry": "",
+      "board": "ETF"
+    },
+    {
       "code": "002772",
       "symbol": "sz002772",
       "name": "众兴菌业",
@@ -6741,19 +7053,6 @@
       "vol_ratio": 1.585,
       "industry": "通用设备制造业",
       "board": "创业板"
-    },
-    {
-      "code": "159981",
-      "symbol": "sz159981",
-      "name": "能源化工ETF建信",
-      "pct": 4.11,
-      "price": 1.748,
-      "prev_close": 1.679,
-      "volume": 7286118.0,
-      "avg_vol_4d": 5781479.5,
-      "vol_ratio": 1.26,
-      "industry": "",
-      "board": "ETF"
     },
     {
       "code": "000010",
@@ -6832,6 +7131,19 @@
       "vol_ratio": 1.282,
       "industry": "农业",
       "board": "创业板"
+    },
+    {
+      "code": "159698",
+      "symbol": "sz159698",
+      "name": "粮食ETF鹏华",
+      "pct": 4.06,
+      "price": 1.051,
+      "prev_close": 1.01,
+      "volume": 2861960.0,
+      "avg_vol_4d": 2346975.25,
+      "vol_ratio": 1.219,
+      "industry": "",
+      "board": "ETF"
     },
     {
       "code": "002059",
@@ -6936,19 +7248,6 @@
       "vol_ratio": 1.275,
       "industry": "批发业",
       "board": "主板"
-    },
-    {
-      "code": "159309",
-      "symbol": "sz159309",
-      "name": "油气ETF汇添富",
-      "pct": 3.09,
-      "price": 1.466,
-      "prev_close": 1.422,
-      "volume": 583492.0,
-      "avg_vol_4d": 322754.0,
-      "vol_ratio": 1.808,
-      "industry": "",
-      "board": "ETF"
     },
     {
       "code": "300759",
@@ -7380,6 +7679,19 @@
       "board": "主板"
     },
     {
+      "code": "159197",
+      "symbol": "sz159197",
+      "name": "石油ETF招商",
+      "pct": 3.1,
+      "price": 0.93,
+      "prev_close": 0.902,
+      "volume": 130350.0,
+      "avg_vol_4d": 97076.25,
+      "vol_ratio": 1.343,
+      "industry": "",
+      "board": "ETF"
+    },
+    {
       "code": "688667",
       "symbol": "sh688667",
       "name": "菱电电控",
@@ -7432,17 +7744,17 @@
       "board": "ETF"
     },
     {
-      "code": "159018",
-      "symbol": "sz159018",
-      "name": "石油ETF广发",
-      "pct": 3.09,
-      "price": 0.933,
-      "prev_close": 0.905,
-      "volume": 76731.0,
-      "avg_vol_4d": 61289.5,
-      "vol_ratio": 1.252,
+      "code": "00035",
+      "symbol": "hk00035",
+      "name": "远东发展",
+      "pct": 3.05,
+      "price": 0.675,
+      "prev_close": 0.655,
+      "volume": 465000.0,
+      "avg_vol_4d": 352583.25,
+      "vol_ratio": 1.319,
       "industry": "",
-      "board": "ETF"
+      "board": "港股"
     },
     {
       "code": "301156",
@@ -7456,19 +7768,6 @@
       "vol_ratio": 1.297,
       "industry": "食品制造业",
       "board": "创业板"
-    },
-    {
-      "code": "159197",
-      "symbol": "sz159197",
-      "name": "石油ETF招商",
-      "pct": 3.1,
-      "price": 0.93,
-      "prev_close": 0.902,
-      "volume": 130350.0,
-      "avg_vol_4d": 105652.75,
-      "vol_ratio": 1.234,
-      "industry": "",
-      "board": "ETF"
     },
     {
       "code": "002868",
@@ -7813,14 +8112,14 @@
       "board": "主板"
     }
   ],
-  "generated_at": "2026-09-08 19:37:36",
-  "update_time": "2026-09-08 19:37:36",
+  "generated_at": "2026-09-08 20:34:43",
+  "update_time": "2026-09-08 20:34:43",
   "source": "raw_data/h_auto_buy 反推算法，无 PDF OCR 依赖",
   "kline_stat": {
-    "cache_fresh": 336,
-    "cache_stale": 54,
-    "net": 304,
-    "fail": 294
+    "cache_fresh": 640,
+    "cache_stale": 36,
+    "net": 53,
+    "fail": 259
   },
   "degraded": false,
   "degraded_reason": "",

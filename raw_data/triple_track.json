@@ -1,113 +1,40 @@
 {
-  "update_time": "2026-09-08 19:08:18",
+  "update_time": "2026-09-08 20:14:20",
   "data_date": "2026-09-08",
   "track_start": "2026-09-08",
   "history_days": 15,
   "strict_count": 0,
-  "near_count": 3,
+  "near_count": 1,
   "tracked": [
     {
-      "code": "301526",
-      "name": "国际复材",
+      "code": "300759",
+      "name": "康龙化成",
       "market": "sz",
       "board": "创业板",
       "status": "near",
-      "total_score": 32.9,
-      "quality_grade": "C",
-      "industry": "非金属矿物制品业",
-      "sectors": [
-        "深股通",
-        "5G概念",
-        "PCB",
-        "深成500",
-        "2026中报预增",
-        "机构重仓",
-        "PEEK材料概念",
-        "非金属矿物制品业"
-      ],
-      "signal_count": null,
-      "enter_date": "2026-09-08",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 27.45,
-      "current_close": 27.45,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "688802",
-      "name": "沐曦股份",
-      "market": "sh",
-      "board": "科创板",
-      "status": "near",
-      "total_score": 28.6,
+      "total_score": 28.0,
       "quality_grade": "D",
-      "industry": "计算机、通信和其他电子设备制造业",
+      "industry": "研究和试验发展",
       "sectors": [
-        "算力概念",
-        "次新股",
-        "QFII重仓",
-        "半导体概念",
-        "大盘成长",
-        "科技风格",
-        "权重股",
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": null,
-      "enter_date": "2026-09-08",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 570.08,
-      "current_close": 570.08,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "一季报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "600584",
-      "name": "长电科技",
-      "market": "sh",
-      "board": "主板",
-      "status": "near",
-      "total_score": 26.7,
-      "quality_grade": "C",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "毫米波概念",
-        "物联网",
-        "2026中报预增",
-        "生物识别",
-        "计算机、通信和其他电子设备制造业",
-        "新材料",
         "MSCI中国",
-        "HS300"
+        "研究和试验发展",
+        "AH股",
+        "AI制药（医疗）",
+        "深股通",
+        "中证500",
+        "创业成份",
+        "CRO"
       ],
-      "signal_count": null,
+      "signal_count": 2,
       "enter_date": "2026-09-08",
       "hold_days": 1,
       "consecutive_days": 1,
-      "first_close": 69.0,
-      "current_close": 69.0,
+      "first_close": 42.76,
+      "current_close": 42.76,
       "pnl_pct": 0.0,
       "catalysts": [
         {
-          "tag": "中报预增",
-          "score": 5,
-          "reaction": "观察中"
-        },
-        {
-          "tag": "处罚",
+          "tag": "中报略增",
           "score": 5,
           "reaction": "观察中"
         }
@@ -323,115 +250,51 @@
   "sector_cluster": {
     "by_industry": [
       {
-        "industry": "计算机、通信和其他电子设备制造业",
-        "count": 2,
-        "names": [
-          "沐曦股份",
-          "长电科技"
-        ]
-      },
-      {
-        "industry": "非金属矿物制品业",
+        "industry": "研究和试验发展",
         "count": 1,
         "names": [
-          "国际复材"
+          "康龙化成"
         ]
       }
     ],
     "by_sector": [
       {
-        "sector": "2026中报预增",
-        "count": 2
+        "sector": "MSCI中国",
+        "count": 1
       },
       {
-        "sector": "计算机、通信和其他电子设备制造业",
-        "count": 2
+        "sector": "研究和试验发展",
+        "count": 1
+      },
+      {
+        "sector": "AH股",
+        "count": 1
+      },
+      {
+        "sector": "AI制药（医疗）",
+        "count": 1
       },
       {
         "sector": "深股通",
         "count": 1
       },
       {
-        "sector": "5G概念",
+        "sector": "中证500",
         "count": 1
       },
       {
-        "sector": "PCB",
+        "sector": "创业成份",
         "count": 1
       },
       {
-        "sector": "深成500",
-        "count": 1
-      },
-      {
-        "sector": "机构重仓",
-        "count": 1
-      },
-      {
-        "sector": "PEEK材料概念",
-        "count": 1
-      },
-      {
-        "sector": "非金属矿物制品业",
-        "count": 1
-      },
-      {
-        "sector": "算力概念",
-        "count": 1
-      },
-      {
-        "sector": "次新股",
-        "count": 1
-      },
-      {
-        "sector": "QFII重仓",
-        "count": 1
-      },
-      {
-        "sector": "半导体概念",
-        "count": 1
-      },
-      {
-        "sector": "大盘成长",
-        "count": 1
-      },
-      {
-        "sector": "科技风格",
-        "count": 1
-      },
-      {
-        "sector": "权重股",
-        "count": 1
-      },
-      {
-        "sector": "毫米波概念",
-        "count": 1
-      },
-      {
-        "sector": "物联网",
-        "count": 1
-      },
-      {
-        "sector": "生物识别",
-        "count": 1
-      },
-      {
-        "sector": "新材料",
-        "count": 1
-      },
-      {
-        "sector": "MSCI中国",
-        "count": 1
-      },
-      {
-        "sector": "HS300",
+        "sector": "CRO",
         "count": 1
       }
     ],
-    "concentration": 66.67
+    "concentration": 100.0
   },
   "overlap": {
-    "total_tracked": 3,
+    "total_tracked": 1,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,

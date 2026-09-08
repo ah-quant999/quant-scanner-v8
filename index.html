@@ -537,11 +537,11 @@ window.__domReadyFns=[];
     <script src="data/CRISIS_DATA.js?v=36ec8adccd" defer></script>
     <script src="data/JUDGMENT_DATA.js?v=6a68ca293b" defer></script>
     <script src="data/OVERSEAS_MARKETS.js?v=2dfabf2db4" defer></script>
-    <script src="data/STOCK_RPS.js?v=3ed2971847" defer></script>
+    <script src="data/STOCK_RPS.js?v=3a4ecc6d71" defer></script>
     <!-- 🛡 2026-08-19：H 反推短线买点（data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js）反推代码 + 跟踪回测，独立于 PDF OCR
          v= 占位由 api_push_raw._stamp_index_v 在每日推送后自动重写为新 sha，确保 CDN 不缓存旧版 -->
-    <script src="data/H_AUTO_BUY.js?v=a6c267c830" defer></script>
-    <script src="data/H_AUTO_BUY_TRACK.js?v=398220eb33" defer></script>
+    <script src="data/H_AUTO_BUY.js?v=bb6900f89e" defer></script>
+    <script src="data/H_AUTO_BUY_TRACK.js?v=f0b0104e4d" defer></script>
     <script src="data/UNLISTED_PANEL.js?v=e4a2df05e9" defer></script>
     <!-- 2026-09-07 主人令：机构研究·maharo 聚合卡（本机 cookie 拉取，云端无权限；数据由 .workbuddy/maharo_daily_pull.py 每日生成 data/maharo_macro.js） -->
     <script src="data/maharo_macro.js?v=20260907b" defer></script>
@@ -1533,9 +1533,9 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/CAPITAL_FLOW_DATA.js?v=393c3ab99d" defer></script>
 <script src="data/SH_SZ_HISTORY.js?v=0dfe49d396" defer></script>
 <script src="data/CANDIDATE.js?v=17ef564cf3" defer></script>
-    <script src="data/FOUR_VOLUME.js?v=29fe55da5b" defer></script>
-    <script src="data/FOUR_VOLUME_60M.js?v=acf459e437" defer></script>
-    <script src="data/STOCK_STOP_DATA.js?v=1cf3dc30f2" defer></script>
+    <script src="data/FOUR_VOLUME.js?v=a2c1cce05f" defer></script>
+    <script src="data/FOUR_VOLUME_60M.js?v=cb80a744f3" defer></script>
+    <script src="data/STOCK_STOP_DATA.js?v=a68a62efe3" defer></script>
     <!-- 2026-08-31 一劳永逸：window.STOCK_RPS_DATA 已由 line 492 data/STOCK_RPS.js 注入（最新 19:16 版本），
          此处再引入 data/STOCK_RPS_DATA.js（旧 01:56 版本）会覆盖最新数据 → 相对强度子页/状态胶囊均读到陈旧值。
          删除重复注入，确保全局只保留一份最新 RPS 数据。 -->

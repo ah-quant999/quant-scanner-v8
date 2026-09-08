@@ -353,6 +353,9 @@
     },
     "688802": {
       "2026-09-08": 570.08
+    },
+    "300759": {
+      "2026-09-08": 42.76
     }
   },
   "_tracking_latest": {
@@ -731,12 +734,20 @@
       "last_close": 68.45,
       "status": "near",
       "streak": 1
+    },
+    "300759": {
+      "enter_date": "2026-09-08",
+      "enter_close": 42.76,
+      "last_date": "2026-09-08",
+      "last_close": 42.76,
+      "status": "near",
+      "streak": 1
     }
   },
   "_meta": {
     "track_start": "2026-08-17",
     "created": "2026-08-17 00:19:06",
-    "last_update": "2026-09-08 19:08:08"
+    "last_update": "2026-09-08 20:14:10"
   },
   "2026-08-18": [
     {
@@ -1331,7 +1342,7 @@
       "status": "near"
     }
   ],
-  "update_time": "2026-09-08 19:08:08",
+  "update_time": "2026-09-08 20:14:10",
   "2026-08-30": [
     {
       "code": "300475",
@@ -1820,72 +1831,26 @@
   ],
   "2026-09-08": [
     {
-      "code": "301526",
-      "name": "国际复材",
+      "code": "300759",
+      "name": "康龙化成",
       "market": "sz",
       "board": "创业板",
-      "close": 27.45,
-      "pct_chg": 4.06,
-      "total_score": 32.9,
-      "quality_grade": "C",
-      "industry": "非金属矿物制品业",
-      "sectors": [
-        "深股通",
-        "5G概念",
-        "PCB",
-        "深成500",
-        "2026中报预增",
-        "机构重仓",
-        "PEEK材料概念",
-        "非金属矿物制品业"
-      ],
-      "signal_count": null,
-      "status": "near"
-    },
-    {
-      "code": "688802",
-      "name": "沐曦股份",
-      "market": "sh",
-      "board": "科创板",
-      "close": 570.08,
-      "pct_chg": -9.67,
-      "total_score": 28.6,
+      "close": 42.76,
+      "pct_chg": 3.64,
+      "total_score": 28.0,
       "quality_grade": "D",
-      "industry": "计算机、通信和其他电子设备制造业",
+      "industry": "研究和试验发展",
       "sectors": [
-        "算力概念",
-        "次新股",
-        "QFII重仓",
-        "半导体概念",
-        "大盘成长",
-        "科技风格",
-        "权重股",
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": null,
-      "status": "near"
-    },
-    {
-      "code": "600584",
-      "name": "长电科技",
-      "market": "sh",
-      "board": "主板",
-      "close": 69.0,
-      "pct_chg": 2.43,
-      "total_score": 26.7,
-      "quality_grade": "C",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "毫米波概念",
-        "物联网",
-        "2026中报预增",
-        "生物识别",
-        "计算机、通信和其他电子设备制造业",
-        "新材料",
         "MSCI中国",
-        "HS300"
+        "研究和试验发展",
+        "AH股",
+        "AI制药（医疗）",
+        "深股通",
+        "中证500",
+        "创业成份",
+        "CRO"
       ],
-      "signal_count": null,
+      "signal_count": 2,
       "status": "near"
     }
   ]

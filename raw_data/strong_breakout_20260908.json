@@ -1,10 +1,10 @@
 {
-  "update_time": "2026-09-08 19:38:36",
+  "update_time": "2026-09-08 20:35:51",
   "date": "2026-09-08",
   "method": "强势突破(高手反推v1): 涨幅≥5.0% + 量比≥1.35(5日均量) + 收位≥0.55 + 5日累计∈[0.5,15.0]%",
   "version": "v1 (2026-09-03 样本 31/31 全召回)",
-  "pool_count": 576,
-  "kline_fail": 4,
+  "pool_count": 599,
+  "kline_fail": 27,
   "picked_count": 123,
   "core_top_n": 30,
   "stocks": [

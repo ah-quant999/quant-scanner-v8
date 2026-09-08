@@ -1,6 +1,6 @@
 {
-  "update_time": "2026-09-08 19:08:13",
-  "data_time": "2026-09-08 18:50:16",
+  "update_time": "2026-09-08 20:14:15",
+  "data_time": "2026-09-08 19:57:34",
   "count": 0,
   "near_miss_count": 1,
   "criteria": "主站TOP10精选（rank≤10 & score≥max(max_score×0.5,25)） · 基本面A档",
@@ -12,7 +12,7 @@
       "name": "康龙化成",
       "market": "sz",
       "board": "创业板",
-      "total_score": 28.0,
+      "total_score": 26.7,
       "top10_rank": 1,
       "a_score": 0,
       "quality_grade": "D",
@@ -23,7 +23,7 @@
       "miss_steps": 1,
       "close": 42.76,
       "pct_chg": 3.64,
-      "pct_chg_20d": 5.780780780780787,
+      "pct_chg_20d": -10.149191006513984,
       "signals": {
         "chan": true,
         "jinzuan": true,
@@ -32,14 +32,14 @@
         "form_A": false
       },
       "sectors": [
-        "MSCI中国",
-        "研究和试验发展",
-        "AH股",
-        "AI制药（医疗）",
-        "深股通",
         "中证500",
+        "MSCI中国",
+        "AH股",
+        "研究和试验发展",
         "创业成份",
-        "CRO"
+        "AI制药（医疗）",
+        "CRO",
+        "深股通"
       ],
       "enter_date": "2026-09-08",
       "industry": "研究和试验发展",
