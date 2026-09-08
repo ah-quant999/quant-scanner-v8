@@ -1326,7 +1326,9 @@ window.__judgmentCandidatesHTML = __judgmentCandidatesHTML;
    数据来源（详见逻辑详解）：JUDGMENT_DATA（每日盘前 08:25 刷新）。动态时事驱动，不写固定文字。 */
 function _buildJudgmentEnvHTML(d){
   // 🛡️ 2026-08-14 一劳永逸修复：返回空时显示"等待盘前 08:25 自动生成"占位
-  if(!d) return '<div style="color:var(--dim);padding:14px;text-align:center;line-height:1.7">'
+  // 2026-09-09 一劳永逸（同类第4处 no_data 防御，前三处：概念资金热力/行业树图/板块资金）：
+  //   JUDGMENT_DATA 被旧版盘前清空写成 no_data 空壳时，不得渲染假「观望」灯，统一走下方等待占位。
+  if(!d || d.no_data) return '<div style="color:var(--dim);padding:14px;text-align:center;line-height:1.7">'
     + '<div style="font-size:13px;color:#fbbf24;margin-bottom:4px">⏳ 等待数据生成中…</div>'
     + '<div style="font-size:11px">盘前 08:25 自动生成 · 云端抓取中或非交易日</div>'
     + '<div style="font-size:10.5px;margin-top:6px;color:var(--sub)">生成后会自动刷新，无需手动操作</div>'
@@ -1733,7 +1735,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     window.__renderJudgmentHeader = function(){
       var jd = window.JUDGMENT_DATA || {};
       var mb = window.MACRO_BRIEF || {};
-      var ts = jd.update_time || mb.update_time || '';
+      var ts = (!jd.no_data && jd.update_time) || mb.update_time || '';
       var head = document.getElementById('judgmentCardHeader');
       if(!head || typeof window.v8CardHeader !== 'function') return;
       // 🛡️ 2026-08-14 一劳永逸式修复（主人令"空的！一劳永逸式修复！"）：不传 !ts，
@@ -1776,7 +1778,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       //   现加条件：ts 有值但 head 不含「更新于」时强制重昆明，确保数据落地后膠勢出现。
       var jd2 = window.JUDGMENT_DATA || {};
       var mb2 = window.MACRO_BRIEF || {};
-      var ts2 = jd2.update_time || mb2.update_time || '';
+      var ts2 = (!jd2.no_data && jd2.update_time) || mb2.update_time || '';
       var hasCard = head && head.innerHTML && head.innerHTML.indexOf('今日判定') >= 0;
       var hasTime = head && head.innerHTML && head.innerHTML.indexOf('更新于') >= 0;
       var needRe = (!hasCard) || (ts2 && !hasTime);
@@ -1795,7 +1797,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     window.__selfHealJudgmentBody = function(){
       var _self = arguments.callee;
       var body = document.getElementById('judgmentBodyOp');
-      var jdReady = !!(window.JUDGMENT_DATA && window.JUDGMENT_DATA.update_time);
+      var jdReady = !!(window.JUDGMENT_DATA && window.JUDGMENT_DATA.update_time && !window.JUDGMENT_DATA.no_data);
       var fnReady = typeof window._buildJudgmentEnvHTML==='function' && typeof window.__renderJudgmentBody==='function';
       // 按「是否已渲染真实内容」判定，而不是匹配占位文案，避免占位文案改一次就要改一次判定
       var hasRendered = !!(body && body.innerHTML && body.innerHTML.indexOf('今日信号')>=0);
