@@ -225,7 +225,26 @@ def get_name(code):
         pass
     return ""
 
+def _start_heartbeat(sec=30):
+    """🛡 2026-09-09 一劳永逸：向 stdout 定期打心跳，防算法链监督器的「静默杀」误判。
+    背景：本脚本冷启动 50-90min，长段落（baostock 逐只查询/缓存命中批量）无任何 stdout，
+    算法链监督器 SILENCE_KILL_SEC 默认 15min 无输出即 kill → 实测 2026-09-09 00:04 被误杀，
+    产物写不出、链上计数为「失败 1」，因子实验室永远刷不出来。
+    心跳线程为 daemon，主进程结束即退出，不影响任何业务逻辑。"""
+    import threading as _th
+    import time as _t
+    def _hb():
+        n = 0
+        while True:
+            _t.sleep(sec)
+            n += sec
+            log("heartbeat 运行中 %d 分钟（防监督器静默误杀）" % (n // 60))
+    t = _th.Thread(target=_hb, daemon=True)
+    t.start()
+
+
 def main():
+    _start_heartbeat()
     lg = bs.login(); log("login", lg.error_code)
     # 🔴 2026-09-08 一劳永逸：先解析「baostock 真正已生成数据」的日期并覆盖全局 KL_END。
     #    原实现用「今天」去查，盘前/凌晨必返回 0 行 → universe 0 → 保护性中止 → FACTOR_LAB 停更
