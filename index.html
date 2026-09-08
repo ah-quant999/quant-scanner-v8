@@ -5632,7 +5632,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
       + '<b style="font-size:15px;">🌡 中信 PE 极值温度计</b>'
       + '<span style="font-size:10px;font-weight:600;color:#fbbf24;background:rgba(251,191,36,.12);padding:1px 6px;border-radius:4px;">参考级 · 自上而下择时 · 不作交易信号</span>'
-      + '<span class="fresh">' + _ev(T.update_time) + ' · 数据 ' + _ev(T.data_date) + '</span>'
+      + _uBadge('盘后', '中长线', T.update_time, '数据 ' + _ev(T.data_date))
       + '</div>'
       + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">'
       + '<div style="background:rgba(56,189,248,.06);border:1px solid rgba(56,189,248,.3);border-radius:8px;padding:10px 12px;">'
@@ -5749,7 +5749,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">'
       + '<b style="font-size:15px;">📊 中信 PE&lt;10 历史回测</b>'
       + '<span style="font-size:10px;font-weight:600;color:#60a5fa;background:rgba(96,165,250,.12);padding:1px 6px;border-radius:4px;">纯历史回测 · 不预测未来</span>'
-      + '<span class="fresh">' + _ev(B.update_time) + ' · 数据 ' + _ev(B.data_range[0]) + ' ~ ' + _ev(B.data_range[1]) + '</span>'
+      + _uBadge('盘后', '中长线', B.update_time, '数据 ' + _ev(B.data_range[0]) + ' ~ ' + _ev(B.data_range[1]))
       + '</div>'
       + '<div style="background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.25);border-radius:7px;padding:8px 10px;font-size:11.5px;line-height:1.65;color:var(--sub);margin-bottom:10px;">'
       + '<b style="color:#60a5fa;">方法：</b>' + _ev(B.method) + '<br>'
