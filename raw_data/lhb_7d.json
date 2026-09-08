@@ -1,19 +1,11 @@
 {
-  "update_time": "2026-09-08 02:59:14",
+  "update_time": "2026-09-08 19:39:33",
   "range": [
-    "2026-08-28",
-    "2026-09-07"
+    "2026-08-31",
+    "2026-09-08"
   ],
   "days_count": 7,
   "daily_summary": [
-    {
-      "date": "2026-08-28",
-      "total": 51,
-      "resonance": 1,
-      "inst_only": 0,
-      "yz_only": 7,
-      "north_present": 23
-    },
     {
       "date": "2026-08-31",
       "total": 70,
@@ -61,6 +53,14 @@
       "inst_only": 8,
       "yz_only": 8,
       "north_present": 35
+    },
+    {
+      "date": "2026-09-08",
+      "total": 55,
+      "resonance": 0,
+      "inst_only": 1,
+      "yz_only": 9,
+      "north_present": 26
     }
   ],
   "top_inst_buy": [
@@ -105,14 +105,14 @@
       "resonance_days": 1
     },
     {
-      "code": "001232",
-      "name": "嘉立创",
-      "inst_net": 25316.2,
-      "yz_net": 39927.5,
-      "north_net": 0.0,
-      "combined_net": 65243.7,
+      "code": "002916",
+      "name": "深南电路",
+      "inst_net": 24979.1,
+      "yz_net": 3344.7,
+      "north_net": 26662.5,
+      "combined_net": 28323.8,
       "days": 1,
-      "resonance_days": 1
+      "resonance_days": 0
     }
   ],
   "top_inst_sell": [
@@ -137,16 +137,6 @@
       "resonance_days": 0
     },
     {
-      "code": "600378",
-      "name": "昊华科技",
-      "inst_net": -51852.6,
-      "yz_net": 1740.6,
-      "north_net": -15680.0,
-      "combined_net": -50112.0,
-      "days": 2,
-      "resonance_days": 0
-    },
-    {
       "code": "603256",
       "name": "宏和科技",
       "inst_net": -31341.0,
@@ -157,13 +147,23 @@
       "resonance_days": 0
     },
     {
-      "code": "600354",
-      "name": "敦煌种业",
-      "inst_net": -25313.4,
-      "yz_net": 43319.4,
-      "north_net": 0.0,
-      "combined_net": 18006.0,
-      "days": 5,
+      "code": "002437",
+      "name": "誉衡药业",
+      "inst_net": -28047.9,
+      "yz_net": -4692.7,
+      "north_net": -6236.7,
+      "combined_net": -32740.6,
+      "days": 2,
+      "resonance_days": 0
+    },
+    {
+      "code": "002297",
+      "name": "博云新材",
+      "inst_net": -26818.0,
+      "yz_net": 13849.0,
+      "north_net": 26288.9,
+      "combined_net": -12969.0,
+      "days": 3,
       "resonance_days": 0
     }
   ],
@@ -221,16 +221,6 @@
   ],
   "top_yz_sell": [
     {
-      "code": "600127",
-      "name": "金健米业",
-      "inst_net": 0.0,
-      "yz_net": -38178.6,
-      "north_net": 3603.0,
-      "combined_net": -38178.6,
-      "days": 6,
-      "resonance_days": 0
-    },
-    {
       "code": "603228",
       "name": "景旺电子",
       "inst_net": 84161.8,
@@ -269,19 +259,19 @@
       "combined_net": -25303.8,
       "days": 1,
       "resonance_days": 0
+    },
+    {
+      "code": "300684",
+      "name": "中石科技",
+      "inst_net": 8849.2,
+      "yz_net": -25033.3,
+      "north_net": -3601.7,
+      "combined_net": -16184.1,
+      "days": 2,
+      "resonance_days": 0
     }
   ],
   "top_resonance": [
-    {
-      "code": "001232",
-      "name": "嘉立创",
-      "inst_net": 25316.2,
-      "yz_net": 39927.5,
-      "north_net": 0.0,
-      "combined_net": 65243.7,
-      "days": 1,
-      "resonance_days": 1
-    },
     {
       "code": "002536",
       "name": "飞龙股份",
@@ -321,6 +311,16 @@
       "combined_net": 34759.3,
       "days": 1,
       "resonance_days": 1
+    },
+    {
+      "code": "002579",
+      "name": "中京电子",
+      "inst_net": 3737.0,
+      "yz_net": 27674.2,
+      "north_net": 4013.4,
+      "combined_net": 31411.2,
+      "days": 1,
+      "resonance_days": 0
     }
   ],
   "top_north_buy": [
@@ -365,13 +365,13 @@
       "resonance_days": 0
     },
     {
-      "code": "002297",
-      "name": "博云新材",
-      "inst_net": -5656.9,
-      "yz_net": 15107.0,
-      "north_net": 33952.6,
-      "combined_net": 9450.1,
-      "days": 2,
+      "code": "002916",
+      "name": "深南电路",
+      "inst_net": 24979.1,
+      "yz_net": 3344.7,
+      "north_net": 26662.5,
+      "combined_net": 28323.8,
+      "days": 1,
       "resonance_days": 0
     }
   ],
@@ -409,11 +409,11 @@
     {
       "code": "600378",
       "name": "昊华科技",
-      "inst_net": -51852.6,
-      "yz_net": 1740.6,
-      "north_net": -15680.0,
-      "combined_net": -50112.0,
-      "days": 2,
+      "inst_net": 0.0,
+      "yz_net": -23316.0,
+      "north_net": -10512.2,
+      "combined_net": -23316.0,
+      "days": 1,
       "resonance_days": 0
     },
     {

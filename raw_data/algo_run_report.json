@@ -1,8 +1,13 @@
 {
-  "update_time": "2026-09-08 17:46:24",
-  "run_start": "2026-09-08 17:15:52",
-  "ok": 12,
-  "fail": 0,
-  "failed_scripts": [],
+  "update_time": "2026-09-08 19:39:38",
+  "run_start": "2026-09-08 18:00:17",
+  "ok": 21,
+  "fail": 1,
+  "failed_scripts": [
+    {
+      "script": "calc_crds.py",
+      "reason": "超时 >45min"
+    }
+  ],
   "skipped_by_time_gate": []
 }

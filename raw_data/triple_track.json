@@ -1,65 +1,31 @@
 {
-  "update_time": "2026-09-08 03:12:21",
+  "update_time": "2026-09-08 19:08:18",
   "data_date": "2026-09-08",
   "track_start": "2026-09-08",
   "history_days": 15,
-  "strict_count": 5,
-  "near_count": 5,
+  "strict_count": 0,
+  "near_count": 3,
   "tracked": [
-    {
-      "code": "688802",
-      "name": "沐曦股份",
-      "market": "sh",
-      "board": "科创板",
-      "status": "near",
-      "total_score": 31.1,
-      "quality_grade": "D",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "算力概念",
-        "半导体概念",
-        "次新股",
-        "权重股",
-        "QFII重仓",
-        "科技风格",
-        "大盘成长",
-        "计算机、通信和其他电子设备制造业"
-      ],
-      "signal_count": 2,
-      "enter_date": "2026-09-08",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 570.08,
-      "current_close": 570.08,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "一季报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
     {
       "code": "301526",
       "name": "国际复材",
       "market": "sz",
       "board": "创业板",
       "status": "near",
-      "total_score": 29.2,
+      "total_score": 32.9,
       "quality_grade": "C",
       "industry": "非金属矿物制品业",
       "sectors": [
-        "PEEK材料概念",
-        "深成500",
-        "PCB",
+        "深股通",
         "5G概念",
-        "机构重仓",
+        "PCB",
+        "深成500",
         "2026中报预增",
-        "非金属矿物制品业",
-        "深股通"
+        "机构重仓",
+        "PEEK材料概念",
+        "非金属矿物制品业"
       ],
-      "signal_count": 2,
+      "signal_count": null,
       "enter_date": "2026-09-08",
       "hold_days": 1,
       "consecutive_days": 1,
@@ -75,25 +41,59 @@
       ]
     },
     {
+      "code": "688802",
+      "name": "沐曦股份",
+      "market": "sh",
+      "board": "科创板",
+      "status": "near",
+      "total_score": 28.6,
+      "quality_grade": "D",
+      "industry": "计算机、通信和其他电子设备制造业",
+      "sectors": [
+        "算力概念",
+        "次新股",
+        "QFII重仓",
+        "半导体概念",
+        "大盘成长",
+        "科技风格",
+        "权重股",
+        "计算机、通信和其他电子设备制造业"
+      ],
+      "signal_count": null,
+      "enter_date": "2026-09-08",
+      "hold_days": 1,
+      "consecutive_days": 1,
+      "first_close": 570.08,
+      "current_close": 570.08,
+      "pnl_pct": 0.0,
+      "catalysts": [
+        {
+          "tag": "一季报预增",
+          "score": 15,
+          "reaction": "观察中"
+        }
+      ]
+    },
+    {
       "code": "600584",
       "name": "长电科技",
       "market": "sh",
       "board": "主板",
       "status": "near",
-      "total_score": 29.2,
+      "total_score": 26.7,
       "quality_grade": "C",
       "industry": "计算机、通信和其他电子设备制造业",
       "sectors": [
-        "生物识别",
-        "MSCI中国",
-        "新材料",
+        "毫米波概念",
         "物联网",
-        "HS300",
         "2026中报预增",
+        "生物识别",
         "计算机、通信和其他电子设备制造业",
-        "毫米波概念"
+        "新材料",
+        "MSCI中国",
+        "HS300"
       ],
-      "signal_count": 2,
+      "signal_count": null,
       "enter_date": "2026-09-08",
       "hold_days": 1,
       "consecutive_days": 1,
@@ -110,232 +110,6 @@
           "tag": "处罚",
           "score": 5,
           "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "603986",
-      "name": "兆易创新",
-      "market": "sh",
-      "board": "主板",
-      "status": "near",
-      "total_score": 27.3,
-      "quality_grade": "C",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "MSCI中国",
-        "超清视频",
-        "无线耳机",
-        "物联网",
-        "2026中报预增",
-        "百元股",
-        "计算机、通信和其他电子设备制造业",
-        "AI眼镜"
-      ],
-      "signal_count": 1,
-      "enter_date": "2026-09-08",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 385.44,
-      "current_close": 385.44,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "300054",
-      "name": "鼎龙股份",
-      "market": "sz",
-      "board": "创业板",
-      "status": "near",
-      "total_score": 26.1,
-      "quality_grade": "C",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "MSCI中国",
-        "光刻机(胶)",
-        "2026中报预增",
-        "2026一季报预增",
-        "行业龙头",
-        "计算机、通信和其他电子设备制造业",
-        "OLED",
-        "深股通"
-      ],
-      "signal_count": 1,
-      "enter_date": "2026-09-08",
-      "hold_days": 1,
-      "consecutive_days": 1,
-      "first_close": 68.45,
-      "current_close": 68.45,
-      "pnl_pct": 0.0,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "002475",
-      "name": "立讯精密",
-      "market": "sz",
-      "board": "主板",
-      "status": "strict",
-      "total_score": 30.4,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "虚拟现实",
-        "MSCI中国",
-        "无线耳机",
-        "机构重仓",
-        "深证100R",
-        "计算机、通信和其他电子设备制造业",
-        "AI眼镜",
-        "铜缆高速连接"
-      ],
-      "signal_count": 1,
-      "enter_date": "2026-08-29",
-      "hold_days": 4,
-      "consecutive_days": 5,
-      "first_close": 56.6,
-      "current_close": 55.93,
-      "pnl_pct": -1.18,
-      "catalysts": [
-        {
-          "tag": "中报略增",
-          "score": 5,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "601899",
-      "name": "紫金矿业",
-      "market": "sh",
-      "board": "主板",
-      "status": "strict",
-      "total_score": 28.6,
-      "quality_grade": "A",
-      "industry": "有色金属矿采选业",
-      "sectors": [
-        "MSCI中国",
-        "锂矿概念",
-        "反转股",
-        "机构重仓",
-        "2026中报预增",
-        "有色金属矿采选业",
-        "稀缺资源",
-        "一带一路"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 9,
-      "consecutive_days": 1,
-      "first_close": 33.36,
-      "current_close": 32.87,
-      "pnl_pct": -1.47,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "观察中"
-        }
-      ]
-    },
-    {
-      "code": "300274",
-      "name": "阳光电源",
-      "market": "sz",
-      "board": "创业板",
-      "status": "strict",
-      "total_score": 36.6,
-      "quality_grade": "A",
-      "industry": "电气机械和器材制造业",
-      "sectors": [
-        "MSCI中国",
-        "电气机械和器材制造业",
-        "HS300",
-        "深股通",
-        "百元股",
-        "深证100R",
-        "行业龙头",
-        "充电桩"
-      ],
-      "signal_count": 1,
-      "enter_date": "2026-08-17",
-      "hold_days": 3,
-      "consecutive_days": 1,
-      "first_close": 0,
-      "current_close": 88.75,
-      "pnl_pct": null,
-      "catalysts": []
-    },
-    {
-      "code": "300476",
-      "name": "胜宏科技",
-      "market": "sz",
-      "board": "创业板",
-      "status": "strict",
-      "total_score": 32.9,
-      "quality_grade": "A",
-      "industry": "计算机、通信和其他电子设备制造业",
-      "sectors": [
-        "MSCI中国",
-        "PCB",
-        "物联网",
-        "小米概念",
-        "百元股",
-        "深证100R",
-        "计算机、通信和其他电子设备制造业",
-        "深股通"
-      ],
-      "signal_count": 1,
-      "enter_date": "2026-08-17",
-      "hold_days": 3,
-      "consecutive_days": 1,
-      "first_close": 0,
-      "current_close": 233.46,
-      "pnl_pct": null,
-      "catalysts": []
-    },
-    {
-      "code": "300604",
-      "name": "长川科技",
-      "market": "sz",
-      "board": "创业板",
-      "status": "strict",
-      "total_score": 29.8,
-      "quality_grade": "A",
-      "industry": "专用设备制造业",
-      "sectors": [
-        "MSCI中国",
-        "深成500",
-        "基金重仓",
-        "专用设备制造业",
-        "大盘股",
-        "2026中报预增",
-        "百元股",
-        "深股通"
-      ],
-      "signal_count": 0,
-      "enter_date": "2026-08-17",
-      "hold_days": 3,
-      "consecutive_days": 1,
-      "first_close": 0,
-      "current_close": 270.5,
-      "pnl_pct": null,
-      "catalysts": [
-        {
-          "tag": "中报预增",
-          "score": 15,
-          "reaction": "—"
         }
       ]
     }
@@ -550,14 +324,10 @@
     "by_industry": [
       {
         "industry": "计算机、通信和其他电子设备制造业",
-        "count": 6,
+        "count": 2,
         "names": [
           "沐曦股份",
-          "长电科技",
-          "兆易创新",
-          "鼎龙股份",
-          "立讯精密",
-          "胜宏科技"
+          "长电科技"
         ]
       },
       {
@@ -566,116 +336,19 @@
         "names": [
           "国际复材"
         ]
-      },
-      {
-        "industry": "有色金属矿采选业",
-        "count": 1,
-        "names": [
-          "紫金矿业"
-        ]
-      },
-      {
-        "industry": "电气机械和器材制造业",
-        "count": 1,
-        "names": [
-          "阳光电源"
-        ]
-      },
-      {
-        "industry": "专用设备制造业",
-        "count": 1,
-        "names": [
-          "长川科技"
-        ]
       }
     ],
     "by_sector": [
       {
-        "sector": "MSCI中国",
-        "count": 8
+        "sector": "2026中报预增",
+        "count": 2
       },
       {
         "sector": "计算机、通信和其他电子设备制造业",
-        "count": 6
-      },
-      {
-        "sector": "2026中报预增",
-        "count": 6
+        "count": 2
       },
       {
         "sector": "深股通",
-        "count": 5
-      },
-      {
-        "sector": "百元股",
-        "count": 4
-      },
-      {
-        "sector": "机构重仓",
-        "count": 3
-      },
-      {
-        "sector": "物联网",
-        "count": 3
-      },
-      {
-        "sector": "深证100R",
-        "count": 3
-      },
-      {
-        "sector": "深成500",
-        "count": 2
-      },
-      {
-        "sector": "PCB",
-        "count": 2
-      },
-      {
-        "sector": "HS300",
-        "count": 2
-      },
-      {
-        "sector": "无线耳机",
-        "count": 2
-      },
-      {
-        "sector": "AI眼镜",
-        "count": 2
-      },
-      {
-        "sector": "行业龙头",
-        "count": 2
-      },
-      {
-        "sector": "算力概念",
-        "count": 1
-      },
-      {
-        "sector": "半导体概念",
-        "count": 1
-      },
-      {
-        "sector": "次新股",
-        "count": 1
-      },
-      {
-        "sector": "权重股",
-        "count": 1
-      },
-      {
-        "sector": "QFII重仓",
-        "count": 1
-      },
-      {
-        "sector": "科技风格",
-        "count": 1
-      },
-      {
-        "sector": "大盘成长",
-        "count": 1
-      },
-      {
-        "sector": "PEEK材料概念",
         "count": 1
       },
       {
@@ -683,7 +356,59 @@
         "count": 1
       },
       {
+        "sector": "PCB",
+        "count": 1
+      },
+      {
+        "sector": "深成500",
+        "count": 1
+      },
+      {
+        "sector": "机构重仓",
+        "count": 1
+      },
+      {
+        "sector": "PEEK材料概念",
+        "count": 1
+      },
+      {
         "sector": "非金属矿物制品业",
+        "count": 1
+      },
+      {
+        "sector": "算力概念",
+        "count": 1
+      },
+      {
+        "sector": "次新股",
+        "count": 1
+      },
+      {
+        "sector": "QFII重仓",
+        "count": 1
+      },
+      {
+        "sector": "半导体概念",
+        "count": 1
+      },
+      {
+        "sector": "大盘成长",
+        "count": 1
+      },
+      {
+        "sector": "科技风格",
+        "count": 1
+      },
+      {
+        "sector": "权重股",
+        "count": 1
+      },
+      {
+        "sector": "毫米波概念",
+        "count": 1
+      },
+      {
+        "sector": "物联网",
         "count": 1
       },
       {
@@ -695,82 +420,18 @@
         "count": 1
       },
       {
-        "sector": "毫米波概念",
+        "sector": "MSCI中国",
         "count": 1
       },
       {
-        "sector": "超清视频",
-        "count": 1
-      },
-      {
-        "sector": "光刻机(胶)",
-        "count": 1
-      },
-      {
-        "sector": "2026一季报预增",
-        "count": 1
-      },
-      {
-        "sector": "OLED",
-        "count": 1
-      },
-      {
-        "sector": "虚拟现实",
-        "count": 1
-      },
-      {
-        "sector": "铜缆高速连接",
-        "count": 1
-      },
-      {
-        "sector": "锂矿概念",
-        "count": 1
-      },
-      {
-        "sector": "反转股",
-        "count": 1
-      },
-      {
-        "sector": "有色金属矿采选业",
-        "count": 1
-      },
-      {
-        "sector": "稀缺资源",
-        "count": 1
-      },
-      {
-        "sector": "一带一路",
-        "count": 1
-      },
-      {
-        "sector": "电气机械和器材制造业",
-        "count": 1
-      },
-      {
-        "sector": "充电桩",
-        "count": 1
-      },
-      {
-        "sector": "小米概念",
-        "count": 1
-      },
-      {
-        "sector": "基金重仓",
-        "count": 1
-      },
-      {
-        "sector": "专用设备制造业",
-        "count": 1
-      },
-      {
-        "sector": "大盘股",
+        "sector": "HS300",
         "count": 1
       }
     ],
-    "concentration": 60.0
+    "concentration": 66.67
   },
   "overlap": {
-    "total_tracked": 10,
+    "total_tracked": 3,
     "top10_ge70": {
       "count": 0,
       "overlap": 0,
@@ -899,13 +560,13 @@
     "summary": {
       "1d": {
         "count": 16,
-        "win_rate": 31.25,
-        "avg_return": 2.52
+        "win_rate": 37.5,
+        "avg_return": 2.54
       },
       "3d": {
         "count": 9,
         "win_rate": 55.56,
-        "avg_return": 3.24
+        "avg_return": 3.81
       },
       "5d": {
         "count": 9,
@@ -915,7 +576,7 @@
       "10d": {
         "count": 7,
         "win_rate": 71.43,
-        "avg_return": 2.39
+        "avg_return": 2.19
       },
       "20d": {
         "count": 0,
@@ -1056,7 +717,7 @@
         "offsets": {
           "1d": 0.0,
           "3d": 9.68,
-          "10d": 11.56
+          "10d": 10.15
         }
       },
       {
@@ -1099,7 +760,7 @@
         "enter_date": "2026-09-03",
         "offsets": {
           "1d": -1.9,
-          "3d": -6.1
+          "3d": -0.98
         }
       },
       {
@@ -1115,7 +776,7 @@
         "name": "联讯仪器",
         "enter_date": "2026-09-07",
         "offsets": {
-          "1d": 7.78
+          "1d": 7.63
         }
       },
       {
@@ -1123,7 +784,7 @@
         "name": "迈瑞医疗",
         "enter_date": "2026-09-07",
         "offsets": {
-          "1d": -0.42
+          "1d": 0.02
         }
       }
     ]
