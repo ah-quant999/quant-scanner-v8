@@ -80,6 +80,14 @@ def api(method, path, data=None):
     return {"__error__": "network", "__msg__": last_msg}
 
 
+# 🛡 2026-09-08 审计产物保护（主人令）：审计轨迹只由本机审计脚本经 git 推送（audit_history.json / audit_nightly.log），
+#   绝不走 api_push_raw 裸推。否则 cn runner 工作区里的旧审计文件会经 Git Database API 覆盖 main 上的新版，
+#   吞掉历史审计轨迹（实测 09-08 多轮审计记录丢失）。此处 + main() PUSH_FILES 分支双重跳过。
+_PROTECTED_RAW = {
+    "raw_data/audit_history.json",
+    "raw_data/audit_nightly.log",
+}
+
 def walk_raw():
     out = {}
     if not os.path.isdir("raw_data"):
@@ -111,6 +119,8 @@ def walk_raw():
                 continue
             full = os.path.join(root, f)
             rel = os.path.relpath(full, ".").replace("\\", "/")
+            if rel in _PROTECTED_RAW:  # 🛡 审计产物保护：跳过，不进裸推队列
+                continue
             with open(full, "rb") as fh:
                 out[rel] = fh.read()
     return out
@@ -251,6 +261,9 @@ def main():
         files = {}
         _missing = []
         for _rel in [p.strip() for p in push_files_env.split(",") if p.strip()]:
+            if _rel in _PROTECTED_RAW:  # 🛡 审计产物保护：绝不裸推
+                print(f"  🛡 跳过审计产物（不进 api_push 队列）: {_rel}")
+                continue
             if os.path.isfile(_rel):
                 with open(_rel, "rb") as _fh:
                     files[_rel] = _fh.read()

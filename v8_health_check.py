@@ -67,7 +67,9 @@ CARD_DEFS = [
     # NT_DATA(nt_data.json) 由 algorithms/fetch_orphan_nt_data.py 产出，归 run_algorithms.py(算法链)，
     # 不在 cloud_fetch_v8.py 的 premarket 注册表内 —— 按 page 映射派发 cn_fetch premarket 永远刷不到它，
     # 故显式覆盖自愈类别为 algo_run（2026-08-11 第155轮看门狗定位并根治）。
-    {"id": "NT_DATA", "name": "市场提示", "page": "今日事件", "freq": "每日盘前", "max_age": 720, "key_fields": ["alerts"], "weekend_update": False, "heal_cat": "algo_run"},
+    # 🛡 2026-09-08 一劳永逸：NT_DATA 由盘后算法链(fetch_orphan_nt_data.py)产出，原挂"今日事件"页
+    #   在 08:00-10:00 盘前被 adjust_max_age 收紧到 180min 误杀（盘后产物不可能 <180min 新鲜）→ 改挂"全量数据"页豁免。
+    {"id": "NT_DATA", "name": "市场提示", "page": "全量数据", "freq": "每日盘后(算法链)", "max_age": 720, "key_fields": ["alerts"], "weekend_update": False, "heal_cat": "algo_run"},
     # 实时数据
     {"id": "INDEX_QUOTES", "name": "全球指数 / 股指期货", "page": "实时数据", "freq": "盘中每30分", "max_age": 60, "key_fields": ["items"]},
     {"id": "ETF_PULSE", "name": "ETF 盘中异动", "page": "实时数据", "freq": "盘中实时", "max_age": 60, "key_fields": ["etfs"]},
