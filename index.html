@@ -507,11 +507,11 @@ window.__domReadyFns=[];
   .tp-hist-cell .tp-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:2px}
   .tp-empty{color:var(--dim);text-align:center;padding:24px 10px;font-size:13px}
 </style>
-    <script src="data/ETF_INTRADAY_HEAT.js?v=a05a92f5cb" defer></script>
-    <script src="data/SECTOR_FUND_FLOW.js?v=7b3a27ce38" defer></script>
+    <script src="data/ETF_INTRADAY_HEAT.js?v=8e2aeeeb3b" defer></script>
+    <script src="data/SECTOR_FUND_FLOW.js?v=884215da6e" defer></script>
 
     <script src="data/SECTOR_FUND_FLOW_TREND.js?v=96aafd6292" defer></script>
-    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=cb9ea0b6ea" defer></script>
+    <script src="data/SECTOR_FUND_FLOW_INTRADAY.js?v=a76efa9915" defer></script>
     <script src="data/DO_NOT_DELETE.js?v=252f0fe179" defer></script>
     <!-- 2026-08-31 轻量化：data/ANALYST_RATINGS.js（3.5 KB）前端零引用，停止注入（省 3.5 KB） -->
     <script src="data/SUSPENSION_ALERT.js?v=6daab76b13" defer></script>
@@ -519,24 +519,24 @@ window.__domReadyFns=[];
     <!-- A2 懒加载：STOCK_LIST 移至文末 loader 按需注入 -->
     <!-- A2 懒加载：STOCK_PROFILE 不再单独下载（1.4MB 与 STOCK_LIST 100% 重复），由 STOCK_LIST 合成 -->
     <!-- A2 懒加载：STOCK_QUOTE 移至文末 loader 按需注入 -->
-    <script src="data/MACRO_DATA.js?v=8b6317b1f0" defer></script>
-    <script src="data/MACRO_BRIEF.js?v=bc0512850d" defer></script>
+    <script src="data/MACRO_DATA.js?v=f443e39407" defer></script>
+    <script src="data/MACRO_BRIEF.js?v=e6c6cd2515" defer></script>
 <script src="data/NT_DATA.js?v=78a71df284" defer></script>
 <script src="data/LHB_DATA.js?v=5062242591" defer></script>
 <!-- 2026-08-31 轻量化：data/LHB_7D.js（5.9 KB）前端零引用，停止注入（省 5.9 KB） -->
 <!-- 🛡 2026-08-31 重要事件日历归档索引（回看旧月用） -->
 <script src="data/archive/V8_CAL_INDEX.js" defer></script>
 <!-- A2 懒加载：LHB_HISTORY 移至文末 loader 按需注入 -->
-<script src="data/CONCEPT_RANKING.js?v=e37b456134" defer></script>
+<script src="data/CONCEPT_RANKING.js?v=8e36d68d7b" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
-<script src="data/INDEX_QUOTES.js?v=f751590b66" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=5e8afab4c4" defer></script>
+<script src="data/INDEX_QUOTES.js?v=82266f364a" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=25d63792e2" defer></script>
 <script src="data/MARGIN_DATA.js?v=d882b7fe1e" defer></script>
-<script src="data/CFFEX_HOLDINGS.js?v=aa98d6c479" defer></script>
-<script src="data/IPO_DATA.js?v=095e72c9dc" defer></script>
-    <script src="data/CRISIS_DATA.js?v=b14435d7fa" defer></script>
-    <script src="data/JUDGMENT_DATA.js?v=dda04692ed" defer></script>
-    <script src="data/OVERSEAS_MARKETS.js?v=480986141c" defer></script>
+<script src="data/CFFEX_HOLDINGS.js?v=7fcd25013a" defer></script>
+<script src="data/IPO_DATA.js?v=c17da797ca" defer></script>
+    <script src="data/CRISIS_DATA.js?v=7addb82e7c" defer></script>
+    <script src="data/JUDGMENT_DATA.js?v=2f1cbb502e" defer></script>
+    <script src="data/OVERSEAS_MARKETS.js?v=d5018e6dd2" defer></script>
     <script src="data/STOCK_RPS.js?v=27fa74b678" defer></script>
     <!-- 🛡 2026-08-19：H 反推短线买点（data/H_AUTO_BUY.js + data/H_AUTO_BUY_TRACK.js）反推代码 + 跟踪回测，独立于 PDF OCR
          v= 占位由 api_push_raw._stamp_index_v 在每日推送后自动重写为新 sha，确保 CDN 不缓存旧版 -->
@@ -548,11 +548,11 @@ window.__domReadyFns=[];
     <!-- 🛡 2026-08-31 一劳永逸：以下 4 个文件此前「后端已生成、前端从未注入」，
          导致对应 window 变量永远 undefined、卡片静默空壳（不报错只显空）。现补齐注入。 -->
     <script src="data/MARKET_REGIME.js?v=067b90f41d" defer></script><!-- 1.7 KB · 市场状态（11669 行读取） -->
-    <script src="data/RISK_GAUGE.js?v=0b7a3c9dce" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
+    <script src="data/RISK_GAUGE.js?v=1751033437" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
     <script src="data/SECTOR_RECOMMENDATION.js?v=19b55e1abe" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
     <script src="data/WEEKEND_META_REPORT.js?v=35ec47478d" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
   <script src="data/DELISTED.js?v=f0a71ed823" defer></script>
-  <script src="data/AVG_PRICE_DATA.js?v=1ed7707d1e" defer></script>
+  <script src="data/AVG_PRICE_DATA.js?v=d385438db8" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
     <!-- 2026-08-30 删除 data/PORTFOLIO_COST.js：与 PORTFOLIO_DATA 重复且更陈旧，持仓成本统一从 PORTFOLIO_DATA 读取 -->
@@ -1521,17 +1521,17 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/SECTOR_PHASE_HISTORY.js?v=f869403919" defer></script>
 <script src="data/INST_TRADE.js?v=1cad03b8f5" defer></script>
 <script src="data/NORTH_FUND.js?v=538ad42e57" defer></script>
-<script src="data/MARKET_ALERTS.js?v=05a1e15b31" defer></script>
-<script src="data/MARKET_FUND_FLOW_DATA.js?v=5d7b5240ea" defer></script>
+<script src="data/MARKET_ALERTS.js?v=bf6aa33989" defer></script>
+<script src="data/MARKET_FUND_FLOW_DATA.js?v=07d96405cf" defer></script>
 <!-- 2026-08-30 阿狸咪加注：东方财富口径 ETF 申购赎回（股票/债券/货币/商品/跨境 5 类 + 亿元）。
      2026-09-06 主人令轻量化：旧宽基+亿份口径全链删除，仅保留 window.ETF_SUBSCRIPTION_EM。 -->
 <script src="data/ETF_SUBSCRIPTION_EM.js?v=2ddfd9889a" defer></script>
-<script src="data/LIMIT_UP_HEATMAP.js?v=ce99d47494" defer></script>
-<script src="data/LIMIT_UP_BROKEN.js?v=912424636b" defer></script>
+<script src="data/LIMIT_UP_HEATMAP.js?v=56b717401e" defer></script>
+<script src="data/LIMIT_UP_BROKEN.js?v=86fbe352a2" defer></script>
 <script src="data/HERDING_DATA.js?v=76b96121bf" defer></script>
 <script src="data/VOLATILITY.js?v=7f60918789" defer></script>
-<script src="data/CAPITAL_FLOW_DATA.js?v=2a032d5e01" defer></script>
-<script src="data/SH_SZ_HISTORY.js?v=534100818a" defer></script>
+<script src="data/CAPITAL_FLOW_DATA.js?v=40c2e1852e" defer></script>
+<script src="data/SH_SZ_HISTORY.js?v=5f15246bcf" defer></script>
 <script src="data/CANDIDATE.js?v=b197f3c66a" defer></script>
     <script src="data/FOUR_VOLUME.js?v=f6775ae28e" defer></script>
     <script src="data/FOUR_VOLUME_60M.js?v=65f6b9f7e0" defer></script>
@@ -1554,8 +1554,8 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
     <script src="data/RPS_BACKTEST.js?v=2a17d82ae9" defer></script>
     <script src="data/FACTOR_LAB.js?v=86980a0312" defer></script>
 <!-- 2026-08-31 轻量化：data/ALGO_TRACK.js（42.4 KB）前端零引用，停止注入（省 42.4 KB） -->
-<script src="data/ETF_PULSE.js?v=4fdb914c79" defer></script>
-<script src="data/ETF_DAILY_MONITOR.js?v=35c9bfba97" defer></script>
+<script src="data/ETF_PULSE.js?v=c31be6b738" defer></script>
+<script src="data/ETF_DAILY_MONITOR.js?v=7cc4e63fbf" defer></script>
 <script src="data/TOP10_DAILY.js?v=4892c15d03" defer></script>
 <script src="data/WEEKEND_RUN.js?v=1ff43710f0" defer></script>
 <script src="data/W52_HIGH.js?v=986cdc9683" defer></script>
@@ -1563,14 +1563,14 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=60fdf6ea1c" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=a3616a0d64" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=00f691a2d4" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=ce12f3a953" defer></script>
-<script src="data/HEALTH_CHECK.js?v=d39c59420b" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=8b5bb83e23" defer></script>
+<script src="data/RUNNER_STATUS.js?v=596d936ff0" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=89a25bc348" defer></script>
+<script src="data/HEALTH_CHECK.js?v=457be83fa7" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=87a079b72e" defer></script>
     <!-- 2026-09-07 主人令：中信 PE 极值温度计 + PE<10 历史回测 双卡（暂未上架·实验区最下方） -->
     <script src="data/CITIC_PE_THERMO.js?v=f28b64dd3d" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=8160f142b0" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=3e784ad191" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=b828803b98" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=4baa03b1f9" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=3ba6acb28d" defer></script>
@@ -1755,7 +1755,7 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
       //   原 ok 仅校验 head 含卡名，但：defer 时序下需排序：
       //     1) HTML 分析到 line 1630+ 注册 ◐◦selfHealJudgmentHeader；
       //     2) HTML 继续分析到 line 10673 注册 v8CardHeader；
-      //     3) <script src="data/JUDGMENT_DATA.js?v=dda04692ed" defer> 和 <script src="data/MACRO_BRIEF.js?v=bc0512850d" defer> 在 HTML 分析完成后才异步执行；
+      //     3) <script src="data/JUDGMENT_DATA.js?v=2f1cbb502e" defer> 和 <script src="data/MACRO_BRIEF.js?v=e6c6cd2515" defer> 在 HTML 分析完成后才异步执行；
       //     4) 首次 initCardBadges / switchSec 触发 ◐◦renderJudgmentHeader 时，JUDGMENT_DATA.js 可能还没加载完；
       //     5) ts='' → v8CardHeader 返回的 HTML 中：卡名、副标题，但缺少「更新于」膠勢；
       //     6) 自愈校验 ok 通过（head.innerHTML.indexOf('今日判定')>=0）→ 永不重昆明；
@@ -7433,17 +7433,17 @@ window.__renderV8CalFull();
       applyData(window.IPO_DATA);
     }else{
       /* 🛡 2026-08-28 一劳永逸（主站审计 P1-8）：缓存戳 ?v= 从页面已注入的
-         <script src="data/IPO_DATA.js?v=095e72c9dc"> 实时读取，不再手写 hash。
+         <script src="data/IPO_DATA.js?v=c17da797ca"> 实时读取，不再手写 hash。
          历史债务：本处注释写死一个旧 hash、实际引用是另一个、报错信息又写一遍，
          三处漂移；且手写 hash 不随构建更新 → CDN 吐旧副本 → 打新数据陈旧。
          现以 script 标签为唯一真源，fetch 永远跟随它，与注入数据同版本。 */
       var _ipoUrl=(function(){
         try{
-          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=095e72c9dc"]');
+          var el=document.querySelector('script[src*="data/IPO_DATA.js?v=c17da797ca"]');
           var s=el?el.getAttribute('src'):'';
           if(s) return s;
         }catch(e){}
-        return 'data/IPO_DATA.js?v=095e72c9dc';
+        return 'data/IPO_DATA.js?v=c17da797ca';
       })();
       // 优先 fetch data/IPO_DATA.js（缓存戳复用注入标签），其次 data/ipo_score.json（兼容旧路径）
       fetch(_ipoUrl)
@@ -13318,7 +13318,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }
   var seen=(function(){ try{ var h=window.HEALTH_CHECK||{}; return h.update_time||h.updated_at||h.updated||h.last_update||''; }catch(e){ return ''; } })();
   function _check(){
-    var url = _scriptUrl('data/HEALTH_CHECK.js?v=d39c59420b') + '_ts=' + Date.now();
+    var url = _scriptUrl('data/HEALTH_CHECK.js?v=457be83fa7') + '_ts=' + Date.now();
     fetch(url,{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var remote=_pickTs(t);
       if(remote){
@@ -14038,7 +14038,7 @@ window.__renderV8CalToday();
     // 🛡 2026-08-31 一劳永逸：STOCK_PROFILE.js(1.4MB) 与 STOCK_LIST 的 industry/concepts
     //   实测 9602 条【零差异】、且 45.9% 为空值 → 停止单独下载，改由 STOCK_LIST 到位后就地
     //   合成 window.STOCK_PROFILE，前端引用点(819/5979 行)零改动。省 1.4 MB 下载。
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=9c9da2efc1'},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=8d7209400a'},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=e43bd4a302'}
   ];
   function loadOne(item, done){
