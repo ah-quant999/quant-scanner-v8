@@ -958,6 +958,10 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
           <tr><td>💰 平均股价</td><td>涨 → 绿；跌&gt;0.2% → 红；其余 → 黄</td></tr>
           <tr><td>🎯 操作建议</td><td>加仓/持筹 → 绿；减仓/赎回/抛压 → 红；观望/轻仓 → 黄</td></tr>
         </table>
+        <div class="logic-h">2026-09-08 修复：AI速览 3 处死行逻辑</div>
+        <div class="logic-p">🛡 <b>情绪定级</b>：改涨跌家数比优先定级。原逻辑只看沪指单点（≥0.5%才偏暖），窄幅震荡市每日死落"情绪震荡"导致文字几天不变；现 |沪指|<0.5% 时按涨跌比直接给偏暖/偏冷/震荡，并剔除原 <code>sh_chg&gt;=1.0</code> / <code>sh_chg&lt;=-1.5</code> 两处几乎不可达分支，避免结论忽高忽低。<br>
+        🛡 <b>资金灯口径</b>：原口径用概念净流入 TOP10 之和（永远为正）且阈值 100/20 亿，资金灯恒"大幅流入"，其下分支全部死行。改为真实双向主力净额 <code>market_net</code>，阈值调整为 ≥300亿大幅流入 / ≥60亿流入 / ≤-300亿大幅流出 / ≤-60亿流出 / 其余均衡，恢复区分度。</div>
+
         <div class="logic-h">14 维度</div>
         <div class="logic-p">日内风向标、ETF国家队资金、板块资金主线、主力抱团方向、指数纵览、异动催化剂、美联储FOMC、投行观点、异常速览（上证连跌/涨跌家数/涨停跌停/成交额/两融/VIX/国债/ETF申赎等）。</div>
         <div class="logic-h">ETF国家队资金估算口径</div>
@@ -1018,9 +1022,9 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
                          
     
 <div class="card">
-        <h3><span class="ic">📈</span>板块资金三合一 / 概念资金热力图 - 说明</h3>
-        <div class="logic-h">板块资金三合一</div>
-        <div class="logic-p">行业板块主力净流入/流出排名，|净流入|≥5亿为「大幅流入/流出」。红色=流入，绿色=流出。主数据源失败时自动切换备用数据源（流入TOP10+流出TOP10合并去重）。</div>
+        <h3><span class="ic">📈</span>板块资金趋势 / 概念资金热力图 - 说明（2026-09-08 轻量化更名）</h3>
+        <div class="logic-h">板块资金趋势</div>
+        <div class="logic-p">原「板块资金三合一 - 盘中+盘后+趋势」简化为「板块资金趋势」：保留周期定位 + 资金趋势验证核心两栏，前端卡片标题同步精简。行业板块主力净流入/流出排名，|净流入|≥5亿为「大幅流入/流出」。红色=流入，绿色=流出。主数据源失败时自动切换备用数据源（流入TOP10+流出TOP10合并去重）。</div>
         <div class="logic-h">概念资金热力图</div>
         <div class="logic-p">以 treemap 方块可视化概念板块主力净流入 TOP30。方块大小∝|净流入|，红色=上涨、绿色=下跌。一眼识别资金集中流向与概念热度。</div>
         <div class="logic-h">收盘复盘 · 周期定位 + 资金趋势（2026-08-30 主人令：数据源说明从卡片移到逻辑详解）</div>
@@ -1727,6 +1731,8 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         · 🔴 <b>D 差</b> &lt;20 · 基本面差（避免介入）<br>
         <b>字段显示规则</b>：每个字段独立 &lt; if 数据非空 &gt; 包裹，没数据整行不渲染（如某只股票没 BVPS，BVPS 行根本不显示，不留 "-"）。<br>
         <b>不显示规则</b>：股票不在候选池 → 综合财务画像段不渲染（不显示「无财务数据」占位）；v8 全市场 5537 候选池内股票才有。</div>
+        <div class="logic-h">2026-09-08 修复：ROE 串行网络风暴护栏</div>
+        <div class="logic-p"><code>fetch_fundamental_quality.py</code> 的 <code>build_universe()</code> 加 <code>max_codes=500</code> 护栏：候选池缺失 fallback 到全量 <code>stock_names</code> 时，全量 5000+ 只串行查 Baostock 会产生网络风暴；超过阈值则截断前 500 只并告警，保留核心标的，防止把 runner/本机网络打挂。</div>
         <div class="logic-h">止盈止损口径（v8 升级版，三档目标）</div>
         <div class="logic-p">· <b>止损</b> = max(当前价×0.93, 当日最低价×0.99)，至少留 1% 缓冲<br>· <b>短线目标</b> = 当前价×1.07（+7%）· <b>中线目标</b> = 当前价×1.12（+12%）· <b>强势目标</b> = 当前价×1.15（+15%）<br>· <b>盈亏比</b> = 短线收益 / 止损亏损，≥2 优秀 / 1.5-2 一般 / &lt;1.5 较差<br>· 波动率 = max(当日振幅, 当前价×1.5%)，&gt;4% 高波动 / &gt;2% 中波动 / 其余低波动<br>· 操作提示按当日涨跌：涨 ≥5% 追高谨慎 / 跌 ≥5% 警惕破位 / 其余中性可分批建仓</div>
         <div class="logic-h">个股查询网格卡片清单（2026-08-06 清理后）</div>
@@ -1765,6 +1771,13 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
         <div class="logic-p"><b>执行方说明（2026-08-06 更新）</b>：中国数据抓取已迁 <b>GitHub 云端 ubuntu-latest</b>（实测 push2delay 东财镜像 + akshare 从 GHA 可达，OK 10/11），<code>v8_cn_fetch_cloud</code> 自动调度跑在云端 24/7，<b>不依赖小九停电与否</b>。原盘中自愈器 v8_intraday_healer / Safety Net 兜底 v8_safety_net 已于 2026-08 删除（commit 1fe4f8c71），职能并入 v8_health_patrol + v8_freshness_watch。盘后算法链主链已迁 GitHub 云端 <code>v8_algo_cloud</code>（08-06 收敛 4→1 条 cron 修复静默失效），<code>v8_algo_run</code> 仅保留 workflow_dispatch 应急回退（cn runner 不再跑 cron 主链）；构建/部署/体检/清理/备份/自愈/健康监控全部云端。小九本机只运行看门狗监督 + 盘后算法链，不手动跑数据、不手动部署。</div>
 
         <div class="logic-p">每次抓取后经 <code>api_push_raw</code> 推 <code>raw_data</code> → <code>v8_build_deploy</code> 自动 selective build + 部署 Pages，所以每个时间槽的“更新”必然触发对应前端的“部署”，不遗漏。</div>
+
+        <div class="logic-h">2026-09-08 修复：数据时段与调度漂移</div>
+        <div class="logic-p">🛡 <b>HERDING_DATA（羊群效应）</b>：类别由 <code>premarket</code> 改为 <code>post_close</code>。该模块依赖当日完整涨停池，盘前/盘中数据不全，只有盘后生成才有意义，消除 runner 空 1 模块 warn。<br>
+        🛡 <b>RUNNER_STATUS 时间戳</b>：<code>cloud_fetch_v8.py</code> 生成 runner_status 时补标准字段 <code>update_time</code>；<code>update_v8.py</code> 兼容旧产物 <code>run_time</code> → <code>update_time</code>，供 guard/前端统一读取。<br>
+        🛡 <b>NT_DATA 盘前 180min 豁免</b>：NT_DATA 为 ETF 实时异动，盘前本就不刷新；<code>guard_v8_freshness.py</code> 在 06:30–09:30 之间对 NT_DATA 陈旧/无时间豁免告警与派发，避免清晨误报。<br>
+        🛡 <b>调度器深夜窗口漂移</b>：<code>v8_freshness_watch.yml</code> cron 由全天 <code>10,40 * * * *</code> 收紧为工作日 <code>10,40 0-14 * * 1-5</code>（CST 08:00–22:10）；本地 WorkBuddy 档期调度器 rrule 同步加 BYDAY/BYHOUR 限制（8–22 点、工作日），防止深夜窗口外空转漂移。</div>
+
         <table class="lg-table">
           <tr><th>时间槽</th><th>Workflow</th><th>类别</th><th>刷新的前端模块</th></tr>
           <tr><td>08:25（工作日）/ 09:00（周六日）</td><td>v8_cn_fetch_cloud</td><td>盘前</td><td>今日事件(V8_CAL日历+今日判定JUDGMENT_DATA+打新)、IPO、两融、宏观、危机雷达、北向、分析师评级、52周高、羊群效应、ETF申赎、解禁日历、业绩预告</td></tr>
