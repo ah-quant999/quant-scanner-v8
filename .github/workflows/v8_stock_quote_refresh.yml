@@ -58,7 +58,8 @@ concurrency:
 
 jobs:
   refresh:
-    runs-on: [self-hosted]
+    # 🔴 2026-09-08 主人令「active-active」：仅 IP 敏感 workflow 用 cn label，lemoncat/alimi 双机互为兜底。
+    runs-on: [self-hosted, cn]
     timeout-minutes: 30
     env:
       TZ: Asia/Shanghai
