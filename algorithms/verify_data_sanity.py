@@ -26,6 +26,7 @@ SKIP_CONTENT = {
     "DO_NOT_DELETE",          # HTML 视图非数据表
     "STOCK_MOMENTUM_STATE",   # IIFE 结构，仅查 update_time
     "HEALTH_CHECK",
+    "CONCEPT_ETF_MAP",        # 2026-09-08 一劳永逸：JS 对象字面量(键无引号)非严格 JSON，前端正常；仅查 update_time
 }
 # 空表豁免（人工维护/静态/已知可能为空且合理）
 EMPTY_OK = {
@@ -98,11 +99,12 @@ def parse_time(v):
     return None
 
 def strip_js_comments(s):
-    """剥 // 行注释（保守：仅剥 // 后无 http 的行注释）"""
+    """剥 // 行注释（保守：仅剥真正的行注释，跳过 http:// https:// 协议头中的 //）"""
     out = []
     for line in s.splitlines():
         idx = line.find("//")
-        if idx >= 0 and "http" not in line[idx:idx + 6]:
+        # 跳过协议头中的 //（http:// https://）→ 不误删 URL 内 //（否则 json.loads 崩）
+        if idx >= 0 and not (idx >= 1 and line[idx - 1] == ":"):
             line = line[:idx]
         out.append(line)
     return "\n".join(out)
