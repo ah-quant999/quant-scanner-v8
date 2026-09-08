@@ -530,7 +530,7 @@ window.__domReadyFns=[];
 <script src="data/CONCEPT_RANKING.js?v=e82cbf02ee" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/INDEX_QUOTES.js?v=56614eb140" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=1d75c79d8d" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=8106c403fc" defer></script>
 <script src="data/MARGIN_DATA.js?v=015ae4ff1b" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=1a3af88637" defer></script>
 <script src="data/IPO_DATA.js?v=2598f71728" defer></script>
@@ -1564,13 +1564,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/PERFORMANCE_FORECAST.js?v=1af6d361b7" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=c5512b4471" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=a9fef734cb" defer></script>
-<script src="data/HEALTH_CHECK.js?v=d23c136566" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=59c599ee73" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=2d7d7cb32a" defer></script>
+<script src="data/HEALTH_CHECK.js?v=c71c326f50" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=a889f90032" defer></script>
     <!-- 2026-09-07 主人令：中信 PE 极值温度计 + PE<10 历史回测 双卡（暂未上架·实验区最下方） -->
     <script src="data/CITIC_PE_THERMO.js?v=f28b64dd3d" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=8160f142b0" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=a2402ba2d5" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=0d0e30bcc9" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=4baa03b1f9" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=3ba6acb28d" defer></script>
@@ -13318,7 +13318,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }
   var seen=(function(){ try{ var h=window.HEALTH_CHECK||{}; return h.update_time||h.updated_at||h.updated||h.last_update||''; }catch(e){ return ''; } })();
   function _check(){
-    var url = _scriptUrl('data/HEALTH_CHECK.js?v=d23c136566') + '_ts=' + Date.now();
+    var url = _scriptUrl('data/HEALTH_CHECK.js?v=c71c326f50') + '_ts=' + Date.now();
     fetch(url,{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var remote=_pickTs(t);
       if(remote){
