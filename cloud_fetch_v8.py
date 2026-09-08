@@ -106,7 +106,7 @@ CATEGORY_MAP = {
     "ANALYST_RATINGS": "premarket",
     # 🛡 2026-09-04 同上：盘后数据页「市场宽度 · 新高家数与宽度评分」卡读本变量（52周新高广度）。
     "W52_HIGH": "premarket,post_close",
-    "HERDING_DATA": "premarket",
+    "HERDING_DATA": "post_close",  # 🛡 2026-09-08 改 post_close：f_herding_data 依赖当日完整涨停池，盘前/盘中数据不全，只有盘后生成才有意义
     # 盘中（含 ETF 三连板、板块资金三连板盘中追热等实时场景）
     "INDEX_QUOTES": "intraday",
     "ETF_PULSE": "intraday",
@@ -3707,6 +3707,7 @@ def main(category=None, only=None):
     # 生成 runner 状态文件，供前端「定时任务跟踪」看板展示
     try:
         runner_status = {
+            "update_time": now_cst().strftime("%Y-%m-%d %H:%M:%S"),  # 🛡 2026-09-08 补标准时间戳，供 guard/前端统一读取
             "run_time": now_cst().strftime("%Y-%m-%d %H:%M:%S"),
             "category": category or "all",
             "hostname": os.environ.get("COMPUTERNAME", "") or os.environ.get("HOSTNAME", ""),
