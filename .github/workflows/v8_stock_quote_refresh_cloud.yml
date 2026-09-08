@@ -50,7 +50,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: v8-stock-quote-refresh
+  group: v8-stock-quote-refresh-cloud
   cancel-in-progress: false
 
 jobs:
