@@ -1242,7 +1242,9 @@ def adjust_max_age(def_max, page=None):
         hours_since_close = (n - close).total_seconds() / 3600
         if hours_since_close < 8:
             # 收盘后 8 小时内是新数据产出窗口（18:30 跑完 + 构建部署延迟），严格检查
-            return min(def_max, 360)
+            # 🛡 2026-09-08 D2-A 一劳永逸：仅对天然严格项(def_max<=360)收紧；
+            #   FACTOR_LAB 等天然 1440 的低频项不得被压到 360（否则夜间/周末满屏红黄灯误报）。
+            return min(def_max, 360) if def_max <= 360 else def_max
         # 其他时段：阈值 = 自最近收盘以来分钟数 + 3 小时缓冲
         # 自动覆盖夜间/周末/周一早盘，避免周五数据在周日夜间被 2880 分钟阈值误杀
         return int(hours_since_close * 60) + 180
