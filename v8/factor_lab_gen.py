@@ -256,7 +256,7 @@ def main():
             log("abn 进度", i+1, "/", len(kcodes))
         if i > 0 and i % 100 == 0:
             try: bs.logout()
-            except Exception: pass
+            except Exception as e: log("bs.logout 异常(忽略,继续重登)", str(e)[:120])
             time.sleep(1)
             lg = bs.login(); log("自动重登录 abn", lg.error_code, "at", i)
         time.sleep(0.02)
@@ -304,7 +304,7 @@ def main():
                 "有效", len([1 for v in r.values() if v.get('roe_ttm') is not None]))
         if i > 0 and i % 200 == 0:
             try: bs.logout()
-            except Exception: pass
+            except Exception as e: log("bs.logout 异常(忽略,继续重登)", str(e)[:120])
             time.sleep(1)
             lg = bs.login(); log("自动重登录 roe", lg.error_code, "at", i)
         time.sleep(0.02)

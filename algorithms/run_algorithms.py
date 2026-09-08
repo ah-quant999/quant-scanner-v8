@@ -117,7 +117,6 @@ ORDER = [
     "fetch_lhb.py",
     # 🛡 2026-08-20 一劳永逸：5 年长 K 线 fetcher 补入算法链（此前无任何调度方，
     #   且只写 out/ 不 bridge raw_data/ → INDEX_HISTORY 永不更新）。
-    #   必须在 market_path_probability.py 之前执行（历史沿用，现仅维护 INDEX_HISTORY）
     "scripts/fetch_index_history.py",
     # 🛡 2026-08-29 主人令：补跑第二基准（中证1000 / 国证A指），判断 +6% excess 是 alpha 还是风格 beta。
     "scripts/fetch_index_history_multi.py",
@@ -158,6 +157,7 @@ ORDER = [
     #   - fetch_weekend_run.py → raw_data/weekend_run.json（周度运行汇总）
     "refresh_stock_metadata.py",
     "fetch_weekend_run.py",
+    "scripts/build_delisted.py",       # → data/DELISTED.js（已下架股票目录，从 raw_data/delisted_stocks.json 转换；护栏≤300条防污染）
     # 🛡 2026-08-19 一劳永逸式修复：H 反推算法从PDF OCR 脱离，反推代码 + 每日盘后自跑 + 跟踪回测。
     #   auto_run_dn_algorithm.py 默认 emit-js（写 data/H_AUTO_BUY.js）；
     #   track_h_auto_buy.py 默认 emit-js（写 data/H_AUTO_BUY_TRACK.js，写 raw_data/h_auto_buy_history.json）。
@@ -225,6 +225,7 @@ STAGES = {
         "gen_stock_stop.py", "gen_algo_track.py", "calc_sentiment_cycle.py",
         "refresh_dividend_cninfo.py",
         "refresh_stock_metadata.py", "fetch_weekend_run.py",   # 周末复盘/周度汇总（原 ORDER 漏挂 STAGE）
+        "scripts/build_delisted.py",       # 🆕 2026-09-08 挂链：已下架股票目录转换（依赖 refresh_stock_metadata 产出的 delisted_stocks.json）
         "auto_run_dn_algorithm.py", "strong_breakout.py", "track_h_auto_buy.py",
         # 2026-09-08 一劳永逸：gen_lhb_7d.py 此前只存在于 STOCK_PICKING_SCRIPTS 与 step 顺序表里，
         # 从未挂进 STAGES -> 分批模式（A/B/D/E）永远跑不到它，data/LHB_7D.js 卡在 09-04 的红灯根因。

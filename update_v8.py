@@ -76,6 +76,7 @@ DATA_SOURCES = {
     "suspension_alert.json":       "SUSPENSION_ALERT",
     "volatility.json":             "VOLATILITY",
     "index_quotes.json":           "INDEX_QUOTES",
+    "index_history.json":           "INDEX_HISTORY",   # 🛡 2026-09-08 一劳永逸：原 DATA_SOURCES 漏挂此映射 → data/INDEX_HISTORY.js 永停 09-04；现补，post_close 段自动重建
     "capital_flow_data.json":      "CAPITAL_FLOW_DATA",
     "candidate.json":              "CANDIDATE",
     "backtest_comprehensive.json": "BACKTEST_COMPREHENSIVE",

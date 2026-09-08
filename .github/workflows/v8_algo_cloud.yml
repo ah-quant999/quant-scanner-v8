@@ -700,3 +700,26 @@ jobs:
             echo "::error::盘后算法链产物不完整——核心产物未在本交易日产出，详见上方闸门报告"
           fi
           exit $GATE_EXIT
+
+      # ============================================================
+      #  2026-09-08 一劳永逸（主人令「一劳永逸式修复」·C 收敛版·阿狸咪暗灯审计跟进）
+      #    ── 算法链「结构一致性」机器校验，作为收尾硬性闸门 ──
+      #  背景：阿狸咪夜班只读审计发现 4 个「暗灯」（体检 freshness_status.json 扫不到）+ 6 类
+      #    系统性漏洞，根因之一是 run_algorithms 的 ORDER/STAGES 双表靠人工同步、极易漏挂，
+      #    漏挂一个即 import 即崩（09-08 P0 教训：gen_lhb_7d 漏挂 ORDER）。
+      #  本步骤在每次全链跑完做机器校验：
+      #    ① STAGES↔ORDER 双表一致（不一致 → exit 1，防 P0 回潮）
+      #    ② 无孤儿脚本（声明在 ORDER 但 DATA_SOURCES 无映射 / 反之 → 告警）
+      #    ③ 无数据断链（raw 有更新但 data/*.js 未重建 → 告警）
+      #    ④ 无映射悬空（DATA_SOURCES 声明但 data/*.js 缺失 → 告警）
+      #  失败即 job 失败，告警链路可见，杜绝「漏挂/断链」类暗灯再悄悄上线。
+      # ============================================================
+      - name: "🛡 算法链结构一致性校验（ORDER↔STAGES / 孤儿 / 断链 / 悬空）"
+        if: (steps.silent.outputs.skip_silent != 'true' || github.event.inputs.force_run == 'true') && (steps.trading.outputs.is_trading_day == 'true' || steps.wknd.outputs.weekend_t1 == 'true') && steps.route.outputs.route != 'cn'
+        run: |
+          python algorithms/verify_chain_consistency.py
+          VERIFY_EXIT=$?
+          if [ "$VERIFY_EXIT" != "0" ]; then
+            echo "::error::算法链结构一致性校验未通过（STAGES/ORDER 双表不一致或存在孤儿/断链/悬空），详见上方报告"
+          fi
+          exit $VERIFY_EXIT
