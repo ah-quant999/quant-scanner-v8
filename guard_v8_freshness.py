@@ -84,6 +84,11 @@ CORE_SOURCES = {
     "INDEX_QUOTES": 26,
     "ETF_PULSE": 26,
     "ETF_DAILY_MONITOR": 26,
+    # 🛡 2026-09-08 盘中更新审计·一劳永逸：STOCK_QUOTE 此前不在任何监控清单，
+    # 且 guard 自愈只派发 cn_fetch/algo、无 STOCK_QUOTE 通道 → 反复陈旧只能用户肉眼发现。
+    # 现纳入 CORE（阈值 35min，非交易日按 check_group 周末豁免自动跳过），并以专属通道
+    # 派发 v8_stock_quote_refresh.yml（云端 ubuntu-latest）自愈，不再依赖哨兵单点。
+    "STOCK_QUOTE": 35,
     "V8_CAL": 6,    # 2026-08-02 收紧：日历为高频显示，48h 太宽；周内强制日刷新，节假日另豁免,
     "SH_SZ_HISTORY": 72,  # 2026-08-02 修订：原 3h 偏严（盘中刚过就误报），改 72h=3 个交易日；check_group 按交易日判定
 }
@@ -163,6 +168,7 @@ from collections import defaultdict
 REPO = "ah-quant999/quant-scanner-v8"
 CN_WORKFLOW_ID = 327687211   # 🇨🇳 v8 中国数据抓取(云端)（v8_cn_fetch_cloud.yml）
 ALGO_WORKFLOW_ID = 324119592  # ☁️ v8 盘后算法链（v8_algo_cloud.yml）
+STOCK_QUOTE_WORKFLOW_ID = 336548691  # 📈 v8 STOCK_QUOTE 轻量 refresh（v8_stock_quote_refresh.yml，云端 ubuntu-latest）
 SELFHEAL_PATH = DATA_DIR / "freshness_selfheal.json"
 SELFHEAL_COOLDOWN_MIN = 30   # 同 category 自愈派发冷却，避免每小时重复派发刷爆 runner
 
@@ -229,6 +235,46 @@ def _dispatch_algo(token):
         return False, f"HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:120]}"
     except Exception as e:
         return False, str(e)[:120]
+
+
+def _dispatch_stock_quote(token):
+    """派发 v8_stock_quote_refresh.yml（云端 ubuntu-latest）重抓个股行情，用于 STOCK_QUOTE stale 自愈。"""
+    url = f"https://api.github.com/repos/{REPO}/actions/workflows/{STOCK_QUOTE_WORKFLOW_ID}/dispatches"
+    hdr = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    data = json.dumps({"ref": "main"}).encode()
+    req = urllib.request.Request(url, data=data, headers=hdr, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return True, r.status
+    except urllib.error.HTTPError as e:
+        return False, f"HTTP {e.code}: {e.read().decode('utf-8', 'replace')[:120]}"
+    except Exception as e:
+        return False, str(e)[:120]
+
+
+def _heal_stock_quote(token, sh, now, items):
+    """STOCK_QUOTE 专属自愈：30min 冷却去重 + 派发 v8_stock_quote_refresh.yml（云端）。"""
+    last = sh.get("stock_quote", {}).get("ts")
+    if last:
+        try:
+            lt = datetime.strptime(last, "%Y-%m-%d %H:%M:%S")
+            if (now - lt).total_seconds() < SELFHEAL_COOLDOWN_MIN * 60:
+                print(f"  [冷却中] stock_quote 近{SELFHEAL_COOLDOWN_MIN}min已派发，跳过（{', '.join(v for v, _ in items)}）")
+                return True
+        except Exception:
+            pass
+    ok, msg = _dispatch_stock_quote(token)
+    if ok:
+        sh["stock_quote"] = {"ts": now.strftime("%Y-%m-%d %H:%M:%S"), "vars": [v for v, _ in items]}
+        print(f"  [自愈✓] 派发 stock_quote(云端) 刷新 {', '.join(v for v, _ in items)}（HTTP {msg}）")
+        return True
+    else:
+        print(f"  [自愈✗] stock_quote 派发失败: {msg}（{', '.join(v for v, _ in items)}）")
+        return False
 
 
 def load_selfheal():
@@ -543,6 +589,14 @@ def main():
     # 30min 冷却去重；自愈成功/冷却中 → 该项从 core_stale 剔除 → 最终 exit 0（不刷屏）。
     healed_cats = set()
     sh = load_selfheal()   # 始终加载，确保数据自愈与管线自愈都能读写冷却状态
+    # 🛡 2026-09-08 盘中更新审计·一劳永逸：STOCK_QUOTE 走专属通道自愈（不进 cn_fetch 错派）
+    sq_stale = [(v, r) for (v, r) in core_stale if v == "STOCK_QUOTE"]
+    if sq_stale and token:
+        _heal_stock_quote(token, sh, now, sq_stale)
+        save_selfheal(sh)
+        core_stale = [(v, r) for (v, r) in core_stale if v != "STOCK_QUOTE"]
+    elif sq_stale and not token:
+        print("  [自愈跳过] STOCK_QUOTE 陈旧但未找到 GitHub token，无法派发刷新")
     if core_stale and token:
         by_cat = defaultdict(list)
         for it in _with_cat(core_stale):
