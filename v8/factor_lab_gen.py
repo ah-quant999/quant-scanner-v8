@@ -18,7 +18,7 @@ import baostock as bs, json, time, datetime as dt, re, os, subprocess, sys
 #   （实测卡在 roe 进度 100/3195 静止 5 分钟+）。设全局 socket 超时 → 阻塞转为可捕获异常，
 #   配合 get_roe_ttm / 主循环的 try 兜底，卡住的个股自动跳过而不是拖死全链。
 import socket as _socket
-_socket.setdefaulttimeout(20)
+_socket.setdefaulttimeout(30)  # 2026-09-08 上调至 30s：盘前 baostock 响应偏慢，避免误触超时
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # 自适应：本机 E:/workspace/stock-scanner = 云端 checkout 根（2026-09-04 云端适配，根治硬编码路径致云端必挂）
 # 缓存目录：默认仓库内 raw_data/flab_work（随 git 提交 → 云端/双机共享热缓存，冷启动逐晚收敛）；
@@ -118,17 +118,38 @@ def resolve_data_date(max_back=10, min_rows=1000):
     让调用方显式报错（不再静默产出空数据）。
     """
     d = dt.datetime.now().date()
+    t0 = time.time()
+    TOTAL_LIMIT = 300  # 单轮探测总超时硬上限（秒），防止任何意外静默挂死
     for i in range(max_back):
         day = (d - dt.timedelta(days=i)).strftime("%Y-%m-%d")
+        # 🔴 2026-09-08 真根因修复：实测「先查 0 行日(盘前/凌晨=今天) 再查回退日」时，
+        #    baostock 连接态被污染 → 下一轮 rs.next() 永久阻塞（静默挂起 5.4h）。
+        #    每次探测（i>0）前重登录重置连接态，从根上杜绝该阻塞。
+        if i > 0:
+            try:
+                bs.logout()
+            except Exception:
+                pass
+            lg = bs.login()
+            if lg.error_code != '0':
+                log("⚠️ 数据日探测重登录失败", lg.error_code, "at", day)
+            else:
+                log("数据日探测重登录", f"i={i} {day}")
         rs = bs.query_all_stock(day=day)
         n = 0
         while rs.error_code == '0' and rs.next():
             n += 1
+            if n >= min_rows:  # 够数即停，避免读全市场数千行拖慢探测
+                break
+        el = time.time() - t0
+        if el > TOTAL_LIMIT:
+            log("ERROR: 数据日探测超时", f"{el:.0f}s > {TOTAL_LIMIT}s，中止（不产出空 FACTOR_LAB）")
+            return None
         if n >= min_rows:
             if i:
                 log("数据日回退", f"{d.strftime('%Y-%m-%d')} → {day}（baostock 当日数据未生成，回退 {i} 天）")
             return day
-        log("数据日探测", f"{day}: {n} 行（不足 {min_rows}），继续回退")
+        log("数据日探测", f"[{i+1}/{max_back}] {day}: {n} 行（不足 {min_rows}），继续回退")
     return None
 
 
