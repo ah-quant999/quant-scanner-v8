@@ -54,6 +54,7 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     #   导致 data/FACTOR_LAB.js 长期无人刷新（运维暗灯）。现正式挂链并给足冷启动预算
     #   （脚本自述冷启动 50-90min；热缓存后分钟级）。
     "v8/factor_lab_gen.py": 5400,
+    "v8/backtest_crds.py": 3600,            # CRDS 回测：逐只回测，给 1h 预算 （2026-09-09 挂链时补）
 }
 
 
@@ -188,6 +189,7 @@ ORDER = [
     # 🛡 2026-09-08 D2-A2：生成器挂在同一位置（ORDER 与 STAGES["E"] 必须同位，模块级 assert 强校验）
     "v8/factor_lab_gen.py",               # → data/FACTOR_LAB.js（先产因子，再分层回测）
     "factor_lab_backtest.py",         # → data/FACTOR_LAB_BACKTEST.js（五分位分层·胜率/回撤/OOS）
+    "v8/backtest_crds.py",               # → data/CRDS_BACKTEST.js （逆势龙头回测；2026-09-09 挂链补登，此前零调度成孤儿 → 红灯 age 1447min）
     # 🛡 2026-09-07 修复：以下两脚本曾只挂 E 批 STAGES、漏挂 ORDER → 模块级自校验
     #   `_STAGE_UNION == set(ORDER)` 断言崩（仅STAGES有两脚本），盘后链启动即死、0 产出。
     #   此前被 V5 心跳闸门跳过链本体掩盖，2026-09-07 17:40 #1579 首次真跑暴露。
@@ -242,6 +244,7 @@ STAGES = {
         #   不会与链尾统一推送互踢（暴风根治前提不变）。
         "v8/factor_lab_gen.py",   # → data/FACTOR_LAB.js + raw_data/factor_lab.json（baostock，冷启动长）
         "factor_lab_backtest.py",   # 🆕 因子实验室分层回测（读 _rps_cache，依赖 B 批 calc_stock_rps）
+        "v8/backtest_crds.py",   # → data/CRDS_BACKTEST.js （逆势龙头回测；2026-09-09 挂链补登，此前仅存在于 v8/ 目录、STAGES/ORDER 均未挂 → 永远跑不到）
         # 2026-09-06 主人令：AI预测卡回测 INVALID → 下架，停跑 path_probability_backtest.py
         "strategy_four_volume.py",  # 四量终极回测模式（SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js，根治孤儿）
         # 🛡 2026-09-07 主人令「互踢/暴风/覆盖不想再看到·方案 B 一劳永逸根治」：

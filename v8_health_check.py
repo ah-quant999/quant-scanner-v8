@@ -1188,7 +1188,9 @@ def adjust_max_age(def_max, page=None):
         close = last_trade_day_close(n)
         hours_since_close = (n - close).total_seconds() / 3600
         if hours_since_close < 8:
-            return min(def_max, 360)
+            # 2026-09-09 一劳永逸：与盘后数据页同口径，仅对天然严格项(def_max<=360)收紧；
+            #   全量数据页多为低频/日频产物（all_* 通用红线 1440），被压到 360 会在收盘后 8h 内误报红。
+            return min(def_max, 360) if def_max <= 360 else def_max
         return int(hours_since_close * 60) + 180
 
     # ── 通用收紧：交易时段内实时数据必须很新 ──
