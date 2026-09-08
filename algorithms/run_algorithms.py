@@ -33,9 +33,7 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     "calc_stock_rps.py": 3600,   # 全 universe 逐只取 K 线，实测 30min 偶发不够
     "calc_crds.py": 2700,        # 逆势龙头 CRDS，同样遍历较广
     "gen_stock_profile.py": 2700,
-    "v8/backtest_crds.py": 2400,    # 逆势龙头 CRDS 回测：读 crds history + baostock 取 K 线回填收益
     "factor_lab_backtest.py": 1800,  # 🆕 700日长历史抓取+五分位分层回测（cn ~5min / 云端 ~15min）
-    "v8/factor_lab_gen.py": 5400,    # 🛡 2026-09-04 云端适配：全市场主板 baostock 逐只，冷启动 ~50-90min（缓存随 raw_data/flab_work 入仓逐晚收敛，热缓存后数分钟）
     # 🛡 2026-09-07 一劳永逸：H 反推对「全市场涨幅≥3%」的数百只逐只取前 4 日均量。
     #   原为串行逐只 HTTP（云端抓中国源必挂）→ 30min 被 kill → 产物文件写不出来
     #   → track 兜底读旧 H_AUTO_BUY.js → 前端卡冻结 3 天（09-05~09-07 事故）。
@@ -50,7 +48,6 @@ SCRIPT_TIMEOUT_OVERRIDE = {
     "fetch_lhb.py": 2400,                  # 逐股 ×2flag ×3attempt 东财 akshare
     "build_candidate_pool.py": 2400,       # missing[:200] 串行东财补全行业
     "fetch_sector_rs.py": 1800,            # ~90 同花顺板块串行
-    "v8/backtest_rps.py": 2400,            # 逐信号 baostock fetch_kline_around
     "calc_volatility_watch.py": 1800,      # 多源兜底，源慢时串行拉长
 }
 
@@ -117,15 +114,12 @@ ORDER = [
     "fetch_lhb.py",
     # 🛡 2026-08-20 一劳永逸：5 年长 K 线 fetcher 补入算法链（此前无任何调度方，
     #   且只写 out/ 不 bridge raw_data/ → INDEX_HISTORY 永不更新）。
-    "scripts/fetch_index_history.py",
     # 🛡 2026-08-29 主人令：补跑第二基准（中证1000 / 国证A指），判断 +6% excess 是 alpha 还是风格 beta。
-    "scripts/fetch_index_history_multi.py",
     "calc_crds.py",
     "build_candidate_pool.py",         # 读 guanlan/maharo 输入 → gold_pool / candidate_pool
     "calc_stock_rps.py",               # → data/STOCK_RPS.js（个股RPS+RS，读 candidate.json 做 universe）
     "generate_top10.py",               # 读 fundamental_quality / gold_pool → raw_data/top10_daily.json + raw_data/history/top10_daily_YYYYMMDD.json
     # 🛡 2026-08-29 主人令：A/B 对照（金股池/候选池/全市场同一信号收益），每日累积信号、T+N 后回填收益。
-    "scripts/ab_universe_backtest.py",
     "backtest_tdx.py",                 # 读 gold_pool 输入
     "backtest_comprehensive.py",       # 读 raw_data/history/top10_daily_YYYYMMDD.json（必须在 generate_top10 之后）
     "export_optimized_strategy.py",    # → raw_data/optimized_strategy.json（读 backtest_tdx.json 汇总优化策略效果）
@@ -157,7 +151,7 @@ ORDER = [
     #   - fetch_weekend_run.py → raw_data/weekend_run.json（周度运行汇总）
     "refresh_stock_metadata.py",
     "fetch_weekend_run.py",
-    "scripts/build_delisted.py",       # → data/DELISTED.js（已下架股票目录，从 raw_data/delisted_stocks.json 转换；护栏≤300条防污染）
+
     # 🛡 2026-08-19 一劳永逸式修复：H 反推算法从PDF OCR 脱离，反推代码 + 每日盘后自跑 + 跟踪回测。
     #   auto_run_dn_algorithm.py 默认 emit-js（写 data/H_AUTO_BUY.js）；
     #   track_h_auto_buy.py 默认 emit-js（写 data/H_AUTO_BUY_TRACK.js，写 raw_data/h_auto_buy_history.json）。
@@ -176,29 +170,27 @@ ORDER = [
     #   算法链从不调度 → 它是最终推荐 8 源里唯一「链外依赖」的一源，与强势突破不对称。
     #   现正式挂链（B 批，依赖 A 批 fetch_stock_quote_v8.py 产出的 STOCK_QUOTE，纯本地计算无重抓）。
     #   runner 无参调用 → 由 SCRIPT_ENV 注入 V8_MOMENTUM_EMIT_JS=1 触发 --emit-js 等价行为。
-    "scripts/momentum_common_filter.py",   # → data/MOMENTUM_FILTER.js（动量共识筛选·无未来函数版）
+
     #   杜绝「某选股还没跑完，推荐却已生成」的抢跑问题。
     #   🆕 2026-09-04 主人令：因子实验室(FACTOR_LAB.js)此前零调度成孤儿（运维红灯）——
     #      生成器 v8/factor_lab_gen.py 挂在 final_recommend 之前（final_recommend 方案B融合读它）。
-    "v8/factor_lab_gen.py",            # → data/FACTOR_LAB.js（异常换手率·重点池 + ROE 全市场主板）
+
     "final_recommend.py",              # → FINAL_RECOMMEND_DATA.js（跨策略共振 Top5，管线最终产物，置于末尾）
     #   前端策略回顾卡长期为空/陈旧）。统一挂链尾（依赖各自历史/截面数据已就位）。
     #   - rps：读 stock_rps 截面（RPS 为相对强度指标，非选股信号引擎，回测为截面有效性说明）
     #   三者失败均不影响选股结果，仅自身卡片可能不刷新。
-    "v8/backtest_crds.py",            # → data/CRDS_BACKTEST.js（逆势龙头 CRDS 真实历史回测）
+
     # 🆕 2026-09-04 主人令「都按你的建议做」：因子实验室独立分层回测（升4⭐证据链）
     "factor_lab_backtest.py",         # → data/FACTOR_LAB_BACKTEST.js（五分位分层·胜率/回撤/OOS）
     # 🛡 2026-09-07 修复：以下两脚本曾只挂 E 批 STAGES、漏挂 ORDER → 模块级自校验
     #   `_STAGE_UNION == set(ORDER)` 断言崩（仅STAGES有两脚本），盘后链启动即死、0 产出。
     #   此前被 V5 心跳闸门跳过链本体掩盖，2026-09-07 17:40 #1579 首次真跑暴露。
     "backtest_expectancy.py",         # → raw_data/backtest_expectancy.json（期望收益回测，与 E 批同位）
-    "v8/backtest_rps.py",             # → raw_data/rps_backtest.json（2026-09-06 主人令 RPS A档 30 天考核）
+
     # 🆕 2026-09-07 主人令「中信 PE 极值温度计 + 历史回测」双卡：fetcher 拉 sh.600030 PE/PB 时序
     # (raw_data/citic_pe_history.json) + 生成器产 data/CITIC_PE_THERMO.js + CITIC_PE_BACKTEST.js。
     # 同类纳入 E 回测批：baostock 数据源 + 夜间跑（不阻塞盘后 20:00 final_recommend）。
-    "v8/fetch_citic_pe.py",
-    "v8/gen_citic_pe.py",
-]
+    ]
 
 
 
@@ -212,10 +204,8 @@ STAGES = {
         "fetch_fundamental_quality.py", "fetch_stock_names.py", "gen_stock_profile.py",
         "fetch_stock_quote_v8.py", "fetch_sh_index_fib.py", "fetch_inst_trade.py",
         "fetch_sector_rs.py", "fetch_lhb.py",
-        "scripts/fetch_index_history.py", "scripts/fetch_index_history_multi.py",
         "fetch_orphan_suspension.py", "fetch_orphan_market_alerts.py",
-        "fetch_orphan_nt_data.py", "fetch_orphan_sector_fund_flow.py",
-    ],
+        "fetch_orphan_nt_data.py", "fetch_orphan_sector_fund_flow.py"],
     "B": [  # 选股批（~18:10 CST，盘后数据齐）：核心选股策略
         "calc_crds.py", "build_candidate_pool.py", "calc_stock_rps.py", "generate_top10.py",
         "strategy_four_volume_60m.py", "strategy_four_volume.py",
@@ -225,26 +215,21 @@ STAGES = {
         "gen_stock_stop.py", "gen_algo_track.py", "calc_sentiment_cycle.py",
         "refresh_dividend_cninfo.py",
         "refresh_stock_metadata.py", "fetch_weekend_run.py",   # 周末复盘/周度汇总（原 ORDER 漏挂 STAGE）
-        "scripts/build_delisted.py",       # 🆕 2026-09-08 挂链：已下架股票目录转换（依赖 refresh_stock_metadata 产出的 delisted_stocks.json）
+
         "auto_run_dn_algorithm.py", "strong_breakout.py", "track_h_auto_buy.py",
         # 2026-09-08 一劳永逸：gen_lhb_7d.py 此前只存在于 STOCK_PICKING_SCRIPTS 与 step 顺序表里，
         # 从未挂进 STAGES -> 分批模式（A/B/D/E）永远跑不到它，data/LHB_7D.js 卡在 09-04 的红灯根因。
         # 挂 B 批：依赖 A 批 fetch_lhb.py 产出的当日龙虎榜，属选股向汇总。
-        "gen_lhb_7d.py",
-        "scripts/momentum_common_filter.py",   # 🆕 2026-09-04 挂链：动量共识筛选（读 STOCK_QUOTE，纯本地）
-    ],
+        "gen_lhb_7d.py"],
     # 🛡 2026-09-04 主人令「策略全部数据出来→最终数据上线→然后才是回测」时序重排：
     #   原 C(回测 19:15) 在 D(final_recommend 20:00) 之前 → 回测汇总胶囊早于最终推荐，时序倒挂。
     #   现改为 A(16:40 采集) → B(18:10 选股) → D(20:00 汇总·最终推荐上线) → E(21:00 回测)。
     #   键名 C 退役；回测批内容原样迁入 E，另收编 strategy_four_volume.py（回测模式，SCRIPT_ENV 注入）。
     "E": [  # 回测批（~21:00 CST，最终推荐上线后）：backtest 全家 + 因子实验室生成（长任务，放夜间/21:00 后跑）
-        "scripts/ab_universe_backtest.py", "backtest_tdx.py", "backtest_comprehensive.py",
+        "backtest_tdx.py", "backtest_comprehensive.py",
         "backtest_expectancy.py",          # 🆕 期望收益回测：walk-forward 产出 raw_data/backtest_expectancy.json
         "export_optimized_strategy.py",   # 读 backtest_tdx.json 汇总优化策略（在 backtest_tdx 之后）
-        "v8/backtest_crds.py",   # 逆势龙头 回测（原 ORDER 漏挂 STAGE）
-        "v8/backtest_rps.py",   # 🆕 2026-09-06 主人令：RPS A档 30 天样本考核（读 history/stock_rps_* 日归档 → raw_data/rps_backtest.json；baostock 失败自动降级空回测不挂 CI）
-        "v8/fetch_citic_pe.py",   # 🆕 2026-09-07 主人令「中信 PE 极值温度计」：拉 sh.600030 PE/PB 时序到 raw_data/citic_pe_history.json（断点续跑：< 1s/日；首跑 16 年；baostock 失败自动降级空跑不挂 CI）
-        "v8/gen_citic_pe.py",   # 🆕 2026-09-07 生成器：raw_data/citic_pe_history.json → data/CITIC_PE_THERMO.js + data/CITIC_PE_BACKTEST.js（双卡纯前端直读，纯本地计算无网络）
+
         "factor_lab_backtest.py",   # 🆕 因子实验室分层回测（读 _rps_cache，依赖 B 批 calc_stock_rps）
         # 2026-09-06 主人令：AI预测卡回测 INVALID → 下架，停跑 path_probability_backtest.py
         "strategy_four_volume.py",  # 四量终极回测模式（SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js，根治孤儿）
@@ -255,12 +240,11 @@ STAGES = {
         #   FACTOR_LAB 停在 09-05 仍出 5 只），生成器根本不该绑在 final_recommend 关键路径上。
         #   现把生成器从 D 摘到 E 批（21:00 夜间跑，不阻塞盘后 20:00 出最终推荐），
         #   D 批瘦身至 final_recommend 单脚本 → 选股策略全部数据出来 30-40min 内出最终推荐。
-        "v8/factor_lab_gen.py",   # → data/FACTOR_LAB.js（夜间回测批跑，FAIL 也不阻塞 final_recommend）
+
     ],
     "D": [  # 汇总批（~20:00 CST，依赖全部）：仅 final_recommend（LHB历史/7d/生命周期/factor_lab_gen 全部前置到 E 批·互踢暴风根治）
         "final_recommend.py",   # 必需上游 = B 批产物（CRDS/TOP10/三重共识/crisis/sector_rs/stock_profile/triple_track）
-    ],
-}
+    ]}
 
 # 🛡 2026-09-04 主人令：回测批需要「选股脚本以回测模式运行」——runner 对所有脚本无参调用，
 #   故按脚本注入环境变量（strategy_four_volume.py 读 V8_BACKTEST_YEARS>0 时同时跑近 N 年回测
@@ -268,9 +252,6 @@ STAGES = {
 SCRIPT_ENV = {
     "strategy_four_volume.py": {"V8_BACKTEST_YEARS": "3"},
     "backtest_expectancy.py": {"V8_USE_BAOSTOCK": "1"},   # 🆕 runner 用 baostock 拉全量K线，产出新鲜回测
-    # 🆕 2026-09-04 挂链配套：动量共识筛选器需 --emit-js 才写 data/MOMENTUM_FILTER.js，
-    #   而 runner 对所有脚本无参调用 → 用环境变量触发（脚本内已支持，与 --emit-js 等价且幂等）。
-    "scripts/momentum_common_filter.py": {"V8_MOMENTUM_EMIT_JS": "1"},
 }
 # 自校验：STAGES 并集必须精确覆盖 ORDER（无遗漏/多余，保证分批模式不丢脚本）
 _STAGE_UNION = set()
@@ -384,7 +365,6 @@ STOCK_PICKING_SCRIPTS = {
     "calc_sentiment_cycle.py",       # 情绪周期（读 LIMIT_UP_HEATMAP）
     "auto_run_dn_algorithm.py",      # H 反推算法
     "strong_breakout.py",            # 强势突破选股（高手反推版，依赖当日 h_auto_buy 池）
-    "scripts/momentum_common_filter.py",  # 🆕 2026-09-04 挂链：动量共识筛选（读 STOCK_QUOTE 实时快照，属选股类，18:00 前禁跑）
     "track_h_auto_buy.py",           # H 反推跟踪
     "calc_volatility_watch.py",      # 波动率观察选股
     "gen_stock_stop.py",             # ATR 止损止盈（读候选宇宙日K）
@@ -395,13 +375,10 @@ STOCK_PICKING_SCRIPTS = {
 #   也禁止重算回测，防止用半日数据重算出「看起来新鲜」的假回测（今日 13:14 事故根因：
 #   STOCK_PICKING_SCRIPTS 门控漏掉回测批，盘中 force 链跳过选股但照跑回测并重刷 update_time）。
 BACKTEST_SCRIPTS = {
-    "scripts/ab_universe_backtest.py",
     "backtest_tdx.py",
     "backtest_comprehensive.py",
     "backtest_expectancy.py",
-    "export_optimized_strategy.py",
-    "v8/backtest_crds.py",
-}
+    "export_optimized_strategy.py"}
 # 18:00 = 所有盘后数据（龙虎榜/北向/板块资金/个股行情/机构调研等）稳定就绪时间
 _STOCK_PICKING_READY_HOUR, _STOCK_PICKING_READY_MIN = 18, 0
 # 次日凌晨补跑的截止时刻（CST）：过了这个点就属于新交易日的盘前，不再放行
