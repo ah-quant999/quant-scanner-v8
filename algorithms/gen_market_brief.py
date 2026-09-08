@@ -68,19 +68,26 @@ def _sentiment_signal(label):
 
 
 def classify_sentiment(sh_chg, up_down_ratio):
-    """情绪定级"""
-    if sh_chg >= 1.0 and up_down_ratio >= 2.0:
+    """情绪定级：涨跌家数比优先，沪指单点仅作微调
+    🛡 2026-09-08 一劳永逸修复：原逻辑只看沪指单点(>=0.5%才偏暖)，窄幅震荡市
+       (沪指日内<0.5%)每日落兜底'情绪震荡'→ 文字几天不变。现改为涨跌比优先。"""
+    r = up_down_ratio or 0
+    if r >= 2.0 and sh_chg >= 0.3:
         return "情绪高涨", "普涨格局，资金积极", "green"
-    if sh_chg >= 0.5 and up_down_ratio >= 1.5:
-        return "情绪偏暖", "结构性上涨，热点活跃", "green"
-    if sh_chg <= -1.5 and up_down_ratio <= 0.5:
+    if r >= 1.5 and sh_chg >= -0.3:
+        return "情绪偏暖", "涨多跌少，热点活跃", "green"
+    if r <= 0.5 and sh_chg <= -0.3:
         return "情绪冰点", "普跌格局，避险为主", "red"
-    if sh_chg <= -0.5 and up_down_ratio <= 0.8:
+    if r <= 0.7 and sh_chg <= 0.3:
         return "情绪偏冷", "跌多涨少，谨慎操作", "red"
-    if sh_chg >= 0.2 and up_down_ratio >= 1.0:
+    if r >= 1.0 and sh_chg >= 0.2:
         return "情绪温和", "震荡偏多，精选个股", "green"
-    if sh_chg <= -0.2 and up_down_ratio < 1.0:
+    if r < 1.0 and sh_chg <= -0.2:
         return "情绪谨慎", "震荡偏弱，控制仓位", "yellow"
+    if sh_chg >= 1.0:
+        return "情绪高涨", "普涨格局，资金积极", "green"
+    if sh_chg <= -1.5:
+        return "情绪冰点", "普跌格局，避险为主", "red"
     return "情绪震荡", "多空拉锯，观望为主", "yellow"
 
 
@@ -386,6 +393,9 @@ def build_strategy(sentiment_label, health, anomalies, indices, etf_daily, conce
     elif health["structure"][1] == "yellow" and health["emotion"][1] == "green":
         s = f"指数震荡但个股活跃，可轻指数重个股，聚焦{sector_str}，关注{pick_str}。"
         strategies.append({"text": s, "signal": "yellow"})
+    elif health["fund"][1] == "green" or health["emotion"][1] == "green":
+        s = f"指数方向不明但个股活跃、资金偏暖，可轻指数重个股，聚焦{sector_str}，关注{pick_str}，严格止损。"
+        strategies.append({"text": s, "signal": "yellow"})
     else:
         s = "当前市场方向不明或资金犹豫，建议保持观望或轻仓试错，严格止损纪律。"
         strategies.append({"text": s, "signal": "yellow"})
@@ -484,9 +494,16 @@ def main():
     sh_chg = sh.get("chg", 0)
     sentiment_label, sentiment_desc, sentiment_signal = classify_sentiment(sh_chg, up_down_ratio or 0)
 
-    # 主力净流入估算：真实概念排名前十净流入之和（亿）
-    real_items = real_concepts(concepts.get("items", [])) if concepts else []
-    main_net = sum(c.get("net", 0) for c in real_items[:10])
+    # 主力资金净额：优先用全市场主力净额 market_net；回退用个股主力前排净流入+净流出合计（含方向）
+    # 🛡 2026-09-08 一劳永逸修复：原 main_net=概念净流入前十之和，但 concept_ranking 仅含正净流入，
+    #    → 永远正大数、阈值100恒绿、资金灯失去区分度。改用真实双向主力净额。
+    market_net = capital.get("market_net") if capital else None
+    if market_net is not None:
+        main_net = market_net
+    else:
+        cap_in = sum(x.get("net", 0) for x in capital.get("top_inflow", [])[:20])
+        cap_out = sum(x.get("net", 0) for x in capital.get("top_outflow", [])[:20])
+        main_net = cap_in + cap_out
 
     # 健康度
     health = health_lights(indices, up_down_ratio, main_net)
