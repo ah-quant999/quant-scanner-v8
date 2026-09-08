@@ -1,13 +1,15 @@
 {
-"update_time": "2026-09-08 03:41:34",
-"total": 9620,
-"new_listings_count": 0,
+"update_time": "2026-09-08 15:49:12",
+"total": 9621,
+"new_listings_count": 1,
 "delisted_count": 0,
-"new_listings": [],
+"new_listings": [
+"09976 江波龙"
+],
 "delisted": [],
-"meta_enriched": 0,
+"meta_enriched": 1,
 "guard_tripped": false,
 "guard_reasons": [],
 "old_universe": 9620,
-"fresh_universe": 9620
+"fresh_universe": 9621
 }

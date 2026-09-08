@@ -1,30 +1,29 @@
 {
-  "update_time": "2026-09-08 12:33:16",
+  "update_time": "2026-09-08 15:55:54",
   "data_date": "2026-09-08",
   "source": "LIMIT_UP_HEATMAP",
   "phase": "退潮",
   "color": "#f97316",
-  "score": 85.0,
-  "delta_pct": -65.2,
+  "score": 80.0,
+  "delta_pct": -63.73,
   "advice": "⚠️ 情绪退潮中：高位股注意回撤，关注高低切换",
   "metrics": {
-    "total_up": 71,
-    "max_ladder": 7,
-    "high_ladder_count": 7,
+    "total_up": 74,
+    "max_ladder": 4,
+    "high_ladder_count": 6,
     "sectors_count": 15
   },
   "ladder_dist": {
-    "1": 50,
-    "2": 14,
+    "1": 55,
+    "2": 13,
     "3": 3,
-    "4": 3,
-    "7": 1
+    "4": 3
   },
   "leaders": [
     {
-      "code": "605577",
-      "name": "龙版传媒",
-      "lbc": 7,
+      "code": "002403",
+      "name": "爱仕达",
+      "lbc": 4,
       "chg": 9.99
     },
     {

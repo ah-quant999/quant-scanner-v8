@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-09-08 03:11:28",
+  "update_time": "2026-09-08 15:50:11",
   "universe": "重点池 A股（_rps_cache）",
   "cost_roundtrip": 0.002,
   "rebalance": "每10个交易日，入场=次日开盘",
   "abnormal_volume": {
     "n_points": 42,
     "point_dates": [
-      "2024-11-07",
+      "2024-11-08",
       "",
       "",
       "",
@@ -53,72 +53,72 @@
     "layers": {
       "1": {
         "n": 3536,
-        "avg_5d": 1.152,
-        "win_5d": 54.6,
-        "avg_10d": 2.557,
+        "avg_5d": 0.733,
+        "win_5d": 51.2,
+        "avg_10d": 2.535,
         "win_10d": 55.9,
-        "avg_20d": 4.899,
-        "win_20d": 58.5,
+        "avg_20d": 4.852,
+        "win_20d": 58.2,
         "nav_mdd_10d": -100.0,
-        "nav_total_10d": 2.1133407685802773e+31
+        "nav_total_10d": 5.837495406774102e+30
       },
       "2": {
-        "n": 3513,
-        "avg_5d": 0.98,
-        "win_5d": 51.0,
-        "avg_10d": 2.309,
-        "win_10d": 54.5,
-        "avg_20d": 5.41,
-        "win_20d": 57.4,
+        "n": 3514,
+        "avg_5d": 1.006,
+        "win_5d": 51.7,
+        "avg_10d": 2.497,
+        "win_10d": 54.3,
+        "avg_20d": 5.588,
+        "win_20d": 57.7,
         "nav_mdd_10d": -100.0,
-        "nav_total_10d": 2.045595212202908e+24
+        "nav_total_10d": 6.3337298525499155e+25
       },
       "3": {
-        "n": 3523,
-        "avg_5d": 1.056,
-        "win_5d": 50.5,
-        "avg_10d": 2.618,
-        "win_10d": 53.9,
-        "avg_20d": 4.856,
-        "win_20d": 55.3,
+        "n": 3522,
+        "avg_5d": 1.12,
+        "win_5d": 50.3,
+        "avg_10d": 2.807,
+        "win_10d": 53.4,
+        "avg_20d": 5.243,
+        "win_20d": 54.9,
         "nav_mdd_10d": -100.0,
-        "nav_total_10d": 5.609025493861761e+28
+        "nav_total_10d": 5.576130612761643e+30
       },
       "4": {
-        "n": 3513,
-        "avg_5d": 1.402,
-        "win_5d": 50.8,
-        "avg_10d": 2.936,
-        "win_10d": 53.3,
-        "avg_20d": 5.932,
-        "win_20d": 56.3,
+        "n": 3514,
+        "avg_5d": 1.047,
+        "win_5d": 49.6,
+        "avg_10d": 2.825,
+        "win_10d": 53.4,
+        "avg_20d": 5.754,
+        "win_20d": 55.9,
         "nav_mdd_10d": -100.0,
-        "nav_total_10d": 1.674404657350987e+31
+        "nav_total_10d": 5.635446117631974e+28
       },
       "5": {
         "n": 3502,
-        "avg_5d": 1.497,
-        "win_5d": 48.7,
-        "avg_10d": 3.282,
-        "win_10d": 51.3,
-        "avg_20d": 6.016,
-        "win_20d": 53.0,
+        "avg_5d": 1.466,
+        "win_5d": 49.7,
+        "avg_10d": 3.527,
+        "win_10d": 52.5,
+        "avg_20d": 6.315,
+        "win_20d": 53.2,
         "nav_mdd_10d": -100.0,
-        "nav_total_10d": 2.7430382920322774e+31
+        "nav_total_10d": 4.5545061153639914e+33
       }
     },
-    "spread_top_bottom_10d_pct": -0.721,
-    "spread_in_sample_pct": 0.124,
-    "spread_oos_pct": -1.66,
+    "spread_top_bottom_10d_pct": -0.977,
+    "spread_in_sample_pct": -0.151,
+    "spread_oos_pct": -1.894,
     "top_layer_win_10d": 55.9,
     "quarterly_stability": {
       "2024Q4": {
-        "avg_spread_10d": -1.697,
+        "avg_spread_10d": -1.75,
         "n": 1,
         "positive": false
       },
       "?": {
-        "avg_spread_10d": -0.703,
+        "avg_spread_10d": -0.963,
         "n": 41,
         "positive": false
       }
@@ -128,18 +128,18 @@
   },
   "roe_largecap": {
     "top30_n": 30,
-    "top30_avg_5d": 1.134,
-    "top30_win_5d": 52.4,
-    "univ_avg_5d": 1.219,
-    "excess_5d": -0.085,
-    "top30_avg_10d": 2.979,
-    "top30_win_10d": 57.6,
-    "univ_avg_10d": 2.733,
-    "excess_10d": 0.246,
-    "top30_avg_20d": 5.821,
-    "top30_win_20d": 61.3,
-    "univ_avg_20d": 5.41,
-    "excess_20d": 0.41,
+    "top30_avg_5d": 1.003,
+    "top30_win_5d": 51.2,
+    "univ_avg_5d": 1.075,
+    "excess_5d": -0.072,
+    "top30_avg_10d": 2.291,
+    "top30_win_10d": 53.8,
+    "univ_avg_10d": 2.851,
+    "excess_10d": -0.559,
+    "top30_avg_20d": 4.661,
+    "top30_win_20d": 56.4,
+    "univ_avg_20d": 5.57,
+    "excess_20d": -0.91,
     "methodology_limit": "当期 ROE 分组回看历史（隐含 ROE 排名持续性假设），证据强度弱于量比因子的 point-in-time 分层"
   }
 }
