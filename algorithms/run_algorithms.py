@@ -161,8 +161,7 @@ ORDER = [
     "strong_breakout.py",
     "track_h_auto_buy.py",
     # 🛡 2026-09-08 P0 修复：gen_lhb_7d.py 被 5920e4cba 加进 STAGES["B"] 却漏挂 ORDER，
-    #   导致模块级 assert(_STAGE_UNION == set(ORDER)) 崩盘 → 整个算法链 import 即挂（B/E 段全废，
-    #   连带 09-07 新挂的 v8/fetch_citic_pe.py + v8/gen_citic_pe.py 也跑不到）。
+    #   导致模块级 assert(_STAGE_UNION == set(ORDER)) 崩盘 → 整个算法链 import 即挂（B/E 段全废）。
     #   补挂 ORDER（与 STAGES["B"] 同位：track_h_auto_buy 之后、momentum_common_filter 之前）。
     "gen_lhb_7d.py",                   # → data/LHB_7D.js（龙虎榜 7 日累计，依赖 A 批 fetch_lhb.py）
     # 🛡 2026-09-04 主人令（一劳永逸挂链）：动量共识筛选器此前零调度成孤儿——
@@ -173,7 +172,7 @@ ORDER = [
 
     #   杜绝「某选股还没跑完，推荐却已生成」的抢跑问题。
     #   🆕 2026-09-04 主人令：因子实验室(FACTOR_LAB.js)此前零调度成孤儿（运维红灯）——
-    #      生成器 v8/factor_lab_gen.py 挂在 final_recommend 之前（final_recommend 方案B融合读它）。
+    #      生成器(factor_lab 生成器)挂在 final_recommend 之前（final_recommend 方案B融合读它）。
 
     "final_recommend.py",              # → FINAL_RECOMMEND_DATA.js（跨策略共振 Top5，管线最终产物，置于末尾）
     #   前端策略回顾卡长期为空/陈旧）。统一挂链尾（依赖各自历史/截面数据已就位）。
@@ -234,7 +233,7 @@ STAGES = {
         # 2026-09-06 主人令：AI预测卡回测 INVALID → 下架，停跑 path_probability_backtest.py
         "strategy_four_volume.py",  # 四量终极回测模式（SCRIPT_ENV 注入 V8_BACKTEST_YEARS=3 → 补写 FOUR_VOLUME_BACKTEST.js，根治孤儿）
         # 🛡 2026-09-07 主人令「互踢/暴风/覆盖不想再看到·方案 B 一劳永逸根治」：
-        #   原 D 批首脚本 v8/factor_lab_gen.py 冷启动 50-90min（注释自述），串行堵在
+        #   原 D 批首脚本(factor_lab 生成器)冷启动 50-90min（注释自述），串行堵在
         #   final_recommend 前 → 整批从理论 8min 拖到实测 35-90min。
         #   实测 final_recommend.py:559 对 FACTOR_LAB 缺失只 print warn 跳过（今晚
         #   FACTOR_LAB 停在 09-05 仍出 5 只），生成器根本不该绑在 final_recommend 关键路径上。
