@@ -1,6 +1,6 @@
 # 九宝量化 v8.0 - 禁止删除清单
 
-**最后更新**: 2026-08-01 22:42
+**最后更新**: 2026-09-08 11:30（阿狸咪暗灯审计跟进·DELISTED 重新挂链受保护 + verify_chain_consistency.py 收尾闸门）
 **维护人**: HH + AI助手
 **用途**: 防止误删核心资产，每次项目瘦身/清理前必须核对此清单
 **继承自**: v6 DO_NOT_DELETE.md（已验证 v6 2026-07-25 版本）
@@ -58,7 +58,7 @@
 > 🟢 🔴 **中信 PE 双卡保护段（2026-09-08 主人令，勿当孤儿误删）**：`v8/fetch_citic_pe.py` + `v8/gen_citic_pe.py` + `raw_data/citic_pe_history.json` + `raw_data/citic_pe_history.meta.json` + `data/CITIC_PE_THERMO.js` + `data/CITIC_PE_BACKTEST.js` 为完整活链（E 段算法链 21:00 每日调度 → 前端「暂未上架实验区最下方」双卡直读）。回测结论：PE<10 买入持有 250 日胜率 97.6%/均收益 +19.6%（4051 交易日样本）。当前 PE≈10.9（低估边缘）。**严禁删除任何一环**——删 fetcher 则断更，删 raw 则卡空，删 data/*.js 则卡片空白。
 > 🟢 豁免 `data/POTENTIAL_PICKS.js` + `raw_data/potential_picks.json` + `raw_data/history/potential_*.json` + `algorithms/calc_potential_picks.py`：已于 2026-09-06 主人令全链删除（卡下线、考核取消），云端残留允许清理，勿复活。
 > 🟢 豁免 `data/BLOAT_CHECK.js`：v8_bloat_check.py 已停生成（产物迁 .workbuddy/v8_bloat_report.json），全站0引用，允许删除（2026-08-29 轻量化收尾）。
-> 🟢 豁免 `data/DELISTED_STOCKS.js`：renderDelisted 已改读 raw_data/delisted_stocks.json，update_v8.py 已移除映射，全站0引用，允许删除（2026-08-29 轻量化收尾）。
+> 🔴 **`data/DELISTED_STOCKS.js` 已重新挂链·受保护（2026-09-08 阿狸咪暗灯审计修正）**：前端 `_renderV8StockLists()`（「暂未上架+已下架股票目录」卡，index.html:12432）实时消费 `window.DELISTED_STOCKS`；由 `scripts/build_delisted.py` 从 `raw_data/delisted_stocks.json` 生成，已挂回 `run_algorithms.py` ORDER/STAGES（暗灯1 修复）。**禁止删除**，旧「允许删除」豁免作废（原误判 renderDelisted 改读 raw_data，实际仍读 window.DELISTED_STOCKS，详见 2026-09-08 算法链一致性修复交接文档）。
 > 🟢 豁免 `data/MAHORO.js` + `algorithms/fetch_maharo_signals.py` + `.github/workflows/mahoro_refresh.yml` + `scripts/monitor_maharo_refresh.py`：mahoro 全链路引用/监控已移除（commit 7193a5b93），功能上等同删除，全站0引用，允许物理删除（2026-08-29 主人令：mahoro 孤儿清理）。
 > 🟢 豁免 `raw_data/kline_cache/*` + `raw_data/backtest_kline_cache/*` + `raw_data/_rps_cache/*` + `raw_data/_tdx_cache/*`：算法运行时行情缓存（RPS / K线 / TDX / 回测K线），纯本地加速用、可随时重建，`.gitignore` 已忽略（严禁入库）。2026-08-29 仓库瘦身：`git rm --cached` 移出版本跟踪，**本地文件全部保留**，仅删除库内副本，不删本地缓存、不影响任何算法运行。本条为通配符豁免，避免 `raw_data/*.json` 保护规则（其 `*` 跨 `/`）误伤缓存子目录。
 
@@ -133,6 +133,13 @@
 
 **注意**: 根目录下所有 `*.py` 脚本都是核心管线组件，**禁止批量删除**。
 
+**🛡 2026-09-08 阿狸咪暗灯审计·重新挂链脚本（原被误当孤儿清掉，现恢复为活链）**：
+
+| 文件路径 | 内容描述 | 禁止删除原因 |
+|---------|---------|------------|
+| `scripts/build_delisted.py` | 已下架股票目录生成器（raw_data/delisted_stocks.json → data/DELISTED_STOCKS.js） | **已挂回 `run_algorithms.py` ORDER/STAGES（暗灯1 修复）**；前端「暂未上架+已下架」卡实时消费，删除则卡片空白 + 算法链缺产物 |
+| `scripts/gen_lhb_7d.py` | 龙虎榜 7 日聚合生成器 | 阿狸咪 2026-09-08 修复漏挂 ORDER 的 P0（commit c54c5f44d），已挂链；缺失则 LHB 7日卡断更 |
+
 ---
 
 ## 🟠 应用层脚本 (scripts/) — 2026-08-29 Tier 1/2 升级新增
@@ -155,7 +162,8 @@
 | 目录/文件 | 内容描述 | 禁止删除原因 |
 |-----------|---------|------------|
 | `algorithms/run_algorithms.py` | 盘后算法链总控 | v8_algo_run.yml 唯一入口 |
-| `algorithms/*.py` (全部 22 个) | 选股/回测/龙虎榜/波动率等算法 | 算法链依赖，缺失则对应卡片冻结 |
+| `algorithms/*.py` (全部 23 个) | 选股/回测/龙虎榜/波动率等算法 | 算法链依赖，缺失则对应卡片冻结 |
+| `algorithms/verify_chain_consistency.py` | **2026-09-08 新增·一劳永逸（C收敛版）**：算法链结构一致性机器校验（ORDER↔STAGES 双表一致 / 孤儿脚本 / 数据断链 / 映射悬空），挂 `v8_algo_cloud.yml` 收尾硬性闸门 | 防漏挂/断链类暗灯再悄悄上线，缺失则失去结构性护栏 |
 | `algorithms/stage_to_raw.py` | 算法输出 → raw_data 格式转换 | run_algorithms.py 调用 |
 
 **注意**: `algorithms/data/` 和 `algorithms/out/` 已在 .gitignore 中，可随时重建。
