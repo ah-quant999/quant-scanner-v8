@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "9a40f518a";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "89f61d8c9";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -530,7 +530,7 @@ window.__domReadyFns=[];
 <script src="data/CONCEPT_RANKING.js?v=6db49f7bb5" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/INDEX_QUOTES.js?v=c368c441c2" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=30c7e0ae16" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=2319a346ae" defer></script>
 <script src="data/MARGIN_DATA.js?v=3d4c21c843" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=4cf35c325b" defer></script>
 <script src="data/IPO_DATA.js?v=1e3b190199" defer></script>
@@ -1563,18 +1563,18 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/RESTRICTED_RELEASE.js?v=23eb01a5d3" defer></script>
 <script src="data/PERFORMANCE_FORECAST.js?v=31d598d684" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
-<script src="data/RUNNER_STATUS.js?v=04c7b30ca1" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=cf643b647c" defer></script>
-<script src="data/HEALTH_CHECK.js?v=2877dbbea1" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=c39c62c057" defer></script>
+<script src="data/RUNNER_STATUS.js?v=308cb92805" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=4241c04643" defer></script>
+<script src="data/HEALTH_CHECK.js?v=ffcbffa316" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=8a69b71cbe" defer></script>
     <!-- 2026-09-07 主人令：中信 PE 极值温度计 + PE<10 历史回测 双卡（暂未上架·实验区最下方） -->
     <script src="data/CITIC_PE_THERMO.js?v=4399f6fc6c" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=8e563f812e" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=2f5c2ad25e" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=aeae966712" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
-    <script src="data/STOCK_MOMENTUM_STATE.js?v=b3c2513b2b" defer></script>
-    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=3b95f46622" defer></script>
-    <script src="data/MOMENTUM_FILTER.js?v=91d9e990c8" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE.js?v=37029451c3" defer></script>
+    <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=382c5dcf73" defer></script>
+    <script src="data/MOMENTUM_FILTER.js?v=02e710edc1" defer></script>
     <!-- 2026-09-02 主人令：策略回顾统一收纳全部算法回测，新增四量/全站/CRDS/RPS 回测注入 -->
     <script src="data/FOUR_VOLUME_BACKTEST.js?v=4461f11a37" defer></script>
     <!-- 2026-09-04 主人令收尾：ALLSITE_BACKTEST.js 注入已删（生成器/raw_data 已于 09-03「干掉全站精选」系列删除，前端无任何代码读 window.ALLSITE_BACKTEST，标签纯 404 噪音） -->
@@ -11234,7 +11234,7 @@ window.showRestrictedItems = showRestrictedItems;
       }
       el.dataset.smsLoading='1';
       var _smsScript=document.createElement('script');
-      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=b3c2513b2b';
+      _smsScript.src='data/STOCK_MOMENTUM_STATE.js?v=37029451c3';
       _smsScript.onload=function(){ el.dataset.smsLoading=''; window.renderUnlisted(); };
       _smsScript.onerror=function(){ el.dataset.smsLoading=''; el.dataset.smsFailed='1'; window.renderUnlisted(); };
       document.head.appendChild(_smsScript);
@@ -11243,7 +11243,7 @@ window.showRestrictedItems = showRestrictedItems;
     // 🚀 V2 增强数据自愈（K线验证分析）
     if(window.STOCK_MOMENTUM_STATE && !window.STOCK_MOMENTUM_ENHANCED && !el.dataset.smeFailed){
       var _smeScript=document.createElement('script');
-      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=3b95f46622';
+      _smeScript.src='data/STOCK_MOMENTUM_STATE_V2.js?v=382c5dcf73';
       _smeScript.onload=function(){ window.renderUnlisted(); };
       _smeScript.onerror=function(){ el.dataset.smeFailed='1'; };  // V2 缺失不阻塞基础卡
       document.head.appendChild(_smeScript);
@@ -13224,7 +13224,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }
   var seen=(function(){ try{ var h=window.HEALTH_CHECK||{}; return h.update_time||h.updated_at||h.updated||h.last_update||''; }catch(e){ return ''; } })();
   function _check(){
-    var url = _scriptUrl('data/HEALTH_CHECK.js?v=2877dbbea1') + '_ts=' + Date.now();
+    var url = _scriptUrl('data/HEALTH_CHECK.js?v=ffcbffa316') + '_ts=' + Date.now();
     fetch(url,{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var remote=_pickTs(t);
       if(remote){
