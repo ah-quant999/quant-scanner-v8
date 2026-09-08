@@ -384,27 +384,54 @@ def main():
     except Exception as e:
         log("?v 更新失败", e)
 
-    # ===== 同一进程内原子提交推送 =====
-    rc, o = git("add", "index.html", "data/FACTOR_LAB.js", "raw_data/factor_lab.json")
-    log("git add rc=", rc)
-    if rc != 0:
-        log("git add 失败", o[-300:]); bs.logout(); return
-    rc, o = git("commit", "-m",
-        "chore(v8): 因子实验室定时刷新(异常换手率重点池 + ROE全市场主板)")
-    log("git commit rc=", rc, (o[-400:] if o else ""))
-    rc, o = git("fetch", "origin", "main")
-    log("git fetch rc=", rc)
-    rc, o = git("rebase", "FETCH_HEAD")
-    if rc != 0:
-        log("rebase 失败 -> abort"); git("rebase", "--abort")
-    else:
-        log("rebase ok")
-    rc, o = git("push", "origin", "HEAD:refs/heads/main")
-    log("git push rc=", rc, (o[-500:] if o else ""))
-    rc, o = git("ls-remote", "origin", "main")
-    log("ls-remote main =>", (o.strip() if o else "NONE"))
+    # 🛡 2026-09-08 一劳永逸：本地工作树若存在未提交/未跟踪文件（如 AUDIT_*.md、
+    #   update_v8.py CRLF 噪声），会导致 rebase 失败 → push abort，数据算好却上不了线。
+    #   修复：推送前先把当前工作树整体 stash（含未跟踪），强同步到 origin/main，
+    #   再恢复 stash，最后只提交目标文件并推送。push 失败时自动重试一次。
+    def _push_with_clean_tree(max_retries=2):
+        for attempt in range(1, max_retries + 1):
+            log("推送尝试", attempt)
+            # 1) 保存工作树（含未跟踪），避免 rebase 被脏树阻挡
+            rc, o = git("stash", "push", "--include-untracked", "-m", "factor_lab auto-stash before push")
+            stash_created = (rc == 0) or ("Saved" in (o or ""))
+            log("stash created=", stash_created, o.strip()[-100:] if o else "")
+            # 2) 强同步到远端最新 main
+            rc, o = git("fetch", "origin", "main")
+            log("fetch rc=", rc)
+            rc, o = git("reset", "--hard", "FETCH_HEAD")
+            log("reset --hard FETCH_HEAD rc=", rc, (o[-200:] if o else ""))
+            # 3) 恢复 stash；若冲突，优先保留 stash（ours）版本
+            if stash_created:
+                rc, o = git("stash", "pop")
+                if rc != 0:
+                    log("stash pop 冲突 -> 强制恢复 stash 版本", o[-300:] if o else "")
+                    git("checkout", "--theirs", ".")
+                    git("add", ".")
+            # 4) 提交目标文件
+            rc, o = git("add", "index.html", "data/FACTOR_LAB.js", "raw_data/factor_lab.json")
+            log("git add rc=", rc)
+            if rc != 0:
+                log("git add 失败", o[-300:] if o else "")
+                if attempt < max_retries:
+                    continue
+                bs.logout(); return False
+            rc, o = git("commit", "-m",
+                "chore(v8): 因子实验室定时刷新(异常换手率重点池 + ROE全市场主板)")
+            log("git commit rc=", rc, (o[-400:] if o else ""))
+            # 5) 推送
+            rc, o = git("push", "origin", "HEAD:refs/heads/main")
+            log("git push rc=", rc, (o[-500:] if o else ""))
+            if rc == 0:
+                rc, o = git("ls-remote", "origin", "main")
+                log("ls-remote main =>", (o.strip() if o else "NONE"))
+                return True
+            # 6) 失败时清理本地 commit，准备重试
+            log("push 失败，清理并重试"); git("reset", "--hard", "FETCH_HEAD")
+        return False
+
+    ok = _push_with_clean_tree()
     bs.logout()
-    log("DONE")
+    log("DONE", "success" if ok else "FAILED_PUSH")
 
 if __name__ == "__main__":
     main()

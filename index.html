@@ -9534,7 +9534,13 @@ function drawUpDownChart(){
       if (fs.check_time) cands.push(fs.check_time);
     } catch (e) {}
     const liveUpdated = cands.length ? cands.sort().pop() : nowStr;
-    if(timeEl) timeEl.innerHTML = _uBadge('实时','—', liveUpdated);
+    const liveUpdatedDate = parseTs(liveUpdated);
+    const staleMin = liveUpdatedDate ? Math.floor((new Date() - liveUpdatedDate) / 60000) : 0;
+    const isStale = staleMin > 30;
+    if(timeEl) {
+      timeEl.innerHTML = _uBadge('实时','—', liveUpdated) +
+        (isStale ? ' <span title="页面数据陈旧：最新 '+liveUpdated+'，请 Ctrl+F5 硬刷新（或点击此处）" style="display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:rgba(239,68,68,.14);color:#f87171;border:1px solid rgba(239,68,68,.38);cursor:pointer;white-space:nowrap" onclick="location.reload(true)">⚠️ 已停更 '+staleMin+' 分钟</span>' : '');
+    }
 
     const now = new Date();
 
@@ -13312,7 +13318,8 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }
   var seen=(function(){ try{ var h=window.HEALTH_CHECK||{}; return h.update_time||h.updated_at||h.updated||h.last_update||''; }catch(e){ return ''; } })();
   function _check(){
-    fetch(_scriptUrl('data/HEALTH_CHECK.js?v=18e9c44cfa')+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
+    var url = _scriptUrl('data/HEALTH_CHECK.js') + '_ts=' + Date.now();
+    fetch(url,{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var remote=_pickTs(t);
       if(remote){
         if(seen && remote!==seen){
