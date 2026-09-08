@@ -264,26 +264,33 @@ def fetch_news_signals(a_codes):
     return signals
 
 
-def build_universe():
+def build_universe(max_codes: int = 500):
     """取 candidate_pool + gold_pool 并集
     🔴 2026-08-12 修复：stage_to_raw 的 V6_TO_V8 映射自 08-04 起把
     out/candidate_pool.json 改名搬运为 raw_data/candidate.json，raw_data 下
     不存在 candidate_pool.json → universe 只剩 gold_pool（全港股）→
     基本面 A 股全空 → 三重共识/TOP10 quality 分连续 8 天失效。
-    现改为 candidate_pool.json 优先、candidate.json 兜底。"""
+    现改为 candidate_pool.json 优先、candidate.json 兜底。
+    🛡 2026-09-08 加 max_codes 护栏：候选池缺失 fallback 到全量 stock_names 时，
+       全量 5000+ 只串行查 Baostock 会产生网络风暴；超过阈值则截断并告警，保留核心标的。"""
     codes = set()
     for fn in ("candidate_pool.json", "candidate.json", "gold_pool.json"):
         p = os.path.join(DATA_DIR, fn)
         d = load_json(p)
         codes.update(d.get("stocks", {}).keys())
+    source = "candidate_pool/gold_pool"
     if not codes:
-        # 全量股票名
+        source = "stock_names fallback"
         sn = load_json(STOCK_NAMES, [])
         for s in sn:
             fc = s.get("full_code", "")
             if fc.startswith(("sh", "sz")) and s.get("code"):
                 codes.add(s["code"])
-    return sorted(codes)
+    codes = sorted(codes)
+    if len(codes) > max_codes:
+        log(f"  ⚠️ universe 过大({len(codes)} > {max_codes})，按{source}截断前 {max_codes} 只，防止 ROE 串行网络风暴")
+        codes = codes[:max_codes]
+    return codes
 
 
 def build_name_map():
