@@ -48,6 +48,16 @@ def _is_trading_day(d) -> bool:
     return True
 
 
+def _is_market_open(now) -> bool:
+    """判断当前是否处于 A 股连续竞价时段（09:30-11:30 / 13:00-15:00，北京时间）。
+    盘前(09:00-09:30)/午休(11:30-13:00)/盘后(15:00-16:30)及非交易日，STOCK_QUOTE 本就不刷新，
+    不应判陈旧、也不应自愈派发（避免收盘后误报风暴 + 冗余派发）。"""
+    if not _is_trading_day(now.date()):
+        return False
+    hm = now.hour * 60 + now.minute
+    return (9 * 60 + 30 <= hm <= 11 * 60 + 30) or (13 * 60 <= hm <= 15 * 60)
+
+
 def trading_days_between(start_date, end_date) -> int:
     """两个日期之间经过的交易日数（含两端；周末/节假日扣除；补班日计入）。
 
@@ -513,6 +523,11 @@ def main():
     algo_stale, algo_notime = check_group(CORE_SOURCES_ALGO, close, "CORE_ALGO", is_trading, token=token, use_cloud=True)
     core_stale += algo_stale
     core_notime += algo_notime
+    # 🛡 2026-09-08 盘中更新审计：STOCK_QUOTE 仅连续竞价时段(09:30-11:30/13:00-15:00)才刷新，
+    # 盘前/午休/盘后及非交易日本就冻结 → 仅交易时段判定陈旧，避免收盘后误报 + 冗余自愈派发。
+    if not _is_market_open(now):
+        core_stale = [(v, r) for (v, r) in core_stale if v != "STOCK_QUOTE"]
+        core_notime = [v for v in core_notime if v != "STOCK_QUOTE"]
     warn_stale, warn_notime = check_group(WARN_SOURCES, close, "WARN", is_trading)
     frozen_stale, frozen_notime = check_group(FROZEN_SOURCES, close, "FROZEN", is_trading)
 
