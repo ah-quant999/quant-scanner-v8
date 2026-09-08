@@ -278,7 +278,7 @@ def main():
     # 缓存也不落盘 -> 下一轮又从 0 开始，永不收敛（FACTOR_LAB 常年 2-3 天前红灯的真根因）。
     # 改法：每轮最多新取 BUDGET 只（已缓存且当季的自动跳过、不计入），到预算即停，
     # 必定在时限内 save_cache 落盘 + 产出 FACTOR_LAB.js，逐晚增量收敛到全量。
-    BUDGET = int(os.environ.get("V8_FLAB_BUDGET", "1500"))
+    BUDGET = int(os.environ.get("V8_FLAB_BUDGET", "800"))
     n_new = 0
     for i, code in enumerate(mcodes):
         if n_new >= BUDGET:
