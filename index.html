@@ -13335,6 +13335,33 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
 })();
 </script>
 
+<!-- 2026-09-08 主人令：智能时段整页硬刷新兜底（与上方「数据变化即刷新」自愈互补）。
+     规则：① 交易日开盘时段 09:30-15:00 → 每 15 分钟；② 非开盘（盘后/午休/周末）→ 每 1 小时；
+           ③ 夜间 22:00-次日 07:00 → 不刷新。location.reload(true) 强制绕过所有缓存。 -->
+<script>
+(function(){
+  if(window.__v8SmartRefresh) return;
+  window.__v8SmartRefresh = true;
+  var last = Date.now();
+  function _refreshIvMs(){
+    var d = new Date(), h = d.getHours(), m = d.getMinutes(), day = d.getDay();
+    var t = h * 60 + m;
+    if(t >= 22 * 60 || t < 7 * 60) return Infinity;            // 夜间不刷新
+    var isWeekday = (day >= 1 && day <= 5);
+    if(isWeekday && t >= 9 * 60 + 30 && t < 15 * 60) return 15 * 60 * 1000; // 开盘 15 分
+    return 60 * 60 * 1000;                                     // 其余 1 小时
+  }
+  setInterval(function(){
+    var iv = _refreshIvMs();
+    if(iv === Infinity) return;
+    if(Date.now() - last >= iv){
+      last = Date.now();
+      try{ location.reload(true); }catch(e){}
+    }
+  }, 60 * 1000);
+})();
+</script>
+
 <!-- ===== 独立脚本：V8_CAL 日历 + 今日事件（确保执行） ===== -->
 <script>
 /* 完整周历渲染（兜底重绘：defer 数据脚本执行后由 DOMContentLoaded 再次触发） */
@@ -14011,7 +14038,7 @@ window.__renderV8CalToday();
     // 🛡 2026-08-31 一劳永逸：STOCK_PROFILE.js(1.4MB) 与 STOCK_LIST 的 industry/concepts
     //   实测 9602 条【零差异】、且 45.9% 为空值 → 停止单独下载，改由 STOCK_LIST 到位后就地
     //   合成 window.STOCK_PROFILE，前端引用点(819/5979 行)零改动。省 1.4 MB 下载。
-    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=2fc2b432ec'},
+    {name:'STOCK_QUOTE',   url:'data/STOCK_QUOTE.js?v=1a90d43405'},
     {name:'LHB_HISTORY',   url:'data/LHB_HISTORY.js?v=47e9f8aafa'}
   ];
   function loadOne(item, done){
