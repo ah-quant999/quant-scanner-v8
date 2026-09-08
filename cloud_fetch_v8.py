@@ -3097,7 +3097,9 @@ def _clear_intraday_for_premarket(category, only=None):
     #   盘前一旦被清成 stub，累积史即全毁（实测 history_days 恒为 1 的直接原因）。
     # 2026-09-01：SECTOR_FUND_FLOW_INTRADAY 盘前不清空；次日 09:25 前保留上一交易日全天快照，
     #   开盘后由 intraday_snapshot.py 自然覆盖为当日数据（符合「第二天开盘前才清空」）。
-    KEEP_VARS = {"SH_SZ_HISTORY", "CAPITAL_FLOW_DATA", "LIMIT_UP_HEATMAP", "ETF_DAILY_MONITOR", "CONCEPT_RANKING", "CFFEX_HOLDINGS", "AVG_PRICE_DATA", "SECTOR_FUND_FLOW_INTRADAY"}
+    # 2026-09-08：MACRO_DATA 加入保留名单——LPR/M2/CPI/PMI/中美利差/汇率/商品为日级/月级宏观
+    #   指标，与开盘无关，此前因 CATEGORY_MAP 含 intraday 被盘前清成「暂不可用」（第 4 次同类误伤）。
+    KEEP_VARS = {"SH_SZ_HISTORY", "CAPITAL_FLOW_DATA", "LIMIT_UP_HEATMAP", "ETF_DAILY_MONITOR", "CONCEPT_RANKING", "CFFEX_HOLDINGS", "AVG_PRICE_DATA", "SECTOR_FUND_FLOW_INTRADAY", "MACRO_DATA"}
 
     for var, cat in CATEGORY_MAP.items():
         if "intraday" not in [x.strip() for x in cat.split(",")]:
@@ -3198,6 +3200,15 @@ def _clear_intraday_for_premarket(category, only=None):
     data["premarket_cleared"] = True
     data["note"] = "盘前主力净流入为上一交易日收盘值，开盘后自动刷新"
     save("CAPITAL_FLOW_DATA", data)
+
+    # MACRO_DATA：2026-09-08 一劳永逸（主人质询「放盘后数据，为啥盘前会清空」）。宏观为日级/月级
+    #   数据，盘前保留上一交易日值并打标记（有真实内容才写，避免把 stub 又存回去），开盘后批次自然刷新。
+    data = _load_judgment_raw("MACRO_DATA", VAR_TO_RAW.get("MACRO_DATA")) or {}
+    if data.get("monetary") or data.get("cpi") or data.get("pmi"):
+        data.pop("no_data", None)
+        data["premarket_cleared"] = True
+        data["note"] = "宏观为日级/月级数据，盘前保留上一交易日值，开盘后自动刷新"
+        save("MACRO_DATA", data)
 
     print(f"🧹 盘前清空完成（保留 SH_SZ_HISTORY/CAPITAL_FLOW_DATA/LIMIT_UP_HEATMAP/ETF_DAILY_MONITOR）")
 
