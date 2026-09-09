@@ -14,9 +14,10 @@
 name: "🐕 v8 数据抓取看门狗(云端自愈)"
 
 on:
-  schedule:
-    # 交易日 08:00-21:30 CST 每 30 分（UTC 00:00-13:30）。覆盖盘前/盘中/盘后+晚间全窗口。
-    - cron: '*/30 0-13 * * 1-5'
+  # 🔴 2026-09-09 盘中更新审计·一劳永逸：移除 GitHub schedule cron。
+  #    根因：GitHub schedule 在高负载时被整段静默漏触发（实测 2026-09-01 全天 0 次），单靠
+  #    workflow 内置 cron 不可靠。改由 WorkBuddy 自动化「v8 看门狗驱动(每15分)」(id=2d9121c8)
+  #    用 workflow_dispatch 主动触发本看门狗，彻底去 schedule 依赖（与云端 cron 静默丢失解耦）。
   workflow_dispatch:
     inputs:
       force_category:
