@@ -15,7 +15,7 @@ html>
 // 只要不一致（说明部署了新版本），强制带 ?nocache=1 刷新一次，彻底免疫跨版本旧缓存。
 (function(){
   try{
-    var BUILD = "db70eda1c";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
+    var BUILD = "d53b1805b";   // 由 v8_build_deploy.yml 注入当前 commit 短 SHA（占位值与远端 main 对齐，CI 构建时替换为实际部署 SHA）
     // ✅ 2026-08-28 一劳永逸：BUILD 原为 IIFE 内局部变量，页面其它脚本无法读取，
     //    导致运维页「部署 SHA」恒为 "--"。此处显式挂到 window 供运维页等复用。
     window.V8_BUILD_SHA = BUILD;
@@ -530,7 +530,7 @@ window.__domReadyFns=[];
 <script src="data/CONCEPT_RANKING.js?v=cb43252d10" defer></script>
 <!-- 2026-09-02 08:57 主人令：恢复 3 卡到「暂未上架」平铺（renderUnlisted 已重建 body+fill）；此处恢复对应数据注入（数据文件 main 上确实存在） -->
 <script src="data/INDEX_QUOTES.js?v=185ac2ea09" defer></script>
-<script src="data/AI_MARKET_BRIEF.js?v=3ac21fc99e" defer></script>
+<script src="data/AI_MARKET_BRIEF.js?v=5fa9a99eb0" defer></script>
 <script src="data/MARGIN_DATA.js?v=9dd4a2c776" defer></script>
 <script src="data/CFFEX_HOLDINGS.js?v=08160409d0" defer></script>
 <script src="data/IPO_DATA.js?v=9173c36477" defer></script>
@@ -1604,13 +1604,13 @@ window._buildJudgmentEnvHTML = _buildJudgmentEnvHTML;
 <script src="data/PERFORMANCE_FORECAST.js?v=9138921563" defer></script>
 <!-- 2026-08-31 轻量化：data/CANDIDATE_QUOTES.js（31.5 KB）前端零引用，停止注入（省 31.5 KB） -->
 <script src="data/RUNNER_STATUS.js?v=579d04a2ab" defer></script>
-    <script src="data/AUDIT_TRAIL.js?v=a42911b374" defer></script>
-<script src="data/HEALTH_CHECK.js?v=f5d51adf59" defer></script>
-    <script src="data/COMMODITY_ELASTICITY.js?v=58532b3625" defer></script>
+    <script src="data/AUDIT_TRAIL.js?v=e8b9b15702" defer></script>
+<script src="data/HEALTH_CHECK.js?v=9388ac6d59" defer></script>
+    <script src="data/COMMODITY_ELASTICITY.js?v=417fe4b19d" defer></script>
     <!-- 2026-09-07 主人令：中信 PE 极值温度计 + PE<10 历史回测 双卡（暂未上架·实验区最下方） -->
     <script src="data/CITIC_PE_THERMO.js?v=f33cb17c29" defer></script>
     <script src="data/CITIC_PE_BACKTEST.js?v=8a8894a3b0" defer></script>
-    <script src="data/SENTIMENT_CYCLE.js?v=bacf500c17" defer></script>
+    <script src="data/SENTIMENT_CYCLE.js?v=bd1f09d523" defer></script>
     <!-- 2026-08-31 轻量化：data/INDEX_HISTORY.js（91.2 KB）前端零引用，停止注入（省 91.2 KB） -->
     <script src="data/STOCK_MOMENTUM_STATE.js?v=4e5a1f8878" defer></script>
     <script src="data/STOCK_MOMENTUM_STATE_V2.js?v=31d3ebc334" defer></script>
@@ -13210,7 +13210,7 @@ try{/* 已合并到 v8TodayAll 统一渲染器 */}catch(e){}
   }
   var seen=(function(){ try{ var h=window.HEALTH_CHECK||{}; return h.update_time||h.updated_at||h.updated||h.last_update||''; }catch(e){ return ''; } })();
   function _check(){
-    var url = _scriptUrl('data/HEALTH_CHECK.js?v=f5d51adf59') + '_ts=' + Date.now();
+    var url = _scriptUrl('data/HEALTH_CHECK.js?v=9388ac6d59') + '_ts=' + Date.now();
     fetch(url,{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){
       var remote=_pickTs(t);
       if(remote){
