@@ -1,12 +1,12 @@
 {
-  "update_time": "2026-09-09 20:06:11",
+  "update_time": "2026-09-09 21:02:10",
   "source": "akshare fund_etf_spot_em (东方财富)",
   "metric": "净流入(亿元) + 规模(亿元)",
   "categories": {
     "stock": {
       "name": "股票型",
-      "net_amount_yi": -29.69604034,
-      "scale_yi": 29566.917288300003,
+      "net_amount_yi": -29.696040339999985,
+      "scale_yi": 29548.74832241002,
       "n_funds": 1307,
       "top5": [
         {
@@ -30,7 +30,7 @@
         {
           "code": "588000",
           "name": "科创50ETF华夏",
-          "scale_yi": 899.98,
+          "scale_yi": 894.56,
           "net_amount_yi": -5.4242
         },
         {
@@ -51,13 +51,13 @@
     "money": {
       "name": "货币型",
       "net_amount_yi": 0.43251543,
-      "scale_yi": 553.6365596300002,
+      "scale_yi": 552.8204714,
       "n_funds": 50,
       "top5": [
         {
           "code": "159201",
           "name": "自由现金流ETF华夏",
-          "scale_yi": 162.78,
+          "scale_yi": 162.39,
           "net_amount_yi": 0.3015
         },
         {
@@ -75,21 +75,21 @@
         {
           "code": "159001",
           "name": "货币ETF易方达",
-          "scale_yi": 32.87,
+          "scale_yi": 32.5,
           "net_amount_yi": -0.0118
         },
         {
           "code": "563390",
           "name": "全指现金流ETF华泰柏瑞",
-          "scale_yi": 26.43,
+          "scale_yi": 26.41,
           "net_amount_yi": 0.0102
         }
       ]
     },
     "commodity": {
       "name": "商品型",
-      "net_amount_yi": -0.6693188300000001,
-      "scale_yi": 3570.94223532,
+      "net_amount_yi": -0.6693188300000004,
+      "scale_yi": 3571.1164830199996,
       "n_funds": 55,
       "top5": [
         {
@@ -119,7 +119,7 @@
         {
           "code": "512400",
           "name": "XD有色金属ETF南方",
-          "scale_yi": 265.92,
+          "scale_yi": 266.23,
           "net_amount_yi": -0.0069
         }
       ]
@@ -127,13 +127,13 @@
     "cross_border": {
       "name": "跨境型",
       "net_amount_yi": -11.164729899999998,
-      "scale_yi": 6063.743240740003,
+      "scale_yi": 6065.641681870002,
       "n_funds": 192,
       "top5": [
         {
           "code": "513180",
           "name": "恒生科技ETF华夏",
-          "scale_yi": 388.77,
+          "scale_yi": 388.65,
           "net_amount_yi": -1.2529
         },
         {
@@ -145,7 +145,7 @@
         {
           "code": "513050",
           "name": "中概互联网ETF易方达",
-          "scale_yi": 355.9,
+          "scale_yi": 355.74,
           "net_amount_yi": -1.6347
         },
         {
@@ -157,7 +157,7 @@
         {
           "code": "513130",
           "name": "恒生科技ETF华泰柏瑞",
-          "scale_yi": 316.7,
+          "scale_yi": 317.37,
           "net_amount_yi": -1.3925
         }
       ]
