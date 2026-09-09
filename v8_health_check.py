@@ -101,7 +101,7 @@ CARD_DEFS = [
     # 🛡 2026-09-04 主人令一劳永逸：孤儿文件转正——此前无生成调度（all_ 动态扫描按通用 1440 红线误报 fail）。
     #   FACTOR_LAB 由 v8/factor_lab_gen.py 挂 STAGES[B] 产出；FOUR_VOLUME_BACKTEST 由 strategy_four_volume.py
     #   在回测批（STAGES[E]，注入 V8_BACKTEST_YEARS）产出。登记后走运维卡区正式判定，all_ 扫描跳过。
-    {"id": "FACTOR_LAB", "name": "因子实验室", "page": "盘后数据", "freq": "每日盘后(挂链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run"},
+    {"id": "FACTOR_LAB", "name": "因子实验室", "page": "盘后数据", "freq": "每日盘后(挂链)", "max_age": 1440, "key_fields": ["update_time"], "heal_cat": "algo_run", "manual_dep": True, "manual_note": "本机baostock被风控黑名单(err=10001011匿名用户)，无替代数据源，需小九中国IP+浏览器UA在线刷全市场3200只财务+ROE+异常换手。本机无法产出，保留旧数据待小九。"},
     {"id": "FOUR_VOLUME_BACKTEST", "name": "四量终极回测", "page": "盘后数据", "freq": "每日回测批", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run"},  # 🛡 2026-09-07 22:2x：原 key_fields=["periods"] 但 periods 在 summary.by_period 嵌套、回测未跑时顶层缺失 → 永久 warn。改为 summary（永远非空 dict，by_period/calc_time 都在内）。
     {"id": "CFFEX_HOLDINGS", "name": "股指期货持仓", "page": "实时数据", "freq": "盘中每30分（日行情取最近交易日）", "max_age": 120, "key_fields": ["items"], "heal_cat": "intraday"},  # 2026-08-31 修复：cloud_fetch_v8.py 的 tasks 列表含 CFFEX_HOLDINGS，盘中每 30 分执行并刷新 update_time，但数据为日行情取最近交易日；HC 分类应与调度一致，避免盘后/盘中口径冲突
     {"id": "CRISIS_DATA", "name": "危机雷达", "page": "盘后数据", "freq": "收盘后1次", "max_age": 360, "key_fields": ["currency", "global"], "heal_cat": "premarket"},  # 危机雷达每日 08:25 跑一次
@@ -142,6 +142,15 @@ CARD_DEFS = [
     # 🛡 2026-09-02 一劳永逸：HUNTER_BACKTEST.js（大牛股猎手历史回测）此前无 CARD_DEFS 登记，
     #   被通用全量审计按「全量数据/24h 红线」误杀。实际为历史回测产物，依赖 lhb_history，
     #   变化慢、baostock 取 K 线可能不稳定；改为显式登记，max_age=7 天，并纳入算法链日常调度。
+    # 🛡 2026-09-10 主人令：RPS_BACKTEST / STOCK_STOP_DATA 本机 100% 不可解（已实测）
+    #   RPS_BACKTEST 需 baostock 黑名单(10001011) → 阿狸咪无 baostock 凭据；
+    #   阿狸咪的 v8/backtest_rps_offline.py 用 kline_cache 替 baostock 可跑出 T+1/T+3 半残数据，
+    #   已 push 到 main 但仍降级为 degraded=true（无 baostock 凭据前不要全量回测）。
+    #   STOCK_STOP_DATA 需 gtimg 日 K（urllib 走 HTTPS=HTTP 501 腾讯 waf 反爬虫拦截）→ 阿狸咪无浏览器 UA。
+    #   两者均显式登记 manual_dep + manual_note，让面板明确显示「本机限制」而非「陈旧」，
+    #   自愈链不去派发永远刷不出的任务，避免日复一日假派发噪声邮件。
+    {"id": "RPS_BACKTEST", "name": "RPS A档回测", "page": "盘后数据", "freq": "每日盘后", "max_age": 1440, "key_fields": ["summary"], "heal_cat": "algo_run", "manual_dep": True, "manual_note": "需 baostock 拉前复权K线计算 T+1/T+20 持有期收益。本机 baostock 被风控黑名单(err=10001011匿名用户)，无凭据。阿狸咪走 v8/backtest_rps_offline.py 离线半残版（kline_cache 替 baostock，T+1=57样本/T+3=11样本/T+5+0样本 degraded=true）；完整版需小九中国IP在线跑原版。"},
+    {"id": "STOCK_STOP_DATA", "name": "精确止损止盈", "page": "选股策略", "freq": "盘后", "max_age": 1440, "key_fields": ["stocks"], "heal_cat": "algo_run", "manual_dep": True, "manual_note": "需 gtimg 日K(腾讯 urllib HTTPS) 计算 fixedP10/rrK1.5 止损止盈。本机实测 gtimg HTTPS=HTTP 501（腾讯waf反爬虫JS challenge拦截 urllib 类爬虫），无浏览器UA绕不开。本机无替代源，需小九中国IP+浏览器UA在线跑原版。"},
 ]
 
 
@@ -1424,6 +1433,12 @@ def check_data_cards():
         #   陈旧属预期，降 warn 不误报 fail（看板保留提示主人更新）。
         if d.get("manual_dep") and age_min > max_age:
             status = "warn"
+            # 🛡 2026-09-10 主人令：manual_dep 项的 message 必须带 manual_note，
+            #   否则运维面板只显示"陈旧超过阈值"无法判断是"待主人手动更新"还是"本机网络无替代源"。
+            #   区分：note 区分人工(需主人)/网络(需小九中国IP)，让自愈链不会去派发永远刷不出的任务。
+            _note = d.get("manual_note") or d.get("alimi_note")
+            if _note:
+                msg = _note
 
         page = d.get("page")
         # 周末/节假日不更新模块：直接放行，不判 stale、不判空值，避免误告警
