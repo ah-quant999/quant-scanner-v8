@@ -840,6 +840,73 @@ def _is_raw_empty_or_stale(raw_path):
     return (False, "")
 
 
+def _should_skip_data_staleness_guard(var_name, obj):
+    """🛡 2026-09-09 主人令根治「旧 raw 洗新 data」P0 回滚事故：data 比 raw 新则跳过覆盖。
+
+    触发场景：云端 build / 本地自托管跑批，仓库里的 raw_data/*.json 因某种原因（外部
+    已先推 data 而 raw 还没补推 / 上一轮 build 失败留下残缺 raw / 第三方协作编辑了
+    data 但 raw 漏推）变得陈旧，update_v8 仍会按 raw 重建 data/*.js → 用旧内容覆盖
+    新内容，等于「旧 raw 洗新 data」回滚。
+
+    判据：data/<var>.js 的 update_time（语义时间，不是 republish_time 那种构建时刻）
+    > raw 的「真实时间」= max(顶层 update_time, _meta.last_update, 源文件 mtime)，
+    则跳过本次重写（前端拿到的是 data 已有的更新版本，不会被旧 raw 拉回）。
+
+    设计要点：
+    1) **不影响计数**：走 skipped += 1，统计保持一致，CI 日志更易读。
+    2) **不影响 detect-changes / 全量构建**：只跳过「覆盖动作」，流程照常推进。
+    3) **不误伤**：data 不存在（首次构建）/ data 无 update_time / 源 raw 不存在
+       / raw 时间无法取得 → 全部走正常构建，不护栏。
+    4) **不阻断：raw 是空 / 占位的**：由 _is_raw_empty_or_stale 在更前一道拦截，
+       此函数不会被调用到（顺序：empty → staleness → build）。
+    5) **不依赖 mtime 单独**：raw 文件 mtime 在 git checkout 时会被重置（见本脚本
+       334 行 SECTOR_PHASE_HISTORY 注释），用 max 三源兜底最稳。
+
+    返回 (is_skipped: bool, reason: str)。
+    """
+    data_path = DATA_DIR / f"{var_name}.js"
+    if not data_path.exists():
+        return (False, "data 不存在（首次构建）")
+    try:
+        data_text = data_path.read_text(encoding='utf-8')
+    except Exception:
+        return (False, "data 读取失败")
+    m = re.search(r'"update_time"\s*:\s*"([^"]+)"', data_text)
+    if not m:
+        return (False, "data 无 update_time")
+    data_ts = m.group(1)
+    if not data_ts or data_ts in ("", "0001-01-01 00:00:00"):
+        return (False, "data update_time 为空")
+    src_path = None
+    for fname, var in DATA_SOURCES.items():
+        if var == var_name:
+            sp = RAW_DIR / fname
+            if sp.exists():
+                src_path = sp
+            break
+    if src_path is None:
+        return (False, "raw 源不在 DATA_SOURCES 或文件不存在")
+    candidates = []
+    if isinstance(obj, dict):
+        top = obj.get("update_time") or ""
+        if top:
+            candidates.append(("顶层 ut", top))
+        meta = (obj.get("_meta") or {}).get("last_update") or ""
+        if meta:
+            candidates.append(("_meta.lu", meta))
+    try:
+        mtime_ts = datetime.fromtimestamp(src_path.stat().st_mtime, tz=CST).strftime("%Y-%m-%d %H:%M:%S")
+        candidates.append(("mtime", mtime_ts))
+    except Exception:
+        pass
+    raw_ts = max([t for _, t in candidates], default="")
+    if not raw_ts:
+        return (False, "raw 真实时间无法取得")
+    if data_ts > raw_ts:
+        return (True, f"data={data_ts} 已新于 raw={raw_ts}（{dict(candidates)}），跳过覆盖")
+    return (False, f"data={data_ts} ≤ raw={raw_ts}（{dict(candidates)}）")
+
+
 # 🆕 2026-09-05 变量名→raw_data 文件名反向映射（供 RUNNER_STATUS 标 stale）
 _VAR_TO_RAW = {v: k for k, v in DATA_SOURCES.items()}
 
@@ -1031,6 +1098,14 @@ def build(category=None, detect_changes=False):
         is_empty, empty_reason = _is_raw_empty_or_stale(src_path)
         if is_empty:
             print(f"  ⏭️  {src_path.name} 判空/占位（{empty_reason}），跳过重建 data/{var_name}.js（保留线上旧版）")
+            skipped += 1
+            continue
+        # 🛡 2026-09-09 主人令根治「旧 raw 洗新 data」P0 回滚事故：data 比 raw 新则跳过覆盖
+        #   判据：data/<var>.js 的 update_time > raw 的「真实时间」(max(顶层 ut, _meta.last_update, mtime))
+        #   仅跳过本次重写，不影响计数（skipped += 1），前端拿到的是 data 已有的更新版本。
+        is_skipped, skip_reason = _should_skip_data_staleness_guard(var_name, obj)
+        if is_skipped:
+            print(f"  ⏭️  {src_path.name} → data/{var_name}.js | {skip_reason}（云端 build 护栏）")
             skipped += 1
             continue
         out_path = _write_js(var_name, obj)
