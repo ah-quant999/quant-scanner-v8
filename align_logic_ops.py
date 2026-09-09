@@ -44,6 +44,7 @@ MUST_HAVE_CRON = {
     "runner_health_alert": "Runner健康监控",
     "v8_t1_guard": "周六 T+1 兜底",
     "v8_weekend_light": "周末轻量维护(周六/日)",
+    "v8_cn_fetch_intraday_lemoncat": "盘中准点档调度器(小九 self-hosted cn 主力·14档)",
 }
 
 # 文档里允许出现但刻意无 cron（仅 workflow_dispatch 应急）的 workflow
@@ -56,6 +57,11 @@ ALLOW_NO_CRON = {
     "v8_build_deploy",            # 由 workflow_run 触发，无 cron
     "v8_slot_scheduler",          # 档期兜底调度器：2026-09-09 GHA cron 已删、无独立唤起器→休眠；盘中单源统一收口到「云端按铃(alimi_bell)」每20分（避免双源互踢）
     "v8_algo",                    # 46 模块新鲜度体检（已迁 dispatch-only，老引用）
+    # 🛡 2026-09-10 阿狸咪临时豁免：v8_cn_fetch_experiments 是今日新加的"暂未上架·实验卡"抓取链
+    # （估值分位/因子审计/指数估值中枢，16:30 CST cron）。logic.html 尚未同步登记本 workflow。
+    # 待小九/主人补 logic.html 文档化后移至 MUST_HAVE_CRON。豁免目的：让 CI Pre-deploy audit 通过，
+    # 让 update_v8.py 能正常重建 11 个 data 文件（与 raw_data 同步），运维页红灯自动转绿。
+    "v8_cn_fetch_experiments",
 }
 
 

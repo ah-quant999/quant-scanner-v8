@@ -1808,6 +1808,7 @@ CRDS_score = min(100, round(CRDS_raw × 10))   # 归一化并截断到 0~100</di
           <tr><td>09:40 / 10:00 / 10:30 / 11:00 / 11:30 / 13:00 / 13:30 / 14:00 / 14:30 / 15:10</td><td>v8_cn_fetch_cloud</td><td>盘中</td><td>指数行情、亚太市场、ETF脉搏、ETF盘中热度、ETF日监控(实时)、板块资金流、行业树图、个股资金流、概念排行、涨停热力、候选池实时行情、成交金额/涨跌家数(SH_SZ_HISTORY)</td></tr>
           <tr><td>15:30 / 17:20</td><td>v8_cn_fetch_cloud</td><td>盘后</td><td>EXPERIMENT、期指主力合约、大盘资金流累积序列、ETF日监控再补抓(T+1收盘定稿)、龙虎榜历史回填</td></tr>
           <tr><td>16:30</td><td>v8_cn_fetch_cloud</td><td>港股收盘补抓</td><td>港股16:00收盘后补抓恒指/港股候选/盘中模块收盘值（A股已收盘，不重复抓A股）</td></tr>
+          <tr><td>16:30</td><td>v8_cn_fetch_experiments</td><td>实验卡（暂未上架）</td><td>🧪 2026-09-10 主人令：3 张实验卡（估值分位切换 / 因子审计 / 指数估值中枢）盘后抓取，独立于主链 v8_cn_fetch_cloud 的 17:20/18:20/19:20 三档，避免单点失败连累主链路。fetcher→update_v8→推 main 原子提交（仅这 3 张相关 data + index.html）。</td></tr>
           <tr><td>盘中每30分</td><td>v8_risk_gauge</td><td>危机雷达</td><td>危机雷达/风险温度计实时刷新（美股开盘情绪覆盖 19:00-22:00 北京时间）</td></tr>
           <tr><td>16:40 / 18:10 / 19:15 / 20:00（A/B/C/D 四批）</td><td>v8_algo_cloud<br><span style="color:var(--cyan)">+ 探针路由</span></td><td>盘后算法（云端主链·分批跑）</td><td>A采集/B选股/C回测/D汇总(final_recommend)；龙虎榜/三重共识/逆势龙头/top10/回测/板块资金流趋势/停牌预警/市场预警/NT数据（已迁 GitHub 云端 ubuntu）。<br><span style="color:var(--cyan)">调度前探针检查 lemoncat-cn 状态：online+idle 则 A/B/C 批转派中国节点；离线/忙/失败均回落云端。</span></td></tr>
           <tr><td>23:00</td><td>v8_backup</td><td>每日备份</td><td>备份 raw_data/*.json 防意外丢失（push 至 main）</td></tr>
