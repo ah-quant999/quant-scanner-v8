@@ -551,7 +551,6 @@ window.__domReadyFns=[];
     <script src="data/RISK_GAUGE.js?v=0b2460958b" defer></script><!-- 2.4 KB · 风险仪表（8985 行读取） -->
     <script src="data/SECTOR_RECOMMENDATION.js?v=5b8a1321be" defer></script><!-- 3.8 KB · 板块推荐（11706 行读取） -->
     <script src="data/WEEKEND_META_REPORT.js?v=3da570c4a0" defer></script><!-- 0.2 KB · 周末元报告（8996 行读取） -->
-  <script src="data/DELISTED.js?v=fe7564d8ba" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=a0f136067b" defer></script>
     <!-- 2026-09-02 08:57 主人令：恢复 CONCEPT_ETF_MAP 注入（ETF·龙头参考卡用；main 上 data/CONCEPT_ETF_MAP.js 确实存在，update_time 2026-08-18） -->
     <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
@@ -12401,9 +12400,6 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
   /* 2026-08-30 主人令：暂未上架 + 已下架股票目录填充（统一 unlistedPanel + dl 两个 tab 共用） */
   function _renderV8StockLists(){
     var ulEl = document.getElementById('unlistedPanel');
-    var ds = window.DELISTED_STOCKS || {};
-    var dsRecent = ds.recent || [];
-    var dsTotal = ds.total || 0;
     // 🛡 2026-09-02 主人令根治：UNLISTED_PANEL 为 defer 脚本，未注入即「模块去向索引」卡永久空 → 轮询补填
     if(!window.UNLISTED_PANEL){
       if(!window.__ulIdxRetryTimer){
@@ -12437,81 +12433,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       h+='</div>';
       return h;
     }
-    /* 🛡 2026-09-01 主人令一劳永逸：已下架目录「合理性护栏」
-       事故复盘：算法端 algorithms/refresh_stock_metadata.py 用「全量差集」判退市且零阈值护栏——
-         delisted = old_stock_names - fresh_stock_names
-       当 fetch_stock_names 某轮口径塌缩（只返回单一市场）时，另一市场的全部在市股票被判退市并
-       永久归档（下游 existing_delisted_codes 去重 ⇒ 污染不可自愈）：
-         · 2026-08-19 整个港股主板被归档（00001 长和 / 00002 中电控股 / 00005 汇丰控股…）
-         · 2026-08-27 整个 A 股主板被归档（600000 浦发银行 / 600028 中国石化 / 600036 招商银行…）
-       累计污染 7935 条 —— 这正是主人看到「已下架很多 3 天前」的真相：全是在市蓝筹被误判。
-       前端不替数据背锅：两道校验任一不过，只显示诊断卡，绝不展示误判明细。 */
-    function _delistedAudit(){
-      var live = {};
-      function put(c){ if(!c) return; c=String(c).replace(/^(sh|sz|hk|bj)[_\.]?/i,''); live[c]=1; live[c.replace(/^0+/,'')]=1; }
-      function collect(src, key){
-        if(!src) return;
-        if(Object.prototype.toString.call(src)==='[object Array]'){
-          for(var i=0;i<src.length;i++){
-            var it=src[i];
-            if(it && typeof it==='object') put(it[key||'code'] || it.code);
-            else put(it);
-          }
-        } else if(typeof src==='object'){
-          for(var k in src) put(k);
-        }
-      }
-      try{ collect((window.CANDIDATE||{}).stocks); }catch(e){}
-      try{ collect((window.GOLD_POOL||{}).stocks); collect((window.GOLD_POOL||{}).candidates); }catch(e){}
-      try{ collect((window.STOCK_RPS_DATA||{}).records); }catch(e){}
-      try{ collect((window.CANDIDATE_QUOTES||{}).items); }catch(e){}
-      var falsePos=[], liveN=0;
-      for(var lk in live) liveN++;
-      for(var j=0;j<dsRecent.length;j++){
-        var raw=String(dsRecent[j].code||'');
-        if(live[raw] || live[raw.replace(/^0+/,'')]) falsePos.push((dsRecent[j].name||'')+' '+raw);
-      }
-      var reasons=[];
-      // ① 规模护栏：A股+港股有史以来累计退市约 200~300 只，单一目录破 300 必属误判
-      if(dsTotal>300) reasons.push('目录总数 <b>'+dsTotal+'</b> 只，远超 A股+港股历史累计退市规模（正常 &lt; 300）——典型「全量差集误判」特征');
-      // ② 在市交叉校验：误判股必然仍出现在当前在市数据源里
-      if(falsePos.length>0) reasons.push('最近 '+dsRecent.length+' 条中有 <b>'+falsePos.length+'</b> 只仍出现在当前在市数据源（仍在交易）：'+falsePos.slice(0,6).join('、')+(falsePos.length>6?' 等':''));
-      return {ok:reasons.length===0, reasons:reasons, falsePos:falsePos.length, liveN:liveN};
-    }
-    function stocksHtml(){
-      var audit=_delistedAudit();
-      if(!audit.ok){
-        var hd='<div class="card" style="border-left:4px solid #ef5350;margin-top:14px;">'
-          +'<h3><span class="ic">🚨</span>已下架股票目录 <span class="fresh" style="color:#ef5350">数据源异常 · 已屏蔽展示</span></h3>'
-          +'<div style="padding:10px 14px;font-size:12px;line-height:1.9;color:var(--sub)">'
-          +'<div style="color:#ef5350;font-weight:700;margin-bottom:6px;">校验未通过，本卡拒绝展示明细（避免把在市股票显示成已下架）：</div>';
-        audit.reasons.forEach(function(r){ hd+='<div style="padding-left:14px;position:relative;margin-bottom:4px;"><span style="position:absolute;left:0;color:#ef5350">•</span>'+r+'</div>'; });
-        hd+='<div style="margin-top:10px;padding:8px 10px;background:var(--card2);border:1px solid var(--border);border-radius:6px;font-size:11.5px;color:var(--dim);line-height:1.8;">'
-          +'<b style="color:var(--sub)">根因</b>：算法端「退市 = 昨日全量列表 − 今日全量列表」无阈值护栏，'
-          +'全量列表抓取口径塌缩时会把另一市场的全部在市股票判成退市，且归档去重使污染永久化。<br>'
-          +'<b style="color:var(--sub)">处置</b>：已在算法端加三重护栏（口径塌缩 / 单轮退市数 / 列表过小），'
-          +'并清空被污染的退市归档重建目录；护栏生效后本卡自动恢复正常展示。'
-          +'</div></div></div>';
-        return hd;
-      }
-      var h='<div class="card" style="border-left:4px solid #7b1fa2;margin-top:14px;">'
-          +'<h3><span class="ic">📜</span>已下架股票目录 <span class="fresh">共 '+dsTotal+' 只 · 最近 '+dsRecent.length+' 条</span></h3>'
-          +'<div style="padding:10px 14px;">'
-          +(dsTotal===0 ? '<div style="font-size:12px;color:var(--dim);line-height:1.8;">✅ 当前无退市记录（2026-09-01 已清空被误判污染的历史归档，算法端护栏已生效；后续真实退市将逐条累积）</div>' : '')
-          +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;">';
-      dsRecent.forEach(function(s){
-        h+='<div style="background:var(--card2);padding:6px 10px;border-radius:6px;border:1px solid var(--border2);border-left:3px solid #7b1fa2;font-size:12px;">'
-          +'<b style="color:var(--txt)">'+(s.name||"")+'</b>'
-          +' <span style="color:var(--dim);font-family:monospace;font-size:10.5px;">'+(s.code||"")+'</span>'
-          +'<div style="font-size:10.5px;color:var(--dim);margin-top:2px;">'+(s.delisted_date||"")+' · '+(s.last_board||"")+'</div>'
-          +'</div>';
-      });
-      h+='</div></div>';
-      if(dsTotal>dsRecent.length) h+='<div style="font-size:10.5px;color:var(--dim);padding:8px 14px 0;">显示最近 '+dsRecent.length+' 条 · 共 '+dsTotal+' 只（A股+港股退市归档，按 delisted_date 倒序；已过在市交叉校验）</div>';
-      h+='</div>';
-      return h;
-    }
-    if(ulEl) ulEl.innerHTML = modulesHtml() + stocksHtml();
+    if(ulEl) ulEl.innerHTML = modulesHtml();
   }
   window._renderV8StockLists = _renderV8StockLists;
 
