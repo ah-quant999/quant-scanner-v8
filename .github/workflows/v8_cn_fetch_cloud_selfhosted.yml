@@ -229,8 +229,13 @@ jobs:
           exit 0
 
       - name: "📡 抓中国数据 → raw_data/（selective）"
-        # 🛡️ 2026-08-12 移除 continue-on-error：抓取失败必须让 job 失败，
-        #    阻止 api_push_raw 把只刷了 update_time 的空壳数据推送到 main。
+        # 🛡️ 2026-08-12 曾移除 continue-on-error（防空壳推送）。
+        # 🔴 2026-09-09 盘中更新审计·一劳永逸：反转——本步失败不再令整 job 失败。
+        #    原因：intraday 单源（LIMIT_UP/ETF/题材等）失败即令整轮非零 → selfhosted job 被 kill
+        #    → 后续 api_push_raw/update_v8/health_check 全 skipped → 盘中数据整段空窗（13点事故同类）。
+        #    配合 cloud_fetch_v8._has_critical_failures(intraday 仅核心源致命) + 消费层软失败策略，
+        #    本步失败仅留痕、其余已成功源照常推送，兜得住。空壳防护改由 freshness 看门狗事后核对。
+        continue-on-error: true
         shell: bash
         run: |
           cat="${{ steps.cat.outputs.category }}"
