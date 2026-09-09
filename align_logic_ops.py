@@ -44,7 +44,10 @@ MUST_HAVE_CRON = {
     "runner_health_alert": "Runner健康监控",
     "v8_t1_guard": "周六 T+1 兜底",
     "v8_weekend_light": "周末轻量维护(周六/日)",
-    "v8_cn_fetch_intraday_lemoncat": "盘中准点档调度器(小九 self-hosted cn 主力·14档)",
+    # 🛡 2026-09-10 移出：v8_cn_fetch_intraday_lemoncat 是「小九 self-hosted cn 主力·盘中14档」调度器，
+    # 设计上就是 dispatch-only（由小九准点档/云端按铃按档派发），GHA cron 已刻意删除（防双源互踢）。
+    # 原放在 MUST_HAVE_CRON 会恒定报「期望有 cron 但实际无 cron」→ Pre-deploy audit 阻断 → CI 不重建 data
+    # → 运维页 11 个假红灯。故移入 ALLOW_NO_CRON（语义正确：允许无 cron）。
 }
 
 # 文档里允许出现但刻意无 cron（仅 workflow_dispatch 应急）的 workflow
@@ -62,6 +65,7 @@ ALLOW_NO_CRON = {
     # 待小九/主人补 logic.html 文档化后移至 MUST_HAVE_CRON。豁免目的：让 CI Pre-deploy audit 通过，
     # 让 update_v8.py 能正常重建 11 个 data 文件（与 raw_data 同步），运维页红灯自动转绿。
     "v8_cn_fetch_experiments",
+    "v8_cn_fetch_intraday_lemoncat",  # 见上方 MUST_HAVE_CRON 移出说明：dispatch-only 准点档，无 cron 属设计
 }
 
 
