@@ -1,17 +1,8 @@
 {
-  "update_time": "2026-09-09 19:35:24",
-  "run_start": "2026-09-09 17:09:43",
-  "ok": 6,
-  "fail": 2,
-  "failed_scripts": [
-    {
-      "script": "export_optimized_strategy.py",
-      "reason": "退出码 1 | ⚠️ backtest_tdx.json 中无 optimized_summary，先运行 backtest_tdx.py"
-    },
-    {
-      "script": "factor_lab_backtest.py",
-      "reason": "超时 >30min"
-    }
-  ],
+  "update_time": "2026-09-10 01:43:15",
+  "run_start": "2026-09-10 01:24:52",
+  "ok": 12,
+  "fail": 0,
+  "failed_scripts": [],
   "skipped_by_time_gate": []
 }
