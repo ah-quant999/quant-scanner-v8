@@ -724,7 +724,6 @@ window._uBadge = _uBadge; window.setBadge = setBadge;
   <script src="data/RISK_GAUGE.js?v=f90a48fe41" defer></script>
   <script src="data/SECTOR_RECOMMENDATION.js?v=3f3856577e" defer></script>
   <script src="data/WEEKEND_META_REPORT.js?v=14594c5a2a" defer></script>
-  <script src="data/DELISTED.js?v=9eef4eba4e" defer></script>
   <script src="data/AVG_PRICE_DATA.js?v=2816fdd5d7" defer></script>
   <script src="data/CONCEPT_ETF_MAP.js?v=5a0c4641e1" defer></script>
   <script src="data/PORTFOLIO.js?v=1d8d158a7d" defer></script>
@@ -7540,9 +7539,6 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
   /* 2026-08-30 主人令：暂未上架 + 已下架股票目录填充（统一 unlistedPanel + dl 两个 tab 共用） */
   function _renderV8StockLists(){
     var ulEl = document.getElementById('unlistedPanel');
-    var ds = window.DELISTED_STOCKS || {};
-    var dsRecent = ds.recent || [];
-    var dsTotal = ds.total || 0;
     var d = window.UNLISTED_PANEL || {};
     var mods = d.modules || [];
     function modulesHtml(){
@@ -7561,24 +7557,7 @@ h+='<div style="background:linear-gradient(135deg,rgba(167,139,250,.18),rgba(167
       h+='</div>';
       return h;
     }
-    function stocksHtml(){
-      var h='<div class="card" style="border-left:4px solid #7b1fa2;margin-top:14px;">'
-          +'<h3><span class="ic">📜</span>已下架股票目录 <span class="fresh">共 '+dsTotal+' 只 · 最近 '+dsRecent.length+' 条</span></h3>'
-          +'<div style="padding:10px 14px;">'
-          +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;">';
-      dsRecent.forEach(function(s){
-        h+='<div style="background:var(--card2);padding:6px 10px;border-radius:6px;border:1px solid var(--border2);border-left:3px solid #7b1fa2;font-size:12px;">'
-          +'<b style="color:var(--txt)">'+(s.name||"")+'</b>'
-          +' <span style="color:var(--dim);font-family:monospace;font-size:10.5px;">'+(s.code||"")+'</span>'
-          +'<div style="font-size:10.5px;color:var(--dim);margin-top:2px;">'+(s.delisted_date||"")+' · '+(s.last_board||"")+'</div>'
-          +'</div>';
-      });
-      h+='</div></div>';
-      if(dsTotal>dsRecent.length) h+='<div style="font-size:10.5px;color:var(--dim);padding:8px 14px 0;">显示最近 '+dsRecent.length+' 条 · 共 '+dsTotal+' 只（港股下架样本，按 delisted_date 倒序）</div>';
-      h+='</div>';
-      return h;
-    }
-    if(ulEl) ulEl.innerHTML = modulesHtml() + stocksHtml();
+    if(ulEl) ulEl.innerHTML = modulesHtml();
   }
   window._renderV8StockLists = _renderV8StockLists;
 
