@@ -1,12 +1,13 @@
-name: "🔍 mahoro API 探测(只读)"
+name: "maharo API probe"
 
 on:
   workflow_dispatch:
     inputs:
-      endpoints:
-        description: "逗号分隔的额外 /api/ 路径（不含域名），留空=只抓首页链接+已知端点"
+      dummy:
+        description: "placeholder"
         required: false
         default: ""
+
 permissions:
   contents: write
 
@@ -20,59 +21,18 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-
-      - name: "🐍 配置 Python"
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
-      - name: "🔍 探测 mahoro API"
+      - name: "run probe"
         env:
           MAHORO_COOKIE: ${{ secrets.MAHORO_COOKIE }}
-          EXTRA_ENDPOINTS: ${{ inputs.endpoints }}
-        run: |
-          python - <<'PY'
-import urllib.request, json, os, re
-BASE="https://data.maharo.cn"
-CK=os.environ.get("MAHORO_COOKIE","").strip()
-def get(path, cookie=""):
-    url=BASE+path
-    req=urllib.request.Request(url, headers={"User-Agent":"Mozilla/5.0","Accept":"application/json"})
-    if cookie: req.add_header("Cookie", cookie)
-    try:
-        r=urllib.request.urlopen(req, timeout=20)
-        return r.read().decode("utf-8","replace"), r.headers.get("content-type","")
-    except Exception as e:
-        return "ERR: %s" % e, "text/plain"
-
-out=[]
-# 1) 首页：找所有 /api/ 链接
-html, ct = get("/")
-apis=set(re.findall(r'(/api/[A-Za-z0-9_./-]+)', html))
-out.append("=== 首页 /api/ 链接 (content-type=%s) ===" % ct)
-out.append("\n".join(sorted(apis)) or "(无)")
-# 2) 已知 signals 端点
-sig, ct2 = get("/api/signals?limit=2", CK)
-out.append("\n=== /api/signals (ct=%s) ===" % ct2)
-out.append((sig[:2000] if not sig.startswith("ERR") else sig))
-# 3) 候选新端点（专家档案/估值分位/聚合等）
-cands=["/api/experts","/api/valuation","/api/research","/api/sources","/api/profile","/api/aggregate","/api/docs","/api/user","/api/signal/aggregate"]
-ep=os.environ.get("EXTRA_ENDPOINTS","").strip()
-if ep:
-    cands += [e for e in ep.split(",") if e]
-for c in cands:
-    r, _=get(c, CK)
-    out.append("\n=== %s ===" % c)
-    out.append((r[:1500] if not r.startswith("ERR") else r))
-open("maharo_probe_result.txt","w",encoding="utf-8").write("\n".join(out))
-print("PROBE DONE, total bytes=", len("\n".join(out)))
-          PY
-
-      - name: "📤 提交探测结果到分支 maharo-probe"
+        run: python scripts/probe_maharo.py
+      - name: "push result to maharo-probe branch"
         run: |
           git config user.email "bot@workbuddy.local"
           git config user.name "WorkBuddy Bot"
-          git checkout -B mahoro-probe
+          git checkout -B maharo-probe
           git add maharo_probe_result.txt
-          git commit -m "probe: maharo api endpoints (read-only)" || echo "nothing to commit"
-          git push --force origin maharo-probe
+          git commit -m "probe: mahoro api result" || echo "nothing"
+          git push --force origin mahoro-probe
