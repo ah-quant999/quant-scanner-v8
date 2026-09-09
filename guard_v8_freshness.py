@@ -102,6 +102,7 @@ CORE_SOURCES = {
     "VOLATILITY": 26,
     "W52_HIGH": 26,
     "INDEX_QUOTES": 26,
+    "CANDIDATE_QUOTES": 35,   # 🔴 2026-09-09 盘中更新审计：候选池纳入 CORE（阈值 35min，盘中每20分刷新留冗余）；非交易时段由下方 _is_market_open 过滤豁免
     "ETF_PULSE": 26,
     "ETF_DAILY_MONITOR": 26,
     # 🛡 2026-09-08 盘中更新审计·一劳永逸：STOCK_QUOTE 此前不在任何监控清单，
