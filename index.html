@@ -8092,7 +8092,23 @@ window.__renderV8CalFull();
     }
     $b3.innerHTML = h3;
 
-    setBadge('phSectorTime', '盘后', '短线', sft.update_time || sff.update_time || sr.update_time || '');
+    // 🛡 2026-09-09 一劳永逸：phSectorTime 三源挑「今日 update_time」优先。
+    //   原 sft.update_time || sff.update_time || sr.update_time 在 SECTOR_FUND_FLOW_TREND
+    //   卡昨日时会把整张卡顶成"昨日 17:31"，但 SECTOR_RS（盘后定稿每日都有）和
+    //   SECTOR_FUND_FLOW（盘后仍有）通常是当日——应优先用当日时间显示，让"过期胶囊"
+    //   只在三源都陈旧时才真正触发（避免一张卡里的"陈旧孤儿模块"遮盖另两源的真实当日时间）。
+    var _sectorTs = '';
+    try {
+      var _today = (window._cstParts ? window._cstParts(new Date()) : null);
+      _today = _today ? (_today.y + '-' + String(_today.m).padStart(2,'0') + '-' + String(_today.d).padStart(2,'0'))
+                     : new Date().toISOString().slice(0,10);
+      var _isToday = function(t){ return t && String(t).indexOf(_today) === 0; };
+      _sectorTs = (_isToday(sft.update_time) ? sft.update_time : '')
+                || (_isToday(sff.update_time) ? sff.update_time : '')
+                || (_isToday(sr.update_time)  ? sr.update_time  : '')
+                || sft.update_time || sff.update_time || sr.update_time || '';
+    } catch(_){ _sectorTs = sft.update_time || sff.update_time || sr.update_time || ''; }
+    setBadge('phSectorTime', '盘后', '短线', _sectorTs);
   }
 
   /* ---- 主力净额分时累计曲线  /* ---- 主力净额分时累计曲线（盘中分时 + 盘后定基合并成一条线，2026-08-18 加） ---- */
