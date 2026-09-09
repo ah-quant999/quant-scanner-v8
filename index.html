@@ -7438,7 +7438,9 @@ window.__renderV8CalFull();
     today = dateFromUpdate(data&&data.update_time) || todayStr(new Date());
     grouped = classify((data&&data.stocks)||[], today);
     const fresh=document.getElementById('ipoFresh');
-    if(fresh && data && data.update_time) fresh.innerHTML = _uBadge('盘中','短线',data.update_time) + (fmtStaleness(data.update_time) || '');
+    // 2026-09-09 一劳永逸：打新是日频盘前数据（07:40 产出），不应使用盘中 1.5h SLA，
+    //   否则开盘后 1.5h 即误报「已停更 N 小时」。
+    if(fresh && data && data.update_time) fresh.innerHTML = _uBadge('盘前','日频',data.update_time) + (fmtStaleness(data.update_time) || '');
     else if(fresh && data && data._isFallback) fresh.innerHTML = '<span style="color:#fbbf24;font-weight:700;">⚠️ 打新数据暂不可用（兜底空态，非实时）</span>';
     renderAll();
   }
