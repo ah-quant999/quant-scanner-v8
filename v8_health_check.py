@@ -1908,7 +1908,11 @@ def check_runner():
                     stuck_min = 0
 
             is_fail = (latest_failed and checkout_failures > 0) or consecutive >= 3
-            is_warn = (latest_failed and not is_fail) or (latest and latest.get("status") == "in_progress" and stuck_min > 10)
+            # 2026-09-09 一劳永逸：stuck 阈值 10 -> 30 分钟。实测 v8_cn_fetch_cloud（workflow 327687211）
+            #   单次抓取耗时 17.8~26.0 分钟（最近 6 次 success 实测），10 分钟阈值会在每次抓取跑到
+            #   一半时误报 warn（假告警家族：阈值 < 任务真实耗时，与 D2-C liveUpdated 同型）。
+            #   30 分钟覆盖最长实测 26 分并留余量，同时仍能抓到真卡死（远超 26 分即异常）。
+            is_warn = (latest_failed and not is_fail) or (latest and latest.get("status") == "in_progress" and stuck_min > 30)
 
             if is_fail:
                 results.append({
