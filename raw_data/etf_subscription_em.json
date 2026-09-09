@@ -1,13 +1,13 @@
 {
-  "update_time": "2026-09-10 06:53:34",
+  "update_time": "2026-09-10 07:31:11",
   "source": "akshare fund_etf_spot_em (东方财富)",
   "metric": "净流入(亿元) + 规模(亿元)",
   "categories": {
     "stock": {
       "name": "股票型",
       "net_amount_yi": -29.696040339999985,
-      "scale_yi": 29591.600486140032,
-      "n_funds": 1307,
+      "scale_yi": 29586.397318610037,
+      "n_funds": 1308,
       "top5": [
         {
           "code": "511880",
@@ -51,13 +51,13 @@
     "money": {
       "name": "货币型",
       "net_amount_yi": 0.43251543,
-      "scale_yi": 552.5247887600001,
+      "scale_yi": 551.76407553,
       "n_funds": 50,
       "top5": [
         {
           "code": "159201",
           "name": "自由现金流ETF华夏",
-          "scale_yi": 162.78,
+          "scale_yi": 162.39,
           "net_amount_yi": 0.3015
         },
         {
@@ -75,7 +75,7 @@
         {
           "code": "159001",
           "name": "货币ETF易方达",
-          "scale_yi": 32.87,
+          "scale_yi": 32.5,
           "net_amount_yi": -0.0118
         },
         {
@@ -89,7 +89,7 @@
     "commodity": {
       "name": "商品型",
       "net_amount_yi": -0.6693188300000004,
-      "scale_yi": 3571.34614778,
+      "scale_yi": 3571.960413760001,
       "n_funds": 55,
       "top5": [
         {
@@ -127,7 +127,7 @@
     "cross_border": {
       "name": "跨境型",
       "net_amount_yi": -11.164729899999998,
-      "scale_yi": 6063.630696530002,
+      "scale_yi": 6063.681515000001,
       "n_funds": 192,
       "top5": [
         {
@@ -151,7 +151,7 @@
         {
           "code": "159792",
           "name": "港股通互联网ETF富国",
-          "scale_yi": 346.41,
+          "scale_yi": 345.4,
           "net_amount_yi": -1.3149
         },
         {
